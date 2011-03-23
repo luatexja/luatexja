@@ -1,0 +1,113 @@
+
+% Fonts  for 8pt
+\font\eightrm=cmr8
+\font\eightbf=cmbx8
+\font\eightit=cmti8
+\font\eightsl=cmsl8
+\font\eightmus=cmmi8
+\font\eighttt=cmtt8
+% Fonts  for 12pt
+\font\twelverm=cmr12
+\font\twelvebf=cmbx12
+\font\twelveit=cmti12
+\font\twelvesl=cmsl12
+\font\twelvemus=cmmi12
+\font\twelvett=cmtt12
+
+\font\bigbf=cmbx12 scaled \magstep3
+\font\eightsc=cmcsc10 at 8pt
+\font\tensc=cmcsc10
+\font\twelvesc=cmcsc10 at 12pt
+
+% Japanese fonts
+\input luatexja-core.sty
+\loadjfontmetric{mt}{ujis}
+\loadjfontmetric{zero}{mono}
+\def\minfnt{file:ipam.ttf }
+\def\gothfnt{file:ipag.ttf }
+\font\eightipam=\minfnt at 10.5\jQ\jfont\eightipam{mt}
+\font\eightipag=\gothfnt at 10.5\jQ\jfont\eightipag{mt}
+\font\tenipam=\minfnt at 13.5\jQ\jfont\tenipam{mt}
+\font\tenjtt=\gothfnt at 13.5\jQ\jfont\tenjtt{zero}
+\font\tenipag=\gothfnt at 13.5\jQ\jfont\tenipag{mt}
+\font\twelveipam=\minfnt at 16\jQ\jfont\twelveipam{mt}
+\font\twelveipag=\gothfnt at 16\jQ\jfont\twelveipag{mt}
+\font\bigipag=\gothfnt at 28\jQ\jfont\bigipag{mt}
+
+% Size 
+\def\large{\def\rm{\textfont0=\twelverm\twelverm\fam0}\def\bf{\twelvebf\gt}%
+  \let\it=\twelveit  \let\sl=\twelvesl \let\mus=\twelvemus 
+  \let\sc=\twelvesc  \let\tt=\twelvett
+  \let\mc=\twelveipam \let\gt=\twelveipag
+  \baselineskip=18pt\rm\mc\xkanjiskip=0.25\zw plus 0.10\zw minus 0.10\zw}
+
+\def\big{\bigbf\bigipag\xkanjiskip=0.25\zw plus 0.10\zw minus 0.10\zw}
+
+\def\normalsize{\def\rm{\textfont0=\tenrm\tenrm\fam0}\def\bf{\tenbf\gt}%
+  \let\it=\tenit \let\sl=\tensl \let\mus=\tenmus 
+  \let\sc=\tensc \def\tt{\tentt\tenjtt}%
+  \let\mc=\tenipam \let\gt=\tenipag
+  \baselineskip=15pt\rm\mc\xkanjiskip=0.25\zw plus 0.10\zw minus 0.10\zw}
+\def\small{\def\rm{\textfont0=\eightrm\eightrm\fam0}\def\bf{\eightbf\gt}%
+  \let\it=\eightit \let\sl=\eightsl \let\mus=\eightmus 
+  \let\sc=\eightsc \def\tt{\eighttt\eightjtt}%
+  \let\mc=\eightipam \let\gt=\eightipag%
+  \rm\mc\xkanjiskip=0.25\zw plus 0.10\zw minus 0.10\zw%
+  \ykbaselineshift=-49807\yabaselineshift=-49807% 0.76 pt
+}
+
+
+
+% layout
+\normalsize\parindent=1\zw\parskip=0pt
+\pdfpagewidth=210mm\pdfpageheight=297mm
+\hsize=40\zw\hoffset=\dimexpr(\pdfpagewidth-\hsize)/2-1in\relax
+\vsize=246mm
+
+% heading
+\outer\def\beginsection#1\par{\vskip0pt plus.1\vsize\penalty-250%
+  \vskip0pt plus-.1\vsize\bigskip\vskip\parskip%
+  \message{#1}\leftline{\large\bf#1\hskip0.5\zw\hrulefill}\nobreak\smallskip}
+\outer\def\beginparagraph#1\par{\vskip0pt plus.1\vsize\penalty-100%
+  \vskip0pt plus-.1\vsize\medskip\vskip\parskip%
+  \message{#1}\leftline{\bf■#1}\nobreak}
+
+% verbatim
+% borrowed from manmac.tex
+\chardef\other=12
+\newbox\vspbox
+\setbox\vspbox=\hbox{\tt\char32}
+{\catcode`\ =\active%\catcode`\%=\active
+\gdef\ttverbatim{\begingroup\xkanjiskip=0pt
+\catcode`\ =\active\let =~\catcode`\%=\other
+\catcode`\\=\other\catcode`\{=\other\catcode`\}=\other
+\catcode`\$=\other\catcode`\&=\other\catcode`\#=\other\catcode`\~=\other
+\catcode`\_=\other\catcode`\^=\other\catcode"FFFFF=12%" <- needed
+\obeyspaces\obeylines\tt}}
+
+\abovedisplayskip=\medskipamount
+\abovedisplayshortskip=\medskipamount
+\belowdisplayskip=\medskipamount
+\belowdisplayshortskip=\medskipamount
+%
+\outer\def\begintt{$$\let\par=\endgraf \ttverbatim\parskip=0pt\catcode`\|=0 \rightskip-5pc\ttfinish}
+{\catcode`\|=0 |catcode`|\=\other% | is temporary escape character
+|obeylines% end of line is active
+|gdef|ttfinish#1^^M#2\endtt{#1|parindent3|zw|noindent|vbox{#2}|hss|endgroup$$}}
+
+\catcode`\|=\active
+{\obeylines \gdef|{\ttverbatim \spaceskip.5em\let^^M=\  \let|=\endgroup}}
+
+\catcode`\<=\active
+\def<#1>{{\it$\langle$#1$\rangle$}}
+
+% itemize
+\newcount\enumi\enumi=0
+\def\item{\par\medskip\leftskip=3\zw\noindent\hskip-1\zw\hbox to 1\zw{\hss$\bullet$\hss}\kern-1\zw　}
+\def\itemitem{\par\leftskip=5\zw\noindent\hskip-1\zw\hbox to 1\zw{\hss$-$\hss}\kern-1\zw　}
+\def\itemT{\par\leftskip=7\zw\noindent\hskip-1\zw\hbox to 1\zw{\hss$\bullet$\hss}\kern-1\zw　}
+\def\enum{\par\medskip\advance\enumi1\leftskip=3\zw\noindent\hskip-1\zw\hbox to 1\zw{\hss\the\enumi.\kern0.5\zw}\kern-1\zw　}
+\def\enditem{\medskip\par\enumi=0\leftskip=0pt\parskip=0pt\noindent}
+
+
+\endinput

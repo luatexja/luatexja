@@ -1,0 +1,17 @@
+\parindent0pt
+\output={\shipout\box255}
+\tt\catcode`\_=12
+\def\{{\char'173 }\def\}{\char'175}
+\toks0={\%}
+\def\postbreakpenalty{\out\toks0={\string\postbreakpenalty\{}\count600 }%
+\def\prebreakpenalty{\out\toks0={\string\prebreakpenalty\{}\count600 }%
+\def\inhibitxspcode{\out\toks0={\string\inhibitxspcode\{}\count600 }%
+\def\xspcode{\out\toks0={\string\xspcode\{}\count600 }%
+\catcode`\=13
+\def={\count601 }%\
+\def\out{\par\the\toks0 \the\count600\}\{\the\count601\}}
+\input ukinsoku
+\end
+
+% euptex pte-kinsoku-make ; dvitype -output-level=1 pte-kinsoku-make
+% | grep "\[" | sed "s/\[\(.*\)\]/\1/" > pte-kinsoku.tex

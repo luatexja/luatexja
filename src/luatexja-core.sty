@@ -1,0 +1,83 @@
+\input luaotfload.sty
+\catcode`\@=11
+\catcode"FFFFF=14 %"
+
+\ifdefined\luatexja@loaded\endinput\fi
+\def\luatexja@loaded{hoge}
+
+\newcount\luatexja@tempcnta
+\newdimen\luatexja@tempdima
+%\newcount\jcharwidowpenalty
+\newskip\kanjiskip\kanjiskip=0pt minus.4pt
+\newskip\xkanjiskip
+\newdimen\zw
+\newdimen\zh
+\newdimen\jQ \jQ=0.25mm
+\newdimen\jH \jH=0.25mm
+\newcount\luatexja@autospc
+\newcount\luatexja@autoxspc
+
+\directlua{%
+  ltj = {}
+  function ltj.loadlua(file)
+    local path = assert(kpse.find_file(file, 'tex'),
+      "File '"..file.."' no found")
+    texio.write_nl("("..path..")")
+    dofile(path)
+  end
+  ltj.loadlua('luatexja-core.lua')
+  ltj.loadlua('luatexja-core-aux.lua')
+}
+
+% Attributes for Japanese typesetting.
+\newluatexattribute\luatexja@curjfnt   % index for ``current Japanese font''
+\newluatexattribute\luatexja@yablshift % attribute for \yabaselineshift
+\newluatexattribute\luatexja@ykblshift % attribute for \ykbaselineshift
+
+% for italic correction
+\newluatexattribute\luatexja@icflag
+\let\luatexja@ic=\/
+\def\/{{\luatexja@icflag=1\luatexja@ic}}
+
+% for hyphenation
+\newlanguage\luatexja@japanese
+\directlua{ltj.ja_lang_number=\the\luatexja@japanese}
+
+
+% \jfont<font><metric name> : Regard <font> as a Japanese font.
+% <font> must be defined by \font primitive already, and <metric> must be a control 
+% sequence defined by \loadjfontmetric below.
+\def\jfont{\directlua{ltj.jfontdefA(true)}}
+\def\@jfont#1{\directlua{ltj.jfontdefB('#1')}}
+
+% \loadjfontmetric<metric name><filename> : 
+% load <filename> which contains a font metric for a Japanese font.
+\def\loadjfontmetric#1#2{% #1: key, #2: file name
+\directlua{
+  jfm.name='#1'; jfm.char_type={}; jfm.glue={}; jfm.kern={}
+  ltj.loadlua('luatj-#2.lua'); ltj.loadjfontmetric()}
+}
+
+% ybaselineshift
+\let\yabaselineshift=\luatexja@yablshift % 欧文文字
+\let\ykbaselineshift=\luatexja@ykblshift % 和文文字
+\luatexja@yablshift=0 \luatexja@ykblshift=0
+
+% \inhibitxspcode, \xspcode
+\def\inhibitxspcode#1#2{\directlua{ltj.set_inhibit_xsp_table(#1,#2)}}
+\let\xspcode=\inhibitxspcode
+% \prebreakpenalty, \postbreakpenalty
+\def\prebreakpenalty#1#2{\directlua{ltj.set_penalty_table('pre',#1,#2)}}
+\def\postbreakpenalty#1#2{\directlua{ltj.set_penalty_table('post',#1,#2)}}
+
+\def\autospacing{\luatexja@autospc=0 }
+\def\noautospacing{\luatexja@autospc=1 }
+\def\autoxspacing{\luatexja@autoxspc=0 }
+\def\noautoxspacing{\luatexja@autoxspc=1 }
+\autospacing\autoxspacing
+% \inhibitglue
+\def\inhibitglue{\directlua{ltj.create_ihb_node()}}
+
+\input luatexja-kinsoku.tex
+\catcode`\@=12
+\endinput
