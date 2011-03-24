@@ -1,6 +1,7 @@
-%#! luatex doc-sample
+%#! time luatex doc-sample
 \input doc-sampsty.tex % style file
 
+\message{BB}
 \overfullrule=0pt
 \def\LaTeX{L\kern-.36em\setbox0=\hbox{T}\vbox to\ht0{\hbox{\sevenrm A}\vss}\kern-.15em\TeX}
 \xkanjiskip=0.25\zw plus .10\zw minus .10\zw
@@ -17,9 +18,13 @@
 \centerline{\big Lua\TeX-jaパッケージ}\bigskip
 \centerline{\large\the\year/\the\month/\the\day}\medskip
 
+\message{AA}
 \bigskip
+
 本パッケージは，（最低でもp\TeX と同等の水準の）日本語組版をLua\TeX 上で実現させることを
 目標としたマクロである．まだまだ足りないところはあるが，とりあえず動くようになった？ので公開する． 
+
+%{\showboxdepth=10000\showboxbreadth=10000\tracingonline=1\scrollmode\showlists}\end
 
 \beginparagraph 特徴
 
@@ -48,6 +53,7 @@
 \itemitem 縦組み関連一式．|\tate|, |\tfont|, |\tbaselineshift|, |\dtou|,$\,\ldots$
 \enditem
 
+
 \beginparagraph ファイル構成
 
 
@@ -72,7 +78,7 @@
 \font\tenipam={file:ipam.ttf}at13.5\jQ 
 \jfont\tenipam{mt}                     % 和文フォントとして認識
 \tenipam\parindent=1\zw 
-\yabaselineshift=32768                 % 32768 sp =  0.5 pt
+\yabaselineshift=32768                 % （例）32768 sp =  0.5 pt
 
 \rm abcほげほげ）（あいう本文本文……
 \endtt
@@ -82,15 +88,17 @@
 \beginparagraph attributes, dimensions,$\,\ldots$
 
 以下はLua\TeX-jaパッケージ内で使用するattributeやその他の種類のレジスタである．
-上3つは内部処理用なので利用者が意識することはない．それ以外は，p\TeX に類似の名前の
+上4つは内部処理用なので利用者が意識することはない．それ以外は，p\TeX に類似の名前の
 primitiveがあることから，意味は容易にわかるだろう:
 
 \item attribute |\luatexja@curjfn|: 現在の和文フォント番号
 
 p\TeX では内部のグローバル変数で「現在の横組/縦組和文フォント」をそれぞれ保持していたが，
 当然ながら欧文用\TeX ではそのようなことはそのままではできない．
-node $p$が保持しているattribute |\luatexja@curjfn|の値$k$は，
+node~$p$が保持しているattribute |\luatexja@curjfn|の値$k$は，
 「もし$p$の中身が和文文字であれば，そのフォントは$k$番の番号のフォントである」という意味をもつ．
+
+\item attribute |\luatexja@charclass|: （和文文字の）文字クラス
 
 \item attribute |\luatexja@icflag|: この属性をもつkernはイタリック補正由来である
 
@@ -100,10 +108,10 @@ p\TeX では，|\kern|由来のkernと，イタリック補正由来のkernを�
 \item language |\luatexja@japanese|: 「日本語」に対応する|\language|番号
 
 \item attribute |\yabaselineshift|: 欧文文字ベースラインの補正量．
-\itemitem {\bf sp${}=2^{-16}\,{\rm pt}$単位の整数値}で指定．
-正値を指定すると，欧文文字は下にずれる．
-\itemitem 数式中では，boxやruleもこの量だけずれる
-（よって，行中数式は全体が|\yabaselineshift|だけずれたように見えるだろう）．
+\itemitem {\bf sp$\fam\bffam {}=2^{-16}\,{\bf pt}$単位の整数値}で指定．
+正の値を指定すると，その分だけ欧文文字は下にずれる．
+\itemitem 数式中では，boxやruleもこの量だけずれる\hfil\break
+（よって，行中数式は全体が|\yabaselineshift|だけずれたように見える）．
 \item attribute |\ykbaselineshift|: 和文文字ベースラインの補正量．
 
 p\TeX では「和文が主」という考えからか，常に和文文字のベースラインが基準であり，
@@ -129,15 +137,20 @@ p\TeX における{\tt JFM}ファイルのようなものと考えてよい．
 
 このため，和文フォントを使うには，以下のような手順が必要である．
 
-\enum |\font<font>={file: <fontfile>} at 13.5\jQ|
+\enum |\font<font>={file:<fontfile>} [at <size>]|
 
 \TeX の|\font| primitiveを用いてひとまずフォントを読み込む．和文フォントの場合は，
-このようにTrueType/OpenTypeフォントをこのように読み込むことになると思われる%
-{\small（システムにインストールされているフォントの指定も可能と思われる）\inhibitglue}．
+このようにluaotfloadパッケージの機能を用いてTrueType/OpenTypeフォントを読み込むことになる．
 
-この段階では，制御綴<font>は「現在の欧文フォントを変更する」意味である．
+\itemitem この段階では，制御綴<font>はまだ「現在の（欧文）フォントを変更する」意味である．
+\itemitem 例えば，
+\begintt
+  \font\tenipam={file:ipaexm.ttf:script=latn;+jp90}
+\endtt
+のように各種のfeatureを用いてもよい．{\bf 本文書では全てのフォントに|jp90| featureを
+適用させている{\small\rm （「辻」など）\inhibitglue}．}
 
-\enum |\loadjcharmetric{<key>}{<file>}|
+\enum |\loadjfontmetric{<key>}{<file>}|
 
 Luaソース|luatj-<file>.lua|に書かれたメトリック情報を読み込む．
 内部では<key>というキーで参照されることとなる．同じkeyで2回以上読み込むことはできないが，
@@ -146,27 +159,27 @@ Luaソース|luatj-<file>.lua|に書かれたメトリック情報を読み込�
 \enum |\jfont<font>{<key>}|
 
 制御綴<font>を「metric keyが<key>の和文フォント」と認識させる．
-\itemitem 制御綴<font>で指定されるフォントから，
-<key>で参照されるメトリックの字幅情報のみを反映させた仮想フォント$v$を作る．
-\itemitem 制御綴<font>の意味を，「$\hbox{|\luatexja@curjfn|}\leftarrow v$」というように変更する．
+正確に言うと，制御綴<font>の意味を，「$\hbox{|\luatexja@curjfn|}\leftarrow v$」というように変更する．
 これにより，以後<font>を発行しても，欧文フォントは変わらない．
 
 \enditem
 
 \beginparagraph その他命令類
 
-\item |\inhibitxspcode{<code>}{<num>}|, |\xspcode{<code>}{<num>}|,\hfil\break
-|\prebreakpenalty{<code>}{<num>}|,  |\postbreakpenalty{<code>}{<num>}|
+\item |\(set/get)inhibitxspcode{<code>}{<num>}|, \hfil\break
+|\(set/get)xspcode{<code>}{<num>}|,\hfil\break
+|\(set/get)prebreakpenalty{<code>}{<num>}|,\hfil\break
+|\(set/get)postbreakpenalty{<code>}{<num>}|
 
-これらはp\TeX の対応する命令と意味は概ね同じであるが，以下の点が異なる．
+これらはp\TeX の（|set|/|get|を抜かした）命令と意味は概ね同じであるが，以下の点が異なる．
 
 \itemitem 同じ文字コードについて|\prebreakpenalty|, |\postbreakpenalty|を両方指定することが
 可能．
-\itemitem |\xspcode|（欧文文字用）は|\inhibitxspcode|（和文文字用）の別名であり，
+\itemitem |\(set/get)xspcode|（欧文文字用）は|\(set/get)inhibitxspcode|（和文文字用）の別名であり，
 \begintt
-\xspcode{12289}{1}  \inhibitxspcode{12289}{1}
+\setxspcode{12289}{1}  \setinhibitxspcode{12289}{1}
 \endtt
-は全く同じ意味である．|\xspcode|, |\inhibitxspcode|の第2引数の意味は異なるが，
+は全く同じ意味である．|\setxspcode|, |\setinhibitxspcode|の第2引数の意味は異なるが，
 両者の意味は文字コードにより判断している．
 
 \item |\inhibitglue|: 指定箇所での和文フォントメトリック由来のglue/kernの挿入を禁止する．
@@ -194,14 +207,18 @@ Lua\TeX-jaパッケージでは，次のような流れで処理を行う．
 
 \item 和文フォントへの置換: |hyphenate|, |hpack_filter| callbacks
 
-この段階の前では，和文文字であっても，それを内部で表している|glyph_node| $p$は，
+この段階の前では，和文文字であっても，それを内部で表している|glyph_node|~$p$は，
 「|\temrm あ|」のように，欧文フォントが指定されている状態になっている．しかし，
 $p$は「現在の和文フォント」の番号もattribute |\luatexja@curjfn|として保持している．そのため，
-この段階では，「和文文字が格納されている」|glyph_node| $p$に対して，次を行う．
+この段階では，「和文文字が格納されている」|glyph_node|~$p$に対して，次を行う．
 
 \itemitem $p$のフォントをattribute |\luatexja@curjfn|の値に置換．
 \itemitem $p$の|language| fieldを|\luatexja@japanese|の値に置換．
 誤って和文文字間でハイフネーションがされてしまうのを防止するため．
+\itemitem $p$の文字の文字クラスを計算し，その値をattribute |\luatexja@charclass|に格納．
+これにより，|jp90|等のfeatureによりグリフが置換されても，文字クラスの値は保たれる．
+
+\item （luaotfloadパッケージによるグリフ置換等の処理はこの位置で行われる）
 
 \item メトリック由来glue/kernの挿入: |pre_linebreak_filter|, |hpack_filter|
 
@@ -221,7 +238,7 @@ $p$は「現在の和文フォント」の番号もattribute |\luatexja@curjfn|�
 
 \item |\kanjiskip|, |\xkanjiskip|の挿入: |pre_linebreak_filter|, |hpack_filter|
 
-p\TeX の|adjust_hlist| procedureと同様の処理を用いて，
+p\TeX の|adjust_hlist| procedureとほぼ同様の処理を用いて，
 和文間glue |\kanjiskip|や和欧文間glue |\xkanjiskip|を
 挿入する．
 \itemitem p\TeX と同様に，これらの自動挿入は（box/段落ごとに）
@@ -244,6 +261,13 @@ Lua\TeX で文字を表す|glyph_node|には|y_offset| fieldがあるので，�
 さて，実際に補正されるのは次の場合である:
 \itemitem 文字 (|glyph_node|)
 \itemitem ボックス・rule（文中数式内部）．これによって，数式全体が下がったように見えるはず．
+
+\item 和文文字の幅の補正: |pre_linebreak_filter|, |hpack_filter|
+
+例えば，括弧類は「フォント中では全角幅だが，組版では半角幅として扱う」ことが多いが，このように
+文字幅を補正する処理を最後に行う．jafontspecパッケージのように，補正対象となる|glyph_node|~$p$%
+を，しかるべき量のglueと共に|\hbox|にカプセル化して行っている．
+
 \enditem 
 
 \beginparagraph 和文フォントメトリックについて
@@ -266,13 +290,15 @@ p\TeX 用{\tt JFM}で言うところの「文字クラス」を定義する．
 \itemT |'\boxbdd'|: 水平ボックスの先頭/末尾，段落の先頭/末尾．
 \itemT |'jcharbdd'|: 和文文字達の連続の境界．
 \itemT |'diffmet'|: 異なるメトリックの和文文字間に入るglueの計算に使われる．
-\item |jfm.define_type_dim(<class>, <left>, <width>, <height>, <depth>, <italic>)|
+
+\item |jfm.define_type_dim(<class>,<left>,<down>,<width>,<height>,<depth>,<italic>)|
 
 文字クラス<class>ごとに，文字の寸法のフォントサイズに対する割合を記述する．
 \itemitem <left>: 例えば開き括弧類は組版をする際には半角幅だが，TrueTypeフォント内では
 左に半角空白が付け加わって全角幅となっていることが多い．このような場合，逆に
 TrueTypeフォントを基準にすると，「左に半角幅ずらす」ことをしないといけない．
 <left>はその「左へのずらし量」を指定する．
+\itemitem <down>: 同様に，「下へのずらし量」を指定する．
 \itemitem <width>, <height>, <depth>: それぞれ幅，高さ，深さ．
 \itemitem <italic>: イタリック補正値．
 
@@ -284,7 +310,6 @@ TrueTypeフォントを基準にすると，「左に半角幅ずらす」こと
 \item |jfm.define_kern(<bclass>, <aclass>, <width>)|
 
 文字クラス<bclass>の文字と<aclass>の文字の間に，幅<width>のkernを挿入．
-
 
 \enditem
 

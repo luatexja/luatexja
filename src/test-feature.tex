@@ -1,0 +1,54 @@
+%#! luatex
+\input luatexja-core.sty
+
+\loadjfontmetric{mt}{ujis}
+\font\tenmin={file:ipaexm.ttf}\jfont\tenmin{mt}\tenmin
+\font\tengoth={file:ipaexg.ttf}\jfont\tengoth{mt}
+\font\jisninety={file:ipaexm.ttf:script=latn;+jp90}\jfont\jisninety{mt}
+\font\jisexpt={file:ipaexm.ttf:script=latn;+expt}\jfont\jisexpt{mt}
+\font\jishwid={file:ipaexm.ttf:script=latn;+hwid}\jfont\jishwid{mt}
+%\font\tmihwid={file:ipaexm.ttf:script=latn;+hwid}
+\font\jisnalt={file:ipaexm.ttf:script=latn;+nalt}\jfont\jisnalt{mt}
+\font\jistrad={file:ipaexm.ttf:script=latn;+trad}\jfont\jistrad{mt}
+\font\jissups={file:ipaexm.ttf:script=latn;+sups}\jfont\jissups{mt}
+\font\jisliga={file:ipaexm.ttf:script=latn;+liga}\jfont\jisliga{mt}
+%\font\tmiliga={file:ipaexm.ttf:script=latn;+liga}
+\font\jisvert={file:ipaexm.ttf:script=latn;+vert}\jfont\jisvert{mt}
+\parskip=\smallskipamount\parindent=1\zw
+
+{\noindent\bf\tengoth luatj-ujis.lua を使用}
+
+\bigskip
+
+{\noindent\bf\tengoth luaotf\/load による feature との共存状況}
+
+{\tentt expt} feature: 剥→{\jisexpt 剥}
+
+{\tentt jp90} feature: 辻→{\jisninety 辻}
+
+{\tentt hwid} feature: アイｳｴ→{\jishwid アイｳｴ}\hfil\break
+↑文字クラスが変わらないので幅も変わらない．
+
+{\tentt nalt} feature: 男→{\jisnalt 男}
+
+{\tentt trad} feature: 医学→{\jistrad 医学}
+
+{\tentt sups} feature: 注１注1→{\jissups 注１注1}\hfil\break
+↑文字クラスが変わらないので幅も変わらない．
+
+{\tentt liga} feature: か゜き゜く゜け゜こ゜→{\jisliga か゜き゜く゜け゜こ゜}\hfil\break
+↑なぜかうまくいかない．%比較：{\tmiliga か゜き゜く゜け゜こ゜}
+
+{\tentt vert} feature: あ（㌢㍍），い→{\jisvert あ（㌢㍍），い}\hfil\break
+↑縦組み時に気にすればいいか．
+
+\bigskip
+
+\noindent あいうえお
+
+「あいうえお←全角下がりが正しい（{\tt'boxbdd'}のテスト1）
+
+{\tt'boxbdd'}のテスト2: \vrule\hbox{「」}\vrule ←正しい実装ならば2本の罫線の間は全角幅
+
+\end
+

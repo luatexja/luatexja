@@ -3,10 +3,10 @@
 \tt\catcode`\_=12
 \def\{{\char'173 }\def\}{\char'175}
 \toks0={\%}
-\def\postbreakpenalty{\out\toks0={\string\postbreakpenalty\{}\count600 }%
-\def\prebreakpenalty{\out\toks0={\string\prebreakpenalty\{}\count600 }%
-\def\inhibitxspcode{\out\toks0={\string\inhibitxspcode\{}\count600 }%
-\def\xspcode{\out\toks0={\string\xspcode\{}\count600 }%
+\def\postbreakpenalty{\out\toks0={\string\setpostbreakpenalty\{}\count600 }%
+\def\prebreakpenalty{\out\toks0={\string\setprebreakpenalty\{}\count600 }%
+\def\inhibitxspcode{\out\toks0={\string\setinhibitxspcode\{}\count600 }%
+\def\xspcode{\out\toks0={\string\setxspcode\{}\count600 }%
 \catcode`\=13
 \def={\count601 }%\
 \def\out{\par\the\toks0 \the\count600\}\{\the\count601\}}

@@ -31,6 +31,7 @@
 
 % Attributes for Japanese typesetting.
 \newluatexattribute\luatexja@curjfnt   % index for ``current Japanese font''
+\newluatexattribute\luatexja@charclass % 
 \newluatexattribute\luatexja@yablshift % attribute for \yabaselineshift
 \newluatexattribute\luatexja@ykblshift % attribute for \ykbaselineshift
 
@@ -64,11 +65,15 @@
 \luatexja@yablshift=0 \luatexja@ykblshift=0
 
 % \inhibitxspcode, \xspcode
-\def\inhibitxspcode#1#2{\directlua{ltj.set_inhibit_xsp_table(#1,#2)}}
-\let\xspcode=\inhibitxspcode
+\def\setinhibitxspcode#1#2{\directlua{ltj.set_inhibit_xsp_table(#1,#2)}}
+\def\getinhibitxspcode#1{\directlua{ltj.get_inhibit_xsp_table(#1)}}
+\let\setxspcode=\setinhibitxspcode
+\let\getxspcode=\getinhibitxspcode
 % \prebreakpenalty, \postbreakpenalty
-\def\prebreakpenalty#1#2{\directlua{ltj.set_penalty_table('pre',#1,#2)}}
-\def\postbreakpenalty#1#2{\directlua{ltj.set_penalty_table('post',#1,#2)}}
+\def\setprebreakpenalty#1#2{\directlua{ltj.set_penalty_table('pre',#1,#2)}}
+\def\setpostbreakpenalty#1#2{\directlua{ltj.set_penalty_table('post',#1,#2)}}
+\def\getprebreakpenalty#1{\directlua{ltj.get_penalty_table('pre',#1)}}
+\def\getpostbreakpenalty#1{\directlua{ltj.get_penalty_table('post',#1)}}
 
 \def\autospacing{\luatexja@autospc=0 }
 \def\noautospacing{\luatexja@autospc=1 }

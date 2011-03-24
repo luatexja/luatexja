@@ -10,10 +10,11 @@ function jfm.define_char_type(t,lt)
    if not jfm.char_type[t] then jfm.char_type[t]={} end
    jfm.char_type[t].chars=lt 
 end
-function jfm.define_type_dim(t,l,w,h,d,i)
+function jfm.define_type_dim(t,l,x,w,h,d,i)
    if not jfm.char_type[t] then jfm.char_type[t]={} end
    jfm.char_type[t].width=w; jfm.char_type[t].height=h;
-   jfm.char_type[t].depth=d; jfm.char_type[t].italic=i; jfm.char_type[t].left=l
+   jfm.char_type[t].depth=d; jfm.char_type[t].italic=i; 
+   jfm.char_type[t].left=l; jfm.char_type[t].down=x
 end
 function jfm.define_glue(b,a,w,st,sh)
    local j=b*0x800+a
@@ -27,32 +28,43 @@ function jfm.define_kern(b,a,w)
 end
 
 -- procedures for \loadjfontmetric
-ltj.metrics={} -- this table stores all metric information
+ltj.metrics={} -- this table stores all metric informations
+ltj.font_metric_table={}
+
+function ltj.search_metric(key)
+   for i,v in ipairs(ltj.metrics) do 
+      if v.name==key then return i end
+   end
+   return nil
+end
 
 function ltj.loadjfontmetric()
    if string.len(jfm.name)==0 then
       ltj.error("the key of font metric is null"); return nil
-   elseif ltj.metrics[jfm.name] then
+   elseif ltj.search_metric(jfm.name) then
       ltj.error("the metric '" .. jfm.name .. "' is already loaded"); return nil
    end
-   ltj.metrics[jfm.name]={}
    if jfm.dir~='yoko' then
       ltj.error("jfm.dir must be 'yoko'"); return nil
    end
-   ltj.metrics[jfm.name].dir=jfm.dir
-   ltj.metrics[jfm.name].zw=jfm.zw
-   ltj.metrics[jfm.name].zh=jfm.zh
-   ltj.metrics[jfm.name].char_type=jfm.char_type
-   ltj.metrics[jfm.name].glue=jfm.glue
-   ltj.metrics[jfm.name].kern=jfm.kern
+   local t={}
+   t.name=jfm.name
+   t.dir=jfm.dir
+   t.zw=jfm.zw
+   t.zh=jfm.zh
+   t.char_type=jfm.char_type
+   t.glue=jfm.glue
+   t.kern=jfm.kern
+   table.insert(ltj.metrics,t)
 end
 
-function ltj.find_char_type(c,metrickey)
--- c: character code, metrickey: key
-   for i, v in pairs(ltj.metrics[metrickey].char_type) do
+function ltj.find_char_type(c,m)
+-- c: character code, m
+   if not ltj.metrics[m] then return 0 end
+   for i, v in pairs(ltj.metrics[m].char_type) do
       if i~=0 then
         for j,w in pairs(v.chars) do
-           if w==c then return i; end
+           if w==c then return i end
         end
       end
    end
@@ -68,92 +80,26 @@ function ltj.jfontdefA(b)
   -- font.id() does not seem to work in my environment...
 end
 function ltj.jfontdefB(s) -- for horizontal font
-   if not ltj.metrics[s] then
+   local j=ltj.search_metric(s)
+   if not j then
       ltj.error("metric named '" .. s .. "' didn't loaded")
       return
    end
-   local i = ltj.transform_jfont(font.current(), s)
+   local fn=font.current()
+   local f = font.fonts[fn]
+   ltj.font_metric_table[fn]={}
+   ltj.font_metric_table[fn].jfm=j; ltj.font_metric_table[fn].size=f.size
    tex.sprint('\\expandafter\\def\\csname ' .. ltj.cstemp .. '\\endcsname' 
-	      .. '{\\csname luatexja@curjfnt\\endcsname=' .. i
-	      .. '\\zw=' .. font.fonts[i].parameters.quad .. 'sp' 
-	      .. '\\zh=' .. font.fonts[i].parameters.x_height .. 'sp\\relax}')
+	      .. '{\\csname luatexja@curjfnt\\endcsname=' .. fn
+	      .. ' \\zw=' .. tex.round(f.size*ltj.metrics[j].zw) .. 'sp' 
+	      .. '\\zh=' .. tex.round(f.size*ltj.metrics[j].zh) .. 'sp\\relax}')
    font.current(ltj.fntbki); ltj.fntbk = {}; ltj.cstemp = {}
 end
 
--- "transform" font according to a font metric
-function ltj.transform_jfont(index,metrickey)
-   local f = {}
-   local of=font.fonts[index]
-   f.name = of.name
-   f.fullname = metrickey
-   f.size = of.size
-   f.parameters = {}
-   f.parameters.quad=tex.round(f.size*ltj.metrics[metrickey].zw)
-   f.parameters.x_height=tex.round(f.size*ltj.metrics[metrickey].zh)
-   f.designsize = of.designsize
-   f.type = 'virtual'
-   f.characters = {}
-   f.fonts = { { id = index } }
-   for i,v in pairs(of.characters) do
-      f.characters[i]={}
-      local ci = ltj.metrics[metrickey].char_type[ltj.find_char_type(i,metrickey)]
-      if ci.left~=0.0 then
-         f.characters[i].commands = { 
-            {'right', tex.round(-ci.left*f.size)}, 
-            {'char',i} 
-         }
-      else
-         f.characters[i].commands = { {'char',i} }
-      end
-      f.characters[i].italic = tex.round(ci.italic*f.size)
-      f.characters[i].width  = tex.round(ci.width*f.size)
-      f.characters[i].height = tex.round(ci.height*f.size)
-      f.characters[i].depth  = tex.round(ci.depth*f.size)
-   end
-   if not f.characters[0x3000] then
-      f.characters[0x3000]={}
-      local ci = ltj.metrics[metrickey].char_type[ltj.find_char_type(0x3000,metrickey)]
-      f.characters[0x3000].commands = {{'right', tex.round(ci.width*f.size)} }
-      f.characters[0x3000].italic = tex.round(ci.italic*f.size)
-      f.characters[0x3000].width  = tex.round(ci.width*f.size)
-      f.characters[0x3000].height = tex.round(ci.height*f.size)
-      f.characters[0x3000].depth  = tex.round(ci.depth*f.size)
-   end
-   return font.define(f)
-end
-
-
--- Replace font in nodes which character code is in the range of
--- Japanese characters, using two attributes
-function ltj.replace_ja_font(head)
-   local p=head
-   while p do 
-      if node.type(p.id)=='glyph' then
-	 if ltj.is_ucs_in_japanese_char(p.char) then
-	    local v = node.has_attribute(p,luatexbase.attributes['luatexja@curjfnt'])
-	    if v then p.font=v end
-	    v=node.has_attribute(p,luatexbase.attributes['luatexja@ykblshift'])
-	    if v then 
-	       node.set_attribute(p,luatexbase.attributes['luatexja@yablshift'],v)
-	    else
-	       node.unset_attribute(p,luatexbase.attributes['luatexja@yablshift'])
-	    end
-	 end
-      end
-      p=node.next(p)
-   end
-   return head
-end
-
-
 -- return true if and only if p is a Japanese character node
 function ltj.is_japanese_glyph_node(p)
-   if not p then return false
-   elseif node.type(p.id)~='glyph' then return false
-   elseif p.font==node.has_attribute(p,luatexbase.attributes['luatexja@curjfnt']) then
-      return true
-   else return false
-   end
+   return p and (node.type(p.id)=='glyph') 
+   and (p.font==node.has_attribute(p,luatexbase.attributes['luatexja@curjfnt']))
 end
 
 ---------- Kinsoku 
@@ -167,10 +113,23 @@ function ltj.set_penalty_table(m,c,p)
       ltj.penalty_table[c].post=p
    end
 end
+function ltj.get_penalty_table(m,c)
+   local i=ltj.penalty_table[c]
+   if i then 
+      i=(ltj.penalty_table[c])[m]
+   end
+   if not i then i=0 end
+   tex.swrite(i)
+end
 
 ltj.inhibit_xsp_table = {}
 function ltj.set_inhibit_xsp_table(c,p)
    ltj.inhibit_xsp_table[c]=p
+end
+function ltj.get_inhibit_xsp_table(c,p)
+   local i=ltj.inhibit_xsp_table[c]
+   if not i then i=3 end
+   tex.swrite(i)
 end
 
 ----------
@@ -182,9 +141,9 @@ function ltj.create_ihb_node()
 end
 
 -- The fullname field of virtual font expresses its metric
-function ltj.find_size_metrickey(p)
-   if ltj.is_japanese_glyph_node(p) then
-      return font.fonts[p.font].size, font.fonts[p.font].fullname
+function ltj.find_size_metric(px)
+   if ltj.is_japanese_glyph_node(px) then
+      return ltj.font_metric_table[px.font].size, ltj.font_metric_table[px.font].jfm
    else 
       return nil, nil
    end
@@ -216,53 +175,52 @@ function ltj.calc_between_two_jchar(q,p)
    -- q, p: node (possibly null)
    local ps,pm,qs,qm,g,h
    if not p then -- q is the last node
-      qs, qm = ltj.find_size_metrickey(q)
+      qs, qm = ltj.find_size_metric(q)
       if not qm then 
 	 return nil
       else
 	 g=ltj.new_jfm_glue(qs,qm,
-				ltj.find_char_type(q.char,qm),
+				node.has_attribute(q,luatexbase.attributes['luatexja@charclass']),
 				ltj.find_char_type('boxbdd',qm))
       end
    elseif not q then
       -- p is the first node etc.
-      if q then print(node.type(q.id)) end
-      ps, pm = ltj.find_size_metrickey(p)
+      ps, pm = ltj.find_size_metric(p)
       if not pm then
 	 return nil
       else
 	 g=ltj.new_jfm_glue(ps,pm,
 				ltj.find_char_type('boxbdd',pm),
-				ltj.find_char_type(p.char,pm))
+				node.has_attribute(p,luatexbase.attributes['luatexja@charclass']))
       end
    else -- p and q are not nil
-      qs, qm = ltj.find_size_metrickey(q)
-      ps, pm = ltj.find_size_metrickey(p)
+      qs, qm = ltj.find_size_metric(q)
+      ps, pm = ltj.find_size_metric(p)
       if (not pm) and (not qm) then 
 	 -- Both p and q are NOT Japanese glyph node
 	 return nil
       elseif (qs==ps) and (qm==pm) then 
 	 -- Both p and q are Japanese glyph node, and same metric and size
 	 g=ltj.new_jfm_glue(ps,pm,
-				ltj.find_char_type(q.char,qm),
-				ltj.find_char_type(p.char,pm))
+			    node.has_attribute(q,luatexbase.attributes['luatexja@charclass']),
+			    node.has_attribute(p,luatexbase.attributes['luatexja@charclass']))
       elseif not qm then
 	 -- q is not Japanese glyph node
 	 g=ltj.new_jfm_glue(ps,pm,
-				ltj.find_char_type('jcharbdd',pm),
-				ltj.find_char_type(p.char,pm))
+			    ltj.find_char_type('jcharbdd',pm),
+			    node.has_attribute(p,luatexbase.attributes['luatexja@charclass']))
       elseif not pm then
 	 -- p is not Japanese glyph node
 	 g=ltj.new_jfm_glue(qs,qm,
-				ltj.find_char_type(q.char,qm),
-				ltj.find_char_type('jcharbdd',qm))
+			    node.has_attribute(q,luatexbase.attributes['luatexja@charclass']),
+			    ltj.find_char_type('jcharbdd',qm))
       else
 	 g=ltj.new_jfm_glue(qs,qm,
-				ltj.find_char_type(q.char,qm),
-				ltj.find_char_type('diffmet',qm))
+			    node.has_attribute(q,luatexbase.attributes['luatexja@charclass']),
+			    ltj.find_char_type('diffmet',qm))
 	 h=ltj.new_jfm_glue(ps,pm,
-				ltj.find_char_type('diffmet',pm),
-				ltj.find_char_type(p.char,pm))
+			    ltj.find_char_type('diffmet',pm),
+			    node.has_attribute(p,luatexbase.attributes['luatexja@charclass']))
 	 g=ltj.calc_between_two_jchar_aux(g,h)
       end
    end
@@ -288,7 +246,7 @@ function ltj.add_kinsoku_penalty(head,p)
    if not ltj.penalty_table[c] then return false; end
    if ltj.penalty_table[c].pre then
       local q = node.prev(p)
-      if (not q) and node.type(q.id)=='penalty' then
+      if q and node.type(q.id)=='penalty' then
 	 q.penalty=q.penalty+ltj.penalty_table[c].pre
       else 
 	 q=node.new(node.id('penalty'))
@@ -298,7 +256,7 @@ function ltj.add_kinsoku_penalty(head,p)
    end
    if ltj.penalty_table[c].post then
       local q = node.next(p)
-      if (not q) and node.type(q.id)=='penalty' then
+      if q and node.type(q.id)=='penalty' then
 	 q.penalty=q.penalty+ltj.penalty_table[c].post
 	 return false
       else 
@@ -563,7 +521,7 @@ end
 -- Insert \xkanjiskip around p, a penalty
 function ltj.insks_around_penalty(head,q,p)
    local r=node.next(p)
-   if (not r) and node.type(r.id)=='glyph' then
+   if r  and node.type(r.id)=='glyph' then
       local a=ltj.inhibit_xsp_table[r.char]
       if ltj.is_japanese_glyph_node(r) then
 	 ltj.cx=r.char
@@ -650,14 +608,88 @@ function ltj.main_process(head)
    p = ltj.insert_jfm_glue(p)
    p = ltj.insert_kanji_skip(p)
    p = ltj.baselineshift(p)
+   p = ltj.set_ja_width(p)
    return p
 end
+
+-- TeX's \hss
+function ltj.get_hss()
+   local hss = node.new(node.id("glue"))
+   local hss_spec = node.new(node.id("glue_spec"))
+   hss_spec.width = 0
+   hss_spec.stretch = 65536
+   hss_spec.stretch_order = 2
+   hss_spec.shrink = 65536
+   hss_spec.shrink_order = 2
+   hss.spec = hss_spec
+   return hss
+end
+
+function ltj.set_ja_width(head)
+   local p = head
+   local t,s,th, g, q,a
+   while p do
+      if ltj.is_japanese_glyph_node(p) then
+	 t=ltj.metrics[ltj.font_metric_table[p.font].jfm]
+	 s=t.char_type[node.has_attribute(p,luatexbase.attributes['luatexja@charclass'])]
+	 if not(s.left==0.0 and s.down==0.0 
+		and tex.round(s.width*ltj.font_metric_table[p.font].size)==p.width) then
+	    -- must be encapsuled by a \hbox
+	    head, q = node.remove(head,p)
+	    p.next=nil
+	    p.yoffset=tex.round(p.yoffset-ltj.font_metric_table[p.font].size*s.down)
+	    p.xoffset=tex.round(p.xoffset-ltj.font_metric_table[p.font].size*s.left)
+	    node.insert_after(p,p,ltj.get_hss())
+	    g=node.hpack(p, tex.round(ltj.font_metric_table[p.font].size*s.width)
+			 , 'exactly')
+	    g.height=tex.round(ltj.font_metric_table[p.font].size*s.height)
+	    g.depth=tex.round(ltj.font_metric_table[p.font].size*s.depth)
+	    head,p = node.insert_before(head,q,g)
+	    p=q
+	 else p=node.next(p)
+	 end
+      else p=node.next(p)
+      end
+   end
+   return head
+end
+
+-- debug
+ltj.depth=""
+function ltj.to_pt(a) 
+   return math.floor(a/65536*100000)/100000
+end
+function ltj.show_node_list(head)
+   local p =head
+   local k=ltj.depth
+   ltj.depth=ltj.depth .. '.'
+   while p do
+      local s=node.type(p.id)
+      if s == 'glyph' then
+	 print(ltj.depth .. ' glyph', p.subtype, unicode.utf8.char(p.char), p.font)
+      elseif s=='hlist' then
+	 print(ltj.depth .. ' hlist', p.subtype, '(' .. ltj.to_pt(p.height)
+	    .. '+' .. ltj.to_pt(p.depth)
+	 .. ')x' .. ltj.to_pt(p.width) )
+	 ltj.show_node_list(p.head)
+	 ltj.depth=k
+      elseif s=='whatsit' then
+	 print(ltj.depth .. ' whatsit', p.subtype)
+      elseif s=='glue' then
+	 print(ltj.depth .. ' glue', p.subtype, ltj.to_pt(p.spec.width))
+      else
+	 print(ltj.depth .. ' ' .. s, s.subtype)
+      end
+      p=node.next(p)
+   end
+end
+
+
 
 --- the following function is modified from jafontspec.lua (by K. Maeda).
 --- Instead of "%", we use U+FFFFF for suppressing spaces.
 utf = unicode.utf8
 function ltj.process_input_buffer(buffer)
---	print(utf.byte(buffer, utf.len(buffer)))
    if utf.len(buffer) > 0 
         and ltj.is_ucs_in_japanese_char(utf.byte(buffer, utf.len(buffer))) then
 	buffer = buffer .. string.char(0xF3,0xBF,0xBF,0xBF) -- U+FFFFF
@@ -674,7 +706,12 @@ function ltj.suppress_hyphenate_ja(head)
    while p do 
       if node.type(p.id)=='glyph' and  ltj.is_ucs_in_japanese_char(p.char) then
 	 local v = node.has_attribute(p,luatexbase.attributes['luatexja@curjfnt'])
-	 if v then p.font=v end
+	 if v then 
+	    p.font=v 
+	    local l=ltj.find_char_type(p.char,ltj.font_metric_table[v].jfm)
+	    if not l then l=0 end
+	    node.set_attribute(p,luatexbase.attributes['luatexja@charclass'],l)
+	 end
 	 v=node.has_attribute(p,luatexbase.attributes['luatexja@ykblshift'])
 	 if v then 
 	    node.set_attribute(p,luatexbase.attributes['luatexja@yablshift'],v)
@@ -685,22 +722,30 @@ function ltj.suppress_hyphenate_ja(head)
       end
       p=node.next(p)
    end
-   lang.hyphenate(head) 
+   lang.hyphenate(head)
+   return head -- 共通化のため値を返す
 end
 
--- callback
+-- callbacks
 luatexbase.add_to_callback('process_input_buffer', 
    function (buffer)
      return ltj.process_input_buffer(buffer)
    end,'ltj.process_input_buffer')
+
 luatexbase.add_to_callback('pre_linebreak_filter', 
    function (head,groupcode)
      return ltj.main_process(head)
-   end,'ltj.pre_linebreak_filter')
+   end,'ltj.pre_linebreak_filter',2)
 luatexbase.add_to_callback('hpack_filter', 
   function (head,groupcode,size,packtype)
-     return ltj.main_process(ltj.replace_ja_font(head))
-  end,'ltj.hpack_filter')
+     return ltj.main_process(head)
+  end,'ltj.hpack_filter',2)
+
+--insert before callbacks from luaotfload
+luatexbase.add_to_callback('hpack_filter', 
+  function (head,groupcode,size,packtype)
+     return ltj.suppress_hyphenate_ja(head)
+  end,'ltj.hpack_filter_pre',0)
 luatexbase.add_to_callback('hyphenate', 
  function (head,tail)
     return ltj.suppress_hyphenate_ja(head)
