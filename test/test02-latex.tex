@@ -1,0 +1,34 @@
+%#! lualatex
+\documentclass{article}
+\usepackage{fontspec,pdftexcmds}
+
+\newopentypefeature{Style}{OLDJIS}{+jp90}
+\newfontfamily\hiramin[BoldFont={ipaexg.ttf},Style=OLDJIS]{ipaexm.ttf}
+\input luatexja-core.sty
+\loadjfontmetric{mt}{ujis}
+
+\begin{document}
+\makeatletter
+
+\def\extract@font{%
+    \get@external@font
+    \global\expandafter\font\font@name\external@font\relax
+    \ifnum\pdf@strcmp{\f@encoding}{EU2}=0\jfont\font@name{mt}\fi
+    \font@name\global\zw=\zw\global\zh=\zh
+    \ifnum\pdf@strcmp{\f@encoding}{EU2}=0%
+      \global\kanjiskip=0pt plus 0.4pt minus 0.4pt%
+      \global\xkanjiskip=0.25\zw plus 0.083333\zw minus 0.083333\zw%
+    \fi
+    \csname \f@encoding+\f@family\endcsname
+    \csname\curr@fontshape\endcsname
+       }
+% ! The font "ipaexg.ttf/I" cannot be found. というエラーが出る
+
+
+\hiramin abcdfghjfgあいう辻）\textbf{\unkern（辻あ{\Large あ}いう}
+
+\hiramin abcdfghjfgあいう辻）\textbf{（辻あ{\Large あ}いう}
+% \unkern がないとうなくいかない
+
+\tracingonline=1\scrollmode\showboxdepth=10000\showboxbreadth=10000\showlists
+\end{document}

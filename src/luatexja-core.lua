@@ -74,7 +74,12 @@ end
 -- procedures for \jfont command.
 function ltj.jfontdefA(b)
   ltj.fntbki=font.current()
-  ltj.cstemp=token.csname_name(token.get_next())
+  local t = token.get_next()
+  ltj.cstemp=token.csname_name(t)
+  if ltj.cstemp=='font@name' then 
+    -- a hack for NFSS. We need more fundamental solution.
+    token.expand(t); t=token.get_next(); ltj.cstemp=token.csname_name(t)
+  end
   tex.sprint('\\csname ' .. ltj.cstemp .. '\\endcsname\\csname @jfont\\endcsname')
   -- A trick to get font id associated of the argument of \jfont.
   -- font.id() does not seem to work in my environment...
@@ -89,7 +94,8 @@ function ltj.jfontdefB(s) -- for horizontal font
    local f = font.fonts[fn]
    ltj.font_metric_table[fn]={}
    ltj.font_metric_table[fn].jfm=j; ltj.font_metric_table[fn].size=f.size
-   tex.sprint('\\expandafter\\def\\csname ' .. ltj.cstemp .. '\\endcsname' 
+   tex.sprint('\\expandafter\\expandafter\\expandafter\\global\\expandafter'
+              .. '\\def\\csname ' .. ltj.cstemp .. '\\endcsname' 
 	      .. '{\\csname luatexja@curjfnt\\endcsname=' .. fn
 	      .. ' \\zw=' .. tex.round(f.size*ltj.metrics[j].zw) .. 'sp' 
 	      .. '\\zh=' .. tex.round(f.size*ltj.metrics[j].zh) .. 'sp\\relax}')

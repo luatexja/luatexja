@@ -1,0 +1,833 @@
+This is LuaTeX, Version beta-0.66.0-2011032121 (rev 4093)  (format=lualatex 2011.3.21)  31 MAR 2011 09:09
+ restricted \write18 enabled.
+**test02-latex.tex
+(./test02-latex.tex
+LaTeX2e <2009/09/24>
+LuaTeX adaptation of babel <v3.8l-luatex-1.4> and hyphenation patterns for engl
+ish, dumylang, nohyphenation, afrikaans, ethiopic, loaded.
+(/opt/texlive/p2010/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2007/10/19 v1.4h Standard LaTeX document class
+(/opt/texlive/p2010/texmf-dist/tex/latex/base/size10.clo
+File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/fontspec/fontspec.sty
+Package: fontspec 2011/02/26 v2.1f Advanced font selection for XeLaTeX/LuaLaTeX
+
+
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/expl3.sty
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3names.sty
+Package: l3names 2011/01/08 v2122 L3 Experimental Naming Scheme for TeX Primiti
+ves
+
+(/opt/texlive/p2010/texmf-dist/tex/generic/oberdiek/luatex.sty
+Package: luatex 2010/03/09 v0.4 LuaTeX basic definition package (HO)
+
+(/opt/texlive/p2010/texmf-dist/tex/generic/oberdiek/infwarerr.sty
+Package: infwarerr 2010/04/08 v1.3 Providing info/warning/message (HO)
+)
+(/opt/texlive/p2010/texmf-dist/tex/generic/oberdiek/ifluatex.sty
+Package: ifluatex 2010/03/01 v1.3 Provides the ifluatex switch (HO)
+Package ifluatex Info: LuaTeX detected.
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/etex-pkg/etex.sty
+Package: etex 1998/03/26 v2.0 eTeX basic definition package (PEB)
+\et@xins=\count87
+)
+\LuT@AllocAttribute=\count277
+\LuT@AllocCatcodeTable=\count278
+\CatcodeTableStack=\count279
+\CatcodeTableIniTeX=\catcodetable1
+\CatcodeTableString=\catcodetable3
+\CatcodeTableOther=\catcodetable5
+\CatcodeTableLaTeX=\catcodetable7
+
+(/opt/texlive/p2010/texmf-dist/tex/generic/oberdiek/luatex-loader.sty
+Package: luatex-loader 2010/03/09 v0.4 Lua module loader (HO)
+
+(/opt/texlive/p2010/texmf-dist/scripts/oberdiek/oberdiek.luatex.lua)))
+(/opt/texlive/p2010/texmf-dist/tex/generic/oberdiek/pdftexcmds.sty
+Package: pdftexcmds 2010/04/01 v0.9 Utility functions of pdfTeX for LuaTeX (HO)
+
+
+(/opt/texlive/p2010/texmf-dist/tex/generic/oberdiek/ltxcmds.sty
+Package: ltxcmds 2010/04/26 v1.7 LaTeX kernel commands for general use (HO)
+)
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+\pdftexcmds@toks=\toks14
+))
+Package: expl3 2011/02/17 v2156 L3 Experimental code bundle wrapper
+
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3basics.sty
+Package: l3basics 2011/02/26 v2158 L3 Experimental basic definitions
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3expan.sty
+Package: l3expan 2010/09/20 v2037 L3 Experimental Argument Expansion module
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3tl.sty
+Package: l3tl 2011/03/07 v2184 L3 Experimental Token Lists
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3int.sty
+Package: l3int 2011/03/06 v2178 L3 Experimental Integer module
+\l_tmpa_int=\count280
+\l_tmpb_int=\count281
+\l_tmpc_int=\count282
+\g_tmpa_int=\count283
+\g_tmpb_int=\count284
+\c_max_int=\count285
+\g_tl_inline_level_int=\count286
+\g_prg_inline_level_int=\count287
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3quark.sty
+Package: l3quark 2011/03/03 v2172 L3 Experimental Quark Commands
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3seq.sty
+Package: l3seq 2010/03/29 v1879 L3 Experimental sequences and stacks
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3toks.sty
+Package: l3toks 2010/09/20 v2037 L3 Experimental Token Registers
+\l_tmpb_toks=\toks15
+\l_tmpc_toks=\toks16
+\g_tmpa_toks=\toks17
+\g_tmpb_toks=\toks18
+\g_tmpc_toks=\toks19
+\c_empty_toks=\toks20
+\l_tl_replace_toks=\toks21
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3prg.sty
+Package: l3prg 2011/03/06 v2178 L3 Experimental control structures
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3clist.sty
+Package: l3clist 2011/03/06 v2178 L3 Experimental comma separated lists
+\g_clist_map_inline_int=\count288
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3token.sty
+Package: l3token 2011/02/16 v2151 L3 Experimental token investigation and manip
+ulation
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3prop.sty
+Package: l3prop 2010/11/23 v2087 L3 Experimental Property Lists
+\g_prop_inline_level_int=\count289
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3msg.sty
+Package: l3msg 2010/10/02 v2052 L3 Experimental LaTeX Messages module
+\l_msg_redirect_classes_prop=\toks22
+\l_msg_redirect_names_prop=\toks23
+\l_msg_redirect_fatal_prop=\toks24
+\l_msg_redirect_error_prop=\toks25
+\l_msg_redirect_warning_prop=\toks26
+\l_msg_redirect_info_prop=\toks27
+\l_msg_redirect_log_prop=\toks28
+\l_msg_redirect_trace_prop=\toks29
+\l_msg_redirect_none_prop=\toks30
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3io.sty
+Package: l3io 2010/10/03 v2063 L3 Experimental i/o module
+\g_iow_streams_prop=\toks31
+\g_ior_streams_prop=\toks32
+\l_iow_stream_int=\count290
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3skip.sty
+Package: l3skip 2011/02/15 v2149 L3 Experimental skip registers
+\l_tmpa_skip=\skip256
+\l_tmpb_skip=\skip257
+\l_tmpc_skip=\skip258
+\g_tmpa_skip=\skip259
+\g_tmpb_skip=\skip260
+\l_tmpa_dim=\dimen256
+\l_tmpb_dim=\dimen257
+\l_tmpc_dim=\dimen258
+\l_tmpd_dim=\dimen259
+\g_tmpa_dim=\dimen260
+\g_tmpb_dim=\dimen261
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3box.sty
+Package: l3box 2011/03/06 v2178 L3 Experimental Box module
+\l_tmpb_box=\box256
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3keyval.sty
+Package: l3keyval 2010/04/11 v1890 L3 Experimental keyval processing
+\l_KV_level_int=\count291
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3keys.sty
+Package: l3keys 2010/11/11 v2082 L3 Experimental key-value support
+\l_keys_choice_int=\count292
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3precom.sty
+Package: l3precom 2010/02/09 v1793 L3 Experimental precompilation module
+\g_gen_sym_int=\count293
+\g_ggen_sym_int=\count294
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3xref.sty
+Package: l3xref 2011/02/16 v2151 L3 Experimental cross referencing
+\g_xref_all_curr_immediate_fields_prop=\toks33
+\g_xref_all_curr_deferred_fields_prop=\toks34
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3file.sty
+Package: l3file 2010/03/21 v1853 L3 Experimental file loading
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3fp.sty
+Package: l3fp 2011/03/06 v2178 L3 Experimental floating-point operations
+\c_one_million=\count295
+\c_one_hundred_million=\count296
+\c_five_hundred_million=\count297
+\c_one_thousand_million=\count298
+\c_fp_pi_by_four_decimal_int=\count299
+\c_fp_pi_by_four_extended_int=\count300
+\c_fp_pi_decimal_int=\count301
+\c_fp_pi_extended_int=\count302
+\c_fp_two_pi_decimal_int=\count303
+\c_fp_two_pi_extended_int=\count304
+\l_fp_count_int=\count305
+\l_fp_div_offset_int=\count306
+\l_fp_exp_integer_int=\count307
+\l_fp_exp_decimal_int=\count308
+\l_fp_exp_extended_int=\count309
+\l_fp_exp_exponent_int=\count310
+\l_fp_input_a_sign_int=\count311
+\l_fp_input_a_integer_int=\count312
+\l_fp_input_a_decimal_int=\count313
+\l_fp_input_a_exponent_int=\count314
+\l_fp_input_b_sign_int=\count315
+\l_fp_input_b_integer_int=\count316
+\l_fp_input_b_decimal_int=\count317
+\l_fp_input_b_exponent_int=\count318
+\l_fp_input_a_extended_int=\count319
+\l_fp_input_b_extended_int=\count320
+\l_fp_mul_a_i_int=\count321
+\l_fp_mul_a_ii_int=\count322
+\l_fp_mul_a_iii_int=\count323
+\l_fp_mul_a_iv_int=\count324
+\l_fp_mul_a_v_int=\count325
+\l_fp_mul_a_vi_int=\count326
+\l_fp_mul_b_i_int=\count327
+\l_fp_mul_b_ii_int=\count328
+\l_fp_mul_b_iii_int=\count329
+\l_fp_mul_b_iv_int=\count330
+\l_fp_mul_b_v_int=\count331
+\l_fp_mul_b_vi_int=\count332
+\l_fp_mul_output_int=\count333
+\l_fp_output_sign_int=\count334
+\l_fp_output_integer_int=\count335
+\l_fp_output_decimal_int=\count336
+\l_fp_output_exponent_int=\count337
+\l_fp_output_extended_int=\count338
+\l_fp_round_position_int=\count339
+\l_fp_round_target_int=\count340
+\l_fp_split_sign_int=\count341
+\l_fp_tmp_int=\count342
+\l_fp_trig_octant_int=\count343
+\l_fp_trig_sign_int=\count344
+\l_fp_trig_decimal_int=\count345
+\l_fp_trig_extended_int=\count346
+\l_fp_tmp_dim=\dimen262
+\l_fp_tmp_skip=\skip261
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3luatex.sty
+Package: l3luatex 2010/07/18 v1985 L3 Experimental LuaTeX functions
+\g_cctab_allocate_int=\count347
+\g_cctab_stack_int=\count348
+\c_code_cctab=\catcodetable9
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/expl3/l3font.sty
+Package: l3font 2011/03/03 v2175 L3 Experimental Font Loading
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/tools/calc.sty
+Package: calc 2007/08/22 v4.3 Infix arithmetic (KKT,FJ)
+\calc@Acount=\count349
+\calc@Bcount=\count350
+\calc@Adimen=\dimen263
+\calc@Bdimen=\dimen264
+\calc@Askip=\skip262
+\calc@Bskip=\skip263
+LaTeX Info: Redefining \setlength on input line 76.
+LaTeX Info: Redefining \addtolength on input line 77.
+\calc@Ccount=\count351
+\calc@Cskip=\skip264
+))
+(/opt/texlive/p2010/texmf-dist/tex/latex/xpackages/xbase/xparse.sty
+Package: xparse 2011/01/23 v2136 Generic document command parser
+\c_xparse_shorthands_prop=\toks35
+\l_xparse_m_args_int=\count352
+\l_xparse_mandatory_args_int=\count353
+\l_xparse_processor_int=\count354
+\l_xparse_total_args_int=\count355
+)
+(/opt/texlive/p2010/texmf-dist/tex/generic/kastrup/binhex.tex)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/luaotfload.sty
+Package: luaotfload 2011/02/16 v1.24 OpenType layout system
+
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase.sty
+Package: luatexbase 2010/10/06 v0.3 Module utilities for LuaTeX
+
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase-compat.sty
+Package: luatexbase-compat 2010/10/10 v0.3 Compatibility tools for LuaTeX
+)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase-loader.sty
+Package: luatexbase-loader 2010/10/10 v0.3 Lua module loader for LuaTeX
+
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase.loader.lua))
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase-regs.sty
+Package: luatexbase-regs 2010/10/10 v0.3 Registers allocation for LuaTeX
+)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase-attr.sty
+Package: luatexbase-attr 2010/10/10 v0.3 Attributes allocation for LuaTeX
+
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/attr.lua))
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase-cctb.sty
+Package: luatexbase-cctb 2010/10/10 v0.3 Catcodetable allocation for LuaTeX
+
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/cctb.lua)
+\lltxb@catcodetable@alloc=\count356
+\CatcodeTableIniTeX=\luatexcatcodetable1
+\CatcodeTableString=\luatexcatcodetable2
+\CatcodeTableOther=\luatexcatcodetable3
+\CatcodeTableLaTeX=\luatexcatcodetable4
+\CatcodeTableLaTeXAtLetter=\luatexcatcodetable5
+\CatcodeTableExpl=\luatexcatcodetable6
+)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase-mcb.sty
+Package: luatexbase-mcb 2010/10/10 v0.3 Callback management for LuaTeX
+
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase-modutils.sty
+Package: luatexbase-modutils 2010/10/10 v0.3 Module utilities for LuaTeX
+
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/modutils.lua))
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/mcb.lua)
+Lua module: luatexbase-mcb 2010/05/12 0.2 register several functions in a callb
+ack
+))
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs.lua)
+Lua module: lualibs 2011/01/20 0.96 Lua additional functions.
+
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-string.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-lpeg.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-boolean.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-number.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-math.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-table.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-aux.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-io.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-os.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-file.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-md5.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-dir.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-unicode.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-utils.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-dimen.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-url.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-set.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/luaotfload.lua)
+Lua module: luaotfload 2011/02/16 1.24 OpenType layout system.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-luat-dum.lua.(using cache: /home/h7k/.texlive2010/texmf-var/luatex-cache/gen
+eric)
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-luat-ovr.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-data-con.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-ini.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-node-dum.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-node-inj.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-tfm.lua.
+luatexbase.attributes["otfl@state"] = 1
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-cid.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-ott.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-map.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-otf.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-otd.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-oti.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-otb.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-otn.lua.
+luatexbase.attributes["otfl@markbase"] = 2
+luatexbase.attributes["otfl@markmark"] = 3
+luatexbase.attributes["otfl@markdone"] = 4
+luatexbase.attributes["otfl@cursbase"] = 5
+luatexbase.attributes["otfl@curscurs"] = 6
+luatexbase.attributes["otfl@cursdone"] = 7
+luatexbase.attributes["otfl@kernpair"] = 8
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-ota.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-otc.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-def.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-xtx.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-dum.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-nms.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-clr.lua.
+Module luatexbase-mcb info: creating 'luaotfload.patch_font' type 4
+Module luatexbase-mcb info: inserting 'luaotfload.pre_linebreak_filter'
+(luatexbase-mcb)            at position 1 in 'pre_linebreak_filter'
+Module luatexbase-mcb info: inserting 'luaotfload.hpack_filter'
+(luatexbase-mcb)            at position 1 in 'hpack_filter'
+Module luatexbase-mcb info: resetting callback 'define_font'
+Module luatexbase-mcb info: inserting 'luaotfload.define_font'
+(luatexbase-mcb)            at position 1 in 'define_font'
+Module luatexbase-mcb info: inserting 'luaotfload.find_vf_file'
+(luatexbase-mcb)            at position 1 in 'find_vf_file'
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/fontspec/fontspec.lua)
+Lua module: fontspec 2009/12/04 2 Advanced font selection for LuaLaTeX.
+\l_fontspec_script_int=\count357
+\l_fontspec_language_int=\count358
+\l_fontspec_strnum_int=\count359
+Variant \tl_gset:cV already defined; not changing it on line 83
+
+(/opt/texlive/p2010/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+Package: xkeyval 2008/08/13 v2.6a package option processing (HA)
+
+(/opt/texlive/p2010/texmf-dist/tex/generic/xkeyval/xkeyval.tex
+\XKV@toks=\toks36
+\XKV@tempa@toks=\toks37
+\XKV@depth=\count360
+File: xkeyval.tex 2008/08/13 v2.6a key=value parser (HA)
+
+(/opt/texlive/p2010/texmf-dist/tex/generic/xkeyval/keyval.tex)))
+(/opt/texlive/p2010/texmf-dist/tex/latex/fontspec/fontspec-patches.sty
+Package: fontspec-patches 2011/02/26 v2.1f Advanced font selection for XeLaTeX/
+LuaLaTeX
+
+(/opt/texlive/p2010/texmf-dist/tex/latex/base/fixltx2e.sty
+Package: fixltx2e 2006/09/13 v1.1m fixes to LaTeX
+LaTeX Info: Redefining \em on input line 420.
+)
+LaTeX Info: Redefining \em on input line 22.
+LaTeX Info: Redefining \emph on input line 29.
+LaTeX Info: Redefining \- on input line 32.
+)
+(/opt/texlive/p2010/texmf-dist/tex/latex/base/fontenc.sty
+Package: fontenc 2005/09/27 v1.99g Standard LaTeX package
+
+(/opt/texlive/p2010/texmf-dist/tex/latex/euenc/eu2enc.def
+File: eu2enc.def 2010/05/27 v0.1h Experimental Unicode font encodings
+)
+LaTeX Font Info:    Try loading font information for EU2+lmr on input line 100.
+
+
+(/opt/texlive/p2010/texmf-dist/tex/latex/euenc/eu2lmr.fd
+File: eu2lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
+luaotfload | load font: auto-selecting default features for script: dflt (was l
+atn)(load: /home/h7k/.texlive2010/texmf-var/luatex-cache/generic/fonts/otf/temp
+-lmroman10-regular.lua))
+(/opt/texlive/p2010/texmf-dist/tex/xelatex/xunicode/xunicode.sty
+File: xunicode.sty 2010/11/06 v0.96 provides access to latin accents and many o
+ther characters in Unicode lower plane
+)
+ LaTeX info: Defining document command \fontspec
+(LaTeX)  with arg. spec. 'O{}m' on line 335.
+
+ LaTeX info: Defining document command \setmainfont
+(LaTeX)  with arg. spec. 'O{}m' on line 339.
+
+ LaTeX info: Defining document command \setsansfont
+(LaTeX)  with arg. spec. 'O{}m' on line 343.
+
+ LaTeX info: Defining document command \setmonofont
+(LaTeX)  with arg. spec. 'O{}m' on line 347.
+
+ LaTeX info: Defining document command \setmathrm
+(LaTeX)  with arg. spec. 'O{}m' on line 351.
+
+ LaTeX info: Defining document command \setboldmathrm
+(LaTeX)  with arg. spec. 'O{}m' on line 354.
+
+ LaTeX info: Defining document command \setmathsf
+(LaTeX)  with arg. spec. 'O{}m' on line 357.
+
+ LaTeX info: Defining document command \setmathtt
+(LaTeX)  with arg. spec. 'O{}m' on line 360.
+
+ LaTeX info: Defining document command \newfontfamily
+(LaTeX)  with arg. spec. 'mO{}m' on line 377.
+
+ LaTeX info: Defining document command \newfontface
+(LaTeX)  with arg. spec. 'mO{}m' on line 380.
+
+ LaTeX info: Defining document command \defaultfontfeatures
+(LaTeX)  with arg. spec. 'm' on line 383.
+
+ LaTeX info: Defining document command \addfontfeatures
+(LaTeX)  with arg. spec. 'm' on line 400.
+
+ LaTeX info: Defining document command \newfontfeature
+(LaTeX)  with arg. spec. 'mm' on line 407.
+
+ LaTeX info: Defining document command \newAATfeature
+(LaTeX)  with arg. spec. 'mmmm' on line 416.
+
+ LaTeX info: Defining document command \newICUfeature
+(LaTeX)  with arg. spec. 'mmm' on line 425.
+
+ LaTeX info: Defining document command \aliasfontfeature
+(LaTeX)  with arg. spec. 'mm' on line 427.
+
+ LaTeX info: Defining document command \aliasfontfeatureoption
+(LaTeX)  with arg. spec. 'mmm' on line 430.
+
+ LaTeX info: Defining document command \newfontscript
+(LaTeX)  with arg. spec. 'mm' on line 435.
+
+ LaTeX info: Defining document command \newfontlanguage
+(LaTeX)  with arg. spec. 'mm' on line 457.
+
+ LaTeX info: Defining document command \DeclareFontsExtensions
+(LaTeX)  with arg. spec. 'm' on line 474.
+
+\c@fontspec_tmp_int=\count361
+LaTeX Info: Redefining \itshape on input line 2105.
+LaTeX Info: Redefining \slshape on input line 2109.
+LaTeX Info: Redefining \scshape on input line 2113.
+LaTeX Info: Redefining \upshape on input line 2117.
+
+(/opt/texlive/p2010/texmf-dist/tex/latex/fontspec/fontspec.cfg))(load: /home/h7
+k/.texlive2010/texmf-var/luatex-cache/generic/fonts/otf/temp-ipaexm.lua)
+fontspec: script 'latn' exists in font 'IPAexMincho'
+fontspec: script 'latn' exists in font 'IPAexMincho'
+fontspec: feature '+jp90' for language 'DFLT' and script 'latn' exists in font 
+'IPAexMincho'
+\g_fontspec_family_ipaexm.ttf_int=\count362
+ fontspec info: Defining font family 'ipaexm.ttf(0)' for font 'ipaexm.ttf' with
+ options [BoldFont={ipaexg.ttf},Style=OLDJIS].
+
+\g_fontspec_ipaexm.ttf(0)_prop=\toks38
+fontspec: feature '+jp90' for language 'DFLT' and script 'latn' exists in font 
+'IPAexMincho'
+ fontspec info: Defining shape 'normal' with NFSS spec.:
+(fontspec)  <->"file:ipaexm.ttf:mode=node;script=latn;language=DFLT;+jp90;"
+
+(load: /home/h7k/.texlive2010/texmf-var/luatex-cache/generic/fonts/otf/temp-ipa
+exg.lua)
+fontspec: feature '+jp90' for language 'DFLT' and script 'latn' exists in font 
+'IPAexGothic'
+ fontspec info: Defining shape 'bold' with NFSS spec.:
+(fontspec)  <->"file:ipaexg.ttf:mode=node;script=latn;language=DFLT;+jp90;"
+
+luaotfload | define font: font with name ipaexg.ttf/I is not found
+luaotfload | define font: unknown font ipaexg.ttf/I, loading aborted
+luaotfload | define font: font with name ipaexg.ttf/I is not found
+luaotfload | define font: unknown font ipaexg.ttf/I, loading aborted
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 
+! fontspec error: "font-not-found"
+! 
+! The font "ipaexg.ttf/I" cannot be found.
+! 
+! See the fontspec documentation for further information.
+! For immediate help type H <return>.
+!...............................................  
+                                                  
+l.6 ...Font={ipaexg.ttf},Style=OLDJIS]{ipaexm.ttf}
+                                                  
+? 
+ fontspec warning: OpenType feature 'Style=OLDJIS' (+jp90) not available
+(fontspec)  for font 'ipaexg.ttf/I',
+(fontspec)  with script 'Latin', and language 'Default'.
+
+ fontspec info: Defining shape 'bold italic' with NFSS spec.:
+(fontspec)  <->"file:ipaexg.ttf/I:mode=node;script=latn;language=DFLT;"
+
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-core.sty
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/luaotfload.sty)
+\luatexja@tempcnta=\count363
+\luatexja@tempdima=\dimen265
+\kanjiskip=\skip265
+\xkanjiskip=\skip266
+\zw=\dimen266
+\zh=\dimen267
+\jQ=\dimen268
+\jH=\dimen269
+\luatexja@autospc=\count364
+\luatexja@autoxspc=\count365
+
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-core.lua)
+Module luatexbase-mcb info: inserting 'ltj.process_input_buffer'
+(luatexbase-mcb)            at position 1 in 'process_input_buffer'
+Module luatexbase-mcb info: inserting 'ltj.pre_linebreak_filter'
+(luatexbase-mcb)            at position 2 in 'pre_linebreak_filter'
+Module luatexbase-mcb info: inserting 'ltj.hpack_filter'
+(luatexbase-mcb)            at position 2 in 'hpack_filter'
+Module luatexbase-mcb info: inserting 'ltj.hpack_filter_pre'
+(luatexbase-mcb)            at position 1 in 'hpack_filter'
+Module luatexbase-mcb info: inserting 'ltj.hyphenate'
+(luatexbase-mcb)            at position 1 in 'hyphenate'
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-core-aux.lua)
+\luatexja@curjfnt=\luatexattribute9
+\luatexja@charclass=\luatexattribute10
+\luatexja@yablshift=\luatexattribute11
+\luatexja@ykblshift=\luatexattribute12
+\luatexja@icflag=\luatexattribute13
+\luatexja@japanese=\language74
+
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-kinsoku.tex))
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatj-ujis.lua)
+(./test02-latex.aux)
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for EU2/lmr/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+ fontspec info: Adjusting the maths setup (use [no-math] to avoid this).
+
+\symlegacymaths=\mathgroup4
+LaTeX Font Info:    Overwriting symbol font `legacymaths' in version `bold'
+(Font)                  OT1/cmr/m/n --> OT1/cmr/bx/n on input line 10.
+LaTeX Font Info:    Redeclaring math accent \acute on input line 10.
+LaTeX Font Info:    Redeclaring math accent \grave on input line 10.
+LaTeX Font Info:    Redeclaring math accent \ddot on input line 10.
+LaTeX Font Info:    Redeclaring math accent \tilde on input line 10.
+LaTeX Font Info:    Redeclaring math accent \bar on input line 10.
+LaTeX Font Info:    Redeclaring math accent \breve on input line 10.
+LaTeX Font Info:    Redeclaring math accent \check on input line 10.
+LaTeX Font Info:    Redeclaring math accent \hat on input line 10.
+LaTeX Font Info:    Redeclaring math accent \dot on input line 10.
+LaTeX Font Info:    Redeclaring math accent \mathring on input line 10.
+LaTeX Font Info:    Redeclaring math symbol \colon on input line 10.
+LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 10.
+LaTeX Font Info:    Redeclaring math symbol \Delta on input line 10.
+LaTeX Font Info:    Redeclaring math symbol \Theta on input line 10.
+LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 10.
+LaTeX Font Info:    Redeclaring math symbol \Xi on input line 10.
+LaTeX Font Info:    Redeclaring math symbol \Pi on input line 10.
+LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 10.
+LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 10.
+LaTeX Font Info:    Redeclaring math symbol \Phi on input line 10.
+LaTeX Font Info:    Redeclaring math symbol \Psi on input line 10.
+LaTeX Font Info:    Redeclaring math symbol \Omega on input line 10.
+LaTeX Font Info:    Redeclaring math symbol \mathdollar on input line 10.
+LaTeX Font Info:    Redeclaring symbol font `operators' on input line 10.
+LaTeX Font Info:    Encoding `OT1' has changed to `EU2' for symbol font
+(Font)              `operators' in the math version `normal' on input line 10.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
+(Font)                  OT1/cmr/m/n --> EU2/lmr/m/n on input line 10.
+LaTeX Font Info:    Encoding `OT1' has changed to `EU2' for symbol font
+(Font)              `operators' in the math version `bold' on input line 10.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
+(Font)                  OT1/cmr/bx/n --> EU2/lmr/m/n on input line 10.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
+(Font)                  EU2/lmr/m/n --> EU2/lmr/m/n on input line 10.
+LaTeX Font Info:    Overwriting math alphabet `\mathrm' in version `normal'
+(Font)                  EU2/lmr/m/n --> EU2/lmr/m/n on input line 10.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
+(Font)                  OT1/cmr/m/it --> EU2/lmr/m/it on input line 10.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
+(Font)                  OT1/cmr/bx/n --> EU2/lmr/bx/n on input line 10.
+LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
+(Font)                  OT1/cmss/m/n --> EU2/lmss/m/n on input line 10.
+LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
+(Font)                  OT1/cmtt/m/n --> EU2/lmtt/m/n on input line 10.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
+(Font)                  EU2/lmr/m/n --> EU2/lmr/bx/n on input line 10.
+LaTeX Font Info:    Overwriting math alphabet `\mathrm' in version `bold'
+(Font)                  EU2/lmr/m/n --> EU2/lmr/bx/n on input line 10.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
+(Font)                  OT1/cmr/bx/it --> EU2/lmr/bx/it on input line 10.
+LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
+(Font)                  OT1/cmss/bx/n --> EU2/lmss/bx/n on input line 10.
+LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
+(Font)                  OT1/cmtt/m/n --> EU2/lmtt/bx/n on input line 10.
+luaotfload | load font: auto-selecting default features for script: dflt (was l
+atn)
+luaotfload | load font: auto-selecting default features for script: dflt (was l
+atn)
+luaotfload | load font: auto-selecting default features for script: dflt (was l
+atn)
+
+### vertical mode entered at line 0
+### current page:
+\write-{}
+\glue(\topskip) 0.0
+\hbox(11.36249+2.06)x345.0, glue set 171.42003fil, direction TLT
+.\whatsit
+..\localinterlinepenalty=0
+..\localbrokenpenalty=0
+..\localleftbox=null
+..\localrightbox=null
+.\hbox(0.0+0.0)x15.0, direction TLT
+.\EU2/lmr/m/n/10 a
+.\EU2/lmr/m/n/10 b
+.\kern 0.28
+.\EU2/lmr/m/n/10 c
+.\EU2/lmr/m/n/10 d
+.\discretionary
+..\EU2/lmr/m/n/10 -
+.\EU2/lmr/m/n/10 f
+.\EU2/lmr/m/n/10 g
+.\EU2/lmr/m/n/10 h
+.\EU2/lmr/m/n/10 j
+.\EU2/lmr/m/n/10 f
+.\EU2/lmr/m/n/10 g
+.\glue 3.59999 plus 1.19992 minus 1.19992
+.\EU2/ipaexm.ttf(0)/m/n/10 あ
+.\glue 0.0 plus 0.4 minus 0.4
+.\EU2/ipaexm.ttf(0)/m/n/10 い
+.\glue 0.0 plus 0.4 minus 0.4
+.\EU2/ipaexm.ttf(0)/m/n/10 う
+.\glue 0.0 plus 0.4 minus 0.4
+.\EU2/ipaexm.ttf(0)/m/n/10 󰄃
+.\penalty 10000
+.\hbox(8.8+1.2)x5.0, glue set - 5.0fil, direction TLT
+..\EU2/ipaexm.ttf(0)/m/n/10 ）
+..\glue 0.0 plus 1.0fil minus 1.0fil
+.\glue 5.0 minus 5.0
+.\hbox(8.8+1.2)x5.0, glue set - 5.0fil, direction TLT
+..\EU2/ipaexm.ttf(0)/bx/n/10 （
+..\glue 0.0 plus 1.0fil minus 1.0fil
+.\penalty 10000
+.\EU2/ipaexm.ttf(0)/bx/n/10 󰄃
+.\glue 0.0 plus 0.4 minus 0.4
+.\EU2/ipaexm.ttf(0)/bx/n/10 あ
+.\glue 0.0 plus 0.4 minus 0.4
+.\EU2/ipaexm.ttf(0)/bx/n/14.4 あ
+.\glue 0.0 plus 0.4 minus 0.4
+.\EU2/ipaexm.ttf(0)/bx/n/10 い
+.\glue 0.0 plus 0.4 minus 0.4
+.\EU2/ipaexm.ttf(0)/bx/n/10 う
+.\kern 0.0
+.\penalty 10000
+.\glue(\parfillskip) 0.0 plus 1.0fil
+.\glue(\rightskip) 0.0
+\glue(\parskip) 0.0 plus 1.0
+\glue(\lineskip) 1.0
+\hbox(11.36249+2.06)x345.0, glue set 166.42003fil, direction TLT
+.\whatsit
+..\localinterlinepenalty=0
+..\localbrokenpenalty=0
+..\localleftbox=null
+..\localrightbox=null
+.\hbox(0.0+0.0)x15.0, direction TLT
+.\EU2/lmr/m/n/10 a
+.\EU2/lmr/m/n/10 b
+.\kern 0.28
+.\EU2/lmr/m/n/10 c
+.\EU2/lmr/m/n/10 d
+.\discretionary
+..\EU2/lmr/m/n/10 -
+.\EU2/lmr/m/n/10 f
+.\EU2/lmr/m/n/10 g
+.\EU2/lmr/m/n/10 h
+.\EU2/lmr/m/n/10 j
+.\EU2/lmr/m/n/10 f
+.\EU2/lmr/m/n/10 g
+.\glue 3.59999 plus 1.19992 minus 1.19992
+.\EU2/ipaexm.ttf(0)/m/n/10 あ
+.\glue 0.0 plus 0.4 minus 0.4
+.\EU2/ipaexm.ttf(0)/m/n/10 い
+.\glue 0.0 plus 0.4 minus 0.4
+.\EU2/ipaexm.ttf(0)/m/n/10 う
+.\glue 0.0 plus 0.4 minus 0.4
+.\EU2/ipaexm.ttf(0)/m/n/10 󰄃
+.\penalty 10000
+.\hbox(8.8+1.2)x5.0, glue set - 5.0fil, direction TLT
+..\EU2/ipaexm.ttf(0)/m/n/10 ）
+..\glue 0.0 plus 1.0fil minus 1.0fil
+.\glue 5.0 minus 5.0
+.\kern 0.0
+.\glue 5.0 minus 5.0
+.\hbox(8.8+1.2)x5.0, glue set - 5.0fil, direction TLT
+..\EU2/ipaexm.ttf(0)/bx/n/10 （
+..\glue 0.0 plus 1.0fil minus 1.0fil
+.\penalty 10000
+.\EU2/ipaexm.ttf(0)/bx/n/10 󰄃
+.\glue 0.0 plus 0.4 minus 0.4
+.\EU2/ipaexm.ttf(0)/bx/n/10 あ
+.\glue 0.0 plus 0.4 minus 0.4
+.\EU2/ipaexm.ttf(0)/bx/n/14.4 あ
+.\glue 0.0 plus 0.4 minus 0.4
+.\EU2/ipaexm.ttf(0)/bx/n/10 い
+.\glue 0.0 plus 0.4 minus 0.4
+.\EU2/ipaexm.ttf(0)/bx/n/10 う
+.\kern 0.0
+.\penalty 10000
+.\glue(\parfillskip) 0.0 plus 1.0fil
+.\glue(\rightskip) 0.0
+total height 25.78497 plus 1.0
+ goal height 550.0
+prevdepth 2.06, prevgraf 1 line
+
+! OK.
+<recently read> \showlists 
+                           
+l.32 ...depth=10000\showboxbreadth=10000\showlists
+                                                  
+
+[1
+
+{/opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdftex.map
+LuaTeX warning (file /opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdfte
+x.map): fontmap entry for `bchb8r' already exists, duplicates ignored
+
+LuaTeX warning (file /opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdfte
+x.map): fontmap entry for `bchbi8r' already exists, duplicates ignored
+
+LuaTeX warning (file /opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdfte
+x.map): fontmap entry for `bchbo8r' already exists, duplicates ignored
+
+LuaTeX warning (file /opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdfte
+x.map): fontmap entry for `bchr8r' already exists, duplicates ignored
+
+LuaTeX warning (file /opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdfte
+x.map): fontmap entry for `bchri8r' already exists, duplicates ignored
+
+LuaTeX warning (file /opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdfte
+x.map): fontmap entry for `bchro8r' already exists, duplicates ignored
+}] (./test02-latex.aux) )
+
+Here is how much of LuaTeX's memory you used:
+ 10767 strings out of 494974
+ 100000,319454 words of node,token memory allocated
+ 301 words of node memory still in use:
+   2 hlist, 1 vlist, 1 rule, 2 glue, 11 attribute, 42 glue_spec, 3 attribute_li
+st, 1 write nodes
+   avail lists: 2:339,3:7,4:72,5:5,6:52,7:1,9:12,10:2
+ 13973 multiletter control sequences out of 65536+200000
+ 21 fonts using 10241151 bytes
+ 48i,4n,74p,243b,296s stack positions out of 5000i,500n,10000p,200000b,50000s
+</opt/texlive/p2010/texmf/fonts/truetype/test/ipaexg.ttf></opt/texlive/p2010/te
+xmf/fonts/truetype/test/ipaexm.ttf></opt/texlive/p2010/texmf-dist/fonts/opentyp
+e/public/lm/lmroman10-regular.otf>
+Output written on test02-latex.pdf (1 page, 260205 bytes).
+PDF statistics: 29 PDF objects out of 1000 (max. 8388607)
+ 16 compressed objects within 1 object stream
+ 0 named destinations out of 1000 (max. 131072)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+
