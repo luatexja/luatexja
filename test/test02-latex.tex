@@ -13,7 +13,7 @@
 \def\extract@font{%
     \get@external@font
     \global\expandafter\font\font@name\external@font\relax
-    \ifnum\pdf@strcmp{\f@encoding}{EU2}=0\jfont\font@name{mt}\fi
+    \ifnum\pdf@strcmp{\f@encoding}{EU2}=0\expandafter\jfont\font@name{mt}\fi
     \font@name\global\zw=\zw\global\zh=\zh
     \ifnum\pdf@strcmp{\f@encoding}{EU2}=0%
       \global\kanjiskip=0pt plus 0.4pt minus 0.4pt%

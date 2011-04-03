@@ -76,10 +76,6 @@ function ltj.jfontdefA(b)
   ltj.fntbki=font.current()
   local t = token.get_next()
   ltj.cstemp=token.csname_name(t)
-  if ltj.cstemp=='font@name' then 
-    -- a hack for NFSS. We need more fundamental solution.
-    token.expand(t); t=token.get_next(); ltj.cstemp=token.csname_name(t)
-  end
   tex.sprint('\\csname ' .. ltj.cstemp .. '\\endcsname\\csname @jfont\\endcsname')
   -- A trick to get font id associated of the argument of \jfont.
   -- font.id() does not seem to work in my environment...

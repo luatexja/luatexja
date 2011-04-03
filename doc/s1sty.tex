@@ -53,7 +53,7 @@
   \let\sc=\eightsc \def\tt{\eighttt\eightjtt}%
   \let\mc=\eightipam \let\gt=\eightipag%
   \rm\mc\xkanjiskip=0.25\zw plus 0.10\zw minus 0.10\zw%
-  \ykbaselineshift=-49807\yabaselineshift=-0.76 pt
+  \ykbaselineshift=-49807\yabaselineshift=-49807
 }
 
 
@@ -70,7 +70,7 @@
   \message{#1}\leftline{\large\bf#1\hskip0.5\zw\hrulefill}\nobreak\smallskip}
 \outer\def\beginparagraph#1\par{\vskip0pt plus.1\vsize\penalty-100%
   \vskip0pt plus-.1\vsize\medskip\vskip\parskip%
-  \message{#1}\leftline{\bf■#1}\nobreak}
+  \message{#1}\leftline{\bf\char"25A0#1}\nobreak}
 
 % verbatim
 % borrowed from manmac.tex

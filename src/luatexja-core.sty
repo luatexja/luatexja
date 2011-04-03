@@ -83,9 +83,6 @@
 % \inhibitglue
 \def\inhibitglue{\directlua{ltj.create_ihb_node()}}
 
-\def\yabaselineshift{\afterassignment\luatexja@yabsset\luatexja@tempdima}
-\def\luatexja@yabsset{\luatexja@yablshift=\luatexja@tempdima }
-
 \input luatexja-kinsoku.tex
 \catcode`\@=12
 \endinput
