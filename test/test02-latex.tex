@@ -2,19 +2,45 @@
 \documentclass{article}
 \usepackage{fontspec,pdftexcmds}
 
-\newopentypefeature{Style}{OLDJIS}{+jp90}
-\newfontfamily\hiramin[BoldFont={ipaexg.ttf},Style=OLDJIS]{ipaexm.ttf}
 \input luatexja-core.sty
 \loadjfontmetric{mt}{ujis}
 
+\ExplSyntaxOn
+\xetex_or_luatex:nnn { \tl_set:Nn \l_fontspec_pre_feat_sclist }
+  {
+    \bool_if:NT \l_fontspec_icu_bool {
+      \tl_if_empty:NF \l_fontspec_script_tl
+      {
+        script   = \l_fontspec_script_tl ;
+        language = \l_fontspec_lang_tl   ;jfm=mt;
+      }
+    }
+  }
+  {
+    mode     = \l_fontspec_mode_tl   ;
+    \tl_if_empty:NF \l_fontspec_script_tl
+    {
+      script   = \l_fontspec_script_tl ;
+      language = \l_fontspec_lang_tl   ;jfm=mt;
+    }
+  }
+\ExplSyntaxOff
+
+\newopentypefeature{Style}{OLDJIS}{+jp90}
+\newfontfamily\goth[BoldFont={ipaexg.ttf},Style=OLDJIS]{ipaexm.ttf}
+
 \begin{document}
 \makeatletter
-
 \def\extract@font{%
     \get@external@font
-    \global\expandafter\font\font@name\external@font\relax
-    \ifnum\pdf@strcmp{\f@encoding}{EU2}=0\expandafter\jfont\font@name{mt}\fi
-    \font@name\global\zw=\zw\global\zh=\zh
+    \ifnum\pdf@strcmp{\f@encoding}{EU2}=0
+      \expandafter\jfont\font@name\external@font\relax
+      \global\expandafter\font@name{\font@name}%
+      \font@name\global\zw=\zw\global\zh=\zh
+    \else
+      \global\expandafter\font\font@name\external@font\relax
+      \font@name
+    \fi
     \ifnum\pdf@strcmp{\f@encoding}{EU2}=0%
       \global\kanjiskip=0pt plus 0.4pt minus 0.4pt%
       \global\xkanjiskip=0.25\zw plus 0.083333\zw minus 0.083333\zw%
@@ -25,9 +51,9 @@
 % ! The font "ipaexg.ttf/I" cannot be found. というエラーが出る
 
 
-\hiramin abcdfghjfgあいう辻）\textbf{\unkern（辻あ{\Large あ}いう}
+\goth abcdfghjfgあいう辻）\textbf{\unkern（辻あ{\Large あ}いう}
 
-\hiramin abcdfghjfgあいう辻）\textbf{（辻あ{\Large あ}いう}
+\goth abcdfghjfgあいう辻）\textbf{（辻あ{\Large あ}いう}
 % \unkern がないとうなくいかない
 
 \tracingonline=1\scrollmode\showboxdepth=10000\showboxbreadth=10000\showlists

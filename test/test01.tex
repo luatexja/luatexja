@@ -2,18 +2,18 @@
 \input luatexja-core.sty
 
 \loadjfontmetric{mt}{ujis}
-\font\tenmin={file:ipaexm.ttf}\jfont\tenmin{mt}\tenmin
-\font\tengoth={file:ipaexg.ttf}\jfont\tengoth{mt}
-\font\jisninety={file:ipaexm.ttf:script=latn;+jp90}\jfont\jisninety{mt}
-\font\jisexpt={file:ipaexm.ttf:script=latn;+expt}\jfont\jisexpt{mt}
-\font\jishwid={file:ipaexm.ttf:script=latn;+hwid}\jfont\jishwid{mt}
+\jfont\tenmin={file:ipaexm.ttf:jfm=mt}\tenmin
+\jfont\tengoth={file:ipaexg.ttf:jfm=mt}
+\jfont\jisninety={file:ipaexm.ttf:script=latn;+jp90;jfm=mt}
+\jfont\jisexpt={file:ipaexm.ttf:script=latn;+expt;jfm=mt}
+\jfont\jishwid={file:ipaexm.ttf:script=latn;+hwid;jfm=mt}
 %\font\tmihwid={file:ipaexm.ttf:script=latn;+hwid}
-\font\jisnalt={file:ipaexm.ttf:script=latn;+nalt}\jfont\jisnalt{mt}
-\font\jistrad={file:ipaexm.ttf:script=latn;+trad}\jfont\jistrad{mt}
-\font\jissups={file:ipaexm.ttf:script=latn;+sups}\jfont\jissups{mt}
-\font\jisliga={file:ipaexm.ttf:script=latn;+liga}\jfont\jisliga{mt}
+\jfont\jisnalt={file:ipaexm.ttf:script=latn;+nalt;jfm=mt}
+\jfont\jistrad={file:ipaexm.ttf:script=latn;+trad;jfm=mt}
+\jfont\jissups={file:ipaexm.ttf:script=latn;+sups;jfm=mt}
+\jfont\jisliga={file:ipaexm.ttf:script=latn;+liga;jfm=mt}
 %\font\tmiliga={file:ipaexm.ttf:script=latn;+liga}
-\font\jisvert={file:ipaexm.ttf:script=latn;+vert}\jfont\jisvert{mt}
+\jfont\jisvert={file:ipaexm.ttf:script=latn;+vert;jfm=mt}
 \parskip=\smallskipamount\parindent=1\zw
 
 {\noindent\bf\tengoth luatj-ujis.lua を使用}

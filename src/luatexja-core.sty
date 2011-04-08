@@ -1,7 +1,7 @@
-\input luaotfload.sty
 \catcode`\@=11
 \catcode"FFFFF=14 %"
 
+\input luaotfload.sty
 \ifdefined\luatexja@loaded\endinput\fi
 \def\luatexja@loaded{hoge}
 
@@ -18,6 +18,7 @@
 \newcount\luatexja@autoxspc
 
 \directlua{%
+  utf = unicode.utf8
   ltj = {}
   function ltj.loadlua(file)
     local path = assert(kpse.find_file(file, 'tex'),
@@ -25,7 +26,10 @@
     texio.write_nl("("..path..")")
     dofile(path)
   end
+ ltj.loadlua('luatexja-rmlgbm.lua') 
+    % This file must be read before luatexja-jfont.lua. For Ryumin-Light and GothicBBB-Medium.
   ltj.loadlua('luatexja-core.lua')
+  ltj.loadlua('luatexja-jfont.lua')
   ltj.loadlua('luatexja-core-aux.lua')
 }
 
@@ -38,18 +42,16 @@
 % for italic correction
 \newluatexattribute\luatexja@icflag
 \let\luatexja@ic=\/
-\def\/{{\luatexja@icflag=1\luatexja@ic}}
+\protected\def\/{{\luatexja@icflag=1\luatexja@ic}}
 
 % for hyphenation
 \newlanguage\luatexja@japanese
 \directlua{ltj.ja_lang_number=\the\luatexja@japanese}
 
 
-% \jfont<font><metric name> : Regard <font> as a Japanese font.
-% <font> must be defined by \font primitive already, and <metric> must be a control 
-% sequence defined by \loadjfontmetric below.
-\def\jfont{\directlua{ltj.jfontdefA(true)}}
-\def\@jfont#1{\directlua{ltj.jfontdefB('#1')}}
+% \jfont\CS={...:...;jfm=metric;...}
+\def\jfont{\afterassignment\@jfont\directlua{ltj.jfontdefX(true)}}
+\def\@jfont{\directlua{ltj.jfontdefY()}}
 
 % \loadjfontmetric<metric name><filename> : 
 % load <filename> which contains a font metric for a Japanese font.

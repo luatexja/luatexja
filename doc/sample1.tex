@@ -42,7 +42,7 @@
 
 \item 全体的にテスト不足です．
 \item 合字の前後の和欧文間空白の挿入処理は適当{\small（合字でない場合の処理をそのまま流用）\inhibitglue}．
-\item {\bf 現時点で\LaTeX での使用は全く考慮されていません．``plain Lua\TeX''で使ってください．}
+\item {\bf 現時点で\LaTeX での使用は殆ど考慮されていません．``plain Lua\TeX''で使ってください．}
 \item |\accent|を和文文字に対して使うことはできません．これは「フォントを後で置換する」という実装上，
 仕方のないことだと思われます．
 \item 数式中の日本語は想定していません．|\hbox|か何かで囲ってください．
@@ -58,13 +58,18 @@
 
 
 \item {\tt luatexja-core.sty}: 
-マクロ本体．拡張子は{\tt sty}であるが，この単一のファイルでplain \TeX と\LaTeX 両方に
+コア部分．拡張子は{\tt sty}であるが，この単一のファイルでplain \TeX と\LaTeX 両方に
 対応するように設計する方針である．しかし，
 {\bf 現時点で\LaTeX での使用は全く考慮されていない．}
-\item {\tt luatexja-core.lua}: Luaコード部分．
+\item {\tt luatexja-core.lua}: コア部分に使われるLuaコード．
+\item {\tt luatexja-jfont.lua}: 和文フォント定義部のLuaコード．
+\item {\tt luatexja-rmlgbm.lua}: 非埋込和文フォント (Ryumin-Light etc.) 定義部．
+\item {\tt luatexja-ucs2aj16.lua}: UnicodeとCIDの対応表（{\tt UniJIS-UTF32-H}由来）．
+\item {\tt mk\_lua.py}: {\tt luatexja-ucs2aj16.lua}作成用Pythonスクリプト．
+
 \item {\tt luatexja-kinsoku.tex}: 禁則用ペナルティ等のパラメータを書いたファイル．
 下のファイルによって{\tt ukinsoku.tex} (in up\TeX-0.30) から自動生成されたもの．
-\item {\tt luatexja-kinsoku\_make.tex}: 上の{\tt luatexja-kinsoku.tex}を作るためのファイル．
+\item {\tt luatexja-kinsoku\_make.tex}: 上の{\tt luatexja-kinsoku.tex}製作用ファイル．
 \item {\tt luatj-ujis.lua}: up\TeX-0.30の{\tt ujis.tfm}ベースのメトリックサンプル．
 \item {\tt luatj-mono.lua}: 「全文字が全角幅」のメトリックサンプル．
 \enditem
@@ -75,8 +80,7 @@
 \begintt
 \input luatexja-core.sty               % ←マクロ本体を読み込み
 \loadjfontmetric{mt}{ujis}             % ←メトリックの読み込み
-\font\tenipam={file:ipam.ttf}at13.5\jQ 
-\jfont\tenipam{mt}                     % 和文フォントとして認識
+\jfont\tenipam={file:ipam.ttf:jfm=mt}at13.5\jQ 
 \tenipam\parindent=1\zw 
 \yabaselineshift=32768                 % （例）32768 sp =  0.5 pt
 
@@ -95,7 +99,7 @@ primitiveがあることから，意味は容易にわかるだろう:
 
 p\TeX では内部のグローバル変数で「現在の横組/縦組和文フォント」をそれぞれ保持していたが，
 当然ながら欧文用\TeX ではそのようなことはそのままではできない．
-node~$p$が保持しているattribute |\luatexja@curjfn|の値$k$は，
+node~$p$が保持しているattribute |\luatexja@curjfnt|の値$k$は，
 「もし$p$の中身が和文文字であれば，そのフォントは$k$番の番号のフォントである」という意味をもつ．
 
 \item attribute |\luatexja@charclass|: （和文文字の）文字クラス
@@ -137,30 +141,34 @@ p\TeX における{\tt JFM}ファイルのようなものと考えてよい．
 
 このため，和文フォントを使うには，以下のような手順が必要である．
 
-\enum |\font<font>={file:<fontfile>} [at <size>]|
-
-\TeX の|\font| primitiveを用いてひとまずフォントを読み込む．和文フォントの場合は，
-このようにluaotfloadパッケージの機能を用いてTrueType/OpenTypeフォントを読み込むことになる．
-
-\itemitem この段階では，制御綴<font>はまだ「現在の（欧文）フォントを変更する」意味である．
-\itemitem 例えば，
-\begintt
-  \font\tenipam={file:ipaexm.ttf:script=latn;+jp90}
-\endtt
-のように各種のfeatureを用いてもよい．{\bf 本文書では全てのフォントに|jp90| featureを
-適用させている{\small\rm （「辻」など）\inhibitglue}．}
-
 \enum |\loadjfontmetric{<key>}{<file>}|
 
 Luaソース|luatj-<file>.lua|に書かれたメトリック情報を読み込む．
 内部では<key>というキーで参照されることとなる．同じkeyで2回以上読み込むことはできないが，
 同じメトリック情報に異なるキーをつけることは差し支えない．
 
-\enum |\jfont<font>{<key>}|
+\enum |\jfont<font>={<fontname>:jfm=<key>} [at <size>/scaled <scale>]|
 
-制御綴<font>を「metric keyが<key>の和文フォント」と認識させる．
-正確に言うと，制御綴<font>の意味を，「$\hbox{|\luatexja@curjfn|}\leftarrow v$」というように変更する．
-これにより，以後<font>を発行しても，欧文フォントは変わらない．
+\TeX の|\font| primitiveと同様の書式を持った|\jfont|命令を用いて和文フォントを定義する．
+少し正確に言うと，制御綴<font>の意味を，「$\hbox{|\luatexja@curjfnt|}\leftarrow v$」というように
+変更する．
+
+\itemitem 内部でluaotfloadパッケージを読み込んでいる．そのため，
+<fontname>の部分は |file:ipam.ttf| 等のように，TrueType/OpenTypeフォントを指定することが可能．
+
+\itemitem 但し，<fontname>が|psft:<ps-font>|であった場合は，
+<ps-font>で指定された名前の和文フォント（非埋込）となる．
+例えば，本文章では，
+\begintt
+\jfont\tenipam={psft:Ryumin-Light:jfm=mt} at 13.5\jQ
+\jfont\tenipag={psft:GothicBBB-Medium:jfm=mt} at 13.5\jQ
+\endtt
+のような定義をし，標準和文フォントRyumin-Light, GothicBBB-Mediumを用いている．
+\itemitem luaotfload packageの他の機能，例えば各種のfeature，を用いてもよい．例えば，次のように：
+\begintt
+\jfont\tenipam={file:ipaexm.ttf:script=latn;+jp90;jfm=mt}
+\endtt
+
 
 \enditem
 
@@ -209,10 +217,10 @@ Lua\TeX-jaパッケージでは，次のような流れで処理を行う．
 
 この段階の前では，和文文字であっても，それを内部で表している|glyph_node|~$p$は，
 「|\temrm あ|」のように，欧文フォントが指定されている状態になっている．しかし，
-$p$は「現在の和文フォント」の番号もattribute |\luatexja@curjfn|として保持している．そのため，
+$p$は「現在の和文フォント」の番号もattribute |\luatexja@curjfnt|として保持している．そのため，
 この段階では，「和文文字が格納されている」|glyph_node|~$p$に対して，次を行う．
 
-\itemitem $p$のフォントをattribute |\luatexja@curjfn|の値に置換．
+\itemitem $p$のフォントをattribute |\luatexja@curjfnt|の値に置換．
 \itemitem $p$の|language| fieldを|\luatexja@japanese|の値に置換．
 誤って和文文字間でハイフネーションがされてしまうのを防止するため．
 \itemitem $p$の文字の文字クラスを計算し，その値をattribute |\luatexja@charclass|に格納．
@@ -229,7 +237,8 @@ $p$は「現在の和文フォント」の番号もattribute |\luatexja@curjfn|�
 \itemitem 和文文字とそうでないもの（欧文文字，ボックス等）の間に関しては，
 和文文字でない方は「文字コード|'jcharbdd'|の文字」であると見做す．
 \itemitem フォントの異なる2つの和文文字においても，
-両者のフォントのmetric keyとsizeが一致した場合は，挿入処理においては「同じフォント」であるかのように扱う．
+両者のフォントのmetric keyとsizeが一致した場合は，
+挿入処理においては「同じフォント」であるかのように扱う．
 \itemitem  そうでない場合は，両者の間に「文字コード|'diffmet'|の文字」があると見做して，
 両和文文字からそれぞれglue/kern |gb|, |ga|を計算し，そこから実際に入るglue/kernを，
 関数|ltj.calc_between_two_jchar_aux|で計算している：
@@ -287,7 +296,7 @@ p\TeX 用{\tt JFM}で言うところの「文字クラス」を定義する．
 リストの形|{...}|で記述する．
 
 また，このリストには，以下の「仮想的な文字」も指定可能である．
-\itemT |'\boxbdd'|: 水平ボックスの先頭/末尾，段落の先頭/末尾．
+\itemT |'boxbdd'|: 水平ボックスの先頭/末尾，段落の先頭/末尾．
 \itemT |'jcharbdd'|: 和文文字達の連続の境界．
 \itemT |'diffmet'|: 異なるメトリックの和文文字間に入るglueの計算に使われる．
 
@@ -300,7 +309,7 @@ TrueTypeフォントを基準にすると，「左に半角幅ずらす」こと
 <left>はその「左へのずらし量」を指定する．
 \itemitem <down>: 同様に，「下へのずらし量」を指定する．
 \itemitem <width>, <height>, <depth>: それぞれ幅，高さ，深さ．
-\itemitem <italic>: イタリック補正値．
+\itemitem <italic>: イタリック補正値（未実装）．
 
 \item |jfm.define_glue(<bclass>, <aclass>, <width>, <stretch>, <shrink>)|
 
@@ -330,7 +339,7 @@ TrueTypeフォントを基準にすると，「左に半角幅ずらす」こと
 
 \beginparagraph 表記法
 
-正しくは “\TeX”と表記するが、それができない場合には
+正しくは“\TeX”と表記するが、それができない場合には
 “{\tt TeX}”と表記する（“{\tt TEX}”と表記するのは誤り）。
 
 \beginparagraph 読み方

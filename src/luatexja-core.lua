@@ -3,101 +3,6 @@ function ltj.error(s)
   tex.error("LuaTeX-ja error: " .. s ); 
 end
 
--- procedures for loading Japanese font metric
-jfm={}; jfm.char_type={}; jfm.glue={}; jfm.kern={}
-
-function jfm.define_char_type(t,lt) 
-   if not jfm.char_type[t] then jfm.char_type[t]={} end
-   jfm.char_type[t].chars=lt 
-end
-function jfm.define_type_dim(t,l,x,w,h,d,i)
-   if not jfm.char_type[t] then jfm.char_type[t]={} end
-   jfm.char_type[t].width=w; jfm.char_type[t].height=h;
-   jfm.char_type[t].depth=d; jfm.char_type[t].italic=i; 
-   jfm.char_type[t].left=l; jfm.char_type[t].down=x
-end
-function jfm.define_glue(b,a,w,st,sh)
-   local j=b*0x800+a
-   if not jfm.glue[j] then jfm.glue[j]={} end
-   jfm.glue[j].width=w; jfm.glue[j].stretch=st; 
-   jfm.glue[j].shrink=sh
-end
-function jfm.define_kern(b,a,w)
-   local j=b*0x800+a
-   if not jfm.kern[j] then jfm.kern[j]=w end
-end
-
--- procedures for \loadjfontmetric
-ltj.metrics={} -- this table stores all metric informations
-ltj.font_metric_table={}
-
-function ltj.search_metric(key)
-   for i,v in ipairs(ltj.metrics) do 
-      if v.name==key then return i end
-   end
-   return nil
-end
-
-function ltj.loadjfontmetric()
-   if string.len(jfm.name)==0 then
-      ltj.error("the key of font metric is null"); return nil
-   elseif ltj.search_metric(jfm.name) then
-      ltj.error("the metric '" .. jfm.name .. "' is already loaded"); return nil
-   end
-   if jfm.dir~='yoko' then
-      ltj.error("jfm.dir must be 'yoko'"); return nil
-   end
-   local t={}
-   t.name=jfm.name
-   t.dir=jfm.dir
-   t.zw=jfm.zw
-   t.zh=jfm.zh
-   t.char_type=jfm.char_type
-   t.glue=jfm.glue
-   t.kern=jfm.kern
-   table.insert(ltj.metrics,t)
-end
-
-function ltj.find_char_type(c,m)
--- c: character code, m
-   if not ltj.metrics[m] then return 0 end
-   for i, v in pairs(ltj.metrics[m].char_type) do
-      if i~=0 then
-        for j,w in pairs(v.chars) do
-           if w==c then return i end
-        end
-      end
-   end
-   return 0
-end
-
--- procedures for \jfont command.
-function ltj.jfontdefA(b)
-  ltj.fntbki=font.current()
-  local t = token.get_next()
-  ltj.cstemp=token.csname_name(t)
-  tex.sprint('\\csname ' .. ltj.cstemp .. '\\endcsname\\csname @jfont\\endcsname')
-  -- A trick to get font id associated of the argument of \jfont.
-  -- font.id() does not seem to work in my environment...
-end
-function ltj.jfontdefB(s) -- for horizontal font
-   local j=ltj.search_metric(s)
-   if not j then
-      ltj.error("metric named '" .. s .. "' didn't loaded")
-      return
-   end
-   local fn=font.current()
-   local f = font.fonts[fn]
-   ltj.font_metric_table[fn]={}
-   ltj.font_metric_table[fn].jfm=j; ltj.font_metric_table[fn].size=f.size
-   tex.sprint('\\expandafter\\expandafter\\expandafter\\global\\expandafter'
-              .. '\\def\\csname ' .. ltj.cstemp .. '\\endcsname' 
-	      .. '{\\csname luatexja@curjfnt\\endcsname=' .. fn
-	      .. ' \\zw=' .. tex.round(f.size*ltj.metrics[j].zw) .. 'sp' 
-	      .. '\\zh=' .. tex.round(f.size*ltj.metrics[j].zh) .. 'sp\\relax}')
-   font.current(ltj.fntbki); ltj.fntbk = {}; ltj.cstemp = {}
-end
-
 -- return true if and only if p is a Japanese character node
 function ltj.is_japanese_glyph_node(p)
    return p and (node.type(p.id)=='glyph') 
@@ -134,15 +39,14 @@ function ltj.get_inhibit_xsp_table(c,p)
    tex.swrite(i)
 end
 
-----------
-----------
+---------- 
 function ltj.create_ihb_node()
    local g=node.new(node.id('whatsit'), node.subtype('user_defined'))
    g.user_id=30111; g.type=number; g.value=1
    node.write(g)
 end
 
--- The fullname field of virtual font expresses its metric
+
 function ltj.find_size_metric(px)
    if ltj.is_japanese_glyph_node(px) then
       return ltj.font_metric_table[px.font].size, ltj.font_metric_table[px.font].jfm
@@ -172,7 +76,7 @@ function ltj.new_jfm_glue(size,mt,bc,ac)
    end
 end
 
--- The fullname field of virtual font expresses its metric
+
 function ltj.calc_between_two_jchar(q,p)
    -- q, p: node (possibly null)
    local ps,pm,qs,qm,g,h
@@ -469,7 +373,7 @@ end
 -- Insert \xkanjiskip around p, an hbox
 function ltj.insks_around_hbox(head,q,p)
    if p.shift==0 then
-      ltj.find_first_char=true
+      ltj.find_first_char=true; ltj.first_char=nil; ltj.last_char=nil
       if ltj.check_box(p.head) then
 	 -- first char
 	 if ltj.is_japanese_glyph_node(ltj.first_char) then
@@ -668,7 +572,7 @@ function ltj.show_node_list(head)
    while p do
       local s=node.type(p.id)
       if s == 'glyph' then
-	 print(ltj.depth .. ' glyph', p.subtype, unicode.utf8.char(p.char), p.font)
+	 print(ltj.depth .. ' glyph', p.subtype, utf.char(p.char), p.font)
       elseif s=='hlist' then
 	 print(ltj.depth .. ' hlist', p.subtype, '(' .. ltj.to_pt(p.height)
 	    .. '+' .. ltj.to_pt(p.depth)
@@ -701,8 +605,6 @@ end
 
 
 ---------- Hyphenate
-
--- 
 function ltj.suppress_hyphenate_ja(head)
    local p=head
    while p do 

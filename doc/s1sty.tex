@@ -1,4 +1,5 @@
 
+
 % Fonts  for 8pt
 \font\eightrm=cmr8
 \font\eightbf=cmbx8
@@ -23,16 +24,16 @@
 \input luatexja-core.sty
 \loadjfontmetric{mt}{ujis}
 \loadjfontmetric{zero}{mono}
-\def\minfnt{file:ipaexm.ttf:script=latn;+jp90 }
-\def\gothfnt{file:ipaexg.ttf:script=latn;+jp90 }
-\font\eightipam=\minfnt at 10.5\jQ\jfont\eightipam{mt}
-\font\eightipag=\gothfnt at 10.5\jQ\jfont\eightipag{mt}
-\font\tenipam=\minfnt at 13.5\jQ\jfont\tenipam{mt}
-\font\tenjtt=\gothfnt at 13.5\jQ\jfont\tenjtt{zero}
-\font\tenipag=\gothfnt at 13.5\jQ\jfont\tenipag{mt}
-\font\twelveipam=\minfnt at 16\jQ\jfont\twelveipam{mt}
-\font\twelveipag=\gothfnt at 16\jQ\jfont\twelveipag{mt}
-\font\bigipag=\gothfnt at 28\jQ\jfont\bigipag{mt}
+\def\minfnt{psft:Ryumin-Light:jfm=mt }
+\def\gothfnt{psft:GothicBBB-Medium:jfm=mt }
+\jfont\eightipam=\minfnt at 10.5\jQ
+\jfont\eightipag=\gothfnt at 10.5\jQ
+\jfont\tenipam=\minfnt at 13.5\jQ
+\jfont\tenjtt={psft:GothicBBB-Medium:jfm=zero} at 13.5\jQ
+\jfont\tenipag=\gothfnt at 13.5\jQ
+\jfont\twelveipam=\minfnt at 16\jQ
+\jfont\twelveipag=\gothfnt at 16\jQ
+\jfont\bigipag=\gothfnt at 28\jQ
 
 % Size 
 \def\large{\def\rm{\textfont0=\twelverm\twelverm\fam0}\def\bf{\twelvebf\gt}%
