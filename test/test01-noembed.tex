@@ -1,0 +1,56 @@
+%#! luatex
+\input luatexja-core.sty
+
+\loadjfontmetric{mt}{ujis}
+\jfont\tenmin={psft:Ryumin-Light:jfm=mt}\tenmin
+\jfont\tengoth={psft:GothicBBB-Medium:jfm=mt}
+\jfont\jisse={psft:Ryumin-Light:script=latn;+jp78;jfm=mt}
+\jfont\jisexpt={psft:Ryumin-Light:script=latn;+expt;jfm=mt}
+\jfont\jishwid={psft:Ryumin-Light:script=latn;+hwid;jfm=mt}
+%\font\tmihwid={psft:Ryumin-Light:script=latn;+hwid}
+\jfont\jisnalt={psft:Ryumin-Light:script=latn;+nalt;jfm=mt}
+\jfont\jistrad={psft:Ryumin-Light:script=latn;+trad;jfm=mt}
+\jfont\jissups={psft:Ryumin-Light:script=latn;+sups;jfm=mt}
+\jfont\jisliga={psft:Ryumin-Light:script=latn;+liga;jfm=mt}
+%\font\tmiliga={psft:Ryumin-Light:script=latn;+liga}
+\jfont\jisvert={psft:Ryumin-Light:script=latn;+vert;jfm=mt}
+\parskip=\smallskipamount\parindent=1\zw
+
+{\noindent\bf\tengoth luatj-ujis.lua を使用}
+
+\bigskip
+
+{\noindent\bf\tengoth luaotf\/load による feature との共存状況（非埋め込み版）}
+
+{\noindent\bf\tengoth 注: 表示はビューワによって実際に用いられるフォントに依存します．}
+
+{\tentt expt} feature: 剥→{\jisexpt 剥}
+
+{\tentt jp78} feature: 辻→{\jisse 辻}
+
+{\tentt hwid} feature: アイｳｴ→{\jishwid アイｳｴ}\hfil\break
+↑文字クラスが変わらないので幅も変わらない．
+
+{\tentt nalt} feature: 男→{\jisnalt 男}
+
+{\tentt trad} feature: 医学→{\jistrad 医学}
+
+{\tentt sups} feature: 注１注1→{\jissups 注１注1}\hfil\break
+↑文字クラスが変わらないので幅も変わらない．
+
+{\tentt liga} feature: か゜き゜く゜け゜こ゜→{\jisliga か゜き゜く゜け゜こ゜}\hfil\break
+↑なぜかうまくいかない．%比較：{\tmiliga か゜き゜く゜け゜こ゜}
+
+{\tentt vert} feature: あ（㌢㍍），い→{\jisvert あ（㌢㍍），い}\hfil\break
+↑縦組み時に気にすればいいか．
+
+\bigskip
+
+\noindent あいうえお
+
+「あいうえお←全角下がりが正しい（{\tt'boxbdd'}のテスト1）
+
+{\tt'boxbdd'}のテスト2: \vrule\hbox{「」}\vrule ←正しい実装ならば2本の罫線の間は全角幅
+
+\end
+
