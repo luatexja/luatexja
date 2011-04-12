@@ -1,0 +1,22 @@
+% LuaTeX-ja macros against plain TeX
+
+\jfont\tenmin=psft:Ryumin-Light:jfm=ujis at 13.5\jQ
+\jfont\sevenmin=psft:Ryumin-Light:jfm=ujis at 9.5\jQ
+\jfont\fivemin=psft:Ryumin-Light:jfm=ujis at 7\jQ
+\jfont\tengt=psft:GothicBBB-Medium:jfm=ujis at 13.5\jQ
+\jfont\sevengt=psft:GothicBBB-Medium:jfm=ujis at 9.5\jQ
+\jfont\fivegt=psft:GothicBBB-Medium:jfm=ujis at 7\jQ
+
+\let\mc=\tenmin
+\let\gt=\tengt
+\mc
+\setjaparameter{kanjiskip=0pt plus 0.4pt minus 0.4pt, 
+  xkanjiskip=.25\zw plus 1pt minus 1pt,
+  autospacing, autoxspacing,
+  yabaselineshift=0pt, ykbaselineshift=0pt,
+  jcharwidowpenalty=500
+}
+
+\input luatexja-kinsoku.tex
+
+\endinput
