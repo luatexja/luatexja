@@ -3,7 +3,6 @@
 \usepackage{fontspec,pdftexcmds}
 
 \input luatexja-core.sty
-\loadjfontmetric{mt}{ujis}
 
 \ExplSyntaxOn
 \xetex_or_luatex:nnn { \tl_set:Nn \l_fontspec_pre_feat_sclist }
@@ -12,7 +11,7 @@
       \tl_if_empty:NF \l_fontspec_script_tl
       {
         script   = \l_fontspec_script_tl ;
-        language = \l_fontspec_lang_tl   ;jfm=mt;
+        language = \l_fontspec_lang_tl   ;jfm=ujis;
       }
     }
   }
@@ -21,7 +20,7 @@
     \tl_if_empty:NF \l_fontspec_script_tl
     {
       script   = \l_fontspec_script_tl ;
-      language = \l_fontspec_lang_tl   ;jfm=mt;
+      language = \l_fontspec_lang_tl   ;jfm=ujis;
     }
   }
 \ExplSyntaxOff
@@ -34,8 +33,7 @@
 \def\extract@font{%
     \get@external@font
     \ifnum\pdf@strcmp{\f@encoding}{EU2}=0
-      \expandafter\jfont\font@name\external@font\relax
-      \global\expandafter\font@name{\font@name}%
+      \expandafter\gjfont\font@name\external@font\relax
       \font@name\global\zw=\zw\global\zh=\zh
     \else
       \global\expandafter\font\font@name\external@font\relax

@@ -1,6 +1,6 @@
 -- error messages
-function ltj.error(s)
-  tex.error("LuaTeX-ja error: " .. s ); 
+function ltj.error(s,t)
+  tex.error('LuaTeX-ja error: ' .. s ,t) 
 end
 
 -- return true if and only if p is a Japanese character node
@@ -26,20 +26,77 @@ function ltj.get_penalty_table(m,c)
       i=(ltj.penalty_table[c])[m]
    end
    if not i then i=0 end
-   tex.swrite(i)
+   tex.write(i)
 end
 
 ltj.inhibit_xsp_table = {}
 function ltj.set_inhibit_xsp_table(c,p)
    ltj.inhibit_xsp_table[c]=p
 end
-function ltj.get_inhibit_xsp_table(c,p)
-   local i=ltj.inhibit_xsp_table[c]
-   if not i then i=3 end
-   tex.swrite(i)
+function ltj.get_inhibit_xsp_table(c)
+   return ltj.inhibit_xsp_table[c] or 3
 end
 
----------- 
+--------
+function ltj.out_ja_parameter_one(k)
+   if k == 'yabaselineshift' then
+      tex.write(tex.getattribute('luatexja@yablshift')/65536 .. 'pt')
+   elseif k == 'ykbaselineshift' then
+      tex.write(tex.getattribute('luatexja@ykblshift')/65536 .. 'pt')
+   elseif k == 'kanjiskip' then
+      tex.sprint('\\the\\kanjiskip')
+   elseif k == 'xkanjiskip' then
+      tex.sprint('\\the\\xkanjiskip')
+   elseif k == 'jcharwidowpenalty' then
+      tex.write(tex.getattribute('jcharwidowpenalty'))
+   elseif k == 'autospacing' then
+      tex.write(tostring(ltj.auto_spacing))
+   elseif k == 'autoxspacing' then
+      tex.write(tostring(ltj.auto_xspacing))
+   elseif k == 'differentjfm' then
+      if ltj.calc_between_two_jchar_aux==ltj.calc_between_two_jchar_aux_large then
+	 tex.write('large')
+      elseif ltj.calc_between_two_jchar_aux==ltj.calc_between_two_jchar_aux_small then
+	 tex.write('small')
+      elseif ltj.calc_between_two_jchar_aux==ltj.calc_between_two_jchar_aux_average then
+	 tex.write('average')
+      elseif ltj.calc_between_two_jchar_aux==ltj.calc_between_two_jchar_aux_both then
+	 tex.write('both')
+      else
+	 tex.write('???')
+      end
+   end
+end
+
+function ltj.out_ja_parameter_two(k,c)
+   print(k,c)
+   if k == 'prebreakpenalty' then
+      tex.write(ltj.get_penalty_table('pre',c))
+   elseif k == 'postbreakpenalty' then
+      tex.write(ltj.get_penalty_table('post',c))
+   elseif k == 'cjkxspmode' then
+      local i = ltj.get_inhibit_xsp_table(c)
+      if i==0 then tex.write('inhibit')
+      elseif i==1 then  tex.write('postonly')
+      elseif i==2 then  tex.write('preonly')
+      else tex.write('allow')
+      end
+   elseif k == 'asciixspmode' then
+      local i = ltj.get_inhibit_xsp_table(c)
+      if i==0 then tex.write('inhibit')
+      elseif i==2 then  tex.write('postonly')
+      elseif i==1 then  tex.write('preonly')
+      else tex.write('allow')
+      end
+   end
+end
+
+
+--------- 
+function ltj.print_global()
+  if ltj.isglobal=='global' then tex.sprint('\\global') end
+end
+
 function ltj.create_ihb_node()
    local g=node.new(node.id('whatsit'), node.subtype('user_defined'))
    g.user_id=30111; g.type=number; g.value=1
@@ -226,13 +283,13 @@ ltj.cx = nil
     -- 0: ``no_skip'', 1: ``after_schar'', 2: ``after_wchar''
 -- These variables are ``global'', because we want to avoid to write one large function.
 function ltj.insert_kanji_skip(head)
-   if tex.count['luatexja@autospc']==0 then
+   if ltj.auto_spacing then
       ltj.kanji_skip=tex.skip['kanjiskip']
    else
       ltj.kanji_skip=node.new(node.id('glue_spec'))
       ltj.kanji_skip.width=0;  ltj.kanji_skip.stretch=0; ltj.kanji_skip.shrink=0
    end
-   if tex.count['luatexja@autoxspc']==0 then
+   if ltj.auto_xspacing then
       ltj.xkanji_skip=tex.skip['xkanjiskip']
    else
       ltj.xkanji_skip=node.new(node.id('glue_spec'))
@@ -274,7 +331,7 @@ end
 -- Insert \xkanjiskip before p, a glyph node
 -- TODO; ligature
 function ltj.insks_around_char(head,q,p)
-   local a=ltj.inhibit_xsp_table[p.char]
+   local a=ltj.get_inhibit_xsp_table(p.char)
    if ltj.is_japanese_glyph_node(p) then
       ltj.cx=p.char
       if ltj.is_japanese_glyph_node(q)  then
@@ -286,7 +343,6 @@ function ltj.insks_around_char(head,q,p)
       end
       ltj.insert_skip=2
    else
-      if not a then a=3 end
       if ltj.insert_skip==2 then
 	 ltj.insert_kaxsp(head,q,a)
       end
@@ -299,11 +355,9 @@ function ltj.insks_around_char(head,q,p)
 end
 
 function ltj.insert_akxsp(head,q)
-   local f = ltj.inhibit_xsp_table[ltj.cx]
+   local f = ltj.get_inhibit_xsp_table(ltj.cx)
    local g
-   if f then 
-      if f<=1 then return end
-   end
+   if f<=1 then return end
    g = node.new(node.id('glue'))
    g.subtype=0; g.spec=node.copy(ltj.xkanji_skip)
    node.insert_after(head,q,g)
@@ -311,11 +365,9 @@ end
 
 function ltj.insert_kaxsp(head,q,a)
    local g=true
-   local f=ltj.inhibit_xsp_table[ltj.cx]
+   local f=ltj.get_inhibit_xsp_table(ltj.cx)
    if a%2 == 1 then
-      if f then 
-	 if f%2==0 then g=false end
-      end
+      if f%2==0 then g=false end
    else 
       g=false
    end
@@ -387,8 +439,7 @@ function ltj.insks_around_hbox(head,q,p)
 	    end
 	    ltj.insert_skip=2
 	 elseif ltj.first_char then
-	    local a=ltj.inhibit_xsp_table[ltj.first_char.char]
-	    if not a then a=3 end
+	    local a=ltj.get_inhibit_xsp_table(ltj.first_char.char)
 	    if ltj.insert_skip==2 then
 	       local g = node.new(node.id('glue'))
 	       g.subtype=0; g.spec=node.copy(ltj.kanji_skip)
@@ -409,8 +460,7 @@ function ltj.insks_around_hbox(head,q,p)
 	    end
 	    ltj.insert_skip=2
 	 elseif ltj.last_char then
-	    local a=ltj.inhibit_xsp_table[ltj.last_char.char]
-	    if not a then a=3 end
+	    local a=ltj.get_inhibit_xsp_table(ltj.last_char.char)
 	    if a>=2 then
 	       ltj.insert_skip=1
 	    else
@@ -428,7 +478,7 @@ end
 function ltj.insks_around_penalty(head,q,p)
    local r=node.next(p)
    if r  and node.type(r.id)=='glyph' then
-      local a=ltj.inhibit_xsp_table[r.char]
+      local a=ltj.get_inhibit_xsp_table(r.char)
       if ltj.is_japanese_glyph_node(r) then
 	 ltj.cx=r.char
 	 if ltj.is_japanese_glyph_node(p)  then
@@ -441,7 +491,6 @@ function ltj.insks_around_penalty(head,q,p)
 	 q=p; p=node.next(p)
 	 ltj.insert_skip=2
       else
-	 if not a then a=3 end
 	 if ltj.insert_skip==2 then
 	    ltj.insert_kaxsp(head,p,a)
 	 end
@@ -472,8 +521,7 @@ end
 
 -- Insert \xkanjiskip around p, a math_node
 function ltj.insks_around_math(head,q,p)
-   local a=ltj.inhibit_xsp_table['math']
-   if not a then a=3 end
+   local a=ltj.get_inhibit_xsp_table('math')
    if (p.subtype==0) and (ltj.insert_skip==2) then
       ltj.insert_kaxsp(head,q,a)
       ltj.insert_skip=0
@@ -594,7 +642,6 @@ end
 
 --- the following function is modified from jafontspec.lua (by K. Maeda).
 --- Instead of "%", we use U+FFFFF for suppressing spaces.
-utf = unicode.utf8
 function ltj.process_input_buffer(buffer)
    if utf.len(buffer) > 0 
         and ltj.is_ucs_in_japanese_char(utf.byte(buffer, utf.len(buffer))) then

@@ -1,23 +1,48 @@
 %#!luatex
 \input luatexja-core.sty
-\loadjfontmetric{mta}{ujis}
-
 \def\\{\hfill\break}
-\tentt\meaning\tenipam
+\tentt\tenmin
+
+\catcode`\@=11
+\the\luatexja@ykblshift
+\setjaparameter{ykbaselineshift=\maxdimen,autoxspacing=false}
+\the\luatexja@ykblshift\ 
+\getjaparameter{ykbaselineshift}
+
+\getjaparameter{kanjiskip},
+\getjaparameter{xkanjiskip},
+\getjaparameter{autospacing},
+\getjaparameter{autoxspacing},
+\getjaparameter{differentjfm}.
+\setjaparameter{ykbaselineshift=0pt,autoxspacing=true}
 
 
-{\jfont\tenipam={file:ipam.ttf:script=latn;jfm=mta}%
-aiu\tenipam あい円うえ（）（お辻abc\\\meaning\tenipam
+あいうえお{\setjaparameter{ykbaselineshift=2pt}かきくけこ}さしすせそ
 
-↑defined by \char"5C jfont}
+あいうえお{\globalsetjaparameter{ykbaselineshift=2pt}かきくけこ}さしすせそ
 
-\tentt\meaning\tenipam
+\getjaparameter{prebreakpenalty}{`（},
+\getjaparameter{prebreakpenalty}{`）},
+\getjaparameter{prebreakpenalty}{`あ}
 
-\font\tenipax={file:ipam.ttf:script=latn;jfm=mta}\message{\the\font}%
-aiu\tenipax あい円うえ（）（お辻abc\\\meaning\tenipax
 
-↑defined by \char"5C font
+\getjaparameter{postbreakpenalty}{`（},
+\getjaparameter{postbreakpenalty}{`）},
+\getjaparameter{postbreakpenalty}{`あ}
 
-\tentt\meaning\tenipam
+a\inhibitglue （a）\inhibitglue aあa〜a
+
+\getjaparameter{cjkxspmode}{`（},
+\getjaparameter{cjkxspmode}{`）},
+\getjaparameter{cjkxspmode}{`あ},
+\getjaparameter{cjkxspmode}{`〜}
+
+\setjaparameter{asciixspmode={`\b,inhibit}}
+あ[あ]あaあbあ
+
+\getjaparameter{asciixspmode}{`[},
+\getjaparameter{asciixspmode}{`]},
+\getjaparameter{asciixspmode}{`a},
+\getjaparameter{asciixspmode}{`b}
 
 \end

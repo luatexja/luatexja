@@ -22,39 +22,37 @@
 
 % Japanese fonts
 \input luatexja-core.sty
-\loadjfontmetric{mt}{ujis}
-\loadjfontmetric{zero}{mono}
-\def\minfnt{psft:Ryumin-Light:jfm=mt }
-\def\gothfnt{psft:GothicBBB-Medium:jfm=mt }
-\jfont\eightipam=\minfnt at 10.5\jQ
-\jfont\eightipag=\gothfnt at 10.5\jQ
-\jfont\tenipam=\minfnt at 13.5\jQ
-\jfont\tenjtt={psft:GothicBBB-Medium:jfm=zero} at 13.5\jQ
-\jfont\tenipag=\gothfnt at 13.5\jQ
-\jfont\twelveipam=\minfnt at 16\jQ
-\jfont\twelveipag=\gothfnt at 16\jQ
-\jfont\bigipag=\gothfnt at 28\jQ
+\def\minfnt{psft:Ryumin-Light:jfm=ujis }
+\def\gothfnt{psft:GothicBBB-Medium:jfm=ujis }
+\jfont\eightmc=\minfnt at 10.5\jQ
+\jfont\eightgt=\gothfnt at 10.5\jQ
+\let\tenmc=\tenmin
+\jfont\tenjtt={psft:GothicBBB-Medium:jfm=mono} at 13.5\jQ
+\let\tengt=\tengt
+\jfont\twelvemc=\minfnt at 16\jQ
+\jfont\twelvegt=\gothfnt at 16\jQ
+\jfont\biggt=\gothfnt at 28\jQ
 
 % Size 
 \def\large{\def\rm{\textfont0=\twelverm\twelverm\fam0}\def\bf{\twelvebf\gt}%
   \let\it=\twelveit  \let\sl=\twelvesl \let\mus=\twelvemus 
   \let\sc=\twelvesc  \let\tt=\twelvett
-  \let\mc=\twelveipam \let\gt=\twelveipag
+  \let\mc=\twelvemc \let\gt=\twelvegt
   \baselineskip=18pt\rm\mc\xkanjiskip=0.25\zw plus 0.10\zw minus 0.10\zw}
 
-\def\big{\bigbf\bigipag\xkanjiskip=0.25\zw plus 0.10\zw minus 0.10\zw}
+\def\big{\bigbf\biggt\xkanjiskip=0.25\zw plus 0.10\zw minus 0.10\zw}
 
 \def\normalsize{\def\rm{\textfont0=\tenrm\tenrm\fam0}\def\bf{\tenbf\gt}%
   \let\it=\tenit \let\sl=\tensl \let\mus=\tenmus 
   \let\sc=\tensc \def\tt{\tentt\tenjtt}%
-  \let\mc=\tenipam \let\gt=\tenipag
-  \baselineskip=15pt\rm\mc\xkanjiskip=0.25\zw plus 0.10\zw minus 0.10\zw}
+  \let\mc=\tenmc \let\gt=\tengt
+  \baselineskip=15pt\rm\mc\xkanjiskip=0.25\zw plus 1pt minus 1pt}
 \def\small{\def\rm{\textfont0=\eightrm\eightrm\fam0}\def\bf{\eightbf\gt}%
   \let\it=\eightit \let\sl=\eightsl \let\mus=\eightmus 
   \let\sc=\eightsc \def\tt{\eighttt\eightjtt}%
-  \let\mc=\eightipam \let\gt=\eightipag%
-  \rm\mc\xkanjiskip=0.25\zw plus 0.10\zw minus 0.10\zw%
-  \ykbaselineshift=-49807\yabaselineshift=-49807
+  \let\mc=\eightmc \let\gt=\eightgt%
+  \rm\mc\xkanjiskip=0.25\zw plus 1pt minus 1pt%
+  \setjaparameter{ykbaselineshift=-0.76pt, yabaselineshift=-0.76pt}
 }
 
 
@@ -62,7 +60,7 @@
 % layout
 \normalsize\parindent=1\zw\parskip=0pt
 \pdfpagewidth=210mm\pdfpageheight=297mm
-\hsize=40\zw\hoffset=\dimexpr(\pdfpagewidth-\hsize)/2-1in\relax
+\hsize=43\zw\hoffset=\dimexpr(\pdfpagewidth-\hsize)/2-1in\relax
 \vsize=246mm
 
 % heading

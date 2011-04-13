@@ -1,28 +1,36 @@
+% LuaTeX-ja core TeX source
+
 \catcode`\@=11
 \catcode"FFFFF=14 %"
 
 \input luaotfload.sty
+\input xkeyval.tex
+\input infwarerr.sty
 \ifdefined\luatexja@loaded\endinput\fi
 \def\luatexja@loaded{hoge}
 
 \newcount\luatexja@tempcnta
+\newcount\luatexja@tempcntb
 \newdimen\luatexja@tempdima
-%\newcount\jcharwidowpenalty
-\newskip\kanjiskip\kanjiskip=0pt minus.4pt
+
+\newcount\luatexja@autospc
+\newcount\luatexja@autoxspc
+
+\newcount\jcharwidowpenalty
+\newskip\kanjiskip
 \newskip\xkanjiskip
 \newdimen\zw
 \newdimen\zh
 \newdimen\jQ \jQ=0.25mm
 \newdimen\jH \jH=0.25mm
-\newcount\luatexja@autospc
-\newcount\luatexja@autoxspc
 
+%%%%%%%% Loading lua files
 \directlua{%
   utf = unicode.utf8
   ltj = {}
   function ltj.loadlua(file)
     local path = assert(kpse.find_file(file, 'tex'),
-      "File '"..file.."' no found")
+      "File '"..file.."' not found")
     texio.write_nl("("..path..")")
     dofile(path)
   end
@@ -33,58 +41,158 @@
   ltj.loadlua('luatexja-core-aux.lua')
 }
 
-% Attributes for Japanese typesetting.
+%%%%%%%% Attributes for Japanese typesetting.
 \newluatexattribute\luatexja@curjfnt   % index for ``current Japanese font''
 \newluatexattribute\luatexja@charclass % 
 \newluatexattribute\luatexja@yablshift % attribute for \yabaselineshift
 \newluatexattribute\luatexja@ykblshift % attribute for \ykbaselineshift
+\newluatexattribute\luatexja@icflag    % attribute for italic correction
+\newlanguage\luatexja@japanese\directlua{ltj.ja_lang_number=\the\luatexja@japanese}
 
-% for italic correction
-\newluatexattribute\luatexja@icflag
-\let\luatexja@ic=\/
-\protected\def\/{{\luatexja@icflag=1\luatexja@ic}}
+%%%%%%%% \asluastring
+\def\asluastring#1{'\luaescapestring{\detokenize{#1}}'}
 
-% for hyphenation
-\newlanguage\luatexja@japanese
-\directlua{ltj.ja_lang_number=\the\luatexja@japanese}
+%%%%%%%% Redefine \/
+\let\luatexja@ic=\/ \protected\def\/{{\luatexja@icflag=1\luatexja@ic}}
 
-
-% \jfont\CS={...:...;jfm=metric;...}
-\def\jfont{\afterassignment\@jfont\directlua{ltj.jfontdefX(true)}}
+%%%%%%%% \jfont\CS={...:...;jfm=metric;...}, \gjfont
+\def\jfont{\afterassignment\@jfont\directlua{ltj.jfontdefX('false')}}
+\def\gjfont{\afterassignment\@jfont\directlua{ltj.jfontdefX('true')}}
 \def\@jfont{\directlua{ltj.jfontdefY()}}
 
-% \loadjfontmetric<metric name><filename> : 
-% load <filename> which contains a font metric for a Japanese font.
-\def\loadjfontmetric#1#2{% #1: key, #2: file name
-\directlua{
-  jfm.name='#1'; jfm.char_type={}; jfm.glue={}; jfm.kern={}
-  ltj.loadlua('luatj-#2.lua'); ltj.loadjfontmetric()}
-}
-
-% ybaselineshift
-\let\yabaselineshift=\luatexja@yablshift % 欧文文字
-\let\ykbaselineshift=\luatexja@ykblshift % 和文文字
-\luatexja@yablshift=0 \luatexja@ykblshift=0
-
-% \inhibitxspcode, \xspcode
-\def\setinhibitxspcode#1#2{\directlua{ltj.set_inhibit_xsp_table(#1,#2)}}
-\def\getinhibitxspcode#1{\directlua{ltj.get_inhibit_xsp_table(#1)}}
-\let\setxspcode=\setinhibitxspcode
-\let\getxspcode=\getinhibitxspcode
-% \prebreakpenalty, \postbreakpenalty
-\def\setprebreakpenalty#1#2{\directlua{ltj.set_penalty_table('pre',#1,#2)}}
-\def\setpostbreakpenalty#1#2{\directlua{ltj.set_penalty_table('post',#1,#2)}}
-\def\getprebreakpenalty#1{\directlua{ltj.get_penalty_table('pre',#1)}}
-\def\getpostbreakpenalty#1{\directlua{ltj.get_penalty_table('post',#1)}}
-
-\def\autospacing{\luatexja@autospc=0 }
-\def\noautospacing{\luatexja@autospc=1 }
-\def\autoxspacing{\luatexja@autoxspc=0 }
-\def\noautoxspacing{\luatexja@autoxspc=1 }
-\autospacing\autoxspacing
-% \inhibitglue
+%%%%%%%% \inhibitglue
 \def\inhibitglue{\directlua{ltj.create_ihb_node()}}
 
-\input luatexja-kinsoku.tex
+%%%%%%%% \setjaparameter
+
+% prebreakpenalty = {<char_code>, <penalty>}
+\define@key[ltj]{japaram}{prebreakpenalty}{%
+  \expandafter\luatexja@setbp#1:{pre}}
+\define@key[ltj]{japaram}{postbreakpenalty}{%
+  \expandafter\luatexja@setbp#1:{post}}
+\def\luatexja@setbp#1,#2:#3{
+  \luatexja@tempcnta=#1\relax
+  \luatexja@tempcntb=#2\relax
+  \directlua{ltj.set_penalty_table(\asluastring{#3},
+    tex.getcount('luatexja@tempcnta'),tex.getcount('luatexja@tempcntb'))}}
+
+% yabaselineshift = <dimen>
+\define@key[ltj]{japaram}{yabaselineshift}{%
+  \luatexja@tempdima=#1\relax%
+  \directlua{tex.setattribute(ltj.isglobal, 
+    luatexbase.attributes['luatexja@yablshift'],
+    tex.getdimen('luatexja@tempdima'))}}
+\define@key[ltj]{japaram}{ykbaselineshift}{%
+  \luatexja@tempdima=#1\relax%
+  \directlua{tex.setattribute(ltj.isglobal, 
+    luatexbase.attributes['luatexja@ykblshift'],
+    tex.getdimen('luatexja@tempdima'))}}
+
+% cjkxspmode = {<char_code>, <mode>}
+% mode: inhibit, preonly, postonly, allow
+%    or       0        2         1      3
+\define@key[ltj]{japaram}{cjkxspmode}{%        \inhibitxspcode
+  \expandafter\luatexja@setjxspmode#1:\relax}
+\def\luatexja@setjxspmode#1,#2:{%
+  \lowercase{\edef\ltj@temp{#2}}%
+  \def\ltj@tempa{inhibit}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{0}\fi
+  \def\ltj@tempa{preonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{2}\fi
+  \def\ltj@tempa{postonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{1}\fi
+  \def\ltj@tempa{allow}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{3}\fi
+  \luatexja@tempcnta=#1\relax\luatexja@tempcntb=\ltj@temp\relax
+  \directlua{ltj.set_inhibit_xsp_table(tex.getcount('luatexja@tempcnta'),
+    tex.getcount('luatexja@tempcntb'))}}
+
+% asciixspmode = {<char_code>, <mode>}
+% mode: inhibit, preonly, postonly, allow
+%    or       0        1         2      3
+\define@key[ltj]{japaram}{asciixspmode}{%        \inhibitxspcode
+  \expandafter\luatexja@setaxspmode#1:\relax}
+\def\luatexja@setaxspmode#1,#2:{%
+  \lowercase{\edef\ltj@temp{#2}}%
+  \def\ltj@tempa{inhibit}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{0}\fi
+  \def\ltj@tempa{preonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{1}\fi
+  \def\ltj@tempa{postonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{2}\fi
+  \def\ltj@tempa{allow}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{3}\fi
+  \luatexja@tempcnta=#1\relax\luatexja@tempcntb=\ltj@temp\relax
+  \directlua{ltj.set_inhibit_xsp_table(tex.getcount('luatexja@tempcnta'),
+    tex.getcount('luatexja@tempcntb'))}}
+
+% autospacing = <bool> (default: true)
+\define@boolkey[ltj]{japaram}{autospacing}[true]{%
+  \ifltj@japaram@autospacing
+    \directlua{ltj.auto_spacing=true}%
+  \else
+    \directlua{ltj.auto_spacing=false}%
+  \fi
+  }
+
+% autoxspacing = <bool> (default: true)
+\define@boolkey[ltj]{japaram}{autoxspacing}[true]{%
+  \ifltj@japaram@autoxspacing
+    \directlua{ltj.auto_xspacing=true}%
+  \else
+    \directlua{ltj.auto_xspacing=false}%
+  \fi
+  }
+
+\define@key[ltj]{japaram}{kanjiskip}{%              % SKIP
+  \directlua{ltj.print_global()}\kanjiskip=#1 }
+\define@key[ltj]{japaram}{xkanjiskip}{%             % SKIP
+  \directlua{ltj.print_global()}\xkanjiskip=#1 }
+\define@key[ltj]{japaram}{jcharwidowpenalty}{%      %COUNT
+  \directlua{ltj.print_global()}\jcharwidowpenalty=#1 }
+
+% differentjfm = { large | small | average | both }
+\define@choicekey*+[ltj]{japaram}{differentjfm}[\ltj@temp\ltj@tempcnta]%
+  {large,small,average,both}{%
+  \ifcase\ltj@tempcnta
+    \directlua{ltj.calc_between_two_jchar_aux=ltj.calc_between_two_jchar_aux_large}\or
+    \directlua{ltj.calc_between_two_jchar_aux=ltj.calc_between_two_jchar_aux_small}\or
+    \directlua{ltj.calc_between_two_jchar_aux=ltj.calc_between_two_jchar_aux_average}\or
+    \directlua{ltj.calc_between_two_jchar_aux=ltj.calc_between_two_jchar_aux_both}%
+  \fi
+}{\@PackageWarning{luatexja}{ignored invalid argument '#1' for 'differentjfm'}}
+  % large, small, average(OK), both(OK)
+
+\def\setjaparameter#1{\directlua{ltj.isglobal=''}%
+  \setkeys[ltj]{japaram}{#1}}
+\def\globalsetjaparameter#1{\directlua{ltj.isglobal='global'}%
+  \setkeys[ltj]{japaram}{#1}}
+
+%%%%%%%% 
+\def\getjaparameter#1{%
+  \lowercase{\edef\ltj@temp{#1}}\let\@next=\getjaparameter@one%
+  \def\ltj@tempa{prebreakpenalty}\ifx\ltj@temp\ltj@tempa\let\@next=\getjaparameter@two\fi
+  \def\ltj@tempa{postbreakpenalty}\ifx\ltj@temp\ltj@tempa\let\@next=\getjaparameter@two\fi
+  \def\ltj@tempa{cjkxspmode}\ifx\ltj@temp\ltj@tempa\let\@next=\getjaparameter@two\fi
+  \def\ltj@tempa{asciixspmode}\ifx\ltj@temp\ltj@tempa\let\@next=\getjaparameter@two\fi
+  \@next
+}
+\def\getjaparameter@one{\directlua{ltj.out_ja_parameter_one('\ltj@temp')}}
+\def\getjaparameter@two#1{%
+  \luatexja@tempcnta=#1
+  \directlua{ltj.out_ja_parameter_two('\ltj@temp', tex.getcount('luatexja@tempcnta'))}%
+}
+
+
+
+%%%%%%%% commands for ``compatibility''
+% \def\setinhibitxspcode#1#2{\setjaparameter{cjkxspmode={#1,#2}}}
+% \def\setxspcode#1#2{\setjaparameter{asciixspmode={#1,#2}}}
+% \def\setprebreakpenalty#1#2{\setjaparameter{prebreakpenalty={#1,#2}}}
+% \def\setpostbreakpenalty#1#2{\setjaparameter{prebreakpenalty={#1,#2}}}
+% \def\getprebreakpenalty#1{\directlua{ltj.get_penalty_table('pre',#1)}\luatexja@tempcnta}
+% \def\getpostbreakpenalty#1{\directlua{ltj.get_penalty_table('post',#1)}\luatexja@tempcnta}
+% \def\autospacing{\luatexja@autospc=0 }
+% \def\noautospacing{\luatexja@autospc=1 }
+% \def\autoxspacing{\luatexja@autoxspc=0 }
+% \def\noautoxspacing{\luatexja@autoxspc=1 }
+
+\def\ltj@temp{plain}
+\ifx\fmtname\ltj@temp
+  \message{plain format: loading luatexja-plain.tex}
+\fi
+\input luatexja-plain.tex
 \catcode`\@=12
 \endinput

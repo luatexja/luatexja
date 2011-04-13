@@ -1,26 +1,23 @@
-%#! luatex
+%#! time luatex test01
 \input luatexja-core.sty
 
-\loadjfontmetric{mt}{ujis}
-\jfont\tenmin={file:ipaexm.ttf:jfm=mt}\tenmin
-\jfont\tengoth={file:ipaexg.ttf:jfm=mt}
-\jfont\jisninety={file:ipaexm.ttf:script=latn;+jp90;jfm=mt}
-\jfont\jisexpt={file:ipaexm.ttf:script=latn;+expt;jfm=mt}
-\jfont\jishwid={file:ipaexm.ttf:script=latn;+hwid;jfm=mt}
+\jfont\jisninety={file:ipaexm.ttf:script=latn;+jp90;jfm=ujis}
+\jfont\jisexpt={file:ipaexm.ttf:script=latn;+expt;jfm=ujis}
+\jfont\jishwid={file:ipaexm.ttf:script=latn;+hwid;jfm=ujis}
 %\font\tmihwid={file:ipaexm.ttf:script=latn;+hwid}
-\jfont\jisnalt={file:ipaexm.ttf:script=latn;+nalt;jfm=mt}
-\jfont\jistrad={file:ipaexm.ttf:script=latn;+trad;jfm=mt}
-\jfont\jissups={file:ipaexm.ttf:script=latn;+sups;jfm=mt}
-\jfont\jisliga={file:ipaexm.ttf:script=latn;+liga;jfm=mt}
+\jfont\jisnalt={file:ipaexm.ttf:script=latn;+nalt;jfm=ujis}
+\jfont\jistrad={file:ipaexm.ttf:script=latn;+trad;jfm=ujis}
+\jfont\jissups={file:ipaexm.ttf:script=latn;+sups;jfm=ujis}
+\jfont\jisliga={file:ipaexm.ttf:script=latn;+liga;jfm=ujis}
 %\font\tmiliga={file:ipaexm.ttf:script=latn;+liga}
-\jfont\jisvert={file:ipaexm.ttf:script=latn;+vert;jfm=mt}
+\jfont\jisvert={file:ipaexm.ttf:script=latn;+vert;jfm=ujis}
 \parskip=\smallskipamount\parindent=1\zw
 
-{\noindent\bf\tengoth luatj-ujis.lua を使用}
+{\noindent\bf\tengt jfm-ujis.lua を使用}
 
 \bigskip
 
-{\noindent\bf\tengoth luaotf\/load による feature との共存状況}
+{\noindent\bf\tengt ■luaotf\/load による feature との共存状況}
 
 {\tentt expt} feature: 剥→{\jisexpt 剥}
 
@@ -49,6 +46,42 @@
 「あいうえお←全角下がりが正しい（{\tt'boxbdd'}のテスト1）
 
 {\tt'boxbdd'}のテスト2: \vrule\hbox{「」}\vrule ←正しい実装ならば2本の罫線の間は全角幅
+
+
+\bigskip
+{\noindent\bf\tengt ■{\tt differentjfm}による挙動の違い}
+
+\jfont\tenMa={file:ipaexm.ttf:jfm=ujis}
+\jfont\tenMb={file:ipaexm.ttf:jfm=ujis;jfmvar=a}
+\jfont\tenGa={file:ipaexg.ttf:jfm=ujis} at 15pt
+\jfont\tenGb={file:ipaexg.ttf:jfm=ujis;jfmvar=a} at 15pt\relax
+
+\def\djtest{%
+{\tt Ma-Ma}: \setbox0=\hbox{{\tenMa ）}{\tenMa  ・}}\hbox to 90pt{\copy0\hss(\the\wd0)},
+{\tt Ma-Mb}: \setbox0=\hbox{{\tenMa ）}{\tenMb ・}}\hbox to 90pt{\copy0\hss(\the\wd0)},
+{\tt Mb-Mb}: \setbox0=\hbox{{\tenMb ）}{\tenMb ・}}\hbox to 90pt{\copy0\hss(\the\wd0)},
+
+{\tt Ma-Ga}: \setbox0=\hbox{{\tenMa ）}{\tenGa ・}}\hbox to 90pt{\copy0\hss(\the\wd0)},
+{\tt Ma-Gb}: \setbox0=\hbox{{\tenMa ）}{\tenGb ・}}\hbox to 90pt{\copy0\hss(\the\wd0)},
+{\tt Mb-Gb}: \setbox0=\hbox{{\tenMb ）}{\tenGb ・}}\hbox to 90pt{\copy0\hss(\the\wd0)}%
+}
+
+{\noindent\bf\tengt {\tt differentjfm=small}（小さい方）}
+
+\setjaparameter{differentjfm=small}\djtest
+
+{\noindent\bf\tengt {\tt differentjfm=large}（大きい方）}
+
+\setjaparameter{differentjfm=LARGE}\djtest
+
+{\noindent\bf\tengt {\tt differentjfm=average}（default，平均）}
+
+\setjaparameter{differentjfm=AVERAGE}\djtest
+
+{\noindent\bf\tengt {\tt differentjfm=both}（両方挿入）}
+
+\setjaparameter{differentjfm=Both}\djtest
+
 
 \end
 

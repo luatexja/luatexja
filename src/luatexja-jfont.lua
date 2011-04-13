@@ -33,24 +33,28 @@ function ltj.search_metric(key)
    return nil
 end
 
-function ltj.loadjfontmetric()
-   if string.len(jfm.name)==0 then
-      ltj.error("the key of font metric is null"); return nil
-   elseif ltj.search_metric(jfm.name) then
-      ltj.error("the metric '" .. jfm.name .. "' is already loaded"); return nil
+function ltj.load_jfont_metric()
+  if ltj.jfmfname=='' then 
+     ltj.error('no JFM specified', 
+	       {[1]='To load and define a Japanese font, the name of JFM must be specified.',
+		[2]="The JFM 'ujis' will be  used for now."})
+     ltj.jfmfname='ujis'
+  end
+  jfm.name=ltj.jfmfname .. ':' .. ltj.jfmvar;
+  local i = ltj.search_metric(jfm.name)
+  local t = {}
+  if i then  return i end
+  jfm.char_type={}; jfm.glue={}; jfm.kern={}
+  ltj.loadlua('jfm-' .. ltj.jfmfname .. '.lua');
+  if jfm.dir~='yoko' then
+     ltj.error("jfm.dir must be 'yoko'", {}); return nil
    end
-   if jfm.dir~='yoko' then
-      ltj.error("jfm.dir must be 'yoko'"); return nil
-   end
-   local t={}
    t.name=jfm.name
-   t.dir=jfm.dir
-   t.zw=jfm.zw
-   t.zh=jfm.zh
+   t.dir=jfm.dir; t.zw=jfm.zw; t.zh=jfm.zh
    t.char_type=jfm.char_type
-   t.glue=jfm.glue
-   t.kern=jfm.kern
+   t.glue=jfm.glue; t.kern=jfm.kern
    table.insert(ltj.metrics,t)
+   return #ltj.metrics
 end
 
 function ltj.find_char_type(c,m)
@@ -69,40 +73,40 @@ end
 
 --====== \setjfont\CS={...:...;jfm=metric;...}
 
-function ltj.jfontdefX(b)
+function ltj.jfontdefX(g)
   local t = token.get_next()
   ltj.cstemp=token.csname_name(t)
-  ltj.mettemp=''
+  if g then ltj.is_global = '\\global' else ltj.is_global = '' end
   tex.sprint('\\expandafter\\font\\csname ' .. ltj.cstemp .. '\\endcsname')
 end
+
 function ltj.jfontdefY() -- for horizontal font
-   local j=ltj.search_metric(ltj.mettemp)
-   if not j then
-      ltj.error("metric named '" .. ltj.mettemp .. "' didn't loaded")
-      return
-   end
+   local j=ltj.load_jfont_metric()
    local fn=font.id(ltj.cstemp)
    local f = font.fonts[fn]
    ltj.font_metric_table[fn]={}
    ltj.font_metric_table[fn].jfm=j; ltj.font_metric_table[fn].size=f.size
-   tex.sprint('\\protected\\expandafter\\def\\csname ' .. ltj.cstemp .. '\\endcsname' 
-	      .. '{\\csname luatexja@curjfnt\\endcsname=' .. fn
-	      .. ' \\zw=' .. tex.round(f.size*ltj.metrics[j].zw) .. 'sp' 
-	      .. '\\zh=' .. tex.round(f.size*ltj.metrics[j].zh) .. 'sp\\relax}')
+   tex.sprint(ltj.is_global .. '\\protected\\expandafter\\def\\csname '
+              .. ltj.cstemp .. '\\endcsname'
+              .. '{\\csname luatexja@curjfnt\\endcsname=' .. fn
+              .. ' \\zw=' .. tex.round(f.size*ltj.metrics[j].zw) .. 'sp'
+              .. '\\zh=' .. tex.round(f.size*ltj.metrics[j].zh) .. 'sp\\relax}')
 end
-
 
 local dr_orig = fonts.define.read
 function fonts.define.read(name, size, id)
-   ltj.mettemp = ltj.determine_metric(name)
-   -- In hthe present imple., we don't remove "jfm=..." from name.
+   ltj.extract_metric(name)
+   -- In the present imple., we don't remove "jfm=..." from name.
    local fontdata = dr_orig(name, size, id)
    return fontdata
 end
 
-function ltj.determine_metric(name)
+-- extract ltj.jfmfname and ltj.jfmvar
+function ltj.extract_metric(name)
    local basename=name
    local tmp = utf.sub(basename, 1, 5)
+   ltj.jfmfname = ''
+   ltj.jfmvar = ''
    if tmp == 'file:' or tmp == 'name:' or tmp == 'psft:' then
       basename = utf.sub(basename, 6)
    end
@@ -110,16 +114,18 @@ function ltj.determine_metric(name)
    local p = utf.find(basename, ":")
    if p then 
       basename = utf.sub(basename, p+1)
-   else return ''
+   else return 
    end
 
    p=1
    while p do
       local q= utf.find(basename, ";",p+1) or utf.len(basename)+1
       if utf.sub(basename,p,p+3)=='jfm=' and q>p+4 then
-	 return utf.sub(basename,p+4,q-1)
+	 ltj.jfmfname = utf.sub(basename,p+4,q-1)
+      elseif utf.sub(basename,p,p+6)=='jfmvar=' and q>p+6 then
+	 ltj.jfmvar = utf.sub(basename,p+7,q-1)
       end
       if utf.len(basename)+1==q then p=nil else p=q+1 end
    end
-   return ''
+   return
 end
