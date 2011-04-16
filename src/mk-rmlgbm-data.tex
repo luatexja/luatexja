@@ -1,0 +1,72 @@
+%#! lualatex
+\documentclass{article}
+
+\usepackage{luaotfload}
+\usepackage{luacode}
+
+\begin{luacode}
+local fontdata = containers.read(fonts.otf.cache, 'kozminpr6n-regular')
+
+-- from fonts.otf.otf_to_tfm()
+local tfmdata
+fontdata.shared = fontdata.shared or {
+   featuredata = { },
+   anchorhash  = { },
+   initialized = false,
+}
+tfmdata = fonts.otf.copy_to_tfm(fontdata)
+tfmdata.unique = tfmdata.unique or { }
+tfmdata.shared = tfmdata.shared or { } -- combine
+local shared = tfmdata.shared
+shared.otfdata = fontdata
+shared.features = features -- default
+shared.dynamics = { }
+shared.processes = { }
+tfmdata.luatex = fontdata.luatex
+tfmdata.indices = fontdata.luatex.indices
+tfmdata.unicodes = fontdata.luatex.unicodes
+tfmdata.marks = fontdata.luatex.marks
+tfmdata.originals = fontdata.luatex.originals
+tfmdata.changed = { }
+tfmdata.has_italic = fontdata.metadata.has_italic
+if not tfmdata.language then tfmdata.language = 'dflt' end
+if not tfmdata.script   then tfmdata.script   = 'dflt' end
+_, shared.features = fonts.otf.set_features(tfmdata,fonts.define.check(features,fonts.otf.features.default))
+
+-- from fonts.otf.read_from_open_type()
+tfmdata = fonts.tfm.scale(tfmdata, 655360)
+
+-- delete extra data
+fontdata.subfonts = nil
+fontdata.metadata = {}
+fontdata.pfminfo = {}
+fontdata.luatex.filename = 'dummy.otf'
+fontdata.luatex.foundfilename = nil
+fontdata.size = nil
+fontdata.time = nil
+fontdata.glyphs = nil
+fontdata.luatex.indices = nil
+fontdata.luatex.unicodes = nil
+fontdata.luatex.originals = nil
+fontdata.luatex.tounicode = nil
+tfmdata.indices = nil
+tfmdata.descriptions = {}
+
+tfmdata.psname = ''
+tfmdata.filename = ''
+tfmdata.fontname = ''
+tfmdata.fullname = ''
+tfmdata.name = ''
+
+for k, v in pairs(tfmdata.characters) do
+   tfmdata.characters[k].height = nil
+end
+
+-- for luaotfload
+fontdata.pfminfo.os2_capheight = 0
+
+table.tofile('luatexja-rmlgbm-data.lua', tfmdata, 'return', false, true, false)
+\end{luacode}
+
+\begin{document}
+\end{document}

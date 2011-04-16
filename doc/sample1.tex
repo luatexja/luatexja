@@ -63,9 +63,7 @@
 \item {\tt luatexja-core.lua}: コア部分に使われるLuaコード．
 \item {\tt luatexja-jfont.lua}: 和文フォント定義部のLuaコード．
 \item {\tt luatexja-rmlgbm-data.lua}: 非埋込和文フォント用のデータ（小塚明朝Pr6N R由来）．
-\item {\tt mk-rmlgbm-data.lua}: {\tt luatexja-rmlgbm-data.lua}作成用Luaスクリプト({\tt texlua}で実行；小塚明朝を{\tt luaotfload}で読み込んだ時のキャッシュが必要)．
-\item {\tt mk\_lua.py}: {\tt luatexja-ucs2aj16.lua}作成用Pythonスクリプト．
-
+\item {\tt mk-rmlgbm-data.tex}: {\tt luatexja-rmlgbm-data.lua}作成用スクリプト(小塚明朝を{\tt luaotfload}で読み込んだ時のキャッシュが必要)．
 \item {\tt luatexja-kinsoku.tex}: 禁則用ペナルティ等のパラメータを書いたファイル．
 下のファイルによって{\tt ukinsoku.tex} (in up\TeX-0.30) から自動生成されたもの．
 \item {\tt luatexja-kinsoku\_make.tex}: 上の{\tt luatexja-kinsoku.tex}製作用ファイル．
@@ -173,7 +171,7 @@ PSフォント名<PSfontname>を直接指定することもでき，
 \begintt
 \jfont\tenipam={file:ipaexm.ttf:script=latn;+jp90;jfm=mt}
 \endtt
-
+なお，非埋込の場合は，GSUB/GPOSテーブルとして小塚明朝 Pr6N Rのものが用いられる．
 \enditem
 
 \beginparagraph 組版パラメタの調整
@@ -264,7 +262,7 @@ Lua\TeX-jaパッケージでは，次のような流れで処理を行う．
 \item 和文フォントへの置換: |hyphenate|, |hpack_filter| callbacks
 
 この段階の前では，和文文字であっても，それを内部で表している|glyph_node|~$p$は，
-「|\temrm あ|」のように，欧文フォントが指定されている状態になっている．しかし，
+「|\tenrm あ|」のように，欧文フォントが指定されている状態になっている．しかし，
 $p$は「現在の和文フォント」の番号もattribute |\luatexja@curjfnt|として保持している．そのため，
 この段階では，「和文文字が格納されている」|glyph_node|~$p$に対して，次を行う．
 
