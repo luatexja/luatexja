@@ -27,7 +27,7 @@
 
 \beginparagraph 特徴
 
-\item 欧文フォント/和文フォントの内部独立管理．
+\item 欧文フォント/和文フォントの外部独立管理．
 \item 違う和文フォントでも「メトリックが同じ」なら，字間に空白を挿入する際には同じものとして扱う．
 {\bf 例}: 「ほげほげ）{\gt （ふがふが}」は以下の出力より得られた:
 \begintt
@@ -40,10 +40,9 @@
 \beginparagraph 制限
 
 \item 全体的にテスト不足です．
-\item 合字の前後の和欧文間空白の挿入処理は適当{\small（合字でない場合の処理をそのまま流用）\inhibitglue}．
-\item {\bf 現時点で\LaTeX での使用は殆ど考慮されていません．``plain Lua\TeX''で使ってください．}
-\item |\accent|を和文文字に対して使うことはできません．これは「フォントを後で置換する」という実装上，
-仕方のないことだと思われます．
+\item {\bf 現時点で\LaTeX での使用は殆ど考慮されていません．今は``plain Lua\TeX''で使ってください．}
+\item |\accent|を和文文字に対して使うことはできません．
+これは「フォントを後で置換する」という実装上，仕方のないことだと思われます．
 \item 数式中の日本語は想定していません．|\hbox|か何かで囲ってください．
 \item p\TeX にあった以下の機能はまだ実装していません．
 \itemitem |\euc|, |\jis|, |\sjis|, |\kuten|といった，コード変換プリミティブ．
@@ -63,12 +62,13 @@
 \item {\tt luatexja-core.lua}: コア部分に使われるLuaコード．
 \item {\tt luatexja-jfont.lua}: 和文フォント定義部のLuaコード．
 \item {\tt luatexja-rmlgbm-data.lua}: 非埋込和文フォント用のデータ（小塚明朝Pr6N R由来）．
-\item {\tt mk-rmlgbm-data.tex}: {\tt luatexja-rmlgbm-data.lua}作成用スクリプト(小塚明朝を{\tt luaotfload}で読み込んだ時のキャッシュが必要)．
+\item {\tt luatexja-rmlgbm.lua}: 非埋込和文フォント (Ryumin-Light etc.) 定義部．
+\item {\tt mk-rmlgbm-data.tex}: {\tt luatexja-rmlgbm-data.lua}作成用スクリプト
+{\small（小塚明朝を{\tt luaotfload}で読み込んだ時のキャッシュが必要）\inhibitglue}．
 \item {\tt luatexja-kinsoku.tex}: 禁則用ペナルティ等のパラメータを書いたファイル．
 下のファイルによって{\tt ukinsoku.tex} (in up\TeX-0.30) から自動生成されたもの．
-\item {\tt luatexja-kinsoku\_make.tex}: 上の{\tt luatexja-kinsoku.tex}製作用ファイル．
-\item {\tt luatj-ujis.lua}: up\TeX-0.30の{\tt ujis.tfm}ベースのメトリックサンプル．
-\item {\tt luatj-mono.lua}: 「全文字が全角幅」のメトリックサンプル．
+\item {\tt jfm-ujis.lua}: up\TeX-0.30の{\tt ujis.tfm}ベースのメトリックサンプル．
+\item {\tt jfm-mono.lua}: 「全文字が全角幅」のメトリックサンプル．
 \enditem
 
 \beginsection 使用方法
@@ -139,20 +139,20 @@ JFM は和文文字の幅や，和文文字間の空白の入り方などを規�
 \TeX の|\font| primitiveと同様の書式を持った次の命令を用いて和文フォントを定義する：
 
 \begintt
-  \jfont<font>={<fontname>:<features>} <size>  % local に定義
-  \gjfont<font>={<fontname>:<features>} <size> % global に定義
+  \jfont<font>={<font_name>:<features>} <size>  % local に定義
+  \gjfont<font>={<font_name>:<features>} <size> % global に定義
 \endtt
 
 
-\item {\bf <fontname> の指定について}\par\noindent
+\item {\bf <font_name> の指定について}\par\noindent
 内部でluaotfloadパッケージを読み込んでいる．大きくわけて，以下の4種類がある．
 このうち，前の2つはluaotfloadパッケージの機能である．
-\itemitem |file:<filename>|\par\noindent
-TrueType/OpenTypeフォントをファイル名<filename>で指定．
-\itemitem |name:<fontname>|\par\noindent
-システム内のフォント名を<fontname>に指定することも可能．
-\itemitem |psft:<PSfontname>|\par\noindent
-PSフォント名<PSfontname>を直接指定することもでき，
+\itemitem |file:<file_name>|\par\noindent
+TrueType/OpenTypeフォントをファイル名<file_name>で指定．
+\itemitem |name:<font_name>|\par\noindent
+システム内のフォント名を<font_name>に指定することも可能．
+\itemitem |psft:<PSfont_name>|\par\noindent
+PSフォント名<PSfont_name>を直接指定することもでき，
 この場合はフォントは名前だけ（非埋込）となる．
 例えば，本文章では，
 \begintt
@@ -163,7 +163,7 @@ PSフォント名<PSfontname>を直接指定することもでき，
 %\itemitem |vf:<vfname>|
 
 \item {\bf JFMの指定}：<features>欄に次を指定する．\par\noindent
-\itemitem |jfm=<jfmfile>|: JFMとして|jfm-<jfmfile>.lua|を用いることを示す．必須．
+\itemitem |jfm=<jfm_file>|: JFMとして|jfm-<jfm_file>.lua|を用いることを示す．必須．
 \itemitem |jfmvar=<varkey>|\par\noindent
 和文文字間の空白の挿入処理は，使用するJFMと，この<varkey>の値とのペアによって行われる．
 
@@ -171,7 +171,8 @@ PSフォント名<PSfontname>を直接指定することもでき，
 \begintt
 \jfont\tenipam={file:ipaexm.ttf:script=latn;+jp90;jfm=mt}
 \endtt
-なお，非埋込の場合は，GSUB/GPOSテーブルとして小塚明朝 Pr6N Rのものが用いられる．
+なお，非埋込の場合は，GSUB/GPOSテーブルとして小塚明朝 Pr6N Rのものが用いられる
+（|test01-noembed.pdf|を参照）．
 \enditem
 
 \beginparagraph 組版パラメタの調整
@@ -188,27 +189,27 @@ PSフォント名<PSfontname>を直接指定することもでき，
 
 \enum ◎がついているものは，自動的にglobalな代入となってしまうもの．
 
-\item |prebreakpenalty={<chrcode>, <penalty>}|★◎\par\noindent
+\item |prebreakpenalty={<chr_code>, <penalty>}|★\par\noindent
 p\TeX の|\prebreakpenalty|に対応した設定項目である．
-\itemitem <chrcode>: 文字コードを指定する．一旦補助カウンタに代入されるので，
+\itemitem <chr_code>: 文字コードを指定する．一旦補助カウンタに代入されるので，
 16進法での数値の指定 (|"abcd|) や，%"
 文字トークンによる指定 (|`あ|) も可能である．
 \itemitem <penalty>: penalty の値を0から10000までの自然数で指定する
 {\small（範囲外でも可能だが）\inhibitglue}．
 
-\item |postbreakpenalty={<chrcode>, <penalty>}|★◎\par\noindent
+\item |postbreakpenalty={<chr_code>, <penalty>}|★\par\noindent
 同様に，p\TeX の|\postbreakpenalty|に対応した設定項目である．
 p\TeX では，同一文字に対して|\prebreakpenalty|, |\postbreakpenalty|の両方を定義する
 ことはできなかったが，Lua\TeX-jaでは可能である．
 
-\item |cjkxspmode={<chrcode>, <mode>}|★◎\par\noindent
+\item |cjkxspmode={<chr_code>, <mode>}|★\par\noindent
 p\TeX の|\inhibitxspcode|に対応した設定項目である．<mode>で許される値は，
 \itemitem 0, 1, 2, 3: p\TeX の対応するprimitiveと同じ意味．
 \itemitem |inhibit|: 前後の欧文文字との間の|\xkanjiskip|自動挿入を禁止．
 \itemitem |preonly|: 前の欧文文字との間の|\xkanjiskip|自動挿入のみを許可．
 \itemitem |postonly|: 後の欧文文字との間の|\xkanjiskip|自動挿入のみを許可．
 \itemitem |allow|: 前後の欧文文字との間の|\xkanjiskip|自動挿入を許可．
-\item |asciixspmode={<chrcode>, <mode>}|★◎\par\noindent
+\item |asciixspmode={<chr_code>, <mode>}|★\par\noindent
 同様に，p\TeX の|\xspcode|に対応した設定項目である．
 \item |yabaselineshift=<dimen>|:
 欧文文字のベースライン補正量をdimensionで指定する．
@@ -218,8 +219,10 @@ p\TeX の|\inhibitxspcode|に対応した設定項目である．<mode>で許さ
 \item |xkanjiskip=<skip>|★\inhibitglue: |\xkanjiskip=<skip>|と同じ意味．
 \item |jcharwidowpenalty=<penalty>|★\inhibitglue: |\jcharwidowpenalty=<penalty>|と同じ意味．
 \item |autospacing[=<bool>]|★◎\par\noindent
+%\item |autospacing[=<bool>]|★\par\noindent
 和文文字間のglue（|\kanjiskip|）の自動挿入をするかしないかを制御．
 \item |autoxspacing[=<bool>]|★◎\par\noindent
+%\item |autoxspacing[=<bool>]|★\par\noindent
 和欧文間のglue（|\xkanjiskip|）の自動挿入をするかしないかを制御．
 
 \item |differentjfm=(large/small/average/both)|★◎\par\noindent
@@ -296,8 +299,11 @@ p\TeX の|adjust_hlist| procedureとほぼ同様の処理を用いて，
 挿入する．
 \itemitem 数式境界 (|math_node|) との間に|\xkanjiskip|を自動挿入するかの決定は，
 p\TeX では数字{\tt 0}との間に挿入するかどうかで判定していたが，Lua\TeX-jaでは
-「文字コード|'math'|の文字」で判定している．
-
+「文字コード$-1$の文字」で判定している．
+\itemitem 合字の周囲の空白挿入については，構成要素の文字列を通じて判断している．例えば，
+「漢ffi字」という文字列に対して，
+\itemT 「漢」と「ffi」間の空白挿入：「漢」と「f」間に入るかで判断
+\itemT 「ffi」と「字」間の空白挿入：「i」と「字」間に入るかで判断
 
 \item ベースライン補正: |pre_linebreak_filter|, |hpack_filter|
 

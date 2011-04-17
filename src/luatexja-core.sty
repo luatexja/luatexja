@@ -34,7 +34,8 @@
     texio.write_nl("("..path..")")
     dofile(path)
   end
- ltj.loadlua('luatexja-rmlgbm.lua') 
+  require('lualibs')
+  ltj.loadlua('luatexja-rmlgbm.lua') 
     % This file must be read before luatexja-jfont.lua. For Ryumin-Light and GothicBBB-Medium.
   ltj.loadlua('luatexja-core.lua')
   ltj.loadlua('luatexja-jfont.lua')
@@ -64,6 +65,8 @@
 \def\inhibitglue{\directlua{ltj.create_ihb_node()}}
 
 %%%%%%%% \setjaparameter
+\newcount\ltj@stack@pbp\newcount\ltj@group@level@pbp
+\ltj@group@level@pbp=0 \ltj@stack@pbp=0
 
 % prebreakpenalty = {<char_code>, <penalty>}
 \define@key[ltj]{japaram}{prebreakpenalty}{%
@@ -73,7 +76,7 @@
 \def\luatexja@setbp#1,#2:#3{
   \luatexja@tempcnta=#1\relax
   \luatexja@tempcntb=#2\relax
-  \directlua{ltj.set_penalty_table(\asluastring{#3},
+  \directlua{ltj.set_ch_table(ltj.isglobal, \asluastring{#3},
     tex.getcount('luatexja@tempcnta'),tex.getcount('luatexja@tempcntb'))}}
 
 % yabaselineshift = <dimen>
@@ -100,7 +103,7 @@
   \def\ltj@tempa{postonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{1}\fi
   \def\ltj@tempa{allow}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{3}\fi
   \luatexja@tempcnta=#1\relax\luatexja@tempcntb=\ltj@temp\relax
-  \directlua{ltj.set_inhibit_xsp_table(tex.getcount('luatexja@tempcnta'),
+  \directlua{ltj.set_ch_table(ltj.isglobal, 'xsp', tex.getcount('luatexja@tempcnta'),
     tex.getcount('luatexja@tempcntb'))}}
 
 % asciixspmode = {<char_code>, <mode>}
@@ -115,7 +118,7 @@
   \def\ltj@tempa{postonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{2}\fi
   \def\ltj@tempa{allow}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{3}\fi
   \luatexja@tempcnta=#1\relax\luatexja@tempcntb=\ltj@temp\relax
-  \directlua{ltj.set_inhibit_xsp_table(tex.getcount('luatexja@tempcnta'),
+  \directlua{ltj.set_ch_table(ltj.isglobal, 'xsp', tex.getcount('luatexja@tempcnta'),
     tex.getcount('luatexja@tempcntb'))}}
 
 % autospacing = <bool> (default: true)

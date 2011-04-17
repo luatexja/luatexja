@@ -1,0 +1,14 @@
+%#!luatex
+\input luatexja-core.sty
+
+\jfont\rml={psft:Ryumin-Light:jfm=ujis} at 10pt
+\rml あ\inhibitglue\char"201Cあ←Ryumin-Light
+
+\jfont\rml={file:ipam.ttf:jfm=ujis} at 10pt
+\rml あ\inhibitglue\char"201Cあ←ipam
+
+\jfont\rml={file:KozMinPr6N-Regular.otf:jfm=ujis} at 10pt
+\rml あ\inhibitglue\char"201Cあ←KozMinPr6N-Regular
+
+あ\discretionary{．\inhibitglue\kern-1\zw}{}{．}あ
+\end

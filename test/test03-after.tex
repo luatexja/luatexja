@@ -45,4 +45,16 @@ a\inhibitglue （a）\inhibitglue aあa〜a
 \getjaparameter{asciixspmode}{`a},
 \getjaparameter{asciixspmode}{`b}
 
+{\setjaparameter{kanjiskip=0pt plus 1fi minus 1fil}\getjaparameter{kanjiskip}\par}
+{x\setjaparameter{kanjiskip=0pt plus 1fill minus 1filll}\getjaparameter{kanjiskip}\par}
+
+\tenrm
+{\setjaparameter{asciixspmode={`i,preonly},ykbaselineshift=0pt}
+あiあfiあffiあ\par}
+
+{\setjaparameter{asciixspmode={`f,postonly},ykbaselineshift=0pt}
+あfあfiあffiあ\par}
+
+\setjaparameter{asciixspmode={-1,inhibit}}
+あ$a$あ
 \end

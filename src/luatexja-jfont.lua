@@ -129,3 +129,48 @@ function ltj.extract_metric(name)
    end
    return
 end
+
+
+--====== Adjust the width of Japanese glyphs
+
+-- TeX's \hss
+function ltj.get_hss()
+   local hss = node.new(node.id("glue"))
+   local hss_spec = node.new(node.id("glue_spec"))
+   hss_spec.width = 0
+   hss_spec.stretch = 65536
+   hss_spec.stretch_order = 2
+   hss_spec.shrink = 65536
+   hss_spec.shrink_order = 2
+   hss.spec = hss_spec
+   return hss
+end
+
+function ltj.set_ja_width(head)
+   local p = head
+   local t,s,th, g, q,a
+   while p do
+      if ltj.is_japanese_glyph_node(p) then
+	 t=ltj.metrics[ltj.font_metric_table[p.font].jfm]
+	 s=t.char_type[node.has_attribute(p,luatexbase.attributes['luatexja@charclass'])]
+	 if not(s.left==0.0 and s.down==0.0 
+		and tex.round(s.width*ltj.font_metric_table[p.font].size)==p.width) then
+	    -- must be encapsuled by a \hbox
+	    head, q = node.remove(head,p)
+	    p.next=nil
+	    p.yoffset=tex.round(p.yoffset-ltj.font_metric_table[p.font].size*s.down)
+	    p.xoffset=tex.round(p.xoffset-ltj.font_metric_table[p.font].size*s.left)
+	    node.insert_after(p,p,ltj.get_hss())
+	    g=node.hpack(p, tex.round(ltj.font_metric_table[p.font].size*s.width)
+			 , 'exactly')
+	    g.height=tex.round(ltj.font_metric_table[p.font].size*s.height)
+	    g.depth=tex.round(ltj.font_metric_table[p.font].size*s.depth)
+	    head,p = node.insert_before(head,q,g)
+	    p=q
+	 else p=node.next(p)
+	 end
+      else p=node.next(p)
+      end
+   end
+   return head
+end
