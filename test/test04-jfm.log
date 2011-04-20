@@ -1,0 +1,262 @@
+This is LuaTeX, Version beta-0.66.0-2011032121 (rev 4093)  (format=luatex 2011.3.21)  19 APR 2011 21:02
+ restricted \write18 enabled.
+**test04-jfm.tex
+(./test04-jfm.tex
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-core.sty
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/luaotfload.sty
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase.sty
+Package: luatexbase 2010/10/06 v0.3 Module utilities for LuaTeX
+(/opt/texlive/p2010/texmf-dist/tex/generic/oberdiek/ifluatex.sty
+Package: ifluatex 2010/03/01 v1.3 Provides the ifluatex switch (HO)
+Package ifluatex Info: LuaTeX detected.
+)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase-compat.sty
+Package: luatexbase-compat 2010/10/10 v0.3 Compatibility tools for LuaTeX
+(/opt/texlive/p2010/texmf-dist/tex/generic/oberdiek/ifluatex.sty
+Package ifluatex Info: The package is already loaded.
+))
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase-loader.sty
+Package: luatexbase-loader 2010/10/10 v0.3 Lua module loader for LuaTeX
+(/opt/texlive/p2010/texmf-dist/tex/generic/oberdiek/ifluatex.sty
+Package ifluatex Info: The package is already loaded.
+)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase-compat.sty)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase.loader.lua))
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase-regs.sty
+Package: luatexbase-regs 2010/10/10 v0.3 Registers allocation for LuaTeX
+(/opt/texlive/p2010/texmf-dist/tex/generic/oberdiek/ifluatex.sty
+Package ifluatex Info: The package is already loaded.
+))
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase-attr.sty
+Package: luatexbase-attr 2010/10/10 v0.3 Attributes allocation for LuaTeX
+(/opt/texlive/p2010/texmf-dist/tex/generic/oberdiek/ifluatex.sty
+Package ifluatex Info: The package is already loaded.
+)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase-compat.sty)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase-loader.sty)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/attr.lua))
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase-cctb.sty
+Package: luatexbase-cctb 2010/10/10 v0.3 Catcodetable allocation for LuaTeX
+(/opt/texlive/p2010/texmf-dist/tex/generic/oberdiek/ifluatex.sty
+Package ifluatex Info: The package is already loaded.
+)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase-loader.sty)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/cctb.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase-compat.sty)
+\lltxb@catcodetable@alloc=\count277
+\@tempcnta=\count278
+\@tempcntb=\count279
+\CatcodeTableIniTeX=\luatexcatcodetable1
+\CatcodeTableString=\luatexcatcodetable2
+\CatcodeTableOther=\luatexcatcodetable3
+\CatcodeTableLaTeX=\luatexcatcodetable4
+\CatcodeTableLaTeXAtLetter=\luatexcatcodetable5
+\CatcodeTableExpl=\luatexcatcodetable6
+)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase-mcb.sty
+Package: luatexbase-mcb 2010/10/10 v0.3 Callback management for LuaTeX
+(/opt/texlive/p2010/texmf-dist/tex/generic/oberdiek/ifluatex.sty
+Package ifluatex Info: The package is already loaded.
+)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase-modutils.sty
+Package: luatexbase-modutils 2010/10/10 v0.3 Module utilities for LuaTeX
+(/opt/texlive/p2010/texmf-dist/tex/generic/oberdiek/ifluatex.sty
+Package ifluatex Info: The package is already loaded.
+)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase-loader.sty)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/modutils.lua))
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/mcb.lua)
+Lua module: luatexbase-mcb 2010/05/12 0.2 register several functions in a callb
+ack
+)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luatexbase/luatexbase-modutils.sty))
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs.lua)
+Lua module: lualibs 2011/01/20 0.96 Lua additional functions.
+
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-string.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-lpeg.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-boolean.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-number.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-math.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-table.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-aux.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-io.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-os.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-file.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-md5.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-dir.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-unicode.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-utils.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-dimen.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-url.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/lualibs/lualibs-set.lua)
+(/opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/luaotfload.lua)
+Lua module: luaotfload 2011/02/16 1.24 OpenType layout system.
+
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-luat-dum.lua.(using cache: /home/h7k/.texlive2010/texmf-var/luatex-cache/gen
+eric)
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-luat-ovr.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-data-con.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-ini.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-node-dum.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-node-inj.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-tfm.lua.
+luatexbase.attributes["otfl@state"] = 1
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-cid.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-ott.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-map.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-otf.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-otd.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-oti.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-otb.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-otn.lua.
+luatexbase.attributes["otfl@markbase"] = 2
+luatexbase.attributes["otfl@markmark"] = 3
+luatexbase.attributes["otfl@markdone"] = 4
+luatexbase.attributes["otfl@cursbase"] = 5
+luatexbase.attributes["otfl@curscurs"] = 6
+luatexbase.attributes["otfl@cursdone"] = 7
+luatexbase.attributes["otfl@kernpair"] = 8
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-ota.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-otc.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-def.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-xtx.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-dum.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-nms.lua.
+luaotfload: loading file /opt/texlive/p2010/texmf-dist/tex/luatex/luaotfload/ot
+fl-font-clr.lua.
+Module luatexbase-mcb info: creating 'luaotfload.patch_font' type 4
+Module luatexbase-mcb info: inserting 'luaotfload.pre_linebreak_filter'
+(luatexbase-mcb)            at position 1 in 'pre_linebreak_filter'
+Module luatexbase-mcb info: inserting 'luaotfload.hpack_filter'
+(luatexbase-mcb)            at position 1 in 'hpack_filter'
+Module luatexbase-mcb info: resetting callback 'define_font'
+Module luatexbase-mcb info: inserting 'luaotfload.define_font'
+(luatexbase-mcb)            at position 1 in 'define_font'
+Module luatexbase-mcb info: inserting 'luaotfload.find_vf_file'
+(luatexbase-mcb)            at position 1 in 'find_vf_file'
+) (/opt/texlive/p2010/texmf-dist/tex/generic/xkeyval/xkeyval.tex
+\XKV@toks=\toks13
+\XKV@tempa@toks=\toks14
+\XKV@depth=\count280
+
+2008/08/13 v2.6a key=value parser (HA)
+(/opt/texlive/p2010/texmf-dist/tex/generic/xkeyval/xkvtxhdr.tex
+2005/02/22 v1.1 xkeyval TeX header (HA))
+(/opt/texlive/p2010/texmf-dist/tex/generic/xkeyval/keyval.tex))
+(/opt/texlive/p2010/texmf-dist/tex/generic/oberdiek/infwarerr.sty
+Package: infwarerr 2010/04/08 v1.3 Providing info/warning/message (HO)
+)
+\luatexja@tempcnta=\count281
+\luatexja@tempcntb=\count282
+\luatexja@tempdima=\dimen256
+\luatexja@autospc=\count283
+\luatexja@autoxspc=\count284
+\jcharwidowpenalty=\count285
+\kanjiskip=\skip256
+\xkanjiskip=\skip257
+\zw=\dimen257
+\zh=\dimen258
+\jQ=\dimen259
+\jH=\dimen260
+
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-rmlgbm.lua)
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-core.lua)
+Module luatexbase-mcb info: inserting 'ltj.process_input_buffer'
+(luatexbase-mcb)            at position 1 in 'process_input_buffer'
+Module luatexbase-mcb info: inserting 'ltj.pre_linebreak_filter'
+(luatexbase-mcb)            at position 2 in 'pre_linebreak_filter'
+Module luatexbase-mcb info: inserting 'ltj.hpack_filter'
+(luatexbase-mcb)            at position 2 in 'hpack_filter'
+Module luatexbase-mcb info: inserting 'ltj.hpack_filter_pre'
+(luatexbase-mcb)            at position 1 in 'hpack_filter'
+Module luatexbase-mcb info: inserting 'ltj.hyphenate'
+(luatexbase-mcb)            at position 1 in 'hyphenate'
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-jfont.lua)
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-core-aux.lua)
+\luatexja@curjfnt=\luatexattribute9
+\luatexja@charclass=\luatexattribute10
+\luatexja@yablshift=\luatexattribute11
+\luatexja@ykblshift=\luatexattribute12
+\luatexja@icflag=\luatexattribute13
+\luatexja@japanese=\language87
+\ltj@stack@pbp=\count286
+\ltj@group@level@pbp=\count287
+
+plain format: loading luatexja-plain.tex
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-plain.tex
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-rmlgbm-data.lu
+a)
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-ujis.lua)
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-ujis.lua)
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-ujis.lua)
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-ujis.lua)
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-ujis.lua)
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-ujis.lua)
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-kinsoku.tex)))
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-ujis.lua)(load: /ho
+me/h7k/.texlive2010/texmf-var/luatex-cache/generic/fonts/otf/temp-ipam.lua)
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-ujis.lua)(load: /ho
+me/h7k/.texlive2010/texmf-var/luatex-cache/generic/fonts/otf/temp-kozminpr6n-re
+gular.lua)
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-ujis.lua)
+(./jfm-bad.lua)
+! LuaTeX-ja error: bad JFM 'bad'.
+\@jfont ->\directlua {ltj.jfontdefY()}
+                                      
+<to be read again> 
+                   \rml 
+l.15 \rml
+          あ󿿿
+? h
+The JFM file you specified is not valid JFM file.
+Defining Japanese font is cancelled.
+? 
+[1{/opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdftex.map
+LuaTeX warning (file /opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdfte
+x.map): fontmap entry for `bchb8r' already exists, duplicates ignored
+
+LuaTeX warning (file /opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdfte
+x.map): fontmap entry for `bchbi8r' already exists, duplicates ignored
+
+LuaTeX warning (file /opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdfte
+x.map): fontmap entry for `bchbo8r' already exists, duplicates ignored
+
+LuaTeX warning (file /opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdfte
+x.map): fontmap entry for `bchr8r' already exists, duplicates ignored
+
+LuaTeX warning (file /opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdfte
+x.map): fontmap entry for `bchri8r' already exists, duplicates ignored
+
+LuaTeX warning (file /opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdfte
+x.map): fontmap entry for `bchro8r' already exists, duplicates ignored
+}] )</opt/texlive/p2010/texmf/fonts/opentype/test/kozuka/KozMinPr6N-Regular.otf
+></opt/texlive/p2010/texmf/fonts/truetype/test/ipam.ttf></opt/texlive/p2010/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb>
+Output written on test04-jfm.pdf (1 page, 163518 bytes).
+PDF statistics: 31 PDF objects out of 1000 (max. 8388607)
+ 19 compressed objects within 1 object stream
+ 0 named destinations out of 1000 (max. 131072)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+
