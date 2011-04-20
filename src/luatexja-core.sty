@@ -24,6 +24,24 @@
 \newdimen\jQ \jQ=0.25mm
 \newdimen\jH \jH=0.25mm
 
+%%%%%%%% Attributes for Japanese typesetting.
+\newluatexattribute\luatexja@curjfnt   % index for ``current Japanese font''
+\newluatexattribute\luatexja@charclass % 
+\newluatexattribute\luatexja@yablshift % attribute for \yabaselineshift
+\newluatexattribute\luatexja@ykblshift % attribute for \ykbaselineshift
+\newluatexattribute\luatexja@icflag    % attribute for italic correction
+\newlanguage\luatexja@japanese
+\expandafter\newluatexattribute\csname luatexja@kcat0\endcsname
+\expandafter\newluatexattribute\csname luatexja@kcat1\endcsname
+\expandafter\newluatexattribute\csname luatexja@kcat2\endcsname
+\expandafter\newluatexattribute\csname luatexja@kcat3\endcsname
+\expandafter\newluatexattribute\csname luatexja@kcat4\endcsname
+\csname luatexja@kcat0\endcsname='0
+\csname luatexja@kcat1\endcsname='0
+\csname luatexja@kcat2\endcsname=0
+\csname luatexja@kcat3\endcsname=0
+\csname luatexja@kcat4\endcsname=0
+
 %%%%%%%% Loading lua files
 \directlua{%
   utf = unicode.utf8
@@ -40,15 +58,8 @@
   ltj.loadlua('luatexja-core.lua')
   ltj.loadlua('luatexja-jfont.lua')
   ltj.loadlua('luatexja-core-aux.lua')
+  ltj.ja_lang_number=\the\luatexja@japanese
 }
-
-%%%%%%%% Attributes for Japanese typesetting.
-\newluatexattribute\luatexja@curjfnt   % index for ``current Japanese font''
-\newluatexattribute\luatexja@charclass % 
-\newluatexattribute\luatexja@yablshift % attribute for \yabaselineshift
-\newluatexattribute\luatexja@ykblshift % attribute for \ykbaselineshift
-\newluatexattribute\luatexja@icflag    % attribute for italic correction
-\newlanguage\luatexja@japanese\directlua{ltj.ja_lang_number=\the\luatexja@japanese}
 
 %%%%%%%% \asluastring
 \def\asluastring#1{'\luaescapestring{\detokenize{#1}}'}
@@ -63,6 +74,27 @@
 
 %%%%%%%% \inhibitglue
 \def\inhibitglue{\directlua{ltj.create_ihb_node()}}
+
+%%%%%%%% \defcharrange<name>{100-200,3000-,5000,...}
+\def\defcharrange#1#2{%
+  \def\ltj@nametemp{#1}\expandafter\ltj@dcrange#2,,\relax
+  \ltj@defcrkey{#1}\relax}
+\def\ltj@dcrange#1,{\def\ltj@temp{#1}%
+  \ifx\ltj@temp\empty\let\@next=\relax\else
+  \ltj@@dcrange{#1}\let\@next=\ltj@dcrange\fi\@next}
+\def\ltj@@dcrange#1{\ltj@enexist#1--\@nil}
+\def\ltj@enexist#1-#2-#3\@nil{\def\ltj@temp{#3}%
+  \ifx\ltj@temp\empty
+    \luatexja@tempcnta=#1 \luatexja@tempcntb=\luatexja@tempcnta
+  \else
+    \def\ltj@temp{#1}%
+    \ifx\ltj@temp\empty\luatexja@tempcnta='200 \else\luatexja@tempcnta=#1 \fi
+    \def\ltj@temp{#2}%
+    \ifx\ltj@temp\empty\luatexja@tempcntb="10FFFF \else\luatexja@tempcntb=#2 \fi%"
+  \fi
+  \directlua{ltj.def_jchar_range(\the\luatexja@tempcnta,\the\luatexja@tempcntb,
+    '\ltj@nametemp')}%
+  }
 
 %%%%%%%% \setjaparameter
 \newcount\ltj@stack@pbp\newcount\ltj@group@level@pbp
@@ -147,16 +179,23 @@
   \directlua{ltj.print_global()}\jcharwidowpenalty=#1 }
 
 % differentjfm = { large | small | average | both }
-\define@choicekey*+[ltj]{japaram}{differentjfm}[\ltj@temp\ltj@tempcnta]%
+\define@choicekey*+[ltj]{japaram}{differentjfm}[\ltj@temp\ltj@result]%
   {large,small,average,both}{%
-  \ifcase\ltj@tempcnta
+  \ifcase\ltj@result
     \directlua{ltj.calc_between_two_jchar_aux=ltj.calc_between_two_jchar_aux_large}\or
     \directlua{ltj.calc_between_two_jchar_aux=ltj.calc_between_two_jchar_aux_small}\or
     \directlua{ltj.calc_between_two_jchar_aux=ltj.calc_between_two_jchar_aux_average}\or
     \directlua{ltj.calc_between_two_jchar_aux=ltj.calc_between_two_jchar_aux_both}%
   \fi
 }{\@PackageWarning{luatexja}{ignored invalid argument '#1' for 'differentjfm'}}
-  % large, small, average(OK), both(OK)
+  % large, small, average, both
+
+
+% jcharrange = { <range_name> = { kanji | kana | letter | punct | noncjk} }
+\def\ltj@defcrkey#1{\message{(#1)}\define@choicekey*+[ltj]{charrange}{#1}[\ltj@temp\ltj@result]%
+  {kanji,kana,letter,punct,noncjk}{%
+  \directlua{ltj.set_jchar_range(ltj.isglobal, '#1',\ltj@result)}}\relax}
+\define@key[ltj]{japaram}{jcharrange}{\setkeys[ltj]{charrange}{#1}}
 
 \def\setjaparameter#1{\directlua{ltj.isglobal=''}%
   \setkeys[ltj]{japaram}{#1}}

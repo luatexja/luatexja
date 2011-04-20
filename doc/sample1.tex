@@ -3,7 +3,7 @@
 
 \message{BB}
 \overfullrule=0pt
-\def\LaTeX{L\kern-.36em\setbox0=\hbox{T}\vbox to\ht0{\hbox{\sevenrm A}\vss}\kern-.15em\TeX}
+\def\LaTeX{L\kern-.36em\setbox0=\hbox{T}\vbox to\ht0{\hbox{\sx A}\vss}\kern-.15em\TeX}
 \font\mff=manfnt at 10pt
 \def\mf{{\mff META{\rm\-}FONT}}
 \def\textfontii{\the\textfont2 }
@@ -82,51 +82,6 @@
 \rm\tenipam abcほげほげ）（あいう本文本文……
 \endtt
 
-\beginsection 実装解説
-
-\beginparagraph attributes, dimensions,$\,\ldots$
-
-以下はLua\TeX-jaパッケージ内で使用するattributeやその他の種類のレジスタである．
-上6つは内部処理用なので利用者が意識することはない．それ以外は，p\TeX に類似の名前の
-primitiveがあることから，意味は容易にわかるだろう:
-
-\item attribute |\luatexja@curjfnt|: 現在の和文フォント番号
-
-p\TeX では内部のグローバル変数で「現在の横組/縦組和文フォント」をそれぞれ保持していたが，
-当然ながら欧文用\TeX ではそのようなことはそのままではできない．
-node~$p$が保持しているattribute |\luatexja@curjfnt|の値$k$は，
-「もし$p$の中身が和文文字であれば，そのフォントは$k$番の番号のフォントである」という意味をもつ．
-
-\item attribute |\luatexja@charclass|: （和文文字の）文字クラス
-
-\item attribute |\luatexja@icflag|: この属性をもつkernはイタリック補正由来である
-
-p\TeX では，|\kern|由来のkernと，イタリック補正由来のkernを内部で区別していた．しかし，
-欧文用の\TeX ではそのような区別はなく，Lua\TeX においても区別がないようである．
-
-\item language |\luatexja@japanese|: 「日本語」に対応する|\language|番号
-
-\item attribute |\luatexja@yabaselineshift|: 欧文文字ベースラインの補正量．
-\itemitem {\bf sp$\fam\bffam {}=2^{-16}\,{\bf pt}$単位の整数値}で指定．
-正の値を指定すると，その分だけ欧文文字は下にずれる．
-\itemitem 数式中では，boxやruleもこの量だけずれる\hfil\break
-（よって，行中数式は全体が|\yabaselineshift|だけずれたように見える）．
-\item attribute |\luatexja@ykbaselineshift|: 和文文字ベースラインの補正量．
-
-p\TeX では「和文が主」という考えからか，常に和文文字のベースラインが基準であり，
-欧文文字の方をずらすことになっていた．しかし，「欧文の中に和文をちょっと入れる」ような場合では，
-逆に和文文字をずらす方が理にかなっているので，和文文字のベースラインもずらせるようにした．
-
-また，これを用いることで%
-{\small 異なる文字サイズの文字を「上下中央揃え」で組む}ことも可能．
-\item skip |\kanjiskip|: 和文文字同士の間に入る空白量．
-\item skip |\xkanjiskip|: 和文文字と欧文文字の間に入る空白量．
-\item count |\jcharwidowpenalty|: {\bf 未実装}
-\item dimen |\zw|, |\zh|: 現在の和文フォントの「幅」/「高さ」（メトリックから指定）
-\item dimen |\jQ|, |\jH|${}= 0.25\,{\rm mm}$
-\enditem
-
-
 \beginparagraph 和文フォントの定義
 
 Lua\TeX-jaでは，大雑把にいうと
@@ -175,6 +130,55 @@ PSフォント名<PSfont_name>を直接指定することもでき，
 （|test01-noembed.pdf|を参照）．
 \enditem
 
+\beginparagraph 「和文文字の範囲」の設定
+
+\item |\defcharrange{<name>}{<char_range>}|: 文字範囲の定義．
+\itemitem <name>: 範囲を参照するためにつけるkey．
+\itemitem <range>: 文字範囲を|"100-"200, 800, 1701-|のように指定する．
+\itemT ASCII codeの範囲 (|0x00|--|0x7F|) は指定できない．
+\itemT 既に他の文字範囲に使われている領域を指定することはできない．
+また，内部処理の都合上，引数に指定している範囲達はdisjointでなければならない．
+\item 各「文字範囲」ごとに，以下の5種類の取り扱い方を設定できる．
+{\bf 下表の3, 4列目の部分についてはまだ未実装である．}
+
+\medskip
+
+\vbox{\leavevmode\hfill\leftskip=0pt\vbox{\lineskiplimit=\maxdimen\lineskip=0pt\halign{%
+\quad\hfil#\hskip.5\zw\vrule height 1.38\zh depth 0.62\zh%
+\hskip.5\zw&\hfil#\hfil\quad&\hfil#\hfil\quad&\hfil#\hfil\quad\cr
+\noalign{\hrule height 0.8pt}
+        &\bf 和文文字扱い&|\catcode|&\bf |\jcharwidowpenalty|無視\cr
+\noalign{\hrule}
+|punct| &○          &12        &○                 \cr
+\noalign{\hrule}
+|letter|&○          &12        &NO                 \cr
+\noalign{\hrule}
+|kanji| &○          &11        &NO                 \cr
+\noalign{\hrule}
+|kana|  &○          &11        &NO                 \cr
+\noalign{\hrule}
+|noncjk|&NO          &|\catcode|依存&---\cr
+\noalign{\hrule height 0.8pt}
+}}\hfill\null}
+
+Lua\TeX-ja では文字範囲の設定用に5つのattributeを確保しており，
+{\bf 1つの文書中に設定できる文字範囲の数は49個までである．}
+
+\item デフォルトでは，|0x100|以降の文字コードは全部|kanji|扱いであり，さらに文字範囲として，
+\begintt
+  \defcharrange{iso88591}{"80-"FF}
+  \setjaparameter{jcharrange={iso8859-1=noncjk}}
+\endtt
+が定義されている{\small（つまり|0x80|--|0xFF|の範囲は欧文扱い）\inhibitglue}．
+
+TODO: 「{\setjaparameter{jcharrange={iso8859-1=kanji}}× (|U+00D7|)}」等，ISO 8859-1領域
+にマッピングされた文字の扱い．
+「{\setjaparameter{jcharrange={iso8859-1=kanji}}¢ (|U+00A2|)}」はHalfwidth and
+Fullwidth Formsに全角形（\char"FFE0）があるから%"
+luaotfloadの置換処理に割り込めばよいが……．
+\enditem
+
+
 \beginparagraph 組版パラメタの調整
 
 日本語組版用の各種パラメタの調整には，次の命令を用いる．
@@ -212,9 +216,19 @@ p\TeX の|\inhibitxspcode|に対応した設定項目である．<mode>で許さ
 \item |asciixspmode={<chr_code>, <mode>}|★\par\noindent
 同様に，p\TeX の|\xspcode|に対応した設定項目である．
 \item |yabaselineshift=<dimen>|:
-欧文文字のベースライン補正量をdimensionで指定する．
+p\TeX の|\yabaselineshift|に対応したものであり，欧文文字のベースライン補正量をdimensionで指定する．
+\itemitem 正の値を指定すると，その分だけ欧文文字は下にずれることとなる．
+\itemitem 数式中では，boxやruleもこの量だけずれる\hfil\break
+（よって，行中数式は全体が|\yabaselineshift|だけずれたように見える）．
 \item |ykbaselineshift=<dimen>|:
 和文文字のベースライン補正量をdimensionで指定する．
+p\TeX では「和文が主」という考えからか，常に和文文字のベースラインが基準であり，
+欧文文字の方をずらすことになっていた．しかし，「欧文の中に和文をちょっと入れる」ような場合では，
+逆に和文文字をずらす方が理にかなっているので，和文文字のベースラインもずらせるようにした．
+
+また，この値を適切に調整することで，%
+{\small 異なる文字サイズの文字を「上下中央揃え」で組む}ことも可能である．
+
 \item |kanjiskip=<skip>|★\inhibitglue: |\kanjiskip=<skip>|と同じ意味．
 \item |xkanjiskip=<skip>|★\inhibitglue: |\xkanjiskip=<skip>|と同じ意味．
 \item |jcharwidowpenalty=<penalty>|★\inhibitglue: |\jcharwidowpenalty=<penalty>|と同じ意味．
@@ -234,103 +248,32 @@ glue/kernの計算方法を設定する．
 \itemitem {\tt average}: 両者の相加平均．
 \itemitem {\tt both}: 両者の合計値の幅をもつglue/kernを挿入する．
 
+\item |setjcharrange={<range_name>=<mode>}|: 
+\itemitem <range_name>: |\defcharrange|で定義した「文字コードの範囲」か，|other|を指定する．
+|other|は，今まで定義した文字範囲の中に属さないような文字コード
+$c\in [\hbox{\tt 0x100},\infty)$全体の集合を表す．
+\itemitem <mode>: <range_name>で指定した範囲の文字の取扱を指定．
+
 
 \enditem
 
-\beginparagraph inhibitglue
+\beginparagraph その他の命令
 
-|\inhibitglue|
-: 指定箇所での和文フォントメトリック由来のglue/kernの挿入を禁止する．
+\item skip |\kanjiskip|: 和文文字同士の間に入る空白量を指定．p\TeX の同名の命令と同様．
+\item skip |\xkanjiskip|: 和文文字と欧文文字の間に入る空白量．p\TeX の同名の命令と同様．
+\item count |\jcharwidowpenalty|: {\bf 未実装}
+\item dimen |\zw|, |\zh|: 現在の和文フォントの「幅」/「高さ」（メトリックから指定）
+\item dimen |\jQ|, |\jH|${}= 0.25\,{\rm mm}$.
+\item |\inhibitglue|: 
+指定箇所でのJFM由来のglue/kernの挿入を禁止する．
 内部的には，|user_id|が30111のwhatsit nodeを作成している{\small（メトリック由来の
 glue/kern挿入処理で役目を終え，削除される）\inhibitglue}．
+\enditem
 
-
-\beginparagraph 大まかな処理の流れ
-
-Lua\TeX-jaパッケージでは，次のような流れで処理を行う．
-
-\item 行末空白の削除: |process_input_buffer| callback
-
-通常，\TeX において改行は空白とほぼ同じ意味であり，
-改行した箇所には自動的に空白が入るようになっている．
-だが，日本語ではそのような振る舞いは不自然であり，p\TeX でも
-「和文文字で行が終わった場合，改行文字は無視する」という
-使用になっている．
-
-そこで，入力が和文文字で終わった場合，コメント文字を挿入することにより
-この問題を解決する方法をとっている．
-この部分のコードは前田氏のjafontspecパッケージの部分から拝借したが，挿入する文字を|%|から
-（通常使用されることはないと思われる）|U+FFFFF|へと変更している．
-
-\item 和文フォントへの置換: |hyphenate|, |hpack_filter| callbacks
-
-この段階の前では，和文文字であっても，それを内部で表している|glyph_node|~$p$は，
-「|\tenrm あ|」のように，欧文フォントが指定されている状態になっている．しかし，
-$p$は「現在の和文フォント」の番号もattribute |\luatexja@curjfnt|として保持している．そのため，
-この段階では，「和文文字が格納されている」|glyph_node|~$p$に対して，次を行う．
-
-\itemitem $p$のフォントをattribute |\luatexja@curjfnt|の値に置換．
-\itemitem $p$の|language| fieldを|\luatexja@japanese|の値に置換．
-誤って和文文字間でハイフネーションがされてしまうのを防止するため．
-\itemitem $p$の文字の文字クラスを計算し，その値をattribute |\luatexja@charclass|に格納．
-これにより，|jp90|等のfeatureによりグリフが置換されても，文字クラスの値は保たれる．
-
-\item （luaotfloadパッケージによるグリフ置換等の処理はこの位置で行われる）
-
-\item メトリック由来glue/kernの挿入: |pre_linebreak_filter|, |hpack_filter|
-
-ここで，メトリックに由来する和文文字間のglue/kernを挿入する．
-基本的には連続する和文文字間に挿入するが，
-\itemitem 水平ボックスの先頭/末尾，段落の先頭/末尾には「文字コード|'boxbdd'|の文字」があると
-見做して空白を挿入する．
-\itemitem 和文文字とそうでないもの（欧文文字，ボックス等）の間に関しては，
-和文文字でない方は「文字コード|'jcharbdd'|の文字」であると見做す．
-\itemitem フォントの異なる2つの和文文字においても，
-両者のフォントのmetric keyとsizeが一致した場合は，
-挿入処理においては「同じフォント」であるかのように扱う．
-\itemitem  そうでない場合は，両者の間に「文字コード|'diffmet'|の文字」があると見做して，
-両和文文字からそれぞれglue/kern |gb|, |ga|を計算し，そこから実際に入るglue/kernを
-計算している（|\setjaparameter|中の|differentjfm|キーを参照）．
-
-\item |\kanjiskip|, |\xkanjiskip|の挿入: |pre_linebreak_filter|, |hpack_filter|
-
-p\TeX の|adjust_hlist| procedureとほぼ同様の処理を用いて，
-和文間glue |\kanjiskip|や和欧文間glue |\xkanjiskip|を
-挿入する．
-\itemitem 数式境界 (|math_node|) との間に|\xkanjiskip|を自動挿入するかの決定は，
-p\TeX では数字{\tt 0}との間に挿入するかどうかで判定していたが，Lua\TeX-jaでは
-「文字コード$-1$の文字」で判定している．
-\itemitem 合字の周囲の空白挿入については，構成要素の文字列を通じて判断している．例えば，
-「漢ffi字」という文字列に対して，
-\itemT 「漢」と「ffi」間の空白挿入：「漢」と「f」間に入るかで判断
-\itemT 「ffi」と「字」間の空白挿入：「i」と「字」間に入るかで判断
-
-\item ベースライン補正: |pre_linebreak_filter|, |hpack_filter|
-
-この段階では，（主として）欧文文字のベースラインをずらす作業を行う．幸いにして，
-Lua\TeX で文字を表す|glyph_node|には|y_offset| fieldがあるので，作業は楽である．
-
-補正量は，attribute |\luatexja@yablshift|の値（先も書いた通り，sp単位）である．和文文字の
-補正量は|\luatexja@ykblshift|の値で指定されるが，以前の「和文フォントへの置換」処理において，
-|\luatexja@yablshift|へと値を移し変えているので，この段階では|\luatexja@yablshift|の値のみを気にしている．
-
-
-さて，実際に補正されるのは次の場合である:
-\itemitem 文字 (|glyph_node|)
-\itemitem ボックス・rule（文中数式内部）．これによって，数式全体が下がったように見えるはず．
-
-\item 和文文字の幅の補正: |pre_linebreak_filter|, |hpack_filter|
-
-例えば，括弧類は「フォント中では全角幅だが，組版では半角幅として扱う」ことが多いが，このように
-文字幅を補正する処理を最後に行う．jafontspecパッケージのように，補正対象となる|glyph_node|~$p$%
-を，しかるべき量のglueと共に|\hbox|にカプセル化して行っている．
-
-\enditem 
-
-\beginparagraph 和文フォントメトリックについて
+\beginsection JFMについて
 
 Lua\TeX-jaで用いる和文用のメトリック情報は，次のような構文で書かれたLuaファイルである．
-見本として，|luatj-ujis.lua|を入れてある．
+見本として，|jfm-ujis.lua|を入れてある．
 
 \item |jfm.dir|: 組方向を指定する．将来的にはいずれ縦組（|'tate'|）を実装したいが，
 現時点では横組（|'yoko'|）のみの対応．
@@ -344,8 +287,9 @@ p\TeX 用{\tt JFM}で言うところの「文字クラス」を定義する．
 リストの形|{...}|で記述する．
 
 また，このリストには，以下の「仮想的な文字」も指定可能である．
+\itemT |'lineend'|: 行末．
 \itemT |'boxbdd'|: 水平ボックスの先頭/末尾，段落の先頭/末尾．
-\itemT |'jcharbdd'|: 和文文字達の連続の境界．
+\itemT |'jcharbdd'|: 和文文字達の連続とそれ以外のもの（例えば欧文文字）との境界．
 \itemT |'diffmet'|: 異なるメトリックの和文文字間に入るglueの計算に使われる．
 
 \item |jfm.define_type_dim(<class>,<left>,<down>,<width>,<height>,<depth>,<italic>)|
@@ -370,7 +314,86 @@ TrueTypeフォントを基準にすると，「左に半角幅ずらす」こと
 
 \enditem
 
+\beginsection 大まかな処理の流れ
 
+Lua\TeX-jaパッケージでは，次のような流れで実際の処理を行っている．
+
+\item {\bf 行末空白の削除: |process_input_buffer| callback}
+
+通常，\TeX において改行は空白とほぼ同じ意味であり，
+改行した箇所には自動的に空白が入るようになっている．
+だが，日本語ではそのような振る舞いは不自然であり，p\TeX でも
+「和文文字で行が終わった場合，改行文字は無視する」という
+使用になっている．
+
+そこで，入力が和文文字で終わった場合，コメント文字を挿入することにより
+この問題を解決する方法をとっている．
+この部分のコードは前田氏のjafontspecパッケージの部分から拝借したが，挿入する文字を|%|から
+（通常使用されることはないと思われる）|U+FFFFF|へと変更している．
+
+\item {\bf 和文フォントへの置換: |hyphenate|, |hpack_filter| callbacks}
+
+この段階の前では，和文文字であっても，それを内部で表している|glyph_node|~$p$は，
+「|\tenrm あ|」のように，欧文フォントが指定されている状態になっている．しかし，
+$p$は「現在の和文フォント」の番号もattribute |\luatexja@curjfnt|として保持している．そのため，
+この段階では，「和文文字が格納されている」|glyph_node|~$p$に対して，次を行う．
+
+\itemitem $p$のフォントをattribute |\luatexja@curjfnt|の値に置換．
+\itemitem $p$の|language| fieldを|\luatexja@japanese|の値に置換．
+誤って和文文字間でハイフネーションがされてしまうのを防止するため．
+\itemitem $p$の文字の文字クラスを計算し，その値をattribute |\luatexja@charclass|に格納．
+これにより，|jp90|等のfeatureによりグリフが置換されても，文字クラスの値は保たれる．
+
+\item {\bf （luaotfloadパッケージによるグリフ置換等の処理はこの位置で）}
+
+\item {\bf JFM由来glue/kernの挿入: |pre_linebreak_filter|, |hpack_filter|}
+
+ここで，メトリックに由来する和文文字間のglue/kernを挿入する．
+基本的には連続する和文文字間に挿入するが，
+\itemitem 水平ボックスの先頭/末尾，段落の先頭/末尾には「文字コード|'boxbdd'|の文字」があると
+見做して空白を挿入する．
+\itemitem 和文文字とそうでないもの（欧文文字，ボックス等）の間に関しては，
+和文文字でない方は「文字コード|'jcharbdd'|の文字」であると見做す．
+\itemitem フォントの異なる2つの和文文字においても，
+両者のフォントのmetric keyとsizeが一致した場合は，
+挿入処理においては「同じフォント」であるかのように扱う．
+\itemitem  そうでない場合は，両者の間に「文字コード|'diffmet'|の文字」があると見做して，
+両和文文字からそれぞれglue/kern |gb|, |ga|を計算し，そこから実際に入るglue/kernを
+計算している（|\setjaparameter|中の|differentjfm|キーを参照）．
+
+\item {\bf |\kanjiskip|, |\xkanjiskip|の挿入: |pre_linebreak_filter|, |hpack_filter|}
+
+p\TeX の|adjust_hlist| procedureとほぼ同様の処理を用いて，
+和文間glue |\kanjiskip|や和欧文間glue |\xkanjiskip|を
+挿入する．
+\itemitem 数式境界 (|math_node|) との間に|\xkanjiskip|を自動挿入するかの決定は，
+p\TeX では数字{\tt 0}との間に挿入するかどうかで判定していたが，Lua\TeX-jaでは
+「文字コード$-1$の文字」で判定している．
+\itemitem 合字の周囲の空白挿入については，構成要素の文字列を通じて判断している．例えば，
+「漢ffi字」という文字列に対して，
+\itemT 「漢」と「ffi」間の空白挿入：「漢」と「f」間に入るかで判断
+\itemT 「ffi」と「字」間の空白挿入：「i」と「字」間に入るかで判断
+
+\item {\bf ベースライン補正: |pre_linebreak_filter|, |hpack_filter|}
+
+この段階では，（主として）欧文文字のベースラインをずらす作業を行う．幸いにして，
+Lua\TeX で文字を表す|glyph_node|には|y_offset| fieldがあるので，作業は楽である．
+
+補正量は，attribute |\luatexja@yablshift|の値（先も書いた通り，sp単位）である．和文文字の
+補正量は|\luatexja@ykblshift|の値で指定されるが，以前の「和文フォントへの置換」処理において，
+|\luatexja@yablshift|へと値を移し変えているので，この段階では|\luatexja@yablshift|の値のみを気にしている．
+
+さて，実際に補正されるのは次の場合である:
+\itemitem 文字 (|glyph_node|)
+\itemitem ボックス・rule（文中数式内部）．これによって，数式全体が下がったように見えるはず．
+
+\item {\bf 和文文字の幅の補正: |pre_linebreak_filter|, |hpack_filter|}
+
+例えば，括弧類は「フォント中では全角幅だが，組版では半角幅として扱う」ことが多いが，このように
+文字幅を補正する処理を最後に行う．jafontspecパッケージのように，補正対象となる|glyph_node|~$p$%
+を，しかるべき量のglueと共に|\hbox|にカプセル化して行っている．
+
+\enditem 
 
 \vfill\eject
 \leftline{{\big 組版サンプル}\hfill
@@ -378,8 +401,8 @@ TrueTypeフォントを基準にすると，「左に半角幅ずらす」こと
 
 \bigskip
 %% sample
-\TeX（読み方については、「読み方」の小節を参照）は数学者・計算機科学者である
-ドナルド・クヌース (Donald~E. Knuth) により作られた組版処理ソフトウェアである。
+{\bf\TeX}（読み方については、「読み方」の小節を参照）は数学者・計算機科学者である
+ドナルド・クヌース (Donald~E. {\sc Knuth}) により作られた組版処理ソフトウェアである。
 
 \beginsection 名称について
 
@@ -387,7 +410,7 @@ TrueTypeフォントを基準にすると，「左に半角幅ずらす」こと
 
 \beginparagraph 表記法
 
-正しくは“\TeX”と表記するが、それができない場合には
+正しくは“{\bf\TeX}”と表記するが、それができない場合には
 “{\tt TeX}”と表記する（“{\tt TEX}”と表記するのは誤り）。
 
 \beginparagraph 読み方
@@ -402,7 +425,7 @@ TrueTypeフォントを基準にすると，「左に半角幅ずらす」こと
 \TeX はマークアップ言語処理系であり、チューリング完全性を備えた関数型言語でもある。
 文章そのものと、文章の構造を指定する命令とが混在して記述されたテキストファイルを読み込み、
 そこに書かれた命令に従って文章を組版して、組版結果を{\tt DVI}形式のファイルに書き出す。
-{\tt DVI}形式というのは、装置に依存しない (device-independent) 中間形式である。
+{\tt DVI}形式というのは、装置に依存しない ({\bf d}e{\bf v}ice-{\bf i}ndependent) 中間形式である。
 
 {\tt DVI}ファイルには紙面のどの位置にどの文字を配置するかといった情報が書き込まれている。
 実際に紙に印刷したりディスプレイ上に表示したするためには、{\tt DVI}ファイルを解釈する
@@ -422,7 +445,7 @@ Post\-Scriptなど他のページ記述言語へのトランスレータ、プ�
 比較的よく知られている\TeX 上のマクロパッケージには、クヌース自身による plain \TeX、
 一般的な文書記述に優れた\LaTeX\ ({\tt LaTeX})、数学的文書用の\AmS-\TeX などがある。
 一般の使用者は、\TeX を直接使うよりも、\TeX に何らかのマクロパッケージを読み込ませたものを
-使うことの方が多い。そのため、これらのマクロパッケージのことも “\TeX” と呼ぶ場合があるが、
+使うことの方が多い。そのため、これらのマクロパッケージのことも“\TeX”と呼ぶ場合があるが、
 本来は誤用である。
 
 \TeX のマクロパッケージには、他にも次のようなものなどがある。
@@ -435,8 +458,8 @@ Post\-Scriptなど他のページ記述言語へのトランスレータ、プ�
 \item MusiX\TeX\ ({\tt MusiXTeX}) ……楽譜の記述に用いる。
 \enditem
 
-\TeX とそれに関連するプログラム、および\TeX のマクロパッケージなどは CTAN（Comprehensive TeX Archive Network、
-包括 TeX アーカイブネットワーク）からダウンロードできる。
+\TeX とそれに関連するプログラム、および\TeX のマクロパッケージなどは CTAN（{\bf C}omprehensive \TeX {\bf A}rchive {\bf N}etwork、
+包括\TeX アーカイブネットワーク）からダウンロードできる。
 
 
 \beginsection 数式の表示例
@@ -462,7 +485,7 @@ $$
 
 \beginsection 生い立ち
 
-\TeX は、クヌースが自身の著書The Art of Computer Programmingを書いたときに、組版の汚さに憤慨し、
+\TeX は、クヌースが自身の著書{\it The Art of Computer Programming\/}を書いたときに、組版の汚さに憤慨し、
 自分自身で心行くまで組版を制御するために作成したとされている。開発にあたって、伝統的な組版および
 その関連技術に対する広範囲にわたる調査を行った。その調査結果を取り入れることで、\TeX は
 商業品質の組版ができる柔軟で強力な組版システムになった。
@@ -491,12 +514,12 @@ $$
 \beginsection \TeX の日本語化
 
 日本語組版処理のできる日本語版の\TeX および\LaTeX には、アスキー・メディアワークスによるp\TeX\ 
-(pTeX) およびp\LaTeX\ (pLaTeX) と、NTTの斉藤康己によるNTT J\TeX\ (NTT JTeX) およびNTT J\LaTeX\
-(NTT JLaTeX) などがある。
+({\tt pTeX}) およびp\LaTeX\ ({\tt pLaTeX}) と、NTTの斉藤康己によるNTT J\TeX\ ({\tt NTT JTeX}) およびNTT J\LaTeX\
+({\tt NTT JLaTeX}) などがある。
 
 \TeX の日本語対応において技術的に最も大きな課題は、複数バイト文字コードへの対応である。
 p\TeX（および前身の日本語\TeX）は、JIS X 0208を文字集合とした文字コード（ISO-2022-JP、EUC-JP、
-およびShift\_JIS）を直接扱う。DVIフォーマットは元々16ビット以上の文字コードを格納できる仕様が
+およびShift\_\thinspace JIS）を直接扱う。DVIフォーマットは元々16ビット以上の文字コードを格納できる仕様が
 含まれていた。しかしオリジナルの英語版では使われていなかったため、既存プログラムの多くはp\TeX が
 出力するDVIファイルを処理できない。またフォントに関係するファイルフォーマットが拡張されている。
 これに対してNTT J\TeX は、複数の1バイト文字セットに分割することで対応している。例えば、

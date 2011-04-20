@@ -1,3 +1,6 @@
+local has_attr = node.has_attribute
+local jfmfname
+
 --====== METRIC
 jfm={}; jfm.char_type={}; jfm.glue={}; jfm.kern={}
 
@@ -26,35 +29,50 @@ end
 ltj.metrics={} -- this table stores all metric informations
 ltj.font_metric_table={}
 
-function ltj.search_metric(key)
+local function search_metric(key)
    for i,v in ipairs(ltj.metrics) do 
       if v.name==key then return i end
    end
    return nil
 end
 
-function ltj.load_jfont_metric()
-  if ltj.jfmfname=='' then 
-     ltj.error('no JFM specified', 
-	       {[1]='To load and define a Japanese font, the name of JFM must be specified.',
-		[2]="The JFM 'ujis' will be  used for now."})
-     ltj.jfmfname='ujis'
-  end
-  jfm.name=ltj.jfmfname .. ':' .. ltj.jfmvar;
-  local i = ltj.search_metric(jfm.name)
-  local t = {}
-  if i then  return i end
-  jfm.char_type={}; jfm.glue={}; jfm.kern={}
-  ltj.loadlua('jfm-' .. ltj.jfmfname .. '.lua');
-  if jfm.dir~='yoko' then
-     ltj.error("jfm.dir must be 'yoko'", {}); return nil
+-- return nil iff ltj.metrics[ind] is a bad metric
+local function consistency_check(ind)
+   local t = ltj.metrics[ind]
+   local r = ind
+   if t.dir~='yoko' then -- TODO: tate?
+      r=nil
+   elseif type(t.zw)~='number' or type(t.zh)~='number' then 
+      r=nil -- .zw, .zh must be present
+   else
+      local lbt = ltj.find_char_type('lindend',ind)
+      if lbt~=0 and t.char_type[lbt].chars~={'linebdd'} then
+	 r=nil -- 'linebdd' must be isolated char_type
+      end
    end
+   if not r then ltj.metrics[ind] = nil end
+   return r
+end
+
+function ltj.load_jfont_metric()
+   if jfmfname=='' then 
+      ltj.error('no JFM specified', 
+		{[1]='To load and define a Japanese font, the name of JFM must be specified.',
+		 [2]="The JFM 'ujis' will be  used for now."})
+      jfmfname='ujis'
+   end
+   jfm.name=jfmfname .. ':' .. ltj.jfmvar
+   local i = search_metric(jfm.name)
+   local t = {}
+   if i then  return i end
+   jfm.char_type={}; jfm.glue={}; jfm.kern={}
+   ltj.loadlua('jfm-' .. jfmfname .. '.lua')
    t.name=jfm.name
    t.dir=jfm.dir; t.zw=jfm.zw; t.zh=jfm.zh
    t.char_type=jfm.char_type
    t.glue=jfm.glue; t.kern=jfm.kern
    table.insert(ltj.metrics,t)
-   return #ltj.metrics
+   return consistency_check(#ltj.metrics)
 end
 
 function ltj.find_char_type(c,m)
@@ -84,6 +102,12 @@ function ltj.jfontdefY() -- for horizontal font
    local j=ltj.load_jfont_metric()
    local fn=font.id(ltj.cstemp)
    local f = font.fonts[fn]
+   if not j then 
+     ltj.error("bad JFM '" .. jfmfname .. "'",
+               {[1]='The JFM file you specified is not valid JFM file.',
+                [2]='Defining Japanese font is cancelled.'})
+     return 
+   end
    ltj.font_metric_table[fn]={}
    ltj.font_metric_table[fn].jfm=j; ltj.font_metric_table[fn].size=f.size
    tex.sprint(ltj.is_global .. '\\protected\\expandafter\\def\\csname '
@@ -101,11 +125,11 @@ function fonts.define.read(name, size, id)
    return fontdata
 end
 
--- extract ltj.jfmfname and ltj.jfmvar
+-- extract jfmfname and ltj.jfmvar
 function ltj.extract_metric(name)
    local basename=name
    local tmp = utf.sub(basename, 1, 5)
-   ltj.jfmfname = ''
+   jfmfname = ''
    ltj.jfmvar = ''
    if tmp == 'file:' or tmp == 'name:' or tmp == 'psft:' then
       basename = utf.sub(basename, 6)
@@ -121,7 +145,7 @@ function ltj.extract_metric(name)
    while p do
       local q= utf.find(basename, ";",p+1) or utf.len(basename)+1
       if utf.sub(basename,p,p+3)=='jfm=' and q>p+4 then
-	 ltj.jfmfname = utf.sub(basename,p+4,q-1)
+	 jfmfname = utf.sub(basename,p+4,q-1)
       elseif utf.sub(basename,p,p+6)=='jfmvar=' and q>p+6 then
 	 ltj.jfmvar = utf.sub(basename,p+7,q-1)
       end
@@ -131,46 +155,108 @@ function ltj.extract_metric(name)
 end
 
 
---====== Adjust the width of Japanese glyphs
+--====== Range of Japanese characters.
+local threshold = 0x100 -- must be >=0x100
+-- below threshold: kcat_table_main[chr_code] = index
+-- above threshold: kcat_table_range = 
+--   { [1] = {b_1, b_2, ...},
+--     [2] = {i_1, i_2, ...} }
+-- ( Characters b_i<=chr_code <b_{i+1} have the index i_i )
+-- kcat_table_index = index1, index2, ...
 
--- TeX's \hss
-function ltj.get_hss()
-   local hss = node.new(node.id("glue"))
-   local hss_spec = node.new(node.id("glue_spec"))
-   hss_spec.width = 0
-   hss_spec.stretch = 65536
-   hss_spec.stretch_order = 2
-   hss_spec.shrink = 65536
-   hss_spec.shrink_order = 2
-   hss.spec = hss_spec
-   return hss
+-- init
+local ucs_out = 0x110000
+local kcat_table_main = {}
+kcat_table_range = { [1] = {threshold,ucs_out}, [2] = {0,-1} }
+kcat_table_index = { [0] = 'other' ,
+			   [1] = 'iso8859-1'}
+
+local kc_kanji = 0
+local kc_kana = 1
+local kc_letter = 2
+local kc_punct = 3
+local kc_noncjk = 4
+
+for i=0x80,0xFF do
+   kcat_table_main[i]=1
+end
+for i=0x100,threshold-1 do
+   kcat_table_main[i]=0
 end
 
-function ltj.set_ja_width(head)
-   local p = head
-   local t,s,th, g, q,a
-   while p do
-      if ltj.is_japanese_glyph_node(p) then
-	 t=ltj.metrics[ltj.font_metric_table[p.font].jfm]
-	 s=t.char_type[node.has_attribute(p,luatexbase.attributes['luatexja@charclass'])]
-	 if not(s.left==0.0 and s.down==0.0 
-		and tex.round(s.width*ltj.font_metric_table[p.font].size)==p.width) then
-	    -- must be encapsuled by a \hbox
-	    head, q = node.remove(head,p)
-	    p.next=nil
-	    p.yoffset=tex.round(p.yoffset-ltj.font_metric_table[p.font].size*s.down)
-	    p.xoffset=tex.round(p.xoffset-ltj.font_metric_table[p.font].size*s.left)
-	    node.insert_after(p,p,ltj.get_hss())
-	    g=node.hpack(p, tex.round(ltj.font_metric_table[p.font].size*s.width)
-			 , 'exactly')
-	    g.height=tex.round(ltj.font_metric_table[p.font].size*s.height)
-	    g.depth=tex.round(ltj.font_metric_table[p.font].size*s.depth)
-	    head,p = node.insert_before(head,q,g)
-	    p=q
-	 else p=node.next(p)
-	 end
-      else p=node.next(p)
+local function add_jchar_range(b,e,ind)
+   -- We assume that e>=b
+   if b<threshold then
+      for i=math.max(0x80,b),math.min(threshold-1,e) do
+	 kcat_table_main[i]=ind
+      end
+      if e<threshold then return true else b=threshold end
+   end
+   local insp
+   for i,v in ipairs(kcat_table_range[1]) do
+      if v>e then 
+	 insp = i-1; break
       end
    end
-   return head
+   if kcat_table_range[1][insp]>b or kcat_table_range[2][insp]>1 then
+      ltj.error("Bad character range",{}); return nil -- error
+   end
+   if kcat_table_range[1][insp]<b  then 
+   -- now [insp]¢« <b .. b .. [insp+1]¢« >e
+      table.insert(kcat_table_range[1],insp+1,b)
+      table.insert(kcat_table_range[2], insp+1, kcat_table_range[2][insp])
+      insp=insp+1
+   end
+   -- [insp]¢« =b .. e .. [insp+1]¢« >e
+   table.insert(kcat_table_range[1], insp+1,e+1)
+   table.insert(kcat_table_range[2], insp+1, kcat_table_range[2][insp])
+   kcat_table_range[2][insp]=ind
+end
+
+function ltj.def_jchar_range(b,e,name) 
+   local ind = #kcat_table_index+1
+   for i,v in pairs(kcat_table_index) do
+      if v==name then ind=i; break  end
+   end
+   if ind>=50 then 
+      ltj.error("No room for new character range",{}); return -- error
+   end
+   if ind == #kcat_table_index+1 then
+      table.insert(kcat_table_index, name)
+      print('New char range: ' .. name, ind) 
+   end
+   add_jchar_range(b,e,ind)
+end
+
+local function get_char_kcatcode(p)
+   local i
+   local c = p.char
+   if c<0x80 then return kc_noncjk
+   elseif c<threshold then i=kcat_table_main[c] 
+   else
+      for j,v in ipairs(kcat_table_range[1]) do
+	 if v>c then 
+	    i = kcat_table_range[2][j-1]; break
+	 end
+      end
+   end
+   return math.floor(has_attr(p,
+         luatexbase.attributes['luatexja@kcat'..math.floor(i/10)])
+         /math.pow(8, i%10))%8
+end
+
+--  ÏÂÊ¸Ê¸»ú¤ÈÇ§¼±¤¹¤ë unicode ¤ÎÈÏ°Ï
+function ltj.is_ucs_in_japanese_char(p)
+   return (get_char_kcatcode(p)~=kc_noncjk) 
+end
+
+function ltj.set_jchar_range(g, name,kc)
+   local ind = 0
+   for i,v in pairs(kcat_table_index) do
+      if v==name then ind=i; break  end
+   end
+   local attr = luatexbase.attributes['luatexja@kcat'..math.floor(ind/10)]
+   local a = tex.getattribute(attr)
+   local k = math.pow(8, ind%10)
+   tex.setattribute(g,attr,(math.floor(a/k/8)*8+kc)*k+a%k)
 end

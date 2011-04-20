@@ -1,19 +1,4 @@
 
---  和文文字と満たす unicode の範囲（適当）
-function ltj.is_ucs_in_japanese_char(c)
-   if (c>=0x2000)and(c<=0x27FF) then return true
-   elseif (c>=0x2900)and(c<=0x29FF) then return true
-   elseif (c>=0x3000)and(c<=0x30FF) then return true
-   elseif (c>=0x31F0)and(c<=0x4DBF) then return true
-   elseif (c>=0x4E00)and(c<=0x9FFF) then return true
-   elseif (c>=0xF900)and(c<=0xFAFF) then return true
-   elseif (c>=0xFF00)and(c<=0xFFEF) then return true
-   elseif (c>=0x20000)and(c<=0xDFFFF) then return true
-   else return false
-   end
-end
-
-
 -- gb: 前側の和文文字 b 由来の glue/kern (maybe nil)
 -- ga: 後側の和文文字 a 由来の glue/kern (maybe nil)
 -- 両者から，b と a の間に入る glue/kern を計算する

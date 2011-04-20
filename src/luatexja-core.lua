@@ -1,3 +1,19 @@
+local node_type = node.type
+local has_attr = node.has_attribute
+local node_insert_before = node.insert_before
+local node_insert_after = node.insert_after
+local node_hpack = node.hpack
+local round = tex.round
+local node_new = node.new
+local id_glyph = node.id('glyph')
+local id_glue_spec = node.id('glue_spec')
+local id_glue = node.id('glue')
+local id_whatsit = node.id('whatsit')
+local next_node = node.next
+local attr_jchar_class = luatexbase.attributes['luatexja@charclass']
+local attr_curjfnt = luatexbase.attributes['luatexja@curjfnt']
+local attr_yablshift = luatexbase.attributes['luatexja@yablshift']
+
 -- error messages
 function ltj.error(s,t)
   tex.error('LuaTeX-ja error: ' .. s ,t) 
@@ -47,9 +63,9 @@ return out
 end
 
 -- return true if and only if p is a Japanese character node
-function ltj.is_japanese_glyph_node(p)
-   return p and (node.type(p.id)=='glyph') 
-   and (p.font==node.has_attribute(p,luatexbase.attributes['luatexja@curjfnt']))
+local function is_japanese_glyph_node(p)
+   return p and (p.id==id_glyph) 
+   and (p.font==has_attr(p,attr_curjfnt))
 end
 
 ---------- Stack table
@@ -59,7 +75,7 @@ end
 
 ltj.stack_ch_table={}; ltj.stack_ch_table[0]={}
 
-function ltj.new_stack_level()
+local function new_stack_level()
   local i = tex.getcount('ltj@stack@pbp')
   if tex.currentgrouplevel > tex.getcount('ltj@group@level@pbp') then
     i = i+1 -- new stack level
@@ -73,7 +89,7 @@ function ltj.new_stack_level()
   return i
 end
 function ltj.set_ch_table(g,m,c,p)
-  local i = ltj.new_stack_level()
+  local i = new_stack_level()
   if not ltj.stack_ch_table[i][c] then ltj.stack_ch_table[i][c] = {} end
   ltj.stack_ch_table[i][c][m] = p
   if g=='global' then
@@ -84,14 +100,14 @@ function ltj.set_ch_table(g,m,c,p)
   end
 end
 
-function ltj.get_penalty_table(m,c)
+local function get_penalty_table(m,c)
   local i = tex.getcount('ltj@stack@pbp')
   i = ltj.stack_ch_table[i][c]
   if i then i=i[m] end
   return i or 0
 end
 
-function ltj.get_inhibit_xsp_table(c)
+local function get_inhibit_xsp_table(c)
   local i = tex.getcount('ltj@stack@pbp')
   i = ltj.stack_ch_table[i][c]
   if i then i=i.xsp end
@@ -131,18 +147,18 @@ end
 
 function ltj.out_ja_parameter_two(k,c)
    if k == 'prebreakpenalty' then
-      tex.write(ltj.get_penalty_table('pre',c))
+      tex.write(get_penalty_table('pre',c))
    elseif k == 'postbreakpenalty' then
-      tex.write(ltj.get_penalty_table('post',c))
+      tex.write(get_penalty_table('post',c))
    elseif k == 'cjkxspmode' then
-      local i = ltj.get_inhibit_xsp_table(c)
+      local i = get_inhibit_xsp_table(c)
       if i==0 then tex.write('inhibit')
       elseif i==1 then  tex.write('postonly')
       elseif i==2 then  tex.write('preonly')
       else tex.write('allow')
       end
    elseif k == 'asciixspmode' then
-      local i = ltj.get_inhibit_xsp_table(c)
+      local i = get_inhibit_xsp_table(c)
       if i==0 then tex.write('inhibit')
       elseif i==2 then  tex.write('postonly')
       elseif i==1 then  tex.write('preonly')
@@ -158,92 +174,92 @@ function ltj.print_global()
 end
 
 function ltj.create_ihb_node()
-   local g=node.new(node.id('whatsit'), node.subtype('user_defined'))
+   local g=node_new(id_whatsit, node.subtype('user_defined'))
    g.user_id=30111; g.type=number; g.value=1
    node.write(g)
 end
 
 
-function ltj.find_size_metric(px)
-   if ltj.is_japanese_glyph_node(px) then
+local function find_size_metric(px)
+   if is_japanese_glyph_node(px) then
       return ltj.font_metric_table[px.font].size, ltj.font_metric_table[px.font].jfm
    else 
       return nil, nil
    end
 end
 
-function ltj.new_jfm_glue(size,mt,bc,ac)
+local function new_jfm_glue(size,mt,bc,ac)
 -- mt: metric key, bc, ac: char classes
    local g=nil
    local h
    local w=bc*0x800+ac
    if ltj.metrics[mt].glue[w] then
-      h=node.new(node.id('glue_spec'))
-      h.width  =tex.round(size*ltj.metrics[mt].glue[w].width)
-      h.stretch=tex.round(size*ltj.metrics[mt].glue[w].stretch)
-      h.shrink =tex.round(size*ltj.metrics[mt].glue[w].shrink)
+      h=node_new(id_glue_spec)
+      h.width  =round(size*ltj.metrics[mt].glue[w].width)
+      h.stretch=round(size*ltj.metrics[mt].glue[w].stretch)
+      h.shrink =round(size*ltj.metrics[mt].glue[w].shrink)
       h.stretch_order=0; h.shrink_order=0
-      g=node.new(node.id('glue'))
+      g=node_new(id_glue)
       g.subtype=0; g.spec=h; return g
    elseif ltj.metrics[mt].kern[w] then
-      g=node.new(node.id('kern'))
-      g.subtype=0; g.kern=tex.round(size*ltj.metrics[mt].kern[w]); return g
+      g=node_new(node.id('kern'))
+      g.subtype=0; g.kern=round(size*ltj.metrics[mt].kern[w]); return g
    else
       return nil
    end
 end
 
 
-function ltj.calc_between_two_jchar(q,p)
+function calc_between_two_jchar(q,p)
    -- q, p: node (possibly null)
    local ps,pm,qs,qm,g,h
    if not p then -- q is the last node
-      qs, qm = ltj.find_size_metric(q)
+      qs, qm = find_size_metric(q)
       if not qm then 
 	 return nil
       else
-	 g=ltj.new_jfm_glue(qs,qm,
-				node.has_attribute(q,luatexbase.attributes['luatexja@charclass']),
+	 g=new_jfm_glue(qs,qm,
+			    has_attr(q,attr_jchar_class),
 				ltj.find_char_type('boxbdd',qm))
       end
    elseif not q then
       -- p is the first node etc.
-      ps, pm = ltj.find_size_metric(p)
+      ps, pm = find_size_metric(p)
       if not pm then
 	 return nil
       else
-	 g=ltj.new_jfm_glue(ps,pm,
+	 g=new_jfm_glue(ps,pm,
 				ltj.find_char_type('boxbdd',pm),
-				node.has_attribute(p,luatexbase.attributes['luatexja@charclass']))
+				has_attr(p,attr_jchar_class))
       end
    else -- p and q are not nil
-      qs, qm = ltj.find_size_metric(q)
-      ps, pm = ltj.find_size_metric(p)
+      qs, qm = find_size_metric(q)
+      ps, pm = find_size_metric(p)
       if (not pm) and (not qm) then 
 	 -- Both p and q are NOT Japanese glyph node
 	 return nil
       elseif (qs==ps) and (qm==pm) then 
 	 -- Both p and q are Japanese glyph node, and same metric and size
-	 g=ltj.new_jfm_glue(ps,pm,
-			    node.has_attribute(q,luatexbase.attributes['luatexja@charclass']),
-			    node.has_attribute(p,luatexbase.attributes['luatexja@charclass']))
+	 g=new_jfm_glue(ps,pm,
+			    has_attr(q,attr_jchar_class),
+			    has_attr(p,attr_jchar_class))
       elseif not qm then
 	 -- q is not Japanese glyph node
-	 g=ltj.new_jfm_glue(ps,pm,
+	 g=new_jfm_glue(ps,pm,
 			    ltj.find_char_type('jcharbdd',pm),
-			    node.has_attribute(p,luatexbase.attributes['luatexja@charclass']))
+			    has_attr(p,attr_jchar_class))
       elseif not pm then
 	 -- p is not Japanese glyph node
-	 g=ltj.new_jfm_glue(qs,qm,
-			    node.has_attribute(q,luatexbase.attributes['luatexja@charclass']),
+	 g=new_jfm_glue(qs,qm,
+			    has_attr(q,attr_jchar_class),
 			    ltj.find_char_type('jcharbdd',qm))
       else
-	 g=ltj.new_jfm_glue(qs,qm,
-			    node.has_attribute(q,luatexbase.attributes['luatexja@charclass']),
+	 g=new_jfm_glue(qs,qm,
+			    has_attr(q,attr_jchar_class),
 			    ltj.find_char_type('diffmet',qm))
-	 h=ltj.new_jfm_glue(ps,pm,
+	 h=new_jfm_glue(ps,pm,
 			    ltj.find_char_type('diffmet',pm),
-			    node.has_attribute(p,luatexbase.attributes['luatexja@charclass']))
+			    has_attr(p,attr_jchar_class))
 	 g=ltj.calc_between_two_jchar_aux(g,h)
       end
    end
@@ -256,37 +272,37 @@ end
 --   o a whatsit node which contains local paragraph materials.
 -- When we insert jfm glues, we ignore these nodes.
 function ltj.is_parindent_box(p)
-   if node.type(p.id)=='hlist' then 
+   if node_type(p.id)=='hlist' then 
       return (p.subtype==3)
       -- hlist (subtype=3) is a box by \parindent
-   elseif node.type(p.id)=='whatsit' then 
+   elseif p.id==id_whatsit then 
       return (p.subtype==node.subtype('local_par'))
    end
 end
 
-function ltj.add_kinsoku_penalty(head,p)
+local function add_kinsoku_penalty(head,p)
    local c = p.char
-   local e = ltj.get_penalty_table('pre',c)
+   local e = get_penalty_table('pre',c)
    if e~=0 then
       local q = node.prev(p)
-      if q and node.type(q.id)=='penalty' then
+      if q and node_type(q.id)=='penalty' then
 	 q.penalty=q.penalty+e
       else 
-	 q=node.new(node.id('penalty'))
+	 q=node_new(node.id('penalty'))
 	 q.penalty=e
-	 node.insert_before(head,p,q)
+	 node_insert_before(head,p,q)
       end
    end
-   e = ltj.get_penalty_table('post',c)
+   e = get_penalty_table('post',c)
    if e~=0 then
-      local q = node.next(p)
-      if q and node.type(q.id)=='penalty' then
+      local q = next_node(p)
+      if q and node_type(q.id)=='penalty' then
 	 q.penalty=q.penalty+e
 	 return false
       else 
-	 q=node.new(node.id('penalty'))
+	 q=node_new(node.id('penalty'))
 	 q.penalty=e
-	 node.insert_after(head,p,q)
+	 node_insert_after(head,p,q)
 	 return true
       end
    end
@@ -294,39 +310,45 @@ end
 
 -- Insert jfm glue: main routine
 
-function ltj.insert_jfm_glue(head)
+local function insert_jfm_glue(head)
    local p = head
    local q = nil  -- the previous node of p
    local g
    local ihb_flag = false
+   local inserted_after_penalty = false
    if not p then 
       return head 
    end
-   while p and  ltj.is_parindent_box(p) do p=node.next(p) end
+   while p and  ltj.is_parindent_box(p) do p=next_node(p) end
    while p do
-      if node.type(p.id)=='whatsit' and p.subtype==node.subtype('user_defined')
+      if p.id==id_whatsit and p.subtype==node.subtype('user_defined')
          and p.user_id==30111 then
-	 g=p; p=node.next(p); 
+	 g=p; p=next_node(p); 
 	 ihb_flag=true; head,p=node.remove(head, g)
       else
-	 g=ltj.calc_between_two_jchar(q,p)
+	 g=calc_between_two_jchar(q,p)
 	 if g and (not ihb_flag) then
-	    h = node.insert_before(head,p,g)
+	    h = node_insert_before(head,p,g)
 	    if not q then head=h end 
 	    -- If p is the first node (=head), the skip is inserted
 	    -- before head. So we must change head.
 	 end
-	 q=p; ihb_flag=false
-	 if ltj.is_japanese_glyph_node(p) 
-            and ltj.add_kinsoku_penalty(head,p) then
-	    p=node.next(p)
+	 --if is_japanese_glyph_node(q) then
+	 --   node.insert(q, inserted_after_penalty)
+	 --end
+	 q=p; ihb_flag=false; 
+	 if is_japanese_glyph_node(p) 
+            and add_kinsoku_penalty(head,p) then
+	    p=next_node(p); inserted_after_penalty = true
+	 else 
+	    inserted_after_penalty = false
 	 end
-	 p=node.next(p)
+	 p=next_node(p)
       end
    end
    -- Insert skip after the last node
-   g=ltj.calc_between_two_jchar(q,nil)
-   if g then h = node.insert_after(head,q,g) end
+   g=calc_between_two_jchar(q,nil)
+   if g then h = node_insert_after(head,q,g) end
    return head
 end
 
@@ -342,59 +364,43 @@ local no_skip=0
 local after_schar=1
 local after_wchar=2
 local insert_skip=no_skip
-function ltj.insert_kanji_skip(head)
-   if ltj.auto_spacing then
-      kanji_skip=tex.skip['kanjiskip']
-   else
-      kanji_skip=node.new(node.id('glue_spec'))
-      kanji_skip.width=0;  kanji_skip.stretch=0; kanji_skip.shrink=0
-   end
-   if ltj.auto_xspacing then
-      xkanji_skip=tex.skip['xkanjiskip']
-   else
-      xkanji_skip=node.new(node.id('glue_spec'))
-      xkanji_skip.width=0;  xkanji_skip.stretch=0; xkanji_skip.shrink=0
-   end
-   local p=head -- 「現在のnode」
-   local q=nil  -- pの一つ前 
-   insert_skip=no_skip
-   while p do
-      if node.type(p.id)=='glyph' then
-	 repeat 
-	    ltj.insks_around_char(head,q,p)
-	    q=p; p=node.next(p)
-	 until (not p) or node.type(p.id)~='glyph'
-      else
-	 if node.type(p.id) == 'hlist' then
-	    ltj.insks_around_hbox(head,q,p)
-	 elseif node.type(p.id) == 'penalty' then
-	    ltj.insks_around_penalty(head,q,p)
-	 elseif node.type(p.id) == 'kern' then
-	    ltj.insks_around_kern(head,q,p)
-	 elseif node.type(p.id) == 'math' then
-	    ltj.insks_around_math(head,q,p)
-	 elseif node.type(p.id) == 'ins' or node.type(p.id) == 'mark'
-            or node.type(p.id) == 'adjust'
-            or node.type(p.id) == 'whatsit' then
-	    -- do nothing
-	    p=p
-	 else
-	    -- rule, disc, glue, margin_kern
-	    insert_skip=no_skip
-	 end
-	 q=p; p=node.next(p)
-      end
-   end
-   return head
+
+
+-- In the next two function, cx is the Kanji code.
+local function insert_akxsp(head,q)
+   if get_inhibit_xsp_table(cx)<=1 then return end
+   local g = node_new(id_glue)
+   g.subtype=0; g.spec=node.copy(xkanji_skip)
+   node_insert_after(head,q,g)
 end
 
-function ltj.set_insert_skip_after_achar(p)
+local function insert_kaxsp(head,q,p)
+   local g=true
+   local c=p.char
+   while p.components and p.subtype 
+      and math.floor(p.subtype/2)%2==1 do
+      p=p.components; c = p.char
+   end
+   if get_inhibit_xsp_table(c)%2 == 1 then
+      if get_inhibit_xsp_table(cx)%2==0 then g=false end
+   else 
+      g=false
+   end
+   if g then
+      g = node_new(id_glue)
+      g.subtype=0; g.spec=node.copy(xkanji_skip)
+      node_insert_after(head,q,g)
+   end
+end
+
+
+local function set_insert_skip_after_achar(p)
    local c=p.char
    while p.components and p.subtype 
       and math.floor(p.subtype/2)%2==1 do
       p=node.tail(p.components); c = p.char
    end
-  if ltj.get_inhibit_xsp_table(c)>=2 then
+  if get_inhibit_xsp_table(c)>=2 then
      insert_skip=after_schar
   else
      insert_skip=no_skip
@@ -402,50 +408,22 @@ function ltj.set_insert_skip_after_achar(p)
 end
 
 -- Insert \xkanjiskip before p, a glyph node
-function ltj.insks_around_char(head,q,p)
-   local a=ltj.get_inhibit_xsp_table(p.char)
-   if ltj.is_japanese_glyph_node(p) then
+local function insks_around_char(head,q,p)
+   if is_japanese_glyph_node(p) then
       cx=p.char
-      if ltj.is_japanese_glyph_node(q)  then
-	 local g = node.new(node.id('glue'))
+      if is_japanese_glyph_node(q)  then
+	 local g = node_new(id_glue)
 	 g.subtype=0; g.spec=node.copy(kanji_skip)
-	 node.insert_before(head,p,g)
+	 node_insert_before(head,p,g)
       elseif insert_skip==after_schar then
-	 ltj.insert_akxsp(head,q)
+	 insert_akxsp(head,q)
       end
       insert_skip=after_wchar
    else
       if insert_skip==after_wchar then
-	 ltj.insert_kaxsp(head,q,p)
+	 insert_kaxsp(head,q,p)
       end
-      ltj.set_insert_skip_after_achar(p)
-   end
-end
-
--- In the next two function, cx is the Kanji code.
-function ltj.insert_akxsp(head,q)
-   if ltj.get_inhibit_xsp_table(cx)<=1 then return end
-   local g = node.new(node.id('glue'))
-   g.subtype=0; g.spec=node.copy(xkanji_skip)
-   node.insert_after(head,q,g)
-end
-
-function ltj.insert_kaxsp(head,q,p)
-   local g=true
-   local c=p.char
-   while p.components and p.subtype 
-      and math.floor(p.subtype/2)%2==1 do
-      p=p.components; c = p.char
-   end
-   if ltj.get_inhibit_xsp_table(c)%2 == 1 then
-      if ltj.get_inhibit_xsp_table(cx)%2==0 then g=false end
-   else 
-      g=false
-   end
-   if g then
-      g = node.new(node.id('glue'))
-      g.subtype=0; g.spec=node.copy(xkanji_skip)
-      node.insert_after(head,q,g)
+      set_insert_skip_after_achar(p)
    end
 end
 
@@ -453,31 +431,32 @@ end
 local first_char = nil
 local last_char = nil
 local find_first_char = nil
-function ltj.check_box(bp)
+local function check_box(bp)
    local p = bp; local  flag = false
    while p do
-      if node.type(p.id)=='glyph' then
+      local pt = node_type(p.id)
+      if pt=='glyph' then
 	 repeat 
 	    if find_first_char then
 	       first_char=p; find_first_char=false
 	    end
-	    last_char=p; flag=true; p=node.next(p)
+	    last_char=p; flag=true; p=next_node(p)
 	    if not p then return flag end
-	 until node.type(p.id)~='glyph'
+	 until p.id~=id_glyph
       end
-      if node.type(p.id)=='hlist' then
+      if pt=='hlist' then
 	 flag=true
 	 if p.shift==0 then
-	    if ltj.check_box(p.head) then flag=true end
+	    if check_box(p.head) then flag=true end
 	 else if find_first_char then 
 	       find_first_char=false
 	    else 
 	       last_char=nil
 	    end
 	 end
-      elseif node.type(p.id) == 'ins' or node.type(p.id) == 'mark'
-         or node.type(p.id) == 'adjust' 
-         or node.type(p.id) == 'whatsit' or node.type(p.id) == 'penalty' then
+      elseif pt == 'ins' or pt == 'mark'
+         or pt == 'adjust' 
+         or pt == 'whatsit' or pt == 'penalty' then
 	 p=p
       else
 	 flag=true
@@ -487,44 +466,44 @@ function ltj.check_box(bp)
 	    last_char=nil
 	 end
       end
-      p=node.next(p)
+      p=next_node(p)
    end
    return flag
 end 
 
 -- Insert \xkanjiskip around p, an hbox
-function ltj.insks_around_hbox(head,q,p)
+local function insks_around_hbox(head,q,p)
    if p.shift==0 then
       find_first_char=true; first_char=nil; last_char=nil
-      if ltj.check_box(p.head) then
+      if check_box(p.head) then
 	 -- first char
-	 if ltj.is_japanese_glyph_node(first_char) then
+	 if is_japanese_glyph_node(first_char) then
 	    cx=first_char.char
 	    if insert_skip==after_schar then 
-	       ltj.insert_akxsp(head,q)
+	       insert_akxsp(head,q)
 	    elseif insert_skip==after_wchar then
-	       local g = node.new(node.id('glue'))
+	       local g = node_new(id_glue)
 	       g.subtype=0; g.spec=node.copy(kanji_skip)
-	       node.insert_before(head,p,g)
+	       node_insert_before(head,p,g)
 	    end
 	    insert_skip=after_wchar
 	 elseif first_char then
 	    cx=first_char.char
 	    if insert_skip==after_wchar then
-	       ltj.insert_kaxsp(head,q,first_char)
+	       insert_kaxsp(head,q,first_char)
 	    end
-	    ltj.set_insert_skip_after_achar(first_char)
+	    set_insert_skip_after_achar(first_char)
 	 end
 	 -- last char
-	 if ltj.is_japanese_glyph_node(last_char) then
-	    if ltj.is_japanese_glyph_node(node.next(p)) then
-	       local g = node.new(node.id('glue'))
+	 if is_japanese_glyph_node(last_char) then
+	    if is_japanese_glyph_node(next_node(p)) then
+	       local g = node_new(id_glue)
 	       g.subtype=0; g.spec=node.copy(kanji_skip)
-	       node.insert_after(head,p,g)
+	       node_insert_after(head,p,g)
 	    end
 	    insert_skip=after_wchar
 	 elseif last_char then
-	    ltj.set_insert_skip_after_achar(last_char)
+	    set_insert_skip_after_achar(last_char)
 	 else insert_skip=no_skip
 	 end
       else insert_skip=no_skip
@@ -534,115 +513,205 @@ function ltj.insks_around_hbox(head,q,p)
 end
 
 -- Insert \xkanjiskip around p, a penalty
-function ltj.insks_around_penalty(head,q,p)
-   local r=node.next(p)
-   if r  and node.type(r.id)=='glyph' then
-      if ltj.is_japanese_glyph_node(r) then
+local function insks_around_penalty(head,q,p)
+   local r=next_node(p)
+   if r  and r.id==id_glyph then
+      if is_japanese_glyph_node(r) then
 	 cx=r.char
-	 if ltj.is_japanese_glyph_node(p)  then
-	    local g = node.new(node.id('glue'))
+	 if is_japanese_glyph_node(p)  then
+	    local g = node_new(id_glue)
 	    g.subtype=0; g.spec=node.copy(kanji_skip)
-	    node.insert_before(head,r,g)
+	    node_insert_before(head,r,g)
 	 elseif insert_skip==insert_schar then
-	    ltj.insert_akxsp(head,p)
+	    insert_akxsp(head,p)
 	 end
-	 q=p; p=node.next(p)
+	 q=p; p=next_node(p)
 	 insert_skip=after_wchar
       else
 	 if insert_skip==after_wchar then
-	    ltj.insert_kaxsp(head,p,r)
+	    insert_kaxsp(head,p,r)
 	 end
-	 ltj.set_insert_skip_after_achar(r)
+	 set_insert_skip_after_achar(r)
       end
    end
 end
 
 -- Insert \xkanjiskip around p, a kern
-function ltj.insks_around_kern(head,q,p)
+local function insks_around_kern(head,q,p)
    if p.subtype==1 then -- \kern or \/
-      if node.has_attribute(p,luatexbase.attributes['luatexja@icflag']) then
-	 p=p -- p is a kern from \/: do nothing
-      else
+      if not has_attr(p,luatexbase.attributes['luatexja@icflag']) then
 	 insert_skip=no_skip
       end
    elseif p.subtype==2 then -- \accent: We ignore the accent character.
-      local v = node.next(node.next(node.next(p)))
-      if v and node.type(v.id)=='glyph' then
-	 ltj.insks_around_char(head,q,v)
+      local v = next_node(next_node(next_node(p)))
+      if v and v.id==id_glyph then
+	 insks_around_char(head,q,v)
       end
    end
 end
 
 -- Insert \xkanjiskip around p, a math_node
-function ltj.insks_around_math(head,q,p)
+local function insks_around_math(head,q,p)
    local g = { char = -1 }
    if (p.subtype==0) and (insert_skip==after_wchar) then
-      ltj.insert_kaxsp(head,q,g)
+      insert_kaxsp(head,q,g)
       insert_skip=no_skip
    else
-      ltj.set_insert_skip_after_achar(g)
+      set_insert_skip_after_achar(g)
    end
 end
 
+local function insert_kanji_skip(head)
+   if ltj.auto_spacing then
+      kanji_skip=tex.skip['kanjiskip']
+   else
+      kanji_skip=node_new(id_glue_spec)
+      kanji_skip.width=0;  kanji_skip.stretch=0; kanji_skip.shrink=0
+   end
+   if ltj.auto_xspacing then
+      xkanji_skip=tex.skip['xkanjiskip']
+   else
+      xkanji_skip=node_new(id_glue_spec)
+      xkanji_skip.width=0;  xkanji_skip.stretch=0; xkanji_skip.shrink=0
+   end
+   local p=head -- 「現在のnode」
+   local q=nil  -- pの一つ前 
+   insert_skip=no_skip
+   while p do
+      local pt = node_type(p.id)
+      if pt=='glyph' then
+	 repeat 
+	    insks_around_char(head,q,p)
+	    q=p; p=next_node(p)
+	 until (not p) or p.id~=id_glyph
+      else
+	 if pt == 'hlist' then
+	    insks_around_hbox(head,q,p)
+	 elseif pt == 'penalty' then
+	    insks_around_penalty(head,q,p)
+	 elseif pt == 'kern' then
+	    insks_around_kern(head,q,p)
+	 elseif pt == 'math' then
+	    insks_around_math(head,q,p)
+	 elseif pt == 'ins' or pt == 'mark'
+            or pt == 'adjust'
+            or pt == 'whatsit' then
+	    -- do nothing
+	    p=p
+	 else
+	    -- rule, disc, glue, margin_kern
+	    insert_skip=no_skip
+	 end
+	 q=p; p=next_node(p)
+      end
+   end
+   return head
+end
+
 -- Shift baseline
-function ltj.baselineshift(head)
+local function baselineshift(head)
    local p=head
    local m=false -- is in math mode?
    while p do 
-      local v=node.has_attribute(p,luatexbase.attributes['luatexja@yablshift'])
+      local v=has_attr(p,attr_yablshift)
       if v then
-	 if node.type(p.id)=='glyph' then
+	 local pt = node_type(p.id)
+	 if pt=='glyph' then
 	    p.yoffset=p.yoffset-v
-	 elseif node.type(p.id)=='math' then
+	 elseif pt=='math' then
 	    m=(p.subtype==0)
 	 end
 	 if m then -- boxes and rules are shifted only in math mode
-	    if node.type(p.id)=='hlist' or node.type(p.id)=='vlist' then
+	    if pt=='hlist' or pt=='vlist' then
 	       p.shift=p.shift+v
-	    elseif node.type(p.id)=='rule' then
+	    elseif pt=='rule' then
 	       p.height=p.height-v; p.depth=p.depth+v 
 	    end
 	 end
       end
-      p=node.next(p)
+      p=next_node(p)
    end
    return head
 end
 
 
--- main process
-function ltj.main_process(head)
+--====== Adjust the width of Japanese glyphs
+
+-- TeX's \hss
+local function get_hss()
+   local hss = node_new(id_glue)
+   local hss_spec = node_new(id_glue_spec)
+   hss_spec.width = 0
+   hss_spec.stretch = 65536
+   hss_spec.stretch_order = 2
+   hss_spec.shrink = 65536
+   hss_spec.shrink_order = 2
+   hss.spec = hss_spec
+   return hss
+end
+
+local function set_ja_width(head)
    local p = head
-   p = ltj.insert_jfm_glue(p)
-   p = ltj.insert_kanji_skip(p)
-   p = ltj.baselineshift(p)
-   p = ltj.set_ja_width(p)
+   local t,s,th, g, q,a
+   while p do
+      if is_japanese_glyph_node(p) then
+	 t=ltj.metrics[ltj.font_metric_table[p.font].jfm]
+	 s=t.char_type[has_attr(p,attr_jchar_class)]
+	 if not(s.left==0.0 and s.down==0.0 
+		and round(s.width*ltj.font_metric_table[p.font].size)==p.width) then
+	    -- must be encapsuled by a \hbox
+	    head, q = node.remove(head,p)
+	    p.next=nil
+	    p.yoffset=round(p.yoffset-ltj.font_metric_table[p.font].size*s.down)
+	    p.xoffset=round(p.xoffset-ltj.font_metric_table[p.font].size*s.left)
+	    node_insert_after(p,p,get_hss())
+	    g=node_hpack(p, round(ltj.font_metric_table[p.font].size*s.width)
+			 , 'exactly')
+	    g.height=round(ltj.font_metric_table[p.font].size*s.height)
+	    g.depth=round(ltj.font_metric_table[p.font].size*s.depth)
+	    head,p = node_insert_before(head,q,g)
+	    p=q
+	 else p=next_node(p)
+	 end
+      else p=next_node(p)
+      end
+   end
+   return head
+end
+
+-- main process
+local function main_process(head)
+   local p = head
+   p = insert_jfm_glue(p)
+   p = insert_kanji_skip(p)
+   p = baselineshift(p)
+   p = set_ja_width(p)
    return p
 end
 
 -- debug
 local depth=""
 function ltj.show_node_list(head)
-   local p =head; local k = depth; local s
+   local p =head; local k = depth
    depth=depth .. '.'
    while p do
-      s=node.type(p.id)
-      if s == 'glyph' then
+      local pt=node_type(p.id)
+      if pt == 'glyph' then
 	 print(depth .. ' glyph', p.subtype, utf.char(p.char), p.font)
-      elseif s=='hlist' then
+      elseif pt=='hlist' then
 	 print(depth .. ' hlist', p.subtype, '(' .. print_scaled(p.height)
 	    .. '+' .. print_scaled(p.depth)
 	 .. ')x' .. print_scaled(p.width) )
 	 ltj.show_node_list(p.head)
 	 depth=k
-      elseif s=='whatsit' then
+      elseif pt == 'whatsit' then
 	 print(depth .. ' whatsit', p.subtype)
-      elseif s=='glue' then
+      elseif pt == 'glue' then
 	 print(depth .. ' glue', p.subtype, print_spec(p.spec))
       else
 	 print(depth .. ' ' .. s, s.subtype)
       end
-      p=node.next(p)
+      p=next_node(p)
    end
 end
 
@@ -650,9 +719,12 @@ end
 
 --- the following function is modified from jafontspec.lua (by K. Maeda).
 --- Instead of "%", we use U+FFFFF for suppressing spaces.
-function ltj.process_input_buffer(buffer)
+local function process_input_buffer(buffer)
+   local c = utf.byte(buffer, utf.len(buffer))
+   local p = node.new(id_glyph)
+   p.char = c
    if utf.len(buffer) > 0 
-        and ltj.is_ucs_in_japanese_char(utf.byte(buffer, utf.len(buffer))) then
+   and ltj.is_ucs_in_japanese_char(p) then
 	buffer = buffer .. string.char(0xF3,0xBF,0xBF,0xBF) -- U+FFFFF
    end
    return buffer
@@ -660,26 +732,27 @@ end
 
 
 ---------- Hyphenate
-function ltj.suppress_hyphenate_ja(head)
-   local p=head
-   while p do 
-      if node.type(p.id)=='glyph' and  ltj.is_ucs_in_japanese_char(p.char) then
-	 local v = node.has_attribute(p,luatexbase.attributes['luatexja@curjfnt'])
-	 if v then 
-	    p.font=v 
-	    local l=ltj.find_char_type(p.char,ltj.font_metric_table[v].jfm)
-	    if not l then l=0 end
-	    node.set_attribute(p,luatexbase.attributes['luatexja@charclass'],l)
+local function suppress_hyphenate_ja(head)
+   local p
+   for p in node.traverse(head) do
+      if p.id == id_glyph then
+	 local pc=p.char
+	 if ltj.is_ucs_in_japanese_char(p) then
+	    local v = has_attr(p,attr_curjfnt)
+	    if v then 
+	       p.font=v 
+	       local l=ltj.find_char_type(pc,ltj.font_metric_table[v].jfm) or 0
+	       node.set_attribute(p,attr_jchar_class,l)
+	    end
+	    v=has_attr(p,luatexbase.attributes['luatexja@ykblshift'])
+	    if v then 
+	       node.set_attribute(p,attr_yablshift,v)
+	    else
+	       node.unset_attribute(p,attr_yablshift)
+	    end
+	    p.lang=ltj.ja_lang_number
 	 end
-	 v=node.has_attribute(p,luatexbase.attributes['luatexja@ykblshift'])
-	 if v then 
-	    node.set_attribute(p,luatexbase.attributes['luatexja@yablshift'],v)
-	 else
-	    node.unset_attribute(p,luatexbase.attributes['luatexja@yablshift'])
-	 end
-	 p.lang=ltj.ja_lang_number
       end
-      p=node.next(p)
    end
    lang.hyphenate(head)
    return head -- 共通化のため値を返す
@@ -688,24 +761,24 @@ end
 -- callbacks
 luatexbase.add_to_callback('process_input_buffer', 
    function (buffer)
-     return ltj.process_input_buffer(buffer)
+     return process_input_buffer(buffer)
    end,'ltj.process_input_buffer')
 
 luatexbase.add_to_callback('pre_linebreak_filter', 
    function (head,groupcode)
-     return ltj.main_process(head)
+     return main_process(head)
    end,'ltj.pre_linebreak_filter',2)
 luatexbase.add_to_callback('hpack_filter', 
   function (head,groupcode,size,packtype)
-     return ltj.main_process(head)
+     return main_process(head)
   end,'ltj.hpack_filter',2)
 
 --insert before callbacks from luaotfload
 luatexbase.add_to_callback('hpack_filter', 
   function (head,groupcode,size,packtype)
-     return ltj.suppress_hyphenate_ja(head)
+     return suppress_hyphenate_ja(head)
   end,'ltj.hpack_filter_pre',0)
 luatexbase.add_to_callback('hyphenate', 
  function (head,tail)
-    return ltj.suppress_hyphenate_ja(head)
+    return suppress_hyphenate_ja(head)
  end,'ltj.hyphenate')

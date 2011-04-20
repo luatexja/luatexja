@@ -1,5 +1,6 @@
-function ltj.mk_rml(name, size, id)
-   ltj.rmlgbm_data = ltj.rmlgbm_data or require('luatexja-rmlgbm-data')
+local rmlgbm_data = require('luatexja-rmlgbm-data')
+
+local function mk_rml(name, size, id)
 
    local specification = fonts.define.analyze(name,size)
    specification = fonts.define.specify[':'](specification)
@@ -7,7 +8,7 @@ function ltj.mk_rml(name, size, id)
 
    local fontdata = {}
    local cachedata = {}
-   for k, v in pairs(ltj.rmlgbm_data) do
+   for k, v in pairs(rmlgbm_data) do
       fontdata[k] = v
       cachedata[k] = v
    end
@@ -16,7 +17,7 @@ function ltj.mk_rml(name, size, id)
    fontdata.shared = nil
    cachedata.shared = {}
    local shared = cachedata.shared
-   for k, v in pairs(ltj.rmlgbm_data.shared) do
+   for k, v in pairs(rmlgbm_data.shared) do
       shared[k] = v
    end
 
@@ -25,10 +26,10 @@ function ltj.mk_rml(name, size, id)
    
    -- characters & scaling
    local characters = {}
-   local orig_chars = ltj.rmlgbm_data.characters 
+   local orig_chars = rmlgbm_data.characters
    if size < 0 then size = -size * 655.36 end
    local scale = size / 655360
-   local size_cache = {}
+   -- local size_cache = {}
    for k, v in pairs(orig_chars) do
       characters[k] = {}
       characters[k].index = v.index
@@ -39,7 +40,7 @@ function ltj.mk_rml(name, size, id)
    cachedata.characters = characters
 
    local parameters = {}
-   for k, v in pairs(ltj.rmlgbm_data.parameters) do
+   for k, v in pairs(rmlgbm_data.parameters) do
       parameters[k] = v * scale
    end
    fontdata.parameters = parameters
@@ -78,9 +79,8 @@ end
 local dr_orig = fonts.define.read
 function fonts.define.read(name, size, id)
    local p = utf.find(name, ":") or utf.len(name)+1
-   local tmp = utf.sub(name, 1, p-1)
-   if tmp == 'psft' then
-      return ltj.mk_rml(utf.sub(name,p+1), size, id)
+   if utf.sub(name, 1, p-1) == 'psft' then
+      return mk_rml(utf.sub(name,p+1), size, id)
    else 
       return dr_orig(name, size, id)
    end

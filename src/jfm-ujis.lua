@@ -35,15 +35,17 @@ jfm.define_char_type(7, {
 
 
 -- 'boxbdd' matches 
---       o the beginning of paragraphs and hboxes
---       o the ending of paragraphs and hboxes
---       o just after the hbox created by \parindent
+--       o the beginning of paragraphs and hboxes,
+--       o the ending of paragraphs and hboxes,
+--       o just after the hbox created by \parindent.
 
 -- 'jcharbdd' matches the boundary between two Japanese characters whose metrics (or sizes) 
 --            are different.
 
 -- 'diffmet' matches the boundary between a Japanese character 
 --           and a material which is not a Japanese character.
+
+-- 'lineend' matches the ending of a line.
 
 -- dimension
 -- jfm.define_type_dim(<type>, <left>, <down>, <width>, 
