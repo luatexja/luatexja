@@ -11,6 +11,43 @@
 \rml あ\inhibitglue\char"201Cあ←KozMinPr6N-Regular
 
 \scrollmode
-\jfont\rml={psft:GothicBBB-Medium:jfm=bad} at 10pt
-\rml あ
+\jfont\rml={psft:GothicBBB-Medium:jfm=bad} at 10pt % must be error
+\rml あ123 % \rml は未定義となる
+
+\bigskip
+\font\rml={file:ipaexg.ttf} at 10pt\rml
+
+ここからは，欧文文字フォントはIPA EXゴシック
+
+
+\medskip{\tengt 文字範囲の代入/取得テスト}
+
+\defcharrange{2}{`あ,"E0-"FF}
+「\char"F4」は2番の文字範囲なので，和文扱いのはず
+
+{iso8859-1 和文扱い:\setjaparameter{jcharrange={1}}%
+\getjaparameter{jcharrange}{1}%
+§ ¶ ° £ ¥ \char"F4}
+
+{iso8859-1 欧文扱い:\setjaparameter{jcharrange={-1}}%
+\getjaparameter{jcharrange}{1}%
+§ ¶ ° £ ¥ \char"F4}
+
+
+\medskip{\tengt 文字範囲の状況取得}
+\getjaparameter{jcharrange}{0}
+\getjaparameter{jcharrange}{1}
+\getjaparameter{jcharrange}{2}
+
+\medskip{\tengt 文字コード→文字範囲}
+\getjaparameter{chartorange}{`い} % must be 217
+\getjaparameter{chartorange}{`§} % must be 1
+\getjaparameter{chartorange}{"F7} % must be 2
+\getjaparameter{chartorange}{-1}  % must be -1
+
+\medskip
+\setjaparameter{jcharrange={-217}}
+ほとんど欧文扱い．2番は別（「あ」）
+\setjaparameter{jcharrange={218}}
+和文扱いにもどる
 \end

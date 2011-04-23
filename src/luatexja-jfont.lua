@@ -106,6 +106,8 @@ function ltj.jfontdefY() -- for horizontal font
      ltj.error("bad JFM '" .. jfmfname .. "'",
                {[1]='The JFM file you specified is not valid JFM file.',
                 [2]='Defining Japanese font is cancelled.'})
+     tex.sprint(ltj.is_global .. '\\expandafter\\let\\csname '
+		.. ltj.cstemp .. '\\endcsname=\\relax')
      return 
    end
    ltj.font_metric_table[fn]={}
@@ -156,107 +158,69 @@ end
 
 
 --====== Range of Japanese characters.
-local threshold = 0x100 -- must be >=0x100
--- below threshold: kcat_table_main[chr_code] = index
--- above threshold: kcat_table_range = 
---   { [1] = {b_1, b_2, ...},
---     [2] = {i_1, i_2, ...} }
--- ( Characters b_i<=chr_code <b_{i+1} have the index i_i )
--- kcat_table_index = index1, index2, ...
+-- jcr_table_main[chr_code] = index
+-- index : internal 0, 1, 2, ..., 216               0: 'other'
+--         external    1  2       216, (out of range): 'other'
 
--- init
+-- init: 
 local ucs_out = 0x110000
-local kcat_table_main = {}
-kcat_table_range = { [1] = {threshold,ucs_out}, [2] = {0,-1} }
-kcat_table_index = { [0] = 'other' ,
-			   [1] = 'iso8859-1'}
-
-local kc_kanji = 0
-local kc_kana = 1
-local kc_letter = 2
-local kc_punct = 3
-local kc_noncjk = 4
+local jcr_table_main = {}
+local jcr_cjk = 0
+local jcr_noncjk = 1
 
 for i=0x80,0xFF do
-   kcat_table_main[i]=1
+   jcr_table_main[i]=1
 end
-for i=0x100,threshold-1 do
-   kcat_table_main[i]=0
-end
-
-local function add_jchar_range(b,e,ind)
-   -- We assume that e>=b
-   if b<threshold then
-      for i=math.max(0x80,b),math.min(threshold-1,e) do
-	 kcat_table_main[i]=ind
-      end
-      if e<threshold then return true else b=threshold end
-   end
-   local insp
-   for i,v in ipairs(kcat_table_range[1]) do
-      if v>e then 
-	 insp = i-1; break
-      end
-   end
-   if kcat_table_range[1][insp]>b or kcat_table_range[2][insp]>1 then
-      ltj.error("Bad character range",{}); return nil -- error
-   end
-   if kcat_table_range[1][insp]<b  then 
-   -- now [insp]¢« <b .. b .. [insp+1]¢« >e
-      table.insert(kcat_table_range[1],insp+1,b)
-      table.insert(kcat_table_range[2], insp+1, kcat_table_range[2][insp])
-      insp=insp+1
-   end
-   -- [insp]¢« =b .. e .. [insp+1]¢« >e
-   table.insert(kcat_table_range[1], insp+1,e+1)
-   table.insert(kcat_table_range[2], insp+1, kcat_table_range[2][insp])
-   kcat_table_range[2][insp]=ind
+for i=0x100,ucs_out-1 do
+   jcr_table_main[i]=0
 end
 
-function ltj.def_jchar_range(b,e,name) 
-   local ind = #kcat_table_index+1
-   for i,v in pairs(kcat_table_index) do
-      if v==name then ind=i; break  end
+function ltj.def_char_range(b,e,ind) -- ind: external range number
+   if ind<0 or ind>216 then 
+      ltj.error('Invalid range number (' .. ind .. '), should be in the range 1..216.',
+		{}); return
    end
-   if ind>=50 then 
-      ltj.error("No room for new character range",{}); return -- error
+   for i=math.max(0x80,b),math.min(ucs_out-1,e) do
+      jcr_table_main[i]=ind
    end
-   if ind == #kcat_table_index+1 then
-      table.insert(kcat_table_index, name)
-      print('New char range: ' .. name, ind) 
-   end
-   add_jchar_range(b,e,ind)
 end
 
-local function get_char_kcatcode(p)
+local function get_char_jcrcode(p) -- for internal use
    local i
    local c = p.char
-   if c<0x80 then return kc_noncjk
-   elseif c<threshold then i=kcat_table_main[c] 
-   else
-      for j,v in ipairs(kcat_table_range[1]) do
-	 if v>c then 
-	    i = kcat_table_range[2][j-1]; break
-	 end
-      end
-   end
+   if c<0x80 then return jcr_noncjk else i=jcr_table_main[c] end
    return math.floor(has_attr(p,
-         luatexbase.attributes['luatexja@kcat'..math.floor(i/10)])
-         /math.pow(8, i%10))%8
+         luatexbase.attributes['luatexja@kcat'..math.floor(i/31)])
+         /math.pow(2, i%31))%2
+end
+
+function ltj.get_char_jcrnumber(c) -- return the (external) range number
+   if c<0x80 or c>=ucs_out then return -1
+   else 
+      local i = jcr_table_main[c] or 0
+      if i==0 then return 217 else return i end
+   end
+end
+
+function ltj.get_jcr_setting(i) -- i: internal range number
+   return math.floor(tex.getattribute(luatexbase.attributes['luatexja@kcat'..math.floor(i/31)])
+         /math.pow(2, i%31))%2
 end
 
 --  ÏÂÊ¸Ê¸»ú¤ÈÇ§¼±¤¹¤ë unicode ¤ÎÈÏ°Ï
 function ltj.is_ucs_in_japanese_char(p)
-   return (get_char_kcatcode(p)~=kc_noncjk) 
+   return (get_char_jcrcode(p)~=jcr_noncjk) 
 end
 
-function ltj.set_jchar_range(g, name,kc)
-   local ind = 0
-   for i,v in pairs(kcat_table_index) do
-      if v==name then ind=i; break  end
+function ltj.set_jchar_range(g, i) -- i: external range number
+   if i==0 then return 
+   else
+      local kc
+      if i>0 then kc=0 else kc=1; i=-i end
+      if i>216 then i=0 end
+      local attr = luatexbase.attributes['luatexja@kcat'..math.floor(i/31)]
+      local a = tex.getattribute(attr)
+      local k = math.pow(2, i%31)
+      tex.setattribute(g,attr,(math.floor(a/k/2)*2+kc)*k+a%k)
    end
-   local attr = luatexbase.attributes['luatexja@kcat'..math.floor(ind/10)]
-   local a = tex.getattribute(attr)
-   local k = math.pow(8, ind%10)
-   tex.setattribute(g,attr,(math.floor(a/k/8)*8+kc)*k+a%k)
 end

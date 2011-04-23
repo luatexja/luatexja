@@ -130,50 +130,29 @@ PSフォント名<PSfont_name>を直接指定することもでき，
 （|test01-noembed.pdf|を参照）．
 \enditem
 
+\item 不良なJFMを用いた場合，エラーを返すとともに，<font>の意味は|\relax|となる．
+
 \beginparagraph 「和文文字の範囲」の設定
 
-\item |\defcharrange{<name>}{<char_range>}|: 文字範囲の定義．
-\itemitem <name>: 範囲を参照するためにつけるkey．
-\itemitem <range>: 文字範囲を|"100-"200, 800, 1701-|のように指定する．
+\item |\defcharrange{<number>}{<char_range>}|: 文字範囲の新規定義/追加．
+\itemitem <number>:  文字範囲の番号で，1--216の整数値で指定．
+\itemitem <range>: 文字コードの範囲を|"100-"200, 800, 1701-|のように指定する．
 \itemT ASCII codeの範囲 (|0x00|--|0x7F|) は指定できない．
-\itemT 既に他の文字範囲に使われている領域を指定することはできない．
-また，内部処理の都合上，引数に指定している範囲達はdisjointでなければならない．
-\item 各「文字範囲」ごとに，以下の5種類の取り扱い方を設定できる．
-{\bf 下表の3, 4列目の部分についてはまだ未実装である．}
+\itemT 既に他の$n$番の文字範囲に使われている領域を指定した場合は，
+その領域は$n$番の文字範囲からは除外される．即ち，後に定義した文字範囲の方が優先度が高い．
+\itemitem 定義した文字範囲ごとに，「和文扱い」「欧文扱い」をlocalに指定できる．
+% 216 = (31*7-1)
 
-\medskip
-
-\vbox{\leavevmode\hfill\leftskip=0pt\vbox{\lineskiplimit=\maxdimen\lineskip=0pt\halign{%
-\quad\hfil#\hskip.5\zw\vrule height 1.38\zh depth 0.62\zh%
-\hskip.5\zw&\hfil#\hfil\quad&\hfil#\hfil\quad&\hfil#\hfil\quad\cr
-\noalign{\hrule height 0.8pt}
-        &\bf 和文文字扱い&|\catcode|&\bf |\jcharwidowpenalty|無視\cr
-\noalign{\hrule}
-|punct| &○          &12        &○                 \cr
-\noalign{\hrule}
-|letter|&○          &12        &NO                 \cr
-\noalign{\hrule}
-|kanji| &○          &11        &NO                 \cr
-\noalign{\hrule}
-|kana|  &○          &11        &NO                 \cr
-\noalign{\hrule}
-|noncjk|&NO          &|\catcode|依存&---\cr
-\noalign{\hrule height 0.8pt}
-}}\hfill\null}
-
-Lua\TeX-ja では文字範囲の設定用に5つのattributeを確保しており，
-{\bf 1つの文書中に設定できる文字範囲の数は49個までである．}
-
-\item デフォルトでは，|0x100|以降の文字コードは全部|kanji|扱いであり，さらに文字範囲として，
+\item デフォルトでは，|U+0100|以降の文字は全部和文扱いであり，さらに文字範囲として，
 \begintt
-  \defcharrange{iso88591}{"80-"FF}
-  \setjaparameter{jcharrange={iso8859-1=noncjk}}
+  \defcharrange{1}{"80-"FF}
+  \setjaparameter{jcharrange={-1}}
 \endtt
-が定義されている{\small（つまり|0x80|--|0xFF|の範囲は欧文扱い）\inhibitglue}．
+と指定している{\small（つまりLatin-1 Supplementの範囲は欧文扱い）\inhibitglue}．
 
-TODO: 「{\setjaparameter{jcharrange={iso8859-1=kanji}}× (|U+00D7|)}」等，ISO 8859-1領域
+TODO: 「{\setjaparameter{jcharrange={1}}× (|U+00D7|)}」等，ISO 8859-1領域
 にマッピングされた文字の扱い．
-「{\setjaparameter{jcharrange={iso8859-1=kanji}}¢ (|U+00A2|)}」はHalfwidth and
+「{\setjaparameter{jcharrange={1}}¢ (|U+00A2|)}」はHalfwidth and
 Fullwidth Formsに全角形（\char"FFE0）があるから%"
 luaotfloadの置換処理に割り込めばよいが……．
 \enditem
@@ -206,15 +185,29 @@ p\TeX の|\prebreakpenalty|に対応した設定項目である．
 p\TeX では，同一文字に対して|\prebreakpenalty|, |\postbreakpenalty|の両方を定義する
 ことはできなかったが，Lua\TeX-jaでは可能である．
 
+\item |kcatcode={<chr_code>, <kind>}|★\par\noindent
+文字コード<chr_code>の文字が和文文字扱いされている時，
+「和文文字の種類」を|0|--|"7FFFFFFF|の自然数値<kind>で指定する．%"
+\itemitem 最下位bitはウィドウ防止用penaltyの挿入処理に関係する．
+\itemitem デフォルトでは，次の3つのUnicodeの範囲において，|kcatcode=1|としている．
+\itemT |U+2000|--|U+206F| (General Punctuation)
+\itemT |U+3000|--|U+303F| (CJK Symbols and Punctuation)
+\itemT |U+FF00|--|U+FFEF| (Halfwidth and Fullwidth Forms)
+
 \item |cjkxspmode={<chr_code>, <mode>}|★\par\noindent
 p\TeX の|\inhibitxspcode|に対応した設定項目である．<mode>で許される値は，
-\itemitem 0, 1, 2, 3: p\TeX の対応するprimitiveと同じ意味．
-\itemitem |inhibit|: 前後の欧文文字との間の|\xkanjiskip|自動挿入を禁止．
-\itemitem |preonly|: 前の欧文文字との間の|\xkanjiskip|自動挿入のみを許可．
-\itemitem |postonly|: 後の欧文文字との間の|\xkanjiskip|自動挿入のみを許可．
-\itemitem |allow|: 前後の欧文文字との間の|\xkanjiskip|自動挿入を許可．
+\itemitem |0|, |inhibit|: 前後の欧文文字との間の|\xkanjiskip|自動挿入を禁止．
+\itemitem |2|, |preonly|: 前の欧文文字との間の|\xkanjiskip|自動挿入のみを許可．
+\itemitem |1|, |postonly|: 後の欧文文字との間の|\xkanjiskip|自動挿入のみを許可．
+\itemitem |3|, |allow|: 前後の欧文文字との間の|\xkanjiskip|自動挿入を許可．
 \item |asciixspmode={<chr_code>, <mode>}|★\par\noindent
 同様に，p\TeX の|\xspcode|に対応した設定項目である．
+<mode>で許される値は，
+\itemitem |0|, |inhibit|: 前後の和文文字との間の|\xkanjiskip|自動挿入を禁止．
+\itemitem |1|, |preonly|: 前の和文文字との間の|\xkanjiskip|自動挿入のみを許可．
+\itemitem |2|, |postonly|: 後の和文文字との間の|\xkanjiskip|自動挿入のみを許可．
+\itemitem |3|, |allow|: 前後の和文文字との間の|\xkanjiskip|自動挿入を許可．
+
 \item |yabaselineshift=<dimen>|:
 p\TeX の|\yabaselineshift|に対応したものであり，欧文文字のベースライン補正量をdimensionで指定する．
 \itemitem 正の値を指定すると，その分だけ欧文文字は下にずれることとなる．
@@ -229,9 +222,10 @@ p\TeX では「和文が主」という考えからか，常に和文文字の�
 また，この値を適切に調整することで，%
 {\small 異なる文字サイズの文字を「上下中央揃え」で組む}ことも可能である．
 
-\item |kanjiskip=<skip>|★\inhibitglue: |\kanjiskip=<skip>|と同じ意味．
-\item |xkanjiskip=<skip>|★\inhibitglue: |\xkanjiskip=<skip>|と同じ意味．
-\item |jcharwidowpenalty=<penalty>|★\inhibitglue: |\jcharwidowpenalty=<penalty>|と同じ意味．
+\item |kanjiskip=<skip>|★\inhibitglue: 後に述べる|\kanjiskip=<skip>|と同じ意味．
+\item |xkanjiskip=<skip>|★\inhibitglue: 後に述べる|\xkanjiskip=<skip>|と同じ意味．
+\item |jcharwidowpenalty=<penalty>|★\inhibitglue: 
+後に述べる|\jcharwidowpenalty=<penalty>|と同じ意味．
 \item |autospacing[=<bool>]|★◎\par\noindent
 %\item |autospacing[=<bool>]|★\par\noindent
 和文文字間のglue（|\kanjiskip|）の自動挿入をするかしないかを制御．
@@ -248,20 +242,54 @@ glue/kernの計算方法を設定する．
 \itemitem {\tt average}: 両者の相加平均．
 \itemitem {\tt both}: 両者の合計値の幅をもつglue/kernを挿入する．
 
-\item |setjcharrange={<range_name>=<mode>}|: 
-\itemitem <range_name>: |\defcharrange|で定義した「文字コードの範囲」か，|other|を指定する．
-|other|は，今まで定義した文字範囲の中に属さないような文字コード
-$c\in [\hbox{\tt 0x100},\infty)$全体の集合を表す．
-\itemitem <mode>: <range_name>で指定した範囲の文字の取扱を指定．
-
-
+\item |jcharrange={<range_num>,<range_num>,...}|: 
+$\lvert\hbox{<range_num>}\rvert$番の文字範囲の文字を和文扱いするか欧文扱いするかを設定する．
+\itemitem $\lvert\hbox{<range_num>}\rvert>216$の場合，
+「どの文字範囲にも属さない|U+0100|以降の文字」に
+対しての処理を行う．
+\itemitem 正値が指定されたら，$\lvert\hbox{<range_num>}\rvert$番の文字範囲は和文文字扱いとなる．
+\itemitem 負値が指定されたら，$\lvert\hbox{<range_num>}\rvert$番の文字範囲は欧文文字扱いとなる．
+\itemitem $\hbox{<range_num>}=0$の場合は，単に無視される．
 \enditem
+
+\beginparagraph 組版パラメタの取得
+
+日本語組版用の各種パラメタの取得には，次の命令を用いる．
+\begintt
+  \getjaparameter{<key>} or \getjaparameter{<key>}{<chr_code>}
+\endtt
+戻り値は全て「空白は|\catcode=10|，それ以外の文字は全て|\catcode=12|」の文字列である．
+
+<key>に指定できる値は，説明がない限りは|\setjaparameter|で指定できる<key>と同じで，次の通りである，
+
+\item |kanjiskip|, |xkanjiskip|, |yabaselineshift|, |ykbaselineshift|, |jcharwidowpenalty|%
+\par\noindent
+それぞれ値を表現する文字列を返す．
+
+\item |differentjfm|: 戻り値は{\tt large}, {\tt small}, {\tt average}, {\tt both}の
+4つの文字列のいずれか．
+
+\item |prebreakpenalty|, |postbreakpenalty|, |kcatcode|, |cjkxspmode|, |asciixspmode|
+\par\noindent
+これらは各文字コード別に設定される値であるので，文字コード<chr_code>を第2引数にとる．
+指定されている整数値を表す文字列を返す．
+
+\item |jcharrange|: 文字範囲の番号$n$を第2引数にとり，$n$番の文字範囲が
+和文文字扱いされていれば|0|，欧文文字扱いされていれば|1|を返す．
+$n\notin [1,216]$の場合は，「どの文字範囲にも属さない|U+0100|以降の文字」に対しての結果を返す．
+
+\item |chartorange|: 文字コード<chr_code>を第2引数にとり，それが属している文字範囲の番号を返す．
+\itemitem <chr_code>がUnicodeの範囲外または|0x80|未満ならば，|-1|を返す．
+\itemitem 上の場合以外で，<chr_code>の文字がどの文字範囲にも属さない場合は，|217|を返す．
 
 \beginparagraph その他の命令
 
 \item skip |\kanjiskip|: 和文文字同士の間に入る空白量を指定．p\TeX の同名の命令と同様．
 \item skip |\xkanjiskip|: 和文文字と欧文文字の間に入る空白量．p\TeX の同名の命令と同様．
-\item count |\jcharwidowpenalty|: {\bf 未実装}
+\item count |\jcharwidowpenalty|: 段落において「最後の1文字のみが次の行に」くることを
+抑制するためのpenalty値．このpenaltyは，段落内にある，最後の「|kcatcode|の最下位bitが
+1で{\bf ない}ような和文文字」の直前に挿入される．
+
 \item dimen |\zw|, |\zh|: 現在の和文フォントの「幅」/「高さ」（メトリックから指定）
 \item dimen |\jQ|, |\jH|${}= 0.25\,{\rm mm}$.
 \item |\inhibitglue|: 
@@ -394,6 +422,7 @@ Lua\TeX で文字を表す|glyph_node|には|y_offset| fieldがあるので，�
 を，しかるべき量のglueと共に|\hbox|にカプセル化して行っている．
 
 \enditem 
+
 
 \vfill\eject
 \leftline{{\big 組版サンプル}\hfill

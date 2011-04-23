@@ -1,4 +1,4 @@
-This is LuaTeX, Version beta-0.66.0-2011032121 (rev 4093)  (format=luatex 2011.3.21)  19 APR 2011 21:02
+This is LuaTeX, Version beta-0.66.0-2011032121 (rev 4093)  (format=luatex 2011.4.20)  23 APR 2011 12:44
  restricted \write18 enabled.
 **test04-jfm.tex
 (./test04-jfm.tex
@@ -170,18 +170,27 @@ Package: infwarerr 2010/04/08 v1.3 Providing info/warning/message (HO)
 )
 \luatexja@tempcnta=\count281
 \luatexja@tempcntb=\count282
+\luatexja@tempcntc=\count283
 \luatexja@tempdima=\dimen256
-\luatexja@autospc=\count283
-\luatexja@autoxspc=\count284
-\jcharwidowpenalty=\count285
+\luatexja@autospc=\count284
+\luatexja@autoxspc=\count285
+\jcharwidowpenalty=\count286
 \kanjiskip=\skip256
 \xkanjiskip=\skip257
 \zw=\dimen257
 \zh=\dimen258
 \jQ=\dimen259
 \jH=\dimen260
+\luatexja@curjfnt=\luatexattribute9
+\luatexja@charclass=\luatexattribute10
+\luatexja@yablshift=\luatexattribute11
+\luatexja@ykblshift=\luatexattribute12
+\luatexja@icflag=\luatexattribute13
+\luatexja@japanese=\language87
 
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-rmlgbm.lua)
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-rmlgbm-data.lu
+a)
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-core.lua)
 Module luatexbase-mcb info: inserting 'ltj.process_input_buffer'
 (luatexbase-mcb)            at position 1 in 'process_input_buffer'
@@ -195,32 +204,23 @@ Module luatexbase-mcb info: inserting 'ltj.hyphenate'
 (luatexbase-mcb)            at position 1 in 'hyphenate'
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-jfont.lua)
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-core-aux.lua)
-\luatexja@curjfnt=\luatexattribute9
-\luatexja@charclass=\luatexattribute10
-\luatexja@yablshift=\luatexattribute11
-\luatexja@ykblshift=\luatexattribute12
-\luatexja@icflag=\luatexattribute13
-\luatexja@japanese=\language87
-\ltj@stack@pbp=\count286
-\ltj@group@level@pbp=\count287
+\luatexja@kcat0=\luatexattribute14
+\luatexja@kcat1=\luatexattribute15
+\luatexja@kcat2=\luatexattribute16
+\luatexja@kcat3=\luatexattribute17
+\luatexja@kcat4=\luatexattribute18
+\luatexja@kcat5=\luatexattribute19
+\luatexja@kcat6=\luatexattribute20
+\ltj@stack@pbp=\count287
+\ltj@group@level@pbp=\count288
 
 plain format: loading luatexja-plain.tex
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-plain.tex
-(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-rmlgbm-data.lu
-a)
-(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-ujis.lua)
-(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-ujis.lua)
-(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-ujis.lua)
-(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-ujis.lua)
-(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-ujis.lua)
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-ujis.lua)
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-kinsoku.tex)))
-(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-ujis.lua)(load: /ho
-me/h7k/.texlive2010/texmf-var/luatex-cache/generic/fonts/otf/temp-ipam.lua)
-(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-ujis.lua)(load: /ho
-me/h7k/.texlive2010/texmf-var/luatex-cache/generic/fonts/otf/temp-kozminpr6n-re
-gular.lua)
-(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-ujis.lua)
+(load: /home/h7k/.texlive2010/texmf-var/luatex-cache/generic/fonts/otf/temp-ipa
+m.lua)(load: /home/h7k/.texlive2010/texmf-var/luatex-cache/generic/fonts/otf/te
+mp-kozminpr6n-regular.lua)
 (./jfm-bad.lua)
 ! LuaTeX-ja error: bad JFM 'bad'.
 \@jfont ->\directlua {ltj.jfontdefY()}
@@ -228,11 +228,31 @@ gular.lua)
 <to be read again> 
                    \rml 
 l.15 \rml
-          あ󿿿
-? h
+          あ123 % \rml は未定義となる󿿿
 The JFM file you specified is not valid JFM file.
 Defining Japanese font is cancelled.
-? 
+
+(load: /home/h7k/.texlive2010/texmf-var/luatex-cache/generic/fonts/otf/temp-ipa
+exg.lua)
+! Undefined control sequence.
+\defcharrange #1#2->\ltj@tempcntc 
+                                  =#1 \expandafter \ltj@dcrange #2,,\ignores...
+l.25 \defcharrange{2}{`あ,"E0-"FF}
+                                   
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+! LuaTeX-ja error: Invalid character code (-1), should in the range 0.."10FFFF.
+.
+\@next ...p ', tex.getcount('luatexja@tempcnta'))}
+                                                   
+l.46 \getjaparameter{chartorange}{-1}
+                                       % must be -1
+I'm going to use 0 instead of that illegal character code.
+
 [1{/opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdftex.map
 LuaTeX warning (file /opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdfte
 x.map): fontmap entry for `bchb8r' already exists, duplicates ignored
@@ -251,12 +271,13 @@ x.map): fontmap entry for `bchri8r' already exists, duplicates ignored
 
 LuaTeX warning (file /opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdfte
 x.map): fontmap entry for `bchro8r' already exists, duplicates ignored
-}] )</opt/texlive/p2010/texmf/fonts/opentype/test/kozuka/KozMinPr6N-Regular.otf
-></opt/texlive/p2010/texmf/fonts/truetype/test/ipam.ttf></opt/texlive/p2010/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb>
-Output written on test04-jfm.pdf (1 page, 163518 bytes).
-PDF statistics: 31 PDF objects out of 1000 (max. 8388607)
- 19 compressed objects within 1 object stream
+}] )</opt/texlive/p2010/texmf/fonts/truetype/test/ipaexg.ttf></opt/texlive/p201
+0/texmf/fonts/opentype/test/kozuka/KozMinPr6N-Regular.otf></opt/texlive/p2010/t
+exmf/fonts/truetype/test/ipam.ttf></opt/texlive/p2010/texmf-dist/fonts/type1/pu
+blic/amsfonts/cm/cmr10.pfb>
+Output written on test04-jfm.pdf (1 page, 283021 bytes).
+PDF statistics: 43 PDF objects out of 1000 (max. 8388607)
+ 27 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 131072)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

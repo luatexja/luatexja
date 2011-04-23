@@ -11,6 +11,7 @@
 
 \newcount\luatexja@tempcnta
 \newcount\luatexja@tempcntb
+\newcount\luatexja@tempcntc
 \newdimen\luatexja@tempdima
 
 \newcount\luatexja@autospc
@@ -31,16 +32,6 @@
 \newluatexattribute\luatexja@ykblshift % attribute for \ykbaselineshift
 \newluatexattribute\luatexja@icflag    % attribute for italic correction
 \newlanguage\luatexja@japanese
-\expandafter\newluatexattribute\csname luatexja@kcat0\endcsname
-\expandafter\newluatexattribute\csname luatexja@kcat1\endcsname
-\expandafter\newluatexattribute\csname luatexja@kcat2\endcsname
-\expandafter\newluatexattribute\csname luatexja@kcat3\endcsname
-\expandafter\newluatexattribute\csname luatexja@kcat4\endcsname
-\csname luatexja@kcat0\endcsname='0
-\csname luatexja@kcat1\endcsname='0
-\csname luatexja@kcat2\endcsname=0
-\csname luatexja@kcat3\endcsname=0
-\csname luatexja@kcat4\endcsname=0
 
 %%%%%%%% Loading lua files
 \directlua{%
@@ -54,12 +45,22 @@
   end
   require('lualibs')
   ltj.loadlua('luatexja-rmlgbm.lua') 
-    % This file must be read before luatexja-jfont.lua. For Ryumin-Light and GothicBBB-Medium.
+    % For Ryumin-Light and GothicBBB-Medium.
   ltj.loadlua('luatexja-core.lua')
   ltj.loadlua('luatexja-jfont.lua')
   ltj.loadlua('luatexja-core-aux.lua')
   ltj.ja_lang_number=\the\luatexja@japanese
 }
+
+
+%%%%%%%% Attributes for character ranges
+\luatexja@tempcnta=0
+\loop\ifnum\luatexja@tempcnta<7
+  \expandafter\newluatexattribute%
+    \csname luatexja@kcat\the\luatexja@tempcnta\endcsname
+  \csname luatexja@kcat\the\luatexja@tempcnta\endcsname=0
+  \advance\luatexja@tempcnta by1
+\repeat
 
 %%%%%%%% \asluastring
 \def\asluastring#1{'\luaescapestring{\detokenize{#1}}'}
@@ -77,8 +78,7 @@
 
 %%%%%%%% \defcharrange<name>{100-200,3000-,5000,...}
 \def\defcharrange#1#2{%
-  \def\ltj@nametemp{#1}\expandafter\ltj@dcrange#2,,\relax
-  \ltj@defcrkey{#1}\relax}
+  \ltj@tempcntc=#1 \expandafter\ltj@dcrange#2,,\ignorespaces}
 \def\ltj@dcrange#1,{\def\ltj@temp{#1}%
   \ifx\ltj@temp\empty\let\@next=\relax\else
   \ltj@@dcrange{#1}\let\@next=\ltj@dcrange\fi\@next}
@@ -92,8 +92,8 @@
     \def\ltj@temp{#2}%
     \ifx\ltj@temp\empty\luatexja@tempcntb="10FFFF \else\luatexja@tempcntb=#2 \fi%"
   \fi
-  \directlua{ltj.def_jchar_range(\the\luatexja@tempcnta,\the\luatexja@tempcntb,
-    '\ltj@nametemp')}%
+  \directlua{ltj.def_char_range(\the\luatexja@tempcnta,\the\luatexja@tempcntb,
+    \the\luatexja@tempcntc)}%
   }
 
 %%%%%%%% \setjaparameter
@@ -101,15 +101,17 @@
 \ltj@group@level@pbp=0 \ltj@stack@pbp=0
 
 % prebreakpenalty = {<char_code>, <penalty>}
+\define@key[ltj]{japaram}{kcatcode}{%
+  \expandafter\luatexja@setbp#1:{kcat}{0}{0x7FFFFFFF}}
 \define@key[ltj]{japaram}{prebreakpenalty}{%
-  \expandafter\luatexja@setbp#1:{pre}}
+  \expandafter\luatexja@setbp#1:{pre}{-10000}{10000}}
 \define@key[ltj]{japaram}{postbreakpenalty}{%
-  \expandafter\luatexja@setbp#1:{post}}
-\def\luatexja@setbp#1,#2:#3{
+  \expandafter\luatexja@setbp#1:{post}{-10000}{10000}}
+\def\luatexja@setbp#1,#2:#3#4#5{
   \luatexja@tempcnta=#1\relax
   \luatexja@tempcntb=#2\relax
   \directlua{ltj.set_ch_table(ltj.isglobal, \asluastring{#3},
-    tex.getcount('luatexja@tempcnta'),tex.getcount('luatexja@tempcntb'))}}
+    tex.getcount('luatexja@tempcnta'),tex.getcount('luatexja@tempcntb'),#4,#5)}}
 
 % yabaselineshift = <dimen>
 \define@key[ltj]{japaram}{yabaselineshift}{%
@@ -136,7 +138,7 @@
   \def\ltj@tempa{allow}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{3}\fi
   \luatexja@tempcnta=#1\relax\luatexja@tempcntb=\ltj@temp\relax
   \directlua{ltj.set_ch_table(ltj.isglobal, 'xsp', tex.getcount('luatexja@tempcnta'),
-    tex.getcount('luatexja@tempcntb'))}}
+    tex.getcount('luatexja@tempcntb'),0,3)}}
 
 % asciixspmode = {<char_code>, <mode>}
 % mode: inhibit, preonly, postonly, allow
@@ -151,7 +153,7 @@
   \def\ltj@tempa{allow}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{3}\fi
   \luatexja@tempcnta=#1\relax\luatexja@tempcntb=\ltj@temp\relax
   \directlua{ltj.set_ch_table(ltj.isglobal, 'xsp', tex.getcount('luatexja@tempcnta'),
-    tex.getcount('luatexja@tempcntb'))}}
+    tex.getcount('luatexja@tempcntb'),0,3)}}
 
 % autospacing = <bool> (default: true)
 \define@boolkey[ltj]{japaram}{autospacing}[true]{%
@@ -191,16 +193,24 @@
   % large, small, average, both
 
 
-% jcharrange = { <range_name> = { kanji | kana | letter | punct | noncjk} }
-\def\ltj@defcrkey#1{\message{(#1)}\define@choicekey*+[ltj]{charrange}{#1}[\ltj@temp\ltj@result]%
-  {kanji,kana,letter,punct,noncjk}{%
-  \directlua{ltj.set_jchar_range(ltj.isglobal, '#1',\ltj@result)}}\relax}
-\define@key[ltj]{japaram}{jcharrange}{\setkeys[ltj]{charrange}{#1}}
+% jcharrange = { +-<range_number> }
+\define@key[ltj]{japaram}{jcharrange}{\expandafter\@setjcharrange#1,,}
+\def\@setjcharrange#1,{%
+  \edef\ltj@temp{#1}%
+  \ifx\ltj@temp\empty\let\next=\relax\else\let\next=\@setjcharrange
+    \luatexja@tempcnta=#1 \directlua{ltj.set_jchar_range(%
+      ltj.is_global,tex.getcount('luatexja@tempcnta'))}%
+  \fi\next
+}
+
+
+
+
 
 \def\setjaparameter#1{\directlua{ltj.isglobal=''}%
-  \setkeys[ltj]{japaram}{#1}}
+  \setkeys[ltj]{japaram}{#1}\ignorespaces}
 \def\globalsetjaparameter#1{\directlua{ltj.isglobal='global'}%
-  \setkeys[ltj]{japaram}{#1}}
+  \setkeys[ltj]{japaram}{#1}\ignorespaces}
 
 %%%%%%%% 
 \def\getjaparameter#1{%
@@ -209,12 +219,15 @@
   \def\ltj@tempa{postbreakpenalty}\ifx\ltj@temp\ltj@tempa\let\@next=\getjaparameter@two\fi
   \def\ltj@tempa{cjkxspmode}\ifx\ltj@temp\ltj@tempa\let\@next=\getjaparameter@two\fi
   \def\ltj@tempa{asciixspmode}\ifx\ltj@temp\ltj@tempa\let\@next=\getjaparameter@two\fi
+  \def\ltj@tempa{kcatcode}\ifx\ltj@temp\ltj@tempa\let\@next=\getjaparameter@two\fi
+  \def\ltj@tempa{jcharrange}\ifx\ltj@temp\ltj@tempa\let\@next=\getjaparameter@two\fi
+  \def\ltj@tempa{chartorange}\ifx\ltj@temp\ltj@tempa\let\@next=\getjaparameter@two\fi
   \@next
 }
 \def\getjaparameter@one{\directlua{ltj.out_ja_parameter_one('\ltj@temp')}}
 \def\getjaparameter@two#1{%
   \luatexja@tempcnta=#1
-  \directlua{ltj.out_ja_parameter_two('\ltj@temp', tex.getcount('luatexja@tempcnta'))}%
+  \directlua{ltj.out_ja_parameter_two('\ltj@temp', tex.getcount('luatexja@tempcnta'))}
 }
 
 

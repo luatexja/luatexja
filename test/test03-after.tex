@@ -3,6 +3,8 @@
 \def\\{\hfill\break}
 \tentt\tenmin
 
+{\tengt ■パラメタ代入テスト}
+
 \catcode`\@=11
 \the\luatexja@ykblshift
 \setjaparameter{ykbaselineshift=\maxdimen,autoxspacing=false}
@@ -10,16 +12,18 @@
 \getjaparameter{ykbaselineshift}
 
 \getjaparameter{kanjiskip},
-\getjaparameter{xkanjiskip},
+\getjaparameter{xkanjiskip}
+
 \getjaparameter{autospacing},
-\getjaparameter{autoxspacing},
+\getjaparameter{autoxspacing}
+
 \getjaparameter{differentjfm}.
 \setjaparameter{ykbaselineshift=0pt,autoxspacing=true}
 
 
-あいうえお{\setjaparameter{ykbaselineshift=2pt}かきくけこ}さしすせそ
+あいうえお{\setjaparameter{ykbaselineshift=2pt}かきくけこ}さしすせそ: local
 
-あいうえお{\globalsetjaparameter{ykbaselineshift=2pt}かきくけこ}さしすせそ
+あいうえお{\globalsetjaparameter{ykbaselineshift=2pt}かきくけこ}さしすせそ: global
 
 \getjaparameter{prebreakpenalty}{`（},
 \getjaparameter{prebreakpenalty}{`）},
@@ -31,6 +35,9 @@
 \getjaparameter{postbreakpenalty}{`あ}
 
 a\inhibitglue （a）\inhibitglue aあa〜a
+
+\medskip
+xspmode
 
 \getjaparameter{cjkxspmode}{`（},
 \getjaparameter{cjkxspmode}{`）},
@@ -48,6 +55,9 @@ a\inhibitglue （a）\inhibitglue aあa〜a
 {\setjaparameter{kanjiskip=0pt plus 1fi minus 1fil}\getjaparameter{kanjiskip}\par}
 {x\setjaparameter{kanjiskip=0pt plus 1fill minus 1filll}\getjaparameter{kanjiskip}\par}
 
+\medskip
+{\tengt ■合字テスト}
+
 \tenrm
 {\setjaparameter{asciixspmode={`i,preonly},ykbaselineshift=0pt}
 あiあfiあffiあ\par}
@@ -55,6 +65,6 @@ a\inhibitglue （a）\inhibitglue aあa〜a
 {\setjaparameter{asciixspmode={`f,postonly},ykbaselineshift=0pt}
 あfあfiあffiあ\par}
 
-\setjaparameter{asciixspmode={-1,inhibit}}
+\setjaparameter{asciixspmode={0,inhibit}}
 あ$a$あ
 \end

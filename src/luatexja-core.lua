@@ -5,6 +5,7 @@ local node_insert_after = node.insert_after
 local node_hpack = node.hpack
 local round = tex.round
 local node_new = node.new
+local id_penalty = node.id('penalty')
 local id_glyph = node.id('glyph')
 local id_glue_spec = node.id('glue_spec')
 local id_glue = node.id('glue')
@@ -13,6 +14,7 @@ local next_node = node.next
 local attr_jchar_class = luatexbase.attributes['luatexja@charclass']
 local attr_curjfnt = luatexbase.attributes['luatexja@curjfnt']
 local attr_yablshift = luatexbase.attributes['luatexja@yablshift']
+local attr_icflag = luatexbase.attributes['luatexja@icflag']
 
 -- error messages
 function ltj.error(s,t)
@@ -75,7 +77,7 @@ end
 
 ltj.stack_ch_table={}; ltj.stack_ch_table[0]={}
 
-local function new_stack_level()
+local function get_stack_level()
   local i = tex.getcount('ltj@stack@pbp')
   if tex.currentgrouplevel > tex.getcount('ltj@group@level@pbp') then
     i = i+1 -- new stack level
@@ -88,9 +90,20 @@ local function new_stack_level()
   end
   return i
 end
-function ltj.set_ch_table(g,m,c,p)
-  local i = new_stack_level()
-  if not ltj.stack_ch_table[i][c] then ltj.stack_ch_table[i][c] = {} end
+function ltj.set_ch_table(g,m,c,p,lb,ub)
+  local i = get_stack_level()
+  if p<lb or p>ub then 
+     ltj.error('Invalid code (' .. p .. '), should in the range '
+	       .. tostring(lb) .. '..' .. tostring(ub) .. '.',
+	    {"I'm going to use 0 instead of that illegal code value."})
+     p=0
+  elseif c<0 or c>0x10FFFF then
+     ltj.error('Invalid character code (' .. p 
+	       .. '), should in the range 0.."10FFFF.',{})
+     return 
+  elseif not ltj.stack_ch_table[i][c] then 
+     ltj.stack_ch_table[i][c] = {} 
+  end
   ltj.stack_ch_table[i][c][m] = p
   if g=='global' then
     for j,v in pairs(ltj.stack_ch_table) do 
@@ -101,15 +114,13 @@ function ltj.set_ch_table(g,m,c,p)
 end
 
 local function get_penalty_table(m,c)
-  local i = tex.getcount('ltj@stack@pbp')
-  i = ltj.stack_ch_table[i][c]
+  local i = ltj.stack_ch_table[tex.getcount('ltj@stack@pbp')][c]
   if i then i=i[m] end
   return i or 0
 end
 
 local function get_inhibit_xsp_table(c)
-  local i = tex.getcount('ltj@stack@pbp')
-  i = ltj.stack_ch_table[i][c]
+  local i = ltj.stack_ch_table[tex.getcount('ltj@stack@pbp')][c]
   if i then i=i.xsp end
   return i or 3
 end
@@ -145,24 +156,29 @@ function ltj.out_ja_parameter_one(k)
    end
 end
 
+
+
 function ltj.out_ja_parameter_two(k,c)
-   if k == 'prebreakpenalty' then
-      tex.write(get_penalty_table('pre',c))
-   elseif k == 'postbreakpenalty' then
-      tex.write(get_penalty_table('post',c))
-   elseif k == 'cjkxspmode' then
-      local i = get_inhibit_xsp_table(c)
-      if i==0 then tex.write('inhibit')
-      elseif i==1 then  tex.write('postonly')
-      elseif i==2 then  tex.write('preonly')
-      else tex.write('allow')
+   if k == 'jcharrange' then
+      if c<0 or c>216 then c=0 end
+      tex.write(ltj.get_jcr_setting(c))
+   else
+      if c<0 or c>0x10FFFF then
+	 ltj.error('Invalid character code (' .. c 
+		   .. '), should in the range 0.."10FFFF.',
+		{"I'm going to use 0 instead of that illegal character code."})
+	 c=0
       end
-   elseif k == 'asciixspmode' then
-      local i = get_inhibit_xsp_table(c)
-      if i==0 then tex.write('inhibit')
-      elseif i==2 then  tex.write('postonly')
-      elseif i==1 then  tex.write('preonly')
-      else tex.write('allow')
+      if k == 'prebreakpenalty' then
+	 tex.write(get_penalty_table('pre',c))
+      elseif k == 'postbreakpenalty' then
+	 tex.write(get_penalty_table('post',c))
+      elseif k == 'kcatcode' then
+	 tex.write(get_penalty_table('kcat',c))
+      elseif k == 'chartorange' then 
+	 tex.write(ltj.get_char_jcrnumber(c))
+      elseif k == 'cjkxspmode' or k == 'asciixspmode' then
+	 tex.write(get_inhibit_xsp_table(c))
       end
    end
 end
@@ -213,9 +229,11 @@ end
 function calc_between_two_jchar(q,p)
    -- q, p: node (possibly null)
    local ps,pm,qs,qm,g,h
-   if not p then -- q is the last node
+   if (not p) or (p.id==id_glue and p.subtype==15) then
+      -- q is the last node
+      -- (p is nil or \parfillskip)
       qs, qm = find_size_metric(q)
-      if not qm then 
+      if not qm then
 	 return nil
       else
 	 g=new_jfm_glue(qs,qm,
@@ -263,6 +281,7 @@ function calc_between_two_jchar(q,p)
 	 g=ltj.calc_between_two_jchar_aux(g,h)
       end
    end
+   if g then node.set_attribute(g,attr_icflag,2) end
    return g
 end
 
@@ -271,7 +290,7 @@ end
 --   o a hbox by \parindent
 --   o a whatsit node which contains local paragraph materials.
 -- When we insert jfm glues, we ignore these nodes.
-function ltj.is_parindent_box(p)
+local function parindent_box(p)
    if node_type(p.id)=='hlist' then 
       return (p.subtype==3)
       -- hlist (subtype=3) is a box by \parindent
@@ -285,10 +304,10 @@ local function add_kinsoku_penalty(head,p)
    local e = get_penalty_table('pre',c)
    if e~=0 then
       local q = node.prev(p)
-      if q and node_type(q.id)=='penalty' then
+      if q and q.id==id_penalty then
 	 q.penalty=q.penalty+e
       else 
-	 q=node_new(node.id('penalty'))
+	 q=node_new(id_penalty)
 	 q.penalty=e
 	 node_insert_before(head,p,q)
       end
@@ -296,11 +315,11 @@ local function add_kinsoku_penalty(head,p)
    e = get_penalty_table('post',c)
    if e~=0 then
       local q = next_node(p)
-      if q and node_type(q.id)=='penalty' then
+      if q and q.id==id_penalty then
 	 q.penalty=q.penalty+e
 	 return false
       else 
-	 q=node_new(node.id('penalty'))
+	 q=node_new(id_penalty)
 	 q.penalty=e
 	 node_insert_after(head,p,q)
 	 return true
@@ -308,19 +327,47 @@ local function add_kinsoku_penalty(head,p)
    end
 end
 
--- Insert jfm glue: main routine
-
-local function insert_jfm_glue(head)
-   local p = head
-   local q = nil  -- the previous node of p
-   local g
-   local ihb_flag = false
-   local inserted_after_penalty = false
-   if not p then 
+local function insert_widow_penalty(head,jq)
+   if not jq then 
       return head 
    end
-   while p and  ltj.is_parindent_box(p) do p=next_node(p) end
-   while p do
+   local p = node.prev(jq)
+   local jwp=tex.getcount('jcharwidowpenalty')
+   if p and has_attr(p,attr_icflag)==2 then
+      jq=p -- the case where jq has the non-zero \prebreakpenalty.
+   end
+   if jq.id==id_penalty then
+      jq.penalty=jq.penalty + jwp
+      return head
+   else
+      local g = node.new(id_penalty)
+      g.penalty=jwp
+      return node_insert_before(head,jq,g)
+   end
+end
+
+local depth=""
+
+-- Insert jfm glue: main routine
+-- mode = true iff insert_jfm_glue is called from pre_linebreak_filter
+local function insert_jfm_glue(head, mode)
+   local p = head
+   local q = nil  -- the previous node of p
+   local jq = nil -- 最後の「句読点扱いでない」和文文字
+   local g
+   local ihb_flag = false
+   local pn = nil
+   if not p then return head 
+   elseif mode then
+      while p and  parindent_box(p) do p=next_node(p) end
+      pn=node.tail(head)
+      if pn and pn.id==id_glue and pn.subtype==15 then
+	 pn=node.prev(pn)
+	 while (pn and pn.id==id_penalty) do pn=node.prev(pn) end
+      end
+      if pn then pn=next_node(pn) end
+   end
+   while p~=pn do
       if p.id==id_whatsit and p.subtype==node.subtype('user_defined')
          and p.user_id==30111 then
 	 g=p; p=next_node(p); 
@@ -333,15 +380,14 @@ local function insert_jfm_glue(head)
 	    -- If p is the first node (=head), the skip is inserted
 	    -- before head. So we must change head.
 	 end
-	 --if is_japanese_glyph_node(q) then
-	 --   node.insert(q, inserted_after_penalty)
-	 --end
 	 q=p; ihb_flag=false; 
-	 if is_japanese_glyph_node(p) 
-            and add_kinsoku_penalty(head,p) then
-	    p=next_node(p); inserted_after_penalty = true
-	 else 
-	    inserted_after_penalty = false
+	 if is_japanese_glyph_node(p) then
+	    if get_penalty_table('kcat',p.char)%2~=1 then
+	       jq=p
+	    end
+	    if add_kinsoku_penalty(head,p) then
+	       p=next_node(p)
+	    end
 	 end
 	 p=next_node(p)
       end
@@ -349,6 +395,11 @@ local function insert_jfm_glue(head)
    -- Insert skip after the last node
    g=calc_between_two_jchar(q,nil)
    if g then h = node_insert_after(head,q,g) end
+
+   if mode then
+      -- Insert \jcharwidowpenalty
+      head = insert_widow_penalty(head,jq)
+   end
    return head
 end
 
@@ -518,7 +569,7 @@ local function insks_around_penalty(head,q,p)
    if r  and r.id==id_glyph then
       if is_japanese_glyph_node(r) then
 	 cx=r.char
-	 if is_japanese_glyph_node(p)  then
+	 if is_japanese_glyph_node(q)  then
 	    local g = node_new(id_glue)
 	    g.subtype=0; g.spec=node.copy(kanji_skip)
 	    node_insert_before(head,r,g)
@@ -539,7 +590,7 @@ end
 -- Insert \xkanjiskip around p, a kern
 local function insks_around_kern(head,q,p)
    if p.subtype==1 then -- \kern or \/
-      if not has_attr(p,luatexbase.attributes['luatexja@icflag']) then
+      if not has_attr(p,attr_icflag) then
 	 insert_skip=no_skip
       end
    elseif p.subtype==2 then -- \accent: We ignore the accent character.
@@ -680,9 +731,10 @@ local function set_ja_width(head)
 end
 
 -- main process
-local function main_process(head)
+-- mode = true iff main_process is called from pre_linebreak_filter
+local function main_process(head, mode)
    local p = head
-   p = insert_jfm_glue(p)
+   p = insert_jfm_glue(p,mode)
    p = insert_kanji_skip(p)
    p = baselineshift(p)
    p = set_ja_width(p)
@@ -690,7 +742,6 @@ local function main_process(head)
 end
 
 -- debug
-local depth=""
 function ltj.show_node_list(head)
    local p =head; local k = depth
    depth=depth .. '.'
@@ -708,8 +759,10 @@ function ltj.show_node_list(head)
 	 print(depth .. ' whatsit', p.subtype)
       elseif pt == 'glue' then
 	 print(depth .. ' glue', p.subtype, print_spec(p.spec))
+      elseif pt == 'penalty' then
+	 print(depth .. ' penalty', p.penalty)
       else
-	 print(depth .. ' ' .. s, s.subtype)
+	 print(depth .. ' ' .. node.type(p.id), p.subtype)
       end
       p=next_node(p)
    end
@@ -766,11 +819,11 @@ luatexbase.add_to_callback('process_input_buffer',
 
 luatexbase.add_to_callback('pre_linebreak_filter', 
    function (head,groupcode)
-     return main_process(head)
+     return main_process(head, true)
    end,'ltj.pre_linebreak_filter',2)
 luatexbase.add_to_callback('hpack_filter', 
   function (head,groupcode,size,packtype)
-     return main_process(head)
+     return main_process(head, false)
   end,'ltj.hpack_filter',2)
 
 --insert before callbacks from luaotfload

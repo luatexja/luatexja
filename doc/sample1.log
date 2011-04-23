@@ -1,4 +1,4 @@
-This is LuaTeX, Version beta-0.66.0-2011032121 (rev 4093)  (format=luatex 2011.3.21)  20 APR 2011 15:10
+This is LuaTeX, Version beta-0.66.0-2011032121 (rev 4093)  (format=luatex 2011.4.20)  23 APR 2011 12:48
  restricted \write18 enabled.
 **sample1
 (./sample1.tex (./s1sty.tex
@@ -170,10 +170,11 @@ Package: infwarerr 2010/04/08 v1.3 Providing info/warning/message (HO)
 )
 \luatexja@tempcnta=\count281
 \luatexja@tempcntb=\count282
+\luatexja@tempcntc=\count283
 \luatexja@tempdima=\dimen256
-\luatexja@autospc=\count283
-\luatexja@autoxspc=\count284
-\jcharwidowpenalty=\count285
+\luatexja@autospc=\count284
+\luatexja@autoxspc=\count285
+\jcharwidowpenalty=\count286
 \kanjiskip=\skip256
 \xkanjiskip=\skip257
 \zw=\dimen257
@@ -186,11 +187,6 @@ Package: infwarerr 2010/04/08 v1.3 Providing info/warning/message (HO)
 \luatexja@ykblshift=\luatexattribute12
 \luatexja@icflag=\luatexattribute13
 \luatexja@japanese=\language87
-\luatexja@kcat0=\luatexattribute14
-\luatexja@kcat1=\luatexattribute15
-\luatexja@kcat2=\luatexattribute16
-\luatexja@kcat3=\luatexattribute17
-\luatexja@kcat4=\luatexattribute18
 
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-rmlgbm.lua)
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-rmlgbm-data.lu
@@ -208,17 +204,23 @@ Module luatexbase-mcb info: inserting 'ltj.hyphenate'
 (luatexbase-mcb)            at position 1 in 'hyphenate'
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-jfont.lua)
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-core-aux.lua)
-\ltj@stack@pbp=\count286
-\ltj@group@level@pbp=\count287
+\luatexja@kcat0=\luatexattribute14
+\luatexja@kcat1=\luatexattribute15
+\luatexja@kcat2=\luatexattribute16
+\luatexja@kcat3=\luatexattribute17
+\luatexja@kcat4=\luatexattribute18
+\luatexja@kcat5=\luatexattribute19
+\luatexja@kcat6=\luatexattribute20
+\ltj@stack@pbp=\count287
+\ltj@group@level@pbp=\count288
 
 plain format: loading luatexja-plain.tex
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-plain.tex
-(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-ujis.lua) (other)
-(iso8859-1)
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-ujis.lua)
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-kinsoku.tex)))
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-mono.lua)
 \vspbox=\box256
-\enumi=\count288
+\enumi=\count289
 ) BB AA
 特徴 制限 ファイル構成 使用方法 [1{/opt/texlive/p2010/texmf-var/f
 onts/map/pdftex/updmap/pdftex.map
@@ -240,26 +242,9 @@ x.map): fontmap entry for `bchri8r' already exists, duplicates ignored
 LuaTeX warning (file /opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdfte
 x.map): fontmap entry for `bchro8r' already exists, duplicates ignored
 }] 和文フォントの定義 「和文文字の範囲」の設定 [2]
-組版パラメタの調整 [3] その他の命令 [4] JFMについて
-大まかな処理の流れ [5]
-Overfull \hbox (16.21461pt too wide) in paragraph at lines 336--340
- [][]\tenmin こ の 段 階 の 前 で は[] 和 文 文 字 で あっ て 
-も[] そ れ を 内 部 で 表 し て い る \tentt glyph[]node $\teni p$ 
-\tenmin は[] []\tentt \tenrm \tenjtt あ[]
-
-\hbox(8.45029+2.22223)x412.9118, glue set - 1.0, direction TLT
-.\glue(\leftskip) 19.2052
-.\whatsit
-..\localinterlinepenalty=0
-..\localbrokenpenalty=0
-..\localleftbox=null
-..\localrightbox=null
-.\hbox(0.0+0.0)x9.6026, direction TLT
-.\tenmin こ
-.\glue 0.0 plus 0.4 minus 0.4
-.etc.
-
-[6] [7] 名称について 表記法 読み方 機能 [8] 数式の表示例
+組版パラメタの調整 [3] 組版パラメタの取得 [4]
+その他の命令 JFMについて [5] 大まかな処理の流れ [6] [7]
+名称について 表記法 読み方 機能 [8] 数式の表示例
 生い立ち T\kern -.1667em\lower .5ex\hbox {E}\kern -.125emXの日本語化
 [9]
 T\kern -.1667em\lower .5ex\hbox {E}\kern -.125emXによる組版の作業工
@@ -279,7 +264,7 @@ opt/texlive/p2010/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></opt/te
 xlive/p2010/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></opt/texlive/
 p2010/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></opt/texlive/p2010/t
 exmf-dist/fonts/type1/hoekwater/manfnt/manfnt.pfb>
-Output written on sample1.pdf (11 pages, 213643 bytes).
+Output written on sample1.pdf (11 pages, 218012 bytes).
 PDF statistics: 114 PDF objects out of 1000 (max. 8388607)
  82 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 131072)

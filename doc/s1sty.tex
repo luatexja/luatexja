@@ -103,8 +103,11 @@
 
 {\catcode`\_=\active \global\catcode`\<=\active
 \gdef<{\begingroup\catcode`\_=\active\let_=\_\it\@arg}
-\gdef\@arg#1>{$\langle$#1$\rangle$\endgroup}
+\gdef\@arg#1>{$\langle$#1\/$\rangle$\endgroup}
 }
+
+\def\lvert{\delimiter"426A30C }
+\def\rvert{\delimiter"526A30C }
 
 % itemize
 \newcount\enumi\enumi=0
