@@ -207,7 +207,7 @@ function ltj.get_jcr_setting(i) -- i: internal range number
          /math.pow(2, i%31))%2
 end
 
---  ÏÂÊ¸Ê¸»ú¤ÈÇ§¼±¤¹¤ë unicode ¤ÎÈÏ°Ï
+--  å’Œæ–‡æ–‡å­—ã¨èªè­˜ã™ã‚‹ unicode ã®ç¯„å›²
 function ltj.is_ucs_in_japanese_char(p)
    return (get_char_jcrcode(p)~=jcr_noncjk) 
 end
