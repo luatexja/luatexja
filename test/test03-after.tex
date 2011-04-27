@@ -7,64 +7,64 @@
 
 \catcode`\@=11
 \the\luatexja@ykblshift
-\setjaparameter{ykbaselineshift=\maxdimen,autoxspacing=false}
+\ltjsetparameter{ykbaselineshift=\maxdimen,autoxspacing=false}
 \the\luatexja@ykblshift\ 
-\getjaparameter{ykbaselineshift}
+\ltjgetparameter{ykbaselineshift}
 
-\getjaparameter{kanjiskip},
-\getjaparameter{xkanjiskip}
+\ltjgetparameter{kanjiskip},
+\ltjgetparameter{xkanjiskip}
 
-\getjaparameter{autospacing},
-\getjaparameter{autoxspacing}
+\ltjgetparameter{autospacing},
+\ltjgetparameter{autoxspacing}
 
-\getjaparameter{differentjfm}.
-\setjaparameter{ykbaselineshift=0pt,autoxspacing=true}
-
-
-あいうえお{\setjaparameter{ykbaselineshift=2pt}かきくけこ}さしすせそ: local
-
-あいうえお{\globalsetjaparameter{ykbaselineshift=2pt}かきくけこ}さしすせそ: global
-
-\getjaparameter{prebreakpenalty}{`（},
-\getjaparameter{prebreakpenalty}{`）},
-\getjaparameter{prebreakpenalty}{`あ}
+\ltjgetparameter{differentjfm}.
+\ltjsetparameter{ykbaselineshift=0pt,autoxspacing=true}
 
 
-\getjaparameter{postbreakpenalty}{`（},
-\getjaparameter{postbreakpenalty}{`）},
-\getjaparameter{postbreakpenalty}{`あ}
+あいうえお{\ltjsetparameter{ykbaselineshift=2pt}かきくけこ}さしすせそ: local
+
+あいうえお{\globalltjsetparameter{ykbaselineshift=2pt}かきくけこ}さしすせそ: global
+
+\ltjgetparameter{prebreakpenalty}{`（},
+\ltjgetparameter{prebreakpenalty}{`）},
+\ltjgetparameter{prebreakpenalty}{`あ}
+
+
+\ltjgetparameter{postbreakpenalty}{`（},
+\ltjgetparameter{postbreakpenalty}{`）},
+\ltjgetparameter{postbreakpenalty}{`あ}
 
 a\inhibitglue （a）\inhibitglue aあa〜a
 
 \medskip
 xspmode
 
-\getjaparameter{cjkxspmode}{`（},
-\getjaparameter{cjkxspmode}{`）},
-\getjaparameter{cjkxspmode}{`あ},
-\getjaparameter{cjkxspmode}{`〜}
+\ltjgetparameter{cjkxspmode}{`（},
+\ltjgetparameter{cjkxspmode}{`）},
+\ltjgetparameter{cjkxspmode}{`あ},
+\ltjgetparameter{cjkxspmode}{`〜}
 
-\setjaparameter{asciixspmode={`\b,inhibit}}
+\ltjsetparameter{asciixspmode={`\b,inhibit}}
 あ[あ]あaあbあ
 
-\getjaparameter{asciixspmode}{`[},
-\getjaparameter{asciixspmode}{`]},
-\getjaparameter{asciixspmode}{`a},
-\getjaparameter{asciixspmode}{`b}
+\ltjgetparameter{asciixspmode}{`[},
+\ltjgetparameter{asciixspmode}{`]},
+\ltjgetparameter{asciixspmode}{`a},
+\ltjgetparameter{asciixspmode}{`b}
 
-{\setjaparameter{kanjiskip=0pt plus 1fi minus 1fil}\getjaparameter{kanjiskip}\par}
-{x\setjaparameter{kanjiskip=0pt plus 1fill minus 1filll}\getjaparameter{kanjiskip}\par}
+{\ltjsetparameter{kanjiskip=0pt plus 1fi minus 1fil}\ltjgetparameter{kanjiskip}\par}
+{x\ltjsetparameter{kanjiskip=0pt plus 1fill minus 1filll}\ltjgetparameter{kanjiskip}\par}
 
 \medskip
 {\tengt ■合字テスト}
 
 \tenrm
-{\setjaparameter{asciixspmode={`i,preonly},ykbaselineshift=0pt}
+{\ltjsetparameter{asciixspmode={`i,preonly},ykbaselineshift=0pt}
 あiあfiあffiあ\par}
 
-{\setjaparameter{asciixspmode={`f,postonly},ykbaselineshift=0pt}
+{\ltjsetparameter{asciixspmode={`f,postonly},ykbaselineshift=0pt}
 あfあfiあffiあ\par}
 
-\setjaparameter{asciixspmode={0,inhibit}}
+\ltjsetparameter{asciixspmode={-1,inhibit}}
 あ$a$あ
 \end

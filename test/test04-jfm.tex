@@ -1,6 +1,7 @@
 %#!luatex
 \input luatexja-core.sty
 
+\def\head#1{\medskip\noindent{\bf\tengt ■ #1}\par}
 \jfont\rml={psft:Ryumin-Light:jfm=ujis} at 10pt
 \rml あ\inhibitglue\char"201Cあ←Ryumin-Light
 
@@ -10,9 +11,11 @@
 \jfont\rml={file:KozMinPr6N-Regular.otf:jfm=ujis} at 10pt
 \rml あ\inhibitglue\char"201Cあ←KozMinPr6N-Regular
 
-\scrollmode
-\jfont\rml={psft:GothicBBB-Medium:jfm=bad} at 10pt % must be error
+{\scrollmode
+\gjfont\rml={psft:GothicBBB-Medium:jfm=bad} at 10pt % must be error
+}
 \rml あ123 % \rml は未定義となる
+{\tt\meaning\rml}
 
 \bigskip
 \font\rml={file:ipaexg.ttf} at 10pt\rml
@@ -20,34 +23,66 @@
 ここからは，欧文文字フォントはIPA EXゴシック
 
 
-\medskip{\tengt 文字範囲の代入/取得テスト}
+\head{文字範囲の代入/取得テスト}
 
-\defcharrange{2}{`あ,"E0-"FF}
+\ltjdefcharrange{2}{`あ,"E0-"FF}
 「\char"F4」は2番の文字範囲なので，和文扱いのはず
 
-{iso8859-1 和文扱い:\setjaparameter{jcharrange={1}}%
-\getjaparameter{jcharrange}{1}%
+{iso8859-1 和文扱い:\ltjsetparameter{jcharrange={1}}%
+\ltjgetparameter{jcharrange}{1}%
 § ¶ ° £ ¥ \char"F4}
 
-{iso8859-1 欧文扱い:\setjaparameter{jcharrange={-1}}%
-\getjaparameter{jcharrange}{1}%
+{iso8859-1 欧文扱い:\ltjsetparameter{jcharrange={-1}}%
+\ltjgetparameter{jcharrange}{1}%
 § ¶ ° £ ¥ \char"F4}
 
 
-\medskip{\tengt 文字範囲の状況取得}
-\getjaparameter{jcharrange}{0}
-\getjaparameter{jcharrange}{1}
-\getjaparameter{jcharrange}{2}
+\head{文字範囲の状況取得}
+\ltjgetparameter{jcharrange}{0}
+\ltjgetparameter{jcharrange}{1}
+\ltjgetparameter{jcharrange}{2}
 
-\medskip{\tengt 文字コード→文字範囲}
-\getjaparameter{chartorange}{`い} % must be 217
-\getjaparameter{chartorange}{`§} % must be 1
-\getjaparameter{chartorange}{"F7} % must be 2
-\getjaparameter{chartorange}{-1}  % must be -1
+\head{文字コード→文字範囲}
+\ltjgetparameter{chartorange}{`い} % must be 217
+\ltjgetparameter{chartorange}{`§} % must be 1
+\ltjgetparameter{chartorange}{"F7} % must be 2
+\ltjgetparameter{chartorange}{-1}  % must be error "
 
 \medskip
-\setjaparameter{jcharrange={-217}}
+\ltjsetparameter{jcharrange={-217}}
 ほとんど欧文扱い．2番は別（「あ」）
-\setjaparameter{jcharrange={218}}
+\ltjsetparameter{jcharrange={218}}
 和文扱いにもどる
+
+\vfill\eject
+\jfont\rmlh={psft:Ryumin-Light:jfm=hang} at 10pt
+\head{‘lineend’検証}
+\jfont\sixgt={psft:GothicBBB-Medium:jfm=ujis} at 6pt
+\font\sixtt=cmtt10 at 6pt
+
+
+\def\dumplist#1{\par\noindent\leavevmode
+\hbox to 0.2\hsize{\copy#1\hss}%
+\vbox{\hsize=0.6\hsize\sixtt\baselineskip=7.2pt\sixgt\let\\=\relax
+\directlua{ltj.ext_show_node_list(tex.getbox(#1).head, '\\par', tex.print)}\hrule}}
+
+\setbox0=\hbox{\rmlh あえあいえ}
+\dumplist0
+
+\medskip
+\ltjsetparameter{postbreakpenalty={`あ,100}}
+\ltjsetparameter{postbreakpenalty={`い,100}}
+\ltjsetparameter{postbreakpenalty={`う,100}}
+\ltjsetparameter{postbreakpenalty={`え,100}}
+\setbox0=\hbox{\rmlh あえあいえ}
+\dumplist0
+
+\head{italic correction}
+
+\setbox0=\hbox{x{\rmlh お\/}（{\rmlh お\/}あ}
+\dumplist0
+
+\setbox0=\hbox{x{\it f\/}（{\it g\/}あ}
+\dumplist0
+
 \end

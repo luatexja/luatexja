@@ -1,7 +1,6 @@
 %#! time luatex sample1
 \input s1sty.tex % style file
 
-\message{BB}
 \overfullrule=0pt
 \def\LaTeX{L\kern-.36em\setbox0=\hbox{T}\vbox to\ht0{\hbox{\sx A}\vss}\kern-.15em\TeX}
 \font\mff=manfnt at 10pt
@@ -17,13 +16,11 @@
 \centerline{\big Lua\TeX-jaパッケージ}\bigskip
 \centerline{\large\the\year/\the\month/\the\day}\medskip
 
-\message{AA}
 \bigskip
 
 本パッケージは，（最低でもp\TeX と同等の水準の）日本語組版をLua\TeX 上で実現させることを
 目標としたマクロである．まだまだ足りないところはあるが，とりあえず動くようになった？ので公開する． 
 
-%{\showboxdepth=10000\showboxbreadth=10000\tracingonline=1\scrollmode\showlists}\end
 
 \beginparagraph 特徴
 
@@ -43,6 +40,7 @@
 \item {\bf 現時点で\LaTeX での使用は殆ど考慮されていません．今は``plain Lua\TeX''で使ってください．}
 \item |\accent|を和文文字に対して使うことはできません．
 これは「フォントを後で置換する」という実装上，仕方のないことだと思われます．
+{\small|\/|を試験的に日本語にも対応させました．|make_accent|の処理をLuaコードで書けば可能だと思われます．}
 \item 数式中の日本語は想定していません．|\hbox|か何かで囲ってください．
 \item p\TeX にあった以下の機能はまだ実装していません．
 \itemitem |\euc|, |\jis|, |\sjis|, |\kuten|といった，コード変換プリミティブ．
@@ -61,6 +59,7 @@
 {\bf 現時点で\LaTeX での使用は全く考慮されていない．}
 \item {\tt luatexja-core.lua}: コア部分に使われるLuaコード．
 \item {\tt luatexja-jfont.lua}: 和文フォント定義部のLuaコード．
+\item {\tt luatexja-xkanji.lua}: |\[x]kanjiskip|自動挿入処理のLuaコード．
 \item {\tt luatexja-rmlgbm-data.lua}: 非埋込和文フォント用のデータ（小塚明朝Pr6N R由来）．
 \item {\tt luatexja-rmlgbm.lua}: 非埋込和文フォント (Ryumin-Light etc.) 定義部．
 \item {\tt mk-rmlgbm-data.tex}: {\tt luatexja-rmlgbm-data.lua}作成用スクリプト
@@ -146,13 +145,13 @@ PSフォント名<PSfont_name>を直接指定することもでき，
 \item デフォルトでは，|U+0100|以降の文字は全部和文扱いであり，さらに文字範囲として，
 \begintt
   \defcharrange{1}{"80-"FF}
-  \setjaparameter{jcharrange={-1}}
+  \ltjsetparameter{jcharrange={-1}}
 \endtt
 と指定している{\small（つまりLatin-1 Supplementの範囲は欧文扱い）\inhibitglue}．
 
-TODO: 「{\setjaparameter{jcharrange={1}}× (|U+00D7|)}」等，ISO 8859-1領域
+TODO: 「{\ltjsetparameter{jcharrange={1}}× (|U+00D7|)}」等，ISO 8859-1領域
 にマッピングされた文字の扱い．
-「{\setjaparameter{jcharrange={1}}¢ (|U+00A2|)}」はHalfwidth and
+「{\ltjsetparameter{jcharrange={1}}¢ (|U+00A2|)}」はHalfwidth and
 Fullwidth Formsに全角形（\char"FFE0）があるから%"
 luaotfloadの置換処理に割り込めばよいが……．
 \enditem
@@ -162,8 +161,8 @@ luaotfloadの置換処理に割り込めばよいが……．
 
 日本語組版用の各種パラメタの調整には，次の命令を用いる．
 \begintt
-  \setjaparameter{<key>=<value>, ...}       % local に変更
-  \globalsetjaparameter{<key>=<value>, ...} % global に変更
+  \ltjsetparameter{<key>=<value>, ...}       % local に変更
+  \globalltjsetparameter{<key>=<value>, ...} % global に変更
 \endtt
 
 <key> に許される値は次の通りである．
@@ -256,11 +255,11 @@ $\lvert\hbox{<range_num>}\rvert$番の文字範囲の文字を和文扱いする
 
 日本語組版用の各種パラメタの取得には，次の命令を用いる．
 \begintt
-  \getjaparameter{<key>} or \getjaparameter{<key>}{<chr_code>}
+  \ltjgetparameter{<key>} or \ltjgetparameter{<key>}{<chr_code>}
 \endtt
 戻り値は全て「空白は|\catcode=10|，それ以外の文字は全て|\catcode=12|」の文字列である．
 
-<key>に指定できる値は，説明がない限りは|\setjaparameter|で指定できる<key>と同じで，次の通りである，
+<key>に指定できる値は，説明がない限りは|\ltjsetparameter|で指定できる<key>と同じで，次の通りである，
 
 \item |kanjiskip|, |xkanjiskip|, |yabaselineshift|, |ykbaselineshift|, |jcharwidowpenalty|%
 \par\noindent
@@ -313,9 +312,17 @@ p\TeX 用{\tt JFM}で言うところの「文字クラス」を定義する．
 \itemitem <class>は文字クラスを表す1以上$\hbox{\tt0x800}=2048$未満の整数．
 \itemitem <chars>には，<class>に属する「文字」達のUnicodeにおけるコード番号を
 リストの形|{...}|で記述する．
+\itemitem どの文字クラスにも属さなかった文字は，自動的に0番の文字クラスに属するとみなされる．
 
 また，このリストには，以下の「仮想的な文字」も指定可能である．
 \itemT |'lineend'|: 行末．
+この「文字」を0以外の文字クラスに設定することで，ぶら下げ組のような組版も可能になる．
+例えば，句点類の文字クラスが2のとき，
+\begintt
+  jfm.define_char_type(8,{'linebdd'}})
+  jfm.define_kern(2, 8, -0.5)
+\endtt
+と指定すればよい．
 \itemT |'boxbdd'|: 水平ボックスの先頭/末尾，段落の先頭/末尾．
 \itemT |'jcharbdd'|: 和文文字達の連続とそれ以外のもの（例えば欧文文字）との境界．
 \itemT |'diffmet'|: 異なるメトリックの和文文字間に入るglueの計算に使われる．
@@ -376,18 +383,32 @@ $p$は「現在の和文フォント」の番号もattribute |\luatexja@curjfnt|
 
 \item {\bf JFM由来glue/kernの挿入: |pre_linebreak_filter|, |hpack_filter|}
 
-ここで，メトリックに由来する和文文字間のglue/kernを挿入する．
-基本的には連続する和文文字間に挿入するが，
+ここで，JFMに由来する和文文字間のglue/kernを挿入する．
+基本的には連続する和文文字（を表すnode）間に挿入するが，
 \itemitem 水平ボックスの先頭/末尾，段落の先頭/末尾には「文字コード|'boxbdd'|の文字」があると
 見做して空白を挿入する．
 \itemitem 和文文字とそうでないもの（欧文文字，ボックス等）の間に関しては，
 和文文字でない方は「文字コード|'jcharbdd'|の文字」であると見做す．
 \itemitem フォントの異なる2つの和文文字においても，
-両者のフォントのmetric keyとsizeが一致した場合は，
+両者のフォントのJFMとsizeが一致した場合は，
 挿入処理においては「同じフォント」であるかのように扱う．
 \itemitem  そうでない場合は，両者の間に「文字コード|'diffmet'|の文字」があると見做して，
 両和文文字からそれぞれglue/kern |gb|, |ga|を計算し，そこから実際に入るglue/kernを
-計算している（|\setjaparameter|中の|differentjfm|キーを参照）．
+計算している（|\ltjsetparameter|中の|differentjfm|キーを参照）．
+\itemitem もうちょっと詳しく書くと，本処理前において，和文文字を表す
+2つの連続した|glyph_node| $Q$, $P$の間には，次のnode達が挿入される：
+$$
+ \ldots,\ Q,\ (\hbox{|\kern|}\ w\,{\rm pt}),\ (\hbox{|\penalty|}\ p),\ 
+(\hbox{|\kern|}\ (k-w)\,{\rm pt})
+,\ P,\ \ldots
+$$
+上に書いた全てのnodeが挿入されるとは限らず，また4つめのkernもglueに変わる可能性がある．
+上に出てきた量の意味は次の通りである：
+\itemT $w$: $Q$が行末にきたときに，行末からどれだけずらすかを指定した量．
+\itemT $p$: $Q$の行末禁則用penaltyと$P$の行頭禁則用penaltyの合計値．ウィドウ防止用の
+|\jcharwidowpenalty|が挿入される時は，値はここに加算される．
+\itemT |\kern| $k$: 本来の$Q$と$P$の間に入る空き（glueであることも）．
+$w$のために自然長を補正している．
 
 \item {\bf |\kanjiskip|, |\xkanjiskip|の挿入: |pre_linebreak_filter|, |hpack_filter|}
 

@@ -1,0 +1,18 @@
+%#! time luatex  test05-speed.tex
+\input luatexja-core.sty
+
+\newcount\cnt\newcount\cnta
+\cnt=0
+\long\def\loop#1\repeat{\def\body{#1}\iterate}
+\loop\ifnum\cnt<10 % <= this value
+  \cnta=0 \message{\the\cnt:}\par
+  {\loop\ifnum\cnta<500 あ．「い，うえお・か（き）く）（けこ\advance\cnta1\repeat}
+  \advance\cnt1
+\repeat
+
+\end
+
+%     real time:
+% 20: 14.373s
+% 10:  8.476s
+% env: C2D E7300, Mem 4GB, LuaTeX 0.66.0pre, Gentoo amd64 unstable
