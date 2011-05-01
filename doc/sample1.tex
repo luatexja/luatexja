@@ -93,8 +93,8 @@ JFM は和文文字の幅や，和文文字間の空白の入り方などを規�
 \TeX の|\font| primitiveと同様の書式を持った次の命令を用いて和文フォントを定義する：
 
 \begintt
-  \jfont<font>={<font_name>:<features>} <size>  % local に定義
-  \gjfont<font>={<font_name>:<features>} <size> % global に定義
+  \jfont<font>={<font_name>:<features>} <size>       % local に定義
+  \globaljfont<font>={<font_name>:<features>} <size> % global に定義
 \endtt
 
 
@@ -145,13 +145,13 @@ PSフォント名<PSfont_name>を直接指定することもでき，
 \item デフォルトでは，|U+0100|以降の文字は全部和文扱いであり，さらに文字範囲として，
 \begintt
   \defcharrange{1}{"80-"FF}
-  \ltjsetparameter{jcharrange={-1}}
+  \ltjsetparameter{jacharrange={-1}}
 \endtt
 と指定している{\small（つまりLatin-1 Supplementの範囲は欧文扱い）\inhibitglue}．
 
-TODO: 「{\ltjsetparameter{jcharrange={1}}× (|U+00D7|)}」等，ISO 8859-1領域
+TODO: 「{\ltjsetparameter{jacharrange={1}}× (|U+00D7|)}」等，ISO 8859-1領域
 にマッピングされた文字の扱い．
-「{\ltjsetparameter{jcharrange={1}}¢ (|U+00A2|)}」はHalfwidth and
+「{\ltjsetparameter{jacharrange={1}}¢ (|U+00A2|)}」はHalfwidth and
 Fullwidth Formsに全角形（\char"FFE0）があるから%"
 luaotfloadの置換処理に割り込めばよいが……．
 \enditem
@@ -162,7 +162,7 @@ luaotfloadの置換処理に割り込めばよいが……．
 日本語組版用の各種パラメタの調整には，次の命令を用いる．
 \begintt
   \ltjsetparameter{<key>=<value>, ...}       % local に変更
-  \globalltjsetparameter{<key>=<value>, ...} % global に変更
+  \ltjglobalsetparameter{<key>=<value>, ...} % global に変更
 \endtt
 
 <key> に許される値は次の通りである．
@@ -193,13 +193,13 @@ p\TeX では，同一文字に対して|\prebreakpenalty|, |\postbreakpenalty|�
 \itemT |U+3000|--|U+303F| (CJK Symbols and Punctuation)
 \itemT |U+FF00|--|U+FFEF| (Halfwidth and Fullwidth Forms)
 
-\item |cjkxspmode={<chr_code>, <mode>}|★\par\noindent
+\item |jaxspmode={<chr_code>, <mode>}|★\par\noindent
 p\TeX の|\inhibitxspcode|に対応した設定項目である．<mode>で許される値は，
 \itemitem |0|, |inhibit|: 前後の欧文文字との間の|\xkanjiskip|自動挿入を禁止．
 \itemitem |2|, |preonly|: 前の欧文文字との間の|\xkanjiskip|自動挿入のみを許可．
 \itemitem |1|, |postonly|: 後の欧文文字との間の|\xkanjiskip|自動挿入のみを許可．
 \itemitem |3|, |allow|: 前後の欧文文字との間の|\xkanjiskip|自動挿入を許可．
-\item |asciixspmode={<chr_code>, <mode>}|★\par\noindent
+\item |alxspmode={<chr_code>, <mode>}|★\par\noindent
 同様に，p\TeX の|\xspcode|に対応した設定項目である．
 <mode>で許される値は，
 \itemitem |0|, |inhibit|: 前後の和文文字との間の|\xkanjiskip|自動挿入を禁止．
@@ -207,12 +207,12 @@ p\TeX の|\inhibitxspcode|に対応した設定項目である．<mode>で許さ
 \itemitem |2|, |postonly|: 後の和文文字との間の|\xkanjiskip|自動挿入のみを許可．
 \itemitem |3|, |allow|: 前後の和文文字との間の|\xkanjiskip|自動挿入を許可．
 
-\item |yabaselineshift=<dimen>|:
-p\TeX の|\yabaselineshift|に対応したものであり，欧文文字のベースライン補正量をdimensionで指定する．
+\item |yalbaselineshift=<dimen>|:
+p\TeX の|\baselineshift|に対応したものであり，欧文文字のベースライン補正量をdimensionで指定する．
 \itemitem 正の値を指定すると，その分だけ欧文文字は下にずれることとなる．
 \itemitem 数式中では，boxやruleもこの量だけずれる\hfil\break
-（よって，行中数式は全体が|\yabaselineshift|だけずれたように見える）．
-\item |ykbaselineshift=<dimen>|:
+（よって，行中数式は全体が|yalbaselineshift|だけずれたように見える）．
+\item |yjabaselineshift=<dimen>|:
 和文文字のベースライン補正量をdimensionで指定する．
 p\TeX では「和文が主」という考えからか，常に和文文字のベースラインが基準であり，
 欧文文字の方をずらすことになっていた．しかし，「欧文の中に和文をちょっと入れる」ような場合では，
@@ -241,7 +241,7 @@ glue/kernの計算方法を設定する．
 \itemitem {\tt average}: 両者の相加平均．
 \itemitem {\tt both}: 両者の合計値の幅をもつglue/kernを挿入する．
 
-\item |jcharrange={<range_num>,<range_num>,...}|: 
+\item |jacharrange={<range_num>,<range_num>,...}|: 
 $\lvert\hbox{<range_num>}\rvert$番の文字範囲の文字を和文扱いするか欧文扱いするかを設定する．
 \itemitem $\lvert\hbox{<range_num>}\rvert>216$の場合，
 「どの文字範囲にも属さない|U+0100|以降の文字」に
@@ -261,19 +261,19 @@ $\lvert\hbox{<range_num>}\rvert$番の文字範囲の文字を和文扱いする
 
 <key>に指定できる値は，説明がない限りは|\ltjsetparameter|で指定できる<key>と同じで，次の通りである，
 
-\item |kanjiskip|, |xkanjiskip|, |yabaselineshift|, |ykbaselineshift|, |jcharwidowpenalty|%
+\item |kanjiskip|, |xkanjiskip|, |yalbaselineshift|, |yjabaselineshift|, |jcharwidowpenalty|%
 \par\noindent
 それぞれ値を表現する文字列を返す．
 
 \item |differentjfm|: 戻り値は{\tt large}, {\tt small}, {\tt average}, {\tt both}の
 4つの文字列のいずれか．
 
-\item |prebreakpenalty|, |postbreakpenalty|, |kcatcode|, |cjkxspmode|, |asciixspmode|
+\item |prebreakpenalty|, |postbreakpenalty|, |kcatcode|, |jaxspmode|, |alxspmode|
 \par\noindent
 これらは各文字コード別に設定される値であるので，文字コード<chr_code>を第2引数にとる．
 指定されている整数値を表す文字列を返す．
 
-\item |jcharrange|: 文字範囲の番号$n$を第2引数にとり，$n$番の文字範囲が
+\item |jacharrange|: 文字範囲の番号$n$を第2引数にとり，$n$番の文字範囲が
 和文文字扱いされていれば|0|，欧文文字扱いされていれば|1|を返す．
 $n\notin [1,216]$の場合は，「どの文字範囲にも属さない|U+0100|以降の文字」に対しての結果を返す．
 
@@ -370,13 +370,13 @@ Lua\TeX-jaパッケージでは，次のような流れで実際の処理を行�
 
 この段階の前では，和文文字であっても，それを内部で表している|glyph_node|~$p$は，
 「|\tenrm あ|」のように，欧文フォントが指定されている状態になっている．しかし，
-$p$は「現在の和文フォント」の番号もattribute |\luatexja@curjfnt|として保持している．そのため，
+$p$は「現在の和文フォント」の番号もattribute |\ltj@curjfnt|として保持している．そのため，
 この段階では，「和文文字が格納されている」|glyph_node|~$p$に対して，次を行う．
 
-\itemitem $p$のフォントをattribute |\luatexja@curjfnt|の値に置換．
-\itemitem $p$の|language| fieldを|\luatexja@japanese|の値に置換．
+\itemitem $p$のフォントをattribute |\ltj@curjfnt|の値に置換．
+\itemitem $p$の|language| fieldを|\ltj@japanese|の値に置換．
 誤って和文文字間でハイフネーションがされてしまうのを防止するため．
-\itemitem $p$の文字の文字クラスを計算し，その値をattribute |\luatexja@charclass|に格納．
+\itemitem $p$の文字の文字クラスを計算し，その値をattribute |\ltj@charclass|に格納．
 これにより，|jp90|等のfeatureによりグリフが置換されても，文字クラスの値は保たれる．
 
 \item {\bf （luaotfloadパッケージによるグリフ置換等の処理はこの位置で）}
@@ -428,9 +428,9 @@ p\TeX では数字{\tt 0}との間に挿入するかどうかで判定してい�
 この段階では，（主として）欧文文字のベースラインをずらす作業を行う．幸いにして，
 Lua\TeX で文字を表す|glyph_node|には|y_offset| fieldがあるので，作業は楽である．
 
-補正量は，attribute |\luatexja@yablshift|の値（先も書いた通り，sp単位）である．和文文字の
-補正量は|\luatexja@ykblshift|の値で指定されるが，以前の「和文フォントへの置換」処理において，
-|\luatexja@yablshift|へと値を移し変えているので，この段階では|\luatexja@yablshift|の値のみを気にしている．
+補正量は，attribute |\ltj@yablshift|の値（先も書いた通り，sp単位）である．和文文字の
+補正量は|\ltj@ykblshift|の値で指定されるが，以前の「和文フォントへの置換」処理において，
+|\ltj@yablshift|へと値を移し変えているので，この段階では|\ltj@yablshift|の値のみを気にしている．
 
 さて，実際に補正されるのは次の場合である:
 \itemitem 文字 (|glyph_node|)

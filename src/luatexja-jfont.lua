@@ -3,8 +3,8 @@ local has_attr = node.has_attribute
 local floor = math.floor
 local round = tex.round
 
-local attr_icflag = luatexbase.attributes['luatexja@icflag']
-local attr_curjfnt = luatexbase.attributes['luatexja@curjfnt']
+local attr_icflag = luatexbase.attributes['ltj@icflag']
+local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local id_glyph = node.id('glyph')
 local id_kern = node.id('kern')
 
@@ -127,7 +127,7 @@ function ltj.ext_jfontdefY() -- for horizontal font
    ltj.font_metric_table[fn].jfm=j; ltj.font_metric_table[fn].size=f.size
    tex.sprint(ltj.is_global .. '\\protected\\expandafter\\def\\csname '
               .. cstemp .. '\\endcsname'
-              .. '{\\csname luatexja@curjfnt\\endcsname=' .. fn
+              .. '{\\csname ltj@curjfnt\\endcsname=' .. fn
               .. ' \\zw=' .. tex.round(f.size*ltj.metrics[j].zw) .. 'sp'
               .. '\\zh=' .. tex.round(f.size*ltj.metrics[j].zh) .. 'sp\\relax}')
 end
@@ -203,7 +203,7 @@ end
 
 local function rgjc_get_range_setting(i) -- i: internal range number
    return floor(tex.getattribute(
-			luatexbase.attributes['luatexja@kcat'..floor(i/31)])
+			luatexbase.attributes['ltj@kcat'..floor(i/31)])
 		     /math.pow(2, i%31))%2
 end
 ltj.int_get_range_setting = rgjc_get_range_setting
@@ -216,7 +216,7 @@ local function rgjc_is_ucs_in_japanese_char(p)
    else 
       local i=jcr_table_main[c] 
       return (floor(
-		 has_attr(p, luatexbase.attributes['luatexja@kcat'..floor(i/31)])
+		 has_attr(p, luatexbase.attributes['ltj@kcat'..floor(i/31)])
 		 /math.pow(2, i%31))%2 ~= jcr_noncjk) 
    end
 end
@@ -229,7 +229,7 @@ function ltj.ext_toggle_char_range(g, i) -- i: external range number
       local kc
       if i>0 then kc=0 else kc=1; i=-i end
       if i>216 then i=0 end
-      local attr = luatexbase.attributes['luatexja@kcat'..floor(i/31)]
+      local attr = luatexbase.attributes['ltj@kcat'..floor(i/31)]
       local a = tex.getattribute(attr)
       local k = math.pow(2, i%31)
       tex.setattribute(g,attr,(floor(a/k/2)*2+kc)*k+a%k)

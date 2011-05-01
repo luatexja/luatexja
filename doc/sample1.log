@@ -1,4 +1,4 @@
-This is LuaTeX, Version beta-0.66.0-2011032121 (rev 4093)  (format=luatex 2011.4.20)  23 APR 2011 12:48
+This is LuaTeX, Version beta-0.66.0-2011043022 (rev 4141)  (format=luatex 2011.4.27)  1 MAY 2011 11:44
  restricted \write18 enabled.
 **sample1
 (./sample1.tex (./s1sty.tex
@@ -156,7 +156,10 @@ Module luatexbase-mcb info: inserting 'luaotfload.define_font'
 (luatexbase-mcb)            at position 1 in 'define_font'
 Module luatexbase-mcb info: inserting 'luaotfload.find_vf_file'
 (luatexbase-mcb)            at position 1 in 'find_vf_file'
-) (/opt/texlive/p2010/texmf-dist/tex/generic/xkeyval/xkeyval.tex
+) (/opt/texlive/p2010/texmf-dist/tex/generic/oberdiek/ltxcmds.sty
+Package: ltxcmds 2010/04/26 v1.7 LaTeX kernel commands for general use (HO)
+)
+(/opt/texlive/p2010/texmf-dist/tex/generic/xkeyval/xkeyval.tex
 \XKV@toks=\toks13
 \XKV@tempa@toks=\toks14
 \XKV@depth=\count280
@@ -168,12 +171,12 @@ Module luatexbase-mcb info: inserting 'luaotfload.find_vf_file'
 (/opt/texlive/p2010/texmf-dist/tex/generic/oberdiek/infwarerr.sty
 Package: infwarerr 2010/04/08 v1.3 Providing info/warning/message (HO)
 )
-\luatexja@tempcnta=\count281
-\luatexja@tempcntb=\count282
-\luatexja@tempcntc=\count283
-\luatexja@tempdima=\dimen256
-\luatexja@autospc=\count284
-\luatexja@autoxspc=\count285
+\ltj@tempcnta=\count281
+\ltj@tempcntb=\count282
+\ltj@tempcntc=\count283
+\ltj@tempdima=\dimen256
+\ltj@autospc=\count284
+\ltj@autoxspc=\count285
 \jcharwidowpenalty=\count286
 \kanjiskip=\skip256
 \xkanjiskip=\skip257
@@ -181,38 +184,39 @@ Package: infwarerr 2010/04/08 v1.3 Providing info/warning/message (HO)
 \zh=\dimen258
 \jQ=\dimen259
 \jH=\dimen260
-\luatexja@curjfnt=\luatexattribute9
-\luatexja@charclass=\luatexattribute10
-\luatexja@yablshift=\luatexattribute11
-\luatexja@ykblshift=\luatexattribute12
-\luatexja@icflag=\luatexattribute13
-\luatexja@japanese=\language87
+\ltj@curjfnt=\luatexattribute9
+\ltj@charclass=\luatexattribute10
+\ltj@yablshift=\luatexattribute11
+\ltj@ykblshift=\luatexattribute12
+\ltj@icflag=\luatexattribute13
+\ltj@japanese=\language87
 
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-rmlgbm.lua)
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-rmlgbm-data.lu
 a)
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-jfont.lua)
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-core.lua)
 Module luatexbase-mcb info: inserting 'ltj.process_input_buffer'
 (luatexbase-mcb)            at position 1 in 'process_input_buffer'
-Module luatexbase-mcb info: inserting 'ltj.pre_linebreak_filter'
-(luatexbase-mcb)            at position 2 in 'pre_linebreak_filter'
-Module luatexbase-mcb info: inserting 'ltj.hpack_filter'
-(luatexbase-mcb)            at position 2 in 'hpack_filter'
 Module luatexbase-mcb info: inserting 'ltj.hpack_filter_pre'
 (luatexbase-mcb)            at position 1 in 'hpack_filter'
 Module luatexbase-mcb info: inserting 'ltj.hyphenate'
 (luatexbase-mcb)            at position 1 in 'hyphenate'
-(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-jfont.lua)
+Module luatexbase-mcb info: inserting 'ltj.pre_linebreak_filter'
+(luatexbase-mcb)            at position 2 in 'pre_linebreak_filter'
+Module luatexbase-mcb info: inserting 'ltj.hpack_filter'
+(luatexbase-mcb)            at position 2 in 'hpack_filter'
+(/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-xkanji.lua)
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-core-aux.lua)
-\luatexja@kcat0=\luatexattribute14
-\luatexja@kcat1=\luatexattribute15
-\luatexja@kcat2=\luatexattribute16
-\luatexja@kcat3=\luatexattribute17
-\luatexja@kcat4=\luatexattribute18
-\luatexja@kcat5=\luatexattribute19
-\luatexja@kcat6=\luatexattribute20
-\ltj@stack@pbp=\count287
-\ltj@group@level@pbp=\count288
+\ltj@kcat0=\luatexattribute14
+\ltj@kcat1=\luatexattribute15
+\ltj@kcat2=\luatexattribute16
+\ltj@kcat3=\luatexattribute17
+\ltj@kcat4=\luatexattribute18
+\ltj@kcat5=\luatexattribute19
+\ltj@kcat6=\luatexattribute20
+\ltj@@stack=\count287
+\ltj@@group@level=\count288
 
 plain format: loading luatexja-plain.tex
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-plain.tex
@@ -221,9 +225,9 @@ plain format: loading luatexja-plain.tex
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-mono.lua)
 \vspbox=\box256
 \enumi=\count289
-) BB AA
-特徴 制限 ファイル構成 使用方法 [1{/opt/texlive/p2010/texmf-var/f
-onts/map/pdftex/updmap/pdftex.map
+) 特徴
+制限 ファイル構成 [1{/opt/texlive/p2010/texmf-var/fonts/map/pdftex/updm
+ap/pdftex.map
 LuaTeX warning (file /opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdfte
 x.map): fontmap entry for `bchb8r' already exists, duplicates ignored
 
@@ -241,14 +245,36 @@ x.map): fontmap entry for `bchri8r' already exists, duplicates ignored
 
 LuaTeX warning (file /opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdfte
 x.map): fontmap entry for `bchro8r' already exists, duplicates ignored
-}] 和文フォントの定義 「和文文字の範囲」の設定 [2]
-組版パラメタの調整 [3] 組版パラメタの取得 [4]
-その他の命令 JFMについて [5] 大まかな処理の流れ [6] [7]
-名称について 表記法 読み方 機能 [8] 数式の表示例
-生い立ち T\kern -.1667em\lower .5ex\hbox {E}\kern -.125emXの日本語化
-[9]
+}] 使用方法 和文フォントの定義 [2]
+「和文文字の範囲」の設定 組版パラメタの調整 [3]
+Overfull \hbox (2.29878pt too wide) in paragraph at lines 215--220
+ [] []\tentt yjabaselineshift=$\tensy h$\tenit di-men$\tensy i$\tenrm : \tenmin
+ 和 文 文 字 の ベ ー ス ラ イ ン 補 正 量 を \tenrm di-men-sion
+ \tenmin で 指 定 す る [] \tenrm pT[]X
+
+\hbox(8.45029+2.5)x412.9118, glue set - 1.0, direction TLT
+.\glue(\leftskip) 19.2052
+.\whatsit
+..\localinterlinepenalty=0
+..\localbrokenpenalty=0
+..\localleftbox=null
+..\localrightbox=null
+.\glue -9.6026
+.\hbox(4.44444+0.0)x9.6026, glue set 2.3013fil, direction TLT
+..\glue 0.0 plus 1.0fil minus 1.0fil
+..\mathon
+..\tensy 
+..\mathoff
+..\glue 0.0 plus 1.0fil minus 1.0fil
+.\tentt y
+.etc.
+
+組版パラメタの取得 [4] その他の命令 JFMについて [5]
+大まかな処理の流れ [6] [7] [8] 名称について 表記法 読み方
+機能 [9] 数式の表示例 生い立ち
+T\kern -.1667em\lower .5ex\hbox {E}\kern -.125emXの日本語化 [10]
 T\kern -.1667em\lower .5ex\hbox {E}\kern -.125emXによる組版の作業工
-程 [10] GUI環境とT\kern -.1667em\lower .5ex\hbox {E}\kern -.125emX [11] )</
+程 [11] GUI環境とT\kern -.1667em\lower .5ex\hbox {E}\kern -.125emX [12] )</
 opt/texlive/p2010/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></opt/te
 xlive/p2010/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></opt/texlive/
 p2010/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx7.pfb></opt/texlive/p2010/t
@@ -264,9 +290,9 @@ opt/texlive/p2010/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></opt/te
 xlive/p2010/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></opt/texlive/
 p2010/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></opt/texlive/p2010/t
 exmf-dist/fonts/type1/hoekwater/manfnt/manfnt.pfb>
-Output written on sample1.pdf (11 pages, 218012 bytes).
-PDF statistics: 114 PDF objects out of 1000 (max. 8388607)
- 82 compressed objects within 1 object stream
+Output written on sample1.pdf (12 pages, 222125 bytes).
+PDF statistics: 117 PDF objects out of 1000 (max. 8388607)
+ 84 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 131072)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

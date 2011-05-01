@@ -33,7 +33,7 @@
 \def\extract@font{%
     \get@external@font
     \ifnum\pdf@strcmp{\f@encoding}{EU2}=0
-      \expandafter\gjfont\font@name\external@font\relax
+      \expandafter\globaljfont\font@name\external@font\relax
       \font@name\global\zw=\zw\global\zh=\zh
     \else
       \global\expandafter\font\font@name\external@font\relax

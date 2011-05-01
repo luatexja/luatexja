@@ -6,10 +6,10 @@
 {\tengt ■パラメタ代入テスト}
 
 \catcode`\@=11
-\the\luatexja@ykblshift
-\ltjsetparameter{ykbaselineshift=\maxdimen,autoxspacing=false}
-\the\luatexja@ykblshift\ 
-\ltjgetparameter{ykbaselineshift}
+\the\ltj@ykblshift
+\ltjsetparameter{yjabaselineshift=\maxdimen,autoxspacing=false}
+\the\ltj@ykblshift\ 
+\ltjgetparameter{yjabaselineshift}
 
 \ltjgetparameter{kanjiskip},
 \ltjgetparameter{xkanjiskip}
@@ -18,12 +18,12 @@
 \ltjgetparameter{autoxspacing}
 
 \ltjgetparameter{differentjfm}.
-\ltjsetparameter{ykbaselineshift=0pt,autoxspacing=true}
+\ltjsetparameter{yjabaselineshift=0pt,autoxspacing=true}
 
 
-あいうえお{\ltjsetparameter{ykbaselineshift=2pt}かきくけこ}さしすせそ: local
+あいうえお{\ltjsetparameter{yjabaselineshift=2pt}かきくけこ}さしすせそ: local
 
-あいうえお{\globalltjsetparameter{ykbaselineshift=2pt}かきくけこ}さしすせそ: global
+あいうえお{\ltjglobalsetparameter{yjabaselineshift=2pt}かきくけこ}さしすせそ: global
 
 \ltjgetparameter{prebreakpenalty}{`（},
 \ltjgetparameter{prebreakpenalty}{`）},
@@ -39,18 +39,18 @@ a\inhibitglue （a）\inhibitglue aあa〜a
 \medskip
 xspmode
 
-\ltjgetparameter{cjkxspmode}{`（},
-\ltjgetparameter{cjkxspmode}{`）},
-\ltjgetparameter{cjkxspmode}{`あ},
-\ltjgetparameter{cjkxspmode}{`〜}
+\ltjgetparameter{jaxspmode}{`（},
+\ltjgetparameter{jaxspmode}{`）},
+\ltjgetparameter{jaxspmode}{`あ},
+\ltjgetparameter{jaxspmode}{`〜}
 
-\ltjsetparameter{asciixspmode={`\b,inhibit}}
+\ltjsetparameter{alxspmode={`\b,inhibit}}
 あ[あ]あaあbあ
 
-\ltjgetparameter{asciixspmode}{`[},
-\ltjgetparameter{asciixspmode}{`]},
-\ltjgetparameter{asciixspmode}{`a},
-\ltjgetparameter{asciixspmode}{`b}
+\ltjgetparameter{alxspmode}{`[},
+\ltjgetparameter{alxspmode}{`]},
+\ltjgetparameter{alxspmode}{`a},
+\ltjgetparameter{alxspmode}{`b}
 
 {\ltjsetparameter{kanjiskip=0pt plus 1fi minus 1fil}\ltjgetparameter{kanjiskip}\par}
 {x\ltjsetparameter{kanjiskip=0pt plus 1fill minus 1filll}\ltjgetparameter{kanjiskip}\par}
@@ -59,12 +59,21 @@ xspmode
 {\tengt ■合字テスト}
 
 \tenrm
-{\ltjsetparameter{asciixspmode={`i,preonly},ykbaselineshift=0pt}
+{\ltjsetparameter{alxspmode={`i,preonly},yjabaselineshift=0pt}
 あiあfiあffiあ\par}
 
-{\ltjsetparameter{asciixspmode={`f,postonly},ykbaselineshift=0pt}
+{\ltjsetparameter{alxspmode={`f,postonly},yjabaselineshift=0pt}
 あfあfiあffiあ\par}
 
-\ltjsetparameter{asciixspmode={-1,inhibit}}
+\ltjsetparameter{alxspmode={-1,inhibit}}
 あ$a$あ
+
+\medskip
+{\tengt ■ltjgetparameter}
+
+\ltjsetparameter{yalbaselineshift=2pt}
+\edef\yabls{\ltjgetparameter{yalbaselineshift}}
+\ltjsetparameter{yalbaselineshift=3pt}
+\dimen255=\yabls\relax\the\dimen255
+
 \end

@@ -19,14 +19,14 @@ local id_rule = node.id('rule')
 local id_math = node.id('math')
 local id_whatsit = node.id('whatsit')
 
-local attr_jchar_class = luatexbase.attributes['luatexja@charclass']
-local attr_curjfnt = luatexbase.attributes['luatexja@curjfnt']
-local attr_yablshift = luatexbase.attributes['luatexja@yablshift']
-local attr_ykblshift = luatexbase.attributes['luatexja@ykblshift']
-local attr_icflag = luatexbase.attributes['luatexja@icflag']
+local attr_jchar_class = luatexbase.attributes['ltj@charclass']
+local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
+local attr_yablshift = luatexbase.attributes['ltj@yablshift']
+local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
+local attr_icflag = luatexbase.attributes['ltj@icflag']
 -- attr_icflag: 1: kern from \/, 2: 'lineend' kern from JFM
 
-local lang_ja_token = token.create('luatexja@japanese')
+local lang_ja_token = token.create('ltj@japanese')
 local lang_ja = lang_ja_token[2]
 
 -- 
@@ -160,10 +160,10 @@ ltj.int_get_inhibit_xsp_table = cstb_get_inhibit_xsp_table
 
 -- EXT: print parameters that don't need arguments
 function ltj.ext_get_parameter_unary(k)
-   if k == 'yabaselineshift' then
-      tex.write(print_scaled(tex.getattribute('luatexja@yablshift'))..'pt')
-   elseif k == 'ykbaselineshift' then
-      tex.write(print_scaled(tex.getattribute('luatexja@ykblshift'))..'pt')
+   if k == 'yalbaselineshift' then
+      tex.write(print_scaled(tex.getattribute('ltj@yablshift'))..'pt')
+   elseif k == 'yjabaselineshift' then
+      tex.write(print_scaled(tex.getattribute('ltj@ykblshift'))..'pt')
    elseif k == 'kanjiskip' then
       tex.write(print_spec(tex.getskip('kanjiskip')))
    elseif k == 'xkanjiskip' then
@@ -191,7 +191,7 @@ end
 
 -- EXT: print parameters that need arguments
 function ltj.ext_get_parameter_binary(k,c)
-   if k == 'jcharrange' then
+   if k == 'jacharrange' then
       if c<0 or c>216 then c=0 end
       tex.write(rgjc_get_range_setting(c))
    else
@@ -209,7 +209,7 @@ function ltj.ext_get_parameter_binary(k,c)
 	 tex.write(cstb_get_penalty_table('kcat',c))
       elseif k == 'chartorange' then 
 	 tex.write(rgjc_char_to_range(c))
-      elseif k == 'cjkxspmode' or k == 'asciixspmode' then
+      elseif k == 'jaxspmode' or k == 'alxspmode' then
 	 tex.write(cstb_get_inhibit_xsp_table(c))
       end
    end

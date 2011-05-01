@@ -23,8 +23,8 @@ local id_adjust = node.id('adjust')
 local id_math = node.id('math')
 local id_whatsit = node.id('whatsit')
 
-local attr_icflag = luatexbase.attributes['luatexja@icflag']
-local attr_curjfnt = luatexbase.attributes['luatexja@curjfnt']
+local attr_icflag = luatexbase.attributes['ltj@icflag']
+local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 
 local kanji_skip
 local xkanji_skip

@@ -12,28 +12,28 @@
 \mc
 \ltjsetparameter{kanjiskip=0pt plus 0.4pt minus 0.4pt, 
   xkanjiskip=.25\zw plus 1pt minus 1pt,
-  autospacing, autoxspacing, jcharrange={-1}, 
-  yabaselineshift=0pt, ykbaselineshift=0pt,
+  autospacing, autoxspacing, jacharrange={-1}, 
+  yalbaselineshift=0pt, yjabaselineshift=0pt,
   jcharwidowpenalty=500, differentjfm=average
 }
 
 \input luatexja-kinsoku.tex
 
-\luatexja@tempcnta="2000%"
-\loop\ifnum\luatexja@tempcnta<"2070%"
-  \ltjsetparameter{kcatcode={\luatexja@tempcnta,1}}%
-  \advance\luatexja@tempcnta by1
+\ltj@tempcnta="2000%"
+\loop\ifnum\ltj@tempcnta<"2070%"
+  \ltjsetparameter{kcatcode={\ltj@tempcnta,1}}%
+  \advance\ltj@tempcnta by1
 \repeat
 
-\luatexja@tempcnta="3000%"
-\loop\ifnum\luatexja@tempcnta<"3040%"
-  \ltjsetparameter{kcatcode={\luatexja@tempcnta,1}}%
-  \advance\luatexja@tempcnta by1
+\ltj@tempcnta="3000%"
+\loop\ifnum\ltj@tempcnta<"3040%"
+  \ltjsetparameter{kcatcode={\ltj@tempcnta,1}}%
+  \advance\ltj@tempcnta by1
 \repeat
 
-\luatexja@tempcnta="FF00%"
-\loop\ifnum\luatexja@tempcnta<"FFF0%"
-  \ltjsetparameter{kcatcode={\luatexja@tempcnta,1}}%
-  \advance\luatexja@tempcnta by1
+\ltj@tempcnta="FF00%"
+\loop\ifnum\ltj@tempcnta<"FFF0%"
+  \ltjsetparameter{kcatcode={\ltj@tempcnta,1}}%
+  \advance\ltj@tempcnta by1
 \repeat
 \endinput

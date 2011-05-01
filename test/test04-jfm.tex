@@ -12,7 +12,7 @@
 \rml あ\inhibitglue\char"201Cあ←KozMinPr6N-Regular
 
 {\scrollmode
-\gjfont\rml={psft:GothicBBB-Medium:jfm=bad} at 10pt % must be error
+\globaljfont\rml={psft:GothicBBB-Medium:jfm=bad} at 10pt % must be error
 }
 \rml あ123 % \rml は未定義となる
 {\tt\meaning\rml}
@@ -28,12 +28,12 @@
 \ltjdefcharrange{2}{`あ,"E0-"FF}
 「\char"F4」は2番の文字範囲なので，和文扱いのはず
 
-{iso8859-1 和文扱い:\ltjsetparameter{jcharrange={1}}%
-\ltjgetparameter{jcharrange}{1}%
+{iso8859-1 和文扱い:\ltjsetparameter{jacharrange={1}}%
+\ltjgetparameter{jacharrange}{1}%
 § ¶ ° £ ¥ \char"F4}
 
-{iso8859-1 欧文扱い:\ltjsetparameter{jcharrange={-1}}%
-\ltjgetparameter{jcharrange}{1}%
+{iso8859-1 欧文扱い:\ltjsetparameter{jacharrange={-1}}%
+\ltjgetparameter{jacharrange}{1}%
 § ¶ ° £ ¥ \char"F4}
 
 
@@ -49,9 +49,9 @@
 \ltjgetparameter{chartorange}{-1}  % must be error "
 
 \medskip
-\ltjsetparameter{jcharrange={-217}}
+\ltjsetparameter{jacharrange={-217}}
 ほとんど欧文扱い．2番は別（「あ」）
-\ltjsetparameter{jcharrange={218}}
+\ltjsetparameter{jacharrange={218}}
 和文扱いにもどる
 
 \vfill\eject

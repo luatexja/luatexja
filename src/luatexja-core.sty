@@ -4,18 +4,19 @@
 \catcode"FFFFF=14 %"
 
 \input luaotfload.sty
+\input ltxcmds.sty
 \input xkeyval.tex
 \input infwarerr.sty
-\ifdefined\luatexja@loaded\endinput\fi
-\def\luatexja@loaded{hoge}
+\ifdefined\ltj@loaded\endinput\fi
+\def\ltj@loaded{hoge}
 
-\newcount\luatexja@tempcnta
-\newcount\luatexja@tempcntb
-\newcount\luatexja@tempcntc
-\newdimen\luatexja@tempdima
+\newcount\ltj@tempcnta
+\newcount\ltj@tempcntb
+\newcount\ltj@tempcntc
+\newdimen\ltj@tempdima
 
-\newcount\luatexja@autospc
-\newcount\luatexja@autoxspc
+\newcount\ltj@autospc
+\newcount\ltj@autoxspc
 
 \newcount\jcharwidowpenalty
 \newskip\kanjiskip
@@ -26,12 +27,12 @@
 \newdimen\jH \jH=0.25mm
 
 %%%%%%%% Attributes for Japanese typesetting.
-\newluatexattribute\luatexja@curjfnt   % index for ``current Japanese font''
-\newluatexattribute\luatexja@charclass % 
-\newluatexattribute\luatexja@yablshift % attribute for \yabaselineshift
-\newluatexattribute\luatexja@ykblshift % attribute for \ykbaselineshift
-\newluatexattribute\luatexja@icflag    % attribute for italic correction
-\newlanguage\luatexja@japanese
+\newluatexattribute\ltj@curjfnt   % index for ``current Japanese font''
+\newluatexattribute\ltj@charclass % 
+\newluatexattribute\ltj@yablshift % attribute for \yabaselineshift
+\newluatexattribute\ltj@ykblshift % attribute for \ykbaselineshift
+\newluatexattribute\ltj@icflag    % attribute for italic correction
+\newlanguage\ltj@japanese
 
 %%%%%%%% Loading lua files
 \directlua{%
@@ -54,47 +55,48 @@
 
 
 %%%%%%%% Attributes for character ranges
-\luatexja@tempcnta=0
-\loop\ifnum\luatexja@tempcnta<7
+\ltj@tempcnta=0
+\loop\ifnum\ltj@tempcnta<7
   \expandafter\newluatexattribute%
-    \csname luatexja@kcat\the\luatexja@tempcnta\endcsname
-  \csname luatexja@kcat\the\luatexja@tempcnta\endcsname=0
-  \advance\luatexja@tempcnta by1
+    \csname ltj@kcat\the\ltj@tempcnta\endcsname
+  \csname ltj@kcat\the\ltj@tempcnta\endcsname=0
+  \advance\ltj@tempcnta by1
 \repeat
 
 %%%%%%%% \asluastring
 \def\asluastring#1{'\luaescapestring{\detokenize{#1}}'}
 
 %%%%%%%% Redefine \/
-%\let\luatexja@ic=\/ \protected\def\/{{\luatexja@icflag=1\luatexja@ic}}
+%\let\ltj@ic=\/ \protected\def\/{{\ltj@icflag=1\ltj@ic}}
 \protected\def\/{\directlua{ltj.ext_append_italic()}}
 
-%%%%%%%% \jfont\CS={...:...;jfm=metric;...}, \gjfont
-\def\jfont{\afterassignment\ltj@@jfont\directlua{ltj.ext_jfontdefX(false)}}
-\def\gjfont{\afterassignment\ltj@@jfont\directlua{ltj.ext_jfontdefX(true)}}
+%%%%%%%% \jfont\CS={...:...;jfm=metric;...}, \globaljfont
+\protected\def\jfont{\afterassignment\ltj@@jfont\directlua{ltj.ext_jfontdefX(false)}}
+\protected\def\globaljfont{%
+  \afterassignment\ltj@@jfont\directlua{ltj.ext_jfontdefX(true)}}
 \def\ltj@@jfont{\directlua{ltj.ext_jfontdefY()}}
 
 %%%%%%%% \inhibitglue
-\def\inhibitglue{\directlua{ltj.ext_create_inhibitglue_node()}}
+\protected\def\inhibitglue{\directlua{ltj.ext_create_inhibitglue_node()}}
 
 %%%%%%%% \ltjdefcharrange<name>{100-200,3000-,5000,...}
-\def\ltjdefcharrange#1#2{%
-  \luatexja@tempcntc=#1 \expandafter\ltj@@dcrange#2,,\ignorespaces}
+\protected\def\ltjdefcharrange#1#2{%
+  \ltj@tempcntc=#1 \expandafter\ltj@@dcrange#2,,\ignorespaces}
 \def\ltj@@dcrange#1,{\def\ltj@temp{#1}%
   \ifx\ltj@temp\empty\let\@next=\relax\else
   \ltj@@dcrangeA{#1}\let\@next=\ltj@@dcrange\fi\@next}
 \def\ltj@@dcrangeA#1{\ltj@@dcrangeB#1--\@nil}
 \def\ltj@@dcrangeB#1-#2-#3\@nil{\def\ltj@temp{#3}%
   \ifx\ltj@temp\empty
-    \luatexja@tempcnta=#1 \luatexja@tempcntb=\luatexja@tempcnta
+    \ltj@tempcnta=#1 \ltj@tempcntb=\ltj@tempcnta
   \else
     \def\ltj@temp{#1}%
-    \ifx\ltj@temp\empty\luatexja@tempcnta='200 \else\luatexja@tempcnta=#1 \fi
+    \ifx\ltj@temp\empty\ltj@tempcnta='200 \else\ltj@tempcnta=#1 \fi
     \def\ltj@temp{#2}%
-    \ifx\ltj@temp\empty\luatexja@tempcntb="10FFFF \else\luatexja@tempcntb=#2 \fi%"
+    \ifx\ltj@temp\empty\ltj@tempcntb="10FFFF \else\ltj@tempcntb=#2 \fi%"
   \fi
-  \directlua{ltj.ext_add_char_range(\the\luatexja@tempcnta,\the\luatexja@tempcntb,
-    \the\luatexja@tempcntc)}%
+  \directlua{ltj.ext_add_char_range(\the\ltj@tempcnta,\the\ltj@tempcntb,
+    \the\ltj@tempcntc)}%
   }
 
 %%%%%%%% \ltjsetparameter
@@ -109,51 +111,52 @@
 \define@key[ltj]{japaram}{postbreakpenalty}{%
   \expandafter\ltj@@set@stack#1:{post}{-10000}{10000}}
 \def\ltj@@set@stack#1,#2:#3#4#5{%
-  \luatexja@tempcnta=#1\relax \luatexja@tempcntb=#2\relax
+  \ltj@tempcnta=#1\relax \ltj@tempcntb=#2\relax
   \directlua{ltj.ext_set_stack_table(ltj.isglobal, \asluastring{#3},
-    \the\luatexja@tempcnta,tex.getcount('luatexja@tempcntb'),#4,#5)}}
+    \the\ltj@tempcnta,tex.getcount('ltj@tempcntb'),#4,#5)}}
 
-% yabaselineshift = <dimen>
-\define@key[ltj]{japaram}{yabaselineshift}{%
-  \luatexja@tempdima=#1\relax%
+% yalbaselineshift = <dimen>
+% yjabaselineshift = <dimen>
+\define@key[ltj]{japaram}{yalbaselineshift}{%
+  \ltj@tempdima=#1\relax%
   \directlua{tex.setattribute(ltj.isglobal, 
-    luatexbase.attributes['luatexja@yablshift'],
-    tex.getdimen('luatexja@tempdima'))}}
-\define@key[ltj]{japaram}{ykbaselineshift}{%
-  \luatexja@tempdima=#1\relax%
+    luatexbase.attributes['ltj@yablshift'],
+    tex.getdimen('ltj@tempdima'))}}
+\define@key[ltj]{japaram}{yjabaselineshift}{%
+  \ltj@tempdima=#1\relax%
   \directlua{tex.setattribute(ltj.isglobal, 
-    luatexbase.attributes['luatexja@ykblshift'],
-    tex.getdimen('luatexja@tempdima'))}}
+    luatexbase.attributes['ltj@ykblshift'],
+    tex.getdimen('ltj@tempdima'))}}
 
-% cjkxspmode = {<char_code>, <mode>}
+% jaxspmode = {<char_code>, <mode>}
 % mode: inhibit, preonly, postonly, allow
 %    or       0        2         1      3
-\define@key[ltj]{japaram}{cjkxspmode}{%        \inhibitxspcode
-  \expandafter\ltj@set@cjkxspmode#1:\relax}
-\def\ltj@set@cjkxspmode#1,#2:{%
+\define@key[ltj]{japaram}{jaxspmode}{%        \inhibitxspcode
+  \expandafter\ltj@set@jaxspmode#1:\relax}
+\def\ltj@set@jaxspmode#1,#2:{%
   \lowercase{\edef\ltj@temp{#2}}%
   \def\ltj@tempa{inhibit}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{0}\fi
   \def\ltj@tempa{preonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{2}\fi
   \def\ltj@tempa{postonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{1}\fi
   \def\ltj@tempa{allow}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{3}\fi
-  \luatexja@tempcnta=#1\relax\luatexja@tempcntb=\ltj@temp\relax
-  \directlua{ltj.ext_set_stack_table(ltj.isglobal, 'xsp', \the\luatexja@tempcnta,
-    \the\luatexja@tempcntb,0,3)}}
+  \ltj@tempcnta=#1\relax\ltj@tempcntb=\ltj@temp\relax
+  \directlua{ltj.ext_set_stack_table(ltj.isglobal, 'xsp', \the\ltj@tempcnta,
+    \the\ltj@tempcntb,0,3)}}
 
-% asciixspmode = {<char_code>, <mode>}
+% alxspmode = {<char_code>, <mode>}
 % mode: inhibit, preonly, postonly, allow
 %    or       0        1         2      3
-\define@key[ltj]{japaram}{asciixspmode}{%        \inhibitxspcode
-  \expandafter\ltj@set@asciixspmode#1:\relax}
-\def\ltj@set@asciixspmode#1,#2:{%
+\define@key[ltj]{japaram}{alxspmode}{%        \inhibitxspcode
+  \expandafter\ltj@set@alxspmode#1:\relax}
+\def\ltj@set@alxspmode#1,#2:{%
   \lowercase{\edef\ltj@temp{#2}}%
   \def\ltj@tempa{inhibit}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{0}\fi
   \def\ltj@tempa{preonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{1}\fi
   \def\ltj@tempa{postonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{2}\fi
   \def\ltj@tempa{allow}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{3}\fi
-  \luatexja@tempcnta=#1\relax\luatexja@tempcntb=\ltj@temp\relax
-  \directlua{ltj.ext_set_stack_table(ltj.isglobal, 'xsp', \the\luatexja@tempcnta,
-    \the\luatexja@tempcntb,0,3)}}
+  \ltj@tempcnta=#1\relax\ltj@tempcntb=\ltj@temp\relax
+  \directlua{ltj.ext_set_stack_table(ltj.isglobal, 'xsp', \the\ltj@tempcnta,
+    \the\ltj@tempcntb,0,3)}}
 
 % autospacing = <bool> (default: true)
 \define@boolkey[ltj]{japaram}{autospacing}[true]{%
@@ -193,41 +196,45 @@
   % large, small, average, both
 
 
-% jcharrange = { +-<range_number> }
-\define@key[ltj]{japaram}{jcharrange}{\expandafter\ltj@@scrange#1,,}
+% jacharrange = { +-<range_number> }
+\define@key[ltj]{japaram}{jacharrange}{\expandafter\ltj@@scrange#1,,}
 \def\ltj@@scrange#1,{%
   \edef\ltj@temp{#1}%
   \ifx\ltj@temp\empty\let\next=\relax\else\let\next=\ltj@@scrange
-    \luatexja@tempcnta=#1 \directlua{ltj.ext_toggle_char_range(%
-      ltj.is_global,\the\luatexja@tempcnta)}%
+    \ltj@tempcnta=#1 \directlua{ltj.ext_toggle_char_range(%
+      ltj.is_global,\the\ltj@tempcnta)}%
   \fi\next
 }
 
-
-
-
-
-\def\ltjsetparameter#1{\directlua{ltj.isglobal=''}%
+\protected\def\ltjsetparameter#1{\directlua{ltj.isglobal=''}%
   \setkeys[ltj]{japaram}{#1}\ignorespaces}
-\def\globalltjsetparameter#1{\directlua{ltj.isglobal='global'}%
+\protected\def\ltjglobalsetparameter#1{\directlua{ltj.isglobal='global'}%
   \setkeys[ltj]{japaram}{#1}\ignorespaces}
 
 %%%%%%%% 
-\def\ltjgetparameter#1{%
-  \lowercase{\edef\ltj@temp{#1}}\let\@next=\ltj@@getparam@one%
-  \def\ltj@tempa{prebreakpenalty}\ifx\ltj@temp\ltj@tempa\let\@next=\ltj@@getparam@two\fi
-  \def\ltj@tempa{postbreakpenalty}\ifx\ltj@temp\ltj@tempa\let\@next=\ltj@@getparam@two\fi
-  \def\ltj@tempa{cjkxspmode}\ifx\ltj@temp\ltj@tempa\let\@next=\ltj@@getparam@two\fi
-  \def\ltj@tempa{asciixspmode}\ifx\ltj@temp\ltj@tempa\let\@next=\ltj@@getparam@two\fi
-  \def\ltj@tempa{kcatcode}\ifx\ltj@temp\ltj@tempa\let\@next=\ltj@@getparam@two\fi
-  \def\ltj@tempa{jcharrange}\ifx\ltj@temp\ltj@tempa\let\@next=\ltj@@getparam@two\fi
-  \def\ltj@tempa{chartorange}\ifx\ltj@temp\ltj@tempa\let\@next=\ltj@@getparam@two\fi
-  \@next
+\def\ltj@@decl@array@param#1{%
+  \expandafter\let\csname ltj@@array@param/#1\endcsname=t%
 }
-\def\ltj@@getparam@one{\directlua{ltj.ext_get_parameter_unary('\ltj@temp')}}
-\def\ltj@@getparam@two#1{%
-  \luatexja@tempcnta=#1
-  \directlua{ltj.ext_get_parameter_binary('\ltj@temp', \the\luatexja@tempcnta)}
+\ltj@@decl@array@param{prebreakpenalty}
+\ltj@@decl@array@param{postbreakpenalty}
+\ltj@@decl@array@param{jaxspmode}
+\ltj@@decl@array@param{alxspmode}
+\ltj@@decl@array@param{kcatcode}
+\ltj@@decl@array@param{jacharrange}
+\ltj@@decl@array@param{chartorange}
+\def\ltjgetparameter#1{%
+  \ifcsname ltj@@array@param/#1\endcsname
+    \expandafter\ltx@firstoftwo
+  \else
+    \expandafter\ltx@secondoftwo
+  \fi
+  {\ltj@@getparam@two{#1}}%
+  {\ltj@@getparam@one{#1}}%
+}
+\def\ltj@@getparam@one#1{%
+  \directlua{ltj.ext_get_parameter_unary('#1')}}
+\def\ltj@@getparam@two#1#2{\ltj@tempcnta=#2
+  \directlua{ltj.ext_get_parameter_binary('#1', \the\ltj@tempcnta)}
 }
 
 
