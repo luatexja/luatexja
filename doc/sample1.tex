@@ -40,13 +40,17 @@
 \item {\bf 現時点で\LaTeX での使用は殆ど考慮されていません．今は``plain Lua\TeX''で使ってください．}
 \item |\accent|を和文文字に対して使うことはできません．
 これは「フォントを後で置換する」という実装上，仕方のないことだと思われます．
-{\small|\/|を試験的に日本語にも対応させました．|make_accent|の処理をLuaコードで書けば可能だと思われます．}
+{\small|\/|を試験的に日本語にも対応させました．
+アクセントも，|make_accent|の処理をLuaコードで書けば可能だと思われます．}
 \item 数式中の日本語は想定していません．|\hbox|か何かで囲ってください．
 \item p\TeX にあった以下の機能はまだ実装していません．
 \itemitem |\euc|, |\jis|, |\sjis|, |\kuten|といった，コード変換プリミティブ．
 \itemitem |\kansuji|, |\kansujichar|.
-\itemitem |\showmode|, |\jfam|, |\jcharwidowpenalty|.
+\itemitem |\showmode|, |\jfam|.
 \itemitem 縦組み関連一式．|\tate|, |\tfont|, |\tbaselineshift|, |\dtou|,$\,\ldots$
+
+\item 和文間・和欧文間空白の自動挿入がglobalでしかできていません．
+←解決はさほど難しくないので，仕様を決定した後に書き上げます．
 \enditem
 
 
@@ -208,7 +212,8 @@ p\TeX の|\inhibitxspcode|に対応した設定項目である．<mode>で許さ
 \itemitem |3|, |allow|: 前後の和文文字との間の|\xkanjiskip|自動挿入を許可．
 
 \item |yalbaselineshift=<dimen>|:
-p\TeX の|\baselineshift|に対応したものであり，欧文文字のベースライン補正量をdimensionで指定する．
+p\TeX の|\ybaselineshift|に対応したものであり，
+欧文文字のベースライン補正量をdimensionで指定する．
 \itemitem 正の値を指定すると，その分だけ欧文文字は下にずれることとなる．
 \itemitem 数式中では，boxやruleもこの量だけずれる\hfil\break
 （よって，行中数式は全体が|yalbaselineshift|だけずれたように見える）．
@@ -299,53 +304,103 @@ glue/kern挿入処理で役目を終え，削除される）\inhibitglue}．
 
 \beginsection JFMについて
 
-Lua\TeX-jaで用いる和文用のメトリック情報は，次のような構文で書かれたLuaファイルである．
+Lua\TeX-jaで用いる和文用のメトリック情報は，次のようなLuaファイルである．
 見本として，|jfm-ujis.lua|を入れてある．
 
-\item |jfm.dir|: 組方向を指定する．将来的にはいずれ縦組（|'tate'|）を実装したいが，
-現時点では横組（|'yoko'|）のみの対応．
-\item |jfm.zw|, |jfm.zh|: それぞれ|\zw|, |\zh|のフォントサイズに対する割合を記述する．
-通常は両方とも1.0となるだろう．
-\item |jfm.define_char_type(<class>, <chars>)|
+\begintt
+ltj.define_jfm {
+   dir = 'yoko', zw = 1.0, zh = 1.0,
+   [0] = {
+      align = 'left', left = 0.0, down = 0.0,
+      width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
+      glue = {
+         [1] = { 0.5 , 0.0, 0.5  },  [3] = { 0.25, 0.0, 0.25 }
+      }
+   }, ...
+  [1] = {
+      chars = {
+         0x2018, 0x201C, 0x3008, 0x300A, 0x300C, 0x300E, 0x3010, 0x3014, 
+         0x3016, 0x3018, 0x301D, 0xFF08, 0xFF3B, 0xFF5B, 0xFF5F
+      },
+      align = 'right', left = 0.0, down = 0.0, ...
+   }, ...
+   [5] = {
+      ..., 
+      glue = {
+         [1] = { 0.5 , 0.0, 0.5  },
+         [3] = { 0.25, 0.0, 0.25 }
+      },
+      kern = { [5] = 0.0 }
+   }, ...
+}
+\endtt
 
-p\TeX 用{\tt JFM}で言うところの「文字クラス」を定義する．
-\itemitem <class>は文字クラスを表す1以上$\hbox{\tt0x800}=2048$未満の整数．
-\itemitem <chars>には，<class>に属する「文字」達のUnicodeにおけるコード番号を
+全体は，「関数|ltj.define_jfm|にテーブルを引数として与える」という構造になっている．
+以下に，テーブルの中身を述べる．
+\item |dir|: 組方向を指定する．将来的にはいずれ縦組（|'tate'|）を実装したいが，
+現時点では横組（|'yoko'|）のみの対応．
+\item |zw|, |zh|: それぞれ|\zw|, |\zh|のフォントサイズに対する割合を記述する（必須）．
+通常は両方とも1.0となるだろう．
+\item 数字のindex $i$を持った値：$i$番の文字クラスについての情報を記述する．
+\itemitem |glue|: 現在の文字クラスの文字の後に挿入するglueを指定する．
+この項目の内容は
+\begintt
+{ [<j>] = { <width>, <stretch>, <shrink> }, ... }
+\endtt
+というテーブルであり，各要素は
+
+{\par\medskip\advance\leftskip3\zw\noindent\rightskip2\zw
+$i$番の文字クラスの文字と$j$番の文字クラスの文字の間に，
+自然長<width>，伸び<stretch>, 縮み<shrink>（フォントサイズ基準）なる
+glueを挿入
+\par\medskip}
+
+\noindent という意味である．
+
+\itemitem |kern|: 現在の文字クラスの文字の後に挿入するkernを指定する．
+この項目の内容も，
+\begintt
+{ [<j>] = <width>, ... }
+\endtt
+というテーブルであり，各要素は
+
+{\par\medskip\advance\leftskip3\zw\noindent\rightskip2\zw
+$i$番の文字クラスの文字と$j$番の文字クラスの文字の間に，\hfil\break
+幅<width>のkernを挿入
+\par\medskip}
+
+\noindent という意味である．
+
+\itemitem |chars|: 文字クラスに属する「文字」達のUnicodeにおけるコード番号を
 リストの形|{...}|で記述する．
-\itemitem どの文字クラスにも属さなかった文字は，自動的に0番の文字クラスに属するとみなされる．
+どの文字クラスにも属さなかった文字は，0番の文字クラスに属するとみなされる．
+そのため，0番以外の文字クラスではこの項目は必須である．
 
 また，このリストには，以下の「仮想的な文字」も指定可能である．
 \itemT |'lineend'|: 行末．
 この「文字」を0以外の文字クラスに設定することで，ぶら下げ組のような組版も可能になる．
-例えば，句点類の文字クラスが2のとき，
-\begintt
-  jfm.define_char_type(8,{'linebdd'}})
-  jfm.define_kern(2, 8, -0.5)
-\endtt
-と指定すればよい．
 \itemT |'boxbdd'|: 水平ボックスの先頭/末尾，段落の先頭/末尾．
 \itemT |'jcharbdd'|: 和文文字達の連続とそれ以外のもの（例えば欧文文字）との境界．
 \itemT |'diffmet'|: 異なるメトリックの和文文字間に入るglueの計算に使われる．
+\enditem
 
-\item |jfm.define_type_dim(<class>,<left>,<down>,<width>,<height>,<depth>,<italic>)|
+\noindent {\bf 
+以下の3項目は，文字クラスに属する文字が「仮想的な文字」達だけでない場合に必須．}
 
-文字クラス<class>ごとに，文字の寸法のフォントサイズに対する割合を記述する．
-\itemitem <left>: 例えば開き括弧類は組版をする際には半角幅だが，TrueTypeフォント内では
-左に半角空白が付け加わって全角幅となっていることが多い．このような場合，逆に
-TrueTypeフォントを基準にすると，「左に半角幅ずらす」ことをしないといけない．
-<left>はその「左へのずらし量」を指定する．
-\itemitem <down>: 同様に，「下へのずらし量」を指定する．
-\itemitem <width>, <height>, <depth>: それぞれ幅，高さ，深さ．
-\itemitem <italic>: イタリック補正値（未実装）．
+\itemitem |align|: |'left'|, |'middle'|, |'right'|のどれかを指定する．
 
-\item |jfm.define_glue(<bclass>, <aclass>, <width>, <stretch>, <shrink>)|
+例えば，開き括弧類は組版をする際には半角幅だが，TrueTypeフォント内では
+左に半角空白が付け加わって全角幅となっていることが多い．そのような場合，
+|align='right'|と指定することで，
+「半角幅の領域に（右詰めで）フォントの実際の字形を入れる」といったことができる．
 
-文字クラス<bclass>の文字と<aclass>の文字の間に，自然長<width>，伸び<stretch>, 縮み<shrink>
-（いずれもフォントサイズ基準）のglueを挿入する．
+\itemitem |width|, |height|, |depth|, |italic|: 
+それぞれ幅，高さ，深さ，そしてイタリック補正値をフォントサイズに対する割合で指定する．
+例外として，|width='prop'|の場合には，その文字クラスは特に幅を定めず，
+実際のフォントにおける文字幅そのままで出力する．
 
-\item |jfm.define_kern(<bclass>, <aclass>, <width>)|
-
-文字クラス<bclass>の文字と<aclass>の文字の間に，幅<width>のkernを挿入．
+\itemitem |left|, |down|: それぞれ左右，上下方向のずらし量を指定する．
+|align|項目のため，|left|はほとんどの場合0で良いだろう．
 
 \enditem
 

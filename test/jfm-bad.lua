@@ -1,8 +1,9 @@
-jfm.dir = 'yoko2' -- bad
+ltj.define_jfm {
+   dir = 'yoko2',
+   zw = 1.0, zh = 1.0,
 
-jfm.zw= 1.0; jfm.zh = 1.0
-
--- character type
--- jfm.define_char_type(<type>, <letters>)
-
-jfm.define_type_dim(0, 0.0 , 0.0 , 1.0 , 0.88, 0.12, 0.0)
+   [0] = {
+      align = 'left', left = 0.0, down = 0.0,
+      width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
+   }
+}

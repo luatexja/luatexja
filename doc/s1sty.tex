@@ -93,7 +93,8 @@
 \belowdisplayskip=\medskipamount
 \belowdisplayshortskip=\medskipamount
 %
-\outer\def\begintt{$$\let\par=\endgraf \ttverbatim\parskip=0pt\catcode`\|=0 \rightskip-5pc\ttfinish}
+\outer\def\begintt{$$\let\par=\endgraf\baselineskip=12pt
+\ttverbatim\parskip=0pt\catcode`\|=0 \rightskip-5pc\ttfinish}
 {\catcode`\|=0 |catcode`|\=\other% | is temporary escape character
 |obeylines% end of line is active
 |gdef|ttfinish#1^^M#2\endtt{#1|parindent3|zw|noindent|vbox{#2}|hss|endgroup$$}}

@@ -291,36 +291,36 @@ end
 
 local function main2_find_size_metric(px)
    if is_japanese_glyph_node(px) then
-      return ltj.font_metric_table[px.font].size, ltj.font_metric_table[px.font].jfm
+      return ltj.font_metric_table[px.font].size, 
+      ltj.font_metric_table[px.font].jfm, ltj.font_metric_table[px.font].var
    else 
-      return nil, nil
+      return nil, nil, nil
    end
 end
 
 local function main2_new_jfm_glue(size,mt,bc,ac)
 -- mt: metric key, bc, ac: char classes
    local g=nil
-   local w=bc*0x800+ac
-   local z = ltj.metrics[mt]
-   if z.glue[w] then
+   local z = ltj.metrics[mt].char_type[bc]
+   if z.glue and z.glue[ac] then
       local h = node_new(id_glue_spec)
-      h.width   = round(size*z.glue[w][0])
-      h.stretch = round(size*z.glue[w][1])
-      h.shrink  = round(size*z.glue[w][2])
+      h.width   = round(size*z.glue[ac][1])
+      h.stretch = round(size*z.glue[ac][2])
+      h.shrink  = round(size*z.glue[ac][3])
       h.stretch_order=0; h.shrink_order=0
       g = node_new(id_glue)
       g.subtype = 0; g.spec = h
-   elseif z.kern[w] then
+   elseif z.kern and z.kern[ac] then
       g = node_new(id_kern)
-      g.subtype = 1; g.kern = round(size*z.kern[w])
+      g.subtype = 1; g.kern = round(size*z.kern[ac])
    end
    return g
 end
 
 -- return value: g (glue/kern from JFM), w (width of 'lineend' kern)
-local function main2_calc(qs,qm,q,p,last,ihb_flag)
+local function main2_calc(qs,qm,qv,q,p,last,ihb_flag)
    -- q, p: node (possibly null)
-   local ps, pm, g, h
+   local ps, pm, pv, g, h
    local w = 0
    if (not p) or p==last then
       -- q is the last node
@@ -333,7 +333,7 @@ local function main2_calc(qs,qm,q,p,last,ihb_flag)
       end
    elseif qs==0 then
       -- p is the first node etc.
-      ps, pm = main2_find_size_metric(p)
+      ps, pm, pv = main2_find_size_metric(p)
       if not pm then
 	 return nil, 0
       elseif not ihb_flag then 
@@ -342,10 +342,10 @@ local function main2_calc(qs,qm,q,p,last,ihb_flag)
 				has_attr(p,attr_jchar_class))
       end
    else -- p and q are not nil
-      ps, pm = main2_find_size_metric(p)
+      ps, pm, pv = main2_find_size_metric(p)
       if ihb_flag or ((not pm) and (not qm)) then 
 	 g = nil
-      elseif (qs==ps) and (qm==pm) then 
+      elseif (qs==ps) and (qm==pm) and (qv==pv) then 
 	 -- Both p and q are Japanese glyph nodes, and same metric and size
 	 g = main2_new_jfm_glue(ps,pm,
 				has_attr(q,attr_jchar_class),
@@ -374,9 +374,9 @@ local function main2_calc(qs,qm,q,p,last,ihb_flag)
    if qm then
       local x = ljfm_find_char_class('lineend', qm)
       if x~=0  then
-	 x = has_attr(q,attr_jchar_class)*0x800 + x
-	 if ltj.metrics[qm].kern[x] then 
-	    w = round(qs*ltj.metrics[qm].kern[x])
+	 qv = ltj.metrics[qm].char_type[has_attr(q,attr_jchar_class)]
+	 if qv.kern and qv.kern[x] then 
+	    w = round(qs*qv.kern[x])
 	 end
       end
    end
@@ -386,11 +386,11 @@ end
 
 local function main2_between_two_char(head,q,p,p_bp,ihb_flag,last)
    local qs = 0; local g, w
-   local qm = nil
+   local qm = nil, qv
    if q then
-      qs, qm = main2_find_size_metric(q)
+      qs, qm, qv = main2_find_size_metric(q)
    end
-   g, w = main2_calc(qs, qm, q, p, last, ihb_flag)
+   g, w = main2_calc(qs, qm, qv, q, p, last, ihb_flag)
    if w~=0 and (not p_bp) then
       p_bp = node_new(id_penalty); p_bp.penalty = 0
       head = node_insert_before(head, p, p_bp)
@@ -557,7 +557,7 @@ end
 
 local function main4_set_ja_width(head)
    local p = head
-   local met_tb, t, s, g, th, q, a
+   local met_tb, t, s, g, q, a, h
    local m = false -- is in math mode?
    while p do
       local v=has_attr(p,attr_yablshift) or 0
@@ -567,15 +567,21 @@ local function main4_set_ja_width(head)
 	    met_tb = ltj.font_metric_table[p.font]
 	    t = ltj.metrics[met_tb.jfm]
 	    s = t.char_type[has_attr(p,attr_jchar_class)]
-	    if not(s.left==0.0 and s.down==0.0 
+	    if s.width ~= 'prop' and
+	       not(s.left==0.0 and s.down==0.0 and s.align=='left' 
 		   and round(s.width*met_tb.size)==p.width) then
 	       -- must be encapsuled by a \hbox
 	       head, q = node.remove(head,p)
 	       p.next=nil
 	       p.yoffset=round(p.yoffset-met_tb.size*s.down)
 	       p.xoffset=round(p.xoffset-met_tb.size*s.left)
-	       node_insert_after(p, p, main4_get_hss())
-	       g = node_hpack(p, round(met_tb.size*s.width), 'exactly')
+	       if s.align=='middle' or s.align=='right' then
+		  h = node_insert_before(p, p, main4_get_hss())
+	       else h=p end
+	       if s.align=='middle' or s.align=='left' then
+		  node_insert_after(h, p, main4_get_hss())
+	       end
+	       g = node_hpack(h, round(met_tb.size*s.width), 'exactly')
 	       g.height = round(met_tb.size*s.height)
 	       g.depth = round(met_tb.size*s.depth)
 	       head, p = node_insert_before(head, q, g)

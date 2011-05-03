@@ -3,13 +3,16 @@
 
 \def\head#1{\medskip\noindent{\bf\tengt ■ #1}\par}
 \jfont\rml={psft:Ryumin-Light:jfm=ujis} at 10pt
-\rml あ\inhibitglue\char"201Cあ←Ryumin-Light
+\rml あ\inhibitglue\char"201Cあ・い←Ryumin-Light
 
 \jfont\rml={file:ipam.ttf:jfm=ujis} at 10pt
-\rml あ\inhibitglue\char"201Cあ←ipam
+\rml あ\inhibitglue\char"201Cあ・い←IPA\hbox{}明朝 (ipam)
 
 \jfont\rml={file:KozMinPr6N-Regular.otf:jfm=ujis} at 10pt
-\rml あ\inhibitglue\char"201Cあ←KozMinPr6N-Regular
+\rml あ\inhibitglue\char"201Cあ・い←KozMinPr6N-Regular
+
+\jfont\rml={file:ipamp.ttf:jfm=ujis} at 10pt
+\rml あ\inhibitglue\char"201Cあ・い←IPA P\hbox{}明朝 (ipamp)
 
 {\scrollmode
 \globaljfont\rml={psft:GothicBBB-Medium:jfm=bad} at 10pt % must be error
@@ -38,9 +41,9 @@
 
 
 \head{文字範囲の状況取得}
-\ltjgetparameter{jcharrange}{0}
-\ltjgetparameter{jcharrange}{1}
-\ltjgetparameter{jcharrange}{2}
+\ltjgetparameter{jacharrange}{0}
+\ltjgetparameter{jacharrange}{1}
+\ltjgetparameter{jacharrange}{2}
 
 \head{文字コード→文字範囲}
 \ltjgetparameter{chartorange}{`い} % must be 217
@@ -54,9 +57,16 @@
 \ltjsetparameter{jacharrange={218}}
 和文扱いにもどる
 
+↓「あ」「い」「う」「お」以外はプロポーショナル組（IPA P明朝）
+
+\jfont\rmlh={file:ipamp.ttf:jfm=hang} at 10pt
+\rmlh プロポーショナルのテスト！あいうえおさ，かき・くけこ
+
+
+
 \vfill\eject
-\jfont\rmlh={psft:Ryumin-Light:jfm=hang} at 10pt
 \head{‘lineend’検証}
+\jfont\rmlh={psft:Ryumin-Light:jfm=hang} at 10pt
 \jfont\sixgt={psft:GothicBBB-Medium:jfm=ujis} at 6pt
 \font\sixtt=cmtt10 at 6pt
 

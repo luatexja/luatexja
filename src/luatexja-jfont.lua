@@ -15,53 +15,55 @@ local id_kern = node.id('kern')
 ltj.metrics={} -- this table stores all metric informations
 ltj.font_metric_table={} -- [font number] -> jfm_name, jfm_var, size
 
-jfm={}; jfm.char_type={}; jfm.glue={}; jfm.kern={}; jfm.chars = {}
-
-local ljfm_jfm_cons
 local jfm_file_name, jfm_var
+local defjfm_res
 
-function jfm.define_char_type(t,lt) 
-   if not jfm.char_type[t] then jfm.char_type[t]={} end
-   jfm.char_type[t].chars=lt 
-   for i,v in pairs(lt) do
-      if v == 'linebdd' then
-	 if #lt ~= 1 then ljfm_jfm_cons = false; return end
-      elseif not jfm.chars[v] then 
-	 jfm.chars[v] = t 
-      else 
-	 ljfm_jfm_cons = false ; return
+function ltj.define_jfm(t)
+   local real_char -- Does current character class have the 'real' character?
+   if t.dir~='yoko' then
+      defjfm_res= nil; return
+   elseif type(t.zw)~='number' or type(t.zh)~='number' then 
+      defjfm_res= nil; return
+   end
+   t.char_type = {}; t.chars = {}
+   for i,v in pairs(t) do
+      if type(i) == 'number' then -- char_type
+	 if not v.chars then
+	    if i ~= 0 then defjfm_res= nil; return  end
+	    real_char = true
+	 else
+	    real_char = false
+	    for j,w in pairs(v.chars) do
+	       if w == 'lineend' then
+		  if #v.chars ~= 1 then defjfm_res= nil; return end
+	       elseif type(w) == 'number' then
+		  real_char = true
+	       end
+	       if not t.chars[w] then
+		  t.chars[w] = i
+	       else 
+		  defjfm_res= nil; return
+	       end
+	    end
+	    if real_char then
+	       if not (type(v.width)=='number' or v.width~='prop') then
+		  defjfm_res= nil; return
+	       elseif type(v.height)~='number' or type(v.depth)~='number' then
+		  defjfm_res= nil; return
+	       end
+	    end
+	    v.chars = nil
+	 end
+	 if v.kern then
+	    for j,w in pairs(v.glue) do
+	       if v.kern[j] then defjfm_res= nil; return end
+	    end
+	 end
+	 t.char_type[i] = v
+	 t[i] = nil
       end
    end
-end
-function jfm.define_type_dim(t,l,x,w,h,d,i)
-   if not jfm.char_type[t] then jfm.char_type[t]={} end
-   jfm.char_type[t].width=w; jfm.char_type[t].height=h;
-   jfm.char_type[t].depth=d; jfm.char_type[t].italic=i; 
-   jfm.char_type[t].left=l; jfm.char_type[t].down=x
-end
-function jfm.define_glue(b,a,w,st,sh)
-   local j=b*0x800+a
-   if not jfm.glue[j] then jfm.glue[j]={} end
-   jfm.glue[j][0]=w; jfm.glue[j][1]=st; 
-   jfm.glue[j][2]=sh
-end
-function jfm.define_kern(b,a,w)
-   local j=b*0x800+a
-   if not jfm.kern[j] then jfm.kern[j]=w end
-end
-
--- return nil iff ltj.metrics[ind] is a bad metric
-local function ljfm_consistency_check(ind)
-   local t = ltj.metrics[ind]
-   local r = nil
-   if ljfm_jfm_cons then r = ind end
-   if t.dir~='yoko' then -- TODO: tate?
-      r=nil
-   elseif type(t.zw)~='number' or type(t.zh)~='number' then 
-      r=nil -- .zw, .zh must be present
-   end
-   if not r then ltj.metrics[ind] = nil end
-   return r
+   defjfm_res= t
 end
 
 local function ljfm_find_char_class(c,m)
@@ -78,22 +80,17 @@ local function ljfm_load_jfont_metric()
 		 [2]="The JFM 'ujis' will be  used for now."})
       jfm_file_name='ujis'
    end
-   local name=jfm_file_name .. ':' .. jfm_var
-   local i = nil
    for j,v in ipairs(ltj.metrics) do 
-      if v.name==name then i=j; break end
+      if v.name==jfm_file_name then return j end
    end
-   local t = {}
-   if i then  return i end
-   jfm.char_type={}; jfm.glue={}; jfm.kern={}; jfm.chars = {}
-   ljfm_jfm_cons = true
    ltj.loadlua('jfm-' .. jfm_file_name .. '.lua')
-   t.name=name
-   t.dir=jfm.dir; t.zw=jfm.zw; t.zh=jfm.zh
-   t.char_type=jfm.char_type; t.chars=jfm.chars
-   t.glue=jfm.glue; t.kern=jfm.kern
-   table.insert(ltj.metrics,t)
-   return ljfm_consistency_check(#ltj.metrics)
+   if defjfm_res then
+      defjfm_res.name = jfm_file_name
+      table.insert(ltj.metrics,defjfm_res)
+      return #ltj.metrics
+   else 
+      return nil
+   end
 end
 
 
@@ -124,7 +121,9 @@ function ltj.ext_jfontdefY() -- for horizontal font
      return 
    end
    ltj.font_metric_table[fn]={}
-   ltj.font_metric_table[fn].jfm=j; ltj.font_metric_table[fn].size=f.size
+   ltj.font_metric_table[fn].jfm=j
+   ltj.font_metric_table[fn].size=f.size
+   ltj.font_metric_table[fn].var=jfm_var
    tex.sprint(ltj.is_global .. '\\protected\\expandafter\\def\\csname '
               .. cstemp .. '\\endcsname'
               .. '{\\csname ltj@curjfnt\\endcsname=' .. fn

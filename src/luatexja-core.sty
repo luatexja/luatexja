@@ -232,9 +232,9 @@
   {\ltj@@getparam@one{#1}}%
 }
 \def\ltj@@getparam@one#1{%
-  \directlua{ltj.ext_get_parameter_unary('#1')}}
+  \directlua{ltj.ext_get_parameter_unary('#1')}}%
 \def\ltj@@getparam@two#1#2{\ltj@tempcnta=#2
-  \directlua{ltj.ext_get_parameter_binary('#1', \the\ltj@tempcnta)}
+  \directlua{ltj.ext_get_parameter_binary('#1', \the\ltj@tempcnta)}%
 }
 
 
