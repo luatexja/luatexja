@@ -1,7 +1,7 @@
 local rmlgbm_data = require('luatexja-rmlgbm-data')
+local cache_chars = { [655360] = rmlgbm_data.characters }
 
 local function mk_rml(name, size, id)
-
    local specification = fonts.define.analyze(name,size)
    specification = fonts.define.specify[':'](specification)
    local features = specification.features.normal
@@ -12,7 +12,8 @@ local function mk_rml(name, size, id)
       fontdata[k] = v
       cachedata[k] = v
    end
-
+   fontdata.characters = nil
+   cachedata.characters = nil
    fontdata.unicodes = nil
    fontdata.shared = nil
    cachedata.shared = {}
@@ -25,19 +26,19 @@ local function mk_rml(name, size, id)
    shared.processes, shared.features = fonts.otf.set_features(cachedata,fonts.define.check(features,fonts.otf.features.default))
    
    -- characters & scaling
-   local characters = {}
-   local orig_chars = rmlgbm_data.characters
    if size < 0 then size = -size * 655.36 end
    local scale = size / 655360
-   -- local size_cache = {}
-   for k, v in pairs(orig_chars) do
-      characters[k] = {}
-      characters[k].index = v.index
-      characters[k].width = v.width * scale
-      characters[k].tounicode = v.tounicode
+   if not cache_chars[size] then
+      cache_chars[size]  = {}
+      for k, v in pairs(cache_chars[655360]) do
+         cache_chars[size][k] = {}
+         cache_chars[size][k].index = v.index
+         cache_chars[size][k].width = v.width * scale
+         cache_chars[size][k].tounicode = v.tounicode
+      end
    end
-   fontdata.characters = characters
-   cachedata.characters = characters
+   fontdata.characters = cache_chars[size]
+   cachedata.characters = cache_chars[size]
 
    local parameters = {}
    for k, v in pairs(rmlgbm_data.parameters) do
