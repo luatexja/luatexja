@@ -41,6 +41,8 @@ local TEMPORARY = 2
 local FROM_JFM = 3
 local KINSOKU = 4
 local LINE_END = 5
+local KANJI_SKIP = 6
+local XKANJI_SKIP = 7
 
 ------------------------------------------------------------------------
 -- naming:
@@ -270,7 +272,7 @@ local function main1_suppress_hyphenate_ja(head)
       end
    end
    lang.hyphenate(head)
-   return head -- 互換性のために値を返す
+   return head
 end
 
 -- CALLBACKS
@@ -397,10 +399,14 @@ function debug_show_node_list_X(p,print_fn)
       elseif pt == 'glue' then
 	 s = debug_depth.. ' glue   ' ..  p.subtype 
 	    .. ' ' ..  print_spec(p.spec)
-	 if has_attr(p, attr_icflag)==2 then
+	 if has_attr(p, attr_icflag)==TEMPORARY then
 	    s = s .. ' (might be replaced)'
-	 elseif has_attr(p, attr_icflag)==3 then
+	 elseif has_attr(p, attr_icflag)==FROM_JFM then
 	    s = s .. ' (from JFM)'
+	 elseif has_attr(p, attr_icflag)==KANJI_SKIP then
+	    s = s .. ' (kanjiskip)'
+	 elseif has_attr(p, attr_icflag)==XKANJI_SKIP then
+	    s = s .. ' (xkanjiskip)'
 	 end
 	 print_fn(s)
       elseif pt == 'kern' then

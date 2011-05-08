@@ -1,7 +1,7 @@
 %#!luatex
 \input luatexja-core.sty
 
-\def\head#1{\medskip\noindent{\bf\tengt ■ #1}\par}
+\def\head#1{\medskip\penalty-100\noindent{\bf\tengt ■ #1}\par\penalty10000}
 \jfont\rml={psft:Ryumin-Light:jfm=ujis} at 10pt
 \rml あ\inhibitglue\char"201Cあ・い←Ryumin-Light
 
@@ -175,6 +175,8 @@
 
 \vfill\eject
 \kanjiskip=\maxdimen
-\setbox0=\hbox{\rmlh ンン}\dumplist0
+\message{SSS}
+\setbox0=\hbox{\rmlh \ltjsetparameter{autospacing=true}ンン\ltjsetparameter{autospacing=false}ンン}\message{SSS}
+\dumplist0
 
 \end
