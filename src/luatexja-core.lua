@@ -35,6 +35,13 @@ local rgjc_char_to_range     = ltj.int_char_to_range
 local rgjc_is_ucs_in_japanese_char = ltj.int_is_ucs_in_japanese_char
 local ljfm_find_char_class = ltj.int_find_char_class
 
+
+local ITALIC = 1
+local TEMPORARY = 2
+local FROM_JFM = 3
+local KINSOKU = 4
+local LINE_END = 5
+
 ------------------------------------------------------------------------
 -- naming:
 --    ltj.ext_... : called from \directlua{}
@@ -95,6 +102,8 @@ local function is_japanese_glyph_node(p)
    and (p.font==has_attr(p,attr_curjfnt))
 end
 
+function math.two_add(a,b) return a+b end
+function math.two_average(a,b) return (a+b)/2 end
 
 ------------------------------------------------------------------------
 -- CODE FOR STACK TABLE FOR CHARACTER PROPERTIES (prefix: cstb)
@@ -126,7 +135,7 @@ function ltj.ext_set_stack_table(g,m,c,p,lb,ub)
 	    {"I'm going to use 0 instead of that illegal code value."})
      p=0
   elseif c<-1 or c>0x10FFFF then
-     ltj.error('Invalid character code (' .. p 
+     ltj.error('Invalid character code (' .. c
 	       .. '), should in the range -1.."10FFFF.',{})
      return 
   elseif not charprop_stack_table[i][c] then 
@@ -146,6 +155,7 @@ local function cstb_get_penalty_table(m,c)
   if i then i=i[m] end
   return i or 0
 end
+ltj.int_get_penalty_table = cstb_get_penalty_table
 
 local function cstb_get_inhibit_xsp_table(c)
   local i = charprop_stack_table[tex.getcount('ltj@@stack')][c]
@@ -171,17 +181,17 @@ function ltj.ext_get_parameter_unary(k)
    elseif k == 'jcharwidowpenalty' then
       tex.write(tex.getcount('jcharwidowpenalty'))
    elseif k == 'autospacing' then
-      tex.write(tostring(ltj.auto_spacing))
+      tex.write(tex.getattribute('ltj@autospc'))
    elseif k == 'autoxspacing' then
-      tex.write(tostring(ltj.auto_xspacing))
+      tex.write(tex.getattribute('ltj@autoxspc'))
    elseif k == 'differentjfm' then
-      if ltj.calc_between_two_jchar_aux==ltj.calc_between_two_jchar_aux_large then
+      if ltj.ja_diffmet_rule == math.max then
 	 tex.write('large')
-      elseif ltj.calc_between_two_jchar_aux==ltj.calc_between_two_jchar_aux_small then
+      elseif ltj.ja_diffmet_rule == math.min then
 	 tex.write('small')
-      elseif ltj.calc_between_two_jchar_aux==ltj.calc_between_two_jchar_aux_average then
+      elseif ltj.ja_diffmet_rule == math.two_average then
 	 tex.write('average')
-      elseif ltj.calc_between_two_jchar_aux==ltj.calc_between_two_jchar_aux_both then
+      elseif ltj.ja_diffmet_rule == math.two_add then
 	 tex.write('both')
       else -- This can't happen.
 	 tex.write('???')
@@ -260,7 +270,7 @@ local function main1_suppress_hyphenate_ja(head)
       end
    end
    lang.hyphenate(head)
-   return head -- 共通化のため値を返す
+   return head -- 互換性のために値を返す
 end
 
 -- CALLBACKS
@@ -276,266 +286,6 @@ luatexbase.add_to_callback('hyphenate',
  function (head,tail)
     return main1_suppress_hyphenate_ja(head)
  end,'ltj.hyphenate')
-
-
-------------------------------------------------------------------------
--- MAIN PROCESS STEP 2: insert glue/kerns from JFM (prefix: main2)
-------------------------------------------------------------------------
-
--- EXT: for \inhibitglue
-function ltj.ext_create_inhibitglue_node()
-   local g=node_new(id_whatsit, node.subtype('user_defined'))
-   g.user_id=30111; g.type=number; g.value=1; node.write(g)
-end
-
-
-local function main2_find_size_metric(px)
-   if is_japanese_glyph_node(px) then
-      return ltj.font_metric_table[px.font].size, 
-      ltj.font_metric_table[px.font].jfm, ltj.font_metric_table[px.font].var
-   else 
-      return nil, nil, nil
-   end
-end
-
-local function main2_new_jfm_glue(size,mt,bc,ac)
--- mt: metric key, bc, ac: char classes
-   local g=nil
-   local z = ltj.metrics[mt].char_type[bc]
-   if z.glue and z.glue[ac] then
-      local h = node_new(id_glue_spec)
-      h.width   = round(size*z.glue[ac][1])
-      h.stretch = round(size*z.glue[ac][2])
-      h.shrink  = round(size*z.glue[ac][3])
-      h.stretch_order=0; h.shrink_order=0
-      g = node_new(id_glue)
-      g.subtype = 0; g.spec = h
-   elseif z.kern and z.kern[ac] then
-      g = node_new(id_kern)
-      g.subtype = 1; g.kern = round(size*z.kern[ac])
-   end
-   return g
-end
-
--- return value: g (glue/kern from JFM), w (width of 'lineend' kern)
-local function main2_calc(qs,qm,qv,q,p,last,ihb_flag)
-   -- q, p: node (possibly null)
-   local ps, pm, pv, g, h
-   local w = 0
-   if (not p) or p==last then
-      -- q is the last node
-      if not qm then
-	 return nil, 0
-      elseif not ihb_flag then 
-	 g=main2_new_jfm_glue(qs,qm,
-			    has_attr(q,attr_jchar_class),
-				ljfm_find_char_class('boxbdd',qm))
-      end
-   elseif qs==0 then
-      -- p is the first node etc.
-      ps, pm, pv = main2_find_size_metric(p)
-      if not pm then
-	 return nil, 0
-      elseif not ihb_flag then 
-	 g=main2_new_jfm_glue(ps,pm,
-				ljfm_find_char_class('boxbdd',pm),
-				has_attr(p,attr_jchar_class))
-      end
-   else -- p and q are not nil
-      ps, pm, pv = main2_find_size_metric(p)
-      if ihb_flag or ((not pm) and (not qm)) then 
-	 g = nil
-      elseif (qs==ps) and (qm==pm) and (qv==pv) then 
-	 -- Both p and q are Japanese glyph nodes, and same metric and size
-	 g = main2_new_jfm_glue(ps,pm,
-				has_attr(q,attr_jchar_class),
-				has_attr(p,attr_jchar_class))
-      elseif not qm then
-	 -- q is not a Japanese glyph node
-	 g = main2_new_jfm_glue(ps,pm,
-				ljfm_find_char_class('jcharbdd',pm),
-				has_attr(p,attr_jchar_class))
-      elseif not pm then
-	 -- p is not a Japanese glyph node
-	 g = main2_new_jfm_glue(qs,qm,
-				has_attr(q,attr_jchar_class),
-				ljfm_find_char_class('jcharbdd',qm))
-      else
-	 g = main2_new_jfm_glue(qs,qm,
-				has_attr(q,attr_jchar_class),
-				ljfm_find_char_class('diffmet',qm))
-	 h = main2_new_jfm_glue(ps,pm,
-				ljfm_find_char_class('diffmet',pm),
-				has_attr(p,attr_jchar_class))
-	 g = ltj.calc_between_two_jchar_aux(g,h)
-      end
-   end
-   if g then node.set_attribute(g, attr_icflag, 3) end
-   if qm then
-      local x = ljfm_find_char_class('lineend', qm)
-      if x~=0  then
-	 qv = ltj.metrics[qm].char_type[has_attr(q,attr_jchar_class)]
-	 if qv.kern and qv.kern[x] then 
-	    w = round(qs*qv.kern[x])
-	 end
-      end
-   end
-
-   return g, w
-end
-
-local function main2_between_two_char(head,q,p,p_bp,ihb_flag,last)
-   local qs = 0; local g, w
-   local qm = nil, qv
-   if q then
-      qs, qm, qv = main2_find_size_metric(q)
-   end
-   g, w = main2_calc(qs, qm, qv, q, p, last, ihb_flag)
-   if w~=0 and (not p_bp) then
-      p_bp = node_new(id_penalty); p_bp.penalty = 0
-      head = node_insert_before(head, p, p_bp)
-   end
-   if g then
-      if g.id==id_kern then 
-	 g.kern = round(g.kern - w)
-      else
-	 g.spec.width = round(g.spec.width - w)
-      end
-      head = node_insert_before(head, p, g)
-   elseif w~=0 then
-      g = node_new(id_kern); g.kern = -w; g.subtype = 1
-      node.set_attribute(g,attr_icflag,2)
-      head = node_insert_before(head, p, g)
-      -- this g might be replaced by \[x]kanjiskip in step 3.
-   end
-   if w~=0 then
-      g = node_new(id_kern); g.kern = w; g.subtype = 0
-      head = node_insert_before(head, p_bp, g)
-   end
-return head, p_bp
-end
-
--- In the beginning of a hlist created by line breaking, there are the followings:
---   - a hbox by \parindent
---   - a whatsit node which contains local paragraph materials.
--- When we insert jfm glues, we ignore these nodes.
-local function main2_is_parindent_box(p)
-   if p.id==id_hlist then 
-      return (p.subtype==3)
-      -- hlist (subtype=3) is a box by \parindent
-   elseif p.id==id_whatsit then 
-      return (p.subtype==node.subtype('local_par'))
-   end
-end
-
--- next three functions deal with inserting penalty by kinsoku.
-local function main2_add_penalty_before(head,p,p_bp,pen)
-   if p_bp then
-      p_bp.penalty = p_bp.penalty + pen
-   else -- we must create a new penalty node
-      local g = node_new(id_penalty); g.penalty = pen
-      local q = node_prev(p)
-      if q then
-	 if has_attr(q, attr_icflag) ~= 3 then
-	    q = p
-	 end
-	 return node_insert_before(head, q, g)
-      end
-   end
-   return head
-end
-
-local function main2_add_kinsoku_penalty(head,p,p_bp)
-   local c = p.char
-   local e = cstb_get_penalty_table('pre',c)
-   if e~=0 then
-      head = main2_add_penalty_before(head, p, p_bp, e)
-   end
-   e = cstb_get_penalty_table('post',c)
-   if e~=0 then
-      local q = node_next(p)
-      if q and q.id==id_penalty then
-	 q.penalty = q.penalty + e
-	 return false
-      else 
-	 q = node_new(id_penalty); q.penalty = e
-	 node_insert_after(head,p,q)
-	 return true
-      end
-   end
-end
-
-local function main2_add_widow_penalty(head,widow_node,widow_bp)
-   if not widow_node then 
-      return head
-   else
-      return main2_add_penalty_before(head, widow_node,
-                 widow_bp, tex.getcount('jcharwidowpenalty'))
-   end
-end
-
-local depth=""
-
--- Insert jfm glue: main routine
--- mode = true iff insert_jfm_glue is called from pre_linebreak_filter
-local function main2_insert_jfm_glue(head, mode)
-   local p = head
-   local p_bp = nil -- p と直前の文字の間の penalty node
-   local q = nil  -- the previous node of p
-   local widow_node = nil -- 最後の「句読点扱いでない」和文文字
-   local widow_bp = nil -- \jcharwidowpenalty 挿入位置
-   local last -- the sentinel 
-   local ihb_flag = false -- is \inhibitglue specified?
-   local g
-   -- initialization
-   if not p then return head 
-   elseif mode then
-      while p and main2_is_parindent_box(p) do p=node_next(p) end
-      last=node.tail(head)
-      if last and last.id==id_glue and last.subtype==15 then
-	 last=node.prev(last)
-	 while (last and last.id==id_penalty) do last=node.prev(last) end
-      end
-      if last then last=node_next(last) end
-   else -- 番人を挿入
-      last=node.tail(head); g = node_new('kern')
-      node_insert_after(head,last,g); last = g
-   end
-   -- main loop
-   while q~=last do
-      if p.id==id_whatsit and p.subtype==node.subtype('user_defined')
-         and p.user_id==30111 then
-	 g = p; p = node_next(p)
-	 ihb_flag = true; head, p = node.remove(head, g)
-      else
-	 head, p_bp = main2_between_two_char(head, q, p, p_bp, ihb_flag, last)
-	 q=p; ihb_flag=false
-	 if is_japanese_glyph_node(p) then
-	    if cstb_get_penalty_table('kcat',p.char)%2~=1 then
-	       widow_node = p; widow_bp = p_bp
-	    end
-	    if main2_add_kinsoku_penalty(head, p, p_bp) then
-	       p_bp = node_next(p); p = p_bp
-	    else p_bp = nil
-	    end
-	 else p_bp = nil
-	 end
-	 p=node_next(p)
-      end
-   end
-   if mode then
-      -- Insert \jcharwidowpenalty
-      head = main2_add_widow_penalty(head, widow_node, widow_bp)
-      -- cleanup
-      p = node_prev(last)
-      if p and p.id==id_kern and has_attr(p,attr_icflag)==2 then
-	 head = node.remove(head, p)
-      end
-   else
-      head = node.remove(head, last)
-   end
-   return head
-end
 
 
 ------------------------------------------------------------------------
@@ -610,8 +360,9 @@ end
 -- mode = true iff main_process is called from pre_linebreak_filter
 local function main_process(head, mode)
    local p = head
-   p = main2_insert_jfm_glue(p,mode)
-   p = ltj.int_insert_kanji_skip(p)
+   p = ltj.int_insert_jfm_glue(p,mode)
+   p = ltj.int_insert_kanji_skip(p) 
+   -- off because we write the code of step 2
    p = main4_set_ja_width(p)
    return p
 end
@@ -630,10 +381,11 @@ end
 function debug_show_node_list_X(p,print_fn)
    debug_depth=debug_depth.. '.'
    local k = debug_depth
+   local s
    while p do
       local pt=node_type(p.id)
       if pt == 'glyph' then
-	 print_fn(debug_depth.. ' glyph  ', p.subtype, utf.char(p.char), p.font)
+	 print_fn(debug_depth.. ' GLYPH  ', p.subtype, utf.char(p.char), p.font)
       elseif pt=='hlist' then
 	 print_fn(debug_depth.. ' hlist  ', p.subtype, '(' .. print_scaled(p.height)
 	    .. '+' .. print_scaled(p.depth)
@@ -643,18 +395,39 @@ function debug_show_node_list_X(p,print_fn)
       elseif pt == 'whatsit' then
 	 print_fn(debug_depth.. ' whatsit', p.subtype)
       elseif pt == 'glue' then
-	 print_fn(debug_depth.. ' glue   ', p.subtype, print_spec(p.spec))
+	 s = debug_depth.. ' glue   ' ..  p.subtype 
+	    .. ' ' ..  print_spec(p.spec)
+	 if has_attr(p, attr_icflag)==2 then
+	    s = s .. ' (might be replaced)'
+	 elseif has_attr(p, attr_icflag)==3 then
+	    s = s .. ' (from JFM)'
+	 end
+	 print_fn(s)
       elseif pt == 'kern' then
-	 print_fn(debug_depth.. ' kern   ', p.subtype, print_scaled(p.kern) .. 'pt')
+	 s = debug_depth.. ' kern   ' ..  p.subtype
+	    .. ' ' .. print_scaled(p.kern) .. 'pt'
+	 if has_attr(p, attr_icflag)==ITALIC then
+	    s = s .. ' (italic correction)'
+	 elseif has_attr(p, attr_icflag)==TEMPORARY then
+	    s = s .. ' (might be replaced)'
+	 elseif has_attr(p, attr_icflag)==FROM_JFM then
+	    s = s .. ' (from JFM)'
+	 elseif has_attr(p, attr_icflag)==LINE_END then
+	    s = s .. " (from 'lineend' in JFM)"
+	 end
+	 print_fn(s)
       elseif pt == 'penalty' then
-	 print_fn(debug_depth.. ' penalty', p.penalty)
+	 s = debug_depth.. ' penalty ' ..  tostring(p.penalty)
+	 if has_attr(p, attr_icflag)==KINSOKU then
+	    s = s .. ' (for kinsoku)'
+	 end
+	 print_fn(s)
       else
 	 print_fn(debug_depth.. ' ' .. node.type(p.id), p.subtype)
       end
       p=node_next(p)
    end
 end
-
 
 
 -- callbacks

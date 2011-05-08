@@ -31,6 +31,8 @@
 \newluatexattribute\ltj@charclass % 
 \newluatexattribute\ltj@yablshift % attribute for \yabaselineshift
 \newluatexattribute\ltj@ykblshift % attribute for \ykbaselineshift
+\newluatexattribute\ltj@autospc   % attribute for autospacing
+\newluatexattribute\ltj@autoxspc  % attribute for autoxspacing
 \newluatexattribute\ltj@icflag    % attribute for italic correction
 \newlanguage\ltj@japanese
 
@@ -49,8 +51,8 @@
     % For Ryumin-Light and GothicBBB-Medium.
   ltj.loadlua('luatexja-jfont.lua')
   ltj.loadlua('luatexja-core.lua')
+  ltj.loadlua('luatexja-jfmglue.lua')
   ltj.loadlua('luatexja-xkanji.lua')
-  ltj.loadlua('luatexja-core-aux.lua')
 }
 
 
@@ -161,20 +163,18 @@
 % autospacing = <bool> (default: true)
 \define@boolkey[ltj]{japaram}{autospacing}[true]{%
   \ifltj@japaram@autospacing
-    \directlua{ltj.auto_spacing=true}%
+    \directlua{ltj.ext_print_global()}\ltj@autospc=1
   \else
-    \directlua{ltj.auto_spacing=false}%
-  \fi
-  }
+    \directlua{ltj.ext_print_global()}\ltj@autospc=0
+  \fi}
 
 % autoxspacing = <bool> (default: true)
 \define@boolkey[ltj]{japaram}{autoxspacing}[true]{%
   \ifltj@japaram@autoxspacing
-    \directlua{ltj.auto_xspacing=true}%
+    \directlua{ltj.ext_print_global()}\ltj@autoxspc=1
   \else
-    \directlua{ltj.auto_xspacing=false}%
-  \fi
-  }
+    \directlua{ltj.ext_print_global()}\ltj@autoxspc=0
+  \fi}
 
 \define@key[ltj]{japaram}{kanjiskip}{%              % SKIP
   \directlua{ltj.ext_print_global()}\kanjiskip=#1 }
@@ -187,10 +187,10 @@
 \define@choicekey*+[ltj]{japaram}{differentjfm}[\ltj@temp\ltj@tempr]%
   {large,small,average,both}{%
   \ifcase\ltj@tempr
-    \directlua{ltj.calc_between_two_jchar_aux=ltj.calc_between_two_jchar_aux_large}\or
-    \directlua{ltj.calc_between_two_jchar_aux=ltj.calc_between_two_jchar_aux_small}\or
-    \directlua{ltj.calc_between_two_jchar_aux=ltj.calc_between_two_jchar_aux_average}\or
-    \directlua{ltj.calc_between_two_jchar_aux=ltj.calc_between_two_jchar_aux_both}%
+    \directlua{ltj.ja_diffmet_rule = math.max}\or
+    \directlua{ltj.ja_diffmet_rule = math.min}\or
+    \directlua{ltj.ja_diffmet_rule = math.two_average}\or
+    \directlua{ltj.ja_diffmet_rule = math.two_add}
   \fi
 }{\@PackageWarning{luatexja}{ignored invalid argument '#1' for 'differentjfm'}}
   % large, small, average, both

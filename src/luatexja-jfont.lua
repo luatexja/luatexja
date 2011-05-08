@@ -8,6 +8,7 @@ local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local id_glyph = node.id('glyph')
 local id_kern = node.id('kern')
 
+local ITALIC = 1
 ------------------------------------------------------------------------
 -- LOADING JFM (prefix: ljfm)
 ------------------------------------------------------------------------
@@ -38,6 +39,8 @@ function ltj.define_jfm(t)
 		  if #v.chars ~= 1 then defjfm_res= nil; return end
 	       elseif type(w) == 'number' then
 		  real_char = true
+	       elseif type(w) == 'string' and utf.len(w)==1 then
+		  real_char = true; w = utf.byte(w)
 	       end
 	       if not t.chars[w] then
 		  t.chars[w] = i
@@ -54,7 +57,7 @@ function ltj.define_jfm(t)
 	    end
 	    v.chars = nil
 	 end
-	 if v.kern then
+	 if v.kern and v.glue then
 	    for j,w in pairs(v.glue) do
 	       if v.kern[j] then defjfm_res= nil; return end
 	    end
@@ -245,10 +248,9 @@ function ltj.ext_append_italic()
    if p and p.id==id_glyph then
       local f = p.font
       local g = node_new(id_kern)
-      g.subtype = 1; node.set_attribute(g, attr_icflag, 1)
+      g.subtype = 1; node.set_attribute(g, attr_icflag, ITALIC)
       if rgjc_is_ucs_in_japanese_char(p) then
 	 f = has_attr(p, attr_curjfnt)
-	 print(f, p.char)
 	 local j = ltj.font_metric_table[f]
 	 local c = ljfm_find_char_class(p.char, j.jfm)
 	 g.kern = round(j.size * ltj.metrics[j.jfm].char_type[c].italic)

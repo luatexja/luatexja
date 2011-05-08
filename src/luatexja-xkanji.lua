@@ -6,10 +6,12 @@ local node_type = node.type
 local node_new = node.new
 local node_prev = node.prev
 local node_next = node.next
+local node_copy = node.copy
 local has_attr = node.has_attribute
 local node_insert_before = node.insert_before
 local node_insert_after = node.insert_after
 local node_hpack = node.hpack
+local round = tex.round
 
 local id_penalty = node.id('penalty')
 local id_glyph = node.id('glyph')
@@ -24,14 +26,19 @@ local id_math = node.id('math')
 local id_whatsit = node.id('whatsit')
 
 local attr_icflag = luatexbase.attributes['ltj@icflag']
+local attr_autospc = luatexbase.attributes['ltj@autospc']
+local attr_autoxspc = luatexbase.attributes['ltj@autoxspc']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
+local max_dimen = 1073741823
+
+local ITALIC = 1
+local TEMPORARY = 2
+local FROM_JFM = 3
+local KINSOKU = 4
+local LINE_END = 5
 
 local kanji_skip
 local xkanji_skip
-local no_skip = 0
-local after_schar = 1
-local after_wchar = 2
-local insert_skip = no_skip
 
 -- (glyph_node nr) ... (node nq) <GLUE> ,,, (node np)
 local np, nq, nrc
@@ -39,6 +46,7 @@ local no_skip = 0
 local after_schar = 1
 local after_wchar = 2 -- nr is a Japanese glyph_node
 local insert_skip = no_skip
+local head
 
 local cstb_get_inhibit_xsp_table = ltj.int_get_inhibit_xsp_table
 
@@ -47,16 +55,23 @@ local function is_japanese_glyph_node(p)
    and (p.font==has_attr(p,attr_curjfnt))
 end
 
+local function get_zero_glue()
+   local g = node_new(id_glue_spec)
+   g.width = 0; g.stretch_order = 0; g.stretch = 0
+   g.shrink_order = 0; g.shrink = 0
+   return g
+end
+
 -- the following 2 functions are the lowest part.
 -- cx: the Kanji code of np
-local function insert_ascii_kanji_xkskip(head,q,cx)
+local function insert_ascii_kanji_xkskip(q, cx)
    if cstb_get_inhibit_xsp_table(cx)<=1 then return end
    local g = node_new(id_glue)
    g.subtype = 0; g.spec = node.copy(xkanji_skip)
    node_insert_after(head, q, g)
 end
 
-local function insert_kanji_ascii_xkskip(head,q,p)
+local function insert_kanji_ascii_xkskip(q, p)
    local g=true
    local c = p.char
    while p.components and p.subtype 
@@ -88,20 +103,71 @@ local function set_insert_skip_after_achar(p)
   end
 end
 
+local function get_kanji_skip_from_jfm(p)
+   local px = { ltj.font_metric_table[p.font].size, 
+		ltj.font_metric_table[p.font].jfm }
+   local i = ltj.metrics[px[2]].kanjiskip
+   print(p.font, px[1], px[2], ltj.metrics[px[2]].dir, i)
+   if i then
+      return { round(i[1]*px[1]), round(i[2]*px[1]), round(i[3]*px[1]) }
+   else return nil
+   end
+end
+
+local function insert_kanji_skip()
+   print('a', utf.char(np.char))
+   local g = node_new(id_glue); g.subtype=0
+   if kanji_skip.width==max_dimen then -- use kanjiskip from JFM
+      local gx = node_new(id_glue_spec);
+      gx.stretch_order = 0; gx.shrink_order = 0
+      local bk = nil -- incomplete
+      local ak = get_kanji_skip_from_jfm(np)
+      if bk then
+	 if ak then
+	    gx.width = round(ltj.ja_diffmet_rule(bk[1], ak[1]))
+	    gx.stretch = round(ltj.ja_diffmet_rule(bk[2], ak[2]))
+	    gx.shrink = -round(ltj.ja_diffmet_rule(-bk[3], -ak[3]))
+	 else
+	    gx.width = bk[1]; gx.stretch = bk[2]; gx.shrink = bk[3]
+	 end
+      elseif ak then
+	 gx.width = ak[1]; gx.stretch = ak[2]; gx.shrink = ak[3]
+      else
+	 gx = get_zero_glue()-- ???
+      end
+      g.spec = gx
+   else
+      g.spec=node.copy(kanji_skip)
+   end
+   local h = node_prev(np)
+   if h  and has_attr(h, attr_icflag)==TEMPORARY then
+      if h.id==id_kern then
+	 g.spec.width = g.spec.width + h.kern
+	 head = node.remove(head, h)
+	 node_insert_before(head, np, g)
+      else
+	 h.spec.width = g.spec.width + h.spec.width
+	 h.spec.stretch = g.spec.stretch + h.spec.stretch
+	 h.spec.shrink = g.spec.shrink + h.spec.shrink
+      end
+   else
+      node_insert_before(head, np, g)
+   end
+   print('b', utf.char(np.char))
+end
+
 -- When p is a glyph_node ...
-local function insks_around_char(head)
+local function insks_around_char()
    if is_japanese_glyph_node(np) then
       if insert_skip==after_wchar then
-	 local g = node_new(id_glue)
-	 g.subtype=0; g.spec=node.copy(kanji_skip)
-	 node_insert_before(head, np, g)
+	 insert_kanji_skip()
       elseif insert_skip==after_schar then
-	 insert_ascii_kanji_xkskip(head, nq, np.char)
+	 insert_ascii_kanji_xkskip(nq, np.char)
       end
       insert_skip=after_wchar; nrc = np.char
    else
       if insert_skip==after_wchar then
-	 insert_kanji_ascii_xkskip(head, nq, np)
+	 insert_kanji_ascii_xkskip(nq, np)
       end
       set_insert_skip_after_achar(np)
    end
@@ -152,7 +218,7 @@ local function check_box(box_ptr)
 end 
 
 -- When np is a hlist_node ...
-local function insks_around_hbox(head)
+local function insks_around_hbox()
    if np.shift==0 then
       find_first_char = true; first_char = nil; last_char = nil
       if check_box(np.head) then
@@ -160,16 +226,14 @@ local function insks_around_hbox(head)
 	 if is_japanese_glyph_node(first_char) then
 	    nrc = first_char.char
 	    if insert_skip==after_schar then 
-	       insert_ascii_kanji_xkskip(head, nq, first_char.char)
+	       insert_ascii_kanji_xkskip(nq, first_char.char)
 	    elseif insert_skip==after_wchar then
-	       local g = node_new(id_glue)
-	       g.subtype = 0; g.spec = node.copy(kanji_skip)
-	       node_insert_before(head, np, g)
+	       insert_kanji_skip()
 	    end
 	    insert_skip = after_wchar
 	 elseif first_char then
 	    if insert_skip==after_wchar then
-	       insert_kanji_ascii_xkskip(head, nq, first_char)
+	       insert_kanji_ascii_xkskip(nq, first_char)
 	    end
 	    set_insert_skip_after_achar(first_char)
 	 end
@@ -193,18 +257,18 @@ local function insks_around_hbox(head)
 end
 
 -- When np is a penalty ...
-local function insks_around_penalty(head)
+local function insks_around_penalty()
    nq = np
 end
 
 -- When np is a kern ...
 -- 
-local function insks_around_kern(head)
+local function insks_around_kern()
    if np.subtype==1 then -- \kern or \/
       local i = has_attr(np, attr_icflag)
-      if not i then -- \kern
+      if not i or i==FROM_JFM then -- \kern
 	 insert_skip = no_skip
-      elseif i==1 then
+      elseif i==ITALIC or i==LINE_END or i==TEMPORARY then
 	 nq = np
       end
    elseif np.subtype==2 then 
@@ -214,44 +278,35 @@ local function insks_around_kern(head)
 end
 
 -- When np is a math_node ...
-local function insks_around_math(head)
+local function insks_around_math()
    local g = { char = -1 }
    if (np.subtype==0) and (insert_skip==after_wchar) then
-      insert_kanji_ascii_xkskip(head, nq, g)
+      insert_kanji_ascii_xkskip(nq, g)
       insert_skip = no_skip
    else
       nq = np; set_insert_skip_after_achar(g)
    end
 end
 
-function ltj.int_insert_kanji_skip(head)
-   if ltj.auto_spacing then
-      kanji_skip=tex.skip['kanjiskip']
-   else
-      kanji_skip=node_new(id_glue_spec)
-      kanji_skip.width=0;  kanji_skip.stretch=0; kanji_skip.shrink=0
-   end
-   if ltj.auto_xspacing then
-      xkanji_skip=tex.skip['xkanjiskip']
-   else
-      xkanji_skip=node_new(id_glue_spec)
-      xkanji_skip.width=0;  xkanji_skip.stretch=0; xkanji_skip.shrink=0
-   end
+function ltj.int_insert_kanji_skip(ahead)
+   kanji_skip=tex.skip['kanjiskip']
+   xkanji_skip=tex.skip['xkanjiskip']
+   head = ahead
    np = head; nq = nil; insert_skip = no_skip
    while np do
       if np.id==id_glyph then
 	 repeat 
-	    insks_around_char(head); np=node_next(np)
+	    insks_around_char(); np=node_next(np)
 	 until (not np) or np.id~=id_glyph
       else
 	 if np.id==id_hlist then
-	    insks_around_hbox(head)
+	    insks_around_hbox()
 	 elseif np.id==id_penalty then
-	    insks_around_penalty(head)
+	    insks_around_penalty()
 	 elseif np.id==id_kern then
-	    insks_around_kern(head)
+	    insks_around_kern()
 	 elseif np.id==id_math then
-	    insks_around_math(head)
+	    insks_around_math()
 	 elseif np.id==id_ins    or np.id==id_mark
              or np.id==id_adjust or np.id==id_whatsit then
 	    -- do nothing
