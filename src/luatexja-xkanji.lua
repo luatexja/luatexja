@@ -65,19 +65,7 @@ local function get_zero_glue()
    return g
 end
 
-local function get_kanji_skip_from_jfm(pf)
-   if pf then
-      local px = { ltj.font_metric_table[pf].size, 
-		   ltj.font_metric_table[pf].jfm }
-      local i = ltj.metrics[px[2]].kanjiskip
-      if i then
-	 return { round(i[1]*px[1]), round(i[2]*px[1]), round(i[3]*px[1]) }
-      else return nil
-      end
-   else return nil
-   end
-end
-
+-- lowest part of \xkanjiskip 
 local function get_xkanji_skip_from_jfm(pf)
    if pf then
       local px = { ltj.font_metric_table[pf].size, 
@@ -91,13 +79,43 @@ local function get_xkanji_skip_from_jfm(pf)
    end
 end
 
--- the following 2 functions are the lowest part.
--- cx: the Kanji code of np
-local function insert_ascii_kanji_xkskip(q, cx)
-   if cstb_get_inhibit_xsp_table(cx)<=1 then return end
-   local g = node_new(id_glue)
-   g.subtype = 0; g.spec = node.copy(xkanji_skip)
-   node_insert_after(head, q, g)
+local function insert_xkanjiskip_node(q, f, p)
+   local g = node_new(id_glue); g.subtype = 0
+   if nr_spc[2] or np_spc[2] then
+      if xkanji_skip.width==max_dimen then -- use xkanjiskip from JFM
+	 local gx = node_new(id_glue_spec);
+	 gx.stretch_order = 0; gx.shrink_order = 0
+	 local ak = get_xkanji_skip_from_jfm(nrf)
+	 if ak then
+	    gx.width = ak[1]; gx.stretch = ak[2]; gx.shrink = ak[3]
+	 else gx = get_zero_glue() -- fallback
+	 end
+	 g.spec = gx
+      else g.spec=node.copy(xkanji_skip)
+      end
+   else g.spec = get_zero_glue()
+   end
+   local h = node_prev(p)
+   if h  and has_attr(h, attr_icflag)==TEMPORARY then
+      if h.id==id_kern then
+	 g.spec.width = g.spec.width + h.kern
+	 node.set_attribute(g,attr_icflag,XKANJI_SKIP)
+	 node_insert_after(head, q, g)
+	 head = node.remove(head, h)
+      else
+	 h.spec.width = g.spec.width + h.spec.width
+	 h.spec.stretch = g.spec.stretch + h.spec.stretch
+	 h.spec.shrink = g.spec.shrink + h.spec.shrink
+      end
+   else
+      node.set_attribute(g,attr_icflag,XKANJI_SKIP)
+      node_insert_after(head, q, g)
+   end
+end
+
+local function insert_ascii_kanji_xkskip(q, p)
+   if cstb_get_inhibit_xsp_table(p.char)<=1 then return end
+   insert_xkanjiskip_node(q, p.font, p)
 end
 
 local function insert_kanji_ascii_xkskip(q, p)
@@ -111,41 +129,8 @@ local function insert_kanji_ascii_xkskip(q, p)
       if cstb_get_inhibit_xsp_table(nrc)%2 == 0 then g = false end
    else g = false
    end
-   if g then -- 挿入
-      g = node_new(id_glue); g.subtype = 0
-      if nr_spc[1] or np_spc[1] then
-	 if xkanji_skip.width==max_dimen then -- use kanjiskip from JFM
-	    local gx = node_new(id_glue_spec);
-	    gx.stretch_order = 0; gx.shrink_order = 0
-	    local ak = get_xkanji_skip_from_jfm(p.font)
-	    if ak then
-	       gx.width = ak[1]; gx.stretch = ak[2]; gx.shrink = ak[3]
-	    else gx = get_zero_glue() -- fallback
-	    end
-	    g.spec = gx
-	 else g.spec=node.copy(xkanji_skip)
-	 end
-      else g.spec = get_zero_glue()
-      end
-      local h = node_prev(p)
-      if h  and has_attr(h, attr_icflag)==TEMPORARY then
-	 if h.id==id_kern then
-	    g.spec.width = g.spec.width + h.kern
-	    node.set_attribute(g,attr_icflag,XKANJI_SKIP)
-	    node_insert_after(head, q, g)
-	    head = node.remove(head, h)
-	 else
-	    h.spec.width = g.spec.width + h.spec.width
-	    h.spec.stretch = g.spec.stretch + h.spec.stretch
-	    h.spec.shrink = g.spec.shrink + h.spec.shrink
-	 end
-      else
-	 node.set_attribute(g,attr_icflag,XKANJI_SKIP)
-	 node_insert_after(head, q, g)
-      end
-   end
+   if g then insert_xkanjiskip_node(q, nrf, p) end
 end
-
 
 local function set_insert_skip_after_achar(p)
    local c = p.char
@@ -160,14 +145,28 @@ local function set_insert_skip_after_achar(p)
   end
 end
 
-local function insert_kanji_skip()
+-- lowest part of \kanjiskip 
+local function get_kanji_skip_from_jfm(pf)
+   if pf then
+      local px = { ltj.font_metric_table[pf].size, 
+		   ltj.font_metric_table[pf].jfm }
+      local i = ltj.metrics[px[2]].kanjiskip
+      if i then
+	 return { round(i[1]*px[1]), round(i[2]*px[1]), round(i[3]*px[1]) }
+      else return nil
+      end
+   else return nil
+   end
+end
+
+local function insert_kanji_skip(ope, p)
       local g = node_new(id_glue); g.subtype=0
       if nr_spc[1] or np_spc[1] then
 	 if kanji_skip.width==max_dimen then -- use kanjiskip from JFM
 	    local gx = node_new(id_glue_spec);
 	    gx.stretch_order = 0; gx.shrink_order = 0
 	    local bk = get_kanji_skip_from_jfm(nrf)
-	    local ak = get_kanji_skip_from_jfm(np.font)
+	    local ak = get_kanji_skip_from_jfm(p.font)
 	    if bk then
 	       if ak then
 		  gx.width = round(ltj.ja_diffmet_rule(bk[1], ak[1]))
@@ -185,13 +184,13 @@ local function insert_kanji_skip()
 	 end
       else g.spec = get_zero_glue()
       end
-      local h = node_prev(np)
+      local h = node_prev(p)
       if h  and has_attr(h, attr_icflag)==TEMPORARY then
 	 if h.id==id_kern then
 	    g.spec.width = g.spec.width + h.kern
 	    head = node.remove(head, h)
 	    node.set_attribute(g,attr_icflag,KANJI_SKIP)
-	    node_insert_before(head, np, g)
+	    ope(head, p, g)
 	 else
 	    h.spec.width = g.spec.width + h.spec.width
 	    h.spec.stretch = g.spec.stretch + h.spec.stretch
@@ -199,7 +198,7 @@ local function insert_kanji_skip()
 	 end
       else
 	 node.set_attribute(g,attr_icflag,KANJI_SKIP)
-	 node_insert_before(head, np, g)
+	 ope(head, p, g)
       end
 end
 
@@ -207,9 +206,9 @@ end
 local function insks_around_char()
    if is_japanese_glyph_node(np) then
       if insert_skip==after_wchar then
-	 insert_kanji_skip()
+	 insert_kanji_skip(node_insert_before, np)
       elseif insert_skip==after_schar then
-	 insert_ascii_kanji_xkskip(nq, np.char)
+	 insert_ascii_kanji_xkskip(nq, np)
       end
       insert_skip=after_wchar
       nrc = np.char; nrf = np.font; nr_spc = np_spc
@@ -274,11 +273,11 @@ local function insks_around_hbox()
 	 if is_japanese_glyph_node(first_char) then
 	    nrc = first_char.char; nrf = first_char.font
 	    if insert_skip==after_schar then 
-	       insert_ascii_kanji_xkskip(nq, first_char.char)
+	       insert_ascii_kanji_xkskip(nq, first_char)
 	    elseif insert_skip==after_wchar then
 	       np_spc = { has_attr(first_char, attr_autospc)==1, 
 			  has_attr(first_char, attr_autoxspc)==1 }
-	       insert_kanji_skip()
+	       insert_kanji_skip(node_insert_before, np)
 	    end
 	    insert_skip = after_wchar
 	 elseif first_char then
@@ -290,9 +289,7 @@ local function insks_around_hbox()
 	 -- last char
 	 if is_japanese_glyph_node(last_char) then
 	    if is_japanese_glyph_node(node_next(np)) then
-	       local g = node_new(id_glue)
-	       g.subtype = 0; g.spec = node.copy(kanji_skip)
-	       node_insert_after(head, np, g)
+	       insert_kanji_skip(node_insert_after, np)
 	    end
 	    insert_skip = after_wchar
 	    nrc = last_char.char; nrf = last_char.font

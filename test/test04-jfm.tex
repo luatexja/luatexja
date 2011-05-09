@@ -119,10 +119,41 @@
 
 \setbox0=\hbox{\rmlh \kern3ptう}\dumplist0
 
-\head{italic correction}
+\head{JA--hbox (penなし)}
 
-\setbox0=\hbox{\it f\/（\/あ}\dumplist0
+\setbox0=\hbox{\rmlh あ\hbox{}}\dumplist0
 
+\setbox0=\hbox{\rmlh い\hbox{}}\dumplist0
+
+\setbox0=\hbox{\rmlh う\hbox{}}\dumplist0
+
+\setbox0=\hbox{\rmlh え\hbox{}}\dumplist0
+
+\head{hbox--JA (penなし)}
+
+\setbox0=\hbox{\rmlh \hbox{}あ}\dumplist0
+
+\setbox0=\hbox{\rmlh \hbox{}い}\dumplist0
+
+\setbox0=\hbox{\rmlh \hbox{}う}\dumplist0
+
+\head{JA--penalty (penなし)} TODO: この場合の挙動はこれで良いか？
+
+\setbox0=\hbox{\rmlh あ\penalty567}\dumplist0
+
+\setbox0=\hbox{\rmlh い\penalty567}\dumplist0
+
+\setbox0=\hbox{\rmlh う\penalty567}\dumplist0
+
+\setbox0=\hbox{\rmlh え\penalty567}\dumplist0
+
+\head{penalty--JA (penなし)} TODO: この場合の挙動はこれで良いか？
+
+\setbox0=\hbox{\rmlh \penalty567あ}\dumplist0
+
+\setbox0=\hbox{\rmlh \penalty567い}\dumplist0
+
+\setbox0=\hbox{\rmlh \penalty567う}\dumplist0
 
 {\vfill\eject%
 
@@ -174,9 +205,47 @@
 }
 
 \vfill\eject
-\kanjiskip=\maxdimen
-\message{SSS}
-\setbox0=\hbox{\rmlh \ltjsetparameter{autospacing=true}ンン\ltjsetparameter{autospacing=false}ンン}\message{SSS}
-\dumplist0
+\noindent{\gt\bf [x]kanjiskipの挿入}
+
+\head{kanjiskip from JFM, autospacing (JA--JA)}
+\setbox0=\hbox{あ\rmlh あ}\dumplist0
+
+{\kanjiskip=\maxdimen
+\setbox0=\hbox{あ\rmlh あ}\dumplist0
+\jfont\rmlk={psft:Ryumin-Light:jfm=test} at 12pt
+\setbox0=\hbox{\rmlk は\rmlh あ}\dumplist0}
+
+\def\naspc{\ltjsetparameter{autospacing=false}\relax}
+\def\naxspc{\ltjsetparameter{autoxspacing=false}\relax}
+\setbox0=\hbox{あ\naspc ああ}\dumplist0
+
+\head{kanjiskip from JFM/autoxspacing (JA--EN)}
+\setbox0=\hbox{\rmlh まx}\dumplist0
+
+\setbox0=\hbox{\rmlh ま\naxspc x}\dumplist0
+
+\setbox0=\hbox{\naxspc\rmlh まx}\dumplist0
+
+{\xkanjiskip=\maxdimen\setbox0=\hbox{\rmlh まx}\dumplist0}
+
+{\ltjsetparameter{jaxspmode={`ま,preonly}}
+\setbox0=\hbox{\rmlh まx}\dumplist0}
+{\ltjsetparameter{alxspmode={`x,postonly}}
+\setbox0=\hbox{\rmlh まx}\dumplist0}
+
+
+\head{kanjiskip from JFM/autoxspacing (EN--JA)}
+\setbox0=\hbox{\rmlh xま}\dumplist0
+
+\setbox0=\hbox{\rmlh x\naxspc ま}\dumplist0
+
+\setbox0=\hbox{\naxspc\rmlh xま}\dumplist0
+
+{\xkanjiskip=\maxdimen\setbox0=\hbox{\rmlh xま}\dumplist0}
+
+{\ltjsetparameter{jaxspmode={`ま,postonly}}
+\setbox0=\hbox{\rmlh xま}\dumplist0}
+{\ltjsetparameter{alxspmode={`x,inhibit}}
+\setbox0=\hbox{\rmlh xまおx}\dumplist0}
 
 \end

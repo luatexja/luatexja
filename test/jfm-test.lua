@@ -1,8 +1,8 @@
 ltj.define_jfm {
    dir = 'yoko',
    zw = 1.0, zh = 1.0,
-   kanjiskip = { 0.0, 0.04, 0.05 },
-   xkanjiskip = { 0.25, 0.083, 0.083 },
+   kanjiskip = { 0.1, 0.04, 0.05 },
+   xkanjiskip = { 0.31, 0.045, 0.057 },
 
    [0] = {
       align = 'left', left = 0.0, down = 0.0,

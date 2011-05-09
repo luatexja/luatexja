@@ -1,4 +1,4 @@
-This is LuaTeX, Version beta-0.71.0-2011050715  (format=luatex 2011.5.7)  8 MAY 2011 21:45
+This is LuaTeX, Version beta-0.71.0-2011050119 (rev 4235)  (format=luatex 2011.5.1)  9 MAY 2011 21:56
  restricted \write18 enabled.
 **test04-jfm.tex
 (./test04-jfm.tex
@@ -175,9 +175,7 @@ Package: infwarerr 2010/04/08 v1.3 Providing info/warning/message (HO)
 \ltj@tempcntb=\count282
 \ltj@tempcntc=\count283
 \ltj@tempdima=\dimen256
-\ltj@autospc=\count284
-\ltj@autoxspc=\count285
-\jcharwidowpenalty=\count286
+\jcharwidowpenalty=\count284
 \kanjiskip=\skip256
 \xkanjiskip=\skip257
 \zw=\dimen257
@@ -217,8 +215,8 @@ Module luatexbase-mcb info: inserting 'ltj.hpack_filter'
 \ltj@kcat4=\luatexattribute20
 \ltj@kcat5=\luatexattribute21
 \ltj@kcat6=\luatexattribute22
-\ltj@@stack=\count287
-\ltj@@group@level=\count288
+\ltj@@stack=\count285
+\ltj@@group@level=\count286
 
 plain format: loading luatexja-plain.tex
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-plain.tex
@@ -268,17 +266,37 @@ x.map): fontmap entry for `bchri8r' already exists, duplicates ignored
 LuaTeX warning (file /opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdfte
 x.map): fontmap entry for `bchro8r' already exists, duplicates ignored
 }]
-(./jfm-test.lua) [2] [3] [4] [5] )</opt/texlive/p2010/texmf/fonts/truetype/test
-/ipaexg.ttf></opt/texlive/p2010/texmf/fonts/truetype/test/ipamp.ttf></opt/texli
-ve/p2010/texmf/fonts/opentype/test/kozuka/KozMinPr6N-Regular.otf></opt/texlive/
-p2010/texmf/fonts/truetype/test/ipam.ttf></opt/texlive/p2010/texmf-dist/fonts/t
-ype1/public/amsfonts/cm/cmbx10.pfb></opt/texlive/p2010/texmf-dist/fonts/type1/p
-ublic/amsfonts/cm/cmr10.pfb></opt/texlive/p2010/texmf-dist/fonts/type1/public/a
-msfonts/cm/cmti10.pfb></opt/texlive/p2010/texmf-dist/fonts/type1/public/amsfont
-s/cm/cmtt10.pfb>
-Output written on test04-jfm.pdf (5 pages, 463601 bytes).
-PDF statistics: 74 PDF objects out of 1000 (max. 8388607)
- 48 compressed objects within 1 object stream
+(./jfm-test.lua) [2] [3] [4]
+Underfull \vbox (badness 1990) has occurred while \output is active
+\vbox(643.20255+0.0)x469.75499, glue set 2.71211, direction TLT
+.\glue(\topskip) 2.5
+.\hbox(7.5+2.5)x469.75499, glue set 381.78162fil, direction TLT
+..\whatsit
+...\localinterlinepenalty=0
+...\localbrokenpenalty=0
+...\localleftbox=null
+...\localrightbox=null
+..\tenbf [
+..\tenbf x
+..\tenbf ]
+..\tenbf k
+..etc.
+.\glue 6.0 plus 2.0 minus 2.0
+.\penalty -100
+.\glue(\parskip) 0.0 plus 1.0
+.etc.
+
+ [5]
+[6] )</opt/texlive/p2010/texmf/fonts/truetype/test/ipaexg.ttf></opt/texlive/p20
+10/texmf/fonts/truetype/test/ipamp.ttf></opt/texlive/p2010/texmf/fonts/opentype
+/test/kozuka/KozMinPr6N-Regular.otf></opt/texlive/p2010/texmf/fonts/truetype/te
+st/ipam.ttf></opt/texlive/p2010/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx1
+0.pfb></opt/texlive/p2010/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><
+/opt/texlive/p2010/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></opt/t
+exlive/p2010/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on test04-jfm.pdf (6 pages, 483176 bytes).
+PDF statistics: 77 PDF objects out of 1000 (max. 8388607)
+ 50 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 131072)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

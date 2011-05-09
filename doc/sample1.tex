@@ -153,11 +153,11 @@ PSフォント名<PSfont_name>を直接指定することもでき，
 \endtt
 と指定している{\small（つまりLatin-1 Supplementの範囲は欧文扱い）\inhibitglue}．
 
-TODO: 「{\ltjsetparameter{jacharrange={1}}× (|U+00D7|)}」等，ISO 8859-1領域
-にマッピングされた文字の扱い．
-「{\ltjsetparameter{jacharrange={1}}¢ (|U+00A2|)}」はHalfwidth and
-Fullwidth Formsに全角形（\char"FFE0）があるから%"
-luaotfloadの置換処理に割り込めばよいが……．
+%TODO: 「{\ltjsetparameter{jacharrange={1}}× (|U+00D7|)}」等，ISO 8859-1領域
+%にマッピングされた文字の扱い．
+%「{\ltjsetparameter{jacharrange={1}}¢ (|U+00A2|)}」はHalfwidth and
+%Fullwidth Formsに全角形（\char"FFE0）があるから%"
+%luaotfloadの置換処理に割り込めばよいが……．
 \enditem
 
 
@@ -230,12 +230,19 @@ p\TeX では「和文が主」という考えからか，常に和文文字の�
 \item |xkanjiskip=<skip>|★\inhibitglue: 後に述べる|\xkanjiskip=<skip>|と同じ意味．
 \item |jcharwidowpenalty=<penalty>|★\inhibitglue: 
 後に述べる|\jcharwidowpenalty=<penalty>|と同じ意味．
-\item |autospacing[=<bool>]|★◎\par\noindent
-%\item |autospacing[=<bool>]|★\par\noindent
+\item |autospacing[=<bool>]|\par\noindent
 和文文字間のglue（|\kanjiskip|）の自動挿入をするかしないかを制御．
-\item |autoxspacing[=<bool>]|★◎\par\noindent
-%\item |autoxspacing[=<bool>]|★\par\noindent
+p\TeX では段落/hbox 単位での設定となったが，Lua\TeX-ja では
+そうではなくなった．
+挿入可能な箇所の両端のノードにおいて，片方でも
+この値がfalseなら自動挿入は行われる．つまり，例えば
+\begintt
+あ\ltjsetparameter{autospacing=false}いう
+\endtt
+の場合，「あい」の間には|\kanjiskip|が挿入され，「いう」の間には入らない．
+\item |autoxspacing[=<bool>]|\par\noindent
 和欧文間のglue（|\xkanjiskip|）の自動挿入をするかしないかを制御．
+その他は|autospacing|と同様．
 
 \item |differentjfm=(large/small/average/both)|★◎\par\noindent
 異なる$(\hbox{<jfm>}, \hbox{<varkey>})$である2つの和文文字の間の
@@ -245,6 +252,8 @@ glue/kernの計算方法を設定する．
 \itemitem {\tt small}: 両者のうち小さい方．
 \itemitem {\tt average}: 両者の相加平均．
 \itemitem {\tt both}: 両者の合計値の幅をもつglue/kernを挿入する．
+この指定は，JFM由来の|\kanjiskip|の値が左右の和文文字で異なったときの
+挙動にも適用される．
 
 \item |jacharrange={<range_num>,<range_num>,...}|: 
 $\lvert\hbox{<range_num>}\rvert$番の文字範囲の文字を和文扱いするか欧文扱いするかを設定する．
@@ -280,7 +289,7 @@ $\lvert\hbox{<range_num>}\rvert$番の文字範囲の文字を和文扱いする
 
 \item |jacharrange|: 文字範囲の番号$n$を第2引数にとり，$n$番の文字範囲が
 和文文字扱いされていれば|0|，欧文文字扱いされていれば|1|を返す．
-$n\notin [1,216]$の場合は，「どの文字範囲にも属さない|U+0100|以降の文字」に対しての結果を返す．
+$n\notin [1,216]$の場合は，「どの文字範囲にも属さない|U+0080|以降の文字」に対しての結果を返す（しかし，前に述べたデフォルトでの設定のため，実際には|U+0100|以降となる）．
 
 \item |chartorange|: 文字コード<chr_code>を第2引数にとり，それが属している文字範囲の番号を返す．
 \itemitem <chr_code>がUnicodeの範囲外または|0x80|未満ならば，|-1|を返す．
@@ -288,8 +297,21 @@ $n\notin [1,216]$の場合は，「どの文字範囲にも属さない|U+0100|�
 
 \beginparagraph その他の命令
 
-\item skip |\kanjiskip|: 和文文字同士の間に入る空白量を指定．p\TeX の同名の命令と同様．
-\item skip |\xkanjiskip|: 和文文字と欧文文字の間に入る空白量．p\TeX の同名の命令と同様．
+\item skip |\kanjiskip|: 和文文字同士の間に入る空白量を指定．
+p\TeX の同名の命令と同様に，基本的には段落/hbox終了時の値が，その段落/hbox全体に適用される．
+
+{\bf TODO}: 現在の実装では，hboxにおいては，hbox終了{\gt 後}の値が適用される．
+要検討．
+
+但し，|\kanjiskip|の自然長が$\hbox{|\maxdimen|}=16383.99998\,{\rm pt}$の場合は，
+\itemitem （和文文字の間それぞれについて）JFMに指定されている
+|\kanjiskip|の値を採用する．
+\itemitem 左側JFM，右側JFMのどちらかにおいて指定されていれば，そちらを使用する．
+\itemitem どちらにおいても指定されていない場合は，0とみなす．
+
+\item skip |\xkanjiskip|: 和文文字と欧文文字の間に入る空白量．p\TeX の同名の命令と同様．これも，自然長が|\maxdimen|の場合は，JFMで指定された値を使う．
+
+
 \item count |\jcharwidowpenalty|: 段落において「最後の1文字のみが次の行に」くることを
 抑制するためのpenalty値．このpenaltyは，段落内にある，最後の「|kcatcode|の最下位bitが
 1で{\bf ない}ような和文文字」の直前に挿入される．
@@ -341,6 +363,11 @@ ltj.define_jfm {
 現時点では横組（|'yoko'|）のみの対応．
 \item |zw|, |zh|: それぞれ|\zw|, |\zh|のフォントサイズに対する割合を記述する（必須）．
 通常は両方とも1.0となるだろう．
+\item |kanjiskip|, |xkanjiskip|: それぞれ和文文字間グルー量，和欧文間グルー量を
+\begintt
+{<width>, <stretch>, <shrink>}
+\endtt
+という形で，フォントサイズ単位で指定する．
 \item 数字のindex $i$を持った値：$i$番の文字クラスについての情報を記述する．
 \itemitem |glue|: 現在の文字クラスの文字の後に挿入するglueを指定する．
 この項目の内容は

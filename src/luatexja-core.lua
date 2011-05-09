@@ -324,7 +324,7 @@ local function main4_set_ja_width(head)
 		   and round(s.width*met_tb.size)==p.width) then
 	       -- must be encapsuled by a \hbox
 	       head, q = node.remove(head,p)
-	       p.next=nil
+	       p.next = nil
 	       p.yoffset=round(p.yoffset-met_tb.size*s.down)
 	       p.xoffset=round(p.xoffset-met_tb.size*s.left)
 	       if s.align=='middle' or s.align=='right' then
@@ -336,7 +336,11 @@ local function main4_set_ja_width(head)
 	       g = node_hpack(h, round(met_tb.size*s.width), 'exactly')
 	       g.height = round(met_tb.size*s.height)
 	       g.depth = round(met_tb.size*s.depth)
-	       head, p = node_insert_before(head, q, g)
+	       if q then
+		  head = node_insert_before(head, q, g)
+	       else
+		  head = node_insert_after(head, node.tail(head), g)
+	       end
 	       p = q
 	    else p=node_next(p)
 	    end
@@ -363,8 +367,7 @@ end
 local function main_process(head, mode)
    local p = head
    p = ltj.int_insert_jfm_glue(p,mode)
-   p = ltj.int_insert_kanji_skip(p) 
-   -- off because we write the code of step 2
+   p = ltj.int_insert_kanji_skip(p)
    p = main4_set_ja_width(p)
    return p
 end
@@ -375,64 +378,87 @@ local debug_depth
 function ltj.ext_show_node_list(head,depth,print_fn)
    debug_depth = depth
    if head then
-      debug_show_node_list_X(head, print_fn)
+      while head do
+	 debug_show_node_X(head, print_fn); head = node_next(head)
+      end
    else
       print_fn(debug_depth .. ' (null list)')
    end
 end
-function debug_show_node_list_X(p,print_fn)
-   debug_depth=debug_depth.. '.'
+function ltj.ext_show_node(head,depth,print_fn)
+   debug_depth = depth
+   if head then
+      debug_show_node_X(head, print_fn)
+   else
+      print_fn(debug_depth .. ' (null list)')
+   end
+end
+function debug_show_node_X(p,print_fn)
    local k = debug_depth
    local s
-   while p do
-      local pt=node_type(p.id)
-      if pt == 'glyph' then
-	 print_fn(debug_depth.. ' GLYPH  ', p.subtype, utf.char(p.char), p.font)
-      elseif pt=='hlist' then
-	 print_fn(debug_depth.. ' hlist  ', p.subtype, '(' .. print_scaled(p.height)
-	    .. '+' .. print_scaled(p.depth)
-	 .. ')x' .. print_scaled(p.width) )
-	 debug_show_node_list_X(p.head,print_fn)
-	 debug_depth=k
-      elseif pt == 'whatsit' then
-	 print_fn(debug_depth.. ' whatsit', p.subtype)
-      elseif pt == 'glue' then
-	 s = debug_depth.. ' glue   ' ..  p.subtype 
-	    .. ' ' ..  print_spec(p.spec)
-	 if has_attr(p, attr_icflag)==TEMPORARY then
-	    s = s .. ' (might be replaced)'
-	 elseif has_attr(p, attr_icflag)==FROM_JFM then
-	    s = s .. ' (from JFM)'
-	 elseif has_attr(p, attr_icflag)==KANJI_SKIP then
-	    s = s .. ' (kanjiskip)'
-	 elseif has_attr(p, attr_icflag)==XKANJI_SKIP then
-	    s = s .. ' (xkanjiskip)'
+   local pt=node_type(p.id)
+   if pt == 'glyph' then
+      print_fn(debug_depth.. ' GLYPH  ', p.subtype, utf.char(p.char), p.font)
+   elseif pt=='hlist' then
+      s = debug_depth .. ' hlist  ' ..  p.subtype
+	 .. '(' .. print_scaled(p.height) .. '+' .. print_scaled(p.depth) .. ')x'
+         .. print_scaled(p.width)
+      if p.glue_sign >= 1 then 
+	 s = s .. ' glue set '
+	 if p.glue_sign == 2 then s = s .. '-' end
+	 s = s .. tostring(math.floor(p.glue_set*10000)/10000)
+	 if p.glue_order == 0 then 
+	    s = s .. 'pt' 
+	 else 
+	    s = s .. 'fi'
+	    for i = 2,  p.glue_order do s = s .. 'l' end
 	 end
-	 print_fn(s)
-      elseif pt == 'kern' then
-	 s = debug_depth.. ' kern   ' ..  p.subtype
-	    .. ' ' .. print_scaled(p.kern) .. 'pt'
-	 if has_attr(p, attr_icflag)==ITALIC then
-	    s = s .. ' (italic correction)'
-	 elseif has_attr(p, attr_icflag)==TEMPORARY then
-	    s = s .. ' (might be replaced)'
-	 elseif has_attr(p, attr_icflag)==FROM_JFM then
-	    s = s .. ' (from JFM)'
-	 elseif has_attr(p, attr_icflag)==LINE_END then
-	    s = s .. " (from 'lineend' in JFM)"
-	 end
-	 print_fn(s)
-      elseif pt == 'penalty' then
-	 s = debug_depth.. ' penalty ' ..  tostring(p.penalty)
-	 if has_attr(p, attr_icflag)==KINSOKU then
-	    s = s .. ' (for kinsoku)'
-	 end
-	 print_fn(s)
-      else
-	 print_fn(debug_depth.. ' ' .. node.type(p.id), p.subtype)
       end
-      p=node_next(p)
+      print_fn(s)
+      local q = p.head
+      debug_depth=debug_depth.. '.'
+      while q do 
+	 debug_show_node_X(q, print_fn); q = node_next(q)
+      end
+      debug_depth=k
+   elseif pt == 'whatsit' then
+      print_fn(debug_depth.. ' whatsit', p.subtype)
+   elseif pt == 'glue' then
+      s = debug_depth.. ' glue   ' ..  p.subtype 
+	 .. ' ' ..  print_spec(p.spec)
+      if has_attr(p, attr_icflag)==TEMPORARY then
+	 s = s .. ' (might be replaced)'
+      elseif has_attr(p, attr_icflag)==FROM_JFM then
+	    s = s .. ' (from JFM)'
+      elseif has_attr(p, attr_icflag)==KANJI_SKIP then
+	 s = s .. ' (kanjiskip)'
+      elseif has_attr(p, attr_icflag)==XKANJI_SKIP then
+	 s = s .. ' (xkanjiskip)'
+      end
+      print_fn(s)
+   elseif pt == 'kern' then
+      s = debug_depth.. ' kern   ' ..  p.subtype
+	 .. ' ' .. print_scaled(p.kern) .. 'pt'
+      if has_attr(p, attr_icflag)==ITALIC then
+	 s = s .. ' (italic correction)'
+      elseif has_attr(p, attr_icflag)==TEMPORARY then
+	 s = s .. ' (might be replaced)'
+      elseif has_attr(p, attr_icflag)==FROM_JFM then
+	 s = s .. ' (from JFM)'
+      elseif has_attr(p, attr_icflag)==LINE_END then
+	 s = s .. " (from 'lineend' in JFM)"
+      end
+      print_fn(s)
+   elseif pt == 'penalty' then
+      s = debug_depth.. ' penalty ' ..  tostring(p.penalty)
+      if has_attr(p, attr_icflag)==KINSOKU then
+	 s = s .. ' (for kinsoku)'
+      end
+      print_fn(s)
+   else
+      print_fn(debug_depth.. ' ' .. node.type(p.id), p.subtype)
    end
+   p=node_next(p)
 end
 
 

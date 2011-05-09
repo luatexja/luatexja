@@ -49,7 +49,7 @@ local function add_penalty(p,e)
       if i>=10000 then i = 10000
       elseif i<=-10000 then i = -10000 end
    end
-return p
+   return i
 end
 
 -- return true if and only if p is a Japanese character node
@@ -206,24 +206,6 @@ local function real_insert_kern(g)
    end
 end
 
--- Calc the glue between two Japanese characters
-local function calc_ja_ja_glue()
-   if ihb_flag then return nil
-   elseif table.are_equal(qs,ps) then
-      return new_jfm_glue(ps[1],ps[2],
-			  has_attr(q,attr_jchar_class),
-			  has_attr(p,attr_jchar_class))
-   else
-      local g = new_jfm_glue(qs[1],qs[2],
-			     has_attr(q,attr_jchar_class),
-			     ljfm_find_char_class('diffmet',qs[2]))
-      local h = new_jfm_glue(ps[1],ps[2],
-			     ljfm_find_char_class('diffmet',ps[2]),
-			     has_attr(p,attr_jchar_class))
-      return calc_ja_ja_aux(g,h)
-   end
-end
-
 ltj.ja_diffmet_rule = math.two_average
 
 local function calc_ja_ja_aux(gb,ga)
@@ -255,6 +237,24 @@ local function calc_ja_ja_aux(gb,ga)
 	 gb.spec.shrink  = -round(ltj.ja_diffmet_rule(-gb.spec.shrink, 0))
 	 return gb
       end
+   end
+end
+
+-- Calc the glue between two Japanese characters
+local function calc_ja_ja_glue()
+   if ihb_flag then return nil
+   elseif table.are_equal(qs,ps) then
+      return new_jfm_glue(ps[1],ps[2],
+			  has_attr(q,attr_jchar_class),
+			  has_attr(p,attr_jchar_class))
+   else
+      local g = new_jfm_glue(qs[1],qs[2],
+			     has_attr(q,attr_jchar_class),
+			     ljfm_find_char_class('diffmet',qs[2]))
+      local h = new_jfm_glue(ps[1],ps[2],
+			     ljfm_find_char_class('diffmet',ps[2]),
+			     has_attr(p,attr_jchar_class))
+      return calc_ja_ja_aux(g,h)
    end
 end
 
@@ -326,7 +326,11 @@ local function ins_gk_JA_any()
 	 local h = ltj.metrics[qs[2]].char_type[has_attr(q,attr_jchar_class)]
 	 if h.kern and h.kern[x] then w = round(qs[1]*h.kern[x]) end
       end
-      real_insert(g, w, q_post, false)
+      if p.id~=penalty then
+	 real_insert(g, w, q_post, true)
+      else
+	 real_insert(g, w, q_post, false)
+      end
    end
    chain = false; q, qs, q_post = p, nil, 0; p = node_next(p)
 end
