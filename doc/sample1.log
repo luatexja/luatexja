@@ -1,4 +1,4 @@
-This is LuaTeX, Version beta-0.71.0-2011050119 (rev 4235)  (format=luatex 2011.5.1)  9 MAY 2011 22:29
+This is LuaTeX, Version beta-0.71.0-2011050119 (rev 4235)  (format=luatex 2011.5.1)  11 MAY 2011 10:33
  restricted \write18 enabled.
 **sample1
 (./sample1.tex (./s1sty.tex
@@ -175,9 +175,7 @@ Package: infwarerr 2010/04/08 v1.3 Providing info/warning/message (HO)
 \ltj@tempcntb=\count282
 \ltj@tempcntc=\count283
 \ltj@tempdima=\dimen256
-\jcharwidowpenalty=\count284
-\kanjiskip=\skip256
-\xkanjiskip=\skip257
+\ltj@tempskipa=\skip256
 \zw=\dimen257
 \zh=\dimen258
 \jQ=\dimen259
@@ -200,6 +198,8 @@ Module luatexbase-mcb info: inserting 'ltj.process_input_buffer'
 (luatexbase-mcb)            at position 1 in 'process_input_buffer'
 Module luatexbase-mcb info: inserting 'ltj.hpack_filter_pre'
 (luatexbase-mcb)            at position 1 in 'hpack_filter'
+Module luatexbase-mcb info: inserting 'ltj.pre_linebreak_filter_pre'
+(luatexbase-mcb)            at position 1 in 'pre_linebreak_filter'
 Module luatexbase-mcb info: inserting 'ltj.hyphenate'
 (luatexbase-mcb)            at position 1 in 'hyphenate'
 Module luatexbase-mcb info: inserting 'ltj.pre_linebreak_filter'
@@ -215,8 +215,8 @@ Module luatexbase-mcb info: inserting 'ltj.hpack_filter'
 \ltj@kcat4=\luatexattribute20
 \ltj@kcat5=\luatexattribute21
 \ltj@kcat6=\luatexattribute22
-\ltj@@stack=\count285
-\ltj@@group@level=\count286
+\ltj@@stack=\count284
+\ltj@@group@level=\count285
 
 plain format: loading luatexja-plain.tex
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-plain.tex
@@ -224,7 +224,7 @@ plain format: loading luatexja-plain.tex
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/luatexja-kinsoku.tex)))
 (/opt/texlive/p2010/../texmf-local/tex/generic/luatexja/jfm-mono.lua)
 \vspbox=\box256
-\enumi=\count287
+\enumi=\count286
 ) 特徴
 制限 ファイル構成 [1{/opt/texlive/p2010/texmf-var/fonts/map/pdftex/updm
 ap/pdftex.map
@@ -245,9 +245,9 @@ x.map): fontmap entry for `bchri8r' already exists, duplicates ignored
 
 LuaTeX warning (file /opt/texlive/p2010/texmf-var/fonts/map/pdftex/updmap/pdfte
 x.map): fontmap entry for `bchro8r' already exists, duplicates ignored
-}] 使用方法 和文フォントの定義 [2]
-「和文文字の範囲」の設定 組版パラメタの調整 [3]
-Overfull \hbox (2.29878pt too wide) in paragraph at lines 220--225
+}] 使用方法 和文フォントの定義
+「和文文字の範囲」の設定 [2] 組版パラメタの調整 [3]
+Overfull \hbox (2.29878pt too wide) in paragraph at lines 218--223
  [] []\tentt yjabaselineshift=$\tensy h$\tenit di-men$\tensy i$\tenrm : \tenmin
  和 文 文 字 の ベ ー ス ラ イ ン 補 正 量 を \tenrm di-men-sion
  \tenmin で 指 定 す る [] \tenrm pT[]X
@@ -267,6 +267,24 @@ Overfull \hbox (2.29878pt too wide) in paragraph at lines 220--225
 ..\mathoff
 ..\glue 0.0 plus 1.0fil minus 1.0fil
 .\tentt y
+.etc.
+
+
+Overfull \hbox (7.2025pt too wide) in paragraph at lines 246--249
+ []\tenmin 和 文 文 字 と 欧 文 文 字 の 間 に 入 る 空 白 量 
+[] \tenrm pT[]X \tenmin の 同 名 の 命 令 と 同 様 [] こ れ も [] 
+自 然 長 が\tentt \maxdimen
+
+\hbox(8.45029+2.15277)x412.9118, glue set - 1.0, direction TLT
+.\glue(\leftskip) 19.2052
+.\whatsit
+..\localinterlinepenalty=0
+..\localbrokenpenalty=0
+..\localleftbox=null
+..\localrightbox=null
+.\tenmin 和
+.\glue 0.0 plus 0.4 minus 0.4
+.\tenmin 文
 .etc.
 
 [4] 組版パラメタの取得 その他の命令 [5] JFMについて [6]
@@ -290,7 +308,7 @@ opt/texlive/p2010/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></opt/te
 xlive/p2010/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></opt/texlive/
 p2010/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></opt/texlive/p2010/t
 exmf-dist/fonts/type1/hoekwater/manfnt/manfnt.pfb>
-Output written on sample1.pdf (13 pages, 225588 bytes).
+Output written on sample1.pdf (13 pages, 224676 bytes).
 PDF statistics: 120 PDF objects out of 1000 (max. 8388607)
  86 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 131072)

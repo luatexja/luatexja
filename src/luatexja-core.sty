@@ -14,11 +14,8 @@
 \newcount\ltj@tempcntb
 \newcount\ltj@tempcntc
 \newdimen\ltj@tempdima
+\newskip\ltj@tempskipa
 
-
-\newcount\jcharwidowpenalty
-\newskip\kanjiskip
-\newskip\xkanjiskip
 \newdimen\zw
 \newdimen\zh
 \newdimen\jQ \jQ=0.25mm
@@ -175,11 +172,15 @@
   \fi}
 
 \define@key[ltj]{japaram}{kanjiskip}{%              % SKIP
-  \directlua{ltj.ext_print_global()}\kanjiskip=#1 }
-\define@key[ltj]{japaram}{xkanjiskip}{%             % SKIP
-  \directlua{ltj.ext_print_global()}\xkanjiskip=#1 }
+  \ltj@tempskipa=#1\relax
+  \directlua{ltj.ext_set_stack_skip(ltj.isglobal, 'kanjiskip')}}
+\define@key[ltj]{japaram}{xkanjiskip}{%              % SKIP
+  \ltj@tempskipa=#1\relax
+  \directlua{ltj.ext_set_stack_skip(ltj.isglobal, 'xkanjiskip')}}
 \define@key[ltj]{japaram}{jcharwidowpenalty}{%      %COUNT
-  \directlua{ltj.ext_print_global()}\jcharwidowpenalty=#1 }
+  \ltj@tempcnta=#1 
+  \directlua{ltj.ext_set_stack_table(ltj.isglobal, 'jwp', 0,
+    \the\ltj@tempcnta, -10000, 10000)}}
 
 % differentjfm = { large | small | average | both }
 \define@choicekey*+[ltj]{japaram}{differentjfm}[\ltj@temp\ltj@tempr]%

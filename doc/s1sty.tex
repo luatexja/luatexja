@@ -40,22 +40,24 @@
   \let\it=\twelveit  \let\sl=\twelvesl \let\mus=\twelvemus 
   \let\sc=\twelvesc  \let\tt=\twelvett
   \let\mc=\twelvemc \let\gt=\twelvegt
-  \baselineskip=18pt\rm\mc\xkanjiskip=0.25\zw plus 0.10\zw minus 0.10\zw}
+  \baselineskip=18pt\rm\mc
+  \ltjsetparameter{xkanjiskip={0.25\zw plus 0.10\zw minus 0.10\zw}}}
 
-\def\big{\bigbf\biggt\xkanjiskip=0.25\zw plus 0.10\zw minus 0.10\zw}
+\def\big{\bigbf\biggt\ltjsetparameter{xkanjiskip={0.25\zw plus 0.10\zw minus 0.10\zw}}}
 
 \def\normalsize{\def\rm{\textfont0=\tenrm\tenrm\fam0\let\sx=\sevenrm}%
   \def\bf{\tenbf\gt\let\sx=\sevenbf}%
   \let\it=\tenit \let\sl=\tensl \let\mus=\tenmus 
   \let\sc=\tensc \def\tt{\tentt\tenjtt}%
   \let\mc=\tenmc \let\gt=\tengt
-  \baselineskip=15pt\rm\mc\xkanjiskip=0.25\zw plus 1pt minus 1pt}
+  \baselineskip=15pt\rm\mc
+  \ltjsetparameter{xkanjiskip=0.25\zw plus 1pt minus 1pt}}
 \def\small{\def\rm{\textfont0=\eightrm\eightrm\fam0}\def\bf{\eightbf\gt}%
   \let\it=\eightit \let\sl=\eightsl \let\mus=\eightmus 
   \let\sc=\eightsc \def\tt{\eighttt\eightjtt}%
   \let\mc=\eightmc \let\gt=\eightgt%
-  \rm\mc\xkanjiskip=0.25\zw plus 1pt minus 1pt%
-  \ltjsetparameter{yjabaselineshift=-0.76pt, yalbaselineshift=-0.76pt}
+  \rm\mc\ltjsetparameter{xkanjiskip={0.25\zw plus 1pt minus 1pt},
+  yjabaselineshift=-0.76pt, yalbaselineshift=-0.76pt}
 }
 
 
@@ -80,7 +82,7 @@
 \newbox\vspbox
 \setbox\vspbox=\hbox{\tt\char32}
 {\catcode`\ =\active\catcode`\_=\active%\catcode`\%=\active
-\gdef\ttverbatim{\begingroup\xkanjiskip=0pt
+\gdef\ttverbatim{\begingroup\ltjsetparameter{xkanjiskip=0pt}
 \catcode`\ =\active\let =~\catcode`\%=\other
 \catcode`\\=\other\catcode`\{=\other\catcode`\}=\other
 \catcode`\$=\other\catcode`\&=\other\catcode`\#=\other\catcode`\~=\other

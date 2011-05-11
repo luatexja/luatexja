@@ -18,13 +18,13 @@ local id_vlist = node.id('vlist')
 local id_rule = node.id('rule')
 local id_math = node.id('math')
 local id_whatsit = node.id('whatsit')
+local sid_user = node.subtype('user_defined')
 
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
--- attr_icflag: 1: kern from \/, 2: 'lineend' kern from JFM
 
 local lang_ja_token = token.create('ltj@japanese')
 local lang_ja = lang_ja_token[2]
@@ -43,6 +43,7 @@ local KINSOKU = 4
 local LINE_END = 5
 local KANJI_SKIP = 6
 local XKANJI_SKIP = 7
+local PACKED = 8
 
 ------------------------------------------------------------------------
 -- naming:
@@ -115,56 +116,84 @@ function math.two_average(a,b) return (a+b)/2 end
 local charprop_stack_table={}; charprop_stack_table[0]={}
 
 local function cstb_get_stack_level()
-  local i = tex.getcount('ltj@@stack')
-  if tex.currentgrouplevel > tex.getcount('ltj@@group@level') then
-    i = i+1 -- new stack level
-    tex.setcount('ltj@@group@level', tex.currentgrouplevel)
-    for j,v in pairs(charprop_stack_table) do -- clear the stack above i
-      if j>=i then charprop_stack_table[j]=nil end
-    end
-    charprop_stack_table[i] = table.fastcopy(charprop_stack_table[i-1])
-    tex.setcount('ltj@@stack', i)
-  end
-  return i
+   local i = tex.getcount('ltj@@stack')
+   local j = tex.currentgrouplevel
+   if j > tex.getcount('ltj@@group@level') then
+      i = i+1 -- new stack level
+      tex.setcount('ltj@@group@level', j)
+      for k,v in pairs(charprop_stack_table) do -- clear the stack above i
+	 if k>=i then charprop_stack_table[k]=nil end
+      end
+      charprop_stack_table[i] = table.fastcopy(charprop_stack_table[i-1])
+      tex.setcount('ltj@@stack', i)
+      local g = node_new(id_whatsit, sid_user)
+      g.user_id=30112; g.type=100; g.value=j; node.write(g)
+   end
+   return i
 end
 
 -- EXT
 function ltj.ext_set_stack_table(g,m,c,p,lb,ub)
+   local i = cstb_get_stack_level()
+   if p<lb or p>ub then 
+      ltj.error('Invalid code (' .. p .. '), should in the range '
+		.. tostring(lb) .. '..' .. tostring(ub) .. '.',
+	     {"I'm going to use 0 instead of that illegal code value."})
+      p=0
+   elseif c<-1 or c>0x10FFFF then
+      ltj.error('Invalid character code (' .. c
+		.. '), should in the range -1.."10FFFF.',{})
+      return 
+   elseif not charprop_stack_table[i][c] then 
+      charprop_stack_table[i][c] = {} 
+   end
+   charprop_stack_table[i][c][m] = p
+  if g=='global' then
+     for j,v in pairs(charprop_stack_table) do 
+	if not charprop_stack_table[j][c] then charprop_stack_table[j][c] = {} end
+	charprop_stack_table[j][c][m] = p
+     end
+  end
+end
+
+-- EXT: store \ltj@tempskipa
+function ltj.ext_set_stack_skip(g,c)
   local i = cstb_get_stack_level()
-  if p<lb or p>ub then 
-     ltj.error('Invalid code (' .. p .. '), should in the range '
-	       .. tostring(lb) .. '..' .. tostring(ub) .. '.',
-	    {"I'm going to use 0 instead of that illegal code value."})
-     p=0
-  elseif c<-1 or c>0x10FFFF then
-     ltj.error('Invalid character code (' .. c
-	       .. '), should in the range -1.."10FFFF.',{})
-     return 
-  elseif not charprop_stack_table[i][c] then 
+  local sp = tex.getskip('ltj@tempskipa')
+  if not charprop_stack_table[i][c] then 
      charprop_stack_table[i][c] = {} 
   end
-  charprop_stack_table[i][c][m] = p
+  charprop_stack_table[i][c].width   = sp.width
+  charprop_stack_table[i][c].stretch = sp.stretch
+  charprop_stack_table[i][c].shrink  = sp.shrink
+  charprop_stack_table[i][c].stretch_order = sp.stretch_order
+  charprop_stack_table[i][c].shrink_order  = sp.shrink_order
   if g=='global' then
-    for j,v in pairs(charprop_stack_table) do 
-      if not charprop_stack_table[j][c] then charprop_stack_table[j][c] = {} end
-      charprop_stack_table[j][c][m] = p
-    end
+     for j,v in pairs(charprop_stack_table) do 
+	if not charprop_stack_table[j][c] then charprop_stack_table[j][c] = {} end
+	charprop_stack_table[j][c].width   = sp.width
+	charprop_stack_table[j][c].stretch = sp.stretch
+	charprop_stack_table[j][c].shrink  = sp.shrink
+	charprop_stack_table[j][c].stretch_order = sp.stretch_order
+	charprop_stack_table[j][c].shrink_order  = sp.shrink_order
+     end
   end
 end
 
-local function cstb_get_penalty_table(m,c)
-  local i = charprop_stack_table[tex.getcount('ltj@@stack')][c]
-  if i then i=i[m] end
-  return i or 0
+-- mode: nil iff it is called in callbacks
+local function cstb_get_skip_table(m, idx)
+   local i = charprop_stack_table[idx][m]
+   return i or { width = 0, stretch = 0, shrink = 0,
+		 stretch_order = 0, shrink_order = 0 }
+end
+ltj.int_get_skip_table = cstb_get_skip_table
+
+local function cstb_get_penalty_table(m,c,d, idx)
+   local i = charprop_stack_table[idx][c]
+   if i then i=i[m] end
+   return i or d
 end
 ltj.int_get_penalty_table = cstb_get_penalty_table
-
-local function cstb_get_inhibit_xsp_table(c)
-  local i = charprop_stack_table[tex.getcount('ltj@@stack')][c]
-  if i then i=i.xsp end
-  return i or 3
-end
-ltj.int_get_inhibit_xsp_table = cstb_get_inhibit_xsp_table
 
 ------------------------------------------------------------------------
 -- CODE FOR GETTING/SETTING PARAMETERS 
@@ -177,11 +206,11 @@ function ltj.ext_get_parameter_unary(k)
    elseif k == 'yjabaselineshift' then
       tex.write(print_scaled(tex.getattribute('ltj@ykblshift'))..'pt')
    elseif k == 'kanjiskip' then
-      tex.write(print_spec(tex.getskip('kanjiskip')))
+      tex.write(print_spec(cstb_get_skip_table('kanjiskip', tex.getcount('ltj@@stack'))))
    elseif k == 'xkanjiskip' then
-      tex.write(print_spec(tex.getskip('xkanjiskip')))
+      tex.write(print_spec(cstb_get_skip_table('xkanjiskip', tex.getcount('ltj@@stack'))))
    elseif k == 'jcharwidowpenalty' then
-      tex.write(tex.getcount('jcharwidowpenalty'))
+      tex.write(cstb_get_penalty_table('jwp', 0, 0, tex.getcount('ltj@@stack')))
    elseif k == 'autospacing' then
       tex.write(tex.getattribute('ltj@autospc'))
    elseif k == 'autoxspacing' then
@@ -214,11 +243,11 @@ function ltj.ext_get_parameter_binary(k,c)
 	 c=0
       end
       if k == 'prebreakpenalty' then
-	 tex.write(cstb_get_penalty_table('pre',c))
+	 tex.write(cstb_get_penalty_table('pre', c, 0, tex.getcount('ltj@@stack')))
       elseif k == 'postbreakpenalty' then
-	 tex.write(cstb_get_penalty_table('post',c))
+	 tex.write(cstb_get_penalty_table('post', c, 0, tex.getcount('ltj@@stack')))
       elseif k == 'kcatcode' then
-	 tex.write(cstb_get_penalty_table('kcat',c))
+	 tex.write(cstb_get_penalty_table('kcat', c, 0, tex.getcount('ltj@@stack')))
       elseif k == 'chartorange' then 
 	 tex.write(rgjc_char_to_range(c))
       elseif k == 'jaxspmode' or k == 'alxspmode' then
@@ -236,6 +265,8 @@ end
 ------------------------------------------------------------------------
 -- MAIN PROCESS STEP 1: replace fonts (prefix: main1)
 ------------------------------------------------------------------------
+ltj.box_stack_level = 0
+-- This is used in Step 2 (JFM glue/kern) and Step 3 (\[x]kanjiskip).
 
 --- the following function is modified from jafontspec.lua (by K. Maeda).
 --- Instead of "%", we use U+FFFFF for suppressing spaces.
@@ -250,28 +281,47 @@ local function main1_process_input_buffer(buffer)
    return buffer
 end
 
+
 local function main1_suppress_hyphenate_ja(head)
-   local p
-   for p in node.traverse(head) do
-      if p.id == id_glyph then
-	 if rgjc_is_ucs_in_japanese_char(p) then
-	    local v = has_attr(p, attr_curjfnt)
-	    if v then 
-	       p.font = v 
-	       node.set_attribute(p,attr_jchar_class,
-                 ljfm_find_char_class(p.char, ltj.font_metric_table[v].jfm))
-	    end
-	    v = has_attr(p, attr_ykblshift)
-	    if v then 
-	       node.set_attribute(p, attr_yablshift, v)
-	    else
-	       node.unset_attribute(p, attr_yablshift)
-	    end
-	    p.lang=lang_ja
+   for p in node.traverse_id(id_glyph, head) do
+      if rgjc_is_ucs_in_japanese_char(p) then
+	 local v = has_attr(p, attr_curjfnt)
+	 if v then 
+	    p.font = v 
+	    node.set_attribute(p, attr_jchar_class,
+			       ljfm_find_char_class(p.char, ltj.font_metric_table[v].jfm))
 	 end
+	 v = has_attr(p, attr_ykblshift)
+	 if v then 
+	    node.set_attribute(p, attr_yablshift, v)
+	 else
+	    node.unset_attribute(p, attr_yablshift)
+	 end
+	 p.lang=lang_ja
       end
    end
    lang.hyphenate(head)
+   return head
+end
+
+-- mode: true iff this function is called from hpack_filter
+local function main1_set_box_stack_level(head, mode)
+   local box_set = false
+   local p = head
+   local cl = tex.currentgrouplevel + 1
+   while p do
+      if p.id==id_whatsit and p.subtype==sid_user and p.user_id==30112 then
+	 local g = p; 
+	 if mode and g.value==cl then box_set = true end
+	 head, p = node.remove(head, g)
+      else p = node_next(p)
+      end
+   end
+   if box_set then 
+      ltj.box_stack_level = tex.getcount('ltj@@stack') + 1 
+   else 
+      ltj.box_stack_level = tex.getcount('ltj@@stack') 
+   end
    return head
 end
 
@@ -281,9 +331,13 @@ luatexbase.add_to_callback('process_input_buffer',
      return main1_process_input_buffer(buffer)
    end,'ltj.process_input_buffer')
 luatexbase.add_to_callback('hpack_filter', 
-  function (head,groupcode,size,packtype)
-     return main1_suppress_hyphenate_ja(head)
-  end,'ltj.hpack_filter_pre',0)
+   function (head)
+     return main1_set_box_stack_level(head, true)
+   end,'ltj.hpack_filter_pre',1)
+luatexbase.add_to_callback('pre_linebreak_filter', 
+  function (head)
+     return main1_set_box_stack_level(head, false)
+  end,'ltj.pre_linebreak_filter_pre',1)
 luatexbase.add_to_callback('hyphenate', 
  function (head,tail)
     return main1_suppress_hyphenate_ja(head)
@@ -336,6 +390,7 @@ local function main4_set_ja_width(head)
 	       g = node_hpack(h, round(met_tb.size*s.width), 'exactly')
 	       g.height = round(met_tb.size*s.height)
 	       g.depth = round(met_tb.size*s.depth)
+	       node.set_attribute(g, attr_icflag, PACKED)
 	       if q then
 		  head = node_insert_before(head, q, g)
 	       else
@@ -421,8 +476,6 @@ function debug_show_node_X(p,print_fn)
 	 debug_show_node_X(q, print_fn); q = node_next(q)
       end
       debug_depth=k
-   elseif pt == 'whatsit' then
-      print_fn(debug_depth.. ' whatsit', p.subtype)
    elseif pt == 'glue' then
       s = debug_depth.. ' glue   ' ..  p.subtype 
 	 .. ' ' ..  print_spec(p.spec)
@@ -453,6 +506,14 @@ function debug_show_node_X(p,print_fn)
       s = debug_depth.. ' penalty ' ..  tostring(p.penalty)
       if has_attr(p, attr_icflag)==KINSOKU then
 	 s = s .. ' (for kinsoku)'
+      end
+      print_fn(s)
+   elseif pt == 'whatsit' then
+      s = debug_depth.. ' whatsit ' ..  tostring(p.subtype)
+      if p.subtype==sid_user then
+	 s = s .. ' user_id: ' .. p.user_id .. ' ' .. p.value
+      else
+	 s = s .. node.subtype(p.subtype)
       end
       print_fn(s)
    else

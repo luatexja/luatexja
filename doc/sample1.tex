@@ -49,8 +49,6 @@
 \itemitem |\showmode|, |\jfam|.
 \itemitem 縦組み関連一式．|\tate|, |\tfont|, |\tbaselineshift|, |\dtou|,$\,\ldots$
 
-\item 和文間・和欧文間空白の自動挿入がglobalでしかできていません．
-←解決はさほど難しくないので，仕様を決定した後に書き上げます．
 \enditem
 
 
@@ -199,17 +197,17 @@ p\TeX では，同一文字に対して|\prebreakpenalty|, |\postbreakpenalty|�
 
 \item |jaxspmode={<chr_code>, <mode>}|★\par\noindent
 p\TeX の|\inhibitxspcode|に対応した設定項目である．<mode>で許される値は，
-\itemitem |0|, |inhibit|: 前後の欧文文字との間の|\xkanjiskip|自動挿入を禁止．
-\itemitem |2|, |preonly|: 前の欧文文字との間の|\xkanjiskip|自動挿入のみを許可．
-\itemitem |1|, |postonly|: 後の欧文文字との間の|\xkanjiskip|自動挿入のみを許可．
-\itemitem |3|, |allow|: 前後の欧文文字との間の|\xkanjiskip|自動挿入を許可．
+\itemitem |0|, |inhibit|: 前後の欧文文字との間の|xkanjiskip|自動挿入を禁止．
+\itemitem |2|, |preonly|: 前の欧文文字との間の|xkanjiskip|自動挿入のみを許可．
+\itemitem |1|, |postonly|: 後の欧文文字との間の|xkanjiskip|自動挿入のみを許可．
+\itemitem |3|, |allow|: 前後の欧文文字との間の|xkanjiskip|自動挿入を許可．
 \item |alxspmode={<chr_code>, <mode>}|★\par\noindent
 同様に，p\TeX の|\xspcode|に対応した設定項目である．
 <mode>で許される値は，
-\itemitem |0|, |inhibit|: 前後の和文文字との間の|\xkanjiskip|自動挿入を禁止．
-\itemitem |1|, |preonly|: 前の和文文字との間の|\xkanjiskip|自動挿入のみを許可．
-\itemitem |2|, |postonly|: 後の和文文字との間の|\xkanjiskip|自動挿入のみを許可．
-\itemitem |3|, |allow|: 前後の和文文字との間の|\xkanjiskip|自動挿入を許可．
+\itemitem |0|, |inhibit|: 前後の和文文字との間の|xkanjiskip|自動挿入を禁止．
+\itemitem |1|, |preonly|: 前の和文文字との間の|xkanjiskip|自動挿入のみを許可．
+\itemitem |2|, |postonly|: 後の和文文字との間の|xkanjiskip|自動挿入のみを許可．
+\itemitem |3|, |allow|: 前後の和文文字との間の|xkanjiskip|自動挿入を許可．
 
 \item |yalbaselineshift=<dimen>|:
 p\TeX の|\ybaselineshift|に対応したものであり，
@@ -226,12 +224,38 @@ p\TeX では「和文が主」という考えからか，常に和文文字の�
 また，この値を適切に調整することで，%
 {\small 異なる文字サイズの文字を「上下中央揃え」で組む}ことも可能である．
 
-\item |kanjiskip=<skip>|★\inhibitglue: 後に述べる|\kanjiskip=<skip>|と同じ意味．
-\item |xkanjiskip=<skip>|★\inhibitglue: 後に述べる|\xkanjiskip=<skip>|と同じ意味．
-\item |jcharwidowpenalty=<penalty>|★\inhibitglue: 
-後に述べる|\jcharwidowpenalty=<penalty>|と同じ意味．
+\item |kanjiskip=<skip>|★\par\noindent
+和文文字同士の間に入る空白量を指定．p\TeX の同名の命令と同様に，
+基本的には段落/hbox終了時の値が，その段落/hbox全体に適用される． つまり，
+\begintt
+\ltjsetparameter{kanjiskip=3pt}あい%
+{\ltjsetparameter{kanjiskip=10pt}うえ}}
+\endtt
+の組版結果は（段落終了時の値が$3\,{\rm pt}$のため），
+$$
+ \hbox{\ltjsetparameter{kanjiskip=3pt}あい{\ltjsetparameter{kanjiskip=10pt}うえ}}
+$$
+となる．
+
+但し，|kanjiskip|の自然長が$\hbox{|\maxdimen|}=16383.99998\,{\rm pt}$の場合は，
+\itemitem （和文文字の間それぞれについて）JFMに指定されている
+|kanjiskip|の値を採用する．
+\itemitem 左側JFM，右側JFMのどちらかにおいて指定されていれば，そちらを使用する．
+\itemitem どちらにおいても指定されていない場合は，0とみなす．
+
+\item |xkanjiskip=<skip>|★\par\noindent
+和文文字と欧文文字の間に入る空白量．p\TeX の同名の命令と同様．
+これも，自然長が|\maxdimen|の場合は，JFMで指定された値を使う．
+
+
+\item |jcharwidowpenalty=<penalty>|★\par\noindent
+段落において「最後の1文字のみが次の行に」くることを
+抑制するためのpenalty値．このpenaltyは，段落内にある，最後の「|kcatcode|の最下位bitが
+1で{\bf ない}ような和文文字」の直前に挿入される．
+
+
 \item |autospacing[=<bool>]|\par\noindent
-和文文字間のglue（|\kanjiskip|）の自動挿入をするかしないかを制御．
+和文文字間のglue（|kanjiskip|）の自動挿入をするかしないかを制御．
 p\TeX では段落/hbox 単位での設定となったが，Lua\TeX-ja では
 そうではなくなった．
 挿入可能な箇所の両端のノードにおいて，片方でも
@@ -239,9 +263,9 @@ p\TeX では段落/hbox 単位での設定となったが，Lua\TeX-ja では
 \begintt
 あ\ltjsetparameter{autospacing=false}いう
 \endtt
-の場合，「あい」の間には|\kanjiskip|が挿入され，「いう」の間には入らない．
+の場合，「あい」の間には|kanjiskip|が挿入され，「いう」の間には入らない．
 \item |autoxspacing[=<bool>]|\par\noindent
-和欧文間のglue（|\xkanjiskip|）の自動挿入をするかしないかを制御．
+和欧文間のglue（|xkanjiskip|）の自動挿入をするかしないかを制御．
 その他は|autospacing|と同様．
 
 \item |differentjfm=(large/small/average/both)|★◎\par\noindent
@@ -252,7 +276,7 @@ glue/kernの計算方法を設定する．
 \itemitem {\tt small}: 両者のうち小さい方．
 \itemitem {\tt average}: 両者の相加平均．
 \itemitem {\tt both}: 両者の合計値の幅をもつglue/kernを挿入する．
-この指定は，JFM由来の|\kanjiskip|の値が左右の和文文字で異なったときの
+この指定は，JFM由来の|kanjiskip|の値が左右の和文文字で異なったときの
 挙動にも適用される．
 
 \item |jacharrange={<range_num>,<range_num>,...}|: 
@@ -296,25 +320,6 @@ $n\notin [1,216]$の場合は，「どの文字範囲にも属さない|U+0080|�
 \itemitem 上の場合以外で，<chr_code>の文字がどの文字範囲にも属さない場合は，|217|を返す．
 
 \beginparagraph その他の命令
-
-\item skip |\kanjiskip|: 和文文字同士の間に入る空白量を指定．
-p\TeX の同名の命令と同様に，基本的には段落/hbox終了時の値が，その段落/hbox全体に適用される．
-
-{\bf TODO}: 現在の実装では，hboxにおいては，hbox終了{\gt 後}の値が適用される．
-要検討．
-
-但し，|\kanjiskip|の自然長が$\hbox{|\maxdimen|}=16383.99998\,{\rm pt}$の場合は，
-\itemitem （和文文字の間それぞれについて）JFMに指定されている
-|\kanjiskip|の値を採用する．
-\itemitem 左側JFM，右側JFMのどちらかにおいて指定されていれば，そちらを使用する．
-\itemitem どちらにおいても指定されていない場合は，0とみなす．
-
-\item skip |\xkanjiskip|: 和文文字と欧文文字の間に入る空白量．p\TeX の同名の命令と同様．これも，自然長が|\maxdimen|の場合は，JFMで指定された値を使う．
-
-
-\item count |\jcharwidowpenalty|: 段落において「最後の1文字のみが次の行に」くることを
-抑制するためのpenalty値．このpenaltyは，段落内にある，最後の「|kcatcode|の最下位bitが
-1で{\bf ない}ような和文文字」の直前に挿入される．
 
 \item dimen |\zw|, |\zh|: 現在の和文フォントの「幅」/「高さ」（メトリックから指定）
 \item dimen |\jQ|, |\jH|${}= 0.25\,{\rm mm}$.
@@ -492,12 +497,12 @@ $$
 \itemT |\kern| $k$: 本来の$Q$と$P$の間に入る空き（glueであることも）．
 $w$のために自然長を補正している．
 
-\item {\bf |\kanjiskip|, |\xkanjiskip|の挿入: |pre_linebreak_filter|, |hpack_filter|}
+\item {\bf |kanjiskip|, |xkanjiskip|の挿入: |pre_linebreak_filter|, |hpack_filter|}
 
 p\TeX の|adjust_hlist| procedureとほぼ同様の処理を用いて，
-和文間glue |\kanjiskip|や和欧文間glue |\xkanjiskip|を
+和文間glue |kanjiskip|や和欧文間glue |xkanjiskip|を
 挿入する．
-\itemitem 数式境界 (|math_node|) との間に|\xkanjiskip|を自動挿入するかの決定は，
+\itemitem 数式境界 (|math_node|) との間に|xkanjiskip|を自動挿入するかの決定は，
 p\TeX では数字{\tt 0}との間に挿入するかどうかで判定していたが，Lua\TeX-jaでは
 「文字コード$-1$の文字」で判定している．
 \itemitem 合字の周囲の空白挿入については，構成要素の文字列を通じて判断している．例えば，

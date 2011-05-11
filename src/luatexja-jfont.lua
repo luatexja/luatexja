@@ -247,7 +247,6 @@ function ltj.ext_append_italic()
    local p = tex.nest[tex.nest.ptr].tail
    if p and p.id==id_glyph then
       local f = p.font
-      print('it:', utf.char(p.char), p.char)
       local g = node_new(id_kern)
       g.subtype = 1; node.set_attribute(g, attr_icflag, ITALIC)
       if rgjc_is_ucs_in_japanese_char(p) then

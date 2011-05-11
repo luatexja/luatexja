@@ -57,6 +57,18 @@
 \ltjsetparameter{jacharrange={218}}
 和文扱いにもどる
 
+\head{Ticket \#25121}
+\setbox0=\hbox{\ltjsetparameter{kanjiskip=-5pt}
+あいうえお\hbox{\ltjsetparameter{kanjiskip=12pt}かきくけこ}さしすせそ\par a}\copy0
+\tracingonline=0\showboxdepth=10000\showboxbreadth=10000\tracingonline=1\showbox0
+
+{\ltjsetparameter{kanjiskip=3pt}
+あいうえお{\ltjsetparameter{kanjiskip=-5pt}% this setting is ignored
+かきくけこ}さしすせそ\par}
+
+{\ltjsetparameter{kanjiskip=3pt}
+あいうえおさしすせそ}\par
+
 
 \vfill\eject
 \noindent{\bf\gt  以下はJFMグルー挿入検証}
@@ -210,7 +222,7 @@
 \head{kanjiskip from JFM, autospacing (JA--JA)}
 \setbox0=\hbox{あ\rmlh あ}\dumplist0
 
-{\kanjiskip=\maxdimen
+{\ltjsetparameter{kanjiskip=\maxdimen}
 \setbox0=\hbox{あ\rmlh あ}\dumplist0
 \jfont\rmlk={psft:Ryumin-Light:jfm=test} at 12pt
 \setbox0=\hbox{\rmlk は\rmlh あ}\dumplist0}
@@ -226,7 +238,7 @@
 
 \setbox0=\hbox{\naxspc\rmlh まx}\dumplist0
 
-{\xkanjiskip=\maxdimen\setbox0=\hbox{\rmlh まx}\dumplist0}
+{\ltjsetparameter{xkanjiskip=\maxdimen}\setbox0=\hbox{\rmlh まx}\dumplist0}
 
 {\ltjsetparameter{jaxspmode={`ま,preonly}}
 \setbox0=\hbox{\rmlh まx}\dumplist0}
@@ -241,7 +253,7 @@
 
 \setbox0=\hbox{\naxspc\rmlh xま}\dumplist0
 
-{\xkanjiskip=\maxdimen\setbox0=\hbox{\rmlh xま}\dumplist0}
+{\ltjsetparameter{xkanjiskip=\maxdimen}\setbox0=\hbox{\rmlh xま}\dumplist0}
 
 {\ltjsetparameter{jaxspmode={`ま,postonly}}
 \setbox0=\hbox{\rmlh xま}\dumplist0}
