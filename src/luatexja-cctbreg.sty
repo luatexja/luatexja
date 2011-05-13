@@ -1,0 +1,282 @@
+%
+% luatexja-cctbreg.sty
+%
+
+%! luatexbase と luatex パッケージのカテゴリコードテーブルの割当に
+%! 関する衝突を回避する.
+%! この衝突に関して「外部のパッチ」で解決しようとするのは, あまり
+%! 筋が良くなく, できるなら避けたいが, 今のままだと LuaTeX-ja を
+%! LaTeX + fontspec で用いた時に確実に影響が出る. また衝突を残した
+%! ままだとカテゴリコードテーブルが実質的に使えない訳で, これも
+%! 残念なことである. 
+%! 「近いうちに両パッケージの中で解決される」ことを期待しつつ,
+%! 「衝突がない」という前提で開発を行いたいので, 暫定的処置として,
+%! このモジュールを用意する.
+
+%! これは外から読まれない
+%% Avoid multiple loading.
+\csname luatexjacctbregLoaded\endcsname
+\edef\ltj@cctbreg@AtEnd{%
+\endlinechar=\the\endlinechar
+\relax}
+\endlinechar=-1 %
+\def\luatexjacctbregLoaded{\endinput}
+
+\ifltj@in@latex                 %<*LaTeX>
+  \NeedsTeXFormat{LaTeX2e}
+  \ProvidesPackage{luatexja-cctbreg}[2011/04/01 v0.1]
+\fi                             %</LaTeX>
+
+% LS = Size of storage reserved for luatex-pkg.
+\chardef\ltj@cctb@lower@stor@size=32768
+
+%-------------------
+
+\newcount\ltj@@cctb@failure
+
+\ltj@@cctb@failure=0
+\def\ltj@@cctb@check@failure{
+  \ifnum\ltj@@cctb@failure>0 %
+    \@PackageWarningNoLine{luatexja-cctbreg}
+      {Cannot apply the patch (\the\ltj@@cctb@failure)}
+    \ltj@cctbreg@AtEnd
+  \expandafter\endinput\fi\relax
+}
+
+\chardef\ltj@@cctb@lower@stor@max=
+  \numexpr\ltj@cctb@lower@stor@size-1\relax
+\chardef\ltj@@cctb@lower@stor@safemax=
+  \numexpr\ltj@cctb@lower@stor@size-8\relax
+
+\chardef\ltj@@tempcctb@a=\ltj@cctb@lower@stor@size
+\chardef\ltj@@tempcctb@b=\numexpr\ltj@cctb@lower@stor@size+1\relax
+\def\ltj@@copy@cctb#1#2{%
+  % Note: The current cctb number is supposed to be zero.
+  \luatexcatcodetable#1\relax
+  \luatexsavecatcodetable#2\relax
+  \luatexcatcodetable0\relax
+}
+
+%-------------------
+
+% The luatexbase-cctb package stores its preset settings to
+% registers 1--6, and new user allocations go to number 7, 8, ....
+
+\ifdefined\lltxb@catcodetable@alloc
+  \ifnum\lltxb@catcodetable@alloc>\ltj@@cctb@lower@stor@safemax
+    % Failure: luatexbase-cctb alloc pointer is too high!
+    \ltj@@cctb@failure=2 %
+  \fi
+\else
+  % Failure: luatexbase-cctb not loaded!
+  \ltj@@cctb@failure=1 %
+\fi
+
+\begingroup
+\endlinechar=13
+\catcode`\_=12
+\gdef\ltj@@cctb@org@def#1{%
+  \ifnum\lltxb@catcodetable@alloc<65535\relax
+    \global\advance\lltxb@catcodetable@alloc\@ne
+    \allocationnumber\lltxb@catcodetable@alloc
+    \global\chardef#1\allocationnumber
+    \luatexinitcatcodetable\allocationnumber
+    \begingroup\escapechar\m@ne
+    \luatexbase@directlua{luatexbase.catcodetabledef_from_tex(
+      '\luatexluaescapestring{\string#1}', '\number\allocationnumber')}%
+    \endgroup
+    \wlog{\string#1=\string\luatexcatcodetable\the\allocationnumber}%
+  \else
+    \errmessage{No room for a new \string\luatexcatcodetable}%
+  \fi}
+\endgroup
+
+\unless\ifx\ltj@@cctb@org@def\newluatexcatcodetable
+  % Failure: luatexbase-cctb is not of expected version!
+\bebo
+  \ltj@@cctb@failure=3 %
+\fi
+
+\ifdefined\LuT@AllocAttribute
+  \ifnum\LuT@AllocAttribute>\ltj@@cctb@lower@stor@safemax
+    % Failure: luatex-pkg alloc pointer is too high!
+    \ltj@@cctb@failure=4 %
+  \fi
+\fi
+\ifdefined\CatcodeTableStack
+  \ifnum\CatcodeTableStack>\ltj@@cctb@lower@stor@safemax
+    % Failure: luatex-pkg cctb-stack pointer is too high!
+    \ltj@@cctb@failure=5 %
+  \fi
+\fi
+
+\ltj@@cctb@check@failure
+
+\ltx@firstofone{
+  \newluatexcatcodetable\cctb@seven
+  \catcode12345=14 %
+  \luatexsavecatcodetable\cctb@seven
+  \catcode12345=12 %
+}
+
+%% Save the register 7 (to a temporary register)
+\unless\ifnum\lltxb@catcodetable@alloc<7 %
+  \ltj@@copy@cctb{7}{\ltj@@tempcctb@a}
+\fi
+
+%-------------------
+
+% The luatex package stores its preset settings to registers 1, 3, 5, 7
+% and new user allocations go to odd number 9, 11, 13, etc.; registers
+% with even number are reserved for the "category code table stack".
+
+% I relocate all the future allocation by luatexbase-cctb to the "higher"
+% area (number >= \ltj@cctb@lower@stor@size), which is simply done by
+% moving the allocation pointer. And all the preset settings of
+% luatexbase-cctb (those of luatex-pkg is a subset) are prepared again.
+% The colliding user allocation cannot be helped, but in the fortunate
+% case where luatex-pkg is not yet loaded or its allocating function
+% is never invoked, the only endangered user allocation is register 7
+% of luatexbase-cctb, which is rescued by simply reassining the table,
+% since the all presets are migrated to the higher area.
+
+\unless\ifdefined\LuT@AllocAttribute
+  \ifltj@in@latex
+    \RequirePackage{luatex}[2010/03/01]
+  \else
+    \input luatex.sty\relax
+  \fi
+\fi
+
+\edef\ltj@@tempa{\meaning\LuT@AllocAttribute}
+\edef\ltj@@tempb{\meaning\lltxb@catcodetable@alloc}
+\ifx\ltj@@tempa\ltj@@tempb
+  % Failure: luatexbase-cctb and luatex-pkg seem to be synchronized!
+  \ltj@@cctb@failure=6 %
+\fi
+\ltj@@cctb@check@failure
+
+\unless\ifnum 7=
+ \ifdefined\CatcodeTableLaTeX \CatcodeTableLaTeX
+ \else 0 \fi
+  % Failure: luatex-pkg is not of expected version!!
+  \ltj@@cctb@failure=100 %
+\fi
+
+\def\ltj@@cctb@org@def#1{
+  \ifnum\LuT@AllocCatcodeTable<1114110 %
+    \global\advance\LuT@AllocCatcodeTable by\tw@
+    \allocationnumber=\LuT@AllocCatcodeTable
+    \global\chardef#1=\allocationnumber
+    \wlog{
+      \string#1=\string\catcodetable\the\allocationnumber
+    }
+  \else
+    \errmessage{No room for a new \string\catcodetable}
+  \fi
+}
+\unless\ifx\ltj@@cctb@org@def\newcatcodetable
+  % Failure: luatex-pkg is not of expected version!!
+  \ltj@@cctb@failure=100 %
+\fi
+
+\def\ltj@@cctb@org@def{%
+  \ifnum\CatcodeTableStack<268435454 %
+    \global\advance\CatcodeTableStack by\tw@
+  \else
+    \@PackageError{luatex}{%
+      Catcode table stack overflow%
+    }\@ehd
+  \fi
+}
+\unless\ifx\ltj@@cctb@org@def\IncCatcodeTableStack
+  % Failure: luatex-pkg is not of expected version!!
+  \ltj@@cctb@failure=100 %
+\fi
+\ltj@@cctb@check@failure
+
+%% Restore the register 7 which is overwritten by luatex-pkg.
+\unless\ifnum\lltxb@catcodetable@alloc<7 %
+  \ltj@@copy@cctb{\ltj@@tempcctb@a}{7}
+\fi
+
+%% Move the pointer of luatexbase-cctb to higher area.
+\lltxb@catcodetable@alloc=\ltj@cctb@lower@stor@size
+
+%% Restrict the allocation by luatex-pkg to lower area.
+\chardef\ltj@@cctb@lower@stor@check=
+ \numexpr\ltj@cctb@lower@stor@size-2\relax
+\def\newcatcodetable#1{
+  \ifnum\LuT@AllocCatcodeTable<\ltj@@cctb@lower@stor@check
+    \global\advance\LuT@AllocCatcodeTable by\tw@
+    \allocationnumber=\LuT@AllocCatcodeTable
+    \global\chardef#1=\allocationnumber
+    \wlog{
+      \string#1=\string\catcodetable\the\allocationnumber
+    }
+  \else
+    \errmessage{No room for a new \string\catcodetable}
+  \fi
+}
+\def\IncCatcodeTableStack{%
+  \ifnum\CatcodeTableStack<\ltj@@cctb@lower@stor@check
+    \global\advance\CatcodeTableStack by\tw@
+  \else
+    \@PackageError{luatex}{%
+      Catcode table stack overflow%
+    }\@ehd
+  \fi
+}
+
+%------------------- Re-create the presets
+
+\newluatexcatcodetable\CatcodeTableIniTeX
+\newluatexcatcodetable\CatcodeTableString
+\setluatexcatcodetable\CatcodeTableString{%
+  \luatexcatcodetable\CatcodeTableIniTeX
+  \catcode0   12 % nul
+  \catcode13  12 % carriage return
+  \catcode37  12 % percent
+  \setcatcoderange{65}{90}{12}% A-Z
+  \setcatcoderange{97}{122}{12}% a-z
+  \catcode92  12 % backslash
+  \catcode127 12 }
+\newluatexcatcodetable\CatcodeTableOther
+\setluatexcatcodetable\CatcodeTableOther{%
+  \luatexcatcodetable\CatcodeTableString
+  \catcode32 12 }
+\newluatexcatcodetable\CatcodeTableLaTeX
+\setluatexcatcodetable\CatcodeTableLaTeX{%
+  \luatexcatcodetable\CatcodeTableIniTeX
+  \setcatcoderange{0}{31}{15}%
+  \catcode9   10 % tab
+  \catcode12  13 % form feed
+  \catcode13  5  % carriage return
+  \catcode35  6  % hash
+  \catcode36  3  % dollar
+  \catcode38  4  % ampersand
+  \catcode94  7  % circumflex
+  \catcode95  8  % underscore
+  \catcode123 1  % brace left
+  \catcode125 2  % brace right
+  \catcode126 13 % tilde
+  \catcode127 15 }
+\newluatexcatcodetable\CatcodeTableLaTeXAtLetter
+\setluatexcatcodetable\CatcodeTableLaTeXAtLetter{%
+  \luatexcatcodetable\CatcodeTableLaTeX
+  \catcode64=11 }
+\newluatexcatcodetable\CatcodeTableExpl
+\setluatexcatcodetable\CatcodeTableExpl{%
+  \luatexcatcodetable\CatcodeTableLaTeX
+  \catcode126 10 % tilde is a space char
+  \catcode32  9  % space is ignored
+  \catcode9   9  % tab also ignored
+  \catcode95  11 % underscore letter
+  \catcode58  11 % colon letter
+  }
+\luatexbase@directlua{luatexbase.catcodetable_do_shortcuts()}
+
+%%------------------ all done
+\ltj@cctbreg@AtEnd
+\endinput
+%% EOF

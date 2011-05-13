@@ -1,0 +1,519 @@
+%
+% luatexja-base.sty
+%
+
+%! これは外から読まれない
+%% Avoid multiple loading.
+\csname luatexjabaseLoaded\endcsname
+\edef\ltj@base@AtEnd{%
+\endlinechar=\the\endlinechar
+\relax}
+\endlinechar=-1 %
+\def\luatexjabaseLoaded{\endinput}
+
+\ifltj@in@latex                 %<*LaTeX>
+  \NeedsTeXFormat{LaTeX2e}
+  \ProvidesPackage{luatexja-base}[2011/04/01 v0.1]
+\fi                             %</LaTeX>
+
+%% Quark tokens needed in Lua modules.
+\protected\def\ltj@@q@escape{\ltj@@q@escape@}
+\protected\def\ltj@@q@escapenum{\ltj@@q@escapenum@}
+
+%% Load Lua modules.
+\RequireLuaModule{luatexja.base}
+\RequireLuaModule{luatexja.tangle}
+\RequireLuaModule{luatexja.stack}
+
+%%------------------ Tiny helpers
+
+%% Registers
+\newcount\ltj@tempcnta
+\newcount\ltj@tempcntb
+\newdimen\ltj@tempdima
+
+%% Quarks
+%! ただ expl3 の quark とは異なり展開されるとエラーになる.
+%% \ltj@q@stop
+\protected\def\ltj@q@stop{\ltj@q@stop@}
+%% \ltj@q@nil
+\protected\def\ltj@q@nil{\ltj@q@nil@}
+%% \ltj@q@mark
+\protected\def\ltj@q@mark{\ltj@q@mark@}
+
+%! etoolbox の \letcs, \cslet, \csletcs.
+%% \ltj@letcs
+\protected\def\ltj@letcs#1#2{
+  \expandafter\let\expandafter#1\csname#2\endcsname
+}
+
+%% \ltj@cslet
+\protected\def\ltj@cslet#1#2{
+  \expandafter\let\csname#1\endcsname#2
+}
+
+%% \ltj@csletcs
+\protected\def\ltj@csletcs#1#2{
+  \expandafter\let\csname#1\expandafter\endcsname
+  \csname#2\endcsname
+}
+
+%% \ltj@ifx{<sutff>}{<yes>}{<no>}
+%! LaTeX 形式の \ifx. この形式の利点は自動的に条件ネストからの
+%! 脱出が可能であること.
+% Does \ifx<stuff> test in LaTeX style.
+\long\def\ltj@ifx#1{
+  \ifx#1\expandafter\ltx@firstoftwo
+  \else\expandafter\ltx@secondoftwo\fi
+}
+
+%% \ltj@if@empty{<stuff>}{<yes>}{<no>}
+%! <stuff> が空であるか.
+% Checks if <stuff> is empty.
+\long\def\ltj@if@empty#1{
+  \ltj@ifx{\ltj@@q@empty#1\ltj@@q@empty}
+}
+\protected\def\ltj@@q@empty{\ltj@@q@empty@}
+
+%% \ltj@if@blank{<stuff>}{<yes>}{<no>}
+%! <stuff> が空または空白文字からなるか.
+% Checks if <stuff> is either empty or consisting only of spaces.
+\def\ltj@if@blank#1{
+  \ltj@@if@blankA#1\ltj@@q@empty\ltj@@q@empty
+   \ltx@secondoftwo\ltx@firstoftwo\ltj@q@nil
+}
+\long\def\ltj@@if@blankA#1#2\ltj@@q@empty#3#4#5\ltj@q@nil{
+  #4
+}
+
+%% \ltj@burst-`>TEXT
+%! トリックに使う \romannumeral をエイリアスしておく.
+% Gets the head of TEXT expanded repeatedly until an unexpandable
+% token is seen, and if the token is a space then it is gobbled.
+\let\ltj@burst\romannumeral
+
+%%------------------ LaTeX vs plain
+\ifltj@in@latex            %<*LaTeX>
+
+%% \ifltj@in@latex
+%! LaTeX であるか.
+%(Defined in luatexja-core.sty.)
+
+%% \ifltj@in@plain
+%! plain であるか.
+\ltj@csletcs{ifltj@in@plain}{iffalse}
+
+%% \ltj@require@package{<package>}{<date>}
+%! サブパッケージを読み込む. LaTeX では \RequirePackage、それ以外では
+%! \input を使う. <date> は必須だが空でもよい.
+\def\ltj@require@package#1#2{
+  \RequirePackage{#1}[#2]
+}
+
+%% \ltj@print{<message>}
+%! 端末への出力.
+\let\ltj@print\typeout
+
+\else                           %<*!LaTeX>
+
+%% \ifltj@in@plain
+\ifnum\pdf@strcmp{\fmtname}{plain}=0 %
+  \ltj@csletcs{ifltj@in@plain}{iftrue}
+\else
+  \ltj@csletcs{ifltj@in@plain}{iffalse}
+\fi
+
+%% \ltj@require@package{<package>}{<date>}
+\def\ltj@require@package#1#2{
+  \input #1.sty\relax
+}
+
+%% \ltj@print{<message>}
+\def\ltj@print#1{
+  \immediate\write16{#1}
+}
+
+\fi                             %</LaTeX>
+%%------------------ Value-token handling
+
+%% helper stuffs
+
+%% \ltj@gobble@num <number>
+%! 次に続く整数を(2 回展開で)読み捨てる. 
+\def\ltj@gobble@num{
+  \ltj@burst-`>\ltj@@gobble@num
+}
+\def\ltj@@gobble@num{
+  \expandafter\ltj@@gobble@numA\the\parshapeindent
+}
+\begingroup
+  \lccode`8=`p\lccode`9=`t
+\lowercase{\endgroup
+  \def\ltj@@gobble@numA#189{ }
+}
+
+%% \ltj@gobble@glue <glue>
+%! 次に続くグルー値を(2 回展開で)読み捨てる. 
+\def\ltj@gobble@glue{%
+  \ltj@burst-`>\ltj@@gobble@glue
+}
+\def\ltj@@gobble@glue{
+  \expandafter\ltj@@gobble@glueA\the\glueshrinkorder
+}
+\def\ltj@@gobble@glueA#1{ }
+
+%% \ltj@gobble@dimen <dimen>
+%! 次に続く寸法値を(2 回展開で)読み捨てる. 
+\def\ltj@gobble@dimen{%
+  \ltj@burst-`>\ltj@@gobble@dimen
+}
+\def\ltj@@gobble@dimen{
+  \expandafter\ltj@@gobble@dimenA\the\glueshrinkorder
+  0pt minus
+}
+\def\ltj@@gobble@dimenA#1{ }
+
+%% \ltj@@scan@brace
+% This is to be followed by a macro with one argument; if the macro is
+% followed by an open-group token (catcode 1), then it receives as the
+% argument a token \bxnt@escape instead of the group initiated by the
+% open-group, which is left untouched.
+\def\ltj@@scan@brace{
+  \directlua{luatexja.base.scan_brace()}
+}
+
+%% \ltj@@scan@number
+\def\ltj@@scan@number{
+  \directlua{luatexja.base.scan_number()}
+}
+
+%% \ltj@grab@num <number>
+%! 次に続く整数を読み取って, それと等しい整数を表すトークン列
+%! (必ずしも整数表記とは限らない)を { } に入れたものに(2 回で)
+%! 展開する.
+%! ただし, 整数は以下の形式のいずれかでなければならない.
+%! - 整数表記(10 進, 8 進, 16 進, 文字)
+%! - chardef トークン
+%! - 内部整数パラメタ, countdef トークン
+%!   (command_name が "assign_int" であるトークン).
+%! (注意: まだ文字表記(`A)に対応していません.)
+\def\ltj@grab@num{
+  \ltj@burst-`>\ltj@@grab@num
+}
+\def\ltj@@grab@num{
+  \ltj@@scan@brace\ltj@@grab@numA
+}
+\def\ltj@@grab@numA#1{
+  \ltj@ifx{#1\ltj@@q@escape}{}{%else
+    \ltj@@scan@number\ltj@@grab@numB#1
+  }
+}
+\def\ltj@@grab@numB#1{
+  \ltj@ifx{#1\ltj@@q@escape}{
+    {0}
+  }{
+    \ltj@@grab@numC
+  }
+}
+\def\ltj@@grab@numC#1\ltj@@q@escapenum{
+  {#1}
+}
+
+%%------------------ Safe passing
+
+% These macros convert a token sequence denoting a TeX value to its
+% suitable notation in Lua, and when the argument is malformed then
+% 'nil' is returned. They are all fully-expandable.
+%! TeX の値を Lua 上の表記に変換する. 不正形式だと nil にする.
+
+\def\ltj@@safe@end{\noexpand\ltj@@safe@end}
+  % behaves same as \relax but is distinct from it
+
+%% \ltj@safe@invalid
+% The value passed to lua instead of malformed value tokens.
+\def\ltj@safe@invalid{(nil)}
+
+%% \ltj@safe@num{<number>}
+%! 整数.
+% For a number (integer).
+\def\ltj@safe@num{
+  \ltj@safe@num@or\ltj@safe@invalid
+}
+\def\ltj@safe@num@or#1#2{
+  \expandafter\expandafter\expandafter\ltj@@safe@numA
+   \ltj@gobble@num#2\ltj@@safe@end{#2}{#1}
+}
+\def\ltj@@safe@numA#1\ltj@@safe@end#2#3{
+  \ltj@if@blank{#1}{
+    (\number#2)
+  }{
+    #3
+  }
+}
+
+%% \ltj@safe@dimen{<dimen>}
+%! 寸法値.
+% For a dimension. The result is a scaled-point value.
+\def\ltj@safe@dimen{
+  \ltj@safe@dimen@or\ltj@safe@invalid
+}
+\def\ltj@safe@dimen@or#1#2{
+  \expandafter\expandafter\expandafter\ltj@@safe@dimenA
+   \ltj@gobble@dimen#2\ltj@@safe@end{#2}{#1}
+}
+\def\ltj@@safe@dimenA#1\ltj@@safe@end#2#3{
+  \ltj@if@blank{#1}{
+    (\number\dimexpr#2\relax)
+  }{
+    #3
+  }
+}
+
+%% \ltj@safe@glue{<glue>}
+%! グルー値.
+% For a glue. The result is a gluespec object.
+\def\ltj@safe@glue{
+  \ltj@safe@glue@or\ltj@safe@invalid
+}
+\def\ltj@safe@glue@or#1#2{
+  \expandafter\expandafter\expandafter\ltj@@safe@glueA
+   \ltj@gobble@glue#2\ltj@@safe@end{#2}{#1}
+}
+\def\ltj@@safe@glueA#1\ltj@@safe@end#2#3{
+  \ltj@if@blank{#1}{
+    (luatexja.base.to_skip("\the\glueexpr#2\relax"))
+  }{
+    #3
+  }
+}
+
+%% \ltj@safe@real{<real>}
+%! 実数. これは十進表記に限る.
+% For a real number given in decimal notation or a macro that
+% expands to such notation.
+\def\ltj@safe@real#1{
+  (tonumber("\luatexluaescapestring{#1}"))
+}
+
+%% \ltj@val@counter{<counter>}
+%! LaTeX カウンタの現在値.
+% For the current value of a LaTeX counter.
+\def\ltj@val@counter#1{
+  (\expandafter\number\csname c@#1\endcsname)
+}
+
+%% \ltj@val@skip{<skip>}
+% For the current value of a skip (or LaTeX-length) parameter.
+%! グルーレジスタ(LaTeX 長さ変数).
+%! 整形式のグルー値にも使える.
+\def\ltj@val@skip#1{
+  (luatexja.base.to_skip("\the\glueexpr#1\relax"))
+}
+%! 整形式の整数 → 数値 : \number#1
+%! 内部寸法 → 数値 : \number#1
+%! 整形式の寸法 → 数値 : \number\dimexpr#1\relax
+
+%% \ltj@safe@str{<text>}
+%! 文字列. (トークン列を非トークン化)
+% Converts a token sequence to Lua string notation.
+\def\ltj@safe@str#1{
+  "\luatexluaescapestring{\detokenize{#1}}"
+}
+
+%% \ltj@luaescape{<text>}
+%! 非トークン化して Lua エスケープ.
+\def\ltj@luaescape#1{
+  \luatexluaescapestring{\detokenize{#1}}
+}
+%% \ltj@luaxescape{<text>}
+%! 非トークン化せずに(展開ありで) Lua エスケープ.
+%! つまり単なる \luatexescape.
+\let\ltj@luaxescape\luatexluaescapestring
+
+%%------------------ Fully-expandable error messaging
+
+%! ixerrtrick パッケージから移植.
+%! 展開限定文脈でも使える \PackageError 等.
+%! Lua 関数版(luatexja/base.lua 参照)もある.
+
+%% \ltj@@error@message@a
+\begingroup
+\def~{ }
+\xdef\ltj@@error@message@a{%
+  Type~~H <return>~~for immediate help%
+}%
+\endgroup
+
+%%<+> \ltj@MessageBreak
+% An analogue of \MessageBreak that is used in \ltj@GenericError, etc.
+% (\MessageBreak cannot be used there.)
+% NB: It is realized as a macro that expands to two instances
+% of the character of code 127. This marker is later detected
+% by the Lua process.
+\begingroup
+\lccode42=127
+\lowercase{
+  \gdef\ltj@MessageBreak{**}
+  \directlua{
+    luatexja.base._error_set_break("**")
+  }
+}
+\endgroup
+
+%%<+> \ltj@GenericError{<cont>}{<msg-main>}{<msg-ref>}{<msg-help>}
+% A variant of \GenericError that can be used in expansion-only
+% situation. The meanings of arguments are the same as the original
+% \GenericError.
+%%<+> \ltj@PlainError{<msg-main>}{<msg-help>}
+% A simpler error messenger available in expansion-only situations.
+% It behaves similarly to:
+%   \errhelp{<msg-help}\errmessage{<msg-main>}
+\begingroup
+% with the same hack as in \GenericError...
+\lccode`\@=`\ %
+\lccode`\~=`\ %
+\lccode`\}=`\ %
+\lccode`\{=`\ %
+\catcode`\ =11\relax%
+\lowercase{%
+\endgroup%
+\def\ltj@GenericError#1#2#3#4{% not protected
+\directlua{%
+luatexja.base._error_set_message("\ltj@luaxescape{#1}",%
+"\ltj@luaxescape{#2.^^J^^J#3^^J\ltj@@error@message@a}",%
+"\ltj@luaxescape{#4}")%
+}%
+\    % use csname with four spaces as last expander
+}
+\def\    {% csname with four spaces
+\directlua{%
+luatexja.base._error_show(false)% and many spaces trail!
+                                        %
+                                        %
+}%
+}%
+\def\ltj@PlainError#1#2{%
+\directlua{%
+luatexja.base._error_set_message("  ",%
+"\ltj@luaxescape{#1}",%
+"\ltj@luaxescape{#2}")%
+}%
+\error  % again a weird name is used
+}
+\def\error  {% csname with two trailing spaces
+\directlua{%
+luatexja.base._error_show(true)% and many spaces trail!
+                                        %
+                                        %
+}%
+}%
+}
+
+%% \ltj@@error@on@line
+\def\ltj@@error@on@line{
+  on input line \the \inputlineno
+}
+
+%% \ltj@generic@warn@info
+\def\ltj@@generic@warn@info#1#2#3#4{
+  \begingroup
+    \directlua{
+      luatexja.base._generic_warn_info("\ltj@luaxescape{#3}",
+        "\ltj@luaxescape{#4}", (#1 > 0), (#2 > 0))
+    }
+  \endgroup
+}
+
+%% \ltj@GenericWarning{<cont>}{<msg-main>}
+\def\ltj@GenericWarning{
+  \ltj@@generic@warn@info{1}{1}
+}
+%% \ltj@GenericWarningNoLine{<cont>}{<msg-main>}
+\def\ltj@GenericWarningNoLine{
+  \ltj@@generic@warn@info{1}{0}
+}
+%% \ltj@GenericInfo{<cont>}{<msg-main>}
+\def\ltj@GenericInfo{
+  \ltj@@generic@warn@info{0}{1}
+}
+%% \ltj@GenericInfoNoLine{<cont>}{<msg-main>}
+\def\ltj@GenericInfoNoLine{
+  \ltj@@generic@warn@info{0}{0}
+}
+
+%% \ltj@@space@seq@a
+\begingroup
+\def~{ }
+\xdef\ltj@@space@seq@a{~~~~~~~~~~~~~~~~}
+\xdef\ltj@@space@seq@b{~~~~~~~~~~~~~}
+\endgroup
+
+%% \ltj@PackageError{<pkg-name>}{<msg-main>}{<msg-help>}
+\def\ltj@PackageError#1#2#3{%
+  \ltj@GenericError{(#1)\ltj@@space@seq@a}%
+   {Package #1 Error: #2}%
+   {See the #1 package documentation for explanation.}%
+   {#3}%
+}
+%% \ltj@PackageWarning{<pkg-name>}{<msg-main>}
+\def\ltj@PackageWarning#1#2{%
+  \ltj@GenericWarning{(#1)\ltj@@space@seq@a}%
+   {Package #1 Warning: #2}%
+}
+%% \ltj@PackageWarningNoLine{<pkg-name>}{<msg-main>}
+\def\ltj@PackageWarningNoLine#1#2{%
+  \ltj@GenericWarningNoLine{(#1)\ltj@@space@seq@a}%
+   {Package #1 Warning: #2}%
+}
+%% \ltj@PackageInfo{<pkg-name>}{<msg-main>}
+\def\ltj@PackageInfo#1#2{%
+  \ltj@GenericInfo{(#1)\ltj@@space@seq@b}%
+   {Package #1 Info: #2}%
+}
+%% \ltj@PackageInfoNoLine{<pkg-name>}{<msg-main>}
+\def\ltj@PackageInfoNoLine#1#2{%
+  \ltj@GenericInfoNoLine{(#1)\ltj@@space@seq@b}%
+   {Package #1 Info: #2}%
+}
+
+%%------------------ debug logging
+\ifdefined\LuaTeXjaDebugEnabled
+
+%% Load Lua module
+\RequireLuaModule{luatexja.debug}
+
+%% \ltj@debug{<format>}{<arg>,...}
+\def\ltj@debug#1#2{
+  \directlua{
+    luatexja.base.debug(\ltj@safe@str{#1}
+      \ltj@if@blank{#2}{}{, }
+      #2)
+  }
+}
+
+%% \ltj@package@debug{<package>}{<format>}{<arg>,...}
+\def\ltj@package@debug#1#2#3{
+  \directlua{
+    luatexja.base.package_debug(\ltj@safe@str{#1},
+      \ltj@safe@str{#2}
+      \ltj@if@blank{#3}{}{, }
+      #3)
+  }
+}
+
+\else
+
+\def\ltj@debug#1#2{}
+\def\ltj@package@debug#1#2#3{}
+
+\fi
+
+%% \ltj@debug@logger\CS{<package>}
+\def\ltj@debug@logger#1#2{
+  \def#1{\ltj@package@debug{#2}}
+}
+
+%%------------------ all done
+\ltj@base@AtEnd
+\endinput
+%% EOF
