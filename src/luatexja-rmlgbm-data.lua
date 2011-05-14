@@ -2,6 +2,7 @@ return {
  ascender=576716.8,
  boundarychar=65536,
  boundarychar_label=0,
+ cache="yes",
  characters={
   [32]={
    index=1,
@@ -99943,6 +99944,7 @@ return {
  descriptions={},
  designsize=655360,
  direction=0,
+ embedding="no",
  encodingbytes=2,
  extend=1000,
  factor=655.36,

@@ -1,3 +1,26 @@
+%
+% luatexja-plain.sty
+%
+
+%! これは外から読まれない
+%% Avoid multiple loading.
+\csname luatexjaplainLoaded\endcsname
+\edef\ltj@plain@AtEnd{%
+\endlinechar=\the\endlinechar
+\relax}
+\endlinechar=-1 %
+\def\luatexjaplainLoaded{\endinput}
+
+\ifltj@in@latex                 %<*LaTeX>
+  \NeedsTeXFormat{LaTeX2e}
+  \ProvidesPackage{luatexja-plain}[2011/04/01 v0.1]
+\fi                             %</LaTeX>
+
+%%------------------
+
+\endlinechar=13
+%! この中に master の luatexja-plain.tex の内容を挿入する
+%! ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 % LuaTeX-ja macros against plain TeX
 
 \jfont\tenmin=psft:Ryumin-Light:jfm=ujis at 13.5\jQ
@@ -60,4 +83,10 @@
   \ltjsetparameter{kcatcode={\ltj@tempcnta,1}}%
   \advance\ltj@tempcnta by1
 \repeat
+%\endinput
+%! ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+
+%%------------------ all done
+\ltj@plain@AtEnd
 \endinput
+%% EOF

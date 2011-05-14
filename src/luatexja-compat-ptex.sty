@@ -1,0 +1,67 @@
+%
+% luatexja-compat-ptex.sty
+%
+
+%! これは外から読まれない
+%% Avoid multiple loading.
+\csname luatexjacompatptexLoaded\endcsname
+\edef\ltj@compat@ptex@AtEnd{%
+\catcode64=\the\catcode64%
+\endlinechar=\the\endlinechar
+\relax}
+\catcode64=11 %<@>
+\endlinechar=-1 %
+\def\luatexjacompatptexLoaded{\endinput}
+
+%% Check if LaTeX is used.
+\begingroup\expandafter\expandafter\expandafter\endgroup
+\expandafter\ifx\csname RequirePackage\endcsname\relax %<*!LaTeX>
+  \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
+    \csname iffalse\endcsname
+\else                           %<*LaTeX>
+  \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
+    \csname iftrue\endcsname
+  \NeedsTeXFormat{LaTeX2e}
+  \ProvidesPackage{luatexja-compat-ptex}[2011/04/01 v0.1]
+\fi                             %</LaTeX>
+
+%% Load prerequisite packages.
+\endlinechar=13 %
+\ifltj@in@latex                 %<*LaTeX>
+  \RequirePackage{infwarerr}  [2010/04/08] % v1.3
+  \RequirePackage{ltxcmds}    [2010/04/26] % v1.7
+  \RequirePackage{xkeyval}    [2008/08/13] % v2.6a
+\else                           %<*!LaTeX>
+  \input infwarerr.sty
+  \input ltxcmds.sty
+  \input xkeyval
+\fi                             %</LaTeX>
+\endlinechar=-1 %
+
+\ifx\luatexjacompatLoaded\@undefined
+  \@PackageError{luatexja}
+   {This file must be loaded through 'luatexja-compat'}
+   {\InfWarErr@ehc}
+\fi
+
+%%------------------
+
+\endlinechar=13
+%! この中に master の luatexja-compat-ptex.tex の内容を挿入する
+%! ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+\def\getprebreakpenalty#1{\prebreakpenalty#1 }
+\def\getpostbreakpenalty#1{\postbreakpenalty#1 }
+\def\setprebreakpenalty#1#2{\prebreakpenalty#1=#2 }
+\def\setpostbreakpenalty#1#2{\postbreakpenalty#1=#2 }
+\def\getinhibitxspcode#1{\inhibitxspcode#1 }
+\def\setinhibitxspcode#1#2{\inhibitxspcode#1=#2 }
+\def\getxspcode#1{\xspcode#1 }
+\def\setxspcode#1#2{\xspcode#1=#2 }
+
+%\endinput
+%! ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+
+%%------------------ all done
+\ltj@compat@ptex@AtEnd
+\endinput
+%% EOF

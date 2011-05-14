@@ -67,10 +67,6 @@ local function mk_rml(name, size, id)
    cachedata.fullname = fontdata.fullname
    fontdata.psname = specification.name
    cachedata.psname = fontdata.psname
-   fontdata.embedding = 'no'; 
-   cachedata.embedding = fontdata.embedding
-   fontdata.cache = 'no'
-   cachedata.cache = fontdata.cache
 
    fonts.ids[id] = cachedata
 

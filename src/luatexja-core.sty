@@ -1,13 +1,142 @@
+%
+% luatexja-core.sty
+%
+
+%! 外から読まれるので仰々しくなってます
+%% Avoid multiple loading.
+\csname\if11luatexjacoreLoaded\fi\endcsname
+\edef\x{%
+\catcode32=\the\catcode32%
+\catcode33=\the\catcode33%
+\catcode35=\the\catcode35%
+\catcode40=\the\catcode40%
+\catcode41=\the\catcode41%
+\catcode42=\the\catcode42%
+\catcode43=\the\catcode43%
+\catcode44=\the\catcode44%
+\catcode45=\the\catcode45%
+\catcode46=\the\catcode46%
+\catcode58=\the\catcode58%
+\catcode59=\the\catcode59%
+\catcode60=\the\catcode60%
+\catcode61=\the\catcode61%
+\catcode62=\the\catcode62%
+\catcode64=\the\catcode64%
+\catcode91=\the\catcode91%
+\catcode93=\the\catcode93%
+\catcode94=\the\catcode94%
+\catcode95=\the\catcode95%
+\catcode126=\the\catcode126%
+\endlinechar=\the\endlinechar
+\relax}
+\catcode32=10 %< >
+\catcode33=12 %<">
+\catcode35=6  %<#>
+\catcode40=12 %<(>
+\catcode41=12 %<)>
+\catcode42=12 %<*>
+\catcode43=12 %<+>
+\catcode44=12 %<,>
+\catcode45=12 %<->
+\catcode46=12 %<.>
+\catcode58=12 %<:>
+\catcode59=12 %<;>
+\catcode60=12 %<<>
+\catcode61=12 %<=>
+\catcode62=12 %<>>
+\catcode64=11 %<@>
+\catcode91=12 %<[>
+\catcode93=12 %<]>
+\catcode94=7  %<^>
+\catcode95=8  %<_>
+\catcode126=13 %<~>
+\endlinechar=-1 %
+%! なお, 上のcatcode設定はcoreとcompatで同一にしておく.
+\edef\ltj@core@AtEnd{\x
+  \noexpand\let\noexpand\ltj@core@AtEnd\relax}
+\def\luatexjacoreLoaded{\endinput}
+
+%% Check if LaTeX is used.
+\begingroup\expandafter\expandafter\expandafter\endgroup
+\expandafter\ifx\csname RequirePackage\endcsname\relax %<*!LaTeX>
+  \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
+    \csname iffalse\endcsname
+\else                           %<*LaTeX>
+  \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
+    \csname iftrue\endcsname
+  \NeedsTeXFormat{LaTeX2e}
+  \ProvidesPackage{luatexja-core}[2011/04/01 v0.1]
+\fi                             %</LaTeX>
+
+%% Load prerequisite packages.
+%! 参考： W32TeX の LuaTeX 
+%!     2010/11/27 v0.65.0 r3988 (LuaTeX-ja の最低要件)
+%!     2010/07/10 v0.60.2 r3735 (TL2010 とほぼ同じ)
+\endlinechar=13 %
+%! 外部パッケージは普通の \endlinechar で読まないと危険.
+\ifltj@in@latex                 %<*LaTeX>
+  \RequirePackage{luaotfload} [2010/11/11] % v1.21
+  \RequirePackage{infwarerr}  [2010/04/08] % v1.3
+  \RequirePackage{ltxcmds}    [2010/04/26] % v1.7
+  \RequirePackage{pdftexcmds} [2010/04/01] % v0.9
+  \RequirePackage{xkeyval}    [2008/08/13] % v2.6a
+\else                           %<*!LaTeX>
+  \input luaotfload.sty
+  \input infwarerr.sty
+  \input ltxcmds.sty
+  \input pdftexcmds.sty
+  \input xkeyval
+\fi                             %</LaTeX>
+\endlinechar=-1 %
+
+%% Check if LuaTeX is used
+\ltx@LocalExpandAfter\ifx\csname directlua\endcsname\relax
+  % Loading is silently aborted, since the notice of the wrong
+  % engine is aldready shown in otfluaload.
+  \ltj@core@AtEnd
+\expandafter\endinput\fi\relax
+
+%% Check LuaTeX version.
+\ifnum\luatexversion<65
+  \@PackageError{luatexja-core}
+    {This LuaTeX engine is too old for this package;\MessageBreak
+     at least v0.65 is needed}
+    {Package loading is aborted now.\MessageBreak}
+\expandafter\endinput\fi\relax
+
+%! なお、luatexbase-compat の説明に従うと、LuaTeX 拡張プリミティブは
+%! plain/LaTeX の両方で \luatex 付の名前（\directlua はそのまま)
+%! で使えると考えてよい。
+
+%% \LuaTeXjaAvailable
+%! 環境検査にパスした時に定義される.
+\let\LuaTeXjaAvailable=t %
+
+%%------------------
+
+%% Load all sub-packages.
+\ifltj@in@latex                 %<*LaTeX>
+  \RequirePackage{luatexja-cctbreg}[2011/04/01]
+  \RequirePackage{luatexja-base}[2011/04/01]
+\else                           %<*!LaTeX>
+  \input luatexja-cctbreg.sty %
+  \input luatexja-base.sty %
+\fi                             %</LaTeX>
+
+%%------------------
+\endlinechar=13
+%! この中に master の luatexja-core.sty の内容を挿入する
+%! ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 % LuaTeX-ja core TeX source
 
-\catcode`\@=11
+%\catcode`\@=11
 \catcode"FFFFF=14 %"
 
-\input luaotfload.sty
-\input ltxcmds.sty
-\input xkeyval.tex
-\input infwarerr.sty
-\ifdefined\ltj@loaded\endinput\fi
+%\input luaotfload.sty
+%\input ltxcmds.sty
+%\input xkeyval.tex
+%\input infwarerr.sty
+%\ifdefined\ltj@loaded\endinput\fi
 \def\ltj@loaded{hoge}
 
 \newcount\ltj@tempcnta
@@ -238,10 +367,24 @@
 
 
 
-\def\ltj@temp{plain}
-\ifx\fmtname\ltj@temp
-  \message{plain format: loading luatexja-plain.tex}
-\fi
-\input luatexja-plain.tex
-\catcode`\@=12
+%\def\ltj@temp{plain}
+%\ifx\fmtname\ltj@temp
+%  \message{plain format: loading luatexja-plain.tex}
+%\fi
+%\input luatexja-plain.tex
+%\catcode`\@=12
+%\endinput
+%! ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+
+%%------------------ Load module for the format
+
+\ifltj@in@latex                 %<*LaTeX>
+  \RequirePackage{luatexja-latex}[2011/04/01]
+\else\ifltj@in@plain            %<*plain>
+  \input luatexja-plain.sty %
+\fi\fi                          %</LaTeX|plain>
+
+%%------------------ all done
+\ltj@core@AtEnd
 \endinput
+%% EOF
