@@ -178,8 +178,7 @@ p\TeX の|\prebreakpenalty|に対応した設定項目である．
 \itemitem <chr_code>: 文字コードを指定する．一旦補助カウンタに代入されるので，
 16進法での数値の指定 (|"abcd|) や，%"
 文字トークンによる指定 (|`あ|) も可能である．
-\itemitem <penalty>: penalty の値を0から10000までの自然数で指定する
-{\small（範囲外でも可能だが）\inhibitglue}．
+\itemitem <penalty>: penalty の値を$-10000$から10000までの整数で指定する．
 
 \item |postbreakpenalty={<chr_code>, <penalty>}|★\par\noindent
 同様に，p\TeX の|\postbreakpenalty|に対応した設定項目である．
@@ -403,8 +402,9 @@ $i$番の文字クラスの文字と$j$番の文字クラスの文字の間に�
 
 \noindent という意味である．
 
-\itemitem |chars|: 文字クラスに属する「文字」達のUnicodeにおけるコード番号を
-リストの形|{...}|で記述する．
+\itemitem |chars|: 文字クラスに属する「文字」達をリストの形|{...}|で記述する．
+文字の指定には，Unicodeにおけるコード番号か，その文字1文字だけからなる文字列（|'字'|のように）
+を用いる．
 どの文字クラスにも属さなかった文字は，0番の文字クラスに属するとみなされる．
 そのため，0番以外の文字クラスではこの項目は必須である．
 
@@ -453,7 +453,7 @@ Lua\TeX-jaパッケージでは，次のような流れで実際の処理を行�
 この部分のコードは前田氏のjafontspecパッケージの部分から拝借したが，挿入する文字を|%|から
 （通常使用されることはないと思われる）|U+FFFFF|へと変更している．
 
-\item {\bf 和文フォントへの置換: |hyphenate|, |hpack_filter| callbacks}
+\item {\bf 和文フォントへの置換: |hyphenate| callback}
 
 この段階の前では，和文文字であっても，それを内部で表している|glyph_node|~$p$は，
 「|\tenrm あ|」のように，欧文フォントが指定されている状態になっている．しかし，
@@ -468,7 +468,7 @@ $p$は「現在の和文フォント」の番号もattribute |\ltj@curjfnt|と�
 
 \item {\bf （luaotfloadパッケージによるグリフ置換等の処理はこの位置で）}
 
-\item {\bf JFM由来glue/kernの挿入: |pre_linebreak_filter|, |hpack_filter|}
+\item {\bf JFM由来glue/kernの挿入: |pre_linebreak_filter|, |hpack_filter| callbacks}
 
 ここで，JFMに由来する和文文字間のglue/kernを挿入する．
 基本的には連続する和文文字（を表すnode）間に挿入するが，
@@ -497,7 +497,7 @@ $$
 \itemT |\kern| $k$: 本来の$Q$と$P$の間に入る空き（glueであることも）．
 $w$のために自然長を補正している．
 
-\item {\bf |kanjiskip|, |xkanjiskip|の挿入: |pre_linebreak_filter|, |hpack_filter|}
+\item {\bf |kanjiskip|, |xkanjiskip|の挿入: |pre_linebreak_filter|, |hpack_filter| callbacks}
 
 p\TeX の|adjust_hlist| procedureとほぼ同様の処理を用いて，
 和文間glue |kanjiskip|や和欧文間glue |xkanjiskip|を
@@ -510,7 +510,7 @@ p\TeX では数字{\tt 0}との間に挿入するかどうかで判定してい�
 \itemT 「漢」と「ffi」間の空白挿入：「漢」と「f」間に入るかで判断
 \itemT 「ffi」と「字」間の空白挿入：「i」と「字」間に入るかで判断
 
-\item {\bf ベースライン補正: |pre_linebreak_filter|, |hpack_filter|}
+\item {\bf ベースライン補正: |pre_linebreak_filter|, |hpack_filter| callbacks}
 
 この段階では，（主として）欧文文字のベースラインをずらす作業を行う．幸いにして，
 Lua\TeX で文字を表す|glyph_node|には|y_offset| fieldがあるので，作業は楽である．
@@ -523,7 +523,7 @@ Lua\TeX で文字を表す|glyph_node|には|y_offset| fieldがあるので，�
 \itemitem 文字 (|glyph_node|)
 \itemitem ボックス・rule（文中数式内部）．これによって，数式全体が下がったように見えるはず．
 
-\item {\bf 和文文字の幅の補正: |pre_linebreak_filter|, |hpack_filter|}
+\item {\bf 和文文字の幅の補正: |pre_linebreak_filter|, |hpack_filter| callbacks}
 
 例えば，括弧類は「フォント中では全角幅だが，組版では半角幅として扱う」ことが多いが，このように
 文字幅を補正する処理を最後に行う．jafontspecパッケージのように，補正対象となる|glyph_node|~$p$%

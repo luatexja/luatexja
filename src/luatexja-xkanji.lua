@@ -8,6 +8,7 @@ local node_prev = node.prev
 local node_next = node.next
 local node_copy = node.copy
 local has_attr = node.has_attribute
+local set_attr = node.set_attribute
 local node_insert_before = node.insert_before
 local node_insert_after = node.insert_after
 local node_hpack = node.hpack
@@ -60,7 +61,6 @@ local function is_japanese_glyph_node(p)
    and (p.font==has_attr(p,attr_curjfnt))
 end
 
-
 local function get_zero_glue()
    local g = node_new(id_glue_spec)
    g.width = 0; g.stretch_order = 0; g.stretch = 0
@@ -74,6 +74,23 @@ local function skip_table_to_spec(n)
    g.width = st.width; g.stretch = st.stretch; g.shrink = st.shrink
    g.stretch_order = st.stretch_order; g.shrink_order = st.shrink_order
    return g
+end
+
+local function add_glue_spec(g,h)
+   -- g := g + h
+   g.width = g.width + h.width
+   if g.stretch_order<h.stretch_order then
+      g.stretch_order = h.stretch_order
+      g.stretch = h.stretch
+   elseif g.stretch_order==h.stretch_order then
+      g.stretch = g.stretch + h.stretch
+   end
+   if g.shrink_order<h.shrink_order then
+      g.shrink_order = h.shrink_order
+      g.shrink = h.shrink
+   elseif g.shrink_order==h.shrink_order then
+      g.shrink = g.shrink + h.shrink
+   end
 end
 
 -- lowest part of \xkanjiskip 
@@ -110,16 +127,14 @@ local function insert_xkanjiskip_node(q, f, p)
    if h  and has_attr(h, attr_icflag)==TEMPORARY then
       if h.id==id_kern then
 	 g.spec.width = g.spec.width + h.kern
-	 node.set_attribute(g,attr_icflag,XKANJI_SKIP)
+	 set_attr(g,attr_icflag,XKANJI_SKIP)
 	 node_insert_after(head, q, g)
 	 head = node.remove(head, h)
       else
-	 h.spec.width = g.spec.width + h.spec.width
-	 h.spec.stretch = g.spec.stretch + h.spec.stretch
-	 h.spec.shrink = g.spec.shrink + h.spec.shrink
+	 add_glue_spec(h.spec, g.spec)
       end
    else
-      node.set_attribute(g,attr_icflag,XKANJI_SKIP)
+      set_attr(g,attr_icflag,XKANJI_SKIP)
       node_insert_after(head, q, g)
    end
 end
@@ -200,15 +215,13 @@ local function insert_kanji_skip(ope, p)
 	 if h.id==id_kern then
 	    g.spec.width = g.spec.width + h.kern
 	    head = node.remove(head, h)
-	    node.set_attribute(g,attr_icflag,KANJI_SKIP)
+	    set_attr(g,attr_icflag,KANJI_SKIP)
 	    ope(head, p, g)
 	 else
-	    h.spec.width = g.spec.width + h.spec.width
-	    h.spec.stretch = g.spec.stretch + h.spec.stretch
-	    h.spec.shrink = g.spec.shrink + h.spec.shrink
+	    add_glue_spec(h.spec, g.spec)
 	 end
       else
-	 node.set_attribute(g,attr_icflag,KANJI_SKIP)
+	 set_attr(g,attr_icflag,KANJI_SKIP)
 	 ope(head, p, g)
       end
 end

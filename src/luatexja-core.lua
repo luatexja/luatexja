@@ -311,7 +311,7 @@ local function main1_set_box_stack_level(head, mode)
    local cl = tex.currentgrouplevel + 1
    while p do
       if p.id==id_whatsit and p.subtype==sid_user and p.user_id==30112 then
-	 local g = p; 
+	 local g = p
 	 if mode and g.value==cl then box_set = true end
 	 head, p = node.remove(head, g)
       else p = node_next(p)
@@ -321,6 +321,9 @@ local function main1_set_box_stack_level(head, mode)
       ltj.box_stack_level = tex.getcount('ltj@@stack') + 1 
    else 
       ltj.box_stack_level = tex.getcount('ltj@@stack') 
+   end
+   if not head then -- prevent that the list is null
+      head = node_new(id_kern); head.kern = 0; head.subtype = 1
    end
    return head
 end

@@ -8,6 +8,7 @@ local node_remove = node.remove
 local node_prev = node.prev
 local node_next = node.next
 local has_attr = node.has_attribute
+local set_attr = node.set_attribute
 local node_insert_before = node.insert_before
 local node_insert_after = node.insert_after
 local round = tex.round
@@ -144,7 +145,7 @@ local function ins_gk_head()
 			     ljfm_find_char_class('boxbdd',ps[2]),
 			     has_attr(p,attr_jchar_class))
       if g then
-	 node.set_attribute(g, attr_icflag, FROM_JFM)
+	 set_attr(g, attr_icflag, FROM_JFM)
 	 head = node_insert_before(head, p, g)
       end
       q_post = cstb_get_penalty_table('post', p.char, 0, ltj.box_stack_level); chain = true
@@ -164,10 +165,10 @@ local function real_insert(g, w, pen, always_penalty_ins)
    if w~=0 then
       if not g then
 	 g = node_new(id_kern); g.kern = -w; g.subtype = 1
-	 node.set_attribute(g, attr_icflag, TEMPORARY)
+	 set_attr(g, attr_icflag, TEMPORARY)
 	 -- this g might be replaced by \[x]kanjiskip in step 3.
       else 
-	 node.set_attribute(g, attr_icflag, FROM_JFM)
+	 set_attr(g, attr_icflag, FROM_JFM)
 	 if g.id==id_kern then w=0
 	 else g.spec.width = round(g.spec.width - w) 
 	 end
@@ -175,17 +176,17 @@ local function real_insert(g, w, pen, always_penalty_ins)
    end
    if w~=0 then
       local h = node_new(id_kern)
-      node.set_attribute(h, attr_icflag, LINE_END)
+      set_attr(h, attr_icflag, LINE_END)
       h.kern = w; h.subtype = 0; node_insert_before(head, p, h)
    elseif g then
-      node.set_attribute(g, attr_icflag, FROM_JFM)
+      set_attr(g, attr_icflag, FROM_JFM)
       if g.id==id_kern  then
 	 pen=0; always_penalty_ins = false
       end
    end
    if w~=0  or pen~=0 or ((not g) and always_penalty_ins) then
       local h = node_new(id_penalty)
-      h.penalty = pen; node.set_attribute(h, attr_icflag, KINSOKU)
+      h.penalty = pen; set_attr(h, attr_icflag, KINSOKU)
       node_insert_before(head, p, h)
    end
    if g then
@@ -198,10 +199,10 @@ local function real_insert_kern(g)
    if g then
       if g.id==id_glue then
 	 local h = node_new(id_penalty)
-	 h.penalty = 10000; node.set_attribute(h, attr_icflag, KINSOKU)
+	 h.penalty = 10000; set_attr(h, attr_icflag, KINSOKU)
 	 node_insert_before(head, p, h)
       end
-      node.set_attribute(g, attr_icflag, FROM_JFM)
+      set_attr(g, attr_icflag, FROM_JFM)
       node_insert_before(head, p, g)
    end
 end
@@ -347,7 +348,7 @@ local function ins_gk_tail()
 	 end
 	 if w~=0 then
 	    g = node_new(id_kern); g.subtype = 0; g.kern = w
-	    node.set_attribute(g, attr_icflag, LINE_END)
+	    set_attr(g, attr_icflag, LINE_END)
 	    node_insert_before(head, last, g)
 	 end
       end
@@ -409,7 +410,6 @@ function ltj.int_insert_jfm_glue(ahead, amode)
 	 ihb_flag = false
       end
    end
-
    ins_gk_tail(); finishing(); return head
 end
 
