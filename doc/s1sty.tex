@@ -8,6 +8,7 @@
 \font\eightsl=cmsl8
 \font\eightmus=cmmi8
 \font\eighttt=cmtt8
+\font\eightsf=cmss8
 % Fonts  for 12pt
 \font\twelverm=cmr12
 \font\twelvebf=cmbx12
@@ -15,10 +16,12 @@
 \font\twelvesl=cmsl12
 \font\twelvemus=cmmi12
 \font\twelvett=cmtt12
+\font\twelvesf=cmss12
 
 \font\bigbf=cmbx12 scaled \magstep3
 \font\eightsc=cmcsc10 at 8pt
 \font\tensc=cmcsc10
+\font\tensf=cmss10
 \font\twelvesc=cmcsc10 at 12pt
 
 % Japanese fonts
@@ -38,7 +41,7 @@
 % Size 
 \def\large{\def\rm{\textfont0=\twelverm\twelverm\fam0}\def\bf{\twelvebf\gt}%
   \let\it=\twelveit  \let\sl=\twelvesl \let\mus=\twelvemus 
-  \let\sc=\twelvesc  \let\tt=\twelvett
+  \let\sc=\twelvesc  \let\tt=\twelvett \let\sf=\twelvesf
   \let\mc=\twelvemc \let\gt=\twelvegt
   \baselineskip=18pt\rm\mc
   \ltjsetparameter{xkanjiskip={0.25\zw plus 0.10\zw minus 0.10\zw}}}
@@ -48,13 +51,13 @@
 \def\normalsize{\def\rm{\textfont0=\tenrm\tenrm\fam0\let\sx=\sevenrm}%
   \def\bf{\tenbf\gt\let\sx=\sevenbf}%
   \let\it=\tenit \let\sl=\tensl \let\mus=\tenmus 
-  \let\sc=\tensc \def\tt{\tentt\tenjtt}%
+  \let\sc=\tensc \def\tt{\tentt\tenjtt}\let\sf=\tensf %
   \let\mc=\tenmc \let\gt=\tengt
   \baselineskip=15pt\rm\mc
   \ltjsetparameter{xkanjiskip=0.25\zw plus 1pt minus 1pt}}
 \def\small{\def\rm{\textfont0=\eightrm\eightrm\fam0}\def\bf{\eightbf\gt}%
   \let\it=\eightit \let\sl=\eightsl \let\mus=\eightmus 
-  \let\sc=\eightsc \def\tt{\eighttt\eightjtt}%
+  \let\sc=\eightsc \def\tt{\eighttt\eightjtt}\let\sf=\eightsf %
   \let\mc=\eightmc \let\gt=\eightgt%
   \rm\mc\ltjsetparameter{xkanjiskip={0.25\zw plus 1pt minus 1pt},
   yjabaselineshift=-0.76pt, yalbaselineshift=-0.76pt}

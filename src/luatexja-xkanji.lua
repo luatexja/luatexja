@@ -108,12 +108,12 @@ local function get_xkanji_skip_from_jfm(pf)
 end
 
 local function insert_xkanjiskip_node(q, f, p)
-   local g = node_new(id_glue); g.subtype = 0
    if nr_spc[2] or np_spc[2] then
+      local g = node_new(id_glue); g.subtype = 0
       if xkanji_skip.width==max_dimen then -- use xkanjiskip from JFM
 	 local gx = node_new(id_glue_spec)
 	 gx.stretch_order = 0; gx.shrink_order = 0
-	 local ak = get_xkanji_skip_from_jfm(nrf)
+	 local ak = get_xkanji_skip_from_jfm(f)
 	 if ak then
 	    gx.width = ak[1]; gx.stretch = ak[2]; gx.shrink = ak[3]
 	 else gx = get_zero_glue() -- fallback
@@ -121,21 +121,20 @@ local function insert_xkanjiskip_node(q, f, p)
 	 g.spec = gx
       else g.spec=node_copy(xkanji_skip)
       end
-   else g.spec = get_zero_glue()
-   end
-   local h = node_prev(p)
-   if h  and has_attr(h, attr_icflag)==TEMPORARY then
-      if h.id==id_kern then
-	 g.spec.width = g.spec.width + h.kern
+      local h = node_prev(p)
+      if h  and has_attr(h, attr_icflag)==TEMPORARY then
+	 if h.id==id_kern then
+	    g.spec.width = g.spec.width + h.kern
+	    set_attr(g,attr_icflag,XKANJI_SKIP)
+	    node_insert_after(head, q, g)
+	    head = node.remove(head, h)
+	 else
+	    add_glue_spec(h.spec, g.spec)
+	 end
+      else
 	 set_attr(g,attr_icflag,XKANJI_SKIP)
 	 node_insert_after(head, q, g)
-	 head = node.remove(head, h)
-      else
-	 add_glue_spec(h.spec, g.spec)
       end
-   else
-      set_attr(g,attr_icflag,XKANJI_SKIP)
-      node_insert_after(head, q, g)
    end
 end
 
@@ -186,44 +185,44 @@ local function get_kanji_skip_from_jfm(pf)
 end
 
 local function insert_kanji_skip(ope, p)
-      local g = node_new(id_glue); g.subtype=0
-      if nr_spc[1] or np_spc[1] then
-	 if kanji_skip.width==max_dimen then -- use kanjiskip from JFM
-	    local gx = node_new(id_glue_spec);
-	    gx.stretch_order = 0; gx.shrink_order = 0
-	    local bk = get_kanji_skip_from_jfm(nrf)
-	    local ak = get_kanji_skip_from_jfm(p.font)
-	    if bk then
-	       if ak then
-		  gx.width = round(ltj.ja_diffmet_rule(bk[1], ak[1]))
-		  gx.stretch = round(ltj.ja_diffmet_rule(bk[2], ak[2]))
-		  gx.shrink = -round(ltj.ja_diffmet_rule(-bk[3], -ak[3]))
-	       else
-		  gx.width = bk[1]; gx.stretch = bk[2]; gx.shrink = bk[3]
-	       end
-	    elseif ak then
-	       gx.width = ak[1]; gx.stretch = ak[2]; gx.shrink = ak[3]
-	    else gx = get_zero_glue() -- fallback
+   local g = node_new(id_glue); g.subtype=0
+   if nr_spc[1] or np_spc[1] then
+      if kanji_skip.width==max_dimen then -- use kanjiskip from JFM
+	 local gx = node_new(id_glue_spec);
+	 gx.stretch_order = 0; gx.shrink_order = 0
+	 local bk = get_kanji_skip_from_jfm(nrf)
+	 local ak = get_kanji_skip_from_jfm(p.font)
+	 if bk then
+	    if ak then
+	       gx.width = round(ltj.ja_diffmet_rule(bk[1], ak[1]))
+	       gx.stretch = round(ltj.ja_diffmet_rule(bk[2], ak[2]))
+	       gx.shrink = -round(ltj.ja_diffmet_rule(-bk[3], -ak[3]))
+	    else
+	       gx.width = bk[1]; gx.stretch = bk[2]; gx.shrink = bk[3]
 	    end
-	    g.spec = gx
-	 else g.spec=node_copy(kanji_skip)
+	 elseif ak then
+	    gx.width = ak[1]; gx.stretch = ak[2]; gx.shrink = ak[3]
+	 else gx = get_zero_glue() -- fallback
 	 end
-      else g.spec = get_zero_glue()
+	 g.spec = gx
+      else g.spec=node_copy(kanji_skip)
       end
-      local h = node_prev(p)
-      if h  and has_attr(h, attr_icflag)==TEMPORARY then
-	 if h.id==id_kern then
-	    g.spec.width = g.spec.width + h.kern
-	    head = node.remove(head, h)
-	    set_attr(g,attr_icflag,KANJI_SKIP)
-	    ope(head, p, g)
-	 else
-	    add_glue_spec(h.spec, g.spec)
-	 end
-      else
+   else g.spec = get_zero_glue()
+   end
+   local h = node_prev(p)
+   if h  and has_attr(h, attr_icflag)==TEMPORARY then
+      if h.id==id_kern then
+	 g.spec.width = g.spec.width + h.kern
+	 head = node.remove(head, h)
 	 set_attr(g,attr_icflag,KANJI_SKIP)
 	 ope(head, p, g)
+      else
+	 add_glue_spec(h.spec, g.spec)
       end
+   else
+      set_attr(g,attr_icflag,KANJI_SKIP)
+      ope(head, p, g)
+   end
 end
 
 -- When p is a glyph_node ...
@@ -251,6 +250,10 @@ local last_char = nil
 local find_first_char = nil
 local function check_box(box_ptr)
    local p = box_ptr; local found_visible_node = false
+   if not p then 
+      find_first_char = false; first_char = nil; last_char = nil
+      return true
+   end
    while p do
       if p.id==id_glyph then
 	 repeat 
@@ -358,6 +361,8 @@ local function insks_around_kern()
    elseif np.subtype==2 then 
       -- (np = kern from \accent) .. (accent char) .. (kern from \accent) .. (glyph)
       np = node_next(node_next(np))
+   else  -- kern from TFM
+      nq = np
    end
 end
 

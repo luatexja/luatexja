@@ -259,4 +259,18 @@
 {\ltjsetparameter{alxspmode={`x,inhibit}}
 \setbox0=\hbox{\rmlh xまおx}\dumplist0}
 
+\head{more than one penalty}
+
+\setbox0=\hbox{\rmlh お\penalty1701\penalty1701\penalty1701い}
+\dumplist0
+\setbox0=\hbox{\rmlh お\penalty1701\penalty1701\penalty1701お}
+\dumplist0
+\setbox0=\hbox{\rmlh あ\penalty1701\penalty1701\penalty1701い}
+\dumplist0
+\setbox0=\hbox{\rmlh あ\penalty1701\penalty1701\penalty1701お}
+\dumplist0
+
+\setbox0=\hbox{\tenrm あ\/\v{A}あ}
+\dumplist0
+
 \end
