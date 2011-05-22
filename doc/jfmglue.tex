@@ -13,6 +13,9 @@
 \def\z{\,{\rm zw}}
 \jfont\tenmini={file:ipam.ttf:slant=0.5;jfm=ujis} at 13\jQ
 \def\mibox#1{\hbox{\it #1\/}}\def\IT#1{{\it #1\/}}
+\ltjsetparameter{alxspmode={`\$,allow}}
+\ltjsetparameter{alxspmode={`\\,allow}}
+\ltjsetparameter{alxspmode={`\',allow}}
 
 \centerline{\big Lua\TeX-ja 和文処理グルーについて}\bigskip
 \centerline{\large\the\year/\the\month/\the\day}\medskip
@@ -24,17 +27,17 @@
 
 説明に入る前に，段落やhboxの中身は，\TeX の内部ではnode達による
 リストとして表現されていることに注意する．nodeの種類については，
-\mibox{The\ Lua\TeX\ Reference}の第8章を参照して欲しい．代表的なものを挙げると，
+\IT{The\ Lua\TeX\ Reference}の第8章を参照して欲しい．代表的なものを挙げると，
 
 \item \IT{glyph\_node}: 文字（合字も含む）を表現する．和文処理グルーを挿入する際には，
 既に各\IT{glyph\_node}が欧文文字のものか和文文字のものか区別がついている．また，
-しばしば\IT{glyph\_node} $p$と，それの表す文字の文字コード$p.\mibox{char}$とを同一視する．
+しばしば\IT{glyph\_node}~$p$と，それの表す文字の文字コード$p.\mibox{char}$とを同一視する．
 \item \IT{glue\_node}: glueを表す．
 \item \IT{kern\_node}: kernを表す．各|kern_node|には|subtype|という値があり，
 次の3種類を区別できるようになっている．
 \itemitem 0: 欧文用TFM由来
 \itemitem 1: 明示的な|\kern|か，イタリック補正 (|\/|) によるもの
-\itemitem 2: 非数式アクセント用文字の左右位置調整のためのもの
+\itemitem 2: |\accent|による非数式アクセント用文字の左右位置調整のためのもの
 \item \IT{penalty\_node}: penaltyを表す．
 \item \IT{hlist\_node}: hbox（水平ボックス）を表す．
 \enditem
@@ -74,11 +77,12 @@ JFM由来グルーの処理は，「連続する2つのnodeの間に何を入れ
 \begintt
 ）（　　）\hbox{}（
 \endtt
-\item JFM由来グルーの挿入禁止を行う|\inhibitglue|は，内部では専用のnodeを作ること
-によって実装している．この|\inhibitglue|用nodeは透過する．
+\item 「現在位置でのJFM由来グルーの挿入抑制」を行う|\inhibitglue|は，内部では専用のwhatsit node 
+($\hbox{\tt subtype}=44$, \setbox0=\hbox{|user_id|}$\copy0=30111$)を作ること
+によって実装している．これらのnodeは，「現在位置で挿入しない」というフラグを立てるためだけ
+に存在するものであって，挿入処理中に全て削除される．
 \enditem
 以下，$q$, $p$を連続するnodeとする．
-
 
 \beginparagraph 2つの和文文字の間
 
@@ -90,12 +94,13 @@ JFMで規定されていないときは$\emptyset$と書こう．
 \item $w$: JFMで指定された，「$q$の直後で改行が行われた場合，
 $q$と行末の間に入るカーン量」の値．
 
-$g-w$で，$g$の自然長を$w$だけ減算したglue/kernを表すことにする．
+また，$g-w$で，$g$の自然長を$w$だけ減算したglue/kernを表すことにする（$g$がglueならばこのnodeはglue，$g$がkernならばkern）．
 
 \item $P$: $q$に対する行末禁則用ペナルティ (post-break penalty) と，
 $p$に対する行頭禁則用ペナルティ (pre-break penalty) との和．どちらも
 設定されていないときは0となる．
 \enditem
+なお，間に|\inhibitglue|による指定があった場合，$g=\emptyset$, $w=0$として処理される．
 
 設計方針としては，
 \item JFM由来で入るものがkernの場合，この場所では行分割は許さない．
@@ -243,20 +248,20 @@ $$
 \enditem
 
 なお，ここでの$g$は，
-\item kernが前だった場合は，
-$q$のJFMにおける，「$q$と|'jcharbdd'|」の間に
-入るglue/kernの値．
-\item kernが後だった場合は，
+\item $p$がkernだった場合は，
 $p$のJFMにおける，「|'jcharbdd'|と$p$」の間に
+入るglue/kernの値．
+\item $q$がkernだった場合は，
+$q$のJFMにおける，「$q$と|'jcharbdd'|」の間に
 入るglue/kernの値．
 \enditem
 
 \beginparagraph 要検討の箇所
 
 私が推測するに，欧文では，
-\item 単語内ではフォントは変わらない．
+\item 単語内ではフォントは変わらない；
 \item 単語内では，明示的に/ハイフネーションにより挿入されたdiscretionary break以外では
-行分割がおきない．
+行分割がおきない；
 \enditem
 という事情があるため，TFM由来のkernや合字処理は（nodeを生成しないもの以外は）
 何も透過しないという状態になっているものと思われます．
@@ -275,12 +280,15 @@ $p$のJFMにおける，「|'jcharbdd'|と$p$」の間に
 「|）\/（|」という入力からは，次のnodeの並びを得る：
 \setbox1=\hbox{|\/|}%
 $$
-\node{\hbox{）}}
-\node{\np 10000}_{\rm K}
-\node{\ng 0.5\z_{-0.5}}_{\rm J}
-\node{\nk \copy1}
-\node{\ng 0.5\z_{-0.5}}_{\rm J}
-\node{\hbox{（}}
+\vbox{\halign{$#$\hfil&$#$\hfil&$#$\hfil&$#$\hfil&$#$\hfil\cr
+\node{\hbox{）}}&\ncount=1
+\node{\np 10000}_{\rm K}&\ncount=1
+\node{\ng 0.5\z_{-0.5}}_{\rm J}\cr&\ncount=1
+\node{\nk \copy1}&\ncount=1
+\node{\np 10000}_{\rm K}&\ncount=1
+\node{\ng 0.5\z_{-0.5}}_{\rm J}&\ncount=1
+\node{\hbox{（}}\cr
+}}
 $$
 一方，イタリック補正をJFM由来グルーが透過するとしたならば，当然
 $$
@@ -354,8 +362,14 @@ discretionary break (\IT{disc\_node})は，行分割時の行末の内容<pre>�
 
 \item {\bf 数式の取り扱い}
 
-まだ数式中に和文文字が（hboxでカプセル化されることなく）出現することは想定していないが，
-数式用コードを書いた後は，「数式中は和文処理グルーの挿入処理を無効とする」ようにしないといけないだろう．
+まだ数式中に和文文字が（hboxでカプセル化されることなく）出現することは想定していない．
+実用的にはそれでも十分だと思うが，もしp\TeX のように単に
+\begintt
+$aあa$
+\endtt
+などと書いても和文文字が
+出力されるようにするとなれば，「数式リストから変換されてできた水平リストでは，
+和文処理グルーの挿入処理を無効とする」ようにしないといけないだろう．
 
 \enditem
 
@@ -404,8 +418,8 @@ $\mibox{insert\_skip}=\mibox{no\_skip}$のときには，それだけで情報�
 ループの中で，以下の場合には\IT{nr}は変化せず，$\IT{nq}\leftarrow \IT{np}$となる．
 つまり，これらのnodeに対して|\[x]kanjiskip|は透過する：
 \item \IT{np}がpenaltyの場合
-\item \IT{np}が|subtype|が0のkern（TFM由来）の場合．
-\item \IT{np}が|subtype|が1のkern（つまり，明示的kernかイタリック補正由来）であって，jtypeが
+\item \IT{np}が$\hbox{\tt subtype}=0$のkern（TFM由来）の場合．
+\item \IT{np}が$\hbox{\tt subtype}=1$のkern（つまり，明示的kernかイタリック補正由来）であって，jtypeが
 $$
 \hbox{I (イタリック補正），E（行末との間），T（一時的）}
 $$
@@ -613,7 +627,7 @@ jtypeがない（明示的kern）か，jtypeがJ（JFM由来グルー）とい�
 行われる処理は，$\mibox{insert\_skip}\leftarrow\mibox{no\_skip}$, 
 $\mibox{np}\leftarrow\mibox{next}(\mibox{np})$だけである．
 
-\item $\hbox{\tt subtype}=2$（アクセント由来）の場合．
+\item $\hbox{\tt subtype}=2$（|\accent|由来）の場合．
 
 \IT{np}はリストの先頭から走査されていることから，\IT{np}に続くnodeの並びは
 $$\ncount=0
@@ -643,6 +657,7 @@ $\mibox{np}\leftarrow
 最後に，今まで説明した，JFM由来グルーと|\[x]kanjiskip|の処理によって，実際にどのようにnodeの
 並びが変わるかをいくつかの例で示す．上付きで$*$がついているnodeは，値が0だと挿入されないことを示す．
 
+
 \item {\bf 例1: 2つの連続する和文文字の間}
 \setbox1=\hbox{|\kanjiskip|}
 $$\ncount=0
@@ -657,7 +672,7 @@ $$\ncount=0
 \left\{\vcenter{%
 \halign{$#$\hfil\cr
 \ncount=0\node{{\rm glue/kern}\ g+w}_{\rm J}\cr
-\ncount=0\node{\ng \copy1}_{\rm KS}\cr
+\ncount=0\node{\copy1+w}_{\rm KS}\cr
 }}\right\}
 \node{\hbox{和文文字}}\cr
 }}
@@ -677,11 +692,16 @@ $$\ncount=0
 \left\{\vcenter{%
 \halign{$#$\hfil\cr
 \ncount=0\node{{\rm glue/kern}\ g+w}_{\rm J}\cr
-\ncount=0\node{\ng \copy1}_{\rm XS}\cr
+\ncount=0\node{\copy1+w}_{\rm XS}\cr
 }}\right\}^*
 \node{\hbox{欧文文字}}\cr
 }}
 $$
+ここで，上の2つの例に出てきた記号の意味は次の通り：
+\itemitem $w$: 前側の和文文字と行末の間に入るkern量．
+\itemitem $g$: 2つの文字の間に入るglue/kern（JFM由来）．
+\itemitem $P$: 2つの文字の禁則用penaltyの合計値．
+
 
 \par\vfill\eject
 \item {\bf 例3: 2つの和文文字の間にいくつかの「無視される」node達}
