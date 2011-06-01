@@ -1,6 +1,5 @@
 local node_new = node.new
 local has_attr = node.has_attribute
-local floor = math.floor
 local round = tex.round
 
 local attr_icflag = luatexbase.attributes['ltj@icflag']
@@ -130,8 +129,8 @@ function ltj.ext_jfontdefY() -- for horizontal font
    tex.sprint(ltj.is_global .. '\\protected\\expandafter\\def\\csname '
               .. cstemp .. '\\endcsname'
               .. '{\\csname ltj@curjfnt\\endcsname=' .. fn
-              .. ' \\zw=' .. tex.round(f.size*ltj.metrics[j].zw) .. 'sp'
-              .. '\\zh=' .. tex.round(f.size*ltj.metrics[j].zh) .. 'sp\\relax}')
+              .. ' \\zw=' .. round(f.size*ltj.metrics[j].zw) .. 'sp'
+              .. '\\zh=' .. round(f.size*ltj.metrics[j].zh) .. 'sp\\relax}')
 end
 
 -- extract jfm_file_name and jfm_var
@@ -170,75 +169,6 @@ function fonts.define.read(name, size, id)
 end
 
 ------------------------------------------------------------------------
--- MANAGING THE RANGE OF JAPANESE CHARACTERS (prefix: rgjc)
-------------------------------------------------------------------------
--- jcr_table_main[chr_code] = index
--- index : internal 0, 1, 2, ..., 216               0: 'other'
---         external    1  2       216, (out of range): 'other'
-
--- initialize 
-local jcr_table_main = {}
-local jcr_cjk = 0; local jcr_noncjk = 1; local ucs_out = 0x110000
-
-for i=0x80 ,0xFF      do jcr_table_main[i]=1 end
-for i=0x100,ucs_out-1 do jcr_table_main[i]=0 end
-
--- EXT: add characters to a range
-function ltj.ext_add_char_range(b,e,ind) -- ind: external range number
-   if ind<0 or ind>216 then 
-      ltj.error('Invalid range number (' .. ind ..
-		'), should be in the range 1..216.',
-	     {}); return
-   end
-   for i=math.max(0x80,b),math.min(ucs_out-1,e) do
-      jcr_table_main[i]=ind
-   end
-end
-
-local function rgjc_char_to_range(c) -- return the (external) range number
-   if c<0x80 or c>=ucs_out then return -1
-   else 
-      local i = jcr_table_main[c] or 0
-      if i==0 then return 217 else return i end
-   end
-end
-
-local function rgjc_get_range_setting(i) -- i: internal range number
-   return floor(tex.getattribute(
-			luatexbase.attributes['ltj@kcat'..floor(i/31)])
-		     /math.pow(2, i%31))%2
-end
-ltj.int_get_range_setting = rgjc_get_range_setting
-ltj.int_char_to_range = rgjc_char_to_range
-
---  glyph_node p は和文文字か？
-local function rgjc_is_ucs_in_japanese_char(p)
-   local c = p.char
-   if c<0x80 then return false 
-   else 
-      local i=jcr_table_main[c] 
-      return (floor(
-		 has_attr(p, luatexbase.attributes['ltj@kcat'..floor(i/31)])
-		 /math.pow(2, i%31))%2 ~= jcr_noncjk) 
-   end
-end
-ltj.int_is_ucs_in_japanese_char = rgjc_is_ucs_in_japanese_char
-
--- EXT
-function ltj.ext_toggle_char_range(g, i) -- i: external range number
-   if i==0 then return 
-   else
-      local kc
-      if i>0 then kc=0 else kc=1; i=-i end
-      if i>216 then i=0 end
-      local attr = luatexbase.attributes['ltj@kcat'..floor(i/31)]
-      local a = tex.getattribute(attr)
-      local k = math.pow(2, i%31)
-      tex.setattribute(g,attr,(floor(a/k/2)*2+kc)*k+a%k)
-   end
-end
-
-------------------------------------------------------------------------
 -- MISC
 ------------------------------------------------------------------------
 
@@ -249,7 +179,7 @@ function ltj.ext_append_italic()
       local f = p.font
       local g = node_new(id_kern)
       g.subtype = 1; node.set_attribute(g, attr_icflag, ITALIC)
-      if rgjc_is_ucs_in_japanese_char(p) then
+      if luatexja.charrange.is_ucs_in_japanese_char(p) then
 	 f = has_attr(p, attr_curjfnt)
 	 local j = ltj.font_metric_table[f]
 	 local c = ljfm_find_char_class(p.char, j.jfm)

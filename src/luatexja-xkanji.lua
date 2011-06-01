@@ -53,9 +53,6 @@ local after_wchar = 2 -- nr is a Japanese glyph_node
 local insert_skip = no_skip
 local head
 
-local cstb_get_penalty_table = ltj.int_get_penalty_table
-local cstb_get_skip_table = ltj.int_get_skip_table
-
 local function is_japanese_glyph_node(p)
    return p and (p.id==id_glyph) 
    and (p.font==has_attr(p,attr_curjfnt))
@@ -70,7 +67,7 @@ end
 
 local function skip_table_to_spec(n)
    local g = node_new(id_glue_spec)
-   local st = cstb_get_skip_table(n, ltj.box_stack_level)
+   local st = luatexja.stack.get_skip_table(n, ltj.box_stack_level)
    g.width = st.width; g.stretch = st.stretch; g.shrink = st.shrink
    g.stretch_order = st.stretch_order; g.shrink_order = st.shrink_order
    return g
@@ -128,8 +125,10 @@ local function insert_xkanjiskip_node(q, f, p)
 	    set_attr(g,attr_icflag,XKANJI_SKIP)
 	    node_insert_after(head, q, g)
 	    head = node.remove(head, h)
+	    node.free(h)
 	 else
 	    add_glue_spec(h.spec, g.spec)
+	    node.free(g.spec); node.free(g)
 	 end
       else
 	 set_attr(g,attr_icflag,XKANJI_SKIP)
@@ -139,7 +138,7 @@ local function insert_xkanjiskip_node(q, f, p)
 end
 
 local function insert_ascii_kanji_xkskip(q, p)
-   if cstb_get_penalty_table('xsp', p.char, 3, ltj.box_stack_level)<=1 then return end
+   if luatexja.stack.get_penalty_table('xsp', p.char, 3, ltj.box_stack_level)<=1 then return end
    insert_xkanjiskip_node(q, p.font, p)
 end
 
@@ -150,8 +149,8 @@ local function insert_kanji_ascii_xkskip(q, p)
       and math.floor(p.subtype/2)%2==1 do
       p = p.components; c = p.char
    end
-   if cstb_get_penalty_table('xsp', c, 3, ltj.box_stack_level)%2 == 1 then
-      if cstb_get_penalty_table('xsp', nrc, 3, ltj.box_stack_level)%2 == 0 then g = false end
+   if luatexja.stack.get_penalty_table('xsp', c, 3, ltj.box_stack_level)%2 == 1 then
+      if luatexja.stack.get_penalty_table('xsp', nrc, 3, ltj.box_stack_level)%2 == 0 then g = false end
    else g = false
    end
    if g then insert_xkanjiskip_node(q, nrf, p) end
@@ -163,7 +162,7 @@ local function set_insert_skip_after_achar(p)
       and math.floor(p.subtype/2)%2 == 1 do
       p=node.tail(p.components); c = p.char
    end
-  if cstb_get_penalty_table('xsp', c, 3, ltj.box_stack_level)>=2 then
+  if luatexja.stack.get_penalty_table('xsp', c, 3, ltj.box_stack_level)>=2 then
      insert_skip = after_schar
   else
      insert_skip = no_skip
@@ -214,10 +213,12 @@ local function insert_kanji_skip(ope, p)
       if h.id==id_kern then
 	 g.spec.width = g.spec.width + h.kern
 	 head = node.remove(head, h)
+	 node.free(h)
 	 set_attr(g,attr_icflag,KANJI_SKIP)
 	 ope(head, p, g)
       else
 	 add_glue_spec(h.spec, g.spec)
+	 node.free(g.spec); node.free(g)
       end
    else
       set_attr(g,attr_icflag,KANJI_SKIP)

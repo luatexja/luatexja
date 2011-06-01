@@ -215,7 +215,7 @@
     \def\ltj@temp{#2}%
     \ifx\ltj@temp\empty\ltj@tempcntb="10FFFF \else\ltj@tempcntb=#2 \fi%"
   \fi
-  \directlua{ltj.ext_add_char_range(\the\ltj@tempcnta,\the\ltj@tempcntb,
+  \directlua{luatexja.charrange.add_char_range(\the\ltj@tempcnta,\the\ltj@tempcntb,
     \the\ltj@tempcntc)}%
   }
 
@@ -232,7 +232,7 @@
   \expandafter\ltj@@set@stack#1:{post}{-10000}{10000}}
 \def\ltj@@set@stack#1,#2:#3#4#5{%
   \ltj@tempcnta=#1\relax \ltj@tempcntb=#2\relax
-  \directlua{ltj.ext_set_stack_table(ltj.isglobal, \asluastring{#3},
+  \directlua{luatexja.stack.set_stack_table(ltj.isglobal, \asluastring{#3},
     \the\ltj@tempcnta,tex.getcount('ltj@tempcntb'),#4,#5)}}
 
 % yalbaselineshift = <dimen>
@@ -260,7 +260,7 @@
   \def\ltj@tempa{postonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{1}\fi
   \def\ltj@tempa{allow}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{3}\fi
   \ltj@tempcnta=#1\relax\ltj@tempcntb=\ltj@temp\relax
-  \directlua{ltj.ext_set_stack_table(ltj.isglobal, 'xsp', \the\ltj@tempcnta,
+  \directlua{luatexja.stack.set_stack_table(ltj.isglobal, 'xsp', \the\ltj@tempcnta,
     \the\ltj@tempcntb,0,3)}}
 
 % alxspmode = {<char_code>, <mode>}
@@ -275,7 +275,7 @@
   \def\ltj@tempa{postonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{2}\fi
   \def\ltj@tempa{allow}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{3}\fi
   \ltj@tempcnta=#1\relax\ltj@tempcntb=\ltj@temp\relax
-  \directlua{ltj.ext_set_stack_table(ltj.isglobal, 'xsp', \the\ltj@tempcnta,
+  \directlua{luatexja.stack.set_stack_table(ltj.isglobal, 'xsp', \the\ltj@tempcnta,
     \the\ltj@tempcntb,0,3)}}
 
 % autospacing = <bool> (default: true)
@@ -296,13 +296,13 @@
 
 \define@key[ltj]{japaram}{kanjiskip}{%              % SKIP
   \ltj@tempskipa=#1\relax
-  \directlua{ltj.ext_set_stack_skip(ltj.isglobal, 'kanjiskip')}}
+  \directlua{luatexja.stack.set_stack_skip(ltj.isglobal, 'kanjiskip')}}
 \define@key[ltj]{japaram}{xkanjiskip}{%              % SKIP
   \ltj@tempskipa=#1\relax
-  \directlua{ltj.ext_set_stack_skip(ltj.isglobal, 'xkanjiskip')}}
+  \directlua{luatexja.stack.set_stack_skip(ltj.isglobal, 'xkanjiskip')}}
 \define@key[ltj]{japaram}{jcharwidowpenalty}{%      %COUNT
   \ltj@tempcnta=#1 
-  \directlua{ltj.ext_set_stack_table(ltj.isglobal, 'jwp', 0,
+  \directlua{luatexja.stack.set_stack_table(ltj.isglobal, 'jwp', 0,
     \the\ltj@tempcnta, -10000, 10000)}}
 
 % differentjfm = { large | small | average | both }
@@ -323,7 +323,7 @@
 \def\ltj@@scrange#1,{%
   \edef\ltj@temp{#1}%
   \ifx\ltj@temp\empty\let\next=\relax\else\let\next=\ltj@@scrange
-    \ltj@tempcnta=#1 \directlua{ltj.ext_toggle_char_range(%
+    \ltj@tempcnta=#1 \directlua{luatexja.charrange.toggle_char_range(%
       ltj.is_global,\the\ltj@tempcnta)}%
   \fi\next
 }
