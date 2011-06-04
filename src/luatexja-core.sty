@@ -144,6 +144,11 @@
 \newdimen\jQ \jQ=0.25mm
 \newdimen\jH \jH=0.25mm
 
+%%%%%%%% error message
+\def\ltj@defnum{0}
+\def\ltj@defdimen{0}
+
+
 %%%%%%%% Attributes for Japanese typesetting.
 \newluatexattribute\ltj@curjfnt   % index for ``current Japanese font''
 \newluatexattribute\ltj@charclass % 
@@ -231,22 +236,19 @@
 \define@key[ltj]{japaram}{postbreakpenalty}{%
   \expandafter\ltj@@set@stack#1:{post}{-10000}{10000}}
 \def\ltj@@set@stack#1,#2:#3#4#5{%
-  \ltj@tempcnta=#1\relax \ltj@tempcntb=#2\relax
   \directlua{luatexja.stack.set_stack_table(ltj.isglobal, \asluastring{#3},
-    \the\ltj@tempcnta,tex.getcount('ltj@tempcntb'),#4,#5)}}
+    \ltj@safe@num@or\ltj@defnum{#1},\ltj@safe@num@or\ltj@defnum{#2},#4,#5)}}
 
 % yalbaselineshift = <dimen>
 % yjabaselineshift = <dimen>
 \define@key[ltj]{japaram}{yalbaselineshift}{%
-  \ltj@tempdima=#1\relax%
   \directlua{tex.setattribute(ltj.isglobal, 
     luatexbase.attributes['ltj@yablshift'],
-    tex.getdimen('ltj@tempdima'))}}
+    \ltj@safe@dimen@or\ltj@defdimen{#1})}}
 \define@key[ltj]{japaram}{yjabaselineshift}{%
-  \ltj@tempdima=#1\relax%
   \directlua{tex.setattribute(ltj.isglobal, 
     luatexbase.attributes['ltj@ykblshift'],
-    tex.getdimen('ltj@tempdima'))}}
+    \ltj@safe@dimen@or\ltj@defdimen{#1})}}
 
 % jaxspmode = {<char_code>, <mode>}
 % mode: inhibit, preonly, postonly, allow
@@ -259,9 +261,9 @@
   \def\ltj@tempa{preonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{2}\fi
   \def\ltj@tempa{postonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{1}\fi
   \def\ltj@tempa{allow}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{3}\fi
-  \ltj@tempcnta=#1\relax\ltj@tempcntb=\ltj@temp\relax
-  \directlua{luatexja.stack.set_stack_table(ltj.isglobal, 'xsp', \the\ltj@tempcnta,
-    \the\ltj@tempcntb,0,3)}}
+  \directlua{luatexja.stack.set_stack_table(ltj.isglobal, 'xsp', 
+    \ltj@safe@num@or\ltj@defnum{#1},
+    \ltj@safe@num@or\ltj@defnum{\ltj@temp},0,3)}}
 
 % alxspmode = {<char_code>, <mode>}
 % mode: inhibit, preonly, postonly, allow
@@ -274,9 +276,9 @@
   \def\ltj@tempa{preonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{1}\fi
   \def\ltj@tempa{postonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{2}\fi
   \def\ltj@tempa{allow}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{3}\fi
-  \ltj@tempcnta=#1\relax\ltj@tempcntb=\ltj@temp\relax
-  \directlua{luatexja.stack.set_stack_table(ltj.isglobal, 'xsp', \the\ltj@tempcnta,
-    \the\ltj@tempcntb,0,3)}}
+  \directlua{luatexja.stack.set_stack_table(ltj.isglobal, 'xsp', 
+    \ltj@safe@num@or\ltj@defnum{#1},
+    \ltj@safe@num@or\ltj@defnum{\ltj@temp},0,3)}}
 
 % autospacing = <bool> (default: true)
 \define@boolkey[ltj]{japaram}{autospacing}[true]{%
@@ -295,15 +297,12 @@
   \fi}
 
 \define@key[ltj]{japaram}{kanjiskip}{%              % SKIP
-  \ltj@tempskipa=#1\relax
-  \directlua{luatexja.stack.set_stack_skip(ltj.isglobal, 'kanjiskip')}}
-\define@key[ltj]{japaram}{xkanjiskip}{%              % SKIP
-  \ltj@tempskipa=#1\relax
-  \directlua{luatexja.stack.set_stack_skip(ltj.isglobal, 'xkanjiskip')}}
+  \directlua{luatexja.stack.set_stack_skip(ltj.isglobal, 'kanjiskip', \ltj@safe@glue{#1})}}
+\define@key[ltj]{japaram}{xkanjiskip}{%             % SKIP
+  \directlua{luatexja.stack.set_stack_skip(ltj.isglobal, 'xkanjiskip', \ltj@safe@glue{#1})}}
 \define@key[ltj]{japaram}{jcharwidowpenalty}{%      %COUNT
-  \ltj@tempcnta=#1 
   \directlua{luatexja.stack.set_stack_table(ltj.isglobal, 'jwp', 0,
-    \the\ltj@tempcnta, -10000, 10000)}}
+    \ltj@safe@num@or\ltj@defnum{#1}, -10000, 10000)}}
 
 % differentjfm = { large | small | average | both }
 \define@choicekey*+[ltj]{japaram}{differentjfm}[\ltj@temp\ltj@tempr]%
@@ -314,7 +313,9 @@
     \directlua{ltj.ja_diffmet_rule = math.two_average}\or
     \directlua{ltj.ja_diffmet_rule = math.two_add}
   \fi
-}{\@PackageWarning{luatexja}{ignored invalid argument '#1' for 'differentjfm'}}
+}{\ltj@PackageError{luatexja}{invalid argument `#1' for `differentjfm'}{%
+  Argument for `differentjfm' must be one of `large', `small', `average',^^J%
+  and `both'. }}
   % large, small, average, both
 
 
@@ -323,8 +324,8 @@
 \def\ltj@@scrange#1,{%
   \edef\ltj@temp{#1}%
   \ifx\ltj@temp\empty\let\next=\relax\else\let\next=\ltj@@scrange
-    \ltj@tempcnta=#1 \directlua{luatexja.charrange.toggle_char_range(%
-      ltj.is_global,\the\ltj@tempcnta)}%
+    \directlua{luatexja.charrange.toggle_char_range(%
+      ltj.is_global,\ltj@safe@num@or\ltj@defnum{#1})}%
   \fi\next
 }
 
@@ -355,8 +356,8 @@
 }
 \def\ltj@@getparam@one#1{%
   \directlua{ltj.ext_get_parameter_unary('#1')}}%
-\def\ltj@@getparam@two#1#2{\ltj@tempcnta=#2
-  \directlua{ltj.ext_get_parameter_binary('#1', \the\ltj@tempcnta)}%
+\def\ltj@@getparam@two#1#2{%
+  \directlua{ltj.ext_get_parameter_binary('#1', \ltj@safe@num{#2})}%
 }
 
 

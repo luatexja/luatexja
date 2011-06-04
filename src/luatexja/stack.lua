@@ -37,14 +37,17 @@ end
 function set_stack_table(g,m,c,p,lb,ub)
    local i = get_stack_level()
    if p<lb or p>ub then 
-      ltj.error('Invalid code (' .. p .. '), should in the range '
-		.. tostring(lb) .. '..' .. tostring(ub) .. '.',
-	     {"I'm going to use 0 instead of that illegal code value."})
+      tex.print(luatexbase.catcodetables['latex-atletter'], "\\ltj@PackageError{luatexja}{invalid code (".. p .. 
+		")}{A  should in the range "
+		.. tostring(lb) .. '..' .. tostring(ub) .. "." .. 
+	     "I'm going to use 0 instead of that illegal code value.}{}")
       p=0
-   elseif c<-1 or c>0x10FFFF then
-      ltj.error('Invalid character code (' .. c
-		.. '), should in the range -1.."10FFFF.',{})
-      return 
+   elseif c<-1 or c>0x10ffff then 
+      tex.print(luatexbase.catcodetables['latex-atletter'], "\\ltj@PackageError{luatexja}{bad character code ("..c..")}" .. 
+		"{A character number must be between -1 and 0x10ffff. " .. 
+		"(-1 is used for denoting `math boundary') " ..
+		"So I changed this one to zero.}{}")
+      c=0
    elseif not charprop_stack_table[i][c] then 
       charprop_stack_table[i][c] = {} 
    end
@@ -58,9 +61,9 @@ function set_stack_table(g,m,c,p,lb,ub)
 end
 
 -- EXT: store \ltj@tempskipa
-function set_stack_skip(g,c)
+function set_stack_skip(g,c,sp)
   local i = get_stack_level()
-  local sp = tex.getskip('ltj@tempskipa')
+  if not sp then return end
   if not charprop_stack_table[i][c] then 
      charprop_stack_table[i][c] = {} 
   end

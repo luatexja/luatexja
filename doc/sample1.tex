@@ -44,8 +44,6 @@
 アクセントも，|make_accent|の処理をLuaコードで書けば可能だと思われます．}
 \item 数式中の日本語は想定していません．|\hbox|か何かで囲ってください．
 \item p\TeX にあった以下の機能はまだ実装していません．
-\itemitem |\euc|, |\jis|, |\sjis|, |\kuten|といった，コード変換プリミティブ．
-\itemitem |\kansuji|, |\kansujichar|.
 \itemitem |\showmode|, |\jfam|.
 \itemitem 縦組み関連一式．|\tate|, |\tfont|, |\tbaselineshift|, |\dtou|,$\,\ldots$
 
@@ -435,6 +433,15 @@ $i$番の文字クラスの文字と$j$番の文字クラスの文字の間に�
 |align|項目のため，|left|はほとんどの場合0で良いだろう．
 
 \enditem
+
+\beginsection 互換用命令（書きかけ）
+
+{\tt luatexja-compat.sty}を読み込むことで，次が追加．
+\item |\euc|, |\jis|, |\sjis|, |\kuten|
+\item |\kansuji|
+\item |kansujichar={<num>, <char>}| key in |\ltjsetparameter|.
+\enditem
+
 
 \beginsection 大まかな処理の流れ
 

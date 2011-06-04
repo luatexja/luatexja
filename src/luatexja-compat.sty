@@ -96,13 +96,38 @@
 \expandafter\endinput\fi\relax
 
 %% Load Lua modules.
-\RequireLuaModule{luatexja.infomute}
+%\RequireLuaModule{luatexja.infomute}
+% not yet implemented.
 
 %% Silence info messages of luatexbase-mcb
-\directlua{ luatexja.infomute.add_mute("luatexbase-mcb") }
+%\directlua{ luatexja.infomute.add_mute("luatexbase-mcb") }
+% not yet implemented.
 
 %%------------------
 %! これ以降に LuaTeX 用の compat の内容を入れる.
+\RequireLuaModule{luatexja.jisx0213} %% JISX0213 => unicode のテーブル
+\RequireLuaModule{luatexja.compat}
+
+\def\euc#1{\directlua{luatexja.compat.from_euc(\ltj@safe@num{#1})}}
+\def\kuten#1{\directlua{luatexja.compat.from_kuten(\ltj@safe@num{#1})}}
+\def\jis#1{\directlua{luatexja.compat.from_jis(\ltj@safe@num{#1})}}
+\def\sjis#1{\directlua{luatexja.compat.from_sjis(\ltj@safe@num{#1})}}
+\def\ucs#1{\directlua{luatexja.compat.from_ucs(\ltj@safe@num{#1})}}
+
+\define@key[ltj]{japaram}{kansujichar}{%
+  \expandafter\ltj@@set@stack#1:{ksj}{0}{0x7FFFFFFF}}
+\def\kansuji#1{\directlua{luatexja.compat.to_kansuji(\ltj@safe@num{#1})}}
+
+\ltjsetparameter{kansujichar={0,`〇}}
+\ltjsetparameter{kansujichar={1,`一}}
+\ltjsetparameter{kansujichar={2,`二}}
+\ltjsetparameter{kansujichar={3,`三}}
+\ltjsetparameter{kansujichar={4,`四}}
+\ltjsetparameter{kansujichar={5,`五}}
+\ltjsetparameter{kansujichar={6,`六}}
+\ltjsetparameter{kansujichar={7,`七}}
+\ltjsetparameter{kansujichar={8,`八}}
+\ltjsetparameter{kansujichar={9,`九}}
 
 %%------------------ all done
 \ltj@compat@AtEnd

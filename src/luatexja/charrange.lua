@@ -26,18 +26,22 @@ for i=0x100,ucs_out-1 do jcr_table_main[i]=0 end
 
 -- EXT: add characters to a range
 function add_char_range(b,e,ind) -- ind: external range number
-   if ind<0 or ind>216 then 
-      ltj.error('Invalid range number (' .. ind ..
-		'), should be in the range 1..216.',
-	     {}); return
-   end
+   if not ind or ind<0 or ind>216 then 
+      tex.print(luatexbase.catcodetables['latex-atletter'], "\\ltj@PackageError{luatexja}{invalid character range number (" .. ind ..
+		")}{A character range number should be in the range 1..216, " ..
+                "ignored.}{}"); return
+   elseif b<0x80 or e>=ucs_out or b>e then
+      tex.print(luatexbase.catcodetables['latex-atletter'], "\\ltj@PackageError{luatexja}{bad character range ("
+		.. b .. ".." .. e .. ")}" .. 
+		"{A character range must be a subset of [0x80, 0x10ffff].}{}")
+   end 
    for i=math.max(0x80,b),math.min(ucs_out-1,e) do
       jcr_table_main[i]=ind
    end
 end
 
 function char_to_range(c) -- return the (external) range number
-   if c<0x80 or c>=ucs_out then return -1
+   if c<0x80 then return -1
    else 
       local i = jcr_table_main[c] or 0
       if i==0 then return 217 else return i end

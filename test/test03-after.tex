@@ -1,5 +1,6 @@
 %#!luatex
-\input luatexja-core.sty
+\input luatexja.sty
+\input luatexja-compat.sty
 \def\\{\hfill\break}
 \tentt\tenmin
 
@@ -19,7 +20,6 @@
 
 \ltjgetparameter{differentjfm}.
 \ltjsetparameter{yjabaselineshift=0pt,autoxspacing=true}
-
 
 あいうえお{\ltjsetparameter{yjabaselineshift=2pt}かきくけこ}さしすせそ: local
 
@@ -77,5 +77,28 @@ xspmode
 \edef\yabls{\ltjgetparameter{yalbaselineshift}}
 \ltjsetparameter{yalbaselineshift=3pt}
 \dimen255=\yabls\relax\the\dimen255
+
+\medskip
+{\tengt ■compat: kansuji}
+\kansuji{1}\ 
+\kansuji{10}\ 
+\kansuji{-32445}
+
+\char\jis{"346E}
+\char\kuten{"253C}
+\char\euc{"B0A5}
+\char\sjis{"8A79}
+
+\medskip
+{\tengt ■error messages}
+\nonstopmode
+
+\char\sjis{XXX}
+
+{\ltjsetparameter{kanjiskip=4pt, autoxspacing=true}
+\ltjdefcharrange{6576}{67666677}\ltjdefcharrange{1}{67666677,345-12}
+\ltjgetparameter{prebreakpenalty}{3298677}
+\ltjgetparameter{jacharrange}{3298677}
+あいうえお\par}
 
 \end
