@@ -47,7 +47,7 @@ local function apply_patch()
   patch_applied = true
 end
 
-!-- モジュール mod の情報出力を抑止する.
+--! モジュール mod の情報出力を抑止する.
 function add_mute(mod)
   info_mute[mod] = true
   if not patch_applied then
