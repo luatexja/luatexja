@@ -301,8 +301,7 @@
 \define@key[ltj]{japaram}{xkanjiskip}{%             % SKIP
   \directlua{luatexja.stack.set_stack_skip(ltj.isglobal, 'xkanjiskip', \ltj@safe@glue{#1})}}
 \define@key[ltj]{japaram}{jcharwidowpenalty}{%      %COUNT
-  \directlua{luatexja.stack.set_stack_table(ltj.isglobal, 'jwp', 0,
-    \ltj@safe@num@or\ltj@defnum{#1}, -10000, 10000)}}
+  \ltj@@set@stack0,#1:{jwp}{-10000}{10000}}
 
 % differentjfm = { large | small | average | both }
 \define@choicekey*+[ltj]{japaram}{differentjfm}[\ltj@temp\ltj@tempr]%

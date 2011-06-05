@@ -2,6 +2,8 @@
 -- MAIN PROCESS STEP 2: insert glue/kerns from JFM (prefix: none)
 ------------------------------------------------------------------------
 
+local ltjs = luatexja.stack
+
 local node_type = node.type
 local node_new = node.new
 local node_remove = node.remove
@@ -147,9 +149,9 @@ local function ins_gk_head()
 	 set_attr(g, attr_icflag, FROM_JFM)
 	 head = node_insert_before(head, p, g)
       end
-      q_post = luatexja.stack.get_penalty_table('post', p.char, 0, ltj.box_stack_level); chain = true
+      q_post = ltjs.get_penalty_table('post', p.char, 0, ltj.box_stack_level); chain = true
    elseif p.id==id_glyph then
-      q_post = luatexja.stack.get_penalty_table('post', p.char, 0, ltj.box_stack_level)
+      q_post = ltjs.get_penalty_table('post', p.char, 0, ltj.box_stack_level)
    end
    qs = ps; q = p; p = node_next(p)
 end
@@ -267,7 +269,7 @@ local function ins_gk_any_JA()
 	 local h = ltj.metrics[qs[2]].char_type[has_attr(q, attr_jchar_class)]
 	 if h.kern and h.kern[x] then w = round(qs[1]*h.kern[x]) end
       end
-      q_post = add_penalty(q_post, luatexja.stack.get_penalty_table('pre', p.char, 0, ltj.box_stack_level))
+      q_post = add_penalty(q_post, ltjs.get_penalty_table('pre', p.char, 0, ltj.box_stack_level))
       real_insert(g, w, q_post, false)
    elseif q.id==id_glyph then -- (q,p): AL-JA
       local g = nil
@@ -276,7 +278,7 @@ local function ins_gk_any_JA()
 			  ljfm_find_char_class('jcharbdd',ps[2]),
 			  has_attr(p,attr_jchar_class))
       end
-      q_post = add_penalty(q_post, luatexja.stack.get_penalty_table('pre', p.char, 0, ltj.box_stack_level))
+      q_post = add_penalty(q_post, ltjs.get_penalty_table('pre', p.char, 0, ltj.box_stack_level))
       real_insert(g, 0, q_post, true)
    elseif q.id==id_kern then -- (q,p): kern-JA
       local g = nil
@@ -295,8 +297,8 @@ local function ins_gk_any_JA()
       end
       real_insert(g, 0, q_post, true)
    end
-   q, qs, q_post = p, ps, luatexja.stack.get_penalty_table('post', p.char, 0, ltj.box_stack_level)
-   if luatexja.stack.get_penalty_table('kcat', p.char, 0, ltj.box_stack_level)%2~=1 then
+   q, qs, q_post = p, ps, ltjs.get_penalty_table('post', p.char, 0, ltj.box_stack_level)
+   if ltjs.get_penalty_table('kcat', p.char, 0, ltj.box_stack_level)%2~=1 then
       widow_node = p
    end
    p = node_next(p); chain = true
@@ -316,7 +318,7 @@ local function ins_gk_JA_any()
 	 local h = ltj.metrics[qs[2]].char_type[has_attr(q,attr_jchar_class)]
 	 if h.kern and h.kern[x] then w = round(qs[1]*h.kern[x]) end
       end
-      q_post = add_penalty(q_post, luatexja.stack.get_penalty_table('pre', p.char, 0, ltj.box_stack_level))
+      q_post = add_penalty(q_post, ltjs.get_penalty_table('pre', p.char, 0, ltj.box_stack_level))
       real_insert(g, w, q_post, true)
    elseif p.id==id_kern then -- (q,p): JA-kern
       real_insert_kern(g)
@@ -359,7 +361,7 @@ local function add_widow_penalty()
    if not widow_node then return end
    local a = node_prev(widow_node)
    local i = has_attr(a, attr_icflag) or 0
-   local wp = luatexja.stack.get_penalty_table('jwp', 0, 0, ltj.box_stack_level)
+   local wp = ltjs.get_penalty_table('jwp', 0, 0, ltj.box_stack_level)
    if i==4 then
       a.penalty=add_penalty(a.penalty, wp)
    elseif i>=2 then

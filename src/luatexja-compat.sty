@@ -105,18 +105,36 @@
 
 %%------------------
 %! これ以降に LuaTeX 用の compat の内容を入れる.
-\RequireLuaModule{luatexja.jisx0213} %% JISX0213 => unicode のテーブル
+\RequireLuaModule{luatexja.jisx0208} %% JIS X 0208 => unicode のテーブル
 \RequireLuaModule{luatexja.compat}
 
-\def\euc#1{\directlua{luatexja.compat.from_euc(\ltj@safe@num{#1})}}
-\def\kuten#1{\directlua{luatexja.compat.from_kuten(\ltj@safe@num{#1})}}
-\def\jis#1{\directlua{luatexja.compat.from_jis(\ltj@safe@num{#1})}}
-\def\sjis#1{\directlua{luatexja.compat.from_sjis(\ltj@safe@num{#1})}}
-\def\ucs#1{\directlua{luatexja.compat.from_ucs(\ltj@safe@num{#1})}}
+\def\euc{\ltj@code@conv{euc}}
+\def\kuten{\ltj@code@conv{kuten}}
+\def\jis{\ltj@code@conv{jis}}
+\def\sjis{\ltj@code@conv{sjis}}
+\def\ucs{\ltj@code@conv{ucs}}
 
+\def\ltj@code@conv#1{%
+  \directlua{ luatexja._cc_next = luatexja.compat.from_#1 }%
+  \ltj@code@convA
+}
+\def\ltj@code@convA{%
+  \expandafter\expandafter\expandafter
+   \ltj@code@convB\ltj@grab@num
+}
+\def\ltj@code@convB#1{%
+  \directlua{ luatexja._cc_next(\ltj@safe@num{#1}) }%
+}
+
+\def\kansuji{%
+  \expandafter\expandafter\expandafter
+   \ltj@kansujiA\ltj@grab@num
+}
+\def\ltj@kansujiA#1{%
+  \directlua{ luatexja.compat.to_kansuji(\ltj@safe@num{#1}) }%
+}
 \define@key[ltj]{japaram}{kansujichar}{%
   \expandafter\ltj@@set@stack#1:{ksj}{0}{0x7FFFFFFF}}
-\def\kansuji#1{\directlua{luatexja.compat.to_kansuji(\ltj@safe@num{#1})}}
 
 \ltjsetparameter{kansujichar={0,`〇}}
 \ltjsetparameter{kansujichar={1,`一}}

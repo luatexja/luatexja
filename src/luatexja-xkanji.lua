@@ -1,6 +1,7 @@
 ------------------------------------------------------------------------
 -- MAIN PROCESS STEP 3: insert \xkanjiskip (prefix: none)
 ------------------------------------------------------------------------
+local ltjs = luatexja.stack
 
 local node_type = node.type
 local node_new = node.new
@@ -67,7 +68,7 @@ end
 
 local function skip_table_to_spec(n)
    local g = node_new(id_glue_spec)
-   local st = luatexja.stack.get_skip_table(n, ltj.box_stack_level)
+   local st = ltjs.get_skip_table(n, ltj.box_stack_level)
    g.width = st.width; g.stretch = st.stretch; g.shrink = st.shrink
    g.stretch_order = st.stretch_order; g.shrink_order = st.shrink_order
    return g
@@ -138,7 +139,7 @@ local function insert_xkanjiskip_node(q, f, p)
 end
 
 local function insert_ascii_kanji_xkskip(q, p)
-   if luatexja.stack.get_penalty_table('xsp', p.char, 3, ltj.box_stack_level)<=1 then return end
+   if ltjs.get_penalty_table('xsp', p.char, 3, ltj.box_stack_level)<=1 then return end
    insert_xkanjiskip_node(q, p.font, p)
 end
 
@@ -149,8 +150,8 @@ local function insert_kanji_ascii_xkskip(q, p)
       and math.floor(p.subtype/2)%2==1 do
       p = p.components; c = p.char
    end
-   if luatexja.stack.get_penalty_table('xsp', c, 3, ltj.box_stack_level)%2 == 1 then
-      if luatexja.stack.get_penalty_table('xsp', nrc, 3, ltj.box_stack_level)%2 == 0 then g = false end
+   if ltjs.get_penalty_table('xsp', c, 3, ltj.box_stack_level)%2 == 1 then
+      if ltjs.get_penalty_table('xsp', nrc, 3, ltj.box_stack_level)%2 == 0 then g = false end
    else g = false
    end
    if g then insert_xkanjiskip_node(q, nrf, p) end
@@ -162,7 +163,7 @@ local function set_insert_skip_after_achar(p)
       and math.floor(p.subtype/2)%2 == 1 do
       p=node.tail(p.components); c = p.char
    end
-  if luatexja.stack.get_penalty_table('xsp', c, 3, ltj.box_stack_level)>=2 then
+  if ltjs.get_penalty_table('xsp', c, 3, ltj.box_stack_level)>=2 then
      insert_skip = after_schar
   else
      insert_skip = no_skip

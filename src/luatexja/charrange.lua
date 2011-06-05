@@ -10,6 +10,8 @@ luatexbase.provides_module({
 module('luatexja.charrange', package.seeall)
 local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
+local ltjb = luatexja.base
+
 local floor = math.floor
 local has_attr = node.has_attribute
 
@@ -27,13 +29,17 @@ for i=0x100,ucs_out-1 do jcr_table_main[i]=0 end
 -- EXT: add characters to a range
 function add_char_range(b,e,ind) -- ind: external range number
    if not ind or ind<0 or ind>216 then 
-      tex.print(luatexbase.catcodetables['latex-atletter'], "\\ltj@PackageError{luatexja}{invalid character range number (" .. ind ..
-		")}{A character range number should be in the range 1..216, " ..
-                "ignored.}{}"); return
-   elseif b<0x80 or e>=ucs_out or b>e then
-      tex.print(luatexbase.catcodetables['latex-atletter'], "\\ltj@PackageError{luatexja}{bad character range ("
-		.. b .. ".." .. e .. ")}" .. 
-		"{A character range must be a subset of [0x80, 0x10ffff].}{}")
+      ltjb.package_error('luatexja',
+			 "invalid character range number (" .. ind .. ")",
+			 {"A character range number should be in the range 1..216,",
+			  "ignored."})
+      return
+   elseif b<0x80 or e>=ucs_out then
+      ltjb.package_warning('luatexja',
+			 'bad character range ([' .. b .. ',' .. e .. ']). ' ..
+			   'I take the intersection with [0x80, 0x10ffff].')
+   elseif b>e then
+      local j=b; e=b; b=j
    end 
    for i=math.max(0x80,b),math.min(ucs_out-1,e) do
       jcr_table_main[i]=ind
@@ -41,7 +47,13 @@ function add_char_range(b,e,ind) -- ind: external range number
 end
 
 function char_to_range(c) -- return the (external) range number
-   if c<0x80 then return -1
+   if c<0 or c>0x10FFFF then
+	 ltjb.package_error('luatexja',
+			    'bad character code (' .. c .. ')',
+			    {'A character number must be between 0 and 0x10ffff.',
+			     'So I changed this one to zero.'})
+	 c=0
+   elseif c<0x80 then return -1
    else 
       local i = jcr_table_main[c] or 0
       if i==0 then return 217 else return i end

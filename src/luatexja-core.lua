@@ -1,3 +1,7 @@
+local ltjb = luatexja.base
+local ltjc = luatexja.charrange
+local ltjs = luatexja.stack
+
 local node_type = node.type
 local node_new = node.new
 local node_prev = node.prev
@@ -118,11 +122,11 @@ function ltj.ext_get_parameter_unary(k)
    elseif k == 'yjabaselineshift' then
       tex.write(print_scaled(tex.getattribute('ltj@ykblshift'))..'pt')
    elseif k == 'kanjiskip' then
-      tex.write(print_spec(luatexja.stack.get_skip_table('kanjiskip', tex.getcount('ltj@@stack'))))
+      tex.write(print_spec(ltjs.get_skip_table('kanjiskip', tex.getcount('ltj@@stack'))))
    elseif k == 'xkanjiskip' then
-      tex.write(print_spec(luatexja.stack.get_skip_table('xkanjiskip', tex.getcount('ltj@@stack'))))
+      tex.write(print_spec(ltjs.get_skip_table('xkanjiskip', tex.getcount('ltj@@stack'))))
    elseif k == 'jcharwidowpenalty' then
-      tex.write(luatexja.stack.get_penalty_table('jwp', 0, 0, tex.getcount('ltj@@stack')))
+      tex.write(ltjs.get_penalty_table('jwp', 0, 0, tex.getcount('ltj@@stack')))
    elseif k == 'autospacing' then
       tex.write(tex.getattribute('ltj@autospc'))
    elseif k == 'autoxspacing' then
@@ -146,29 +150,32 @@ end
 function ltj.ext_get_parameter_binary(k,c)
    if k == 'jacharrange' then
       if c<0 or c>216 then 
-	 tex.print(luatexbase.catcodetables['latex-atletter'], "\\ltj@PackageError{luatexja}{invalid character range number (" .. c ..
-		   ")}{A character range number should be in the range 0..216, " ..
-		   "So I changed this one to zero.}{}"); c=0
+	 ltjb.package_error('luatexja',
+			    'invalid character range number (' .. c .. ')',
+			    {'A character range number should be in the range 0..216,',
+			     'So I changed this one to zero.'})
+	 c=0
       end
-      tex.write(luatexja.charrange.get_range_setting(c))
+      tex.write(ltjc.get_range_setting(c))
    else
       if c<0 or c>0x10FFFF then
-	 tex.print(luatexbase.catcodetables['latex-atletter'], "\\ltj@PackageError{luatexja}{bad character code ("..c..")}" .. 
-		"{A character number must be between -1 and 0x10ffff. " ..
-		"(-1 is used for denoting `math boundary') " ..
-		"So I changed this one to zero.}{}")
+	 ltjb.package_error('luatexja',
+			    'bad character code (' .. c .. ')',
+			    {'A character number must be between -1 and 0x10ffff.',
+			     "(-1 is used for denoting `math boundary')",
+			     'So I changed this one to zero.'})
 	 c=0
       end
       if k == 'prebreakpenalty' then
-	 tex.write(luatexja.stack.get_penalty_table('pre', c, 0, tex.getcount('ltj@@stack')))
+	 tex.write(ltjs.get_penalty_table('pre', c, 0, tex.getcount('ltj@@stack')))
       elseif k == 'postbreakpenalty' then
-	 tex.write(luatexja.stack.get_penalty_table('post', c, 0, tex.getcount('ltj@@stack')))
+	 tex.write(ltjs.get_penalty_table('post', c, 0, tex.getcount('ltj@@stack')))
       elseif k == 'kcatcode' then
-	 tex.write(luatexja.stack.get_penalty_table('kcat', c, 0, tex.getcount('ltj@@stack')))
+	 tex.write(ltjs.get_penalty_table('kcat', c, 0, tex.getcount('ltj@@stack')))
       elseif k == 'chartorange' then 
-	 tex.write(luatexja.charrange.char_to_range(c))
+	 tex.write(ltjc.char_to_range(c))
       elseif k == 'jaxspmode' or k == 'alxspmode' then
-	 tex.write(luatexja.stack.get_penalty_table('xsp', c, 3, tex.getcount('ltj@@stack')))
+	 tex.write(ltjs.get_penalty_table('xsp', c, 3, tex.getcount('ltj@@stack')))
       end
    end
 end
@@ -187,7 +194,7 @@ ltj.box_stack_level = 0
 
 local function main1_suppress_hyphenate_ja(head)
    for p in node.traverse_id(id_glyph, head) do
-      if luatexja.charrange.is_ucs_in_japanese_char(p) then
+      if ltjc.is_ucs_in_japanese_char(p) then
 	 local v = has_attr(p, attr_curjfnt)
 	 if v then 
 	    p.font = v 

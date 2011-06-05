@@ -10,6 +10,8 @@ luatexbase.provides_module({
 module('luatexja.inputbuf', package.seeall)
 local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
+local ltjc = luatexja.charrange
+
 local node_new = node.new
 local id_glyph = node.id('glyph')
 
@@ -27,7 +29,7 @@ function add_comment(buffer)
       if (ct==11) or (ct==12) then
 	 local p =  node.new(id_glyph)
 	 p.char = c
-	 if luatexja.charrange.is_ucs_in_japanese_char(p) then
+	 if ltjc.is_ucs_in_japanese_char(p) then
 	    buffer = buffer .. string.char(0xF3,0xBF,0xBF,0xBF) -- U+FFFFF
 	 end
 	 node.free(p)

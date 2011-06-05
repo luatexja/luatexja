@@ -1,3 +1,6 @@
+local ltjb = luatexja.base
+local ltjc = luatexja.charrange
+
 local node_new = node.new
 local has_attr = node.has_attribute
 local round = tex.round
@@ -77,9 +80,10 @@ ltj.int_find_char_class = ljfm_find_char_class
 
 local function ljfm_load_jfont_metric()
    if jfm_file_name=='' then 
-      ltj.error('no JFM specified', 
-		{[1]='To load and define a Japanese font, the name of JFM must be specified.',
-		 [2]="The JFM 'ujis' will be  used for now."})
+      ltjb.package_error('luatexja',
+			 'no JFM specified',
+			 {'To load and define a Japanese font, a JFM must be specified.',
+			  "The JFM 'ujis' will be  used for now."})
       jfm_file_name='ujis'
    end
    for j,v in ipairs(ltj.metrics) do 
@@ -115,11 +119,12 @@ function ltj.ext_jfontdefY() -- for horizontal font
    local fn = font.id(cstemp)
    local f = font.fonts[fn]
    if not j then 
-     ltj.error("bad JFM '" .. jfm_file_name .. "'",
-               {[1]='The JFM file you specified is not valid JFM file.',
-                [2]='Defining Japanese font is cancelled.'})
-     tex.sprint(ltj.is_global .. '\\expandafter\\let\\csname '
-		.. cstemp .. '\\endcsname=\\relax')
+      ltjb.package_error('luatexja',
+			 "bad JFM `" .. jfm_file_name .. "'",
+			 {'The JFM file you specified is not valid JFM file.',
+			  'So defining Japanese font is cancelled.'})
+      tex.sprint(ltj.is_global .. '\\expandafter\\let\\csname '
+		 .. cstemp .. '\\endcsname=\\relax')
      return 
    end
    ltj.font_metric_table[fn]={}
@@ -179,7 +184,7 @@ function ltj.ext_append_italic()
       local f = p.font
       local g = node_new(id_kern)
       g.subtype = 1; node.set_attribute(g, attr_icflag, ITALIC)
-      if luatexja.charrange.is_ucs_in_japanese_char(p) then
+      if ltjc.is_ucs_in_japanese_char(p) then
 	 f = has_attr(p, attr_curjfnt)
 	 local j = ltj.font_metric_table[f]
 	 local c = ljfm_find_char_class(p.char, j.jfm)
