@@ -1,6 +1,7 @@
 local ltjb = luatexja.base
 local ltjc = luatexja.charrange
 local ltjs = luatexja.stack
+local ltjj = luatexja.jfmglue
 
 local node_type = node.type
 local node_new = node.new
@@ -38,13 +39,14 @@ local ljfm_find_char_class = ltj.int_find_char_class
 
 
 local ITALIC = 1
-local TEMPORARY = 2
+local KINSOKU = 2
 local FROM_JFM = 3
-local KINSOKU = 4
-local LINE_END = 5
-local KANJI_SKIP = 6
-local XKANJI_SKIP = 7
-local PACKED = 8
+local LINE_END = 4
+local KANJI_SKIP = 5
+local XKANJI_SKIP = 6
+local BOXBDD = 7
+local PROCESSED = 8
+local PACKED = 9
 
 ------------------------------------------------------------------------
 -- naming:
@@ -132,13 +134,13 @@ function ltj.ext_get_parameter_unary(k)
    elseif k == 'autoxspacing' then
       tex.write(tex.getattribute('ltj@autoxspc'))
    elseif k == 'differentjfm' then
-      if ltj.ja_diffmet_rule == math.max then
+      if luatexja.jfmglue.diffmet_rule == math.max then
 	 tex.write('large')
-      elseif ltj.ja_diffmet_rule == math.min then
+      elseif luatexja.jfmglue.diffmet_rule == math.min then
 	 tex.write('small')
-      elseif ltj.ja_diffmet_rule == math.two_average then
+      elseif luatexja.jfmglue.diffmet_rule == math.two_average then
 	 tex.write('average')
-      elseif ltj.ja_diffmet_rule == math.two_add then
+      elseif luatexja.jfmglue.diffmet_rule == math.two_add then
 	 tex.write('both')
       else -- This can't happen.
 	 tex.write('???')
@@ -152,8 +154,8 @@ function ltj.ext_get_parameter_binary(k,c)
       if c<0 or c>216 then 
 	 ltjb.package_error('luatexja',
 			    'invalid character range number (' .. c .. ')',
-			    {'A character range number should be in the range 0..216,',
-			     'So I changed this one to zero.'})
+			    'A character range number should be in the range 0..216,\n'..
+			     'So I changed this one to zero.')
 	 c=0
       end
       tex.write(ltjc.get_range_setting(c))
@@ -161,9 +163,9 @@ function ltj.ext_get_parameter_binary(k,c)
       if c<0 or c>0x10FFFF then
 	 ltjb.package_error('luatexja',
 			    'bad character code (' .. c .. ')',
-			    {'A character number must be between -1 and 0x10ffff.',
-			     "(-1 is used for denoting `math boundary')",
-			     'So I changed this one to zero.'})
+			    'A character number must be between -1 and 0x10ffff.\n'..
+			       "(-1 is used for denoting `math boundary')\n"..
+			       'So I changed this one to zero.')
 	 c=0
       end
       if k == 'prebreakpenalty' then
@@ -330,8 +332,7 @@ end
 -- mode = true iff main_process is called from pre_linebreak_filter
 local function main_process(head, mode)
    local p = head
-   p = ltj.int_insert_jfm_glue(p,mode)
-   p = ltj.int_insert_kanji_skip(p)
+   p = ltjj.main(p,mode)
    p = main4_set_ja_width(p)
    return p
 end
@@ -378,6 +379,9 @@ function debug_show_node_X(p,print_fn)
 	    for i = 2,  p.glue_order do s = s .. 'l' end
 	 end
       end
+      if has_attr(p, attr_icflag, PACKED) then
+	 s = s .. ' (packed)'
+      end
       print_fn(s)
       local q = p.head
       debug_depth=debug_depth.. '.'
@@ -388,9 +392,7 @@ function debug_show_node_X(p,print_fn)
    elseif pt == 'glue' then
       s = debug_depth.. ' glue   ' ..  p.subtype 
 	 .. ' ' ..  print_spec(p.spec)
-      if has_attr(p, attr_icflag)==TEMPORARY then
-	 s = s .. ' (might be replaced)'
-      elseif has_attr(p, attr_icflag)==FROM_JFM then
+      if has_attr(p, attr_icflag)==FROM_JFM then
 	    s = s .. ' (from JFM)'
       elseif has_attr(p, attr_icflag)==KANJI_SKIP then
 	 s = s .. ' (kanjiskip)'

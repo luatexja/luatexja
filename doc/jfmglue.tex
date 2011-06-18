@@ -6,7 +6,7 @@
   \setbox0=\hbox{\kern.5em$\mathstrut#1$\kern.5em}\dp0=0pt
   \hbox{\vrule
     $\vcenter{\hsize=\wd0\hrule\kern.5ex\copy0\kern.5ex\hrule}$%
-    \vrule\kern.1em}}
+    \vrule\kern.1em}{}}
 \def\nk{{\rm kern}\ }
 \def\ng{{\rm glue}\ }
 \def\np{{\rm penalty}\ }
@@ -22,6 +22,10 @@
 
 本文書では，Lua\TeX-jaが（現時点において）和文処理に関わるglue/kernを
 どのように挿入するかの内部処理について説明する．
+
+\bigskip
+{\large\bf\noindent これは仕様・内部処理の提案の1つにしかすぎません．最終的にこのようになる
+保証はどこにもありませんし，これを書いている時点では実際のLuaコードは書きあがっていません．}
 
 \beginsection 予備知識
 
@@ -45,714 +49,453 @@
 
 \item 次のように，nodeがどのように連続しているかを表すことにする．
 $$
-\node{a}\node{b}_{\rm I}\node{c}
+\node{a}\node{b}_{1}\node{c}
 $$
-右下についている添字は，Lua\TeX-jaにおいてそのnodeの役割を区別するためにつけられた
-値（jtypeと呼ぼう）であり，次のようになっている．
+下添字は，Lua\TeX-jaにおいてそのnodeの役割を区別するためにつけられた
+値（icflagと呼ぼう）であり，次のようになっている．
 $$
 \vbox{\halign{#:\ \hfil&#\hfil\quad&#:\ \hfil&#\hfil\cr
-I&イタリック補正由来のkern&
-T&|\[x]kanjiskip|に置換されうるkern\cr
-J&JFM由来のglue/kern&
-K&禁則処理用penalty\cr
-E&「行末」との間に入るkern&
-KS&|\kanjiskip|用glue\cr
-XS&|\xkanjiskip|用glue\cr
+1&イタリック補正由来のkern &
+2&禁則処理用penalty\cr
+3&JFM由来のglue/kern&
+4&「行末」との間に入るkern\cr
+5&|\kanjiskip|用glue&
+6&|\xkanjiskip|用glue\cr
+7&リスト先頭/末尾に入るglue/kern/penalty&
+8&既に処理対象となったnode\cr
 }}
 $$
+和文処理グルーの挿入処理に一度通されたnodeは，みなicflagが2以上となることに注意．
+
+なお，上添字はnodeのsubtypeを表す．
 \item {\sf jaxspmode}のようなサンセリフ体で，|\ltjsetparameter|で設定可能なパラメタ値を表す．
-\item タイプライタ体の|\kanjiskip|, |\xkanjiskip|は，それぞれ「和文間空白」「和欧文間空白」の意味で
-抽象的に用いている．
+\item タイプライタ体の|\kanjiskip|, |\xkanjiskip|は，
+それぞれ「和文間空白」「和欧文間空白」の意味で抽象的に用いている．
 \item nil値は$\emptyset$と書く．
 \enditem
 
-\beginsection JFM由来グルーの挿入 ({\tt luatexja-jfmglue.lua})
+\beginsection 方針など
 
-JFM由来グルーの処理は，「連続する2つのnodeの間に何を入れるか」という単位で行われる．
-そのため，
-\item node生成を伴わないもの（グループ境界，|\relax|等）は全て無視される．
-\item 一方，node生成を伴うものは全て「透過しない」．
-例えば，次のソースにおいて，閉じ括弧と開き括弧の間に入る物は，
-左と右とで異なる：
+本バージョンにおいては，JFM由来グルーと|\[x]kanjiskip|の挿入は同じ段階で行われる．
+大雑把に言うと，
+$$
+\vbox{\hsize=0.85\hsize\bf 和文処理グルーの挿入処理では，以下は存在しないものとして扱われる：
+\item 「文字に付属する」アクセントやイタリック補正．
+\item 行中数式の内部．
+\item 実際の組版中には現れないinsertion, vadjust, mark, whatsit node達．
+\enditem}
+$$
+
+\beginparagraph 和文文字の「自然長」（JFMにおける{\tt width}の指定値）について
+
+p\TeX においては，和文文字の行頭と行末に自動的にglueやkernをおくことはできなかったことから，
+JFMにおける文字幅の意味は，
+$$
+\hbox{\vbox{\hsize=0.8\hsize \noindent
+「その文字が行頭におかれるときの，版面左端の位置」を左端，\hfill\break
+「その文字が行末におかれるときの，版面右端の位置」を右端としたときの幅}}
+$$
+というように，明確な意味があるものであった．例えば，乙部さんによるぶら下げ組パッケージ ({\tt burasage.lzh})
+においては，句読点類（「|，、．。|」の4文字）の文字幅は0.0となっている．
+
+一方，Lua\TeX-ja においては，和文文字が行末にきた場合，その文字と行末の間にkernを挿入することができる：
+例えば，前に挙げた4文字についてぶら下げ組をしたいのであれば，
+
 \begintt
-）（　　）\hbox{}（
+   [1701] = {
+      chars = { 'lineend' }
+   },
+   [42] = {
+      chars = { '，', '、', '．', '。' },
+      align = 'left', left = 0.0, down = 0.0,
+      width = 0.5, height = 0.88, depth = 0.12, italic=0.0,
+      kern = { [1701] = -0.5, ...}
+   }, ...
 \endtt
-\item 「現在位置でのJFM由来グルーの挿入抑制」を行う|\inhibitglue|は，内部では専用のwhatsit node 
-($\hbox{\tt subtype}=44$, \setbox0=\hbox{|user_id|}$\copy0=30111$)を作ること
-によって実装している．これらのnodeは，「現在位置で挿入しない」というフラグを立てるためだけ
-に存在するものであって，挿入処理中に全て削除される．
-\enditem
-以下，$q$, $p$を連続するnodeとする．
+のように，「文字|'lineend'|との間に負のkernをおく」ように指定すればよい．
+そのため，p\TeX と比較すると，JFMにおける|width|の指定値に絶対的な意味はあまりないことになる．
+{\small 行頭にもkern をおけるようにするかどうかは検討中である．}
 
-\beginparagraph 2つの和文文字の間
 
-この場合，グルー挿入に関係する量は次の通りである．これら3つの量の値によって，
-$q$と$p$の間に何が挿入されるかが決定される．これらの記号は他の場合にも用いる．
-\item $g$: JFMで指定された，$q$と$p$の間に入るglue/kern．
-JFMで規定されていないときは$\emptyset$と書こう．
-両ノードで使われているJFMが異なる時の$g$の決定方法は，後に記述する．
-\item $w$: JFMで指定された，「$q$の直後で改行が行われた場合，
-$q$と行末の間に入るカーン量」の値．
+\beginparagraph グルーの挿入単位「塊」
 
-また，$g-w$で，$g$の自然長を$w$だけ減算したglue/kernを表すことにする（$g$がglueならばこのnodeはglue，$g$がkernならばkern）．
+和文処理グルーの挿入処理は，
+ごく大雑把にいうと，「連続する2つのnodeの間に何を挿入するか」の繰り返しである．
+実際の挿入処理は，「隣り合った2つの『塊』\IT{Nq}, \IT{Np}の間に何を入れるか」を
+単位として行われる．
 
-\item $P$: $q$に対する行末禁則用ペナルティ (post-break penalty) と，
-$p$に対する行頭禁則用ペナルティ (pre-break penalty) との和．どちらも
-設定されていないときは0となる．
-\enditem
-なお，間に|\inhibitglue|による指定があった場合，$g=\emptyset$, $w=0$として処理される．
+\medskip\noindent{\bf 定義}\quad
+「{\bf 塊}」（\IT{Nn}などで表す）とは，次の4つのいずれかの条件を満たすnode（達のリスト）
+のことである：
+\enum icflagが2以上6以下 or 8であるnode達の連続からなるリスト．
 
-設計方針としては，
-\item JFM由来で入るものがkernの場合，この場所では行分割は許さない．
-\item そうでない場合，（penaltyの値$P$があるが）この場所での行分割は可能である．
-\enditem
-である．さて，次が実際の場合わけである：
+このようなnode達は，既に組み上がったhboxを|\unpackage|により解体したときに発生する．
+一度和文処理グルーの挿入処理が行われているため，二重の処理を防ぐためにこうして1つの塊を構成させている．
 
-\enum $w\neq 0$, $g=\emptyset$のとき
-$$\ncount=0
-\node{q}
-\node{\nk w}_{\rm E}
-\node{\np P}_{\rm K}
-\node{\nk{-w}}_{\rm T}
-\node{p}
+なお，icflagが7であるnodeは，処理中に発見されしだい削除される
+（hboxの先頭や末尾に挿入されたglue/kern/penaltyであるので，
+本来の「段落/hboxの中身に適宜グルーを挿入する」という目的を考えると存在すべきでない）．
+\enum 数式開始を表す\IT{math\_node}から始まる文中数式を表すnodeのリスト：
 $$
-この$\node{\nk{-w}}_{\rm T}$は，
-「$q$と$p$の間で行分割されないときは間に何のglue/kernもないように見える」ために
-挿入されたものである．次のステップで|\[x]kanjiskip|の挿入が行われる時に，このnodeは
-|\[x]kanjiskip|用のglueに置換される．
-
-\enum $w\neq 0$, $g\neq\emptyset$のとき：
-$$\ncount=0
-\node{q}
-\node{\nk w}_{\rm E}
-\node{\np P}_{\rm K}
-\node{g-w}_{\rm J}
-\node{p}
+ \node{\hbox{数式境界（開始）}}
+ \longrightarrow\hbox{（この間，行中数式が続く）}
+ \node{\hbox{数式境界（終了）}}
 $$
-
-\enum $w=0$, $g$: kernのとき
-$$\ncount=0
-\node{q}
-\node{g}_{\rm J}
-\node{p}
+\enum \IT{glyph\_node}~$p$と，それと切り離すことが望ましくないと考えられるnode達：
 $$
-
-\enum $w=0$, $g$: glueのとき
-$$\ncount=0
-\node{q}
-\node{\np P}_{\rm K}
-\node{g}_{\rm J}
-\node{p}
+ \Bigl[\node{\nk\hskip-.5em}^2
+ \node{\hbox{アクセント文字}}
+ \node{\nk\hskip-.5em}^2\Bigr]
+ \node{p}
+ \Bigl[\node{\nk\hskip-.5em}_1\Bigr]
 $$
-
-\enum $w=0$, $g=\emptyset$, $P\neq 0$のとき
-$$\ncount=0
-\node{q}
-\node{\np P}_{\rm K}
-\node{p}
-$$
-
-\enum $w=0$, $g=\emptyset$, $P=0$のとき
-$$\ncount=0
-\node{q}
-\node{p}
-$$
-\enditem
-
-なお，両ノードで使われているJFMが異なる時の$g$の決定方法であるが，
-\enum $g_{\rm L}$を，$q$に使用されているJFMにおける，「$q$と文字|'diffmet'|」の間に
-入るglue/kernの値とする．
-\enum $g_{\rm R}$を，$p$に使用されているJFMにおける，「文字|'diffmet'|と$p$」の間に
-入るglue/kernの値とする．
-\enum 両方から，実際に入る$g$の値を計算する．
-\itemitem $g_L$, $g_R$の少なくとも片方が$\emptyset$のときは，$\emptyset$でない方を
-そのまま採用する．
-\itemitem 両方とも$\emptyset$でない場合は，|differentjfm|の値にそって$g$の値を計算する．
-\enditem
-
-\beginparagraph 和文文字と（和文文字，kern以外のnode）の間
-
-「和文文字の間」の場合に対して，以下が異なる：
-\item $g$は，$q$に使用されているJFMにおける，「$q$と文字|'jcharbdd'|」の間に
-入るglue/kernの値である．
-\item $p$が{\bf penaltyでない場合}は，いつもこの位置で行分割できるようにするため，
-case~6 ($w$, $P=0$, $g=\emptyset$) の場合にも，$q$と$p$の間には
-0という値のpenaltyが入る．即ち，次のようになる．
-$$\ncount=0
-\node{q}
-\node{\np 0}_{\rm K}
-\node{p}
-$$
-\enditem
-
-\beginparagraph （和文文字，kern以外のnode）と和文文字の間
-
-この場合も，基本的には「和文文字の間」と似ているが，以下が異なる：
-\item $g$は，$p$のJFMにおける，「文字|'jcharbdd'|と$p$」の間に
-入るglue/kernの値である．
-\item 常に$w=0$である．
-\item いつもこの位置で行分割できるようにするため，
-case~6 ($w$, $P=0$, $g=\emptyset$) の場合にも，$q$と$p$の間には
-0という値のpenaltyが入る．
-\enditem
-
-即ち，次の3通りになる．
-\enum $g$: kernのとき
-$$\ncount=0
-\node{q}
-\node{g}_{\rm J}
-\node{p}
-$$
-
-\enum $g$: glueのとき
-$$\ncount=0
-\node{q}
-\node{\np P}_{\rm K}
-\node{g}_{\rm J}
-\node{p}
-$$
-
-\enum $g=\emptyset$のとき
-$$\ncount=0
-\node{q}
-\node{\np P}_{\rm K}
-\node{p}
-$$
-\enditem
-
-\beginparagraph 和文文字とkernの間，kernと和文文字の間
-
-和文文字の後にkernが続いた場合，あるいはkernの後に和文文字が続いた場合，
-この間で行分割はできないものとしている．そのため，
-以下の3ケースに限られる：
-\enum $g$: kernのとき
-$$\ncount=0
-\node{q}
-\node{g}_{\rm J}
-\node{p}
-$$
-
-\enum $g$: glueのとき
-$$\ncount=0
-\node{q}
-\node{\np 10000}_{\rm K}
-\node{g}_{\rm J}
-\node{p}
-$$
-
-\enum $g=\emptyset$のとき
-$$\ncount=0
-\node{q}
-\node{p}
-$$
-\enditem
-
-なお，ここでの$g$は，
-\item $q$がkernだった場合は，
-$p$のJFMにおける，「|'jcharbdd'|と$p$」の間に
-入るglue/kernの値．
-\item $p$がkernだった場合は，
-$q$のJFMにおける，「$q$と|'jcharbdd'|」の間に
-入るglue/kernの値．
-\enditem
-
-\beginparagraph 要検討の箇所
-
-私が推測するに，欧文では，
-\item 単語内ではフォントは変わらない；
-\item 単語内では，明示的に/ハイフネーションにより挿入されたdiscretionary break以外では
-行分割がおきない；
-\enditem
-という事情があるため，TFM由来のkernや合字処理は（nodeを生成しないもの以外は）
-何も透過しないという状態になっているものと思われます．
-
-そのため，JFMグルー等の仕様を考える場合，欧文でいう「単語」に対応するようなものは
-何か，というのを考える必要があります．現実装では，素直に欧文の合字処理と同様のものであると考え，
-透過するnodeはない，という仕様にしています．
-しかし，|\[x]kanjiskip|の処理と共通にしてしまうというのも
-考え方によってはありかもしれません．
-
-\bigskip
-\item {\bf イタリック補正のkernの周囲}
-
-例えば，|jfm-ujis.lua|では，|'jcharbdd'|は文字クラス
-0であるため，今の実装では，\hfil\break
-「|）\/（|」という入力からは，次のnodeの並びを得る：
-\setbox1=\hbox{|\/|}%
-$$
-\vbox{\halign{$#$\hfil&$#$\hfil&$#$\hfil&$#$\hfil&$#$\hfil\cr
-\node{\hbox{）}}&\ncount=1
-\node{\np 10000}_{\rm K}&\ncount=1
-\node{\ng 0.5\z_{-0.5}}_{\rm J}\cr&\ncount=1
-\node{\nk \copy1}&\ncount=1
-\node{\np 10000}_{\rm K}&\ncount=1
-\node{\ng 0.5\z_{-0.5}}_{\rm J}&\ncount=1
-\node{\hbox{（}}\cr
-}}
-$$
-一方，イタリック補正をJFM由来グルーが透過するとしたならば，当然
-$$
-\node{\hbox{）}}
-\node{\nk \copy1}
-\node{\ng 0.5\z_{-0.5}}
-\node{\hbox{（}}
-$$
-となる（実際の組版イメージでは，
-「{\tenmini 斜め）}\hbox{}（」「{\tenmini 斜め）}（」）．どちらにするか？
-
-
-
-\item {\bf penaltyの周囲}
-
-これも，例えば次の設定の下では，「|）\penalty1701（|」からは以下を得る：
-\itemitem 「）」と行末の間に$-0.5\z$だけkernを入れる．
-\itemitem 「）」「（」の行頭/行末禁則用penaltyの値はどれも1000．
-$$
-\vbox{\halign{$#$\hfil&$#$\hfil&$#$\hfil&$#$\hfil&$#$\hfil\cr
-\node{\hbox{）}}&\ncount=1
-\node{\nk {-0.5}\z}_{\rm E}&\ncount=1
-\node{\np 1000}_{\rm K}&\ncount=1
-\node{\ng 1\z_{-0.5}}_{\rm J}\cr
-&\ncount=1\node{\np 1701}&\ncount=1
-\node{\np 1000}_{\rm K}&\ncount=1
-\node{\ng 0.5\z_{-0.5}}_{\rm J}&\ncount=1
-\node{\hbox{（}}\cr}}
-$$
-\leftskip2\zw
-例えばpenaltyを合算することとした場合，上の入力例では本来「）」「（」の間に
-1701のpenaltyがあるのだから，
-$$
-\vbox{\halign{$#$\hfil&$#$\hfil&$#$\hfil&$#$\hfil&$#$\hfil&$#$\hfil\cr
-\node{\hbox{）}}&\ncount=1
-\node{\nk {-0.5}\z}_{\rm E}&\ncount=1
-\node{\np 3701}_{\rm K}&\ncount=1
-\node{\ng 0.5\z_{-0.5}}_{\rm J}&\ncount=1
-\node{\hbox{（}}\cr
-\node{\hbox{）}}&\ncount=1
-\node{\nk {-0.5}\z}_{\rm E}&\ncount=1
-\node{\np 3701}_{\rm K}&\ncount=1
-\node{\ng 1\z_{-0.5}}_{\rm J}&\ncount=1
-\node{\ng 0.5\z_{-0.5}}_{\rm J}&\ncount=1
-\node{\hbox{（}}\cr
-}}
-$$
-のどちらか（上はpenaltyを透過する場合，下は透過しない場合）にするのが
-良いと思われます．
-
-
-\item {\bf discretionary breakの取り扱い}
-
-discretionary break (\IT{disc\_node})は，行分割時の行末の内容<pre>，
-行頭の内容<post>，それに行分割しないときの内容<no_break>の3つをリストの形で
-持っている．|linebreak.w|を見る限り，Lua\TeX でも<pre>, <post>, <no_break>の
-中身にはglueやpenaltyを許容していないようだ．
-
-現行の実装では，<pre>, <post>, <no_break>のどれも，和文フォントへの置換の
-段階からして行われていない（だから中身は全部欧文扱いとなる）．
-{\small 単純にサボっていました|^^;|}
-<pre>, <post>, <no_break>の中身にglueやpenaltyが許容されないことから，
-これらに対する和文用処理の方法として，次の2種類が挙げられる．
-私は前者で良いのではないかと思っているのだが……．
-\itemitem （現行のまま）discretionary breakの中身に和文文字はないものと想定する．
-例えば<pre>の中身に和文文字を入れたい場合は，<pre>の中身全体を
-必ずhboxで括ることとする．
-\itemitem 「glueを挿入」を全部「自然長だけを取り出したkernを挿入」に置き換え，
-普段の和文処理グルー挿入処理を流用する．
-
-
-\item {\bf 数式の取り扱い}
-
-まだ数式中に和文文字が（hboxでカプセル化されることなく）出現することは想定していない．
-実用的にはそれでも十分だと思うが，もしp\TeX のように単に
-\begintt
-$aあa$
-\endtt
-などと書いても和文文字が
-出力されるようにするとなれば，「数式リストから変換されてできた水平リストでは，
-和文処理グルーの挿入処理を無効とする」ようにしないといけないだろう．
+\enum {\bf 以下のどれにもあてはまらない}node~$p$：
+\itemitem 組版結果からは消えてしまう，\IT{ins\_node}, 
+\IT{mark\_node}, \IT{adjust\_node}, \IT{whatsit\_node}．
+\itemitem penalty（←但し，挿入処理の過程で値が変更されることはある）
 
 \enditem
 
-\beginsection {\tt \char"5C[x]kanjiskip}の挿入%"
+\medskip\noindent{\bf 記号}\quad
+\IT{Bp}で，塊\IT{Nq}と塊\IT{Np}の間にある\IT{penalty\_node}達の配列を表す．
 
-現実装の|\[x]kanjiskip|の挿入の方針として，
-\item JFMグルーが挿入されていないところに「標準の空き量」として挿入する．
-\item 実際の段落/hboxの内容に即して，組版イメージの見た目に関係のないところは透過する．
+
+\beginsection 挿入処理の大枠
+
+\beginparagraph 「塊」の保持するデータ
+
+「塊」\IT{Np}は，内部では少なくとも次の要素を持ったテーブルとして表される：
+
+\item \IT{.first}: \IT{Np}の先頭のnode．
+\item \IT{.nuc}: \IT{Np}の「核」となるnode．
+\itemitem 1., 2.によるものである場合，$\mibox{Np.nuc}=\mibox{Np.first}$．
+\item \IT{.last}: \IT{Np}の最後のnode．
+\item \IT{.id}: \IT{Np}の種類を表す値．
+\itemitem 1.によるものである場合，\IT{id\_pbox}（Pseudo BOXのつもり）．
+\itemitem 3.によるものであり，$p$が和文文字だった場合，\IT{id\_jglyph}．
+\itemitem 3.によるものであり，$p$が垂直変位がnon-zeroなhbox，
+あるいはvbox, ruleだった場合，\IT{id\_box\_like}．
+\itemitem それ以外の場合，node~$p$の種別を表す数値$p.\mibox{id}$そのもの．
+（数値そのものだと使い勝手が悪いので，\IT{id\_glyph}, \IT{id\_glue}, \IT{id\_kern}などと
+別名を定義している）
 \enditem
 
-\beginparagraph 処理の概要
+\medskip\noindent{\bf 定義}\quad
+「\IT{Np}の中身の先頭」を意味する$\mibox{head}(\mibox{Np})$は，以下で定義される：
 
-|\[x]kanjiskip|挿入処理では，次の3つのnodeを用いている．
-$$\ncount=0
-\node{\IT{nr}}\longrightarrow\cdots
-\node{\IT{nq}}\longrightarrow\cdots
-\node{\IT{np}}
-$$
-\item \IT{nr}と\IT{np}の間に|\[x]kanjiskip|を挿入しようとする．
-\item 実際にnodeの形で挿入しようとする場所は$\it nq$の直後である．
-\item \IT{nr}, \IT{nq}は異なるnodeとは限らない．
-\item {\bf \IT{np}はリストの先頭から末尾までループで渡る．}その過程で
-\IT{nr}, \IT{nq}を適宜更新し，実際のnode挿入処理を行っている．
-\item 厳密には，コード中では\IT{nr}という変数は使っていない．代わりに使われているのは，
-\itemitem $\mibox{insert\_skip}\in \{\mibox{no\_skip}, 
-  \mibox{after\_schar}, \mibox{after\_wchar}\}$: 
-「node \IT{nr}」の種類を表す：
-\itemT \IT{no\_skip}: 「node \IT{nr}」の後ろ（\IT{nr}と\IT{np}の間）に
-|\[x]kanjiskip|が入ることはない．
-\itemT \IT{after\_schar}: 「node \IT{nr}」を，欧文文字（の入った\IT{glyph\_node}）であり，
-かつ{\sf alxspmode}パラメータの指定により「\IT{nr}の後ろに|\xkanjiskip|の挿入を許可する」ようなものとみなす．
-\itemT \IT{after\_wchar}: 「node \IT{nr}」を和文文字（の入った\IT{glyph\_node}）とみなす．
-\itemitem \IT{nrc}: 「node \IT{nr}の文字コード」を表す．
-\itemitem \IT{nrf\/}: 「\IT{nr}のフォント」を表す．
-\itemitem $\mibox{nr\_spc}[1]$: 「node \IT{nr}」における
-{\sf autospacing}（|\kanjiskip|の自動挿入を行うか否か）の設定値．
-\itemitem $\mibox{nr\_spc}[2]$: 「node \IT{nr}」における
-{\sf autoxspacing}（|\xkanjiskip|の自動挿入を行うか否か）の設定値．
+\noindent{\small （説明の都合上作った記法で，Luaソース中にはこのような書き方はない）}
 
-\medskip\leftskip=2\zw\noindent
-\IT{nrc}, \IT{nrf}の値は，$\mibox{insert\_skip}=\mibox{after\_wchar}$のときのみ用いられる．
-$\mibox{insert\_skip}=\mibox{no\_skip}$のときには，それだけで情報は十分であるから，
-\IT{nr\_spc}, \IT{nq}の値も用いられない．
+\item \IT{Np.id}が\IT{id\_hlist}の場合：後に述べる{\tt check\_box}関数を用いて，
+hbox~\IT{Np.nuc}中の「最初のnode」「最後のnode」を求める．
+\item \IT{Np.id}が\IT{id\_pbox}の場合：\IT{id\_hlist}の場合とほぼ同様．
+\item $\mibox{Np}.\mibox{id}=\mibox{id\_glyph}$（欧文文字）の場合：
+\itemitem \IT{glyph\_node}~\IT{Np.nuc}が単一の文字を格納している（合字でない）場合は，\IT{Np.nuc}自身．
+\itemitem そうでない場合は，合字の構成要素の先頭→構成要素の先頭→……
+と再帰的に探索し，最後にたどり着いた\IT{glyph\_node}．
+\item $\mibox{Np}.\mibox{id}=\mibox{id\_disc}$ (discretionary break) の場合：
+\IT{disc\_node}は，
+\item $\mibox{Np}.\mibox{id}=\mibox{id\_jglyph}$（和文文字）の場合：\IT{Np.nuc}自身．
+\item $\mibox{Np}.\mibox{id}=\mibox{id\_math}$（数式境界）の場合：
+「文字コード$-1$の欧文文字」を仮想的に考え，それを$\mibox{head}(\mibox{Np})$とする．
+\item それ以外の場合：未定義．敢えて書けば$\mibox{head}(\mibox{Np}):=\emptyset$．
 \enditem
 
-ループの中で，以下の場合には\IT{nr}は変化せず，$\IT{nq}\leftarrow \IT{np}$となる．
-つまり，これらのnodeに対して|\[x]kanjiskip|は透過する：
-\item \IT{np}がpenaltyの場合
-\item \IT{np}が$\hbox{\tt subtype}=0$のkern（TFM由来）の場合．
-\item \IT{np}が$\hbox{\tt subtype}=1$のkern（つまり，明示的kernかイタリック補正由来）であって，jtypeが
-$$
-\hbox{I (イタリック補正），E（行末との間），T（一時的）}
-$$
-であった場合．後者2つはJFMグルーの挿入で入るものなので，
-ユーザは「イタリック補正は透過」と考えればよい．
+\noindent 同様にして，「\IT{Np}の中身の先頭」を意味する$\mibox{last}(\mibox{Np})$も定義され，
+「\IT{Np}は，先頭が$\mibox{head}(\mibox{Np})$，
+末尾が$\mibox{tail}(\mibox{Np})$であるような単語」のように
+考えることができる．
 
-\item \IT{np}がinsertion, mark, |\vadjust|, whatsitのnodeである場合．
-これらは水平リストからは消え去る運命にある．
+\medskip\noindent{\bf 定義}\quad
+「\IT{glyph\_node}~$h$の情報を算出する」とは，
+$h\neq\emptyset$の時に，テーブル\IT{Np}に
+以下のような要素を追加することである：
+
+\item \IT{.pre}: $h$の文字コードに対する{\sf prebreakpenalty}パラメタの値
+\item \IT{.post}: $h$の文字コードに対する{\sf postbreakpenalty}パラメタの値
+\item \IT{.xspc\_before}, \IT{.xspc\_after}: $h$の前後に|\xkanjiskip|が挿入可能であるかの
+指定値（パラメタ{\sf jaxspmode}, {\sf alxspmode}由来）
+\item \IT{.auto\_xspc}: $h$での{\sf autoxspacing}パラメタの値
 \enditem
 
+$h$が和文文字を格納している場合は，さらに次の要素の追加作業も含む：
 
-\beginparagraph \IT{np}が文字 (\IT{glyph\_node}) の場合
+\item \IT{.size}: $h$で使われている和文フォントのフォントサイズ．
+\item \IT{.met}, \IT{.var}: 使われているJFMの情報．
+\item \IT{.auto\_kspc}: {\sf autospacing}パラメタの値．
+\enditem
 
-この場合がやはり一番基本となる．
-\enum $\mibox{insert\_skip}=\mibox{after\_schar}$, \IT{np}: 和文文字の場合
+\beginparagraph 全体図
 
-前に書いたように，「node \IT{nr}」は（直後に|\xkanjiskip|の挿入が許可されている）欧文文字と
-みなされている．
-そのため，「node \IT{nr}」と\IT{np}の間に|\xkanjiskip|の入る条件は以下である．
-\itemitem 文字\IT{np}に対する{\sf jaxspmode}パラメータの指定において
-「直前への|\xkanjiskip|の挿入が許可」されている．
-\itemitem 「node \IT{nr}における」{\sf autoxspacing}パラメタの値 ($\mibox{nr\_spc}[2]$) か，
-\IT{np}における{\sf autoxspacing}の値の少なくとも一方が真である．
-
-\medskip\leftskip=2\zw\noindent
-まず，実際に入る|\xkanjiskip|の量$g$を次の方法で決定する：
-\itemitem {\sf xkanjiskip}パラメータの自然長が|\maxdimen|でない場合，
-{\sf xkanjiskip}パラメータの値をそのまま採用する．
-\itemitem {\sf xkanjiskip}パラメータの自然長が|\maxdimen|の場合は，
-\IT{np}で使われているJFMに設定されている|\xkanjiskip|の量を用いる．
-\itemitem 上の2つのどれでもない場合，fallbackとして0を用いる．
-
-{\bf 要検討}：既にJFMグルー挿入処理で和欧文間の行分割は可能としているので
-0を挿入する意味はない？
-
-\medskip\leftskip=2\zw\noindent
-次にこのようにして決定された$g$を実際に挿入する：
-\itemitem ほとんどの場合，$g$の値をもつglueを\IT{nq}の直後に挿入する．
-$$\ncount=0
-\node{\mibox{nr}}\longrightarrow\cdots
-\node{\mibox{nq}}\node{\ng g}_{\rm XS}\longrightarrow\cdots
-\node{\mibox{np}}
-$$
-\itemitem \IT{np}の直前が${\rm jtype}={\rm T}$なnodeの場合，そのnodeに
-$g$の分だけ自然長/伸び/縮み量を加算する．
-$$\ncount=0
-\vbox{\halign{$#$\hfil\cr
-\node{\mibox{nr}}\longrightarrow\cdots
-\node{\mibox{nq}}\longrightarrow\cdots
-\node{\ng h}_{\rm T}
-\node{\mibox{np}}\cr
-\hfil\Downarrow\cr
-\vadjust{\bigskip}
-\node{\mibox{nr}}\longrightarrow\cdots
-\node{\mibox{nq}}\longrightarrow\cdots
-\node{\ng g+h}_{\rm XS}
-\node{\mibox{np}}\cr
-\node{\mibox{nr}}\longrightarrow\cdots
-\node{\mibox{nq}}\longrightarrow\cdots
-\node{\nk k}_{\rm T}
-\node{\mibox{np}}\cr
-\hfil\Downarrow\cr
-\node{\mibox{nr}}\longrightarrow\cdots
-\node{\mibox{nq}}\longrightarrow\cdots
-\node{\ng g+k}_{\rm XS}
-\node{\mibox{np}}\cr
-}}
-$$
-
-\medskip\leftskip=2\zw\noindent
-最後に，次のループに移るために，次の処理を行う：
+\enum 変数類の初期化
+\itemitem 処理対象が段落の中身（後で行分割される）の場合：$\mibox{mode}\leftarrow\top$
+\itemT \IT{lp}（node走査用カーソル）の初期位置は，
+リスト先頭部にある|\parindent|由来のhboxや
+local paragraph（$\Omega$由来）等の情報を格納するwhatsit nodeたちが終わった所
+（つまり，段落本来の先頭部分）となる．
+\itemT \IT{last}（リスト末尾のnode）も，リストの最後部に挿入される|\parfillskip|由来のglue%
+を指す．
 \itemitem 
-$\mibox{nq}\leftarrow \mibox{np}$, 
-$\mibox{nr\_spcの設定}$, 
-$\mibox{nrf}\leftarrow \mibox{np}.\mibox{font}$, 
-$\mibox{nrc}\leftarrow \mibox{np}.\mibox{char}$
-\itemitem $\mibox{np}\leftarrow \mibox{next\/}(\mibox{np})$
-\itemitem $\mibox{insert\_skip}\leftarrow \mibox{after\_wchar}$
+処理対象がhboxの中身の場合：$\mibox{mode}\leftarrow\bot$
+\itemT \IT{lp}はリスト先頭．
+\itemT 番人として，リスト末尾にkernを挿入．\IT{last}はこのkernとなる．
 
-\enum $\mibox{insert\_skip}=\mibox{after\_wchar}$, \IT{np}: 欧文文字の場合
+\enum 先頭が\IT{lp}以降にある塊で，一番早いものを\IT{Np}にセットする．
+\itemitem 作業の途中で$\mibox{lp}=\mibox{last}$となったら，処理対象のリストに塊はないので，8.へ．
+\itemitem そうでなければ，$\mibox{head}(\mibox{Np})$の情報を算出しておく．
+\itemitem 本段階終了後，\IT{lp}は\IT{Np.last}の次のnodeとなる．
 
-前に書いたように，「node \IT{nr}」は和文文字とみなされている．
-そのため，「node \IT{nr}」と\IT{np}の間に|\xkanjiskip|の挿入が起こるための条件は
-次の3条件が満たされていることである：
-\itemitem \IT{nrc}番の和文文字に対する{\sf jaxspmode}パラメータの設定で，
-「直後への|\xkanjiskip|挿入」が許可されている．
-\itemitem \IT{np}の文字{\small（もし\IT{np}が合字であれば，合字の構成要素の最初の文字）}%
-に対する{\sf alxspmode}パラメータの設定で，
-「直前への|\xkanjiskip|挿入」が許可されている．
-\itemitem \IT{nr}における{\sf autoxspacing}パラメタの値 ($\mibox{nr\_spc}[2]$) か，
-「node \IT{nr}」における{\sf autoxspacing}の値の少なくとも一方が真である．
 
-\medskip\leftskip=2\zw\noindent
-この後，実際に|\xkanjiskip|の量を計算し，nodeの形で実際に挿入するところは，
-量の決定のところで\IT{np}の代わりに\IT{nrf}を用いる以外は同じである．
-最後の，次のループに移るための処理では，次が行われる．
-\itemitem 
-$\mibox{nq}\leftarrow \mibox{np}$, 
-$\mibox{nrc}\leftarrow \mibox{np}.\mibox{char}$, 
-$\mibox{nr\_spcの設定}$
-\itemitem $\mibox{np}\leftarrow \mibox{next\/}(\mibox{np})$
-\itemitem \IT{insert\_skip}の設定．
+\enum ({\tt handle\_list\_head}) 
+リストに最初に出てくる塊\IT{Np}が求まったので，リスト「先頭」とこの塊との間に和文処理グルーを挿入．
 
-$\mibox{insert\_skip}\leftarrow \mibox{after\_schar}$となるのは，
-\IT{np}の文字{\small（もし\IT{np}が合字であれば，合字の構成要素の末尾の文字）}%
-における{\sf alxspmode}パラメータの設定で，
-「直後への|\xkanjiskip|挿入」が許可されている場合である．
-そうでないときは，$\mibox{insert\_skip}\leftarrow \mibox{no\_skip}$となる．
+\enum 今の塊\IT{Np}と，その次の塊の間に入る和文処理グルーを求めるため，
+一旦$\mibox{Nq}\leftarrow \mibox{Np}$として待避させ，次の塊\IT{Np}を探索する．
+\itemitem 作業の途中で$\mibox{lp}=\mibox{last}$となったら，\IT{Nq}がリスト中最後の塊であるので，
+7.へ．
+\itemitem そうでなければ，$\mibox{head}(\mibox{Np})$の情報を算出しておく．
+\itemitem 本段階終了後，\IT{lp}は\IT{Np.last}の次のnodeとなる．
 
-\enum $\mibox{insert\_skip}=\mibox{after\_wchar}$, \IT{np}: 和文文字の場合
+\enum \IT{Nq}と\IT{Np}の間に和文処理グルーを挿入する．\IT{Np.id}による場合分けを行う．
+「main loop その\nobreak1,~2」を参照のこと．
 
-この場合は|\xkanjiskip|の代わりに|\kanjiskip|を挿入することとなる．
-{\sf jaxspmode}, {\sf alxspmode}のように「直前/直後への|\kanjiskip|挿入許可の制御」
-を行うパラメータは存在しない．「{\sf autospacing}で自動挿入が禁止される」とマニュアルでは言っているが，
-それは{\bf 挿入する|\kanjiskip|の量を一時的に0にしているだけで，
-「node \IT{nr}」と\IT{np}の間には
-常に|\kanjiskip|が入ることには変わりはない}ことに注意．
+\enum \IT{Np}が単一の文字ではない{\small （合字など）}可能性がある以下の場合において，
+$\mibox{tail}(\mibox{Np})$の情報を算出する．終わったら，再びループに入るため，4.へ．
+
+
+\itemitem \IT{id\_glyph}（欧文文字）のとき
+\itemitem \IT{id\_disc} (discretionary break) のとき
+\itemitem \IT{id\_hlist}のとき
+\itemitem \IT{id\_pbox}のとき
+
+\enum ({\tt handle\_list\_tail}) 
+リストの最後にある塊\IT{Nq}が求まったので，この塊とリスト「末尾」の間に和文処理グルーを挿入．
+
+\enum $\mibox{mode}=\bot$の場合，番人となるkernを1.において挿入したので，その番人を削除する．
+
+\enditem
+
+\beginsection リスト先頭・末尾の処理と「boxの内容」
+
+\beginparagraph リスト先頭の処理 ({\tt handle\_list\_head})
+
+次の場合に，
+\IT{Np}で使われているのと同じJFMを使った「文字コードが{\tt 'boxbdd'}の文字」と
+\IT{Np}との間に入るglue/kernを，\IT{Np.first}の直前に挿入する：
+\item $\mibox{Np.id}=\mibox{id\_jglyph}$（和文文字）
+\item $\mibox{Np.id}=\mibox{id\_pbox}$であり，$\mibox{head}(\mibox{Np})$が和文文字であるとき．
+\enditem
+$$
+\vcenter{\halign{$\mibox{mode}=#$:\qquad\hfil&$#$\hfil\cr
+\bot&\node{\kern-1em}\,\hbox{（リスト先頭）}\longrightarrow\cdots\node{g}_7\node{\mibox{Np}}\cr
+\top&\node{\hbox{{\tt\char92 parindent}由来hbox}}\longrightarrow\cdots\Bigl[\node{\np 10000}_7\Bigr]\node{g}_7\node{\mibox{Np}}\cr
+}}
+$$
+ここで，$g$がglueかつ$\mibox{mode}=\top$かつ$\#\mibox{Bp}=0$のときのみ，|\parindent|由来のhboxの直後で改行されることを防ぐために
+$g$の直前にpenaltyを挿入する．{\small 
+（$\#\mibox{Bp}$が1以上の場合は，|\parindent|と\IT{Np}の間にある
+penaltyのため，\IT{Np}の直前での改行が起こり得る状態となっているので，
+特にそれを抑制することもしない）\inhibitglue}．
+
+
+\beginparagraph リスト末尾の処理 ({\tt handle\_list\_tail})
+
+この場合，\IT{mode}の値により処理が全く異なる．
+
+\noindent{\bf A: \IT{mode}が偽である場合．}
+
+この場合はリストはhboxの中身だから，行分割はおこり得ない．
+リスト先頭の処理と同様に，
+次の場合に
+\IT{Nq}と「文字コードが{\tt 'boxbdd'}の文字」と
+の間に入るglue/kernを，\IT{Nq.last}の直後に挿入する：
+\item $\mibox{Nq.id}=\mibox{id\_jglyph}$（和文文字）
+\item $\mibox{Nq.id}=\mibox{id\_pbox}$であり，$\mibox{tail}(\mibox{Nq})$が和文文字であるとき．
+\enditem
+$$
+\node{\mibox{Nq}}\node{g}_7\longrightarrow\cdots\node{\nk\hbox{（番人）}}
+$$
+上の番人は，次のstepで除去されるのだった．
 
 \medskip
-実際に入る|\kanjiskip|の量$g$は次の方法で決定される：
-\itemitem \IT{nr}における{\sf autospacing}の値 ($\mibox{nr\_spc}[1]$) か，
-\IT{np}における{\sf autospacing}の値が共に偽なら，$g=0$．
-\itemitem {\sf kanjiskip}パラメータの自然長が|\maxdimen|でない場合，
-{\sf kanjiskip}パラメータの値をそのまま採用する．
-\itemitem {\sf xkanjiskip}パラメータの自然長が|\maxdimen|の場合は，
-\IT{np}で使われているJFMに設定されている|\kanjiskip|の量を用いる：
-\itemT 「node \IT{nr}」で使用されているJFMと，\IT{np}で使用されているJFMそれぞれに
-|\kanjiskip|の値が設定されている場合，……．
+\noindent{\bf B: \IT{mode}が真である場合．}
 
-\itemitem 上の3つのどれでもない場合，fallbackとして0を用いる．
+この場合，段落の末尾には常に|\penalty 10000|と|\parfillskip|由来のグルーが存在する．
+そのため，上のように「文字コードが{\tt 'boxbdd'}の文字」との空白を考えるのではなく，
+まず，\IT{Nq}が行末にきたときに行末との間に入る空白$w$を代わりに挿入する．
+\item $\mibox{Nq.id}=\mibox{id\_jglyph}$（和文文字）
+\item $\mibox{Nq.id}=\mibox{id\_pbox}$であり，$\mibox{tail}(\mibox{Nq})$が和文文字であるとき．
+\enditem
+$$
+\node{\mibox{Nq}}\node{\nk w}_7\node{\np10000}\longrightarrow\cdots
+\node{\ng (\hbox{\tt\char92 parfillskip})}
+$$
+次に，|\jcharwidowpenalty|の挿入処理を行う→省略．
 
+\beginparagraph box内の「最初/最後の文字」の検索 ({\tt check\_box})
+
+「hboxの中の文字と外の文字の間に」|\kanjiskip|, |\xkanjiskip|の挿入を行えるようにするため，
+{\tt check\_box}関数ではhbox内の「最初のnode」「最後のnode」の検索を行う．
+
+\item 以下のnodeは検索から除外される：
+\itemitem 組版結果からは消えてしまう，\IT{ins\_node}, 
+\IT{mark\_node}, \IT{adjust\_node}, \IT{whatsit\_node}, penalty．
+\itemitem （box中身の先頭/末尾に入っている）icflagが7のglue/kern/penalty．
+\itemitem アクセント部とイタリック補正．
+\item \IT{hlist\_node}~$q$に出会ったら，$q$の垂直変位量が0である限り，検索は$q$の内部も進む．以下同文．
+\item 検索して得られた「最初のnode」「最後のnode」がそれぞれ\IT{glyph\_node}でなければ，
+実際には$\emptyset$を返す．
 \enditem
 
-\medskip
-$g$を実際に挿入するところは，今の場合も1.の場合と変わらない．
-次のループに移るために\IT{nq}等の設定処理も，1.と同じである．
+\beginsection main loop その1: $\mibox{head}(\mibox{Np})$が和文文字の場合
 
-\beginparagraph \IT{np}がhboxの場合
+これは，次の3つの場合でおこる：
+\item \IT{Np.id}が\IT{id\_jglyph}の場合（本当に和文文字）
+\item \IT{Np.id}が\IT{id\_pbox}で，$\mibox{head}(\mibox{Np})$が和文文字の場合
+\item \IT{Np.id}が\IT{id\_hlist}で，$\mibox{head}(\mibox{Np})$が和文文字の場合
+\enditem
+前2つの場合は，$\mibox{head}(\mibox{Np})$は処理対象のリスト中に現れる本当の\IT{glyph\_node}である．
+一方，最後の場合では，$\mibox{head}(\mibox{Np})$はリスト中にあるhboxの中身（の最初）に出現する\IT{glyph\_node}である．
 
-|\[x]kanjiskip|は，垂直変位が0である（即ち，|\raise|, |\lower|により上下に移動されていない）
-hboxの境界を跨ぐ．
-
-\enum hbox内の「最初のnode」\IT{first\_char}と「最後のnode」\IT{last\_char}を探索する．
-この探索は，次を透過する：
-\itemitem 垂直変位が0であるhboxの境界（但し，空hboxは透過しない）．
-\itemitem insertion, mark, |\vadjust|, whatsit, penalty用のnode．
-\itemitem 「最初のnode」「最後のnode」それぞれにいえることだが，文字 (\IT{glyph\_node}) でない場合は
-\IT{first\_char},~\IT{last\_char}はそれぞれ$\emptyset$となる．
-
-\medskip\leftskip=2\zw\noindent
-前者の具体例として，例えば，次の入力を考える．
-\begintt
-あ\hbox{a}い\hbox{\hbox{}b\hbox{}}う\hbox{}cえ\hbox{\hbox{d}}お
-\endtt
-すると，
+そのため，挿入される和文処理グルーの種類については，前2つと最後の場合とで扱いを異なったものとしている：
 $$
-\vbox{\halign{#の間のhbox\hfil\quad $\longrightarrow$\quad
-&$\mibox{first\_char}=\hbox{#}$,\ \hfil
-&$\mibox{last\_char}=\hbox{#}$\hfil\cr
-1.\ 「あ」「い」&「a」&「a」\cr
-2.\ 「い」「う」&$\emptyset$&$\emptyset$\cr
-3.\ 「う」「c」&$\emptyset$&$\emptyset$\cr
-4.\ 「え」「お」&「d」&「d」\cr
+\vbox{\hsize=0.85\hsize\bf 
+hboxの外側の文字と内側の文字の間の空白では，|\kanjiskip|, |\xkanjiskip|の量の計算では両方の文字の情報を使うが，
+JFM由来のグルーでは内側の文字の情報は使われない．}
+$$
+
+
+\beginparagraph 挿入されるglue/kernの種類
+
+\setbox1=\hbox{hp}\setbox2=\hbox to 0.4pt{\vrule height\dimexpr \ht1+0.25em\relax depth \dimexpr \dp1+0.25em\relax}
+$$\def\:{\hskip0.5em}\lineskiplimit=\maxdimen\lineskip=0pt
+\vcenter{\halign{\hfil\IT{#}\hfil\hskip1em\copy2%
+\:&\:\hfil\IT{#}\hfil\:&\:\hfil\IT{#}\hfil\:&\:\hfil\IT{#}\hfil\:&\:\hfil\IT{#}\hfil%
+\:&\:\hfil\IT{#}\hfil\:&\:\hfil\IT{#}\hfil\:&\:\hfil\IT{#}\hfil\:&\:\hfil\IT{#}\hfil\cr
+\IT{Nq}→&id\_jglyph&&&id\_hlist 非文字\cr
+\IT{Np}↓&id\_pbox 和&id\_hlist 和&$\mibox{head}(\mibox{Nq})$\rm: 欧文&id\_box\_like&id\_glue&id\_kern\cr
+\noalign{\vskip.25em\hrule\vskip.25em}
+id\_jglyph&\rm E${}+{}$(M→K)&{\rm $\rm O_A$→$\rm K$}&{\rm $\rm O_A$→X}&$\rm O_A^*$&$\rm O_A$&$\rm O_A^+$\cr
+id\_pbox 和&\rm E${}+{}$(M→K)&{\rm $\rm O_A$→$\rm K$}&{\rm $\rm O_A$→X}&$\rm O_A^*$&$\rm O_A$&$\rm O_A^+$\cr
+id\_hlist 和&\rm E${}+{}$($\rm O_B$→$\rm K$)&{\rm K}${}^+$&{\rm X}${}^+$&---&---&---\cr
+}}$$
+挿入されるglue/kernの種別を表にすると上のようになる．最後の1つ以外は，挿入される位置は\IT{Np.first}の直前であり，
+以降「右側の空白」と呼ぶ．
+\item M: \IT{Nq}と\IT{Np}の間に入るJFM由来のglue/kern．
+\IT{Nq}, \IT{Np}の間で|\inhibitglue|を発行した場合は抑止される．
+\itemitem 両方の塊で使われているJFMが（サイズもこめて）等しかったら量の決定は容易い．
+\itemitem そうでなければ，まず
+$$
+\vcenter{\halign{\hfil$#:={}$&(\inhibitglue#\inhibitglue)\cr
+gb&\IT{Nq}と「文字コードが|'diffmet'|の文字」との間に入るglue/kern．\cr
+ga&「文字コードが|'diffmet'|の文字」と\IT{Np}との間に入るglue/kern．\cr
 }}
-$$%$
+$$
+として2つの量を計算．少なくとも片方が$\emptyset$の場合は，もう片方の値を用いる．
+そうでなければ，両者の値から自然長，伸び量，縮み量ごとに計算
+（方法として，平均，和，大きい方，小さい方）を行い，それによって得られたglue/kernを採用する．
+\item K: |\kanjiskip|を表すglueを挿入（$\emptyset$にはならない）．
+\itemitem 両方の塊において「|\kanjiskip|の自動挿入が無効」
+ ($\mibox{Nq.auto\_kspc}\vee \mibox{Np.auto\_kspc}=\bot$) ならば，長さ0のglueを挿入する．
+\itemitem {\sf kanjiskip}パラメタの自然長が$\hbox{\tt\char92maxdimen}=(2^{30}-1)\,{\rm sp}$であれば，
+JFMに指定されている|\kanjiskip|の量を用いる．\IT{Nq}, \IT{Np}で使われているJFMが異なった時の処理は，
+Mの場合と同じである．
+\itemitem 上のどれにも当てはまらなければ，{\sf kanjiskip}パラメタで表される量のglueを挿入する．
+\item X: |\xkanjiskip|を表すglueを挿入（$\emptyset$にはならない）．
+\itemitem 両方の塊において「|\xkanjiskip|の自動挿入が無効」
+ ($\mibox{Nq.auto\_xspc}\vee \mibox{Np.auto\_xspc}=\bot$) ならば，長さ0のglueを挿入する．
+\itemitem \mibox{Nq}内の文字が「直後への|\xkanjiskip|挿入が無効」という指定
+($\hbox{\sf alxspmode}\ge 2$)であるか，
+\mibox{Np}内の文字が「直前への|\xkanjiskip|挿入が無効」という指定
+($\hbox{\sf jaxspmode}\ge 2$)であるならば，長さ0のglueを挿入する．
+\itemitem {\sf xkanjiskip}パラメタの自然長が|\maxdimen|であれば，
+JFMに指定されている|\xkanjiskip|の量を用いる．
+\itemitem 上のどれにも当てはまらなければ，{\sf xkanjiskip}パラメタで表される量のglueを挿入する．
+\item $\rm O_B$: \IT{Nq}と「文字コードが|'jcharbdd'|の文字」との間に入るglue．
+Mのバリエーションと考えればよく，同じように|\inhibitglue|の指定で抑止される．
+\item $\rm O_A$: 「文字コードが|'jcharbdd'|の文字」と\IT{Np}との間に入るglue．
+Mのバリエーションと考えればよく，同じように|\inhibitglue|の指定で抑止される．
+\item E: \IT{Nq}が行末にきたとき，\IT{Nq}と行末の間に入る空白 (kern)．挿入位置は\IT{Nq.last}の直後．
+\itemitem JFMでは「文字コード|'lineend'|の文字」との間に入るkern量として設定できる．
+\itemitem 右側の空白がkernであるときは挿入されない．
+\itemitem この種のkernが挿入される時，右側の空白は自然長がEの分だけ引かれる．
+\enditem
+
+あと，注として，
+
+\item 「→」は，左側の種類（例えばM）のglue/kernは$\emptyset$であった場合，右側の種類（例えばK）のglueを挿入することを示す．
+\item ${}^*$, ${}^+$は，penalty処理時のバリエーションを表す．次の節では，上添字なしの場合のpenaltyの処理について述べる．
+\enditem
+
+\beginparagraph penaltyまわりの処理
+
+隣り合った塊\IT{Nq}, \IT{Np}の間には，集合\IT{Bp}で表される0個以上のpenaltyがあるのだった：
+$$
+\node{\mibox{Nq}}
+\Bigl[\node{\hbox{E}}_4\Bigr]
+\longrightarrow\cdots 
+\hbox{（penaltyある可能性あり）}\cdots
+\Bigl[\node{\hbox{M, K, X他}}_{3,\,5,\,6}\Bigr]
+\node{\mibox{Np}}
+$$
+このような状況下で，禁則処理に関係するpenaltyの挿入処理は，原則として（上ほど優先度高）：
+\item $\#\mibox{Bp}\ge 1$の場合，{\bf 全ての}\IT{Bp}の元$p$~(penalty)に対して，
+$$p.\mibox{penalty}\mathrel{+}=\mibox{Nq.post}+\mibox{Np.pre}.$$
+\itemitem 
+全ての\IT{Bp}の元に対して行うのは，実際にはどのpenaltyの位置で行分割が行われるかわからないからである．
+\itemitem $\mibox{Nq.id}=\mibox{id\_hlist}$の場合には，\IT{Nq.post}は0と扱われる．
+$\mibox{Np.id}=\mibox{id\_hlist}$の場合も同様．
+
+\item $\#\mibox{Bp}=0$かつ$\mibox{Nq.post}+\mibox{Np.pre}=:a\neq 0$，
+さらに「右側の空白がkernでない」場合：
+$p.\mibox{penalty}=a$であるpenalty~$p$を作成し，
+それを（M, K他のglue挿入前に）\IT{Np.first}の直前に挿入する．
+つまり，この場合，
+$$
+\longrightarrow\cdots\longrightarrow\node{\np a}
+\Bigl[\node{\hbox{M, K, X他}}_{3,\,5,\,6}\Bigr]
+\node{\mibox{Np}}
+$$
 となる．
-
-\enum \IT{np}の前に|\[x]kanjiskip|を挿入するか否か，あるいは実際に挿入する量の決定は，
-\IT{first\_char}に対しての処理をそのまま適用する．つまり，上の例では
-\itemitem 「あ」と「a」の間に|\xkanjiskip|が挿入されることから，「あ」とhbox 1.の間には|\xkanjiskip|が挿入される．
-\itemitem 「い」とhbox 2.の間には|\xkanjiskip|が挿入されない．
-
-\enum 同様に，\IT{np}の後ろに|\[x]kanjiskip|を挿入するか否かは，
-文字\IT{last\_char}の後ろに対してどうなるかの値を用いる．上の例では，
-\itemitem 「a」と「い」の間に|\xkanjiskip|が挿入されることから，hbox 1.と「い」の間には|\xkanjiskip|が挿入される．
-\itemitem hbox 2.と「う」の間には|\xkanjiskip|が挿入されない．
-\medskip\leftskip=2\zw\noindent
-次のループに進むための設定も，node~\IT{last\_char}における値をもとに行う．
+\item $\#\mibox{Bp}=0$かつ${\rm E}\neq 0$（かつ右側の空白がglue）の場合：同様に新たなpenaltyを作る．\hfil\break
+（Eの位置で改行可能にしたいので）
+\item つまり，$\#\mibox{Bp}=0$であったとき，新たなpenaltyを作らないのは，
+${\rm E}=0$かつ$a=0$の場合に限る．
 \enditem
 
-以上より，項目1.で与えられた入力では，次の出力が得られる：
-$$
-\hbox{あ\hbox{a}い\hbox{\hbox{}b\hbox{}}う\hbox{}cえ\hbox{\hbox{d}}お}
-$$
-{\bf 要検討：}空のhboxは跨がないようにしているのは，次の2つを使い分けられるようにするため：
-\item JFMグルー挿入の抑止：|\inhibitglue|
-\item 全ての和文処理グルー挿入の抑止：
-|\inhibitglue\hbox{}\inhibitglue|
+なお，penalty値の計算では，$+10000$は正の無限大，$-10000$は負の無限大として扱っている．
+そのため，通常の加減算で絶対値が10000を越えたら，その分はカットしている．
+あと，$(10000)+(-10000)=0$としている．また，\IT{Nq.post}, \IT{Np.pre}が$\emptyset$の場合は，
+それぞれ0として扱う．
+
+\medskip\noindent{\bf バリエーションについて}\quad
+前節の表に出てきた${}^*$, ${}^+$では，上の原則から以下の点が変更されている．
+変更点は，いずれも$\#\mibox{Bp}=0$の場合に関するところのみである：
+
+\item ${}^*$: \IT{Nq}と\IT{Np}の間での行分割を常に可能とするため，
+右側の空白（$\rm O_A$）が$\emptyset$の場合であっても新たなpenaltyを作る．
+
+\item ${}^+$: このとき，\IT{Nq}と\IT{Np}の間での行分割は元々不可能である．
+Lua\TeX-ja では，そのような場合を「わざわざ行分割可能に」することはしない．そのため，
+\itemitem 右側の空白がglueの場合は，値が10000のpenaltyを作成する．
+\itemitem 右側の空白が$\emptyset$かkernの場合は，新たにpenaltyを作ることはしない．
 \enditem
 
-なお，\IT{np}の垂直変位が0でない場合は，\IT{np}の前後への|\[x]kanjiskip|の挿入は行われない
-（即ち，$\mibox{insert\_skip}\leftarrow\mibox{no\_skip}$となる）．
+\beginparagraph いくつかの例：未完
 
+\beginsection main loop その2: その他の場合
 
-\beginparagraph \IT{np}がkernの場合
-
-前に書いたように，|subtype|が0のkern（TFM由来）や，|subtype|が1であってもjtypeがI, E,~Tのkernは
-挿入処理を透過してしまうので，今問題にしているのはそうでない場合である．
-
-\item $\hbox{\tt subtype}=1$の場合．
-
-挿入処理で透過されないのは
-jtypeがない（明示的kern）か，jtypeがJ（JFM由来グルー）という2つの場合であるが，
-いずれの場合も，\IT{np}の周囲には|\[x]kanjiskip|の挿入は行われない．そのため，次ループのために
-行われる処理は，$\mibox{insert\_skip}\leftarrow\mibox{no\_skip}$, 
-$\mibox{np}\leftarrow\mibox{next}(\mibox{np})$だけである．
-
-\item $\hbox{\tt subtype}=2$（|\accent|由来）の場合．
-
-\IT{np}はリストの先頭から走査されていることから，\IT{np}に続くnodeの並びは
-$$\ncount=0
-\node{\mibox{np}=\nk\!\!}
-\node{\hbox{アクセント文字}}
-\node{\nk\!\!}
-\node{\hbox{アクセントのつく文字}}
-$$
-となっている．p\TeX-3.2と同様に，Lua\TeX-jaでは|\[x]kanjiskip|挿入処理で
-アクセント文字は無視することにしている．そのため，
-\IT{nq}は変化せず，次回のループで処理対象となる\IT{np}は
-$\mibox{np}\leftarrow 
-\mibox{next\/}(\mibox{next\/}(\mibox{next\/}(\mibox{np})))$となる．
-\enditem
-
-\beginparagraph \IT{np}が数式境界 (\IT{math\_node})の場合
-
-数式境界は，便宜的に「文字コードが$-1$である文字」とみなして内部で処理している．
-
-\beginparagraph その他の場合
-
-以上に出てきていないnode（vbox, rule, discretionary break, glue, margin\_kern）の
-周囲には|\[x]kanjiskip|の挿入は行われない．
-
-\beginsection JFM由来グルーとの関係の例
-
-最後に，今まで説明した，JFM由来グルーと|\[x]kanjiskip|の処理によって，実際にどのようにnodeの
-並びが変わるかをいくつかの例で示す．上付きで$*$がついているnodeは，値が0だと挿入されないことを示す．
-
-
-\item {\bf 例1: 2つの連続する和文文字の間}
-\setbox1=\hbox{|\kanjiskip|}
-$$\ncount=0
-\vbox{\halign{$#$\hfil\cr
-\node{\hbox{和文文字}}\node{\hbox{和文文字}}
-\cr
-\hfil\Downarrow\cr
-\vadjust{\bigskip}
-\node{\hbox{和文文字}}
-\node{\nk w}_{\rm E}^*
-\node{\np P}^*\longrightarrow
-\left\{\vcenter{%
-\halign{$#$\hfil\cr
-\ncount=0\node{{\rm glue/kern}\ g+w}_{\rm J}\cr
-\ncount=0\node{\copy1+w}_{\rm KS}\cr
-}}\right\}
-\node{\hbox{和文文字}}\cr
-}}
-$$
-
-\item {\bf 例2: 和文文字と欧文文字の間}
-\setbox1=\hbox{|\xkanjiskip|}
-$$\ncount=0
-\vbox{\halign{$#$\hfil\cr
-\node{\hbox{和文文字}}\node{\hbox{欧文文字}}
-\cr
-\hfil\Downarrow\cr
-\vadjust{\bigskip}
-\node{\hbox{和文文字}}
-\node{\nk w}_{\rm E}^*
-\node{\np P}\longrightarrow
-\left\{\vcenter{%
-\halign{$#$\hfil\cr
-\ncount=0\node{{\rm glue/kern}\ g+w}_{\rm J}\cr
-\ncount=0\node{\copy1+w}_{\rm XS}\cr
-}}\right\}^*
-\node{\hbox{欧文文字}}\cr
-}}
-$$
-ここで，上の2つの例に出てきた記号の意味は次の通り：
-\itemitem $w$: 前側の和文文字と行末の間に入るkern量．
-\itemitem $g$: 2つの文字の間に入るglue/kern（JFM由来）．
-\itemitem $P$: 2つの文字の禁則用penaltyの合計値．
-
-
-\par\vfill\eject
-\item {\bf 例3: 2つの和文文字の間にいくつかの「無視される」node達}
-\setbox1=\hbox{|\kanjiskip|}
-$$\ncount=0
-\vbox{\halign{$\relax#$\hfil&$\relax#$\hfil\cr
-\node{\hbox{和字}\ A}&
-\ncount=1\node{\nk i_A}_{\rm I}
-\longrightarrow \cdots
-\node{\np p_B}
-\node{\hbox{和字}\ B}
-\cr
-\span\Downarrow\cr
-\vadjust{\bigskip}
-% T
-\node{\hbox{和字}\ A}&
-\ncount=1\node{\nk w_A}_{\rm E}^*
-\node{\np P_A}_{\rm K}^*
-\node{\nk {-w_A}}_{\rm T}^*
-\node{\nk i_A}_{\rm I}
-\longrightarrow \cdots\cr
-&\ncount=1\node{\np p_B}
-\node{\np P_B}^*\longrightarrow 
-\left\{\vcenter{%
-\halign{$#$\hfil\cr
-\ncount=0\node{{\rm glue/kern}\ g_B}_{\rm J}\cr
-\ncount=0\node{\copy1}_{\rm KS}\cr
-}}\right\}
-\node{\hbox{和字}\ B}\cr
-\span\hbox{or}\cr
-% T
-\node{\hbox{和字}\ A}&
-\ncount=1\node{\nk w_A}_{\rm E}^*
-\node{\np P_A}_{\rm K}^*
-\node{{\rm glue/kern}\ g_A-w_A}_{\rm J}
-\node{\nk i_A}_{\rm I}\cr
-&\ncount=1
-\longrightarrow \cdots
-\node{\np p_B}
-\node{\np P_B}
-\node{{\rm glue/kern}\ g_B}_{\rm J}^*
-\node{\hbox{和字}\ B}\cr
-}}
-$$
-ここで，
-\itemitem $w_A$: 和文文字$A$と行末の間に入るkern量．
-\itemitem $P_A$: 和文文字$A$の行末禁則用penalty．
-\itemitem $g_A$: 和文文字$A$と|'jcharbdd'|との間に入るglue/kern．
-\itemitem $P_B$: 和文文字$B$の行頭禁則用penalty．
-\itemitem $g_B$: |'jcharbdd'|と和文文字$B$の間に入るglue/kern．
-\enditem
-
+\setbox1=\hbox{hp}\setbox2=\hbox to 0.4pt{\vrule height\dimexpr \ht1+0.25em\relax depth \dimexpr \dp1+0.25em\relax}
+$$\def\:{\hskip0.5em}\lineskiplimit=\maxdimen\lineskip=0pt
+\vcenter{\halign{\hfil\IT{#}\hfil\hskip1em\copy2%
+\:&\:\hfil\IT{#}\hfil\:&\:\hfil\IT{#}\hfil\:&\:\hfil\IT{#}\hfil\:&\:\hfil\IT{#}\hfil%
+\:&\:\hfil\IT{#}\hfil\:&\:\hfil\IT{#}\hfil\:&\:\hfil\IT{#}\hfil\:&\:\hfil\IT{#}\hfil\cr
+\IT{Np}→&&id\_hlist 非文字\cr
+\IT{Nq}↓&$\mibox{head}(\mibox{Nq})$\rm: 欧文&id\_box\_like&id\_glue&id\_kern\cr
+\noalign{\vskip.25em\hrule\vskip.25em}
+id\_jglyph&\rm E${}+{}$({\rm $\rm O_B$→X})&\rm E${}+\rm O_B^*$&\rm E${}+\rm O_B$&\rm E${}+\rm O_B^+$\cr
+id\_pbox 和&\rm E${}+{}$({\rm $\rm O_B$→X})&\rm E${}+\rm O_B^*$&\rm E${}+\rm O_B$&\rm E${}+\rm O_B^+$\cr
+id\_hlist 和&\rm X${}^+$&---&---&---\cr
+他&---&---&---&---\cr
+}}$$
 
 \end

@@ -42,6 +42,12 @@ ltj.define_jfm {
       width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
       kern = { [8] = -1.41 , [2] = 2.0}
    },
+   [51] = {
+      chars = { 'か' },
+      align = 'left', left = 0.0, down = 0.0,
+      width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
+      kern = { [199] = 0.85 },
+   },
 
    [2] = {
       chars = { 'ア' },
@@ -55,14 +61,14 @@ ltj.define_jfm {
    },
    [99] = {
       chars = { 'jcharbdd' },
-      align = 'left', left = 0.0, down = 0.0,
-      width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
       glue = { [11] = { 1.41, 0, 0} },
       kern = { [21] = 2.0, }
    },
+   [199] = {
+      chars = { 'boxbdd' },
+      glue = { [51] = { 1.03, 0, 0} , [1] = { 0.94, 0.23, 0.45 }},
+   },
    [8] = {
       chars = { 'lineend' },
-      align = 'left', left = 0.0, down = 0.0,
-      width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
    }
 }

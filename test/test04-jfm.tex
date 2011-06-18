@@ -81,6 +81,8 @@
 \vbox{\hsize=0.6\hsize\sixtt\baselineskip=7.2pt\sixgt\let\\=\relax
 \directlua{ltj.ext_show_node_list(tex.getbox(#1).head, '\\par', tex.print)}\hrule}}
 
+%\tracingonline=1\tracingoutput=1\showboxdepth=3\showboxbreadth=100
+
 \head{JA--JA (penなし)}
 
 \setbox0=\hbox{\rmlh あア}\dumplist0
@@ -158,6 +160,8 @@
 \setbox0=\hbox{\rmlh う\penalty567}\dumplist0
 
 \setbox0=\hbox{\rmlh え\penalty567}\dumplist0
+
+\setbox0=\hbox{\rmlh か\penalty567}\dumplist0
 
 \head{penalty--JA (penなし)} TODO: この場合の挙動はこれで良いか？
 
@@ -270,7 +274,16 @@
 \setbox0=\hbox{\rmlh あ\penalty1701\penalty1701\penalty1701お}
 \dumplist0
 
+\head{その他}
+
 \setbox0=\hbox{\tenrm あ\/\v{A}あ}
 \dumplist0
+\setbox0=\hbox{\rmlh かあか}
+\dumplist0
+\setbox0=\hbox{\rmlh あか}
+\dumplist0
+\setbox0=\hbox{\setbox3=\hbox{\rmlh かa}\unhbox3}
+\dumplist0
+
 
 \end

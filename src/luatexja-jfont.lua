@@ -121,8 +121,8 @@ function ltj.ext_jfontdefY() -- for horizontal font
    if not j then 
       ltjb.package_error('luatexja',
 			 "bad JFM `" .. jfm_file_name .. "'",
-			 {'The JFM file you specified is not valid JFM file.',
-			  'So defining Japanese font is cancelled.'})
+			 'The JFM file you specified is not valid JFM file.\n'..
+			    'So defining Japanese font is cancelled.')
       tex.sprint(ltj.is_global .. '\\expandafter\\let\\csname '
 		 .. cstemp .. '\\endcsname=\\relax')
      return 
