@@ -79,7 +79,7 @@
 \def\dumplist#1{\par\noindent\leavevmode
 \hbox to 0.2\hsize{\copy#1\hss}%
 \vbox{\hsize=0.6\hsize\sixtt\baselineskip=7.2pt\sixgt\let\\=\relax
-\directlua{ltj.ext_show_node_list(tex.getbox(#1).head, '\\par', tex.print)}\hrule}}
+\directlua{ltj.ext_show_node_list(tex.getbox(#1).head, '\\par ', tex.print)}\hrule}}
 
 %\tracingonline=1\tracingoutput=1\showboxdepth=3\showboxbreadth=100
 
@@ -150,26 +150,6 @@
 \setbox0=\hbox{\rmlh \hbox{}い}\dumplist0
 
 \setbox0=\hbox{\rmlh \hbox{}う}\dumplist0
-
-\head{JA--penalty (penなし)} TODO: この場合の挙動はこれで良いか？
-
-\setbox0=\hbox{\rmlh あ\penalty567}\dumplist0
-
-\setbox0=\hbox{\rmlh い\penalty567}\dumplist0
-
-\setbox0=\hbox{\rmlh う\penalty567}\dumplist0
-
-\setbox0=\hbox{\rmlh え\penalty567}\dumplist0
-
-\setbox0=\hbox{\rmlh か\penalty567}\dumplist0
-
-\head{penalty--JA (penなし)} TODO: この場合の挙動はこれで良いか？
-
-\setbox0=\hbox{\rmlh \penalty567あ}\dumplist0
-
-\setbox0=\hbox{\rmlh \penalty567い}\dumplist0
-
-\setbox0=\hbox{\rmlh \penalty567う}\dumplist0
 
 {\vfill\eject%
 
@@ -249,7 +229,7 @@
 {\ltjsetparameter{alxspmode={`x,postonly}}
 \setbox0=\hbox{\rmlh まx}\dumplist0}
 
-\head{kanjiskip from JFM/autoxspacing (EN--JA)}
+\head{xkanjiskip from JFM/autoxspacing (EN--JA)}
 \setbox0=\hbox{\rmlh xま}\dumplist0
 
 \setbox0=\hbox{\rmlh x\naxspc ま}\dumplist0
@@ -274,16 +254,27 @@
 \setbox0=\hbox{\rmlh あ\penalty1701\penalty1701\penalty1701お}
 \dumplist0
 
-\head{その他}
+\head{その他: italic correction and accents}
 
-\setbox0=\hbox{\tenrm あ\/\v{A}あ}
+\setbox0=\hbox{\tenrm あ\/j}
 \dumplist0
+\setbox0=\hbox{\tenrm\rmlh れ\v{A}）}
+\dumplist0
+
+\head{その他: box boundary}
+
 \setbox0=\hbox{\rmlh かあか}
 \dumplist0
-\setbox0=\hbox{\rmlh あか}
+\setbox0=\hbox{a\setbox3=\hbox{\rmlh  かあか}\unhbox3a}
 \dumplist0
-\setbox0=\hbox{\setbox3=\hbox{\rmlh かa}\unhbox3}
+\setbox0=\hbox{a\setbox3=\hbox{\rmlh  か}\box3a}
 \dumplist0
+\setbox0=\hbox{\rmlh き\hbox{か}き\hbox{き}き}
+\dumplist0
+
+{\ltjsetparameter{postbreakpenalty={`あ,1000},prebreakpenalty={`あ,1000}}
+\setbox0=\hbox{あ\hbox{（}あ\setbox3=\hbox{（}\unhbox3あ}
+\dumplist0}
 
 
 \end

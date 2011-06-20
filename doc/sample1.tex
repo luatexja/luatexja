@@ -97,7 +97,6 @@ JFM は和文文字の幅や，和文文字間の空白の入り方などを規�
   \globaljfont<font>={<font_name>:<features>} <size> % global に定義
 \endtt
 
-
 \item {\bf <font_name> の指定について}\par\noindent
 内部でluaotfloadパッケージを読み込んでいる．大きくわけて，以下の4種類がある．
 このうち，前の2つはluaotfloadパッケージの機能である．
@@ -437,9 +436,11 @@ $i$番の文字クラスの文字と$j$番の文字クラスの文字の間に�
 \beginsection 互換用命令（書きかけ）
 
 {\tt luatexja-compat.sty}を読み込むことで，次が追加．
-\item |\euc|, |\jis|, |\sjis|, |\kuten|, |\ucs|: up\TeX と同じ動作．
+\item |\euc|, |\jis|, |\sjis|, |\kuten|, |\ucs|: 
+それぞれEUC-JP，ISO-2022-JP，Shift-JIS，区点コードからUnicodeへの変換を行う．
+JIS~X~0208→Unicodeへの変換テーブルとしては，up\TeX-0.30で用いられているものを利用している．
 \item |\kansuji|
-\item |kansujichar={<num>, <char>}| key in |\ltjsetparameter|.
+\item |kansujichar={<num>, <char>}|~key in |\ltjsetparameter|.
 \enditem
 
 
@@ -490,47 +491,9 @@ $p$は「現在の和文フォント」の番号もattribute |\ltj@curjfnt|と�
 
 \item {\bf （luaotfloadパッケージによるグリフ置換等の処理はこの位置で）}
 
-\item {\bf JFM由来glue/kernの挿入: |pre_linebreak_filter|, |hpack_filter| callbacks}
+\item {\bf 和文処理グルーの挿入: |pre_linebreak_filter|, |hpack_filter| callbacks}
 
-ここで，JFMに由来する和文文字間のglue/kernを挿入する．
-基本的には連続する和文文字（を表すnode）間に挿入するが，
-\itemitem 水平ボックスの先頭/末尾，段落の先頭/末尾には「文字コード|'boxbdd'|の文字」があると
-見做して空白を挿入する．
-\itemitem 和文文字とそうでないもの（欧文文字，ボックス等）の間に関しては，
-和文文字でない方は「文字コード|'jcharbdd'|の文字」であると見做す．
-\itemitem フォントの異なる2つの和文文字においても，
-両者のフォントのJFMとsizeが一致した場合は，
-挿入処理においては「同じフォント」であるかのように扱う．
-\itemitem  そうでない場合は，両者の間に「文字コード|'diffmet'|の文字」があると見做して，
-両和文文字からそれぞれglue/kern |gb|, |ga|を計算し，そこから実際に入るglue/kernを
-計算している（|\ltjsetparameter|中の|differentjfm|キーを参照）．
-\itemitem もうちょっと詳しく書くと，本処理前において，和文文字を表す
-2つの連続した|glyph_node| $Q$, $P$の間には，次のnode達が挿入される：
-$$
- \ldots,\ Q,\ (\hbox{|\kern|}\ w\,{\rm pt}),\ (\hbox{|\penalty|}\ p),\ 
-(\hbox{|\kern|}\ (k-w)\,{\rm pt})
-,\ P,\ \ldots
-$$
-上に書いた全てのnodeが挿入されるとは限らず，また4つめのkernもglueに変わる可能性がある．
-上に出てきた量の意味は次の通りである：
-\itemT $w$: $Q$が行末にきたときに，行末からどれだけずらすかを指定した量．
-\itemT $p$: $Q$の行末禁則用penaltyと$P$の行頭禁則用penaltyの合計値．ウィドウ防止用の
-|\jcharwidowpenalty|が挿入される時は，値はここに加算される．
-\itemT |\kern| $k$: 本来の$Q$と$P$の間に入る空き（glueであることも）．
-$w$のために自然長を補正している．
-
-\item {\bf |kanjiskip|, |xkanjiskip|の挿入: |pre_linebreak_filter|, |hpack_filter| callbacks}
-
-p\TeX の|adjust_hlist| procedureとほぼ同様の処理を用いて，
-和文間glue |kanjiskip|や和欧文間glue |xkanjiskip|を
-挿入する．
-\itemitem 数式境界 (|math_node|) との間に|xkanjiskip|を自動挿入するかの決定は，
-p\TeX では数字{\tt 0}との間に挿入するかどうかで判定していたが，Lua\TeX-jaでは
-「文字コード$-1$の文字」で判定している．
-\itemitem 合字の周囲の空白挿入については，構成要素の文字列を通じて判断している．例えば，
-「漢ffi字」という文字列に対して，
-\itemT 「漢」と「ffi」間の空白挿入：「漢」と「f」間に入るかで判断
-\itemT 「ffi」と「字」間の空白挿入：「i」と「字」間に入るかで判断
+動作については，{\tt jfmglue.pdf}（未完）を参照．
 
 \item {\bf ベースライン補正: |pre_linebreak_filter|, |hpack_filter| callbacks}
 

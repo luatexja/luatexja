@@ -48,14 +48,14 @@ local id_pbox = node.id('hlist') + 512
 local sid_user = node.subtype('user_defined')
 
 local ITALIC = 1
-local KINSOKU = 2
-local FROM_JFM = 3
-local LINE_END = 4
-local KANJI_SKIP = 5
-local XKANJI_SKIP = 6
-local BOXBDD = 7
+local PACKED = 2
+local KINSOKU = 3
+local FROM_JFM = 4
+local LINE_END = 5
+local KANJI_SKIP = 6
+local XKANJI_SKIP = 7
 local PROCESSED = 8
-local PACKED = 9
+local BOXBDD = 15
 
 local kanji_skip
 local xkanji_skip
@@ -154,7 +154,7 @@ local function check_box(box_ptr, box_end)
       find_first_char = false; first_char = nil; last_char = nil
       return true
    end
-   while p~=box_end do
+   while p and p~=box_end do
       local pid = p.id
       if pid==id_kern then
 	 if p.subtype==2 then
@@ -169,20 +169,20 @@ local function check_box(box_ptr, box_end)
 	       first_char = p; find_first_char = false
 	    end
 	    last_char = p; found_visible_node = true; p=node_next(p)
-	    if not p then return found_visible_node end
+	    if (not p) or p==box_end then return found_visible_node end
 	 until p.id~=id_glyph
       end
       if pid==id_hlist then
 	 if has_attr(p, attr_icflag)==PACKED then
 	    for q in node.traverse_id(id_glyph, p.head) do
 	       if find_first_char then
-		  first_char = q; find_first_char = false
+	 	  first_char = q; find_first_char = false
 	       end
-	       last_char = q; found_visible_node = true
+	       last_char = q; found_visible_node = true; break
 	    end
 	 else
 	    if p.shift==0 then
-	       if check_box(p.head) then found_visible_node = true end
+	       if check_box(p.head, nil) then found_visible_node = true end
 	    else if find_first_char then 
 		  find_first_char = false
 	       else 
@@ -213,14 +213,27 @@ local function check_next_ickern()
    else Np.last = Np.nuc end
 end
 
+local function calc_np_pbox()
+   Np.first = lp; Np.id = id_pbox
+   lpa = KINSOKU -- dummy
+   while lp~=last and lpa>=KINSOKU and lpa~=BOXBDD do
+      Np.nuc = lp; lp = node_next(lp); lpa = has_attr(lp, attr_icflag) or 0
+   end
+   check_next_ickern()
+end
+
 local function calc_np()
    -- We assume lp = node_next(Np.last)
-   local pBp = Bp
-   local lpi, lpa
+   local pBp = Bp; local lpi, lpa
    Nq = Np; Bp = {}; Bp[0] = 0; Np = {}; ihb_flag = false 
    while true do
       lpi = lp.id; lpa = has_attr(lp, attr_icflag) or 0
       if lp==last then Np = nil; return
+      elseif lpa>=PACKED then -- elseif lpa>=KINSOKU then 
+	 if lpa == BOXBDD then
+	    local lq = node_next(lp)
+	    head = node_remove(head, lp); lp = lq
+	 else calc_np_pbox(); return end -- id_pbox
       elseif lpi == id_ins or lpi == id_mark or lpi == id_adjust then
 	 lp = node_next(lp)
       elseif lpi == id_penalty then
@@ -234,23 +247,17 @@ local function calc_np()
 	 end
       else -- a `cluster' is found
 	 Np.first = lp
-	 if lpa >=2 then
-	    if lpa == BOXBDD then
-	       local lq = node_next(lp)
-	       head = node_remove(head, lp); lp = lq
-	    else -- id_pbox
-	       Np.id = id_pbox; Np.nuc = lp
-	       while lp~=last and lpa>=2 and lpa~=7 do
-		  lp = node_next(lp); lpa = has_attr(lp, attr_icflag) or 0
-	       end
-	       Np.last = lp; check_next_ickern(); return
-	    end
-	 elseif lpi == id_glyph then -- id_[j]glyph
+	 if lpi == id_glyph then -- id_[j]glyph
 	    if lp.font == has_attr(lp, attr_curjfnt) then Np.id = id_jglyph 
 	    else Np.id = id_glyph end
 	    Np.nuc = lp; lp = node_next(lp); check_next_ickern(); return
 	 elseif lpi == id_hlist then -- hlist
-	    Np.nuc = lp; Np.last = lp
+	    Np.last = lp; Np.nuc = lp
+	    --if lpa == PACKED then
+	    --   Np.id = id_jglyph
+	    --   for q in node.traverse_id(id_glyph, lp.head) do
+	    --	  Np.nuc = q; break
+	    --   end
 	    if lp.shift~=0 then Np.id = id_box_like
 	    else Np.id = lpi end
 	    lp = node_next(lp); return
@@ -258,11 +265,12 @@ local function calc_np()
 	    Np.nuc = lp; Np.last = lp; Np.id = id_box_like; break
 	 elseif lpi == id_math then -- id_math
 	    Np.nuc = lp; lp  = node_next(lp)
-	    while lp.id~=id_math do lp  = node_next(lp) end
-	    break
+	    while lp.id~=id_math do lp  = node_next(lp) end; break
 	 elseif lpi == id_kern and lp.subtype==2 then -- id_kern
-	    lp = node_next(node_next(node_next(lp))) 
-	    Np.nuc = lp ; lp = node_next(lp); check_next_ickern(); return
+	    lp = node_next(node_next(node_next(lp))); Np.nuc = lp
+	    if lp.font == has_attr(lp, attr_curjfnt) then Np.id = id_jglyph 
+	    else Np.id = id_glyph end
+	    lp = node_next(lp); check_next_ickern(); return
 	 else -- id_disc, id_glue, id_kern
 	    Np.nuc = lp; break
 	 end
@@ -346,7 +354,7 @@ local function extract_np()
       end
    elseif Np.id == id_pbox then --  mikann 
       find_first_char = true; first_char = nil; last_char = nil
-      if check_box(Np.first, Np.last) then
+      if check_box(Np.first, node_next(Np.last)) then
 	 if first_char then
 	    if first_char.font == has_attr(first_char, attr_curjfnt) then 
 	       set_np_xspc_jachar(first_char.char,first_char)
@@ -409,37 +417,35 @@ local function lineend_fix(g)
 end
 
 -- change penalties (or create a new penalty, if needed)
-local function handle_penalty_normal(pre, post, g)
+local function handle_penalty_normal(post, pre, g)
    local a = (pre or 0) + (post or 0)
    if Bp[0] == 0 then
-      if (a~=0 and not(g and g.id==id_kern)) or Nq.lend~=0 then
+      if (a~=0 and not(g and g.id==id_kern)) or (Nq.lend and Nq.lend~=0) then
 	 local p = node_new(id_penalty)
 	 if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
 	 p.penalty = a
 	 head = node_insert_before(head, Np.first, p)
 	 Bp[1] = p; Bp[0] = 1; set_attr(p, attr_icflag, KINSOKU)
       end
-   else
-      for i, v in ipairs(Bp) do add_penalty(v,a) end
+   else for i, v in ipairs(Bp) do add_penalty(v,a) end
    end
 end
 
-local function handle_penalty_always(pre, post, g)
+local function handle_penalty_always(post, pre, g)
    local a = (pre or 0) + (post or 0)
    if Bp[0] == 0 then
-      if not (g and g.id==id_glue) or Nq.lend~=0 then
+      if not (g and g.id==id_glue) or (Nq.lend and Nq.lend~=0) then
 	 local p = node_new(id_penalty)
 	 if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
 	 p.penalty = a
 	 head = node_insert_before(head, Np.first, p)
 	 Bp[1] = p; Bp[0] = 1; set_attr(p, attr_icflag, KINSOKU)
       end
-   else
-      for i, v in ipairs(Bp) do add_penalty(v,a) end
+   else for i, v in ipairs(Bp) do add_penalty(v,a) end
    end
 end
 
-local function handle_penalty_suppress(pre, post, g)
+local function handle_penalty_suppress(post, pre, g)
    local a = (pre or 0) + (post or 0)
    if Bp[0] == 0 then
       if g and g.id==id_glue then
@@ -447,8 +453,7 @@ local function handle_penalty_suppress(pre, post, g)
 	 p.penalty = 10000; head = node_insert_before(head, Np.first, p)
 	 Bp[1] = p; Bp[0] = 1; set_attr(p, attr_icflag, KINSOKU)
       end
-   else
-      for i, v in ipairs(Bp) do add_penalty(v,a) end
+   else for i, v in ipairs(Bp) do add_penalty(v,a) end
    end
 end
 
@@ -673,12 +678,12 @@ local function handle_nq_jachar()
 end
 
 -- (anything) .. (和文文字で終わる hlist)
-local function handle_nq_ja_hlist()
+local function handle_np_ja_hlist()
    local g = nil
-   if Nq.id==id_jglyph or (Nq.id==id_pbox and Nq.pre) then 
+   if Nq.id==id_jglyph or (Nq.id==id_pbox and Nq.met) then 
       g = get_OB_skip() or get_kanjiskip() -- O_B->K
       g = lineend_fix(g)
-      handle_penalty_normal(Nq.post, Np.pre, g); real_insert(Nq.lend, g)
+      handle_penalty_normal(Nq.post, 0, g); real_insert(Nq.lend, g)
    elseif Nq.met then  -- Nq.id==id_hlist
       g = get_kanjiskip() -- K
       handle_penalty_suppress(0, 0, g); real_insert(0, g)
@@ -689,9 +694,9 @@ local function handle_nq_ja_hlist()
 end
 
 -- (和文文字で終わる hlist) .. (anything)
-local function handle_np_ja_hlist()
+local function handle_nq_ja_hlist()
    local g = nil
-   if Nq.pre then 
+   if Np.pre then 
       g = get_xkanjiskip(Nq) -- X
       handle_penalty_suppress(0, 0, g); real_insert(0, g)
    end
@@ -707,7 +712,7 @@ local function handle_list_tail()
       if Np.id == id_jglyph or (Np.id==id_pbox and Np.met) then 
 	 if Np.lend~=0 then
 	    g = node_new(id_kern); g.subtype = 0; g.kern = Np.lend
-	    set_attr(g, attr_icflag, LINE_END)
+	    set_attr(g, attr_icflag, BOXBDD)
 	    node_insert_after(head, Np.last, g)
 	 end
       end
@@ -722,7 +727,7 @@ local function handle_list_tail()
       if Np.id == id_jglyph or (Np.id==id_pbox and Np.met) then 
 	 local g = new_jfm_glue(Np, Np.class, find_char_class('boxbdd',Np.met))
 	 if g then
-	    set_attr(g, attr_icflag, FROM_JFM)
+	    set_attr(g, attr_icflag, BOXBDD)
 	    head = node_insert_after(head, Np.last, g)
 	 end
       end
@@ -735,9 +740,10 @@ local function handle_list_head()
    if Np.id ==  id_jglyph or (Np.id==id_pbox and Np.met) then 
       local g = new_jfm_glue(Np, find_char_class('boxbdd',Np.met), Np.class)
       if g then
-	 set_attr(g, attr_icflag, FROM_JFM)
-	 if g.id==id_glue then
-	    handle_penalty_suppress(0, 0)
+	 set_attr(g, attr_icflag, BOXBDD)
+	 if g.id==id_glue and Bp[0]==0 then
+	    local h = node_new(id_penalty)
+	    h.penalty = 10000; set_attr(h, attr_icflag, BOXBDD)
 	 end
 	 head = node_insert_before(head, Np.first, g)
       end
@@ -771,10 +777,11 @@ function main(ahead, amode)
    head = ahead; mode = amode; init_var(); calc_np()
    if Np then 
       extract_np(); handle_list_head()
-   else
-      if not mode then
-	 head = node_remove(head, last) -- remove the sentinel
+      if Np.id==id_glyph then after_alchar()
+      elseif Np.id==id_hlist or Np.id==id_pbox or Np.id==id_disc then after_hlist()
       end
+   else
+      if not mode then head = node_remove(head, last) end
       return head
    end
    calc_np()
@@ -796,7 +803,14 @@ function main(ahead, amode)
       end
       calc_np()
    end
-   handle_list_tail(); return head
+   handle_list_tail()
+   -- adjust attr_icflag
+   for p in node.traverse(head) do 
+      local a = has_attr(p, attr_icflag) or 0
+      if a==0 then set_attr(p, attr_icflag, PROCESSED) end
+   end
+   tex.attribute[attr_icflag] = -(0x7FFFFFFF)
+   return head
 end
 
 -- \inhibitglue

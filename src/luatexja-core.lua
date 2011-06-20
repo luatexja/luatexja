@@ -39,14 +39,14 @@ local ljfm_find_char_class = ltj.int_find_char_class
 
 
 local ITALIC = 1
-local KINSOKU = 2
-local FROM_JFM = 3
-local LINE_END = 4
-local KANJI_SKIP = 5
-local XKANJI_SKIP = 6
-local BOXBDD = 7
+local PACKED = 2
+local KINSOKU = 3
+local FROM_JFM = 4
+local LINE_END = 5
+local KANJI_SKIP = 6
+local XKANJI_SKIP = 7
 local PROCESSED = 8
-local PACKED = 9
+local BOXBDD = 15
 
 ------------------------------------------------------------------------
 -- naming:
@@ -272,7 +272,7 @@ local function main4_get_hss()
    return hss
 end
 
-local function main4_set_ja_width(head)
+local function main4_set_ja_width(head, dir)
    local p = head
    local met_tb, t, s, g, q, a, h
    local m = false -- is in math mode?
@@ -288,19 +288,32 @@ local function main4_set_ja_width(head)
 	       not(s.left==0.0 and s.down==0.0 and s.align=='left' 
 		   and round(s.width*met_tb.size)==p.width) then
 	       -- must be encapsuled by a \hbox
-	       head, q = node.remove(head,p)
-	       p.next = nil
-	       p.yoffset=round(p.yoffset-met_tb.size*s.down)
-	       p.xoffset=round(p.xoffset-met_tb.size*s.left)
-	       if s.align=='middle' or s.align=='right' then
-		  h = node_insert_before(p, p, main4_get_hss())
-	       else h=p end
-	       if s.align=='middle' or s.align=='left' then
-		  node_insert_after(h, p, main4_get_hss())
+	       head, q = node.remove(head, p)
+	       local full_width = round(s.width*met_tb.size)
+	       p.yoffset=p.yoffset-round(met_tb.size*s.down)
+	       p.xoffset=p.xoffset-round(met_tb.size*s.left)
+	       
+	       -- The next if block sets h:=(head of a new list)
+	       if s.align=='left' then
+		  h = node_new(id_kern); h.subtype = 0
+		  h.kern = full_width - p.width
+		  p.next = h; h = p
+	       elseif s.align=='right' then
+		  h = node_new(id_kern); h.subtype = 0
+		  h.kern = full_width - p.width
+		  p.next = nil; h.next = p
+	       elseif s.align=='middle' then
+		  local total = full_width - p.width
+		  h = node_new(id_kern); h.subtype = 0
+		  h.kern = round(total/2); p.next = h
+		  h = node_new(id_kern); h.subtype = 0
+		  h.kern = total - round(total/2); h.next = p
 	       end
-	       g = node_hpack(h, round(met_tb.size*s.width), 'exactly')
+	       g = node_new(id_hlist); g.width = full_width
 	       g.height = round(met_tb.size*s.height)
 	       g.depth = round(met_tb.size*s.depth)
+	       g.glue_set = 0; g.glue_order = 0; g.head = h
+	       g.shift = 0; g.dir = dir or 'TLT'
 	       node.set_attribute(g, attr_icflag, PACKED)
 	       if q then
 		  head = node_insert_before(head, q, g)
@@ -330,10 +343,10 @@ end
 
 -- main process
 -- mode = true iff main_process is called from pre_linebreak_filter
-local function main_process(head, mode)
+local function main_process(head, mode, dir)
    local p = head
    p = ltjj.main(p,mode)
-   p = main4_set_ja_width(p)
+   p = main4_set_ja_width(p, dir)
    return p
 end
 
@@ -362,12 +375,13 @@ function debug_show_node_X(p,print_fn)
    local k = debug_depth
    local s
    local pt=node_type(p.id)
+   local base = debug_depth .. string.format('%X', has_attr(p,attr_icflag) or 0) 
+     .. ' ' .. pt .. ' ' ..  p.subtype 
    if pt == 'glyph' then
-      print_fn(debug_depth.. ' GLYPH  ', p.subtype, utf.char(p.char), p.font)
+      print_fn(base, utf.char(p.char), p.font)
    elseif pt=='hlist' then
-      s = debug_depth .. ' hlist  ' ..  p.subtype
-	 .. '(' .. print_scaled(p.height) .. '+' .. print_scaled(p.depth) .. ')x'
-         .. print_scaled(p.width)
+      s = base .. '(' .. print_scaled(p.height) .. '+' 
+         .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
       if p.glue_sign >= 1 then 
 	 s = s .. ' glue set '
 	 if p.glue_sign == 2 then s = s .. '-' end
@@ -390,8 +404,7 @@ function debug_show_node_X(p,print_fn)
       end
       debug_depth=k
    elseif pt == 'glue' then
-      s = debug_depth.. ' glue   ' ..  p.subtype 
-	 .. ' ' ..  print_spec(p.spec)
+      s = base .. ' ' ..  print_spec(p.spec)
       if has_attr(p, attr_icflag)==FROM_JFM then
 	    s = s .. ' (from JFM)'
       elseif has_attr(p, attr_icflag)==KANJI_SKIP then
@@ -401,12 +414,11 @@ function debug_show_node_X(p,print_fn)
       end
       print_fn(s)
    elseif pt == 'kern' then
-      s = debug_depth.. ' kern   ' ..  p.subtype
-	 .. ' ' .. print_scaled(p.kern) .. 'pt'
-      if has_attr(p, attr_icflag)==ITALIC then
+      s = base .. ' ' .. print_scaled(p.kern) .. 'pt'
+      if p.subtype==2 then
+	 s = s .. ' (for accent)'
+      elseif has_attr(p, attr_icflag)==ITALIC then
 	 s = s .. ' (italic correction)'
-      elseif has_attr(p, attr_icflag)==TEMPORARY then
-	 s = s .. ' (might be replaced)'
       elseif has_attr(p, attr_icflag)==FROM_JFM then
 	 s = s .. ' (from JFM)'
       elseif has_attr(p, attr_icflag)==LINE_END then
@@ -414,13 +426,13 @@ function debug_show_node_X(p,print_fn)
       end
       print_fn(s)
    elseif pt == 'penalty' then
-      s = debug_depth.. ' penalty ' ..  tostring(p.penalty)
+      s = base .. ' ' .. tostring(p.penalty)
       if has_attr(p, attr_icflag)==KINSOKU then
 	 s = s .. ' (for kinsoku)'
       end
       print_fn(s)
    elseif pt == 'whatsit' then
-      s = debug_depth.. ' whatsit ' ..  tostring(p.subtype)
+      s = base .. ' subtype: ' ..  tostring(p.subtype)
       if p.subtype==sid_user then
 	 s = s .. ' user_id: ' .. p.user_id .. ' ' .. p.value
       else
@@ -428,7 +440,7 @@ function debug_show_node_X(p,print_fn)
       end
       print_fn(s)
    else
-      print_fn(debug_depth.. ' ' .. node.type(p.id), p.subtype)
+      print_fn(base)
    end
    p=node_next(p)
 end
@@ -437,9 +449,9 @@ end
 -- callbacks
 luatexbase.add_to_callback('pre_linebreak_filter', 
    function (head,groupcode)
-     return main_process(head, true)
+      return main_process(head, true, tex.textdir)
    end,'ltj.pre_linebreak_filter',2)
 luatexbase.add_to_callback('hpack_filter', 
-  function (head,groupcode,size,packtype)
-     return main_process(head, false)
+  function (head,groupcode,size,packtype, dir)
+     return main_process(head, false, dir)
   end,'ltj.hpack_filter',2)
