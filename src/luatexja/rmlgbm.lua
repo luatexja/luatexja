@@ -1,3 +1,15 @@
+--
+-- luatexja/rmlgbm.lua
+--
+luatexbase.provides_module({
+  name = 'luatexja.rmlgbm',
+  date = '2011/06/27',
+  version = '0.1',
+  description = 'Definitions of non-embedded Japanese fonts',
+})
+module('luatexja.rmlgbm', package.seeall)
+local err, warn, info, log = luatexbase.errwarinf(_NAME)
+
 local rmlgbm_data = require('luatexja-rmlgbm-data')
 local cache_chars = { [655360] = rmlgbm_data.characters }
 

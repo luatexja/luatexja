@@ -10,8 +10,8 @@ luatexbase.provides_module({
 module('luatexja.compat', package.seeall)
 local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
-local ltjb = luatexja.base
-local ltjs = luatexja.stack
+require('luatexja.base');      local ltjb = luatexja.base
+require('luatexja.stack');     local ltjs = luatexja.stack
 
 -- \kuten, \jis, \euc, \sjis, \ucs, \kansuji
 function to_kansuji(num)

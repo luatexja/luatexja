@@ -1,4 +1,4 @@
-ltj.define_jfm {
+luatexja.jfont.define_jfm {
    dir = 'yoko2',
    zw = 1.0, zh = 1.0,
 

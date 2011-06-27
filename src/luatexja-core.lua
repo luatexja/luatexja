@@ -2,6 +2,7 @@ local ltjb = luatexja.base
 local ltjc = luatexja.charrange
 local ltjs = luatexja.stack
 local ltjj = luatexja.jfmglue
+local ltjf = luatexja.jfont
 
 local node_type = node.type
 local node_new = node.new
@@ -28,15 +29,7 @@ local sid_user = node.subtype('user_defined')
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_yablshift = luatexbase.attributes['ltj@yablshift']
-local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
-
-local lang_ja_token = token.create('ltj@japanese')
-local lang_ja = lang_ja_token[2]
-
--- 
-local ljfm_find_char_class = ltj.int_find_char_class
-
 
 local ITALIC = 1
 local PACKED = 2
@@ -46,6 +39,7 @@ local LINE_END = 5
 local KANJI_SKIP = 6
 local XKANJI_SKIP = 7
 local PROCESSED = 8
+local IC_PROCESSED = 9
 local BOXBDD = 15
 
 ------------------------------------------------------------------------
@@ -189,73 +183,6 @@ end
 
 
 ------------------------------------------------------------------------
--- MAIN PROCESS STEP 1: replace fonts (prefix: main1)
-------------------------------------------------------------------------
-ltj.box_stack_level = 0
--- This is used in Step 2 (JFM glue/kern) and Step 3 (\[x]kanjiskip).
-
-local function main1_suppress_hyphenate_ja(head)
-   for p in node.traverse_id(id_glyph, head) do
-      if ltjc.is_ucs_in_japanese_char(p) then
-	 local v = has_attr(p, attr_curjfnt)
-	 if v then 
-	    p.font = v 
-	    node.set_attribute(p, attr_jchar_class,
-			       ljfm_find_char_class(p.char, ltj.font_metric_table[v].jfm))
-	 end
-	 v = has_attr(p, attr_ykblshift)
-	 if v then 
-	    node.set_attribute(p, attr_yablshift, v)
-	 else
-	    node.unset_attribute(p, attr_yablshift)
-	 end
-	 p.lang=lang_ja
-      end
-   end
-   lang.hyphenate(head)
-   return head
-end
-
--- mode: true iff this function is called from hpack_filter
-local function main1_set_box_stack_level(head, mode)
-   local box_set = false
-   local p = head
-   local cl = tex.currentgrouplevel + 1
-   while p do
-      if p.id==id_whatsit and p.subtype==sid_user and p.user_id==30112 then
-	 local g = p
-	 if mode and g.value==cl then box_set = true end
-	 head, p = node.remove(head, g)
-      else p = node_next(p)
-      end
-   end
-   if box_set then 
-      ltj.box_stack_level = tex.getcount('ltj@@stack') + 1 
-   else 
-      ltj.box_stack_level = tex.getcount('ltj@@stack') 
-   end
-   if not head then -- prevent that the list is null
-      head = node_new(id_kern); head.kern = 0; head.subtype = 1
-   end
-   return head
-end
-
--- CALLBACKS
-luatexbase.add_to_callback('hpack_filter', 
-   function (head)
-     return main1_set_box_stack_level(head, true)
-   end,'ltj.hpack_filter_pre',1)
-luatexbase.add_to_callback('pre_linebreak_filter', 
-  function (head)
-     return main1_set_box_stack_level(head, false)
-  end,'ltj.pre_linebreak_filter_pre',1)
-luatexbase.add_to_callback('hyphenate', 
- function (head,tail)
-    return main1_suppress_hyphenate_ja(head)
- end,'ltj.hyphenate')
-
-
-------------------------------------------------------------------------
 -- MAIN PROCESS STEP 4: width of japanese chars (prefix: main4)
 ------------------------------------------------------------------------
 
@@ -281,8 +208,8 @@ local function main4_set_ja_width(head, dir)
       if p.id==id_glyph then
 	 p.yoffset = p.yoffset-v
 	 if is_japanese_glyph_node(p) then
-	    met_tb = ltj.font_metric_table[p.font]
-	    t = ltj.metrics[met_tb.jfm]
+	    met_tb = ltjf.font_metric_table[p.font]
+	    t = ltjf.metrics[met_tb.jfm]
 	    s = t.char_type[has_attr(p,attr_jchar_class)]
 	    if s.width ~= 'prop' and
 	       not(s.left==0.0 and s.down==0.0 and s.align=='left' 
@@ -417,8 +344,10 @@ function debug_show_node_X(p,print_fn)
       s = base .. ' ' .. print_scaled(p.kern) .. 'pt'
       if p.subtype==2 then
 	 s = s .. ' (for accent)'
-      elseif has_attr(p, attr_icflag)==ITALIC then
+      elseif has_attr(p, attr_icflag)==IC_PROCESSED then
 	 s = s .. ' (italic correction)'
+      -- elseif has_attr(p, attr_icflag)==ITALIC then
+      --    s = s .. ' (italic correction)'
       elseif has_attr(p, attr_icflag)==FROM_JFM then
 	 s = s .. ' (from JFM)'
       elseif has_attr(p, attr_icflag)==LINE_END then
@@ -447,11 +376,16 @@ end
 
 
 -- callbacks
+
 luatexbase.add_to_callback('pre_linebreak_filter', 
    function (head,groupcode)
       return main_process(head, true, tex.textdir)
-   end,'ltj.pre_linebreak_filter',2)
+   end,'ltj.pre_linebreak_filter',
+   luatexbase.priority_in_callback('pre_linebreak_filter',
+				   'luaotfload.pre_linebreak_filter') + 1)
 luatexbase.add_to_callback('hpack_filter', 
   function (head,groupcode,size,packtype, dir)
      return main_process(head, false, dir)
-  end,'ltj.hpack_filter',2)
+  end,'ltj.hpack_filter',
+   luatexbase.priority_in_callback('hpack_filter',
+				   'luaotfload.hpack_filter') + 1)

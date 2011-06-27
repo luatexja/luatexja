@@ -1,4 +1,4 @@
-ltj.define_jfm {
+luatexja.jfont.define_jfm {
    dir = 'yoko',
    zw = 1.0, zh = 1.0,
    kanjiskip = { 0.1, 0.04, 0.05 },

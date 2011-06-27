@@ -170,20 +170,19 @@
     dofile(path)
   end
   require('lualibs')
-  ltj.loadlua('luatexja-rmlgbm.lua') 
-    % For Ryumin-Light and GothicBBB-Medium.
+  
+
     }
+\RequireLuaModule{luatexja.rmlgbm} % For Ryumin-Light and GothicBBB-Medium.
 \RequireLuaModule{luatexja.charrange}
-\directlua{
-  ltj.loadlua('luatexja-jfont.lua')}
+\RequireLuaModule{luatexja.jfont}
 \RequireLuaModule{luatexja.stack}
+\RequireLuaModule{luatexja.pretreat}
 \RequireLuaModule{luatexja.inputbuf}
 \RequireLuaModule{luatexja.jfmglue}
 
 \directlua{
   ltj.loadlua('luatexja-core.lua')
-  %ltj.loadlua('luatexja-jfmglue.lua')
-  %ltj.loadlua('luatexja-xkanji.lua')
 }
 
 
@@ -201,13 +200,13 @@
 
 %%%%%%%% Redefine \/
 %\let\ltj@ic=\/ \protected\def\/{{\ltj@icflag=1\ltj@ic}}
-\protected\def\/{\directlua{ltj.ext_append_italic()}}
+\protected\def\/{\directlua{luatexja.jfont.append_italic()}}
 
 %%%%%%%% \jfont\CS={...:...;jfm=metric;...}, \globaljfont
-\protected\def\jfont{\afterassignment\ltj@@jfont\directlua{ltj.ext_jfontdefX(false)}}
+\protected\def\jfont{\afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false)}}
 \protected\def\globaljfont{%
-  \afterassignment\ltj@@jfont\directlua{ltj.ext_jfontdefX(true)}}
-\def\ltj@@jfont{\directlua{ltj.ext_jfontdefY()}}
+  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true)}}
+\def\ltj@@jfont{\directlua{luatexja.jfont.jfontdefY()}}
 
 %%%%%%%% \inhibitglue
 \protected\def\inhibitglue{\directlua{luatexja.jfmglue.create_inhibitglue_node()}}

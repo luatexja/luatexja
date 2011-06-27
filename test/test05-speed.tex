@@ -1,10 +1,10 @@
-%#! time luatex  test05-speed.tex
+%#! time luatex  "\count300=40\input test05-speed.tex"
 \input luatexja-core.sty
 
 \newcount\cnt\newcount\cnta
-\cnt=0
+\cnt=0\output={\deadcycles=0\setbox2000=\box255}
 \long\def\loop#1\repeat{\def\body{#1}\iterate}
-\loop\ifnum\cnt<20 % <= this value
+\loop\ifnum\cnt<\count300 % <= this value
   \cnta=0 \message{\the\cnt:}\par
   {\loop\ifnum\cnta<500 あ．「い，うえお・か（き）く）（けこ\advance\cnta1\repeat}
   \advance\cnt1
@@ -13,6 +13,8 @@
 \end
 
 %     real time:
-% 20:  9.950s    10.584
-% 10:  5.209s    5.523
+% 40: 17.453
+% 30: 13.254
+% 20:  8.771
+% 10:  4.927
 % env: C2D E7300, Mem 4GB, LuaTeX 0.71.0pre, Gentoo amd64 unstable

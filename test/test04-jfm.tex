@@ -143,6 +143,12 @@
 
 \setbox0=\hbox{\rmlh え\hbox{}}\dumplist0
 
+\setbox0=\hbox{\rmlh あ\hbox{ア}}\dumplist0
+
+\setbox0=\hbox{\rmlh あ\hbox{a}}\dumplist0
+
+\setbox0=\hbox{\rmlh い\hbox{a}}\dumplist0
+
 \head{hbox--JA (penなし)}
 
 \setbox0=\hbox{\rmlh \hbox{}あ}\dumplist0
@@ -155,7 +161,7 @@
 
 \ltjsetparameter{prebreakpenalty={`（,123}}
 \ltjsetparameter{postbreakpenalty={`あ,123}}
-\ltjsetparameter{postbreakpenalty={`い,123}}
+\ltjsetparameter{prebreakpenalty={`い,571}, postbreakpenalty={`い,123}}
 \ltjsetparameter{postbreakpenalty={`う,123}}
 \ltjsetparameter{postbreakpenalty={`え,123}}
 \ltjsetparameter{postbreakpenalty={`お,123}}
@@ -193,6 +199,16 @@
 \setbox0=\hbox{\rmlh aい}\dumplist0
 
 \setbox0=\hbox{\rmlh aう}\dumplist0
+
+\head{JA--hbox (penあり)}
+
+\setbox0=\hbox{\rmlh あ\hbox{ア}}\dumplist0
+
+\setbox0=\hbox{\rmlh あ\hbox{a}}\dumplist0
+
+\setbox0=\hbox{\rmlh い\hbox{a}}\dumplist0
+
+\setbox0=\hbox{\rmlh \hbox{（}い\hbox{）}}\dumplist0
 
 \head{italic correction}
 

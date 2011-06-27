@@ -352,85 +352,140 @@ $$
 実際には$\emptyset$を返す．
 \enditem
 
-\beginsection main loop その1: $\mibox{head}(\mibox{Np})$が和文文字の場合
+\vfill\eject
+\beginsection main loop
 
-これは，次の3つの場合でおこる：
-\item \IT{Np.id}が\IT{id\_jglyph}の場合（本当に和文文字）
-\item \IT{Np.id}が\IT{id\_pbox}で，$\mibox{head}(\mibox{Np})$が和文文字の場合
-\item \IT{Np.id}が\IT{id\_hlist}で，$\mibox{head}(\mibox{Np})$が和文文字の場合
+\beginparagraph 一覧表
+
+\IT{Nq}, \IT{Np}の種類別に挿入されるglue/kernの種別を表にすると次のようになる．
+
+\def\;{\hskip0.25em}\ltjsetparameter{jacharrange={+1}}
+\def\gkf#1#2#3#4#5{$\vcenter{\small\rm\halign{\hbox to 1em{\hss##\hss}\;\vrule&%
+\hbox to 3em{\hss##\hss}&\vrule\;\hbox to 1em{\hss##\hss}\cr
+#1\mathstrut&\omit\hfil #2\span\omit\cr\noalign{\hrule}#3&#4\strut&#5\cr}}$}
+\setbox1=\hbox{\gkf{E}{M→K}{○}{nor}{○}}
+\setbox2=\hbox to 0.4pt{\vrule height\dimexpr \ht1+0.5em\relax depth \dimexpr \dp1\relax}
+$$\def\:{\hskip0.5em}\lineskiplimit=\maxdimen\lineskip=0pt
+\vcenter{\halign{\hfil#\hfil\hskip1em\copy2%
+\:&\:\hfil#\hfil\:&\:\hfil#\hfil\:&\:\hfil#\hfil\:&\:\hfil#\hfil%
+\:&\:\hfil#\hfil\:&\:\hfil#\hfil\:&\:\hfil#\hfil\:&\:\hfil#\hfil\cr
+\raise0.5em\hbox{$\vcenter{\hbox{\IT{Nq}→}\smallskip\hbox{\IT{Np}↓}}$}%
+&和文1&和文2&欧文&箱&id\_glue&id\_kern\cr
+\noalign{\hrule}
+和文1&
+\gkf{E}{M→K}{○}{nor}{○}&
+\gkf{}{$\rm O_A$→K}{×}{nor}{○}&
+\gkf{}{$\rm O_A$→X}{○}{nor}{○}&
+\gkf{}{$\rm O_A$}{---}{all}{○}&
+\gkf{}{$\rm O_A$}{---}{nor}{○}&
+\gkf{}{$\rm O_A$}{---}{sup}{○}\cr
+和文2&
+\gkf{E}{$\rm O_B$→K}{○}{nor}{×}&
+\gkf{}{K}{×}{sup}{×}&
+\gkf{}{X}{○}{sup}{×}\cr
+欧文&
+\gkf{E}{$\rm O_B$→X}{○}{nor}{○}&
+\gkf{}{X}{○}{sup}{×}\cr
+箱&\gkf{E}{$\rm O_B$}{○}{alw}{---}\cr
+\IT{id\_glue}&\gkf{E}{$\rm O_B$}{○}{nor}{---}\cr
+\IT{id\_kern}&\gkf{E}{$\rm O_B$}{○}{sup}{---}\cr
+}}$$
+
+\item {\bf 項目名}\quad 表1行目の\IT{Nq}の種類について説明する．\IT{Np}についても同様．
+\itemitem 「和文1」：リスト中に直接出現している和文文字．
+\itemT $\mibox{Nq.id}=\mibox{id\_jglyph}$であったとき．
+\itemT $\mibox{Nq.id}=\mibox{id\_pbox}$かつ$\mibox{last}(\mibox{Nq})$が和文文字であったとき．
+\itemitem 「和文2」：リスト内にあるhboxの中身として出現した和文文字．すなわち，
+$\mibox{Nq.id}=\mibox{id\_hlist}$かつ
+$\mibox{last}(\mibox{Nq})$が和文文字であったとき．
+\itemitem 「欧文」：$\mibox{last}(\mibox{Nq})$が欧文文字であったとき．即ち，
+\itemT リスト中に直接出現しているとき（$\mibox{Nq.id}=\mibox{id\_jglyph}$ or~%
+$\mibox{Nq.id}=\mibox{id\_pbox}$かつ$\mibox{last}(\mibox{Nq})$が欧文文字）．
+\itemT $\mibox{Nq.id}=\mibox{id\_hlist}$かつ
+$\mibox{last}(\mibox{Nq})$が欧文文字であったとき．
+\itemT $\mibox{Nq.id}=\mibox{id\_math}$であったとき．
+\itemitem 「箱」：前後に和文処理グルーが挿入されない用なbox状のnode．
+\itemT $\mibox{Nq.id}=\mibox{id\_list}$かつ
+$\mibox{last}(\mibox{Nq})$が文字でなかった（未定義）だったとき．
+\itemT $\mibox{Nq.id}=\mibox{id\_box\_like}$のとき．
+\itemitem 「\IT{id\_glue}」：そのまま，$\mibox{Nq.id}=\mibox{id\_glue}$であったとき．
+\itemitem 「\IT{id\_kern}」：そのまま，$\mibox{Nq.id}=\mibox{id\_kern}$であったとき．
+
+\item 表中の各セルは，それぞれ次のような内容を表している：
+$$\vcenter{\rm\halign{\hbox to 3em{\hss#\hss}\;\vrule&%
+\hbox to 3.5em{\hss#\hss}&\vrule\;\hbox to 3em{\hss#\hss}\cr
+左空白\mathstrut&\omit\hfil 右空白\span\omit\cr\noalign{\hrule}L&P取扱\strut&R\cr}}$$
+
+\itemitem 「左空白」：\IT{Nq}の直後に挿入される空白の種類．空欄は，何も入らないことを表す．
+\itemitem 「右空白」：\IT{Np}の直前に挿入される空白の種類．
+
+なお，「A→B」は，まずAの種類のglue/kernを調べ，それが未定義ならば，
+Bの種類のglue/kernを採用することを示している．このとき，矢印の右側に入る空白%
+(K, X)はいつでも定義されていることに注意．
+
+\itemitem 「P取扱」：\IT{Nq}と\IT{Np}の間に入る禁則用ペナルティの取扱の方法を表す．
+\IT{Nq}と\IT{Np}の間で常に行分割を許すかに伴い，
+{\bf nor}mal, {\bf alw}ays, {\bf sup}pressの3種類がある．
+\itemitem 「L」「R」：禁則用ペナルティの挿入処理において，
+\IT{Nq.post}~(L)や\IT{Np.pre}~(R)の値を実際に活用するかどうかを示す．値は次の3種類：
+$$
+\hbox{○（利用する），×（利用せず，0として扱う），---（未定義のため0扱い）}$$
 \enditem
-前2つの場合は，$\mibox{head}(\mibox{Np})$は処理対象のリスト中に現れる本当の\IT{glyph\_node}である．
-一方，最後の場合では，$\mibox{head}(\mibox{Np})$はリスト中にあるhboxの中身（の最初）に出現する\IT{glyph\_node}である．
-
-そのため，挿入される和文処理グルーの種類については，前2つと最後の場合とで扱いを異なったものとしている：
-$$
-\vbox{\hsize=0.85\hsize\bf 
-hboxの外側の文字と内側の文字の間の空白では，|\kanjiskip|, |\xkanjiskip|の量の計算では両方の文字の情報を使うが，
-JFM由来のグルーでは内側の文字の情報は使われない．}
-$$
 
 
 \beginparagraph 挿入されるglue/kernの種類
 
-\setbox1=\hbox{hp}\setbox2=\hbox to 0.4pt{\vrule height\dimexpr \ht1+0.25em\relax depth \dimexpr \dp1+0.25em\relax}
-$$\def\:{\hskip0.5em}\lineskiplimit=\maxdimen\lineskip=0pt
-\vcenter{\halign{\hfil\IT{#}\hfil\hskip1em\copy2%
-\:&\:\hfil\IT{#}\hfil\:&\:\hfil\IT{#}\hfil\:&\:\hfil\IT{#}\hfil\:&\:\hfil\IT{#}\hfil%
-\:&\:\hfil\IT{#}\hfil\:&\:\hfil\IT{#}\hfil\:&\:\hfil\IT{#}\hfil\:&\:\hfil\IT{#}\hfil\cr
-\IT{Nq}→&id\_jglyph&&&id\_hlist 非文字\cr
-\IT{Np}↓&id\_pbox 和&id\_hlist 和&$\mibox{head}(\mibox{Nq})$\rm: 欧文&id\_box\_like&id\_glue&id\_kern\cr
-\noalign{\vskip.25em\hrule\vskip.25em}
-id\_jglyph&\rm E${}+{}$(M→K)&{\rm $\rm O_A$→$\rm K$}&{\rm $\rm O_A$→X}&$\rm O_A^*$&$\rm O_A$&$\rm O_A^+$\cr
-id\_pbox 和&\rm E${}+{}$(M→K)&{\rm $\rm O_A$→$\rm K$}&{\rm $\rm O_A$→X}&$\rm O_A^*$&$\rm O_A$&$\rm O_A^+$\cr
-id\_hlist 和&\rm E${}+{}$($\rm O_B$→$\rm K$)&{\rm K}${}^+$&{\rm X}${}^+$&---&---&---\cr
-}}$$
-挿入されるglue/kernの種別を表にすると上のようになる．最後の1つ以外は，挿入される位置は\IT{Np.first}の直前であり，
-以降「右側の空白」と呼ぶ．
+前節の表にある空白の種類についての解説を行う．
+
+\item E: \IT{Nq}が行末にきたとき，
+\IT{Nq}と行末の間に入る空白 (kern)．挿入位置は\IT{Nq.last}の直後．
+\itemitem JFMでは「文字コード|'lineend'|の文字」との間に入るkern量として設定できる．
+\itemitem 右空白がkernであるときは挿入されない．
+\itemitem この種類のkernが挿入される時，右空白は自然長がEの分だけ引かれる．
+
+
 \item M: \IT{Nq}と\IT{Np}の間に入るJFM由来のglue/kern．
-\IT{Nq}, \IT{Np}の間で|\inhibitglue|を発行した場合は抑止される．
-\itemitem 両方の塊で使われているJFMが（サイズもこめて）等しかったら量の決定は容易い．
+\itemitem \IT{Nq}, \IT{Np}の間で|\inhibitglue|を発行した場合，挿入は抑止される．
+\itemitem 両方の塊で使われているJFMが（サイズもこめて）等しい場合は，両者で使われている
+JFMの情報をそのまま利用できるので，量の決定は容易い．
 \itemitem そうでなければ，まず
 $$
 \vcenter{\halign{\hfil$#:={}$&(\inhibitglue#\inhibitglue)\cr
-gb&\IT{Nq}と「文字コードが|'diffmet'|の文字」との間に入るglue/kern．\cr
-ga&「文字コードが|'diffmet'|の文字」と\IT{Np}との間に入るglue/kern．\cr
+gb&\IT{Nq}と「文字コードが|'diffmet'|の文字」との間に入るglue/kern\cr
+ga&「文字コードが|'diffmet'|の文字」と\IT{Np}との間に入るglue/kern\cr
 }}
 $$
-として2つの量を計算．少なくとも片方が$\emptyset$の場合は，もう片方の値を用いる．
+として2つの量を計算．少なくとも片方が未定義の場合は，もう片方の値を用いる．
 そうでなければ，両者の値から自然長，伸び量，縮み量ごとに計算
 （方法として，平均，和，大きい方，小さい方）を行い，それによって得られたglue/kernを採用する．
 \item K: |\kanjiskip|を表すglueを挿入（$\emptyset$にはならない）．
 \itemitem 両方の塊において「|\kanjiskip|の自動挿入が無効」
  ($\mibox{Nq.auto\_kspc}\vee \mibox{Np.auto\_kspc}=\bot$) ならば，長さ0のglueを挿入する．
-\itemitem {\sf kanjiskip}パラメタの自然長が$\hbox{\tt\char92maxdimen}=(2^{30}-1)\,{\rm sp}$であれば，
+\itemitem {\sf kanjiskip}パラメタの自然長が$\hbox{\tt\char92maxdimen}=(2^{30}-1)\,{\rm sp}$で
+あれば，
 JFMに指定されている|\kanjiskip|の量を用いる．\IT{Nq}, \IT{Np}で使われているJFMが異なった時の処理は，
 Mの場合と同じである．
 \itemitem 上のどれにも当てはまらなければ，{\sf kanjiskip}パラメタで表される量のglueを挿入する．
 \item X: |\xkanjiskip|を表すglueを挿入（$\emptyset$にはならない）．
-\itemitem 両方の塊において「|\xkanjiskip|の自動挿入が無効」
- ($\mibox{Nq.auto\_xspc}\vee \mibox{Np.auto\_xspc}=\bot$) ならば，長さ0のglueを挿入する．
-\itemitem \mibox{Nq}内の文字が「直後への|\xkanjiskip|挿入が無効」という指定
-($\hbox{\sf alxspmode}\ge 2$)であるか，
-\mibox{Np}内の文字が「直前への|\xkanjiskip|挿入が無効」という指定
-($\hbox{\sf jaxspmode}\ge 2$)であるならば，長さ0のglueを挿入する．
+\itemitem 次のいずれかの場合には，|\xkanjiskip|は長さ0のglueとなる：
+\itemT  両方の塊において，「|\xkanjiskip|の自動挿入が無効」という指定
+($\mibox{Nq}.\mibox{auto\_xspc}\vee \mibox{Np}.\mibox{auto\_xspc}=\bot$)
+がされていた場合．
+\itemT \IT{Nq}内の文字について「直後への|\xkanjiskip|挿入が無効」であった場合，即ち
+$\hbox{\sf alxspmode}\ge 2$（欧文）か$\hbox{\sf jaxspmode}\equiv0\pmod2$（和文）．
+\itemT \IT{Np}内の文字について「直前への|\xkanjiskip|挿入が無効」であった場合，即ち
+$\hbox{\sf alxspmode}\equiv0\pmod2$（欧文）か$\hbox{\sf jaxspmode}\ge2$（和文）．
 \itemitem {\sf xkanjiskip}パラメタの自然長が|\maxdimen|であれば，
-JFMに指定されている|\xkanjiskip|の量を用いる．
+$\mibox{last}(\mibox{Nq})$, $\mibox{head}(\mibox{Np})$の片方が和文文字であるので，
+そこで使われているJFMで指定されている|\xkanjiskip|の量を用いる
+（JFMで指定されていなければ長さ0のglueと見なされる）．
 \itemitem 上のどれにも当てはまらなければ，{\sf xkanjiskip}パラメタで表される量のglueを挿入する．
 \item $\rm O_B$: \IT{Nq}と「文字コードが|'jcharbdd'|の文字」との間に入るglue．
 Mのバリエーションと考えればよく，同じように|\inhibitglue|の指定で抑止される．
 \item $\rm O_A$: 「文字コードが|'jcharbdd'|の文字」と\IT{Np}との間に入るglue．
 Mのバリエーションと考えればよく，同じように|\inhibitglue|の指定で抑止される．
-\item E: \IT{Nq}が行末にきたとき，\IT{Nq}と行末の間に入る空白 (kern)．挿入位置は\IT{Nq.last}の直後．
-\itemitem JFMでは「文字コード|'lineend'|の文字」との間に入るkern量として設定できる．
-\itemitem 右側の空白がkernであるときは挿入されない．
-\itemitem この種のkernが挿入される時，右側の空白は自然長がEの分だけ引かれる．
 \enditem
 
-あと，注として，
-
-\item 「→」は，左側の種類（例えばM）のglue/kernは$\emptyset$であった場合，右側の種類（例えばK）のglueを挿入することを示す．
-\item ${}^*$, ${}^+$は，penalty処理時のバリエーションを表す．次の節では，上添字なしの場合のpenaltyの処理について述べる．
-\enditem
 
 \beginparagraph penaltyまわりの処理
 
@@ -443,47 +498,39 @@ $$
 \Bigl[\node{\hbox{M, K, X他}}_{3,\,5,\,6}\Bigr]
 \node{\mibox{Np}}
 $$
-このような状況下で，禁則処理に関係するpenaltyの挿入処理は，原則として（上ほど優先度高）：
-\item $\#\mibox{Bp}\ge 1$の場合，{\bf 全ての}\IT{Bp}の元$p$~(penalty)に対して，
-$$p.\mibox{penalty}\mathrel{+}=\mibox{Nq.post}+\mibox{Np.pre}.$$
-\itemitem 
-全ての\IT{Bp}の元に対して行うのは，実際にはどのpenaltyの位置で行分割が行われるかわからないからである．
-\itemitem $\mibox{Nq.id}=\mibox{id\_hlist}$の場合には，\IT{Nq.post}は0と扱われる．
-$\mibox{Np.id}=\mibox{id\_hlist}$の場合も同様．
+禁則処理に関係するpenaltyの挿入処理は，以下に述べるところ部分は共通の動作である．
 
-\item $\#\mibox{Bp}=0$かつ$\mibox{Nq.post}+\mibox{Np.pre}=:a\neq 0$，
-さらに「右側の空白がkernでない」場合：
-$p.\mibox{penalty}=a$であるpenalty~$p$を作成し，
-それを（M, K他のglue挿入前に）\IT{Np.first}の直前に挿入する．
-つまり，この場合，
-$$
-\longrightarrow\cdots\longrightarrow\node{\np a}
-\Bigl[\node{\hbox{M, K, X他}}_{3,\,5,\,6}\Bigr]
-\node{\mibox{Np}}
-$$
-となる．
-\item $\#\mibox{Bp}=0$かつ${\rm E}\neq 0$（かつ右側の空白がglue）の場合：同様に新たなpenaltyを作る．\hfil\break
-（Eの位置で改行可能にしたいので）
-\item つまり，$\#\mibox{Bp}=0$であったとき，新たなpenaltyを作らないのは，
-${\rm E}=0$かつ$a=0$の場合に限る．
+\medskip 
+$\#\mibox{Bp}\ge 1$の場合には，{\bf 全ての}\IT{Bp}の元$p$~(penalty)に対して次を行う：
+$$p.\mibox{penalty}\mathrel{+}=a,\qquad a:=\mibox{Nq.post}+\mibox{Np.pre}.$$
+\item
+全ての\IT{Bp}の元に対して行うのは，
+実際にはどのpenaltyの位置で行分割が行われるかがわからないからである．
+\item 数ページ前の表で，左下が「×」 or 「---」となっていた場合は，上の計算式において
+\IT{Nq.post}は0と扱われる．右下が「×」 or 「---」なら，\IT{Np.pre}が0と扱われる．
+\item penalty値の計算では，$+10000$は正の無限大，$-10000$は負の無限大として扱っている．
+そのため，$a$の計算や$p.\mibox{penalty}$への加算代入のところでは，
+通常の加減算で絶対値が10000を越えたら分はカットし，さらに$(10000)+(-10000)=0$としている．
 \enditem
 
-なお，penalty値の計算では，$+10000$は正の無限大，$-10000$は負の無限大として扱っている．
-そのため，通常の加減算で絶対値が10000を越えたら，その分はカットしている．
-あと，$(10000)+(-10000)=0$としている．また，\IT{Nq.post}, \IT{Np.pre}が$\emptyset$の場合は，
-それぞれ0として扱う．
+$\#\mibox{Bp}=0$の場合が，penalty挿入の3種類の方法「normal」「always」「suppress」で
+異なる部分である：
 
-\medskip\noindent{\bf バリエーションについて}\quad
-前節の表に出てきた${}^*$, ${}^+$では，上の原則から以下の点が変更されている．
-変更点は，いずれも$\#\mibox{Bp}=0$の場合に関するところのみである：
+\item {\bf「normal」の場合：}
+次の場合に，$p.\mibox{penalty}=a$であるpenalty~$p$を作成し，
+それを（M, K他のglue挿入前に）\IT{Np.first}の直前に挿入する：
+$$
+\hbox{左空白（E）が存在しているか，$a\neq 0$かつ右空白がkernである．}
+$$
+\item {\bf「always」の場合：}
+この場合は，\IT{Nq}, \IT{Np}の間で常に行分割可能にしたいので，挿入する条件は以下のようになる：
+$$
+\hbox{左空白（E）が存在しているか，右空白がglueでない（つまり，kernか未定義のとき）．}
+$$
 
-\item ${}^*$: \IT{Nq}と\IT{Np}の間での行分割を常に可能とするため，
-右側の空白（$\rm O_A$）が$\emptyset$の場合であっても新たなpenaltyを作る．
-
-\item ${}^+$: このとき，\IT{Nq}と\IT{Np}の間での行分割は元々不可能である．
-Lua\TeX-ja では，そのような場合を「わざわざ行分割可能に」することはしない．そのため，
-\itemitem 右側の空白がglueの場合は，値が10000のpenaltyを作成する．
-\itemitem 右側の空白が$\emptyset$かkernの場合は，新たにpenaltyを作ることはしない．
+\item {\bf「suppress」の場合：}このとき，\IT{Nq}と\IT{Np}の間での行分割は元々不可能である．
+Lua\TeX-ja では，そのような場合を「わざわざ行分割可能に」することはしない．
+つまり，右空白がglueであるとき，その直前に|\penalty 10000|を挿入する．
 \enditem
 
 \beginparagraph いくつかの例：未完

@@ -10,7 +10,7 @@ luatexbase.provides_module({
 module('luatexja.stack', package.seeall)
 local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
-local ltjb = luatexja.base
+require('luatexja.base');      local ltjb = luatexja.base
 
 local node_new = node.new
 local id_whatsit = node.id('whatsit')
