@@ -1,8 +1,13 @@
-local ltjb = luatexja.base
-local ltjc = luatexja.charrange
-local ltjs = luatexja.stack
-local ltjj = luatexja.jfmglue
-local ltjf = luatexja.jfont
+require('lualibs')
+require('luatexja.rmlgbm');    local ltjr = luatexja.rmlgbm -- must be 1st
+require('luatexja.base');      local ltjb = luatexja.base
+require('luatexja.charrange'); local ltjc = luatexja.charrange
+require('luatexja.jfont');     local ltjf = luatexja.jfont
+require('luatexja.inputbuf');  local ltji = luatexja.inputbuf
+require('luatexja.jfmglue');   local ltjj = luatexja.jfmglue
+require('luatexja.pretreat');  local ltjp = luatexja.pretreat
+require('luatexja.stack');     local ltjs = luatexja.stack
+require('luatexja.setwidth');  local ltjw = luatexja.setwidth
 
 local node_type = node.type
 local node_new = node.new
@@ -96,12 +101,6 @@ local function print_spec(p)
 return out
 end
 
--- return true if and only if p is a Japanese character node
-local function is_japanese_glyph_node(p)
-   return p and (p.id==id_glyph) 
-   and (p.font==has_attr(p,attr_curjfnt))
-end
-
 function math.two_add(a,b) return a+b end
 function math.two_average(a,b) return (a+b)/2 end
 
@@ -182,98 +181,12 @@ function ltj.ext_print_global()
 end
 
 
-------------------------------------------------------------------------
--- MAIN PROCESS STEP 4: width of japanese chars (prefix: main4)
-------------------------------------------------------------------------
-
--- TeX's \hss
-local function main4_get_hss()
-   local hss = node_new(id_glue)
-   local fil_spec = node_new(id_glue_spec)
-   fil_spec.width = 0
-   fil_spec.stretch = 65536
-   fil_spec.stretch_order = 2
-   fil_spec.shrink = 65536
-   fil_spec.shrink_order = 2
-   hss.spec = fil_spec
-   return hss
-end
-
-local function main4_set_ja_width(head, dir)
-   local p = head
-   local met_tb, t, s, g, q, a, h
-   local m = false -- is in math mode?
-   while p do
-      local v=has_attr(p,attr_yablshift) or 0
-      if p.id==id_glyph then
-	 p.yoffset = p.yoffset-v
-	 if is_japanese_glyph_node(p) then
-	    met_tb = ltjf.font_metric_table[p.font]
-	    t = ltjf.metrics[met_tb.jfm]
-	    s = t.char_type[has_attr(p,attr_jchar_class)]
-	    if s.width ~= 'prop' and
-	       not(s.left==0.0 and s.down==0.0 and s.align=='left' 
-		   and round(s.width*met_tb.size)==p.width) then
-	       -- must be encapsuled by a \hbox
-	       head, q = node.remove(head, p)
-	       local full_width = round(s.width*met_tb.size)
-	       p.yoffset=p.yoffset-round(met_tb.size*s.down)
-	       p.xoffset=p.xoffset-round(met_tb.size*s.left)
-	       
-	       -- The next if block sets h:=(head of a new list)
-	       if s.align=='left' then
-		  h = node_new(id_kern); h.subtype = 0
-		  h.kern = full_width - p.width
-		  p.next = h; h = p
-	       elseif s.align=='right' then
-		  h = node_new(id_kern); h.subtype = 0
-		  h.kern = full_width - p.width
-		  p.next = nil; h.next = p
-	       elseif s.align=='middle' then
-		  local total = full_width - p.width
-		  h = node_new(id_kern); h.subtype = 0
-		  h.kern = round(total/2); p.next = h
-		  h = node_new(id_kern); h.subtype = 0
-		  h.kern = total - round(total/2); h.next = p
-	       end
-	       g = node_new(id_hlist); g.width = full_width
-	       g.height = round(met_tb.size*s.height)
-	       g.depth = round(met_tb.size*s.depth)
-	       g.glue_set = 0; g.glue_order = 0; g.head = h
-	       g.shift = 0; g.dir = dir or 'TLT'
-	       node.set_attribute(g, attr_icflag, PACKED)
-	       if q then
-		  head = node_insert_before(head, q, g)
-	       else
-		  head = node_insert_after(head, node.tail(head), g)
-	       end
-	       p = q
-	    else p=node_next(p)
-	    end
-	 else p=node_next(p)
-	 end
-      elseif p.id==id_math then
-	 m=(p.subtype==0); p=node_next(p)
-      else
-	 if m then
-	    if p.id==id_hlist or p.id==id_vlist then
-	       p.shift=p.shift+v
-	    elseif p.id==id_rule then
-	       p.height=p.height-v; p.depth=p.depth+v 
-	    end
-	 end
-	 p=node_next(p)
-      end
-   end
-return head
-end
-
 -- main process
 -- mode = true iff main_process is called from pre_linebreak_filter
 local function main_process(head, mode, dir)
    local p = head
    p = ltjj.main(p,mode)
-   p = main4_set_ja_width(p, dir)
+   p = ltjw.set_ja_width(p, dir)
    return p
 end
 
@@ -305,7 +218,10 @@ function debug_show_node_X(p,print_fn)
    local base = debug_depth .. string.format('%X', has_attr(p,attr_icflag) or 0) 
      .. ' ' .. pt .. ' ' ..  p.subtype 
    if pt == 'glyph' then
-      print_fn(base, utf.char(p.char), p.font)
+      s = base .. ' ' .. utf.char(p.char) .. ' ' .. tostring(p.font)
+         .. ' (' .. print_scaled(p.height) .. '+' 
+         .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
+      print_fn(s)
    elseif pt=='hlist' then
       s = base .. '(' .. print_scaled(p.height) .. '+' 
          .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)

@@ -169,19 +169,6 @@
     texio.write_nl("("..path..")")
     dofile(path)
   end
-  require('lualibs')
-  
-
-    }
-\RequireLuaModule{luatexja.rmlgbm} % For Ryumin-Light and GothicBBB-Medium.
-\RequireLuaModule{luatexja.charrange}
-\RequireLuaModule{luatexja.jfont}
-\RequireLuaModule{luatexja.stack}
-\RequireLuaModule{luatexja.pretreat}
-\RequireLuaModule{luatexja.inputbuf}
-\RequireLuaModule{luatexja.jfmglue}
-
-\directlua{
   ltj.loadlua('luatexja-core.lua')
 }
 

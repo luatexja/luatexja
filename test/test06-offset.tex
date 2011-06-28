@@ -1,0 +1,44 @@
+%#!luatex
+\input luatexja.sty
+
+\def\gbox#1{\noindent\setbox0=\hbox{\d#1}
+  \vrule height 0.2pt depth 0.2pt width \dimexpr \wd0+10pt\relax
+  \kern\dimexpr -\wd0-5pt\relax\vrule height\ht0 depth \dp0\hbox{\copy0}%
+  \vrule height\ht0 depth \dp0\relax}
+\font\d=cmr17 at 20pt
+\baselineskip=40pt
+
+\jfont\sixgt={psft:GothicBBB-Medium:jfm=ujis} at 6pt
+\font\sixtt=cmtt10 at 6pt
+\def\dumplist#1{\par\noindent\leavevmode
+\hbox to 0.2\hsize{\copy#1\hss}%
+\vbox{\hsize=0.6\hsize\sixtt\baselineskip=7.2pt\sixgt\let\\=\relax
+\directlua{ltj.ext_show_node_list(tex.getbox(#1).head, '\\par ', tex.print)}\hrule}}
+
+\ltjsetparameter{yalbaselineshift=0pt,yjabaselineshift=0pt}
+\setbox0=\hbox{\d Hy}\dumplist0
+
+\ltjsetparameter{yalbaselineshift=-10pt}\gbox{Hy}
+\ltjsetparameter{yalbaselineshift=-0pt}\gbox{Hy}
+\ltjsetparameter{yalbaselineshift=10pt}\gbox{Hy}
+\ltjsetparameter{yalbaselineshift=20pt}\gbox{Hy}
+
+\jfont\f=psft:Ryumin-Light:jfm=ujis at 20pt\f
+\ltjsetparameter{yalbaselineshift=0pt,yjabaselineshift=0pt}
+\setbox0=\hbox{\f あ}\dumplist0
+
+\ltjsetparameter{yjabaselineshift=-10pt}\gbox{あ}
+\ltjsetparameter{yjabaselineshift=0pt}\gbox{あ}
+\ltjsetparameter{yjabaselineshift=10pt}\gbox{あ}
+\ltjsetparameter{yjabaselineshift=20pt}\gbox{あ}
+
+\jfont\f=name:IPAMincho:jfm=ujis at 20pt\f
+\ltjsetparameter{yalbaselineshift=0pt,yjabaselineshift=0pt}
+\setbox0=\hbox{\f あ}\dumplist0
+
+\ltjsetparameter{yjabaselineshift=-10pt}\gbox{あ}
+\ltjsetparameter{yjabaselineshift=0pt}\gbox{あ}
+\ltjsetparameter{yjabaselineshift=10pt}\gbox{あ}
+\ltjsetparameter{yjabaselineshift=20pt}\gbox{あ}
+
+\end
