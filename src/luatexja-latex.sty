@@ -1,0 +1,38 @@
+%
+% luatexja-latex.sty
+%
+
+%! これは外から読まれない
+%% Avoid multiple loading.
+\csname luatexjalatexLoaded\endcsname
+\edef\ltj@latex@AtEnd{%
+\endlinechar=\the\endlinechar
+\relax}
+\endlinechar=-1 %
+\def\luatexjalatexLoaded{\endinput}
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{luatexja-latex}[2011/08/01 v0.1]
+
+\endlinechar=13
+
+
+%%% patch for LaTeX (similar to plfonts.dtx)
+\input{lltjfont.sty}
+\input{lltjdefs.sty}
+
+%%% parameter
+
+\ltjsetparameter{kanjiskip=0pt plus 0.4pt minus 0.4pt, 
+  xkanjiskip=.25\zw plus 1pt minus 1pt,
+  autospacing, autoxspacing, jacharrange={-1}, 
+  yalbaselineshift=0pt, yjabaselineshift=0pt,
+  jcharwidowpenalty=500, differentjfm=average
+}
+
+\input luatexja-kinsoku.tex
+
+%%------------------ all done
+\ltj@latex@AtEnd
+\endinput
+%% EOF
