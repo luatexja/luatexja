@@ -207,6 +207,7 @@ local function main1_suppress_hyphenate_ja(head)
 	 else
 	    node.unset_attribute(p, attr_yablshift)
 	 end
+         if p.subtype%2==1 then p.subtype = p.subtype - 1 end
 	 p.lang=lang_ja
       end
    end
