@@ -5,6 +5,7 @@ require('luatexja.charrange'); local ltjc = luatexja.charrange
 require('luatexja.jfont');     local ltjf = luatexja.jfont
 require('luatexja.inputbuf');  local ltji = luatexja.inputbuf
 require('luatexja.jfmglue');   local ltjj = luatexja.jfmglue
+require('luatexja.math');      local ltjm = luatexja.math
 require('luatexja.pretreat');  local ltjp = luatexja.pretreat
 require('luatexja.stack');     local ltjs = luatexja.stack
 require('luatexja.setwidth');  local ltjw = luatexja.setwidth
@@ -224,6 +225,9 @@ function debug_show_node_X(p,print_fn)
    elseif pt=='hlist' then
       s = base .. '(' .. print_scaled(p.height) .. '+' 
          .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
+      if p.shift~=0 then
+	 s = s .. ', shifted ' .. print_scaled(p.shift)
+      end
       if p.glue_sign >= 1 then 
 	 s = s .. ' glue set '
 	 if p.glue_sign == 2 then s = s .. '-' end
@@ -283,6 +287,27 @@ function debug_show_node_X(p,print_fn)
 	 s = s .. node.subtype(p.subtype)
       end
       print_fn(s)
+   --  ここから数式用 node
+   elseif pt=='noad' then
+      s = base ; print_fn(s)
+      if p.nucleus then
+	 debug_depth = k .. 'N'; debug_show_node_X(p.nucleus, print_fn); 
+      end
+      if p.sup then
+	 debug_depth = k .. '^'; debug_show_node_X(p.sup, print_fn); 
+      end
+      if p.sub then
+	 debug_depth = k .. '_'; debug_show_node_X(p.sub, print_fn); 
+      end
+      debug_depth = k;
+   elseif pt=='math_char' then
+      s = base .. ' fam: ' .. p.fam .. ' , char = ' .. utf.char(p.char)
+      print_fn(s)
+   elseif pt=='sub_box' then
+      print_fn(base)
+      if p.head then
+	 debug_depth = k .. '.'; debug_show_node_X(p.head, print_fn); 
+      end
    else
       print_fn(base)
    end

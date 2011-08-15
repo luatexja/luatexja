@@ -63,6 +63,27 @@ function set_stack_table(g,m,c,p,lb,ub)
   end
 end
 
+-- EXT
+function set_stack_font(g,m,c,p)
+   local i = get_stack_level()
+   if c<0 or c>255 then 
+      ltjb.package_error('luatexja',
+			 "invalid family number (".. p .. ")",
+			 {"The family number should in the range 0 .. 255.",
+			  "I'm going to use 0 instead of that illegal family number."})
+      c=0
+   elseif not charprop_stack_table[i][c] then 
+      charprop_stack_table[i][c] = {} 
+   end
+   charprop_stack_table[i][c][m] = p
+  if g=='global' then
+     for j,v in pairs(charprop_stack_table) do 
+	if not charprop_stack_table[j][c] then charprop_stack_table[j][c] = {} end
+	charprop_stack_table[j][c][m] = p
+     end
+  end
+end
+
 -- EXT: store \ltj@tempskipa
 function set_stack_skip(g,c,sp)
   local i = get_stack_level()

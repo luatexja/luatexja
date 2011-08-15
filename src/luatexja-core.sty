@@ -151,6 +151,7 @@
 
 %%%%%%%% Attributes for Japanese typesetting.
 \newluatexattribute\ltj@curjfnt   % index for ``current Japanese font''
+\newluatexattribute\jfam          % index for current jfam
 \newluatexattribute\ltj@charclass % 
 \newluatexattribute\ltj@yablshift % attribute for \yabaselineshift
 \newluatexattribute\ltj@ykblshift % attribute for \ykbaselineshift
@@ -233,6 +234,24 @@
   \directlua{luatexja.stack.set_stack_table(ltj.isglobal, \asluastring{#3},
     \ltj@safe@num@or\ltj@defnum{#1},\ltj@safe@num@or\ltj@defnum{#2},#4,#5)}}
 
+% jatextfont = {<char_code>, <font_cs>}
+\define@key[ltj]{japaram}{jatextfont}{%
+  \expandafter\ltj@@set@stackfont#1:{mjtext}}
+\define@key[ltj]{japaram}{jascriptfont}{%
+  \expandafter\ltj@@set@stackfont#1:{mjscr}}
+\define@key[ltj]{japaram}{jascriptscriptfont}{%
+  \expandafter\ltj@@set@stackfont#1:{mjss}}
+\def\ltj@@set@stackfont#1,#2:#3{%
+  {\ltj@curjfnt=-1 #2\global\ltj@tempcnta=\ltj@curjfnt}%
+  \ifnum\ltj@tempcnta=-1
+    \@PackageError{luatexja-core}
+    {\string#2 is not a control sequence that represents \MessageBreak
+     a Japanese font}{}%
+  \else
+    \directlua{luatexja.stack.set_stack_font(ltj.isglobal, \asluastring{#3},
+    \ltj@safe@num@or\ltj@defnum{#1}, \the\ltj@tempcnta)}
+  \fi}
+
 % yalbaselineshift = <dimen>
 % yjabaselineshift = <dimen>
 \define@key[ltj]{japaram}{yalbaselineshift}{%
@@ -290,10 +309,13 @@
     \directlua{ltj.ext_print_global()}\ltj@autoxspc=0
   \fi}
 
+% [x]]kanjiskip = <dimen>
 \define@key[ltj]{japaram}{kanjiskip}{%              % SKIP
   \directlua{luatexja.stack.set_stack_skip(ltj.isglobal, 'kanjiskip', \ltj@safe@glue{#1})}}
 \define@key[ltj]{japaram}{xkanjiskip}{%             % SKIP
   \directlua{luatexja.stack.set_stack_skip(ltj.isglobal, 'xkanjiskip', \ltj@safe@glue{#1})}}
+
+% jcharwidowpenalty = <count>
 \define@key[ltj]{japaram}{jcharwidowpenalty}{%      %COUNT
   \ltj@@set@stack0,#1:{jwp}{-10000}{10000}}
 
