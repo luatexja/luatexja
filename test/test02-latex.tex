@@ -1,6 +1,7 @@
 %#! lualatex
 \documentclass{article}
 \usepackage{luatexja}
+\usepackage{luatexja-fontspec}
 
 \makeatletter
 % from jsclasses
@@ -17,9 +18,19 @@
   \ifdim\@tempskipa>\z@
     \ltjsetparameter{xkanjiskip={0.25em plus 0.15em minus 0.06em}}%
   \fi}
+\makeatother
+
+\setmainfont{TeXGyreTermes}
+\setsansfont{TeXGyreHeros}
+
+\setmainjfont[Scale=.95,BoldFont=IPAexGothic]{IPAexMincho} % default: JFM=ujis
+\setsansjfont[Scale=.95]{IPAexGothic}
+
+\newjfontfamily\ipajisninety[Scale=.95,CJKShape=JIS1990]{IPAexMincho}
 
 \begin{document}
 \section{NFSS2}
+
 
 ◆あいうえおabcかきく{\gt かきくa{\bf uyあ}いう}
 
@@ -28,9 +39,55 @@
 \DeclareFixedFont{\dr}{JY3}{gt}{m}{n}{12}
 あいうえおpqr{\dr かaiu}きく）{\bf （漢字}
 
+{\tiny ◆あいうえおabcかきく{\gt かきくa{\bf uyあ}いう}}
+
+{\scriptsize ◆あいうえおabcかきく{\gt かきくa{\bf uyあ}いう}}
+
+{\footnotesize ◆あいうえおabcかきく{\gt かきくa{\bf uyあ}いう}}
+
+{\small ◆あいうえおabcかきく{\gt かきくa{\bf uyあ}いう}}
+
+{\normalsize ◆あいうえおabcかきく{\gt かきくa{\bf uyあ}いう}}
+
+{\large ◆あいうえおabcかきく{\gt かきくa{\bf uyあ}いう}}
+
+{\Large ◆あいうえおabcかきく{\gt かきくa{\bf uyあ}いう}}
+
+{\LARGE ◆あいうえおabcかきく{\gt かきくa{\bf uyあ}いう}}
+
+{\huge ◆あいうえおabcかきく{\gt かきくa{\bf uyあ}いう}}
+
+{\Huge ◆あいうえおabcかきく{\gt かきくa{\bf uyあ}いう}}
+
 \section{fontspec}
 
-かいてない
+通常：「あいうえお」、（かきくけこ）。
+
+{\jfontspec[Scale=.95,JFM=mono]{IPAexMincho}
+\noindent 等幅：「あいうえお」、（かきくけこ）。
+}
+
+\subsection{JIS2004}
+逢芦飴溢茨鰯淫迂厩噂餌襖迦牙廻恢晦蟹葛鞄釜翰翫徽
+祇汲灸笈卿饗僅喰櫛屑粂祁隙倦捲牽鍵諺巷梗膏鵠甑叉
+榊薩鯖錆鮫餐杓灼酋楯薯藷哨鞘杖蝕訊逗摺撰煎煽穿箭
+詮噌遡揃遜腿蛸辿樽歎註瀦捗槌鎚辻挺鄭擢溺兎堵屠賭
+瀞遁謎灘楢禰牌這秤駁箸叛挽誹樋稗逼謬豹廟瀕斧蔽瞥
+蔑篇娩鞭庖蓬鱒迄儲餅籾爺鑓愈猷漣煉簾榔屢冤叟咬嘲
+囀徘扁棘橙狡甕甦疼祟竈筵篝腱艘芒虔蜃蠅訝靄靱騙鴉
+
+\subsection{JIS1990}
+{\ipajisninety
+逢芦飴溢茨鰯淫迂厩噂餌襖迦牙廻恢晦蟹葛鞄釜翰翫徽
+祇汲灸笈卿饗僅喰櫛屑粂祁隙倦捲牽鍵諺巷梗膏鵠甑叉
+榊薩鯖錆鮫餐杓灼酋楯薯藷哨鞘杖蝕訊逗摺撰煎煽穿箭
+詮噌遡揃遜腿蛸辿樽歎註瀦捗槌鎚辻挺鄭擢溺兎堵屠賭
+瀞遁謎灘楢禰牌這秤駁箸叛挽誹樋稗逼謬豹廟瀕斧蔽瞥
+蔑篇娩鞭庖蓬鱒迄儲餅籾爺鑓愈猷漣煉簾榔屢冤叟咬嘲
+囀徘扁棘橙狡甕甦疼祟竈筵篝腱艘芒虔蜃蠅訝靄靱騙鴉
+}
+
+
 \end{document}
 
 
