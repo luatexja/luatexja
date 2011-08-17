@@ -10,6 +10,7 @@
 \ExplSyntaxOn
 
 \define@key[zf]{options}{JFM}{
+  \fontspec_update_fontid:n  {+jfm=#1}
   \fontspec_update_featstr:n {jfm=#1}
 }
 
@@ -17,10 +18,7 @@
   \group_begin:
   \tl_set:Nn \zf@enc {JY3}
   \fontspec_select:nn{JFM=ujis,#1}{#2}
-  \cs_undefine:c{g_fontspec_ \zf@family _prop}
-  \fontspec_select:nn{JFM=ujis,#1}{#2}
   \group_end:
-  \cs_undefine:c{g_fontspec_ \zf@family _prop}  
 }
 
 \cs_new:Nn \ltj_fontspec_set_newjfamily:Nnn {
@@ -54,3 +52,5 @@
     }
   }
 }
+
+\endinput
