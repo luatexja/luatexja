@@ -169,13 +169,7 @@
     texio.write_nl("("..path..")")
     dofile(path)
   end
-  require('lualibs')
-  ltj.loadlua('luatexja-rmlgbm.lua') 
-    % For Ryumin-Light and GothicBBB-Medium.
-  ltj.loadlua('luatexja-jfont.lua')
   ltj.loadlua('luatexja-core.lua')
-  ltj.loadlua('luatexja-jfmglue.lua')
-  ltj.loadlua('luatexja-xkanji.lua')
 }
 
 
@@ -193,16 +187,16 @@
 
 %%%%%%%% Redefine \/
 %\let\ltj@ic=\/ \protected\def\/{{\ltj@icflag=1\ltj@ic}}
-\protected\def\/{\directlua{ltj.ext_append_italic()}}
+\protected\def\/{\directlua{luatexja.jfont.append_italic()}}
 
 %%%%%%%% \jfont\CS={...:...;jfm=metric;...}, \globaljfont
-\protected\def\jfont{\afterassignment\ltj@@jfont\directlua{ltj.ext_jfontdefX(false)}}
+\protected\def\jfont{\afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false)}}
 \protected\def\globaljfont{%
-  \afterassignment\ltj@@jfont\directlua{ltj.ext_jfontdefX(true)}}
-\def\ltj@@jfont{\directlua{ltj.ext_jfontdefY()}}
+  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true)}}
+\def\ltj@@jfont{\directlua{luatexja.jfont.jfontdefY()}}
 
 %%%%%%%% \inhibitglue
-\protected\def\inhibitglue{\directlua{ltj.ext_create_inhibitglue_node()}}
+\protected\def\inhibitglue{\directlua{luatexja.jfmglue.create_inhibitglue_node()}}
 
 %%%%%%%% \ltjdefcharrange<name>{100-200,3000-,5000,...}
 \protected\def\ltjdefcharrange#1#2{%
@@ -307,10 +301,10 @@
 \define@choicekey*+[ltj]{japaram}{differentjfm}[\ltj@temp\ltj@tempr]%
   {large,small,average,both}{%
   \ifcase\ltj@tempr
-    \directlua{ltj.ja_diffmet_rule = math.max}\or
-    \directlua{ltj.ja_diffmet_rule = math.min}\or
-    \directlua{ltj.ja_diffmet_rule = math.two_average}\or
-    \directlua{ltj.ja_diffmet_rule = math.two_add}
+    \directlua{luatexja.jfmglue.diffmet_rule = math.max}\or
+    \directlua{luatexja.jfmglue.diffmet_rule = math.min}\or
+    \directlua{luatexja.jfmglue.diffmet_rule = math.two_average}\or
+    \directlua{luatexja.jfmglue.diffmet_rule = math.two_add}
   \fi
 }{\ltj@PackageError{luatexja}{invalid argument `#1' for `differentjfm'}{%
   Argument for `differentjfm' must be one of `large', `small', `average',^^J%

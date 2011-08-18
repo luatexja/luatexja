@@ -1,5 +1,41 @@
 %#! lualatex
 \documentclass{article}
+\usepackage{luatexja}
+
+\makeatletter
+% from jsclasses
+\def\@setfontsize#1#2#3{%
+  \ifx\protect\@typeset@protect
+    \let\@currsize#1%
+  \fi
+  \fontsize{#2}{#3}\selectfont
+  \ifdim\parindent>\z@
+      \parindent=1\zw
+  \fi
+  \ltjsetparameter{kanjiskip={0\zw plus .1\zw minus .01\zw}}%
+  \@tempskipa=\ltjgetparameter{xkanjiskip}%
+  \ifdim\@tempskipa>\z@
+    \ltjsetparameter{xkanjiskip={0.25em plus 0.15em minus 0.06em}}%
+  \fi}
+
+\begin{document}
+\section{NFSS2}
+
+◆あいうえおabcかきく{\gt かきくa{\bf uyあ}いう}
+
+{\ltjsetparameter{xkanjiskip=0pt}イタリック補正\textit{f}◆\par}
+
+\DeclareFixedFont{\dr}{JY3}{gt}{m}{n}{12}
+あいうえおpqr{\dr かaiu}きく）{\bf （漢字}
+
+\section{fontspec}
+
+かいてない
+\end{document}
+
+
+%%%%%%%%%%%%%%%%%%%%% OLD TEST
+\documentclass{article}
 \usepackage{fontspec,pdftexcmds}
 
 \input luatexja-core.sty

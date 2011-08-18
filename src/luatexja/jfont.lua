@@ -1,5 +1,16 @@
-local ltjb = luatexja.base
-local ltjc = luatexja.charrange
+--
+-- luatexja/jfont.lua
+--
+luatexbase.provides_module({
+  name = 'luatexja.jfont',
+  date = '2011/06/27',
+  version = '0.1',
+  description = 'Loader for Japanese fonts',
+})
+module('luatexja.jfont', package.seeall)
+
+require('luatexja.base');      local ltjb = luatexja.base
+require('luatexja.charrange'); local ltjc = luatexja.charrange
 
 local node_new = node.new
 local has_attr = node.has_attribute
@@ -12,16 +23,16 @@ local id_kern = node.id('kern')
 
 local ITALIC = 1
 ------------------------------------------------------------------------
--- LOADING JFM (prefix: ljfm)
+-- LOADING JFM
 ------------------------------------------------------------------------
 
-ltj.metrics={} -- this table stores all metric informations
-ltj.font_metric_table={} -- [font number] -> jfm_name, jfm_var, size
+metrics={} -- this table stores all metric informations
+font_metric_table={} -- [font number] -> jfm_name, jfm_var, size
 
 local jfm_file_name, jfm_var
 local defjfm_res
 
-function ltj.define_jfm(t)
+function define_jfm(t)
    local real_char -- Does current character class have the 'real' character?
    if t.dir~='yoko' then
       defjfm_res= nil; return
@@ -71,14 +82,13 @@ function ltj.define_jfm(t)
    defjfm_res= t
 end
 
-local function ljfm_find_char_class(c,m)
+function find_char_class(c,m)
 -- c: character code, m
-   if not ltj.metrics[m] then return 0 end
-   return ltj.metrics[m].chars[c] or 0
+   if not metrics[m] then return 0 end
+   return metrics[m].chars[c] or 0
 end
-ltj.int_find_char_class = ljfm_find_char_class
 
-local function ljfm_load_jfont_metric()
+local function load_jfont_metric()
    if jfm_file_name=='' then 
       ltjb.package_error('luatexja',
 			 'no JFM specified',
@@ -86,14 +96,14 @@ local function ljfm_load_jfont_metric()
 			  "The JFM 'ujis' will be  used for now."})
       jfm_file_name='ujis'
    end
-   for j,v in ipairs(ltj.metrics) do 
+   for j,v in ipairs(metrics) do 
       if v.name==jfm_file_name then return j end
    end
    ltj.loadlua('jfm-' .. jfm_file_name .. '.lua')
    if defjfm_res then
       defjfm_res.name = jfm_file_name
-      table.insert(ltj.metrics,defjfm_res)
-      return #ltj.metrics
+      table.insert(metrics, defjfm_res)
+      return #metrics
    else 
       return nil
    end
@@ -101,12 +111,12 @@ end
 
 
 ------------------------------------------------------------------------
--- LOADING JAPANESE FONTS (prefix: ljft)
+-- LOADING JAPANESE FONTS
 ------------------------------------------------------------------------
 local cstemp
 
 -- EXT
-function ltj.ext_jfontdefX(g)
+function jfontdefX(g)
   local t = token.get_next()
   cstemp=token.csname_name(t)
   if g then ltj.is_global = '\\global' else ltj.is_global = '' end
@@ -114,32 +124,32 @@ function ltj.ext_jfontdefX(g)
 end
 
 -- EXT
-function ltj.ext_jfontdefY() -- for horizontal font
-   local j = ljfm_load_jfont_metric()
+function jfontdefY() -- for horizontal font
+   local j = load_jfont_metric()
    local fn = font.id(cstemp)
    local f = font.fonts[fn]
    if not j then 
       ltjb.package_error('luatexja',
 			 "bad JFM `" .. jfm_file_name .. "'",
-			 {'The JFM file you specified is not valid JFM file.',
-			  'So defining Japanese font is cancelled.'})
+			 'The JFM file you specified is not valid JFM file.\n'..
+			    'So defining Japanese font is cancelled.')
       tex.sprint(ltj.is_global .. '\\expandafter\\let\\csname '
 		 .. cstemp .. '\\endcsname=\\relax')
      return 
    end
-   ltj.font_metric_table[fn]={}
-   ltj.font_metric_table[fn].jfm=j
-   ltj.font_metric_table[fn].size=f.size
-   ltj.font_metric_table[fn].var=jfm_var
+   font_metric_table[fn]={}
+   font_metric_table[fn].jfm=j
+   font_metric_table[fn].size=f.size
+   font_metric_table[fn].var=jfm_var
    tex.sprint(ltj.is_global .. '\\protected\\expandafter\\def\\csname '
               .. cstemp .. '\\endcsname'
               .. '{\\csname ltj@curjfnt\\endcsname=' .. fn
-              .. ' \\zw=' .. round(f.size*ltj.metrics[j].zw) .. 'sp'
-              .. '\\zh=' .. round(f.size*ltj.metrics[j].zh) .. 'sp\\relax}')
+              .. ' \\zw=' .. round(f.size*metrics[j].zw) .. 'sp'
+              .. '\\zh=' .. round(f.size*metrics[j].zh) .. 'sp\\relax}')
 end
 
 -- extract jfm_file_name and jfm_var
-local function ljft_extract_metric(name)
+local function extract_metric(name)
    local basename=name
    local tmp = utf.sub(basename, 1, 5)
    jfm_file_name = ''; jfm_var = ''
@@ -168,7 +178,7 @@ end
 -- replace fonts.define.read()
 local ljft_dr_orig = fonts.define.read
 function fonts.define.read(name, size, id)
-   ljft_extract_metric(name)
+   extract_metric(name)
    -- In the present imple., we don't remove "jfm=..." from name.
    return ljft_dr_orig(name, size, id)
 end
@@ -178,7 +188,7 @@ end
 ------------------------------------------------------------------------
 
 -- EXT: italic correction
-function ltj.ext_append_italic()
+function append_italic()
    local p = tex.nest[tex.nest.ptr].tail
    if p and p.id==id_glyph then
       local f = p.font
@@ -186,9 +196,9 @@ function ltj.ext_append_italic()
       g.subtype = 1; node.set_attribute(g, attr_icflag, ITALIC)
       if ltjc.is_ucs_in_japanese_char(p) then
 	 f = has_attr(p, attr_curjfnt)
-	 local j = ltj.font_metric_table[f]
-	 local c = ljfm_find_char_class(p.char, j.jfm)
-	 g.kern = round(j.size * ltj.metrics[j.jfm].char_type[c].italic)
+	 local j = font_metric_table[f]
+	 local c = find_char_class(p.char, j.jfm)
+	 g.kern = round(j.size * metrics[j.jfm].char_type[c].italic)
       else
 	 g.kern = font.fonts[f].characters[p.char].italic
       end

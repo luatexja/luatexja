@@ -40,52 +40,6 @@
   jcharwidowpenalty=500, differentjfm=average
 }
 
-\ltj@tempcnta="0%"
-\loop\ifnum\ltj@tempcnta<"100%"
-  \ltjsetparameter{alxspmode={\ltj@tempcnta,0}}%
-  \advance\ltj@tempcnta by1
-\repeat
-
-\ltj@tempcnta=`\0%"
-\loop\ifnum\ltj@tempcnta<`\:%"
-  \ltjsetparameter{alxspmode={\ltj@tempcnta,3}}%
-  \advance\ltj@tempcnta by1
-\repeat
-
-\ltj@tempcnta=`\A%"
-\loop\ifnum\ltj@tempcnta<`\[%"
-  \ltjsetparameter{alxspmode={\ltj@tempcnta,3}}%
-  \advance\ltj@tempcnta by1
-\repeat
-
-\ltj@tempcnta=`\a%"
-\loop\ifnum\ltj@tempcnta<`\{%"
-  \ltjsetparameter{alxspmode={\ltj@tempcnta,3}}%
-  \advance\ltj@tempcnta by1
-\repeat
-
-\input luatexja-kinsoku.tex
-
-\ltj@tempcnta="2000%"
-\loop\ifnum\ltj@tempcnta<"2070%"
-  \ltjsetparameter{kcatcode={\ltj@tempcnta,1}}%
-  \advance\ltj@tempcnta by1
-\repeat
-
-\ltj@tempcnta="3000%"
-\loop\ifnum\ltj@tempcnta<"3040%"
-  \ltjsetparameter{kcatcode={\ltj@tempcnta,1}}%
-  \advance\ltj@tempcnta by1
-\repeat
-
-\ltj@tempcnta="FF00%"
-\loop\ifnum\ltj@tempcnta<"FFF0%"
-  \ltjsetparameter{kcatcode={\ltj@tempcnta,1}}%
-  \advance\ltj@tempcnta by1
-\repeat
-%\endinput
-%! ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-
 %%------------------ all done
 \ltj@plain@AtEnd
 \endinput
