@@ -19,36 +19,35 @@
   \tl_set:Nn \zf@enc {JY3}
   \fontspec_select:nn{JFM=ujis,#1}{#2}
   \group_end:
+  \DeclareKanjiFamily{JY3}{\zf@family}{}
 }
 
-\cs_new:Nn \ltj_fontspec_set_newjfamily:Nnn {
+\cs_new:Nn \ltj_fontspec_set_jfamily:Nnn {
   \ltj_fontspec_select:nn{#2}{#3}
   \tl_set_eq:NN #1 \zf@family
 }
 
 \DeclareDocumentCommand \jfontspec { O{} m } {
-  \ltj_fontspec_set_newjfamily:Nnn \k@family {#1}{#2}
+  \ltj_fontspec_set_jfamily:Nnn \k@family {#1}{#2}
   \selectfont
   \ignorespaces
 }
 
 \DeclareDocumentCommand \setmainjfont { O{} m } {
-  \ltj_fontspec_set_newjfamily:Nnn \mcdefault {#1}{#2}
+  \ltj_fontspec_set_jfamily:Nnn \mcdefault {#1}{#2}
   \normalfont
 }
 
 \DeclareDocumentCommand \setsansjfont { O{} m } {
-  \ltj_fontspec_set_newjfamily:Nnn \gtdefault {#1}{#2}
+  \ltj_fontspec_set_jfamily:Nnn \gtdefault {#1}{#2}
   \normalfont
 }
-
-\DeclareRobustCommand\jfontfamily[1]{\edef\k@family{#1}}
 
 \DeclareDocumentCommand \newjfontfamily { m O{} m } {
   \ltj_fontspec_select:nn{#2}{#3}
   \use:x {
     \exp_not:N \DeclareRobustCommand \exp_not:N #1 {
-      \exp_not:N \jfontfamily {\zf@family} \exp_not:N \selectfont
+      \exp_not:N \kanjifamily {\zf@family} \exp_not:N \selectfont
     }
   }
 }
