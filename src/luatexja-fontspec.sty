@@ -17,29 +17,29 @@
 \cs_new:Nn \ltj_fontspec_select:nn {
   \group_begin:
   \tl_set:Nn \zf@enc {JY3}
+  \cs_set_eq:NN \DeclareFontFamily \DeclareKanjiFamily
   \fontspec_select:nn{JFM=ujis,#1}{#2}
   \group_end:
-  \DeclareKanjiFamily{JY3}{\zf@family}{}
 }
 
-\cs_new:Nn \ltj_fontspec_set_jfamily:Nnn {
+\cs_new:Nn \ltj_fontspec_set_family:Nnn {
   \ltj_fontspec_select:nn{#2}{#3}
   \tl_set_eq:NN #1 \zf@family
 }
 
 \DeclareDocumentCommand \jfontspec { O{} m } {
-  \ltj_fontspec_set_jfamily:Nnn \k@family {#1}{#2}
+  \ltj_fontspec_set_family:Nnn \k@family {#1}{#2}
   \selectfont
   \ignorespaces
 }
 
 \DeclareDocumentCommand \setmainjfont { O{} m } {
-  \ltj_fontspec_set_jfamily:Nnn \mcdefault {#1}{#2}
+  \ltj_fontspec_set_family:Nnn \mcdefault {#1}{#2}
   \normalfont
 }
 
 \DeclareDocumentCommand \setsansjfont { O{} m } {
-  \ltj_fontspec_set_jfamily:Nnn \gtdefault {#1}{#2}
+  \ltj_fontspec_set_family:Nnn \gtdefault {#1}{#2}
   \normalfont
 }
 

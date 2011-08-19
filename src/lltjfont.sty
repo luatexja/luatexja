@@ -496,20 +496,20 @@
     \inlist@\expandafter\tmp@item\expandafter{\notkfam@list}%
     \ifin@ \@notkfamtrue
     \else
-      \@tempswzfalse
-      \def\fam@elt{\noexpand\fam@elt}%
-      \message{(I search kanjifont definition file:}%
-      \def\enc@elt<##1>{\message{.}%
-        \edef\reserved@a{\lowercase{\noexpand\IfFileExists{##1#1.fd}}}%
-        \reserved@a{\@tempswztrue}{}\relax}%
-      \kenc@list
-      \message{)}%
-      \if@tempswz
-        \edef\k@family{#1}%
-      \else
+      %% \@tempswzfalse
+      %% \def\fam@elt{\noexpand\fam@elt}%
+      %% \message{(I search kanjifont definition file:}%
+      %% \def\enc@elt<##1>{\message{.}%
+      %%   \edef\reserved@a{\lowercase{\noexpand\IfFileExists{##1#1.fd}}}%
+      %%   \reserved@a{\@tempswztrue}{}\relax}%
+      %% \kenc@list
+      %% \message{)}%
+      %% \if@tempswz
+      %%   \edef\k@family{#1}%
+      %% \else
         \@notkfamtrue
         \xdef\notkfam@list{\notkfam@list\fam@elt<#1>}%
-      \fi
+      %% \fi
   \fi\fi
   \expandafter\expandafter\expandafter
   \inlist@\expandafter\tmp@item\expandafter{\ffam@list}%
