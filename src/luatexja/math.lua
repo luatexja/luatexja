@@ -82,7 +82,6 @@ end
 
 conv_jchar_to_hbox_A = 
 function (p, sty)
-   print ("  Pa: ",p);
    if not p then return nil
    elseif p.id == id_sub_mlist then
       if p.head then
@@ -115,11 +114,7 @@ end
 
 luatexbase.add_to_callback('mlist_to_hlist', 
    function (n, display_type, penalties)
-      ltj.ext_show_node_list(n, '  ', print)
       local head = conv_jchar_to_hbox(n, 0);
       head = node.mlist_to_hlist(head, display_type, penalties)
-      print("--------");
-      ltj.ext_show_node_list(head, '  ', print)
-      print("--------");
       return head
    end,'ltj.mlist_to_hlist', 1)

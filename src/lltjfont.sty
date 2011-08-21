@@ -589,6 +589,16 @@
   %\iftdir\raise-\tbaselineshift\fi
   \vbox{\hrule\@width.3em}}
 
+%%%%%% LuaTeX-ja specific
+
+% #1 の展開結果から encoding 部分をとりだし，それが和文用かどうかの結果を \ifin@ に代入
+\def\ltj@@IsFontJapanese#1{%
+  \expandafter\ltj@@IsFontJapaneseX#1//:%
+  \expandafter\expandafter\expandafter
+  \inlist@\expandafter\tmp@item\expandafter{\kenc@list}}
+\def\ltj@@IsFontJapaneseX#1/#2/:{\edef\tmp@item{{\directlua{tex.print('#1')}}}}
+
+
 \let\extract@afont\extract@font
 \def\pickup@jfont{%
     \expandafter \ifx \font@name \relax
@@ -604,5 +614,55 @@
     \font@name\global\zw=\zw\global\zh=\zh
     \csname \f@encoding+\f@family\endcsname
     \csname\curr@fontshape\endcsname}
+
+\let\ltj@@al@do@subst@correction=\do@subst@correction
+\def\ltj@@ja@do@subst@correction{%
+    \xdef\subst@correction{%
+      \font@name
+      \global\expandafter\let\csname \curr@fontshape/\f@size\endcsname\font@name%
+      \relax}%
+    \aftergroup\subst@correction
+}
+\def\do@subst@correction{%
+   \ltj@@IsFontJapanese{\curr@fontshape}\ifin@
+     \ltj@@ja@do@subst@correction
+   \else
+     \ltj@@al@do@subst@correction
+   \fi
+}
+
+
+%%%%%% Japanese font for math mode
+
+% \M@<enc> から その <enc> が和文用か調べる
+{\catcode`M=12%
+\gdef\ltj@@mathJapaneseFonts#1M#2#3\relax{\ltj@@IsFontJapanese{#3}}}
+
+\let\ltj@@al@getanddefine@fonts=\getanddefine@fonts
+\def\ltj@@ja@getanddefine@fonts#1#2{%
+  \xdef\font@name{\csname \string#2/\tf@size\endcsname}%
+  \pickup@jfont \let\textfont@name\font@name
+  \xdef\font@name{\csname \string#2/\sf@size\endcsname}%
+  \pickup@jfont \let\scriptfont@name\font@name
+  \xdef\font@name{\csname \string#2/\ssf@size\endcsname}%
+  \pickup@jfont
+  \edef\math@fonts{\math@fonts\ltjsetparameter{%
+    jatextfont={#1,\textfont@name},%
+    jascriptfont={#1,\scriptfont@name},%
+    jascriptscriptfont={#1,\font@name}}}
+}
+
+\def\getanddefine@fonts#1#2{%
+  \ltj@tempcnta=#1 \ltj@@IsFontJapanese{\string#2}%
+  \ifin@\ltj@@ja@getanddefine@fonts{#1}{#2}%
+  \else \ltj@@al@getanddefine@fonts{#1}{#2}%
+  \fi
+}
+\def\use@mathgroup#1#2{\relax\ifmmode
+  \math@bgroup
+    \expandafter\ifx\csname M@\f@encoding\endcsname#1\else
+    #1\fi \ltj@tempcnta=#2 \expandafter\ltj@@mathJapaneseFonts\string#1\relax%
+    \ifin@\jfam#2\relax\else\mathgroup#2\relax\fi
+  \expandafter\math@egroup\fi}%
 
 \endinput

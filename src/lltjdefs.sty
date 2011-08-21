@@ -16,7 +16,7 @@
 \DeclareFontShape{JY3}{mc}{m}{n}{<-> psft:Ryumin-Light:jfm=ujis}{}
 \DeclareKanjiFamily{JY3}{gt}{}
 \DeclareFontShape{JY3}{gt}{m}{n}{<-> psft:GothicBBB-Medium:jfm=ujis}{}
-\DeclareFontShape{JY3}{mc}{bx}{n}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JY3}{mc}{bx}{n}{<-> sub*gt/m/n}{}
 
 %fontencoding{JT3}\selectfont
 \fontencoding{JY3}\selectfont
@@ -24,5 +24,11 @@
 \DeclareTextFontCommand{\textgt}{\gtfamily}
 \DeclareOldFontCommand{\mc}{\normalfont\mcfamily}{}
 \DeclareOldFontCommand{\gt}{\normalfont\gtfamily}{}
+
+\DeclareSymbolFont{mincho}{JY3}{mc}{m}{n}
+\jfam\symmincho
+\SetSymbolFont{mincho}{bold}{JY3}{gt}{m}{n}
+\DeclareSymbolFontAlphabet{\mathmc}{mincho}
+\DeclareMathAlphabet{\mathgt}{JY3}{gt}{m}{n}
 
 \endinput

@@ -242,7 +242,8 @@
 \define@key[ltj]{japaram}{jascriptscriptfont}{%
   \expandafter\ltj@@set@stackfont#1:{mjss}}
 \def\ltj@@set@stackfont#1,#2:#3{%
-  {\ltj@curjfnt=-1 #2\global\ltj@tempcnta=\ltj@curjfnt}%
+  {\ltj@tempcntb=\ltj@curjfnt\ltj@curjfnt=-1 #2%
+   \global\ltj@tempcnta=\ltj@curjfnt\global\ltj@curjfnt=\ltj@tempcntb}%
   \ifnum\ltj@tempcnta=-1
     \@PackageError{luatexja-core}
     {\string#2 is not a control sequence that represents \MessageBreak
