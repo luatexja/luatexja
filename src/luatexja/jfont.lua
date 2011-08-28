@@ -20,7 +20,7 @@ local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local id_glyph = node.id('glyph')
 local id_kern = node.id('kern')
-
+local cat_lp = luatexbase.catcodetables['latex-package']
 local ITALIC = 1
 ------------------------------------------------------------------------
 -- LOADING JFM
@@ -120,7 +120,7 @@ function jfontdefX(g)
   local t = token.get_next()
   cstemp=token.csname_name(t)
   if g then ltj.is_global = '\\global' else ltj.is_global = '' end
-  tex.sprint('\\expandafter\\font\\csname ' .. cstemp .. '\\endcsname')
+  tex.sprint(cat_lp, '\\expandafter\\font\\csname ' .. cstemp .. '\\endcsname')
 end
 
 -- EXT
@@ -133,19 +133,35 @@ function jfontdefY() -- for horizontal font
 			 "bad JFM `" .. jfm_file_name .. "'",
 			 'The JFM file you specified is not valid JFM file.\n'..
 			    'So defining Japanese font is cancelled.')
-      tex.sprint(ltj.is_global .. '\\expandafter\\let\\csname '
-		 .. cstemp .. '\\endcsname=\\relax')
+      tex.sprint(cat_lp, ltj.is_global .. '\\expandafter\\let\\csname ' ..cstemp 
+             .. '\\endcsname=\\relax')
      return 
    end
    font_metric_table[fn]={}
    font_metric_table[fn].jfm=j
    font_metric_table[fn].size=f.size
    font_metric_table[fn].var=jfm_var
-   tex.sprint(ltj.is_global .. '\\protected\\expandafter\\def\\csname '
-              .. cstemp .. '\\endcsname'
-              .. '{\\csname ltj@curjfnt\\endcsname=' .. fn
-              .. ' \\zw=' .. round(f.size*metrics[j].zw) .. 'sp'
-              .. '\\zh=' .. round(f.size*metrics[j].zh) .. 'sp\\relax}')
+   tex.sprint(cat_lp, ltj.is_global .. '\\protected\\expandafter\\def\\csname ' 
+          .. cstemp  .. '\\endcsname{\\ltj@curjfnt=' .. fn .. '\\relax}')
+end
+
+-- zw, zh
+function load_zw()
+   local a = font_metric_table[tex.attribute[attr_curjfnt]]
+   if a then
+      tex.setdimen('ltj@zw', round(a.size*metrics[a.jfm].zw))
+   else 
+      tex.setdimen('ltj@zw',0)
+   end
+end
+
+function load_zh()
+   local a = font_metric_table[tex.attribute[attr_curjfnt]]
+   if a then
+      tex.setdimen('ltj@zh', round(a.size*metrics[a.jfm].zh))
+   else 
+      tex.setdimen('ltj@zh', round(a.size*metrics[a.jfm].zh))
+   end
 end
 
 -- extract jfm_file_name and jfm_var

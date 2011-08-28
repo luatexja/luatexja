@@ -612,7 +612,7 @@
 \def\extract@jfont{%
     \get@external@font
     \expandafter\globaljfont\font@name\external@font\relax
-    \font@name\global\zw=\zw\global\zh=\zh
+    \font@name%\global\zw=\zw\global\zh=\zh
     \csname \f@encoding+\f@family\endcsname
     \csname\curr@fontshape\endcsname}
 

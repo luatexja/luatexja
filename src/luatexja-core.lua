@@ -36,6 +36,7 @@ local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
+local cat_lp = luatexbase.catcodetables['latex-package']
 
 local ITALIC = 1
 local PACKED = 2
@@ -178,7 +179,7 @@ end
 
 -- EXT: print \global if necessary
 function ltj.ext_print_global()
-  if ltj.isglobal=='global' then tex.sprint('\\global') end
+  if ltj.isglobal=='global' then tex.sprint(cat_lp, '\\global') end
 end
 
 -- main process
