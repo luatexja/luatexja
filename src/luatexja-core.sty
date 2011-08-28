@@ -245,12 +245,12 @@
   {\ltj@tempcntb=\ltj@curjfnt\ltj@curjfnt=-1 #2%
    \global\ltj@tempcnta=\ltj@curjfnt\global\ltj@curjfnt=\ltj@tempcntb}%
   \ifnum\ltj@tempcnta=-1
-    \@PackageError{luatexja-core}
+    \@PackageError{luatexja-core}%
     {\string#2 is not a control sequence that represents \MessageBreak
      a Japanese font}{}%
   \else
     \directlua{luatexja.stack.set_stack_font(ltj.isglobal, \asluastring{#3},
-    \ltj@safe@num@or\ltj@defnum{#1}, \the\ltj@tempcnta)}
+    \ltj@safe@num@or\ltj@defnum{#1}, \the\ltj@tempcnta)}%
   \fi}
 
 % yalbaselineshift = <dimen>

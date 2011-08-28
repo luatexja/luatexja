@@ -44,11 +44,12 @@
 \newbox\tstrutbox
 \newbox\zstrutbox
 \def\strut{\relax
-  \ifydir
+%  \ifydir
     \ifmmode\copy\strutbox\else\unhcopy\strutbox\fi
-  \else
-    \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi
-  \fi}
+%  \else
+%    \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi
+%  \fi}
+}
 \def\tstrut{\relax\hbox{\tate
    \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi}}
 \def\zstrut{\relax\hbox{\tate
@@ -641,27 +642,26 @@
 \let\ltj@@al@getanddefine@fonts=\getanddefine@fonts
 \def\ltj@@ja@getanddefine@fonts#1#2{%
   \xdef\font@name{\csname \string#2/\tf@size\endcsname}%
-  \pickup@jfont \let\textfont@name\font@name
+  \pickup@jfont\let\textfont@name\font@name
   \xdef\font@name{\csname \string#2/\sf@size\endcsname}%
-  \pickup@jfont \let\scriptfont@name\font@name
+  \pickup@jfont\let\scriptfont@name\font@name
   \xdef\font@name{\csname \string#2/\ssf@size\endcsname}%
   \pickup@jfont
   \edef\math@fonts{\math@fonts\ltjsetparameter{%
     jatextfont={#1,\textfont@name},%
     jascriptfont={#1,\scriptfont@name},%
-    jascriptscriptfont={#1,\font@name}}}
+    jascriptscriptfont={#1,\font@name}}}%
 }
 
 \def\getanddefine@fonts#1#2{%
   \ltj@tempcnta=#1 \ltj@@IsFontJapanese{\string#2}%
   \ifin@\ltj@@ja@getanddefine@fonts{#1}{#2}%
-  \else \ltj@@al@getanddefine@fonts{#1}{#2}%
-  \fi
+  \else \ltj@@al@getanddefine@fonts{#1}{#2}\fi
 }
 \def\use@mathgroup#1#2{\relax\ifmmode
   \math@bgroup
     \expandafter\ifx\csname M@\f@encoding\endcsname#1\else
-    #1\fi \ltj@tempcnta=#2 \expandafter\ltj@@mathJapaneseFonts\string#1\relax%
+    #1\fi\ltj@tempcnta=#2 \expandafter\ltj@@mathJapaneseFonts\string#1\relax%
     \ifin@\jfam#2\relax\else\mathgroup#2\relax\fi
   \expandafter\math@egroup\fi}%
 
