@@ -7,7 +7,6 @@
 % LuaTeX-ja uses JY3 and JT3 encodings.
 \def\cy@encoding{JY3}\def\ct@encoding{JT3}
 
-
 \let\k@family\@empty
 \let\k@series\@empty
 \let\k@shape\@empty
@@ -654,7 +653,7 @@
 }
 
 \def\getanddefine@fonts#1#2{%
-  \ltj@tempcnta=#1 \ltj@@IsFontJapanese{\string#2}%
+  \ltj@tempcnta=#1\ltj@@IsFontJapanese{\string#2}%
   \ifin@\ltj@@ja@getanddefine@fonts{#1}{#2}%
   \else \ltj@@al@getanddefine@fonts{#1}{#2}\fi
 }
