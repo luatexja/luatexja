@@ -245,8 +245,8 @@
 \define@key[ltj]{japaram}{jascriptscriptfont}{%
   \expandafter\ltj@@set@stackfont#1:{mjss}}
 \def\ltj@@set@stackfont#1,#2:#3{%
-  {\ltj@tempcntb=\ltj@curjfnt\ltj@curjfnt=-1 #2%
-   \global\ltj@tempcnta=\ltj@curjfnt\global\ltj@curjfnt=\ltj@tempcntb}%
+  \ltj@tempcntb=\globaldefs{\globaldefs0 \ltj@curjfnt=-1 #2%
+   \global\ltj@tempcnta=\ltj@curjfnt}\globaldefs\ltj@tempcntb%
   \ifnum\ltj@tempcnta=-1
     \@PackageError{luatexja-core}%
     {\string#2 is not a control sequence that represents \MessageBreak
@@ -348,7 +348,8 @@
   \fi\next
 }
 
-\protected\def\ltjsetparameter#1{\directlua{ltj.isglobal=''}%
+\protected\def\ltjsetparameter#1{%
+  \ifnum\globaldefs=0\directlua{ltj.isglobal=''}\else\directlua{ltj.isglobal='global'}\fi
   \setkeys[ltj]{japaram}{#1}\ignorespaces}
 \protected\def\ltjglobalsetparameter#1{\directlua{ltj.isglobal='global'}%
   \setkeys[ltj]{japaram}{#1}\ignorespaces}
