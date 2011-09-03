@@ -1,0 +1,55 @@
+%
+% luatexja-fontspec.sty
+%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{luatexja-fontspec}[2011/08/17 v0.1]
+
+\RequirePackage{luatexja,fontspec}
+
+\ExplSyntaxOn
+
+\define@key[zf]{options}{JFM}{
+  \fontspec_update_fontid:n  {+jfm=#1}
+  \fontspec_update_featstr:n {jfm=#1}
+}
+
+\cs_new:Nn \ltj_fontspec_select:nn {
+  \group_begin:
+  \tl_set:Nn \zf@enc {JY3}
+  \cs_set_eq:NN \DeclareFontFamily \DeclareKanjiFamily
+  \fontspec_select:nn{JFM=ujis,#1}{#2}
+  \group_end:
+}
+
+\cs_new:Nn \ltj_fontspec_set_family:Nnn {
+  \ltj_fontspec_select:nn{#2}{#3}
+  \tl_set_eq:NN #1 \zf@family
+}
+
+\DeclareDocumentCommand \jfontspec { O{} m } {
+  \ltj_fontspec_set_family:Nnn \k@family {#1}{#2}
+  \selectfont
+  \ignorespaces
+}
+
+\DeclareDocumentCommand \setmainjfont { O{} m } {
+  \ltj_fontspec_set_family:Nnn \mcdefault {#1}{#2}
+  \normalfont
+}
+
+\DeclareDocumentCommand \setsansjfont { O{} m } {
+  \ltj_fontspec_set_family:Nnn \gtdefault {#1}{#2}
+  \normalfont
+}
+
+\DeclareDocumentCommand \newjfontfamily { m O{} m } {
+  \ltj_fontspec_select:nn{#2}{#3}
+  \use:x {
+    \exp_not:N \DeclareRobustCommand \exp_not:N #1 {
+      \exp_not:N \kanjifamily {\zf@family} \exp_not:N \selectfont
+    }
+  }
+}
+
+\endinput
