@@ -1,0 +1,174 @@
+%#!lualatex
+\documentclass[a4paper,titlepage]{article}
+\usepackage{booktabs,amsmath}
+\usepackage{luatexja}
+%\usepackage{luatexja-fontspec}
+\usepackage[margin=20mm]{geometry}
+\usepackage[unicode=true]{hyperref}
+
+\title{The Lua\TeX-ja package}
+\author{The Lua\TeX-ja project team}
+\begin{document}
+\maketitle
+\part{User's manual}
+{\Large\bf This documentation is far from complete. It may have many grammatical errors.}
+
+\section{Introduction}
+
+The Lua\TeX-ja package is a macro package for typesetting high-quality Japanese documents in Lua\TeX.
+
+\subsection{Backgrounds}
+Traditionally, ASCII p\TeX, an extension of \TeX, and its derivatives are used to typeset Japanese documents in \TeX.
+p\TeX is an engine extension of \TeX: so it can produce high-quality Japanese documents without using very complicated macros.
+But this point is a mixed blessing: p\TeX\ is left behind from other extensions of \TeX, especially $\varepsilon$-\TeX\ and pdf\TeX,
+and from changes about Japanese processing in computers (\textit{e.g.}, the UTF-8 encoding).
+Recently the extensions of p\TeX, namely up\TeX\ (Unicode-implementation of p\TeX) and 
+$\varepsilon$-p\TeX\ (Merging of p\TeX and $\varepsilon$-\TeX\ extension), have developed to fill those gap to some extent,
+but gaps are still exist.
+
+However, the appearance of Lua\TeX\ changed the whole situation. With using Lua ``callbacks'', 
+users can customize the internal processing of Lua\TeX. So there is no need to modify sources of the \TeX\ engine to
+support Japanese typesetting: to do this, we only have to write Lua script for appropriate callbacks.
+
+\subsection{Functionality relation with p\TeX}
+The Lua\TeX-ja package is much influenced by p\TeX\ engine. The initial target of development was to implement features of p\TeX.
+However, \emph{Lua\TeX-ja is not a just porting of p\TeX: Unnatural specifications/behaviors of p\TeX\ were not adopted}.
+The followings are major changes from p\TeX:
+\begin{itemize}
+\item At the present, vertical typesetting, or \textit{tategaki}, is not supported in Lua\TeX-ja.
+\end{itemize} 
+For detailed information, see Part~\ref{part-imp}.
+
+\subsection{Notations}
+In this document, the following terms and notations are used:
+\begin{itemize}
+\item Characters are divided into two types: 
+\begin{itemize}
+\item \textbf{JAchar}: standing for Japanese characters such as Hiragana, Katakana, Kanji and other punctuation marks for Japanese.
+\item \textbf{ALchar}: standing for all other characters like alphabets. 
+\end{itemize}
+\item A word in sans-serif font (like \textsf{prebreakpenalty}) represents an internal parameter for Japanese typesetting, and
+it is used as a key in \verb+\ltjsetparameter+ command.
+\item The word ``primitive'' is used not only for primitives in Lua\TeX, but also for control sequences that defined 
+in the core module of Lua\TeX-ja.
+\end{itemize}
+
+\newpage
+\section{Getting Started}
+\subsection{Installation}
+To install the Lua\TeX-ja\ package, you will need:
+\begin{itemize}
+\item Lua\TeX, version 0.65.0-beta or later.\\
+If you are using \TeX~Live\ 2011 or W32\TeX, you don't have to worry.
+\item The source archive or Lua\TeX-ja, of course{\tt:)}
+\end{itemize}
+
+The installation methods are as follows:
+\begin{enumerate}
+\item Download the source archive.
+
+At the present, Lua\TeX-ja has no official release, so you have to retrieve
+the archive from the repository.
+You can retrieve the Git repository via
+\begin{verbatim}
+$ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
+\end{verbatim} 
+or download the archive of HEAD in the master branch from
+\begin{flushleft}
+\url{http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git;a=snapshot;h=HEAD;sf=tgz}.
+\end{flushleft}
+\item Extract the archive. You will see {\tt src/} and several other sub-directories.
+\item Copy all the contents of {\tt src/} into your TEXMF trees.
+\item If {\tt mktexlsr} is needed to update the filename database, make it so.
+\end{enumerate}
+
+\subsection{Cautions}
+\begin{itemize}
+\item UTF-8
+\item conflicts with unicode-math
+\end{itemize}
+
+\subsection{Using in plain \TeX}
+To use Lua\TeX-ja in plain \TeX, simply put the following  at the beginning of the document:
+\begin{verbatim}
+\input luatexja.sty
+\end{verbatim}
+
+This does the minimal setting (like {\tt ptex.tex}) for typesetting Japanese documents:
+\begin{itemize}
+\item The following 6 Japanese fonts are preloaded.
+\begin{center}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{classification}&\textbf{font name}&\textbf{13.5\,Q}&\textbf{9.5\,Q}&\textbf{7\,Q}\\\midrule
+\textit{mincho}&Ryumin-Light    &\verb+\tenmin+&\verb+\sevenmin+&\verb+\fivemin+\\
+\textit{gothic}&GothicBBB-Medium&\verb+\tengt+ &\verb+\sevengt+ &\verb+\fivegt+\\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{itemize}
+\item The `Q' is an unit used in Japanese phototypesetting, and $1\,\textrm{Q}=0.25\,\textrm{mm}$.
+\item It is widely accepted that the font `Ryumin-Light' and `GothicBBB-Medium' aren't embedded into PDF files, and
+the PDF reader substitutes them by some external Japanese font. We adopt this custom to the default setting.
+\item size
+\end{itemize}
+\item A character in Unicode is treated as \textbf{JAchar} if and only if its code-point has more than or equal to U+0100.
+\item The amount of glue that are inserted between \textbf{JAchar} and \textbf{ALchar} (the parameter {\sf xkanjiskip}) is
+set to
+\[
+ 0.25\,\hbox{\verb+\zw+}^{+1\,\text{pt}}_{-1\,\text{pt}} = \frac{27}{32}\,\mathrm{mm}^{+1\,\text{pt}}_{-1\,\text{pt}}.
+\]
+Here \verb+\zw+ is the virtual width of `current' Japanese font.
+\end{itemize}
+
+
+\subsection{Using in \LaTeX}
+\paragraph{\LaTeXe}
+Using in \LaTeXe\ is basically same. To set up the minimal environment for Japanese, you only have to load {\tt luatexja.sty}:
+\begin{verbatim}
+\usepackage{luatexja}
+\end{verbatim}
+It also does the minimal setting (the counterpart in p\LaTeX\ is  {\tt plfonts.dtx} and {\tt pldefs.ltx}):
+
+\begin{itemize}
+\item {\tt JY3} is used as the font encoding for Japanese fonts (in horizontal direction).\\
+If vertical typesetting is supported by Lua\TeX-ja, {\tt JT3} will be used for vertical fonts.
+\item Two font families {\tt mc} and {\tt gt} are defined: 
+\begin{center}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{classification}&\textbf{family}&\verb+\mdseries+&\verb+\bfseries+&\textbf{scale}\\\midrule
+\textit{mincho}&\tt mc&Ryumin-Light    &GothicBBB-Medium&0.960444\\
+\textit{gothic}&\tt gt&GothicBBB-Medium&GothicBBB-Medium&0.960444\\
+\bottomrule
+\end{tabular}
+\end{center}
+\item Japanese characters in math mode are typeset by font family {\tt mc}.
+\end{itemize}
+
+However, the above setting is not sufficient for Japanese-based documents. To do this, 
+You are better to use class files other than {\tt article.cls}, {\tt book.cls}, ...
+The better alternatives are:
+\begin{itemize}
+\item BXjscls
+\item ltjarticle, ltjbook?
+\item ltjsarticle, ltjsbook?
+\end{itemize}
+
+\subsection{Changing Fonts}
+\paragraph{Remark: Japanese Characters in Math Mode}
+
+
+\paragraph{plain \TeX}
+\paragraph{NFSS2}
+\paragraph{fontspec}
+
+\subsection{Changing parameters}
+
+
+\part{Reference}
+\section{Font Metric and Japanese Font}
+\section{Parameters}
+\section{Other Primitives}
+\part{Implementations}\label{part-imp}
+\end{document}
