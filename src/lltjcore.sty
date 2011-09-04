@@ -1,5 +1,6 @@
 %%
 %% lltjcore.sty: derived from plcore.dtx in pLaTeX.
+%% This file does not include the code relating to "tategaki".
 %% 
 \makeatletter
 \newif\iftombow \tombowfalse
@@ -148,6 +149,5 @@
   \stepcounter{page}%
   \let\firstmark\botmark
 }
-\newcommand\printglossary{\@input@{\jobname.gls}}
 
 \endinput
