@@ -147,7 +147,9 @@
 \ltjsetparameter{kansujichar={8,`八}}
 \ltjsetparameter{kansujichar={9,`九}}
 
-\newcommand\printglossary{\@input@{\jobname.gls}}
+\ifltj@in@latex
+  \newcommand\printglossary{\@input@{\jobname.gls}}
+\fi
 \newcount\hour
 \newcount\minute
 
