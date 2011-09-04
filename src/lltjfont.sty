@@ -1,5 +1,5 @@
 %%
-%% luatexja-latex-fonts.sty: derived from plfonts.dtx in pLaTeX.
+%% lltjfont.sty: derived from plfonts.dtx in pLaTeX.
 %% 
 \makeatletter
 \let\k@encoding\@empty
@@ -43,11 +43,11 @@
 \newbox\tstrutbox
 \newbox\zstrutbox
 \def\strut{\relax
-%  \ifydir
+  \ifydir
     \ifmmode\copy\strutbox\else\unhcopy\strutbox\fi
-%  \else
-%    \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi
-%  \fi
+  \else
+    \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi
+  \fi
 }
 \def\tstrut{\relax\hbox{\tate
    \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi}}

@@ -202,6 +202,14 @@
 %%%%%%%% \inhibitglue
 \protected\def\inhibitglue{\directlua{luatexja.jfmglue.create_inhibitglue_node()}}
 
+%%%%%%%% \yoko, \tate, \ifydir, \iftdir
+%% At this moment, tategaki mode is not implemented; 
+%% there is only yokogaki mode now.
+\let\yoko\relax
+\let\tate\relax
+\let\ifydir\iftrue
+\let\iftdir\iffalse
+
 %%%%%%%% \ltjdefcharrange<name>{100-200,3000-,5000,...}
 \protected\def\ltjdefcharrange#1#2{%
   \ltj@tempcntc=#1 \expandafter\ltj@@dcrange#2,,\ignorespaces}
