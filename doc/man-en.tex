@@ -8,34 +8,78 @@
 
 \title{The Lua\TeX-ja package}
 \author{The Lua\TeX-ja project team}
+
+
+\makeatletter
+\catcode`\<=13
+\def<#1>{{\normalfont\itshape$\langle$#1$\rangle$}}
 \begin{document}
 \maketitle
 \part{User's manual}
-{\Large\bf This documentation is far from complete. It may have many grammatical errors.}
+{\Large\bf This documentation is far from complete. It may have many
+grammatical errors.}
+
 
 \section{Introduction}
 
-The Lua\TeX-ja package is a macro package for typesetting high-quality Japanese documents in Lua\TeX.
+The Lua\TeX-ja package is a macro package for typesetting high-quality
+Japanese documents in Lua\TeX.
 
 \subsection{Backgrounds}
-Traditionally, ASCII p\TeX, an extension of \TeX, and its derivatives are used to typeset Japanese documents in \TeX.
-p\TeX is an engine extension of \TeX: so it can produce high-quality Japanese documents without using very complicated macros.
-But this point is a mixed blessing: p\TeX\ is left behind from other extensions of \TeX, especially $\varepsilon$-\TeX\ and pdf\TeX,
-and from changes about Japanese processing in computers (\textit{e.g.}, the UTF-8 encoding).
-Recently the extensions of p\TeX, namely up\TeX\ (Unicode-implementation of p\TeX) and 
-$\varepsilon$-p\TeX\ (Merging of p\TeX and $\varepsilon$-\TeX\ extension), have developed to fill those gap to some extent,
-but gaps are still exist.
+Traditionally, ASCII p\TeX, an extension of \TeX, and its derivatives
+are used to typeset Japanese documents in \TeX. p\TeX is an engine
+extension of \TeX: so it can produce high-quality Japanese documents
+without using very complicated macros. But this point is a mixed
+blessing: p\TeX\ is left behind from other extensions of \TeX,
+especially $\varepsilon$-\TeX\ and pdf\TeX, and from changes about
+Japanese processing in computers (\textit{e.g.}, the UTF-8 encoding).
 
-However, the appearance of Lua\TeX\ changed the whole situation. With using Lua ``callbacks'', 
-users can customize the internal processing of Lua\TeX. So there is no need to modify sources of the \TeX\ engine to
-support Japanese typesetting: to do this, we only have to write Lua script for appropriate callbacks.
+Recently the extensions of p\TeX, namely up\TeX\ (Unicode-implementation
+of p\TeX) and $\varepsilon$-p\TeX\ (Merging of p\TeX and
+$\varepsilon$-\TeX\ extension), have developed to fill those gap to some
+extent, but gaps are still exist.
 
-\subsection{Functionality relation with p\TeX}
-The Lua\TeX-ja package is much influenced by p\TeX\ engine. The initial target of development was to implement features of p\TeX.
-However, \emph{Lua\TeX-ja is not a just porting of p\TeX: Unnatural specifications/behaviors of p\TeX\ were not adopted}.
+However, the appearance of Lua\TeX\ changed the whole situation. With
+using Lua `callbacks', users can customize the internal processing of
+Lua\TeX. So there is no need to modify sources of the \TeX\ engine to
+support Japanese typesetting: to do this, we only have to write Lua
+script for appropriate callbacks.
+
+
+\subsection{Major Changes from p\TeX}
+The Lua\TeX-ja package is much influenced by p\TeX\ engine. The initial
+target of development was to implement features of p\TeX. However,
+\emph{Lua\TeX-ja is not a just porting of p\TeX: Unnatural
+specifications/behaviors of p\TeX\ were not adopted}.
+
 The followings are major changes from p\TeX:
 \begin{itemize}
-\item At the present, vertical typesetting, or \textit{tategaki}, is not supported in Lua\TeX-ja.
+\item Japanese fonts are a tuple of a `real' font, a Japanese font
+      metric (\textbf{JFM}, for short), and an optional string called
+      `variation'.
+
+\item In p\TeX, a linebreak after Japanese character is ignored (and
+      doesn't yield a space), since Japanese texts can linebreak almost
+      everywhere. However, Lua\TeX-ja doesn't have this function
+      completely, because of a specification of Lua\TeX.
+\item The insertion process of glues/kerns between two Japanese
+      characters and between a Japanese character and other characters
+      (we refer these glue/kerns as \textbf{JAglue}) is rewritten from
+      scratch.
+
+\begin{itemize}
+\item As Lua\TeX's internal character handling is `node-based'
+      (\textit{e.g.}, \verb+of{}fice+ doesn't prevent ligatures), the
+      insertion process of \textbf{JAglue} is now `node-based'.
+\item Furthermore, nodes between two characters which have no effects in
+      linebreak (\textit{e.g.}, \verb+\special+ node) are ignored in the
+      insertion process.
+\item In the process, two Japanese fonts which differ in their `real'
+      fonts only are identified.
+\end{itemize}
+\item At the present, vertical typesetting (\textit{tategaki}), is not
+      supported in Lua\TeX-ja.
+
 \end{itemize} 
 For detailed information, see Part~\ref{part-imp}.
 
@@ -44,13 +88,17 @@ In this document, the following terms and notations are used:
 \begin{itemize}
 \item Characters are divided into two types: 
 \begin{itemize}
-\item \textbf{JAchar}: standing for Japanese characters such as Hiragana, Katakana, Kanji and other punctuation marks for Japanese.
+\item \textbf{JAchar}: standing for Japanese characters such as
+      Hiragana, Katakana, Kanji and other punctuation marks for
+      Japanese.'
 \item \textbf{ALchar}: standing for all other characters like alphabets. 
 \end{itemize}
-\item A word in sans-serif font (like \textsf{prebreakpenalty}) represents an internal parameter for Japanese typesetting, and
-it is used as a key in \verb+\ltjsetparameter+ command.
-\item The word ``primitive'' is used not only for primitives in Lua\TeX, but also for control sequences that defined 
-in the core module of Lua\TeX-ja.
+\item A word in sans-serif font (like \textsf{prebreakpenalty})
+      represents an internal parameter for Japanese typesetting, and it
+      is used as a key in \verb+\ltjsetparameter+ command.
+\item The word ``primitive'' is used not only for primitives in Lua\TeX,
+      but also for control sequences that defined in the core module of
+      Lua\TeX-ja.
 \end{itemize}
 
 \newpage
@@ -84,7 +132,7 @@ or download the archive of HEAD in the master branch from
 
 \subsection{Cautions}
 \begin{itemize}
-\item UTF-8
+\item The encording of your source file must be UTF-8. 
 \item conflicts with unicode-math
 \end{itemize}
 
@@ -107,14 +155,20 @@ This does the minimal setting (like {\tt ptex.tex}) for typesetting Japanese doc
 \end{tabular}
 \end{center}
 \begin{itemize}
-\item The `Q' is an unit used in Japanese phototypesetting, and $1\,\textrm{Q}=0.25\,\textrm{mm}$.
-\item It is widely accepted that the font `Ryumin-Light' and `GothicBBB-Medium' aren't embedded into PDF files, and
-the PDF reader substitutes them by some external Japanese font. We adopt this custom to the default setting.
+\item The `Q' is an unit used in Japanese phototypesetting, and
+      $1\,\textrm{Q}=0.25\,\textrm{mm}$. This length is stored in a
+      dimension \verb+\jQ+.
+
+\item It is widely accepted that the font `Ryumin-Light' and
+      `GothicBBB-Medium' aren't embedded into PDF files, and the PDF
+      reader substitutes them by some external Japanese font. We adopt
+      this custom to the default setting.
 \item size
 \end{itemize}
-\item A character in Unicode is treated as \textbf{JAchar} if and only if its code-point has more than or equal to U+0100.
-\item The amount of glue that are inserted between \textbf{JAchar} and \textbf{ALchar} (the parameter {\sf xkanjiskip}) is
-set to
+\item A character in Unicode is treated as \textbf{JAchar} if and only
+      if its code-point has more than or equal to U+0100.
+\item The amount of glue that are inserted between \textbf{JAchar} and
+      \textbf{ALchar} (the parameter \textsf{xkanjiskip}) is set to
 \[
  0.25\,\hbox{\verb+\zw+}^{+1\,\text{pt}}_{-1\,\text{pt}} = \frac{27}{32}\,\mathrm{mm}^{+1\,\text{pt}}_{-1\,\text{pt}}.
 \]
@@ -124,11 +178,13 @@ Here \verb+\zw+ is the virtual width of `current' Japanese font.
 
 \subsection{Using in \LaTeX}
 \paragraph{\LaTeXe}
-Using in \LaTeXe\ is basically same. To set up the minimal environment for Japanese, you only have to load {\tt luatexja.sty}:
+Using in \LaTeXe\ is basically same. To set up the minimal environment
+for Japanese, you only have to load {\tt luatexja.sty}:
 \begin{verbatim}
 \usepackage{luatexja}
 \end{verbatim}
-It also does the minimal setting (the counterpart in p\LaTeX\ is  {\tt plfonts.dtx} and {\tt pldefs.ltx}):
+It also does the minimal setting (the counterpart in p\LaTeX\ is  {\tt
+plfonts.dtx} and {\tt pldefs.ltx}):
 
 \begin{itemize}
 \item {\tt JY3} is used as the font encoding for Japanese fonts (in horizontal direction).\\
@@ -143,7 +199,7 @@ If vertical typesetting is supported by Lua\TeX-ja, {\tt JT3} will be used for v
 \bottomrule
 \end{tabular}
 \end{center}
-\item Japanese characters in math mode are typeset by font family {\tt mc}.
+\item Japanese characters in math mode are typeset by the font family {\tt mc}.
 \end{itemize}
 
 However, the above setting is not sufficient for Japanese-based documents. To do this, 
@@ -157,18 +213,235 @@ The better alternatives are:
 
 \subsection{Changing Fonts}
 \paragraph{Remark: Japanese Characters in Math Mode}
+Since p\TeX\ supports Japanese characters in math mode, there are
+sources like the following:
+\begin{verbatim}
+$T_{高圧}$, $$ y=(x-1)^2+2\quad よって\quad y>0$$ 
+\end{verbatim}
+However, ...
+
+So in this chapter, we don't describe how to change Japanese fonts in
+math mode. For the method, please see Part~\ref{part-ref}.
 
 
 \paragraph{plain \TeX}
+To change Japanese fonts in plain \TeX, you must use the primitive
+\verb+\jfont+. So please see Part~\ref{part-ref}.
+
+
 \paragraph{NFSS2}
+For \LaTeXe, Lua\TeX-ja simply adopted font selection system from that
+of p\LaTeXe\ (in: {\tt plfont.dtx}).
+\begin{itemize}
+\item Two control sequences \verb+\mcdefault+ and \verb+\gtdefault+ are
+      used to specify the default font family for \textit{mincho} and
+      \textit{gothic}, respectively.
+\item Commands \verb+\fontfamily+, \verb+\fontseries+,
+      \verb+\fontshape+ and \verb+\selectfont+ can be used to change
+      attributes of Japanese fonts. 
+\begin{center}
+\begin{tabular}{ccccc}
+\toprule
+&\textbf{encoding}&\textbf{family}&\textbf{series}&\textbf{shape}\\\midrule
+alphabetic fonts
+&\verb+\romanencoding+&\verb+\romanfamily+&\verb+\romanseries+&\verb+\romanshape+\\
+Japanese fonts
+&\verb+\kanjiencoding+&\verb+\kanjifamily+&\verb+\kanjiseries+&\verb+\kanjishape+\\
+both&---&--&\verb+\fontseries+&\verb+\fontshape+\\
+auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---\\
+\bottomrule
+\end{tabular}
+\end{center}
+\item For defining a Japanese font family, use \verb+\DeclareKanjiFamily+
+      instead of \verb+\DeclareFontFamily+.
+\end{itemize}
+
 \paragraph{fontspec}
+To use with \texttt{fontspec} package, it is needed to load
+\texttt{luatexja-fontspec} package in the preamble. This additional
+package automatically loads \texttt{luatexja} and \texttt{fontspec}
+package, if needed.
 
-\subsection{Changing parameters}
+In \texttt{luatexja-fontspec} package, the following 4 commands are defined as
+counterparts of original commands in \texttt{fontspec}:
+\begin{center}
+\begin{tabular}{ccccc}
+\toprule
+Japanese fonts
+&\verb+\jfontspec+&\verb+\setmainjfont+&\verb+\setsansjfont+&\verb+\newjfontfamily+\\
+alphabetic fonts
+&\verb+\fontspec+&\verb+\setmainfont+&\verb+\setsansfont+&\verb+\newfontfamily+\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Note that there is no command named \verb+\setmonojfont+, since it is
+popular for Japansese fonts that (nearly) all Japanese glyphs have the same width.
 
 
-\part{Reference}
+\section{Changing Parameters}
+There are many parameters in Lua\TeX-ja. And due to the implementation,
+most of them were not stored as internal register of \TeX, but as an
+original storage system in Lua\TeX-ja. Hence, to change or recall those
+parameters, you have to use commands \verb+\ltjsetparameter+ and
+\verb+\ltjgetparameter+.
+
+\subsection{Editing the range of \textbf{JAchar}}
+As noted before, the default setting is:
+\begin{center}
+A character in Unicode is treated as \textbf{JAchar} if and only if its
+ code-point has more than or equal to U+0100.
+\end{center}
+$\uparrow$ TODO: CHANGE THIS!
+
+
+
+
+
+\subsection{\textsf{kanjiskip} and \textsf{xkanjiskip}}
+\textbf{JAglue} is divided into the following three categories:
+\begin{itemize}
+\item Glue/kerns specified in JFM. If \verb+\inhibitglue+ is issued,
+      this glue will be not inserted.
+\item The default glue which inserted between two \textbf{JAchar}s ({\sf
+      kanjiskip}).
+\item The default glue which inserted between a \textbf{JAchar} and an
+      \textbf{ALchar} (\textsf{xkanjiskip}).
+\end{itemize}
+The value (a skip) of \textsf{kanjiskip} or \textsf{xkanjiskip} can be changed as the
+following.
+\begin{verbatim}
+\ltjsetparameter{kanjiskip={0pt plus 0.4pt minus 0.4pt}, 
+                 xkanjiskip={0.25\zw plus 1pt minus 1pt}}
+\end{verbatim}
+
+
+It may occur that JFM contains the data of `ideal width of {\sf
+kanjiskip}' and/or `ideal width of \textsf{xkanjiskip}'.
+To use these data from JFM, set the value of \textsf{kanjiskip} or 
+\textsf{xkanjiskip} to \verb+\maxdimen+.
+
+\subsection{Insertion Setting of \textsf{xkanjiskip}}
+It is not desirable that \textsf{xkanjiskip} is inserted between every
+boundary between \textbf{JAchar} and \textbf{ALchar}. For example,
+\textsf{xkanjiskip} should not be inserted after opening parenthesis
+(\textit{e.g.}, compare `(あ' and `(\hskip\ltjgetparameter{xkanjiskip}あ').
+
+Lua\TeX-ja can control whether \textsf{xkanjiskip} can be inserted
+before/after a character, by using \textsf{jaxspmode} and
+\textsf{alxspmode} parameters. 
+
+For example, the following source
+\begin{verbatim}
+\ltjsetparameter{jaxspmode={`あ,preonly}, alxspmode={`\!,postonly}} 
+pあq い!う
+\end{verbatim}
+yields
+\begin{center}
+\ltjsetparameter{jaxspmode={`あ,preonly}, alxspmode={`\!,postonly}} 
+pあq い!う
+\end{center}
+The second argument {\tt preonly} means `the insertion of
+\textsf{xkanjiskip} is allowed before this character, but not after'.
+the other possible values are {\tt postonly}, {\tt allow} and {\tt
+inhibit}.
+
+If you want to enable/disable all insertion of \textsf{kanjiskip} and
+\textsf{xkanjiskip}, set \textsf{autospacing} and \textsf{autoxspacing}
+parameters to {\tt false}, respectively.
+
+
+\subsection{Shifting Baseline}
+To make a match between a Japanese font and an alphabetic font, sometimes
+the shifting of baseline of one of the pair. In p\TeX, this is achived
+by setting \verb+\ybaselineshift+ to a non-zero length (the
+baseline of alphabetic fonts is shifted below). However, for documents
+whose main language is not Japanese,it is good to shift the baseline of
+Japanese fonts, but not that of alphabetic fonts.
+Because of this, Lua\TeX-ja can be independently set the shifting amount
+of the baseline of alphabetic fonts (\textsf{yalbaselineshift}
+parameter) and that of Japanese fonts (\textsf{yjabaselineshift}
+parameter). 
+
+For example, the following 
+\begin{verbatim}
+\vrule width 150pt height 0.4pt depth 0.4pt\hskip-120pt
+\ltjsetparameter{yjabaselineshift=0pt, yalbaselineshift=0pt}abcあいう.
+\ltjsetparameter{yjabaselineshift=5pt, yalbaselineshift=2pt}abcあいう
+\end{verbatim}
+yields
+\begin{center}
+\vrule width 150pt height 0.4pt depth 0.4pt\hskip-120pt
+\ltjsetparameter{yjabaselineshift=0pt, yalbaselineshift=0pt}abcあいう.
+\ltjsetparameter{yjabaselineshift=5pt, yalbaselineshift=2pt}abcあいう
+\end{center}
+Here the horizontal line in above is the baseline of a line.
+
+There is an interesting side-effect from that the baseline of
+Japanese fonts can be shifted: characters in different size can be
+vertically aligned center in a line, by setting two parameters appropriately.
+For example, 
+\begin{verbatim}
+xyz漢字 
+{\scriptsize\ltjsetparameter{yjabaselineshift-1pt, yalbaselineshift=-1pt}
+XYZひらがな}abcかな
+\end{verbatim}
+yields
+\begin{center}
+xyz漢字
+{\scriptsize\ltjsetparameter{yjabaselineshift=-1pt, yalbaselineshift=-1pt}
+XYZひらがな}abcかな
+\end{center}
+
+
+\subsection{`tombow'}
+`tombow' is a mark for indicating 4~corners and horizontal/vartical
+center of the paper. p\LaTeX and this Lua\TeX-ja suport `tombow' by
+their kernel. The following steps are needed to typeset tombow:
+
+\begin{enumerate}
+\item First, define the banner which will be printed at the upper left
+      of the paper. This is done by assigning a token list to
+      \verb+\@bannertoken+.
+
+For example, the following sets banner as `{\tt filename (2012-01-01 17:01)}':
+\begin{verbatim}
+\makeatletter
+
+\hour\time \divide\hour by 60 \@tempcnta\hour \multiply\@tempcnta 60\relax
+\minute\time \advance\minute-\@tempcnta
+\@bannertoken{%
+   \jobname\space(\number\year-\two@digits\month-\two@digits\day
+   \space\two@digits\hour:\two@digits\minute)}%
+\end{verbatim}
+
+\item ...
+\end{enumerate}
+
+
+\part{Reference}\label{part-ref}
 \section{Font Metric and Japanese Font}
 \section{Parameters}
+\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
+\item[\textsf{kcatcode}\,=\{<chr\_code>,<value>\}]
+\item[\textsf{prebreakpenalty}\,=\{<chr\_code>,<penalty>\}]
+\item[\textsf{postbreakpenalty}\,=\{<chr\_code>,<penalty>\}]
+\item[\textsf{jatextfont}\,=\{<jfam>,<jfont\_cs>\}]
+\item[\textsf{jascriptfont}\,=\{<jfam>,<jfont\_cs>\}]
+\item[\textsf{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}]
+\item[\textsf{yjabaselineshift}\,=<dimen>]
+\item[\textsf{yalbaselineshift}\,=<dimen>]
+\item[\textsf{jaxspmode}\,=\{<chr\_code>,<mode>\}]
+\item[\textsf{alxspmode}\,=\{<chr\_code>,<mode>\}]
+\item[\textsf{autospacing}\,=<bool>]
+\item[\textsf{autoxspacing}\,=<bool>]
+\item[\textsf{kanjiskip}\,=<skip>]
+\item[\textsf{xkanjiskip}\,=<skip>]
+\item[\textsf{jcharwidowpenalty}\,=<penalty>]
+\item[\textsf{differentjfm}\,=<mode>]
+\item[\textsf{jacharrange}\,=<ranges>]
+\end{list}
 \section{Other Primitives}
+\section{Control Sequences for \LaTeXe}
 \part{Implementations}\label{part-imp}
 \end{document}
