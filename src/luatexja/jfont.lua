@@ -64,8 +64,25 @@ function define_jfm(t)
 	    if real_char then
 	       if not (type(v.width)=='number' or v.width~='prop') then
 		  defjfm_res= nil; return
-	       elseif type(v.height)~='number' or type(v.depth)~='number' then
-		  defjfm_res= nil; return
+	       else
+		  if type(v.height)~='number' then
+		     v.height = 0.0
+		  end
+		  if type(v.depth)~='number' then
+		     v.depth = 0.0
+		  end
+		  if type(v.italic)~='number' then 
+		     v.italic = 0.0
+		  end
+		  if type(v.left)~='number' then 
+		     v.left = 0.0
+		  end
+		  if type(v.down)~='number' then 
+		     v.down = 0.0
+		  end
+		  if type(v.align)=='nil' then
+		     v.align = 'left'
+		  end
 	       end
 	    end
 	    v.chars = nil

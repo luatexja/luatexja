@@ -1,6 +1,7 @@
 %#!lualatex
 \documentclass[a4paper,titlepage]{article}
-\usepackage{booktabs,amsmath}
+\usepackage{amsmath,amssymb,xcolor,pict2e}
+\usepackage{booktabs,listings,lltjlisting,showexpl}
 \usepackage{luatexja}
 %\usepackage{luatexja-fontspec}
 \usepackage[margin=20mm]{geometry}
@@ -10,11 +11,19 @@
 \author{The Lua\TeX-ja project team}
 
 
-\makeatletter
+\lstset{
+  basicstyle=\ttfamily\small, pos=o, breaklines=true,
+  numbers=none, rframe={}
+}
+
 \catcode`\<=13
 \def<#1>{{\normalfont\itshape$\langle$#1$\rangle$}}
 \begin{document}
 \maketitle
+
+\tableofcontents
+
+\newpage
 \part{User's manual}
 {\Large\bf This documentation is far from complete. It may have many
 grammatical errors.}
@@ -64,7 +73,7 @@ The followings are major changes from p\TeX:
       completely, because of a specification of Lua\TeX.
 \item The insertion process of glues/kerns between two Japanese
       characters and between a Japanese character and other characters
-      (we refer these glue/kerns as \textbf{JAglue}) is rewritten from
+      (we refer these glues/kerns as \textbf{JAglue}) is rewritten from
       scratch.
 
 \begin{itemize}
@@ -101,6 +110,20 @@ In this document, the following terms and notations are used:
       Lua\TeX-ja.
 \end{itemize}
 
+\subsection{About the project}
+\paragraph{Project Wiki} \url{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage%28en%29}
+
+This project is hosted by SourceForge.JP.
+\paragraph{Members}
+
+%h7k
+%kmaeda
+%abenori
+%kuroky
+%munepi
+%thonda
+%zrbabbler
+
 \newpage
 \section{Getting Started}
 \subsection{Installation}
@@ -108,7 +131,7 @@ To install the Lua\TeX-ja\ package, you will need:
 \begin{itemize}
 \item Lua\TeX, version 0.65.0-beta or later.\\
 If you are using \TeX~Live\ 2011 or W32\TeX, you don't have to worry.
-\item The source archive or Lua\TeX-ja, of course{\tt:)}
+\item The source archive of Lua\TeX-ja, of course{\tt:)}
 \end{itemize}
 
 The installation methods are as follows:
@@ -126,13 +149,13 @@ or download the archive of HEAD in the master branch from
 \url{http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git;a=snapshot;h=HEAD;sf=tgz}.
 \end{flushleft}
 \item Extract the archive. You will see {\tt src/} and several other sub-directories.
-\item Copy all the contents of {\tt src/} into your TEXMF trees.
+\item Copy all the contents of {\tt src/} into one of your \texttt{TEXMF} tree.
 \item If {\tt mktexlsr} is needed to update the filename database, make it so.
 \end{enumerate}
 
 \subsection{Cautions}
 \begin{itemize}
-\item The encording of your source file must be UTF-8. 
+\item The encoding of your source file must be UTF-8. 
 \item conflicts with unicode-math
 \end{itemize}
 
@@ -172,7 +195,7 @@ This does the minimal setting (like {\tt ptex.tex}) for typesetting Japanese doc
 \[
  0.25\,\hbox{\verb+\zw+}^{+1\,\text{pt}}_{-1\,\text{pt}} = \frac{27}{32}\,\mathrm{mm}^{+1\,\text{pt}}_{-1\,\text{pt}}.
 \]
-Here \verb+\zw+ is the virtual width of `current' Japanese font.
+Here \verb+\zw+ is a counterpart of \texttt{em} for Japanese fonts, that is, the length of `full-width' in the current Japanese font.
 \end{itemize}
 
 
@@ -215,12 +238,35 @@ The better alternatives are:
 \paragraph{Remark: Japanese Characters in Math Mode}
 Since p\TeX\ supports Japanese characters in math mode, there are
 sources like the following:
-\begin{verbatim}
-$T_{高圧}$, $$ y=(x-1)^2+2\quad よって\quad y>0$$ 
-\end{verbatim}
-However, ...
 
-So in this chapter, we don't describe how to change Japanese fonts in
+\begin{LTXexample}
+$f_{高温}$~($f_{\text{high temperature}}$).
+\[ y=(x-1)^2+2\quad{}よって\quad y>0 \]
+$5\in{}素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
+\end{LTXexample}
+We (the project members of Lua\TeX-ja) think that using
+Japanese characters in math mode are allowed if these are used as identifiers.
+In this point of view, 
+\begin{itemize}
+\item The lines 1~and~2 above are not correct, since `高温' in above is used as a textual label, and
+`よって' is used as a conjunction. 
+\item However, the line~3 is correct, since `素' is used as an identifier.
+\end{itemize}
+
+Hence, in our opinion, the above input should be corrected as:
+\begin{LTXexample}
+$f_{\text{高温}}$~%
+($f_{\text{high temperature}}$).
+\[ y=(x-1)^2+2\quad 
+  \mathrel{\text{よって}}\quad y>0 \]
+$5\in{}素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
+\end{LTXexample}
+%BUG?: \{\}がなければ「素」がでない．上の段落の「よって」もでてない．
+
+
+どう繋ごうか？
+
+In this chapter, we don't describe how to change Japanese fonts in
 math mode. For the method, please see Part~\ref{part-ref}.
 
 
@@ -276,7 +322,7 @@ alphabetic fonts
 \end{center}
 
 Note that there is no command named \verb+\setmonojfont+, since it is
-popular for Japansese fonts that (nearly) all Japanese glyphs have the same width.
+popular for Japanese fonts that (nearly) all Japanese glyphs have the same width.
 
 
 \section{Changing Parameters}
@@ -298,18 +344,18 @@ $\uparrow$ TODO: CHANGE THIS!
 
 
 
-\subsection{\textsf{kanjiskip} and \textsf{xkanjiskip}}
+\subsection{\textsf{kanjiskip} and \textsf{xkanjiskip}}\label{subs-kskip}
 \textbf{JAglue} is divided into the following three categories:
 \begin{itemize}
-\item Glue/kerns specified in JFM. If \verb+\inhibitglue+ is issued,
+\item Glues/kerns specified in JFM. If \verb+\inhibitglue+ is issued,
       this glue will be not inserted.
 \item The default glue which inserted between two \textbf{JAchar}s ({\sf
       kanjiskip}).
 \item The default glue which inserted between a \textbf{JAchar} and an
       \textbf{ALchar} (\textsf{xkanjiskip}).
 \end{itemize}
-The value (a skip) of \textsf{kanjiskip} or \textsf{xkanjiskip} can be changed as the
-following.
+The value (a skip) of \textsf{kanjiskip} or \textsf{xkanjiskip} can be
+changed as the following.
 \begin{verbatim}
 \ltjsetparameter{kanjiskip={0pt plus 0.4pt minus 0.4pt}, 
                  xkanjiskip={0.25\zw plus 1pt minus 1pt}}
@@ -330,17 +376,11 @@ boundary between \textbf{JAchar} and \textbf{ALchar}. For example,
 Lua\TeX-ja can control whether \textsf{xkanjiskip} can be inserted
 before/after a character, by using \textsf{jaxspmode} and
 \textsf{alxspmode} parameters. 
+\begin{LTXexample}
+\ltjsetparameter{jaxspmode={`あ,preonly}, alxspmode={`\!,postonly}} 
+pあq い!う
+\end{LTXexample}
 
-For example, the following source
-\begin{verbatim}
-\ltjsetparameter{jaxspmode={`あ,preonly}, alxspmode={`\!,postonly}} 
-pあq い!う
-\end{verbatim}
-yields
-\begin{center}
-\ltjsetparameter{jaxspmode={`あ,preonly}, alxspmode={`\!,postonly}} 
-pあq い!う
-\end{center}
 The second argument {\tt preonly} means `the insertion of
 \textsf{xkanjiskip} is allowed before this character, but not after'.
 the other possible values are {\tt postonly}, {\tt allow} and {\tt
@@ -353,7 +393,7 @@ parameters to {\tt false}, respectively.
 
 \subsection{Shifting Baseline}
 To make a match between a Japanese font and an alphabetic font, sometimes
-the shifting of baseline of one of the pair. In p\TeX, this is achived
+the shifting of baseline of one of the pair. In p\TeX, this is achieved
 by setting \verb+\ybaselineshift+ to a non-zero length (the
 baseline of alphabetic fonts is shifted below). However, for documents
 whose main language is not Japanese,it is good to shift the baseline of
@@ -363,40 +403,31 @@ of the baseline of alphabetic fonts (\textsf{yalbaselineshift}
 parameter) and that of Japanese fonts (\textsf{yjabaselineshift}
 parameter). 
 
-For example, the following 
-\begin{verbatim}
-\vrule width 150pt height 0.4pt depth 0.4pt\hskip-120pt
-\ltjsetparameter{yjabaselineshift=0pt, yalbaselineshift=0pt}abcあいう.
+\begin{LTXexample}
+\vrule width 150pt height 0.4pt depth 0pt\hskip-120pt
+\ltjsetparameter{yjabaselineshift=0pt, yalbaselineshift=0pt}abcあいう
 \ltjsetparameter{yjabaselineshift=5pt, yalbaselineshift=2pt}abcあいう
-\end{verbatim}
-yields
-\begin{center}
-\vrule width 150pt height 0.4pt depth 0.4pt\hskip-120pt
-\ltjsetparameter{yjabaselineshift=0pt, yalbaselineshift=0pt}abcあいう.
-\ltjsetparameter{yjabaselineshift=5pt, yalbaselineshift=2pt}abcあいう
-\end{center}
+\end{LTXexample}
+
 Here the horizontal line in above is the baseline of a line.
 
 There is an interesting side-effect from that the baseline of
 Japanese fonts can be shifted: characters in different size can be
 vertically aligned center in a line, by setting two parameters appropriately.
-For example, 
-\begin{verbatim}
+
+\begin{LTXexample}
 xyz漢字 
-{\scriptsize\ltjsetparameter{yjabaselineshift-1pt, yalbaselineshift=-1pt}
-XYZひらがな}abcかな
-\end{verbatim}
-yields
-\begin{center}
-xyz漢字
-{\scriptsize\ltjsetparameter{yjabaselineshift=-1pt, yalbaselineshift=-1pt}
-XYZひらがな}abcかな
-\end{center}
+{\scriptsize
+  \ltjsetparameter{yjabaselineshift=-1pt, 
+    yalbaselineshift=-1pt}
+  XYZひらがな
+}abcかな
+\end{LTXexample}
 
 
 \subsection{`tombow'}
-`tombow' is a mark for indicating 4~corners and horizontal/vartical
-center of the paper. p\LaTeX and this Lua\TeX-ja suport `tombow' by
+`tombow' is a mark for indicating 4~corners and horizontal/vertical
+center of the paper. p\LaTeX and this Lua\TeX-ja support `tombow' by
 their kernel. The following steps are needed to typeset tombow:
 
 \begin{enumerate}
@@ -421,7 +452,167 @@ For example, the following sets banner as `{\tt filename (2012-01-01 17:01)}':
 
 \part{Reference}\label{part-ref}
 \section{Font Metric and Japanese Font}
+\subsection{\texttt{\char92jfont} primitive}
+Caution: 10pt
+
+\subsection{Structure of JFM file}
+A JFM file is a Lua script which has only one function call:
+\begin{verbatim}
+luatexja.jfont.define_jfm { ... }
+\end{verbatim}
+Real data are stored in the table which indicated above by
+\verb+{ ... }+.  So, the rest of subsection are devoted to describe the
+structure of this table.  Note that all lengths in a JFM file are
+floating-point numbers in design-size unit.
+
+\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
+\item[dir=<direction>] (required)
+
+The direction of JFM. At the present, only \texttt{'yoko'} is supported.
+
+\item[zw=<length>] (required)
+
+The amount of the length of the `full-width.
+
+\item[zh=<length>] (required)
+
+\item[kanjiskip=\{<natural>, <stretch>, <shrink>\}] (optional)
+
+This field specifies the `ideal' amount of \textsf{kanjiskip}. As noted
+	     in Subsection~\ref{subs-kskip}, if \textsf{kanjiskip} is
+	     \verb+\maxdimen+, the value specified in this field is used
+	     (if this field is not specified in JFM, 0\,pt is
+	     used). Note that <stretch> and <shrink> fields are in
+	     design-size unit too.
+
+
+\item[xkanjiskip=\{<natural>, <stretch>, <shrink>\}] (optional)
+
+Like the \texttt{kanjiskip} field, this field specifies the `ideal'
+	     amount of \textsf{xkanjiskip}.
+
+\end{list}
+
+Besides from above fields, a JFM file have several sub-tables those
+indices are natural numbers.  The table indexed by~$i\in\omega$ stores
+informations of `character class'~$i$. At least, the character class~0 is
+always present, so each JFM file must have a sub-table whose index is
+\texttt{[0]}.  Each sub-table (its numerical index is denoted by $i$) has
+the following fields:
+
+\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
+\item[chars=\{<character>, ...\}] (required except character class~0)
+
+This field is a list of \textbf{JAchar}s which are in this character
+	     type~$i$. This field is not required if $i=0$, since all
+	     \textbf{JAchar} which are not in any character class other
+	     than 0 (hence, the character class~0 contains most of
+	     \textbf{JAchar}s). In the list, a \textbf{JAchar} can be
+	     specified by its code number, or by the character itself
+	     (as a string of length~1).
+
+In addition to those `real' characters, the following `imaginary
+	     characters' can be specified in the list:
+
+\item[width=<length>, height=<length>, depth=<length>, italic=<length>]\ 
+
+Specify width of characters in character class~$i$, height, depth and
+the amount of italic correction.  These fields are required.
+
+
+\item[left=<length>, down=<length>, align=<align>]\ 
+
+These are for adjusting the position of the `real' glyph. Legal
+	     values of \texttt{align} field are \texttt{'left'},
+	     \texttt{'middle'} and \texttt{'right'}. If one of these
+	     3~fields are omitted, \texttt{left} and \texttt{down} are
+	     treated as~0, and \texttt{align} field is treated as
+	     \texttt{'left'}.
+The effects of these 3~fields are indicated in Figure~\ref{fig-pos}.
+
+In most cases, \texttt{left} and \texttt{down} fields are~0, while
+it is not uncommon that the \texttt{align} field is \texttt{'middle'} or \texttt{'right'}.
+For example, setting the \texttt{align} field to \texttt{'right'} is practically needed 
+when the current character class is the class for opening delimiters'. 
+\begin{figure}[htb]
+\begin{minipage}{0.4\textwidth}%
+\begin{center}\unitlength=10pt\small
+\begin{picture}(15,12)(-1,-4)
+\color{black!10!white}% real glyph :step1
+\put(0,0){\vrule width 12\unitlength height 8\unitlength depth 3\unitlength}
+
+\color{red!20!white}% real glyph :step1
+\put(-1,-1.5){\vrule width 6\unitlength height 7\unitlength depth 2.5\unitlength}
+
+\color{red}% real glyph
+\thicklines
+\put(-1,-1.5){\vector(0,1){7}\vector(0,-1){2.5}\vector(1,0){6}}
+\put(5,-1.5){\line(0,1){7}\line(0,-1){2.5}}
+\put(-1,5.5){\line(1,0){6}}
+\put(-1,-4){\line(1,0){6}}
+
+\color{green!20!white}% real glyph :step1
+\put(3,0){\vrule width 6\unitlength height 7\unitlength depth 2.5\unitlength}
+
+\color{black}% real glyph :step1
+\thicklines
+\put(0,0){\vector(0,1){8}\line(0,-1){3}\vector(1,0){12}}
+\put(12,0){\line(0,1){8}\vector(0,-1){3}}
+\put(0,8){\line(1,0){12}}
+\put(0,-3){\line(1,0){12}}
+\put(0.2,4){\makebox(0,0)[l]{\texttt{height}}}
+\put(12.2,-1.5){\makebox(0,0)[l]{\texttt{depth}}}
+\put(6,0.2){\makebox(0,0)[b]{\texttt{width}}}
+
+\color{green!50!black}% real glyph :step1
+\thicklines
+\put(3,0){\vector(0,1){7}\vector(0,-1){2.5}\vector(1,0){6}}
+\put(9,0){\line(0,1){7}\line(0,-1){2.5}}
+\put(3,7){\line(1,0){6}}
+\put(3,-2.5){\line(1,0){6}}
+\newsavebox{\eqdist}
+\savebox{\eqdist}(0,0)[b]{%
+  \thinlines
+  \put(-0.08,0.2){\line(0,-1){0.4}}%
+  \put(0.08,0.2){\line(0,-1){0.4}}}
+\put(1.5,0){\usebox{\eqdist}}
+\put(10.5,0){\usebox{\eqdist}}
+
+\color{blue}% shifted
+\thicklines
+\put(3,-1.5){\vector(-1,0){4}}
+\put(1,-1.7){\makebox(0,0)[t]{\texttt{left}}}
+\put(3,0){\vector(0,-1){1.5}}
+\put(3.2,-0.75){\makebox(0,0)[l]{\texttt{down}}}
+\end{picture} 
+\end{center}
+\end{minipage}%
+\begin{minipage}{0.6\textwidth}%
+Consider a node containing Japanese character whose value of the \texttt{align} 
+field is \texttt{'middle'}.
+\begin{itemize}
+\item The black rectangle is a frame of the node.
+Its width, height and depth are specified by JFM.
+\item Since the \texttt{align} field is \texttt{'middle'}, 
+the `real' glyph is centered horizontally (the green rectangle).
+\item Furthermore, the glyph is shifted according to values of fields \texttt{left} and \texttt{down}. The ultimate position of the real glyph is the red rectangle.
+\end{itemize}
+\end{minipage}
+\caption{The position of the `real' glyph}
+\label{fig-pos}
+\end{figure}
+
+
+\item[kern=\{\}]
+\item[glue=\{\}]
+\end{list}
+
+\subsection{Math Font Family}
+
 \section{Parameters}
+\subsection{{\tt\char92 ltjsetparameter} primitive}
+
+\subsection{List of Parameters}
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
 \item[\textsf{kcatcode}\,=\{<chr\_code>,<value>\}]
 \item[\textsf{prebreakpenalty}\,=\{<chr\_code>,<penalty>\}]
