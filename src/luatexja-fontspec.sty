@@ -9,25 +9,28 @@
 
 \ExplSyntaxOn
 
-\cs_new:Npn \ltj_fontspec_warning:n   { \msg_warning:nn   {ltj_fontspec} }
+\cs_new:Npn \ltj_fontspec_warning:n   { \msg_warning:nn   {ltj-fontspec} }
 
-\msg_new:nnn {ltj_fontspec} {addjfontfeatures-ignored}
+\msg_new:nnn {ltj-fontspec} {addjfontfeatures-ignored}
 {
   \string\addjfontfeature (s)~ ignored;\\
   it~ cannot~ be~ used~ with~ a~ font~ that~ wasn't~ selected~ by~ luatexja-fontspec.
 }
 
-\define@key[zf]{options}{JFM}{
-  \fontspec_update_fontid:n  {+jfm=#1}
-  \fontspec_update_featstr:n {jfm=#1}
-}
-
 \cs_new:Nn \ltj_fontspec_select:nn {
   \group_begin:
+  \define@key[zf]{options}{JFM}{
+    \fontspec_update_fontid:n  {+jfm=##1}
+    \fontspec_update_featstr:n {jfm=##1}
+  }
+  \define@key[zf]{preparse-external}{NoEmbed}[]{
+    \cs_set:Nn \fontspec_namewrap:n {psft:####1}
+  }
   \tl_set:Nn \zf@enc {JY3}
-  \tl_set:Nn \g_fontspec_default_fontopts_tl \g_ltj_fontspec_default_fontopts_tl
+  \tl_set:Nx \g_fontspec_default_fontopts_tl 
+             {JFM=ujis,Scale=0.960444,\g_ltj_fontspec_default_fontopts_tl}
   \cs_set_eq:NN \DeclareFontFamily \DeclareKanjiFamily
-  \fontspec_select:nn{JFM=ujis,Scale=0.960444,#1}{#2}
+  \fontspec_select:nn{#1}{#2}
   \group_end:
 }
 
