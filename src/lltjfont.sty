@@ -1,5 +1,5 @@
 %%
-%% luatexja-latex-fonts.sty: derived from plfonts.dtx in pLaTeX.
+%% lltjfont.sty: derived from plfonts.dtx in pLaTeX.
 %% 
 \makeatletter
 \let\k@encoding\@empty
@@ -12,17 +12,17 @@
 \let\k@shape\@empty
 \def\curr@kfontshape{\k@encoding/\k@family/\k@series/\k@shape}
 \def\rel@fontshape{\f@encoding/\f@family/\f@series/\f@shape}
-\newdimen\Cht
-\newdimen\cht
-\newdimen\Cdp
-\newdimen\cdp
-\newdimen\Cwd
-\newdimen\cwd
-\newdimen\Cvs
-\newdimen\cvs
-\newdimen\Chs
-\newdimen\chs
-\newdimen\cHT
+\ifdefined\Cht\else\newdimen\Cht\fi
+\ifdefined\cht\else\newdimen\cht\fi
+\ifdefined\Cdp\else\newdimen\Cdp\fi
+\ifdefined\cdp\else\newdimen\cdp\fi
+\ifdefined\Cwd\else\newdimen\Cwd\fi
+\ifdefined\cwd\else\newdimen\cwd\fi
+\ifdefined\Cvs\else\newdimen\Cvs\fi
+\ifdefined\cvs\else\newdimen\cvs\fi
+\ifdefined\Chs\else\newdimen\Chs\fi
+\ifdefined\chs\else\newdimen\chs\fi
+\ifdefined\cHT\else\newdimen\cHT\fi
 %\let\afont\font
 \def\inlist@#1#2{%
   \def\in@@##1<#1>##2##3\in@@{%
@@ -43,11 +43,11 @@
 \newbox\tstrutbox
 \newbox\zstrutbox
 \def\strut{\relax
-%  \ifydir
+  \ifydir
     \ifmmode\copy\strutbox\else\unhcopy\strutbox\fi
-%  \else
-%    \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi
-%  \fi
+  \else
+    \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi
+  \fi
 }
 \def\tstrut{\relax\hbox{\tate
    \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi}}
