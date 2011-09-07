@@ -22,11 +22,13 @@
 \maketitle
 
 \tableofcontents
+\bigskip
+{\Large\bf This documentation is far from complete. It may have many
+grammatical (and contextual) errors.}
 
 \newpage
 \part{User's manual}
-{\Large\bf This documentation is far from complete. It may have many
-grammatical errors.}
+\makeatletter\the\ltj@@stack,\the\ltj@@group@level,\the\currentgrouplevel.
 
 
 \section{Introduction}
@@ -198,7 +200,6 @@ This does the minimal setting (like {\tt ptex.tex}) for typesetting Japanese doc
 Here \verb+\zw+ is a counterpart of \texttt{em} for Japanese fonts, that is, the length of `full-width' in the current Japanese font.
 \end{itemize}
 
-
 \subsection{Using in \LaTeX}
 \paragraph{\LaTeXe}
 Using in \LaTeXe\ is basically same. To set up the minimal environment
@@ -244,6 +245,7 @@ $f_{高温}$~($f_{\text{high temperature}}$).
 \[ y=(x-1)^2+2\quad{}よって\quad y>0 \]
 $5\in{}素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
 \end{LTXexample}
+
 We (the project members of Lua\TeX-ja) think that using
 Japanese characters in math mode are allowed if these are used as identifiers.
 In this point of view, 
@@ -453,7 +455,31 @@ For example, the following sets banner as `{\tt filename (2012-01-01 17:01)}':
 \part{Reference}\label{part-ref}
 \section{Font Metric and Japanese Font}
 \subsection{\texttt{\char92jfont} primitive}
-Caution: 10pt
+To load a font as a Japanese font, you must use the
+\verb+\jfont+ primitive instead of~\verb+\font+, while
+\verb+\jfont+ admits the same syntax used in~\verb+\font+. 
+Lua\TeX-ja automatically loads \texttt{luaotfload} package,
+so TrueType/OpenType fonts with features can be used for Japanese fonts:
+\begin{LTXexample}
+\jfont\tradgt={file:ipaexg.ttf:script=latn;%
+  +trad;jfm=ujis} at 14pt
+\tradgt{}当／体／医／区
+\end{LTXexample}
+
+Note that the defined control sequence (\verb+\tradgt+ in the example above) using \verb+\jfont+ is not a \textit{font\_def} token.
+
+\paragraph{Prefix}
+Besides \texttt{file:} and \texttt{name:} prefixes, \texttt{psft:} can
+be used a prefix in \verb+\jfont+ (and~\verb+\font+) primitive..  Using
+this prefix, you can specify a font that has its name only and is not
+related to any real font.
+
+The typical use of this \texttt{psft:} prefix is ...
+
+\paragraph{Features}
+
+
+
 
 \subsection{Structure of JFM file}
 A JFM file is a Lua script which has only one function call:
@@ -534,7 +560,7 @@ In most cases, \texttt{left} and \texttt{down} fields are~0, while
 it is not uncommon that the \texttt{align} field is \texttt{'middle'} or \texttt{'right'}.
 For example, setting the \texttt{align} field to \texttt{'right'} is practically needed 
 when the current character class is the class for opening delimiters'. 
-\begin{figure}[htb]
+\begin{figure}[tb]
 \begin{minipage}{0.4\textwidth}%
 \begin{center}\unitlength=10pt\small
 \begin{picture}(15,12)(-1,-4)
@@ -595,7 +621,9 @@ field is \texttt{'middle'}.
 Its width, height and depth are specified by JFM.
 \item Since the \texttt{align} field is \texttt{'middle'}, 
 the `real' glyph is centered horizontally (the green rectangle).
-\item Furthermore, the glyph is shifted according to values of fields \texttt{left} and \texttt{down}. The ultimate position of the real glyph is the red rectangle.
+\item Furthermore, the glyph is shifted according to values of fields
+      \texttt{left} and \texttt{down}. The ultimate position of the real
+      glyph is indicated by the red rectangle.
 \end{itemize}
 \end{minipage}
 \caption{The position of the `real' glyph}
@@ -613,6 +641,13 @@ the `real' glyph is centered horizontally (the green rectangle).
 \subsection{{\tt\char92 ltjsetparameter} primitive}
 
 \subsection{List of Parameters}
+In the following list of parameters, 
+\begin{itemize}
+\item `\ast' : local
+\item `\dagger' always global
+\item No mark: the last of paragraph
+\end{itemize}
+
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
 \item[\textsf{kcatcode}\,=\{<chr\_code>,<value>\}]
 \item[\textsf{prebreakpenalty}\,=\{<chr\_code>,<penalty>\}]
@@ -620,19 +655,101 @@ the `real' glyph is centered horizontally (the green rectangle).
 \item[\textsf{jatextfont}\,=\{<jfam>,<jfont\_cs>\}]
 \item[\textsf{jascriptfont}\,=\{<jfam>,<jfont\_cs>\}]
 \item[\textsf{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}]
-\item[\textsf{yjabaselineshift}\,=<dimen>]
-\item[\textsf{yalbaselineshift}\,=<dimen>]
+\item[\textsf{yjabaselineshift}\,=<dimen>$^\ast$]
+\item[\textsf{yalbaselineshift}\,=<dimen>$^\ast$]
 \item[\textsf{jaxspmode}\,=\{<chr\_code>,<mode>\}]
 \item[\textsf{alxspmode}\,=\{<chr\_code>,<mode>\}]
-\item[\textsf{autospacing}\,=<bool>]
-\item[\textsf{autoxspacing}\,=<bool>]
+\item[\textsf{autospacing}\,=<bool>$^\ast$]
+\item[\textsf{autoxspacing}\,=<bool>$^\ast$]
 \item[\textsf{kanjiskip}\,=<skip>]
 \item[\textsf{xkanjiskip}\,=<skip>]
 \item[\textsf{jcharwidowpenalty}\,=<penalty>]
-\item[\textsf{differentjfm}\,=<mode>]
-\item[\textsf{jacharrange}\,=<ranges>]
+\item[\textsf{differentjfm}\,=<mode>$^\dagger$]
+\item[\textsf{jacharrange}\,=<ranges>$^\ast$]
 \end{list}
 \section{Other Primitives}
 \section{Control Sequences for \LaTeXe}
 \part{Implementations}\label{part-imp}
+\section{Storing Parameters}
+\subsection{Used Dimensions and Attributes}
+Here the following is the list of dimension and attributes which are used in Lua\TeX-ja.
+\begin{list}{}{%
+\def\makelabel{\ttfamily}
+\def\dim#1{\item[\char92 #1\ \textrm{(dimension)}]}
+\def\attr#1{\item[\char92 #1\ \textrm{(attribute)}]}
+}
+
+\dim{jQ}
+\dim{jH}
+\dim{ltj@zw}
+\dim{ltj@zh}
+\attr{jfam} 
+\attr{ltj@curjfnt} The font index of current Japanese font.
+\attr{ltj@charclass} The character class of Japanese \textit{glyph\_node}.
+\attr{ltj@yablshift} The amount of shifting the baseline of alphabetic
+			fonts in scaled point ($2^{-16}\,\textrm{pt}$).
+\attr{ltj@ykblshift} The amount of shifting the baseline of Japanese
+			fonts in scaled point ($2^{-16}\,\textrm{pt}$).
+\attr{ltj@autospc} Whether the auto insertion of \textsf{kanjiskip} is allowed at the node.
+\attr{ltj@autoxspc} Whether the auto insertion of \textsf{xkanjiskip} is allowed at the node.
+\attr{ltj@icflag} For distinguishing `kinds' of the node. To this
+			attribute, one of the following value is
+			assigned:
+\begin{description}
+\item[ITALIC (1)]
+\item[PACKED (2)]
+\item[KINSOKU (3)]
+\item[FROM\_JFM (4)]
+\item[LINE\_END (5)]
+\item[KANJI\_SKIP (6)]
+\item[XKANJI\_SKIP (7)]
+\item[PROCESSED (8)]
+\item[IC\_PROCESSED (9)]
+\item[BOXBDD (15)]
+\end{description}
+\attr{ltj@kcat$i$} Where $i$~is a natural number which is less than~8.
+These 8~attributes store bit~vectors indicating ...
+\end{list}
+
+\subsection{Stack System of Lua\TeX-ja}
+\paragraph{Overview}
+Lua\TeX-ja has its own stack system, and most parameters of Lua\TeX-ja
+are stored in it.  To clarify the reason, imagine the parameter
+\textsf{kanjiskip} is stored by a skip, and consider the following
+source:
+\begin{LTXexample}
+\ltjsetparameter{kanjiskip=0pt}ふがふが.%
+\setbox0=\hbox{\ltjsetparameter{kanjiskip=5pt}ほげほげ}
+\box0.ぴよぴよ\par
+\end{LTXexample}
+
+As described in Part~\ref{part-ref}, the only effective value of
+\textsf{kanjiskip} in an hbox is the latest value, so the value of
+\textsf{kanjiskip} which applied in the entire hbox should be 5\,pt.
+However, by the implementation method of Lua\TeX, this `5\,pt' cannot be
+known from any callbacks.  In the \texttt{tex/packaging.w} (which is a
+file in the source of Lua\TeX), there are the following codes:
+\begin{lstlisting}
+void package(int c)
+{
+    scaled h;                   /* height of box */
+    halfword p;                 /* first node in a box */
+    scaled d;                   /* max depth */
+    int grp;
+    grp = cur_group;
+    d = box_max_depth;
+    unsave();
+    save_ptr -= 4;
+    if (cur_list.mode_field == -hmode) {
+        cur_box = filtered_hpack(cur_list.head_field,
+                                 cur_list.tail_field, saved_value(1),
+                                 saved_level(1), grp, saved_level(2));
+        subtype(cur_box) = HLIST_SUBTYPE_HBOX;
+\end{lstlisting}
+Notice that \verb+unsave+ is executed \emph{before}
+\verb+filtered_hpack+ (this is where \verb+hpack_filter+ callback is
+executed): so `5\,pt' in the above source is orphaned at
+\texttt+unsave+, and hence it can't be accessed from \verb+hpack_filter+
+callback.
+
 \end{document}

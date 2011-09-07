@@ -23,12 +23,16 @@ function get_stack_level()
    local j = tex.currentgrouplevel
    if j > tex.getcount('ltj@@group@level') then
       i = i+1 -- new stack level
+      local gd = tex.globaldefs
+      if gd>0 then tex.globaldefs = 0 end
+      --  'tex.globaldefs = 0' is local even if \globaldefs > 0.
       tex.setcount('ltj@@group@level', j)
       for k,v in pairs(charprop_stack_table) do -- clear the stack above i
 	 if k>=i then charprop_stack_table[k]=nil end
       end
       charprop_stack_table[i] = table.fastcopy(charprop_stack_table[i-1])
       tex.setcount('ltj@@stack', i)
+      if gd>0 then tex.globaldefs = gd end
       local g = node_new(id_whatsit, sid_user)
       g.user_id=30112; g.type=100; g.value=j; node.write(g)
    end
