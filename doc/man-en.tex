@@ -18,6 +18,7 @@
 
 \catcode`\<=13
 \def<#1>{{\normalfont\itshape$\langle$#1$\rangle$}}
+\parskip=\smallskipamount
 \begin{document}
 \maketitle
 
@@ -28,8 +29,6 @@ grammatical (and contextual) errors.}
 
 \newpage
 \part{User's manual}
-\makeatletter\the\ltj@@stack,\the\ltj@@group@level,\the\currentgrouplevel.
-
 
 \section{Introduction}
 
@@ -45,34 +44,35 @@ blessing: p\TeX\ is left behind from other extensions of \TeX,
 especially $\varepsilon$-\TeX\ and pdf\TeX, and from changes about
 Japanese processing in computers (\textit{e.g.}, the UTF-8 encoding).
 
-Recently the extensions of p\TeX, namely up\TeX\ (Unicode-implementation
-of p\TeX) and $\varepsilon$-p\TeX\ (Merging of p\TeX and
-$\varepsilon$-\TeX\ extension), have developed to fill those gap to some
+Recently extensions of p\TeX, namely up\TeX\ (Unicode-implementation
+of p\TeX) and $\varepsilon$-p\TeX\ (merging of p\TeX and
+$\varepsilon$-\TeX\ extension), have developed to fill those gaps to some
 extent, but gaps are still exist.
 
 However, the appearance of Lua\TeX\ changed the whole situation. With
 using Lua `callbacks', users can customize the internal processing of
-Lua\TeX. So there is no need to modify sources of the \TeX\ engine to
+Lua\TeX. So there is no need to modify sources of engines to
 support Japanese typesetting: to do this, we only have to write Lua
-script for appropriate callbacks.
+scripts for appropriate callbacks.
 
 
 \subsection{Major Changes from p\TeX}
-The Lua\TeX-ja package is much influenced by p\TeX\ engine. The initial
+The Lua\TeX-ja package is under much influence of p\TeX\ engine. The initial
 target of development was to implement features of p\TeX. However,
-\emph{Lua\TeX-ja is not a just porting of p\TeX: Unnatural
+\emph{Lua\TeX-ja is not a just porting of p\TeX; unnatural
 specifications/behaviors of p\TeX\ were not adopted}.
 
 The followings are major changes from p\TeX:
 \begin{itemize}
-\item Japanese fonts are a tuple of a `real' font, a Japanese font
+\item A Japanese font is a tuple of a `real' font, a Japanese font
       metric (\textbf{JFM}, for short), and an optional string called
       `variation'.
 
 \item In p\TeX, a linebreak after Japanese character is ignored (and
-      doesn't yield a space), since Japanese texts can linebreak almost
-      everywhere. However, Lua\TeX-ja doesn't have this function
-      completely, because of a specification of Lua\TeX.
+      doesn't yield a space), since linebreaks (in source files) are
+      permitted almost everywhere in Japanese texts. However, Lua\TeX-ja
+      doesn't have this function completely, because of a specification
+      of Lua\TeX.
 \item The insertion process of glues/kerns between two Japanese
       characters and between a Japanese character and other characters
       (we refer these glues/kerns as \textbf{JAglue}) is rewritten from
@@ -88,7 +88,7 @@ The followings are major changes from p\TeX:
 \item In the process, two Japanese fonts which differ in their `real'
       fonts only are identified.
 \end{itemize}
-\item At the present, vertical typesetting (\textit{tategaki}), is not
+\item At the present, vertical typesetting (\emph{tategaki}), is not
       supported in Lua\TeX-ja.
 
 \end{itemize} 
@@ -104,10 +104,12 @@ In this document, the following terms and notations are used:
       Japanese.'
 \item \textbf{ALchar}: standing for all other characters like alphabets. 
 \end{itemize}
-\item A word in sans-serif font (like \textsf{prebreakpenalty})
+We say `alphabetic fonts' for fonts used in \textbf{ALchar}, and `Japanese fonts' for fonts used in \textbf{JAchar}.
+
+\item A word in a sans-serif font (like \textsf{prebreakpenalty})
       represents an internal parameter for Japanese typesetting, and it
       is used as a key in \verb+\ltjsetparameter+ command.
-\item The word ``primitive'' is used not only for primitives in Lua\TeX,
+\item The word `primitive' is used not only for primitives in Lua\TeX,
       but also for control sequences that defined in the core module of
       Lua\TeX-ja.
 \end{itemize}
@@ -131,7 +133,7 @@ This project is hosted by SourceForge.JP.
 \subsection{Installation}
 To install the Lua\TeX-ja\ package, you will need:
 \begin{itemize}
-\item Lua\TeX, version 0.65.0-beta or later.\\
+\item Lua\TeX\ (version 0.65.0-beta or later) and its supporting packages.\\
 If you are using \TeX~Live\ 2011 or W32\TeX, you don't have to worry.
 \item The source archive of Lua\TeX-ja, of course{\tt:)}
 \end{itemize}
@@ -146,7 +148,7 @@ You can retrieve the Git repository via
 \begin{verbatim}
 $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
 \end{verbatim} 
-or download the archive of HEAD in the master branch from
+or download the archive of HEAD in \texttt{master} branch from
 \begin{flushleft}
 \url{http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git;a=snapshot;h=HEAD;sf=tgz}.
 \end{flushleft}
@@ -158,7 +160,9 @@ or download the archive of HEAD in the master branch from
 \subsection{Cautions}
 \begin{itemize}
 \item The encoding of your source file must be UTF-8. 
-\item conflicts with unicode-math
+\item Not well-tested. In particular, the default setting of the range
+      of \textbf{JAchar} in the present version does not coexist with
+      other packages which use Unicode fonts. 
 \end{itemize}
 
 \subsection{Using in plain \TeX}
@@ -167,15 +171,15 @@ To use Lua\TeX-ja in plain \TeX, simply put the following  at the beginning of t
 \input luatexja.sty
 \end{verbatim}
 
-This does the minimal setting (like {\tt ptex.tex}) for typesetting Japanese documents:
+This does minimal settings (like {\tt ptex.tex}) for typesetting Japanese documents:
 \begin{itemize}
-\item The following 6 Japanese fonts are preloaded.
+\item The following 6~Japanese fonts are preloaded:
 \begin{center}
 \begin{tabular}{ccccc}
 \toprule
 \textbf{classification}&\textbf{font name}&\textbf{13.5\,Q}&\textbf{9.5\,Q}&\textbf{7\,Q}\\\midrule
-\textit{mincho}&Ryumin-Light    &\verb+\tenmin+&\verb+\sevenmin+&\verb+\fivemin+\\
-\textit{gothic}&GothicBBB-Medium&\verb+\tengt+ &\verb+\sevengt+ &\verb+\fivegt+\\
+\emph{mincho}&Ryumin-Light    &\verb+\tenmin+&\verb+\sevenmin+&\verb+\fivemin+\\
+\emph{gothic}&GothicBBB-Medium&\verb+\tengt+ &\verb+\sevengt+ &\verb+\fivegt+\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -185,19 +189,22 @@ This does the minimal setting (like {\tt ptex.tex}) for typesetting Japanese doc
       dimension \verb+\jQ+.
 
 \item It is widely accepted that the font `Ryumin-Light' and
-      `GothicBBB-Medium' aren't embedded into PDF files, and the PDF
-      reader substitutes them by some external Japanese font. We adopt
-      this custom to the default setting.
-\item size
+      `GothicBBB-Medium' aren't embedded into PDF files, and PDF reader
+      substitute them by some external Japanese fonts (\textit{e.g.},
+      Kozuka Mincho is used in Adobe Reader). We adopt this custom to
+      the default setting.
+\item You may notice that size of above fonts is slightly smaller than
+      their alphabetic counterparts: for example, the size
+      \verb+\texmin+ is $13.5\,\textrm{Q}\simeq 9.60444\,\textrm{pt}$. This is intensional: ...
 \end{itemize}
 \item A character in Unicode is treated as \textbf{JAchar} if and only
       if its code-point has more than or equal to U+0100.
-\item The amount of glue that are inserted between \textbf{JAchar} and
-      \textbf{ALchar} (the parameter \textsf{xkanjiskip}) is set to
+\item The amount of glue that are inserted between a \textbf{JAchar} and
+      an \textbf{ALchar} (the parameter \textsf{xkanjiskip}) is set to
 \[
  0.25\,\hbox{\verb+\zw+}^{+1\,\text{pt}}_{-1\,\text{pt}} = \frac{27}{32}\,\mathrm{mm}^{+1\,\text{pt}}_{-1\,\text{pt}}.
 \]
-Here \verb+\zw+ is a counterpart of \texttt{em} for Japanese fonts, that is, the length of `full-width' in the current Japanese font.
+Here \verb+\zw+ is the counterpart of \texttt{em} for Japanese fonts, that is, the length of `full-width' in current Japanese font.
 \end{itemize}
 
 \subsection{Using in \LaTeX}
@@ -207,33 +214,34 @@ for Japanese, you only have to load {\tt luatexja.sty}:
 \begin{verbatim}
 \usepackage{luatexja}
 \end{verbatim}
-It also does the minimal setting (the counterpart in p\LaTeX\ is  {\tt
+It also does minimal settings (counterparts in p\LaTeX\ are {\tt
 plfonts.dtx} and {\tt pldefs.ltx}):
 
 \begin{itemize}
-\item {\tt JY3} is used as the font encoding for Japanese fonts (in horizontal direction).\\
-If vertical typesetting is supported by Lua\TeX-ja, {\tt JT3} will be used for vertical fonts.
+\item {\tt JY3} is the font encoding for Japanese fonts (in horizontal direction).\\
+When vertical typesetting is supported by Lua\TeX-ja in the future, {\tt JT3} will be used for vertical fonts.
 \item Two font families {\tt mc} and {\tt gt} are defined: 
 \begin{center}
 \begin{tabular}{ccccc}
 \toprule
 \textbf{classification}&\textbf{family}&\verb+\mdseries+&\verb+\bfseries+&\textbf{scale}\\\midrule
-\textit{mincho}&\tt mc&Ryumin-Light    &GothicBBB-Medium&0.960444\\
-\textit{gothic}&\tt gt&GothicBBB-Medium&GothicBBB-Medium&0.960444\\
+\emph{mincho}&\tt mc&Ryumin-Light    &GothicBBB-Medium&0.960444\\
+\emph{gothic}&\tt gt&GothicBBB-Medium&GothicBBB-Medium&0.960444\\
 \bottomrule
 \end{tabular}
 \end{center}
+\textbf{Note on fonts in bold series}
+
 \item Japanese characters in math mode are typeset by the font family {\tt mc}.
 \end{itemize}
 
-However, the above setting is not sufficient for Japanese-based documents. To do this, 
-You are better to use class files other than {\tt article.cls}, {\tt book.cls}, ...
-The better alternatives are:
-\begin{itemize}
-\item BXjscls
-\item ltjarticle, ltjbook?
-\item ltjsarticle, ltjsbook?
-\end{itemize}
+However, above settings are not sufficient for Japanese-based
+documents. To typeset Japanese-based documents, You are better to use
+class files other than {\tt article.cls}, {\tt book.cls}, ...  At the
+present, BXjscls (\texttt{bxjsarticle.cls} and \texttt{bxjsbook.cls}, by
+Takayuki Yato) are better alternative. It is not determined whether
+Lua\TeX-ja will develop and contain counterparts of major classes used
+in p\TeX\ (including jsclasses by Haruhiko Okumura).
 
 \subsection{Changing Fonts}
 \paragraph{Remark: Japanese Characters in Math Mode}
@@ -247,14 +255,13 @@ $5\in{}素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
 \end{LTXexample}
 
 We (the project members of Lua\TeX-ja) think that using
-Japanese characters in math mode are allowed if these are used as identifiers.
+Japanese characters in math mode are allowed if and only if these are used as identifiers.
 In this point of view, 
 \begin{itemize}
 \item The lines 1~and~2 above are not correct, since `高温' in above is used as a textual label, and
 `よって' is used as a conjunction. 
 \item However, the line~3 is correct, since `素' is used as an identifier.
 \end{itemize}
-
 Hence, in our opinion, the above input should be corrected as:
 \begin{LTXexample}
 $f_{\text{高温}}$~%
@@ -264,12 +271,9 @@ $f_{\text{高温}}$~%
 $5\in{}素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
 \end{LTXexample}
 %BUG?: \{\}がなければ「素」がでない．上の段落の「よって」もでてない．
-
-
-どう繋ごうか？
-
-In this chapter, we don't describe how to change Japanese fonts in
-math mode. For the method, please see Part~\ref{part-ref}.
+We also believe that using Japanese characters as identifiers is rare,
+hence we don't describe how to change Japanese fonts in math mode in
+this chapter. For the method, please see Part~\ref{part-ref}.
 
 
 \paragraph{plain \TeX}
@@ -278,12 +282,13 @@ To change Japanese fonts in plain \TeX, you must use the primitive
 
 
 \paragraph{NFSS2}
-For \LaTeXe, Lua\TeX-ja simply adopted font selection system from that
-of p\LaTeXe\ (in: {\tt plfont.dtx}).
+For \LaTeXe, Lua\TeX-ja simply adopted the font selection system from that
+of p\LaTeXe\ (in {\tt plfonts.dtx}).
 \begin{itemize}
 \item Two control sequences \verb+\mcdefault+ and \verb+\gtdefault+ are
-      used to specify the default font family for \textit{mincho} and
-      \textit{gothic}, respectively.
+      used to specify the default font families for \emph{mincho} and
+      \emph{gothic}, respectively. Default values: \texttt{mc} for
+      \verb+\mcdefault+ and \texttt{gt} for \verb+\gtdefault+.
 \item Commands \verb+\fontfamily+, \verb+\fontseries+,
       \verb+\fontshape+ and \verb+\selectfont+ can be used to change
       attributes of Japanese fonts. 
@@ -305,12 +310,12 @@ auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---\\
 \end{itemize}
 
 \paragraph{fontspec}
-To use with \texttt{fontspec} package, it is needed to load
+To coexist with \texttt{fontspec} package, it is needed to load
 \texttt{luatexja-fontspec} package in the preamble. This additional
 package automatically loads \texttt{luatexja} and \texttt{fontspec}
 package, if needed.
 
-In \texttt{luatexja-fontspec} package, the following 4 commands are defined as
+In \texttt{luatexja-fontspec} package, the following 7~commands are defined as
 counterparts of original commands in \texttt{fontspec}:
 \begin{center}
 \begin{tabular}{ccccc}
@@ -319,25 +324,33 @@ Japanese fonts
 &\verb+\jfontspec+&\verb+\setmainjfont+&\verb+\setsansjfont+&\verb+\newjfontfamily+\\
 alphabetic fonts
 &\verb+\fontspec+&\verb+\setmainfont+&\verb+\setsansfont+&\verb+\newfontfamily+\\
+\midrule
+Japanese fonts
+&\verb+\newjfontface+&\verb+\defaultjfontfeatures+&\verb+\addjfontfeatures+\\
+alphabetic fonts
+&\verb+\newfontface+&\verb+\defaultfontfeatures+&\verb+\addfontfeatures+\\
 \bottomrule
 \end{tabular}
 \end{center}
+使用例
+
 
 Note that there is no command named \verb+\setmonojfont+, since it is
-popular for Japanese fonts that (nearly) all Japanese glyphs have the same width.
+popular for Japanese fonts that nearly all Japanese glyphs have same widths.
 
 
 \section{Changing Parameters}
-There are many parameters in Lua\TeX-ja. And due to the implementation,
-most of them were not stored as internal register of \TeX, but as an
-original storage system in Lua\TeX-ja. Hence, to change or recall those
+There are many parameters in Lua\TeX-ja. And due to the behavior of Lua\TeX,
+most of them are not stored as internal register of \TeX, but as an
+original storage system in Lua\TeX-ja. Hence, to assign or acquire those
 parameters, you have to use commands \verb+\ltjsetparameter+ and
 \verb+\ltjgetparameter+.
 
 \subsection{Editing the range of \textbf{JAchar}}
 As noted before, the default setting is:
 \begin{center}
-A character in Unicode is treated as \textbf{JAchar} if and only if its
+A character in Unicode is treated as \textbf{JAchar},\\
+ if and only if its
  code-point has more than or equal to U+0100.
 \end{center}
 $\uparrow$ TODO: CHANGE THIS!
@@ -349,8 +362,8 @@ $\uparrow$ TODO: CHANGE THIS!
 \subsection{\textsf{kanjiskip} and \textsf{xkanjiskip}}\label{subs-kskip}
 \textbf{JAglue} is divided into the following three categories:
 \begin{itemize}
-\item Glues/kerns specified in JFM. If \verb+\inhibitglue+ is issued,
-      this glue will be not inserted.
+\item Glues/kerns specified in JFM. If \verb+\inhibitglue+ is issued around a Japanese character,
+      this glue will be not inserted at the place.
 \item The default glue which inserted between two \textbf{JAchar}s ({\sf
       kanjiskip}).
 \item The default glue which inserted between a \textbf{JAchar} and an
@@ -371,13 +384,13 @@ To use these data from JFM, set the value of \textsf{kanjiskip} or
 
 \subsection{Insertion Setting of \textsf{xkanjiskip}}
 It is not desirable that \textsf{xkanjiskip} is inserted between every
-boundary between \textbf{JAchar} and \textbf{ALchar}. For example,
+boundary between \textbf{JAchar}s and \textbf{ALchar}s. For example,
 \textsf{xkanjiskip} should not be inserted after opening parenthesis
 (\textit{e.g.}, compare `(あ' and `(\hskip\ltjgetparameter{xkanjiskip}あ').
 
 Lua\TeX-ja can control whether \textsf{xkanjiskip} can be inserted
-before/after a character, by using \textsf{jaxspmode} and
-\textsf{alxspmode} parameters. 
+before/after a character, by changing \textsf{jaxspmode} for \textbf{JAchar}s and
+\textsf{alxspmode} parameters \textbf{ALchar}s respectively. 
 \begin{LTXexample}
 \ltjsetparameter{jaxspmode={`あ,preonly}, alxspmode={`\!,postonly}} 
 pあq い!う
@@ -386,21 +399,24 @@ pあq い!う
 The second argument {\tt preonly} means `the insertion of
 \textsf{xkanjiskip} is allowed before this character, but not after'.
 the other possible values are {\tt postonly}, {\tt allow} and {\tt
-inhibit}.
+inhibit}. For the compatibility with p\TeX, natural numbers between
+0~and~3 are also allowed as the second argument\footnote{But we don't
+recommend this: since numbers 1~and~2 have opposite meanings in
+\textsf{jaxspmode} and \textsf{alxspmode}.}.
 
-If you want to enable/disable all insertion of \textsf{kanjiskip} and
+If you want to enable/disable all insertions of \textsf{kanjiskip} and
 \textsf{xkanjiskip}, set \textsf{autospacing} and \textsf{autoxspacing}
 parameters to {\tt false}, respectively.
 
 
 \subsection{Shifting Baseline}
 To make a match between a Japanese font and an alphabetic font, sometimes
-the shifting of baseline of one of the pair. In p\TeX, this is achieved
+shifting of the baseline of one of the pair is needed. In p\TeX, this is achieved
 by setting \verb+\ybaselineshift+ to a non-zero length (the
 baseline of alphabetic fonts is shifted below). However, for documents
-whose main language is not Japanese,it is good to shift the baseline of
+whose main language is not Japanese, it is good to shift the baseline of
 Japanese fonts, but not that of alphabetic fonts.
-Because of this, Lua\TeX-ja can be independently set the shifting amount
+Because of this, Lua\TeX-ja can independently set the shifting amount
 of the baseline of alphabetic fonts (\textsf{yalbaselineshift}
 parameter) and that of Japanese fonts (\textsf{yjabaselineshift}
 parameter). 
@@ -410,13 +426,11 @@ parameter).
 \ltjsetparameter{yjabaselineshift=0pt, yalbaselineshift=0pt}abcあいう
 \ltjsetparameter{yjabaselineshift=5pt, yalbaselineshift=2pt}abcあいう
 \end{LTXexample}
-
 Here the horizontal line in above is the baseline of a line.
 
-There is an interesting side-effect from that the baseline of
-Japanese fonts can be shifted: characters in different size can be
+There is an interesting side-effect: characters in different size can be
 vertically aligned center in a line, by setting two parameters appropriately.
-
+The following is an example (beware the value is not well tuned):
 \begin{LTXexample}
 xyz漢字 
 {\scriptsize
@@ -466,18 +480,23 @@ so TrueType/OpenType fonts with features can be used for Japanese fonts:
 \tradgt{}当／体／医／区
 \end{LTXexample}
 
-Note that the defined control sequence (\verb+\tradgt+ in the example above) using \verb+\jfont+ is not a \textit{font\_def} token.
+Note that the defined control sequence
+(\verb+\tradgt+ in the example above) using \verb+\jfont+ is not a
+\textit{font\_def} token, hence the input like
+\verb+\fontname\tradgt+ causes a error. We denote control sequences which are defined in \verb+\jfont+
+by <jfont\_cs>.
 
 \paragraph{Prefix}
-Besides \texttt{file:} and \texttt{name:} prefixes, \texttt{psft:} can
-be used a prefix in \verb+\jfont+ (and~\verb+\font+) primitive..  Using
+Besides \texttt{file:}\ and \texttt{name:}\ prefixes, \texttt{psft:}\ can
+be used a prefix in \verb+\jfont+ (and~\verb+\font+) primitive.  Using
 this prefix, you can specify a font that has its name only and is not
 related to any real font.
 
-The typical use of this \texttt{psft:} prefix is ...
+Mainly, use of this \texttt{psft:}\ prefix is for using non-embedding `standard' Japanese fonts (Ryumin-Light and GothicBBB-Medium).
+歴史
 
 \paragraph{Features}
-
+jfm, jfmvar
 
 
 
@@ -487,7 +506,7 @@ A JFM file is a Lua script which has only one function call:
 luatexja.jfont.define_jfm { ... }
 \end{verbatim}
 Real data are stored in the table which indicated above by
-\verb+{ ... }+.  So, the rest of subsection are devoted to describe the
+\verb+{ ... }+.  So, the rest of this subsection are devoted to describe the
 structure of this table.  Note that all lengths in a JFM file are
 floating-point numbers in design-size unit.
 
@@ -498,18 +517,18 @@ The direction of JFM. At the present, only \texttt{'yoko'} is supported.
 
 \item[zw=<length>] (required)
 
-The amount of the length of the `full-width.
+The amount of the length of the `full-width'.
 
 \item[zh=<length>] (required)
 
 \item[kanjiskip=\{<natural>, <stretch>, <shrink>\}] (optional)
 
 This field specifies the `ideal' amount of \textsf{kanjiskip}. As noted
-	     in Subsection~\ref{subs-kskip}, if \textsf{kanjiskip} is
-	     \verb+\maxdimen+, the value specified in this field is used
-	     (if this field is not specified in JFM, 0\,pt is
-	     used). Note that <stretch> and <shrink> fields are in
-	     design-size unit too.
+	     in Subsection~\ref{subs-kskip}, if the parameter
+	     \textsf{kanjiskip} is \verb+\maxdimen+, the value specified
+	     in this field is actually used (if this field is not specified in
+	     JFM, it is regarded as 0\,pt). Note that <stretch> and <shrink>
+	     fields are in design-size unit too.
 
 
 \item[xkanjiskip=\{<natural>, <stretch>, <shrink>\}] (optional)
@@ -529,26 +548,27 @@ the following fields:
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
 \item[chars=\{<character>, ...\}] (required except character class~0)
 
-This field is a list of \textbf{JAchar}s which are in this character
+This field is a list of characters which are in this character
 	     type~$i$. This field is not required if $i=0$, since all
 	     \textbf{JAchar} which are not in any character class other
 	     than 0 (hence, the character class~0 contains most of
-	     \textbf{JAchar}s). In the list, a \textbf{JAchar} can be
+	     \textbf{JAchar}s). In the list, a character can be
 	     specified by its code number, or by the character itself
-	     (as a string of length~1).
+	     (as a string of length~1). 
 
 In addition to those `real' characters, the following `imaginary
 	     characters' can be specified in the list:
 
-\item[width=<length>, height=<length>, depth=<length>, italic=<length>]\ 
+\item[width=<length>, height=<length>, depth=<length>, italic=<length>]\ (required)
 
 Specify width of characters in character class~$i$, height, depth and
-the amount of italic correction.  These fields are required.
-
+the amount of italic correction. All characters in character class~$i$ are regarded that its width, height and depth are
+as values of these fields. 
+But there is one exception: if \texttt{'prop'} is specified in \texttt{width} field, width of a character becomes that of its `real' glyph 
 
 \item[left=<length>, down=<length>, align=<align>]\ 
 
-These are for adjusting the position of the `real' glyph. Legal
+These fields are for adjusting the position of the `real' glyph. Legal
 	     values of \texttt{align} field are \texttt{'left'},
 	     \texttt{'middle'} and \texttt{'right'}. If one of these
 	     3~fields are omitted, \texttt{left} and \texttt{down} are
@@ -631,14 +651,59 @@ the `real' glyph is centered horizontally (the green rectangle).
 \end{figure}
 
 
-\item[kern=\{\}]
-\item[glue=\{\}]
+\item[kern={\{[$j$]=<kern>, ...\}}]
+
+\item[glue={\{[$j$]=\{<width>, <stretch>, <shrink>\}, ...\}}]
 \end{list}
 
 \subsection{Math Font Family}
 
+\begin{center}\def\{{\char`\{}\def\}{\char`\}}
+\begin{tabular}{lll}
+\toprule
+&Japanese fonts&alphabetic fonts\\
+font family&\verb+\jfam+&\verb+\fam+\\
+text size&\tt\textsf{jatextfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\verb+\textfont+<fam>=<font\_cs>\\
+script size&\tt\textsf{jascriptfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\verb+\scriptfont+<fam>=<font\_cs>\\
+scriptscript size&\tt\textsf{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\verb+\scriptscriptfont+<fam>=<font\_cs>\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+
 \section{Parameters}
 \subsection{{\tt\char92 ltjsetparameter} primitive}
+As noted before, \verb+\ltjsetparameter+ and \verb+\ltjgetparameter+ are
+primitives for accessing most parameters of Lua\TeX-ja. One of the main
+reason that Lua\TeX-ja didn't adopted the syntax similar to that of p\TeX\ 
+(\textit{e.g.},~\verb+\prebreakpenalty`）=10000+) 
+is the position of \verb+hpack_filter+ callback in the source
+of Lua\TeX, see Section~\ref{sec-para}.
+
+\verb+\ltjsetparameter+ and \verb+\ltjglobalsetparameter+ are primitives
+for assigning parameters. These take one argument which is a
+\texttt{<key>=<value>} list. Allowed keys are described in the next
+subsection.  
+The difference between
+\verb+\ltjsetparameter+ and \verb+\ltjglobalsetparameter+ is only the
+scope of assignment;
+\verb+\ltjsetparameter+ does a local assignment and 
+\verb+\ltjglobalsetparameter+ does a global one. 
+They also obey the value of \verb+\globaldefs+,
+like other assignment.
+
+\verb+\ltjgetparameter+ is the primitive for acquiring parameters. It
+always takes a parameter name as first argument, and also takes the
+additional argument---a character code, for example---in some cases.
+\begin{LTXexample}
+\ltjgetparameter{differentjfm}, 
+\ltjgetparameter{autospacing},
+\ltjgetparameter{prebreakpenalty}{`）}.
+\end{LTXexample}
+\emph{The return value of\/ {\normalfont\tt\char92ltjgetparameter} is
+always a string}. This is outputted by \texttt{tex.write()}, so any
+character other than space~` '~(U+0020) has the category code
+12~(other), while the space has 10~(space).
 
 \subsection{List of Parameters}
 In the following list of parameters, 
@@ -670,7 +735,7 @@ In the following list of parameters,
 \section{Other Primitives}
 \section{Control Sequences for \LaTeXe}
 \part{Implementations}\label{part-imp}
-\section{Storing Parameters}
+\section{Storing Parameters}\label{sec-para}
 \subsection{Used Dimensions and Attributes}
 Here the following is the list of dimension and attributes which are used in Lua\TeX-ja.
 \begin{list}{}{%
@@ -712,7 +777,7 @@ These 8~attributes store bit~vectors indicating ...
 \end{list}
 
 \subsection{Stack System of Lua\TeX-ja}
-\paragraph{Overview}
+\paragraph{Background}
 Lua\TeX-ja has its own stack system, and most parameters of Lua\TeX-ja
 are stored in it.  To clarify the reason, imagine the parameter
 \textsf{kanjiskip} is stored by a skip, and consider the following
@@ -752,4 +817,42 @@ executed): so `5\,pt' in the above source is orphaned at
 \texttt+unsave+, and hence it can't be accessed from \verb+hpack_filter+
 callback.
 
+\paragraph{The method}
+The code of stack system is based on that in a post of Dev-luatex mailing list\footnote{%
+\texttt{[Dev-luatex] tex.currentgrouplevel}, a post at 2008/8/19 by Jonathan Sauer.}.
+
+These are two \TeX\ count registers for maintaining informations:
+\verb+\ltj@@stack+ for the stack level, and \verb+\ltj@@group@level+ for
+the \TeX's group level when the last assignment was done.  Parameters
+are stored in one big table named \texttt{charprop\_stack\_table}, where
+\texttt{charprop\_stack\_table[$i$]} stores data of stack level~$i$. If
+a new stack level is created by \verb+\ltjsetparameter+, all data of the
+previous level is copied.
+
+To resolve the problem mentioned in `Background' above, Lua\TeX-ja uses
+another thing: When a new stack level is about to be created, a whatsit
+node whose type, subtype and value are 44~(\textit{user\_defined}),
+30112, and current group level respectively is appended to the current
+list (we refer this node by \textit{stack\_flag}). This enables us to
+know whether assignment is done just inside a hbox. Suppose that the
+stack level is~$s$ and the \TeX's group level is~$t$ just after the hbox
+group, then:
+\begin{itemize}
+\item If there is no \textit{stack\_flag} node in the list of hbox, then
+      no assignment was occurred inside the hbox. Hence values of
+      parameters at the end of the hbox are stored in the stack
+      level~$s$.
+\item If there is a \textit{stack\_flag} node whose value is~$t+1$, then
+      an assignment was occurred just inside the hbox group. Hence
+      values of parameters at the end of the hbox are stored in the
+      stack level~$s+1$.
+\item If there are \textit{stack\_flag} nodes but all of their values
+      are more than~$t+1$, then an assignment was occurred in the box,
+      but it is done is `more internal' group. Hence values of
+      parameters at the end of the hbox are stored in the stack
+      level~$s$.
+\end{itemize}
+
+Note that to work this trick correctly, assignments to \verb+\ltj@@stack+ and \verb+\ltj@@group@level+ have to be local always.
+...
 \end{document}
