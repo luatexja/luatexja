@@ -1,0 +1,150 @@
+%#!lualatex
+\documentclass[a4paper]{bxjsarticle}
+\setpagelayout*{left=20truemm, right=20truemm,top=15truemm,bottom=20truemm}
+\pagestyle{empty}
+\usepackage{luatextra,booktabs,amsmath,lmodern}
+\usepackage[unicode=true]{hyperref}
+\usepackage{luatexja}
+
+\def\title{\LuaTeX-jaの開発}
+\def\author{北川 弘典}
+\def\mail{h\_kitagawa2001@yahoo.co.jp}
+\hypersetup{pdftitle=\title, pdfauthor=\author}
+
+\makeatletter
+\baselineskip=15pt
+\DeclareFontShape{JY3}{mc}{m}{n}{<-> s*[0.92489] psft:Ryumin-Light:jfm=ujis}{}
+\DeclareFontShape{JY3}{gt}{m}{n}{<-> s*[0.92489] psft:GothicBBB-Medium:jfm=ujis}{}
+
+  \renewcommand{\section}{%
+    \@startsection{section}{1}{\z@}%
+    {\Cvs}% 前アキ
+    {.25\Cvs}% 後アキ
+    {\normalfont\large\headfont\raggedright}}
+  \renewcommand{\paragraph}{\@startsection{paragraph}{4}{\z@}%
+    {0.5\Cvs}{-1\zw}% 改行せず 1zw のアキ
+    {\normalfont\normalsize\headfont ■}}
+\let\subsection=\paragraph
+
+\def\@listI{\leftmargin\leftmargini
+  \parsep \z@\topsep\z@\itemsep\z@}
+\@listI
+\def\headfont{\normalfont\bfseries\mathversion{bold}}
+\def\emph#1{\textbf{\mathversion{bold}#1}}
+\def\centerbaseline#1#2{%
+  \setbox0=\hbox{#1\ltjsetparameter{yjabaselineshift=\z@}あ}%
+  \@tempdima=\dimexpr\cht-\cdp-\ht0+\dp0\relax{#1%
+  \ltjsetparameter{yjabaselineshift=-0.5\@tempdima, yalbaselineshift=-0.5\@tempdima}#2%
+  }}
+\def\.#1{{\normalfont\it$\langle$#1$\rangle$}}
+\def\:#1{{\normalfont\tt\char92 #1}}
+\begin{document}
+\begin{center}
+\LARGE\bfseries\title
+\end{center}
+\smallskip
+\begin{flushright}
+\author~({\tt\mail})
+\end{flushright}
+
+
+\section{開発目標}
+Lua\TeX-ja は，p\TeX と同等あるいはそれ以上の水準の日本語組版を，
+次世代標準\TeX エンジンであるLua\TeX で可能にすることを目的としたマクロパッケージである．
+\begin{itemize}
+\item \emph{最低でもp\TeX と同等の組版の自由度を確保する．}
+\item \emph{p\TeX との100\%互換は目的としない．}
+p\TeX において不自然/不都合な実装があれば，積極的に改める．
+\end{itemize}
+
+
+\section{p\TeX からの主な違い}
+\subsection{縦書きは未実装}
+落ち着いてきたら縦書きも開発したいが，現状は左横書きのみサポート．
+
+\subsection{命令名称の変更}
+大半のパラメタへの代入は\:{ltjsetparameter}へ
+{\tt \.{key}=\.{value}}の形で渡す．
+
+例：行頭禁則用ペナルティ({\sf prebreakpenalty})
+\begin{center}\medskip\small%
+\begin{tabular}{lll}
+\toprule
+&p\TeX&Lua\TeX-ja\\\midrule
+代入&\:{prebreakpenalty}\.{chr}{\tt =}\.{pena}&
+\verb+\ltjsetparameter{prebreakpenalty={+\.{chr}{\tt,}\.{pena}\verb+}}+\\
+取得&\:{prebreakpenalty}\.{chr}（count）&
+\verb+\ltjgetparameter{prebreakpenalty}{+\.{chr}\verb+}+（string）\\
+\bottomrule
+\end{tabular}
+\end{center}
+\ 
+
+\subsection{行末が和文文字の場合の改行の扱い}
+Lua\TeX の仕様上，「前行行末時のcatcode」で判定するad hocな仕様．
+%1行を外部から読み込むとき，前行行末のcatcodeの状態で，行の末尾が次の形のときに改行を無視する：
+%\[
+% \hbox{(catcodeが11 or 12の和文文字)}\hbox{(catcodeが1 or 2の文字)}^*
+%\]
+
+\subsection{和文間・和欧文間の空白挿入処理}
+\begin{enumerate}
+\item 空白挿入処理をノードベースに変更（Lua\TeX の合字・カーニング処理に合わせた）．
+\item 「和文フォント」はメトリックと実際の字形との組：
+\begin{center}
+$\tt\mathcode`\:="703A\mathcode`\*="7020
+\mathcode`\=="703D\mathcode`\-="702D\mathcode`\|="705C%"
+\mathcode`\<="707B\mathcode`\>="707D
+|jfont|tenmin=\underbrace{\tt psft:Ryumin-Light}_{\text{PostScriptフォント（非埋込）}}:%
+\underbrace{\tt jfm=ujis}_{\text{メトリック}}*at*13.5|jQ
+$\smallskip
+\end{center}
+空白挿入処理では，メトリックとサイズの同じ和文フォントは同一視される．
+
+\item 異なるメトリック・サイズの2つの和文文字の間には，両メトリックから決まる空白の平均値が入る．
+\end{enumerate}
+
+\begin{center}\medskip\small%
+\begin{tabular}{ccc}
+\toprule
+\textbf{入力}&\textbf{p\TeX}&\textbf{Lua\TeX-ja}\\\midrule
+$
+\tt\mathcode`\:="703A\mathcode`\*="7020
+\mathcode`\=="703D\mathcode`\-="702D\mathcode`\|="705C%"
+\mathcode`\<="707B\mathcode`\>="707D
+あ\overbrace{\tt）<|gt（}^{\text{2.}}い
+\overbrace{\tt）<>（}^{\text{1.}}>う\overbrace{\tt）<|Large（}^{\text{3.}}え>
+$
+&\large あ）\hbox{}{\gt（い）\hbox{}（}う）\hbox{}{\Large（え}&
+\large あ）{\gt（い）{}（}う）{\Large（え}\\
+\bottomrule
+\end{tabular}
+\end{center}
+\
+
+\section{現況}
+\subsection{\inhibitglue 「エンジン拡張部分」%
+\centerbaseline{\scriptsize\normalfont}{（\TeX →p\TeX のエンジン拡張部分
+に対応）}}\ \par概ね実装済みであるが，細かい仕様変更の可能性あり．また，
+従来ではprimitiveとして実装していた機能をLuaコードと\TeX マクロで実装しな
+いといけないので，バグが残っている可能性がある．
+
+\subsection{plain \TeX~formatに対するマクロ%
+\centerbaseline{\scriptsize\normalfont}{（{\tt ptex.tex}に相当）}}
+ほぼ翻訳完了．
+
+\subsection{\LaTeXe 用マクロ%
+\centerbaseline{\scriptsize\normalfont}{（p\LaTeXe 実装{\tt plcore.dtx}他に相当）}%
+及び，{\tt fontspec}パッケージ用マクロ}\ \par
+試験的に一部の機能が実装され，ある程度は使える．
+日本語用クラスファイルとしては，八登さんによるBXjsclsを使用するのが現状では手っ取り早い．
+
+
+
+\vfill
+\subsection{Lua\TeX-ja プロジェクトについて}\ 
+
+プロジェクト Wiki：\url{http://sourceforge.jp/projects/luatex-ja/wiki/}
+
+開発メンバー：北川 弘典，前田 一貴，八登 崇之，黒木 裕介，阿部 紀行，本田 知亮，山本 宗宏
+\end{document}
