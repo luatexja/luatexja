@@ -25,6 +25,7 @@ local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_jfam = luatexbase.attributes['jfam']
+local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 
 local id_glyph = node.id('glyph')
 local id_hlist = node.id('hlist')
@@ -100,6 +101,7 @@ function (p, sty)
 	    local r = node_new(id_glyph); r.next = nil
 	    r.char = p.char; r.font = f; r.subtype = 256
 	    set_attr(r, attr_icflag, PROCESSED)
+	    set_attr(r, attr_yablshift, 0)
 	    local class = ltjf.find_char_class(p.char, ltjf.font_metric_table[f].jfm)
 	    set_attr(r, attr_jchar_class, class)
 	    ltjw.met_tb = ltjf.font_metric_table[f]

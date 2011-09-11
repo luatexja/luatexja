@@ -1,15 +1,29 @@
-%#!lualatex
+%#! lualatex -shell-escape manual.ins && lualatex man-en && lualatex man-ja
+
+%<*Eng>
 \documentclass[a4paper,titlepage]{article}
+\usepackage[margin=20mm]{geometry}
+%</Eng>
+%<*Jpn>
+\documentclass[a4paper,titlepage]{bxjsarticle}
+\setpagelayout*{margin=20mm}
+\def\headfont{\normalfont\bfseries}
+% \def\headfont{\sffamily\gtfamily} is needed in ordinal documents
+%</Jpn>
+
 \usepackage{amsmath,amssymb,xcolor,pict2e}
 \usepackage{booktabs,listings,lltjlisting,showexpl}
 \usepackage{luatexja}
-%\usepackage{luatexja-fontspec}
-\usepackage[margin=20mm]{geometry}
 \usepackage[unicode=true]{hyperref}
 
+%<*Eng>
 \title{The Lua\TeX-ja package}
 \author{The Lua\TeX-ja project team}
-
+%</Eng>
+%<*Jpn>
+\title{Lua\TeX-jaパッケージ}
+\author{Lua\TeX-jaプロジェクトチーム}
+%</Jpn>
 
 \lstset{
   basicstyle=\ttfamily\small, pos=o, breaklines=true,
@@ -24,20 +38,34 @@
 
 \tableofcontents
 \bigskip
+
+%<*Eng>
 {\Large\bf This documentation is far from complete. It may have many
 grammatical (and contextual) errors.}
+%</Eng>
+%<*Jpn>
+\textbf{\large 本ドキュメントはまだまだ未完成です．
+また，英語版と日本語版をdocstripプログラムを用いることで一緒に生成している都合上，
+見出しが英語のままになっています．}
+%</Jpn>
 
 \newpage
 \part{User's manual}
 
 \section{Introduction}
 
+%<*Eng>
 The Lua\TeX-ja package is a macro package for typesetting high-quality
 Japanese documents in Lua\TeX.
+%</Eng>
+%<*Jpn>
+Lua\TeX-jaパッケージは，次世代標準\TeX であるLua\TeX の上で，p\TeX と同等
+/それ以上の品質の日本語組版を実現させようとするマクロパッケージである．
+%</Jpn>
 
 \subsection{Backgrounds}
 Traditionally, ASCII p\TeX, an extension of \TeX, and its derivatives
-are used to typeset Japanese documents in \TeX. p\TeX is an engine
+are used to typeset Japanese documents in \TeX. p\TeX\ is an engine
 extension of \TeX: so it can produce high-quality Japanese documents
 without using very complicated macros. But this point is a mixed
 blessing: p\TeX\ is left behind from other extensions of \TeX,
@@ -112,6 +140,7 @@ We say `alphabetic fonts' for fonts used in \textbf{ALchar}, and `Japanese fonts
 \item The word `primitive' is used not only for primitives in Lua\TeX,
       but also for control sequences that defined in the core module of
       Lua\TeX-ja.
+\item In this document, natural numbers start from~0.
 \end{itemize}
 
 \subsection{About the project}
@@ -165,7 +194,7 @@ or download the archive of HEAD in \texttt{master} branch from
       other packages which use Unicode fonts. 
 \end{itemize}
 
-\subsection{Using in plain \TeX}
+\subsection{Using in plain \TeX}\label{ssec-plain}
 To use Lua\TeX-ja in plain \TeX, simply put the following  at the beginning of the document:
 \begin{verbatim}
 \input luatexja.sty
@@ -184,7 +213,7 @@ This does minimal settings (like {\tt ptex.tex}) for typesetting Japanese docume
 \end{tabular}
 \end{center}
 \begin{itemize}
-\item The `Q' is an unit used in Japanese phototypesetting, and
+\item The `Q' is a unit used in Japanese phototypesetting, and
       $1\,\textrm{Q}=0.25\,\textrm{mm}$. This length is stored in a
       dimension \verb+\jQ+.
 
@@ -706,7 +735,7 @@ character other than space~` '~(U+0020) has the category code
 12~(other), while the space has 10~(space).
 
 \subsection{List of Parameters}
-In the following list of parameters, 
+In the following list of parameters, [\verb+\cs+] indicates the counterpart in p\TeX, and each symbol has the following meaning:
 \begin{itemize}
 \item `\ast' : local
 \item `\dagger' always global
@@ -714,25 +743,73 @@ In the following list of parameters,
 \end{itemize}
 
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
-\item[\textsf{kcatcode}\,=\{<chr\_code>,<value>\}]
-\item[\textsf{prebreakpenalty}\,=\{<chr\_code>,<penalty>\}]
-\item[\textsf{postbreakpenalty}\,=\{<chr\_code>,<penalty>\}]
-\item[\textsf{jatextfont}\,=\{<jfam>,<jfont\_cs>\}]
-\item[\textsf{jascriptfont}\,=\{<jfam>,<jfont\_cs>\}]
-\item[\textsf{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}]
-\item[\textsf{yjabaselineshift}\,=<dimen>$^\ast$]
-\item[\textsf{yalbaselineshift}\,=<dimen>$^\ast$]
-\item[\textsf{jaxspmode}\,=\{<chr\_code>,<mode>\}]
-\item[\textsf{alxspmode}\,=\{<chr\_code>,<mode>\}]
-\item[\textsf{autospacing}\,=<bool>$^\ast$]
-\item[\textsf{autoxspacing}\,=<bool>$^\ast$]
-\item[\textsf{kanjiskip}\,=<skip>]
-\item[\textsf{xkanjiskip}\,=<skip>]
-\item[\textsf{jcharwidowpenalty}\,=<penalty>]
+\item[\textsf{jcharwidowpenalty}\,=<penalty>] [\verb+\jcharwidowpenalty+]
+
+Penalty value for supressing orphans. This penalty is inserted just
+	     after the last \textbf{JAchar} which is not regarded as a
+	     (Japanese) punctuation mark.
+
+\item[\textsf{kcatcode}\,=\{<chr\_code>,<natural number>\}]\
+
+An additional attributes having each character whose character code is <chr\_code>.  
+At the present version, the lowermost bit of <natural number> indicates
+	     whether the character is considered as a punctuation mark
+	     (see the description of \textsf{jcharwidowpenalty} above).
+
+
+\item[\textsf{prebreakpenalty}\,=\{<chr\_code>,<penalty>\}] [\verb+\prebreakpenalty+]
+\item[\textsf{postbreakpenalty}\,=\{<chr\_code>,<penalty>\}] [\verb+\postbreakpenalty+]
+\item[\textsf{jatextfont}\,=\{<jfam>,<jfont\_cs>\}] [\verb+\textfont+ in \TeX]
+\item[\textsf{jascriptfont}\,=\{<jfam>,<jfont\_cs>\}] [\verb+\scriptfont+ in \TeX]
+\item[\textsf{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}] [\verb+\scriptscriptfont+ in \TeX]
+\item[\textsf{yjabaselineshift}\,=<dimen>$^\ast$]\ 
+\item[\textsf{yalbaselineshift}\,=<dimen>$^\ast$] [\verb+\ybaselineshift+]
+
+\item[\textsf{jaxspmode}\,=\{<chr\_code>,<mode>\}] [\verb+\inhibitxspcode+]
+
+Setting whether inserting  \textsf{xkanjiskip} is allowed before/after a \textbf{JAchar} whose character code is <chr\_code>.
+The followings are allowed for <mode>:
+\begin{description}
+\item[0, \texttt{inhibit}] Insertion of \textsf{xkanjiskip} is inhibited before the charater, nor after the charater.
+\item[2, \texttt{preonly}] Insertion of \textsf{xkanjiskip} is allowed before the charater, but not after.
+\item[1, \texttt{postonly}] Insertion of \textsf{xkanjiskip} is allowed after the charater, but not before.
+\item[3, \texttt{allow}] Insertion of \textsf{xkanjiskip} is allowed before the charater and after the charater.
+This is the default value.
+\end{description}
+
+\item[\textsf{alxspmode}\,=\{<chr\_code>,<mode>\}] [\verb+\xspcode+]
+
+Setting whether inserting  \textsf{xkanjiskip} is allowed before/after a \textbf{ALchar} whose character code is <chr\_code>.
+The followings are allowed for <mode>:
+\begin{description}
+\item[0, \texttt{inhibit}] Insertion of \textsf{xkanjiskip} is inhibited before the charater, nor after the charater.
+\item[1 \texttt{preonly}] Insertion of \textsf{xkanjiskip} is allowed before the charater, but not after.
+\item[2 \texttt{postonly}] Insertion of \textsf{xkanjiskip} is allowed after the charater, but not before.
+\item[3, \texttt{allow}] Insertion of \textsf{xkanjiskip} is allowed before the charater and after the charater.
+This is the default value.
+\end{description}
+Note that parameters \textsf{jaxspmode} and \textsf{alxspmode} use a common table.
+
+\item[\textsf{autospacing}\,=<bool>$^\ast$] [\verb+\autospacing+]
+\item[\textsf{autoxspacing}\,=<bool>$^\ast$] [\verb+\autoxspacing+]
+\item[\textsf{kanjiskip}\,=<skip>] [\verb+\kanjiskip+]
+\item[\textsf{xkanjiskip}\,=<skip>] [\verb+\xkanjiskip+]
 \item[\textsf{differentjfm}\,=<mode>$^\dagger$]
 \item[\textsf{jacharrange}\,=<ranges>$^\ast$]
+\item[\textsf{kansujichar}\,=\{<digit>, <chr\_code>\}] [\verb+\kansujichar+]
 \end{list}
+
+
 \section{Other Primitives}
+\subsection{Compatibility with p\TeX}
+\begin{list}{}{\def\makelabel{\ttfamily\char92 }}
+\item[kuten]
+\item[jis]
+\item[euc]
+\item[sjis]
+\item[ucs]
+\item[kansuji]
+\end{list}
 \section{Control Sequences for \LaTeXe}
 \part{Implementations}\label{part-imp}
 \section{Storing Parameters}\label{sec-para}
@@ -745,9 +822,15 @@ Here the following is the list of dimension and attributes which are used in Lua
 }
 
 \dim{jQ}
+As explained in Subsection~\ref{ssec-plain}, \verb+\jQ+ is equal to
+			$1\,\textrm{Q}=0.25\,\textrm{mm}$, where `Q'~(also called `級') is
+			a unit used in Japanese phototypesetting. So one should not change the value of this dimension. 
 \dim{jH}
-\dim{ltj@zw}
-\dim{ltj@zh}
+There is also a unit called `歯' which equals to $0.25\,\textrm{mm}$ and
+			used in Japanese phototypesetting. The dimension
+			\verb+\jH+ stores this length, similar to \verb+\jQ+. 
+\dim{ltj@zw} A temporal register for the `full-width' of current Japanese font.
+\dim{ltj@zh} A temporal register for the `full-height' (usually the sum of height of imaginary body and its depth) of current Japanese font.
 \attr{jfam} 
 \attr{ltj@curjfnt} The font index of current Japanese font.
 \attr{ltj@charclass} The character class of Japanese \textit{glyph\_node}.
@@ -761,19 +844,21 @@ Here the following is the list of dimension and attributes which are used in Lua
 			attribute, one of the following value is
 			assigned:
 \begin{description}
-\item[ITALIC (1)]
-\item[PACKED (2)]
-\item[KINSOKU (3)]
-\item[FROM\_JFM (4)]
-\item[LINE\_END (5)]
-\item[KANJI\_SKIP (6)]
-\item[XKANJI\_SKIP (7)]
-\item[PROCESSED (8)]
-\item[IC\_PROCESSED (9)]
-\item[BOXBDD (15)]
+\item[ITALIC (1)] Glues from an itaric correction
+	   (\verb+\/+). This distinction of origins of glues (from explicit \verb+\kern+, or from \verb+\/+)
+	   is needed in the insertion process of \textsf{xkanjiskip}.
+\item[PACKED (2)] 
+\item[KINSOKU (3)] Penalties inserted for the word-wrapping  process of Japanese characters (\emph{kinsoku}).
+\item[FROM\_JFM (4)] Glues/kerns from JFM.
+\item[LINE\_END (5)] Kerns
+\item[KANJI\_SKIP (6)] Glues for \textsf{kanjiskip}.
+\item[XKANJI\_SKIP (7)] Glues for \textsf{xkanjiskip}.
+\item[PROCESSED (8)] Nodes which is already processed by ...
+\item[IC\_PROCESSED (9)] Glues from an itaric correction
+\item[BOXBDD (15)] Glues/kerns that inserted just the beginning or the ending of an hbox or a paragraph.
 \end{description}
-\attr{ltj@kcat$i$} Where $i$~is a natural number which is less than~8.
-These 8~attributes store bit~vectors indicating ...
+\attr{ltj@kcat$i$} Where $i$~is a natural number which is less than~7.
+These 7~attributes store bit~vectors indicating which character block is regarded as a block of \textbf{JAchar}s.
 \end{list}
 
 \subsection{Stack System of Lua\TeX-ja}
@@ -853,6 +938,9 @@ group, then:
       level~$s$.
 \end{itemize}
 
-Note that to work this trick correctly, assignments to \verb+\ltj@@stack+ and \verb+\ltj@@group@level+ have to be local always.
-...
+Note that to work this trick correctly, assignments to
+\verb+\ltj@@stack+ and \verb+\ltj@@group@level+ have to be local always, 
+regardless the value of \verb+\globaldefs+.
+This problem is resolved by using
+\hbox{\verb+\directlua{tex.globaldefs=0}+} (this assignment is local).
 \end{document}
