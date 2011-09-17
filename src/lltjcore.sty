@@ -150,4 +150,24 @@
   \let\firstmark\botmark
 }
 
+\def\@setref#1#2#3{%
+  \ifx#1\relax
+    \protect\G@refundefinedtrue
+    \nfss@text{\reset@font\bfseries ??}%
+    \@latex@warning{Reference `#3' on page \thepage \space
+              undefined}%
+  \else
+    \expandafter#2#1\relax% change \null to \relax
+  \fi}
+\if@compatibility\else
+\def\verb{\relax\ifmmode\hbox\else\leavevmode\fi
+  \bgroup
+    \verb@eol@error \let\do\@makeother \dospecials
+    \verbatim@font\@noligs
+    \@ifstar\@sverb\@verb}
+\fi
+\gdef\@stopfield{\null\color@endgroup\egroup}
+\newcount\hour
+\newcount\minute
+
 \endinput
