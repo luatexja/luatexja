@@ -1,4 +1,4 @@
-%#! lualatex -shell-escape manual.ins && lualatex man-en && lualatex man-ja
+%#! lualatex -shell-escape manual.ins
 
 %<*Eng>
 \documentclass[a4paper,titlepage]{article}
@@ -12,9 +12,11 @@
 %</Jpn>
 
 \usepackage{amsmath,amssymb,xcolor,pict2e}
-\usepackage{booktabs,listings,lltjlisting,showexpl}
+\usepackage{booktabs,listings,lltjlisting,showexpl,multicol}
 \usepackage{luatexja}
 \usepackage[unicode=true]{hyperref}
+\usepackage[all]{xy}
+\SelectTips{cm}{}
 
 %<*Eng>
 \title{The Lua\TeX-ja package}
@@ -30,10 +32,10 @@
   numbers=none, rframe={}
 }
 
-\catcode`\<=13
-\def<#1>{{\normalfont\itshape$\langle$#1$\rangle$}}
 \parskip=\smallskipamount
 \begin{document}
+\catcode`\<=13
+\def<#1>{{\normalfont\rm\itshape$\langle$#1$\rangle$}}
 \maketitle
 
 \tableofcontents
@@ -144,18 +146,27 @@ We say `alphabetic fonts' for fonts used in \textbf{ALchar}, and `Japanese fonts
 \end{itemize}
 
 \subsection{About the project}
-\paragraph{Project Wiki} \url{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage%28en%29}
+\paragraph{Project Wiki} Project Wiki is under construction.
+\begin{itemize}
+\item \url{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage%28en%29} (English)
+\item \url{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage} (Japanese)
+\end{itemize}
 
 This project is hosted by SourceForge.JP.
-\paragraph{Members}
 
-%h7k
-%kmaeda
-%abenori
-%kuroky
-%munepi
-%thonda
-%zrbabbler
+\paragraph{Members}\ 
+% \begin{multicols}{2}
+% \begin{itemize}
+% \item Hironori KITAGAWA
+% \item Kazuki MAEDA
+% \item Takayuki YATO
+% \item Yusuke KUROKI
+% \item Noriyuki ABE
+% \item Munehiro YAMAMOTO
+% \item Tomoaki HONDA
+% \par\ 
+% \end{itemize}
+% \end{multicols}
 
 \newpage
 \section{Getting Started}
@@ -236,7 +247,7 @@ This does minimal settings (like {\tt ptex.tex}) for typesetting Japanese docume
 Here \verb+\zw+ is the counterpart of \texttt{em} for Japanese fonts, that is, the length of `full-width' in current Japanese font.
 \end{itemize}
 
-\subsection{Using in \LaTeX}
+\subsection{Using in \LaTeX}\label{ssec-ltx}
 \paragraph{\LaTeXe}
 Using in \LaTeXe\ is basically same. To set up the minimal environment
 for Japanese, you only have to load {\tt luatexja.sty}:
@@ -375,7 +386,7 @@ original storage system in Lua\TeX-ja. Hence, to assign or acquire those
 parameters, you have to use commands \verb+\ltjsetparameter+ and
 \verb+\ltjgetparameter+.
 
-\subsection{Editing the range of \textbf{JAchar}}
+\subsection{Editing the range of \textbf{JAchar}s}
 As noted before, the default setting is:
 \begin{center}
 A character in Unicode is treated as \textbf{JAchar},\\
@@ -385,8 +396,18 @@ A character in Unicode is treated as \textbf{JAchar},\\
 $\uparrow$ TODO: CHANGE THIS!
 
 
+To edit the range of \textbf{JAchar}s, You have to assign a non-zero
+natural number which is less than 217 to the character range first. This
+can be done by using \verb+\ltjdefcharrange+ primitive. For example, the
+next line assigns whole characters in Supplementary Multilingual Plane
+and the character `漢' to the range number~4.
+\begin{lstlisting}
+\ltjdefcharrange{4}{"10000-"1FFFF,`漢}
+\end{lstlisting}
+This assignment of numbers to ranges are always global, so you should
+not do this in the middle of a document. 上書き
 
-
+After assigning numbers to ranges, ...
 
 \subsection{\textsf{kanjiskip} and \textsf{xkanjiskip}}\label{subs-kskip}
 \textbf{JAglue} is divided into the following three categories:
@@ -686,18 +707,31 @@ the `real' glyph is centered horizontally (the green rectangle).
 \end{list}
 
 \subsection{Math Font Family}
+\TeX\ handles fonts in math formulas by 16~font families\footnote{Omega,
+Aleph, Lua\TeX~and $\varepsilon$-(u)p\TeX can handles 256~families, but
+an external package is needed to support this in plain \TeX\ and
+\LaTeX.}, and each family has three fonts:
+\verb+\textfont+, \verb+\scriptfont+ and \verb+\scriptscriptfont+.
 
+Lua\TeX-ja's handling of Japanese fonts in math formulas is similar;
+Table~\ref{tab-math} shows counterparts to \TeX's primitives for math
+font families.
+
+\begin{table}[tb]
+\label{tab-math}
+\caption{Primitives for Japanese math fonts}
 \begin{center}\def\{{\char`\{}\def\}{\char`\}}
 \begin{tabular}{lll}
 \toprule
 &Japanese fonts&alphabetic fonts\\
-font family&\verb+\jfam+&\verb+\fam+\\
+font family&\verb+\jfam+${}\in [0,256)$&\verb+\fam+\\
 text size&\tt\textsf{jatextfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\verb+\textfont+<fam>=<font\_cs>\\
 script size&\tt\textsf{jascriptfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\verb+\scriptfont+<fam>=<font\_cs>\\
 scriptscript size&\tt\textsf{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\verb+\scriptscriptfont+<fam>=<font\_cs>\\
 \bottomrule
 \end{tabular}
 \end{center}
+\end{table}
 
 
 \section{Parameters}
@@ -731,15 +765,16 @@ additional argument---a character code, for example---in some cases.
 \end{LTXexample}
 \emph{The return value of\/ {\normalfont\tt\char92ltjgetparameter} is
 always a string}. This is outputted by \texttt{tex.write()}, so any
-character other than space~` '~(U+0020) has the category code
+character other than space~`{\tt\char32}'~(U+0020) has the category code
 12~(other), while the space has 10~(space).
 
 \subsection{List of Parameters}
 In the following list of parameters, [\verb+\cs+] indicates the counterpart in p\TeX, and each symbol has the following meaning:
 \begin{itemize}
-\item `\ast' : local
-\item `\dagger' always global
-\item No mark: the last of paragraph
+\item No mark: values at the end of the paragraph or the hbox are
+      adopted in the whole paragraph/hbox.
+\item `\ast' : local parameters, which can change everywhere inside a paragraph/hbox.
+\item `\dagger': assignments are always global.
 \end{itemize}
 
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
@@ -794,7 +829,18 @@ Note that parameters \textsf{jaxspmode} and \textsf{alxspmode} use a common tabl
 \item[\textsf{autoxspacing}\,=<bool>$^\ast$] [\verb+\autoxspacing+]
 \item[\textsf{kanjiskip}\,=<skip>] [\verb+\kanjiskip+]
 \item[\textsf{xkanjiskip}\,=<skip>] [\verb+\xkanjiskip+]
+
 \item[\textsf{differentjfm}\,=<mode>$^\dagger$]
+
+Specify how glues/kerns between two \textbf{JAchar}s whose JFM (or size) are different. 
+The allowed arguments are the followings:
+\begin{description}
+\item[\texttt{average}]
+\item[\texttt{both}]
+\item[\texttt{large}]
+\item[\texttt{small}]
+\end{description}
+
 \item[\textsf{jacharrange}\,=<ranges>$^\ast$]
 \item[\textsf{kansujichar}\,=\{<digit>, <chr\_code>\}] [\verb+\kansujichar+]
 \end{list}
@@ -810,7 +856,13 @@ Note that parameters \textsf{jaxspmode} and \textsf{alxspmode} use a common tabl
 \item[ucs]
 \item[kansuji]
 \end{list}
+
 \section{Control Sequences for \LaTeXe}
+\subsection{Patch for NFSS2}
+As described in Subsection~\ref{ssec-ltx}, Lua\TeX-ja simply adopted \texttt{plfonts.dtx} in p\LaTeXe for the Japanese patch for NFSS2. 
+
+\subsection{`tombow'}
+
 \part{Implementations}\label{part-imp}
 \section{Storing Parameters}\label{sec-para}
 \subsection{Used Dimensions and Attributes}
@@ -831,7 +883,7 @@ There is also a unit called `歯' which equals to $0.25\,\textrm{mm}$ and
 			\verb+\jH+ stores this length, similar to \verb+\jQ+. 
 \dim{ltj@zw} A temporal register for the `full-width' of current Japanese font.
 \dim{ltj@zh} A temporal register for the `full-height' (usually the sum of height of imaginary body and its depth) of current Japanese font.
-\attr{jfam} 
+\attr{jfam} Current number of Japanese font family for math formulas.
 \attr{ltj@curjfnt} The font index of current Japanese font.
 \attr{ltj@charclass} The character class of Japanese \textit{glyph\_node}.
 \attr{ltj@yablshift} The amount of shifting the baseline of alphabetic
@@ -845,16 +897,17 @@ There is also a unit called `歯' which equals to $0.25\,\textrm{mm}$ and
 			assigned:
 \begin{description}
 \item[ITALIC (1)] Glues from an itaric correction
-	   (\verb+\/+). This distinction of origins of glues (from explicit \verb+\kern+, or from \verb+\/+)
+	   (\verb+\/+). This distinction of origins of glues 
+	   (from explicit \verb+\kern+, or from \verb+\/+)
 	   is needed in the insertion process of \textsf{xkanjiskip}.
 \item[PACKED (2)] 
 \item[KINSOKU (3)] Penalties inserted for the word-wrapping  process of Japanese characters (\emph{kinsoku}).
 \item[FROM\_JFM (4)] Glues/kerns from JFM.
-\item[LINE\_END (5)] Kerns
+\item[LINE\_END (5)] Kerns for ...
 \item[KANJI\_SKIP (6)] Glues for \textsf{kanjiskip}.
 \item[XKANJI\_SKIP (7)] Glues for \textsf{xkanjiskip}.
 \item[PROCESSED (8)] Nodes which is already processed by ...
-\item[IC\_PROCESSED (9)] Glues from an itaric correction
+\item[IC\_PROCESSED (9)] Glues from an itaric correction, but also already processed.
 \item[BOXBDD (15)] Glues/kerns that inserted just the beginning or the ending of an hbox or a paragraph.
 \end{description}
 \attr{ltj@kcat$i$} Where $i$~is a natural number which is less than~7.
@@ -943,4 +996,91 @@ Note that to work this trick correctly, assignments to
 regardless the value of \verb+\globaldefs+.
 This problem is resolved by using
 \hbox{\verb+\directlua{tex.globaldefs=0}+} (this assignment is local).
+
+
+\section{Linebreak after Japanese Character}\label{sec-lbreak}
+\subsection{Reference: Behavior in p\TeX}
+(NOT COMPLETED)
+
+In~p\TeX, a linebreak after a Japanese character doesn't emit a space,
+since words are not separated by spaces in Japanese writings. However,
+this feature isn't fully implemented in Lua\TeX-ja due to the
+specification of callbacks in~Lua\TeX. To clarify the difference between
+p\TeX~and~Lua\TeX, We briefly describe the handling of a linebreak in~p\TeX, in
+this subsection. 
+
+p\TeX's input processor can be described in terms of a finite state
+automaton, as that of~\TeX\ in~Section~2.5 of~\cite{texbytopic}. The
+internal states are as follows:
+\begin{itemize}
+\item State~$N$: new line
+\item State~$S$: skipping spaces
+\item State~$M$: middle of line
+\item State~$K$: after a Japanese character
+\end{itemize}
+The first three states---$N$, $S$~and~$M$---are as same as \TeX's input
+processor.  State~$K$ is similar to state~$M$, and is entered after
+Japanese characters.  The diagram of state transitions are indicated in
+Figure~\ref{fig-ptexipro}.  Note that p\TeX\ doesn't leave state~$K$
+after `beginning/ending of a group' characters.
+\begin{figure}[tb]
+\label{fig-ptexipro}
+\begin{gather*}
+ \def\sp{\text{\tt\char32}}
+ \xymatrix{&&
+   {\text{scan a cs}}\ar@(r,ul)[dr]&\\
+\ar[r]&
+   *++[o][F-]{N}\ar[ur]^0\ar[dd]_{d,\ g}\ar[u]^{5\ (\text{\tt\char92par})}
+     \ar@{->}@(d,l)[ddrr]_(0.45){j}&&
+   *++[o][F-]{S}\ar@(l,dr)[ul]^0\ar@(l,ur)[ddll]_{d,\ g}\ar[u]_{5}
+     \ar@{->}@(r,r)[dd]^{j}\\&\\&
+   *++[o][F-]{M}\ar[uuur]^0\ar@(r,dl)[uurr]_(0.55){10\ (\sp)}
+     \ar[d]_{5\ ({\sp})}\ar@{->}@(dr,dl)[rr]_{j}&&
+   *++[o][F-]{K}\ar@{->}@(ul,d)[uuul]^0\ar@{->}[ll]^{d}
+     \ar@{->}@(ur,dr)[uu]^{10\ (\sp)}\ar@{->}[d]_5\\
+   &&&
+ }\\
+ d:=\{3,4,6,7,8,11,12,13\},\quad g:=\{1,2\},\quad j:=(\text{Japanese characters})
+\end{gather*}
+\begin{itemize}
+\item Numbers represent category codes.
+\item Category codes 9~(ignored), 14~(comment)~and~15~(invalid) are omitted in above diagram.
+\end{itemize}
+\caption{State transitions of p\TeX's input processor}
+\end{figure}
+
+
+\subsection{Behavior in Lua\TeX-ja}
+States in the input processoe of Lua\TeX\ is the same as that of \TeX,
+and they can't be customized by any callbacks. Hence, we can only use
+\verb+process_input_buffer+ and \verb+token_filter+ callbacks for to
+suppress a space by a linebreak which is after Japanese characters.
+
+However, \verb+token_filter+ callback cannot be used either, since a
+character in category code 5~(end-of-line) is converted into an space
+token \emph{in the input processor}.  So we can use only the
+\verb+process_input_buffer+ callback.  This means that suppressing a
+space must be done \emph{just before} an input line is read.
+
+Considering these situations, handling of a end-of-line in Lua\TeX-ja are as follows:
+\begin{quote}
+A character U+FFFFF (its category code is set to 14~(comment) by
+Lua\TeX-ja) is appended to an input line, before Lua\TeX\ actually
+process it, if and only if the following two conditions are satisfied:
+\begin{enumerate}
+\item The category code of the character $\langle${return}$\rangle$
+      (whose character code is 13) is 5~(end-of-line).
+\item The input line matches the following `regular expression':
+\[
+  (\text{any char})^*(\textbf{JAchar})
+  \bigl(\{\text{catcode}=1\}\cup\{\text{catcode}=2\}\bigr)^*
+\]
+\end{enumerate}
+
+\end{quote}
+
+\section{Insertion of JFM glues, \textsf{kanjiskip} and \textsf{xkanjiskip}}
+This is the longest section of the document.
+
+jfmglue.tex の内容をここに入れる
 \end{document}
