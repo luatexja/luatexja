@@ -1,0 +1,625 @@
+%#! lualatex -shell-escape tc11-slide.tex
+\documentclass[notheorems,12pt,hyperref={unicode=true}]{beamer}
+\usepackage{luatexja,luatexja-otf,showexpl,lltjlisting}
+\usepackage{lmodern,mathtools,graphicx}
+\usepackage{amsmath,bm,mflogo,booktabs}
+\usepackage[all]{xy}
+
+\SelectTips{cm}{}
+
+%%% theme
+\useinnertheme{rectangles}
+\useoutertheme{split}
+\usecolortheme{rose}
+\usecolortheme{dolphin}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}
+
+\makeatletter
+\definecolor{purple}{rgb}{0.60, 0.0, 1.0}
+\definecolor{green}{rgb}{0.0, 0.70, 0.0}
+\definecolor{lblue}{rgb}{0.30, 0.0, 1.00}
+\definecolor{gray}{rgb}{0.60, 0.60, 0.60}
+\definecolor{linenavy}{rgb}{0.0 ,0.0 ,0.50}
+\definecolor{linesky}{rgb} {0.50,0.75,1.00}
+\newdimen\lineheight \lineheight=6pt
+\def\lines#1{%
+  \noindent\null\hskip-30pt\setbox0=\hbox{%
+  {\color{linenavy}\vrule height \lineheight width #1\lineheight}%
+  \kern 0.2\lineheight{\color{linenavy!80!linesky}\vrule height\lineheight width 0.6\lineheight}%
+  \kern 0.2\lineheight{\color{linenavy!60!linesky}\vrule height\lineheight width 0.52\lineheight}%
+  \kern 0.2\lineheight{\color{linenavy!40!linesky}\vrule height\lineheight width 0.44\lineheight}%
+  \kern 0.2\lineheight{\color{linenavy!20!linesky}\vrule height\lineheight width 0.36\lineheight}%
+  \kern 0.2\lineheight}\copy0\nobreak
+  \@tempdima=\textwidth\advance\@tempdima64pt\advance\@tempdima-\wd0
+  \hbox to 0pt{\color{linesky}\vrule height \lineheight width \@tempdima \hss}\par
+}
+\setbeamertemplate{frametitle}{
+  \noindent\insertframetitle\par\vskip-8pt\lines{12}\vskip-16pt
+}
+\setbeamertemplate{footline}{
+  \leavevmode%
+  \hbox{\begin{beamercolorbox}[wd=.5\paperwidth,ht=2.5ex,dp=1.125ex,
+leftskip=.3cm,rightskip=.3cm]{author in head/foot}%
+    \usebeamerfont{author in head/foot}\ \hfill \insertshortauthor
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.5ex,dp=1.125ex,
+leftskip=.3cm,rightskip=.3cm plus1fil]{title in head/foot}%
+    \usebeamerfont{title in head/foot}\insertshorttitle
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+\expandafter\let\csname beamer@@tmpop@title page@default\endcsname=\relax
+\defbeamertemplate*{title page}{default}[1][]
+{
+  \vbox{}
+  \vfill
+  \begin{centering}
+    \begin{beamercolorbox}[sep=8pt,center,#1]{title}
+      \usebeamerfont{title}\inserttitle
+    \end{beamercolorbox}
+  \end{centering}
+
+\lines{30}\vskip8pt
+  \begin{centering}
+    \begin{beamercolorbox}[sep=8pt,center,#1]{author}
+      \usebeamerfont{author}\insertauthor
+    \end{beamercolorbox}
+    \begin{beamercolorbox}[sep=8pt,center,#1]{date}
+      \usebeamerfont{date}\insertdate
+    \end{beamercolorbox}
+  \end{centering}
+  \vskip-8pt\vfill
+}
+
+\AtBeginSection[]{
+  \begin{frame}
+    \frametitle{Outline}
+    \tableofcontents[currentsection,hideothersubsections]
+  \end{frame}
+}
+
+\setbeamercolor{structure}{fg=linenavy}
+\setbeamercolor{author in head/foot}{fg=white,bg=linenavy}
+\setbeamercolor{title in head/foot}{fg=black,bg=linesky}
+\setbeamercolor{block title}{bg=linenavy!50!linesky,fg=white}
+\setbeamercolor{block body}{fg=black,bg=linesky!20!white}
+\setbeamertemplate{section in toc}{■\null\inserttocsection\par\smallskip}
+\setbeamerfont{section in toc}{size=\normalsize}
+\setbeamerfont{title}{size=\Large, series=\bfseries}
+\setbeamerfont{frametitle}{size=\Large, series=\bfseries, shape=\upshape}
+
+\def\mcdefault{gt}
+\DeclareFontShape{JY3}{gt}{bx}{n}{ <-> s*[0.960444] psft:FutoGoB101-Bold:jfm=ujis}{}
+\def\notice#1{{\color{blue!50!black}#1}}
+\def\pTeX{p\TeX}
+\parindent=0pt
+\catcode`\|=13\def|{\char92 }
+\makeatother
+
+\title{Lua\TeX-jaの開発}
+\author[北川 弘典]{北川 弘典\\\footnotesize（Lua\TeX-jaプロジェクトチーム）}
+\date{2011年10月22日}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\section{導入}
+
+
+\subsection{背景}
+\begin{frame}
+  \frametitle{Lua\TeX-ja}
+  {\large\[
+    \xymatrix{
+      \text{\TeX}\ar[r]\ar[d]&\text{$\varepsilon$-\TeX}\ar[d]\ar[r]
+      &\text{pdf\TeX}\ar[r]&\text{Lua\TeX}\ar@{-->}[d]\\
+      \text{p\TeX}\ar[r]&\text{$\varepsilon$-p\TeX}
+      \ar@{-->}[rr]&&\text{\alert{Lua\TeX-ja}}
+    }
+  \]}%
+  \begin{center}
+    \bfseries\Large 
+    Lua\TeX-jaは，Lua\TeX 上で日本語組版を実現させるマクロパッケージである．
+  \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Lua\TeX}
+  {\large\begin{align*}
+    \text{Lua\TeX}&\simeq \text{pdf\TeX}+ \text{Lua}+\text{\MP}\\
+    &\qquad+\text{Omega}+\text{OpenType}+ \cdots
+  \end{align*}}
+  \textbf{主な特徴：}
+  \begin{itemize}
+    \item pdfへの直接出力（pdf\TeX の後継）
+    \item Unicodeへの対応{\small （SIP内の文字も余裕）}
+    \item TrueType/OpenTypeフォントの直接利用
+    \item Luaスクリプトで\TeX 処理のカスタマイズが可能\\
+      \quad →もはやエンジンレベルで拡張する必要はない
+  \end{itemize}
+
+  \footnotesize 詳しくは，昨年度の八登さんの講演を参照．
+\end{frame}
+
+\subsection{開発方針}
+\begin{frame}
+  \frametitle{開発方針1}
+  \begin{flushleft}
+   \alert{\bfseries\large 
+    p\TeX のプリミティブに対応する機能から実装．}%
+  \end{flushleft}\vskip-\medskipamount
+  \begin{itemize}
+  \item 最低でもp\TeX と同等の組版の自由度を確保する．\medskip
+  \item 以前から存在した，Lua\TeX で日本語組版を行う実験：
+  \begin{itemize}
+    \item \texttt{luaums.sty}（北川）\\\quad
+      {\small 適当にでっち上げた最低限の実装．}
+    \item \texttt{luajalayout}パッケージ（作者：前田一貴）\\\quad
+      {\small フォント合成・fontspecパッケージを用いた実装．}
+  \end{itemize}
+  は「\LaTeX ベース」，組版の調整機能が不足していた．
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{開発方針2}
+  \begin{flushleft}
+    \alert{\bfseries\large 
+    p\TeX と100\%の互換性は目指さない．}%
+  \end{flushleft}\vskip-\medskipamount
+  \begin{itemize}
+    \item p\TeX の不都合・不可解な点があれば，積極的に改める．
+    \item p\TeX と全く同じ文法・動作の実装は事実上不可能．
+  \end{itemize}\medskip
+  \begin{flushleft}
+    \alert{\bfseries\large 
+    最終的に，（空白挿入等の）仕様を文書化する．}
+  \end{flushleft}
+\end{frame}
+
+\subsection{使い方: plain \TeX}
+\begin{frame}
+  \frametitle{\only<1>{plain p\TeX 用ソース}\only<2>{``plain Lua\TeX-ja''用ソース}}
+\begin{flushleft}\ttfamily
+\only<2>{\alert{|input luatexja.sty} \notice{\% \normalfont Lua\TeX-ja本体}}\ \\
+|hsize=20\alert{\only<2>{|zw}}\only<1>{zw}\\
+\only<1>{|font|bigmc=jis at 14.4pt}
+\alert{\only<2>{|jfont|bigmc=psft:Ryumin-Light:jfm=ujis at 14.4pt}}\\
+\notice{\ \ \% 和文フォント定義}\\
+こんにちは，|TeX の世界へ！\\
+\{|bigmc 大きい文字だよ．\}\\
+|end
+\end{flushleft}
+\uncover<2>{
+\begin{itemize}
+\item {\tt luatexja.sty}を読み込む{\footnotesize（これがないと話が始まらない）}
+\item {\tt zw}, {\tt zh}は{\tt |zw}, {\tt |zh}に．
+\item 和文フォント定義は{\tt |jfont}のみ可．書式も変化．
+\end{itemize}}
+\end{frame}
+
+
+\subsection{使い方: \LaTeX}
+\begin{frame}
+  \frametitle{p\LaTeX 用ソース}
+\begin{flushleft}\ttfamily
+|documentclass[a4paper,10pt]\{\only<1>{jsarticle}\alert{\only<2>{bxjsarticle}}\}\\
+\alert{\only<2>{|usepackage\{luatexja\}}}\only<1>{\notice{\%}}\\
+|usepackage\{lmodern\}\\
+|begin\{document\}\\
+「これはまったく意味がない日本語の文だ．」\\
+（あいう）\{|large|gtfamily（abcゴシック）\}\\
+\ \\
+何かalphabet（欧文文字）も打ってみるか．\\
+\only<1>{\notice{\%}}\only<2>{\$|zeta(2) |simeq}\\
+\only<2>{\ \ |directlua\{tex.print(math.pi\char`\^2/6)\}\$.}\only<1>{\notice{\%}}\\
+|end\{document\}
+\end{flushleft}
+\uncover<2>{
+\begin{itemize}
+\item まだ日本語組版用クラスは用意していない．\\
+（とりあえず八登さんの\texttt{bxjsarticle}で代用）
+\end{itemize}
+}
+\end{frame}
+
+\begin{frame}
+  \frametitle{組版結果}
+\begin{center}
+\fboxsep=1\zw
+\fbox{\large\parbox{20\zw}{\parindent=1\zw%
+\fontfamily{mc}\fontfamily{rm}\selectfont
+\baselineskip=1.6em
+「これはまったく意味がない日本語の文だ．」
+（あいう）{\Large\gtfamily（abcゴシック）}
+
+何かalphabet（欧文文字）も打ってみるか．
+$\zeta(2) \simeq
+  \directlua{tex.print(math.pi^2/6)}$.
+}}
+\end{center}
+\end{frame}
+
+
+
+\section{現在の状況}
+
+\begin{frame}
+  \frametitle{実装の模式図}
+  \begin{center}\unitlength=10mm
+  \begin{picture}(9.2,6.5)
+    \linethickness{1pt}
+    % primitive:
+    \only<1>{%
+    \color{lblue!20!white}
+    \put(0,0){\vrule width 9.2\unitlength height 3.2\unitlength depth 0pt}
+    \put(7.2,3.2){\vrule width 2\unitlength height 3.3\unitlength depth 0pt}
+    \color{lblue}
+    \put(0,0){\line(1,0){9.2}}
+    \put(0,0){\line(0,1){3.2}}
+    \put(9.2,0){\line(0,1){6.5}}
+    \put(0,3.2){\line(1,0){7.2}}
+    \put(7.2,3.2){\line(0,1){3.3}}
+    \put(7.2,6.5){\line(1,0){2}}
+    \color{lblue!50!black}
+    \put(4.6,1.6){\makebox(0,0)[c]{「エンジン拡張」}}
+    }%
+    % primitive (detailed)
+    \only<2>{%
+    %% typesetting
+    \color{linenavy!20!white}
+    \put(0,0){\vrule width 9.2\unitlength height \unitlength depth 0pt}
+    \color{linenavy}
+    \put(0,0){\line(1,0){9.2}}
+    \put(0,0){\line(0,1){1}}
+    \put(0,1){\line(1,0){9.2}}
+    \put(9.2,0){\line(0,1){1}}
+    \color{linenavy!50!black}
+    \put(4.6,0.5){\makebox(0,0)[c]{実際の組版処理用Luaコード}}
+    \color{blue!20!white}
+    \put(0,1.1){\vrule width 9.2\unitlength height \unitlength depth 0pt}
+    \color{blue}
+    \put(0,1.1){\line(1,0){9.2}}
+    \put(0,1.1){\line(0,1){1}}
+    \put(0,2.1){\line(1,0){9.2}}
+    \put(9.2,1.1){\line(0,1){1}}
+    \color{blue!50!black}
+    \put(4.6,1.6){\makebox(0,0)[c]{パラメタ設定用Luaコード}}
+    \color{lblue!20!white}
+    \put(0,2.2){\vrule width 9.2\unitlength height \unitlength depth 0pt}
+    \put(7.2,3.2){\vrule width 2\unitlength height 3.3\unitlength depth 0pt}
+    \color{lblue}
+    \put(0,2.2){\line(1,0){9.2}}
+    \put(0,2.2){\line(0,1){1}}
+    \put(9.2,2.2){\line(0,1){4.3}}
+    \put(0,3.2){\line(1,0){7.2}}
+    \put(7.2,3.2){\line(0,1){3.3}}
+    \put(7.2,6.5){\line(1,0){2}}
+    \color{lblue!50!black}
+    \put(4.6,2.7){\makebox(0,0)[c]{\TeX インターフェース}}
+    }%
+    % plain
+    \color{green!20!white}
+    \put(0,3.3){\vrule width 2\unitlength height 3.2\unitlength depth 0pt}
+    \color{green}
+    \put(0,3.3){\line(1,0){2}}
+    \put(0,3.3){\line(0,1){3.2}}
+    \put(2,3.3){\line(0,1){3.2}}
+    \put(0,6.5){\line(1,0){2}}
+    \color{green!50!black}
+    \put(1,4.9){\makebox(0,0)[c]{\parbox[c]{7\zw}{\centering plain \TeX\\対応}}}
+    % LaTeX kernel
+    \color{purple!20!white}
+    \put(2.1,3.3){\vrule width 5\unitlength height \unitlength depth 0pt}
+    \color{purple}
+    \put(2.1,3.3){\line(1,0){5}}
+    \put(2.1,3.3){\line(0,1){1}}
+    \put(7.1,3.3){\line(0,1){1}}
+    \put(2.1,4.3){\line(1,0){5}}
+    \color{purple!50!black}
+    \put(4.6,3.8){\makebox(0,0)[c]{\LaTeX 対応}}
+    % class file
+    \color{gray!20!white}
+    \put(2.1,4.4){\vrule width 5\unitlength height \unitlength depth 0pt}
+    \color{gray}
+    \put(2.1,4.4){\line(1,0){5}}
+    \put(2.1,4.4){\line(0,1){1}}
+    \put(7.1,4.4){\line(0,1){1}}
+    \put(2.1,5.4){\line(1,0){5}}
+    \color{gray!50!black}
+    \put(4.6,4.9){\makebox(0,0)[c]{日本語用クラスファイル}}
+    % patches for packages
+    \color{red!20!white}
+    \put(2.1,5.5){\vrule width 5\unitlength height \unitlength depth 0pt}
+    \color{red}
+    \put(2.1,5.5){\line(1,0){5}}
+    \put(2.1,5.5){\line(0,1){1}}
+    \put(7.1,5.5){\line(0,1){1}}
+    \put(2.1,6.5){\line(1,0){5}}
+    \color{red!50!black}
+    \put(4.6,6.0){\makebox(0,0)[c]{各種パッケージへの対応}}
+  \end{picture}
+  \end{center}
+\end{frame}
+
+\subsection{「エンジン拡張」部分・plain \TeX 対応}
+\begin{frame}
+  \frametitle{「エンジン拡張」部分・plain \TeX 対応}
+  \begin{flushleft}
+    \large\bfseries
+    \color{linenavy!50!black}概ね実装完了，テスト段階．
+  \end{flushleft}\vskip-\medskipamount
+  \begin{itemize}
+    \item 和文フォントの（欧文フォントとの）独立管理
+    \item 和文文字間・和欧文間の空白挿入
+    \item 禁則処理用のペナルティ挿入
+    \item 欧文・和文のベースライン上下移動
+    \item 和文文字直後の改行での空白挿入抑制\alert{（限定的）}
+    \item \alert{縦書き関連はまだ}
+  \end{itemize}
+  しかし，細かい仕様変更はまだ行う可能性はある．
+\end{frame}
+
+\subsection{\LaTeX 対応}
+\begin{frame}
+  \frametitle{\LaTeX 対応}
+  \begin{flushleft}
+    \large\bfseries
+    \color{purple!50!black}（横組みに関する）大半のp\LaTeXe 拡張を実装．
+  \end{flushleft}\vskip-\medskipamount
+  \begin{itemize}
+    \item 和文フォントの管理（\texttt{plfonts.dtx}相当）
+    \item \LaTeX カーネルへのパッチ（\texttt{plcore.dtx}相当）\\
+    但し，次の変更はomitした：
+    \begin{itemize}
+      \item ボトムフロートの出力順序
+      \item 脚注マクロ
+    \end{itemize}
+    \item \alert{クラスファイルの方針は未決定}\\
+    現時点では，BXjsclsを用いるのが手っ取り早い．
+  \end{itemize}
+\end{frame}
+
+
+\subsection{fontspec等への対応}
+
+\begin{frame}[fragile]
+  \frametitle{fontspec対応，\texttt{\char92 CID}・\texttt{\char92 UTF}}
+\noindent\textbf{fontspec対応}
+\begin{itemize}
+\item \verb+luatexja-fontspec+パッケージを使用する．
+\item 和文フォント用命令は\verb+\setmainjfont+のように「j」がつく．
+\end{itemize}
+
+\noindent\textbf{\texttt{\char92 CID}と\texttt{\char92 UTF}}
+\begin{itemize}
+\item \verb+luatexja-otf+パッケージを使用する．
+\item 例：「\verb+\CID{8705}と高+」→\quad\CID{8705}と高
+\item それ以外のotfパッケージの機能はまだ実装していない．
+\end{itemize}
+
+\end{frame}
+
+\section{p\TeX との主要な変更点}
+
+\subsection{命令名称・書式}
+\def\.#1{{\rm\fontshape{it}\selectfont$\langle$#1$\rangle$}}
+\begin{frame}
+\frametitle{命令名称の変更}
+殆どの組版パラメタは\texttt{|ltjsetparameter}にkey-valueリストを渡すことで設定．
+
+例：
+\begin{tabular}{cll}
+\toprule
+\multicolumn{2}{l}{\bf 和欧文間空白}\\
+\hskip1\zw代入&\tt
+\only<1>{|xkanjiskip=\.{length}}
+\alert{\only<2>{|ltjsetprameter\{xkanjiskip=\.{length}\}}}\\
+\hskip1\zw取得&\tt
+\only<1>{|xkanjiskip\sf\ (as a skip)}
+\alert{\only<2>{|ltjgetprameter\{xkanjiskip\}\sf\ (as string)}}\\\midrule
+\multicolumn{2}{l}{\bf 禁則用ペナルティ\hss}\\
+\hskip1\zw代入&\tt |prebreakpenalty\.{chr\_code}=\.{penalty}\\
+\hskip1\zw取得&\tt |prebreakpenalty\.{chr\_code}\sf\ (as a count)\\
+\bottomrule
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{和文フォントの指定方法}
+
+\begin{flushleft}
+\tt\large |jfont|piyo=\textcolor{green}{psft:GothicBBB-Medium}\\
+\hskip7em:\textcolor{blue}{jfm=ujis};...\ \textcolor{red}{at 20pt}
+\end{flushleft}
+
+和文フォントは，次の3要素の組である：
+\begin{description}[サイズ]
+\item[\textcolor{green}{字形}]
+  OpenType/TrueTypeフォントも可．\\
+  prefix \texttt{psft:}で非埋込フォントを指定可能．
+\item[\textcolor{blue}{metric}] p\TeX のJFMに相当．
+\item[\textcolor{red}{サイズ}]\ 
+\end{description}
+
+\end{frame}
+
+\subsection{空白挿入処理}
+
+\newdimen\bx\bx=3.2pt
+\newdimen\by
+\makeatletter
+\def\fw#1#2#3#4#5{\fboxsep0pt\vtop{\centering\by=#3\bx\hsize=\by
+  \leavevmode\fcolorbox{#4}{#4!25!white}{%
+  \hbox to\by{\fontsize{\by}{\by}\selectfont\color{black}%
+  \inhibitglue#1\inhibitglue}}\par\vskip5pt#2\par#5}\ignorespaces}
+\def\hw#1#2#3#4#5{\fboxsep0pt\vtop{\centering\by=#3\bx\hsize=0.5\by
+  \leavevmode\fcolorbox{#4}{#4!25!white}{%
+  \hbox to0.5\by{\fontsize{\by}{\by}\selectfont\color{black}%
+  \inhibitglue#1\inhibitglue}}\par\vskip5pt#2\par#5}\ignorespaces}
+\def\spc#1#2{\fboxsep0pt\vtop{\centering\by=#1\bx\hsize=0.5\by
+  \leavevmode\color{#2}\vrule width 0.5\by height 2pt depth 2pt}\ignorespaces}
+\def\bar{\vrule width 0.4pt height 5pt depth 5pt}
+
+\begin{frame}
+\frametitle{空白挿入の単位：Lua\TeX-jaの場合}
+
+\textbf{入力例：\quad}{\large\tt
+\textcolor{green}{$\underbracket{\hbox{）\{\}（}}_{\scriptstyle 1}$}%
+\textcolor{blue}{$\underbracket{\hbox{）|typeout\{\}（}}_{\scriptstyle 2}$}%
+\textcolor{red}{$\underbracket{\hbox{）\{|gt （}}_{\scriptstyle 3}$}\}}
+
+\begin{center}
+\vskip-\bigskipamount
+\leavevmode\bx=3.6pt
+\only<1>{%
+\hw{\fontfamily{mc}\selectfont ）}{jis}{10}{green}{\ }
+\spc{10}{green}\bar
+\spc{10}{green}
+\hw{\fontfamily{mc}\selectfont （}{jis}{10}{green}{}
+\hw{\fontfamily{mc}\selectfont ）}{jis}{10}{blue}{}
+\spc{10}{blue}
+\hw{\hss\setbox0=\hbox{\rotatebox{270}{\small whatsit}}\raise.5\dp0\copy0\hss}{}{10}{blue}{}
+\spc{10}{blue}
+\hw{\fontfamily{mc}\selectfont （}{jis}{10}{blue}{}
+\hw{\fontfamily{mc}\selectfont ）}{jis}{10}{red}{}
+\spc{10}{red}\bar
+\spc{10}{red}
+\hw{（}{jisg}{10}{red}{}
+}%
+\only<2>{%
+\hw{\fontfamily{mc}\selectfont ）}{ujis}{10}{green}{R}
+\spc{10}{green}
+\hw{\fontfamily{mc}\selectfont （}{ujis}{10}{green}{R}
+\hw{\fontfamily{mc}\selectfont ）}{ujis}{10}{blue}{R}
+\hw{\hss\setbox0=\hbox{\rotatebox{270}{\small whatsit}}\raise.5\dp0\copy0\hss}{}{10}{blue}{}
+\spc{10}{blue}
+\hw{\fontfamily{mc}\selectfont （}{ujis}{10}{blue}{R}
+\hw{\fontfamily{mc}\selectfont ）}{ujis}{10}{red}{R}
+\spc{10}{red}
+\hw{（}{ujis}{10}{red}{G}
+}
+\end{center}
+
+\vskip-\medskipamount
+\uncover<2>{
+\begin{enumerate}
+\item \alert{水平リスト内に寄与しないものは無視}\\
+ Lua\TeX でも，{\tt of\{\}fice}では合字は抑制されない
+\item 行分割に影響しないものも無視
+\item 例え\textcolor{green}{字形}が異なっても，
+\textcolor{blue}{metric}と\textcolor{red}{サイズ}が同じならば，
+空白挿入処理では同じフォントとして扱われる
+\end{enumerate}
+}
+\end{frame}
+
+\begin{frame}
+\frametitle{異フォントの文字：p\TeX の場合}
+
+\pTeX では，異なるフォントの文字間には，\\
+両者のJFM由来の空白が（両方別々に）入る：
+
+\medskip
+
+\leavevmode
+\vtop{\parindent=0pt\hsize=40pt\ \par\vskip5pt JFM\par size}
+\fw{\fontfamily{mc}\selectfont あ}{jis}{10}{green}{10}
+\hw{\fontfamily{mc}\selectfont 〗}{\textcolor{green}{jis}}{10}{green}{10}
+\spc{10}{green}\bar\spc{10}{blue}
+\hw{〖}{\textcolor{blue}{jisg}}{10}{blue}{10}
+\fw{い}{jisg}{10}{blue}{10}
+\hw{】}{jisg}{10}{blue}{\textcolor{blue}{10}}
+\spc{10}{blue}\bar\spc{14.4}{red}
+\hw{【}{jisg}{14.4}{red}{\textcolor{red}{14.4}}
+\fw{う}{jisg}{14.4}{red}{14.4}
+
+\begin{itemize}
+\item \leavevmode
+\smash{\spc{10}{green}\bar\spc{10}{blue}\hskip7.04pt}%
+：$\textcolor{green}{5\,\textrm{pt\footnotesize （左側由来）}}
++\textcolor{blue}{5\,\text{pt\footnotesize （右側由来）}}=10\,\text{pt}$
+\item \leavevmode
+\smash{\spc{10}{blue}\bar\spc{14.4}{red}}%
+：$\textcolor{blue}{5\,\textrm{pt\footnotesize （左側由来）}}
++\textcolor{red}{7.2\,\text{pt\footnotesize （右側由来）}}=12.2\,\text{pt}$
+\end{itemize}
+\end{frame}
+\begin{frame}
+\frametitle{異フォントの文字：\alert{Lua\TeX-ja} の場合}
+
+Lua\TeX-jaにおいて，異なるフォントの文字間には，\\
+両者のmetric由来の空白の\alert{平均}値が入る{\small（設定で変更可）}：
+
+\medskip
+
+
+\leavevmode
+\vtop{\parindent=0pt\hsize=40pt\ \par\vskip5pt metric\par size}
+\fw{\fontfamily{mc}\selectfont あ}{ujis$'$}{10}{green}{10}
+\hw{\fontfamily{mc}\selectfont〗}{\textcolor{green}{ujis$'$}}{10}{green}{10}
+\spc{10}{green!50!blue}
+\hw{〖}{\textcolor{blue}{ujis}}{10}{blue}{10}
+\fw{い}{ujis}{10}{blue}{10}
+\hw{】}{ujis}{10}{blue}{\textcolor{blue}{10}}
+\spc{12.2}{purple}
+\hw{【}{ujis}{14.4}{red}{\textcolor{red}{14.4}}
+\fw{う}{ujis}{14.4}{red}{14.4}
+
+\begin{itemize}
+\item \leavevmode
+\smash{\spc{10}{blue!50!green}\hskip3.52pt}%
+：$(\textcolor{green}{5\,\textrm{pt\footnotesize （左側由来）}}
++\textcolor{blue}{5\,\text{pt\footnotesize （右側由来）}})/2=5\,\text{pt}$
+\item \leavevmode
+\smash{\spc{12.2}{purple}}%
+：$(\textcolor{blue}{5\,\textrm{pt\footnotesize （左側由来）}}
++\textcolor{red}{7.2\,\text{pt\footnotesize （右側由来）}})/2=6.1\,\text{pt}$
+\end{itemize}
+\end{frame}
+
+\subsection{注意}
+\begin{frame}
+\frametitle{和文文字直後の改行}
+Lua\TeX の使用により，以下のようなad hocな実装：
+
+入力行が以下の場合
+\end{frame}
+
+\section*{まとめ}
+\begin{frame}
+\frametitle{まとめ}
+\large Lua\TeX-ja は，
+\begin{itemize}
+\item 日本語組版をLua\TeX 上で行うパッケージ．
+\item p\TeX をかなり意識しているが，\\ 100\% 互換とはならない．
+\item \LaTeX, fontspec用コードが試験的に整備され，ある程度は使える．
+しかし，バグが埋まっている可能性ありなので，使用には注意．
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Lua\TeX-ja プロジェクトについて}
+\begin{itemize}
+\item \textbf{公式ページ}\\
+\url{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage}
+\item まだ安定版のリリースはない．\\スナップショットがダウンロード可能．
+\item \textbf{開発メンバー}
+\begin{itemize}
+\item 北川 弘典
+\item 前田 一貴
+\item 八登 崇之
+\item 黒木 裕介
+\item 阿部 紀行
+\item 本田 知亮
+\item 山本 宗宏
+\end{itemize}
+\end{itemize}
+\end{frame}
+\end{document}
