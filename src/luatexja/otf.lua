@@ -10,7 +10,6 @@ luatexbase.provides_module({
 module('luatexja.otf', package.seeall)
 
 require('luatexja.base');      local ltjb = luatexja.base
-require('luatexja.jfont');     local ltjf = luatexja.jfont
 
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 
@@ -29,7 +28,7 @@ function cid(key)
                          'Use a font including the specified CID character.')
       return
    end
-   tex.print("\\char"..tostring(char).."\\relax")
+   tex.print(char)
 end
 
 -------------------- all done

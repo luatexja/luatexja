@@ -2,6 +2,7 @@
 \documentclass{bxjsarticle}
 \usepackage{luatexja}
 \usepackage{luatexja-otf}
+\usepackage{luatexja-fontspec}
 \begin{document}
 
 ※このファイルはフォントを埋め込んでいないため，代替されるフォントによっては正しく
@@ -27,6 +28,17 @@
   \item フラーレン(fullerene) C$_{60}$は
         サッカーボール状（\CID{20957}）の構造をしている。
   \item \UTF{9B87}とは岩魚（イワナ）のことであり，嘉魚とも書く。
+\end{itemize}
+
+\section*{要検討}
+現在の実装だと，対応する Unicode の符号位置を取得して単純に \verb|\char| に
+渡しているだけなので，以下の問題がある．
+\begin{itemize}
+\item 欧文文字範囲に設定されている文字は CID で出力しても欧文フォントになる．
+  例: あ\CID{18}1あ
+\item OpenType の feature が指定されているとそちらが優先される．
+  例: {\jfontspec[NoEmbed,CJKShape=JIS1978]{Ryumin-Light}\CID{3056}\CID{8267}}
+  （左は一点，右は二点になってほしい．）
 \end{itemize}
 
 \end{document}
