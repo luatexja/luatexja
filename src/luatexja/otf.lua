@@ -50,7 +50,7 @@ function cid(key)
    end
    local char = curjfnt.unicodes['Japan1.'..tostring(key)]
    if not char then
-      ltjb.package_error('luatexja-otf',
+      ltjb.package_warning('luatexja-otf',
                          'Current Japanese font "'..curjfnt.psname..'" does not include the specified CID character ('..tostring(key)..')', 
                          'Use a font including the specified CID character.')
       return

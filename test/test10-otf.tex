@@ -1,11 +1,9 @@
 %#! lualatex
 \documentclass{bxjsarticle}
+\usepackage{luacode}
 \usepackage{luatexja}
 \usepackage{luatexja-otf}
-\usepackage{luatexja-fontspec}
 \begin{document}
-%\ltjsetparameter{yjabaselineshift=3pt,yalbaselineshift=1pt}
-
 
 ※このファイルはフォントを埋め込んでいないため，代替されるフォントによっては正しく
 表示されないでしょう．
@@ -16,8 +14,8 @@
 
 \section*{Adobe-Japan1-5で追加された文字を使った例}
 \begin{itemize}
-  %% \item 「\゜か」，「\゜き」，「\゜く」，「\゜け」，「\゜こ」，
-  %%       「\゜カ」，「\゜キ」，「\゜ク」，「\゜ケ」，「\゜コ」は鼻濁音を表す。
+  \item 「\゜か」，「\゜き」，「\゜く」，「\゜け」，「\゜こ」，
+        「\゜カ」，「\゜キ」，「\゜ク」，「\゜ケ」，「\゜コ」は鼻濁音を表す。
   \item Macintosh用キーボードの\UTF{2318}(Command key)を押す。
   \item \UTF{2672}を心がけよう。
 \end{itemize}
@@ -32,18 +30,39 @@
   \item \UTF{9B87}とは岩魚（イワナ）のことであり，嘉魚とも書く。
 \end{itemize}
 
-\section*{要検討}
-現在の実装だと，対応する Unicode の符号位置を取得して単純に \verb|\char| に
-渡しているだけなので，以下の問題がある．
-\begin{itemize}
-\item 欧文文字範囲に設定されている文字は CID で出力しても欧文フォントになる．
-  例: あ\CID{18}1あ
+\section*{ajmacros}
 
-  \textgt{←一応和文文字扱いになるようにしたが，文字幅が問題．
-  欧文文字範囲の文字は（フォントだけ）和文のにするのはどうか？}
-\item OpenType の feature が指定されているとそちらが優先される．
-  例: {\jfontspec[NoEmbed,CJKShape=JIS1978]{Ryumin-Light}\CID{3056}\CID{8267}}
-  （左は一点，右は二点になってほしい．）
-\end{itemize}
+\begin{enumerate}\renewcommand{\labelenumi}{\ajLabel\ajKuroKaku{enumi}}
+\item その1
+\item その2
+\item その3
+\end{enumerate}
+
+{\bf（速報）}世界陸上\CID{20660}，\ajLig{ボルト}がフライングで失格．
+
+\ajHankaku{半角カタカナひらがな} ←JFM の問題か，半角ひらがなが全角幅で出てしまう．
+
+\newpage
+
+\section*{Adobe-Japan1-6 全グリフ}
+
+{\footnotesize
+% 表の作成は Lua でサボってしまう．
+% \CID{0} (.notdef) は luaotfload がマッピングしてくれないみたい．
+\begin{luacode*}
+for i = 0, 23057 do
+   if i % 50 == 0 then
+      tex.print(string.format("\\noindent%05d", i))
+   end
+   if i % 10 == 0 then
+      tex.print("　")
+   end
+   tex.print("\\hbox to 1\\zw{\\CID{"..tostring(i).."}}%")
+   if i % 50 == 49 then
+      tex.print("\\\\")
+   end
+end
+\end{luacode*}
+}
 
 \end{document}
