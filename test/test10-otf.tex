@@ -4,6 +4,8 @@
 \usepackage{luatexja-otf}
 \usepackage{luatexja-fontspec}
 \begin{document}
+%\ltjsetparameter{yjabaselineshift=3pt,yalbaselineshift=1pt}
+
 
 ※このファイルはフォントを埋め込んでいないため，代替されるフォントによっては正しく
 表示されないでしょう．
@@ -36,6 +38,9 @@
 \begin{itemize}
 \item 欧文文字範囲に設定されている文字は CID で出力しても欧文フォントになる．
   例: あ\CID{18}1あ
+
+  \textgt{←一応和文文字扱いになるようにしたが，文字幅が問題．
+  欧文文字範囲の文字は（フォントだけ）和文のにするのはどうか？}
 \item OpenType の feature が指定されているとそちらが優先される．
   例: {\jfontspec[NoEmbed,CJKShape=JIS1978]{Ryumin-Light}\CID{3056}\CID{8267}}
   （左は一点，右は二点になってほしい．）

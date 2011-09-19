@@ -85,10 +85,10 @@
 %! Main part of luatexja-otf
 \RequireLuaModule{luatexja.otf}
 
-\protected\def\CID#1{\char\directlua{luatexja.otf.cid(#1)}\relax}
+\protected\def\CID#1{\ifvmode\leavevmode\fi\directlua{luatexja.otf.cid(#1)}\relax}
 
 %% \UTF being compatible with the OTF package for pLaTeX
-\protected\def\UTF#1{\char"#1\relax}
+\protected\def\UTF#1{\ifvmode\leavevmode\fi\directlua{luatexja.otf.append_jglyph(0x#1)}}
 
 %%------------------ all done
 \ltj@otf@AtEnd
