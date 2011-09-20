@@ -212,7 +212,7 @@
 
 %%%%%%%% \ltjdefcharrange<name>{100-200,3000-,5000,...}
 \protected\def\ltjdefcharrange#1#2{%
-  \ltj@tempcntc=#1 \expandafter\ltj@@dcrange#2,,\ignorespaces}
+  {\ltj@tempcntc=#1 \expandafter\ltj@@dcrange#2,,}\ignorespaces}
 \def\ltj@@dcrange#1,{\def\ltj@temp{#1}%
   \ifx\ltj@temp\empty\let\@next=\relax\else
   \ltj@@dcrangeA{#1}\let\@next=\ltj@@dcrange\fi\@next}
@@ -222,9 +222,9 @@
     \ltj@tempcnta=#1 \ltj@tempcntb=\ltj@tempcnta
   \else
     \def\ltj@temp{#1}%
-    \ifx\ltj@temp\empty\ltj@tempcnta='200 \else\ltj@tempcnta=#1 \fi
+    \ifx\ltj@temp\empty\ltj@tempcnta='200\else\ltj@tempcnta=#1\fi\relax
     \def\ltj@temp{#2}%
-    \ifx\ltj@temp\empty\ltj@tempcntb="10FFFF \else\ltj@tempcntb=#2 \fi%"
+    \ifx\ltj@temp\empty\ltj@tempcntb="10FFFF\else\ltj@tempcntb=#2\fi\relax%"
   \fi
   \directlua{luatexja.charrange.add_char_range(\the\ltj@tempcnta,\the\ltj@tempcntb,
     \the\ltj@tempcntc)}%

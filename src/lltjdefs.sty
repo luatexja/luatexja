@@ -32,4 +32,114 @@
 \DeclareSymbolFontAlphabet{\mathmc}{mincho}
 \DeclareMathAlphabet{\mathgt}{JY3}{gt}{m}{n}
 
+\ltjdefcharrange{1}{"80-"36F, "1E00-"1EFF} 
+\ltjdefcharrange{2}{"370-"4FF, "1F00-"1FFF} 
+\ltjdefcharrange{3}{%
+  "2000-"243F, "2500-"27BF, "2900-"29FF, "2B00-"2BFF, "E000-"F8FF, 
+  "FB00-"FB4F} 
+\ltjdefcharrange{4}{%
+   "500-"10FF, "1200-"1DFF, "2440-"245F, "27C0-"28FF, "2A00-"2AFF, 
+  "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A82F, "A840-"ABFF, "FB50-"FE0F, 
+  "FE20-"FE2F, "FE70-"FEFF, "10000-"1FFFF} % non-Japanese
+\ltjdefcharrange{5}{"D800-"DFFF, "E0000-"10FFFF} 
+\ltjdefcharrange{6}{%
+  "2460-"24FF, "2E80-"2EFF, "3000-"30FF, "3190-"319F, "31F0-"4DBF, 
+  "4E00-"9FFF, "F900-"FAFF, "FE10-"FE6F, "20000-"2FFFF}
+\ltjdefcharrange{7}{
+  "1100-"11FF, "2F00-"2FFF, "3100-"31EF, "A000-"A4CF, "A830-"A83F, 
+  "AC00-"D7FF}
+\ltjdefcharrange{8}{"A7, "A8, "B0, "B1, "B4, "B6, "D7, "F7}
+\ltjsetparameter{jacharrange={-1, +2, +3, -4, -5, +6, +7, +8}}
+
+% END OF FILE
 \endinput
+
+======== comment ========
+
+MIDDLE
+
+\ltjdefcharrange{1}{"80-"36F, "1E00-"1EFF} 
+  %   2  "80-"FF num = 471/128 name = Latin-1 Supplement
+  %   3  "100-"17F num = 484/128 name = Latin Extended-A
+  %   4  "180-"24F num = 87/208 name = Latin Extended-B
+  %   5  "250-"2AF num = 154/96 name = IPA Extensions
+  %   6  "2B0-"2FF num = 42/80 name = Spacing Modifier Letters
+  %   7  "300-"36F num = 98/112 name = Combining Diacritical Marks
+  %  64  "1E00-"1EFF num = 16/256 name = Latin Extended Additional
+
+\ltjdefcharrange{2}{"370-"4FF, "1F00-"1FFF} 
+  % Greek and Coptic, Cyrillic, Greek Extended
+
+\ltjdefcharrange{3}{%
+  "2000-"243F, "2500-"27BF, "2900-"29FF, "2B00-"2BFF, "E000-"F8FF, 
+  "FB00-"FB4F} 
+  %   66  "2000-"206F num = 140/112 name = General Punctuation
+  %   67  "2070-"209F num = 68/48 name = Superscripts and Subscripts
+  %   68  "20A0-"20CF num = 5/48 name = Currency Symbols
+  %   69  "20D0-"20FF num = 2/48 name = Combining Diacritical Marks for Symbols
+  %   70  "2100-"214F num = 46/80 name = Letterlike Symbols
+  %   71  "2150-"218F num = 90/64 name = Number Forms
+  %   72  "2190-"21FF num = 39/112 name = Arrows
+  %   73  "2200-"22FF num = 210/256 name = Mathematical Operators
+  %   74  "2300-"23FF num = 69/256 name = Miscellaneous Technical
+  %   75  "2400-"243F num = 1/64 name = Control Pictures
+  %   78  "2500-"257F num = 241 name = Box Drawing
+  %   79  "2580-"259F num = 17 name = Block Elements
+  %   80  "25A0-"25FF num = 70 name = Geometric Shapes
+  %   81  "2600-"26FF num = 49 name = Miscellaneous Symbols
+  %   82  "2700-"27BF num = 23 name = Dingbats
+  %   86  "2900-"297F num = 2 name = Supplemental Arrows-B
+  %   87  "2980-"29FF num = 4 name = Miscellaneous Mathematical Symbols-B
+  %   89  "2B00-"2BFF num = 3 name = Miscellaneous Symbols and Arrows
+  %  142  "E000-"F8FF num = 5/6400 name = Private Use Area
+  %  144  "FB00-"FB4F num = 20/80 name = Alphabetic Presentation Forms
+
+NEGATIVE
+
+\ltjdefcharrange{4}{%
+   "500-"10FF, "1200-"1DFF, "2440-"245F, "27C0-"28FF, "2A00-"2AFF, 
+  "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A82F, "A840-"ABFF, "FB50-"FE0F, 
+  "FE20-"FE2F, "FE70-"FEFF, "10000-"1FFFF} % non-Japanese
+\ltjdefcharrange{5}{"D800-"DFFF, "E0000-"10FFFF} 
+  % Surrogates, Tags and Variation Selectors Supplement
+  %  208  "F0000-"FFFFF num = 0/65536 name = Supplementary Private Use Area-A
+  %  209  "100000-"10FFFF num = 0/65536 name = Supplementary Private Use Area-B
+
+POSITIVE
+
+% Japanese
+\ltjdefcharrange{6}{%
+  "2460-"24FF, "2E80-"2EFF, "3000-"30FF, "3190-"319F, "31F0-"4DBF, 
+  "4E00-"9FFF, "F900-"FAFF, "FE10-"FE6F, "20000-"2FFFF}
+%   77  "2460-"24FF num = 150/160 name = Enclosed Alphanumerics
+%   98  "2E80-"2EFF num = 21 name = CJK Radicals Supplement
+%  101  "3000-"303F num = 144 name = CJK Symbols and Punctuation
+%  102  "3040-"309F num = 1074 name = Hiragana
+%  103  "30A0-"30FF num = 985 name = Katakana
+%  106  "3190-"319F num = 16/16 name = Kanbun
+%  109  "31F0-"31FF num = 128 name = Katakana Phonetic Extensions
+%  110  "3200-"32FF num = 143 name = Enclosed CJK Letters and Months
+%  111  "3300-"33FF num = 255 name = CJK Compatibility
+%  112  "3400-"4DBF num = 203 name = CJK Unified Ideographs Extension A
+%  114  "4E00-"9FFF num = 14087 name = CJK Unified Ideographs
+%  143  "F900-"FAFF num = 110/512 name = CJK Compatibility Ideographs
+%  147  "FE10-"FE1F num = 0/16 name = Vertical Forms
+%  149  "FE30-"FE4F num = 8/32 name = CJK Compatibility Forms
+%  150  "FE50-"FE6F num = 0/32 name = Small Form Variants
+%  SIP
+
+\ltjdefcharrange{7}{
+  "1100-"11FF, "2F00-"2FFF, "3100-"31EF, "A000-"A4CF, "A830-"A83F, 
+  "AC00-"D7FF}
+  %   35  "1100-"11FF num = 1 name = Hangul Jamo
+  %   99  "2F00-"2FDF num = 0/224 name = Kangxi Radicals
+  %  100  "2FF0-"2FFF num = 0/16 name = Ideographic Description Characters
+  %  104  "3100-"312F num = 0/48 name = Bopomofo
+  %  105  "3130-"318F num = 0/96 name = Hangul Compatibility Jamo
+  %  107  "31A0-"31BF num = 0/32 name = Bopomofo Extended
+  %  108  "31C0-"31EF num = 0/48 name = CJK Strokes
+  %  115  "A000-"A48F num = 0/1168 name = Yi Syllables
+  %  116  "A490-"A4CF num = 0/64 name = Yi Radicals
+  %  124  "A830-"A83F num = 0/16 name = Common Indic Number Forms
+  %  137  "AC00-"D7AF num = 0/11184 name = Hangul Syllables
+  %  138  "D7B0-"D7FF num = 0/80 name = Hangul Jamo Extended-B

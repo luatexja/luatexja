@@ -51,7 +51,7 @@
 
 \lstset{
   basicstyle=\ttfamily\small, pos=o, breaklines=true,
-  numbers=none, rframe={}
+  numbers=none, rframe={}, basewidth=0.5em
 }
 
 \parskip=\smallskipamount
@@ -261,8 +261,6 @@ This does minimal settings (like {\tt ptex.tex}) for typesetting Japanese docume
       their alphabetic counterparts: for example, the size
       \verb+\texmin+ is $13.5\,\textrm{Q}\simeq 9.60444\,\textrm{pt}$. This is intensional: ...
 \end{itemize}
-\item A character in Unicode is treated as \textbf{JAchar} if and only
-      if its code-point has more than or equal to U+0100.
 \item The amount of glue that are inserted between a \textbf{JAchar} and
       an \textbf{ALchar} (the parameter \textsf{xkanjiskip}) is set to
 \[
@@ -411,33 +409,171 @@ parameters, you have to use commands \verb+\ltjsetparameter+ and
 \verb+\ltjgetparameter+.
 
 \subsection{Editing the range of \textbf{JAchar}s}
-As noted before, the default setting is:
-\begin{center}
-A character in Unicode is treated as \textbf{JAchar},\\
- if and only if its
- code-point has more than or equal to U+0100.
-\end{center}
-$\uparrow$ TODO: CHANGE THIS!
 
 
 To edit the range of \textbf{JAchar}s, You have to assign a non-zero
 natural number which is less than 217 to the character range first. This
 can be done by using \verb+\ltjdefcharrange+ primitive. For example, the
 next line assigns whole characters in Supplementary Multilingual Plane
-and the character `漢' to the range number~4.
+and the character `漢' to the range number~100.
 \begin{lstlisting}
-\ltjdefcharrange{4}{"10000-"1FFFF,`漢}
+\ltjdefcharrange{100}{"10000-"1FFFF,`漢}
 \end{lstlisting}
 This assignment of numbers to ranges are always global, so you should
 not do this in the middle of a document. 上書き
 
 After assigning numbers to ranges, ...
 
+\paragraph{Default Setting}
+Lua\TeX-ja predefines eight character ranges for convinience. They are
+determined from the following data:
+\begin{itemize}
+\item Blocks in Unicode~6.0.
+\item The \texttt{Adobe-Japan1-UCS2} mapping between a CID Adobe-Japan1-6 and Unicode.
+\item The \texttt{PXbase} bundle for \upTeX\ by Takayuki Yato.
+\end{itemize}
+
+Now we describe these eight ranges. The alphabet `J' or `A' after the
+number shows whether characters in the range is treated as
+\textbf{JAchar}s or not by default. These settings are similar to \texttt{prefercjk} ...
+\begin{description}
+\item[Range~8${}^{\text{J}}$] Symbols in the intersection of the upper half of ISO~8859-1
+	 (Latin-1 Supplement) and JIS~X~0208 (a basic character set for Japanese). This character range
+	 consists of the following charatcers:
+\begin{multicols}{2}
+\begin{itemize}
+\def\ch#1#2{\item \char"#1\ ({\tt U+00#1}, #2)}%"
+\ch{A7}{Section Sign}
+\ch{A8}{Umlaut or diaeresis}
+\ch{B0}{Degree sign}
+\ch{B1}{Plus-minus sign}
+\ch{B4}{Spacing acute}
+\ch{B6}{Paragraph sign}
+\ch{D7}{Multiplication sign}
+\ch{F7}{Division Sign}
+\end{itemize}
+\end{multicols}
+\item[Range~1${}^{\text{A}}$] Latin characters that some of them are included in Adobe-Japan1-6.
+This range consist of the following Unicode ranges, \emph{except characters in the range~8 above}:
+\begin{multicols}{2}
+\begin{itemize}
+\item {\tt U+0080}--{\tt U+00FF}: Latin-1 Supplement
+\item {\tt U+0100}--{\tt U+017F}: Latin Extended-A
+\item {\tt U+0180}--{\tt U+024F}: Latin Extended-B
+\item {\tt U+0250}--{\tt U+02AF}: IPA Extensions
+\item {\tt U+02B0}--{\tt U+02FF}: Spacing Modifier Letters
+\item {\tt U+0300}--{\tt U+036F}: Combining Diacritical Marks
+\item {\tt U+1E00}--{\tt U+1EFF}: Latin Extended Additional
+\par\ 
+\end{itemize}
+\end{multicols}
+\item[Range~2${}^{\text{J}}$] Greek and Cyrillic letters. JIS~X~0208 (hence most of Japanese
+	   fonts) has some of these characters.
+\begin{multicols}{2}
+\begin{itemize}
+\item {\tt U+0370}--{\tt U+03FF}: Greek and Coptic
+\item {\tt U+0400}--{\tt U+04FF}: Cyrillic
+\item {\tt U+1F00}--{\tt U+1FFF}: Greek Extended
+\\\ 
+\end{itemize}
+\end{multicols}
+\item[Range~3${}^{\text{J}}$] Punctuations and Miscellaneous symbols. The block list is
+	   indicated in Table~\ref{table-rng3}.
+\begin{table}[p]
+\caption{Unicode blocks in predefined character range~3.}\label{table-rng3}
+\catcode`\"=13\def"#1#2#3#4{{\tt U+#1#2#3#4}}%"
+\begin{center}
+\begin{tabular}{ll}
+"2000--"206F&General Punctuation\\
+"2070--"209F&Superscripts and Subscripts\\
+"20A0--"20CF&Currency Symbols\\
+"20D0--"20FF&Combining Diacritical Marks for Symbols\\
+"2100--"214F&Letterlike Symbols\\
+"2150--"218F&Number Forms\\
+"2190--"21FF&Arrows\\
+"2200--"22FF&Mathematical Operators\\
+"2300--"23FF&Miscellaneous Technical\\
+"2400--"243F&Control Pictures\\
+"2500--"257F&Box Drawing\\
+"2580--"259F&Block Elements\\
+"25A0--"25FF&Geometric Shapes\\
+"2600--"26FF&Miscellaneous Symbols\\
+"2700--"27BF&Dingbats\\
+"2900--"297F&Supplemental Arrows-B\\
+"2980--"29FF&Miscellaneous Mathematical Symbols-B\\
+"2B00--"2BFF&Miscellaneous Symbols and Arrows\\
+"E000--"F8FF&Private Use Area\\
+"FB00--"FB4F&Alphabetic Presentation Forms
+\end{tabular}
+\end{center}
+\end{table}
+\item[Range~4${}^{\text{A}}$] Characters usually not in Japanese fonts. This range consists
+	   of almost all Unicode blocks which are not in other
+	   predefined ranges. Hence, instead of showing the block list,
+	   we put the definition of this range itself:
+\begin{lstlisting}
+\ltjdefcharrange{4}{%
+   "500-"10FF, "1200-"1DFF, "2440-"245F, "27C0-"28FF, "2A00-"2AFF, 
+  "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A82F, "A840-"ABFF, "FB50-"FE0F, 
+  "FE20-"FE2F, "FE70-"FEFF, "10000-"1FFFF} % non-Japanese
+\end{lstlisting}
+\item[Range~5${}^{\text{A}}$] Surrogates and Supplementary Private Use Areas.
+\item[Range~6${}^{\text{J}}$] Characters used in Japanese. The block list is indicated in Table~\ref{table-rng6}.
+\begin{table}[p]
+\caption{Unicode blocks in predefined character range~6.}\label{table-rng6}
+\catcode`\"=13\def"#1#2#3#4{{\tt U+#1#2#3#4}}%"
+\begin{center}
+\begin{tabular}{ll}
+"2460--"24FF&Enclosed Alphanumerics\\
+"2E80--"2EFF&CJK Radicals Supplement\\
+"3000--"303F&CJK Symbols and Punctuation\\
+"3040--"309F&Hiragana\\
+"30A0--"30FF&Katakana\\
+"3190--"319F&Kanbun\\
+"31F0--"31FF&Katakana Phonetic Extensions\\
+"3200--"32FF&Enclosed CJK Letters and Months\\
+"3300--"33FF&CJK Compatibility\\
+"3400--"4DBF&CJK Unified Ideographs Extension A\\
+"4E00--"9FFF&CJK Unified Ideographs\\
+"F900--"FAFF&CJK Compatibility Ideographs\\
+"FE10--"FE1F&Vertical Forms\\
+"FE30--"FE4F&CJK Compatibility Forms\\
+"FE50--"FE6F&Small Form Variants\\
+"{20}000--"{2F}FFF&(Supplementary Ideographic Plane)
+\end{tabular}
+\end{center}
+\end{table}
+\item[Range~7${}^{\text{J}}$] Characters used in CJK languages, but not included in  Adobe-Japan1-6.
+The block list is indicated in Table~\ref{table-rng7}.
+\begin{table}[p]
+\caption{Unicode blocks in predefined character range~7.}\label{table-rng7}
+\catcode`\"=13\def"#1#2#3#4{{\tt U+#1#2#3#4}}%"
+\begin{center}
+\begin{tabular}{ll}
+"1100--"11FF&Hangul Jamo\\
+"2F00--"2FDF&Kangxi Radicals\\
+"2FF0--"2FFF&Ideographic Description Characters\\
+"3100--"312F&Bopomofo\\
+"3130--"318F&Hangul Compatibility Jamo\\
+"31A0--"31BF&Bopomofo Extended\\
+"31C0--"31EF&CJK Strokes\\
+"A000--"A48F&Yi Syllables\\
+"A490--"A4CF&Yi Radicals\\
+"A830--"A83F&Common Indic Number Forms\\
+"AC00--"D7AF&Hangul Syllables\\
+"D7B0--"D7FF&Hangul Jamo Extended-B
+\end{tabular}
+\end{center}
+\end{table}
+\end{description}
+
+
 \subsection{\textsf{kanjiskip} and \textsf{xkanjiskip}}\label{subs-kskip}
 \textbf{JAglue} is divided into the following three categories:
 \begin{itemize}
-\item Glues/kerns specified in JFM. If \verb+\inhibitglue+ is issued around a Japanese character,
-      this glue will be not inserted at the place.
+\item Glues/kerns specified in JFM. If \verb+\inhibitglue+ is issued
+      around a Japanese character, this glue will be not inserted at the
+      place.
 \item The default glue which inserted between two \textbf{JAchar}s ({\sf
       kanjiskip}).
 \item The default glue which inserted between a \textbf{JAchar} and an
@@ -445,10 +581,10 @@ After assigning numbers to ranges, ...
 \end{itemize}
 The value (a skip) of \textsf{kanjiskip} or \textsf{xkanjiskip} can be
 changed as the following.
-\begin{verbatim}
+\begin{lstlisting}
 \ltjsetparameter{kanjiskip={0pt plus 0.4pt minus 0.4pt}, 
                  xkanjiskip={0.25\zw plus 1pt minus 1pt}}
-\end{verbatim}
+\end{lstlisting}
 
 
 It may occur that JFM contains the data of `ideal width of {\sf
