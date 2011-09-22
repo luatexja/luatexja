@@ -1,0 +1,840 @@
+%
+% luatexja-ajmacros.sty
+%
+% Original:
+% \ProvidesPackage{ajmacros}[2005/12/25 13:52 iNOUE Koich! <inoue@ma.ns.musashi-tech.ac.jp>]
+%
+% Note 1: \aj半角 is renamed \ajHankaku
+% Note 2: Comment out \ajQuote
+%
+
+%% Avoid multiple loading.
+\csname\if11luatexjaajmacrosLoaded\fi\endcsname
+\edef\x{%
+\catcode32=\the\catcode32%
+\catcode33=\the\catcode33%
+\catcode35=\the\catcode35%
+\catcode40=\the\catcode40%
+\catcode41=\the\catcode41%
+\catcode42=\the\catcode42%
+\catcode43=\the\catcode43%
+\catcode44=\the\catcode44%
+\catcode45=\the\catcode45%
+\catcode46=\the\catcode46%
+\catcode58=\the\catcode58%
+\catcode59=\the\catcode59%
+\catcode60=\the\catcode60%
+\catcode61=\the\catcode61%
+\catcode62=\the\catcode62%
+\catcode64=\the\catcode64%
+\catcode91=\the\catcode91%
+\catcode93=\the\catcode93%
+\catcode94=\the\catcode94%
+\catcode95=\the\catcode95%
+\catcode126=\the\catcode126%
+\endlinechar=\the\endlinechar
+\relax}
+\catcode32=10 %< >
+\catcode33=12 %<">
+\catcode35=6  %<#>
+\catcode40=12 %<(>
+\catcode41=12 %<)>
+\catcode42=12 %<*>
+\catcode43=12 %<+>
+\catcode44=12 %<,>
+\catcode45=12 %<->
+\catcode46=12 %<.>
+\catcode58=12 %<:>
+\catcode59=12 %<;>
+\catcode60=12 %<<>
+\catcode61=12 %<=>
+\catcode62=12 %<>>
+\catcode64=11 %<@>
+\catcode91=12 %<[>
+\catcode93=12 %<]>
+\catcode94=7  %<^>
+\catcode95=8  %<_>
+\catcode126=13 %<~>
+\endlinechar=-1 %
+
+\edef\ltj@ajmacros@AtEnd{\x
+  \noexpand\let\noexpand\ltj@ajmacros@AtEnd\relax}
+\def\luatexjaajmacrosLoaded{\endinput}
+
+%% Check if LaTeX is used.
+\begingroup\expandafter\expandafter\expandafter\endgroup
+\expandafter\ifx\csname RequirePackage\endcsname\relax %<*!LaTeX>
+  \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
+    \csname iffalse\endcsname
+\else                           %<*LaTeX>
+  \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
+    \csname iftrue\endcsname
+  \NeedsTeXFormat{LaTeX2e}
+  \ProvidesPackage{luatexja-ajmacros}[2011/09/19 v0.1]
+\fi                             %</LaTeX>
+
+%%------------------
+%! Main part of luatexja-ajmacros
+\newif\if@kana\@kanafalse
+%% for plain TeX
+\newcount\@tempcnta
+\newcount\@tempcntb
+\ifltj@in@latex\else
+  \def\@tw{\char"2}
+  \def\@ifstar#1#2#3{\ifx*#3\expandafter#1\else#2{#3}\fi}
+\fi
+
+{%
+\gdef\shift@CID#1#2{{\@tempcnta#1\advance\@tempcnta#2\CID{\@tempcnta}}}
+\gdef\ajTsumesuji{\@ifstar{\@@ajTsumesuji}{\@ajTsumesuji}}
+\global\let\ajTumesuji\ajTsumesuji
+\gdef\@ajTsumesuji#1#2{{\@tempcnta\ifydir\ifcase#1\or780\or247\or9758\or9738\fi
+	\else\ifcase#1\or8736\or8966\or13274\or13254\fi\fi
+	\aj@expand\aj@Tsumesuji#2\@nil}}
+\gdef\@@ajTsumesuji#1{\@ajTsumesuji{\aj@expand\aj@count@toks#14321\@nil}{#1}}
+\gdef\aj@expand#1#2{\expandafter\@aj@expand\number#2!#1}
+\gdef\@aj@expand#1!#2{#2#1}
+\gdef\aj@count@toks#1#2#3#4#5#6\@nil{#5}
+\gdef\aj@Tsumesuji#1{\ifx\@nil#1\else\shift@CID{\@tempcnta}{#1}%
+	\expandafter\aj@Tsumesuji
+	\fi}
+\gdef\ajMaru{\@ifstar{\@aj@Maru}{\aj@Maru}}
+\gdef\aj@Maru#1{\ifnum#1=\z@ \CID{8224}%
+	\else\ifnum#1<21 \shift@CID{#1}{7554}%
+	\else\ifnum#1=21 \CID{8091}%
+	\else\ifnum#1<32 \shift@CID{#1}{8080}%
+	\else\shift@CID{#1}{10212}%
+	\fi\fi\fi\fi}
+\gdef\@aj@Maru#1{\ifnum#1<10 \shift@CID{#1}{10234}%
+	\else\ifnum#1<21 \shift@CID{#1}{7554}%
+	\else\ifnum#1=21 \CID{8091}%
+	\else\ifnum#1<32 \shift@CID{#1}{8080}%
+	\else\shift@CID{#1}{10212}%
+	\fi\fi\fi\fi}
+\gdef\ajKuroMaru{\@ifstar{\@aj@KuroMaru}{\aj@KuroMaru}}
+\gdef\aj@KuroMaru#1{\ifnum#1=\z@ \CID{10503}%
+	\else\ifnum#1<10 \shift@CID{#1}{8285}%
+	\else\shift@CID{#1}{10504}%
+	\fi\fi}
+\gdef\@aj@KuroMaru#1{\shift@CID{#1}{10504}}
+\gdef\ajKaku{\@ifstar{\@aj@Kaku}{\aj@Kaku}}
+\gdef\aj@Kaku#1{\ifnum#1<10{\@tempcnta#1\multiply\@tempcnta\tw@
+	\shift@CID{\@tempcnta}{10764}}%
+	\else\shift@CID{#1}{10774}%
+	\fi}
+\gdef\@aj@Kaku#1{\ifnum#1<10{\@tempcnta#1\multiply\@tempcnta\tw@
+	\shift@CID{\@tempcnta}{10765}}%
+	\else\shift@CID{#1}{10774}%
+	\fi}
+\gdef\ajKuroKaku{\@ifstar{\@aj@KuroKaku}{\aj@KuroKaku}}
+\gdef\aj@KuroKaku#1{\ifnum#1<10{\@tempcnta#1\multiply\@tempcnta\tw@
+	\shift@CID{\@tempcnta}{11037}}%
+	\else\shift@CID{#1}{11047}%
+	\fi}
+\gdef\@aj@KuroKaku#1{\ifnum#1<10{\@tempcnta#1\multiply\@tempcnta\tw@
+	\shift@CID{\@tempcnta}{11038}}%
+	\else\shift@CID{#1}{11047}%
+	\fi}
+\gdef\ajMaruKaku{\@ifstar{\@aj@MaruKaku}{\aj@MaruKaku}}
+\gdef\aj@MaruKaku#1{\ifnum#1<10{\@tempcnta#1\multiply\@tempcnta\tw@
+	\shift@CID{\@tempcnta}{11307}}%
+	\else\shift@CID{#1}{11317}%
+	\fi}
+\gdef\@aj@MaruKaku#1{\ifnum#1<10{\@tempcnta#1\multiply\@tempcnta\tw@
+	\shift@CID{\@tempcnta}{11308}}%
+	\else\shift@CID{#1}{11317}%
+	\fi}
+\gdef\ajKuroMaruKaku{\@ifstar{\@aj@KuroMaruKaku}{\aj@KuroMaruKaku}}
+\gdef\aj@KuroMaruKaku#1{\ifnum#1<10{\@tempcnta#1\multiply\@tempcnta\tw@
+	\shift@CID{\@tempcnta}{11576}}%
+	\else\shift@CID{#1}{11586}%
+	\fi}
+\gdef\@aj@KuroMaruKaku#1{\ifnum#1<10{\@tempcnta#1\multiply\@tempcnta\tw@
+	\shift@CID{\@tempcnta}{11577}}%
+	\else\shift@CID{#1}{11586}%
+	\fi}
+\gdef\ajKakko{\@ifstar{\@aj@Kakko}{\aj@Kakko}}
+\gdef\aj@Kakko#1{\ifnum#1=\z@ \CID{8227}%
+	\else\ifnum#1<21 \shift@CID{#1}{8070}%
+	\else\shift@CID{#1}{9873}%
+	\fi\fi}
+\gdef\@aj@Kakko#1{\ifnum#1<10 \shift@CID{#1}{9884}%
+	\else\ifnum#1<21 \shift@CID{#1}{8070}%
+	\else\shift@CID{#1}{9873}%
+	\fi\fi}
+\gdef\ajRoman{\@ifstar{\@aj@Roman}{\aj@Roman}}
+\gdef\aj@Roman#1{\ifnum#1<11 \shift@CID{#1}{7574}%
+	\else\ifnum#1<13 \shift@CID{#1}{8214}%
+	\else\shift@CID{#1}{8282}%
+	\fi\fi}
+\gdef\@aj@Roman#1{\ifnum#1=4 \CID{9883}\else\aj@Roman{#1}\fi}
+\gdef\ajroman#1{\ifnum#1<11 \shift@CID{#1}{8091}%
+	\else\shift@CID{#1}{8287}%
+	\fi}
+\gdef\ajPeriod#1{\ifnum#1<10 \shift@CID{#1}{8061}\else\shift@CID{#1}{20577}\fi}%AJ1-6
+\gdef\ajKakkoalph#1{\shift@CID{#1}{8111}}
+\gdef\ajKakkoYobi#1{\shift@CID{#1}{8196}}
+\gdef\ajKakkoroman#1{\shift@CID{#1}{9973}}
+\gdef\ajKakkoRoman#1{\shift@CID{#1}{9988}}
+\gdef\ajKakkoAlph#1{\shift@CID{#1}{10003}}
+\gdef\ajKakkoHira#1{\shift@CID{#1}{10029}}
+\gdef\ajKakkoKata#1{\shift@CID{#1}{10077}}
+\gdef\ajKakkoKansuji#1{\shift@CID{#1}{10125}}
+\gdef\ajMaruKansuji#1{\shift@CID{#1}{10460}}
+\gdef\ajNijuMaru#1{\shift@CID{#1}{16222}}
+\gdef\ajRecycle#1{\shift@CID{#1}{16314}}
+\gdef\ajHasenKakuAlph#1{\shift@CID{#1}{20496}}%AJ1-6
+\gdef\ajCross#1{\shift@CID{#1}{20523}}%AJ1-6
+\gdef\ajSlanted{\@ifstar{\aj@Slanted}{\@aj@Slanted}}%AJ1-6
+\gdef\aj@Slanted#1{\shift@CID{#1}{20589}}%AJ1-6
+\gdef\@aj@Slanted#1{\ifnum#1<10 \shift@CID{#1}{9460}\else\shift@CID{#1}{20589}\fi}%AJ1-6
+\gdef\ajApostrophe#1{\shift@CID{#1}{20649}}%AJ1-6
+\global\let\ajYear\ajApostrophe%AJ1-6
+\gdef\ajSquareMark{\@ifstar{\aj@SquareMark}{\@ifnextchar+{\@aj@SquareMark}{\@ajSquareMark}}}
+\gdef\@ajSquareMark#1{\shift@CID{#1}{12229}}
+\gdef\aj@SquareMark#1{\shift@CID{#1}{12241}}
+\gdef\@aj@SquareMark+#1{\shift@CID{#1}{\ifodd\@tempcnta24459\else24482\fi
+	\divide\@tempcnta\tw@}}
+\gdef\ajHishi#1{\shift@CID{#1}{12256}}
+%
+\let\offsetalph\z@
+\chardef\offsetAlph26
+\chardef\offsetHira26
+\chardef\offsetKata48
+\chardef\offsetYobi48
+\let\offsetMaru\z@
+\chardef\offsetKuroMaru144
+\chardef\offsetKaku122
+\chardef\offsetKuroKaku125
+\chardef\offsetMaruKaku122
+\chardef\offsetKuroMaruKaku121
+\@tempcnta10312
+\def\@aj@sujidef#1{\ifx\@nil#1%
+	\else\advance\@tempcnta\csname offset#1\endcsname
+	\expandafter\xdef\csname aj\@ajsujifam#1\endcsname##1%
+		{\noexpand\shift@CID{##1}{\number\@tempcnta}}%
+	\expandafter\@aj@sujidef\fi}
+\def\@ajsujidef#1{\ifx\@nil#1%
+	\else\advance\@tempcnta\csname offset#1\endcsname
+	\def\@ajsujifam{#1}%
+	\@aj@sujidef{alph}{Alph}{Hira}{Kata}{Yobi}\@nil
+	\expandafter\@ajsujidef\fi}
+\@ajsujidef{Maru}{KuroMaru}{Kaku}{KuroKaku}{MaruKaku}{KuroMaruKaku}\@nil
+\gdef\ajMaruYobi#1{\ifnum#1<8 \shift@CID{#1}{10470}%
+	\else\ifnum#1=8 \CID{10492}%
+	\else\ifnum#1=9 \CID{10487}%
+	\fi\fi\fi}
+%
+\gdef\ajTsumekakko#1{\aj@expand\@ajTsumekakko#1\@nil}
+\global\let\ajTumekakko\ajTsumekakko
+\gdef\@ajTsumekakko#1#2{\ifx\@nil#2\mbox{\ifydir\rlap{\CID{10233}}\shift@CID{#1}{9872}%
+	\else\CID{13268}\shift@CID{#1}{10185}\CID{13269}\fi}%
+	\expandafter\@gobble
+	\else\shift@CID{#1}{\ifydir10152\else10174\fi}%
+	\expandafter\aj@Tsumekakko
+	\fi#2}
+\gdef\aj@Tsumekakko#1#2{\ifx\@nil#2\shift@CID{#1}{\ifydir10162\else10196\fi}%
+	\expandafter\@gobble
+	\else\shift@CID{#1}{\ifydir247\else10185\fi}%
+	\expandafter\aj@Tsumekakko
+	\fi#2}
+\gdef\ajNenrei#1{\ifcase#1\relax\expandafter\ajTsumekakko\or\expandafter\aj@NenreiTu
+	\or\expandafter\aj@NenreiSai\or\expandafter\aj@Nenrei@Tu
+	\or\expandafter\aj@Nenrei@Sai
+	\fi}
+\gdef\aj@NenreiTu#1{\aj@expand\@aj@NenreiTu#1\@nil}
+\gdef\@aj@NenreiTu#1#2{\shift@CID{#1}{\ifydir10152\else10174\fi}%
+	\ifx\@nil#2\CID{\ifydir10172\else10206\fi}\expandafter\@gobble
+	\else\expandafter\aj@Tsumekakko
+	\fi#2}
+\gdef\aj@NenreiSai#1{\aj@expand\@aj@NenreiSai#1\@nil}
+\gdef\@aj@NenreiSai#1{\shift@CID{#1}{\ifydir10152\else10174\fi}\@aj@NenreiSai@}
+\gdef\@aj@NenreiSai@#1{\ifx\@nil#1\CID{\ifydir10173\else10207\fi}%
+	\else\shift@CID{#1}{\ifydir247\else10185\fi}%
+	\expandafter\@aj@NenreiSai@\fi}
+\gdef\aj@Nenrei@Tu#1{\ifnum#1<10 \shift@CID{#1}{10174}\CID{10206}%
+	\else\expandafter\@aj@Nenrei@Tu\number#1%
+	\fi}
+\gdef\@aj@Nenrei@Tu#1#2{\ifnum#2=\z@ \shift@CID{#1}{10174}\CID{10196}%
+	\else\ifnum#1<\tw@ \CID{10184}%
+	\else\shift@CID{#1}{10174}\CID{10195}%
+	\fi
+	\shift@CID{#2}{10196}%
+	\fi}
+\gdef\aj@Nenrei@Sai#1{\ifnum#1<10 \shift@CID{#1}{10174}%
+	\else\expandafter\@aj@Nenrei@Sai\number#1%
+	\fi\CID{10207}}
+\gdef\@aj@Nenrei@Sai#1#2{\ifnum#1<\tw@ \CID{10184}%
+	\else\shift@CID{#1}{10174}\CID{10195}%
+	\fi
+	\ifnum#2>\z@ \shift@CID{#2}{10185}%
+	\fi}
+\gdef\ajnenrei#1#2{\hskip\kanjiskip\hbox{\tate\ifnum#2<10
+	\shift@CID{#2}{10207}\CID{\ifcase#1\or10230\or10232\or10231\or10229\fi}%
+	\else\ifnum#2=10\CID{\ifodd#1 10208\else10217\fi}%
+		\CID{\ifcase#1\or10218\or10232\or10218\or10229\fi}%
+	\else\ifnum#2<20\CID{\ifodd#1 10208\else10217\fi}\shift@CID{#2}{10208}%
+	\else\expandafter\aj@nenrei\number#2{#1}%
+	\fi\fi\fi}}
+\gdef\aj@nenrei#1#2#3{\shift@CID{#1}{10207}%
+	\ifcase#2 \CID{\ifodd#3 10218\else10228\fi}%
+	\else\shift@CID{#2}{10218}%
+	\fi}
+\gdef\ajKosu{\ajnenrei4}
+%
+\gdef\ajLabel#1#2#{\ifx\\#2\\\aj@Label#1\else\@aj@Label#1#2\fi}
+\gdef\aj@Label#1\else#2\fi#3{\fi
+	\expandafter\protect
+	\expandafter#1%
+	\expandafter{\number\csname c@#3\endcsname}}
+\gdef\@aj@Label#1#2\fi#3{\fi
+	\expandafter\protect
+	\expandafter#1%
+	\expandafter#2%
+	\expandafter{\number\csname c@#3\endcsname}}
+%
+%
+\gdef\ajFrac{\@ifstar{\@aj@Frac}{\aj@Frac}}
+\gdef\@ajFrac#1#2{\ifcase#2\or
+	\or\ifcase#1\or9826\fi
+	\or\ifcase#1+9825\or9827\or9828\fi
+	\or\ifcase#1\or9829\or9826\or9830\fi
+	\or\ifcase#1\or9831\or9832\or9833\or9834\fi
+	\or\ifcase#1\or9835\or9827\or9826\or9828\or9836\fi
+	\or\ifcase#1\or9837\or9838\or9839\or9840\or9841\or9842\fi
+	\or\ifcase#1\or9843\or9829\or9844\or9826\or9845\or9830\or9846\fi
+	\or\ifcase#1\or9847\or9848\or9827\or9849\or9850\or9828\or9851\or9852\fi
+	\or\ifcase#1\or9853\or9831\or9854\or9832\or9826\or9833\or9855\or9834\or9856\fi
+	\or\ifcase#1\or9857\or9858\or9859\or9860\or9861\or9862\or9863\or9864\or9865\or9866\fi
+	\or\ifcase#1\or9867\or9835\or9829\or9827\or9868\or9826\or9869\or9828\or9830\or9836
+				\or9870\fi
+	\else\ifnum#2=100 \ifnum#1=1 9871\fi\fi
+	\fi}
+\gdef\@aj@Frac#1#2{\CID{\@ajFrac{#1}{#2}}}
+\gdef\aj@Frac#1#2{{\@tempcnta\@ajFrac{#1}{#2}%
+	\advance\@tempcnta-9825
+	\advance\@tempcnta\ifcase\@tempcnta9780\or8183\or9779\or9779\or8181\else9778\fi\relax
+	\CID{\@tempcnta}}}
+%1/4  161  8880 9604 13120
+%1/2  162  8881 9605 13121
+%3/4  163  8882 9606 13122
+%1/8 9371 12887 9691 13207
+%3/8 9372 12888 9692 13208
+%5/8 9373 12889 9693 13209
+%7/8 9374 12890 9694 13210
+%1/3 9375 12891 9695 13211
+%2/3 9376 12892 9696 13212
+%
+%
+\def\@ajHankakudef#1{\ifx\@nil#1\else
+	\expandafter\xdef\csname ajHankaku@#1\endcsname{\noexpand\CID
+		{\noexpand\ifydir\number\@tempcnta\noexpand\else\number\@tempcntb\noexpand\fi}}%
+	\advance\@tempcnta\@ne\advance\@tempcntb\@ne
+	\expandafter\@ajHankakudef\fi}
+\@tempcnta326
+\@tempcntb9084
+\@ajHankakudef 　。「」、・ヲァィゥェォャュョッーアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン゛゜｀ヰヱヮヵヶヴガギグゲゴザジズゼゾダヂヅデドバパビピブプベペボポ\@nil
+\@tempcnta516
+\@ajHankakudef をぁぃぅぇぉゃゅょっあいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわんゐゑゎがぎぐげござじずぜぞだぢづでどばぱびぴぶぷべぺぼぽ\@nil
+\gdef\ajHankaku#1{\aj@Hankaku#1\@nil}
+\gdef\aj@Hankaku#1{\ifx\@nil#1\else
+	\expandafter\ifx\csname ajHankaku@#1\endcsname\relax
+	   #1\else\csname ajHankaku@#1\endcsname\fi
+   \expandafter\aj@Hankaku\fi}
+%
+%
+\def\@ajligdef#1#2{\expandafter\xdef\csname ajLig\@ajmojifam#1\endcsname{\noexpand\CID{#2}}}
+\def\@ajligaturedef#1{\ifx\@nil#1\else
+	\@ajligdef{#1}{\number\@tempcnta}\advance\@tempcnta\@ne
+	\expandafter\@ajligaturedef\fi}
+\def\@aj@ligdef#1#2#3{\expandafter\xdef\csname ajLig\@ajmojifam#1\endcsname
+	{\noexpand\CID{\noexpand\ifydir#2\noexpand\else#3\noexpand\fi}}}
+\def\@aj@ligaturedef#1{\ifx\@nil#1\else
+	\@aj@ligdef{#1}{\number\@tempcnta}{\number\@tempcntb}%
+	\advance\@tempcnta\@ne\advance\@tempcntb\@ne
+	\expandafter\@aj@ligaturedef\fi}
+%
+\let\@ajmojifam\@empty
+\@tempcnta12111
+\@ajligaturedef{!!}{!?}{!*}{!!*}{!?*}\@nil
+\@ajligdef{?!}{16279}
+\@ajligdef{??}{16278}
+%
+\let\@ajmojifam\@empty
+\@tempcnta7601
+\@ajligaturedef{mm}{cm}{km}{mg}{kg}{cc}{m2}\@nil
+\@tempcnta7610
+\@ajligaturedef{No.}{K.K.}{TEL}\@nil
+\@tempcnta8020
+\@ajligaturedef{cm2}{km2}{cm3}{m3}{dl}{l}{kl}{ms}{micros}{ns}{ps}{KB}{MB}{GB}{HP}{Hz}{mb}{ml}\@nil
+\@ajligdef{KK.}{8053}
+\@ajligdef{Tel}{8055}
+\@ajligdef{in}{8182}
+\@tempcnta8186
+\@ajligaturedef{mm2}{mm3}{km3}{sec}{min}\@nil
+\@tempcnta8192
+\@ajligaturedef{cal}{kcal}{dB}\@nil
+\@tempcnta8303
+\@ajligaturedef{m}{g}{F}{TB}{FAX}{JIS}\@nil
+\@ajligdef{euro}{9779}
+\@aj@ligdef{euro*}{9354}{12870}
+\@aj@ligdef{ohm*}{9355}{12871}
+\@ajligdef{mho}{16204}
+\@aj@ligdef{mho*}{15515}{16526}
+\@aj@ligdef{No*}{20321}{20965}%AJ1-6
+\@tempcnta11846
+\@ajligaturedef{AM}{KK}{No}{PH}{PM}{PR}{tel}{tm}{VS}{a/c}{a.m.}{c/c}{c.c.}{c/o}{dl*}{hPa}{kl*}{l*}{microg}{microm}{ml*}{m/m}{n/m}{pH}{p.m.}\@nil
+\@ajligdef{JAS}{12088}
+\@tempcnta20919
+\@ajligaturedef{ppb}{ppm}{'S}{H2}{O2}{Ox}{Nx}{Q2}{Jr.}{Dr.}\@nil%AJ1-6
+%
+\let\@ajmojifam\@empty
+\@tempcnta7621
+\@tempcntb12041
+\@aj@ligaturedef{明治}{大正}{昭和}\@nil
+\@tempcnta7585
+\@tempcntb7940
+\@aj@ligaturedef{ミリ}{キロ}{センチ*}{メートル}{グラム*}{トン}{アール*}{ヘクタール}{リットル}{ワット*}{カロリー}{ドル}{セント*}{パーセント}{ミリバール}{ページ*}\@nil
+\@aj@ligdef{センチ}{8038}{8329}
+\@aj@ligdef{キロメートル}{8039}{8330}
+\@aj@ligdef{グラム}{8040}{8339}
+\@aj@ligdef{キログラム}{8041}{8340}
+\@aj@ligdef{アール}{8042}{8338}
+\@aj@ligdef{セント}{8043}{8348}
+\@aj@ligdef{ワット}{8044}{8344}
+\@aj@ligdef{ホーン}{8045}{8347}
+\@aj@ligdef{ヘルツ}{8046}{8343}
+\@aj@ligdef{ページ}{8047}{8349}
+\@aj@ligdef{アパート}{8048}{8350}
+\@aj@ligdef{ビル}{8049}{8358}
+\@aj@ligdef{マンション}{8050}{8357}
+\@aj@ligdef{コーポ}{8051}{8353}
+\@aj@ligdef{ハイツ}{8052}{8356}
+\@aj@ligdef{株式会社}{8054}{8324}
+\@aj@ligdef{インチ}{8183}{8333}
+\@aj@ligdef{有限会社}{8321}{8325}
+\@aj@ligdef{財団法人}{8322}{8326}
+\@aj@ligdef{平成}{8323}{12044}
+\@aj@ligdef{フィート}{8327}{8334}
+\@aj@ligdef{ヤード}{8328}{8337}
+\@aj@ligdef{インチ*}{8331}{8332}
+\@aj@ligdef{ヤード*}{8335}{8336}
+\@aj@ligdef{ヘルツ*}{8341}{8342}
+\@aj@ligdef{ホーン*}{8345}{8346}
+\@aj@ligdef{コーポ*}{8351}{8352}
+\@aj@ligdef{ハイツ*}{8354}{8355}
+\@aj@ligdef{さじ}{11871}{11872}
+\@tempcnta11873
+\@tempcntb11957
+\@aj@ligaturedef{アト}{アルファ}{アンペア}{イニング}{ウォン}{ウルシ}{エーカー}{エクサ}{エスクード}{オーム}{オングストローム}{オンス}{オントロ}{カイリ}%
+{カップ}{カラット}{ガロン}{ガンマ}{ギガ}{ギニー}{キュリー}{ギルダー}{キロリットル}{キロワット}{グスーム}{グラムトン}{クルサード}{クルゼイロ}{クローネ}%
+{ケース}{コルナ}{サイクル}{サンチーム}{シリング}{ダース}{デカ}{デシ}{テラ}{ドラクマ}{ナノ}{ノット}{バーツ}{バーレル}{パスカル}{バレル}{ピアストル}{ピクル}%
+{ピコ}{ファラッド}{ファラド}{フェムト}{ブッシェル}{フラン}{ベータ}{ヘクト}{ヘクトパスカル}{ペセタ}{ペソ}{ペタ}{ペニヒ}{ペンス}{ポイント}{ホール}{ボルト}{ホン}%
+{ポンド}{マイクロ}{マイル}{マッハ}{マルク}{ミクロン}{メガ}{メガトン}{ヤール}{ユアン}{ユーロ}{ラド}{リラ}{ルーブル}{ルクス}{ルピア}{ルピー}{レム}{レントゲン}\@nil
+\@tempcnta12045
+\@tempcntb12054
+\@aj@ligaturedef{医療法人}{学校法人}{共同組合}{協同組合}{合資会社}{合名会社}{社団法人}{宗教法人}{郵便番号}\@nil
+\expandafter\gdef\csname ajLigオングストローム*\endcsname
+	{\mbox{\kern.05zw\ajLig{オントロ}\kern-.1zw\ajLig{グスーム}\kern.05zw}}
+\@tempcnta20929
+\@tempcntb20943
+\@aj@ligaturedef{ガル}{グレイ}{クローナ}{シーベルト}{シェケル}{ジュール}{デシベル}{ドット}{バイト}{ビット}{ベクレル}{ボー}{ランド}{リンギット}\@nil%AJ1-6
+\@ajligdef{より}{12181}
+\@ajligdef{升}{16194}
+\@ajligdef{コト}{16195}
+%
+\def\@ajmojifam{○}
+\@tempcnta7613
+\@ajligaturedef 上中下左右\@nil
+\@ajligdef{〒}{8057}
+\@tempcnta8152
+\@ajligaturedef 夜企医協名宗労学有株社監資財\@nil
+\@ajligdef{印}{8191}
+\@ajligdef{秘}{8223}
+\@tempcnta8317
+\@ajligaturedef 大小優控\@nil
+\@tempcnta10478
+\@ajligaturedef 調注副減標欠基禁項休女男正写祝出適特済増問答例電\@nil%
+\@ajligdef{年}{20553}%AJ1-6
+%
+\def\@ajmojifam#1{(#1)}
+\@ajligdef{株}{7618}
+\@ajligdef{有}{7619}
+\@ajligdef{代}{7620}
+\@tempcnta8138
+\@ajligaturedef 至企協名労社監自資財特学祭呼\@nil
+\@ajligdef{祝}{8204}
+\@ajligdef{休}{8205}
+\@tempcnta10146
+\@ajligaturedef 営合注問答例\@nil
+%
+\def\@ajmojifam{□}
+\@ajligdef{印}{8196}
+\@ajligdef{負}{11030}
+\@ajligdef{勝}{11031}
+\@tempcnta20497
+\@ajligaturedef{:A}{:B}{:C}{:D}{:E}{:F}{:終}\@nil%AJ1-6
+\@tempcnta20505
+\@ajligaturedef{:CL}{:KCL}{:BEL}{:AS}{:AM}{:段}{:ゴ}{:ミ}\@nil%AJ1-6
+%
+\def\@ajmojifam{◇}
+\@tempcnta20554
+\@ajligaturedef {News}天再新映声前後終立交{ほか}劇司解株気二多文手{PV}{MV}双{SS}{S1}{S2}{S3}デ{HV}\@nil%AJ1-6
+%
+\def\@ajmojifam{▽}
+\@ajligdef{〒}{12180}
+\@ajligdef{▽}{12193}
+%
+\def\@ajmojifam{△}
+\@ajligdef{!}{12192}
+%
+\def\@ajmojifam{■}
+\@ajligdef{◇}{12231}
+%
+\expandafter\chardef\csname offset●\endcsname\z@
+\expandafter\mathchardef\csname offset□\endcsname269
+\expandafter\mathchardef\csname offset■\endcsname268
+\expandafter\mathchardef\csname offset◇\endcsname267
+\expandafter\mathchardef\csname offset◆\endcsname266
+\@tempcnta10760
+\def\@ajmojidef#1{\ifx\@nil#1%
+	\else\advance\@tempcnta\csname offset#1\endcsname
+	\def\@ajmojifam{#1}%
+	\@ajligaturedef 問答例\@nil
+	\expandafter\@ajmojidef\fi}
+\@ajmojidef ●□■◇◆\@nil
+%
+\def\@ajkanadef#1#2#3#4#5#6#7{\expandafter\gdef\csname ajLig#1\endcsname
+	{\if@kana\def\reserved@a{ruby}%
+		\ifx\k@family\reserved@a
+			\ifydir\CID{#6}\else\CID{#7}\fi
+		\else\ifydir\CID{#4}\else\CID{#5}\fi
+		\fi
+	\else\ifydir\CID{#2}\else\CID{#3}\fi
+	\fi}}
+\newcount\@tempcntc
+\newcount\@tempcntd
+\newcount\@tempcnte
+\newcount\@tempcntf
+\def\@aj@kanadef#1{\ifx\@nil#1%
+	\else\edef\reserved@b{\noexpand\@ajkanadef{#1}%
+		{\number\@tempcnta}{\number\@tempcntb}{\number\@tempcntc}%
+		{\number\@tempcntd}{\number\@tempcnte}{\number\@tempcntf}}\reserved@b
+		\advance\@tempcnta\@ne\advance\@tempcntb\@ne\advance\@tempcntc\@ne
+		\advance\@tempcntd\@ne\advance\@tempcnte\@ne\advance\@tempcntf\@ne
+	\expandafter\@aj@kanadef\fi}
+\@ajkanadef{う゛}{7958}{7958}{12361}{12544}{12756}{12756}
+\@tempcnta8313
+\@tempcntb8313
+\@tempcntc12452
+\@tempcntd12635
+\@tempcnte16444
+\@tempcntf16444
+\@aj@kanadef{ワ゛}{ヰ゛}{ヱ゛}{ヲ゛}\@nil
+\@tempcnta16209
+\@tempcntb16209
+\@tempcntc16352
+\@tempcntd16382
+\@tempcnte16414
+\@tempcntf16414
+\@aj@kanadef{か゜}{き゜}{く゜}{け゜}{こ゜}{カ゜}{キ゜}{ク゜}{ケ゜}{コ゜}{セ゜}{ツ゜}{ト゜}\@nil
+\@ajkanadef{小か}{7959}{8264}{12285}{12468}{12682}{12762}
+\@ajkanadef{小け}{7960}{8265}{12292}{12475}{12689}{12763}
+\@ajkanadef{小こ}{12269}{12270}{12295}{12478}{16448}{16467}
+\@ajkanadef{小コ}{12271}{12272}{12385}{12568}{16449}{16468}
+\@tempcnta16236
+\@tempcntb16333
+\@tempcntc16365
+\@tempcntd16395
+\@tempcnte16427
+\@tempcntf16450
+\@aj@kanadef{小ク}{小シ}{小ス}{小ト}{小ヌ}{小ハ}{小ヒ}{小フ}{小ヘ}{小ホ}{小プ}{小ム}{小ラ}{小リ}{小ル}{小レ}{小ロ}\@nil
+%
+\def\@aj@numberdef#1#2{\ifx\@nil#2\expandafter\@gobble
+	\else\expandafter\xdef\csname ajnumber#2\endcsname{{#1}{\number\@tempcnta}}%
+	\advance\@tempcnta\@ne
+	\expandafter\@aj@numberdef\fi{#1}}
+\@tempcnta\@ne
+\@aj@numberdef{alph}abcdefghijklmnopqrstuvwxyz\@nil
+\@tempcnta\@ne
+\@aj@numberdef{Alph}ABCDEFGHIJKLMNOPQRSTUVWXYZ\@nil
+\@tempcnta\@ne
+\@aj@numberdef{Hira}あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわゐゑをん\@nil
+\@tempcnta\@ne
+\@aj@numberdef{Kata}アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヰヱヲン\@nil
+\@tempcnta\@ne
+\@aj@numberdef{Yobi}日月火水木金土祝休\@nil
+\gdef\@ajnumber#1{\expandafter\expandafter\expandafter\aj@number\csname ajnumber#1\endcsname}
+\gdef\aj@number#1{\ifx\relax#1\expandafter\@gobbletwo\else\expandafter\@aj@number\fi{#1}}
+\gdef\@aj@number#1#2#3{\csname aj#3#1\endcsname{#2}}
+%
+\def\@aj@kakomidef#1#2{\expandafter\gdef\csname#1\endcsname##1%
+	{\expandafter\ifx\csname ajLig#1##1\endcsname\relax\@ajnumber{##1}{#2}%
+	\else\csname ajLig#1##1\endcsname\fi}}
+\@aj@kakomidef{○}{Maru}
+\@aj@kakomidef{●}{KuroMaru}
+\@aj@kakomidef{□}{Kaku}
+\@aj@kakomidef{■}{KuroKaku}
+\@aj@kakomidef{◇}{MaruKaku}
+\@aj@kakomidef{◆}{KuroMaruKaku}
+\gdef\△#1{\csname ajLig△#1\endcsname}
+\gdef\▽#1{\csname ajLig▽#1\endcsname}
+\gdef\（#1）{\expandafter\ifx\csname ajLig(#1)\endcsname\relax\@ajnumber{#1}{Kakko}%
+	\else\csname ajLig(#1)\endcsname\fi}
+\gdef\゛#1{\csname ajLig#1゛\endcsname}
+\gdef\゜#1{\csname ajLig#1゜\endcsname}
+\gdef\！#1{\csname ajLig小#1\endcsname}
+\gdef\ajLig#1{\csname ajLig#1\endcsname}
+%
+%
+\def\@ajPICTdef#1#2{\expandafter\xdef\csname ajPICT#1\endcsname{\noexpand\CID{#2}}}
+\def\@aj@PICTdef#1{\ifx\@nil#1\else
+	\@ajPICTdef{#1}{\number\@tempcnta}\advance\@tempcnta\@ne
+	\expandafter\@aj@PICTdef\fi}
+\@tempcnta8016
+\@aj@PICTdef{Club}{Heart}{Spade}{Diamond}\@nil
+\@ajPICTdef{電話}{8056}
+\@ajPICTdef{〒}{8058}
+\@tempcnta8211
+\@aj@PICTdef{Spade*}{Heart*}{Club*}{Diamond*}\@nil
+\@tempcnta8215
+\@aj@PICTdef 晴曇雨雪→←↑↓\@nil
+\@ajPICTdef{野球}{12097}
+\@ajPICTdef{湯}{12098}
+\@ajPICTdef{花}{12228}
+\@ajPICTdef{花*}{12229}
+\@ajPICTdef{サッカー}{20957}%AJ1-6
+\gdef\ajPICT#1{\csname ajPICT#1\endcsname}
+\global\let\※\ajPICT
+%
+%
+\def\@ajArrowdef#1#2{\expandafter\xdef\csname ajArrow#1\endcsname{\noexpand\CID{#2}}}
+\def\@aj@Arrowdef#1{\ifx\@nil#1\else
+	\@ajArrowdef{#1}{\number\@tempcnta}\advance\@tempcnta\@ne
+	\expandafter\@aj@Arrowdef\fi}
+\@tempcnta8009
+\@aj@Arrowdef{LeftTriangle}{RightTriangle}{DOWN}{UP}{LEFT}{RIGHT}\@nil
+\@tempcnta8206
+\@aj@Arrowdef{RIGHT*}{LEFT*}{UP*}{DOWN*}\@nil
+\@tempcnta8219
+\@aj@Arrowdef{RightHand}{LeftHand}{UpHand}{DownHand}\@nil
+\@tempcnta8309
+\@aj@Arrowdef{Left/Right}{Right/Left}{Up/Down}{Down/Up}\@nil
+\@tempcnta12175
+\@aj@Arrowdef{LeftScissors}{RightScissors}{UpScissors}{DownScissors}\@nil
+\@tempcnta12194
+\@aj@Arrowdef
+{LeftTriangle*}{RightTriangle*}{Left}{Right}{Up}{Down}{LeftDouble}{LeftRight*}{RightDown}{LeftDown}{LeftUp}{RightUp}%
+{Right/Left*}{Left/Right*}{Right/Left+}{Down/Up+}{Left+}{Right+}{Up+}{Down+}{LeftRight+}{UpDown+}\@nil
+\@tempcnta12261
+\@aj@Arrowdef
+{LeftAngle}{RightAngle}{UpAngle}{DownAngle}{LeftAngle*}{RightAngle*}{UpAngle*}{DownAngle*}\@nil
+\@ajArrowdef{RightDouble}{15482}%752 16493
+\@ajArrowdef{LeftRightDouble}{15483}%753 16494
+%\@ajArrowdef{LeftRight}{15511}%12201 16522
+\@ajArrowdef{RightUp*}{16201}
+\@ajArrowdef{RightDown*}{16202}
+%\@ajArrowdef{DOWNLEFT*}{16273}
+\gdef\ajArrow#1{\csname ajArrow#1\endcsname}
+%
+%
+\def\@aj@kuntendef#1{\ifx\@nil#1%
+	\else\expandafter\xdef\csname aj訓点#1\endcsname
+		{\noexpand\CID{\number\@tempcnta}}%
+	\advance\@tempcnta\@ne
+	\expandafter\@aj@kuntendef
+	\fi}
+\@tempcnta16283
+\@aj@kuntendef ｜レ一二三四上中下甲乙丙丁天地人\@nil
+\gdef\aj@smallReten{{\@tempdimb\f@size pt\@tempskipa\f@baselineskip
+	\@tempdimb.94\@tempdimb
+	\@tempskipa.94\@tempskipa
+	\fontsize{\@tempdimb}{\@tempskipa}\selectfont\aj訓点レ}}
+\gdef\aj訓点一レ{\mbox{\tate\kern-.24zw\aj訓点一\kern-.65zw\raise.15zw\hbox{\aj@smallReten}}}
+\gdef\aj訓点上レ{\mbox{\tate\aj訓点上\kern-.3zw\raise.15zw\hbox{\aj@smallReten}}}
+\gdef\aj訓点甲レ{\mbox{\tate\aj訓点甲\kern-.25zw\raise.15zw\hbox{\aj@smallReten}}}
+\gdef\aj訓点天レ{\mbox{\tate\aj訓点天\kern-.4zw\raise.1zw\hbox{\aj@smallReten}}}
+\def\@ajongofudef#1{\ifx\@nil#1%
+	\else\expandafter\xdef\csname aj訓点#1｜\endcsname
+	{\noexpand\mbox{\yoko\expandafter\noexpand\csname aj訓点#1\endcsname
+		\hbox to\z@{\hss\expandafter\noexpand\csname aj訓点｜\endcsname\kern-.5zw}}}%
+	\expandafter\@ajongofudef\fi}
+\@ajongofudef 二三四中下乙丙丁地人\@nil
+\expandafter\gdef\csname aj訓点　｜\endcsname{\mbox{\yoko{　}\hbox to\z@{\hss\csname aj訓点｜\endcsname\kern-.5zw}}}
+\def\@ajkungofudef#1{\ifx\@nil#1%
+	\else\expandafter\xdef\csname aj訓点｜#1\endcsname
+	{\noexpand\mbox{\yoko\hbox to\z@{\hss\expandafter\noexpand\csname aj訓点｜\endcsname\kern-.5zw}%
+		\expandafter\noexpand\csname aj訓点#1\endcsname}}%
+	\expandafter\@ajkungofudef\fi}
+\@ajkungofudef 二三四中下乙丙丁地人\@nil
+\expandafter\gdef\csname aj訓点｜　\endcsname{\mbox{\yoko\hbox to\z@{\hss\csname aj訓点｜\endcsname\kern-.5zw}{　}}}
+%
+\gdef\ajKunten#1{\csname aj訓点#1\endcsname}
+%
+\newtoks\@temptokenb
+\newtoks\@temptokenc
+\gdef\ajRedefine@KundokuMacros{\ifx\kokana\@undefined
+	\else\let\orig@kokana\kokana
+	\let\orig@retenform\retenform
+	\let\orig@reten\reten
+	\let\orig@retenkana\retenkana
+	\let\orig@kaeriten\kaeriten
+	\def\aj@kokana##1##2{\orig@kokana{\aj@kundokusize\if@kana\rubyfamily\fi##1}%
+		{\aj@kundokusize\ajKunten{##2}}}%
+	\def\aj@retenform{\aj@kundokusize\aj訓点レ}%
+	\def\aj@reten{\orig@kaeriten{\aj@kundokusize\aj訓点レ}}%
+	\def\aj@retenkana##1{\orig@retenkana{\aj@kundokusize\if@kana\rubyfamily\fi##1}}%
+	\def\aj@kaeriten##1{\orig@kaeriten{\aj@kundokusize\ajKunten{##1}}}%
+	\let\aj@kundokusize\tiny
+	\fi
+	\ifx\@k@nd@ku@\@undefined
+	\else{\global\let\orig@k@nd@ku@\@k@nd@ku@
+	\def\get@hbox##1\hbox##2##3\get@hbox
+		{\@temptokena{##1}\@temptokenb{##2}\@temptokenc{##3}}%
+	\expandafter\get@hbox
+		\@k@nd@ku@[##1]{##2}{##3}{##4}{\ajKunten{##5}}[\ajKunten{##6}]<##7>(##8)\get@hbox
+	\def\change@reten##1\def\temptopleft##2\def\tempbottomleft##3##4\change@reten
+		{\@temptokenb{##1\def\temptopleft{####6}\def\tempbottomleft{####5}##4}}%
+	\expandafter\change@reten\the\@temptokenb\change@reten
+	\edef\redefine@k@nd@ku@##1{\gdef\noexpand\aj@k@nd@ku@##1%
+		{\the\@temptokena\hbox{\the\@temptokenb}\the\@temptokenc}}%
+	\redefine@k@nd@ku@{[##1]##2##3##4##5[##6]<##7>(##8)}}%
+	\let\aj@kundokusize\kundokusize
+	\fi}
+\ifltj@in@latex
+  \@onlypreamble\ajRedefine@KundokuMacros
+  \AtBeginDocument{\ajRedefine@KundokuMacros}
+\fi
+\gdef\DeclareOriginalKundokuStyle{\@ifnextchar[%]
+	{\Declare@OriginalKundokuStyle}%
+	{\Declare@OriginalKundokuStyle[\aj@kundokusize]}}
+\gdef\Declare@OriginalKundokuStyle[#1]{\let\aj@kundokusize#1%
+	\ifx\orig@k@nd@ku@\@undefined
+	\else\let\@k@nd@ku@\orig@k@nd@ku@
+	\let\kundokusize\aj@kundokusize
+	\fi
+	\ifx\orig@kokana\@undefined
+	\else
+	\let\kokana\orig@kokana
+	\let\retenform\orig@retenform
+	\let\reten\orig@reten
+	\let\retenkana\orig@retenkana
+	\let\kaeriten\orig@kaeriten
+	\fi}
+\gdef\DeclareAJKundokuStyle{\@ifnextchar[%]
+	{\Declare@AJKundokuStyle}%
+	{\Declare@AJKundokuStyle[\aj@kundokusize]}}
+\gdef\Declare@AJKundokuStyle[#1]{\let\aj@kundokusize#1%
+	\ifx\aj@k@nd@ku@\@undefined
+	\else\let\@k@nd@ku@\aj@k@nd@ku@
+	\def\kundokusize{\aj@kundokusize\if@kana\rubyfamily\fi}%
+	\fi
+	\ifx\aj@kokana\@undefined
+	\else
+	\let\kokana\aj@kokana
+	\let\retenform\aj@retenform
+	\let\reten\aj@reten
+	\let\retenkana\aj@retenkana
+	\let\kaeriten\aj@kaeriten
+	\fi}
+%
+%
+\gdef\ajCIDVarDef{\aj@VarDef\CID}
+\gdef\ajUTFVarDef{\aj@VarDef\UTF}
+\gdef\aj@VarDef#1#2#3{\expandafter\xdef\csname ajVar#2\endcsname{\noexpand#1{#3}}}
+\gdef\ajCIDVarList#1{{\@ajCIDVarList#1\relax}}
+\gdef\@ajCIDVarList#1{\ifx\relax#1\else\def\reserved@a{#1}\expandafter\aj@CIDVarList\fi}
+\gdef\aj@CIDVarList{\afterassignment\@aj@CIDVarList\@tempcnta}
+\gdef\@aj@CIDVarList{\aj@VarDef\CID\reserved@a{\number\@tempcnta}\@ajCIDVarList}
+\gdef\ajUTFVarList#1{{\@ajUTFVarList#1 \relax}}
+\gdef\@ajUTFVarList#1{\ifx\relax#1\else\def\reserved@a{#1}\expandafter\aj@UTFVarList\fi}
+\gdef\aj@UTFVarList#1#2{\ifx=#1\expandafter\@aj@UTFVarList\else\expandafter\@aj@UTFVarList\expandafter#1\fi#2}
+\gdef\@aj@UTFVarList#1 {\aj@VarDef\UTF\reserved@a{#1}\@ajUTFVarList}
+\gdef\ajVar#1{\csname ajVar#1\endcsname}
+\ifltj@in@latex
+  \@onlypreamble\ajCIDVarDef
+  \@onlypreamble\ajUTFVarDef
+  \@onlypreamble\ajCIDVarList
+  \@onlypreamble\ajUTFVarList
+\fi
+%\ajCIDVarList{吉=13706 教=8471 高=8705 鴎=7646 崎=14290 碕=17009 第=13910 角=13682 浜=8531}
+\gdef\ajHashigoTaka{\CID{8705}}
+\gdef\ajTsuchiYoshi{\CID{13706}}
+\gdef\ajTatsuSaki{\CID{14290}}
+\gdef\ajMayuHama{\CID{8531}}
+%
+%
+%\gdef\ajRedefine@ajVar{\@ifpackageloaded{hyperref}{%
+%	\let\aj@Var\ajVar
+%	\def\ajVar##1{\ifHy@pdfstring
+%		\expandafter\expandafter
+%		\expandafter\check@UTF\csname ajVar##1\endcsname{##1}%
+%		\else\aj@Var{##1}\fi}
+%	\def\check@UTF##1##2##3{\ifx\UTF##1\0x##2\else##3\fi}}{}}
+\gdef\ajRedefine@ajCommands{\@ifpackageloaded{hyperref}{%
+	\let\hyperref@ajLabel\ajLabel
+	\def\ajLabel##1##{\ifHy@pdfstring\Hy@ReturnAfterElseFi\hyperref@ajLabel\@arabic\else\Hy@ReturnAfterFi\hyperref@ajLabel##1\fi}%
+	\ajRedefine@ajCommand\△{Lig△}\▽{Lig▽}\！{Lig小}\ajLig{Lig}\ajPICT{PICT}\※{PICT}\ajVar{Var}\@nil\@nil
+	\aj@Redefine@ajCommand○{Maru}●{KuroMaru}□{Kaku}■{KuroKaku}◇{MaruKaku}◆{KuroMaruKaku}\@nil\@nil
+	\def\（##1）{\ifHy@pdfstring(##1)\else\expandafter\ifx\csname ajLig(##1)\endcsname\relax\@ajnumber{##1}{Kakko}%
+		\else\csname ajLig(##1)\endcsname\fi\fi}%
+	\def\゛##1{\ifHy@pdfstring##1゛\else\csname ajLig##1゛\endcsname\fi}%
+	\def\゜##1{\ifHy@pdfstring##1゜\else\csname ajLig##1゜\endcsname\fi}%
+	}{}}
+\gdef\ajRedefine@ajCommand#1#2{\ifx\@nil#1\else\def#1##1{\ifHy@pdfstring##1\else\csname aj#2##1\endcsname\fi}%
+	\expandafter\ajRedefine@ajCommand\fi}
+\gdef\aj@Redefine@ajCommand#1#2{\ifx\@nil#1\else\expandafter\def\csname#1\endcsname##1%
+	{\ifHy@pdfstring##1\else\expandafter\ifx\csname ajLig#1##1\endcsname\relax\@ajnumber{##1}{#2}\else
+		\csname ajLig#1##1\endcsname\fi\fi}%
+	\expandafter\aj@Redefine@ajCommand\fi}
+\ifltj@in@latex
+  \AtBeginDocument{\ajRedefine@ajCommands}
+\fi
+%
+%
+\gdef\ajLeader{\@ifnextchar[{\aj@Leader}{\aj@Leader[\z@ plus1fill]}}
+\gdef\aj@Leader[#1]#2{{\@tempcnta#2\multiply\@tempcnta\tw@
+	\advance\@tempcnta1221\ifhmode\ifydir4\else5\fi\else\ifydir5\else4\fi\fi
+	\leaders\hbox{\CID{\@tempcnta}}\ifhmode\hskip\else\vskip\fi#1}}
+%
+%
+%% \toks0{}\toks1{}\toks2{}\toks3{}
+%% \def\ajQuotedef#1 #2 #3 #4 {\ifx*#1\else
+%% 	\toks0\expandafter{\the\toks0 \or#1}%
+%% 	\toks1\expandafter{\the\toks1 \or#2}%
+%% 	\toks2\expandafter{\the\toks2 \or#3}%
+%% 	\toks3\expandafter{\the\toks3 \or#4}%
+%% 	\expandafter\ajQuotedef\fi}
+%% \ajQuotedef
+%% 670 671 12173 12174
+%% 672 673 7956 7957
+%% 674 675 7899 7900
+%% 676 677 7901 7902
+%% 678 679 7903 7904
+%% 680 681 7905 7906
+%% 682 683 7907 7908
+%% 684 685 7909 7910
+%% 686 687 7911 7912
+%% 688 689 7913 7914
+%% 690 691 7915 7916
+%% 7608 7609 7956 7957
+%% 12125 12126 12135 12136
+%% 12127 12128 12137 12138
+%% 12129 12130 12139 12140
+%% 12131 12132 12141 12142
+%% 12171 12172 12173 12174
+%% 16197 16198 16329 16330
+%% * * * *
+%% \xdef\ajQuote#1#2{\noexpand\CID{\noexpand\ifydir\noexpand\ifcase#1\the\toks0
+%% 	\noexpand\fi\noexpand\else\noexpand\ifcase#1\the\toks2
+%% 	\noexpand\fi\noexpand\fi}#2\inhibitglue\noexpand\CID{\noexpand\ifydir\noexpand\ifcase#1\the\toks1
+%% 	\noexpand\fi\noexpand\else\noexpand\ifcase#1\the\toks3
+%% 	\noexpand\fi\noexpand\fi}}
+}
+\ifltj@in@latex\else
+  \ajRedefine@KundokuMacros
+\fi
+%%------------------ all done
+\ltj@ajmacros@AtEnd
+\endinput
+%% EOF
