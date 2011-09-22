@@ -103,4 +103,14 @@ xspmode
 \ltjgetparameter{jacharrange}{3298677}
 あいうえお\par}
 
+
+{\tengt ■globaldefs}
+
+abc\ltjgetparameter{yalbaselineshift}
+{\globaldefs1\ltjsetparameter{yalbaselineshift=2pt}}% global (by \globaldefs)
+\ltjgetparameter{yalbaselineshift}
+{\ltjglobalsetparameter{yalbaselineshift=1pt}}% global (explicit)
+\ltjgetparameter{yalbaselineshift}
+{\ltjglobalsetparameter{yalbaselineshift=4pt}}% local
+\ltjgetparameter{yalbaselineshift}
 \end

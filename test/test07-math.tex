@@ -1,0 +1,46 @@
+%#!lualatex
+\documentclass{article}
+\usepackage[a4paper]{geometry}
+\usepackage{luatexja}
+\usepackage{unicode-math}
+\setmathfont{XITSMath}
+
+% only for testing
+\SetMathAlphabet{\mathgt}{bold}{JY3}{mc}{m}{n} 
+
+\begin{document}\makeatletter
+\paragraph{Unicodeの数式領域}\
+
+標準 $a_i=i,\ i=1, 2, \dots, n$. 
+\ltjdefcharrange{2}{"10000-"1FFFF}% 第1面を欧文扱いに
+\ltjsetparameter{jacharrange={-2}}%
+第1面を欧文扱いに $a_i=i,\ i=1, 2, \dots, n$.
+
+\paragraph{和文数式 on \LaTeX}
+数式フォント関連のコマンドは一緒．e.g.\ in \verb+lltjdefs.sty+,
+\begin{verbatim}
+\DeclareSymbolFont{mincho}{JY3}{mc}{m}{n}
+\jfam\symmincho
+\SetSymbolFont{mincho}{bold}{JY3}{gt}{m}{n}
+\DeclareSymbolFontAlphabet{\mathmc}{mincho}
+\DeclareMathAlphabet{\mathgt}{JY3}{gt}{m}{n}
+\end{verbatim}
+
+添字：${あz}^{いy}_{うu\mathgt{え}}$
+
+数式内の空白処理：$a（）a\hbox{a（）a}a$
+
+mathgt: $\mathrm{\mathmc{あa}}\mathmc{あb}\mathgt{あa}$
+\begin{itemize}
+\item 和文数式フォント選択命令は，和文文字しか影響しない
+\item 欧文数式フォント選択命令は，欧文文字しか影響しない
+\end{itemize}
+
+\bf mathversion bold: {\mathversion{bold}$aあa\mathgt{あa}$}き\\
+二つ目の「あ」は\verb+\mathgt+下だが，明朝なのは本文書の設定通り．
+
+\LaTeX では数式ファミリ番号は欧文と共用→$\the\jfam$
+
+
+\end{document}
+

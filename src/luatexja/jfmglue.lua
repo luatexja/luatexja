@@ -269,7 +269,7 @@ local function calc_np()
 	 elseif lpi == id_vlist or lpi == id_rule then -- id_box_like
 	    Np.nuc = lp; Np.last = lp; Np.id = id_box_like; break
 	 elseif lpi == id_math then -- id_math
-	    Np.nuc = lp
+	    Np.nuc = lp; lp  = node_next(lp) 
 	    while lp.id~=id_math do 
 	       set_attr_icflag_processed(lp); lp  = node_next(lp) 
 	    end; break
@@ -824,5 +824,3 @@ function create_inhibitglue_node()
    local g=node_new(id_whatsit, sid_user)
    g.user_id=30111; g.type=100; g.value=1; node.write(g)
 end
-
--- TODO: 二重挿入の回避

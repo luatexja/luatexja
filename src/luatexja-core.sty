@@ -139,8 +139,8 @@
 \newdimen\ltj@tempdima
 \newskip\ltj@tempskipa
 
-\newdimen\zw
-\newdimen\zh
+\newdimen\ltj@zw
+\newdimen\ltj@zh
 \newdimen\jQ \jQ=0.25mm
 \newdimen\jH \jH=0.25mm
 
@@ -151,6 +151,7 @@
 
 %%%%%%%% Attributes for Japanese typesetting.
 \newluatexattribute\ltj@curjfnt   % index for ``current Japanese font''
+\newluatexattribute\jfam          % index for current jfam
 \newluatexattribute\ltj@charclass % 
 \newluatexattribute\ltj@yablshift % attribute for \yabaselineshift
 \newluatexattribute\ltj@ykblshift % attribute for \ykbaselineshift
@@ -195,12 +196,23 @@
   \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true)}}
 \def\ltj@@jfont{\directlua{luatexja.jfont.jfontdefY()}}
 
+\def\zw{\directlua{luatexja.jfont.load_zw()}\ltj@zw}
+\def\zh{\directlua{luatexja.jfont.load_zh()}\ltj@zh}
+
 %%%%%%%% \inhibitglue
 \protected\def\inhibitglue{\directlua{luatexja.jfmglue.create_inhibitglue_node()}}
 
+%%%%%%%% \yoko, \tate, \ifydir, \iftdir
+%% At this moment, tategaki mode is not implemented; 
+%% there is only yokogaki mode now.
+\let\yoko\relax
+\let\tate\relax
+\let\ifydir\iftrue
+\let\iftdir\iffalse
+
 %%%%%%%% \ltjdefcharrange<name>{100-200,3000-,5000,...}
 \protected\def\ltjdefcharrange#1#2{%
-  \ltj@tempcntc=#1 \expandafter\ltj@@dcrange#2,,\ignorespaces}
+  {\ltj@tempcntc=#1 \expandafter\ltj@@dcrange#2,,}\ignorespaces}
 \def\ltj@@dcrange#1,{\def\ltj@temp{#1}%
   \ifx\ltj@temp\empty\let\@next=\relax\else
   \ltj@@dcrangeA{#1}\let\@next=\ltj@@dcrange\fi\@next}
@@ -210,9 +222,9 @@
     \ltj@tempcnta=#1 \ltj@tempcntb=\ltj@tempcnta
   \else
     \def\ltj@temp{#1}%
-    \ifx\ltj@temp\empty\ltj@tempcnta='200 \else\ltj@tempcnta=#1 \fi
+    \ifx\ltj@temp\empty\ltj@tempcnta='200\else\ltj@tempcnta=#1\fi\relax
     \def\ltj@temp{#2}%
-    \ifx\ltj@temp\empty\ltj@tempcntb="10FFFF \else\ltj@tempcntb=#2 \fi%"
+    \ifx\ltj@temp\empty\ltj@tempcntb="10FFFF\else\ltj@tempcntb=#2\fi\relax%"
   \fi
   \directlua{luatexja.charrange.add_char_range(\the\ltj@tempcnta,\the\ltj@tempcntb,
     \the\ltj@tempcntc)}%
@@ -232,6 +244,25 @@
 \def\ltj@@set@stack#1,#2:#3#4#5{%
   \directlua{luatexja.stack.set_stack_table(ltj.isglobal, \asluastring{#3},
     \ltj@safe@num@or\ltj@defnum{#1},\ltj@safe@num@or\ltj@defnum{#2},#4,#5)}}
+
+% jatextfont = {<char_code>, <font_cs>}
+\define@key[ltj]{japaram}{jatextfont}{%
+  \expandafter\ltj@@set@stackfont#1:{mjtext}}
+\define@key[ltj]{japaram}{jascriptfont}{%
+  \expandafter\ltj@@set@stackfont#1:{mjscr}}
+\define@key[ltj]{japaram}{jascriptscriptfont}{%
+  \expandafter\ltj@@set@stackfont#1:{mjss}}
+\def\ltj@@set@stackfont#1,#2:#3{%
+  {\directlua{tex.globaldefs=0}\ltj@curjfnt=-1 #2%
+   \global\ltj@tempcnta=\ltj@curjfnt}%
+  \ifnum\ltj@tempcnta=-1
+    \@PackageError{luatexja-core}%
+    {\string#2 is not a control sequence that represents \MessageBreak
+     a Japanese font}{}%
+  \else
+    \directlua{luatexja.stack.set_stack_font(ltj.isglobal, \asluastring{#3},
+    \ltj@safe@num@or\ltj@defnum{#1}, \the\ltj@tempcnta)}%
+  \fi}
 
 % yalbaselineshift = <dimen>
 % yjabaselineshift = <dimen>
@@ -290,10 +321,13 @@
     \directlua{ltj.ext_print_global()}\ltj@autoxspc=0
   \fi}
 
+% [x]]kanjiskip = <dimen>
 \define@key[ltj]{japaram}{kanjiskip}{%              % SKIP
   \directlua{luatexja.stack.set_stack_skip(ltj.isglobal, 'kanjiskip', \ltj@safe@glue{#1})}}
 \define@key[ltj]{japaram}{xkanjiskip}{%             % SKIP
   \directlua{luatexja.stack.set_stack_skip(ltj.isglobal, 'xkanjiskip', \ltj@safe@glue{#1})}}
+
+% jcharwidowpenalty = <count>
 \define@key[ltj]{japaram}{jcharwidowpenalty}{%      %COUNT
   \ltj@@set@stack0,#1:{jwp}{-10000}{10000}}
 
@@ -322,9 +356,11 @@
   \fi\next
 }
 
-\protected\def\ltjsetparameter#1{\directlua{ltj.isglobal=''}%
+\protected\def\ltjsetparameter#1{%
+  \ifnum\globaldefs>0\directlua{ltj.isglobal='global'}\else\directlua{ltj.isglobal=''}\fi
   \setkeys[ltj]{japaram}{#1}\ignorespaces}
-\protected\def\ltjglobalsetparameter#1{\directlua{ltj.isglobal='global'}%
+\protected\def\ltjglobalsetparameter#1{%
+  \ifnum\globaldefs<0\directlua{ltj.isglobal=''}\else\directlua{ltj.isglobal='global'}\fi
   \setkeys[ltj]{japaram}{#1}\ignorespaces}
 
 %%%%%%%% 

@@ -23,12 +23,16 @@ function get_stack_level()
    local j = tex.currentgrouplevel
    if j > tex.getcount('ltj@@group@level') then
       i = i+1 -- new stack level
+      local gd = tex.globaldefs
+      if gd>0 then tex.globaldefs = 0 end
+      --  'tex.globaldefs = 0' is local even if \globaldefs > 0.
       tex.setcount('ltj@@group@level', j)
       for k,v in pairs(charprop_stack_table) do -- clear the stack above i
 	 if k>=i then charprop_stack_table[k]=nil end
       end
       charprop_stack_table[i] = table.fastcopy(charprop_stack_table[i-1])
       tex.setcount('ltj@@stack', i)
+      if gd>0 then tex.globaldefs = gd end
       local g = node_new(id_whatsit, sid_user)
       g.user_id=30112; g.type=100; g.value=j; node.write(g)
    end
@@ -50,6 +54,27 @@ function set_stack_table(g,m,c,p,lb,ub)
 			 {'A character number must be between -1 and 0x10ffff.',
 			  "(-1 is used for denoting `math boundary')",
 			  'So I changed this one to zero.'})
+      c=0
+   elseif not charprop_stack_table[i][c] then 
+      charprop_stack_table[i][c] = {} 
+   end
+   charprop_stack_table[i][c][m] = p
+  if g=='global' then
+     for j,v in pairs(charprop_stack_table) do 
+	if not charprop_stack_table[j][c] then charprop_stack_table[j][c] = {} end
+	charprop_stack_table[j][c][m] = p
+     end
+  end
+end
+
+-- EXT
+function set_stack_font(g,m,c,p)
+   local i = get_stack_level()
+   if c<0 or c>255 then 
+      ltjb.package_error('luatexja',
+			 "invalid family number (".. p .. ")",
+			 {"The family number should in the range 0 .. 255.",
+			  "I'm going to use 0 instead of that illegal family number."})
       c=0
    elseif not charprop_stack_table[i][c] then 
       charprop_stack_table[i][c] = {} 

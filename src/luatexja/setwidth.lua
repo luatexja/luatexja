@@ -37,16 +37,17 @@ local attr_icflag = luatexbase.attributes['ltj@icflag']
 
 local PACKED = 2
 
-local met_tb = {}
-local char_data = {}
-local head
+met_tb = {}
+char_data = {}
+head = nil
 
 -- return true if and only if p is a Japanese character node
 local function is_japanese_glyph_node(p)
    return p.font==has_attr(p, attr_curjfnt)
 end
 
-local function capsule_glyph(p, dir)
+-- mode: true iff p will be always encapsuled by a hbox
+function capsule_glyph(p, dir, mode)
    local h, box, q, fwidth, fheight, fdepth
    p.xoffset= p.xoffset - round(met_tb.size*char_data.left)
    if char_data.width ~= 'prop' then
@@ -54,7 +55,7 @@ local function capsule_glyph(p, dir)
    else fwidth = p.width end
    fheight = round(met_tb.size*char_data.height)
    fdepth = round(met_tb.size*char_data.depth)
-   if p.width ~= fwidth or p.height ~= fheight or p.depth ~= fdepth then
+   if mode or p.width ~= fwidth or p.height ~= fheight or p.depth ~= fdepth then
       local y_shift = - p.yoffset + (has_attr(p,attr_yablshift) or 0)
       p.yoffset = -round(met_tb.size*char_data.down)
       head, q = node.remove(head, p)
@@ -63,14 +64,14 @@ local function capsule_glyph(p, dir)
 	 h = p; p.next = nil
       else
 	 h = node_new(id_kern); h.subtype = 0
-	 if char_data.align=='left' then
-	    h.kern = total; p.next = h; h = p
-	 elseif char_data.align=='right' then
+	 if char_data.align=='right' then
 	    h.kern = total; p.next = nil; h.next = p
 	 elseif char_data.align=='middle' then
 	    h.kern = round(total/2); p.next = h
 	    h = node_new(id_kern); h.subtype = 0
 	    h.kern = total - round(total/2); h.next = p
+	 else -- left
+	    h.kern = total; p.next = h; h = p
 	 end
       end
       box = node_new(id_hlist); 
@@ -98,7 +99,7 @@ function set_ja_width(ahead, dir)
 	 if is_japanese_glyph_node(p) then
 	    met_tb = ltjf.font_metric_table[p.font]
 	    char_data = ltjf.metrics[met_tb.jfm].char_type[has_attr(p, attr_jchar_class)]
-	    p = capsule_glyph(p, dir)
+	    p = capsule_glyph(p, dir, false)
 	 else 
 	    p.yoffset = p.yoffset - (has_attr(p,attr_yablshift) or 0); p = node_next(p)
 	 end

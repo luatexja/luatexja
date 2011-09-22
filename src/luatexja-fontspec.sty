@@ -9,16 +9,28 @@
 
 \ExplSyntaxOn
 
-\define@key[zf]{options}{JFM}{
-  \fontspec_update_fontid:n  {+jfm=#1}
-  \fontspec_update_featstr:n {jfm=#1}
+\cs_new:Npn \ltj_fontspec_warning:n   { \msg_warning:nn   {ltj-fontspec} }
+
+\msg_new:nnn {ltj-fontspec} {addjfontfeatures-ignored}
+{
+  \string\addjfontfeature (s)~ ignored;\\
+  it~ cannot~ be~ used~ with~ a~ font~ that~ wasn't~ selected~ by~ luatexja-fontspec.
 }
 
 \cs_new:Nn \ltj_fontspec_select:nn {
   \group_begin:
+  \define@key[zf]{options}{JFM}{
+    \fontspec_update_fontid:n  {+jfm=##1}
+    \fontspec_update_featstr:n {jfm=##1}
+  }
+  \define@key[zf]{preparse-external}{NoEmbed}[]{
+    \cs_set:Nn \fontspec_namewrap:n {psft:####1}
+  }
   \tl_set:Nn \zf@enc {JY3}
+  \tl_set:Nx \g_fontspec_default_fontopts_tl 
+             {JFM=ujis,Scale=0.960444,\g_ltj_fontspec_default_fontopts_tl}
   \cs_set_eq:NN \DeclareFontFamily \DeclareKanjiFamily
-  \fontspec_select:nn{JFM=ujis,#1}{#2}
+  \fontspec_select:nn{#1}{#2}
   \group_end:
 }
 
@@ -51,5 +63,34 @@
     }
   }
 }
+
+\DeclareDocumentCommand \newjfontface { m O{} m } {
+  \newjfontfamily #1 [ BoldFont={},ItalicFont={},SmallCapsFont={},#2 ] {#3}
+}
+
+\DeclareDocumentCommand \defaultjfontfeatures {m} {
+  \tl_set:Nn \g_ltj_fontspec_default_fontopts_tl {#1,}
+}
+
+\tl_clear:N \g_ltj_fontspec_default_fontopts_tl
+
+\DeclareDocumentCommand \addjfontfeatures {m} {
+  \ifcsname zf@family@fontdef\k@family\endcsname
+    \group_begin:
+      \tl_clear:N \g_ltj_fontspec_default_fontopts_tl
+      \use:x {
+        \exp_not:N\ltj_fontspec_select:nn
+          {\csname zf@family@options\k@family\endcsname,#1}
+          {\csname zf@family@fontname\k@family\endcsname}
+      }
+    \group_end:
+    \fontfamily\zf@family\selectfont
+  \else
+    \ltj_fontspec_warning:n {addjfontfeatures-ignored}
+  \fi
+  \ignorespaces
+}
+
+\cs_set_eq:NN \addjfontfeature \addjfontfeatures
 
 \endinput

@@ -1,7 +1,7 @@
 %#! lualatex
 \documentclass{article}
 \usepackage{luatexja}
-\usepackage{luatexja-fontspec}
+\nonstopmode
 
 \makeatletter
 % from jsclasses
@@ -20,17 +20,19 @@
   \fi}
 
 \makeatother
-
 \begin{document}
-\section{NFSS2}
-
+\section{NFSS2 のテスト}
 
 ◆あいうえおabcかきく{\gt かきくa{\bf uyあ}いう}
 
-{\ltjsetparameter{xkanjiskip=0pt}イタリック補正\textit{f}◆\par}
+{\ltjsetparameter{xkanjiskip=0pt}イタリック補正\textit{f}◆{\it f\/}◆\par}
 
 \DeclareFixedFont{\dr}{JY3}{gt}{m}{n}{12}
 あいうえおpqr{\dr かaiu}きく）{\bf （漢字}
+
+{abcdfghjfgあいう辻）\textbf{（辻あ{\Large あ}いう）}}
+
+{abcdfghjfgあいう辻）\textbf{\unkern（辻あ{\Large あ}いう}}
 
 \noindent{\tiny ◆あいうえおabcかきく{\gt かきくa{\bf uyあ}いう}}
 
@@ -47,102 +49,7 @@
 \noindent{\Large ◆あいうえおabcかきく{\gt かきくa{\bf uyあ}いう}}
 
 \noindent{\LARGE ◆あいうえおabcかきく{\gt かきくa{\bf uyあ}いう}}
-
-\section{fontspec}
-
-\setmainfont{TeXGyreTermes}
-\setsansfont{TeXGyreHeros}
-
-\setmainjfont[Scale=.95,BoldFont=IPAexGothic]{IPAexMincho} % default: JFM=ujis
-\setsansjfont[Scale=.95]{IPAexGothic}
-
-\newjfontfamily\ipajisninety[Scale=.95,CJKShape=JIS1990]{IPAexMincho}
-
-通常：「あいうえお」、（かきくけこ）。
-
-{\jfontspec[Scale=.95,JFM=mono]{IPAexMincho}
-\noindent 等幅：「あいうえお」、（かきくけこ）。
-}
-
-\subsection{JIS2004}
-逢芦飴溢茨鰯淫迂厩噂餌襖迦牙廻恢晦蟹葛鞄釜翰翫徽
-祇汲灸笈卿饗僅喰櫛屑粂祁隙倦捲牽鍵諺巷梗膏鵠甑叉
-榊薩鯖錆鮫餐杓灼酋楯薯藷哨鞘杖蝕訊逗摺撰煎煽穿箭
-詮噌遡揃遜腿蛸辿樽歎註瀦捗槌鎚辻挺鄭擢溺兎堵屠賭
-瀞遁謎灘楢禰牌這秤駁箸叛挽誹樋稗逼謬豹廟瀕斧蔽瞥
-蔑篇娩鞭庖蓬鱒迄儲餅籾爺鑓愈猷漣煉簾榔屢冤叟咬嘲
-囀徘扁棘橙狡甕甦疼祟竈筵篝腱艘芒虔蜃蠅訝靄靱騙鴉
-
-\subsection{JIS1990}
-{\ipajisninety
-逢芦飴溢茨鰯淫迂厩噂餌襖迦牙廻恢晦蟹葛鞄釜翰翫徽
-祇汲灸笈卿饗僅喰櫛屑粂祁隙倦捲牽鍵諺巷梗膏鵠甑叉
-榊薩鯖錆鮫餐杓灼酋楯薯藷哨鞘杖蝕訊逗摺撰煎煽穿箭
-詮噌遡揃遜腿蛸辿樽歎註瀦捗槌鎚辻挺鄭擢溺兎堵屠賭
-瀞遁謎灘楢禰牌這秤駁箸叛挽誹樋稗逼謬豹廟瀕斧蔽瞥
-蔑篇娩鞭庖蓬鱒迄儲餅籾爺鑓愈猷漣煉簾榔屢冤叟咬嘲
-囀徘扁棘橙狡甕甦疼祟竈筵篝腱艘芒虔蜃蠅訝靄靱騙鴉
-}
+%\end{document}
 
 
-\end{document}
-
-
-%%%%%%%%%%%%%%%%%%%%% OLD TEST
-\documentclass{article}
-\usepackage{fontspec,pdftexcmds}
-
-\input luatexja-core.sty
-
-\ExplSyntaxOn
-\xetex_or_luatex:nnn { \tl_set:Nn \l_fontspec_pre_feat_sclist }
-  {
-    \bool_if:NT \l_fontspec_icu_bool {
-      \tl_if_empty:NF \l_fontspec_script_tl
-      {
-        script   = \l_fontspec_script_tl ;
-        language = \l_fontspec_lang_tl   ;jfm=ujis;
-      }
-    }
-  }
-  {
-    mode     = \l_fontspec_mode_tl   ;
-    \tl_if_empty:NF \l_fontspec_script_tl
-    {
-      script   = \l_fontspec_script_tl ;
-      language = \l_fontspec_lang_tl   ;jfm=ujis;
-    }
-  }
-\ExplSyntaxOff
-
-\newopentypefeature{Style}{OLDJIS}{+jp90}
-\newfontfamily\goth[BoldFont={ipaexg.ttf},Style=OLDJIS]{ipaexm.ttf}
-
-\begin{document}
-\makeatletter
-\def\extract@font{%
-    \get@external@font
-    \ifnum\pdf@strcmp{\f@encoding}{EU2}=0
-      \expandafter\globaljfont\font@name\external@font\relax
-      \font@name\global\zw=\zw\global\zh=\zh
-    \else
-      \global\expandafter\font\font@name\external@font\relax
-      \font@name
-    \fi
-    \ifnum\pdf@strcmp{\f@encoding}{EU2}=0%
-      \ltjglobalsetparameter{kanjiskip={0pt plus 0.4pt minus 0.4pt},
-        xkanjiskip={0.25\zw plus 0.083333\zw minus 0.083333\zw}}%
-    \fi
-    \csname \f@encoding+\f@family\endcsname
-    \csname\curr@fontshape\endcsname
-       }
-% ! The font "ipaexg.ttf/I" cannot be found. というエラーが出る
-
-
-\goth abcdfghjfgあいう辻）\textbf{\unkern（辻あ{\Large あ}いう}
-
-\goth abcdfghjfgあいう辻）\textbf{（辻あ{\Large あ}いう}
-% \unkern がないとうなくいかない
-
-\tracingonline=1\scrollmode\showboxdepth=10000\showboxbreadth=10000\showlists
 \end{document}

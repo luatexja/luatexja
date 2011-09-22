@@ -1,5 +1,5 @@
 %%
-%% luatexja-latex-fonts.sty: derived from plfonts.dtx in pLaTeX.
+%% lltjfont.sty: derived from plfonts.dtx in pLaTeX.
 %% 
 \makeatletter
 \let\k@encoding\@empty
@@ -7,23 +7,22 @@
 % LuaTeX-ja uses JY3 and JT3 encodings.
 \def\cy@encoding{JY3}\def\ct@encoding{JT3}
 
-
 \let\k@family\@empty
 \let\k@series\@empty
 \let\k@shape\@empty
 \def\curr@kfontshape{\k@encoding/\k@family/\k@series/\k@shape}
 \def\rel@fontshape{\f@encoding/\f@family/\f@series/\f@shape}
-\newdimen\Cht
-\newdimen\cht
-\newdimen\Cdp
-\newdimen\cdp
-\newdimen\Cwd
-\newdimen\cwd
-\newdimen\Cvs
-\newdimen\cvs
-\newdimen\Chs
-\newdimen\chs
-\newdimen\cHT
+\ifdefined\Cht\else\newdimen\Cht\fi
+\ifdefined\cht\else\newdimen\cht\fi
+\ifdefined\Cdp\else\newdimen\Cdp\fi
+\ifdefined\cdp\else\newdimen\cdp\fi
+\ifdefined\Cwd\else\newdimen\Cwd\fi
+\ifdefined\cwd\else\newdimen\cwd\fi
+\ifdefined\Cvs\else\newdimen\Cvs\fi
+\ifdefined\cvs\else\newdimen\cvs\fi
+\ifdefined\Chs\else\newdimen\Chs\fi
+\ifdefined\chs\else\newdimen\chs\fi
+\ifdefined\cHT\else\newdimen\cHT\fi
 %\let\afont\font
 \def\inlist@#1#2{%
   \def\in@@##1<#1>##2##3\in@@{%
@@ -44,11 +43,11 @@
 \newbox\tstrutbox
 \newbox\zstrutbox
 \def\strut{\relax
-%  \ifydir
+  \ifydir
     \ifmmode\copy\strutbox\else\unhcopy\strutbox\fi
-%  \else
-%    \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi
-%  \fi
+  \else
+    \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi
+  \fi
 }
 \def\tstrut{\relax\hbox{\tate
    \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi}}
@@ -590,6 +589,16 @@
   %\iftdir\raise-\tbaselineshift\fi
   \vbox{\hrule\@width.3em}}
 
+%%%%%% LuaTeX-ja specific
+
+% #1 の展開結果から encoding 部分をとりだし，それが和文用かどうかの結果を \ifin@ に代入
+\def\ltj@@IsFontJapanese#1{%
+  \expandafter\ltj@@IsFontJapaneseX#1//:%
+  \expandafter\expandafter\expandafter
+  \inlist@\expandafter\tmp@item\expandafter{\kenc@list}}
+\def\ltj@@IsFontJapaneseX#1/#2/:{\edef\tmp@item{{\directlua{tex.print('#1')}}}}
+
+
 \let\extract@afont\extract@font
 \def\pickup@jfont{%
     \expandafter \ifx \font@name \relax
@@ -602,8 +611,57 @@
 \def\extract@jfont{%
     \get@external@font
     \expandafter\globaljfont\font@name\external@font\relax
-    \font@name\global\zw=\zw\global\zh=\zh
+    \font@name%\global\zw=\zw\global\zh=\zh
     \csname \f@encoding+\f@family\endcsname
     \csname\curr@fontshape\endcsname}
+
+\let\ltj@@al@do@subst@correction=\do@subst@correction
+\def\ltj@@ja@do@subst@correction{%
+    \xdef\subst@correction{%
+      \font@name
+      \global\expandafter\let\csname \curr@fontshape/\f@size\endcsname\font@name%
+      \relax}%
+    \aftergroup\subst@correction
+}
+\def\do@subst@correction{%
+   \ltj@@IsFontJapanese{\curr@fontshape}\ifin@
+     \ltj@@ja@do@subst@correction
+   \else
+     \ltj@@al@do@subst@correction
+   \fi
+}
+\let\@@italiccorr=\/
+
+%%%%%% Japanese font for math mode
+
+% \M@<enc> から その <enc> が和文用か調べる
+{\catcode`M=12%
+\gdef\ltj@@mathJapaneseFonts#1M#2#3\relax{\ltj@@IsFontJapanese{#3}}}
+
+\let\ltj@@al@getanddefine@fonts=\getanddefine@fonts
+\def\ltj@@ja@getanddefine@fonts#1#2{%
+  \xdef\font@name{\csname \string#2/\tf@size\endcsname}%
+  \pickup@jfont\let\textfont@name\font@name
+  \xdef\font@name{\csname \string#2/\sf@size\endcsname}%
+  \pickup@jfont\let\scriptfont@name\font@name
+  \xdef\font@name{\csname \string#2/\ssf@size\endcsname}%
+  \pickup@jfont
+  \edef\math@fonts{\math@fonts\ltjsetparameter{%
+    jatextfont={#1,\textfont@name},%
+    jascriptfont={#1,\scriptfont@name},%
+    jascriptscriptfont={#1,\font@name}}}%
+}
+
+\def\getanddefine@fonts#1#2{%
+  \ltj@tempcnta=#1\ltj@@IsFontJapanese{\string#2}%
+  \ifin@\ltj@@ja@getanddefine@fonts{#1}{#2}%
+  \else \ltj@@al@getanddefine@fonts{#1}{#2}\fi
+}
+\def\use@mathgroup#1#2{\relax\ifmmode
+  \math@bgroup
+    \expandafter\ifx\csname M@\f@encoding\endcsname#1\else
+    #1\fi\ltj@tempcnta=#2 \expandafter\ltj@@mathJapaneseFonts\string#1\relax%
+    \ifin@\jfam#2\relax\else\mathgroup#2\relax\fi
+  \expandafter\math@egroup\fi}%
 
 \endinput
