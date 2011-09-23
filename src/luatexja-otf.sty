@@ -1,0 +1,106 @@
+%
+% luatexja-otf.sty
+%
+
+%% Avoid multiple loading.
+\csname\if11luatexjaotfLoaded\fi\endcsname
+\edef\x{%
+\catcode32=\the\catcode32%
+\catcode33=\the\catcode33%
+\catcode35=\the\catcode35%
+\catcode40=\the\catcode40%
+\catcode41=\the\catcode41%
+\catcode42=\the\catcode42%
+\catcode43=\the\catcode43%
+\catcode44=\the\catcode44%
+\catcode45=\the\catcode45%
+\catcode46=\the\catcode46%
+\catcode58=\the\catcode58%
+\catcode59=\the\catcode59%
+\catcode60=\the\catcode60%
+\catcode61=\the\catcode61%
+\catcode62=\the\catcode62%
+\catcode64=\the\catcode64%
+\catcode91=\the\catcode91%
+\catcode93=\the\catcode93%
+\catcode94=\the\catcode94%
+\catcode95=\the\catcode95%
+\catcode126=\the\catcode126%
+\endlinechar=\the\endlinechar
+\relax}
+\catcode32=10 %< >
+\catcode33=12 %<">
+\catcode35=6  %<#>
+\catcode40=12 %<(>
+\catcode41=12 %<)>
+\catcode42=12 %<*>
+\catcode43=12 %<+>
+\catcode44=12 %<,>
+\catcode45=12 %<->
+\catcode46=12 %<.>
+\catcode58=12 %<:>
+\catcode59=12 %<;>
+\catcode60=12 %<<>
+\catcode61=12 %<=>
+\catcode62=12 %<>>
+\catcode64=11 %<@>
+\catcode91=12 %<[>
+\catcode93=12 %<]>
+\catcode94=7  %<^>
+\catcode95=8  %<_>
+\catcode126=13 %<~>
+\endlinechar=-1 %
+
+\edef\ltj@otf@AtEnd{\x
+  \noexpand\let\noexpand\ltj@otf@AtEnd\relax}
+\def\luatexjaotfLoaded{\endinput}
+
+%% Check if LaTeX is used.
+\begingroup\expandafter\expandafter\expandafter\endgroup
+\expandafter\ifx\csname RequirePackage\endcsname\relax %<*!LaTeX>
+  \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
+    \csname iffalse\endcsname
+\else                           %<*LaTeX>
+  \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
+    \csname iftrue\endcsname
+  \NeedsTeXFormat{LaTeX2e}
+  \ProvidesPackage{luatexja-otf}[2011/09/09 v0.1]
+\fi                             %</LaTeX>
+
+% Load core module if not yet.
+\ifx\luatexjacoreLoaded\@undefined
+  \ifltj@in@latex                 %<*LaTeX>
+    \RequirePackage{luatexja-core}[2011/04/01]
+  \else                           %<*!LaTeX>
+    \input luatexja-core.sty %
+  \fi                             %</LaTeX>
+\fi
+
+%% When environment check fails, exit now.
+\ifx\LuaTeXjaAvailable\@undefined
+  \ltj@otf@AtEnd
+\expandafter\endinput\fi\relax
+
+%%------------------
+%! Main part of luatexja-otf
+\RequireLuaModule{luatexja.otf}
+
+\newcount\ltj@tempcnta
+
+\protected\def\CID#1{\ifvmode\leavevmode\fi\ltj@tempcnta#1\relax\directlua{luatexja.otf.cid(\the\ltj@tempcnta)}\relax}
+
+%% \UTF compatible with the OTF package for pLaTeX
+\protected\def\UTF#1{\ifvmode\leavevmode\fi\directlua{luatexja.otf.append_jglyph(0x#1)}}
+
+%% Load ajmacros
+\ifltj@in@latex                 %<*LaTeX>
+  \RequirePackage{luatexja-ajmacros}[2011/09/19]
+\else                           %<*!LaTeX>
+  \input luatexja-ajmacros.sty %
+\fi                             %</LaTeX>
+
+
+%%------------------ all done
+\ltj@otf@AtEnd
+\endinput
+%% EOF
