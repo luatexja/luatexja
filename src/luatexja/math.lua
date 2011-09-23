@@ -104,8 +104,8 @@ function (p, sty)
 	    set_attr(r, attr_yablshift, 0)
 	    local class = ltjf.find_char_class(p.char, ltjf.font_metric_table[f].jfm)
 	    set_attr(r, attr_jchar_class, class)
-	    ltjw.met_tb = ltjf.font_metric_table[f]
-	    ltjw.char_data = ltjf.metrics[ltjw.met_tb.jfm].char_type[class]
+	    local met = ltjf.font_metric_table[f]
+	    ltjw.char_data = ltjf.metrics[met.jfm].size_cache[met.size].char_type[class]
 	    ltjw.head = r; ltjw.capsule_glyph(r, tex.mathdir , true);
 	    q.head = ltjw.head; node_free(p); p=q;
 	 end

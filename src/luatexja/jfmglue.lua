@@ -305,9 +305,9 @@ local function set_np_xspc_jachar(c,x)
    Np.pre = ltjs.get_penalty_table('pre', c, 0, ltjp.box_stack_level)
    Np.post = ltjs.get_penalty_table('post', c, 0, ltjp.box_stack_level)
    z = find_char_class('lineend', Np.met)
-   local y = Np.met.char_type[Np.class]
+   local y = Np.met.size_cache[Np.size].char_type[Np.class]
    if y.kern and y.kern[z] then 
-      Np.lend = round(Np.size*y.kern[z]) 
+      Np.lend = y.kern[z]
    else 
       Np.lend = 0 
    end
@@ -471,18 +471,18 @@ end
 local function new_jfm_glue(Nn, bc, ac)
 -- bc, ac: char classes
    local g = nil
-   local z = Nn.met.char_type[bc]
+   local z = Nn.met.size_cache[Nn.size].char_type[bc]
    if z.glue and z.glue[ac] then
       local h = node_new(id_glue_spec)
-      h.width   = round(Nn.size*z.glue[ac][1])
-      h.stretch = round(Nn.size*z.glue[ac][2])
-      h.shrink  = round(Nn.size*z.glue[ac][3])
+      h.width   = z.glue[ac][1]
+      h.stretch = z.glue[ac][2]
+      h.shrink  = z.glue[ac][3]
       h.stretch_order=0; h.shrink_order=0
       g = node_new(id_glue)
       g.subtype = 0; g.spec = h
    elseif z.kern and z.kern[ac] then
       g = node_new(id_kern)
-      g.subtype = 1; g.kern = round(Nn.size*z.kern[ac])
+      g.subtype = 1; g.kern = z.kern[ac]
    end
    if g then set_attr(g, attr_icflag, FROM_JFM) end
    return g
@@ -506,9 +506,9 @@ end
 
 -- get kanjiskip
 local function get_kanji_skip_from_jfm(Nn)
-   local i = Nn.met.kanjiskip
+   local i = Nn.met.size_cache[Nn.size].kanjiskip
    if i then
-      return { round(i[1]*Nn.size), round(i[2]*Nn.size), round(i[3]*Nn.size) }
+      return { i[1], i[2], i[3] }
    else return nil
    end
 end
@@ -600,9 +600,9 @@ end
 
 -- get xkanjiskip
 local function get_xkanji_skip_from_jfm(Nn)
-   local i = Nn.met.xkanjiskip
+   local i = Nn.met.size_cache[Nn.size].xkanjiskip
    if i then
-      return { round(i[1]*Nn.size), round(i[2]*Nn.size), round(i[3]*Nn.size) }
+      return { i[1], i[2], i[3] }
    else return nil
    end
 end

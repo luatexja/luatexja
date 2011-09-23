@@ -37,7 +37,6 @@ local attr_icflag = luatexbase.attributes['ltj@icflag']
 
 local PACKED = 2
 
-met_tb = {}
 char_data = {}
 head = nil
 
@@ -49,15 +48,15 @@ end
 -- mode: true iff p will be always encapsuled by a hbox
 function capsule_glyph(p, dir, mode)
    local h, box, q, fwidth, fheight, fdepth
-   p.xoffset= p.xoffset - round(met_tb.size*char_data.left)
+   p.xoffset= p.xoffset - char_data.left
    if char_data.width ~= 'prop' then
-      fwidth = round(char_data.width*met_tb.size)
+      fwidth = char_data.width
    else fwidth = p.width end
-   fheight = round(met_tb.size*char_data.height)
-   fdepth = round(met_tb.size*char_data.depth)
+   fheight = char_data.height
+   fdepth = char_data.depth
    if mode or p.width ~= fwidth or p.height ~= fheight or p.depth ~= fdepth then
       local y_shift = - p.yoffset + (has_attr(p,attr_yablshift) or 0)
-      p.yoffset = -round(met_tb.size*char_data.down)
+      p.yoffset = -char_data.down
       head, q = node.remove(head, p)
       local total = fwidth - p.width
       if total == 0 then
@@ -86,7 +85,7 @@ function capsule_glyph(p, dir, mode)
       end
       return q
    else
-      p.yoffset = p.yoffset - (has_attr(p, attr_yablshift) or 0) - round(met_tb.size*char_data.down)
+      p.yoffset = p.yoffset - (has_attr(p, attr_yablshift) or 0) - char_data.down
       return node_next(p)
    end
 end
@@ -97,8 +96,8 @@ function set_ja_width(ahead, dir)
    while p do
       if p.id==id_glyph then
 	 if is_japanese_glyph_node(p) then
-	    met_tb = ltjf.font_metric_table[p.font]
-	    char_data = ltjf.metrics[met_tb.jfm].char_type[has_attr(p, attr_jchar_class)]
+	    local met = ltjf.font_metric_table[p.font]
+	    char_data = ltjf.metrics[met.jfm].size_cache[met.size].char_type[has_attr(p, attr_jchar_class)]
 	    p = capsule_glyph(p, dir, false)
 	 else 
 	    p.yoffset = p.yoffset - (has_attr(p,attr_yablshift) or 0); p = node_next(p)

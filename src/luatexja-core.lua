@@ -18,7 +18,6 @@ local has_attr = node.has_attribute
 local node_insert_before = node.insert_before
 local node_insert_after = node.insert_after
 local node_hpack = node.hpack
-local round = tex.round
 
 local id_penalty = node.id('penalty')
 local id_glyph = node.id('glyph')
@@ -288,7 +287,7 @@ function debug_show_node_X(p,print_fn)
 	 s = s .. node.subtype(p.subtype)
       end
       print_fn(s)
-   --  ここから数式用 node
+   -------- math node --------
    elseif pt=='noad' then
       s = base ; print_fn(s)
       if p.nucleus then

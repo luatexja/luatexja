@@ -96,7 +96,34 @@ function define_jfm(t)
 	 t[i] = nil
       end
    end
+   t.size_cache = {}
    defjfm_res= t
+end
+
+local function mult_table(old,scale) -- modified from table.fastcopy
+    if old then
+       local new = { }
+       for k,v in next, old do
+	  if type(v) == "table" then
+	     new[k] = mult_table(v,scale)
+	  elseif type(v) == "number" then
+	     new[k] = round(v*scale)
+	  else
+	     new[k] = v
+	  end
+       end
+       return new
+    else return nil end
+end
+
+local function update_jfm_cache(j,sz)
+   if metrics[j].size_cache[sz] then return end
+   metrics[j].size_cache[sz] = {}
+   metrics[j].size_cache[sz].char_type = mult_table(metrics[j].char_type, sz)
+   metrics[j].size_cache[sz].kanjijskip = mult_table(metrics[j].kanjiskip, sz)
+   metrics[j].size_cache[sz].xkanjiskip = mult_table(metrics[j].xkanjiskip,sz)
+   metrics[j].size_cache[sz].zw = round(metrics[j].zw*sz)
+   metrics[j].size_cache[sz].zh = round(metrics[j].zh*sz)
 end
 
 function find_char_class(c,m)
@@ -158,6 +185,7 @@ function jfontdefY() -- for horizontal font
    font_metric_table[fn].jfm=j
    font_metric_table[fn].size=f.size
    font_metric_table[fn].var=jfm_var
+   update_jfm_cache(j, f.size)
    tex.sprint(cat_lp, ltj.is_global .. '\\protected\\expandafter\\def\\csname ' 
           .. cstemp  .. '\\endcsname{\\ltj@curjfnt=' .. fn .. '\\relax}')
 end
@@ -166,7 +194,7 @@ end
 function load_zw()
    local a = font_metric_table[tex.attribute[attr_curjfnt]]
    if a then
-      tex.setdimen('ltj@zw', round(a.size*metrics[a.jfm].zw))
+      tex.setdimen('ltj@zw', metrics[a.jfm].size_cache[a.size].zw)
    else 
       tex.setdimen('ltj@zw',0)
    end
@@ -175,9 +203,9 @@ end
 function load_zh()
    local a = font_metric_table[tex.attribute[attr_curjfnt]]
    if a then
-      tex.setdimen('ltj@zh', round(a.size*metrics[a.jfm].zh))
+      tex.setdimen('ltj@zh', metrics[a.jfm].size_cache[a.size].zh)
    else 
-      tex.setdimen('ltj@zh', round(a.size*metrics[a.jfm].zh))
+      tex.setdimen('ltj@zh',0)
    end
 end
 
@@ -231,7 +259,7 @@ function append_italic()
 	 f = has_attr(p, attr_curjfnt)
 	 local j = font_metric_table[f]
 	 local c = find_char_class(p.char, j.jfm)
-	 g.kern = round(j.size * metrics[j.jfm].char_type[c].italic)
+	 g.kern = metrics[j.jfm].size_cache[j.size].char_type[c].italic
       else
 	 g.kern = font.fonts[f].characters[p.char].italic
       end
