@@ -398,8 +398,10 @@ alphabetic fonts
 
 
 Note that there is no command named \verb+\setmonojfont+, since it is
-popular for Japanese fonts that nearly all Japanese glyphs have same widths.
-
+popular for Japanese fonts that nearly all Japanese glyphs have same
+widths.  Also note that the kerning feature is set off by default in
+these 7~commands, since this feature and \textbf{JAglue} will clash (see
+\ref{para-kern}).
 
 \section{Changing Parameters}
 There are many parameters in \LuaTeX-ja. And due to the behavior of \LuaTeX,
@@ -687,7 +689,7 @@ To load a font as a Japanese font, you must use the
 so TrueType/OpenType fonts with features can be used for Japanese fonts:
 \begin{LTXexample}
 \jfont\tradgt={file:ipaexg.ttf:script=latn;%
-  +trad;jfm=ujis} at 14pt
+  +trad;-kern;jfm=ujis} at 14pt
 \tradgt{}当／体／医／区
 \end{LTXexample}
 
@@ -703,12 +705,29 @@ be used a prefix in \verb+\jfont+ (and~\verb+\font+) primitive.  Using
 this prefix, you can specify a font that has its name only and is not
 related to any real font.
 
-Mainly, use of this \texttt{psft:}\ prefix is for using non-embedding `standard' Japanese fonts (Ryumin-Light and GothicBBB-Medium).
-歴史
+Mainly, use of this \texttt{psft:}\ prefix is for using non-embedding
+`standard' Japanese fonts (Ryumin-Light and GothicBBB-Medium). 歴史
 
-\paragraph{Features}
+\paragraph{JFM}
 jfm, jfmvar
 
+\paragraph{Note: kern feature}\label{para-kern}
+Some fonts have information for inter-glyph spacing. However, this
+information is not well-compatible with \LuaTeX-ja.  More concretely,
+this kerning space from this information are inserted \emph{before} the
+insertion process of \textbf{JAglue}, and this causes incorrect spacing
+between two characters when both a glue/kern from the data in the font
+and it from JFM are present.
+
+\begin{itemize}
+\item You should specify {\tt -kern} in
+{\tt\char92jfont} primitive, when you want to use other font features,
+      such as {\tt script=...}\,.
+\item If you want to use Japanese fonts in proportinal width, and use
+      information from this font, use \texttt{jfm-prop.lua} for its JFM, and ...
+
+TODO: kanjiskip?
+\end{itemize}
 
 
 \subsection{Structure of JFM file}
