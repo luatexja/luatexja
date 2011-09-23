@@ -1,4 +1,4 @@
-%#! time luatex  "\count300=10\input test05-speed.tex"
+%#! time luatex  "\count300=60\input test05-speed.tex"
 \input luatexja-core.sty
 
 \newcount\cnt\newcount\cnta
@@ -13,8 +13,10 @@
 \end
 
 %     real time:
-% 40: 17.453 14.234s
-% 30: 13.254 10.624
-% 20:  8.771  7.097
-% 10:  4.927  4.145
+% 60:               19.765
+% 50:               16.378
+% 40: 17.453 14.234 12.996
+% 30: 13.254 10.624  9.795
+% 20:  8.771  7.097  6.735
+% 10:  4.927  4.145  3.857
 % env: C2D E7300, Mem 4GB, LuaTeX 0.71.0pre, Gentoo amd64 unstable

@@ -141,8 +141,8 @@ local head -- the head of current list
 local last -- the last node of current list
 local lp   -- 外側での list 走査時のカーソル
 
-local Np, Nq, Bp
-local widow_Bp, widow_Np -- \jcharwidowpenalty 挿入位置管理用
+local Np, Nq, Bp, Bpn
+local widow_Bp, widow_Bpn, widow_Np -- \jcharwidowpenalty 挿入位置管理用
 
 local ihb_flag -- JFM グルー挿入抑止用 flag
                -- on: \inhibitglue 指定時，hlist の周囲
@@ -233,7 +233,9 @@ end
 local function calc_np()
    -- We assume lp = node_next(Np.last)
    local pBp = Bp; local lpi, lpa
-   Nq = Np; Bp = {}; Bp[0] = 0; Np = {}; ihb_flag = false 
+   Nq = Np; ihb_flag = false 
+   for k in pairs(Np) do Np[k]=nil end
+   for k in pairs(Bp) do Bp[k]=nil end; Bpn = 0
    while true do
       lpi = lp.id; lpa = has_attr(lp, attr_icflag) or 0
       if lp==last then Np = nil; return
@@ -245,7 +247,7 @@ local function calc_np()
       elseif lpi == id_ins or lpi == id_mark or lpi == id_adjust then
 	 set_attr_icflag_processed(lp); lp = node_next(lp)
       elseif lpi == id_penalty then
-	 table.insert(Bp, lp); Bp[0] = Bp[0] + 1
+	 table.insert(Bp, lp); Bpn = Bpn + 1
 	 set_attr_icflag_processed(lp); lp = node_next(lp)
       elseif lpi == id_whatsit then
 	 if lp.subtype==sid_user and lp.user_id==30111 then
@@ -429,13 +431,13 @@ end
 -- change penalties (or create a new penalty, if needed)
 local function handle_penalty_normal(post, pre, g)
    local a = (pre or 0) + (post or 0)
-   if Bp[0] == 0 then
+   if Bpn == 0 then
       if (a~=0 and not(g and g.id==id_kern)) or (Nq.lend and Nq.lend~=0) then
 	 local p = node_new(id_penalty)
 	 if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
 	 p.penalty = a
 	 head = node_insert_before(head, Np.first, p)
-	 Bp[1] = p; Bp[0] = 1; set_attr(p, attr_icflag, KINSOKU)
+	 Bp[1] = p; Bpn = 1; set_attr(p, attr_icflag, KINSOKU)
       end
    else for i, v in ipairs(Bp) do add_penalty(v,a) end
    end
@@ -443,13 +445,13 @@ end
 
 local function handle_penalty_always(post, pre, g)
    local a = (pre or 0) + (post or 0)
-   if Bp[0] == 0 then
+   if Bpn == 0 then
       if not (g and g.id==id_glue) or (Nq.lend and Nq.lend~=0) then
 	 local p = node_new(id_penalty)
 	 if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
 	 p.penalty = a
 	 head = node_insert_before(head, Np.first, p)
-	 Bp[1] = p; Bp[0] = 1; set_attr(p, attr_icflag, KINSOKU)
+	 Bp[1] = p; Bpn = 1; set_attr(p, attr_icflag, KINSOKU)
       end
    else for i, v in ipairs(Bp) do add_penalty(v,a) end
    end
@@ -457,11 +459,11 @@ end
 
 local function handle_penalty_suppress(post, pre, g)
    local a = (pre or 0) + (post or 0)
-   if Bp[0] == 0 then
+   if Bpn == 0 then
       if g and g.id==id_glue then
 	 local p = node_new(id_penalty)
 	 p.penalty = 10000; head = node_insert_before(head, Np.first, p)
-	 Bp[1] = p; Bp[0] = 1; set_attr(p, attr_icflag, KINSOKU)
+	 Bp[1] = p; Bpn = 1; set_attr(p, attr_icflag, KINSOKU)
       end
    else for i, v in ipairs(Bp) do add_penalty(v,a) end
    end
@@ -666,7 +668,7 @@ local function handle_np_jachar()
    end
    -- \jcharwidowpenalty 挿入予定箇所更新
    if ltjs.get_penalty_table('kcat', Np.char, 0, ltjp.box_stack_level)%2~=1 then
-      widow_Np = Np; widow_Bp = Bp
+      widow_Np = Np; widow_Bp = Bp; widow_Bpn = Bpn
    end
 end
 
@@ -727,7 +729,7 @@ local function handle_list_tail()
 	 end
       end
       -- Insert \jcharwidowpenalty
-      Bp = widow_Bp; Np = widow_Np
+      Bp = widow_Bp; Np = widow_Np; Bpn = widow_Bpn
       if Np then
 	 handle_penalty_normal(0,
 			       ltjs.get_penalty_table('jwp', 0, 0, ltjp.box_stack_level))
@@ -751,7 +753,7 @@ local function handle_list_head()
       local g = new_jfm_glue(Np, find_char_class('boxbdd',Np.met), Np.class)
       if g then
 	 set_attr(g, attr_icflag, BOXBDD)
-	 if g.id==id_glue and Bp[0]==0 then
+	 if g.id==id_glue and Bpn==0 then
 	    local h = node_new(id_penalty)
 	    h.penalty = 10000; set_attr(h, attr_icflag, BOXBDD)
 	 end
@@ -762,7 +764,7 @@ end
 
 -- initialize
 local function init_var()
-   lp = head; widow_Bp = nil; widow_Np = nil
+   lp = head; widow_Bp = nil; widow_Np = nil; Np = {}; Bp = {}
    kanji_skip=skip_table_to_spec('kanjiskip')
    xkanji_skip=skip_table_to_spec('xkanjiskip')
    if mode then 
