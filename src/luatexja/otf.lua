@@ -126,7 +126,7 @@ luatexbase.add_to_callback("ltj.define_jfont",
 			   cid_to_char, "ltj.otf.define_jfont", 1)
 --  既に読み込まれているフォントに対しても，同じことをやらないといけない
 for fn, v in pairs(ltjf_font_metric_table) do
-   ltjf_font_metric_table[fn] = cid_to_char(fmtable, fn)
+   ltjf_font_metric_table[fn] = cid_to_char(v, fn)
 end
 
 
