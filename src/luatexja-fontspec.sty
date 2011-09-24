@@ -5,7 +5,7 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{luatexja-fontspec}[2011/09/23 v0.2]
 
-\RequirePackage{fontspec}[2011/09/18] % v2.2a
+\RequirePackage{fontspec}
 \RequirePackage{luatexja}
 
 \ExplSyntaxOn
@@ -18,23 +18,46 @@
   it~ cannot~ be~ used~ with~ a~ font~ that~ wasn't~ selected~ by~ luatexja-fontspec.
 }
 
+\prg_new_conditional:Nnn \ltj_fontspec_if_liiikeys: {TF,F} {
+  \@ifpackagelater {fontspec} {2011/09/13}
+  { \prg_return_true: }  % fontspec >= 2.2 (l3keys)
+  { \prg_return_false: } % fontspec <  2.2 (xkeyval)
+}
+
+\cs_new:Nn \ltj_fontspec_define_option:nn {
+  \ltj_fontspec_if_liiikeys:TF {
+    \keys_define:nn {fontspec} { #1 .code:n = {#2}}
+  } {
+    \define@key[zf]{options}{#1}{#2}
+  }
+}
+
+\cs_new:Nn \ltj_fontspec_define_preparse_external:nn {
+  \ltj_fontspec_if_liiikeys:TF {
+    \keys_define:nn {fontspec-preparse-external} { #1 .code:n = {#2}}
+  } {
+    \define@key[zf]{preparse-external}{#1}{#2}
+  }
+}
+
 \cs_new:Nn \ltj_fontspec_select:nn {
   \group_begin:
-  \keys_define:nn {fontspec} { JFM .code:n = {
-      \fontspec_update_fontid:n  {+jfm=##1}
-      \fontspec_update_featstr:n {jfm=##1}      
-    }
+  \ltj_fontspec_define_option:nn {JFM} {
+    \fontspec_update_fontid:n  {+jfm=##1}
+    \fontspec_update_featstr:n {jfm=##1}      
   }
-  \keys_define:nn {fontspec} { JFM-var .code:n = {
-      \fontspec_update_fontid:n  {+jfmvar=##1}
-      \fontspec_update_featstr:n {jfmvar=##1}      
-    }
+  \ltj_fontspec_define_option:nn {JFM-var} {
+    \fontspec_update_fontid:n  {+jfmvar=##1}
+    \fontspec_update_featstr:n {jfmvar=##1}      
   }
-  \keys_define:nn {fontspec-preparse-external} { NoEmbed .code:n = {
-      \cs_set:Nn \fontspec_namewrap:n {psft:####1}
-    }
+  \ltj_fontspec_define_preparse_external:nn {NoEmbed} {
+    \cs_set:Nn \fontspec_namewrap:n {psft:####1}
   }
-  \tl_set:Nn \g_fontspec_encoding_tl {JY3}
+  \ltj_fontspec_if_liiikeys:TF {
+    \tl_set:Nn \g_fontspec_encoding_tl {JY3}
+  } {
+    \tl_set:Nn \zf@enc {JY3}
+  }
   \tl_set:Nx \g_fontspec_default_fontopts_tl 
              {JFM=ujis,Scale=0.960444,\g_ltj_fontspec_default_fontopts_tl}
   \cs_set_eq:NN \DeclareFontFamily \DeclareKanjiFamily
@@ -47,6 +70,9 @@
     \fontspec_select:nn{#1}{#2}
   }
   \group_end:
+  \ltj_fontspec_if_liiikeys:F {
+    \tl_set_eq:NN \l_fontspec_family_tl \zf@family
+  }
 }
 
 \cs_new:Nn \ltj_fontspec_set_family:Nnn {
