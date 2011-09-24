@@ -30,6 +30,10 @@ local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 
+local ltjf_font_metric_table = ltjf.font_metric_table
+local ltjf_find_char_class = ltjf.find_char_class
+
+
 -- Append a whatsit node to the list.
 -- This whatsit node will be extracted to a glyph_node
 function append_jglyph(char)
@@ -67,7 +71,7 @@ function extract(head)
 	    g.subtype = 0; g.char = p.value
 	    v = has_attr(p, attr_curjfnt); g.font = v
 	    set_attr(g, attr_jchar_class,
-		     ltjf.find_char_class(g.char, ltjf.font_metric_table[v].jfm))
+		     ltjf_find_char_class(g.char, ltjf_font_metric_table[v]))
 	    set_attr(g, attr_curjfnt, v)
 	    v = has_attr(p, attr_yablshift)
 	    if v then 
@@ -94,6 +98,47 @@ luatexbase.add_to_callback('pre_linebreak_filter',
    luatexbase.priority_in_callback('pre_linebreak_filter',
 				   'ltj.pre_linebreak_filter'))
 
+
+-- additional callbacks
+-- 以下は，LuaTeX-ja に用意された callback のサンプルになっている．
+--   JFM の文字クラスの指定の所で，"AJ1-xxx" 形式での指定を可能とした．
+--   これらの文字指定は，和文フォント定義ごとに，それぞれのフォントの
+--   CID <-> グリフ 対応状況による変換テーブルが用意される．
+
+-- フォント読み込み時に，CID
+local function cid_to_char(fmtable, fn)
+   local fi = fonts.ids[fn]
+   if fi.cidinfo and fi.cidinfo.ordering == "Japan1" then
+      fmtable.cid_char_type = {}
+      for i, v in pairs(ltjf.metrics[fmtable.jfm].chars) do
+	 local j = string.match(i, "^AJ1%-([0-9]*)")
+	 if j then
+	    j = tonumber(fi.unicodes['Japan1.'..tostring(j)])
+	    if j then
+	       fmtable.cid_char_type[j] = v 
+	    end
+	 end
+      end
+   end
+   return fmtable
+end
+luatexbase.add_to_callback("ltj.define_jfont", 
+			   cid_to_char, "ltj.otf.define_jfont", 1)
+--  既に読み込まれているフォントに対しても，同じことをやらないといけない
+for fn, v in pairs(ltjf_font_metric_table) do
+   ltjf_font_metric_table[fn] = cid_to_char(fmtable, fn)
+end
+
+
+local function cid_set_char_class(arg, fmtable, char)
+   if arg~=0 then return arg
+   elseif fmtable.cid_char_type then 
+      return fmtable.cid_char_type[char] or 0
+   else return 0
+   end
+end
+luatexbase.add_to_callback("ltj.find_char_class", 
+			   cid_set_char_class, "ltj.otf.find_char_class", 1)
 
 -------------------- all done
 -- EOF

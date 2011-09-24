@@ -78,6 +78,7 @@ local ltjf_metrics = ltjf.metrics
 
 -------------------- Helper functions
 
+-- This function is called only for acquiring `special' characters.
 local function find_char_class(c,m)
    return m.chars[c] or 0
 end

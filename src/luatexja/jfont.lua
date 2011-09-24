@@ -126,10 +126,16 @@ local function update_jfm_cache(j,sz)
    metrics[j].size_cache[sz].zh = round(metrics[j].zh*sz)
 end
 
+luatexbase.create_callback("ltj.find_char_class", "data", 
+			   function (arg, fmtable, char)
+			      return 0
+			   end)
+
 function find_char_class(c,m)
--- c: character code, m
-   if not metrics[m] then return 0 end
-   return metrics[m].chars[c] or 0
+-- c: character code, m: index in font_metric table
+   if not metrics[m.jfm] then return 0 end
+   return metrics[m.jfm].chars[c] or 
+      luatexbase.call_callback("ltj.find_char_class", 0, m, c)
 end
 
 local function load_jfont_metric()
@@ -168,6 +174,8 @@ function jfontdefX(g)
 end
 
 -- EXT
+luatexbase.create_callback("ltj.define_jfont", "data", function (ft, fn) return ft end)
+
 function jfontdefY() -- for horizontal font
    local j = load_jfont_metric()
    local fn = font.id(cstemp)
@@ -181,11 +189,10 @@ function jfontdefY() -- for horizontal font
              .. '\\endcsname=\\relax')
      return 
    end
-   font_metric_table[fn]={}
-   font_metric_table[fn].jfm=j
-   font_metric_table[fn].size=f.size
-   font_metric_table[fn].var=jfm_var
    update_jfm_cache(j, f.size)
+   local fmtable = { jfm = j, size = f.size, var = jfm_var }
+   fmtable = luatexbase.call_callback("ltj.define_jfont", fmtable, fn)
+   font_metric_table[fn]=fmtable
    tex.sprint(cat_lp, ltj.is_global .. '\\protected\\expandafter\\def\\csname ' 
           .. cstemp  .. '\\endcsname{\\ltj@curjfnt=' .. fn .. '\\relax}')
 end
@@ -258,7 +265,7 @@ function append_italic()
       if ltjc.is_ucs_in_japanese_char(p) then
 	 f = has_attr(p, attr_curjfnt)
 	 local j = font_metric_table[f]
-	 local c = find_char_class(p.char, j.jfm)
+	 local c = find_char_class(p.char, j)
 	 g.kern = metrics[j.jfm].size_cache[j.size].char_type[c].italic
       else
 	 g.kern = font.fonts[f].characters[p.char].italic

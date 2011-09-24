@@ -29,8 +29,8 @@ local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 
-local lang_ja_token = token.create('ltj@japanese')
-local lang_ja = lang_ja_token[2]
+local ltjf_font_metric_table = ltjf.font_metric_table
+local ltjf_find_char_class = ltjf.find_char_class
 
 ------------------------------------------------------------------------
 -- MAIN PROCESS STEP 1: replace fonts
@@ -45,7 +45,7 @@ local function suppress_hyphenate_ja(head)
 	 if v then 
 	    p.font = v 
 	    set_attr(p, attr_jchar_class,
-		     ltjf.find_char_class(p.char, ltjf.font_metric_table[v].jfm))
+		     ltjf_find_char_class(p.char, ltjf_font_metric_table[v]))
 	 end
 	 v = has_attr(p, attr_ykblshift)
 	 if v then 

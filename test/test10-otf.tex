@@ -40,7 +40,15 @@
 
 {\bf（速報）}世界陸上\CID{20660}，\ajLig{ボルト}がフライングで失格．
 
-\ajHankaku{半角カタカナひらがな} ←JFM の問題か，半角ひらがなが全角幅で出てしまう．
+\ajHankaku{半角カタカナひらがな} %←JFM の問題か，半角ひらがなが全角幅で出てしまう．
+←luatexja-otf.sty 内で，JFMの文法拡張を行いました．
+
+
+{\DeclareKanjiFamily{JY3}{hoge}{}
+\DeclareFontShape{JY3}{hoge}{m}{n}{<-> file:ipaexg.ttf:jfm=ujis}{}
+\fontfamily{hoge}\selectfont 
+luatexja-otf.sty の下でも，TrueTypeフォントは正常に読めるよね？
+\verb+\CID+は正常に働かないと思うけど．}
 
 \newpage
 
