@@ -18,10 +18,12 @@
   it~ cannot~ be~ used~ with~ a~ font~ that~ wasn't~ selected~ by~ luatexja-fontspec.
 }
 
-\prg_new_conditional:Nnn \ltj_fontspec_if_liiikeys: {TF,F} {
+\cs_generate_variant:Nn \prg_new_conditional:Nnn {Nnx}
+
+\prg_new_conditional:Nnx \ltj_fontspec_if_liiikeys: {TF,F} {
   \@ifpackagelater {fontspec} {2011/09/13}
-  { \prg_return_true: }  % fontspec >= 2.2 (l3keys)
-  { \prg_return_false: } % fontspec <  2.2 (xkeyval)
+  { \exp_not:N \prg_return_true: }  % fontspec >= 2.2 (l3keys)
+  { \exp_not:N \prg_return_false: } % fontspec <  2.2 (xkeyval)
 }
 
 \cs_new:Nn \ltj_fontspec_define_option:nn {
