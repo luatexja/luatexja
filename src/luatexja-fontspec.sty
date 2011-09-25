@@ -55,22 +55,21 @@
   \ltj_fontspec_define_preparse_external:nn {NoEmbed} {
     \cs_set:Nn \fontspec_namewrap:n {psft:####1}
   }
+  %% Omit the warning message
+  %% "OpenType feature 'Kerning=Off' (-kern) not available ..."
+  \ltj_fontspec_define_option:nn {Kerning/Off} {
+    \fontspec_update_fontid:n  {-kern}
+    \fontspec_update_featstr:n {-kern}      
+  }  
   \ltj_fontspec_if_liiikeys:TF {
     \tl_set:Nn \g_fontspec_encoding_tl {JY3}
   } {
     \tl_set:Nn \zf@enc {JY3}
   }
   \tl_set:Nx \g_fontspec_default_fontopts_tl 
-             {JFM=ujis,Scale=0.960444,\g_ltj_fontspec_default_fontopts_tl}
+             {JFM=ujis,Scale=0.960444,Kerning=Off,\g_ltj_fontspec_default_fontopts_tl}
   \cs_set_eq:NN \DeclareFontFamily \DeclareKanjiFamily
   \fontspec_select:nn{#1}{#2}
-  \tl_set:Nn \l_fontspec_lang_tl   {dflt}
-  \tl_set:Nn \l_fontspec_script_tl {latn}
-  \fontspec_check_ot_feat:nT {+kern} {
-    \tl_set:Nx \g_fontspec_default_fontopts_tl 
-               {JFM=ujis,Scale=0.960444,Kerning=Off,\g_ltj_fontspec_default_fontopts_tl}
-    \fontspec_select:nn{#1}{#2}
-  }
   \group_end:
   \ltj_fontspec_if_liiikeys:F {
     \tl_set_eq:NN \l_fontspec_family_tl \zf@family
