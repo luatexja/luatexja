@@ -17,7 +17,7 @@
 
 \makeatletter
 \definecolor{purple}{rgb}{0.60, 0.0, 1.0}
-\definecolor{green}{rgb}{0.0, 0.70, 0.0}
+\definecolor{green}{rgb}{0.0, 0.60, 0.0}
 \definecolor{lblue}{rgb}{0.30, 0.0, 1.00}
 \definecolor{gray}{rgb}{0.60, 0.60, 0.60}
 \definecolor{linenavy}{rgb}{0.0 ,0.0 ,0.50}
@@ -92,9 +92,12 @@ leftskip=.3cm,rightskip=.3cm plus1fil]{title in head/foot}%
 \def\mcdefault{gt}
 \DeclareFontShape{JY3}{gt}{bx}{n}{ <-> s*[0.960444] psft:FutoGoB101-Bold:jfm=ujis}{}
 \def\notice#1{{\color{blue!50!black}#1}}
+\def\alert#1{{\color{red}\bfseries#1}}
 \def\pTeX{p\TeX}
 \parindent=0pt
 \catcode`\|=13\def|{\char92 }
+\def\{{{\ttfamily\char`\{}}
+\def\}{{\ttfamily\char`\}}}
 \makeatother
 
 \title{Lua\TeX-jaの開発}
@@ -209,8 +212,7 @@ leftskip=.3cm,rightskip=.3cm plus1fil]{title in head/foot}%
 \begin{flushleft}\ttfamily
 |documentclass[a4paper,10pt]\{\only<1>{jsarticle}\alert{\only<2>{bxjsarticle}}\}\\
 \alert{\only<2>{|usepackage\{luatexja\}}}\only<1>{\notice{\%}}\\
-|usepackage\{lmodern\}\\
-|begin\{document\}\\
+|usepackage\{lmodern\}|begin\{document\}\\
 「これはまったく意味がない日本語の文だ．」\\
 （あいう）\{|large|gtfamily（abcゴシック）\}\\
 \ \\
@@ -388,18 +390,18 @@ $\zeta(2) \simeq
 \subsection{fontspec等への対応}
 
 \begin{frame}[fragile]
-  \frametitle{fontspec対応，\texttt{\char92 CID}・\texttt{\char92 UTF}}
+  \frametitle{fontspec等への対応}
 \noindent\textbf{fontspec対応}
 \begin{itemize}
 \item \verb+luatexja-fontspec+パッケージを使用する．
 \item 和文フォント用命令は\verb+\setmainjfont+のように「j」がつく．
 \end{itemize}
 
-\noindent\textbf{\texttt{\char92 CID}と\texttt{\char92 UTF}}
+\noindent\textbf{OTFパッケージの機能}
 \begin{itemize}
 \item \verb+luatexja-otf+パッケージを使用する．
 \item 例：「\verb+\CID{8705}と高+」→\quad\CID{8705}と高
-\item それ以外のotfパッケージの機能はまだ実装していない．
+\item \verb+\CID+, \verb+\UTF+と，\texttt{ajmacros.sty}の一部機能が実装．
 \end{itemize}
 
 \end{frame}
@@ -410,21 +412,23 @@ $\zeta(2) \simeq
 \def\.#1{{\rm\fontshape{it}\selectfont$\langle$#1$\rangle$}}
 \begin{frame}
 \frametitle{命令名称の変更}
-殆どの組版パラメタは\texttt{|ltjsetparameter}にkey-valueリストを渡すことで設定．
+{\large 殆どの組版パラメタは\texttt{|ltjsetparameter}にkey-valueリストを渡すことで設定．}
 
-例：
+\medskip
 \begin{tabular}{cll}
 \toprule
 \multicolumn{2}{l}{\bf 和欧文間空白}\\
 \hskip1\zw代入&\tt
-\only<1>{|xkanjiskip=\.{length}}
-\alert{\only<2>{|ltjsetprameter\{xkanjiskip=\.{length}\}}}\\
+|ltjsetparameter\{xkanjiskip=\.{length}\}\\
 \hskip1\zw取得&\tt
-\only<1>{|xkanjiskip\sf\ (as a skip)}
-\alert{\only<2>{|ltjgetprameter\{xkanjiskip\}\sf\ (as string)}}\\\midrule
+|ltjgetparameter\{xkanjiskip\}\sf\ (as string)\\\midrule
 \multicolumn{2}{l}{\bf 禁則用ペナルティ\hss}\\
-\hskip1\zw代入&\tt |prebreakpenalty\.{chr\_code}=\.{penalty}\\
-\hskip1\zw取得&\tt |prebreakpenalty\.{chr\_code}\sf\ (as a count)\\
+\hskip1\zw代入&\tt
+|ltjsetparameter\{\\
+&\tt\hskip2emprebreakpenalty=\{\.{chr\_code},\.{penalty}\}\}\\
+\hskip1\zw取得&\tt
+|ltjgetparameter\\
+&\tt\hskip2em\{prebreakpenalty\}\{\.{chr\_code}\}\sf\ (as string)\\
 \bottomrule
 \end{tabular}
 
@@ -434,12 +438,12 @@ $\zeta(2) \simeq
 \frametitle{和文フォントの指定方法}
 
 \begin{flushleft}
-\tt\large |jfont|piyo=\textcolor{green}{psft:GothicBBB-Medium}\\
-\hskip7em:\textcolor{blue}{jfm=ujis};...\ \textcolor{red}{at 20pt}
+\tt\Large |jfont|piyo=\textcolor{green}{psft:GothicBBB-Medium}\\
+\hskip5em:\textcolor{blue}{jfm=ujis};...\ \textcolor{red}{at 20pt}
 \end{flushleft}
 
 和文フォントは，次の3要素の組である：
-\begin{description}[サイズ]
+\begin{description}[metric]\def\makelabel#1{\hbox to \labelwidth{\bf#1}}
 \item[\textcolor{green}{字形}]
   OpenType/TrueTypeフォントも可．\\
   prefix \texttt{psft:}で非埋込フォントを指定可能．
@@ -467,12 +471,12 @@ $\zeta(2) \simeq
 \def\bar{\vrule width 0.4pt height 5pt depth 5pt}
 
 \begin{frame}
-\frametitle{空白挿入の単位：Lua\TeX-jaの場合}
+\frametitle{空白挿入の単位：\only<1>{p\TeX}\only<2>{\alert{Lua\TeX-ja}}の場合}
 
 \textbf{入力例：\quad}{\large\tt
-\textcolor{green}{$\underbracket{\hbox{）\{\}（}}_{\scriptstyle 1}$}%
-\textcolor{blue}{$\underbracket{\hbox{）|typeout\{\}（}}_{\scriptstyle 2}$}%
-\textcolor{red}{$\underbracket{\hbox{）\{|gt （}}_{\scriptstyle 3}$}\}}
+\textcolor{green}{$\underbracket{\mathstrut\hbox{）\{\}（}}_{\scriptstyle 1}$}%
+\textcolor{blue}{$\underbracket{\mathstrut\hbox{）|typeout\{\}（}}_{\scriptstyle 2}$}%
+\textcolor{red}{$\underbracket{\mathstrut\hbox{）\{|gt （}}_{\scriptstyle 3}$}\}}
 
 \begin{center}
 \vskip-\bigskipamount
@@ -507,7 +511,12 @@ $\zeta(2) \simeq
 \end{center}
 
 \vskip-\medskipamount
-\uncover<2>{
+\vbox to 5\baselineskip{%
+\only<1>{
+\alert{入力ソース中で連続していなければ，空白挿入処理は分断．}\\
+元来の\TeX でも，{\tt of\{\}fice}では合字は抑制される．
+}%
+\only<2>{
 \begin{enumerate}
 \item \alert{水平リスト内に寄与しないものは無視}\\
  Lua\TeX でも，{\tt of\{\}fice}では合字は抑制されない
@@ -516,7 +525,7 @@ $\zeta(2) \simeq
 \textcolor{blue}{metric}と\textcolor{red}{サイズ}が同じならば，
 空白挿入処理では同じフォントとして扱われる
 \end{enumerate}
-}
+}}
 \end{frame}
 
 \begin{frame}
@@ -554,7 +563,7 @@ $\zeta(2) \simeq
 \frametitle{異フォントの文字：\alert{Lua\TeX-ja} の場合}
 
 Lua\TeX-jaにおいて，異なるフォントの文字間には，\\
-両者のmetric由来の空白の\alert{平均}値が入る{\small（設定で変更可）}：
+両者のmetric由来の空白の\alert{平均}値が入る{\small（設定で変更可）\inhibitglue\hbox{}}：
 
 \medskip
 
@@ -586,7 +595,8 @@ Lua\TeX-jaにおいて，異なるフォントの文字間には，\\
 \subsection{注意}
 \begin{frame}
 \frametitle{和文文字直後の改行}
-Lua\TeX の使用により，以下のようなad hocな実装：
+{\large Lua\TeX の仕様により，ad hocな実装}
+
 
 入力行が以下の場合
 \end{frame}
