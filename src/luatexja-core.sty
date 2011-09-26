@@ -253,16 +253,21 @@
 \define@key[ltj]{japaram}{jascriptscriptfont}{%
   \expandafter\ltj@@set@stackfont#1:{mjss}}
 \def\ltj@@set@stackfont#1,#2:#3{%
-  {\directlua{tex.globaldefs=0}\ltj@curjfnt=-1 #2%
-   \global\ltj@tempcnta=\ltj@curjfnt}%
-  \ifnum\ltj@tempcnta=-1
+  \directlua{%
+    ltj.global_temp = tex.globaldefs; 
+    tex.globaldefs = 0}%
+  \ltj@tempcnta=\ltj@curjfnt\ltj@curjfnt=-1 #2%
+  \ifnum\ltj@curjfnt=-1
     \@PackageError{luatexja-core}%
     {\string#2 is not a control sequence that represents \MessageBreak
      a Japanese font}{}%
   \else
     \directlua{luatexja.stack.set_stack_font(ltj.isglobal, \asluastring{#3},
-    \ltj@safe@num@or\ltj@defnum{#1}, \the\ltj@tempcnta)}%
-  \fi}
+    \ltj@safe@num@or\ltj@defnum{#1}, \the\ltj@curjfnt)}%
+  \fi
+  \ltj@curjfnt=\ltj@tempcnta
+  \directlua{tex.globaldefs = ltj.global_temp}%
+  }
 
 % yalbaselineshift = <dimen>
 % yjabaselineshift = <dimen>
