@@ -136,8 +136,8 @@ local function load_jfont_metric()
    if jfm_file_name=='' then 
       ltjb.package_error('luatexja',
 			 'no JFM specified',
-			 {'To load and define a Japanese font, a JFM must be specified.',
-			  "The JFM 'ujis' will be  used for now."})
+			 'To load and define a Japanese font, a JFM must be specified.'..
+			  "The JFM 'ujis' will be  used for now.")
       jfm_file_name='ujis'
    end
    for j,v in ipairs(metrics) do 

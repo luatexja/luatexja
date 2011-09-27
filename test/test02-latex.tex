@@ -19,6 +19,9 @@
     \ltjsetparameter{xkanjiskip={0.25em plus 0.15em minus 0.06em}}%
   \fi}
 
+% for test
+\DeclareTextFontCommand{\textix}{\fontshape{ix}\selectfont}
+
 \makeatother
 \begin{document}
 \section{NFSS2 のテスト}
@@ -51,5 +54,52 @@
 \noindent{\LARGE ◆あいうえおabcかきく{\gt かきくa{\bf uyあ}いう}}
 %\end{document}
 
+\section{slanted, extended}
+\DeclareFontShape{JY3}{mc}{m}{sl}{<-> s*[0.960444] 
+  psft:Ryumin-Light:slant=0.25;jfm=ujiso25}{}
+\DeclareFontShape{JY3}{mc}{x}{n}{<-> s*[0.960444] 
+  psft:Ryumin-Light:extend=1.5;jfm=ujisx50}{}
+\DeclareFontShape{JY3}{gt}{m}{sl}{<-> s*[0.960444] 
+  file:ipag.ttf:slant=0.25;jfm=ujiso25}{}
+\DeclareFontShape{JY3}{gt}{x}{n}{<-> s*[0.960444] 
+  file:ipag.ttf:extend=1.5;jfm=ujisx50}{}
+
+% for test
+\DeclareFontShape{JY3}{gt}{m}{ix}{<-> s*[0.960444] 
+  file:ipag.ttf:slant=0.25;jfm=ujiso25}{}
+
+\paragraph{psft prefix でもOK?}\ 
+
+\textsl{日本語の機械的な斜体}直立，
+\textsl{あいう■\textup{■え■■}■おかき}
+
+{\fontfamily{mc}\fontseries{x}\selectfont あいう}
+
+\paragraph{TTF, OTFではOK}\ 
+
+\textgt{\textsl{日本語の機械的な斜体}直立，
+\textsl{あいう■\textup{■え■■}■おかき}}
+
+{\fontfamily{gt}\fontseries{x}\selectfont あいう}
+
+\paragraph{italic correction inserted by {\tt\char92text...}}\
+
+font series `ix': 欧文は未定義，和文は機械的斜体．
+
+{\gt■\textix{■あabcい■\textup{■うxyzえ■■}■おpqrか■}■}
+
+{\gt■f\textix{f■あい■f\textup{f■うえ■■f}f■おか■f}f■}
+
+イタリック補正なし：{\gt {\slshape ■}■}
+イタリック補正あり：{\gt {\slshape ■\/}■}
+
+\newpage{\obeylines\tt
+\setbox0=\hbox{\gt\textsl{あいう■\textup{■え■}■おかき}}
+\directlua{ltj.ext_show_node_list(tex.box[0].head, '', tex.print)}\par}
+
+\bigskip
+
+正しい補正量：$0.960444\times 10 \times 0.88\times 0.25 \simeq
+\directlua{tex.print(0.960444*10*0.88*0.25)}\,\textrm{pt}$
 
 \end{document}
