@@ -33,8 +33,11 @@ function get_stack_level()
       charprop_stack_table[i] = table.fastcopy(charprop_stack_table[i-1])
       tex.setcount('ltj@@stack', i)
       if gd>0 then tex.globaldefs = gd end
-      local g = node_new(id_whatsit, sid_user)
-      g.user_id=30112; g.type=100; g.value=j; node.write(g)
+      if tex.nest[tex.nest.ptr].mode == 127 or
+	 tex.nest[tex.nest.ptr].mode == -127 then
+	 local g = node_new(id_whatsit, sid_user)
+	 g.user_id=30112; g.type=100; g.value=j; node.write(g)
+      end
    end
    return i
 end

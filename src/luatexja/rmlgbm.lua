@@ -73,10 +73,22 @@ local function mk_rml(name, size, id)
    cachedata.size = size
 
    -- no embedding
-   fontdata.name = specification.name .. size
+   local var = ''
+   if features.slant then 
+      fontdata.slant = features.slant*1000
+      cachedata.slant = fontdata.slant
+      var = var .. 's' .. tostring(features.slant)
+   end
+   if features.extend then 
+      fontdata.extend = features.extend*1000
+      cachedata.extend = fontdata.extend
+       var = var .. 'x' .. tostring(features.extend)
+  end
+   fontdata.name = specification.name .. size .. var
    cachedata.name = fontdata.name
-   fontdata.fullname = specification.name
+   fontdata.fullname = specification.name .. var
    cachedata.fullname = fontdata.fullname
+
    fontdata.psname = specification.name
    cachedata.psname = fontdata.psname
 
