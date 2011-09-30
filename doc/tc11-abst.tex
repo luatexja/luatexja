@@ -13,17 +13,18 @@
 
 \makeatletter
 \baselineskip=15pt
-\DeclareFontShape{JY3}{mc}{m}{n}{<-> s*[0.92489] file:ipaexm.ttf:jfm=ujis}{}
-\DeclareFontShape{JY3}{gt}{m}{n}{<-> s*[0.92489] file:ipaexg.ttf:jfm=ujis}{}
+\DeclareFontShape{JY3}{mc}{m}{n}{<-> s*[0.92489] psft:Ryumin-Light:jfm=ujis}{}
+\DeclareFontShape{JY3}{gt}{m}{n}{<-> s*[0.92489] psft:GothicBBB-Medium:jfm=ujis}{}
+\ltjsetparameter{alxspmode={`\\,3}}
 
   \renewcommand{\section}{%
     \@startsection{section}{1}{\z@}%
-    {\Cvs}% 前アキ
+    {.5\Cvs}% 前アキ
     {.25\Cvs}% 後アキ
     {\normalfont\large\headfont\raggedright}}
   \renewcommand{\paragraph}{\@startsection{paragraph}{4}{\z@}%
-    {0.5\Cvs}{-1\zw}% 改行せず 1zw のアキ
-    {\normalfont\normalsize\headfont ■}}
+    {0.25\Cvs}{-1\zw}% 改行せず 1zw のアキ
+    {\normalfont\normalsize\headfont}}
 \let\subsection=\paragraph
 
 \def\@listI{\leftmargin\leftmargini
@@ -33,7 +34,7 @@
 \def\emph#1{\textbf{\mathversion{bold}#1}}
 \def\centerbaseline#1#2{%
   \setbox0=\hbox{#1\ltjsetparameter{yjabaselineshift=\z@}あ}%
-  \@tempdima=\dimexpr\cht-\cdp-\ht0+\dp0\relax{#1%
+  \@tempdima=\dimexpr\cht-\cdp-\ht0+\dp0-1pt\relax{#1%
   \ltjsetparameter{yjabaselineshift=-0.5\@tempdima, yalbaselineshift=-0.5\@tempdima}#2%
   }}
 \def\.#1{{\normalfont\it$\langle$#1$\rangle$}}
@@ -46,21 +47,25 @@
 \begin{flushright}
 \author~({\tt\mail})
 \end{flushright}
+\smallskip
 
-
-\section{開発目標}
+\noindent\textgt{概要}\hskip1\zw
 Lua\TeX-ja は，p\TeX と同等あるいはそれ以上の水準の日本語組版を，
-次世代標準\TeX エンジンであるLua\TeX で可能にすることを目的としたマクロパッケージである．
+次世代標準\TeX エンジンであるLua\TeX で可能にすることを目的とした，開発中のマクロパッケージである．
+本発表では，Lua\TeX-ja の現在の状況について，p\TeX との相違点を中心に報告する．
+
+\section{開発方針}
 \begin{itemize}
 \item \emph{最低でもp\TeX と同等の組版の自由度を確保する．}
+p\TeX のprimitiveに相当するレベルから開発を行う．
 \item \emph{p\TeX との100\%互換は目的としない．}
 p\TeX において不自然/不都合な実装があれば，積極的に改める．
 \end{itemize}
 
 
-\section{p\TeX からの主な違い}
-\subsection{縦書きは未実装}
-落ち着いてきたら縦書きも開発したいが，現状は左横書きのみサポート．
+\section{p\TeX との主な違い}
+\subsection{縦書きはまだ未実装}
+落ち着いてきたら縦書きも開発したいが，現状は左横書きのみに集中している．
 
 \subsection{命令名称の変更}
 大半のパラメタへの代入は\:{ltjsetparameter}へ
@@ -81,16 +86,17 @@ p\TeX において不自然/不都合な実装があれば，積極的に改め�
 \ 
 
 \subsection{行末が和文文字の場合の改行の扱い}
-Lua\TeX の仕様上，「前行行末時のcatcode」で判定するad hocな仕様．
+Lua\TeX の仕様上，「前行行末時の設定値」で判定するad hocな仕様．
 %1行を外部から読み込むとき，前行行末のcatcodeの状態で，行の末尾が次の形のときに改行を無視する：
 %\[
 % \hbox{(catcodeが11 or 12の和文文字)}\hbox{(catcodeが1 or 2の文字)}^*
 %\]
 
 \subsection{和文間・和欧文間の空白挿入処理}
+p\TeX のそれをベースに，1から書き直しを行った．
 \begin{enumerate}
 \item 空白挿入処理をノードベースに変更（Lua\TeX の合字・カーニング処理に合わせた）．
-\item 「和文フォント」はメトリックと実際の字形との組：
+\item \inhibitglue「和文フォント」はメトリックと実際の字形，そしてサイズとの組で定義される：
 \begin{center}
 $\tt\mathcode`\:="703A\mathcode`\*="7020
 \mathcode`\=="703D\mathcode`\-="702D\mathcode`\|="705C%"
@@ -122,22 +128,28 @@ $
 \end{center}
 \
 
-\section{現況}
+\section{現在の実装状況}
 \subsection{\inhibitglue 「エンジン拡張部分」%
 \centerbaseline{\scriptsize\normalfont}{（\TeX\inhibitglue →\inhibitglue p\TeX のエンジン拡張部分
 に相当）}}\ \par概ね実装済みであるが，細かい仕様変更の可能性あり．また，
 従来ではprimitiveとして実装されていた機能をLuaコードと\TeX マクロを用いて実装しな
 いといけないので，予想外のバグの可能性があるとともに，処理速度が非常に遅い．
 
-\subsection{\LaTeXe 用マクロ%
-\centerbaseline{\scriptsize\normalfont}{（p\LaTeXe 実装に相当）}%
-及び，{\tt fontspec}, {\tt otf}パッケージ対応}\ \par
-\verb+\CID+など一部の機能が試験的に実装され，ある程度は使える状況．
-日本語用クラスファイルとしては，八登さんによるBXjsclsを使用するのが現状では手っ取り早い．
+\subsection{\LaTeXe への対応
+\centerbaseline{\scriptsize\normalfont}{（p\LaTeXe 実装に相当）}}\ \par
+p\LaTeXe のソースを参考に，NFSS2へのパッチなど主な部分の実装は行った．
+まだ自前の日本語用クラスファイルは製作しておらず，
+八登さんによるBXjsclsを使用するのが現状では手っ取り早い．
+\centerbaseline{\scriptsize\normalfont}{（本文書も同クラスを使用している）}
+
+
+\subsection{{\tt fontspec}, {\tt otf}パッケージの対応}\ \par
+\verb+\setmainjfont+, \verb+\CID+など一部の機能が実装され，ある程度は使える状況である．
 
 
 
 \vfill
+\hrule\medskip
 \subsection{Lua\TeX-ja プロジェクトについて}\ 
 
 プロジェクト Wiki：\url{http://sourceforge.jp/projects/luatex-ja/wiki/}
