@@ -1,7 +1,7 @@
 %#! lualatex -shell-escape tc11-slide.tex
 \documentclass[notheorems,12pt,hyperref={unicode=true}]{beamer}
 \usepackage{luatexja,luatexja-otf,showexpl,lltjlisting}
-\usepackage{lmodern,mathtools,graphicx}
+\usepackage{lmodern,mathtools,graphicx,pict2e}
 \usepackage{amsmath,bm,mflogo,booktabs}
 \usepackage[all]{xy}
 
@@ -98,6 +98,8 @@ leftskip=.3cm,rightskip=.3cm plus1fil]{title in head/foot}%
 \catcode`\|=13\def|{\char92 }
 \def\{{{\ttfamily\char`\{}}
 \def\}{{\ttfamily\char`\}}}
+\ltjsetparameter{alxspmode={`\\,allow}}
+\lstset{numbers=left, basicstyle=\ttfamily}
 \makeatother
 
 \title{Lua\TeX-jaの開発}
@@ -191,7 +193,7 @@ leftskip=.3cm,rightskip=.3cm plus1fil]{title in head/foot}%
 \only<2>{\alert{|input luatexja.sty} \notice{\% \normalfont Lua\TeX-ja本体}}\ \\
 |hsize=20\alert{\only<2>{|zw}}\only<1>{zw}\\
 \only<1>{|font|bigmc=jis at 14.4pt}
-\alert{\only<2>{|jfont|bigmc=psft:Ryumin-Light:jfm=ujis at 14.4pt}}\\
+\alert{\only<2>{|jfont|bigmc=psft:Ryumin-Light:jfm=ujis at14.4pt}}\\
 \notice{\ \ \% 和文フォント定義}\\
 こんにちは，|TeX の世界へ！\\
 \{|bigmc 大きい文字だよ．\}\\
@@ -447,7 +449,7 @@ $\zeta(2) \simeq
 \item[\textcolor{green}{字形}]
   OpenType/TrueTypeフォントも可．\\
   prefix \texttt{psft:}で非埋込フォントを指定可能．
-\item[\textcolor{blue}{metric}] p\TeX のJFMに相当．
+\item[\textcolor{blue}{metric}] p\TeX のJFMに相当．\verb+jfm-ujis.lua+に格納．
 \item[\textcolor{red}{サイズ}]\ 
 \end{description}
 
@@ -593,14 +595,27 @@ Lua\TeX-jaにおいて，異なるフォントの文字間には，\\
 \end{frame}
 
 \subsection{注意}
-\begin{frame}
+\begin{frame}[fragile]
 \frametitle{和文文字直後の改行}
-{\large Lua\TeX の仕様により，ad hocな実装}
+{\bf\large Lua\TeX の仕様により，ad hocな実装}
 
+\medskip
+改行による空白が抑制されるかは，\\
+\alert{その行を入力から読み込む前}の内部状態で決まる．
 
-入力行が以下の場合
+\bigskip
+\textbf{入力例}：\hskip2\zw\unitlength=1\zw
+{\color{green}\begin{picture}(0,0)\thicklines\put(0,0.38){\vector(0,-1){1.1}}\end{picture}%
+\inhibitglue「ひらがな他を欧文扱いにする」}
+\fbox{\vbox{\tt
+{\color{green}|ltjsetparameter\{jacharrange=\{-6\}\}}xあ\\
+y
+}}
+
+→出力は「xy」となる（\alert{行末空白は入らない}）．
+
+∵1行目を入力から読み込む時点で，「あ」は和文文字扱い．
 \end{frame}
-
 \section*{まとめ}
 \begin{frame}
 \frametitle{まとめ}

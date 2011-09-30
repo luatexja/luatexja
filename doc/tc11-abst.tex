@@ -13,8 +13,8 @@
 
 \makeatletter
 \baselineskip=15pt
-\DeclareFontShape{JY3}{mc}{m}{n}{<-> s*[0.92489] psft:Ryumin-Light:jfm=ujis}{}
-\DeclareFontShape{JY3}{gt}{m}{n}{<-> s*[0.92489] psft:GothicBBB-Medium:jfm=ujis}{}
+\DeclareFontShape{JY3}{mc}{m}{n}{<-> s*[0.92489] file:ipaexm.ttf:jfm=ujis}{}
+\DeclareFontShape{JY3}{gt}{m}{n}{<-> s*[0.92489] file:ipaexg.ttf:jfm=ujis}{}
 
   \renewcommand{\section}{%
     \@startsection{section}{1}{\z@}%
@@ -124,19 +124,15 @@ $
 
 \section{現況}
 \subsection{\inhibitglue 「エンジン拡張部分」%
-\centerbaseline{\scriptsize\normalfont}{（\TeX →p\TeX のエンジン拡張部分
-に対応）}}\ \par概ね実装済みであるが，細かい仕様変更の可能性あり．また，
-従来ではprimitiveとして実装していた機能をLuaコードと\TeX マクロで実装しな
-いといけないので，バグが残っている可能性がある．
-
-\subsection{plain \TeX~formatに対するマクロ%
-\centerbaseline{\scriptsize\normalfont}{（{\tt ptex.tex}に相当）}}
-ほぼ翻訳完了．
+\centerbaseline{\scriptsize\normalfont}{（\TeX\inhibitglue →\inhibitglue p\TeX のエンジン拡張部分
+に相当）}}\ \par概ね実装済みであるが，細かい仕様変更の可能性あり．また，
+従来ではprimitiveとして実装されていた機能をLuaコードと\TeX マクロを用いて実装しな
+いといけないので，予想外のバグの可能性があるとともに，処理速度が非常に遅い．
 
 \subsection{\LaTeXe 用マクロ%
 \centerbaseline{\scriptsize\normalfont}{（p\LaTeXe 実装に相当）}%
 及び，{\tt fontspec}, {\tt otf}パッケージ対応}\ \par
-試験的に一部の機能が実装され，ある程度は使える．
+\verb+\CID+など一部の機能が試験的に実装され，ある程度は使える状況．
 日本語用クラスファイルとしては，八登さんによるBXjsclsを使用するのが現状では手っ取り早い．
 
 
