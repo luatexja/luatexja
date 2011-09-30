@@ -821,9 +821,6 @@ end
 
 -- \inhibitglue
 function create_inhibitglue_node()
-   if tex.nest[tex.nest.ptr].mode == 127 or
-      tex.nest[tex.nest.ptr].mode == -127 then
-      local g=node_new(id_whatsit, sid_user)
-      g.user_id=30111; g.type=100; g.value=1; node.write(g)
-   end
+   local g=node_new(id_whatsit, sid_user)
+   g.user_id=30111; g.type=100; g.value=1; node.write(g)
 end
