@@ -42,6 +42,9 @@ local id_sub_mlist = node.id('sub_mlist')
 
 local PROCESSED = 8
 
+local ltjf_font_metric_table = ltjf.font_metric_table
+local ltjf_find_char_class = ltjf.find_char_class
+
 local conv_jchar_to_hbox_A
 
 -- sty : 0 (display or text), 1 (script), >=2 (scriptscript)
@@ -102,9 +105,9 @@ function (p, sty)
 	    r.char = p.char; r.font = f; r.subtype = 256
 	    set_attr(r, attr_icflag, PROCESSED)
 	    set_attr(r, attr_yablshift, 0)
-	    local class = ltjf.find_char_class(p.char, ltjf.font_metric_table[f].jfm)
+	    local met = ltjf_font_metric_table[f]
+	    local class = ltjf_find_char_class(p.char, met)
 	    set_attr(r, attr_jchar_class, class)
-	    local met = ltjf.font_metric_table[f]
 	    ltjw.char_data = ltjf.metrics[met.jfm].size_cache[met.size].char_type[class]
 	    ltjw.head = r; ltjw.capsule_glyph(r, tex.mathdir , true);
 	    q.head = ltjw.head; node_free(p); p=q;

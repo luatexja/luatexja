@@ -28,14 +28,18 @@
 
 \head{文字範囲の代入/取得テスト}
 
-\ltjdefcharrange{2}{`あ,"E0-"FF}
-「\char"F4」は2番の文字範囲なので，和文扱いのはず
+\ltjdefcharrange{9}{`あ,"E0-"FF}
+「\char"F4」は9番の文字範囲なので，和文扱いのはず
 
-{iso8859-1 和文扱い:\ltjsetparameter{jacharrange={1}}%
+{iso8859-1 和文扱い:\ltjsetparameter{jacharrange={1,8}}%
 \ltjgetparameter{jacharrange}{1}%
 § ¶ ° £ ¥ \char"F4}
 
-{iso8859-1 欧文扱い:\ltjsetparameter{jacharrange={-1}}%
+{iso8859-1 欧文扱い:\ltjsetparameter{jacharrange={-1,-8}}%
+\ltjgetparameter{jacharrange}{1}%
+§ ¶ ° £ ¥ \char"F4}
+
+{標準:%
 \ltjgetparameter{jacharrange}{1}%
 § ¶ ° £ ¥ \char"F4}
 
