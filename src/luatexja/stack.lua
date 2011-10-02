@@ -34,7 +34,6 @@ function get_stack_level()
       charprop_stack_table[i] = table.fastcopy(charprop_stack_table[i-1])
       tex.setcount('ltj@@stack', i)
       if gd>0 then tex.globaldefs = gd end
-      print('mode: ', tex.nest[tex.nest.ptr].mode)
       if tex.nest[tex.nest.ptr].mode == hmode or
 	 tex.nest[tex.nest.ptr].mode == -hmode then
 	 local g = node_new(id_whatsit, sid_user)
