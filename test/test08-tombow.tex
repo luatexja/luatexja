@@ -1,27 +1,6 @@
-\documentclass[twocolumn]{bxjsarticle}
-
-\usepackage{luatexja}
-
-% from jsclasses
-\DeclareRobustCommand\sffamily
-        {\romanfamily\sfdefault\kanjifamily\gtdefault\selectfont}
-
-\makeatletter
-\hour\time \divide\hour by 60\relax
-\@tempcnta\hour \multiply\@tempcnta 60\relax
-\minute\time \advance\minute-\@tempcnta
-
-\tombowtrue \tombowdatetrue
-\setlength{\@tombowwidth}{.1\p@}%
-\@bannertoken{%
-   \jobname\space(\number\year-\two@digits\month-\two@digits\day
-   \space\two@digits\hour:\two@digits\minute)}%
-\maketombowbox
+\documentclass[twocolumn,tombow]{ltjsarticle}
 
 \begin{document}
-
-\addtolength{\pdfpagewidth}{2in}
-\addtolength{\pdfpageheight}{2in}
 
 \section{トンボのテスト}
 ああああああああああああああああああああああああああああああああああああああああ

@@ -1,23 +1,8 @@
 %#! lualatex
-\documentclass{article}
-\usepackage{luatexja}
+\documentclass{ltjsarticle}
 \nonstopmode
 
 \makeatletter
-% from jsclasses
-\def\@setfontsize#1#2#3{%
-  \ifx\protect\@typeset@protect
-    \let\@currsize#1%
-  \fi
-  \fontsize{#2}{#3}\selectfont
-  \ifdim\parindent>\z@
-      \parindent=1\zw
-  \fi
-  \ltjsetparameter{kanjiskip={0\zw plus .1\zw minus .01\zw}}%
-  \@tempskipa=\ltjgetparameter{xkanjiskip}%
-  \ifdim\@tempskipa>\z@
-    \ltjsetparameter{xkanjiskip={0.25em plus 0.15em minus 0.06em}}%
-  \fi}
 
 % for test
 \DeclareTextFontCommand{\textix}{\fontshape{ix}\selectfont}
