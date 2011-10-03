@@ -22,7 +22,7 @@
 %  -----------------------------------------
 %
 % \fi
-% \CheckSum{5283}
+% \CheckSum{5224}
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -127,6 +127,8 @@
 %   これはデフォルトの漢字のカテゴリコードが12であるためです。
 % \end{itemize}
 %
+% \StopEventually
+%
 % 以下では実際のコードに即して説明します。
 % \section{Lua\TeX-ja の読み込み}
 %
@@ -141,7 +143,7 @@
 % あるいは |\documentclass[オプション]{ltjsarticle}|
 % のように呼び出します。
 %
-% まず，オプションに関連するいくつかのコマンドやスイッチ（論理変数）を定
+% 最初に，オプションに関連するいくつかのコマンドやスイッチ（論理変数）を定
 % 義します。
 %
 % \begin{macro}{\if@restonecol}
@@ -575,25 +577,6 @@
 \fi
 %    \end{macrocode}
 %
-% \paragraph{PDF の用紙サイズの設定}
-%
-% \begin{macro}{\pdfpagewidth}
-% \begin{macro}{\pdfpageheight}
-% 出力の PDF の用紙サイズをここで設定しておきます。
-% |tombow| が真のときは2インチ足しておきます。
-%    \begin{macrocode}
-\setlength{\@tempdima}{\paperwidth}
-\setlength{\@tempdimb}{\paperheight}
-\iftombow
-  \advance \@tempdima 2in
-  \advance \@tempdimb 2in
-\fi
-\setlength{\pdfpagewidth}{\@tempdima}
-\setlength{\pdfpageheight}{\@tempdimb}
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
-%
 % \paragraph{基準となる行送り}
 %
 % \begin{macro}{\n@baseline}
@@ -689,6 +672,25 @@
 \setlength\paperwidth{\inv@mag\paperwidth}%
 \setlength\paperheight{\inv@mag\paperheight}%
 %    \end{macrocode}
+%
+% \paragraph{PDF の用紙サイズの設定}
+%
+% \begin{macro}{\pdfpagewidth}
+% \begin{macro}{\pdfpageheight}
+% 出力の PDF の用紙サイズをここで設定しておきます。
+% |tombow| が真のときは2インチ足しておきます。
+%    \begin{macrocode}
+\setlength{\@tempdima}{\paperwidth}
+\setlength{\@tempdimb}{\paperheight}
+\iftombow
+  \advance \@tempdima 2in
+  \advance \@tempdimb 2in
+\fi
+\setlength{\pdfpagewidth}{\@tempdima}
+\setlength{\pdfpageheight}{\@tempdimb}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 %
 % \section{和文フォントの選択}
 %
@@ -1611,15 +1613,14 @@
 % はトンボの内側に |1in| のスペース（|1truein| ではなく）を挿入するので，
 % 場合分けしています。
 %
+% [2011-10-03] Lua\TeX{} (pdf\TeX？) では |1truein| ではなく 
+% |1in| になるようです。
+%
 %    \begin{macrocode}
 \setlength{\oddsidemargin}{\paperwidth}
 \addtolength{\oddsidemargin}{-\fullwidth}
 \setlength{\oddsidemargin}{.5\oddsidemargin}
-\iftombow
-  \addtolength{\oddsidemargin}{-1in}
-\else
-  \addtolength{\oddsidemargin}{-\inv@mag in}
-\fi
+\addtolength{\oddsidemargin}{-1in}
 \setlength{\evensidemargin}{\oddsidemargin}
 \if@mparswitch
   \addtolength{\evensidemargin}{\fullwidth}
@@ -1639,7 +1640,7 @@
 %    \begin{macrocode}
 \setlength\marginparwidth{\paperwidth}
 \addtolength\marginparwidth{-\oddsidemargin}
-\addtolength\marginparwidth{-\inv@mag in}
+\addtolength\marginparwidth{-1in}
 \addtolength\marginparwidth{-\textwidth}
 \addtolength\marginparwidth{-1cm}
 \addtolength\marginparwidth{-\marginparsep}
@@ -1657,6 +1658,9 @@
 % [2003-06-26] |\headheight| を |\topskip| に直しました。
 % 以前はこの二つは値が同じであったので，変化はないはずです。
 %
+% [2011-10-03] ここも |\oddsidemargin| のときと同様に |-\inv@mag in| ではなく
+% |-1in| にします。
+%
 %    \begin{macrocode}
 \setlength\topmargin{\paperheight}
 \addtolength\topmargin{-\textheight}
@@ -1669,11 +1673,7 @@
 \addtolength\topmargin{-\footskip}
 \setlength\topmargin{0.5\topmargin}
 %<kiyou>\setlength\topmargin{81truebp}
-\iftombow
-  \addtolength\topmargin{-1in}
-\else
-  \addtolength\topmargin{-\inv@mag in}
-\fi
+\addtolength\topmargin{-1in}
 %    \end{macrocode}
 % \end{macro}
 %
