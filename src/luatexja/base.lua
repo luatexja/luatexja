@@ -14,6 +14,113 @@ local ltb = luatexbase
 local tostring = tostring
 local node, table, tex, token = node, table, tex, token
 
+-------------------- 
+
+public_name = 'luatexja'
+public_version = 'alpha'
+
+-------------------- Fully-expandable error messaging
+do
+--! LaTeX 形式のエラーメッセージ(\PackageError 等)を
+--! Lua 関数の呼び出しで行う.
+
+  local LF = "\n"
+  local err_break = ""
+  local err_main = ""
+  local err_help = ""
+
+  local function message_cont(str, c)
+    return str:gsub(err_break, LF .. c)
+  end
+  local function into_lines(str)
+    return str:gsub(err_break, LF):explode(LF)
+  end
+
+  function _error_set_break(str)
+    err_break = str
+  end
+
+  function _error_set_message(msgcont, main, help)
+    err_main = message_cont(main, msgcont)
+    err_help = into_lines(help)
+  end
+
+  function _error_show(escchar)
+    local escapechar = tex.escapechar
+    local newlinechar = tex.newlinechar
+    local errorcontextlines = tex.errorcontextlines
+    if not escchar then tex.escapechar = -1 end
+    tex.newlinechar = 10
+    tex.errorcontextlines = -1
+    tex.error(err_main, err_help)
+    tex.escapechar = escapechar
+    tex.newlinechar = newlinechar
+    tex.errorcontextlines = errorcontextlines
+  end
+
+  local message_a = "Type  H <return>  for immediate help"
+
+  function generic_error(msgcont, main, ref, help)
+    local mainref = main..".\n\n"..ref.."\n"..message_a
+    _error_set_message(msgcont, mainref, help)
+    _error_show(true)
+  end
+
+  function _generic_warn_info(msgcont, main, warn, line)
+    local mainc = message_cont(main, msgcont)
+    local br = warn and "\n" or ""
+    local out = warn and "term and log" or "log"
+    local on_line = line and (" on input line "..tex.inputlineno) or ""
+    local newlinechar = tex.newlinechar
+    tex.newlinechar = -1
+    texio.write_nl(out, br..main..on_line.."."..br)
+    tex.newlinechar = newlinechar
+  end
+
+  function generic_warning(msgcont, main)
+    _generic_warn_info(msgcont, main, true, true)
+  end
+  function generic_warning_no_line(msgcont, main)
+    _generic_warn_info(msgcont, main, true, false)
+  end
+  function generic_info(msgcont, main)
+    _generic_warn_info(msgcont, main, false, true)
+  end
+  function generic_info_no_line(msgcont, main)
+    _generic_warn_info(msgcont, main, false, false)
+  end
+
+  function package_error(pkgname, main, help)
+    generic_error("("..pkgname.."                ",
+      "Package "..pkgname.." Error: "..main,
+      "See the "..pkgname.." package documentation for explanation.",
+      help)
+  end
+  function package_warning(pkgname, main)
+    generic_warning("("..pkgname.."                ",
+      "Package "..pkgname.." Warning: "..main)
+  end
+  function package_warning_no_line(pkgname, main)
+    generic_warning_no_line("("..pkgname.."                ",
+      "Package "..pkgname.." Warning: "..main)
+  end
+  function package_info(pkgname, main)
+    generic_info("("..pkgname.."             ",
+      "Package "..pkgname.." Info: "..main)
+  end
+  function package_info_no_line(pkgname, main)
+    generic_info_no_line("("..pkgname.."             ",
+      "Package "..pkgname.." Info: "..main)
+  end
+
+  function ltj_error(main, help)
+    package_error(public_name, main, help)
+  end
+  function ltj_warning_no_line(main)
+    package_warning_no_line(public_name, main, help)
+  end
+
+end
 -------------------- TeX stream I/O
 do
 
@@ -133,101 +240,6 @@ do
   end
 
 --! ixbase.length は tex.skip と全く同じなので不要.
-
-end
--------------------- Fully-expandable error messaging
-do
---! LaTeX 形式のエラーメッセージ(\PackageError 等)を
---! Lua 関数の呼び出しで行う.
-
-  local LF = "\\n"
-  local err_break = ""
-  local err_main = ""
-  local err_help = ""
-
-  local function message_cont(str, c)
-    return str:gsub(err_break, LF .. c)
-  end
-  local function into_lines(str)
-    return str:gsub(err_break, LF):explode(LF)
-  end
-
-  function _error_set_break(str)
-    err_break = str
-  end
-
-  function _error_set_message(msgcont, main, help)
-    err_main = message_cont(main, msgcont)
-    err_help = into_lines(help)
-  end
-
-  function _error_show(escchar)
-    local escapechar = tex.escapechar
-    local newlinechar = tex.newlinechar
-    local errorcontextlines = tex.errorcontextlines
-    if not escchar then tex.escapechar = -1 end
-    tex.newlinechar = 10
-    tex.errorcontextlines = -1
-    tex.error(err_main, err_help)
-    tex.escapechar = escapechar
-    tex.newlinechar = newlinechar
-    tex.errorcontextlines = errorcontextlines
-  end
-
-  local message_a = "Type  H <return>  for immediate help"
-
-  function generic_error(msgcont, main, ref, help)
-    local mainref = main..".\n\n"..ref.."\n"..message_a
-    _error_set_message(msgcont, mainref, help)
-    _error_show(true)
-  end
-
-  function _generic_warn_info(msgcont, main, warn, line)
-    local mainc = message_cont(main, msgcont)
-    local br = warn and "\n" or ""
-    local out = warn and "term and log" or "log"
-    local on_line = line and (" on input line "..tex.inputlineno) or ""
-    local newlinechar = tex.newlinechar
-    tex.newlinechar = -1
-    texio.write_nl(out, br..main..on_line.."."..br)
-    tex.newlinechar = newlinechar
-  end
-
-  function generic_warning(msgcont, main)
-    _generic_warn_info(msgcont, main, true, true)
-  end
-  function generic_warning_no_line(msgcont, main)
-    _generic_warn_info(msgcont, main, true, false)
-  end
-  function generic_info(msgcont, main)
-    _generic_warn_info(msgcont, main, false, true)
-  end
-  function generic_info_no_line(msgcont, main)
-    _generic_warn_info(msgcont, main, false, false)
-  end
-
-  function package_error(pkgname, main, help)
-    generic_error("("..pkgname.."                ",
-      "Package "..pkgname.." Error: "..main,
-      "See the "..pkgname.." package documentation for explanation.",
-      help)
-  end
-  function package_warning(pkgname, main)
-    generic_warning("("..pkgname.."                ",
-      "Package "..pkgname.." Warning: "..main)
-  end
-  function package_warning_no_line(pkgname, main)
-    generic_warning_no_line("("..pkgname.."                ",
-      "Package "..pkgname.." Warning: "..main)
-  end
-  function package_info(pkgname, main)
-    generic_info("("..pkgname.."             ",
-      "Package "..pkgname.." Info: "..main)
-  end
-  function package_info_no_line(pkgname, main)
-    generic_info_no_line("("..pkgname.."             ",
-      "Package "..pkgname.." Info: "..main)
-  end
 
 end
 -------------------- Number handling in TeX source
@@ -369,6 +381,39 @@ do
        if next then table.insert(res, next) end
        return false, res
     end)
+  end
+
+end
+-------------------- TeX register allocation
+do
+  local cmod_base_count = token.create('ltj@@count@zero')[2]
+  local cmod_base_attr = token.create('ltj@@attr@zero')[2]
+  local cmod_base_dimen = token.create('ltj@@dimen@zero')[2]
+  local cmod_base_skip = token.create('ltj@@skip@zero')[2]
+
+  function const_number(name)
+    if name:sub(1, 1) == '\\' then name = name:sub(2) end
+    return token.create(name)[2]
+  end
+
+  function count_number(name)
+    if name:sub(1, 1) == '\\' then name = name:sub(2) end
+    return token.create(name)[2] - cmod_base_count
+  end
+
+  function attribute_number(name)
+    if name:sub(1, 1) == '\\' then name = name:sub(2) end
+    return token.create(name)[2] - cmod_base_attr
+  end
+
+  function dimen_number(name)
+    if name:sub(1, 1) == '\\' then name = name:sub(2) end
+    return token.create(name)[2] - cmod_base_dimen
+  end
+
+  function skip_number(name)
+    if name:sub(1, 1) == '\\' then name = name:sub(2) end
+    return token.create(name)[2] - cmod_base_skip
   end
 
 end

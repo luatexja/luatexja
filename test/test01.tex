@@ -85,6 +85,16 @@
 
 \ltjsetparameter{differentjfm=Both}\djtest
 
+\bigskip
+{\noindent\bf\tengt ■ujis, jis, min}
 
+\def\test#1{\jfont\mx={file:ipaexm.ttf:jfm=#1}
+\par\noindent\hbox to 30pt{#1}%
+\hbox to 250pt{\mx ちょっとチェックしちゃった！が，まあいいです。\hss}%
+\hbox{\mx「大」、「小」，‘国’“国”――……}}
+
+\test{ujis}
+\test{jis}
+\test{min}
 \end
 

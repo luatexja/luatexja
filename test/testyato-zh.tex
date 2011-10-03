@@ -1,0 +1,49 @@
+\input luatexja-core.sty
+
+\jfont\tensong={AR PL SungtiL GB:jfm=quanjiao}
+\rm\tensong
+
+\parindent=2\zw
+\parskip=0pt
+\pdfpagewidth=210mm
+\pdfpageheight=297mm
+\hsize=35\zw
+\hoffset=\dimexpr(\pdfpagewidth-\hsize)/2-1in\relax
+\vsize=246mm
+
+xeCJK是一个XeLaTeX宏包，用于排版CJK文字，
+包括字体选择和标点控制等。主要特点：
+
+\par\medskip
+\item{1.}分别设置CJK和英文字体；
+\item{2.}自动忽略CJK文字间的空格而保留其它空格，
+允许在非标点汉字和英文字母(a--z, A--Z)间断行；
+\item{3.}提供多种标点处理方式：全角式、半角式、开明式、行末半角式；
+\item{4.}自动调整中英文间空白。
+\par\medskip
+
+xeCJK是在CCT和CJK包基础上发展起来的，支持多种标点格式。
+例如，“标点挤压”。
+xeCJK是在CCT和CJK包基础上发展起来的，支持多种标点格式。
+例如，“标点挤压”。
+\par\bigskip
+
+\hrule\bigskip
+
+\newcount\tcount
+\tcount=0 \loop
+xeCJK是一个XeLaTeX宏包，用于排版CJK文字，
+包括字体选择和标点控制等。主要特点：
+分别设置CJK和英文字体；
+自动忽略CJK文字间的空格而保留其它空格，
+允许在非标点汉字和英文字母(a--z, A--Z)间断行；
+提供多种标点处理方式：全角式、半角式、开明式、行末半角式；
+自动调整中英文间空白。
+xeCJK是在CCT和CJK包基础上发展起来的，支持多种标点格式。
+例如，“标点挤压”。
+xeCJK是在CCT和CJK包基础上发展起来的，支持多种标点格式。
+例如，“标点挤压”。
+\advance\tcount1
+\ifnum\tcount<10 \repeat
+
+\bye

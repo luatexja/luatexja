@@ -16,9 +16,18 @@
   \ProvidesPackage{luatexja-base}[2011/04/01 v0.1]
 \fi                             %</LaTeX>
 
+
+%%------------------ Lua module loading
+
 %% Quark tokens needed in Lua modules.
 \protected\def\ltj@@q@escape{\ltj@@q@escape@}
 \protected\def\ltj@@q@escapenum{\ltj@@q@escapenum@}
+
+%% 
+\countdef\ltj@@count@zero=0 %
+\luatexattributedef\ltj@@attr@zero=0 %
+\dimendef\ltj@@dimen@zero=0 %
+\skipdef\ltj@@skip@zero=0 %
 
 %% Load Lua modules.
 \RequireLuaModule{luatexja.base}

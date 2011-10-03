@@ -200,7 +200,8 @@
 \def\zh{\directlua{luatexja.jfont.load_zh()}\ltj@zh}
 
 %%%%%%%% \inhibitglue
-\protected\def\inhibitglue{\directlua{luatexja.jfmglue.create_inhibitglue_node()}}
+\protected\def\inhibitglue{\ifvmode\leavevmode\fi
+  \ifmmode\else\directlua{luatexja.jfmglue.create_inhibitglue_node()}\fi}
 
 %%%%%%%% \yoko, \tate, \ifydir, \iftdir
 %% At this moment, tategaki mode is not implemented; 

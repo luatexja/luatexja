@@ -28,6 +28,7 @@ local set_attr = node.set_attribute
 local node_insert_before = node.insert_before
 local node_insert_after = node.insert_after
 local round = tex.round
+local table_insert = table.insert
 
 local id_glyph = node.id('glyph')
 local id_hlist = node.id('hlist')
@@ -70,24 +71,29 @@ local attr_autospc = luatexbase.attributes['ltj@autospc']
 local attr_autoxspc = luatexbase.attributes['ltj@autoxspc']
 local max_dimen = 1073741823
 
-
+local ltjs_get_penalty_table = ltjs.get_penalty_table
+local ltjs_get_skip_table = ltjs.get_skip_table
+local ltjf_font_metric_table = ltjf.font_metric_table
+local ltjf_metrics = ltjf.metrics
 
 -------------------- Helper functions
 
+-- This function is called only for acquiring `special' characters.
 local function find_char_class(c,m)
    return m.chars[c] or 0
 end
 
+local spec_zero_glue = node_new(id_glue_spec)
+   spec_zero_glue.width = 0; spec_zero_glue.stretch_order = 0; spec_zero_glue.stretch = 0
+   spec_zero_glue.shrink_order = 0; spec_zero_glue.shrink = 0
+
 local function get_zero_glue()
-   local g = node_new(id_glue_spec)
-   g.width = 0; g.stretch_order = 0; g.stretch = 0
-   g.shrink_order = 0; g.shrink = 0
-   return g
+   return node_copy(spec_zero_glue)
 end
 
 local function skip_table_to_spec(n)
    local g = node_new(id_glue_spec)
-   local st = ltjs.get_skip_table(n, ltjp.box_stack_level)
+   local st = ltjs_get_skip_table(n, ltjp.box_stack_level)
    g.width = st.width; g.stretch = st.stretch; g.shrink = st.shrink
    g.stretch_order = st.stretch_order; g.shrink_order = st.shrink_order
    return g
@@ -122,6 +128,13 @@ function math.two_average(a,b) return (a+b)/2 end
 -- 　Nq: 「q を核とする塊」
 -- 　　実際の glue は Np.last, Nq.first の間に挿入される
 -- 　Bp: Np.last, Nq.first の間の penalty node 達の配列
+
+-- Np, Nq, Bp, widow_Bp について
+-- Np, Nq は別々のテーブル．
+-- 1回のループごとに Nq = Np, Np = (new table) となるのは効率が悪いので，
+-- Np <-> Nq 入れ替え，その後 Np をクリアすることでテーブルを再利用．
+-- 同様の関係は Bp, widow_Bp にも．
+
 
 -- 核の定義：
 -- 　node x が non-char node のときは，x のみ
@@ -232,8 +245,11 @@ end
 
 local function calc_np()
    -- We assume lp = node_next(Np.last)
-   local pBp = Bp; local lpi, lpa
-   Nq = Np; Bp = {}; Bp[0] = 0; Np = {}; ihb_flag = false 
+   local lpi, lpa, Nr
+   Nr = Nq; for k in pairs(Nr) do Nr[k] = nil end
+   Nq = Np; Np = Nr
+   for k in pairs(Bp) do Bp[k] = nil end
+   ihb_flag = false 
    while true do
       lpi = lp.id; lpa = has_attr(lp, attr_icflag) or 0
       if lp==last then Np = nil; return
@@ -245,8 +261,7 @@ local function calc_np()
       elseif lpi == id_ins or lpi == id_mark or lpi == id_adjust then
 	 set_attr_icflag_processed(lp); lp = node_next(lp)
       elseif lpi == id_penalty then
-	 table.insert(Bp, lp); Bp[0] = Bp[0] + 1
-	 set_attr_icflag_processed(lp); lp = node_next(lp)
+	 table_insert(Bp, lp); set_attr_icflag_processed(lp); lp = node_next(lp)
       elseif lpi == id_whatsit then
 	 if lp.subtype==sid_user and lp.user_id==30111 then
 	    local lq = node_next(lp)
@@ -298,12 +313,12 @@ end
 local function set_np_xspc_jachar(c,x)
    Np.class = has_attr(x, attr_jchar_class)
    Np.char = c
-   local z = ltjf.font_metric_table[x.font]
+   local z = ltjf_font_metric_table[x.font]
    Np.size= z.size
-   Np.met = ltjf.metrics[z.jfm]
+   Np.met = ltjf_metrics[z.jfm]
    Np.var = z.var
-   Np.pre = ltjs.get_penalty_table('pre', c, 0, ltjp.box_stack_level)
-   Np.post = ltjs.get_penalty_table('post', c, 0, ltjp.box_stack_level)
+   Np.pre = ltjs_get_penalty_table('pre', c, 0, ltjp.box_stack_level)
+   Np.post = ltjs_get_penalty_table('post', c, 0, ltjp.box_stack_level)
    z = find_char_class('lineend', Np.met)
    local y = Np.met.size_cache[Np.size].char_type[Np.class]
    if y.kern and y.kern[z] then 
@@ -311,7 +326,7 @@ local function set_np_xspc_jachar(c,x)
    else 
       Np.lend = 0 
    end
-   y = ltjs.get_penalty_table('xsp', c, 3, ltjp.box_stack_level)
+   y = ltjs_get_penalty_table('xsp', c, 3, ltjp.box_stack_level)
    Np.xspc_before = (y>=2)
    Np.xspc_after  = (y%2==1)
    Np.auto_kspc = (has_attr(x, attr_autospc)==1)
@@ -332,13 +347,13 @@ local function set_np_xspc_alchar(c,x, lig)
 	    x = node_tail(x.components); c = x.char
 	 end
       end
-      Np.pre = ltjs.get_penalty_table('pre', c, 0, ltjp.box_stack_level)
-      Np.post = ltjs.get_penalty_table('post', c, 0, ltjp.box_stack_level)
+      Np.pre = ltjs_get_penalty_table('pre', c, 0, ltjp.box_stack_level)
+      Np.post = ltjs_get_penalty_table('post', c, 0, ltjp.box_stack_level)
    else
       Np.pre = 0; Np.post = 0
    end
    Np.met = nil
-   local y = ltjs.get_penalty_table('xsp', c, 3, ltjp.box_stack_level)
+   local y = ltjs_get_penalty_table('xsp', c, 3, ltjp.box_stack_level)
    Np.xspc_before = (y%2==1)
    Np.xspc_after  = (y>=2)
    Np.auto_xspc = (has_attr(x, attr_autoxspc)==1)
@@ -413,7 +428,7 @@ end
 local function lineend_fix(g)
    if g and g.id==id_kern then 
       Nq.lend = 0
-   elseif Nq.lend and Nq.lend~=0 then
+   elseif Nq.lend~=0 then
       if not g then
 	 g = node_new(id_kern); g.subtype = 1
 	 g.kern = -Nq.lend; set_attr(g, attr_icflag, LINEEND)
@@ -429,41 +444,41 @@ end
 -- change penalties (or create a new penalty, if needed)
 local function handle_penalty_normal(post, pre, g)
    local a = (pre or 0) + (post or 0)
-   if Bp[0] == 0 then
-      if (a~=0 and not(g and g.id==id_kern)) or (Nq.lend and Nq.lend~=0) then
+   if #Bp == 0 then
+      if (a~=0 and not(g and g.id==id_kern)) or Nq.lend~=0 then
 	 local p = node_new(id_penalty)
 	 if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
 	 p.penalty = a
 	 head = node_insert_before(head, Np.first, p)
-	 Bp[1] = p; Bp[0] = 1; set_attr(p, attr_icflag, KINSOKU)
+	 Bp[1] = p; set_attr(p, attr_icflag, KINSOKU)
       end
-   else for i, v in ipairs(Bp) do add_penalty(v,a) end
+   else for i, v in pairs(Bp) do add_penalty(v,a) end
    end
 end
 
 local function handle_penalty_always(post, pre, g)
    local a = (pre or 0) + (post or 0)
-   if Bp[0] == 0 then
-      if not (g and g.id==id_glue) or (Nq.lend and Nq.lend~=0) then
+   if #Bp == 0 then
+      if not (g and g.id==id_glue) or Nq.lend~=0 then
 	 local p = node_new(id_penalty)
 	 if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
 	 p.penalty = a
 	 head = node_insert_before(head, Np.first, p)
-	 Bp[1] = p; Bp[0] = 1; set_attr(p, attr_icflag, KINSOKU)
+	 Bp[1] = p; set_attr(p, attr_icflag, KINSOKU)
       end
-   else for i, v in ipairs(Bp) do add_penalty(v,a) end
+   else for i, v in pairs(Bp) do add_penalty(v,a) end
    end
 end
 
 local function handle_penalty_suppress(post, pre, g)
    local a = (pre or 0) + (post or 0)
-   if Bp[0] == 0 then
+   if #Bp == 0 then
       if g and g.id==id_glue then
 	 local p = node_new(id_penalty)
 	 p.penalty = 10000; head = node_insert_before(head, Np.first, p)
-	 Bp[1] = p; Bp[0] = 1; set_attr(p, attr_icflag, KINSOKU)
+	 Bp[1] = p; set_attr(p, attr_icflag, KINSOKU)
       end
-   else for i, v in ipairs(Bp) do add_penalty(v,a) end
+   else for i, v in pairs(Bp) do add_penalty(v,a) end
    end
 end
 
@@ -493,7 +508,7 @@ local function real_insert(w, g)
    if w~=0 then
       local h = node_new(id_kern)
       set_attr(h, attr_icflag, LINE_END)
-      h.kern = Nq.lend; h.subtype = 1
+      h.kern = w; h.subtype = 1
       head = node_insert_after(head, Nq.last, h)
    end
    if g then
@@ -540,8 +555,7 @@ local function get_kanjiskip()
 	 g.spec = gx
       else g.spec=node_copy(kanji_skip) end
    else
-      local gx = get_zero_glue()
-      g.spec = gx
+      g.spec =  get_zero_glue()
    end
    set_attr(g, attr_icflag, KANJI_SKIP)
    return g
@@ -620,8 +634,7 @@ local function get_xkanjiskip(Nn)
 	 g.spec = gx
       else g.spec=node_copy(xkanji_skip) end
    else
-      local gx = get_zero_glue()
-      g.spec = gx
+      g.spec = get_zero_glue()
    end
    set_attr(g, attr_icflag, XKANJI_SKIP)
    return g
@@ -645,7 +658,7 @@ end
 
 -- (anything) .. jachar
 local function handle_np_jachar()
-   local g = nil
+   local g
    if Nq.id==id_jglyph or (Nq.id==id_pbox and Nq.met) then 
       g = calc_ja_ja_glue() or get_kanjiskip() -- M->K
       g = lineend_fix(g)
@@ -665,14 +678,15 @@ local function handle_np_jachar()
       real_insert(0, g)
    end
    -- \jcharwidowpenalty 挿入予定箇所更新
-   if ltjs.get_penalty_table('kcat', Np.char, 0, ltjp.box_stack_level)%2~=1 then
-      widow_Np = Np; widow_Bp = Bp
+   if mode and ltjs_get_penalty_table('kcat', Np.char, 0, ltjp.box_stack_level)%2~=1 then
+      widow_Np.first = Np.first; 
+      local Bpr = widow_Bp; widow_Bp = Bp; Bp = Bpr
    end
 end
 
 -- jachar .. (anything)
 local function handle_nq_jachar()
-   local g = nil
+   local g
    if Np.pre then 
       g = get_OB_skip() or get_xkanjiskip(Nq) -- O_B->X
       g = lineend_fix(g)
@@ -689,7 +703,7 @@ end
 
 -- (anything) .. (和文文字で終わる hlist)
 local function handle_np_ja_hlist()
-   local g = nil
+   local g
    if Nq.id==id_jglyph or (Nq.id==id_pbox and Nq.met) then 
       g = get_OB_skip() or get_kanjiskip() -- O_B->K
       g = lineend_fix(g)
@@ -727,10 +741,10 @@ local function handle_list_tail()
 	 end
       end
       -- Insert \jcharwidowpenalty
-      Bp = widow_Bp; Np = widow_Np
-      if Np then
+      Bp = widow_Bp; Np = widow_Np; Nq.lend = 0
+      if Np.first then
 	 handle_penalty_normal(0,
-			       ltjs.get_penalty_table('jwp', 0, 0, ltjp.box_stack_level))
+			       ltjs_get_penalty_table('jwp', 0, 0, ltjp.box_stack_level))
       end
    else
       -- the current list is the contents of a hbox
@@ -751,7 +765,7 @@ local function handle_list_head()
       local g = new_jfm_glue(Np, find_char_class('boxbdd',Np.met), Np.class)
       if g then
 	 set_attr(g, attr_icflag, BOXBDD)
-	 if g.id==id_glue and Bp[0]==0 then
+	 if g.id==id_glue and #Bp==0 then
 	    local h = node_new(id_penalty)
 	    h.penalty = 10000; set_attr(h, attr_icflag, BOXBDD)
 	 end
@@ -762,9 +776,19 @@ end
 
 -- initialize
 local function init_var()
-   lp = head; widow_Bp = nil; widow_Np = nil
+   lp = head; Bp = {}; widow_Bp = {}; widow_Np = {first = nil}
    kanji_skip=skip_table_to_spec('kanjiskip')
    xkanji_skip=skip_table_to_spec('xkanjiskip')
+   Np = {
+      auto_kspc=nil, auto_xspc=nil, char=nil, class=nil, 
+      first=nil, id=nil, last=nil, lend=0, met=nil, nuc=nil, 
+      post=nil, pre=nil, var=nil, xspc_after=nil, xspc_before=nil, 
+   }
+   Nq = {
+      auto_kspc=nil, auto_xspc=nil, char=nil, class=nil, 
+      first=nil, id=nil, last=nil, lend=0, met=nil, nuc=nil, 
+      post=nil, pre=nil, var=nil, xspc_after=nil, xspc_before=nil, 
+   }
    if mode then 
       -- the current list is to be line-breaked:
       -- hbox from \parindent is skipped.
@@ -820,10 +844,9 @@ function main(ahead, amode)
 end
 
 -- \inhibitglue
+local inhibitglue_node=node_new(id_whatsit, sid_user)
+inhibitglue_node.user_id=30111; inhibitglue_node.type=100; inhibitglue_node.value=1
+
 function create_inhibitglue_node()
-   if tex.nest[tex.nest.ptr].mode == 127 or
-      tex.nest[tex.nest.ptr].mode == -127 then
-      local g=node_new(id_whatsit, sid_user)
-      g.user_id=30111; g.type=100; g.value=1; node.write(g)
-   end
+   node.write(node.copy(inhibitglue_node))
 end
