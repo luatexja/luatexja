@@ -211,14 +211,6 @@
   \setlength\paperheight{\paperwidth}
   \setlength\paperwidth {\@tempdima}
 \fi
-\setlength{\@tempdima}{\paperwidth}
-\setlength{\@tempdimb}{\paperheight}
-\iftombow
-  \advance \@tempdima 2in
-  \advance \@tempdimb 2in
-\fi
-\setlength{\pdfpagewidth}{\@tempdima}
-\setlength{\pdfpageheight}{\@tempdimb}
 \def\n@baseline{14.554375}
 \def\inv@mag{1}
 \ifnum\@ptsize=-2
@@ -281,6 +273,14 @@
 \fi
 \setlength\paperwidth{\inv@mag\paperwidth}%
 \setlength\paperheight{\inv@mag\paperheight}%
+\setlength{\@tempdima}{\paperwidth}
+\setlength{\@tempdimb}{\paperheight}
+\iftombow
+  \advance \@tempdima 2in
+  \advance \@tempdimb 2in
+\fi
+\setlength{\pdfpagewidth}{\@tempdima}
+\setlength{\pdfpageheight}{\@tempdimb}
 \DeclareFontShape{JY3}{mc}{bx}{n}{<->ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{gt}{bx}{n}{<->ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{mc}{m}{it}{<->ssub*mc/m/n}{}
@@ -510,11 +510,7 @@
 \setlength{\oddsidemargin}{\paperwidth}
 \addtolength{\oddsidemargin}{-\fullwidth}
 \setlength{\oddsidemargin}{.5\oddsidemargin}
-\iftombow
-  \addtolength{\oddsidemargin}{-1in}
-\else
-  \addtolength{\oddsidemargin}{-\inv@mag in}
-\fi
+\addtolength{\oddsidemargin}{-1in}
 \setlength{\evensidemargin}{\oddsidemargin}
 \if@mparswitch
   \addtolength{\evensidemargin}{\fullwidth}
@@ -522,7 +518,7 @@
 \fi
 \setlength\marginparwidth{\paperwidth}
 \addtolength\marginparwidth{-\oddsidemargin}
-\addtolength\marginparwidth{-\inv@mag in}
+\addtolength\marginparwidth{-1in}
 \addtolength\marginparwidth{-\textwidth}
 \addtolength\marginparwidth{-1cm}
 \addtolength\marginparwidth{-\marginparsep}
@@ -539,11 +535,7 @@
 \addtolength\topmargin{-\headsep}
 \addtolength\topmargin{-\footskip}
 \setlength\topmargin{0.5\topmargin}
-\iftombow
-  \addtolength\topmargin{-1in}
-\else
-  \addtolength\topmargin{-\inv@mag in}
-\fi
+\addtolength\topmargin{-1in}
 {\footnotesize\global\setlength\footnotesep{\baselineskip}}
 \setlength\footnotesep{0.7\footnotesep}
 \setlength{\skip\footins}{16\p@ \@plus 5\p@ \@minus 2\p@}
