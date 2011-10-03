@@ -183,18 +183,16 @@
 \newif\ifdraft
 \DeclareOption{draft}{\drafttrue \setlength\overfullrule{5pt}}
 \DeclareOption{final}{\draftfalse \setlength\overfullrule{0pt}}
-\newif\ifwinjis
-\winjisfalse
 \newif\ifmingoth
 \mingothfalse
 \newif\ifjisfont
 \jisfontfalse
-\newif\if@jsc@uplatex
-\@jsc@uplatexfalse
+\newif\ifptexjis
+\ptexjisfalse
+\DeclareOption{winjis}{}\DeclareOption{uplatex}{} % These 2 options are ignored.
 \DeclareOption{mingoth}{\mingothtrue}
-\DeclareOption{winjis}{\winjistrue}
+\DeclareOption{ptexjis}{\ptexjistrue}
 \DeclareOption{jis}{\jisfonttrue}
-\DeclareOption{uplatex}{\@jsc@uplatextrue\winjisfalse}
 \newif\ifpapersize
 \papersizefalse
 \DeclareOption{papersize}{\papersizetrue}
@@ -281,6 +279,18 @@
 \fi
 \setlength\paperwidth{\inv@mag\paperwidth}%
 \setlength\paperheight{\inv@mag\paperheight}%
+\ifmingoth
+  \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] psft:Ryumin-Light:jfm=min}{}
+  \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] psft:GothicBBB-Medium:jfm=min}{}
+\else
+  \ifptexjis
+    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] psft:Ryumin-Light:jfm=jis}{}
+    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] psft:GothicBBB-Medium:jfm=jis}{}
+  \else
+    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] psft:Ryumin-Light:jfm=ujis}{}
+    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] psft:GothicBBB-Medium:jfm=ujis}{}
+  \fi
+\fi
 \DeclareFontShape{JY3}{mc}{bx}{n}{<->ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{gt}{bx}{n}{<->ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{mc}{m}{it}{<->ssub*mc/m/n}{}
@@ -306,8 +316,7 @@
 \DeclareRobustCommand\ttfamily
         {\not@math@alphabet\ttfamily\mathtt
          \romanfamily\ttdefault\kanjifamily\gtdefault\selectfont}
-\def\textmc#1{\relax\ifmmode\hbox\fi{\mcfamily #1}}
-\def\textgt#1{\relax\ifmmode\hbox\fi{\gtfamily #1}}
+%%
 \def\reDeclareMathAlphabet#1#2#3{%
   \edef\@tempa{\expandafter\@gobble\string#2}%
   \edef\@tempb{\expandafter\@gobble\string#3}%

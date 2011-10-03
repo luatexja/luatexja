@@ -113,10 +113,11 @@
 % オプション自体は残してあります（つまり，削除されたオプションが指定されていても
 % コンパイルは通る）。
 % \begin{itemize}
-% \item フォントメトリック関係のオプション |mingoth|, |winjis|, |jis| が
-%   効かないようにしてあります（要検討）。
+% \item フォントメトリック関係のオプション |winjis| は単に無視されます．
+% \item 標準では|jfm-ujis.lua|（Lua\TeX-ja標準のメトリック，OTFパッケージのものがベース）を使用します．
 % \item up\TeX 関係のオプションを削除してあります。
 % \item |disablejfam| オプションが無効になっています。
+%       ←本当にそれでいい？ \LaTeX カーネルレベルではまだ16個のままのような気がします．
 % \item |papersize| オプションの指定に関わらず PDF のページサイズは適切に
 %   設定されます。
 % \item 「\texttt{amsmath} との衝突の回避」のコードは，上流で既に対処されている上に
@@ -495,22 +496,24 @@
 %
 % \paragraph{和文フォントメトリックの選択}
 %
-% 一旦無効にします。Lua\TeX-ja でも対応する JFM ファイルを用意すれば
-% 互換性は確保できると思われます（要検討）。
-%
+% ここではOTFパッケージのメトリックを元とした，|jfm-ujis.lua|メトリックを標準で使います。
+% 古い \texttt{min10}，\texttt{goth10} 互換のメトリックを使いたいときは \texttt{mingoth}
+% というオプションを指定します。
+% p\TeX でよく利用される \texttt{jis} フォントメトリックと互換のメトリックを使いたい場合は，
+% \texttt{ptexjis} というオプションを指定します。
+% \texttt{winjis} メトリックは用済みのため，\texttt{winjis} オプションは無視されます．
+% 
 %    \begin{macrocode}
-\newif\ifwinjis
-\winjisfalse
 \newif\ifmingoth
 \mingothfalse
 \newif\ifjisfont
 \jisfontfalse
-\newif\if@jsc@uplatex
-\@jsc@uplatexfalse
+\newif\ifptexjis
+\ptexjisfalse
+\DeclareOption{winjis}{}\DeclareOption{uplatex}{} % These 2 options are ignored.
 \DeclareOption{mingoth}{\mingothtrue}
-\DeclareOption{winjis}{\winjistrue}
+\DeclareOption{ptexjis}{\ptexjistrue}
 \DeclareOption{jis}{\jisfonttrue}
-\DeclareOption{uplatex}{\@jsc@uplatextrue\winjisfalse}
 %    \end{macrocode}
 %
 % \paragraph{papersizeスペシャルの利用}
@@ -687,6 +690,72 @@
 \setlength\paperheight{\inv@mag\paperheight}%
 %    \end{macrocode}
 %
+% \section{和文フォントの選択}
+%
+% JISの1ポイントは0.3514mm（約1/72.28インチ），
+% PostScriptの1ポイントは1/72インチですが，
+% \TeX では1/72.27インチを1pt（ポイント），
+% 1/72インチを1bp（ビッグポイント）と表します。
+% QuarkXPressなどのDTPソフトは標準で1/72インチを1ポイント
+% としますが，以下ではすべて1/72.27インチを1ptとしています。
+% 1インチは定義により25.4mmです。
+%
+% \pTeX （アスキーが日本語化した\TeX ）では，例えば従来のフォントメトリック
+% \texttt{min10} やJISフォントメトリックでは「公称10ポイントの和文フォントは，
+% 実際には9.62216ptで出力される（メトリック側で0.962216倍される）」という
+% 仕様になっています．
+% 一方，Lua\TeX-jaの提供するメトリックでは，そのようなことはありません．
+% 公称10ポイントの和文フォントは，10ポイントで出力されます．
+% 
+% この|ltjsclasses|でも，派生元の|jsclasses|と同じように，
+% この公称10ポイントのフォントをここでは13級に縮小して
+% 使うことにします。そのためには，$13\,\textrm{Q}/10\,\textrm{pt}\simeq 0.924872$ 倍
+% すればいいことになります。
+%
+%
+%    \begin{macrocode}
+%<*!jspf>
+\ifmingoth
+  \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] psft:Ryumin-Light:jfm=min}{}
+  \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] psft:GothicBBB-Medium:jfm=min}{}
+\else
+  \ifptexjis
+    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] psft:Ryumin-Light:jfm=jis}{}
+    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] psft:GothicBBB-Medium:jfm=jis}{}
+  \else
+    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] psft:Ryumin-Light:jfm=ujis}{}
+    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] psft:GothicBBB-Medium:jfm=ujis}{}
+  \fi
+\fi
+%</!jspf>
+%    \end{macrocode}
+%
+% これにより，公称10ポイントの和文フォントを0.924872倍したことにより，
+% 約9.25ポイント，
+% DTPで使う単位（1/72インチ）では9.21ポイントということになり，
+% 公称10ポイントといっても実は9ポイント強になります。
+%
+% 某学会誌では，
+% 和文フォントをPostScriptの9ポイントにするために，
+% $0.9*72.27/72 \simeq 0.903375$ 倍します。
+%
+%    \begin{macrocode}
+%<*jspf>
+\ifmingoth
+  \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.903375] psft:Ryumin-Light:jfm=min}{}
+  \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.903375] psft:GothicBBB-Medium:jfm=min}{}
+\else
+  \ifptexjis
+    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.903375] psft:Ryumin-Light:jfm=jis}{}
+    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.903375] psft:GothicBBB-Medium:jfm=jis}{}
+  \else
+    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.903375] psft:Ryumin-Light:jfm=ujis}{}
+    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.903375] psft:GothicBBB-Medium:jfm=ujis}{}
+  \fi
+\fi
+%</jspf>
+%    \end{macrocode}
+%
 % 和文でイタリック体，斜体，サンセリフ体，
 % タイプライタ体の代わりにゴシック体を使うことにします。
 %
@@ -730,21 +799,11 @@
         {\not@math@alphabet\ttfamily\mathtt
          \romanfamily\ttdefault\kanjifamily\gtdefault\selectfont}
 %    \end{macrocode}
-%
-% \begin{macro}{\textmc}
-% \begin{macro}{\textgt}
-%
-% 次のコマンドはイタリック補正なども含めて定義されていますが，
-% 和文ではイタリック補正はあまり役に立たず，
-% 欧文・和文間のグルーが入らないという副作用もありますので，
-% 単純な定義に直します。
-%
-%    \begin{macrocode}
-\def\textmc#1{\relax\ifmmode\hbox\fi{\mcfamily #1}}
-\def\textgt#1{\relax\ifmmode\hbox\fi{\gtfamily #1}}
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
+%%
+% Lua\TeX-jaでは和文組版に伴うグルーはノードベースで挿入するようになり，また
+% 欧文・和文間のグルーとイタリック補正は干渉しないようになりました．
+% まだ「和文の斜体」についてはLua\LaTeX カーネル側でまともな対応がされていませんが，
+% |jsclasses.dtx|で行われていた|\textmc|, |\textgt|の再定義は不要のように思われます．
 %
 % 新クラスでも数式内で日本語が使えるようにしました。
 %
