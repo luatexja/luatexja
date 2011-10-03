@@ -90,7 +90,9 @@ leftskip=.3cm,rightskip=.3cm plus1fil]{title in head/foot}%
 \setbeamerfont{frametitle}{size=\Large, series=\bfseries, shape=\upshape}
 
 \def\mcdefault{gt}
-\DeclareFontShape{JY3}{gt}{bx}{n}{ <-> s*[0.960444] psft:FutoGoB101-Bold:jfm=ujis}{}
+\DeclareFontShape{JY3}{gt}{bx}{n}{ <-> s*[0.924872] psft:FutoGoB101-Bold:jfm=ujis}{}
+\DeclareFontShape{JY3}{gt}{m}{n}{ <-> s*[0.924872] psft:GothicBBB-Medium:jfm=ujis}{}
+\DeclareFontShape{JY3}{mc}{m}{n}{ <-> s*[0.924872] psft:Ryumin-Light:jfm=ujis}{}
 \def\notice#1{{\color{blue!50!black}#1}}
 \def\alert#1{{\color{red}\bfseries#1}}
 \def\pTeX{p\TeX}
@@ -212,7 +214,7 @@ leftskip=.3cm,rightskip=.3cm plus1fil]{title in head/foot}%
 \begin{frame}
   \frametitle{p\LaTeX 用ソース}
 \begin{flushleft}\ttfamily
-|documentclass[a4paper,10pt]\{\only<1>{jsarticle}\alert{\only<2>{bxjsarticle}}\}\\
+|documentclass[a4paper,10pt]\{\only<1>{jsarticle}\alert{\only<2>{ltjsarticle}}\}\\
 \alert{\only<2>{|usepackage\{luatexja\}}}\only<1>{\notice{\%}}\\
 |usepackage\{lmodern\}|begin\{document\}\\
 「これはまったく意味がない日本語の文だ．」\\
@@ -225,8 +227,9 @@ leftskip=.3cm,rightskip=.3cm plus1fil]{title in head/foot}%
 \end{flushleft}
 \uncover<2>{
 \begin{itemize}
-\item まだ日本語組版用クラスは用意していない．\\
-（とりあえず八登さんの\texttt{bxjsarticle}で代用）
+\item 日本語組版用クラスを\alert{ltjsarticle.cls}に変える\\
+（まだmasterブランチにはマージされていないので，
+そこではとりあえず八登さんの\texttt{bxjsarticle}で代用がよい）
 \end{itemize}
 }
 \end{frame}
@@ -383,8 +386,9 @@ $\zeta(2) \simeq
       \item ボトムフロートの出力順序
       \item 脚注マクロ
     \end{itemize}
-    \item \alert{クラスファイルの方針は未決定}\\
-    現時点では，BXjsclsを用いるのが手っ取り早い．
+    \item 日本語用クラスファイル：\\
+    試験的に\texttt{ltjclasses}, \texttt{ltjsclasses}を作成．\\
+    {\small（現時点では，masterブランチにはマージされていない．）}
   \end{itemize}
 \end{frame}
 
