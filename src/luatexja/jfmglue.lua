@@ -257,7 +257,7 @@ local function calc_np()
       elseif lpa>=PACKED then
 	 if lpa == BOXBDD then
 	    local lq = node_next(lp)
-	    head = node_remove(head, lp); lp = lq
+	    head = node_remove(head, lp); node_free(lp); lp = lq
 	 else calc_np_pbox(); return end -- id_pbox
       elseif lpi == id_ins or lpi == id_mark or lpi == id_adjust then
 	 set_attr_icflag_processed(lp); lp = node_next(lp)
@@ -266,7 +266,7 @@ local function calc_np()
       elseif lpi == id_whatsit then
 	 if lp.subtype==sid_user and lp.user_id==30111 then
 	    local lq = node_next(lp)
-	    head = node_remove(head, lp); lp = lq; ihb_flag = true
+	    head = node_remove(head, lp); node_free(lp); lp = lq; ihb_flag = true
 	 else
 	    set_attr_icflag_processed(lp); lp = node_next(lp)
 	 end
@@ -551,12 +551,12 @@ local function get_kanjiskip()
 	    end
 	 elseif ak then
 	    gx.width = ak[1]; gx.stretch = ak[2]; gx.shrink = ak[3]
-	 else gx = get_zero_glue() -- fallback
+	 else node_free(gx); gx = get_zero_glue() -- fallback
 	 end
 	 g.spec = gx
-      else g.spec=node_copy(kanji_skip) end
+      else g.spec=node_copy(kanji_skip); node_free(gx) end
    else
-      g.spec =  get_zero_glue()
+      g.spec =  get_zero_glue(); node_free(gx)
    end
    set_attr(g, attr_icflag, KANJI_SKIP)
    return g
@@ -630,7 +630,7 @@ local function get_xkanjiskip(Nn)
 	 local bk = get_xkanji_skip_from_jfm(Nn)
 	 if bk then
 	    gx.width = bk[1]; gx.stretch = bk[2]; gx.shrink = bk[3]
-	 else gx = get_zero_glue() -- fallback
+	 else node_free(gx); gx = get_zero_glue() -- fallback
 	 end
 	 g.spec = gx
       else g.spec=node_copy(xkanji_skip) end
@@ -756,21 +756,24 @@ local function handle_list_tail()
 	    head = node_insert_after(head, Np.last, g)
 	 end
       end
-      head = node_remove(head, last) -- remove the sentinel
+      head = node_remove(head, last); node_free(last);-- remove the sentinel
    end
+   node_free(kanji_skip); node_free(xkanji_skip)
 end
 
 -- リスト先頭の処理
 local function handle_list_head()
    if Np.id ==  id_jglyph or (Np.id==id_pbox and Np.met) then 
-      local g = new_jfm_glue(Np, find_char_class('boxbdd',Np.met), Np.class)
-      if g and not ihb_flag then
-	 set_attr(g, attr_icflag, BOXBDD)
-	 if g.id==id_glue and #Bp==0 then
-	    local h = node_new(id_penalty)
-	    h.penalty = 10000; set_attr(h, attr_icflag, BOXBDD)
+      if not ihb_flag then
+	 local g = new_jfm_glue(Np, find_char_class('boxbdd',Np.met), Np.class)
+	 if g then
+	    set_attr(g, attr_icflag, BOXBDD)
+	    if g.id==id_glue and #Bp==0 then
+	       local h = node_new(id_penalty)
+	       h.penalty = 10000; set_attr(h, attr_icflag, BOXBDD)
+	    end
+	    head = node_insert_before(head, Np.first, g)
 	 end
-	 head = node_insert_before(head, Np.first, g)
       end
    end
 end
@@ -818,7 +821,7 @@ function main(ahead, amode)
       elseif Np.id==id_hlist or Np.id==id_pbox or Np.id==id_disc then after_hlist()
       end
    else
-      if not mode then head = node_remove(head, last) end
+      if not mode then head = node_remove(head, last); node_free(last) end
       return head
    end
    calc_np()

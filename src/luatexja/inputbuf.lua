@@ -28,7 +28,7 @@ function add_comment(buffer)
       local ct = tex.getcatcode(c)
       local ctl = tex.getcatcode(13) -- endline character
       if ((ct==11) or (ct==12)) and (ctl==5) then
-	 local p =  node.new(id_glyph)
+	 local p =  node_new(id_glyph)
 	 p.char = c
 	 if ltjc.is_ucs_in_japanese_char(p) then
 	    buffer = buffer .. string.char(0xF3,0xBF,0xBF,0xBF) -- U+FFFFF
