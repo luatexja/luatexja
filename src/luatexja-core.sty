@@ -138,11 +138,12 @@
 \newcount\ltj@tempcntc
 \newdimen\ltj@tempdima
 \newskip\ltj@tempskipa
+\newtoks\ltj@temptoks
 
 \newdimen\ltj@zw
 \newdimen\ltj@zh
 \newdimen\jQ \jQ=0.25mm
-\newdimen\jH \jH=0.25mm
+\let\jH=\jQ
 
 %%%%%%%% error message
 \def\ltj@defnum{0}
@@ -200,8 +201,16 @@
 \def\zh{\directlua{luatexja.jfont.load_zh()}\ltj@zh}
 
 %%%%%%%% \inhibitglue
-\protected\def\inhibitglue{\ifvmode\leavevmode\fi
-  \ifmmode\else\directlua{luatexja.jfmglue.create_inhibitglue_node()}\fi}
+\let\new@everypar=\everypar
+\protected\def\inhibitglue{%
+  \ifvmode
+  \directlua{ltj.global_temp = tex.globaldefs; tex.globaldefs = 0}% trick
+    \xdef\@@tempa{\the\everypar}%
+    \xdef\@@tempb{\everypar={\@@tempa}\@@tempa\noexpand\ltj@@ihb}%
+    \everypar\expandafter{\@@tempb}%
+    \directlua{tex.globaldefs = ltj.global_temp}% trick
+  \else\ifhmode\ltj@@ihb\fi\fi}
+\def\ltj@@ihb{\directlua{luatexja.jfmglue.create_inhibitglue_node()}}
 
 %%%%%%%% \yoko, \tate, \ifydir, \iftdir
 %% At this moment, tategaki mode is not implemented; 

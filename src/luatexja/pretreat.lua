@@ -19,6 +19,7 @@ local set_attr = node.set_attribute
 local unset_attr = node.unset_attribute
 local node_remove = node.remove
 local node_next = node.next
+local node_free = node.free
 
 local id_glyph = node.id('glyph')
 local id_whatsit = node.id('whatsit')
@@ -70,7 +71,7 @@ function set_box_stack_level(head, mode)
       if p.subtype==sid_user and p.user_id==30112 then
 	 local g = p
 	 if mode and g.value==cl then box_set = true end
-	 head, p = node_remove(head, g); break
+	 head, p = node_remove(head, g); node_free(g); break
       end
    end
    if box_set then 

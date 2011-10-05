@@ -1114,10 +1114,34 @@ The allowed arguments are the followings:
 \item[ucs]
 \item[kansuji]
 \end{list}
+\subsection{{\tt\char92 inhibitglue}}
+The primitive \verb+\inhibitglue+ suppresses the insertion of \textbf{JAglue}.
+The following is an example, using a special JFM that there will be a glue between 
+the beginning of a box and `あ', and also between `あ' and `ウ'.
+
+\begin{LTXexample}
+\jfont\g=psft:Ryumin-Light:jfm=test \g
+あウあ\inhibitglue{}ウ\inhibitglue\par
+あ\par\inhibitglue{}あ
+\par\inhibitglue\hrule{}あoff\inhibitglue ice
+\end{LTXexample}
+
+With the help of this example, we remark the specification of \verb+\inhibitglue+:
+\begin{itemize}
+\item The call of \verb+\inhibitglue+ in the (internal) vertical mode is
+      effective at the beginning of the next paragraph. This is realized
+      by hacking \verb+\everypar+.
+\item The call of \verb+\inhibitglue+ in the (restricted) horizontal
+      mode is only effective on the spot; does not get over boundary of
+      paragraphs. Moreover, \verb+\inhibitglue+ cancels ligatures and
+      kernings, as shown in l.~4 of above example.
+\item The call of \verb+\inhibitglue+ in math mode is just ignored.
+\end{itemize}
 
 \section{Control Sequences for \LaTeXe}
 \subsection{Patch for NFSS2}
-As described in Subsection~\ref{ssec-ltx}, \LuaTeX-ja simply adopted \texttt{plfonts.dtx} in \pLaTeXe\ for the Japanese patch for NFSS2. 
+As described in Subsection~\ref{ssec-ltx}, \LuaTeX-ja simply adopted
+\texttt{plfonts.dtx} in \pLaTeXe\ for the Japanese patch for NFSS2.
 
 \subsection{Cropmark/`tombow'}
 
@@ -1210,8 +1234,7 @@ typesetting. All those nodes store a natural number (hence the node's
 \texttt{type} is 100).
 \begin{description}
 \item[30111] Nodes for indicating that \verb+\inhibitglue+ is
-	   specified. The \texttt{value} field of these nodes is not
-	   used.
+	   specified. The \texttt{value} field of these nodes doesn't matter.
 \item[30112] Nodes for \LuaTeX-ja's stack system (see the next
 	   subsection). The \texttt{value} field of these nodes is
 	   current group.
@@ -1221,6 +1244,7 @@ typesetting. All those nodes store a natural number (hence the node's
 	   \verb+user_id+ is converted to a `glyph\_node' \emph{after}
 	   the callback process of luaotfload.
 \end{description}
+These whatsits will be removed during the process of inserting \textbf{JAglue}s.
 
 \subsection{Stack System of \LuaTeX-ja}\label{ssec-stack}
 \paragraph{Background}

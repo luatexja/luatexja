@@ -75,6 +75,7 @@ local ltjs_get_penalty_table = ltjs.get_penalty_table
 local ltjs_get_skip_table = ltjs.get_skip_table
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_metrics = ltjf.metrics
+local box_stack_level
 
 -------------------- Helper functions
 
@@ -93,7 +94,7 @@ end
 
 local function skip_table_to_spec(n)
    local g = node_new(id_glue_spec)
-   local st = ltjs_get_skip_table(n, ltjp.box_stack_level)
+   local st = ltjs_get_skip_table(n, box_stack_level)
    g.width = st.width; g.stretch = st.stretch; g.shrink = st.shrink
    g.stretch_order = st.stretch_order; g.shrink_order = st.shrink_order
    return g
@@ -256,7 +257,7 @@ local function calc_np()
       elseif lpa>=PACKED then
 	 if lpa == BOXBDD then
 	    local lq = node_next(lp)
-	    head = node_remove(head, lp); lp = lq
+	    head = node_remove(head, lp); node_free(lp); lp = lq
 	 else calc_np_pbox(); return end -- id_pbox
       elseif lpi == id_ins or lpi == id_mark or lpi == id_adjust then
 	 set_attr_icflag_processed(lp); lp = node_next(lp)
@@ -265,7 +266,7 @@ local function calc_np()
       elseif lpi == id_whatsit then
 	 if lp.subtype==sid_user and lp.user_id==30111 then
 	    local lq = node_next(lp)
-	    head = node_remove(head, lp); lp = lq; ihb_flag = true
+	    head = node_remove(head, lp); node_free(lp); lp = lq; ihb_flag = true
 	 else
 	    set_attr_icflag_processed(lp); lp = node_next(lp)
 	 end
@@ -317,8 +318,8 @@ local function set_np_xspc_jachar(c,x)
    Np.size= z.size
    Np.met = ltjf_metrics[z.jfm]
    Np.var = z.var
-   Np.pre = ltjs_get_penalty_table('pre', c, 0, ltjp.box_stack_level)
-   Np.post = ltjs_get_penalty_table('post', c, 0, ltjp.box_stack_level)
+   Np.pre = ltjs_get_penalty_table('pre', c, 0, box_stack_level)
+   Np.post = ltjs_get_penalty_table('post', c, 0, box_stack_level)
    z = find_char_class('lineend', Np.met)
    local y = Np.met.size_cache[Np.size].char_type[Np.class]
    if y.kern and y.kern[z] then 
@@ -326,7 +327,7 @@ local function set_np_xspc_jachar(c,x)
    else 
       Np.lend = 0 
    end
-   y = ltjs_get_penalty_table('xsp', c, 3, ltjp.box_stack_level)
+   y = ltjs_get_penalty_table('xsp', c, 3, box_stack_level)
    Np.xspc_before = (y>=2)
    Np.xspc_after  = (y%2==1)
    Np.auto_kspc = (has_attr(x, attr_autospc)==1)
@@ -347,13 +348,13 @@ local function set_np_xspc_alchar(c,x, lig)
 	    x = node_tail(x.components); c = x.char
 	 end
       end
-      Np.pre = ltjs_get_penalty_table('pre', c, 0, ltjp.box_stack_level)
-      Np.post = ltjs_get_penalty_table('post', c, 0, ltjp.box_stack_level)
+      Np.pre = ltjs_get_penalty_table('pre', c, 0, box_stack_level)
+      Np.post = ltjs_get_penalty_table('post', c, 0, box_stack_level)
    else
       Np.pre = 0; Np.post = 0
    end
    Np.met = nil
-   local y = ltjs_get_penalty_table('xsp', c, 3, ltjp.box_stack_level)
+   local y = ltjs_get_penalty_table('xsp', c, 3, box_stack_level)
    Np.xspc_before = (y%2==1)
    Np.xspc_after  = (y>=2)
    Np.auto_xspc = (has_attr(x, attr_autoxspc)==1)
@@ -550,12 +551,12 @@ local function get_kanjiskip()
 	    end
 	 elseif ak then
 	    gx.width = ak[1]; gx.stretch = ak[2]; gx.shrink = ak[3]
-	 else gx = get_zero_glue() -- fallback
+	 else node_free(gx); gx = get_zero_glue() -- fallback
 	 end
 	 g.spec = gx
-      else g.spec=node_copy(kanji_skip) end
+      else g.spec=node_copy(kanji_skip); node_free(gx) end
    else
-      g.spec =  get_zero_glue()
+      g.spec =  get_zero_glue(); node_free(gx)
    end
    set_attr(g, attr_icflag, KANJI_SKIP)
    return g
@@ -629,7 +630,7 @@ local function get_xkanjiskip(Nn)
 	 local bk = get_xkanji_skip_from_jfm(Nn)
 	 if bk then
 	    gx.width = bk[1]; gx.stretch = bk[2]; gx.shrink = bk[3]
-	 else gx = get_zero_glue() -- fallback
+	 else node_free(gx); gx = get_zero_glue() -- fallback
 	 end
 	 g.spec = gx
       else g.spec=node_copy(xkanji_skip) end
@@ -678,7 +679,7 @@ local function handle_np_jachar()
       real_insert(0, g)
    end
    -- \jcharwidowpenalty 挿入予定箇所更新
-   if mode and ltjs_get_penalty_table('kcat', Np.char, 0, ltjp.box_stack_level)%2~=1 then
+   if mode and ltjs_get_penalty_table('kcat', Np.char, 0, box_stack_level)%2~=1 then
       widow_Np.first = Np.first; 
       local Bpr = widow_Bp; widow_Bp = Bp; Bp = Bpr
    end
@@ -744,7 +745,7 @@ local function handle_list_tail()
       Bp = widow_Bp; Np = widow_Np; Nq.lend = 0
       if Np.first then
 	 handle_penalty_normal(0,
-			       ltjs_get_penalty_table('jwp', 0, 0, ltjp.box_stack_level))
+			       ltjs_get_penalty_table('jwp', 0, 0, box_stack_level))
       end
    else
       -- the current list is the contents of a hbox
@@ -755,21 +756,24 @@ local function handle_list_tail()
 	    head = node_insert_after(head, Np.last, g)
 	 end
       end
-      head = node_remove(head, last) -- remove the sentinel
+      head = node_remove(head, last); node_free(last);-- remove the sentinel
    end
+   node_free(kanji_skip); node_free(xkanji_skip)
 end
 
 -- リスト先頭の処理
 local function handle_list_head()
    if Np.id ==  id_jglyph or (Np.id==id_pbox and Np.met) then 
-      local g = new_jfm_glue(Np, find_char_class('boxbdd',Np.met), Np.class)
-      if g then
-	 set_attr(g, attr_icflag, BOXBDD)
-	 if g.id==id_glue and #Bp==0 then
-	    local h = node_new(id_penalty)
-	    h.penalty = 10000; set_attr(h, attr_icflag, BOXBDD)
+      if not ihb_flag then
+	 local g = new_jfm_glue(Np, find_char_class('boxbdd',Np.met), Np.class)
+	 if g then
+	    set_attr(g, attr_icflag, BOXBDD)
+	    if g.id==id_glue and #Bp==0 then
+	       local h = node_new(id_penalty)
+	       h.penalty = 10000; set_attr(h, attr_icflag, BOXBDD)
+	    end
+	    head = node_insert_before(head, Np.first, g)
 	 end
-	 head = node_insert_before(head, Np.first, g)
       end
    end
 end
@@ -777,6 +781,7 @@ end
 -- initialize
 local function init_var()
    lp = head; Bp = {}; widow_Bp = {}; widow_Np = {first = nil}
+   box_stack_level = ltjp.box_stack_level
    kanji_skip=skip_table_to_spec('kanjiskip')
    xkanji_skip=skip_table_to_spec('xkanjiskip')
    Np = {
@@ -792,7 +797,8 @@ local function init_var()
    if mode then 
       -- the current list is to be line-breaked:
       -- hbox from \parindent is skipped.
-      while lp and (lp.id==id_whatsit or ((lp.id==id_hlist) and (lp.subtype==3))) do
+      while lp and ((lp.id==id_whatsit and lp.subtype~=sid_user) 
+		 or ((lp.id==id_hlist) and (lp.subtype==3))) do
 	 lp=node_next(lp) end
       last=node.tail(head)
    else 
@@ -815,7 +821,7 @@ function main(ahead, amode)
       elseif Np.id==id_hlist or Np.id==id_pbox or Np.id==id_disc then after_hlist()
       end
    else
-      if not mode then head = node_remove(head, last) end
+      if not mode then head = node_remove(head, last); node_free(last) end
       return head
    end
    calc_np()
