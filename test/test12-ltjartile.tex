@@ -1,0 +1,26 @@
+%#!lualatex
+\documentclass{ltjarticle}
+\begin{document}
+\noindent 漢字漢字
+
+「漢字←全角二分下がり？\\
+「あいうえお」\textgt{「かきくけこ」}{\Large 「}
+
+次の例は「\texttt{min10}フォントについて」（乙部厳己）中のp.~8から拝借．
+
+\def\g#1#2#3{\leavevmode\vbox{\hsize=100pt%
+\hrule height 1pt depth 0pt
+\vskip#3pt\hbox{\jfont\e=file:#1:jfm=#2 at 20pt\e あいうえお}\vskip-#3pt
+\hrule height 0pt depth 1pt}: #1, jfm=#2, yjabaselineshift=#3pt\par\bigskip}
+
+\g{KozGoPr6N-Medium.otf}{ujis}{0}
+\g{KozGoPr6N-Medium.otf}{jis}{0.7563636}
+\g{KozGoPr6N-Medium.otf}{jis}{0}
+\g{ipaexg.ttf}{ujis}{0}
+\g{ipaexg.ttf}{jis}{0.7563636}
+\g{ipaexg.ttf}{jis}{0}
+\g{hgrgm.ttc}{ujis}{0}
+\g{hgrgm.ttc}{jis}{0}
+\g{hgrgm.ttc}{jis}{0.7563636}
+
+\end{document}

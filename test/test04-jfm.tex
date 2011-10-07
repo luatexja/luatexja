@@ -296,5 +296,16 @@
 \setbox0=\hbox{あ\hbox{（}あ\setbox3=\hbox{（}\unhbox3あ}
 \dumplist0}
 
+\vfill\eject
+\noindent{\gt\bf paragraph, hbox and math boundary}
 
+\setbox1=\vbox{\parindent19.2pt \rmlh\hsize=100pt\parfillskip=30pt
+かエ\par\global\setbox0=\lastbox}
+\dumplist0
+
+\setbox0=\hbox{\rmlh かエ}
+\dumplist0
+
+\setbox0=\hbox{\rmlh あ$a$さ$a$か}
+\dumplist0
 \end

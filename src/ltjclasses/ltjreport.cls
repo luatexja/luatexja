@@ -154,6 +154,9 @@
 \ExecuteOptions{a4paper,10pt,oneside,onecolumn,final,openany}
 \ProcessOptions\relax
 \input{ltjsize1\@ptsize.clo}
+\DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] psft:Ryumin-Light:jfm=min}{}
+\DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] psft:GothicBBB-Medium:jfm=min;jfmvar=goth}{}
+\ltjglobalsetparameter{differentjfm=both}
 \if@stysize
   \setlength\columnsep{2\Cwd}
 \else

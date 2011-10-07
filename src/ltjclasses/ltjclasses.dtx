@@ -10,7 +10,7 @@
 %
 % \fi
 %
-% \CheckSum{4465}
+% \CheckSum{4468}
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -509,6 +509,26 @@
 %    \end{macrocode}
 %
 % \section{フォント}
+%
+% Lua\LaTeX-jaの標準では，OTFパッケージ由来のメトリックが使われるようになっています．
+% 本クラスでは，「p\TeX の組版と互換性をできだけ持たせる」例を提示するため，
+% \begin{itemize}
+% \item メトリックを\texttt{min10.tfm}ベースの\texttt{jfm-min.lua}に変更．
+% \item 明朝とゴシックは両方とも\texttt{jfm-min.lua}を用いるが，
+%   和文処理用グルー挿入時には「違うメトリックを使用」として思わせる．
+% \item p\TeX と同様に，「異なるメトリックの2つの和文文字」の間には，両者から定める
+%   グルーを両方挿入する．
+% \item \texttt{jfm-min.lua}では，段落始めの括弧が全角二分下がりになるようになっている．
+% 
+% \end{itemize}
+%
+%    \begin{macrocode}
+%<*article|report|book>
+\DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] psft:Ryumin-Light:jfm=min}{}
+\DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] psft:GothicBBB-Medium:jfm=min;jfmvar=goth}{}
+\ltjglobalsetparameter{differentjfm=both}
+%</article|report|book>
+%    \end{macrocode}
 %
 % ここでは、\LaTeX{}のフォントサイズコマンドの定義をしています。
 % フォントサイズコマンドの定義は、次のコマンドを用います。

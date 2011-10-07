@@ -646,13 +646,17 @@ end
 
 local function get_OA_skip()
    if not ihb_flag then
-      return new_jfm_glue(Np, find_char_class('jcharbdd',Np.met), Np.class)
+      local c
+      if Nq.id == id_math then c = -1 else c = 'jcharbdd' end
+      return new_jfm_glue(Np, find_char_class(c,Np.met), Np.class)
    else return nil
    end
 end
 local function get_OB_skip()
    if not ihb_flag then
-      return new_jfm_glue(Nq, Nq.class, find_char_class('jcharbdd',Nq.met))
+      local c
+      if Np.id == id_math then c = -1 else c = 'jcharbdd' end
+      return new_jfm_glue(Nq, Nq.class, find_char_class(c,Nq.met))
    else return nil
    end
 end
@@ -765,7 +769,12 @@ end
 local function handle_list_head()
    if Np.id ==  id_jglyph or (Np.id==id_pbox and Np.met) then 
       if not ihb_flag then
-	 local g = new_jfm_glue(Np, find_char_class('boxbdd',Np.met), Np.class)
+	 local g
+	 if mode then
+	    g = new_jfm_glue(Np, find_char_class('parbdd',Np.met), Np.class)
+	 else
+	    g = new_jfm_glue(Np, find_char_class('boxbdd',Np.met), Np.class)
+	 end
 	 if g then
 	    set_attr(g, attr_icflag, BOXBDD)
 	    if g.id==id_glue and #Bp==0 then

@@ -11,7 +11,7 @@
 % \def\headfont{\sffamily\gtfamily} is needed in ordinal documents
 %</ja>
 
-\usepackage{amsmath,amssymb,xcolor,pict2e}
+\usepackage{amsmath,amssymb,xcolor,pict2e,multienum}
 \usepackage{booktabs,listings,lltjlisting,showexpl,multicol}
 \usepackage{luatexja-otf}
 \usepackage[unicode=true]{hyperref}
@@ -177,18 +177,12 @@ We say `alphabetic fonts' for fonts used in \textbf{ALchar}, and `Japanese fonts
 This project is hosted by SourceForge.JP.
 
 \paragraph{Members}\ 
-% \begin{multicols}{2}
-% \begin{itemize}
-% \item Hironori KITAGAWA
-% \item Kazuki MAEDA
-% \item Takayuki YATO
-% \item Yusuke KUROKI
-% \item Noriyuki ABE
-% \item Munehiro YAMAMOTO
-% \item Tomoaki HONDA
-% \par\ 
-% \end{itemize}
-% \end{multicols}
+\begin{multienumerate}
+\def\labelenumi{$\bullet$}
+\mitemxxx{Hironori KITAGAWA}{Kazuki MAEDA}{Takayuki YATO}
+\mitemxxx{Yusuke KUROKI}{Noriyuki ABE}{Munehiro YAMAMOTO}
+\mitemxx{Tomoaki HONDA}{}{}
+\end{multienumerate}
 
 % \paragraph{Acknowledgments} -- 挿入するならここ
 
@@ -783,7 +777,7 @@ The followings are JFMs shipped with Lua\TeX-ja:
 （乙部さんのmin10.pdfの例を使う？）
 \end{description}
 
-\item[jfmvar=<string>] ...
+\item[jfmvar=<string>] Sometimes there is a need that 
 \end{list}
 
 
@@ -864,6 +858,15 @@ This field is a list of characters which are in this character
 
 In addition to those `real' characters, the following `imaginary
 	     characters' can be specified in the list:
+\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
+\item['lineend'] An ending of a line. 
+\item['diffmet'] Used at a boundary between two \textbf{JAchar}s whose JFM or size is different.
+\item['boxbdd'] The beginning/ending of a horizontal box.
+\item['parbdd'] The beginning of a paragraph.
+\item['jcharbdd'] A boundary between \textbf{JAchar} and anything else
+	     (such as \textbf{ALchar}, kern, glue, ...).
+\item[$-1$] The left/right boundary of an inline math formula.
+\end{list}
 
 \item[width=<length>, height=<length>, depth=<length>, italic=<length>]\ (required)
 

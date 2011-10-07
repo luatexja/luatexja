@@ -257,5 +257,9 @@ luatexja.jfont.define_jfm {
    [99] = { -- box末尾
       chars = {'boxbdd'},
    },
+   [199] = { -- box末尾
+      chars = {'parbdd'},
+      kern = {[6] = 0.476196}
+   },
    
 }
