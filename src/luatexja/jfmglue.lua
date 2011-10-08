@@ -76,6 +76,7 @@ local ltjs_get_skip_table = ltjs.get_skip_table
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_metrics = ltjf.metrics
 local box_stack_level
+local par_indented -- is the paragraph indented?
 
 -------------------- Helper functions
 
@@ -770,7 +771,7 @@ local function handle_list_head()
    if Np.id ==  id_jglyph or (Np.id==id_pbox and Np.met) then 
       if not ihb_flag then
 	 local g
-	 if mode then
+	 if par_indented then
 	    g = new_jfm_glue(Np, find_char_class('parbdd',Np.met), Np.class)
 	 else
 	    g = new_jfm_glue(Np, find_char_class('boxbdd',Np.met), Np.class)
@@ -790,6 +791,7 @@ end
 -- initialize
 local function init_var()
    lp = head; Bp = {}; widow_Bp = {}; widow_Np = {first = nil}
+   par_indented = false 
    box_stack_level = ltjp.box_stack_level
    kanji_skip=skip_table_to_spec('kanjiskip')
    xkanji_skip=skip_table_to_spec('xkanjiskip')
@@ -808,6 +810,7 @@ local function init_var()
       -- hbox from \parindent is skipped.
       while lp and ((lp.id==id_whatsit and lp.subtype~=sid_user) 
 		 or ((lp.id==id_hlist) and (lp.subtype==3))) do
+	 if (lp.id==id_hlist) and (lp.subtype==3) then par_indented = true end
 	 lp=node_next(lp) end
       last=node.tail(head)
    else 

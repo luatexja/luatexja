@@ -11,6 +11,9 @@ luatexja.jfont.define_jfm {
    zw = 1.0, zh = vscale,
 
    [0] = {
+      chars = {'parbdd'}, 
+        -- this line has no effect, but it is useful to note 
+        -- that 'parbdd' is in the character class 0.
       align = 'left', left = 0.0, down = 0.0,
       width = 1.0, height = vht, depth = vdp, italic=0.0,
       glue = {
@@ -257,9 +260,4 @@ luatexja.jfont.define_jfm {
    [99] = { -- box末尾
       chars = {'boxbdd'},
    },
-   [199] = { -- box末尾
-      chars = {'parbdd'},
-      kern = {[6] = 0.476196}
-   },
-   
 }

@@ -861,8 +861,8 @@ In addition to those `real' characters, the following `imaginary
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
 \item['lineend'] An ending of a line. 
 \item['diffmet'] Used at a boundary between two \textbf{JAchar}s whose JFM or size is different.
-\item['boxbdd'] The beginning/ending of a horizontal box.
-\item['parbdd'] The beginning of a paragraph.
+\item['boxbdd'] The beginning/ending of a horizontal box, and the beginging of a noindented paragraph.
+\item['parbdd'] The beginning of an (indented) paragraph.
 \item['jcharbdd'] A boundary between \textbf{JAchar} and anything else
 	     (such as \textbf{ALchar}, kern, glue, ...).
 \item[$-1$] The left/right boundary of an inline math formula.
@@ -1335,8 +1335,7 @@ This problem is resolved by using
 
 \section{Linebreak after Japanese Character}\label{sec-lbreak}
 \subsection{Reference: Behavior in \pTeX}
-(NOT COMPLETED)
-
+%<*en>
 In~\pTeX, a linebreak after a Japanese character doesn't emit a space,
 since words are not separated by spaces in Japanese writings. However,
 this feature isn't fully implemented in \LuaTeX-ja due to the
@@ -1358,8 +1357,36 @@ processor.  State~$K$ is similar to state~$M$, and is entered after
 Japanese characters.  The diagram of state transitions are indicated in
 Figure~\ref{fig-ptexipro}.  Note that \pTeX\ doesn't leave state~$K$
 after `beginning/ending of a group' characters.
+%</en>
+
+%<*ja>
+欧文では文章の改行は単語間でしか行わない．そのため，\TeX では，（文字の直後の）改行は
+空白文字と同じ扱いとして扱われる．一方，和文ではほとんどどどこでも改行が可能なため，
+\pTeX では和文文字の直後の改行は単純に無視されるようになっている．
+
+このような動作は，\pTeX が\TeX からエンジンとして拡張されたことによって可能になったことである．
+\pTeX の入力処理部は，\TeX におけるそれと同じように，有限オートマトンとして記述することができ，
+以下に述べるような4状態を持っている．
+
+\begin{itemize}
+\item State~$N$: 行の開始．
+\item State~$S$: 空白読み飛ばし．
+\item State~$M$: 行中．
+\item State~$K$: 行中（和文文字の後）．
+\end{itemize}
+また，状態遷移は，図\label{fig-ptexipro}のようになっており，図中の数字は
+カテゴリーコードを表している．最初の3状態は\TeX の入力処理部と同じであり，
+図中から状態$K$と「$j$」と書かれた矢印を取り除けば，\TeX の入力処理部と同
+じものになる．
+
+この図から分かることは，
+\begin{quote}
+行が和文文字（とグループ境界文字）で終わっていれば，改行は無視される
+\end{quote}
+ということである．
+%</ja>
+
 \begin{figure}[tb]
-\label{fig-ptexipro}
 \begin{gather*}
  \def\sp{\text{\tt\char32}}
  \xymatrix{&&
@@ -1382,10 +1409,12 @@ after `beginning/ending of a group' characters.
 \item Category codes 9~(ignored), 14~(comment)~and~15~(invalid) are omitted in above diagram.
 \end{itemize}
 \caption{State transitions of \pTeX's input processor.}
+\label{fig-ptexipro}
 \end{figure}
 
 
 \subsection{Behavior in \LuaTeX-ja}
+%<*en>
 States in the input processoe of \LuaTeX\ is the same as that of \TeX,
 and they can't be customized by any callbacks. Hence, we can only use
 \verb+process_input_buffer+ and \verb+token_filter+ callbacks for to
@@ -1397,11 +1426,11 @@ token \emph{in the input processor}.  So we can use only the
 \verb+process_input_buffer+ callback.  This means that suppressing a
 space must be done \emph{just before} an input line is read.
 
-Considering these situations, handling of a end-of-line in \LuaTeX-ja are as follows:
+Considering these situations, handling of an end-of-line in \LuaTeX-ja are as follows:
 \begin{quote}
 A character U+FFFFF (its category code is set to 14~(comment) by
-\LuaTeX-ja) is appended to an input line, before \LuaTeX\ actually
-process it, if and only if the following two conditions are satisfied:
+\LuaTeX-ja) is appended to an input line, \emph{before \LuaTeX\ actually
+process it}, if and only if the following two conditions are satisfied:
 \begin{enumerate}
 \item The category code of the character $\langle${return}$\rangle$
       (whose character code is 13) is 5~(end-of-line).
@@ -1411,11 +1440,88 @@ process it, if and only if the following two conditions are satisfied:
   \bigl(\{\text{catcode}=1\}\cup\{\text{catcode}=2\}\bigr)^*
 \]
 \end{enumerate}
-
 \end{quote}
 
-\section{Insertion of JFM glues, \textsf{kanjiskip} and \textsf{xkanjiskip}}
-This is the longest section of the document.
+\paragraph{Remark}
+The following example shows the major difference from the behavior of \pTeX:
+\begin{LTXexample}
+\ltjsetparameter{autoxspacing=false}
+\ltjsetparameter{jacharrange={-6}}xあ
+y\ltjsetparameter{jacharrange={+6}}zあ
+u
+\end{LTXexample}
+\begin{itemize}
+\item There is no space between `x' and `y', since the line~2 ends with a \textbf{JAchar} `あ'
+(this `あ' considered as an \textbf{JAchar} at the ending of line~1).
+\item There is no space between `あ' (in the line~3) and `u', since the
+      line~3 ends with an \textbf{ALchar}
+(the letter `あ' considered as an \textbf{ALchar} at the ending of line~2).
+\end{itemize}
+%</en>
 
-jfmglue.tex の内容をここに入れる
+%<*ja>
+\LuaTeX の入力処理部は\TeX のそれと全く同じであり，callbackによりユーザが
+カスタマイズすることはできない．このため，改行抑制の目的でユーザが利用で
+きそうなcallbackとしては，\verb+process_input_buffer+や
+\verb+token_filter+に限られてしまう．しかし，\TeX の入力処理部をよく見る
+と，後者も役には経たないことが分かる：改行文字は，入力処理部によってトー
+クン化される時に，カテゴリーコード10の32番文字へと置き換えられてしまうた
+め，\verb+token_filter+で非標準なトークン読み出しを行おうとしても，空白文
+字由来のトークンと，改行文字由来のトークンは区別できないのだ．
+
+すると，我々のとれる道は，\verb+process_input_buffer+を用いて
+\LuaTeX の入力処理部に引き渡される前に入力文字列を編集するというものしかない．
+以上を踏まえ，\LuaTeX-jaにおける「和文文字直後の改行抑制」の処理は，次のようになっている：
+
+\begin{quote}
+各入力行に対し，\textbf{その入力行が読まれる前の内部状態で}
+以下の2条件が満たされている場合，\LuaTeX-jaはU+FFFFF番の文字
+\footnote{この文字はコメント文字として扱われるように\LuaTeX-ja内部で設定をしている．}
+を末尾に追加する．よって，その場合に改行は空白とは見做されないこととなる．
+\begin{enumerate}
+\item 改行文字（文字コード13番）のカテゴリーコードが5~(end-of-line)である．
+\item 入力行は次の「正規表現」にマッチしている：
+\[
+  (\text{any char})^*(\textbf{JAchar})
+  \bigl(\{\text{catcode}=1\}\cup\{\text{catcode}=2\}\bigr)^*
+\]
+\end{enumerate}
+\end{quote}
+
+この仕様は，前節で述べた\pTeX の仕様にできるだけ近づけたものとなっている．最初の条件は，
+\texttt{verbatim}系環境などの日本語対応マクロを書かなくてすませるためのものである．
+しかしながら，完全に同じ挙動が実現できたわけではない．
+差異は，次の例が示すように，和文文字の範囲を変更した行の改行において見られる：
+\begin{LTXexample}
+\ltjsetparameter{autoxspacing=false}
+\ltjsetparameter{jacharrange={-6}}xあ
+y\ltjsetparameter{jacharrange={+6}}zあ
+u
+\end{LTXexample}
+もし\pTeX とまったく同じ挙動を示すならば，出力は
+「\hbox{\ltjsetparameter{autoxspacing=false}x yzあu}」となるべきである．しかし，実際には
+上のように異なる挙動となっている．
+\begin{itemize}
+\item 2行目は「あ」という和文文字で終わる（2行目を処理する前の時点では，
+      「あ」は和文文字扱いである）ため，直後の改行文字は無視される．
+\item 3行目は「あ」という欧文文字で終わる（2行目を処理する前の時点では，
+      「あ」は欧文文字扱いである）ため，直後の改行文字は空白に置き換わる．
+\end{itemize}
+このため，トラブルを避けるために，和文文字の範囲を\verb+\ltjsetparameter+で編集した場合，
+その行はそこで改行するようにした方がいいだろう．
+%</ja>
+
+
+\section{Insertion of JFM glues, \textsf{kanjiskip} and \textsf{xkanjiskip}}
+%<*en>
+This will be the longest section of the document.
+However, ...
+%</en>
+
+%<*ja>
+\LuaTeX-ja における和文処理グルーの挿入方法は，\pTeX のそれとは全く異なる．……
+
+%</ja>
+
+
 \end{document}
