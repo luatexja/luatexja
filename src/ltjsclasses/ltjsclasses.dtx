@@ -22,7 +22,7 @@
 %  -----------------------------------------
 %
 % \fi
-% \CheckSum{5032}
+% \CheckSum{5037}
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -94,7 +94,7 @@
 %   \end{tabular}
 % \end{quote}
 %
-% |ltjclasses| と大きく違うのは以下の点です。
+% |ltjclasses| と違うのは以下の点です。
 %
 % \paragraph{サイズオプションの扱いが違う}
 %
@@ -107,22 +107,23 @@
 % 43ポイント，12Q，14Qの指定を可能にしています。
 %
 % \subsection{\texttt{jsclasses.dtx} からの主な変更点}
-% 全ての変更点を知りたい場合は、|jsclasses.dtx| と |ltjsclasses.dtx| で |diff| を
+% 全ての変更点を知りたい場合は，|jsclasses.dtx| と |ltjsclasses.dtx| で |diff| を
 % とって下さい。
-% なお，オプションで無効にしたものがいくつかありますが，互換性のために
-% オプション自体は残してあります（つまり，削除されたオプションが指定されていても
-% コンパイルは通る）。
 % \begin{itemize}
-% \item フォントメトリック関係のオプション |winjis| は単に無視されます．
-% \item 標準では |jfm-ujis.lua|（Lua\TeX-ja標準のメトリック，OTFパッケージのものがベース）を使用します．
-% \item up\TeX 関係のオプションを削除してあります。
-% \item |disablejfam| オプションが無効になっています。
+% \item フォントメトリック関係のオプション |winjis| は単に無視されます。
+% \item 標準では |jfm-ujis.lua|（Lua\TeX-ja標準のメトリック，OTFパッケージのものがベース）を使用します。
+% \item |uplatex| オプションを削除してあります。
+% \item |disablejfam| オプションが無効になっています。もし
+% \begin{quotation}
+%   |! LaTeX Error: Too many math alphabets used in version ****.|
+% \end{quotation}
+% のエラーが起こった場合は，|lualatex-math| パッケージを読み込んでみて下さい。
 % \item |papersize| オプションの指定に関わらず PDF のページサイズは適切に
 %   設定されます。
-% \item Lua\TeX-ja 同梱のメトリックを用いる限りは，段落の頭にグルーは挿入されません．
+% \item Lua\TeX-ja 同梱のメトリックを用いる限りは，段落の頭にグルーは挿入されません。
 %   そのため，オリジナルの |jsclasses.dtx| 内にあったhack（|\everyparhook|）は不要になったので，
-%   削除しました．
-% \item 「\texttt{amsmath} との衝突の回避」のコードは，上流で既に対処されている上に
+%   削除しました。
+% \item 「\texttt{amsmath} との衝突の回避」のコードは，上流で既に対処されているうえ，
 %   これがあると |grfext.sty| を読み込んだ際にエラーを引き起こすので削除しました。
 % \item |\小|，|\上小|，|\if西暦|，|\西暦|，|\和暦|をそれぞれ
 %   |\Shou|, |\UeShou|, |\ifSeireki|, |\Seireki|, |\Wareki| に変更してあります。
@@ -481,11 +482,13 @@
 %
 % p\TeX では数式中では16通りのフォントしか使えませんでしたが，Lua\TeX では
 % Omega 拡張が取り込まれていて256通りのフォントが使えます。
-% そのためこのオプションは無効にしてありますが，互換性のためにオプション自体は
-% 残しておきます。
+% ただし，\LaTeXe カーネルでは未だに数式ファミリの数は16個に制限されているので，
+% 実際に使用可能な数式ファミリの数を増やすためには |lualatex-math| パッケージを
+% 読み込む必要があることに注意が必要です。
 %
 %    \begin{macrocode}
-\DeclareOption{disablejfam}{\@enablejfamfalse}
+\DeclareOption{disablejfam}{%
+  \ClassWarningNoLine{\@currname}{The class option 'disablejfam' is obsolete}}
 %    \end{macrocode}
 %
 % \paragraph{ドラフト}
@@ -505,7 +508,7 @@
 % というオプションを指定します。
 % p\TeX でよく利用される \texttt{jis} フォントメトリックと互換のメトリックを使いたい場合は，
 % \texttt{ptexjis} というオプションを指定します。
-% \texttt{winjis} メトリックは用済みのため，\texttt{winjis} オプションは無視されます．
+% \texttt{winjis} メトリックは用済みのため，\texttt{winjis} オプションは無視されます。
 % 
 %    \begin{macrocode}
 \newif\ifmingoth
@@ -514,7 +517,10 @@
 \jisfontfalse
 \newif\ifptexjis
 \ptexjisfalse
-\DeclareOption{winjis}{}\DeclareOption{uplatex}{} % These 2 options are ignored.
+\DeclareOption{winjis}{%
+  \ClassWarningNoLine{\@currname}{The class option 'winjis' is obsolete}}
+\DeclareOption{uplatex}{%
+  \ClassWarningNoLine{\@currname}{The class option 'uplatex' is obsolete}}
 \DeclareOption{mingoth}{\mingothtrue}
 \DeclareOption{ptexjis}{\ptexjistrue}
 \DeclareOption{jis}{\jisfonttrue}
@@ -707,9 +713,9 @@
 % \pTeX （アスキーが日本語化した\TeX ）では，例えば従来のフォントメトリック
 % \texttt{min10} やJISフォントメトリックでは「公称10ポイントの和文フォントは，
 % 実際には9.62216ptで出力される（メトリック側で0.962216倍される）」という
-% 仕様になっています．
-% 一方，Lua\TeX-jaの提供するメトリックでは，そのようなことはありません．
-% 公称10ポイントの和文フォントは，10ポイントで出力されます．
+% 仕様になっています。
+% 一方，Lua\TeX-jaの提供するメトリックでは，そのようなことはありません。
+% 公称10ポイントの和文フォントは，10ポイントで出力されます。
 % 
 % この|ltjsclasses|でも，派生元の|jsclasses|と同じように，
 % この公称10ポイントのフォントをここでは13級に縮小して
@@ -805,9 +811,9 @@
 %    \end{macrocode}
 %%
 % Lua\TeX-jaでは和文組版に伴うグルーはノードベースで挿入するようになり，また
-% 欧文・和文間のグルーとイタリック補正は干渉しないようになりました．
+% 欧文・和文間のグルーとイタリック補正は干渉しないようになりました。
 % まだ「和文の斜体」についてはLua\LaTeX カーネル側でまともな対応がされていませんが，
-% |jsclasses.dtx|で行われていた|\textmc|, |\textgt|の再定義は不要のように思われます．
+% |jsclasses.dtx|で行われていた|\textmc|, |\textgt|の再定義は不要のように思われます。
 %
 % 新クラスでも数式内で日本語が使えるようにしました。
 %
@@ -2455,7 +2461,7 @@
 % 二つ挿入した |\everyparhook| のうち後者が |\paragraph| 類の後で2回実行され，
 % それ以降は前者が実行されます。
 %
-% [2011-10-05] Lua\TeX-jaでは|\everyparhook|は不要なので削除．
+% [2011-10-05] Lua\TeX-jaでは|\everyparhook|は不要なので削除。
 %
 %    \begin{macrocode}
 \def\@xsect#1{%

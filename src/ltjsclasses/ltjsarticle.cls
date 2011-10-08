@@ -179,7 +179,8 @@
       &\global\@eqcnt\thr@@ \hb@xt@\z@\bgroup\hss##\egroup
     \tabskip\z@skip\cr
     }}
-\DeclareOption{disablejfam}{\@enablejfamfalse}
+\DeclareOption{disablejfam}{%
+  \ClassWarningNoLine{\@currname}{The class option 'disablejfam' is obsolete}}
 \newif\ifdraft
 \DeclareOption{draft}{\drafttrue \setlength\overfullrule{5pt}}
 \DeclareOption{final}{\draftfalse \setlength\overfullrule{0pt}}
@@ -189,7 +190,10 @@
 \jisfontfalse
 \newif\ifptexjis
 \ptexjisfalse
-\DeclareOption{winjis}{}\DeclareOption{uplatex}{} % These 2 options are ignored.
+\DeclareOption{winjis}{%
+  \ClassWarningNoLine{\@currname}{The class option 'winjis' is obsolete}}
+\DeclareOption{uplatex}{%
+  \ClassWarningNoLine{\@currname}{The class option 'uplatex' is obsolete}}
 \DeclareOption{mingoth}{\mingothtrue}
 \DeclareOption{ptexjis}{\ptexjistrue}
 \DeclareOption{jis}{\jisfonttrue}
