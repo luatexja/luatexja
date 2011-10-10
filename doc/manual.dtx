@@ -11,7 +11,7 @@
 % \def\headfont{\sffamily\gtfamily} is needed in ordinal documents
 %</ja>
 
-\usepackage{amsmath,amssymb,xcolor,pict2e,multienum}
+\usepackage{amsmath,amssymb,xcolor,pict2e,multienum,amsthm}
 \usepackage{booktabs,listings,lltjlisting,showexpl,multicol}
 \usepackage{luatexja-otf}
 \usepackage[unicode=true]{hyperref}
@@ -26,6 +26,8 @@
 \DeclareRobustCommand\pLaTeXe{p\kern-.05em\LaTeXe}
 \DeclareRobustCommand\epTeX{\ensuremath{\varepsilon}-\kern-.125em\pTeX}
 
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}
 
 \makeatletter
 \long\def\@makecaption#1#2{%
@@ -854,19 +856,8 @@ This field is a list of characters which are in this character
 	     than 0 (hence, the character class~0 contains most of
 	     \textbf{JAchar}s). In the list, a character can be
 	     specified by its code number, or by the character itself
-	     (as a string of length~1). 
-
-In addition to those `real' characters, the following `imaginary
-	     characters' can be specified in the list:
-\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
-\item['lineend'] An ending of a line. 
-\item['diffmet'] Used at a boundary between two \textbf{JAchar}s whose JFM or size is different.
-\item['boxbdd'] The beginning/ending of a horizontal box, and the beginging of a noindented paragraph.
-\item['parbdd'] The beginning of an (indented) paragraph.
-\item['jcharbdd'] A boundary between \textbf{JAchar} and anything else
-	     (such as \textbf{ALchar}, kern, glue, ...).
-\item[$-1$] The left/right boundary of an inline math formula.
-\end{list}
+	     (as a string of length~1). Moreover, there are `imaginary
+	     characters' which specified in the list. We will describe these later.
 
 \item[width=<length>, height=<length>, depth=<length>, italic=<length>]\ (required)
 
@@ -965,6 +956,78 @@ the `real' glyph is centered horizontally (the green rectangle).
 \item[glue={\{[$j$]=\{<width>, <stretch>, <shrink>\}, ...\}}]
 \end{list}
 
+%<*en>
+\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
+\item['lineend'] An ending of a line. 
+\item['diffmet'] Used at a boundary between two \textbf{JAchar}s whose JFM or size is different.
+\item['boxbdd'] The beginning/ending of a horizontal box, and the beginging of a noindented paragraph.
+\item['parbdd'] The beginning of an (indented) paragraph.
+\item['jcharbdd'] A boundary between \textbf{JAchar} and anything else
+	     (such as \textbf{ALchar}, kern, glue, ...).
+\item[$-1$] The left/right boundary of an inline math formula.
+\end{list}
+%</en>
+
+%<*ja>
+上で説明した通り，\texttt{chars}フィールド中にはいくつかの「特殊文字」も
+指定可能である．これらは，大半が\pTeX のJFMグルーの挿入処理ではみな「文字
+クラス0の文字」として扱われていた文字であり，その結果として\pTeX より細か
+い組版調整ができるようになっている．以下のその一覧を述べる：
+\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
+\item['lineend'] 行の終端を表す．
+\item['diffmet'] 
+
+\item['boxbdd'] hboxの先頭と末尾，及びインデントされていない
+	     （\verb+\noindent+で開始された）段落の先頭を表す．
+\item['parbdd'] 通常の（\verb+\noindent+で開始されていない）段落の先頭．
+\item['jcharbdd'] 和文文字と「その他のもの」（欧文文字，glue，kern等）との境界．
+\item[$-1$] 行中数式と地の文との境界．
+\end{list}
+
+\paragraph{\pTeX 用和文フォントメトリックの移植}
+以下に，\pTeX 用和文フォントメトリックを\LuaTeX-ja用に移植する場合の注意点を挙げておく．
+\begin{itemize}
+\item 実際に出力される和文フォントのサイズがdesign sizeとなる．
+このため，例えば$1\,\textrm{zw}$がdesign sizeの0.962216倍であるJISフォン
+      トメトリック等を移植する場合は，
+\begin{itemize}
+\item JFM中の全ての数値を$1/0.962216$倍しておく．
+\item \TeX ソース中で使用するところで，サイズ指定を0.962216倍にする．
+      \LaTeX でのフォント宣言なら，例えば次のように：
+\begin{verbatim}
+\DeclareFontShape{JY3}{mc}{m}{n}{<-> s*[0.962216] psft:Ryumin-Light:jfm=jis}{}
+\end{verbatim}
+\end{itemize}
+\item 上に述べた特殊文字は，\texttt{'boxbdd'}を除き文字クラスを全部0とする
+      （JFM中に単に書かなければよい）．
+\item \texttt{'boxbdd'}については，それのみで一つの文字クラスを形成し，その
+      文字クラスに関してはglue/kernの設定はしない．
+
+これは，\pTeX では，
+      hboxの先頭・末尾とインデントされていない（\verb+\noindent+で開始さ
+      れた）段落の先頭にはJFMグルーは入らないという仕様を実現させるためである．
+\item \pTeX の組版を再現させようというのが目的であれば以上の注意を守れば十分である．
+
+ところで，\pTeX では通常の段落の先頭にJFMグルーが残るという仕様があるので，
+      段落先頭の開き括弧は全角二分下がりになる．全角下がりを実現させるに
+      は，段落の最初に手動で\verb+\inhibitglue+を追加するか，あるいは
+      \verb+\everypar+のhackを行い，それを自動化させるしかなかった．
+
+一方，\LuaTeX-jaでは，\texttt{'parbdd'}によって，それがJFM側で調整できるよ
+うになった．例えば，\LuaTeX-ja同梱のJFMのように，\texttt{'boxbdd'}と同じ文字クラスに
+\texttt{'parbdd'}を入れれば全角下がりとなる．
+
+\begin{LTXexample}
+\jfont\g=psft:Ryumin-Light:jfm=test \g
+\parindent1\zw\noindent{}◆◆◆◆◆
+\par{}「◆◆←二分下がり
+\par{}【◆◆←全角下がり
+\par{}〔◆◆←全角二分下がり
+\end{LTXexample}
+\end{itemize}
+
+%</ja>
+
 \subsection{Math Font Family}
 \TeX\ handles fonts in math formulas by 16~font families\footnote{Omega,
 Aleph, \LuaTeX~and $\varepsilon$-\kern-.125em(u)\pTeX can handles 256~families, but
@@ -992,6 +1055,77 @@ scriptscript size&\tt\textsf{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\ve
 \end{tabular}
 \end{center}
 \end{table}
+
+\subsection{Callbacks}
+Like \LuaTeX\ itself, \LuaTeX-ja also has callbacks. These callbacks can
+be accessed via \verb+luatexbase.add_to_callback+ function and so on, as other callbacks
+\begin{list}{}%
+{\def\makelabel#1{\bfseries#1}}
+\item[\texttt{luatexja.load\_jfm} callback]
+With this callback you can overwrite JFMs.
+
+\begin{verbatim}
+function (<table> jfm_info, <string> jfm_name)
+  return <table> new_jfm_info
+end
+\end{verbatim}
+
+The argument \verb+jfm_info+ contains a table similar to the table in a JFM file, except 
+this argument has \texttt{chars} field which contains character codes
+	     whose character class is not~0. This callback doesn't replace any code of \LuaTeX-ja.
+
+\item[\texttt{luatexja.define\_font} callback]
+This callback and the next callback form a pair, and you can assign letters which don't have
+	     fixed codepoints in Unicode to non-zero character classes.
+This \texttt{luatexja.define\_font} callback is called just when new Japanese font is loaded.
+\begin{verbatim}
+function (<table> jfont_info, <number> font_number)
+  return <table> new_jfont_info
+end
+\end{verbatim}
+
+You may assume that \verb+jfont_info+ has the following fields:
+\begin{description}
+\item[\tt jfm] The index number of JFM.
+\item[\tt size] Font size in a scaled point (${}=2^{-16}\,\textrm{pt}$).
+\item[\tt var] The value specified in \texttt{jfmvar=...} at a call of \verb+\jfont+.
+\end{description}
+
+The returned table \verb+new_jfont_info+ also should include these three fields. 
+The \verb+font_number+ is a font number. 
+
+An example of this callback is the \texttt{ltjarticle} class, with
+	     forcefully assigning character class~0 to \texttt{'parbdd'}
+	     in the JFM \texttt{jfm-min.lua}. This callback doesn't
+	     replace any code of \LuaTeX-ja.
+
+
+\item[\texttt{luatexja.find\_char\_class} callback]
+This callback is called just when \LuaTeX-ja inready to determine which
+	     character class a character \verb+chr_code+ belongs.
+A function used in this callback should be in the following form:
+\begin{lstlisting}[numbers=left]
+function (<number> char_class, <table> jfont_info, <number> chr_code)
+  if char_class~=0 then return char_class
+  else
+    ....
+    return (<number> new_char_class or 0)
+  end
+end
+\end{lstlisting}
+
+The argument \verb+char_class+ is the result of \LuaTeX-ja's default
+	     routine or previous function calls in this callback, hence
+	     this argument may not be 0. 
+
+A good example of this and the next callbacks is \texttt{luatexja-otf}
+	     package, supporting \verb+"AJ1-xxx"+ form for Adobe-Japan1
+	     CID characters in a JFM.
+This callback doesn't replace any code of \LuaTeX-ja.
+
+
+
+\end{list}
 
 
 
@@ -1210,23 +1344,22 @@ There is also a unit called `歯' which equals to $0.25\,\textrm{mm}$ and
 			fonts in scaled point ($2^{-16}\,\textrm{pt}$).
 \attr{ltj@autospc} Whether the auto insertion of \textsf{kanjiskip} is allowed at the node.
 \attr{ltj@autoxspc} Whether the auto insertion of \textsf{xkanjiskip} is allowed at the node.
-\attr{ltj@icflag} For distinguishing `kinds' of the node. To this
-			attribute, one of the following value is
-			assigned:
+\attr{ltj@icflag} An attribute for distinguishing `kinds' of a node. One of the following value is
+			assigned to this attribute:
 \begin{description}
-\item[ITALIC (1)] Glues from an itaric correction
+\item[\textit{italic} (1)] Glues from an itaric correction
 	   (\verb+\/+). This distinction of origins of glues 
 	   (from explicit \verb+\kern+, or from \verb+\/+)
 	   is needed in the insertion process of \textsf{xkanjiskip}.
-\item[PACKED (2)] 
-\item[KINSOKU (3)] Penalties inserted for the word-wrapping  process of Japanese characters (\emph{kinsoku}).
-\item[FROM\_JFM (4)] Glues/kerns from JFM.
-\item[LINE\_END (5)] Kerns for ...
-\item[KANJI\_SKIP (6)] Glues for \textsf{kanjiskip}.
-\item[XKANJI\_SKIP (7)] Glues for \textsf{xkanjiskip}.
-\item[PROCESSED (8)] Nodes which is already processed by ...
-\item[IC\_PROCESSED (9)] Glues from an itaric correction, but also already processed.
-\item[BOXBDD (15)] Glues/kerns that inserted just the beginning or the ending of an hbox or a paragraph.
+\item[\textit{packed} (2)] 
+\item[\textit{kinsoku} (3)] Penalties inserted for the word-wrapping  process of Japanese characters (\emph{kinsoku}).
+\item[\textit{from\_jfm} (4)] Glues/kerns from JFM.
+\item[\textit{line\_end} (5)] Kerns for ...
+\item[\textit{kanji\_skip} (6)] Glues for \textsf{kanjiskip}.
+\item[\textit{xkanji\_skip} (7)] Glues for \textsf{xkanjiskip}.
+\item[\textit{processed} (8)] Nodes which is already processed by ...
+\item[\textit{ic\_processed} (9)] Glues from an itaric correction, but also already processed.
+\item[\textit{boxbdd} (15)] Glues/kerns that inserted just the beginning or the ending of an hbox or a paragraph.
 \end{description}
 \attr{ltj@kcat$i$} Where $i$~is a natural number which is less than~7.
 These 7~attributes store bit~vectors indicating which character block is regarded as a block of \textbf{JAchar}s.
@@ -1513,15 +1646,85 @@ u
 
 
 \section{Insertion of JFM glues, \textsf{kanjiskip} and \textsf{xkanjiskip}}
+\subsection{Overview}
 %<*en>
-This will be the longest section of the document.
-However, ...
+NOT COMPLETED
 %</en>
 
 %<*ja>
-\LuaTeX-ja における和文処理グルーの挿入方法は，\pTeX のそれとは全く異なる．……
+\LuaTeX-ja における和文処理グルーの挿入方法は，\pTeX のそれとは全く異なる．
+\pTeX では次のような仕様であった：
+\begin{itemize}
+\item JFMグルーの挿入は，和文文字を表すトークンを元に水平リストに（文字を表す）<char\_node>を
+追加する過程で行われる．
+\item \textsf{xkanjiskip}の挿入は，hboxへのパッケージングや行分割前に行われる．
+\item \textsf{kanjiskip}はノードとしては挿入されない．パッケージングや行分割の計算時に
+「和文文字を表す2つの<char\_node>の間には\textsf{kanjiskip}がある」ものとみなされる．
+\end{itemize}
+しかし，\LuaTeX-jaでは，hboxへのパッケージングや行分割前に全ての
+\textbf{JAglue}，即ちJFMグルー・\textsf{xkanjiskip}・\textsf{kanjiskip}の
+3種類を一度に挿入することになっている．これは，\LuaTeX において欧文の合字・
+カーニング処理がノードベースになったことに対応する変更である．
 
+\LuaTeX-jaにおける\textbf{JAglue}挿入処理では，下の図\ref{fig-clu}のよう
+に「塊」を単位にして行われる．大雑把にいうと，「塊」は文字とそれに付随す
+るノード達（アクセント位置補正用のkernや，イタリック補正）をまとめたもの
+であり，2つの塊の間には，ペナルティ，\verb+\vadjust+，whatsitなど，行組版
+には関係しないものがある．そのため，……
 %</ja>
 
+% \begin{figure}[tb]
+% \unitlength=10mm
+% \end{figure}
 
+\subsection{Definition of a `cluster'}
+
+\begin{defn}
+A \emph{cluster} is a list of nodes in one of the following forms, with the \textit{id} of it:
+\begin{enumerate}
+\item Nodes whose value of \verb+\ltj@icflag+ is in $[3,15)$.  These
+      nodes come from a hbox which is already packaged, by unpackaging
+      (\verb+\unhbox+).
+      The \textit{id} is \textit{id\_pbox}.
+\item A inline math formula, including two \textit{math\_node}s at the boundary of it:
+HOGE
+      The \textit{id} is \textit{id\_math}.
+\item A \textit{glyph\_node} with nodes which relate with it: 
+HOGE
+The \textit{id} is \textit{id\_jglyph} or
+\textit{id\_glyph}, according to whether the \textit{glyph\_node}
+represents a Japanese character or not.
+\item An box-like node, that is, an hbox, an vbox and an rule (\verb+\vrule+). 
+The \textit{id} is \textit{id\_hlist} if the node is an
+      hbox which is not shifted vertically, or \textit{id\_box\_like}
+      otherwise.
+\item A glue, a kern whose subtype is not 2~(\textit{accent}), and a discretionary break.
+The \textit{id} is \textit{id\_glue}, \textit{id\_kern}
+      and \textit{id\_disc}, respectively.
+%Just a node which will \dots, \textit{i.e.}, a node which is \emph{not} one of the following:
+%\textit{ins\_node}, \textit{mark\_node}, \textit{adjust\_node}, \textit{whatsit\_node}
+%and \textit{penalty\_node}.
+\end{enumerate}
+We denote a cluster by \textit{Np}, \textit{Nq} and \textit{Nr}.
+\end{defn}
+
+Internally, a cluster is represented by a table $\textit{Np}$ with the following fields.
+
+\begin{description}
+\def\makelabel#1{\textbf{\textit{#1}}}
+\item[first, last] The first/last node of the cluster.
+\item[id] The \textit{id} in above definition.
+\item[nuc]
+
+% jachar
+\item[auto\_kspc, auto\_xspc]
+\item[xspc\_before, xspc\_after]
+
+% alchar, jachar
+\item[pre, post]
+\item[char]
+\item[class]
+\item[lend]
+\item[met, var]
+\end{description}
 \end{document}

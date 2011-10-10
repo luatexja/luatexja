@@ -8,7 +8,7 @@
 %  This file is part of the pLaTeX2e system.
 %  -----------------------------------------
 %
-% \fi
+% \fi 
 %
 % \CheckSum{4468}
 %% \CharacterTable
@@ -510,23 +510,29 @@
 %
 % \section{フォント}
 %
-% Lua\LaTeX-jaの標準では，OTFパッケージ由来のメトリックが使われるようになっています．
-% 本クラスでは，「p\TeX の組版と互換性をできだけ持たせる」例を提示するため，
+% Lua\LaTeX-jaの標準では、OTFパッケージ由来のメトリックが使われるようになっています。
+% 本クラスでは、「p\TeX の組版と互換性をできだけ持たせる」例を提示するため、
 % \begin{itemize}
-% \item メトリックを\texttt{min10.tfm}ベースの\texttt{jfm-min.lua}に変更．
-% \item 明朝とゴシックは両方とも\texttt{jfm-min.lua}を用いるが，
-%   和文処理用グルー挿入時には「違うメトリックを使用」として思わせる．
-% \item p\TeX と同様に，「異なるメトリックの2つの和文文字」の間には，両者から定める
-%   グルーを両方挿入する．
-% \item \texttt{jfm-min.lua}では，段落始めの括弧が全角二分下がりになるようになっている．
+% \item メトリックを\texttt{min10.tfm}ベースの\texttt{jfm-min.lua}に変更。
+% \item 明朝とゴシックは両方とも\texttt{jfm-min.lua}を用いるが、
+%   和文処理用グルー挿入時には「違うメトリックを使用」として思わせる。
+% \item p\TeX と同様に、「異なるメトリックの2つの和文文字」の間には、両者から定める
+%   グルーを両方挿入する。
+% \item calllback を利用し、標準で用いる\texttt{jfm-min.lua}を、段落始めの括弧が全角二分下がりになるように内部で変更している。
 % 
 % \end{itemize}
 %
 %    \begin{macrocode}
 %<*article|report|book>
-\DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] psft:Ryumin-Light:jfm=min}{}
-\DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] psft:GothicBBB-Medium:jfm=min;jfmvar=goth}{}
+\directlua{luatexbase.add_to_callback('luatexja.load_jfm', 
+  function (ji, jn) ji.chars['parbdd'] = 0; return ji end, 
+  'ltj.jclasses_load_jfm', 1)}
+{\jfont\g=psft:Ryumin-Light:jfm=min } % loading jfm-min.lua
+\expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
+\DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.962216] psft:Ryumin-Light:jfm=min}{}
+\DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.962216] psft:GothicBBB-Medium:jfm=min;jfmvar=goth}{}
 \ltjglobalsetparameter{differentjfm=both}
+\directlua{luatexbase.remove_from_callback('luatexja.load_jfm', 'ltj.jclasses_load_jfm')}
 %</article|report|book>
 %    \end{macrocode}
 %
