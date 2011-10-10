@@ -52,7 +52,6 @@
 \@tempcnta\hour \multiply\@tempcnta 60\relax
 \minute\time \advance\minute-\@tempcnta
 \newif\if@stysize \@stysizefalse
-\newif\if@enablejfam \@enablejfamtrue
 \newif\if@mathrmmc \@mathrmmcfalse
 \DeclareOption{a4paper}{\setcounter{@paper}{1}%
   \setlength\paperheight {297mm}%
@@ -140,7 +139,8 @@
 \if@compatibility
   \@mathrmmctrue
 \else
-  \DeclareOption{disablejfam}{\@enablejfamfalse}
+  \DeclareOption{disablejfam}{%
+    \ClassWarningNoLine{\@currname}{The class option 'disablejfam' is obsolete}}
   \DeclareOption{mathrmmc}{\@mathrmmctrue}
 \fi
 \DeclareOption{draft}{\setlength\overfullrule{5pt}}

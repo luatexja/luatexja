@@ -10,7 +10,7 @@
 %
 % \fi 
 %
-% \CheckSum{4468}
+% \CheckSum{4475}
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -153,8 +153,11 @@
 % 全ての変更点を知りたい場合は、|jclasses.dtx| と |ltjclasses.dtx| で |diff| を
 % とって下さい。
 % \begin{itemize}
-% \item |disablejfam| オプションが効かなくしてあります。互換性のためにオプション
-%   自体は残してあります.
+% \item |disablejfam| オプションを無効化。もし
+% \begin{quotation}
+%   |! LaTeX Error: Too many math alphabets used in version ****.|
+% \end{quotation}
+% のエラーが起こった場合は、|lualatex-math| パッケージを読み込んでみて下さい。
 % \item 出力 PDF の用紙サイズが自動的に設定されるようにしてあります。
 % \item \cs{if西暦}、\cs{西暦}、\cs{和暦}をそれぞれ\cs{ifSeireki}, \cs{Seireki},
 %   \cs{Wareki} に変更してあります。これはデフォルトの漢字のカテゴリコードが12で
@@ -250,13 +253,7 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\if@enablejfam}
-% \changes{v1.1b}{1997/01/28}{Add \cs{if@enablejfam}}
-% 日本語ファミリを宣言するために用いるフラグです。
-% 互換性のために残してあるもので、実際には用いられません。
-%    \begin{macrocode}
-\newif\if@enablejfam \@enablejfamtrue
-%    \end{macrocode}
+% \begin{macro}{\if@mathrmmc}
 % 和欧文両対応の数式文字コマンドを有効にするときに用いるフラグです。
 % マクロの展開順序が複雑になるのを避けるため、
 % デフォルトではfalseとしてあります。
@@ -454,7 +451,9 @@
 % p\TeX では数式ファミリの数が16個だったので日本語ファミリ宣言を抑制する
 % |disablejfam| オプションが用意されていましたが、Lua\TeX では Omega 拡張が
 % 取り込まれて数式ファミリは256個まで使用できるため、このオプションは必要ありません。
-% しかし、互換性のために残しておきます。
+% ただし、\LaTeXe カーネルでは未だに数式ファミリの数は16個に制限されているので、
+% 実際に使用可能な数式ファミリの数を増やすためには |lualatex-math| パッケージを
+% 読み込む必要があることに注意が必要です。
 % 
 % |mathrmmc|オプションは、
 % |\mathrm|と|\mathbf|を和欧文両対応にするためのクラスオプションです。
@@ -463,7 +462,8 @@
 \if@compatibility
   \@mathrmmctrue
 \else
-  \DeclareOption{disablejfam}{\@enablejfamfalse}
+  \DeclareOption{disablejfam}{%
+    \ClassWarningNoLine{\@currname}{The class option 'disablejfam' is obsolete}}
   \DeclareOption{mathrmmc}{\@mathrmmctrue}
 \fi
 %    \end{macrocode}
