@@ -53,7 +53,6 @@
 \@tempcnta\hour \multiply\@tempcnta 60\relax
 \minute\time \advance\minute-\@tempcnta
 \newif\if@stysize \@stysizefalse
-\newif\if@enablejfam \@enablejfamtrue
 \newif\if@mathrmmc \@mathrmmcfalse
 \DeclareOption{a4paper}{\setcounter{@paper}{1}%
   \setlength\paperheight {297mm}%
@@ -146,7 +145,8 @@
 \if@compatibility
   \@mathrmmctrue
 \else
-  \DeclareOption{disablejfam}{\@enablejfamfalse}
+  \DeclareOption{disablejfam}{%
+    \ClassWarningNoLine{\@currname}{The class option 'disablejfam' is obsolete}}
   \DeclareOption{mathrmmc}{\@mathrmmctrue}
 \fi
 \DeclareOption{draft}{\setlength\overfullrule{5pt}}
@@ -154,6 +154,15 @@
 \ExecuteOptions{a4paper,10pt,oneside,onecolumn,final,openany}
 \ProcessOptions\relax
 \input{ltjsize1\@ptsize.clo}
+\directlua{luatexbase.add_to_callback('luatexja.load_jfm',
+  function (ji, jn) ji.chars['parbdd'] = 0; return ji end,
+  'ltj.jclasses_load_jfm', 1)}
+{\jfont\g=psft:Ryumin-Light:jfm=min } % loading jfm-min.lua
+\expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
+\DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.962216] psft:Ryumin-Light:jfm=min}{}
+\DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.962216] psft:GothicBBB-Medium:jfm=min;jfmvar=goth}{}
+\ltjglobalsetparameter{differentjfm=both}
+\directlua{luatexbase.remove_from_callback('luatexja.load_jfm', 'ltj.jclasses_load_jfm')}
 \if@stysize
   \setlength\columnsep{2\Cwd}
 \else

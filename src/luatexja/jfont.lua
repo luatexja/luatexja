@@ -29,6 +29,8 @@ local ITALIC = 1
 metrics={} -- this table stores all metric informations
 font_metric_table={} -- [font number] -> jfm_name, jfm_var, size
 
+luatexbase.create_callback("luatexja.load_jfm", "data", function (ft, jn) return ft end)
+
 local jfm_file_name, jfm_var
 local defjfm_res
 
@@ -96,8 +98,9 @@ function define_jfm(t)
 	 t[i] = nil
       end
    end
+   t = luatexbase.call_callback("luatexja.load_jfm", t, jfm_file_name)
    t.size_cache = {}
-   defjfm_res= t
+   defjfm_res = t
 end
 
 local function mult_table(old,scale) -- modified from table.fastcopy
@@ -126,7 +129,7 @@ local function update_jfm_cache(j,sz)
    metrics[j].size_cache[sz].zh = round(metrics[j].zh*sz)
 end
 
-luatexbase.create_callback("ltj.find_char_class", "data", 
+luatexbase.create_callback("luatexja.find_char_class", "data", 
 			   function (arg, fmtable, char)
 			      return 0
 			   end)
@@ -135,7 +138,7 @@ function find_char_class(c,m)
 -- c: character code, m: index in font_metric table
    if not metrics[m.jfm] then return 0 end
    return metrics[m.jfm].chars[c] or 
-      luatexbase.call_callback("ltj.find_char_class", 0, m, c)
+      luatexbase.call_callback("luatexja.find_char_class", 0, m, c)
 end
 
 local function load_jfont_metric()
@@ -173,9 +176,9 @@ function jfontdefX(g)
   tex.sprint(cat_lp, '\\expandafter\\font\\csname ' .. cstemp .. '\\endcsname')
 end
 
--- EXT
-luatexbase.create_callback("ltj.define_jfont", "data", function (ft, fn) return ft end)
+luatexbase.create_callback("luatexja.define_jfont", "data", function (ft, fn) return ft end)
 
+-- EXT
 function jfontdefY() -- for horizontal font
    local j = load_jfont_metric()
    local fn = font.id(cstemp)
@@ -191,7 +194,7 @@ function jfontdefY() -- for horizontal font
    end
    update_jfm_cache(j, f.size)
    local fmtable = { jfm = j, size = f.size, var = jfm_var }
-   fmtable = luatexbase.call_callback("ltj.define_jfont", fmtable, fn)
+   fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
    font_metric_table[fn]=fmtable
    tex.sprint(cat_lp, ltj.is_global .. '\\protected\\expandafter\\def\\csname ' 
           .. cstemp  .. '\\endcsname{\\ltj@curjfnt=' .. fn .. '\\relax}')

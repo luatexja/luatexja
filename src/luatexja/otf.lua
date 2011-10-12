@@ -122,7 +122,7 @@ local function cid_to_char(fmtable, fn)
    end
    return fmtable
 end
-luatexbase.add_to_callback("ltj.define_jfont", 
+luatexbase.add_to_callback("luatexja.define_jfont", 
 			   cid_to_char, "ltj.otf.define_jfont", 1)
 --  既に読み込まれているフォントに対しても，同じことをやらないといけない
 for fn, v in pairs(ltjf_font_metric_table) do
@@ -137,7 +137,7 @@ local function cid_set_char_class(arg, fmtable, char)
    else return 0
    end
 end
-luatexbase.add_to_callback("ltj.find_char_class", 
+luatexbase.add_to_callback("luatexja.find_char_class", 
 			   cid_set_char_class, "ltj.otf.find_char_class", 1)
 
 -------------------- all done

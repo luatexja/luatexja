@@ -3,6 +3,6 @@
 \askforoverwritefalse
 \generate{\file{man-ja.tex}{\from{manual.dtx}{ja}}
           \file{man-en.tex}{\from{manual.dtx}{en}}}
-%\immediate\write18{lualatex man-ja}
+\immediate\write18{lualatex man-ja}
 \immediate\write18{lualatex man-en}
  \endbatchfile

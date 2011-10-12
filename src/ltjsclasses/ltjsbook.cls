@@ -183,7 +183,8 @@
       &\global\@eqcnt\thr@@ \hb@xt@\z@\bgroup\hss##\egroup
     \tabskip\z@skip\cr
     }}
-\DeclareOption{disablejfam}{\@enablejfamfalse}
+\DeclareOption{disablejfam}{%
+  \ClassWarningNoLine{\@currname}{The class option 'disablejfam' is obsolete}}
 \newif\ifdraft
 \DeclareOption{draft}{\drafttrue \setlength\overfullrule{5pt}}
 \DeclareOption{final}{\draftfalse \setlength\overfullrule{0pt}}
@@ -193,7 +194,10 @@
 \jisfontfalse
 \newif\ifptexjis
 \ptexjisfalse
-\DeclareOption{winjis}{}\DeclareOption{uplatex}{} % These 2 options are ignored.
+\DeclareOption{winjis}{%
+  \ClassWarningNoLine{\@currname}{The class option 'winjis' is obsolete}}
+\DeclareOption{uplatex}{%
+  \ClassWarningNoLine{\@currname}{The class option 'uplatex' is obsolete}}
 \DeclareOption{mingoth}{\mingothtrue}
 \DeclareOption{ptexjis}{\ptexjistrue}
 \DeclareOption{jis}{\jisfonttrue}
@@ -842,8 +846,8 @@
         \hskip -\@tempskipa
       \else
         \clubpenalty \@clubpenalty
-        \everypar{\everyparhook}%
-      \fi\everyparhook}%
+        \everypar{}%
+      \fi}%
   \else
     \par \nobreak
     \vskip \@tempskipa
@@ -1424,113 +1428,6 @@
   \parindent 1\zw
   \noindent
   \llap{\@makefnmark\hskip0.3\zw}#1}
-\def\@inhibitglue{%
-  \futurelet\@let@token\@@inhibitglue}
-\def\@@inhibitglue{%
-  \ifx\@let@token「
-    \inhibitglue
-  \else
-    \ifx\@let@token（
-      \inhibitglue
-    \else
-      \ifx\@let@token『
-        \inhibitglue
-      \else
-        \ifx\@let@token［
-          \inhibitglue
-        \fi
-      \fi
-    \fi
-  \fi}
-\let\everyparhook=\@inhibitglue
-\AtBeginDocument{\everypar{\everyparhook}}
-\def\@doendpe{%
-  \@endpetrue
-  \def\par{%
-    \@restorepar\everypar{\everyparhook}\par\@endpefalse}%
-  \everypar{{\setbox\z@\lastbox}\everypar{\everyparhook}\@endpefalse\everyparhook}}
-\def\@item[#1]{%
-  \if@noparitem
-    \@donoparitem
-  \else
-    \if@inlabel
-      \indent \par
-    \fi
-    \ifhmode
-      \unskip\unskip \par
-    \fi
-    \if@newlist
-      \if@nobreak
-        \@nbitem
-      \else
-        \addpenalty\@beginparpenalty
-        \addvspace\@topsep
-        \addvspace{-\parskip}%
-      \fi
-    \else
-      \addpenalty\@itempenalty
-      \addvspace\itemsep
-    \fi
-    \global\@inlabeltrue
-  \fi
-  \everypar{%
-    \@minipagefalse
-    \global\@newlistfalse
-    \if@inlabel
-      \global\@inlabelfalse
-      {\setbox\z@\lastbox
-       \ifvoid\z@
-         \kern-\itemindent
-       \fi}%
-      \box\@labels
-      \penalty\z@
-    \fi
-    \if@nobreak
-      \@nobreakfalse
-      \clubpenalty \@M
-    \else
-      \clubpenalty \@clubpenalty
-      \everypar{\everyparhook}%
-    \fi\everyparhook}%
-  \if@noitemarg
-    \@noitemargfalse
-    \if@nmbrlist
-      \refstepcounter\@listctr
-    \fi
-  \fi
-  \sbox\@tempboxa{\makelabel{#1}}%
-  \global\setbox\@labels\hbox{%
-    \unhbox\@labels
-    \hskip \itemindent
-    \hskip -\labelwidth
-    \hskip -\labelsep
-    \ifdim \wd\@tempboxa >\labelwidth
-      \box\@tempboxa
-    \else
-      \hbox to\labelwidth {\unhbox\@tempboxa}%
-    \fi
-    \hskip \labelsep}%
-  \ignorespaces}
-\def\@afterheading{%
-  \@nobreaktrue
-  \everypar{%
-    \if@nobreak
-      \@nobreakfalse
-      \clubpenalty \@M
-      \if@afterindent \else
-        {\setbox\z@\lastbox}%
-      \fi
-    \else
-      \clubpenalty \@clubpenalty
-      \everypar{\everyparhook}%
-    \fi\everyparhook}}
-\def\@gnewline #1{%
-  \ifvmode
-    \@nolnerr
-  \else
-    \unskip \reserved@e {\reserved@f#1}\nobreak \hfil \break \null
-    \inhibitglue \ignorespaces
-  \fi}
 \def\Shou#1{\hbox{$\m@th$%
   \csname S@\f@size\endcsname
   \fontsize\sf@size\z@

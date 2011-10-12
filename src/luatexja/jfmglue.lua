@@ -76,6 +76,7 @@ local ltjs_get_skip_table = ltjs.get_skip_table
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_metrics = ltjf.metrics
 local box_stack_level
+local par_indented -- is the paragraph indented?
 
 -------------------- Helper functions
 
@@ -646,13 +647,17 @@ end
 
 local function get_OA_skip()
    if not ihb_flag then
-      return new_jfm_glue(Np, find_char_class('jcharbdd',Np.met), Np.class)
+      local c
+      if Nq.id == id_math then c = -1 else c = 'jcharbdd' end
+      return new_jfm_glue(Np, find_char_class(c,Np.met), Np.class)
    else return nil
    end
 end
 local function get_OB_skip()
    if not ihb_flag then
-      return new_jfm_glue(Nq, Nq.class, find_char_class('jcharbdd',Nq.met))
+      local c
+      if Np.id == id_math then c = -1 else c = 'jcharbdd' end
+      return new_jfm_glue(Nq, Nq.class, find_char_class(c,Nq.met))
    else return nil
    end
 end
@@ -765,7 +770,12 @@ end
 local function handle_list_head()
    if Np.id ==  id_jglyph or (Np.id==id_pbox and Np.met) then 
       if not ihb_flag then
-	 local g = new_jfm_glue(Np, find_char_class('boxbdd',Np.met), Np.class)
+	 local g
+	 if par_indented then
+	    g = new_jfm_glue(Np, find_char_class('parbdd',Np.met), Np.class)
+	 else
+	    g = new_jfm_glue(Np, find_char_class('boxbdd',Np.met), Np.class)
+	 end
 	 if g then
 	    set_attr(g, attr_icflag, BOXBDD)
 	    if g.id==id_glue and #Bp==0 then
@@ -781,6 +791,7 @@ end
 -- initialize
 local function init_var()
    lp = head; Bp = {}; widow_Bp = {}; widow_Np = {first = nil}
+   par_indented = false 
    box_stack_level = ltjp.box_stack_level
    kanji_skip=skip_table_to_spec('kanjiskip')
    xkanji_skip=skip_table_to_spec('xkanjiskip')
@@ -799,6 +810,7 @@ local function init_var()
       -- hbox from \parindent is skipped.
       while lp and ((lp.id==id_whatsit and lp.subtype~=sid_user) 
 		 or ((lp.id==id_hlist) and (lp.subtype==3))) do
+	 if (lp.id==id_hlist) and (lp.subtype==3) then par_indented = true end
 	 lp=node_next(lp) end
       last=node.tail(head)
    else 

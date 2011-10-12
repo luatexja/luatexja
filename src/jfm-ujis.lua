@@ -1,6 +1,6 @@
 -- -*- coding: utf-8 -*-
 -- jfm-ujis.lua: LuaTeX-ja 標準 JFM
--- besed on upnmlminr-h.tfm (a metric in UTF/OTF package used by upTeX).
+-- based on upnmlminr-h.tfm (a metric in UTF/OTF package used by upTeX).
 
 luatexja.jfont.define_jfm {
    dir = 'yoko',
@@ -133,7 +133,7 @@ luatexja.jfont.define_jfm {
    },
 
    [99] = { -- box末尾
-      chars = {'boxbdd'},
+      chars = {'boxbdd', 'parbdd'},
    },
 
 }
