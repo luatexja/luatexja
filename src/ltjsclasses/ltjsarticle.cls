@@ -283,6 +283,7 @@
 \fi
 \setlength{\pdfpagewidth}{\@tempdima}
 \setlength{\pdfpageheight}{\@tempdimb}
+\expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
 \ifmingoth
   \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] psft:Ryumin-Light:jfm=min}{}
   \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] psft:GothicBBB-Medium:jfm=min}{}
