@@ -9,6 +9,7 @@
 \setpagelayout*{margin=20mm,footskip=5mm}
 \def\headfont{\normalfont\bfseries}
 % \def\headfont{\sffamily\gtfamily} is needed in ordinal documents
+% This document cannot typeset in ltjsclasses (conflict with showexpl?)
 %</ja>
 
 \usepackage{amsmath,amssymb,xcolor,pict2e,multienum,amsthm,float}
@@ -610,7 +611,6 @@ This range consist of the following Unicode ranges, \emph{except characters in t
 "2980--"29FF&Misc.\ Mathematical Symbols-B&
 "2B00--"2BFF&Miscellaneous Symbols and Arrows\\
 "E000--"F8FF&Private Use Area&
-"FB00--"FB4F&Alphabetic Presentation Forms
 \end{tabular}
 \end{center}
 \end{table}
@@ -622,7 +622,7 @@ This range consist of the following Unicode ranges, \emph{except characters in t
 \ltjdefcharrange{4}{%
    "500-"10FF, "1200-"1DFF, "2440-"245F, "27C0-"28FF, "2A00-"2AFF, 
   "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A82F, "A840-"ABFF, "FB50-"FE0F, 
-  "FE20-"FE2F, "FE70-"FEFF, "10000-"1FFFF} % non-Japanese
+  "FE20-"FE2F, "FE70-"FEFF, "FB00-"FB4F, "10000-"1FFFF} % non-Japanese
 \end{lstlisting}
 \item[Range~5${}^{\text{A}}$] Surrogates and Supplementary Private Use Areas.
 \item[Range~6${}^{\text{J}}$] Characters used in Japanese. The block list is indicated in Table~\ref{table-rng6}.
