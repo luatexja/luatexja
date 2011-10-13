@@ -26,6 +26,7 @@ local sid_user = node.subtype('user_defined')
 
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
+local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 
@@ -40,7 +41,8 @@ box_stack_level = 0
 
 local function suppress_hyphenate_ja(head)
    for p in node.traverse_id(id_glyph, head) do
-      if ltjc.is_ucs_in_japanese_char(p) then
+      local i = has_attr(p, attr_icflag) or 0
+      if i==0 and ltjc.is_ucs_in_japanese_char(p) then
 	 local v = has_attr(p, attr_curjfnt)
 	 if v then 
 	    p.font = v 
