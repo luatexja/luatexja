@@ -30,16 +30,9 @@
   \in@@#2<#1>\in@\in@@}
 \def\fam@elt{\noexpand\fam@elt}
 \def\enc@elt{\noexpand\enc@elt}
-\def\fenc@list{\enc@elt<OML>\enc@elt<T1>\enc@elt<OT1>\enc@elt<OMS>%
-               \enc@elt<OMX>\enc@elt<TS1>\enc@elt<U>}
 \let\kenc@list\@empty
 \let\kyenc@list\@empty
 \let\ktenc@list\@empty
-\def\kfam@list{\fam@elt<mc>\fam@elt<gt>}
-\def\ffam@list{\fam@elt<cmr>\fam@elt<cmss>\fam@elt<cmtt>%
-               \fam@elt<cmm>\fam@elt<cmsy>\fam@elt<cmex>}
-\let\notkfam@list\ffam@list
-\let\notffam@list\kfam@list
 \newbox\tstrutbox
 \newbox\zstrutbox
 \def\strut{\relax
@@ -67,7 +60,6 @@
                     {\default@shape}}%
      \expandafter\let\csname#1-cmd\endcsname\@changed@cmd
      \def\enc@elt{\noexpand\enc@elt}%
-     \xdef\fenc@list{\fenc@list\enc@elt<#1>}%
   \else
      \@font@info{Redeclaring font encoding #1}%
   \fi
@@ -155,12 +147,6 @@
  \@ifundefined{T@#1}%
     {\@latex@error{Encoding scheme `#1' unknown}\@eha}%
     {\edef\tmp@item{{#2}}%
-     \expandafter\expandafter\expandafter
-     \inlist@\expandafter\tmp@item\expandafter{\ffam@list}%
-     \ifin@ \else
-        \def\fam@elt{\noexpand\fam@elt}%
-        \xdef\ffam@list{\ffam@list\fam@elt<#2>}%
-     \fi
      \def\reserved@a{#3}%
      \global
      \expandafter\let\csname #1+#2\expandafter\endcsname
@@ -174,12 +160,6 @@
  \@ifundefined{T@#1}%
     {\@latex@error{KANJI Encoding scheme `#1' unknown}\@eha}%
     {\edef\tmp@item{{#2}}%
-     \expandafter\expandafter\expandafter
-     \inlist@\expandafter\tmp@item\expandafter{\kfam@list}%
-     \ifin@ \else
-        \def\fam@elt{\noexpand\fam@elt}%
-        \xdef\kfam@list{\kfam@list\fam@elt<#2>}%
-     \fi
      \def\reserved@a{#3}%
      \global
      \expandafter\let\csname #1+#2\expandafter\endcsname
@@ -483,57 +463,66 @@
 \newif\if@tempswz
 \DeclareRobustCommand\romanfamily[1]{\edef\f@family{#1}}
 \DeclareRobustCommand\kanjifamily[1]{\edef\k@family{#1}}
+% \notkfam@list@<enc>: list of non-defined kanji families under <enc>
+% \kfam@list@<enc>:    list of kanji families under <enc>, defined in a .fd file
 \DeclareRobustCommand\fontfamily[1]{%
-  \edef\tmp@item{{#1}}%
-  \@notkfamfalse
-  \@notffamfalse
-  \expandafter\expandafter\expandafter
-  \inlist@\expandafter\tmp@item\expandafter{\kfam@list}%
-  \ifin@ \edef\k@family{#1}%
-  \else
-    \expandafter\expandafter\expandafter
-    \inlist@\expandafter\tmp@item\expandafter{\notkfam@list}%
-    \ifin@ \@notkfamtrue
-    \else
-      %% \@tempswzfalse
-      %% \def\fam@elt{\noexpand\fam@elt}%
-      %% \message{(I search kanjifont definition file:}%
-      %% \def\enc@elt<##1>{\message{.}%
-      %%   \edef\reserved@a{\lowercase{\noexpand\IfFileExists{##1#1.fd}}}%
-      %%   \reserved@a{\@tempswztrue}{}\relax}%
-      %% \kenc@list
-      %% \message{)}%
-      %% \if@tempswz
-      %%   \edef\k@family{#1}%
-      %% \else
-        \@notkfamtrue
-        \xdef\notkfam@list{\notkfam@list\fam@elt<#1>}%
-      %% \fi
-  \fi\fi
-  \expandafter\expandafter\expandafter
-  \inlist@\expandafter\tmp@item\expandafter{\ffam@list}%
-  \ifin@ \edef\f@family{#1}\else
-    \expandafter\expandafter\expandafter
-    \inlist@\expandafter\tmp@item\expandafter{\notffam@list}%
-    \ifin@ \@notffamtrue \else
-      \@tempswzfalse
-      \def\fam@elt{\noexpand\fam@elt}%
-      \message{(I search font definition file:}%
-      \def\enc@elt<##1>{\message{.}%
-        \edef\reserved@a{\lowercase{\noexpand\IfFileExists{##1#1.fd}}}%
-        \reserved@a{\@tempswztrue}{}\relax}%
-      \fenc@list
-      \message{)}%
-      \if@tempswz
-        \edef\f@family{#1}%
-      \else
-        \@notffamtrue
-        \xdef\notffam@list{\notffam@list\fam@elt<#1>}%
-      \fi
-  \fi\fi
+  \@notkfamfalse\@notffamfalse\edef\tmp@item{{#1}}%
+  \ifcsname \k@encoding+#1\endcsname % if \k@encoding+#1 is already defined
+    \edef\k@family{#1}%
+  \else % search font definition file...
+     \ifcsname kfam@list@\k@encoding\endcsname\else
+        \expandafter\let\csname kfam@list@\k@encoding\endcsname\@empty
+       \expandafter\let\csname notkfam@list@\k@encoding\endcsname\@empty
+     \fi
+     \edef\@templist{\@nameuse{kfam@list@\k@encoding}}%
+     \expandafter\expandafter\expandafter\inlist@\expandafter\tmp@item\expandafter{\@templist}%
+     \ifin@\edef\k@family{#1}\else%
+       \edef\@templist{\@nameuse{notkfam@list@\k@encoding}}%
+       \expandafter\expandafter\expandafter\inlist@\expandafter\tmp@item\expandafter{\@templist}%
+       \ifin@\@notkfamtrue\else%
+         \def\@temp##1+{\lowercase{\def\@@temp{##1}}}\expandafter\@temp\k@encoding+%
+         \message{(I search kanjifont definition file: \@@temp#1.fd)}%
+         \IfFileExists{\@@temp#1.fd}{\@tempswztrue}{\@tempswzfalse}%
+         \if@tempswz
+           \expandafter\xdef\csname kfam@list@\k@encoding\endcsname
+             {\@nameuse{kfam@list@\k@encoding}\fam@elt<#1>}\edef\k@family{#1}%
+         \else
+           \expandafter\xdef\csname notkfam@list@\k@encoding\endcsname
+             {\@nameuse{notkfam@list@\k@encoding}\fam@elt<#1>}\@notkfamtrue%
+         \fi
+       \fi
+     \fi
+  \fi
+  \ifcsname \f@encoding+#1\endcsname
+    \edef\f@family{#1}%
+  \else % search font definition file...
+     \ifcsname ffam@list@\f@encoding\endcsname\else
+       \expandafter\let\csname ffam@list@\f@encoding\endcsname\@empty
+       \expandafter\let\csname notffam@list@\f@encoding\endcsname\@empty
+     \fi
+     \edef\@templist{\@nameuse{ffam@list@\f@encoding}}%
+     \expandafter\expandafter\expandafter\inlist@\expandafter\tmp@item\expandafter{\@templist}%
+     \ifin@\edef\f@family{#1}\else
+       \edef\@templist{\@nameuse{notffam@list@\f@encoding}}%
+       \expandafter\expandafter\expandafter\inlist@\expandafter\tmp@item\expandafter{\@templist}%
+       \ifin@\@notffamtrue\else
+         \def\@temp##1+{\lowercase{\def\@@temp{##1}}}\expandafter\@temp\f@encoding+%
+         \message{(I search font definition file: \@@temp#1.fd)}%
+         \IfFileExists{\@@temp#1.fd}{\@tempswztrue}{\@tempswzfalse}%
+         \if@tempswz
+           \expandafter\xdef\csname ffam@list@\f@encoding\endcsname
+             {\@nameuse{ffam@list@\f@encoding}\fam@elt<#1>}\edef\f@family{#1}%
+         \else
+           \expandafter\xdef\csname notffam@list@\f@encoding\endcsname
+             {\@nameuse{notffam@list@\f@encoding}\fam@elt<#1>}\@notffamtrue%
+         \fi
+       \fi
+     \fi
+  \fi
   \if@notkfam\if@notffam
       \edef\k@family{#1}\edef\f@family{#1}%
-  \fi\fi}
+  \fi\fi
+}
 \DeclareRobustCommand\romanseries[1]{\edef\f@series{#1}}
 \DeclareRobustCommand\kanjiseries[1]{\edef\k@series{#1}}
 \DeclareRobustCommand\fontseries[1]{\kanjiseries{#1}\romanseries{#1}}
