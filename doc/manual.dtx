@@ -9,6 +9,7 @@
 \setpagelayout*{margin=20mm,footskip=5mm}
 \def\headfont{\normalfont\bfseries}
 % \def\headfont{\sffamily\gtfamily} is needed in ordinal documents
+% This document cannot typeset in ltjsclasses (conflict with showexpl?)
 %</ja>
 
 \usepackage{amsmath,amssymb,xcolor,pict2e,multienum,amsthm,float}
@@ -33,6 +34,7 @@
 \newenvironment{cslist}{%
   \leftskip2em\parindent=0pt\def\makelabel##1{{\tt\char92##1}}
   \def\{{\char`\{}\def\}{\char`\}}
+  \let\origitem=\item
   \def\item[##1]{\par\smallskip\par\hskip-\leftskip\makelabel{##1}\par}
 }{}
 
@@ -64,6 +66,9 @@
 }
 
 \parskip=\smallskipamount
+\protected\def\Param#1{\textsf{#1}} % parameter name
+\protected\def\Pkg#1{\underline{\smash{\texttt{#1}}}} % packages/classes
+
 \begin{document}
 \catcode`\<=13
 \def<#1>{{\normalfont\rm\itshape$\langle$#1$\rangle$}}
@@ -205,9 +210,11 @@ In this document, the following terms and notations are used:
 \end{itemize}
 We say `alphabetic fonts' for fonts used in \textbf{ALchar}, and `Japanese fonts' for fonts used in \textbf{JAchar}.
 
-\item A word in a sans-serif font (like \textsf{prebreakpenalty})
-      represents an internal parameter for Japanese typesetting, and it
+\item A word in a sans-serif font (like \Param{prebreakpenalty})
+      means an internal parameter for Japanese typesetting, and it
       is used as a key in \verb+\ltjsetparameter+ command.
+\item A word in typewriter font with underline (like \Pkg{fontspec})
+      means a package of a class of \LaTeX.
 \item The word `primitive' is used not only for primitives in \LuaTeX,
       but also for control sequences that defined in the core module of
       \LuaTeX-ja.
@@ -282,7 +289,7 @@ Note that the forefront of development may not be in \texttt{master} branch.
 \item May be conflict with other packages. 
 
 For example, the default setting of \textbf{JAchar} in the present
-      version does not coexist with \texttt{unicode-math}
+      version does not coexist with the \Pkg{unicode-math}
       package. Putting the following line in preamble makes that
       mathematical symbols will be typeset correctly, but several
       Japanese characters will be treated as an \textbf{ALchar} as
@@ -326,7 +333,7 @@ This does minimal settings (like {\tt ptex.tex}) for typesetting Japanese docume
       fonts, namely scaled by 0.962216.
 \end{itemize}
 \item The amount of glue that are inserted between a \textbf{JAchar} and
-      an \textbf{ALchar} (the parameter \textsf{xkanjiskip}) is set to
+      an \textbf{ALchar} (the parameter \Param{xkanjiskip}) is set to
 \[
  (0.25\cdot 13.5\,\textrm{Q})^{+1\,\text{pt}}_{-1\,\text{pt}} 
  = {27\over 32}\,\mathrm{mm}^{+1\,\text{pt}}_{-1\,\text{pt}}.
@@ -365,15 +372,15 @@ This is a convention in \pLaTeX.
 However, above settings are not sufficient for Japanese-based
 documents. To typeset Japanese-based documents, You are better to use
 class files other than {\tt article.cls}, {\tt book.cls}, and so on.  At
-the present, we have the counterparts of \texttt{jclasses} (standard
-classes in \pLaTeX) and \texttt{jsclasses} (classes by Haruhiko
-Okumura), namely, \texttt{ltjclasses} and \texttt{ltjsclasses}.
+the present, we have the counterparts of \Pkg{jclasses} (standard
+classes in \pLaTeX) and \Pkg jsclasses (classes by Haruhiko
+Okumura), namely, \Pkg{ltjclasses} and \Pkg{ltjsclasses}.
 
 \paragraph{{\tt\char92 CID, {\tt\char92 UTF}} and macros in OTF package}
-Under \pTeX, \texttt{OTF} package (developed by Shuzaburo Saito) is
+Under \pTeX, \Pkg{otf} package (developed by Shuzaburo Saito) is
 used for typesetting characters which is in Adobe-japan1-6 CID but not
 in JIS~X~0208. Since this package is widely used, \LuaTeX-ja
-supports some of functions in \texttt{OTF} package.
+supports some of functions in \Pkg{otf} package.
 
 \begin{LTXexample}
 森\UTF{9DD7}外と内田百\UTF{9592}とが\UTF{9AD9}島屋に行く。
@@ -457,20 +464,25 @@ auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
 \begin{verbatim}
 \fontencoding{JY3}\fontencoding{T1}
 \end{verbatim}
+\verb+\fontfamily+も引数により和文側，欧文側，\textbf{あるいは両方}のフォ
+      ントファミリが切り替わる．
+詳細はSubsection~\ref{ssub-nfsspat}を参照すること．
 %</ja>
 
-\item For defining a Japanese font family, use \verb+\DeclareKanjiFamily+
-      instead of \verb+\DeclareFontFamily+.
+\item For defining a Japanese font family, use
+      \verb+\DeclareKanjiFamily+ instead of
+      \verb+\DeclareFontFamily+. However, in the present implementation,
+      using \verb+\DeclareFontFamily+ doesn't cause any problem.
 \end{itemize}
 
 \paragraph{fontspec}
-To coexist with the \texttt{fontspec} package, it is needed to load
-\texttt{luatexja-fontspec} package in the preamble. This additional
-package automatically loads \texttt{luatexja} and \texttt{fontspec}
+To coexist with the \Pkg{fontspec} package, it is needed to load
+\Pkg{luatexja-fontspec} package in the preamble. This additional
+package automatically loads \Pkg{luatexja} and \Pkg{fontspec}
 package, if needed.
 
-In \texttt{luatexja-fontspec} package, the following 7~commands are defined as
-counterparts of original commands in \texttt{fontspec}:
+In \Pkg{luatexja-fontspec} package, the following 7~commands are defined as
+counterparts of original commands in the \Pkg{fontspec} package:
 \begin{center}
 \begin{tabular}{ccccc}
 \toprule
@@ -610,7 +622,6 @@ This range consist of the following Unicode ranges, \emph{except characters in t
 "2980--"29FF&Misc.\ Mathematical Symbols-B&
 "2B00--"2BFF&Miscellaneous Symbols and Arrows\\
 "E000--"F8FF&Private Use Area&
-"FB00--"FB4F&Alphabetic Presentation Forms
 \end{tabular}
 \end{center}
 \end{table}
@@ -622,7 +633,7 @@ This range consist of the following Unicode ranges, \emph{except characters in t
 \ltjdefcharrange{4}{%
    "500-"10FF, "1200-"1DFF, "2440-"245F, "27C0-"28FF, "2A00-"2AFF, 
   "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A82F, "A840-"ABFF, "FB50-"FE0F, 
-  "FE20-"FE2F, "FE70-"FEFF, "10000-"1FFFF} % non-Japanese
+  "FE20-"FE2F, "FE70-"FEFF, "FB00-"FB4F, "10000-"1FFFF} % non-Japanese
 \end{lstlisting}
 \item[Range~5${}^{\text{A}}$] Surrogates and Supplementary Private Use Areas.
 \item[Range~6${}^{\text{J}}$] Characters used in Japanese. The block list is indicated in Table~\ref{table-rng6}.
@@ -675,7 +686,7 @@ The block list is indicated in Table~\ref{table-rng7}.
 \end{description}
 
 
-\subsection{\textsf{kanjiskip} and \textsf{xkanjiskip}}\label{subs-kskip}
+\subsection{\Param{kanjiskip} and \Param{xkanjiskip}}\label{subs-kskip}
 \textbf{JAglue} is divided into the following three categories:
 \begin{itemize}
 \item Glues/kerns specified in JFM. If \verb+\inhibitglue+ is issued
@@ -684,9 +695,9 @@ The block list is indicated in Table~\ref{table-rng7}.
 \item The default glue which inserted between two \textbf{JAchar}s ({\sf
       kanjiskip}).
 \item The default glue which inserted between a \textbf{JAchar} and an
-      \textbf{ALchar} (\textsf{xkanjiskip}).
+      \textbf{ALchar} (\Param{xkanjiskip}).
 \end{itemize}
-The value (a skip) of \textsf{kanjiskip} or \textsf{xkanjiskip} can be
+The value (a skip) of \Param{kanjiskip} or \Param{xkanjiskip} can be
 changed as the following.
 \begin{lstlisting}
 \ltjsetparameter{kanjiskip={0pt plus 0.4pt minus 0.4pt}, 
@@ -695,34 +706,34 @@ changed as the following.
 
 
 It may occur that JFM contains the data of `ideal width of {\sf
-kanjiskip}' and/or `ideal width of \textsf{xkanjiskip}'.
-To use these data from JFM, set the value of \textsf{kanjiskip} or 
-\textsf{xkanjiskip} to \verb+\maxdimen+.
+kanjiskip}' and/or `ideal width of \Param{xkanjiskip}'.
+To use these data from JFM, set the value of \Param{kanjiskip} or 
+\Param{xkanjiskip} to \verb+\maxdimen+.
 
-\subsection{Insertion Setting of \textsf{xkanjiskip}}
-It is not desirable that \textsf{xkanjiskip} is inserted between every
+\subsection{Insertion Setting of \Param{xkanjiskip}}
+It is not desirable that \Param{xkanjiskip} is inserted between every
 boundary between \textbf{JAchar}s and \textbf{ALchar}s. For example,
-\textsf{xkanjiskip} should not be inserted after opening parenthesis
+\Param{xkanjiskip} should not be inserted after opening parenthesis
 (\textit{e.g.}, compare `(あ' and `(\hskip\ltjgetparameter{xkanjiskip}あ').
 
-\LuaTeX-ja can control whether \textsf{xkanjiskip} can be inserted
-before/after a character, by changing \textsf{jaxspmode} for \textbf{JAchar}s and
-\textsf{alxspmode} parameters \textbf{ALchar}s respectively. 
+\LuaTeX-ja can control whether \Param{xkanjiskip} can be inserted
+before/after a character, by changing \Param{jaxspmode} for \textbf{JAchar}s and
+\Param{alxspmode} parameters \textbf{ALchar}s respectively. 
 \begin{LTXexample}
 \ltjsetparameter{jaxspmode={`あ,preonly}, alxspmode={`\!,postonly}} 
 pあq い!う
 \end{LTXexample}
 
 The second argument {\tt preonly} means `the insertion of
-\textsf{xkanjiskip} is allowed before this character, but not after'.
+\Param{xkanjiskip} is allowed before this character, but not after'.
 the other possible values are {\tt postonly}, {\tt allow} and {\tt
 inhibit}. For the compatibility with \pTeX, natural numbers between
 0~and~3 are also allowed as the second argument\footnote{But we don't
 recommend this: since numbers 1~and~2 have opposite meanings in
-\textsf{jaxspmode} and \textsf{alxspmode}.}.
+\Param{jaxspmode} and \Param{alxspmode}.}.
 
-If you want to enable/disable all insertions of \textsf{kanjiskip} and
-\textsf{xkanjiskip}, set \textsf{autospacing} and \textsf{autoxspacing}
+If you want to enable/disable all insertions of \Param{kanjiskip} and
+\Param{xkanjiskip}, set \Param{autospacing} and \Param{autoxspacing}
 parameters to {\tt false}, respectively.
 
 
@@ -734,8 +745,8 @@ baseline of alphabetic fonts is shifted below). However, for documents
 whose main language is not Japanese, it is good to shift the baseline of
 Japanese fonts, but not that of alphabetic fonts.
 Because of this, \LuaTeX-ja can independently set the shifting amount
-of the baseline of alphabetic fonts (\textsf{yalbaselineshift}
-parameter) and that of Japanese fonts (\textsf{yjabaselineshift}
+of the baseline of alphabetic fonts (\Param{yalbaselineshift}
+parameter) and that of Japanese fonts (\Param{yjabaselineshift}
 parameter). 
 
 \begin{LTXexample}
@@ -790,7 +801,7 @@ For example, the following sets banner as `{\tt filename (2012-01-01 17:01)}':
 To load a font as a Japanese font, you must use the
 \verb+\jfont+ primitive instead of~\verb+\font+, while
 \verb+\jfont+ admits the same syntax used in~\verb+\font+. 
-\LuaTeX-ja automatically loads \texttt{luaotfload} package,
+\LuaTeX-ja automatically loads \Pkg{luaotfload} package,
 so TrueType/OpenType fonts with features can be used for Japanese fonts:
 \begin{LTXexample}
 \jfont\tradgt={file:ipaexg.ttf:script=latn;%
@@ -830,7 +841,7 @@ The followings are JFMs shipped with Lua\TeX-ja:
 \begin{description}
 \item[\tt jfm-ujis.lua] A standard JFM in Lua\TeX-ja. This JFM is
       based on \verb+upnmlminr-h.tfm+, a metric for UTF/OTF package that
-      is used in \upTeX. When you use \texttt{luatexja-otf.sty}, please use this JFM.
+      is used in \upTeX. When you use the \Pkg{luatexja-otf} package, please use this JFM.
 \item[\tt jfm-jis.lua] A counterpart for \verb+jis.tfm+, `JIS font
 	   metric' which is widely used in \pTeX. A major difference of
 	   \texttt{jfm-ujis.lua} and this \texttt{jfm-jis.lua} is that
@@ -918,9 +929,9 @@ The amount of the length of the `full-width'.
 
 \item[kanjiskip=\{<natural>, <stretch>, <shrink>\}] (optional)
 
-This field specifies the `ideal' amount of \textsf{kanjiskip}. As noted
+This field specifies the `ideal' amount of \Param{kanjiskip}. As noted
 	     in Subsection~\ref{subs-kskip}, if the parameter
-	     \textsf{kanjiskip} is \verb+\maxdimen+, the value specified
+	     \Param{kanjiskip} is \verb+\maxdimen+, the value specified
 	     in this field is actually used (if this field is not specified in
 	     JFM, it is regarded as 0\,pt). Note that <stretch> and <shrink>
 	     fields are in design-size unit too.
@@ -928,8 +939,8 @@ This field specifies the `ideal' amount of \textsf{kanjiskip}. As noted
 
 \item[xkanjiskip=\{<natural>, <stretch>, <shrink>\}] (optional)
 
-Like the \texttt{kanjiskip} field, this field specifies the `ideal'
-	     amount of \textsf{xkanjiskip}.
+Like the \Param{kanjiskip} field, this field specifies the `ideal'
+	     amount of \Param{xkanjiskip}.
 
 \end{list}
 
@@ -1143,9 +1154,9 @@ you can set both \verb+\fam+ and \verb+\jfam+ to~the same value.
 &Japanese fonts&alphabetic fonts\\
 \midrule
 font family&\verb+\jfam+${}\in [0,256)$&\verb+\fam+\\
-text size&\tt\textsf{jatextfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\verb+\textfont+<fam>=<font\_cs>\\
-script size&\tt\textsf{jascriptfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\verb+\scriptfont+<fam>=<font\_cs>\\
-scriptscript size&\tt\textsf{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\verb+\scriptscriptfont+<fam>=<font\_cs>\\
+text size&\tt\Param{jatextfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\verb+\textfont+<fam>=<font\_cs>\\
+script size&\tt\Param{jascriptfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\verb+\scriptfont+<fam>=<font\_cs>\\
+scriptscript size&\tt\Param{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\verb+\scriptscriptfont+<fam>=<font\_cs>\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1194,7 +1205,7 @@ You may assume that \verb+jfont_info+ has the following fields:
 The returned table \verb+new_jfont_info+ also should include these three fields. 
 The \verb+font_number+ is a font number. 
 
-A good example of this and the next callbacks is \texttt{luatexja-otf}
+A good example of this and the next callbacks is the \Pkg{luatexja-otf}
 	     package, supporting \verb+"AJ1-xxx"+ form for Adobe-Japan1
 	     CID characters in a JFM. This callback doesn't replace any
 	     code of \LuaTeX-ja.
@@ -1275,21 +1286,21 @@ in \pTeX, and symbols beside each parameter has the following meaning:
 \end{itemize}
 
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
-\item[\textsf{jcharwidowpenalty}\,=<penalty>] [\verb+\jcharwidowpenalty+]
+\item[\Param{jcharwidowpenalty}\,=<penalty>] [\verb+\jcharwidowpenalty+]
 
 Penalty value for supressing orphans. This penalty is inserted just
 	     after the last \textbf{JAchar} which is not regarded as a
 	     (Japanese) punctuation mark.
 
-\item[\textsf{kcatcode}\,=\{<chr\_code>,<natural number>\}]\
+\item[\Param{kcatcode}\,=\{<chr\_code>,<natural number>\}]\
 
 An additional attributes having each character whose character code is <chr\_code>.  
 At the present version, the lowermost bit of <natural number> indicates
 	     whether the character is considered as a punctuation mark
-	     (see the description of \textsf{jcharwidowpenalty} above).
+	     (see the description of \Param{jcharwidowpenalty} above).
 
 
-\item[\textsf{prebreakpenalty}\,=\{<chr\_code>,<penalty>\}] [\verb+\prebreakpenalty+]\ 
+\item[\Param{prebreakpenalty}\,=\{<chr\_code>,<penalty>\}] [\verb+\prebreakpenalty+]\ 
 %<*ja>
 文字コード<chr\_code>の\textbf{JAchar}が行頭にくることを抑止するために，
 	     この文字の前に挿入/追加されるペナルティの量を指定する．
@@ -1307,7 +1318,7 @@ At the present version, the lowermost bit of <natural number> indicates
 \end{verbatim}
 %</ja>
 
-\item[\textsf{postbreakpenalty}\,=\{<chr\_code>,<penalty>\}] [\verb+\postbreakpenalty+]
+\item[\Param{postbreakpenalty}\,=\{<chr\_code>,<penalty>\}] [\verb+\postbreakpenalty+]
 %<*ja>
 文字コード<chr\_code>の\textbf{JAchar}が行末にくることを抑止するために，
 	     この文字の後に挿入/追加されるペナルティの量を指定する．
@@ -1321,48 +1332,48 @@ At the present version, the lowermost bit of <natural number> indicates
 という制限があったが，\LuaTeX-ja ではこれらの制限は解消されている．
 %</ja>
 
-\item[\textsf{jatextfont}\,=\{<jfam>,<jfont\_cs>\}] [\verb+\textfont+ in \TeX]
-\item[\textsf{jascriptfont}\,=\{<jfam>,<jfont\_cs>\}] [\verb+\scriptfont+ in \TeX]
-\item[\textsf{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}] [\verb+\scriptscriptfont+ in \TeX]
-\item[\textsf{yjabaselineshift}\,=<dimen>$^\ast$]\ 
-\item[\textsf{yalbaselineshift}\,=<dimen>$^\ast$] [\verb+\ybaselineshift+]
+\item[\Param{jatextfont}\,=\{<jfam>,<jfont\_cs>\}] [\verb+\textfont+ in \TeX]
+\item[\Param{jascriptfont}\,=\{<jfam>,<jfont\_cs>\}] [\verb+\scriptfont+ in \TeX]
+\item[\Param{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}] [\verb+\scriptscriptfont+ in \TeX]
+\item[\Param{yjabaselineshift}\,=<dimen>$^\ast$]\ 
+\item[\Param{yalbaselineshift}\,=<dimen>$^\ast$] [\verb+\ybaselineshift+]
 
-\item[\textsf{jaxspmode}\,=\{<chr\_code>,<mode>\}] [\verb+\inhibitxspcode+]
+\item[\Param{jaxspmode}\,=\{<chr\_code>,<mode>\}] [\verb+\inhibitxspcode+]
 
-Setting whether inserting  \textsf{xkanjiskip} is allowed before/after a \textbf{JAchar} whose character code is <chr\_code>.
+Setting whether inserting  \Param{xkanjiskip} is allowed before/after a \textbf{JAchar} whose character code is <chr\_code>.
 The followings are allowed for <mode>:
 \begin{description}
-\item[0, \texttt{inhibit}] Insertion of \textsf{xkanjiskip} is inhibited before the charater, nor after the charater.
-\item[2, \texttt{preonly}] Insertion of \textsf{xkanjiskip} is allowed before the charater, but not after.
-\item[1, \texttt{postonly}] Insertion of \textsf{xkanjiskip} is allowed after the charater, but not before.
-\item[3, \texttt{allow}] Insertion of \textsf{xkanjiskip} is allowed before the charater and after the charater.
+\item[0, \texttt{inhibit}] Insertion of \Param{xkanjiskip} is inhibited before the charater, nor after the charater.
+\item[2, \texttt{preonly}] Insertion of \Param{xkanjiskip} is allowed before the charater, but not after.
+\item[1, \texttt{postonly}] Insertion of \Param{xkanjiskip} is allowed after the charater, but not before.
+\item[3, \texttt{allow}] Insertion of \Param{xkanjiskip} is allowed before the charater and after the charater.
 This is the default value.
 \end{description}
 
-\item[\textsf{alxspmode}\,=\{<chr\_code>,<mode>\}] [\verb+\xspcode+]
+\item[\Param{alxspmode}\,=\{<chr\_code>,<mode>\}] [\verb+\xspcode+]
 
-Setting whether inserting \textsf{xkanjiskip} is allowed before/after a
+Setting whether inserting \Param{xkanjiskip} is allowed before/after a
 	     \textbf{ALchar} whose character code is <chr\_code>.
 The followings are allowed for <mode>:
 \begin{description}
-\item[0, \texttt{inhibit}] Insertion of \textsf{xkanjiskip} is inhibited
+\item[0, \texttt{inhibit}] Insertion of \Param{xkanjiskip} is inhibited
 	   before the charater, nor after the charater.
-\item[1, \texttt{preonly}] Insertion of \textsf{xkanjiskip} is allowed
+\item[1, \texttt{preonly}] Insertion of \Param{xkanjiskip} is allowed
 	   before the charater, but not after.
-\item[2, \texttt{postonly}] Insertion of \textsf{xkanjiskip} is allowed
+\item[2, \texttt{postonly}] Insertion of \Param{xkanjiskip} is allowed
 	   after the charater, but not before.
-\item[3, \texttt{allow}] Insertion of \textsf{xkanjiskip} is allowed both
+\item[3, \texttt{allow}] Insertion of \Param{xkanjiskip} is allowed both
 	   before the charater and after the charater.
 This is the default value.
 \end{description}
-Note that parameters \textsf{jaxspmode} and \textsf{alxspmode} use a common table.
+Note that parameters \Param{jaxspmode} and \Param{alxspmode} use a common table.
 
-\item[\textsf{autospacing}\,=<bool>$^\ast$] [\verb+\autospacing+]
-\item[\textsf{autoxspacing}\,=<bool>$^\ast$] [\verb+\autoxspacing+]
-\item[\textsf{kanjiskip}\,=<skip>] [\verb+\kanjiskip+]
-\item[\textsf{xkanjiskip}\,=<skip>] [\verb+\xkanjiskip+]
+\item[\Param{autospacing}\,=<bool>$^\ast$] [\verb+\autospacing+]
+\item[\Param{autoxspacing}\,=<bool>$^\ast$] [\verb+\autoxspacing+]
+\item[\Param{kanjiskip}\,=<skip>] [\verb+\kanjiskip+]
+\item[\Param{xkanjiskip}\,=<skip>] [\verb+\xkanjiskip+]
 
-\item[\textsf{differentjfm}\,=<mode>$^\dagger$]
+\item[\Param{differentjfm}\,=<mode>$^\dagger$]
 
 Specify how glues/kerns between two \textbf{JAchar}s whose JFM (or size) are different. 
 The allowed arguments are the followings:
@@ -1373,8 +1384,8 @@ The allowed arguments are the followings:
 \item[\texttt{small}]
 \end{description}
 
-\item[\textsf{jacharrange}\,=<ranges>$^\ast$]
-\item[\textsf{kansujichar}\,=\{<digit>, <chr\_code>\}] [\verb+\kansujichar+]
+\item[\Param{jacharrange}\,=<ranges>$^\ast$]
+\item[\Param{kansujichar}\,=\{<digit>, <chr\_code>\}] [\verb+\kansujichar+]
 \end{list}
 
 
@@ -1414,7 +1425,7 @@ With the help of this example, we remark the specification of \verb+\inhibitglue
 \end{itemize}
 
 \section{Control Sequences for \LaTeXe}
-\subsection{Patch for NFSS2}
+\subsection{Patch for NFSS2}\label{ssub-nfsspat}
 As described in Subsection~\ref{ssec-ltx}, \LuaTeX-ja simply adopted
 \texttt{plfonts.dtx} in \pLaTeXe\ for the Japanese patch for NFSS2.
 For an convinience, we will describe
@@ -1468,6 +1479,32 @@ Like \verb+\fontfamily+, \verb+\selectfont+ is required to take an effect.
 
 \item[adjustbaseline]
 ...
+
+\item[fontfamily\{<family>\}]
+{\let\item\origitem
+As in \LaTeXe, this command changes current font family (alphabetic, Japanese,~\emph{or both}) 
+to <family>. Which family will be changed is determined as follows:
+\begin{itemize}
+\item Let current encoding scheme for Japanese fonts be
+      <ja-enc>. Current Japanese font family will be changed to
+      <family>, if one of the following two conditions is met:
+\begin{itemize}
+\item The family <fam> under the encoding <ja-enc> is already defined by
+      \verb+\DeclareKanijFamily+.
+\item A font definition named \texttt{<enc><ja-enc>.fd} (the filename is
+      all lowercase) exists.
+\end{itemize}
+\item Let current encoding scheme for Japanese fonts be
+      <al-enc>. For alphabetic font family, the criterion as above is used.
+\item There is a case which none of the above applies, that is, the font
+      family named <family> doesn't seem to be defined neither under the
+      encoding <ja-enc>, nor under <al-enc>. 
+
+In this case, the default family for font substitution is used for
+      alphabetic and Japanese fonts. Note that current encoding will not
+      be set to <family>, unlike the original inplementation in \LaTeX.
+\end{itemize}
+}
 \end{cslist}
 
 As closing this subsection, we shall introduce an example of
@@ -1503,7 +1540,7 @@ ordinary characters in the following points:
 \begin{itemize}
 \item Always treated as \textbf{JAchar}s.
 \item Processing codes for supporting OpenType features (\textit{e.g.},
-      glyph replacement and kerning) by the \texttt{luaotfload} package
+      glyph replacement and kerning) by the \Pkg{luaotfload} package
       is not performed to these characters.
 \end{itemize}
 
@@ -1541,21 +1578,21 @@ There is also a unit called `歯' which equals to $0.25\,\textrm{mm}$ and
 			fonts in scaled point ($2^{-16}\,\textrm{pt}$).
 \attr{ltj@ykblshift} The amount of shifting the baseline of Japanese
 			fonts in scaled point ($2^{-16}\,\textrm{pt}$).
-\attr{ltj@autospc} Whether the auto insertion of \textsf{kanjiskip} is allowed at the node.
-\attr{ltj@autoxspc} Whether the auto insertion of \textsf{xkanjiskip} is allowed at the node.
+\attr{ltj@autospc} Whether the auto insertion of \Param{kanjiskip} is allowed at the node.
+\attr{ltj@autoxspc} Whether the auto insertion of \Param{xkanjiskip} is allowed at the node.
 \attr{ltj@icflag} An attribute for distinguishing `kinds' of a node. One of the following value is
 			assigned to this attribute:
 \begin{description}
 \item[\textit{italic} (1)] Glues from an itaric correction
 	   (\verb+\/+). This distinction of origins of glues 
 	   (from explicit \verb+\kern+, or from \verb+\/+)
-	   is needed in the insertion process of \textsf{xkanjiskip}.
+	   is needed in the insertion process of \Param{xkanjiskip}.
 \item[\textit{packed} (2)] 
 \item[\textit{kinsoku} (3)] Penalties inserted for the word-wrapping  process of Japanese characters (\emph{kinsoku}).
 \item[\textit{from\_jfm} (4)] Glues/kerns from JFM.
 \item[\textit{line\_end} (5)] Kerns for ...
-\item[\textit{kanji\_skip} (6)] Glues for \textsf{kanjiskip}.
-\item[\textit{xkanji\_skip} (7)] Glues for \textsf{xkanjiskip}.
+\item[\textit{kanji\_skip} (6)] Glues for \Param{kanjiskip}.
+\item[\textit{xkanji\_skip} (7)] Glues for \Param{xkanjiskip}.
 \item[\textit{processed} (8)] Nodes which is already processed by ...
 \item[\textit{ic\_processed} (9)] Glues from an itaric correction, but also already processed.
 \item[\textit{boxbdd} (15)] Glues/kerns that inserted just the beginning or the ending of an hbox or a paragraph.
@@ -1585,7 +1622,7 @@ These whatsits will be removed during the process of inserting \textbf{JAglue}s.
 \paragraph{Background}
 \LuaTeX-ja has its own stack system, and most parameters of \LuaTeX-ja
 are stored in it.  To clarify the reason, imagine the parameter
-\textsf{kanjiskip} is stored by a skip, and consider the following
+\Param{kanjiskip} is stored by a skip, and consider the following
 source:
 \begin{LTXexample}
 \ltjsetparameter{kanjiskip=0pt}ふがふが.%
@@ -1594,8 +1631,8 @@ source:
 \end{LTXexample}
 
 As described in Part~\ref{part-ref}, the only effective value of
-\textsf{kanjiskip} in an hbox is the latest value, so the value of
-\textsf{kanjiskip} which applied in the entire hbox should be 5\,pt.
+\Param{kanjiskip} in an hbox is the latest value, so the value of
+\Param{kanjiskip} which applied in the entire hbox should be 5\,pt.
 However, by the implementation method of \LuaTeX, this `5\,pt' cannot be
 known from any callbacks.  In the \texttt{tex/packaging.w} (which is a
 file in the source of \LuaTeX), there are the following codes:
@@ -1844,7 +1881,7 @@ u
 %</ja>
 
 
-\section{Insertion of JFM glues, \textsf{kanjiskip} and \textsf{xkanjiskip}}
+\section{Insertion of JFM glues, \Param{kanjiskip} and \Param{xkanjiskip}}
 \subsection{Overview}
 %<*en>
 NOT COMPLETED
@@ -1856,12 +1893,12 @@ NOT COMPLETED
 \begin{itemize}
 \item JFMグルーの挿入は，和文文字を表すトークンを元に水平リストに（文字を表す）<char\_node>を
 追加する過程で行われる．
-\item \textsf{xkanjiskip}の挿入は，hboxへのパッケージングや行分割前に行われる．
-\item \textsf{kanjiskip}はノードとしては挿入されない．パッケージングや行分割の計算時に
-「和文文字を表す2つの<char\_node>の間には\textsf{kanjiskip}がある」ものとみなされる．
+\item \Param{xkanjiskip}の挿入は，hboxへのパッケージングや行分割前に行われる．
+\item \Param{kanjiskip}はノードとしては挿入されない．パッケージングや行分割の計算時に
+「和文文字を表す2つの<char\_node>の間には\Param{kanjiskip}がある」ものとみなされる．
 \end{itemize}
 しかし，\LuaTeX-jaでは，hboxへのパッケージングや行分割前に全ての
-\textbf{JAglue}，即ちJFMグルー・\textsf{xkanjiskip}・\textsf{kanjiskip}の
+\textbf{JAglue}，即ちJFMグルー・\Param{xkanjiskip}・\Param{kanjiskip}の
 3種類を一度に挿入することになっている．これは，\LuaTeX において欧文の合字・
 カーニング処理がノードベースになったことに対応する変更である．
 

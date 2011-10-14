@@ -274,5 +274,6 @@ function append_italic()
 	 g.kern = font.fonts[f].characters[p.char].italic
       end
       node.write(g)
+      tex.attribute[attr_icflag] = -(0x7FFFFFFF)
    end
 end
