@@ -6,6 +6,11 @@
 
 % for test
 \DeclareTextFontCommand{\textix}{\fontshape{ix}\selectfont}
+\DeclareFontFamily{OT1}{hoge}{}\DeclareFontShape{OT1}{hoge}{m}{n}{<-> pagk7t}{}
+\DeclareKanjiFamily{JY3}{hoge}{}
+\DeclareFontShape{JY3}{hoge}{m}{n}{<-> file:ipaexg.ttf:jfm=ujis}{}
+
+\DeclareFontSubstitution{OT1}{cmss}{m}{n}
 
 \makeatother
 \begin{document}
@@ -87,4 +92,31 @@ font series `ix': 欧文は未定義，和文は機械的斜体．
 正しい補正量：$0.962216\times 10 \times 0.88\times 0.25 \simeq
 \directlua{tex.print(0.962216*10*0.88*0.25)}\,\textrm{pt}$
 
+\paragraph{fontfamily}\
+\makeatletter
+\def\TEST#1{\par{\fontfamily{#1}\selectfont あいうabc: font\hfill(#1: \k@family, \f@family)}}
+
+\gt
+\TEST{mc}
+\TEST{fuga}
+\TEST{fuga}
+\TEST{mc}
+
+{\fontfamily{hoge}\selectfont あいうabc: font\hfill(\k@family, \f@family)}
+
+{\romanfamily{hoge}\selectfont あいうabc: roman\hfill(\k@family, \f@family)}
+
+{\kanjifamily{hoge}\selectfont あいうabc: kanji\hfill(\k@family, \f@family)}
+
+\TEST{mc}
+\TEST{ptm}
+\TEST{ptm}
+
+\makeatletter
+\let\@@fontfamily=\fontfamily
+\def\fontfamily#1{(\k@family, \f@family)\@@fontfamily{#1}(\k@family, \f@family)}
+
+あい{うえお\texttt{abc}\globaldefs1あ\/い}うえお
+
+あいうえお{\tt abc}あいうえお
 \end{document}

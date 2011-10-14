@@ -146,8 +146,7 @@
 \def\DeclareFontFamily#1#2#3{%
  \@ifundefined{T@#1}%
     {\@latex@error{Encoding scheme `#1' unknown}\@eha}%
-    {\edef\tmp@item{{#2}}%
-     \def\reserved@a{#3}%
+    {\def\reserved@a{#3}%
      \global
      \expandafter\let\csname #1+#2\expandafter\endcsname
             \ifx \reserved@a\@empty
@@ -159,8 +158,7 @@
 \def\DeclareKanjiFamily#1#2#3{%
  \@ifundefined{T@#1}%
     {\@latex@error{KANJI Encoding scheme `#1' unknown}\@eha}%
-    {\edef\tmp@item{{#2}}%
-     \def\reserved@a{#3}%
+    {\def\reserved@a{#3}%
      \global
      \expandafter\let\csname #1+#2\expandafter\endcsname
             \ifx \reserved@a\@empty
@@ -520,7 +518,10 @@
      \fi
   \fi
   \if@notkfam\if@notffam
-      \edef\k@family{#1}\edef\f@family{#1}%
+      {\ifcsname D@\k@encoding\endcsname\@nameuse{D@\k@encoding}\fi
+        \xdef\@@temp{\default@family}}\edef\k@family{\@@temp}%
+      {\ifcsname D@\f@encoding\endcsname\@nameuse{D@\f@encoding}\fi
+        \xdef\@@temp{\default@family}}\edef\f@family{\@@temp}%
   \fi\fi
 }
 \DeclareRobustCommand\romanseries[1]{\edef\f@series{#1}}
