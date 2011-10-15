@@ -60,7 +60,7 @@ leftskip=.3cm,rightskip=.3cm plus1fil]{title in head/foot}%
     \end{beamercolorbox}
   \end{centering}
 
-\lines{30}\vskip8pt
+\lines{29.5}\vskip8pt
   \begin{centering}
     \begin{beamercolorbox}[sep=8pt,center,#1]{author}
       \usebeamerfont{author}\insertauthor
@@ -145,7 +145,7 @@ leftskip=.3cm,rightskip=.3cm plus1fil]{title in head/foot}%
     \item pdfへの直接出力（pdf\TeX の後継）
     \item Unicodeへの対応{\small （SIP内の文字も余裕）}
     \item TrueType/OpenTypeフォントの直接利用
-    \item Luaスクリプトで\TeX 処理のカスタマイズが可能\\
+    \item Luaスクリプトで\TeX 内部処理のカスタマイズが可能\\
       \quad →もはやエンジンレベルで拡張する必要はない
   \end{itemize}
 
@@ -168,7 +168,7 @@ leftskip=.3cm,rightskip=.3cm plus1fil]{title in head/foot}%
     \item \texttt{luajalayout}パッケージ（作者：前田一貴）\\\quad
       {\small フォント合成・fontspecパッケージを用いた実装．}
   \end{itemize}
-  は「\LaTeX ベース」，組版の調整機能が不足していた．
+  は「\LaTeX ベース」で，組版の調整機能が不足していた．
   \end{itemize}
 \end{frame}
 
@@ -212,10 +212,9 @@ leftskip=.3cm,rightskip=.3cm plus1fil]{title in head/foot}%
 
 \subsection{使い方: \LaTeX}
 \begin{frame}
-  \frametitle{p\LaTeX 用ソース}
+  \frametitle{\only<1>{p\LaTeX}\only<2>{``Lua\LaTeX-ja''}用ソース}
 \begin{flushleft}\ttfamily
 |documentclass[a4paper,10pt]\{\only<1>{jsarticle}\alert{\only<2>{ltjsarticle}}\}\\
-\alert{\only<2>{|usepackage\{luatexja\}}}\only<1>{\notice{\%}}\\
 |usepackage\{lmodern\}|begin\{document\}\\
 「これはまったく意味がない日本語の文だ．」\\
 （あいう）\{|large|gtfamily（abcゴシック）\}\\
@@ -227,9 +226,9 @@ leftskip=.3cm,rightskip=.3cm plus1fil]{title in head/foot}%
 \end{flushleft}
 \uncover<2>{
 \begin{itemize}
-\item 日本語組版用クラスを\alert{ltjsarticle.cls}に変える\\
-（まだmasterブランチにはマージされていないので，
-そこではとりあえず八登さんの\texttt{bxjsarticle}で代用がよい）
+\item クラスを\alert{Lua\TeX-ja 同梱のもの}に変える．
+\item 欧文用クラスに対しても，{\ttfamily|usepackage\{luatexja\}}で\\
+最低限の設定がされる．
 \end{itemize}
 }
 \end{frame}
@@ -366,7 +365,7 @@ $\zeta(2) \simeq
     \item 禁則処理用のペナルティ挿入
     \item 欧文・和文のベースライン上下移動
     \item 和文文字直後の改行での空白挿入抑制\alert{（限定的）}
-    \item \alert{縦書き関連はまだ}
+    \item \alert{縦書き関連はまだ}．また，\alert{速度が非常に遅い}．
   \end{itemize}
   しかし，細かい仕様変更はまだ行う可能性はある．
 \end{frame}
@@ -381,14 +380,19 @@ $\zeta(2) \simeq
   \begin{itemize}
     \item 和文フォントの管理（\texttt{plfonts.dtx}相当）
     \item \LaTeX カーネルへのパッチ（\texttt{plcore.dtx}相当）\\
-    但し，次の変更はomitした：
+    但し，次の変更はomitしている：
     \begin{itemize}
       \item ボトムフロートの出力順序
       \item 脚注マクロ
     \end{itemize}
-    \item 日本語用クラスファイル：\\
-    試験的に\texttt{ltjclasses}, \texttt{ltjsclasses}を作成．\\
-    {\small（現時点では，masterブランチにはマージされていない．）}
+    \item 日本語用クラスファイルを試験的に作成．\\
+    {\small（しかし，最終的にどうなるかは未決定）}
+    \begin{itemize}
+     \def\ {\setbox0=\hbox{M}\hskip\wd0}
+      \item \alert{\texttt{ltjclasses\ }}: \texttt{jclasses\ }%
+	    \hskip\ltjgetparameter{xkanjiskip}のLua\TeX-ja対応版
+      \item \alert{\texttt{ltjsclasses}}: \texttt{jsclasses}のLua\TeX-ja対応版
+    \end{itemize}
   \end{itemize}
 \end{frame}
 
@@ -400,7 +404,7 @@ $\zeta(2) \simeq
 \noindent\textbf{fontspec対応}
 \begin{itemize}
 \item \verb+luatexja-fontspec+パッケージを使用する．
-\item 和文フォント用命令は\verb+\setmainjfont+のように「j」がつく．
+\item 和文フォント用命令は\verb+\setmainjfont+, \verb+\setsansjfont+のように「j」がつく．
 \end{itemize}
 
 \noindent\textbf{OTFパッケージの機能}
@@ -529,7 +533,8 @@ $\zeta(2) \simeq
 \item 行分割に影響しないものも無視
 \item 例え\textcolor{green}{字形}が異なっても，
 \textcolor{blue}{metric}と\textcolor{red}{サイズ}が同じならば，
-空白挿入処理では同じフォントとして扱われる
+空白挿入処理では同じフォントとして扱われる\\
+（違うフォントとして扱うことも設定により可能）
 \end{enumerate}
 }}
 \end{frame}
@@ -557,11 +562,11 @@ $\zeta(2) \simeq
 \begin{itemize}
 \item \leavevmode
 \smash{\spc{10}{green}\bar\spc{10}{blue}\hskip7.04pt}%
-：$\textcolor{green}{5\,\textrm{pt\footnotesize （左側由来）}}
+：$\textcolor{green}{5\,\text{pt\footnotesize （左側由来）}}
 +\textcolor{blue}{5\,\text{pt\footnotesize （右側由来）}}=10\,\text{pt}$
 \item \leavevmode
 \smash{\spc{10}{blue}\bar\spc{14.4}{red}}%
-：$\textcolor{blue}{5\,\textrm{pt\footnotesize （左側由来）}}
+：$\textcolor{blue}{5\,\text{pt\footnotesize （左側由来）}}
 +\textcolor{red}{7.2\,\text{pt\footnotesize （右側由来）}}=12.2\,\text{pt}$
 \end{itemize}
 \end{frame}
@@ -589,11 +594,11 @@ Lua\TeX-jaにおいて，異なるフォントの文字間には，\\
 \begin{itemize}
 \item \leavevmode
 \smash{\spc{10}{blue!50!green}\hskip3.52pt}%
-：$(\textcolor{green}{5\,\textrm{pt\footnotesize （左側由来）}}
+：$(\textcolor{green}{5\,\text{pt\footnotesize （左側由来）}}
 +\textcolor{blue}{5\,\text{pt\footnotesize （右側由来）}})/2=5\,\text{pt}$
 \item \leavevmode
 \smash{\spc{12.2}{purple}}%
-：$(\textcolor{blue}{5\,\textrm{pt\footnotesize （左側由来）}}
+：$(\textcolor{blue}{5\,\text{pt\footnotesize （左側由来）}}
 +\textcolor{red}{7.2\,\text{pt\footnotesize （右側由来）}})/2=6.1\,\text{pt}$
 \end{itemize}
 \end{frame}
@@ -610,7 +615,7 @@ Lua\TeX-jaにおいて，異なるフォントの文字間には，\\
 \bigskip
 \textbf{入力例}：\hskip2\zw\unitlength=1\zw
 {\color{green}\begin{picture}(0,0)\thicklines\put(0,0.38){\vector(0,-1){1.1}}\end{picture}%
-\inhibitglue「ひらがな他を欧文扱いにする」}
+「ひらがな他を欧文扱いにする」}
 \fbox{\vbox{\tt
 {\color{green}|ltjsetparameter\{jacharrange=\{-6\}\}}xあ\\
 y
