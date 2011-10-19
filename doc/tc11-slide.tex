@@ -1,7 +1,7 @@
 %#! lualatex -shell-escape tc11-slide.tex
 \documentclass[notheorems,12pt,hyperref={unicode=true}]{beamer}
-\usepackage{luatexja,luatexja-otf,showexpl,lltjlisting}
-\usepackage{lmodern,mathtools,graphicx,pict2e}
+\usepackage{luatexja,luatexja-otf,luatexja-fontspec,showexpl,lltjlisting}
+\usepackage{mathtools,graphicx,pict2e}
 \usepackage{amsmath,bm,mflogo,booktabs}
 \usepackage[all]{xy}
 
@@ -160,7 +160,6 @@ leftskip=.3cm,rightskip=.3cm plus1fil]{title in head/foot}%
     p\TeX のプリミティブに対応する機能から実装．}%
   \end{flushleft}\vskip-\medskipamount
   \begin{itemize}
-  \item 最低でもp\TeX と同等の組版の自由度を確保する．\medskip
   \item 以前から存在した，Lua\TeX で日本語組版を行う実験：
   \begin{itemize}
     \item \texttt{luaums.sty}（北川）\\\quad
@@ -168,7 +167,8 @@ leftskip=.3cm,rightskip=.3cm plus1fil]{title in head/foot}%
     \item \texttt{luajalayout}パッケージ（作者：前田一貴）\\\quad
       {\small フォント合成・fontspecパッケージを用いた実装．}
   \end{itemize}
-  は「\LaTeX ベース」で，組版の調整機能が不足していた．
+  は「\LaTeX ベース」で，組版の調整機能が不足していた．\medskip
+  \item 最低でもp\TeX と同等の組版の自由度を確保する．
   \end{itemize}
 \end{frame}
 
@@ -185,7 +185,8 @@ leftskip=.3cm,rightskip=.3cm plus1fil]{title in head/foot}%
   \begin{flushleft}
     \alert{\bfseries\large 
     最終的に，（空白挿入等の）仕様を文書化する．}
-  \end{flushleft}
+  \end{flushleft}\vskip-\medskipamount
+  とは言いながら，ドキュメントはまだまだ未完成．
 \end{frame}
 
 \subsection{使い方: plain \TeX}
@@ -448,8 +449,8 @@ $\zeta(2) \simeq
 \frametitle{和文フォントの指定方法}
 
 \begin{flushleft}
-\tt\Large |jfont|piyo=\textcolor{green}{psft:GothicBBB-Medium}\\
-\hskip5em:\textcolor{blue}{jfm=ujis};...\ \textcolor{red}{at 20pt}
+\tt\Large |jfont|piyo=\textcolor{green}{psft:FutoMinA101-Bold}\\
+\hskip5em:\textcolor{blue}{jfm=ujis};...\ \textcolor{red}{at 15pt}
 \end{flushleft}
 
 和文フォントは，次の3要素の組である：
@@ -457,10 +458,15 @@ $\zeta(2) \simeq
 \item[\textcolor{green}{字形}]
   OpenType/TrueTypeフォントも可．\\
   prefix \texttt{psft:}で非埋込フォントを指定可能．
-\item[\textcolor{blue}{metric}] p\TeX のJFMに相当．\verb+jfm-ujis.lua+に格納．
+\item[\textcolor{blue}{metric}] p\TeX のJFMに相当するが，若干設定項目が増加．\\
+上の例では\texttt{jfm-\textcolor{blue}{ujis}.lua}が使われる．
 \item[\textcolor{red}{サイズ}]\ 
 \end{description}
-
+\medskip
+\noindent →\hfill
+\jfont\piyo=psft:FutoMinA101-Bold:jfm=ujis at 15pt
+\piyo 明朝の太文字（非埋込）だよ！
+\hfill\null
 \end{frame}
 
 \subsection{空白挿入処理}
@@ -581,8 +587,8 @@ Lua\TeX-jaにおいて，異なるフォントの文字間には，\\
 
 \leavevmode
 \vtop{\parindent=0pt\hsize=40pt\ \par\vskip5pt metric\par size}
-\fw{\fontfamily{mc}\selectfont あ}{ujis$'$}{10}{green}{10}
-\hw{\fontfamily{mc}\selectfont〗}{\textcolor{green}{ujis$'$}}{10}{green}{10}
+\fw{\fontfamily{mc}\selectfont あ}{min}{10}{green}{10}
+\hw{\fontfamily{mc}\selectfont〗}{\textcolor{green}{min}}{10}{green}{10}
 \spc{10}{green!50!blue}
 \hw{〖}{\textcolor{blue}{ujis}}{10}{blue}{10}
 \fw{い}{ujis}{10}{blue}{10}
@@ -603,10 +609,10 @@ Lua\TeX-jaにおいて，異なるフォントの文字間には，\\
 \end{itemize}
 \end{frame}
 
-\subsection{注意}
+\subsection{和文文字直後の改行}
 \begin{frame}[fragile]
 \frametitle{和文文字直後の改行}
-{\bf\large Lua\TeX の仕様により，ad hocな実装}
+{\bf\large Lua\TeX の仕様により，限定的な実装}
 
 \medskip
 改行による空白が抑制されるかは，\\
@@ -638,11 +644,13 @@ y
 \end{frame}
 
 
+\AtBeginSection[]{}
+\section{プロジェクトについて}
 \begin{frame}
 \frametitle{Lua\TeX-ja プロジェクトについて}
 \begin{itemize}
 \item \textbf{公式ページ}\\
-\url{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage}
+{\tt http://sourceforge.jp/projects/\alert{luatex-ja}/\\\hfill wiki/FrontPage}
 \item まだ安定版のリリースはない．\\スナップショットがダウンロード可能．
 \item \textbf{開発メンバー}
 \begin{itemize}
