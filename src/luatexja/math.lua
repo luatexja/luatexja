@@ -109,7 +109,7 @@ function (p, sty)
 	    local class = ltjf_find_char_class(p.char, met)
 	    set_attr(r, attr_jchar_class, class)
 	    ltjw.char_data = ltjf.metrics[met.jfm].size_cache[met.size].char_type[class]
-	    ltjw.head = r; ltjw.capsule_glyph(r, tex.mathdir , true);
+	    ltjw.head = r; ltjw.capsule_glyph(r, tex.mathdir , true, met, class);
 	    q.head = ltjw.head; node_free(p); p=q;
 	 end
       end
