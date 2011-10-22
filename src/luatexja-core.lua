@@ -61,7 +61,7 @@ end
 
 -- Three aux. functions, bollowed from tex.web
 local unity=65536
-local function print_scaled(s)
+function print_scaled(s)
    local out=''
    local delta=10
    if s<0 then 

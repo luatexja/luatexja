@@ -1168,7 +1168,8 @@ be accessed via \verb+luatexbase.add_to_callback+ function and so on, as other c
 \begin{list}{}%
 {\def\makelabel#1{\bfseries#1}}
 \item[\texttt{luatexja.load\_jfm} callback]
-With this callback you can overwrite JFMs.
+With this callback you can overwrite JFMs. 
+This callback is called when a new JFM is loaded.
 
 \begin{verbatim}
 function (<table> jfm_info, <string> jfm_name)
@@ -1234,8 +1235,36 @@ The argument \verb+char_class+ is the result of \LuaTeX-ja's default
 
 This callback doesn't replace any code of \LuaTeX-ja.
 
+\item[\texttt{luatexja.set\_width} callback]
+This callback is called when \LuaTeX-ja is trying to encapsule a
+	     \textbf{JAchar} \textit{glyph\_node}, to adjust its
+	     dimension and position.
+\begin{lstlisting}[numbers=left]
+function (<table> shift_info, <table> jfont_info, <number> char_class)
+  return <table> new_shift_info
+end
+\end{lstlisting}
 
+The argument \verb+shift_info+ and the returned \verb+new_shift_info+ have 
+\texttt{down} and \texttt{left} fields, which are the amount of shifting
+	     down/left the character in a scaled-point.
 
+%<*ja>
+良い例が\Pkg{test/valign.lua}である．このファイルが読み込まれた状態では，
+	     JFM内で規定された文字クラス0の文字における$(\hbox{高
+	     さ}):(\hbox{深さ})$の比になるように，実際のフォントの出力上
+	     下位置が自動調整される．例えば，
+\begin{itemize}
+\item JFM側の設定：$(\hbox{高さ})=88x$, $(\hbox{深さ})=12x$%
+（和文OpenTypeフォントの標準値）
+\item 実フォント側の数値：$(\hbox{高さ})=28y$, $(\hbox{深さ})=5y$（和文TrueTypeフォントの標準値）
+\end{itemize}
+となっていたとする．すると，実際の文字の出力位置は，
+\[
+ \frac{88x}{88x+12x} (28y+5y) - 28y = \frac{26}{825}y= 0.03\dot1\dot5y
+\]
+だけ上にずらされることになる，
+%</ja>
 \end{list}
 
 
@@ -1567,8 +1596,8 @@ As explained in Subsection~\ref{ssec-plain}, \verb+\jQ+ is equal to
 			a unit used in Japanese phototypesetting. So one should not change the value of this dimension. 
 \dim{jH}
 There is also a unit called `歯' which equals to $0.25\,\textrm{mm}$ and
-			used in Japanese phototypesetting. The dimension
-			\verb+\jH+ stores this length, similar to \verb+\jQ+. 
+			used in Japanese phototypesetting. This
+			\verb+\jH+ is a synonym of \verb+\jQ+.
 \dim{ltj@zw} A temporal register for the `full-width' of current Japanese font.
 \dim{ltj@zh} A temporal register for the `full-height' (usually the sum of height of imaginary body and its depth) of current Japanese font.
 \attr{jfam} Current number of Japanese font family for math formulas.

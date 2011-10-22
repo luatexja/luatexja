@@ -13,11 +13,11 @@ local ltjf_find_char_class = ltjf.find_char_class
 
 local function set_valign(fmtable, fn)
    local fi = fonts.ids[fn]
-   local fa = fi.ascender / (fi.ascender + fi.descender)
    local mt = ltjf.metrics[fmtable.jfm].char_type[0]
-   local ma = mt.height / (mt.height + mt.depth)
-   fmtable.down_offset = round((fa - ma)*fi.size)
-   print('loading :', fn, fmtable.down_offset)
+   local ma = mt.height / (mt.height + mt.depth) * (fi.ascender + fi.descender)
+   fmtable.down_offset = round(fi.ascender - ma)
+   print('loading :', fn, print_scaled(fmtable.down_offset)
+      .. ' / ' .. print_scaled(fi.size))
    return fmtable
 end
 luatexbase.add_to_callback("luatexja.define_jfont", 
