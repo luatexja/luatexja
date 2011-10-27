@@ -1,16 +1,8 @@
 %#! lualatex -shell-escape manual.ins
 
-%<*en>
-\documentclass[a4paper,titlepage]{article}
+%<en>\documentclass[a4paper,titlepage]{article}
+%<ja>\documentclass[a4paper,titlepage]{ltjsarticle}
 \usepackage[margin=20mm,footskip=5mm]{geometry}
-%</en>
-%<*ja>
-\documentclass[a4paper,titlepage]{bxjsarticle}
-\setpagelayout*{margin=20mm,footskip=5mm}
-\def\headfont{\normalfont\bfseries}
-% \def\headfont{\sffamily\gtfamily} is needed in ordinal documents
-% This document cannot typeset in ltjsclasses (conflict with showexpl?)
-%</ja>
 
 \usepackage{amsmath,amssymb,xcolor,pict2e,multienum,amsthm,float}
 \usepackage{booktabs,listings,lltjlisting,showexpl,multicol}
