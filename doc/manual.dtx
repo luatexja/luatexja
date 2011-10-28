@@ -7,7 +7,7 @@
 \usepackage{amsmath,amssymb,xcolor,pict2e,multienum,amsthm,float}
 \usepackage{booktabs,listings,lltjlisting,showexpl,multicol}
 \usepackage{luatexja-otf}
-\usepackage[unicode=false]{hyperref}
+\usepackage[unicode]{hyperref}
 \usepackage[all]{xy}
 \SelectTips{cm}{}
 
@@ -21,7 +21,8 @@
 \DeclareRobustCommand\epTeX{\ensuremath{\varepsilon}-\kern-.125em\pTeX}
 
 \theoremstyle{definition}
-\newtheorem{defn}{Definition}
+%<en>\newtheorem{defn}{Definition}
+%<ja>\newtheorem{defn}{定義}
 
 \newenvironment{cslist}{%
   \leftskip2em\parindent=0pt\def\makelabel##1{{\tt\char92##1}}
@@ -74,15 +75,15 @@
 grammatical (and contextual) errors.}
 %</en>
 %<*ja>
-\textbf{\large 本ドキュメントはまだまだ未完成です．
-また，英語版と日本語版をdocstripプログラムを用いることで一緒に生成している都合上，
-見出しが英語のままになっています．}
+\textbf{\large 本ドキュメントはまだまだ未完成です．}
 %</ja>
 
 \clearpage
-\part{User's manual}
+%<en>\part{User's manual}
+%<ja>\part{ユーザーズマニュアル}
 
-\section{Introduction}
+%<en>\section{Introduction}
+%<ja>\section{はじめに}
 
 %<*en>
 The \LuaTeX-ja package is a macro package for typesetting high-quality
@@ -93,7 +94,9 @@ Japanese documents when using \LuaTeX.
 /それ以上の品質の日本語組版を実現させようとするマクロパッケージである．
 %</ja>
 
-\subsection{Backgrounds}
+%<en>\subsection{Backgrounds}
+%<ja>\subsection{背景}
+
 %<*en>
 Traditionally, ASCII \pTeX, an extension of \TeX, and its derivatives
 are used to typeset Japanese documents in \TeX. \pTeX\ is an engine
@@ -102,17 +105,6 @@ without using very complicated macros. But this point is a mixed
 blessing: \pTeX\ is left behind from other extensions of \TeX,
 especially \eTeX\ and pdf\TeX, and from changes about
 Japanese processing in computers (\textit{e.g.}, the UTF-8 encoding).
-
-Recently extensions of \pTeX, namely \upTeX\ (Unicode-implementation
-of \pTeX) and \epTeX\ (merging of \pTeX\ and
-\eTeX\ extension), have developed to fill those gaps to some
-extent, but gaps still exist.
-
-However, the appearance of \LuaTeX\ changed the whole situation. With
-using Lua `callbacks', users can customize the internal processing of
-\LuaTeX. So there is no need to modify sources of engines to
-support Japanese typesetting: to do this, we only have to write Lua
-scripts for appropriate callbacks.
 %</en>
 %<*ja>
 従来，「\TeX を用いて日本語組版を行う」といったとき，エンジンとしては
@@ -123,7 +115,15 @@ ASCII \pTeX やそれの拡張物が用いられることが一般的であっ�
 行われている数々の\TeX の拡張──例えば\eTeX や\pdfTeX ──や，TrueType,
 OpenType, Unicodeといった計算機で日本語を扱う際の状況の変化に追従すること
 を怠ってしまったのだ．
+%</ja>
 
+%<*en>
+Recently extensions of \pTeX, namely \upTeX\ (Unicode-implementation
+of \pTeX) and \epTeX\ (merging of \pTeX\ and
+\eTeX\ extension), have developed to fill those gaps to some
+extent, but gaps still exist.
+%</en>
+%<*ja>
 ここ数年，若干状況は改善されてきた．現在手に入る大半の\pTeX バイナリでは
 外部UTF-8入力が利用可能となり，さらにUnicode化を推進し，\pTeX の内部処理
 までUnicode化した\upTeX も開発されている．また，\pTeX に\eTeX 拡張をマー
@@ -131,7 +131,16 @@ OpenType, Unicodeといった計算機で日本語を扱う際の状況の変化
 るようになった．だが，\pdfTeX 拡張（pdf直接出力やmicro-typesetting）を
 \pTeX に対応させようという動きはなく，海外とのgapは未だにあるのが現状であ
 る．
+%</ja>
 
+%<*en>
+However, the appearance of \LuaTeX\ changed the whole situation. With
+using Lua `callbacks', users can customize the internal processing of
+\LuaTeX. So there is no need to modify sources of engines to
+support Japanese typesetting: to do this, we only have to write Lua
+scripts for appropriate callbacks.
+%</en>
+%<*ja>
 しかし，\LuaTeX の登場で，状況は大きく変わることになった．Luaコードで
 `callback'を書くことにより，\LuaTeX の内部処理に割り込みをかけることが可
 能となった．これは，エンジン拡張という真似をしなくても，Luaコードとそれに
@@ -141,14 +150,15 @@ OpenType, Unicodeといった計算機で日本語を扱う際の状況の変化
 が始まったパッケージである．
 %</ja>
 
-\subsection{Major Changes from \pTeX}
+%<en>\subsection{Major Changes from \pTeX}
+%<ja>\subsection{\pTeX からの主な変更点}
+
 %<*en>
 The \LuaTeX-ja package is under much influence of \pTeX\ engine. The initial
 target of development was to implement features of \pTeX. However,
 \emph{\LuaTeX-ja is not a just porting of \pTeX; unnatural
 specifications/behaviors of \pTeX\ were not adopted}.
 %</en>
-
 %<*ja>
 \LuaTeX-jaは，\pTeX に多大な影響を受けている．初期の開発目標は，\pTeX の機
 能をLuaコードにより実装することであった．しかし，開発が進むにつれ，\pTeX
@@ -158,71 +168,211 @@ specifications/behaviors of \pTeX\ were not adopted}.
 れば，そこは積極的に改める．}
 %</ja>
 
+%<*en>
 The followings are major changes from \pTeX:
+%</en>
+%<*ja>
+以下は \pTeX からの主な変更点である．
+%</ja>
+
 \begin{itemize}
+%<*en>
 \item A Japanese font is a tuple of a `real' font, a Japanese font
       metric (\textbf{JFM}, for short), and an optional string called
       `variation'.
+%</en>
+%<*ja>
+\item 和文フォントは「実際の」フォント，和文フォントメトリック（JFM と呼ぶ），そ
+      して `variation' と呼ばれる文字列の組である．
+%</ja>
 
+%<*en>
 \item In \pTeX, a linebreak after Japanese character is ignored (and
       doesn't yield a space), since linebreaks (in source files) are
       permitted almost everywhere in Japanese texts. However, \LuaTeX-ja
       doesn't have this function completely, because of a specification
       of \LuaTeX.
+%</en>
+%<*ja>
+\item 日本語の文書中では改行はほとんどどこでも許されるので，\pTeX では和文文字
+      直後の改行は無視される（スペースが入らない）ようになっていた．しかし，
+      \LuaTeX-ja では \LuaTeX の仕様のためにこの機能は完全には実装されていない．
+%</ja>
+
+%<*en>
 \item The insertion process of glues/kerns between two Japanese
       characters and between a Japanese character and other characters
       (we refer these glues/kerns as \textbf{JAglue}) is rewritten from
       scratch.
+%</en>
+%<*ja>
+\item 2つの和文文字の間，和文文字と欧文文字の間に入るグルー／カーン
+      （\textbf{JAglue} と呼ぶ）の挿入処理が0から書き直されている．
+%</ja>
 
 \begin{itemize}
+%<*en>
 \item As \LuaTeX's internal character handling is `node-based'
       (\textit{e.g.}, \verb+of{}fice+ doesn't prevent ligatures), the
       insertion process of \textbf{JAglue} is now `node-based'.
+%</en>
+%<*ja>
+\item \LuaTeX の内部での文字の扱いが「ノードベース」になっているように（例えば，
+      \verb+of{}fice+ で合字は抑制されない），\textbf{JAglue} の挿入処理も
+      「ノードベース」である．
+%</ja>
+
+%<*en>
 \item Furthermore, nodes between two characters which have no effects in
       linebreak (\textit{e.g.}, \verb+\special+ node) are ignored in the
       insertion process.
+%</en>
+%<*ja>
+\item さらに，2つの文字の間にある行末では効果を持たないノード（例えば 
+      \verb+\special+ ノード）は挿入処理中では無視される．
+%</ja>
+
+%<*en>
 \item In the process, two Japanese fonts which differ in their `real'
       fonts only are identified.
+%</en>
+%<*ja>
+\item 処理中では，2つの和文フォントは「実際の」フォントが異なる場合のみ区別され
+      る．
+%</ja>
 \end{itemize}
+
+%<*en>
 \item At the present, vertical typesetting (\emph{tategaki}), is not
       supported in \LuaTeX-ja.
+%</en>
+%<*ja>
+\item 現時点では，縦書きは \LuaTeX-ja ではサポートされていない．
+%</ja>
 
 \end{itemize} 
-For detailed information, see Part~\ref{part-imp}.
 
-\subsection{Notations}
+%<*en>
+For detailed information, see Part~\ref{part-imp}.
+%</en>
+%<*ja>
+詳細については第 \ref{part-imp} 部を見よ．
+%</ja>
+
+%<en>\subsection{Notations}
+%<ja>\subsection{用語と記法}
+
+%<*en>
 In this document, the following terms and notations are used:
+%</en>
+%<*ja>
+本ドキュメントでは，以下の用語と記法を用いる：
+%</ja>
+
 \begin{itemize}
+%<*en>
 \item Characters are divided into two types: 
+%</en>
+%<*ja>
+\item 文字は2種類に分けられる：
+%</ja>
 \begin{itemize}
+%<*en>
 \item \textbf{JAchar}: standing for Japanese characters such as
       Hiragana, Katakana, Kanji and other punctuation marks for
       Japanese.
-\item \textbf{ALchar}: standing for all other characters like alphabets. 
-\end{itemize}
-We say `alphabetic fonts' for fonts used in \textbf{ALchar}, and `Japanese fonts' for fonts used in \textbf{JAchar}.
+%</en>
+%<*ja>
+\item \textbf{JAchar}: ひらがな，カタカナ，漢字，和文用の約物といった和文文字の
+      ことを指す．
+%</ja>
 
+%<*en>
+\item \textbf{ALchar}: standing for all other characters like alphabets. 
+%</en>
+%<*ja>
+\item \textbf{ALchar}: アルファベットを始めとする，その他全ての文字を指す．
+%</ja>
+\end{itemize}
+
+%<*en>
+We say `alphabetic fonts' for fonts used in \textbf{ALchar}, and `Japanese fonts' for fonts used in \textbf{JAchar}.
+%</en>
+%<*ja>
+そして，\textbf{ALchar} に用いられるフォントを「欧文フォント」と呼び，
+\textbf{JAchar} に用いられるフォントを「和文フォント」と呼ぶ．
+%</ja>
+
+%<*en>
 \item A word in a sans-serif font (like \Param{prebreakpenalty})
       means an internal parameter for Japanese typesetting, and it
       is used as a key in \verb+\ltjsetparameter+ command.
+%</en>
+%<*ja>
+\item サンセリフ体で書かれた語（例：\Param{prebreakpenalty}）は日本語組版用の
+      パラメータを表し，これらは \verb+\ltjsetparameter+ コマンドのキーとして
+      用いられる．
+%</ja>
+
+%<*en>
 \item A word in typewriter font with underline (like \Pkg{fontspec})
-      means a package of a class of \LaTeX.
+      means a package or a class of \LaTeX.
+%</en>
+%<*ja>
+\item 下線付きのタイプライタ体で書かれた語（例：\Pkg{fontspec}）は \LaTeX の
+      パッケージやクラスを表す．
+%</ja>
+
+%<*en>
 \item The word `primitive' is used not only for primitives in \LuaTeX,
       but also for control sequences that defined in the core module of
       \LuaTeX-ja.
+%</en>
+%<*ja>
+\item 「プリミティブ」という語を，\LuaTeX のプリミティブだけではなく \LuaTeX-ja
+      のコアモジュールで定義されたコントロールシーケンスに対しても用いる．
+%</ja>
+
+%<*en>
 \item In this document, natural numbers start from~0.
+%</en>
+%<*ja>
+\item 本ドキュメントでは，自然数は0から始まる．
+%</ja>
 \end{itemize}
 
-\subsection{About the project}
+%<en>\subsection{About the project}
+%<ja>\subsection{プロジェクトについて}
+
+%<*en>
 \paragraph{Project Wiki} Project Wiki is under construction.
+%</en>
+%<*ja>
+\paragraph{プロジェクト Wiki} プロジェクト Wiki は構築中である．
+%</ja>
+
+%<*en>
 \begin{itemize}
 \item \url{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage%28en%29} (English)
 \item \url{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage} (Japanese)
 \end{itemize}
+%</en>
+%<*ja>
+\begin{itemize}
+\item \url{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage}（日本語）
+\item \url{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage%28en%29}（英語）
+\end{itemize}
+%</ja>
 
+%<*en>
 This project is hosted by SourceForge.JP.
+%</en>
+%<*ja>
+本プロジェクトは SourceForge.JP のサービスを用いて運営されている．
+%</ja>
 
-\paragraph{Members}\ 
+%<en>\paragraph{Members}\ 
+%<ja>\paragraph{開発メンバー}\ 
 %<*en>
 \begin{multienumerate}
 \def\labelenumi{$\bullet$}
@@ -234,9 +384,9 @@ This project is hosted by SourceForge.JP.
 %<*ja>
 \begin{multienumerate}
 \def\labelenumi{$\bullet$}
-\mitemxxx{Hironori KITAGAWA}{Kazuki MAEDA}{Takayuki YATO}
-\mitemxxx{Yusuke KUROKI}{Noriyuki ABE}{Munehiro YAMAMOTO}
-\mitemx{Tomoaki HONDA}
+\mitemxxx{北川 弘典}{前田 一貴}{八登 崇之}
+\mitemxxx{黒木 裕介}{阿部 紀行}{山本 宗宏}
+\mitemx{本田 知亮}
 \end{multienumerate}
 %</ja>
 
@@ -244,8 +394,10 @@ This project is hosted by SourceForge.JP.
 % \paragraph{Acknowledgments} -- 挿入するならここ
 
 \clearpage
-\section{Getting Started}
-\subsection{Installation}
+%<en>\section{Getting Started}
+%<ja>\section{使い方}
+%<en>\subsection{Installation}
+%<ja>\subsection{インストール}
 To install the \LuaTeX-ja\ package, you will need:
 \begin{itemize}
 \item \LuaTeX\ (version 0.65.0-beta or later) and its supporting packages.\\
@@ -274,7 +426,8 @@ Note that the forefront of development may not be in \texttt{master} branch.
 \item If {\tt mktexlsr} is needed to update the filename database, make it so.
 \end{enumerate}
 
-\subsection{Cautions}
+%<en>\subsection{Cautions}
+%<ja>\subsection{注意点}
 \begin{itemize}
 \item The encoding of your source file must be UTF-8. No other
       encodings, such as EUC-JP or Shift-JIS, are not supported.
@@ -291,7 +444,9 @@ For example, the default setting of \textbf{JAchar} in the present
 \end{verbatim}
 \end{itemize}
 
-\subsection{Using in plain \TeX}\label{ssec-plain}
+%<en>\subsection{Using in plain \TeX}
+%<ja>\subsection{plain \TeX で使う}
+\label{ssec-plain}
 To use \LuaTeX-ja in plain \TeX, simply put the following  at the beginning of the document:
 \begin{verbatim}
 \input luatexja.sty
@@ -332,7 +487,9 @@ This does minimal settings (like {\tt ptex.tex}) for typesetting Japanese docume
 \]
 \end{itemize}
 
-\subsection{Using in \LaTeX}\label{ssec-ltx}
+%<en>\subsection{Using in \LaTeX}
+%<ja>\subsection{\LaTeX で使う}
+\label{ssec-ltx}
 \paragraph{\LaTeXe}
 Using in \LaTeXe\ is basically same. To set up the minimal environment
 for Japanese, you only have to load {\tt luatexja.sty}:
@@ -383,7 +540,9 @@ supports some of functions in \Pkg{otf} package.
 %lltjlisting.sty要修正？：↑「森」の直後で改行．
 
 
-\subsection{Changing Fonts}\label{ssub-chgfnt}
+%<en>\subsection{Changing Fonts}
+%<ja>\subsection{フォントの変更}
+\label{ssub-chgfnt}
 \paragraph{Remark: Japanese Characters in Math Mode}
 Since \pTeX\ supports Japanese characters in math mode, there are
 sources like the following:
@@ -499,15 +658,16 @@ widths.  Also note that the kerning feature is set off by default in
 these 7~commands, since this feature and \textbf{JAglue} will clash (see
 \ref{para-kern}).
 
-\section{Changing Parameters}
+%<en>\section{Changing Parameters}
+%<ja>\section{パラメータの変更}
 There are many parameters in \LuaTeX-ja. And due to the behavior of \LuaTeX,
 most of them are not stored as internal register of \TeX, but as an
 original storage system in \LuaTeX-ja. Hence, to assign or acquire those
 parameters, you have to use commands \verb+\ltjsetparameter+ and
 \verb+\ltjgetparameter+.
 
-\subsection{Editing the range of \textbf{JAchar}s}
-
+%<en>\subsection{Editing the range of \textbf{JAchar}s}
+%<ja>\subsection{\textbf{JAchar} の範囲の設定}
 
 To edit the range of \textbf{JAchar}s, You have to assign a non-zero
 natural number which is less than 217 to the character range first. This
@@ -678,7 +838,9 @@ The block list is indicated in Table~\ref{table-rng7}.
 \end{description}
 
 
-\subsection{\Param{kanjiskip} and \Param{xkanjiskip}}\label{subs-kskip}
+%<en>\subsection{\Param{kanjiskip} and \Param{xkanjiskip}}
+%<ja>\subsection{\Param{kanjiskip} と \Param{xkanjiskip}}
+\label{subs-kskip}
 \textbf{JAglue} is divided into the following three categories:
 \begin{itemize}
 \item Glues/kerns specified in JFM. If \verb+\inhibitglue+ is issued
@@ -702,7 +864,8 @@ kanjiskip}' and/or `ideal width of \Param{xkanjiskip}'.
 To use these data from JFM, set the value of \Param{kanjiskip} or 
 \Param{xkanjiskip} to \verb+\maxdimen+.
 
-\subsection{Insertion Setting of \Param{xkanjiskip}}
+%<en>\subsection{Insertion Setting of \Param{xkanjiskip}}
+%<ja>\subsection{\Param{xkanjiskip} の設定の挿入}
 It is not desirable that \Param{xkanjiskip} is inserted between every
 boundary between \textbf{JAchar}s and \textbf{ALchar}s. For example,
 \Param{xkanjiskip} should not be inserted after opening parenthesis
@@ -729,7 +892,8 @@ If you want to enable/disable all insertions of \Param{kanjiskip} and
 parameters to {\tt false}, respectively.
 
 
-\subsection{Shifting Baseline}
+%<en>\subsection{Shifting Baseline}
+%<ja>\subsection{ベースラインの移動}
 To make a match between a Japanese font and an alphabetic font, sometimes
 shifting of the baseline of one of the pair is needed. In \pTeX, this is achieved
 by setting \verb+\ybaselineshift+ to a non-zero length (the
@@ -761,7 +925,8 @@ xyz漢字
 \end{LTXexample}
 
 
-\subsection{Cropmark}
+%<en>\subsection{Cropmark}
+%<ja>\subsection{トンボ}
 Cropmark is a mark for indicating 4~corners and horizontal/vertical
 center of the paper. In Japanese, we call cropmark as tombo(w).
 \pLaTeX\ and this \LuaTeX-ja support `tombow' by their kernel.
@@ -787,9 +952,13 @@ For example, the following sets banner as `{\tt filename (2012-01-01 17:01)}':
 \end{enumerate}
 
 
-\part{Reference}\label{part-ref}
-\section{Font Metric and Japanese Font}
-\subsection{\texttt{\char92jfont} primitive}
+%<en>\part{Reference}
+%<ja>\part{リファレンス}
+\label{part-ref}
+%<en>\section{Font Metric and Japanese Font}
+%<ja>\section{フォントメトリックと日本語フォント}
+%<en>\subsection{\texttt{\char92jfont} primitive}
+%<ja>\subsection{\texttt{\char92jfont} プリミティブ}
 To load a font as a Japanese font, you must use the
 \verb+\jfont+ primitive instead of~\verb+\font+, while
 \verb+\jfont+ admits the same syntax used in~\verb+\font+. 
@@ -898,7 +1067,8 @@ TODO: kanjiskip?
 \end{itemize}
 
 
-\subsection{Structure of JFM file}
+%<en>\subsection{Structure of JFM file}
+%<ja>\subsection{JFM ファイルの構造}
 A JFM file is a Lua script which has only one function call:
 \begin{verbatim}
 luatexja.jfont.define_jfm { ... }
@@ -1124,7 +1294,8 @@ the `real' glyph is centered horizontally (the green rectangle).
 
 %</ja>
 
-\subsection{Math Font Family}
+%<en>\subsection{Math Font Family}
+%<ja>\subsection{数式フォントファミリ}
 \TeX\ handles fonts in math formulas by 16~font families\footnote{Omega,
 Aleph, \LuaTeX~and $\varepsilon$-\kern-.125em(u)\pTeX can handles 256~families, but
 an external package is needed to support this in plain \TeX\ and
@@ -1154,7 +1325,8 @@ scriptscript size&\tt\Param{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\ver
 \end{center}
 \end{table}
 
-\subsection{Callbacks}
+%<en>\subsection{Callbacks}
+%<ja>\subsection{コールバック}
 Like \LuaTeX\ itself, \LuaTeX-ja also has callbacks. These callbacks can
 be accessed via \verb+luatexbase.add_to_callback+ function and so on, as other callbacks
 \begin{list}{}%
@@ -1232,8 +1404,10 @@ This callback doesn't replace any code of \LuaTeX-ja.
 
 
 
-\section{Parameters}
-\subsection{{\tt\char92 ltjsetparameter} primitive}
+%<en>\section{Parameters}
+%<ja>\section{パラメータ}
+%<en>\subsection{{\tt\char92 ltjsetparameter} primitive}
+%<ja>\subsection{{\tt\char92 ltjsetparameter} プリミティブ}
 As noted before, \verb+\ltjsetparameter+ and \verb+\ltjgetparameter+ are
 primitives for accessing most parameters of \LuaTeX-ja. One of the main
 reason that \LuaTeX-ja didn't adopted the syntax similar to that of \pTeX\ 
@@ -1266,7 +1440,8 @@ always a string}. This is outputted by \texttt{tex.write()}, so any
 character other than space~`{\tt\char32}'~(U+0020) has the category code
 12~(other), while the space has 10~(space).
 
-\subsection{List of Parameters}
+%<en>\subsection{List of Parameters}
+%<ja>\subsection{パラメータ一覧}
 The following is the list of parameters which can be specificated by the
 \verb+\ltjsetparameter+ command. [\verb+\cs+] indicates the counterpart
 in \pTeX, and symbols beside each parameter has the following meaning:
@@ -1381,8 +1556,10 @@ The allowed arguments are the followings:
 \end{list}
 
 
-\section{Other Primitives}
-\subsection{Primitives for Compatibility}
+%<en>\section{Other Primitives}
+%<ja>\section{その他のプリミティブ}
+%<en>\subsection{Primitives for Compatibility}
+%<ja>\subsection{互換プリミティブ}
 The following primtives are implemented for compatibility with \pTeX:
 \begin{list}{}{\def\makelabel{\ttfamily\char92 }}
 \item[kuten]
@@ -1392,7 +1569,8 @@ The following primtives are implemented for compatibility with \pTeX:
 \item[ucs]
 \item[kansuji]
 \end{list}
-\subsection{{\tt\char92 inhibitglue}}
+%<en>\subsection{{\tt\char92 inhibitglue} primitive}
+%<ja>\subsection{{\tt\char92 inhibitglue} プリミティブ}
 The primitive \verb+\inhibitglue+ suppresses the insertion of \textbf{JAglue}.
 The following is an example, using a special JFM that there will be a glue between 
 the beginning of a box and `あ', and also between `あ' and `ウ'.
@@ -1416,8 +1594,11 @@ With the help of this example, we remark the specification of \verb+\inhibitglue
 \item The call of \verb+\inhibitglue+ in math mode is just ignored.
 \end{itemize}
 
-\section{Control Sequences for \LaTeXe}
-\subsection{Patch for NFSS2}\label{ssub-nfsspat}
+%<en>\section{Control Sequences for \LaTeXe}
+%<ja>\section{\LaTeXe 用のコントロールシーケンス}
+%<en>\subsection{Patch for NFSS2}
+%<ja>\subsection{NFSS2 へのパッチ}
+\label{ssub-nfsspat}
 As described in Subsection~\ref{ssec-ltx}, \LuaTeX-ja simply adopted
 \texttt{plfonts.dtx} in \pLaTeXe\ for the Japanese patch for NFSS2.
 For an convinience, we will describe
@@ -1508,9 +1689,11 @@ As closing this subsection, we shall introduce an example of
 \end{LTXexample}
 
 
-\subsection{Cropmark/`tombow'}
+%<en>\subsection{Cropmark/`tombow'}
+%<ja>\subsection{トンボ}
 
-\section{Extensions}
+%<en>\section{Extensions}
+%<ja>\section{拡張}
 \subsection{{\tt luatexja-fontspec.sty}}
 
 \subsection{{\tt luatexja-otf.sty}}
@@ -1543,9 +1726,14 @@ chars} table in JFM now allows a string in the form
 \verb+'AJ1-xxx'+, which stands for the character 
 whose CID number in Adobe-Japan1 is \verb+xxx+. 
 
-\part{Implementations}\label{part-imp}
-\section{Storing Parameters}\label{sec-para}
-\subsection{Used Dimensions,  Attributes and whatsit nodes}
+%<en>\part{Implementations}
+%<ja>\part{実装}
+\label{part-imp}
+%<en>\section{Storing Parameters}
+%<ja>\section{パラメータの保持}
+\label{sec-para}
+%<en>\subsection{Used Dimensions, Attributes and whatsit nodes}
+%<ja>\subsection{ディメンション，アトリビュート，whatsit ノードを用いて}
 Here the following is the list of dimension and attributes which are used in \LuaTeX-ja.
 \begin{list}{}{%
 \def\makelabel{\ttfamily}
@@ -1610,7 +1798,9 @@ typesetting. All those nodes store a natural number (hence the node's
 \end{description}
 These whatsits will be removed during the process of inserting \textbf{JAglue}s.
 
-\subsection{Stack System of \LuaTeX-ja}\label{ssec-stack}
+%<en>\subsection{Stack System of \LuaTeX-ja}
+%<ja>\subsection{\LuaTeX-ja のスタックシステム}
+\label{ssec-stack}
 \paragraph{Background}
 \LuaTeX-ja has its own stack system, and most parameters of \LuaTeX-ja
 are stored in it.  To clarify the reason, imagine the parameter
@@ -1694,8 +1884,11 @@ This problem is resolved by using
 \hbox{\verb+\directlua{tex.globaldefs=0}+} (this assignment is local).
 
 
-\section{Linebreak after Japanese Character}\label{sec-lbreak}
-\subsection{Reference: Behavior in \pTeX}
+%<en>\section{Linebreak after Japanese Character}
+%<ja>\section{和文文字直後の改行}
+\label{sec-lbreak}
+%<en>\subsection{Reference: Behavior in \pTeX}
+%<ja>\subsection{参考: \pTeX の挙動}
 %<*en>
 In~\pTeX, a linebreak after a Japanese character doesn't emit a space,
 since words are not separated by spaces in Japanese writings. However,
@@ -1774,7 +1967,8 @@ after `beginning/ending of a group' characters.
 \end{figure}
 
 
-\subsection{Behavior in \LuaTeX-ja}
+%<en>\subsection{Behavior in \LuaTeX-ja}
+%<ja>\subsection{\LuaTeX-ja の挙動}
 %<*en>
 States in the input processoe of \LuaTeX\ is the same as that of \TeX,
 and they can't be customized by any callbacks. Hence, we can only use
@@ -1873,8 +2067,10 @@ u
 %</ja>
 
 
-\section{Insertion of JFM glues, \Param{kanjiskip} and \Param{xkanjiskip}}
-\subsection{Overview}
+%<en>\section{Insertion of JFM glues, \Param{kanjiskip} and \Param{xkanjiskip}}
+%<ja>\section{JFM グルーの挿入，\Param{kanjiskip} と \Param{xkanjiskip}}
+%<en>\subsection{Overview}
+%<ja>\subsection{概要}
 %<*en>
 NOT COMPLETED
 %</en>
@@ -1905,7 +2101,8 @@ NOT COMPLETED
 % \unitlength=10mm
 % \end{figure}
 
-\subsection{Definition of a `cluster'}
+%<en>\subsection{Definition of a `cluster'}
+%<ja>\subsection{「クラスタ」の定義}
 
 \begin{defn}
 A \emph{cluster} is a list of nodes in one of the following forms, with the \textit{id} of it:
