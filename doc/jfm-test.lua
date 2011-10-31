@@ -12,7 +12,7 @@ luatexja.jfont.define_jfm {
       chars = { 'あ' },
       align = 'left', left = 0.0, down = 0.0,
       width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
-      glue = { [3] = { 1.41, 0, 0} },
+      glue = { [3] = { 1.41, 0, 0}, [399] = {1.25, 0.43, 0.87} },
       kern = { [8] = -1.41 , [2] = 2.0, [99] = 1.21 }
    },
    [11] = {
@@ -59,6 +59,27 @@ luatexja.jfont.define_jfm {
       align = 'left', left = 0.0, down = 0.0,
       width = 1.0, height = 0.88, depth = 0.12, italic=0.0
    },
+   [4] = {
+      chars = { 'エ' },
+      align = 'left', left = 0.0, down = 0.0,
+      width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
+      glue = { [199] = { 0.78, 0, 0} },
+   },
+   [100] = {
+      chars = { '「' },
+      align = 'right', left = 0.0, down = 0.0,
+      width = 0.5, height = 0.88, depth = 0.12, italic=0.0,
+   },
+   [101] = {
+      chars = { '【' },
+      align = 'right', left = 0.0, down = 0.0,
+      width = 0.5, height = 0.88, depth = 0.12, italic=0.0,
+   },
+   [102] = {
+      chars = { '〔' },
+      align = 'right', left = 0.0, down = 0.0,
+      width = 0.5, height = 0.88, depth = 0.12, italic=0.0,
+   },
    [99] = {
       chars = { 'jcharbdd' },
       glue = { [11] = { 1.41, 0, 0} },
@@ -67,6 +88,15 @@ luatexja.jfont.define_jfm {
    [199] = {
       chars = { 'boxbdd' },
       glue = { [51] = { 1.03, 0, 0} , [1] = { 0.94, 0.23, 0.45 }},
+   },
+   [299] = {
+      chars = { 'parbdd' },
+      glue = { [51] = { 0.68, 0.02, 0.04} },
+      kern = { [100] = -0.5, [102] = 0.5 }
+   },
+   [399] = {
+      chars = { -1 }, -- math
+      glue = { [0] = { 0.68, 0.02, 0.04} },
    },
    [8] = {
       chars = { 'lineend' },

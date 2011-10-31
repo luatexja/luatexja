@@ -21,6 +21,7 @@
 \DeclareRobustCommand\pLaTeXe{p\kern-.05em\LaTeXe}
 \DeclareRobustCommand\epTeX{\ensuremath{\varepsilon}-\kern-.125em\pTeX}
 
+\ltjsetparameter{jacharrange={-3}}
 \theoremstyle{definition}
 %<en>\newtheorem{defn}{Definition}
 %<ja>\newtheorem{defn}{定義}
@@ -225,21 +226,45 @@ The followings are major changes from \pTeX:
 
 %<*en>
 \item Furthermore, nodes between two characters which have no effects in
-      linebreak (\textit{e.g.}, \verb+\special+ node) are ignored in the
-      insertion process.
+      linebreak (\textit{e.g.}, \verb+\special+ node) and kerns from
+      italic correction are ignored in the insertion process.
 %</en>
 %<*ja>
-\item さらに，2つの文字の間にある行末では効果を持たないノード（例えば 
-      \verb+\special+ ノード）は挿入処理中では無視される．
+\item さらに，2つの文字の間にある行末では効果を持たないノード（例えば
+      \verb+\special+ ノード）や，イタリック補正に伴う挿入されるカーンは
+      挿入処理中では無視される．
 %</ja>
 
 %<*en>
-\item In the process, two Japanese fonts which differ in their `real'
-      fonts only are identified.
+\item \emph{Caution: due to above two points, many methods which did the
+      dividing the process of the insertion of \textbf{JAglue} in \pTeX\ are not
+      effective anymore.} In concrete terms, the following two methods are not effective anymore:
 %</en>
 %<*ja>
-\item 処理中では，2つの和文フォントは「実際の」フォントが異なる場合のみ区別され
-      る．
+\item \textbf{注意：上の2つの変更により，従来 \textbf{JAglue} の挿入処理を分断するのに
+      使われていたいくつかの方法は用いることができない．具体的には，次の方法はもはや無効である：}
+%</ja>
+\begin{verbatim}
+　　ちょ{}っと　　ちょ\/っと
+\end{verbatim}
+%<*en>
+      If you want to do so, please put an empty hbox between it instead:
+%</en>
+%<*ja>
+      もし同じことをやりたければ，空のhboxを間に挟むようにしてください：
+%</ja>
+\begin{verbatim}
+　　ちょ\hbox{}っと
+\end{verbatim}
+
+
+%<*en>
+\item In the process, two Japanese fonts which only differ in their `real'
+      fonts are identified.
+%</en>
+%<*ja>
+\item 処理中では，2つの和文フォントは，「実際の」フォントのみが異なる場合に同一視
+      される．
 %</ja>
 \end{itemize}
 
@@ -379,7 +404,7 @@ This project is hosted by SourceForge.JP.
 \def\labelenumi{$\bullet$}
 \mitemxxx{Hironori KITAGAWA}{Kazuki MAEDA}{Takayuki YATO}
 \mitemxxx{Yusuke KUROKI}{Noriyuki ABE}{Munehiro YAMAMOTO}
-\mitemx{Tomoaki HONDA}
+\mitemxxx{Tomoaki HONDA}{Shuzaburo SAITO}{}
 \end{multienumerate}
 %</en>
 %<*ja>
@@ -387,7 +412,7 @@ This project is hosted by SourceForge.JP.
 \def\labelenumi{$\bullet$}
 \mitemxxx{北川 弘典}{前田 一貴}{八登 崇之}
 \mitemxxx{黒木 裕介}{阿部 紀行}{山本 宗宏}
-\mitemx{本田 知亮}
+\mitemxxx{本田 知亮}{齋藤修三郎}{}
 \end{multienumerate}
 %</ja>
 
@@ -587,7 +612,7 @@ This does minimal settings (like {\tt ptex.tex}) for typesetting Japanese docume
 %</en>
 %<*ja>
 \item `Ryumin-Light' と `GothicBBB-Medium' は PDF ファイルに埋め込まずに
-      用いることが広く受け入れられており，この場合 PDF リーダーが
+      名前参照のみで用いることが広く受け入れられており，この場合 PDF リーダーが
       適切な外部フォントで代用する（例えば，Adobe Reader では Ryumin-Light は
       小塚明朝で代替される）．そこで，これらをデフォルトのフォントと
       して採用する．
@@ -615,8 +640,8 @@ This does minimal settings (like {\tt ptex.tex}) for typesetting Japanese docume
       量は次のように設定されている：
 %</ja>
 \[
- (0.25\cdot 13.5\,\textrm{Q})^{+1\,\text{pt}}_{-1\,\text{pt}} 
- = {27\over 32}\,\mathrm{mm}^{+1\,\text{pt}}_{-1\,\text{pt}}.
+ (0.25\cdot 0.962216\cdot 10\,\mathrm{pt})^{+1\,\text{pt}}_{-1\,\text{pt}} 
+ = 2.40554\,\mathrm{pt}^{+1\,\text{pt}}_{-1\,\text{pt}}.
 \]
 \end{itemize}
 
@@ -663,7 +688,8 @@ When vertical typesetting is supported by \LuaTeX-ja in the future, {\tt JT3} wi
 \end{tabular}
 \end{center}
 Remark that the bold series in both family are same as the medium series of \emph{gothic} family.
-This is a convention in \pLaTeX.
+This is a convention in \pLaTeX. This is a trace that there were only 2~fonts (these are Ryumin-Light 
+and GothicBBB-Medium) in early yearss of DTP.
 %</en>
 %<*ja>
 \item 2つのフォントファミリ {\tt mc} と {\tt gt} が定義されている：
@@ -677,7 +703,9 @@ This is a convention in \pLaTeX.
 \end{tabular}
 \end{center}
 どちらのファミリにおいても，その bold シリーズはゴシック体の medium シリーズで
-あることに注意．
+あることに注意．これは初期の DTP において和文フォントが2つ（それがちょうど\ 
+Ryumin-Light, GothicBBB-Medium だった）しか利用できなかった時の名残であり，\pLaTeX{}
+での標準設定とも同じである．
 %</ja>
 
 %<*en>
@@ -1354,6 +1382,7 @@ The followings are JFMs shipped with Lua\TeX-ja:
 \begin{table}[t]
 \caption{Differences between JFMs shipped with \LuaTeX-ja}
 \label{tab-difjfm}
+\ltjsetparameter{jacharrange={+3}}
 \begin{center}
 \def\r#1{{\jfont\g=psft:Ryumin-Light:jfm=#1 at 14.43324pt \g
 \setbox0=\vtop{\hsize=7\zw\noindent ◆◆◆◆◆◆◆
@@ -1378,6 +1407,7 @@ Bounding Box&\t{ujis}&\t{jis}&\t{min}\\
 \bottomrule
 \end{tabular}
 \end{center}
+\ltjsetparameter{jacharrange={-3}}
 \end{table}
 
 \paragraph{Note: kern feature}\label{para-kern}
@@ -1615,6 +1645,7 @@ the `real' glyph is centered horizontally (the green rectangle).
 うになった．例えば，\LuaTeX-ja同梱のJFMのように，\texttt{'boxbdd'}と同じ文字クラスに
 \texttt{'parbdd'}を入れれば全角下がりとなる．
 
+\ltjsetparameter{jacharrange={+3}}
 \begin{LTXexample}
 \jfont\g=psft:Ryumin-Light:jfm=test \g
 \parindent1\zw\noindent{}◆◆◆◆◆
@@ -1623,7 +1654,7 @@ the `real' glyph is centered horizontally (the green rectangle).
 \par{}〔◆◆←全角二分下がり
 \end{LTXexample}
 \end{itemize}
-
+\ltjsetparameter{jacharrange={-3}}
 %</ja>
 
 %<en>\subsection{Math Font Family}
