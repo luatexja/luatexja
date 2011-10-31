@@ -7,6 +7,7 @@
 \usepackage{amsmath,amssymb,xcolor,pict2e,multienum,amsthm,float}
 \usepackage{booktabs,listings,lltjlisting,showexpl,multicol}
 \usepackage{luatexja-otf}
+\usepackage{luatexja-fontspec}
 \usepackage[unicode]{hyperref}
 \usepackage[all]{xy}
 \SelectTips{cm}{}
@@ -299,8 +300,8 @@ In this document, the following terms and notations are used:
 We say `alphabetic fonts' for fonts used in \textbf{ALchar}, and `Japanese fonts' for fonts used in \textbf{JAchar}.
 %</en>
 %<*ja>
-そして，\textbf{ALchar} に用いられるフォントを「欧文フォント」と呼び，
-\textbf{JAchar} に用いられるフォントを「和文フォント」と呼ぶ．
+そして，\textbf{ALchar} の出力に用いられるフォントを「欧文フォント」と呼び，
+\textbf{JAchar} の出力に用いられるフォントを「和文フォント」と呼ぶ．
 %</ja>
 
 %<*en>
@@ -398,47 +399,125 @@ This project is hosted by SourceForge.JP.
 %<ja>\section{使い方}
 %<en>\subsection{Installation}
 %<ja>\subsection{インストール}
+
+%<*en>
 To install the \LuaTeX-ja\ package, you will need:
+%</en>
+%<*ja>
+\LuaTeX-ja パッケージのインストールには，次のものが必要である．
+%</ja>
 \begin{itemize}
+%<*en>
 \item \LuaTeX\ (version 0.65.0-beta or later) and its supporting packages.\\
 If you are using \TeX~Live~2011 or current W32\TeX, you don't have to worry.
+%</en>
+%<*ja>
+\item \LuaTeX（バージョン 0.65.0-beta 以降）とその支援パッケージ．
+      \TeX~Live~2011 や W32\TeX の最新版ならば問題ない．
+%</ja>
+%<*en>
 \item The source archive of \LuaTeX-ja, of course{\tt:)}
+%</en>
+%<*ja>
+\item \LuaTeX-ja のソースアーカイブ（もちろん {\tt:)}）．
+%</ja>
 \end{itemize}
 
+%<*en>
 The installation methods are as follows:
+%</en>
+%<*ja>
+インストール方法は以下のようになる：
+%</ja>
 \begin{enumerate}
+%<*en>
 \item Download the source archive.
 
-At the present, \LuaTeX-ja has no official release, so you have to retrieve
-the archive from the repository.
-You can retrieve the Git repository via
+      At the present, \LuaTeX-ja has no official release, so you have to retrieve
+      the archive from the repository.
+      You can retrieve the Git repository via
+%</en>
+%<*ja>
+\item ソースアーカイブをダウンロードする．
+
+      現時点では，\LuaTeX-ja の公式リリースはないので，レポジトリからアーカイブを
+      取得しなければならない．
+      次のようにすることで，Git レポジトリを取得することができる：
+%</ja>
 \begin{verbatim}
 $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
 \end{verbatim} 
-or download the archive of HEAD in \texttt{master} branch from
+%<*en>
+      or download the archive of HEAD in \texttt{master} branch from
+%</en>
+%<*ja>
+      もしくは，\texttt{master} ブランチの HEAD アーカイブを以下からダウンロードすることができる：
+%</ja>
 \begin{flushleft}
 \url{http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git;a=snapshot;h=HEAD;sf=tgz}.
 \end{flushleft}
 
+%<*en>
 Note that the forefront of development may not be in \texttt{master} branch.
+%</en>
+%<*ja>
+開発中の最新の成果は \texttt{master} ブランチには含まれていないかもしれないことに注意．
+%</ja>
+
+%<*en>
 \item Extract the archive. You will see {\tt src/} and several other sub-directories.
+%</en>
+%<*ja>
+\item アーカイブを展開する．{\tt src/} をはじめとしたいくつかのディレクトリができる．
+%</ja>
+
+%<*en>
 \item Copy all the contents of {\tt src/} into one of your \texttt{TEXMF} tree.
+%</en>
+%<*ja>
+\item {\tt src/} の中身全てを自分の \texttt{TEXMF} ツリーにコピーする．
+%</ja>
+
+%<*en>
 \item If {\tt mktexlsr} is needed to update the filename database, make it so.
+%</en>
+%<*ja>
+\item もし {\tt mktexlsr} を実行する必要があればそうする．
+%</ja>
 \end{enumerate}
 
 %<en>\subsection{Cautions}
 %<ja>\subsection{注意点}
+
 \begin{itemize}
+%<*en>
 \item The encoding of your source file must be UTF-8. No other
       encodings, such as EUC-JP or Shift-JIS, are not supported.
+%</en>
+%<*ja>
+\item 原稿のソースファイルの文字コードは UTF-8 でなければならない．
+      EUC-JP や Shift-JIS は使用できない．
+%</ja>
+
+%<*en>
 \item May be conflict with other packages. 
 
-For example, the default setting of \textbf{JAchar} in the present
+      For example, the default setting of \textbf{JAchar} in the present
       version does not coexist with the \Pkg{unicode-math}
       package. Putting the following line in preamble makes that
       mathematical symbols will be typeset correctly, but several
       Japanese characters will be treated as an \textbf{ALchar} as
       side-effect:
+%</en>
+%<*ja>
+\item いくつかのパッケージと衝突する．
+
+      例えば，\textbf{JAchar} の範囲の設定がデフォルトのままだと，現行の
+      バージョンでは \Pkg{unicode-math} パッケージと共存できない．
+      以下の行をプリアンブルに追加することで数学記号が正しく出るように
+      なるが，副作用としていくつかの和文文字が \textbf{ALchar} として
+      扱われるようになってしまう：
+%</ja>
 \begin{verbatim}
 \ltjsetparameter{jacharrange={-3, -8}}
 \end{verbatim}
@@ -447,13 +526,24 @@ For example, the default setting of \textbf{JAchar} in the present
 %<en>\subsection{Using in plain \TeX}
 %<ja>\subsection{plain \TeX で使う}
 \label{ssec-plain}
-To use \LuaTeX-ja in plain \TeX, simply put the following  at the beginning of the document:
+
+%<*en>
+To use \LuaTeX-ja in plain \TeX, simply put the following at the beginning of the document:
 \begin{verbatim}
 \input luatexja.sty
 \end{verbatim}
-
 This does minimal settings (like {\tt ptex.tex}) for typesetting Japanese documents:
+%</en>
+%<*ja>
+\LuaTeX-ja を plain \TeX で使うためには，単に次の行をソースファイルの冒頭に追加すればよい：
+\begin{verbatim}
+\input luatexja.sty
+\end{verbatim}
+これで（{\tt ptex.tex} のように）日本語組版のための最低限の設定がなされる：
+%</ja>
+
 \begin{itemize}
+%<*en>
 \item The following 6~Japanese fonts are preloaded:
 \begin{center}
 \begin{tabular}{ccccc}
@@ -464,23 +554,66 @@ This does minimal settings (like {\tt ptex.tex}) for typesetting Japanese docume
 \bottomrule
 \end{tabular}
 \end{center}
+%</en>
+%<*ja>
+\item 以下の6つの和文フォントが定義される：
+\begin{center}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{字体}&\textbf{フォント名}&\bf `10\,pt'&\bf`7\,pt'&\bf`5\,pt'\\\midrule
+\emph{明朝体}&Ryumin-Light    &\verb+\tenmin+&\verb+\sevenmin+&\verb+\fivemin+\\
+\emph{ゴシック体}&GothicBBB-Medium&\verb+\tengt+ &\verb+\sevengt+ &\verb+\fivegt+\\
+\bottomrule
+\end{tabular}
+\end{center}
+%</ja>
 \begin{itemize}
-\item The `Q' is a unit used in Japanese phototypesetting, and
+%<*en>
+\item The `Q（級）' is a unit used in Japanese phototypesetting, and
       $1\,\textrm{Q}=0.25\,\textrm{mm}$. This length is stored in a
       dimension \verb+\jQ+.
+%</en>
+%<*ja>
+\item `Q（級）' は日本の写植で用いられる単位で，$1\,\textrm{Q}=0.25\,\textrm{mm}$
+      である．この長さは \verb+\jQ+ に保持されている．
+%</ja>
 
+%<*en>
 \item It is widely accepted that the font `Ryumin-Light' and
       `GothicBBB-Medium' aren't embedded into PDF files, and PDF reader
       substitute them by some external Japanese fonts (\textit{e.g.},
       Kozuka Mincho is used for Ryumin-Light in Adobe Reader). We adopt this custom to
       the default setting.
+%</en>
+%<*ja>
+\item `Ryumin-Light' と `GothicBBB-Medium' は PDF ファイルに埋め込まずに
+      用いることが広く受け入れられており，この場合 PDF リーダーが
+      適切な外部フォントで代用する（例えば，Adobe Reader では Ryumin-Light は
+      小塚明朝で代替される）．そこで，これらをデフォルトのフォントと
+      して採用する．
+%</ja>
+
+%<*en>
 \item A character in an alphabetic font is generally smaller than a
       Japanese font in the same size. So actual size specification of
       these Japanese fonts is in fact smaller than that of alphabetic
       fonts, namely scaled by 0.962216.
+%</en>
+%<*ja>
+\item 欧文フォントの文字は和文フォントの文字よりも，同じ文字サイズでも
+      一般に小さい．そこで，これらの和文フォントの実際のサイズは指定された値よりも
+      小さくなるように設定されており，具体的には指定の 0.962216 倍にスケールされる．
+%</ja>
 \end{itemize}
+
+%<*en>
 \item The amount of glue that are inserted between a \textbf{JAchar} and
       an \textbf{ALchar} (the parameter \Param{xkanjiskip}) is set to
+%</en>
+%<*ja>
+\item \textbf{JAchar} と \textbf{ALchar} の間に入るグルー (\Param{xkanjiskip}) の
+      量は次のように設定されている：
+%</ja>
 \[
  (0.25\cdot 13.5\,\textrm{Q})^{+1\,\text{pt}}_{-1\,\text{pt}} 
  = {27\over 32}\,\mathrm{mm}^{+1\,\text{pt}}_{-1\,\text{pt}}.
@@ -490,7 +623,10 @@ This does minimal settings (like {\tt ptex.tex}) for typesetting Japanese docume
 %<en>\subsection{Using in \LaTeX}
 %<ja>\subsection{\LaTeX で使う}
 \label{ssec-ltx}
+
 \paragraph{\LaTeXe}
+
+%<*en>
 Using in \LaTeXe\ is basically same. To set up the minimal environment
 for Japanese, you only have to load {\tt luatexja.sty}:
 \begin{verbatim}
@@ -498,10 +634,24 @@ for Japanese, you only have to load {\tt luatexja.sty}:
 \end{verbatim}
 It also does minimal settings (counterparts in \pLaTeX\ are {\tt
 plfonts.dtx} and {\tt pldefs.ltx}):
+%</en>
+%<*ja>
+\LaTeXe を用いる場合も基本的には同じである．日本語組版のための最低限の環境を
+設定するためには，{\tt luatexja.sty} を読み込むだけでよい：
+%</ja>
 
 \begin{itemize}
+%<*en>
 \item {\tt JY3} is the font encoding for Japanese fonts (in horizontal direction).\\
 When vertical typesetting is supported by \LuaTeX-ja in the future, {\tt JT3} will be used for vertical fonts.
+%</en>
+%<*ja>
+\item {\tt JY3} は和文フォント用のフォントエンコーディングである（横書き用）．\\
+将来的に，\LuaTeX-ja で縦書きがサポートされる際には，{\tt JT3} を縦書き用として
+用いる予定である．
+%</ja>
+
+%<*en>
 \item Two font families {\tt mc} and {\tt gt} are defined: 
 \begin{center}
 \begin{tabular}{ccccc}
@@ -514,22 +664,63 @@ When vertical typesetting is supported by \LuaTeX-ja in the future, {\tt JT3} wi
 \end{center}
 Remark that the bold series in both family are same as the medium series of \emph{gothic} family.
 This is a convention in \pLaTeX.
+%</en>
+%<*ja>
+\item 2つのフォントファミリ {\tt mc} と {\tt gt} が定義されている：
+\begin{center}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{字体}&\textbf{ファミリ}&\verb+\mdseries+&\verb+\bfseries+&\textbf{スケール}\\\midrule
+明朝体&\tt mc&Ryumin-Light    &GothicBBB-Medium&0.962216\\
+ゴシック体&\tt gt&GothicBBB-Medium&GothicBBB-Medium&0.962216\\
+\bottomrule
+\end{tabular}
+\end{center}
+どちらのファミリにおいても，その bold シリーズはゴシック体の medium シリーズで
+あることに注意．
+%</ja>
 
+%<*en>
 \item Japanese characters in math mode are typeset by the font family {\tt mc}.
+%</en>
+%<*ja>
+\item 数式モード中の和文文字は {\tt mc} ファミリで出力される．
+%</ja>
 \end{itemize}
 
+%<*en>
 However, above settings are not sufficient for Japanese-based
-documents. To typeset Japanese-based documents, You are better to use
+documents. To typeset Japanese-based documents, you are better to use
 class files other than {\tt article.cls}, {\tt book.cls}, and so on.  At
 the present, we have the counterparts of \Pkg{jclasses} (standard
-classes in \pLaTeX) and \Pkg jsclasses (classes by Haruhiko
+classes in \pLaTeX) and \Pkg{jsclasses} (classes by Haruhiko
 Okumura), namely, \Pkg{ltjclasses} and \Pkg{ltjsclasses}.
+%</en>
+%<*ja>
+しかしながら，上記の設定は日本語の文書にとって十分とは言えない．
+日本語文書を組版するためには，{\tt article.cls}, {\tt book.cls} といった
+欧文用のクラスファイルではなく，和文用のクラスファイルを用いた方がよい．
+現時点では，\Pkg{jclasses} （\pLaTeX の標準クラス）と \Pkg{jsclasses}
+（奥村晴彦氏によるクラスファイル）に対応するものとして，\Pkg{ltjclasses}，
+\Pkg{ltjsclasses} がそれぞれ用意されている．
+%</ja>
 
+%<*en>
 \paragraph{{\tt\char92 CID, {\tt\char92 UTF}} and macros in OTF package}
-Under \pTeX, \Pkg{otf} package (developed by Shuzaburo Saito) is
-used for typesetting characters which is in Adobe-japan1-6 CID but not
+Under \pLaTeX, \Pkg{otf} package (developed by Shuzaburo Saito) is
+used for typesetting characters which is in Adobe-Japan1-6 CID but not
 in JIS~X~0208. Since this package is widely used, \LuaTeX-ja
 supports some of functions in \Pkg{otf} package.
+If you want to use these functions, load \Pkg{luatexja-otf} package.
+%</en>
+%<*ja>
+\paragraph{{\tt\char92 CID, {\tt\char92 UTF}} と OTF パッケージのマクロ}
+\pLaTeX では，JIS~X~0208 にない Adobe-Japan1-6 の文字を出力するために，
+齋藤修三郎氏による \Pkg{otf} パッケージが用いられていた．このパッケージは
+広く用いられているため，\LuaTeX-ja においても \Pkg{otf} パッケージの機能の
+一部をサポートしている．これらの機能を用いるためには \Pkg{luatexja-otf} パッケージ
+を読み込めばよい．
+%</ja>
 
 \begin{LTXexample}
 森\UTF{9DD7}外と内田百\UTF{9592}とが\UTF{9AD9}島屋に行く。
@@ -543,25 +734,55 @@ supports some of functions in \Pkg{otf} package.
 %<en>\subsection{Changing Fonts}
 %<ja>\subsection{フォントの変更}
 \label{ssub-chgfnt}
+
+%<*en>
 \paragraph{Remark: Japanese Characters in Math Mode}
 Since \pTeX\ supports Japanese characters in math mode, there are
 sources like the following:
-
+%</en>
+%<*ja>
+\paragraph{意見：数式モード中の和文文字}
+\pTeX では数式中での和文文字の使用がサポートされていたので，
+以下のようなソースが存在した：
+%</ja>
 \begin{LTXexample}
 $f_{高温}$~($f_{\text{high temperature}}$).
 \[ y=(x-1)^2+2\quad{}よって\quad y>0 \]
 $5\in{}素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
 \end{LTXexample}
-
+%<*en>
 We (the project members of \LuaTeX-ja) think that using
 Japanese characters in math mode are allowed if and only if these are used as identifiers.
 In this point of view, 
+%</en>
+%<*ja>
+\LuaTeX-ja プロジェクトでは，数式モード中での和文文字はそれらが識別子として用いられる
+ときのみ許されると考えている．
+この観点から，
+%</ja>
 \begin{itemize}
+%<*en>
 \item The lines 1~and~2 above are not correct, since `高温' in above is used as a textual label, and
 `よって' is used as a conjunction. 
+%</en>
+%<*ja>
+\item 上記数式のうち 1, 2 行目は正しくない．なぜならば `高温' が意味のあるラベルと
+      して，`よって' が接続詞として用いられているからである．
+%</ja>
+%<*en>
 \item However, the line~3 is correct, since `素' is used as an identifier.
+%</en>
+%<*ja>
+\item しかしながら，3行目は `素' が識別子として用いられているので正しい．
+%</ja>
 \end{itemize}
+%<*en>
 Hence, in our opinion, the above input should be corrected as:
+%</en>
+%<*ja>
+したがって，\LuaTeX-ja プロジェクトの意見としては，上記の入力は次のように直されるべき
+である：
+%</ja>
 \begin{LTXexample}
 $f_{\text{高温}}$~%
 ($f_{\text{high temperature}}$).
@@ -570,27 +791,61 @@ $f_{\text{高温}}$~%
 $5\in{}素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
 \end{LTXexample}
 %BUG?: \{\}がなければ「素」がでない．上の段落の「よって」もでてない．
+%<*en>
 We also believe that using Japanese characters as identifiers is rare,
 hence we don't describe how to change Japanese fonts in math mode in
 this chapter. For the method, please see Part~\ref{part-ref}.
+%</en>
+%<*ja>
+また \LuaTeX-ja プロジェクトでは，和文文字が識別子として用いられることはほとんどない
+と考えており，したがってこの章では数式モード中の和文フォントを変更する方法については
+記述しない．この方法については第 \ref{part-ref} 章を参照のこと．
+%</ja>
 
-
+%<*en>
 \paragraph{plain \TeX}
 To change Japanese fonts in plain \TeX, you must use the primitive
 \verb+\jfont+. So please see Part~\ref{part-ref}.
+%</en>
+%<*ja>
+\paragraph{plain \TeX}
+plain \TeX で和文フォントを変更するためには，\verb+\jfont+ プリミティブを用いなけれ
+ばならない．第 \ref{part-ref} 章を参照せよ．
+%</ja>
 
-
+%<*en>
 \paragraph{NFSS2}
 For \LaTeXe, \LuaTeX-ja simply adopted the font selection system from that
 of \pLaTeXe\ (in {\tt plfonts.dtx}).
+%</en>
+%<*ja>
+\paragraph{NFSS2}
+\LaTeXe については，\LuaTeX-ja では単にフォント選択システムを \pLaTeXe\ ({\tt plfonts.dtx})
+から採用している．
+%</ja>
 \begin{itemize}
+%<*en>
 \item Two control sequences \verb+\mcdefault+ and \verb+\gtdefault+ are
       used to specify the default font families for \emph{mincho} and
       \emph{gothic}, respectively. Default values: \texttt{mc} for
       \verb+\mcdefault+ and \texttt{gt} for \verb+\gtdefault+.
+%</en>
+%<*ja>
+\item 2つのコントロールシーケンス \verb+\mcdefault+ と \verb+\gtdefault+ がそれぞ
+      れ明朝体とゴシック体のデフォルトのフォントファミリを指定するために用いられる．
+      初期値：\verb+\mcdefault+ は \texttt{mc}，\verb+\gtdefault+ は \texttt{gt}．
+%</ja>
+%<*en>
 \item Commands \verb+\fontfamily+, \verb+\fontseries+,
       \verb+\fontshape+ and \verb+\selectfont+ can be used to change
       attributes of Japanese fonts. 
+%</en>
+%<*ja>
+\item \verb+\fontfamily+, \verb+\fontseries+, \verb+\fontshape+, そして 
+      \verb+\selectfont+ が和文フォントの属性を変更するために使用できる．
+%</ja>
+
+%<*en>
 \begin{center}
 \begin{tabular}{cccccc}
 \toprule
@@ -606,34 +861,78 @@ auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
 \bottomrule
 \end{tabular}
 \end{center}
-
+%</en>
 %<*ja>
-ここで，\verb+\fontencoding{<encoding>}+は，引数により和文側か欧文側かの
-      どちらかが切り替わる．例えば，次の入力で最初の\verb+\fontencoding+
-      の呼び出しは和文フォントのエンコーディングを\texttt{JT3}に変更し，
-      2回目の呼びだしでは欧文フォント側を\texttt{T1}へと変更する．
-\begin{verbatim}
-\fontencoding{JY3}\fontencoding{T1}
-\end{verbatim}
-\verb+\fontfamily+も引数により和文側，欧文側，\textbf{あるいは両方}のフォ
-      ントファミリが切り替わる．
-詳細はSubsection~\ref{ssub-nfsspat}を参照すること．
+\begin{center}
+\begin{tabular}{cccccc}
+\toprule
+&\textbf{エンコーディング}&\textbf{ファミリ}&\textbf{シリーズ}&\textbf{シェープ}&\textbf{選択}\\\midrule
+欧文フォント
+&\verb+\romanencoding+&\verb+\romanfamily+&\verb+\romanseries+&\verb+\romanshape+
+&\verb+\useroman+\\
+和文フォント
+&\verb+\kanjiencoding+&\verb+\kanjifamily+&\verb+\kanjiseries+&\verb+\kanjishape+
+&\verb+\usekanji+\\
+両方&---&--&\verb+\fontseries+&\verb+\fontshape+&---\\
+自動選択&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
+\bottomrule
+\end{tabular}
+\end{center}
 %</ja>
 
+%<*en>
+      \verb+\fontencoding{<encoding>}+ changes the encoding of alphabetic fonts
+      or Japanese fonts depending on the argument. For example, 
+      \verb+\fontencoding{JY3}+ changes the encoding of Japanese fonts to 
+      \texttt{JY3} and \verb+\fontencoding{T1}+ changes the encoding of 
+      alphabetic fonts to \texttt{T1}.
+      \verb+\fontfamily+ also changes the family of Japanese fonts, alphabetic
+      fonts, \emph{or both}. For detail, see Subsection~\ref{ssub-nfsspat}.
+%</en>
+%<*ja>
+      ここで，\verb+\fontencoding{<encoding>}+は，引数により和文側か欧文側かの
+      どちらかが切り替わる．例えば，\verb+\fontencoding{JY3}+は和文フォントの
+      エンコーディングを\texttt{JY3}に変更し，\verb+\fontencoding{T1}+ は欧文
+      フォント側を\texttt{T1}へと変更する．
+      \verb+\fontfamily+も引数により和文側，欧文側，\textbf{あるいは両方}のフォ
+      ントファミリが切り替わる．詳細は\ref{ssub-nfsspat}節を参照すること．
+%</ja>
+
+%<*en>
 \item For defining a Japanese font family, use
       \verb+\DeclareKanjiFamily+ instead of
       \verb+\DeclareFontFamily+. However, in the present implementation,
       using \verb+\DeclareFontFamily+ doesn't cause any problem.
+%</en>
+%<*ja>
+\item 和文フォントファミリの定義には \verb+\DeclareFontFamily+ の代わりに
+      \verb+\DeclareKanjiFamily+ を用いる．しかし，現在の実装では 
+      \verb+\DeclareFontFamily+ を用いても問題は生じない．
+%</ja>
 \end{itemize}
 
+%<*en>
 \paragraph{fontspec}
 To coexist with the \Pkg{fontspec} package, it is needed to load
 \Pkg{luatexja-fontspec} package in the preamble. This additional
 package automatically loads \Pkg{luatexja} and \Pkg{fontspec}
 package, if needed.
+%</en>
+%<*ja>
+\Pkg{fontspec} パッケージと同様の機能を和文フォントに対しても用いるためには，
+\Pkg{luatexja-fontspec} パッケージをプリアンブルで読み込む必要がある．このパッケージ
+は必要ならば自動で \Pkg{luatexja} パッケージと \Pkg{fontspec} パッケージを読み込む．
+%</ja>
 
+%<*en>
 In \Pkg{luatexja-fontspec} package, the following 7~commands are defined as
 counterparts of original commands in the \Pkg{fontspec} package:
+%</en>
+%<*ja>
+\Pkg{luatexja-fontspec} パッケージでは，以下の7つのコマンドを \Pkg{fontspec} 
+パッケージの元のコマンドに対応するものとして定義している：
+%</ja>
+%<*en>
 \begin{center}
 \begin{tabular}{ccccc}
 \toprule
@@ -649,14 +948,47 @@ alphabetic fonts
 \bottomrule
 \end{tabular}
 \end{center}
-使用例
+%</en>
+%<*ja>
+\begin{center}
+\begin{tabular}{ccccc}
+\toprule
+和文フォント
+&\verb+\jfontspec+&\verb+\setmainjfont+&\verb+\setsansjfont+&\verb+\newjfontfamily+\\
+欧文フォント
+&\verb+\fontspec+&\verb+\setmainfont+&\verb+\setsansfont+&\verb+\newfontfamily+\\
+\midrule
+和文フォント
+&\verb+\newjfontface+&\verb+\defaultjfontfeatures+&\verb+\addjfontfeatures+\\
+欧文フォント
+&\verb+\newfontface+&\verb+\defaultfontfeatures+&\verb+\addfontfeatures+\\
+\bottomrule
+\end{tabular}
+\end{center}
+%</ja>
 
+\begin{LTXexample}
+  \fontspec[Numbers=OldStyle]{TeX Gyre Termes}
+  \jfontspec{IPAexMincho}
+  JIS~X~0213:2004→辻
 
+  \addjfontfeatures{CJKShape=JIS1990}
+  JIS~X~0208:1990→辻
+\end{LTXexample}
+
+%<*en>
 Note that there is no command named \verb+\setmonojfont+, since it is
 popular for Japanese fonts that nearly all Japanese glyphs have same
 widths.  Also note that the kerning feature is set off by default in
 these 7~commands, since this feature and \textbf{JAglue} will clash (see
 \ref{para-kern}).
+%</en>
+%<*ja>
+和文フォントについては全ての和文文字のグリフがほぼ等幅であるのが普通であるため，
+\verb+\setmonojfont+ コマンドは存在しないことに注意．また，これらの和文用の7つのコマ
+ンドでは Kerning feature はデフォルトでは off となっている．これはこの
+feature が \textbf{JAglue} と衝突するためである（\ref{para-kern} 節を見よ）．
+%</ja>
 
 %<en>\section{Changing Parameters}
 %<ja>\section{パラメータの変更}
@@ -1733,8 +2065,8 @@ whose CID number in Adobe-Japan1 is \verb+xxx+.
 %<ja>\section{パラメータの保持}
 \label{sec-para}
 %<en>\subsection{Used Dimensions, Attributes and whatsit nodes}
-%<ja>\subsection{ディメンション，アトリビュート，whatsit ノードを用いて}
-Here the following is the list of dimension and attributes which are used in \LuaTeX-ja.
+%<ja>\subsection{用いられる寸法レジスタ，属性レジスタ，whatsit ノード}
+Here the following is the list of dimensions and attributes which are used in \LuaTeX-ja.
 \begin{list}{}{%
 \def\makelabel{\ttfamily}
 \def\dim#1{\item[\char92 #1\ \textrm{(dimension)}]}
