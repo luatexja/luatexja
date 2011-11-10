@@ -189,7 +189,7 @@
 
 %%%%%%%% Redefine \/
 %\let\ltj@ic=\/ \protected\def\/{{\ltj@icflag=1\ltj@ic}}
-\protected\def\/{\directlua{luatexja.jfont.append_italic()}}
+\protected\def\/{\relax\directlua{luatexja.jfont.append_italic()}}
 
 %%%%%%%% \jfont\CS={...:...;jfm=metric;...}, \globaljfont
 \protected\def\jfont{\afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false)}}
@@ -202,9 +202,9 @@
 
 %%%%%%%% \inhibitglue
 \let\new@everypar=\everypar
-\protected\def\inhibitglue{%
+\protected\def\inhibitglue{\relax%
   \ifvmode
-  \directlua{ltj.global_temp = tex.globaldefs; tex.globaldefs = 0}% trick
+    \directlua{ltj.global_temp = tex.globaldefs; tex.globaldefs = 0}% trick
     \xdef\@@tempa{\the\everypar}%
     \xdef\@@tempb{\everypar={\@@tempa}\@@tempa\noexpand\ltj@@ihb}%
     \everypar\expandafter{\@@tempb}%
