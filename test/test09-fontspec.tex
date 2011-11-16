@@ -56,5 +56,25 @@
 \noindent{\addjfontfeatures{Kerning=On} アノ ← Kerning=On}
 }
 
+\subsection{unicode}
 
+設定依存：「\char"201C」「\char"010F」%"
+常に和文：「\kchar"201C」「\kchar"010F」%"
+常に欧文：「\achar"201C」「\achar"010F」%"
+
+{\tracingall\let\char=\achar\textquotedblleft}あ\textquotedblleft あ%
+{\let\char=\kchar\textquotedblleft}あ“あ
+
+\begin{itemize}
+\item hoge
+\begin{itemize}
+\item hoge\textendash\kchar"2013\achar"2013
+\begin{itemize}
+\item hoge
+\begin{itemize}
+\item hoge\textperiodcentered\kchar"00B7\achar"00B7・
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\end{itemize}
 \end{document}
