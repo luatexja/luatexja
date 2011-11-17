@@ -405,29 +405,38 @@
   \directlua{ltj.ext_get_parameter_binary('#1', \ltj@safe@num{#2})}%
 }
 
-%%%%%%%% \achar<number>, \kchar<number>
+%%%%%%%% \ltjalchar<number>, \ltjjachar<number>
 \let\ltj@@origchar=\char
-\protected\def\kchar{\afterassignment\ltj@@kchar\ltj@tempcnta}
-\def\ltj@@kchar{{%
+\protected\def\ltj@alljachar{\relax
     \csname ltj@kcat0\endcsname=0
     \csname ltj@kcat1\endcsname=0
     \csname ltj@kcat2\endcsname=0
     \csname ltj@kcat3\endcsname=0
     \csname ltj@kcat4\endcsname=0
     \csname ltj@kcat5\endcsname=0
-    \csname ltj@kcat6\endcsname=0
-    \ltj@@origchar\ltj@tempcnta}}
-\protected\def\achar{\afterassignment\ltj@@achar\ltj@tempcnta}
-\def\ltj@@achar{{%
+    \csname ltj@kcat6\endcsname=0 }
+\protected\def\ltj@allalchar{\relax
     \csname ltj@kcat0\endcsname="7FFFFFFF %"
     \csname ltj@kcat1\endcsname="7FFFFFFF %"
     \csname ltj@kcat2\endcsname="7FFFFFFF %"
     \csname ltj@kcat3\endcsname="7FFFFFFF %"
     \csname ltj@kcat4\endcsname="7FFFFFFF %"
     \csname ltj@kcat5\endcsname="7FFFFFFF %"
-    \csname ltj@kcat6\endcsname="7FFFFFFF %"
-    \ltj@@origchar\ltj@tempcnta}}
+    \csname ltj@kcat6\endcsname="7FFFFFFF }%"
+\protected\def\ltj@backup@kcat{\edef\ltj@restore@kcat{%
+    \csname ltj@kcat0\endcsname=\expandafter\the\csname ltj@kcat0\endcsname\relax
+    \csname ltj@kcat1\endcsname=\expandafter\the\csname ltj@kcat1\endcsname\relax
+    \csname ltj@kcat2\endcsname=\expandafter\the\csname ltj@kcat2\endcsname\relax
+    \csname ltj@kcat3\endcsname=\expandafter\the\csname ltj@kcat3\endcsname\relax
+    \csname ltj@kcat4\endcsname=\expandafter\the\csname ltj@kcat4\endcsname\relax
+    \csname ltj@kcat5\endcsname=\expandafter\the\csname ltj@kcat5\endcsname\relax
+    \csname ltj@kcat6\endcsname=\expandafter\the\csname ltj@kcat6\endcsname\relax}}
+\let\ltj@restore@kcat=\relax
 
+\protected\def\ltjjachar{\afterassignment\ltj@@kchar\ltj@tempcnta}
+\def\ltj@@kchar{{\directlua{tex.globaldefs = 0}\ltj@alljachar\ltj@@origchar\ltj@tempcnta}}
+\protected\def\ltjalchar{\afterassignment\ltj@@achar\ltj@tempcnta}
+\def\ltj@@achar{{\directlua{tex.globaldefs = 0}\ltj@allalchar\ltj@@origchar\ltj@tempcnta}}
 
 
 

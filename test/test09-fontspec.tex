@@ -59,20 +59,20 @@
 \subsection{unicode}
 
 設定依存：「\char"201C」「\char"010F」%"
-常に和文：「\kchar"201C」「\kchar"010F」%"
-常に欧文：「\achar"201C」「\achar"010F」%"
+常に和文：「\ltjjachar"201C」「\ltjjachar"010F」%"
+常に欧文：「\ltjalchar"201C」「\ltjalchar"010F」%"
 
-{\tracingall\let\char=\achar\textquotedblleft}あ\textquotedblleft あ%
-{\let\char=\kchar\textquotedblleft}あ“あ
+{\tracingall\let\char=\ltjalchar\textquotedblleft}あ\textquotedblleft あ%
+{\let\char=\ltjjachar\textquotedblleft}あ“あ
 
 \begin{itemize}
 \item hoge
 \begin{itemize}
-\item hoge\textendash\kchar"2013\achar"2013
+\item hoge\textendash\ltjjachar"2013\ltjalchar"2013
 \begin{itemize}
 \item hoge
 \begin{itemize}
-\item hoge\textperiodcentered\kchar"00B7\achar"00B7・
+\item hoge|\textperiodcentered|\ltjjachar"00B7|\ltjalchar"00B7|・|
 \end{itemize}
 \end{itemize}
 \end{itemize}

@@ -14,6 +14,8 @@ local ltb = luatexbase
 local tostring = tostring
 local node, table, tex, token = node, table, tex, token
 
+local cat_lp = luatexbase.catcodetables['latex-package']
+
 -------------------- 
 
 public_name = 'luatexja'
@@ -428,6 +430,13 @@ if not _M.debug or _M.debug == _G.debug then
   function debug_logger()
     return no_op
   end
+end
+
+-------------------- getting next token
+cstemp = nil
+function get_cs(s)
+   cstemp = token.csname_name(token.get_next())
+   tex.sprint(cat_lp,'\\' .. s)
 end
 
 -------------------- all done

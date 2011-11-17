@@ -15,7 +15,7 @@
  \else
   \ifcat \active\noexpand#8%
    \ifx\add@flag\@ne %
-    \expandafter\def\csname\UTFencname\string#8\endcsname{\achar"#1#2#3#4\relax}%
+    \expandafter\def\csname\UTFencname\string#8\endcsname{\ltjalchar"#1#2#3#4\relax}%
     \ifx\unDeFiNed@#8%
      \ifx\cf@encoding\UTFencname
       \DeclareTextCommand{#8}{OT1}{\undefined}%
@@ -46,7 +46,7 @@
    \ifx\add@flag\@ne %
     \edef\tmp@name{\expandafter\string\csname\UTFencname\endcsname
       \expandafter\string\csname#8\endcsname}%
-    \expandafter\def\csname\tmp@name\endcsname{\achar"#1#2#3#4\relax}%
+    \expandafter\def\csname\tmp@name\endcsname{\ltjalchar"#1#2#3#4\relax}%
     \ifx\cf@encoding\UTFencname
      \expandafter\DeclareTextCommand\expandafter
        {\csname#8\endcsname}{OT1}{\undefined}%
@@ -63,17 +63,17 @@
  \ifx @#4\relax
   \UTFacc@warning@{insufficient hex digits #7 for #6-\string#8#9}%
  \else
-  \def\UTFchar{\achar"#1#2#3#4\relax}%
+  \def\UTFchar{\ltjalchar"#1#2#3#4\relax}%
   \expandafter\expandafter\expandafter\declare@utf@composite
   \expandafter\expandafter\expandafter
    {\expandafter\csname#6\endcsname}{\UTFchar}{#8}{#9}\relax
  \fi}
-%\gdef\add@UTF@accent#1#2#3{#2\achar"#1\relax}
-\gdef\add@UTF@accent#1#2#3{\ifx\relax#2\relax\achar"#3\else
- \ifx\ #2\relax\achar"#3\else
- \expandafter\ifx\UTF@space#2\relax\achar"#3\else
- \ifx~#2\achar"#3\else#2\achar"#1\fi\fi\fi\fi\relax}
-\gdef\add@UTF@accents#1#2#3{#2\achar"#1\achar"#3\relax}
+%\gdef\add@UTF@accent#1#2#3{#2\ltjalchar"#1\relax}
+\gdef\add@UTF@accent#1#2#3{\ifx\relax#2\relax\ltjalchar"#3\else
+ \ifx\ #2\relax\ltjalchar"#3\else
+ \expandafter\ifx\UTF@space#2\relax\ltjalchar"#3\else
+ \ifx~#2\ltjalchar"#3\else#2\ltjalchar"#1\fi\fi\fi\fi\relax}
+\gdef\add@UTF@accents#1#2#3{#2\ltjalchar"#1\ltjalchar"#3\relax}
 }
 %% End of patch for xunicode.sty "
 
