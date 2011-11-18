@@ -45,6 +45,9 @@ local PROCESSED = 8
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_find_char_class = ltjf.find_char_class
 
+-- table of mathematical characters
+is_math_letters = {}
+
 local conv_jchar_to_hbox_A
 
 -- sty : 0 (display or text), 1 (script), >=2 (scriptscript)
@@ -93,7 +96,7 @@ function (p, sty)
       end
    elseif p.id == id_mchar then
       local fam = has_attr(p, attr_jfam) or -1
-      if ltjc.is_ucs_in_japanese_char(p) and fam>=0 then
+      if (not is_math_letters[p.char]) and ltjc.is_ucs_in_japanese_char(p) and fam>=0 then
 	 local mode = 'mjss'
 	 if sty == 0 then mode = 'mjtext'
 	 elseif sty == 1 then mode = 'mjscr'
