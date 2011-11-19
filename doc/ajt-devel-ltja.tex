@@ -52,8 +52,9 @@
 \keywords{\TeX, p\TeX, \LuaTeX, \LuaTeX-ja, Japanese}
 \abstract{%
 \LuaTeX-ja package is a macro package for typesetting Japanese
-documents under \LuaTeX.  This packages has more flexibility of
-typesetting than p\TeX, and corrected some unwanted features of p\TeX.
+documents under \LuaTeX.  The package has more flexibility of
+typesetting than \pTeX, which is widely used Japanese extension of \TeX,
+and has corrected some unwanted features of \pTeX.
 In this paper, we describe specifications, the current status and some
 internal processing methods of \LuaTeX-ja.
 }
@@ -70,20 +71,20 @@ internal processing methods of \LuaTeX-ja.
 
 \section{Introduction}
 \subsection{History}
-To typeset Japanese documents with \TeX, ASCII p\TeX~\cite{ptex} has
+To typeset Japanese documents with \TeX, ASCII \pTeX~\cite{ptex} has
 been widely used in Japan.  There are other methods---for example, using
 Omega and OTP~\cite{omega}, or with the CJK package---to do so, however,
 these alternative methods did not become a majority.  The author thinks
-that this is because p\TeX\ enables us to produce high-quality documents
-(e.g.,~supporting vertical typesetting), and the appearance of p\TeX\ is
-earlier than alternatives described above.
+that this is because \pTeX\ enables us to produce high-quality documents
+(e.g.,~supporting vertical typesetting), and the appearance of \pTeX\ is
+earlier than that of alternatives described above.
 
-However, p\TeX\ has been left behind from the extensions of \TeX\
+However, \pTeX\ has been left behind from the extensions of \TeX\
 such as \eTeX\ and \pdfTeX, and the diffusion of UTF-8 encoding.  In
-recent years, the situation become better, because of development
+recent years, the situation has become better, because of development
 of |ptexenc|~\cite{ptexenc} by Nobuyuki Tsuchimura (\hbox{土村展之}),
-$\varepsilon$-p\TeX~\cite{eptex} by the author,~and up\TeX~\cite{uptex}
-by Takuji Tanaka (田中琢爾). However, continuing this approach, namely, to develop
+$\varepsilon$-\pTeX~\cite{eptex} by the author,~and u\pTeX~\cite{uptex}
+by Takuji Tanaka (田中琢爾). However, continuing this approach, namely, to develop
 an engine extension localized for Japanese, is not wise. This approach
 needs lots of work for \emph{each} engine, and since \LuaTeX\ has an ability
 to hook \TeX's internal process by using Lua callbacks, the necessity of
@@ -111,8 +112,8 @@ these situations.
 \subsection{Development policy of \LuaTeX-ja}
 \label{ssec-pol} 
 The first aim of \LuaTeX-ja project is to implement features (from the
-'primitive' level) of p\TeX\ as macros under \LuaTeX, so \LuaTeX-ja is
-much affected by p\TeX.  However, as development proceeds, some
+`primitive' level) of \pTeX\ as macros under \LuaTeX, so \LuaTeX-ja is
+much affected by \pTeX.  However, as development proceeds, some
 technical/conceptual difficulties are arisen. Hence we changed the aim
 of the project as follows:
 \begin{itemize}
@@ -127,14 +128,14 @@ of the project as follows:
 In this point, previous attempts of Japanese typesetting with \LuaTeX\
      which we cited in the previous subsection are inadequate.
 
-p\TeX\ has some flexibility of typesetting, by changing internal
+\pTeX\ has some flexibility of typesetting, by changing internal
      parameters such as |\kanjiskip| or |\prebreakpenalty|, and by using
      custom JFM (Japanese TFM). Therefore we decided to include these
      functionality to \LuaTeX-ja.
 
-\item\emph{\LuaTeX-ja isn't mere re-implementation or porting of p\TeX;
+\item\emph{\LuaTeX-ja isn't mere re-implementation or porting of \pTeX;
      some (technically and/or conceptually) inconvenient features of
-     p\TeX\ are modified.} 
+     \pTeX\ are modified.} 
 
      We describe this point in more detail at the next section.
 \end{itemize}
@@ -142,7 +143,7 @@ p\TeX\ has some flexibility of typesetting, by changing internal
 
 \subsection{Overview of the processes}
 \label{ssec-over}
-We describe  an outline of \LuaTeX-ja's process in order.
+We describe an outline of \LuaTeX-ja's process in order.
 \begin{itemize}
 \item In the |process_input_buffer| callback: treatment of breaking
       lines after a Japanese character (in Subsection~\ref{ssec-line}).
@@ -182,18 +183,20 @@ This stage is similar to adjustument of the position of glyphs (see
 
 \subsection{Contents of this paper}
 Here we describe the contents of the rest of this paper briefly.  In
-Section~2, we describe major differences between p\TeX\ and \LuaTeX-ja.
-The next section, Section~3, is concentrated on a problem `how we
+Section~\ref{sec:differences_with_ptex},
+we describe major differences between \pTeX\ and \LuaTeX-ja.
+The next section, Section~\ref{sec:distinction_of_characters},
+is concentrated on a problem `how we
 distinguish between Japanese characters and alphabetic characters'. In
-Section~4, we show rest of features of \LuaTeX-ja package, and
-current status of the package.  Finally, in Section~5, we describe some
+Section~\ref{sec:current_status}, we show rest of features of \LuaTeX-ja package, and
+current status of the package.  Finally, in Section~\ref{sec:implementation}, we describe some
 internal routines of \LuaTeX-ja.
 
-\subsection*{About the project}
+\subsection{General information of the project}
 This \LuaTeX-ja project is hosted by SourceForge.jp. The official wiki
 is located on
-\url{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage}.  There is
-no stable version at Oct.\ 15, 2011, however the latest developer sources can be
+\url{http://sourceforge.jp/projects/luatex-ja/wiki/}.  There is
+no stable version on October 15, 2011, however a set of developer sources can be
 obtained from the git repository.  Members of the project team are as follows
 (in random order): Hironori Kitagawa, Kazuki Maeda, Takayuki Yato,
 Yusuke Kuroki, Noriyuki Abe, Munehiro Yamamoto, Tomoaki Honda,
@@ -201,17 +204,18 @@ and~Shuzaburo Saito.
 
 
 \section{Major differences with \pTeX}
-In this section, we explain several major differences between p\TeX\
+\label{sec:differences_with_ptex}
+In this section, we explain several major differences between \pTeX\
 and our \LuaTeX-ja.  For general information of Japanese typesetting and the
-overview of p\TeX, please see Okumura~\cite{ptexjp}.
+overview of \pTeX, please see Okumura~\cite{ptexjp}.
 
 
 \subsection{Names of control sequences}
-\label{ssec-csname} Because p\TeX\ is an engine modification of Knuth's
+\label{ssec-csname} Because \pTeX\ is an engine modification of Knuth's
 original \TeX82 engine, some primitives added by it take a form that is
 very difficult to be simulated by a macro.  For example, an additional
 primitive |\prebreakpenalty|$\langle\hbox{\it
-char\_code}\rangle$|[=]|$\langle\hbox{\it penalty}\rangle$ in p\TeX\
+char\_code}\rangle$|[=]|$\langle\hbox{\it penalty}\rangle$ in \pTeX\
 sets the amount of penalty inserted before a character whose code is
 $\langle\hbox{\it char\_code}\rangle$ to $\langle\hbox{\it
 penalty}\rangle$, and this form |\prebreakpenalty|$\langle\hbox{\it
@@ -221,12 +225,12 @@ Moreover, there are some parameters which values of them at the end of a
 horizontal box or that of a paragraph are effective in whole box or
 paragraph.  These parameters were implemented as additional internal
 parameters in \pTeX. However, the implementation of these parameters in
-\LuaTeX-ja is not so easy; we will discuss on it in
+\LuaTeX-ja is not so easy; we will discuss it in
 Subsection~\ref{ssec-stack}.
 
-From above 2~problems we discussed above, the assignment and retrieval
+From above two~problems we discussed above, the assignment and retrieval
 of most parameters in \LuaTeX-ja are summarized into the following
-3~control sequences:
+three~control sequences:
 \begin{itemize}
 \item |\ltjsetparameter{|$\langle\hbox{\it
       name}\rangle$|=|$\langle\hbox{\it value}\rangle$|,...}|: for local
@@ -244,7 +248,7 @@ of most parameters in \LuaTeX-ja are summarized into the following
 
 Japanese texts can break lines almost everywhere, in contrast with
 alphabetic texts can break lines only between words (or use
-hyphenation). Hence, p\TeX's input processor is modified so that a
+hyphenation). Hence, \pTeX's input processor is modified so that a
 line-break after a Japanese character doesn't emit a space. However,
 there is no way to customize the input processor of \LuaTeX, other than
 to hack its CWEB-source. All a macro package can do is to modify an input line before
@@ -253,10 +257,10 @@ callback.
 
 Hence, in \LuaTeX-ja, a comment letter (we reserve U+FFFFF for this
 purpose) will be appended to an input line, if this line ends with a Japanese
-character\footnote{Strictly speaking, it also requires that the catcode
+character.\footnote{Strictly speaking, it also requires that the catcode
 of the end-line character is 5~(\emph{end-of-line}). This condition is
-useful under the verbatim environment.}. One might jump to a conclusion
-that the treatment of a line break by p\TeX\ and that of \LuaTeX-ja are
+useful under the verbatim environment.}  One might jump to a conclusion
+that the treatment of a line-break by \pTeX\ and that of \LuaTeX-ja are
 totally same, however they are different in the respect that \LuaTeX-ja's
 judgement whether a comment letter will be appended the line is done
 \emph{before} the line is actually processed by \LuaTeX.
@@ -277,7 +281,7 @@ input line~2.
 \ltjsetparameter{jacharrange={-6}}xあ
 y
 \end{LTXexample}
-\caption{A notable sample showing the treatment of a line break after a
+\caption{A notable sample showing the treatment of a line-break after a
 Japanese character.}\label{fig-linebreak}
 \end{figure}
 
@@ -288,7 +292,7 @@ Traditionally, most Japanese fonts used in typesetting are not
 proportional, that is, most glyphs have same size (in most cases,
 square-shaped). Hence, it is not rare that the contents of different
 JFMs are essentially same, and only differ in their names. For example,
-|min10.tfm| and |goth10.tfm|, which are JFMs shipped with p\TeX\ for
+|min10.tfm| and |goth10.tfm|, which are JFMs shipped with \pTeX\ for
 seriffed \emph{mincho} family and sans-seriffed \emph{gothic} family,
 differ their |FAMILY| and |FACE| only. Moreover, |jis.tfm| and
 |jisg.tfm|, which consists a parts of \emph{jis} font metric, which is
@@ -362,7 +366,7 @@ typesetting will be divided into the following three categories:
       cases, its natural width is zero, and some stretch/shrink for
       justifying each line.
 \end{itemize}
-In p\TeX, these three kinds of glues are treated differently. A JFM glue
+In \pTeX, these three kinds of glues are treated differently. A JFM glue
 is inserted when a (sequence of) Japanese character is appended to the
 current list, same as the case of alphabetic characters in \TeX82. This
 means that one can interrupt the insertion process by saying |{}|.  A
@@ -371,7 +375,7 @@ paragraph; this timing is somewhat similar to that of \LuaTeX's kerning
 process. Finally, A \emph{kanjiskip} is not appeared as a node anywhere;
 only appears implicitly in calculation of the width of a horizontal box,
 that of breaking lines, and the actual output process to a DVI
-file. These specifications made p\TeX's behavior very hard to
+file. These specifications made \pTeX's behavior very hard to
 understand.
 
 \LuaTeX-ja inserts glues in all three categories simultaneously inside
@@ -382,14 +386,14 @@ for \LuaTeX-ja's process.
 
 \subsection{Insertion of glues/kerns for Japanese typesetting: specification}
 \begin{table}
-\caption{Examples of differences between  p\TeX\ and \LuaTeX-ja,}
+\caption{Examples of differences between \pTeX\ and \LuaTeX-ja.}
 \label{tab-jfmglue}
 \begin{center}
 \begin{tabular}{llllllll}
 \toprule
 &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
 Input      &|あ】{}【〙\/〘|        &|い』\/a| &|う）\hbox{}（| &|え］\special{}［|\\\midrule
-p\TeX      &あ】\hbox{}【〙\hbox{}〘&い』\/a   &う）\hbox{}（   &え］\hbox{}［\\
+\pTeX      &あ】\hbox{}【〙\hbox{}〘&い』\/a   &う）\hbox{}（   &え］\hbox{}［\\
 \LuaTeX-ja &あ】{}【〙\/〘          &い』\/a   &う）\hbox{}（   &え］\special{}［\\
 \bottomrule
 \end{tabular}
@@ -417,13 +421,13 @@ Now we will take a look inside the insertion process itself, and describe 4~poin
 
 \begin{description}
 \item[Ignored Nodes]
-As noted in the previous subsection, the insertion process in p\TeX\ can
+As noted in the previous subsection, the insertion process in \pTeX\ can
 	   be interrupted by saying |{}| or anything else\footnote{This
 	   is why some tricks like \texttt{ちょ\char`\{\char`\}っと} for
 	   \texttt{min10.tfm} and other `old' JFMs work.}. This leads
 	   the second row in Table~\ref{tab-jfmglue}, or
 	   Figure~\ref{fig-ptexjfm}. `The process is interrupted' means
-	   that p\TeX\ does not think the letter `】\inhibitglue' is
+	   that \pTeX\ does not think the letter `】\inhibitglue' is
 	   followed by `\inhibitglue【', hence two half-width glues are
 	   inserted between between `】\inhibitglue' and `\inhibitglue【',
 	   where one is from `】\inhibitglue' and another is from
@@ -446,11 +450,11 @@ By the way, around a \emph{glyph\_node} $p$ there may be some nld odes
 	   correction\footnote{\TeX82 (and \LuaTeX) does not distinguish
 	   between explicit kern and a kern for italic correction. To
 	   distinguish them, an additional subtype for kern is introduced
-	   in p\TeX. On the other hand, \LuaTeX-ja uses an additional attribute and
+	   in \pTeX. On the other hand, \LuaTeX-ja uses an additional attribute and
 	   redefines \texttt{\char`\\/}.} for $p$. It is natural that
 	   these attachments should be ignored inside the process. Hence
 	   \LuaTeX-ja takes this approach, as the latest version of
-	   p\TeX\ (p3.2). This explains (2) in the figure.
+	   \pTeX\ (p3.2). This explains (2) in the figure.
 
 Summerizing above, one should put an empty horizontal box |\hbox{}| to
 	   where he wants to interrupt the insertion process in
@@ -466,7 +470,7 @@ Consider the following input, where all Japanese fonts use same metric
 明朝）\gt （ゴシック
 \end{verbatim}
 \end{quote}
-If the above input is processed by p\TeX, because the insertion process is
+If the above input is processed by \pTeX, because the insertion process is
 	   interrupt by |\gt|, the result looks like
 \begin{quote}
 \mc 明朝）\hbox{}\gt （ゴシック
@@ -494,7 +498,7 @@ In the case where two consecutive Japanese characters use different metrics and/
 漢）\gt （漢）\large （大
 \end{verbatim}
 \end{quote}
-As the previous paragraph, this input yields the following, by p\TeX:
+As the previous paragraph, this input yields the following, by \pTeX:
 \begin{quote}
 \mc 漢）\hbox{}\gt （漢）\hbox{}\large （大
 \end{quote}
@@ -533,13 +537,13 @@ We thought that amounts of spaces between parentheses in above output
 \end{figure}
 
 \item[\emph{kanjiskip} and \emph{xkanjiskip}]
-In p\TeX, the value of \emph{xkanjiskip} is controlled by a skip named
+In \pTeX, the value of \emph{xkanjiskip} is controlled by a skip named
 	   |\xkanjiskip|. A defect of this implementation is that the
 	   value of \emph{xkanjiskip} is not connected with the size of
 	   the currnt Japanese font. It seems that |EXTRASPACE|,
 	   |EXTRASTRETCH|, |EXTRASHRINK| parameters in a JFM are
 	   reserved for specifying the default value of
-	   \emph{xkanjiskip} in a unit of the design size, but p\TeX\
+	   \emph{xkanjiskip} in a unit of the design size, but \pTeX\
 	   did not use these parameters. 
 
 Considering this situation of p\TeX, \LuaTeX-ja can use the value of
@@ -553,6 +557,7 @@ This description also applies for \emph{kanjiskip}.
 \end{description}
 
 \section{Distinction of characters}
+\label{sec:distinction_of_characters}
 Since \LuaTeX\ can handle Unicode characters natively, it is a major
 problem that how we distinguish Japanese characters and alphabetic
 characters. For example, the multiplication sign (U+00D7) exists both in
@@ -563,14 +568,14 @@ used in the sense of `negative' in Japan.
 
 \subsection{Character ranges}
 Before we describe the approach taken is \LuaTeX-ja, we review the
-approach taken by up\TeX.  up\TeX\ extends the |\kcatcode| primitive in
-p\TeX, to use this primitive for setting how a character is treated
+approach taken by u\pTeX.  u\pTeX\ extends the |\kcatcode| primitive in
+\pTeX, to use this primitive for setting how a character is treated
 among alphabetic characters~(15), \emph{kanji}~(16), \emph{kana}~(17),
 \emph{kanji}, \emph{Hangul}~(17), or~\emph{other CJK characters}~(18).
 The assignment to |\kcatcode| can be done by a Unicode
 block\footnote{There are some exceptions. For example, U+FF00--FFEF
 (Halfwidth and Fullwidth Forms) are divided into three blocks in recent
-up\TeX.}.
+u\pTeX.}.
 
 \LuaTeX-ja adopted a different approach. There are many Unicode blocks
 	   in Basic Multilingual Plane which are not included in
@@ -635,7 +640,7 @@ This is because some 8-bit TFMs have a glyph in this range; for example,
 
 
 \begin{table}
-\caption{Predefined ranges in \LuaTeX-ja}
+\caption{Predefined ranges in \LuaTeX-ja.}
 \label{tab-chrrng}
 \begin{center}
 \begin{tabular}{@{\bf}rl}
@@ -675,7 +680,7 @@ Figure~\ref{fig-unitxt} ...
 \ltjjachar`×, % Japanese char
 \texttimes     % alph. char (by fontspec)
 \end{LTXexample}
-\caption{Control sequences producing a Unicode character}
+\caption{Control sequences producing a Unicode character.}
 \label{fig-unitxt}
 \end{figure}
 
@@ -707,13 +712,14 @@ We would like to extend treatments described in this section to 8-bit
 font encodings, but we leave it to further development too.
 
 \section{Current status of development}
+\label{sec:current_status}
 At the moment, \LuaTeX-ja can be used under plain \TeX, and under
 \LaTeXe. Generally speaking, one only has to read |luatexja.sty|, by
 |\input| command or |\usepackage| (in~\LaTeXe), if you merely want to
 typeset Japanese characters.  We look more detail by parts. 
 
 \subsection{`Engine extension'}
-The lowest part of \LuaTeX-ja corresponds the p\TeX\ extension as
+The lowest part of \LuaTeX-ja corresponds the \pTeX\ extension as
 \emph{an engine extension of \TeX}. We, the project menbers, think that
 this part is almost done. There is one more feature of \LuaTeX-ja which
 we are going to explain:
@@ -722,13 +728,13 @@ we are going to explain:
 \item[Shifting Baseline]
 In order to make a match between Japanese fonts and alphabetic fonts,
 	   sometimes shifting the baseline of alphabetic characters may
-	   be needed. p\TeX\ has a dimension |\ybaselineshift|, which
+	   be needed. \pTeX\ has a dimension |\ybaselineshift|, which
 	   corresponds the amount of shifting down the baseline of alphabetic
 	   characters. This is useful for Japanese-based documents, but
 	   not for documents mainly in languages with alphabetic
 	   characters.
 
-Hence, \LuaTeX-ja extends p\TeX's |\ybaselineshift| to Japanese
+Hence, \LuaTeX-ja extends \pTeX's |\ybaselineshift| to Japanese
 	   characters. Namely, \LuaTeX-ja offers two parameters,
 	   \textsf{yjabaselineshift} and \textsf{yalbaselineshift}, for the
 	   amount of shifting the baseline of Japanese characters and
@@ -800,7 +806,7 @@ An example output is shown in Figure~\ref{fig-bls}. The left half is the
 Note that \LuaTeX-ja doesn't support vertical typesetting, \emph{tategaki}, for now. 
 
 \subsection{Patches for plain \TeX\ and \LaTeXe}
-p\TeX\ has a patch for plain \TeX, namely |ptex.tex|, that for \LaTeXe\
+\pTeX\ has a patch for plain \TeX, namely |ptex.tex|, that for \LaTeXe\
 macro (this patch and \LaTeXe\ consist \emph{p\LaTeXe}), and
 |kinsoku.tex| which includes the default setting of \emph{kinsoku
 shori}, the Japanese hyphenation.  We ported them to \LuaTeX-ja, except
@@ -850,7 +856,7 @@ To work this behavior well, a list of all (alphabetic) encodings defined
 \subsection{Classes for Japanese documents}
 To produce `high-quality' Japanese documents, we need not only that
 Japanese characters are correctly placed, but also class files for
-Japanese documents. In p\TeX, there are two major families of classes:
+Japanese documents. In \pTeX, there are two major families of classes:
 \emph{jclasses} which is distributed with the official p\LaTeXe\ macros,
 and \emph{jsclasses}.  At the present, \LuaTeX-ja
 simply contains their counterparts: \emph{ltjclasses} and
@@ -879,7 +885,7 @@ the former two packages.
 	   control sequences producing Unicode characters.
 
 \item[The \emph{otf} package]
-This package is widely used in p\TeX\ for characters which is
+This package is widely used in \pTeX\ for characters which is
 not in JIS~X~0208, and for using more than one weight in \emph{mincho}
 and \emph{gothic} font families. Therefore \LuaTeX-ja supports features
 in the \emph{otf} package, by loading \texttt{luatexja-\penalty0otf.sty}
@@ -902,11 +908,11 @@ It is well-known that there is a patch |jlisting.sty| of the
 
 \section{Implementation}
 \subsection{Handling of Japanese fonts}
-In p\TeX, there are three slots for maintaining current fonts, namely
+In \pTeX, there are three slots for maintaining current fonts, namely
 |\font| for alphabetic fonts, |\jfont| for Japanese font (in horizontal
 direction) and |\tfont| for Japanese font (in vertical direction). With
 these slots, we can manage the current font for alphabetic characters
-and that for Japanese characters separately in p\TeX.  However, \LuaTeX\
+and that for Japanese characters separately in \pTeX.  However, \LuaTeX\
 has only one slot for maintaining the current font, as \TeX82.  This
 situation leads a problem: how can we maintain the `current Japanese
 font'?
@@ -917,11 +923,11 @@ mapping table from alphabetic fonts to corresponding Japanese fonts
 that we always use composite fonts with alphabetic fonts and Japanese
 fonts. The third approach is that the information of the current
 Japanese font is stored in an attribute. We adopted the third approach,
-since \LuaTeX-ja is much affected by p\TeX\ as we noted in
+since \LuaTeX-ja is much affected by \pTeX\ as we noted in
 Subsection~\ref{ssec-pol}.
 
 As in Figure~\ref{fig-jfdef}, \LuaTeX-ja uses |\jfont| for defining
-Japanese font, as p\TeX.  However, because the information of the current
+Japanese font, as \pTeX.  However, because the information of the current
 Japanese font is stored into an attribute, control sequences defined by
 |\jfont| (e.g.,~|\foo| and |\bar| in Figure~\ref{fig-jfdef}) is
 not representing a font by the means of \TeX82. In other words, each of
@@ -959,7 +965,7 @@ void package(int c)
         subtype(cur_box) = HLIST_SUBTYPE_HBOX;
     } else {
 \end{lstlisting}
-\caption{An extract of a CWEB-source \texttt{tex/packaging.w} of \LuaTeX}
+\caption{An extract of a CWEB-source \texttt{tex/packaging.w} of \LuaTeX.}
 \label{fig-ltsrc}
 \end{figure}
 
@@ -1018,7 +1024,7 @@ usually differ. For example, the letter `\inhibitglue【' is half-width
 in |jfm-ujis.lua| or |jis.tfm|, while this letter is full-width like `【'
 in most TrueType fonts used in Japanese typesetting, such as
 IPA~Mincho. Hence the adjustment of position of such glyphs is
-needed. In the context of p\TeX, this process was performed using virtual fonts.
+needed. In the context of \pTeX, this process was performed using virtual fonts.
 
 On the other hand, Lua\TeX-ja does the adjustment by encapsuling a glyph
 into a horizontal box. There are two main reasons why we adopted this
@@ -1097,14 +1103,14 @@ now, however we would like to offer several solutions in future development.
 
 \section{Conclusion}
 We have discussed about our \LuaTeX-ja package, which is much affected
-by p\TeX. For now, it can be used for experimental use, however there
+by \pTeX. For now, it can be used for experimental use, however there
 are much refinements which are needed for regular use. The author hopes
 that this paper and this project contribute the typesetting Japanese,
 and possibly other Asian languages, under \LuaTeX.
 
 \section*{Acknowledgements}
 The author would like to thank Ken Nakano and Hideaki Togashi for their
-development of ASCII p\TeX.  The author is very grateful to Haruhiko
+development of ASCII \pTeX.  The author is very grateful to Haruhiko
 Okumura for his leadership in the Japanese \TeX\ community. The author
 is also very grateful to members of \LuaTeX-ja project team for their
 valuable cooperation in development.
@@ -1120,7 +1126,7 @@ Adobe Systems Incorporated, \emph{Adobe-Japan1-6 Character Collection
 \url{http://partners.adobe.com/public/developer/en/font/5078.Adobe-Japan1-6.pdf}
 
 \bibitem{ptex}
-ASCII MEDIA WORKS，アスキー日本語\TeX\ (p\TeX)．\url{http://ascii.asciimw.jp/pb/ptex/}
+ASCII MEDIA WORKS，アスキー日本語\TeX\ (\pTeX)．\url{http://ascii.asciimw.jp/pb/ptex/}
 
 \bibitem{omega}
 Jin-Hwan~Cho and Haruhiko Okumura, \emph{Typesetting CJK Languages with Omega},
@@ -1135,7 +1141,7 @@ Japanese Industrial Standards Committee. \emph{JIS~X~4051: Formatting
 	rules for Japanese documents}, 1993, 1995, 2004.
 
 \bibitem{eptex}
-北川弘典，$\varepsilon$-p\TeX についてのwiki．
+北川弘典，$\varepsilon$-\pTeX についてのwiki．
 \url{http://sourceforge.jp/projects/eptex/wiki/FrontPage}
 
 \bibitem{luaums}
@@ -1166,7 +1172,7 @@ in the Git repository.
 \url{http://oku.edu.mie-u.ac.jp/~okumura/jsclasses/}
 
 \bibitem{ptexjp}
-Haruhiko Okumura, \emph{p\TeX\ and Japanese Typesetting},
+Haruhiko Okumura, \emph{\pTeX\ and Japanese Typesetting},
 	The Asian Journal of \TeX\ \textbf{2}~(2008), 43--51.
 
 \bibitem{min10}
@@ -1182,7 +1188,7 @@ Jonathan Sauer, \emph{[Dev-luatex] tex.currentgrouplevel}.
 \url{http://www.ntg.nl/pipermail/dev-luatex/2008-August/001765.html}
 
 \bibitem{uptex}
-Takuji Tanaka, \emph{up\TeX, up\LaTeX---unicode version of p\TeX, p\LaTeX}.
+Takuji Tanaka, \emph{u\pTeX, up\LaTeX---unicode version of \pTeX, p\LaTeX}.
 \url{http://homepage3.nifty.com/ttk/comp/tex/uptex_en.html}
 
 \bibitem{ptexenc}
