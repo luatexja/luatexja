@@ -833,7 +833,7 @@ this chapter. For the method, please see Part~\ref{part-ref}.
 %</en>
 %<*ja>
 また \LuaTeX-ja プロジェクトでは，和文文字が識別子として用いられることはほとんどない
-と考えており，したがってこの章では数式モード中の和文フォントを変更する方法については
+と考えており，したがってこの節では数式モード中の和文フォントを変更する方法については
 記述しない．この方法については第 \ref{part-ref} 部を参照のこと．
 %</ja>
 
@@ -1154,12 +1154,12 @@ number shows whether characters in the range is treated as
 %</ja>
 \begin{description}
 %<*en>
-\item[Range~8${}^{\text{J}}$] Symbols in the intersection of the upper half of ISO~8859-1
+\item[Range~8${}^{\text{J}}$] Symbols in the intersection of the lower half of ISO~8859-1
 	 (Latin-1 Supplement) and JIS~X~0208 (a basic character set for Japanese). This character range
 	 consists of the following characters:
 %</en>
 %<*ja>
-\item{範囲 8${}^{\text{J}}$} ISO~8869~1 の上半分（ラテン1補助）と 
+\item[範囲 8${}^{\text{J}}$] ISO~8859-1 の下半分（ラテン1補助）と 
                              JIS~X~0208 の共通部分にある記号．この文字範囲は
                              以下の文字で構成される：
 %</ja>
@@ -1194,7 +1194,7 @@ number shows whether characters in the range is treated as
 This range consist of the following Unicode ranges, \emph{except characters in the range~8 above}:
 %</en>
 %<*ja>
-\item{範囲 1${}^{\text{A}}$} ラテン文字．一部はAdobe-Japan1-6 にも含まれている．
+\item[範囲 1${}^{\text{A}}$] ラテン文字．一部はAdobe-Japan1-6 にも含まれている．
                              この範囲は以下の Unicode のブロックから構成されている．
                              \textbf{ただし，範囲 8 は除く．}
 %</ja>
@@ -1446,44 +1446,95 @@ The block list is indicated in Table~\ref{table-rng7}.
 %<en>\subsection{\Param{kanjiskip} and \Param{xkanjiskip}}
 %<ja>\subsection{\Param{kanjiskip} と \Param{xkanjiskip}}
 \label{subs-kskip}
+
+%<*en>
 \textbf{JAglue} is divided into the following three categories:
+%</en>
+%<*ja>
+\textbf{JAglue} は以下の3つのカテゴリに分類される：
+%</ja>
 \begin{itemize}
+%<*en>
 \item Glues/kerns specified in JFM. If \verb+\inhibitglue+ is issued
       around a Japanese character, this glue will be not inserted at the
       place.
-\item The default glue which inserted between two \textbf{JAchar}s (\textsf{
+%</en>
+%<*ja>
+\item JFM で指定されたグルー／カーン．もし \verb+\inhibitglue+ が和文文字の周りで
+      発行されていれば，このグルーは挿入されない．
+%</ja>
+%<*en>
+\item The default glue which inserted between two \textbf{JAchar}s (\Param{
       kanjiskip}).
+%</en>
+%<*ja>
+\item デフォルトで2つの \textbf{JAchar} の間に挿入されるグルー（\Param{kanjiskip}）．
+%</ja>
+%<*en>
 \item The default glue which inserted between a \textbf{JAchar} and an
       \textbf{ALchar} (\Param{xkanjiskip}).
+%</en>
+%<*ja>
+\item デフォルトで \textbf{JAchar} と \textbf{ALchar} の間に挿入されるグルー（\Param{xkanjiskip}）．
+%</ja>
 \end{itemize}
+%<*en>
 The value (a skip) of \Param{kanjiskip} or \Param{xkanjiskip} can be
 changed as the following.
+%</en>
+%<*ja>
+\Param{kanjiskip} や \Param{xkanjiskip} の値は以下のようにして変更可能である.
+%</ja>
 \begin{lstlisting}
 \ltjsetparameter{kanjiskip={0pt plus 0.4pt minus 0.4pt}, 
                  xkanjiskip={0.25\zw plus 1pt minus 1pt}}
 \end{lstlisting}
 
-
-It may occur that JFM contains the data of `ideal width of \textsf{kanjiskip}' 
+%<*en>
+It may occur that JFM contains the data of `ideal width of \Param{kanjiskip}' 
 and/or `ideal width of \Param{xkanjiskip}'.
 To use these data from JFM, set the value of \Param{kanjiskip} or 
 \Param{xkanjiskip} to \verb+\maxdimen+.
+%</en>
+%<*ja>
+JFM は「望ましい \Param{kanjiskip} の値」や「望ましい \Param{xkanjiskip} の値」を
+持っていることがある．
+これらのデータを使うためには，\Param{kanjiskip} や \Param{xkanjiskip} の値を
+\verb+\maxdimen+ の値に設定すればよい．
+%</ja>
 
 %<en>\subsection{Insertion Setting of \Param{xkanjiskip}}
 %<ja>\subsection{\Param{xkanjiskip} の設定の挿入}
-It is not desirable that \Param{xkanjiskip} is inserted between every
+
+%<*en>
+It is not desirable that \Param{xkanjiskip} is inserted into every
 boundary between \textbf{JAchar}s and \textbf{ALchar}s. For example,
 \Param{xkanjiskip} should not be inserted after opening parenthesis
 (\textit{e.g.}, compare `(あ' and `(\hskip\ltjgetparameter{xkanjiskip}あ').
+%</en>
+%<*ja>
+\Param{xkanjiskip} がすべての \textbf{JAchar} と \textbf{ALchar} の境界に
+挿入されるのは望ましいことではない．例えば，\Param{xkanjiskip} は開き括弧の
+後には挿入されるべきではない（`(あ' と `(\hskip\ltjgetparameter{xkanjiskip}あ' を
+比べてみよ）．
+%</ja>
 
+%<*en>
 \LuaTeX-ja can control whether \Param{xkanjiskip} can be inserted
 before/after a character, by changing \Param{jaxspmode} for \textbf{JAchar}s and
 \Param{alxspmode} parameters \textbf{ALchar}s respectively. 
+%</en>
+%<*ja>
+\LuaTeX-ja では \Param{xkanjiskip} をある文字の前／後に挿入するかどうかを，
+\textbf{JAchar} に対しては \Param{jaxspmode} を，\textbf{ALchar} に対しては
+\Param{alxspmode} をそれぞれ変えることで制御することができる．
+%</ja>
 \begin{LTXexample}
 \ltjsetparameter{jaxspmode={`あ,preonly}, alxspmode={`\!,postonly}} 
 pあq い!う
 \end{LTXexample}
 
+%<*en>
 The second argument \texttt{preonly} means `the insertion of
 \Param{xkanjiskip} is allowed before this character, but not after'.
 the other possible values are \texttt{postonly}, \texttt{allow} and \texttt{
@@ -1491,14 +1542,31 @@ inhibit}. For the compatibility with \pTeX, natural numbers between
 0~and~3 are also allowed as the second argument\footnote{But we don't
 recommend this: since numbers 1~and~2 have opposite meanings in
 \Param{jaxspmode} and \Param{alxspmode}.}.
+%</en>
+%<*ja>
+2つ目のの引数の \texttt{preonly} は「\Param{xkanjiskip} の挿入はこの文字の前でのみ
+許され，後では許さない」ことを意味する．他に指定可能な値は \texttt{postonly}, 
+\texttt{allow}, \texttt{inhibit} である．\pTeX との互換性のために，
+0から3の自然数を2つ目の引数として指定することも可能である\footnote{しかし，
+これは推奨されない：なぜならば 1 と 2 は \Param{jaxspmode} と \Param{alxspmode} で
+逆の意味になるから．}．
+%</ja>
 
+%<*en>
 If you want to enable/disable all insertions of \Param{kanjiskip} and
 \Param{xkanjiskip}, set \Param{autospacing} and \Param{autoxspacing}
-parameters to \texttt{false}, respectively.
-
+parameters to \texttt{true}/\texttt{false}, respectively.
+%</en>
+%<*ja>
+もし全ての \Param{kanjiskip} と \Param{xkanjiskip} の挿入を有効化／無効化
+したければ，それぞれ \Param{autospacing} と \Param{autoxspacing} を
+\texttt{true}/\texttt{false} に設定すればよい．
+%</ja>
 
 %<en>\subsection{Shifting Baseline}
 %<ja>\subsection{ベースラインの移動}
+
+%<*en>
 To make a match between a Japanese font and an alphabetic font, sometimes
 shifting of the baseline of one of the pair is needed. In \pTeX, this is achieved
 by setting \verb+\ybaselineshift+ to a non-zero length (the
@@ -1509,17 +1577,39 @@ Because of this, \LuaTeX-ja can independently set the shifting amount
 of the baseline of alphabetic fonts (\Param{yalbaselineshift}
 parameter) and that of Japanese fonts (\Param{yjabaselineshift}
 parameter). 
+%</en>
+%<*ja>
+和文フォントと欧文フォントを合わせるためには，時々どちらかのベースラインの移動が
+必要になる．\pTeX ではこれは \verb+\ybaselineshift+ を非零の長さに設定することで
+なされていた（欧文フォントのベースラインが下がる）．しかし，日本語が主ではない
+文書に対しては，欧文フォントではなく和文フォントのベースラインを移動した方がよい．
+このため，\LuaTeX-ja では欧文フォントのベースラインのシフト量
+（\Param{yalbaselineshift} パラメータ）と和文フォントのベースラインのシフト量
+（\Param{yjabaselineshift}パラメータ）を独立に設定できるようになっている．
+%</ja>
 
 \begin{LTXexample}
 \vrule width 150pt height 0.4pt depth 0pt\hskip-120pt
 \ltjsetparameter{yjabaselineshift=0pt, yalbaselineshift=0pt}abcあいう
 \ltjsetparameter{yjabaselineshift=5pt, yalbaselineshift=2pt}abcあいう
 \end{LTXexample}
+%<*en>
 Here the horizontal line in above is the baseline of a line.
+%</en>
+%<*ja>
+上の例において引かれている水平線がベースラインである．
+%</ja>
 
+%<*en>
 There is an interesting side-effect: characters in different size can be
 vertically aligned center in a line, by setting two parameters appropriately.
 The following is an example (beware the value is not well tuned):
+%</en>
+%<*ja>
+この機能には面白い使い方がある：2つのパラメータを適切に設定することで，サイズの
+異なる文字を中心線に揃えることができるのだ．
+以下は一つの例である（値はあまり調整されていないことに注意）：
+%</ja>
 \begin{LTXexample}
 xyz漢字 
 {\scriptsize
@@ -1532,17 +1622,34 @@ xyz漢字
 
 %<en>\subsection{Cropmark}
 %<ja>\subsection{トンボ}
+
+%<*en>
 Cropmark is a mark for indicating 4~corners and horizontal/vertical
 center of the paper. In Japanese, we call cropmark as tombo(w).
 \pLaTeX\ and this \LuaTeX-ja support `tombow' by their kernel.
 The following steps are needed to typeset cropmark:
+%</en>
+%<*ja>
+トンボは用紙の四つ角と水平／垂直方向の中心を表す印である．
+\pLaTeX と \LuaTeX-ja ではトンボの出力をサポートしている．
+トンボを出力するためには以下の手順が必要である：
+%</ja>
 
 \begin{enumerate}
+%<*en>
 \item First, define the banner which will be printed at the upper left
       of the paper. This is done by assigning a token list to
       \verb+\@bannertoken+.
 
-For example, the following sets banner as `\texttt{filename (2012-01-01 17:01)}':
+For example, the following sets banner as `\texttt{filename (YYYY-MM-DD hh:mm)}':
+%</en>
+%<*ja>
+\item まず，用紙の左上に印刷されるバナーを定義する．これは \verb+\@bannertoken+
+      にトークンリストを与えることでなされる．
+
+例えば，以下はバナーとして `\texttt{filename (YYYY-MM-DD hh:mm)}' を設定する:
+%</ja>
+
 \begin{verbatim}
 \makeatletter
 
@@ -2552,7 +2659,7 @@ after `beginning/ending of a group' characters.
 
 %<*ja>
 欧文では文章の改行は単語間でしか行わない．そのため，\TeX では，（文字の直後の）改行は
-空白文字と同じ扱いとして扱われる．一方，和文ではほとんどどどこでも改行が可能なため，
+空白文字と同じ扱いとして扱われる．一方，和文ではほとんどどこでも改行が可能なため，
 \pTeX では和文文字の直後の改行は単純に無視されるようになっている．
 
 このような動作は，\pTeX が\TeX からエンジンとして拡張されたことによって可能になったことである．
