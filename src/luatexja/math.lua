@@ -60,6 +60,7 @@ local function conv_jchar_to_hbox(head, sty)
 	 p.sub = conv_jchar_to_hbox_A(p.sub, sty + 1)
 	 p.sup = conv_jchar_to_hbox_A(p.sup, sty + 1)
       elseif p.id == id_choice then
+	 p.display = conv_jchar_to_hbox(p.display, 0)
 	 p.text = conv_jchar_to_hbox(p.text, 0)
 	 p.script = conv_jchar_to_hbox(p.script, 1)
 	 p.scriptscript = conv_jchar_to_hbox(p.scriptscript, 2)
