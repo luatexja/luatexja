@@ -151,4 +151,12 @@
 %\lst@AddToHook{Init}{\catcode"FFFFF=9 }
 %\lst@AddToHook{DeInit}{\catcode"FFFFF=14 }
 %\lst@Def{1048575}{}
+
+% 2. listing な環境の処理中に \DeclareFontShape の (s)sub が実行されると，なぜか
+%        ! Use of set@size@funct@args@ doesn't match its definition.
+%    のエラーが出る．
+%    \ifnot@nil #1-> \def\reserved@a{#1}... の \reserved@a=\set@size@funct@args@
+%    がなぜか実行される？
+%    ad hoc な対策として事前に必要な (s)sub は実行しておくことにする．
+\lst@AddToHook{Init}{\begingroup\itshape\bfseries\upshape\endgroup}
 \endinput

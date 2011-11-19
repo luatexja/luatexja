@@ -1,21 +1,14 @@
 %#! lualatex -shell-escape manual.ins
 
-%<*en>
-\documentclass[a4paper,titlepage]{article}
+%<en>\documentclass[a4paper,titlepage]{article}
+%<ja>\documentclass[a4paper,titlepage]{ltjsarticle}
 \usepackage[margin=20mm,footskip=5mm]{geometry}
-%</en>
-%<*ja>
-\documentclass[a4paper,titlepage]{bxjsarticle}
-\setpagelayout*{margin=20mm,footskip=5mm}
-\def\headfont{\normalfont\bfseries}
-% \def\headfont{\sffamily\gtfamily} is needed in ordinal documents
-% This document cannot typeset in ltjsclasses (conflict with showexpl?)
-%</ja>
 
 \usepackage{amsmath,amssymb,xcolor,pict2e,multienum,amsthm,float}
 \usepackage{booktabs,listings,lltjlisting,showexpl,multicol}
 \usepackage{luatexja-otf}
-\usepackage[unicode=false]{hyperref}
+\usepackage{luatexja-fontspec}
+\usepackage[unicode]{hyperref}
 \usepackage[all]{xy}
 \SelectTips{cm}{}
 
@@ -23,13 +16,15 @@
 \DeclareRobustCommand\LuaTeX{Lua\TeX}
 \DeclareRobustCommand\pdfTeX{pdf\TeX}
 \DeclareRobustCommand\pTeX{p\kern-.05em\TeX}
-\DeclareRobustCommand\upTeX{p\kern-.05em\TeX}
+\DeclareRobustCommand\upTeX{up\kern-.05em\TeX}
 \DeclareRobustCommand\pLaTeX{p\kern-.05em\LaTeX}
 \DeclareRobustCommand\pLaTeXe{p\kern-.05em\LaTeXe}
 \DeclareRobustCommand\epTeX{\ensuremath{\varepsilon}-\kern-.125em\pTeX}
 
+\ltjsetparameter{jacharrange={-3}}
 \theoremstyle{definition}
-\newtheorem{defn}{Definition}
+%<en>\newtheorem{defn}{Definition}
+%<ja>\newtheorem{defn}{定義}
 
 \newenvironment{cslist}{%
   \leftskip2em\parindent=0pt\def\makelabel##1{{\tt\char92##1}}
@@ -78,19 +73,19 @@
 \bigskip
 
 %<*en>
-{\Large\bf This documentation is far from complete. It may have many
+\textbf{This documentation is far from complete. It may have many
 grammatical (and contextual) errors.}
 %</en>
 %<*ja>
-\textbf{\large 本ドキュメントはまだまだ未完成です．
-また，英語版と日本語版をdocstripプログラムを用いることで一緒に生成している都合上，
-見出しが英語のままになっています．}
+\textbf{\large 本ドキュメントはまだまだ未完成です．}
 %</ja>
 
 \clearpage
-\part{User's manual}
+%<en>\part{User's manual}
+%<ja>\part{ユーザーズマニュアル}
 
-\section{Introduction}
+%<en>\section{Introduction}
+%<ja>\section{はじめに}
 
 %<*en>
 The \LuaTeX-ja package is a macro package for typesetting high-quality
@@ -101,26 +96,17 @@ Japanese documents when using \LuaTeX.
 /それ以上の品質の日本語組版を実現させようとするマクロパッケージである．
 %</ja>
 
-\subsection{Backgrounds}
+%<en>\subsection{Backgrounds}
+%<ja>\subsection{背景}
+
 %<*en>
 Traditionally, ASCII \pTeX, an extension of \TeX, and its derivatives
 are used to typeset Japanese documents in \TeX. \pTeX\ is an engine
 extension of \TeX: so it can produce high-quality Japanese documents
 without using very complicated macros. But this point is a mixed
 blessing: \pTeX\ is left behind from other extensions of \TeX,
-especially \eTeX\ and pdf\TeX, and from changes about
+especially \eTeX\ and \pdfTeX, and from changes about
 Japanese processing in computers (\textit{e.g.}, the UTF-8 encoding).
-
-Recently extensions of \pTeX, namely \upTeX\ (Unicode-implementation
-of \pTeX) and \epTeX\ (merging of \pTeX\ and
-\eTeX\ extension), have developed to fill those gaps to some
-extent, but gaps still exist.
-
-However, the appearance of \LuaTeX\ changed the whole situation. With
-using Lua `callbacks', users can customize the internal processing of
-\LuaTeX. So there is no need to modify sources of engines to
-support Japanese typesetting: to do this, we only have to write Lua
-scripts for appropriate callbacks.
 %</en>
 %<*ja>
 従来，「\TeX を用いて日本語組版を行う」といったとき，エンジンとしては
@@ -131,15 +117,32 @@ ASCII \pTeX やそれの拡張物が用いられることが一般的であっ�
 行われている数々の\TeX の拡張──例えば\eTeX や\pdfTeX ──や，TrueType,
 OpenType, Unicodeといった計算機で日本語を扱う際の状況の変化に追従すること
 を怠ってしまったのだ．
+%</ja>
 
+%<*en>
+Recently extensions of \pTeX, namely \upTeX\ (Unicode-implementation
+of \pTeX) and \epTeX\ (merging of \pTeX\ and
+\eTeX\ extension), have developed to fill those gaps to some
+extent, but gaps still exist.
+%</en>
+%<*ja>
 ここ数年，若干状況は改善されてきた．現在手に入る大半の\pTeX バイナリでは
 外部UTF-8入力が利用可能となり，さらにUnicode化を推進し，\pTeX の内部処理
 までUnicode化した\upTeX も開発されている．また，\pTeX に\eTeX 拡張をマー
 ジした\epTeX も登場し，\TeX\ Live\ 2011では\pLaTeX が\epTeX の上で動作す
-るようになった．だが，\pdfTeX 拡張（pdf直接出力やmicro-typesetting）を
+るようになった．だが，\pdfTeX 拡張（PDF 直接出力やmicro-typesetting）を
 \pTeX に対応させようという動きはなく，海外とのgapは未だにあるのが現状であ
 る．
+%</ja>
 
+%<*en>
+However, the appearance of \LuaTeX\ changed the whole situation. With
+using Lua `callbacks', users can customize the internal processing of
+\LuaTeX. So there is no need to modify sources of engines to
+support Japanese typesetting: to do this, we only have to write Lua
+scripts for appropriate callbacks.
+%</en>
+%<*ja>
 しかし，\LuaTeX の登場で，状況は大きく変わることになった．Luaコードで
 `callback'を書くことにより，\LuaTeX の内部処理に割り込みをかけることが可
 能となった．これは，エンジン拡張という真似をしなくても，Luaコードとそれに
@@ -149,14 +152,15 @@ OpenType, Unicodeといった計算機で日本語を扱う際の状況の変化
 が始まったパッケージである．
 %</ja>
 
-\subsection{Major Changes from \pTeX}
+%<en>\subsection{Major Changes from \pTeX}
+%<ja>\subsection{\pTeX からの主な変更点}
+
 %<*en>
 The \LuaTeX-ja package is under much influence of \pTeX\ engine. The initial
 target of development was to implement features of \pTeX. However,
 \emph{\LuaTeX-ja is not a just porting of \pTeX; unnatural
 specifications/behaviors of \pTeX\ were not adopted}.
 %</en>
-
 %<*ja>
 \LuaTeX-jaは，\pTeX に多大な影響を受けている．初期の開発目標は，\pTeX の機
 能をLuaコードにより実装することであった．しかし，開発が進むにつれ，\pTeX
@@ -166,85 +170,249 @@ specifications/behaviors of \pTeX\ were not adopted}.
 れば，そこは積極的に改める．}
 %</ja>
 
+%<*en>
 The followings are major changes from \pTeX:
+%</en>
+%<*ja>
+以下は \pTeX からの主な変更点である．
+%</ja>
+
 \begin{itemize}
+%<*en>
 \item A Japanese font is a tuple of a `real' font, a Japanese font
       metric (\textbf{JFM}, for short), and an optional string called
       `variation'.
+%</en>
+%<*ja>
+\item 和文フォントは「実際の」フォント，和文フォントメトリック（JFM と呼ぶ），そ
+      して `variation' と呼ばれる文字列の組である．
+%</ja>
 
-\item In \pTeX, a linebreak after Japanese character is ignored (and
-      doesn't yield a space), since linebreaks (in source files) are
+%<*en>
+\item In \pTeX, a line break after Japanese character is ignored (and
+      doesn't yield a space), since line breaks (in source files) are
       permitted almost everywhere in Japanese texts. However, \LuaTeX-ja
       doesn't have this function completely, because of a specification
       of \LuaTeX.
+%</en>
+%<*ja>
+\item 日本語の文書中では改行はほとんどどこでも許されるので，\pTeX では和文文字
+      直後の改行は無視される（スペースが入らない）ようになっていた．しかし，
+      \LuaTeX-ja では \LuaTeX の仕様のためにこの機能は完全には実装されていない．
+%</ja>
+
+%<*en>
 \item The insertion process of glues/kerns between two Japanese
       characters and between a Japanese character and other characters
       (we refer these glues/kerns as \textbf{JAglue}) is rewritten from
       scratch.
+%</en>
+%<*ja>
+\item 2つの和文文字の間，和文文字と欧文文字の間に入るグルー／カーン
+      （\textbf{JAglue} と呼ぶ）の挿入処理が0から書き直されている．
+%</ja>
 
 \begin{itemize}
+%<*en>
 \item As \LuaTeX's internal character handling is `node-based'
       (\textit{e.g.}, \verb+of{}fice+ doesn't prevent ligatures), the
       insertion process of \textbf{JAglue} is now `node-based'.
+%</en>
+%<*ja>
+\item \LuaTeX の内部での文字の扱いが「ノードベース」になっているように（例えば，
+      \verb+of{}fice+ で合字は抑制されない），\textbf{JAglue} の挿入処理も
+      「ノードベース」である．
+%</ja>
+
+%<*en>
 \item Furthermore, nodes between two characters which have no effects in
-      linebreak (\textit{e.g.}, \verb+\special+ node) are ignored in the
-      insertion process.
-\item In the process, two Japanese fonts which differ in their `real'
-      fonts only are identified.
+      line break (\textit{e.g.}, \verb+\special+ node) and kerns from
+      italic correction are ignored in the insertion process.
+%</en>
+%<*ja>
+\item さらに，2つの文字の間にある行末では効果を持たないノード（例えば
+      \verb+\special+ ノード）や，イタリック補正に伴い挿入されるカーンは
+      挿入処理中では無視される．
+%</ja>
+
+%<*en>
+\item \emph{Caution: due to above two points, many methods which did the
+      dividing the process of the insertion of \textbf{JAglue} in \pTeX\ are not
+      effective anymore.} In concrete terms, the following two methods are not effective anymore:
+%</en>
+%<*ja>
+\item \textbf{注意：上の2つの変更により，従来 \textbf{JAglue} の挿入処理を分断するのに
+      使われていたいくつかの方法は用いることができない．具体的には，次の方法はもはや無効である：}
+%</ja>
+\begin{verbatim}
+　　ちょ{}っと　　ちょ\/っと
+\end{verbatim}
+%<*en>
+      If you want to do so, please put an empty hbox between it instead:
+%</en>
+%<*ja>
+      もし同じことをやりたければ，空のhboxを間に挟めばよい：
+%</ja>
+\begin{verbatim}
+　　ちょ\hbox{}っと
+\end{verbatim}
+
+
+%<*en>
+\item In the process, two Japanese fonts which only differ in their `real'
+      fonts are identified.
+%</en>
+%<*ja>
+\item 処理中では，2つの和文フォントは，「実際の」フォントのみが異なる場合に同一視
+      される．
+%</ja>
 \end{itemize}
+
+%<*en>
 \item At the present, vertical typesetting (\emph{tategaki}), is not
       supported in \LuaTeX-ja.
+%</en>
+%<*ja>
+\item 現時点では，縦書きは \LuaTeX-ja ではサポートされていない．
+%</ja>
 
 \end{itemize} 
-For detailed information, see Part~\ref{part-imp}.
 
-\subsection{Notations}
+%<*en>
+For detailed information, see Part~\ref{part-imp}.
+%</en>
+%<*ja>
+詳細については第 \ref{part-imp} 部を見よ．
+%</ja>
+
+%<en>\subsection{Notations}
+%<ja>\subsection{用語と記法}
+
+%<*en>
 In this document, the following terms and notations are used:
+%</en>
+%<*ja>
+本ドキュメントでは，以下の用語と記法を用いる：
+%</ja>
+
 \begin{itemize}
+%<*en>
 \item Characters are divided into two types: 
+%</en>
+%<*ja>
+\item 文字は2種類に分けられる：
+%</ja>
 \begin{itemize}
+%<*en>
 \item \textbf{JAchar}: standing for Japanese characters such as
       Hiragana, Katakana, Kanji and other punctuation marks for
       Japanese.
-\item \textbf{ALchar}: standing for all other characters like alphabets. 
-\end{itemize}
-We say `alphabetic fonts' for fonts used in \textbf{ALchar}, and `Japanese fonts' for fonts used in \textbf{JAchar}.
+%</en>
+%<*ja>
+\item \textbf{JAchar}: ひらがな，カタカナ，漢字，和文用の約物といった和文文字の
+      ことを指す．
+%</ja>
 
+%<*en>
+\item \textbf{ALchar}: standing for all other characters like alphabets. 
+%</en>
+%<*ja>
+\item \textbf{ALchar}: アルファベットを始めとする，その他全ての文字を指す．
+%</ja>
+\end{itemize}
+
+%<*en>
+We say `alphabetic fonts' for fonts used in \textbf{ALchar}, and `Japanese fonts' for fonts used in \textbf{JAchar}.
+%</en>
+%<*ja>
+そして，\textbf{ALchar} の出力に用いられるフォントを「欧文フォント」と呼び，
+\textbf{JAchar} の出力に用いられるフォントを「和文フォント」と呼ぶ．
+%</ja>
+
+%<*en>
 \item A word in a sans-serif font (like \Param{prebreakpenalty})
       means an internal parameter for Japanese typesetting, and it
       is used as a key in \verb+\ltjsetparameter+ command.
+%</en>
+%<*ja>
+\item サンセリフ体で書かれた語（例：\Param{prebreakpenalty}）は日本語組版用の
+      パラメータを表し，これらは \verb+\ltjsetparameter+ コマンドのキーとして
+      用いられる．
+%</ja>
+
+%<*en>
 \item A word in typewriter font with underline (like \Pkg{fontspec})
-      means a package of a class of \LaTeX.
+      means a package or a class of \LaTeX.
+%</en>
+%<*ja>
+\item 下線付きのタイプライタ体で書かれた語（例：\Pkg{fontspec}）は \LaTeX の
+      パッケージやクラスを表す．
+%</ja>
+
+%<*en>
 \item The word `primitive' is used not only for primitives in \LuaTeX,
       but also for control sequences that defined in the core module of
       \LuaTeX-ja.
+%</en>
+%<*ja>
+\item 「プリミティブ」という語を，\LuaTeX のプリミティブだけではなく \LuaTeX-ja
+      のコアモジュールで定義されたコントロールシーケンスに対しても用いる．
+%</ja>
+
+%<*en>
 \item In this document, natural numbers start from~0.
+%</en>
+%<*ja>
+\item 本ドキュメントでは，自然数は0から始まる．
+%</ja>
 \end{itemize}
 
-\subsection{About the project}
+%<en>\subsection{About the project}
+%<ja>\subsection{プロジェクトについて}
+
+%<*en>
 \paragraph{Project Wiki} Project Wiki is under construction.
+%</en>
+%<*ja>
+\paragraph{プロジェクト Wiki} プロジェクト Wiki は構築中である．
+%</ja>
+
+%<*en>
 \begin{itemize}
 \item \url{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage%28en%29} (English)
 \item \url{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage} (Japanese)
 \end{itemize}
+%</en>
+%<*ja>
+\begin{itemize}
+\item \url{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage}（日本語）
+\item \url{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage%28en%29}（英語）
+\end{itemize}
+%</ja>
 
+%<*en>
 This project is hosted by SourceForge.JP.
+%</en>
+%<*ja>
+本プロジェクトは SourceForge.JP のサービスを用いて運営されている．
+%</ja>
 
-\paragraph{Members}\ 
+%<en>\paragraph{Members}\ 
+%<ja>\paragraph{開発メンバー}\ 
 %<*en>
 \begin{multienumerate}
 \def\labelenumi{$\bullet$}
 \mitemxxx{Hironori KITAGAWA}{Kazuki MAEDA}{Takayuki YATO}
 \mitemxxx{Yusuke KUROKI}{Noriyuki ABE}{Munehiro YAMAMOTO}
-\mitemx{Tomoaki HONDA}
+\mitemxxo{Tomoaki HONDA}{Shuzaburo SAITO}
 \end{multienumerate}
 %</en>
 %<*ja>
 \begin{multienumerate}
 \def\labelenumi{$\bullet$}
-\mitemxxx{Hironori KITAGAWA}{Kazuki MAEDA}{Takayuki YATO}
-\mitemxxx{Yusuke KUROKI}{Noriyuki ABE}{Munehiro YAMAMOTO}
-\mitemx{Tomoaki HONDA}
+\mitemxxx{北川 弘典}{前田 一貴}{八登 崇之}
+\mitemxxx{黒木 裕介}{阿部 紀行}{山本 宗宏}
+\mitemxxo{本田 知亮}{齋藤 修三郎}
 \end{multienumerate}
 %</ja>
 
@@ -252,61 +420,156 @@ This project is hosted by SourceForge.JP.
 % \paragraph{Acknowledgments} -- 挿入するならここ
 
 \clearpage
-\section{Getting Started}
-\subsection{Installation}
+%<en>\section{Getting Started}
+%<ja>\section{使い方}
+%<en>\subsection{Installation}
+%<ja>\subsection{インストール}
+
+%<*en>
 To install the \LuaTeX-ja\ package, you will need:
+%</en>
+%<*ja>
+\LuaTeX-ja パッケージのインストールには，次のものが必要である．
+%</ja>
 \begin{itemize}
+%<*en>
 \item \LuaTeX\ (version 0.65.0-beta or later) and its supporting packages.\\
 If you are using \TeX~Live~2011 or current W32\TeX, you don't have to worry.
-\item The source archive of \LuaTeX-ja, of course{\tt:)}
+%</en>
+%<*ja>
+\item \LuaTeX（バージョン 0.65.0-beta 以降）とその支援パッケージ．
+      \TeX~Live~2011 や W32\TeX の最新版ならば問題ない．
+%</ja>
+%<*en>
+\item The source archive of \LuaTeX-ja, of course\texttt{:)}
+%</en>
+%<*ja>
+\item \LuaTeX-ja のソースアーカイブ（もちろん \texttt{:)}）．
+%</ja>
 \end{itemize}
 
+%<*en>
 The installation methods are as follows:
+%</en>
+%<*ja>
+インストール方法は以下のようになる：
+%</ja>
 \begin{enumerate}
+%<*en>
 \item Download the source archive.
 
-At the present, \LuaTeX-ja has no official release, so you have to retrieve
-the archive from the repository.
-You can retrieve the Git repository via
+      At the present, \LuaTeX-ja has no official release, so you have to retrieve
+      the archive from the repository.
+      You can retrieve the Git repository via
+%</en>
+%<*ja>
+\item ソースアーカイブをダウンロードする．
+
+      現時点では，\LuaTeX-ja の公式リリースはないので，レポジトリからアーカイブを
+      取得しなければならない．
+      次のようにすることで，Git レポジトリを取得することができる：
+%</ja>
 \begin{verbatim}
 $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
 \end{verbatim} 
-or download the archive of HEAD in \texttt{master} branch from
+%<*en>
+      or download the archive of HEAD in \texttt{master} branch from
+%</en>
+%<*ja>
+      もしくは，\texttt{master} ブランチの HEAD アーカイブを以下からダウンロードすることができる：
+%</ja>
 \begin{flushleft}
 \url{http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git;a=snapshot;h=HEAD;sf=tgz}.
 \end{flushleft}
 
+%<*en>
 Note that the forefront of development may not be in \texttt{master} branch.
-\item Extract the archive. You will see {\tt src/} and several other sub-directories.
-\item Copy all the contents of {\tt src/} into one of your \texttt{TEXMF} tree.
-\item If {\tt mktexlsr} is needed to update the filename database, make it so.
+%</en>
+%<*ja>
+開発中の最新の成果は \texttt{master} ブランチには含まれていないかもしれないことに注意．
+%</ja>
+
+%<*en>
+\item Extract the archive. You will see \texttt{src/} and several other sub-directories.
+%</en>
+%<*ja>
+\item アーカイブを展開する．\texttt{src/} をはじめとしたいくつかのディレクトリができる．
+%</ja>
+
+%<*en>
+\item Copy all the contents of \texttt{src/} into one of your \texttt{TEXMF} tree.
+%</en>
+%<*ja>
+\item \texttt{src/} の中身全てを自分の \texttt{TEXMF} ツリーにコピーする．
+%</ja>
+
+%<*en>
+\item If \texttt{mktexlsr} is needed to update the file name database, make it so.
+%</en>
+%<*ja>
+\item もし \texttt{mktexlsr} を実行する必要があればそうする．
+%</ja>
 \end{enumerate}
 
-\subsection{Cautions}
+%<en>\subsection{Cautions}
+%<ja>\subsection{注意点}
+
 \begin{itemize}
+%<*en>
 \item The encoding of your source file must be UTF-8. No other
       encodings, such as EUC-JP or Shift-JIS, are not supported.
+%</en>
+%<*ja>
+\item 原稿のソースファイルの文字コードは UTF-8 でなければならない．
+      EUC-JP や Shift-JIS は使用できない．
+%</ja>
+
+%<*en>
 \item May be conflict with other packages. 
 
-For example, the default setting of \textbf{JAchar} in the present
+      For example, the default setting of \textbf{JAchar} in the present
       version does not coexist with the \Pkg{unicode-math}
       package. Putting the following line in preamble makes that
       mathematical symbols will be typeset correctly, but several
       Japanese characters will be treated as an \textbf{ALchar} as
       side-effect:
+%</en>
+%<*ja>
+\item いくつかのパッケージと衝突する．
+
+      例えば，\textbf{JAchar} の範囲の設定がデフォルトのままだと，現行の
+      バージョンでは \Pkg{unicode-math} パッケージと共存できない．
+      以下の行をプリアンブルに追加することで数学記号が正しく出るように
+      なるが，副作用としていくつかの和文文字が \textbf{ALchar} として
+      扱われるようになってしまう：
+%</ja>
 \begin{verbatim}
 \ltjsetparameter{jacharrange={-3, -8}}
 \end{verbatim}
 \end{itemize}
 
-\subsection{Using in plain \TeX}\label{ssec-plain}
-To use \LuaTeX-ja in plain \TeX, simply put the following  at the beginning of the document:
+%<en>\subsection{Using in plain \TeX}
+%<ja>\subsection{plain \TeX で使う}
+\label{ssec-plain}
+
+%<*en>
+To use \LuaTeX-ja in plain \TeX, simply put the following at the beginning of the document:
+%</en>
+%<*ja>
+\LuaTeX-ja を plain \TeX で使うためには，単に次の行をソースファイルの冒頭に追加すればよい：
+%</ja>
 \begin{verbatim}
 \input luatexja.sty
 \end{verbatim}
+%<*en>
+This does minimal settings (like \texttt{ptex.tex}) for typesetting Japanese documents:
+%</en>
+%<*ja>
+これで（\texttt{ptex.tex} のように）日本語組版のための最低限の設定がなされる：
+%</ja>
 
-This does minimal settings (like {\tt ptex.tex}) for typesetting Japanese documents:
 \begin{itemize}
+%<*en>
 \item The following 6~Japanese fonts are preloaded:
 \begin{center}
 \begin{tabular}{ccccc}
@@ -317,43 +580,111 @@ This does minimal settings (like {\tt ptex.tex}) for typesetting Japanese docume
 \bottomrule
 \end{tabular}
 \end{center}
+%</en>
+%<*ja>
+\item 以下の6つの和文フォントが定義される：
+\begin{center}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{字体}&\textbf{フォント名}&\bf `10\,pt'&\bf`7\,pt'&\bf`5\,pt'\\\midrule
+\emph{明朝体}&Ryumin-Light    &\verb+\tenmin+&\verb+\sevenmin+&\verb+\fivemin+\\
+\emph{ゴシック体}&GothicBBB-Medium&\verb+\tengt+ &\verb+\sevengt+ &\verb+\fivegt+\\
+\bottomrule
+\end{tabular}
+\end{center}
+%</ja>
 \begin{itemize}
-\item The `Q' is a unit used in Japanese phototypesetting, and
+%<*en>
+\item The `Q（級）' is a unit used in Japanese phototypesetting, and
       $1\,\textrm{Q}=0.25\,\textrm{mm}$. This length is stored in a
       dimension \verb+\jQ+.
+%</en>
+%<*ja>
+\item `Q（級）' は日本の写植で用いられる単位で，$1\,\textrm{Q}=0.25\,\textrm{mm}$
+      である．この長さは \verb+\jQ+ に保持されている．
+%</ja>
 
+%<*en>
 \item It is widely accepted that the font `Ryumin-Light' and
       `GothicBBB-Medium' aren't embedded into PDF files, and PDF reader
       substitute them by some external Japanese fonts (\textit{e.g.},
       Kozuka Mincho is used for Ryumin-Light in Adobe Reader). We adopt this custom to
       the default setting.
+%</en>
+%<*ja>
+\item `Ryumin-Light' と `GothicBBB-Medium' は PDF ファイルに埋め込まずに
+      名前参照のみで用いることが広く受け入れられており，この場合 PDF リーダーが
+      適切な外部フォントで代用する（例えば，Adobe Reader では Ryumin-Light は
+      小塚明朝で代替される）．そこで，これらをデフォルトのフォントと
+      して採用する．
+%</ja>
+
+%<*en>
 \item A character in an alphabetic font is generally smaller than a
       Japanese font in the same size. So actual size specification of
       these Japanese fonts is in fact smaller than that of alphabetic
       fonts, namely scaled by 0.962216.
+%</en>
+%<*ja>
+\item 欧文フォントの文字は和文フォントの文字よりも，同じ文字サイズでも
+      一般に小さい．そこで，これらの和文フォントの実際のサイズは指定された値よりも
+      小さくなるように設定されており，具体的には指定の 0.962216 倍にスケールされる．
+%</ja>
 \end{itemize}
+
+%<*en>
 \item The amount of glue that are inserted between a \textbf{JAchar} and
       an \textbf{ALchar} (the parameter \Param{xkanjiskip}) is set to
+%</en>
+%<*ja>
+\item \textbf{JAchar} と \textbf{ALchar} の間に入るグルー (\Param{xkanjiskip}) の
+      量は次のように設定されている：
+%</ja>
 \[
- (0.25\cdot 13.5\,\textrm{Q})^{+1\,\text{pt}}_{-1\,\text{pt}} 
- = {27\over 32}\,\mathrm{mm}^{+1\,\text{pt}}_{-1\,\text{pt}}.
+ (0.25\cdot 0.962216\cdot 10\,\mathrm{pt})^{+1\,\text{pt}}_{-1\,\text{pt}} 
+ = 2.40554\,\mathrm{pt}^{+1\,\text{pt}}_{-1\,\text{pt}}.
 \]
 \end{itemize}
 
-\subsection{Using in \LaTeX}\label{ssec-ltx}
+%<en>\subsection{Using in \LaTeX}
+%<ja>\subsection{\LaTeX で使う}
+\label{ssec-ltx}
+
 \paragraph{\LaTeXe}
+
+%<*en>
 Using in \LaTeXe\ is basically same. To set up the minimal environment
-for Japanese, you only have to load {\tt luatexja.sty}:
+for Japanese, you only have to load \texttt{luatexja.sty}:
+%</en>
+%<*ja>
+\LaTeXe を用いる場合も基本的には同じである．日本語組版のための最低限の環境を
+設定するためには，\texttt{luatexja.sty} を読み込むだけでよい：
+%</ja>
 \begin{verbatim}
 \usepackage{luatexja}
 \end{verbatim}
-It also does minimal settings (counterparts in \pLaTeX\ are {\tt
-plfonts.dtx} and {\tt pldefs.ltx}):
+%<*en>
+It also does minimal settings (counterparts in \pLaTeX\ are \texttt{
+plfonts.dtx} and \texttt{pldefs.ltx}):
+%</en>
+%<*ja>
+これで \pLaTeX の \texttt{plfonts.dtx} と \texttt{pldefs.ltx} に相当する最低限の設定が
+なされる：
+%</ja>
 
 \begin{itemize}
-\item {\tt JY3} is the font encoding for Japanese fonts (in horizontal direction).\\
-When vertical typesetting is supported by \LuaTeX-ja in the future, {\tt JT3} will be used for vertical fonts.
-\item Two font families {\tt mc} and {\tt gt} are defined: 
+%<*en>
+\item \texttt{JY3} is the font encoding for Japanese fonts (in horizontal direction).\\
+When vertical typesetting is supported by \LuaTeX-ja in the future, \texttt{JT3} will be used for vertical fonts.
+%</en>
+%<*ja>
+\item \texttt{JY3} は和文フォント用のフォントエンコーディングである（横書き用）．\\
+将来的に，\LuaTeX-ja で縦書きがサポートされる際には，\texttt{JT3} を縦書き用として
+用いる予定である．
+%</ja>
+
+%<*en>
+\item Two font families \texttt{mc} and \texttt{gt} are defined: 
 \begin{center}
 \begin{tabular}{ccccc}
 \toprule
@@ -364,23 +695,67 @@ When vertical typesetting is supported by \LuaTeX-ja in the future, {\tt JT3} wi
 \end{tabular}
 \end{center}
 Remark that the bold series in both family are same as the medium series of \emph{gothic} family.
-This is a convention in \pLaTeX.
+This is a convention in \pLaTeX. This is a trace that there were only 2~fonts (these are Ryumin-Light 
+and GothicBBB-Medium) in early years of DTP.
+%</en>
+%<*ja>
+\item 2つのフォントファミリ \texttt{mc} と \texttt{gt} が定義されている：
+\begin{center}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{字体}&\textbf{ファミリ}&\verb+\mdseries+&\verb+\bfseries+&\textbf{スケール}\\\midrule
+明朝体&\tt mc&Ryumin-Light    &GothicBBB-Medium&0.962216\\
+ゴシック体&\tt gt&GothicBBB-Medium&GothicBBB-Medium&0.962216\\
+\bottomrule
+\end{tabular}
+\end{center}
+どちらのファミリにおいても，その bold シリーズはゴシック体の medium シリーズで
+あることに注意．これは初期の DTP において和文フォントが2つ（それがちょうど\ 
+Ryumin-Light, GothicBBB-Medium だった）しか利用できなかった時の名残であり，\pLaTeX{}
+での標準設定とも同じである．
+%</ja>
 
-\item Japanese characters in math mode are typeset by the font family {\tt mc}.
+%<*en>
+\item Japanese characters in math mode are typeset by the font family \texttt{mc}.
+%</en>
+%<*ja>
+\item 数式モード中の和文文字は \texttt{mc} ファミリで出力される．
+%</ja>
 \end{itemize}
 
+%<*en>
 However, above settings are not sufficient for Japanese-based
-documents. To typeset Japanese-based documents, You are better to use
-class files other than {\tt article.cls}, {\tt book.cls}, and so on.  At
+documents. To typeset Japanese-based documents, you are better to use
+class files other than \texttt{article.cls}, \texttt{book.cls}, and so on.  At
 the present, we have the counterparts of \Pkg{jclasses} (standard
-classes in \pLaTeX) and \Pkg jsclasses (classes by Haruhiko
+classes in \pLaTeX) and \Pkg{jsclasses} (classes by Haruhiko
 Okumura), namely, \Pkg{ltjclasses} and \Pkg{ltjsclasses}.
+%</en>
+%<*ja>
+しかしながら，上記の設定は日本語の文書にとって十分とは言えない．
+日本語文書を組版するためには，\texttt{article.cls}, \texttt{book.cls} といった
+欧文用のクラスファイルではなく，和文用のクラスファイルを用いた方がよい．
+現時点では，\Pkg{jclasses} （\pLaTeX の標準クラス）と \Pkg{jsclasses}
+（奥村晴彦氏によるクラスファイル）に対応するものとして，\Pkg{ltjclasses}，
+\Pkg{ltjsclasses} がそれぞれ用意されている．
+%</ja>
 
-\paragraph{{\tt\char92 CID, {\tt\char92 UTF}} and macros in OTF package}
-Under \pTeX, \Pkg{otf} package (developed by Shuzaburo Saito) is
-used for typesetting characters which is in Adobe-japan1-6 CID but not
+%<*en>
+\paragraph{\texttt{\char92 CID, \texttt{\char92 UTF}} and macros in OTF package}
+Under \pLaTeX, \Pkg{otf} package (developed by Shuzaburo Saito) is
+used for typesetting characters which is in Adobe-Japan1-6 CID but not
 in JIS~X~0208. Since this package is widely used, \LuaTeX-ja
 supports some of functions in \Pkg{otf} package.
+If you want to use these functions, load \Pkg{luatexja-otf} package.
+%</en>
+%<*ja>
+\paragraph{\texttt{\char92 CID, \texttt{\char92 UTF}} と OTF パッケージのマクロ}
+\pLaTeX では，JIS~X~0208 にない Adobe-Japan1-6 の文字を出力するために，
+齋藤修三郎氏による \Pkg{otf} パッケージが用いられていた．このパッケージは
+広く用いられているため，\LuaTeX-ja においても \Pkg{otf} パッケージの機能の
+一部をサポートしている．これらの機能を用いるためには \Pkg{luatexja-otf} パッケージ
+を読み込めばよい．
+%</ja>
 
 \begin{LTXexample}
 森\UTF{9DD7}外と内田百\UTF{9592}とが\UTF{9AD9}島屋に行く。
@@ -391,26 +766,58 @@ supports some of functions in \Pkg{otf} package.
 %lltjlisting.sty要修正？：↑「森」の直後で改行．
 
 
-\subsection{Changing Fonts}\label{ssub-chgfnt}
+%<en>\subsection{Changing Fonts}
+%<ja>\subsection{フォントの変更}
+\label{ssub-chgfnt}
+
+%<*en>
 \paragraph{Remark: Japanese Characters in Math Mode}
 Since \pTeX\ supports Japanese characters in math mode, there are
 sources like the following:
-
+%</en>
+%<*ja>
+\paragraph{意見：数式モード中の和文文字}
+\pTeX では数式中での和文文字の使用がサポートされていたので，
+以下のようなソースが存在した：
+%</ja>
 \begin{LTXexample}
 $f_{高温}$~($f_{\text{high temperature}}$).
 \[ y=(x-1)^2+2\quad{}よって\quad y>0 \]
 $5\in{}素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
 \end{LTXexample}
-
+%<*en>
 We (the project members of \LuaTeX-ja) think that using
 Japanese characters in math mode are allowed if and only if these are used as identifiers.
 In this point of view, 
+%</en>
+%<*ja>
+\LuaTeX-ja プロジェクトでは，数式モード中での和文文字はそれらが識別子として用いられる
+ときのみ許されると考えている．
+この観点から，
+%</ja>
 \begin{itemize}
+%<*en>
 \item The lines 1~and~2 above are not correct, since `高温' in above is used as a textual label, and
 `よって' is used as a conjunction. 
+%</en>
+%<*ja>
+\item 上記数式のうち 1, 2 行目は正しくない．なぜならば `高温' が意味のあるラベルと
+      して，`よって' が接続詞として用いられているからである．
+%</ja>
+%<*en>
 \item However, the line~3 is correct, since `素' is used as an identifier.
+%</en>
+%<*ja>
+\item しかしながら，3行目は `素' が識別子として用いられているので正しい．
+%</ja>
 \end{itemize}
+%<*en>
 Hence, in our opinion, the above input should be corrected as:
+%</en>
+%<*ja>
+したがって，\LuaTeX-ja プロジェクトの意見としては，上記の入力は次のように直されるべき
+である：
+%</ja>
 \begin{LTXexample}
 $f_{\text{高温}}$~%
 ($f_{\text{high temperature}}$).
@@ -419,27 +826,61 @@ $f_{\text{高温}}$~%
 $5\in{}素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
 \end{LTXexample}
 %BUG?: \{\}がなければ「素」がでない．上の段落の「よって」もでてない．
+%<*en>
 We also believe that using Japanese characters as identifiers is rare,
 hence we don't describe how to change Japanese fonts in math mode in
 this chapter. For the method, please see Part~\ref{part-ref}.
+%</en>
+%<*ja>
+また \LuaTeX-ja プロジェクトでは，和文文字が識別子として用いられることはほとんどない
+と考えており，したがってこの章では数式モード中の和文フォントを変更する方法については
+記述しない．この方法については第 \ref{part-ref} 部を参照のこと．
+%</ja>
 
-
+%<*en>
 \paragraph{plain \TeX}
 To change Japanese fonts in plain \TeX, you must use the primitive
 \verb+\jfont+. So please see Part~\ref{part-ref}.
+%</en>
+%<*ja>
+\paragraph{plain \TeX}
+plain \TeX で和文フォントを変更するためには，\verb+\jfont+ プリミティブを用いなけれ
+ばならない．第 \ref{part-ref} 部を参照せよ．
+%</ja>
 
-
+%<*en>
 \paragraph{NFSS2}
 For \LaTeXe, \LuaTeX-ja simply adopted the font selection system from that
-of \pLaTeXe\ (in {\tt plfonts.dtx}).
+of \pLaTeXe\ (in \texttt{plfonts.dtx}).
+%</en>
+%<*ja>
+\paragraph{NFSS2}
+\LaTeXe については，\LuaTeX-ja では単にフォント選択システムを \pLaTeXe\ (\texttt{plfonts.dtx})
+から採用している．
+%</ja>
 \begin{itemize}
+%<*en>
 \item Two control sequences \verb+\mcdefault+ and \verb+\gtdefault+ are
       used to specify the default font families for \emph{mincho} and
       \emph{gothic}, respectively. Default values: \texttt{mc} for
       \verb+\mcdefault+ and \texttt{gt} for \verb+\gtdefault+.
+%</en>
+%<*ja>
+\item 2つのコントロールシーケンス \verb+\mcdefault+ と \verb+\gtdefault+ がそれぞ
+      れ明朝体とゴシック体のデフォルトのフォントファミリを指定するために用いられる．
+      初期値：\verb+\mcdefault+ は \texttt{mc}，\verb+\gtdefault+ は \texttt{gt}．
+%</ja>
+%<*en>
 \item Commands \verb+\fontfamily+, \verb+\fontseries+,
       \verb+\fontshape+ and \verb+\selectfont+ can be used to change
       attributes of Japanese fonts. 
+%</en>
+%<*ja>
+\item \verb+\fontfamily+, \verb+\fontseries+, \verb+\fontshape+, そして 
+      \verb+\selectfont+ が和文フォントの属性を変更するために使用できる．
+%</ja>
+
+%<*en>
 \begin{center}
 \begin{tabular}{cccccc}
 \toprule
@@ -455,34 +896,78 @@ auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
 \bottomrule
 \end{tabular}
 \end{center}
-
+%</en>
 %<*ja>
-ここで，\verb+\fontencoding{<encoding>}+は，引数により和文側か欧文側かの
-      どちらかが切り替わる．例えば，次の入力で最初の\verb+\fontencoding+
-      の呼び出しは和文フォントのエンコーディングを\texttt{JT3}に変更し，
-      2回目の呼びだしでは欧文フォント側を\texttt{T1}へと変更する．
-\begin{verbatim}
-\fontencoding{JY3}\fontencoding{T1}
-\end{verbatim}
-\verb+\fontfamily+も引数により和文側，欧文側，\textbf{あるいは両方}のフォ
-      ントファミリが切り替わる．
-詳細はSubsection~\ref{ssub-nfsspat}を参照すること．
+\begin{center}
+\begin{tabular}{cccccc}
+\toprule
+&\textbf{エンコーディング}&\textbf{ファミリ}&\textbf{シリーズ}&\textbf{シェープ}&\textbf{選択}\\\midrule
+欧文フォント
+&\verb+\romanencoding+&\verb+\romanfamily+&\verb+\romanseries+&\verb+\romanshape+
+&\verb+\useroman+\\
+和文フォント
+&\verb+\kanjiencoding+&\verb+\kanjifamily+&\verb+\kanjiseries+&\verb+\kanjishape+
+&\verb+\usekanji+\\
+両方&---&--&\verb+\fontseries+&\verb+\fontshape+&---\\
+自動選択&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
+\bottomrule
+\end{tabular}
+\end{center}
 %</ja>
 
+%<*en>
+      \verb+\fontencoding{<encoding>}+ changes the encoding of alphabetic fonts
+      or Japanese fonts depending on the argument. For example, 
+      \verb+\fontencoding{JY3}+ changes the encoding of Japanese fonts to 
+      \texttt{JY3} and \verb+\fontencoding{T1}+ changes the encoding of 
+      alphabetic fonts to \texttt{T1}.
+      \verb+\fontfamily+ also changes the family of Japanese fonts, alphabetic
+      fonts, \emph{or both}. For detail, see Subsection~\ref{ssub-nfsspat}.
+%</en>
+%<*ja>
+      ここで，\verb+\fontencoding{<encoding>}+は，引数により和文側か欧文側かの
+      どちらかが切り替わる．例えば，\verb+\fontencoding{JY3}+は和文フォントの
+      エンコーディングを\texttt{JY3}に変更し，\verb+\fontencoding{T1}+ は欧文
+      フォント側を\texttt{T1}へと変更する．
+      \verb+\fontfamily+も引数により和文側，欧文側，\textbf{あるいは両方}のフォ
+      ントファミリが切り替わる．詳細は\ref{ssub-nfsspat}節を参照すること．
+%</ja>
+
+%<*en>
 \item For defining a Japanese font family, use
       \verb+\DeclareKanjiFamily+ instead of
       \verb+\DeclareFontFamily+. However, in the present implementation,
       using \verb+\DeclareFontFamily+ doesn't cause any problem.
+%</en>
+%<*ja>
+\item 和文フォントファミリの定義には \verb+\DeclareFontFamily+ の代わりに
+      \verb+\DeclareKanjiFamily+ を用いる．しかし，現在の実装では 
+      \verb+\DeclareFontFamily+ を用いても問題は生じない．
+%</ja>
 \end{itemize}
 
+%<*en>
 \paragraph{fontspec}
 To coexist with the \Pkg{fontspec} package, it is needed to load
 \Pkg{luatexja-fontspec} package in the preamble. This additional
 package automatically loads \Pkg{luatexja} and \Pkg{fontspec}
 package, if needed.
+%</en>
+%<*ja>
+\Pkg{fontspec} パッケージと同様の機能を和文フォントに対しても用いるためには，
+\Pkg{luatexja-fontspec} パッケージをプリアンブルで読み込む必要がある．このパッケージ
+は必要ならば自動で \Pkg{luatexja} パッケージと \Pkg{fontspec} パッケージを読み込む．
+%</ja>
 
+%<*en>
 In \Pkg{luatexja-fontspec} package, the following 7~commands are defined as
 counterparts of original commands in the \Pkg{fontspec} package:
+%</en>
+%<*ja>
+\Pkg{luatexja-fontspec} パッケージでは，以下の7つのコマンドを \Pkg{fontspec} 
+パッケージの元のコマンドに対応するものとして定義している：
+%</ja>
+%<*en>
 \begin{center}
 \begin{tabular}{ccccc}
 \toprule
@@ -498,111 +983,287 @@ alphabetic fonts
 \bottomrule
 \end{tabular}
 \end{center}
-使用例
+%</en>
+%<*ja>
+\begin{center}
+\begin{tabular}{ccccc}
+\toprule
+和文フォント
+&\verb+\jfontspec+&\verb+\setmainjfont+&\verb+\setsansjfont+&\verb+\newjfontfamily+\\
+欧文フォント
+&\verb+\fontspec+&\verb+\setmainfont+&\verb+\setsansfont+&\verb+\newfontfamily+\\
+\midrule
+和文フォント
+&\verb+\newjfontface+&\verb+\defaultjfontfeatures+&\verb+\addjfontfeatures+\\
+欧文フォント
+&\verb+\newfontface+&\verb+\defaultfontfeatures+&\verb+\addfontfeatures+\\
+\bottomrule
+\end{tabular}
+\end{center}
+%</ja>
 
+\begin{LTXexample}
+\fontspec[Numbers=OldStyle]{TeX Gyre Termes}
+\jfontspec{IPAexMincho}
+JIS~X~0213:2004→辻
 
+\addjfontfeatures{CJKShape=JIS1990}
+JIS~X~0208:1990→辻
+\end{LTXexample}
+
+%<*en>
 Note that there is no command named \verb+\setmonojfont+, since it is
 popular for Japanese fonts that nearly all Japanese glyphs have same
 widths.  Also note that the kerning feature is set off by default in
 these 7~commands, since this feature and \textbf{JAglue} will clash (see
 \ref{para-kern}).
+%</en>
+%<*ja>
+和文フォントについては全ての和文文字のグリフがほぼ等幅であるのが普通であるため，
+\verb+\setmonojfont+ コマンドは存在しないことに注意．また，これらの和文用の7つのコマ
+ンドでは Kerning feature はデフォルトでは off となっている．これはこの
+feature が \textbf{JAglue} と衝突するためである（\ref{para-kern} 節を見よ）．
+%</ja>
 
-\section{Changing Parameters}
+%<en>\section{Changing Parameters}
+%<ja>\section{パラメータの変更}
+
+%<*en>
 There are many parameters in \LuaTeX-ja. And due to the behavior of \LuaTeX,
 most of them are not stored as internal register of \TeX, but as an
 original storage system in \LuaTeX-ja. Hence, to assign or acquire those
 parameters, you have to use commands \verb+\ltjsetparameter+ and
 \verb+\ltjgetparameter+.
+%</en>
+%<*ja>
+\LuaTeX-ja には多くのパラメータが存在する．そして \LuaTeX の振る舞いのために，
+その多くは \TeX のレジスタにではなく，\LuaTeX-ja 独自の方法で保持されている．
+そのため，これらのパラメータを設定・取得するためには \verb+\ltjsetparameter+ と
+\verb+\ltjgetparameter+ を用いなければならない．
+%</ja>
 
-\subsection{Editing the range of \textbf{JAchar}s}
+%<en>\subsection{Editing the range of \textbf{JAchar}s}
+%<ja>\subsection{\textbf{JAchar} の範囲の設定}
 
-
-To edit the range of \textbf{JAchar}s, You have to assign a non-zero
+%<*en>
+To edit the range of \textbf{JAchar}s, you have to assign a non-zero
 natural number which is less than 217 to the character range first. This
 can be done by using \verb+\ltjdefcharrange+ primitive. For example, the
 next line assigns whole characters in Supplementary Multilingual Plane
 and the character `漢' to the range number~100.
+%</en>
+%<*ja>
+\textbf{JAchar} の範囲を設定するためには，まず文字範囲に0より大きく217より小さい
+自然数を割り当てる必要がある．これには \verb+\ltjdefcharrange+ プリミティブを用いる．
+例えば，次のように書くことで追加多言語面 (SMP) にある全ての文字と `漢' の範囲番号が
+100に設定される．
+%</ja>
 \begin{lstlisting}
 \ltjdefcharrange{100}{"10000-"1FFFF,`漢}
 \end{lstlisting}
+%<*en>
 This assignment of numbers to ranges are always global, so you should
 not do this in the middle of a document. 
+%</en>
+%<*ja>
+この文字範囲への番号の割り当てはいつもグローバルであり，したがって文書の途中で
+この操作をするべきではない．
+%</ja>
 
+%<*en>
 If some character has been belonged to some non-zero numbered range,
 this will be overwritten by the new setting. For example, whole SMP
-belong the range~4 in the default setting of \LuaTeX-ja, and if you
-specify the above line, then SMP will belong the range~100 and be
+belong to the range~4 in the default setting of \LuaTeX-ja, and if you
+specify the above line, then SMP will belong to the range~100 and be
 removed from the range~4.
+%</en>
+%<*ja>
+もし指定されたある文字がある非零番号の範囲に属していたならば，これは新しい設定で
+上書きされる．例えば，SMP は全て \LuaTeX-ja のデフォルトでは4番の文字範囲に
+属しているが，上記の指定を行えば SMP は100番に属すようになり，4番からは除かれる．
+%</ja>
 
-After assigning numbers to ranges, the {\sf jacharrange} parameter can
+%<*en>
+After assigning numbers to ranges, the \textsf{jacharrange} parameter can
 be used to customize which character range will be treated as ranges of
 \textbf{JAchar}s, as the following line (this is just the default
 setting of \LuaTeX-ja):
+%</en>
+%<*ja>
+文字範囲に番号を割り当てた後は，\textsf{jacharrange} パラメータが \textbf{JAchar} と
+して扱われる文字の範囲を設定するために用いられる．例えば，以下は \LuaTeX-ja の
+初期設定である：
+%</ja>
 \begin{verbatim}
 \ltjsetparameter{jacharrange={-1, +2, +3, -4, -5, +6, +7, +8}}
 \end{verbatim}
-The argument to {\sf jacharrange} parameter is a list of integer. Negative interger $-n$ in the list means that `the character range~$n$ is ...'.
+%<*en>
+The argument to \textsf{jacharrange} parameter is a list of integer. 
+Negative integer $-n$ in the list means that `the characters that belong to 
+range~$n$ are treated as \textbf{ALchar}', and positive integer $+n$ means
+that `the characters that belong to range~$n$ are treated as \textbf{JAchar}'.
+%</en>
+%<*ja>
+\textsf{jacharrange} パラメータには整数のリストを与える．
+リスト中の負の整数 $-n$ は「文字範囲 $n$ に属する文字は \textbf{ALchar} として
+扱われる」ことを意味し，正の整数 $+n$ は \textbf{JAchar} として扱うことを意味する．
+%</ja>
 
+%<*en>
 \paragraph{Default Setting}
-Lua\TeX-ja predefines eight character ranges for convinience. They are
+\LuaTeX-ja predefines eight character ranges for convenience. They are
 determined from the following data:
+%</en>
+%<*ja>
+\paragraph{初期設定}
+\LuaTeX-ja では8つの文字範囲を設定している．これらは以下のデータに基づいて決定して
+いる．
+%</ja>
 \begin{itemize}
+%<*en>
 \item Blocks in Unicode~6.0.
+%</en>
+%<*ja>
+\item Unicode~6.0 のブロック．
+%</ja>
+%<*en>
 \item The \texttt{Adobe-Japan1-UCS2} mapping between a CID Adobe-Japan1-6 and Unicode.
+%</en>
+%<*ja>
+\item \texttt{Adobe-Japan1-UCS2} による Adobe-Japan1-6 の CID と Unicode の間の
+      マッピング．
+%</ja>
+%<*en>
 \item The \texttt{PXbase} bundle for \upTeX\ by Takayuki Yato.
+%</en>
+%<*ja>
+\item 八登崇之氏による \upTeX 用の \texttt{PXbase} バンドル．
+%</ja>
 \end{itemize}
 
+%<*en>
 Now we describe these eight ranges. The alphabet `J' or `A' after the
 number shows whether characters in the range is treated as
-\textbf{JAchar}s or not by default. These settings are similar to \texttt{prefercjk} ...
+\textbf{JAchar}s or not by default. These settings are similar to the 
+\texttt{prefercjk} settings defined in \texttt{PXbase} bundle.
+%</en>
+%<*ja>
+以下ではこれら8つの文字範囲について記述する．番号のあとのアルファベット `J' と `A'
+はデフォルトで \textbf{JAchar} として扱われるかどうかを示す．これらの設定は
+\texttt{PXbase} バンドルで定義されている \texttt{prefercjk} と類似のものである．
+%</ja>
 \begin{description}
+%<*en>
 \item[Range~8${}^{\text{J}}$] Symbols in the intersection of the upper half of ISO~8859-1
 	 (Latin-1 Supplement) and JIS~X~0208 (a basic character set for Japanese). This character range
-	 consists of the following charatcers:
+	 consists of the following characters:
+%</en>
+%<*ja>
+\item{範囲 8${}^{\text{J}}$} ISO~8869~1 の上半分（ラテン1補助）と 
+                             JIS~X~0208 の共通部分にある記号．この文字範囲は
+                             以下の文字で構成される：
+%</ja>
 \begin{multicols}{2}
 \begin{itemize}
-\def\ch#1#2{\item \char"#1\ ({\tt U+00#1}, #2)}%"
+\def\ch#1#2{\item \char"#1\ (\texttt{U+00#1}, #2)}%"
+%<*en>
 \ch{A7}{Section Sign}
-\ch{A8}{Umlaut or diaeresis}
+\ch{A8}{Diaeresis}
 \ch{B0}{Degree sign}
 \ch{B1}{Plus-minus sign}
 \ch{B4}{Spacing acute}
 \ch{B6}{Paragraph sign}
 \ch{D7}{Multiplication sign}
 \ch{F7}{Division Sign}
+%</en>
+%<*ja>
+\ch{A7}{節記号}
+\ch{A8}{トレマ}
+\ch{B0}{度}
+\ch{B1}{正又は負符号}
+\ch{B4}{アキュート・アクセント}
+\ch{B6}{段落記号}
+\ch{D7}{乗算記号}
+\ch{F7}{除算記号}
+%</ja>
 \end{itemize}
 \end{multicols}
+
+%<*en>
 \item[Range~1${}^{\text{A}}$] Latin characters that some of them are included in Adobe-Japan1-6.
 This range consist of the following Unicode ranges, \emph{except characters in the range~8 above}:
+%</en>
+%<*ja>
+\item{範囲 1${}^{\text{A}}$} ラテン文字．一部はAdobe-Japan1-6 にも含まれている．
+                             この範囲は以下の Unicode のブロックから構成されている．
+                             \textbf{ただし，範囲 8 は除く．}
+%</ja>
 \begin{multicols}{2}
 \begin{itemize}
-\item {\tt U+0080}--{\tt U+00FF}: Latin-1 Supplement
-\item {\tt U+0100}--{\tt U+017F}: Latin Extended-A
-\item {\tt U+0180}--{\tt U+024F}: Latin Extended-B
-\item {\tt U+0250}--{\tt U+02AF}: IPA Extensions
-\item {\tt U+02B0}--{\tt U+02FF}: Spacing Modifier Letters
-\item {\tt U+0300}--{\tt U+036F}: Combining Diacritical Marks
-\item {\tt U+1E00}--{\tt U+1EFF}: Latin Extended Additional
+%<*en>
+\item \texttt{U+0080}--\texttt{U+00FF}: Latin-1 Supplement
+\item \texttt{U+0100}--\texttt{U+017F}: Latin Extended-A
+\item \texttt{U+0180}--\texttt{U+024F}: Latin Extended-B
+\item \texttt{U+0250}--\texttt{U+02AF}: IPA Extensions
+\item \texttt{U+02B0}--\texttt{U+02FF}: Spacing Modifier Letters
+\item \texttt{U+0300}--\texttt{U+036F}: Combining Diacritical Marks
+\item \texttt{U+1E00}--\texttt{U+1EFF}: Latin Extended Additional
+%</en>
+%<*ja>
+\item \texttt{U+0080}--\texttt{U+00FF}: ラテン1補助
+\item \texttt{U+0100}--\texttt{U+017F}: ラテン文字拡張A
+\item \texttt{U+0180}--\texttt{U+024F}: ラテン文字拡張B
+\item \texttt{U+0250}--\texttt{U+02AF}: IPA拡張（国際音声記号）
+\item \texttt{U+02B0}--\texttt{U+02FF}: 前進を伴う修飾文字
+\item \texttt{U+0300}--\texttt{U+036F}: ダイアクリティカルマーク（合成可能）
+\item \texttt{U+1E00}--\texttt{U+1EFF}: ラテン文字拡張追加
+%</ja>
 \par\ 
 \end{itemize}
 \end{multicols}
+%<*en>
 \item[Range~2${}^{\text{J}}$] Greek and Cyrillic letters. JIS~X~0208 (hence most of Japanese
 	   fonts) has some of these characters.
+%</en>
+%<*ja>
+\item[範囲 2${}^{\text{J}}$] ギリシャ文字とキリル文字．JIS~X~0208（したがって多くの
+                             和文フォント）はこれらの文字を持つ．
+%</ja>
 \begin{multicols}{2}
 \begin{itemize}
-\item {\tt U+0370}--{\tt U+03FF}: Greek and Coptic
-\item {\tt U+0400}--{\tt U+04FF}: Cyrillic
-\item {\tt U+1F00}--{\tt U+1FFF}: Greek Extended
+%<*en>
+\item \texttt{U+0370}--\texttt{U+03FF}: Greek and Coptic
+\item \texttt{U+0400}--\texttt{U+04FF}: Cyrillic
+\item \texttt{U+1F00}--\texttt{U+1FFF}: Greek Extended
+%</en>
+%<*ja>
+\item \texttt{U+0370}--\texttt{U+03FF}: ギリシア文字及びコプト文字
+\item \texttt{U+0400}--\texttt{U+04FF}: キリル文字
+\item \texttt{U+1F00}--\texttt{U+1FFF}: キリル文字補助
+%</ja>
 \\\ 
 \end{itemize}
 \end{multicols}
+%<*en>
 \item[Range~3${}^{\text{J}}$] Punctuations and Miscellaneous symbols. The block list is
 	   indicated in Table~\ref{table-rng3}.
+%</en>
+%<*ja>
+\item[範囲 3${}^{\text{J}}$] 句読点と記号類．ブロックのリストは表~\ref{table-rng3}
+                             に示してある．
+%</ja>
 \begin{table}[!tb]
-\caption{Unicode blocks in predefined character range~3.}\label{table-rng3}
-\catcode`\"=13\def"#1#2#3#4{{\tt U+#1#2#3#4}}%"
+%<*en>
+\caption{Unicode blocks in predefined character range~3.}
+%</en>
+%<*ja>
+\caption{文字範囲 3 に指定されている Unicode ブロック．}
+%</ja>
+\label{table-rng3}
+\catcode`\"=13\def"#1#2#3#4{\texttt{U+#1#2#3#4}}%"
 \begin{center}\small
 \begin{tabular}{llll}
+%<*en>
 "2000--"206F&General Punctuation&
 "2070--"209F&Superscripts and Subscripts\\
 "20A0--"20CF&Currency Symbols&
@@ -622,26 +1283,74 @@ This range consist of the following Unicode ranges, \emph{except characters in t
 "2980--"29FF&Misc.\ Mathematical Symbols-B&
 "2B00--"2BFF&Miscellaneous Symbols and Arrows\\
 "E000--"F8FF&Private Use Area&
+%</en>
+%<*ja>
+"2000--"206F&一般句読点&
+"2070--"209F&上付き・下付き\\
+"20A0--"20CF&通貨記号&
+"20D0--"20FF&記号用ダイアクリティカルマーク（合成可能）\\
+"2100--"214F&文字様記号&
+"2150--"218F&数字に準じるもの\\
+"2190--"21FF&矢印&
+"2200--"22FF&数学記号（演算子）\\
+"2300--"23FF&その他の技術用記号&
+"2400--"243F&制御機能用記号\\
+"2500--"257F&罫線素片&
+"2580--"259F&ブロック要素\\
+"25A0--"25FF&幾何学模様&
+"2600--"26FF&その他の記号\\
+"2700--"27BF&装飾記号&
+"2900--"297F&補助矢印B\\
+"2980--"29FF&その他の数学記号B&
+"2B00--"2BFF&その他の記号及び矢印\\
+"E000--"F8FF&私用領域（外字領域）&
+%</ja>
 \end{tabular}
 \end{center}
 \end{table}
+%<*en>
 \item[Range~4${}^{\text{A}}$] Characters usually not in Japanese fonts. This range consists
 	   of almost all Unicode blocks which are not in other
 	   predefined ranges. Hence, instead of showing the block list,
 	   we put the definition of this range itself:
+%</en>
+%<*ja>
+\item[範囲 4${}^{\text{A}}$] 通常和文フォントには含まれていない文字．
+                             この範囲は他の範囲にないほとんど全ての Unicode ブロック
+                             で構成されている．したがって，ブロックのリストを示す
+                             代わりに，範囲の定義そのものを示す：
+%</ja>
 \begin{lstlisting}
 \ltjdefcharrange{4}{%
    "500-"10FF, "1200-"1DFF, "2440-"245F, "27C0-"28FF, "2A00-"2AFF, 
   "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A82F, "A840-"ABFF, "FB50-"FE0F, 
   "FE20-"FE2F, "FE70-"FEFF, "FB00-"FB4F, "10000-"1FFFF} % non-Japanese
 \end{lstlisting}
+%<*en>
 \item[Range~5${}^{\text{A}}$] Surrogates and Supplementary Private Use Areas.
+%</en>
+%<*ja>
+\item[範囲 5${}^{\text{A}}$] 代用符号と補助私用領域．
+%</ja>
+%<*en>
 \item[Range~6${}^{\text{J}}$] Characters used in Japanese. The block list is indicated in Table~\ref{table-rng6}.
+%</en>
+%<*ja>
+\item[範囲 6${}^{\text{J}}$] 日本語で用いられる文字．ブロックのリストは
+                             表~\ref{table-rng6} に示す．
+%</ja>
 \begin{table}[!tb]
-\caption{Unicode blocks in predefined character range~6.}\label{table-rng6}
-\catcode`\"=13\def"#1#2#3#4{{\tt U+#1#2#3#4}}%"
+%<*en>
+\caption{Unicode blocks in predefined character range~6.}
+%</en>
+%<*ja>
+\caption{文字範囲 6 に指定されている Unicode ブロック．}
+%</ja>
+\label{table-rng6}
+\catcode`\"=13\def"#1#2#3#4{\texttt{U+#1#2#3#4}}%"
 \begin{center}\small
 \begin{tabular}{llll}
+%<*en>
 "2460--"24FF&Enclosed Alphanumerics&
 "2E80--"2EFF&CJK Radicals Supplement\\
 "3000--"303F&CJK Symbols and Punctuation&
@@ -658,16 +1367,49 @@ This range consist of the following Unicode ranges, \emph{except characters in t
 "FE30--"FE4F&CJK Compatibility Forms\\
 "FE50--"FE6F&Small Form Variants&
 "{20}000--"{2F}FFF&(Supplementary Ideographic Plane)
+%</en>
+%<*ja>
+"2460--"24FF&囲み英数字&
+"2E80--"2EFF&CJK部首補助\\
+"3000--"303F&CJKの記号及び句読点&
+"3040--"309F&平仮名\\
+"30A0--"30FF&片仮名&
+"3190--"319F&漢文用記号（返り点）\\
+"31F0--"31FF&片仮名拡張&
+"3200--"32FF&囲みCJK文字・月\\
+"3300--"33FF&CJK互換用文字&
+"3400--"4DBF&CJK統合漢字拡張A\\
+"4E00--"9FFF&CJK統合漢字&
+"F900--"FAFF&CJK互換漢字\\
+"FE10--"FE1F&縦書き形&
+"FE30--"FE4F&CJK互換形\\
+"FE50--"FE6F&小字形&
+"{20}000--"{2F}FFF&（追加多言語面）
+%</ja>
 \end{tabular}
 \end{center}
 \end{table}
+%<*en>
 \item[Range~7${}^{\text{J}}$] Characters used in CJK languages, but not included in  Adobe-Japan1-6.
 The block list is indicated in Table~\ref{table-rng7}.
+%</en>
+%<*ja>
+\item[範囲 7${}^{\text{J}}$] CJK 言語で用いられる文字のうち，Adobe-Japan1-6 に
+                            含まれていないもの．
+                            ブロックのリストは表~\ref{table-rng7} に示す．
+%</ja>
 \begin{table}[!tb]
-\caption{Unicode blocks in predefined character range~7.}\label{table-rng7}
-\catcode`\"=13\def"#1#2#3#4{{\tt U+#1#2#3#4}}%"
+%<*en>
+\caption{Unicode blocks in predefined character range~7.}
+%</en>
+%<*ja>
+\caption{文字範囲 7 に指定されている Unicode ブロック．}
+%</ja>
+\label{table-rng7}
+\catcode`\"=13\def"#1#2#3#4{\texttt{U+#1#2#3#4}}%"
 \begin{center}\small
 \begin{tabular}{llll}
+%<*en>
 "1100--"11FF&Hangul Jamo&
 "2F00--"2FDF&Kangxi Radicals\\
 "2FF0--"2FFF&Ideographic Description Characters&
@@ -680,19 +1422,36 @@ The block list is indicated in Table~\ref{table-rng7}.
 "A830--"A83F&Common Indic Number Forms\\
 "AC00--"D7AF&Hangul Syllables&
 "D7B0--"D7FF&Hangul Jamo Extended-B
+%</en>
+%<*ja>
+"1100--"11FF&ハングル字母&
+"2F00--"2FDF&康熙部首\\
+"2FF0--"2FFF&漢字構成記述文字&
+"3100--"312F&注音字母 （注音符号）\\
+"3130--"318F&ハングル互換字母&
+"31A0--"31BF&注音字母拡張\\
+"31C0--"31EF&CJKの筆画&
+"A000--"A48F&イ文字\\
+"A490--"A4CF&イ文字部首&
+"A830--"A83F&共通インド数字に準じるもの\\
+"AC00--"D7AF&ハングル音節文字&
+"D7B0--"D7FF&ハングル字母拡張B
+%</ja>
 \end{tabular}
 \end{center}
 \end{table}
 \end{description}
 
 
-\subsection{\Param{kanjiskip} and \Param{xkanjiskip}}\label{subs-kskip}
+%<en>\subsection{\Param{kanjiskip} and \Param{xkanjiskip}}
+%<ja>\subsection{\Param{kanjiskip} と \Param{xkanjiskip}}
+\label{subs-kskip}
 \textbf{JAglue} is divided into the following three categories:
 \begin{itemize}
 \item Glues/kerns specified in JFM. If \verb+\inhibitglue+ is issued
       around a Japanese character, this glue will be not inserted at the
       place.
-\item The default glue which inserted between two \textbf{JAchar}s ({\sf
+\item The default glue which inserted between two \textbf{JAchar}s (\textsf{
       kanjiskip}).
 \item The default glue which inserted between a \textbf{JAchar} and an
       \textbf{ALchar} (\Param{xkanjiskip}).
@@ -705,12 +1464,13 @@ changed as the following.
 \end{lstlisting}
 
 
-It may occur that JFM contains the data of `ideal width of {\sf
-kanjiskip}' and/or `ideal width of \Param{xkanjiskip}'.
+It may occur that JFM contains the data of `ideal width of \textsf{kanjiskip}' 
+and/or `ideal width of \Param{xkanjiskip}'.
 To use these data from JFM, set the value of \Param{kanjiskip} or 
 \Param{xkanjiskip} to \verb+\maxdimen+.
 
-\subsection{Insertion Setting of \Param{xkanjiskip}}
+%<en>\subsection{Insertion Setting of \Param{xkanjiskip}}
+%<ja>\subsection{\Param{xkanjiskip} の設定の挿入}
 It is not desirable that \Param{xkanjiskip} is inserted between every
 boundary between \textbf{JAchar}s and \textbf{ALchar}s. For example,
 \Param{xkanjiskip} should not be inserted after opening parenthesis
@@ -724,9 +1484,9 @@ before/after a character, by changing \Param{jaxspmode} for \textbf{JAchar}s and
 pあq い!う
 \end{LTXexample}
 
-The second argument {\tt preonly} means `the insertion of
+The second argument \texttt{preonly} means `the insertion of
 \Param{xkanjiskip} is allowed before this character, but not after'.
-the other possible values are {\tt postonly}, {\tt allow} and {\tt
+the other possible values are \texttt{postonly}, \texttt{allow} and \texttt{
 inhibit}. For the compatibility with \pTeX, natural numbers between
 0~and~3 are also allowed as the second argument\footnote{But we don't
 recommend this: since numbers 1~and~2 have opposite meanings in
@@ -734,10 +1494,11 @@ recommend this: since numbers 1~and~2 have opposite meanings in
 
 If you want to enable/disable all insertions of \Param{kanjiskip} and
 \Param{xkanjiskip}, set \Param{autospacing} and \Param{autoxspacing}
-parameters to {\tt false}, respectively.
+parameters to \texttt{false}, respectively.
 
 
-\subsection{Shifting Baseline}
+%<en>\subsection{Shifting Baseline}
+%<ja>\subsection{ベースラインの移動}
 To make a match between a Japanese font and an alphabetic font, sometimes
 shifting of the baseline of one of the pair is needed. In \pTeX, this is achieved
 by setting \verb+\ybaselineshift+ to a non-zero length (the
@@ -769,7 +1530,8 @@ xyz漢字
 \end{LTXexample}
 
 
-\subsection{Cropmark}
+%<en>\subsection{Cropmark}
+%<ja>\subsection{トンボ}
 Cropmark is a mark for indicating 4~corners and horizontal/vertical
 center of the paper. In Japanese, we call cropmark as tombo(w).
 \pLaTeX\ and this \LuaTeX-ja support `tombow' by their kernel.
@@ -780,7 +1542,7 @@ The following steps are needed to typeset cropmark:
       of the paper. This is done by assigning a token list to
       \verb+\@bannertoken+.
 
-For example, the following sets banner as `{\tt filename (2012-01-01 17:01)}':
+For example, the following sets banner as `\texttt{filename (2012-01-01 17:01)}':
 \begin{verbatim}
 \makeatletter
 
@@ -795,9 +1557,13 @@ For example, the following sets banner as `{\tt filename (2012-01-01 17:01)}':
 \end{enumerate}
 
 
-\part{Reference}\label{part-ref}
-\section{Font Metric and Japanese Font}
-\subsection{\texttt{\char92jfont} primitive}
+%<en>\part{Reference}
+%<ja>\part{リファレンス}
+\label{part-ref}
+%<en>\section{Font Metric and Japanese Font}
+%<ja>\section{フォントメトリックと日本語フォント}
+%<en>\subsection{\texttt{\char92jfont} primitive}
+%<ja>\subsection{\texttt{\char92jfont} プリミティブ}
 To load a font as a Japanese font, you must use the
 \verb+\jfont+ primitive instead of~\verb+\font+, while
 \verb+\jfont+ admits the same syntax used in~\verb+\font+. 
@@ -821,7 +1587,7 @@ can be used a prefix in \verb+\jfont+ (and~\verb+\font+) primitive.
 Using this prefix, you can specify a `name-only' Japanese font which
 will be not embedded to PDF. Typical use of this prefix is to specify
 the `standard' Japanese fonts, namely, `Ryumin-Light' and
-`GothicBBB-Medium'. For kerning or other informations, that of Kozuka
+`GothicBBB-Medium'. For kerning or other information, that of Kozuka
 Mincho Pr6N Regular (this is a font by Adobe Inc., and included in
 Japanese Font Packs for Adore Reader) will be used.
 
@@ -837,15 +1603,15 @@ which JFM will be used for this font by the following keys:
 \item[jfm=<name>]
 Specify the name of JFM. A file named \texttt{jfm-<name>.lua} will be searched and/or loaded.
 
-The followings are JFMs shipped with Lua\TeX-ja:
+The followings are JFMs shipped with \LuaTeX-ja:
 \begin{description}
-\item[\tt jfm-ujis.lua] A standard JFM in Lua\TeX-ja. This JFM is
+\item[\tt jfm-ujis.lua] A standard JFM in \LuaTeX-ja. This JFM is
       based on \verb+upnmlminr-h.tfm+, a metric for UTF/OTF package that
       is used in \upTeX. When you use the \Pkg{luatexja-otf} package, please use this JFM.
 \item[\tt jfm-jis.lua] A counterpart for \verb+jis.tfm+, `JIS font
 	   metric' which is widely used in \pTeX. A major difference of
 	   \texttt{jfm-ujis.lua} and this \texttt{jfm-jis.lua} is that
-	   most haracters under \texttt{jfm-ujis.lua} are square-shaped,
+	   most characters under \texttt{jfm-ujis.lua} are square-shaped,
 	   while that under \texttt{jfm-jis.lua} are horizontal
 	   rectangles.
 
@@ -861,6 +1627,7 @@ The followings are JFMs shipped with Lua\TeX-ja:
 \begin{table}[t]
 \caption{Differences between JFMs shipped with \LuaTeX-ja}
 \label{tab-difjfm}
+\ltjsetparameter{jacharrange={+3}}
 \begin{center}
 \def\r#1{{\jfont\g=psft:Ryumin-Light:jfm=#1 at 14.43324pt \g
 \setbox0=\vtop{\hsize=7\zw\noindent ◆◆◆◆◆◆◆
@@ -885,6 +1652,7 @@ Bounding Box&\t{ujis}&\t{jis}&\t{min}\\
 \bottomrule
 \end{tabular}
 \end{center}
+\ltjsetparameter{jacharrange={-3}}
 \end{table}
 
 \paragraph{Note: kern feature}\label{para-kern}
@@ -896,17 +1664,18 @@ between two characters when both a glue/kern from the data in the font
 and it from JFM are present.
 
 \begin{itemize}
-\item You should specify {\tt -kern} in
-{\tt\char92jfont} primitive, when you want to use other font features,
-      such as {\tt script=...}\,.
-\item If you want to use Japanese fonts in proportinal width, and use
+\item You should specify \texttt{-kern} in
+\texttt{\char92jfont} primitive, when you want to use other font features,
+      such as \texttt{script=...}\,.
+\item If you want to use Japanese fonts in proportional width, and use
       information from this font, use \texttt{jfm-prop.lua} for its JFM, and ...
 
 TODO: kanjiskip?
 \end{itemize}
 
 
-\subsection{Structure of JFM file}
+%<en>\subsection{Structure of JFM file}
+%<ja>\subsection{JFM ファイルの構造}
 A JFM file is a Lua script which has only one function call:
 \begin{verbatim}
 luatexja.jfont.define_jfm { ... }
@@ -946,7 +1715,7 @@ Like the \Param{kanjiskip} field, this field specifies the `ideal'
 
 Besides from above fields, a JFM file have several sub-tables those
 indices are natural numbers.  The table indexed by~$i\in\omega$ stores
-informations of `character class'~$i$. At least, the character class~0 is
+information of `character class'~$i$. At least, the character class~0 is
 always present, so each JFM file must have a sub-table whose index is
 \texttt{[0]}.  Each sub-table (its numerical index is denoted by $i$) has
 the following fields:
@@ -1064,7 +1833,7 @@ the `real' glyph is centered horizontally (the green rectangle).
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
 \item['lineend'] An ending of a line. 
 \item['diffmet'] Used at a boundary between two \textbf{JAchar}s whose JFM or size is different.
-\item['boxbdd'] The beginning/ending of a horizontal box, and the beginging of a noindented paragraph.
+\item['boxbdd'] The beginning/ending of a horizontal box, and the beginning of a noindented paragraph.
 \item['parbdd'] The beginning of an (indented) paragraph.
 \item['jcharbdd'] A boundary between \textbf{JAchar} and anything else
 	     (such as \textbf{ALchar}, kern, glue, ...).
@@ -1121,6 +1890,7 @@ the `real' glyph is centered horizontally (the green rectangle).
 うになった．例えば，\LuaTeX-ja同梱のJFMのように，\texttt{'boxbdd'}と同じ文字クラスに
 \texttt{'parbdd'}を入れれば全角下がりとなる．
 
+\ltjsetparameter{jacharrange={+3}}
 \begin{LTXexample}
 \jfont\g=psft:Ryumin-Light:jfm=test \g
 \parindent1\zw\noindent{}◆◆◆◆◆
@@ -1129,10 +1899,11 @@ the `real' glyph is centered horizontally (the green rectangle).
 \par{}〔◆◆←全角二分下がり
 \end{LTXexample}
 \end{itemize}
-
+\ltjsetparameter{jacharrange={-3}}
 %</ja>
 
-\subsection{Math Font Family}
+%<en>\subsection{Math Font Family}
+%<ja>\subsection{数式フォントファミリ}
 \TeX\ handles fonts in math formulas by 16~font families\footnote{Omega,
 Aleph, \LuaTeX~and $\varepsilon$-\kern-.125em(u)\pTeX can handles 256~families, but
 an external package is needed to support this in plain \TeX\ and
@@ -1142,7 +1913,7 @@ an external package is needed to support this in plain \TeX\ and
 \LuaTeX-ja's handling of Japanese fonts in math formulas is similar;
 Table~\ref{tab-math} shows counterparts to \TeX's primitives for math
 font families. There is no relation between the value of
-\verb+\fam+ and that of \verb+\jfam+; with appropreate settings, 
+\verb+\fam+ and that of \verb+\jfam+; with appropriate settings, 
 you can set both \verb+\fam+ and \verb+\jfam+ to~the same value.
 
 \begin{table}[!tb]
@@ -1162,13 +1933,15 @@ scriptscript size&\tt\Param{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\ver
 \end{center}
 \end{table}
 
-\subsection{Callbacks}
+%<en>\subsection{Callbacks}
+%<ja>\subsection{コールバック}
 Like \LuaTeX\ itself, \LuaTeX-ja also has callbacks. These callbacks can
 be accessed via \verb+luatexbase.add_to_callback+ function and so on, as other callbacks
 \begin{list}{}%
 {\def\makelabel#1{\bfseries#1}}
 \item[\texttt{luatexja.load\_jfm} callback]
-With this callback you can overwrite JFMs.
+With this callback you can overwrite JFMs. 
+This callback is called when a new JFM is loaded.
 
 \begin{verbatim}
 function (<table> jfm_info, <string> jfm_name)
@@ -1187,7 +1960,7 @@ An example of this callback is the \texttt{ltjarticle} class, with
 
 \item[\texttt{luatexja.define\_font} callback]
 This callback and the next callback form a pair, and you can assign letters which don't have
-	     fixed codepoints in Unicode to non-zero character classes.
+	     fixed code points in Unicode to non-zero character classes.
 This \texttt{luatexja.define\_font} callback is called just when new Japanese font is loaded.
 \begin{verbatim}
 function (<table> jfont_info, <number> font_number)
@@ -1234,14 +2007,44 @@ The argument \verb+char_class+ is the result of \LuaTeX-ja's default
 
 This callback doesn't replace any code of \LuaTeX-ja.
 
+\item[\texttt{luatexja.set\_width} callback]
+This callback is called when \LuaTeX-ja is trying to encapsule a
+	     \textbf{JAchar} \textit{glyph\_node}, to adjust its
+	     dimension and position.
+\begin{lstlisting}[numbers=left]
+function (<table> shift_info, <table> jfont_info, <number> char_class)
+  return <table> new_shift_info
+end
+\end{lstlisting}
 
+The argument \verb+shift_info+ and the returned \verb+new_shift_info+ have 
+\texttt{down} and \texttt{left} fields, which are the amount of shifting
+	     down/left the character in a scaled-point.
 
+%<*ja>
+良い例が\Pkg{test/valign.lua}である．このファイルが読み込まれた状態では，
+	     JFM内で規定された文字クラス0の文字における$(\hbox{高
+	     さ}):(\hbox{深さ})$の比になるように，実際のフォントの出力上
+	     下位置が自動調整される．例えば，
+\begin{itemize}
+\item JFM側の設定：$(\hbox{高さ})=88x$, $(\hbox{深さ})=12x$%
+（和文OpenTypeフォントの標準値）
+\item 実フォント側の数値：$(\hbox{高さ})=28y$, $(\hbox{深さ})=5y$（和文TrueTypeフォントの標準値）
+\end{itemize}
+となっていたとする．すると，実際の文字の出力位置は，
+\[
+ \frac{88x}{88x+12x} (28y+5y) - 28y = \frac{26}{825}y= 0.03\dot1\dot5y
+\]
+だけ上にずらされることになる，
+%</ja>
 \end{list}
 
 
 
-\section{Parameters}
-\subsection{{\tt\char92 ltjsetparameter} primitive}
+%<en>\section{Parameters}
+%<ja>\section{パラメータ}
+%<en>\subsection{\texttt{\char92 ltjsetparameter} primitive}
+%<ja>\subsection{\texttt{\char92 ltjsetparameter} プリミティブ}
 As noted before, \verb+\ltjsetparameter+ and \verb+\ltjgetparameter+ are
 primitives for accessing most parameters of \LuaTeX-ja. One of the main
 reason that \LuaTeX-ja didn't adopted the syntax similar to that of \pTeX\ 
@@ -1271,11 +2074,12 @@ additional argument---a character code, for example---in some cases.
 \end{LTXexample}
 \emph{The return value of\/ {\normalfont\tt\char92ltjgetparameter} is
 always a string}. This is outputted by \texttt{tex.write()}, so any
-character other than space~`{\tt\char32}'~(U+0020) has the category code
+character other than space~`\texttt{\char32}'~(U+0020) has the category code
 12~(other), while the space has 10~(space).
 
-\subsection{List of Parameters}
-The following is the list of parameters which can be specificated by the
+%<en>\subsection{List of Parameters}
+%<ja>\subsection{パラメータ一覧}
+The following is the list of parameters which can be specified by the
 \verb+\ltjsetparameter+ command. [\verb+\cs+] indicates the counterpart
 in \pTeX, and symbols beside each parameter has the following meaning:
 \begin{itemize}
@@ -1288,7 +2092,7 @@ in \pTeX, and symbols beside each parameter has the following meaning:
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
 \item[\Param{jcharwidowpenalty}\,=<penalty>] [\verb+\jcharwidowpenalty+]
 
-Penalty value for supressing orphans. This penalty is inserted just
+Penalty value for suppressing orphans. This penalty is inserted just
 	     after the last \textbf{JAchar} which is not regarded as a
 	     (Japanese) punctuation mark.
 
@@ -1343,10 +2147,10 @@ At the present version, the lowermost bit of <natural number> indicates
 Setting whether inserting  \Param{xkanjiskip} is allowed before/after a \textbf{JAchar} whose character code is <chr\_code>.
 The followings are allowed for <mode>:
 \begin{description}
-\item[0, \texttt{inhibit}] Insertion of \Param{xkanjiskip} is inhibited before the charater, nor after the charater.
-\item[2, \texttt{preonly}] Insertion of \Param{xkanjiskip} is allowed before the charater, but not after.
-\item[1, \texttt{postonly}] Insertion of \Param{xkanjiskip} is allowed after the charater, but not before.
-\item[3, \texttt{allow}] Insertion of \Param{xkanjiskip} is allowed before the charater and after the charater.
+\item[0, \texttt{inhibit}] Insertion of \Param{xkanjiskip} is inhibited before the character, nor after the character.
+\item[2, \texttt{preonly}] Insertion of \Param{xkanjiskip} is allowed before the character, but not after.
+\item[1, \texttt{postonly}] Insertion of \Param{xkanjiskip} is allowed after the character, but not before.
+\item[3, \texttt{allow}] Insertion of \Param{xkanjiskip} is allowed before the character and after the character.
 This is the default value.
 \end{description}
 
@@ -1357,13 +2161,13 @@ Setting whether inserting \Param{xkanjiskip} is allowed before/after a
 The followings are allowed for <mode>:
 \begin{description}
 \item[0, \texttt{inhibit}] Insertion of \Param{xkanjiskip} is inhibited
-	   before the charater, nor after the charater.
+	   before the character, nor after the character.
 \item[1, \texttt{preonly}] Insertion of \Param{xkanjiskip} is allowed
-	   before the charater, but not after.
+	   before the character, but not after.
 \item[2, \texttt{postonly}] Insertion of \Param{xkanjiskip} is allowed
-	   after the charater, but not before.
+	   after the character, but not before.
 \item[3, \texttt{allow}] Insertion of \Param{xkanjiskip} is allowed both
-	   before the charater and after the charater.
+	   before the character and after the character.
 This is the default value.
 \end{description}
 Note that parameters \Param{jaxspmode} and \Param{alxspmode} use a common table.
@@ -1389,9 +2193,11 @@ The allowed arguments are the followings:
 \end{list}
 
 
-\section{Other Primitives}
-\subsection{Primitives for Compatibility}
-The following primtives are implemented for compatibility with \pTeX:
+%<en>\section{Other Primitives}
+%<ja>\section{その他のプリミティブ}
+%<en>\subsection{Primitives for Compatibility}
+%<ja>\subsection{互換プリミティブ}
+The following primitives are implemented for compatibility with \pTeX:
 \begin{list}{}{\def\makelabel{\ttfamily\char92 }}
 \item[kuten]
 \item[jis]
@@ -1400,7 +2206,8 @@ The following primtives are implemented for compatibility with \pTeX:
 \item[ucs]
 \item[kansuji]
 \end{list}
-\subsection{{\tt\char92 inhibitglue}}
+%<en>\subsection{\texttt{\char92 inhibitglue} primitive}
+%<ja>\subsection{\texttt{\char92 inhibitglue} プリミティブ}
 The primitive \verb+\inhibitglue+ suppresses the insertion of \textbf{JAglue}.
 The following is an example, using a special JFM that there will be a glue between 
 the beginning of a box and `あ', and also between `あ' and `ウ'.
@@ -1424,11 +2231,14 @@ With the help of this example, we remark the specification of \verb+\inhibitglue
 \item The call of \verb+\inhibitglue+ in math mode is just ignored.
 \end{itemize}
 
-\section{Control Sequences for \LaTeXe}
-\subsection{Patch for NFSS2}\label{ssub-nfsspat}
+%<en>\section{Control Sequences for \LaTeXe}
+%<ja>\section{\LaTeXe 用のコントロールシーケンス}
+%<en>\subsection{Patch for NFSS2}
+%<ja>\subsection{NFSS2 へのパッチ}
+\label{ssub-nfsspat}
 As described in Subsection~\ref{ssec-ltx}, \LuaTeX-ja simply adopted
 \texttt{plfonts.dtx} in \pLaTeXe\ for the Japanese patch for NFSS2.
-For an convinience, we will describe
+For an convenience, we will describe
 commands which are not described in Subsection~\ref{ssub-chgfnt}.
 
 \begin{cslist}%
@@ -1491,7 +2301,7 @@ to <family>. Which family will be changed is determined as follows:
 \begin{itemize}
 \item The family <fam> under the encoding <ja-enc> is already defined by
       \verb+\DeclareKanijFamily+.
-\item A font definition named \texttt{<enc><ja-enc>.fd} (the filename is
+\item A font definition named \texttt{<enc><ja-enc>.fd} (the file name is
       all lowercase) exists.
 \end{itemize}
 \item Let current encoding scheme for Japanese fonts be
@@ -1502,7 +2312,7 @@ to <family>. Which family will be changed is determined as follows:
 
 In this case, the default family for font substitution is used for
       alphabetic and Japanese fonts. Note that current encoding will not
-      be set to <family>, unlike the original inplementation in \LaTeX.
+      be set to <family>, unlike the original implementation in \LaTeX.
 \end{itemize}
 }
 \end{cslist}
@@ -1516,14 +2326,16 @@ As closing this subsection, we shall introduce an example of
 \end{LTXexample}
 
 
-\subsection{Cropmark/`tombow'}
+%<en>\subsection{Cropmark/`tombow'}
+%<ja>\subsection{トンボ}
 
-\section{Extensions}
-\subsection{{\tt luatexja-fontspec.sty}}
+%<en>\section{Extensions}
+%<ja>\section{拡張}
+\subsection{\texttt{luatexja-fontspec.sty}}
 
-\subsection{{\tt luatexja-otf.sty}}
-This optional package supports typesetting charaters in
-Adobe-Japan1. {\tt luatexja-otf.sty} offers the following 2~low-level
+\subsection{\texttt{luatexja-otf.sty}}
+This optional package supports typesetting characters in
+Adobe-Japan1. \texttt{luatexja-otf.sty} offers the following 2~low-level
 commands:
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
 \item[\char92CID\{<number>\}]
@@ -1546,15 +2358,20 @@ ordinary characters in the following points:
 
 
 \paragraph{Additionally Syntax of JFM}
-{\tt luatexja-otf.sty} extends the syntax of JFM; the entries of {\tt
+\texttt{luatexja-otf.sty} extends the syntax of JFM; the entries of \texttt{
 chars} table in JFM now allows a string in the form
 \verb+'AJ1-xxx'+, which stands for the character 
 whose CID number in Adobe-Japan1 is \verb+xxx+. 
 
-\part{Implementations}\label{part-imp}
-\section{Storing Parameters}\label{sec-para}
-\subsection{Used Dimensions,  Attributes and whatsit nodes}
-Here the following is the list of dimension and attributes which are used in \LuaTeX-ja.
+%<en>\part{Implementations}
+%<ja>\part{実装}
+\label{part-imp}
+%<en>\section{Storing Parameters}
+%<ja>\section{パラメータの保持}
+\label{sec-para}
+%<en>\subsection{Used Dimensions, Attributes and whatsit nodes}
+%<ja>\subsection{用いられる寸法レジスタ，属性レジスタ，whatsit ノード}
+Here the following is the list of dimensions and attributes which are used in \LuaTeX-ja.
 \begin{list}{}{%
 \def\makelabel{\ttfamily}
 \def\dim#1{\item[\char92 #1\ \textrm{(dimension)}]}
@@ -1567,8 +2384,8 @@ As explained in Subsection~\ref{ssec-plain}, \verb+\jQ+ is equal to
 			a unit used in Japanese phototypesetting. So one should not change the value of this dimension. 
 \dim{jH}
 There is also a unit called `歯' which equals to $0.25\,\textrm{mm}$ and
-			used in Japanese phototypesetting. The dimension
-			\verb+\jH+ stores this length, similar to \verb+\jQ+. 
+			used in Japanese phototypesetting. This
+			\verb+\jH+ is a synonym of \verb+\jQ+.
 \dim{ltj@zw} A temporal register for the `full-width' of current Japanese font.
 \dim{ltj@zh} A temporal register for the `full-height' (usually the sum of height of imaginary body and its depth) of current Japanese font.
 \attr{jfam} Current number of Japanese font family for math formulas.
@@ -1583,7 +2400,7 @@ There is also a unit called `歯' which equals to $0.25\,\textrm{mm}$ and
 \attr{ltj@icflag} An attribute for distinguishing `kinds' of a node. One of the following value is
 			assigned to this attribute:
 \begin{description}
-\item[\textit{italic} (1)] Glues from an itaric correction
+\item[\textit{italic} (1)] Glues from an italic correction
 	   (\verb+\/+). This distinction of origins of glues 
 	   (from explicit \verb+\kern+, or from \verb+\/+)
 	   is needed in the insertion process of \Param{xkanjiskip}.
@@ -1594,7 +2411,7 @@ There is also a unit called `歯' which equals to $0.25\,\textrm{mm}$ and
 \item[\textit{kanji\_skip} (6)] Glues for \Param{kanjiskip}.
 \item[\textit{xkanji\_skip} (7)] Glues for \Param{xkanjiskip}.
 \item[\textit{processed} (8)] Nodes which is already processed by ...
-\item[\textit{ic\_processed} (9)] Glues from an itaric correction, but also already processed.
+\item[\textit{ic\_processed} (9)] Glues from an italic correction, but also already processed.
 \item[\textit{boxbdd} (15)] Glues/kerns that inserted just the beginning or the ending of an hbox or a paragraph.
 \end{description}
 \attr{ltj@kcat$i$} Where $i$~is a natural number which is less than~7.
@@ -1611,14 +2428,16 @@ typesetting. All those nodes store a natural number (hence the node's
 	   subsection). The \texttt{value} field of these nodes is
 	   current group.
 \item[30113] Nodes for Japanese Characters which the callback process of
-	   luaotfload won't be applied, andd the character code is
+	   luaotfload won't be applied, and the character code is
 	   stored in the \texttt{value} field. Each node having this
 	   \verb+user_id+ is converted to a `glyph\_node' \emph{after}
 	   the callback process of luaotfload.
 \end{description}
 These whatsits will be removed during the process of inserting \textbf{JAglue}s.
 
-\subsection{Stack System of \LuaTeX-ja}\label{ssec-stack}
+%<en>\subsection{Stack System of \LuaTeX-ja}
+%<ja>\subsection{\LuaTeX-ja のスタックシステム}
+\label{ssec-stack}
 \paragraph{Background}
 \LuaTeX-ja has its own stack system, and most parameters of \LuaTeX-ja
 are stored in it.  To clarify the reason, imagine the parameter
@@ -1663,7 +2482,7 @@ callback.
 The code of stack system is based on that in a post of Dev-luatex mailing list\footnote{%
 \texttt{[Dev-luatex] tex.currentgrouplevel}, a post at 2008/8/19 by Jonathan Sauer.}.
 
-These are two \TeX\ count registers for maintaining informations:
+These are two \TeX\ count registers for maintaining information:
 \verb+\ltj@@stack+ for the stack level, and \verb+\ltj@@group@level+ for
 the \TeX's group level when the last assignment was done.  Parameters
 are stored in one big table named \texttt{charprop\_stack\_table}, where
@@ -1702,14 +2521,17 @@ This problem is resolved by using
 \hbox{\verb+\directlua{tex.globaldefs=0}+} (this assignment is local).
 
 
-\section{Linebreak after Japanese Character}\label{sec-lbreak}
-\subsection{Reference: Behavior in \pTeX}
+%<en>\section{Linebreak after Japanese Character}
+%<ja>\section{和文文字直後の改行}
+\label{sec-lbreak}
+%<en>\subsection{Reference: Behavior in \pTeX}
+%<ja>\subsection{参考: \pTeX の挙動}
 %<*en>
-In~\pTeX, a linebreak after a Japanese character doesn't emit a space,
+In~\pTeX, a line break after a Japanese character doesn't emit a space,
 since words are not separated by spaces in Japanese writings. However,
 this feature isn't fully implemented in \LuaTeX-ja due to the
 specification of callbacks in~\LuaTeX. To clarify the difference between
-\pTeX~and~\LuaTeX, We briefly describe the handling of a linebreak in~\pTeX, in
+\pTeX~and~\LuaTeX, We briefly describe the handling of a line break in~\pTeX, in
 this subsection. 
 
 \pTeX's input processor can be described in terms of a finite state
@@ -1743,7 +2565,7 @@ after `beginning/ending of a group' characters.
 \item State~$M$: 行中．
 \item State~$K$: 行中（和文文字の後）．
 \end{itemize}
-また，状態遷移は，図\label{fig-ptexipro}のようになっており，図中の数字は
+また，状態遷移は，図~\ref{fig-ptexipro} のようになっており，図中の数字は
 カテゴリーコードを表している．最初の3状態は\TeX の入力処理部と同じであり，
 図中から状態$K$と「$j$」と書かれた矢印を取り除けば，\TeX の入力処理部と同
 じものになる．
@@ -1757,11 +2579,11 @@ after `beginning/ending of a group' characters.
 
 \begin{figure}[!tb]
 \begin{gather*}
- \def\sp{\text{\tt\char32}}
+ \def\sp{\texttt{\char32}}
  \xymatrix{&&
    {\text{scan a cs}}\ar@(r,ul)[dr]&\\
 \ar[r]&
-   *++[o][F-]{N}\ar[ur]^0\ar[dd]_{d,\ g}\ar[u]^{5\ (\text{\tt\char92par})}
+   *++[o][F-]{N}\ar[ur]^0\ar[dd]_{d,\ g}\ar[u]^{5\ (\texttt{\char92par})}
      \ar@{->}@(d,l)[ddrr]_(0.45){j}&&
    *++[o][F-]{S}\ar@(l,dr)[ul]^0\ar@(l,ur)[ddll]_{d,\ g}\ar[u]_{5}
      \ar@{->}@(r,r)[dd]^{j}\\&\\&
@@ -1782,12 +2604,13 @@ after `beginning/ending of a group' characters.
 \end{figure}
 
 
-\subsection{Behavior in \LuaTeX-ja}
+%<en>\subsection{Behavior in \LuaTeX-ja}
+%<ja>\subsection{\LuaTeX-ja の挙動}
 %<*en>
-States in the input processoe of \LuaTeX\ is the same as that of \TeX,
+States in the input processor of \LuaTeX\ is the same as that of \TeX,
 and they can't be customized by any callbacks. Hence, we can only use
 \verb+process_input_buffer+ and \verb+token_filter+ callbacks for to
-suppress a space by a linebreak which is after Japanese characters.
+suppress a space by a line break which is after Japanese characters.
 
 However, \verb+token_filter+ callback cannot be used either, since a
 character in category code 5~(end-of-line) is converted into an space
@@ -1881,8 +2704,10 @@ u
 %</ja>
 
 
-\section{Insertion of JFM glues, \Param{kanjiskip} and \Param{xkanjiskip}}
-\subsection{Overview}
+%<en>\section{Insertion of JFM glues, \Param{kanjiskip} and \Param{xkanjiskip}}
+%<ja>\section{JFM グルーの挿入，\Param{kanjiskip} と \Param{xkanjiskip}}
+%<en>\subsection{Overview}
+%<ja>\subsection{概要}
 %<*en>
 NOT COMPLETED
 %</en>
@@ -1913,7 +2738,8 @@ NOT COMPLETED
 % \unitlength=10mm
 % \end{figure}
 
-\subsection{Definition of a `cluster'}
+%<en>\subsection{Definition of a `cluster'}
+%<ja>\subsection{「クラスタ」の定義}
 
 \begin{defn}
 A \emph{cluster} is a list of nodes in one of the following forms, with the \textit{id} of it:

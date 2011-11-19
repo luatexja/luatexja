@@ -25,14 +25,12 @@ local id_glyph = node.id('glyph')
 local id_whatsit = node.id('whatsit')
 local sid_user = node.subtype('user_defined')
 
-local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 
 local ltjf_font_metric_table = ltjf.font_metric_table
-local ltjf_find_char_class = ltjf.find_char_class
 
 ------------------------------------------------------------------------
 -- MAIN PROCESS STEP 1: replace fonts
@@ -47,8 +45,6 @@ local function suppress_hyphenate_ja(head)
 	 local v = has_attr(p, attr_curjfnt)
 	 if v then 
 	    p.font = v 
-	    set_attr(p, attr_jchar_class,
-		     ltjf_find_char_class(p.char, ltjf_font_metric_table[v]))
 	 end
 	 v = has_attr(p, attr_ykblshift)
 	 if v then 

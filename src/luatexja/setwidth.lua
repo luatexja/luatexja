@@ -35,6 +35,8 @@ local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 
+local ltjf_font_metric_table = ltjf.font_metric_table
+
 local PACKED = 2
 
 char_data = {}
@@ -45,18 +47,27 @@ local function is_japanese_glyph_node(p)
    return p.font==has_attr(p, attr_curjfnt)
 end
 
+luatexbase.create_callback("luatexja.set_width", "data", 
+			   function (fstable, fmtable, jchar_class) 
+			      return fstable 
+			   end)
+
+local fshift =  { down = 0, left = 0}
 -- mode: true iff p will be always encapsuled by a hbox
-function capsule_glyph(p, dir, mode)
-   local h, box, q, fwidth, fheight, fdepth
-   p.xoffset= p.xoffset - char_data.left
+function capsule_glyph(p, dir, mode, met, class)
+   local h, box, q, fwidth
    if char_data.width ~= 'prop' then
       fwidth = char_data.width
    else fwidth = p.width end
-   fheight = char_data.height
-   fdepth = char_data.depth
+   local fheight = char_data.height
+   local fdepth = char_data.depth
+   fshift.down = char_data.down; fshift.left = char_data.left
+   fshift = luatexbase.call_callback("luatexja.set_width", fshift, met, class)
+--   local ti = 
+   p.xoffset= p.xoffset - fshift.left
    if mode or p.width ~= fwidth or p.height ~= fheight or p.depth ~= fdepth then
       local y_shift = - p.yoffset + (has_attr(p,attr_yablshift) or 0)
-      p.yoffset = -char_data.down
+      p.yoffset = -fshift.down
       head, q = node.remove(head, p)
       local total = fwidth - p.width
       if total == 0 then
@@ -85,7 +96,7 @@ function capsule_glyph(p, dir, mode)
       end
       return q
    else
-      p.yoffset = p.yoffset - (has_attr(p, attr_yablshift) or 0) - char_data.down
+      p.yoffset = p.yoffset - (has_attr(p, attr_yablshift) or 0) - fshift.down
       return node_next(p)
    end
 end
@@ -97,8 +108,9 @@ function set_ja_width(ahead, dir)
       if p.id==id_glyph then
 	 if is_japanese_glyph_node(p) then
 	    local met = ltjf.font_metric_table[p.font]
-	    char_data = ltjf.metrics[met.jfm].size_cache[met.size].char_type[has_attr(p, attr_jchar_class)]
-	    p = capsule_glyph(p, dir, false)
+	    local class = has_attr(p, attr_jchar_class)
+	    char_data = ltjf.metrics[met.jfm].size_cache[met.size].char_type[class]
+	    p = capsule_glyph(p, dir, false, met, class)
 	 else 
 	    p.yoffset = p.yoffset - (has_attr(p,attr_yablshift) or 0); p = node_next(p)
 	 end

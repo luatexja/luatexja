@@ -1,17 +1,21 @@
 %#!lualatex
 \documentclass{ltjarticle}
+\usepackage[margin=20mm]{geometry}
 \begin{document}
 \noindent 漢字漢字ちょっと\textgt{チェック}
 
 「漢字←全角二分下がり？\\
 「あいうえお」\textgt{「かきくけこ」}{\Large 「}
 
-次の例は「\texttt{min10}フォントについて」（乙部厳己）中のp.~8から拝借．
-
+次ページ以下の例は「\texttt{min10}フォントについて」（乙部厳己）中のp.~8から拝借．
 \def\g#1#2#3{\leavevmode\vbox{\hsize=100pt%
 \hrule height 1pt depth 0pt
-\vskip#3pt\hbox{\jfont\e=file:#1:jfm=#2 at 20pt\e あいうえお}\vskip-#3pt
+\vskip#3pt\hbox{\vrule width 40pt height 0.2pt depth 0.2pt\kern-40pt
+\jfont\e=file:#1:jfm=#2 at 20pt\e あいう◆漢}\vskip-#3pt
 \hrule height 0pt depth 1pt}: #1, jfm=#2, yjabaselineshift=#3pt\par\bigskip}
+
+\newpage
+\paragraph{valign.luaなし}\
 
 \g{KozGoPr6N-Medium.otf}{ujis}{0}
 \g{KozGoPr6N-Medium.otf}{jis}{0.7563636}
@@ -23,4 +27,25 @@
 \g{hgrgm.ttc}{jis}{0}
 \g{hgrgm.ttc}{jis}{0.7563636}
 
+\g{KozGoPr6N-Medium.otf}{test2}{0}
+\g{ipaexg.ttf}{test2}{0}
+\g{hgrgm.ttc}{test2}{0}
+
+\newpage
+\directlua{dofile('valign.lua')}
+\paragraph{valign.luaあり}\ 
+
+\g{KozGoPr6N-Medium.otf}{ujis}{0}
+\g{KozGoPr6N-Medium.otf}{jis}{0.7563636}
+\g{KozGoPr6N-Medium.otf}{jis}{0}
+\g{ipaexg.ttf}{ujis}{0}
+\g{ipaexg.ttf}{jis}{0.7563636}
+\g{ipaexg.ttf}{jis}{0}
+\g{hgrgm.ttc}{ujis}{0}
+\g{hgrgm.ttc}{jis}{0}
+\g{hgrgm.ttc}{jis}{0.7563636}
+
+\g{KozGoPr6N-Medium.otf}{test2}{0}
+\g{ipaexg.ttf}{test2}{0}
+\g{hgrgm.ttc}{test2}{0}
 \end{document}

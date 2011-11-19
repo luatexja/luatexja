@@ -184,11 +184,11 @@
   \advance\ltj@tempcnta by1
 \repeat
 
+
 %%%%%%%% \asluastring
 \def\asluastring#1{'\luaescapestring{\detokenize{#1}}'}
 
 %%%%%%%% Redefine \/
-%\let\ltj@ic=\/ \protected\def\/{{\ltj@icflag=1\ltj@ic}}
 \protected\def\/{\relax\directlua{luatexja.jfont.append_italic()}}
 
 %%%%%%%% \jfont\CS={...:...;jfm=metric;...}, \globaljfont
@@ -197,6 +197,7 @@
   \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true)}}
 \def\ltj@@jfont{\directlua{luatexja.jfont.jfontdefY()}}
 
+%%%%%%%% \zw, \zh
 \def\zw{\directlua{luatexja.jfont.load_zw()}\ltj@zw}
 \def\zh{\directlua{luatexja.jfont.load_zh()}\ltj@zh}
 
@@ -378,7 +379,7 @@
   \ifnum\globaldefs<0\directlua{ltj.isglobal=''}\else\directlua{ltj.isglobal='global'}\fi
   \setkeys[ltj]{japaram}{#1}\ignorespaces}
 
-%%%%%%%% 
+%%%%%%%% \ltjgetparameter
 \def\ltj@@decl@array@param#1{%
   \expandafter\let\csname ltj@@array@param/#1\endcsname=t%
 }
@@ -404,16 +405,40 @@
   \directlua{ltj.ext_get_parameter_binary('#1', \ltj@safe@num{#2})}%
 }
 
+%%%%%%%% \ltjalchar<number>, \ltjjachar<number>
+\let\ltj@@origchar=\char
+\protected\def\ltj@alljachar{\relax
+    \csname ltj@kcat0\endcsname=0
+    \csname ltj@kcat1\endcsname=0
+    \csname ltj@kcat2\endcsname=0
+    \csname ltj@kcat3\endcsname=0
+    \csname ltj@kcat4\endcsname=0
+    \csname ltj@kcat5\endcsname=0
+    \csname ltj@kcat6\endcsname=0 }
+\protected\def\ltj@allalchar{\relax
+    \csname ltj@kcat0\endcsname="7FFFFFFF %"
+    \csname ltj@kcat1\endcsname="7FFFFFFF %"
+    \csname ltj@kcat2\endcsname="7FFFFFFF %"
+    \csname ltj@kcat3\endcsname="7FFFFFFF %"
+    \csname ltj@kcat4\endcsname="7FFFFFFF %"
+    \csname ltj@kcat5\endcsname="7FFFFFFF %"
+    \csname ltj@kcat6\endcsname="7FFFFFFF }%"
+\protected\def\ltj@backup@kcat{\edef\ltj@restore@kcat{%
+    \csname ltj@kcat0\endcsname=\expandafter\the\csname ltj@kcat0\endcsname\relax
+    \csname ltj@kcat1\endcsname=\expandafter\the\csname ltj@kcat1\endcsname\relax
+    \csname ltj@kcat2\endcsname=\expandafter\the\csname ltj@kcat2\endcsname\relax
+    \csname ltj@kcat3\endcsname=\expandafter\the\csname ltj@kcat3\endcsname\relax
+    \csname ltj@kcat4\endcsname=\expandafter\the\csname ltj@kcat4\endcsname\relax
+    \csname ltj@kcat5\endcsname=\expandafter\the\csname ltj@kcat5\endcsname\relax
+    \csname ltj@kcat6\endcsname=\expandafter\the\csname ltj@kcat6\endcsname\relax}}
+\let\ltj@restore@kcat=\relax
+
+\protected\def\ltjjachar{\afterassignment\ltj@@kchar\ltj@tempcnta}
+\def\ltj@@kchar{{\directlua{tex.globaldefs = 0}\ltj@alljachar\ltj@@origchar\ltj@tempcnta}}
+\protected\def\ltjalchar{\afterassignment\ltj@@achar\ltj@tempcnta}
+\def\ltj@@achar{{\directlua{tex.globaldefs = 0}\ltj@allalchar\ltj@@origchar\ltj@tempcnta}}
 
 
-%\def\ltj@temp{plain}
-%\ifx\fmtname\ltj@temp
-%  \message{plain format: loading luatexja-plain.tex}
-%\fi
-%\input luatexja-plain.tex
-%\catcode`\@=12
-%\endinput
-%! ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 %%------------------ Load module for the format
 

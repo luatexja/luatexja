@@ -1,0 +1,36 @@
+%#!lualatex
+\documentclass{article}
+\usepackage[a4paper]{geometry}
+\usepackage{luatexja}
+\makeatletter\ltj@alljachar %←全部の（>=U+0080な）文字を和文文字扱いに！
+
+\usepackage{fontspec,unicode-math}
+\ExplSyntaxOn
+\cs_set:Npn \um_set_mathcode:nnnn #1#2#3#4 {
+  \Umathcode \int_eval:n {#1} =
+    \mathchar@type#2 \csname sym#3\endcsname \int_eval:n {#4} \scan_stop:
+  \directlua{luatexja.math.is_math_letters[\int_eval:n {#4}]=true}
+}
+\cs_set:Npn \um_set_mathcode:nnn #1#2#3 {
+  \Umathcode \int_eval:n {#1} =
+    \mathchar@type#2 \csname sym#3\endcsname \int_eval:n {#1} \scan_stop:
+  \directlua{luatexja.math.is_math_letters[\int_eval:n {#1}]=true}
+}
+\cs_set:Npn \um_set_mathchar:NNnn #1#2#3#4 {
+  \Umathchardef #1 =
+    \mathchar@type#2 \csname sym#3\endcsname \int_eval:n {#4} \scan_stop:
+  \directlua{luatexja.math.is_math_letters[\int_eval:n {#4}]=true}
+}
+\ExplSyntaxOff
+
+\setmathfont{XITSMath}
+
+\begin{document}\makeatletter
+
+\[
+ \frac1{1^2}+\frac1{2^2}+\cdots=
+\sum_{n=1}^\infty \frac1{n^s}=\zeta(2)=\frac{\pi^2}{6}
+=\frac16\cdot \pi\times\pi,\qquad a_1,\dots,a_n
+\]
+aaa○×○漢×漢\times \dots←数式外では和文文字扱いのままになっている．
+\end{document}

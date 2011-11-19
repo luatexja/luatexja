@@ -73,6 +73,7 @@ local max_dimen = 1073741823
 
 local ltjs_get_penalty_table = ltjs.get_penalty_table
 local ltjs_get_skip_table = ltjs.get_skip_table
+local ltjf_find_char_class = ltjf.find_char_class
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_metrics = ltjf.metrics
 local box_stack_level
@@ -81,7 +82,7 @@ local par_indented -- is the paragraph indented?
 -------------------- Helper functions
 
 -- This function is called only for acquiring `special' characters.
-local function find_char_class(c,m)
+local function fast_find_char_class(c,m)
    return m.chars[c] or 0
 end
 
@@ -312,23 +313,25 @@ end
 --            "Np is not a character" otherwise.
 
 -- 和文文字のデータを取得
-local function set_np_xspc_jachar(c,x)
-   Np.class = has_attr(x, attr_jchar_class)
-   Np.char = c
+local function set_np_xspc_jachar(x)
    local z = ltjf_font_metric_table[x.font]
+   local cls = ltjf_find_char_class(x.char, z)
+   set_attr(x, attr_jchar_class, cls)
+   Np.class = cls
+   Np.char = x.char
    Np.size= z.size
    Np.met = ltjf_metrics[z.jfm]
    Np.var = z.var
-   Np.pre = ltjs_get_penalty_table('pre', c, 0, box_stack_level)
-   Np.post = ltjs_get_penalty_table('post', c, 0, box_stack_level)
-   z = find_char_class('lineend', Np.met)
+   Np.pre = ltjs_get_penalty_table('pre', x.char, 0, box_stack_level)
+   Np.post = ltjs_get_penalty_table('post', x.char, 0, box_stack_level)
+   z = fast_find_char_class('lineend', Np.met)
    local y = Np.met.size_cache[Np.size].char_type[Np.class]
    if y.kern and y.kern[z] then 
       Np.lend = y.kern[z]
    else 
       Np.lend = 0 
    end
-   y = ltjs_get_penalty_table('xsp', c, 3, box_stack_level)
+   y = ltjs_get_penalty_table('xsp', x.char, 3, box_stack_level)
    Np.xspc_before = (y>=2)
    Np.xspc_after  = (y%2==1)
    Np.auto_kspc = (has_attr(x, attr_autospc)==1)
@@ -365,7 +368,7 @@ end
 local function extract_np()
    local x = Np.nuc
    if Np.id ==  id_jglyph then
-      set_np_xspc_jachar(x.char, x)
+      set_np_xspc_jachar(x)
    elseif Np.id == id_glyph then
       set_np_xspc_alchar(x.char, x, ligature_head)
    elseif Np.id == id_hlist then
@@ -373,7 +376,7 @@ local function extract_np()
       if check_box(x.head, nil) then
 	 if first_char then
 	    if first_char.font == has_attr(first_char, attr_curjfnt) then 
-	       set_np_xspc_jachar(first_char.char,first_char)
+	       set_np_xspc_jachar(first_char)
 	    else
 	       set_np_xspc_alchar(first_char.char,first_char, ligature_head)
 	    end
@@ -384,7 +387,7 @@ local function extract_np()
       if check_box(Np.first, node_next(Np.last)) then
 	 if first_char then
 	    if first_char.font == has_attr(first_char, attr_curjfnt) then 
-	       set_np_xspc_jachar(first_char.char,first_char)
+	       set_np_xspc_jachar(first_char)
 	    else
 	       set_np_xspc_alchar(first_char.char,first_char, ligature_head)
 	    end
@@ -395,7 +398,7 @@ local function extract_np()
       if check_box(x.replace, nil) then
 	 if first_char then
 	    if first_char.font == has_attr(first_char, attr_curjfnt) then 
-	       set_np_xspc_jachar(first_char.char,first_char)
+	       set_np_xspc_jachar(first_char)
 	    else
 	       set_np_xspc_alchar(first_char.char,first_char, ligature_head)
 	    end
@@ -411,7 +414,7 @@ end
 local function after_hlist()
    if last_char then
       if last_char.font == has_attr(last_char, attr_curjfnt) then 
-	 set_np_xspc_jachar(last_char.char,last_char, ligature_after)
+	 set_np_xspc_jachar(last_char, ligature_after)
       else
 	 set_np_xspc_alchar(last_char.char,last_char, ligature_after)
       end
@@ -605,8 +608,8 @@ local function calc_ja_ja_glue()
       return new_jfm_glue(Nq, Nq.class, Np.class)
    else
       local g = new_jfm_glue(Nq, Nq.class,
-			     find_char_class('diffmet',Nq.met))
-      local h = new_jfm_glue(Np, find_char_class('diffmet',Np.met),
+			     fast_find_char_class('diffmet',Nq.met))
+      local h = new_jfm_glue(Np, fast_find_char_class('diffmet',Np.met),
 			     Np.class)
       return calc_ja_ja_aux(g,h)
    end
@@ -649,7 +652,7 @@ local function get_OA_skip()
    if not ihb_flag then
       local c
       if Nq.id == id_math then c = -1 else c = 'jcharbdd' end
-      return new_jfm_glue(Np, find_char_class(c,Np.met), Np.class)
+      return new_jfm_glue(Np, fast_find_char_class(c,Np.met), Np.class)
    else return nil
    end
 end
@@ -657,7 +660,7 @@ local function get_OB_skip()
    if not ihb_flag then
       local c
       if Np.id == id_math then c = -1 else c = 'jcharbdd' end
-      return new_jfm_glue(Nq, Nq.class, find_char_class(c,Nq.met))
+      return new_jfm_glue(Nq, Nq.class, fast_find_char_class(c,Nq.met))
    else return nil
    end
 end
@@ -755,7 +758,7 @@ local function handle_list_tail()
    else
       -- the current list is the contents of a hbox
       if Np.id == id_jglyph or (Np.id==id_pbox and Np.met) then 
-	 local g = new_jfm_glue(Np, Np.class, find_char_class('boxbdd',Np.met))
+	 local g = new_jfm_glue(Np, Np.class, fast_find_char_class('boxbdd',Np.met))
 	 if g then
 	    set_attr(g, attr_icflag, BOXBDD)
 	    head = node_insert_after(head, Np.last, g)
@@ -772,9 +775,9 @@ local function handle_list_head()
       if not ihb_flag then
 	 local g
 	 if par_indented then
-	    g = new_jfm_glue(Np, find_char_class('parbdd',Np.met), Np.class)
+	    g = new_jfm_glue(Np, fast_find_char_class('parbdd',Np.met), Np.class)
 	 else
-	    g = new_jfm_glue(Np, find_char_class('boxbdd',Np.met), Np.class)
+	    g = new_jfm_glue(Np, fast_find_char_class('boxbdd',Np.met), Np.class)
 	 end
 	 if g then
 	    set_attr(g, attr_icflag, BOXBDD)
