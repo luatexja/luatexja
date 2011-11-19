@@ -44,14 +44,14 @@
 \definecolor{grayx}{gray}{0.85}
 
 %%% Mandatory article metadata %%%
-\title{Development of the \LuaTeX-ja package}
+\title{Development of \LuaTeX-ja package}
 \author{Hironori Kitagawa {\normalsize 北川 弘典}}
-\address{The \LuaTeX-ja project team}
+\address{\LuaTeX-ja project team}
 \email{h\_kitagawa2001@yahoo.co.jp}
 
 \keywords{\TeX, p\TeX, \LuaTeX, \LuaTeX-ja, Japanese}
 \abstract{%
-The \LuaTeX-ja package is a macro package for typesetting Japanese
+\LuaTeX-ja package is a macro package for typesetting Japanese
 documents under \LuaTeX.  This packages has more flexibility of
 typesetting than p\TeX, and corrected some unwanted features of p\TeX.
 In this paper, we describe specifications, the current status and some
@@ -108,9 +108,9 @@ than one people separately develop similar packages.  Development of the
 \LuaTeX-ja package is started initially by the author and Kazuki Maeda, because of
 these situations.
 
-\subsection{Development Policy of \LuaTeX-ja}
+\subsection{Development policy of \LuaTeX-ja}
 \label{ssec-pol} 
-The first aim of the \LuaTeX-ja project is to implement features (from the
+The first aim of \LuaTeX-ja project is to implement features (from the
 'primitive' level) of p\TeX\ as macros under \LuaTeX, so \LuaTeX-ja is
 much affected by p\TeX.  However, as development proceeds, some
 technical/conceptual difficulties are arisen. Hence we changed the aim
@@ -140,9 +140,9 @@ p\TeX\ has some flexibility of typesetting, by changing internal
 \end{itemize}
 
 
-\subsection{Overview of the Processes}
+\subsection{Overview of the processes}
 \label{ssec-over}
-We describe  an outline of the \LuaTeX-ja's process in order.
+We describe  an outline of \LuaTeX-ja's process in order.
 \begin{itemize}
 \item In the |process_input_buffer| callback: treatment of breaking
       lines after a Japanese character (in Subsection~\ref{ssec-line}).
@@ -180,16 +180,16 @@ This stage is similar to adjustument of the position of glyphs (see
       above), so we omit it from this paper.
 \end{itemize}
 
-\subsection{Contents of this Paper}
+\subsection{Contents of this paper}
 Here we describe the contents of the rest of this paper briefly.  In
 Section~2, we describe major differences between p\TeX\ and \LuaTeX-ja.
 The next section, Section~3, is concentrated on a problem `how we
 distinguish between Japanese characters and alphabetic characters'. In
-Section~4, we show rest of features of the \LuaTeX-ja package, and
+Section~4, we show rest of features of \LuaTeX-ja package, and
 current status of the package.  Finally, in Section~5, we describe some
 internal routines of \LuaTeX-ja.
 
-\subsection*{About the Project}
+\subsection*{About the project}
 This \LuaTeX-ja project is hosted by SourceForge.jp. The official wiki
 is located on
 \url{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage}.  There is
@@ -206,7 +206,7 @@ and our \LuaTeX-ja.  For general information of Japanese typesetting and the
 overview of p\TeX, please see Okumura~\cite{ptexjp}.
 
 
-\subsection{Names of Control Sequences}
+\subsection{Names of control sequences}
 \label{ssec-csname} Because p\TeX\ is an engine modification of Knuth's
 original \TeX82 engine, some primitives added by it take a form that is
 very difficult to be simulated by a macro.  For example, an additional
@@ -239,7 +239,7 @@ of most parameters in \LuaTeX-ja are summarized into the following
       a string.
 \end{itemize}
 
-\subsection{Line-break after a Japanese Character}
+\subsection{Line-break after a Japanese character}
 \label{ssec-line} 
 
 Japanese texts can break lines almost everywhere, in contrast with
@@ -281,7 +281,7 @@ y
 Japanese character.}\label{fig-linebreak}
 \end{figure}
 
-\subsection{Separation between `real' fonts and Metrics}
+\subsection{Separation between `real' fonts and metrics}
 \label{ssec-sepmet}
 
 Traditionally, most Japanese fonts used in typesetting are not
@@ -334,7 +334,7 @@ clash with glue/kern informations from the metric.
 \label{fig-jfdef}
 \end{figure}
 
-\subsection{Insertion of Kerns and/or Glues for Japanese Typesetting: the Timing}
+\subsection{Insertion of glues/kerns for Japanese typesetting: timing}
 \label{ssec-jglue}
 
 As described in \cite{luatexref}, \LuaTeX's kerning and ligaturing
@@ -380,7 +380,7 @@ this specification are to behave like alphabetic characters in \LuaTeX\
 (as described in the first paragraph), and to clarify the specification
 for \LuaTeX-ja's process.
 
-\subsection{Insertion of Kerns and/or Glues for Japanese Typesetting: the Spec}
+\subsection{Insertion of glues/kerns for Japanese typesetting: specification}
 \begin{table}
 \caption{Examples of differences between  p\TeX\ and \LuaTeX-ja,}
 \label{tab-jfmglue}
@@ -546,13 +546,13 @@ Considering this situation of p\TeX, \LuaTeX-ja can use the value of
 	   \emph{xkanjiskip} that specified in a metric. If the value of
 	   \emph{xkanjiskip} on user side (this is the
 	   \textsf{xkanjiskip} parameter in |\ltjsetparameter|) is
-	   |\maxdimen|, then the \LuaTeX-ja use the specification from
+	   |\maxdimen|, then \LuaTeX-ja use the specification from
 	   the current used metric as the actual value of
 	   \emph{xkanjiskip}.
 This description also applies for \emph{kanjiskip}.
 \end{description}
 
-\section{Distinction of Characters}
+\section{Distinction of characters}
 Since \LuaTeX\ can handle Unicode characters natively, it is a major
 problem that how we distinguish Japanese characters and alphabetic
 characters. For example, the multiplication sign (U+00D7) exists both in
@@ -561,7 +561,7 @@ Japanese character set JIS~X~0208. It is not desirable that this
 character is treated as an alphabetic char, because this symbol is often
 used in the sense of `negative' in Japan. 
 
-\subsection{Character Ranges}
+\subsection{Character ranges}
 Before we describe the approach taken is \LuaTeX-ja, we review the
 approach taken by up\TeX.  up\TeX\ extends the |\kcatcode| primitive in
 p\TeX, to use this primitive for setting how a character is treated
@@ -608,7 +608,7 @@ We note that \LuaTeX-ja offers two additional control sequence,
       the argument is more than or equal to 128) and |\ltjalchar| always
       yields an alphabetic character, regardless of the argument. 
 
-\subsection{Default Setting of Ranges}
+\subsection{Default setting of ranges}
 Patches for plain \TeX\ and \LaTeXe of \LuaTeX-ja predefines 8~character
 ranges, as shown in Table~\ref{tab-chrrng}.  Almost of these ranges are
 just the union of Unicode blocks, and determined from the Adobe-Japan1-6
@@ -651,7 +651,7 @@ This is because some 8-bit TFMs have a glyph in this range; for example,
 \end{center}
 \end{table}
 
-\subsection{Control Sequences Producing Unicode Characters}
+\subsection{Control sequences producing Unicode characters}
 \label{ssec-unichar}
 
 The \emph{fontspec} package\footnote{Preciously
@@ -706,13 +706,13 @@ codes of characters which are mentioned in the \emph{unicode-math}
 We would like to extend treatments described in this section to 8-bit
 font encodings, but we leave it to further development too.
 
-\section{Current Status of Development}
+\section{Current status of development}
 At the moment, \LuaTeX-ja can be used under plain \TeX, and under
 \LaTeXe. Generally speaking, one only has to read |luatexja.sty|, by
 |\input| command or |\usepackage| (in~\LaTeXe), if you merely want to
 typeset Japanese characters.  We look more detail by parts. 
 
-\subsection{`Engine Extension'}
+\subsection{`Engine extension'}
 The lowest part of \LuaTeX-ja corresponds the p\TeX\ extension as
 \emph{an engine extension of \TeX}. We, the project menbers, think that
 this part is almost done. There is one more feature of \LuaTeX-ja which
@@ -847,7 +847,7 @@ To work this behavior well, a list of all (alphabetic) encodings defined
 
 
 
-\subsection{Classes for Japanese Documents}
+\subsection{Classes for Japanese documents}
 To produce `high-quality' Japanese documents, we need not only that
 Japanese characters are correctly placed, but also class files for
 Japanese documents. In p\TeX, there are two major families of classes:
@@ -860,7 +860,7 @@ commercial printing.  In the author's opinion, \emph{ltjclasses} is
 better to stay as an example of porting of class files for \pTeX\ to
 \LuaTeX-ja.
 
-\subsection{Patches for Packages}
+\subsection{Patches for packages}
 Apart from patches for the \LaTeXe~kernel and classes for Japanese
 documents, we need to make patches for several packages. At the present,
 we considered the following packages, and made patches or porting for
@@ -901,7 +901,7 @@ It is well-known that there is a patch |jlisting.sty| of the
 
 
 \section{Implementation}
-\subsection{Handling of Japanese Fonts}
+\subsection{Handling of Japanese fonts}
 In p\TeX, there are three slots for maintaining current fonts, namely
 |\font| for alphabetic fonts, |\jfont| for Japanese font (in horizontal
 direction) and |\tfont| for Japanese font (in vertical direction). With
@@ -935,7 +935,7 @@ Stack Level' (see Subsection~\ref{ssec-over}). Note that calculation of
 character classes for each Japanese character is done \emph{after} the
 these callbacks for now. 
 
-\subsection{Stack Management}
+\subsection{Stack management}
 \label{ssec-stack}
 
 As we noted in Subsection~\ref{ssec-csname}, parameters that the values
@@ -1010,7 +1010,7 @@ Thus, we can conclude that the stack level at the end of the list is
 $y+1$, if and only if there is a \emph{stack\_node} whose value is
 $x+1$. Otherwise, the stack level is just $y$.
 
-\subsection{Adjustment of the Position of Japanese Characters}
+\subsection{Adjustment of the position of Japanese characters}
 \label{ssec-width}
 
 The size of a glyph specified in a metric and that of a real font
@@ -1106,7 +1106,7 @@ and possibly other Asian languages, under \LuaTeX.
 The author would like to thank Ken Nakano and Hideaki Togashi for their
 development of ASCII p\TeX.  The author is very grateful to Haruhiko
 Okumura for his leadership in the Japanese \TeX\ community. The author
-is also very grateful to members of the \LuaTeX-ja project team for their
+is also very grateful to members of \LuaTeX-ja project team for their
 valuable cooperation in development.
 
 %%% The style of the bibiliogrphy is `amsplain'.
@@ -1147,7 +1147,7 @@ Japanese Industrial Standards Committee. \emph{JIS~X~4051: Formatting
 \url{http://www.luatex.org/svn/trunk/manual/luatexref-t.pdf} (snapshot of SVN trunk)
 
 \bibitem{man}
-The \LuaTeX-ja project team, \emph{The \LuaTeX-ja package}. 
+\LuaTeX-ja project team, \emph{The \LuaTeX-ja package}. 
 Not completed for now. Available at |doc/man-en.pdf| (in English) or
 	|doc/man-ja.pdf| (in Japanese)
 in the Git repository.
