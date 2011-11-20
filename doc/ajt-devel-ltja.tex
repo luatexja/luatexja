@@ -896,12 +896,22 @@ in the \emph{otf} package, by loading \texttt{luatexja-\penalty0otf.sty}
 	   does not work with TrueType fonts.
 
 \item[The \emph{listings} package]
-It is well-known that there is a patch |jlisting.sty| of the
-	   \emph{listings} package for p\LaTeXe. Generally speaking, it
-	   also can be used in \LuaTeX-ja. However, it seems to be that
-	   a Japanese character after a space does not recieve any
-	   process of the \emph{listings} package; this is inconvinient
-	   when we use the \emph{showexpl} package.
+It is known for users of \pTeX that there is a patch |jlisting.sty| for
+	   the \emph{listings} package, to use Japanese characters in
+	   the |lstlisting| environment. Generally speaking, it also can
+	   be used in \LuaTeX-ja. However, it seems to be that a
+	   Japanese character after a space does not recieve any process
+	   of the \emph{listings} package; this is inconvinient when we
+	   use the \emph{showexpl} package.
+
+There is another way to use characters above 256 with the
+	   \emph{listings} package (described in\cite{apl}), however,
+	   this method is not suitable for Japanese, since the number of
+	   Japanese characters is very large. We hope that the
+	   \emph{listings} package can cope with all characters above
+	   256.
+
+
 \end{description}
 
 
@@ -1127,6 +1137,10 @@ Adobe Systems Incorporated, \emph{Adobe-Japan1-6 Character Collection
 
 \bibitem{ptex}
 ASCII MEDIA WORKS，アスキー日本語\TeX\ (\pTeX)．\url{http://ascii.asciimw.jp/pb/ptex/}
+
+\bibitem{apl}
+John Baker, \emph{Typesetting UTF8 APL code with the \LaTeX\ lstlisting package}.
+\url{http://bakerjd99.wordpress.com/2011/08/15/}
 
 \bibitem{omega}
 Jin-Hwan~Cho and Haruhiko Okumura, \emph{Typesetting CJK Languages with Omega},
