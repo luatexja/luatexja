@@ -12,18 +12,17 @@
 \def\luatexjalatexLoaded{\endinput}
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-latex}[2011/08/01 v0.1]
+\ProvidesPackage{luatexja-latex}[2011/11/20 v0.2]
 
 \endlinechar=13
 
 
-%%% patch for LaTeX (similar to plfonts.dtx)
+%%% patch for LaTeX
 \input{lltjfont.sty}
 \input{lltjdefs.sty}
 \input{lltjcore.sty}
 
-%%% parameter
-
+%%% default parameters
 \ltjsetparameter{kanjiskip=0pt plus 0.4pt minus 0.4pt, 
   xkanjiskip=.25\zw plus 1pt minus 1pt,
   autospacing, autoxspacing, jacharrange={-1}, 
@@ -33,6 +32,40 @@
 
 \input luatexja-kinsoku.tex
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
+
+%%% patch for packages
+\RequirePackage{expl3}
+\ExplSyntaxOn
+\def\ltj@pkgpatch#1#2#3#4{\@ifpackageloaded{#1}{\typeout{#1: TRUE}#3#2}{\typeout{#1: FALSE}%
+  \@ifpackageloaded{filehook}{\bool_set_true:N \l_tmpa_bool} {\bool_set_false:N \l_tmpa_bool} %
+  \file_if_exist:nTF {filehook.sty} 
+    { \usepackage{filehook} \bool_set_true:N \l_tmpa_bool } 
+    {}%
+  \bool_if:NTF \l_tmpa_bool 
+    {\AtEndOfPackageFile*{#1}{#4#2}} 
+    {}
+  }%
+}
+
+\ltj@pkgpatch{fontspec}{\usepackage{luatexja-fontspec}}{}{}
+\ltj@pkgpatch{unicode-math}{%
+  \cs_set:Npn \um_set_mathcode:nnnn #1#2#3#4 {
+    \Umathcode \int_eval:n {#1} =
+      \mathchar@type#2 \csname sym#3\endcsname \int_eval:n {#4} \scan_stop:
+    \directlua{luatexja.math.is_math_letters[\int_eval:n {#4}]=true}
+  }
+  \cs_set:Npn \um_set_mathcode:nnn #1#2#3 {
+    \Umathcode \int_eval:n {#1} =
+      \mathchar@type#2 \csname sym#3\endcsname \int_eval:n {#1} \scan_stop:
+    \directlua{luatexja.math.is_math_letters[\int_eval:n {#1}]=true}
+  }
+  \cs_set:Npn \um_set_mathchar:NNnn #1#2#3#4 {
+    \Umathchardef #1 =
+      \mathchar@type#2 \csname sym#3\endcsname \int_eval:n {#4} \scan_stop:
+    \directlua{luatexja.math.is_math_letters[\int_eval:n {#4}]=true}
+  }
+}{}{}
+\ExplSyntaxOff
 
 %%------------------ all done
 \ltj@latex@AtEnd
