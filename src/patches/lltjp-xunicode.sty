@@ -67,7 +67,6 @@
   \expandafter\expandafter\expandafter
    {\expandafter\csname#6\endcsname}{\UTFchar}{#8}{#9}\relax
  \fi}
-%\gdef\add@UTF@accent#1#2#3{#2\ltjalchar"#1\relax}
 \gdef\add@UTF@accent#1#2#3{\ifx\relax#2\relax\ltjalchar"#3\else
  \ifx\ #2\relax\ltjalchar"#3\else
  \expandafter\ifx\UTF@space#2\relax\ltjalchar"#3\else
