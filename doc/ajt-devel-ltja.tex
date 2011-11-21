@@ -42,6 +42,10 @@
 %%% Others
 \usepackage{mflogo,booktabs}
 \definecolor{grayx}{gray}{0.85}
+\hyphenation{
+  kanjiskip
+  xkanjiskip
+}
 
 %%% Mandatory article metadata %%%
 \title{Development of \LuaTeX-ja package}
@@ -234,9 +238,9 @@ horizontal box or that of a paragraph are valid in whole box or
 paragraph.  However, the implementation of these parameters in
 \LuaTeX-ja is not so easy; we will discuss it in Subsection~\ref{ssec-stack}.
 
-From above two~problems  discussed above, the assignment and retrieval
+From above two problems  discussed above, the assignment and retrieval
 of most parameters in \LuaTeX-ja are summarized into the following
-three~control sequences:
+three control sequences:
 \begin{itemize}
 \item |\ltjsetparameter{|$\langle\hbox{\it
       name}\rangle$|=|$\langle\hbox{\it value}\rangle$|,...}|: for local
@@ -319,7 +323,7 @@ remarks:
       metric in \LuaTeX-ja, and is based on JFMs used in the \emph{otf}
       package~\cite{otf}.
 \item The \hbox{psft:} prefix can be used to specify name-only, non-embedded
-      fonts. When one display a pdf with these fonts, actual fonts which
+      fonts. When one displays a pdf with these fonts, actual fonts which
       will be used for them depend on a pdf reader. 
 \end{itemize}
 The specification of a metric for \LuaTeX-ja is similar to that of a JFM
@@ -333,7 +337,7 @@ metrics by default; |jfm-ujis.lua|, |jfm-jis.lua| based on the
 
  Note that |-kern| in features
 is important, because kerning information from a real font itself will
-clash with glue/kern informations from the metric.
+clash with glue/kern information from the metric.
 
 \begin{figure}
 \begin{verbatim}
@@ -381,13 +385,13 @@ paragraph; this timing is somewhat similar to that of \LuaTeX's kerning
 process. Finally, A \emph{kanjiskip} is not appeared as a node anywhere;
 only appears implicitly in calculation of the width of a horizontal box,
 that of breaking lines, and the actual output process to a DVI
-file. These specifications made \pTeX's behavior very hard to
+file. These specifications have made \pTeX's behavior very hard to
 understand.
 
 \LuaTeX-ja inserts glues in all three categories simultaneously inside
 |hpack_filter| and |pre_linebreak_filter| callbacks.  The reasons of
 this specification are to behave like alphabetic characters in \LuaTeX\
-(as described in the first paragraph), and to clarify the specification
+(as described in the first paragraph in this subsection), and to clarify the specification
 for \LuaTeX-ja's process.
 
 \subsection{Insertion of glues/kerns for Japanese typesetting: specification}
@@ -422,10 +426,11 @@ Input      &|あ】{}【〙\/〘|        &|い』\/a| &|う）\hbox{}（| &|え�
 \imagfm{\jstrut\inhibitglue〘}%
 \end{center}
 \caption{Detail of (1) in Table~\ref{tab-jfmglue}.}
+% \caption{Details of the output of \pTeX in the case of (1) in Table~\ref{tab-jfmglue}.} のほうがよい？
 \label{fig-ptexjfm}
 \end{figure}
 
-Now we will take a look inside the insertion process itself, and describe 4~points.
+Now we will take a look at the insertion process itself through four points.
 
 \begin{description}
 \item[Ignored Nodes]
@@ -453,7 +458,7 @@ As noted in the previous subsection, the insertion process in \pTeX\ can
 
 
 By the way, around a \emph{glyph\_node} $p$ there may be some nodes
-	   attached to $p$. These are an accent and kerns for
+	   attached to~$p$. These are an accent and kerns for
 	   moving it to the right place, and a kern from the italic
 	   correction\footnote{\TeX82 (and \LuaTeX) does not distinguish
 	   between explicit kern and a kern for italic correction. To
@@ -463,13 +468,16 @@ By the way, around a \emph{glyph\_node} $p$ there may be some nodes
 	   these attachments should be ignored inside the process. Hence
 	   \LuaTeX-ja takes this approach, as the latest version of
 	   \pTeX\ (p3.2). This explains (2) in the figure.
+           % - p3.2 というのは pTeX のバージョン？　(version~p3.2) くらいに補ったほうがよいかも．
+           % - in the figure は指している場所がわからずつらいだろう．面倒でも in Table~\reftab-jfmglue{} のほうがふさわしいだろう．
 
 Summerizing above, one should put an empty horizontal box |\hbox{}| to
-	   where he wants to interrupt the insertion process in
+	   where he/she wants to interrupt the insertion process in
 	   \LuaTeX-ja as (3) in the figure.
+           % - in the figure は指している場所がわからずつらいだろう．面倒でも in Table~\reftab-jfmglue{} のほうがふさわしいだろう．
 
 \item[Fonts with the Same Metric]
-Recall that \LuaTeX-ja separated `real' fonts and metrics, as in Subsection~\ref{ssec-sepmet}. 
+Recall that \LuaTeX-ja separates `real' fonts and metrics, as in Subsection~\ref{ssec-sepmet}. 
 Consider the following input, where all Japanese fonts use same metric
 	   (in \LuaTeX-ja), and |\gt| selects \emph{gothic} family for
 	   the current Japanese font family:
@@ -497,7 +505,7 @@ One might have the situation that this default behavior is not
 	   we leave it to the manual~\cite{man}.
 
 \item[Fonts with Different Metrics] 
-In the case where two consecutive Japanese characters use different metrics and/or
+The case where two consecutive Japanese characters use different metrics and/or
 	   different size is similar. Consider the following input where
 	   the \emph{mincho} family and the \emph{gothic} family use
 	   different metrics:
@@ -510,8 +518,8 @@ As the previous paragraph, this input yields the following, by \pTeX:
 \begin{quote}
 \mc 漢）\hbox{}\gt （漢）\hbox{}\large （大
 \end{quote}
-We thought that amounts of spaces between parentheses in above output
-	   are too much. Hence we changed the default behavior of
+We had thought that amounts of spaces between parentheses in above output
+	   are too much. Hence we have changed the default behavior of
 	   \LuaTeX-ja, so that the amount of a glue between two Japanese
 	   characters with different metrics is the \emph{average} of a glue
 	   from the left character and that from the right
@@ -627,8 +635,8 @@ just the union of Unicode blocks, and determined from the Adobe-Japan1-6
 character collection~\cite{aj16}, and JIS~X~0208. Among these 8~ranges,
 the ranges~2, 3, 6, 7, and~8 are considered ranges of Japanese
 characters, and others are considered ranges of alphabetic
-characters\footnote{Note that ranges 3~and~8 are considered ranges of
-alphabetic characters in this paper.}. We remark on ranges 2~and~8:
+characters.\footnote{Note that ranges 3~and~8 are considered ranges of
+alphabetic characters in this paper.}  We remark on ranges 2~and~8:
 \begin{description}
 \item[The range~2]
 JIS~X~0208 includes Greek letters and Cyrillic letters, however, these
