@@ -1,11 +1,14 @@
-% lltjlisting.sty: modified from jlisting.sty (by Thor) for
-% LuaTeX-ja. 
+%
+% lltjp-listings.sty
+%
+% Modified from jlisting.sty (by Thor) for LuaTeX-ja. 
+%
 
 \NeedsTeXFormat{LaTeX2e}
 \def\filedate{2006/02/20}
 \def\fileversion{0.2}
-\ProvidesPackage{lltjlisting}[\filedate\space\fileversion\space(Thor)]
-%
+\ProvidesPackage{lltjp-listings}[\filedate\space\fileversion\space(Thor)]
+\RequirePackage{listings}
 \newcount\lst@nextchar
 \let\lst@@ProcessSpace\lst@ProcessSpace
 \def\lst@ProcessSpace#1{%

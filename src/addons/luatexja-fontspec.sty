@@ -3,82 +3,9 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec}[2011/11/16 v0.3]
+\ProvidesPackage{luatexja-fontspec}[2011/09/23 v0.2]
 
-\def\UTFencname{EU2}\def\XeTeXpicfile{}
-\RequirePackage{xunicode}
-%% Patch for xunicode.sty
-{\catcode`\"=12
-\gdef\check@hexcom@digits@#1#2#3#4#5@!@#6#7#8{%
- \ifx @#4\relax
-  \UTFacc@warning@{insufficient hex digits #7 for #6-\string#8}%
- \else
-  \ifcat \active\noexpand#8%
-   \ifx\add@flag\@ne %
-    \expandafter\def\csname\UTFencname\string#8\endcsname{\ltjalchar"#1#2#3#4\relax}%
-    \ifx\unDeFiNed@#8%
-     \ifx\cf@encoding\UTFencname
-      \DeclareTextCommand{#8}{OT1}{\undefined}%
-     \else
-      \DeclareTextCommand{#8}{\cf@encoding}{\undefined}%
-     \fi
-    \else {% macro #8 exists already ...
-      \let\protect\noexpand
-      \edef\UTF@testi{#8}\def\UTF@testii{#8}%
-      \ifx\UTF@testi\UTF@testii\aftergroup\UTF@ignore
-      \else\aftergroup\UTF@doit\fi
-     }%
-     \iffalse
-      % ... but when it isn't robust, make it so
-      \expandafter\let\csname?-\string#8\endcsname#8\relax
-      \edef\next@UTF@{{\cf@encoding}%
-        {\expandafter\noexpand\csname?-\string#8\endcsname}}%
-      \expandafter\DeclareTextCommand\expandafter
-         {\expandafter#8\expandafter}\next@UTF@
-     \fi
-    \fi %
-   \else % \add@flag \z@
-    \expandafter\global\expandafter
-      \let\csname\UTFencname\string#8\endcsname\relax
-   \fi % end of \add@flag switch
-  \else % not active catcode --- shouldn't happen
-  % \typeout{*** did you really mean #8 ? ***}%
-   \ifx\add@flag\@ne %
-    \edef\tmp@name{\expandafter\string\csname\UTFencname\endcsname
-      \expandafter\string\csname#8\endcsname}%
-    \expandafter\def\csname\tmp@name\endcsname{\ltjalchar"#1#2#3#4\relax}%
-    \ifx\cf@encoding\UTFencname
-     \expandafter\DeclareTextCommand\expandafter
-       {\csname#8\endcsname}{OT1}{\undefined}%
-    \else
-     \expandafter\DeclareTextCommand\expandafter
-       {\csname#8\endcsname}{\cf@encoding}{\undefined}%
-    \fi
-   \else % \add@flag \z@
-    \expandafter\global\expandafter\let\csname#8\endcsname\relax
-   \fi % end of \add@flag switch
-  \fi % end of \ifcat
- \fi}
-\gdef\check@hex@digits@#1#2#3#4#5@!@#6#7#8#9{%
- \ifx @#4\relax
-  \UTFacc@warning@{insufficient hex digits #7 for #6-\string#8#9}%
- \else
-  \def\UTFchar{\ltjalchar"#1#2#3#4\relax}%
-  \expandafter\expandafter\expandafter\declare@utf@composite
-  \expandafter\expandafter\expandafter
-   {\expandafter\csname#6\endcsname}{\UTFchar}{#8}{#9}\relax
- \fi}
-%\gdef\add@UTF@accent#1#2#3{#2\ltjalchar"#1\relax}
-\gdef\add@UTF@accent#1#2#3{\ifx\relax#2\relax\ltjalchar"#3\else
- \ifx\ #2\relax\ltjalchar"#3\else
- \expandafter\ifx\UTF@space#2\relax\ltjalchar"#3\else
- \ifx~#2\ltjalchar"#3\else#2\ltjalchar"#1\fi\fi\fi\fi\relax}
-\gdef\add@UTF@accents#1#2#3{#2\ltjalchar"#1\ltjalchar"#3\relax}
-}
-%% End of patch for xunicode.sty "
-
-\RequirePackage{fontspec}
-\RequirePackage{luatexja}
+\RequirePackage{fontspec,luatexja}
 
 \ExplSyntaxOn
 
@@ -207,23 +134,4 @@
 
 \cs_set_eq:NN \addjfontfeature \addjfontfeatures
 
-% We reload xunicode package here.
-\ExplSyntaxOff\ReloadXunicode{EU2}
 \endinput
-
-%% the following patch is needed to xunicode.sty:
-%% 
---- /opt/texlive/2011/texmf-dist/tex/xelatex/xunicode/xunicode.sty	2011-09-12 08:31:47.000000000 +0900
-+++ xunicode.sty	2011-11-16 22:06:17.061413113 +0900
-@@ -1475,7 +1475,11 @@
- 
- \newtoks\tipasavetokens
- \newtoks\tipachecktokens
-+
-+\fi
- \newif\iftipaonetoken
-+\expandafter\ifx\csname ReloadXunicode\endcsname\relax
-+
- \def\tipalasttoken{!@! do nothing with this !@!}
- \def\tipacatchonechar#1{\begingroup
-  \def\textipa##1{##1}% prevent recursion

@@ -1,0 +1,26 @@
+%
+% lltjp-unicode-math.sty
+%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{lltjp-unicode-math}[2011/11/22 Patch to unicode-math for LuaLaTeX-ja]
+
+\RequirePackage{unicode-math,luatexja}
+
+\ExplSyntaxOn
+\cs_set:Npn \um_set_mathcode:nnnn #1#2#3#4 {
+  \Umathcode \int_eval:n {#1} =
+  \mathchar@type#2 \csname sym#3\endcsname \int_eval:n {#4} \scan_stop:
+  \directlua{luatexja.math.is_math_letters[\int_eval:n {#4}]=true}
+}
+\cs_set:Npn \um_set_mathcode:nnn #1#2#3 {
+  \Umathcode \int_eval:n {#1} =
+  \mathchar@type#2 \csname sym#3\endcsname \int_eval:n {#1} \scan_stop:
+  \directlua{luatexja.math.is_math_letters[\int_eval:n {#1}]=true}
+}
+\cs_set:Npn \um_set_mathchar:NNnn #1#2#3#4 {
+  \Umathchardef #1 =
+  \mathchar@type#2 \csname sym#3\endcsname \int_eval:n {#4} \scan_stop:
+  \directlua{luatexja.math.is_math_letters[\int_eval:n {#4}]=true}
+}
+\endinput

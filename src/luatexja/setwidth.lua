@@ -110,7 +110,11 @@ function set_ja_width(ahead, dir)
 	    local met = ltjf.font_metric_table[p.font]
 	    local class = has_attr(p, attr_jchar_class)
 	    char_data = ltjf.metrics[met.jfm].size_cache[met.size].char_type[class]
-	    p = capsule_glyph(p, dir, false, met, class)
+            if char_data then
+               p = capsule_glyph(p, dir, false, met, class)
+            else
+               p = node_next(p)
+            end
 	 else 
 	    p.yoffset = p.yoffset - (has_attr(p,attr_yablshift) or 0); p = node_next(p)
 	 end
