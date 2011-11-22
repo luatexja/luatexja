@@ -432,7 +432,7 @@ Input      &|あ】{}【〕\/〔|        &|い』\/a| &|う）\hbox{}（| &|え�
 Now we will take a look at the insertion process itself through four points.
 
 \begin{description}
-\item[Ignored Nodes]
+\item[Ignored nodes]
 As noted in the previous subsection, the insertion process in \pTeX\ can
 	   be interrupted by saying |{}| or anything else.\footnote{This
 	   is why some tricks like \texttt{ちょ\char`\{\char`\}っと} for
@@ -472,7 +472,7 @@ Summerizing above, one should put an empty horizontal box |\hbox{}| to
 	   where he/she wants to interrupt the insertion process in
 	   \LuaTeX-ja as (3) in the Table~\ref{tab-jfmglue}.
 
-\item[Fonts with the Same Metric]
+\item[Fonts with the same metric]
 Recall that \LuaTeX-ja separates `real' fonts and metrics, as in Subsection~\ref{ssec-sepmet}. 
 Consider the following input, where all Japanese fonts use same metric
 	   (in \LuaTeX-ja), and |\gt| selects \emph{gothic} family for
@@ -500,7 +500,7 @@ One might have the situation that this default behavior is not
 	   suitable. \LuaTeX-ja offers a way to handle this situation, but
 	   we leave it to the manual~\cite{man}.
 
-\item[Fonts with Different Metrics] 
+\item[Fonts with different metrics] 
 The case where two consecutive Japanese characters use different metrics and/or
 	   different size is similar. Consider the following input where
 	   the \emph{mincho} family and the \emph{gothic} family use
@@ -735,7 +735,7 @@ this part is almost done. There is one more feature of \LuaTeX-ja which
 we are going to explain:
 
 \begin{description}
-\item[Shifting Baseline]
+\item[Shifting baseline]
 In order to make a match between Japanese fonts and alphabetic fonts,
 	   sometimes shifting the baseline of alphabetic characters may
 	   be needed. \pTeX\ has a dimension |\ybaselineshift|, which
