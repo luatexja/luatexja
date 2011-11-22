@@ -426,12 +426,14 @@
     \csname ltj@kcat5\endcsname="7FFFFFFF %"
     \csname ltj@kcat6\endcsname="7FFFFFFF }%"
 
-\protected\def\ltjjachar{\afterassignment\ltj@@kchar\ltj@tempcnta}
-\def\ltj@@kchar{{\directlua{tex.globaldefs = 0}\ltj@alljachar\ltj@@origchar\ltj@tempcnta}}
-\protected\def\ltjalchar{\afterassignment\ltj@@achar\ltj@tempcnta}
-\def\ltj@@achar{{\directlua{tex.globaldefs = 0}\ltj@allalchar\ltj@@origchar\ltj@tempcnta}}
+\protected\def\ltjjachar{\afterassignment\ltj@@jachar\ltj@tempcnta}
+\def\ltj@@jachar{{\directlua{tex.globaldefs = 0}\ltj@alljachar\ltj@@origchar\ltj@tempcnta}}
+\protected\def\ltjalchar{\afterassignment\ltj@@alchar\ltj@tempcnta}
+\def\ltj@@alchar{{\directlua{tex.globaldefs = 0}\ltj@allalchar\ltj@@origchar\ltj@tempcnta}}
 
-
+%%%%%%%% \ltjsetmathletter<number>, \ltjunsetmathletter<number>
+\def\ltjsetmathletter#1{\directlua{luatexja.math.is_math_letters[#1]=true}}
+\def\ltjunsetmathletter#1{\directlua{luatexja.math.is_math_letters[#1]=false}}
 
 %%------------------ Load module for the format
 
