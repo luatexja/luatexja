@@ -17,11 +17,13 @@ require('luatexja.stack');     local ltjs = luatexja.stack
 local has_attr = node.has_attribute
 local set_attr = node.set_attribute
 local unset_attr = node.unset_attribute
+local node_type = node.type
 local node_remove = node.remove
 local node_next = node.next
 local node_free = node.free
 
 local id_glyph = node.id('glyph')
+local id_math = node.id('math')
 local id_whatsit = node.id('whatsit')
 local sid_user = node.subtype('user_defined')
 
@@ -39,21 +41,26 @@ box_stack_level = 0
 -- This is used in jfmglue.lua.
 
 local function suppress_hyphenate_ja(head)
-   for p in node.traverse_id(id_glyph, head) do
-      local i = has_attr(p, attr_icflag) or 0
-      if i==0 and ltjc.is_ucs_in_japanese_char(p) then
-	 local v = has_attr(p, attr_curjfnt)
-	 if v then 
-	    p.font = v 
+   local non_math = true
+   for p in node.traverse(head) do
+      if p.id == id_glyph and non_math then
+	 local i = has_attr(p, attr_icflag) or 0
+	 if i==0 and ltjc.is_ucs_in_japanese_char(p) then
+	    local v = has_attr(p, attr_curjfnt)
+	    if v then 
+	       p.font = v 
+	    end
+	    v = has_attr(p, attr_ykblshift)
+	    if v then 
+	       set_attr(p, attr_yablshift, v)
+	    else
+	       unset_attr(p, attr_yablshift)
+	    end
+	    if p.subtype%2==1 then p.subtype = p.subtype - 1 end
+	    -- p.lang=lang_ja
 	 end
-	 v = has_attr(p, attr_ykblshift)
-	 if v then 
-	    set_attr(p, attr_yablshift, v)
-	 else
-	    unset_attr(p, attr_yablshift)
-	 end
-         if p.subtype%2==1 then p.subtype = p.subtype - 1 end
-	 -- p.lang=lang_ja
+      elseif p.id == id_math then 
+	 non_math = (p.subtype ~= 0)
       end
    end
    lang.hyphenate(head)

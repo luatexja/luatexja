@@ -425,8 +425,7 @@ Input      &|あ】{}【〙\/〘|        &|い』\/a| &|う）\hbox{}（| &|え�
 \imagfm{\jstrut\kern.5\zw}%
 \imagfm{\jstrut\inhibitglue〘}%
 \end{center}
-\caption{Detail of (1) in Table~\ref{tab-jfmglue}.}
-% \caption{Details of the output of \pTeX in the case of (1) in Table~\ref{tab-jfmglue}.} のほうがよい？
+\caption{Detail of the output of \pTeX in the input~(1) in Table~\ref{tab-jfmglue}.}
 \label{fig-ptexjfm}
 \end{figure}
 
@@ -467,14 +466,11 @@ By the way, around a \emph{glyph\_node} $p$ there may be some nodes
 	   redefines \texttt{\char`\\/} to set this attribute.} for $p$. It is natural that
 	   these attachments should be ignored inside the process. Hence
 	   \LuaTeX-ja takes this approach, as the latest version of
-	   \pTeX\ (p3.2). This explains (2) in the figure.
-           % - p3.2 というのは pTeX のバージョン？　(version~p3.2) くらいに補ったほうがよいかも．
-           % - in the figure は指している場所がわからずつらいだろう．面倒でも in Table~\reftab-jfmglue{} のほうがふさわしいだろう．
+	   \pTeX\ (version~p3.2). This explains (2) in the Table~\ref{tab-jfmglue}.
 
 Summerizing above, one should put an empty horizontal box |\hbox{}| to
 	   where he/she wants to interrupt the insertion process in
-	   \LuaTeX-ja as (3) in the figure.
-           % - in the figure は指している場所がわからずつらいだろう．面倒でも in Table~\reftab-jfmglue{} のほうがふさわしいだろう．
+	   \LuaTeX-ja as (3) in the Table~\ref{tab-jfmglue}.
 
 \item[Fonts with the Same Metric]
 Recall that \LuaTeX-ja separates `real' fonts and metrics, as in Subsection~\ref{ssec-sepmet}. 
@@ -620,7 +616,6 @@ u\pTeX.}
 \end{center}
 \end{table}
 
-%%Example...
 
 We note that \LuaTeX-ja offers two additional control sequences,
       |\ltjjachar| and |\ltjalchar|. They are similar to |\char|
