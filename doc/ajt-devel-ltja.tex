@@ -596,7 +596,7 @@ u\pTeX.}
 	   Latin-1 Supplement is shown in
 	   Table~\ref{tab-inter}. Considering these two points, to
 	   customize the range of Japanese characters in \LuaTeX-ja, one
-	   has to define ranges of character codes in his source in advance.
+	   has to define ranges of character codes in his/her source in advance.
 
 
 \begin{table}
@@ -726,11 +726,11 @@ font encodings, but we leave it to further development too.
 At the moment, \LuaTeX-ja can be used under plain \TeX, and under
 \LaTeXe. Generally speaking, one only has to read |luatexja.sty|, by
 |\input| command or |\usepackage| (in~\LaTeXe), if you merely want to
-typeset Japanese characters.  We look more detail by parts. 
+typeset Japanese characters.  We look more details by parts. 
 
 \subsection{`Engine extension'}
 The lowest part of \LuaTeX-ja corresponds to the \pTeX\ extension as
-\emph{an engine extension of \TeX}. We, the project menbers, think that
+\emph{an engine extension of \TeX}. We, the project members, think that
 this part is almost done. There is one more feature of \LuaTeX-ja which
 we are going to explain:
 
@@ -843,8 +843,8 @@ The control sequence |\fontfamily| in p\LaTeXe\ changes the current alphabetic
 \end{itemize}
 The same criterion is used for changing Japanese font family.
 
-To work this behavior well, a list of all (alphabetic) encodings defined
-	   already in the document is needed. However, since \LuaTeX-ja
+To work this behavior well, it is required that a list of all (alphabetic) encodings defined
+	   already in the document. However, since \LuaTeX-ja
 	   is loaded as a package, \LuaTeX-ja cannot have this list.
 	   Hence \LuaTeX-ja adopted a different approach, namely
 	   |\fontfamily{|$\langle\hbox{\it arg\/}\rangle$|}| changes the
