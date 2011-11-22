@@ -391,8 +391,8 @@ understand.
 \LuaTeX-ja inserts glues in all three categories simultaneously inside
 |hpack_filter| and |pre_linebreak_filter| callbacks.  The reasons of
 this specification are to behave like alphabetic characters in \LuaTeX\
-(as described in the first paragraph in this subsection), and to clarify the specification
-for \LuaTeX-ja's process.
+(as described in the first paragraph in this subsection), and to clarify
+the specification for \LuaTeX-ja's process.
 
 \subsection{Insertion of glues/kerns for Japanese typesetting: specification}
 \label{ssec-jspec}
@@ -404,9 +404,9 @@ for \LuaTeX-ja's process.
 \begin{tabular}{llllllll}
 \toprule
 &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
-Input      &|あ】{}【〙\/〘|        &|い』\/a| &|う）\hbox{}（| &|え］\special{}［|\\\midrule
-\pTeX      &あ】\hbox{}【〙\hbox{}〘&い』\/a   &う）\hbox{}（   &え］\hbox{}［\\
-\LuaTeX-ja &あ】{}【〙\/〘          &い』\/a   &う）\hbox{}（   &え］\special{}［\\
+Input      &|あ】{}【〕\/〔|        &|い』\/a| &|う）\hbox{}（| &|え］\special{}［|\\\midrule
+\pTeX      &あ】\hbox{}【〕\hbox{}〔&い』\/a   &う）\hbox{}（   &え］\hbox{}［\\
+\LuaTeX-ja &あ】{}【〕\/〔          &い』\/a   &う）\hbox{}（   &え］\special{}［\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -420,12 +420,12 @@ Input      &|あ】{}【〙\/〘|        &|い』\/a| &|う）\hbox{}（| &|え�
 \imagfm{\jstrut\kern.5\zw}%
 \imagfm{\jstrut\kern.5\zw}%
 \imagfm{\jstrut\inhibitglue【}%
-\imagfm{\jstrut 〙\inhibitglue}%
+\imagfm{\jstrut 〕\inhibitglue}%
 \imagfm{\jstrut\kern.5\zw}%
 \imagfm{\jstrut\kern.5\zw}%
-\imagfm{\jstrut\inhibitglue〘}%
+\imagfm{\jstrut\inhibitglue〔}%
 \end{center}
-\caption{Detail of the output of \pTeX in the input~(1) in Table~\ref{tab-jfmglue}.}
+\caption{Detail of the output of \pTeX\ in the input~(1) in Table~\ref{tab-jfmglue}.}
 \label{fig-ptexjfm}
 \end{figure}
 
@@ -729,7 +729,7 @@ At the moment, \LuaTeX-ja can be used under plain \TeX, and under
 typeset Japanese characters.  We look more detail by parts. 
 
 \subsection{`Engine extension'}
-The lowest part of \LuaTeX-ja corresponds the \pTeX\ extension as
+The lowest part of \LuaTeX-ja corresponds to the \pTeX\ extension as
 \emph{an engine extension of \TeX}. We, the project menbers, think that
 this part is almost done. There is one more feature of \LuaTeX-ja which
 we are going to explain:
@@ -739,7 +739,7 @@ we are going to explain:
 In order to make a match between Japanese fonts and alphabetic fonts,
 	   sometimes shifting the baseline of alphabetic characters may
 	   be needed. \pTeX\ has a dimension |\ybaselineshift|, which
-	   corresponds the amount of shifting down the baseline of alphabetic
+	   corresponds to the amount of shifting down the baseline of alphabetic
 	   characters. This is useful for Japanese-based documents, but
 	   not for documents mainly in languages with alphabetic
 	   characters.
@@ -835,7 +835,7 @@ The control sequence |\fontfamily| in p\LaTeXe\ changes the current alphabetic
 	   conditions are satisfied:
 \begin{itemize}
 \item An alphabetic font family named $\langle\hbox{\it arg\/}\rangle$ in
-      \emph{some} alphabetic encoding already defined in the document.
+      \emph{some} alphabetic encoding is already defined in the document.
 \item There exists an alphabetic encoding $\langle\hbox{\it
       enc\/}\rangle$ already defined in the document such that a font
       definition file $\langle\hbox{\it enc\/}\rangle\langle\hbox{\it
@@ -853,7 +853,7 @@ To work this behavior well, a list of all (alphabetic) encodings defined
 \begin{itemize}
 \item An alphabetic font family named $\langle\hbox{\it arg\/}\rangle$
       in the current alphabetic encoding $\langle\hbox{\it
-      enc\/}\rangle$ already defined in the document.
+      enc\/}\rangle$ is already defined in the document.
 \item A  font definition file $\langle\hbox{\it enc\/}\rangle\langle\hbox{\it
       arg\/}\rangle$|.fd| (all lowercase) exists.
 \end{itemize}
@@ -950,7 +950,7 @@ since \LuaTeX-ja is much affected by \pTeX\ as we noted in
 Subsection~\ref{ssec-pol}.
 
 As in Figure~\ref{fig-jfdef}, \LuaTeX-ja uses |\jfont| for defining
-Japanese font, as \pTeX.  However, because the information of the current
+Japanese fonts, as \pTeX.  However, because the information of the current
 Japanese font is stored into an attribute, control sequences defined by
 |\jfont| (e.g.,~|\foo| and |\bar| in Figure~\ref{fig-jfdef}) is
 not representing a font by the means of \TeX82. In other words, each of
@@ -959,8 +959,9 @@ they cannot be an argument of |\the|, |\fontname|, nor |\textfont|.
 
 
 Callbacks by the \emph{luaotfload} package, e.g.,~replacement of glyphs
-according to font features, are executed just after `Examination of
-Stack Level' (see Subsections \ref{ssec-over}~and~\ref{ssec-stack}). Note that calculation of
+according to OpenType font features, are performed just after `Examination of
+stack level' (see Subsections
+\ref{ssec-over}~and~\ref{ssec-stack}). Also note that calculation of
 character classes for each Japanese character is done \emph{after} the
 these callbacks for now. 
 
@@ -1015,18 +1016,19 @@ stack level, both inside the |hpack_filter| callback, i.e.,~outside a
 horizontal box. Consider a list which represents the content of the box,
 then we have:
 \begin{itemize}
-\item A \emph{stack\_node} whose value is $x+1$ (because all materials in
-      the box are included in a group |\hbox{...}|, the value is at
-      least $x+1$) in the list represents an assignment related to the
-      stack system in just top-level of the list, like
+\item A \emph{stack\_node} whose value is $x+1$ (because all materials
+      in the box are included in a group |\hbox{...}|, the value of
+      |\currentgrouplevel| inside the box is at least $x+1$) in the list
+      corresponds to an assignment related to the stack system in just
+      top-level of the list, like
 \begin{quote}
 \begin{verbatim}
 \hbox{...(assignment)...}
 \end{verbatim}
 \end{quote}
 In this case, the current stack level is incremented to $y+1$ after the assignment.
-\item A \emph{stack\_node} whose value is more than  $x+1$ in the list represents
-an assignment inside another group contained in the box. For example,
+\item A \emph{stack\_node} whose value is more than  $x+1$ in the list corresponds
+to an assignment inside another group contained in the box. For example,
       the following input creates
 a \emph{stack\_node} whose value is $x+3=(x+1)+2$:
 \begin{quote}
