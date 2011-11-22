@@ -332,8 +332,8 @@ local function set_np_xspc_jachar(x)
       Np.lend = 0 
    end
    y = ltjs_get_penalty_table('xsp', x.char, 3, box_stack_level)
-   Np.xspc_before = (y>=2)
-   Np.xspc_after  = (y%2==1)
+   Np.xspc_before = (y%2==1)
+   Np.xspc_after  = (y>=2)
    Np.auto_kspc = (has_attr(x, attr_autospc)==1)
    Np.auto_xspc = (has_attr(x, attr_autoxspc)==1)
 end
