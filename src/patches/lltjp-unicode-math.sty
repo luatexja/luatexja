@@ -24,11 +24,14 @@
   \directlua{luatexja.math.is_math_letters[\int_eval:n {#4}]=true}
 }
 \group_begin:
-  \char_set_catcode_other:N \^
-  \gdef\q{hoge}\gdef\r{piyo}
   \cs_gset:Npn \um_cs_set_eq_active_char:Nw #1 = "#2 \q_nil {%"
-    \tl_set:Nn \l_tmpa_tl {\ifmmode\char"#2\else\ltjalchar"#2\relax\fi}
-    \cs_gset_eq:NN #1 \l_tmpa_tl
+    \group_begin:
+      \char_set_lccode:nn { `! } { "#2 }
+      \tex_lowercase:D {
+        \tl_set:Nn \l_tmpa_tl {\ifmmode!\else{\directlua{tex.globaldefs = 0}\ltj@allalchar!}\fi}
+        \cs_gset_eq:NN #1 \l_tmpa_tl
+      }
+    \group_end:
   }
 \group_end:
 

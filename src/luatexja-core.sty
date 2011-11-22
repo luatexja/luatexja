@@ -201,15 +201,19 @@
 \def\zw{\directlua{luatexja.jfont.load_zw()}\ltj@zw}
 \def\zh{\directlua{luatexja.jfont.load_zh()}\ltj@zh}
 
+
 %%%%%%%% \inhibitglue
+\protected\def\ltj@reset@globaldefs{%
+  \directlua{ltj.global_temp = tex.globaldefs; tex.globaldefs = 0}}
+\protected\def\ltj@restore@globaldefs{\directlua{tex.globaldefs = ltj.global_temp}}
 \let\new@everypar=\everypar
 \protected\def\inhibitglue{\relax%
   \ifvmode
-    \directlua{ltj.global_temp = tex.globaldefs; tex.globaldefs = 0}% trick
+    \ltj@reset@globaldefs
     \xdef\@@tempa{\the\everypar}%
     \xdef\@@tempb{\everypar={\@@tempa}\@@tempa\noexpand\ltj@@ihb}%
     \everypar\expandafter{\@@tempb}%
-    \directlua{tex.globaldefs = ltj.global_temp}% trick
+    \ltj@restore@globaldefs
   \else\ifhmode\ltj@@ihb\fi\fi}
 \def\ltj@@ihb{\directlua{luatexja.jfmglue.create_inhibitglue_node()}}
 
@@ -264,9 +268,7 @@
 \define@key[ltj]{japaram}{jascriptscriptfont}{%
   \expandafter\ltj@@set@stackfont#1:{mjss}}
 \def\ltj@@set@stackfont#1,#2:#3{%
-  \directlua{%
-    ltj.global_temp = tex.globaldefs; 
-    tex.globaldefs = 0}%
+  \ltj@reset@globaldefs
   \ltj@tempcnta=\ltj@curjfnt\ltj@curjfnt=-1 #2%
   \ifnum\ltj@curjfnt=-1
     \@PackageError{luatexja-core}%
@@ -277,7 +279,7 @@
     \ltj@safe@num@or\ltj@defnum{#1}, \the\ltj@curjfnt)}%
   \fi
   \ltj@curjfnt=\ltj@tempcnta
-  \directlua{tex.globaldefs = ltj.global_temp}%
+  \ltj@restore@globaldefs
   }
 
 % yalbaselineshift = <dimen>
@@ -423,15 +425,6 @@
     \csname ltj@kcat4\endcsname="7FFFFFFF %"
     \csname ltj@kcat5\endcsname="7FFFFFFF %"
     \csname ltj@kcat6\endcsname="7FFFFFFF }%"
-\protected\def\ltj@backup@kcat{\edef\ltj@restore@kcat{%
-    \csname ltj@kcat0\endcsname=\expandafter\the\csname ltj@kcat0\endcsname\relax
-    \csname ltj@kcat1\endcsname=\expandafter\the\csname ltj@kcat1\endcsname\relax
-    \csname ltj@kcat2\endcsname=\expandafter\the\csname ltj@kcat2\endcsname\relax
-    \csname ltj@kcat3\endcsname=\expandafter\the\csname ltj@kcat3\endcsname\relax
-    \csname ltj@kcat4\endcsname=\expandafter\the\csname ltj@kcat4\endcsname\relax
-    \csname ltj@kcat5\endcsname=\expandafter\the\csname ltj@kcat5\endcsname\relax
-    \csname ltj@kcat6\endcsname=\expandafter\the\csname ltj@kcat6\endcsname\relax}}
-\let\ltj@restore@kcat=\relax
 
 \protected\def\ltjjachar{\afterassignment\ltj@@kchar\ltj@tempcnta}
 \def\ltj@@kchar{{\directlua{tex.globaldefs = 0}\ltj@alljachar\ltj@@origchar\ltj@tempcnta}}
