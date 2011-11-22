@@ -293,14 +293,14 @@
 
 % jaxspmode = {<char_code>, <mode>}
 % mode: inhibit, preonly, postonly, allow
-%    or       0        2         1      3
+%    or       0        1         2      3
 \define@key[ltj]{japaram}{jaxspmode}{%        \inhibitxspcode
   \expandafter\ltj@set@jaxspmode#1:\relax}
 \def\ltj@set@jaxspmode#1,#2:{%
   \lowercase{\edef\ltj@temp{#2}}%
   \def\ltj@tempa{inhibit}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{0}\fi
-  \def\ltj@tempa{preonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{2}\fi
-  \def\ltj@tempa{postonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{1}\fi
+  \def\ltj@tempa{preonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{1}\fi
+  \def\ltj@tempa{postonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{2}\fi
   \def\ltj@tempa{allow}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{3}\fi
   \directlua{luatexja.stack.set_stack_table(ltj.isglobal, 'xsp', 
     \ltj@safe@num@or\ltj@defnum{#1},
