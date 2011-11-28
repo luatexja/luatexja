@@ -24,7 +24,6 @@
 \DeclareKanjiFamily{JY3}{\ttdefault}{}{}
 \DeclareFontShape{JY3}{\ttdefault}{m}{n}{<-> s*[0.92489] file:ipag.ttf:jfm=mono}{}
 
-
 %%% LTXexample environment
 \usepackage{showexpl,lltjlisting}
 \lstset{basicstyle=\ttfamily\small, width=0.3\textwidth,  basewidth=.5em}
@@ -95,9 +94,8 @@ use \LuaTeX, the necessity of an engine extension is getting smaller
 because \LuaTeX\ has an ability to hook \TeX's internal process by using
 Lua callbacks.
 
-
-There were several experimental attempts to typeset
-Japanese documents with \LuaTeX\ before. Here we cite three examples:
+Before our \LuaTeX-ja project, there were several experimental attempts to typeset
+Japanese documents with \LuaTeX. Here we cite three examples:
 \begin{itemize}
 \item |luaums.sty|~\cite{luaums} developed by the author. This
       experimental package is for creating a certain Japanese-based presentation
@@ -125,7 +123,7 @@ of the project as follows:
 \item\emph{\LuaTeX-ja offers at least the same flexibility of
      typesetting that p\TeX\ has.}
 
-     We are not satisfied with the ability of producing outputs conformed to
+     We are not satisfied with the ability of producing (PDF) outputs conformed to
      JIS~X~4051~\cite{jisx4051}, the Japanese Industrial Standard for
      typesetting, or to a technical note~\cite{w3c} by W3C;
      if one wants to produce very incoherent outputs for some reason, it
@@ -151,8 +149,8 @@ In this point, previous attempts of Japanese typesetting with \LuaTeX\
 We describe an outline of \LuaTeX-ja's process in order.
 
 \begin{itemize}
-\item In the |process_input_buffer| callback: treatment of breaking
-      lines after a Japanese character (in Subsection~\ref{ssec-line}).
+\item In the |process_input_buffer| callback: treatment of line-break
+      after a Japanese character (in Subsection~\ref{ssec-line}).
 
 \item In the |hyphenate| callback: font replacement.
 
@@ -318,10 +316,10 @@ remarks:
       \hbox{\tt file:} and \hbox{\tt name:} prefixes, and various font features can be
       used as the first line in Figure~\ref{fig-jfdef}.
 \item The |jfm| key specifies the metric for the font. In
-      Figure~\ref{fig-jfdef}, both fonts will use a metric stored in a
+      Figure~\ref{fig-jfdef}, |\foo| and |\bar| will use a metric stored in a
       Lua script named |jfm-ujis.lua|. This metric is the standard
       metric in \LuaTeX-ja, and is based on JFMs used in the \emph{otf}
-      package~\cite{otf}.
+      package~\cite{otf} (hence almost all characters are square-shaped).
 \item The \hbox{\tt psft:} prefix can be used to specify name-only, non-embedded
       fonts. When one displays a pdf with these fonts, actual fonts which
       will be used for them depend on a pdf reader. 
@@ -335,7 +333,7 @@ the author have not tried, it may be possible to develop a program that
 metrics by default; |jfm-ujis.lua|, |jfm-jis.lua| based on the
 \emph{jis} font metric, and |jfm-min.lua| based on old |min10.tfm|.
 
- Note that |-kern| in features
+Note that |-kern| in features
 is important, because kerning information from a real font itself will
 clash with glue/kern information from the metric.
 
@@ -367,7 +365,7 @@ typesetting are divided into the following three categories:
       for short). 
 
 \item Default glue between a Japanese character and an alphabetic
-      character (\emph{xkanjiskip}, for short), usually 1/4 of
+      character (we say \emph{xkanjiskip}, for short), usually 1/4 of
       full-width (\emph{shibuaki}) with some stretch and shrink for
       justifying each line.
 \item Default glue between two consecutive Japanese characters
@@ -501,10 +499,10 @@ One might have the situation that this default behavior is not
 	   we leave it to the manual~\cite{man}.
 
 \item[Fonts with different metrics] 
-The case where two consecutive Japanese characters use different metrics and/or
-	   different size is similar. Consider the following input where
-	   the \emph{mincho} family and the \emph{gothic} family use
-	   different metrics:
+The case where two adjacent Japanese characters use different metrics
+	   and/or different size is similar. Consider the following
+	   input where the \emph{mincho} family and the \emph{gothic}
+	   family use different metrics:
 \begin{quote}
 \begin{verbatim}
 漢）\gt （漢）\large （大
@@ -707,7 +705,7 @@ However, we couldn't develop a satisfactory solution to this problem in
 time for this paper, due to a lack of time. We are just testing a
 solution below:
 \begin{itemize}
-\item \LuaTeX-ja has a list of character codes which will be always reated as
+\item \LuaTeX-ja has a list of character codes which will be always treated as
       alphabetic characters in math mode. Considering 8-bit TFMs for
       math symbols, this list includes natural numbers between |"80| and
       |"FF| by default.
@@ -899,8 +897,8 @@ This package is widely used in \pTeX\ for typesetting characters which is
 not in JIS~X~0208, and for using more than one weight in \emph{mincho}
 and \emph{gothic} font families. Therefore \LuaTeX-ja supports features
 in the \emph{otf} package, by loading \texttt{luatexja-\penalty0otf.sty}
-	   manually. Note that characters by |\UTF{xxxx}| and
-	   |\CID{xxxx}| are not appended to the current list as a
+	   manually. Note that characters by |\UTF{}| and
+	   |\CID{}| are not appended to the current list as a
 	   \emph{glyph\_node}, to avoid from callbacks by the
 	   \emph{luaotfload} package. We have another remark; |\CID|
 	   does not work with TrueType fonts, since |\CID| use the
@@ -1113,8 +1111,9 @@ rectangle is the imaginary body of a real glyph. First, the real glyph
 is aligned with respect to the width of $M$. In the figure, the real
 glyph is aligned `middle'; this setting is useful for the full-width
 middle dot `・'. We have other settings, `left' and `right'.
-After that, it is shifted according to the value of |left| and |down|,
-which are specified in the metric, too. The final position of the real glyph
+Furthermore, it is shifted according to the value of |left| and |down|,
+which are specified in the metric, for fine adjustment.
+The final position of the real glyph
 is shown by the gray rectangle~$R$. If the amount of shifting the baseline is
 not zero, $M$ (and hence the real glyph) is shifted by that amount.
 
@@ -1129,6 +1128,46 @@ Otobe~\cite{min10}. Here the policy on this problem is not determined
 now, however we would like to offer several solutions in future
 development.
 
+
+\subsection{Further notes on metrics for \LuaTeX-ja}
+\label{ssec-jfmnote}
+\begin{description}
+\item[Proportional typesetting]
+Some fonts are proportional, that is, each glyphs in those fonts have
+	   its own width. An example of proportional fonts is
+	   IPA~P~Mincho. Using these fonts in \pTeX\ is very
+	   hard, since one needs to make a dedicated JFM for a real font.
+
+\LuaTeX-ja supports these proportional fonts; specifying the |width| of
+	   a character class in a metric to |"prop"| makes the width of
+	   each character in this class that of a glyph in a real font.
+If no JFM glue is needed, one simply has to use |jfm-prop.lua|. The
+	   following is an example:
+\begin{LTXexample}
+\jfont\pr=file:ipamp.ttf:jfm=prop at 3.25mm 
+あいうえお\\\pr{}あいうえお
+\end{LTXexample}
+
+\item[Scaling by metrics]
+Because of virtual fonts, even if one specifies to use |min10.tfm| or
+	   |jis.tfm| at 10\,pt in \pTeX, the actual size of real fonts used in
+	   dviwares for these JFMs are 9.62212\,pt. Hence, for
+	   example, if one wants to use 3.25\,mm Japanese
+	   fonts and 10\,pt alphabetic fonts in \pTeX, 
+	   he or she need to scale a Japanese font by
+\[
+ \frac{3.25\,\mathrm{mm}}{10\,\mathrm{pt}\cdot 0.962212}\simeq 0.961
+\]
+in declarations of japanese fonts.
+
+\LuaTeX-ja didn't support such scaling of glyphs by metrics, so one has
+	   to adjust the size argument for |\jfont| manually. Continuing
+	   the previous example, for using 3.25\,mm Japanese
+	   fonts and 10\,pt alphabetic fonts in \LuaTeX-ja, 
+he or she need to scale a Japanese font by
+3.25\,mm${}/{}$10\,pt${}\simeq{}$0.92487.
+\end{description}
+
 \section{Conclusion}
 We have discussed about our \LuaTeX-ja package, which is much affected
 by \pTeX. For now, it can be used for experimental use, however there
@@ -1138,7 +1177,7 @@ and possibly other Asian languages, under \LuaTeX.
 
 \section*{Acknowledgements}
 The author would like to thank Ken Nakano and Hideaki Togashi for their
-development of ASCII \pTeX.  The author is very grateful to Haruhiko
+development and management of ASCII \pTeX. The author is very grateful to Haruhiko
 Okumura for his leadership in the Japanese \TeX\ community. The author
 is also very grateful to members of \LuaTeX-ja project team for their
 valuable cooperation in development.
