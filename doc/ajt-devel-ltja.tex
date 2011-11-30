@@ -44,6 +44,7 @@
 \hyphenation{
   kanjiskip
   xkanjiskip
+  Okumura
 }
 
 %%% Mandatory article metadata %%%
@@ -622,10 +623,10 @@ We note that \LuaTeX-ja offers two additional control sequences,
       yields an alphabetic character, regardless of the argument. 
 
 \subsection{Default setting of ranges}
-Patches for plain \TeX\ and \LaTeXe\ of \LuaTeX-ja predefine 8~character
+Patches for plain \TeX\ and \LaTeXe\ of \LuaTeX-ja predefine eight character
 ranges, as shown in Table~\ref{tab-chrrng}.  Almost of these ranges are
 just the union of Unicode blocks, and determined from the Adobe-Japan1-6
-character collection~\cite{aj16}, and JIS~X~0208. Among these 8~ranges,
+character collection~\cite{aj16}, and JIS~X~0208. Among these eight ranges,
 the ranges~2, 3, 6, 7, and~8 are considered ranges of Japanese
 characters, and others are considered ranges of alphabetic
 characters.\footnote{Note that ranges 3~and~8 are considered ranges of
@@ -678,7 +679,7 @@ DOUBLE QUOTATION MARK) is treated as an Japanese character, because it
 belongs to the range~3.  This problem is resolved by using |\ltjalchar|
 instead of the |\char| primitive.  It is included in an optional package
 named \texttt{luatexja-\penalty0fontspec.sty}.  Figure~\ref{fig-unitxt}
-shows several ways o typeset a character , both as a Japanese character
+shows several ways to typeset a character, both as a Japanese character
 and as as an alphabetic characters.
 
 \begin{figure}
@@ -1154,17 +1155,17 @@ Because of virtual fonts, even if one specifies to use |min10.tfm| or
 	   dviwares for these JFMs are 9.62216\,pt. Hence, for
 	   example, if one wants to use 3.25\,mm Japanese
 	   fonts and 10\,pt alphabetic fonts in \pTeX, 
-	   he or she need to scale a Japanese font by
+	   he/she needs to scale a Japanese font by
 \[
  \frac{3.25\,\mathrm{mm}}{10\,\mathrm{pt}\cdot 0.962216}\simeq 0.961
 \]
-in declarations of japanese fonts.
+in declarations of Japanese fonts.
 
 \LuaTeX-ja didn't support such scaling of glyphs by metrics, so one has
 	   to adjust the size argument for |\jfont| manually. Continuing
 	   the previous example, for using 3.25\,mm Japanese
 	   fonts and 10\,pt alphabetic fonts in \LuaTeX-ja, 
-he or she need to scale a Japanese font by
+he/she needs to scale a Japanese font by
 3.25\,mm${}/{}$10\,pt${}\simeq{}$0.92487.
 \end{description}
 
@@ -1190,14 +1191,14 @@ valuable cooperation in development.
 \bibitem{aj16}
 Adobe Systems Incorporated, \emph{Adobe-Japan1-6 Character Collection
 	for CID-Keyed Fonts}, Technical Note~\#5078, 2004.
-\url{http://partners.adobe.com/public/developer/en/font/5078.Adobe-Japan1-6.pdf}
+\newblock\url{http://partners.adobe.com/public/developer/en/font/5078.Adobe-Japan1-6.pdf}
 
 \bibitem{ptex}
-ASCII MEDIA WORKS，アスキー日本語\TeX\ (\pTeX)．\url{http://ascii.asciimw.jp/pb/ptex/}
+ASCII MEDIA WORKS, アスキー日本語\TeX\ (\pTeX). \newblock\url{http://ascii.asciimw.jp/pb/ptex/}
 
 \bibitem{apl}
 John Baker, \emph{Typesetting UTF8 APL code with the \LaTeX\ lstlisting package}.
-\url{http://bakerjd99.wordpress.com/2011/08/15/}
+\newblock\url{http://bakerjd99.wordpress.com/2011/08/15/}
 
 \bibitem{omega}
 Jin-Hwan~Cho and Haruhiko Okumura, \emph{Typesetting CJK Languages with Omega},
@@ -1205,62 +1206,62 @@ Jin-Hwan~Cho and Haruhiko Okumura, \emph{Typesetting CJK Languages with Omega},
 Springer, 2004, 139--148.
 
 \bibitem{joylua}
-Yannis Haralambous. \emph{The Joy of \LuaTeX}. \url{http://luatex.bluwiki.com/}
+Yannis Haralambous. \emph{The Joy of \LuaTeX}. \newblock\url{http://luatex.bluwiki.com/}
 
 \bibitem{jisx4051}
 Japanese Industrial Standards Committee. \emph{JIS~X~4051: Formatting
 	rules for Japanese documents}, 1993, 1995, 2004.
 
 \bibitem{eptex}
-北川弘典，$\varepsilon$-\pTeX についてのwiki．
-\url{http://sourceforge.jp/projects/eptex/wiki/FrontPage}
+北川弘典, $\varepsilon$-\pTeX についてのwiki. 
+\newblock\url{http://sourceforge.jp/projects/eptex/wiki/FrontPage}
 
 \bibitem{luaums}
-北川弘典，\LuaTeX で日本語．
-\url{http://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=378}
+北川弘典, \LuaTeX で日本語. 
+\newblock\url{http://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=378}
 
 \bibitem{luatexref}
 \LuaTeX\ development team, \emph{The \LuaTeX\ reference}. 
-\url{http://www.luatex.org/svn/trunk/manual/luatexref-t.pdf} (snapshot of SVN trunk)
+\newblock\url{http://www.luatex.org/svn/trunk/manual/luatexref-t.pdf} (snapshot of SVN trunk)
 
 \bibitem{man}
-\LuaTeX-ja project team, \emph{The \LuaTeX-ja package}. 
-Not completed for now. Available at |doc/man-en.pdf| (in English) or
+\LuaTeX-ja project team, \emph{The \LuaTeX-ja package}. \newblock
+Not completed for now. \newblock Available at |doc/man-en.pdf| (in English) or
 	|doc/man-ja.pdf| (in Japanese)
 in the Git repository.
 
 \bibitem{luajp-test}
-香田温人，\LuaTeX と日本語．
-\url{http://www1.pm.tokushima-u.ac.jp/~kohda/tex/luatex-old.html}
+香田温人, \LuaTeX と日本語.
+\newblock\url{http://www1.pm.tokushima-u.ac.jp/~kohda/tex/luatex-old.html}
 
 \bibitem{luajalayout}
-前田一貴，luajalayout パッケージ---Lua\LaTeX によ
-	る日本語組版---．
-\url{http://www-is.amp.i.kyoto-u.ac.jp/lab/kmaeda/lualatex/luajalayout/}
+前田一貴, luajalayout パッケージ---Lua\LaTeX によ
+	る日本語組版---.
+\newblock\url{http://www-is.amp.i.kyoto-u.ac.jp/lab/kmaeda/lualatex/luajalayout/}
 
 \bibitem{jsclasses}
-奥村晴彦，p\LaTeXe 新ドキュメントクラス．
-\url{http://oku.edu.mie-u.ac.jp/~okumura/jsclasses/}
+奥村晴彦, p\LaTeXe 新ドキュメントクラス.
+\newblock\url{http://oku.edu.mie-u.ac.jp/~okumura/jsclasses/}
 
 \bibitem{ptexjp}
 Haruhiko Okumura, \emph{\pTeX\ and Japanese Typesetting},
 	The Asian Journal of \TeX\ \textbf{2}~(2008), 43--51.
 
 \bibitem{min10}
-乙部厳己，min10フォントについて．
-\url{http://argent.shinshu-u.ac.jp/~otobe/tex/files/min10.pdf}
+乙部厳己, min10フォントについて.
+\newblock\url{http://argent.shinshu-u.ac.jp/~otobe/tex/files/min10.pdf}
 
 \bibitem{otf}
-齋藤修三郎，Open Type Font用VF．
-\url{http://psitau.kitunebi.com/otf.html}
+齋藤修三郎, Open Type Font用VF.
+\newblock\url{http://psitau.kitunebi.com/otf.html}
 
 \bibitem{stack-mail}
 Jonathan Sauer, \emph{[Dev-luatex] tex.currentgrouplevel}. 
-\url{http://www.ntg.nl/pipermail/dev-luatex/2008-August/001765.html}
+\newblock\url{http://www.ntg.nl/pipermail/dev-luatex/2008-August/001765.html}
 
 \bibitem{uptex}
 Takuji Tanaka, \emph{u\pTeX, up\LaTeX---unicode version of \pTeX, p\LaTeX}.
-\url{http://homepage3.nifty.com/ttk/comp/tex/uptex_en.html}
+\newblock\url{http://homepage3.nifty.com/ttk/comp/tex/uptex_en.html}
 
 \bibitem{ptexenc}
 Nobuyuki Tsuchimura and Yusuke Kuroki, \emph{Development of Japanese \TeX\ Environment},
@@ -1268,7 +1269,7 @@ Nobuyuki Tsuchimura and Yusuke Kuroki, \emph{Development of Japanese \TeX\ Envir
 
 \bibitem{w3c}
 W3C Working Group, \emph{Requirements for Japanese Text Layout}. 
-\url{http://www.w3.org/TR/jlreq/}
+\newblock\url{http://www.w3.org/TR/jlreq/}
 \end{thebibliography}
 
 \end{document}
