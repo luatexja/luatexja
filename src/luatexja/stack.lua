@@ -96,8 +96,8 @@ function set_stack_font(g,m,c,p)
 			 {"The family number should in the range 0 .. 255.",
 			  "I'm going to use 0 instead of that illegal family number."})
       c=0
-   elseif not charprop_stack_table[i][c] then 
-      charprop_stack_table[i][c] = {} 
+   elseif not charprop_stack_table[i][m] then 
+      charprop_stack_table[i][m] = {} 
    end
    charprop_stack_table[i][m][c] = p
   if g=='global' then
