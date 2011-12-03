@@ -455,7 +455,7 @@ local function handle_penalty_normal(post, pre, g)
 	 if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
 	 p.penalty = a
 	 head = node_insert_before(head, Np.first, p)
-	 Bp[1] = p; set_attr(p, attr_icflag, KINSOKU)
+	 table_insert(Bp, p); set_attr(p, attr_icflag, KINSOKU)
       end
    else for i, v in pairs(Bp) do add_penalty(v,a) end
    end
@@ -469,7 +469,7 @@ local function handle_penalty_always(post, pre, g)
 	 if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
 	 p.penalty = a
 	 head = node_insert_before(head, Np.first, p)
-	 Bp[1] = p; set_attr(p, attr_icflag, KINSOKU)
+	 table_insert(Bp, p); set_attr(p, attr_icflag, KINSOKU)
       end
    else for i, v in pairs(Bp) do add_penalty(v,a) end
    end
@@ -481,7 +481,7 @@ local function handle_penalty_suppress(post, pre, g)
       if g and g.id==id_glue then
 	 local p = node_new(id_penalty)
 	 p.penalty = 10000; head = node_insert_before(head, Np.first, p)
-	 Bp[1] = p; set_attr(p, attr_icflag, KINSOKU)
+	 table_insert(Bp, p); set_attr(p, attr_icflag, KINSOKU)
       end
    else for i, v in pairs(Bp) do add_penalty(v,a) end
    end

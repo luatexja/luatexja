@@ -105,7 +105,7 @@ end
 function math.two_add(a,b) return a+b end
 function math.two_average(a,b) return (a+b)/2 end
 
----- table: charprop_stack_table [stack_level][chr_code].{pre|post|xsp}
+---- table: charprop_stack_table [stack_level].{pre|post|xsp}[chr_code]
 
 ------------------------------------------------------------------------
 -- CODE FOR GETTING/SETTING PARAMETERS 

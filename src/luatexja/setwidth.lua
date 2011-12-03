@@ -107,7 +107,7 @@ function set_ja_width(ahead, dir)
    while p do
       if p.id==id_glyph then
 	 if is_japanese_glyph_node(p) then
-	    local met = ltjf.font_metric_table[p.font]
+	    local met = ltjf_font_metric_table[p.font]
 	    local class = has_attr(p, attr_jchar_class)
 	    char_data = ltjf.metrics[met.jfm].size_cache[met.size].char_type[class]
             if char_data then

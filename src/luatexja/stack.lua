@@ -16,6 +16,7 @@ local node_new = node.new
 local id_whatsit = node.id('whatsit')
 local sid_user = node.subtype('user_defined')
 local hmode = 118 -- in luatexref-t.pdf, this must be 127
+local table_fastcopy = table.fastcopy
 
 local charprop_stack_table={}; charprop_stack_table[0]={}
 
@@ -31,7 +32,7 @@ function get_stack_level()
       for k,v in pairs(charprop_stack_table) do -- clear the stack above i
 	 if k>=i then charprop_stack_table[k]=nil end
       end
-      charprop_stack_table[i] = table.fastcopy(charprop_stack_table[i-1])
+      charprop_stack_table[i] = table_fastcopy(charprop_stack_table[i-1])
       tex.setcount('ltj@@stack', i)
       if gd>0 then tex.globaldefs = gd end
       if tex.nest[tex.nest.ptr].mode == hmode or
@@ -42,6 +43,21 @@ function get_stack_level()
    end
    return i
 end
+
+-- local function table_to_str(v) 
+--    local s = ''
+--    for i, a in pairs(v) do
+--       s = s .. i .. "=" .. tostring(a) .. ', '
+--    end
+--    return s
+-- end
+-- function print_stack_table(i)
+--    print('\n>>> get_stack_level:')
+--    for k, v in pairs(charprop_stack_table[i]) do
+--       print("  " , k, type(k), table_to_str(v));
+--    end
+-- end
+
 
 -- EXT
 function set_stack_table(g,m,c,p,lb,ub)
@@ -59,14 +75,14 @@ function set_stack_table(g,m,c,p,lb,ub)
 			  "(-1 is used for denoting `math boundary')",
 			  'So I changed this one to zero.'})
       c=0
-   elseif not charprop_stack_table[i][c] then 
-      charprop_stack_table[i][c] = {} 
+   elseif not charprop_stack_table[i][m] then 
+      charprop_stack_table[i][m] = {} 
    end
-   charprop_stack_table[i][c][m] = p
+   charprop_stack_table[i][m][c] = p
   if g=='global' then
      for j,v in pairs(charprop_stack_table) do 
-	if not charprop_stack_table[j][c] then charprop_stack_table[j][c] = {} end
-	charprop_stack_table[j][c][m] = p
+	if not charprop_stack_table[j][m] then charprop_stack_table[j][m] = {} end
+	charprop_stack_table[j][m][c] = p
      end
   end
 end
@@ -83,35 +99,35 @@ function set_stack_font(g,m,c,p)
    elseif not charprop_stack_table[i][c] then 
       charprop_stack_table[i][c] = {} 
    end
-   charprop_stack_table[i][c][m] = p
+   charprop_stack_table[i][m][c] = p
   if g=='global' then
      for j,v in pairs(charprop_stack_table) do 
-	if not charprop_stack_table[j][c] then charprop_stack_table[j][c] = {} end
-	charprop_stack_table[j][c][m] = p
+	if not charprop_stack_table[j][m] then charprop_stack_table[j][m] = {} end
+	charprop_stack_table[j][m][c] = p
      end
   end
 end
 
 -- EXT: store \ltj@tempskipa
-function set_stack_skip(g,c,sp)
+function set_stack_skip(g,m,sp)
   local i = get_stack_level()
   if not sp then return end
-  if not charprop_stack_table[i][c] then 
-     charprop_stack_table[i][c] = {} 
+  if not charprop_stack_table[i][m] then 
+     charprop_stack_table[i][m] = {} 
   end
-  charprop_stack_table[i][c].width   = sp.width
-  charprop_stack_table[i][c].stretch = sp.stretch
-  charprop_stack_table[i][c].shrink  = sp.shrink
-  charprop_stack_table[i][c].stretch_order = sp.stretch_order
-  charprop_stack_table[i][c].shrink_order  = sp.shrink_order
+  charprop_stack_table[i][m].width   = sp.width
+  charprop_stack_table[i][m].stretch = sp.stretch
+  charprop_stack_table[i][m].shrink  = sp.shrink
+  charprop_stack_table[i][m].stretch_order = sp.stretch_order
+  charprop_stack_table[i][m].shrink_order  = sp.shrink_order
   if g=='global' then
      for j,v in pairs(charprop_stack_table) do 
-	if not charprop_stack_table[j][c] then charprop_stack_table[j][c] = {} end
-	charprop_stack_table[j][c].width   = sp.width
-	charprop_stack_table[j][c].stretch = sp.stretch
-	charprop_stack_table[j][c].shrink  = sp.shrink
-	charprop_stack_table[j][c].stretch_order = sp.stretch_order
-	charprop_stack_table[j][c].shrink_order  = sp.shrink_order
+	if not charprop_stack_table[j][m] then charprop_stack_table[j][m] = {} end
+	charprop_stack_table[j][m].width   = sp.width
+	charprop_stack_table[j][m].stretch = sp.stretch
+	charprop_stack_table[j][m].shrink  = sp.shrink
+	charprop_stack_table[j][m].stretch_order = sp.stretch_order
+	charprop_stack_table[j][m].shrink_order  = sp.shrink_order
      end
   end
 end
@@ -124,8 +140,8 @@ function get_skip_table(m, idx)
 end
 
 function get_penalty_table(m,c,d, idx)
-   local i = charprop_stack_table[idx][c]
-   if i then i=i[m] end
+   local i = charprop_stack_table[idx][m]
+   if i then i=i[c] end
    return i or d
 end
 
