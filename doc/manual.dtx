@@ -2142,17 +2142,19 @@ At the present version, the lowermost bit of <natural number> indicates
 \item[\Param{yjabaselineshift}\,=<dimen>$^\ast$]\ 
 \item[\Param{yalbaselineshift}\,=<dimen>$^\ast$] [\verb+\ybaselineshift+]
 
-\item[\Param{jaxspmode}\,=\{<chr\_code>,<mode>\}] [\verb+\inhibitxspcode+]
+\item[\Param{jaxspmode}\,=\{<chr\_code>,<mode>\}]
 
 Setting whether inserting  \Param{xkanjiskip} is allowed before/after a \textbf{JAchar} whose character code is <chr\_code>.
 The followings are allowed for <mode>:
 \begin{description}
 \item[0, \texttt{inhibit}] Insertion of \Param{xkanjiskip} is inhibited before the character, nor after the character.
-\item[2, \texttt{preonly}] Insertion of \Param{xkanjiskip} is allowed before the character, but not after.
-\item[1, \texttt{postonly}] Insertion of \Param{xkanjiskip} is allowed after the character, but not before.
+\item[1, \texttt{preonly}] Insertion of \Param{xkanjiskip} is allowed before the character, but not after.
+\item[2, \texttt{postonly}] Insertion of \Param{xkanjiskip} is allowed after the character, but not before.
 \item[3, \texttt{allow}] Insertion of \Param{xkanjiskip} is allowed before the character and after the character.
 This is the default value.
 \end{description}
+This parameter is similar to the \verb+\inhibitxspcode+ primitive of \pTeX, but not compatible with \verb+\inhibitxspcode+.
+
 
 \item[\Param{alxspmode}\,=\{<chr\_code>,<mode>\}] [\verb+\xspcode+]
 
@@ -2170,7 +2172,7 @@ The followings are allowed for <mode>:
 	   before the character and after the character.
 This is the default value.
 \end{description}
-Note that parameters \Param{jaxspmode} and \Param{alxspmode} use a common table.
+Note that parameters \Param{jaxspmode} and \Param{alxspmode} use a common table, hence these two parameters are synonyms of each other.
 
 \item[\Param{autospacing}\,=<bool>$^\ast$] [\verb+\autospacing+]
 \item[\Param{autoxspacing}\,=<bool>$^\ast$] [\verb+\autoxspacing+]
