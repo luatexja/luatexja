@@ -109,7 +109,7 @@ Japanese documents with \LuaTeX. Here we cite three examples:
 \end{itemize}
 However, these packages are based on \LaTeXe, and do not have much
 ability to control the typesetting rule. And it is inefficient that more
-than one person 【one people だと，一つの民族と取られかねないので】 separately develop similar packages.  Development of the
+than one person separately develop similar packages.  Development of the
 \LuaTeX-ja package is started initially by the author and Kazuki Maeda, because of
 these situations.
 
@@ -237,7 +237,7 @@ horizontal box or that of a paragraph are valid in whole box or
 paragraph.  However, the implementation of these parameters in
 \LuaTeX-ja is not so easy; we will discuss it in Subsection~\ref{ssec-stack}.
 
-From the two problems discussed above, the assignment and retrieval
+From the two problems  discussed above, the assignment and retrieval
 of most parameters in \LuaTeX-ja are summarized into the following
 three control sequences:
 \begin{itemize}
@@ -279,8 +279,9 @@ command at the first line marks most of Japanese characters as
 `non-Japanese characters'. In other words, from that command onward, the
 letter `あ' will be treated as an alphabetic character by
 \LuaTeX-ja. Then, it is natural to have a space between `あ' and `y' in
-the output, where the actual output 【of the first example /* 以下の figure 環境と連動*/】 in the figure does not so.  This is
-because `あ' is considered a Japanese character by \LuaTeX-ja,
+the output (as the second example in the figure), 
+where the actual output of the first example in the figure does not so.  This is
+because `あ' at the input line~2 is considered a Japanese character by \LuaTeX-ja,
 when \LuaTeX-ja does the decision whether U+FFFFF will be added to the
 input line~2.
 
@@ -288,7 +289,8 @@ input line~2.
 \begin{LTXexample}
 \font\x=IPAMincho \x
 \ltjsetparameter{jacharrange={-6}}xあ
-y%\qquad xあy\qquad x あ y%%%【とかにしないと，空白が空いているかどうかよくわからない】
+y\qquad xあ
+y
 \end{LTXexample}
 \caption{A notable sample showing the treatment of a line-break after a
 Japanese character.}\label{fig-linebreak}
@@ -522,7 +524,7 @@ We had thought that amounts of spaces between parentheses in the above output
 	   output from the above input. The width of glue indicated `(1)' is
 	   $(a/2 + a/2)/2 = 0.5a$, and the width of glue indicated `(2)'
 	   is $(a/2 + 1.2a/2)/2 = 0.55a$. This default behavior can be
-	   changed by \textsf{differentmet} 【綴り間違い？】 parameter of \LuaTeX-ja.
+	   changed by \textsf{differentjfm} parameter of \LuaTeX-ja.
 
 \begin{figure}
 \begin{center}
@@ -581,7 +583,7 @@ Before we describe the approach taken in \LuaTeX-ja, we review the
 approach taken by u\pTeX.  u\pTeX\ extends the |\kcatcode| primitive in
 \pTeX, to use this primitive for setting how a character is treated
 among alphabetic characters~(15), \emph{kanji}~(16), \emph{kana}~(17),
-【kanji は 16 で出てるけど，2 箇所出現？】 \emph{kanji}, \emph{Hangul}~(17), or~\emph{other CJK characters}~(18).
+\emph{Hangul}~(17), or~\emph{other CJK characters}~(18).
 The assignment to |\kcatcode| can be done by a Unicode
 block.\footnote{There are some exceptions. For example, U+FF00--FFEF
 (Halfwidth and Fullwidth Forms) are divided into three blocks in recent
@@ -729,7 +731,7 @@ typeset Japanese characters.  We look more details by parts.
 
 \subsection{`Engine extension'}
 The lowest part of \LuaTeX-ja corresponds to the \pTeX\ extension as
-\emph{an engine extension of \TeX}\@. 【なんとなく，ピリオド直後の空白が小さく見える．補正で直るか？】 We, the project members, think that
+\emph{an engine extension of \TeX}\@. We, the project members, think that
 this part is almost done. There is one more feature of \LuaTeX-ja which
 we are going to explain:
 
@@ -915,7 +917,7 @@ It is known for users of \pTeX\ that there is a patch |jlisting.sty| for
 	   of the \emph{listings} package; this is inconvenient when we
 	   use the \emph{showexpl} package.
 
-There is another way to use over 256 characters with the
+There is another way to use characters whose code are above 256 with the
 	   \emph{listings} package (described in \cite{apl}). However,
 	   this method is not suitable for Japanese, since the number of
 	   Japanese characters is very large. We hope that the
@@ -1050,7 +1052,7 @@ in most TrueType fonts used in Japanese typesetting, such as
 IPA~Mincho. Hence the adjustment of position of such glyphs is
 needed. In the context of \pTeX, this process was performed using virtual fonts.
 
-On the other hand, Lua\TeX-ja does the adjustment by encapsuling a glyph
+On the other hand, Lua\TeX-ja does the adjustment by encapsulating a glyph
 into a horizontal box. There are two main reasons why we adopted this
 method; one is that we feared Lua codes for coexisting with callbacks by
 the |luaotfload| package would be large if we use virtual fonts, and the
@@ -1176,7 +1178,7 @@ are much refinements which are needed for regular use. The author hopes
 that this paper and \LuaTeX-ja project contribute the typesetting Japanese,
 and possibly other Asian languages, under \LuaTeX.
 
-\section*{Acknowledgements}
+\section*{Acknowledgments}
 The author would like to thank Ken Nakano and Hideaki Togashi for their
 development and management of ASCII \pTeX. The author is very grateful to Haruhiko
 Okumura for his leadership in the Japanese \TeX\ community. The author
