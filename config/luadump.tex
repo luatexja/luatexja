@@ -1,0 +1,37 @@
+%
+% luadump.tex
+%
+
+\catcode`@=11
+
+\directlua{require('luadump')}
+
+\let\luadump@directlua@orig\directlua
+
+\long\def\luadump@directlua#1{%
+  \luadump@directlua@orig{
+    #1
+    lua.bytecode[luadump.bytecode_index] = function()
+      #1
+    end
+    luadump.bytecode_index = luadump.bytecode_index + 1
+  }%
+}
+
+\def\luadump@init{%
+  \directlua{luadump.init()}
+  \let\directlua\luadump@directlua
+}
+
+\def\luadump@finalize{%
+  \let\directlua\luadump@directlua@orig
+  \let\luadump@directlua\undefined
+  \let\luadump@directlua@orig\undefined
+  \let\luadump@init\undefined
+  \let\luadump@finalize\undefined
+  \directlua{luadump.finalize()}
+  \everyjob{\directlua{require('luadump'); luadump.restore()}}
+  \catcode`@=12
+}
+
+\endinput

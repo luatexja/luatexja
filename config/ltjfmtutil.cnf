@@ -1,0 +1,8 @@
+#
+# ltjfmtutil.cnf
+#
+# Run: fmtutil --cnffile ltjfmtutil.cnf --all
+#
+
+luatexja luatex language.def,language.dat.lua luatexja.ini
+lualatexja luatex language.def,language.dat.lua lualatexja.ini
