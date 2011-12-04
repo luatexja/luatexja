@@ -109,7 +109,7 @@ Japanese documents with \LuaTeX. Here we cite three examples:
 \end{itemize}
 However, these packages are based on \LaTeXe, and do not have much
 ability to control the typesetting rule. And it is inefficient that more
-than one people separately develop similar packages.  Development of the
+than one person 【one people だと，一つの民族と取られかねないので】 separately develop similar packages.  Development of the
 \LuaTeX-ja package is started initially by the author and Kazuki Maeda, because of
 these situations.
 
@@ -162,7 +162,7 @@ We describe an outline of \LuaTeX-ja's process in order.
 	   at~$p$.
 
 Furthermore, the subtype of $p$ is subtracted by 1 to suppress
-	   hyphenation around $p$ by \LuaTeX, because later processes of
+	   hyphenation around~$p$ by \LuaTeX, because later processes of
 	   \LuaTeX-ja take care of all things about Japanese characters.
 
 \item In |pre_linebreak_filter| and |hpack_filter| callbacks:
@@ -179,7 +179,7 @@ Furthermore, the subtype of $p$ is subtracted by 1 to suppress
       \ref{ssec-jglue}~and~\ref{ssec-jspec} .
 
 \item To make a match between a metric and a real font, sometimes
-      adjustument of the position of (Japanese) glyphs are performed.
+      adjustment of the position of (Japanese) glyphs are performed.
       We will discuss it in Subsection~\ref{ssec-width}.
 \end{enumerate}
 \item In the |mlist_to_hlist| callback: treatment of Japanese characters
@@ -190,7 +190,7 @@ Furthermore, the subtype of $p$ is subtracted by 1 to suppress
 
 In this paper, a \emph{alphabetic character} means a non-Japanese
 character. Similarly, we use the word an \emph{alphabetic font} as the
-counterpart of a jJpanese font.
+counterpart of a Japanese font.
 
 \subsection{Contents of this paper}
 Here we describe the contents of the rest of this paper briefly.  In
@@ -237,7 +237,7 @@ horizontal box or that of a paragraph are valid in whole box or
 paragraph.  However, the implementation of these parameters in
 \LuaTeX-ja is not so easy; we will discuss it in Subsection~\ref{ssec-stack}.
 
-From above two problems  discussed above, the assignment and retrieval
+From the two problems discussed above, the assignment and retrieval
 of most parameters in \LuaTeX-ja are summarized into the following
 three control sequences:
 \begin{itemize}
@@ -271,7 +271,7 @@ of the end-line character is 5~(\emph{end-of-line}). This condition is
 useful under the verbatim environment.}  One might jump to a conclusion
 that the treatment of a line-break by \pTeX\ and that of \LuaTeX-ja are
 totally same, however they are different in the respect that \LuaTeX-ja's
-judgement whether a comment letter will be appended the line is done
+judgment whether a comment letter will be appended the line is done
 \emph{before} the line is actually processed by \LuaTeX.
 
 Figure~\ref{fig-linebreak} shows an example of this situation; the
@@ -279,7 +279,7 @@ command at the first line marks most of Japanese characters as
 `non-Japanese characters'. In other words, from that command onward, the
 letter `あ' will be treated as an alphabetic character by
 \LuaTeX-ja. Then, it is natural to have a space between `あ' and `y' in
-the output, where the actual output in the figure does not so.  This is
+the output, where the actual output 【of the first example /* 以下の figure 環境と連動*/】 in the figure does not so.  This is
 because `あ' is considered a Japanese character by \LuaTeX-ja,
 when \LuaTeX-ja does the decision whether U+FFFFF will be added to the
 input line~2.
@@ -288,7 +288,7 @@ input line~2.
 \begin{LTXexample}
 \font\x=IPAMincho \x
 \ltjsetparameter{jacharrange={-6}}xあ
-y
+y%\qquad xあy\qquad x あ y%%%【とかにしないと，空白が空いているかどうかよくわからない】
 \end{LTXexample}
 \caption{A notable sample showing the treatment of a line-break after a
 Japanese character.}\label{fig-linebreak}
@@ -467,7 +467,7 @@ By the way, around a \emph{glyph\_node} $p$ there may be some nodes
 	   \LuaTeX-ja takes this approach, as the latest version of
 	   \pTeX\ (version~p3.2). This explains (2) in the Table~\ref{tab-jfmglue}.
 
-Summerizing above, one should put an empty horizontal box |\hbox{}| to
+Summarizing the above, one should put an empty horizontal box |\hbox{}| to
 	   where he/she wants to interrupt the insertion process in
 	   \LuaTeX-ja as (3) in the Table~\ref{tab-jfmglue}.
 
@@ -513,16 +513,16 @@ As the previous paragraph, this input yields the following, by \pTeX:
 \begin{quote}
 \mc 漢）\hbox{}\gt （漢）\hbox{}\large （大
 \end{quote}
-We had thought that amounts of spaces between parentheses in above output
+We had thought that amounts of spaces between parentheses in the above output
 	   are too much. Hence we have changed the default behavior of
 	   \LuaTeX-ja, so that the amount of a glue between two Japanese
 	   characters with different metrics is the \emph{average} of a glue
 	   from the left character and that from the right
 	   character. For example, Figure~\ref{fig-diffmet} shows the
-	   output from above input. The width of glue indicated `(1)' is
+	   output from the above input. The width of glue indicated `(1)' is
 	   $(a/2 + a/2)/2 = 0.5a$, and the width of glue indicated `(2)'
 	   is $(a/2 + 1.2a/2)/2 = 0.55a$. This default behavior can be
-	   changed by \textsf{diffrentmet} parameter of \LuaTeX-ja.
+	   changed by \textsf{differentmet} 【綴り間違い？】 parameter of \LuaTeX-ja.
 
 \begin{figure}
 \begin{center}
@@ -551,7 +551,7 @@ We had thought that amounts of spaces between parentheses in above output
 In \pTeX, the value of \emph{xkanjiskip} is controlled by a skip named
 	   |\xkanjiskip|. A well-known defect of this implementation is
 	   that the value of \emph{xkanjiskip} is not connected with the
-	   size of the currnt Japanese font. It seems that |EXTRASPACE|,
+	   size of the current Japanese font. It seems that |EXTRASPACE|,
 	   |EXTRASTRETCH|, |EXTRASHRINK| parameters in a JFM are
 	   reserved for specifying the default value of
 	   \emph{xkanjiskip} in a unit of the design size, but \pTeX\
@@ -561,7 +561,7 @@ Considering this situation of p\TeX, \LuaTeX-ja can use the value of
 	   \emph{xkanjiskip} that specified in a metric. If the value of
 	   \emph{xkanjiskip} on user side (this is the value of 
 	   \textsf{xkanjiskip} parameter of |\ltjsetparameter|) is
-	   |\maxdimen|, then \LuaTeX-ja use the specification from
+	   |\maxdimen|, then \LuaTeX-ja uses the specification from
 	   the current used metric as the actual value of
 	   \emph{xkanjiskip}. This description also applies for \emph{kanjiskip}.
 \end{description}
@@ -577,11 +577,11 @@ an alphabetic character, because this symbol is often used in the sense
 of `negative' in Japan.
 
 \subsection{Character ranges}
-Before we describe the approach taken is \LuaTeX-ja, we review the
+Before we describe the approach taken in \LuaTeX-ja, we review the
 approach taken by u\pTeX.  u\pTeX\ extends the |\kcatcode| primitive in
 \pTeX, to use this primitive for setting how a character is treated
 among alphabetic characters~(15), \emph{kanji}~(16), \emph{kana}~(17),
-\emph{kanji}, \emph{Hangul}~(17), or~\emph{other CJK characters}~(18).
+【kanji は 16 で出てるけど，2 箇所出現？】 \emph{kanji}, \emph{Hangul}~(17), or~\emph{other CJK characters}~(18).
 The assignment to |\kcatcode| can be done by a Unicode
 block.\footnote{There are some exceptions. For example, U+FF00--FFEF
 (Halfwidth and Fullwidth Forms) are divided into three blocks in recent
@@ -638,7 +638,7 @@ JIS~X~0208 includes Greek letters and Cyrillic letters, however, these
 	   course. Hence it is reasonable that Greek letters and
 	   Cyrillic consist another character range.
 \item[The range~8] 
-If one want to use 8-bit TFMs, such as T1 or TS1 encodings, he should
+If one wants to use 8-bit TFMs, such as T1 or TS1 encodings, he should
 	   mark this range~8 as a range of alphabetic characters by
 \begin{quote}
 |\ltjsetparameter{jacharrange={-8}}|
@@ -680,7 +680,7 @@ belongs to the range~3.  This problem is resolved by using |\ltjalchar|
 instead of the |\char| primitive.  It is included in an optional package
 named \texttt{luatexja-\penalty0fontspec.sty}.  Figure~\ref{fig-unitxt}
 shows several ways to typeset a character, both as a Japanese character
-and as as an alphabetic characters.
+and as an alphabetic characters.
 
 \begin{figure}
 \begin{LTXexample}
@@ -729,7 +729,7 @@ typeset Japanese characters.  We look more details by parts.
 
 \subsection{`Engine extension'}
 The lowest part of \LuaTeX-ja corresponds to the \pTeX\ extension as
-\emph{an engine extension of \TeX}. We, the project members, think that
+\emph{an engine extension of \TeX}\@. 【なんとなく，ピリオド直後の空白が小さく見える．補正で直るか？】 We, the project members, think that
 this part is almost done. There is one more feature of \LuaTeX-ja which
 we are going to explain:
 
@@ -809,7 +809,7 @@ An example output is shown in Figure~\ref{fig-bls}. The left half is the
 	   hand, the right half is the output when
 	   \textsf{yalbaselineshift} is positive, hence the baseline of
 	   alphabetic characters is shifted down. Figure~\ref{fig-small}
-	   shows an intresting use of these parameters.
+	   shows an interesting use of these parameters.
 
 \end{description}
 Note that \LuaTeX-ja doesn't support vertical typesetting, \emph{tategaki}, for now. 
@@ -902,7 +902,7 @@ in the \emph{otf} package, by loading \texttt{luatexja-\penalty0otf.sty}
 	   |\CID{}| are not appended to the current list as a
 	   \emph{glyph\_node}, to avoid from callbacks by the
 	   \emph{luaotfload} package. We have another remark; |\CID|
-	   does not work with TrueType fonts, since |\CID| use the
+	   does not work with TrueType fonts, since |\CID| uses the
 	   conversion table between CID and the glyph order of the
 	   current Japanese font.
 
@@ -911,11 +911,11 @@ It is known for users of \pTeX\ that there is a patch |jlisting.sty| for
 	   the \emph{listings} package, to use Japanese characters in
 	   the |lstlisting| environment. Generally speaking, it also can
 	   be used in \LuaTeX-ja. However, it seems to be that a
-	   Japanese character after a space does not recieve any process
-	   of the \emph{listings} package; this is inconvinient when we
+	   Japanese character after a space does not receive any process
+	   of the \emph{listings} package; this is inconvenient when we
 	   use the \emph{showexpl} package.
 
-There is another way to use characters above 256 with the
+There is another way to use over 256 characters with the
 	   \emph{listings} package (described in \cite{apl}). However,
 	   this method is not suitable for Japanese, since the number of
 	   Japanese characters is very large. We hope that the
@@ -998,7 +998,7 @@ is called just when an explicit |\hbox{...}| or |\vbox{...}| is ended, and
 the function |filtered_hpack()| is where the |hpack_filter| and then the
 actual `hpack' process are performed. Notice that the |unsave()|
 function is called before |filtered_hpack()|. This is the problem;
-because of |unsave()|, we can retrive only the values of registers
+because of |unsave()|, we can retrieve only the values of registers
 \emph{outside} the box, even in the |hpack_filter| callback.
 
 To cope with this problem, \LuaTeX-ja has its own stack system, based on
