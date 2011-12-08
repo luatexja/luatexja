@@ -246,6 +246,105 @@ local function calc_np_pbox()
    check_next_ickern()
 end
 
+local calc_np_auxtable = {
+   [id_glyph] = function() 
+		   Np.first = lp
+		   if lp.font == has_attr(lp, attr_curjfnt) then 
+		      Np.id = id_jglyph 
+		   else 
+		      Np.id = id_glyph 
+		   end
+		   Np.first = lp; Np.nuc = lp; set_attr_icflag_processed(lp)
+		   lp = node_next(lp); check_next_ickern(); return true
+		end,
+   [id_hlist] = function() 
+		   Np.first = lp; Np.last = lp; Np.nuc = lp; 
+		   set_attr_icflag_processed(lp)
+		   if lp.shift~=0 then 
+		      Np.id = id_box_like
+		   else 
+		      Np.id = id_hlist 
+		   end
+		   lp = node_next(lp); return true
+		end,
+   [id_vlist] = function()
+		   Np.first = lp; Np.nuc = lp; Np.last = lp;
+		   Np.id = id_box_like; set_attr_icflag_processed(lp); 
+		   lp = node_next(lp); return true
+		end,
+   [id_rule] = function()
+		  Np.first = lp; Np.nuc = lp; Np.last = lp;
+		  Np.id = id_box_like; set_attr_icflag_processed(lp); 
+		  lp = node_next(lp); return true
+	       end,
+   [id_ins] = function() 
+		 set_attr_icflag_processed(lp); lp = node_next(lp)
+		 return false
+	      end,
+   [id_mark] = function() 
+		  set_attr_icflag_processed(lp); lp = node_next(lp)
+		  return false
+	       end,
+   [id_adjust] = function() 
+		    set_attr_icflag_processed(lp); lp = node_next(lp)
+		    return false
+		 end,
+   [id_disc] = function()
+		  Np.first = lp; Np.nuc = lp; set_attr_icflag_processed(lp); 
+		  Np.last = lp; Np.id = id_disc; lp = node_next(lp); return true
+	       end,
+   [id_whatsit] = function() 
+		     if lp.subtype==sid_user and lp.user_id==30111 then
+			local lq = node_next(lp)
+			head = node_remove(head, lp); node_free(lp); lp = lq; ihb_flag = true
+		     else
+			set_attr_icflag_processed(lp); lp = node_next(lp)
+		     end
+		     return false
+		  end,
+   [id_math] = function()
+		  Np.first = lp; Np.nuc = lp; 
+		  set_attr_icflag_processed(lp); lp  = node_next(lp) 
+		  while lp.id~=id_math do 
+		     set_attr_icflag_processed(lp); lp  = node_next(lp) 
+		  end
+		  Np.last = lp; Np.id = id_math; lp = node_next(lp)
+		  return true
+	       end,
+   [id_glue] = function()
+		  Np.first = lp; Np.nuc = lp; set_attr_icflag_processed(lp); 
+		  Np.last = lp; Np.id = id_glue; lp = node_next(lp); return true
+	       end,
+   [id_kern] = function() 
+		  Np.first = lp
+		  if lp.subtype==2 then
+		     set_attr_icflag_processed(lp); lp = node_next(lp)
+		     set_attr_icflag_processed(lp); lp = node_next(lp)
+		     set_attr_icflag_processed(lp); lp = node_next(lp)
+		     set_attr_icflag_processed(lp); Np.nuc = lp
+		     if lp.font == has_attr(lp, attr_curjfnt) then 
+			Np.id = id_jglyph 
+		     else
+			Np.id = id_glyph 
+		     end
+		     lp = node_next(lp); check_next_ickern(); 
+		  else
+		     Np.id = id_kern; set_attr_icflag_processed(lp);
+		     Np.last = lp; lp = node_next(lp)
+		  end
+		  return true
+	       end,
+   [id_penalty] = function()
+		     Bp[#Bp+1] = lp; set_attr_icflag_processed(lp); 
+		     lp = node_next(lp); return false
+		  end,
+   [13] = function()
+		  Np.first = lp; Np.nuc = lp; Np.last = lp;
+		  Np.id = id_box_like; set_attr_icflag_processed(lp); 
+		  lp = node_next(lp); return true
+	       end,
+}
+
 local function calc_np()
    -- We assume lp = node_next(Np.last)
    local lpi, lpa, Nr
@@ -253,58 +352,16 @@ local function calc_np()
    Nq = Np; Np = Nr
    for k in pairs(Bp) do Bp[k] = nil end
    ihb_flag = false 
-   while true do
-      lpi = lp.id; lpa = has_attr(lp, attr_icflag) or 0
-      if lp==last then Np = nil; return
-      elseif lpa>=PACKED then
+   while lp ~= last do
+      lpa = has_attr(lp, attr_icflag) or 0
+      if lpa>=PACKED then
 	 if lpa == BOXBDD then
 	    local lq = node_next(lp)
 	    head = node_remove(head, lp); node_free(lp); lp = lq
 	 else calc_np_pbox(); return end -- id_pbox
-      elseif lpi == id_ins or lpi == id_mark or lpi == id_adjust then
-	 set_attr_icflag_processed(lp); lp = node_next(lp)
-      elseif lpi == id_penalty then
-	 table_insert(Bp, lp); set_attr_icflag_processed(lp); lp = node_next(lp)
-      elseif lpi == id_whatsit then
-	 if lp.subtype==sid_user and lp.user_id==30111 then
-	    local lq = node_next(lp)
-	    head = node_remove(head, lp); node_free(lp); lp = lq; ihb_flag = true
-	 else
-	    set_attr_icflag_processed(lp); lp = node_next(lp)
-	 end
-      else -- a `cluster' is found
-	 Np.first = lp
-	 if lpi == id_glyph then -- id_[j]glyph
-	    if lp.font == has_attr(lp, attr_curjfnt) then Np.id = id_jglyph 
-	    else Np.id = id_glyph end
-	    Np.nuc = lp; set_attr_icflag_processed(lp)
-	    lp = node_next(lp); check_next_ickern(); return
-	 elseif lpi == id_hlist then -- hlist
-	    Np.last = lp; Np.nuc = lp; set_attr_icflag_processed(lp)
-	    if lp.shift~=0 then Np.id = id_box_like
-	    else Np.id = lpi end
-	    lp = node_next(lp); return
-	 elseif lpi == id_vlist or lpi == id_rule then -- id_box_like
-	    Np.nuc = lp; Np.last = lp; Np.id = id_box_like; break
-	 elseif lpi == id_math then -- id_math
-	    Np.nuc = lp; lp  = node_next(lp) 
-	    while lp.id~=id_math do 
-	       set_attr_icflag_processed(lp); lp  = node_next(lp) 
-	    end; break
-	 elseif lpi == id_kern and lp.subtype==2 then -- id_kern
-	    set_attr_icflag_processed(lp); lp = node_next(lp)
-	    set_attr_icflag_processed(lp); lp = node_next(lp)
-	    set_attr_icflag_processed(lp); lp = node_next(lp)
-	    set_attr_icflag_processed(lp); Np.nuc = lp
-	    if lp.font == has_attr(lp, attr_curjfnt) then Np.id = id_jglyph 
-	    else Np.id = id_glyph end
-	    lp = node_next(lp); check_next_ickern(); return
-	 else -- id_disc, id_glue, id_kern
-	    Np.nuc = lp; break
-	 end
-      end
+      elseif calc_np_auxtable[lp.id]() then return end
    end
-   set_attr_icflag_processed(lp); Np.last = lp; Np.id = lpi; lp = node_next(lp)
+   Np = nil; return
 end
 
 -- extract informations from Np
@@ -315,23 +372,25 @@ end
 -- 和文文字のデータを取得
 local function set_np_xspc_jachar(x)
    local z = ltjf_font_metric_table[x.font]
-   local cls = ltjf_find_char_class(x.char, z)
+   local c = x.char
+   local cls = ltjf_find_char_class(c, z)
+   local m = ltjf_metrics[z.jfm]
    set_attr(x, attr_jchar_class, cls)
    Np.class = cls
-   Np.char = x.char
+   Np.char = c
    Np.size= z.size
-   Np.met = ltjf_metrics[z.jfm]
+   Np.met = m
    Np.var = z.var
-   Np.pre = ltjs_get_penalty_table('pre', x.char, 0, box_stack_level)
-   Np.post = ltjs_get_penalty_table('post', x.char, 0, box_stack_level)
-   z = fast_find_char_class('lineend', Np.met)
-   local y = Np.met.size_cache[Np.size].char_type[Np.class]
+   Np.pre = ltjs_get_penalty_table('pre', c, 0, box_stack_level)
+   Np.post = ltjs_get_penalty_table('post', c, 0, box_stack_level)
+   z = fast_find_char_class('lineend', m)
+   local y = m.size_cache[Np.size].char_type[Np.class]
    if y.kern and y.kern[z] then 
       Np.lend = y.kern[z]
    else 
       Np.lend = 0 
    end
-   y = ltjs_get_penalty_table('xsp', x.char, 3, box_stack_level)
+   y = ltjs_get_penalty_table('xsp', c, 3, box_stack_level)
    Np.xspc_before = (y%2==1)
    Np.xspc_after  = (y>=2)
    Np.auto_kspc = (has_attr(x, attr_autospc)==1)

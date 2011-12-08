@@ -16,9 +16,29 @@ local node_new = node.new
 local id_whatsit = node.id('whatsit')
 local sid_user = node.subtype('user_defined')
 local hmode = 118 -- in luatexref-t.pdf, this must be 127
-local table_fastcopy = table.fastcopy
 
 local charprop_stack_table={}; charprop_stack_table[0]={}
+
+-- modified from table.fastcopy
+local next = next
+local function stack_table_copy_aux(old) 
+   local new = {}
+   for i,v in next, old do
+      new[i] = v
+   end
+   return new
+end
+local function stack_table_copy(old) 
+   if old then 
+      local new = {}
+      for i,v in next, old do
+	 new[i] = stack_table_copy_aux(v)
+      end
+      return new
+   else
+      return {}
+   end 
+end
 
 function get_stack_level()
    local i = tex.getcount('ltj@@stack')
@@ -32,7 +52,7 @@ function get_stack_level()
       for k,v in pairs(charprop_stack_table) do -- clear the stack above i
 	 if k>=i then charprop_stack_table[k]=nil end
       end
-      charprop_stack_table[i] = table_fastcopy(charprop_stack_table[i-1])
+      charprop_stack_table[i] = stack_table_copy(charprop_stack_table[i-1])
       tex.setcount('ltj@@stack', i)
       if gd>0 then tex.globaldefs = gd end
       if tex.nest[tex.nest.ptr].mode == hmode or
