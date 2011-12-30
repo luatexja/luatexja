@@ -22,6 +22,7 @@
 \DeclareRobustCommand\epTeX{\ensuremath{\varepsilon}-\kern-.125em\pTeX}
 
 \ltjsetparameter{jacharrange={-3}}
+\ltjdefcharrange{6}{`■}
 \theoremstyle{definition}
 %<en>\newtheorem{defn}{Definition}
 %<ja>\newtheorem{defn}{定義}
@@ -47,6 +48,9 @@
 % Suppress output from showexpl to stdout.
 \let\SX@Info\relax
 \makeatother
+
+\def\Node#1#2{\,\vcenter{\hbox{\fboxsep=1pt\fbox{\vbox{\small\halign{\hfil##\hfil\cr
+  #1\mathstrut\cr\noalign{\hrule height.4pt}\strut#2\cr}}}}\,}}
 
 %<*en>
 \title{The \LuaTeX-ja package}
@@ -509,7 +513,7 @@ Note that the forefront of development may not be in \texttt{master} branch.
 \item If \texttt{mktexlsr} is needed to update the file name database, make it so.
 %</en>
 %<*ja>
-\item もし \texttt{mktexlsr} を実行する必要があればそうする．
+\item 必要があれば，\texttt{mktexlsr} を実行する．
 %</ja>
 \end{enumerate}
 
@@ -523,7 +527,7 @@ Note that the forefront of development may not be in \texttt{master} branch.
 %</en>
 %<*ja>
 \item 原稿のソースファイルの文字コードは UTF-8 でなければならない．
-      EUC-JP や Shift-JIS は使用できない．
+      従来日本語の文字コードとして用いられてきた EUC-JP や Shift-JIS は使用できません．
 %</ja>
 
 %<*en>
@@ -779,8 +783,8 @@ sources like the following:
 %</en>
 %<*ja>
 \paragraph{意見：数式モード中の和文文字}
-\pTeX では数式中での和文文字の使用がサポートされていたので，
-以下のようなソースが存在した：
+\pTeX では，何もしないでも数式中に和文文字を記述することができた．そのため，
+以下のようなソースが見られた：
 %</ja>
 \begin{LTXexample}
 $f_{高温}$~($f_{\text{high temperature}}$).
@@ -927,12 +931,13 @@ auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
       fonts, \emph{or both}. For detail, see Subsection~\ref{ssub-nfsspat}.
 %</en>
 %<*ja>
-      ここで，\verb+\fontencoding{<encoding>}+は，引数により和文側か欧文側かの
-      どちらかが切り替わる．例えば，\verb+\fontencoding{JY3}+は和文フォントの
-      エンコーディングを\texttt{JY3}に変更し，\verb+\fontencoding{T1}+ は欧文
-      フォント側を\texttt{T1}へと変更する．
-      \verb+\fontfamily+も引数により和文側，欧文側，\textbf{あるいは両方}のフォ
-      ントファミリが切り替わる．詳細は\ref{ssub-nfsspat}節を参照すること．
+      ここで，\verb+\fontencoding{<encoding>}+は，引数により和文側か欧文
+      側かのどちらかのエンコーディングを変更する．例えば，
+      \verb+\fontencoding{JY3}+は和文フォントのエンコーディングを
+      \texttt{JY3}に変更し，\verb+\fontencoding{T1}+ は欧文フォント側を
+      \texttt{T1}へと変更する．\verb+\fontfamily+も引数により和文側，欧文
+      側，\textbf{あるいは両方}のフォントファミリを変更する．詳細は
+      \ref{ssub-nfsspat}節を参照すること．
 %</ja>
 
 %<*en>
@@ -948,8 +953,8 @@ auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
 %</ja>
 \end{itemize}
 
+\subsection{fontspec}
 %<*en>
-\paragraph{fontspec}
 To coexist with the \Pkg{fontspec} package, it is needed to load
 \Pkg{luatexja-fontspec} package in the preamble. This additional
 package automatically loads \Pkg{luatexja} and \Pkg{fontspec}
@@ -1024,8 +1029,39 @@ these 7~commands, since this feature and \textbf{JAglue} will clash (see
 和文フォントについては全ての和文文字のグリフがほぼ等幅であるのが普通であるため，
 \verb+\setmonojfont+ コマンドは存在しないことに注意．また，これらの和文用の7つのコマ
 ンドでは Kerning feature はデフォルトでは off となっている．これはこの
-feature が \textbf{JAglue} と衝突するためである（\ref{para-kern} 節を見よ）．
+feature が \textbf{JAglue} と衝突するためである（\ref{para-kern} 節を参照）．
 %</ja>
+
+%<*en>
+\paragraph{Caution}
+\Pkg{xunicode} package will be reloaded during the loading of \Pkg{luatexja-fontspec} package.
+However, this reloading won't work for the current version (2011/09/09,~v0.981) of 
+\Pkg{xunicode} package. Hence we have to patch it, using the following patch, for example:
+%</en>
+%<*ja>
+\paragraph{注意}
+\Pkg{luatexja-fontspec}パッケージでは，内部で \Pkg{xunicode} パッケージの再読み込みを
+行っているが， \textbf{\TeX\ Live\ 2011 他に含まれている \Pkg{xunicode} パッケージ
+(2011/09/09,~v0.981) ではその再読み込みがうまく動作せず}，例えば
+以下のようなパッチを当てる必要がある：
+%</ja>
+\begin{lstlisting}
+--- xunicode.sty.orig   2011-09-12 08:31:47.000000000 +0900
++++ xunicode.sty        2011-11-16 22:06:17.061413113 +0900
+@@ -1475,7 +1475,11 @@
+ 
+ \newtoks\tipasavetokens
+ \newtoks\tipachecktokens
++
++\fi
+ \newif\iftipaonetoken
++\expandafter\ifx\csname ReloadXunicode\endcsname\relax
++
+ \def\tipalasttoken{!@! do nothing with this !@!}
+ \def\tipacatchonechar#1{\begingroup
+  \def\textipa##1{##1}% prevent recursion
+\end{lstlisting}
+
 
 %<en>\section{Changing Parameters}
 %<ja>\section{パラメータの変更}
@@ -1513,20 +1549,15 @@ It is not desirable that \Param{xkanjiskip} is inserted into every
 boundary between \textbf{JAchar}s and \textbf{ALchar}s. For example,
 \Param{xkanjiskip} should not be inserted after opening parenthesis
 (\textit{e.g.}, compare `(あ' and `(\hskip\ltjgetparameter{xkanjiskip}あ').
+\LuaTeX-ja can control whether \Param{xkanjiskip} can be inserted
+before/after a character, by changing \Param{jaxspmode} for \textbf{JAchar}s and
+\Param{alxspmode} parameters \textbf{ALchar}s respectively.
 %</en>
 %<*ja>
 \Param{xkanjiskip} がすべての \textbf{JAchar} と \textbf{ALchar} の境界に
 挿入されるのは望ましいことではない．例えば，\Param{xkanjiskip} は開き括弧の
 後には挿入されるべきではない（`(あ' と `(\hskip\ltjgetparameter{xkanjiskip}あ' を
 比べてみよ）．
-%</ja>
-
-%<*en>
-\LuaTeX-ja can control whether \Param{xkanjiskip} can be inserted
-before/after a character, by changing \Param{jaxspmode} for \textbf{JAchar}s and
-\Param{alxspmode} parameters \textbf{ALchar}s respectively.
-%</en>
-%<*ja>
 \LuaTeX-ja では \Param{xkanjiskip} をある文字の前／後に挿入するかどうかを，
 \textbf{JAchar} に対しては \Param{jaxspmode} を，\textbf{ALchar} に対しては
 \Param{alxspmode} をそれぞれ変えることで制御することができる．
@@ -1540,18 +1571,20 @@ pあq い!う
 The second argument \texttt{preonly} means `the insertion of
 \Param{xkanjiskip} is allowed before this character, but not after'.
 the other possible values are \texttt{postonly}, \texttt{allow} and \texttt{
-inhibit}. For the compatibility with \pTeX, natural numbers between
-0~and~3 are also allowed as the second argument\footnote{But we don't
-recommend this: since numbers 1~and~2 have opposite meanings in
-\Param{jaxspmode} and \Param{alxspmode}.}.
+inhibit}. ...
 %</en>
 %<*ja>
-2つ目のの引数の \texttt{preonly} は「\Param{xkanjiskip} の挿入はこの文字の前でのみ
-許され，後では許さない」ことを意味する．他に指定可能な値は \texttt{postonly},
-\texttt{allow}, \texttt{inhibit} である．\pTeX との互換性のために，
-0から3の自然数を2つ目の引数として指定することも可能である\footnote{しかし，
-これは推奨されない：なぜならば 1 と 2 は \Param{jaxspmode} と \Param{alxspmode} で
-逆の意味になるから．}．
+2つ目の引数の \texttt{preonly} は「\Param{xkanjiskip} の挿入はこの文字の
+前でのみ許され，後では許さない」ことを意味する．他に指定可能な値は
+\texttt{postonly}, \texttt{allow}, \texttt{inhibit} である．
+
+なお，現行の
+仕様では，\Param{jaxspmode}, \Param{alxspmode} はテーブルを共有しており，
+上のソースの1行目を次のように変えても同じことになる：
+\begin{verbatim}
+\ltjsetparameter{alxspmode={`あ,preonly}, jaxspmode={`\!,postonly}}
+\end{verbatim}
+また，これら2パラメータには数値で値を指定することもできる（第\ref{part-ref}部を参照）．
 %</ja>
 
 %<*en>
@@ -1751,14 +1784,14 @@ which JFM will be used for this font by the following keys:
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
 \item[jfm=<name>]
 %<*en>
-Specify the name of JFM. A file named \texttt{jfm-<name>.lua} will be searched
-and/or loaded.
+Specify the name of JFM. If specified JFM has not been loaded, \LuaTeX-ja search and load 
+a file named \texttt{jfm-<name>.lua}.
 
-The followings are JFMs shipped with \LuaTeX-ja:
+The following JFMs are shipped with \LuaTeX-ja:
 %</en>
 %<*ja>
-JFM の名前を指定する．ファイル名が \texttt{jfm-<name>.lua} のものを探し，
-もし存在すればそれを読み込む．
+JFM の名前を指定する．もし以前に指定されたJFMが読み込まれていなければ，
+\texttt{jfm-<name>.lua} を読み込む．
 
 以下の JFM が \LuaTeX-ja には同梱されている：
 %</ja>
@@ -1766,13 +1799,12 @@ JFM の名前を指定する．ファイル名が \texttt{jfm-<name>.lua} のも
 %<*en>
 \item[\tt jfm-ujis.lua] A standard JFM in \LuaTeX-ja. This JFM is
   based on \verb+upnmlminr-h.tfm+, a metric for UTF/OTF package that
-  is used in \upTeX. When you use the \Pkg{luatexja-otf} package, please use this JFM.
+  is used in \upTeX. When you use the \Pkg{luatexja-otf} package, you should use this JFM.
 %</en>
 %<*ja>
 \item[\tt jfm-ujis.lua] \LuaTeX-ja の標準 JFM である．この JFM は \upTeX で
   用いられる UTF/OTF パッケージ用のメトリックである \verb+upnmlminr-h.tfm+ を
-  元にしている．\Pkg{luatexja-otf} パッケージを使うときはこの JFM を指定して
-  下さい．
+  元にしている．\Pkg{luatexja-otf} パッケージを使うときはこの JFM を指定するべきである．
 %</ja>
 %<*en>
 \item[\tt jfm-jis.lua] A counterpart for \verb+jis.tfm+, `JIS font
@@ -1801,7 +1833,7 @@ JFM の名前を指定する．ファイル名が \texttt{jfm-<name>.lua} のも
 %</ja>
 \end{description}
 
-\item[jfmvar=<string>] Sometimes there is a need that
+\item[jfmvar=<string>] Sometimes there is a need that ...
 \end{list}
 
 \begin{table}[t]
@@ -1827,8 +1859,8 @@ JFM の名前を指定する．ファイル名が \texttt{jfm-<name>.lua} のも
 \toprule
 &\tt jfm-ujis.lua&\tt jfm-jis.lua&\tt jfm-min.lua\\
 \midrule
-%<en>Example~1
-%<ja>例1
+%<en>Example~1\footnotemark
+%<ja>例1\footnotemark
 &\r{ujis}&\r{jis}&\r{min}\\
 %<en>Example~2
 %<ja>例2
@@ -1839,6 +1871,8 @@ Bounding Box&\t{ujis}&\t{jis}&\t{min}\\
 \end{center}
 \ltjsetparameter{jacharrange={-3}}
 \end{table}
+\footnotetext{from: 乙部厳己, min10フォントについて.
+\texttt{http://argent.shinshu-u.ac.jp/\~{\ }otobe/tex/files/min10.pdf}.}
 
 %<en>\paragraph{Note: kern feature}
 %<ja>\paragraph{注意：kern feature}
@@ -2918,11 +2952,8 @@ u
 %<ja>\section{JFM グルーの挿入，\Param{kanjiskip} と \Param{xkanjiskip}}
 %<en>\subsection{Overview}
 %<ja>\subsection{概要}
-%<*en>
-NOT COMPLETED
-%</en>
 
-%<*ja>
+
 \LuaTeX-ja における和文処理グルーの挿入方法は，\pTeX のそれとは全く異なる．
 \pTeX では次のような仕様であった：
 \begin{itemize}
@@ -2937,22 +2968,19 @@ NOT COMPLETED
 3種類を一度に挿入することになっている．これは，\LuaTeX において欧文の合字・
 カーニング処理がノードベースになったことに対応する変更である．
 
-\LuaTeX-jaにおける\textbf{JAglue}挿入処理では，下の図\ref{fig-clu}のよう
-に「塊」を単位にして行われる．大雑把にいうと，「塊」は文字とそれに付随す
+\LuaTeX-jaにおける\textbf{JAglue}挿入処理では，次節で定義する
+「クラスタ」を単位にして行われる．大雑把にいうと，「クラスタ」は文字とそれに付随す
 るノード達（アクセント位置補正用のkernや，イタリック補正）をまとめたもの
-であり，2つの塊の間には，ペナルティ，\verb+\vadjust+，whatsitなど，行組版
-には関係しないものがある．そのため，……
-%</ja>
+であり，2つのクラスタの間には，ペナルティ，\verb+\vadjust+，whatsitなど，行組版
+には関係しないものがある．
 
-% \begin{figure}[!tb]
-% \unitlength=10mm
-% \end{figure}
 
-%<en>\subsection{Definition of a `cluster'}
-%<ja>\subsection{「クラスタ」の定義}
+%<en>\subsection{Step 0: definition of a `cluster'}
+%<ja>\subsection{Step 0: 「クラスタ」の定義}
 
 \begin{defn}
-A \emph{cluster} is a list of nodes in one of the following forms, with the \textit{id} of it:
+A \emph{cluster} is a list of consecutive nodes in one of the following forms,
+with the \textit{id} of it:
 \begin{enumerate}
 \item Nodes whose value of\ \verb+\ltj@icflag+ is in $[3,15)$.  These
       nodes come from a hbox which is already packaged, by unpackaging
@@ -2961,8 +2989,25 @@ A \emph{cluster} is a list of nodes in one of the following forms, with the \tex
 \item A inline math formula, including two \textit{math\_node}s at the boundary of it:
 HOGE
       The \textit{id} is \textit{id\_math}.
-\item A \textit{glyph\_node} with nodes which relate with it:
-HOGE
+\item A \textit{glyph\_node}~$p$ with nodes which relate with it:
+\begin{enumerate}
+\item A kern for the italic correction of~$p$. 
+\item An accent attached to $p$ by \verb+\accent+. 
+\end{enumerate}
+\[
+\overbrace{%
+ \Node{kern}{$\mathit{subtype}=2$}\longrightarrow
+\left\{\begin{array}{c}
+\Node{glyph}{accent}\\\noalign{\medskip}
+\Node{hbox}{accent (shifted vert.)}
+\end{array}\right\}\longrightarrow
+\Node{kern}{$\mathit{subtype}=2$}}^{\text{(a)}}
+\longrightarrow
+\Node{glyph}{$p$}\longrightarrow 
+\overbrace{%
+\Node{kern}{italic corr.}}^{\text{(b)}}
+\]
+
 The \textit{id} is \textit{id\_jglyph} or
 \textit{id\_glyph}, according to whether the \textit{glyph\_node}
 represents a Japanese character or not.
@@ -2973,30 +3018,23 @@ The \textit{id} is \textit{id\_hlist} if the node is an
 \item A glue, a kern whose subtype is not 2~(\textit{accent}), and a discretionary break.
 The \textit{id} is \textit{id\_glue}, \textit{id\_kern}
       and \textit{id\_disc}, respectively.
-%Just a node which will \dots, \textit{i.e.}, a node which is \emph{not} one of the following:
-%\textit{ins\_node}, \textit{mark\_node}, \textit{adjust\_node}, \textit{whatsit\_node}
-%and \textit{penalty\_node}.
 \end{enumerate}
 We denote a cluster by \textit{Np}, \textit{Nq} and \textit{Nr}.
 \end{defn}
 
-Internally, a cluster is represented by a table $\textit{Np}$ with the following fields.
+以降は日本語．
 
+一部のクラスタの\textit{id}の意味は次の通り：
 \begin{description}
-\def\makelabel#1{\textbf{\textit{#1}}}
-\item[first, last] The first/last node of the cluster.
-\item[id] The \textit{id} in above definition.
-\item[nuc]
-
-% jachar
-\item[auto\_kspc, auto\_xspc]
-\item[xspc\_before, xspc\_after]
-
-% alchar, jachar
-\item[pre, post]
-\item[char]
-\item[class]
-\item[lend]
-\item[met, var]
+\item[\textit{id\_glyph}] 欧文文字（`ffi' のようなリガチャ由来の可能性あり）．
+\item[\textit{id\_jglyph}] 和文文字．
+\item[\textit{id\_math}] インライン数式．「文字コード$-1$の欧文文字」として内部では扱われる．
+\item[\textit{id\_hlist}] 縦方向にシフトされていない hbox．
+\item[\textit{id\_pbox}] 「既に処理された」ノードのリスト．
+\item[\textit{id\_box\_like}] \textit{id\_hlist}とならないbox
+（縦方向にシフトされたhboxや，vbox）か，rule．
+\item[\textit{id\_disc}] discretionary break (\verb+\discretionary{pre}{post}{nobreak}+).
 \end{description}
+
+
 \end{document}
