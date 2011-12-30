@@ -308,7 +308,8 @@ local calc_np_auxtable = {
 		  while lp.id~=id_math do 
 		     set_attr_icflag_processed(lp); lp  = node_next(lp) 
 		  end
-		  Np.last = lp; Np.id = id_math; lp = node_next(lp)
+		  set_attr_icflag_processed(lp); 
+		  Np.last = lp; Np.id = id_math; lp = node_next(lp); 
 		  return true
 	       end,
    [id_glue] = function()
@@ -877,7 +878,7 @@ local function init_var()
       last=node.tail(head)
    else 
       -- the current list is the contents of a hbox:
-      -- insert a sentinel
+      -- insert a sentinelEG
       last=node.tail(head); local g = node_new(id_kern)
       node_insert_after(head, last, g); last = g
    end
