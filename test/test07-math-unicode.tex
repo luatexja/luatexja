@@ -1,16 +1,21 @@
 %#!lualatex
-\documentclass{article}
+\documentclass{ltjsarticle}
 \usepackage[a4paper]{geometry}
-
-\usepackage{luatexja-fontspec}
-
-\usepackage{luatexja}
 \makeatletter\ltj@alljachar %←全部の（>=U+0080な）文字を和文文字扱いに！
 
+\usepackage{luatexja-fontspec}
 \usepackage{unicode-math}
+
+
 \setmathfont{XITSMath}
 \setmainjfont{IPAGothic}
 
+\makeatletter
+\reDeclareMathAlphabet{\mathtestA}{\mathrm}{\mathmc}
+\reDeclareMathAlphabet{\mathtestB}{\mathrm}{\mathtestb}
+\reDeclareMathAlphabet{\mathtestC}{\mathtesta}{\mathmc}
+\reDeclareMathAlphabet{\mathtestD}{\mathtesta}{\mathtestb}
+\reDeclareMathAlphabet{\mathtestE}{\mathtestE}{\mathmc}
 \begin{document}\makeatletter
 
 \[
@@ -19,16 +24,28 @@
 =\frac16\cdot \pi\times\pi,\qquad a_1,\dots,a_n.
 \]
 
-$
- \frac1{1^2}+\frac1{2^2}+\cdots=
-\sum_{n=1}^\infty \frac1{n^s\zeta}=\zeta(2)=\frac{\pi^2}{6}
-=\frac16\cdot \pi\times\pi,\qquad a_1,\dots,a_n. \hbar
-$
+$\hslash$
 
-{\tt\meaning\sum}
+○×○漢×漢\times え\ltjjachar`\“え\ltjalchar`\“え\textquotedblleft え“え←数式外では和文文字扱いのままになっている．
 
+\kanjifamily{mc}\selectfont
+$あいうえおabcde a^\mathrm{b}$
 
-○×○漢\ltjjachar`\×漢\ltjalchar`\×漢\times 漢
-え\ltjjachar`\“え\ltjalchar`\“え\textquotedblleft え“え
-←数式外では和文文字扱いのままになっている．
+mathrm: $\mathrm{\alpha あいうえおabcde}^\mathrm{b}$
+
+mathbf: $\mathbf{\alpha あいうえおabcde}$
+
+mathmc: $\mathmc{\alpha あいうえおabcde}$
+
+mathgt: $\mathgt{\alpha あいうえおabcde}$
+
+\tt\meaning\mathtestA
+
+\tt\meaning\mathtestB
+
+\tt\meaning\mathtestC
+
+\tt\meaning\mathtestD
+
+\tt\meaning\mathtestE
 \end{document}
