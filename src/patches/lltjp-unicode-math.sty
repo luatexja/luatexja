@@ -9,23 +9,6 @@
 
 \ExplSyntaxOn
 
-%%%%%% 以下の3命令の再定義はもはや不要と思われる（北川） 
-% \cs_set:Npn \um_set_mathcode:nnnn #1#2#3#4 {
-%   \Umathcode \int_eval:n {#1} =
-%   \mathchar@type#2 \csname sym#3\endcsname \int_eval:n {#4} \scan_stop:
-%   \ltjsetmathletter{\int_eval:n {#4}}
-% }
-% \cs_set:Npn \um_set_mathcode:nnn #1#2#3 {
-%   \Umathcode \int_eval:n {#1} =
-%   \mathchar@type#2 \csname sym#3\endcsname \int_eval:n {#1} \scan_stop:
-%   \ltjsetmathletter{\int_eval:n {#1}}
-% }
-% \cs_set:Npn \um_set_mathchar:NNnn #1#2#3#4 {
-%   \Umathchardef #1 =
-%   \mathchar@type#2 \csname sym#3\endcsname \int_eval:n {#4} \scan_stop:
-%   \ltjsetmathletter{\int_eval:n {#4}}
-% }
-%%%%%%
 \group_begin:
   \cs_gset:Npn \um_cs_set_eq_active_char:Nw #1 = "#2 \q_nil {%"
     \group_begin:
@@ -41,4 +24,7 @@
 \group_end:
 
 \ExplSyntaxOff
+
 \endinput
+
+

@@ -329,72 +329,9 @@
         {\not@math@alphabet\ttfamily\mathtt
          \romanfamily\ttdefault\kanjifamily\gtdefault\selectfont}
 %%
-\def\reDeclareMathAlphabet#1#2#3{%
-  \edef\@tempa{\expandafter\@gobble\string#2}%
-  \edef\@tempb{\expandafter\@gobble\string#3}%
-  \edef\@tempc{\string @\expandafter\@gobbletwo\string#2}%
-  \ifx\@tempc\@tempa%
-    \edef\@tempa{\expandafter\@gobbletwo\string#2}%
-    \edef\@tempb{\expandafter\@gobbletwo\string#3}%
-  \fi
-  \begingroup
-    \let\protect\noexpand
-    \def\@tempaa{\relax}%
-    \expandafter\ifx\csname RDMAorg@\@tempa\endcsname\relax
-      \edef\@tempaa{\expandafter\def\expandafter\noexpand%
-        \csname RDMAorg@\@tempa\endcsname{%
-          \expandafter\noexpand\csname\@tempa\endcsname}}%
-    \fi
-    \def\@tempbb{\relax}%
-    \expandafter\ifx\csname RDMAorg@\@tempb\endcsname\relax
-      \edef\@tempbb{\expandafter\def\expandafter\noexpand%
-        \csname RDMAorg@\@tempb\endcsname{%
-          \expandafter\noexpand\csname\@tempb\endcsname}}%
-    \fi
-    \edef\@tempc{\@tempaa\@tempbb}%
-  \expandafter\endgroup\@tempc%
-  \edef#1{\noexpand\protect\expandafter\noexpand\csname%
-    \expandafter\@gobble\string#1\space\space\endcsname}%
-  \expandafter\edef\csname\expandafter\@gobble\string#1\space\space\endcsname%
-    {\noexpand\DualLang@mathalph@bet%
-      {\expandafter\noexpand\csname RDMAorg@\@tempa\endcsname}%
-      {\expandafter\noexpand\csname RDMAorg@\@tempb\endcsname}%
-  }%
-}
-\@onlypreamble\reDeclareMathAlphabet
-\def\DualLang@mathalph@bet#1#2{%
-  \relax\ifmmode
-    \ifx\math@bgroup\bgroup%     2e normal style     (\mathrm{...})
-      \bgroup\let\DualLang@Mfontsw\DLMfontsw@standard
-    \else
-      \ifx\math@bgroup\relax%    2e two letter style (\rm->\mathrm)
-        \let\DualLang@Mfontsw\DLMfontsw@oldstyle
-      \else
-        \ifx\math@bgroup\@empty% 2.09 oldlfont style ({\mathrm ...})
-          \let\DualLang@Mfontsw\DLMfontsw@oldlfont
-        \else%                   panic! assume 2e normal style
-          \bgroup\let\DualLang@Mfontsw\DLMfontsw@standard
-        \fi
-      \fi
-    \fi
-  \else
-    \let\DualLang@Mfontsw\@firstoftwo
-  \fi
-  \DualLang@Mfontsw{#1}{#2}%
-}
-\def\DLMfontsw@standard#1#2#3{#1{#2{#3}}\egroup}
-\def\DLMfontsw@oldstyle#1#2{#1\relax\@fontswitch\relax{#2}}
-\def\DLMfontsw@oldlfont#1#2{#1\relax#2\relax}
-\if@compatibility\else
-  \DeclareSymbolFont{mincho}{JY3}{mc}{m}{n}
-  \DeclareSymbolFontAlphabet{\mathmc}{mincho}
-  \SetSymbolFont{mincho}{bold}{JY3}{gt}{m}{n}
-  \jfam\symmincho
-  \DeclareMathAlphabet{\mathgt}{JY3}{gt}{m}{n}
-\fi
 \AtBeginDocument{%
-  \reDeclareMathAlphabet{\mathrm}{\@mathrm}{\@mathmc}
-  \reDeclareMathAlphabet{\mathbf}{\@mathbf}{\@mathgt}}
+  \reDeclareMathAlphabet{\mathrm}{\mathrm}{\mathmc}
+  \reDeclareMathAlphabet{\mathbf}{\mathbf}{\mathgt}}%
 \ltjsetparameter{jaxspmode={`〒,2}}
 \ltjsetparameter{alxspmode={`+,3}}
 \ltjsetparameter{alxspmode={`\%,3}}

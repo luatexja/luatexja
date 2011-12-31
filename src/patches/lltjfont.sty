@@ -231,41 +231,16 @@
    \endgroup
   }
 \def\reDeclareMathAlphabet#1#2#3{%
-  \edef#1{\noexpand\protect\expandafter\noexpand\csname%
-    \expandafter\@gobble\string#1\space\space\endcsname}%
-  \edef\@tempa{\expandafter\@gobble\string#2}%
-  \edef\@tempb{\expandafter\@gobble\string#3}%
-  \edef\@tempc{\string @\expandafter\@gobbletwo\string#2}%
-  \ifx\@tempc\@tempa%
-    \edef\@tempa{\expandafter\@gobbletwo\string#2}%
-    \edef\@tempb{\expandafter\@gobbletwo\string#3}%
-  \fi
-  \expandafter\edef\csname\expandafter\@gobble\string#1\space\space\endcsname%
-    {\noexpand\DualLang@mathalph@bet%
-      {\expandafter\noexpand\csname\@tempa\space\endcsname}%
-      {\expandafter\noexpand\csname\@tempb\space\endcsname}%
-  }%
+  \ifdefined#2 
+    \ifdefined#3
+      \toks0\expandafter{#3}%
+      \@temptokena\expandafter{#2}%
+      \long\protected\edef#1##1{\the\@temptokena{\the\toks0{##1}}}%
+    \else\let#1#2\fi
+  \else
+    \ifdefined#3\let#1#3\fi\fi
 }
 \@onlypreamble\reDeclareMathAlphabet
-\def\DualLang@mathalph@bet#1#2{%
-  \relax\ifmmode
-    \ifx\math@bgroup\bgroup%     2e normal style     (\mathrm{...})
-      \bgroup\let\DualLang@Mfontsw\DLMfontsw@standard
-    \else
-      \ifx\math@bgroup\relax%    2e two letter style (\rm->\mathrm)
-        \let\DualLang@Mfontsw\DLMfontsw@oldstyle
-      \else
-        \bgroup\let\DualLang@Mfontsw\DLMfontsw@standard
-      \fi
-    \fi
-  \else
-    \let\DualLang@Mfontsw\@firstoftwo
-  \fi
-  \DualLang@Mfontsw{#1}{#2}%
-}
-\def\DLMfontsw@standard#1#2#3{#1{#2{#3}}\egroup}
-\def\DLMfontsw@oldstyle#1#2{#1\relax\@fontswitch\relax{#2}}
-\def\DLMfontsw@oldlfont#1#2{#1\relax#2\relax}
 \def\all@shape{all}%
 \def\DeclareRelationFont#1#2#3#4#5#6#7#8{%
   \def\rel@shape{#4}%

@@ -856,13 +856,12 @@ plain \TeX で和文フォントを変更するためには，\verb+\jfont+ プ�
 
 %<*en>
 \paragraph{NFSS2}
-For \LaTeXe, \LuaTeX-ja simply adopted the font selection system from that
-of \pLaTeXe\ (in \texttt{plfonts.dtx}).
+For \LaTeXe, \LuaTeX-ja adopted most of the font selection system of \pLaTeXe\ (in \texttt{plfonts.dtx}).
 %</en>
 %<*ja>
 \paragraph{NFSS2}
-\LaTeXe については，\LuaTeX-ja では単にフォント選択システムを \pLaTeXe\ (\texttt{plfonts.dtx})
-から採用している．
+\LaTeXe については，\LuaTeX-ja ではフォント選択システムを \pLaTeXe\ (\texttt{plfonts.dtx})
+の大部分を採用している．
 %</ja>
 \begin{itemize}
 %<*en>
@@ -2502,14 +2501,24 @@ The above 3~commands are just the counterparts for \verb+DeclareFontEncodingDefa
 
 \item[reDeclareMathAlphabet\{<unified-cmd>\}\{<al-cmd>\}\{<ja-cmd>\}]
 和文・欧文の数式用フォントファミリを一度に変更する命令を作成する．
-具体的には，欧文数式用フォントファミリ変更の命令<al-cmd>と，和文数式用フォ
-	     ントファミリ変更の命令<ja-cmd>の2つを同時に行う命令として
+具体的には，欧文数式用フォントファミリ変更の命令<al-cmd> （\verb+\mathrm+等）と，和文数式用フォ
+	     ントファミリ変更の命令<ja-cmd>（\verb+\mathmc+等）の2つを同時に行う命令として
 	     <unified-cmd>を（再）定義する．実際の使用では<unified-cmd>と
-	     <al-cmd>に同じものを指定する，すなわち，<al-cmd>に和文側も変
+	     <al-cmd>に同じものを指定する，すなわち，<al-cmd>で和文側も変
 	     更させるようにするのが一般的と思われる．
 
-本コマンドの使用については，\pLaTeX 配布中の\texttt{plfonts.dtx}に詳しく
-	     注意点が述べられているので，そちらを参照されたい．
+{\let\item=\origitem
+本命令は
+\begin{center}\tt
+<unified-cmd>\{<arg>\}\quad$\longrightarrow$\quad
+(<al-cmd>を1段展開したもの)\{<ja-cmd>を1段展開したもの)\{<arg>\}\}
+\end{center}
+と定義を行うので，使用には注意が必要である：
+\begin{itemize}
+\item <al-cmd>,~<ja-cmd>は既に定義されていなければならない．\verb+\reDeclareMathAlphabet+後に
+両命令の内容を再定義しても，<unified-cmd>の内容にそれは反映されない．
+\item <al-cmd>,~<ja-cmd>に\verb+\@mathrm+などと \texttt{@} をつけた命令を指定した時の動作は保証できない．
+\end{itemize}}
 
 \item[DeclareRelationFont\{<ja-encoding>\}\{<ja-family>\}\{<ja-series>\}\{<ja-shape>\}\\
   \hfill\{<al-encoding>\}\{<al-family>\}\{<al-series>\}\{<al-shape>\}]
@@ -2975,8 +2984,8 @@ u
 には関係しないものがある．
 
 
-%<en>\subsection{Step 0: definition of a `cluster'}
-%<ja>\subsection{Step 0: 「クラスタ」の定義}
+%<en>\subsection{definition of a `cluster'}
+%<ja>\subsection{「クラスタ」の定義}
 
 \begin{defn}
 A \emph{cluster} is a list of consecutive nodes in one of the following forms,
@@ -3011,7 +3020,7 @@ HOGE
 The \textit{id} is \textit{id\_jglyph} or
 \textit{id\_glyph}, according to whether the \textit{glyph\_node}
 represents a Japanese character or not.
-\item An box-like node, that is, an hbox, an vbox and an rule (\verb+\vrule+).
+\item An box-like node, that is, an hbox, an vbox, an rule (\verb+\vrule+) and an \textit{unset\_node}.
 The \textit{id} is \textit{id\_hlist} if the node is an
       hbox which is not shifted vertically, or \textit{id\_box\_like}
       otherwise.
@@ -3024,17 +3033,42 @@ We denote a cluster by \textit{Np}, \textit{Nq} and \textit{Nr}.
 
 以降は日本語．
 
-一部のクラスタの\textit{id}の意味は次の通り：
+次に，$\mathit{Np}.\mathit{id}$の意味を述べるとともに，
+「先頭の文字」を表す\textit{glyph\_node}~$\mathit{Np}.\mathit{head}$と，
+「最後の文字」を表す\textit{glyph\_node}~$\mathit{Np}.\mathit{tail}$を次のように定義する．
+
+
 \begin{description}
-\item[\textit{id\_glyph}] 欧文文字（`ffi' のようなリガチャ由来の可能性あり）．
-\item[\textit{id\_jglyph}] 和文文字．
-\item[\textit{id\_math}] インライン数式．「文字コード$-1$の欧文文字」として内部では扱われる．
-\item[\textit{id\_hlist}] 縦方向にシフトされていない hbox．
+\item[\textit{id\_jglyph}] 和文文字．\\
+$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$は，その和文文字を表している
+\textit{glyph\_node}そのものである．
+\item[\textit{id\_glyph}] 和文文字を表していない\textit{glyph\_node}~$p$．\\
+多くの場合，$p$は欧文文字を格納しているが，`ffi'などの合字によって作られた
+\textit{glyph\_node}である可能性もある．
+前者の場合，$\mathit{Np}.\mathit{head}$,~$\mathit{Np}.\mathit{tail} = p$である．
+一方，後者の場合，
+\begin{itemize}
+\item $\mathit{Np}.\mathit{head}$は，
+合字の構成要素の先頭→（その\textit{glyph\_node}における）合字の構成要素の先頭→……
+と再帰的に検索していってたどり着いた\textit{glyph\_node}である．
+\item $\mathit{Np}.\mathit{last}$は，同様に末尾→末尾→と検索してたどり着いた\textit{glyph\_node}である．
+\end{itemize}
+
+
+\item[\textit{id\_math}] インライン数式．\\
+便宜的に，$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$ともに
+「文字コード$-1$の欧文文字」とおく．
+\item[\textit{id\_hlist}] 縦方向にシフトされていない hbox．\\
+
+
 \item[\textit{id\_pbox}] 「既に処理された」ノードのリスト．
-\item[\textit{id\_box\_like}] \textit{id\_hlist}とならないbox
-（縦方向にシフトされたhboxや，vbox）か，rule．
 \item[\textit{id\_disc}] discretionary break (\verb+\discretionary{pre}{post}{nobreak}+).
+
+
+\item[\textit{id\_box\_like}] \textit{id\_hlist}とならないboxや，rule．
+\item[他] ...
 \end{description}
+
 
 
 \end{document}

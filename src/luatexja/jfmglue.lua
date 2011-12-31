@@ -474,9 +474,9 @@ end
 local function after_hlist()
    if last_char then
       if last_char.font == has_attr(last_char, attr_curjfnt) then 
-	 set_np_xspc_jachar(last_char, ligature_after)
+	 set_np_xspc_jachar(last_char, ligature_tail)
       else
-	 set_np_xspc_alchar(last_char.char,last_char, ligature_after)
+	 set_np_xspc_alchar(last_char.char,last_char, ligature_tail)
       end
    else
       Np.pre = nil; Np.met = nil
@@ -484,7 +484,7 @@ local function after_hlist()
 end
 local function after_alchar()
    local x = Np.nuc
-   set_np_xspc_alchar(x.char,x, ligature_after)
+   set_np_xspc_alchar(x.char,x, ligature_tail)
 end
 
 
