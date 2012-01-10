@@ -1,0 +1,87 @@
+%% Created by MaQiYuan（1113706230@qq.com, ClerkMa@gmail.com）
+% This a test file which using LuaTeX-ja to typeset Chinese.
+% 本文是使用 LuaTeX-ja 来排版中文。
+% As peoples knows that the Japanese is similar to Chinese. And the typography of both languages is highly similar too.
+% 如人所周知，日文和中文极为相似。此两者的排版也是高度相似的。
+% In this test file, part of codes can patching to your '.tex' file to typeset Chinese very well.
+% 本文档中的部分代码可以添加到你的“.tex”文档中来排印中文。
+% This file do not using 'luatexja-fontspec'. And in the futrue, when have fixed the bug in 'xunicode.sty', the 'luatexja-fontspec' is the simplest and recommended way to typeset Chinese.% 本文未使用“luatexja-fontspec”。在将来，“xunicode.sty”中的 bug 修复之后，使用“luatexja-fontspec”是最简单而且最有效的方法。
+\documentclass{article}
+\usepackage{luatexja}
+% We need set a new encoding in NFSS for Chinese: ZH (stand for "zhongwen hengban"). 
+% 我们需要重新定义一个 NFSS 中的编码来代表中文，ZH，是“中文横板”的缩写。
+\DeclareYokoKanjiEncoding{ZH}{}{}
+\DeclareKanjiEncodingDefaults{}{}
+\DeclareErrorKanjiFont{ZH}{song}{m}{n}{10}
+\DeclareKanjiSubstitution{ZH}{song}{m}{n}
+%
+\newcommand\songdefault{song}
+\newcommand\heidefault{hei}
+\renewcommand\kanjiencodingdefault{ZH}
+\renewcommand\kanjifamilydefault{\songdefault}
+\renewcommand\kanjiseriesdefault{\mddefault}
+\renewcommand\kanjishapedefault{\updefault}
+% There are two fonts usually using in Chinese typograph: 'song' style and 'hei' style. You can adding some font like 'kai' style, 'fangsong' style etc.
+% 此处设定了中文排版中的两种常用字体：宋体和黑体。你可以填入其他的字体，比如楷体和仿宋体。
+% The pTeX have using 9.62216pt's Japanese font to acompany with 10pt's Latin font. And so is in LuaTeX-ja. But this is not a must when using Chinese font.
+% pTeX 中使用 9.62216pt 大小的中文字体来配合西文字体使用。LuaTeX-ja 中也是如此。但是使用中文字体时，此项非必需。
+% There are two Adobe's font: 'AdobeSongStd-Light' and 'AdobeHeitiStd-Regular'. You also can using the 'SimSun' and 'SimHei' if your platform is Windows.
+% 此处使用两款 Adobe 字体：“AdobeSongStd-Light”和“AdobeHeitiStd-Regular”。如果你的平台是 Windows，你也可使用“中易宋体”和“中易黑体”。
+\DeclareKanjiFamily{ZH}{song}{}
+\DeclareFontShape{ZH}{song}{m}{n}{<->name:AdobeSongStd-Light:jfm=jis}{}
+\DeclareFontShape{ZH}{song}{bx}{n}{<->ssub*hei/m/n}{}
+\DeclareKanjiFamily{ZH}{hei}{}
+\DeclareFontShape{ZH}{hei}{m}{n}{<->name:AdobeHeitiStd-Regular:jfm=jis}{}
+%
+\fontencoding{ZH}\selectfont
+\DeclareTextFontCommand{\textsong}{\songfamily}
+\DeclareTextFontCommand{\texthei}{\heifamily}
+\DeclareOldFontCommand{\song}{\normalfont\songfamily}{}
+\DeclareOldFontCommand{\hei}{\normalfont\heifamily}{}
+% There is the setting of math typestting.
+%此处为数学排版设定。
+\DeclareSymbolFont{songti}{ZH}{song}{m}{n}
+\jfam\symsongti
+\SetSymbolFont{songti}{bold}{ZH}{hei}{m}{n}
+\DeclareSymbolFontAlphabet{\mathsong}{songti}
+\DeclareMathAlphabet{\mathhei}{ZH}{hei}{m}{n}
+% Redefine the fontfamily.
+% 重新定义字体族。
+\makeatletter
+\DeclareRobustCommand\songfamily{\not@math@alphabet\songfamily\mathsong\kanjifamily\songdefault\selectfont}
+\DeclareRobustCommand\heifamily{\not@math@alphabet\heifamily\mathhei\kanjifamily\heidefault\selectfont}
+\DeclareRobustCommand\rmfamily{\not@math@alphabet\rmfamily\mathrm\romanfamily\rmdefault\kanjifamily\songdefault\selectfont}
+\DeclareRobustCommand\sffamily{\not@math@alphabet\sffamily\mathsf\romanfamily\sfdefault\kanjifamily\heidefault\selectfont}
+\makeatother
+\begin{document}
+\section{字体变换}
+
+\verb!{\song 你好！}! → 你好！\hskip 4\zw\verb!{\hei 你好！}! → {\hei 你好！}
+\section{一个简单的积分公式}
+$$	\int\frac{\mathrm{d}x}{x (ax + b)} = - \frac{1}{bx} + \frac{a}{b^2}\ln\biggl|\frac{ax + b}{x}\biggr| + C	$$
+\section{一首诗}
+\begin{center}
+\sf 將進酒
+\end{center}
+君不見，黃河之水天上來，奔流到海不復回！君不見，高堂明鏡悲白髮，朝如青絲暮成雪！人生得意須盡歡，莫使金樽空對月。天生我材必有用，千金散盡還復來。烹羊宰牛且為樂，會須一飲三百杯。
+岑夫子，丹丘生。進酒君莫停。與君歌一曲，請君為我傾耳聽。鐘鼓饌玉不足貴，但願長醉不用醒。古來聖賢皆寂寞，惟有飲者留其名。陳王昔時宴平樂，斗酒十千恣歡謔。主人何為言少錢？
+徑須沽酒對君酌。五花馬，千金裘。呼兒將出換美酒，與爾同銷萬古愁。
+\section{关于汉字数字}
+\verb!\kansuji 1995年! → \kansuji 1995年
+\section{苏州码子}
+\def\suzhoumazi#1{%
+\begingroup%
+\ltjsetparameter{kansujichar={0,`〇}}%
+\ltjsetparameter{kansujichar={1,`〡}}%
+\ltjsetparameter{kansujichar={2,`〢}}%
+\ltjsetparameter{kansujichar={3,`〣}}%
+\ltjsetparameter{kansujichar={4,`〤}}%
+\ltjsetparameter{kansujichar={5,`〥}}%
+\ltjsetparameter{kansujichar={6,`〦}}%
+\ltjsetparameter{kansujichar={7,`〧}}%
+\ltjsetparameter{kansujichar={8,`〨}}%
+\ltjsetparameter{kansujichar={9,`〩}}%
+\kansuji #1%
+\endgroup}
+\fbox{\vbox{\hbox{\suzhoumazi{402}二}\hbox{拾元}}}
+\end{document}
