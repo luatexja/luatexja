@@ -5,9 +5,9 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\def\filedate{2006/02/20}
-\def\fileversion{0.2}
-\ProvidesPackage{lltjp-listings}[\filedate\space\fileversion\space(Thor)]
+\def\filedate{2012/01/11}
+\def\fileversion{0.4}
+\ProvidesPackage{lltjp-listings}[\filedate\space\fileversion]
 \RequirePackage{listings}
 \newcount\lst@nextchar
 \let\lst@@ProcessSpace\lst@ProcessSpace
@@ -48,6 +48,8 @@
       \expandafter\lst@AppendJchar
    \fi
    #1}
+\def\lst@Append#1{\advance\lst@length\@ne%
+                  \lst@token=\expandafter{\the\lst@token#1}}
 \def\lst@AppendJchar#1#2{%
    \lst@check@chartype{#2}%
       {\advance\lst@length\@ne\lst@Append{#1}}%
@@ -150,10 +152,10 @@
 
 % Changes for LuaTeX-ja:
 % 1. \char"FFFFF は通常行末用コメント文字として使われる．
-%    だが，それはソースコードの組版には邪魔ものとなる．
-%\lst@AddToHook{Init}{\catcode"FFFFF=9 }
-%\lst@AddToHook{DeInit}{\catcode"FFFFF=14 }
-%\lst@Def{1048575}{}
+%    \catcode"FFFFF を変更しないと \lstnewenvironment{env}[1] ... 
+%    による env 環境等が異常動作（x19290 さんの報告）
+\lst@AddToHook{Init}{\catcode"FFFFF=9\relax}
+\lst@AddToHook{EOL}{\catcode"FFFFF=14\relax}
 
 % 2. listing な環境の処理中に \DeclareFontShape の (s)sub が実行されると，なぜか
 %        ! Use of set@size@funct@args@ doesn't match its definition.

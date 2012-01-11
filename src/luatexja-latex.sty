@@ -26,6 +26,19 @@
   \fi
 }
 
+% similar to \ltj@pkgpatch, but this is used .sty which
+% can be reloaded inside the document by \input.
+\def\ltj@pkgpatchA#1{
+  \@ifpackageloaded{#1}{\input{ltjp-#1.sty}}{
+    \@ifpackageloaded{filehook}{\AtEndOfFile{#1.sty}{\input{lltjp-#1.sty}}}{}
+  }
+  \ifx\ltj@pkgpatchlist\@empty
+    \gdef\ltj@pkgpatchlist{#1}
+  \else
+    \xdef\ltj@pkgpatchlist{\ltj@pkgpatchlist, #1}
+  \fi
+}
+
 \endlinechar=13
 
 %%% patch for LaTeX
@@ -47,6 +60,7 @@
 %%% patch for packages
 \IfFileExists{filehook.sty}{\usepackage{filehook}}{}
 \ltj@pkgpatch{listings}
+\ltj@pkgpatchA{lstmisc}
 \ltj@pkgpatch{unicode-math}
 \ltj@pkgpatch{xunicode}
 \@ifpackageloaded{filehook}{}{%

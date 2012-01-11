@@ -1,0 +1,39 @@
+%
+% lltjp-lstmisc.sty
+%
+
+% this file is loaded by \input in LTXexample environment,
+% which is defined in showexpl.sty.
+% So, this file does not contain any header.
+\begingroup \catcode`\^^I=11
+\gdef\lst@WFBegin#1#2{%
+    \begingroup
+    \let\lst@OutputBox#1%
+    \def\lst@Append##1{%
+        \advance\lst@length\@ne
+        \expandafter\lst@token\expandafter{\the\lst@token##1}%
+        \ifx ##1\lst@outputspace \else
+            \lst@WFAppend##1%
+        \fi}%
+    \lst@lAddTo\lst@PreGotoTabStop{\lst@WFAppend{^^I}}%
+    \def\lst@ProcessSpace##1{%
+       \lst@WFAppend{ }\lst@check@chartype{##1}%
+          \lst@@ProcessSpace
+          \lst@whitespacetrue}%
+    \let\lst@DeInit\lst@WFDeInit
+    \let\lst@MProcessListing\lst@WFMProcessListing
+    \lst@WFifopen\else
+        \immediate\openout\lst@WF=#2\relax
+        \global\let\lst@WFifopen\iftrue
+        \@gobbletwo\fi\fi
+    \fi}
+\endgroup
+\gdef\lst@frameBlock#1#2#3#4{%
+    \color@begingroup
+      #1%
+      \setbox\z@\hbox{\vrule\@height#3\@depth#4%
+                      \ifx#1\@empty \@width\z@ \kern#2\relax
+                              \else \@width#2\relax \fi}%
+      \box\z@
+    \color@endgroup}
+\endinput
