@@ -29,7 +29,7 @@
 % similar to \ltj@pkgpatch, but this is used .sty which
 % can be reloaded inside the document by \input.
 \def\ltj@pkgpatchA#1{
-  \@ifpackageloaded{#1}{\input{ltjp-#1.sty}}{
+  \@ifpackageloaded{#1}{\input{lltjp-#1.sty}}{
     \@ifpackageloaded{filehook}{\AtEndOfFile{#1.sty}{\input{lltjp-#1.sty}}}{}
   }
   \ifx\ltj@pkgpatchlist\@empty
@@ -47,9 +47,9 @@
 \usepackage{lltjcore}
 
 %%% default parameters
-\ltjsetparameter{kanjiskip=0pt plus 0.4pt minus 0.4pt, 
+\ltjsetparameter{kanjiskip=0pt plus 0.4pt minus 0.4pt,
   xkanjiskip=.25\zw plus 1pt minus 1pt,
-  autospacing, autoxspacing, jacharrange={-1}, 
+  autospacing, autoxspacing, jacharrange={-1},
   yalbaselineshift=0pt, yjabaselineshift=0pt,
   jcharwidowpenalty=500, differentjfm=average
 }
