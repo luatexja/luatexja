@@ -74,7 +74,6 @@
       \lst@ifprint \def\lst@next{\lst@get@filecontents{#1}}%
       \else        \let\lst@next\@empty
       \fi
-      \catcode"FFFFF=12%"
       \lst@next
       \lst@DeInit
    \endgroup}
@@ -163,5 +162,5 @@
 %    \ifnot@nil #1-> \def\reserved@a{#1}... の \reserved@a=\set@size@funct@args@
 %    がなぜか実行される？
 %    ad hoc な対策として事前に必要な (s)sub は実行しておくことにする．
-\lst@AddToHook{Init}{\begingroup\itshape\bfseries\upshape\endgroup}
+%\lst@AddToHook{Init}{\begingroup\itshape\bfseries\upshape\bfseries\mdseries\endgroup}
 \endinput
