@@ -569,7 +569,9 @@
   \expandafter\ltj@@IsFontJapaneseX#1//:%
   \expandafter\expandafter\expandafter
   \inlist@\expandafter\tmp@item\expandafter{\kenc@list}}
-\def\ltj@@IsFontJapaneseX#1/#2/:{\edef\tmp@item{{\directlua{tex.write('#1')}}}}
+\def\ltj@@IsFontJapaneseX#1/#2/:{\edef\tmp@item{{\directlua{%
+  tex.print(luatexbase.catcodetables["latex-package"], '#1')}%
+}}}
 
 
 \let\extract@afont\extract@font
