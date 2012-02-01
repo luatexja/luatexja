@@ -1,12 +1,10 @@
 %
 % lltjp-listings.sty
 %
-% Modified from jlisting.sty (by Thor) for LuaTeX-ja. 
-%
 
 \NeedsTeXFormat{LaTeX2e}
-\def\filedate{2012/01/11}
-\def\fileversion{0.4}
+\def\filedate{2012/02/01}
+\def\fileversion{0.5}
 \ProvidesPackage{lltjp-listings}[\filedate\space\fileversion]
 \RequirePackage{listings,luatexbase-cctb}
 
@@ -17,32 +15,7 @@
   \catcode"FFFFF=9%"
   \setcatcoderange{"3000}{"65535}{13}}
 
-
-\def\ltj@@listing@jpset@#1#2{{\lccode`\~=#1\lccode`\/=#1
-    \lowercase{\gdef\@temp{\gdef~{#2/}}}}%
-  \@temptokena\expandafter\expandafter\expandafter\expandafter%
-  \expandafter\expandafter\expandafter{\expandafter\expandafter%
-  \expandafter\the\expandafter\@temptokena\@temp}%
-}
-
-\def\ltj@@listing@jpset#1#2#3 {%
-  \@tempcnta=#1 \@tempcntb=#2 \@temptokena{}
-  \loop \advance\@tempcnta\@ne\ifnum\@tempcnta<\@tempcntb\relax
-    \ltj@@listing@jpset@{\the\@tempcnta}#3\repeat
-  \expandafter\edef\csname ltj@@listing@jpcmd@i#1\endcsname{\the\@temptokena}%
-  \toks@\expandafter\expandafter\expandafter\expandafter%
-  \expandafter\expandafter\expandafter{\expandafter\expandafter%
-  \expandafter\the\expandafter\toks@\csname ltj@@listing@jpcmd@i#1\endcsname}
-}
-
-\input lltjp-listings-jpt.tex
-
-\edef\ltj@@listing@jpcmd{\the\toks@}
-\toks@{}
-\lst@AddToHook{Init}{%
-  \luatexcatcodetable\CatcodeTableLTJlistings
-  \ltj@@listing@jpcmd}
-
+% lower level
 \def\lst@ProcessJALetter{\lst@whitespacefalse \lst@AppendJALetter}
 \def\lst@AppendJALetter{%
     \lst@ifletter \lst@Output\else\lst@OutputOther\fi\lst@lettertrue
@@ -51,6 +24,65 @@
 \def\lst@AppendJALetterHalf{%
     \lst@ifletter \lst@Output\else\lst@OutputOther\fi\lst@lettertrue
     \lst@Append}
+
+% loading lltjp-listing-jpt.tex
+\def\ltj@@listing@jpset#1#2{%
+  \@tempcnta=#1 \@tempcntb=#2 \@temptokena{}%
+  \loop \global\advance\@tempcnta8\ifnum\@tempcnta<\@tempcntb\relax
+    \ltj@@listing@jpset@\repeat
+  \expandafter\edef\csname ltj@@listing@jpcmd@i#1\endcsname{\the\@temptokena}%
+  \toks@\expandafter\expandafter\expandafter\expandafter%
+  \expandafter\expandafter\expandafter{\expandafter\expandafter%
+  \expandafter\the\expandafter\toks@\csname ltj@@listing@jpcmd@i#1\endcsname}%
+}
+\def\ltj@@listing@jpsetN#1#2#3{%
+  \@tempcnta=#1 \@tempcntb=#2 \@temptokena{}%
+  \loop \global\advance\@tempcnta\@ne\ifnum\@tempcnta<\@tempcntb\relax
+    \ltj@@listing@jpsetN@#3\repeat
+  \expandafter\edef\csname ltj@@listing@jpcmd@i#1\endcsname{\the\@temptokena}%
+  \toks@\expandafter\expandafter\expandafter\expandafter%
+  \expandafter\expandafter\expandafter{\expandafter\expandafter%
+  \expandafter\the\expandafter\toks@\csname ltj@@listing@jpcmd@i#1\endcsname}%
+}
+
+\begingroup
+\catcode`\^^A=13\catcode`\^^B=13\catcode`\^^C=13
+\catcode`\^^D=13\catcode`\^^E=13\catcode`\^^F=13\catcode`\^^G=13
+\gdef\ltj@@listing@jpset@{%
+  {\lccode`\~=\@tempcnta \lccode`\/=\@tempcnta
+    \advance\@tempcnta\@ne\lccode`\^^A=\@tempcnta \lccode`0=\@tempcnta
+    \advance\@tempcnta\@ne\lccode`\^^B=\@tempcnta \lccode`2=\@tempcnta
+    \advance\@tempcnta\@ne\lccode`\^^C=\@tempcnta \lccode`3=\@tempcnta
+    \advance\@tempcnta\@ne\lccode`\^^D=\@tempcnta \lccode`4=\@tempcnta
+    \advance\@tempcnta\@ne\lccode`\^^E=\@tempcnta \lccode`5=\@tempcnta
+    \advance\@tempcnta\@ne\lccode`\^^F=\@tempcnta \lccode`6=\@tempcnta
+    \advance\@tempcnta\@ne\lccode`\^^G=\@tempcnta \lccode`7=\@tempcnta
+    \lowercase{\gdef\@temp{%
+      \gdef~{\lst@ProcessJALetter/}\gdef^^A{\lst@ProcessJALetter0}%
+      \gdef^^B{\lst@ProcessJALetter2}\gdef^^C{\lst@ProcessJALetter3}%
+      \gdef^^D{\lst@ProcessJALetter4}\gdef^^E{\lst@ProcessJALetter5}%
+      \gdef^^F{\lst@ProcessJALetter6}\gdef^^G{\lst@ProcessJALetter7}}}%
+  }%
+  \@temptokena\expandafter\expandafter\expandafter\expandafter%
+  \expandafter\expandafter\expandafter{\expandafter\expandafter%
+  \expandafter\the\expandafter\@temptokena\@temp}%
+}
+\gdef\ltj@@listing@jpsetN@#1{{%
+    \lccode`\~=\@tempcnta \lccode`\/=\@tempcnta
+    \lowercase{\gdef\@temp{\gdef~{#1/}}}}%
+  \@temptokena\expandafter\expandafter\expandafter\expandafter%
+  \expandafter\expandafter\expandafter{\expandafter\expandafter%
+  \expandafter\the\expandafter\@temptokena\@temp}%
+}
+\endgroup
+
+
+\input lltjp-listings-jpt.tex
+\edef\ltj@@listing@jpcmd{\the\toks@}
+\toks@{}
+\lst@AddToHook{Init}{%
+  \luatexcatcodetable\CatcodeTableLTJlistings
+  \ltj@@listing@jpcmd}
 
 
 % 白線対策
@@ -72,4 +104,13 @@
     \lst@ResetToken}
 
 
+%    \begin{修正事項}{1.3} from jlisting.sty
+% ちょっとした修正
+\gdef\lst@breakProcessOther#1{\lst@ProcessOther#1}
+% ソースコード目次における文字と番号の空き
+\let \l@lstlisting = \l@figure
+% キャプションとソースコード目次に対する日本語対応
+\def\lstlistingname{ソースコード}
+\def\lstlistlistingname{ソースコード目次}
+%    \end{修正事項}
 \endinput
