@@ -8,159 +8,68 @@
 \def\filedate{2012/01/11}
 \def\fileversion{0.4}
 \ProvidesPackage{lltjp-listings}[\filedate\space\fileversion]
-\RequirePackage{listings}
-\newcount\lst@nextchar
-\let\lst@@ProcessSpace\lst@ProcessSpace
-\def\lst@ProcessSpace#1{%
-   \lst@check@chartype{#1}%
-      \lst@@ProcessSpace
-      \lst@whitespacetrue}
-\let\lst@@ProcessLetter\lst@ProcessLetter
-\def\lst@ProcessLetter#1#2{%
-   \lst@check@chartype{#2}%
-      {\lst@@ProcessLetter{#1}}%
-      \relax}
-\let\lst@@ProcessDigit\lst@ProcessDigit
-\def\lst@ProcessDigit#1#2{%
-   \lst@check@chartype{#2}%
-      {\lst@@ProcessDigit{#1}}%
-      \relax}
-\let\lst@@ProcessOther\lst@ProcessOther
-\def\lst@ProcessOther#1#2{%
-   \lst@check@chartype{#2}%
-      {\lst@@ProcessOther{#1}}%
-      \relax}
-\let\lst@@ProcessTabulator\lst@ProcessTabulator
-\def\lst@ProcessTabulator#1{%
-   \lst@check@chartype{#1}%
-      \lst@@ProcessTabulator
-      \relax}
-\def\lst@check@chartype#1#2#3{%
-   \edef\@tempa{\lst@nextchar=`\string#1\relax}%
-   \afterassignment\remove@to@nnil
-   \@tempa\@nnil
-   #2%
-   \ifnum\lst@nextchar<\@cclvi
-      #3%
-   \else
-      \lst@ifletter \else \lst@OutputOther \fi
-      \lst@whitespacefalse
-      \expandafter\lst@AppendJchar
-   \fi
-   #1}
-\def\lst@Append#1{\advance\lst@length\@ne%
-                  \lst@token=\expandafter{\the\lst@token#1}}
-\def\lst@AppendJchar#1#2{%
-   \lst@check@chartype{#2}%
-      {\advance\lst@length\@ne\lst@Append{#1}}%
-      \relax}
-\def\lst@check@chartype@BOL#1{%
-   \edef\@tempa{\lst@nextchar=`\string#1\relax}%
-   \afterassignment\remove@to@nnil
-   \@tempa\@nnil
-   \ifnum\lst@nextchar<\@cclvi\else
-      \lst@whitespacefalse
-      \expandafter\lst@AppendJchar
-   \fi
-   #1}
-\def\lst@InputListing#1{%
-   \begingroup
-      \lsthk@PreSet \gdef\lst@intname{#1}%
-      \expandafter\lstset\expandafter{\lst@set}%
-      \lsthk@DisplayStyle
-      \catcode\active=\active
-      \lst@Init\relax \let\lst@gobble\z@
-      \lst@SkipToFirst
-      \lst@ifprint \def\lst@next{\lst@get@filecontents{#1}}%
-      \else        \let\lst@next\@empty
-      \fi
-      \lst@next
-      \lst@DeInit
-   \endgroup}
-\newread\lst@inputfile
-\def\lst@get@filecontents#1{%
-   \let\lst@filecontents\@empty
-   \openin\lst@inputfile=#1\relax
-   \let\@lst@get@filecontents@prevline\relax
-   \lst@get@filecontents@loop
-   \closein\lst@inputfile
-   \lst@filecontents\empty}
-\def\lst@get@filecontents@loop{%
-   \read\lst@inputfile to\@lst@get@filecontents@currline
-   \ifx\@lst@get@filecontents@prevline\relax\else
-      \expandafter\expandafter\expandafter\def
-      \expandafter\expandafter\expandafter\lst@filecontents
-      \expandafter\expandafter\expandafter{%
-         \expandafter\lst@filecontents\@lst@get@filecontents@prevline}%
-   \fi
-   \let\@lst@get@filecontents@prevline\@lst@get@filecontents@currline
-   \ifeof\lst@inputfile\else
-      \expandafter\lst@get@filecontents@loop
-   \fi}
-%%% [この処理も，相当強引です．]
-\def\lst@BOLGobble{%
-   \ifnum\lst@gobble>\z@
-      \@tempcnta\lst@gobble\relax
-      \expandafter\lst@BOLGobble@
-   \else
-      \expandafter\lst@check@chartype@BOL
-   \fi}
-\def\lst@BOLGobble@#1{%
-   \let\lst@next#1%
-   \ifx \lst@next\relax\else
-   \ifx \lst@next\lst@MProcessListing\else
-   \ifx \lst@next\lst@ProcessFormFeed\else
-   \ifx \lst@next\lstenv@backslash
-      \let\lst@next\lstenv@BOLGobble@@
-   \else
-      \let\lst@next\lst@BOLGobble@@
-      \ifx #1\lst@ProcessTabulator
-         \advance\@tempcnta-\lst@tabsize\relax
-         \ifnum\@tempcnta<\z@
-            \lst@length-\@tempcnta \lst@PreGotoTabStop
-         \fi
-      \else
-         \edef\@tempa{\lst@nextchar=`\string#1\relax}%
-         \@tempa
-         \ifnum\lst@nextchar<\@cclvi\else
-            \advance\@tempcnta\m@ne
-         \fi
-         \advance\@tempcnta\m@ne
-      \fi
-   \fi \fi \fi \fi
-   \lst@next}
-\def\lst@BOLGobble@@{%
-   \ifnum\@tempcnta>\z@
-      \expandafter\lst@BOLGobble@
-   \else
-      \expandafter\lst@check@chartype@BOL
-   \fi
+\RequirePackage{listings,luatexbase-cctb}
+
+% catcode 対策
+\newluatexcatcodetable\CatcodeTableLTJlistings
+\setluatexcatcodetable\CatcodeTableLTJlistings{
+  \luatexcatcodetable\CatcodeTableLaTeXAtLetter
+  \catcode"FFFFF=9%"
+  \setcatcoderange{"3000}{"65535}{13}}
+
+
+\def\ltj@@listing@jpset@#1#2{{\lccode`\~=#1\lccode`\/=#1
+    \lowercase{\gdef\@temp{\gdef~{#2/}}}}%
+  \@temptokena\expandafter\expandafter\expandafter\expandafter%
+  \expandafter\expandafter\expandafter{\expandafter\expandafter%
+  \expandafter\the\expandafter\@temptokena\@temp}%
 }
 
-%
-%    \begin{修正事項}{1.3}
-% ちょっとした修正
-\gdef\lst@breakProcessOther#1{\lst@ProcessOther#1}
-% ソースコード目次における文字と番号の空き
-\let \l@lstlisting = \l@figure
-% キャプションとソースコード目次に対する日本語対応
-\def\lstlistingname{ソースコード}
-\def\lstlistlistingname{ソースコード目次}
-%    \end{修正事項}
+\def\ltj@@listing@jpset#1#2#3 {%
+  \@tempcnta=#1 \@tempcntb=#2 \@temptokena{}
+  \loop \advance\@tempcnta\@ne\ifnum\@tempcnta<\@tempcntb\relax
+    \ltj@@listing@jpset@{\the\@tempcnta}#3\repeat
+  \expandafter\edef\csname ltj@@listing@jpcmd@i#1\endcsname{\the\@temptokena}%
+  \toks@\expandafter\expandafter\expandafter\expandafter%
+  \expandafter\expandafter\expandafter{\expandafter\expandafter%
+  \expandafter\the\expandafter\toks@\csname ltj@@listing@jpcmd@i#1\endcsname}
+}
+
+\input lltjp-listings-jpt.tex
+
+\edef\ltj@@listing@jpcmd{\the\toks@}
+\toks@{}
+\lst@AddToHook{Init}{%
+  \luatexcatcodetable\CatcodeTableLTJlistings
+  \ltj@@listing@jpcmd}
+
+\def\lst@ProcessJALetter{\lst@whitespacefalse \lst@AppendJALetter}
+\def\lst@AppendJALetter{%
+    \lst@ifletter \lst@Output\else\lst@OutputOther\fi\lst@lettertrue
+    \advance\lst@length\@ne\lst@Append}
+\def\lst@ProcessJALetterHalf{\lst@whitespacefalse \lst@AppendJALetterHalf}
+\def\lst@AppendJALetterHalf{%
+    \lst@ifletter \lst@Output\else\lst@OutputOther\fi\lst@lettertrue
+    \lst@Append}
 
 
-% Changes for LuaTeX-ja:
-% 1. \char"FFFFF は通常行末用コメント文字として使われる．
-%    \catcode"FFFFF を変更しないと \lstnewenvironment{env}[1] ... 
-%    による env 環境等が異常動作（x19290 さんの報告）
-\lst@AddToHook{Init}{\catcode"FFFFF=9\relax}
-\lst@AddToHook{EOL}{\catcode"FFFFF=14\relax}
+% 白線対策
+\def\lst@OutputToken{%
+    \lst@TrackNewLines \lst@OutputLostSpace
+    \lst@ifgobbledws
+        \lst@gobbledwhitespacefalse
+        \lst@@discretionary
+    \fi
+    \lst@CheckMerge
+    {\lst@thestyle{\lst@FontAdjust
+     \setbox\@tempboxa\lst@hbox
+        {\lsthk@OutputBox
+         \lst@lefthss
+         \expandafter\lst@FillOutputBox\the\lst@token\@empty
+         \lst@righthss}%
+     \ht\@tempboxa=0pt\dp\@tempboxa=0pt
+     \lst@CalcLostSpaceAndOutput}}%
+    \lst@ResetToken}
 
-% 2. listing な環境の処理中に \DeclareFontShape の (s)sub が実行されると，なぜか
-%        ! Use of set@size@funct@args@ doesn't match its definition.
-%    のエラーが出る．
-%    \ifnot@nil #1-> \def\reserved@a{#1}... の \reserved@a=\set@size@funct@args@
-%    がなぜか実行される？
-%    ad hoc な対策として事前に必要な (s)sub は実行しておくことにする．
-%\lst@AddToHook{Init}{\begingroup\itshape\bfseries\upshape\bfseries\mdseries\endgroup}
+
 \endinput
