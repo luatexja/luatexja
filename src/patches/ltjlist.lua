@@ -7,7 +7,7 @@ function innerN(a, b, c)
    print("\\ltj@@listing@jpsetN{" .. a  .. "}{" 
       .. b .. "}{" .. c .. "}")
 end
-k = 256
+k = arg[1]
 t = {{0x2000, 0xFEFF, "BMP"}, {0x20000, 0x2FFFF, "SIP"}}
 for g, v in pairs(t) do
    print("\\message{" .. v[3] .. "}")
