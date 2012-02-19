@@ -1,8 +1,13 @@
 %#! lualatex -shell-escape manual.ins
 
-%<en>\documentclass[a4paper,titlepage]{article}
-%<ja>\documentclass[a4paper,titlepage]{ltjsarticle}
-\usepackage[margin=20mm,footskip=5mm]{geometry}
+%<*en>
+\documentclass[a4paper,titlepage]{article}
+\usepackage[margin=25mm,footskip=5mm]{geometry}
+%</en>
+%<*ja>
+\documentclass[a4paper,titlepage]{ltjsarticle}
+\usepackage[margin=25mm, footskip=5mm]{geometry}
+%</ja>
 
 \usepackage{amsmath,amssymb,xcolor,pict2e,multienum,amsthm,float}
 \usepackage{booktabs,listings,showexpl,multicol}
@@ -190,7 +195,7 @@ The followings are major changes from \pTeX:
       `variation'.
 %</en>
 %<*ja>
-\item 和文フォントは「実際の」フォント，和文フォントメトリック（JFM と呼ぶ），そ
+\item 和文フォントは（小塚明朝，IPA明朝などの）実際のフォント，和文フォントメトリック（JFM と呼ぶ），そ
       して `variation' と呼ばれる文字列の組である．
 %</ja>
 
@@ -471,9 +476,8 @@ The installation methods are as follows:
 %<*ja>
 \item ソースアーカイブをダウンロードする．
 
-      現時点では，\LuaTeX-ja の公式リリースはないので，レポジトリからアーカイブを
-      取得しなければならない．
-      次のようにすることで，Git レポジトリを取得することができる：
+      現時点では，\LuaTeX-ja の公式リリースはまだない．そのため，Git レポジトリを
+      次のようにすることで取得する必要がある：
 %</ja>
 \begin{verbatim}
 $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
@@ -482,7 +486,7 @@ $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
       or download the archive of HEAD in \texttt{master} branch from
 %</en>
 %<*ja>
-      もしくは，\texttt{master} ブランチの HEAD アーカイブを以下からダウンロードすることができる：
+      もしくは，\texttt{master} ブランチの HEAD のアーカイブを以下からダウンロードしてもよい：
 %</ja>
 \begin{flushleft}
 \url{http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git;a=snapshot;h=HEAD;sf=tgz}.
@@ -492,14 +496,17 @@ $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
 Note that the forefront of development may not be in \texttt{master} branch.
 %</en>
 %<*ja>
-開発中の最新の成果は \texttt{master} ブランチには含まれていないかもしれないことに注意．
+\texttt{master} ブランチはたまにしか更新されない．
+最新の開発中のコードは \texttt{master} ブランチには含まれていない場合がかなり多いので注意．
 %</ja>
 
 %<*en>
 \item Extract the archive. You will see \texttt{src/} and several other sub-directories.
 %</en>
 %<*ja>
-\item アーカイブを展開する．\texttt{src/} をはじめとしたいくつかのディレクトリができる．
+\item 後者の方法でアーカイブ取得したならば，それをを展開する．
+      \texttt{src/} をはじめとしたいくつかのディレクトリができるが，
+      動作には \texttt{src/} 以下の内容だけで十分．
 %</ja>
 
 %<*en>
@@ -507,6 +514,8 @@ Note that the forefront of development may not be in \texttt{master} branch.
 %</en>
 %<*ja>
 \item \texttt{src/} の中身全てを自分の \texttt{TEXMF} ツリーにコピーする．
+      シンボリックリンクが利用できる環境で，かつレポジトリを直接取得したのであれば，コピーではなく
+      リンクを貼るのが適切だろう．
 %</ja>
 
 %<*en>
@@ -526,7 +535,7 @@ Note that the forefront of development may not be in \texttt{master} branch.
       encodings, such as EUC-JP or Shift-JIS, are not supported.
 %</en>
 %<*ja>
-\item 原稿のソースファイルの文字コードは UTF-8 でなければならない．
+\item 原稿のソースファイルの文字コードは UTF-8 固定である．
       従来日本語の文字コードとして用いられてきた EUC-JP や Shift-JIS は使用できません．
 %</ja>
 
@@ -621,7 +630,7 @@ This does minimal settings (like \texttt{ptex.tex}) for typesetting Japanese doc
 \item `Ryumin-Light' と `GothicBBB-Medium' は PDF ファイルに埋め込まずに
       名前参照のみで用いることが広く受け入れられており，この場合 PDF リーダーが
       適切な外部フォントで代用する（例えば，Adobe Reader では Ryumin-Light は
-      小塚明朝で代替される）．そこで，これらをデフォルトのフォントと
+      小塚明朝で代替される）．そこで，これらを引き続きデフォルトのフォントと
       して採用する．
 %</ja>
 
@@ -633,8 +642,9 @@ This does minimal settings (like \texttt{ptex.tex}) for typesetting Japanese doc
 %</en>
 %<*ja>
 \item 欧文フォントの文字は和文フォントの文字よりも，同じ文字サイズでも
-      一般に小さい．そこで，これらの和文フォントの実際のサイズは指定された値よりも
+      一般に小さくデザインされている．そこで，標準ではこれらの和文フォントの実際のサイズは指定された値よりも
       小さくなるように設定されており，具体的には指定の 0.962216 倍にスケールされる．
+      この 0.962216 という数値も，p\TeX におけるスケーリングを踏襲した値である．
 %</ja>
 \end{itemize}
 
@@ -783,13 +793,13 @@ sources like the following:
 %</en>
 %<*ja>
 \paragraph{意見：数式モード中の和文文字}
-\pTeX では，何もしないでも数式中に和文文字を記述することができた．そのため，
+\pTeX では，特に何もしないでも数式中に和文文字を記述することができた．そのため，
 以下のようなソースが見られた：
 %</ja>
 \begin{LTXexample}
 $f_{高温}$~($f_{\text{high temperature}}$).
-\[ y=(x-1)^2+2\quad{}よって\quad y>0 \]
-$5\in{}素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
+\[ y=(x-1)^2+2\quad よって\quad y>0 \]
+$5\in 素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
 \end{LTXexample}
 %<*en>
 We (the project members of \LuaTeX-ja) think that using
@@ -829,7 +839,7 @@ $f_{\text{高温}}$~%
 ($f_{\text{high temperature}}$).
 \[ y=(x-1)^2+2\quad
   \mathrel{\text{よって}}\quad y>0 \]
-$5\in{}素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
+$5\in 素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
 \end{LTXexample}
 %BUG?: \{\}がなければ「素」がでない．上の段落の「よって」もでてない．
 %<*en>
@@ -1060,6 +1070,9 @@ However, this reloading won't work for the current version (2011/09/09,~v0.981) 
  \def\tipacatchonechar#1{\begingroup
   \def\textipa##1{##1}% prevent recursion
 \end{lstlisting}
+%<*ja>
+なお，上流で v0.984 (2011/10/14) でこの問題は修正されているそうです．
+%</ja>
 
 
 %<en>\section{Changing Parameters}
@@ -1076,7 +1089,7 @@ parameters, you have to use commands \verb+\ltjsetparameter+ and
 \LuaTeX-ja には多くのパラメータが存在する．そして \LuaTeX の振る舞いのために，
 その多くは \TeX のレジスタにではなく，\LuaTeX-ja 独自の方法で保持されている．
 そのため，これらのパラメータを設定・取得するためには \verb+\ltjsetparameter+ と
-\verb+\ltjgetparameter+ を用いなければならない．
+\verb+\ltjgetparameter+ を用いる必要がある．
 %</ja>
 
 %<en>\subsection{Editing the range of \textbf{JAchar}s}
@@ -1090,10 +1103,10 @@ next line assigns whole characters in Supplementary Multilingual Plane
 and the character `漢' to the range number~100.
 %</en>
 %<*ja>
-\textbf{JAchar} の範囲を設定するためには，まず文字範囲に0より大きく217より小さい
-自然数を割り当てる必要がある．これには \verb+\ltjdefcharrange+ プリミティブを用いる．
-例えば，次のように書くことで追加多言語面 (SMP) にある全ての文字と `漢' の範囲番号が
-100に設定される．
+\textbf{JAchar} の範囲を設定するためには，まず各文字に0より大きく217より小さい index を
+割り当てる必要がある．これには \verb+\ltjdefcharrange+ プリミティブを用いる．
+例えば，次のように書くことで追加多言語面 (SMP) にある全ての文字と `漢' が
+「100番の文字範囲」に属する設定される．
 %</ja>
 \begin{lstlisting}
 \ltjdefcharrange{100}{"10000-"1FFFF,`漢}
@@ -1103,7 +1116,7 @@ This assignment of numbers to ranges are always global, so you should
 not do this in the middle of a document.
 %</en>
 %<*ja>
-この文字範囲への番号の割り当てはいつもグローバルであり，したがって文書の途中で
+この文字範囲の割り当てはいつもグローバルであり，したがって文書の途中で
 この操作をするべきではない．
 %</ja>
 
@@ -1741,30 +1754,6 @@ causes a error.  We denote control sequences which are defined in
 コントロールシーケンスを <jfont\_cs> で表す．
 %</ja>
 
-%<en>\paragraph{Prefix \texttt{psft}}
-%<ja>\paragraph{\texttt{psft} プレフィックス}
-%<*en>
-Besides \texttt{file:}\ and \texttt{name:}\ prefixes, \texttt{psft:}\
-can be used a prefix in \verb+\jfont+ (and~\verb+\font+) primitive.
-Using this prefix, you can specify a `name-only' Japanese font which
-will be not embedded to PDF. Typical use of this prefix is to specify
-the `standard' Japanese fonts, namely, `Ryumin-Light' and
-`GothicBBB-Medium'. For kerning or other information, that of Kozuka
-Mincho Pr6N Regular (this is a font by Adobe Inc., and included in
-Japanese Font Packs for Adore Reader) will be used.
-%</en>
-%<*ja>
-\texttt{file:} と \texttt{name:} のプレフィックスに加えて，
-\verb+\jfont+ プリミティブ（と \verb+\font+ プリミティブ）では
-\texttt{psft:} プレフィックス用いることができる．
-このプレフィックスを用いることで，PDF には埋め込まれない「名前だけの」
-和文フォントを指定することができる．典型的な使い方は「標準的な」和文フォント，
-つまり `Ryumin-Light' と `GothicBBB-Medium' を指定することである．
-この場合，カーニング他の情報は小塚明朝 Pr6N Regular
-（Adobe 社によるフォントで，Adobe Reader の日本語フォントパックに含まれている）
-が用いられる．
-%</ja>
-
 \paragraph{JFM}
 %<*en>
 As noted in Introduction, a JFM has measurements of characters and
@@ -1913,6 +1902,37 @@ JFM に基づくグルー／カーンも挿入される場合には2文字間の
 
 TODO: kanjiskip?
 \end{itemize}
+
+
+%<en>\subsection{Prefix \texttt{psft}}
+%<ja>\subsection{\texttt{psft} プレフィックス}
+%<*en>
+Besides \texttt{file:}\ and \texttt{name:}\ prefixes, \texttt{psft:}\
+can be used a prefix in \verb+\jfont+ (and~\verb+\font+) primitive.
+Using this prefix, you can specify a `name-only' Japanese font which
+will be not embedded to PDF. Typical use of this prefix is to specify
+the `standard' Japanese fonts, namely, `Ryumin-Light' and
+`GothicBBB-Medium'. For kerning or other information, that of Kozuka
+Mincho Pr6N Regular (this is a font by Adobe Inc., and included in
+Japanese Font Packs for Adore Reader) will be used.
+
+...
+
+%</en>
+%<*ja>
+\texttt{file:} と \texttt{name:} のプレフィックスに加えて，
+\verb+\jfont+ プリミティブ（と \verb+\font+ プリミティブ）では
+\texttt{psft:} プレフィックス用いることができる．
+このプレフィックスを用いることで，PDF には埋め込まれない「名前だけの」
+和文フォントを指定することができる．典型的な使い方は「標準的な」和文フォント，
+つまり `Ryumin-Light' と `GothicBBB-Medium' を指定することである．
+この場合，カーニング他の情報は小塚明朝 Pr6N Regular
+（Adobe 社によるフォントで，Adobe Reader の日本語フォントパックに含まれている）
+が用いられる．
+
+... cid key
+%</ja>
+
 
 
 %<en>\subsection{Structure of JFM file}
@@ -2135,9 +2155,9 @@ the `real' glyph is centered horizontally (the green rectangle).
 \begin{LTXexample}
 \jfont\g=psft:Ryumin-Light:jfm=test \g
 \parindent1\zw\noindent{}◆◆◆◆◆
-\par{}「◆◆←二分下がり
-\par{}【◆◆←全角下がり
-\par{}〔◆◆←全角二分下がり
+\par 「◆◆←二分下がり
+\par 【◆◆←全角下がり
+\par 〔◆◆←全角二分下がり
 \end{LTXexample}
 \end{itemize}
 \ltjsetparameter{jacharrange={-3}}
@@ -2457,9 +2477,11 @@ the beginning of a box and `あ', and also between `あ' and `ウ'.
 
 \begin{LTXexample}
 \jfont\g=psft:Ryumin-Light:jfm=test \g
-あウあ\inhibitglue{}ウ\inhibitglue\par
-あ\par\inhibitglue{}あ
-\par\inhibitglue\hrule{}あoff\inhibitglue ice
+\fbox{\hbox{あウあ\inhibitglue ウ}}
+\inhibitglue\par\noindent あ1
+\par\inhibitglue\noindent あ2
+\par\noindent\inhibitglue あ3
+\par\inhibitglue\hrule あoff\inhibitglue ice
 \end{LTXexample}
 
 With the help of this example, we remark the specification of \verb+\inhibitglue+:
@@ -2818,7 +2840,7 @@ after `beginning/ending of a group' characters.
 \item State~$M$: 行中．
 \item State~$K$: 行中（和文文字の後）．
 \end{itemize}
-また，状態遷移は，図~\ref{fig-ptexipro} のようになっており，図中の数字は
+また，状態遷移は，図\ref{fig-ptexipro} のようになっており，図中の数字は
 カテゴリーコードを表している．最初の3状態は\TeX の入力処理部と同じであり，
 図中から状態$K$と「$j$」と書かれた矢印を取り除けば，\TeX の入力処理部と同
 じものになる．
@@ -2995,8 +3017,7 @@ with the \textit{id} of it:
       nodes come from a hbox which is already packaged, by unpackaging
       (\verb+\unhbox+).
       The \textit{id} is \textit{id\_pbox}.
-\item A inline math formula, including two \textit{math\_node}s at the boundary of it:
-HOGE
+\item A inline math formula, including two \textit{math\_node}s at the boundary of it.
       The \textit{id} is \textit{id\_math}.
 \item A \textit{glyph\_node}~$p$ with nodes which relate with it:
 \begin{enumerate}
@@ -3059,16 +3080,35 @@ $\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$は，その和文文字
 便宜的に，$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$ともに
 「文字コード$-1$の欧文文字」とおく．
 \item[\textit{id\_hlist}] 縦方向にシフトされていない hbox．\\
-
-
-\item[\textit{id\_pbox}] 「既に処理された」ノードのリスト．
-\item[\textit{id\_disc}] discretionary break (\verb+\discretionary{pre}{post}{nobreak}+).
-
-
-\item[\textit{id\_box\_like}] \textit{id\_hlist}とならないboxや，rule．
-\item[他] ...
+この場合，$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$はそれぞれ$p$の内容を表すリストの，
+先頭・末尾のノードである．
+\begin{itemize}
+\item 状況によっては，\TeX ソースで言うと
+\begin{verbatim}
+\hbox{\hbox{abc}...\hbox{\lower1pt\hbox{xyz}}}
+\end{verbatim}
+のように，$p$の内容が別の hbox で開始・終了している可能性も十分あり得る．そのような場合，
+$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$の算出は，\textbf{垂直方向にシフトされていない} hbox の
+場合だけ内部を再帰的に探索する．例えば上の例では，$\mathit{Np}.\mathit{head}$は文字「a」を表すノードであり，
+一方$\mathit{Np}.\mathit{tail}$は垂直方向にシフトされた hbox，\verb+\lower1pt\hbox{xyz}+に対応するノードである．
+\item また，先頭にアクセント付きの文字がきたり，末尾にイタリック補正用の kern が
+来ることもあり得る．この場合は，クラスタの定義のところにもあったように，それらは無視して算出を行う．
+\item 最初・最後のノードが合字によって作られた\textit{glyph\_node}のときは，それぞれに対して\textit{id\_glyph}%
+と同様に再帰的に構成要素をたどっていく．
+\end{itemize}
+\item[\textit{id\_pbox}] 「既に処理された」ノードのリスト．\\
+\textit{id\_hlist}と同じ方法で$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$を算出する，
+\item[\textit{id\_disc}] discretionary break (\verb+\discretionary{pre}{post}{nobreak}+).\\
+\textit{id\_hlist}と同じ方法で$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$を算出するが，
+第3引数の \texttt{nobreak}（行分割が行われない時の内容）を使う．言い換えれば，ここで行分割が発生した時の状況は
+全く考慮に入れない．
+\item[\textit{id\_box\_like}] \textit{id\_hlist}とならないboxや，rule．\\
+この場合は，$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$のデータは利用されないので，2つの算出は無意味である．
+敢えて明示するならば，$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$は共にnil値である．
+\item[他] 以上にない\textit{id}に対しても，$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$の算出は無意味．
 \end{description}
 
+\subsection{クラスタ間のグルー：概観}
 
 
 \end{document}
