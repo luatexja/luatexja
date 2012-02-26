@@ -1,16 +1,23 @@
 %#! lualatex -shell-escape manual.ins
 
-%<en>\documentclass[a4paper,titlepage]{article}
-%<ja>\documentclass[a4paper,titlepage]{ltjsarticle}
-\usepackage[margin=20mm,footskip=5mm]{geometry}
+%<*en>
+\documentclass[a4paper,titlepage]{article}
+\usepackage[margin=25mm,footskip=5mm]{geometry}
+%</en>
+%<*ja>
+\documentclass[a4paper,titlepage]{ltjsarticle}
+\usepackage[margin=25mm, footskip=5mm]{geometry}
+\advance\leftmargini-1\zw\advance\leftmarginii-1\zw
+%</ja>
 
-\usepackage{amsmath,amssymb,xcolor,pict2e,multienum,amsthm,float}
+\usepackage{amsmath,amssymb,xcolor,pict2e,multienum,amsthm,float,makecell}
 \usepackage{booktabs,listings,showexpl,multicol}
 \usepackage{luatexja-otf}
 \usepackage{luatexja-fontspec}
 \usepackage[unicode]{hyperref}
 \usepackage[all]{xy}
 \SelectTips{cm}{}
+\def\labelenumii{(\arabic{enumii})}
 
 \DeclareRobustCommand\eTeX{\ensuremath{\varepsilon}-\kern-.125em\TeX}
 \DeclareRobustCommand\LuaTeX{Lua\TeX}
@@ -22,7 +29,7 @@
 \DeclareRobustCommand\epTeX{\ensuremath{\varepsilon}-\kern-.125em\pTeX}
 
 \ltjsetparameter{jacharrange={-3}}
-\ltjdefcharrange{6}{`■}
+\ltjdefcharrange{6}{`■,`…,`→,`←,`↓,`↑}
 \theoremstyle{definition}
 %<en>\newtheorem{defn}{Definition}
 %<ja>\newtheorem{defn}{定義}
@@ -190,7 +197,7 @@ The followings are major changes from \pTeX:
       `variation'.
 %</en>
 %<*ja>
-\item 和文フォントは「実際の」フォント，和文フォントメトリック（JFM と呼ぶ），そ
+\item 和文フォントは（小塚明朝，IPA明朝などの）実際のフォント，和文フォントメトリック（JFM と呼ぶ），そ
       して `variation' と呼ばれる文字列の組である．
 %</ja>
 
@@ -471,9 +478,8 @@ The installation methods are as follows:
 %<*ja>
 \item ソースアーカイブをダウンロードする．
 
-      現時点では，\LuaTeX-ja の公式リリースはないので，レポジトリからアーカイブを
-      取得しなければならない．
-      次のようにすることで，Git レポジトリを取得することができる：
+      現時点では，\LuaTeX-ja の公式リリースはまだない．そのため，Git レポジトリを
+      次のようにすることで取得する必要がある：
 %</ja>
 \begin{verbatim}
 $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
@@ -482,7 +488,7 @@ $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
       or download the archive of HEAD in \texttt{master} branch from
 %</en>
 %<*ja>
-      もしくは，\texttt{master} ブランチの HEAD アーカイブを以下からダウンロードすることができる：
+      もしくは，\texttt{master} ブランチの HEAD のアーカイブを以下からダウンロードしてもよい：
 %</ja>
 \begin{flushleft}
 \url{http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git;a=snapshot;h=HEAD;sf=tgz}.
@@ -492,14 +498,17 @@ $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
 Note that the forefront of development may not be in \texttt{master} branch.
 %</en>
 %<*ja>
-開発中の最新の成果は \texttt{master} ブランチには含まれていないかもしれないことに注意．
+\texttt{master} ブランチはたまにしか更新されない．
+最新の開発中のコードは \texttt{master} ブランチには含まれていない場合がかなり多いので注意．
 %</ja>
 
 %<*en>
 \item Extract the archive. You will see \texttt{src/} and several other sub-directories.
 %</en>
 %<*ja>
-\item アーカイブを展開する．\texttt{src/} をはじめとしたいくつかのディレクトリができる．
+\item 後者の方法でアーカイブ取得したならば，それをを展開する．
+      \texttt{src/} をはじめとしたいくつかのディレクトリができるが，
+      動作には \texttt{src/} 以下の内容だけで十分．
 %</ja>
 
 %<*en>
@@ -507,6 +516,8 @@ Note that the forefront of development may not be in \texttt{master} branch.
 %</en>
 %<*ja>
 \item \texttt{src/} の中身全てを自分の \texttt{TEXMF} ツリーにコピーする．
+      シンボリックリンクが利用できる環境で，かつレポジトリを直接取得したのであれば，コピーではなく
+      リンクを貼るのが適切だろう．
 %</ja>
 
 %<*en>
@@ -526,7 +537,7 @@ Note that the forefront of development may not be in \texttt{master} branch.
       encodings, such as EUC-JP or Shift-JIS, are not supported.
 %</en>
 %<*ja>
-\item 原稿のソースファイルの文字コードは UTF-8 でなければならない．
+\item 原稿のソースファイルの文字コードは UTF-8 固定である．
       従来日本語の文字コードとして用いられてきた EUC-JP や Shift-JIS は使用できません．
 %</ja>
 
@@ -621,7 +632,7 @@ This does minimal settings (like \texttt{ptex.tex}) for typesetting Japanese doc
 \item `Ryumin-Light' と `GothicBBB-Medium' は PDF ファイルに埋め込まずに
       名前参照のみで用いることが広く受け入れられており，この場合 PDF リーダーが
       適切な外部フォントで代用する（例えば，Adobe Reader では Ryumin-Light は
-      小塚明朝で代替される）．そこで，これらをデフォルトのフォントと
+      小塚明朝で代替される）．そこで，これらを引き続きデフォルトのフォントと
       して採用する．
 %</ja>
 
@@ -633,8 +644,9 @@ This does minimal settings (like \texttt{ptex.tex}) for typesetting Japanese doc
 %</en>
 %<*ja>
 \item 欧文フォントの文字は和文フォントの文字よりも，同じ文字サイズでも
-      一般に小さい．そこで，これらの和文フォントの実際のサイズは指定された値よりも
+      一般に小さくデザインされている．そこで，標準ではこれらの和文フォントの実際のサイズは指定された値よりも
       小さくなるように設定されており，具体的には指定の 0.962216 倍にスケールされる．
+      この 0.962216 という数値も，p\TeX におけるスケーリングを踏襲した値である．
 %</ja>
 \end{itemize}
 
@@ -783,13 +795,13 @@ sources like the following:
 %</en>
 %<*ja>
 \paragraph{意見：数式モード中の和文文字}
-\pTeX では，何もしないでも数式中に和文文字を記述することができた．そのため，
+\pTeX では，特に何もしないでも数式中に和文文字を記述することができた．そのため，
 以下のようなソースが見られた：
 %</ja>
 \begin{LTXexample}
 $f_{高温}$~($f_{\text{high temperature}}$).
-\[ y=(x-1)^2+2\quad{}よって\quad y>0 \]
-$5\in{}素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
+\[ y=(x-1)^2+2\quad よって\quad y>0 \]
+$5\in 素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
 \end{LTXexample}
 %<*en>
 We (the project members of \LuaTeX-ja) think that using
@@ -829,7 +841,7 @@ $f_{\text{高温}}$~%
 ($f_{\text{high temperature}}$).
 \[ y=(x-1)^2+2\quad
   \mathrel{\text{よって}}\quad y>0 \]
-$5\in{}素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
+$5\in 素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
 \end{LTXexample}
 %BUG?: \{\}がなければ「素」がでない．上の段落の「よって」もでてない．
 %<*en>
@@ -1060,6 +1072,9 @@ However, this reloading won't work for the current version (2011/09/09,~v0.981) 
  \def\tipacatchonechar#1{\begingroup
   \def\textipa##1{##1}% prevent recursion
 \end{lstlisting}
+%<*ja>
+なお，上流で v0.984 (2011/10/14) でこの問題は修正されているそうです．
+%</ja>
 
 
 %<en>\section{Changing Parameters}
@@ -1076,7 +1091,7 @@ parameters, you have to use commands \verb+\ltjsetparameter+ and
 \LuaTeX-ja には多くのパラメータが存在する．そして \LuaTeX の振る舞いのために，
 その多くは \TeX のレジスタにではなく，\LuaTeX-ja 独自の方法で保持されている．
 そのため，これらのパラメータを設定・取得するためには \verb+\ltjsetparameter+ と
-\verb+\ltjgetparameter+ を用いなければならない．
+\verb+\ltjgetparameter+ を用いる必要がある．
 %</ja>
 
 %<en>\subsection{Editing the range of \textbf{JAchar}s}
@@ -1090,10 +1105,10 @@ next line assigns whole characters in Supplementary Multilingual Plane
 and the character `漢' to the range number~100.
 %</en>
 %<*ja>
-\textbf{JAchar} の範囲を設定するためには，まず文字範囲に0より大きく217より小さい
-自然数を割り当てる必要がある．これには \verb+\ltjdefcharrange+ プリミティブを用いる．
-例えば，次のように書くことで追加多言語面 (SMP) にある全ての文字と `漢' の範囲番号が
-100に設定される．
+\textbf{JAchar} の範囲を設定するためには，まず各文字に0より大きく217より小さい index を
+割り当てる必要がある．これには \verb+\ltjdefcharrange+ プリミティブを用いる．
+例えば，次のように書くことで追加多言語面 (SMP) にある全ての文字と `漢' が
+「100番の文字範囲」に属する設定される．
 %</ja>
 \begin{lstlisting}
 \ltjdefcharrange{100}{"10000-"1FFFF,`漢}
@@ -1103,7 +1118,7 @@ This assignment of numbers to ranges are always global, so you should
 not do this in the middle of a document.
 %</en>
 %<*ja>
-この文字範囲への番号の割り当てはいつもグローバルであり，したがって文書の途中で
+この文字範囲の割り当てはいつもグローバルであり，したがって文書の途中で
 この操作をするべきではない．
 %</ja>
 
@@ -1741,30 +1756,6 @@ causes a error.  We denote control sequences which are defined in
 コントロールシーケンスを <jfont\_cs> で表す．
 %</ja>
 
-%<en>\paragraph{Prefix \texttt{psft}}
-%<ja>\paragraph{\texttt{psft} プレフィックス}
-%<*en>
-Besides \texttt{file:}\ and \texttt{name:}\ prefixes, \texttt{psft:}\
-can be used a prefix in \verb+\jfont+ (and~\verb+\font+) primitive.
-Using this prefix, you can specify a `name-only' Japanese font which
-will be not embedded to PDF. Typical use of this prefix is to specify
-the `standard' Japanese fonts, namely, `Ryumin-Light' and
-`GothicBBB-Medium'. For kerning or other information, that of Kozuka
-Mincho Pr6N Regular (this is a font by Adobe Inc., and included in
-Japanese Font Packs for Adore Reader) will be used.
-%</en>
-%<*ja>
-\texttt{file:} と \texttt{name:} のプレフィックスに加えて，
-\verb+\jfont+ プリミティブ（と \verb+\font+ プリミティブ）では
-\texttt{psft:} プレフィックス用いることができる．
-このプレフィックスを用いることで，PDF には埋め込まれない「名前だけの」
-和文フォントを指定することができる．典型的な使い方は「標準的な」和文フォント，
-つまり `Ryumin-Light' と `GothicBBB-Medium' を指定することである．
-この場合，カーニング他の情報は小塚明朝 Pr6N Regular
-（Adobe 社によるフォントで，Adobe Reader の日本語フォントパックに含まれている）
-が用いられる．
-%</ja>
-
 \paragraph{JFM}
 %<*en>
 As noted in Introduction, a JFM has measurements of characters and
@@ -1780,7 +1771,7 @@ which JFM will be used for this font by the following keys:
 指定する必要がある：
 %</ja>
 
-\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
+\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
 \item[jfm=<name>]
 %<*en>
 Specify the name of JFM. If specified JFM has not been loaded, \LuaTeX-ja search and load 
@@ -1915,6 +1906,36 @@ TODO: kanjiskip?
 \end{itemize}
 
 
+%<en>\subsection{Prefix \texttt{psft}}
+%<ja>\subsection{\texttt{psft} プレフィックス}
+%<*en>
+Besides \texttt{file:}\ and \texttt{name:}\ prefixes, one can use \texttt{psft:}\
+prefix in \verb+\jfont+ (and~\verb+\font+) primitive,
+to specify a `name-only' Japanese font which
+will be not embedded to PDF. Typical use of this prefix is to specify
+the `standard' Japanese fonts, namely, `Ryumin-Light' and
+`GothicBBB-Medium'. For kerning or other information, that of Kozuka
+Mincho Pr6N Regular (this is a font by Adobe Inc., and included in
+Japanese Font Packs for Adobe Reader) will be used.
+%</en>
+%<*ja>
+\texttt{file:} と \texttt{name:} のプレフィックスに加えて，
+\verb+\jfont+ プリミティブ（と \verb+\font+ プリミティブ）では
+\texttt{psft:} プレフィックスを用いることができる．
+このプレフィックスを用いることで，PDF には埋め込まれない「名前だけの」
+和文フォントを指定することができる．典型的な使い方は「標準的な」和文フォント，
+つまり `Ryumin-Light' と `GothicBBB-Medium' を指定することである．
+この場合，カーニング他の情報は小塚明朝 Pr6N Regular
+（Adobe 社によるフォントで，Adobe Reader の日本語フォントパックに含まれている）
+が用いられる．
+%</ja>
+
+\paragraph{\texttt{cid} key}
+\label{para-cid}
+
+ \texttt{cid} key, ...
+
+
 %<en>\subsection{Structure of JFM file}
 %<ja>\subsection{JFM ファイルの構造}
 A JFM file is a Lua script which has only one function call:
@@ -1926,7 +1947,7 @@ Real data are stored in the table which indicated above by
 structure of this table.  Note that all lengths in a JFM file are
 floating-point numbers in design-size unit.
 
-\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
+\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
 \item[dir=<direction>] (required)
 
 The direction of JFM. At the present, only \texttt{'yoko'} is supported.
@@ -1961,7 +1982,7 @@ always present, so each JFM file must have a sub-table whose index is
 \texttt{[0]}.  Each sub-table (its numerical index is denoted by $i$) has
 the following fields:
 
-\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
+\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
 \item[chars=\{<character>, ...\}] (required except character class~0)
 
 This field is a list of characters which are in this character
@@ -2071,7 +2092,7 @@ the `real' glyph is centered horizontally (the green rectangle).
 \end{list}
 
 %<*en>
-\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
+\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
 \item['lineend'] An ending of a line.
 \item['diffmet'] Used at a boundary between two \textbf{JAchar}s whose JFM or size is different.
 \item['boxbdd'] The beginning/ending of a horizontal box, and the beginning of a noindented paragraph.
@@ -2087,7 +2108,7 @@ the `real' glyph is centered horizontally (the green rectangle).
 指定可能である．これらは，大半が\pTeX のJFMグルーの挿入処理ではみな「文字
 クラス0の文字」として扱われていた文字であり，その結果として\pTeX より細か
 い組版調整ができるようになっている．以下でその一覧を述べる：
-\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
+\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
 \item['lineend'] 行の終端を表す．
 \item['diffmet']
 
@@ -2135,9 +2156,9 @@ the `real' glyph is centered horizontally (the green rectangle).
 \begin{LTXexample}
 \jfont\g=psft:Ryumin-Light:jfm=test \g
 \parindent1\zw\noindent{}◆◆◆◆◆
-\par{}「◆◆←二分下がり
-\par{}【◆◆←全角下がり
-\par{}〔◆◆←全角二分下がり
+\par 「◆◆←二分下がり
+\par 【◆◆←全角下がり
+\par 〔◆◆←全角二分下がり
 \end{LTXexample}
 \end{itemize}
 \ltjsetparameter{jacharrange={-3}}
@@ -2330,7 +2351,7 @@ in \pTeX, and symbols beside each parameter has the following meaning:
 \item `\dagger': assignments are always global.
 \end{itemize}
 
-\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
+\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
 \item[\Param{jcharwidowpenalty}\,=<penalty>] [\verb+\jcharwidowpenalty+]
 
 Penalty value for suppressing orphans. This penalty is inserted just
@@ -2441,7 +2462,7 @@ The allowed arguments are the followings:
 %<en>\subsection{Primitives for Compatibility}
 %<ja>\subsection{互換プリミティブ}
 The following primitives are implemented for compatibility with \pTeX:
-\begin{list}{}{\def\makelabel{\ttfamily\char92 }}
+\begin{list}{}{\def\makelabel{\ttfamily\char92 }\advance\leftmargin1\zw}
 \item[kuten]
 \item[jis]
 \item[euc]
@@ -2457,9 +2478,11 @@ the beginning of a box and `あ', and also between `あ' and `ウ'.
 
 \begin{LTXexample}
 \jfont\g=psft:Ryumin-Light:jfm=test \g
-あウあ\inhibitglue{}ウ\inhibitglue\par
-あ\par\inhibitglue{}あ
-\par\inhibitglue\hrule{}あoff\inhibitglue ice
+\fbox{\hbox{あウあ\inhibitglue ウ}}
+\inhibitglue\par\noindent あ1
+\par\inhibitglue\noindent あ2
+\par\noindent\inhibitglue あ3
+\par\inhibitglue\hrule あoff\inhibitglue ice
 \end{LTXexample}
 
 With the help of this example, we remark the specification of \verb+\inhibitglue+:
@@ -2590,7 +2613,7 @@ As closing this subsection, we shall introduce an example of
 This optional package supports typesetting characters in
 Adobe-Japan1. \texttt{luatexja-otf.sty} offers the following 2~low-level
 commands:
-\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}}
+\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
 \item[\char92CID\{<number>\}]
 Typeset a character whose CID number is <number>.
 \item[\char92UTF\{<hex\_number>\}]
@@ -2626,7 +2649,7 @@ whose CID number in Adobe-Japan1 is \verb+xxx+.
 %<ja>\subsection{用いられる寸法レジスタ，属性レジスタ，whatsit ノード}
 Here the following is the list of dimensions and attributes which are used in \LuaTeX-ja.
 \begin{list}{}{%
-\def\makelabel{\ttfamily}
+\def\makelabel{\ttfamily}\advance\leftmargin1\zw
 \def\dim#1{\item[\char92 #1\ \textrm{(dimension)}]}
 \def\attr#1{\item[\char92 #1\ \textrm{(attribute)}]}
 }
@@ -2818,7 +2841,7 @@ after `beginning/ending of a group' characters.
 \item State~$M$: 行中．
 \item State~$K$: 行中（和文文字の後）．
 \end{itemize}
-また，状態遷移は，図~\ref{fig-ptexipro} のようになっており，図中の数字は
+また，状態遷移は，図\ref{fig-ptexipro} のようになっており，図中の数字は
 カテゴリーコードを表している．最初の3状態は\TeX の入力処理部と同じであり，
 図中から状態$K$と「$j$」と書かれた矢印を取り除けば，\TeX の入力処理部と同
 じものになる．
@@ -2987,6 +3010,8 @@ u
 %<en>\subsection{definition of a `cluster'}
 %<ja>\subsection{「クラスタ」の定義}
 
+\def\OA{$\text{\sf O}_{\text{\sf A}}$}
+\def\OB{$\text{\sf O}_{\text{\sf B}}$}
 \begin{defn}
 A \emph{cluster} is a list of consecutive nodes in one of the following forms,
 with the \textit{id} of it:
@@ -2995,8 +3020,7 @@ with the \textit{id} of it:
       nodes come from a hbox which is already packaged, by unpackaging
       (\verb+\unhbox+).
       The \textit{id} is \textit{id\_pbox}.
-\item A inline math formula, including two \textit{math\_node}s at the boundary of it:
-HOGE
+\item A inline math formula, including two \textit{math\_node}s at the boundary of it.
       The \textit{id} is \textit{id\_math}.
 \item A \textit{glyph\_node}~$p$ with nodes which relate with it:
 \begin{enumerate}
@@ -3020,7 +3044,7 @@ HOGE
 The \textit{id} is \textit{id\_jglyph} or
 \textit{id\_glyph}, according to whether the \textit{glyph\_node}
 represents a Japanese character or not.
-\item An box-like node, that is, an hbox, an vbox, an rule (\verb+\vrule+) and an \textit{unset\_node}.
+\item An box-like node, that is, an hbox, a vbox, a rule (\verb+\vrule+) and an \textit{unset\_node}.
 The \textit{id} is \textit{id\_hlist} if the node is an
       hbox which is not shifted vertically, or \textit{id\_box\_like}
       otherwise.
@@ -3033,10 +3057,13 @@ We denote a cluster by \textit{Np}, \textit{Nq} and \textit{Nr}.
 
 以降は日本語．
 
-次に，$\mathit{Np}.\mathit{id}$の意味を述べるとともに，
+\paragraph{\textit{id}の意味}
+$\mathit{Np}.\mathit{id}$の意味を述べるとともに，
 「先頭の文字」を表す\textit{glyph\_node}~$\mathit{Np}.\mathit{head}$と，
 「最後の文字」を表す\textit{glyph\_node}~$\mathit{Np}.\mathit{tail}$を次のように定義する．
-
+直感的に言うと，\textit{Np}は$\mathit{Np}.\mathit{head}$で始まり$\mathit{Np}.\mathit{tail}$で終わるような単語，
+と見做すことができる．これら$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$は
+説明用に準備した概念であって，実際の Lua コード中にそのように書かれているわけではないことに注意．
 
 \begin{description}
 \item[\textit{id\_jglyph}] 和文文字．\\
@@ -3053,22 +3080,461 @@ $\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$は，その和文文字
 と再帰的に検索していってたどり着いた\textit{glyph\_node}である．
 \item $\mathit{Np}.\mathit{last}$は，同様に末尾→末尾→と検索してたどり着いた\textit{glyph\_node}である．
 \end{itemize}
-
-
 \item[\textit{id\_math}] インライン数式．\\
 便宜的に，$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$ともに
 「文字コード$-1$の欧文文字」とおく．
 \item[\textit{id\_hlist}] 縦方向にシフトされていない hbox．\\
-
-
-\item[\textit{id\_pbox}] 「既に処理された」ノードのリスト．
-\item[\textit{id\_disc}] discretionary break (\verb+\discretionary{pre}{post}{nobreak}+).
-
-
-\item[\textit{id\_box\_like}] \textit{id\_hlist}とならないboxや，rule．
-\item[他] ...
+この場合，$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$はそれぞれ$p$の内容を表すリストの，
+先頭・末尾のノードである．
+\begin{itemize}
+\item 状況によっては，\TeX ソースで言うと
+\begin{verbatim}
+\hbox{\hbox{abc}...\hbox{\lower1pt\hbox{xyz}}}
+\end{verbatim}
+のように，$p$の内容が別の hbox で開始・終了している可能性も十分あり得る．そのような場合，
+$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$の算出は，\textbf{垂直方向にシフトされていない} hbox の
+場合だけ内部を再帰的に探索する．例えば上の例では，$\mathit{Np}.\mathit{head}$は文字「a」を表すノードであり，
+一方$\mathit{Np}.\mathit{tail}$は垂直方向にシフトされた hbox，\verb+\lower1pt\hbox{xyz}+に対応するノードである．
+\item また，先頭にアクセント付きの文字がきたり，末尾にイタリック補正用の kern が
+来ることもあり得る．この場合は，クラスタの定義のところにもあったように，それらは無視して算出を行う．
+\item 最初・最後のノードが合字によって作られた\textit{glyph\_node}のときは，それぞれに対して\textit{id\_glyph}%
+と同様に再帰的に構成要素をたどっていく．
+\end{itemize}
+\item[\textit{id\_pbox}] 「既に処理された」ノードのリストであり，これらのノードが二度処理を受けないために
+まとめて1つのクラスタとして取り扱うだけである．
+\textit{id\_hlist}と同じ方法で$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$を算出する，
+\item[\textit{id\_disc}] discretionary break (\verb+\discretionary{pre}{post}{nobreak}+).\\
+\textit{id\_hlist}と同じ方法で$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$を算出するが，
+第3引数の \texttt{nobreak}（行分割が行われない時の内容）を使う．言い換えれば，ここで行分割が発生した時の状況は
+全く考慮に入れない．
+\item[\textit{id\_box\_like}] \textit{id\_hlist}とならないboxや，rule．\\
+この場合は，$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$のデータは利用されないので，2つの算出は無意味である．
+敢えて明示するならば，$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$は共にnil値である．
+\item[他] 以上にない\textit{id}に対しても，$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$の算出は無意味．
 \end{description}
 
+\paragraph{クラスタの別の分類}
+さらに，JFMグルー挿入処理の実際の説明により便利なように，\textit{id}とは別のクラスタの分類を行っておく．
+挿入処理では2つの隣り合ったクラスタの間に
+空白等の実際の挿入を行うことは前に書いたが，ここでの説明では，問題にしているクラスタ\textit{Np}は「後ろ側」のクラスタである
+とする．「前側」のクラスタについては，以下の説明で\textit{head}が\textit{last}に置き換わることに注意すること．
+\begin{description}
+\item[和文A] リスト中に直接出現している和文文字．
+\textit{id}が\textit{id\_jglyph}であるか，\\
+\textit{id}が\textit{id\_pbox}であって$\mathit{Np}.\mathit{head}$が\textbf{JAchar}であるとき．
+
+\item[和文B] リスト中のhboxの中身の先頭として出現した和文文字．和文Aとの違いは，これの前に
+JFMグルーの挿入が行われない（\Param{xkanjiskip},~\Param{kanjiskip}は入り得る）ことである．\\
+\textit{id}が\textit{id\_hlist}か\textit{id\_disc}であって$\mathit{Np}.\mathit{head}$が\textbf{JAchar}であるとき．
+
+\item[欧文] リスト中に直接/hboxの中身として出現している欧文文字．次の3つの場合が該当：
+\begin{itemize}
+\item \textit{id}が\textit{id\_glyph}である．
+\item \textit{id}が\textit{id\_math}である．
+\item \textit{id}が\textit{id\_pbox}か\textit{id\_hlist}か\textit{id\_disc}であって，$\mathit{Np}.\mathit{head}$が\textbf{ALchar}．
+\end{itemize}
+\item[箱] box，またはそれに類似するもの．次の2つが該当：
+\begin{itemize}
+\item \textit{id}が\textit{id\_pbox}か\textit{id\_hlist}か\textit{id\_disc}であって，$\mathit{Np}.\mathit{head}$が\textit{glyph\_node}でない．
+\item \textit{id}が\textit{id\_box\_like}である．
+\end{itemize}
+
+\end{description}
+
+\subsection{段落/hboxの先頭や末尾}
+\paragraph{先頭部の処理}
+まず，段落/hboxの一番最初にあるクラスタ\textit{Np}を探索する．
+hboxの場合は何の問題もないが，段落の場合では以下のノード達を事前に読み飛ばしておく：
+\begin{center}
+\verb+\parindent+由来のhbox ($\mathit{subtype}=3$)，及び\textit{subtype}が44~(\textit{user\_defined})でない
+ようなwhatsit．
+\end{center}
+これは，\verb+\parindent+由来のhboxがクラスタを構成しないようにするためである．
+
+次に，\textit{Np}の直前に空白$g$を必要なら挿入する：
+\begin{enumerate}
+\item この処理が働くような\textit{Np}は\textsf{和文A}である．
+\item 問題のリストが字下げありの段落（\verb+\parindent+由来のhboxあり）の場合は，
+この空白$g$は「文字コード\texttt{'parbdd'}の文字」と\textit{Np}の間に入るglue/kernである．
+\item そうでないとき（\verb+noindent+で開始された段落や，hbox）は，
+$g$は「文字コード\texttt{'boxbdd'}の文字」と\textit{Np}の間に入るglue/kernである．
+\end{enumerate}
+ただし，もし$g$がglueであった場合，この挿入によって\textit{Np}による行分割が新たに可能になるべきではない．
+そこで，以下の場合には，$g$の直前に\verb+\penalty10000+を挿入する：
+\begin{itemize}
+\item 問題にしているリストが段落であり，かつ
+\item \textit{Np}の前には予めペナルティがなく，$g$はglue．
+\end{itemize}
+
+\paragraph{末尾の処理}
+末尾の処理は，問題のリストが段落のものかhboxのものかによって異なる．
+後者の場合は容易い：最後のクラスタを\textit{Nq}とおくと，\textit{Nq}と「文字コード\texttt{'boxbdd'}の文字」の間に入るglue/kernを，
+\textit{Nq}の直後に挿入するのみである．
+
+一方．前者（段落）の場合は，リストの末尾は常に\verb+\penalty10000+と，
+\verb+\parfillskip+由来のグルーが存在する．よって，最後のクラスタ\textit{Np}は
+この\verb+\parfillskip+由来のグルーとなり，実質的な中身の最後はその1つ前のクラスタ\textit{Nq}となる．
+\begin{enumerate}
+\item まず\textit{Nq}の直後に（後に述べる）\textsf{line-end~[E]}によって定まる空白を挿入する．
+\item 次に，段落の最後の「通常の和文文字${}+{}$句点」が独立した行となるのを防ぐために，
+\Param{jcharwidowpenalty}の値の分だけ適切な場所のペナルティを増やす．
+
+ペナルティ量を増やす場所は，\textit{head}が\textbf{JAchar}であり，かつその文字の\Param{kcatcode}が偶数であるような
+最後のクラスタの直前にあるものたちである\footnote{大雑把に言えば，\Param{kcatcode}が奇数であるような\textbf{JAchar}
+を約物として考えていることになる．\Param{kcatcode}の最下位ビットはこの\Param{jcharwidowpenalty}用にのみ利用される．}．
+\end{enumerate}
+
+\subsection{概観と典型例：2つの「和文A」の場合}
+先に述べたように，2つの隣り合ったクラスタ，\textit{Nq}と\textit{Np}の間には，
+ペナルティ，\verb+\vadjust+，whatsitなど，行組版には関係しないものがある．模式的に表すと，
+\[
+ \Node{cluster}{\textit{Nq}}\longrightarrow
+\overbrace{
+\Node{penalty}{$p$}\longrightarrow \cdots\longrightarrow \Node{whatsit}{}}^{(a)}
+\longrightarrow \Node{cluster}{\textit{Np}}
+\]
+のようになっている．間の(a)に相当する部分には，何のノードもない場合ももちろんあり得る．
+そうして，JFMグルー挿入後には，この2クラスタ間は次のようになる：
+\[
+ \Node{cluster}{\textit{Nq}}\longrightarrow\Node{kern}{左空白}\longrightarrow 
+\overbrace{
+\Node{penalty}{$p+x$}\longrightarrow \cdots\longrightarrow \Node{whatsit}{}}^{(a)}
+\longrightarrow \Node{glue or kern}{右空白}\longrightarrow \Node{cluster}{\textit{Np}}
+\]
+
+以後，\textbf{典型的な例として，クラスタ\textit{Nq}と\textit{Np}が共に\textsf{\textmd{和文A}}である場合を見ていこう，}
+この場合が全ての場合の基本となる．
+
+\paragraph{「右空白」の算出}
+まず，「右空白」にあたる量を算出する．通常はこれが，隣り合った2つの和文文字間に入る空白量となる．
+\begin{description}
+\item[JFM由来{[M]}] JFMの文字クラス指定によって入る空白を以下によって求める．この段階で空白量が未定義（未指定）だった場合，
+      デフォルト値\Param{kanjiskip}を採用することとなるので，次へ．
+\begin{enumerate}
+\item もし両クラスタの間で\verb+\inhibitglue+が実行されていた場合（証としてwhatsitノードが自動挿入される），
+      代わりに\Param{kanjiskip}が挿入されることとなる．次へ．
+\item \textit{Nq}と\textit{Np}が同じJFM・同じ\texttt{jfmvar}キー・同じサイズの和文フォントであったならば，
+      共通に使っているJFM内で挿入される空白 (glue or kern) が決まっているか調べる．
+\item 1.でも2.でもない場合は，\textit{Nq}と\textit{Np}が違うJFM/\texttt{jfmvar}/サイズである．
+この場合，まず
+\[
+\vcenter{\halign{\hfil$#:={}$&(\inhibitglue#\inhibitglue)\cr
+gb&\textit{Nq}と「文字コードが{\tt'diffmet'}の文字」との間に入るglue/kern\cr
+ga&「文字コードが{\tt'diffmet'}の文字」と\textit{Np}との間に入るglue/kern\cr
+}}
+\]
+として，左側由来・右側由来の空白 (glue/kern) を（それぞれのJFMから）求める．
+$\mathit{ga}$と$\mathit{gb}$のどちらか片方が未定義であるならば，定義されている側の値をそのまま採用する．
+もし$\mathit{ga}$と$\mathit{gb}$が両方決まっているならば，両者の値を平均\footnote{\Param{differentjfm}パラメタの
+値によって，「大きい方」「小さい方」「合計」に変えることができる．}した値を採用する．
+\end{enumerate}
+
+例えば，
+\begin{verbatim}
+\jfont\foo=psft:Ryumin-Light:jfm=ujis
+\jfont\bar=psft:GothicBBB-Medium:jfm=ujis
+\jfont\baz=psft:GothicBBB-Medium:jfm=ujis;jfmvar=piyo
+\end{verbatim}
+という3フォントを考え，
+\[
+ \overbrace{\Node{glyph}{{\tt\char92 foo}, `あ'}}^{p}
+\longrightarrow \overbrace{\Node{glyph}{{\tt\char92 bar}, `い'}}^{q}
+\longrightarrow \overbrace{\Node{glyph}{{\tt\char92 baz}, `う'}}^{r}
+\]
+という3ノードを考える（それぞれ単独でクラスタをなす）．
+この場合，$p$と$q$の間は，実フォントが異なるにもかかわらず(2)の状況となる一方で，
+$q$と$r$の間は（実フォントが同じなのに）\texttt{jfmvar}キーの内容が異なるので(3)の状況となる．
+\item[\Param{kanjiskip}~{[K]}] 上の[M]において空白が定まらなかった場合，
+\Param{kanjiskip}の値を以下で定め，それを「右空白」として採用する．
+この段階においては，\verb+\inhibitglue+は効力を持たないため，
+結果として，2つの和文文字間には常に何らかのglue/kernが挿入されることとなる．
+\begin{enumerate}
+\item 両クラスタ（厳密には$\mathit{Nq}.\mathit{tail}$，$\mathit{Np}.\mathit{head}$）の中身の文字コードに対する
+\Param{autospacing}パラメタが両方ともfalseだった場合は，長さ0のglueとする．
+\item ユーザ側から見た\Param{kanjiskip}パラメタの自然長が${\tt \char92 maxdimen}=(2^{30}-1)\,{\rm sp}$で
+なければ，\Param{kanjiskip}パラメタの値を持つglueを採用する．
+\item 2.でない場合は，\textit{Nq}, \textit{Np}で使われているJFMに指定されている\Param{kanjiskip}の値を用いる．
+どちらか片方のクラスタだけが和文文字（\textsf{和文A}・\textsf{和文B}）のときは，そちらのクラスタで使われている
+JFM由来の値だけを用いる．もし両者で使われているJFMが異なった場合は，上の[M]~3.と同様の方法を用いて調整する．
+\end{enumerate}
+\end{description}
+\paragraph{「左空白」の算出とそれに伴う補正}
+次に，「左空白」にあたる量を算出する：
+\begin{description}
+\item[line-end~{[E]}]
+\textit{Nq}と\textit{Np}の間で行分割が起きたときに，
+\textit{Nq}と行末の間に入る空白である．ぶら下げ組の組版などに用いられることを期待している．
+\begin{enumerate}
+\item 既に算出した「右空白」がkernである場合は，「左空白」は挿入されない．
+\item 「右空白」がglueか未定義（長さ0のglueとみなす）の場合は，「左空白」は
+\textit{Nq}と「文字コード\texttt{'lineend'}の文字」との間に入るkernとして，JFMから決定される．
+\item 2.で決まった「左空白」の長さが0でなければ，その分だけ先ほど算出した「右空白」の自然長を引く．
+\end{enumerate}
+\end{description}
+\paragraph{禁則用ペナルティの挿入}
+まず，
+\[
+ a:=(\text{\textit{Nq}{\footnotemark}の文字に対する\Param{postbreakpenalty}の値})
++(\text{\textit{Np}{\footnotemark}の文字に対する\Param{prebreakpenalty}の値})
+\]
+とおく\footnotetext{厳密にはそれぞれ$\mathit{Nq}.\mathit{tail}$，$\mathit{Np}.\mathit{head}$．}．
+ペナルティは通常$[-10000,10000]$の整数値をとり，また$\pm 10000$は正負の無限大を意味することになっているが，この$a$の
+算出では単純な整数の加減算を行う．
+
+$a$は禁則処理用に\textit{Nq}と\textit{Np}の間に加えられるべきペナルティ量である．
+\begin{description}
+\item[P-normal~{[PN]}] 
+\textit{Nq}と\textit{Np}の間の(a)部分にペナルティ(\textit{penalty\_node})があれば処理は簡単である：
+それらの各ノードにおいて，ペナルティ値を（$\pm 10000$を無限大として扱いつつ）$a$だけ増加させればよい．
+また，$10000 + (-10000) = 0$としている．
+
+少々困るのは，(a)部分にペナルティが存在していない場合である．
+直感的に，補正すべき量$a$が0でないとき，その値をもつ\textit{penalty\_node}を作って
+「右空白」の（もし未定義なら\textit{Np}の）直前に挿入……
+ということになるが，実際には僅かにこれより複雑である．
+\begin{itemize}
+\item 「右空白」がkernであるとき，
+それは「\textit{Nq}と\textit{Np}の間で改行は許されない」ことを意図している．そのため，
+この場合は$a\neq 0$であってもペナルティの挿入はしない．
+\item 「左空白」がkernとしてきっちり定義されている時（このとき，「右空白」はkernでない），
+この「左空白」の直後での行分割を許容しないといけないので，$a=0$であっても
+\textit{penalty\_node}を作って挿入する．
+\item 以上のどれでもないときは，$a\neq 0$ならば\textit{penalty\_node}を作って挿入する．
+\end{itemize}
+\end{description}
+
+\def\gkf#1#2#3{\sf$\displaystyle\vphantom{\Bigg(}%
+  \frac{\hbox to 1\zw{#1}\hbox to 4.5\zw{\hss #2}}{\hbox{#3}}$}
+\begin{table}[t]
+\caption{Summary of JFM glues}
+\label{tab-jfmglue}
+\begin{center}
+\small
+\begin{tabular}{>{\sf}c|cccccc}
+\toprule
+{\bf\textit{Np}}↓&\sf 和文A&\sf 和文B&\sf 欧文&\sf 箱&\sf glue&\sf kern\\\midrule
+和文A&
+\gkf{E}{M→K}{PN}&
+\gkf{---}{\OA →K}{PN}&
+\gkf{---}{\OA →X}{PN}&
+\gkf{---}{\OA}{PA}&
+\gkf{---}{\OA}{PN}&
+\gkf{---}{\OA}{PS}\\
+和文B&
+\gkf{E}{\OB→K}{PA}&
+\gkf{---}{K}{PS}&
+\gkf{---}{X}{PS}\\
+欧文&
+\gkf{E}{\OB →X}{PA}&
+\gkf{---}{X}{PS}\cr
+箱&\gkf{E}{\OB}{PA}\\
+glue&\gkf{E}{\OB}{PN}\\
+kern&\gkf{E}{\OB}{PS}\\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{quote}
+Here {\small\gkf{E}{M→K}{PN}} means that
+\begin{enumerate}
+\item To determine the `right-space', \LuaTeX-ja first attempts by the method `\textsf{JFM-origin~[M]}'. 
+If this attempt fails, \LuaTeX-ja use the method `\textsf{\Param{kanjiskip}~[K]}'.
+\item The `left space' between \textit{Nq}~and~\textit{Np} is determined by the method `\textsf{line-end~[E]}'.
+\item \LuaTeX-ja adopts the method `\textsf{P-normal~[PN]}' to adjust the penalty between two clusters for \emph{kinsoku shori}.
+\end{enumerate}
+\end{quote}
+\end{table}
+
+\subsection{その他の場合}
+本節の内容は表\ref{tab-jfmglue}にまとめてある．
+
+\paragraph{和文Aと欧文の間}
+\textit{Nq}が\textsf{和文A}で，\textit{Np}が\textsf{欧文}の場合，JFMグルー挿入処理は次のようにして行われる．
+\begin{itemize}
+\item 「右空白」については，まず以下に述べる\textsf{Boundary-B~[\OB]}により空白を決定しようと試みる．
+それが失敗した場合は，\textsf{\Param{xkanjiskip}~[X]}によって定める．
+\item 「左空白」については，既に述べた\textsf{line-end~[E]}をそのまま採用する．それに伴う「右空白」の補正も同じ．
+\item 禁則用ペナルティも，以前述べた\textsf{P-normal~[PN]}と同じである．
+\end{itemize}
+\begin{description}
+\item[Boundary-B~{[\OB]}] 和文文字と「和文でないもの」との間に入る空白を以下によって求め，
+未定義でなければそれを「右空白」として採用する．
+\textsf{JFM-origin~[M]}の変種と考えて良い．
+これによって定まる空白の典型例は，和文の閉じ括弧と欧文文字の間に入る半角アキである．
+\begin{enumerate}
+\item もし両クラスタの間で\verb+\inhibitglue+が実行されていた場合（証としてwhatsitノードが自動挿入される），次へ．
+\item そうでなければ，
+\textit{Nq}と「文字コードが{\tt'jcharbdd'}の文字」との間に入るglue/kernとして定まる．
+\end{enumerate}
+\item[\Param{xkanjiskip}~{[X]}]
+この段階では，\textsf{\Param{kanjiskip}~[K]}のときと同じように，
+\Param{xkanjiskip}の値を以下で定め，それを「右空白」として採用する．
+この段階で\verb+\inhibitglue+は効力を持たないのも同じである．
+\begin{enumerate}
+\item 以下のいずれかの場合は，\Param{xkanjiskip}の挿入は抑止される．しかし，実際には行分割を許容するために，長さ0のglueを採用する：
+\begin{itemize}
+\item 両クラスタにおいて，それらの中身の文字コードに対する\Param{autoxspacing}パラメタが共にfalseである．
+\item \textit{Nq}の中身の文字コードについて，「直後への\Param{xkanjiskip}の挿入」が禁止されている
+（つまり，\Param{jaxspmode}~(or \Param{alxspmode})パラメタが2以上）．
+\item \textit{Np}の中身の文字コードについて，「直前への\Param{xkanjiskip}の挿入」が禁止されている
+（つまり，\Param{jaxspmode}~(or \Param{alxspmode})パラメタが偶数）．
+\end{itemize}
+\item ユーザ側から見た\Param{xkanjiskip}パラメタの自然長が${\tt \char92 maxdimen}=(2^{30}-1)\,{\rm sp}$で
+なければ，\Param{xkanjiskip}パラメタの値を持つglueを採用する．
+\item 2.でない場合は，\textit{Nq}, \textit{Np}（\textsf{和文A}/\textsf{和文B}なのは片方だけ）
+で使われているJFMに指定されている\Param{xkanjiskip}の値を用いる．
+\end{enumerate}
+\end{description}
+
+\paragraph{欧文と和文Aの間}
+\textit{Nq}が\textsf{欧文}で，\textit{Np}が\textsf{和文A}の場合，JFMグルー挿入処理は上の場合とほぼ同じである．
+\textsf{和文A}のクラスタが逆になるので，\textsf{Boundary-A~[\OA]}の部分が変わるだけ．
+\begin{itemize}
+\item 「右空白」については，まず以下に述べる\textsf{Boundary-A~[\OA]}により空白を決定しようと試みる．
+それが失敗した場合は，\textsf{\Param{xkanjiskip}~[X]}によって定める．
+\item \textit{Nq}が和文でないので，「左空白」は算出されない．
+\item 禁則用ペナルティは，以前述べた\textsf{P-normal~[PN]}と同じである．
+\end{itemize}
+\begin{description}
+\item[Boundary-A~{[\OA]}] 「和文でないもの」と和文文字との間に入る空白を以下によって求め，
+未定義でなければそれを「右空白」として採用する．
+\textsf{JFM-origin~[M]}の変種と考えて良い．
+これによって定まる空白の典型例は，欧文文字と和文の開き括弧との間に入る半角アキである．
+\begin{enumerate}
+\item もし両クラスタの間で\verb+\inhibitglue+が実行されていた場合（証としてwhatsitノードが自動挿入される），次へ．
+\item そうでなければ，
+「文字コードが{\tt'jcharbdd'}の文字」と\textit{Np}との間に入るglue/kernとして定まる．
+\end{enumerate}
+\end{description}
+
+\paragraph{和文Aと箱・glue・kernの間}
+\textit{Nq}が\textsf{和文A}で，\textit{Np}が\textsf{箱}・glue・kernのいずれかであった場合，
+両者の間に挿入されるJFMグルーについては同じ処理である．しかし，そこでの行分割に対する仕様が異なるので，
+ペナルティの挿入処理は若干異なったものとなっている．
+
+\begin{itemize}
+\item 「右空白」については，既に述べた\textsf{Boundary-B~[\OB]}により空白を決定しようと試みる．
+それが失敗した場合は，「右空白」は挿入されない．
+\item 「左空白」については，既に述べた\textsf{line-end~[E]}の算出方法をそのまま採用する．それに伴う「右空白」の補正も同じ．
+\item 禁則用ペナルティの処理は，後ろのクラスタ\textit{Np}の種類によって異なる．
+なお，$\mathit{Np}.\mathit{head}$は無意味であるから，
+「$\mathit{Np}.\mathit{head}$に対する\Param{prebreakpenalty}の値」は0とみなされる．言い換えれば，
+\[
+ a:=(\text{\textit{Nq}{\footnotemark}の文字に対する\Param{postbreakpenalty}の値}).
+\]
+\begin{description}
+\item[箱] \textit{Np}が\textsf{箱}であった場合は，両クラスタの間での行分割は
+（明示的に両クラスタの間に\verb+\penalty10000+があった場合を除き）いつも許容される．そのため，
+ペナルティ処理は，後に述べる\textsf{P-allow~[PA]}が\textsf{P-normal~[PN]}の代わりに用いられる．
+\item[glue] \textit{Np}がglueの場合，ペナルティ処理は\textsf{P-normal~[PN]}を用いる．
+\item[kern] \textit{Np}がkernであった場合は，両クラスタの間での行分割は
+（明示的に両クラスタの間にペナルティがあった場合を除き）許容されない．
+ペナルティ処理は，後に述べる\textsf{P-suppress~[PS]}を使う．
+\end{description}
+これらの\textsf{P-normal~[PN]}，\textsf{P-allow~[PA]}，\textsf{P-suppress~[PS]}の違いは，
+\textit{Nq}と\textit{Np}の間（以前の図だと(a)の部分）にペナルティが存在しない場合にのみ存在する．
+\end{itemize}
+
+\begin{description}
+\item[P-allow~{[PA]}] 
+\textit{Nq}と\textit{Np}の間の(a)部分にペナルティがあれば，\textsf{P-normal~[PN]}と同様に，
+それらの各ノードにおいてペナルティ値を$a$だけ増加させる．
+
+(a)部分にペナルティが存在していない場合，
+\LuaTeX-ja は\textit{Nq}と\textit{Np}の間の行分割を可能にしようとする．
+そのために，以下の場合に$a$をもつ\textit{penalty\_node}を作って
+「右空白」の（もし未定義なら\textit{Np}の）直前に挿入する：
+\begin{itemize}
+\item 「右空白」がglueでない（kernか未定義）であるとき．
+\item 「左空白」がkernとしてきっちり定義されている時．
+\end{itemize}
+
+\item[P-suppress~{[PS]}] 
+\textit{Nq}と\textit{Np}の間の(a)部分にペナルティがあれば，\textsf{P-normal~[PN]}と同様に，
+それらの各ノードにおいてペナルティ値を$a$だけ増加させる．
+
+(a)部分にペナルティが存在していない場合，
+\textit{Nq}と\textit{Np}の間の行分割は元々不可能のはずだったのであるが，
+\LuaTeX-ja はそれをわざわざ行分割可能にはしない．
+そのため，「右空白」がglueであれば，その直前に\verb+\penalty10000+を挿入する．
+\end{description}
+
+なお，「右空白」はkern，「左空白」は未定義の
+\[
+ \overbrace{\Node{glyph}{`あ'}}^{\mathit{Nq}}\longrightarrow \overbrace{\Node{glue}{1\,pt}}^{\mathit{Np}}
+\]
+のような状況を考える．
+このとき，$a$，即ち「あ」の\Param{postbreakpenalty}がいかなる値であっても，
+この2クラスタ間は最終的に
+\begin{equation}
+ \overbrace{\Node{glyph}{`あ'}}^{\mathit{Nq}}\longrightarrow 
+\Node{kern}{右空白}\longrightarrow \overbrace{\Node{glue}{1\,pt}}^{\mathit{Np}}
+\label{eq-gref}
+\end{equation}
+となり，$a$分のペナルティは挿入されないことに注意して欲しい．
+\Param{postbreakpenalty}は（$a$は）殆どの場合が非負の値と考えられ，そのような場合では
+\eqref{eq-gref}と
+\[
+ \overbrace{\Node{glyph}{`あ'}}^{\mathit{Nq}}\longrightarrow 
+\Node{penalty}{$a$}\longrightarrow
+\Node{kern}{右空白}\longrightarrow \overbrace{\Node{glue}{1\,pt}}^{\mathit{Np}}
+\]
+との間に差異は生じない%
+\footnote{kern$\rightarrow$glueが1つの行分割可能点(行分割に伴うペナルティは0)
+であるため，たとえ$a=10000$であっても，\textit{Nq}と\textit{Np}の間で行分割を禁止することはできない．}．
+
+\paragraph{箱・glue・kernと和文Aの間}
+\textit{Np}が\textsf{箱}・glue・kernのいずれかで，\textit{Np}が\textsf{和文A}であった場合は，
+すぐ上の（\textit{Nq}と\textit{Np}の順序が逆になっている）場合とほぼ同じであるが，「左空白」がなくなることにのみ注意．
+\begin{itemize}
+\item 「右空白」については，既に述べた\textsf{Boundary-A~[\OA]}により空白を決定しようと試みる．
+それが失敗した場合は，「右空白」は挿入されない．
+\item \textit{Nq}が和文でないので，「左空白」は算出されない．
+\item 禁則用ペナルティの処理は，\textit{Nq}の種類によって異なる．
+$\mathit{Nq}.\mathit{tail}$は無意味なので，
+\[
+ a:=(\text{\textit{Np}{\footnotemark}の文字に対する\Param{prebreakpenalty}の値}).
+\]
+\begin{description}
+\item[箱] \textit{Nq}が\textsf{箱}の場合は，\textsf{P-allow~[PA]}を用いる．
+\item[glue] \textit{Nq}がglueの場合は，\textsf{P-normal~[PN]}を用いる．
+\item[kern] \textit{Nq}がkernの場合は，\textsf{P-suppress~[PS]}を用いる．
+\end{description}
+\end{itemize}
+
+\paragraph{和文Aと和文Bの違い}
+先に述べたように，\textsf{和文B}はhboxの中身の先頭（or 末尾）として出現している
+和文文字である．リスト内に直接ノードとして現れている和文文字（\textsf{和文A}）との違いは，
+\begin{itemize}
+\item \textsf{和文B}に対しては，JFMの文字クラス指定から定まる空白
+\textsf{JFM-origin~[M]}，\textsf{Boundary-A~[\OA]}，\textsf{Boundary-B~[\OB]}）の挿入は行われない．
+「左空白」の算出も行われない．例えば，
+\begin{itemize}
+\item 片方が\textsf{和文A}，もう片方が\textsf{和文B}のクラスタの場合，
+\textsf{Boundary-A~[\OA]}または\textsf{Boundary-B~[\OB]}の挿入を試み，それがダメなら
+\Param{kanjiskip}~\textsf{[K]}の挿入を行う．
+\item \textsf{和文B}の2つのクラスタの間には，\Param{kanjiskip}~\textsf{[K]}が自動的に入る．
+\end{itemize}
+\item \textsf{和文B}と箱・glue・kernが隣接したとき（どちらが前かは関係ない），間にJFMグルー・ペナルティの挿入は一切しない．
+\item \textsf{和文B}と\textsf{和文B}，また\textsf{和文B}と\textsf{欧文}とが隣接した時は，禁則用ペナルティ挿入処理は
+\textsf{P-suppress~[PS]}が用いられる．
+\item \textsf{和文B}の文字に対する\Param{prebreakpenalty},~\Param{postbreakpenalty}の値は使われず，0として計算される．
+\end{itemize}
 
 
+次が具体例である：
+\begin{LTXexample}
+あ．\inhibitglue A\\
+\hbox{あ．}A\\
+あ．A
+\end{LTXexample}
+\begin{itemize}
+\item 1行目の\verb+\inhibitglue+は\textsf{Boundary-B~[\OB]}の処理のみを抑止するので，ピリオドと「A」の間には
+\Param{xkanjiskip}（四分アキ）が入ることに注意．
+\item 2行目のピリオドと「A」の間においては，前者が\textsf{和文B}となる（hboxの中身の末尾として登場しているから）ので，
+そもそも\textsf{Boundary-B~[\OB]}の処理は行われない．よって，\Param{xkanjiskip}が入ることとなる．
+\item 3行目では，ピリオドの属するクラスタは\textsf{和文A}である．これによって，
+ピリオドと「A」の間には\textsf{Boundary-B~[\OB]}由来の半角アキが入ることになる．
+\end{itemize}
+
+\section{psft}
 \end{document}
