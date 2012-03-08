@@ -1,0 +1,96 @@
+\documentclass{zh-article}
+\usepackage{geometry}
+\geometry{twoside,left=23mm,width=170mm,right=17mm,top=25mm,height=231mm,bottom=32mm}
+\def\JTeX{\leavevmode\hbox{\lower.5ex\hbox{J}\kern-.18em\TeX}}
+\def\pTeX{p\TeX}
+\def\upTeX{up\TeX}
+\def\LuaTeX{Lua\TeX}
+\def\cwTeX{cw\TeX}
+\def\PuTeX{P\kern-.1667em\lower.5ex\hbox{U}\kern-.1667em\TeX}
+\begin{document}
+\title{高性能排版：从\pTeX到\LuaTeX-ja}
+\author{马起园}
+\date{2012年3月}
+\maketitle
+\section{引言}
+\subsection{CJK语言排版综述}
+CJK是英文中日韩（Chinese, Japanese, Korean）的缩写。CJK语言的排版因为涉及到大量象形字和诸多技术处理细节，一直是\TeX中的排版难题。自\TeX发明以来，有多种排版CJK语言的方法：
+\begin{itemize}
+\item 次字体框架（subfont scheme），将CJK字体分割为字符为256个或者更少的字符为单位的字体。次字体框架的弊病为不能在不同的次级字体中增加胶（glue）和出格（kern）。
+\item 对\TeX进行扩展，例如扩展至支持Unicode或者JIS之类，可以处理CJK。
+\item 根据扩展的\TeX来处理CJK排版。
+\end{itemize}
+
+由这三种方法，衍生出了大量的CJK版本的\TeX扩展（为讨论方便，此处略去韩国扩展部分）。pmC/pmJ，\cwTeX，\PuTeX，CCT，TY，\JTeX，\pTeX，\Omega-CJK，CJK，xeCJK，zhspacing。
+
+本文主要讨论日本对\TeX的贡献。
+\subsection{日本的\TeX扩展历史}
+1987年，NTT的斋藤康己开发了\JTeX\cite{1}，使用次字体框架（Subfont Scheme）技术，使用33个字体，每个字体包含256个字符。
+
+同年，ASCII公司的大野俊治和苍泽良一开发了ASCII Nihongo \TeX。
+
+1990年，滨野尚人对ASCII Nihongo \TeX扩展了直行排版功能，此版更名为\pTeX。
+
+1995年，\pTeX升级到\TeX3扩展。
+
+2007年，田中琢尔对\pTeX进行Unicode扩展，可以处理CJK区块。
+
+2011年，LuaTeX-ja项目成立。
+\section{\pTeX/\upTeX细节}
+\subsection{汉字间隙}
+汉字间隙在\pTeX中定义为\verb!\kanjiskip!，初始值为\verb!0pt plus .4pt minus.4pt!，有如下定义：
+$$	字宽 \times \frac{1}{单行字数 - 1}	$$
+\subsection{汉字与西文}
+\verb!\noautospacing!和\verb!\autospacing!
+
+汉字与西文之间：\verb!\inhibitxspcode!和\verb!\xspcode!
+
+西文与汉字之间：\verb!\xspcode!和\verb!\inhibitxspcode!
+\subsection{JFM}
+\verb!\inhibitglue!
+
+和文フォントのメトリック情報から、自動的に挿入されるグルーの挿入を禁止します。このプリミティブを挿入した箇所にのみ有効です。 
+\subsection{记号类}
+\verb!\xspcode!和\verb!\inhibitxspcode!
+
+\begin{itemize}
+\item   0  漢字と英字間の処理を禁止する。
+\item   1  文字と直前の英字との間にだけスペースの挿入を禁止する。
+\item   2  直後の英字との間にだけスペースの挿入を禁止する。
+\item   3  前後の英字との間に対して、スペースの挿入を許可する。
+\end{itemize}
+\begin{verbatim}
+    \xspcode`(=1    \xspcode`)=2     \xspcode`[=1
+    \xspcode`]=2    \xspcode``=1     \xspcode`'=2
+    \xspcode`;=2    \xspcode`,=2     \xspcode`.=2
+
+    \inhibitxspcode`、=1   \inhibitxspcode`。=1
+    \inhibitxspcode`，=1   \inhibitxspcode`．=1
+    \inhibitxspcode`；=1   \inhibitxspcode`？=1
+    \inhibitxspcode`（=2   \inhibitxspcode`）=1
+    \inhibitxspcode`［=2   \inhibitxspcode`］=1
+    \inhibitxspcode`｛=2   \inhibitxspcode`｝=1
+    \inhibitxspcode`‘=2   \inhibitxspcode`’=1
+    \inhibitxspcode`“=2   \inhibitxspcode`”=1
+    \inhibitxspcode`〔=2   \inhibitxspcode`〕=1
+    \inhibitxspcode`〈=2   \inhibitxspcode`〉=1
+    \inhibitxspcode`《=2   \inhibitxspcode`》=1
+    \inhibitxspcode`「=2   \inhibitxspcode`」=1
+    \inhibitxspcode`『=2   \inhibitxspcode`』=1
+    \inhibitxspcode`【=2   \inhibitxspcode`】=1
+    \inhibitxspcode`―=0   \inhibitxspcode`～=0
+    \inhibitxspcode`…=0   \inhibitxspcode`￥=0
+    \inhibitxspcode`°=1   \inhibitxspcode`′=1
+    \inhibitxspcode`″=1
+\end{verbatim}
+\section{\LuaTeX-ja：\pTeX的\LuaTeX实现。}
+
+\begin{thebibliography}{99}
+\bibitem{1}奥村晴彦，{\it \pTeX\ and Japanese Typesetting\/}, The Asian Journal of \TeX\ 2 (2008), no. 1, 43-51
+\bibitem{2}斋藤康己，{\it Report on \JTeX: A Japanese \TeX\/}, TUGboat 8 (1987), no. 2, 103-116.
+\bibitem{3}滨野尚人，{\it Vertical typesetting with \TeX\/}, TUGboat 11 (1990), no. 3, 346-352.
+\bibitem{4}田中琢尔，{\it \upTeX\/}. \texttt{http://homepage3.nifty.com/ttk/comp/tex/uptex.html}
+\bibitem{5}ASCII MEDIA WORKS, {\hei アスキー日本語\TeX\ (\pTeX)}. \texttt{http://ascii.asciimw.jp/pb/ptex/}
+\bibitem{6}赵珍焕，奥村晴彦，{\it Typesetting CJK Languages with Omega\/}, \TeX, XML, and Digital Typography, Lecture Notes in Computer Science, vol.~3130, Springer, 2004, 139--148.
+\end{thebibliography}
+\end{document}
