@@ -1,0 +1,86 @@
+%#!lualatex
+\documentclass{article}
+
+\usepackage{luatexja}
+\usepackage{palatino,listings,color,showexpl}
+\usepackage
+[
+	papersize={100mm,100mm},
+	hmargin={5mm,5mm},
+	vmargin={5mm,5mm}
+]{geometry}
+\pagestyle{empty}
+
+\lstset
+{
+	language=sh,
+	backgroundcolor=\color[gray]{.75},
+	breaklines=true,
+    basewidth={0.55\zw, 0.45em},
+	numbers=left,numberstyle=\tiny, numbersep=2pt,
+}
+
+\lstnewenvironment{env}[1]
+{
+	\ifx\relax#1\else
+	\renewcommand{\lstlistingname}{ex}
+	\lstset
+	{
+		caption=#1,
+	}
+	\fi
+}{}
+\DeclareFontShape{JY3}{mc}{m}{sl}{<-> s * [0.92489] psft:Ryumin-Light:jfm=ujis;slant=0.167}{}
+\DeclareFontShape{JY3}{mc}{m}{it}{<-> ssub* mc/m/sl}{}
+\begin{document}
+This test file is based on a.tex\footnote{This can be downloaded from {\tt https://gist.github.com/1574793}.} by x19290.
+
+
+\textbf{SOLVED}: bad folding and not slanted problems are common in pLaTeX and LuaTeX-ja.
+
+The cause of the latter problem is that Japanese fonts don't have italic shape by default.
+In this document, we define them by
+\begin{lstlisting}[language={[AlLaTeX]TeX}, basicstyle=\ttfamily]
+\DeclareFontShape{JY3}{mc}{m}{sl}{<-> s * [0.92489] psft:Ryumin-Light:jfm=ujis;slant=0.167}{}
+\DeclareFontShape{JY3}{mc}{m}{it}{<-> ssub* mc/m/sl}{}
+\end{lstlisting}
+\newpage
+
+We also avoid white band problem, by setting both the height and the depth of each 
+letter/word to 0\,pt. 
+
+\begin{env}{\relax}
+#!/bin/sh
+#長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い
+長い長い長い長い長い長い長い長い長い長い長い長い，長い長い長い長い長い長い
+#I.長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長いI
+長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い
+#IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII
+IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII
+\end{env}
+
+Note that any \emph{kinsoku shori} is not performed inside \textsf{lstlisting} environment,
+as the line~3 in output above. We leave it to further development.
+\newpage
+
+\textbf{SOLVED}: LuaTeX-ja specific problem:
+when the \emph{begin} line of a listings environment ends with JAchar,
+the first line of the listing is not rendered.
+
+\begin{env}{problem; shebang not rendered --- 問題}
+#!/bin/bash
+:
+\end{env}
+
+\begin{LTXexample}[language=TeX]
+え!1あ，い・あ）う（え
+え!2あ
+\end{LTXexample}
+
+\lstinputlisting{test13-listings.tmp}
+
+\begin{lstlisting}
+え!1あｱｲｳｴｵ
+え!2あ
+\end{lstlisting}
+\end{document}

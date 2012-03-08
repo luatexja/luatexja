@@ -6,8 +6,8 @@ luatexja.jfont.define_jfm {
     align = 'left', left = 0.0, down = 0.0,
     width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
     glue = {
-      [1] = { 0.5 , 0.0, 0.5  },
-      [3] = { 0.25, 0.0, 0.25 }
+      --[1] = { 0.5 , 0.0, 0.5  },
+      [3] = { 0.125, 0.0, 0.125 }
     }
   },
 
@@ -27,26 +27,26 @@ luatexja.jfont.define_jfm {
     chars = {
       0x2019, 0x201D, 0x3009, 0x300B, 0x300D, 0x300F, 0x3011, 0x3015, 
       0x3017, 0x3019, 0x301F, 0xFF09, 0xFF0C, 0xFF3D, 0xFF5D, 0xFF60,
-      0xFF0E, 0xFF1A, 0xFF1B, 0xFF01, 0xFF1F
+      0xFF0E, 0xFF1A, 0xFF1B  
     },
     align = 'left', left = 0.0, down = 0.0,
     width = 0.5, height = 0.88, depth = 0.12, italic=0.0,
     glue = {
-      [0] = { 0.5 , 0.0, 0.5  },
-      [1] = { 0.5 , 0.0, 0.5  },
-      [3] = { 0.25, 0.0, 0.25 },
+      --[0] = { 0.5 , 0.0, 0.5  },
+      --[1] = { 0.5 , 0.0, 0.5  },
+      [3] = { 0.125, 0.0, 0.125 },
       [5] = { 0.5 , 0.0, 0.5  }
     }
   },
 
   [3] = { -- fw. middle dot punctuations
-    chars = {0x30FB},
+    chars = {0x30FB, 0x00B7},
     align = 'middle', left = 0.0, down = 0.0,
     width = 0.5, height = 0.88, depth = 0.12, italic=0.0,
     glue = {
-      [0] = { 0.25, 0.0, 0.25 },
-      [1] = { 0.25, 0.0, 0.25 },
-      [2] = { 0.25, 0.0, 0.25 },
+      [0] = { 0.125, 0.0, 0.125 },
+      [1] = { 0.125, 0.0, 0.125 },
+      [2] = { 0.125, 0.0, 0.125 },
       [3] = { 0.5 , 0.0, 0.5  },
       [4] = { 0.25, 0.0, 0.25 },
       [5] = { 0.25, 0.0, 0.25 },
@@ -55,7 +55,7 @@ luatexja.jfont.define_jfm {
   },
 
   [4] = { -- ideographic full stop
-    chars = {0x3002},
+    chars = {0x3002, 0xFF1F, 0xFF01},
     align = 'left', left = 0.0, down = 0.0,
     width = 0.5, height = 0.88, depth = 0.12, italic=0.0,
     glue = {
