@@ -16,13 +16,13 @@
 %
 %  Copyright 1993 1994 1995 1996 1997 1998 1999
 %  The LaTeX3 Project and any individual authors listed elsewhere
-%  in this file. 
+%  in this file.
 %
 %  Copyright 1995-1999 ASCII Corporation.
 %  -----------------------------------------
 %
 % \fi
-% \CheckSum{5047}
+% \CheckSum{4855}
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -214,7 +214,7 @@
 % \pLaTeXe の \texttt{b5paper}
 % は $257\,\mathrm{mm} \times 182\,\mathrm{mm}$ になっています。
 % ここでは\pLaTeXe にならってJISに従いました。
-% 
+%
 % デフォルトは \texttt{a4paper} です。
 %
 % \texttt{b5var}（B5変形，182mm×230mm），
@@ -509,7 +509,7 @@
 % p\TeX でよく利用される \texttt{jis} フォントメトリックと互換のメトリックを使いたい場合は，
 % \texttt{ptexjis} というオプションを指定します。
 % \texttt{winjis} メトリックは用済みのため，\texttt{winjis} オプションは無視されます。
-% 
+%
 %    \begin{macrocode}
 \newif\ifmingoth
 \mingothfalse
@@ -716,7 +716,7 @@
 % 仕様になっています。
 % 一方，Lua\TeX-jaの提供するメトリックでは，そのようなことはありません。
 % 公称10ポイントの和文フォントは，10ポイントで出力されます。
-% 
+%
 % この|ltjsclasses|でも，派生元の|jsclasses|と同じように，
 % この公称10ポイントのフォントをここでは13級に縮小して
 % 使うことにします。そのためには，$13\,\textrm{Q}/10\,\textrm{pt}\simeq 0.924872$ 倍
@@ -819,11 +819,11 @@
 %
 % |jsclasses.dtx| 中で行われていた |\reDeclareMathAlphabet| の再定義は削除。
 %
-% \begin{macrocode}
+%    \begin{macrocode}
 \AtBeginDocument{%
   \reDeclareMathAlphabet{\mathrm}{\mathrm}{\mathmc}
   \reDeclareMathAlphabet{\mathbf}{\mathbf}{\mathgt}}%
-% \end{macrocode}
+%    \end{macrocode}
 %
 % \begin{macro}{\textsterling}
 %
@@ -1554,7 +1554,7 @@
 % はトンボの内側に |1in| のスペース（|1truein| ではなく）を挿入するので，
 % 場合分けしています。
 %
-% [2011-10-03] Lua\TeX{} (pdf\TeX？) では |1truein| ではなく 
+% [2011-10-03] Lua\TeX{} (pdf\TeX？) では |1truein| ではなく
 % |1in| になるようです。
 %
 %    \begin{macrocode}
@@ -1823,7 +1823,7 @@
 % ページスタイルとして，\LaTeXe （欧文版）の標準クラス
 % では |empty|，|plain|，|headings|，|myheadings| があります。
 % このうち |empty|，|plain| スタイルは\LaTeXe 本体
-% で定義されています。 
+% で定義されています。
 %
 % アスキーのクラスファイルでは |headnombre|，|footnombre|，
 % |bothstyle|，|jpl@in| が追加されていますが，
@@ -1969,10 +1969,10 @@
   \let\@evenfoot\@empty
   \def\@evenhead{%
     \if@mparswitch \hss \fi
-    \underline{\hbox to \fullwidth{\autoxspacing
+    \underline{\hbox to \fullwidth{\ltjsetparameter{autoxspacing={true}}
         \textbf{\thepage}\hfil\leftmark}}%
     \if@mparswitch\else \hss \fi}%
-  \def\@oddhead{\underline{\hbox to \fullwidth{\autoxspacing
+  \def\@oddhead{\underline{\hbox to \fullwidth{\ltjsetparameter{autoxspacing={true}}
         {\if@twoside\rightmark\else\leftmark\fi}\hfil\textbf{\thepage}}}\hss}%
   \let\@mkboth\markboth
   \def\chaptermark##1{\markboth{%
@@ -4174,7 +4174,7 @@
    \@lnumwidth #3\relax
    \advance\leftskip \@lnumwidth \null\nobreak\hskip -\leftskip
     {#4}\nobreak
-    \leaders\hbox{$\m@th \mkern \@dotsep mu\hbox{.}\mkern \@dotsep 
+    \leaders\hbox{$\m@th \mkern \@dotsep mu\hbox{.}\mkern \@dotsep
        mu$}\hfill \nobreak\hb@xt@\@pnumwidth{%
          \hfil\normalfont \normalcolor #5}\par}\fi}
 %    \end{macrocode}
