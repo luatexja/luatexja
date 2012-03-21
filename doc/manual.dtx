@@ -29,7 +29,7 @@
 \DeclareRobustCommand\epTeX{\ensuremath{\varepsilon}-\kern-.125em\pTeX}
 
 \ltjsetparameter{jacharrange={-3}}
-\ltjdefcharrange{6}{`■,`…,`→,`←,`↓,`↑}
+\ltjdefcharrange{6}{`■,`…,`→,`←,`↓,`↑,`─}
 \theoremstyle{definition}
 %<en>\newtheorem{defn}{Definition}
 %<ja>\newtheorem{defn}{定義}
@@ -417,7 +417,7 @@ This project is hosted by SourceForge.JP.
 \def\labelenumi{$\bullet$}
 \mitemxxx{Hironori KITAGAWA}{Kazuki MAEDA}{Takayuki YATO}
 \mitemxxx{Yusuke KUROKI}{Noriyuki ABE}{Munehiro YAMAMOTO}
-\mitemxxo{Tomoaki HONDA}{Shuzaburo SAITO}
+\mitemxxx{Tomoaki HONDA}{Shuzaburo SAITO}{MA Qiyuan}
 \end{multienumerate}
 %</en>
 %<*ja>
@@ -425,7 +425,7 @@ This project is hosted by SourceForge.JP.
 \def\labelenumi{$\bullet$}
 \mitemxxx{北川 弘典}{前田 一貴}{八登 崇之}
 \mitemxxx{黒木 裕介}{阿部 紀行}{山本 宗宏}
-\mitemxxo{本田 知亮}{齋藤 修三郎}
+\mitemxxx{本田 知亮}{齋藤 修三郎}{馬 起園}
 \end{multienumerate}
 %</ja>
 
@@ -506,7 +506,7 @@ Note that the forefront of development may not be in \texttt{master} branch.
 \item Extract the archive. You will see \texttt{src/} and several other sub-directories.
 %</en>
 %<*ja>
-\item 後者の方法でアーカイブ取得したならば，それをを展開する．
+\item 後者の方法でアーカイブ取得したならば，それを展開する．
       \texttt{src/} をはじめとしたいくつかのディレクトリができるが，
       動作には \texttt{src/} 以下の内容だけで十分．
 %</ja>
@@ -538,7 +538,7 @@ Note that the forefront of development may not be in \texttt{master} branch.
 %</en>
 %<*ja>
 \item 原稿のソースファイルの文字コードは UTF-8 固定である．
-      従来日本語の文字コードとして用いられてきた EUC-JP や Shift-JIS は使用できません．
+      従来日本語の文字コードとして用いられてきた EUC-JP や Shift-JIS は使用できない．
 %</ja>
 
 %<*en>
@@ -1046,7 +1046,7 @@ feature が \textbf{JAglue} と衝突するためである（\ref{para-kern} 節
 %<*en>
 \paragraph{Caution}
 \Pkg{xunicode} package will be reloaded during the loading of \Pkg{luatexja-fontspec} package.
-However, this reloading won't work for the current version (2011/09/09,~v0.981) of 
+However, this reloading won't work for the current version (2011/09/09,~v0.981) of
 \Pkg{xunicode} package. Hence we have to patch it, using the following patch, for example:
 %</en>
 %<*ja>
@@ -1060,7 +1060,7 @@ However, this reloading won't work for the current version (2011/09/09,~v0.981) 
 --- xunicode.sty.orig   2011-09-12 08:31:47.000000000 +0900
 +++ xunicode.sty        2011-11-16 22:06:17.061413113 +0900
 @@ -1475,7 +1475,11 @@
- 
+
  \newtoks\tipasavetokens
  \newtoks\tipachecktokens
 +
@@ -1073,7 +1073,8 @@ However, this reloading won't work for the current version (2011/09/09,~v0.981) 
   \def\textipa##1{##1}% prevent recursion
 \end{lstlisting}
 %<*ja>
-なお，上流で v0.984 (2011/10/14) でこの問題は修正されているそうです．
+なお，上流で v0.984 (2011/10/14) でこの問題は修正されているそうです（が，2012/03/20
+現在，まだ CTAN には上がっていない）．
 %</ja>
 
 
@@ -1108,7 +1109,7 @@ and the character `漢' to the range number~100.
 \textbf{JAchar} の範囲を設定するためには，まず各文字に0より大きく217より小さい index を
 割り当てる必要がある．これには \verb+\ltjdefcharrange+ プリミティブを用いる．
 例えば，次のように書くことで追加多言語面 (SMP) にある全ての文字と `漢' が
-「100番の文字範囲」に属する設定される．
+「100番の文字範囲」に属するように設定される．
 %</ja>
 \begin{lstlisting}
 \ltjdefcharrange{100}{"10000-"1FFFF,`漢}
@@ -1774,7 +1775,7 @@ which JFM will be used for this font by the following keys:
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
 \item[jfm=<name>]
 %<*en>
-Specify the name of JFM. If specified JFM has not been loaded, \LuaTeX-ja search and load 
+Specify the name of JFM. If specified JFM has not been loaded, \LuaTeX-ja search and load
 a file named \texttt{jfm-<name>.lua}.
 
 The following JFMs are shipped with \LuaTeX-ja:
@@ -1938,71 +1939,148 @@ Japanese Font Packs for Adobe Reader) will be used.
 
 %<en>\subsection{Structure of JFM file}
 %<ja>\subsection{JFM ファイルの構造}
+
+%<*en>
 A JFM file is a Lua script which has only one function call:
+%</en>
+%<*ja>
+JFM ファイルはただ一つの関数呼び出しを含む Lua スクリプトである：
+%</ja>
 \begin{verbatim}
 luatexja.jfont.define_jfm { ... }
 \end{verbatim}
+%<*en>
 Real data are stored in the table which indicated above by
 \verb+{ ... }+.  So, the rest of this subsection are devoted to describe the
 structure of this table.  Note that all lengths in a JFM file are
 floating-point numbers in design-size unit.
+%</en>
+%<*ja>
+実際のデータは上で \verb+{ ... }+ で示されたテーブルの中に格納されている．
+以下ではこのテーブルの構造について記す．
+なお，JFM ファイル中の長さは全て design-size を単位とする浮動小数点数であることに
+注意する．
+%</ja>
 
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
-\item[dir=<direction>] (required)
 
-The direction of JFM. At the present, only \texttt{'yoko'} is supported.
+\item[dir=<direction>]
+%<en>(required)
+%<ja>（必須）
 
-\item[zw=<length>] (required)
+%<en>The direction of JFM. At the present, only \texttt{'yoko'} is supported.
+%<ja>JFM の書字方向．現時点では \texttt{'yoko'} のみがサポートされる．
 
-The amount of the length of the `full-width'.
+\item[zw=<length>]
+%<en>(required)
+%<ja>（必須）
 
-\item[zh=<length>] (required)
+%<en>The amount of the length of the `full-width'.
+%<ja>「全角幅」の長さ．
 
-\item[kanjiskip=\{<natural>, <stretch>, <shrink>\}] (optional)
+\item[zh=<length>]
+%<en>(required)
+%<ja>（必須）
 
+%<en>The amount of the length of the `full-height' (height + depth).
+%<ja>「全角高さ」（height + depth）の長さ．
+
+\item[kanjiskip=\{<natural>, <stretch>, <shrink>\}]
+%<en>(optional)
+%<ja>（任意）
+
+%<*en>
 This field specifies the `ideal' amount of \Param{kanjiskip}. As noted
 	     in Subsection~\ref{subs-kskip}, if the parameter
 	     \Param{kanjiskip} is \verb+\maxdimen+, the value specified
 	     in this field is actually used (if this field is not specified in
 	     JFM, it is regarded as 0\,pt). Note that <stretch> and <shrink>
 	     fields are in design-size unit too.
+%</en>
+%<*ja>
+「理想的な」 \Param{kanjiskip} の量を指定する．\ref{subs-kskip} 節で述べたように，
+もし \Param{kanjiskip} が \verb+\maxdimen+ の値ならば，このフィールドで指定された
+値が実際には用いられる（もしこのフィールドが JFM で指定されていなければ，
+0\,pt であるものとして扱われる）．<stretch> と <shrink> のフィールドも design-size
+が単位であることに注意せよ．
+%</ja>
 
+\item[xkanjiskip=\{<natural>, <stretch>, <shrink>\}]
+%<en>(optional)
+%<ja>（任意）
 
-\item[xkanjiskip=\{<natural>, <stretch>, <shrink>\}] (optional)
-
+%<*en>
 Like the \Param{kanjiskip} field, this field specifies the `ideal'
 	     amount of \Param{xkanjiskip}.
-
+%</en>
+%<*ja>
+\Param{kanjiskip} フィールドと同様に，\Param{xkanjiskip} の「理想的な」量を
+指定する．
+%</ja>
 \end{list}
 
+%<*en>
 Besides from above fields, a JFM file have several sub-tables those
 indices are natural numbers.  The table indexed by~$i\in\omega$ stores
 information of `character class'~$i$. At least, the character class~0 is
 always present, so each JFM file must have a sub-table whose index is
 \texttt{[0]}.  Each sub-table (its numerical index is denoted by $i$) has
 the following fields:
+%</en>
+%<*ja>
+上記のフィールドに加えて，JFM ファイルはそのインデックスが自然数であるいくつかの
+サブテーブルを持つ．インデックスが $i\in\omega$ であるテーブルは「文字クラス」$i$ の
+情報を格納する．少なくとも，文字クラス0は常に存在するので，JFM ファイルはインデックス
+が \texttt{[0]} のサブテーブルを持たなければならない．それぞれのサブテーブル
+（そのインデックスを $i$ で表わす）は以下のフィールドを持つ：
+%</ja>
 
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
-\item[chars=\{<character>, ...\}] (required except character class~0)
+\item[chars=\{<character>, ...\}]
+%<en>(required except character class~0)
+%<ja>（文字クラス0を除いて必須）
 
+%<*en>
 This field is a list of characters which are in this character
 	     type~$i$. This field is not required if $i=0$, since all
 	     \textbf{JAchar} which are not in any character class other
-	     than 0 (hence, the character class~0 contains most of
+	     than 0 are in the character class 0
+             (hence, the character class~0 contains most of
 	     \textbf{JAchar}s). In the list, a character can be
 	     specified by its code number, or by the character itself
 	     (as a string of length~1). Moreover, there are `imaginary
 	     characters' which specified in the list. We will describe these later.
+%</en>
+%<*ja>
+このフィールドは文字クラス~$i$ に属する文字のリストである．このフィールドは $i=0$ の
+場合には必須ではない．なぜならば，文字クラス 0 には，0 以外の文字クラスに属するものを
+除いた全ての \textbf{JAchar} が属するからである（よって，文字クラス 0 はほとんどの
+\textbf{JAchar} を含む）．このリストでは，文字はその文字コードを用いて，もしくは
+文字それ自体（長さ1の文字列）によって指定される．さらに，このリストで指定される
+「仮想的な文字」も存在する．これらについては後に記す．
+%</ja>
 
-\item[width=<length>, height=<length>, depth=<length>, italic=<length>]\ (required)
+\item[width=<length>, height=<length>, depth=<length>, italic=<length>]
+%<en>(required)
+%<ja>（必須）
 
+%<*en>
 Specify width of characters in character class~$i$, height, depth and
 the amount of italic correction. All characters in character class~$i$ are regarded that its width, height and depth are
 as values of these fields.
 But there is one exception: if \texttt{'prop'} is specified in \texttt{width} field, width of a character becomes that of its `real' glyph
+%</en>
+%<*ja>
+文字クラス~$i$ に属する文字の幅，高さ，深さ，イタリック補正の量を指定する．
+文字クラス~$i$ に属する全ての文字は，その幅，高さ，深さがこのフィールドで指定した
+値であるものとして扱われる．
+しかし，例外が一つある：もし \texttt{'prop'} が \texttt{width} フィールドに
+指定された場合，文字の幅はその「実際の」グリフの幅となる．
+%</ja>
 
 \item[left=<length>, down=<length>, align=<align>]\
 
+%<*en>
 These fields are for adjusting the position of the `real' glyph. Legal
 	     values of \texttt{align} field are \texttt{'left'},
 	     \texttt{'middle'} and \texttt{'right'}. If one of these
@@ -2010,11 +2088,29 @@ These fields are for adjusting the position of the `real' glyph. Legal
 	     treated as~0, and \texttt{align} field is treated as
 	     \texttt{'left'}.
 The effects of these 3~fields are indicated in Figure~\ref{fig-pos}.
+%</en>
+%<*ja>
+これらのフィールドは「実際の」グリフの位置を調整するためにある．
+\texttt{align} フィールドに指定できる値は \texttt{'left'}, \texttt{'middle'},
+\texttt{'right'} のいずれかである．もしこれら3つのフィールドのうちの1つが省かれた
+場合，\texttt{left} と \texttt{down} は 0，\texttt{align} フィールドは
+\texttt{'left'} であるものとして扱われる．
+これら3つのフィールドの意味については図\ref{fig-pos} で説明する．
+%</ja>
 
+%<*en>
 In most cases, \texttt{left} and \texttt{down} fields are~0, while
 it is not uncommon that the \texttt{align} field is \texttt{'middle'} or \texttt{'right'}.
 For example, setting the \texttt{align} field to \texttt{'right'} is practically needed
 when the current character class is the class for opening delimiters'.
+%</en>
+%<*ja>
+多くの場合，\texttt{left} と \texttt{down} は 0 である一方，
+\texttt{align} フィールドが \texttt{'middle'} や \texttt{'right'} であることは
+珍しいことではない．
+例えば，\texttt{align} フィールドを \texttt{'right'} に指定することは，
+文字クラスが開き括弧類であるときに実際必要である．
+%</ja>
 \begin{figure}[!tb]
 \begin{minipage}{0.4\textwidth}%
 \begin{center}\unitlength=10pt\small
@@ -2069,19 +2165,49 @@ when the current character class is the class for opening delimiters'.
 \end{center}
 \end{minipage}%
 \begin{minipage}{0.6\textwidth}%
+%<*en>
 Consider a node containing Japanese character whose value of the \texttt{align}
 field is \texttt{'middle'}.
+%</en>
+%<*ja>
+\texttt{align} フィールドの値が \texttt{'middle'} である和文文字を含むノードを
+考えよう．
+%</ja>
 \begin{itemize}
-\item The black rectangle is a frame of the node.
+\item
+%<*en>
+The black rectangle is a frame of the node.
 Its width, height and depth are specified by JFM.
-\item Since the \texttt{align} field is \texttt{'middle'},
+%</en>
+%<*ja>
+黒色の長方形はノードの枠である．
+その幅，高さ，深さは JFM によって指定される．
+%</ja>
+\item
+%<*en>
+Since the \texttt{align} field is \texttt{'middle'},
 the `real' glyph is centered horizontally (the green rectangle).
-\item Furthermore, the glyph is shifted according to values of fields
+%</en>
+%<*ja>
+\texttt{align} フィールドは \texttt{middle} なので，「実際の」グリフは
+水平方向の中心に配置される（緑色の長方形）．
+%</ja>
+\item
+%<*en>
+Furthermore, the glyph is shifted according to values of fields
       \texttt{left} and \texttt{down}. The ultimate position of the real
       glyph is indicated by the red rectangle.
+%</en>
+%<*ja>
+さらに，グリフは \texttt{left} と \texttt{down} の値に従ってシフトされる．
+最終的な実際のグリフの位置は赤色の長方形で示された位置になる．
+%</ja>
 \end{itemize}
 \end{minipage}
-\caption{The position of the `real' glyph.}
+\caption{
+%<en>The position of the `real' glyph.
+%<ja>「実際の」グリフの位置．
+}
 \label{fig-pos}
 \end{figure}
 
@@ -2092,6 +2218,7 @@ the `real' glyph is centered horizontally (the green rectangle).
 \end{list}
 
 %<*en>
+The followings are `imaginary characters' which can be specified in \texttt{chars} field.
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
 \item['lineend'] An ending of a line.
 \item['diffmet'] Used at a boundary between two \textbf{JAchar}s whose JFM or size is different.
@@ -2801,7 +2928,7 @@ This problem is resolved by using
 %<ja>\section{和文文字直後の改行}
 \label{sec-lbreak}
 %<en>\subsection{Reference: Behavior in \pTeX}
-%<ja>\subsection{参考: \pTeX の挙動}
+%<ja>\subsection{参考: \pTeX の動作}
 %<*en>
 In~\pTeX, a line break after a Japanese character doesn't emit a space,
 since words are not separated by spaces in Japanese writings. However,
@@ -2881,7 +3008,7 @@ after `beginning/ending of a group' characters.
 
 
 %<en>\subsection{Behavior in \LuaTeX-ja}
-%<ja>\subsection{\LuaTeX-ja の挙動}
+%<ja>\subsection{\LuaTeX-ja の動作}
 %<*en>
 States in the input processor of \LuaTeX\ is the same as that of \TeX,
 and they can't be customized by any callbacks. Hence, we can only use
@@ -3024,8 +3151,8 @@ with the \textit{id} of it:
       The \textit{id} is \textit{id\_math}.
 \item A \textit{glyph\_node}~$p$ with nodes which relate with it:
 \begin{enumerate}
-\item A kern for the italic correction of~$p$. 
-\item An accent attached to $p$ by \verb+\accent+. 
+\item A kern for the italic correction of~$p$.
+\item An accent attached to $p$ by \verb+\accent+.
 \end{enumerate}
 \[
 \overbrace{%
@@ -3036,7 +3163,7 @@ with the \textit{id} of it:
 \end{array}\right\}\longrightarrow
 \Node{kern}{$\mathit{subtype}=2$}}^{\text{(a)}}
 \longrightarrow
-\Node{glyph}{$p$}\longrightarrow 
+\Node{glyph}{$p$}\longrightarrow
 \overbrace{%
 \Node{kern}{italic corr.}}^{\text{(b)}}
 \]
@@ -3196,7 +3323,7 @@ $g$は「文字コード\texttt{'boxbdd'}の文字」と\textit{Np}の間に入�
 のようになっている．間の(a)に相当する部分には，何のノードもない場合ももちろんあり得る．
 そうして，JFMグルー挿入後には，この2クラスタ間は次のようになる：
 \[
- \Node{cluster}{\textit{Nq}}\longrightarrow\Node{kern}{左空白}\longrightarrow 
+ \Node{cluster}{\textit{Nq}}\longrightarrow\Node{kern}{左空白}\longrightarrow
 \overbrace{
 \Node{penalty}{$p+x$}\longrightarrow \cdots\longrightarrow \Node{whatsit}{}}^{(a)}
 \longrightarrow \Node{glue or kern}{右空白}\longrightarrow \Node{cluster}{\textit{Np}}
@@ -3283,7 +3410,7 @@ JFM由来の値だけを用いる．もし両者で使われているJFMが異�
 
 $a$は禁則処理用に\textit{Nq}と\textit{Np}の間に加えられるべきペナルティ量である．
 \begin{description}
-\item[P-normal~{[PN]}] 
+\item[P-normal~{[PN]}]
 \textit{Nq}と\textit{Np}の間の(a)部分にペナルティ(\textit{penalty\_node})があれば処理は簡単である：
 それらの各ノードにおいて，ペナルティ値を（$\pm 10000$を無限大として扱いつつ）$a$だけ増加させればよい．
 また，$10000 + (-10000) = 0$としている．
@@ -3336,7 +3463,7 @@ kern&\gkf{E}{\OB}{PS}\\
 \begin{quote}
 Here {\small\gkf{E}{M→K}{PN}} means that
 \begin{enumerate}
-\item To determine the `right-space', \LuaTeX-ja first attempts by the method `\textsf{JFM-origin~[M]}'. 
+\item To determine the `right-space', \LuaTeX-ja first attempts by the method `\textsf{JFM-origin~[M]}'.
 If this attempt fails, \LuaTeX-ja use the method `\textsf{\Param{kanjiskip}~[K]}'.
 \item The `left space' between \textit{Nq}~and~\textit{Np} is determined by the method `\textsf{line-end~[E]}'.
 \item \LuaTeX-ja adopts the method `\textsf{P-normal~[PN]}' to adjust the penalty between two clusters for \emph{kinsoku shori}.
@@ -3435,7 +3562,7 @@ If this attempt fails, \LuaTeX-ja use the method `\textsf{\Param{kanjiskip}~[K]}
 \end{itemize}
 
 \begin{description}
-\item[P-allow~{[PA]}] 
+\item[P-allow~{[PA]}]
 \textit{Nq}と\textit{Np}の間の(a)部分にペナルティがあれば，\textsf{P-normal~[PN]}と同様に，
 それらの各ノードにおいてペナルティ値を$a$だけ増加させる．
 
@@ -3448,7 +3575,7 @@ If this attempt fails, \LuaTeX-ja use the method `\textsf{\Param{kanjiskip}~[K]}
 \item 「左空白」がkernとしてきっちり定義されている時．
 \end{itemize}
 
-\item[P-suppress~{[PS]}] 
+\item[P-suppress~{[PS]}]
 \textit{Nq}と\textit{Np}の間の(a)部分にペナルティがあれば，\textsf{P-normal~[PN]}と同様に，
 それらの各ノードにおいてペナルティ値を$a$だけ増加させる．
 
@@ -3466,7 +3593,7 @@ If this attempt fails, \LuaTeX-ja use the method `\textsf{\Param{kanjiskip}~[K]}
 このとき，$a$，即ち「あ」の\Param{postbreakpenalty}がいかなる値であっても，
 この2クラスタ間は最終的に
 \begin{equation}
- \overbrace{\Node{glyph}{`あ'}}^{\mathit{Nq}}\longrightarrow 
+ \overbrace{\Node{glyph}{`あ'}}^{\mathit{Nq}}\longrightarrow
 \Node{kern}{右空白}\longrightarrow \overbrace{\Node{glue}{1\,pt}}^{\mathit{Np}}
 \label{eq-gref}
 \end{equation}
@@ -3474,7 +3601,7 @@ If this attempt fails, \LuaTeX-ja use the method `\textsf{\Param{kanjiskip}~[K]}
 \Param{postbreakpenalty}は（$a$は）殆どの場合が非負の値と考えられ，そのような場合では
 \eqref{eq-gref}と
 \[
- \overbrace{\Node{glyph}{`あ'}}^{\mathit{Nq}}\longrightarrow 
+ \overbrace{\Node{glyph}{`あ'}}^{\mathit{Nq}}\longrightarrow
 \Node{penalty}{$a$}\longrightarrow
 \Node{kern}{右空白}\longrightarrow \overbrace{\Node{glue}{1\,pt}}^{\mathit{Np}}
 \]
