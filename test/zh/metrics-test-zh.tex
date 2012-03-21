@@ -1,0 +1,21 @@
+\input luatexja-core.sty
+\jfont\fmdisplay={name:SimSun:jfm=ujis} at 12pt
+\jfont\banjiao={name:SimSun:jfm=banjiao} at 12pt
+\jfont\quanjiao={name:SimSun:jfm=quanjiao} at 12pt
+\jfont\kaiming={name:SimSun:jfm=kaiming} at 12pt
+\def\texta{a). ……于是她近乎歇斯底里的喊道：“这真的不是我做的！……”然而这么熟识的人中间，竟然没有一个相信她这个“疯子”。}
+\def\textb{b). 他端起茶杯，“俗话说的好，‘到什么山唱什么歌。’”呷了一口茶，继续说到：“像你这样不识抬举，总有一天会吃亏的！”}
+\fmdisplay
+\beginsection A. 半角标点样式
+
+\smallskip
+{\banjiao\texta\par\textb}
+\beginsection B. 全角标点样式
+
+\smallskip
+{\quanjiao\texta\par\textb}
+\beginsection C. 开明标点样式
+
+\smallskip
+{\kaiming\texta\par\textb}
+\bye
