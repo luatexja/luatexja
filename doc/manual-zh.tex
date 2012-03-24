@@ -1,0 +1,210 @@
+\documentclass{ltjarticle}
+\usepackage[twoside,left=23mm,width=170mm,right=17mm,top=25mm,height=231mm,bottom=32mm]{geometry}
+\DeclareYokoKanjiEncoding{ZH}{}{}
+\DeclareKanjiEncodingDefaults{}{}
+\DeclareErrorKanjiFont{ZH}{song}{m}{n}{10}
+\DeclareKanjiSubstitution{ZH}{song}{m}{n}
+\newcommand\songdefault{song}
+\newcommand\heidefault{hei}
+\renewcommand\kanjiencodingdefault{ZH}
+\renewcommand\kanjifamilydefault{\songdefault}
+\renewcommand\kanjiseriesdefault{\mddefault}
+\renewcommand\kanjishapedefault{\updefault}
+\DeclareKanjiFamily{ZH}{song}{}
+\DeclareFontShape{ZH}{song}{m}{n}{<->name:AdobeSongStd-Light:jfm=jis}{}
+\DeclareFontShape{ZH}{song}{bx}{n}{<->ssub*hei/m/n}{}
+\DeclareKanjiFamily{ZH}{hei}{}
+\DeclareFontShape{ZH}{hei}{m}{n}{<->name:AdobeHeitiStd-Regular:jfm=jis}{}
+\fontencoding{ZH}\selectfont
+\DeclareTextFontCommand{\textsong}{\songfamily}
+\DeclareTextFontCommand{\texthei}{\heifamily}
+\DeclareOldFontCommand{\song}{\normalfont\songfamily}{}
+\DeclareOldFontCommand{\hei}{\normalfont\heifamily}{}
+\DeclareSymbolFont{songti}{ZH}{song}{m}{n}
+\jfam\symsongti
+\SetSymbolFont{songti}{bold}{ZH}{hei}{m}{n}
+\DeclareSymbolFontAlphabet{\mathsong}{songti}
+\DeclareMathAlphabet{\mathhei}{ZH}{hei}{m}{n}
+\makeatletter
+\DeclareRobustCommand\songfamily{\not@math@alphabet\songfamily\mathsong\kanjifamily\songdefault\selectfont}
+\DeclareRobustCommand\heifamily{\not@math@alphabet\heifamily\mathhei\kanjifamily\heidefault\selectfont}
+\DeclareRobustCommand\rmfamily{\not@math@alphabet\rmfamily\mathrm\romanfamily\rmdefault\kanjifamily\songdefault\selectfont}
+\DeclareRobustCommand\sffamily{\not@math@alphabet\sffamily\mathsf\romanfamily\sfdefault\kanjifamily\heidefault\selectfont}
+\makeatother
+\def\LuaTeX{Lua\TeX}
+\def\pTeX{p\TeX}
+\def\pLaTeX{p\LaTeX}
+\begin{document}
+\section{\LuaTeX-ja的开发背景}
+\LuaTeX-ja是日本开发者北川宏典首倡的一个\LuaTeX的日文支持项目，该项目将\pTeX移植到了\LuaTeX，并做了一定的扩展，删除了一些不正常的特性。
+
+\LuaTeX-ja的项目开发者如下：北川宏典，前田一贵，八登崇之，黑木裕介，阿部纪行，山本宗宏，本田知亮，斋藤修三郎和马起园等。
+
+\LuaTeX-ja现在只能用于plain \TeX格式和\LaTeXe格式，尚不支持\TeX info和Con\TeX t格式。
+
+\LuaTeX-ja现在的代码实现依赖于\verb!luatexbase!以及\verb!luaotfload!等宏包，并且现在仅仅实现了横排，直排组版尚未实现。
+\section{一些约定}
+在本文档中，有下面一些约定：
+\begin{itemize}
+\item 所有的CJK字符为\textbf{JAchar}，所有的其他字符为\textbf{ALchar}
+\item primitive，该词在本文档中不仅表示\LuaTeX的基本控制命令，也包括\LuaTeX-ja的相关的基本控制命令
+\item 所有的自然数从0开始
+\end{itemize}
+\section{安装使用}
+\subsection{\LuaTeX版本需求}
+\LuaTeX-ja需要使用版本号为大于0.65的\LuaTeX。如果用户使用的是\TeX Live2011或者Mac\TeX 2011以及最新版本的W32\TeX，都可以正常使用\LuaTeX-ja。
+\subsection{\LuaTeX-ja宏包安装}
+\begin{enumerate}
+\item \LuaTeX-ja宏包的获取：
+	\begin{itemize}
+	\item 如果用户使用git，那么可以使用如下命令获取：\\
+		\verb!$ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git!
+	\item 另外用户还可以直接下载master版本：\\
+		\verb!$ wget http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git;a=snapshot;h=HEAD;sf=tgz!
+	\end{itemize}
+\item 用户需要将获取的\LuaTeX-ja宏包的\verb!src/!放置到你所用的发行版中的\verb!TEXMFLOACL!树下\verb!tex/!文件夹（如果不存在，请建立）下即可，查询该环境变量需要使用：\\
+	\verb!$ kpeswhich -expand-var "$TEXMFLOCAL"!
+\item 刷新字体数据库：\\
+	\verb!$ mkluatexfontdb!
+\end{enumerate}
+\section{\LuaTeX-ja在plain \TeX格式下的使用}
+对于日本用户，日文的排版可以直接使用：
+\begin{verbatim}
+\input luatexja.sty
+\end{verbatim}
+
+这一行会默认调用\verb!luatexja.sty!文件，该文件作用相当于\pTeX中的\verb!ptex.tex!。该文件中设定了两款非嵌入字体：Ryumin-Light（明朝体）和GothicBBB-Medium（哥特体）。
+这些字体分别有三种大小：\verb!\tenmin!和\verb!\tengt!（10pt）；\verb!\sevenmin!和\verb!\sevengt!（7pt）；\verb!\fivemin!和\verb!\fivegt!（5pt）。
+
+有几点请用户注意：
+\begin{itemize}
+\item 上述的两款字体需要你的pdf阅读器带有良好的非嵌入字体的支持，这里建议使用Adobe Reader，该阅读器使用了Kozuka Mincho字体。
+\item 在定义字体的时候，可以使用“级”（Q）单位，$1 Q = 0.25mm$，在\LuaTeX-ja中可以使用\verb!\jQ!命令调用该长度单位
+\item 一般情况下，相同大小日文字体比西文字体要大一下（中文字体也是如此），所以定义日文字体的时候需要一个缩放率：0.962216
+\item 在\textbf{JAchar}和\textbf{ALchar}之间插入的胶大小为：$(0.25\times0.962216\times\mathrm{10pt})^{\mathrm{+1pt}}_{\mathrm{-1pt}} = 2.40554\mathrm{pt}^{\mathrm{+1pt}}_{\mathrm{-1pt}}$
+\end{itemize}
+\section{\LuaTeX-ja在\LaTeXe格式的使用}
+\subsection{日文排版设置}
+在\LaTeXe下使用\LuaTeX-ja比较便利：
+\begin{verbatim}
+\usepackage{luatexja}
+\end{verbatim}
+
+该宏包的作用相当于\pLaTeX中的\verb!plfonts.dtx!和\verb!pldefs.ltx!。
+\begin{itemize}
+\item 在该宏包中设定了\verb!JY3!编码，这个编码用来调用日文字体
+\item 该宏包定义了两个字体族：\verb!mc!和\verb!gt!。\\
+\begin{center}
+	\begin{tabular}{ccccc}
+	\hline
+	字体&字体族&\verb!\mdseries!&\verb!\bfseries!&缩放率\\
+	\hline
+	\textit{mincho}&\verb!mc!&Ryumin-Light&GothicBBB-Medium&0.962216\\
+	\textit{gothic}&\verb!gt!&GothicBBB-Medium&GothicBBB-Medium&0.962216\\
+	\hline
+	\end{tabular}
+\end{center}
+\item 在数学模式下，所有的字符使用\verb!mc!字体族来排印
+%中文的C\TeX和xeCJK都没有进行此项设定，导致不能在数学模式下输入中文
+\end{itemize}
+
+上述使用的宏包，只满足了最小的日文环境设定需求，并为满足所有的日文排版需求。
+\LuaTeX-ja宏包提供了两个文档类：\verb!jclasses!（\pLaTeX标准文档类）和\verb!jsclasses!（奥村晴彦）。用户可自行选择两种文档类。
+
+\subsection{中文排版设定}
+请先下载\verb!zh-classes!：
+\begin{verbatim}
+$ wget http://fandol-doc.googlecode.com/files/zh-classes.tar.xz
+\end{verbatim}
+
+该文档类是基于\verb!jclasses!文档的中文设定版。
+这个文档类需要用户在本地安装两款字体：AdobeSongStd-Light.otf和AdobeHeitiStd-Regular.otf。
+这两款字体在你安装的中文版Adobe Reader的文件夹下。这两款字体设定如下：
+\begin{center}
+	\begin{tabular}{cccc}
+	\hline
+	字体&字体族&\verb!\mdseries!&\verb!\bfseries!\\
+	\hline
+	\textit{song}&\verb!song!&AdobeSongStd-Light&AdobeHeitiStd-Regular\\
+	\textit{hei}&\verb!hei!&AdobeHeitiStd-Regular&AdobeHeitiStd-Regular\\
+	\hline
+	\end{tabular}
+\end{center}
+
+例如：
+\begin{verbatim}
+\documentclass{zh-article}
+\title{Lua\TeX测试}
+\author{某人甲}
+\begin{document}
+\maketitle
+Lua\TeX-ja中文测试。{\hei 测试}
+\end{document}
+\end{verbatim}
+\section{\LuaTeX-ja参数设定}
+\LuaTeX-ja包含大量的参数，以控制排版细节。
+设定这些参数需要使用命令：\verb!\ltjsetparameter!和\verb!\ltjgetparameter!命令。
+\subsection{JAchar范围的设定}
+在设定\textbf{JAchar}之前，需要分配一个小于217的自然数。如：
+\begin{verbatim}
+\ltjdefcharrange{100}{"10000-"1FFFF,`漢}
+\end{verbatim}
+
+请注意这个设定是全局性的，不建议在文档正文中进行设定。
+
+在范围设定好了之后，需要进行\verb!jacharrange!的设定：
+\begin{verbatim}
+\ltjsetparameter{jacharrange={-1, +2, +3, -4, -5, +6, +7, +8}}
+\end{verbatim}
+
+这里定义了8个范围，在每个范围之前使用“+”或“-”进行设定，其中如果为$-$，则代表该范围为\textbf{ALchar}，如果为$+$，则该范围视作\textbf{JAchar}。
+
+\LuaTeX-ja默认设定了8个范围，这些范围来源于下列数据：
+\begin{itemize}
+\item Unicode 6.0
+\item Adobe-Japan1-6与Unicode之间的映射\verb!Adobe-Japan1-UCS2!
+\item 八登崇之的up\TeX宏包：\verb!PXbase!
+\end{itemize}
+
+\begin{description}
+\item[范围 $\mathbf{8^J}$]
+\begin{itemize}
+\def\ch#1#2{\item \char"#1\ (\texttt{U+00#1}, #2)}
+\ch{A7}{Section Sign}
+\ch{A8}{Diaeresis}
+\ch{B0}{Degree sign}
+\ch{B1}{Plus-minus sign}
+\ch{B4}{Spacing acute}
+\ch{B6}{Paragraph sign}
+\ch{D7}{Multiplication sign}
+\ch{F7}{Division Sign}
+\end{itemize}
+\item[范围 $\mathbf{1^A}$]
+	\begin{itemize}
+	\item \texttt{U+0080}--\texttt{U+00FF}: Latin-1 Supplement
+	\item \texttt{U+0100}--\texttt{U+017F}: Latin Extended-A
+	\item \texttt{U+0180}--\texttt{U+024F}: Latin Extended-B
+	\item \texttt{U+0250}--\texttt{U+02AF}: IPA Extensions
+	\item \texttt{U+02B0}--\texttt{U+02FF}: Spacing Modifier Letters
+	\item \texttt{U+0300}--\texttt{U+036F}: Combining Diacritical Marks
+	\item \texttt{U+1E00}--\texttt{U+1EFF}: Latin Extended Additional
+\end{itemize}
+\item[范围 $\mathbf{2^J}$]
+	\begin{itemize}
+	\item \texttt{U+0370}--\texttt{U+03FF}: Greek and Coptic
+	\item \texttt{U+0400}--\texttt{U+04FF}: Cyrillic	
+	\item \texttt{U+1F00}--\texttt{U+1FFF}: Greek Extended
+	\end{itemize}
+\end{description}
+\section{Lua\TeX-ja与Lua\TeX相关阅读材料}
+\begin{itemize}
+\item Lua\TeX官方主页：\verb!http://www.luatex.org!
+\item Lua\TeX\ SVN：\verb!http://foundry.supelec.fr/gf/project/luatex/!
+\item Lua\TeX：\verb!http://ja.wikipedia.org/wiki/LuaTeX!
+\item Lua\TeX-ja官方主页：\verb!http://en.sourceforge.jp/projects/luatex-ja/!
+\item p\TeX官方主页：\verb!http://ascii.asciimw.jp/pb/ptex/!
+\item Publishing \TeX：\verb!http://ja.wikipedia.org/wiki/PTeX!
+\item Vertical typesetting in \TeX：\verb!http://tug.org//TUGboat/Articles/tb11-3/tb29hamano.pdf!
+\item up\TeX官方主页：\verb!http://homepage3.nifty.com/ttk/comp/tex/uptex.html!
+\end{itemize}
+\end{document}
