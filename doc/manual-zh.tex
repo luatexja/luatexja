@@ -1,5 +1,12 @@
 \documentclass{ltjarticle}
 \usepackage[twoside,left=23mm,width=170mm,right=17mm,top=25mm,height=231mm,bottom=32mm]{geometry}
+\usepackage{multicol}
+\usepackage{showexpl}
+
+\lstset{
+  basicstyle=\ttfamily\small, pos=o, breaklines=true,
+  numbers=none, rframe={}, basewidth=0.5em
+}
 \DeclareYokoKanjiEncoding{ZH}{}{}
 \DeclareKanjiEncodingDefaults{}{}
 \DeclareErrorKanjiFont{ZH}{song}{m}{n}{10}
@@ -79,7 +86,7 @@
 有几点请用户注意：
 \begin{itemize}
 \item 上述的两款字体需要你的pdf阅读器带有良好的非嵌入字体的支持，这里建议使用Adobe Reader，该阅读器使用了Kozuka Mincho字体。
-\item 在定义字体的时候，可以使用“级”（Q）单位，$1 Q = 0.25mm$，在\LuaTeX-ja中可以使用\verb!\jQ!命令调用该长度单位
+\item 在定义字体的时候，可以使用“级”（Q）单位，$1 \mathrm{Q} = 0.25\mathrm{mm}$，在\LuaTeX-ja中可以使用\verb!\jQ!命令调用该长度单位
 \item 一般情况下，相同大小日文字体比西文字体要大一下（中文字体也是如此），所以定义日文字体的时候需要一个缩放率：0.962216
 \item 在\textbf{JAchar}和\textbf{ALchar}之间插入的胶大小为：$(0.25\times0.962216\times\mathrm{10pt})^{\mathrm{+1pt}}_{\mathrm{-1pt}} = 2.40554\mathrm{pt}^{\mathrm{+1pt}}_{\mathrm{-1pt}}$
 \end{itemize}
@@ -167,35 +174,188 @@ Lua\TeX-ja中文测试。{\hei 测试}
 \end{itemize}
 
 \begin{description}
-\item[范围 $\mathbf{8^J}$]
-\begin{itemize}
-\def\ch#1#2{\item \char"#1\ (\texttt{U+00#1}, #2)}
-\ch{A7}{Section Sign}
-\ch{A8}{Diaeresis}
-\ch{B0}{Degree sign}
-\ch{B1}{Plus-minus sign}
-\ch{B4}{Spacing acute}
-\ch{B6}{Paragraph sign}
-\ch{D7}{Multiplication sign}
-\ch{F7}{Division Sign}
-\end{itemize}
-\item[范围 $\mathbf{1^A}$]
+\item[范围 $\mathbf{8^J}$] ISO 8859-1（Latin-1补充）的上半部和JIS X 0208（日文基本字符集）的重叠部分，包含下列字符：
+\begin{multicols}{2}
 	\begin{itemize}
-	\item \texttt{U+0080}--\texttt{U+00FF}: Latin-1 Supplement
-	\item \texttt{U+0100}--\texttt{U+017F}: Latin Extended-A
-	\item \texttt{U+0180}--\texttt{U+024F}: Latin Extended-B
-	\item \texttt{U+0250}--\texttt{U+02AF}: IPA Extensions
-	\item \texttt{U+02B0}--\texttt{U+02FF}: Spacing Modifier Letters
-	\item \texttt{U+0300}--\texttt{U+036F}: Combining Diacritical Marks
-	\item \texttt{U+1E00}--\texttt{U+1EFF}: Latin Extended Additional
-\end{itemize}
-\item[范围 $\mathbf{2^J}$]
-	\begin{itemize}
-	\item \texttt{U+0370}--\texttt{U+03FF}: Greek and Coptic
-	\item \texttt{U+0400}--\texttt{U+04FF}: Cyrillic
-	\item \texttt{U+1F00}--\texttt{U+1FFF}: Greek Extended
+	\def\ch#1#2{\item \char"#1\ (\texttt{U+00#1}, #2)}
+	\ch{A7}{Section Sign}
+	\ch{A8}{Diaeresis}
+	\ch{B0}{Degree sign}
+	\ch{B1}{Plus-minus sign}
+	\ch{B4}{Spacing acute}
+	\ch{B6}{Paragraph sign}
+	\ch{D7}{Multiplication sign}
+	\ch{F7}{Division Sign}
 	\end{itemize}
+\end{multicols}
+
+\item[范围 $\mathbf{1^A}$] 包含于Adobe-Japan1-6中的拉丁字符，此范围包含下列Unicode区域，但不包括上述提到过的范围8：
+\begin{multicols}{2}
+	\begin{itemize}
+	\item \texttt{U+0080}--\texttt{U+00FF}: 拉丁字母补充-1
+	\item \texttt{U+0100}--\texttt{U+017F}: 拉丁字母扩充-A
+	\item \texttt{U+0180}--\texttt{U+024F}: 拉丁字母扩充-B
+	\item \texttt{U+0250}--\texttt{U+02AF}: 国际音标扩充
+	\item \texttt{U+02B0}--\texttt{U+02FF}: 进格修饰符元
+	\item \texttt{U+0300}--\texttt{U+036F}: 组合音标附加符号
+	\item \texttt{U+1E00}--\texttt{U+1EFF}: 拉丁字母扩充附加
+	\end{itemize}
+\end{multicols}
+
+\item[范围 $\mathbf{2^J}$] 希腊文和西里尔字母，使用JIS X 0208的大部分日文字体包含这些字符：
+\begin{multicols}{2}
+	\begin{itemize}
+	\item \texttt{U+0370}--\texttt{U+03FF}: 希腊字母
+	\item \texttt{U+0400}--\texttt{U+04FF}: 西里尔字母	
+	\item \texttt{U+1F00}--\texttt{U+1FFF}: 希腊文扩充
+	\end{itemize}
+\end{multicols}
+
+\item[范围 $\mathbf{3^J}$] 标点以及杂项符号：
+\begin{multicols}{2}
+	\begin{itemize}
+	\item \texttt{U+2000}--\texttt{U+206F}: 一般标点符号
+	\item \texttt{U+2070}--\texttt{U+209F}: 上标及下标
+	\item \texttt{U+20A0}--\texttt{U+20CF}: 货币符号
+	\item \texttt{U+20D0}--\texttt{U+20FF}: 符号用组合附加符号
+	\item \texttt{U+2100}--\texttt{U+214F}: 类字母符号
+	\item \texttt{U+2150}--\texttt{U+218F}: 数字形式
+	\item \texttt{U+2190}--\texttt{U+21FF}: 箭头符号
+	\item \texttt{U+2200}--\texttt{U+22FF}: 数学运算符号
+	\item \texttt{U+2300}--\texttt{U+23FF}: 杂项技术符号
+	\item \texttt{U+2400}--\texttt{U+243F}: 控制图像
+	\item \texttt{U+2500}--\texttt{U+257F}: 制表符
+	\item \texttt{U+2580}--\texttt{U+259F}: 区块元素
+	\item \texttt{U+25A0}--\texttt{U+25FF}: 几何形状
+	\item \texttt{U+2600}--\texttt{U+26FF}: 杂项符号
+	\item \texttt{U+2700}--\texttt{U+27BF}: 什锦符号
+	\item \texttt{U+2900}--\texttt{U+297F}: 补充性箭头-B
+	\item \texttt{U+2980}--\texttt{U+29FF}: 混合数学符号-B
+	\item \texttt{U+2B00}--\texttt{U+2BFF}: 杂项符号和箭头符号
+	\item \texttt{U+E000}--\texttt{U+F8FF}: 私用区域
+	\end{itemize}
+\end{multicols}
+
+\item[范围 $\mathbf{4^A}$] 通常情况下不包含于日文字体的部分。本范围包含有其他范围尚未涵盖部分。故，我们直接给出定义：
+\begin{verbatim}
+\ltjdefcharrange{4}{%
+   "500-"10FF, "1200-"1DFF, "2440-"245F, "27C0-"28FF, "2A00-"2AFF, 
+  "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A82F, "A840-"ABFF, "FB50-"FE0F, 
+  "FE20-"FE2F, "FE70-"FEFF, "FB00-"FB4F, "10000-"1FFFF} % non-Japanese
+\end{verbatim}
+
+\item[范围 $\mathbf{5^A}$] 代替以及补充私有使用区域。
+\item[范围 $\mathbf{6^J}$] 日文字符。
+\begin{multicols}{2}
+	\begin{itemize}
+	\item \texttt{U+2460}--\texttt{U+24FF}: 圈状字母数字
+	\item \texttt{U+2E80}--\texttt{U+2EFF}: CJK部首补充
+	\item \texttt{U+3000}--\texttt{U+303F}: CJK标点符号
+	\item \texttt{U+3040}--\texttt{U+309F}: 平假名
+	\item \texttt{U+30A0}--\texttt{U+30FF}: 片假名
+	\item \texttt{U+3190}--\texttt{U+319F}: 汉文标注号
+	\item \texttt{U+31F0}--\texttt{U+31FF}: 片假名音标补充
+	\item \texttt{U+3200}--\texttt{U+32FF}: 圈状CJK字母及月份
+	\item \texttt{U+3300}--\texttt{U+33FF}: CJK兼容
+	\item \texttt{U+3400}--\texttt{U+4DBF}: CJK统一表意文字扩充A		\item \texttt{U+4E00}--\texttt{U+9FFF}: CJK统一表意文字
+	\item \texttt{U+F900}--\texttt{U+FAFF}: CJK兼容表意文字
+	\item \texttt{U+FE10}--\texttt{U+FE1F}: 直行标点
+	\item \texttt{U+FE30}--\texttt{U+FE4F}: CJK兼容形式
+	\item \texttt{U+FE50}--\texttt{U+FE6F}: 小写变体
+	\item \texttt{U+20000}--\texttt{U+2FFFF}: （补充字符）
+	\end{itemize}
+\end{multicols}
+
+\item[范围 $\mathbf{7^J}$] 不包含于Adobe-Japan1-6的CJK字符。
+\begin{multicols}{2}
+	\begin{itemize}
+	\item \texttt{U+1100}--\texttt{U+11FF}: 谚文字母
+	\item \texttt{U+2F00}--\texttt{U+2FDF}: 康熙部首
+	\item \texttt{U+2FF0}--\texttt{U+2FFF}: 汉字结构描述字符
+	\item \texttt{U+3100}--\texttt{U+312F}: 注音字母
+	\item \texttt{U+3130}--\texttt{U+318F}: 谚文兼容字母
+	\item \texttt{U+31A0}--\texttt{U+31BF}: 注音字母扩充
+	\item \texttt{U+31C0}--\texttt{U+31EF}: CJK笔划
+	\item \texttt{U+A000}--\texttt{U+A48F}: 彝文音节
+	\item \texttt{U+A490}--\texttt{U+A4CF}: 彝文字母
+	\item \texttt{U+A830}--\texttt{U+A83F}: 一般印度数字
+	\item \texttt{U+AC00}--\texttt{U+D7AF}: 谚文音节
+	\item \texttt{U+D7B0}--\texttt{U+D7FF}: 谚文字母扩充-B
+	\end{itemize}
+\end{multicols}
 \end{description}
+\subsection{\textsf{kanjiskip}和\textsf{xkanjiskip}}
+\textbf{JAglue}分为下列三类范畴：
+\begin{itemize}
+\item JFM设定的胶或出格值。如果在一个日文字符附近使用\verb!\inhibitglue!，则胶便不会插入。
+\item 两个\textbf{JAchar}之间默认插入的胶（\textsf{kanjiskip}）
+\item \textbf{JAchar}和\textbf{ALchar}之间默认插入的胶（\textsf{xkanjiskip}）
+\end{itemize}
+
+\textsf{kanjiskip}和\textsf{xkanjiskip}的设定如下所示：
+\begin{verbatim}
+\ltjsetparameter{kanjiskip={0pt plus 0.4pt minus 0.4pt},
+                 xkanjiskip={0.25\zw plus 1pt minus 1pt}}
+\end{verbatim}
+
+当JFM包含“\textsf{kanjiskip}理想宽度”和/或“\textsf{xkanjiskip}理想宽度”数据时，上述设定产生作用。如果想用JFM中的数据，请设定\textsf{kanjiskip}或\textsf{xkanjiskip}为\verb!\maxdimen!。
+\subsection{\textsc{xkanjiskip}插入设定}
+并不是在所有的\textbf{JAchar}和\textbf{ALchar}周围插入\textsf{xkanjiskip}都是合适的。
+比如，在开标点之后插入\textsf{xkanjiskip}并不合适[如，比较“(あ”和“(\hskip\ltjgetparameter{xkanjiskip}あ”]。
+\LuaTeX-ja可以通过设定\textbf{JAchar}的\textsf{jaxspmode}以及\textbf{ALchar}的\textsf{alxspmode}来控制\textsf{xkanjiskip}在字符前后的插入。
+
+\begin{LTXexample}[pos=r]
+\ltjsetparameter{jaxspmode={`あ,preonly}, alxspmode={`\!,postonly}}
+pあq い!う
+\end{LTXexample}
+
+第二个参数\textsf{preonly}表示的含义为“允许在该字符前插入\textsf{xkanjiskip}，但不允许在该字符之后插入”。
+其他参数还有\textsf{postonly}，\textsf{allow}和\textsf{inhibit}。[TODO]
+
+用户如果想开启/关闭\textsf{kanjiskip}和\textsf{xkanjiskip}的插入，设定\textsf{autospacing}和\textsf{autoxspacing}参数为\textsf{true}/\textsf{false}即可。
+\subsection{基线浮动}
+为了确保日文字体和西文字体能够对其，有时需要浮动其中一者的基线。
+在\pTeX中，此项设定由设定\verb!\yabaselineshift!为非零长度（西文字体基线应向下浮动）。
+不过，如果文档的中主要语言不是日文，那么最好上浮日文字体的基线，西文字体不变。
+如上所述，\LuaTeX-ja可以独立设定西文字体的基线（\textsf{yabaselineshift}参数）和日文字体的基线（\textsf{yjabaselineshift}参数）。
+
+\begin{LTXexample}[pos=r]
+\vrule width 150pt height 0.4pt depth 0pt\hskip-120pt
+\ltjsetparameter{yjabaselineshift=0pt, yalbaselineshift=0pt}abcあいう
+\ltjsetparameter{yjabaselineshift=5pt, yalbaselineshift=2pt}abcあいう
+\end{LTXexample}
+
+上述水平线为此行基线。
+
+这里还有一个有趣的副作用：不同大小的字符可以通过适当调整这两个参数而在一行中垂直居中。下面是一个例子（注意，参数值并没有精心调整）：
+
+\begin{LTXexample}
+xyz漢字
+{\scriptsize
+  \ltjsetparameter{yjabaselineshift=-1pt,
+    yalbaselineshift=-1pt}
+  XYZひらがな
+}abcかな
+\end{LTXexample}[pos=r]
+\subsection{裁剪框标记}
+裁剪框标记是在一页的四角和水平/垂直中央放置的标记。在日文中，裁剪框被称为“トンボ”。
+\pLaTeX和\LuaTeX-ja均在底层支持裁剪框标记。需要下列步骤来实现：
+\begin{enumerate}
+\item 首先，首先定义页面左上角将会出现的注记。这由向\verb!@bannertoken!分配一个token列完成。\\
+例如，下列所示将会设定注记为“\textsf{filename (YYYY-MM-DD hh:mm)}”:
+
+\begin{verbatim}
+\makeatletter
+
+\hour\time \divide\hour by 60 \@tempcnta\hour \multiply\@tempcnta 60\relax
+\minute\time \advance\minute-\@tempcnta
+\@bannertoken{%
+   \jobname\space(\number\year-\two@digits\month-\two@digits\day
+   \space\two@digits\hour:\two@digits\minute)}%
+\end{verbatim}
+
+\item {[TODO]}
+\end{enumerate}
 \section{Lua\TeX-ja与Lua\TeX相关阅读材料}
 \begin{itemize}
 \item Lua\TeX官方主页：\verb!http://www.luatex.org!
