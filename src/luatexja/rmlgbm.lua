@@ -161,10 +161,10 @@ local function mk_rml(name, size, id)
    fontdata.unicodes = nil
    fontdata.shared = nil
    cachedata.shared = nil
-   if cidfont_data[cid_name].shared then
+   if s.shared then
       cachedata.shared = {}
       local shared = cachedata.shared
-      for k, v in pairs(cidfont_data[cid_name].shared) do
+      for k, v in pairs(s.shared) do
 	 shared[k] = v
       end
       
@@ -175,20 +175,22 @@ local function mk_rml(name, size, id)
    -- characters & scaling
    if size < 0 then size = -size * 655.36 end
    local scale = size / 655360
+   local def_height =  round(0.88 * size) -- character's default height (optimized for jfm-ujis.lua)
+   local def_depth =  round(0.12 * size)  -- and depth.
    if not cache_chars[cid_name][size] then
       cache_chars[cid_name][size]  = {}
       for k, v in pairs(cache_chars[cid_name][655360]) do
-         cache_chars[cid_name][size][k] = {}
-         cache_chars[cid_name][size][k].index = v.index
-         cache_chars[cid_name][size][k].width = round(v.width * scale)
-         cache_chars[cid_name][size][k].tounicode = v.tounicode
+         cache_chars[cid_name][size][k] = { 
+	    index = v.index, width = round(v.width * scale), 
+	    height = def_height, depth = def_depth, tounicode = v.tounicode,
+	 }
       end
    end
    fontdata.characters = cache_chars[cid_name][size]
    cachedata.characters = cache_chars[cid_name][size]
 
    local parameters = {}
-   for k, v in pairs(cidfont_data[cid_name].parameters) do
+   for k, v in pairs(s.parameters) do
       parameters[k] = v * scale
    end
    fontdata.parameters = parameters;                cachedata.parameters = parameters
