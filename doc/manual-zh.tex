@@ -71,7 +71,8 @@
 	\end{itemize}
 \item 用户需要将获取的\LuaTeX-ja宏包的\verb!src/!放置到你所用的发行版中的\verb!TEXMFLOACL!树下\verb!tex/!文件夹（如果不存在，请建立）下即可，查询该环境变量需要使用：\\
 	\verb!$ kpeswhich -expand-var "$TEXMFLOCAL"!
-\item 刷新字体数据库：\\
+\item 刷新数据库：\\
+	\verb!$ texhash!\\
 	\verb!$ mkluatexfontdb!
 \end{enumerate}
 \section{\LuaTeX-ja在plain \TeX格式下的使用}
@@ -125,7 +126,8 @@ $ wget http://fandol-doc.googlecode.com/files/zh-classes.tar.xz
 \end{verbatim}
 
 该文档类是基于\verb!jclasses!文档的中文设定版。
-这个文档类需要用户在本地安装两款字体：AdobeSongStd-Light.otf和AdobeHeitiStd-Regular.otf。
+这个文档类需要你安装Adobe Reader并使用两款字体。
+值得注意的是，本文档类提供的两款字体并不嵌入，这首先是为了减轻文档大小，其次为了加快编译速度。
 这两款字体在你安装的中文版Adobe Reader的文件夹下。这两款字体设定如下：
 \begin{center}
 	\begin{tabular}{cccc}
@@ -148,6 +150,51 @@ $ wget http://fandol-doc.googlecode.com/files/zh-classes.tar.xz
 Lua\TeX-ja中文测试。{\hei 测试}
 \end{document}
 \end{verbatim}
+
+我们在这里建议用户更改\textsf{zh-classes.dtx}文件中的相关代码来定制符合自己的文档类。
+但请注意，请将你更改后的文档类更名为你自己的自定义名称。
+这里给出一些常见的中文字体组合：
+\begin{center}
+	\begin{tabular}{ccc}
+	\hline
+        组合&宋体&黑体\\
+	\hline
+        Windows$^{(1)}$&SimSun&SimHei\\
+        Windows$^{(2)}$&方正书宋&方正粗宋简体\\
+        Mac OS X&STSong&STHeiti\\
+	\hline
+	\end{tabular}
+\end{center}
+%名称	SIL-Kai-Reg-Jian	全名	Kai Regular 
+%名称	SimSun-ExtB  		全名	SimSun-ExtB 
+%名称	FangSong                全名	仿宋
+%名称	SimHei                  全名	黑体
+%名称	STHeitiSC-Medium        全名	黑体-简 中等
+%名称	STFangsong              全名	华文仿宋
+%名称	STHeiti                 全名	华文黑体
+%名称	STHupo                  全名	华文琥珀
+%名称	STKaiti                 全名	华文楷体
+%名称	STLiti                  全名	华文隶书
+%名称	STSong                  全名	华文宋体
+%名称	STXinwei                全名	华文新魏
+%名称	STXingkai               全名	华文行楷
+%名称	STZhongsong             全名	华文中宋
+\subsection{fontspec}
+在\LuaTeX-ja中，和\texttt{fontspec}共存的一个包为\texttt{luatexja-fontspec}。
+这个包自动加载\texttt{fontspec}和\texttt{luatexja}宏包。
+
+在\texttt{luatexja-fontspec}，定义了如下七条命令，这些命令和\texttt{fontspec}的相关命令对比如下：
+\begin{center}
+	\begin{tabular}{ccccc}
+	\hline
+	日文字体&\verb+\jfontspec+&\verb+\setmainjfont+&\verb+\setsansjfont+&\verb+\newjfontfamily+\\
+	西文字体&\verb+\fontspec+&\verb+\setmainfont+&\verb+\setsansfont+&\verb+\newfontfamily+\\
+	\hline
+	日文字体&\verb+\newjfontface+&\verb+\defaultjfontfeatures+&\verb+\addjfontfeatures+&\\
+	西文字体&\verb+\newfontface+&\verb+\defaultfontfeatures+&\verb+\addfontfeatures+&\\
+	\hline
+	\end{tabular}
+\end{center}
 \section{\LuaTeX-ja参数设定}
 \LuaTeX-ja包含大量的参数，以控制排版细节。
 设定这些参数需要使用命令：\verb!\ltjsetparameter!和\verb!\ltjgetparameter!命令。
@@ -329,14 +376,14 @@ pあq い!う
 
 这里还有一个有趣的副作用：不同大小的字符可以通过适当调整这两个参数而在一行中垂直居中。下面是一个例子（注意，参数值并没有精心调整）：
 
-\begin{LTXexample}
+\begin{LTXexample}[pos=r]
 xyz漢字
 {\scriptsize
   \ltjsetparameter{yjabaselineshift=-1pt,
     yalbaselineshift=-1pt}
   XYZひらがな
 }abcかな
-\end{LTXexample}[pos=r]
+\end{LTXexample}
 \subsection{裁剪框标记}
 裁剪框标记是在一页的四角和水平/垂直中央放置的标记。在日文中，裁剪框被称为“トンボ”。
 \pLaTeX和\LuaTeX-ja均在底层支持裁剪框标记。需要下列步骤来实现：
@@ -366,5 +413,11 @@ xyz漢字
 \item Publishing \TeX：\verb!http://ja.wikipedia.org/wiki/PTeX!
 \item Vertical typesetting in \TeX：\verb!http://tug.org//TUGboat/Articles/tb11-3/tb29hamano.pdf!
 \item up\TeX官方主页：\verb!http://homepage3.nifty.com/ttk/comp/tex/uptex.html!
+\item “LuaTeX で日本語”：\verb!http://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=627!
+\item luajalayout宏包：\verb!http://www-is.amp.i.kyoto-u.ac.jp/lab/kmaeda/lualatex/luajalayout/!
+\item luafontcomp宏包：\verb!http://www-is.amp.i.kyoto-u.ac.jp/lab/kmaeda/lualatex/luafontcomp/!
+\item 思わずLuaでLaTeXしてみた：\verb!http://zrbabbler.sp.land.to/lualatexlua.html!
+\item luaums.sty：\verb!http://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=378!
+\item koTeXは日本語LuaTeXへの先導役になるか？：\\\verb!http://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=485!
 \end{itemize}
 \end{document}
