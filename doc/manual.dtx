@@ -14,7 +14,7 @@
 \usepackage{booktabs,listings,showexpl,multicol}
 \usepackage{luatexja-otf}
 \usepackage{luatexja-fontspec}
-\usepackage[unicode]{hyperref}
+\usepackage[unicode=true]{hyperref}
 \usepackage[all]{xy}
 \SelectTips{cm}{}
 \def\labelenumii{(\arabic{enumii})}
@@ -1102,13 +1102,13 @@ parameters, you have to use commands \verb+\ltjsetparameter+ and
 To edit the range of \textbf{JAchar}s, you have to assign a non-zero
 natural number which is less than 217 to the character range first. This
 can be done by using \verb+\ltjdefcharrange+ primitive. For example, the
-next line assigns whole characters in Supplementary Multilingual Plane
+next line assigns whole characters in Supplementary Ideographic Plane
 and the character `漢' to the range number~100.
 %</en>
 %<*ja>
 \textbf{JAchar} の範囲を設定するためには，まず各文字に0より大きく217より小さい index を
 割り当てる必要がある．これには \verb+\ltjdefcharrange+ プリミティブを用いる．
-例えば，次のように書くことで追加多言語面 (SMP) にある全ての文字と `漢' が
+例えば，次のように書くことで追加漢字面 (SIP) にある全ての文字と `漢' が
 「100番の文字範囲」に属するように設定される．
 %</ja>
 \begin{lstlisting}
@@ -1125,15 +1125,15 @@ not do this in the middle of a document.
 
 %<*en>
 If some character has been belonged to some non-zero numbered range,
-this will be overwritten by the new setting. For example, whole SMP
+this will be overwritten by the new setting. For example, whole SIP
 belong to the range~4 in the default setting of \LuaTeX-ja, and if you
-specify the above line, then SMP will belong to the range~100 and be
+specify the above line, then SIP will belong to the range~100 and be
 removed from the range~4.
 %</en>
 %<*ja>
 もし指定されたある文字がある非零番号の範囲に属していたならば，これは新しい設定で
-上書きされる．例えば，SMP は全て \LuaTeX-ja のデフォルトでは4番の文字範囲に
-属しているが，上記の指定を行えば SMP は100番に属すようになり，4番からは除かれる．
+上書きされる．例えば，SIP は全て \LuaTeX-ja のデフォルトでは4番の文字範囲に
+属しているが，上記の指定を行えば SIP は100番に属すようになり，4番からは除かれる．
 %</ja>
 
 %<*en>
@@ -1437,7 +1437,7 @@ This range consist of the following Unicode ranges, \emph{except characters in t
 "FE10--"FE1F&縦書き形&
 "FE30--"FE4F&CJK互換形\\
 "FE50--"FE6F&小字形&
-"{20}000--"{2F}FFF&（追加多言語面）
+"{20}000--"{2F}FFF&（追加漢字面）
 %</ja>
 \end{tabular}
 \end{center}
