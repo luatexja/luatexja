@@ -28,8 +28,6 @@
 \DeclareRobustCommand\pLaTeXe{p\kern-.05em\LaTeXe}
 \DeclareRobustCommand\epTeX{\ensuremath{\varepsilon}-\kern-.125em\pTeX}
 
-\ltjsetparameter{jacharrange={-3}}
-\ltjdefcharrange{6}{`■,`…,`→,`←,`↓,`↑,`─}
 \theoremstyle{definition}
 %<en>\newtheorem{defn}{Definition}
 %<ja>\newtheorem{defn}{定義}
@@ -506,7 +504,7 @@ Note that the forefront of development may not be in \texttt{master} branch.
 \item Extract the archive. You will see \texttt{src/} and several other sub-directories.
 %</en>
 %<*ja>
-\item 後者の方法でアーカイブ取得したならば，それを展開する．
+\item 後者の方法でアーカイブを取得したならば，それを展開する．
       \texttt{src/} をはじめとしたいくつかのディレクトリができるが，
       動作には \texttt{src/} 以下の内容だけで十分．
 %</ja>
@@ -540,29 +538,6 @@ Note that the forefront of development may not be in \texttt{master} branch.
 \item 原稿のソースファイルの文字コードは UTF-8 固定である．
       従来日本語の文字コードとして用いられてきた EUC-JP や Shift-JIS は使用できない．
 %</ja>
-
-%<*en>
-\item May be conflict with other packages.
-
-      For example, the default setting of \textbf{JAchar} in the present
-      version does not coexist with the \Pkg{unicode-math}
-      package. Putting the following line in preamble makes that
-      mathematical symbols will be typeset correctly, but several
-      Japanese characters will be treated as an \textbf{ALchar} as
-      side-effect:
-%</en>
-%<*ja>
-\item いくつかのパッケージと衝突する．
-
-      例えば，\textbf{JAchar} の範囲の設定がデフォルトのままだと，現行の
-      バージョンでは \Pkg{unicode-math} パッケージと共存できない．
-      以下の行をプリアンブルに追加することで数学記号が正しく出るように
-      なるが，副作用としていくつかの和文文字が \textbf{ALchar} として
-      扱われるようになってしまう：
-%</ja>
-\begin{verbatim}
-\ltjsetparameter{jacharrange={-3, -8}}
-\end{verbatim}
 \end{itemize}
 
 %<en>\subsection{Using in plain \TeX}
@@ -2218,35 +2193,54 @@ Furthermore, the glyph is shifted according to values of fields
 \end{list}
 
 %<*en>
-The followings are `imaginary characters' which can be specified in \texttt{chars} field.
-\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
-\item['lineend'] An ending of a line.
-\item['diffmet'] Used at a boundary between two \textbf{JAchar}s whose JFM or size is different.
-\item['boxbdd'] The beginning/ending of a horizontal box, and the beginning of a noindented paragraph.
-\item['parbdd'] The beginning of an (indented) paragraph.
-\item['jcharbdd'] A boundary between \textbf{JAchar} and anything else
-	     (such as \textbf{ALchar}, kern, glue, ...).
-\item[$-1$] The left/right boundary of an inline math formula.
-\end{list}
+As described before, you can specify several `imaginary characters' in
+\texttt{chars} field. The most of these characters are regarded as the
+characters of class 0 in \pTeX.
+As a result, \LuaTeX-ja can control typesetting finer than \pTeX.
+The following is the list of `imaginary characters':
 %</en>
-
 %<*ja>
 上で説明した通り，\texttt{chars}フィールド中にはいくつかの「特殊文字」も
 指定可能である．これらは，大半が\pTeX のJFMグルーの挿入処理ではみな「文字
 クラス0の文字」として扱われていた文字であり，その結果として\pTeX より細か
 い組版調整ができるようになっている．以下でその一覧を述べる：
+%</ja>
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
-\item['lineend'] 行の終端を表す．
-\item['diffmet']
+\item['lineend']
+%<en>An ending of a line.
+%<ja>行の終端を表す．
 
-\item['boxbdd'] hboxの先頭と末尾，及びインデントされていない
-	     （\verb+\noindent+で開始された）段落の先頭を表す．
-\item['parbdd'] 通常の（\verb+\noindent+で開始されていない）段落の先頭．
-\item['jcharbdd'] 和文文字と「その他のもの」（欧文文字，glue，kern等）との境界．
-\item[$-1$] 行中数式と地の文との境界．
+\item['diffmet']
+%<en>Used at a boundary between two \textbf{JAchar}s whose JFM or size is different.
+%<ja>JFM やサイズが異なる2つの \textbf{JAchar} の間の境界として用いられる．
+
+\item['boxbdd']
+%<en>The beginning/ending of a horizontal box, and the beginning of a noindented paragraph.
+%<ja>hboxの先頭と末尾，及びインデントされていない（\verb+\noindent+で開始された）段落の先頭を表す．
+
+\item['parbdd']
+%<en>The beginning of an (indented) paragraph.
+%<ja>通常の（\verb+\noindent+で開始されていない）段落の先頭．
+
+\item['jcharbdd']
+%<en>A boundary between \textbf{JAchar} and anything else (such as \textbf{ALchar}, kern, glue, ...).
+%<ja>和文文字と「その他のもの」（欧文文字，glue，kern等）との境界．
+
+\item[$-1$]
+%<en>The left/right boundary of an inline math formula.
+%<ja>行中数式と地の文との境界．
 \end{list}
 
-\paragraph{\pTeX 用和文フォントメトリックの移植}
+%<en>\paragraph{Porting JFM from \pTeX}
+%<ja>\paragraph{\pTeX 用和文フォントメトリックの移植}
+
+% ToDo: English version.
+
+%<*en>
+...
+%</en>
+
+%<*ja>
 以下に，\pTeX 用和文フォントメトリックを\LuaTeX-ja用に移植する場合の注意点を挙げておく．
 \begin{itemize}
 \item 実際に出力される和文フォントのサイズがdesign sizeとなる．
@@ -2293,25 +2287,44 @@ The followings are `imaginary characters' which can be specified in \texttt{char
 
 %<en>\subsection{Math Font Family}
 %<ja>\subsection{数式フォントファミリ}
+
+%<*en>
 \TeX\ handles fonts in math formulas by 16~font families\footnote{Omega,
-Aleph, \LuaTeX~and $\varepsilon$-\kern-.125em(u)\pTeX can handles 256~families, but
+Aleph, \LuaTeX~and $\varepsilon$-\kern-.125em(u)\pTeX\ can handles 256~families, but
 an external package is needed to support this in plain \TeX\ and
 \LaTeX.}, and each family has three fonts:
 \verb+\textfont+, \verb+\scriptfont+ and \verb+\scriptscriptfont+.
+%</en>
+%<*ja>
+\TeX\ は数式フォントを16のファミリ\footnote{Omega, Aleph, \LuaTeX，そして
+  $\varepsilon$-\kern-.125em(u)\pTeX\ では256 の数式ファミリを扱うことができるが，
+  これをサポートするために plain \TeX と \LaTeX では外部パッケージを読み込む必要が
+  ある．}で管理し，それぞれのファミリは3つのフォントを持っている：\verb+\textfont+, \verb+\scriptfont+ そして \verb+\scriptscriptfont+ である.
+%</ja>
 
+%<*en>
 \LuaTeX-ja's handling of Japanese fonts in math formulas is similar;
 Table~\ref{tab-math} shows counterparts to \TeX's primitives for math
 font families. There is no relation between the value of
 \verb+\fam+ and that of \verb+\jfam+; with appropriate settings,
-you can set both \verb+\fam+ and \verb+\jfam+ to~the same value.
+you can set both \verb+\fam+ and \verb+\jfam+ to the same value.
+%</en>
+%<*ja>
+\LuaTeX-ja の数式中での和文フォントの扱いも同様である．
+表 \ref{tab-math} は数式フォントファミリに対する \TeX\ のプリミティブと対応する
+ものを示している．\verb+\fam+ と \verb+\jfam+ の値の間には関係はなく，
+適切な設定の下では \verb+\fam+ と \verb+\jfam+ の両方に同じ値を設定することができる．
+%</ja>
 
 \begin{table}[!tb]
-\caption{Primitives for Japanese math fonts.}
+%<en>\caption{Primitives for Japanese math fonts.}
+%<ja>\caption{和文数式フォントに対するプリミティブ．}
 \label{tab-math}
 \begin{center}\def\{{\char`\{}\def\}{\char`\}}
 \begin{tabular}{lll}
 \toprule
-&Japanese fonts&alphabetic fonts\\
+%<en>&Japanese fonts&alphabetic fonts\\
+%<ja>&和文フォント&欧文フォント\\
 \midrule
 font family&\verb+\jfam+${}\in [0,256)$&\verb+\fam+\\
 text size&\tt\Param{jatextfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\verb+\textfont+<fam>=<font\_cs>\\
@@ -2324,59 +2337,130 @@ scriptscript size&\tt\Param{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\ver
 
 %<en>\subsection{Callbacks}
 %<ja>\subsection{コールバック}
+
+%<*en>
 Like \LuaTeX\ itself, \LuaTeX-ja also has callbacks. These callbacks can
-be accessed via \verb+luatexbase.add_to_callback+ function and so on, as other callbacks
+be accessed via \verb+luatexbase.add_to_callback+ function and so on, as other callbacks.
+%</en>
+%<*ja>
+\LuaTeX 自体のものに加えて，\LuaTeX-ja もコールバックを持っている．
+これらのコールバックには，他のコールバックと同様に \verb+luatexbase.add_to_callback+
+関数などを用いることでアクセスすることができる．
+%</ja>
 \begin{list}{}%
 {\def\makelabel#1{\bfseries#1}}
-\item[\texttt{luatexja.load\_jfm} callback]
+%<en>\item[\texttt{luatexja.load\_jfm} callback]
+%<ja>\item[\texttt{luatexja.load\_jfm} コールバック]
+%<*en>
 With this callback you can overwrite JFMs.
 This callback is called when a new JFM is loaded.
+%</en>
+%<*ja>
+このコールバックを用いることで JFM を上書きすることができる．
+このコールバックは新しい JFM が読み込まれるときに呼び出される．
+%</ja>
 
-\begin{verbatim}
+\begin{lstlisting}[numbers=left]
 function (<table> jfm_info, <string> jfm_name)
   return <table> new_jfm_info
 end
-\end{verbatim}
+\end{lstlisting}
 
+%<*en>
 The argument \verb+jfm_info+ contains a table similar to the table in a JFM file, except
 this argument has \texttt{chars} field which contains character codes
 	     whose character class is not~0.
+%</en>
+%<*ja>
+引数 \verb+jfm_info+ は JFM ファイルのテーブルと似たものが格納されるが，
+クラス0を除いた文字のコードを含んだ \texttt{chars} フィールドを持つ点が異なる．
+%</ja>
 
+%<*en>
 An example of this callback is the \texttt{ltjarticle} class, with
 	     forcefully assigning character class~0 to \texttt{'parbdd'}
 	     in the JFM \texttt{jfm-min.lua}. This callback doesn't
 	     replace any code of \LuaTeX-ja.
+%</en>
+%<*ja>
+このコールバックの使用例は \texttt{ltjarticle} クラスにあり，
+\texttt{jfm-min.lua} 中の \texttt{'parbdd'} を強制的にクラス0に割り当てている．
+このコールバックは \LuaTeX-ja のコードを書き換えない．
+%</ja>
 
-\item[\texttt{luatexja.define\_font} callback]
+%<en>\item[\texttt{luatexja.define\_font} callback]
+%<ja>\item[\texttt{luatexja.define\_font} コールバック]
+%<*en>
 This callback and the next callback form a pair, and you can assign letters which don't have
 	     fixed code points in Unicode to non-zero character classes.
 This \texttt{luatexja.define\_font} callback is called just when new Japanese font is loaded.
-\begin{verbatim}
+%</en>
+%<*ja>
+このコールバックと次のコールバックは組をなしており，Unicode 中に固定された文字コード
+番号を持たない文字を非零の文字クラスに割り当てることができる．
+このコールバックは新しい和文フォントが読み込まれたときに呼び出される．
+%</ja>
+
+\begin{lstlisting}[numbers=left]
 function (<table> jfont_info, <number> font_number)
   return <table> new_jfont_info
 end
-\end{verbatim}
+\end{lstlisting}
 
+%<*en>
 You may assume that \verb+jfont_info+ has the following fields:
+%</en>
+%<*ja>
+\verb+jfont_info+ は以下のフィールドを持つ：
+%</ja>
 \begin{description}
-\item[\tt jfm] The index number of JFM.
-\item[\tt size] Font size in a scaled point (${}=2^{-16}\,\textrm{pt}$).
-\item[\tt var] The value specified in \texttt{jfmvar=...} at a call of \verb+\jfont+.
+\item[\tt jfm]
+%<en>The index number of JFM.
+%<ja>JFM のインデックス番号．
+
+\item[\tt size]
+%<en>Font size in a scaled point (${}=2^{-16}\,\textrm{pt}$).
+%<ja>スケールド・ポイント (${}=2^{-16}\,\textrm{pt}$) を単位としたフォントのサイズ．
+
+\item[\tt var]
+%<en>The value specified in \texttt{jfmvar=...} at a call of \verb+\jfont+.
+%<ja>\verb+\jfont+ の呼び出しの際に \texttt{jfmvar=...} で指定された値．
 \end{description}
 
+%<*en>
 The returned table \verb+new_jfont_info+ also should include these three fields.
 The \verb+font_number+ is a font number.
+%</en>
+%<*ja>
+戻り値の \verb+new_jfont_info+ テーブルもこれら3つのフィールドを含まなければならない．
+\verb+font_number+ はフォント番号である．
+%</ja>
 
+%<*en>
 A good example of this and the next callbacks is the \Pkg{luatexja-otf}
 	     package, supporting \verb+"AJ1-xxx"+ form for Adobe-Japan1
 	     CID characters in a JFM. This callback doesn't replace any
 	     code of \LuaTeX-ja.
+%</en>
+%<*ja>
+これと次のコールバックの良い使用例は \Pkg{luatexja-otf} パッケージであり，
+JFM 中で Adobe-Japan1 CID の文字を \verb+"AJ1-xxx"+ の形で指定するために
+用いられている．
+このコールバックは \LuaTeX-ja のコードを書き換えない．
+%</ja>
 
-
-\item[\texttt{luatexja.find\_char\_class} callback]
-This callback is called just when \LuaTeX-ja inready to determine which
+%<en>\item[\texttt{luatexja.find\_char\_class} callback]
+%<ja>\item[\texttt{luatexja.find\_char\_class} コールバック]
+%<*en>
+This callback is called just when \LuaTeX-ja is trying to determine which
 	     character class a character \verb+chr_code+ belongs.
 A function used in this callback should be in the following form:
+%</en>
+%<*ja>
+このコールバックは \LuaTeX-ja が \verb+chr_code+ の文字がどの文字クラスに
+属するかを決定しようとする際に呼び出される．
+このコールバックで呼び出される関数は次の形をしていなければならない：
+%</ja>
 \begin{lstlisting}[numbers=left]
 function (<number> char_class, <table> jfont_info, <number> chr_code)
   if char_class~=0 then return char_class
@@ -2387,29 +2471,73 @@ function (<number> char_class, <table> jfont_info, <number> chr_code)
 end
 \end{lstlisting}
 
+%<*en>
 The argument \verb+char_class+ is the result of \LuaTeX-ja's default
 	     routine or previous function calls in this callback, hence
 	     this argument may not be 0. Moreover, the returned
 	     \verb+new_char_class+ should be as same as \verb+char_class+ when \verb+char_class+
 	     is not~0, otherwise you will overwrite the \LuaTeX-ja's
 	     default routine.
+%</en>
+%<*ja>
+引数 \verb+char_class+ は \LuaTeX-ja のデフォルトルーチンか，このコールバックの
+直前の関数呼び出しの結果を含んでおり，したがってこの値は0ではないかもしれない．
+さらに，戻り値の \verb+new_char_class+ は \verb+char_class+ が非零のときには
+\verb+char_class+ の値と同じであるべきで，そうでないときは \LuaTeX-ja の
+デフォルトルーチンを書き換えることになる．
+%</ja>
 
+%<*en>
 This callback doesn't replace any code of \LuaTeX-ja.
+%</en>
+%<*ja>
+このコールバックは \LuaTeX-ja のコードを書き換えない．
+%</ja>
 
-\item[\texttt{luatexja.set\_width} callback]
+%<en>\item[\texttt{luatexja.set\_width} callback]
+%<ja>\item[\texttt{luatexja.set\_width} コールバック]
+%<*en>
 This callback is called when \LuaTeX-ja is trying to encapsule a
 	     \textbf{JAchar} \textit{glyph\_node}, to adjust its
 	     dimension and position.
+%</en>
+%<*ja>
+このコールバックは \LuaTeX-ja が \textbf{JAchar} の寸法と位置を調節するために
+その \textit{glyph\_node} をカプセル化しようとする際に呼び出される．
+%</ja>
 \begin{lstlisting}[numbers=left]
 function (<table> shift_info, <table> jfont_info, <number> char_class)
   return <table> new_shift_info
 end
 \end{lstlisting}
 
+%<*en>
 The argument \verb+shift_info+ and the returned \verb+new_shift_info+ have
 \texttt{down} and \texttt{left} fields, which are the amount of shifting
 	     down/left the character in a scaled-point.
+%</en>
+%<*ja>
+引数 \verb+shift_info+ と戻り値の \verb+new_shift_info+ は
+\texttt{down} と \texttt{left} のフィールドを持ち，これらの値は
+文字の下／左へのシフト量（スケールド・ポイント単位）である．
+%</ja>
 
+%<*en>
+A good example is \Pkg{test/valign.lua}.
+After loading this file, the vertical position of glyphs is automatically
+adjusted; the ratio $(\hbox{height}:\hbox{depth})$ of glyphs is adjusted
+to be that of letters in the character class~0. For example, suppose that
+\begin{itemize}
+\item The setting of the JFM: $(\hbox{height})=88x$, $(\hbox{depth})=12x$
+  (the standard values of Japanese OpenType fonts);
+\item The value of the real font: $(\hbox{height})=28y$, $(\hbox{depth})=5y$
+  (the standard values of Japanese TrueType fonts).
+\end{itemize}
+Then, the position of glyphs is shifted up by
+\[
+ \frac{88x}{88x+12x} (28y+5y) - 28y = \frac{26}{825}y= 0.03\dot1\dot5y.
+\]
+%</en>
 %<*ja>
 良い例が\Pkg{test/valign.lua}である．このファイルが読み込まれた状態では，
 	     JFM内で規定された文字クラス0の文字における$(\hbox{高
@@ -2424,7 +2552,7 @@ The argument \verb+shift_info+ and the returned \verb+new_shift_info+ have
 \[
  \frac{88x}{88x+12x} (28y+5y) - 28y = \frac{26}{825}y= 0.03\dot1\dot5y
 \]
-だけ上にずらされることになる，
+だけ上にずらされることになる．
 %</ja>
 \end{list}
 
@@ -3664,4 +3792,10 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 \end{itemize}
 
 \section{psft}
+
+\begin{thebibliography}{99}
+  \addcontentsline{toc}{section}{\refname}
+\bibitem{texbytopic}
+Victor Eijkhout,  \emph{\TeX\ by Topic, A \TeX nician's Reference}, Addison-Wesley, 1992.
+\end{thebibliography}
 \end{document}
