@@ -1,0 +1,54 @@
+\catcode`@=11
+\ifx\xgujifnt@defined\@undefined
+\def\xgujifnt@defined{\relax}
+\def\gujifnt@cjkchar{国}
+\newbox\gujifnt@tmpbox
+\def\gujifnt@setdepth#1#2{%
+  \ifdim #1=\maxdimen
+    \setbox\gujifnt@tmpbox=\hbox{\gujifnt@cjkchar}%
+    #2=\dp\gujifnt@tmpbox
+  \else
+    #2=#1%
+  \fi
+}
+\newdimen\zmh@depth
+\newdimen\zmh@thickness
+\newdimen\zmh@skip
+\newbox\zmh@tmpbox
+\newdimen\zmh@tmpdim
+\newdimen\zmh@tmpdep
+\zmh@skip=0.1em
+\zmh@depth=\maxdimen
+\zmh@thickness=0.4pt
+\def\zmh#1{%
+  \gujifnt@setdepth\zmh@depth\zmh@tmpdep
+  \setbox\zmh@tmpbox=\hbox{#1}%
+  \zmh@tmpdim=\wd\zmh@tmpbox
+  \advance\zmh@tmpdim by -2\zmh@skip
+  \hbox{\vbox to \z@{\hbox to\z@{\raise -\zmh@tmpdep\hbox{\hskip\zmh@skip\vrule width\zmh@tmpdim height\zmh@thickness
+    \hskip\zmh@skip}\hss}\vss}#1}%
+}
+\def\zmhl#1{%
+  \gujifnt@setdepth\zmh@depth\zmh@tmpdep
+  \setbox\zmh@tmpbox=\hbox{#1}%
+  \zmh@tmpdim=\wd\zmh@tmpbox
+  \advance\zmh@tmpdim by -\zmh@skip
+  \hbox{\vbox to \z@{\hbox to\z@{\raise -\zmh@tmpdep\hbox{\hskip\zmh@skip\vrule width\zmh@tmpdim height\zmh@thickness
+    }\hss}\vss}#1}%
+}
+\def\zmhm#1{%
+  \gujifnt@setdepth\zmh@depth\zmh@tmpdep
+  \setbox\zmh@tmpbox=\hbox{#1}%
+  \zmh@tmpdim=\wd\zmh@tmpbox
+  \hbox{\vbox to \z@{\hbox to\z@{\raise -\zmh@tmpdep\hbox{\vrule width\zmh@tmpdim height\zmh@thickness
+    }\hss}\vss}#1}%
+}
+\def\zmhr#1{%
+  \gujifnt@setdepth\zmh@depth\zmh@tmpdep
+  \setbox\zmh@tmpbox=\hbox{#1}%
+  \zmh@tmpdim=\wd\zmh@tmpbox
+  \advance\zmh@tmpdim by -\zmh@skip
+  \hbox{\vbox to \z@{\hbox to\z@{\raise -\zmh@tmpdep\hbox{\vrule width\zmh@tmpdim height\zmh@thickness
+    \hskip\zmh@skip}\hss}\vss}#1}%
+}
+\fi

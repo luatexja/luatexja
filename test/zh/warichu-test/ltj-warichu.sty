@@ -1,0 +1,596 @@
+\catcode`@=11
+\ifx\LaTeX\@undefined
+\def\@nnil{\@nil}%
+\def\@empty{}%
+\def\@fornoop#1\@@#2#3{}%
+\long\def\@for#1:=#2\do#3{%
+  \expandafter\def\expandafter\@fortmp\expandafter{#2}%
+  \ifx\@fortmp\@empty \else
+    \expandafter\@forloop#2,\@nil,\@nil\@@#1{#3}
+  \fi}%
+\long\def\@forloop#1,#2,#3\@@#4#5{%
+  \def#4{#1}
+  \ifx #4\@nnil \else
+       #5\def#4{#2}
+    \ifx #4\@nnil 
+      \else#5\@iforloop #3\@@#4{#5}
+    \fi
+  \fi}%
+\long\def\@iforloop#1,#2\@@#3#4{\def#3{#1}\ifx #3\@nnil
+       \expandafter\@fornoop \else
+      #4\relax\expandafter\@iforloop\fi#2\@@#3{#4}}%
+\def\@tfor#1:={\@tf@r#1 }%
+\long\def\@tf@r#1#2\do#3{\def\@fortmp{#2}\ifx\@fortmp\space\else
+    \@tforloop#2\@nil\@nil\@@#1{#3}\fi}%
+\long\def\@tforloop#1#2\@@#3#4{\def#3{#1}\ifx #3\@nnil
+       \expandafter\@fornoop \else
+      #4\relax\expandafter\@tforloop\fi#2\@@#3{#4}}%
+\long\def\@ifnextchar#1#2#3{%
+  \let\reserved@d=#1%
+  \def\reserved@a{#2}%
+  \def\reserved@b{#3}%
+  \futurelet\@let@token\@ifnch}
+\def\@ifnch{%
+  \ifx\@let@token\@sptoken
+    \let\reserved@c\@xifnch
+  \else
+    \ifx\@let@token\reserved@d
+      \let\reserved@c\reserved@a
+    \else
+      \let\reserved@c\reserved@b
+    \fi
+  \fi
+  \reserved@c}
+\def\:{\let\@sptoken= } \:  % this makes \@sptoken a space token
+\def\:{\@xifnch} \expandafter\def\: {\futurelet\@let@token\@ifnch}
+\fi % end if
+\ifx\xguji@defined\@undefined
+\def\xguji@defined{\relax}
+%% punctuation prohibition testing module
+\def\linestartforbid{,.!?'、。，．：；！？’”〕）］｝〉》〗】」』}
+\def\lineendforbid{`‘“〔（［｛〈《〖【「『}
+\ifx\testinset\@undefined
+\newif\ifisinset
+\long\def\testinset#1#2{% return whether #1 is in the set of #2, result stored in \ifisinset
+  \isinsetfalse
+  \ifx#1\par
+  \else
+    \expandafter\@tfor\expandafter\testinset@member
+    \expandafter:\expandafter=#2\do{%
+      \if\testinset@member #1%
+        \isinsettrue
+      \fi
+    }%
+  \fi
+}
+\def\testcharinset#1#2{% test whether character #1 is in #2, not using tfor
+  \def\t@ctest##1{\expandafter\t@ct@st ##1#1\t@ctest\t@ct@st}%
+  \def\t@ct@st##1#1##2##3\t@ct@st{\ifx\t@ctest##2\isinsetfalse
+    \else\isinsettrue\fi}%
+  \t@ctest{\noexpand #2}%
+}
+\fi
+\def\getlastelem#1#2{%  return the last tfor element of #1, stored in #2
+  \expandafter\@tfor\expandafter\getlastelem@member\expandafter:\expandafter=#1\do{%
+    \edef#2{\getlastelem@member}%
+  }%
+}
+\def\testbreak#1#2#3{% #1: \output  #2: \lasttext  #3:\nowchar  return \output if breakable
+  \def#1{}%
+  \ifx\@empty#2%
+    \edef#2{#3}%
+  \else
+    \getlastelem{#2}\lastchar
+    \testinset\lastchar\lineendforbid
+    \ifisinset   % \lastchar is a line-end prohibition, which cannot be at the end of line
+      \edef#2{#2#3}%
+    \else
+      \testinset\lastchar\linestartforbid
+      \ifisinset % \lastchar is a line-start prohibition, which cannot appear at the start of line
+        \testinset{#3}\linestartforbid
+        \ifisinset  % \nowchar is a line-start prohibition, which should be appended after \lasttext
+          \edef#2{#2#3}%
+        \else       % \nowchar is not a line-start prohibition. Can break after \lasttext
+          \edef#1{#2}%
+          \edef#2{#3}%
+        \fi
+      \else      % \lastchar is a normal char
+        \testinset{#3}\linestartforbid
+        \ifisinset  % \nowchar is a line-start prohibition, which make the place after \lasttext unbreakable
+          \edef#2{#2#3}%
+        \else       % \nowchar is not a line-start prohibition. Can break after \lasttext
+          \edef#1{#2}%
+          \edef#2{#3}%
+        \fi
+      \fi
+    \fi
+  \fi
+}
+%%  list manipulation module
+\def\getnumofelem#1#2{%  return the num of element of #1, stored in counter #2
+  #2=0
+  \if!#1!% test whether #1 is non-empty
+  \else
+    \expandafter\@for\expandafter\getnumofelem@member
+    \expandafter:\expandafter=#1\do{%
+      \advance#2 by 1
+    }%
+  \fi
+}
+\ifx\getforitem\@undefined
+\newcount\getforitem@tmpcount
+\def\getforitem#1#2#3{% #1: for list  #2: index   #3: output macro
+  \getforitem@tmpcount=0
+  \expandafter\@for\expandafter\getitem@member\expandafter:\expandafter=#1\do{%
+    \ifnum\getforitem@tmpcount = #2%
+      \edef#3{\getitem@member}%
+    \fi
+    \advance\getforitem@tmpcount by 1
+  }%
+}
+\fi
+
+\input ltj-warichu-hsplit.sty
+
+\newdimen\guji@hsize
+\newdimen\guji@hoffset
+\newdimen\guji@twolineraise
+\newdimen\guji@hfuzz
+\newskip\guji@hanzisep
+\newbox\guji@savebox
+\newif\ifguji@debug
+\newif\ifguji@heavydebug
+\newdimen\guji@tmpdim
+\newdimen\guji@tmpdil
+\newcount\guji@tmpcount
+\newbox\guji@tmpbox
+\newbox\guji@tmpboy
+\newtoks\guji@everytwolinemode
+\newtoks\guji@everycommand
+\guji@debugtrue
+\guji@heavydebugfalse
+\guji@hanzisep=0pt plus 0.1em minus 0.1em
+\guji@twolineraise=-.3ex
+\guji@hfuzz=0.4em
+\guji@everytwolinemode={\fiverm\baselineskip=6pt}
+\guji@everycommand={\parindent=2em\indent}
+\def\guji{%
+  \begingroup
+  \everypar{\guji@iterate}%
+  \everyvbox{\everypar{}}%
+  \guji@hsize=\hsize
+  \parindent=0pt
+  \guji@hoffset=0pt
+  \rightskip=0pt plus 0.1em minus 0.1em
+  \def\guji@oktext{}%
+  \def\guji@lasttext{}%
+  \guji@makespecials
+  \guji@adjustsectioncmd
+  \endgraf
+}
+\def\guji@adjustcmd#1#2{%
+  \ifx#1\@undefined
+  \else
+    \let#2=#1%
+    %\def#1{{\ifvmode\vskip -\baselineskip\vskip -\parsep\fi}\leavevmode #2}%
+    \def#1{\leavevmode #2}%
+  \fi
+}
+\def\guji@adjustsectioncmd{%
+  \guji@adjustcmd\part\guji@oldpart
+  \guji@adjustcmd\chapter\guji@oldchapter
+  \guji@adjustcmd\section\guji@oldsection
+  \guji@adjustcmd\subsection\guji@oldsubsection
+  \guji@adjustcmd\subsubsection\guji@oldsubsubsection
+  \guji@adjustcmd\paragraph\guji@oldparagraph
+}
+{\catcode`\|=\active
+%\catcode`\<=\active
+%\catcode`\>=\active
+\gdef\guji@makespecials{%
+  \catcode`\|=\active
+  \let|\guji@special
+}%
+}
+\def\guji@special{%
+  \@ifnextchar[{\guji@sp@cial}{\guji@twolinemode}% ]
+}
+\def\guji@sp@cial[#1]#2{% #1 is a comma-seperated list of command names
+  \ifguji@debug
+    \message{special \meaning #1 \meaning #2}%
+  \fi
+  %\leavevmode
+  \begingroup
+  \everypar={}%
+  \leavevmode
+  \getnumofelem{#1}\guji@tmpcount%
+  \ifcase\guji@tmpcount
+    \ifguji@debug
+      \message{Zero}% just a local group
+    \fi
+    \def\guji@lasttext{{#2}}%
+    \guji@flush
+  \or
+    \ifguji@debug
+      \message{One}%  a command that applies to the entire #2
+    \fi
+    \def\guji@lasttext{{\csname #1\endcsname{#2}}}%
+    \guji@flush
+  \or
+    \ifguji@debug
+      \message{Two}% execute the first command, then apply the second to #2
+    \fi
+    \csname #1\endcsname
+    \def\guji@lasttext{{\csname #1\endcsname{#2}}}%
+    \guji@flush
+  \or
+    \ifguji@debug
+      \message{Three}%  #1,#2,#3, apply #1 #2 #3 to the first, middle, last char
+    \fi
+    % if #1 empty, #1<-#2; if #3 empty, #3<-#2
+    \def\guji@sp@docmd##1##2{%
+      \def\guji@lasttext{{##1{##2}}}%
+      \guji@flush
+    }%
+    \guji@hanzisep=0pt
+    \guji@sp@cial@three[#1]#2\end
+  \else
+    \errmessage{guji@sp@cial: Unsupported option #1.}%
+  \fi
+  \global\guji@tmpdim=\guji@hoffset
+  \endgroup
+  \hskip\guji@hanzisep
+  \guji@hoffset=\guji@tmpdim
+  \guji@iterate % continue to iterate
+}
+\def\guji@sp@cial@three[#1,#2,#3]#4#5\end{%
+  \expandafter\let\expandafter\guji@sp@middle\csname #2\endcsname
+  \if!#1!% #1 is empty
+    \let\guji@sp@first=\guji@sp@middle
+  \else
+    \expandafter\let\expandafter\guji@sp@first\csname #1\endcsname
+  \fi
+  \if!#3!% #3 is empty
+    \let\guji@sp@last=\guji@sp@middle
+  \else
+    \expandafter\let\expandafter\guji@sp@last\csname #3\endcsname
+  \fi
+  \ifguji@heavydebug
+    \message{first is #4 by \meaning\guji@sp@first}%
+  \fi
+  \guji@sp@docmd\guji@sp@first{#4}%
+  \def\guji@sp@midtext{}%
+  \def\guji@sp@lasttext{}%
+  \@tfor\guji@sp@member:=#5\do{%
+    \edef\guji@sp@midtext{\guji@sp@lasttext}%
+    \edef\guji@sp@lasttext{\guji@sp@member}%
+    \ifx\guji@sp@midtext\empty
+    \else
+      \expandafter\guji@sp@docmd\expandafter\guji@sp@middle
+      \expandafter{\guji@sp@midtext}%
+      \ifguji@heavydebug
+        \message{middle is \guji@sp@midtext by \meaning\guji@sp@middle}%
+      \fi
+    \fi
+  }%
+  \expandafter\guji@sp@docmd\expandafter\guji@sp@last
+  \expandafter{\guji@sp@lasttext}%
+  \ifguji@heavydebug
+    \message{last is \guji@sp@lasttext by \meaning\guji@sp@last}%
+  \fi
+}
+\def\guji@twoline@sp@cial[#1]#2{% #1 is a comma-seperated list of command names
+  \ifguji@debug
+    \message{special \meaning #1 \meaning #2}%
+  \fi
+  \getnumofelem{#1}\guji@tmpcount%
+  \ifcase\guji@tmpcount
+    \ifguji@debug
+      \message{Zero}% just a local group
+    \fi
+    \setbox\guji@savebox=\hbox{\unhbox\guji@savebox{#2}\allowbreak\hskip\guji@hanzisep}%
+  \or
+    \ifguji@debug
+      \message{One}%  a command that applies to the entire #2
+    \fi
+    \setbox\guji@savebox=\hbox{\unhbox\guji@savebox{{\csname #1\endcsname{#2}}}\allowbreak\hskip\guji@hanzisep}%
+  \or
+    \ifguji@debug
+      \message{Two}% execute the first command, then apply the second to #2
+    \fi
+    \csname #1\endcsname
+    \setbox\guji@savebox=\hbox{\unhbox\guji@savebox{{\csname #1\endcsname{#2}}}\allowbreak\hskip\guji@hanzisep}%
+  \or
+    \ifguji@debug
+      \message{Three}%  #1,#2,#3, apply #1 #2 #3 to the first, middle, last char
+    \fi
+    % if #1 empty, #1<-#2; if #3 empty, #3<-#2
+    \def\guji@sp@docmd##1##2{%
+      \setbox\guji@savebox=\hbox{\unhbox\guji@savebox{##1{##2}}\allowbreak\hskip\guji@hanzisep}%
+    }%
+    \guji@sp@cial@three[#1]#2\end
+  \else
+    \errmessage{guji@twoline@sp@cial: Unsupported option #1.}%
+  \fi
+  \guji@twoline@iterate % continue to iterate
+}
+\def\guji@twolinemode#1{%
+  \begingroup
+  \everypar={}%
+  \parindent=0pt
+  \the\guji@everytwolinemode
+  \let\guji@sp@cial\guji@twoline@sp@cial  % no nest allowed
+  \let\guji@twolinemode\guji@twoline@iterate  % no nest allowed
+  \setbox\guji@savebox=\hbox{}%
+  \hfuzz=\maxdimen\hbadness=\@M
+  %(#1)%
+  \guji@twoline@iterate
+  #1\guji@twoline@enditer
+  \global\guji@tmpdim=\guji@hoffset
+  \endgroup
+  \guji@hoffset=\guji@tmpdim
+  \guji@iterate % continue to iterate
+}
+\def\guji@twoline@iterate#1{%
+  %\message{iterating \meaning#1}%
+  \ifx #1\guji@twoline@enditer
+    \guji@twoline@enditer
+  \else
+    \let\guji@twoiter@next\guji@twoline@iterate
+    \ifx#1\guji@special
+      %\guji@twoline@flush
+      \let\guji@twoiter@next\guji@special
+    \else
+      \testbreak\guji@oktext\guji@lasttext{#1}%
+      \ifx\guji@oktext\empty
+      \else
+        %\setbox\guji@tmpbox=\hbox{\unhcopy\guji@savebox[\guji@oktext]\allowbreak}%
+        \setbox\guji@tmpbox=\hbox{\unhcopy\guji@savebox\guji@oktext\allowbreak\hskip\guji@hanzisep}%
+        \guji@tmpdim=\wd\guji@tmpbox
+        \divide\guji@tmpdim by 2
+        \advance\guji@tmpdim by \guji@hoffset
+        \advance\guji@tmpdim by -\guji@hfuzz
+        \ifdim\guji@tmpdim > \guji@hsize % a break is required
+          \guji@tmpdim=\guji@hsize
+          \advance\guji@tmpdim by -\guji@hoffset
+          \guji@twoline@flush
+          %\setbox\guji@savebox=\hbox{\guji@oktext\allowbreak\hskip\guji@hanzisep}%
+          \setbox\guji@savebox=\hbox{\unhbox\guji@savebox\guji@oktext\allowbreak\hskip\guji@hanzisep}%
+        \else
+          %\setbox\guji@savebox=\hbox{\unhbox\guji@savebox[\guji@oktext]\allowbreak}%
+          \setbox\guji@savebox=\hbox{\unhbox\guji@savebox\guji@oktext\allowbreak\hskip\guji@hanzisep}%
+        \fi
+      \fi
+    \fi
+    \expandafter\guji@twoiter@next
+  \fi
+}
+\def\guji@twoline@flush{%  \guji@tmpdim is required to be presetted
+  \ifguji@debug
+    \message{flush it}%
+  \fi
+  \setbox\guji@tmpboy=\copy\guji@savebox % make a backup of savebox
+  \let\guji@twoline@break\relax
+  \hsplit\guji@savebox\to\guji@tmpdim\into\guji@tmpbox
+  \guji@tmpdil=\wd\guji@tmpbox
+  \advance\guji@tmpdil by -\guji@tmpdim
+  \ifdim\guji@tmpdil > \guji@hfuzz
+    %\showbox\guji@tmpboy
+    \guji@tmpdim=\wd\guji@tmpbox
+  %\else
+  %  \advance\guji@tmpdim by \wd\guji@tmpbox
+  %  \divide\guji@tmpdim by 2
+  %\fi
+    \ifdim\guji@tmpdim < \wd\guji@savebox % the second box is longer than the first, should be truncated
+      \setbox\guji@tmpbox=\hbox to \guji@tmpdim{\unhbox\guji@tmpbox}%
+      \hsplit\guji@savebox\to\guji@tmpdim\into\guji@tmpboy
+      \setbox\guji@tmpboy=\hbox to \guji@tmpdim{\unhbox\guji@tmpboy\hss}%
+      \message{1<2}%
+      \advance\guji@tmpdim by \guji@hoffset
+      \ifdim\guji@tmpdim > \guji@hsize % at the end of line, should break in advance
+        \let\guji@twoline@break\break
+      \fi
+    \else % the first box is longer than the second
+      \message{1>2}%
+      \advance\guji@tmpdim by \guji@hoffset
+      \ifdim\guji@tmpdim > \guji@hsize % at the end of line, should break in advance
+        \message{eol}%
+        \let\guji@twoline@break\break
+        \advance\guji@tmpdim by -\guji@hoffset
+        \advance\guji@tmpdim by -2\guji@hfuzz
+        \setbox\guji@savebox=\hbox{\allowbreak\unhcopy\guji@tmpboy}%
+        \hsplit\guji@savebox\to\guji@tmpdim\into\guji@tmpbox
+        \guji@tmpdim=\wd\guji@tmpbox
+        %\showbox\guji@tmpbox
+        % now the first box should be shorter than the second. if not, just go on.
+        %\setbox\guji@tmpbox=\hbox to \guji@tmpdim{\unhbox\guji@tmpbox}%
+        \guji@tmpdil=\wd\guji@savebox
+        \advance\guji@tmpdil by -\guji@tmpdim
+        \ifdim\guji@tmpdil < 0pt
+          \guji@tmpdil=-\guji@tmpdil
+        \fi
+        \ifdim\guji@tmpdil > \guji@hfuzz
+          \setbox\guji@savebox=\hbox{\allowbreak\unhcopy\guji@savebox}%
+          \hsplit\guji@savebox\to\guji@tmpdim\into\guji@tmpboy
+          \setbox\guji@tmpboy=\hbox to \guji@tmpdim{\unhbox\guji@tmpboy\hss}%
+        \else
+          \advance\guji@tmpdim by \wd\guji@savebox
+          \divide\guji@tmpdim by 2
+          \setbox\guji@tmpbox=\hbox to \guji@tmpdim{\unhbox\guji@tmpbox}%
+          \setbox\guji@tmpboy=\hbox to \guji@tmpdim{\unhbox\guji@savebox\hss}%
+          %\setbox\guji@savebox=\hbox{}%
+        \fi
+        %\showbox\guji@tmpboy
+        %\showbox\guji@savebox
+      \else
+        \advance\guji@tmpdim by -\guji@hoffset
+        \setbox\guji@tmpbox=\hbox to \guji@tmpdim{\unhbox\guji@tmpbox}%
+        \setbox\guji@tmpboy=\hbox to \guji@tmpdim{\unhbox\guji@savebox\hss}%
+        %\setbox\guji@savebox=\hbox{}%
+      \fi
+    \fi
+  \else
+    \message{normal}%
+    \setbox\guji@tmpbox=\hbox to \guji@tmpdim{\unhbox\guji@tmpbox}%
+    \setbox\guji@tmpboy=\hbox to \guji@tmpdim{\unhbox\guji@savebox\hskip 0pt plus 1fil}%
+    %\setbox\guji@savebox=\hbox{}%
+  \fi
+  \setbox\guji@tmpbox=\hbox to \guji@tmpdim{\vbox{\hsize=\guji@tmpdim
+    \nointerlineskip\box\guji@tmpbox\box\guji@tmpboy}}%
+  \leavevmode
+  \raise\guji@twolineraise\box\guji@tmpbox
+  \hskip\guji@hanzisep
+  \advance\guji@hoffset by \guji@tmpdim
+  \ifx\guji@twoline@break\break
+    \penalty -9999  % issue a break
+    \guji@hoffset=0pt
+  \else
+    \guji@tmpdim=\guji@hoffset
+    \advance\guji@tmpdim by \guji@hfuzz
+    \ifdim\guji@tmpdim > \guji@hsize
+      \penalty -9999  % issue a break
+      \guji@hoffset=0pt
+    \fi
+  \fi
+}
+\def\guji@twoline@enditer{%
+  %\message{end iter}%
+  \edef\guji@oktext{\guji@lasttext}%
+  \def\guji@lasttext{}%
+  \setbox\guji@savebox=\hbox{\unhcopy\guji@savebox\guji@oktext\hskip\guji@hanzisep}%
+  \guji@tmpdim=\wd\guji@savebox
+  \divide\guji@tmpdim by 2
+  % search to find a proper hbox width to break
+  \loop
+    %\message{LOOP}%
+    \setbox\guji@tmpboy=\copy\guji@savebox
+    \hsplit\guji@tmpboy\to\guji@tmpdim\into\guji@tmpbox
+    %\message{SPLITTED}%
+    \guji@tmpdil=\wd\guji@tmpbox
+    \ifdim\guji@tmpdil < \wd\guji@tmpboy % failed
+      \global\advance\guji@tmpdim by 0.5ex
+      %\message{REPEAT}%
+  \repeat
+  %\showbox\guji@tmpbox
+  \guji@twoline@flush
+  \relax
+  %\message{iteration ended}%
+}
+\def\guji@docommand{%
+  \ifguji@debug
+    \message{Starting do command \meaning\guji@whatcmd}%
+  \fi
+  \def\guji@whatparam{}%
+  \futurelet\guji@nextchar\guji@d@command
+}
+\def\guji@d@command{%
+  \ifcat\noexpand\guji@nextchar\bgroup
+    \let\guji@docmd@next\guji@docmd@saveparam
+  \else
+    \let\guji@docmd@next\guji@docomm@nd
+    \ifx\guji@whatcmd\unhbox
+      \ifx\guji@whatparam\empty
+        \let\guji@docmd@next\guji@docmd@saveparam
+      \fi
+    \fi
+  \fi
+  \guji@docmd@next
+}
+\long\def\guji@docmd@saveparam#1{%
+  \ifguji@debug
+    \message{Param #1 saved}%
+  \fi
+  \edef\guji@whatparam{\guji@whatparam{#1}}%
+  \futurelet\guji@nextchar\guji@d@command
+}
+\def\guji@docomm@nd{%
+  \ifguji@debug
+    \message{Now doing command}%
+  \fi
+  \ifx\guji@whatcmd\unhbox
+    \expandafter\def\expandafter\guji@whatparam\guji@whatparam
+  \fi
+  \def\guji@tmpparam{\voidb@x}%
+  \ifx\guji@whatparam\guji@tmpparam
+    % the command is leavevmode. just execute it
+    \expandafter\guji@whatcmd\guji@whatparam
+  \else
+    \begingroup
+      \everypar{}%
+      \the\guji@everycommand
+      \expandafter\guji@whatcmd\guji@whatparam
+      \endgraf
+    \endgroup
+  \fi
+  \guji@hoffset=0pt
+  \guji@iterate
+}
+\long\def\guji@iterate#1{%
+  %\message{ITERATing \meaning#1}%
+  \ifx #1\par
+    \guji@flush
+    \par
+    \guji@hoffset=0pt
+  \else
+    \ifx #1\endguji
+      \endguji
+    \else
+      \let\guji@iterate@next\guji@iterate
+      \ifx#1\guji@special
+        \guji@flush
+        \let\guji@iterate@next\guji@special
+      \else
+        \ifcat\noexpand#1\relax % test if it's a command
+          \guji@flush
+          \let\guji@whatcmd=#1%
+          \let\guji@iterate@next\guji@docommand
+        \else
+          \testbreak\guji@oktext\guji@lasttext{#1}%
+          \ifx\guji@oktext\empty
+          \else
+            %\message{oktext \meaning\guji@oktext}%
+            \setbox\guji@tmpbox=\hbox{\guji@oktext\hskip\guji@hanzisep}%
+            \guji@tmpdim=\wd\guji@tmpbox
+            \advance\guji@tmpdim by \guji@hoffset
+            \ifdim\guji@tmpdim > \guji@hsize % a break is required
+              \penalty -\@M
+              \guji@hoffset=\wd\guji@tmpbox
+              \unhbox\guji@tmpbox
+            \else
+              \advance\guji@hoffset by \wd\guji@tmpbox
+              \unhbox\guji@tmpbox
+            \fi
+          \fi
+        \fi
+      \fi
+      \expandafter\expandafter\expandafter\guji@iterate@next
+      \expandafter
+    \fi
+  \fi
+}
+\def\guji@flush{%
+  \edef\guji@oktext{\guji@lasttext}%
+  \def\guji@lasttext{}%
+  \ifx\guji@oktext\empty
+  \else
+    \setbox\guji@tmpbox=\hbox{\guji@oktext\hskip\guji@hanzisep}%
+    \guji@tmpdim=\wd\guji@tmpbox
+    \advance\guji@tmpdim by \guji@hoffset
+    \ifdim\guji@tmpdim > \guji@hsize % a break is required
+      \penalty -\@M
+      \guji@hoffset=\wd\guji@tmpbox
+      \unhbox\guji@tmpbox
+    \else
+      \advance\guji@hoffset by \wd\guji@tmpbox
+      %\show\guji@oktext
+      \unhbox\guji@tmpbox
+      %\showbox\guji@tmpbox
+    \fi
+    \def\guji@oktext{}%
+  \fi
+}
+\def\endguji{%
+  \guji@flush
+  \endgroup
+}
+\fi
