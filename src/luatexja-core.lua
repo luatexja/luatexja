@@ -35,6 +35,7 @@ local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
+local attr_uniqid = luatexbase.attributes['ltj@uniqid']
 local cat_lp = luatexbase.catcodetables['latex-package']
 
 local ITALIC = 1
@@ -215,16 +216,17 @@ function debug_show_node_X(p,print_fn)
    local k = debug_depth
    local s
    local pt=node_type(p.id)
-   local base = debug_depth .. string.format('%X', has_attr(p,attr_icflag) or 0) 
-   .. ' ' .. pt .. ' ' ..  tostring(p.subtype )
+   local base = debug_depth .. string.format('%X', has_attr(p,attr_icflag) or 0)
+   .. ' ' .. string.format('%X', has_attr(p, attr_uniqid) or 0)
+   .. ' ' .. node.type(p.id) .. ' ' ..  tostring(p.subtype )
    if pt == 'glyph' then
       s = base .. ' ' .. utf.char(p.char) .. ' ' .. tostring(p.font)
          .. ' (' .. print_scaled(p.height) .. '+' 
          .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
       print_fn(s)
-   elseif pt=='hlist' then
+   elseif pt=='hlist' or pt=='vlist' then
       s = base .. '(' .. print_scaled(p.height) .. '+' 
-         .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
+         .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width) .. p.dir
       if p.shift~=0 then
 	 s = s .. ', shifted ' .. print_scaled(p.shift)
       end
@@ -282,7 +284,11 @@ function debug_show_node_X(p,print_fn)
    elseif pt == 'whatsit' then
       s = base .. ' subtype: ' ..  tostring(p.subtype)
       if p.subtype==sid_user then
-	 s = s .. ' user_id: ' .. p.user_id .. ' ' .. p.value
+         if p.type ~= 110 then 
+            s = s .. ' user_id: ' .. p.user_id .. ' ' .. p.value
+         else
+            s = s .. ' user_id: ' .. p.user_id .. ' (node list)'
+         end
       else
 	 s = s .. node.subtype(p.subtype)
       end

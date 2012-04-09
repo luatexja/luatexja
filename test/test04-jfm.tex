@@ -312,4 +312,13 @@
 
 \setbox0=\hbox{\rmlh あ$a$さ$a$か}
 \dumplist0
+
+\head{その他: unhbox の連続}
+\setbox0=\hbox{\tenmin\setbox1=\hbox{）}\setbox2=\hbox{a}\unhbox1\unhbox2}
+\dumplist0
+
+\setbox3=\hbox{\tenmin\setbox1=\hbox{）}\setbox2=\hbox{a}\unhbox1\unhbox2}
+\setbox0=\hbox{\unhbox3}
+\dumplist0
+
 \end
