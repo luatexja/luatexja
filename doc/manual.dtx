@@ -940,6 +940,7 @@ auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
 \end{itemize}
 
 \subsection{fontspec}
+\label{ssec-fontspec}
 %<*en>
 To coexist with the \Pkg{fontspec} package, it is needed to load
 \Pkg{luatexja-fontspec} package in the preamble. This additional
@@ -1484,7 +1485,7 @@ The block list is indicated in Table~\ref{table-rng7}.
 \begin{itemize}
 %<*en>
 \item Glues/kerns specified in JFM. If \verb+\inhibitglue+ is issued
-      around a Japanese character, this glue will be not inserted at the
+      around a Japanese character, this glue will not be inserted at the
       place.
 %</en>
 %<*ja>
@@ -1696,6 +1697,7 @@ For example, the following sets banner as `\texttt{filename (YYYY-MM-DD hh:mm)}'
 %<ja>\section{フォントメトリックと和文フォント}
 %<en>\subsection{\texttt{\char92jfont} primitive}
 %<ja>\subsection{\texttt{\char92jfont} プリミティブ}
+\label{ssec-jfont}
 
 %<*en>
 To load a font as a Japanese font, you must use the
@@ -1884,11 +1886,12 @@ TODO: kanjiskip?
 
 %<en>\subsection{Prefix \texttt{psft}}
 %<ja>\subsection{\texttt{psft} プレフィックス}
+\label{ssec-psft}
 %<*en>
 Besides \texttt{file:}\ and \texttt{name:}\ prefixes, one can use \texttt{psft:}\
 prefix in \verb+\jfont+ (and~\verb+\font+) primitive,
 to specify a `name-only' Japanese font which
-will be not embedded to PDF. Typical use of this prefix is to specify
+will not be embedded to PDF. Typical use of this prefix is to specify
 the `standard' Japanese fonts, namely, `Ryumin-Light' and
 `GothicBBB-Medium'. For kerning or other information, that of Kozuka
 Mincho Pr6N Regular (this is a font by Adobe Inc., and included in
@@ -2576,7 +2579,7 @@ of \LuaTeX, see Section~\ref{sec-para}.
 \LuaTeX-ja のほとんどのパラメータにアクセスするためのプリミティブである．
 \LuaTeX-ja が \pTeX のような文法（例えば，\verb+\prebreakpenalty`）=10000+）を
 採用しない理由の一つは，\LuaTeX のソースにおける \verb+\hpack_filter+
-コールバックの位置にある．\ref{sec-para} 節を見よ．
+コールバックの位置にある．\ref{sec-para} 節を参照．
 %</ja>
 
 %<*en>
@@ -2667,7 +2670,6 @@ in \pTeX, and symbols beside each parameter has the following meaning:
 
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
 \item[\Param{jcharwidowpenalty}\,=<penalty>] [\verb+\jcharwidowpenalty+]
-
 %<*en>
 Penalty value for suppressing orphans. This penalty is inserted just
 	     after the last \textbf{JAchar} which is not regarded as a
@@ -2680,7 +2682,6 @@ Penalty value for suppressing orphans. This penalty is inserted just
 %</ja>
 
 \item[\Param{kcatcode}\,=\{<chr\_code>,<natural number>\}]\
-
 %<*en>
 An additional attributes which each character whose character code is <chr\_code> has.
 At the present version, the lowermost bit of <natural number> indicates
@@ -2690,7 +2691,7 @@ At the present version, the lowermost bit of <natural number> indicates
 %<*ja>
 文字コードが <chr\_code> の文字が持つ付加的な属性値 (attribute)．
 現在のバージョンでは，<natural number> の最下位ビットが，その文字が句読点と
-みなされるかどうかを表している（上の \Param{jcharwidowpenalty} の記述を見よ）．
+みなされるかどうかを表している（上の \Param{jcharwidowpenalty} の記述を参照）．
 %</ja>
 
 \item[\Param{prebreakpenalty}\,=\{<chr\_code>,<penalty>\}] [\verb+\prebreakpenalty+]\
@@ -2907,30 +2908,59 @@ With the help of this example, we remark the specification of \verb+\inhibitglue
 
 %<en>\section{Control Sequences for \LaTeXe}
 %<ja>\section{\LaTeXe 用のコントロールシーケンス}
+
 %<en>\subsection{Patch for NFSS2}
 %<ja>\subsection{NFSS2 へのパッチ}
 \label{ssub-nfsspat}
+
+%<*en>
 As described in Subsection~\ref{ssec-ltx}, \LuaTeX-ja simply adopted
 \texttt{plfonts.dtx} in \pLaTeXe\ for the Japanese patch for NFSS2.
 For an convenience, we will describe
 commands which are not described in Subsection~\ref{ssub-chgfnt}.
+%</en>
+%<*ja>
+\ref{ssec-ltx} 節で述べたように，\LuaTeX-ja は NFSS2 への日本語パッチである
+\pLaTeXe の \texttt{plfonts.dtx} を単純に取り入れている．
+便宜のため，ここでは \ref{ssub-chgfnt} 節で述べていなかったコマンドについて
+記述しておく．
+%</ja>
 
 \begin{cslist}%
 \item[DeclareYokoKanjiEncoding\{<encoding>\}\{<text-settings>\}\{<math-settings>\}]
+
+%<*en>
 In NFSS2 under \LuaTeX-ja, distinction between alphabetic font families
-	     and Japanese font families is only made by its
-	     encoding. For example, encodings OT1 and T1 are for
+	     and Japanese font families are only made by their
+	     encodings. For example, encodings OT1 and T1 are for
 	     alphabetic font families, and a Japanese font family cannot
 	     have these encodings. This command defines a new encoding
 	     scheme for Japanese font family (in horizontal direction).
+%</en>
+%<*ja>
+\LuaTeX-ja の NFSS2 においては，欧文フォントファミリと和文フォントファミリは
+そのエンコーディングからのみ作られる．
+例えば，OT1 と T1 のエンコーディングは欧文フォントファミリに対するものであり，
+和文フォントファミリはこれらのエンコーディングを持つことはできない．
+このコマンドは和文フォントファミリ（横書き用）のための新しいエンコーディングを
+定義する．
+%</ja>
 
 \item[DeclareKanjiEncodingDefaults\{<text-settings>\}\{<math-settings>\}]
 \item[DeclareKanjiSubstitution\{<encoding>\}\{<family>\}\{<series>\}\{<shape>\}]
 \item[DeclareErrorKanjiFont\{<encoding>\}\{<family>\}\{<series>\}\{<shape>\}\{<size>\}]
 
+%<*en>
 The above 3~commands are just the counterparts for \verb+DeclareFontEncodingDefaults+ and~others.
+%</en>
+%<*ja>
+上記3つのコマンドはちょうど \verb+DeclareFontEncodingDefaults+ などに対応するものである．
+%</ja>
 
 \item[reDeclareMathAlphabet\{<unified-cmd>\}\{<al-cmd>\}\{<ja-cmd>\}]
+
+% ToDo: en
+%<*ja>
 和文・欧文の数式用フォントファミリを一度に変更する命令を作成する．
 具体的には，欧文数式用フォントファミリ変更の命令<al-cmd> （\verb+\mathrm+等）と，和文数式用フォ
 	     ントファミリ変更の命令<ja-cmd>（\verb+\mathmc+等）の2つを同時に行う命令として
@@ -2950,6 +2980,7 @@ The above 3~commands are just the counterparts for \verb+DeclareFontEncodingDefa
 両命令の内容を再定義しても，<unified-cmd>の内容にそれは反映されない．
 \item <al-cmd>,~<ja-cmd>に\verb+\@mathrm+などと \texttt{@} をつけた命令を指定した時の動作は保証できない．
 \end{itemize}}
+%</ja>
 
 \item[DeclareRelationFont\{<ja-encoding>\}\{<ja-family>\}\{<ja-series>\}\{<ja-shape>\}\\
   \hfill\{<al-encoding>\}\{<al-family>\}\{<al-series>\}\{<al-shape>\}]
@@ -2962,47 +2993,106 @@ with respect to a Japanese font family given by the former 4~arguments.
 そのフォントに対応する「従属欧文」フォントファミリを後半の4引数により与える．
 %</ja>
 \item[SetRelationFont]
+%<*en>
 This command is almost same as \verb+\DeclareRelationFont+, except that this command does a local
 assignment, where \verb+\DeclareRelationFont+ does a global assignment.
+%</en>
+%<*ja>
+このコマンドは \verb+\DeclareRelationFont+ とローカルな指定であることを除いて
+ほとんど同じである（\verb+\DeclareRelationFont+ はグローバル）．
+%</ja>
+
 \item[userelfont]
+%<*en>
 Change current alphabetic font encoding/family/\dots\ to the `accompanied' alphabetic
 	     font family with respect to current Japanese font family,
 	     which was set by
-	     \verb+\DeclareRelationFont+ or \verb+SetRelationFont+.
+	     \verb+\DeclareRelationFont+ or \verb+\SetRelationFont+.
 Like \verb+\fontfamily+, \verb+\selectfont+ is required to take an effect.
+%</en>
+%<*ja>
+現在の欧文フォントエンコーディング／ファミリ／…… を，
+\verb+\DeclareRelationFont+ か \verb+\SetRelationFont+ で指定された
+現在の和文フォントファミリに対応する「従属欧文」フォントファミリに変更する．
+\verb+\fontfamily+ のように，有効にするためには \verb+\selectfont+ が必要である．
+%</ja>
 
 \item[adjustbaseline]
 ...
 
 \item[fontfamily\{<family>\}]
 {\let\item\origitem
+%<*en>
 As in \LaTeXe, this command changes current font family (alphabetic, Japanese,~\emph{or both})
 to <family>. Which family will be changed is determined as follows:
+%</en>
+%<*ja>
+元々の \LaTeXe におけるものと同様に，このコマンドは現在のフォントファミリ（欧文，
+和文，\textbf{もしくは両方}）を <family> に変更する．
+どのファミリが変更されるかは以下のようにして決定される：
+%</ja>
 \begin{itemize}
+%<*en>
 \item Let current encoding scheme for Japanese fonts be
       <ja-enc>. Current Japanese font family will be changed to
       <family>, if one of the following two conditions is met:
+%</en>
+%<*ja>
+\item 現在の和文フォントに対するエンコーディングが <ja-enc> であるとしよう．
+  現在の和文フォントファミリは，以下の2つの条件のうちの1つが満たされているときに
+  <family> に変更される：
+%</ja>
 \begin{itemize}
-\item The family <fam> under the encoding <ja-enc> is already defined by
+%<*en>
+\item The family <fam> under the encoding <ja-enc> has been already defined by
       \verb+\DeclareKanijFamily+.
+%</en>
+%<*ja>
+\item エンコーディング <ja-enc> におけるファミリ <fam> が既に \verb+\DeclareKanjiFamily+ によって定義されている．
+%</ja>
+%<*en>
 \item A font definition named \texttt{<enc><ja-enc>.fd} (the file name is
       all lowercase) exists.
+%</en>
+%<*ja>
+\item フォント定義ファイル \texttt{<enc><ja-enc>.fd}（ファイル名は全て小文字）が存在する．
+%</ja>
 \end{itemize}
-\item Let current encoding scheme for Japanese fonts be
+%<*en>
+\item Let current encoding scheme for alphabetic fonts be
       <al-enc>. For alphabetic font family, the criterion as above is used.
+%</en>
+%<*ja>
+\item 現在の欧文フォントに対するエンコーディングを <al-enc> とする．
+  欧文フォントファミリに対しても，上記の基準が用いられる．
+%</ja>
+%<*en>
 \item There is a case which none of the above applies, that is, the font
       family named <family> doesn't seem to be defined neither under the
       encoding <ja-enc>, nor under <al-enc>.
-
 In this case, the default family for font substitution is used for
       alphabetic and Japanese fonts. Note that current encoding will not
       be set to <family>, unlike the original implementation in \LaTeX.
+%</en>
+%<*ja>
+\item 上記のいずれもが適用されない，つまり <family> が <ja-enc> と <al-enc> の
+  どちらでも定義されないような場合がある．
+  この場合，代替フォントに用いられるデフォルトのフォントファミリが欧文フォントと
+  和文フォントに用いられる．\LaTeX のオリジナルの実装とは異なり，
+  現在のエンコーディングは <family> には設定されないことに注意する．
+%</ja>
 \end{itemize}
 }
 \end{cslist}
 
+%<*en>
 As closing this subsection, we shall introduce an example of
-\verb+SetRelationFont+ and \verb+\userelfont+:
+\verb+\SetRelationFont+ and \verb+\userelfont+:
+%</en>
+%<*ja>
+この節の終わりに，\verb+\SetRelationFont+ と \verb+\userelfont+ の例を
+紹介しておこう．
+%</ja>
 \begin{LTXexample}
 \gtfamily{}あいうabc
 \SetRelationFont{JY3}{gt}{m}{n}{OT1}{pag}{m}{n}
@@ -3012,40 +3102,128 @@ As closing this subsection, we shall introduce an example of
 
 %<en>\subsection{Cropmark/`tombow'}
 %<ja>\subsection{トンボ}
+% ToDo
 
 %<en>\section{Extensions}
 %<ja>\section{拡張}
 \subsection{\texttt{luatexja-fontspec.sty}}
 
+%<*en>
+As described in Subsection~\ref{ssec-fontspec}, this optional package
+provides the counterparts for several commands defined in the
+\Pkg{fontspec} package．
+In addition to `font features' in the original \Pkg{fontspec},
+the following `font features' specifications are allowed for
+the commands of Japanese version:
+%</en>
+%<*ja>
+\ref{ssec-fontspec} 節で述べたように，この追加パッケージは \Pkg{fontspec}
+パッケージで定義されているコマンドに対応する和文フォント用のコマンドを提供する．
+オリジナルの \Pkg{fontspec} での `font feature' に加えて，和文版のコマンドには
+以下の `font feature' を指定することができる：
+%</ja>
+
+
+\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
+\item[JFM=<name>]
+\item[JFM-var=<name>]
+
+%<*en>
+These 2 font features correspond to \texttt{jfm} and \texttt{jfmvar} keys for
+\verb+\jfont+ primitive, respectively. See Subsection~\ref{ssec-jfont}.
+%</en>
+%<*ja>
+これらの2つはそれぞれ \verb+\jfont+ プリミティブに対する
+\texttt{jfm}, \texttt{jfmvar} キーとそれぞれ対応する．
+\ref{ssec-jfont} 節を参照．
+%</ja>
+
+\item[NoEmbed]
+%<*en>
+By specifying this font feature, you can use `name-only' Japanese font which
+will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
+%</en>
+%<*ja>
+これを指定することで，PDF に埋め込まれない「名前だけ」のフォントを指定することが
+できる．\ref{ssec-psft} 節を参照．
+%</ja>
+\end{list}
+
 \subsection{\texttt{luatexja-otf.sty}}
+
+%<*en>
 This optional package supports typesetting characters in
 Adobe-Japan1. \texttt{luatexja-otf.sty} offers the following 2~low-level
 commands:
+%</en>
+%<*ja>
+この追加パッケージは Adobe-Japan1 の文字の出力をサポートする．
+\texttt{luatexja-otf.sty} は以下の2つの低レベルコマンドを提供する：
+%</ja>
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
 \item[\char92CID\{<number>\}]
+%<*en>
 Typeset a character whose CID number is <number>.
+%</en>
+%<*ja>
+CID 番号が <number> の文字を出力する．
+%</ja>
+
 \item[\char92UTF\{<hex\_number>\}]
+%<*en>
 Typeset a character whose character code is <hex\_number> (in hexadecimal).
 This command is similar to \verb+\char"+<hex\_number>,\ %"
 but please remind remarks below.
+%</en>
+%<*ja>
+文字コードが（16進で）<hex\_number> の文字を出力する．
+このコマンドは \verb+\char"+<hex\_number> と似ているが，下の記述に注意すること．
+%</ja>
 \end{list}
 
-\paragraph{Remarks}
+%<en>\paragraph{Remarks}
+%<ja>\paragraph{注意}
+%<*en>
 Characters by \verb+\CID+ and \verb+\UTF+ commands are different from
 ordinary characters in the following points:
+%</en>
+%<*ja>
+\verb+\CID+ と \verb+\UTF+ コマンドによって出力される文字は
+以下の点で通常の文字と異なる：
+%</ja>
 \begin{itemize}
+%<*en>
 \item Always treated as \textbf{JAchar}s.
+%</en>
+%<*ja>
+\item 常に \textbf{JAchar} として扱われる．
+%</ja>
+%<*en>
 \item Processing codes for supporting OpenType features (\textit{e.g.},
       glyph replacement and kerning) by the \Pkg{luaotfload} package
       is not performed to these characters.
+%</en>
+%<*ja>
+\item OpenType feature（例えばグリフ置換やカーニング）をサポートするための
+  \Pkg{luaotfload} パッケージのコードはこれらの文字には働かない．
+%</ja>
 \end{itemize}
 
 
-\paragraph{Additionally Syntax of JFM}
+%<en>\paragraph{Additional Syntax of JFM}
+%<ja>\paragraph{JFM への記法の追加}
+
+%<*en>
 \texttt{luatexja-otf.sty} extends the syntax of JFM; the entries of \texttt{
 chars} table in JFM now allows a string in the form
 \verb+'AJ1-xxx'+, which stands for the character
 whose CID number in Adobe-Japan1 is \verb+xxx+.
+%</en>
+%<*ja>
+\texttt{luatexja-otf.sty} は JFM の記法を拡張する．
+JFM の \texttt{chars} テーブルのエントリとして \verb+'AJ1-xxx'+ の形の文字列が
+使えるようになる．これは Adobe-Japan1 における CID 番号が \verb+xxx+ の文字を表す．
+%</ja>
 
 %<en>\part{Implementations}
 %<ja>\part{実装}
