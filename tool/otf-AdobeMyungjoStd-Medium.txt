@@ -1,0 +1,13 @@
+aalt	Access All Alternates
+dlig	Discretionary Ligatures
+fwid	Full Widths
+halt	Alternate Half Widths
+hngl	Hangul
+hwid	Half Widths
+nalt	Alternate Annotation Forms
+pwid	Proportional Widths
+sinf	Scientific Inferiors
+sups	Superscript
+vert	Vertical Writing
+vhal	Alternate Vertical Half Metrics
+vrt2	Vertical Alternates and Rotation
