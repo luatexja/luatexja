@@ -1,0 +1,12 @@
+aalt	Access All Alternates
+cpct	<unknown feature>
+dlig	Discretionary Ligatures
+fwid	Full Widths
+halt	Alternate Half Widths
+hwid	Half Widths
+nalt	Alternate Annotation Forms
+pwid	Proportional Widths
+trad	Traditional Forms
+vert	Vertical Writing
+vhal	Alternate Vertical Half Metrics
+vrt2	Vertical Alternates and Rotation
