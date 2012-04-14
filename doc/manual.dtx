@@ -104,7 +104,7 @@ Japanese documents when using \LuaTeX.
 %</en>
 %<*ja>
 \LuaTeX-jaパッケージは，次世代標準\TeX である\LuaTeX の上で，\pTeX と同等
-/それ以上の品質の日本語組版を実現させようとするマクロパッケージである．
+／それ以上の品質の日本語組版を実現させようとするマクロパッケージである．
 %</ja>
 
 %<en>\subsection{Backgrounds}
@@ -241,9 +241,8 @@ The followings are major changes from \pTeX:
       italic correction are ignored in the insertion process.
 %</en>
 %<*ja>
-\item さらに，2つの文字の間にある行末では効果を持たないノード（例えば
-      \verb+\special+ ノード）や，イタリック補正に伴い挿入されるカーンは
-      挿入処理中では無視される．
+\item さらに，2つの文字の間にある行末では効果を持たないノード（例えば \verb+\special+ ノード）や，
+  イタリック補正に伴い挿入されるカーンは挿入処理中では無視される．
 %</ja>
 
 %<*en>
@@ -262,7 +261,7 @@ The followings are major changes from \pTeX:
       If you want to do so, please put an empty hbox between it instead:
 %</en>
 %<*ja>
-      もし同じことをやりたければ，空のhboxを間に挟めばよい：
+      もし同じことをやりたければ，空の水平ボックスを間に挟めばよい：
 %</ja>
 \begin{verbatim}
 　　ちょ\hbox{}っと
@@ -293,7 +292,7 @@ The followings are major changes from \pTeX:
 For detailed information, see Part~\ref{part-imp}.
 %</en>
 %<*ja>
-詳細については第 \ref{part-imp} 部を見よ．
+詳細については第 \ref{part-imp} 部を参照．
 %</ja>
 
 %<en>\subsection{Notations}
@@ -476,12 +475,12 @@ The installation methods are as follows:
 %<*ja>
 \item ソースアーカイブをダウンロードする．
 
-      現時点では，\LuaTeX-ja の公式リリースはまだない．そのため，Git レポジトリを
+      現時点では，\LuaTeX-ja の公式リリースはまだない．そのため，Git リポジトリを
       次のようにすることで取得する必要がある：
 %</ja>
 \begin{verbatim}
 $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
-\end{verbatim} 
+\end{verbatim}
 %<*en>
       or download the archive of HEAD in \texttt{master} branch from
 %</en>
@@ -822,23 +821,23 @@ $5\in 素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
 %<*en>
 We also believe that using Japanese characters as identifiers is rare,
 hence we don't describe how to change Japanese fonts in math mode in
-this chapter. For the method, please see Part~\ref{part-ref}.
+this chapter. For the method, please see Subsection~\ref{ssec-math}.
 %</en>
 %<*ja>
 また \LuaTeX-ja プロジェクトでは，和文文字が識別子として用いられることはほとんどない
 と考えており，したがってこの節では数式モード中の和文フォントを変更する方法については
-記述しない．この方法については第 \ref{part-ref} 部を参照のこと．
+記述しない．この方法については \ref{ssec-math} 節を参照のこと．
 %</ja>
 
 %<*en>
 \paragraph{plain \TeX}
 To change Japanese fonts in plain \TeX, you must use the primitive
-\verb+\jfont+. So please see Part~\ref{part-ref}.
+\verb+\jfont+. So please see Subsection~\ref{ssec-jfont}.
 %</en>
 %<*ja>
 \paragraph{plain \TeX}
 plain \TeX で和文フォントを変更するためには，\verb+\jfont+ プリミティブを用いなけれ
-ばならない．第 \ref{part-ref} 部を参照せよ．
+ばならない．\ref{ssec-jfont} 節を参照．
 %</ja>
 
 %<*en>
@@ -848,7 +847,7 @@ For \LaTeXe, \LuaTeX-ja adopted most of the font selection system of \pLaTeXe\ (
 %<*ja>
 \paragraph{NFSS2}
 \LaTeXe については，\LuaTeX-ja ではフォント選択システムを \pLaTeXe\ (\texttt{plfonts.dtx})
-の大部分を採用している．
+の大部分をそのまま採用している．
 %</ja>
 \begin{itemize}
 %<*en>
@@ -917,11 +916,11 @@ auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
       fonts, \emph{or both}. For detail, see Subsection~\ref{ssub-nfsspat}.
 %</en>
 %<*ja>
-      ここで，\verb+\fontencoding{<encoding>}+は，引数により和文側か欧文
+      ここで，\verb+\fontencoding{<encoding>}+ は，引数により和文側か欧文
       側かのどちらかのエンコーディングを変更する．例えば，
-      \verb+\fontencoding{JY3}+は和文フォントのエンコーディングを
+      \verb+\fontencoding{JY3}+ は和文フォントのエンコーディングを
       \texttt{JY3}に変更し，\verb+\fontencoding{T1}+ は欧文フォント側を
-      \texttt{T1}へと変更する．\verb+\fontfamily+も引数により和文側，欧文
+      \texttt{T1}へと変更する．\verb+\fontfamily+ も引数により和文側，欧文
       側，\textbf{あるいは両方}のフォントファミリを変更する．詳細は
       \ref{ssub-nfsspat}節を参照すること．
 %</ja>
@@ -933,9 +932,9 @@ auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
       using \verb+\DeclareFontFamily+ doesn't cause any problem.
 %</en>
 %<*ja>
-\item 和文フォントファミリの定義には \verb+\DeclareFontFamily+ の代わりに
-      \verb+\DeclareKanjiFamily+ を用いる．しかし，現在の実装では
-      \verb+\DeclareFontFamily+ を用いても問題は生じない．
+\item 和文フォントファミリの定義には \verb+\DeclareFontFamily+ の
+      代わりに \verb+\DeclareKanjiFamily+ を用いる．しかし，現在の
+      実装では \verb+\DeclareFontFamily+ を用いても問題は生じない．
 %</ja>
 \end{itemize}
 
@@ -1065,10 +1064,10 @@ parameters, you have to use commands \verb+\ltjsetparameter+ and
 \verb+\ltjgetparameter+.
 %</en>
 %<*ja>
-\LuaTeX-ja には多くのパラメータが存在する．そして \LuaTeX の振る舞いのために，
+\LuaTeX-ja には多くのパラメータが存在する．そして \LuaTeX の仕様のために，
 その多くは \TeX のレジスタにではなく，\LuaTeX-ja 独自の方法で保持されている．
-そのため，これらのパラメータを設定・取得するためには \verb+\ltjsetparameter+ と
-\verb+\ltjgetparameter+ を用いる必要がある．
+そのため，これらのパラメータを設定・取得するためには \verb+\ltjsetparameter+ と \verb+\ltjgetparameter+ を
+用いる必要がある．
 %</ja>
 
 %<en>\subsection{Editing the range of \textbf{JAchar}s}
@@ -1095,7 +1094,7 @@ This assignment of numbers to ranges are always global, so you should
 not do this in the middle of a document.
 %</en>
 %<*ja>
-この文字範囲の割り当てはいつもグローバルであり，したがって文書の途中で
+この文字範囲の割り当ては常にグローバルであり，したがって文書の途中で
 この操作をするべきではない．
 %</ja>
 
@@ -1178,7 +1177,7 @@ number shows whether characters in the range is treated as
 %</en>
 %<*ja>
 以下ではこれら8つの文字範囲について記述する．番号のあとのアルファベット `J' と `A'
-はデフォルトで \textbf{JAchar} として扱われるかどうかを示す．これらの設定は
+はデフォルトで \textbf{JAchar} か \textbf{ALchar} かを表している．これらの設定は
 \texttt{PXbase} バンドルで定義されている \texttt{prefercjk} と類似のものである．
 %</ja>
 \begin{description}
@@ -1528,8 +1527,8 @@ To use these data from JFM, set the value of \Param{kanjiskip} or
 %<*ja>
 JFM は「望ましい \Param{kanjiskip} の値」や「望ましい \Param{xkanjiskip} の値」を
 持っていることがある．
-これらのデータを使うためには，\Param{kanjiskip} や \Param{xkanjiskip} の値を
-\verb+\maxdimen+ の値に設定すればよい．
+これらのデータを使うためには，\Param{kanjiskip} や \Param{xkanjiskip} の
+値を \verb+\maxdimen+ の値に設定すればよい．
 %</ja>
 
 %<en>\subsection{Insertion Setting of \Param{xkanjiskip}}
@@ -2263,7 +2262,7 @@ The following is the list of `imaginary characters':
       文字クラスに関してはglue/kernの設定はしない．
 
 これは，\pTeX では，
-      hboxの先頭・末尾とインデントされていない（\verb+\noindent+で開始さ
+      水平ボックスの先頭・末尾とインデントされていない（\verb+\noindent+で開始さ
       れた）段落の先頭にはJFMグルーは入らないという仕様を実現させるためである．
 \item \pTeX の組版を再現させようというのが目的であれば以上の注意を守れば十分である．
 
@@ -2290,6 +2289,7 @@ The following is the list of `imaginary characters':
 
 %<en>\subsection{Math Font Family}
 %<ja>\subsection{数式フォントファミリ}
+\label{ssec-math}
 
 %<*en>
 \TeX\ handles fonts in math formulas by 16~font families\footnote{Omega,
@@ -2652,13 +2652,13 @@ in \pTeX, and symbols beside each parameter has the following meaning:
       adopted in the whole paragraph/hbox.
 %</en>
 %<*ja>
-\item 記号なし：段落や hbox の終端での値がその段落／hbox 全体で用いられる．
+\item 記号なし：段落や水平ボックスの終端での値がその段落／水平ボックス全体で用いられる．
 %</ja>
 %<*en>
 \item `\ast' : local parameters, which can change everywhere inside a paragraph/hbox.
 %</en>
 %<*ja>
-\item `\ast'：ローカルなパラメータであり，段落／hbox 内のどこででも値を変えることができる．
+\item `\ast'：ローカルなパラメータであり，段落／水平ボックス内のどこででも値を変えることができる．
 %</ja>
 %<*en>
 \item `\dagger': assignments are always global.
@@ -3232,8 +3232,15 @@ JFM の \texttt{chars} テーブルのエントリとして \verb+'AJ1-xxx'+ の
 %<ja>\section{パラメータの保持}
 \label{sec-para}
 %<en>\subsection{Used Dimensions, Attributes and whatsit nodes}
-%<ja>\subsection{用いられる寸法レジスタ，属性レジスタ，whatsit ノード}
+%<ja>\subsection{\LuaTeX-ja で用いられる寸法レジスタ，属性レジスタ，whatsit ノード}
+
+%<*en>
 Here the following is the list of dimensions and attributes which are used in \LuaTeX-ja.
+%</en>
+%<*ja>
+以下は \LuaTeX-ja で用いられる寸法レジスタ (dimension)，属性レジスタ (attribute) の
+リストである．
+%</ja>
 \begin{list}{}{%
 \def\makelabel{\ttfamily}\advance\leftmargin1\zw
 \def\dim#1{\item[\char92 #1\ \textrm{(dimension)}]}
@@ -3241,82 +3248,294 @@ Here the following is the list of dimensions and attributes which are used in \L
 }
 
 \dim{jQ}
+%<*en>
 As explained in Subsection~\ref{ssec-plain}, \verb+\jQ+ is equal to
 			$1\,\textrm{Q}=0.25\,\textrm{mm}$, where `Q'~(also called `級') is
 			a unit used in Japanese phototypesetting. So one should not change the value of this dimension.
+%</en>
+%<*ja>
+\ref{ssec-plain} 節で述べたように，\verb+\jQ+ は $1\,\textrm{Q}=0.25\,\textrm{mm}$
+と等しい．ここで，`Q'（もしくは「級」）は日本の写植で用いられる単位である．したがって，
+この寸法レジスタの値を変更してはならない．
+%</ja>
+
 \dim{jH}
+%<*en>
 There is also a unit called `歯' which equals to $0.25\,\textrm{mm}$ and
 			used in Japanese phototypesetting. This
 			\verb+\jH+ is a synonym of \verb+\jQ+.
-\dim{ltj@zw} A temporal register for the `full-width' of current Japanese font.
-\dim{ltj@zh} A temporal register for the `full-height' (usually the sum of height of imaginary body and its depth) of current Japanese font.
-\attr{jfam} Current number of Japanese font family for math formulas.
-\attr{ltj@curjfnt} The font index of current Japanese font.
-\attr{ltj@charclass} The character class of Japanese \textit{glyph\_node}.
-\attr{ltj@yablshift} The amount of shifting the baseline of alphabetic
-			fonts in scaled point ($2^{-16}\,\textrm{pt}$).
-\attr{ltj@ykblshift} The amount of shifting the baseline of Japanese
-			fonts in scaled point ($2^{-16}\,\textrm{pt}$).
-\attr{ltj@autospc} Whether the auto insertion of \Param{kanjiskip} is allowed at the node.
-\attr{ltj@autoxspc} Whether the auto insertion of \Param{xkanjiskip} is allowed at the node.
-\attr{ltj@icflag} An attribute for distinguishing `kinds' of a node. One of the following value is
-			assigned to this attribute:
+%</en>
+%<*ja>
+同じく写植で用いられていた単位として「歯」があり，これは $0.25\,\textrm{mm}$ と
+等しい．\verb+\jH+ は \verb+\jQ+ の別名である．
+%</ja>
+
+\dim{ltj@zw}
+%<*en>
+A temporal register for the `full-width' of current Japanese font.
+%</en>
+%<*ja>
+現在の和文フォントの「全角幅」を保持する一時レジスタ．
+%</ja>
+
+\dim{ltj@zh}
+%<*en>
+A temporal register for the `full-height' (usually the sum of height of imaginary body and its depth) of current Japanese font.
+%</en>
+%<*ja>
+現在の和文フォントの「全角高さ」（通常，高さと深さの和）を保持する一時レジスタ．
+%</ja>
+
+\attr{jfam}
+%<*en>
+Current number of Japanese font family for math formulas.
+%</en>
+%<*ja>
+数式用の和文フォントファミリの現在の番号．
+%</ja>
+
+\attr{ltj@curjfnt}
+%<*en>
+The font index of current Japanese font.
+%</en>
+%<*ja>
+現在の和文フォントのフォント番号．
+%</ja>
+
+\attr{ltj@charclass}
+%<*en>
+The character class of Japanese \textit{glyph\_node}.
+%</en>
+%<*ja>
+和文文字の \textit{glyph\_node} の文字クラス．
+%</ja>
+
+\attr{ltj@yablshift}
+%<*en>
+The amount of shifting the baseline of alphabetic fonts in scaled point ($2^{-16}\,\textrm{pt}$).
+%</en>
+%<*ja>
+スケールド・ポイント ($2^{-16}\,\textrm{pt}$) を単位とした欧文フォントのベースラインの移動量．
+%</ja>
+
+\attr{ltj@ykblshift}
+%<*en>
+The amount of shifting the baseline of Japanese fonts in scaled point ($2^{-16}\,\textrm{pt}$).
+%</en>
+%<*ja>
+スケールド・ポイント ($2^{-16}\,\textrm{pt}$) を単位とした和文フォントのベースラインの移動量．
+%</ja>
+
+\attr{ltj@autospc}
+%<*en>
+Whether the auto insertion of \Param{kanjiskip} is allowed at the node.
+%</en>
+%<*ja>
+そのノードで \Param{kanjiskip} の自動挿入が許されるかどうか．
+%</ja>
+
+\attr{ltj@autoxspc}
+%<*en>
+Whether the auto insertion of \Param{xkanjiskip} is allowed at the node.
+%</en>
+%<*ja>
+そのノードで \Param{xkanjiskip} の自動挿入が許されるかどうか．
+%</ja>
+
+\attr{ltj@icflag}
+%<*en>
+An attribute for distinguishing `kinds' of a node. One of the following value is
+assigned to this attribute:
+%</en>
+%<*ja>
+ノードの「種類」を区別するための属性．以下のうちのひとつが値として割り当てられる：
+%</ja>
 \begin{description}
-\item[\textit{italic} (1)] Glues from an italic correction
+\item[\textit{italic} (1)]
+%<*en>
+Glues from an italic correction
 	   (\verb+\/+). This distinction of origins of glues
 	   (from explicit \verb+\kern+, or from \verb+\/+)
 	   is needed in the insertion process of \Param{xkanjiskip}.
+%</en>
+%<*ja>
+イタリック補正 (\verb+\/+) によるグルー．このグルーの由来の区別（\verb+\kern+ か
+\verb+\/+ か）は \Param{xkanjiskip} の挿入過程において必要になる．
+%</ja>
+
 \item[\textit{packed} (2)]
-\item[\textit{kinsoku} (3)] Penalties inserted for the word-wrapping  process of Japanese characters (\emph{kinsoku}).
-\item[\textit{from\_jfm} (4)] Glues/kerns from JFM.
-\item[\textit{line\_end} (5)] Kerns for ...
-\item[\textit{kanji\_skip} (6)] Glues for \Param{kanjiskip}.
-\item[\textit{xkanji\_skip} (7)] Glues for \Param{xkanjiskip}.
-\item[\textit{processed} (8)] Nodes which is already processed by ...
-\item[\textit{ic\_processed} (9)] Glues from an italic correction, but also already processed.
-\item[\textit{boxbdd} (15)] Glues/kerns that inserted just the beginning or the ending of an hbox or a paragraph.
+
+\item[\textit{kinsoku} (3)]
+%<*en>
+Penalties inserted for the word-wrapping process of Japanese characters (\emph{kinsoku}).
+%</en>
+%<*ja>
+和文文字のワードラップ過程において挿入されたペナルティ (\emph{kinsoku})．
+%</ja>
+
+\item[\textit{from\_jfm} (4)]
+%<*en>
+Glues/kerns from JFM.
+%</en>
+%<*ja>
+JFM 由来のグルー／カーン．
+%</ja>
+
+\item[\textit{line\_end} (5)]
+%<*en>
+Kerns for ...
+%</en>
+%<*ja>
+カーン ...
+%</ja>
+
+\item[\textit{kanji\_skip} (6)]
+%<*en>
+Glues for \Param{kanjiskip}.
+%</en>
+%<*ja>
+\Param{kanjiskip} のグルー．
+%</ja>
+
+\item[\textit{xkanji\_skip} (7)]
+%<*en>
+Glues for \Param{xkanjiskip}.
+%</en>
+%<*ja>
+\Param{xkanjiskip} のグルー．
+%</ja>
+
+\item[\textit{processed} (8)]
+%<*en>
+Nodes which is already processed by ...
+%</en>
+%<*ja>
+... によって既に処理されたノード．
+%</ja>
+
+\item[\textit{ic\_processed} (9)]
+%<*en>
+Glues from an italic correction, but also already processed.
+%</en>
+%<*ja>
+イタリック補正に由来するグルーであるが，まだ処理されていないもの．
+%</ja>
+
+\item[\textit{boxbdd} (15)]
+%<*en>
+Glues/kerns that inserted just the beginning or the ending of an hbox or a paragraph.
+%</en>
+%<*ja>
+ある水平ボックスか段落の最初か最後に挿入されたグルー／カーン．
+%</ja>
 \end{description}
-\attr{ltj@kcat$i$} Where $i$~is a natural number which is less than~7.
+
+\attr{ltj@kcat$i$}
+%<*en>
+Where $i$~is a natural number which is less than~7.
 These 7~attributes store bit~vectors indicating which character block is regarded as a block of \textbf{JAchar}s.
+%</en>
+%<*ja>
+$i$ は7より小さい自然数．
+これら7つの属性レジスタは，どの文字ブロックが \textbf{JAchar} のブロックとして
+扱われるかを示すビットベクトルを格納する．
+%</ja>
 \end{list}
 
+%<*en>
 Furthermore, \LuaTeX-ja uses several `user-defined' whatsit nodes for
 typesetting. All those nodes store a natural number (hence the node's
 \texttt{type} is 100).
+%</en>
+%<*ja>
+さらに，\LuaTeX-ja はいくつかの「ユーザ定義の」whatsit ノードを組版に用いる．
+これらの全てのノードは自然数を格納している（したがってノードの \texttt{type} は
+100 である）．
+%</ja>
 \begin{description}
-\item[30111] Nodes for indicating that \verb+\inhibitglue+ is
+\item[30111]
+%<*en>
+Nodes for indicating that \verb+\inhibitglue+ is
 	   specified. The \texttt{value} field of these nodes doesn't matter.
-\item[30112] Nodes for \LuaTeX-ja's stack system (see the next
+%</en>
+%<*ja>
+\verb+\inhibitglue+ が指定されたことを示すノード．これらのノードの
+\texttt{value} フィールド は意味を持たない．
+%</ja>
+
+\item[30112]
+%<*en>
+Nodes for \LuaTeX-ja's stack system (see the next
 	   subsection). The \texttt{value} field of these nodes is
 	   current group.
-\item[30113] Nodes for Japanese Characters which the callback process of
+%</en>
+%<*ja>
+\LuaTeX-ja のスタックシステム（次の節を参照）のためのノード．
+これらのノードの \texttt{value} フィールドは現在のグループを表す．
+%</ja>
+
+\item[30113]
+%<*en>
+Nodes for Japanese Characters which the callback process of
 	   luaotfload won't be applied, and the character code is
 	   stored in the \texttt{value} field. Each node having this
 	   \verb+user_id+ is converted to a `glyph\_node' \emph{after}
 	   the callback process of luaotfload.
+%</en>
+%<*ja>
+luaotfload のコールバックによる処理が適用されない和文文字のためのノードで，
+\texttt{value} フィールドにその文字のコードが格納されている．
+この \verb+user_id+ を持つノードはそれぞれが luaotfload のコールバックの処理の
+\textbf{後で} `glyph\_node' に変換される．
+%</ja>
 \end{description}
+%<*en>
 These whatsits will be removed during the process of inserting \textbf{JAglue}s.
+%</en>
+%<*ja>
+これらの whatsit ノードは \textbf{JAglue} の挿入処理の間に取り除かれる．
+%</ja>
 
 %<en>\subsection{Stack System of \LuaTeX-ja}
 %<ja>\subsection{\LuaTeX-ja のスタックシステム}
 \label{ssec-stack}
-\paragraph{Background}
+
+%<en>\paragraph{Background}
+%<ja>\paragraph{背景}
+%<*en>
 \LuaTeX-ja has its own stack system, and most parameters of \LuaTeX-ja
-are stored in it.  To clarify the reason, imagine the parameter
+are stored in it. To clarify the reason, imagine the parameter
 \Param{kanjiskip} is stored by a skip, and consider the following
 source:
+%</en>
+%<*ja>
+\LuaTeX-ja は独自のスタックシステムを持ち，\LuaTeX-ja のほとんどのパラメータは
+これを用いて保持されている．その理由を明らかにするために，
+\Param{kanjiskip} パラメータがスキップレジスタで保持されているとし，
+以下のコードを考えてみよう：
+%</ja>
 \begin{LTXexample}
 \ltjsetparameter{kanjiskip=0pt}ふがふが.%
 \setbox0=\hbox{\ltjsetparameter{kanjiskip=5pt}ほげほげ}
 \box0.ぴよぴよ\par
 \end{LTXexample}
 
+%<*en>
 As described in Part~\ref{part-ref}, the only effective value of
 \Param{kanjiskip} in an hbox is the latest value, so the value of
 \Param{kanjiskip} which applied in the entire hbox should be 5\,pt.
 However, by the implementation method of \LuaTeX, this `5\,pt' cannot be
 known from any callbacks.  In the \texttt{tex/packaging.w} (which is a
 file in the source of \LuaTeX), there are the following codes:
+%</en>
+%<*ja>
+第 \ref{part-ref} 部で述べたように，ある水平ボックスの中で効力を持つ
+\Param{kanjiskip} の値は最後に現れた値のみであり，したがってボックス全体に適用される
+\Param{kanjiskip} は 5\,pt であるべきである．しかし，\LuaTeX の実装のために，
+この `5\,pt' はどのコールバックからも知ることはできない．
+\texttt{tex/packaging.w}（これは \LuaTeX のソースファイルである）の中に，
+以下のコードがある：
+%</ja>
 \begin{lstlisting}
 void package(int c)
 {
@@ -3334,16 +3553,33 @@ void package(int c)
                                  saved_level(1), grp, saved_level(2));
         subtype(cur_box) = HLIST_SUBTYPE_HBOX;
 \end{lstlisting}
+%<*en>
 Notice that \verb+unsave+ is executed \emph{before}
 \verb+filtered_hpack+ (this is where \verb+hpack_filter+ callback is
 executed): so `5\,pt' in the above source is orphaned at
-\texttt+unsave+, and hence it can't be accessed from \verb+hpack_filter+
+\verb+unsave+, and hence it can't be accessed from \verb+hpack_filter+
 callback.
+%</en>
+%<*ja>
+\verb+unsave+ が \verb+filtered_hpack+（これは \verb+hpack_filter+ コールバックが
+実行されるところである）の\textbf{前に}実行されていることに注意する．
+したがって，上記ソース中で `5\,pt' は \verb+unsave+ のところで捨てられ，
+\verb+hpack_filter+ からはアクセスすることができない．
+%</ja>
 
-\paragraph{The method}
+%<en>\paragraph{The method}
+%<ja>\paragraph{解決法}
+
+%<*en>
 The code of stack system is based on that in a post of Dev-luatex mailing list\footnote{%
 \texttt{[Dev-luatex] tex.currentgrouplevel}, a post at 2008/8/19 by Jonathan Sauer.}.
+%</en>
+%<*ja>
+スタックシステムのコードは Dev-luatex メーリングリスト\footnote{\texttt{[Dev-luatex] tex.currentgrouplevel} の Jonathan Sauer による 2008/8/19 の投稿．}のある投稿を
+ベースにしている．
+%</ja>
 
+%<*en>
 These are two \TeX\ count registers for maintaining information:
 \verb+\ltj@@stack+ for the stack level, and \verb+\ltj@@group@level+ for
 the \TeX's group level when the last assignment was done.  Parameters
@@ -3351,7 +3587,18 @@ are stored in one big table named \texttt{charprop\_stack\_table}, where
 \texttt{charprop\_stack\_table[$i$]} stores data of stack level~$i$. If
 a new stack level is created by \verb+\ltjsetparameter+, all data of the
 previous level is copied.
+%</en>
+%<*ja>
+情報を保持するために，2つの \TeX の整数レジスタを用いている：
+\verb+\ltj@@stack+ でスタックレベル，\verb+\ltj@@group@level+ で最後の代入が
+なされた時点での \TeX のグループレベルを保持している．
+パラメータは \texttt{charprop\_stack\_table} という名前のひとつの大きなテーブルに
+格納される．ここで，\texttt{charprop\_stack\_table[$i$]} はスタックレベル $i$ の
+データを格納している．もし新しいスタックレベルが \verb+\ltjsetparameter+ によって
+生成されたら，前のレベルの全てのデータがコピーされる．
+%</ja>
 
+%<*en>
 To resolve the problem mentioned in `Background' above, \LuaTeX-ja uses
 another thing: When a new stack level is about to be created, a whatsit
 node whose type, subtype and value are 44~(\textit{user\_defined}),
@@ -3360,28 +3607,71 @@ list (we refer this node by \textit{stack\_flag}). This enables us to
 know whether assignment is done just inside a hbox. Suppose that the
 stack level is~$s$ and the \TeX's group level is~$t$ just after the hbox
 group, then:
+%</en>
+%<*ja>
+上の「背景」で述べた問題を解決するために，\LuaTeX-ja ではもう一つの手法を導入する：
+新しいスタックレベルが生成されようとするとき，type, subtype, value がそれぞれ
+44~(\textit{user\_defined}), 30112，そして現在のグループレベルである whatsit ノード
+を現在のリストに付け加える（このノードを \textit{stack\_flag} とする）．
+これにより，ある水平ボックスの中で代入がなされたかどうかを知ることが可能
+となる．スタックレベルを $s$，その水平ボックスグループの直後の \TeX のグループレベルを
+$t$ とすると：
+%</ja>
 \begin{itemize}
-\item If there is no \textit{stack\_flag} node in the list of hbox, then
+%<*en>
+\item If there is no \textit{stack\_flag} node in the list of the hbox, then
       no assignment was occurred inside the hbox. Hence values of
       parameters at the end of the hbox are stored in the stack
       level~$s$.
+%</en>
+%<*ja>
+\item もしその水平ボックスのリストの中に \textit{stack\_flag} ノードがなければ，
+  水平ボックスの中では代入は起こらなかったということになる．
+  したがって，その水平ボックスの終わりにおけるパラメータの値はスタックレベル $s$ に
+  格納されている．
+%</ja>
+
+%<*en>
 \item If there is a \textit{stack\_flag} node whose value is~$t+1$, then
       an assignment was occurred just inside the hbox group. Hence
       values of parameters at the end of the hbox are stored in the
       stack level~$s+1$.
+%</en>
+%<*ja>
+\item もし値が $t+1$ の \textit{stack\_flag} ノードがあれば，その
+  水平ボックスグループの中で代入が起こったことになる．
+  したがって，水平ボックスの終わりにおけるパラメータの値はスタックレベル $s+1$ に
+  格納されている．
+%</ja>
+
+%<*en>
 \item If there are \textit{stack\_flag} nodes but all of their values
       are more than~$t+1$, then an assignment was occurred in the box,
       but it is done is `more internal' group. Hence values of
       parameters at the end of the hbox are stored in the stack
       level~$s$.
+%</en>
+%<*ja>
+\item もし \textit{stack\_flag} ノードがあるがそれらの値が全て $t+1$ より大きい
+  場合，そのボックスの中で代入が起こったが，それは「より内部の」グループで
+  起こったということになる．したがって，水平ボックスの終わりでのパラメータの
+  値はスタックレベル $s$ に格納されている．
+%</ja>
 \end{itemize}
 
+%<*en>
 Note that to work this trick correctly, assignments to
 \verb+\ltj@@stack+ and \verb+\ltj@@group@level+ have to be local always,
 regardless the value of \verb+\globaldefs+.
 This problem is resolved by using
 \hbox{\verb+\directlua{tex.globaldefs=0}+} (this assignment is local).
-
+%</en>
+%<*ja>
+このトリックを正しく働かせるためには，\verb+\ltj@@stack+ と \verb+\ltj@@group@level+ への
+代入は \verb+\globaldefs+ の値によらず常にローカルでなければならないことに注意する．
+この問題は \hbox{\verb+\directlua{tex.globaldefs=0}+}（この代入は常にローカル）を
+用いることで解決している．
+%</ja>
 
 %<en>\section{Linebreak after Japanese Character}
 %<ja>\section{和文文字直後の改行}
@@ -3577,11 +3867,11 @@ u
 \begin{itemize}
 \item JFMグルーの挿入は，和文文字を表すトークンを元に水平リストに（文字を表す）<char\_node>を
 追加する過程で行われる．
-\item \Param{xkanjiskip}の挿入は，hboxへのパッケージングや行分割前に行われる．
+\item \Param{xkanjiskip}の挿入は，水平ボックスへのパッケージングや行分割前に行われる．
 \item \Param{kanjiskip}はノードとしては挿入されない．パッケージングや行分割の計算時に
 「和文文字を表す2つの<char\_node>の間には\Param{kanjiskip}がある」ものとみなされる．
 \end{itemize}
-しかし，\LuaTeX-jaでは，hboxへのパッケージングや行分割前に全ての
+しかし，\LuaTeX-jaでは，水平ボックスへのパッケージングや行分割前に全ての
 \textbf{JAglue}，即ちJFMグルー・\Param{xkanjiskip}・\Param{kanjiskip}の
 3種類を一度に挿入することになっている．これは，\LuaTeX において欧文の合字・
 カーニング処理がノードベースになったことに対応する変更である．
@@ -3669,7 +3959,7 @@ $\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$は，その和文文字
 \item[\textit{id\_math}] インライン数式．\\
 便宜的に，$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$ともに
 「文字コード$-1$の欧文文字」とおく．
-\item[\textit{id\_hlist}] 縦方向にシフトされていない hbox．\\
+\item[\textit{id\_hlist}] 縦方向にシフトされていない水平ボックス．\\
 この場合，$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$はそれぞれ$p$の内容を表すリストの，
 先頭・末尾のノードである．
 \begin{itemize}
@@ -3678,9 +3968,9 @@ $\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$は，その和文文字
 \hbox{\hbox{abc}...\hbox{\lower1pt\hbox{xyz}}}
 \end{verbatim}
 のように，$p$の内容が別の hbox で開始・終了している可能性も十分あり得る．そのような場合，
-$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$の算出は，\textbf{垂直方向にシフトされていない} hbox の
+$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$の算出は，\textbf{垂直方向にシフトされていない}水平ボックスの
 場合だけ内部を再帰的に探索する．例えば上の例では，$\mathit{Np}.\mathit{head}$は文字「a」を表すノードであり，
-一方$\mathit{Np}.\mathit{tail}$は垂直方向にシフトされた hbox，\verb+\lower1pt\hbox{xyz}+に対応するノードである．
+一方$\mathit{Np}.\mathit{tail}$は垂直方向にシフトされた水平ボックス，\verb+\lower1pt\hbox{xyz}+に対応するノードである．
 \item また，先頭にアクセント付きの文字がきたり，末尾にイタリック補正用の kern が
 来ることもあり得る．この場合は，クラスタの定義のところにもあったように，それらは無視して算出を行う．
 \item 最初・最後のノードが合字によって作られた\textit{glyph\_node}のときは，それぞれに対して\textit{id\_glyph}%
@@ -3709,11 +3999,11 @@ $\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$の算出は，\textbf{�
 \textit{id}が\textit{id\_jglyph}であるか，\\
 \textit{id}が\textit{id\_pbox}であって$\mathit{Np}.\mathit{head}$が\textbf{JAchar}であるとき．
 
-\item[和文B] リスト中のhboxの中身の先頭として出現した和文文字．和文Aとの違いは，これの前に
+\item[和文B] リスト中の水平ボックスの中身の先頭として出現した和文文字．和文Aとの違いは，これの前に
 JFMグルーの挿入が行われない（\Param{xkanjiskip},~\Param{kanjiskip}は入り得る）ことである．\\
 \textit{id}が\textit{id\_hlist}か\textit{id\_disc}であって$\mathit{Np}.\mathit{head}$が\textbf{JAchar}であるとき．
 
-\item[欧文] リスト中に直接/hboxの中身として出現している欧文文字．次の3つの場合が該当：
+\item[欧文] リスト中に直接／水平ボックスの中身として出現している欧文文字．次の3つの場合が該当：
 \begin{itemize}
 \item \textit{id}が\textit{id\_glyph}である．
 \item \textit{id}が\textit{id\_math}である．
@@ -3727,22 +4017,22 @@ JFMグルーの挿入が行われない（\Param{xkanjiskip},~\Param{kanjiskip}�
 
 \end{description}
 
-\subsection{段落/hboxの先頭や末尾}
+\subsection{段落／水平ボックスの先頭や末尾}
 \paragraph{先頭部の処理}
-まず，段落/hboxの一番最初にあるクラスタ\textit{Np}を探索する．
-hboxの場合は何の問題もないが，段落の場合では以下のノード達を事前に読み飛ばしておく：
+まず，段落／水平ボックスの一番最初にあるクラスタ\textit{Np}を探索する．
+水平ボックスの場合は何の問題もないが，段落の場合では以下のノード達を事前に読み飛ばしておく：
 \begin{center}
-\verb+\parindent+由来のhbox ($\mathit{subtype}=3$)，及び\textit{subtype}が44~(\textit{user\_defined})でない
+\verb+\parindent+由来の水平ボックス ($\mathit{subtype}=3$)，及び\textit{subtype}が44~(\textit{user\_defined})でない
 ようなwhatsit．
 \end{center}
-これは，\verb+\parindent+由来のhboxがクラスタを構成しないようにするためである．
+これは，\verb+\parindent+由来の水平ボックスがクラスタを構成しないようにするためである．
 
 次に，\textit{Np}の直前に空白$g$を必要なら挿入する：
 \begin{enumerate}
 \item この処理が働くような\textit{Np}は\textsf{和文A}である．
-\item 問題のリストが字下げありの段落（\verb+\parindent+由来のhboxあり）の場合は，
+\item 問題のリストが字下げありの段落（\verb+\parindent+由来の水平ボックスあり）の場合は，
 この空白$g$は「文字コード\texttt{'parbdd'}の文字」と\textit{Np}の間に入るglue/kernである．
-\item そうでないとき（\verb+noindent+で開始された段落や，hbox）は，
+\item そうでないとき（\verb+noindent+で開始された段落や水平ボックス）は，
 $g$は「文字コード\texttt{'boxbdd'}の文字」と\textit{Np}の間に入るglue/kernである．
 \end{enumerate}
 ただし，もし$g$がglueであった場合，この挿入によって\textit{Np}による行分割が新たに可能になるべきではない．
@@ -3753,7 +4043,7 @@ $g$は「文字コード\texttt{'boxbdd'}の文字」と\textit{Np}の間に入�
 \end{itemize}
 
 \paragraph{末尾の処理}
-末尾の処理は，問題のリストが段落のものかhboxのものかによって異なる．
+末尾の処理は，問題のリストが段落のものか水平ボックスのものかによって異なる．
 後者の場合は容易い：最後のクラスタを\textit{Nq}とおくと，\textit{Nq}と「文字コード\texttt{'boxbdd'}の文字」の間に入るglue/kernを，
 \textit{Nq}の直後に挿入するのみである．
 
@@ -4088,7 +4378,7 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 \end{itemize}
 
 \paragraph{和文Aと和文Bの違い}
-先に述べたように，\textsf{和文B}はhboxの中身の先頭（or 末尾）として出現している
+先に述べたように，\textsf{和文B}は水平ボックスの中身の先頭（or 末尾）として出現している
 和文文字である．リスト内に直接ノードとして現れている和文文字（\textsf{和文A}）との違いは，
 \begin{itemize}
 \item \textsf{和文B}に対しては，JFMの文字クラス指定から定まる空白
@@ -4116,7 +4406,7 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 \begin{itemize}
 \item 1行目の\verb+\inhibitglue+は\textsf{Boundary-B~[\OB]}の処理のみを抑止するので，ピリオドと「A」の間には
 \Param{xkanjiskip}（四分アキ）が入ることに注意．
-\item 2行目のピリオドと「A」の間においては，前者が\textsf{和文B}となる（hboxの中身の末尾として登場しているから）ので，
+\item 2行目のピリオドと「A」の間においては，前者が\textsf{和文B}となる（水平ボックスの中身の末尾として登場しているから）ので，
 そもそも\textsf{Boundary-B~[\OB]}の処理は行われない．よって，\Param{xkanjiskip}が入ることとなる．
 \item 3行目では，ピリオドの属するクラスタは\textsf{和文A}である．これによって，
 ピリオドと「A」の間には\textsf{Boundary-B~[\OB]}由来の半角アキが入ることになる．
