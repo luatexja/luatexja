@@ -1561,20 +1561,32 @@ pあq い!う
 The second argument \texttt{preonly} means `the insertion of
 \Param{xkanjiskip} is allowed before this character, but not after'.
 the other possible values are \texttt{postonly}, \texttt{allow} and \texttt{
-inhibit}. ...
+inhibit}.
 %</en>
 %<*ja>
 2つ目の引数の \texttt{preonly} は「\Param{xkanjiskip} の挿入はこの文字の
 前でのみ許され，後では許さない」ことを意味する．他に指定可能な値は
 \texttt{postonly}, \texttt{allow}, \texttt{inhibit} である．
+%</ja>
 
+%<*en>
+\Param{jaxspmode} and \Param{alxspmode} use a same table to store the parameters
+on the current version. Therefore, line 1 in the code above can be rewritten
+as follows:
+%</en>
+%<*ja>
 なお，現行の
 仕様では，\Param{jaxspmode}, \Param{alxspmode} はテーブルを共有しており，
-上のソースの1行目を次のように変えても同じことになる：
+上のコードの1行目を次のように変えても同じことになる：
+%</ja>
 \begin{verbatim}
 \ltjsetparameter{alxspmode={`あ,preonly}, jaxspmode={`\!,postonly}}
 \end{verbatim}
-また，これら2パラメータには数値で値を指定することもできる（第\ref{part-ref}部を参照）．
+%<*en>
+One can use also numbers to specify these two parameters (see Subsection \ref{ssec-param}).
+%</en>
+%<*ja>
+また，これら2パラメータには数値で値を指定することもできる（\ref{ssec-param} 節を参照）．
 %</ja>
 
 %<*en>
@@ -2635,6 +2647,7 @@ character other than space~`\texttt{\char32}'~(U+0020) has the category code
 
 %<en>\subsection{List of Parameters}
 %<ja>\subsection{パラメータ一覧}
+\label{ssec-param}
 
 %<*en>
 The following is the list of parameters which can be specified by the
@@ -3521,7 +3534,7 @@ source:
 \end{LTXexample}
 
 %<*en>
-As described in Part~\ref{part-ref}, the only effective value of
+As described in Subsection~\ref{ssec-param}, the only effective value of
 \Param{kanjiskip} in an hbox is the latest value, so the value of
 \Param{kanjiskip} which applied in the entire hbox should be 5\,pt.
 However, by the implementation method of \LuaTeX, this `5\,pt' cannot be
@@ -3529,7 +3542,7 @@ known from any callbacks.  In the \texttt{tex/packaging.w} (which is a
 file in the source of \LuaTeX), there are the following codes:
 %</en>
 %<*ja>
-第 \ref{part-ref} 部で述べたように，ある水平ボックスの中で効力を持つ
+\ref{ssec-param} 節で述べたように，ある水平ボックスの中で効力を持つ
 \Param{kanjiskip} の値は最後に現れた値のみであり，したがってボックス全体に適用される
 \Param{kanjiskip} は 5\,pt であるべきである．しかし，\LuaTeX の実装のために，
 この `5\,pt' はどのコールバックからも知ることはできない．
