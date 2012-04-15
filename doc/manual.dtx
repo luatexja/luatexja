@@ -3575,7 +3575,7 @@ The code of stack system is based on that in a post of Dev-luatex mailing list\f
 \texttt{[Dev-luatex] tex.currentgrouplevel}, a post at 2008/8/19 by Jonathan Sauer.}.
 %</en>
 %<*ja>
-スタックシステムのコードは Dev-luatex メーリングリスト\footnote{\texttt{[Dev-luatex] tex.currentgrouplevel} の Jonathan Sauer による 2008/8/19 の投稿．}のある投稿を
+スタックシステムのコードは Dev-luatex メーリングリストのある投稿\footnote{\texttt{[Dev-luatex] tex.currentgrouplevel}: Jonathan Sauer による 2008/8/19 の投稿．}を
 ベースにしている．
 %</ja>
 
@@ -3717,7 +3717,7 @@ after `beginning/ending of a group' characters.
 \item State~$M$: 行中．
 \item State~$K$: 行中（和文文字の後）．
 \end{itemize}
-また，状態遷移は，図\ref{fig-ptexipro} のようになっており，図中の数字は
+また，状態遷移は，図 \ref{fig-ptexipro} のようになっており，図中の数字は
 カテゴリーコードを表している．最初の3状態は\TeX の入力処理部と同じであり，
 図中から状態$K$と「$j$」と書かれた矢印を取り除けば，\TeX の入力処理部と同
 じものになる．
@@ -3748,10 +3748,21 @@ after `beginning/ending of a group' characters.
  d:=\{3,4,6,7,8,11,12,13\},\quad g:=\{1,2\},\quad j:=(\text{Japanese characters})
 \end{gather*}
 \begin{itemize}
+%<*en>
 \item Numbers represent category codes.
-\item Category codes 9~(ignored), 14~(comment)~and~15~(invalid) are omitted in above diagram.
+%</en>
+%<*ja>
+\item 数字はカテゴリーコードを表わしている．
+%</ja>
+%<*en>
+\item Category codes 9~(ignored), 14~(comment)~and~15~(invalid) are omitted in the above diagram.
+%</en>
+%<*ja>
+\item カテゴリーコード 9（無視する文字），14（コメント文字），15（無効文字）は上の図では省かれている．
+%</ja>
 \end{itemize}
-\caption{State transitions of \pTeX's input processor.}
+%<en>\caption{State transitions of \pTeX's input processor.}
+%<ja>\caption{\pTeX の入力処理部の状態遷移．}
 \label{fig-ptexipro}
 \end{figure}
 
@@ -3889,19 +3900,56 @@ u
 \def\OA{$\text{\sf O}_{\text{\sf A}}$}
 \def\OB{$\text{\sf O}_{\text{\sf B}}$}
 \begin{defn}
+%<*en>
 A \emph{cluster} is a list of consecutive nodes in one of the following forms,
 with the \textit{id} of it:
+%</en>
+%<*ja>
+\textbf{クラスタ}は以下の形のうちのどれかひとつをとる連続的なノードのリストである：
+%</ja>
 \begin{enumerate}
+%<*en>
 \item Nodes whose value of\ \verb+\ltj@icflag+ is in $[3,15)$.  These
       nodes come from a hbox which is already packaged, by unpackaging
       (\verb+\unhbox+).
       The \textit{id} is \textit{id\_pbox}.
+%</en>
+%<*ja>
+\item その \verb+\ltj@icflag+ の値が $[3,15)$ に入るノードのリスト．
+  これらのノードはある既にパッケージングされた水平ボックスから \verb+\unhbox+ で
+  アンパックされたものである．
+  その \textit{id} は \textit{id\_pbox} である．
+%</ja>
+
+%<*en>
 \item A inline math formula, including two \textit{math\_node}s at the boundary of it.
       The \textit{id} is \textit{id\_math}.
+%</en>
+%<*ja>
+\item インライン数式でその境界に2つの \textit{math\_node} を含むもの．
+  その \textit{id} は \textit{id\_math} である．
+%</ja>
+
+%<*en>
 \item A \textit{glyph\_node}~$p$ with nodes which relate with it:
+%</en>
+%<*ja>
+\item \textit{glpyh\_node}~$p$ とそれに関係するノード：
+%</ja>
 \begin{enumerate}
+%<*en>
 \item A kern for the italic correction of~$p$.
+%</en>
+%<*ja>
+\item $p$ のイタリック補正のためのカーン．
+%</ja>
+
+%<*en>
 \item An accent attached to $p$ by \verb+\accent+.
+%</en>
+%<*ja>
+\item \verb+\accent+ による $p$ に付随したアクセント．
+%</ja>
 \end{enumerate}
 \[
 \overbrace{%
@@ -3917,21 +3965,47 @@ with the \textit{id} of it:
 \Node{kern}{italic corr.}}^{\text{(b)}}
 \]
 
+%<*en>
 The \textit{id} is \textit{id\_jglyph} or
 \textit{id\_glyph}, according to whether the \textit{glyph\_node}
 represents a Japanese character or not.
+%</en>
+%<*ja>
+\textit{id} は \textit{glyph\_node} が和文文字を表すかどうかによって
+\textit{id\_jglyph}，もしくは \textit{id\_glyph} となる．
+%</ja>
+
+%<*en>
 \item An box-like node, that is, an hbox, a vbox, a rule (\verb+\vrule+) and an \textit{unset\_node}.
 The \textit{id} is \textit{id\_hlist} if the node is an
       hbox which is not shifted vertically, or \textit{id\_box\_like}
       otherwise.
+%</en>
+%<*ja>
+\item ボックス様のノード，つまり水平ボックス，垂直ボックス，罫線 (\verb+\vrule+)，
+  そして \textit{unset\_node}．
+  その \textit{id} は垂直に移動していない水平ボックスならば \textit{id\_hlist}，
+  そうでなければ \textit{id\_box\_like} となる．
+%</ja>
+
+%<*en>
 \item A glue, a kern whose subtype is not 2~(\textit{accent}), and a discretionary break.
 The \textit{id} is \textit{id\_glue}, \textit{id\_kern}
       and \textit{id\_disc}, respectively.
+%</en>
+%<*ja>
+\item グルー，subtype が 2~(\textit{accent}) ではないカーン，そして任意改行．
+  その \textit{id} はそれぞれ \textit{id\_glue}, \textit{id\_kern}，そして
+  \textit{id\_disc} である．
+%</ja>
 \end{enumerate}
-We denote a cluster by \textit{Np}, \textit{Nq} and \textit{Nr}.
+%<*en>
+Let \textit{Np}, \textit{Nq} and \textit{Nr} denote a cluster.
+%</en>
+%<*ja>
+以下では \textit{Np}, \textit{Nq}, \textit{Nr} でクラスタを表す．
+%</ja>
 \end{defn}
-
-以降は日本語．
 
 \paragraph{\textit{id}の意味}
 $\mathit{Np}.\mathit{id}$の意味を述べるとともに，
