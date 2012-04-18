@@ -1548,20 +1548,32 @@ pあq い!う
 The second argument \texttt{preonly} means `the insertion of
 \Param{xkanjiskip} is allowed before this character, but not after'.
 the other possible values are \texttt{postonly}, \texttt{allow} and \texttt{
-inhibit}. ...
+inhibit}.
 %</en>
 %<*ja>
 2つ目の引数の \texttt{preonly} は「\Param{xkanjiskip} の挿入はこの文字の
 前でのみ許され，後では許さない」ことを意味する．他に指定可能な値は
 \texttt{postonly}, \texttt{allow}, \texttt{inhibit} である．
+%</ja>
 
+%<*en>
+\Param{jaxspmode} and \Param{alxspmode} use a same table to store the parameters
+on the current version. Therefore, line 1 in the code above can be rewritten
+as follows:
+%</en>
+%<*ja>
 なお，現行の
 仕様では，\Param{jaxspmode}, \Param{alxspmode} はテーブルを共有しており，
-上のソースの1行目を次のように変えても同じことになる：
+上のコードの1行目を次のように変えても同じことになる：
+%</ja>
 \begin{verbatim}
 \ltjsetparameter{alxspmode={`あ,preonly}, jaxspmode={`\!,postonly}}
 \end{verbatim}
-また，これら2パラメータには数値で値を指定することもできる（第\ref{part-ref}部を参照）．
+%<*en>
+One can use also numbers to specify these two parameters (see Subsection \ref{ssec-param}).
+%</en>
+%<*ja>
+また，これら2パラメータには数値で値を指定することもできる（\ref{ssec-param} 節を参照）．
 %</ja>
 
 %<*en>
@@ -2246,7 +2258,7 @@ The following is the list of `imaginary characters':
 \item 上に述べた特殊文字は，\texttt{'boxbdd'}を除き文字クラスを全部0とする
       （JFM中に単に書かなければよい）．
 \item \texttt{'boxbdd'}については，それのみで一つの文字クラスを形成し，その
-      文字クラスに関してはglue/kernの設定はしない．
+      文字クラスに関してはグルー／カーンの設定はしない．
 
 これは，\pTeX では，
       水平ボックスの先頭・末尾とインデントされていない（\verb+\noindent+で開始さ
@@ -2622,6 +2634,7 @@ character other than space~`\texttt{\char32}'~(U+0020) has the category code
 
 %<en>\subsection{List of Parameters}
 %<ja>\subsection{パラメータ一覧}
+\label{ssec-param}
 
 %<*en>
 The following is the list of parameters which can be specified by the
@@ -3508,7 +3521,7 @@ source:
 \end{LTXexample}
 
 %<*en>
-As described in Part~\ref{part-ref}, the only effective value of
+As described in Subsection~\ref{ssec-param}, the only effective value of
 \Param{kanjiskip} in an hbox is the latest value, so the value of
 \Param{kanjiskip} which applied in the entire hbox should be 5\,pt.
 However, by the implementation method of \LuaTeX, this `5\,pt' cannot be
@@ -3516,7 +3529,7 @@ known from any callbacks.  In the \texttt{tex/packaging.w} (which is a
 file in the source of \LuaTeX), there are the following codes:
 %</en>
 %<*ja>
-第 \ref{part-ref} 部で述べたように，ある水平ボックスの中で効力を持つ
+\ref{ssec-param} 節で述べたように，ある水平ボックスの中で効力を持つ
 \Param{kanjiskip} の値は最後に現れた値のみであり，したがってボックス全体に適用される
 \Param{kanjiskip} は 5\,pt であるべきである．しかし，\LuaTeX の実装のために，
 この `5\,pt' はどのコールバックからも知ることはできない．
@@ -3562,7 +3575,7 @@ The code of stack system is based on that in a post of Dev-luatex mailing list\f
 \texttt{[Dev-luatex] tex.currentgrouplevel}, a post at 2008/8/19 by Jonathan Sauer.}.
 %</en>
 %<*ja>
-スタックシステムのコードは Dev-luatex メーリングリスト\footnote{\texttt{[Dev-luatex] tex.currentgrouplevel} の Jonathan Sauer による 2008/8/19 の投稿．}のある投稿を
+スタックシステムのコードは Dev-luatex メーリングリストのある投稿\footnote{\texttt{[Dev-luatex] tex.currentgrouplevel}: Jonathan Sauer による 2008/8/19 の投稿．}を
 ベースにしている．
 %</ja>
 
@@ -3704,7 +3717,7 @@ after `beginning/ending of a group' characters.
 \item State~$M$: 行中．
 \item State~$K$: 行中（和文文字の後）．
 \end{itemize}
-また，状態遷移は，図\ref{fig-ptexipro} のようになっており，図中の数字は
+また，状態遷移は，図 \ref{fig-ptexipro} のようになっており，図中の数字は
 カテゴリーコードを表している．最初の3状態は\TeX の入力処理部と同じであり，
 図中から状態$K$と「$j$」と書かれた矢印を取り除けば，\TeX の入力処理部と同
 じものになる．
@@ -3735,10 +3748,21 @@ after `beginning/ending of a group' characters.
  d:=\{3,4,6,7,8,11,12,13\},\quad g:=\{1,2\},\quad j:=(\text{Japanese characters})
 \end{gather*}
 \begin{itemize}
+%<*en>
 \item Numbers represent category codes.
-\item Category codes 9~(ignored), 14~(comment)~and~15~(invalid) are omitted in above diagram.
+%</en>
+%<*ja>
+\item 数字はカテゴリーコードを表わしている．
+%</ja>
+%<*en>
+\item Category codes 9~(ignored), 14~(comment)~and~15~(invalid) are omitted in the above diagram.
+%</en>
+%<*ja>
+\item カテゴリーコード 9（無視する文字），14（コメント文字），15（無効文字）は上の図では省かれている．
+%</ja>
 \end{itemize}
-\caption{State transitions of \pTeX's input processor.}
+%<en>\caption{State transitions of \pTeX's input processor.}
+%<ja>\caption{\pTeX の入力処理部の状態遷移．}
 \label{fig-ptexipro}
 \end{figure}
 
@@ -3865,7 +3889,7 @@ u
 
 \LuaTeX-jaにおける\textbf{JAglue}挿入処理では，次節で定義する
 「クラスタ」を単位にして行われる．大雑把にいうと，「クラスタ」は文字とそれに付随す
-るノード達（アクセント位置補正用のkernや，イタリック補正）をまとめたもの
+るノード達（アクセント位置補正用のカーンや，イタリック補正）をまとめたもの
 であり，2つのクラスタの間には，ペナルティ，\verb+\vadjust+，whatsitなど，行組版
 には関係しないものがある．
 
@@ -3876,19 +3900,56 @@ u
 \def\OA{$\text{\sf O}_{\text{\sf A}}$}
 \def\OB{$\text{\sf O}_{\text{\sf B}}$}
 \begin{defn}
+%<*en>
 A \emph{cluster} is a list of consecutive nodes in one of the following forms,
 with the \textit{id} of it:
+%</en>
+%<*ja>
+\textbf{クラスタ}は以下の形のうちのどれかひとつをとる連続的なノードのリストである：
+%</ja>
 \begin{enumerate}
+%<*en>
 \item Nodes whose value of\ \verb+\ltj@icflag+ is in $[3,15)$.  These
       nodes come from a hbox which is already packaged, by unpackaging
       (\verb+\unhbox+).
       The \textit{id} is \textit{id\_pbox}.
+%</en>
+%<*ja>
+\item その \verb+\ltj@icflag+ の値が $[3,15)$ に入るノードのリスト．
+  これらのノードはある既にパッケージングされた水平ボックスから \verb+\unhbox+ で
+  アンパックされたものである．
+  その \textit{id} は \textit{id\_pbox} である．
+%</ja>
+
+%<*en>
 \item A inline math formula, including two \textit{math\_node}s at the boundary of it.
       The \textit{id} is \textit{id\_math}.
+%</en>
+%<*ja>
+\item インライン数式でその境界に2つの \textit{math\_node} を含むもの．
+  その \textit{id} は \textit{id\_math} である．
+%</ja>
+
+%<*en>
 \item A \textit{glyph\_node}~$p$ with nodes which relate with it:
+%</en>
+%<*ja>
+\item \textit{glpyh\_node}~$p$ とそれに関係するノード：
+%</ja>
 \begin{enumerate}
+%<*en>
 \item A kern for the italic correction of~$p$.
+%</en>
+%<*ja>
+\item $p$ のイタリック補正のためのカーン．
+%</ja>
+
+%<*en>
 \item An accent attached to $p$ by \verb+\accent+.
+%</en>
+%<*ja>
+\item \verb+\accent+ による $p$ に付随したアクセント．
+%</ja>
 \end{enumerate}
 \[
 \overbrace{%
@@ -3904,21 +3965,47 @@ with the \textit{id} of it:
 \Node{kern}{italic corr.}}^{\text{(b)}}
 \]
 
+%<*en>
 The \textit{id} is \textit{id\_jglyph} or
 \textit{id\_glyph}, according to whether the \textit{glyph\_node}
 represents a Japanese character or not.
+%</en>
+%<*ja>
+\textit{id} は \textit{glyph\_node} が和文文字を表すかどうかによって
+\textit{id\_jglyph}，もしくは \textit{id\_glyph} となる．
+%</ja>
+
+%<*en>
 \item An box-like node, that is, an hbox, a vbox, a rule (\verb+\vrule+) and an \textit{unset\_node}.
 The \textit{id} is \textit{id\_hlist} if the node is an
       hbox which is not shifted vertically, or \textit{id\_box\_like}
       otherwise.
+%</en>
+%<*ja>
+\item ボックス様のノード，つまり水平ボックス，垂直ボックス，罫線 (\verb+\vrule+)，
+  そして \textit{unset\_node}．
+  その \textit{id} は垂直に移動していない水平ボックスならば \textit{id\_hlist}，
+  そうでなければ \textit{id\_box\_like} となる．
+%</ja>
+
+%<*en>
 \item A glue, a kern whose subtype is not 2~(\textit{accent}), and a discretionary break.
 The \textit{id} is \textit{id\_glue}, \textit{id\_kern}
       and \textit{id\_disc}, respectively.
+%</en>
+%<*ja>
+\item グルー，subtype が 2~(\textit{accent}) ではないカーン，そして任意改行．
+  その \textit{id} はそれぞれ \textit{id\_glue}, \textit{id\_kern}，そして
+  \textit{id\_disc} である．
+%</ja>
 \end{enumerate}
-We denote a cluster by \textit{Np}, \textit{Nq} and \textit{Nr}.
+%<*en>
+Let \textit{Np}, \textit{Nq} and \textit{Nr} denote a cluster.
+%</en>
+%<*ja>
+以下では \textit{Np}, \textit{Nq}, \textit{Nr} でクラスタを表す．
+%</ja>
 \end{defn}
-
-以降は日本語．
 
 \paragraph{\textit{id}の意味}
 $\mathit{Np}.\mathit{id}$の意味を述べるとともに，
@@ -3958,7 +4045,7 @@ $\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$は，その和文文字
 $\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$の算出は，\textbf{垂直方向にシフトされていない}水平ボックスの
 場合だけ内部を再帰的に探索する．例えば上の例では，$\mathit{Np}.\mathit{head}$は文字「a」を表すノードであり，
 一方$\mathit{Np}.\mathit{tail}$は垂直方向にシフトされた水平ボックス，\verb+\lower1pt\hbox{xyz}+に対応するノードである．
-\item また，先頭にアクセント付きの文字がきたり，末尾にイタリック補正用の kern が
+\item また，先頭にアクセント付きの文字がきたり，末尾にイタリック補正用のカーンが
 来ることもあり得る．この場合は，クラスタの定義のところにもあったように，それらは無視して算出を行う．
 \item 最初・最後のノードが合字によって作られた\textit{glyph\_node}のときは，それぞれに対して\textit{id\_glyph}%
 と同様に再帰的に構成要素をたどっていく．
@@ -4018,9 +4105,9 @@ JFMグルーの挿入が行われない（\Param{xkanjiskip},~\Param{kanjiskip}�
 \begin{enumerate}
 \item この処理が働くような\textit{Np}は\textsf{和文A}である．
 \item 問題のリストが字下げありの段落（\verb+\parindent+由来の水平ボックスあり）の場合は，
-この空白$g$は「文字コード\texttt{'parbdd'}の文字」と\textit{Np}の間に入るglue/kernである．
+この空白$g$は「文字コード\texttt{'parbdd'}の文字」と\textit{Np}の間に入るグルー／カーンである．
 \item そうでないとき（\verb+noindent+で開始された段落や水平ボックス）は，
-$g$は「文字コード\texttt{'boxbdd'}の文字」と\textit{Np}の間に入るglue/kernである．
+$g$は「文字コード\texttt{'boxbdd'}の文字」と\textit{Np}の間に入るグルー／カーンである．
 \end{enumerate}
 ただし，もし$g$がglueであった場合，この挿入によって\textit{Np}による行分割が新たに可能になるべきではない．
 そこで，以下の場合には，$g$の直前に\verb+\penalty10000+を挿入する：
@@ -4031,7 +4118,7 @@ $g$は「文字コード\texttt{'boxbdd'}の文字」と\textit{Np}の間に入�
 
 \paragraph{末尾の処理}
 末尾の処理は，問題のリストが段落のものか水平ボックスのものかによって異なる．
-後者の場合は容易い：最後のクラスタを\textit{Nq}とおくと，\textit{Nq}と「文字コード\texttt{'boxbdd'}の文字」の間に入るglue/kernを，
+後者の場合は容易い：最後のクラスタを\textit{Nq}とおくと，\textit{Nq}と「文字コード\texttt{'boxbdd'}の文字」の間に入るグルー／カーンを，
 \textit{Nq}の直後に挿入するのみである．
 
 一方．前者（段落）の場合は，リストの末尾は常に\verb+\penalty10000+と，
@@ -4077,16 +4164,16 @@ $g$は「文字コード\texttt{'boxbdd'}の文字」と\textit{Np}の間に入�
 \item もし両クラスタの間で\verb+\inhibitglue+が実行されていた場合（証としてwhatsitノードが自動挿入される），
       代わりに\Param{kanjiskip}が挿入されることとなる．次へ．
 \item \textit{Nq}と\textit{Np}が同じJFM・同じ\texttt{jfmvar}キー・同じサイズの和文フォントであったならば，
-      共通に使っているJFM内で挿入される空白 (glue or kern) が決まっているか調べる．
+      共通に使っているJFM内で挿入される空白（グルーかカーン）が決まっているか調べる．
 \item 1.でも2.でもない場合は，\textit{Nq}と\textit{Np}が違うJFM/\texttt{jfmvar}/サイズである．
 この場合，まず
 \[
 \vcenter{\halign{\hfil$#:={}$&(\inhibitglue#\inhibitglue)\cr
-gb&\textit{Nq}と「文字コードが{\tt'diffmet'}の文字」との間に入るglue/kern\cr
-ga&「文字コードが{\tt'diffmet'}の文字」と\textit{Np}との間に入るglue/kern\cr
+gb&\textit{Nq}と「文字コードが{\tt'diffmet'}の文字」との間に入るグルー／カーン\cr
+ga&「文字コードが{\tt'diffmet'}の文字」と\textit{Np}との間に入るグルー／カーン\cr
 }}
 \]
-として，左側由来・右側由来の空白 (glue/kern) を（それぞれのJFMから）求める．
+として，左側由来・右側由来の空白（グルー／カーン）を（それぞれのJFMから）求める．
 $\mathit{ga}$と$\mathit{gb}$のどちらか片方が未定義であるならば，定義されている側の値をそのまま採用する．
 もし$\mathit{ga}$と$\mathit{gb}$が両方決まっているならば，両者の値を平均\footnote{\Param{differentjfm}パラメタの
 値によって，「大きい方」「小さい方」「合計」に変えることができる．}した値を採用する．
@@ -4110,7 +4197,7 @@ $q$と$r$の間は（実フォントが同じなのに）\texttt{jfmvar}キー�
 \item[\Param{kanjiskip}~{[K]}] 上の[M]において空白が定まらなかった場合，
 \Param{kanjiskip}の値を以下で定め，それを「右空白」として採用する．
 この段階においては，\verb+\inhibitglue+は効力を持たないため，
-結果として，2つの和文文字間には常に何らかのglue/kernが挿入されることとなる．
+結果として，2つの和文文字間には常に何らかのグルー／カーンが挿入されることとなる．
 \begin{enumerate}
 \item 両クラスタ（厳密には$\mathit{Nq}.\mathit{tail}$，$\mathit{Np}.\mathit{head}$）の中身の文字コードに対する
 \Param{autospacing}パラメタが両方ともfalseだった場合は，長さ0のglueとする．
@@ -4128,9 +4215,9 @@ JFM由来の値だけを用いる．もし両者で使われているJFMが異�
 \textit{Nq}と\textit{Np}の間で行分割が起きたときに，
 \textit{Nq}と行末の間に入る空白である．ぶら下げ組の組版などに用いられることを期待している．
 \begin{enumerate}
-\item 既に算出した「右空白」がkernである場合は，「左空白」は挿入されない．
+\item 既に算出した「右空白」がカーンである場合は，「左空白」は挿入されない．
 \item 「右空白」がglueか未定義（長さ0のglueとみなす）の場合は，「左空白」は
-\textit{Nq}と「文字コード\texttt{'lineend'}の文字」との間に入るkernとして，JFMから決定される．
+\textit{Nq}と「文字コード\texttt{'lineend'}の文字」との間に入るカーンとして，JFMから決定される．
 \item 2.で決まった「左空白」の長さが0でなければ，その分だけ先ほど算出した「右空白」の自然長を引く．
 \end{enumerate}
 \end{description}
@@ -4156,10 +4243,10 @@ $a$は禁則処理用に\textit{Nq}と\textit{Np}の間に加えられるべき�
 「右空白」の（もし未定義なら\textit{Np}の）直前に挿入……
 ということになるが，実際には僅かにこれより複雑である．
 \begin{itemize}
-\item 「右空白」がkernであるとき，
+\item 「右空白」がカーンであるとき，
 それは「\textit{Nq}と\textit{Np}の間で改行は許されない」ことを意図している．そのため，
 この場合は$a\neq 0$であってもペナルティの挿入はしない．
-\item 「左空白」がkernとしてきっちり定義されている時（このとき，「右空白」はkernでない），
+\item 「左空白」がカーンとしてきっちり定義されている時（このとき，「右空白」はカーンでない），
 この「左空白」の直後での行分割を許容しないといけないので，$a=0$であっても
 \textit{penalty\_node}を作って挿入する．
 \item 以上のどれでもないときは，$a\neq 0$ならば\textit{penalty\_node}を作って挿入する．
@@ -4169,7 +4256,8 @@ $a$は禁則処理用に\textit{Nq}と\textit{Np}の間に加えられるべき�
 \def\gkf#1#2#3{\sf$\displaystyle\vphantom{\Bigg(}%
   \frac{\hbox to 1\zw{#1}\hbox to 4.5\zw{\hss #2}}{\hbox{#3}}$}
 \begin{table}[t]
-\caption{Summary of JFM glues}
+%<en>\caption{Summary of JFM glues.}
+%<ja>\caption{JFM グルーの概要．}
 \label{tab-jfmglue}
 \begin{center}
 \small
@@ -4197,18 +4285,42 @@ kern&\gkf{E}{\OB}{PS}\\
 \end{tabular}
 \end{center}
 \begin{quote}
+%<*en>
 Here {\small\gkf{E}{M→K}{PN}} means that
+%</en>
+%<*ja>
+ここで {\small\gkf{E}{M→K}{PN}} は次の意味である：
+%</ja>
 \begin{enumerate}
+%<*en>
 \item To determine the `right-space', \LuaTeX-ja first attempts by the method `\textsf{JFM-origin~[M]}'.
 If this attempt fails, \LuaTeX-ja use the method `\textsf{\Param{kanjiskip}~[K]}'.
+%</en>
+%<*ja>
+\item 「右空白」を決めるために，\LuaTeX-ja はまず「JFM由来{[M]}」の方法を試みる．
+  これが失敗したら，\LuaTeX-ja は「\Param{kanjiskip}~{[K]}」の方法を試みる．
+%</ja>
+
+%<*en>
 \item The `left space' between \textit{Nq}~and~\textit{Np} is determined by the method `\textsf{line-end~[E]}'.
+%</en>
+%<*ja>
+\item \textit{Nq} と \textit{Np} の間の「左空白」は「\textsf{line-end~[E]}」の
+  方法で決定される．
+%</ja>
+
+%<*en>
 \item \LuaTeX-ja adopts the method `\textsf{P-normal~[PN]}' to adjust the penalty between two clusters for \emph{kinsoku shori}.
+%</en>
+%<*ja>
+\item \LuaTeX-ja は2つのクラスタの間の禁則処理用のペナルティを調節するために「\textsf{P-normal~[PN]}」の方法を採用する．
+%</ja>
 \end{enumerate}
 \end{quote}
 \end{table}
 
 \subsection{その他の場合}
-本節の内容は表\ref{tab-jfmglue}にまとめてある．
+本節の内容は表 \ref{tab-jfmglue} にまとめてある．
 
 \paragraph{和文Aと欧文の間}
 \textit{Nq}が\textsf{和文A}で，\textit{Np}が\textsf{欧文}の場合，JFMグルー挿入処理は次のようにして行われる．
@@ -4226,7 +4338,7 @@ If this attempt fails, \LuaTeX-ja use the method `\textsf{\Param{kanjiskip}~[K]}
 \begin{enumerate}
 \item もし両クラスタの間で\verb+\inhibitglue+が実行されていた場合（証としてwhatsitノードが自動挿入される），次へ．
 \item そうでなければ，
-\textit{Nq}と「文字コードが{\tt'jcharbdd'}の文字」との間に入るglue/kernとして定まる．
+\textit{Nq}と「文字コードが{\tt'jcharbdd'}の文字」との間に入るグルー／カーンとして定まる．
 \end{enumerate}
 \item[\Param{xkanjiskip}~{[X]}]
 この段階では，\textsf{\Param{kanjiskip}~[K]}のときと同じように，
@@ -4265,12 +4377,12 @@ If this attempt fails, \LuaTeX-ja use the method `\textsf{\Param{kanjiskip}~[K]}
 \begin{enumerate}
 \item もし両クラスタの間で\verb+\inhibitglue+が実行されていた場合（証としてwhatsitノードが自動挿入される），次へ．
 \item そうでなければ，
-「文字コードが{\tt'jcharbdd'}の文字」と\textit{Np}との間に入るglue/kernとして定まる．
+「文字コードが{\tt'jcharbdd'}の文字」と\textit{Np}との間に入るグルー／カーンとして定まる．
 \end{enumerate}
 \end{description}
 
-\paragraph{和文Aと箱・glue・kernの間}
-\textit{Nq}が\textsf{和文A}で，\textit{Np}が\textsf{箱}・glue・kernのいずれかであった場合，
+\paragraph{和文Aと箱・グルー・カーンの間}
+\textit{Nq}が\textsf{和文A}で，\textit{Np}が\textsf{箱}・グルー・カーンのいずれかであった場合，
 両者の間に挿入されるJFMグルーについては同じ処理である．しかし，そこでの行分割に対する仕様が異なるので，
 ペナルティの挿入処理は若干異なったものとなっている．
 
@@ -4288,8 +4400,8 @@ If this attempt fails, \LuaTeX-ja use the method `\textsf{\Param{kanjiskip}~[K]}
 \item[箱] \textit{Np}が\textsf{箱}であった場合は，両クラスタの間での行分割は
 （明示的に両クラスタの間に\verb+\penalty10000+があった場合を除き）いつも許容される．そのため，
 ペナルティ処理は，後に述べる\textsf{P-allow~[PA]}が\textsf{P-normal~[PN]}の代わりに用いられる．
-\item[glue] \textit{Np}がglueの場合，ペナルティ処理は\textsf{P-normal~[PN]}を用いる．
-\item[kern] \textit{Np}がkernであった場合は，両クラスタの間での行分割は
+\item[グルー] \textit{Np}がグルーの場合，ペナルティ処理は\textsf{P-normal~[PN]}を用いる．
+\item[カーン] \textit{Np}がカーンであった場合は，両クラスタの間での行分割は
 （明示的に両クラスタの間にペナルティがあった場合を除き）許容されない．
 ペナルティ処理は，後に述べる\textsf{P-suppress~[PS]}を使う．
 \end{description}
@@ -4307,8 +4419,8 @@ If this attempt fails, \LuaTeX-ja use the method `\textsf{\Param{kanjiskip}~[K]}
 そのために，以下の場合に$a$をもつ\textit{penalty\_node}を作って
 「右空白」の（もし未定義なら\textit{Np}の）直前に挿入する：
 \begin{itemize}
-\item 「右空白」がglueでない（kernか未定義）であるとき．
-\item 「左空白」がkernとしてきっちり定義されている時．
+\item 「右空白」がグルーでない（カーンか未定義）であるとき．
+\item 「左空白」がカーンとしてきっちり定義されている時．
 \end{itemize}
 
 \item[P-suppress~{[PS]}]
@@ -4321,7 +4433,7 @@ If this attempt fails, \LuaTeX-ja use the method `\textsf{\Param{kanjiskip}~[K]}
 そのため，「右空白」がglueであれば，その直前に\verb+\penalty10000+を挿入する．
 \end{description}
 
-なお，「右空白」はkern，「左空白」は未定義の
+なお，「右空白」はカーン，「左空白」は未定義の
 \[
  \overbrace{\Node{glyph}{`あ'}}^{\mathit{Nq}}\longrightarrow \overbrace{\Node{glue}{1\,pt}}^{\mathit{Np}}
 \]
@@ -4345,8 +4457,8 @@ If this attempt fails, \LuaTeX-ja use the method `\textsf{\Param{kanjiskip}~[K]}
 \footnote{kern$\rightarrow$glueが1つの行分割可能点(行分割に伴うペナルティは0)
 であるため，たとえ$a=10000$であっても，\textit{Nq}と\textit{Np}の間で行分割を禁止することはできない．}．
 
-\paragraph{箱・glue・kernと和文Aの間}
-\textit{Np}が\textsf{箱}・glue・kernのいずれかで，\textit{Np}が\textsf{和文A}であった場合は，
+\paragraph{箱・グルー・カーンと和文Aの間}
+\textit{Np}が\textsf{箱}・グルー・カーンのいずれかで，\textit{Np}が\textsf{和文A}であった場合は，
 すぐ上の（\textit{Nq}と\textit{Np}の順序が逆になっている）場合とほぼ同じであるが，「左空白」がなくなることにのみ注意．
 \begin{itemize}
 \item 「右空白」については，既に述べた\textsf{Boundary-A~[\OA]}により空白を決定しようと試みる．
@@ -4359,8 +4471,8 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 \]
 \begin{description}
 \item[箱] \textit{Nq}が\textsf{箱}の場合は，\textsf{P-allow~[PA]}を用いる．
-\item[glue] \textit{Nq}がglueの場合は，\textsf{P-normal~[PN]}を用いる．
-\item[kern] \textit{Nq}がkernの場合は，\textsf{P-suppress~[PS]}を用いる．
+\item[グルー] \textit{Nq}がグルーの場合は，\textsf{P-normal~[PN]}を用いる．
+\item[カーン] \textit{Nq}がカーンの場合は，\textsf{P-suppress~[PS]}を用いる．
 \end{description}
 \end{itemize}
 
@@ -4377,7 +4489,7 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 \Param{kanjiskip}~\textsf{[K]}の挿入を行う．
 \item \textsf{和文B}の2つのクラスタの間には，\Param{kanjiskip}~\textsf{[K]}が自動的に入る．
 \end{itemize}
-\item \textsf{和文B}と箱・glue・kernが隣接したとき（どちらが前かは関係ない），間にJFMグルー・ペナルティの挿入は一切しない．
+\item \textsf{和文B}と箱・グルー・カーンが隣接したとき（どちらが前かは関係ない），間にJFMグルー・ペナルティの挿入は一切しない．
 \item \textsf{和文B}と\textsf{和文B}，また\textsf{和文B}と\textsf{欧文}とが隣接した時は，禁則用ペナルティ挿入処理は
 \textsf{P-suppress~[PS]}が用いられる．
 \item \textsf{和文B}の文字に対する\Param{prebreakpenalty},~\Param{postbreakpenalty}の値は使われず，0として計算される．
