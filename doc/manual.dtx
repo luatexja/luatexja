@@ -85,7 +85,8 @@
 
 %<*en>
 \textbf{This documentation is far from complete. It may have many
-grammatical (and contextual) errors.}
+grammatical (and contextual) errors.} Also, several parts
+(especially, Section~\ref{sec-jfmglue}) are written in Japanese only.
 %</en>
 %<*ja>
 \textbf{\large 本ドキュメントはまだまだ未完成です．}
@@ -246,7 +247,7 @@ The followings are major changes from \pTeX:
 %</ja>
 
 %<*en>
-\item \emph{Caution: due to above two points, many methods which did the
+\item \emph{Caution: due to above two points, many methods which did for the
       dividing the process of the insertion of \textbf{JAglue} in \pTeX\ are not
       effective anymore.} In concrete terms, the following two methods are not effective anymore:
 %</en>
@@ -456,6 +457,22 @@ If you are using \TeX~Live~2011 or current W32\TeX, you don't have to worry.
 %<*ja>
 \item \LuaTeX-ja のソースアーカイブ（もちろん \texttt{:)}）．
 %</ja>
+%<*en>
+\item The \Pkg{filehook} package.
+%</en>
+%<*ja>
+\item \Pkg{filehook} パッケージ．
+%</ja>
+%<*en>
+\item The \Pkg{xunicode} package, which version is \emph{just v0.981 (2011/09/09)}.\\
+If you have the \Pkg{fontspec} package, this \Pkg{xunicode} package must be exist.
+But be careful about the version; other versions may not work correctly with \LuaTeX-ja.
+%</en>
+%<*ja>
+\item \Pkg{xunicode} パッケージ (\textbf{2011/09/09,~v0.981})．\\
+\Pkg{fontspec} パッケージが導入されていればこのパッケージも導入されているはずであるが，
+この v0.981 以外のバージョンでは\LuaTeX-ja 上で正しく動作しない危険性がある．
+%</ja>
 \end{itemize}
 
 %<*en>
@@ -482,7 +499,7 @@ The installation methods are as follows:
 $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
 \end{verbatim}
 %<*en>
-      or download the archive of HEAD in \texttt{master} branch from
+      or download the archive of HEAD in the \texttt{master} branch from
 %</en>
 %<*ja>
       もしくは，\texttt{master} ブランチの HEAD のアーカイブを以下からダウンロードしてもよい：
@@ -492,7 +509,7 @@ $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
 \end{flushleft}
 
 %<*en>
-Note that the forefront of development may not be in \texttt{master} branch.
+Note that the forefront of development may not be the \texttt{master} branch.
 %</en>
 %<*ja>
 \texttt{master} ブランチはたまにしか更新されない．
@@ -509,10 +526,15 @@ Note that the forefront of development may not be in \texttt{master} branch.
 %</ja>
 
 %<*en>
-\item Copy all the contents of \texttt{src/} into one of your \texttt{TEXMF} tree.
+\item Copy all the contents of \texttt{src/} (except \texttt{src/no\_runtime/}) into one of your \texttt{TEXMF} tree.\\
+      \texttt{TEXMF/tex/luatex/luatexja/} is an example location. 
+      Files in \texttt{src/no\_runtime/} are not required for the regular use, 
+      so you may simply remove \texttt{src/no\_runtime/}.
 %</en>
 %<*ja>
-\item \texttt{src/} の中身全てを自分の \texttt{TEXMF} ツリーにコピーする．
+\item \texttt{src/} の中身で，（\texttt{src/no\_runtime/}以外の）全てを自分の \texttt{TEXMF} ツリーにコピーする．\\
+      場所の例としては，例えば \texttt{TEXMF/tex/luatex/luatexja/} がある．
+      \texttt{src/no\_runtime/} 中のファイルは通常の使用には必要ないので，単に削除して構わない．
       シンボリックリンクが利用できる環境で，かつレポジトリを直接取得したのであれば，コピーではなく
       リンクを貼るのが適切だろう．
 %</ja>
@@ -1018,41 +1040,6 @@ these 7~commands, since this feature and \textbf{JAglue} will clash (see
 feature が \textbf{JAglue} と衝突するためである（\ref{para-kern} 節を参照）．
 %</ja>
 
-%<*en>
-\paragraph{Caution}
-\Pkg{xunicode} package will be reloaded during the loading of \Pkg{luatexja-fontspec} package.
-However, this reloading won't work for the current version (2011/09/09,~v0.981) of
-\Pkg{xunicode} package. Hence we have to patch it, using the following patch, for example:
-%</en>
-%<*ja>
-\paragraph{注意}
-\Pkg{luatexja-fontspec}パッケージでは，内部で \Pkg{xunicode} パッケージの再読み込みを
-行っているが， \textbf{\TeX\ Live\ 2011 他に含まれている \Pkg{xunicode} パッケージ
-(2011/09/09,~v0.981) ではその再読み込みがうまく動作せず}，例えば
-以下のようなパッチを当てる必要がある：
-%</ja>
-\begin{lstlisting}
---- xunicode.sty.orig   2011-09-12 08:31:47.000000000 +0900
-+++ xunicode.sty        2011-11-16 22:06:17.061413113 +0900
-@@ -1475,7 +1475,11 @@
-
- \newtoks\tipasavetokens
- \newtoks\tipachecktokens
-+
-+\fi
- \newif\iftipaonetoken
-+\expandafter\ifx\csname ReloadXunicode\endcsname\relax
-+
- \def\tipalasttoken{!@! do nothing with this !@!}
- \def\tipacatchonechar#1{\begingroup
-  \def\textipa##1{##1}% prevent recursion
-\end{lstlisting}
-%<*ja>
-なお，上流で v0.984 (2011/10/14) でこの問題は修正されているそうです（が，2012/03/20
-現在，まだ CTAN には上がっていない）．
-%</ja>
-
-
 %<en>\section{Changing Parameters}
 %<ja>\section{パラメータの変更}
 
@@ -1492,7 +1479,7 @@ The block list is indicated in Table~\ref{table-rng7}.
       発行されていれば，このグルーは挿入されない．
 %</ja>
 %<*en>
-\item The default glue which inserted between two \textbf{JAchar}s (\Param{
+\item The default glue which inserted between two \textbf{JAchar}s (\Param{%
       kanjiskip}).
 %</en>
 %<*ja>
@@ -3177,7 +3164,7 @@ but please remind remarks below.
 %</en>
 %<*ja>
 文字コードが（16進で）<hex\_number> の文字を出力する．
-このコマンドは \verb+\char"+<hex\_number> と似ているが，下の記述に注意すること．
+このコマンドは \verb+\char"+<hex\_number> と似ているが，下の記述に注意すること．%"
 %</ja>
 \end{list}
 
@@ -3858,9 +3845,9 @@ u
 
 %<en>\section{Insertion of JFM glues, \Param{kanjiskip} and \Param{xkanjiskip}}
 %<ja>\section{JFM グルーの挿入，\Param{kanjiskip} と \Param{xkanjiskip}}
+\label{sec-jfmglue}
 %<en>\subsection{Overview}
 %<ja>\subsection{概要}
-
 
 \LuaTeX-ja における和文処理グルーの挿入方法は，\pTeX のそれとは全く異なる．
 \pTeX では次のような仕様であった：
