@@ -1,0 +1,49 @@
+The LuaTeX-ja Package 2012/04/19
+--------------------------------
+Copyright 2011--2012 The LuaTeX-ja project
+
+LuaTeX-ja is a macro package for typesetting Japanese documents with LuaTeX.
+This package is highly affected by ASCII pTeX engine, but not a porting of it.
+
+Note that this package is still *alpha-stage*; documentations are not complete
+and specifications are subject to change. Documentations are located at
+  doc/man-en.pdf (en), doc/man-ja.pdf (ja), doc/manual-zh.pdf (zh).
+
+LuaTeX-ja is developed on
+  <http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage(en)>.
+If you have questions/requests/bugs, please contact the project members via
+links found in the page above. 
+
+
+
+Installation
+------------
+
+0. Please make sure that your TeX distribution is up-to-date. 
+   Needed (additional) packages are:
+   - xunicode.sty v0.981
+   - filehook.sty
+1. If you use TeX Live 2011 or later, you can install LuaTeX-ja via tlmgr.
+2. If you must/want to install manually:
+   a. Download the source archive from CTAN, or HEAD in the Git repository by
+      <http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git
+                                                    ;a=snapshot;h=HEAD;sf=tgz>
+   b. Extract the archive and put src/ into your TEXMF tree.
+      An example location is TEXMF/tex/luatex/luatexja.
+   c. Files in src/no_runtime/ are not used in the regular use, 
+      so you can remove them.
+   d. You may need to update the filename database, by 'mktexlsr' or something.
+
+
+Basic Usage
+-----------
+
+LuaTeX-ja supports both the plain format and LaTeX2e.
+Simply loading luatexja.sty by \input or \usepackage does the minimal setting.
+
+- If you want to create Japanese-based documents, you can consider the use of 
+  ltj{article,book,report}.cls or ltjs{article,book}.cls.
+- If you want to use the fontspec package, please load luatexja-fontspec.sty.
+  It defines control sequences such as \setmainjfont, setsansjfont and 
+  \jfontspec, which can be used for specifying Japanese fonts.
+
