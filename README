@@ -1,6 +1,6 @@
-The LuaTeX-ja Package 2012/04/19
+The LuaTeX-ja Package 20120419.0
 --------------------------------
-Copyright 2011--2012 The LuaTeX-ja project
+Copyright (c) 2011--2012 The LuaTeX-ja project
 
 LuaTeX-ja is a macro package for typesetting Japanese documents with LuaTeX.
 This package is highly affected by ASCII pTeX engine, but not a porting of it.
@@ -11,8 +11,9 @@ and specifications are subject to change. Documentations are located at
 
 LuaTeX-ja is developed on
   <http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage(en)>.
-If you have questions/requests/bugs, please contact the project members via
-links found in the page above. 
+If you recognise questions/requests or bugs, we would like you to make a
+thread in the forum or a ticket in the bug tracking system for that in the way
+which SourceForge.jp supplies, via links found in the page above.
 
 
 
