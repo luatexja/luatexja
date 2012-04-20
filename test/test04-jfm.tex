@@ -83,7 +83,7 @@
 \def\dumplist#1{\par\noindent\leavevmode
 \hbox to 0.2\hsize{\copy#1\hss}%
 \vbox{\hsize=0.6\hsize\sixtt\baselineskip=7.2pt\sixgt\let\\=\relax
-\directlua{ltj.ext_show_node_list(tex.getbox(#1).head, '\\par ', tex.print)}\hrule}}
+\directlua{luatexja.ext_show_node_list(tex.getbox(#1).head, '\\par ', tex.print)}\hrule}}
 
 %\tracingonline=1\tracingoutput=1\showboxdepth=3\showboxbreadth=100
 

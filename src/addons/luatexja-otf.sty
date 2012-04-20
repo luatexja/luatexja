@@ -64,13 +64,13 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-otf}[2011/09/09 v0.1]
+  \ProvidesPackage{luatexja-otf}[2012/4/20 v0.2]
 \fi                             %</LaTeX>
 
 % Load core module if not yet.
 \ifx\luatexjacoreLoaded\@undefined
   \ifltj@in@latex                 %<*LaTeX>
-    \RequirePackage{luatexja-core}[2011/04/01]
+    \RequirePackage{luatexja-core}[2012/04/20]
   \else                           %<*!LaTeX>
     \input luatexja-core.sty %
   \fi                             %</LaTeX>
@@ -83,7 +83,7 @@
 
 %%------------------
 %! Main part of luatexja-otf
-\RequireLuaModule{luatexja.otf}
+\directlua{luatexja.load_module('otf')}
 
 \newcount\ltj@tempcnta
 

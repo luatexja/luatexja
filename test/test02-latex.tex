@@ -1,6 +1,6 @@
 %#! lualatex
 \documentclass{ltjsarticle}
-\nonstopmode
+%\nonstopmode
 
 \makeatletter
 
@@ -85,7 +85,7 @@ font series `ix': 欧文は未定義，和文は機械的斜体．
 
 \newpage{\obeylines\tt
 \setbox0=\hbox{\gt\textsl{あいう■\textup{■え■}■おかき}}
-\directlua{ltj.ext_show_node_list(tex.box[0].head, '', tex.print)}\par}
+\directlua{luatexja.ext_show_node_list(tex.box[0].head, '', tex.print)}\par}
 
 \bigskip
 

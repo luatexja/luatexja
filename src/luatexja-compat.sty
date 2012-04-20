@@ -84,7 +84,7 @@
 % Load core module if not yet.
 \ifx\luatexjacoreLoaded\@undefined
   \ifltj@in@latex                 %<*LaTeX>
-    \RequirePackage{luatexja-core}[2011/04/01]
+    \RequirePackage{luatexja-core}[2012/04/20]
   \else                           %<*!LaTeX>
     \input luatexja-core.sty %
   \fi                             %</LaTeX>
@@ -104,9 +104,11 @@
 % not yet implemented.
 
 %%------------------
-%! これ以降に LuaTeX 用の compat の内容を入れる.
-\RequireLuaModule{luatexja.jisx0208} %% JIS X 0208 => unicode のテーブル
-\RequireLuaModule{luatexja.compat}
+
+\directlua{
+  luatexja.load_module('jisx0208');
+  luatexja.load_module('compat');
+}
 
 \def\euc{\ltj@code@conv{euc}}
 \def\kuten{\ltj@code@conv{kuten}}
@@ -115,7 +117,7 @@
 \def\ucs{\ltj@code@conv{ucs}}
 
 \def\ltj@code@conv#1{%
-  \directlua{ luatexja._cc_next = luatexja.compat.from_#1 }%
+  \directlua{luatexja._cc_next = luatexja.compat.from_#1 }%
   \ltj@code@convA
 }
 \def\ltj@code@convA{%
@@ -123,15 +125,16 @@
    \ltj@code@convB\ltj@grab@num
 }
 \def\ltj@code@convB#1{%
-  \directlua{ luatexja._cc_next(\ltj@safe@num{#1}) }%
+  \directlua{luatexja._cc_next(\ltj@safe@num{#1}) }%
 }
 
 \def\kansuji{%
+\tracingall
   \expandafter\expandafter\expandafter
    \ltj@kansujiA\ltj@grab@num
 }
 \def\ltj@kansujiA#1{%
-  \directlua{ luatexja.compat.to_kansuji(\ltj@safe@num{#1}) }%
+  \directlua{luatexja.compat.to_kansuji(\ltj@safe@num{#1}) }%
 }
 \define@key[ltj]{japaram}{kansujichar}{%
   \expandafter\ltj@@set@stack#1:{ksj}{0}{0x7FFFFFFF}}

@@ -1,14 +1,37 @@
+
+local floor = math.floor
+
 require('lualibs')
-require('luatexja.rmlgbm');    local ltjr = luatexja.rmlgbm -- must be 1st
-require('luatexja.base');      local ltjb = luatexja.base
-require('luatexja.charrange'); local ltjc = luatexja.charrange
-require('luatexja.jfont');     local ltjf = luatexja.jfont
-require('luatexja.inputbuf');  local ltji = luatexja.inputbuf
-require('luatexja.jfmglue');   local ltjj = luatexja.jfmglue
-require('luatexja.math');      local ltjm = luatexja.math
-require('luatexja.pretreat');  local ltjp = luatexja.pretreat
-require('luatexja.stack');     local ltjs = luatexja.stack
-require('luatexja.setwidth');  local ltjw = luatexja.setwidth
+
+------------------------------------------------------------------------
+-- naming:
+--    ext_... : called from \directlua{}
+--    int_... : called from other Lua codes, but not from \directlua{}
+--    (other)     : only called from this file
+
+function luatexja.load_lua(fn)
+   local found = kpse.find_file(fn, 'tex')
+   if not found then
+      error("File `" .. fn .. "' not found")
+   else 
+      texio.write('(' .. found .. ')')
+      require(found)
+   end
+end
+
+local load_module = luatexja.load_module
+load_module('base');      local ltjb = luatexja.base
+load_module('rmlgbm');    local ltjr = luatexja.rmlgbm -- must be 1st
+load_module('charrange'); local ltjc = luatexja.charrange
+load_module('jfont');     local ltjf = luatexja.jfont
+load_module('inputbuf');  local ltji = luatexja.inputbuf
+load_module('stack');     local ltjs = luatexja.stack
+load_module('pretreat');  local ltjp = luatexja.pretreat
+load_module('jfmglue');   local ltjj = luatexja.jfmglue
+load_module('setwidth');  local ltjw = luatexja.setwidth
+load_module('math');      local ltjm = luatexja.math
+load_module('tangle');    local ltjb = luatexja.base
+
 
 local node_type = node.type
 local node_new = node.new
@@ -49,30 +72,20 @@ local PROCESSED = 8
 local IC_PROCESSED = 9
 local BOXBDD = 15
 
-------------------------------------------------------------------------
--- naming:
---    ltj.ext_... : called from \directlua{}
---    ltj.int_... : called from other Lua codes, but not from \directlua{}
---    (other)     : only called from this file
-
--- error messages
-function ltj.error(s,t)
-  tex.error('LuaTeX-ja error: ' .. s ,t) 
-end
 
 -- Three aux. functions, bollowed from tex.web
 local unity=65536
-function print_scaled(s)
+local function print_scaled(s)
    local out=''
    local delta=10
    if s<0 then 
       out=out..'-'; s=-s
    end
-   out=out..tostring(math.floor(s/unity)) .. '.'
+   out=out..tostring(floor(s/unity)) .. '.'
    s=10*(s%unity)+5
    repeat
       if delta>unity then s=s+32768-50000 end
-      out=out .. tostring(math.floor(s/unity)) 
+      out=out .. tostring(floor(s/unity)) 
       s=10*(s%unity)
       delta=delta*10
    until s<=delta
@@ -113,7 +126,7 @@ function math.two_average(a,b) return (a+b)/2 end
 ------------------------------------------------------------------------
 
 -- EXT: print parameters that don't need arguments
-function ltj.ext_get_parameter_unary(k)
+function luatexja.ext_get_parameter_unary(k)
    if k == 'yalbaselineshift' then
       tex.write(print_scaled(tex.getattribute('ltj@yablshift'))..'pt')
    elseif k == 'yjabaselineshift' then
@@ -143,8 +156,9 @@ function ltj.ext_get_parameter_unary(k)
    end
 end
 
+
 -- EXT: print parameters that need arguments
-function ltj.ext_get_parameter_binary(k,c)
+function luatexja.ext_get_parameter_binary(k,c)
    if k == 'jacharrange' then
       if c<0 or c>216 then 
 	 ltjb.package_error('luatexja',
@@ -178,8 +192,8 @@ function ltj.ext_get_parameter_binary(k,c)
 end
 
 -- EXT: print \global if necessary
-function ltj.ext_print_global()
-  if ltj.isglobal=='global' then tex.sprint(cat_lp, '\\global') end
+function luatexja.ext_print_global()
+  if isglobal=='global' then tex.sprint(cat_lp, '\\global') end
 end
 
 -- main process
@@ -191,28 +205,25 @@ local function main_process(head, mode, dir)
    return p
 end
 
+-- callbacks
+
+luatexbase.add_to_callback('pre_linebreak_filter', 
+   function (head,groupcode)
+      return main_process(head, true, tex.textdir)
+   end,'ltj.pre_linebreak_filter',
+   luatexbase.priority_in_callback('pre_linebreak_filter',
+				   'luaotfload.pre_linebreak_filter') + 1)
+luatexbase.add_to_callback('hpack_filter', 
+  function (head,groupcode,size,packtype, dir)
+     return main_process(head, false, dir)
+  end,'ltj.hpack_filter',
+   luatexbase.priority_in_callback('hpack_filter',
+				   'luaotfload.hpack_filter') + 1)
 
 -- debug
 local debug_depth
-function ltj.ext_show_node_list(head,depth,print_fn)
-   debug_depth = depth
-   if head then
-      while head do
-	 debug_show_node_X(head, print_fn); head = node_next(head)
-      end
-   else
-      print_fn(debug_depth .. ' (null list)')
-   end
-end
-function ltj.ext_show_node(head,depth,print_fn)
-   debug_depth = depth
-   if head then
-      debug_show_node_X(head, print_fn)
-   else
-      print_fn(debug_depth .. ' (null list)')
-   end
-end
-function debug_show_node_X(p,print_fn)
+
+local function debug_show_node_X(p,print_fn)
    local k = debug_depth
    local s
    local pt=node_type(p.id)
@@ -233,7 +244,7 @@ function debug_show_node_X(p,print_fn)
       if p.glue_sign >= 1 then 
 	 s = s .. ' glue set '
 	 if p.glue_sign == 2 then s = s .. '-' end
-	 s = s .. tostring(math.floor(p.glue_set*10000)/10000)
+	 s = s .. tostring(floor(p.glue_set*10000)/10000)
 	 if p.glue_order == 0 then 
 	    s = s .. 'pt' 
 	 else 
@@ -319,19 +330,21 @@ function debug_show_node_X(p,print_fn)
    end
    p=node_next(p)
 end
-
-
--- callbacks
-
-luatexbase.add_to_callback('pre_linebreak_filter', 
-   function (head,groupcode)
-      return main_process(head, true, tex.textdir)
-   end,'ltj.pre_linebreak_filter',
-   luatexbase.priority_in_callback('pre_linebreak_filter',
-				   'luaotfload.pre_linebreak_filter') + 1)
-luatexbase.add_to_callback('hpack_filter', 
-  function (head,groupcode,size,packtype, dir)
-     return main_process(head, false, dir)
-  end,'ltj.hpack_filter',
-   luatexbase.priority_in_callback('hpack_filter',
-				   'luaotfload.hpack_filter') + 1)
+function luatexja.ext_show_node_list(head,depth,print_fn)
+   debug_depth = depth
+   if head then
+      while head do
+	 debug_show_node_X(head, print_fn); head = node_next(head)
+      end
+   else
+      print_fn(debug_depth .. ' (null list)')
+   end
+end
+function luatexja.ext_show_node(head,depth,print_fn)
+   debug_depth = depth
+   if head then
+      debug_show_node_X(head, print_fn)
+   else
+      print_fn(debug_depth .. ' (null list)')
+   end
+end

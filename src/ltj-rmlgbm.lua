@@ -21,122 +21,27 @@ local path           = {
     localdir  = file.join(kpse.expand_var("$TEXMFVAR"), aux_dir),
     systemdir = file.join(kpse.expand_var("$TEXMFSYSVAR"), aux_dir),
 }
-local cid_replace = {
-   ["Adobe-Japan1"] = "UniJISX0213-UTF32",
-   ["Adobe-Korea1"] = "UniKS-UTF32",
-   ["Adobe-GB1"]    = "UniGB-UTF32",
-   ["Adobe-CNS1"]   = "UniCNS-UTF32",
-}
-
--- reading CID maps
-local line, fh, tt
-
-local function load_bf_char()
-   local cid, ucs, ucsa
-   line = fh:read("*l")
-   while line do
-      if line == "endcidchar" then 
-	 line = fh:read("*l"); return
-      else -- WMA l is in the form "<%x+>%s%d+"
-	 ucs, cid = string.match(line, "<(%x+)>%s+(%d+)")
-	 cid = tonumber(cid, 10); ucs = tonumber(ucs, 16); 
-	 if not tt[ucs]  then 
-	    tt[ucs] = { index = cid, width = 655360 } 
-	 end
-      end
-      line = fh:read("*l")
-   end
-end
-
-local function load_bf_range()
-   local bucs, eucs, cid
-   line = fh:read("*l")
-   while line do
-      if line == "endcidrange" then 
-	 line = fh:read("*l"); return
-      else -- WMA l is in the form "<%x+>%s+<%x+>"
-	 bucs, eucs, cid = string.match(line, "<(%x+)>%s+<(%x+)>%s+(%d+)")
-	 cid = tonumber(cid, 10); bucs = tonumber(bucs, 16); eucs = tonumber(eucs, 16);
-	 for ucs = bucs, eucs do
-	    if not tt[ucs]  then 
-	       tt[ucs] = { index = cid, width = 655360 }
-	    end
-	    cid = cid+1
-	 end
-      end
-      line = fh:read("*l")
-   end
-end
-
-local function make_cid_font()
-   cidfont_data[cid_name] = {
-      cidinfo = { ordering=cid_order, registry=cid_reg, supplement=cid_supp },
-      encodingbytes = 2, extend=1000, format = 'opentype',
-      direction = 0, characters = {}, parameters = {}, embedding = "no", cache = "yes", 
-      ascender = 0, descender = 0, factor = 0, hfactor = 0, vfactor = 0, 
-   }
-   tt = {}
-
-   -- Open
-   -- TODO: vertical fonts?
-   fh = io.open(kpse.find_file(cid_replace[cid_name] .. "-H", 'cmap files'), "r")
-   line = fh:read("*l")
-   while line do
-      if string.find(line, "%x+%s+begincidchar") then
-	 load_bf_char()
-      elseif string.find(line, "%x+%s+begincidrange") then
-	 load_bf_range()
-      else
-	 line = fh:read("*l")
-      end
-   end
-   fh:close();  cidfont_data[cid_name].characters = tt
-   cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
-
-   -- Save
-   local savepath  = path.localdir
-   if not lfs.isdir(savepath) then
-      dir.mkdirs(savepath)
-   end
-   savepath = file.join(savepath, "luatexja-cid-auto-" 
-			.. string.lower(cid_name)  .. ".lua")
-   if file.iswritable(savepath) then
-      table.tofile(savepath, cidfont_data[cid_name],'return', false, true, false )
-   else 
-      ltjb.package_warning('luatexja', 
-			   'failed to save informations of non-embedded 2-byte fonts', '')
-   end
-end
 
 -- 
 local function read_cid_font()
-   local names = {
-      "luatexja-cid-std-" .. string.lower(cid_name) .. ".lua",
-      "luatexja-cid-auto-" .. string.lower(cid_name) .. ".lua",
-   }
-   local s
-   for i,v in ipairs(names) do
-      local localpath  = file.join(path.localdir, v)
-      local systempath = file.join(path.systemdir, v)
-      local kpsefound  = kpse.find_file(v)
-      if kpsefound and file.isreadable(kpsefound) then
-	 cidfont_data[cid_name] = require(kpsefound)
-	 cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
-	 return
-      elseif file.isreadable(localpath)  then
-	 cidfont_data[cid_name] = require(localpath)
-	 cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
-	 return
-      elseif file.isreadable(systempath) then
-	 cidfont_data[cid_name] = require(systempath)
-	 cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
-	 return
-      end
+   local v = "ltj-cid-" .. string.lower(cid_name) .. ".lua"
+   local localpath  = file.join(path.localdir, v)
+   local systempath = file.join(path.systemdir, v)
+   local kpsefound  = kpse.find_file(v)
+   if kpsefound and file.isreadable(kpsefound) then
+      cidfont_data[cid_name] = require(kpsefound)
+      cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
+      return
+   elseif file.isreadable(localpath)  then
+      cidfont_data[cid_name] = require(localpath)
+      cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
+      return
+   elseif file.isreadable(systempath) then
+      cidfont_data[cid_name] = require(systempath)
+      cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
+      return
    end
-   -- Now we must create the virtual metrics from CMap.
-   ltjb.package_info('luatexja', 
-			'I try to generate informations of non-embedded 2-byte fonts...', '')
-   make_cid_font()
+   --
 end
 
 -- High-level
