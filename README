@@ -1,13 +1,14 @@
-The LuaTeX-ja Package 20120421.0
+The LuaTeX-ja Package 20120422.0
 --------------------------------
 Copyright (c) 2011--2012 The LuaTeX-ja project
+License: modified BSD (see COPYING)
 
 LuaTeX-ja is a macro package for typesetting Japanese documents with LuaTeX.
 This package is highly affected by ASCII pTeX engine, but not a porting of it.
 
 Note that this package is still *alpha-stage*; documentations are not complete
 and specifications are subject to change. Documentations are located at
-  doc/man-en.pdf (en), doc/man-ja.pdf (ja), doc/manual-zh.pdf (zh).
+  doc/luatexja-en.pdf (en), doc/luatexja-ja.pdf (ja), doc/luatexja-zh.pdf (zh).
 
 LuaTeX-ja is developed on
   <http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage(en)>.
@@ -16,22 +17,26 @@ thread in the forum or a ticket in the bug tracking system for that in the way
 which SourceForge.jp supplies, via links found in the page above.
 
 
-
 Installation
 ------------
 
 0. Please make sure that your TeX distribution is up-to-date.
    LuaTeX-ja (luatexja-fontspec.sty) requires xunicode.sty v0.981.
+
 1. If you use TeX Live 2011 or later, you can install LuaTeX-ja via tlmgr.
+
 2. If you must/want to install manually:
+
    a. Download the source archive from CTAN, or HEAD in the Git repository by
       <http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git
                                                     ;a=snapshot;h=HEAD;sf=tgz>
    b. Extract the archive and put src/ into your TEXMF tree.
       An example location is TEXMF/tex/luatex/luatexja.
-   c. Files in src/no_runtime/ are not used in the regular use,
-      so you can remove them.
-   d. You may need to update the filename database, by 'mktexlsr' or something.
+
+      If you are updating from old version, you MUST remove it before
+      extracting the new version of LuaTeX-ja.
+
+   c. You may need to update the filename database, by 'mktexlsr' or something.
 
 
 Basic Usage
