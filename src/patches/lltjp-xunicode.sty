@@ -75,17 +75,15 @@
 }
 % If unicode-math is already loaded, the following error occurs:
 %    ! Undefined control sequence.
-%    \hbar ->\hslash 
+%    \hbar ->\hslash
 % Therefore temporarily set \hbar=\relax.
 \let\ltj@tmpa\hbar
 \let\hbar\relax
 \let\ltj@tmpb\iftipaonetoken
 \let\iftipaonetoken\relax
-\let\hbar\relax
 \ReloadXunicode{EU2}
 \makeatletter
 \let\hbar\ltj@tmpa
 \let\iftipaonetoken\ltj@tmpb
 \let\ltj@tmpb\relax % no more an if-token
 \endinput
-
