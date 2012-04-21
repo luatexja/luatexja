@@ -3,9 +3,9 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.rmlgbm',
-  date = '2012/02/17',
-  version = '0.2',
-  description = 'Definitions of non-embedded Japanese fonts',
+  date = '2012/04/21',
+  version = '0.3',
+  description = 'Definitions of non-embedded Japanese (or other CJK) fonts',
 })
 module('luatexja.rmlgbm', package.seeall)
 local err, warn, info, log = luatexbase.errwarinf(_NAME)
@@ -15,7 +15,6 @@ require('luatexja.base');      local ltjb = luatexja.base
 local round = tex.round
 local cidfont_data = {}
 local cache_chars = {}
-local cid_reg, cid_order, cid_supp, cid_name
 local taux_dir = 'luatex-cache/luatexja'
 local path           = {
     localdir  = file.join(kpse.expand_var("$TEXMFVAR"), aux_dir),
@@ -23,7 +22,7 @@ local path           = {
 }
 
 -- 
-local function read_cid_font()
+local function read_cid_font(cid_name)
    local v = "ltj-cid-" .. string.lower(cid_name) .. ".lua"
    local localpath  = file.join(path.localdir, v)
    local systempath = file.join(path.systemdir, v)
@@ -45,7 +44,7 @@ local function read_cid_font()
 end
 
 -- High-level
-local function mk_rml(name, size, id)
+local function mk_rml(name, size, id, cid_name)
    local specification = fonts.define.analyze(name,size)
    specification = fonts.define.specify[':'](specification)
    local features = specification.features.normal
@@ -53,10 +52,6 @@ local function mk_rml(name, size, id)
    local fontdata = {}
    local cachedata = {}
    local s = cidfont_data[cid_name]
-   if not s then 
-      -- error message?
-      s = cidfont_data["Adobe-Japan1"]
-   end
    for k, v in pairs(s) do
       fontdata[k] = v
       cachedata[k] = v
@@ -128,6 +123,7 @@ local dr_orig = fonts.define.read
 function fonts.define.read(name, size, id)
    local p = utf.find(name, ":") or utf.len(name)+1
    if utf.sub(name, 1, p-1) == 'psft' then
+      local cid_reg, cid_order, cid_name
       local s = "Adobe-Japan1-6"
       local basename = utf.sub(name,p+1)
       local p = utf.find(basename, ":")
@@ -142,12 +138,29 @@ function fonts.define.read(name, size, id)
 	    if utf.len(xname)+1==q then p = nil else p = q + 1 end
 	 end
       end
-      cid_reg, cid_order, cid_supp = string.match(s, "(.-)%-(.-)%-(%d-)")
+      cid_reg, cid_order = string.match(s, "^(.-)%-(.-)%-(%d-)$")
+      if not cid_reg then 
+	 cid_reg, cid_order = string.match(s, "^(.-)%-(.-)$")
+      end
       cid_name = cid_reg .. '-' .. cid_order
-      if not cidfont_data[cid_name] then read_cid_font() end
-      return mk_rml(basename, size, id)
+      if not cidfont_data[cid_name] then 
+	 read_cid_font(cid_name) 
+	 if not cidfont_data[cid_name] then 
+	    ltjb.package_error('luatexja',
+			 "bad cid key `" .. s .. "'",
+			 "I couldn't find any non-embedded font information for the CID\n" ..
+				  '`' .. s .. "'. For now, I'll use `Adobe-Japan1-6'.\n"..
+				  'Please contact the LuaTeX-ja project team.')
+	    cid_name = "Adobe-Japan1"
+	 end
+      end
+      return mk_rml(basename, size, id, cid_name)
    else 
       return dr_orig(name, size, id)
    end
 end
+
+
+read_cid_font("Adobe-Japan1") 
+
 
