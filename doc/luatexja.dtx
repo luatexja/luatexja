@@ -11,12 +11,19 @@
 %</ja>
 
 \usepackage{amsmath,amssymb,xcolor,pict2e,multienum,amsthm,float,makecell}
+\usepackage{mathptmx}
 \usepackage{booktabs,listings,showexpl,multicol}
 \usepackage{luatexja-otf}
 \usepackage{luatexja-fontspec}
 \usepackage[unicode=true]{hyperref}
 \usepackage[all]{xy}
-\SelectTips{cm}{}
+%<ja> \SelectTips{cm}{}
+%<*en>
+\usepackage{mathptmx}
+\setmainfont[Ligatures=TeX]{TeX Gyre Termes}
+\setsansfont[Ligatures=TeX]{TeX Gyre Heros}
+\frenchspacing
+%</en>
 \def\labelenumii{(\arabic{enumii})}
 
 \DeclareRobustCommand\eTeX{\ensuremath{\varepsilon}-\kern-.125em\TeX}
@@ -483,60 +490,69 @@ The installation methods are as follows:
 %</ja>
 \begin{enumerate}
 %<*en>
-\item Download the source archive.
+\item Download the source archive, by one of the following method.
+      At the present, \LuaTeX-ja has no \emph{stable} release.
 
-      At the present, \LuaTeX-ja has no official release, so you have to retrieve
-      the archive from the repository.
-      You can retrieve the Git repository via
-%</en>
-%<*ja>
-\item ソースアーカイブをダウンロードする．
-
-      現時点では，\LuaTeX-ja の公式リリースはまだない．そのため，Git リポジトリを
-      次のようにすることで取得する必要がある：
-%</ja>
+\begin{itemize}
+\item Copy the Git repository:
 \begin{verbatim}
 $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
 \end{verbatim}
-%<*en>
-      or download the archive of HEAD in the \texttt{master} branch from
-%</en>
-%<*ja>
-      もしくは，\texttt{master} ブランチの HEAD のアーカイブを以下からダウンロードしてもよい：
-%</ja>
+\item Download the \texttt{tar.gz} archive of HEAD in the \texttt{master} branch from
 \begin{flushleft}
 \url{http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git;a=snapshot;h=HEAD;sf=tgz}.
 \end{flushleft}
+\item Now Lua\TeX-ja is included in CTAN (in the \texttt{macros/luatex/generic/luatexja} directory)
+and W32\TeX\ (in \texttt{luatexja.tar.xz}). These are based on the \texttt{master} branch.
+\end{itemize}
 
-%<*en>
-Note that the forefront of development may not be the \texttt{master} branch.
+Note that the \texttt{master} branch, and hence the archive in CTAN, are not updated frequently;
+the forefront of development is not the \texttt{master} branch.
 %</en>
 %<*ja>
-\texttt{master} ブランチはたまにしか更新されない．
-最新の開発中のコードは \texttt{master} ブランチには含まれていない場合がかなり多いので注意．
+\item ソースアーカイブを以下のいずれかの方法で取得する．現在公開されているのはあくまでも
+      開発版であって，安定版でないことに注意．
+
+\begin{itemize}
+\item Git リポジトリの内容をコピーする：
+\begin{verbatim}
+$ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
+\end{verbatim}
+\item \texttt{master} ブランチのスナップショット（\texttt{tar.gz} 形式）をダウンロードする．
+\begin{flushleft}
+\url{http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git;a=snapshot;h=HEAD;sf=tgz}.
+\end{flushleft}
+\item 今や，Lua\TeX-ja は CTAN (\texttt{macros/luatex/generic/luatexja}) や
+W32\TeX\ (\texttt{luatexja.tar.xz}) にも収録されている．
+これらは \texttt{master} ブランチの内容を元にしている．
+\end{itemize}
+
+\texttt{master} ブランチ（従って，CTAN 内のアーカイブも）はたまにしか更新されないことに注意．
+主な開発は \texttt{master} の外で行われ，比較的まとまってきたらそれを \texttt{master} に
+反映させることにしている．
 %</ja>
 
 %<*en>
 \item Extract the archive. You will see \texttt{src/} and several other sub-directories.
+But only the contents in \texttt{src/} are needed to work \LuaTeX-ja.
 %</en>
 %<*ja>
-\item 後者の方法でアーカイブを取得したならば，それを展開する．
+\item 「Git リポジトリをコピー」以外の方法でアーカイブを取得したならば，それを展開する．
       \texttt{src/} をはじめとしたいくつかのディレクトリができるが，
       動作には \texttt{src/} 以下の内容だけで十分．
 %</ja>
 
 %<*en>
-\item Copy all the contents of \texttt{src/} (except \texttt{src/no\_runtime/}) into one of your \texttt{TEXMF} tree.\\
+\item Copy all the contents of \texttt{src/} into one of your \texttt{TEXMF} tree.
       \texttt{TEXMF/tex/luatex/luatexja/} is an example location. 
-      Files in \texttt{src/no\_runtime/} are not required for the regular use, 
-      so you may simply remove \texttt{src/no\_runtime/}.
+      If you cloned entire Git repository, making a symbolic link of \texttt{src/}
+      instead copying is also good.
 %</en>
 %<*ja>
-\item \texttt{src/} の中身で，（\texttt{src/no\_runtime/}以外の）全てを自分の \texttt{TEXMF} ツリーにコピーする．\\
+\item \texttt{src/} の中身を自分の \texttt{TEXMF} ツリーにコピーする．
       場所の例としては，例えば \texttt{TEXMF/tex/luatex/luatexja/} がある．
-      \texttt{src/no\_runtime/} 中のファイルは通常の使用には必要ないので，単に削除して構わない．
-      シンボリックリンクが利用できる環境で，かつレポジトリを直接取得したのであれば，コピーではなく
-      リンクを貼るのが適切だろう．
+      シンボリックリンクが利用できる環境で，かつリポジトリを直接取得したのであれば，
+      （更新を容易にするために）コピーではなくリンクを貼ることを勧める．
 %</ja>
 
 %<*en>
@@ -546,6 +562,7 @@ Note that the forefront of development may not be the \texttt{master} branch.
 \item 必要があれば，\texttt{mktexlsr} を実行する．
 %</ja>
 \end{enumerate}
+
 
 %<en>\subsection{Cautions}
 %<ja>\subsection{注意点}
@@ -777,8 +794,6 @@ If you want to use these functions, load \Pkg{luatexja-otf} package.
 \CID{7652}飾区の\CID{13706}野家，
 葛飾区の吉野家
 \end{LTXexample}
-%lltjp-listings.sty要修正？：↑「森」の直後で改行．
-
 
 %<en>\subsection{Changing Fonts}
 %<ja>\subsection{フォントの変更}
