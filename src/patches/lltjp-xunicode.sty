@@ -75,17 +75,21 @@
 }
 % If unicode-math is already loaded, the following error occurs:
 %    ! Undefined control sequence.
-%    \hbar ->\hslash 
-% Therefore temporarily set \hbar=\relax.
+%    \hbar ->\hslash
+%    ! Missing \endcsname inserted.
+%    <to be read again>
+%                       \Zbar
+% Therefore temporarily set \hbar=\relax and \Zbar=\relax.
 \let\ltj@tmpa\hbar
 \let\hbar\relax
 \let\ltj@tmpb\iftipaonetoken
 \let\iftipaonetoken\relax
-\let\hbar\relax
+\let\ltj@tmpc\Zbar
+\let\Zbar\relax
 \ReloadXunicode{EU2}
 \makeatletter
 \let\hbar\ltj@tmpa
 \let\iftipaonetoken\ltj@tmpb
 \let\ltj@tmpb\relax % no more an if-token
+\let\Zbar\ltj@tmpc
 \endinput
-
