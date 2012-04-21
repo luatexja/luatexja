@@ -10,7 +10,7 @@ luatexbase.provides_module({
 module('luatexja.rmlgbm', package.seeall)
 local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
-require('luatexja.base');      local ltjb = luatexja.base
+luatexja.load_module('base');      local ltjb = luatexja.base
 
 local round = tex.round
 local cidfont_data = {}

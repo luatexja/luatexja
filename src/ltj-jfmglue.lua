@@ -10,10 +10,10 @@ luatexbase.provides_module({
 module('luatexja.jfmglue', package.seeall)
 local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
-require('luatexja.base');      local ltjb = luatexja.base
-require('luatexja.stack');     local ltjs = luatexja.stack
-require('luatexja.jfont');     local ltjf = luatexja.jfont
-require('luatexja.pretreat');  local ltjp = luatexja.pretreat
+luatexja.load_module('base');      local ltjb = luatexja.base
+luatexja.load_module('stack');     local ltjs = luatexja.stack
+luatexja.load_module('jfont');     local ltjf = luatexja.jfont
+luatexja.load_module('pretreat');  local ltjp = luatexja.pretreat
 
 local node_type = node.type
 local node_new = node.new

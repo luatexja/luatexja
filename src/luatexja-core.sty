@@ -149,32 +149,27 @@
 
 \directlua{%
   luatexja = {}
-  function luatexja.error(s,t)
-    tex.error('LuaTeX-ja error: ' .. s ,t) 
-  end
-  function luatexja.load_module(name)
-     local fn = 'ltj-' .. name .. '.lua'
-     local found = kpse.find_file(fn, 'tex')
-     if not found then
-        luatexja.error("File `" .. fn .. "' not found", 
-	      {'This file ' .. fn .. ' is required for LuaTeX-ja.', 'Please check your installation.'})
-     else 
-        texio.write('(' .. found .. ')')
-        require(found)
-     end
-  end
-  local path = assert(kpse.find_file('luatexja.lua', 'tex'),
-      "File `luatexja.lua' not found")
-  dofile(path)
+  dofile(assert(kpse.find_file('luatexja.lua', 'tex'),
+      "File `luatexja.lua' not found"))
 }
+
+%% \RequireLuaTeXjaSubmodule{name}[date]
+% A TeX version of luatexja.load_module(name)
+% The second optional argument [date] is simply ignored.
+\def\RequireLuaTeXjaSubmodule#1{%
+  \@ifnextchar[{\ltj@requirelua@submod{#1}}{\ltj@requirelua@submod{#1}[]}}
+\def\ltj@requirelua@submod#1[#2]{%
+  \directlua{luatexja.load_module(
+    "\luatexluaescapestring{#1}")}}
+
 
 %%%%%%%% Load all sub-packages.
 \ifltj@in@latex                 %<*LaTeX>
-  \RequirePackage{luatexja-cctbreg}[2011/04/01]
-  \RequirePackage{luatexja-base}[2011/04/20]
+  \RequirePackage{ltj-cctbreg}[2012/04/21]
+  \RequirePackage{ltj-base}[2012/04/21]
 \else                           %<*!LaTeX>
-  \input luatexja-cctbreg.sty %
-  \input luatexja-base.sty %
+  \input ltj-cctbreg.sty %
+  \input ltj-base.sty %
 \fi                             %</LaTeX>
 
 
@@ -440,9 +435,9 @@
 %%------------------ Load module for the format
 
 \ifltj@in@latex                 %<*LaTeX>
-  \RequirePackage{luatexja-latex}[2011/04/01]
+  \RequirePackage{ltj-latex}[2012/04/21]
 \else\ifltj@in@plain            %<*plain>
-  \input luatexja-plain.sty %
+  \input ltj-plain.sty %
 \fi\fi                          %</LaTeX|plain>
 
 %%------------------ all done

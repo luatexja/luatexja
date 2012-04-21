@@ -9,11 +9,11 @@ luatexbase.provides_module({
 })
 module('luatexja.math', package.seeall)
 
-require('luatexja.base');      local ltjb = luatexja.base
-require('luatexja.charrange'); local ltjc = luatexja.charrange
-require('luatexja.jfont');     local ltjf = luatexja.jfont
-require('luatexja.stack');     local ltjs = luatexja.stack
-require('luatexja.setwidth');  local ltjw = luatexja.setwidth
+luatexja.load_module('base');      local ltjb = luatexja.base
+luatexja.load_module('charrange'); local ltjc = luatexja.charrange
+luatexja.load_module('jfont');     local ltjf = luatexja.jfont
+luatexja.load_module('stack');     local ltjs = luatexja.stack
+luatexja.load_module('setwidth');  local ltjw = luatexja.setwidth
 
 local node_new = node.new
 local node_next = node.next

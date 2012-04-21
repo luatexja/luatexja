@@ -10,8 +10,8 @@ luatexbase.provides_module({
 module('luatexja.setwidth', package.seeall)
 local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
-require('luatexja.base');      local ltjb = luatexja.base
-require('luatexja.jfont');     local ltjf = luatexja.jfont
+luatexja.load_module('base');      local ltjb = luatexja.base
+luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 
 local node_type = node.type
 local node_new = node.new

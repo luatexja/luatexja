@@ -10,7 +10,7 @@ luatexbase.provides_module({
 module('luatexja.inputbuf', package.seeall)
 local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
-require('luatexja.charrange'); local ltjc = luatexja.charrange
+luatexja.load_module('charrange'); local ltjc = luatexja.charrange
 
 local node_new = node.new
 local id_glyph = node.id('glyph')

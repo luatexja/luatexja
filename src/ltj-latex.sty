@@ -1,5 +1,5 @@
 %
-% luatexja-latex.sty
+% ltj-latex.sty
 %
 
 %! これは外から読まれない
@@ -12,7 +12,7 @@
 \def\luatexjalatexLoaded{\endinput}
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-latex}[2011/11/22 LuaLaTeX-ja]
+\ProvidesPackage{ltj-latex}[2012/04/21 LuaLaTeX-ja]
 
 \def\ltj@pkgpatchlist{}
 \def\ltj@pkgpatch#1{
@@ -63,7 +63,7 @@
 \ltj@pkgpatch{unicode-math}
 \ltj@pkgpatch{xunicode}
 \@ifpackageloaded{filehook}{}{%
-  \@PackageWarningNoLine{luatexja-latex}{
+  \@PackageWarningNoLine{ltj-latex}{
     LuaTeX-ja uses filehook package to apply patches to the following packages:\MessageBreak
     \ltj@pkgpatchlist.\MessageBreak
     But your TeX system does not have the filehook package.\MessageBreak

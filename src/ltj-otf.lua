@@ -9,8 +9,8 @@ luatexbase.provides_module({
 })
 module('luatexja.otf', package.seeall)
 
-require('luatexja.base');      local ltjb = luatexja.base
-require('luatexja.jfont');     local ltjf = luatexja.jfont
+luatexja.load_module('base');      local ltjb = luatexja.base
+luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 
 local id_glyph = node.id('glyph')
 local id_whatsit = node.id('whatsit')

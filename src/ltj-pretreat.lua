@@ -10,9 +10,9 @@ luatexbase.provides_module({
 module('luatexja.pretreat', package.seeall)
 local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
-require('luatexja.charrange'); local ltjc = luatexja.charrange
-require('luatexja.jfont');     local ltjf = luatexja.jfont
-require('luatexja.stack');     local ltjs = luatexja.stack
+luatexja.load_module('charrange'); local ltjc = luatexja.charrange
+luatexja.load_module('jfont');     local ltjf = luatexja.jfont
+luatexja.load_module('stack');     local ltjs = luatexja.stack
 
 local has_attr = node.has_attribute
 local set_attr = node.set_attribute

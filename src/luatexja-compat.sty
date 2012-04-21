@@ -74,9 +74,9 @@
 \ifx\ltj@@tempa\ltj@@tempb      %<*pTeX>
   \let\ltj@@compat@pTeX=t
   \ifltj@in@latex                 %<*LaTeX>
-    \RequirePackage{luatexja-compat-ptex}[2011/04/01]
+    \RequirePackage{ltj-compat-ptex}[2012/04/21]
   \else                           %<*!LaTeX>
-    \input luatexja-compat-ptex.sty %
+    \input ltj-compat-ptex.sty %
   \fi                             %</LaTeX>
   \ltj@compat@AtEnd
 \expandafter\endinput\fi\relax  %</pTeX>
@@ -104,11 +104,8 @@
 % not yet implemented.
 
 %%------------------
-
-\directlua{
-  luatexja.load_module('jisx0208');
-  luatexja.load_module('compat');
-}
+\RequireLuaTeXjaSubmodule{jisx0208}
+\RequireLuaTeXjaSubmodule{compat}
 
 \def\euc{\ltj@code@conv{euc}}
 \def\kuten{\ltj@code@conv{kuten}}
@@ -129,7 +126,6 @@
 }
 
 \def\kansuji{%
-\tracingall
   \expandafter\expandafter\expandafter
    \ltj@kansujiA\ltj@grab@num
 }

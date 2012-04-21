@@ -1,5 +1,5 @@
 %
-% luatexja-cctbreg.sty
+% ltj-cctbreg.sty
 %
 
 %! luatexbase と luatex パッケージのカテゴリコードテーブルの割当に
@@ -24,7 +24,7 @@
 
 \ifltj@in@latex                 %<*LaTeX>
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-cctbreg}[2011/04/01 v0.1]
+  \ProvidesPackage{ltj-cctbreg}[2012/04/21 v0.2]
 \fi                             %</LaTeX>
 
 % LS = Size of storage reserved for luatex-pkg.
@@ -37,7 +37,7 @@
 \ltj@@cctb@failure=0
 \def\ltj@@cctb@check@failure{
   \ifnum\ltj@@cctb@failure>0 %
-    \@PackageWarningNoLine{luatexja-cctbreg}
+    \@PackageWarningNoLine{ltj-cctbreg}
       {Cannot apply the patch (\the\ltj@@cctb@failure)}
     \ltj@cctbreg@AtEnd
   \expandafter\endinput\fi\relax

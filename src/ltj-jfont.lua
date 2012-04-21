@@ -9,8 +9,8 @@ luatexbase.provides_module({
 })
 module('luatexja.jfont', package.seeall)
 
-require('luatexja.base');      local ltjb = luatexja.base
-require('luatexja.charrange'); local ltjc = luatexja.charrange
+luatexja.load_module('base');      local ltjb = luatexja.base
+luatexja.load_module('charrange'); local ltjc = luatexja.charrange
 
 local node_new = node.new
 local has_attr = node.has_attribute
