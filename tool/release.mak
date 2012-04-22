@@ -10,6 +10,6 @@ all:
 	git add README
 	git commit -m 'Releases $(VER)'
 	git tag $(VER)
-	git archive --format=tar --prefix=$(PROJECT)-$(VER) $(VER) | gzip > $(DIR)/$(PROJECT)-$(VER).tar.gz
+	git archive --format=tar --prefix=$(PROJECT)-$(VER)/ $(VER) | gzip > $(DIR)/$(PROJECT)-$(VER).tar.gz
 	git push origin $(VER) || echo
 	git reset --hard HEAD~
