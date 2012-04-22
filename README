@@ -1,4 +1,4 @@
-The LuaTeX-ja Package $VER$
+The LuaTeX-ja Package 20120422.0
 --------------------------------
 Copyright (c) 2011--2012 The LuaTeX-ja project
 License: modified BSD (see COPYING)
@@ -29,9 +29,9 @@ Installation
 2. If you must/want to install manually:
 
    a. Download the source archive from CTAN,
-      or tagged as $VER$ in the Git repository by
+      or tagged as 20120422.0 in the Git repository by
       <http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git
-                              ;a=snapshot;h=$VER$;sf=tgz>
+                              ;a=snapshot;h=20120422.0;sf=tgz>
 
    b. Extract the archive and put src/ into your TEXMF tree.
       An example location is TEXMF/tex/luatex/luatexja.
