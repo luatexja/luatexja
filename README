@@ -50,3 +50,7 @@ Simply loading luatexja.sty by \input or \usepackage does the minimal setting.
 - If you want to use the fontspec package, please load luatexja-fontspec.sty.
   It defines control sequences such as \setmainjfont, setsansjfont and
   \jfontspec, which can be used for specifying Japanese fonts.
+
+
+Last commit date: $Format:%cd$
+
