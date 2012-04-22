@@ -31,7 +31,7 @@ Installation
    a. Download the source archive from CTAN,
       or tagged as $VER$ in the Git repository by
       <http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git
-                              ;a=snapshot;h=$VER$;sf=tgz>
+                              ;a=snapshot;h=refs/tags/$VER$;sf=tgz>
 
    b. Extract the archive and put src/ into your TEXMF tree.
       An example location is TEXMF/tex/luatex/luatexja.
