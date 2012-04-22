@@ -1,7 +1,7 @@
 #-*- mode: Makefile -*-
 
 PROJECT=luatexja
-DIR=.
+DIR=..
 VER=HEAD
 
 all:
@@ -11,5 +11,5 @@ all:
 	git commit -m 'Releases $(VER)'
 	git tag $(VER)
 	git archive --format=tar --prefix=$(PROJECT)-$(VER) $(VER) | gzip > $(DIR)/$(PROJECT)-$(VER).tar.gz
-	git push origin $(VER)
+	git push origin $(VER) || echo
 	git reset --hard HEAD~
