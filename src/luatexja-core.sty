@@ -195,8 +195,8 @@
 \def\ltj@@jfont{\directlua{luatexja.jfont.jfontdefY()}}
 
 %%%%%%%% \zw, \zh
-\def\zw{\directlua{luatexja.jfont.load_zw()}\ltj@zw}
-\def\zh{\directlua{luatexja.jfont.load_zh()}\ltj@zh}
+\protected\def\zw{\directlua{luatexja.jfont.load_zw()}\ltj@zw}
+\protected\def\zh{\directlua{luatexja.jfont.load_zh()}\ltj@zh}
 
 
 %%%%%%%% \inhibitglue
@@ -204,14 +204,7 @@
   \directlua{luatexja.global_temp = tex.globaldefs; tex.globaldefs = 0}}
 \protected\def\ltj@restore@globaldefs{\directlua{tex.globaldefs = luatexja.global_temp}}
 \let\new@everypar=\everypar
-\protected\def\inhibitglue{\relax%
-  \ifvmode
-    \ltj@reset@globaldefs
-    \xdef\@@tempa{\the\everypar}%
-    \xdef\@@tempb{\everypar={\@@tempa}\@@tempa\noexpand\ltj@@ihb}%
-    \everypar\expandafter{\@@tempb}%
-    \ltj@restore@globaldefs
-  \else\ifhmode\ltj@@ihb\fi\fi}
+\protected\def\inhibitglue{\ifhmode\ltj@@ihb\fi}
 \def\ltj@@ihb{\directlua{luatexja.jfmglue.create_inhibitglue_node()}}
 
 %%%%%%%% \yoko, \tate, \ifydir, \iftdir
@@ -429,8 +422,8 @@
 \def\ltj@@alchar{{\directlua{tex.globaldefs = 0}\ltj@allalchar\ltj@@origchar\ltj@tempcnta}}
 
 %%%%%%%% \ltjsetmathletter<number>, \ltjunsetmathletter<number>
-\def\ltjsetmathletter#1{\directlua{luatexja.math.is_math_letters[#1]=true}}
-\def\ltjunsetmathletter#1{\directlua{luatexja.math.is_math_letters[#1]=false}}
+\protected\def\ltjsetmathletter#1{\directlua{luatexja.math.is_math_letters[#1]=true}}
+\protected\def\ltjunsetmathletter#1{\directlua{luatexja.math.is_math_letters[#1]=false}}
 
 %%------------------ Load module for the format
 

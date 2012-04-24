@@ -3,8 +3,8 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2012/04/02',
-  version = '0.3',
+  date = '2012/04/25',
+  version = '0.4',
   description = 'Insertion process of JFM glues and kanjiskip',
 })
 module('luatexja.jfmglue', package.seeall)
@@ -331,20 +331,20 @@ local calc_np_auxtable = {
 	       end,
    [id_whatsit] = function() 
 		  if lp.subtype==sid_user then
-             if lp.user_id==30111 then
-                local lq = node_next(lp)
-                head = node_remove(head, lp); node_free(lp); lp = lq; ihb_flag = true
-             else
-                set_attr_icflag_processed(lp)
-                luatexbase.call_callback("luatexja.jfmglue.whatsit_getinfo"
-					 , Np, lp, Nq, box_stack_level)
-                lp = node_next(lp)
-                if Np.nuc then 
-                   Np.id = id_pbox_w; Np.first = Np.nuc; Np.last = Np.nuc; return true
-                end
-             end
-          else
-            set_attr_icflag_processed(lp)
+		     if lp.user_id==30111 then
+			local lq = node_next(lp)
+			head = node_remove(head, lp); node_free(lp); lp = lq; ihb_flag = true
+		     else
+			set_attr_icflag_processed(lp)
+			luatexbase.call_callback("luatexja.jfmglue.whatsit_getinfo"
+						 , Np, lp, Nq, box_stack_level)
+			lp = node_next(lp)
+			if Np.nuc then 
+			   Np.id = id_pbox_w; Np.first = Np.nuc; Np.last = Np.nuc; return true
+			end
+		     end
+		  else
+		     set_attr_icflag_processed(lp); lp = node_next(lp)
 		  end
 		  return false
 		  end,
@@ -461,8 +461,9 @@ function set_np_xspc_alchar(Nx, c,x, lig)
       end
       Nx.pre = ltjs_get_penalty_table('pre', c, 0, box_stack_level)
       Nx.post = ltjs_get_penalty_table('post', c, 0, box_stack_level)
+      Nx.char = 'jcharbdd'
    else
-      Nx.pre = 0; Nx.post = 0
+      Nx.pre = 0; Nx.post = 0; Nx.char = -1
    end
    Nx.met = nil
    local y = ltjs_get_penalty_table('xsp', c, 3, box_stack_level)
@@ -737,16 +738,14 @@ end
 
 local function get_OA_skip()
    if not ihb_flag then
-      local c
-      if Nq.id == id_math then c = -1 else c = 'jcharbdd' end
+      local c = Nq.char or 'jcharbdd'
       return new_jfm_glue(Np, fast_find_char_class(c,Np.met), Np.class)
    else return nil
    end
 end
 local function get_OB_skip()
    if not ihb_flag then
-      local c
-      if Np.id == id_math then c = -1 else c = 'jcharbdd' end
+      local c = Np.char or 'jcharbdd'
       return new_jfm_glue(Nq, Nq.class, fast_find_char_class(c,Nq.met))
    else return nil
    end
@@ -822,11 +821,21 @@ local function handle_nq_ja_hlist()
    end
 end
 
+-- Nq が前側のクラスタとなることによる修正
+local function adjust_nq()
+   if Nq.id==id_glyph then after_alchar(Nq)
+   elseif Nq.id==id_hlist or Nq.id==id_pbox or Nq.id==id_disc then after_hlist(Nq)
+   elseif Nq.id == id_pbox_w then 
+      luatexbase.call_callback("luatexja.jfmglue.whatsit_after",
+			       false, Nq, Np, box_stack_level)
+   end
+end
+
 -------------------- 開始・終了時の処理
 
 -- リスト末尾の処理
 local function handle_list_tail()
-   Np = Nq
+   adjust_nq(); Np = Nq
    if mode then
       -- the current list is to be line-breaked:
       if Np.id == id_jglyph or (Np.id==id_pbox and Np.met) then 
@@ -851,9 +860,7 @@ local function handle_list_tail()
 	    head = node_insert_after(head, Np.last, g)
 	 end
       end
-      head = node_remove(head, last); node_free(last);-- remove the sentinel
    end
-   node_free(kanji_skip); node_free(xkanji_skip)
 end
 
 -- リスト先頭の処理
@@ -913,13 +920,22 @@ local function init_var()
    end
 end
 
--- Nq が前側のクラスタとなることによる修正
-local function adjust_nq()
-   if Nq.id==id_glyph then after_alchar(Nq)
-   elseif Nq.id==id_hlist or Nq.id==id_pbox or Nq.id==id_disc then after_hlist(Nq)
-   elseif Nq.id == id_pbox_w then 
-      luatexbase.call_callback("luatexja.jfmglue.whatsit_after",
-			       false, Nq, Np, box_stack_level)
+local function cleanup()
+   -- adjust attr_icflag for avoiding error
+   tex.attribute[attr_icflag] = -(0x7FFFFFFF)
+   node_free(kanji_skip); node_free(xkanji_skip)
+   if mode then
+      local h = node_next(head)
+      if h.id == id_penalty and h.penalty == 10000 then
+	 h = h.next
+	 if h.id == id_glue and h.subtype == 15 and not h.next then
+	    return false
+	 end
+      end
+      return head
+   else
+      head = node_remove(head, last); node_free(last);-- remove the sentinel
+      return head
    end
 end
 -------------------- 外部から呼ばれる関数
@@ -931,8 +947,7 @@ function main(ahead, amode)
    if Np then 
       extract_np(); handle_list_head()
    else
-      if not mode then head = node_remove(head, last); node_free(last) end
-      return head
+      return cleanup()
    end
    calc_np()
    while Np do
@@ -950,15 +965,49 @@ function main(ahead, amode)
       calc_np()
    end
    handle_list_tail()
-   -- adjust attr_icflag
-   tex.attribute[attr_icflag] = -(0x7FFFFFFF)
-   return head
+   return cleanup()
 end
 
 -- \inhibitglue
-local inhibitglue_node=node_new(id_whatsit, sid_user)
-inhibitglue_node.user_id=30111; inhibitglue_node.type=100; inhibitglue_node.value=1
 
 function create_inhibitglue_node()
-   node.write(node.copy(inhibitglue_node))
+   local tn = node_new(id_whatsit, sid_user)
+   tn.user_id=30111; tn.type=100; tn.value=1
+   node.write(tn)
 end
+
+-- Node for indicating beginning of a paragraph
+-- (for ltjsclasses)
+function create_beginpar_node()
+   local tn = node_new(id_whatsit, sid_user)
+   tn.user_id=30114; tn.type=100; tn.value=1
+   node.write(tn)
+end
+
+local function whatsit_callback(Np, lp, Nq, bsl)
+   if Np.nuc then return Np 
+   elseif lp.user_id == 30114 then
+      Np.first = lp; Np.nuc = lp; Np.last = lp
+      Np.char = 'parbdd'
+      Np.met = nil
+      Np.pre = 0; Np.post = 0
+      Np.xspc_before = false
+      Np.xspc_after  = false
+      Np.auto_xspc = false
+      return Np
+   end
+end
+local function whatsit_after_callback(s, Nq, Np, bsl)
+   if not s and Nq.nuc.user_id == 30114 then
+      local x, y = node.prev(Nq.nuc), Nq.nuc
+      Nq.first, Nq.nuc, Nq.last = x, x, x
+      head = node_remove(head, y)
+   end
+   return s
+end
+
+luatexbase.add_to_callback("luatexja.jfmglue.whatsit_getinfo", whatsit_callback,
+                           "luatexja.beginpar.np_info", 1)
+luatexbase.add_to_callback("luatexja.jfmglue.whatsit_after", whatsit_after_callback,
+                           "luatexja.beginpar.np_info_after", 1)
+
