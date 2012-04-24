@@ -3142,7 +3142,7 @@ These 2 font features correspond to \texttt{jfm} and \texttt{jfmvar} keys for
 \verb+\jfont+ primitive, respectively. See Subsection~\ref{ssec-jfont}.
 %</en>
 %<*ja>
-これらの2つはそれぞれ \verb+\jfont+ プリミティブに対する
+これら2つのキーはそれぞれ \verb+\jfont+ プリミティブに対する
 \texttt{jfm}, \texttt{jfmvar} キーとそれぞれ対応する．
 \ref{ssec-jfont} 節を参照．
 %</ja>
@@ -3155,6 +3155,19 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
 %<*ja>
 これを指定することで，PDF に埋め込まれない「名前だけ」のフォントを指定することが
 できる．\ref{ssec-psft} 節を参照．
+%</ja>
+
+\item[CID=<name>]
+%<*en>
+This feature is effective only when with NoEmbed feature.
+You can use the non-embedded CID-keyed font whose glyphs are addressed according
+to the specified character collection defined by Adobe Inc.
+The default value is Adobe-Japan1. See also Subsection~\ref{ssec-psft}.
+%</en>
+%<*ja>
+NoEmbed キーと合わせて用いる．
+非埋め込みの CID-keyed フォントがどの文字コレクションに基づくものかを指定する．
+デフォルトは Adobe-Japan1 である．\ref{ssec-psft} 節も参照．
 %</ja>
 \end{list}
 
