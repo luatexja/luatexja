@@ -1,17 +1,18 @@
 %#! time luatex test01
 \input luatexja-core.sty
 
-\jfont\jisninety={file:ipaexm.ttf:script=latn;+jp90;jfm=ujis}
-\jfont\jisfour={file:ipaexm.ttf:script=latn;+jp04;jfm=ujis}
-\jfont\jisexpt={file:ipaexm.ttf:script=latn;+expt;jfm=ujis}
-\jfont\jishwid={file:ipaexm.ttf:script=latn;+hwid;jfm=ujis}
-%\font\tmihwid={file:ipaexm.ttf:script=latn;+hwid}
-\jfont\jisnalt={file:ipaexm.ttf:script=latn;+nalt;jfm=ujis}
-\jfont\jistrad={file:ipaexm.ttf:script=latn;+trad;jfm=ujis}
-\jfont\jissups={file:ipaexm.ttf:script=latn;+sups;jfm=ujis}
-\jfont\jisliga={file:ipaexm.ttf:script=latn;+liga;jfm=ujis}
-%\font\tmiliga={file:ipaexm.ttf:script=latn;+liga}
-\jfont\jisvert={file:ipaexm.ttf:script=latn;+vert;jfm=ujis}
+\jfont\jisninety={file:KozMinPr6N-Regular.otf:script=latn;+jp90;jfm=ujis}
+\jfont\jisfour={file:KozMinPr6N-Regular.otf:script=latn;+jp04;jfm=ujis}
+\jfont\jisexpt={file:KozMinPr6N-Regular.otf:script=latn;+expt;jfm=ujis}
+\jfont\jishwid={file:KozMinPr6N-Regular.otf:script=latn;+hwid;jfm=ujis}
+\jfont\jispalt={file:KozMinPr6N-Regular.otf:script=latn;+palt;jfm=ujis}
+%\font\tmihwid={file:KozMinPr6N-Regular.otf:script=latn;+hwid}
+\jfont\jisnalt={file:KozMinPr6N-Regular.otf:script=latn;+nalt;jfm=ujis}
+\jfont\jistrad={file:KozMinPr6N-Regular.otf:script=latn;+trad;jfm=ujis}
+\jfont\jissups={file:KozMinPr6N-Regular.otf:script=latn;+sups;jfm=ujis}
+\jfont\jisliga={file:KozMinPr6N-Regular.otf:script=latn;+liga;jfm=ujis}
+%\font\tmiliga={file:KozMinPr6N-Regular.otf:script=latn;+liga}
+\jfont\jisvert={file:KozMinPr6N-Regular.otf:script=latn;+vert;jfm=ujis}
 \parskip=\smallskipamount\parindent=1\zw
 
 {\noindent\bf\tengt jfm-ujis.lua を使用}
@@ -26,7 +27,9 @@
 
 {\tentt jp04} feature: 辻→{\jisfour 辻}
 
-{\tentt hwid} feature: アイｳｴ→{\jishwid アイｳｴ}\hfil\break
+{\tentt hwid} feature: アイｳｴ→{\jishwid アイｳｴ}
+
+{\tentt palt} feature: トップクォーク→{\jispalt トップクォーク}\hfil\break
 
 {\tentt nalt} feature: 男→{\jisnalt 男}
 
@@ -53,8 +56,8 @@
 \bigskip
 {\noindent\bf\tengt ■{\tt differentjfm}による挙動の違い}
 
-\jfont\tenMa={file:ipaexm.ttf:jfm=ujis}
-\jfont\tenMb={file:ipaexm.ttf:jfm=ujis;jfmvar=a}
+\jfont\tenMa={file:KozMinPr6N-Regular.otf:jfm=ujis}
+\jfont\tenMb={file:KozMinPr6N-Regular.otf:jfm=ujis;jfmvar=a}
 \jfont\tenGa={file:ipaexg.ttf:jfm=ujis} at 15pt
 \jfont\tenGb={file:ipaexg.ttf:jfm=ujis;jfmvar=a} at 15pt\relax
 
@@ -87,7 +90,7 @@
 \bigskip
 {\noindent\bf\tengt ■ujis, jis, min}
 
-\def\test#1{\jfont\mx={file:ipaexm.ttf:jfm=#1}
+\def\test#1{\jfont\mx={file:KozMinPr6N-Regular.otf:jfm=#1}
 \par\noindent\hbox to 30pt{#1}%
 \hbox to 250pt{\mx ちょっとチェックしちゃった！が，まあいいです。\hss}%
 \hbox{\mx「大」、「小」，‘国’“国”――……}}

@@ -3,11 +3,23 @@
 
 \usepackage{luaotfload}
 \usepackage{luacode}
-
 \begin{luacode}
+-- only for debug
+function table_search(tbl, name, prefix)
+  for i,x in pairs(tbl) do
+    if string.match(i, name) then
+      print('found: entry' .. prefix .. '.' .. i)
+    elseif type(x) == 'string' and string.match(x, name)  then
+      print('found: entry' .. prefix .. '.' .. i .. ' = ' .. x)
+    elseif type(x) == 'table' then
+      table_search(x, name, prefix .. '.' .. i)
+    end
+  end
+end
+
 function mkrmlgbm(nonfilename,opfilename)
-	local fontdata = containers.read(fonts.otf.cache, nonfilename)
-		
+	local fontdata = containers.read(fonts.otf.cache, string.lower(nonfilename))
+	
 	-- from fonts.otf.otf_to_tfm()
 	local tfmdata
 	fontdata.shared = fontdata.shared or {
@@ -62,18 +74,46 @@ function mkrmlgbm(nonfilename,opfilename)
 	tfmdata.cache = 'yes'
 	
 	for k, v in pairs(tfmdata.characters) do
-	   tfmdata.characters[k].height = nil
+	   v.height = nil
+	   v.depth = nil
+       if v.width == 655360 then v.width = nil     -- 全角
+       elseif v.width == 327680 then v.width = 327680 -- 半角
+       elseif v.width == 163840 then v.width = 163840 -- 1/4 角
+       elseif v.width == 218234.88 then v.width = 218234.88 -- 1/3 角
+       else v.width = nil
+       end
 	end
 	
+    if fontdata then -- remove gpos data
+      local tmpt = fontdata.shared.featuredata
+      tmpt.gpos_single  = {}
+      tmpt.gpos_pair  = {}
+      tmpt.gpos_reversecontextchain  = {}
+      tmpt.gpos_contextchain  = {}
+      tmpt.gpos_cursive  = {}
+      tmpt.gpos_mark2base  = {}
+      tmpt.gpos_mark2ligature = {}
+      tmpt.gpos_mark2mark = {}
+      shared.otfdata.luatex.features.gpos = nil
+      shared.otfdata.luatex.features.pwid = nil
+      shared.otfdata.luatex.features.palt = nil
+      shared.otfdata.luatex.features.vkrn = nil
+      for i,x in pairs(tfmdata.shared.otfdata.luatex.sequences) do
+        if string.match(x.type,'gpos') then x.subtables = {} end
+      end
+    end
+
 	-- for luaotfload
-	fontdata.pfminfo.os2_capheight = 0
-	
+    if fontdata.pfminfo then
+	  fontdata.pfminfo.os2_capheight = 0
+	end
+    --table_search(tfmdata, 'gpos', '')
 	table.tofile(opfilename, tfmdata, 'return', false, true, false)
 end
-mkrmlgbm('AdobeMingStd-Light', 'luatexja-cid-std-adobe-cns1.lua')
-mkrmlgbm('AdobeSongStd-Light', 'luatexja-cid-std-adobe-gb1.lua')
-mkrmlgbm('KozMinPr6N-Regular', 'luatexja-cid-std-adobe-japan1.lua')
-mkrmlgbm('AdobeMyungjoStd-Medium', 'luatexja-cid-std-adobe-korea1.lua')
+mkrmlgbm('AdobeMingStd-Light', 'ltj-cid-adobe-cns1.lua')
+mkrmlgbm('AdobeSongStd-Light', 'ltj-cid-adobe-gb1.lua')
+mkrmlgbm('KozMinPr6N-Regular', 'ltj-cid-adobe-japan1.lua')
+mkrmlgbm('AdobeMyungjoStd-Medium', 'ltj-cid-adobe-korea1.lua')
 \end{luacode}
 
 \begin{document}

@@ -30,15 +30,21 @@ local function read_cid_font(cid_name)
    if kpsefound and file.isreadable(kpsefound) then
       cidfont_data[cid_name] = require(kpsefound)
       cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
-      return
+      for i,v in pairs(cidfont_data[cid_name].characters) do
+         if not v.width then v.width = 655360 end
+      end
    elseif file.isreadable(localpath)  then
       cidfont_data[cid_name] = require(localpath)
       cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
-      return
+      for i,v in pairs(cidfont_data[cid_name].characters) do
+         if not v.width then v.width = 655360 end
+      end
    elseif file.isreadable(systempath) then
       cidfont_data[cid_name] = require(systempath)
       cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
-      return
+      for i,v in pairs(cidfont_data[cid_name].characters) do
+         if not v.width then v.width = 655360 end
+      end
    end
    --
 end
@@ -140,19 +146,19 @@ function fonts.define.read(name, size, id)
       end
       cid_reg, cid_order = string.match(s, "^(.-)%-(.-)%-(%d-)$")
       if not cid_reg then 
-	 cid_reg, cid_order = string.match(s, "^(.-)%-(.-)$")
+         cid_reg, cid_order = string.match(s, "^(.-)%-(.-)$")
       end
       cid_name = cid_reg .. '-' .. cid_order
       if not cidfont_data[cid_name] then 
-	 read_cid_font(cid_name) 
-	 if not cidfont_data[cid_name] then 
-	    ltjb.package_error('luatexja',
-			 "bad cid key `" .. s .. "'",
-			 "I couldn't find any non-embedded font information for the CID\n" ..
-				  '`' .. s .. "'. For now, I'll use `Adobe-Japan1-6'.\n"..
-				  'Please contact the LuaTeX-ja project team.')
-	    cid_name = "Adobe-Japan1"
-	 end
+         read_cid_font(cid_name)
+         if not cidfont_data[cid_name] then 
+            ltjb.package_error('luatexja',
+                               "bad cid key `" .. s .. "'",
+                               "I couldn't find any non-embedded font information for the CID\n" ..
+                                  '`' .. s .. "'. For now, I'll use `Adobe-Japan1-6'.\n"..
+                                  'Please contact the LuaTeX-ja project team.')
+            cid_name = "Adobe-Japan1"
+         end
       end
       return mk_rml(basename, size, id, cid_name)
    else 
@@ -161,6 +167,4 @@ function fonts.define.read(name, size, id)
 end
 
 
-read_cid_font("Adobe-Japan1") 
-
-
+read_cid_font("Adobe-Japan1")
