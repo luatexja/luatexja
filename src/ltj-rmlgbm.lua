@@ -12,7 +12,6 @@ local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
 luatexja.load_module('base');      local ltjb = luatexja.base
 
-local round = tex.round
 local cidfont_data = {}
 local cache_chars = {}
 local taux_dir = 'luatex-cache/luatexja'
@@ -30,23 +29,19 @@ local function read_cid_font(cid_name)
    if kpsefound and file.isreadable(kpsefound) then
       cidfont_data[cid_name] = require(kpsefound)
       cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
-      for i,v in pairs(cidfont_data[cid_name].characters) do
-         if not v.width then v.width = 655360 end
-      end
    elseif file.isreadable(localpath)  then
       cidfont_data[cid_name] = require(localpath)
       cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
-      for i,v in pairs(cidfont_data[cid_name].characters) do
-         if not v.width then v.width = 655360 end
-      end
    elseif file.isreadable(systempath) then
       cidfont_data[cid_name] = require(systempath)
       cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
+   end
+   if cidfont_data[cid_name] then
       for i,v in pairs(cidfont_data[cid_name].characters) do
          if not v.width then v.width = 655360 end
+	 v.height, v.depth = 576716.8, 78643.2 -- optimized for jfm-ujis.lua
       end
    end
-   --
 end
 
 -- High-level
@@ -81,13 +76,13 @@ local function mk_rml(name, size, id, cid_name)
    -- characters & scaling
    if size < 0 then size = -size * 655.36 end
    local scale = size / 655360
-   local def_height =  round(0.88 * size) -- character's default height (optimized for jfm-ujis.lua)
-   local def_depth =  round(0.12 * size)  -- and depth.
+   local def_height =  0.88 * size -- character's default height (optimized for jfm-ujis.lua)
+   local def_depth =  0.12 * size  -- and depth.
    if not cache_chars[cid_name][size] then
       cache_chars[cid_name][size]  = {}
       for k, v in pairs(cache_chars[cid_name][655360]) do
          cache_chars[cid_name][size][k] = { 
-	    index = v.index, width = round(v.width * scale), 
+	    index = v.index, width = v.width * scale, 
 	    height = def_height, depth = def_depth, tounicode = v.tounicode,
 	 }
       end

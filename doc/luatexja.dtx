@@ -228,7 +228,7 @@ The followings are major changes from \pTeX:
 %</en>
 %<*ja>
 \item 2つの和文文字の間，和文文字と欧文文字の間に入るグルー／カーン
-      （\textbf{JAglue} と呼ぶ）の挿入処理が0から書き直されている．
+      （\textbf{JAglue}と呼ぶ）の挿入処理が0から書き直されている．
 %</ja>
 
 \begin{itemize}
@@ -300,7 +300,7 @@ The followings are major changes from \pTeX:
 For detailed information, see Part~\ref{part-imp}.
 %</en>
 %<*ja>
-詳細については第 \ref{part-imp} 部を参照．
+詳細については第\ref{part-imp}部を参照．
 %</ja>
 
 %<en>\subsection{Notations}
@@ -866,7 +866,7 @@ this chapter. For the method, please see Subsection~\ref{ssec-math}.
 %<*ja>
 また\LuaTeX-jaプロジェクトでは，和文文字が識別子として用いられることはほとんどない
 と考えており，したがってこの節では数式モード中の和文フォントを変更する方法については
-記述しない．この方法については \ref{ssec-math} 節を参照のこと．
+記述しない．この方法については\ref{ssec-math}節を参照のこと．
 %</ja>
 
 %<*en>
@@ -877,7 +877,7 @@ To change Japanese fonts in plain \TeX, you must use the primitive
 %<*ja>
 \paragraph{plain \TeX}
 plain \TeX で和文フォントを変更するためには，\verb+\jfont+ プリミティブを用いなけれ
-ばならない．\ref{ssec-jfont} 節を参照．
+ばならない．\ref{ssec-jfont}節を参照．
 %</ja>
 
 %<*en>
@@ -962,7 +962,7 @@ auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
       \texttt{JY3}に変更し，\verb+\fontencoding{T1}+ は欧文フォント側を
       \texttt{T1}へと変更する．\verb+\fontfamily+ も引数により和文側，欧文
       側，\textbf{あるいは両方}のフォントファミリを変更する．詳細は
-      \ref{ssub-nfsspat} 節を参照すること．
+      \ref{ssub-nfsspat}節を参照すること．
 %</ja>
 
 %<*en>
@@ -1055,7 +1055,7 @@ these 7~commands, since this feature and \textbf{JAglue} will clash (see
 和文フォントについては全ての和文文字のグリフがほぼ等幅であるのが普通であるため，
 \verb+\setmonojfont+ コマンドは存在しないことに注意．また，これらの和文用の7つのコマ
 ンドではKerning featureはデフォルトではoffとなっている．これはこの
-featureが\textbf{JAglue}と衝突するためである（\ref{para-kern} 節を参照）．
+featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を参照）．
 %</ja>
 
 %<en>\section{Changing Parameters}
@@ -1282,7 +1282,7 @@ This range consist of the following Unicode ranges, \emph{except characters in t
 	   indicated in Table~\ref{table-rng3}.
 %</en>
 %<*ja>
-\item[範囲3${}^{\text{J}}$] 句読点と記号類．ブロックのリストは表 \ref{table-rng3}
+\item[範囲3${}^{\text{J}}$] 句読点と記号類．ブロックのリストは表\ref{table-rng3}%
                              に示してある．
 %</ja>
 \begin{table}[!tb]
@@ -1370,7 +1370,7 @@ This range consist of the following Unicode ranges, \emph{except characters in t
 %</en>
 %<*ja>
 \item[範囲6${}^{\text{J}}$] 日本語で用いられる文字．ブロックのリストは
-                             表 \ref{table-rng6} に示す．
+                             表\ref{table-rng6}に示す．
 %</ja>
 \begin{table}[!tb]
 %<*en>
@@ -1429,7 +1429,7 @@ The block list is indicated in Table~\ref{table-rng7}.
 %<*ja>
 \item[範囲7${}^{\text{J}}$] CJK言語で用いられる文字のうち，Adobe-Japan1-6に
                             含まれていないもの．
-                            ブロックのリストは表 \ref{table-rng7} に示す．
+                            ブロックのリストは表\ref{table-rng7}に示す．
 %</ja>
 \begin{table}[!tb]
 %<*en>
@@ -1588,10 +1588,10 @@ as follows:
 \ltjsetparameter{alxspmode={`あ,preonly}, jaxspmode={`\!,postonly}}
 \end{verbatim}
 %<*en>
-One can use also numbers to specify these two parameters (see Subsection \ref{ssec-param}).
+One can use also numbers to specify these two parameters (see Subsection~\ref{ssec-param}).
 %</en>
 %<*ja>
-また，これら2パラメータには数値で値を指定することもできる（\ref{ssec-param} 節を参照）．
+また，これら2パラメータには数値で値を指定することもできる（\ref{ssec-param}節を参照）．
 %</ja>
 
 %<*en>
@@ -1813,7 +1813,7 @@ JFMの名前を指定する．もし以前に指定されたJFMが読み込ま�
 %<*ja>
 \item[\tt jfm-min.lua] \pTeX に同梱されているデフォルトの和文フォントメトリック
   である \verb+min10.tfm+ に相当するJFMである．このJFMと他の2つのJFMの間には
-  表 \ref{tab-difjfm} に示すような特筆すべき違いがある．
+  表\ref{tab-difjfm}に示すような特筆すべき違いがある．
 %</ja>
 \end{description}
 
@@ -1901,7 +1901,7 @@ TODO: kanjiskip?
 
 
 %<en>\subsection{Prefix \texttt{psft}}
-%<ja>\subsection{\texttt{psft} プレフィックス}
+%<ja>\subsection{\texttt{psft}プリフィックス}
 \label{ssec-psft}
 %<*en>
 Besides \texttt{file:}\ and \texttt{name:}\ prefixes, one can use \texttt{psft:}\
@@ -1909,27 +1909,57 @@ prefix in \verb+\jfont+ (and~\verb+\font+) primitive,
 to specify a `name-only' Japanese font which
 will not be embedded to PDF. Typical use of this prefix is to specify
 the `standard' Japanese fonts, namely, `Ryumin-Light' and
-`GothicBBB-Medium'. For kerning or other information, that of Kozuka
-Mincho Pr6N Regular (this is a font by Adobe Inc., and included in
-Japanese Font Packs for Adobe Reader) will be used.
+`GothicBBB-Medium'.
 %</en>
 %<*ja>
-\texttt{file:}と\texttt{name:}のプレフィックスに加えて，
+\texttt{file:}と\texttt{name:}のプリフィックスに加えて，
 \verb+\jfont+ プリミティブ（と \verb+\font+ プリミティブ）では
-\texttt{psft:}プレフィックスを用いることができる．
-このプレフィックスを用いることで，PDFには埋め込まれない「名前だけの」
-和文フォントを指定することができる．典型的な使い方は「標準的な」和文フォント，
-つまり`Ryumin-Light'と`GothicBBB-Medium'を指定することである．
-この場合，カーニング他の情報は小塚明朝 Pr6N Regular
-（Adobe社によるフォントで，Adobe Readerの日本語フォントパックに含まれている）
-が用いられる．
+\texttt{psft:}プリフィックスを用いることができる．
+このプリフィックスを用いることで，PDFには埋め込まれない「名前だけの」
+和文フォントを指定することができる．「標準的な」和文フォント，
+つまり`Ryumin-Light'と`GothicBBB-Medium'の指定でこのプリフィックスが使われる．
 %</ja>
 
 \paragraph{\texttt{cid} key}
 \label{para-cid}
 
- \texttt{cid} key, ...
+標準で\texttt{psft:}プリフィックスで定義されるフォントは日本語用のもので
+あり，Adobe-Japan1-6のCIDに対応したものとなる．しかし，\LuaTeX-jaは中国語
+の組版にも威力を発揮することが分かり，日本語フォントでない非埋込フォント
+の対応も必要となった．そのために追加されたのが\texttt{cid}キーである．
 
+\texttt{cid}キーに値を指定すると，そのCIDを持った非埋込フォントを定義することができる：
+\begin{lstlisting}[numbers=left]
+\jfont\testJ={psft:Ryumin-Light:cid=Adobe-Japan1-6;jfm=jis}     % 日本語
+\jfont\testD={psft:Ryumin-Light:jfm=jis}                        % 無指定時は Adobe-Japan1-6
+\jfont\testC={psft:AdobeMingStd-Light:cid=Adobe-CNS1-5;jfm=jis} % 中国語繁体字
+\jfont\testG={psft:SimSun:cid=Adobe-GB1-5;jfm=jis}              % 中国語簡体字
+\jfont\testK={psft:Batang:cid=Adobe-Korea1-2;jfm=jis}           % 韓国語
+\end{lstlisting}
+上のコードでは中国語・韓国語用フォントに対してもJFMに
+日本語用の \texttt{jfm-jis.lua} を指定しているので注意されたい．
+
+今のところ，\LuaTeX-jaは上のサンプルコード中に書いた4つの値しかサポートしていない．
+\begin{lstlisting}
+\jfont\test={psft:Ryumin-Light:cid=Adobe-Japan2;jfm=jis}
+\end{lstlisting}
+のようにそれら以外の値を指定すると，
+\begin{lstlisting}[numbers=left]
+! Package luatexja Error: bad cid key `Adobe-Japan2'.
+
+See the luatexja package documentation for explanation.
+Type  H <return>  for immediate help.
+<to be read again> 
+                   \par 
+l.78 
+     
+? h
+I couldn't find any non-embedded font information for the CID
+`Adobe-Japan2'. For now, I'll use `Adobe-Japan1-6'.
+Please contact the LuaTeX-ja project team.
+? 
+\end{lstlisting}
+というエラーが出る．
 
 %<en>\subsection{Structure of JFM file}
 %<ja>\subsection{JFMファイルの構造}
@@ -1992,7 +2022,7 @@ This field specifies the `ideal' amount of \Param{kanjiskip}. As noted
 	     fields are in design-size unit too.
 %</en>
 %<*ja>
-「理想的な」\Param{kanjiskip}の量を指定する．\ref{subs-kskip} 節で述べたように，
+「理想的な」\Param{kanjiskip}の量を指定する．\ref{subs-kskip}節で述べたように，
 もし\Param{kanjiskip}が \verb+\maxdimen+ の値ならば，このフィールドで指定された
 値が実際には用いられる（もしこのフィールドがJFMで指定されていなければ，
 0\,ptであるものとして扱われる）．<stretch>と<shrink>のフィールドもdesign-size
@@ -2089,7 +2119,7 @@ The effects of these 3~fields are indicated in Figure~\ref{fig-pos}.
 \texttt{'right'}のいずれかである．もしこれら3つのフィールドのうちの1つが省かれた
 場合，\texttt{left}と\texttt{down}は0，\texttt{align}フィールドは
 \texttt{'left'}であるものとして扱われる．
-これら3つのフィールドの意味については図 \ref{fig-pos} で説明する．
+これら3つのフィールドの意味については図\ref{fig-pos}で説明する．
 %</ja>
 
 %<*en>
@@ -2286,13 +2316,12 @@ The following is the list of `imaginary characters':
 ところで，\pTeX では通常の段落の先頭にJFMグルーが残るという仕様があるので，
       段落先頭の開き括弧は全角二分下がりになる．全角下がりを実現させるに
       は，段落の最初に手動で \verb+\inhibitglue+ を追加するか，あるいは
-      \verb+\everypar+ のハックを行い，それを自動化させるしかなかった．
+      \ \verb+\everypar+ のハックを行い，それを自動化させるしかなかった．
 
 一方，\LuaTeX-jaでは，\texttt{'parbdd'}によって，それがJFM側で調整できるよ
 うになった．例えば，\LuaTeX-ja同梱のJFMのように，\texttt{'boxbdd'}と同じ文字クラスに
 \texttt{'parbdd'}を入れれば全角下がりとなる．
 
-\ltjsetparameter{jacharrange={+3}}
 \begin{LTXexample}
 \jfont\g=psft:Ryumin-Light:jfm=test \g
 \parindent1\zw\noindent{}◆◆◆◆◆
@@ -2301,7 +2330,12 @@ The following is the list of `imaginary characters':
 \par 〔◆◆←全角二分下がり
 \end{LTXexample}
 \end{itemize}
-\ltjsetparameter{jacharrange={-3}}
+
+但し，\verb+\everypar+ を利用している場合にはこの仕組みは正しく動かない．
+そのような例としては箇条書き中の \verb+\item+ で始まる段落があり，\Pkg{ltjsclasses}では
+人工的に「\texttt{'parbdd'}の意味を持つ」whatsitノードを作ることによって対処している%
+\footnote{\texttt{no\_runtime/ltjsclasses.dtx} を参照されたい．
+JFM側で一部の対処ができることにより，\Pkg{jsclasses}のようにif文の判定はしていない．}
 %</ja>
 
 %<en>\subsection{Math Font Family}
@@ -2331,7 +2365,7 @@ you can set both \verb+\fam+ and \verb+\jfam+ to the same value.
 %</en>
 %<*ja>
 \LuaTeX-jaの数式中での和文フォントの扱いも同様である．
-表 \ref{tab-math} は数式フォントファミリに対する \TeX のプリミティブと対応する
+表\ref{tab-math}は数式フォントファミリに対する \TeX のプリミティブと対応する
 ものを示している．\verb+\fam+ と \verb+\jfam+ の値の間には関係はなく，
 適切な設定の下では \verb+\fam+ と \verb+\jfam+ の両方に同じ値を設定することができる．
 %</ja>
@@ -2596,7 +2630,7 @@ of \LuaTeX, see Section~\ref{sec-para}.
 \LuaTeX-jaのほとんどのパラメータにアクセスするためのプリミティブである．
 \LuaTeX-jaが\pTeX のような文法（例えば，\verb+\prebreakpenalty`）=10000+）を
 採用しない理由の一つは，\LuaTeX のソースにおける \verb+\hpack_filter+
-コールバックの位置にある．\ref{sec-para} 節を参照．
+コールバックの位置にある．\ref{sec-para}節を参照．
 %</ja>
 
 %<*en>
@@ -2938,9 +2972,9 @@ For an convenience, we will describe
 commands which are not described in Subsection~\ref{ssub-chgfnt}.
 %</en>
 %<*ja>
-\ref{ssec-ltx} 節で述べたように，\LuaTeX-jaはNFSS2への日本語パッチである
+\ref{ssec-ltx}節で述べたように，\LuaTeX-jaはNFSS2への日本語パッチである
 \pLaTeXe の\texttt{plfonts.dtx}を単純に取り入れている．
-便宜のため，ここでは \ref{ssub-chgfnt} 節で述べていなかったコマンドについて
+便宜のため，ここでは\ref{ssub-chgfnt}節で述べていなかったコマンドについて
 記述しておく．
 %</ja>
 
@@ -3135,7 +3169,7 @@ the following `font features' specifications are allowed for
 the commands of Japanese version:
 %</en>
 %<*ja>
-\ref{ssec-fontspec} 節で述べたように，この追加パッケージは\Pkg{fontspec}
+\ref{ssec-fontspec}節で述べたように，この追加パッケージは\Pkg{fontspec}
 パッケージで定義されているコマンドに対応する和文フォント用のコマンドを提供する．
 オリジナルの\Pkg{fontspec}での`font feature'に加えて，和文版のコマンドには
 以下の`font feature'を指定することができる：
@@ -3153,7 +3187,7 @@ These 2 font features correspond to \texttt{jfm} and \texttt{jfmvar} keys for
 %<*ja>
 これら2つのキーはそれぞれ \verb+\jfont+ プリミティブに対する
 \texttt{jfm}, \texttt{jfmvar}キーとそれぞれ対応する．
-\ref{ssec-jfont} 節を参照．
+\ref{ssec-jfont}節を参照．
 %</ja>
 
 \item[NoEmbed]
@@ -3163,7 +3197,7 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
 %</en>
 %<*ja>
 これを指定することで，PDFに埋め込まれない「名前だけ」のフォントを指定することが
-できる．\ref{ssec-psft} 節を参照．
+できる．\ref{ssec-psft}節を参照．
 %</ja>
 
 \item[CID=<name>]
@@ -3176,7 +3210,7 @@ The default value is Adobe-Japan1. See also Subsection~\ref{ssec-psft}.
 %<*ja>
 NoEmbed キーと合わせて用いる．
 非埋め込みの CID-keyed フォントがどの文字コレクションに基づくものかを指定する．
-デフォルトは Adobe-Japan1 である．\ref{ssec-psft} 節も参照．
+デフォルトは Adobe-Japan1 である．\ref{ssec-psft}節も参照．
 %</ja>
 \end{list}
 
@@ -3285,7 +3319,7 @@ As explained in Subsection~\ref{ssec-plain}, \verb+\jQ+ is equal to
 			a unit used in Japanese phototypesetting. So one should not change the value of this dimension.
 %</en>
 %<*ja>
-\ref{ssec-plain} 節で述べたように，\verb+\jQ+ は$1\,\textrm{Q}=0.25\,\textrm{mm}$
+\ref{ssec-plain}節で述べたように，\verb+\jQ+ は$1\,\textrm{Q}=0.25\,\textrm{mm}$
 と等しい．ここで，`Q'（もしくは「級」）は日本の写植で用いられる単位である．したがって，
 この寸法レジスタの値を変更してはならない．
 %</ja>
@@ -3567,7 +3601,7 @@ known from any callbacks.  In the \texttt{tex/packaging.w} (which is a
 file in the source of \LuaTeX), there are the following codes:
 %</en>
 %<*ja>
-\ref{ssec-param} 節で述べたように，ある水平ボックスの中で効力を持つ
+\ref{ssec-param}節で述べたように，ある水平ボックスの中で効力を持つ
 \Param{kanjiskip}の値は最後に現れた値のみであり，したがってボックス全体に適用される
 \Param{kanjiskip}は5\,ptであるべきである．しかし，\LuaTeX の実装のために，
 この`5\,pt'はどのコールバックからも知ることはできない．
@@ -3755,7 +3789,7 @@ after `beginning/ending of a group' characters.
 \item State~$M$: 行中．
 \item State~$K$: 行中（和文文字の後）．
 \end{itemize}
-また，状態遷移は，図 \ref{fig-ptexipro} のようになっており，図中の数字は
+また，状態遷移は，図\ref{fig-ptexipro}のようになっており，図中の数字は
 カテゴリーコードを表している．最初の3状態は\TeX の入力処理部と同じであり，
 図中から状態$K$と「$j$」と書かれた矢印を取り除けば，\TeX の入力処理部と同
 じものになる．
@@ -4358,7 +4392,7 @@ If this attempt fails, \LuaTeX-ja use the method `\textsf{\Param{kanjiskip}~[K]}
 \end{table}
 
 \subsection{その他の場合}
-本節の内容は表 \ref{tab-jfmglue} にまとめてある．
+本節の内容は表\ref{tab-jfmglue}にまとめてある．
 
 \paragraph{和文Aと欧文の間}
 \textit{Nq}が\textsf{和文A}で，\textit{Np}が\textsf{欧文}の場合，JFMグルー挿入処理は次のようにして行われる．
