@@ -204,14 +204,7 @@
   \directlua{luatexja.global_temp = tex.globaldefs; tex.globaldefs = 0}}
 \protected\def\ltj@restore@globaldefs{\directlua{tex.globaldefs = luatexja.global_temp}}
 \let\new@everypar=\everypar
-\protected\def\inhibitglue{\relax%
-  \ifvmode
-    \ltj@reset@globaldefs
-    \edef\ltj@@tmp{%
-      \everypar={\the\everypar}\the\everypar\noexpand\ltj@@ihb}%
-    \everypar\expandafter{\ltj@@tmp}%
-    \ltj@restore@globaldefs
-  \else\ifhmode\ltj@@ihb\fi\fi}
+\protected\def\inhibitglue{\ifhmode\ltj@@ihb\fi}
 \def\ltj@@ihb{\directlua{luatexja.jfmglue.create_inhibitglue_node()}}
 
 %%%%%%%% \yoko, \tate, \ifydir, \iftdir

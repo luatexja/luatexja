@@ -216,7 +216,7 @@ end
 local function main_process(head, mode, dir)
    local p = head
    p = ltjj.main(p,mode)
-   p = ltjw.set_ja_width(p, dir)
+   if p then p = ltjw.set_ja_width(p, dir) end
    return p
 end
 

@@ -3,8 +3,8 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2012/04/02',
-  version = '0.3',
+  date = '2012/04/25',
+  version = '0.4',
   description = 'Insertion process of JFM glues and kanjiskip',
 })
 module('luatexja.jfmglue', package.seeall)
@@ -331,20 +331,20 @@ local calc_np_auxtable = {
 	       end,
    [id_whatsit] = function() 
 		  if lp.subtype==sid_user then
-             if lp.user_id==30111 then
-                local lq = node_next(lp)
-                head = node_remove(head, lp); node_free(lp); lp = lq; ihb_flag = true
-             else
-                set_attr_icflag_processed(lp)
-                luatexbase.call_callback("luatexja.jfmglue.whatsit_getinfo"
-					 , Np, lp, Nq, box_stack_level)
-                lp = node_next(lp)
-                if Np.nuc then 
-                   Np.id = id_pbox_w; Np.first = Np.nuc; Np.last = Np.nuc; return true
-                end
-             end
-          else
-            set_attr_icflag_processed(lp)
+		     if lp.user_id==30111 then
+			local lq = node_next(lp)
+			head = node_remove(head, lp); node_free(lp); lp = lq; ihb_flag = true
+		     else
+			set_attr_icflag_processed(lp)
+			luatexbase.call_callback("luatexja.jfmglue.whatsit_getinfo"
+						 , Np, lp, Nq, box_stack_level)
+			lp = node_next(lp)
+			if Np.nuc then 
+			   Np.id = id_pbox_w; Np.first = Np.nuc; Np.last = Np.nuc; return true
+			end
+		     end
+		  else
+		     set_attr_icflag_processed(lp); lp = node_next(lp)
 		  end
 		  return false
 		  end,
@@ -821,11 +821,21 @@ local function handle_nq_ja_hlist()
    end
 end
 
+-- Nq が前側のクラスタとなることによる修正
+local function adjust_nq()
+   if Nq.id==id_glyph then after_alchar(Nq)
+   elseif Nq.id==id_hlist or Nq.id==id_pbox or Nq.id==id_disc then after_hlist(Nq)
+   elseif Nq.id == id_pbox_w then 
+      luatexbase.call_callback("luatexja.jfmglue.whatsit_after",
+			       false, Nq, Np, box_stack_level)
+   end
+end
+
 -------------------- 開始・終了時の処理
 
 -- リスト末尾の処理
 local function handle_list_tail()
-   Np = Nq
+   adjust_nq(); Np = Nq
    if mode then
       -- the current list is to be line-breaked:
       if Np.id == id_jglyph or (Np.id==id_pbox and Np.met) then 
@@ -850,9 +860,7 @@ local function handle_list_tail()
 	    head = node_insert_after(head, Np.last, g)
 	 end
       end
-      head = node_remove(head, last); node_free(last);-- remove the sentinel
    end
-   node_free(kanji_skip); node_free(xkanji_skip)
 end
 
 -- リスト先頭の処理
@@ -912,13 +920,22 @@ local function init_var()
    end
 end
 
--- Nq が前側のクラスタとなることによる修正
-local function adjust_nq()
-   if Nq.id==id_glyph then after_alchar(Nq)
-   elseif Nq.id==id_hlist or Nq.id==id_pbox or Nq.id==id_disc then after_hlist(Nq)
-   elseif Nq.id == id_pbox_w then 
-      luatexbase.call_callback("luatexja.jfmglue.whatsit_after",
-			       false, Nq, Np, box_stack_level)
+local function cleanup()
+   -- adjust attr_icflag for avoiding error
+   tex.attribute[attr_icflag] = -(0x7FFFFFFF)
+   node_free(kanji_skip); node_free(xkanji_skip)
+   if mode then
+      local h = node_next(head)
+      if h.id == id_penalty and h.penalty == 10000 then
+	 h = h.next
+	 if h.id == id_glue and h.subtype == 15 and not h.next then
+	    return false
+	 end
+      end
+      return head
+   else
+      head = node_remove(head, last); node_free(last);-- remove the sentinel
+      return head
    end
 end
 -------------------- 外部から呼ばれる関数
@@ -930,8 +947,7 @@ function main(ahead, amode)
    if Np then 
       extract_np(); handle_list_head()
    else
-      if not mode then head = node_remove(head, last); node_free(last) end
-      return head
+      return cleanup()
    end
    calc_np()
    while Np do
@@ -949,9 +965,7 @@ function main(ahead, amode)
       calc_np()
    end
    handle_list_tail()
-   -- adjust attr_icflag
-   tex.attribute[attr_icflag] = -(0x7FFFFFFF)
-   return head
+   return cleanup()
 end
 
 -- \inhibitglue
