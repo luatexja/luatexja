@@ -2546,7 +2546,7 @@ to be that of letters in the character class~0. For example, suppose that
 \end{itemize}
 Then, the position of glyphs is shifted up by
 \[
- \frac{88x}{88x+12x} (28y+5y) - 28y = \frac{26}{825}y= 0.03\dot1\dot5y.
+ \frac{88x}{88x+12x} (28y+5y) - 28y = \frac{26}{25}y= 1.04y.
 \]
 %</en>
 %<*ja>
@@ -2561,7 +2561,7 @@ Then, the position of glyphs is shifted up by
 \end{itemize}
 となっていたとする．すると，実際の文字の出力位置は，
 \[
- \frac{88x}{88x+12x} (28y+5y) - 28y = \frac{26}{825}y= 0.03\dot1\dot5y
+ \frac{88x}{88x+12x} (28y+5y) - 28y = \frac{26}{25}y= 1.04y.
 \]
 だけ上にずらされることになる．
 %</ja>
@@ -3466,13 +3466,13 @@ $i$ は7より小さい自然数．
 
 %<*en>
 Furthermore, \LuaTeX-ja uses several `user-defined' whatsit nodes for
-typesetting. All those nodes store a natural number (hence the node's
-\texttt{type} is 100).
+inrernal processing. All those nodes store a natural number (hence the node's
+\texttt{type} is 100). The following \verb+user_id+s are used:
 %</en>
 %<*ja>
-さらに，\LuaTeX-ja はいくつかの「ユーザ定義の」whatsit ノードを組版に用いる．
+さらに，\LuaTeX-ja はいくつかの「ユーザ定義の」whatsit ノードを内部処理に用いる．
 これらの全てのノードは自然数を格納している（したがってノードの \texttt{type} は
-100 である）．
+100 である）．次の \verb+user_id+ が使用される：
 %</ja>
 \begin{description}
 \item[30111]
@@ -3502,14 +3502,21 @@ Nodes for Japanese Characters which the callback process of
 	   luaotfload won't be applied, and the character code is
 	   stored in the \texttt{value} field. Each node having this
 	   \verb+user_id+ is converted to a `glyph\_node' \emph{after}
-	   the callback process of luaotfload.
+	   the callback process of luaotfload. 
+	   This \verb+user_id+ is only used by the \Pkg{luatexja-otf} package.
 %</en>
 %<*ja>
 luaotfload のコールバックによる処理が適用されない和文文字のためのノードで，
 \texttt{value} フィールドにその文字のコードが格納されている．
 この \verb+user_id+ を持つノードはそれぞれが luaotfload のコールバックの処理の
-\textbf{後で} `glyph\_node' に変換される．
+\textbf{後で} `glyph\_node' に変換される．この \verb+user_id+ は %
+\Pkg{luatexja-otf} パッケージでのみ使用される．
 %</ja>
+
+\item[30114]
+Nodes for indicating beginning of a paragraph. 
+A paragraph which is started by \verb+\item+ in list-like environments has a horizontal box
+for its label before the actual contents. So \dots
 \end{description}
 %<*en>
 These whatsits will be removed during the process of inserting \textbf{JAglue}s.

@@ -461,8 +461,9 @@ function set_np_xspc_alchar(Nx, c,x, lig)
       end
       Nx.pre = ltjs_get_penalty_table('pre', c, 0, box_stack_level)
       Nx.post = ltjs_get_penalty_table('post', c, 0, box_stack_level)
+      Nx.char = 'jcharbdd'
    else
-      Nx.pre = 0; Nx.post = 0
+      Nx.pre = 0; Nx.post = 0; Nx.char = -1
    end
    Nx.met = nil
    local y = ltjs_get_penalty_table('xsp', c, 3, box_stack_level)
@@ -737,16 +738,14 @@ end
 
 local function get_OA_skip()
    if not ihb_flag then
-      local c
-      if Nq.id == id_math then c = -1 else c = 'jcharbdd' end
+      local c = Nq.char or 'jcharbdd'
       return new_jfm_glue(Np, fast_find_char_class(c,Np.met), Np.class)
    else return nil
    end
 end
 local function get_OB_skip()
    if not ihb_flag then
-      local c
-      if Np.id == id_math then c = -1 else c = 'jcharbdd' end
+      local c = Np.char or 'jcharbdd'
       return new_jfm_glue(Nq, Nq.class, fast_find_char_class(c,Nq.met))
    else return nil
    end
@@ -956,9 +955,45 @@ function main(ahead, amode)
 end
 
 -- \inhibitglue
-local inhibitglue_node=node_new(id_whatsit, sid_user)
-inhibitglue_node.user_id=30111; inhibitglue_node.type=100; inhibitglue_node.value=1
 
 function create_inhibitglue_node()
-   node.write(node.copy(inhibitglue_node))
+   local tn = node_new(id_whatsit, sid_user)
+   tn.user_id=30111; tn.type=100; tn.value=1
+   node.write(tn)
 end
+
+-- Node for indicating beginning of a paragraph
+-- (for ltjsclasses)
+function create_beginpar_node()
+   local tn = node_new(id_whatsit, sid_user)
+   tn.user_id=30114; tn.type=100; tn.value=1
+   node.write(tn)
+end
+
+local function whatsit_callback(Np, lp, Nq, bsl)
+   if Np.nuc then return Np 
+   elseif lp.user_id == 30114 then
+      Np.first = lp; Np.nuc = lp; Np.last = lp
+      Np.char = 'parbdd'
+      Np.met = nil
+      Np.pre = 0; Np.post = 0
+      Np.xspc_before = false
+      Np.xspc_after  = false
+      Np.auto_xspc = false
+      return Np
+   end
+end
+local function whatsit_after_callback(s, Nq, Np, bsl)
+   if not s and Nq.nuc.user_id == 30114 then
+      local x, y = node.prev(Nq.nuc), Nq.nuc
+      Nq.first, Nq.nuc, Nq.last = x, x, x
+      head = node_remove(head, y)
+   end
+   return s
+end
+
+luatexbase.add_to_callback("luatexja.jfmglue.whatsit_getinfo", whatsit_callback,
+                           "luatexja.beginpar.np_info", 1)
+luatexbase.add_to_callback("luatexja.jfmglue.whatsit_after", whatsit_after_callback,
+                           "luatexja.beginpar.np_info_after", 1)
+
