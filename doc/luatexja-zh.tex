@@ -1,7 +1,6 @@
 \documentclass{ltjarticle}
 \usepackage[twoside,left=23mm,width=170mm,right=17mm,top=25mm,height=231mm,bottom=32mm]{geometry}
-\usepackage{multicol}
-\usepackage{showexpl}
+\usepackage{amsmath,amssymb,xcolor,pict2e,multienum,amsthm,float,makecell,multicol,hyperref,showexpl}
 
 \lstset{
   basicstyle=\ttfamily\small, pos=o, breaklines=true,
@@ -41,26 +40,54 @@
 \def\LuaTeX{Lua\TeX}
 \def\pTeX{p\TeX}
 \def\pLaTeX{p\LaTeX}
+\title{\LuaTeX-ja宏包}
+\author{\LuaTeX-ja项目团队}
+\date{}
 \begin{document}
-\section{\LuaTeX-ja的开发背景}
+\maketitle
+\tableofcontents
+\section{引言}
+\subsection{开发背景}
 \LuaTeX-ja是日本开发者北川弘典首倡的一个\LuaTeX的日文支持项目，该项目将\pTeX移植到了\LuaTeX，并做了一定的扩展，删除了一些不正常的特性。
 
-\LuaTeX-ja的项目开发者如下：北川弘典，前田一贵，八登崇之，黑木裕介，阿部纪行，山本宗宏，本田知亮，斋藤修三郎和马起园等。
+%\LuaTeX-ja的项目开发者如下：北川弘典，前田一贵，八登崇之，黑木裕介，阿部纪行，山本宗宏，本田知亮，斋藤修三郎和马起园等。
 
 \LuaTeX-ja现在只能用于plain \TeX格式和\LaTeXe格式，尚不支持\TeX info和Con\TeX t格式。
 
 \LuaTeX-ja现在的代码实现依赖于\verb!luatexbase!以及\verb!luaotfload!等宏包，并且现在仅仅实现了横排，直排组版尚未实现。
-\section{一些约定}
+\subsection{一些约定}
 在本文档中，有下面一些约定：
 \begin{itemize}
-\item 所有的CJK字符为\textbf{JAchar}，所有的其他字符为\textbf{ALchar}
+\item 所有的日文字符为\textbf{JAchar}，所有的其他字符为\textbf{ALchar}
 \item primitive，该词在本文档中不仅表示\LuaTeX的基本控制命令，也包括\LuaTeX-ja的相关的基本控制命令
 \item 所有的自然数从0开始
+\item 本文档中文文档是根据日文文档翻译并添加部分材料组织而成的，所以在大部分篇幅上还是主要依赖于日文原文档
 \end{itemize}
-\section{安装使用}
-\subsection{\LuaTeX版本需求}
-\LuaTeX-ja需要使用版本号为大于0.65的\LuaTeX。如果用户使用的是\TeX Live2011或者Mac\TeX 2011以及最新版本的W32\TeX，都可以正常使用\LuaTeX-ja。
-\subsection{\LuaTeX-ja宏包安装}
+\subsection{关于本项目}
+\paragraph{项目wiki} 本项目wiki正在不断编写中。
+\begin{itemize}
+\item \url{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage%28en%29}（英文）
+\item \url{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage}（日文）
+\item \url{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage%28zh%29}（中文）
+\end{itemize}
+\paragraph{开发者}
+\begin{multienumerate}
+\def\labelenumi{$\bullet$}
+\mitemxxx{北川弘典}{前田一贵}{八登崇之}
+\mitemxxx{黒木裕介}{阿部纪行}{山本宗宏}
+\mitemxxx{本田知亮}{斋藤修三郎}{马起园}
+\end{multienumerate}
+\section{初次使用}
+\subsection{安装}
+在安装\LuaTeX-ja之前，请确认：
+\begin{itemize}
+\item \LuaTeX（版本号为大于0.65）和相关支持宏包。\\
+如果用户使用的是\TeX Live2011以及最新版本的W32\TeX，都可以不考虑此项。
+\item \LuaTeX-ja的源码:)
+\item \underline{\texttt{xunicode}}宏包，当前版本必须为\textit{v0.981(2011/09/09)}。\\
+如果你使用\underline{\texttt{fontspec}}宏包，\underline{\texttt{xunicode}}必须存在。但是请注意该包版本，其他版本可能不会正常工作。
+\end{itemize}
+安装方法如下：
 \begin{enumerate}
 \item \LuaTeX-ja宏包的获取：
 	\begin{itemize}
@@ -113,7 +140,6 @@
 	\end{tabular}
 \end{center}
 \item 在数学模式下，所有的字符使用\verb!mc!字体族来排印
-%中文的C\TeX和xeCJK都没有进行此项设定，导致不能在数学模式下输入中文
 \end{itemize}
 
 上述使用的宏包，只满足了最小的日文环境设定需求，并为满足所有的日文排版需求。
@@ -346,7 +372,7 @@ Lua\TeX-ja中文测试。{\hei 测试}
 \end{verbatim}
 
 当JFM包含“\textsf{kanjiskip}理想宽度”和/或“\textsf{xkanjiskip}理想宽度”数据时，上述设定产生作用。如果想用JFM中的数据，请设定\textsf{kanjiskip}或\textsf{xkanjiskip}为\verb!\maxdimen!。
-\subsection{\textsc{xkanjiskip}插入设定}
+\subsection{\textsf{xkanjiskip}插入设定}
 并不是在所有的\textbf{JAchar}和\textbf{ALchar}周围插入\textsf{xkanjiskip}都是合适的。
 比如，在开标点之后插入\textsf{xkanjiskip}并不合适[如，比较“(あ”和“(\hskip\ltjgetparameter{xkanjiskip}あ”]。
 \LuaTeX-ja可以通过设定\textbf{JAchar}的\textsf{jaxspmode}以及\textbf{ALchar}的\textsf{alxspmode}来控制\textsf{xkanjiskip}在字符前后的插入。
