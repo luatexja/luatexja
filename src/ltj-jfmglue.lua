@@ -193,6 +193,7 @@ local function check_box(box_ptr, box_end)
 	    last_char = p; found_visible_node = true; p=node_next(p)
 	    if (not p) or p==box_end then return found_visible_node end
 	 until p.id~=id_glyph
+	 pid = p.id
       end
       if pid==id_hlist then
 	 if has_attr(p, attr_icflag)==PACKED then
@@ -763,6 +764,7 @@ local function handle_np_jachar()
       handle_penalty_normal(0, Np.pre, g); real_insert(0, g)
    elseif Nq.pre then 
       g = get_OA_skip() or get_xkanjiskip(Np) -- O_A->X
+      if Nq.id==id_hlist then Nq.post = 0 end
       handle_penalty_normal(Nq.post, Np.pre, g); real_insert(0, g)
    else
       g = get_OA_skip() -- O_A
@@ -783,6 +785,7 @@ end
 local function handle_nq_jachar()
    local g
    if Np.pre then 
+      if Np.id==id_hlist then Np.pre = 0 end
       g = get_OB_skip() or get_xkanjiskip(Nq) -- O_B->X
       g = lineend_fix(g)
       handle_penalty_normal(Nq.post, Np.pre, g); real_insert(Nq.lend, g)
