@@ -1920,9 +1920,26 @@ the `standard' Japanese fonts, namely, `Ryumin-Light' and
 つまり`Ryumin-Light'と`GothicBBB-Medium'の指定でこのプリフィックスが使われる．
 %</ja>
 
-\paragraph{\texttt{cid} key}
+%<en>\paragraph{\texttt{cid} key}
+%<ja>\paragraph{\texttt{cid}キー}
 \label{para-cid}
 
+%<*en>
+The default font defined by using \texttt{psft:} prefix is for Japanese typesetting;
+it is Adobe-Japan1-6 CID-keyed font.
+One can specify \texttt{cid} key to use other CID-keyed non-embedded fonts
+for Chinese or Korean typesetting.
+\begin{lstlisting}[numbers=left]
+\jfont\testJ={psft:Ryumin-Light:cid=Adobe-Japan1-6;jfm=jis}     % Japanese
+\jfont\testD={psft:Ryumin-Light:jfm=jis}                        % default value is Adobe-Japan1-6
+\jfont\testC={psft:AdobeMingStd-Light:cid=Adobe-CNS1-5;jfm=jis} % Traditional Chinese
+\jfont\testG={psft:SimSun:cid=Adobe-GB1-5;jfm=jis}              % Simplified Chinese
+\jfont\testK={psft:Batang:cid=Adobe-Korea1-2;jfm=jis}           % Korean
+\end{lstlisting}
+Note that the code above specifies \texttt{jfm-jis.lua}, which is for Japanese fonts,
+as JFM for Chinese and Korean fonts.
+%</en>
+%<*ja>
 標準で\texttt{psft:}プリフィックスで定義されるフォントは日本語用のもので
 あり，Adobe-Japan1-6のCIDに対応したものとなる．しかし，\LuaTeX-jaは中国語
 の組版にも威力を発揮することが分かり，日本語フォントでない非埋込フォント
@@ -1937,29 +1954,43 @@ the `standard' Japanese fonts, namely, `Ryumin-Light' and
 \jfont\testK={psft:Batang:cid=Adobe-Korea1-2;jfm=jis}           % 韓国語
 \end{lstlisting}
 上のコードでは中国語・韓国語用フォントに対してもJFMに
-日本語用の \texttt{jfm-jis.lua} を指定しているので注意されたい．
+日本語用の\texttt{jfm-jis.lua}を指定しているので注意されたい．
+%</ja>
 
+%<*en>
+At present, \LuaTeX-ja supports only 4 values written in the sample code above.
+Specifying other values, e.g.,
+%</en>
+%<*ja>
 今のところ，\LuaTeX-jaは上のサンプルコード中に書いた4つの値しかサポートしていない．
+%</ja>
 \begin{lstlisting}
 \jfont\test={psft:Ryumin-Light:cid=Adobe-Japan2;jfm=jis}
 \end{lstlisting}
+%<*en>
+occurs the following error:
+%</en>
+%<*ja>
 のようにそれら以外の値を指定すると，
+%</ja>
 \begin{lstlisting}[numbers=left]
 ! Package luatexja Error: bad cid key `Adobe-Japan2'.
 
 See the luatexja package documentation for explanation.
 Type  H <return>  for immediate help.
-<to be read again> 
-                   \par 
-l.78 
-     
+<to be read again>
+                   \par
+l.78
+
 ? h
 I couldn't find any non-embedded font information for the CID
 `Adobe-Japan2'. For now, I'll use `Adobe-Japan1-6'.
 Please contact the LuaTeX-ja project team.
-? 
+?
 \end{lstlisting}
+%<*ja>
 というエラーが出る．
+%</ja>
 
 %<en>\subsection{Structure of JFM file}
 %<ja>\subsection{JFMファイルの構造}
@@ -3177,40 +3208,32 @@ the commands of Japanese version:
 
 
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
+\item[CID=<name>]
 \item[JFM=<name>]
-\item[JFM-var=<name>]
+\item[JFM-var=<name>] \
 
 %<*en>
-These 2 font features correspond to \texttt{jfm} and \texttt{jfmvar} keys for
-\verb+\jfont+ primitive, respectively. See Subsection~\ref{ssec-jfont}.
+These 3 font features correspond to \texttt{cid}, \texttt{jfm} and
+\texttt{jfmvar} keys for \verb+\jfont+ primitive, respectively.
+\texttt{CID} is effective only when with \texttt{NoEmbed}
+described below.
+See Subsections~\ref{ssec-jfont} and \ref{ssec-psft} for details.
 %</en>
 %<*ja>
-これら2つのキーはそれぞれ \verb+\jfont+ プリミティブに対する
-\texttt{jfm}, \texttt{jfmvar}キーとそれぞれ対応する．
-\ref{ssec-jfont}節を参照．
+これら3つのキーはそれぞれ \verb+\jfont+ プリミティブに対する
+\texttt{cid}, \texttt{jfm}, \texttt{jfmvar}キーとそれぞれ対応する．
+\texttt{CID} は下の \texttt{NoEmbed} と合わせて用いられたときのみ有効である．
+詳細は\ref{ssec-jfont}節と\ref{ssec-psft}節を参照．
 %</ja>
 
 \item[NoEmbed]
 %<*en>
-By specifying this font feature, you can use `name-only' Japanese font which
+By specifying this font feature, one can use `name-only' Japanese font which
 will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
 %</en>
 %<*ja>
 これを指定することで，PDFに埋め込まれない「名前だけ」のフォントを指定することが
 できる．\ref{ssec-psft}節を参照．
-%</ja>
-
-\item[CID=<name>]
-%<*en>
-This feature is effective only when with NoEmbed feature.
-You can use the non-embedded CID-keyed font whose glyphs are addressed according
-to the specified character collection defined by Adobe Inc.
-The default value is Adobe-Japan1. See also Subsection~\ref{ssec-psft}.
-%</en>
-%<*ja>
-NoEmbed キーと合わせて用いる．
-非埋め込みの CID-keyed フォントがどの文字コレクションに基づくものかを指定する．
-デフォルトは Adobe-Japan1 である．\ref{ssec-psft}節も参照．
 %</ja>
 \end{list}
 
@@ -3557,7 +3580,7 @@ Nodes for Japanese Characters which the callback process of
 %</ja>
 
 \item[30114]
-Nodes for indicating beginning of a paragraph. 
+Nodes for indicating beginning of a paragraph.
 A paragraph which is started by \verb+\item+ in list-like environments has a horizontal box
 for its label before the actual contents. So \dots
 \end{description}
