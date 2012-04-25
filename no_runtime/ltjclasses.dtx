@@ -8,7 +8,7 @@
 %  This file is part of the pLaTeX2e system.
 %  -----------------------------------------
 %
-% \fi 
+% \fi
 %
 % \CheckSum{4475}
 %% \CharacterTable
@@ -75,7 +75,7 @@
 %   \cs{section},\cs{subsection},\cs{subsubsection}の前後空きの伸縮幅を修正。
 %   (ありがとうございます、鈴木た＠MILNさん)}
 % \changes{v1.6}{2006/06/27}{フォントコマンドを修正。ありがとう、ymtさん。}
-% \changes{v1.6-ltj}{2011/09/27}{jclasses.dtx v1.6 をベースに Lua\LaTeX-ja 用に修正。}
+% \changes{v1.6-ltj}{2011/09/27}{jclasses.dtx v1.6 をベースにLua\LaTeX-ja用に修正。}
 % \fi
 %
 % \iffalse
@@ -113,8 +113,8 @@
 \documentclass{ltjltxdoc}
 \GetFileInfo{ltjclasses.dtx}
 \usepackage[unicode]{hyperref}
-\title{Lua\LaTeX-ja用 \texttt{jclasses} 互換クラス}
-\author{Lua\TeX-ja プロジェクト}
+\title{Lua\LaTeX-ja用\texttt{jclasses}互換クラス}
+\author{Lua\TeX-jaプロジェクト}
 \date{\filedate}
 \begin{document}
   \maketitle
@@ -125,8 +125,8 @@
 % \fi
 %
 % \section{はじめに}
-% このファイルは、Lua\LaTeX-ja 用の |jclasses| 互換クラスファイルです。
-% v1.6 をベースに作成しています。
+% このファイルは、Lua\LaTeX-ja用の|jclasses|互換クラスファイルです。
+% v1.6をベースに作成しています。
 % \dst{}プログラムによって、横組用のクラスファイルと縦組用のクラスファイル
 % を作成することができます。
 %
@@ -150,22 +150,22 @@
 % \MakeShortVerb{\|}
 %
 % \subsection{\texttt{jclasses.dtx} からの主な変更点}
-% 全ての変更点を知りたい場合は、|jclasses.dtx| と |ltjclasses.dtx| で |diff| を
+% 全ての変更点を知りたい場合は、|jclasses.dtx|と|ltjclasses.dtx|で|diff|を
 % とって下さい。
 % \begin{itemize}
-% \item |disablejfam| オプションを無効化。もし
+% \item |disablejfam|オプションを無効化。もし
 % \begin{quotation}
 %   |! LaTeX Error: Too many math alphabets used in version ****.|
 % \end{quotation}
-% のエラーが起こった場合は、|lualatex-math| パッケージを読み込んでみて下さい。
-% \item 出力 PDF の用紙サイズが自動的に設定されるようにしてあります。
+% のエラーが起こった場合は、|lualatex-math|パッケージを読み込んでみて下さい。
+% \item 出力PDFの用紙サイズが自動的に設定されるようにしてあります。
 % \item \cs{if西暦}、\cs{西暦}、\cs{和暦}をそれぞれ\cs{ifSeireki}, \cs{Seireki},
-%   \cs{Wareki} に変更してあります。これはデフォルトの漢字のカテゴリコードが12で
+%   \cs{Wareki}に変更してあります。これはデフォルトの漢字のカテゴリコードが12で
 %   あるためです。
 % \end{itemize}
 %
 % \section{Lua\TeX-ja の読み込み}
-% 最初に |luatexja| を読み込みます。
+% 最初に|luatexja|を読み込みます。
 %    \begin{macrocode}
 %<*article|report|book>
 \RequirePackage{luatexja}
@@ -176,7 +176,7 @@
 %
 % \begin{macro}{\c@@paper}
 % 用紙サイズを示すために使います。
-% A4, A5, B4, B5 用紙はそれぞれ、1, 2, 3, 4 として表されます。
+% A4, A5, B4, B5用紙はそれぞれ、1, 2, 3, 4として表されます。
 %    \begin{macrocode}
 \newcounter{@paper}
 %    \end{macrocode}
@@ -191,7 +191,7 @@
 %
 % \begin{macro}{\@ptsize}
 % 組版をするポイント数の一の位を保存するために使います。
-% 0, 1, 2 のいずれかです。
+% 0, 1, 2のいずれかです。
 %    \begin{macrocode}
 \newcommand{\@ptsize}{}
 %    \end{macrocode}
@@ -373,7 +373,7 @@
 %
 % \subsection{組方向オプション}
 % このオプションが指定されると、縦組で組版をします。
-% しかし Lua\TeX-ja ではまだ縦組は未対応なのでコメントアウトします。
+% しかしLua\TeX-jaではまだ縦組は未対応なのでコメントアウトします。
 % \changes{v1.0g}{1997/01/25}{Insert \cs{hbox}, to switch tate-mode.}
 % \changes{v1.1d}{1997/02/05}{開始ページがおかしくなるのを修正}
 % \changes{v1.1f}{1997/07/08}{縦組時にベースラインがおかしくなるのを修正}
@@ -449,12 +449,12 @@
 %
 % \subsection{日本語ファミリ宣言の抑制、和欧文両対応の数式文字}
 % p\TeX では数式ファミリの数が16個だったので日本語ファミリ宣言を抑制する
-% |disablejfam| オプションが用意されていましたが、Lua\TeX では Omega 拡張が
+% |disablejfam|オプションが用意されていましたが、Lua\TeX ではOmega拡張が
 % 取り込まれて数式ファミリは256個まで使用できるため、このオプションは必要ありません。
 % ただし、\LaTeXe カーネルでは未だに数式ファミリの数は16個に制限されているので、
-% 実際に使用可能な数式ファミリの数を増やすためには |lualatex-math| パッケージを
+% 実際に使用可能な数式ファミリの数を増やすためには|lualatex-math|パッケージを
 % 読み込む必要があることに注意が必要です。
-% 
+%
 % |mathrmmc|オプションは、
 % |\mathrm|と|\mathbf|を和欧文両対応にするためのクラスオプションです。
 % \changes{v1.1d}{1992/02/04}{disablejfamの判断を間違えてたのを修正}
@@ -501,7 +501,7 @@
 %<!book&yoko>\input{ltjsize1\@ptsize.clo}
 %    \end{macrocode}
 % 縦組用クラスファイルの場合は、ここで\file{plext.sty}が読み込まれていました。
-% Lua\TeX-ja でどうなるかは未定です。
+% Lua\TeX-jaでどうなるかは未定です。
 % \changes{v1.0e}{1996/03/21}{\cs{usepackage} to \cs{RequirePackage}}
 %    \begin{macrocode}
 %<tate>%\RequirePackage{plext}
@@ -511,21 +511,21 @@
 % \section{フォント}
 %
 % Lua\LaTeX-jaの標準では、OTFパッケージ由来のメトリックが使われるようになっています。
-% 本クラスでは、「p\TeX の組版と互換性をできだけ持たせる」例を提示するため、
+% 本クラスでは、「p\TeX の組版と互換性をできるだけ持たせる」例を提示するため、
 % \begin{itemize}
 % \item メトリックを\texttt{min10.tfm}ベースの\texttt{jfm-min.lua}に変更。
 % \item 明朝とゴシックは両方とも\texttt{jfm-min.lua}を用いるが、
 %   和文処理用グルー挿入時には「違うメトリックを使用」として思わせる。
 % \item p\TeX と同様に、「異なるメトリックの2つの和文文字」の間には、両者から定める
 %   グルーを両方挿入する。
-% \item calllback を利用し、標準で用いる\texttt{jfm-min.lua}を、段落始めの括弧が全角二分下がりになるように内部で変更している。
-% 
+% \item calllbackを利用し、標準で用いる\texttt{jfm-min.lua}を、段落始めの括弧が全角二分下がりになるように内部で変更している。
+%
 % \end{itemize}
 %
 %    \begin{macrocode}
 %<*article|report|book>
-\directlua{luatexbase.add_to_callback('luatexja.load_jfm', 
-  function (ji, jn) ji.chars['parbdd'] = 0; return ji end, 
+\directlua{luatexbase.add_to_callback('luatexja.load_jfm',
+  function (ji, jn) ji.chars['parbdd'] = 0; return ji end,
   'ltj.jclasses_load_jfm', 1)}
 {\jfont\g=psft:Ryumin-Light:jfm=min } % loading jfm-min.lua
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
@@ -776,8 +776,8 @@
 %
 % \begin{macro}{\pdfpagewidth}
 % \begin{macro}{\pdfpageheight}
-% 出力の PDF の用紙サイズをここで設定しておきます。
-% |tombow| が真のときは2インチ足しておきます。
+% 出力のPDFの用紙サイズをここで設定しておきます。
+% |tombow|が真のときは2インチ足しておきます。
 %    \begin{macrocode}
 \setlength{\@tempdima}{\paperwidth}
 \setlength{\@tempdimb}{\paperheight}
@@ -1667,7 +1667,7 @@
 %
 % \section{ページスタイル}\label{sec:pagestyle}
 % つぎの6種類のページスタイルを使用できます。
-% \pstyle{empty}は\file{latex.dtx}で定義されています。 
+% \pstyle{empty}は\file{latex.dtx}で定義されています。
 %
 % \begin{tabular}{ll}
 % empty      & ヘッダにもフッタにも出力しない\\
@@ -1880,7 +1880,7 @@
 % ヘッダに見出しを、フッタにページ番号を出力します。
 %
 % このスタイルは、両面印刷と片面印刷とで形式が異なります。
-% \changes{v1.0d}{1995/08/23}{横組の evenfoot が中央揃えになっていたのを修正}
+% \changes{v1.0d}{1995/08/23}{横組のevenfootが中央揃えになっていたのを修正}
 % \changes{v1.0d}{1996/03/05}{横組で偶数ページと奇数ページの設定が逆なのを修正}
 %    \begin{macrocode}
 \if@twoside
@@ -3461,7 +3461,7 @@
 %
 % \changes{v1.6}{2006/06/27}{フォントコマンドを修正。ありがとう、ymtさん。}
 %    \LaTeX{} 2.09
-%    compatibility mode では和文数式フォントfam が2重定義されていた
+%    compatibility mode では和文数式フォントfamが2重定義されていた
 %    ので、その部分を変更しました。
 %    \begin{macrocode}
 \if@compatibility\else
@@ -4176,7 +4176,7 @@
 %<*yoko>
 \if@twoside
   \@mparswitchtrue
-\else 
+\else
   \@mparswitchfalse
 \fi
 %</yoko>
