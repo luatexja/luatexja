@@ -52,6 +52,11 @@ local id_pbox = node.id('hlist') + 512        -- already processed nodes (by \un
 local id_pbox_w = node.id('hlist') + 513      -- cluster which consists of a whatsit
 local sid_user = node.subtype('user_defined')
 
+local sid_start_link = node.subtype('pdf_start_link')
+local sid_start_thread = node.subtype('pdf_start_thread')
+local sid_end_link = node.subtype('pdf_end_link')
+local sid_end_thread = node.subtype('pdf_end_thread')
+
 local ITALIC = 1
 local PACKED = 2
 local KINSOKU = 3
@@ -273,7 +278,7 @@ end
 
 local function calc_np_pbox()
    local uid = has_attr(lp, attr_uniqid)
-   Np.first = lp; Np.id = id_pbox
+   Np.first = Np.first or lp; Np.id = id_pbox
    lpa = KINSOKU -- dummy=
    while lp~=last and lpa>=PACKED and lpa~=BOXBDD
       and has_attr(lp, attr_uniqid) == uid do
@@ -285,17 +290,17 @@ end
 
 local calc_np_auxtable = {
    [id_glyph] = function() 
-		   Np.first = lp
+		   Np.first = Np.first or lp
 		   if lp.font == has_attr(lp, attr_curjfnt) then 
 		      Np.id = id_jglyph 
 		   else 
 		      Np.id = id_glyph 
 		   end
-		   Np.first = lp; Np.nuc = lp; set_attr_icflag_processed(lp)
+		   Np.nuc = lp; set_attr_icflag_processed(lp)
 		   lp = node_next(lp); check_next_ickern(); return true
 		end,
    [id_hlist] = function() 
-		   Np.first = lp; Np.last = lp; Np.nuc = lp; 
+		   Np.first = Np.first or lp; Np.last = lp; Np.nuc = lp; 
 		   set_attr_icflag_processed(lp)
 		   if lp.shift~=0 then 
 		      Np.id = id_box_like
@@ -305,12 +310,12 @@ local calc_np_auxtable = {
 		   lp = node_next(lp); return true
 		end,
    [id_vlist] = function()
-		   Np.first = lp; Np.nuc = lp; Np.last = lp;
+		   Np.first = Np.first or lp; Np.nuc = lp; Np.last = lp;
 		   Np.id = id_box_like; set_attr_icflag_processed(lp); 
 		   lp = node_next(lp); return true
 		end,
    [id_rule] = function()
-		  Np.first = lp; Np.nuc = lp; Np.last = lp;
+		  Np.first = Np.first or lp; Np.nuc = lp; Np.last = lp;
 		  Np.id = id_box_like; set_attr_icflag_processed(lp); 
 		  lp = node_next(lp); return true
 	       end,
@@ -327,7 +332,8 @@ local calc_np_auxtable = {
 		    return false
 		 end,
    [id_disc] = function()
-		  Np.first = lp; Np.nuc = lp; set_attr_icflag_processed(lp); 
+		  Np.first = Np.first or lp; 
+          Np.nuc = lp; set_attr_icflag_processed(lp); 
 		  Np.last = lp; Np.id = id_disc; lp = node_next(lp); return true
 	       end,
    [id_whatsit] = function() 
@@ -345,12 +351,18 @@ local calc_np_auxtable = {
 			end
 		     end
 		  else
+             -- we do special treatment for these whatsit nodes.
+             if lp.subtype == sid_start_link or lp.subtype == sid_start_thread then
+                Np.first = lp 
+             elseif lp.subtype == sid_end_link or lp.subtype == sid_end_thread then
+                Nq.last = lp; Np.first = nil
+             end
 		     set_attr_icflag_processed(lp); lp = node_next(lp)
 		  end
 		  return false
 		  end,
    [id_math] = function()
-		  Np.first = lp; Np.nuc = lp; 
+		  Np.first = Np.first or lp; Np.nuc = lp; 
 		  set_attr_icflag_processed(lp); lp  = node_next(lp) 
 		  while lp.id~=id_math do 
 		     set_attr_icflag_processed(lp); lp  = node_next(lp) 
@@ -360,11 +372,11 @@ local calc_np_auxtable = {
 		  return true
 	       end,
    [id_glue] = function()
-		  Np.first = lp; Np.nuc = lp; set_attr_icflag_processed(lp); 
+		  Np.first = Np.first or lp; Np.nuc = lp; set_attr_icflag_processed(lp); 
 		  Np.last = lp; Np.id = id_glue; lp = node_next(lp); return true
 	       end,
    [id_kern] = function() 
-		  Np.first = lp
+		  Np.first = Np.first or lp
 		  if lp.subtype==2 then
 		     set_attr_icflag_processed(lp); lp = node_next(lp)
 		     set_attr_icflag_processed(lp); lp = node_next(lp)
@@ -387,7 +399,7 @@ local calc_np_auxtable = {
 		     lp = node_next(lp); return false
 		  end,
    [13] = function()
-		  Np.first = lp; Np.nuc = lp; Np.last = lp;
+		  Np.first = Np.first or lp; Np.nuc = lp; Np.last = lp;
 		  Np.id = id_box_like; set_attr_icflag_processed(lp); 
 		  lp = node_next(lp); return true
 	       end,

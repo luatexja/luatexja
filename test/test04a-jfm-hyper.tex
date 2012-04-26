@@ -1,0 +1,28 @@
+%#!lualatex
+\documentclass{article}
+\usepackage{luatexja}
+\usepackage[pdfborder={0 0 0.1}]{hyperref}
+% \usepackage{hyperref,luatexja} ではなぜかダメ
+\def\dumplist#1{\par\noindent\leavevmode
+\hbox to 0.2\hsize{\copy#1\hss}%
+\vbox{\hsize=0.6\hsize\scriptsize\tt\baselineskip=7.2pt\let\\=\relax
+\directlua{luatexja.ext_show_node_list(tex.getbox(#1).head, '\\par ', tex.print)}\hrule}}
+
+\def\thesubsection{．}
+\def\thesubsubsection{あ}
+\DeclareFontShape{JY3}{mc}{h}{n}{<-> s*[0.962212] psft:GothicBBB-Medium:jfm=hang}{}
+\ltjsetparameter{xkanjiskip=10pt}% わざと大きくする
+\begin{document}
+\section{hoge}\label{hoge}
+
+\subsection{piyo}\label{piyo}
+
+\subsubsection{fuga}\label{fuga}
+
+\setbox0=\hbox{あ\ref{hoge}い}\dumplist0
+\setbox0=\hbox{）\ref{hoge}（}\dumplist0
+\setbox0=\hbox{\kanjiseries{h}\selectfont あ\ref{piyo}い}\dumplist0
+\setbox0=\hbox{あ\ref{piyo}い}\dumplist0
+\setbox0=\hbox{）\ref{hoge}\ref{fuga}}\dumplist0
+
+\end{document}
