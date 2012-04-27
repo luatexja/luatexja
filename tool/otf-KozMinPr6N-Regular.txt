@@ -1,0 +1,38 @@
+aalt	Access All Alternates
+afrc	Alternative Fractions
+ccmp	Glyph Composition/Decomposition
+dlig	Discretionary Ligatures
+dnom	Denominators
+expt	Expert Forms
+frac	Fractions
+fwid	Full Widths
+halt	Alternate Half Widths
+hkna	Horizontal Kana Alternates
+hojo	<unknown feature>
+hwid	Half Widths
+ital	Italics
+jp78	JIS78 Forms
+jp83	JIS83 Forms
+jp90	JIS90 Forms
+kern	Kerning
+liga	Standard Ligatures
+nalt	Alternate Annotation Forms
+nlck	NLC Kanji Forms
+numr	Numerators
+palt	Proportional Alternate Widths
+pkna	<unknown feature>
+pwid	Proportional Widths
+qwid	Quarter Widths
+ruby	Ruby Notation Forms
+sinf	Scientific Inferiors
+subs	Subscript
+sups	Superscript
+trad	Traditional Forms
+twid	Third Widths
+vert	Vertical Writing
+vhal	Alternate Vertical Half Metrics
+vkna	Vertical Kana Alternates
+vkrn	Vertical Kerning
+vpal	Proportional Alternate Vertical Metrics
+vrt2	Vertical Alternates and Rotation
+zero	Slashed Zero

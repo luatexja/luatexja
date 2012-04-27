@@ -1,0 +1,67 @@
+\catcode`\@=11
+\ifx\hsplit@defined\@undefined
+\def\hsplit@defined{\relax}%
+\newbox\hsplit@tmpbox
+\newbox\hsplit@tmpboy
+\newbox\hsplit@tmpboz
+\newbox\hsplit@tmpbow
+\newbox\hsplit@tmpbov
+\newdimen\hsplit@tmpdim
+\def\hsplit#1\to#2\into#3{%  \hsplit\boxnum\to\dimen\into\outboxnum
+  \hsplit@tmpdim=#2%
+  \multiply\hsplit@tmpdim by -1
+  \advance\hsplit@tmpdim by \wd#1%
+  \setbox\hsplit@tmpbox=\vbox{\hfuzz=\maxdimen\hbadness=\@M
+    \hsize=\hsplit@tmpdim\nointerlineskip
+    \global\hsplit@tmpdim=#2
+    \global\multiply\hsplit@tmpdim by -2
+    \global\advance\hsplit@tmpdim by \wd#1
+    \noindent\kern\hsplit@tmpdim\unhbox#1}%
+  %\showbox\hsplit@tmpbox
+  \setbox\hsplit@tmpbox=\vbox{% get into internal vertical mode
+    \unvbox\hsplit@tmpbox
+    \hsplit@makehboxofhboxesandsplit
+    \global\setbox\hsplit@tmpbow=\hbox{\unhbox\hsplit@tmpbow
+      \hsplit@removehboxes\unskip\unpenalty}%
+    \hbadness=\@M\hfuzz=\maxdimen
+    \global\setbox\hsplit@tmpbov=\hbox to #2{\unhbox\hsplit@tmpbov\unskip}%
+    % Now we've got the first line in \hsplit@tmpbov starting with a kern
+    %\showbox\hsplit@tmpbow
+  }%
+  %\showbox\hsplit@tmpbov
+  \setbox#1=\box\hsplit@tmpbow
+  \setbox\hsplit@tmpbox=\vbox{\hbadness=\@M\hfuzz=\maxdimen
+    \hsize=\maxdimen\nointerlineskip
+    \noindent\break\unhbox\hsplit@tmpbov}%
+  %\showbox\hsplit@tmpbox
+  \setbox\hsplit@tmpbox=\vbox{% get into internal vertical mode
+    \unvbox\hsplit@tmpbox
+    \hsplit@makehboxofhboxesandsplit
+    %\showbox\hsplit@tmpbov
+    \global\setbox\hsplit@tmpbow=\hbox{\unhbox\hsplit@tmpbow
+      \hsplit@removehboxes\unskip\unpenalty}%
+    %\showbox\hsplit@tmpbow
+  }%
+  \setbox#3=\box\hsplit@tmpbow
+}%
+\def\hsplit@makehboxofhboxesandsplit{%
+  \setbox\hsplit@tmpboy=\hbox{}%
+  \loop
+    \setbox\hsplit@tmpboz=\lastbox
+    \ifhbox\hsplit@tmpboz
+      \setbox\hsplit@tmpbow=\copy\hsplit@tmpboy
+      \setbox\hsplit@tmpbov=\copy\hsplit@tmpboz
+      \setbox\hsplit@tmpboy=\hbox{\box\hsplit@tmpboz\unhbox\hsplit@tmpboy}%
+      \unskip
+      \unpenalty
+  \repeat
+}%
+\def\hsplit@removehboxes{%
+  \setbox\hsplit@tmpboz=\lastbox
+  \ifhbox\hsplit@tmpboz
+    {\hsplit@removehboxes}% for use local tmpboz
+    \unhbox\hsplit@tmpboz
+    \unskip % removes \rightskip
+  \fi
+}%
+\fi
