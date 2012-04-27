@@ -1000,8 +1000,8 @@ function create_beginpar_node()
 end
 
 local function whatsit_callback(Np, lp, Nq, bsl)
-   if Np.nuc then return Np 
-   elseif lp.user_id == 30114 then
+   if Np and Np.nuc then return Np 
+   elseif Np and lp.user_id == 30114 then
       Np.first = lp; Np.nuc = lp; Np.last = lp
       Np.char = 'parbdd'
       Np.met = nil

@@ -243,8 +243,7 @@ local function debug_show_node_X(p,print_fn)
    local s
    local pt=node_type(p.id)
    local base = debug_depth .. string.format('%X', has_attr(p,attr_icflag) or 0)
-   .. ' ' .. string.format('%X', has_attr(p, attr_uniqid) or 0)
-   .. ' ' .. node.type(p.id) .. ' ' ..  tostring(p.subtype )
+       .. ' ' .. tostring(p)
    if pt == 'glyph' then
       s = base .. ' ' .. utf.char(p.char) .. ' ' .. tostring(p.font)
          .. ' (' .. print_scaled(p.height) .. '+' 
@@ -254,33 +253,33 @@ local function debug_show_node_X(p,print_fn)
       s = base .. '(' .. print_scaled(p.height) .. '+' 
          .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width) .. p.dir
       if p.shift~=0 then
-	 s = s .. ', shifted ' .. print_scaled(p.shift)
+         s = s .. ', shifted ' .. print_scaled(p.shift)
       end
       if p.glue_sign >= 1 then 
-	 s = s .. ' glue set '
-	 if p.glue_sign == 2 then s = s .. '-' end
-	 s = s .. tostring(floor(p.glue_set*10000)/10000)
-	 if p.glue_order == 0 then 
-	    s = s .. 'pt' 
-	 else 
-	    s = s .. 'fi'
-	    for i = 2,  p.glue_order do s = s .. 'l' end
-	 end
+         s = s .. ' glue set '
+         if p.glue_sign == 2 then s = s .. '-' end
+         s = s .. tostring(floor(p.glue_set*10000)/10000)
+         if p.glue_order == 0 then 
+            s = s .. 'pt' 
+         else 
+            s = s .. 'fi'
+            for i = 2,  p.glue_order do s = s .. 'l' end
+         end
       end
       if has_attr(p, attr_icflag, PACKED) then
-	 s = s .. ' (packed)'
+         s = s .. ' (packed)'
       end
       print_fn(s)
       local q = p.head
       debug_depth=debug_depth.. '.'
       while q do 
-	 debug_show_node_X(q, print_fn); q = node_next(q)
+         debug_show_node_X(q, print_fn); q = node_next(q)
       end
       debug_depth=k
    elseif pt == 'glue' then
       s = base .. ' ' ..  print_spec(p.spec)
       if has_attr(p, attr_icflag)==FROM_JFM then
-	    s = s .. ' (from JFM)'
+         s = s .. ' (from JFM)'
       elseif has_attr(p, attr_icflag)==KANJI_SKIP then
 	 s = s .. ' (kanjiskip)'
       elseif has_attr(p, attr_icflag)==XKANJI_SKIP then
@@ -293,8 +292,8 @@ local function debug_show_node_X(p,print_fn)
 	 s = s .. ' (for accent)'
       elseif has_attr(p, attr_icflag)==IC_PROCESSED then
 	 s = s .. ' (italic correction)'
-      -- elseif has_attr(p, attr_icflag)==ITALIC then
-      --    s = s .. ' (italic correction)'
+         -- elseif has_attr(p, attr_icflag)==ITALIC then
+         --    s = s .. ' (italic correction)'
       elseif has_attr(p, attr_icflag)==FROM_JFM then
 	 s = s .. ' (from JFM)'
       elseif has_attr(p, attr_icflag)==LINE_END then
@@ -312,24 +311,31 @@ local function debug_show_node_X(p,print_fn)
       if p.subtype==sid_user then
          if p.type ~= 110 then 
             s = s .. ' user_id: ' .. p.user_id .. ' ' .. p.value
+            print_fn(s)
          else
             s = s .. ' user_id: ' .. p.user_id .. ' (node list)'
+            print_fn(s)
+            local q = p.value
+            debug_depth=debug_depth.. '.'
+            while q do 
+               debug_show_node_X(q, print_fn); q = node_next(q)
+            end
+            debug_depth=k
          end
       else
-	 s = s .. node.subtype(p.subtype)
+         s = s .. node.subtype(p.subtype); print_fn(s)
       end
-      print_fn(s)
    -------- math node --------
    elseif pt=='noad' then
       s = base ; print_fn(s)
       if p.nucleus then
-	 debug_depth = k .. 'N'; debug_show_node_X(p.nucleus, print_fn); 
+         debug_depth = k .. 'N'; debug_show_node_X(p.nucleus, print_fn); 
       end
       if p.sup then
-	 debug_depth = k .. '^'; debug_show_node_X(p.sup, print_fn); 
+         debug_depth = k .. '^'; debug_show_node_X(p.sup, print_fn); 
       end
       if p.sub then
-	 debug_depth = k .. '_'; debug_show_node_X(p.sub, print_fn); 
+         debug_depth = k .. '_'; debug_show_node_X(p.sub, print_fn); 
       end
       debug_depth = k;
    elseif pt=='math_char' then
@@ -338,7 +344,7 @@ local function debug_show_node_X(p,print_fn)
    elseif pt=='sub_box' then
       print_fn(base)
       if p.head then
-	 debug_depth = k .. '.'; debug_show_node_X(p.head, print_fn); 
+         debug_depth = k .. '.'; debug_show_node_X(p.head, print_fn); 
       end
    else
       print_fn(base)
@@ -349,7 +355,7 @@ function luatexja.ext_show_node_list(head,depth,print_fn)
    debug_depth = depth
    if head then
       while head do
-	 debug_show_node_X(head, print_fn); head = node_next(head)
+         debug_show_node_X(head, print_fn); head = node_next(head)
       end
    else
       print_fn(debug_depth .. ' (null list)')
