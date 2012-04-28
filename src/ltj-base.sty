@@ -1,5 +1,5 @@
 %
-% luatexja-base.sty
+% ltj-base.sty
 %
 
 %! これは外から読まれない
@@ -13,31 +13,23 @@
 
 \ifltj@in@latex                 %<*LaTeX>
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-base}[2011/04/01 v0.1]
+  \ProvidesPackage{ltj-base}[2012/04/21 v0.2]
 \fi                             %</LaTeX>
 
-
-%%------------------ Lua module loading
-
-%% Quark tokens needed in Lua modules.
-\protected\def\ltj@@q@escape{\ltj@@q@escape@}
-\protected\def\ltj@@q@escapenum{\ltj@@q@escapenum@}
-
-%% 
-\countdef\ltj@@count@zero=0 %
-\luatexattributedef\ltj@@attr@zero=0 %
-\dimendef\ltj@@dimen@zero=0 %
-\skipdef\ltj@@skip@zero=0 %
-
-%% Load Lua modules.
-\RequireLuaModule{luatexja.base}
-\RequireLuaModule{luatexja.tangle}
 %%------------------ Tiny helpers
 
 %% Registers
 \newcount\ltj@tempcnta
 \newcount\ltj@tempcntb
+\newcount\ltj@tempcntc
 \newdimen\ltj@tempdima
+\newskip\ltj@tempskipa
+\newtoks\ltj@temptoks
+
+\countdef\ltj@@count@zero=0 %
+\luatexattributedef\ltj@@attr@zero=0 %
+\dimendef\ltj@@dimen@zero=0 %
+\skipdef\ltj@@skip@zero=0 %
 
 %% Quarks
 %! ただ expl3 の quark とは異なり展開されるとエラーになる.

@@ -43,13 +43,17 @@
 
 \cs_new:Nn \ltj_fontspec_select:nn {
   \group_begin:
+  \ltj_fontspec_define_option:nn {CID} {
+    \fontspec_update_fontid:n  {+cid=##1}
+    \fontspec_update_featstr:n {cid=##1}
+  }
   \ltj_fontspec_define_option:nn {JFM} {
     \fontspec_update_fontid:n  {+jfm=##1}
-    \fontspec_update_featstr:n {jfm=##1}      
+    \fontspec_update_featstr:n {jfm=##1}
   }
   \ltj_fontspec_define_option:nn {JFM-var} {
     \fontspec_update_fontid:n  {+jfmvar=##1}
-    \fontspec_update_featstr:n {jfmvar=##1}      
+    \fontspec_update_featstr:n {jfmvar=##1}
   }
   \ltj_fontspec_define_preparse_external:nn {NoEmbed} {
     \cs_set:Nn \fontspec_namewrap:n {psft:####1}
@@ -58,14 +62,14 @@
   %% "OpenType feature 'Kerning=Off' (-kern) not available ..."
   \ltj_fontspec_define_option:nn {Kerning/Off} {
     \fontspec_update_fontid:n  {-kern}
-    \fontspec_update_featstr:n {-kern}      
-  }  
+    \fontspec_update_featstr:n {-kern}
+  }
   \ltj_fontspec_if_liiikeys:TF {
     \tl_set:Nn \g_fontspec_encoding_tl {JY3}
   } {
     \tl_set:Nn \zf@enc {JY3}
   }
-  \tl_set:Nx \g_fontspec_default_fontopts_tl 
+  \tl_set:Nx \g_fontspec_default_fontopts_tl
              {JFM=ujis,Scale=0.962216,Kerning=Off,\g_ltj_fontspec_default_fontopts_tl}
   \cs_set_eq:NN \DeclareFontFamily \DeclareKanjiFamily
   \fontspec_select:nn{#1}{#2}

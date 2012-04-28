@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-xunicode}[2011/11/22 Patch to xunicode for LuaLaTeX-ja]
+\ProvidesPackage{lltjp-xunicode}[2012/4/18 Patch to xunicode for LuaLaTeX-ja]
 
 \def\UTFencname{EU2}\def\XeTeXpicfile{}
 \RequirePackage{xunicode,luatexja}
@@ -75,28 +75,15 @@
 }
 % If unicode-math is already loaded, the following error occurs:
 %    ! Undefined control sequence.
-%    \hbar ->\hslash 
+%    \hbar ->\hslash
 % Therefore temporarily set \hbar=\relax.
 \let\ltj@tmpa\hbar
 \let\hbar\relax
+\let\ltj@tmpb\iftipaonetoken
+\let\iftipaonetoken\relax
 \ReloadXunicode{EU2}
 \makeatletter
 \let\hbar\ltj@tmpa
+\let\iftipaonetoken\ltj@tmpb
+\let\ltj@tmpb\relax % no more an if-token
 \endinput
-
-%% the following patch is needed to xunicode.sty:
-%% 
---- /opt/texlive/2011/texmf-dist/tex/xelatex/xunicode/xunicode.sty	2011-09-12 08:31:47.000000000 +0900
-+++ xunicode.sty	2011-11-16 22:06:17.061413113 +0900
-@@ -1475,7 +1475,11 @@
- 
- \newtoks\tipasavetokens
- \newtoks\tipachecktokens
-+
-+\fi
- \newif\iftipaonetoken
-+\expandafter\ifx\csname ReloadXunicode\endcsname\relax
-+
- \def\tipalasttoken{!@! do nothing with this !@!}
- \def\tipacatchonechar#1{\begingroup
-  \def\textipa##1{##1}% prevent recursion

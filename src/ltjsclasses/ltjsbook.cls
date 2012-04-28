@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsbook}
-  [2011/10/03 ]
+  [2012/04/24]
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
@@ -573,10 +573,10 @@
   \let\@evenfoot\@empty
   \def\@evenhead{%
     \if@mparswitch \hss \fi
-    \underline{\hbox to \fullwidth{\autoxspacing
+    \underline{\hbox to \fullwidth{\ltjsetparameter{autoxspacing={true}}
         \textbf{\thepage}\hfil\leftmark}}%
     \if@mparswitch\else \hss \fi}%
-  \def\@oddhead{\underline{\hbox to \fullwidth{\autoxspacing
+  \def\@oddhead{\underline{\hbox to \fullwidth{\ltjsetparameter{autoxspacing={true}}
         {\if@twoside\rightmark\else\leftmark\fi}\hfil\textbf{\thepage}}}\hss}%
   \let\@mkboth\markboth
   \def\chaptermark##1{\markboth{%
@@ -781,7 +781,7 @@
         \begingroup \@svsechd \endgroup
         \unskip
         \@tempskipa #1\relax
-        \hskip -\@tempskipa
+        \hskip -\@tempskipa\@inhibitglue
       \else
         \clubpenalty \@clubpenalty
         \everypar{}%
@@ -1366,6 +1366,76 @@
   \parindent 1\zw
   \noindent
   \llap{\@makefnmark\hskip0.3\zw}#1}
+\protected\def\@inhibitglue{\directlua{luatexja.jfmglue.create_beginpar_node()}}
+\def\@item[#1]{%
+  \if@noparitem
+    \@donoparitem
+  \else
+    \if@inlabel
+      \indent \par
+    \fi
+    \ifhmode
+      \unskip\unskip \par
+    \fi
+    \if@newlist
+      \if@nobreak
+        \@nbitem
+      \else
+        \addpenalty\@beginparpenalty
+        \addvspace\@topsep
+        \addvspace{-\parskip}%
+      \fi
+    \else
+      \addpenalty\@itempenalty
+      \addvspace\itemsep
+    \fi
+    \global\@inlabeltrue
+  \fi
+  \everypar{%
+    \@minipagefalse
+    \global\@newlistfalse
+    \if@inlabel
+      \global\@inlabelfalse
+      {\setbox\z@\lastbox
+       \ifvoid\z@
+         \kern-\itemindent
+       \fi}%
+      \box\@labels
+      \penalty\z@
+    \fi
+    \if@nobreak
+      \@nobreakfalse
+      \clubpenalty \@M
+    \else
+      \clubpenalty \@clubpenalty
+      \everypar{}%
+    \fi\@inhibitglue}%
+  \if@noitemarg
+    \@noitemargfalse
+    \if@nmbrlist
+      \refstepcounter\@listctr
+    \fi
+  \fi
+  \sbox\@tempboxa{\makelabel{#1}}%
+  \global\setbox\@labels\hbox{%
+    \unhbox\@labels
+    \hskip \itemindent
+    \hskip -\labelwidth
+    \hskip -\labelsep
+    \ifdim \wd\@tempboxa >\labelwidth
+      \box\@tempboxa
+    \else
+      \hbox to\labelwidth {\unhbox\@tempboxa}%
+    \fi
+    \hskip \labelsep}%
+  \ignorespaces}
+\def\@gnewline #1{%
+  \ifvmode
+    \@nolnerr
+  \else
+    \unskip \reserved@e {\reserved@f#1}\nobreak \hfil \break \null
+    \inhibitglue \ignorespaces
+  \fi}
 \def\Shou#1{\hbox{$\m@th$%
   \csname S@\f@size\endcsname
   \fontsize\sf@size\z@

@@ -1,0 +1,60 @@
+%
+% ltj-latex.sty
+%
+
+%! これは外から読まれない
+%% Avoid multiple loading.
+\csname luatexjalatexLoaded\endcsname
+\edef\ltj@latex@AtEnd{%
+\endlinechar=\the\endlinechar
+\relax}
+\endlinechar=-1 %
+\def\luatexjalatexLoaded{\endinput}
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{ltj-latex}[2012/04/21 LuaLaTeX-ja]
+
+% Globally add to the head of a macro (cf. LaTeX2e's \g@addto@macro)
+\long\def\ltj@g@addto@macro#1#2{
+  \begingroup
+    \def\ltj@tmpa{#2}
+    \toks@\expandafter\expandafter\expandafter{\expandafter\ltj@tmpa#1}
+    \xdef#1{\the\toks@}
+  \endgroup}
+
+\def\ltj@AtBeginDocument{\ltj@g@addto@macro\@begindocumenthook}
+
+\def\ltj@pkgpatch#1{\ltj@AtBeginDocument{\@ifpackageloaded{#1}{\usepackage{lltjp-#1}}{}}}
+
+% similar to \ltj@pkgpatch, but this is used .sty which
+% can be reloaded inside the document by \input.
+\def\ltj@pkgpatchA#1{\ltj@AtBeginDocument{\@ifpackageloaded{#1}{\input{lltjp-#1.sty}}{}}}
+
+\endlinechar=13
+
+%%% patch for LaTeX
+\usepackage{lltjfont}
+\usepackage{lltjdefs}
+\usepackage{lltjcore}
+
+%%% default parameters
+\ltjsetparameter{kanjiskip=0pt plus 0.4pt minus 0.4pt,
+  xkanjiskip=.25\zw plus 1pt minus 1pt,
+  autospacing, autoxspacing, jacharrange={-1},
+  yalbaselineshift=0pt, yjabaselineshift=0pt,
+  jcharwidowpenalty=500, differentjfm=average
+}
+
+\input luatexja-kinsoku.tex
+\expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
+
+%%% patch for packages
+\ltj@pkgpatch{listings}
+\ltj@pkgpatch{unicode-math}
+\ltj@pkgpatch{xunicode}
+
+
+%%------------------ all done
+\ltj@latex@AtEnd
+\endinput
+%% EOF

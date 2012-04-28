@@ -9,8 +9,8 @@ luatexbase.provides_module({
 })
 module('luatexja.jfont', package.seeall)
 
-require('luatexja.base');      local ltjb = luatexja.base
-require('luatexja.charrange'); local ltjc = luatexja.charrange
+luatexja.load_module('base');      local ltjb = luatexja.base
+luatexja.load_module('charrange'); local ltjc = luatexja.charrange
 
 local node_new = node.new
 local has_attr = node.has_attribute
@@ -152,7 +152,7 @@ local function load_jfont_metric()
    for j,v in ipairs(metrics) do 
       if v.name==jfm_file_name then return j end
    end
-   ltj.loadlua('jfm-' .. jfm_file_name .. '.lua')
+   luatexja.load_lua('jfm-' .. jfm_file_name .. '.lua')
    if defjfm_res then
       defjfm_res.name = jfm_file_name
       table.insert(metrics, defjfm_res)
@@ -172,7 +172,7 @@ local cstemp
 function jfontdefX(g)
   local t = token.get_next()
   cstemp=token.csname_name(t)
-  if g then ltj.is_global = '\\global' else ltj.is_global = '' end
+  if g then luatexja.is_global = '\\global' else luatexja.is_global = '' end
   tex.sprint(cat_lp, '\\expandafter\\font\\csname ' .. cstemp .. '\\endcsname')
 end
 
@@ -188,7 +188,7 @@ function jfontdefY() -- for horizontal font
 			 "bad JFM `" .. jfm_file_name .. "'",
 			 'The JFM file you specified is not valid JFM file.\n'..
 			    'So defining Japanese font is cancelled.')
-      tex.sprint(cat_lp, ltj.is_global .. '\\expandafter\\let\\csname ' ..cstemp 
+      tex.sprint(cat_lp, luatexja.is_global .. '\\expandafter\\let\\csname ' ..cstemp 
              .. '\\endcsname=\\relax')
      return 
    end
@@ -196,7 +196,7 @@ function jfontdefY() -- for horizontal font
    local fmtable = { jfm = j, size = f.size, var = jfm_var }
    fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
    font_metric_table[fn]=fmtable
-   tex.sprint(cat_lp, ltj.is_global .. '\\protected\\expandafter\\def\\csname ' 
+   tex.sprint(cat_lp, luatexja.is_global .. '\\protected\\expandafter\\def\\csname ' 
           .. cstemp  .. '\\endcsname{\\ltj@curjfnt=' .. fn .. '\\relax}')
 end
 

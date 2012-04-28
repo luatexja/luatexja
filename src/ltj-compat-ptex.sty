@@ -1,5 +1,5 @@
 %
-% luatexja-compat-ptex.sty
+% ltj-compat-ptex.sty
 %
 
 %! これは外から読まれない
@@ -22,7 +22,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-compat-ptex}[2011/04/01 v0.1]
+  \ProvidesPackage{ltj-compat-ptex}[2012/04/21 v0.2]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -47,7 +47,6 @@
 %%------------------
 
 \endlinechar=13
-%! この中に master の luatexja-compat-ptex.tex の内容を挿入する
 %! ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 \def\getprebreakpenalty#1{\prebreakpenalty#1 }
 \def\getpostbreakpenalty#1{\postbreakpenalty#1 }

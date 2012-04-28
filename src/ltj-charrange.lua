@@ -10,7 +10,7 @@ luatexbase.provides_module({
 module('luatexja.charrange', package.seeall)
 local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
-require('luatexja.base');      local ltjb = luatexja.base
+luatexja.load_module('base');      local ltjb = luatexja.base
 
 local floor = math.floor
 local has_attr = node.has_attribute
