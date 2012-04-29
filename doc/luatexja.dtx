@@ -3857,10 +3857,11 @@ Considering these situations, handling of an end-of-line in \LuaTeX-ja are as fo
 \begin{quote}
 A character U+FFFFF (its category code is set to 14~(comment) by
 \LuaTeX-ja) is appended to an input line, \emph{before \LuaTeX\ actually
-process it}, if and only if the following two conditions are satisfied:
+process it}, if and only if the following three conditions are satisfied:
 \begin{enumerate}
 \item The category code of the character $\langle${return}$\rangle$
       (whose character code is 13) is 5~(end-of-line).
+\item The category code of U+FFFFF itself is 14~(comment).
 \item The input line matches the following `regular expression':
 \[
   (\text{any char})^*(\textbf{JAchar})
@@ -3902,11 +3903,12 @@ u
 
 \begin{quote}
 各入力行に対し，\textbf{その入力行が読まれる前の内部状態で}
-以下の2条件が満たされている場合，\LuaTeX-jaはU+FFFFF番の文字
+以下の3条件が満たされている場合，\LuaTeX-jaはU+FFFFF番の文字
 \footnote{この文字はコメント文字として扱われるように\LuaTeX-ja内部で設定をしている．}
 を末尾に追加する．よって，その場合に改行は空白とは見做されないこととなる．
 \begin{enumerate}
 \item 改行文字（文字コード13番）のカテゴリーコードが5~(end-of-line)である．
+\item U+FFFFFのカテゴリーコードが14~(comment)である．
 \item 入力行は次の「正規表現」にマッチしている：
 \[
   (\text{any char})^*(\textbf{JAchar})

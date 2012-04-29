@@ -37,7 +37,7 @@ end
 -- \kuten: 面区点 （それぞれで16進2桁を使用）=> Unicode 符号位置
 function from_kuten(i)
    if not i then i=0 end
-   tex.write(tostring(luatexja.jisx0208.table_jisx0208_uptex[i]) or '0')
+   tex.write(tostring(luatexja.jisx0208.table_jisx0208_uptex[i] or 0))
 end
 
 -- \euc: EUC-JP による符号位置 => Unicode 符号位置
