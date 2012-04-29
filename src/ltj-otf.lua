@@ -46,16 +46,19 @@ end
 
 function cid(key)
    local curjfnt = fonts.ids[tex.attribute[attr_curjfnt]]
-   if curjfnt.cidinfo.ordering ~= "Japan1" then
+   if curjfnt.cidinfo.ordering ~= "Japan1" and
+	   curjfnt.cidinfo.ordering ~= "GB1" and
+	   curjfnt.cidinfo.ordering ~= "CNS1" and
+	   curjfnt.cidinfo.ordering ~= "Korea1" then
       ltjb.package_error('luatexja-otf',
-                         'Current Japanese font "'..curjfnt.psname..'" is not a CID-Keyed font (Adobe-Japan1)', 
+                         'Current Japanese font (or other CJK font) "'..curjfnt.psname..'" is not a CID-Keyed font (Adobe-Japan1 etc.)', 
                          'Select a CID-Keyed font using \jfont.')
       return
    end
-   local char = curjfnt.unicodes['Japan1.'..tostring(key)]
+   local char = curjfnt.unicodes[curjfnt.cidinfo.ordering..'.'..tostring(key)]
    if not char then
       ltjb.package_warning('luatexja-otf',
-                         'Current Japanese font "'..curjfnt.psname..'" does not include the specified CID character ('..tostring(key)..')', 
+                         'Current Japanese font (or other CJK font) "'..curjfnt.psname..'" does not include the specified CID character ('..tostring(key)..')', 
                          'Use a font including the specified CID character.')
       return
    end
