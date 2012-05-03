@@ -22,19 +22,25 @@
   \advance\ltj@tempcnta by1
 \repeat
 
-\ltj@tempcnta="2000%"
+\ltj@tempcnta="2000%" General Punctuation
 \loop\ifnum\ltj@tempcnta<"2070%"
   \ltjsetparameter{kcatcode={\ltj@tempcnta,1}}%
   \advance\ltj@tempcnta by1
 \repeat
 
-\ltj@tempcnta="3000%"
+\ltj@tempcnta="2500%" 罫線
+\loop\ifnum\ltj@tempcnta<"2580%"
+  \ltjsetparameter{alxspmode={\ltj@tempcnta,0}}%
+  \advance\ltj@tempcnta by1
+\repeat
+
+\ltj@tempcnta="3000%" CJK Symbols and Punctuation
 \loop\ifnum\ltj@tempcnta<"3040%"
   \ltjsetparameter{kcatcode={\ltj@tempcnta,1}}%
   \advance\ltj@tempcnta by1
 \repeat
 
-\ltj@tempcnta="FF00%"
+\ltj@tempcnta="FF00%" 	半角・全角形
 \loop\ifnum\ltj@tempcnta<"FFF0%"
   \ltjsetparameter{kcatcode={\ltj@tempcnta,1}}%
   \advance\ltj@tempcnta by1

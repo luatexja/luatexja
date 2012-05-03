@@ -14,7 +14,6 @@ luatexja.load_module('base');      local ltjb = luatexja.base
 
 local cidfont_data = {}
 local cache_chars = {}
-local taux_dir = 'luatex-cache/luatexja'
 local path           = {
     localdir  = file.join(kpse.expand_var("$TEXMFVAR"), aux_dir),
     systemdir = file.join(kpse.expand_var("$TEXMFSYSVAR"), aux_dir),

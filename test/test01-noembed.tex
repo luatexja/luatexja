@@ -102,4 +102,28 @@
 \test{jis}
 \test{min}
 
+\par\vfill\eject
+{\noindent\bf\tengt ■dash}
+
+左から順に，U+2500（罫線），U+2015 (HORIZONTAL~BAR)，U+2014 (EM~DASH)
+
+\def\test#1{\jfont\mx={psft:Ryumin-Light:jfm=#1}
+\par\noindent\hbox to 30pt{#1}%
+\hbox to 250pt{\mx  a──b――c——d}}
+
+\test{ujis}
+\test{jis}
+\test{min}
+
+{\catcode`\@=11 罫線のalxspmodeを3にしてみる（以前の設定値）
+\ltj@tempcnta="2500%" 罫線
+\loop\ifnum\ltj@tempcnta<"2580%"
+  \ltjsetparameter{alxspmode={\ltj@tempcnta,3}}%
+  \advance\ltj@tempcnta by1
+\repeat
+\test{ujis}
+\test{jis}
+\test{min}
+}
+
 \end
