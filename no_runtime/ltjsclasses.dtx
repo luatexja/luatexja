@@ -50,7 +50,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2012/04/24]
+  [2012/04/24 ]
 %<*driver>
 \documentclass{ltjsarticle}
 \usepackage{doc}
@@ -73,8 +73,8 @@
 %
 % \fi
 %
-% \title{Lua\LaTeX-ja 用 \texttt{jsclasses} 互換クラス}
-% \author{Lua\TeX-ja プロジェクト}
+% \title{Lua\LaTeX-ja用\texttt{jsclasses}互換クラス}
+% \author{Lua\TeX-jaプロジェクト}
 % \date{\filedate}
 % \maketitle
 % \tableofcontents
@@ -83,7 +83,7 @@
 %
 % \section{はじめに}
 %
-% これは奥村晴彦先生による |jsclasses.dtx| を Lua\LaTeX-ja 用に改変したものです。
+% これは奥村晴彦先生による |jsclasses.dtx| をLua\LaTeX-ja用に改変したものです。
 % 次のドキュメントクラス（スタイルファイル）を生成します。
 % \begin{quote}
 %   \begin{tabular}{lll}
@@ -106,11 +106,11 @@
 % ミティブで全体的に拡大するという手を使って，9ポイントや21，25，30，36，
 % 43ポイント，12Q，14Qの指定を可能にしています。
 %
-% \subsection{\texttt{jsclasses.dtx} からの主な変更点}
+% \subsection{\texttt{jsclasses.dtx}からの主な変更点}
 % 全ての変更点を知りたい場合は，|jsclasses.dtx| と |ltjsclasses.dtx| で |diff| を
 % とって下さい。
 % \begin{itemize}
-% \item フォントメトリック関係のオプション |winjis| は単に無視されます。
+% \item フォントメトリック関係のオプション |winjis |は単に無視されます。
 % \item 標準では |jfm-ujis.lua|（Lua\TeX-ja標準のメトリック，OTFパッケージのものがベース）を使用します。
 % \item |uplatex| オプションを削除してあります。
 % \item |disablejfam| オプションが無効になっています。もし
@@ -118,12 +118,12 @@
 %   |! LaTeX Error: Too many math alphabets used in version ****.|
 % \end{quotation}
 % のエラーが起こった場合は，|lualatex-math| パッケージを読み込んでみて下さい。
-% \item |papersize| オプションの指定に関わらず PDF のページサイズは適切に
+% \item |papersize| オプションの指定に関わらずPDFのページサイズは適切に
 %   設定されます。
-% \item Lua\TeX-ja 同梱のメトリックを用いる限りは，段落の頭にグルーは挿入されません。
-%   そのため，オリジナルの |jsclasses.dtx| 内にあったhack（|\everyparhook|）は不要になったので，
+% \item Lua\TeX-ja同梱のメトリックを用いる限りは，段落の頭にグルーは挿入されません。
+%   そのため，オリジナルの |jsclasses.dtx| 内にあったhack (|\everyparhook|)は不要になったので，
 %   削除しました。
-% \item 「\texttt{amsmath} との衝突の回避」のコードは，上流で既に対処されているうえ，
+% \item 「\texttt{amsmath}との衝突の回避」のコードは，上流で既に対処されているうえ，
 %   これがあると |grfext.sty| を読み込んだ際にエラーを引き起こすので削除しました。
 % \item |\小|，|\上小|，|\if西暦|，|\西暦|，|\和暦|をそれぞれ
 %   |\Shou|, |\UeShou|, |\ifSeireki|, |\Seireki|, |\Wareki| に変更してあります。
@@ -133,7 +133,7 @@
 % \StopEventually
 %
 % 以下では実際のコードに即して説明します。
-% \section{Lua\TeX-ja の読み込み}
+% \section{Lua\TeX-jaの読み込み}
 %
 % まず，|luatexja| を読み込みます。
 %    \begin{macrocode}
@@ -201,18 +201,18 @@
 %
 % \paragraph{用紙サイズ}
 %
-% JISやISOのA0判は面積 $1\,\mathrm{m}^2$，縦横比 $1:\sqrt{2}$
-% の長方形の辺の長さを mm 単位に切り捨てたものです。
-% これを基準として順に半截しては mm 単位に切り捨てたものがA1，A2，…です。
+% JISやISOのA0判は面積$1\,\mathrm{m}^2$，縦横比$1:\sqrt{2}$
+% の長方形の辺の長さをmm単位に切り捨てたものです。
+% これを基準として順に半截してはmm単位に切り捨てたものがA1，A2，…です。
 %
 % B判はJISとISOで定義が異なります。
-% JISではB0判の面積が $1.5\,\mathrm{m}^2$ ですが，
+% JISではB0判の面積が$1.5\,\mathrm{m}^2$ですが，
 % ISOではB1判の辺の長さがA0判とA1判の辺の長さの幾何平均です。
-% したがってISOのB0判は $1000\,\mathrm{mm} \times 1414\,\mathrm{mm}$ です。
-% このため，\LaTeXe の \texttt{b5paper}
-% は $250\,\mathrm{mm} \times 176\,\mathrm{mm}$ ですが，
-% \pLaTeXe の \texttt{b5paper}
-% は $257\,\mathrm{mm} \times 182\,\mathrm{mm}$ になっています。
+% したがってISOのB0判は$1000\,\mathrm{mm} \times 1414\,\mathrm{mm}$です。
+% このため，\LaTeXe の\texttt{b5paper}
+% は$250\,\mathrm{mm} \times 176\,\mathrm{mm}$ですが，
+% \pLaTeXe の\texttt{b5paper}
+% は$257\,\mathrm{mm} \times 182\,\mathrm{mm}$になっています。
 % ここでは\pLaTeXe にならってJISに従いました。
 %
 % デフォルトは \texttt{a4paper} です。
@@ -283,7 +283,7 @@
 %
 % \paragraph{slide}
 %
-% オプション \texttt{slide} を新設しました。
+% オプション\texttt{slide}を新設しました。
 %
 %    \begin{macrocode}
 \newif\if@slide
@@ -292,8 +292,8 @@
 %
 % \paragraph{サイズオプション}
 %
-% 10pt，11pt，12pt のほかに，8pt，9pt，14pt，17pt，21pt，25pt，30pt，36pt，43pt を追加しました。
-% これは等比数列になるように選んだものです（従来の 20pt も残しました）。
+% 10pt，11pt，12ptのほかに，8pt，9pt，14pt，17pt，21pt，25pt，30pt，36pt，43ptを追加しました。
+% これは等比数列になるように選んだものです（従来の20ptも残しました）。
 % |\@ptsize| の定義が変だったのでご迷惑をおかけしましたが，
 % 標準的なドキュメントクラスと同様にポイント数から10を引いたものに直しました。
 %
@@ -323,10 +323,10 @@
 %
 % \paragraph{トンボオプション}
 %
-% トンボ（crop marks）を出力します。
+% トンボ(crop marks)を出力します。
 % 実際の処理は |lltjcore.sty| で行います。
-% オプション \texttt{tombow} で日付付きのトンボ，
-% オプション \texttt{tombo} で日付なしのトンボを出力します。
+% オプション\texttt{tombow}で日付付きのトンボ，
+% オプション\texttt{tombo}で日付なしのトンボを出力します。
 % これらはアスキー版のままです。
 % カウンタ |\hour|，|\minute| は |luatexja-compat.sty| で宣言されています。
 %
@@ -349,7 +349,7 @@
 %
 % \paragraph{面付け}
 %
-% オプション \texttt{mentuke} で幅ゼロのトンボを出力します。
+% オプション\texttt{mentuke}で幅ゼロのトンボを出力します。
 % 面付けに便利です。これもアスキー版のままです。
 %
 %    \begin{macrocode}
@@ -361,9 +361,9 @@
 %
 % \paragraph{両面，片面オプション}
 %
-% \texttt{twoside} で奇数ページ・偶数ページのレイアウトが変わります。
+% \texttt{twoside}で奇数ページ・偶数ページのレイアウトが変わります。
 %
-% [2003-04-29] \texttt{vartwoside} でどちらのページも傍注が右側になります。
+% [2003-04-29] \texttt{vartwoside}でどちらのページも傍注が右側になります。
 %
 %    \begin{macrocode}
 \DeclareOption{oneside}{\@twosidefalse \@mparswitchfalse}
@@ -373,7 +373,7 @@
 %
 % \paragraph{二段組}
 %
-% \texttt{twocolumn} で二段組になります。
+% \texttt{twocolumn}で二段組になります。
 %
 %    \begin{macrocode}
 \DeclareOption{onecolumn}{\@twocolumnfalse}
@@ -382,7 +382,7 @@
 %
 % \paragraph{表題ページ}
 %
-% \texttt{titlepage} で表題・概要を独立したページに出力します。
+% \texttt{titlepage}で表題・概要を独立したページに出力します。
 %
 %    \begin{macrocode}
 \DeclareOption{titlepage}{\@titlepagetrue}
@@ -392,7 +392,7 @@
 % \paragraph{右左起こし}
 %
 % 書籍では章は通常は奇数ページ起こしになりますが，
-% \texttt{openany} で偶数ページからでも始まるようになります。
+% \texttt{openany}で偶数ページからでも始まるようになります。
 %
 %    \begin{macrocode}
 %<book>\DeclareOption{openright}{\@openrighttrue}
@@ -428,8 +428,8 @@
 %    \end{macrocode}
 % \end{environment}
 %
-% \texttt{leqno} で数式番号が左側になります。
-% \texttt{fleqn} で数式が本文左端から一定距離のところに出力されます。
+% \texttt{leqno}で数式番号が左側になります。
+% \texttt{fleqn}で数式が本文左端から一定距離のところに出力されます。
 % 森本さんにしたがって訂正しました。
 %
 %    \begin{macrocode}
@@ -481,7 +481,7 @@
 % \paragraph{数式フォントとして和文フォントを登録しないオプション}
 %
 % p\TeX では数式中では16通りのフォントしか使えませんでしたが，Lua\TeX では
-% Omega 拡張が取り込まれていて256通りのフォントが使えます。
+% Omega拡張が取り込まれていて256通りのフォントが使えます。
 % ただし，\LaTeXe カーネルでは未だに数式ファミリの数は16個に制限されているので，
 % 実際に使用可能な数式ファミリの数を増やすためには |lualatex-math| パッケージを
 % 読み込む必要があることに注意が必要です。
@@ -493,7 +493,7 @@
 %
 % \paragraph{ドラフト}
 %
-% \texttt{draft} でoverfull boxの起きた行末に5ptの罫線を引きます。
+% \texttt{draft}でoverfull boxの起きた行末に5ptの罫線を引きます。
 %
 %    \begin{macrocode}
 \newif\ifdraft
@@ -503,12 +503,12 @@
 %
 % \paragraph{和文フォントメトリックの選択}
 %
-% ここではOTFパッケージのメトリックを元とした，|jfm-ujis.lua|メトリックを標準で使います。
-% 古い \texttt{min10}，\texttt{goth10} 互換のメトリックを使いたいときは \texttt{mingoth}
+% ここではOTFパッケージのメトリックを元とした，|jfm-ujis.lua| メトリックを標準で使います。
+% 古い\texttt{min10}，\texttt{goth10}互換のメトリックを使いたいときは\texttt{mingoth}
 % というオプションを指定します。
-% p\TeX でよく利用される \texttt{jis} フォントメトリックと互換のメトリックを使いたい場合は，
-% \texttt{ptexjis} というオプションを指定します。
-% \texttt{winjis} メトリックは用済みのため，\texttt{winjis} オプションは無視されます。
+% p\TeX でよく利用される\texttt{jis}フォントメトリックと互換のメトリックを使いたい場合は，
+% \texttt{ptexjis}というオプションを指定します。
+% \texttt{winjis}メトリックは用済みのため，\texttt{winjis}オプションは無視されます。
 %
 %    \begin{macrocode}
 \newif\ifmingoth
@@ -529,7 +529,7 @@
 % \paragraph{papersizeスペシャルの利用}
 %
 % |ltjsclasses| では |papersize| オプションの有無に関わらず，
-% PDF のページサイズは適切に設定されます。
+% PDFのページサイズは適切に設定されます。
 %
 %    \begin{macrocode}
 \newif\ifpapersize
@@ -539,7 +539,7 @@
 %
 % \paragraph{英語化}
 %
-% オプション \texttt{english} を新設しました。
+% オプション\texttt{english}を新設しました。
 %
 %    \begin{macrocode}
 \newif\if@english
@@ -549,7 +549,7 @@
 %
 % \paragraph{ltjsreport相当}
 %
-% オプション \texttt{report} を新設しました。
+% オプション\texttt{report}を新設しました。
 %
 %    \begin{macrocode}
 %<*book>
@@ -681,11 +681,11 @@
 \setlength\paperheight{\inv@mag\paperheight}%
 %    \end{macrocode}
 %
-% \paragraph{PDF の用紙サイズの設定}
+% \paragraph{PDFの用紙サイズの設定}
 %
 % \begin{macro}{\pdfpagewidth}
 % \begin{macro}{\pdfpageheight}
-% 出力の PDF の用紙サイズをここで設定しておきます。
+% 出力のPDFの用紙サイズをここで設定しておきます。
 % |tombow| が真のときは2インチ足しておきます。
 %    \begin{macrocode}
 \setlength{\@tempdima}{\paperwidth}
@@ -711,15 +711,15 @@
 % 1インチは定義により25.4mmです。
 %
 % \pTeX （アスキーが日本語化した\TeX ）では，例えば従来のフォントメトリック
-% \texttt{min10} やJISフォントメトリックでは「公称10ポイントの和文フォントは，
+% \texttt{min10}やJISフォントメトリックでは「公称10ポイントの和文フォントは，
 % 実際には9.62216ptで出力される（メトリック側で0.962216倍される）」という
 % 仕様になっています。
 % 一方，Lua\TeX-jaの提供するメトリックでは，そのようなことはありません。
 % 公称10ポイントの和文フォントは，10ポイントで出力されます。
 %
-% この|ltjsclasses|でも，派生元の|jsclasses|と同じように，
+% この |ltjsclasses| でも，派生元の |jsclasses| と同じように，
 % この公称10ポイントのフォントをここでは13級に縮小して
-% 使うことにします。そのためには，$13\,\textrm{Q}/10\,\textrm{pt}\simeq 0.924872$ 倍
+% 使うことにします。そのためには，$13\,\textrm{Q}/10\,\textrm{pt}\simeq 0.924872$倍
 % すればいいことになります。
 %
 %
@@ -748,7 +748,7 @@
 %
 % 某学会誌では，
 % 和文フォントをPostScriptの9ポイントにするために，
-% $0.9*72.27/72 \simeq 0.903375$ 倍します。
+% $0.9*72.27/72 \simeq 0.903375$倍します。
 %
 %    \begin{macrocode}
 %<*jspf>
@@ -815,7 +815,7 @@
 % Lua\TeX-jaでは和文組版に伴うグルーはノードベースで挿入するようになり，また
 % 欧文・和文間のグルーとイタリック補正は干渉しないようになりました。
 % まだ「和文の斜体」についてはLua\LaTeX カーネル側でまともな対応がされていませんが，
-% |jsclasses.dtx|で行われていた|\textmc|, |\textgt|の再定義は不要のように思われます。
+% |jsclasses.dtx| で行われていた |\textmc|, |\textgt| の再定義は不要のように思われます。
 %
 % |jsclasses.dtx| 中で行われていた |\reDeclareMathAlphabet| の再定義は削除。
 %
@@ -829,12 +829,12 @@
 %
 % これは |\pounds| 命令で実際に呼び出される文字です。
 % 従来からのOT1エンコーディングでは |\$| のイタリック体が |\pounds|
-% なので \texttt{cmti} が使われていましたが，
-% 1994年春からは \texttt{cmu}（upright italic，直立イタリック体）
+% なので\texttt{cmti}が使われていましたが，
+% 1994年春からは\texttt{cmu}（upright italic，直立イタリック体）
 % に変わりました。
-% しかし \texttt{cmu} はその性格からして実験的なものであり，
+% しかし\texttt{cmu}はその性格からして実験的なものであり，
 % |\pounds| 以外で使われるとは思えないので，
-% ここでは \texttt{cmti} に戻してしまいます。
+% ここでは\texttt{cmti}に戻してしまいます。
 %
 % [2003-08-20] Computer Modernフォントを使う機会も減り，T1エンコーディング
 % が一般的になってきました。この定義はもうあまり意味がないので消します。
@@ -851,7 +851,7 @@
 %    \end{macrocode}
 %
 % 「CやC++では……」と書くと，C++の直後に四分アキが入らないのでバランスが悪くなります。
-% 四分アキが入るようにしました。\% の両側も同じです。
+% 四分アキが入るようにしました。\%の両側も同じです。
 %
 %    \begin{macrocode}
 \ltjsetparameter{alxspmode={`+,3}}
@@ -861,7 +861,7 @@
 % \begin{macro}{\@}
 %
 % \LaTeX の |\def\@{\spacefactor\@m}| という定義（|\@m| は1000）
-% では |I watch TV\@.| と書くと V とピリオドのペアカーニングが効かなくなります。
+% では |I watch TV\@.| と書くとVとピリオドのペアカーニングが効かなくなります。
 % そこで，次のような定義に直し，|I watch TV.\@| と書くことにします。
 %
 %    \begin{macrocode}
@@ -898,7 +898,7 @@
 % 和文文字間のスペース |kanjiskip|，
 % 和文・欧文間のスペース |xkanjiskip| を変更しています。
 %
-% |kanjiskip| は |luatexja-latex.sty| で |0pt plus 0.4pt minus 0.4pt| に
+% |kanjiskip| は |ltj-latex.sty| で |0pt plus 0.4pt minus 0.4pt| に
 % 設定していますが，
 % これはそもそも文字サイズの変更に応じて変わるべきものです。
 % それに，プラスになったりマイナスになったりするのは，
@@ -914,7 +914,7 @@
 %
 % |\parindent| については，0（以下）でなければ全角幅（|1\zw|）に直します。
 %
-% [2008-02-18] |english| オプションで |\parindent| を 1em にしました。
+% [2008-02-18] |english| オプションで |\parindent| を1emにしました。
 %
 %    \begin{macrocode}
 \def\@setfontsize#1#2#3{%
@@ -994,7 +994,7 @@
 % 公称10ポイントの和文フォントが約9.25ポイント
 % （アスキーのものの0.961倍）であることもあり，
 % 行送りがかなりゆったりとしたと思います。
-% 実際，$16/9.25 \approx 1.73$ であり，
+% 実際，$16/9.25 \approx 1.73$であり，
 % 和文の推奨値の一つ「二分四分」（1.75）
 % に近づきました。
 %
@@ -1045,7 +1045,7 @@
 % \begin{macro}{\Chs}
 %
 % 基準となる長さの設定をします。
-% \texttt{lltjfont.dtx} で宣言されている
+% \texttt{lltjfont.dtx}で宣言されている
 % パラメータに実際の値を設定します。
 % たとえば |\Cwd| は |\normalfont| の全角幅（|1\zw|）です。
 %
@@ -1067,10 +1067,10 @@
 %
 % |\small| も |\normalsize| と同様に設定します。
 % 行送りは，|\normalsize| が16ポイントなら，
-% 割合からすれば $16 \times 0.9 = 14.4$ ポイントになりますが，
+% 割合からすれば$16 \times 0.9 = 14.4$ポイントになりますが，
 % |\small| の使われ方を考えて，ここでは和文13ポイント，
 % 欧文11ポイントとします。
-% また，|\topsep| と |\parsep| は，元はそれぞれ $4 \pm 2$，$2 \pm 1$
+% また，|\topsep| と |\parsep| は，元はそれぞれ$4 \pm 2$，$2 \pm 1$
 % ポイントでしたが，ここではゼロ（|\z@|）にしました。
 %
 %    \begin{macrocode}
@@ -1096,7 +1096,7 @@
 % \begin{macro}{\footnotesize}
 %
 % |\footnotesize| も同様です。
-% |\topsep| と |\parsep| は，元はそれぞれ $3 \pm 1$，$2 \pm 1$
+% |\topsep| と |\parsep| は，元はそれぞれ$3 \pm 1$，$2 \pm 1$
 % ポイントでしたが，ここではゼロ（|\z@|）にしました。
 %
 %    \begin{macrocode}
@@ -1223,7 +1223,7 @@
 % 上下の行の文字が |\lineskiplimit| より接近したら，
 % |\lineskip| より近づかないようにします。
 % 元は0ptでしたが1ptに変更しました。
-% \texttt{normal...} の付いた方は保存用です。
+% \texttt{normal...}の付いた方は保存用です。
 %
 %    \begin{macrocode}
 \setlength\lineskip{1\p@}
@@ -1256,7 +1256,7 @@
 % \begin{macro}{\parindent}
 %
 % |\parskip| は段落間の追加スペースです。
-% 元は 0pt plus 1pt になっていましたが，ここではゼロにしました。
+% 元は0pt plus 1ptになっていましたが，ここではゼロにしました。
 % |\parindent| は段落の先頭の字下げ幅です。
 %
 %    \begin{macrocode}
@@ -1289,7 +1289,7 @@
 %
 % \begin{macro}{\interlinepenalty}
 %
-% 段落中の改ページのペナルティです。デフォルトは 0 です。
+% 段落中の改ページのペナルティです。デフォルトは0です。
 %
 %    \begin{macrocode}
 % \interlinepenalty 0
@@ -1299,7 +1299,7 @@
 % \begin{macro}{\brokenpenalty}
 %
 % ページの最後の行がハイフンで終わる際のペナルティです。
-% デフォルトは 100 です。
+% デフォルトは100です。
 %
 %    \begin{macrocode}
 % \brokenpenalty 100
@@ -1314,7 +1314,7 @@
 % \begin{macro}{\topskip}
 %
 % |\topskip| は本文領域上端と本文1行目のベースラインとの距離です。
-% あまりぎりぎりの値にすると，本文中に $\int$ のような高い文字が
+% あまりぎりぎりの値にすると，本文中に$\int$のような高い文字が
 % 入ったときに1行目のベースラインが他のページより下がってしまいます。
 % ここでは本文の公称フォントサイズ（10pt）にします。
 %
@@ -1340,8 +1340,8 @@
 % \begin{macro}{\footskip}
 %
 % |\footskip| は本文領域下端とフッタ下端との距離です。
-% 標準クラスファイルでは，book で0.35in（約8.89mm），
-% book 以外で30pt（約10.54mm）となっていましたが，
+% 標準クラスファイルでは，bookで0.35in（約8.89mm），
+% book以外で30pt（約10.54mm）となっていましたが，
 % ここではA4判のときちょうど1cmとなるように，
 % |\paperheight| の0.03367倍（最小 |\baselineskip|）としました。
 % 書籍については，フッタは使わないことにして，ゼロにしました。
@@ -1374,9 +1374,9 @@
 % \begin{macro}{\headsep}
 %
 % |\headsep| はヘッダ下端と本文領域上端との距離です。
-% 元は book で18pt（約6.33mm），
+% 元はbookで18pt（約6.33mm），
 % それ以外で25pt（約8.79mm）になっていました。
-% ここでは article は |\footskip| $-$ |\topskip| としました。
+% ここではarticleは |\footskip| $-$ |\topskip| としました。
 %
 %    \begin{macrocode}
 %<*article>
@@ -1434,10 +1434,10 @@
 \newdimen\fullwidth
 %    \end{macrocode}
 %
-% この |\fullwidth| は article では紙幅 |\paperwidth|の0.76倍を超えない
+% この |\fullwidth| はarticleでは紙幅 |\paperwidth|の0.76倍を超えない
 % 全角幅の整数倍（二段組では全角幅の偶数倍）にします。0.76倍という数値は
 % A4縦置きの場合に紙幅から約2インチを引いた値になるように選びました。
-% book では紙幅から36ミリを引いた値にしました。
+% bookでは紙幅から36ミリを引いた値にしました。
 %
 % \begin{macro}{\textwidth}
 %
@@ -1635,7 +1635,7 @@
 % \begin{macro}{\footins}
 %
 % |\skip\footins| は本文の最終行と最初の脚注との間の距離です。
-% 標準の10ポイントクラスでは 9 plus 4 minus 2 ポイントになっていますが，
+% 標準の10ポイントクラスでは9 plus 4 minus 2ポイントになっていますが，
 % 和文の行送りを考えてもうちょっと大きくします。
 %
 %    \begin{macrocode}
@@ -1664,7 +1664,7 @@
 % \begin{macro}{\topfraction}
 %
 % 本文ページ上部のフロートが占有できる最大の割合です。
-% フロートが入りやすいように，元の値 0.7 を 0.8 [2003-08-23: 0.85] に変えてあります。
+% フロートが入りやすいように，元の値0.7を0.8 [2003-08-23: 0.85]に変えてあります。
 %
 %    \begin{macrocode}
 \renewcommand{\topfraction}{.85}
@@ -1684,7 +1684,7 @@
 %
 % \begin{macro}{\bottomfraction}
 %
-% 本文ページ下部のフロートが占有できる最大の割合です。元は 0.3 でした。
+% 本文ページ下部のフロートが占有できる最大の割合です。元は0.3でした。
 %
 %    \begin{macrocode}
 \renewcommand{\bottomfraction}{.8}
@@ -1705,7 +1705,7 @@
 % \begin{macro}{\textfraction}
 %
 % 本文ページに最低限入らなければならない本文の割合です。
-% フロートが入りやすいように元の 0.2 を 0.1 に変えました。
+% フロートが入りやすいように元の0.2を0.1に変えました。
 %
 %    \begin{macrocode}
 \renewcommand{\textfraction}{.1}
@@ -1715,7 +1715,7 @@
 % \begin{macro}{\floatpagefraction}
 %
 % フロートだけのページでのフロートの最小割合です。
-% これも 0.5 を 0.8 に変えてあります。
+% これも0.5を0.8に変えてあります。
 %
 %    \begin{macrocode}
 \renewcommand{\floatpagefraction}{.8}
@@ -1738,7 +1738,7 @@
 %
 % 二段組のとき本文ページ上部に出力できる
 % 段抜きフロートが占めうる最大の割合です。
-% 0.7 を 0.8 に変えてあります。
+% 0.7を0.8に変えてあります。
 %
 %    \begin{macrocode}
 \renewcommand{\dbltopfraction}{.8}
@@ -1749,7 +1749,7 @@
 %
 % 二段組のときフロートだけのページに入るべき
 % 段抜きフロートの最小割合です。
-% 0.5 を 0.8 に変えてあります。
+% 0.5を0.8に変えてあります。
 %
 %    \begin{macrocode}
 \renewcommand{\dblfloatpagefraction}{.8}
@@ -1924,7 +1924,7 @@
 % |headings| スタイルはヘッダに見出しとページ番号を出力します。
 % ここではヘッダにアンダーラインを引くようにしてみました。
 %
-% まず article の場合です。
+% まずarticleの場合です。
 %
 %    \begin{macrocode}
 %<*article|kiyou>
@@ -1960,7 +1960,7 @@
 %</article|kiyou>
 %    \end{macrocode}
 %
-% 次は book の場合です。
+% 次はbookの場合です。
 %
 %    \begin{macrocode}
 %<*book>
@@ -2490,7 +2490,7 @@
 %
 % 見出し番号のカウンタです。
 % |\newcounter| の第1引数が新たに作るカウンタです。
-% これは第2引数が増加するたびに 0 に戻されます。
+% これは第2引数が増加するたびに0に戻されます。
 % 第2引数は定義済みのカウンタです。
 %
 %    \begin{macrocode}
@@ -2698,7 +2698,7 @@
 % 部の見出しを出力します。
 % |\bfseries| を |\headfont| に変えました。
 %
-% |book| クラス以外では |secnumdepth| が $-1$ より大きいとき
+% |book| クラス以外では |secnumdepth| が$-1$より大きいとき
 % 部番号を付けます。
 %
 %    \begin{macrocode}
@@ -2728,7 +2728,7 @@
 %</!book>
 %    \end{macrocode}
 %
-% |book| クラスでは |secnumdepth| が $-2$ より大きいとき部番号を付けます。
+% |book| クラスでは |secnumdepth| が$-2$より大きいとき部番号を付けます。
 %
 %    \begin{macrocode}
 %<*book>
@@ -2807,7 +2807,7 @@
 %
 %    章の最初のページスタイルは，全体が |empty| でなければ |plain| に
 %    します。
-%    また，|\@topnum| を 0 にして，
+%    また，|\@topnum| を0にして，
 %    章見出しの上に図や表が来ないようにします。
 %
 %    \begin{macrocode}
@@ -3005,13 +3005,13 @@
 %
 % \subsection{リスト環境}
 %
-% 第 $k$ レベルのリストの初期化をするのが |\@list|$k$ です
+% 第$k$レベルのリストの初期化をするのが |\@list|$k$です
 % （$k = \mathtt{i}, \mathtt{ii}, \mathtt{iii}, \mathtt{iv}$）。
-% |\@list|$k$ は |\leftmargin| を |\leftmargin|$k$ に設定します。
+% |\@list|$k$は |\leftmargin| を |\leftmargin|$k$に設定します。
 %
 % \begin{macro}{\leftmargini}
 %
-% 二段組であるかないかに応じてそれぞれ 2em，2.5em でしたが，
+% 二段組であるかないかに応じてそれぞれ2em，2.5emでしたが，
 % ここでは全角幅の2倍にしました。
 %
 % [2002-05-11] |3\zw| に変更しました。
@@ -3038,7 +3038,7 @@
 % \begin{macro}{\leftmarginvi}
 %
 %    |ii|，|iii|，|iv| は |\labelsep| と
-%    それぞれ `(m)'，`vii.'，`M.' の幅との和より大きくする
+%    それぞれ`(m)'，`vii.'，`M.'の幅との和より大きくする
 %    ことになっています。ここでは全角幅の整数倍に丸めました。
 %
 %    \begin{macrocode}
@@ -3082,7 +3082,7 @@
 %    リスト環境の前に空行がある場合，
 %    |\parskip| と |\topsep| に |\partopsep| を
 %    加えた値だけ縦方向の空白ができます。
-%    0 に改変しました。
+%    0に改変しました。
 %
 %    \begin{macrocode}
 \setlength\partopsep{\z@} % {2\p@ \@plus 1\p@ \@minus 1\p@}
@@ -3119,7 +3119,7 @@
 %    トップレベルの |itemize|，|enumerate| 環境でだけ
 %    最初と最後に行送りの半分の空きが入るようになっていました。
 %
-%    [2004-09-27] |\topsep| のグルー $_{-0.1}^{+0.2}$ |\baselineskip|
+%    [2004-09-27] |\topsep| のグルー$_{-0.1}^{+0.2}$ |\baselineskip|
 %    を思い切って外しました。
 %
 %    \begin{macrocode}
@@ -3176,7 +3176,7 @@
 % \paragraph{enumerate環境}
 %
 % |enumerate| 環境はカウンタ |enumi|，|enumii|，|enumiii|，
-% |enumiv| を使います。|enum|$n$ は第 $n$ レベルの番号です。
+% |enumiv| を使います。|enum|$n$は第$n$レベルの番号です。
 %
 % \begin{macro}{\theenumi}
 % \begin{macro}{\theenumii}
@@ -3184,7 +3184,7 @@
 % \begin{macro}{\theenumiv}
 %
 %    出力する番号の書式を設定します。
-%    これらは\LaTeX 本体（\texttt{ltlists.dtx} 参照）で定義済みですが，
+%    これらは\LaTeX 本体（\texttt{ltlists.dtx}参照）で定義済みですが，
 %    ここでは表し方を変えています。
 %    |\@arabic|，|\@alph|，|\@roman|，|\@Alph| はそれぞれ
 %    算用数字，小文字アルファベット，小文字ローマ数字，大文字アルファベット
@@ -3228,7 +3228,7 @@
 % \begin{macro}{\p@enumiii}
 % \begin{macro}{\p@enumiv}
 %
-%    |\p@enum|$n$ は |\ref| コマンドで |enumerate| 環境の第 $n$ レベルの
+%    |\p@enum|$n$は |\ref| コマンドで |enumerate| 環境の第$n$レベルの
 %    項目が参照されるときの書式です。
 %    これも第2レベルは和文用かっこにしました。
 %
@@ -3247,7 +3247,7 @@
 % \begin{macro}{\labelitemii}
 % \begin{macro}{\labelitemiii}
 % \begin{macro}{\labelitemiv}
-%    |itemize| 環境の第 $n$ レベルのラベルを作るコマンドです。
+%    |itemize| 環境の第$n$レベルのラベルを作るコマンドです。
 %    \begin{macrocode}
 \newcommand\labelitemi{\textbullet}
 \newcommand\labelitemii{\normalfont\bfseries \textendash}
@@ -3416,7 +3416,7 @@
 % \begin{environment}{quotation}
 %
 % 段落の頭の字下げ量を1.5emから |\parindent| に変えました。
-% また，右マージンを 0 にしました。
+% また，右マージンを0にしました。
 %
 %    \begin{macrocode}
 \newenvironment{quotation}{%
@@ -3977,7 +3977,7 @@
 %
 % \begin{macro}{\@dotsep}
 %
-% 点の間隔です（単位 mu）。
+% 点の間隔です（単位mu）。
 %
 % \begin{macro}{\c@tocdepth}
 %
@@ -4249,7 +4249,7 @@
 % \begin{macro}{\bibindent}
 %
 % オープンスタイルの参考文献で使うインデント幅です。
-% 元は 1.5em でした。
+% 元は1.5emでした。
 %
 %    \begin{macrocode}
 \newdimen\bibindent
@@ -4328,7 +4328,7 @@
 % \begin{macro}{\@cite}
 % \begin{macro}{\@citex}
 %
-% 文献の番号を出力する部分は \texttt{ltbibl.dtx} で定義されていますが，
+% 文献の番号を出力する部分は\texttt{ltbibl.dtx}で定義されていますが，
 % コンマとかっこを和文フォントにするには次のようにします。
 % とりあえずコメントアウトしておきましたので，必要に応じて生かしてください。
 % かっこの前後に入るグルーを |\inhibitglue| で取っていますので，
@@ -4611,7 +4611,7 @@
 %
 % 段落頭のかぎかっこなどを見かけ1字半下げから全角1字下げに直します。
 %
-% [2012-04-24] LuaTeX-ja では JFM に段落開始時の括弧類の字下げ幅をコントロール
+% [2012-04-24] LuaTeX-jaではJFMに段落開始時の括弧類の字下げ幅をコントロール
 % する機能がありますが，|\item| 直後ではラベル用のボックスが段落先頭になる
 % ため，うまく働きませんでした．形を変えて復活させます．
 %
@@ -4725,7 +4725,7 @@
 % \begin{macro}{\TeX}
 % \begin{macro}{\LaTeX}
 %
-% これらは \texttt{ltlogos.dtx} で定義されていますが，
+% これらは\texttt{ltlogos.dtx}で定義されていますが，
 % TimesやHelveticaでも見栄えがするように若干変更しました。
 %
 % [2003-06-12] Palatinoも加えました（要調整）。
@@ -4853,7 +4853,7 @@
 %
 % |\LaTeXe| コマンドの |\mbox{\m@th ...| で始まる新しい定義では
 % 直後の和文との間に |xkanjiskip| が入りません。また，
-% |mathptmx| パッケージなどと併用すると，最後の $\varepsilon$ が
+% |mathptmx| パッケージなどと併用すると，最後の$\varepsilon$が
 % 下がりすぎてしまいます。そのため，ちょっと手を加えました。
 %
 %    \begin{macrocode}
@@ -4881,7 +4881,7 @@
 %
 % \begin{macro}{\AmSTeX}
 %
-% \texttt{amstex.sty} で定義されています。
+% \texttt{amstex.sty}で定義されています。
 %
 %    \begin{macrocode}
 \def\AmSTeX{\protect\AmS-\protect\TeX{}}
@@ -4892,7 +4892,7 @@
 % \begin{macro}{\BibTeX}
 % \begin{macro}{\SliTeX}
 %
-% これらは \texttt{doc.dtx} から取ったものです。
+% これらは\texttt{doc.dtx}から取ったものです。
 % ただし，|\BibTeX| だけはちょっと修正しました。
 %
 %    \begin{macrocode}
