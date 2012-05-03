@@ -1,31 +1,37 @@
 \documentclass{ltjarticle}
-\usepackage[twoside,left=23mm,width=170mm,right=17mm,top=25mm,height=231mm,bottom=32mm]{geometry}
-\usepackage{amsmath,amssymb,xcolor,pict2e,multienum,amsthm,float,makecell,multicol,hyperref,showexpl}
-
-\lstset{
-  basicstyle=\ttfamily\small, pos=o, breaklines=true,
-  numbers=none, rframe={}, basewidth=0.5em
-}
+\pdfgentounicode=1
+\pdfglyphtounicode{ff}{0066 0066}
+\pdfglyphtounicode{fi}{0066 0069}
+\pdfglyphtounicode{fl}{0066 006C}
+\pdfglyphtounicode{ffi}{0066 0066 0069}
+\pdfglyphtounicode{ffl}{0066 0066 006C}
 \DeclareYokoKanjiEncoding{ZH}{}{}
 \DeclareKanjiEncodingDefaults{}{}
 \DeclareErrorKanjiFont{ZH}{song}{m}{n}{10}
 \DeclareKanjiSubstitution{ZH}{song}{m}{n}
 \newcommand\songdefault{song}
 \newcommand\heidefault{hei}
+\newcommand\minchodefault{mincho}
 \renewcommand\kanjiencodingdefault{ZH}
 \renewcommand\kanjifamilydefault{\songdefault}
 \renewcommand\kanjiseriesdefault{\mddefault}
 \renewcommand\kanjishapedefault{\updefault}
 \DeclareKanjiFamily{ZH}{song}{}
 \DeclareFontShape{ZH}{song}{m}{n}{<->name:AdobeSongStd-Light:jfm=jis}{}
+\DeclareFontShape{ZH}{song}{m}{it}{<->name:AdobeSongStd-Light:jfm=jis}{}
 \DeclareFontShape{ZH}{song}{bx}{n}{<->ssub*hei/m/n}{}
 \DeclareKanjiFamily{ZH}{hei}{}
 \DeclareFontShape{ZH}{hei}{m}{n}{<->name:AdobeHeitiStd-Regular:jfm=jis}{}
+\DeclareFontShape{ZH}{hei}{bx}{n}{<->name:AdobeHeitiStd-Regular:jfm=jis}{}
+\DeclareKanjiFamily{ZH}{mincho}{}
+\DeclareFontShape{ZH}{mincho}{m}{n}{<->name:KozMinPr6N-Regular:jfm=jis}{}
 \fontencoding{ZH}\selectfont
 \DeclareTextFontCommand{\textsong}{\songfamily}
 \DeclareTextFontCommand{\texthei}{\heifamily}
+\DeclareTextFontCommand{\textmincho}{\minchofamily}
 \DeclareOldFontCommand{\song}{\normalfont\songfamily}{}
 \DeclareOldFontCommand{\hei}{\normalfont\heifamily}{}
+\DeclareOldFontCommand{\mincho}{\normalfont\minchofamily}{}
 \DeclareSymbolFont{songti}{ZH}{song}{m}{n}
 \jfam\symsongti
 \SetSymbolFont{songti}{bold}{ZH}{hei}{m}{n}
@@ -34,28 +40,86 @@
 \makeatletter
 \DeclareRobustCommand\songfamily{\not@math@alphabet\songfamily\mathsong\kanjifamily\songdefault\selectfont}
 \DeclareRobustCommand\heifamily{\not@math@alphabet\heifamily\mathhei\kanjifamily\heidefault\selectfont}
+\DeclareRobustCommand\minchofamily{\not@math@alphabet\minchofamily\mathhei\kanjifamily\minchodefault\selectfont}
 \DeclareRobustCommand\rmfamily{\not@math@alphabet\rmfamily\mathrm\romanfamily\rmdefault\kanjifamily\songdefault\selectfont}
 \DeclareRobustCommand\sffamily{\not@math@alphabet\sffamily\mathsf\romanfamily\sfdefault\kanjifamily\heidefault\selectfont}
 \makeatother
-\def\LuaTeX{Lua\TeX}
-\def\pTeX{p\TeX}
-\def\pLaTeX{p\LaTeX}
+\protected\def\Pkg#1{\underline{\smash{\texttt{#1}}}}
+\def\postpartname{编}
+\DeclareRobustCommand\eTeX{\ensuremath{\varepsilon}-\kern-.125em\TeX}
+\DeclareRobustCommand\LuaTeX{Lua\TeX}
+\DeclareRobustCommand\pdfTeX{pdf\TeX}
+\DeclareRobustCommand\pTeX{p\kern-.05em\TeX}
+\DeclareRobustCommand\upTeX{up\kern-.05em\TeX}
+\DeclareRobustCommand\pLaTeX{p\kern-.05em\LaTeX}
+\DeclareRobustCommand\pLaTeXe{p\kern-.05em\LaTeXe}
+\DeclareRobustCommand\epTeX{\ensuremath{\varepsilon}-\kern-.125em\pTeX}
+\usepackage[twoside,left=23mm,width=170mm,right=17mm,top=25mm,height=231mm,bottom=32mm]{geometry}
+\usepackage{amsmath,amssymb,xcolor,pict2e,multienum,amsthm,float,makecell,booktabs,multicol,showexpl}
+\usepackage{luatexja-otf}
+\usepackage{luatexja-fontspec}
+\usepackage[all]{xy}
+\usepackage{hyperref}
+\hypersetup{%
+	unicode,
+	bookmarksnumbered,
+	bookmarksopen,
+	colorlinks,
+	allbordercolors=1 1 1,
+	allcolors=blue,
+	pdfauthor={LuaTeX-ja团队},
+	pdftitle={LuaTeX-ja宏包}
+}
+
+\lstset{
+  basicstyle=\ttfamily\small, pos=r, breaklines=true,
+  numbers=none, rframe={}, basewidth=0.5em
+}
 \title{\LuaTeX-ja宏包}
 \author{\LuaTeX-ja项目团队}
 \date{}
 \begin{document}
 \maketitle
 \tableofcontents
+\part{用户手册}
 \section{引言}
+\LuaTeX-ja宏包是应用于\LuaTeX引擎上的高质量日语文档排版宏包。
 \subsection{开发背景}
-\LuaTeX-ja是日本开发者北川弘典首倡的一个\LuaTeX的日文支持项目，该项目将\pTeX移植到了\LuaTeX，并做了一定的扩展，删除了一些不正常的特性。
+一般情况下，\TeX下的日语文档输出，是ASCII \pTeX（\TeX的一个扩展）及其衍生软件来完成的。
+\pTeX作为\TeX的一个扩展引擎，在生成高质量的日语文档时，规避了繁杂的宏编写。
+但是在和同时期的引擎相比之下，\pTeX的处境未免有些尴尬：\pTeX已经远远落后于\eTeX和pdf\TeX，此外也没有跟上计算机上对日文处理的演进（比如，UTF-8编码，TrueType字体，OpenType字体）。
 
-%\LuaTeX-ja的项目开发者如下：北川弘典，前田一贵，八登崇之，黑木裕介，阿部纪行，山本宗宏，本田知亮，斋藤修三郎和马起园等。
+最近开发的\pTeX扩展，即\upTeX（Unicode下的\pTeX实现）和\epTeX（\pTeX和\eTeX的融合版本），虽然在部分情况上弥补了上述的差距，但是差距依然存在。
 
-\LuaTeX-ja现在只能用于plain \TeX格式和\LaTeXe格式，尚不支持\TeX info和Con\TeX t格式。
+不过，\LuaTeX的出现改变了整个状况。用户可以通过使用Lua语言的“callback”来调整\LuaTeX的内部处理机制。所以，没有必要去通过修改引擎的源代码来支持日文排版，相反，我们需要做的仅仅是编写其当处理callback的Lua脚本。
+\subsection{与\pTeX的差异所在}
+\LuaTeX-ja宏包在设计上，受\pTeX影响很大。最初开发的主要议题是实现\pTeX的特性。
+不过，{\bf\LuaTeX-ja不是简简单单的移植\pTeX，很多不自然的特征和现象都被移出了。}
 
-\LuaTeX-ja现在的代码实现依赖于\verb!luatexbase!以及\verb!luaotfload!等宏包，并且现在仅仅实现了横排，直排组版尚未实现。
-\subsection{一些约定}
+下面列举出了一些和\pTeX的差异：
+\begin{itemize}
+\item 一个日文字体是由三部分构成的元组：实际的字体（如小塚明朝，IPA明朝），日文字体测度（\textbf{JFM}）和变体字串。
+\item \pTeX中，日文字符之后的断行并不允许（也不产生空格），其他在源码中的断行是可以随处允许的。不过，因为\LuaTeX的特殊关系，\LuaTeX-ja并没有这个功能。
+\item 插在日文字符和其他字符言之间的胶/出格（我们将此称为\textbf{JAglue}）是重现实现的。
+	\begin{itemize}
+	\item 在\LuaTeX中，内部的字符处理是“基于node的”（例如：\verb!of{}fice!不会避免合字），
+		\textbf{JAglue}的插入处理，现在也是“基于node的”。
+	\item 此外，两个字符之间的node在断行时不起作用的（例如，\verb!\special!node），还有
+		意大利体校正带来的出格在插入处理中也是被忽略的。
+	\item \textbf{警告：鉴于以上两点，在\pTeX中分割\textbf{JAglue}处理的多种方法不再生效。}
+		明确地说，下列两种方法不再生效：
+		\begin{verbatim}
+		　　ちょ{}っと　　ちょ\/っと
+		\end{verbatim}
+		如果想得到此种结果，请使用空盒子替代：
+		\begin{verbatim}
+		　　ちょ\hbox{}っと
+		\end{verbatim}
+	\item 处理过程中，两个在“真实”字体上具区别的日文字体可以被识别出来。
+	\end{itemize}
+\item 当下，\LuaTeX-ja并不支持直行排版。
+\end{itemize}
+\subsection{一些约定} 
 在本文档中，有下面一些约定：
 \begin{itemize}
 \item 所有的日文字符为\textbf{JAchar}，所有的其他字符为\textbf{ALchar}
@@ -84,130 +148,151 @@
 \item \LuaTeX（版本号为大于0.65）和相关支持宏包。\\
 如果用户使用的是\TeX Live2011以及最新版本的W32\TeX，都可以不考虑此项。
 \item \LuaTeX-ja的源码:)
-\item \underline{\texttt{xunicode}}宏包，当前版本必须为\textit{v0.981(2011/09/09)}。\\
-如果你使用\underline{\texttt{fontspec}}宏包，\underline{\texttt{xunicode}}必须存在。但是请注意该包版本，其他版本可能不会正常工作。
+\item \Pkg{xunicode}宏包，当前版本必须为\textit{v0.981(2011/09/09)}。\\
+如果你使用\Pkg{fontspec}宏包，\Pkg{xunicode}必须存在。但是请注意该包版本，其他版本可能不会正常工作。
 \end{itemize}
 安装方法如下：
 \begin{enumerate}
-\item \LuaTeX-ja宏包的获取：
+\item 用下列诸多方法下载源码归档。当前，\LuaTeX-ja并无\textbf{稳定}版本。
 	\begin{itemize}
-	\item 如果用户使用git，那么可以使用如下命令获取：\\
+	\item 从git中复制\\
 		\verb!$ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git!
-	\item 另外用户还可以直接下载master版本：\\
-		\verb!$ wget http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git;a=snapshot;h=HEAD;sf=tgz!
+	\item 下载\texttt{master}分支HEAD的\texttt{tar.gz}归档\\
+		\url{http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git;a=snapshot;h=HEAD;sf=tgz}
+	\item 现在\LuaTeX-ja已经包含于CTAN中（在\texttt{macros/luatex/generic/luatexja}文件夹）和W32\TeX中（\texttt{luatexja.tar.gz}）。这些版本基于\texttt{master}版本。
 	\end{itemize}
-\item 用户需要将获取的\LuaTeX-ja宏包的\verb!src/!放置到你所用的发行版中的\verb!TEXMFLOACL!树下\verb!tex/!文件夹（如果不存在，请建立）下即可，查询该环境变量需要使用：\\
-	\verb!$ kpeswhich -expand-var "$TEXMFLOCAL"!
-\item 刷新数据库：\\
-	\verb!$ texhash!\\
-	\verb!$ mkluatexfontdb!
+\item 解压归档。你将看到\texttt{src/}和其他文件夹。但是只有\texttt{src/}文件夹的内容是\LuaTeX-ja宏包运行所需。
+\item 将\texttt{src/}文件夹内容复制到\texttt{TEXMF}树下某个位置。\texttt{TEXMF/tex/luatex/luatexja/}是一个例子。如果你克隆了全部的Git仓库，将\texttt{src/}做成符号链接来代替复制也不错。
+\item 如果需要升级文件名数据库，请执行\texttt{mktexlsr}。
 \end{enumerate}
-\section{\LuaTeX-ja在plain \TeX格式下的使用}
-对于日本用户，日文的排版可以直接使用：
+\subsection{警告}
+\begin{itemize}
+\item 你的源文件编码必须是UTF-8。其他编码不行，例如EUC-JP或者Shift-JIS。
+\end{itemize}
+\subsection{plain \TeX格式下的使用}
+在plain \TeX下使用\LuaTeX-ja相当简易，在文档开头放置一行：
 \begin{verbatim}
 \input luatexja.sty
 \end{verbatim}
 
-这一行会默认调用\verb!luatexja.sty!文件，该文件作用相当于\pTeX中的\verb!ptex.tex!。该文件中设定了两款非嵌入字体：Ryumin-Light（明朝体）和GothicBBB-Medium（哥特体）。
-这些字体分别有三种大小：\verb!\tenmin!和\verb!\tengt!（10pt）；\verb!\sevenmin!和\verb!\sevengt!（7pt）；\verb!\fivemin!和\verb!\fivegt!（5pt）。
-
-有几点请用户注意：
+这里做出了做小的日文文档排版设定（如\texttt{ptex.tex}）：
 \begin{itemize}
-\item 上述的两款字体需要你的pdf阅读器带有良好的非嵌入字体的支持，这里建议使用Adobe Reader，该阅读器使用了Kozuka Mincho字体。
-\item 在定义字体的时候，可以使用“级”（Q）单位，$1 \mathrm{Q} = 0.25\mathrm{mm}$，在\LuaTeX-ja中可以使用\verb!\jQ!命令调用该长度单位
-\item 一般情况下，相同大小日文字体比西文字体要大一下（中文字体也是如此），所以定义日文字体的时候需要一个缩放率：0.962216
-\item 在\textbf{JAchar}和\textbf{ALchar}之间插入的胶大小为：$(0.25\times0.962216\times\mathrm{10pt})^{\mathrm{+1pt}}_{\mathrm{-1pt}} = 2.40554\mathrm{pt}^{\mathrm{+1pt}}_{\mathrm{-1pt}}$
+\item 提前加载了六种日文字体，如下：
+\begin{center}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{字体}&\textbf{字体名}&\bf `10\,pt'&\bf`7\,pt'&\bf`5\,pt'\\\midrule
+明朝体&Ryumin-Light    &\verb+\tenmin+&\verb+\sevenmin+&\verb+\fivemin+\\
+哥特体&GothicBBB-Medium&\verb+\tengt+ &\verb+\sevengt+ &\verb+\fivegt+\\
+\bottomrule
+\end{tabular}
+\end{center}
+	\begin{itemize}
+	\item “Q（级）”是日本照排中使用的尺寸单位，$1 \mathrm{Q} = 0.25\mathrm{mm}$。该长度保存在长度\verb!\jQ!中。
+	\item 广为接受的“Ryumin-Light”和“GothicBBB-Medium”字体不嵌入PDF文件，而PDF阅读器则会使用外部日文字体替代（例如，在Adobe Reader中使用Kozuka Mincho字体替代Ryumin-Light）。我们使用默认设定。
+	\item 一般情况下，相同大小日文字体比西文字体要大一下。所以实际的日文字体尺寸需哟小于西文字体，即使用一个缩放率：0.962216。
+	\end{itemize}
+\item 在\textbf{JAchar}和\textbf{ALchar}之间插入的胶（\textsf{xkanjiskip}参数）大小为：
+$$(0.25\times0.962216\times\mathrm{10pt})^{\mathrm{+1pt}}_{\mathrm{-1pt}} = 2.40554\mathrm{pt}^{\mathrm{+1pt}}_{\mathrm{-1pt}}$$
 \end{itemize}
-\section{\LuaTeX-ja在\LaTeXe格式的使用}
-\subsection{日文排版设置}
-在\LaTeXe下使用\LuaTeX-ja比较便利：
+\subsection{在\LaTeX下使用}
+\paragraph{\LaTeXe} 在\LaTeXe下使用基本相同。设定日文的最小环境，你只需加载\texttt{luatexja.sty}：
 \begin{verbatim}
 \usepackage{luatexja}
 \end{verbatim}
 
-该宏包的作用相当于\pLaTeX中的\verb!plfonts.dtx!和\verb!pldefs.ltx!。
+这些做了最小的设定（作用相当于\pLaTeX中的\verb!plfonts.dtx!和\verb!pldefs.ltx!）：
 \begin{itemize}
-\item 在该宏包中设定了\verb!JY3!编码，这个编码用来调用日文字体
-\item 该宏包定义了两个字体族：\verb!mc!和\verb!gt!。\\
+\item \texttt{JY3}是日文字体编码（在水平方向）。\\
+	在将来\LuaTeX-ja要支持直行排版的时候，\texttt{JT3}会用于直行字体。
+\item 定义了两个字体族：\verb!mc!和\verb!gt!：\\
 \begin{center}
 	\begin{tabular}{ccccc}
 	\hline
-	字体&字体族&\verb!\mdseries!&\verb!\bfseries!&缩放率\\
+	\textbf{字体}&\textbf{字体族}&\verb!\mdseries!&\verb!\bfseries!&缩放率\\
 	\hline
 	\textit{mincho}&\verb!mc!&Ryumin-Light&GothicBBB-Medium&0.962216\\
 	\textit{gothic}&\verb!gt!&GothicBBB-Medium&GothicBBB-Medium&0.962216\\
 	\hline
 	\end{tabular}
 \end{center}
-\item 在数学模式下，所有的字符使用\verb!mc!字体族来排印
+注意的是两个字体族的粗体系列同为中等系列的\textbf{哥特}族。这\pLaTeX中的规定。在近些年中的DTP实务中有仅使用2个字体的趋向（是为Ryumin-Light和GothicBBB-Medium）。
+\item 在数学模式下，日文字符使用\verb!mc!字体族来排印
 \end{itemize}
 
-上述使用的宏包，只满足了最小的日文环境设定需求，并为满足所有的日文排版需求。
-\LuaTeX-ja宏包提供了两个文档类：\verb!jclasses!（\pLaTeX标准文档类）和\verb!jsclasses!（奥村晴彦）。用户可自行选择两种文档类。
+不过，上述设定并不能满足排版基于日文的文档。为了排印基于日文的文档，你最好不要使用\texttt{article.cls}，\texttt{book.cls}等文档类文件。
+现在，我们有相当于\Pkg{jclasses}（\pLaTeX标准文档类）和\Pkg{jsclasses}（奥村晴彦）的文档类，即\Pkg{ltjclasses}和\Pkg{ltjsclasses}。
 
-\subsection{中文排版设定}
-请先下载\verb!zh-classes!：
-\begin{verbatim}
-$ wget http://fandol-doc.googlecode.com/files/zh-classes.tar.xz
-\end{verbatim}
+\paragraph{OTF包中的\texttt{\char92CID}，\texttt{\char92UTF}及其他宏} \pLaTeX下，\underline{\texttt{otf}}宏包（斋藤修三郎开发）是用来排印存在于Adobe-Japan1-6但不存在于JIS X 0208中的字符。
+该包已经广泛使用，\LuaTeX-ja支持部分\Pkg{otf}包中的部分功能。
+如果你想使用这些功能，加载\Pkg{luatexja-otf}宏包。
+\bgroup
+\mincho
+\begin{LTXexample}
+森\UTF{9DD7}外と内田百\UTF{9592}とが\UTF{9AD9}島屋に行く。
 
-该文档类是基于\verb!jclasses!文档的中文设定版。
-这个文档类需要你安装Adobe Reader并使用两款字体。
-值得注意的是，本文档类提供的两款字体并不嵌入，这首先是为了减轻文档大小，其次为了加快编译速度。
-这两款字体在你安装的中文版Adobe Reader的文件夹下。这两款字体设定如下：
+\CID{7652}飾区の\CID{13706}野家，
+葛飾区の吉野家
+\end{LTXexample}
+\egroup
+\subsection{改变字体}
+\paragraph{注记：数学模式下的日文字符} \pTeX支持在数学模式下的日文字符，如以下源码：
+\begin{LTXexample}
+$f_{高温}$~($f_{\text{high temperature}}$).
+\[ y=(x-1)^2+2\quad よって\quad y>0 \]
+$5\in 素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
+\end{LTXexample}
+
+我们（\LuaTeX-ja项目成员）认为在数学模式下使用日文字符，只有在这些字符充当标识符时才是正确的。在这点下，
+\begin{itemize}
+\item 第1行和第2行是不正确的，因为“高温”的作用为文本标签，“よって”用作为连词。
+\item 不过，第3行是正确的，因为“素”是作为标识符的。
+\end{itemize}
+
+那么，根据我们的观点，上述输入应当校正为：
+\begin{LTXexample}
+$f_{\text{高温}}$~%
+($f_{\text{high temperature}}$).
+\[ y=(x-1)^2+2\quad
+  \mathrel{\text{よって}}\quad y>0 \]
+$5\in 素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
+\end{LTXexample}
+
+我们也认为使用日文字符作为标识符的情况极为少见，所以我们不在此章节描述如何在数学模式下改变日文字体。
+关于此方法，请参见。
+\paragraph{plain \TeX} 在plain \TeX下改变日文字体，你必须使用基本语句\verb!\jfont!。请参见。
+
+\paragraph{NFSS2} 对于\LaTeXe，\LuaTeX-ja采用了\pLaTeXe中（即\texttt{plfonts.dtx}）大部分字体选择系统。
+\begin{itemize}
+\item \verb!\mcdefault!和\verb!\gtdefault!控制语句用来分别控制默认的\textit{mincho}和\textit{gothic}字体族。
+	默认值：\texttt{mc}用于\verb!\mcdefault!，\texttt{gt}用于\verb!\gtdefault!。
+\item 命令\verb!\fontfamily!，\verb!\fontseries!，\verb!\fontshape!个\verb!\selectfont!用来改变日文字体属性。
 \begin{center}
-	\begin{tabular}{cccc}
-	\hline
-	字体&字体族&\verb!\mdseries!&\verb!\bfseries!\\
-	\hline
-	\textit{song}&\verb!song!&AdobeSongStd-Light&AdobeHeitiStd-Regular\\
-	\textit{hei}&\verb!hei!&AdobeHeitiStd-Regular&AdobeHeitiStd-Regular\\
-	\hline
-	\end{tabular}
+\begin{tabular}{cccccc}
+\toprule
+&\textbf{编码}&\textbf{族}&\textbf{系列}&\textbf{形状}&\textbf{选择}\\\midrule
+西文字体
+&\verb+\romanencoding+&\verb+\romanfamily+&\verb+\romanseries+&\verb+\romanshape+
+&\verb+\useroman+\\
+日文字体
+&\verb+\kanjiencoding+&\verb+\kanjifamily+&\verb+\kanjiseries+&\verb+\kanjishape+
+&\verb+\usekanji+\\
+两者&---&--&\verb+\fontseries+&\verb+\fontshape+&---\\
+自动选择&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
+\bottomrule
+\end{tabular}
 \end{center}
+\verb!\fontencoding{<encoding>}!依赖于参数以改变西文字体或者日文字体。
+例如，\verb!\fontencoding{JY3}!改变当前日文字体至\texttt{JY3}，\verb!\fontencoding{T1}!改变西文字体至\texttt{T1}。
+\verb!\fontfamily!也会改变日文字体或西文字体的族，抑或二者。
+细节详见。
+\item 对于定义日文字体族，使用\verb!\DeclareKanjiFamily!代替\verb!\DeclareFontFamily!。
+不过，在现在的实现中，使用\verb!\DeclareFontFamily!不会引起任何问题。
+\end{itemize}
 
-例如：
-\begin{verbatim}
-\documentclass{zh-article}
-\title{Lua\TeX测试}
-\author{某人甲}
-\begin{document}
-\maketitle
-Lua\TeX-ja中文测试。{\hei 测试}
-\end{document}
-\end{verbatim}
-
-我们在这里建议用户更改\textsf{zh-classes.dtx}文件中的相关代码来定制符合自己的文档类。
-但请注意，请将你更改后的文档类更名为你自己的自定义名称。
-这里给出一些常见的中文字体组合：
-\begin{center}
-	\begin{tabular}{ccc}
-	\hline
-        组合&宋体&黑体\\
-	\hline
-        Windows$^{(1)}$&SimSun&SimHei\\
-        Windows$^{(2)}$&方正书宋&方正粗宋简体\\
-        Mac OS X&STSong&STHeiti\\
-	\hline
-	\end{tabular}
-\end{center}
-%名称	SIL-Kai-Reg-Jian	全名	Kai Regular 
-%名称	SimSun-ExtB  		全名	SimSun-ExtB 
-%名称	FangSong                全名	仿宋
-%名称	SimHei                  全名	黑体
-%名称	STHeitiSC-Medium        全名	黑体-简 中等
-%名称	STFangsong              全名	华文仿宋
-%名称	STHeiti                 全名	华文黑体
-%名称	STHupo                  全名	华文琥珀
-%名称	STKaiti                 全名	华文楷体
-%名称	STLiti                  全名	华文隶书
-%名称	STSong                  全名	华文宋体
-%名称	STXinwei                全名	华文新魏
-%名称	STXingkai               全名	华文行楷
-%名称	STZhongsong             全名	华文中宋
 \subsection{fontspec}
-在\LuaTeX-ja中，和\texttt{fontspec}共存的一个包为\texttt{luatexja-fontspec}。
-这个包自动加载\texttt{fontspec}和\texttt{luatexja}宏包。
+为与\Pkg{fontspec}宏包共存，需要在导言区中使用\Pkg{luatexja-fontspec}宏包。
+这个附加宏包会自动加载\Pkg{luatexja}和\Pkg{fontspec}。
 
 在\texttt{luatexja-fontspec}，定义了如下七条命令，这些命令和\texttt{fontspec}的相关命令对比如下：
 \begin{center}
@@ -221,7 +306,20 @@ Lua\TeX-ja中文测试。{\hei 测试}
 	\hline
 	\end{tabular}
 \end{center}
-\section{\LuaTeX-ja参数设定}
+\bgroup
+\begin{LTXexample}
+\fontspec[Numbers=OldStyle]{TeX Gyre Termes}
+\jfontspec{IPAexMincho}
+JIS~X~0213:2004→辻
+
+\addjfontfeatures{CJKShape=JIS1990}
+JIS~X~0208:1990→辻
+\end{LTXexample}
+\egroup
+
+请注意并没有\verb!\setmonofont!命令，因为流行的日文字体几乎全部是等宽的。
+另注意，出格特性在这7个命令中默认关闭，因为此特性会与\textbf{JAglue}冲突（参见）。
+\section{参数设定}
 \LuaTeX-ja包含大量的参数，以控制排版细节。
 设定这些参数需要使用命令：\verb!\ltjsetparameter!和\verb!\ltjgetparameter!命令。
 \subsection{JAchar范围的设定}
@@ -377,7 +475,7 @@ Lua\TeX-ja中文测试。{\hei 测试}
 比如，在开标点之后插入\textsf{xkanjiskip}并不合适[如，比较“(あ”和“(\hskip\ltjgetparameter{xkanjiskip}あ”]。
 \LuaTeX-ja可以通过设定\textbf{JAchar}的\textsf{jaxspmode}以及\textbf{ALchar}的\textsf{alxspmode}来控制\textsf{xkanjiskip}在字符前后的插入。
 
-\begin{LTXexample}[pos=r]
+\begin{LTXexample}
 \ltjsetparameter{jaxspmode={`あ,preonly}, alxspmode={`\!,postonly}}
 pあq い!う
 \end{LTXexample}
@@ -392,7 +490,7 @@ pあq い!う
 不过，如果文档的中主要语言不是日文，那么最好上浮日文字体的基线，西文字体不变。
 如上所述，\LuaTeX-ja可以独立设定西文字体的基线（\textsf{yabaselineshift}参数）和日文字体的基线（\textsf{yjabaselineshift}参数）。
 
-\begin{LTXexample}[pos=r]
+\begin{LTXexample}
 \vrule width 150pt height 0.4pt depth 0pt\hskip-120pt
 \ltjsetparameter{yjabaselineshift=0pt, yalbaselineshift=0pt}abcあいう
 \ltjsetparameter{yjabaselineshift=5pt, yalbaselineshift=2pt}abcあいう
@@ -402,7 +500,7 @@ pあq い!う
 
 这里还有一个有趣的副作用：不同大小的字符可以通过适当调整这两个参数而在一行中垂直居中。下面是一个例子（注意，参数值并没有精心调整）：
 
-\begin{LTXexample}[pos=r]
+\begin{LTXexample}
 xyz漢字
 {\scriptsize
   \ltjsetparameter{yjabaselineshift=-1pt,
@@ -429,21 +527,75 @@ xyz漢字
 
 \item {[TODO]}
 \end{enumerate}
-\section{Lua\TeX-ja与Lua\TeX相关阅读材料}
-\begin{itemize}
-\item Lua\TeX官方主页：\verb!http://www.luatex.org!
-\item Lua\TeX\ SVN：\verb!http://foundry.supelec.fr/gf/project/luatex/!
-\item Lua\TeX：\verb!http://ja.wikipedia.org/wiki/LuaTeX!
-\item Lua\TeX-ja官方主页：\verb!http://en.sourceforge.jp/projects/luatex-ja/!
-\item p\TeX官方主页：\verb!http://ascii.asciimw.jp/pb/ptex/!
-\item Publishing \TeX：\verb!http://ja.wikipedia.org/wiki/PTeX!
-\item Vertical typesetting in \TeX：\verb!http://tug.org//TUGboat/Articles/tb11-3/tb29hamano.pdf!
-\item up\TeX官方主页：\verb!http://homepage3.nifty.com/ttk/comp/tex/uptex.html!
-\item “LuaTeX で日本語”：\verb!http://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=627!
-\item luajalayout宏包：\verb!http://www-is.amp.i.kyoto-u.ac.jp/lab/kmaeda/lualatex/luajalayout/!
-\item luafontcomp宏包：\verb!http://www-is.amp.i.kyoto-u.ac.jp/lab/kmaeda/lualatex/luafontcomp/!
-\item 思わずLuaでLaTeXしてみた：\verb!http://zrbabbler.sp.land.to/lualatexlua.html!
-\item luaums.sty：\verb!http://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=378!
-\item koTeXは日本語LuaTeXへの先導役になるか？：\\\verb!http://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=485!
-\end{itemize}
+\part{参考指南}
+\section{字体测度和日文字体}
+\subsection{\texttt{\char92jfont}基本语句}
+为了加载日文字体，需要使用\verb!\jfont!基本语句替代\verb!\font!，前者支持后者所有相同句法。
+\LuaTeX-ja自动加载\Pkg{luaotfload}宏包，故TrueType/OpenType字体的特性可以使用于日文字体：
+\begin{LTXexample}
+\jfont\tradgt={file:ipaexg.ttf:script=latn;%
+  +trad;-kern;jfm=ujis} at 14pt
+\tradgt{}当／体／医／区
+\end{LTXexample}
+
+注意定义的控制序列（上例中的\verb!\tradgt!）使用的\verb!\jfont!并不是一个\textit{font\_def}标记，故类似\verb!\fontname\tradgt!输入会引起错误。
+我们指出定义于\verb!\jfont!控制序列>
+\paragraph{JFM}
+\paragraph{注：kern特性}
+\subsection{\texttt{\char92psft}前缀}
+除使用\texttt{file:}和\texttt{name:}外，我们还可以在\verb!\jfont!（以及\verb!\font!）中使用\texttt{psft:}来设定一个“名义上”的并不嵌入PDF中的日文字体。
+此前缀的典型使用是定义“标准”日文字体，即“Ryumin-Light”和“GothicBBB-Medium”。
+\paragraph{\texttt{cid}键} 默认使用\texttt{psft:}前缀定义的字体是为Adobe-Japan1-6 CID字体。
+也可以使用\texttt{cid}键来使用其他的CID字体，如中文和韩文。
+\begin{lstlisting}[numbers=left]
+\jfont\testJ={psft:Ryumin-Light:cid=Adobe-Japan1-6;jfm=jis}     % 日语
+\jfont\testD={psft:Ryumin-Light:jfm=jis}                        % 默认值为Adobe-Japan1-6
+\jfont\testC={psft:AdobeMingStd-Light:cid=Adobe-CNS1-5;jfm=jis} % 繁体中文
+\jfont\testG={psft:SimSun:cid=Adobe-GB1-5;jfm=jis}              % 简体中文
+\jfont\testK={psft:Batang:cid=Adobe-Korea1-2;jfm=jis}           % 韩文
+\end{lstlisting}
+注意上述代码使用了\texttt{jfm-jis.lua}，这可以用于日文字体，也可以用于中文和韩文字体。
+
+当下，\LuaTeX-ja只支持如上例中的4个值，改为其他值，例如：
+\begin{lstlisting}
+\jfont\test={psft:Ryumin-Light:cid=Adobe-Japan2;jfm=jis}
+\end{lstlisting}
+会发生下列错误：
+\begin{lstlisting}[numbers=left]
+! Package luatexja Error: bad cid key `Adobe-Japan2'.
+
+See the luatexja package documentation for explanation.
+Type  H <return>  for immediate help.
+<to be read again>
+                   \par
+l.78
+
+? h
+I couldn't find any non-embedded font information for the CID
+`Adobe-Japan2'. For now, I'll use `Adobe-Japan1-6'.
+Please contact the LuaTeX-ja project team.
+?
+\end{lstlisting}
+
+%\subsection{JFM文件结构}
+%\subsection{数学字体族}
+%\subsection{Callbacks}
+%\part{实现细节}
+%\section{Lua\TeX-ja与Lua\TeX相关阅读材料}
+%\begin{itemize}
+%\item Lua\TeX官方主页：\verb!http://www.luatex.org!
+%\item Lua\TeX\ SVN：\verb!http://foundry.supelec.fr/gf/project/luatex/!
+%\item Lua\TeX：\verb!http://ja.wikipedia.org/wiki/LuaTeX!
+%\item Lua\TeX-ja官方主页：\verb!http://en.sourceforge.jp/projects/luatex-ja/!
+%\item p\TeX官方主页：\verb!http://ascii.asciimw.jp/pb/ptex/!
+%\item Publishing \TeX：\verb!http://ja.wikipedia.org/wiki/PTeX!
+%\item Vertical typesetting in \TeX：\verb!http://tug.org//TUGboat/Articles/tb11-3/tb29hamano.pdf!
+%\item up\TeX官方主页：\verb!http://homepage3.nifty.com/ttk/comp/tex/uptex.html!
+%\item “LuaTeX で日本語”：\verb!http://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=627!
+%\item luajalayout宏包：\verb!http://www-is.amp.i.kyoto-u.ac.jp/lab/kmaeda/lualatex/luajalayout/!
+%\item luafontcomp宏包：\verb!http://www-is.amp.i.kyoto-u.ac.jp/lab/kmaeda/lualatex/luafontcomp/!
+%\item 思わずLuaでLaTeXしてみた：\verb!http://zrbabbler.sp.land.to/lualatexlua.html!
+%\item luaums.sty：\verb!http://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=378!
+%\item koTeXは日本語LuaTeXへの先導役になるか？：\\\verb!http://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=485!
+%\end{itemize}
 \end{document}
