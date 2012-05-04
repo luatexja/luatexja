@@ -38,6 +38,10 @@
   \ProvidesPackage{luatexja}[2011/04/01 v0.1]
 \fi                             %</LaTeX>
 
+\ifnum\catcode`漢=12
+  \input ltj-unicode-ccfix.tex
+\fi
+
 %% Load all sub-packages.
 \ifltj@in@latex                 %<*LaTeX>
   \RequirePackage{luatexja-core}[2011/04/01]

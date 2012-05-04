@@ -433,6 +433,15 @@
   \input ltj-plain.sty %
 \fi\fi                          %</LaTeX|plain>
 
+\newluatexcatcodetable\ltj@temp@cctb
+\def\ltj@overwrite@catcodetable#1{%
+  \setluatexcatcodetable\ltj@temp@cctb{\luatexcatcodetable#1}%
+  \setluatexcatcodetable#1{\luatexcatcodetable\ltj@temp@cctb\catcode"FFFFF=14}%
+}
+\ltj@overwrite@catcodetable\CatcodeTableLaTeX
+\ltj@overwrite@catcodetable\CatcodeTableLaTeXAtLetter
+\ltj@overwrite@catcodetable\CatcodeTableExpl
+
 %%------------------ all done
 \ltj@core@AtEnd
 \endinput
