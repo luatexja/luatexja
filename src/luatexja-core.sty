@@ -248,7 +248,7 @@
   \expandafter\ltj@@set@stack#1:{post}{-10000}{10000}}
 \def\ltj@@set@stack#1,#2:#3#4#5{%
   \directlua{luatexja.stack.set_stack_table(luatexja.isglobal, \asluastring{#3},
-    \ltj@safe@num@or\ltj@defnum{#1},\ltj@safe@num@or\ltj@defnum{#2},#4,#5)}}
+    \ltj@safe@num@or{nil}{#1},\ltj@safe@num@or{nil}{#2},#4,#5)}}
 
 % jatextfont = {<char_code>, <font_cs>}
 \define@key[ltj]{japaram}{jatextfont}{%
@@ -266,7 +266,7 @@
      a Japanese font}{}%
   \else
     \directlua{luatexja.stack.set_stack_font(luatexja.isglobal, \asluastring{#3},
-    \ltj@safe@num@or\ltj@defnum{#1}, \the\ltj@curjfnt)}%
+    \ltj@safe@num@or{nil}{#1}, \the\ltj@curjfnt)}%
   \fi
   \ltj@curjfnt=\ltj@tempcnta
   \ltj@restore@globaldefs
@@ -295,8 +295,8 @@
   \def\ltj@tempa{postonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{2}\fi
   \def\ltj@tempa{allow}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{3}\fi
   \directlua{luatexja.stack.set_stack_table(luatexja.isglobal, 'xsp', 
-    \ltj@safe@num@or\ltj@defnum{#1},
-    \ltj@safe@num@or\ltj@defnum{\ltj@temp},0,3)}}
+    \ltj@safe@num@or{nil}{#1},
+    \ltj@safe@num@or{nil}{\ltj@temp},0,3)}}
 
 % alxspmode = {<char_code>, <mode>}
 % mode: inhibit, preonly, postonly, allow
@@ -310,8 +310,8 @@
   \def\ltj@tempa{postonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{2}\fi
   \def\ltj@tempa{allow}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{3}\fi
   \directlua{luatexja.stack.set_stack_table(luatexja.isglobal, 'xsp', 
-    \ltj@safe@num@or\ltj@defnum{#1},
-    \ltj@safe@num@or\ltj@defnum{\ltj@temp},0,3)}}
+    \ltj@safe@num@or{nil}{#1},
+    \ltj@safe@num@or{nil}{\ltj@temp},0,3)}}
 
 % autospacing = <bool> (default: true)
 \define@boolkey[ltj]{japaram}{autospacing}[true]{%
@@ -360,7 +360,7 @@
   \edef\ltj@temp{#1}%
   \ifx\ltj@temp\empty\let\next=\relax\else\let\next=\ltj@@scrange
     \directlua{luatexja.charrange.toggle_char_range(%
-      luatexja.is_global,\ltj@safe@num@or\ltj@defnum{#1})}%
+      luatexja.is_global,\ltj@safe@num@or{nil}{#1})}%
   \fi\next
 }
 
@@ -394,7 +394,7 @@
 \def\ltj@@getparam@one#1{%
   \directlua{luatexja.ext_get_parameter_unary('#1')}}%
 \def\ltj@@getparam@two#1#2{%
-  \directlua{luatexja.ext_get_parameter_binary('#1', \ltj@safe@num{#2})}%
+  \directlua{luatexja.ext_get_parameter_binary('#1', \ltj@safe@num@or{nil}{#2})}%
 }
 
 %%%%%%%% \ltjalchar<number>, \ltjjachar<number>

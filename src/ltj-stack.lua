@@ -82,18 +82,19 @@ end
 -- EXT
 function set_stack_table(g,m,c,p,lb,ub)
    local i = get_stack_level()
-   if p<lb or p>ub then 
+   if type(p)~='number' or p<lb or p>ub then
       ltjb.package_error('luatexja',
-			 "invalid code (".. p .. ")",
-			 {"The code should in the range "..tostring(lb) ..'..'.. tostring(ub) .. ".",
-			  "I'm going to use 0 instead of that illegal code value."})
+			 "invalid code (".. tostring(p) .. ")",
+			 "The code should in the range "..tostring(lb) .. '..' ..
+			 tostring(ub) .. ".\n" ..
+		      "I'm going to use 0 instead of that illegal code value.")
       p=0
-   elseif c<-1 or c>0x10ffff then 
+   elseif type(c)~='number' or c<-1 or c>0x10ffff then
       ltjb.package_error('luatexja',
-			 'bad character code (' .. c .. ')',
-			 {'A character number must be between -1 and 0x10ffff.',
-			  "(-1 is used for denoting `math boundary')",
-			  'So I changed this one to zero.'})
+			 'bad character code (' .. tostring(c) .. ')',
+			 'A character number must be between -1 and 0x10ffff.\n' ..
+			 "(-1 is used for denoting `math boundary')\n" ..
+			 'So I changed this one to zero.')
       c=0
    elseif not charprop_stack_table[i][m] then 
       charprop_stack_table[i][m] = {} 
@@ -110,11 +111,11 @@ end
 -- EXT
 function set_stack_font(g,m,c,p)
    local i = get_stack_level()
-   if c<0 or c>255 then 
+   if type(c)~='number' or c<0 or c>255 then 
       ltjb.package_error('luatexja',
-			 "invalid family number (".. p .. ")",
-			 {"The family number should in the range 0 .. 255.",
-			  "I'm going to use 0 instead of that illegal family number."})
+			 "invalid family number (".. tostring(c) .. ")",
+			 "The family number should in the range 0 .. 255.\n" ..
+			  "I'm going to use 0 instead of that illegal family number.")
       c=0
    elseif not charprop_stack_table[i][m] then 
       charprop_stack_table[i][m] = {} 

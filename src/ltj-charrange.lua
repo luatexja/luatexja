@@ -28,7 +28,7 @@ for i=0x100,ucs_out-1 do jcr_table_main[i]=0 end
 
 -- EXT: add characters to a range
 function add_char_range(b,e,ind) -- ind: external range number
-   if not ind or ind<0 or ind>216 then 
+   if not ind or ind<0 or ind>216 then -- 0 は error にしない（隠し）
       ltjb.package_error('luatexja',
 			 "invalid character range number (" .. ind .. ")",
 			 {"A character range number should be in the range 1..216,",
@@ -47,9 +47,9 @@ function add_char_range(b,e,ind) -- ind: external range number
 end
 
 function char_to_range(c) -- return the (external) range number
-   if c<0 or c>0x10FFFF then
+   if not c or c<0 or c>0x10FFFF then
 	 ltjb.package_error('luatexja',
-			    'bad character code (' .. c .. ')',
+			    'bad character code (' .. tostring(c) .. ')',
 			    {'A character number must be between 0 and 0x10ffff.',
 			     'So I changed this one to zero.'})
 	 c=0
@@ -80,7 +80,11 @@ end
 
 -- EXT
 function toggle_char_range(g, i) -- i: external range number
-   if i==0 then return 
+   if type(i)~='number' then
+	      ltjb.package_error('luatexja',
+				 "invalid character range number (" .. tostring(i).. ")",
+				 "A character range number must be a number, ignored.")
+   elseif i==0 then return 
    else
       local kc
       if i>0 then kc=0 else kc=1; i=-i end

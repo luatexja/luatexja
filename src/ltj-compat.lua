@@ -31,35 +31,56 @@ end
 
 -- \ucs: 単なる identity
 function from_ucs(i)
+   if type(i)~='number' then 
+      ltjb.package_error('luatexja',
+			 "invalid character code (".. tostring(i) .. ")",
+			 "I'm going to use 0 instead of that illegal character code.")
+      i=0 
+   end
    tex.write(i)
 end
 
--- \kuten: 面区点 （それぞれで16進2桁を使用）=> Unicode 符号位置
+-- \kuten: 面区点 （それぞれで16進2桁を使用）=> Unicharacter code 符号位置
 function from_kuten(i)
-   if not i then i=0 end
+   if type(i)~='number' then 
+      ltjb.package_error('luatexja',
+			 "invalid character code (".. tostring(i) .. ")",
+			 "I'm going to use 0 instead of that illegal character code.")
+      i=0 
+   end
    tex.write(tostring(luatexja.jisx0208.table_jisx0208_uptex[i] or 0))
 end
 
--- \euc: EUC-JP による符号位置 => Unicode 符号位置
+-- \euc: EUC-JP による符号位置 => Unicharacter code 符号位置
 function from_euc(i)
-   if not i then i=0
+   if type(i)~='number' then 
+      ltjb.package_error('luatexja',
+			 "invalid character code (".. tostring(i) .. ")",
+			 "I'm going to use 0 instead of that illegal character code.")
+      i=0
    elseif i>=0x10000 or i<0xa0a0 then 
       i=0
    end
    from_kuten(i-0xa0a0)
 end
 
--- \jis: ISO-2022-JP による符号位置 => Unicode 符号位置
+-- \jis: ISO-2022-JP による符号位置 => Unicharacter code 符号位置
 function from_jis(i)
-   if (not i) or i>=0x10000 or i<0 then 
+   if (type(i)~='number') or i>=0x10000 or i<0 then 
+      ltjb.package_error('luatexja',
+			 "invalid character code (".. tostring(i) .. ")",
+			 "I'm going to use 0 instead of that illegal character code.")
       i=0
    end
    from_kuten(i-0x2020)
 end
 
--- \sjis: Shift_JIS による符号位置 => Unicode 符号位置
+-- \sjis: Shift_JIS による符号位置 => Unicharacter code 符号位置
 function from_sjis(i)
-   if (not i) or i>=0x10000 or i<0 then 
+   if (type(i)~='number') or i>=0x10000 or i<0 then 
+      ltjb.package_error('luatexja',
+			 "invalid character code (".. tostring(i) .. ")",
+			 "I'm going to use 0 instead of that illegal character code.")
       tex.write('0'); return 
    end
    local c2 = math.floor(i/256)

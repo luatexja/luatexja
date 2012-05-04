@@ -122,7 +122,7 @@
    \ltj@code@convB\ltj@grab@num
 }
 \def\ltj@code@convB#1{%
-  \directlua{luatexja._cc_next(\ltj@safe@num{#1}) }%
+  \directlua{luatexja._cc_next(\ltj@safe@num@or{nil}{#1}) }%
 }
 
 \def\kansuji{%

@@ -174,6 +174,12 @@ end
 
 -- EXT: print parameters that need arguments
 function luatexja.ext_get_parameter_binary(k,c)
+   if type(c)~='number' then
+      ltjb.package_error('luatexja',
+			 'invalid the second argument (' .. tostring(c) .. ')',
+			 'I changed this one to zero.')
+      c=0
+   end
    if k == 'jacharrange' then
       if c<0 or c>216 then 
 	 ltjb.package_error('luatexja',
