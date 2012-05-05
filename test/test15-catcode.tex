@@ -1,0 +1,29 @@
+%#!luatex
+
+\input luatexbase.sty
+\newluatexcatcodetable\CatcodeTablehoge
+\input luatexja.sty
+\newluatexcatcodetable\CatcodeTablepiyo
+\def\testcattable#1{\par\noindent{\tenbf \string#1}\par{%
+table: \the#1\quad\luatexcatcodetable#1
+U+FFFFF: \the\catcode"FFFFF\quad%"
+漢: \the\catcode`漢\quad ß: \the\catcode`ß\quad
+@: \the\catcode`@
+}}
+\chardef\zero0
+
+
+plain \TeX
+
+
+\testcattable{\zero}
+\testcattable{\CatcodeTableIniTeX}
+\testcattable{\CatcodeTableString}
+\testcattable{\CatcodeTableOther}
+\testcattable{\CatcodeTableLaTeX}
+\testcattable{\CatcodeTableLaTeXAtLetter}
+\testcattable{\CatcodeTableExpl}
+\testcattable{\CatcodeTablehoge}
+\testcattable{\CatcodeTablepiyo}
+
+\end
