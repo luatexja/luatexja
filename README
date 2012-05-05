@@ -24,7 +24,7 @@ Installation
 0. Please make sure that your TeX distribution is up-to-date.
    LuaTeX-ja (luatexja-fontspec.sty) requires xunicode.sty v0.981.
 
-1. If you use TeX Live 2011 or later, you can install LuaTeX-ja via tlmgr.
+1. If you are using TeX Live 2011 or later, you can install LuaTeX-ja via tlmgr.
 
 2. If you must/want to install manually:
 
