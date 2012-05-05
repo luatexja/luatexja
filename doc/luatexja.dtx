@@ -2756,13 +2756,15 @@ the following fields:
 %</ja>
 %<*zh>
 除了上面涉及到的内容，JFM文件中还有几个以自然数进行声明的次级表。
-这些表依靠$i\in\omega$
+这些表依靠满足$i\in\omega$的“字符类”$i$来索引。
+一般，最少需要的是字符类0，故每一个JFM文件必须有次级表索引为\texttt{[0]}。
 %</zh>
 
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
 \item[chars=\{<character>, ...\}]
 %<en>(required except character class~0)
 %<ja>（文字クラス0を除いて必須）
+%<zh>（字符类0外必须）
 
 %<*en>
 This field is a list of characters which are in this character
@@ -2783,10 +2785,17 @@ This field is a list of characters which are in this character
 文字それ自体（長さ1の文字列）によって指定される．さらに，このリストで指定される
 「仮想的な文字」も存在する．これらについては後に記す．
 %</ja>
+%<*zh>
+这部分为字符集$i$的字符列表。当$i=0$时不需要设定此部分，因为不在字符集0种的\textbf{JAchar}
+字符都包含在字符集0中（也就是字符集0包含大多数的\textbf{JAchar}）。在这个字符列表中，每一个
+字符据可以使用其编码，或者字符本身（长度为1的字符串）。另外还有部分“假想字符”可在此列表中
+使用。我们会在下面描述。
+%</zh>
 
 \item[width=<length>, height=<length>, depth=<length>, italic=<length>]
 %<en>(required)
 %<ja>（必須）
+%<zh>（必须）
 
 %<*en>
 Specify width of characters in character class~$i$, height, depth and
@@ -2801,6 +2810,11 @@ But there is one exception: if \texttt{'prop'} is specified in \texttt{width} fi
 しかし，例外が一つある：もし\texttt{'prop'}が\texttt{width}フィールドに
 指定された場合，文字の幅はその「実際の」グリフの幅となる．
 %</ja>
+%<*zh>
+设定字符类$i$的宽度，高度和深度以及意大利体校正。在字符集$i$中，所有字符的宽度，高度
+和深度的值为上述设定之值。不过还有例外，如果\texttt{'prop'}设定了\texttt{width}部分，那么
+字符的宽度则为其“真实”字形宽度。
+%</zh>
 
 \item[left=<length>, down=<length>, align=<align>]\
 
@@ -2821,6 +2835,12 @@ The effects of these 3~fields are indicated in Figure~\ref{fig-pos}.
 \texttt{'left'}であるものとして扱われる．
 これら3つのフィールドの意味については図 \ref{fig-pos} で説明する．
 %</ja>
+%<*zh>
+此部分为“真实”字形对齐位置。\texttt{align}的合法值为\texttt{'left'}，
+\texttt{'middle'}和\texttt{'right'}。如此三项被省略，则\texttt{left}和
+\texttt{down}被视作0，\texttt{align}被视作\texttt{'left'}。
+此部分三个域的作用，请参见图\ref{fig-pos}。
+%</zh>
 
 %<*en>
 In most cases, \texttt{left} and \texttt{down} fields are~0, while
@@ -2835,6 +2855,11 @@ when the current character class is the class for opening delimiters'.
 例えば，\texttt{align}フィールドを\texttt{'right'}に指定することは，
 文字クラスが開き括弧類であるときに実際必要である．
 %</ja>
+%<*zh>
+在大多数情况下，\texttt{left}和\texttt{down}域为0，但是在\texttt{align}域为
+\texttt{'middle'}或者\texttt{'right'}时则是不正常的。例如，必须设定\texttt{align}
+为\texttt{'right'}时，则当前字符类必须为开定界符。
+%</zh>
 \begin{figure}[!tb]
 \begin{minipage}{0.4\textwidth}%
 \begin{center}\unitlength=10pt\small
@@ -2897,6 +2922,9 @@ field is \texttt{'middle'}.
 \texttt{align}フィールドの値が\texttt{'middle'}である和文文字を含むノードを
 考えよう．
 %</ja>
+%<*zh>
+假定一个node包含日语字符，且其值为\texttt{align}的\texttt{'middle'}。
+%</zh>
 \begin{itemize}
 \item
 %<*en>
@@ -2907,6 +2935,9 @@ Its width, height and depth are specified by JFM.
 黒色の長方形はノードの枠である．
 その幅，高さ，深さはJFMによって指定される．
 %</ja>
+%<*zh>
+黑色长方形为node框。其宽度，高度，深度均为JFM所设定。
+%</zh>
 \item
 %<*en>
 Since the \texttt{align} field is \texttt{'middle'},
@@ -2916,6 +2947,9 @@ the `real' glyph is centered horizontally (the green rectangle).
 \texttt{align}フィールドは\texttt{middle}なので，「実際の」グリフは
 水平方向の中心に配置される（緑色の長方形）．
 %</ja>
+%<*zh>
+因\texttt{align}被设定为\texttt{middle}，故“真实”字形为水平居中（绿长方形中）。
+%</zh>
 \item
 %<*en>
 Furthermore, the glyph is shifted according to values of fields
@@ -2926,11 +2960,15 @@ Furthermore, the glyph is shifted according to values of fields
 さらに，グリフは\texttt{left}と\texttt{down}の値に従ってシフトされる．
 最終的な実際のグリフの位置は赤色の長方形で示された位置になる．
 %</ja>
+%<*zh>
+此外，字形移位由\texttt{left}和\texttt{down}决定。最终字形位置为红长方形所示。
+%</zh>
 \end{itemize}
 \end{minipage}
 \caption{
 %<en>The position of the `real' glyph.
 %<ja>「実際の」グリフの位置．
+%<zh>“真实”字形位置
 }
 \label{fig-pos}
 \end{figure}
@@ -2954,34 +2992,46 @@ The following is the list of `imaginary characters':
 クラス0の文字」として扱われていた文字であり，その結果として\pTeX より細か
 い組版調整ができるようになっている．以下でその一覧を述べる：
 %</ja>
+%<*zh>
+如上所述，你可以在\texttt{chars}中设定多个“假想字符”。这些字符中的多数字符在
+\pTeX中式被视作字符集0中字符。故此，\LuaTeX-ja可以比\pTeX做得更好。
+下列为“假想字符”列表：
+%</zh>
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
 \item['lineend']
 %<en>An ending of a line.
 %<ja>行の終端を表す．
+%<zh>行尾结束字符。
 
 \item['diffmet']
 %<en>Used at a boundary between two \textbf{JAchar}s whose JFM or size is different.
 %<ja>JFMやサイズが異なる2つの\textbf{JAchar}の間の境界として用いられる．
+%<zh>用于两个不同大小或不同JFM的两个\textbf{JAchar}间边界。
 
 \item['boxbdd']
 %<en>The beginning/ending of a horizontal box, and the beginning of a noindented paragraph.
 %<ja>水平ボックスの先頭と末尾，及びインデントされていない（\verb+\noindent+ で開始された）段落の先頭を表す．
+%<zh>水平合字结束或结尾，以及未缩进段落开头。
 
 \item['parbdd']
 %<en>The beginning of an (indented) paragraph.
 %<ja>通常の（\verb+\noindent+ で開始されていない）段落の先頭．
+%<zh>缩进段落开头。
 
 \item['jcharbdd']
 %<en>A boundary between \textbf{JAchar} and anything else (such as \textbf{ALchar}, kern, glue, ...).
 %<ja>和文文字と「その他のもの」（欧文文字，glue，kern等）との境界．
+%<zh>日文字符和其他（如\textbf{ALchar}，胶，出格等）边界。
 
 \item[$-1$]
 %<en>The left/right boundary of an inline math formula.
 %<ja>行中数式と地の文との境界．
+%<zh>行中数学式的左/右边界。
 \end{list}
 
 %<en>\paragraph{Porting JFM from \pTeX}
 %<ja>\paragraph{\pTeX 用和文フォントメトリックの移植}
+%<zh>\paragraph{\pTeX下使用的JFM移植}
 
 % ToDo: English version.
 
@@ -3033,9 +3083,14 @@ The following is the list of `imaginary characters':
 \end{itemize}
 \ltjsetparameter{jacharrange={-3}}
 %</ja>
+%<*zh>
+下面，给出用于\pTeX使用的JFM移植到\LuaTeX-ja过程中需要注意的几点。
+%</zh>
+
 
 %<en>\subsection{Math Font Family}
 %<ja>\subsection{数式フォントファミリ}
+%<zh>\subsection{数学字体族}
 \label{ssec-math}
 
 %<*en>
@@ -3069,12 +3124,14 @@ you can set both \verb+\fam+ and \verb+\jfam+ to the same value.
 \begin{table}[!tb]
 %<en>\caption{Primitives for Japanese math fonts.}
 %<ja>\caption{和文数式フォントに対するプリミティブ．}
+%<zh>\caption{日语数学字体基本语句}
 \label{tab-math}
 \begin{center}\def\{{\char`\{}\def\}{\char`\}}
 \begin{tabular}{lll}
 \toprule
 %<en>&Japanese fonts&alphabetic fonts\\
 %<ja>&和文フォント&欧文フォント\\
+%<zh>&日文字体&西文字体\\
 \midrule
 font family&\verb+\jfam+${}\in [0,256)$&\verb+\fam+\\
 text size&\tt\Param{jatextfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\verb+\textfont+<fam>=<font\_cs>\\
@@ -3087,6 +3144,7 @@ scriptscript size&\tt\Param{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\ver
 
 %<en>\subsection{Callbacks}
 %<ja>\subsection{コールバック}
+%<zh>\subsection{回调}
 
 %<*en>
 Like \LuaTeX\ itself, \LuaTeX-ja also has callbacks. These callbacks can
@@ -3101,6 +3159,7 @@ be accessed via \verb+luatexbase.add_to_callback+ function and so on, as other c
 {\def\makelabel#1{\bfseries#1}}
 %<en>\item[\texttt{luatexja.load\_jfm} callback]
 %<ja>\item[\texttt{luatexja.load\_jfm}コールバック]
+%<zh>\item[\texttt{luatexja.load\_jfm}回调]
 %<*en>
 With this callback you can overwrite JFMs.
 This callback is called when a new JFM is loaded.
@@ -3140,6 +3199,7 @@ An example of this callback is the \texttt{ltjarticle} class, with
 
 %<en>\item[\texttt{luatexja.define\_font} callback]
 %<ja>\item[\texttt{luatexja.define\_font}コールバック]
+%<zh>\item[\texttt{luatexja.define\_font}回调]
 %<*en>
 This callback and the next callback form a pair, and you can assign letters which don't have
 	     fixed code points in Unicode to non-zero character classes.
@@ -3167,14 +3227,17 @@ You may assume that \verb+jfont_info+ has the following fields:
 \item[\tt jfm]
 %<en>The index number of JFM.
 %<ja>JFMのインデックス番号．
+%<zh>JFM索引编号。
 
 \item[\tt size]
 %<en>Font size in a scaled point (${}=2^{-16}\,\textrm{pt}$).
 %<ja>スケールド・ポイント(${}=2^{-16}\,\textrm{pt}$)を単位としたフォントのサイズ．
+%<zh>以参照点(${}=2^{-16}\,\textrm{pt}$)为点位的字体大小。
 
 \item[\tt var]
 %<en>The value specified in \texttt{jfmvar=...} at a call of \verb+\jfont+.
 %<ja>\verb+\jfont+ の呼び出しの際に\texttt{jfmvar=...}で指定された値．
+%<zh>\verb!\jfont!调用的\texttt{jfmvar=...}值。
 \end{description}
 
 %<*en>
@@ -3201,6 +3264,7 @@ JFM中でAdobe-Japan1 CIDの文字を \verb+"AJ1-xxx"+ の形で指定するた�
 
 %<en>\item[\texttt{luatexja.find\_char\_class} callback]
 %<ja>\item[\texttt{luatexja.find\_char\_class}コールバック]
+%<zh>\item[\texttt{luatexja.find\_char\_class}回调]
 %<*en>
 This callback is called just when \LuaTeX-ja is trying to determine which
 	     character class a character \verb+chr_code+ belongs.
@@ -3243,9 +3307,13 @@ This callback doesn't replace any code of \LuaTeX-ja.
 %<*ja>
 このコールバックは\LuaTeX-jaのコードを書き換えない．
 %</ja>
+%<*zh>
+此回调不会替换\LuaTeX-ja中任何代码。
+%</zh>
 
 %<en>\item[\texttt{luatexja.set\_width} callback]
 %<ja>\item[\texttt{luatexja.set\_width}コールバック]
+%<zh>\item[\texttt{luatexja.set\_width}回调]
 %<*en>
 This callback is called when \LuaTeX-ja is trying to encapsule a
 	     \textbf{JAchar} \textit{glyph\_node}, to adjust its
@@ -3310,8 +3378,10 @@ Then, the position of glyphs is shifted up by
 
 %<en>\section{Parameters}
 %<ja>\section{パラメータ}
+%<zh>\section{参数}
 %<en>\subsection{\texttt{\char92 ltjsetparameter} primitive}
 %<ja>\subsection{\texttt{\char92 ltjsetparameter}プリミティブ}
+%<zh>\subsection{\texttt{\char92 ltjsetparameter}基本参数}
 
 %<*en>
 As noted before, \verb+\ltjsetparameter+ and \verb+\ltjgetparameter+ are
@@ -3382,6 +3452,7 @@ character other than space~`\texttt{\char32}'~(U+0020) has the category code
 
 %<en>\subsection{List of Parameters}
 %<ja>\subsection{パラメータ一覧}
+%<zh>\subsection{参数一览}
 \label{ssec-param}
 
 %<*en>
@@ -3477,12 +3548,15 @@ At the present version, the lowermost bit of <natural number> indicates
 \item[\Param{jatextfont}\,=\{<jfam>,<jfont\_cs>\}]
 %<en>[\verb+\textfont+ in \TeX]
 %<ja>[\TeX の \verb+\textfont+]
+%<zh>[\TeX中的\verb+\textfont+]
 \item[\Param{jascriptfont}\,=\{<jfam>,<jfont\_cs>\}]
 %<en>[\verb+\scriptfont+ in \TeX]
 %<ja>[\TeX の \verb+\scriptfont+]
+%<zh>[\TeX中的\verb+\scriptfont+]
 \item[\Param{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}]
 %<en>[\verb+\scriptscriptfont+ in \TeX]
 %<ja>[\TeX の \verb+\scriptscriptfont+]
+%<zh>[\TeX中的\verb+\scriptscriptfont+]
 \item[\Param{yjabaselineshift}\,=<dimen>$^\ast$]\
 \item[\Param{yalbaselineshift}\,=<dimen>$^\ast$] [\verb+\ybaselineshift+]
 
@@ -3500,12 +3574,16 @@ The followings are allowed for <mode>:
 \begin{description}
 %<en>\item[0, \texttt{inhibit}] Insertion of \Param{xkanjiskip} is inhibited before the character, nor after the character.
 %<ja>\item[0, \texttt{inhibit}] \Param{xkanjiskip}の挿入は文字の前／後ろのいずれでも禁止される．
+%<zh>\item[0, \texttt{inhibit}] 插入文字前/后的\Param{xkanjiskip}均被禁止。
 %<en>\item[1, \texttt{preonly}] Insertion of \Param{xkanjiskip} is allowed before the character, but not after.
 %<ja>\item[1, \texttt{preonly}] \Param{xkanjiskip}の挿入は文字の前では許されるが，後ろでは許されない．
+%<zh>\item[1, \texttt{preonly}] 文字前允许插入\Param{xkanjiskip}，但其后不允许插入。
 %<en>\item[2, \texttt{postonly}] Insertion of \Param{xkanjiskip} is allowed after the character, but not before.
 %<ja>\item[2, \texttt{postonly}] \Param{xkanjiskip}の挿入は文字の後ろでは許されるが，前では許されない．
+%<zh>\item[2, \texttt{postonly}] 文字后允许插入\Param{xkanjiskip}，但之前不允许插入。
 %<en>\item[3, \texttt{allow}] Insertion of \Param{xkanjiskip} is allowed both before the character and after the character. This is the default value.
 %<ja>\item[3, \texttt{allow}] \Param{xkanjiskip}の挿入は文字の前／後ろのいずれでも許される．これがデフォルトの値である．
+%<zh>\item[3, \texttt{allow}] 文字前后均可插入\Param{xkanjiskip}。此为默认值。
 \end{description}
 %<*en>
 This parameter is similar to the \verb+\inhibitxspcode+ primitive of \pTeX, but not compatible with \verb+\inhibitxspcode+.
@@ -3514,7 +3592,9 @@ This parameter is similar to the \verb+\inhibitxspcode+ primitive of \pTeX, but 
 このパラメータは\pTeX の \verb+\inhibitxspcode+ プリミティブと似ているが，
 互換性はない．
 %</ja>
-
+%<*zh>
+此参数类似\pTeX基本语句\verb!\inhibitxspcode!，但是和\verb!\inhibitxspcode不兼容。!
+%</zh>
 \item[\Param{alxspmode}\,=\{<chr\_code>,<mode>\}] [\verb+\xspcode+]
 
 %<*en>
@@ -3530,12 +3610,16 @@ Setting whether inserting \Param{xkanjiskip} is allowed before/after a
 \begin{description}
 %<en>\item[0, \texttt{inhibit}] Insertion of \Param{xkanjiskip} is inhibited before the character, nor after the character.
 %<ja>\item[0, \texttt{inhibit}] \Param{xkanjiskip}の挿入は文字の前／後ろのいずれでも禁止される．
+%<zh>\item[0, \texttt{inhibit}] 插入文字前/后的\Param{xkanjiskip}均被禁止。
 %<en>\item[1, \texttt{preonly}] Insertion of \Param{xkanjiskip} is allowed before the character, but not after.
 %<ja>\item[1, \texttt{preonly}] \Param{xkanjiskip}の挿入は文字の前では許されるが，後ろでは許されない．
+%<zh>\item[1, \texttt{preonly}] 文字前允许插入\Param{xkanjiskip}，但其后不允许插入。
 %<en>\item[2, \texttt{postonly}] Insertion of \Param{xkanjiskip} is allowed after the character, but not before.
 %<ja>\item[2, \texttt{postonly}] \Param{xkanjiskip}の挿入は文字の後ろでは許されるが，前では許されない．
+%<zh>\item[2, \texttt{postonly}] 文字后允许插入\Param{xkanjiskip}，但之前不允许插入。
 %<en>\item[3, \texttt{allow}] Insertion of \Param{xkanjiskip} is allowed before the character and after the character. This is the default value.
 %<ja>\item[3, \texttt{allow}] \Param{xkanjiskip}の挿入は文字の前／後ろのいずれでも許される．これがデフォルトの値である．
+%<zh>\item[3, \texttt{allow}] 文字前后均可插入\Param{xkanjiskip}。此为默认值。
 \end{description}
 %<*en>
 Note that parameters \Param{jaxspmode} and \Param{alxspmode} use a common table, hence these two parameters are synonyms of each other.
@@ -3544,6 +3628,9 @@ Note that parameters \Param{jaxspmode} and \Param{alxspmode} use a common table,
 \Param{jaxspmode}と\Param{alxspmode}は共通のテーブルを用いているため，
 これら2つのパラメータは互いの異名となっていることに注意する．
 %</ja>
+%<*zh>
+注意参数\Param{jaxspmode}和\Param{alxspmode}公用一个表，故这两个参数互为同义语。
+%</zh>
 
 \item[\Param{autospacing}\,=<bool>$^\ast$] [\verb+\autospacing+]
 \item[\Param{autoxspacing}\,=<bool>$^\ast$] [\verb+\autoxspacing+]
@@ -3561,6 +3648,10 @@ JFM（もしくはサイズ）が異なる2つの\textbf{JAchar}の間にグル�
 入れるかを指定うる．
 許される値は以下の通り：
 %</ja>
+%<*zh>
+对于处理不同大小或者JFM的两种\textbf{JAchar}之间的胶/出格。
+有下列参数：
+%</zh>
 \begin{description}
 \item[\texttt{average}]
 \item[\texttt{both}]
@@ -3575,8 +3666,10 @@ JFM（もしくはサイズ）が異なる2つの\textbf{JAchar}の間にグル�
 
 %<en>\section{Other Primitives}
 %<ja>\section{その他のプリミティブ}
+%<zh>\section{其他基本语句}
 %<en>\subsection{Primitives for Compatibility}
 %<ja>\subsection{互換プリミティブ}
+%<zh>\subsection{基本语句兼容性}
 
 %<*en>
 The following primitives are implemented for compatibility with \pTeX:
@@ -3584,6 +3677,9 @@ The following primitives are implemented for compatibility with \pTeX:
 %<*ja>
 以下のプリミティブは\pTeX との互換性のために実装されている：
 %</ja>
+%<*zh>
+下列基本语句的实现与\pTeX兼容：
+%</zh>
 \begin{list}{}{\def\makelabel{\ttfamily\char92 }\advance\leftmargin1\zw}
 \item[kuten]
 \item[jis]
@@ -3595,7 +3691,7 @@ The following primitives are implemented for compatibility with \pTeX:
 
 %<en>\subsection{\texttt{\char92 inhibitglue} primitive}
 %<ja>\subsection{\texttt{\char92 inhibitglue}プリミティブ}
-
+%<zh>\subsection{\texttt{\char92 inhibitglue}基本语句}
 %<*en>
 The primitive \verb+\inhibitglue+ suppresses the insertion of \textbf{JAglue}.
 The following is an example, using a special JFM that there will be a glue between
@@ -3606,6 +3702,10 @@ the beginning of a box and `あ', and also between `あ' and `ウ'.
 以下は，ボックスの始めと`あ'の間，`あ'と`ウ'の間にグルーが入る特別なJFMを用いた例で
 ある．
 %</ja>
+%<*zh>
+基本语句\verb!\inhibitglue!会压缩\textbf{JAchar}的插入。
+下面的例子使用了特殊的JFM。在一个盒子和“あ”之间，以及“あ”和“ウ”之间存在胶。
+%</zh>
 
 \begin{LTXexample}
 \jfont\g=psft:Ryumin-Light:jfm=test \g
@@ -3622,6 +3722,9 @@ With the help of this example, we remark the specification of \verb+\inhibitglue
 %<*ja>
 この例を援用して，\verb+\inhibitglue+ の仕様について述べる．
 %</ja>
+%<*zh>
+如上例子，我们注意到\verb!\inhibtglue!的用法。
+%</zh>
 \begin{itemize}
 %<*en>
 \item The call of \verb+\inhibitglue+ in the (internal) vertical mode is
@@ -3656,9 +3759,11 @@ With the help of this example, we remark the specification of \verb+\inhibitglue
 
 %<en>\section{Control Sequences for \LaTeXe}
 %<ja>\section{\LaTeXe 用のコントロールシーケンス}
+%<zh>\section{\LaTeXe 下使用的控制序列}
 
 %<en>\subsection{Patch for NFSS2}
 %<ja>\subsection{NFSS2へのパッチ}
+%<zh>\subsection{NFSS2补丁}
 \label{ssub-nfsspat}
 
 %<*en>
@@ -4337,6 +4442,7 @@ callback.
 
 %<en>\paragraph{The method}
 %<ja>\paragraph{解決法}
+%<zh>\paragraph{解决方法}
 
 %<*en>
 The code of stack system is based on that in a post of Dev-luatex mailing list\footnote{%
@@ -4443,9 +4549,11 @@ This problem is resolved by using
 
 %<en>\section{Linebreak after Japanese Character}
 %<ja>\section{和文文字直後の改行}
+%<ja>\section{日文字符后断行}
 \label{sec-lbreak}
 %<en>\subsection{Reference: Behavior in \pTeX}
 %<ja>\subsection{参考:\pTeX の動作}
+%<zh>\subsection{参考:\pTeX 行为}
 %<*en>
 In~\pTeX, a line break after a Japanese character doesn't emit a space,
 since words are not separated by spaces in Japanese writings. However,
@@ -4537,6 +4645,7 @@ after `beginning/ending of a group' characters.
 
 %<en>\subsection{Behavior in \LuaTeX-ja}
 %<ja>\subsection{\LuaTeX-jaの動作}
+%<zh>\subsection{\LuaTeX-ja行为}
 %<*en>
 States in the input processor of \LuaTeX\ is the same as that of \TeX,
 and they can't be customized by any callbacks. Hence, we can only use
@@ -4637,9 +4746,11 @@ u
 
 %<en>\section{Insertion of JFM glues, \Param{kanjiskip} and \Param{xkanjiskip}}
 %<ja>\section{JFMグルーの挿入，\Param{kanjiskip}と\Param{xkanjiskip}}
+%<ja>\section{JFM的胶插入，\Param{kanjiskip}和\Param{xkanjiskip}}
 \label{sec-jfmglue}
 %<en>\subsection{Overview}
 %<ja>\subsection{概要}
+%<zh>\subsection{概要}
 
 \LuaTeX-jaにおける和文処理グルーの挿入方法は，\pTeX のそれとは全く異なる．
 \pTeX では次のような仕様であった：
@@ -4664,6 +4775,7 @@ u
 
 %<en>\subsection{definition of a `cluster'}
 %<ja>\subsection{「クラスタ」の定義}
+%<zh>\subsection{“cluster”定义}
 
 \def\OA{$\text{\sf O}_{\text{\sf A}}$}
 \def\OB{$\text{\sf O}_{\text{\sf B}}$}
@@ -5026,6 +5138,7 @@ $a$は禁則処理用に\textit{Nq}と\textit{Np}の間に加えられるべき�
 \begin{table}[t]
 %<en>\caption{Summary of JFM glues.}
 %<ja>\caption{JFM グルーの概要．}
+%<zh>\caption{JFM胶总结。}
 \label{tab-jfmglue}
 \begin{center}
 \small
