@@ -105,7 +105,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2011/10/03 v1.6-ltj
+  [2012/05/08 v1.6-ltj
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -159,9 +159,6 @@
 % \end{quotation}
 % のエラーが起こった場合は、|lualatex-math|パッケージを読み込んでみて下さい。
 % \item 出力PDFの用紙サイズが自動的に設定されるようにしてあります。
-% \item \cs{if西暦}、\cs{西暦}、\cs{和暦}をそれぞれ\cs{ifSeireki}, \cs{Seireki},
-%   \cs{Wareki}に変更してあります。これはデフォルトの漢字のカテゴリコードが12で
-%   あるためです。
 % \end{itemize}
 %
 % \section{Lua\TeX-ja の読み込み}
@@ -4029,16 +4026,16 @@
 %        platex jclasses.dtx で dvi を作るときにエラーになるため。
 % \fi
 % \DisableCrossrefs
-% \begin{macro}{\ifSeireki}
-% \begin{macro}{\Seireki}
-% \begin{macro}{\Wareki}
+% \begin{macro}{\if西暦}
+% \begin{macro}{\西暦}
+% \begin{macro}{\和暦}
 % \changes{v1.0h}{1996/12/17}{Typo:和歴 to 和暦}
 % |\today|コマンドの`年'を、
 % 西暦か和暦のどちらで出力するかを指定するコマンドです。
 %    \begin{macrocode}
-\newif\ifSeireki \Seirekifalse
-\def\Seireki{\Seirekitrue}
-\def\Wareki{\Seirekifalse}
+\newif\if西暦 \西暦false
+\def\西暦{\西暦true}
+\def\和暦{\西暦false}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -4060,7 +4057,7 @@
 %    \begin{macrocode}
 \def\today{{%
   \iftdir
-    \ifSeireki
+    \if西暦
       \kansuji\number\year 年
       \kansuji\number\month 月
       \kansuji\number\day 日
@@ -4070,7 +4067,7 @@
       \kansuji\number\day 日
     \fi
   \else
-    \ifSeireki
+    \if西暦
       \number\year~年
       \number\month~月
       \number\day~日

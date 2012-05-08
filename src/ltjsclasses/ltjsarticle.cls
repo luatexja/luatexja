@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsarticle}
-  [2012/04/24]
+  [2012/05/08 ]
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
@@ -1361,12 +1361,12 @@
     \unskip \reserved@e {\reserved@f#1}\nobreak \hfil \break \null
     \inhibitglue \ignorespaces
   \fi}
-\def\Shou#1{\hbox{$\m@th$%
+\def\小#1{\hbox{$\m@th$%
   \csname S@\f@size\endcsname
   \fontsize\sf@size\z@
   \math@fontsfalse\selectfont
   #1}}
-\def\UeShou#1{{\sbox\z@ T\vbox to\ht0{\Shou{#1}\vss}}}
+\def\上小#1{{\sbox\z@ T\vbox to\ht0{\小{#1}\vss}}}
 \def\cmrTeX{%
   \ifdim \fontdimen\@ne\font >\z@
     T\kern-.25em\lower.5ex\hbox{E}\kern-.125emX\@
@@ -1375,12 +1375,12 @@
   \fi}
 \def\cmrLaTeX{%
   \ifdim \fontdimen\@ne\font >\z@
-    L\kern-.32em\UeShou{A}\kern-.22em\cmrTeX
+    L\kern-.32em\上小{A}\kern-.22em\cmrTeX
   \else
-    L\kern-.36em\UeShou{A}\kern-.15em\cmrTeX
+    L\kern-.36em\上小{A}\kern-.15em\cmrTeX
   \fi}
 \def\sfTeX{T\kern-.1em\lower.4ex\hbox{E}\kern-.07emX\@}
-\def\sfLaTeX{L\kern-.25em\UeShou{A}\kern-.08em\sfTeX}
+\def\sfLaTeX{L\kern-.25em\上小{A}\kern-.08em\sfTeX}
 \def\ptmTeX{%
   \ifdim \fontdimen\@ne\font >\z@
     T\kern-.12em\lower.37ex\hbox{E}\kern-.02emX\@
@@ -1389,9 +1389,9 @@
   \fi}
 \def\ptmLaTeX{%
   \ifdim \fontdimen\@ne\font >\z@
-    L\kern-.2em\UeShou{A}\kern-.1em\ptmTeX
+    L\kern-.2em\上小{A}\kern-.1em\ptmTeX
   \else
-    L\kern-.3em\UeShou{A}\kern-.1em\ptmTeX
+    L\kern-.3em\上小{A}\kern-.1em\ptmTeX
   \fi}
 \def\pncTeX{%
   \ifdim \fontdimen\@ne\font >\z@
@@ -1401,9 +1401,9 @@
   \fi}
 \def\pncLaTeX{%
   \ifdim \fontdimen\@ne\font >\z@
-    L\kern-.3em\UeShou{A}\kern-.1em\pncTeX
+    L\kern-.3em\上小{A}\kern-.1em\pncTeX
   \else
-    L\kern-.3em\UeShou{A}\kern-.1em\pncTeX
+    L\kern-.3em\上小{A}\kern-.1em\pncTeX
   \fi}
 \def\pplTeX{%
   \ifdim \fontdimen\@ne\font >\z@
@@ -1413,9 +1413,9 @@
   \fi}
 \def\pplLaTeX{%
   \ifdim \fontdimen\@ne\font >\z@
-    L\kern-.27em\UeShou{A}\kern-.12em\pplTeX
+    L\kern-.27em\上小{A}\kern-.12em\pplTeX
   \else
-    L\kern-.3em\UeShou{A}\kern-.15em\pplTeX
+    L\kern-.3em\上小{A}\kern-.15em\pplTeX
   \fi}
 \def\ugmTeX{%
   \ifdim \fontdimen\@ne\font >\z@
@@ -1425,9 +1425,9 @@
   \fi}
 \def\ugmLaTeX{%
   \ifdim \fontdimen\@ne\font >\z@
-    L\kern-.2em\UeShou{A}\kern-.13em\ugmTeX
+    L\kern-.2em\上小{A}\kern-.13em\ugmTeX
   \else
-    L\kern-.3em\UeShou{A}\kern-.13em\ugmTeX
+    L\kern-.3em\上小{A}\kern-.13em\ugmTeX
   \fi}
 \DeclareRobustCommand{\TeX}{%
   \def\@tempa{cmr}%
@@ -1487,10 +1487,10 @@
 \def\pLaTeX{p\LaTeX}
 \def\pLaTeXe{p\LaTeXe}
 \def\AmSTeX{\protect\AmS-\protect\TeX{}}
-\DeclareRobustCommand{\BibTeX}{B\kern-.05em\Shou{I\kern-.025em B}%
+\DeclareRobustCommand{\BibTeX}{B\kern-.05em\小{I\kern-.025em B}%
   \ifx\f@family\cmr\kern-.08em\else\kern-.15em\fi\TeX}
 \DeclareRobustCommand{\SliTeX}{%
-  S\kern-.06emL\kern-.18em\UeShou{I}\kern -.03em\TeX}
+  S\kern-.06emL\kern-.18em\上小{I}\kern -.03em\TeX}
 \newcommand{\prepartname}{\if@english Part~\else 第\fi}
 \newcommand{\postpartname}{\if@english\else 部\fi}
 \newcommand{\presectionname}{}%  第
@@ -1505,9 +1505,9 @@
 \newcommand{\tablename}{\if@english Table.~\else 表\fi}
 \newcommand{\appendixname}{\if@english Appendix~\else 付録\fi}
 \newcommand{\abstractname}{\if@english Abstract\else 概要\fi}
-\newif\ifSeireki \Seirekitrue
-\def\Seireki{\Seirekitrue}
-\def\Wareki{\Seirekifalse}
+\newif\if西暦 \西暦true
+\def\西暦{\西暦true}
+\def\和暦{\西暦false}
 \newcount\heisei \heisei\year \advance\heisei-1988\relax
 \def\today{%
   \if@english
@@ -1516,7 +1516,7 @@
       July\or August\or September\or October\or November\or December\fi
       \space\number\day, \number\year
   \else
-    \ifSeireki
+    \if西暦
       \number\year 年
       \number\month 月
       \number\day 日

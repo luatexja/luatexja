@@ -50,7 +50,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2012/04/24 ]
+  [2012/05/08 ]
 %<*driver>
 \documentclass{ltjsarticle}
 \usepackage{doc}
@@ -125,9 +125,6 @@
 %   削除しました。
 % \item 「\texttt{amsmath}との衝突の回避」のコードは，上流で既に対処されているうえ，
 %   これがあると |grfext.sty| を読み込んだ際にエラーを引き起こすので削除しました。
-% \item |\小|，|\上小|，|\if西暦|，|\西暦|，|\和暦|をそれぞれ
-%   |\Shou|, |\UeShou|, |\ifSeireki|, |\Seireki|, |\Wareki| に変更してあります。
-%   これはデフォルトの漢字のカテゴリコードが12であるためです。
 % \end{itemize}
 %
 % \StopEventually
@@ -4706,18 +4703,18 @@
 %
 % \LaTeX 関連のロゴを作り直します。
 %
-% \begin{macro}{\Shou}
-% \begin{macro}{\UeShou}
+% \begin{macro}{\小}
+% \begin{macro}{\上小}
 %
 % 文字を小さめに出したり上寄りに小さめに出したりする命令です。
 %
 %    \begin{macrocode}
-\def\Shou#1{\hbox{$\m@th$%
+\def\小#1{\hbox{$\m@th$%
   \csname S@\f@size\endcsname
   \fontsize\sf@size\z@
   \math@fontsfalse\selectfont
   #1}}
-\def\UeShou#1{{\sbox\z@ T\vbox to\ht0{\Shou{#1}\vss}}}
+\def\上小#1{{\sbox\z@ T\vbox to\ht0{\小{#1}\vss}}}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -4739,12 +4736,12 @@
   \fi}
 \def\cmrLaTeX{%
   \ifdim \fontdimen\@ne\font >\z@
-    L\kern-.32em\UeShou{A}\kern-.22em\cmrTeX
+    L\kern-.32em\上小{A}\kern-.22em\cmrTeX
   \else
-    L\kern-.36em\UeShou{A}\kern-.15em\cmrTeX
+    L\kern-.36em\上小{A}\kern-.15em\cmrTeX
   \fi}
 \def\sfTeX{T\kern-.1em\lower.4ex\hbox{E}\kern-.07emX\@}
-\def\sfLaTeX{L\kern-.25em\UeShou{A}\kern-.08em\sfTeX}
+\def\sfLaTeX{L\kern-.25em\上小{A}\kern-.08em\sfTeX}
 \def\ptmTeX{%
   \ifdim \fontdimen\@ne\font >\z@
     T\kern-.12em\lower.37ex\hbox{E}\kern-.02emX\@
@@ -4753,9 +4750,9 @@
   \fi}
 \def\ptmLaTeX{%
   \ifdim \fontdimen\@ne\font >\z@
-    L\kern-.2em\UeShou{A}\kern-.1em\ptmTeX
+    L\kern-.2em\上小{A}\kern-.1em\ptmTeX
   \else
-    L\kern-.3em\UeShou{A}\kern-.1em\ptmTeX
+    L\kern-.3em\上小{A}\kern-.1em\ptmTeX
   \fi}
 \def\pncTeX{%
   \ifdim \fontdimen\@ne\font >\z@
@@ -4765,9 +4762,9 @@
   \fi}
 \def\pncLaTeX{%
   \ifdim \fontdimen\@ne\font >\z@
-    L\kern-.3em\UeShou{A}\kern-.1em\pncTeX
+    L\kern-.3em\上小{A}\kern-.1em\pncTeX
   \else
-    L\kern-.3em\UeShou{A}\kern-.1em\pncTeX
+    L\kern-.3em\上小{A}\kern-.1em\pncTeX
   \fi}
 \def\pplTeX{%
   \ifdim \fontdimen\@ne\font >\z@
@@ -4777,9 +4774,9 @@
   \fi}
 \def\pplLaTeX{%
   \ifdim \fontdimen\@ne\font >\z@
-    L\kern-.27em\UeShou{A}\kern-.12em\pplTeX
+    L\kern-.27em\上小{A}\kern-.12em\pplTeX
   \else
-    L\kern-.3em\UeShou{A}\kern-.15em\pplTeX
+    L\kern-.3em\上小{A}\kern-.15em\pplTeX
   \fi}
 \def\ugmTeX{%
   \ifdim \fontdimen\@ne\font >\z@
@@ -4789,9 +4786,9 @@
   \fi}
 \def\ugmLaTeX{%
   \ifdim \fontdimen\@ne\font >\z@
-    L\kern-.2em\UeShou{A}\kern-.13em\ugmTeX
+    L\kern-.2em\上小{A}\kern-.13em\ugmTeX
   \else
-    L\kern-.3em\UeShou{A}\kern-.13em\ugmTeX
+    L\kern-.3em\上小{A}\kern-.13em\ugmTeX
   \fi}
 \DeclareRobustCommand{\TeX}{%
   \def\@tempa{cmr}%
@@ -4900,10 +4897,10 @@
 %    {\def\BibTeX{{\rmfamily B\kern-.05em%
 %     \textsc{i\kern-.025em b}\kern-.08em%
 %     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}}{}
-\DeclareRobustCommand{\BibTeX}{B\kern-.05em\Shou{I\kern-.025em B}%
+\DeclareRobustCommand{\BibTeX}{B\kern-.05em\小{I\kern-.025em B}%
   \ifx\f@family\cmr\kern-.08em\else\kern-.15em\fi\TeX}
 \DeclareRobustCommand{\SliTeX}{%
-  S\kern-.06emL\kern-.18em\UeShou{I}\kern -.03em\TeX}
+  S\kern-.06emL\kern-.18em\上小{I}\kern -.03em\TeX}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -4981,13 +4978,13 @@
 %
 % \LaTeX で処理した日付を出力します。
 % |ltjarticle| などと違って，標準を西暦にし，余分な空白が入らないように改良しました。
-% 和暦にするには |\Wareki| と書いてください。
+% 和暦にするには |\和暦| と書いてください。
 %
 % \begin{macro}{\today}
 %    \begin{macrocode}
-\newif\ifSeireki \Seirekitrue
-\def\Seireki{\Seirekitrue}
-\def\Wareki{\Seirekifalse}
+\newif\if西暦 \西暦true
+\def\西暦{\西暦true}
+\def\和暦{\西暦false}
 \newcount\heisei \heisei\year \advance\heisei-1988\relax
 \def\today{%
   \if@english
@@ -4996,7 +4993,7 @@
       July\or August\or September\or October\or November\or December\fi
       \space\number\day, \number\year
   \else
-    \ifSeireki
+    \if西暦
       \number\year 年
       \number\month 月
       \number\day 日
