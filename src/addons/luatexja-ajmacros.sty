@@ -797,39 +797,40 @@
 	\leaders\hbox{\CID{\@tempcnta}}\ifhmode\hskip\else\vskip\fi#1}}
 %
 %
+\endlinechar=13
 \toks0{}\toks1{}\toks2{}\toks3{}
-\def\ajQuotedef#1/#2/#3/#4/{\ifx*#1\else
+\def\ajQuotedef#1 #2 #3 #4 {\ifx*#1\else
 	\toks0\expandafter{\the\toks0 \or#1}%
 	\toks1\expandafter{\the\toks1 \or#2}%
 	\toks2\expandafter{\the\toks2 \or#3}%
 	\toks3\expandafter{\the\toks3 \or#4}%
 	\expandafter\ajQuotedef\fi}
 \ajQuotedef
-670/671/12173/12174/
-672/673/7956/7957/
-674/675/7899/7900/
-676/677/7901/7902/
-678/679/7903/7904/
-680/681/7905/7906/
-682/683/7907/7908/
-684/685/7909/7910/
-686/687/7911/7912/
-688/689/7913/7914/
-690/691/7915/7916/
-7608/7609/7956/7957/
-12125/12126/12135/12136/
-12127/12128/12137/12138/
-12129/12130/12139/12140/
-12131/12132/12141/12142/
-12171/12172/12173/12174/
-16197/16198/16329/16330/
-*/*/*/*/
+670 671 12173 12174
+672 673 7956 7957
+674 675 7899 7900
+676 677 7901 7902
+678 679 7903 7904
+680 681 7905 7906
+682 683 7907 7908
+684 685 7909 7910
+686 687 7911 7912
+688 689 7913 7914
+690 691 7915 7916
+7608 7609 7956 7957
+12125 12126 12135 12136
+12127 12128 12137 12138
+12129 12130 12139 12140
+12131 12132 12141 12142
+12171 12172 12173 12174
+16197 16198 16329 16330
+* * * *
 \def\@removetop#1{\toks#1\expandafter\expandafter\expandafter{\expandafter\@gobble\the\toks#1}}
 \@removetop0\@removetop1\@removetop2\@removetop3
-\xdef\ajQuote#1#2{\noexpand\CID{\noexpand\ifydir\noexpand\ifcase#1 \the\toks0\relax
-        \noexpand\fi\noexpand\else\noexpand\ifcase#1 \the\toks2\relax
-	\noexpand\fi\noexpand\fi}#2\inhibitglue\noexpand\CID{\noexpand\ifydir\noexpand\ifcase#1 \the\toks1\relax
-	\noexpand\fi\noexpand\else\noexpand\ifcase#1 \the\toks3\relax
+\xdef\ajQuote#1#2{\noexpand\CID{\noexpand\ifydir\noexpand\ifcase#1 \the\toks0
+	\noexpand\fi\noexpand\else\noexpand\ifcase#1 \the\toks2
+	\noexpand\fi\noexpand\fi}#2\inhibitglue\noexpand\CID{\noexpand\ifydir\noexpand\ifcase#1 \the\toks1
+	\noexpand\fi\noexpand\else\noexpand\ifcase#1 \the\toks3
 	\noexpand\fi\noexpand\fi}}
 }
 \ifltj@in@latex\else
