@@ -70,7 +70,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-ajmacros}[2011/09/19 v0.1]
+  \ProvidesPackage{luatexja-ajmacros}[2012/05/08 v0.1a]
 \fi                             %</LaTeX>
 
 %%------------------
@@ -326,21 +326,21 @@
 %2/3 9376 12892 9696 13212
 %
 %
-\def\@ajHankakudef#1{\ifx\@nil#1\else
-	\expandafter\xdef\csname ajHankaku@#1\endcsname{\noexpand\CID
+\def\@aj半角def#1{\ifx\@nil#1\else
+	\expandafter\xdef\csname aj半角@#1\endcsname{\noexpand\CID
 		{\noexpand\ifydir\number\@tempcnta\noexpand\else\number\@tempcntb\noexpand\fi}}%
 	\advance\@tempcnta\@ne\advance\@tempcntb\@ne
-	\expandafter\@ajHankakudef\fi}
+	\expandafter\@aj半角def\fi}
 \@tempcnta326
 \@tempcntb9084
-\@ajHankakudef 　。「」、・ヲァィゥェォャュョッーアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン゛゜｀ヰヱヮヵヶヴガギグゲゴザジズゼゾダヂヅデドバパビピブプベペボポ\@nil
+\@aj半角def 　。「」、・ヲァィゥェォャュョッーアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン゛゜｀ヰヱヮヵヶヴガギグゲゴザジズゼゾダヂヅデドバパビピブプベペボポ\@nil
 \@tempcnta516
-\@ajHankakudef をぁぃぅぇぉゃゅょっあいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわんゐゑゎがぎぐげござじずぜぞだぢづでどばぱびぴぶぷべぺぼぽ\@nil
-\gdef\ajHankaku#1{\aj@Hankaku#1\@nil}
-\gdef\aj@Hankaku#1{\ifx\@nil#1\else
-	\expandafter\ifx\csname ajHankaku@#1\endcsname\relax
-	   #1\else\csname ajHankaku@#1\endcsname\fi
-   \expandafter\aj@Hankaku\fi}
+\@aj半角def をぁぃぅぇぉゃゅょっあいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわんゐゑゎがぎぐげござじずぜぞだぢづでどばぱびぴぶぷべぺぼぽ\@nil
+\gdef\aj半角#1{\aj@半角#1\@nil}
+\gdef\aj@半角#1{\ifx\@nil#1\else
+	\expandafter\ifx\csname aj半角@#1\endcsname\relax
+	   #1\else\csname aj半角@#1\endcsname\fi
+   \expandafter\aj@半角\fi}
 %
 %
 \def\@ajligdef#1#2{\expandafter\xdef\csname ajLig\@ajmojifam#1\endcsname{\noexpand\CID{#2}}}
