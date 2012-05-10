@@ -2360,7 +2360,7 @@ For example, the following sets banner as `\texttt{filename (YYYY-MM-DD hh:mm)}'
 \label{part-ref}
 %<en>\section{Font Metric and Japanese Font}
 %<ja>\section{フォントメトリックと和文フォント}
-%<ja>\section{字体测度和日文字体}
+%<zh>\section{字体测度和日文字体}
 %<en>\subsection{\texttt{\char92jfont} primitive}
 %<ja>\subsection{\texttt{\char92jfont}プリミティブ}
 %<zh>\subsection{\texttt{\char92jfont}基本语句}
@@ -4628,7 +4628,7 @@ This problem is resolved by using
 
 %<en>\section{Linebreak after Japanese Character}
 %<ja>\section{和文文字直後の改行}
-%<ja>\section{日文字符后断行}
+%<zh>\section{日文字符后断行}
 \label{sec-lbreak}
 %<en>\subsection{Reference: Behavior in \pTeX}
 %<ja>\subsection{参考:\pTeX の動作}
@@ -4746,8 +4746,9 @@ A character U+FFFFF (its category code is set to 14~(comment) by
 \LuaTeX-ja) is appended to an input line, \emph{before \LuaTeX\ actually
 process it}, if and only if the following three conditions are satisfied:
 \begin{enumerate}
-\item The category code of the character $\langle${return}$\rangle$
-      (whose character code is 13) is 5~(end-of-line).
+\item The category code of \verb+\endlinechar+%
+\footnote{Usually, it is $\langle${return}$\rangle$
+      (whose character code is 13).} is 5~(end-of-line).
 \item The category code of U+FFFFF itself is 14~(comment).
 \item The input line matches the following `regular expression':
 \[
@@ -4794,7 +4795,8 @@ u
 \footnote{この文字はコメント文字として扱われるように\LuaTeX-ja内部で設定をしている．}
 を末尾に追加する．よって，その場合に改行は空白とは見做されないこととなる．
 \begin{enumerate}
-\item 改行文字（文字コード13番）のカテゴリーコードが5~(end-of-line)である．
+\item \verb+\endlinechar+の文字\footnote{普通は，改行文字（文字コード13番）である．}
+のカテゴリーコードが5~(end-of-line)である．
 \item U+FFFFFのカテゴリーコードが14~(comment)である．
 \item 入力行は次の「正規表現」にマッチしている：
 \[
@@ -4830,7 +4832,7 @@ u
 
 %<en>\section{Insertion of JFM glues, \Param{kanjiskip} and \Param{xkanjiskip}}
 %<ja>\section{JFMグルーの挿入，\Param{kanjiskip}と\Param{xkanjiskip}}
-%<ja>\section{JFM的胶插入，\Param{kanjiskip}和\Param{xkanjiskip}}
+%<zh>\section{JFM的胶插入，\Param{kanjiskip}和\Param{xkanjiskip}}
 \label{sec-jfmglue}
 %<en>\subsection{Overview}
 %<ja>\subsection{概要}
