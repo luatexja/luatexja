@@ -26,4 +26,27 @@ plain \TeX
 \testcattable{\CatcodeTablehoge}
 \testcattable{\CatcodeTablepiyo}
 
+\bigskip
+
+\par\noindent{\tenbf\tengt endlinecharが13でない場合}\par
+{\catcode13=12\spaceskip=20pt%
+\ltjsetparameter{autoxspacing=false}%
+{\endlinechar=`\A\catcode`\A=5 
+%%%% {\endlinechar=`\A\catcode`\A=5% ではダメ
+%%%%（末尾の % のおかげで \catcode 代入が行末までに完結していない）
+あいうえお
+かきくけこ
+C
+B}%
+あいうえお
+かきくけこ
+C
+B}
+
+{\spaceskip=20pt\ltjsetparameter{autoxspacing=false}%
+\endlinechar=`\A\catcode`\A=5 
+あいうえお
+かきくけこ
+C
+B}
 \end
