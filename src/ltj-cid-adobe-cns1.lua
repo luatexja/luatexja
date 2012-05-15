@@ -6,126 +6,167 @@ return {
  characters={
   [32]={
    index=1,
+   width=164495.36,
   },
   [33]={
    index=2,
+   width=227409.92,
   },
   [34]={
    index=3,
+   width=265420.8,
   },
   [35]={
    index=4,
+   width=484311.04,
   },
   [36]={
    index=5,
+   width=330301.44,
   },
   [37]={
    index=6,
+   width=496762.88,
   },
   [38]={
    index=7,
+   width=540672,
   },
   [39]={
    index=8,
+   width=184156.16,
   },
   [40]={
    index=9,
+   width=192020.48,
   },
   [41]={
    index=10,
+   width=192675.84,
   },
   [42]={
    index=11,
+   width=323747.84,
   },
   [43]={
    index=12,
+   width=406323.2,
   },
   [44]={
    index=13,
+   width=164495.36,
   },
   [45]={
    index=14,
+   width=244449.28,
   },
   [46]={
    index=15,
+   width=165150.72,
   },
   [47]={
    index=16,
+   width=202506.24,
   },
   [48]={
    index=17,
+   width=329646.08,
   },
   [49]={
    index=18,
+   width=329646.08,
   },
   [50]={
    index=19,
+   width=329646.08,
   },
   [51]={
    index=20,
+   width=329646.08,
   },
   [52]={
    index=21,
+   width=330301.44,
   },
   [53]={
    index=22,
+   width=329646.08,
   },
   [54]={
    index=23,
+   width=328990.72,
   },
   [55]={
    index=24,
+   width=329646.08,
   },
   [56]={
    index=25,
+   width=329646.08,
   },
   [57]={
    index=26,
+   width=330301.44,
   },
   [58]={
    index=27,
+   width=164495.36,
   },
   [59]={
    index=28,
+   width=164495.36,
   },
   [60]={
    index=29,
+   width=406978.56,
   },
   [61]={
    index=30,
+   width=406978.56,
   },
   [62]={
    index=31,
+   width=406978.56,
   },
   [63]={
    index=32,
+   width=265420.8,
   },
   [64]={
    index=33,
+   width=682885.12,
   },
   [65]={
    index=34,
+   width=490864.64,
   },
   [66]={
    index=35,
+   width=441057.28,
   },
   [67]={
    index=36,
+   width=444989.44,
   },
   [68]={
    index=37,
+   width=444989.44,
   },
   [69]={
    index=38,
+   width=448921.6,
   },
   [70]={
    index=39,
+   width=439746.56,
   },
   [71]={
    index=40,
+   width=483655.68,
   },
   [72]={
    index=41,
+   width=482344.96,
   },
   [73]={
    index=42,
@@ -133,72 +174,95 @@ return {
   },
   [74]={
    index=43,
+   width=323747.84,
   },
   [75]={
    index=44,
+   width=477757.44,
   },
   [76]={
    index=45,
+   width=456130.56,
   },
   [77]={
    index=46,
+   width=590479.36,
   },
   [78]={
    index=47,
+   width=471859.2,
   },
   [79]={
    index=48,
+   width=491520,
   },
   [80]={
    index=49,
+   width=441712.64,
   },
   [81]={
    index=50,
+   width=488898.56,
   },
   [82]={
    index=51,
+   width=440401.92,
   },
   [83]={
    index=52,
+   width=410910.72,
   },
   [84]={
    index=53,
+   width=503971.84,
   },
   [85]={
    index=54,
+   width=463339.52,
   },
   [86]={
    index=55,
+   width=509214.72,
   },
   [87]={
    index=56,
+   width=581304.32,
   },
   [88]={
    index=57,
+   width=464650.24,
   },
   [89]={
    index=58,
+   width=469237.76,
   },
   [90]={
    index=59,
+   width=403701.76,
   },
   [91]={
    index=60,
+   width=182845.44,
   },
   [92]={
    index=61,
+   width=202506.24,
   },
   [93]={
    index=62,
+   width=181534.72,
   },
   [94]={
    index=63,
+   width=230686.72,
   },
   [95]={
    index=64,
+   width=376832,
   },
   [96]={
    index=65,
+   width=192675.84,
   },
   [97]={
    index=66,
@@ -206,90 +270,119 @@ return {
   },
   [98]={
    index=67,
+   width=334888.96,
   },
   [99]={
    index=68,
+   width=328990.72,
   },
   [100]={
    index=69,
+   width=359792.64,
   },
   [101]={
    index=70,
+   width=323747.84,
   },
   [102]={
    index=71,
+   width=233308.16,
   },
   [103]={
    index=72,
+   width=338165.76,
   },
   [104]={
    index=73,
+   width=360448,
   },
   [105]={
    index=74,
+   width=210370.56,
   },
   [106]={
    index=75,
+   width=210370.56,
   },
   [107]={
    index=76,
+   width=334233.6,
   },
   [108]={
    index=77,
+   width=207749.12,
   },
   [109]={
    index=78,
+   width=483655.68,
   },
   [110]={
    index=79,
+   width=349306.88,
   },
   [111]={
    index=80,
+   width=350617.6,
   },
   [112]={
    index=81,
+   width=357171.2,
   },
   [113]={
    index=82,
+   width=349306.88,
   },
   [114]={
    index=83,
+   width=246415.36,
   },
   [115]={
    index=84,
+   width=290324.48,
   },
   [116]={
    index=85,
+   width=236584.96,
   },
   [117]={
    index=86,
+   width=346685.44,
   },
   [118]={
    index=87,
+   width=344719.36,
   },
   [119]={
    index=88,
+   width=486277.12,
   },
   [120]={
    index=89,
+   width=349962.24,
   },
   [121]={
    index=90,
+   width=377487.36,
   },
   [122]={
    index=91,
+   width=287703.04,
   },
   [123]={
    index=92,
+   width=292945.92,
   },
   [124]={
    index=93,
+   width=171704.32,
   },
   [125]={
    index=94,
+   width=292290.56,
   },
   [126]={
    index=95,
+   width=309329.92,
   },
   [162]={
    index=262,
@@ -58871,26 +58964,6 @@ return {
        },
       },
       nalt={
-       cyrl={
-        dflt=true,
-       },
-       dflt={
-        dflt=true,
-       },
-       grek={
-        dflt=true,
-       },
-       hani={
-        dflt=true,
-       },
-       kana={
-        dflt=true,
-       },
-       latn={
-        dflt=true,
-       },
-      },
-      pwid={
        cyrl={
         dflt=true,
        },
