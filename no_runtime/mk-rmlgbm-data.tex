@@ -2,6 +2,9 @@
 \documentclass{article}
 
 \usepackage{luaotfload}
+
+\font\a=file:AdobeMingStd-Light.otf
+\font\b=file:AdobeMyungjoStd-Medium.otf
 \usepackage{luacode}
 \begin{luacode}
 -- only for debug
@@ -80,7 +83,7 @@ function mkrmlgbm(nonfilename,opfilename)
        elseif v.width == 327680 then v.width = 327680 -- 半角
        elseif v.width == 163840 then v.width = 163840 -- 1/4 角
        elseif v.width == 218234.88 then v.width = 218234.88 -- 1/3 角
-       else v.width = nil
+       elseif k>=128 then v.width = nil 
        end
 	end
 	
@@ -95,19 +98,19 @@ function mkrmlgbm(nonfilename,opfilename)
       tmpt.gpos_mark2ligature = {}
       tmpt.gpos_mark2mark = {}
       shared.otfdata.luatex.features.gpos = nil
-      shared.otfdata.luatex.features.pwid = nil
-      shared.otfdata.luatex.features.palt = nil
-      shared.otfdata.luatex.features.vkrn = nil
       for i,x in pairs(tfmdata.shared.otfdata.luatex.sequences) do
         if string.match(x.type,'gpos') then x.subtables = {} end
       end
+      -- Following features use proportional glyphs, so remove them.
+      shared.otfdata.luatex.features.gsub.pwid = nil
+      shared.otfdata.luatex.features.gsub.pkna = nil
+      shared.otfdata.luatex.features.gsub.palt = nil
     end
 
 	-- for luaotfload
-    if fontdata.pfminfo then
+	if fontdata.pfminfo then
 	  fontdata.pfminfo.os2_capheight = 0
 	end
-    --table_search(tfmdata, 'gpos', '')
 	table.tofile(opfilename, tfmdata, 'return', false, true, false)
 end
 mkrmlgbm('AdobeMingStd-Light', 'ltj-cid-adobe-cns1.lua')
