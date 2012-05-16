@@ -39,7 +39,7 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjbook}
-  [2011/10/03 v1.6-ltj
+  [2012/05/08 v1.6-ltj
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -847,13 +847,13 @@
 \@addtoreset{footnote}{chapter}
 \newcommand\@makefntext[1]{\parindent 1em
   \noindent\hbox to 1.8em{\hss\@makefnmark}#1}
-\newif\ifSeireki \Seirekifalse
-\def\Seireki{\Seirekitrue}
-\def\Wareki{\Seirekifalse}
+\newif\if西暦 \西暦false
+\def\西暦{\西暦true}
+\def\和暦{\西暦false}
 \newcount\heisei \heisei\year \advance\heisei-1988\relax
 \def\today{{%
   \iftdir
-    \ifSeireki
+    \if西暦
       \kansuji\number\year 年
       \kansuji\number\month 月
       \kansuji\number\day 日
@@ -863,7 +863,7 @@
       \kansuji\number\day 日
     \fi
   \else
-    \ifSeireki
+    \if西暦
       \number\year~年
       \number\month~月
       \number\day~日

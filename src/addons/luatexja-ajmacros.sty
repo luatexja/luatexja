@@ -4,9 +4,7 @@
 % Original:
 % \ProvidesPackage{ajmacros}[2005/12/25 13:52 iNOUE Koich! <inoue@ma.ns.musashi-tech.ac.jp>]
 %
-% Note 1: \aj半角 is renamed \ajHankaku
-% Note 2: Comment out \ajQuote
-%
+
 
 %% Avoid multiple loading.
 \csname\if11luatexjaajmacrosLoaded\fi\endcsname
@@ -70,7 +68,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-ajmacros}[2011/09/19 v0.1]
+  \ProvidesPackage{luatexja-ajmacros}[2012/05/08 v0.1a]
 \fi                             %</LaTeX>
 
 %%------------------
@@ -82,6 +80,7 @@
 \ifltj@in@latex\else
   \def\@tw{\char"2}
   \def\@ifstar#1#2#3{\ifx*#3\expandafter#1\else#2{#3}\fi}
+  \long\def\@gobble#1{}
 \fi
 
 {%
@@ -326,21 +325,21 @@
 %2/3 9376 12892 9696 13212
 %
 %
-\def\@ajHankakudef#1{\ifx\@nil#1\else
-	\expandafter\xdef\csname ajHankaku@#1\endcsname{\noexpand\CID
+\def\@aj半角def#1{\ifx\@nil#1\else
+	\expandafter\xdef\csname aj半角@#1\endcsname{\noexpand\CID
 		{\noexpand\ifydir\number\@tempcnta\noexpand\else\number\@tempcntb\noexpand\fi}}%
 	\advance\@tempcnta\@ne\advance\@tempcntb\@ne
-	\expandafter\@ajHankakudef\fi}
+	\expandafter\@aj半角def\fi}
 \@tempcnta326
 \@tempcntb9084
-\@ajHankakudef 　。「」、・ヲァィゥェォャュョッーアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン゛゜｀ヰヱヮヵヶヴガギグゲゴザジズゼゾダヂヅデドバパビピブプベペボポ\@nil
+\@aj半角def 　。「」、・ヲァィゥェォャュョッーアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン゛゜｀ヰヱヮヵヶヴガギグゲゴザジズゼゾダヂヅデドバパビピブプベペボポ\@nil
 \@tempcnta516
-\@ajHankakudef をぁぃぅぇぉゃゅょっあいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわんゐゑゎがぎぐげござじずぜぞだぢづでどばぱびぴぶぷべぺぼぽ\@nil
-\gdef\ajHankaku#1{\aj@Hankaku#1\@nil}
-\gdef\aj@Hankaku#1{\ifx\@nil#1\else
-	\expandafter\ifx\csname ajHankaku@#1\endcsname\relax
-	   #1\else\csname ajHankaku@#1\endcsname\fi
-   \expandafter\aj@Hankaku\fi}
+\@aj半角def をぁぃぅぇぉゃゅょっあいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわんゐゑゎがぎぐげござじずぜぞだぢづでどばぱびぴぶぷべぺぼぽ\@nil
+\gdef\aj半角#1{\aj@半角#1\@nil}
+\gdef\aj@半角#1{\ifx\@nil#1\else
+	\expandafter\ifx\csname aj半角@#1\endcsname\relax
+	   #1\else\csname aj半角@#1\endcsname\fi
+   \expandafter\aj@半角\fi}
 %
 %
 \def\@ajligdef#1#2{\expandafter\xdef\csname ajLig\@ajmojifam#1\endcsname{\noexpand\CID{#2}}}
@@ -798,38 +797,41 @@
 	\leaders\hbox{\CID{\@tempcnta}}\ifhmode\hskip\else\vskip\fi#1}}
 %
 %
-%% \toks0{}\toks1{}\toks2{}\toks3{}
-%% \def\ajQuotedef#1 #2 #3 #4 {\ifx*#1\else
-%% 	\toks0\expandafter{\the\toks0 \or#1}%
-%% 	\toks1\expandafter{\the\toks1 \or#2}%
-%% 	\toks2\expandafter{\the\toks2 \or#3}%
-%% 	\toks3\expandafter{\the\toks3 \or#4}%
-%% 	\expandafter\ajQuotedef\fi}
-%% \ajQuotedef
-%% 670 671 12173 12174
-%% 672 673 7956 7957
-%% 674 675 7899 7900
-%% 676 677 7901 7902
-%% 678 679 7903 7904
-%% 680 681 7905 7906
-%% 682 683 7907 7908
-%% 684 685 7909 7910
-%% 686 687 7911 7912
-%% 688 689 7913 7914
-%% 690 691 7915 7916
-%% 7608 7609 7956 7957
-%% 12125 12126 12135 12136
-%% 12127 12128 12137 12138
-%% 12129 12130 12139 12140
-%% 12131 12132 12141 12142
-%% 12171 12172 12173 12174
-%% 16197 16198 16329 16330
-%% * * * *
-%% \xdef\ajQuote#1#2{\noexpand\CID{\noexpand\ifydir\noexpand\ifcase#1\the\toks0
-%% 	\noexpand\fi\noexpand\else\noexpand\ifcase#1\the\toks2
-%% 	\noexpand\fi\noexpand\fi}#2\inhibitglue\noexpand\CID{\noexpand\ifydir\noexpand\ifcase#1\the\toks1
-%% 	\noexpand\fi\noexpand\else\noexpand\ifcase#1\the\toks3
-%% 	\noexpand\fi\noexpand\fi}}
+\endlinechar=13
+\toks0{}\toks1{}\toks2{}\toks3{}
+\def\ajQuotedef#1 #2 #3 #4 {\ifx*#1\else
+	\toks0\expandafter{\the\toks0 \or#1}%
+	\toks1\expandafter{\the\toks1 \or#2}%
+	\toks2\expandafter{\the\toks2 \or#3}%
+	\toks3\expandafter{\the\toks3 \or#4}%
+	\expandafter\ajQuotedef\fi}
+\ajQuotedef
+670 671 12173 12174
+672 673 7956 7957
+674 675 7899 7900
+676 677 7901 7902
+678 679 7903 7904
+680 681 7905 7906
+682 683 7907 7908
+684 685 7909 7910
+686 687 7911 7912
+688 689 7913 7914
+690 691 7915 7916
+7608 7609 7956 7957
+12125 12126 12135 12136
+12127 12128 12137 12138
+12129 12130 12139 12140
+12131 12132 12141 12142
+12171 12172 12173 12174
+16197 16198 16329 16330
+* * * *
+\def\@removetop#1{\toks#1\expandafter\expandafter\expandafter{\expandafter\@gobble\the\toks#1}}
+\@removetop0\@removetop1\@removetop2\@removetop3
+\xdef\ajQuote#1#2{\noexpand\CID{\noexpand\ifydir\noexpand\ifcase#1 \the\toks0
+	\noexpand\fi\noexpand\else\noexpand\ifcase#1 \the\toks2
+	\noexpand\fi\noexpand\fi}#2\inhibitglue\noexpand\CID{\noexpand\ifydir\noexpand\ifcase#1 \the\toks1
+	\noexpand\fi\noexpand\else\noexpand\ifcase#1 \the\toks3
+	\noexpand\fi\noexpand\fi}}
 }
 \ifltj@in@latex\else
   \ajRedefine@KundokuMacros
