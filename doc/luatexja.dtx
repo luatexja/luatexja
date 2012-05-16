@@ -57,7 +57,7 @@
 %</zh>
 
 \usepackage{amsmath,amssymb,xcolor,pict2e,multienum,amsthm,float,makecell}
-\usepackage{booktabs,listings,showexpl,multicol}
+\usepackage{booktabs,listings,showexpl,multicol,metalogo}
 \usepackage{luatexja-otf}
 \usepackage{luatexja-fontspec}
 \usepackage{hyperref}
@@ -304,7 +304,7 @@ The followings are major changes from \pTeX:
       `variation'.
 %</en>
 %<*ja>
-\item 和文フォントは（小塚明朝，IPA明朝などの）実際のフォント，和文フォントメトリック（JFMと呼ぶ），そ
+\item 和文フォントは（小塚明朝，IPA明朝などの）実際のフォント，和文フォントメトリック（JFMと呼ぶ\footnote{混乱を防ぐため，p\TeX の意味でのJFM (\texttt{min10.tfm}) などは本ドキュメントでは\textbf{和文用TFM}とよぶことにする．}），そ
       して`variation'と呼ばれる文字列の組である．
 %</ja>
 %<*zh>
@@ -415,6 +415,12 @@ The followings are major changes from \pTeX:
 \item 处理过程中，两个在“真实”字体上具区别的日文字体可以被识别出来。
 %</zh>
 \end{itemize}
+
+%<*ja>
+\item \LuaTeX-jaでは，\pTeX と同様に漢字・仮名を制御綴内に用いることができ，
+\verb+\西暦+ などが正しく動作するようにしている．
+但し，制御綴中に使える和文文字が\pTeX・\upTeX と全く同じではないことに注意すること．
+%</ja>
 
 %<*en>
 \item At the present, vertical typesetting (\emph{tategaki}), is not
@@ -901,20 +907,6 @@ This does minimal settings (like \texttt{ptex.tex}) for typesetting Japanese doc
 %</zh>
 \begin{itemize}
 %<*en>
-\item The `Q（級）' is a unit used in Japanese phototypesetting, and
-      $1\,\textrm{Q}=0.25\,\textrm{mm}$. This length is stored in a
-      dimension \verb+\jQ+.
-%</en>
-%<*ja>
-\item `Q（級）'は日本の写植で用いられる単位で，$1\,\textrm{Q}=0.25\,\textrm{mm}$
-      である．この長さは \verb+\jQ+ に保持されている．
-%</ja>
-%<*zh>
-\item “Q（级）”是日本照排中使用的尺寸单位，$1 \mathrm{Q} = 0.25\mathrm{mm}$。
-该长度保存在长度\verb!\jQ!中。
-%</zh>
-
-%<*en>
 \item It is widely accepted that the font `Ryumin-Light' and
       `GothicBBB-Medium' aren't embedded into PDF files, and PDF reader
       substitute them by some external Japanese fonts (\textit{e.g.},
@@ -1096,42 +1088,6 @@ Okumura), namely, \Pkg{ltjclasses} and \Pkg{ltjsclasses}.
 档，你最好不要使用\texttt{article.cls}，\texttt{book.cls}等文档类文件。
 现在，我们有相当于\Pkg{jclasses}（\pLaTeX 标准文档类）和\Pkg{jsclasses}
 （奥村晴彦）的文档类，即\Pkg{ltjclasses}和\Pkg{ltjsclasses}。
-%</zh>
-
-%<*en>
-\paragraph{\texttt{\char92 CID}, \texttt{\char92 UTF} and macros in OTF package}
-Under \pLaTeX, \Pkg{otf} package (developed by Shuzaburo Saito) is
-used for typesetting characters which is in Adobe-Japan1-6 CID but not
-in JIS~X~0208. Since this package is widely used, \LuaTeX-ja
-supports some of functions in \Pkg{otf} package.
-If you want to use these functions, load \Pkg{luatexja-otf} package.
-%</en>
-%<*ja>
-\paragraph{\texttt{\char92 CID}, \texttt{\char92 UTF}とOTFパッケージのマクロ}
-\pLaTeX では，JIS~X~0208にないAdobe-Japan1-6の文字を出力するために，
-齋藤修三郎氏による\Pkg{otf}パッケージが用いられていた．このパッケージは
-広く用いられているため，\LuaTeX-jaにおいても\Pkg{otf}パッケージの機能の
-一部をサポートしている．これらの機能を用いるためには\Pkg{luatexja-otf}パッケージ
-を読み込めばよい．
-%</ja>
-%<*zh>
-\paragraph{OTF包中的\texttt{\char92CID}，\texttt{\char92UTF}及其他宏} 
-\pLaTeX 下，\underline{\texttt{otf}}宏包（斋藤修三郎开发）是用来排印存在
-于Adobe-Japan1-6但不存在于JIS X 0208中的字符。
-该包已经广泛使用，\LuaTeX-ja支持部分\Pkg{otf}包中的部分功能。
-如果你想使用这些功能，加载\Pkg{luatexja-otf}宏包。
-\bgroup
-\fontencoding{JY3}\selectfont
-%</zh>
-
-\begin{LTXexample}
-森\UTF{9DD7}外と内田百\UTF{9592}とが\UTF{9AD9}島屋に行く。
-
-\CID{7652}飾区の\CID{13706}野家，
-葛飾区の吉野家
-\end{LTXexample}
-%<*zh>
-\egroup
 %</zh>
 
 %<en>\subsection{Changing Fonts}
@@ -1482,6 +1438,59 @@ featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を�
 请注意并没有\verb!\setmonofont!命令，因为流行的日文字体几乎全部是等宽的。
 另注意，出格特性在这7个命令中默认关闭，因为此特性会与\textbf{JAglue}冲突（参见\ref{para-kern}）。
 %</zh>
+
+%<*en>
+\subsection{\texttt{\char92 CID}, \texttt{\char92 UTF} and macros in \Pkg{otf} package}
+Under \pLaTeX, \Pkg{otf} package (developed by Shuzaburo Saito) is
+used for typesetting characters which is in Adobe-Japan1-6 CID but not
+in JIS~X~0208. Since this package is widely used, \LuaTeX-ja
+supports some of functions in \Pkg{otf} package.
+If you want to use these functions, load \Pkg{luatexja-otf} package.
+%</en>
+%<*ja>
+\subsection{\texttt{\char92 CID}, \texttt{\char92 UTF}と\Pkg{otf}パッケージのマクロ}
+\pLaTeX では，JIS~X~0208にないAdobe-Japan1-6の文字を出力するために，
+齋藤修三郎氏による\Pkg{otf}パッケージが用いられていた．このパッケージは
+広く用いられているため，\LuaTeX-jaにおいても\Pkg{otf}パッケージの機能の
+一部をサポートしている．これらの機能を用いるためには\Pkg{luatexja-otf}パッケージ
+を読み込めばよい．
+%</ja>
+%<*zh>
+\subsection{\Pkg{otf}包中的\texttt{\char92CID}，\texttt{\char92UTF}及其他宏} 
+\pLaTeX 下，\underline{\texttt{otf}}宏包（斋藤修三郎开发）是用来排印存在
+于Adobe-Japan1-6但不存在于JIS X 0208中的字符。
+该包已经广泛使用，\LuaTeX-ja支持部分\Pkg{otf}包中的部分功能。
+如果你想使用这些功能，加载\Pkg{luatexja-otf}宏包。
+\bgroup
+\fontencoding{JY3}\selectfont
+%</zh>
+
+\begin{LTXexample}
+森\UTF{9DD7}外と内田百\UTF{9592}とが\UTF{9AD9}島屋に行く。
+
+\CID{7652}飾区の\CID{13706}野家，
+葛飾区の吉野家
+\end{LTXexample}
+%<*zh>
+\egroup
+%</zh>
+
+%<*ja>
+\Pkg{otf}パッケージでは，それぞれ次のようなオプションが存在した：
+\begin{description}
+\item[\texttt{deluxe}] 明朝体・ゴシック体各2ウェイトと，丸ゴシック体を扱えるようになる．
+\item[\texttt{expert}] 仮名が横組・縦組専用のものに切り替わり，ルビ用仮名も扱えるようになる．
+\item[\texttt{bold}] ゴシック体を標準で太いウェイトのものに設定する．
+\end{description}
+これらは，\Pkg{otf}パッケージが文書中で使用する
+和文用TFMを自前の物に置き換えていることで可能になっている．
+
+一方，\Pkg{luatexja-otf}パッケージでは，文書中で使用する和文用JFMを置き換えることはしない．
+そのため，上に述べた3つのオプションと同等のことを実現するには，\ref{ssub-chgfnt}節 (NFSS2) や
+\ref{ssec-fontspec}節 (\Pkg{fontspec}) によって\textbf{事前に}設定しておかなければならない．
+
+TODO: 設定方法と例を載せる．フォントの関係上（複数の）別ファイルでよい？
+%</ja>
 
 %<en>\section{Changing Parameters}
 %<ja>\section{パラメータの変更}
@@ -2455,7 +2464,7 @@ JFMの名前を指定する．もし以前に指定されたJFMが読み込ま�
 %</en>
 %<*ja>
 \item[\tt jfm-ujis.lua] \LuaTeX-jaの標準JFMである．このJFMは\upTeX で
-  用いられるUTF/OTFパッケージ用のメトリックである \verb+upnmlminr-h.tfm+ を
+  用いられるUTF/OTFパッケージ用の和文用TFMである \verb+upnmlminr-h.tfm+ を
   元にしている．\Pkg{luatexja-otf}パッケージを使うときはこのJFMを指定するべきである．
 %</ja>
 %<*zh>
@@ -2489,7 +2498,7 @@ JFMの名前を指定する．もし以前に指定されたJFMが読み込ま�
   shown in Table~\ref{tab-difjfm}.
 %</en>
 %<*ja>
-\item[\tt jfm-min.lua] \pTeX に同梱されているデフォルトの和文フォントメトリック
+\item[\tt jfm-min.lua] \pTeX に同梱されているデフォルトの和文用TFM
   である \verb+min10.tfm+ に相当するJFMである．このJFMと他の2つのJFMの間には
   表\ref{tab-difjfm}に示すような特筆すべき違いがある．
 %</ja>
@@ -3093,8 +3102,8 @@ The following is the list of `imaginary characters':
 \end{list}
 
 %<en>\paragraph{Porting JFM from \pTeX}
-%<ja>\paragraph{\pTeX 用和文フォントメトリックの移植}
-%<zh>\paragraph{\pTeX 下使用的JFM移植}
+%<ja>\paragraph{\pTeX 用和文用TFMの移植}
+%<zh>\paragraph{\pTeX 下使用的TFM移植}
 
 % ToDo: English version.
 
@@ -3103,7 +3112,7 @@ The following is the list of `imaginary characters':
 %</en>
 
 %<*ja>
-以下に，\pTeX 用和文フォントメトリックを\LuaTeX-ja用に移植する場合の注意点を挙げておく．
+以下に，\pTeX 用に作られた和文用TFMを\LuaTeX-ja用に移植する場合の注意点を挙げておく．
 \begin{itemize}
 \item 実際に出力される和文フォントのサイズがdesign sizeとなる．
 このため，例えば$1\,\textrm{zw}$がdesign sizeの0.962216倍であるJISフォン
@@ -4189,12 +4198,12 @@ Here the following is the list of dimensions and attributes which are used in \L
 
 \dim{jQ}
 %<*en>
-As explained in Subsection~\ref{ssec-plain}, \verb+\jQ+ is equal to
+\verb+\jQ+ is equal to
 			$1\,\textrm{Q}=0.25\,\textrm{mm}$, where `Q'~(also called `級') is
 			a unit used in Japanese phototypesetting. So one should not change the value of this dimension.
 %</en>
 %<*ja>
-\ref{ssec-plain}節で述べたように，\verb+\jQ+ は$1\,\textrm{Q}=0.25\,\textrm{mm}$
+\verb+\jQ+ は$1\,\textrm{Q}=0.25\,\textrm{mm}$
 と等しい．ここで，`Q'（もしくは「級」）は日本の写植で用いられる単位である．したがって，
 この寸法レジスタの値を変更してはならない．
 %</ja>
@@ -4206,7 +4215,7 @@ There is also a unit called `歯' which equals to $0.25\,\textrm{mm}$ and
 			\verb+\jH+ is a synonym of \verb+\jQ+.
 %</en>
 %<*ja>
-同じく写植で用いられていた単位として「歯」があり，これは$0.25\,\textrm{mm}$と
+同じく写植で用いられていた単位として「歯」があり，これも$0.25\,\textrm{mm}$と
 等しい．\verb+\jH+ は \verb+\jQ+ の別名である．
 %</ja>
 
