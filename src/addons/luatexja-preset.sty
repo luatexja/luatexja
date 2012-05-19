@@ -1,0 +1,272 @@
+% luatexja-preset.sty
+\ProvidesPackage{luatexja-preset}
+  [2012/05/18 v0.0]
+
+\RequirePackage{expl3}
+\RequirePackage{luatexja-fontspec}
+\ExplSyntaxOn
+
+%%%% message
+
+
+\bool_new:N \l_ltjpreset_bold_bool % bold
+\bool_set_false:N \l_ltjpreset_bold_bool
+\DeclareOption{bold}  {\bool_set_true:N \l_ltjpreset_bold_bool}
+\DeclareOption{nobold}{\bool_set_false:N \l_ltjpreset_bold_bool}
+
+\bool_new:N \l_ltjpreset_expert_bool % expert
+\bool_set_false:N \l_ltjpreset_expert_bool
+\DeclareOption{expert}  {\bool_set_true:N \l_ltjpreset_expert_bool}
+\DeclareOption{noexpert}{\bool_set_false:N \l_ltjpreset_expert_bool}
+
+\int_new:N \l_ltjpreset_deluxe_int % expert
+\int_set:Nn \l_ltjpreset_deluxe_int { 0 }
+\DeclareOption{deluxe}{\int_set:Nn \l_ltjpreset_deluxe_int { 2 }} % 7 fonts
+\DeclareOption{nodeluxe}{\int_set:Nn \l_ltjpreset_deluxe_int { 0 }} % 2 fonts
+
+% scale
+{ \fontsize{1024}{1024}\selectfont
+  \fp_set_from_dim:Nn \l_ltjpreset_scale_fp \zw
+  \fp_gdiv:Nn \l_ltjpreset_scale_fp {1024}
+}
+\msg_new:nnn { luatexja-preset }{ scale }{
+  日本語フォントは~\fp_use:N \l_ltjpreset_scale_fp~倍にスケーリングされます．
+}
+\msg_warning:nn { luatexja-preset }{ scale }
+
+% JFM
+\cs_set:Npn \ltjpreset_use_jfm: {ujis}  % 使用する JFM
+%%% \DeclareOption{min}{\cs_set:Npn  \ltjpreset_use_jfm: {min}} % min
+%%% ↑jfm-min.lua が横組み・縦組み専用仮名に追いついていないので使用禁止
+\DeclareOption{jis}{\cs_set:Npn  \ltjpreset_use_jfm: {jis}}     % jis
+\DeclareOption{ujis}{\cs_set:Npn  \ltjpreset_use_jfm: {ujis}}   % ujis
+
+% 漢字字形
+\tl_new:N \l_ltjpreset_kanji_shape_tl
+\DeclareOption{90jis}{  \tl_set:Nn \l_ltjpreset_kanji_shape_tl { , RawFeature = +jp90 }} % 90jis
+\DeclareOption{jis2004}{\tl_set:Nn \l_ltjpreset_kanji_shape_tl { , RawFeature = +jp04 }} % jis2004
+
+% font preset
+\bool_new:N \l_ltjpreset_office_bool  % MS Office の HG 系フォントを使っているか
+\bool_new:N \l_ltjpreset_noembed_bool % 非埋込か
+\clist_new:N \l_ltjpreset_font_list
+
+\cs_new:Npn \ltjpreset_set_uni:nn #1#2 {
+  \ltjpreset_set_multi:n { #1, #1, #2, #2, #2, #2, #1 }
+}
+\cs_new:Npn \ltjpreset_set_multi:n #1 {
+  \clist_set:Nn \l_ltjpreset_font_list { #1 }
+  \bool_set_false:N \l_ltjpreset_office_bool
+  \bool_set_false:N \l_ltjpreset_noembed_bool
+}
+\cs_new:Npn \ltjpreset_set_office:nn #1 #2{
+  \ltjpreset_set_multi:n {
+    #1, hgrmb.ttc ,           % mc/m, mc/bx
+    HGGothicM , HGGothicE ,   % gt/m, gt/bx (multiweight))
+    #2 , HGSoeiKakugothicUB , % gt/m (uni), gt/eb
+    HGMaruGothicMPRO          % mg/m
+  }
+  \bool_set_true:N \l_ltjpreset_office_bool
+}
+
+% kozuka
+\DeclareOption{kozuka4}{
+  \ltjpreset_set_multi:n {
+    KozMinPro-Regular.otf , KozMinPro-Bold.otf, % mc/m, mc/bx
+    KozGoPro-Regular.otf  , KozGoPro-Bold.otf,  % gt/m, gt/bx (multiweight))
+    KozGoPro-Medium.otf   , KozGoPro-Heavy.otf, % gt/m (uni), gt/eb
+    KozGoPro-Heavy.otf                          % mg/m
+  }
+}
+\DeclareOption{kozuka6}{
+  \ltjpreset_set_multi:n {
+    KozMinProVI-Regular.otf , KozMinProVI-Bold.otf, % mc/m, mc/bx
+    KozGoProVI-Regular.otf  , KozGoProVI-Bold.otf,  % gt/m, gt/bx (multiweight))
+    KozGoProVI-Medium.otf   , KozGoProVI-Heavy.otf, % gt/m (uni), gt/eb
+    KozGoProVI-Heavy.otf                            % mg/m
+  }
+}
+\DeclareOption{kozuka6n}{
+  \ltjpreset_set_multi:n {
+    KozMinPr6N-Regular.otf , KozMinPr6N-Bold.otf, % mc/m, mc/bx
+    KozGoPr6N-Regular.otf  , KozGoPr6N-Bold.otf,  % gt/m, gt/bx (multiweight))
+    KozGoPr6N-Medium.otf   , KozGoPr6N-Heavy.otf, % gt/m (uni), gt/eb
+    KozGoPr6N-Heavy.otf                           % mg/m
+  }
+}
+
+% hiragino
+\DeclareOption{hiragino}{
+  \ltjpreset_set_multi:n {
+    HiraMinPro-W3.otf      , HiraMinPro-W6.otf,   % mc/m, mc/bx
+    HiraKakuPro-W3.otf     , HiraKakuPro-W6.otf,  % gt/m, gt/bx (multiweight))
+    HiraKakuPro-W3.otf     , HiraKakuStd-W8.otf,  % gt/m (uni), gt/eb
+    HiraMaruPro-W4.otf                            % mg/m
+  }
+}
+\DeclareOption{hiraginon}{
+  \ltjpreset_set_multi:n {
+    HiraMinProN-W3.otf      , HiraMinProN-W6.otf,   % mc/m, mc/bx
+    HiraKakuProN-W3.otf     , HiraKakuProN-W6.otf,  % gt/m, gt/bx (multiweight))
+    HiraKakuProN-W3.otf     , HiraKakuStdN-W8.otf,  % gt/m (uni), gt/eb
+    HiraMaruProN-W4.otf                             % mg/m
+  }
+}
+
+% morisawa?
+\DeclareOption{morisawa4}{
+  \ltjpreset_set_multi:n {
+    A-OTF-RyuminPro-Light.otf , A-OTF-FutoMinA101Pro-Bold.otf ,    % mc/m, mc/bx
+    A-OTF-GothicBBBPro-Medium.otf , A-OTF-FutoGoB101Pro-Bold.otf , % gt/m, gt/bx (multiweight))
+    A-OTF-GothicBBBPro-Medium.otf , A-OTF-MidashiGoPro-MB31.otf ,  % gt/m (uni), gt/eb
+    A-OTF-RyuminPro-Light.otf % mg/m
+  }
+}
+\DeclareOption{morisawa6n}{
+  \ltjpreset_set_multi:n {
+    A-OTF-RyuminPr6N-Light.otf , A-OTF-FutoMinA101Pr6N-Bold.otf ,    % mc/m, mc/bx
+    A-OTF-GothicBBBPr6N-Medium.otf , A-OTF-FutoGoB101Pr6N-Bold.otf , % gt/m, gt/bx (multiweight))
+    A-OTF-GothicBBBPr6N-Medium.otf , A-OTF-MidashiGoPr6N-MB31.otf ,  % gt/m (uni), gt/eb
+    A-OTF-RyuminPr6N-Light.otf                                       % mg/m
+  }
+}
+
+
+% ipa, ipaex, ms
+\DeclareOption{ipa}{
+  \ltjpreset_set_uni:nn { IPAMincho } { IPAGothic }
+}
+\DeclareOption{ipaex}{
+  \ltjpreset_set_uni:nn { IPAExMincho } { IPAExGothic }
+}
+\DeclareOption{ms}{
+  \ltjpreset_set_uni:nn { MS-Mincho } { MS-Gothic }
+}
+
+% {ipa,ipaex,ms}-dx % Office 付属フォントを利用
+\DeclareOption{ipaex-dx}{
+  \ltjpreset_set_office:nn { IPAExMincho } { IPAExGothic }
+}
+\DeclareOption{ipa-dx}{
+  \ltjpreset_set_office:nn { IPAMincho } { IPAGothic }
+}
+\DeclareOption{ms-dx}{
+  \ltjpreset_set_office:nn { MS-Mincho } { MS-Gothic }
+}
+
+
+% 非埋込
+\DeclareOption{noembed}{
+  \ltjpreset_set_uni:nn { Ryumin-Light } { GothicBBB-Medium }
+  \bool_set_true:N \l_ltjpreset_noembed_bool
+}
+
+
+\ProcessOptions*
+
+%% KozMinPr6N の場合はjp04 feature がないので，nlck にする
+\clist_if_in:NnT \l_ltjpreset_font_list { KozMinPr6N-Regular.otf } {
+  \tl_set:Nn \l_tmpa_tl {, RawFeature = +jp04}
+  \tl_if_eq:NNT \l_ltjpreset_kanji_shape_tl \l_tmpa_tl {
+    \tl_set:Nn \l_ltjpreset_kanji_shape_tl { , RawFeature = +nlck }
+  }
+}
+
+%%%%%%%% main routine
+
+%%%%  リストからの展開
+% mc/m
+\clist_pop:NN \l_ltjpreset_font_list \l_tmpa_tl
+\cs_set:Nx \ltjpreset_font_mc_m: { \tl_use:N \l_tmpa_tl }
+
+% mc/bx
+\clist_pop:NN \l_ltjpreset_font_list \l_tmpa_tl
+\cs_set:Nx \ltjpreset_font_mc_bx: { \tl_use:N \l_tmpa_tl }
+
+% gt/m
+\clist_pop:NN \l_ltjpreset_font_list \l_tmpa_tl
+\cs_set:Nx \ltjpreset_font_gt_m: { \tl_use:N \l_tmpa_tl }
+
+% gt/bx
+\clist_pop:NN \l_ltjpreset_font_list \l_tmpa_tl
+\cs_set:Nx \ltjpreset_font_gt_bx: { \tl_use:N \l_tmpa_tl }
+
+% gt/m-uni
+\clist_pop:NN \l_ltjpreset_font_list \l_tmpa_tl
+\cs_set:Nx \ltjpreset_font_gt_n_uni: { \tl_use:N \l_tmpa_tl }
+
+% gt/eb
+\clist_pop:NN \l_ltjpreset_font_list \l_tmpa_tl
+\cs_set:Nx \ltjpreset_font_gt_eb: { \tl_use:N \l_tmpa_tl }
+
+% mg/m
+\clist_pop:NN \l_ltjpreset_font_list \l_tmpa_tl
+\cs_set:Nx \ltjpreset_font_mg: { \tl_use:N \l_tmpa_tl }
+
+%% HG 系フォント + JIS2004/90JIS のときはフォント名を置換
+\bool_if:NT \l_ltjpreset_office_bool {
+  \tl_set:Nn \l_tmpa_tl {, RawFeature = +jp04}
+  \tl_if_eq:NNT \l_ltjpreset_kanji_shape_tl \l_tmpa_tl { 
+    \cs_set:Nx \ltjpreset_font_mc_bx: { hgrme04.ttc }
+    \cs_set:Nx \ltjpreset_font_gt_bx: { hgrge04.ttc }
+    \cs_set:Nx \ltjpreset_font_mg:    { hgrsmp04.ttf }
+    \cs_set_eq:NN \ltjpreset_font_gt_m: \ltjpreset_font_gt_n_uni:
+    % HG ゴシックM のときはそうはいかないので 1 ウェイト時のゴシック体を使う
+  }
+  \tl_set:Nn \l_tmpa_tl {, RawFeature = +jp90}
+  \tl_if_eq:NNT \l_ltjpreset_kanji_shape_tl \l_tmpa_tl { 
+    \cs_set:Nx \ltjpreset_font_mc_bx: { hgrme.ttc }
+    \cs_set:Nx \ltjpreset_font_gt_bx: { hgrge.ttc }
+    \cs_set:Nx \ltjpreset_font_mg:    { hgrsmp.ttf }
+  }
+}
+
+%%%% expert 用設定
+\tl_new:N \l_ltjpreset_add_features_tl
+
+\tl_set:Nx \l_ltjpreset_add_features_tl {
+  Scale = \fp_use:N \l_ltjpreset_scale_fp ,
+  \tl_use:N \l_ltjpreset_kanji_shape_tl, 
+  JFM   = \ltjpreset_use_jfm:
+}
+
+\bool_if:NT \l_ltjpreset_expert_bool {
+  \cs_set:Npn \rubyfamily { \addfontfeatures { Style = Ruby} }
+  \tl_put_left:Nn \l_ltjpreset_add_features_tl { Style = HorizontalKana, }
+}
+
+%%%% （丸）ゴシック体の設定: bold option もここで
+\int_compare:nTF { \l_ltjpreset_deluxe_int ==  2 } {
+  \newjfontfamily \mgfamily [
+      \tl_use:N \l_ltjpreset_add_features_tl
+      \bool_if:NT \l_ltjpreset_noembed_bool { , NoEmbed }
+    ] { \ltjpreset_font_mg: }
+  \bool_if:NT \l_ltjpreset_bold_bool {
+    \cs_set_eq:NN \ltjpreset_font_mc_bx: \ltjpreset_font_gt_bx:
+  }
+}{
+  \bool_if:NTF \l_ltjpreset_bold_bool {
+    \cs_set_eq:NN \ltjpreset_font_gt_m: \ltjpreset_font_gt_bx:
+  }{
+    \cs_set_eq:NN \ltjpreset_font_gt_m: \ltjpreset_font_gt_n_uni:
+  }
+  \cs_set_eq:NN \ltjpreset_font_gt_bx: \ltjpreset_font_gt_m:
+  \cs_set_eq:NN \ltjpreset_font_mc_bx: \ltjpreset_font_gt_m:
+}
+
+
+%%%% 実際の fontspec の呼びだし
+
+\defaultjfontfeatures{ Kerning=Off, \tl_use:N \l_ltjpreset_add_features_tl }
+
+\setmainjfont [ 
+  BoldFont = \ltjpreset_font_mc_bx:
+  \bool_if:NT \l_ltjpreset_noembed_bool { , NoEmbed }
+] { \ltjpreset_font_mc_m: }
+\setsansjfont [ 
+  BoldFont = \ltjpreset_font_gt_bx: 
+  \bool_if:NT \l_ltjpreset_noembed_bool { , NoEmbed }
+] { \ltjpreset_font_gt_m: }
+
+\ExplSyntaxOff
+\endinput
