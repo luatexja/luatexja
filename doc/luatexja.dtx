@@ -74,7 +74,7 @@
 \makeatother
 %</zh>
 
-\usepackage{amsmath,amssymb,xcolor,pict2e,multienum,amsthm,float,makecell}
+\usepackage{amsmath,amssymb,xcolor,pict2e,multienum,amsthm,float}
 \usepackage{booktabs,listings,showexpl,multicol,metalogo}
 \usepackage{luatexja-otf}
 \usepackage{luatexja-fontspec}
@@ -5256,26 +5256,26 @@ $a$は禁則処理用に\textit{Nq}と\textit{Np}の間に加えられるべき�
 \label{tab-jfmglue}
 \begin{center}
 \small
-\begin{tabular}{>{\sf}c|cccccc}
+\begin{tabular}{c|cccccc}
 \toprule
 {\bf\textit{Np}}↓&\sf 和文A&\sf 和文B&\sf 欧文&\sf 箱&\sf glue&\sf kern\\\midrule
-和文A&
+\sf 和文A&
 \gkf{E}{M→K}{PN}&
 \gkf{---}{\OA →K}{PN}&
 \gkf{---}{\OA →X}{PN}&
 \gkf{---}{\OA}{PA}&
 \gkf{---}{\OA}{PN}&
 \gkf{---}{\OA}{PS}\\
-和文B&
+\sf 和文B&
 \gkf{E}{\OB→K}{PA}&
 \gkf{---}{K}{PS}&
 \gkf{---}{X}{PS}\\
-欧文&
+\sf 欧文&
 \gkf{E}{\OB →X}{PA}&
 \gkf{---}{X}{PS}\cr
-箱&\gkf{E}{\OB}{PA}\\
-glue&\gkf{E}{\OB}{PN}\\
-kern&\gkf{E}{\OB}{PS}\\
+\sf 箱&\gkf{E}{\OB}{PA}\\
+\sf glue&\gkf{E}{\OB}{PN}\\
+\sf kern&\gkf{E}{\OB}{PS}\\
 \bottomrule
 \end{tabular}
 \end{center}
