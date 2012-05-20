@@ -1,18 +1,35 @@
 %<*!showexpl>
 %#! lualatex -shell-escape
 
+%<en> \documentclass[a4paper,titlepage]{article}
+%<ja> \documentclass[a4paper,titlepage]{ltjsarticle}
+%<zh> \documentclass[a4paper,titlepage]{ltjsarticle}
+
+\makeatletter
+\let\ltjpkglist\empty
+\newif\if@real@append@list
+\def\@append@newentry#1#2{{%
+  \@real@append@listtrue \def\@tempa{#2}%
+  \let\@pkglist\@append@newentry@pkglist#1%
+  \if@real@append@list
+    \let\@pkglist=\relax\xdef#1{#1\@pkglist{#2}}%
+  \fi}}
+\def\@append@newentry@pkglist#1{%
+  \def\@tempb{#1}%
+  \ifx\@tempa\@tempb\@real@append@listfalse\fi}
+\def\@addtofilelist#1{\@append@newentry\ltjpkglist{#1}}
+\let\@listfiles\empty
+\makeatother
+
 %<*en>
-\documentclass[a4paper,titlepage]{article}
 \usepackage[margin=25mm,footskip=5mm]{geometry}
 \usepackage{mathptmx}
 %</en>
 %<*ja>
-\documentclass[a4paper,titlepage]{ltjsarticle}
 \usepackage[textwidth=45\zw, lines=45, footskip=5mm]{geometry}
 \advance\leftmargini-1\zw\advance\leftmarginii-1\zw
 %</ja>
 %<*zh>
-\documentclass[a4paper,titlepage]{ltjsarticle}
 \usepackage[margin=25mm, footskip=5mm]{geometry}
 \advance\leftmargini-1\zw\advance\leftmarginii-1\zw
 \def\postpartname{编}
@@ -305,8 +322,11 @@ The followings are major changes from \pTeX:
       `variation'.
 %</en>
 %<*ja>
-\item 和文フォントは（小塚明朝，IPA明朝などの）実際のフォント，和文フォントメトリック（JFMと呼ぶ\footnote{混乱を防ぐため，p\TeX の意味でのJFM (\texttt{min10.tfm}) などは本ドキュメントでは\textbf{和文用TFM}とよぶことにする．}），そ
-      して`variation'と呼ばれる文字列の組である．
+\item 和文フォントは（小塚明朝，IPA明朝などの）実際のフォント，和文フォン
+      トメトリック（JFMと呼ぶ\footnote{混乱を防ぐため，p\TeX の意味での
+      JFM (\texttt{min10.tfm}) などは本ドキュメントでは\textbf{和文用
+      TFM}とよぶことにする．}），そして`variation'と呼ばれる文字列の組で
+      ある．
 %</ja>
 %<*zh>
 \item 一个日文字体是由三部分构成的元组：实际的字体（如小塚明
@@ -821,7 +841,6 @@ But only the contents in \texttt{src/} are needed to work \LuaTeX-ja.
 \item 如有必要，执行\texttt{mktexlsr}。
 %</zh>
 \end{enumerate}
-
 
 %<en>\subsection{Cautions}
 %<ja>\subsection{注意点}
@@ -5494,6 +5513,29 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 \bibitem{texbytopic}
 Victor Eijkhout,  \emph{\TeX\ by Topic, A \TeX nician's Reference}, Addison-Wesley, 1992.
 \end{thebibliography}
+
+\newpage
+\appendix
+\section{Package versions used in this document}
+This document was typeset using the following packages:
+
+\medskip
+
+{\makeatletter\tt\footnotesize
+  \def\@pkglist#1{%
+    \filename@parse{#1}\def\@temp{sty}
+    \ifx\@temp\filename@ext
+      \edef\reserved@a{%
+        \filename@base.%
+        \ifx\filename@ext\relax tex\else\filename@ext\fi}%
+      \leavevmode\hskip-13em\hbox to 13em{\filename@area\reserved@a\hss}%
+      \csname ver@\reserved@a\endcsname\par
+    \fi
+  }%
+\parindent0pt\leftskip13em
+\ltjpkglist
+
+\makeatother}
 \end{document}
 %</!showexpl>
 %<*showexpl>
