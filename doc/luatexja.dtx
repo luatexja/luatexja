@@ -1,4 +1,5 @@
-%#! lualatex -shell-escape manual.ins
+%<*!showexpl>
+%#! lualatex -shell-escape
 
 %<*en>
 \documentclass[a4paper,titlepage]{article}
@@ -5494,3 +5495,16 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 Victor Eijkhout,  \emph{\TeX\ by Topic, A \TeX nician's Reference}, Addison-Wesley, 1992.
 \end{thebibliography}
 \end{document}
+%</!showexpl>
+%<*showexpl>
+%%
+%% config file for showexpl.sty
+%%
+%% Copyright The LuaTeX-ja project team, 2005
+%%
+\ProvidesFile{showexpl.cfg}
+  [2012/05/20 v0.01 Definitions for the showexpl package (luatexja)]
+\lstset{}
+\def\SX@Info{}
+\endinput
+%</*showexpl>
