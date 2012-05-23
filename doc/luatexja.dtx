@@ -77,7 +77,7 @@
 \usepackage{amsmath,amssymb,xcolor,pict2e,multienum,amsthm,float}
 \usepackage{booktabs,listings,showexpl,multicol,metalogo}
 \usepackage{luatexja-otf}
-\usepackage{luatexja-fontspec}
+\usepackage[jis2004]{luatexja-preset}
 \usepackage{hyperref}
 \hypersetup{%
 	unicode,
@@ -891,7 +891,7 @@ This does minimal settings (like \texttt{ptex.tex}) for typesetting Japanese doc
 \begin{itemize}
 %<*en>
 \item The following 6~Japanese fonts are preloaded:
-\begin{center}
+\begin{center}\small
 \begin{tabular}{ccccc}
 \toprule
 \textbf{classification}&\textbf{font name}&\bf `10\,pt'&\bf`7\,pt'&\bf`5\,pt'\\\midrule
@@ -903,7 +903,7 @@ This does minimal settings (like \texttt{ptex.tex}) for typesetting Japanese doc
 %</en>
 %<*ja>
 \item 以下の6つの和文フォントが定義される：
-\begin{center}
+\begin{center}\small
 \begin{tabular}{ccccc}
 \toprule
 \textbf{字体}&\textbf{フォント名}&\bf `10\,pt'&\bf`7\,pt'&\bf`5\,pt'\\\midrule
@@ -915,7 +915,7 @@ This does minimal settings (like \texttt{ptex.tex}) for typesetting Japanese doc
 %</ja>
 %<*zh>
 \item 提前加载了六种日文字体，如下：
-\begin{center}
+\begin{center}\small
 \begin{tabular}{ccccc}
 \toprule
 \textbf{字体}&\textbf{字体名}&\bf `10\,pt'&\bf`7\,pt'&\bf`5\,pt'\\\midrule
@@ -1031,7 +1031,7 @@ When vertical typesetting is supported by \LuaTeX-ja in the future, \texttt{JT3}
 
 %<*en>
 \item Two font families \texttt{mc} and \texttt{gt} are defined:
-\begin{center}
+\begin{center}\small
 \begin{tabular}{ccccc}
 \toprule
 \textbf{classification}&\textbf{family}&\verb+\mdseries+&\verb+\bfseries+&\textbf{scale}\\\midrule
@@ -1046,7 +1046,7 @@ and GothicBBB-Medium) in early years of DTP.
 %</en>
 %<*ja>
 \item 2つのフォントファミリ\texttt{mc}と\texttt{gt}が定義されている：
-\begin{center}
+\begin{center}\small
 \begin{tabular}{ccccc}
 \toprule
 \textbf{字体}&\textbf{ファミリ}&\verb+\mdseries+&\verb+\bfseries+&\textbf{スケール}\\\midrule
@@ -1062,7 +1062,7 @@ Ryumin-Light, GothicBBB-Mediumだった）しか利用できなかった時の�
 %</ja>
 %<*zh>
 \item 定义了两个字体族：\texttt{mc}!和\texttt{gt}：\\
-\begin{center}
+\begin{center}\small
 	\begin{tabular}{ccccc}
 	\hline
 	\textbf{字体}&\textbf{字体族}&\verb!\mdseries!&\verb!\bfseries!&缩放率\\
@@ -1110,9 +1110,11 @@ Okumura), namely, \Pkg{ltjclasses} and \Pkg{ltjsclasses}.
 （奥村晴彦）的文档类，即\Pkg{ltjclasses}和\Pkg{ltjsclasses}。
 %</zh>
 
-%<en>\subsection{Changing Fonts}
-%<ja>\subsection{フォントの変更}
-%<zh>\subsection{字体更改}
+%<en>\section{Changing Fonts}
+%<ja>\section{フォントの変更}
+%<zh>\section{字体更改}
+
+\subsection{plain \TeX~and~\LaTeXe}
 \label{ssub-chgfnt}
 
 %<*en>
@@ -1203,32 +1205,28 @@ this chapter. For the method, please see Subsection~\ref{ssec-math}.
 关于此方法，请参见\ref{ssec-math}。
 %</zh>
 
-%<*en>
 \paragraph{plain \TeX}
+%<*en>
 To change Japanese fonts in plain \TeX, you must use the primitive
 \verb+\jfont+. So please see Subsection~\ref{ssec-jfont}.
 %</en>
 %<*ja>
-\paragraph{plain \TeX}
-plain \TeX で和文フォントを変更するためには，\verb+\jfont+ プリミティブを用いなけれ
-ばならない．\ref{ssec-jfont}節を参照．
+plain \TeX で和文フォントを変更するためには，\verb+\jfont+ プリミティブを直接用いる．
+\ref{ssec-jfont}節を参照．
 %</ja>
 %<*zh>
-\paragraph{plain \TeX} 
 在plain \TeX 下改变日文字体，你必须使用基本语句\verb!\jfont!。请参见\ref{ssec-jfont}。
 %</zh>
 
+\paragraph{\LaTeXe\ (NFSS2)}
 %<*en>
-\paragraph{NFSS2}
 For \LaTeXe, \LuaTeX-ja adopted most of the font selection system of \pLaTeXe\ (in \texttt{plfonts.dtx}).
 %</en>
 %<*ja>
-\paragraph{NFSS2}
 \LaTeXe については，\LuaTeX-jaではフォント選択システムを\pLaTeXe\ (\texttt{plfonts.dtx})
 の大部分をそのまま採用している．
 %</ja>
 %<*zh>
-\paragraph{NFSS2}
 对于\LaTeXe，\LuaTeX-ja采用了\pLaTeXe 中（即\texttt{plfonts.dtx}）大部分字体选择系统。
 %</zh>
 \begin{itemize}
@@ -1261,7 +1259,7 @@ For \LaTeXe, \LuaTeX-ja adopted most of the font selection system of \pLaTeXe\ (
 %</zh>
 
 %<*en>
-\begin{center}
+\begin{center}\small
 \begin{tabular}{cccccc}
 \toprule
 &\textbf{encoding}&\textbf{family}&\textbf{series}&\textbf{shape}&\textbf{selection}\\\midrule
@@ -1278,14 +1276,14 @@ auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
 \end{center}
 %</en>
 %<*ja>
-\begin{center}
+\begin{center}\small
 \begin{tabular}{cccccc}
 \toprule
 &\textbf{エンコーディング}&\textbf{ファミリ}&\textbf{シリーズ}&\textbf{シェープ}&\textbf{選択}\\\midrule
-欧文フォント
+欧文
 &\verb+\romanencoding+&\verb+\romanfamily+&\verb+\romanseries+&\verb+\romanshape+
 &\verb+\useroman+\\
-和文フォント
+和文
 &\verb+\kanjiencoding+&\verb+\kanjifamily+&\verb+\kanjiseries+&\verb+\kanjishape+
 &\verb+\usekanji+\\
 両方&---&--&\verb+\fontseries+&\verb+\fontshape+&---\\
@@ -1295,7 +1293,7 @@ auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
 \end{center}
 %</ja>
 %<*zh>
-\begin{center}
+\begin{center}\small
 \begin{tabular}{cccccc}
 \toprule
 &\textbf{编码}&\textbf{族}&\textbf{系列}&\textbf{形状}&\textbf{选择}\\\midrule
@@ -1385,7 +1383,7 @@ counterparts of original commands in the \Pkg{fontspec} package:
 在\Pkg{luatexja-fontspec}中，定义了如下七条命令，这些命令和\Pkg{fontspec}的相关命令对比如下：
 %</zh>
 %<*en>
-\begin{center}
+\begin{center}\small
 \begin{tabular}{ccccc}
 \toprule
 Japanese fonts
@@ -1402,24 +1400,29 @@ alphabetic fonts
 \end{center}
 %</en>
 %<*ja>
-\begin{center}
-\begin{tabular}{ccccc}
+\begin{center}\small
+\begin{tabular}{cccc}
 \toprule
-和文フォント
-&\verb+\jfontspec+&\verb+\setmainjfont+&\verb+\setsansjfont+&\verb+\newjfontfamily+\\
-欧文フォント
-&\verb+\fontspec+&\verb+\setmainfont+&\verb+\setsansfont+&\verb+\newfontfamily+\\
+和文
+&\verb+\jfontspec+&\verb+\setmainjfont+&\verb+\setsansjfont+\\
+欧文
+&\verb+\fontspec+&\verb+\setmainfont+&\verb+\setsansfont+\\
 \midrule
-和文フォント
-&\verb+\newjfontface+&\verb+\defaultjfontfeatures+&\verb+\addjfontfeatures+\\
-欧文フォント
-&\verb+\newfontface+&\verb+\defaultfontfeatures+&\verb+\addfontfeatures+\\
+和文
+&\verb+\newjfontfamily+&\verb+\newjfontface+&\verb+\defaultjfontfeatures+\\
+欧文
+&\verb+\newfontfamily+&\verb+\newfontface+&\verb+\defaultfontfeatures+\\
+\midrule
+和文
+&\verb+\addjfontfeatures+\\
+欧文
+&\verb+\addfontfeatures+\\
 \bottomrule
 \end{tabular}
 \end{center}
 %</ja>
 %<*zh>
-\begin{center}
+\begin{center}\small
 \begin{tabular}{ccccc}
 \toprule
 日文字体&\verb+\jfontspec+&\verb+\setmainjfont+&\verb+\setsansjfont+&\verb+\newjfontfamily+\\
@@ -1458,6 +1461,144 @@ featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を�
 请注意并没有\verb!\setmonofont!命令，因为流行的日文字体几乎全部是等宽的。
 另注意，出格特性在这7个命令中默认关闭，因为此特性会与\textbf{JAglue}冲突（参见\ref{para-kern}）。
 %</zh>
+
+
+\subsection{プリセット設定}
+\label{ssec-preset}
+
+よく使われている和文フォント設定を一行で指定できるようにしたのが
+\Pkg{luatexja-preset}パッケージである．このパッケージは，
+\Pkg{otf}パッケージの一部機能と八登崇之氏による\Pkg{PXchfon}パッケージの一部機能とを
+合わせたような格好をおり，内部で\Pkg{luatexja-fontspec}を読み込んでいる．
+
+\paragraph{一般的なオプション}
+\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
+\item[deluxe] 明朝・ゴシック各2ウェイトと，
+丸ゴシック体 (\verb+\mgfamily+) を使用可能とする．
+\item[expert] 横組専用仮名を用いる．また，\verb+\rubyfamily+ でルビ用仮名が使用可能となる．
+\item[bold] 明朝の太字をゴシック体の太字とする．
+\item[90jis] 出来る限り90JISの字形を使う．
+\item[jis2004] 出来る限りJIS2004の字形を使う．
+\item[jis] 用いるJFMを \texttt{jfm-jis.lua} とする．このオプションがない時は
+\LuaTeX-ja標準の \texttt{jfm-ujis.lua} が用いられる．
+\end{list}
+
+\paragraph{小塚フォント}
+まず，小塚フォントを用いる設定を述べる．
+単ウェイト時のゴシック体は小塚ゴシックRでは細いように感じるので，
+小塚ゴシックに変更している．
+さらに，丸ゴシック体はないので便宜上小塚ゴシックHで代用している．
+\begin{center}\small
+\begin{tabular}{llll}
+\toprule
+&\tt kozuka4&\tt kozuka6&\tt kozuka6n\\
+\midrule
+\gt 明朝体細字&小塚明朝Pro~R&小塚明朝ProVI~R&小塚明朝Pr6N~R\\
+\gt 明朝体太字&小塚明朝Pro~B&小塚明朝ProVI~B&小塚明朝Pr6N~B\\
+\midrule
+\gt ゴシック体細字\\
+　単ウェイト時
+&小塚ゴシックPro~M&小塚ゴシックProVI~M&小塚ゴシックPr6N~M\\
+　多ウェイト時
+&小塚ゴシックPro~R&小塚ゴシックProVI~R&小塚ゴシックPr6N~R\\
+\midrule
+\gt ゴシック体太字
+&小塚ゴシックPro~B&小塚ゴシックProVI~B&小塚ゴシックPr6N~B\\
+\inhibitglue（丸ゴシック体）\inhibitglue
+&小塚ゴシックPro~H&小塚ゴシックProVI~H&小塚ゴシックPr6N~H\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{モリサワ・ヒラギノ}
+モリサワ・ヒラギノ用の設定はそのようなことは行っていない：
+% これらは持っているわけではないので，フォント名が
+% 異なっているかもしれません．確認お願いします．
+\begin{center}\small
+\begin{tabular}{lll}
+\toprule
+&\tt hiragino&\tt hiraginon\\
+\midrule
+\gt 明朝体細字&
+ヒラギノ明朝体Pro~W3&ヒラギノ明朝体Pr6N~W3\\
+\gt 明朝体太字&
+ヒラギノ明朝体Pro~W6&ヒラギノ明朝体Pr6N~W6\\
+\gt ゴシック体細字&
+ヒラギノ角ゴPro~W3&ヒラギノ角ゴPr6N~W3\\
+\gt ゴシック体太字&
+ヒラギノ角ゴPro~W6&ヒラギノ角ゴPr6N~W6\\
+\gt 丸ゴシック体&
+ヒラギノ丸ゴPro~W4&ヒラギノ丸ゴPr6N~W4\\
+\midrule
+&\tt morisawa4&\tt morisawa6n\\
+\midrule
+\gt 明朝体細字&
+リュウミンPro~L-KL&リュウミンPr6N~L-KL\\
+\gt 明朝体太字&
+太ミンA101~Pro~Bold&太ミンA101~Pr6N~Bold\\
+\gt ゴシック体細字&
+中ゴシックBBB~Pro~Med&中ゴシックBBB~Pr6N~Med\\
+\gt ゴシック体太字&
+太ゴB101~Pro~Bold&太ゴB101~Pr6N~Bold\\
+\gt 丸ゴシック体&
+じゅんPro 101&じゅんPr6N 101\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{単ウェイト用設定}
+次に，単ウェイト用の設定を述べる．この4設定では「細字」「太字」の区別はない．
+また，丸ゴシック体はゴシック体と同じフォントを用いる．
+\begin{center}\small
+\begin{tabular}{lllll}
+\toprule
+&\tt noembed&\tt ipa&\tt ipaex&\tt ms\\
+\midrule
+\gt 明朝体&Ryumin-Light（非埋込）
+&IPA明朝&IPAex明朝&MS明朝\\
+\gt ゴシック体&GothicBBB-Medium（非埋込）
+&IPAゴシック&IPAexゴシック&MSゴシック\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{HGフォントの利用}
+すぐ前に書いた単ウェイト用設定を，Microsoft Office等に付属するHGフォントを使って
+多ウェイト化した設定もある．
+\begin{center}\small
+\begin{tabular}{llll}
+\toprule
+&\tt ipa-dx&\tt ipaex-dx&\tt ms-dx\\
+\midrule
+\gt 明朝体細字
+&IPA明朝&IPAex明朝&MS明朝\\\midrule
+\gt 明朝体太字&
+\multicolumn{3}{c}{HG明朝E}\\\midrule
+\gt ゴシック体細字\\
+　単ウェイト時
+&IPAゴシック&IPAexゴシック&MSゴシック\\
+　{\tt jis2004}指定時
+&IPAゴシック&IPAexゴシック&MSゴシック\\
+\cmidrule(lr){1-4}
+　それ以外の時&
+\multicolumn{3}{c}{HGゴシックM}\\\midrule
+\gt ゴシック体太字&
+\multicolumn{3}{c}{HGゴシックE}\\\midrule
+\gt 丸ゴシック体&
+\multicolumn{3}{c}{HG丸ゴシック体PRO}\\
+\bottomrule
+\end{tabular}
+\end{center}
+なお，HG明朝E・HGゴシックE・HG丸ゴシック体PROの3つについては，内部で
+\begin{description}
+\item[標準] フォント名（\texttt{HGMinchoE} など）による指定
+\item[{\tt 90jis}指定時] ファイル名 (%
+\texttt{hgrme.ttc}, \texttt{hgrge.ttc}, \texttt{hgrsmp.ttf}) による指定
+\item[{\tt jis2004}指定時] ファイル名 (%
+\texttt{hgrme04.ttc}, \texttt{hgrge04.ttc}, \texttt{hgrsmp04.ttf}) による指定
+\end{description}
+となっているので注意すること．
+
 
 %<*en>
 \subsection{\texttt{\char92 CID}, \texttt{\char92 UTF} and macros in \Pkg{otf} package}
@@ -1508,8 +1649,6 @@ If you want to use these functions, load \Pkg{luatexja-otf} package.
 一方，\Pkg{luatexja-otf}パッケージでは，文書中で使用する和文用JFMを置き換えることはしない．
 そのため，上に述べた3つのオプションと同等のことを実現するには，\ref{ssub-chgfnt}節 (NFSS2) や
 \ref{ssec-fontspec}節 (\Pkg{fontspec}) によって\textbf{事前に}設定しておかなければならない．
-
-TODO: 設定方法と例を載せる．フォントの関係上（複数の）別ファイルでよい？
 %</ja>
 
 %<en>\section{Changing Parameters}
@@ -1660,13 +1799,13 @@ determined from the following data:
 \item 在CID Adobe-Japan1-6和Unicode之间的映射\texttt{Adobe-Japan1-UCS2}。
 %</zh>
 %<*en>
-\item The \texttt{PXbase} bundle for \upTeX\ by Takayuki Yato.
+\item The \Pkg{PXbase} bundle for \upTeX\ by Takayuki Yato.
 %</en>
 %<*ja>
-\item 八登崇之氏による\upTeX 用の\texttt{PXbase}バンドル．
+\item 八登崇之氏による\upTeX 用の\Pkg{PXbase}バンドル．
 %</ja>
 %<*zh>
-\item 八登崇之的\texttt{PXbase}宏包（\upTeX 下使用）。
+\item 八登崇之的\Pkg{PXbase}宏包（\upTeX 下使用）。
 %</zh>
 \end{itemize}
 
@@ -2537,7 +2676,7 @@ JFMの名前を指定する．もし以前に指定されたJFMが読み込ま�
 %<zh>\caption{\LuaTeX-ja下不同JFM表现}
 \label{tab-difjfm}
 \ltjsetparameter{jacharrange={+3}}
-\begin{center}
+\begin{center}\small
 \def\r#1{{\jfont\g=psft:Ryumin-Light:jfm=#1 at 14.43324pt \g
 \setbox0=\vtop{\hsize=7\zw\noindent ◆◆◆◆◆◆◆
 ある日モモちゃんがお使いで迷子になって泣きました．}\copy0
@@ -3057,14 +3196,15 @@ Furthermore, the glyph is shifted according to values of fields
 %</zh>
 \end{itemize}
 \end{minipage}
-\caption{
+\medskip
+
+\caption{%
 %<en>The position of the `real' glyph.
 %<ja>「実際の」グリフの位置．
 %<zh>“真实”字形位置
 }
 \label{fig-pos}
 \end{figure}
-
 
 \item[kern={\{[$j$]=<kern>, ...\}}]
 
@@ -3222,17 +3362,18 @@ you can set both \verb+\fam+ and \verb+\jfam+ to the same value.
 %<ja>\caption{和文数式フォントに対するプリミティブ．}
 %<zh>\caption{日语数学字体基本语句}
 \label{tab-math}
-\begin{center}\def\{{\char`\{}\def\}{\char`\}}
-\begin{tabular}{lll}
+\begin{center}
+\def\{{\char`\{}\def\}{\char`\}}\small
+\begin{tabular}{ll}
 \toprule
-%<en>&Japanese fonts&alphabetic fonts\\
-%<ja>&和文フォント&欧文フォント\\
-%<zh>&日文字体&西文字体\\
+%<en>\bf Japanese fonts&\bf alphabetic fonts\\
+%<ja>\bf 和文フォント&\bf 欧文フォント\\
+%<zh>\bf 日文字体&\bf 西文字体\\
 \midrule
-font family&\verb+\jfam+${}\in [0,256)$&\verb+\fam+\\
-text size&\tt\Param{jatextfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\verb+\textfont+<fam>=<font\_cs>\\
-script size&\tt\Param{jascriptfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\verb+\scriptfont+<fam>=<font\_cs>\\
-scriptscript size&\tt\Param{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\verb+\scriptscriptfont+<fam>=<font\_cs>\\
+\verb+\jfam+${}\in [0,256)$&\verb+\fam+\\
+\tt\Param{jatextfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\verb+\textfont+<fam>=<font\_cs>\\
+\tt\Param{jascriptfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\verb+\scriptfont+<fam>=<font\_cs>\\
+\tt\Param{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\verb+\scriptscriptfont+<fam>=<font\_cs>\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -4713,8 +4854,8 @@ after `beginning/ending of a group' characters.
 %</ja>
 
 \begin{figure}[!tb]
+\let\sp\textvisiblespace
 \begin{gather*}
- \def\sp{\texttt{\char32}}
  \xymatrix{&&
    {\text{scan a cs}}\ar@(r,ul)[dr]&\\
 \ar[r]&

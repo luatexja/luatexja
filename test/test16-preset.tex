@@ -1,7 +1,7 @@
 %#!lualatex test16-preset && pdffonts test16-preset.pdf
 \documentclass{ltjsarticle}
 
-\usepackage[ipa,jis2004,bold,deluxe]{luatexja-preset}
+\usepackage[kozuka6n,jis2004,deluxe]{luatexja-preset}
 
 % deluxe: 丸ゴシック体 + 多ウェイト
 % bold: mc/bx を太ゴシック体にする．non-deluxe のときは，gt/m もそうする
@@ -18,7 +18,7 @@
 %   ヒラギノ・モリサワは持ってないので未テスト
 % ipa, ipaex, ms
 
-% ipa-dx, ipaex-dx, ms-ex：HGゴシックM, HG明朝B，
+% ipa-dx, ipaex-dx, ms-ex：HGゴシックM, HG明朝E，
 %   HGゴシックE，HG創英角ゴシックUB，HG丸ゴシック体PRO を使う．
 %   jis90, jis2004 のときはフォントファイルを変更することで効果を得ようとする．
 
@@ -27,6 +27,8 @@
 % ・非埋込でボールドフォントを出す場合のお決まりの指定はあるのだろうか？
 % ・スケーリングの手動指定機能．現状は自動設定
 % ・\ebseries の実装
+
+\setmainjfont{HGKyokashotai}
 
 \begin{document}
 \def\r#1#2{ \csname #1family \endcsname \csname #2series \endcsname
@@ -39,11 +41,17 @@
 
 
 
-\r{gt}{md}
+\r{sf}{md}
 
-\r{gt}{bf}
+\r{sf}{bf}
 
 \ifdefined\mgfamily
 \r{mg}{md}
 \fi
+
+\r{tt}{md}
+
+\r{tt}{bf}
+
+
 \end{document}

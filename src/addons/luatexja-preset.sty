@@ -61,7 +61,7 @@
 }
 \cs_new:Npn \ltjpreset_set_office:nn #1 #2{
   \ltjpreset_set_multi:n {
-    #1, hgrmb.ttc ,           % mc/m, mc/bx
+    #1, HGMinchoE ,           % mc/m, mc/bx
     HGGothicM , HGGothicE ,   % gt/m, gt/bx (multiweight))
     #2 , HGSoeiKakugothicUB , % gt/m (uni), gt/eb
     HGMaruGothicMPRO          % mg/m
@@ -119,7 +119,7 @@
     A-OTF-RyuminPro-Light.otf , A-OTF-FutoMinA101Pro-Bold.otf ,    % mc/m, mc/bx
     A-OTF-GothicBBBPro-Medium.otf , A-OTF-FutoGoB101Pro-Bold.otf , % gt/m, gt/bx (multiweight))
     A-OTF-GothicBBBPro-Medium.otf , A-OTF-MidashiGoPro-MB31.otf ,  % gt/m (uni), gt/eb
-    A-OTF-RyuminPro-Light.otf % mg/m
+    A-OTF-Jun101Pro-Light.otf % mg/m
   }
 }
 \DeclareOption{morisawa6n}{
@@ -127,7 +127,7 @@
     A-OTF-RyuminPr6N-Light.otf , A-OTF-FutoMinA101Pr6N-Bold.otf ,    % mc/m, mc/bx
     A-OTF-GothicBBBPr6N-Medium.otf , A-OTF-FutoGoB101Pr6N-Bold.otf , % gt/m, gt/bx (multiweight))
     A-OTF-GothicBBBPr6N-Medium.otf , A-OTF-MidashiGoPr6N-MB31.otf ,  % gt/m (uni), gt/eb
-    A-OTF-RyuminPr6N-Light.otf                                       % mg/m
+    A-OTF-Jun101Pr6N-Light.otf                                       % mg/m
   }
 }
 
@@ -161,7 +161,7 @@
   \bool_set_true:N \l_ltjpreset_noembed_bool
 }
 
-
+\ExecuteOptions{noembed}
 \ProcessOptions*
 
 %% KozMinPr6N の場合はjp04 feature がないので，nlck にする
