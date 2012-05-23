@@ -1,34 +1,7 @@
 %#!lualatex test16-preset && pdffonts test16-preset.pdf
 \documentclass{ltjsarticle}
 
-\usepackage[kozuka6n,jis2004,deluxe]{luatexja-preset}
-
-% deluxe: 丸ゴシック体 + 多ウェイト
-% bold: mc/bx を太ゴシック体にする．non-deluxe のときは，gt/m もそうする
-% expert: 横組専用仮名．と \rubyfamily
-
-% jis, ujis : jfm-jis.lua (resp. jfm-ujis.lua) を使う．
-%   min は横組専用仮名に対応してないので *今は* 封印
-% 90jis, jis2004
-
-% 非埋込
-% 小塚：kozuka4, kozuka6, kozuka6n
-% ヒラギノ：hiragino, hiraginon
-% モリサワ：morisawa4, morisawa6n
-%   ヒラギノ・モリサワは持ってないので未テスト
-% ipa, ipaex, ms
-
-% ipa-dx, ipaex-dx, ms-ex：HGゴシックM, HG明朝E，
-%   HGゴシックE，HG創英角ゴシックUB，HG丸ゴシック体PRO を使う．
-%   jis90, jis2004 のときはフォントファイルを変更することで効果を得ようとする．
-
-% TODO
-% ・PXchfon の \setminchofont などに相当する機能
-% ・非埋込でボールドフォントを出す場合のお決まりの指定はあるのだろうか？
-% ・スケーリングの手動指定機能．現状は自動設定
-% ・\ebseries の実装
-
-\setmainjfont{HGKyokashotai}
+\usepackage[ipa-dx,jis2004,deluxe]{luatexja-preset}
 
 \begin{document}
 \def\r#1#2{ \csname #1family \endcsname \csname #2series \endcsname
@@ -47,6 +20,10 @@
 
 \ifdefined\mgfamily
 \r{mg}{md}
+\fi
+
+\ifdefined\gtebfamily
+\r{gteb}{md}
 \fi
 
 \r{tt}{md}

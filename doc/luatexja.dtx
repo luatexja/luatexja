@@ -1473,8 +1473,11 @@ featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を�
 
 \paragraph{一般的なオプション}
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
-\item[deluxe] 明朝・ゴシック各2ウェイトと，
+\item[deluxe] 明朝体2ウェイト・ゴシック体3ウェイトと，
 丸ゴシック体 (\verb+\mgfamily+) を使用可能とする．
+ゴシック体は細字・太字・極太の3ウェイトがあるが，極太ゴシック体はファミリの切り替え (\verb+\gtebfamily+) %
+で実現している．\Pkg{fontspec}では通常 (\verb+\mdseries+) と太字 (\verb+\bfseries+) しか扱えないために
+このような中途半端な実装になっている．
 \item[expert] 横組専用仮名を用いる．また，\verb+\rubyfamily+ でルビ用仮名が使用可能となる．
 \item[bold] 明朝の太字をゴシック体の太字とする．
 \item[90jis] 出来る限り90JISの字形を使う．
@@ -1504,6 +1507,8 @@ featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を�
 \midrule
 \gt ゴシック体太字
 &小塚ゴシックPro~B&小塚ゴシックProVI~B&小塚ゴシックPr6N~B\\
+\gt ゴシック体極太
+&小塚ゴシックPro~H&小塚ゴシックProVI~H&小塚ゴシックPr6N~H\\
 \inhibitglue（丸ゴシック体）\inhibitglue
 &小塚ゴシックPro~H&小塚ゴシックProVI~H&小塚ゴシックPr6N~H\\
 \bottomrule
@@ -1511,7 +1516,8 @@ featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を�
 \end{center}
 
 \paragraph{モリサワ・ヒラギノ}
-モリサワ・ヒラギノ用の設定はそのようなことは行っていない：
+モリサワ・ヒラギノ用の設定はそのようなことは行っていない．
+まずヒラギノフォントから：
 % これらは持っているわけではないので，フォント名が
 % 異なっているかもしれません．確認お願いします．
 \begin{center}\small
@@ -1524,12 +1530,21 @@ featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を�
 \gt 明朝体太字&
 ヒラギノ明朝体Pro~W6&ヒラギノ明朝体Pr6N~W6\\
 \gt ゴシック体細字&
-ヒラギノ角ゴPro~W3&ヒラギノ角ゴPr6N~W3\\
+ヒラギノ角ゴPro~W3&ヒラギノ角ゴProN~W3\\
 \gt ゴシック体太字&
-ヒラギノ角ゴPro~W6&ヒラギノ角ゴPr6N~W6\\
+ヒラギノ角ゴPro~W6&ヒラギノ角ゴProN~W6\\
+\gt ゴシック体極太&
+ヒラギノ角ゴStd~W8&ヒラギノ角ゴStdN~W8\\
 \gt 丸ゴシック体&
-ヒラギノ丸ゴPro~W4&ヒラギノ丸ゴPr6N~W4\\
-\midrule
+ヒラギノ丸ゴPro~W4&ヒラギノ丸ゴProN~W4\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+次はモリサワフォントを用いる設定である：
+\begin{center}\small
+\begin{tabular}{lll}
+\toprule
 &\tt morisawa4&\tt morisawa6n\\
 \midrule
 \gt 明朝体細字&
@@ -1540,6 +1555,8 @@ featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を�
 中ゴシックBBB~Pro~Med&中ゴシックBBB~Pr6N~Med\\
 \gt ゴシック体太字&
 太ゴB101~Pro~Bold&太ゴB101~Pr6N~Bold\\
+\gt ゴシック体極太&
+見出ゴPro~MB31&見出ゴPr6N~MB31\\
 \gt 丸ゴシック体&
 じゅんPro 101&じゅんPr6N 101\\
 \bottomrule
@@ -1584,20 +1601,22 @@ featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を�
 \multicolumn{3}{c}{HGゴシックM}\\\midrule
 \gt ゴシック体太字&
 \multicolumn{3}{c}{HGゴシックE}\\\midrule
+\gt ゴシック体極太&
+\multicolumn{3}{c}{HG創英角ゴシックUB}\\\midrule
 \gt 丸ゴシック体&
 \multicolumn{3}{c}{HG丸ゴシック体PRO}\\
 \bottomrule
 \end{tabular}
 \end{center}
-なお，HG明朝E・HGゴシックE・HG丸ゴシック体PROの3つについては，内部で
+なお，HG明朝E・HGゴシックE・HG創英角ゴシックUB・HG丸ゴシック体PROの4つについては，内部で
 \begin{description}
-\item[標準] フォント名（\texttt{HGMinchoE} など）による指定
+\item[標準] フォント名（\texttt{HGMinchoE} など）
 \item[{\tt 90jis}指定時] ファイル名 (%
-\texttt{hgrme.ttc}, \texttt{hgrge.ttc}, \texttt{hgrsmp.ttf}) による指定
+\texttt{hgrme.ttc}, \texttt{hgrge.ttc}, \texttt{hgrsgu.ttc}, \texttt{hgrsmp.ttf}) 
 \item[{\tt jis2004}指定時] ファイル名 (%
-\texttt{hgrme04.ttc}, \texttt{hgrge04.ttc}, \texttt{hgrsmp04.ttf}) による指定
+\texttt{hgrme04.ttc}, \texttt{hgrge04.ttc}, \texttt{hgrsgu04.ttc}, \texttt{hgrsmp04.ttf}) 
 \end{description}
-となっているので注意すること．
+として指定を行っているので注意すること．
 
 
 %<*en>

@@ -209,6 +209,7 @@
   \tl_if_eq:NNT \l_ltjpreset_kanji_shape_tl \l_tmpa_tl { 
     \cs_set:Nx \ltjpreset_font_mc_bx: { hgrme04.ttc }
     \cs_set:Nx \ltjpreset_font_gt_bx: { hgrge04.ttc }
+    \cs_set:Nx \ltjpreset_font_gt_eb: { hgrsgu04.ttc }
     \cs_set:Nx \ltjpreset_font_mg:    { hgrsmp04.ttf }
     \cs_set_eq:NN \ltjpreset_font_gt_m: \ltjpreset_font_gt_n_uni:
     % HG ゴシックM のときはそうはいかないので 1 ウェイト時のゴシック体を使う
@@ -217,6 +218,7 @@
   \tl_if_eq:NNT \l_ltjpreset_kanji_shape_tl \l_tmpa_tl { 
     \cs_set:Nx \ltjpreset_font_mc_bx: { hgrme.ttc }
     \cs_set:Nx \ltjpreset_font_gt_bx: { hgrge.ttc }
+    \cs_set:Nx \ltjpreset_font_gt_eb: { hgrsgu.ttc }
     \cs_set:Nx \ltjpreset_font_mg:    { hgrsmp.ttf }
   }
 }
@@ -241,6 +243,10 @@
       \tl_use:N \l_ltjpreset_add_features_tl
       \bool_if:NT \l_ltjpreset_noembed_bool { , NoEmbed }
     ] { \ltjpreset_font_mg: }
+  \newjfontfamily \gtebfamily [
+      \tl_use:N \l_ltjpreset_add_features_tl
+      \bool_if:NT \l_ltjpreset_noembed_bool { , NoEmbed }
+    ] { \ltjpreset_font_gt_eb: }
   \bool_if:NT \l_ltjpreset_bold_bool {
     \cs_set_eq:NN \ltjpreset_font_mc_bx: \ltjpreset_font_gt_bx:
   }
