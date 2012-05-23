@@ -468,7 +468,7 @@ For detailed information, see Part~\ref{part-imp}.
 
 %<en>\subsection{Notations}
 %<ja>\subsection{用語と記法}
-%<zh>\subsection{一些约定} 
+%<zh>\subsection{一些约定}
 
 
 %<*en>
@@ -1469,7 +1469,7 @@ featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を�
 よく使われている和文フォント設定を一行で指定できるようにしたのが
 \Pkg{luatexja-preset}パッケージである．このパッケージは，
 \Pkg{otf}パッケージの一部機能と八登崇之氏による\Pkg{PXchfon}パッケージの一部機能とを
-合わせたような格好をおり，内部で\Pkg{luatexja-fontspec}を読み込んでいる．
+合わせたような格好をしており，内部で\Pkg{luatexja-fontspec}を読み込んでいる．
 
 \paragraph{一般的なオプション}
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
@@ -1489,7 +1489,7 @@ featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を�
 \paragraph{小塚フォント}
 まず，小塚フォントを用いる設定を述べる．
 単ウェイト時のゴシック体は小塚ゴシックRでは細いように感じるので，
-小塚ゴシックに変更している．
+小塚ゴシックMに変更している．
 さらに，丸ゴシック体はないので便宜上小塚ゴシックHで代用している．
 \begin{center}\small
 \begin{tabular}{llll}
@@ -1612,9 +1612,9 @@ featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を�
 \begin{description}
 \item[標準] フォント名（\texttt{HGMinchoE} など）
 \item[{\tt 90jis}指定時] ファイル名 (%
-\texttt{hgrme.ttc}, \texttt{hgrge.ttc}, \texttt{hgrsgu.ttc}, \texttt{hgrsmp.ttf}) 
+\texttt{hgrme.ttc}, \texttt{hgrge.ttc}, \texttt{hgrsgu.ttc}, \texttt{hgrsmp.ttf})
 \item[{\tt jis2004}指定時] ファイル名 (%
-\texttt{hgrme04.ttc}, \texttt{hgrge04.ttc}, \texttt{hgrsgu04.ttc}, \texttt{hgrsmp04.ttf}) 
+\texttt{hgrme04.ttc}, \texttt{hgrge04.ttc}, \texttt{hgrsgu04.ttc}, \texttt{hgrsmp04.ttf})
 \end{description}
 として指定を行っているので注意すること．
 
@@ -1636,7 +1636,7 @@ If you want to use these functions, load \Pkg{luatexja-otf} package.
 を読み込めばよい．
 %</ja>
 %<*zh>
-\subsection{\Pkg{otf}包中的\texttt{\char92CID}，\texttt{\char92UTF}及其他宏} 
+\subsection{\Pkg{otf}包中的\texttt{\char92CID}，\texttt{\char92UTF}及其他宏}
 \pLaTeX 下，\underline{\texttt{otf}}宏包（斋藤修三郎开发）是用来排印存在
 于Adobe-Japan1-6但不存在于JIS X 0208中的字符。
 该包已经广泛使用，\LuaTeX-ja支持部分\Pkg{otf}包中的部分功能。
@@ -1963,7 +1963,7 @@ This range consist of the following Unicode ranges, \emph{except characters in t
 %</ja>
 %<*zh>
 \item \texttt{U+0370}--\texttt{U+03FF}: 希腊字母
-\item \texttt{U+0400}--\texttt{U+04FF}: 西里尔字母	
+\item \texttt{U+0400}--\texttt{U+04FF}: 西里尔字母
 \item \texttt{U+1F00}--\texttt{U+1FFF}: 希腊文扩充
 %</zh>
 \\\
