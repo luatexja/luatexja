@@ -1117,94 +1117,6 @@ Okumura), namely, \Pkg{ltjclasses} and \Pkg{ltjsclasses}.
 \subsection{plain \TeX~and~\LaTeXe}
 \label{ssub-chgfnt}
 
-%<*en>
-\paragraph{Remark: Japanese Characters in Math Mode}
-Since \pTeX\ supports Japanese characters in math mode, there are
-sources like the following:
-%</en>
-%<*ja>
-\paragraph{意見：数式モード中の和文文字}
-\pTeX では，特に何もしないでも数式中に和文文字を記述することができた．そのため，
-以下のようなソースが見られた：
-%</ja>
-%<*zh>
-\paragraph{注记：数学模式下的日文字符}
-\pTeX 支持在数学模式下的日文字符，如以下源码：
-%</zh>
-
-\begin{LTXexample}
-$f_{高温}$~($f_{\text{high temperature}}$).
-\[ y=(x-1)^2+2\quad よって\quad y>0 \]
-$5\in 素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
-\end{LTXexample}
-%<*en>
-We (the project members of \LuaTeX-ja) think that using
-Japanese characters in math mode are allowed if and only if these are used as identifiers.
-In this point of view,
-%</en>
-%<*ja>
-\LuaTeX-jaプロジェクトでは，数式モード中での和文文字はそれらが識別子として用いられる
-ときのみ許されると考えている．
-この観点から，
-%</ja>
-%<*zh>
-我们（\LuaTeX-ja项目成员）认为在数学模式下使用日文字符，只有在这些字符充当标识符时才是正确的。在这点下：
-%</zh>
-\begin{itemize}
-%<*en>
-\item The lines 1~and~2 above are not correct, since `高温' in above is used as a textual label, and
-`よって' is used as a conjunction.
-%</en>
-%<*ja>
-\item 上記数式のうち1, 2行目は正しくない．なぜならば`高温'が意味のあるラベルと
-      して，`よって'が接続詞として用いられているからである．
-%</ja>
-%<*zh>
-\item 第1行和第2行是不正确的，因为“高温”的作用为文本标签，“よって”用作为连词。
-%</zh>
-%<*en>
-\item However, the line~3 is correct, since `素' is used as an identifier.
-%</en>
-%<*ja>
-\item しかしながら，3行目は`素'が識別子として用いられているので正しい．
-%</ja>
-%<*zh>
-\item 不过，第3行是正确的，因为“素”是作为标识符的。
-%</zh>
-\end{itemize}
-%<*en>
-Hence, in our opinion, the above input should be corrected as:
-%</en>
-%<*ja>
-したがって，\LuaTeX-jaプロジェクトの意見としては，上記の入力は次のように直されるべき
-である：
-%</ja>
-%<*zh>
-那么，根据我们的观点，上述输入应当校正为：
-%</zh>
-\begin{LTXexample}
-$f_{\text{高温}}$~%
-($f_{\text{high temperature}}$).
-\[ y=(x-1)^2+2\quad
-  \mathrel{\text{よって}}\quad y>0 \]
-$5\in 素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
-\end{LTXexample}
-%BUG?: \{\}がなければ「素」がでない．上の段落の「よって」もでてない．
-%<*en>
-We also believe that using Japanese characters as identifiers is rare,
-hence we don't describe how to change Japanese fonts in math mode in
-this chapter. For the method, please see Subsection~\ref{ssec-math}.
-%</en>
-%<*ja>
-また\LuaTeX-jaプロジェクトでは，和文文字が識別子として用いられることはほとんどない
-と考えており，したがってこの節では数式モード中の和文フォントを変更する方法については
-記述しない．この方法については\ref{ssec-math}節を参照のこと．
-%</ja>
-%<*zh>
-我们也认为使用日文字符作为标识符的情况极为少见，所以我们不在此章节描述如何在数学模式下改变日文字体。
-关于此方法，请参见\ref{ssec-math}。
-%</zh>
-
 \paragraph{plain \TeX}
 %<*en>
 To change Japanese fonts in plain \TeX, you must use the primitive
@@ -1353,6 +1265,94 @@ auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
 %</zh>
 \end{itemize}
 
+%<*en>
+\paragraph{Remark: Japanese Characters in Math Mode}
+Since \pTeX\ supports Japanese characters in math mode, there are
+sources like the following:
+%</en>
+%<*ja>
+\paragraph{注意：数式モード中の和文文字}
+\pTeX では，特に何もしないでも数式中に和文文字を記述することができた．そのため，
+以下のようなソースが見られた：
+%</ja>
+%<*zh>
+\paragraph{注记：数学模式下的日文字符}
+\pTeX 支持在数学模式下的日文字符，如以下源码：
+%</zh>
+
+\begin{LTXexample}
+$f_{高温}$~($f_{\text{high temperature}}$).
+\[ y=(x-1)^2+2\quad よって\quad y>0 \]
+$5\in 素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
+\end{LTXexample}
+%<*en>
+We (the project members of \LuaTeX-ja) think that using
+Japanese characters in math mode are allowed if and only if these are used as identifiers.
+In this point of view,
+%</en>
+%<*ja>
+\LuaTeX-jaプロジェクトでは，数式モード中での和文文字はそれらが識別子として用いられる
+ときのみ許されると考えている．
+この観点から，
+%</ja>
+%<*zh>
+我们（\LuaTeX-ja项目成员）认为在数学模式下使用日文字符，只有在这些字符充当标识符时才是正确的。在这点下：
+%</zh>
+\begin{itemize}
+%<*en>
+\item The lines 1~and~2 above are not correct, since `高温' in above is used as a textual label, and
+`よって' is used as a conjunction.
+%</en>
+%<*ja>
+\item 上記数式のうち1, 2行目は正しくない．なぜならば`高温'が意味のあるラベルと
+      して，`よって'が接続詞として用いられているからである．
+%</ja>
+%<*zh>
+\item 第1行和第2行是不正确的，因为“高温”的作用为文本标签，“よって”用作为连词。
+%</zh>
+%<*en>
+\item However, the line~3 is correct, since `素' is used as an identifier.
+%</en>
+%<*ja>
+\item しかしながら，3行目は`素'が識別子として用いられているので正しい．
+%</ja>
+%<*zh>
+\item 不过，第3行是正确的，因为“素”是作为标识符的。
+%</zh>
+\end{itemize}
+%<*en>
+Hence, in our opinion, the above input should be corrected as:
+%</en>
+%<*ja>
+したがって，\LuaTeX-jaプロジェクトの意見としては，上記の入力は次のように直されるべき
+である：
+%</ja>
+%<*zh>
+那么，根据我们的观点，上述输入应当校正为：
+%</zh>
+\begin{LTXexample}
+$f_{\text{高温}}$~%
+($f_{\text{high temperature}}$).
+\[ y=(x-1)^2+2\quad
+  \mathrel{\text{よって}}\quad y>0 \]
+$5\in 素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
+\end{LTXexample}
+%BUG?: \{\}がなければ「素」がでない．上の段落の「よって」もでてない．
+%<*en>
+We also believe that using Japanese characters as identifiers is rare,
+hence we don't describe how to change Japanese fonts in math mode in
+this chapter. For the method, please see Subsection~\ref{ssec-math}.
+%</en>
+%<*ja>
+また\LuaTeX-jaプロジェクトでは，和文文字が識別子として用いられることはほとんどない
+と考えており，したがってこの節では数式モード中の和文フォントを変更する方法については
+記述しない．この方法については\ref{ssec-math}節を参照のこと．
+%</ja>
+%<*zh>
+我们也认为使用日文字符作为标识符的情况极为少见，所以我们不在此章节描述如何在数学模式下改变日文字体。
+关于此方法，请参见\ref{ssec-math}。
+%</zh>
+
 \subsection{fontspec}
 \label{ssec-fontspec}
 %<*en>
@@ -1462,40 +1462,120 @@ featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を�
 另注意，出格特性在这7个命令中默认关闭，因为此特性会与\textbf{JAglue}冲突（参见\ref{para-kern}）。
 %</zh>
 
-
-\subsection{プリセット設定}
+%<en>\subsection{Preset}
+%<ja>\subsection{プリセット設定}
 \label{ssec-preset}
 
+%<*en>
+To use standard Japanese font settings easily, one can load \Pkg{luatexja-preset}
+package with several options. This package provides functions in a part of
+\Pkg{otf} package and a part of \Pkg{PXchfon} package by Takayuki Yato.
+Internally, \Pkg{luatexja-preset} loads \Pkg{luatexja-fontspec}.
+%</en>
+%<*ja>
 よく使われている和文フォント設定を一行で指定できるようにしたのが
 \Pkg{luatexja-preset}パッケージである．このパッケージは，
 \Pkg{otf}パッケージの一部機能と八登崇之氏による\Pkg{PXchfon}パッケージの一部機能とを
 合わせたような格好をしており，内部で\Pkg{luatexja-fontspec}を読み込んでいる．
+%</ja>
 
-\paragraph{一般的なオプション}
+%<en>\paragraph{General options}
+%<ja>\paragraph{一般的なオプション}
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
-\item[deluxe] 明朝体2ウェイト・ゴシック体3ウェイトと，
+\item[deluxe]
+%<*en>
+Specifying this option enables us to use mincho with two weights,
+gothic with three weights, and round gothic
+(\verb+\mgfamily+, because round gothic is called \textit{maru gothic} in Japanese).
+Gothic has the weights regular, bold and heavy, and one can use the heavy gothic
+by changing family (\verb+\gtebfamily+).
+Since \Pkg{fontspec} package can handle only regular (\verb+\mdseries+) and
+bold (\verb+\bfseries+), this incomplete implementation is provided.
+%</en>
+%<*ja>
+明朝体2ウェイト・ゴシック体3ウェイトと，
 丸ゴシック体 (\verb+\mgfamily+) を使用可能とする．
 ゴシック体は細字・太字・極太の3ウェイトがあるが，極太ゴシック体はファミリの切り替え (\verb+\gtebfamily+) %
 で実現している．\Pkg{fontspec}では通常 (\verb+\mdseries+) と太字 (\verb+\bfseries+) しか扱えないために
 このような中途半端な実装になっている．
-\item[expert] 横組専用仮名を用いる．また，\verb+\rubyfamily+ でルビ用仮名が使用可能となる．
-\item[bold] 明朝の太字をゴシック体の太字とする．
-\item[90jis] 出来る限り90JISの字形を使う．
-\item[jis2004] 出来る限りJIS2004の字形を使う．
-\item[jis] 用いるJFMを \texttt{jfm-jis.lua} とする．このオプションがない時は
-\LuaTeX-ja標準の \texttt{jfm-ujis.lua} が用いられる．
+%</ja>
+\item[expert]
+%<*en>
+Use horizontal kana characters and define \verb+\rubyfamily+ to use kana
+characters designed for ruby.
+%</en>
+%<*ja>
+横組専用仮名を用いる．また，\verb+\rubyfamily+ でルビ用仮名が使用可能となる．
+%</ja>
+\item[bold]
+%<*en>
+Use bold gothic as bold mincho.
+%</en>
+%<*ja>
+明朝の太字をゴシック体の太字とする．
+%</ja>
+\item[90jis]
+%<*en>
+Use 90JIS glyphs if possible.
+%</en>
+%<*ja>
+出来る限り90JISの字形を使う．
+%</ja>
+\item[jis2004]
+%<*en>
+Use JIS2004 glyphs if possible.
+%</en>
+%<*ja>
+出来る限りJIS2004の字形を使う．
+%</ja>
+\item[jis]
+%<*en>
+Use JFM of \texttt{jfm-jis.lua}. When not specifying this option,
+standard \texttt{jfm-ujis.lua} is used.
+%</en>
+%<*ja>
+用いるJFMを\texttt{jfm-jis.lua}とする．このオプションがない時は
+\LuaTeX-ja標準の\texttt{jfm-ujis.lua}が用いられる．
+%</ja>
 \end{list}
 
-\paragraph{小塚フォント}
+%<en>\paragraph{Kozuka fonts}
+%<ja>\paragraph{小塚フォント}
+%<*en>
+When using single weight, we specify Kozuka Gothic M as gothic
+because Kozuka Gothic R looks thin.
+There is not Kozuka Round Gothic, therefore Kozuka Gothic H is alternatively
+specified as round gothic.
+%</en>
+%<*ja>
 まず，小塚フォントを用いる設定を述べる．
 単ウェイト時のゴシック体は小塚ゴシックRでは細いように感じるので，
 小塚ゴシックMに変更している．
 さらに，丸ゴシック体はないので便宜上小塚ゴシックHで代用している．
+%</ja>
 \begin{center}\small
 \begin{tabular}{llll}
 \toprule
 &\tt kozuka4&\tt kozuka6&\tt kozuka6n\\
 \midrule
+%<*en>
+\bf mincho regular&Kozuka Mincho Pro R&Kozuka Mincho ProVI R&Kozuka Mincho Pr6N R\\
+\bf mincho bold&Kozuka Mincho Pro B&Kozuka Mincho ProVI B&Kozuka Mincho Pr6N B\\
+\midrule
+\bf gothic regular\\
+  single weight
+&Kozuka Gothic Pro M&Kozuka Gothic ProVI M&Kozuka Gothic Pr6N M\\
+  multiple weights
+&Kozuka Gothic Pro R&Kozuka Gothic ProVI R&Kozuka Gothic Pr6N R\\
+\midrule
+\bf gothic bold
+&Kozuka Gothic Pro B&Kozuka Gothic ProVI B&Kozuka Gothic Pr6N B\\
+\bf gothic heavy
+&Kozuka Gothic Pro H&Kozuka Gothic ProVI H&Kozuka Gothic Pr6N H\\
+(round gothic)
+&Kozuka Gothic Pro H&Kozuka Gothic ProVI H&Kozuka Gothic Pr6N H\\
+%</en>
+%<*ja>
 \gt 明朝体細字&小塚明朝Pro~R&小塚明朝ProVI~R&小塚明朝Pr6N~R\\
 \gt 明朝体太字&小塚明朝Pro~B&小塚明朝ProVI~B&小塚明朝Pr6N~B\\
 \midrule
@@ -1511,13 +1591,20 @@ featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を�
 &小塚ゴシックPro~H&小塚ゴシックProVI~H&小塚ゴシックPr6N~H\\
 \inhibitglue（丸ゴシック体）\inhibitglue
 &小塚ゴシックPro~H&小塚ゴシックProVI~H&小塚ゴシックPr6N~H\\
+%</ja>
 \bottomrule
 \end{tabular}
 \end{center}
 
-\paragraph{モリサワ・ヒラギノ}
+%<en>\paragraph{Hiragino and Morisawa}
+%<ja>\paragraph{ヒラギノ・モリサワ}
+%<*en>
+Settings for Hiragino fonts:
+%</en>
+%<*ja>
 モリサワ・ヒラギノ用の設定はそのようなことは行っていない．
 まずヒラギノフォントから：
+%</ja>
 % これらは持っているわけではないので，フォント名が
 % 異なっているかもしれません．確認お願いします．
 \begin{center}\small
@@ -1525,6 +1612,21 @@ featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を�
 \toprule
 &\tt hiragino&\tt hiraginon\\
 \midrule
+%<*en>
+\bf mincho regular&
+Hiragino Mincho Pro W3&Hiragino Mincho Pr6N W3\\
+\bf mincho bold&
+Hiragino Mincho Pro W6&Hiragino Mincho Pr6N W6\\
+\bf gothic regular&
+Hiragino Kaku Gothic Pro W3&Hiragino Kaku Gothic ProN W3\\
+\bf gothic bold&
+Hiragino Kaku Gothic Pro W6&Hiragino Kaku Gothic ProN W6\\
+\bf gothic heavy&
+Hiragino Kaku Gothic Std W8&Hiragino Kaku Gothic StdN W8\\
+\bf round gothic&
+Hiragino Maru Gothic Pro W4&Hiragino Maru Gothic ProN W4\\
+%</en>
+%<*ja>
 \gt 明朝体細字&
 ヒラギノ明朝体Pro~W3&ヒラギノ明朝体Pr6N~W3\\
 \gt 明朝体太字&
@@ -1537,16 +1639,36 @@ featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を�
 ヒラギノ角ゴStd~W8&ヒラギノ角ゴStdN~W8\\
 \gt 丸ゴシック体&
 ヒラギノ丸ゴPro~W4&ヒラギノ丸ゴProN~W4\\
+%</ja>
 \bottomrule
 \end{tabular}
 \end{center}
-
+%<*en>
+Settings for Morisawa fonts:
+%</en>
+%<*ja>
 次はモリサワフォントを用いる設定である：
+%</ja>
 \begin{center}\small
 \begin{tabular}{lll}
 \toprule
 &\tt morisawa4&\tt morisawa6n\\
 \midrule
+%<*en>
+\bf mincho regular&
+Ryumin Pro L-KL&Ryumin Pr6N L-KL\\
+\bf mincho bold&
+Futo Min A101 Pro Bold&Futo Min A101 Pr6N Bold\\
+\bf gothic regular&
+Chu Gothic BBB Pro Med&Chu Gothic BBB Pr6N Med\\
+\bf gothic bold&
+Futo Go B101 Pro Bold&Futo Go B101 Pr6N Bold\\
+\bf gothic heavy&
+Midashi Go Pro MB31&Midashi Go Pr6N MB31\\
+\bf round gothic&
+Jun Pro 101&Jun Pr6N 101\\
+%</en>
+%<*ja>
 \gt 明朝体細字&
 リュウミンPro~L-KL&リュウミンPr6N~L-KL\\
 \gt 明朝体太字&
@@ -1559,34 +1681,78 @@ featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を�
 見出ゴPro~MB31&見出ゴPr6N~MB31\\
 \gt 丸ゴシック体&
 じゅんPro 101&じゅんPr6N 101\\
+%</ja>
 \bottomrule
 \end{tabular}
 \end{center}
 
-\paragraph{単ウェイト用設定}
+%<en>\paragraph{Settings for single weight}
+%<ja>\paragraph{単ウェイト用設定}
+%<*en>
+Next, we describe settings for single weight.
+These four settings use a same font for regular and bold fonts,
+and gothic font is also used for round gothic font.
+%</en>
+%<*ja>
 次に，単ウェイト用の設定を述べる．この4設定では「細字」「太字」の区別はない．
 また，丸ゴシック体はゴシック体と同じフォントを用いる．
+%</ja>
 \begin{center}\small
 \begin{tabular}{lllll}
 \toprule
 &\tt noembed&\tt ipa&\tt ipaex&\tt ms\\
 \midrule
+%<*en>
+\bf mincho&Ryumin-Light (non-embedded)
+&IPAMincho&IPAexMincho&MS Mincho\\
+\bf gothic&GothicBBB-Medium (non-embedded)
+&IPAGothic&IPAexGothic&MS Gothic\\
+%</en>
+%<*ja>
 \gt 明朝体&Ryumin-Light（非埋込）
 &IPA明朝&IPAex明朝&MS明朝\\
 \gt ゴシック体&GothicBBB-Medium（非埋込）
 &IPAゴシック&IPAexゴシック&MSゴシック\\
+%</ja>
 \bottomrule
 \end{tabular}
 \end{center}
 
-\paragraph{HGフォントの利用}
+%<en>\paragraph{Use HG fonts}
+%<ja>\paragraph{HGフォントの利用}
+%<*en>
+In addition to the above, HG fonts bundled with Microsoft Office are also available.
+%</en>
+%<*ja>
 すぐ前に書いた単ウェイト用設定を，Microsoft Office等に付属するHGフォントを使って
 多ウェイト化した設定もある．
+%</ja>
 \begin{center}\small
 \begin{tabular}{llll}
 \toprule
 &\tt ipa-dx&\tt ipaex-dx&\tt ms-dx\\
 \midrule
+%<*en>
+\bf mincho regular
+&IPAMincho&IPAexMincho&MS Mincho\\\midrule
+\bf mincho bold&
+\multicolumn{3}{c}{HG Mincho E}\\\midrule
+\bf Gothic regular\\
+  single weight
+&IPAGothic&IPAexGothic&MS Gothic\\
+  {\tt jis2004}
+&IPAGothic&IPAexGothic&MS Gothic\\
+\cmidrule(lr){1-4}
+　otherwise&
+\multicolumn{3}{c}{HG Gothic M}\\\midrule
+\bf gothic bold&
+\multicolumn{3}{c}{HG Gothic E}\\\midrule
+\gt gothic heavy&
+\multicolumn{3}{c}{HG Soei Kaku Gothic UB}\\\midrule
+\gt round gothic&
+\multicolumn{3}{c}{HG Maru Gothic PRO}\\
+%</en>
+%<*ja>
 \gt 明朝体細字
 &IPA明朝&IPAex明朝&MS明朝\\\midrule
 \gt 明朝体太字&
@@ -1605,9 +1771,21 @@ featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を�
 \multicolumn{3}{c}{HG創英角ゴシックUB}\\\midrule
 \gt 丸ゴシック体&
 \multicolumn{3}{c}{HG丸ゴシック体PRO}\\
+%</ja>
 \bottomrule
 \end{tabular}
 \end{center}
+%<*en>
+Note that HG Mincho E, HG Gothic E, HG Soei Kaku Gothic UB and HG Maru Gothic PRO
+are internally specified by
+\begin{description}
+\item[default] font name (\texttt{HGMinchoE}, etc.),
+\item[{\tt 90jis}] file name (\texttt{hgrme.ttc}, \texttt{hgrge.ttc}, \texttt{hgrsgu.ttc}, \texttt{hgrsmp.ttf}),
+\item[{\tt jis2004}] file name (\texttt{hgrme04.ttc}, \texttt{hgrge04.ttc}, \texttt{hgrsgu04.ttc}, \texttt{hgrsmp04.ttf}),
+\end{description}
+respectively.
+%</en>
+%<*ja>
 なお，HG明朝E・HGゴシックE・HG創英角ゴシックUB・HG丸ゴシック体PROの4つについては，内部で
 \begin{description}
 \item[標準] フォント名（\texttt{HGMinchoE} など）
@@ -1617,6 +1795,7 @@ featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を�
 \texttt{hgrme04.ttc}, \texttt{hgrge04.ttc}, \texttt{hgrsgu04.ttc}, \texttt{hgrsmp04.ttf})
 \end{description}
 として指定を行っているので注意すること．
+%</ja>
 
 
 %<*en>
