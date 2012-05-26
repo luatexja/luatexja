@@ -5050,9 +5050,10 @@ after `beginning/ending of a group' characters.
 %</ja>
 
 \begin{figure}[!tb]
-\let\sp\textvisiblespace
+\let\sp\textvisiblespace\small
+\begin{minipage}{.6\textwidth}%
 \begin{center}
-\unitlength=7mm\sf\mathversion{bold}
+\unitlength=6.5mm\sf\mathversion{bold}
 \begin{tikzpicture}[
   ->, auto, shorten >=1pt
 ]
@@ -5071,6 +5072,8 @@ after `beginning/ending of a group' characters.
       (init)    edge                 node {} (newline)
       (midline) edge [bend right=10] node {10} (skipspc)
       (skipspc) edge [bend right]    node [left,right=10,above=7]{G, O} (midline)
+      (skipspc) edge [loop right]    node {10} (skipspc)
+      (newline) edge [loop right]    node {10} (newline)
       (scanacs) edge [bend left]     node [left=3,below]{$(*)$} (skipspc)
       (scanacs) edge [bend right]    node [right=30,above=20]{$(*)$} (midline)
       (midline) edge                 node {5\ [\sp]} (endm)
@@ -5090,23 +5093,29 @@ after `beginning/ending of a group' characters.
 \end{scope}
 \end{tikzpicture}
 \end{center}
+\end{minipage}%
+\begin{minipage}{.4\textwidth}
+\begin{description}
+\item[\textsf{G}] Beginning of group (usually \verb+{+)\\
+ and ending of group (usually \verb+}+).
+\item[\textsf{J}] Japanese characters.
+\item[\textsf{5}] \textit{end-of-line} (usually \verb+^^J+).
+\item[\textsf{10}] space (usually \sp).
+\item[\textsf{O}] other characters, whose category code is in $\{3,4,6,7,8,11,12,13\}$.
+\item[\textsf{[\sp]}, \textsf{[{\tt\char92par}]}] 
+emits a space, or~\verb+\par+.
+\end{description}
+\end{minipage}
 \begin{itemize}
 \item We omitted about category codes 
 9~(\textit{ignored}), 14~(\textit{comment})~and~15~(\textit{invalid})
-from the above diagram.
+from the above diagram. We also ignored the input like `\verb+^^A+' or `\verb+^+\verb+^df+'.
 \item When a character whose category code is 0 (\textit{escape character}) is seen by \TeX, 
 the input processor scans a control sequence (\textsf{scan a c.s.}). 
 These paths are not shown in the above diagram.
 
 After that, the state is changed to State~$S$ (skipping blanks) in most cases, but 
 to State~$M$ (middle of line) sometimes.
-\item \textsf{G}: beginning of group (usually \verb+{+)
- and ending of group (usually \verb+}+).
-\item \textsf{J}: Japanese characters.
-\item \textsf{5}: \textit{end-of-line} (usually \verb+^^J+).
-\item \textsf{10}: space (usually \verb*+ +).
-\item \textsf{O}: other characters, whose category code is in $\{3,4,6,7,8,11,12,13\}$.
-\item `\textsf{[\sp]}' means that ``emits a space''. 
 \end{itemize}
 %<en>\caption{State transitions of \pTeX's input processor.}
 %<ja>\caption{\pTeX の入力処理部の状態遷移．}
