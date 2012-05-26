@@ -74,7 +74,7 @@
 \makeatother
 %</zh>
 
-\usepackage{amsmath,amssymb,xcolor,pict2e,multienum,amsthm,float}
+\usepackage{amsmath,amssymb,tikz,pict2e,multienum,amsthm,float}
 \usepackage{booktabs,listings,showexpl,multicol,metalogo}
 \usepackage{luatexja-otf}
 \usepackage[jis2004]{luatexja-preset}
@@ -97,8 +97,6 @@
 	pdftitle={LuaTeX-ja宏包}
 %</zh>
 }
-\usepackage[all]{xy}
-%<ja> \SelectTips{cm}{}
 %<*en>
 \setmainfont[Ligatures=TeX]{TeX Gyre Termes}
 \setsansfont[Ligatures=TeX]{TeX Gyre Heros}
@@ -4998,8 +4996,8 @@ This problem is resolved by using
 %<zh>\section{日文字符后断行}
 \label{sec-lbreak}
 %<en>\subsection{Reference: Behavior in \pTeX}
-%<ja>\subsection{参考:\pTeX の動作}
-%<zh>\subsection{参考:\pTeX 行为}
+%<ja>\subsection{参考：\pTeX の動作}
+%<zh>\subsection{参考: \pTeX 行为}
 %<*en>
 In~\pTeX, a line break after a Japanese character doesn't emit a space,
 since words are not separated by spaces in Japanese writings. However,
@@ -5053,38 +5051,62 @@ after `beginning/ending of a group' characters.
 
 \begin{figure}[!tb]
 \let\sp\textvisiblespace
-\begin{gather*}
- \xymatrix{&&
-   {\text{scan a cs}}\ar@(r,ul)[dr]&\\
-\ar[r]&
-   *++[o][F-]{N}\ar[ur]^0\ar[dd]_{d,\ g}\ar[u]^{5\ (\texttt{\char92par})}
-     \ar@{->}@(d,l)[ddrr]_(0.45){j}&&
-   *++[o][F-]{S}\ar@(l,dr)[ul]^0\ar@(l,ur)[ddll]_{d,\ g}\ar[u]_{5}
-     \ar@{->}@(r,r)[dd]^{j}\\&\\&
-   *++[o][F-]{M}\ar[uuur]^0\ar@(r,dl)[uurr]_(0.55){10\ (\sp)}
-     \ar[d]_{5\ ({\sp})}\ar@{->}@(dr,dl)[rr]_{j}&&
-   *++[o][F-]{K}\ar@{->}@(ul,d)[uuul]^0\ar@{->}[ll]^{d}
-     \ar@{->}@(ur,dr)[uu]^{10\ (\sp)}\ar@{->}[d]_5\\
-   &&&
- }\\
- d:=\{3,4,6,7,8,11,12,13\},\quad g:=\{1,2\},\quad j:=(\text{Japanese characters})
-\end{gather*}
+\begin{center}
+\unitlength=7mm\sf\mathversion{bold}
+\begin{tikzpicture}[
+  ->, auto, shorten >=1pt
+]
+\node [shape=rectangle, font=\scriptsize] (init) at (2,7) {start};
+\node [shape=circle,draw, fill=blue!20] (newline) at (4,7) {$N$};
+\node [shape=circle,draw, fill=blue!20] (midline) at (4,4) {$M$};
+\node [shape=circle,draw, fill=blue!20] (skipspc) at (8,7) {$S$};
+\node [shape=circle,draw, fill=red!20]  (kanji) at (8,4) {$K$};
+\node [shape=rectangle,draw, fill=green!20] (scanacs) at (6,8) {scan a c.s.};
+\node (endk) at (8,2.5) {} ;
+\node (endm) at (4,2.5) {} ;
+\node (ends) at (8,8.5) {} ;
+\node (endn) at (4,8.5) {} ;
+\begin{scope}[font=\scriptsize]
+\path (newline) edge [bend right]    node [left]{G, O} (midline)
+      (init)    edge                 node {} (newline)
+      (midline) edge [bend right=10] node {10} (skipspc)
+      (skipspc) edge [bend right]    node [left,right=10,above=7]{G, O} (midline)
+      (scanacs) edge [bend left]     node [left=3,below]{$(*)$} (skipspc)
+      (scanacs) edge [bend right]    node [right=30,above=20]{$(*)$} (midline)
+      (midline) edge                 node {5\ [\sp]} (endm)
+      (midline) edge [loop left]     node {G, O} (midline)
+      (skipspc) edge                 node [right] {5} (ends)
+      (newline) edge                 node {5 [{\tt\char92par}]} (endn);
+\begin{scope}[red]
+\path (newline) edge [bend right]    node [right=25,below=3]{J} (kanji)
+      (midline) edge                 node [below]{J} (kanji)
+      (kanji)   edge [bend left]     node {O} (midline)
+      (kanji)   edge                 node {10} (skipspc)
+      (kanji)   edge [loop right]    node {G, J} (kanji)
+      (skipspc) edge [bend left]     node {J} (kanji)
+      (kanji)   edge                 node {5} (endk)
+;
+\end{scope}
+\end{scope}
+\end{tikzpicture}
+\end{center}
 \begin{itemize}
-%<*en>
-\item Numbers represent category codes.
-%</en>
-%<*ja>
-\item 数字はカテゴリーコードを表わしている．
-%</ja>
-%<*en>
-\item Category codes 9~(ignored), 14~(comment)~and~15~(invalid) are omitted in the above diagram.
-%</en>
-%<*ja>
-\item カテゴリーコード9（無視する文字），14（コメント文字），15（無効文字）は上の図では省かれている．
-%</ja>
-%<*zh>
-\item
-%</zh>
+\item We omitted about category codes 
+9~(\textit{ignored}), 14~(\textit{comment})~and~15~(\textit{invalid})
+from the above diagram.
+\item When a character whose category code is 0 (\textit{escape character}) is seen by \TeX, 
+the input processor scans a control sequence (\textsf{scan a c.s.}). 
+These paths are not shown in the above diagram.
+
+After that, the state is changed to State~$S$ (skipping blanks) in most cases, but 
+to State~$M$ (middle of line) sometimes.
+\item \textsf{G}: beginning of group (usually \verb+{+)
+ and ending of group (usually \verb+}+).
+\item \textsf{J}: Japanese characters.
+\item \textsf{5}: \textit{end-of-line} (usually \verb+^^J+).
+\item \textsf{10}: space (usually \verb*+ +).
+\item \textsf{O}: other characters, whose category code is in $\{3,4,6,7,8,11,12,13\}$.
+\item `\textsf{[\sp]}' means that ``emits a space''. 
 \end{itemize}
 %<en>\caption{State transitions of \pTeX's input processor.}
 %<ja>\caption{\pTeX の入力処理部の状態遷移．}
