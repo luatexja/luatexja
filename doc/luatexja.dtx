@@ -5,7 +5,11 @@
 %<ja> \documentclass[a4paper,titlepage]{ltjsarticle}
 %<zh> \documentclass[a4paper,titlepage]{ltjsarticle}
 
+%%%%%%%%
 \makeatletter
+%%%%%%%%
+
+%%%%%%%% record loaded packages
 \let\ltjpkglist\empty
 \newif\if@real@append@list
 \def\@append@newentry#1#2{{%
@@ -19,18 +23,17 @@
   \ifx\@tempa\@tempb\@real@append@listfalse\fi}
 \def\@addtofilelist#1{\@append@newentry\ltjpkglist{#1}}
 \let\@listfiles\empty
-\makeatother
 
 %<*en>
-\usepackage[margin=25mm,footskip=5mm]{geometry}
-\usepackage{mathptmx}
+\usepackage[margin=25mm,footskip=6mm]{geometry}
+\parskip=\smallskipamount
 %</en>
 %<*ja>
-\usepackage[textwidth=45\zw, lines=45, footskip=5mm]{geometry}
+\usepackage[textwidth=45\zw, lines=45, footskip=6mm]{geometry}
 \advance\leftmargini-1\zw\advance\leftmarginii-1\zw
 %</ja>
 %<*zh>
-\usepackage[margin=25mm, footskip=5mm]{geometry}
+\usepackage[textwidth=45\zw, lines=45, footskip=6mm]{geometry}
 \advance\leftmargini-1\zw\advance\leftmarginii-1\zw
 \def\postpartname{编}
 \DeclareYokoKanjiEncoding{ZH}{}{}
@@ -65,20 +68,40 @@
 \SetSymbolFont{songti}{bold}{ZH}{hei}{m}{n}
 \DeclareSymbolFontAlphabet{\mathsong}{songti}
 \DeclareMathAlphabet{\mathhei}{ZH}{hei}{m}{n}
-\makeatletter
 \DeclareRobustCommand\songfamily{\not@math@alphabet\songfamily\mathsong\kanjifamily\songdefault\selectfont}
 \DeclareRobustCommand\heifamily{\not@math@alphabet\heifamily\mathhei\kanjifamily\heidefault\selectfont}
 \DeclareRobustCommand\minchofamily{\not@math@alphabet\minchofamily\mathhei\kanjifamily\minchodefault\selectfont}
 \DeclareRobustCommand\rmfamily{\not@math@alphabet\rmfamily\mathrm\romanfamily\rmdefault\kanjifamily\songdefault\selectfont}
 \DeclareRobustCommand\sffamily{\not@math@alphabet\sffamily\mathsf\romanfamily\sfdefault\kanjifamily\heidefault\selectfont}
-\makeatother
 %</zh>
 
-\usepackage{amsmath,amssymb,tikz,pict2e,multienum,amsthm,float}
-\usepackage{booktabs,listings,showexpl,multicol,metalogo}
-\usepackage{luatexja-otf}
-\usepackage[jis2004]{luatexja-preset}
+\usepackage{amsmath,tikz,pict2e,multienum,float}
+\usepackage{booktabs,multicol}
+
+%%%%%%%% listings
+\usepackage{listings,showexpl}
+\lstset{
+  basicstyle=\ttfamily\small, pos=r, breaklines=true,
+  numbers=none, rframe={}, basewidth=0.5em, numberstyle=\tiny, numbersep=0.5em,
+  explpreset={numberstyle=\tiny, numbers=left, numbersep=1em}
+}
+% Suppress output from showexpl to stdout.
+\let\SX@Info\relax
+
+%%%%%%%% hyperref
 \usepackage{hyperref}
+%<*en>
+\title{The \LuaTeX-ja package}
+\author{The \LuaTeX-ja project team}
+%</en>
+%<*ja>
+\title{\LuaTeX-jaパッケージ}
+\author{\LuaTeX-jaプロジェクトチーム}
+%</ja>
+%<*zh>
+\title{\LuaTeX-ja宏包}
+\author{\LuaTeX-ja项目团队}
+%</zh>
 \hypersetup{%
 	unicode,
 	colorlinks,
@@ -97,13 +120,28 @@
 	pdftitle={LuaTeX-ja宏包}
 %</zh>
 }
+
+%%%%%%%% definition env.
+\usepackage{amsthm}
+\theoremstyle{definition}
+%<en>\newtheorem{defn}{Definition}
+%<ja>\newtheorem{defn}{定義}
+%<zh>\newtheorem{defn}{定义}
+
+%%%%%%%% fonts
+\usepackage{luatexja-otf}
+\usepackage[jis2004]{luatexja-preset}
+%<!en>\usepackage{amssymb}
 %<*en>
+\usepackage{unicode-math}
 \setmainfont[Ligatures=TeX]{TeX Gyre Termes}
 \setsansfont[Ligatures=TeX]{TeX Gyre Heros}
+\setmathfont{xits-math.otf}
 \frenchspacing
 %</en>
-\def\labelenumii{(\arabic{enumii})}
 
+%%%%%%%% logo
+\usepackage{metalogo}
 \DeclareRobustCommand\eTeX{\ensuremath{\varepsilon}-\kern-.125em\TeX}
 \DeclareRobustCommand\LuaTeX{Lua\TeX}
 \DeclareRobustCommand\pdfTeX{pdf\TeX}
@@ -113,11 +151,7 @@
 \DeclareRobustCommand\pLaTeXe{p\kern-.05em\LaTeXe}
 \DeclareRobustCommand\epTeX{\ensuremath{\varepsilon}-\kern-.125em\pTeX}
 
-\theoremstyle{definition}
-%<en>\newtheorem{defn}{Definition}
-%<ja>\newtheorem{defn}{定義}
-%<zh>\newtheorem{defn}{定义}
-
+%%%%%%%% other macros
 \newenvironment{cslist}{%
   \leftskip2em\parindent=0pt\def\makelabel##1{{\tt\char92##1}}
   \def\{{\char`\{}\def\}{\char`\}}
@@ -125,7 +159,7 @@
   \def\item[##1]{\par\smallskip\par\hskip-\leftskip\makelabel{##1}\par}
 }{}
 
-\makeatletter
+\def\labelenumii{(\arabic{enumii})}
 \long\def\@makecaption#1#2{%
   \vskip\abovecaptionskip
   \sbox\@tempboxa{{\small #1. #2}}%
@@ -136,33 +170,17 @@
     \hb@xt@\hsize{\hfil\box\@tempboxa\hfil}%
   \fi
   \vskip\belowcaptionskip}
-% Suppress output from showexpl to stdout.
-\let\SX@Info\relax
+
+%%%%%%%%
 \makeatother
+%%%%%%%%
 
 \def\Node#1#2{\,\vcenter{\hbox{\fboxsep=1pt\fbox{\vbox{\small\halign{\hfil##\hfil\cr
   #1\mathstrut\cr\noalign{\hrule height.4pt}\strut#2\cr}}}}\,}}
 
-%<*en>
-\title{The \LuaTeX-ja package}
-\author{The \LuaTeX-ja project team}
-%</en>
-%<*ja>
-\title{\LuaTeX-jaパッケージ}
-\author{\LuaTeX-jaプロジェクトチーム}
-%</ja>
-%<*zh>
-\title{\LuaTeX-ja宏包}
-\author{\LuaTeX-ja项目团队}
-%</zh>
-\lstset{
-  basicstyle=\ttfamily\small, pos=r, breaklines=true,
-  numbers=none, rframe={}, basewidth=0.5em
-}
-
-\parskip=\smallskipamount
 \protected\def\Param#1{\textsf{#1}} % parameter name
 \protected\def\Pkg#1{\underline{\smash{\texttt{#1}}}} % packages/classes
+
 
 \begin{document}
 \catcode`\<=13
@@ -545,7 +563,7 @@ We say `alphabetic fonts' for fonts used in \textbf{ALchar}, and `Japanese fonts
       means a package or a class of \LaTeX.
 %</en>
 %<*ja>
-\item 下線付きのタイプライタ体で書かれた語（例：\Pkg{fontspec}）は\LaTeX の
+\item 下線付きタイプライタ体の語（例：\Pkg{fontspec}）は\LaTeX の
       パッケージやクラスを表す．
 %</ja>
 %<*zh>
@@ -1482,13 +1500,13 @@ and loads \Pkg{luatexja-fontspec} internally.
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
 \item[deluxe]
 %<*en>
-Specifying this option enables us to use mincho with two weights,
-gothic with three weights, and round gothic
-(\verb+\mgfamily+, because round gothic is called \textit{maru gothic} in Japanese).
-Gothic has the weights regular, bold and heavy, and one can use the heavy gothic
-by changing family (\verb+\gtebfamily+).
-Since \Pkg{fontspec} package can handle only regular (\verb+\mdseries+) and
-bold (\verb+\bfseries+), this incomplete implementation is provided.
+Specifying this option enables us to use \textit{mincho} with two weights (medium~and~bold),
+\textit{gothic} with three weights (medium,~bold and~heavy), and \textit{rounded gothic}%
+\footnote{Provided by \texttt{\char92mgfamily}, 
+because \textit{rounded gothic} is called \textit{maru gothic} (丸ゴシック) in Japanese.}.
+The heavy weight of \textit{gothic} can be used by ``changing the family'' \verb+\gtebfamily+.
+This is because \Pkg{fontspec} package can handle only medium (\verb+\mdseries+) and
+bold (\verb+\bfseries+).
 %</en>
 %<*ja>
 明朝体2ウェイト・ゴシック体3ウェイトと，
@@ -1499,7 +1517,7 @@ bold (\verb+\bfseries+), this incomplete implementation is provided.
 %</ja>
 \item[expert]
 %<*en>
-Use horizontal kana characters and define \verb+\rubyfamily+ to use kana
+Use horizontal kana alternates, and define a control sequence \verb+\rubyfamily+ to use kana
 characters designed for ruby.
 %</en>
 %<*ja>
@@ -1528,8 +1546,8 @@ Use JIS2004 glyphs if possible.
 %</ja>
 \item[jis]
 %<*en>
-Use JFM of \texttt{jfm-jis.lua}. When not specifying this option,
-standard \texttt{jfm-ujis.lua} is used.
+Use the JFM \texttt{jfm-jis.lua}, instead of the default JFM of 
+\LuaTeX-ja, \texttt{jfm-ujis.lua}.
 %</en>
 %<*ja>
 用いるJFMを\texttt{jfm-jis.lua}とする．このオプションがない時は
@@ -1540,10 +1558,10 @@ standard \texttt{jfm-ujis.lua} is used.
 %<en>\paragraph{Kozuka fonts}
 %<ja>\paragraph{小塚フォント}
 %<*en>
-When using single weight, we specify Kozuka Gothic M as gothic
-because Kozuka Gothic R looks thin.
-There is not Kozuka Round Gothic, therefore Kozuka Gothic H is alternatively
-specified as round gothic.
+When using single weight, we adopt Kozuka~Gothic~M as \textit{gothic},
+because we think that Kozuka~Gothic~R looks thin.
+There is not `Kozuka Maru Gothic', therefore Kozuka~Gothic~H is used
+as a substitute for \textit{rounded gothic}.
 %</en>
 %<*ja>
 まず，小塚フォントを用いる設定を述べる．
@@ -1557,11 +1575,11 @@ specified as round gothic.
 &\tt kozuka4&\tt kozuka6&\tt kozuka6n\\
 \midrule
 %<*en>
-\bf mincho regular&Kozuka Mincho Pro R&Kozuka Mincho ProVI R&Kozuka Mincho Pr6N R\\
+\bf mincho medium&Kozuka Mincho Pro R&Kozuka Mincho ProVI R&Kozuka Mincho Pr6N R\\
 \bf mincho bold&Kozuka Mincho Pro B&Kozuka Mincho ProVI B&Kozuka Mincho Pr6N B\\
 \midrule
-\bf gothic regular\\
-  single weight
+\bf gothic medium\\
+  without \texttt{deluxe}
 &Kozuka Gothic Pro M&Kozuka Gothic ProVI M&Kozuka Gothic Pr6N M\\
   multiple weights
 &Kozuka Gothic Pro R&Kozuka Gothic ProVI R&Kozuka Gothic Pr6N R\\
@@ -1570,7 +1588,7 @@ specified as round gothic.
 &Kozuka Gothic Pro B&Kozuka Gothic ProVI B&Kozuka Gothic Pr6N B\\
 \bf gothic heavy
 &Kozuka Gothic Pro H&Kozuka Gothic ProVI H&Kozuka Gothic Pr6N H\\
-(round gothic)
+(rounded gothic)
 &Kozuka Gothic Pro H&Kozuka Gothic ProVI H&Kozuka Gothic Pr6N H\\
 %</en>
 %<*ja>
@@ -1611,17 +1629,17 @@ Settings for Hiragino fonts:
 &\tt hiragino&\tt hiraginon\\
 \midrule
 %<*en>
-\bf mincho regular&
+\bf mincho medium&
 Hiragino Mincho Pro W3&Hiragino Mincho Pr6N W3\\
 \bf mincho bold&
 Hiragino Mincho Pro W6&Hiragino Mincho Pr6N W6\\
-\bf gothic regular&
+\bf gothic medium&
 Hiragino Kaku Gothic Pro W3&Hiragino Kaku Gothic ProN W3\\
 \bf gothic bold&
 Hiragino Kaku Gothic Pro W6&Hiragino Kaku Gothic ProN W6\\
 \bf gothic heavy&
 Hiragino Kaku Gothic Std W8&Hiragino Kaku Gothic StdN W8\\
-\bf round gothic&
+\bf rounded gothic&
 Hiragino Maru Gothic Pro W4&Hiragino Maru Gothic ProN W4\\
 %</en>
 %<*ja>
@@ -1653,17 +1671,17 @@ Settings for Morisawa fonts:
 &\tt morisawa4&\tt morisawa6n\\
 \midrule
 %<*en>
-\bf mincho regular&
+\bf mincho medium&
 Ryumin Pro L-KL&Ryumin Pr6N L-KL\\
 \bf mincho bold&
 Futo Min A101 Pro Bold&Futo Min A101 Pr6N Bold\\
-\bf gothic regular&
+\bf gothic medium&
 Chu Gothic BBB Pro Med&Chu Gothic BBB Pr6N Med\\
 \bf gothic bold&
 Futo Go B101 Pro Bold&Futo Go B101 Pr6N Bold\\
 \bf gothic heavy&
 Midashi Go Pro MB31&Midashi Go Pr6N MB31\\
-\bf round gothic&
+\bf rounded gothic&
 Jun Pro 101&Jun Pr6N 101\\
 %</en>
 %<*ja>
@@ -1687,9 +1705,10 @@ Jun Pro 101&Jun Pr6N 101\\
 %<en>\paragraph{Settings for single weight}
 %<ja>\paragraph{単ウェイト用設定}
 %<*en>
-Next, we describe settings for single weight.
-These four settings use a same font for regular and bold fonts,
-and gothic font is also used for round gothic font.
+Next, we describe settings for using only single weight.
+In four settings below, we use same fonts for medium and bold (and heavy) weights.
+(Hence \verb+\mcfamily\bfseries+ and \verb+\mcfamily\mdseries+ yields same Japanese fonts, 
+if \texttt{deluxe} option is also specified).
 %</en>
 %<*ja>
 次に，単ウェイト用の設定を述べる．この4設定では「細字」「太字」の区別はない．
@@ -1716,10 +1735,10 @@ and gothic font is also used for round gothic font.
 \end{tabular}
 \end{center}
 
-%<en>\paragraph{Use HG fonts}
+%<en>\paragraph{Using HG fonts}
 %<ja>\paragraph{HGフォントの利用}
 %<*en>
-In addition to the above, HG fonts bundled with Microsoft Office are also available.
+We can use HG~fonts bundled with Microsoft Office for realizing multiple weights in Japanese fonts.
 %</en>
 %<*ja>
 すぐ前に書いた単ウェイト用設定を，Microsoft Office等に付属するHGフォントを使って
@@ -1731,23 +1750,23 @@ In addition to the above, HG fonts bundled with Microsoft Office are also availa
 &\tt ipa-dx&\tt ipaex-dx&\tt ms-dx\\
 \midrule
 %<*en>
-\bf mincho regular
+\bf mincho medium
 &IPAMincho&IPAexMincho&MS Mincho\\\midrule
 \bf mincho bold&
 \multicolumn{3}{c}{HG Mincho E}\\\midrule
-\bf Gothic regular\\
-  single weight
+\bf Gothic medium\\
+~~without \texttt{deluxe}
 &IPAGothic&IPAexGothic&MS Gothic\\
-  {\tt jis2004}
+~~with {\tt jis2004}
 &IPAGothic&IPAexGothic&MS Gothic\\
 \cmidrule(lr){1-4}
-　otherwise&
+~~otherwise&
 \multicolumn{3}{c}{HG Gothic M}\\\midrule
 \bf gothic bold&
 \multicolumn{3}{c}{HG Gothic E}\\\midrule
 \bf gothic heavy&
 \multicolumn{3}{c}{HG Soei Kaku Gothic UB}\\\midrule
-\bf round gothic&
+\bf rounded gothic&
 \multicolumn{3}{c}{HG Maru Gothic PRO}\\
 %</en>
 %<*ja>
@@ -1774,14 +1793,13 @@ In addition to the above, HG fonts bundled with Microsoft Office are also availa
 \end{tabular}
 \end{center}
 %<*en>
-Note that HG Mincho E, HG Gothic E, HG Soei Kaku Gothic UB and HG Maru Gothic PRO
-are internally specified by
+Note that HG~Mincho~E, HG~Gothic~E, HG Soei Kaku Gothic UB and HG Maru Gothic PRO
+are internally specified by:
 \begin{description}
-\item[default] font name (\texttt{HGMinchoE}, etc.),
-\item[{\tt 90jis}] file name (\texttt{hgrme.ttc}, \texttt{hgrge.ttc}, \texttt{hgrsgu.ttc}, \texttt{hgrsmp.ttf}),
-\item[{\tt jis2004}] file name (\texttt{hgrme04.ttc}, \texttt{hgrge04.ttc}, \texttt{hgrsgu04.ttc}, \texttt{hgrsmp04.ttf}),
+\item[default] by font name (\texttt{HGMinchoE}, etc.).
+\item[{\tt 90jis}] by filename (\texttt{hgrme.ttc}, \texttt{hgrge.ttc}, \texttt{hgrsgu.ttc}, \texttt{hgrsmp.ttf}).
+\item[{\tt jis2004}] by filename (\texttt{hgrme04.ttc}, \texttt{hgrge04.ttc}, \texttt{hgrsgu04.ttc}, \texttt{hgrsmp04.ttf}).
 \end{description}
-respectively.
 %</en>
 %<*ja>
 なお，HG明朝E・HGゴシックE・HG創英角ゴシックUB・HG丸ゴシック体PROの4つについては，内部で
@@ -1839,12 +1857,14 @@ If you want to use these functions, load \Pkg{luatexja-otf} package.
 \item[\texttt{expert}] 仮名が横組・縦組専用のものに切り替わり，ルビ用仮名も扱えるようになる．
 \item[\texttt{bold}] ゴシック体を標準で太いウェイトのものに設定する．
 \end{description}
-これらは，\Pkg{otf}パッケージが文書中で使用する
-和文用TFMを自前の物に置き換えていることで可能になっている．
+しかしこれらのオプションは\Pkg{luatexja-otf}パッケージには存在しない．
+\Pkg{otf}パッケージが文書中で使用する和文用TFMを自前の物に置き換えていたのに対し，
+\Pkg{luatexja-otf}パッケージでは，そのようなことは行わないからである．
 
-一方，\Pkg{luatexja-otf}パッケージでは，文書中で使用する和文用JFMを置き換えることはしない．
-そのため，上に述べた3つのオプションと同等のことを実現するには，\ref{ssub-chgfnt}節 (NFSS2) や
-\ref{ssec-fontspec}節 (\Pkg{fontspec}) によって\textbf{事前に}設定しておかなければならない．
+これら3オプションについては，
+\Pkg{luatexja-preset} パッケージにプリセットを使う時に一緒に指定するか，
+あるいは対応する内容を\ref{ssub-chgfnt}節 (NFSS2) や
+\ref{ssec-fontspec}節 (\Pkg{fontspec}) の方法で手動で指定する必要がある．
 %</ja>
 
 %<en>\section{Changing Parameters}
