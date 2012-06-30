@@ -28,7 +28,6 @@ local set_attr = node.set_attribute
 local node_insert_before = node.insert_before
 local node_insert_after = node.insert_after
 local round = tex.round
-local table_insert = table.insert
 local uniq_id = 0 -- unique id 
 
 local id_glyph = node.id('glyph')
@@ -127,7 +126,7 @@ end
 -- 「異なる JFM」の間の調整方法
 diffmet_rule = math.two_average
 function math.two_add(a,b) return a+b end
-function math.two_average(a,b) return (a+b)/2 end
+function math.two_average(a,b) return (a+b)*0.5 end
 
 -------------------- idea
 -- 2 node の間に glue/kern/penalty を挿入する．
@@ -261,8 +260,7 @@ luatexbase.create_callback("luatexja.jfmglue.whatsit_after", "data",
 
 -- calc next Np
 local function set_attr_icflag_processed(p)
-   local a = has_attr(p, attr_icflag) or 0
-   if a<= ITALIC then 
+   if (has_attr(p, attr_icflag) or 0)<= ITALIC then 
       set_attr(p, attr_uniqid, uniq_id) 
       set_attr(p, attr_icflag, PROCESSED) 
    end
@@ -285,8 +283,9 @@ local function calc_np_pbox()
       Np.nuc = lp; set_attr(lp, attr_uniqid, uniq_id) 
       lp = node_next(lp); lpa = has_attr(lp, attr_icflag) or 0
    end
-   check_next_ickern()
+   return check_next_ickern()
 end
+
 
 local calc_np_auxtable = {
    [id_glyph] = function() 
@@ -407,13 +406,12 @@ local calc_np_auxtable = {
 
 local function calc_np()
    -- We assume lp = node_next(Np.last)
-   local lpi, lpa, Nr
-   Nr = Nq; for k in pairs(Nr) do Nr[k] = nil end
-   Nq = Np; Np = Nr
+   local Nr = Nq
+   for k in pairs(Nr) do Nr[k] = nil end; Nq = Np; Np = Nr
    for k in pairs(Bp) do Bp[k] = nil end
    ihb_flag = false 
    while lp ~= last do
-      lpa = has_attr(lp, attr_icflag) or 0
+      local lpa = has_attr(lp, attr_icflag) or 0
       if lpa>=PACKED then
          if lpa == BOXBDD then
             local lq = node_next(lp)
@@ -424,6 +422,9 @@ local function calc_np()
    end
    Np = nil; return
 end
+
+
+
 
 -- extract informations from Np
 -- We think that "Np is a Japanese character" if Np.met~=nil,
@@ -446,11 +447,7 @@ function set_np_xspc_jachar(Nx, x)
    Nx.post = ltjs_get_penalty_table('post', c, 0, box_stack_level)
    z = fast_find_char_class('lineend', m)
    local y = m.size_cache[Nx.size].char_type[Nx.class]
-   if y.kern and y.kern[z] then 
-      Nx.lend = y.kern[z]
-   else 
-      Nx.lend = 0 
-   end
+   Nx.lend = y.kern[z] or 0
    y = ltjs_get_penalty_table('xsp', c, 3, box_stack_level)
    Nx.xspc_before = (y%2==1)
    Nx.xspc_after  = (y>=2)
@@ -464,11 +461,11 @@ local ligature_tail = 2
 function set_np_xspc_alchar(Nx, c,x, lig)
    if c~=-1 then
       if lig == ligature_head then
-	 while x.components and x.subtype and math.floor(x.subtype/2)%2==1 do
+	 while x.components and x.subtype and math.floor(x.subtype*0.5)%2==1 do
 	    x = x.components; c = x.char
 	 end
       else
-	 while x.components and x.subtype and math.floor(x.subtype/2)%2==1 do
+	 while x.components and x.subtype and math.floor(x.subtype*0.5)%2==1 do
 	    x = node_tail(x.components); c = x.char
 	 end
       end
@@ -487,13 +484,13 @@ end
 
 -- Np の情報取得メインルーチン
 local function extract_np()
-   local x = Np.nuc;
-   if Np.id ==  id_jglyph then set_np_xspc_jachar(Np, x)
-   elseif Np.id == id_glyph then set_np_xspc_alchar(Np, x.char, x, ligature_head)
-   elseif Np.id == id_hlist then Np.last_char = check_box_high(Np, x.head, nil)
-   elseif Np.id == id_pbox then Np.last_char = check_box_high(Np, Np.first, node.next(Np.last))
-   elseif Np.id == id_disc then Np.last_char = check_box_high(Np, x.replace, nil)
-   elseif Np.id == id_math then set_np_xspc_alchar(Np, -1, x)
+   local x, i = Np.nuc, Np.id;
+   if i ==  id_jglyph then return set_np_xspc_jachar(Np, x)
+   elseif i == id_glyph then return set_np_xspc_alchar(Np, x.char, x, ligature_head)
+   elseif i == id_hlist then Np.last_char = check_box_high(Np, x.head, nil)
+   elseif i == id_pbox then Np.last_char = check_box_high(Np, Np.first, node.next(Np.last))
+   elseif i == id_disc then Np.last_char = check_box_high(Np, x.replace, nil)
+   elseif i == id_math then return set_np_xspc_alchar(Np, -1, x)
    end
 end
 
@@ -513,7 +510,7 @@ end
 
 local function after_alchar(Nx)
    local x = Nx.nuc
-   set_np_xspc_alchar(Nx, x.char,x, ligature_tail)
+   return set_np_xspc_alchar(Nx, x.char,x, ligature_tail)
 end
 
 
@@ -545,7 +542,7 @@ local function handle_penalty_normal(post, pre, g)
 	 if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
 	 p.penalty = a
 	 head = node_insert_before(head, Np.first, p)
-     table_insert(Bp, p); 
+	 Bp[#Bp+1]=p; 
      set_attr(p, attr_icflag, KINSOKU)
      set_attr(p, attr_uniqid, uniq_id) 
       end
@@ -561,7 +558,7 @@ local function handle_penalty_always(post, pre, g)
 	 if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
 	 p.penalty = a
 	 head = node_insert_before(head, Np.first, p)
-	 table_insert(Bp, p)
+	 Bp[#Bp+1]=p
      set_attr(p, attr_icflag, KINSOKU)
      set_attr(p, attr_uniqid, uniq_id) 
       end
@@ -575,7 +572,7 @@ local function handle_penalty_suppress(post, pre, g)
       if g and g.id==id_glue then
 	 local p = node_new(id_penalty)
 	 p.penalty = 10000; head = node_insert_before(head, Np.first, p)
-	 table_insert(Bp, p); 
+	 Bp[#Bp+1]=p
      set_attr(p, attr_icflag, KINSOKU)
      set_attr(p, attr_uniqid, uniq_id) 
       end
@@ -588,20 +585,18 @@ local function new_jfm_glue(Nn, bc, ac)
 -- bc, ac: char classes
    local g = nil
    local z = Nn.met.size_cache[Nn.size].char_type[bc]
-   if z.glue and z.glue[ac] then
+   if z.glue[ac] then
       local h = node_new(id_glue_spec)
       h.width   = z.glue[ac][1]
       h.stretch = z.glue[ac][2]
       h.shrink  = z.glue[ac][3]
       h.stretch_order=0; h.shrink_order=0
-      g = node_new(id_glue)
-      g.subtype = 0; g.spec = h
-   elseif z.kern and z.kern[ac] then
+      g = node_new(id_glue); g.subtype = 0; g.spec = h
+      set_attr(g, attr_icflag, FROM_JFM); set_attr(g, attr_uniqid, uniq_id)
+   elseif z.kern[ac] then
       g = node_new(id_kern)
       g.subtype = 1; g.kern = z.kern[ac]
-   end
-   if g then 
-      set_attr(g, attr_icflag, FROM_JFM); set_attr(g, attr_uniqid, uniq_id) 
+      set_attr(g, attr_icflag, FROM_JFM); set_attr(g, attr_uniqid, uniq_id)
    end
    return g
 end
@@ -626,6 +621,7 @@ end
 -- get kanjiskip
 local function get_kanji_skip_from_jfm(Nn)
    local i = Nn.met.size_cache[Nn.size].kanjiskip
+   print(Nn.met.size_cache[Nn.size])
    if i then
       return { i[1], i[2], i[3] }
    else return nil
@@ -638,11 +634,13 @@ local function get_kanjiskip()
 	 local gx = node_new(id_glue_spec);
 	 gx.stretch_order = 0; gx.shrink_order = 0
 	 local bk = get_kanji_skip_from_jfm(Nq)
+	 if bk then    print('bk: ', bk[1], bk[2], bk[3]) else print('bk: nil') end
 	 local ak
 	 if (Np.met==Nq.met) and (Nq.size==Np.size) and (Nq.var==Np.var) then
 	    ak = nil
 	 else
 	    ak = get_kanji_skip_from_jfm(Np)
+	    if ak then print('ak: ', ak[1], ak[2], ak[3]) else print('ak: nil') end
 	 end
 	 if bk then
 	    if ak then
@@ -721,7 +719,7 @@ end
 local function get_xkanji_skip_from_jfm(Nn)
    local i = Nn.met.size_cache[Nn.size].xkanjiskip
    if i then
-      return { i[1], i[2], i[3] }
+      return i and { i[1], i[2], i[3] }
    else return nil
    end
 end
@@ -751,14 +749,14 @@ end
 
 local function get_OA_skip()
    if not ihb_flag then
-      local c = Nq.char or 'jcharbdd'
+      local c = (Np.id == id_math and -1) or 'jcharbdd'
       return new_jfm_glue(Np, fast_find_char_class(c,Np.met), Np.class)
    else return nil
    end
 end
 local function get_OB_skip()
    if not ihb_flag then
-      local c = Np.char or 'jcharbdd'
+      local c = (Np.id == id_math and -1) or'jcharbdd'
       return new_jfm_glue(Nq, Nq.class, fast_find_char_class(c,Nq.met))
    else return nil
    end
@@ -768,8 +766,7 @@ end
 local function handle_np_jachar()
    local g
    if Nq.id==id_jglyph or ((Nq.id==id_pbox or Nq.id==id_pbox_w) and Nq.met) then 
-      g = calc_ja_ja_glue() or get_kanjiskip() -- M->K
-      g = lineend_fix(g)
+      g = lineend_fix(calc_ja_ja_glue() or get_kanjiskip()) -- M->K
       handle_penalty_normal(Nq.post, Np.pre, g); real_insert(Nq.lend, g)
    elseif Nq.met then  -- Nq.id==id_hlist
       g = get_OA_skip() or get_kanjiskip() -- O_A->K
@@ -798,11 +795,10 @@ local function handle_nq_jachar()
    local g
    if Np.pre then 
       if Np.id==id_hlist then Np.pre = 0 end
-      g = get_OB_skip() or get_xkanjiskip(Nq) -- O_B->X
-      g = lineend_fix(g)
+      g = lineend_fix(get_OB_skip() or get_xkanjiskip(Nq)) -- O_B->X
       handle_penalty_normal(Nq.post, Np.pre, g); real_insert(Nq.lend, g)
    else
-      g = get_OB_skip(); g = lineend_fix(g) -- O_B
+      g = lineend_fix(get_OB_skip()) -- O_B
       if Np.id==id_glue then handle_penalty_normal(Nq.post, 0, g)
       elseif Np.id==id_kern then handle_penalty_suppress(Nq.post, 0, g)
       else handle_penalty_always(Nq.post, 0, g)
@@ -811,12 +807,12 @@ local function handle_nq_jachar()
    end
 end
 
--- (anything) .. (和文文字で終わる hlist)
+-- (anything) .. (和文文字で始まる hlist)
 local function handle_np_ja_hlist()
    local g
+   print('handle_np_ja_hlist', Nq.id)
    if Nq.id==id_jglyph or ((Nq.id==id_pbox or Nq.id == id_pbox_w) and Nq.met) then 
-      g = get_OB_skip() or get_kanjiskip() -- O_B->K
-      g = lineend_fix(g)
+      g = lineend_fix(get_OB_skip() or get_kanjiskip()) -- O_B->K
       handle_penalty_normal(Nq.post, 0, g); real_insert(Nq.lend, g)
    elseif Nq.met then  -- Nq.id==id_hlist
       g = get_kanjiskip() -- K

@@ -13,7 +13,15 @@ local err, warn, info, log = luatexbase.errwarinf(_NAME)
 luatexja.load_module('base');      local ltjb = luatexja.base
 
 local floor = math.floor
+local pow = math.pow
 local has_attr = node.has_attribute
+local kcat_attr_table = {}
+local pow_table = {}
+for i = 0, 216 do
+   kcat_attr_table[i] = luatexbase.attributes['ltj@kcat'..floor(i/31)]
+   pow_table[i] =  pow(2, i%31)
+end
+pow_table[217] = pow(2, 31)
 
 -- jcr_table_main[chr_code] = index
 -- index : internal 0, 1, 2, ..., 216               0: 'other'
@@ -61,20 +69,18 @@ function char_to_range(c) -- return the (external) range number
 end
 
 function get_range_setting(i) -- i: internal range number
-   return floor(tex.getattribute(
-			luatexbase.attributes['ltj@kcat'..floor(i/31)])
-		     /math.pow(2, i%31))%2
+   return floor(tex.getattribute(kcat_attr_table[i])/pow_table[i])%2
 end
 
 --  glyph_node p は和文文字か？
 function is_ucs_in_japanese_char(p)
    local c = p.char
-   if c<0x80 then return false 
+   if c<0x80 then 
+      return false 
    else 
       local i=jcr_table_main[c] 
       return (floor(
-		 has_attr(p, luatexbase.attributes['ltj@kcat'..floor(i/31)])
-		 /math.pow(2, i%31))%2 ~= jcr_noncjk) 
+		 has_attr(p, kcat_attr_table[i])/pow_table[i])%2 ~= jcr_noncjk) 
    end
 end
 
@@ -89,10 +95,9 @@ function toggle_char_range(g, i) -- i: external range number
       local kc
       if i>0 then kc=0 else kc=1; i=-i end
       if i>216 then i=0 end
-      local attr = luatexbase.attributes['ltj@kcat'..floor(i/31)]
+      local attr = kcat_attr_table[i]
       local a = tex.getattribute(attr)
-      local k = math.pow(2, i%31)
-      tex.setattribute(g,attr,(floor(a/k/2)*2+kc)*k+a%k)
+      tex.setattribute(g,attr,(floor(a/pow_table[i+1])*2+kc)*pow_table[i]+a%pow_table[i])
    end
 end
 

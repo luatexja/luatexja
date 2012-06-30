@@ -120,7 +120,7 @@ local function print_glue(d,order)
    return out
 end
 
-local function print_spec(p)
+function print_spec(p)
    local out=print_scaled(p.width)..'pt'
    if p.stretch~=0 then
       out=out..' plus '..print_glue(p.stretch,p.stretch_order)
@@ -131,8 +131,6 @@ local function print_spec(p)
 return out
 end
 
-function math.two_add(a,b) return a+b end
-function math.two_average(a,b) return (a+b)/2 end
 
 ---- table: charprop_stack_table [stack_level].{pre|post|xsp}[chr_code]
 
@@ -249,7 +247,7 @@ local function debug_show_node_X(p,print_fn)
    local s
    local pt=node_type(p.id)
    local base = debug_depth .. string.format('%X', has_attr(p,attr_icflag) or 0)
-       .. ' ' .. tostring(p)
+   .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
    if pt == 'glyph' then
       s = base .. ' ' .. utf.char(p.char) .. ' ' .. tostring(p.font)
          .. ' (' .. print_scaled(p.height) .. '+' 

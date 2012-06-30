@@ -224,16 +224,16 @@
 \noindent{\gt\bf [x]kanjiskipの挿入}
 
 \head{kanjiskip from JFM, autospacing (JA--JA)}
-\setbox0=\hbox{あ\rmlh あ}\dumplist0
+\setbox0=\hbox{\rmlh ああ}\dumplist0
 
 {\ltjsetparameter{kanjiskip=\maxdimen}
-\setbox0=\hbox{あ\rmlh あ}\dumplist0
+\setbox0=\hbox{\rmlh ああ}\dumplist0
 \jfont\rmlk={psft:Ryumin-Light:jfm=test} at 12pt
 \setbox0=\hbox{\rmlk は\rmlh あ}\dumplist0}
 
 \def\naspc{\ltjsetparameter{autospacing=false}\relax}
 \def\naxspc{\ltjsetparameter{autoxspacing=false}\relax}
-\setbox0=\hbox{あ\naspc ああ}\dumplist0
+\setbox0=\hbox{\rmlh あ\naspc ああ}\dumplist0
 
 \head{kanjiskip from JFM/autoxspacing (JA--EN)}
 \setbox0=\hbox{\rmlh まx}\dumplist0

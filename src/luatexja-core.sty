@@ -142,6 +142,17 @@
 \newluatexattribute\ltj@autoxspc  % attribute for autoxspacing
 \newluatexattribute\ltj@icflag    % attribute for italic correction
 
+%%%%%%%% Attributes for character ranges
+\newcount\ltj@tempcnta
+\ltj@tempcnta=0
+\loop\ifnum\ltj@tempcnta<7
+  \expandafter\newluatexattribute%
+    \csname ltj@kcat\the\ltj@tempcnta\endcsname
+  \csname ltj@kcat\the\ltj@tempcnta\endcsname=0
+  \advance\ltj@tempcnta by1
+\repeat
+
+
 %%%%%%%% Loading luatexja.lua
 %% Quark tokens needed in ltj-base
 \protected\def\ltj@@q@escape{\ltj@@q@escape@}
@@ -172,15 +183,6 @@
   \input ltj-base.sty %
 \fi                             %</LaTeX>
 
-
-%%%%%%%% Attributes for character ranges
-\ltj@tempcnta=0
-\loop\ifnum\ltj@tempcnta<7
-  \expandafter\newluatexattribute%
-    \csname ltj@kcat\the\ltj@tempcnta\endcsname
-  \csname ltj@kcat\the\ltj@tempcnta\endcsname=0
-  \advance\ltj@tempcnta by1
-\repeat
 
 %%%%%%%% \asluastring
 \def\asluastring#1{'\luaescapestring{\detokenize{#1}}'}

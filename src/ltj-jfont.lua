@@ -89,10 +89,10 @@ function define_jfm(t)
 	    end
 	    v.chars = nil
 	 end
-	 if v.kern and v.glue then
-	    for j,w in pairs(v.glue) do
-	       if v.kern[j] then defjfm_res= nil; return end
-	    end
+	 if not v.kern then v.kern = {} end
+	 if not v.glue then v.glue = {} end
+	 for j in pairs(v.glue) do
+	    if v.kern[j] then defjfm_res= nil; return end
 	 end
 	 t.char_type[i] = v
 	 t[i] = nil
@@ -123,7 +123,7 @@ local function update_jfm_cache(j,sz)
    if metrics[j].size_cache[sz] then return end
    metrics[j].size_cache[sz] = {}
    metrics[j].size_cache[sz].char_type = mult_table(metrics[j].char_type, sz)
-   metrics[j].size_cache[sz].kanjijskip = mult_table(metrics[j].kanjiskip, sz)
+   metrics[j].size_cache[sz].kanjiskip = mult_table(metrics[j].kanjiskip, sz)
    metrics[j].size_cache[sz].xkanjiskip = mult_table(metrics[j].xkanjiskip,sz)
    metrics[j].size_cache[sz].zw = round(metrics[j].zw*sz)
    metrics[j].size_cache[sz].zh = round(metrics[j].zh*sz)

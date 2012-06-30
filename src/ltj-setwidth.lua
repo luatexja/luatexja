@@ -78,9 +78,9 @@ function capsule_glyph(p, dir, mode, met, class)
 	 if char_data.align=='right' then
 	    h.kern = total; p.next = nil; h.next = p
 	 elseif char_data.align=='middle' then
-	    h.kern = round(total/2); p.next = h
+	    h.kern = round(total*0.5); p.next = h
 	    h = node_new(id_kern); h.subtype = 0
-	    h.kern = total - round(total/2); h.next = p
+	    h.kern = total - round(total*0.5); h.next = p
 	 else -- left
 	    h.kern = total; p.next = h; h = p
 	 end
