@@ -151,9 +151,9 @@ function luatexja.ext_get_parameter_unary(k)
    elseif k == 'jcharwidowpenalty' then
       tex.write(ltjs.get_penalty_table('jwp', 0, 0, tex.getcount('ltj@@stack')))
    elseif k == 'autospacing' then
-      tex.write(tex.getattribute('ltj@autospc'))
+      tex.write(math.floor(tex.getattribute('ltj@autospc')/2))
    elseif k == 'autoxspacing' then
-      tex.write(tex.getattribute('ltj@autoxspc'))
+      tex.write(tex.getattribute('ltj@autospc')%2)
    elseif k == 'differentjfm' then
       if luatexja.jfmglue.diffmet_rule == math.max then
 	 tex.write('large')
@@ -249,7 +249,7 @@ local function debug_show_node_X(p,print_fn)
    local base = debug_depth .. string.format('%X', has_attr(p,attr_icflag) or 0)
    .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
    if pt == 'glyph' then
-      s = base .. ' ' .. utf.char(p.char) .. ' ' .. tostring(p.font)
+      s = base .. ' ' .. utf.char(p.char) .. ' (' .. p.char .. ') ' .. tostring(p.font)
          .. ' (' .. print_scaled(p.height) .. '+' 
          .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
       print_fn(s)

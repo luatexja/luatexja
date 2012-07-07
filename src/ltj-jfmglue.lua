@@ -74,7 +74,6 @@ local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_autospc = luatexbase.attributes['ltj@autospc']
-local attr_autoxspc = luatexbase.attributes['ltj@autoxspc']
 local attr_uniqid = luatexbase.attributes['ltj@uniqid']
 local max_dimen = 1073741823
 
@@ -434,8 +433,9 @@ end
 -- 和文文字のデータを取得
 function set_np_xspc_jachar(Nx, x)
    local z = ltjf_font_metric_table[x.font]
-   local c = x.char
-   local cls = ltjf_find_char_class(c, z)
+   local c = has_attr(x, attr_jchar_class) or 0
+   local cls = ltjf_find_char_class(x.char, z) or 0
+   if cls==0 then cls = ltjf_find_char_class(-c, z) end
    local m = ltjf_metrics[z.jfm]
    set_attr(x, attr_jchar_class, cls)
    Nx.class = cls
@@ -451,8 +451,9 @@ function set_np_xspc_jachar(Nx, x)
    y = ltjs_get_penalty_table('xsp', c, 3, box_stack_level)
    Nx.xspc_before = (y%2==1)
    Nx.xspc_after  = (y>=2)
-   Nx.auto_kspc = (has_attr(x, attr_autospc)==1)
-   Nx.auto_xspc = (has_attr(x, attr_autoxspc)==1)
+   y = has_attr(x, attr_autospc) or 0
+   Nx.auto_kspc = (y>=2)
+   Nx.auto_xspc = (y%2==1)
 end
 
 -- 欧文文字のデータを取得
@@ -479,7 +480,7 @@ function set_np_xspc_alchar(Nx, c,x, lig)
    local y = ltjs_get_penalty_table('xsp', c, 3, box_stack_level)
    Nx.xspc_before = (y%2==1)
    Nx.xspc_after  = (y>=2)
-   Nx.auto_xspc = (has_attr(x, attr_autoxspc)==1)
+   Nx.auto_xspc = (has_attr(x, attr_autospc)%2==1)
 end
 
 -- Np の情報取得メインルーチン

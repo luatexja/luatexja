@@ -35,6 +35,9 @@ local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjc_is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char
+local attr_jchar_class = luatexbase.attributes['ltj@charclass']
+local ltjf_find_char_class = ltjf.find_char_class
+
 ------------------------------------------------------------------------
 -- MAIN PROCESS STEP 1: replace fonts
 ------------------------------------------------------------------------
@@ -47,6 +50,7 @@ local function suppress_hyphenate_ja(head)
       if p.id == id_glyph and non_math then
 	 if (has_attr(p, attr_icflag) or 0)==0 and ltjc_is_ucs_in_japanese_char(p) then
 	    p.font = has_attr(p, attr_curjfnt) or p.font
+	    set_attr(p, attr_jchar_class, p.char)
 	    set_attr(p, attr_yablshift, has_attr(p, attr_ykblshift) or 0)
 	    p.subtype = floor(p.subtype/2)*2
 	 end

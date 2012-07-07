@@ -56,6 +56,8 @@ function define_jfm(t)
 		  real_char = true;
 	       elseif type(w) == 'string' and utf.len(w)==1 then
 		  real_char = true; w = utf.byte(w)
+	       elseif type(w) == 'string' and utf.len(w)==2 and utf.sub(w,2) == '*' then
+		  real_char = true; w = -utf.byte(utf.sub(w,1,1))
 	       end
 	       if not t.chars[w] then
 		  t.chars[w] = i
