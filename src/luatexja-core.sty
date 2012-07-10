@@ -371,9 +371,11 @@
   \fi\next
 }
 
-\protected\def\ltjsetparameter#1{%
+\protected\def\ltj@setpar@global{%
   \ifnum\globaldefs>0\directlua{luatexja.isglobal='global'}\else\directlua{luatexja.isglobal=''}\fi
-  \setkeys[ltj]{japaram}{#1}\ignorespaces}
+}
+\protected\def\ltjsetparameter#1{%
+  \ltj@setpar@global\setkeys[ltj]{japaram}{#1}\ignorespaces}
 \protected\def\ltjglobalsetparameter#1{%
   \ifnum\globaldefs<0\directlua{luatexja.isglobal=''}\else\directlua{luatexja.isglobal='global'}\fi
   \setkeys[ltj]{japaram}{#1}\ignorespaces}

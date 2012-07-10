@@ -621,10 +621,12 @@
   \pickup@jfont\let\scriptfont@name\font@name
   \xdef\font@name{\csname \string#2/\ssf@size\endcsname}%
   \pickup@jfont
-  \edef\math@fonts{\math@fonts\ltjsetparameter{%
-    jatextfont={#1,\textfont@name},%
-    jascriptfont={#1,\scriptfont@name},%
-    jascriptscriptfont={#1,\font@name}}}%
+  \ltj@temptoks{\ltj@@set@stackfont}
+  \edef\math@fonts{\math@fonts\ltj@setpar@global%
+    \the\ltj@temptoks#1,\textfont@name:{mjtext}%
+    \the\ltj@temptoks#1,\scriptfont@name:{mjscr}%
+    \the\ltj@temptoks#1,\font@name:{mjss}%
+  }%
 }
 
 \def\getanddefine@fonts#1#2{%
