@@ -2603,16 +2603,11 @@ One can use also numbers to specify these two parameters (see Subsection~\ref{ss
 If you want to enable/disable all insertions of \Param{kanjiskip} and
 \Param{xkanjiskip}, set \Param{autospacing} and \Param{autoxspacing}
 parameters to \texttt{true}/\texttt{false}, respectively.
-Note that if you sets one of the parameters 
-\Param{autospacing}~and~\Param{autoxspacing},
-the other parameter also will be set globally.
 %</en>
 %<*ja>
 もし全ての\Param{kanjiskip}と\Param{xkanjiskip}の挿入を有効化／無効化
 したければ，それぞれ\Param{autospacing}と\Param{autoxspacing}を
 \texttt{true}/\texttt{false}に設定すればよい．
-なお，\Param{autospacing}と\Param{autoxspacing}の片方をグローバルに設定した場合，
-他方のパラメタもグローバルに設定されることになる．
 %</ja>
 %<*zh>
 如果你想要启用/屏蔽所有的\Param{kanjiskip}和\Param{xkanjiskip}插入，设定
@@ -4659,10 +4654,18 @@ The amount of shifting the baseline of Japanese fonts in scaled point ($2^{-16}\
 
 \attr{ltj@autospc}
 %<*en>
-Whether the auto insertion of \Param{kanjiskip} and \Param{xkanjiskip} is allowed at the node.
+Whether the auto insertion of \Param{kanjiskip} is allowed at the node.
 %</en>
 %<*ja>
-そのノードで\Param{kanjiskip}や\Param{xkanjiskip}の自動挿入が許されるかどうか．
+そのノードで\Param{kanjiskip}の自動挿入が許されるかどうか．
+%</ja>
+
+\attr{ltj@autoxspc}
+%<*en>
+Whether the auto insertion of \Param{xkanjiskip} is allowed at the node.
+%</en>
+%<*ja>
+そのノードで\Param{xkanjiskip}の自動挿入が許されるかどうか．
 %</ja>
 
 \attr{ltj@icflag}

@@ -151,9 +151,9 @@ function luatexja.ext_get_parameter_unary(k)
    elseif k == 'jcharwidowpenalty' then
       tex.write(ltjs.get_penalty_table('jwp', 0, 0, tex.getcount('ltj@@stack')))
    elseif k == 'autospacing' then
-      tex.write(math.floor(tex.getattribute('ltj@autospc')/2))
+      tex.write(tex.getattribute('ltj@autospc'))
    elseif k == 'autoxspacing' then
-      tex.write(tex.getattribute('ltj@autospc')%2)
+      tex.write(tex.getattribute('ltj@autoxspc'))
    elseif k == 'differentjfm' then
       if luatexja.jfmglue.diffmet_rule == math.max then
 	 tex.write('large')
@@ -212,7 +212,7 @@ end
 
 -- EXT: print \global if necessary
 function luatexja.ext_print_global()
-  if isglobal=='global' then tex.sprint(cat_lp, '\\global') end
+   if luatexja.isglobal=='global' then tex.sprint(cat_lp, '\\global') end
 end
 
 -- main process

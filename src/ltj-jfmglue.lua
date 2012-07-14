@@ -65,6 +65,7 @@ local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_autospc = luatexbase.attributes['ltj@autospc']
+local attr_autoxspc = luatexbase.attributes['ltj@autoxspc']
 local attr_uniqid = luatexbase.attributes['ltj@uniqid']
 local max_dimen = 1073741823
 
@@ -446,9 +447,8 @@ function set_np_xspc_jachar(Nx, x)
    y = ltjs.get_penalty_table('xsp', c, 3, box_stack_level)
    Nx.xspc_before = (y%2==1)
    Nx.xspc_after  = (y>=2)
-   y = has_attr(x, attr_autospc) or 0
-   Nx.auto_kspc = (y>=2)
-   Nx.auto_xspc = (y%2==1)
+   Nx.auto_kspc = (has_attr(x, attr_autospc)==1)
+   Nx.auto_xspc = (has_attr(x, attr_autoxspc)==1)
 end
 
 -- 欧文文字のデータを取得
@@ -475,7 +475,7 @@ function set_np_xspc_alchar(Nx, c,x, lig)
    local y = ltjs.get_penalty_table('xsp', c, 3, box_stack_level)
    Nx.xspc_before = (y%2==1)
    Nx.xspc_after  = (y>=2)
-   Nx.auto_xspc = (has_attr(x, attr_autospc)%2==1)
+   Nx.auto_xspc = (has_attr(x, attr_autoxspc)==1)
 end
 
 -- Np の情報取得メインルーチン

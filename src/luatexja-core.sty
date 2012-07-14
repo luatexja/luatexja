@@ -139,7 +139,7 @@
 \newluatexattribute\ltj@yablshift % attribute for \yabaselineshift
 \newluatexattribute\ltj@ykblshift % attribute for \ykbaselineshift
 \newluatexattribute\ltj@autospc   % attribute for autospacing
-\ltj@autospc=0
+\newluatexattribute\ltj@autoxspc  % attribute for autoxspacing
 \newluatexattribute\ltj@icflag    % attribute for italic correction
 
 %%%%%%%% Attributes for character ranges
@@ -316,24 +316,19 @@
     \ltj@safe@num@or{nil}{\ltj@temp},0,3)}}
 
 % autospacing = <bool> (default: true)
-%% \numexpr 3/2\relax yields 2, so we use \numexpr (2*3-1)/4\relax to get [3/2].
 \define@boolkey[ltj]{japaram}{autospacing}[true]{%
   \ifltj@japaram@autospacing
-    \directlua{luatexja.ext_print_global()}\ltj@autospc%
-      =\numexpr\ltj@autospc-((2*\the\ltj@autospc-1)/4)*2+2\relax
+    \directlua{luatexja.ext_print_global()}\ltj@autospc=1
   \else
-    \directlua{luatexja.ext_print_global()}\ltj@autospc%
-      =\numexpr\ltj@autospc-((2*\the\ltj@autospc-1)/4)*2\relax
+    \directlua{luatexja.ext_print_global()}\ltj@autospc=0
   \fi}
 
 % autoxspacing = <bool> (default: true)
 \define@boolkey[ltj]{japaram}{autoxspacing}[true]{%
   \ifltj@japaram@autoxspacing
-    \directlua{luatexja.ext_print_global()}\ltj@autospc%
-      =\numexpr((2*\the\ltj@autospc-1)/4)*2+1\relax
+    \directlua{luatexja.ext_print_global()}\ltj@autoxspc=1
   \else
-    \directlua{luatexja.ext_print_global()}\ltj@autospc%
-      =\numexpr((2*\the\ltj@autospc-1)/4)*2\relax
+    \directlua{luatexja.ext_print_global()}\ltj@autoxspc=0
   \fi}
 
 % [x]]kanjiskip = <dimen>
