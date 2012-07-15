@@ -5,6 +5,7 @@ luatexja.jfont.define_jfm {
    xkanjiskip = { 0.31, 0.045, 0.057 },
 
    [0] = {
+      chars = { '漢', 'ヒ*' }, 
       align = 'left', left = 0.0, down = 0.0,
       width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
    },
@@ -64,6 +65,11 @@ luatexja.jfont.define_jfm {
       align = 'left', left = 0.0, down = 0.0,
       width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
       glue = { [199] = { 0.78, 0, 0} },
+   },
+   [2000] = {
+      chars = { '。', '、*', 'ﾋ' },
+      align = 'left', left = 0.0, down = 0.0,
+      width = 0.5, height = 0.88, depth = 0.12, italic=0.0,
    },
    [100] = {
       chars = { '「' },

@@ -62,6 +62,7 @@ local kanji_skip
 local xkanji_skip
 
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
+local attr_orig_char = luatexbase.attributes['ltj@origchar']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_autospc = luatexbase.attributes['ltj@autospc']
@@ -75,12 +76,7 @@ local par_indented -- is the paragraph indented?
 -------------------- Helper functions
 
 local function copy_attr(new, old) 
-  local a = old.attr
-  if a then a = a.next end
-  while a do
-     set_attr(new, a.number, a.value)
-     a = node.next(a)
-  end
+  -- 仕様が決まるまで off にしておく
 end
 
 -- This function is called only for acquiring `special' characters.
@@ -429,9 +425,9 @@ end
 -- 和文文字のデータを取得
 function set_np_xspc_jachar(Nx, x)
    local z = ltjf.font_metric_table[x.font]
-   local c = has_attr(x, attr_jchar_class) or 0
+   local c = has_attr(x, attr_orig_char) or 0
    local cls = ltjf.find_char_class(x.char, z) or 0
-   if cls==0 then cls = ltjf.find_char_class(-c, z) end
+   if cls==0 and c ~= x.char then cls = ltjf.find_char_class(-c, z) end
    local m = ltjf.metrics[z.jfm]
    set_attr(x, attr_jchar_class, cls)
    Nx.class = cls
@@ -619,7 +615,6 @@ end
 -- get kanjiskip
 local function get_kanji_skip_from_jfm(Nn)
    local i = Nn.met.size_cache[Nn.size].kanjiskip
-   print(Nn.met.size_cache[Nn.size])
    if i then
       return { i[1], i[2], i[3] }
    else return nil

@@ -66,7 +66,7 @@ function capsule_glyph(p, dir, mode, met, class)
    fshift = luatexbase.call_callback("luatexja.set_width", fshift, met, class)
 --   local ti = 
    p.xoffset= p.xoffset - fshift.left
-   if mode or p.width ~= fwidth or p.height ~= fheight or p.depth ~= fdepth then
+   if (mode or p.width ~= fwidth or p.height ~= fheight or p.depth ~= fdepth) then
       local y_shift = - p.yoffset + (has_attr(p,attr_yablshift) or 0)
       p.yoffset = -fshift.down
       head, q = node.remove(head, p)

@@ -249,7 +249,7 @@ local function debug_show_node_X(p,print_fn)
    local base = debug_depth .. string.format('%X', has_attr(p,attr_icflag) or 0)
    .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
    if pt == 'glyph' then
-      s = base .. ' ' .. utf.char(p.char) .. ' (' .. p.char .. ') ' .. tostring(p.font)
+      s = base .. ' ' .. utf.char(p.char) .. ' '  .. tostring(p.font)
          .. ' (' .. print_scaled(p.height) .. '+' 
          .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
       print_fn(s)

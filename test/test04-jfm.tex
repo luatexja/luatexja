@@ -1,6 +1,6 @@
-%#!luatex
+%#!luatex test04-jfm ; pdftotext test04-jfm.pdf /tmp/new
 \input luatexja-core.sty
-
+\pdfcompresslevel=0
 \def\head#1{\medskip\penalty-100\noindent{\bf\tengt ■ #1}\par\penalty10000 }
 \jfont\rml={psft:Ryumin-Light:jfm=ujis} at 10pt
 \rml あ\inhibitglue\char"201Cあ・い←Ryumin-Light
@@ -74,7 +74,7 @@
 あいうえおさしすせそ}\par
 
 
-\vfill\eject
+\vfill\eject\tracingonline=0
 \noindent{\bf\gt  以下はJFMグルー挿入検証}
 \jfont\rmlh={psft:Ryumin-Light:jfm=test} at 10pt
 \jfont\sixgt={psft:GothicBBB-Medium:jfm=ujis} at 6pt
