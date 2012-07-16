@@ -62,10 +62,7 @@ function char_to_range(c) -- return the (external) range number
 			     'So I changed this one to zero.'})
 	 c=0
    elseif c<0x80 then return -1
-   else 
-      local i = jcr_table_main[c] or 0
-      if i==0 then return 217 else return i end
-   end
+   else return  jcr_table_main[c] or 0 end
 end
 
 function get_range_setting(i) -- i: internal range number
