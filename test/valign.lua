@@ -30,7 +30,7 @@ local function print_scaled(s)
 end
 local function set_valign(fmtable, fn)
    local fi = fonts.ids[fn]
-   local mt = ltjf.metrics[fmtable.jfm].char_type[0]
+   local mt = fmtable.size_cache.char_type[0]
    local ma = mt.height / (mt.height + mt.depth) * (fi.ascender + fi.descender)
    fmtable.down_offset = round(fi.ascender - ma)
    print('loading :', fn, print_scaled(fmtable.down_offset)

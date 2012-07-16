@@ -3707,13 +3707,11 @@ this argument has \texttt{chars} field which contains character codes
 %<*en>
 An example of this callback is the \texttt{ltjarticle} class, with
 	     forcefully assigning character class~0 to \texttt{'parbdd'}
-	     in the JFM \texttt{jfm-min.lua}. This callback doesn't
-	     replace any code of \LuaTeX-ja.
+	     in the JFM \texttt{jfm-min.lua}. 
 %</en>
 %<*ja>
 このコールバックの使用例は\texttt{ltjarticle}クラスにあり，
 \texttt{jfm-min.lua}中の\texttt{'parbdd'}を強制的にクラス0に割り当てている．
-このコールバックは\LuaTeX-jaのコードを書き換えない．
 %</ja>
 
 %<en>\item[\texttt{luatexja.define\_font} callback]
@@ -3740,18 +3738,26 @@ end
 You may assume that \verb+jfont_info+ has the following fields:
 %</en>
 %<*ja>
-\verb+jfont_info+ は以下のフィールドを持つ：
+\verb+jfont_info+ は以下の2フィールドを持つ：
 %</ja>
 \begin{description}
-\item[\tt jfm]
-%<en>The index number of JFM.
-%<ja>JFMのインデックス番号．
-%<zh>JFM索引编号。
-
-\item[\tt size]
-%<en>Font size in a scaled point (${}=2^{-16}\,\textrm{pt}$).
-%<ja>スケールド・ポイント(${}=2^{-16}\,\textrm{pt}$)を単位としたフォントのサイズ．
-%<zh>以参照点(${}=2^{-16}\,\textrm{pt}$)为点位的字体大小。
+\item[\tt size\_cache]
+%<*ja>
+使用されているJFMの情報が格納されているテーブルで，
+\textbf{このテーブルを書き換えてはならない}．
+中身はほぼJFMファイルに書かれている唯一のテーブルであるが，次のように若干変わっている：
+\begin{itemize}
+\item 各文字クラス$i$に属する文字達のテーブル
+\texttt{[$i$].chars=\{<character>, ...\}}は，トップレベルにまとめられ，
+\texttt{chars=\{[<character>]=$i$, ...\}}という形になっている．
+\item \texttt{zw},~\texttt{zh}, \texttt{kanjiskip},~\texttt{xkanjiskip} の各フィールドの値は，
+実際に使われるフォントサイズに合わせたsp ($1\,\mathrm{sp}=2^{-6}\,\mathrm{pt}$)単位の長さに変わっている．
+\item 各文字クラス$i$の情報を格納したテーブルも，\texttt{char\_type} フィールドの下にまとめられている．
+例えば，文字クラス1に属する文字の高さは \texttt{char\_type[1].height} で参照できる．
+\item \texttt{dir} フィールドはこのテーブルにはない．
+\end{itemize}
+%</ja>
+%<!ja> ...
 
 \item[\tt var]
 %<en>The value specified in \texttt{jfmvar=...} at a call of \verb+\jfont+.
@@ -3760,11 +3766,12 @@ You may assume that \verb+jfont_info+ has the following fields:
 \end{description}
 
 %<*en>
-The returned table \verb+new_jfont_info+ also should include these three fields.
+The returned table \verb+new_jfont_info+ also should include these two fields.
 The \verb+font_number+ is a font number.
 %</en>
 %<*ja>
-戻り値の \verb+new_jfont_info+ テーブルもこれら3つのフィールドを含まなければならない．
+戻り値の \verb+new_jfont_info+ テーブルもこれら2つのフィールドを含まなければならないが，
+それ以外にユーザが勝手にフィールドを付け加えることは自由である．
 \verb+font_number+ はフォント番号である．
 %</ja>
 
@@ -3778,7 +3785,6 @@ A good example of this and the next callbacks is the \Pkg{luatexja-otf}
 これと次のコールバックの良い使用例は\Pkg{luatexja-otf}パッケージであり，
 JFM中でAdobe-Japan1 CIDの文字を \verb+"AJ1-xxx"+ の形で指定するために
 用いられている．
-このコールバックは\LuaTeX-jaのコードを書き換えない．
 %</ja>
 
 %<en>\item[\texttt{luatexja.find\_char\_class} callback]
@@ -3819,16 +3825,6 @@ The argument \verb+char_class+ is the result of \LuaTeX-ja's default
 \verb+char_class+ の値と同じであるべきで，そうでないときは\LuaTeX-jaの
 デフォルトルーチンを書き換えることになる．
 %</ja>
-
-%<*en>
-This callback doesn't replace any code of \LuaTeX-ja.
-%</en>
-%<*ja>
-このコールバックは\LuaTeX-jaのコードを書き換えない．
-%</ja>
-%<*zh>
-此回调不会替换\LuaTeX-ja中任何代码。
-%</zh>
 
 %<en>\item[\texttt{luatexja.set\_width} callback]
 %<ja>\item[\texttt{luatexja.set\_width}コールバック]

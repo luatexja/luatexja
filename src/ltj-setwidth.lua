@@ -39,6 +39,8 @@ local attr_uniqid = luatexbase.attributes['ltj@uniqid']
 local ltjf_font_metric_table = ltjf.font_metric_table
 
 local PACKED = 2
+local PROCESSED = 8
+local IC_PROCESSED = 9
 
 char_data = {}
 head = nil
@@ -64,8 +66,7 @@ function capsule_glyph(p, dir, mode, met, class)
    local fdepth = char_data.depth
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = luatexbase.call_callback("luatexja.set_width", fshift, met, class)
---   local ti = 
-   p.xoffset= p.xoffset - fshift.left
+   p.xoffset = p.xoffset - fshift.left
    if (mode or p.width ~= fwidth or p.height ~= fheight or p.depth ~= fdepth) then
       local y_shift = - p.yoffset + (has_attr(p,attr_yablshift) or 0)
       p.yoffset = -fshift.down
@@ -107,17 +108,20 @@ function set_ja_width(ahead, dir)
    local p = ahead; head  = ahead
    local m = false -- is in math mode?
    while p do
-      if p.id==id_glyph then
+      if (p.id==id_glyph) and (has_attr(p, attr_icflag, PROCESSED) or 0)<=0  then
 	 if is_japanese_glyph_node(p) then
 	    local met = ltjf_font_metric_table[p.font]
 	    local class = has_attr(p, attr_jchar_class)
-	    char_data = ltjf.metrics[met.jfm].size_cache[met.size].char_type[class]
+	    char_data = met.size_cache.char_type[class]
+	    set_attr(p, attr_icflag, PROCESSED)
             if char_data then
                p = capsule_glyph(p, dir, false, met, class)
             else
                p = node_next(p)
             end
-	 else 
+	       
+	 else
+	    set_attr(p, attr_icflag, PROCESSED) 
 	    p.yoffset = p.yoffset - (has_attr(p,attr_yablshift) or 0); p = node_next(p)
 	 end
       elseif p.id==id_math then
@@ -135,6 +139,6 @@ function set_ja_width(ahead, dir)
       end
    end
    -- adjust attr_icflag
-   tex.attribute[attr_icflag] = -(0x7FFFFFFF)
+   tex.setattribute('global', attr_icflag, 0)
    return head
 end

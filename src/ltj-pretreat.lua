@@ -36,7 +36,6 @@ local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjc_is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char
 local attr_orig_char = luatexbase.attributes['ltj@origchar']
-local ltjf_find_char_class = ltjf.find_char_class
 
 ------------------------------------------------------------------------
 -- MAIN PROCESS STEP 1: replace fonts

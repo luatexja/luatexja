@@ -66,7 +66,8 @@ function cid(key)
 end
 
 function extract(head)
-   local p = head, v
+   local p = head
+   local v
    while p do
       if p.id==id_whatsit then
 	 if p.subtype==sid_user and p.user_id==30113 then
@@ -113,7 +114,7 @@ local function cid_to_char(fmtable, fn)
    local fi = fonts.ids[fn]
    if fi.cidinfo and fi.cidinfo.ordering == "Japan1" then
       fmtable.cid_char_type = {}
-      for i, v in pairs(ltjf.metrics[fmtable.jfm].chars) do
+      for i, v in pairs(fmtable.size_cache.chars) do
 	 local j = string.match(i, "^AJ1%-([0-9]*)")
 	 if j then
 	    j = tonumber(fi.unicodes['Japan1.'..tostring(j)])
@@ -135,7 +136,7 @@ end
 
 local function cid_set_char_class(arg, fmtable, char)
    if arg~=0 then return arg
-   elseif fmtable.cid_char_type then 
+   elseif fmtable.cid_char_type then
       return fmtable.cid_char_type[char] or 0
    else return 0
    end

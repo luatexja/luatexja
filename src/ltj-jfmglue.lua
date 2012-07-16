@@ -81,7 +81,7 @@ end
 
 -- This function is called only for acquiring `special' characters.
 local function fast_find_char_class(c,m)
-   return m.chars[c] or 0
+   return m.size_cache.chars[c] or 0
 end
 
 local spec_zero_glue = node.new(id_glue_spec)
@@ -286,7 +286,9 @@ local calc_np_auxtable = {
 		   else 
 		      Np.id = id_glyph 
 		   end
-		   Np.nuc = lp; set_attr_icflag_processed(lp)
+		   Np.nuc = lp; 
+		   set_attr(lp, attr_uniqid, uniq_id) 
+		   --set_attr_icflag_processed(lp) treated in ltj-setwidth.lua
 		   lp = node.next(lp); check_next_ickern(); return true
 		end,
    [id_hlist] = function() 
@@ -424,23 +426,20 @@ end
 
 -- 和文文字のデータを取得
 function set_np_xspc_jachar(Nx, x)
-   local z = ltjf.font_metric_table[x.font]
+   local m = ltjf.font_metric_table[x.font]
+   Nx.var  = m.var
    local c = has_attr(x, attr_orig_char) or 0
-   local cls = ltjf.find_char_class(x.char, z) or 0
-   if cls==0 and c ~= x.char then cls = ltjf.find_char_class(-c, z) end
-   local m = ltjf.metrics[z.jfm]
+   local cls = ltjf.find_char_class(x.char, m) or 0
+   if cls==0 and c ~= x.char then cls = ltjf.find_char_class(-c, m) end
    set_attr(x, attr_jchar_class, cls)
    Nx.class = cls
    Nx.char = c
-   Nx.size= z.size
    Nx.met = m
-   Nx.var = z.var
    Nx.pre = ltjs.get_penalty_table('pre', c, 0, box_stack_level)
    Nx.post = ltjs.get_penalty_table('post', c, 0, box_stack_level)
-   z = fast_find_char_class('lineend', m)
-   local y = m.size_cache[Nx.size].char_type[Nx.class]
-   Nx.lend = y.kern[z] or 0
-   y = ltjs.get_penalty_table('xsp', c, 3, box_stack_level)
+   local z = fast_find_char_class('lineend', m)
+   Nx.lend = m.size_cache.char_type[Nx.class].kern[z] or 0
+   local y = ltjs.get_penalty_table('xsp', c, 3, box_stack_level)
    Nx.xspc_before = (y%2==1)
    Nx.xspc_after  = (y>=2)
    Nx.auto_kspc = (has_attr(x, attr_autospc)==1)
@@ -577,7 +576,7 @@ end
 local function new_jfm_glue(Nn, bc, ac)
 -- bc, ac: char classes
    local g = nil
-   local z = Nn.met.size_cache[Nn.size].char_type[bc]
+   local z = Nn.met.size_cache.char_type[bc]
    if z.glue[ac] then
       local h = node.new(id_glue_spec)
       h.width   = z.glue[ac][1]
@@ -614,7 +613,7 @@ end
 
 -- get kanjiskip
 local function get_kanji_skip_from_jfm(Nn)
-   local i = Nn.met.size_cache[Nn.size].kanjiskip
+   local i = Nn.met.size_cache.kanjiskip
    if i then
       return { i[1], i[2], i[3] }
    else return nil
@@ -628,7 +627,7 @@ local function get_kanjiskip()
 	 gx.stretch_order = 0; gx.shrink_order = 0
 	 local bk = get_kanji_skip_from_jfm(Nq)
 	 local ak
-	 if (Np.met==Nq.met) and (Nq.size==Np.size) and (Nq.var==Np.var) then
+	 if (Np.met.size_cache==Nq.met.size_cache) and (Nq.var==Np.var) then
 	    ak = nil
 	 else
 	    ak = get_kanji_skip_from_jfm(Np)
@@ -693,7 +692,7 @@ end
 
 local function calc_ja_ja_glue()
    if  ihb_flag then return nil
-   elseif (Nq.size==Np.size) and (Nq.met==Np.met) and (Nq.var==Np.var) then
+   elseif (Nq.met.size_cache==Np.met.size_cache) and (Nq.var==Np.var) then
       return new_jfm_glue(Nq, Nq.class, Np.class)
    else
       return calc_ja_ja_aux(new_jfm_glue(Nq, Nq.class, fast_find_char_class('diffmet',Nq.met)),
@@ -705,7 +704,7 @@ end
 
 -- get xkanjiskip
 local function get_xkanji_skip_from_jfm(Nn)
-   local i = Nn.met.size_cache[Nn.size].xkanjiskip
+   local i = Nn.met.size_cache.xkanjiskip
    if i then
       return i and { i[1], i[2], i[3] }
    else return nil
@@ -889,12 +888,12 @@ local function init_var()
    Np = {
       auto_kspc=nil, auto_xspc=nil, char=nil, class=nil, 
       first=nil, id=nil, last=nil, lend=0, met=nil, nuc=nil, 
-      post=nil, pre=nil, var=nil, xspc_after=nil, xspc_before=nil, 
+      post=nil, pre=nil, xspc_after=nil, xspc_before=nil, 
    }
    Nq = {
       auto_kspc=nil, auto_xspc=nil, char=nil, class=nil, 
       first=nil, id=nil, last=nil, lend=0, met=nil, nuc=nil, 
-      post=nil, pre=nil, var=nil, xspc_after=nil, xspc_before=nil, 
+      post=nil, pre=nil, xspc_after=nil, xspc_before=nil, 
    }
    if mode then 
       -- the current list is to be line-breaked:
@@ -914,7 +913,7 @@ end
 
 local function cleanup()
    -- adjust attr_icflag for avoiding error
-   tex.attribute[attr_icflag] = -(0x7FFFFFFF)
+   tex.setattribute('global', attr_icflag, 0)
    node.free(kanji_skip); node.free(xkanji_skip)
    if mode then
       local h = node.next(head)
