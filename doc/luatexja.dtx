@@ -5972,6 +5972,165 @@ Victor Eijkhout,  \emph{\TeX\ by Topic, A \TeX nician's Reference}, Addison-Wesl
 
 \newpage
 \appendix
+
+%<*ja>
+\section{\LuaTeX-jaにおけるJIS~X~0208:1990非漢字のcatcode}
+
+ここでは，JIS~X~0208:1990の非漢字部分（第1区〜第8区）のうち，
+どの文字が(u)p\TeX や\LuaTeX-jaで制御綴内に使用可能かを表にしてまとめる．
+各文字は
+\begin{center}
+\tt\fboxsep=1pt\fbox{\hbox to \zw{\gt あ\hss}}\,\scriptsize LUP
+\end{center}
+のように表示しており，各文字は次の意味を持っている．
+この表の生成は\verb+\jis+命令を使って行なっている．
+\begin{itemize}
+\item{\tt L}：\XeTeX や\LuaTeX-jaにおいてこの文字が制御綴内に使用可能（catcodeは11）．
+\item{\tt U}：\upTeX においてこの文字が制御綴内に使用可能（kcatcodeは16,~17）．
+\item{\tt P}：\pTeX においてこの文字が制御綴内に使用可能（kcatcodeは16,~17）．
+\end{itemize}
+
+
+\makeatletter
+\def\uplist{%
+  \@elt {8486}\@elt {8491}\@elt {8492}\@elt {8499}\@elt {8500}\@elt {8501}%
+  \@elt {8502}\@elt {8504}\@elt {8508}\@elt {9008}\@elt {9009}\@elt {9010}%
+  \@elt {9011}\@elt {9012}\@elt {9013}\@elt {9014}\@elt {9015}\@elt {9016}%
+  \@elt {9017}\@elt {9025}\@elt {9026}\@elt {9027}\@elt {9028}\@elt {9029}%
+  \@elt {9030}\@elt {9031}\@elt {9032}\@elt {9033}\@elt {9034}\@elt {9035}%
+  \@elt {9036}\@elt {9037}\@elt {9038}\@elt {9039}\@elt {9040}\@elt {9041}%
+  \@elt {9042}\@elt {9043}\@elt {9044}\@elt {9045}\@elt {9046}\@elt {9047}%
+  \@elt {9048}\@elt {9049}\@elt {9050}\@elt {9057}\@elt {9058}\@elt {9059}%
+  \@elt {9060}\@elt {9061}\@elt {9062}\@elt {9063}\@elt {9064}\@elt {9065}%
+  \@elt {9066}\@elt {9067}\@elt {9068}\@elt {9069}\@elt {9070}\@elt {9071}%
+  \@elt {9072}\@elt {9073}\@elt {9074}\@elt {9075}\@elt {9076}\@elt {9077}%
+  \@elt {9078}\@elt {9079}\@elt {9080}\@elt {9081}\@elt {9082}\@elt {9249}%
+  \@elt {9250}\@elt {9251}\@elt {9252}\@elt {9253}\@elt {9254}\@elt {9255}%
+  \@elt {9256}\@elt {9257}\@elt {9258}\@elt {9259}\@elt {9260}\@elt {9261}%
+  \@elt {9262}\@elt {9263}\@elt {9264}\@elt {9265}\@elt {9266}\@elt {9267}%
+  \@elt {9268}\@elt {9269}\@elt {9270}\@elt {9271}\@elt {9272}\@elt {9273}%
+  \@elt {9274}\@elt {9275}\@elt {9276}\@elt {9277}\@elt {9278}\@elt {9279}%
+  \@elt {9280}\@elt {9281}\@elt {9282}\@elt {9283}\@elt {9284}\@elt {9285}%
+  \@elt {9286}\@elt {9287}\@elt {9288}\@elt {9289}\@elt {9290}\@elt {9291}%
+  \@elt {9292}\@elt {9293}\@elt {9294}\@elt {9295}\@elt {9296}\@elt {9297}%
+  \@elt {9298}\@elt {9299}\@elt {9300}\@elt {9301}\@elt {9302}\@elt {9303}%
+  \@elt {9304}\@elt {9305}\@elt {9306}\@elt {9307}\@elt {9308}\@elt {9309}%
+  \@elt {9310}\@elt {9311}\@elt {9312}\@elt {9313}\@elt {9314}\@elt {9315}%
+  \@elt {9316}\@elt {9317}\@elt {9318}\@elt {9319}\@elt {9320}\@elt {9321}%
+  \@elt {9322}\@elt {9323}\@elt {9324}\@elt {9325}\@elt {9326}\@elt {9327}%
+  \@elt {9328}\@elt {9329}\@elt {9330}\@elt {9331}\@elt {9505}\@elt {9506}%
+  \@elt {9507}\@elt {9508}\@elt {9509}\@elt {9510}\@elt {9511}\@elt {9512}%
+  \@elt {9513}\@elt {9514}\@elt {9515}\@elt {9516}\@elt {9517}\@elt {9518}%
+  \@elt {9519}\@elt {9520}\@elt {9521}\@elt {9522}\@elt {9523}\@elt {9524}%
+  \@elt {9525}\@elt {9526}\@elt {9527}\@elt {9528}\@elt {9529}\@elt {9530}%
+  \@elt {9531}\@elt {9532}\@elt {9533}\@elt {9534}\@elt {9535}\@elt {9536}%
+  \@elt {9537}\@elt {9538}\@elt {9539}\@elt {9540}\@elt {9541}\@elt {9542}%
+  \@elt {9543}\@elt {9544}\@elt {9545}\@elt {9546}\@elt {9547}\@elt {9548}%
+  \@elt {9549}\@elt {9550}\@elt {9551}\@elt {9552}\@elt {9553}\@elt {9554}%
+  \@elt {9555}\@elt {9556}\@elt {9557}\@elt {9558}\@elt {9559}\@elt {9560}%
+  \@elt {9561}\@elt {9562}\@elt {9563}\@elt {9564}\@elt {9565}\@elt {9566}%
+  \@elt {9567}\@elt {9568}\@elt {9569}\@elt {9570}\@elt {9571}\@elt {9572}%
+  \@elt {9573}\@elt {9574}\@elt {9575}\@elt {9576}\@elt {9577}\@elt {9578}%
+  \@elt {9579}\@elt {9580}\@elt {9581}\@elt {9582}\@elt {9583}\@elt {9584}%
+  \@elt {9585}\@elt {9586}\@elt {9587}\@elt {9588}\@elt {9589}\@elt {9590}%
+}
+\def\plist{%
+  \@elt {8993}\@elt {8994}\@elt {8995}\@elt {8996}\@elt {8997}\@elt {8998}%
+  \@elt {8999}\@elt {9000}\@elt {9001}\@elt {9002}\@elt {9003}\@elt {9004}%
+  \@elt {9005}\@elt {9006}\@elt {9007}\@elt {9008}\@elt {9009}\@elt {9010}%
+  \@elt {9011}\@elt {9012}\@elt {9013}\@elt {9014}\@elt {9015}\@elt {9016}%
+  \@elt {9017}\@elt {9018}\@elt {9019}\@elt {9020}\@elt {9021}\@elt {9022}%
+  \@elt {9023}\@elt {9024}\@elt {9025}\@elt {9026}\@elt {9027}\@elt {9028}%
+  \@elt {9029}\@elt {9030}\@elt {9031}\@elt {9032}\@elt {9033}\@elt {9034}%
+  \@elt {9035}\@elt {9036}\@elt {9037}\@elt {9038}\@elt {9039}\@elt {9040}%
+  \@elt {9041}\@elt {9042}\@elt {9043}\@elt {9044}\@elt {9045}\@elt {9046}%
+  \@elt {9047}\@elt {9048}\@elt {9049}\@elt {9050}\@elt {9051}\@elt {9052}%
+  \@elt {9053}\@elt {9054}\@elt {9055}\@elt {9056}\@elt {9057}\@elt {9058}%
+  \@elt {9059}\@elt {9060}\@elt {9061}\@elt {9062}\@elt {9063}\@elt {9064}%
+  \@elt {9065}\@elt {9066}\@elt {9067}\@elt {9068}\@elt {9069}\@elt {9070}%
+  \@elt {9071}\@elt {9072}\@elt {9073}\@elt {9074}\@elt {9075}\@elt {9076}%
+  \@elt {9077}\@elt {9078}\@elt {9079}\@elt {9080}\@elt {9081}\@elt {9082}%
+  \@elt {9083}\@elt {9084}\@elt {9085}\@elt {9086}\@elt {9249}\@elt {9250}%
+  \@elt {9251}\@elt {9252}\@elt {9253}\@elt {9254}\@elt {9255}\@elt {9256}%
+  \@elt {9257}\@elt {9258}\@elt {9259}\@elt {9260}\@elt {9261}\@elt {9262}%
+  \@elt {9263}\@elt {9264}\@elt {9265}\@elt {9266}\@elt {9267}\@elt {9268}%
+  \@elt {9269}\@elt {9270}\@elt {9271}\@elt {9272}\@elt {9273}\@elt {9274}%
+  \@elt {9275}\@elt {9276}\@elt {9277}\@elt {9278}\@elt {9279}\@elt {9280}%
+  \@elt {9281}\@elt {9282}\@elt {9283}\@elt {9284}\@elt {9285}\@elt {9286}%
+  \@elt {9287}\@elt {9288}\@elt {9289}\@elt {9290}\@elt {9291}\@elt {9292}%
+  \@elt {9293}\@elt {9294}\@elt {9295}\@elt {9296}\@elt {9297}\@elt {9298}%
+  \@elt {9299}\@elt {9300}\@elt {9301}\@elt {9302}\@elt {9303}\@elt {9304}%
+  \@elt {9305}\@elt {9306}\@elt {9307}\@elt {9308}\@elt {9309}\@elt {9310}%
+  \@elt {9311}\@elt {9312}\@elt {9313}\@elt {9314}\@elt {9315}\@elt {9316}%
+  \@elt {9317}\@elt {9318}\@elt {9319}\@elt {9320}\@elt {9321}\@elt {9322}%
+  \@elt {9323}\@elt {9324}\@elt {9325}\@elt {9326}\@elt {9327}\@elt {9328}%
+  \@elt {9329}\@elt {9330}\@elt {9331}\@elt {9332}\@elt {9333}\@elt {9334}%
+  \@elt {9335}\@elt {9336}\@elt {9337}\@elt {9338}\@elt {9339}\@elt {9340}%
+  \@elt {9341}\@elt {9342}\@elt {9505}\@elt {9506}\@elt {9507}\@elt {9508}%
+  \@elt {9509}\@elt {9510}\@elt {9511}\@elt {9512}\@elt {9513}\@elt {9514}%
+  \@elt {9515}\@elt {9516}\@elt {9517}\@elt {9518}\@elt {9519}\@elt {9520}%
+  \@elt {9521}\@elt {9522}\@elt {9523}\@elt {9524}\@elt {9525}\@elt {9526}%
+  \@elt {9527}\@elt {9528}\@elt {9529}\@elt {9530}\@elt {9531}\@elt {9532}%
+  \@elt {9533}\@elt {9534}\@elt {9535}\@elt {9536}\@elt {9537}\@elt {9538}%
+  \@elt {9539}\@elt {9540}\@elt {9541}\@elt {9542}\@elt {9543}\@elt {9544}%
+  \@elt {9545}\@elt {9546}\@elt {9547}\@elt {9548}\@elt {9549}\@elt {9550}%
+  \@elt {9551}\@elt {9552}\@elt {9553}\@elt {9554}\@elt {9555}\@elt {9556}%
+  \@elt {9557}\@elt {9558}\@elt {9559}\@elt {9560}\@elt {9561}\@elt {9562}%
+  \@elt {9563}\@elt {9564}\@elt {9565}\@elt {9566}\@elt {9567}\@elt {9568}%
+  \@elt {9569}\@elt {9570}\@elt {9571}\@elt {9572}\@elt {9573}\@elt {9574}%
+  \@elt {9575}\@elt {9576}\@elt {9577}\@elt {9578}\@elt {9579}\@elt {9580}%
+  \@elt {9581}\@elt {9582}\@elt {9583}\@elt {9584}\@elt {9585}\@elt {9586}%
+  \@elt {9587}\@elt {9588}\@elt {9589}\@elt {9590}\@elt {9591}\@elt {9592}%
+  \@elt {9593}\@elt {9594}\@elt {9595}\@elt {9596}\@elt {9597}\@elt {9598}%
+  \@elt {9761}\@elt {9762}\@elt {9763}\@elt {9764}\@elt {9765}\@elt {9766}%
+  \@elt {9767}\@elt {9768}\@elt {9769}\@elt {9770}\@elt {9771}\@elt {9772}%
+  \@elt {9773}\@elt {9774}\@elt {9775}\@elt {9776}\@elt {9777}\@elt {9778}%
+  \@elt {9779}\@elt {9780}\@elt {9781}\@elt {9782}\@elt {9783}\@elt {9784}%
+  \@elt {9785}\@elt {9786}\@elt {9787}\@elt {9788}\@elt {9789}\@elt {9790}%
+  \@elt {9791}\@elt {9792}\@elt {9793}\@elt {9794}\@elt {9795}\@elt {9796}%
+  \@elt {9797}\@elt {9798}\@elt {9799}\@elt {9800}\@elt {9801}\@elt {9802}%
+  \@elt {9803}\@elt {9804}\@elt {9805}\@elt {9806}\@elt {9807}\@elt {9808}%
+  \@elt {9809}\@elt {9810}\@elt {9811}\@elt {9812}\@elt {9813}\@elt {9814}%
+  \@elt {9815}\@elt {9816}\@elt {9817}\@elt {9818}\@elt {9819}\@elt {9820}%
+  \@elt {9821}\@elt {9822}\@elt {9823}\@elt {9824}\@elt {9825}\@elt {9826}%
+  \@elt {9827}\@elt {9828}\@elt {9829}\@elt {9830}\@elt {9831}\@elt {9832}%
+  \@elt {9833}\@elt {9834}\@elt {9835}\@elt {9836}\@elt {9837}\@elt {9838}%
+  \@elt {9839}\@elt {9840}\@elt {9841}\@elt {9842}\@elt {9843}\@elt {9844}%
+  \@elt {9845}\@elt {9846}\@elt {9847}\@elt {9848}\@elt {9849}\@elt {9850}%
+  \@elt {9851}\@elt {9852}\@elt {9853}\@elt {9854}%
+}
+\newcount\cntA
+\newcount\cntB
+\newcount\flag
+\def\chk@in@#1#2{{\global\flag=0 %
+  \def\@elt##1{\ifnum#2=##1 \global\flag=1\fi }%
+  #1}}
+
+\def\outi{%
+\cntB=\jis\cntA{}\ifnum\cntB=0 \else
+  \fbox{\hbox to 1\zw{\gt\hss 　\char\cntB 　\hss}}\,\scriptsize%
+  \ifnum\catcode\cntB=11 L\else~\fi%
+  \chk@in@{\uplist}{\cntA}\ifnum\flag=1 U\else~\fi%
+  \chk@in@{\plist}{\cntA}\ifnum\flag=1 P\else~\fi%
+\fi\global\advance\cntA1 }
+
+\def\out#1#2{%
+\midrule\global\cntA=\numexpr 8192+#1*256+#2*16\relax
+"#2{}x&\ifnum#2=2\global\advance\cntA1\else\outi\fi&\outi&\outi&\outi&\outi&\outi&\outi&\outi%"
+&\outi&\outi&\outi&\outi&\outi&\outi&\outi&\ifnum#2=7\global\advance\cntA1\else\outi\fi\\
+}
+
+\def\test#1{{%
+\subsection*{第#1区}\tt\small\fboxsep=1pt\centering\tabcolsep=0.25\zw
+\begin{tabular}{ccccccccccccccccc}\toprule&"0&"1&"2&"3&"4&"5&"6&"7&"8&"9&"A&"B&"C&"D&"E&"F\\
+\out{#1}{2}\out{#1}{3}\out{#1}{4}\out{#1}{5}\out{#1}{6}\out{#1}{7}\bottomrule
+\end{tabular}\par}\medskip}
+
+\test{1}\test{2}\test{3}\test{4}\test{5}\test{6}\test{7}\test{8}
+
+%</ja>
+
+
 \section{Package versions used in this document}
 This document was typeset using the following packages:
 
