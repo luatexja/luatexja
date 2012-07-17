@@ -108,12 +108,9 @@ function (p, sty)
 	    local r = node_new(id_glyph); r.next = nil
 	    r.char = p.char; r.font = f; r.subtype = 256
 	    set_attr(r, attr_yablshift, 0)
-	    local met = ltjf_font_metric_table[f]
-	    local class = ltjf_find_char_class(p.char, met)
-	    set_attr(r, attr_jchar_class, class)
 	    set_attr(r, attr_icflag, PROCESSED)
-	    ltjw.char_data = met.size_cache.char_type[class]
-	    ltjw.head = r; ltjw.capsule_glyph(r, tex.mathdir , true, met, class);
+	    local met = ltjf_font_metric_table[f]
+	    ltjw.head = r; ltjw.capsule_glyph(r, tex.mathdir , true, met, ltjf_find_char_class(p.char, met));
 	    q.head = ltjw.head; node_free(p); p=q;
 	 end
       end

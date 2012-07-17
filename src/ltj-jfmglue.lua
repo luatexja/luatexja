@@ -192,12 +192,10 @@ local function check_box(box_ptr, box_end)
       end
       if pid==id_hlist then
 	 if has_attr(p, attr_icflag)==PACKED then
-	    for q in node.traverse_id(id_glyph, p.head) do
-	       if find_first_char then
-	 	  first_char = q; find_first_char = false
-	       end
-	       last_char = q; found_visible_node = true; break
+	    if find_first_char then
+	       first_char = p.head; find_first_char = false
 	    end
+	    last_char = p.head; found_visible_node = true
 	 else
 	    if p.shift==0 then
 	       if check_box(p.head, nil) then found_visible_node = true end
@@ -427,23 +425,17 @@ end
 -- 和文文字のデータを取得
 function set_np_xspc_jachar(Nx, x)
    local m = ltjf.font_metric_table[x.font]
-   Nx.var  = m.var
    local c = has_attr(x, attr_orig_char) or 0
    local cls = ltjf.find_char_class(x.char, m) or 0
    if cls==0 and c ~= x.char then cls = ltjf.find_char_class(-c, m) end
-   set_attr(x, attr_jchar_class, cls)
-   Nx.class = cls
-   Nx.char = c
-   Nx.met = m
+   Nx.class = cls; set_attr(x, attr_jchar_class, cls)
+   Nx.lend = m.size_cache.char_type[cls].kern[fast_find_char_class('lineend', m)] or 0
+   Nx.met, Nx.var, Nx.char = m, m.var, c
    Nx.pre = ltjs.get_penalty_table('pre', c, 0, box_stack_level)
    Nx.post = ltjs.get_penalty_table('post', c, 0, box_stack_level)
-   local z = fast_find_char_class('lineend', m)
-   Nx.lend = m.size_cache.char_type[Nx.class].kern[z] or 0
    local y = ltjs.get_penalty_table('xsp', c, 3, box_stack_level)
-   Nx.xspc_before = (y%2==1)
-   Nx.xspc_after  = (y>=2)
-   Nx.auto_kspc = (has_attr(x, attr_autospc)==1)
-   Nx.auto_xspc = (has_attr(x, attr_autoxspc)==1)
+   Nx.xspc_before, Nx.xspc_after = (y%2==1), (y>=2)
+   Nx.auto_kspc, Nx.auto_xspc = (has_attr(x, attr_autospc)==1), (has_attr(x, attr_autoxspc)==1)
 end
 
 -- 欧文文字のデータを取得

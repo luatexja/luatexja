@@ -74,8 +74,6 @@ function extract(head)
 	    local g = node_new(id_glyph)
 	    g.subtype = 0; g.char = p.value
 	    v = has_attr(p, attr_curjfnt); g.font = v
-	    set_attr(g, attr_jchar_class,
-		     ltjf_find_char_class(g.char, ltjf_font_metric_table[v]))
 	    set_attr(g, attr_curjfnt, v)
 	    v = has_attr(p, attr_yablshift)
 	    if v then 

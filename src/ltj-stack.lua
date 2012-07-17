@@ -153,17 +153,14 @@ function set_stack_skip(g,m,sp)
   end
 end
 
--- mode: nil iff it is called in callbacks
 function get_skip_table(m, idx)
-   local i = charprop_stack_table[idx][m]
-   return i or { width = 0, stretch = 0, shrink = 0,
-		 stretch_order = 0, shrink_order = 0 }
+   return charprop_stack_table[idx][m] 
+      or { width = 0, stretch = 0, shrink = 0, stretch_order = 0, shrink_order = 0 }
 end
 
 function get_penalty_table(m,c,d, idx)
    local i = charprop_stack_table[idx][m]
-   if i then i=i[c] end
-   return i or d
+   return (i and i[c]) or d
 end
 
 -- EOF
