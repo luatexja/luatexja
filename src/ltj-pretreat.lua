@@ -3,8 +3,8 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.pretreat',
-  date = '2011/06/27',
-  version = '0.1',
+  date = '2012/07/19',
+  version = '0.2',
   description = '',
 })
 module('luatexja.pretreat', package.seeall)
@@ -22,6 +22,7 @@ local node_type = node.type
 local node_remove = node.remove
 local node_next = node.next
 local node_free = node.free
+local tex_getcount = tex.getcount
 
 local id_glyph = node.id('glyph')
 local id_math = node.id('math')
@@ -30,8 +31,6 @@ local sid_user = node.subtype('user_defined')
 
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
-local attr_yablshift = luatexbase.attributes['ltj@yablshift']
-local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjc_is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char
@@ -44,14 +43,13 @@ box_stack_level = 0
 -- This is used in jfmglue.lua.
 
 local function suppress_hyphenate_ja(head)
-   local non_math = true
+   local non_math, p = true, nil
    for p in node_traverse(head) do
       if p.id == id_glyph and non_math then
 	 if (has_attr(p, attr_icflag) or 0)<=0 and ltjc_is_ucs_in_japanese_char(p) then
 	    p.font = has_attr(p, attr_curjfnt) or p.font
+	    p.subtype = floor(p.subtype*0.5)*2
 	    set_attr(p, attr_orig_char, p.char)
-	    set_attr(p, attr_yablshift, has_attr(p, attr_ykblshift) or 0)
-	    p.subtype = floor(p.subtype/2)*2
 	 end
       elseif p.id == id_math then 
 	 non_math = (p.subtype ~= 0)
@@ -73,7 +71,7 @@ function set_box_stack_level(head, mode)
 	 head, p = node_remove(head, g); node_free(g); break
       end
    end
-   box_stack_level = tex.getcount('ltj@@stack') + (box_set and 1 or 0)
+   box_stack_level = tex_getcount('ltj@@stack') + (box_set and 1 or 0)
    return head
 end
 

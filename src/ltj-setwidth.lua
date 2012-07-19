@@ -3,8 +3,8 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.setwidth',
-  date = '2011/06/28',
-  version = '0.1',
+  date = '2012/07/19',
+  version = '0.2',
   description = '',
 })
 module('luatexja.setwidth', package.seeall)
@@ -33,6 +33,7 @@ local id_math = node.id('math')
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_yablshift = luatexbase.attributes['ltj@yablshift']
+local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_uniqid = luatexbase.attributes['ltj@uniqid']
 
@@ -59,6 +60,7 @@ local fshift =  { down = 0, left = 0}
 function capsule_glyph(p, dir, mode, met, class)
    local char_data = met.size_cache.char_type[class]
    if not char_data then return node_next(p) end
+   local fwidth
    if char_data.width ~= 'prop' then
       fwidth = char_data.width
    else fwidth = p.width end
@@ -66,7 +68,7 @@ function capsule_glyph(p, dir, mode, met, class)
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = luatexbase.call_callback("luatexja.set_width", fshift, met, class)
    if (mode or p.width ~= fwidth or p.height ~= fheight or p.depth ~= fdepth) then
-      local y_shift, total = - p.yoffset + (has_attr(p,attr_yablshift) or 0), fwidth - p.width
+      local y_shift, total = - p.yoffset + (has_attr(p,attr_ykblshift) or 0), fwidth - p.width
       local q; head, q = node.remove(head, p)
       p.yoffset, p.next = -fshift.down, nil
       if total ~= 0 and char_data.align~='left' then
