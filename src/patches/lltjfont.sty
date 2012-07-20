@@ -621,7 +621,7 @@
   \pickup@jfont\let\scriptfont@name\font@name
   \xdef\font@name{\csname \string#2/\ssf@size\endcsname}%
   \pickup@jfont
-  \ltj@temptoks{\ltj@@set@stackfont}
+  \ltj@temptoks{\ltj@@set@stackfont}%
   \edef\math@fonts{\math@fonts\ltj@setpar@global%
     \the\ltj@temptoks#1,\textfont@name:{mjtext}%
     \the\ltj@temptoks#1,\scriptfont@name:{mjscr}%
