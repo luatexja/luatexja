@@ -261,7 +261,7 @@
   \expandafter\ltj@@set@stackfont#1:{mjscr}}
 \define@key[ltj]{japaram}{jascriptscriptfont}{%
   \expandafter\ltj@@set@stackfont#1:{mjss}}
-\def\ltj@@set@stackfont#1,#2:#3{%
+\protected\def\ltj@@set@stackfont#1,#2:#3{%
   \ltj@reset@globaldefs
   \ltj@tempcnta=\ltj@curjfnt\ltj@curjfnt=-1 #2%
   \ifnum\ltj@curjfnt=-1
