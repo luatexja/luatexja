@@ -45,11 +45,6 @@ local IC_PROCESSED = 9
 
 head = nil
 
--- return true if and only if p is a Japanese character node
-local function is_japanese_glyph_node(p)
-   return p.font==has_attr(p, attr_curjfnt)
-end
-
 luatexbase.create_callback("luatexja.set_width", "data", 
 			   function (fstable, fmtable, jchar_class) 
 			      return fstable 
@@ -91,7 +86,7 @@ function capsule_glyph(p, dir, mode, met, class)
       return q
    else
       p.xoffset = p.xoffset - fshift.left
-      p.yoffset = p.yoffset - (has_attr(p, attr_yablshift) or 0) - fshift.down
+      p.yoffset = p.yoffset - (has_attr(p, attr_ykblshift) or 0) - fshift.down
       return node_next(p)
    end
 end
@@ -100,10 +95,11 @@ function set_ja_width(ahead, dir)
    local p = ahead; head  = ahead
    local m = false -- is in math mode?
    while p do
-      if (p.id==id_glyph) and (has_attr(p, attr_icflag, PROCESSED) or 0)<=0  then
-	 if is_japanese_glyph_node(p) then
+      if (p.id==id_glyph) and (has_attr(p, attr_icflag) or 0)<=0 then
+	 if p.font == has_attr(p, attr_curjfnt) then
 	    set_attr(p, attr_icflag, PROCESSED)
-	    p = capsule_glyph(p, dir, false, ltjf_font_metric_table[p.font], has_attr(p, attr_jchar_class))
+	    p = capsule_glyph(p, dir, false, ltjf_font_metric_table[p.font], 
+			      has_attr(p, attr_jchar_class))
 	 else
 	    set_attr(p, attr_icflag, PROCESSED) 
 	    p.yoffset = p.yoffset - (has_attr(p,attr_yablshift) or 0); p = node_next(p)

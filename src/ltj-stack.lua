@@ -121,7 +121,7 @@ function set_stack_font(g,m,c,p)
       charprop_stack_table[i][m] = {} 
    end
    charprop_stack_table[i][m][c] = p
-  if g=='global' then
+   if g=='global' then
      for j,v in pairs(charprop_stack_table) do 
 	if not charprop_stack_table[j][m] then charprop_stack_table[j][m] = {} end
 	charprop_stack_table[j][m][c] = p
