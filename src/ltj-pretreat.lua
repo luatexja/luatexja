@@ -47,7 +47,6 @@ local function suppress_hyphenate_ja(head)
    local non_math, p = true, head
    wt = {}
    while p do
-   --for p in node_traverse(head) do
       if p.id == id_glyph then
 	 if (has_attr(p, attr_icflag) or 0)<=0 and ltjc_is_ucs_in_japanese_char(p) then
 	    p.font = has_attr(p, attr_curjfnt) or p.font
@@ -55,7 +54,8 @@ local function suppress_hyphenate_ja(head)
 	    set_attr(p, attr_orig_char, p.char)
 	 end
       elseif p.id == id_math then 
-	 while p.id~=id_math do p = node_next(p) end
+	 p = node_next(p) -- skip math on
+	 while p and p.id~=id_math do p = node_next(p) end
       elseif p.id == id_whatsit and p.subtype==sid_user and p.user_id==30112 then
 	 wt[#wt+1] = p; head = node_remove(head, p)
       end
