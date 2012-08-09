@@ -51,14 +51,12 @@ luatexbase.create_callback("luatexja.set_width", "data",
 			   end)
 
 local fshift =  { down = 0, left = 0}
+
 -- mode: true iff p will be always encapsuled by a hbox
 function capsule_glyph(p, dir, mode, met, class)
    local char_data = met.size_cache.char_type[class]
    if not char_data then return node_next(p) end
-   local fwidth
-   if char_data.width ~= 'prop' then
-      fwidth = char_data.width
-   else fwidth = p.width end
+   local fwidth = (char_data.width ~= 'prop') and char_data.width or p.width
    local fheight, fdepth = char_data.height, char_data.depth
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = luatexbase.call_callback("luatexja.set_width", fshift, met, class)
@@ -74,15 +72,12 @@ function capsule_glyph(p, dir, mode, met, class)
       end
       local box = node_new(id_hlist); 
       box.width, box.height, box.depth = fwidth, fheight, fdepth
-      box.glue_set, box.glue_order, box.head = 0, 0, p
-      box.shift = y_shift; box.dir = dir or 'TLT'
+      box.head, box.shift, box.dir = p, y_shift, (dir or 'TLT')
+      box.glue_set, box.glue_order = 0, 0
       set_attr(box, attr_icflag, PACKED)
       set_attr(box, attr_uniqid, has_attr(p, attr_uniqid) or 0)
-      if q then
-	 head = node_insert_before(head, q, box)
-      else
-	 head = node_insert_after(head, node_tail(head), box)
-      end
+      head = q and node_insert_before(head, q, box) 
+               or node_insert_after(head, node_tail(head), box)
       return q
    else
       p.xoffset = p.xoffset - fshift.left

@@ -153,14 +153,29 @@ function set_stack_skip(g,m,sp)
   end
 end
 
+-- These three functions are used in ltj-jfmglue.lua.
+local table_current_stack
+function report_stack_level(bsl)
+   table_current_stack = charprop_stack_table[bsl]
+end
+function fast_get_skip_table(m)
+   return table_current_stack[m] 
+      or { width = 0, stretch = 0, shrink = 0, stretch_order = 0, shrink_order = 0 }
+end
+function fast_get_penalty_table(m,c,d)
+   local i = table_current_stack[m]
+   return (i and i[c]) or d
+end
+
+-- For other situations, use the following instead:
 function get_skip_table(m, idx)
    return charprop_stack_table[idx][m] 
       or { width = 0, stretch = 0, shrink = 0, stretch_order = 0, shrink_order = 0 }
 end
-
 function get_penalty_table(m,c,d, idx)
    local i = charprop_stack_table[idx][m]
    return (i and i[c]) or d
 end
+
 
 -- EOF

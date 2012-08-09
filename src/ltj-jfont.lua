@@ -14,14 +14,18 @@ luatexja.load_module('charrange'); local ltjc = luatexja.charrange
 
 local node_new = node.new
 local has_attr = node.has_attribute
+local set_attr = node.set_attribute
 local round = tex.round
 
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local id_glyph = node.id('glyph')
 local id_kern = node.id('kern')
+local id_glue_spec = node.id('glue_spec')
+local id_glue = node.id('glue')
 local cat_lp = luatexbase.catcodetables['latex-package']
 local ITALIC = 1
+local FROM_JFM = 4
 ------------------------------------------------------------------------
 -- LOADING JFM
 ------------------------------------------------------------------------
@@ -113,8 +117,8 @@ local function mult_table(old,scale) -- modified from table.fastcopy
 	     new[k] = mult_table(v,scale)
 	  elseif type(v) == "number" then
 	     new[k] = round(v*scale)
-	  else
-	     new[k] = v
+          else
+             new[k] = v
 	  end
        end
        return new
@@ -123,13 +127,24 @@ end
 
 local function update_jfm_cache(j,sz)
    if metrics[j].size_cache[sz] then return end
-   metrics[j].size_cache[sz] = {}
-   metrics[j].size_cache[sz].chars = metrics[j].chars
-   metrics[j].size_cache[sz].char_type = mult_table(metrics[j].char_type, sz)
-   metrics[j].size_cache[sz].kanjiskip = mult_table(metrics[j].kanjiskip, sz)
-   metrics[j].size_cache[sz].xkanjiskip = mult_table(metrics[j].xkanjiskip,sz)
-   metrics[j].size_cache[sz].zw = round(metrics[j].zw*sz)
-   metrics[j].size_cache[sz].zh = round(metrics[j].zh*sz)
+   local t = {}
+   metrics[j].size_cache[sz] = t
+   t.chars = metrics[j].chars
+   t.char_type = mult_table(metrics[j].char_type, sz)
+   for i,v in pairs(t.char_type) do
+      if type(i) == 'number' then -- char_type
+	 for k,w in pairs(v.glue) do
+	    local g, h = node.new(id_glue), node_new(id_glue_spec); v.glue[k] = g
+            h.width, h.stretch, h.shrink = w[1], w[2], w[3]
+            h.stretch_order, h.shrink_order = 0, 0
+            g.subtype = 0; g.spec = h; set_attr(g, attr_icflag, FROM_JFM); 
+	 end
+      end
+   end
+   t.kanjiskip = mult_table(metrics[j].kanjiskip, sz)
+   t.xkanjiskip = mult_table(metrics[j].xkanjiskip,sz)
+   t.zw = round(metrics[j].zw*sz)
+   t.zh = round(metrics[j].zh*sz)
 end
 
 luatexbase.create_callback("luatexja.find_char_class", "data", 

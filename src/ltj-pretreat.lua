@@ -39,8 +39,6 @@ local attr_orig_char = luatexbase.attributes['ltj@origchar']
 ------------------------------------------------------------------------
 -- MAIN PROCESS STEP 1: replace fonts
 ------------------------------------------------------------------------
-box_stack_level = 0
--- This is used in jfmglue.lua.
 local wt
 
 local function suppress_hyphenate_ja(head)
@@ -71,7 +69,7 @@ function set_box_stack_level(head, mode)
    for _,p  in pairs(wt) do
       if mode and p.value==cl then box_set = 1 end; node_free(p)
    end
-   box_stack_level = tex_getcount('ltj@@stack') + box_set
+   ltjs.report_stack_level(tex_getcount('ltj@@stack') + box_set)
    return head
 end
 
