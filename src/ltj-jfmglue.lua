@@ -65,6 +65,11 @@ local XKANJI_SKIP = 7
 local PROCESSED = 8
 local IC_PROCESSED = 9
 local BOXBDD = 15
+local PROCESSED_BEGIN_FLAG = 16
+
+local function get_attr_icflag(p)
+   return (has_attr(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
+end
 
 local kanji_skip
 local xkanji_skip
@@ -188,10 +193,10 @@ local function check_box(box_ptr, box_end)
 	 until p.id~=id_glyph
 	 pid = p.id -- p must be non-nil
       end
-      if pid==id_kern and has_attr(p, attr_icflag)==IC_PROCESSED then
+      if pid==id_kern and get_attr_icflag(p)==IC_PROCESSED then
 	 p = node_next(p); 
       elseif pid==id_hlist then
-	 if PACKED == has_attr(p, attr_icflag) then
+	 if PACKED == get_attr_icflag(p) then
 	    if find_first_char then
 	       first_char = p.head; find_first_char = false
 	    end
@@ -251,16 +256,16 @@ luatexbase.create_callback("luatexja.jfmglue.whatsit_after", "data",
 do
 
 local function set_attr_icflag_processed(p)
-   if (has_attr(p, attr_icflag) or 0)<= ITALIC then 
-      set_attr(p, attr_uniqid, uniq_id) 
+   if get_attr_icflag(p)<= ITALIC then 
+      --set_attr(p, attr_uniqid, uniq_id) 
       set_attr(p, attr_icflag, PROCESSED) 
    end
 end
 
 local function check_next_ickern(lp)
-   if lp.id == id_kern and ITALIC == has_attr(lp, attr_icflag) then
+   if lp.id == id_kern and ITALIC == get_attr_icflag(lp) then
       set_attr(lp, attr_icflag, IC_PROCESSED) 
-      set_attr(lp, attr_uniqid, uniq_id) 
+      --set_attr(lp, attr_uniqid, uniq_id) 
       Np.last = lp; return node_next(lp)
    else 
       Np.last = Np.nuc; return lp
@@ -271,10 +276,11 @@ local function calc_np_pbox(lp, last)
    local uid = has_attr(lp, attr_uniqid)
    Np.first = Np.first or lp; Np.id = id_pbox
    local lpa = KINSOKU -- dummy=
-   while lp~=last and lpa>=PACKED and lpa~=BOXBDD
+   set_attr(lp, attr_icflag, get_attr_icflag(lp));
+   while lp~=last and lpa>=PACKED and lpa<BOXBDD
       and uid == has_attr(lp, attr_uniqid) do
-      Np.nuc = lp; set_attr(lp, attr_uniqid, uniq_id) 
-      lp = node_next(lp); lpa = has_attr(lp, attr_icflag) or 0
+      Np.nuc = lp; --set_attr(lp, attr_uniqid, uniq_id) 
+      lp = node_next(lp); lpa = has_attr(lp, attr_icflag)
    end
    return check_next_ickern(lp)
 end
@@ -284,7 +290,7 @@ local calc_np_auxtable = {
    [id_glyph] = function (lp) 
 		   Np.first, Np.nuc = (Np.first or lp), lp;
 		   Np.id = (lp.font == has_attr(lp, attr_curjfnt)) and id_jglyph or id_glyph
-		   set_attr(lp, attr_uniqid, uniq_id) 
+		   --set_attr(lp, attr_uniqid, uniq_id) 
 		   --set_attr_icflag_processed(lp) treated in ltj-setwidth.lua
 		   return true, check_next_ickern(node_next(lp)); 
 		end,
@@ -492,7 +498,7 @@ local function lineend_fix(g)
 	 g = node_new(id_kern); --copy_attr(g, Nq.nuc); 
          g.subtype = 1; g.kern = -Nq.lend;
 	 set_attr(g, attr_icflag, LINEEND)
-	 set_attr(g, attr_uniqid, uniq_id) 
+	 --set_attr(g, attr_uniqid, uniq_id) 
       else
 	 g.spec.width = g.spec.width - Nq.lend
       end
@@ -511,7 +517,7 @@ local function handle_penalty_normal(post, pre, g)
 	 head = insert_before(head, Np.first, p)
 	 Bp[1]=p; 
 	 set_attr(p, attr_icflag, KINSOKU)
-	 set_attr(p, attr_uniqid, uniq_id) 
+	 --set_attr(p, attr_uniqid, uniq_id) 
       end
    --else for _, v in pairs(Bp) do v.penalty = v.penalty + a end
    else for _, v in pairs(Bp) do add_penalty(v,a) end
@@ -528,7 +534,7 @@ local function handle_penalty_always(post, pre, g)
 	 head = insert_before(head, Np.first, p)
 	 Bp[1]=p
      set_attr(p, attr_icflag, KINSOKU)
-     set_attr(p, attr_uniqid, uniq_id) 
+     --set_attr(p, attr_uniqid, uniq_id) 
       end
    else for _, v in pairs(Bp) do add_penalty(v,a) end
    end
@@ -542,7 +548,7 @@ local function handle_penalty_suppress(post, pre, g)
 	 p.penalty = 10000; head = insert_before(head, Np.first, p)
 	 Bp[1]=p
      set_attr(p, attr_icflag, KINSOKU)
-     set_attr(p, attr_uniqid, uniq_id) 
+     --set_attr(p, attr_uniqid, uniq_id) 
       end
    else for _, v in pairs(Bp) do add_penalty(v,a) end
    end
@@ -555,11 +561,11 @@ local function new_jfm_glue(Nn, bc, ac)
    local g = z.glue[ac]
    if g then
       g = node_copy(g); g.spec = node.copy(g.spec);
-      set_attr(g, attr_uniqid, uniq_id)
+      --set_attr(g, attr_uniqid, uniq_id)
    elseif z.kern[ac] then
       g = node_new(id_kern); --copy_attr(g, Nn.nuc)
       g.subtype = 1; g.kern = z.kern[ac]
-      set_attr(g, attr_icflag, FROM_JFM); set_attr(g, attr_uniqid, uniq_id)
+      set_attr(g, attr_icflag, FROM_JFM); --set_attr(g, attr_uniqid, uniq_id)
    end
    return g
 end
@@ -569,7 +575,7 @@ local function real_insert(w, g)
    if w~=0 then
       local h = node_new(id_kern); --copy_attr(h, Nq.nuc)
       set_attr(h, attr_icflag, LINE_END)
-      set_attr(h, attr_uniqid, uniq_id) 
+      --set_attr(h, attr_uniqid, uniq_id) 
       h.kern = w; h.subtype = 1
       head = node.insert_after(head, Nq.last, h)
    end
@@ -589,7 +595,7 @@ local function get_kanjiskip_normal()
    local g = node_new(id_glue); --copy_attr(g, Nq.nuc)
    g.spec = (Np.auto_kspc or Nq.auto_kspc) and node_copy(kanji_skip) or get_zero_spec()
    set_attr(g, attr_icflag, KANJI_SKIP)
-   set_attr(g, attr_uniqid, uniq_id) 
+   --set_attr(g, attr_uniqid, uniq_id) 
    return g
 end
 local function get_kanjiskip_jfm()
@@ -622,7 +628,7 @@ local function get_kanjiskip_jfm()
       g.spec =  get_zero_spec()
    end
    set_attr(g, attr_icflag, KANJI_SKIP)
-   set_attr(g, attr_uniqid, uniq_id) 
+   --set_attr(g, attr_uniqid, uniq_id) 
    return g
 end
 
@@ -685,7 +691,7 @@ local function get_xkanjiskip_normal(Nn)
       g.spec = get_zero_spec()
    end
    set_attr(g, attr_icflag, XKANJI_SKIP)
-   set_attr(g, attr_uniqid, uniq_id) 
+   --set_attr(g, attr_uniqid, uniq_id) 
    return g
 end
 local function get_xkanjiskip_jfm(Nn)
@@ -704,7 +710,7 @@ local function get_xkanjiskip_jfm(Nn)
       g.spec = get_zero_spec()
    end
    set_attr(g, attr_icflag, XKANJI_SKIP)
-   set_attr(g, attr_uniqid, uniq_id) 
+   --set_attr(g, attr_uniqid, uniq_id) 
    return g
 end
 
@@ -906,6 +912,8 @@ local function cleanup(mode, last)
       return head
    else
       head = node.remove(head, last); node.free(last);-- remove the sentinel
+      set_attr(head, attr_icflag, 
+               get_attr_icflag(head) + PROCESSED_BEGIN_FLAG);
       return head
    end
 end

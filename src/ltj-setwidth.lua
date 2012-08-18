@@ -22,6 +22,8 @@ local set_attr = node.set_attribute
 local node_insert_before = node.insert_before
 local node_insert_after = node.insert_after
 local round = tex.round
+local floor = math.floor
+
 
 local id_glyph = node.id('glyph')
 local id_kern = node.id('kern')
@@ -42,6 +44,7 @@ local ltjf_font_metric_table = ltjf.font_metric_table
 local PACKED = 2
 local PROCESSED = 8
 local IC_PROCESSED = 9
+local PROCESSED_BEGIN_FLAG = 16
 
 head = nil
 
@@ -74,12 +77,15 @@ function capsule_glyph(p, dir, mode, met, class)
       box.width, box.height, box.depth = fwidth, fheight, fdepth
       box.head, box.shift, box.dir = p, y_shift, (dir or 'TLT')
       box.glue_set, box.glue_order = 0, 0
-      set_attr(box, attr_icflag, PACKED)
-      set_attr(box, attr_uniqid, has_attr(p, attr_uniqid) or 0)
+      set_attr(box, attr_icflag, PACKED
+               + floor(has_attr(p, attr_icflag)/PROCESSED_BEGIN_FLAG)*PROCESSED_BEGIN_FLAG)
+      --set_attr(box, attr_uniqid, has_attr(p, attr_uniqid) or 0)
       head = q and node_insert_before(head, q, box) 
                or node_insert_after(head, node_tail(head), box)
       return q
    else
+      set_attr(p, attr_icflag, PROCESSED
+               + floor(has_attr(p, attr_icflag)/PROCESSED_BEGIN_FLAG)*PROCESSED_BEGIN_FLAG)
       p.xoffset = p.xoffset - fshift.left
       p.yoffset = p.yoffset - (has_attr(p, attr_ykblshift) or 0) - fshift.down
       return node_next(p)
@@ -90,13 +96,15 @@ function set_ja_width(ahead, dir)
    local p = ahead; head  = ahead
    local m = false -- is in math mode?
    while p do
-      if (p.id==id_glyph) and (has_attr(p, attr_icflag) or 0)<=0 then
+      if (p.id==id_glyph) 
+      and ((has_attr(p, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG)<=0 then
 	 if p.font == has_attr(p, attr_curjfnt) then
-	    set_attr(p, attr_icflag, PROCESSED)
 	    p = capsule_glyph(p, dir, false, ltjf_font_metric_table[p.font], 
 			      has_attr(p, attr_jchar_class))
 	 else
-	    set_attr(p, attr_icflag, PROCESSED) 
+	    set_attr(p, attr_icflag, PROCESSED 
+                     + floor((has_attr(p, attr_icflag) or 0)
+                          /PROCESSED_BEGIN_FLAG)*PROCESSED_BEGIN_FLAG) 
 	    p.yoffset = p.yoffset - (has_attr(p,attr_yablshift) or 0); p = node_next(p)
 	 end
       elseif p.id==id_math then

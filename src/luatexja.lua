@@ -86,6 +86,7 @@ local XKANJI_SKIP = 7
 local PROCESSED = 8
 local IC_PROCESSED = 9
 local BOXBDD = 15
+local PROCESSED_BEGIN_FLAG = 16
 
 
 -- Three aux. functions, bollowed from tex.web
@@ -240,13 +241,17 @@ luatexbase.add_to_callback('hpack_filter',
 				   'luaotfload.hpack_filter') + 1)
 
 -- debug
+local function get_attr_icflag(p)
+   return (has_attr(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
+end
+
 local debug_depth
 
 local function debug_show_node_X(p,print_fn)
    local k = debug_depth
    local s
    local pt=node_type(p.id)
-   local base = debug_depth .. string.format('%X', has_attr(p,attr_icflag) or 0)
+   local base = debug_depth .. string.format('%X', get_attr_icflag(p))
    .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
    if pt == 'glyph' then
       s = base .. ' ' .. utf.char(p.char) .. ' '  .. tostring(p.font)
@@ -270,7 +275,7 @@ local function debug_show_node_X(p,print_fn)
             for i = 2,  p.glue_order do s = s .. 'l' end
          end
       end
-      if has_attr(p, attr_icflag, PACKED) then
+      if get_attr_icflag(p) == PACKED then
          s = s .. ' (packed)'
       end
       print_fn(s)
@@ -282,11 +287,11 @@ local function debug_show_node_X(p,print_fn)
       debug_depth=k
    elseif pt == 'glue' then
       s = base .. ' ' ..  print_spec(p.spec)
-      if has_attr(p, attr_icflag)==FROM_JFM then
+      if get_attr_icflag(p)==FROM_JFM then
          s = s .. ' (from JFM)'
-      elseif has_attr(p, attr_icflag)==KANJI_SKIP then
+      elseif get_attr_icflag(p)==KANJI_SKIP then
 	 s = s .. ' (kanjiskip)'
-      elseif has_attr(p, attr_icflag)==XKANJI_SKIP then
+      elseif get_attr_icflag(p)==XKANJI_SKIP then
 	 s = s .. ' (xkanjiskip)'
       end
       print_fn(s)
@@ -294,19 +299,19 @@ local function debug_show_node_X(p,print_fn)
       s = base .. ' ' .. print_scaled(p.kern) .. 'pt'
       if p.subtype==2 then
 	 s = s .. ' (for accent)'
-      elseif has_attr(p, attr_icflag)==IC_PROCESSED then
+      elseif get_attr_icflag(p)==IC_PROCESSED then
 	 s = s .. ' (italic correction)'
-         -- elseif has_attr(p, attr_icflag)==ITALIC then
+         -- elseif get_attr_icflag(p)==ITALIC then
          --    s = s .. ' (italic correction)'
-      elseif has_attr(p, attr_icflag)==FROM_JFM then
+      elseif get_attr_icflag(p)==FROM_JFM then
 	 s = s .. ' (from JFM)'
-      elseif has_attr(p, attr_icflag)==LINE_END then
+      elseif get_attr_icflag(p)==LINE_END then
 	 s = s .. " (from 'lineend' in JFM)"
       end
       print_fn(s)
    elseif pt == 'penalty' then
       s = base .. ' ' .. tostring(p.penalty)
-      if has_attr(p, attr_icflag)==KINSOKU then
+      if get_attr_icflag(p)==KINSOKU then
 	 s = s .. ' (for kinsoku)'
       end
       print_fn(s)
