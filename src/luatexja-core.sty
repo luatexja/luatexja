@@ -207,9 +207,8 @@
 \protected\def\ltj@reset@globaldefs{%
   \directlua{luatexja.global_temp = tex.globaldefs; tex.globaldefs = 0}}
 \protected\def\ltj@restore@globaldefs{\directlua{tex.globaldefs = luatexja.global_temp}}
-\let\new@everypar=\everypar
 \protected\def\inhibitglue{\ifhmode\ltj@@ihb\fi}
-\def\ltj@@ihb{\directlua{luatexja.jfmglue.create_inhibitglue_node()}}
+\def\ltj@@ihb{\relax\directlua{luatexja.jfmglue.create_inhibitglue_node()}}
 
 %%%%%%%% \yoko, \tate, \ifydir, \iftdir
 %% At this moment, tategaki mode is not implemented; 
