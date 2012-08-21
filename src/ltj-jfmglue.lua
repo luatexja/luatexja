@@ -67,10 +67,6 @@ local IC_PROCESSED = 9
 local BOXBDD = 15
 local PROCESSED_BEGIN_FLAG = 16
 
-local function get_attr_icflag(p)
-   return (has_attr(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
-end
-
 local kanji_skip
 local xkanji_skip
 
@@ -81,6 +77,10 @@ local attr_autospc = luatexbase.attributes['ltj@autospc']
 local attr_autoxspc = luatexbase.attributes['ltj@autoxspc']
 local attr_uniqid = luatexbase.attributes['ltj@uniqid']
 local max_dimen = 1073741823
+
+local function get_attr_icflag(p)
+   return (has_attr(p, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG
+end
 
 -------------------- Helper functions
 
@@ -281,6 +281,7 @@ local function calc_np_pbox(lp, last)
       and uid == has_attr(lp, attr_uniqid) do
       Np.nuc = lp; --set_attr(lp, attr_uniqid, uniq_id) 
       lp = node_next(lp); lpa = has_attr(lp, attr_icflag)
+      -- get_attr_icflag() ではいけない！
    end
    return check_next_ickern(lp)
 end
@@ -386,6 +387,7 @@ function calc_np(lp, last)
    for k = 1,#Bp do Bp[k] = nil end
    while lp ~= last do
       local lpa = has_attr(lp, attr_icflag) or 0
+      -- unbox 由来ノードの検出
       if lpa>=PACKED then
          if lpa == BOXBDD then
 	    local lq = node_next(lp) 
