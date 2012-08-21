@@ -17,33 +17,75 @@
   \setcatcoderange{"20000}{"2FFFF}{13}}
 
 % lowest level
-\def\lst@ProcessJALetter{\lst@whitespacefalse \lst@AppendJALetter}
-\def\lst@AppendJALetter{%
-    \lst@ifletter \lst@Output\else\lst@OutputOther\fi\lst@lettertrue
-    \advance\lst@length\@ne\lst@Append}
-\def\lst@ProcessJALetterHalf{\lst@whitespacefalse \lst@AppendJALetterHalf}
-\def\lst@AppendJALetterHalf{%
-    \lst@ifletter \lst@Output\else\lst@OutputOther\fi\lst@lettertrue
+\def\lst@kanjitrue{\let\lst@ifkanji\iftrue}
+\def\lst@kanjifalse{\let\lst@ifkanji\iffalse}
+\lst@AddToHook{InitVars}{\lst@kanjifalse}
+
+\def\lst@AppendOther{%
+    \lst@ifletter\lst@Output\lst@letterfalse\fi\lst@kanjifalse
+    \futurelet\lst@lastother\lst@Append}
+\def\lst@AppendLetter{%
+    \lst@ifletter
+      \lst@ifkanji\lst@Output\lst@kanjifalse
+      \fi
+    \else
+      \lst@lettertrue\lst@ifkanji\lst@kanjifalse\else\lst@OutputOther\fi
+    \fi
     \lst@Append}
+
+\def\lst@ProcessJALetter{\lst@whitespacefalse \lst@AppendJALetter}
+\def\lst@ProcessJALetterHalf{\lst@whitespacefalse \lst@AppendJALetterHalf}
+\def\lst@ProcessJALetter@inhibit@prebreak{%
+  \lst@whitespacefalse \lst@AppendJALetter@inhibit@prebreak}
+\def\lst@ProcessJALetter@inhibit@postbreak{%
+  \lst@whitespacefalse \lst@AppendJALetter@inhibit@postbreak}
+
+\def\lst@AppendJALetter{%
+    \lst@ifletter
+      \lst@Output
+    \else
+      \lst@ifkanji\else\lst@OutputOther\fi\lst@lettertrue
+    \fi\lst@kanjitrue
+    \advance\lst@length\@ne\lst@Append}
+\def\lst@AppendJALetterHalf{%
+    \lst@ifletter
+      \lst@Output
+    \else
+      \lst@ifkanji\else\lst@OutputOther\fi\lst@lettertrue
+    \fi\lst@kanjitrue
+    \lst@Append}
+\def\lst@AppendJALetter@inhibit@prebreak{%
+    \lst@ifletter\else\lst@lettertrue\fi\lst@kanjitrue
+    \advance\lst@length\@ne\lst@Append}
+\def\lst@AppendJALetter@inhibit@postbreak{%
+    \lst@ifletter
+      \lst@Output
+    \else
+      \lst@ifkanji\else\lst@OutputOther\fi
+    \fi\lst@letterfalse\lst@kanjitrue
+    \advance\lst@length\@ne\lst@Append}
+
 
 % loading lltjp-listing-jpt.tex
 \def\ltj@@listing@jpset#1#2{% fast: #2-#1+1 must be a multiple of 16
   \@tempcnta=#1 \@tempcntb=#2 \@temptokena{}%
   \loop\relax\ifnum\@tempcnta<\@tempcntb\relax
     \ltj@@listing@jpset@\global\advance\@tempcnta\sixt@@n\repeat
-  \expandafter\edef\csname ltj@@listing@jpcmd@i#1\endcsname{\the\@temptokena}%
-  \toks@\expandafter\expandafter\expandafter\expandafter%
-  \expandafter\expandafter\expandafter{\expandafter\expandafter%
-  \expandafter\the\expandafter\toks@\csname ltj@@listing@jpcmd@i#1\endcsname}%
+  \ltj@@listing@jpset@after{#1}
 }
-\def\ltj@@listing@jpsetN#1#2#3{%
+\def\ltj@@listing@jpsetN#1#2#3{% for (not large) range
   \@tempcnta=#1 \@tempcntb=#2 \@temptokena{}%
   \loop \global\advance\@tempcnta\@ne\ifnum\@tempcnta<\@tempcntb\relax
-    \ltj@@listing@jpsetN@#3\repeat
+    \ltj@@listing@jpsetN@{\@tempcnta}{#3}\repeat
+  \ltj@@listing@jpset@after{#1}
+}
+
+\def\ltj@@listing@jpset@after#1{%
   \expandafter\edef\csname ltj@@listing@jpcmd@i#1\endcsname{\the\@temptokena}%
   \toks@\expandafter\expandafter\expandafter\expandafter%
   \expandafter\expandafter\expandafter{\expandafter\expandafter%
   \expandafter\the\expandafter\toks@\csname ltj@@listing@jpcmd@i#1\endcsname}%
+  \@temptokena{}%
 }
 
 \begingroup
@@ -87,9 +129,9 @@
   \expandafter\expandafter\expandafter{\expandafter\expandafter%
   \expandafter\the\expandafter\@temptokena\@temp}%
 }
-\gdef\ltj@@listing@jpsetN@#1{{%
-    \lccode`\~=\@tempcnta \lccode`\/=\@tempcnta
-    \lowercase{\gdef\@temp{\gdef~{#1/}}}}%
+\gdef\ltj@@listing@jpsetN@#1#2{{%
+    \@tempcnta=#1 \lccode`\~=\@tempcnta \lccode`\/=\@tempcnta
+    \lowercase{\gdef\@temp{\gdef~{#2/}}}}%
   \@temptokena\expandafter\expandafter\expandafter\expandafter%
   \expandafter\expandafter\expandafter{\expandafter\expandafter%
   \expandafter\the\expandafter\@temptokena\@temp}%

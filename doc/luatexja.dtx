@@ -2684,59 +2684,6 @@ xyz漢字
 \end{LTXexample}
 
 
-%<en>\subsection{Cropmark}
-%<ja>\subsection{トンボ}
-%<zh>\subsection{裁剪框标记}
-
-%<*en>
-Cropmark is a mark for indicating 4~corners and horizontal/vertical
-center of the paper. In Japanese, we call cropmark as tombo(w).
-\pLaTeX\ and this \LuaTeX-ja support `tombow' by their kernel.
-The following steps are needed to typeset cropmark:
-%</en>
-%<*ja>
-トンボは用紙の四つ角と水平／垂直方向の中心を表す印である．
-\pLaTeX と \LuaTeX-jaではトンボの出力をサポートしている．
-トンボを出力するためには以下の手順が必要である：
-%</ja>
-%<*zh>
-裁剪框标记是在一页的四角和水平/垂直中央放置的标记。在日文中，裁剪框被称为“トンボ”。
-\pLaTeX 和\LuaTeX-ja均在底层支持裁剪框标记。需要下列步骤来实现：
-%</zh>
-
-\begin{enumerate}
-%<*en>
-\item First, define the banner which will be printed at the upper left
-      of the paper. This is done by assigning a token list to
-      \verb+\@bannertoken+.
-
-For example, the following sets banner as `\texttt{filename (YYYY-MM-DD hh:mm)}':
-%</en>
-%<*ja>
-\item まず，用紙の左上に印刷されるバナーを定義する．これは \verb+\@bannertoken+
-      にトークンリストを与えることでなされる．
-
-例えば，以下はバナーとして`\texttt{filename (YYYY-MM-DD hh:mm)}'を設定する:
-%</ja>
-%<*zh>
-\item 首先，首先定义页面左上角将会出现的注记。这由向\verb!@bannertoken!分配一个token列完成。\\
-例如，下列所示将会设定注记为“\textsf{filename (YYYY-MM-DD hh:mm)}”:
-%</zh>
-
-\begin{verbatim}
-\makeatletter
-
-\hour\time \divide\hour by 60 \@tempcnta\hour \multiply\@tempcnta 60\relax
-\minute\time \advance\minute-\@tempcnta
-\@bannertoken{%
-   \jobname\space(\number\year-\two@digits\month-\two@digits\day
-   \space\two@digits\hour:\two@digits\minute)}%
-\end{verbatim}
-
-\item ...
-\end{enumerate}
-
-
 %<en>\part{Reference}
 %<ja>\part{リファレンス}
 %<zh>\part{参考指南}
@@ -4266,8 +4213,9 @@ With the help of this example, we remark the specification of \verb+\inhibitglue
 %<*ja>
 \item \verb+\inhibitglue+ の（制限された）水平モード中での呼び出しはその場でのみ
   有効であり，段落の境界を乗り越えない．
-  さらに，\verb+\inhibitglue+ は上の例の最終行のようにリガチャとカーニングを
-  打ち消す．
+  さらに，\verb+\inhibitglue+ は上の例の最終行のように（欧文における）リガチャとカーニングを
+  打ち消す．これは，\verb+\inhibitglue+ が内部的には「現在のリスト中にwhatsitノードを
+  追加する」ことを行なっているからである．
 %</ja>
 
 %<*en>
@@ -4471,18 +4419,14 @@ As closing this subsection, we shall introduce an example of
 %</en>
 %<*ja>
 この節の終わりに，\verb+\SetRelationFont+ と \verb+\userelfont+ の例を
-紹介しておこう．
+紹介しておこう．\verb+\userelfont+ の使用によって，「abc」の部分のフォントが
+Avant Garde (OT1/pag/m/n) に変わっていることがわかる．
 %</ja>
 \begin{LTXexample}
-\gtfamily{}あいうabc
+\kanjifamily{gt}\selectfont あいうxyz
 \SetRelationFont{JY3}{gt}{m}{n}{OT1}{pag}{m}{n}
-\userelfont\selectfont{}あいうabc
+\userelfont\selectfont あいうabc
 \end{LTXexample}
-
-
-%<en>\subsection{Cropmark/`tombow'}
-%<ja>\subsection{トンボ}
-% ToDo
 
 %<en>\section{Extensions}
 %<ja>\section{拡張}
@@ -5959,6 +5903,71 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 \end{itemize}
 
 \section{psft}
+
+
+%<*ja>
+\subsection{\Pkg{listings} パッケージへの対応}
+\Pkg{listings} パッケージが，そのままでは日本語をまともに出力できないこと
+はよく知られている，きちんと整形して出力するために，\Pkg{listings}パッケー
+ジは内部で「ほとんどの文字」をアクティブにし，各文字に対してその文字の出
+力命令を割り当てている (\cite{listings})．
+しかし，そこでアクティブにする文字の中に，和文文
+字がないためである．p\TeX 系列では，和文文字をアクティブにする手法がなく，
+\Pkg{jlisting.sty} というパッチ\cite{jlisting}を用いることで無理やり解決していたが，
+\LuaTeX-jaでは，（\LuaTeX がネイティブでUnicodeを理解することから）「和文
+文字をアクティブ化し，それらに対して適切に出力命令を設定する」というより正統的な
+方法を取ることにした．
+
+\LuaTeX-ja で利用される \Pkg{listings} パッケージへのパッチ \Pkg{lltjp-listings.sty} は，
+\Pkg{listings.sty} と\LuaTeX-jaを読み込んでおけば，
+\verb+\begin{document}+ の箇所において自動的に読み込まれるので，通常はあまり
+意識する必要はない．
+
+\paragraph{文字種}
+\Pkg{listings} パッケージの内部では，大雑把に言うと
+\begin{enumerate}
+\item 識別子として使える文字 (``letter'',~``digit'') たちを
+集める．
+\item letterでもdigitでもない文字が現れた時に，収集した文字列を（必要なら修飾して）出力する．
+\item 今度は逆に，letterでない文字たちをletterが現れるまで集める．
+\item letterが出現したら集めた文字列を出力する．
+\item 1.に戻る．
+\end{enumerate}
+という処理が行われている．これにより，識別子の途中では行分割が行われないようになっている．
+直前の文字が識別子として使えるか否かは \verb+\lst@ifletter+ というフラグに格納されている．
+
+さて，日本語の処理である．殆どの和文文字の前後では行分割が可能であるが，その一方で
+括弧類や音引きなどでは禁則処理が必要なことから，\Pkg{lltjp-listings.sty} では，
+直前が和文文字であるかを示すフラグ \verb+lst@kanji+ を新たに導入した．
+以降，説明のために以下のように文字を分類する：
+\begin{center}
+\small
+\begin{tabular}{lcccc}
+\toprule
+&Letter&Other&Kanji&Nobreak\\\midrule
+\verb+\lst@ifletter+&T&F&T&F\\
+\verb+\lst@ifkanji+&F&F&T&T\\
+意図&識別子中の文字&その他欧文文字&殆どの和文文字&和文開き括弧類\\
+\bottomrule
+\end{tabular}
+\end{center}
+なお，本来の\Pkg{listings} パッケージでの分類``digit''は，
+出現状況によって，上の表のLetterとOtherのどちらにもなりうる．
+
+
+%%  ↓ここで行分割が許容されるか否か
+%% L--L: 保留  L--O: 出力  L--K: 出力  L--P: 出力
+%% O--L: 出力  O--O: 保留  O--K: 出力  O--P: 出力
+%% K--L: 出力  K--O: 出力  K--K: 出力  K--P: 出力
+%% P--L: 保留  p--O: 保留  P--K: 保留  P--P: 保留
+%% 閉じ括弧類については，直前での出力はせず，Other 扱いとする．
+
+
+
+
+
+%</ja>
+
 
 \begin{thebibliography}{99}
   \addcontentsline{toc}{section}{\refname}

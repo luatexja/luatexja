@@ -415,7 +415,7 @@ do
    local attr_jchar_class = luatexbase.attributes['ltj@charclass']
    function set_np_xspc_jachar(Nx, x)
       local m = ltjf_font_metric_table[x.font]
-      local c = has_attr(x, attr_orig_char)
+      local c = has_attr(x, attr_orig_char) or x.char
       local cls = ltjf_find_char_class(x.char, m)
       if c ~= x.char and  cls==0 then cls = ltjf_find_char_class(-c, m) end
       Nx.class = cls; set_attr(x, attr_jchar_class, cls)
