@@ -74,7 +74,7 @@
   \ltj@@listing@jpset@after{#1}
 }
 \def\ltj@@listing@jpsetN#1#2#3{% for (not large) range
-  \@tempcnta=#1 \@tempcntb=#2 \@temptokena{}%
+  \@tempcnta=#1 \@tempcntb=\numexpr 1+#2\relax \@temptokena{}%
   \loop \global\advance\@tempcnta\@ne\ifnum\@tempcnta<\@tempcntb\relax
     \ltj@@listing@jpsetN@{\@tempcnta}{#3}\repeat
   \ltj@@listing@jpset@after{#1}

@@ -1892,7 +1892,7 @@ parameters, you have to use commands \verb+\ltjsetparameter+ and
 %<en>\subsection{Editing the range of \textbf{JAchar}s}
 %<ja>\subsection{\textbf{JAchar}の範囲の設定}
 %<zh>\subsection{\textbf{JAchar}范围设定}
-
+\label{ssec-setrange}
 
 %<*en>
 To edit the range of \textbf{JAchar}s, you have to assign a non-zero
@@ -5906,7 +5906,7 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 
 
 %<*ja>
-\subsection{\Pkg{listings} パッケージへの対応}
+\section{\Pkg{listings} パッケージへの対応}
 \Pkg{listings} パッケージが，そのままでは日本語をまともに出力できないこと
 はよく知られている，きちんと整形して出力するために，\Pkg{listings}パッケー
 ジは内部で「ほとんどの文字」をアクティブにし，各文字に対してその文字の出
@@ -5942,29 +5942,66 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 以降，説明のために以下のように文字を分類する：
 \begin{center}
 \small
-\begin{tabular}{lcccc}
+\begin{tabular}{lccccc}
 \toprule
-&Letter&Other&Kanji&Nobreak\\\midrule
-\verb+\lst@ifletter+&T&F&T&F\\
-\verb+\lst@ifkanji+&F&F&T&T\\
-意図&識別子中の文字&その他欧文文字&殆どの和文文字&和文開き括弧類\\
+&Letter&Other&Kanji&Open&Close\\\midrule
+\verb+\lst@ifletter+&T&F&T&F&T\\
+\verb+\lst@ifkanji+&F&F&T&T&F\\
+意図&識別子中の文字&その他欧文文字&殆どの和文文字&開き括弧類&閉じ括弧類\\
 \bottomrule
 \end{tabular}
 \end{center}
 なお，本来の\Pkg{listings} パッケージでの分類``digit''は，
 出現状況によって，上の表のLetterとOtherのどちらにもなりうる．
+また，KanjiとCloseは \verb+\lst@ifletter+ と \verb+\lst@ifkanji+ の値が一致しているが，
+これは間違いではない．
 
+例えば，Letterの直後にOpenが来た場合を考える．
+文字種Openは和文開き括弧類を想定しているので，Letterの直後では行分割が可能であることが望ましい．
+そのため，この場合では，すでに収集されている文字列を出力することで行分割を許容するようにした．
+同じように，$5\times 5=25$通り全てについて書くと，次のようになる：
+\begin{center}
+\small
+\begin{tabular}{llccccc}
+\toprule
+&&\multicolumn{4}{c}{後ろ側の文字}\\\cmidrule(lr){3-7}
+&&\hbox to 4em{\hss Letter\hss}&\hbox to 4em{\hss Other\hss}
+&\hbox to 4em{\hss Kanji\hss}&\hbox to 4em{\hss Open\hss}&Close\\\midrule
+直&Letter&収集&\multicolumn{3}{c}{\hrulefill \ 出力\ \hrulefill}&収集\\
+前&Other&出力&収集&\multicolumn{2}{c}{\hrulefill \ 出力\ \hrulefill}&収集\\
+文&Kanji&\multicolumn{4}{c}{\hrulefill \ 出力\ \hrulefill}&収集\\
+字&Open&\multicolumn{5}{c}{\hrulefill \ 収集\ \hrulefill}\\
+種&Close&\multicolumn{4}{c}{\hrulefill \ 出力\ \hrulefill}&収集\\
+\bottomrule
+\end{tabular}
+\end{center}
+上の表において，
+\begin{itemize}
+\item 「出力」は，それまでに集めた文字列を出力（≒ここで行分割可能）を意味する．
+\item 「収集」は，後側の文字を，現在収集された文字列に追加（行分割不可）を意味する．
+\end{itemize}
 
-%%  ↓ここで行分割が許容されるか否か
-%% L--L: 保留  L--O: 出力  L--K: 出力  L--P: 出力
-%% O--L: 出力  O--O: 保留  O--K: 出力  O--P: 出力
-%% K--L: 出力  K--O: 出力  K--K: 出力  K--P: 出力
-%% P--L: 保留  p--O: 保留  P--K: 保留  P--P: 保留
-%% 閉じ括弧類については，直前での出力はせず，Other 扱いとする．
+\paragraph{和文文字扱いとなる文字}
+\Pkg{listings} パッケージにおいて和文文字と扱われる
+（前に述べたKanji, Open，あるいは「閉じ括弧類」分類）か否かは，
+通常の\textbf{JAchar}/\textbf{Alchar}の範囲の設定（\ref{ssec-setrange}節）とは全く関係ない．
 
+また，禁則処理に関する\Param{prebreakpenalty},~\Param{postbreakpenalty}の設定も
+\Pkg{listings} パッケージ内部ではまったく影響しない．
 
-
-
+\medskip
+現在の実装では，
+\begin{itemize}
+\item 基本多言語面のU+2000--U+FFFF，追加漢字面の文字は，以下の場合を除きKanji扱いとなり，
+また欧文文字2文字分の幅をとる．．但し，以下は例外．
+\item U+FF61--U+FF9Fの半角カナはKanji扱いだが，欧文文字1文字分しか幅がない．
+\item 禁則処理のパラメータの標準値を定めている \texttt{luatexja-kinsoku.tex}\ %
+において \Param{prebreakpenalty} が
+10000と設定されている文字はClose扱いである．
+\item \texttt{luatexja-kinsoku.tex} で \Param{postbreakpenalty} が10000
+と設定されている文字はOpen扱いである．
+\end{itemize}
+これらの設定をユーザが\TeX ソースで変更させる仕組みはまだ作成していない．
 
 %</ja>
 
