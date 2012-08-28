@@ -134,7 +134,6 @@
 %%%%%%%% Attributes for Japanese typesetting.
 \newluatexattribute\ltj@curjfnt   % index for ``current Japanese font''
 \newluatexattribute\jfam          % index for current jfam
-\newluatexattribute\ltj@uniqid    % unique id of box/paragraph
 \newluatexattribute\ltj@charclass % 
 \newluatexattribute\ltj@origchar % 
 \newluatexattribute\ltj@yablshift % attribute for \yabaselineshift
@@ -142,7 +141,7 @@
 \newluatexattribute\ltj@autospc   % attribute for autospacing
 \newluatexattribute\ltj@autoxspc  % attribute for autoxspacing
 \newluatexattribute\ltj@icflag    % attribute for italic correction
-\ltj@icflag=0 \ltj@uniqid=0
+\ltj@icflag=0 \ltj@origchar=0
 
 %%%%%%%% Attributes for character ranges
 \newcount\ltj@tempcnta

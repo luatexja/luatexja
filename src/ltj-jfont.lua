@@ -93,7 +93,7 @@ function define_jfm(t)
 		  if type(v.down)~='number' then 
 		     v.down = 0.0
 		  end
-		  if type(v.align)=='nil' then
+		  if type(v.align)~='string' then 
 		     v.align = 'left'
 		  end
 	       end

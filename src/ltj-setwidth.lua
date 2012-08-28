@@ -36,7 +36,6 @@ local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
-local attr_uniqid = luatexbase.attributes['ltj@uniqid']
 
 local ltjf_font_metric_table = ltjf.font_metric_table
 
@@ -86,7 +85,6 @@ function capsule_glyph(p, dir, mode, met, class)
       box.head, box.shift, box.dir = p, y_shift, (dir or 'TLT')
       box.glue_set, box.glue_order = 0, 0
       set_attr(box, attr_icflag, PACKED + get_pr_begin_flag(p))
-      --set_attr(box, attr_uniqid, has_attr(p, attr_uniqid) or 0)
       head = q and node_insert_before(head, q, box) 
                or node_insert_after(head, node_tail(head), box)
       return q

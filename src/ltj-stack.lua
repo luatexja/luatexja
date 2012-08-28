@@ -162,9 +162,9 @@ function fast_get_skip_table(m)
    return table_current_stack[m] 
       or { width = 0, stretch = 0, shrink = 0, stretch_order = 0, shrink_order = 0 }
 end
-function fast_get_penalty_table(m,c,d)
+function fast_get_penalty_table(m,c)
    local i = table_current_stack[m]
-   return (i and i[c]) or d
+   return (i and i[c])
 end
 
 -- For other situations, use the following instead:
