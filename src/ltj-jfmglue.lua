@@ -183,8 +183,12 @@ local function check_box(box_ptr, box_end)
    end
    while p and p~=box_end do
       local pid = p.id
-      if pid==id_kern and p.subtype==2 then
-	    p = node_next(node_next(node_next(p))); pid = p.id -- p must be glyph_node
+      if pid==id_kern then
+	 if p.subtype==2 then
+	    p = node_next(node_next(node_next(p))); pid = p.id
+	 elseif has_attr(p, attr_icflag)==IC_PROCESSED then
+	    p = node_next(p); pid = p.id
+	 end
       end
       if pid==id_glyph then
 	 repeat 
@@ -194,11 +198,9 @@ local function check_box(box_ptr, box_end)
 	    last_char = p; found_visible_node = true; p=node_next(p)
 	    if (not p) or p==box_end then return found_visible_node end
 	 until p.id~=id_glyph
-	 pid = p.id -- p must be non-nil
+	 pid = p.id
       end
-      if pid==id_kern and has_attr(p, attr_icflag)==IC_PROCESSED then
-	 p = node_next(p); 
-      elseif pid==id_hlist then
+      if pid==id_hlist then
 	 if has_attr(p, attr_icflag)==PACKED then
 	    for q in node.traverse_id(id_glyph, p.head) do
 	       if find_first_char then
