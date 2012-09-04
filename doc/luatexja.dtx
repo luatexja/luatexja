@@ -1892,7 +1892,7 @@ parameters, you have to use commands \verb+\ltjsetparameter+ and
 %<en>\subsection{Editing the range of \textbf{JAchar}s}
 %<ja>\subsection{\textbf{JAchar}の範囲の設定}
 %<zh>\subsection{\textbf{JAchar}范围设定}
-
+\label{ssec-setrange}
 
 %<*en>
 To edit the range of \textbf{JAchar}s, you have to assign a non-zero
@@ -2524,7 +2524,7 @@ JFMは「望ましい\Param{kanjiskip}の値」や「望ましい\Param{xkanjisk
 %</zh>
 
 %<en>\subsection{Insertion Setting of \Param{xkanjiskip}}
-%<ja>\subsection{\Param{xkanjiskip} の設定の挿入}
+%<ja>\subsection{\Param{xkanjiskip} の挿入設定}
 %<zh>\subsection{\Param{xkanjiskip}插入设定}
 
 %<*en>
@@ -2682,59 +2682,6 @@ xyz漢字
   XYZひらがな
 }abcかな
 \end{LTXexample}
-
-
-%<en>\subsection{Cropmark}
-%<ja>\subsection{トンボ}
-%<zh>\subsection{裁剪框标记}
-
-%<*en>
-Cropmark is a mark for indicating 4~corners and horizontal/vertical
-center of the paper. In Japanese, we call cropmark as tombo(w).
-\pLaTeX\ and this \LuaTeX-ja support `tombow' by their kernel.
-The following steps are needed to typeset cropmark:
-%</en>
-%<*ja>
-トンボは用紙の四つ角と水平／垂直方向の中心を表す印である．
-\pLaTeX と \LuaTeX-jaではトンボの出力をサポートしている．
-トンボを出力するためには以下の手順が必要である：
-%</ja>
-%<*zh>
-裁剪框标记是在一页的四角和水平/垂直中央放置的标记。在日文中，裁剪框被称为“トンボ”。
-\pLaTeX 和\LuaTeX-ja均在底层支持裁剪框标记。需要下列步骤来实现：
-%</zh>
-
-\begin{enumerate}
-%<*en>
-\item First, define the banner which will be printed at the upper left
-      of the paper. This is done by assigning a token list to
-      \verb+\@bannertoken+.
-
-For example, the following sets banner as `\texttt{filename (YYYY-MM-DD hh:mm)}':
-%</en>
-%<*ja>
-\item まず，用紙の左上に印刷されるバナーを定義する．これは \verb+\@bannertoken+
-      にトークンリストを与えることでなされる．
-
-例えば，以下はバナーとして`\texttt{filename (YYYY-MM-DD hh:mm)}'を設定する:
-%</ja>
-%<*zh>
-\item 首先，首先定义页面左上角将会出现的注记。这由向\verb!@bannertoken!分配一个token列完成。\\
-例如，下列所示将会设定注记为“\textsf{filename (YYYY-MM-DD hh:mm)}”:
-%</zh>
-
-\begin{verbatim}
-\makeatletter
-
-\hour\time \divide\hour by 60 \@tempcnta\hour \multiply\@tempcnta 60\relax
-\minute\time \advance\minute-\@tempcnta
-\@bannertoken{%
-   \jobname\space(\number\year-\two@digits\month-\two@digits\day
-   \space\two@digits\hour:\two@digits\minute)}%
-\end{verbatim}
-
-\item ...
-\end{enumerate}
 
 
 %<en>\part{Reference}
@@ -3187,6 +3134,7 @@ Like the \Param{kanjiskip} field, this field specifies the `ideal'
 \end{list}
 
 %<*en>
+\paragraph{Character classes}
 Besides from above fields, a JFM file have several sub-tables those
 indices are natural numbers.  The table indexed by~$i\in\omega$ stores
 information of `character class'~$i$. At least, the character class~0 is
@@ -3195,6 +3143,7 @@ always present, so each JFM file must have a sub-table whose index is
 the following fields:
 %</en>
 %<*ja>
+\paragraph{文字クラス}
 上記のフィールドに加えて，JFMファイルはそのインデックスが自然数であるいくつかの
 サブテーブルを持つ．インデックスが$i\in\omega$であるテーブルは「文字クラス」$i$の
 情報を格納する．少なくとも，文字クラス0は常に存在するので，JFMファイルはインデックス
@@ -3202,6 +3151,7 @@ the following fields:
 （そのインデックスを$i$で表わす）は以下のフィールドを持つ：
 %</ja>
 %<*zh>
+\paragraph{Character classes}
 除了上面涉及到的内容，JFM文件中还有几个以自然数进行声明的次级表。
 这些表依靠满足$i\in\omega$的“字符类”$i$来索引。
 一般，最少需要的是字符类0，故每一个JFM文件必须有次级表索引为\texttt{[0]}。
@@ -3215,22 +3165,28 @@ the following fields:
 
 %<*en>
 This field is a list of characters which are in this character
-	     type~$i$. This field is not required if $i=0$, since all
-	     \textbf{JAchar} which are not in any character class other
+	     type~$i$. This field is optional if $i=0$, since all
+	     \textbf{JAchar} which do not belong  any character classes other
 	     than 0 are in the character class 0
              (hence, the character class~0 contains most of
-	     \textbf{JAchar}s). In the list, a character can be
-	     specified by its code number, or by the character itself
-	     (as a string of length~1). Moreover, there are `imaginary
-	     characters' which specified in the list. We will describe these later.
+	     \textbf{JAchar}s). In the list, character(s) can be specified in the following form:
+\begin{itemize}
+\item a Unicode code point
+\item the character itself (as a Lua string, like \verb+'あ'+)
+\item a string like \verb+'あ*'+ (the character followed by an asterisk)
+\item several ``imaginary'' characters (We will describe these later.)
+\end{itemize}
 %</en>
 %<*ja>
 このフィールドは文字クラス$i$に属する文字のリストである．このフィールドは$i=0$の
-場合には必須ではない．なぜならば，文字クラス0には，0以外の文字クラスに属するものを
-除いた全ての\textbf{JAchar}が属するからである（よって，文字クラス0はほとんどの
-\textbf{JAchar}を含む）．このリストでは，文字はその文字コードを用いて，もしくは
-文字それ自体（長さ1の文字列）によって指定される．さらに，このリストで指定される
-「仮想的な文字」も存在する．これらについては後に記す．
+場合には任意である（文字クラス0には，0以外の文字クラスに属するものを
+除いた全ての\textbf{JAchar}が属するから）．このリスト中で文字を指定するには，以下の方法がある：
+\begin{itemize}
+\item Unicode におけるコード番号
+\item 「\verb+'あ'+」のような，文字それ自体
+\item 「\verb+'あ*'+」のような，文字それ自体の後にアスタリスクをつけたもの
+\item いくつかの「仮想的な文字」（後に説明する）
+\end{itemize}
 %</ja>
 %<*zh>
 这部分为字符集$i$的字符列表。当$i=0$时不需要设定此部分，因为不在字符集0种的\textbf{JAchar}
@@ -3427,6 +3383,66 @@ Furthermore, the glyph is shifted according to values of fields
 \item[glue={\{[$j$]=\{<width>, <stretch>, <shrink>\}, ...\}}]
 \end{list}
 
+%<*ja>
+\paragraph{文字クラスの決定}
+文字クラスの決定は少々複雑である．ここでは例を用いて説明しよう．
+
+
+たとえば，次の内容を一部に含んだ \texttt{jfm-test.lua} を考えよう：
+\begin{lstlisting}
+   [0] = {
+      chars = { '漢', 'ヒ*' }, 
+      align = 'left', left = 0.0, down = 0.0,
+      width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
+   },
+   [2000] = {
+      chars = { '。', '、*', 'ﾋ' },
+      align = 'left', left = 0.0, down = 0.0,
+      width = 0.5, height = 0.88, depth = 0.12, italic=0.0,
+   },
+\end{lstlisting}
+句点「。」の幅は二分であるので
+\begin{LTXexample}
+\jfont\a=psft:Ryumin-Light:jfm=test;+vert
+\setbox0\hbox{\a 。\inhibitglue 漢}
+\the\wd0
+\end{LTXexample}
+では，全角二分(15.0\,pt)とならなければおかしいが，上の実行結果では20\,ptとなっている．
+それは以下の事情によるものである：
+\begin{enumerate}
+\item \verb+vert+ featureによって句点が縦書き用のグリフと置き換わる（\Pkg{luaotfload} による処理）．
+\item しかしこのグリフは「文字コード」U+F0000以降とみなされている
+（実際にいくらになるかは，フォントによって異なる）．
+\item よって，文字クラス0とみなされるため，結果として「。」の幅は全角だと認識されてしまう．
+\end{enumerate}
+
+一方，「\texttt{'、*'}」のようにアスタリスクつきの指定があると，
+状況は異なってくる．
+\begin{LTXexample}
+\jfont\a=psft:Ryumin-Light:jfm=test;+vert
+\a 漢、\inhibitglue 漢
+\end{LTXexample}
+ここで，読点「、」の文字クラスは，以下のようにして決まる．
+\begin{enumerate}
+\item とりあえず句点の時と同じように，\Pkg{luaotfload} によって縦書き用読点のグリフに置き換わる．
+\item 置換後のグリフの「文字コード」はU+F0000以降であり，
+そのままでは文字クラスは0と判定される．
+\item ところが，JFMには「\texttt{'、*'}」指定があるので，置換前の横書き用読点のグリフ「、」（文字コードはU+3001）によって文字クラスを判定する．
+\item 結果として，上の出力例中の読点の文字クラスは2000となる．
+\end{enumerate}
+
+なお，置換後のグリフで判定した文字クラスの値が0でなければ，そちらをそのまま作用する．
+\begin{LTXexample}
+\jfont\a=psft:Ryumin-Light:jfm=test;+hwid
+\a 漢ﾋひ
+\end{LTXexample}
+上の例では，
+\texttt{hwid} featureにより，「ヒ」が半角の「ﾋ」に置き換わるが，
+文字クラスは「ヒ」の属する0\textbf{ではなく}，「ﾋ」の属する2000となる．
+%</ja>
+
+%<ja>\paragraph{仮想的な文字}
+%<!ja>\paragraph{Imaginary characters}
 %<*en>
 As described before, you can specify several `imaginary characters' in
 \texttt{chars} field. The most of these characters are regarded as the
@@ -3641,13 +3657,11 @@ this argument has \texttt{chars} field which contains character codes
 %<*en>
 An example of this callback is the \texttt{ltjarticle} class, with
 	     forcefully assigning character class~0 to \texttt{'parbdd'}
-	     in the JFM \texttt{jfm-min.lua}. This callback doesn't
-	     replace any code of \LuaTeX-ja.
+	     in the JFM \texttt{jfm-min.lua}. 
 %</en>
 %<*ja>
 このコールバックの使用例は\texttt{ltjarticle}クラスにあり，
 \texttt{jfm-min.lua}中の\texttt{'parbdd'}を強制的にクラス0に割り当てている．
-このコールバックは\LuaTeX-jaのコードを書き換えない．
 %</ja>
 
 %<en>\item[\texttt{luatexja.define\_font} callback]
@@ -3674,18 +3688,38 @@ end
 You may assume that \verb+jfont_info+ has the following fields:
 %</en>
 %<*ja>
-\verb+jfont_info+ は以下のフィールドを持つ：
+\verb+jfont_info+ は以下の2フィールドを持つ：
 %</ja>
 \begin{description}
-\item[\tt jfm]
-%<en>The index number of JFM.
-%<ja>JFMのインデックス番号．
-%<zh>JFM索引编号。
-
-\item[\tt size]
-%<en>Font size in a scaled point (${}=2^{-16}\,\textrm{pt}$).
-%<ja>スケールド・ポイント(${}=2^{-16}\,\textrm{pt}$)を単位としたフォントのサイズ．
-%<zh>以参照点(${}=2^{-16}\,\textrm{pt}$)为点位的字体大小。
+\item[\tt size\_cache]
+%<*ja>
+使用されているJFMの情報が格納されているテーブルで，
+\textbf{このテーブルを書き換えてはならない}．
+中身はほぼJFMファイルに書かれている唯一のテーブルであるが，次のように若干変わっている：
+\begin{itemize}
+\item 各文字クラス$i$に属する文字達のテーブル
+\texttt{[$i$].chars=\{<character>, ...\}}は，トップレベルにまとめられ，
+\texttt{chars=\{[<character>]=$i$, ...\}}という形になっている．
+\item \texttt{zw},~\texttt{zh}, \texttt{kanjiskip},~\texttt{xkanjiskip} の各フィールドの値は，
+実際に使われるフォントサイズに合わせたsp ($1\,\mathrm{sp}=2^{-6}\,\mathrm{pt}$)単位の長さに変わっている．
+\item 各文字クラス$i$の情報を格納したテーブルも，\texttt{char\_type} フィールドの下にまとめられている．
+例えば，文字クラス1に属する文字の高さは \texttt{char\_type[1].height} で参照できる．
+\item \texttt{dir} フィールドはこのテーブルにはない．
+\end{itemize}
+%</ja>
+%<*en>
+A table which contains the information of a JFM, and \emph{this table must not be changed}.
+The contents of this table are similar to that which is written is the JFM file, but 
+the following differ:
+\begin{itemize}
+\item There is a \texttt{chars} table, \dots
+\item The value in \texttt{zw},~\texttt{zh}, \texttt{kanjiskip},~\texttt{xkanjiskip} fields are
+now scaled by real font size, and in scaled-pont unit.
+\item ...
+\item There is no \texttt{dir} field in this table.
+\end{itemize}
+%</en>
+%<zh> ...
 
 \item[\tt var]
 %<en>The value specified in \texttt{jfmvar=...} at a call of \verb+\jfont+.
@@ -3694,11 +3728,12 @@ You may assume that \verb+jfont_info+ has the following fields:
 \end{description}
 
 %<*en>
-The returned table \verb+new_jfont_info+ also should include these three fields.
+The returned table \verb+new_jfont_info+ also should include these two fields.
 The \verb+font_number+ is a font number.
 %</en>
 %<*ja>
-戻り値の \verb+new_jfont_info+ テーブルもこれら3つのフィールドを含まなければならない．
+戻り値の \verb+new_jfont_info+ テーブルもこれら2つのフィールドを含まなければならないが，
+それ以外にユーザが勝手にフィールドを付け加えることは自由である．
 \verb+font_number+ はフォント番号である．
 %</ja>
 
@@ -3712,7 +3747,6 @@ A good example of this and the next callbacks is the \Pkg{luatexja-otf}
 これと次のコールバックの良い使用例は\Pkg{luatexja-otf}パッケージであり，
 JFM中でAdobe-Japan1 CIDの文字を \verb+"AJ1-xxx"+ の形で指定するために
 用いられている．
-このコールバックは\LuaTeX-jaのコードを書き換えない．
 %</ja>
 
 %<en>\item[\texttt{luatexja.find\_char\_class} callback]
@@ -3753,16 +3787,6 @@ The argument \verb+char_class+ is the result of \LuaTeX-ja's default
 \verb+char_class+ の値と同じであるべきで，そうでないときは\LuaTeX-jaの
 デフォルトルーチンを書き換えることになる．
 %</ja>
-
-%<*en>
-This callback doesn't replace any code of \LuaTeX-ja.
-%</en>
-%<*ja>
-このコールバックは\LuaTeX-jaのコードを書き換えない．
-%</ja>
-%<*zh>
-此回调不会替换\LuaTeX-ja中任何代码。
-%</zh>
 
 %<en>\item[\texttt{luatexja.set\_width} callback]
 %<ja>\item[\texttt{luatexja.set\_width}コールバック]
@@ -4128,7 +4152,8 @@ JFM（もしくはサイズ）が異なる2つの\textbf{JAchar}の間にグル�
 %<zh>\subsection{基本语句兼容性}
 
 %<*en>
-The following primitives are implemented for compatibility with \pTeX:
+The following primitives are implemented for compatibility with \pTeX.
+Note that these primitives don't support JIS~X~0213, but only JIS~X~0208.
 %</en>
 %<*ja>
 以下のプリミティブは\pTeX との互換性のために実装されている：
@@ -4204,8 +4229,9 @@ With the help of this example, we remark the specification of \verb+\inhibitglue
 %<*ja>
 \item \verb+\inhibitglue+ の（制限された）水平モード中での呼び出しはその場でのみ
   有効であり，段落の境界を乗り越えない．
-  さらに，\verb+\inhibitglue+ は上の例の最終行のようにリガチャとカーニングを
-  打ち消す．
+  さらに，\verb+\inhibitglue+ は上の例の最終行のように（欧文における）リガチャとカーニングを
+  打ち消す．これは，\verb+\inhibitglue+ が内部的には「現在のリスト中にwhatsitノードを
+  追加する」ことを行なっているからである．
 %</ja>
 
 %<*en>
@@ -4409,18 +4435,14 @@ As closing this subsection, we shall introduce an example of
 %</en>
 %<*ja>
 この節の終わりに，\verb+\SetRelationFont+ と \verb+\userelfont+ の例を
-紹介しておこう．
+紹介しておこう．\verb+\userelfont+ の使用によって，「abc」の部分のフォントが
+Avant Garde (OT1/pag/m/n) に変わっていることがわかる．
 %</ja>
 \begin{LTXexample}
-\gtfamily{}あいうabc
+\kanjifamily{gt}\selectfont あいうxyz
 \SetRelationFont{JY3}{gt}{m}{n}{OT1}{pag}{m}{n}
-\userelfont\selectfont{}あいうabc
+\userelfont\selectfont あいうabc
 \end{LTXexample}
-
-
-%<en>\subsection{Cropmark/`tombow'}
-%<ja>\subsection{トンボ}
-% ToDo
 
 %<en>\section{Extensions}
 %<ja>\section{拡張}
@@ -5898,6 +5920,110 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 
 \section{psft}
 
+%<*ja>
+\section{\Pkg{listings} パッケージへの対応}
+\Pkg{listings} パッケージが，そのままでは日本語をまともに出力できないこと
+はよく知られている，きちんと整形して出力するために，\Pkg{listings}パッケー
+ジは内部で「ほとんどの文字」をアクティブにし，各文字に対してその文字の出
+力命令を割り当てている (\cite{listings})．
+しかし，そこでアクティブにする文字の中に，和文文
+字がないためである．p\TeX 系列では，和文文字をアクティブにする手法がなく，
+\Pkg{jlisting.sty} というパッチ\cite{jlisting}を用いることで無理やり解決していたが，
+\LuaTeX-jaでは，（\LuaTeX がネイティブでUnicodeを理解することから）「和文
+文字をアクティブ化し，それらに対して適切に出力命令を設定する」というより正統的な
+方法を取ることにした．
+
+\LuaTeX-ja で利用される \Pkg{listings} パッケージへのパッチ \Pkg{lltjp-listings.sty} は，
+\Pkg{listings.sty} と\LuaTeX-jaを読み込んでおけば，
+\verb+\begin{document}+ の箇所において自動的に読み込まれるので，通常はあまり
+意識する必要はない．
+
+\paragraph{文字種}
+\Pkg{listings} パッケージの内部では，大雑把に言うと
+\begin{enumerate}
+\item 識別子として使える文字 (``letter'',~``digit'') たちを
+集める．
+\item letterでもdigitでもない文字が現れた時に，収集した文字列を（必要なら修飾して）出力する．
+\item 今度は逆に，letterでない文字たちをletterが現れるまで集める．
+\item letterが出現したら集めた文字列を出力する．
+\item 1.に戻る．
+\end{enumerate}
+という処理が行われている．これにより，識別子の途中では行分割が行われないようになっている．
+直前の文字が識別子として使えるか否かは \verb+\lst@ifletter+ というフラグに格納されている．
+
+さて，日本語の処理である．殆どの和文文字の前後では行分割が可能であるが，その一方で
+括弧類や音引きなどでは禁則処理が必要なことから，\Pkg{lltjp-listings.sty} では，
+直前が和文文字であるかを示すフラグ \verb+lst@kanji+ を新たに導入した．
+以降，説明のために以下のように文字を分類する：
+\begin{center}
+\small
+\begin{tabular}{lccccc}
+\toprule
+&Letter&Other&Kanji&Open&Close\\\midrule
+\verb+\lst@ifletter+&T&F&T&F&T\\
+\verb+\lst@ifkanji+&F&F&T&T&F\\
+意図&識別子中の文字&その他欧文文字&殆どの和文文字&開き括弧類&閉じ括弧類\\
+\bottomrule
+\end{tabular}
+\end{center}
+なお，本来の\Pkg{listings} パッケージでの分類``digit''は，
+出現状況によって，上の表のLetterとOtherのどちらにもなりうる．
+また，KanjiとCloseは \verb+\lst@ifletter+ と \verb+\lst@ifkanji+ の値が一致しているが，
+これは間違いではない．
+
+例えば，Letterの直後にOpenが来た場合を考える．
+文字種Openは和文開き括弧類を想定しているので，Letterの直後では行分割が可能であることが望ましい．
+そのため，この場合では，すでに収集されている文字列を出力することで行分割を許容するようにした．
+同じように，$5\times 5=25$通り全てについて書くと，次のようになる：
+\begin{center}
+\small
+\begin{tabular}{llccccc}
+\toprule
+&&\multicolumn{4}{c}{後ろ側の文字}\\\cmidrule(lr){3-7}
+&&\hbox to 4em{\hss Letter\hss}&\hbox to 4em{\hss Other\hss}
+&\hbox to 4em{\hss Kanji\hss}&\hbox to 4em{\hss Open\hss}&Close\\\midrule
+直&Letter&収集&\multicolumn{3}{c}{\hrulefill \ 出力\ \hrulefill}&収集\\
+前&Other&出力&収集&\multicolumn{2}{c}{\hrulefill \ 出力\ \hrulefill}&収集\\
+文&Kanji&\multicolumn{4}{c}{\hrulefill \ 出力\ \hrulefill}&収集\\
+字&Open&\multicolumn{5}{c}{\hrulefill \ 収集\ \hrulefill}\\
+種&Close&\multicolumn{4}{c}{\hrulefill \ 出力\ \hrulefill}&収集\\
+\bottomrule
+\end{tabular}
+\end{center}
+上の表において，
+\begin{itemize}
+\item 「出力」は，それまでに集めた文字列を出力（≒ここで行分割可能）を意味する．
+\item 「収集」は，後側の文字を，現在収集された文字列に追加（行分割不可）を意味する．
+\end{itemize}
+
+\paragraph{和文文字扱いとなる文字}
+\Pkg{listings} パッケージにおいて和文文字と扱われる
+（前に述べたKanji, Open，あるいは「閉じ括弧類」分類）か否かは，
+通常の\textbf{JAchar}/\textbf{Alchar}の範囲の設定（\ref{ssec-setrange}節）とは全く関係ない．
+
+また，禁則処理に関する\Param{prebreakpenalty},~\Param{postbreakpenalty}の設定も
+\Pkg{listings} パッケージ内部ではまったく影響しない．
+
+\medskip
+現在の実装では，
+\begin{itemize}
+\item 基本多言語面のU+2000--U+FFFF，追加漢字面の文字は，以下の場合を除きKanji扱いとなり，
+また欧文文字2文字分の幅をとる．．但し，以下は例外．
+\item U+FF61--U+FF9Fの半角カナはKanji扱いだが，欧文文字1文字分しか幅がない．
+\item 禁則処理のパラメータの標準値を定めている \texttt{luatexja-kinsoku.tex}\ %
+において \Param{prebreakpenalty} が
+10000と設定されている文字はClose扱いである．
+\item \texttt{luatexja-kinsoku.tex} で \Param{postbreakpenalty} が10000
+と設定されている文字はOpen扱いである．
+\end{itemize}
+これらの設定をユーザが\TeX ソースで変更させる仕組みはまだ作成していない．
+
+%</ja>
+%<*en>
+\section{Patch for the \Pkg{listings} package}
+\dots
+%</en>
+
 \begin{thebibliography}{99}
   \addcontentsline{toc}{section}{\refname}
 \bibitem{texbytopic}
@@ -5906,6 +6032,366 @@ Victor Eijkhout,  \emph{\TeX\ by Topic, A \TeX nician's Reference}, Addison-Wesl
 
 \newpage
 \appendix
+
+%<*ja>
+\section{\LuaTeX-jaにおけるJIS~X~0213非漢字のcatcode}
+
+ここでは，JIS~X~0213の非漢字部分（第1区〜第13区）のうち，
+どの文字が(u)\pTeX や\LuaTeX-jaで制御綴内に使用可能かを表にしてまとめる．
+各文字は
+\begin{center}
+\tt\fboxsep=1pt\fbox{\hbox to \zw{\gt あ\hss}}\,\scriptsize LUP
+\end{center}
+のように表示しており，各文字は次の意味を持っている．
+この表の生成は，JIS X 0208の範囲内の文字については\verb+\jis+命令を使って行なっている．
+\begin{itemize}
+\item 背景が薄く青く塗られている文字は，
+\LuaTeX-ja の標準で\textbf{ALchar}として認識されている文字である．
+\item 1文字目の {\tt L} は，\XeTeX や\LuaTeX-jaにおいてこの文字が制御綴内に
+使用可能（catcodeが11）であることを表している．
+\item 2文字目の{\tt U} は，\upTeX においてこの文字が制御綴内に使用可能（kcatcodeは16,~17）であることを
+表している．この範囲内では，\upTeX は標準で全文字を和文文字として扱うようである．
+\item 3文字目の {\tt P} は，\pTeX においてこの文字が制御綴内に使用可能（kcatcodeは16,~17）であることを
+表している．
+\item 3文字目が{\tt -}となっているもの（本体の文字も赤身がかっている）は，
+JIS~X~0208にないため使用不能と考えて良いものである．
+\item 第4区と第5区にある，鼻濁音の仮名については省略した．
+\end{itemize}
+
+
+\makeatletter
+\def\uplist{% upTeX で \kcatcode!=18 なもの
+  \@elt {8486}\@elt {8491}\@elt {8492}\@elt {8499}\@elt {8500}\@elt {8501}%
+  \@elt {8502}\@elt {8504}\@elt {8508}\@elt {9008}\@elt {9009}\@elt {9010}%
+  \@elt {9011}\@elt {9012}\@elt {9013}\@elt {9014}\@elt {9015}\@elt {9016}%
+  \@elt {9017}\@elt {9025}\@elt {9026}\@elt {9027}\@elt {9028}\@elt {9029}%
+  \@elt {9030}\@elt {9031}\@elt {9032}\@elt {9033}\@elt {9034}\@elt {9035}%
+  \@elt {9036}\@elt {9037}\@elt {9038}\@elt {9039}\@elt {9040}\@elt {9041}%
+  \@elt {9042}\@elt {9043}\@elt {9044}\@elt {9045}\@elt {9046}\@elt {9047}%
+  \@elt {9048}\@elt {9049}\@elt {9050}\@elt {9057}\@elt {9058}\@elt {9059}%
+  \@elt {9060}\@elt {9061}\@elt {9062}\@elt {9063}\@elt {9064}\@elt {9065}%
+  \@elt {9066}\@elt {9067}\@elt {9068}\@elt {9069}\@elt {9070}\@elt {9071}%
+  \@elt {9072}\@elt {9073}\@elt {9074}\@elt {9075}\@elt {9076}\@elt {9077}%
+  \@elt {9078}\@elt {9079}\@elt {9080}\@elt {9081}\@elt {9082}\@elt {9249}%
+  \@elt {9250}\@elt {9251}\@elt {9252}\@elt {9253}\@elt {9254}\@elt {9255}%
+  \@elt {9256}\@elt {9257}\@elt {9258}\@elt {9259}\@elt {9260}\@elt {9261}%
+  \@elt {9262}\@elt {9263}\@elt {9264}\@elt {9265}\@elt {9266}\@elt {9267}%
+  \@elt {9268}\@elt {9269}\@elt {9270}\@elt {9271}\@elt {9272}\@elt {9273}%
+  \@elt {9274}\@elt {9275}\@elt {9276}\@elt {9277}\@elt {9278}\@elt {9279}%
+  \@elt {9280}\@elt {9281}\@elt {9282}\@elt {9283}\@elt {9284}\@elt {9285}%
+  \@elt {9286}\@elt {9287}\@elt {9288}\@elt {9289}\@elt {9290}\@elt {9291}%
+  \@elt {9292}\@elt {9293}\@elt {9294}\@elt {9295}\@elt {9296}\@elt {9297}%
+  \@elt {9298}\@elt {9299}\@elt {9300}\@elt {9301}\@elt {9302}\@elt {9303}%
+  \@elt {9304}\@elt {9305}\@elt {9306}\@elt {9307}\@elt {9308}\@elt {9309}%
+  \@elt {9310}\@elt {9311}\@elt {9312}\@elt {9313}\@elt {9314}\@elt {9315}%
+  \@elt {9316}\@elt {9317}\@elt {9318}\@elt {9319}\@elt {9320}\@elt {9321}%
+  \@elt {9322}\@elt {9323}\@elt {9324}\@elt {9325}\@elt {9326}\@elt {9327}%
+  \@elt {9328}\@elt {9329}\@elt {9330}\@elt {9331}\@elt {9505}\@elt {9506}%
+  \@elt {9507}\@elt {9508}\@elt {9509}\@elt {9510}\@elt {9511}\@elt {9512}%
+  \@elt {9513}\@elt {9514}\@elt {9515}\@elt {9516}\@elt {9517}\@elt {9518}%
+  \@elt {9519}\@elt {9520}\@elt {9521}\@elt {9522}\@elt {9523}\@elt {9524}%
+  \@elt {9525}\@elt {9526}\@elt {9527}\@elt {9528}\@elt {9529}\@elt {9530}%
+  \@elt {9531}\@elt {9532}\@elt {9533}\@elt {9534}\@elt {9535}\@elt {9536}%
+  \@elt {9537}\@elt {9538}\@elt {9539}\@elt {9540}\@elt {9541}\@elt {9542}%
+  \@elt {9543}\@elt {9544}\@elt {9545}\@elt {9546}\@elt {9547}\@elt {9548}%
+  \@elt {9549}\@elt {9550}\@elt {9551}\@elt {9552}\@elt {9553}\@elt {9554}%
+  \@elt {9555}\@elt {9556}\@elt {9557}\@elt {9558}\@elt {9559}\@elt {9560}%
+  \@elt {9561}\@elt {9562}\@elt {9563}\@elt {9564}\@elt {9565}\@elt {9566}%
+  \@elt {9567}\@elt {9568}\@elt {9569}\@elt {9570}\@elt {9571}\@elt {9572}%
+  \@elt {9573}\@elt {9574}\@elt {9575}\@elt {9576}\@elt {9577}\@elt {9578}%
+  \@elt {9579}\@elt {9580}\@elt {9581}\@elt {9582}\@elt {9583}\@elt {9584}%
+  \@elt {9585}\@elt {9586}\@elt {9587}\@elt {9588}\@elt {9589}\@elt {9590}%
+  % ここから JIS X 0213
+  \@elt {8760}\@elt {8761}\@elt {9083}\@elt {9332}\@elt {9333}\@elt {9334}%
+  \@elt {9335}\@elt {9336}\@elt {9337}\@elt {9338}\@elt {9339}\@elt {9591}%
+  \@elt {9592}\@elt {9593}\@elt {9594}\@elt {9595}\@elt {9596}\@elt {9597}%
+  \@elt {9598}\@elt {9838}\@elt {9839}\@elt {9840}\@elt {9841}\@elt {9842}%
+  \@elt {9843}\@elt {9844}\@elt {9845}\@elt {9846}\@elt {9847}\@elt {9848}%
+  \@elt {9849}\@elt {9850}\@elt {9851}\@elt {9852}\@elt {9853}\@elt {9854}%
+  \@elt {10098}\@elt {10099}\@elt {10100}\@elt {10101}%
+}
+\def\plist{% pTeX で \kcatcode!=18 なもの
+  \@elt {8993}\@elt {8994}\@elt {8995}\@elt {8996}\@elt {8997}\@elt {8998}%
+  \@elt {8999}\@elt {9000}\@elt {9001}\@elt {9002}\@elt {9003}\@elt {9004}%
+  \@elt {9005}\@elt {9006}\@elt {9007}\@elt {9008}\@elt {9009}\@elt {9010}%
+  \@elt {9011}\@elt {9012}\@elt {9013}\@elt {9014}\@elt {9015}\@elt {9016}%
+  \@elt {9017}\@elt {9018}\@elt {9019}\@elt {9020}\@elt {9021}\@elt {9022}%
+  \@elt {9023}\@elt {9024}\@elt {9025}\@elt {9026}\@elt {9027}\@elt {9028}%
+  \@elt {9029}\@elt {9030}\@elt {9031}\@elt {9032}\@elt {9033}\@elt {9034}%
+  \@elt {9035}\@elt {9036}\@elt {9037}\@elt {9038}\@elt {9039}\@elt {9040}%
+  \@elt {9041}\@elt {9042}\@elt {9043}\@elt {9044}\@elt {9045}\@elt {9046}%
+  \@elt {9047}\@elt {9048}\@elt {9049}\@elt {9050}\@elt {9051}\@elt {9052}%
+  \@elt {9053}\@elt {9054}\@elt {9055}\@elt {9056}\@elt {9057}\@elt {9058}%
+  \@elt {9059}\@elt {9060}\@elt {9061}\@elt {9062}\@elt {9063}\@elt {9064}%
+  \@elt {9065}\@elt {9066}\@elt {9067}\@elt {9068}\@elt {9069}\@elt {9070}%
+  \@elt {9071}\@elt {9072}\@elt {9073}\@elt {9074}\@elt {9075}\@elt {9076}%
+  \@elt {9077}\@elt {9078}\@elt {9079}\@elt {9080}\@elt {9081}\@elt {9082}%
+  \@elt {9083}\@elt {9084}\@elt {9085}\@elt {9086}\@elt {9249}\@elt {9250}%
+  \@elt {9251}\@elt {9252}\@elt {9253}\@elt {9254}\@elt {9255}\@elt {9256}%
+  \@elt {9257}\@elt {9258}\@elt {9259}\@elt {9260}\@elt {9261}\@elt {9262}%
+  \@elt {9263}\@elt {9264}\@elt {9265}\@elt {9266}\@elt {9267}\@elt {9268}%
+  \@elt {9269}\@elt {9270}\@elt {9271}\@elt {9272}\@elt {9273}\@elt {9274}%
+  \@elt {9275}\@elt {9276}\@elt {9277}\@elt {9278}\@elt {9279}\@elt {9280}%
+  \@elt {9281}\@elt {9282}\@elt {9283}\@elt {9284}\@elt {9285}\@elt {9286}%
+  \@elt {9287}\@elt {9288}\@elt {9289}\@elt {9290}\@elt {9291}\@elt {9292}%
+  \@elt {9293}\@elt {9294}\@elt {9295}\@elt {9296}\@elt {9297}\@elt {9298}%
+  \@elt {9299}\@elt {9300}\@elt {9301}\@elt {9302}\@elt {9303}\@elt {9304}%
+  \@elt {9305}\@elt {9306}\@elt {9307}\@elt {9308}\@elt {9309}\@elt {9310}%
+  \@elt {9311}\@elt {9312}\@elt {9313}\@elt {9314}\@elt {9315}\@elt {9316}%
+  \@elt {9317}\@elt {9318}\@elt {9319}\@elt {9320}\@elt {9321}\@elt {9322}%
+  \@elt {9323}\@elt {9324}\@elt {9325}\@elt {9326}\@elt {9327}\@elt {9328}%
+  \@elt {9329}\@elt {9330}\@elt {9331}\@elt {9332}\@elt {9333}\@elt {9334}%
+  \@elt {9335}\@elt {9336}\@elt {9337}\@elt {9338}\@elt {9339}\@elt {9340}%
+  \@elt {9341}\@elt {9342}\@elt {9505}\@elt {9506}\@elt {9507}\@elt {9508}%
+  \@elt {9509}\@elt {9510}\@elt {9511}\@elt {9512}\@elt {9513}\@elt {9514}%
+  \@elt {9515}\@elt {9516}\@elt {9517}\@elt {9518}\@elt {9519}\@elt {9520}%
+  \@elt {9521}\@elt {9522}\@elt {9523}\@elt {9524}\@elt {9525}\@elt {9526}%
+  \@elt {9527}\@elt {9528}\@elt {9529}\@elt {9530}\@elt {9531}\@elt {9532}%
+  \@elt {9533}\@elt {9534}\@elt {9535}\@elt {9536}\@elt {9537}\@elt {9538}%
+  \@elt {9539}\@elt {9540}\@elt {9541}\@elt {9542}\@elt {9543}\@elt {9544}%
+  \@elt {9545}\@elt {9546}\@elt {9547}\@elt {9548}\@elt {9549}\@elt {9550}%
+  \@elt {9551}\@elt {9552}\@elt {9553}\@elt {9554}\@elt {9555}\@elt {9556}%
+  \@elt {9557}\@elt {9558}\@elt {9559}\@elt {9560}\@elt {9561}\@elt {9562}%
+  \@elt {9563}\@elt {9564}\@elt {9565}\@elt {9566}\@elt {9567}\@elt {9568}%
+  \@elt {9569}\@elt {9570}\@elt {9571}\@elt {9572}\@elt {9573}\@elt {9574}%
+  \@elt {9575}\@elt {9576}\@elt {9577}\@elt {9578}\@elt {9579}\@elt {9580}%
+  \@elt {9581}\@elt {9582}\@elt {9583}\@elt {9584}\@elt {9585}\@elt {9586}%
+  \@elt {9587}\@elt {9588}\@elt {9589}\@elt {9590}\@elt {9591}\@elt {9592}%
+  \@elt {9593}\@elt {9594}\@elt {9595}\@elt {9596}\@elt {9597}\@elt {9598}%
+  \@elt {9761}\@elt {9762}\@elt {9763}\@elt {9764}\@elt {9765}\@elt {9766}%
+  \@elt {9767}\@elt {9768}\@elt {9769}\@elt {9770}\@elt {9771}\@elt {9772}%
+  \@elt {9773}\@elt {9774}\@elt {9775}\@elt {9776}\@elt {9777}\@elt {9778}%
+  \@elt {9779}\@elt {9780}\@elt {9781}\@elt {9782}\@elt {9783}\@elt {9784}%
+  \@elt {9785}\@elt {9786}\@elt {9787}\@elt {9788}\@elt {9789}\@elt {9790}%
+  \@elt {9791}\@elt {9792}\@elt {9793}\@elt {9794}\@elt {9795}\@elt {9796}%
+  \@elt {9797}\@elt {9798}\@elt {9799}\@elt {9800}\@elt {9801}\@elt {9802}%
+  \@elt {9803}\@elt {9804}\@elt {9805}\@elt {9806}\@elt {9807}\@elt {9808}%
+  \@elt {9809}\@elt {9810}\@elt {9811}\@elt {9812}\@elt {9813}\@elt {9814}%
+  \@elt {9815}\@elt {9816}\@elt {9817}\@elt {9818}\@elt {9819}\@elt {9820}%
+  \@elt {9821}\@elt {9822}\@elt {9823}\@elt {9824}\@elt {9825}\@elt {9826}%
+  \@elt {9827}\@elt {9828}\@elt {9829}\@elt {9830}\@elt {9831}\@elt {9832}%
+  \@elt {9833}\@elt {9834}\@elt {9835}\@elt {9836}\@elt {9837}\@elt {9838}%
+  \@elt {9839}\@elt {9840}\@elt {9841}\@elt {9842}\@elt {9843}\@elt {9844}%
+  \@elt {9845}\@elt {9846}\@elt {9847}\@elt {9848}\@elt {9849}\@elt {9850}%
+  \@elt {9851}\@elt {9852}\@elt {9853}\@elt {9854}%
+}
+
+\def\jlist{% JIS X 0213 だけにあるもの
+\@elt{"222F}{"FF07}\@elt{"2230}{"FF02}\@elt{"2231}{"FF0D}\@elt{"2232}{"FF5E}%
+\@elt{"2233}{"3033}\@elt{"2234}{"3034}\@elt{"2235}{"3035}\@elt{"2236}{"303B}%
+\@elt{"2237}{"303C}\@elt{"2238}{"30FF}\@elt{"2239}{"309F}\@elt{"2242}{"2284}%
+\@elt{"2243}{"2285}\@elt{"2244}{"228A}\@elt{"2245}{"228B}\@elt{"2246}{"2209}%
+\@elt{"2247}{"2205}\@elt{"2248}{"2305}\@elt{"2249}{"2306}\@elt{"2251}{"2295}%
+\@elt{"2252}{"2296}\@elt{"2253}{"2297}\@elt{"2254}{"2225}\@elt{"2255}{"2226}%
+\@elt{"2256}{"FF5F}\@elt{"2257}{"FF60}\@elt{"2258}{"3018}\@elt{"2259}{"3019}%
+\@elt{"225A}{"3016}\@elt{"225B}{"3017}\@elt{"226B}{"2262}\@elt{"226C}{"2243}%
+\@elt{"226D}{"2245}\@elt{"226E}{"2248}\@elt{"226F}{"2276}\@elt{"2270}{"2277}%
+\@elt{"2271}{"2194}\@elt{"227A}{"266E}\@elt{"227B}{"266B}\@elt{"227C}{"266C}%
+\@elt{"227D}{"2669}\@elt{"2321}{"25B7}\@elt{"2322}{"25B6}\@elt{"2323}{"25C1}%
+\@elt{"2324}{"25C0}\@elt{"2325}{"2197}\@elt{"2326}{"2198}\@elt{"2327}{"2196}%
+\@elt{"2328}{"2199}\@elt{"2329}{"21C4}\@elt{"232A}{"21E8}\@elt{"232B}{"21E6}%
+\@elt{"232C}{"21E7}\@elt{"232D}{"21E9}\@elt{"232E}{"2934}\@elt{"232F}{"2935}%
+\@elt{"233A}{"29BF}\@elt{"233B}{"25C9}\@elt{"233C}{"303D}\@elt{"233D}{"FE46}%
+\@elt{"233E}{"FE45}\@elt{"233F}{"25E6}\@elt{"2340}{"2022}\@elt{"235B}{"2213}%
+\@elt{"235C}{"2135}\@elt{"235D}{"210F}\@elt{"235E}{"33CB}\@elt{"235F}{"2113}%
+\@elt{"2360}{"2127}\@elt{"237B}{"30A0}\@elt{"237C}{"2013}\@elt{"237D}{"29FA}%
+\@elt{"237E}{"29FB}\@elt{"2474}{"3094}\@elt{"2475}{"3095}\@elt{"2476}{"3096}%
+\@elt{"2639}{"2664}\@elt{"263A}{"2660}\@elt{"263B}{"2662}%
+\@elt{"263C}{"2666}\@elt{"263D}{"2661}\@elt{"263E}{"2665}\@elt{"263F}{"2667}%
+\@elt{"2640}{"2663}\@elt{"2659}{"03C2}\@elt{"265A}{"24F5}\@elt{"265B}{"24F6}%
+\@elt{"265C}{"24F7}\@elt{"265D}{"24F8}\@elt{"265E}{"24F9}\@elt{"265F}{"24FA}%
+\@elt{"2660}{"24FB}\@elt{"2661}{"24FC}\@elt{"2662}{"24FD}\@elt{"2663}{"24FE}%
+\@elt{"2664}{"2616}\@elt{"2665}{"2617}\@elt{"2666}{"3020}\@elt{"2667}{"260E}%
+\@elt{"2668}{"2600}\@elt{"2669}{"2601}\@elt{"266A}{"2602}\@elt{"266B}{"2603}%
+\@elt{"266C}{"2668}\@elt{"266D}{"25B1}\@elt{"266E}{"31F0}\@elt{"266F}{"31F1}%
+\@elt{"2670}{"31F2}\@elt{"2671}{"31F3}\@elt{"2672}{"31F4}\@elt{"2673}{"31F5}%
+\@elt{"2674}{"31F6}\@elt{"2675}{"31F7}\@elt{"2676}{"31F8}\@elt{"2677}{"31F9}%
+\@elt{"2678}{"31F7}\@elt{"2679}{"31FA}\@elt{"267A}{"31FB}\@elt{"267B}{"31FC}%
+\@elt{"267C}{"31FD}\@elt{"267D}{"31FE}\@elt{"267E}{"31FF}\@elt{"2742}{"23BE}%
+\@elt{"2743}{"23BF}\@elt{"2744}{"23C0}\@elt{"2745}{"23C1}\@elt{"2746}{"23C2}%
+\@elt{"2747}{"23C3}\@elt{"2748}{"23C4}\@elt{"2749}{"23C5}\@elt{"274A}{"23C6}%
+\@elt{"274B}{"23C7}\@elt{"274C}{"23C8}\@elt{"274D}{"23C9}\@elt{"274E}{"23CA}%
+\@elt{"274F}{"23CB}\@elt{"2750}{"23CC}\@elt{"2772}{"30F7}\@elt{"2773}{"30F8}%
+\@elt{"2774}{"30F9}\@elt{"2775}{"30FA}\@elt{"2776}{"22DA}\@elt{"2777}{"22DB}%
+\@elt{"2778}{"2153}\@elt{"2779}{"2154}\@elt{"277A}{"2155}\@elt{"277B}{"2713}%
+\@elt{"277C}{"2318}\@elt{"277D}{"2423}\@elt{"277E}{"23CE}\@elt{"2841}{"3251}%
+\@elt{"2842}{"3252}\@elt{"2843}{"3253}\@elt{"2844}{"3254}\@elt{"2845}{"3255}%
+\@elt{"2846}{"3256}\@elt{"2847}{"3257}\@elt{"2848}{"3258}\@elt{"2849}{"3259}%
+\@elt{"284A}{"325A}\@elt{"284B}{"325B}\@elt{"284C}{"325C}\@elt{"284D}{"325D}%
+\@elt{"284E}{"325E}\@elt{"284F}{"325F}\@elt{"2850}{"32B1}\@elt{"2851}{"32B2}%
+\@elt{"2852}{"32B3}\@elt{"2853}{"32B4}\@elt{"2854}{"32B5}\@elt{"2855}{"32B6}%
+\@elt{"2856}{"32B7}\@elt{"2857}{"32B8}\@elt{"2858}{"32B9}\@elt{"2859}{"32BA}%
+\@elt{"285A}{"32BB}\@elt{"285B}{"32BC}\@elt{"285C}{"32BD}\@elt{"285D}{"32BE}%
+\@elt{"285E}{"32BF}\@elt{"2867}{"25D0}\@elt{"2868}{"25D1}\@elt{"2869}{"25D2}%
+\@elt{"286A}{"25D3}\@elt{"286B}{"203C}\@elt{"286C}{"2047}\@elt{"286D}{"2048}%
+\@elt{"286E}{"2049}\@elt{"286F}{"01CD}\@elt{"2870}{"01CE}\@elt{"2871}{"01D0}%
+\@elt{"2872}{"1E3E}\@elt{"2873}{"1E3F}\@elt{"2874}{"01F8}\@elt{"2875}{"01F9}%
+\@elt{"2876}{"01D1}\@elt{"2877}{"01D2}\@elt{"2878}{"01D4}\@elt{"2879}{"01D6}%
+\@elt{"287A}{"01D8}\@elt{"287B}{"01DA}\@elt{"287C}{"01DC}\@elt{"2921}{"20AC}%
+\@elt{"2922}{"00A0}\@elt{"2923}{"00A1}\@elt{"2924}{"00A4}\@elt{"2925}{"00A6}%
+\@elt{"2926}{"00A9}\@elt{"2927}{"00AA}\@elt{"2928}{"00AB}\@elt{"2929}{"00AD}%
+\@elt{"292A}{"00AE}\@elt{"292B}{"00AF}\@elt{"292C}{"00B2}\@elt{"292D}{"00B3}%
+\@elt{"292E}{"00B7}\@elt{"292F}{"00B8}\@elt{"2930}{"00B9}\@elt{"2931}{"00BA}%
+\@elt{"2932}{"00BB}\@elt{"2933}{"00BC}\@elt{"2934}{"00BD}\@elt{"2935}{"00BE}%
+\@elt{"2936}{"00BF}\@elt{"2937}{"00C0}\@elt{"2938}{"00C1}\@elt{"2939}{"00C2}%
+\@elt{"293A}{"00C3}\@elt{"293B}{"00C4}\@elt{"293C}{"00C5}\@elt{"293D}{"00C6}%
+\@elt{"293E}{"00C7}\@elt{"293F}{"00C8}\@elt{"2940}{"00C9}\@elt{"2941}{"00CA}%
+\@elt{"2942}{"00CB}\@elt{"2943}{"00CC}\@elt{"2944}{"00CD}\@elt{"2945}{"00CE}%
+\@elt{"2946}{"00CF}\@elt{"2947}{"00D0}\@elt{"2948}{"00D1}\@elt{"2949}{"00D2}%
+\@elt{"294A}{"00D3}\@elt{"294B}{"00D4}\@elt{"294C}{"00D5}\@elt{"294D}{"00D6}%
+\@elt{"294E}{"00D8}\@elt{"294F}{"00D9}\@elt{"2950}{"00DA}\@elt{"2951}{"00DB}%
+\@elt{"2952}{"00DC}\@elt{"2953}{"00DD}\@elt{"2954}{"00DE}\@elt{"2955}{"00DF}%
+\@elt{"2956}{"00E0}\@elt{"2957}{"00E1}\@elt{"2958}{"00E2}\@elt{"2959}{"00E3}%
+\@elt{"295A}{"00E4}\@elt{"295B}{"00E5}\@elt{"295C}{"00E6}\@elt{"295D}{"00E7}%
+\@elt{"295E}{"00E8}\@elt{"295F}{"00E9}\@elt{"2960}{"00EA}\@elt{"2961}{"00EB}%
+\@elt{"2962}{"00EC}\@elt{"2963}{"00ED}\@elt{"2964}{"00EE}\@elt{"2965}{"00EF}%
+\@elt{"2966}{"00F0}\@elt{"2967}{"00F1}\@elt{"2968}{"00F2}\@elt{"2969}{"00F3}%
+\@elt{"296A}{"00F4}\@elt{"296B}{"00F5}\@elt{"296C}{"00F6}\@elt{"296D}{"00F8}%
+\@elt{"296E}{"00F9}\@elt{"296F}{"00FA}\@elt{"2970}{"00FB}\@elt{"2971}{"00FC}%
+\@elt{"2972}{"00FD}\@elt{"2973}{"00FE}\@elt{"2974}{"00FF}\@elt{"2975}{"0100}%
+\@elt{"2976}{"012A}\@elt{"2977}{"016A}\@elt{"2978}{"0112}\@elt{"2979}{"014C}%
+\@elt{"297A}{"0101}\@elt{"297B}{"012B}\@elt{"297C}{"016B}\@elt{"297D}{"0113}%
+\@elt{"297E}{"014D}\@elt{"2A21}{"0104}\@elt{"2A22}{"02D8}\@elt{"2A23}{"0141}%
+\@elt{"2A24}{"013D}\@elt{"2A25}{"015A}\@elt{"2A26}{"0160}\@elt{"2A27}{"015E}%
+\@elt{"2A28}{"0164}\@elt{"2A29}{"0179}\@elt{"2A2A}{"017D}\@elt{"2A2B}{"017B}%
+\@elt{"2A2C}{"0105}\@elt{"2A2D}{"02DB}\@elt{"2A2E}{"0142}\@elt{"2A2F}{"013E}%
+\@elt{"2A30}{"015B}\@elt{"2A31}{"02C7}\@elt{"2A32}{"0161}\@elt{"2A33}{"015F}%
+\@elt{"2A34}{"0165}\@elt{"2A35}{"017A}\@elt{"2A36}{"02DD}\@elt{"2A37}{"017E}%
+\@elt{"2A38}{"017C}\@elt{"2A39}{"0154}\@elt{"2A3A}{"0102}\@elt{"2A3B}{"0139}%
+\@elt{"2A3C}{"0106}\@elt{"2A3D}{"010C}\@elt{"2A3E}{"0118}\@elt{"2A3F}{"011A}%
+\@elt{"2A40}{"010E}\@elt{"2A41}{"0143}\@elt{"2A42}{"0147}\@elt{"2A43}{"0150}%
+\@elt{"2A44}{"0158}\@elt{"2A45}{"016E}\@elt{"2A46}{"0170}\@elt{"2A47}{"0162}%
+\@elt{"2A48}{"0155}\@elt{"2A49}{"0103}\@elt{"2A4A}{"013A}\@elt{"2A4B}{"0107}%
+\@elt{"2A4C}{"010D}\@elt{"2A4D}{"0119}\@elt{"2A4E}{"011B}\@elt{"2A4F}{"010F}%
+\@elt{"2A50}{"0111}\@elt{"2A51}{"0144}\@elt{"2A52}{"0148}\@elt{"2A53}{"0151}%
+\@elt{"2A54}{"0159}\@elt{"2A55}{"016F}\@elt{"2A56}{"0171}\@elt{"2A57}{"0163}%
+\@elt{"2A58}{"02D9}\@elt{"2A59}{"0108}\@elt{"2A5A}{"011C}\@elt{"2A5B}{"0124}%
+\@elt{"2A5C}{"0134}\@elt{"2A5D}{"015C}\@elt{"2A5E}{"016C}\@elt{"2A5F}{"0109}%
+\@elt{"2A60}{"011D}\@elt{"2A61}{"0125}\@elt{"2A62}{"0135}\@elt{"2A63}{"015D}%
+\@elt{"2A64}{"016D}\@elt{"2A65}{"0271}\@elt{"2A66}{"028B}\@elt{"2A67}{"027E}%
+\@elt{"2A68}{"0283}\@elt{"2A69}{"0292}\@elt{"2A6A}{"026C}\@elt{"2A6B}{"026E}%
+\@elt{"2A6C}{"0279}\@elt{"2A6D}{"0288}\@elt{"2A6E}{"0256}\@elt{"2A6F}{"0273}%
+\@elt{"2A70}{"027D}\@elt{"2A71}{"0282}\@elt{"2A72}{"0290}\@elt{"2A73}{"027B}%
+\@elt{"2A74}{"026D}\@elt{"2A75}{"025F}\@elt{"2A76}{"0272}\@elt{"2A77}{"029D}%
+\@elt{"2A78}{"028E}\@elt{"2A79}{"0261}\@elt{"2A7A}{"014B}\@elt{"2A7B}{"0270}%
+\@elt{"2A7C}{"0281}\@elt{"2A7D}{"0127}\@elt{"2A7E}{"0295}\@elt{"2B21}{"0294}%
+\@elt{"2B22}{"0266}\@elt{"2B23}{"0298}\@elt{"2B24}{"01C2}\@elt{"2B25}{"0253}%
+\@elt{"2B26}{"0257}\@elt{"2B27}{"0284}\@elt{"2B28}{"0260}\@elt{"2B29}{"0193}%
+\@elt{"2B2A}{"0153}\@elt{"2B2B}{"0152}\@elt{"2B2C}{"0268}\@elt{"2B2D}{"0289}%
+\@elt{"2B2E}{"0258}\@elt{"2B2F}{"0275}\@elt{"2B30}{"0259}\@elt{"2B31}{"025C}%
+\@elt{"2B32}{"025E}\@elt{"2B33}{"0250}\@elt{"2B34}{"026F}\@elt{"2B35}{"028A}%
+\@elt{"2B36}{"0264}\@elt{"2B37}{"028C}\@elt{"2B38}{"0254}\@elt{"2B39}{"0251}%
+\@elt{"2B3A}{"0252}\@elt{"2B3B}{"028D}\@elt{"2B3C}{"0265}\@elt{"2B3D}{"02A2}%
+\@elt{"2B3E}{"02A1}\@elt{"2B3F}{"0255}\@elt{"2B40}{"0291}\@elt{"2B41}{"027A}%
+\@elt{"2B42}{"0267}\@elt{"2B43}{"025A}\@elt{"2B44}{"00E6}\@elt{"2B45}{"01FD}%
+\@elt{"2B46}{"1F70}\@elt{"2B47}{"1F71}\@elt{"2B48}{"0254}\@elt{"2B49}{"0254}%
+\@elt{"2B4A}{"028C}\@elt{"2B4B}{"028C}\@elt{"2B4C}{"0259}\@elt{"2B4D}{"0259}%
+\@elt{"2B4E}{"025A}\@elt{"2B4F}{"025A}\@elt{"2B50}{"1F72}\@elt{"2B51}{"1F73}%
+\@elt{"2B52}{"0361}\@elt{"2B53}{"02C8}\@elt{"2B54}{"02CC}\@elt{"2B55}{"02D0}%
+\@elt{"2B56}{"02D1}\@elt{"2B57}{"0306}\@elt{"2B58}{"203F}\@elt{"2B59}{"030B}%
+\@elt{"2B5A}{"0301}\@elt{"2B5B}{"0304}\@elt{"2B5C}{"0300}\@elt{"2B5D}{"030F}%
+\@elt{"2B5E}{"030C}\@elt{"2B5F}{"0302}\@elt{"2B60}{"02E5}\@elt{"2B61}{"02E6}%
+\@elt{"2B62}{"02E7}\@elt{"2B63}{"02E8}\@elt{"2B64}{"02E9}\@elt{"2B65}{"02E9}%
+\@elt{"2B66}{"02E5}\@elt{"2B67}{"0325}\@elt{"2B68}{"032C}\@elt{"2B69}{"0339}%
+\@elt{"2B6A}{"031C}\@elt{"2B6B}{"031F}\@elt{"2B6C}{"0320}\@elt{"2B6D}{"0308}%
+\@elt{"2B6E}{"033D}\@elt{"2B6F}{"0329}\@elt{"2B70}{"032F}\@elt{"2B71}{"02DE}%
+\@elt{"2B72}{"0324}\@elt{"2B73}{"0330}\@elt{"2B74}{"033C}\@elt{"2B75}{"0334}%
+\@elt{"2B76}{"031D}\@elt{"2B77}{"031E}\@elt{"2B78}{"0318}\@elt{"2B79}{"0319}%
+\@elt{"2B7A}{"032A}\@elt{"2B7B}{"033A}\@elt{"2B7C}{"033B}\@elt{"2B7D}{"0303}%
+\@elt{"2B7E}{"031A}\@elt{"2C21}{"2776}\@elt{"2C22}{"2777}\@elt{"2C23}{"2778}%
+\@elt{"2C24}{"2779}\@elt{"2C25}{"277A}\@elt{"2C26}{"277B}\@elt{"2C27}{"277C}%
+\@elt{"2C28}{"277D}\@elt{"2C29}{"277E}\@elt{"2C2A}{"277F}\@elt{"2C2B}{"24EB}%
+\@elt{"2C2C}{"24EC}\@elt{"2C2D}{"24ED}\@elt{"2C2E}{"24EE}\@elt{"2C2F}{"24EF}%
+\@elt{"2C30}{"24F0}\@elt{"2C31}{"24F1}\@elt{"2C32}{"24F2}\@elt{"2C33}{"24F3}%
+\@elt{"2C34}{"24F4}\@elt{"2C35}{"2170}\@elt{"2C36}{"2171}\@elt{"2C37}{"2172}%
+\@elt{"2C38}{"2173}\@elt{"2C39}{"2174}\@elt{"2C3A}{"2175}\@elt{"2C3B}{"2176}%
+\@elt{"2C3C}{"2177}\@elt{"2C3D}{"2178}\@elt{"2C3E}{"2179}\@elt{"2C3F}{"217A}%
+\@elt{"2C40}{"217B}\@elt{"2C41}{"24D0}\@elt{"2C42}{"24D1}\@elt{"2C43}{"24D2}%
+\@elt{"2C44}{"24D3}\@elt{"2C45}{"24D4}\@elt{"2C46}{"24D5}\@elt{"2C47}{"24D6}%
+\@elt{"2C48}{"24D7}\@elt{"2C49}{"24D8}\@elt{"2C4A}{"24D9}\@elt{"2C4B}{"24DA}%
+\@elt{"2C4C}{"24DB}\@elt{"2C4D}{"24DC}\@elt{"2C4E}{"24DD}\@elt{"2C4F}{"24DE}%
+\@elt{"2C50}{"24DF}\@elt{"2C51}{"24E0}\@elt{"2C52}{"24E1}\@elt{"2C53}{"24E2}%
+\@elt{"2C54}{"24E3}\@elt{"2C55}{"24E4}\@elt{"2C56}{"24E5}\@elt{"2C57}{"24E6}%
+\@elt{"2C58}{"24E7}\@elt{"2C59}{"24E8}\@elt{"2C5A}{"24E9}\@elt{"2C5B}{"32D0}%
+\@elt{"2C5C}{"32D1}\@elt{"2C5D}{"32D2}\@elt{"2C5E}{"32D3}\@elt{"2C5F}{"32D4}%
+\@elt{"2C60}{"32D5}\@elt{"2C61}{"32D6}\@elt{"2C62}{"32D7}\@elt{"2C63}{"32D8}%
+\@elt{"2C64}{"32D9}\@elt{"2C65}{"32DA}\@elt{"2C66}{"32DB}\@elt{"2C67}{"32DC}%
+\@elt{"2C68}{"32DD}\@elt{"2C69}{"32DE}\@elt{"2C6A}{"32DF}\@elt{"2C6B}{"32E0}%
+\@elt{"2C6C}{"32E1}\@elt{"2C6D}{"32E2}\@elt{"2C6E}{"32E3}\@elt{"2C6F}{"32FA}%
+\@elt{"2C70}{"32E9}\@elt{"2C71}{"32E5}\@elt{"2C72}{"32ED}\@elt{"2C73}{"32EC}%
+\@elt{"2C7D}{"2051}\@elt{"2C7E}{"2042}\@elt{"2D21}{"2460}\@elt{"2D22}{"2461}%
+\@elt{"2D23}{"2462}\@elt{"2D24}{"2463}\@elt{"2D25}{"2464}\@elt{"2D26}{"2465}%
+\@elt{"2D27}{"2466}\@elt{"2D28}{"2467}\@elt{"2D29}{"2468}\@elt{"2D2A}{"2469}%
+\@elt{"2D2B}{"246A}\@elt{"2D2C}{"246B}\@elt{"2D2D}{"246C}\@elt{"2D2E}{"246D}%
+\@elt{"2D2F}{"246E}\@elt{"2D30}{"246F}\@elt{"2D31}{"2470}\@elt{"2D32}{"2471}%
+\@elt{"2D33}{"2472}\@elt{"2D34}{"2473}\@elt{"2D35}{"2160}\@elt{"2D36}{"2161}%
+\@elt{"2D37}{"2162}\@elt{"2D38}{"2163}\@elt{"2D39}{"2164}\@elt{"2D3A}{"2165}%
+\@elt{"2D3B}{"2166}\@elt{"2D3C}{"2167}\@elt{"2D3D}{"2168}\@elt{"2D3E}{"2169}%
+\@elt{"2D3F}{"216A}\@elt{"2D40}{"3349}\@elt{"2D41}{"3314}\@elt{"2D42}{"3322}%
+\@elt{"2D43}{"334D}\@elt{"2D44}{"3318}\@elt{"2D45}{"3327}\@elt{"2D46}{"3303}%
+\@elt{"2D47}{"3336}\@elt{"2D48}{"3351}\@elt{"2D49}{"3357}\@elt{"2D4A}{"330D}%
+\@elt{"2D4B}{"3326}\@elt{"2D4C}{"3323}\@elt{"2D4D}{"332B}\@elt{"2D4E}{"334A}%
+\@elt{"2D4F}{"333B}\@elt{"2D50}{"339C}\@elt{"2D51}{"339D}\@elt{"2D52}{"339E}%
+\@elt{"2D53}{"338E}\@elt{"2D54}{"338F}\@elt{"2D55}{"33C4}\@elt{"2D56}{"33A1}%
+\@elt{"2D57}{"216B}\@elt{"2D5F}{"337B}\@elt{"2D60}{"301D}\@elt{"2D61}{"301F}%
+\@elt{"2D62}{"2116}\@elt{"2D63}{"33CD}\@elt{"2D64}{"2121}\@elt{"2D65}{"32A4}%
+\@elt{"2D66}{"32A5}\@elt{"2D67}{"32A6}\@elt{"2D68}{"32A7}\@elt{"2D69}{"32A8}%
+\@elt{"2D6A}{"3231}\@elt{"2D6B}{"3232}\@elt{"2D6C}{"3239}\@elt{"2D6D}{"337E}%
+\@elt{"2D6E}{"337D}\@elt{"2D6F}{"337C}\@elt{"2D73}{"222E}\@elt{"2D78}{"221F}%
+\@elt{"2D79}{"22BF}\@elt{"2D7D}{"2756}\@elt{"2D7E}{"261E}%
+}
+
+\newcount\cntA
+\newcount\cntB
+\newcount\flag
+\def\chk@in@#1#2{{\global\flag=0\relax%
+  \def\@elt##1{\ifnum#2=##1\global\flag=1 \fi}%
+  #1}}
+\def\get@in@#1#2{{%
+  \global\flag=0\relax%
+  \def\@elt##1##2{\ifnum#2=##1\global\flag##2 \fi}%
+  #1}}
+
+\def\outi{%
+\get@in@{\jlist}{\cntA}\cntB=\flag
+\ifnum\cntB=0{}%
+  \cntB=\jis\cntA{}%
+  \ifnum\cntB=0 \else
+    \ifnum\ltjgetparameter{jacharrange}{\ltjgetparameter{chartorange}{\cntB}}=0
+    \def\@@@tmp{white}\else\def\@@@tmp{white!85!blue}\fi
+    \fcolorbox{black}{\@@@tmp}{%
+      \hbox to \zw{\gt 　\hskip-\zw\ltjjachar\cntB 　\hss}}\,\scriptsize%
+    \ifnum\catcode\cntB=11 L\else\ \fi
+    \chk@in@{\uplist}{\cntA}\ifnum\flag=1 U\else~\fi
+    \chk@in@{\plist}{\cntA}\ifnum\flag=1 P\else~\fi
+  \fi
+\else
+  \ifnum\ltjgetparameter{jacharrange}{\ltjgetparameter{chartorange}{\cntB}}=0
+  \def\@@@tmp{white}\else\def\@@@tmp{white!85!blue}\fi
+  \fcolorbox{black}{\@@@tmp}{\color{red!50!black}%
+     \hbox to \zw{\gt 　\hskip-\zw\ltjjachar\cntB 　\hss}}\,\scriptsize%
+   \ifnum\catcode\cntB=11 L\else~\fi
+  \chk@in@{\uplist}{\cntA}\ifnum\flag=1 U\else~\fi-%
+\fi\global\advance\cntA1 }
+
+\def\out#1#2{%
+\midrule\global\cntA=\numexpr 8192+#1*256+#2*16\relax
+"#2{}x&\ifnum#2=2\global\advance\cntA1\else\outi\fi&\outi&\outi&\outi&\outi&\outi&\outi&\outi%"
+&\outi&\outi&\outi&\outi&\outi&\outi&\outi&\ifnum#2=7\global\advance\cntA1\else\outi\fi\\
+}
+
+\def\test#1{{%
+\subsection*{第#1区}\tt\small\fboxsep=1pt\centering\tabcolsep=0.25\zw
+\begin{tabular}{ccccccccccccccccc}\toprule&"0&"1&"2&"3&"4&"5&"6&"7&"8&"9&"A&"B&"C&"D&"E&"F\\
+\out{#1}{2}\out{#1}{3}\out{#1}{4}\out{#1}{5}\out{#1}{6}\out{#1}{7}\bottomrule
+\end{tabular}\par}\medskip}
+
+\test{1}\test{2}\test{3}\test{4}\test{5}\test{6}\test{7}\test{8}
+\test{9}\test{10}\test{11}\test{12}\test{13}
+
+%</ja>
+
+
 \section{Package versions used in this document}
 This document was typeset using the following packages:
 
@@ -5932,7 +6418,7 @@ This document was typeset using the following packages:
 %%
 %% config file for showexpl.sty
 %%
-%% Copyright The LuaTeX-ja project team, 2005
+%% Copyright The LuaTeX-ja project team, 2012
 %%
 \ProvidesFile{showexpl.cfg}
   [2012/05/20 v0.01 Definitions for the showexpl package (luatexja)]

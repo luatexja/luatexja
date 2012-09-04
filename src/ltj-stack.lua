@@ -121,7 +121,7 @@ function set_stack_font(g,m,c,p)
       charprop_stack_table[i][m] = {} 
    end
    charprop_stack_table[i][m][c] = p
-  if g=='global' then
+   if g=='global' then
      for j,v in pairs(charprop_stack_table) do 
 	if not charprop_stack_table[j][m] then charprop_stack_table[j][m] = {} end
 	charprop_stack_table[j][m][c] = p
@@ -153,17 +153,29 @@ function set_stack_skip(g,m,sp)
   end
 end
 
--- mode: nil iff it is called in callbacks
-function get_skip_table(m, idx)
-   local i = charprop_stack_table[idx][m]
-   return i or { width = 0, stretch = 0, shrink = 0,
-		 stretch_order = 0, shrink_order = 0 }
+-- These three functions are used in ltj-jfmglue.lua.
+local table_current_stack
+function report_stack_level(bsl)
+   table_current_stack = charprop_stack_table[bsl]
+end
+function fast_get_skip_table(m)
+   return table_current_stack[m] 
+      or { width = 0, stretch = 0, shrink = 0, stretch_order = 0, shrink_order = 0 }
+end
+function fast_get_penalty_table(m,c)
+   local i = table_current_stack[m]
+   return (i and i[c])
 end
 
+-- For other situations, use the following instead:
+function get_skip_table(m, idx)
+   return charprop_stack_table[idx][m] 
+      or { width = 0, stretch = 0, shrink = 0, stretch_order = 0, shrink_order = 0 }
+end
 function get_penalty_table(m,c,d, idx)
    local i = charprop_stack_table[idx][m]
-   if i then i=i[c] end
-   return i or d
+   return (i and i[c]) or d
 end
+
 
 -- EOF

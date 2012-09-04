@@ -14,14 +14,18 @@ luatexja.load_module('charrange'); local ltjc = luatexja.charrange
 
 local node_new = node.new
 local has_attr = node.has_attribute
+local set_attr = node.set_attribute
 local round = tex.round
 
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local id_glyph = node.id('glyph')
 local id_kern = node.id('kern')
+local id_glue_spec = node.id('glue_spec')
+local id_glue = node.id('glue')
 local cat_lp = luatexbase.catcodetables['latex-package']
 local ITALIC = 1
+local FROM_JFM = 4
 ------------------------------------------------------------------------
 -- LOADING JFM
 ------------------------------------------------------------------------
@@ -56,6 +60,13 @@ function define_jfm(t)
 		  real_char = true;
 	       elseif type(w) == 'string' and utf.len(w)==1 then
 		  real_char = true; w = utf.byte(w)
+	       elseif type(w) == 'string' and utf.len(w)==2 and utf.sub(w,2) == '*' then
+		  real_char = true; w = utf.byte(utf.sub(w,1,1))
+                  if not t.chars[-w] then 
+                     t.chars[-w] = i
+                  else 
+                     defjfm_res= nil; return
+                  end
 	       end
 	       if not t.chars[w] then
 		  t.chars[w] = i
@@ -82,17 +93,17 @@ function define_jfm(t)
 		  if type(v.down)~='number' then 
 		     v.down = 0.0
 		  end
-		  if type(v.align)=='nil' then
+		  if type(v.align)~='string' then 
 		     v.align = 'left'
 		  end
 	       end
 	    end
 	    v.chars = nil
 	 end
-	 if v.kern and v.glue then
-	    for j,w in pairs(v.glue) do
-	       if v.kern[j] then defjfm_res= nil; return end
-	    end
+	 if not v.kern then v.kern = {} end
+	 if not v.glue then v.glue = {} end
+	 for j in pairs(v.glue) do
+	    if v.kern[j] then defjfm_res= nil; return end
 	 end
 	 t.char_type[i] = v
 	 t[i] = nil
@@ -111,8 +122,8 @@ local function mult_table(old,scale) -- modified from table.fastcopy
 	     new[k] = mult_table(v,scale)
 	  elseif type(v) == "number" then
 	     new[k] = round(v*scale)
-	  else
-	     new[k] = v
+          else
+             new[k] = v
 	  end
        end
        return new
@@ -121,12 +132,24 @@ end
 
 local function update_jfm_cache(j,sz)
    if metrics[j].size_cache[sz] then return end
-   metrics[j].size_cache[sz] = {}
-   metrics[j].size_cache[sz].char_type = mult_table(metrics[j].char_type, sz)
-   metrics[j].size_cache[sz].kanjijskip = mult_table(metrics[j].kanjiskip, sz)
-   metrics[j].size_cache[sz].xkanjiskip = mult_table(metrics[j].xkanjiskip,sz)
-   metrics[j].size_cache[sz].zw = round(metrics[j].zw*sz)
-   metrics[j].size_cache[sz].zh = round(metrics[j].zh*sz)
+   local t = {}
+   metrics[j].size_cache[sz] = t
+   t.chars = metrics[j].chars
+   t.char_type = mult_table(metrics[j].char_type, sz)
+   for i,v in pairs(t.char_type) do
+      if type(i) == 'number' then -- char_type
+	 for k,w in pairs(v.glue) do
+	    local g, h = node.new(id_glue), node_new(id_glue_spec); v.glue[k] = g
+            h.width, h.stretch, h.shrink = w[1], w[2], w[3]
+            h.stretch_order, h.shrink_order = 0, 0
+            g.subtype = 0; g.spec = h; set_attr(g, attr_icflag, FROM_JFM); 
+	 end
+      end
+   end
+   t.kanjiskip = mult_table(metrics[j].kanjiskip, sz)
+   t.xkanjiskip = mult_table(metrics[j].xkanjiskip,sz)
+   t.zw = round(metrics[j].zw*sz)
+   t.zh = round(metrics[j].zh*sz)
 end
 
 luatexbase.create_callback("luatexja.find_char_class", "data", 
@@ -135,9 +158,9 @@ luatexbase.create_callback("luatexja.find_char_class", "data",
 			   end)
 
 function find_char_class(c,m)
--- c: character code, m: index in font_metric table
-   if not metrics[m.jfm] then return 0 end
-   return metrics[m.jfm].chars[c] or 
+-- c: character code, m: 
+   if not m then return 0 end
+   return m.size_cache.chars[c] or 
       luatexbase.call_callback("luatexja.find_char_class", 0, m, c)
 end
 
@@ -193,7 +216,8 @@ function jfontdefY() -- for horizontal font
      return 
    end
    update_jfm_cache(j, f.size)
-   local fmtable = { jfm = j, size = f.size, var = jfm_var }
+   local fmtable = { jfm = j, size = f.size, var = jfm_var, 
+		     size_cache = metrics[j].size_cache[f.size] }
    fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
    font_metric_table[fn]=fmtable
    tex.sprint(cat_lp, luatexja.is_global .. '\\protected\\expandafter\\def\\csname ' 
@@ -204,7 +228,7 @@ end
 function load_zw()
    local a = font_metric_table[tex.attribute[attr_curjfnt]]
    if a then
-      tex.setdimen('ltj@zw', metrics[a.jfm].size_cache[a.size].zw)
+      tex.setdimen('ltj@zw', a.size_cache.zw)
    else 
       tex.setdimen('ltj@zw',0)
    end
@@ -213,7 +237,7 @@ end
 function load_zh()
    local a = font_metric_table[tex.attribute[attr_curjfnt]]
    if a then
-      tex.setdimen('ltj@zh', metrics[a.jfm].size_cache[a.size].zh)
+      tex.setdimen('ltj@zh', a.size_cache.zh)
    else 
       tex.setdimen('ltj@zh',0)
    end
@@ -269,7 +293,7 @@ function append_italic()
 	 f = has_attr(p, attr_curjfnt)
 	 local j = font_metric_table[f]
 	 local c = find_char_class(p.char, j)
-	 g.kern = metrics[j.jfm].size_cache[j.size].char_type[c].italic
+	 g.kern = j.size_cache.char_type[c].italic
       else
 	 g.kern = font.fonts[f].characters[p.char].italic
       end

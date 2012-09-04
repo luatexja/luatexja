@@ -134,13 +134,25 @@
 %%%%%%%% Attributes for Japanese typesetting.
 \newluatexattribute\ltj@curjfnt   % index for ``current Japanese font''
 \newluatexattribute\jfam          % index for current jfam
-\newluatexattribute\ltj@uniqid    % unique id of box/paragraph
 \newluatexattribute\ltj@charclass % 
+\newluatexattribute\ltj@origchar % 
 \newluatexattribute\ltj@yablshift % attribute for \yabaselineshift
 \newluatexattribute\ltj@ykblshift % attribute for \ykbaselineshift
 \newluatexattribute\ltj@autospc   % attribute for autospacing
 \newluatexattribute\ltj@autoxspc  % attribute for autoxspacing
 \newluatexattribute\ltj@icflag    % attribute for italic correction
+\ltj@icflag=0 \ltj@origchar=0
+
+%%%%%%%% Attributes for character ranges
+\newcount\ltj@tempcnta
+\ltj@tempcnta=0
+\loop\ifnum\ltj@tempcnta<7
+  \expandafter\newluatexattribute%
+    \csname ltj@kcat\the\ltj@tempcnta\endcsname
+  \csname ltj@kcat\the\ltj@tempcnta\endcsname=0
+  \advance\ltj@tempcnta by1
+\repeat
+
 
 %%%%%%%% Loading luatexja.lua
 %% Quark tokens needed in ltj-base
@@ -173,15 +185,6 @@
 \fi                             %</LaTeX>
 
 
-%%%%%%%% Attributes for character ranges
-\ltj@tempcnta=0
-\loop\ifnum\ltj@tempcnta<7
-  \expandafter\newluatexattribute%
-    \csname ltj@kcat\the\ltj@tempcnta\endcsname
-  \csname ltj@kcat\the\ltj@tempcnta\endcsname=0
-  \advance\ltj@tempcnta by1
-\repeat
-
 %%%%%%%% \asluastring
 \def\asluastring#1{'\luaescapestring{\detokenize{#1}}'}
 
@@ -203,9 +206,8 @@
 \protected\def\ltj@reset@globaldefs{%
   \directlua{luatexja.global_temp = tex.globaldefs; tex.globaldefs = 0}}
 \protected\def\ltj@restore@globaldefs{\directlua{tex.globaldefs = luatexja.global_temp}}
-\let\new@everypar=\everypar
 \protected\def\inhibitglue{\ifhmode\ltj@@ihb\fi}
-\def\ltj@@ihb{\directlua{luatexja.jfmglue.create_inhibitglue_node()}}
+\def\ltj@@ihb{\relax\directlua{luatexja.jfmglue.create_inhibitglue_node()}}
 
 %%%%%%%% \yoko, \tate, \ifydir, \iftdir
 %% At this moment, tategaki mode is not implemented; 
@@ -257,7 +259,7 @@
   \expandafter\ltj@@set@stackfont#1:{mjscr}}
 \define@key[ltj]{japaram}{jascriptscriptfont}{%
   \expandafter\ltj@@set@stackfont#1:{mjss}}
-\def\ltj@@set@stackfont#1,#2:#3{%
+\protected\def\ltj@@set@stackfont#1,#2:#3{%
   \ltj@reset@globaldefs
   \ltj@tempcnta=\ltj@curjfnt\ltj@curjfnt=-1 #2%
   \ifnum\ltj@curjfnt=-1
@@ -364,9 +366,11 @@
   \fi\next
 }
 
-\protected\def\ltjsetparameter#1{%
+\protected\def\ltj@setpar@global{%
   \ifnum\globaldefs>0\directlua{luatexja.isglobal='global'}\else\directlua{luatexja.isglobal=''}\fi
-  \setkeys[ltj]{japaram}{#1}\ignorespaces}
+}
+\protected\def\ltjsetparameter#1{%
+  \ltj@setpar@global\setkeys[ltj]{japaram}{#1}\ignorespaces}
 \protected\def\ltjglobalsetparameter#1{%
   \ifnum\globaldefs<0\directlua{luatexja.isglobal=''}\else\directlua{luatexja.isglobal='global'}\fi
   \setkeys[ltj]{japaram}{#1}\ignorespaces}

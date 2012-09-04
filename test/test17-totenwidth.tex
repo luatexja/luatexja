@@ -1,0 +1,84 @@
+%#!lualatex
+
+%% 行末の句読点の位置によって，全角取りか半角取りかを自動的に調整する
+%% 仕様：全調整量が二分以上なら，全角取りにする
+\documentclass{article}
+\usepackage{luatexja,luacode}
+\begin{luacode}
+local id_hlist = node.id('hlist')
+local id_glue  = node.id('glue')
+local id_glue_spec = node.id('glue_spec')
+local attr_icflag = luatexbase.attributes['ltj@icflag']
+local PACKED = 2
+local PROCESSED_BEGIN_FLAG = 16
+
+local function get_attr_icflag(p)
+   return (node.has_attribute(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
+end
+
+-- box 内で伸縮された glue の合計値を計算
+local function compute_total_stretched(p)
+  local go, gf, gs = p.glue_order, p.glue_set, p.glue_sign
+  if gs ~= 1 and gs ~= 2 then return 0 end
+  local a = 0
+  for q in node.traverse_id(id_glue, p.head) do
+    local qs = q.spec
+    if gs == 1 then -- stretching
+      if qs.stretch_order == go then a = a + qs.stretch end
+    else -- shrinking
+      if qs.shrink_order == go then a = a - qs.shrink end
+    end
+  end
+  return tex.round(a * gf)
+end
+
+function adjust_width_toten(head) 
+  if not head then return head end
+  for p in node.traverse_id(id_hlist, head) do
+    local t = node.tail(p.head) -- \rightskip glue
+    local x = node.prev(t)      -- 本当の行末の node を格納
+    if x.id == id_glue and x.subtype == 15 then
+      -- 段落最終行のときの補正
+      x = node.prev(node.prev(x))
+    end
+    if x.id == id_hlist and get_attr_icflag(x) == PACKED then
+       local xc = x.head
+       local xcs = tex.round(font.fonts[xc.font].size*0.5)
+       local xcc = unicode.utf8.char(xc.char)
+       if (xcc == '，'  or xcc == '、' or xcc == '．'  or xcc == '。')
+          and xcs <= compute_total_stretched(p) then
+         local ag  = node.new(id_glue) -- additional glue
+         local ags = node.new(id_glue_spec)
+         ag.spec, ags.width = ags, xcs
+         ags.shrink, ags.stretch, ags.shrink_order, ags.stretch_order = 0, 0, 0, 0
+         node.insert_after(p.head, x, ag)
+         local f = node.hpack(p.head, p.width, 'exactly')
+         f.head, p.glue_set, p.glue_sign, p.glue_order 
+           = nil, f.glue_set, f.glue_sign, f.glue_order
+         node.free(f)
+       end
+    end
+  end
+  return head
+end
+
+luatexbase.add_to_callback('post_linebreak_filter', 
+  adjust_width_toten, 'Adjust width of toten', 100)
+\end{luacode}
+
+\begin{document}
+\parindent0pt
+\leavevmode
+\vrule\setbox0=\vbox{\hsize=20\zw 
+０１２３４５６７８９あいうえおかきくけ，%
+０１２３４５６７８９あいうえおかきくけ．%
+０１２３４５６７８９あいうえおかきく\hskip .25\zw こ．%
+０１２３４５６７８９あいうえおかきく\hskip .5 \zw け，%
+０１２３４５６７８\hskip0\zw ９あいうえおかきくけ，%
+
+０１２３４５６７８９あいうえおかきくけこ%
+}\copy0\vrule
+
+\directlua{luatexja.ext_show_node_list(tex.box[0], '  ', print)}
+
+\end{document}

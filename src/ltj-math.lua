@@ -3,8 +3,8 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.math',
-  date = '2011/08/14',
-  version = '0.1',
+  date = '2012/07/19',
+  version = '0.2',
   description = 'Handling routines for Japanese characters in math mode',
 })
 module('luatexja.math', package.seeall)
@@ -20,6 +20,7 @@ local node_next = node.next
 local node_free = node.free
 local has_attr = node.has_attribute
 local set_attr = node.set_attribute
+local tex_getcount = tex.getcount
 
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
@@ -102,18 +103,15 @@ function (p, sty)
 	 if sty == 0 then mode = 'mjtext'
 	 elseif sty == 1 then mode = 'mjscr'
 	 end
-	 local f = ltjs.get_penalty_table(mode, fam, -1, tex.getcount('ltj@@stack'))
+	 local f = ltjs.get_penalty_table(mode, fam, -1, tex_getcount('ltj@@stack'))
 	 if f ~= -1 then
 	    local q = node_new(id_sub_box)
 	    local r = node_new(id_glyph); r.next = nil
 	    r.char = p.char; r.font = f; r.subtype = 256
+	    set_attr(r, attr_ykblshift, 0)
 	    set_attr(r, attr_icflag, PROCESSED)
-	    set_attr(r, attr_yablshift, 0)
 	    local met = ltjf_font_metric_table[f]
-	    local class = ltjf_find_char_class(p.char, met)
-	    set_attr(r, attr_jchar_class, class)
-	    ltjw.char_data = ltjf.metrics[met.jfm].size_cache[met.size].char_type[class]
-	    ltjw.head = r; ltjw.capsule_glyph(r, tex.mathdir , true, met, class);
+	    ltjw.head = r; ltjw.capsule_glyph(r, tex.mathdir , true, met, ltjf_find_char_class(p.char, met));
 	    q.head = ltjw.head; node_free(p); p=q;
 	 end
       end
