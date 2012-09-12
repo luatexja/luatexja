@@ -228,7 +228,7 @@ function check_box_high(Nx, box_ptr, box_end)
    first_char = nil;  last_char = nil;  find_first_char = true
    if check_box(box_ptr, box_end) then
       if first_char then
-         if first_char.font == has_attr(first_char, attr_curjfnt) then 
+         if first_char.font == (has_attr(first_char, attr_curjfnt) or -1) then 
             set_np_xspc_jachar(Nx, first_char)
          else
             set_np_xspc_alchar(Nx, first_char.char,first_char, ligature_head)
@@ -274,7 +274,7 @@ local function calc_np_pbox(lp, last)
    set_attr(lp, attr_icflag, get_attr_icflag(lp));
    while lp~=last and lpa>=PACKED and lpa<BOXBDD do
       Np.nuc = lp;
-      lp = node_next(lp); lpa = has_attr(lp, attr_icflag)
+      lp = node_next(lp); lpa = has_attr(lp, attr_icflag) or 0
       -- get_attr_icflag() ではいけない！
    end
    return check_next_ickern(lp)
@@ -284,7 +284,7 @@ end
 local calc_np_auxtable = {
    [id_glyph] = function (lp) 
 		   Np.first, Np.nuc = (Np.first or lp), lp;
-		   Np.id = (lp.font == has_attr(lp, attr_curjfnt)) and id_jglyph or id_glyph
+		   Np.id = (lp.font == (has_attr(lp, attr_curjfnt) or -1)) and id_jglyph or id_glyph
 		   --set_attr_icflag_processed(lp) treated in ltj-setwidth.lua
 		   return true, check_next_ickern(node_next(lp)); 
 		end,
@@ -350,7 +350,7 @@ local calc_np_auxtable = {
 		     set_attr_icflag_processed(lp); lp = node_next(lp)
 		     set_attr_icflag_processed(lp); lp = node_next(lp)
 		     set_attr_icflag_processed(lp); Np.nuc = lp
-		     Np.id = (lp.font == has_attr(lp, attr_curjfnt)) and id_jglyph or id_glyph
+		     Np.id = (lp.font == (has_attr(lp, attr_curjfnt) or -1)) and id_jglyph or id_glyph
 		     return true, check_next_ickern(node_next(lp)); 
 		  else
 		     Np.id = id_kern; set_attr_icflag_processed(lp);
@@ -469,7 +469,7 @@ do
    function after_hlist(Nx)
       local s = Nx.last_char
       if s then
-	 if s.font == has_attr(s, attr_curjfnt) then 
+	 if s.font == (has_attr(s, attr_curjfnt) or -1) then 
 	    set_np_xspc_jachar(Nx, s)
 	 else
 	    set_np_xspc_alchar(Nx, s.char, s, ligature_tail)
