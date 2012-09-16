@@ -1,6 +1,6 @@
 % luatexja-preset.sty
 \ProvidesPackage{luatexja-preset}
-  [2012/05/18 v0.0]
+  [2012/09/17 v0.1]
 
 \RequirePackage{expl3}
 \RequirePackage{luatexja-fontspec}
@@ -25,12 +25,8 @@
 \DeclareOption{nodeluxe}{\int_set:Nn \l_ltjpreset_deluxe_int { 0 }} % 2 fonts
 
 % scale
-{ \fontsize{1024}{1024}\selectfont
-  \fp_set_from_dim:Nn \l_ltjpreset_scale_fp \zw
-  \fp_gdiv:Nn \l_ltjpreset_scale_fp {1024}
-}
 \msg_new:nnn { luatexja-preset }{ scale }{
-  日本語フォントは~\fp_use:N \l_ltjpreset_scale_fp~倍にスケーリングされます．
+  日本語フォントは~\fp_use:N \g_ltj_fontspec_scale_fp~倍にスケーリングされます．
 }
 \msg_warning:nn { luatexja-preset }{ scale }
 
@@ -227,7 +223,6 @@
 \tl_new:N \l_ltjpreset_add_features_tl
 
 \tl_set:Nx \l_ltjpreset_add_features_tl {
-  Scale = \fp_use:N \l_ltjpreset_scale_fp ,
   \tl_use:N \l_ltjpreset_kanji_shape_tl, 
   JFM   = \ltjpreset_use_jfm:
 }
