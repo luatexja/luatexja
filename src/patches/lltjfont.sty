@@ -452,8 +452,8 @@
     \edef\k@family{#1}%
   \else % search font definition file...
      \ifcsname kfam@list@\k@encoding\endcsname\else
-       \expandafter\gdef\csname kfam@list@\k@encoding\endcsname{}
-       \expandafter\gdef\csname notkfam@list@\k@encoding\endcsname{}
+       \expandafter\gdef\csname kfam@list@\k@encoding\endcsname{}%
+       \expandafter\gdef\csname notkfam@list@\k@encoding\endcsname{}%
      \fi
      \edef\@templist{\@nameuse{kfam@list@\k@encoding}}%
      \expandafter\expandafter\expandafter\inlist@\expandafter\tmp@item\expandafter{\@templist}%
@@ -478,8 +478,8 @@
     \edef\f@family{#1}%
   \else % search font definition file...
      \ifcsname ffam@list@\f@encoding\endcsname\else
-       \expandafter\gdef\csname ffam@list@\f@encoding\endcsname{}
-       \expandafter\gdef\csname notffam@list@\f@encoding\endcsname{}
+       \expandafter\gdef\csname ffam@list@\f@encoding\endcsname{}%
+       \expandafter\gdef\csname notffam@list@\f@encoding\endcsname{}%
      \fi
      \edef\@templist{\@nameuse{ffam@list@\f@encoding}}%
      \expandafter\expandafter\expandafter\inlist@\expandafter\tmp@item\expandafter{\@templist}%
