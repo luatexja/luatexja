@@ -1,8 +1,8 @@
 %#!lualatex
 \documentclass{article}
 
-\usepackage{luatexja}
-\usepackage{palatino,listings,color,showexpl}
+\usepackage{luatexja-fontspec}
+\usepackage{listings,color,showexpl}
 \usepackage
 [
 	papersize={100mm,100mm},
@@ -13,7 +13,7 @@
 
 \lstset
 {
-	language=sh,
+	language=sh, extendedchars=false,
 	backgroundcolor=\color[gray]{.75},
 	breaklines=true,
     basewidth={0.55\zw, 0.45em},
@@ -32,6 +32,9 @@
 }{}
 \DeclareFontShape{JY3}{mc}{m}{sl}{<-> s * [0.92489] psft:Ryumin-Light:jfm=ujis;slant=0.167}{}
 \DeclareFontShape{JY3}{mc}{m}{it}{<-> ssub* mc/m/sl}{}
+
+\setmainfont{TeX Gyre Pagella}
+\setmonofont{TeX Gyre Cursor}
 \begin{document}
 This test file is based on a.tex\footnote{This can be downloaded from {\tt https://gist.github.com/1574793}.} by x19290.
 
@@ -98,4 +101,24 @@ the first line of the listing is not rendered.
 長い長い長い長い長い長い長い長い長い長い長い長い）（長い
 \end{env}
 
+\newpage
+\textbf{Ticket \#29604}
+
+\ltjsetparameter{jacharrange={-2,-8}}
+ギリシャ文字欧文扱い
+
+\begin{lstlisting}[basewidth=.5em,basicstyle=\tt, emph={TeX}, emphstyle=\color{red}]
+01234567890123456789
+!あ!漢!α!×!
+\TeX はギリシャ文字のΤ-Ε-Χ（タウ・イプシロン・カイ）であるから、……
+\end{lstlisting}
+
+\ltjsetparameter{jacharrange={+2,+8}}
+ギリシャ文字和文扱い
+
+\begin{lstlisting}[basewidth=.5em,basicstyle=\tt, emph={TeX}, emphstyle=\color{red}]
+01234567890123456789
+!あ!漢!α!×!
+\TeX はギリシャ文字のΤ-Ε-Χ（タウ・イプシロン・カイ）であるから、……
+\end{lstlisting}
 \end{document}
