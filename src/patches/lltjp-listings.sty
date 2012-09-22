@@ -3,8 +3,8 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\def\filedate{2012/02/02}
-\def\fileversion{0.51}
+\def\filedate{2012/09/22}
+\def\fileversion{0.6}
 \ProvidesPackage{lltjp-listings}[\filedate\space\fileversion]
 \RequirePackage{listings,luatexbase-cctb}
 
@@ -13,8 +13,9 @@
 \setluatexcatcodetable\CatcodeTableLTJlistings{
   \luatexcatcodetable\CatcodeTableLaTeXAtLetter
   \catcode"FFFFF=9%"
-  \setcatcoderange{"2000}{"FFFF}{13}%
-  \setcatcoderange{"20000}{"2FFFF}{13}}
+  \setcatcoderange{"0080}{"FFFF}{13}%   BMP
+  \setcatcoderange{"20000}{"2FFFF}{13}% SIP
+}
 
 % lowest level
 \def\lst@kanjitrue{\let\lst@ifkanji\iftrue}
@@ -24,46 +25,64 @@
 \def\lst@AppendOther{%
     \lst@ifletter\lst@Output\lst@letterfalse\fi\lst@kanjifalse
     \futurelet\lst@lastother\lst@Append}
-\def\lst@AppendLetter{%
-    \lst@ifletter
-      \lst@ifkanji\lst@Output\lst@kanjifalse
-      \fi
-    \else
-      \lst@lettertrue\lst@ifkanji\lst@kanjifalse\else\lst@OutputOther\fi
-    \fi
-    \lst@Append}
 
-\def\lst@ProcessJALetter{\lst@whitespacefalse \lst@AppendJALetter}
-\def\lst@ProcessJALetterHalf{\lst@whitespacefalse \lst@AppendJALetterHalf}
-\def\lst@ProcessJALetter@inhibit@prebreak{%
-  \lst@whitespacefalse \lst@AppendJALetter@inhibit@prebreak}
-\def\lst@ProcessJALetter@inhibit@postbreak{%
-  \lst@whitespacefalse \lst@AppendJALetter@inhibit@postbreak}
+\def\ltj@lst@setletterflag{%
+  \lst@ifletter
+    \lst@ifkanji\lst@Output\lst@kanjifalse\fi
+  \else
+    \lst@lettertrue\lst@ifkanji\lst@kanjifalse\else\lst@OutputOther\fi
+  \fi}
 
-\def\lst@AppendJALetter{%
-    \lst@ifletter
-      \lst@Output
+\def\ltj@lst@setkanjiflag{%
+  \lst@ifletter
+    \lst@Output
+  \else
+    \lst@ifkanji\else\lst@OutputOther\fi\lst@lettertrue
+  \fi}
+
+\def\ltj@lst@setopenflag{%
+  \lst@ifletter
+    \lst@letterfalse\lst@Output
+  \else
+    \lst@ifkanji\else\lst@OutputOther\fi
+  \fi\lst@kanjitrue}
+
+\def\ltj@lst@setcloseflag{%
+  \lst@ifletter\else\lst@lettertrue\fi\lst@kanjitrue}
+
+\def\lst@ProcessLetter#1{%
+  \lst@whitespacefalse
+  \ifnum\ltjgetparameter{jacharrange}{\ltjgetparameter{chartorange}{`#1}}=0
+    \ifnum\ltjgetparameter{postbreakpenalty}{`#1}>0
+      \ltj@lst@setopenflag    % 開き括弧類
     \else
-      \lst@ifkanji\else\lst@OutputOther\fi\lst@lettertrue
-    \fi\lst@kanjitrue
-    \advance\lst@length\@ne\lst@Append}
-\def\lst@AppendJALetterHalf{%
-    \lst@ifletter
-      \lst@Output
+      \ifnum\ltjgetparameter{prebreakpenalty}{`#1}>0
+        \ltj@lst@setcloseflag % 閉じ括弧類，句読点
+      \else
+        \ltj@lst@setkanjiflag % 通常の和文文字
+    \fi\fi
+    \advance\lst@length\@ne   % 和文文字は通常の2倍の幅
+  \else
+    \ltj@lst@setletterflag
+  \fi
+  \lst@Append#1}
+
+\def\lst@ProcessJALetterHalf#1{%
+  \lst@whitespacefalse
+  \ifnum\ltjgetparameter{jacharrange}{\ltjgetparameter{chartorange}{`#1}}=0
+    \ifnum\ltjgetparameter{postbreakpenalty}{`#1}>0
+      \ltj@lst@setopenflag    % 開き括弧類
     \else
-      \lst@ifkanji\else\lst@OutputOther\fi\lst@lettertrue
-    \fi\lst@kanjitrue
-    \lst@Append}
-\def\lst@AppendJALetter@inhibit@prebreak{%
-    \lst@ifletter\else\lst@lettertrue\fi\lst@kanjitrue
-    \advance\lst@length\@ne\lst@Append}
-\def\lst@AppendJALetter@inhibit@postbreak{%
-    \lst@ifletter
-      \lst@Output
-    \else
-      \lst@ifkanji\else\lst@OutputOther\fi
-    \fi\lst@letterfalse\lst@kanjitrue
-    \advance\lst@length\@ne\lst@Append}
+      \ifnum\ltjgetparameter{prebreakpenalty}{`#1}>0
+        \ltj@lst@setcloseflag % 閉じ括弧類
+      \else
+        \ltj@lst@setkanjiflag % 通常の和文文字
+    \fi\fi
+    \advance\lst@length\@ne   % 半角カナは欧文文字と同じ幅
+  \else
+    \ltj@lst@setletterflag
+  \fi
+  \lst@Append#1}
 
 
 % loading lltjp-listing-jpt.tex
@@ -115,14 +134,14 @@
     \advance\@tempcnta\@ne\lccode`\^^ae=\@tempcnta \lccode`\^^be=\@tempcnta
     \advance\@tempcnta\@ne\lccode`\^^af=\@tempcnta \lccode`\^^bf=\@tempcnta
     \lowercase{\gdef\@temp{%
-      \gdef^^a0{\lst@ProcessJALetter^^b0}\gdef^^a1{\lst@ProcessJALetter^^b1}%
-      \gdef^^a2{\lst@ProcessJALetter^^b2}\gdef^^a3{\lst@ProcessJALetter^^b3}%
-      \gdef^^a4{\lst@ProcessJALetter^^b4}\gdef^^a5{\lst@ProcessJALetter^^b5}%
-      \gdef^^a6{\lst@ProcessJALetter^^b6}\gdef^^a7{\lst@ProcessJALetter^^b7}%
-      \gdef^^a8{\lst@ProcessJALetter^^b8}\gdef^^a9{\lst@ProcessJALetter^^b9}%
-      \gdef^^aa{\lst@ProcessJALetter^^ba}\gdef^^ab{\lst@ProcessJALetter^^bb}%
-      \gdef^^ac{\lst@ProcessJALetter^^bc}\gdef^^ad{\lst@ProcessJALetter^^bd}%
-      \gdef^^ae{\lst@ProcessJALetter^^be}\gdef^^af{\lst@ProcessJALetter^^bf}%
+      \gdef^^a0{\lst@ProcessLetter^^b0}\gdef^^a1{\lst@ProcessLetter^^b1}%
+      \gdef^^a2{\lst@ProcessLetter^^b2}\gdef^^a3{\lst@ProcessLetter^^b3}%
+      \gdef^^a4{\lst@ProcessLetter^^b4}\gdef^^a5{\lst@ProcessLetter^^b5}%
+      \gdef^^a6{\lst@ProcessLetter^^b6}\gdef^^a7{\lst@ProcessLetter^^b7}%
+      \gdef^^a8{\lst@ProcessLetter^^b8}\gdef^^a9{\lst@ProcessLetter^^b9}%
+      \gdef^^aa{\lst@ProcessLetter^^ba}\gdef^^ab{\lst@ProcessLetter^^bb}%
+      \gdef^^ac{\lst@ProcessLetter^^bc}\gdef^^ad{\lst@ProcessLetter^^bd}%
+      \gdef^^ae{\lst@ProcessLetter^^be}\gdef^^af{\lst@ProcessLetter^^bf}%
     }}%\message{\meaning\@temp}%
   }%
   \@temptokena\expandafter\expandafter\expandafter\expandafter%
