@@ -180,14 +180,15 @@ function luatexja.ext_get_parameter_binary(k,c)
       c=0
    end
    if k == 'jacharrange' then
-      if c<0 or c>216 then 
+      if c>216 then 
 	 ltjb.package_error('luatexja',
 			    'invalid character range number (' .. c .. ')',
 			    'A character range number should be in the range 0..216,\n'..
 			     'So I changed this one to zero.')
 	 c=0
       end
-      tex.write(ltjc.get_range_setting(c))
+      -- 負の値は <U+0080 の文字の文字範囲，として出てくる．この時はいつも欧文文字なので 1 を返す
+      tex.write( (c<0) and -1 or ltjc.get_range_setting(c))
    else
       if c<0 or c>0x10FFFF then
 	 ltjb.package_error('luatexja',
