@@ -13,6 +13,8 @@
 \def\lst@kanjifalse{\let\lst@ifkanji\iffalse}
 \lst@AddToHook{InitVars}{\lst@kanjifalse}
 
+\def\lst@AppendLetter{%
+    \ltj@lst@setletterflag\lst@Append}
 \def\lst@AppendOther{%
     \lst@ifletter\lst@Output\lst@letterfalse\fi\lst@kanjifalse
     \futurelet\lst@lastother\lst@Append}
@@ -41,7 +43,7 @@
 \def\ltj@lst@setcloseflag{%
   \lst@ifletter\else\lst@lettertrue\fi\lst@kanjitrue}
 
-\def\lst@ProcessLetter#1{%
+\def\lst@ProcessJALetter#1{%
   \lst@whitespacefalse
   \ifnum\ltjgetparameter{jacharrange}{\ltjgetparameter{chartorange}{`#1}}=0
     \ifnum\ltjgetparameter{postbreakpenalty}{`#1}>0
@@ -116,20 +118,21 @@
 % hook!
 \lst@AddToHook{Init}{
   \luatexcatcodetable\CatcodeTableLTJlistings\ltj@@listing@jpcmd
-  \lccode`\~="FFFFF\lowercase{\let~\lst@ProcessLetter}%"
+  \lccode`\~="FFFFF\lowercase{\let~\lst@ProcessJALetter}%"
   \directlua{luatexbase.add_to_callback('process_input_buffer',
     function(buf)
       local ret = ''
       for i = 1, utf.len(buf) do
         local c = utf.sub(buf, i, i)
-        if tex.getcatcode(utf.byte(c)) \string~= 13 then
+        local cu = utf.byte(c)
+        if cu > 0x80 and tex.getcatcode(cu) \string~= 13 then
           ret = ret .. utf.char(1048575) % U+FFFFF
         end
         ret = ret .. c
       end
       return ret
     end, 'ltj.listings_unicode', 1)}}
-\lst@AddToHook{DeInit}{\directlua{luatexbase.remove_from_callback('process_input_buffer', 'ltj.listings_unicode')}}
+\lst@AddToHook{ExitVars}{\directlua{luatexbase.remove_from_callback('process_input_buffer', 'ltj.listings_unicode')}}
 
 
 % 白線対策
