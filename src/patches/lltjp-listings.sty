@@ -8,15 +8,6 @@
 \ProvidesPackage{lltjp-listings}[\filedate\space\fileversion]
 \RequirePackage{listings,luatexbase-cctb}
 
-% catcode 対策
-\newluatexcatcodetable\CatcodeTableLTJlistings
-\setluatexcatcodetable\CatcodeTableLTJlistings{
-  \luatexcatcodetable\CatcodeTableLaTeXAtLetter
-  \catcode"FFFFF=9%"
-  \setcatcoderange{"0080}{"FFFF}{13}%   BMP
-  \setcatcoderange{"20000}{"2FFFF}{13}% SIP
-}
-
 % lowest level
 \def\lst@kanjitrue{\let\lst@ifkanji\iftrue}
 \def\lst@kanjifalse{\let\lst@ifkanji\iffalse}
@@ -78,20 +69,15 @@
       \else
         \ltj@lst@setkanjiflag % 通常の和文文字
     \fi\fi
-    \advance\lst@length\@ne   % 半角カナは欧文文字と同じ幅
+    % 半角カナは欧文文字と同じ幅
   \else
     \ltj@lst@setletterflag
   \fi
   \lst@Append#1}
 
 
-% loading lltjp-listing-jpt.tex
-\def\ltj@@listing@jpset#1#2{% fast: #2-#1+1 must be a multiple of 16
-  \@tempcnta=#1 \@tempcntb=#2 \@temptokena{}%
-  \loop\relax\ifnum\@tempcnta<\@tempcntb\relax
-    \ltj@@listing@jpset@\global\advance\@tempcnta\sixt@@n\repeat
-  \ltj@@listing@jpset@after{#1}
-}
+% 半角カナの扱い
+
 \def\ltj@@listing@jpsetN#1#2#3{% for (not large) range
   \@tempcnta=#1 \@tempcntb=\numexpr 1+#2\relax \@temptokena{}%
   \loop \global\advance\@tempcnta\@ne\ifnum\@tempcnta<\@tempcntb\relax
@@ -107,64 +93,43 @@
   \@temptokena{}%
 }
 
-\begingroup
-\catcode`\^^a0=13\catcode`\^^a1=13\catcode`\^^a2=13\catcode`\^^a3=13
-\catcode`\^^a4=13\catcode`\^^a5=13\catcode`\^^a6=13\catcode`\^^a7=13
-\catcode`\^^a8=13\catcode`\^^a9=13\catcode`\^^aa=13\catcode`\^^ab=13
-\catcode`\^^ac=13\catcode`\^^ad=13\catcode`\^^ae=13\catcode`\^^af=13
-\catcode`\^^b0=12\catcode`\^^b1=12\catcode`\^^b2=12\catcode`\^^b3=12
-\catcode`\^^b4=12\catcode`\^^b5=12\catcode`\^^b6=12\catcode`\^^b7=12
-\catcode`\^^b8=12\catcode`\^^b9=12\catcode`\^^ba=12\catcode`\^^bb=12
-\catcode`\^^bc=12\catcode`\^^bd=12\catcode`\^^be=12\catcode`\^^bf=12
-\gdef\ltj@@listing@jpset@{%
-   {\lccode`\^^a0=\@tempcnta \lccode`\^^b0=\@tempcnta
-    \advance\@tempcnta\@ne\lccode`\^^a1=\@tempcnta \lccode`\^^b1=\@tempcnta
-    \advance\@tempcnta\@ne\lccode`\^^a2=\@tempcnta \lccode`\^^b2=\@tempcnta
-    \advance\@tempcnta\@ne\lccode`\^^a3=\@tempcnta \lccode`\^^b3=\@tempcnta
-    \advance\@tempcnta\@ne\lccode`\^^a4=\@tempcnta \lccode`\^^b4=\@tempcnta
-    \advance\@tempcnta\@ne\lccode`\^^a5=\@tempcnta \lccode`\^^b5=\@tempcnta
-    \advance\@tempcnta\@ne\lccode`\^^a6=\@tempcnta \lccode`\^^b6=\@tempcnta
-    \advance\@tempcnta\@ne\lccode`\^^a7=\@tempcnta \lccode`\^^b7=\@tempcnta
-    \advance\@tempcnta\@ne\lccode`\^^a8=\@tempcnta \lccode`\^^b8=\@tempcnta
-    \advance\@tempcnta\@ne\lccode`\^^a9=\@tempcnta \lccode`\^^b9=\@tempcnta
-    \advance\@tempcnta\@ne\lccode`\^^aa=\@tempcnta \lccode`\^^ba=\@tempcnta
-    \advance\@tempcnta\@ne\lccode`\^^ab=\@tempcnta \lccode`\^^bb=\@tempcnta
-    \advance\@tempcnta\@ne\lccode`\^^ac=\@tempcnta \lccode`\^^bc=\@tempcnta
-    \advance\@tempcnta\@ne\lccode`\^^ad=\@tempcnta \lccode`\^^bd=\@tempcnta
-    \advance\@tempcnta\@ne\lccode`\^^ae=\@tempcnta \lccode`\^^be=\@tempcnta
-    \advance\@tempcnta\@ne\lccode`\^^af=\@tempcnta \lccode`\^^bf=\@tempcnta
-    \lowercase{\gdef\@temp{%
-      \gdef^^a0{\lst@ProcessLetter^^b0}\gdef^^a1{\lst@ProcessLetter^^b1}%
-      \gdef^^a2{\lst@ProcessLetter^^b2}\gdef^^a3{\lst@ProcessLetter^^b3}%
-      \gdef^^a4{\lst@ProcessLetter^^b4}\gdef^^a5{\lst@ProcessLetter^^b5}%
-      \gdef^^a6{\lst@ProcessLetter^^b6}\gdef^^a7{\lst@ProcessLetter^^b7}%
-      \gdef^^a8{\lst@ProcessLetter^^b8}\gdef^^a9{\lst@ProcessLetter^^b9}%
-      \gdef^^aa{\lst@ProcessLetter^^ba}\gdef^^ab{\lst@ProcessLetter^^bb}%
-      \gdef^^ac{\lst@ProcessLetter^^bc}\gdef^^ad{\lst@ProcessLetter^^bd}%
-      \gdef^^ae{\lst@ProcessLetter^^be}\gdef^^af{\lst@ProcessLetter^^bf}%
-    }}%\message{\meaning\@temp}%
-  }%
-  \@temptokena\expandafter\expandafter\expandafter\expandafter%
-  \expandafter\expandafter\expandafter{\expandafter\expandafter%
-  \expandafter\the\expandafter\@temptokena\@temp}%
-}
-\gdef\ltj@@listing@jpsetN@#1#2{{%
+\def\ltj@@listing@jpsetN@#1#2{{%
     \@tempcnta=#1 \lccode`\~=\@tempcnta \lccode`\/=\@tempcnta
     \lowercase{\gdef\@temp{\gdef~{#2/}}}}%
   \@temptokena\expandafter\expandafter\expandafter\expandafter%
   \expandafter\expandafter\expandafter{\expandafter\expandafter%
   \expandafter\the\expandafter\@temptokena\@temp}%
 }
-\endgroup
-
 
 \toks@{}
-\input lltjp-listings-jpt.tex
-\edef\ltj@@listing@jpcmd{\the\toks@}
-\toks@{}
-\lst@AddToHook{Init}{%
-  \luatexcatcodetable\CatcodeTableLTJlistings
-  \ltj@@listing@jpcmd}
+\ltj@@listing@jpsetN{65377}{65439}{\lst@ProcessJALetterHalf}
+\edef\ltj@@listing@jpcmd{\the\toks@}\toks@{}
+
+% catcode 対策
+\newluatexcatcodetable\CatcodeTableLTJlistings
+\setluatexcatcodetable\CatcodeTableLTJlistings{
+  \luatexcatcodetable\CatcodeTableLaTeXAtLetter
+  \catcode"FFFFF=13%"
+  \setcatcoderange{"FF61}{"FF9F}{13}%   半角文字
+}
+
+% hook!
+\lst@AddToHook{Init}{
+  \luatexcatcodetable\CatcodeTableLTJlistings\ltj@@listing@jpcmd
+  \lccode`\~="FFFFF\lowercase{\let~\lst@ProcessLetter}%"
+  \directlua{luatexbase.add_to_callback('process_input_buffer',
+    function(buf)
+      local ret = ''
+      for i = 1, utf.len(buf) do
+        local c = utf.sub(buf, i, i)
+        if tex.getcatcode(utf.byte(c)) \string~= 13 then
+          ret = ret .. utf.char(1048575) % U+FFFFF
+        end
+        ret = ret .. c
+      end
+      return ret
+    end, 'ltj.listings_unicode', 1)}}
+\lst@AddToHook{DeInit}{\directlua{luatexbase.remove_from_callback('process_input_buffer', 'ltj.listings_unicode')}}
 
 
 % 白線対策

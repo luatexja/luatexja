@@ -104,21 +104,24 @@ the first line of the listing is not rendered.
 \newpage
 \textbf{Ticket \#29604}
 
-\ltjsetparameter{jacharrange={-2,-8}}
+\setmonofont{DejaVu Sans Mono}
+\ltjsetparameter{jacharrange={-2,-3,-8}}
 ギリシャ文字欧文扱い
 
 \begin{lstlisting}[basewidth=.5em,basicstyle=\tt, emph={TeX}, emphstyle=\color{red}]
 01234567890123456789
 !あ!漢!α!×!
 \TeX はギリシャ文字のΤ-Ε-Χ（タウ・イプシロン・カイ）であるから、……
+\TeX is an abbreviation of τέχνη (ΤΕΧΝΗ – technē).
 \end{lstlisting}
 
-\ltjsetparameter{jacharrange={+2,+8}}
+\ltjsetparameter{jacharrange={+2,+8,+3}}
 ギリシャ文字和文扱い
 
 \begin{lstlisting}[basewidth=.5em,basicstyle=\tt, emph={TeX}, emphstyle=\color{red}]
 01234567890123456789
 !あ!漢!α!×!
 \TeX はギリシャ文字のΤ-Ε-Χ（タウ・イプシロン・カイ）であるから、……
+\TeX is an abbreviation of τέχνη (ΤΕΧΝΗ – technē).
 \end{lstlisting}
 \end{document}
