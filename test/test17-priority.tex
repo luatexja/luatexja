@@ -1,0 +1,186 @@
+%#!lualatex
+
+%% 行末の句読点の位置によって，全角取りか半角取りかを自動的に調整する
+%% 仕様：全調整量が二分以上なら，全角取りにする
+\documentclass{article}
+\usepackage{luatexja,luacode,xcolor}
+\begin{luacode}
+local id_hlist = node.id('hlist')
+local id_glue  = node.id('glue')
+local id_glue_spec = node.id('glue_spec')
+local attr_icflag = luatexbase.attributes['ltj@icflag']
+local PACKED = 2
+local PROCESSED_BEGIN_FLAG = 16
+local FROM_JFM = 4
+local KANJI_SKIP = 6
+local XKANJI_SKIP = 7
+
+local function get_attr_icflag(p)
+   return (node.has_attribute(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
+end
+
+-- box 内で伸縮された glue の合計値を計算
+
+local function get_stretched(q, go, gs)
+  local qs = q.spec
+  if not qs.writable then return 0 end
+  if gs == 1 then -- stretching
+    if qs.stretch_order == go then return qs.stretch end
+  else -- shrinking
+    if qs.shrink_order == go then return qs.shrink end
+  end
+end
+
+local function get_total_stretched(p)
+  local go, gf, gs = p.glue_order, p.glue_set, p.glue_sign
+  local res = {
+    other = 0, xkanji = 0, jfm = 0, kanji = 0, 
+    glue_set = gf, glue_sign = gs
+  }
+  if go ~= 0 then return nil end
+  if gs ~= 1 and gs ~= 2 then return res end
+  for q in node.traverse_id(id_glue, p.head) do
+    local a, ic = get_stretched(q, go, gs), get_attr_icflag(q)
+    if     ic == KANJI_SKIP  then res.kanji  = res.kanji + a
+    elseif ic == XKANJI_SKIP then res.xkanji = res.xkanji + a
+    elseif ic == FROM_JFM    then res.jfm    = res.jfm + a
+    else                          res.other  = res.other + a
+    end
+  end
+  return res
+end
+
+local function clear_stretch(p, ic)
+  for q in node.traverse_id(id_glue, p.head) do
+    if get_attr_icflag(q) == ic then
+      local qs = q.spec
+      if qs.writable then
+        qs.stretch_order, qs.shrink_order, qs.stretch, qs.shrink = 0, 0, 0, 0
+      end
+    end
+  end
+end
+
+local function set_stretch(p, after, before, ic)
+  if before > 0 then
+    print (ic, before, after)
+    local ratio = after/before
+    for q in node.traverse_id(id_glue, p.head) do
+      if get_attr_icflag(q) == ic then
+        local qs = q.spec
+        if qs.writable then
+          qs.stretch, qs.shrink = qs.stretch*ratio, qs.shrink*ratio
+        end
+      end
+    end    
+  end
+end
+
+function adjust_width(head) 
+  if not head then return head end
+  for p in node.traverse_id(id_hlist, head) do
+    local res = get_total_stretched(p)
+    if res then
+      -- 調整量の合計
+      local total = tex.round((res.other + res.xkanji + res.jfm + res.kanji) * res.glue_set)
+      print('before: ', p.glue_set, p.glue_sign, p.glue_order )
+      print(total, res.other, res.xkanji, res.jfm, res.kanji)
+      if total <= res.other then -- 和文処理グルー以外で足りる
+        clear_stretch(p, KANJI_SKIP)
+        clear_stretch(p, XKANJI_SKIP)
+        clear_stretch(p, FROM_JFM)
+        local f = node.hpack(p.head, p.width, 'exactly')
+        f.head, p.glue_set, p.glue_sign, p.glue_order 
+           = nil, f.glue_set, f.glue_sign, f.glue_order
+        node.free(f)
+      else
+        total = total - res.other
+        if total <= res.jfm then -- JFMグルーだけで良い
+          clear_stretch(p, KANJI_SKIP)
+          clear_stretch(p, XKANJI_SKIP)
+          set_stretch(p, total,res.jfm, FROM_JFM)
+          local f = node.hpack(p.head, p.width, 'exactly')
+          f.head, p.glue_set, p.glue_sign, p.glue_order 
+             = nil, f.glue_set, f.glue_sign, f.glue_order
+          node.free(f)
+        else
+          total = total - res.jfm
+          if total <= res.xkanji then -- xkanjiskip まで
+            clear_stretch(p, KANJI_SKIP)
+            set_stretch(p, total,res.xkanji, XKANJI_SKIP)
+            local f = node.hpack(p.head, p.width, 'exactly')
+            f.head, p.glue_set, p.glue_sign, p.glue_order 
+               = nil, f.glue_set, f.glue_sign, f.glue_order
+            node.free(f)
+          else
+            total = total - res.xkanji
+            if total <= res.kanji then -- kanjiskip まで
+              set_stretch(p, total,res.kanji, KANJI_SKIP)
+              local f = node.hpack(p.head, p.width, 'exactly')
+              f.head, p.glue_set, p.glue_sign, p.glue_order 
+                 = nil, f.glue_set, f.glue_sign, f.glue_order
+              node.free(f)
+            else
+              -- glue_set > 1 なので，どうしようもない
+            end
+          end
+        end
+      end
+    print('after:  ', p.glue_set, p.glue_sign, p.glue_order )
+    end
+  end
+  return head
+end
+
+
+\end{luacode}
+
+\def\sq{\hbox to 1\zw{\hss\fboxsep=-.5\fboxrule\fbox{　}\hss}}
+\def\sb{\hbox to 1\zw{\hss\fboxsep=-.5\fboxrule\fbox{■}\hss}}
+\newbox\gridbox
+\setbox\gridbox=\hbox to 20\zw{\sq\sq\sq\sq\sb\sq\sq\sq\sq\sb\sq\sq\sq\sq\sb\sq\sq\sq\sq\sb}
+\def\outbox#1{%
+  \leavevmode\hbox to 2em{\tt #1\hss}\vrule
+  \textcolor{cyan!50!white}{\copy\gridbox}\hskip-20\zw\copy0\vrule\par
+}
+
+\def\DisableCB{\directlua{luatexbase.remove_from_callback('post_linebreak_filter', 'Adjust width')}}
+\def\EnableCB{\directlua{luatexbase.add_to_callback('post_linebreak_filter', adjust_width, 'Adjust width', 100)}}
+
+\long\def\testbox#1{%
+  \EnableCB\setbox0=\vbox{\hsize=20\zw\parfillskip0pt#1}\outbox{ON}\par
+  \DisableCB\setbox0=\vbox{\hsize=20\zw\parfillskip0pt#1}\outbox{OFF}\par
+}
+
+\parindent0pt
+\begin{document}
+{\tt kanjiskip: \ltjgetparameter{kanjiskip}
+
+\ltjsetparameter{xkanjiskip=.25\zw plus .25\zw minus -.125\zw}
+xkanjiskip: \ltjgetparameter{xkanjiskip}}
+
+\testbox{%
+あいうえおかきくけこさしすせそたちつてと
+}
+
+\testbox{%
+あいうえおかきくけこ「「さしすせそたちつて
+}
+
+\testbox{%
+あいうえおかきA B C Dこさ\texttt{DO i=1,10}『
+}
+
+\testbox{%
+「\texttt{\textbackslash expandafter}ユーザの集い」が開催された
+}
+
+\testbox{%
+あいうえおきくけこ「」さ123456そたちつて
+}
+
+\def\pTeX{p\kern-.2em\TeX}
+\testbox{%
+日本では\pTeX，p\LaTeX がよく使われている。
+}
+\end{document}
