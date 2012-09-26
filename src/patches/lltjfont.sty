@@ -519,7 +519,7 @@
 \def\useroman#1#2#3#4{%
     \romanencoding{#1}\romanfamily{#2}\romanseries{#3}\romanshape{#4}%
     \selectfont\ignorespaces}
-\def\usefont#1#2#3#4{%
+\protected\def\usefont#1#2#3#4{%
   \edef\tmp@item{{#1}}%
   \expandafter\expandafter\expandafter
   \inlist@\expandafter\tmp@item\expandafter{\kenc@list}%
