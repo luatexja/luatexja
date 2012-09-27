@@ -1502,7 +1502,7 @@ and loads \Pkg{luatexja-fontspec} internally.
 %<*en>
 Specifying this option enables us to use \textit{mincho} with two weights (medium~and~bold),
 \textit{gothic} with three weights (medium,~bold and~heavy), and \textit{rounded gothic}%
-\footnote{Provided by \texttt{\char92mgfamily}, 
+\footnote{Provided by \texttt{\char92mgfamily},
 because \textit{rounded gothic} is called \textit{maru gothic} (丸ゴシック) in Japanese.}.
 The heavy weight of \textit{gothic} can be used by ``changing the family'' \verb+\gtebfamily+.
 This is because \Pkg{fontspec} package can handle only medium (\verb+\mdseries+) and
@@ -1546,7 +1546,7 @@ Use JIS2004 glyphs if possible.
 %</ja>
 \item[jis]
 %<*en>
-Use the JFM \texttt{jfm-jis.lua}, instead of the default JFM of 
+Use the JFM \texttt{jfm-jis.lua}, instead of the default JFM of
 \LuaTeX-ja, \texttt{jfm-ujis.lua}.
 %</en>
 %<*ja>
@@ -1707,7 +1707,7 @@ Jun Pro 101&Jun Pr6N 101\\
 %<*en>
 Next, we describe settings for using only single weight.
 In four settings below, we use same fonts for medium and bold (and heavy) weights.
-(Hence \verb+\mcfamily\bfseries+ and \verb+\mcfamily\mdseries+ yields same Japanese fonts, 
+(Hence \verb+\mcfamily\bfseries+ and \verb+\mcfamily\mdseries+ yields same Japanese fonts,
 if \texttt{deluxe} option is also specified).
 %</en>
 %<*ja>
@@ -3391,7 +3391,7 @@ Furthermore, the glyph is shifted according to values of fields
 たとえば，次の内容を一部に含んだ \texttt{jfm-test.lua} を考えよう：
 \begin{lstlisting}
    [0] = {
-      chars = { '漢', 'ヒ*' }, 
+      chars = { '漢', 'ヒ*' },
       align = 'left', left = 0.0, down = 0.0,
       width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
    },
@@ -3657,7 +3657,7 @@ this argument has \texttt{chars} field which contains character codes
 %<*en>
 An example of this callback is the \texttt{ltjarticle} class, with
 	     forcefully assigning character class~0 to \texttt{'parbdd'}
-	     in the JFM \texttt{jfm-min.lua}. 
+	     in the JFM \texttt{jfm-min.lua}.
 %</en>
 %<*ja>
 このコールバックの使用例は\texttt{ltjarticle}クラスにあり，
@@ -3709,7 +3709,7 @@ You may assume that \verb+jfont_info+ has the following fields:
 %</ja>
 %<*en>
 A table which contains the information of a JFM, and \emph{this table must not be changed}.
-The contents of this table are similar to that which is written is the JFM file, but 
+The contents of this table are similar to that which is written is the JFM file, but
 the following differ:
 \begin{itemize}
 \item There is a \texttt{chars} table, \dots
@@ -5144,19 +5144,19 @@ after `beginning/ending of a group' characters.
 \item[\textsf{5}] \textit{end-of-line} (usually \verb+^^J+).
 \item[\textsf{10}] space (usually \sp).
 \item[\textsf{O}] other characters, whose category code is in $\{3,4,6,7,8,11,12,13\}$.
-\item[\textsf{[\sp]}, \textsf{[{\tt\char92par}]}] 
+\item[\textsf{[\sp]}, \textsf{[{\tt\char92par}]}]
 emits a space, or~\verb+\par+.
 \end{description}
 \end{minipage}
 \begin{itemize}
-\item We omitted about category codes 
+\item We omitted about category codes
 9~(\textit{ignored}), 14~(\textit{comment})~and~15~(\textit{invalid})
 from the above diagram. We also ignored the input like `\verb+^^A+' or `\verb+^+\verb+^df+'.
-\item When a character whose category code is 0 (\textit{escape character}) is seen by \TeX, 
-the input processor scans a control sequence (\textsf{scan a c.s.}). 
+\item When a character whose category code is 0 (\textit{escape character}) is seen by \TeX,
+the input processor scans a control sequence (\textsf{scan a c.s.}).
 These paths are not shown in the above diagram.
 
-After that, the state is changed to State~$S$ (skipping blanks) in most cases, but 
+After that, the state is changed to State~$S$ (skipping blanks) in most cases, but
 to State~$M$ (middle of line) sometimes.
 \end{itemize}
 %<en>\caption{State transitions of \pTeX's input processor.}
@@ -5615,7 +5615,7 @@ JFM由来の値だけを用いる．もし両者で使われているJFMが異�
 \end{enumerate}
 \end{description}
 \paragraph{「左空白」の算出とそれに伴う補正}
-「左空白」は過去のバージョンでは定義していたが，このバージョンでは挿入は一切行われない（機能自体削除している）．しかし，仕様は流動的であり，将来復活する可能性もあるため，マニュアル中の記述は今のとkろ極力変更しない．
+「左空白」は過去のバージョンでは定義していたが，このバージョンでは挿入は一切行われない（機能自体削除している）．しかし，仕様は流動的であり，将来復活する可能性もあるため，マニュアル中の記述は今のところ極力変更しない．
 % 次に，「左空白」にあたる量を算出する：
 % \begin{description}
 % \item[line-end~{[E]}]
@@ -5932,7 +5932,7 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 \Pkg{jlisting.sty} というパッチ\cite{jlisting}を用いることで無理やり解決していた．
 
 \LuaTeX-jaでは，\verb+process_input_buffer+ コールバックを利用することで，
-「各行に出現するU+0080以降の文字に対して，それらの出力命令を全治する」という方法をとっている．
+「各行に出現するU+0080以降の文字に対して，それらの出力命令を前置する」という方法をとっている．
 これにより，（入力には使用されていないかもしれない）和文文字をもすべてアクティブ化する手間もなく，
 見通しが良い実装になっている．
 
