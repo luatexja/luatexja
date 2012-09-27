@@ -57,14 +57,15 @@ local sid_end_thread = node.subtype('pdf_end_thread')
 local ITALIC = 1
 local PACKED = 2
 local KINSOKU = 3
-local FROM_JFM = 4
-local LINE_END = 5
-local KANJI_SKIP = 6
-local XKANJI_SKIP = 7
-local PROCESSED = 8
-local IC_PROCESSED = 9
+local FROM_JFM = 6
+-- FROM_JFM: 4, 5, 6, 7, 8 →優先度高
+-- 6 が標準
+local KANJI_SKIP = 9
+local XKANJI_SKIP = 10
+local PROCESSED = 11
+local IC_PROCESSED = 12
 local BOXBDD = 15
-local PROCESSED_BEGIN_FLAG = 16
+local PROCESSED_BEGIN_FLAG = 32
 
 local kanji_skip
 local xkanji_skip
@@ -154,8 +155,7 @@ function math.two_average(a,b) return (a+b)*0.5 end
 -- p, q の走査で無視するもの：
 -- 　ins, mark, adjust, whatsit, penalty
 --
--- Nq.last .. + .. Bp.first .... Bp[last] .... * .. Np.first
--- +: kern from LINEEND はここに入る
+-- Nq.last ..  Bp.first .... Bp[last] .... * .. Np.first
 -- *: jfm glue はここに入る
 
 local head -- the head of current list
@@ -379,7 +379,7 @@ function calc_np(lp, last)
    -- We clear `predefined' entries of Np before pairs() loop,
    -- because using only pairs() loop is slower.
    Np.post, Np.pre, Np.xspc = nil, nil, nil
-   Np.first, Np.id, Np.last, Np.lend, Np.met = nil, nil, nil, nil
+   Np.first, Np.id, Np.last, Np.met = nil, nil, nil
    Np.auto_kspc, Np.auto_xspc, Np.char, Np.class, Np.nuc = nil, nil, nil, nil, nil
    for k in pairs(Np) do Np[k] = nil end
 
@@ -418,7 +418,6 @@ do
       local cls = ltjf_find_char_class(x.char, m)
       if c ~= x.char and  cls==0 then cls = ltjf_find_char_class(-c, m) end
       Nx.class = cls; set_attr(x, attr_jchar_class, cls)
-      Nx.lend = m.size_cache.char_type[cls].kern[fast_find_char_class('lineend', m)] or 0
       Nx.met, Nx.var, Nx.char = m, m.var, c
       Nx.pre = ltjs_fast_get_penalty_table('pre', c) or 0
       Nx.post = ltjs_fast_get_penalty_table('post', c) or 0
@@ -489,26 +488,11 @@ local after_hlist, after_alchar, extract_np = after_hlist, after_alchar, extract
 
 -------------------- 最下層の処理
 
-local function lineend_fix(g)
-   if g and g.id==id_kern then 
-      Nq.lend = 0
-   elseif Nq.lend~=0 then
-      if not g then
-	 g = node_new(id_kern); --copy_attr(g, Nq.nuc); 
-         g.subtype = 1; g.kern = -Nq.lend;
-	 set_attr(g, attr_icflag, LINEEND)
-      else
-	 g.spec.width = g.spec.width - Nq.lend
-      end
-   end
-   return g
-end
-
 -- change penalties (or create a new penalty, if needed)
 local function handle_penalty_normal(post, pre, g)
    local a = (pre or 0) + (post or 0)
    if #Bp == 0 then
-      if (a~=0 and not(g and g.id==id_kern)) or Nq.lend~=0 then
+      if (a~=0 and not(g and g.id==id_kern)) then
 	 local p = node_new(id_penalty); --copy_attr(p, Nq.nuc)
 	 if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
 	 p.penalty = a
@@ -523,7 +507,7 @@ end
 local function handle_penalty_always(post, pre, g)
    local a = (pre or 0) + (post or 0)
    if #Bp == 0 then
-      if not (g and g.id==id_glue) or Nq.lend~=0 then
+      if not (g and g.id==id_glue) then
 	 local p = node_new(id_penalty); --copy_attr(p, Nq.nuc)
 	 if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
 	 p.penalty = a
@@ -565,12 +549,6 @@ end
 
 -- Nq.last (kern w) .... (glue/kern g) Np.first
 local function real_insert(w, g)
-   if w~=0 then
-      local h = node_new(id_kern); --copy_attr(h, Nq.nuc)
-      set_attr(h, attr_icflag, LINE_END)
-      h.kern = w; h.subtype = 1
-      head = node.insert_after(head, Nq.last, h)
-   end
    if g then
       head  = insert_before(head, Np.first, g)
       Np.first = g
@@ -724,8 +702,8 @@ end
 -- (anything) .. jachar
 local function handle_np_jachar(mode)
    if Nq.id==id_jglyph or ((Nq.id==id_pbox or Nq.id==id_pbox_w) and Nq.met) then 
-      local g = lineend_fix(calc_ja_ja_glue() or get_kanjiskip()) -- M->K
-      handle_penalty_normal(Nq.post, Np.pre, g); real_insert(Nq.lend, g)
+      local g = calc_ja_ja_glue() or get_kanjiskip() -- M->K
+      handle_penalty_normal(Nq.post, Np.pre, g); real_insert(0, g)
    elseif Nq.met then  -- Nq.id==id_hlist
       local g = get_OA_skip() or get_kanjiskip() -- O_A->K
       handle_penalty_normal(0, Np.pre, g); real_insert(0, g)
@@ -751,23 +729,23 @@ end
 local function handle_nq_jachar()
     if Np.pre then 
       if Np.id==id_hlist then Np.pre = 0 end
-      local g = lineend_fix(get_OB_skip() or get_xkanjiskip(Nq)) -- O_B->X
-      handle_penalty_normal(Nq.post, Np.pre, g); real_insert(Nq.lend, g)
+      local g = get_OB_skip() or get_xkanjiskip(Nq) -- O_B->X
+      handle_penalty_normal(Nq.post, Np.pre, g); real_insert(0, g)
    else
-      local g = lineend_fix(get_OB_skip()) -- O_B
+      local g = get_OB_skip() -- O_B
       if Np.id==id_glue then handle_penalty_normal(Nq.post, 0, g)
       elseif Np.id==id_kern then handle_penalty_suppress(Nq.post, 0, g)
       else handle_penalty_always(Nq.post, 0, g)
       end
-      real_insert(Nq.lend, g)
+      real_insert(0, g)
    end
 end
 
 -- (anything) .. (和文文字で始まる hlist)
 local function handle_np_ja_hlist()
    if Nq.id==id_jglyph or ((Nq.id==id_pbox or Nq.id == id_pbox_w) and Nq.met) then 
-      local g = lineend_fix(get_OB_skip() or get_kanjiskip()) -- O_B->K
-      handle_penalty_normal(Nq.post, 0, g); real_insert(Nq.lend, g)
+      local g = get_OB_skip() or get_kanjiskip() -- O_B->K
+      handle_penalty_normal(Nq.post, 0, g); real_insert(0, g)
    elseif Nq.met then  -- Nq.id==id_hlist
       local g = get_kanjiskip() -- K
       handle_penalty_suppress(0, 0, g); real_insert(0, g)
@@ -801,17 +779,9 @@ end
 local function handle_list_tail(mode)
    adjust_nq(); Np = Nq
    if mode then
-      -- the current list is to be line-breaked:
-      if Np.id == id_jglyph or (Np.id==id_pbox and Np.met) then 
-	 if Np.lend~=0 then
-	    g = node_new(id_kern); g.subtype = 0; g.kern = Np.lend
-            --copy_attr(g, Np.nuc); 
-            set_attr(g, attr_icflag, BOXBDD)
-	    node.insert_after(head, Np.last, g)
-	 end
-      end
+      -- the current list is to be line-breaked.
       -- Insert \jcharwidowpenalty
-      Bp = widow_Bp; Np = widow_Np; Nq.lend = 0
+      Bp = widow_Bp; Np = widow_Np
       if Np.first then
 	 handle_penalty_normal(0,
 			       ltjs_fast_get_penalty_table('jwp', 0) or 0)
@@ -857,12 +827,12 @@ local function init_var(mode)
       and get_xkanjiskip_jfm or get_xkanjiskip_normal
    Np = {
       auto_kspc=nil, auto_xspc=nil, char=nil, class=nil, 
-      first=nil, id=nil, last=nil, lend=0, met=nil, nuc=nil, 
+      first=nil, id=nil, last=nil, met=nil, nuc=nil, 
       post=nil, pre=nil, xspc=nil, 
    }
    Nq = {
       auto_kspc=nil, auto_xspc=nil, char=nil, class=nil, 
-      first=nil, id=nil, last=nil, lend=0, met=nil, nuc=nil, 
+      first=nil, id=nil, last=nil, met=nil, nuc=nil, 
       post=nil, pre=nil, xspc=nil, 
    }
    if mode then 

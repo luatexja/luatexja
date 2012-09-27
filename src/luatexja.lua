@@ -79,14 +79,15 @@ local cat_lp = luatexbase.catcodetables['latex-package']
 local ITALIC = 1
 local PACKED = 2
 local KINSOKU = 3
-local FROM_JFM = 4
-local LINE_END = 5
-local KANJI_SKIP = 6
-local XKANJI_SKIP = 7
-local PROCESSED = 8
-local IC_PROCESSED = 9
+local FROM_JFM = 6
+-- FROM_JFM: 4, 5, 6, 7, 8 →優先度高
+-- 6 が標準
+local KANJI_SKIP = 9
+local XKANJI_SKIP = 10
+local PROCESSED = 11
+local IC_PROCESSED = 12
 local BOXBDD = 15
-local PROCESSED_BEGIN_FLAG = 16
+local PROCESSED_BEGIN_FLAG = 32
 
 
 -- Three aux. functions, bollowed from tex.web
@@ -288,8 +289,8 @@ local function debug_show_node_X(p,print_fn)
       debug_depth=k
    elseif pt == 'glue' then
       s = base .. ' ' ..  print_spec(p.spec)
-      if get_attr_icflag(p)==FROM_JFM then
-         s = s .. ' (from JFM)'
+      if get_attr_icflag(p)>KINSOKU and get_attr_icflag(p)<KANJI_SKIP then
+         s = s .. ' (from JFM: priority ' .. get_attr_icflag(p)-FROM_JFM .. ')'
       elseif get_attr_icflag(p)==KANJI_SKIP then
 	 s = s .. ' (kanjiskip)'
       elseif get_attr_icflag(p)==XKANJI_SKIP then
@@ -304,10 +305,8 @@ local function debug_show_node_X(p,print_fn)
 	 s = s .. ' (italic correction)'
          -- elseif get_attr_icflag(p)==ITALIC then
          --    s = s .. ' (italic correction)'
-      elseif get_attr_icflag(p)==FROM_JFM then
-	 s = s .. ' (from JFM)'
-      elseif get_attr_icflag(p)==LINE_END then
-	 s = s .. " (from 'lineend' in JFM)"
+      elseif get_attr_icflag(p)>KINSOKU and get_attr_icflag(p)<KANJI_SKIP then
+	 s = s .. ' (from JFM: priority ' .. get_attr_icflag(p)-FROM_JFM .. ')'
       end
       print_fn(s)
    elseif pt == 'penalty' then

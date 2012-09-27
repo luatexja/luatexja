@@ -10,10 +10,10 @@ local id_glue  = node.id('glue')
 local id_glue_spec = node.id('glue_spec')
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local PACKED = 2
-local PROCESSED_BEGIN_FLAG = 16
-local FROM_JFM = 4
-local KANJI_SKIP = 6
-local XKANJI_SKIP = 7
+local PROCESSED_BEGIN_FLAG = 32
+local FROM_JFM = 6
+local KANJI_SKIP = 9
+local XKANJI_SKIP = 10
 
 local function get_attr_icflag(p)
    return (node.has_attribute(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG

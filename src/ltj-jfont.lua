@@ -25,7 +25,7 @@ local id_glue_spec = node.id('glue_spec')
 local id_glue = node.id('glue')
 local cat_lp = luatexbase.catcodetables['latex-package']
 local ITALIC = 1
-local FROM_JFM = 4
+local FROM_JFM = 6
 ------------------------------------------------------------------------
 -- LOADING JFM
 ------------------------------------------------------------------------

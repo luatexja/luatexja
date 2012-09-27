@@ -10,7 +10,7 @@ local id_glue  = node.id('glue')
 local id_glue_spec = node.id('glue_spec')
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local PACKED = 2
-local PROCESSED_BEGIN_FLAG = 16
+local PROCESSED_BEGIN_FLAG = 32
 
 local function get_attr_icflag(p)
    return (node.has_attribute(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
@@ -44,12 +44,13 @@ function adjust_width_toten(head)
     if x.id == id_hlist and get_attr_icflag(x) == PACKED then
        local xc = x.head
        local xcs = tex.round(font.fonts[xc.font].size*0.5)
+       -- 句読点の最大補正幅
        local xcc = unicode.utf8.char(xc.char)
-       if (xcc == '，'  or xcc == '、' or xcc == '．'  or xcc == '。')
-          and xcs <= compute_total_stretched(p) then
+       local cts = compute_total_stretched(p)
+       if (xcc == '，'  or xcc == '、' or xcc == '．'  or xcc == '。') and cts>=0 then
          local ag  = node.new(id_glue) -- additional glue
          local ags = node.new(id_glue_spec)
-         ag.spec, ags.width = ags, xcs
+         ag.spec, ags.width = ags, math.min(xcs, cts)
          ags.shrink, ags.stretch, ags.shrink_order, ags.stretch_order = 0, 0, 0, 0
          node.insert_after(p.head, x, ag)
          local f = node.hpack(p.head, p.width, 'exactly')

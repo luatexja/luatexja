@@ -40,9 +40,9 @@ local attr_icflag = luatexbase.attributes['ltj@icflag']
 local ltjf_font_metric_table = ltjf.font_metric_table
 
 local PACKED = 2
-local PROCESSED = 8
-local IC_PROCESSED = 9
-local PROCESSED_BEGIN_FLAG = 16
+local PROCESSED = 11
+local IC_PROCESSED = 12
+local PROCESSED_BEGIN_FLAG = 32
 
 do
    local floor = math.floor

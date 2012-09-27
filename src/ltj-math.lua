@@ -41,7 +41,7 @@ local id_frac    = node.id('fraction')
 local id_simple  = node.id('noad')
 local id_sub_mlist = node.id('sub_mlist')
 
-local PROCESSED = 8
+local PROCESSED = 11
 
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_find_char_class = ltjf.find_char_class
