@@ -1,7 +1,7 @@
 %#!lualatex
 
-\documentclass{article}
-\usepackage{luatexja,luacode,xcolor}
+\documentclass{ltjsarticle}
+\usepackage{luatexja-fontspec,luacode,xcolor}
 \RequireLuaTeXjaSubmodule{adjust}
 
 \def\sq{%
@@ -28,10 +28,28 @@
 
 \parindent0pt
 \begin{document}
+\jfontspec[JFM=hang]{ipam.ttf}
+
+\ltjsetparameter{kanjiskip=.0\zw plus .4pt minus .4pt}
 {\tt kanjiskip: \ltjgetparameter{kanjiskip}
 
 \ltjsetparameter{xkanjiskip=.25\zw plus .25\zw minus .125\zw}
 xkanjiskip: \ltjgetparameter{xkanjiskip}}
+
+このテストでは，行末の句読点・中点類の位置調整を有効にした
+\texttt{jfm-hang.lua}を用いている．
+\begin{itemize}
+\item 句読点は，調整量に合わせて，ぶら下げ，二分取り，全角取りの3種類から選択される．
+\item 中点類は，行末に四分空きを追加することのみ対応．
+詰める際の「直前の四分空きも取る」は未実装，
+\item 行末文字の位置調整は，glueによる調整の負担量が少なくなるように行われる．
+なお，この位置調整で調整の方向が変わることはない．
+
+例えば，「三分伸ばす」調整が必要な，句点で終わる行があった場合，句点を全
+      角取りにするとglueの負担合計は「六分詰める」となり，調整量の絶対値
+      は減るが，方向が「伸ばす」から「詰める」こととなる．よってこのよう
+      な場合，句点は二分取りのままである．
+\end{itemize}
 
 \testbox{%
 ◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
@@ -43,7 +61,7 @@ xkanjiskip: \ltjgetparameter{xkanjiskip}}
 }
 
 \testbox{%
-あいうえおかきA B C Dこさ\texttt{DO i=1,10}『
+あいうえおかきA M M Dこさ\texttt{DO i=1,10}『
 }
 
 \testbox{%
@@ -56,7 +74,7 @@ xkanjiskip: \ltjgetparameter{xkanjiskip}}
 
 \def\pTeX{p\kern-.2em\TeX}
 \testbox{%
-日本では\pTeX，p\LaTeX がよく使われている。
+日本で\pTeX，p\LaTeX がよく使われている。
 }
 
 中点類の空き詰めは括弧類より優先
@@ -64,4 +82,25 @@ xkanjiskip: \ltjgetparameter{xkanjiskip}}
 \testbox{%
 あいうえおかきくけ・こさしすせそたち「「あ
 }
+
+句読点類・中点類の後ろ空き
+
+\testbox{%
+日本では\pTeX，p\LaTeX が使われている。
+}
+\testbox{%
+あいうえおかきくけこさしすせそたちつて．
+}
+\testbox{%
+あいうえおかきくけこさしすせそたちつ\vrule width .5\zw て．
+}
+\testbox{%
+あいうえおかきくけこさしすせそたちつ\vrule width 1\zw て．
+}
+\testbox{%
+あいうえおかきくけこさしすせそたちつて・
+}
+
+\newpage
+
 \end{document}

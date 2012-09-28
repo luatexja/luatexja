@@ -9,10 +9,20 @@ luatexbase.provides_module({
 })
 module('luatexja.adjust', package.seeall)
 
+luatexja.load_module('jfont');     local ltjf = luatexja.jfont
+
+local id_glyph = node.id('glyph')
+local id_kern = node.id('kern')
 local id_hlist = node.id('hlist')
 local id_glue  = node.id('glue')
 local id_glue_spec = node.id('glue_spec')
+local has_attr = node.has_attribute
+local set_attr = node.set_attribute
 local attr_icflag = luatexbase.attributes['ltj@icflag']
+local attr_jchar_class = luatexbase.attributes['ltj@charclass']
+local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
+
+local ltjf_font_metric_table = ltjf.font_metric_table
 
 local PACKED = 2
 local FROM_JFM = 6
@@ -92,6 +102,81 @@ local function set_stretch(p, after, before, ic, name)
    end
 end
 
+-- step 1: 行末に kern を挿入（句読点，中点用）
+local function aw_step1(p, res, total)
+   local x = node.tail(p.head); if not x then return false end
+   local x = node.prev(x)     ; if not x then return false end
+   -- 本当の行末の node を格納
+   if x.id == id_glue and x.subtype == 15 then 
+      -- 段落最終行のときは，\penalty10000 \parfillskip が入るので，
+      -- その前の node が本来の末尾文字となる
+      x = node.prev(node.prev(x)) 
+   end
+
+   local xc
+   if x.id == id_glyph and has_attr(x, attr_curjfnt) == x.font then
+      -- 和文文字
+      xc = x
+   elseif x.id == id_hlist and get_attr_icflag(x) == PACKED then
+      -- packed JAchar
+      xc = x.head
+   else
+     return false-- それ以外は対象外．
+   end
+   local xk = ltjf_font_metric_table -- 
+     [xc.font].size_cache.char_type[has_attr(xc, attr_jchar_class) or 0]
+     ['end_' .. res.name] or 0
+     print(res.name, total, xk, unicode.utf8.char(xc.char))
+
+   if xk>0 and total>=xk then
+      print("ADDED")
+      total = total - xk
+      local kn = node.new(id_kern)
+      kn.kern = (res.name=='shrink' and -1 or 1) * xk
+      set_attr(kn, attr_icflag, FROM_JFM)
+      node.insert_after(p.head, x, kn)
+      return true
+   else return false
+   end
+end
+
+-- step 2: 行中の glue を変える
+local function aw_step2(p, res, total, added_flag)
+   if total == 0 then -- もともと伸縮の必要なし
+      if added_flag then -- 行末に kern 追加したので，それによる補正
+	 local f = node.hpack(p.head, p.width, 'exactly')
+	 f.head, p.glue_set, p.glue_sign, p.glue_order 
+	    = nil, f.glue_set, f.glue_sign, f.glue_order
+	 node.free(f); return
+      end
+   elseif total <= res[0] then -- 和文処理グルー以外で足りる
+      for _,v in pairs(priority_table) do clear_stretch(p, v, res.name) end
+      local f = node.hpack(p.head, p.width, 'exactly')
+      f.head, p.glue_set, p.glue_sign, p.glue_order 
+         = nil, f.glue_set, f.glue_sign, f.glue_order
+      node.free(f)
+   else
+      total, i = total - res[0], 1
+      while i <= #priority_table do
+         local v = priority_table[i]
+         if total <= res[v] then
+            for j = i+1,#priority_table do
+               clear_stretch(p, priority_table[j], res.name)
+            end
+            set_stretch(p, total, res[v], v, res.name)
+            i = #priority_table + 9 -- ループから抜けさせたいため
+         end
+         total, i= total - res[v], i+1
+      end
+      if i == #priority_table + 10 or added_flag then
+	 local f = node.hpack(p.head, p.width, 'exactly')
+	 f.head, p.glue_set, p.glue_sign, p.glue_order 
+	    = nil, f.glue_set, f.glue_sign, f.glue_order
+	 node.free(f)
+      end
+   end
+end
+
 
 function adjust_width(head) 
    if not head then return head end
@@ -106,31 +191,8 @@ function adjust_width(head)
                total = total + v
             end
          end; total = tex.round(total * res.glue_set)
-         if total <= res[0] then -- 和文処理グルー以外で足りる
-            for _,v in pairs(priority_table) do clear_stretch(p, v, res.name) end
-            local f = node.hpack(p.head, p.width, 'exactly')
-            f.head, p.glue_set, p.glue_sign, p.glue_order 
-               = nil, f.glue_set, f.glue_sign, f.glue_order
-            node.free(f)
-         else
-            total = total - res[0]
-            for i = 1, #priority_table do
-               local v = priority_table[i]
-               if total <= res[v] then
-                  for j = i+1,#priority_table do
-                     clear_stretch(p, priority_table[j], res.name)
-                  end
-                  set_stretch(p, total, res[v], v, res.name)
-                  local f = node.hpack(p.head, p.width, 'exactly')
-                  f.head, p.glue_set, p.glue_sign, p.glue_order 
-                     = nil, f.glue_set, f.glue_sign, f.glue_order
-                  node.free(f)
-                  --print(p.glue_set, p.glue_sign, p.glue_order)
-                  return head
-               end
-               total = total - res[v]
-            end
-         end
+         local added_flag = aw_step1(p, res, total)
+         aw_step2(p, res, total, added_flag)
       end
    end
    return head
