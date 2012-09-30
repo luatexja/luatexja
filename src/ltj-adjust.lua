@@ -126,10 +126,10 @@ local function aw_step1(p, res, total)
    local xk = ltjf_font_metric_table -- 
      [xc.font].size_cache.char_type[has_attr(xc, attr_jchar_class) or 0]
      ['end_' .. res.name] or 0
-     print(res.name, total, xk, unicode.utf8.char(xc.char))
+     --print(res.name, total, xk, unicode.utf8.char(xc.char))
 
    if xk>0 and total>=xk then
-      print("ADDED")
+      --print("ADDED")
       total = total - xk
       local kn = node.new(id_kern)
       kn.kern = (res.name=='shrink' and -1 or 1) * xk
@@ -198,3 +198,16 @@ function adjust_width(head)
    return head
 end
 
+local is_reg = false
+function enable_cb()
+   if not is_reg then
+      luatexbase.add_to_callback('post_linebreak_filter', adjust_width, 'Adjust width', 100)
+      is_reg = true
+   end
+end
+function disable_cb()
+   if is_reg then
+      luatexbase.remove_from_callback('post_linebreak_filter', 'Adjust width')
+      is_reg = false
+   end
+end

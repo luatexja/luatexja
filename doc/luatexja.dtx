@@ -145,8 +145,8 @@
 \DeclareRobustCommand\eTeX{\ensuremath{\varepsilon}-\kern-.125em\TeX}
 \DeclareRobustCommand\LuaTeX{Lua\TeX}
 \DeclareRobustCommand\pdfTeX{pdf\TeX}
-\DeclareRobustCommand\pTeX{p\kern-.05em\TeX}
-\DeclareRobustCommand\upTeX{up\kern-.05em\TeX}
+\DeclareRobustCommand\pTeX{p\kern-.15em\TeX}
+\DeclareRobustCommand\upTeX{up\kern-.15em\TeX}
 \DeclareRobustCommand\pLaTeX{p\kern-.05em\LaTeX}
 \DeclareRobustCommand\pLaTeXe{p\kern-.05em\LaTeXe}
 \DeclareRobustCommand\epTeX{\ensuremath{\varepsilon}-\kern-.125em\pTeX}
@@ -2857,9 +2857,9 @@ JFMの名前を指定する．もし以前に指定されたJFMが読み込ま�
 \toprule
 &\tt jfm-ujis.lua&\tt jfm-jis.lua&\tt jfm-min.lua\\
 \midrule
-%<en>Example~1\footnotemark
-%<ja>例1\footnotemark
-%<zh>例1\footnotemark
+%<en>Example~1\cite{min10}
+%<ja>例1\cite{min10}
+%<zh>例1\cite{min10}
 &\r{ujis}&\r{jis}&\r{min}\\
 %<en>Example~2
 %<ja>例2
@@ -2871,8 +2871,6 @@ Bounding Box&\t{ujis}&\t{jis}&\t{min}\\
 \end{center}
 \ltjsetparameter{jacharrange={-3}}
 \end{table}
-\footnotetext{from: 乙部厳己, min10フォントについて.
-\texttt{http://argent.shinshu-u.ac.jp/\~{\ }otobe/tex/files/min10.pdf}.}
 
 %<en>\paragraph{Note: kern feature}
 %<ja>\paragraph{注意：kern feature}
@@ -3380,7 +3378,23 @@ Furthermore, the glyph is shifted according to values of fields
 
 \item[kern={\{[$j$]=<kern>, ...\}}]
 
-\item[glue={\{[$j$]=\{<width>, <stretch>, <shrink>\}, ...\}}]
+\item[glue={\{[$j$]=\{<width>, <stretch>, <shrink>, [<priority>]\}, ...\}}]
+%<*ja>
+文字クラス$i$の文字と$j$の文字の間に挿入されるkernやglueの量を指定する．
+             <priority>は省略可能であり，行調整処理におけるこのglueの優先
+             度を$-2$から$+2$の間の整数で指定する．<priority>の省略時の値
+             は0であり，範囲外の値が指定されたときの動作は未定義である）．
+
+%</ja>
+
+\item[end\_stretch=<kern>]
+\item[end\_shrink=<kern>]
+%<*ja>
+これらのフィールドは省略可能である．
+現在の文字クラスの文字が行末に来た時に，行長を詰める調整・伸ばす調整のた
+             めにこの文字と行末の間に挿入可能なカーンの大きさを指定する．
+%</ja>
+
 \end{list}
 
 %<*ja>
@@ -4572,6 +4586,43 @@ whose CID number in Adobe-Japan1 is \verb+xxx+.
 JFMの\texttt{chars}テーブルのエントリとして \verb+'AJ1-xxx'+ の形の文字列が
 使えるようになる．これはAdobe-Japan1におけるCID番号が \verb+xxx+ の文字を表す．
 %</ja>
+
+\subsection{\texttt{luatexja-adjust.sty}}
+%<*en>
+...
+%</en>
+%<*ja>
+\pTeX では，行長調整において優先度の概念が存在しなかったため，図
+\ref{fig-adj-input}から半角分の半端は，図\ref{fig-adj-ptex}のように，鍵括
+弧周辺の空白と和文間空白(\Param{kanjiskip}))の両方によって負担される．し
+かし，「日本語組版の要件」\cite{jlreq}やJIS~X~4051~\cite{x4051}においては，
+この図\ref{fig-adj-input}のような状況では半端は鍵括弧周辺の空白のみで負担
+し，その他の和文文字はベタ組で組まれることになっている．この追加パッケー
+ジは\cite{jlreq}や\cite{x4051}における規定のような，優先順位付きの行長調
+整を提供する．
+
+
+\texttt{luatexja-adjust.sty}は，以下の命令を提供する．これらはすべてグローバルに効力を発揮する．
+
+\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
+\item[\char92ltjdisableadjust]
+優先順位付きの行長調整を無効化し，
+\pTeX や\LuaTeX-jaデフォルトのような，優先度なしの行長調整に戻す．
+
+\item[\char92ltjenableadjust]
+優先順位付きの行長調整を有効化する．
+
+\item[優先度設定……]
+
+\end{list}
+
+
+
+
+
+%</ja>
+
+
 
 %<en>\part{Implementations}
 %<ja>\part{実装}
@@ -6016,20 +6067,56 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 \end{itemize}
 
 これらの文字種決定は，実際に \texttt{lstlisting} 環境などの内部で文字が出てくるたびに行われる．
-
 %</ja>
+
 %<*en>
 \section{Patch for the \Pkg{listings} package}
 \dots
 %</en>
+
+
+%<*ja>
+\section{和文の行長補正方法}
+\texttt{luatexja-adjust.sty} で提供される優先順位付きの行長調整の詳細を述
+べる．大まかに述べると，次のようになる．
+\begin{itemize}
+\item 通常の\TeX の行分割方法に従って，段落を行分割する．この段階では，行長に半端が出た場合，その半端分は\Param{xkanjiskip}，\Param{kanjiskip}，JFMグルーの全てで（優先順位なく）負担される．
+\item その後，\texttt{post\_linebreak\_filter} callbackによって，\textbf{段落中の各行ごとに}，
+      行末文字の位置を調整したり，優先度付きの行長調整を実現するためにグルーの伸縮度を調整する．
+\texttt{luatexja-adjust.sty} の作用は，このcallbackを追加するだけである．
+\end{itemize}
+
+段落中の行中のグルーは，
+\begin{itemize}
+\item 下のどれにも該当しないグルー
+\item 和欧文間空白(\Param{xkanjiskip})
+\item JFMグルー（JFM中で優先度を$-2$--$+2$の整数値で指定できるが，優先度別にまとめられる）
+\item 和文間空白(\Param{kanjiskip})
+\end{itemize}
+の$1+1+5+1=8$つに類別される，
+
+\subsection{行末文字の位置調整}
+まず，
+
+%</ja>
+
+%<*en>
+\section{Advanced line-adjustment for Japanese characters}
+\dots
+%</en>
+
+
+
 
 \begin{thebibliography}{99}
   \addcontentsline{toc}{section}{\refname}
 \bibitem{texbytopic}
 Victor Eijkhout,  \emph{\TeX\ by Topic, A \TeX nician's Reference}, Addison-Wesley, 1992.
 \bibitem{listings} C.\ Heinz, B.\ Moses. The \textsf{Listings} Package.
-\bibitem{jlisting} Thor Watanabe. Listings\ -\ MyTeXpert.\newblock
+\bibitem{jlisting} Thor Watanabe. Listings\ -\ MyTeXpert. \newblock
 \url{http://mytexpert.sourceforge.jp/index.php?Listings}
+\bibitem{min10} 乙部厳己，「min10フォントについて」．
+\url{http://argent.shinshu-u.ac.jp/\~{\ }otobe/tex/files/min10.pdf}
 \end{thebibliography}
 
 \newpage

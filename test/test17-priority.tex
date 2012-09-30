@@ -1,8 +1,7 @@
 %#!lualatex
 
 \documentclass{ltjsarticle}
-\usepackage{luatexja-fontspec,luacode,xcolor}
-\RequireLuaTeXjaSubmodule{adjust}
+\usepackage{luatexja-fontspec,luatexja-adjust, luacode,xcolor}
 
 \def\sq{%
   \hbox to 1\zw{\hss\fboxsep=-.5\fboxrule\fbox{%
@@ -18,12 +17,10 @@
   \textcolor{cyan!50!white}{\copy\gridbox}\hskip-20\zw\copy0\vrule\par
 }
 
-\def\DisableCB{\directlua{luatexbase.remove_from_callback('post_linebreak_filter', 'Adjust width')}}
-\def\EnableCB{\directlua{luatexbase.add_to_callback('post_linebreak_filter', luatexja.adjust.adjust_width, 'Adjust width', 100)}}
 
 \long\def\testbox#1{%
-  \EnableCB\setbox0=\vbox{\hsize=20\zw\parfillskip0pt#1}\outbox{ON}\par
-  \DisableCB\setbox0=\vbox{\hsize=20\zw\parfillskip0pt#1}\outbox{OFF}\par
+  \ltjenableadjust\setbox0=\vbox{\hsize=20\zw\parfillskip0pt#1}\outbox{ON}\par
+  \ltjdisableadjust\setbox0=\vbox{\hsize=20\zw\parfillskip0pt#1}\outbox{OFF}\par
 }
 
 \parindent0pt
