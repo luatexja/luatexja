@@ -26,14 +26,17 @@
 
 %<*en>
 \usepackage[margin=25mm,footskip=6mm]{geometry}
+\usepackage{luatexja-adjust}\ltjdisableadjust
 \parskip=\smallskipamount
 %</en>
 %<*ja>
 \usepackage[textwidth=45\zw, lines=45, footskip=6mm]{geometry}
+\usepackage{luatexja-adjust}
 \advance\leftmargini-1\zw\advance\leftmarginii-1\zw
 %</ja>
 %<*zh>
 \usepackage[textwidth=45\zw, lines=45, footskip=6mm]{geometry}
+\usepackage{luatexja-adjust}\ltjdisableadjust
 \advance\leftmargini-1\zw\advance\leftmarginii-1\zw
 \def\postpartname{编}
 \DeclareYokoKanjiEncoding{ZH}{}{}
@@ -369,12 +372,12 @@ The followings are major changes from \pTeX:
 %<*en>
 \item The insertion process of glues/kerns between two Japanese
       characters and between a Japanese character and other characters
-      (we refer these glues/kerns as \textbf{JAglue}) is rewritten from
+      (we refer glues/kerns of both kinds as \textbf{JAglue}) is rewritten from
       scratch.
 %</en>
 %<*ja>
-\item 2つの和文文字の間，和文文字と欧文文字の間に入るグルー／カーン
-      （\textbf{JAglue}と呼ぶ）の挿入処理が0から書き直されている．
+\item 2つの和文文字の間や，和文文字と欧文文字の間に入るグルー／カーン
+      （両者をあわせて\textbf{JAglue}と呼ぶ）の挿入処理が0から書き直されている．
 %</ja>
 %<*zh>
 \item 插在日文字符和其他字符言之间的胶/出格（我们将此称为\textbf{JAglue}）是重新实现的。
@@ -1532,25 +1535,25 @@ Use bold gothic as bold mincho.
 %</ja>
 \item[90jis]
 %<*en>
-Use 90JIS glyphs if possible.
+Use fonts with 90JIS glyphs if possible.
 %</en>
 %<*ja>
-出来る限り90JISの字形を使う．
+出来る限り90JISの字形を採用しているフォントを使う．
 %</ja>
 \item[jis2004]
 %<*en>
-Use JIS2004 glyphs if possible.
+Use fonts with JIS2004 glyphs if possible.
 %</en>
 %<*ja>
-出来る限りJIS2004の字形を使う．
+出来る限りJIS2004の字形を採用しているフォントを使う．
 %</ja>
 \item[jis]
 %<*en>
-Use the JFM \texttt{jfm-jis.lua}, instead of the default JFM of
-\LuaTeX-ja, \texttt{jfm-ujis.lua}.
+Use the JFM \texttt{jfm-jis.lua}, instead of \texttt{jfm-ujis.lua}, which is the default JFM of
+\LuaTeX-ja.
 %</en>
 %<*ja>
-用いるJFMを\texttt{jfm-jis.lua}とする．このオプションがない時は
+用いるJFMを（JISフォントメトリック類似の）\texttt{jfm-jis.lua}にする．このオプションがない時は
 \LuaTeX-ja標準の\texttt{jfm-ujis.lua}が用いられる．
 %</ja>
 \end{list}
@@ -1618,7 +1621,6 @@ as a substitute for \textit{rounded gothic}.
 Settings for Hiragino fonts:
 %</en>
 %<*ja>
-モリサワ・ヒラギノ用の設定はそのようなことは行っていない．
 まずヒラギノフォントから：
 %</ja>
 % これらは持っているわけではないので，フォント名が
@@ -2120,7 +2122,7 @@ This range consist of the following Unicode ranges, \emph{except characters in t
 \item \texttt{U+0180}--\texttt{U+024F}: ラテン文字拡張B
 \item \texttt{U+0250}--\texttt{U+02AF}: IPA拡張（国際音声記号）
 \item \texttt{U+02B0}--\texttt{U+02FF}: 前進を伴う修飾文字
-\item \texttt{U+0300}--\texttt{U+036F}: ダイアクリティカルマーク（合成可能）
+\item \texttt{U+0300}--\texttt{U+036F}: 合成可能な識別記号
 \item \texttt{U+1E00}--\texttt{U+1EFF}: ラテン文字拡張追加
 %</ja>
 %<*zh>
@@ -2140,7 +2142,7 @@ This range consist of the following Unicode ranges, \emph{except characters in t
 	   fonts) has some of these characters.
 %</en>
 %<*ja>
-\item[範囲2${}^{\text{J}}$] ギリシャ文字とキリル文字．JIS~X~0208（したがって多くの
+\item[範囲2${}^{\text{J}}$] ギリシャ文字とキリル文字．JIS~X~0208（したがってほとんどの
                              和文フォント）はこれらの文字を持つ．
 %</ja>
 %<*zh>
@@ -3381,7 +3383,10 @@ Furthermore, the glyph is shifted according to values of fields
 \item[glue={\{[$j$]=\{<width>, <stretch>, <shrink>, [<priority>]\}, ...\}}]
 %<*ja>
 文字クラス$i$の文字と$j$の文字の間に挿入されるkernやglueの量を指定する．
-             <priority>は省略可能であり，行調整処理におけるこのglueの優先
+
+             <priority>は\texttt{luatexja-adjust.sty} による優先順位付き
+	     行長調整（\ref{ssec-adj}節）が有効なときのみ意味を持つ．
+このフィールドは省略可能であり，行調整処理におけるこのglueの優先
              度を$-2$から$+2$の間の整数で指定する．<priority>の省略時の値
              は0であり，範囲外の値が指定されたときの動作は未定義である）．
 
@@ -3391,7 +3396,8 @@ Furthermore, the glyph is shifted according to values of fields
 \item[end\_shrink=<kern>]
 %<*ja>
 これらのフィールドは省略可能である．
-現在の文字クラスの文字が行末に来た時に，行長を詰める調整・伸ばす調整のた
+優先順位付き行長調整が有効であり，かつ現在の文字クラスの文字が行
+	     末に来た時に，行長を詰める調整・伸ばす調整のた
              めにこの文字と行末の間に挿入可能なカーンの大きさを指定する．
 %</ja>
 
@@ -4494,7 +4500,9 @@ See Subsections~\ref{ssec-jfont} and \ref{ssec-psft} for details.
 これら3つのキーはそれぞれ \verb+\jfont+ プリミティブに対する
 \texttt{cid}, \texttt{jfm}, \texttt{jfmvar}キーとそれぞれ対応する．
 \texttt{CID} は下の \texttt{NoEmbed} と合わせて用いられたときのみ有効である．
-詳細は\ref{ssec-jfont}節と\ref{ssec-psft}節を参照．
+\verb+\jfont+ プリミティブに対する
+\texttt{cid}, \texttt{jfm}, \texttt{jfmvar}キーの詳細は\ref{ssec-jfont}節
+	     と\ref{ssec-psft}節を参照．
 %</ja>
 
 \item[NoEmbed]
@@ -4588,26 +4596,66 @@ JFMの\texttt{chars}テーブルのエントリとして \verb+'AJ1-xxx'+ の形
 %</ja>
 
 \subsection{\texttt{luatexja-adjust.sty}}
+\label{ssec-adj}
+\begin{figure}[t]
+\def\sq{%
+  \hbox to 1\zw{\hss\fboxsep=-.5\fboxrule\fbox{%
+  　\hskip\dimexpr-.5\zw-.2pt\vrule width.4pt height.08\zw depth.12\zw%
+  \hskip\dimexpr.5\zw-.2pt\relax}\hss}}
+\def\sb{\hbox to 1\zw{\hss\fboxsep=-.5\fboxrule\fbox{%
+  ■\hskip\dimexpr-.5\zw-.2pt\vrule width.4pt height.08\zw depth.12\zw%
+  \hskip\dimexpr.5\zw-.2pt\relax}\hss}}
+\newbox\gridbox
+\def\outbox#1{{\Large%
+  \ltjsetparameter{kanjiskip=0pt plus .2\zw minus .2\zw}%
+  \setbox\gridbox=\hbox to 20\zw{\sq\sq\sq\sq\sb\sq\sq\sq\sq\sb\sq\sq\sq\sq\sb\sq\sq\sq\sq\sb}%
+  \hbox{\textcolor{cyan!50!white}{\copy\gridbox}\hskip-20\zw%
+  \vbox{\hsize=20\zw\noindent\leftskip0pt\rightskip0pt\parfillskip0pt#1}\vrule}%
+}}
+
+{\centering
+\begin{tabular}{lc}
+\toprule
+no adjustment&\outbox{以上の原理は，「包除原理」とよく呼ばれるが\hskip-.5\zw\null}\\
+without priority&%
+\ltjdisableadjust
+\outbox{以上の原理は，「包除原理」とよく呼ばれるが}%
+\ltjenableadjust\\
+with priority&%
+\outbox{以上の原理は，「包除原理」とよく呼ばれるが}
+%<!ja>\ltjdisableadjust
+\\
+\bottomrule
+\end{tabular}\par}
+\smallskip
+
+Note: the value of 
+\Param{kanjiskip} is 0\,pt${}^{+1/5\,\mathrm{em}}_{-1/5\,\mathrm{em}}$ in this figure,
+for making the difference obvious.
+%<ja>\caption{行長調整}\label{fig-adj}
+%<en>\caption{Line adjustment}\label{fig-adj}
+\end{figure}
+
+
 %<*en>
 ...
 %</en>
 %<*ja>
 \pTeX では，行長調整において優先度の概念が存在しなかったため，図
-\ref{fig-adj-input}から半角分の半端は，図\ref{fig-adj-ptex}のように，鍵括
-弧周辺の空白と和文間空白(\Param{kanjiskip}))の両方によって負担される．し
-かし，「日本語組版の要件」\cite{jlreq}やJIS~X~4051~\cite{x4051}においては，
-この図\ref{fig-adj-input}のような状況では半端は鍵括弧周辺の空白のみで負担
-し，その他の和文文字はベタ組で組まれることになっている．この追加パッケー
-ジは\cite{jlreq}や\cite{x4051}における規定のような，優先順位付きの行長調
-整を提供する．
+\ref{fig-adj}上段における半角分の半端は，図\ref{fig-adj}中段のように，鍵
+括弧周辺の空白と和文間空白(\Param{kanjiskip})の両方によって負担される．し
+かし，「日本語組版処理の要件」\cite{jlreq}やJIS~X~4051~\cite{x4051}におい
+ては，このような状況では半端は鍵括弧周辺の空白のみで負担し，その他の和文
+文字はベタ組で組まれる（図\ref{fig-adj}下段）ことになっている．この追加
+パッケージは\cite{jlreq}や\cite{x4051}における規定のような，優先順位付き
+の行長調整を提供する．詳細な仕様については\ref{sec-adjspec}を参照．
 
 
 \texttt{luatexja-adjust.sty}は，以下の命令を提供する．これらはすべてグローバルに効力を発揮する．
 
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
 \item[\char92ltjdisableadjust]
-優先順位付きの行長調整を無効化し，
-\pTeX や\LuaTeX-jaデフォルトのような，優先度なしの行長調整に戻す．
+優先順位付きの行長調整を無効化する．
 
 \item[\char92ltjenableadjust]
 優先順位付きの行長調整を有効化する．
@@ -5329,7 +5377,7 @@ u
 %<ja>\subsection{概要}
 %<zh>\subsection{概要}
 
-\LuaTeX-jaにおける和文処理グルーの挿入方法は，\pTeX のそれとは全く異なる．
+\LuaTeX-jaにおける \textbf{JAglue} の挿入方法は，\pTeX のそれとは全く異なる．
 \pTeX では次のような仕様であった：
 \begin{itemize}
 \item JFMグルーの挿入は，和文文字を表すトークンを元に水平リストに（文字を表す）<char\_node>を
@@ -6077,26 +6125,41 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 
 %<*ja>
 \section{和文の行長補正方法}
+\label{sec-adjspec}
 \texttt{luatexja-adjust.sty} で提供される優先順位付きの行長調整の詳細を述
 べる．大まかに述べると，次のようになる．
 \begin{itemize}
-\item 通常の\TeX の行分割方法に従って，段落を行分割する．この段階では，行長に半端が出た場合，その半端分は\Param{xkanjiskip}，\Param{kanjiskip}，JFMグルーの全てで（優先順位なく）負担される．
-\item その後，\texttt{post\_linebreak\_filter} callbackによって，\textbf{段落中の各行ごとに}，
-      行末文字の位置を調整したり，優先度付きの行長調整を実現するためにグルーの伸縮度を調整する．
-\texttt{luatexja-adjust.sty} の作用は，このcallbackを追加するだけである．
+\item 通常の\TeX の行分割方法に従って，段落を行分割する．この段階では，行
+      長に半端が出た場合，その半端分は\Param{xkanjiskip}，
+      \Param{kanjiskip}，JFMグルーの全てで（優先順位なく）負担される．
+\item その後，\texttt{post\_linebreak\_filter} callbackを使い，\textbf{段
+      落中の各行ごとに}，行末文字の位置を調整したり，優先度付きの行長調整
+      を実現するためにグルーの伸縮度を調整する．
+\texttt{luatexja-adjust.sty} の作用は，このcallbackを追加するだけであり，
+      この章の残りではcallbackでの処理について解説する．
 \end{itemize}
 
-段落中の行中のグルーは，
+\paragraph{準備：合計伸縮量の計算}
+グルーの伸縮度（\texttt{plus} や \texttt{minus} で指定されている値）には，
+有限値の他に，\texttt{fi}，\texttt{fil}，\texttt{fill}，\texttt{filll}と
+いう4つの無限大レベル（後ろの方ほど大きい）があり，行の調整に
+\texttt{fi} などの\textbf{無限大レベルの伸縮度が用いられている場合は，そ
+の行に対しての処理を中止}する．
+
+よって，以降，問題にしている行の行長調整は伸縮度が有限長のグルーを用いて
+行われているとして良い．まず，段落中の行中のグルーを
 \begin{itemize}
 \item 下のどれにも該当しないグルー
 \item 和欧文間空白(\Param{xkanjiskip})
-\item JFMグルー（JFM中で優先度を$-2$--$+2$の整数値で指定できるが，優先度別にまとめられる）
+\item JFMグルー（優先度別にまとめられる）
 \item 和文間空白(\Param{kanjiskip})
 \end{itemize}
-の$1+1+5+1=8$つに類別される，
+の$1+1+5+1=8$つに類別し，それぞれの種別ごとに許容されている伸縮度の合計を計算する．
+また，行長と自然長との差の絶対値を計算し，それを\textit{total}とおく．
 
 \subsection{行末文字の位置調整}
-まず，
+まず，行末が和文文字であった場合，それを動かすことによって，\textbf{JAglue} が負担する調整量を
+少なくしようとする．
 
 %</ja>
 
@@ -6115,8 +6178,13 @@ Victor Eijkhout,  \emph{\TeX\ by Topic, A \TeX nician's Reference}, Addison-Wesl
 \bibitem{listings} C.\ Heinz, B.\ Moses. The \textsf{Listings} Package.
 \bibitem{jlisting} Thor Watanabe. Listings\ -\ MyTeXpert. \newblock
 \url{http://mytexpert.sourceforge.jp/index.php?Listings}
-\bibitem{min10} 乙部厳己，「min10フォントについて」．
-\url{http://argent.shinshu-u.ac.jp/\~{\ }otobe/tex/files/min10.pdf}
+\bibitem{min10} 乙部厳己，min10フォントについて．
+\url{http://argent.shinshu-u.ac.jp/~otobe/tex/files/min10.pdf}
+\bibitem{jlreq}  W3C Japanese Layout Task Force~(ed), Requirements for Japanese Text Layout (W3C Working Group Note), 2011, 2012. \newblock
+\url{http://www.w3.org/TR/jlreq/}%
+%<ja> \\日本語訳の書籍版：W3C日本語組版タスクフォース（編），『W3C技術ノート 日本語組版処理の要件』，東京電機大学出版局，2012．
+\bibitem{x4051} 日本工業規格(Japanese Industrial Standard) JIS~X~4051,
+日本語文書の組版方法(Formatting rules for Japanese documents), 1993, 1995, 2004.
 \end{thebibliography}
 
 \newpage
