@@ -5972,43 +5972,122 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 
 \section{psft}
 
-%<*ja>
-\section{\Pkg{listings} パッケージへの対応}
-\Pkg{listings} パッケージが，そのままでは日本語をまともに出力できないこと
-はよく知られている，きちんと整形して出力するために，\Pkg{listings}パッケー
-ジは内部で「ほとんどの文字」をアクティブにし，各文字に対してその文字の出
-力命令を割り当てている (\cite{listings})．
-しかし，そこでアクティブにする文字の中に，和文文
-字がないためである．p\TeX 系列では，和文文字をアクティブにする手法がなく，
-\Pkg{jlisting.sty} というパッチ\cite{jlisting}を用いることで無理やり解決していた．
+%<en>\section{Patch for the \Pkg{listings} package}
+%<ja>\section{\Pkg{listings} パッケージへの対応}
 
+%<*en>
+It is well-known that the \Pkg{listings} package outputs weird results
+for Japanese input.
+The \Pkg{listings} package makes most of letters active and assigns
+output command for each letter \cite{listings}.
+But Japanese characters are not included in these activated letters.
+For \pTeX{} series, there is no method to make Japanese characters active;
+a patch \Pkg{jlisting.sty} \cite{jlisting} resolves the problem forcibly.
+%</en>
+%<*ja>
+\Pkg{listings} パッケージが，そのままでは日本語をまともに出力できないこと
+はよく知られている．きちんと整形して出力するために，\Pkg{listings}パッケー
+ジは内部で「ほとんどの文字」をアクティブにし，各文字に対してその文字の出
+力命令を割り当てている \cite{listings}．
+しかし，そこでアクティブにする文字の中に，和文文
+字がないためである．\pTeX 系列では，和文文字をアクティブにする手法がなく，
+\Pkg{jlisting.sty} というパッチ\cite{jlisting}を用いることで無理やり解決していた．
+%</ja>
+
+%<*en>
+In \LuaTeX-ja, the problem is resolved by using \verb+process_input_buffer+ callback.
+The callback function inserts the output command before each letter above U+0080.
+This method can omits the process to make all Japanese characters active
+(most of the activated characters are not used in many cases).
+%</en>
+%<*ja>
 \LuaTeX-jaでは，\verb+process_input_buffer+ コールバックを利用することで，
 「各行に出現するU+0080以降の文字に対して，それらの出力命令を前置する」という方法をとっている．
 これにより，（入力には使用されていないかもしれない）和文文字をもすべてアクティブ化する手間もなく，
 見通しが良い実装になっている．
+%</ja>
 
+%<*en>
+If \Pkg{listings.sty} and \LuaTeX-ja were loaded,
+then the patch \Pkg{lltjp-listings.sty} is loaded automatically at \verb+\begin{document}+.
+%</en>
+%<*ja>
 \LuaTeX-ja で利用される \Pkg{listings} パッケージへのパッチ \Pkg{lltjp-listings.sty} は，
 \Pkg{listings.sty} と\LuaTeX-jaを読み込んでおけば，
 \verb+\begin{document}+ の箇所において自動的に読み込まれるので，通常はあまり
 意識する必要はない．
+%</ja>
 
-\paragraph{文字種}
+%<en>\paragraph{Class of characters}
+%<ja>\paragraph{文字種}
+
+%<*en>
+Roughly speaking, the \Pkg{listings} package processes input as follows:
+%</en>
+%<*ja>
 \Pkg{listings} パッケージの内部では，大雑把に言うと
+%</ja>
 \begin{enumerate}
+%<*en>
+\item Collects \textit{letters} and \textit{digits}, which can be used for the name of identifiers.
+%</en>
+%<*ja>
 \item 識別子として使える文字 (``letter'',~``digit'') たちを
 集める．
+%</ja>
+
+%<*en>
+\item When reading an \textit{other}, outputs the collected string (with modification, if needed).
+%</en>
+%<*ja>
 \item letterでもdigitでもない文字が現れた時に，収集した文字列を（必要なら修飾して）出力する．
+%</ja>
+
+%<*en>
+\item Collects \textit{others}.
+%</en>
+%<*ja>
 \item 今度は逆に，letterでない文字たちをletterが現れるまで集める．
+%</ja>
+
+%<*en>
+\item When reading a \textit{letter} or a \textit{digit}, outputs the collected string.
+%</en>
+%<*ja>
 \item letterが出現したら集めた文字列を出力する．
+%</ja>
+
+%<*en>
+\item Turns back to 1.
+%</en>
+%<*ja>
 \item 1.に戻る．
+%</ja>
 \end{enumerate}
+%<*en>
+By the above process, line breaks inside of an identifier is blocked.
+A flag \verb+\lst@ifletter+ shows whether the last character can be used
+for the name of identifiers or not.
+%</en>
+%<*ja>
 という処理が行われている．これにより，識別子の途中では行分割が行われないようになっている．
 直前の文字が識別子として使えるか否かは \verb+\lst@ifletter+ というフラグに格納されている．
+%</ja>
 
+%<*en>
+For Japanese characters, line breaks are permitted on both sides
+except for parentheses, dashes, etc.
+To process Japanese characters,
+\Pkg{lltjp-listings.sty} introduces a new flag \verb+\lst@kanji+, which indicates
+whether the last character is Japanese character or not.
+For illustration, we introduce the following classes of character:
+%</en>
+%<*ja>
 さて，日本語の処理である．殆どの和文文字の前後では行分割が可能であるが，その一方で
 括弧類や音引きなどでは禁則処理が必要なことから，\Pkg{lltjp-listings.sty} では，
 直前が和文文字であるかを示すフラグ \verb+\lst@kanji+ を新たに導入した．
 以降，説明のために以下のように文字を分類する：
+%</ja>
 \begin{center}
 \small
 \begin{tabular}{lccccc}
@@ -6016,23 +6095,50 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 &Letter&Other&Kanji&Open&Close\\\midrule
 \verb+\lst@ifletter+&T&F&T&F&T\\
 \verb+\lst@ifkanji+&F&F&T&T&F\\
-意図&識別子中の文字&その他欧文文字&殆どの和文文字&開き括弧類&閉じ括弧類\\
+%<en>Meaning&identifier char&other alphabet&most of Japanese char&open paren&close paren\\
+%<ja>意図&識別子中の文字&その他欧文文字&殆どの和文文字&開き括弧類&閉じ括弧類\\
 \bottomrule
 \end{tabular}
 \end{center}
+%<*en>
+Note that \textit{digits} in the \Pkg{listings} package can be Letter or
+Other according to circumstances.
+%</en>
+%<*ja>
 なお，本来の\Pkg{listings} パッケージでの分類``digit''は，
 出現状況によって，上の表のLetterとOtherのどちらにもなりうる．
 また，KanjiとCloseは \verb+\lst@ifletter+ と \verb+\lst@ifkanji+ の値が一致しているが，
 これは間違いではない．
+%</ja>
 
+%<*en>
+For example, let us consider the case an Open comes after a Letter.
+Since an Open represents Japanese open parenthesis,
+it is preferred to be permitted to insert line break after the Letter.
+Therefore, the collected string is output in this case.
+The following table summarizes $5\times 5=25$ cases:
+%</en>
+%<*ja>
 例えば，Letterの直後にOpenが来た場合を考える．
 文字種Openは和文開き括弧類を想定しているので，Letterの直後では行分割が可能であることが望ましい．
 そのため，この場合では，すでに収集されている文字列を出力することで行分割を許容するようにした．
 同じように，$5\times 5=25$通り全てについて書くと，次のようになる：
+%</ja>
 \begin{center}
 \small
 \begin{tabular}{llccccc}
 \toprule
+%<*en>
+&&\multicolumn{4}{c}{Next}\\\cmidrule(lr){3-7}
+&&\hbox to 4em{\hss Letter\hss}&\hbox to 4em{\hss Other\hss}
+&\hbox to 4em{\hss Kanji\hss}&\hbox to 4em{\hss Open\hss}&Close\\\midrule
+&Letter&collects&\multicolumn{3}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
+&Other&outputs&collects&\multicolumn{2}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
+Last&Kanji&\multicolumn{4}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
+&Open&\multicolumn{5}{c}{\hrulefill \ collects\ \hrulefill}\\
+&Close&\multicolumn{4}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
+%</en>
+%<*ja>
 &&\multicolumn{4}{c}{後ろ側の文字}\\\cmidrule(lr){3-7}
 &&\hbox to 4em{\hss Letter\hss}&\hbox to 4em{\hss Other\hss}
 &\hbox to 4em{\hss Kanji\hss}&\hbox to 4em{\hss Open\hss}&Close\\\midrule
@@ -6041,39 +6147,64 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 文&Kanji&\multicolumn{4}{c}{\hrulefill \ 出力\ \hrulefill}&収集\\
 字&Open&\multicolumn{5}{c}{\hrulefill \ 収集\ \hrulefill}\\
 種&Close&\multicolumn{4}{c}{\hrulefill \ 出力\ \hrulefill}&収集\\
+%</ja>
 \bottomrule
 \end{tabular}
 \end{center}
-上の表において，
+%<en>In the above table,
+%<ja>上の表において，
 \begin{itemize}
-\item 「出力」は，それまでに集めた文字列を出力（≒ここで行分割可能）を意味する．
-\item 「収集」は，後側の文字を，現在収集された文字列に追加（行分割不可）を意味する．
+%<en>\item ``outputs'' means to output the collected string (i.e., line breaking is permitted there).
+%<ja>\item 「出力」は，それまでに集めた文字列を出力（≒ここで行分割可能）を意味する．
+
+%<en>\item ``collects'' means to append the next character to the collected string (i.e., line breaking is prohibited there).
+%<ja>\item 「収集」は，後側の文字を，現在収集された文字列に追加（行分割不可）を意味する．
 \end{itemize}
 
-\paragraph{和文文字扱いとなる文字}
+%<en>\paragraph{Classification of characters}
+%<ja>\paragraph{和文文字扱いとなる文字}
+
+%<*en>
+Characters are classified according to \Param{jacharrange} parameter (see Section \ref{ssec-setrange}):
+%</en>
+%<*ja>
 \Pkg{listings} パッケージにおいて和文文字と扱われる
 （前に述べたKanji, Open，あるいは「閉じ括弧類」分類）か否かは，
 通常の\textbf{JAchar}/\textbf{Alchar}の範囲の設定（\ref{ssec-setrange}節）に従って行われる：
+%</ja>
 \begin{itemize}
-\item （U+0080以降の）\textbf{ALchar}は，すべてLetter扱いである．
-\item （U+0080以降の）\textbf{JAchar}については，以下の順序に従って文字種を決める：
+%<en>\item \textbf{ALchars} above U+0080 are Letter.
+%<ja>\item （U+0080以降の）\textbf{ALchar}は，すべてLetter扱いである．
+
+%<en>\item \textbf{JAchars} are classified in the order as follows:
+%<ja>\item （U+0080以降の）\textbf{JAchar}については，以下の順序に従って文字種を決める：
 \begin{enumerate}
-\item \Param{prebreakpenalty} が0以上の文字はOpen扱いである．
-\item \Param{postbreakpenalty} が0以上の文字はClose扱いである．
-\item 上の2条件のどちらにも当てはまらなかった文字は，Kanji扱いである．
+%<en>\item Characters whose \Param{prebreakpenalty} is greater than or equal to 0 are Open.
+%<ja>\item \Param{prebreakpenalty} が0以上の文字はOpen扱いである．
+
+%<en>\item Characters whose \Param{postbreakpenalty} is greater than or equal to 0 are Close.
+%<ja>\item \Param{postbreakpenalty} が0以上の文字はClose扱いである．
+
+%<en>\item Characters that don't satisfy the above two conditions are Kanji.
+%<ja>\item 上の2条件のどちらにも当てはまらなかった文字は，Kanji扱いである．
 \end{enumerate}
-なお，半角カナ(U+FF61--U+FF9F)以外の\textbf{JAchar}は欧文文字2文字分の幅をとるものとみなされる．
-半角カナは欧文文字1文字分の幅となる．
 \end{itemize}
 
-これらの文字種決定は，実際に \texttt{lstlisting} 環境などの内部で文字が出てくるたびに行われる．
+%<*en>
+The width of halfwidth kana (U+FF61--U+FF9F) is same as the width of \textbf{ALchar}; the width of the other \textbf{JAchars} is double the width of \textbf{ALchar}.
+%</en>
+%<*ja>
+なお，半角カナ(U+FF61--U+FF9F)以外の\textbf{JAchar}は欧文文字2文字分の幅をとるものとみなされる．
+半角カナは欧文文字1文字分の幅となる．
 %</ja>
 
 %<*en>
-\section{Patch for the \Pkg{listings} package}
-\dots
+The classification process is executed every time a character appears in
+listing environments.
 %</en>
-
+%<*ja>
+これらの文字種決定は，実際に \texttt{lstlisting} 環境などの内部で文字が出てくるたびに行われる．
+%</ja>
 
 %<*ja>
 \section{和文の行長補正方法}
@@ -6157,16 +6288,18 @@ Each character in the tables means:
 \item 背景が薄く青く塗られている文字は，
 \LuaTeX-ja の標準で\textbf{ALchar}として認識されている文字である．
 %</ja>
+
 %<*en>
-\item The first letter {\tt L} means that the character is available in
+\item The first letter {\tt L} means that the character is available for
   the name of a control sequence in \XeTeX{} and \LuaTeX-ja (its catcode is 11).
 %</en>
 %<*ja>
 \item 1文字目の {\tt L} は，\XeTeX や\LuaTeX-jaにおいてこの文字が制御綴内に
 使用可能（catcodeが11）であることを表している．
 %</ja>
+
 %<*en>
-\item The second letter {\tt U} means that the character is available in
+\item The second letter {\tt U} means that the character is available for
   the name of a control sequence in \upTeX{} (its kcatcode is 16 or 17).
   \upTeX{} regards these characters as Japanese character.
 %</en>
@@ -6174,14 +6307,16 @@ Each character in the tables means:
 \item 2文字目の{\tt U} は，\upTeX においてこの文字が制御綴内に使用可能（kcatcodeは16,~17）であることを
 表している．この範囲内では，\upTeX は標準で全文字を和文文字として扱うようである．
 %</ja>
+
 %<*en>
-\item The third letter {\tt P} means that the character is available in
+\item The third letter {\tt P} means that the character is available for
   the name of a control sequence in \pTeX{} (its kcatcode is 16 or 17).
 %</en>
 %<*ja>
 \item 3文字目の {\tt P} は，\pTeX においてこの文字が制御綴内に使用可能（kcatcodeは16,~17）であることを
 表している．
 %</ja>
+
 %<*en>
 \item If the third letter is {\tt -} (or the character is printed in red),
   the character is not included in JIS~X~0208.
@@ -6191,6 +6326,7 @@ Each character in the tables means:
 \item 3文字目が{\tt -}となっているもの（本体の文字も赤身がかっている）は，
 JIS~X~0208にないため使用不能と考えて良いものである．
 %</ja>
+
 %<*en>
 \item The kana for bidakuon in row 4 and 5 are omitted.
 %</en>
