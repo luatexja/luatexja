@@ -6037,7 +6037,7 @@ Roughly speaking, the \Pkg{listings} package processes input as follows:
 %</ja>
 
 %<*en>
-\item When reading an \textit{other}, outputs the collected string (with modification, if needed).
+\item When reading an \textit{other}, outputs the collected character string (with modification, if needed).
 %</en>
 %<*ja>
 \item letterでもdigitでもない文字が現れた時に，収集した文字列を（必要なら修飾して）出力する．
@@ -6051,7 +6051,7 @@ Roughly speaking, the \Pkg{listings} package processes input as follows:
 %</ja>
 
 %<*en>
-\item When reading a \textit{letter} or a \textit{digit}, outputs the collected string.
+\item When reading a \textit{letter} or a \textit{digit}, outputs the collected character string.
 %</en>
 %<*ja>
 \item letterが出現したら集めた文字列を出力する．
@@ -6065,8 +6065,8 @@ Roughly speaking, the \Pkg{listings} package processes input as follows:
 %</ja>
 \end{enumerate}
 %<*en>
-By the above process, line breaks inside of an identifier is blocked.
-A flag \verb+\lst@ifletter+ shows whether the last character can be used
+By the above process, line breaks inside of an identifier are blocked.
+A flag \verb+\lst@ifletter+ indicates whether the previous character can be used
 for the name of identifiers or not.
 %</en>
 %<*ja>
@@ -6078,14 +6078,14 @@ for the name of identifiers or not.
 For Japanese characters, line breaks are permitted on both sides
 except for parentheses, dashes, etc.
 To process Japanese characters,
-\Pkg{lltjp-listings.sty} introduces a new flag \verb+\lst@kanji+, which indicates
-whether the last character is Japanese character or not.
+The pacth \Pkg{lltjp-listings.sty} introduces a new flag \verb+\lst@ifkanji+, which indicates
+whether the previous character is Japanese character or not.
 For illustration, we introduce the following classes of character:
 %</en>
 %<*ja>
 さて，日本語の処理である．殆どの和文文字の前後では行分割が可能であるが，その一方で
 括弧類や音引きなどでは禁則処理が必要なことから，\Pkg{lltjp-listings.sty} では，
-直前が和文文字であるかを示すフラグ \verb+\lst@kanji+ を新たに導入した．
+直前が和文文字であるかを示すフラグ \verb+\lst@ifkanji+ を新たに導入した．
 以降，説明のために以下のように文字を分類する：
 %</ja>
 \begin{center}
@@ -6115,13 +6115,18 @@ Other according to circumstances.
 For example, let us consider the case an Open comes after a Letter.
 Since an Open represents Japanese open parenthesis,
 it is preferred to be permitted to insert line break after the Letter.
-Therefore, the collected string is output in this case.
-The following table summarizes $5\times 5=25$ cases:
+Therefore, the collected character string is output in this case.
 %</en>
 %<*ja>
 例えば，Letterの直後にOpenが来た場合を考える．
 文字種Openは和文開き括弧類を想定しているので，Letterの直後では行分割が可能であることが望ましい．
 そのため，この場合では，すでに収集されている文字列を出力することで行分割を許容するようにした．
+%</ja>
+
+%<*en>
+The following table summarizes $5\times 5=25$ cases:
+%</en>
+%<*ja>
 同じように，$5\times 5=25$通り全てについて書くと，次のようになる：
 %</ja>
 \begin{center}
@@ -6134,7 +6139,7 @@ The following table summarizes $5\times 5=25$ cases:
 &\hbox to 4em{\hss Kanji\hss}&\hbox to 4em{\hss Open\hss}&Close\\\midrule
 &Letter&collects&\multicolumn{3}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
 &Other&outputs&collects&\multicolumn{2}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
-Last&Kanji&\multicolumn{4}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
+Prev&Kanji&\multicolumn{4}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
 &Open&\multicolumn{5}{c}{\hrulefill \ collects\ \hrulefill}\\
 &Close&\multicolumn{4}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
 %</en>
@@ -6154,10 +6159,10 @@ Last&Kanji&\multicolumn{4}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
 %<en>In the above table,
 %<ja>上の表において，
 \begin{itemize}
-%<en>\item ``outputs'' means to output the collected string (i.e., line breaking is permitted there).
+%<en>\item ``outputs'' means to output the collected character string (i.e., line breaking is permitted there).
 %<ja>\item 「出力」は，それまでに集めた文字列を出力（≒ここで行分割可能）を意味する．
 
-%<en>\item ``collects'' means to append the next character to the collected string (i.e., line breaking is prohibited there).
+%<en>\item ``collects'' means to append the next character to the collected character string (i.e., line breaking is prohibited there).
 %<ja>\item 「収集」は，後側の文字を，現在収集された文字列に追加（行分割不可）を意味する．
 \end{itemize}
 
@@ -6170,7 +6175,7 @@ Characters are classified according to \Param{jacharrange} parameter (see Sectio
 %<*ja>
 \Pkg{listings} パッケージにおいて和文文字と扱われる
 （前に述べたKanji, Open，あるいは「閉じ括弧類」分類）か否かは，
-通常の\textbf{JAchar}/\textbf{Alchar}の範囲の設定（\ref{ssec-setrange}節）に従って行われる：
+通常の\textbf{JAchar}/\textbf{Alchar}の範囲の設定（\Param{jacharrange} パラメータ，\ref{ssec-setrange}節を参照）に従って行われる：
 %</ja>
 \begin{itemize}
 %<en>\item \textbf{ALchars} above U+0080 are Letter.
@@ -6191,7 +6196,8 @@ Characters are classified according to \Param{jacharrange} parameter (see Sectio
 \end{itemize}
 
 %<*en>
-The width of halfwidth kana (U+FF61--U+FF9F) is same as the width of \textbf{ALchar}; the width of the other \textbf{JAchars} is double the width of \textbf{ALchar}.
+The width of halfwidth kana (U+FF61--U+FF9F) is same as the width of \textbf{ALchar};
+the width of the other \textbf{JAchars} is double the width of \textbf{ALchar}.
 %</en>
 %<*ja>
 なお，半角カナ(U+FF61--U+FF9F)以外の\textbf{JAchar}は欧文文字2文字分の幅をとるものとみなされる．
