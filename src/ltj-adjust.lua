@@ -30,12 +30,12 @@ local KANJI_SKIP = 9
 local XKANJI_SKIP = 10
 
 local priority_table = {
-   XKANJI_SKIP,
    FROM_JFM + 2,
    FROM_JFM + 1,
    FROM_JFM,
    FROM_JFM - 1,
    FROM_JFM - 2,
+   XKANJI_SKIP,
    KANJI_SKIP
 }
 
@@ -192,6 +192,7 @@ function adjust_width(head)
             end
          end; total = tex.round(total * res.glue_set)
          local added_flag = aw_step1(p, res, total)
+         --print(total, res[0], res[KANJI_SKIP], res[FROM_JFM])
          aw_step2(p, res, total, added_flag)
       end
    end
