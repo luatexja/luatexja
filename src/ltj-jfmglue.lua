@@ -95,7 +95,7 @@ end
 -- 文字クラスの決定
 local function slow_find_char_class(c, m, oc)
    local xc = c or oc
-   local cls = ltjf_find_char_class(xc, m)
+   local cls = ltjf_find_char_class(oc, m)
    if xc ~= oc and  cls==0 then cls, xc = ltjf_find_char_class(-xc, m) end
    return cls, xc
 end
