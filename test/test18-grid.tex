@@ -1,0 +1,210 @@
+%#!lualatex
+\documentclass{ltjsarticle}
+\usepackage{xcolor,luatexja-adjust}
+\ltjenableadjust
+\usepackage[textwidth=35\zw,lines=40]{geometry}
+
+% 設定
+%\def\ltjgridcolor{cyan!50!white}
+%\def\ltjgridmode{grid} %% grid or line
+
+\def\ltjgridcolor{red}
+\def\ltjgridmode{line} %% grid or line
+
+
+%%%% code
+\makeatletter
+\newbox\@gridbox
+\def\@outputpage{%
+\begingroup % the \endgroup is put in by \aftergroup
+  \iftdir
+    \dimen\z@\textwidth \textwidth\textheight \textheight\dimen\z@
+  \fi
+  \let \protect \noexpand
+  \@resetactivechars
+  \global\let\@@if@newlist\if@newlist
+  \global\@newlistfalse
+  \@parboxrestore
+  \shipout\vbox{\yoko
+    \set@typeset@protect
+    \aftergroup\endgroup
+    \aftergroup\set@typeset@protect
+     \if@specialpage
+       \global\@specialpagefalse\@nameuse{ps@\@specialstyle}%
+     \fi
+     \if@twoside
+       \ifodd\count\z@ \let\@thehead\@oddhead \let\@thefoot\@oddfoot
+          \iftdir\let\@themargin\evensidemargin
+          \else\let\@themargin\oddsidemargin\fi
+       \else \let\@thehead\@evenhead
+          \let\@thefoot\@evenfoot
+           \iftdir\let\@themargin\oddsidemargin
+           \else\let\@themargin\evensidemargin\fi
+     \fi\fi
+     \@@topmargin\topmargin
+     \iftombow
+       \@@paperwidth\paperwidth \advance\@@paperwidth 6mm\relax
+       \@@paperheight\paperheight \advance\@@paperheight 16mm\relax
+       \advance\@@topmargin 1in\relax \advance\@themargin 1in\relax
+     \fi
+     \reset@font
+     \normalsize
+     \normalsfcodes
+     \let\label\@gobble
+     \let\index\@gobble
+     \let\glossary\@gobble
+     \@makegrid
+     \baselineskip\z@skip \lineskip\z@skip \lineskiplimit\z@
+    \@begindvi
+    \@outputtombow
+    \vskip \@@topmargin
+    \moveright\@themargin\vbox{%
+      \setbox\@tempboxa \vbox to\headheight{%
+        \vfil
+        \color@hbox
+          \normalcolor
+          \hb@xt@\textwidth{\@thehead}%
+        \color@endbox
+      }%                        %% 22 Feb 87
+      \dp\@tempboxa \z@
+      \box\@tempboxa
+      \vskip \headsep
+      \copy\@gridbox
+      \box\@outputbox
+      \baselineskip \footskip
+      \color@hbox
+        \normalcolor
+        \hb@xt@\textwidth{\@thefoot}%
+      \color@endbox
+    }%
+  }%
+  \global\let\if@newlist\@@if@newlist
+  \global \@colht \textheight
+  \stepcounter{page}%
+  \let\firstmark\botmark
+}
+
+\def\@makegrid{%
+  \ifvoid\@gridbox
+  \@tempdima=\dimexpr\textheight-\topskip
+  \setbox\@gridbox\vtop to\z@{\hsize=\textwidth
+    \vskip\topskip
+    \setbox\@tempboxa=\hbox{\smash{%
+        \color@hbox\color{\ltjgridcolor}%
+          \dimen@=\dimexpr\textwidth-\zw\relax\count@1 
+          \csname ltj@@mk@grid@\ltjgridmode\endcsname
+        \color@endbox}}
+    \loop
+      \leavevmode\copy\@tempboxa\par\advance\@tempdima-\baselineskip
+    \unless\ifdim\@tempdima<0pt\repeat
+  \vss}\fi
+}
+
+% マス目
+\def\ltj@@mk@grid@grid{%
+  \unless\ifdim\dimen@<0pt
+    \hbox to 1\zw{\hss\fboxsep=-.5\fboxrule\fbox{%
+    \@tempcnta\count@\divide\@tempcnta5\multiply\@tempcnta5
+    \ifnum\@tempcnta=\count@ ■\else 　\fi
+    \hskip\dimexpr-.5\zw-.2pt\vrule width.4pt height.08\zw depth.12\zw%
+    \hskip\dimexpr.5\zw-.2pt\relax}\hss}%
+    \advance\dimen@-\zw\advance\count@1 \expandafter\ltj@@mk@grid@grid
+  \fi
+}
+
+% baseline
+\def\ltj@@mk@grid@line{%
+  \vrule width\textwidth height.2pt depth.2pt\hskip-\textwidth
+  \ltj@@mk@grid@line@aux
+}
+\def\ltj@@mk@grid@line@aux{%
+  \unless\ifdim\dimen@<0pt
+    \vrule width.2pt height.2\zw depth0pt
+    \hskip\dimexpr\zw-.4pt\vrule width.2pt height.2\zw depth0pt%
+    \advance\dimen@-\zw\advance\count@1 \expandafter\ltj@@mk@grid@line@aux
+  \fi
+}
+
+\makeatother
+
+\begin{document}
+晩の7時15分少し前からWilhelm Weber町29番地の前の歩道を僕は行きつ戻りつし
+ていました．星の見えたのは近日珍らしいが，秋風が冷こくなってリンデの落葉
+が二ひら三ひら散らばっているなどは誂向きの道具立です．
+
+其処で僕は或るFr\"auleinとrendez-vous があったのです．フロイラインという
+のはProf.\ Dr.\ Emmy Noether女史です！
+
+ヒルベルト先生を訪問するのに，僕一人では話が途切れたときに困るだろうとい
+うて，親切なNさんが同行してくれる約束なのです．
+
+Wilhelm Weber町29番地．H先生のお宅も随分久しいものですねェ．昔ながらのさ
+さやかな――あれは「柴折戸」としておきたい．それから広くもないあの「前
+栽」．それはしかしながら三十年間に木立が茂って，李だか梨だか，暗くて分ら
+ないが，丁度季節ではあり，定めて老先生夫婦の食卓を賑わせていることでしょ
+う．玄関は矢張り暗いが，勝手を知ったNさんは殆ど案内を乞わないで，「来まし
+たよ」の科白と取次ぎに出た女中とを跡に残して，さっさと例の客間へ僕を導き
+ました．電話で言ってあったのでしょう，「承知していましたよ．よく来てくれ
+たねエ」と言いつつH先生は直ぐ出て来られました．今年丁度七十歳のH先生は血
+色もよく，昔ながらの童顔に微笑を湛えていられます．四五年前に先生は難治の
+重病で，病名はラテン語で何とやら，聞いても忘れましたが肝臓の故障らしい，
+一時は殆ど絶望の状態に陥られました頃，丁度アメリカで新薬が発見されて，其
+の為に一命を取り留めたということです．しかし，その薬だけでは効験不確だか
+ら，毎日生肝を四半斤ずつ食っておられるそうです．それでも不治の病だから，
+若しもこの療法を中止するならば，生命は週を以って数うべきだというのです．
+これは君も既に御承知でしたね．唯々療法の効験が現われて，今年チューリヒの
+コングレスへ出掛けるほどの元気が出たのです．
+
+H先生は一昨年か，退職の後にも大学で毎週一回位ずつ，自由に講義をしているそ
+うです．例の数学基礎論などでしょう．「この冬学期には未だ片附いていない事
+を全部やってしまおうと思ったがね，助手達が存外批判的(kritisch)でね――
+まあまあ無理をしないで，ぼつぼつやるより外はなかろう……Formalismus（形式
+論）は重大だ．それは誰でも認めなくてはならない．しかしそのFormalismusばか
+りでは済ませない所があってね，そこに問題があるのだがね……」．くどくどと
+独り言のようにつぶやく老先生を見て，僕は暗涙を禁ずることを得ませんでした．
+
+数年前に僕は数学基礎論に関して通俗的の解説を述べた折に，H先生は一生の思出
+に凡（すべ）てのホトトギスを鳴かせて見せるのだというようなことを書きまし
+た．それは勿論数学基礎論を解決し了る意気込を言った積りなのですが，比喩が
+不適切である為に，僕の意志にない所の，嘲笑というような印象を読者に与える
+虞（おそれ）がありましたから，「数学基礎論は完成してもよい，又は完成しな
+くてもよい．只H先生は余生を安楽に送られることを望む」という意味を，何処
+かへ書き入れようと思いながら，それを忘れてしまいました．僕は今それを思い
+出したのです．毎日三十匁の生肝を食って不治の難病と戦いつつも，駿馬も老い
+ては揚足を若い助手連に時々は取られながらも，どうして排中律の証明等等を書
+かずには居られないでしょう．余生を楽しむなどは論外で，生きながらの餓鬼道
+ではありませんか．恐ろしいのは，これも不治なる知識追求症です．
+
+さてNさんはと見ると，これは又明らかに困却の色を表わしています．尤も毎日の
+ように聞かされているのでは，十年振に会ったものと感じが違うのも止むを得な
+いでしょう．
+
+H先生はしばしば話頭を転じました．社会問題といったようなものも出ました．人
+間があまりに多い．地球があまりに狭い．しかし科学の進歩は，どうにかして難
+局を打開するだろう，等等．「なに，ロシヤ人などには何も出来やせんがね」な
+どということもあったようです．
+
+話は段々超越的になりました．「予は人間の無窮の進歩を確信する．そもそも人
+間の歴史の五千年などは時の無究に比べて零である．然るに其の間に我々は現在
+これだけの進歩をしたではないか．いや，そればかりではない，科学が説明する
+如く，幾milliardの歳月の間に我々は泡のようなものから今日の人間にまで進歩
+したのだ，億といい，兆といい，知れたものだ．この後無窮の歳月に於て我々は
+無限に進歩するのである……」
+
+milliard年前の石塊が出た頃に，Nさんが僕に目くばせをしました．無限の進歩の
+所で僕等は起立しました．面白い御話を承って思わず長座を致しました．さぞ御
+疲れでしょう．有難うございました．御休みなさい．
+
+後で其の晩C氏の所で聞けば，H先生のmilliard年の話は近頃当地有名だそうです．
+君もmilliard聞かされたか，というようなことらしい．近頃先生はWells 世界史
+概説を愛読していられるそうです（例の一冊物，近頃そのドイツ訳が盛んに行わ
+れている由）．
+
+先生が証明論の休み休みに，Wellsを読んだり，十億年間の人間の進歩について瞑
+想したりしていられるならば，それは誠に結構です．若い人達がそれをゴシップ
+にして興じても，構わないでしょう．先ずはめでたし，めでたし！
+
+
+\raggedleft 高木貞治「ヒルベルト訪問記――1932年10月8日，ゲッチンゲンに於て」\\
+（青空文庫\footnote{\verb+http://www.aozora.gr.jp/cards/001398/files/50908_41912.html+}）
+\end{document}
