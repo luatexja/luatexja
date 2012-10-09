@@ -3378,9 +3378,9 @@ Furthermore, the glyph is shifted according to values of fields
 \label{fig-pos}
 \end{figure}
 
-\item[kern={\{[$j$]=<kern>, ...\}}]
+\item[kern={\{[$j$]=<kern>, [$j'$]=\{<kern>, [<dir>]\}...\}}]
 
-\item[glue={\{[$j$]=\{<width>, <stretch>, <shrink>, [<priority>]\}, ...\}}]
+\item[glue={\{[$j$]=\{<width>, <stretch>, <shrink>, [<priority>], [<dir>]\}, ...\}}]
 %<*ja>
 文字クラス$i$の文字と$j$の文字の間に挿入されるkernやglueの量を指定する．
 
@@ -3389,6 +3389,25 @@ Furthermore, the glyph is shifted according to values of fields
 このフィールドは省略可能であり，行調整処理におけるこのglueの優先
              度を$-2$から$+2$の間の整数で指定する．<priority>の省略時の値
              は0であり，範囲外の値が指定されたときの動作は未定義である）．
+
+<dir>も省略可能フィールドであり，$-1$から$+1$の実数値をとる．省略時の値は0である．
+\begin{itemize}
+\item $-1$はこのグルーが「前の文字」由来であることを示す．
+\item $+1$はこのグルーが「後の文字」由来であることを示す．
+\item それ以外の値は，「前の文字」由来のグルーと「後の文字」由来の
+グルーが混合されていることを示す．
+\end{itemize}
+なお，このフィールドの値は\Param{differentjfm}の値が\texttt{pleft},~\texttt{pright},~\texttt{paverage}の値のときのみ実際に用いられる．
+
+例えば，\cite{x4051}では，句点と中点の間には，
+句点由来の二分空きと中点由来の四分空きが挿入されるが，この場合には
+\begin{itemize}
+\item <width>には$0.5+0.25=0.75$を指定する．
+\item <dir>には次の値を指定する．
+\[
+ -1\cdot \frac{0.5}{0.5+0.25} + 1 \cdot \frac{0.25}{0.5+0.25} = -\frac13
+\]
+\end{itemize}
 
 %</ja>
 
@@ -3487,10 +3506,10 @@ The following is the list of `imaginary characters':
 %%%<ja>行の終端を表す．
 %%%<zh>行尾结束字符。
 
-\item['diffmet']
-%<en>Used at a boundary between two \textbf{JAchar}s whose JFM or size is different.
-%<ja>JFMやサイズが異なる2つの\textbf{JAchar}の間の境界として用いられる．
-%<zh>用于两个不同大小或不同JFM的两个\textbf{JAchar}间边界。
+%%\item['diffmet']
+%%<en>Used at a boundary between two \textbf{JAchar}s whose JFM or size is different.
+%%<ja>JFMやサイズが異なる2つの\textbf{JAchar}の間の境界として用いられる．
+%%<zh>用于两个不同大小或不同JFM的两个\textbf{JAchar}间边界。
 
 \item['boxbdd']
 %<en>The beginning/ending of a horizontal box, and the beginning of a noindented paragraph.
@@ -4157,6 +4176,9 @@ JFM（もしくはサイズ）が異なる2つの\textbf{JAchar}の間にグル�
 \item[\texttt{both}]
 \item[\texttt{large}]
 \item[\texttt{small}]
+\item[\texttt{pleft}]
+\item[\texttt{pright}]
+\item[\texttt{paverage}]
 \end{description}
 
 \item[\Param{jacharrange}\,=<ranges>$^\ast$]
@@ -5669,19 +5691,54 @@ $g$は「文字コード\texttt{'boxbdd'}の文字」と\textit{Np}の間に入�
 \item もし両クラスタの間で\verb+\inhibitglue+が実行されていた場合（証としてwhatsitノードが自動挿入される），
       代わりに\Param{kanjiskip}が挿入されることとなる．次へ．
 \item \textit{Nq}と\textit{Np}が同じJFM・同じ\texttt{jfmvar}キー・同じサイズの和文フォントであったならば，
-      共通に使っているJFM内で挿入される空白（グルーかカーン）が決まっているか調べる．
+      共通に使っているJFM内で挿入される空白（グルーかカーン）が決まっているか調べ，決まっていればそれを採用．
 \item 1.でも2.でもない場合は，\textit{Nq}と\textit{Np}が違うJFM/\texttt{jfmvar}/サイズである．
 この場合，まず
 \[
-\vcenter{\halign{\hfil$#:={}$&(\inhibitglue#\inhibitglue)\cr
-gb&\textit{Nq}と「文字コードが{\tt'diffmet'}の文字」との間に入るグルー／カーン\cr
-ga&「文字コードが{\tt'diffmet'}の文字」と\textit{Np}との間に入るグルー／カーン\cr
+\vcenter{\halign{\hfil$#:={}$&\inhibitglue#\inhibitglue\cr
+gb&(\textit{Nq}と「使用フォントが\textit{Nq}のそれと同じで，\hfil\cr
+\omit&\quad 文字コードが\textit{Np}のそれの文字」との間に入るグルー／カーン)\hfil\cr
+ga&(\inhibitglue 「使用フォントが\textit{Np}のそれと同じで，\hfil\cr
+\omit&\quad 文字コードが\textit{Nq}のそれの文字」と\textit{Np}との間に入るグルー／カーン)\hfil\cr
 }}
 \]
-として，左側由来・右側由来の空白（グルー／カーン）を（それぞれのJFMから）求める．
-$\mathit{ga}$と$\mathit{gb}$のどちらか片方が未定義であるならば，定義されている側の値をそのまま採用する．
-もし$\mathit{ga}$と$\mathit{gb}$が両方決まっているならば，両者の値を平均\footnote{\Param{differentjfm}パラメタの
-値によって，「大きい方」「小さい方」「合計」に変えることができる．}した値を採用する．
+として，前側の文字のJFMを使った時の空白（グルー／カーン）と，後側の文字のJFMを使った時のそれを求める．
+
+$\mathit{gb}$,~$\mathit{ga}$それぞれに対する<dir>の値を$d_b$,~$d_a$とする．
+\begin{itemize}
+\item 
+$\mathit{ga}$と$\mathit{gb}$の両方が未定義であるならば，JFM由来のグルーは挿入されず，\Param{kanjiskip}を採用することとなる．どちらか片方のみが未定義であるならば，次のステップでその未定義の方は長さ0のkernで，<dir>の値は0であるかのように扱われる．
+\item 
+\Param{differentjfm}の値が\texttt{pleft}, \texttt{pright}, \texttt{paverage}のとき，
+<dir>の指定に従って比例配分を行う．
+JFM由来のグルー／カーンは以下の値となる：
+\[
+ f\left(\frac{1-d_b}2\textit{gb} + \frac{1+d_b}2\textit{ga},
+\frac{1-d_a}2\textit{gb} + \frac{1+d_a}2\textit{ga}\right)
+\]
+ここで．$f(x,y)$は
+\[
+ f(x,y)=\begin{cases}
+x&\text{if\ }\Param{differentjfm}=\texttt{pleft};\\
+y&\text{if\ }\Param{differentjfm}=\texttt{pright};\\
+(x+y)/2&\text{if\ }\Param{differentjfm}=\texttt{paverage};
+\end{cases}.
+\]
+\item 
+\Param{differentmet}がそれ以外の値の時は，<dir>の値は無視され，JFM由来のグルー／カーンは以下の値となる：
+\[
+ f(\textit{gb},\textit{ga})
+\]
+ここで．$f(x,y)$は
+\[
+ f(x,y)=\begin{cases}
+\min(x,y)&\text{if\ }\Param{differentjfm}=\texttt{small};\\
+\max(x,y)&\text{if\ }\Param{differentjfm}=\texttt{large};\\
+(x+y)/2&\text{if\ }\Param{differentjfm}=\texttt{average};\\
+x+y&\text{if\ }\Param{differentjfm}=\texttt{both};
+\end{cases}.
+\]
+\end{itemize}
 \end{enumerate}
 
 例えば，
@@ -6085,7 +6142,7 @@ Roughly speaking, the \Pkg{listings} package processes input as follows:
 %</ja>
 
 %<*en>
-\item When reading an \textit{other}, outputs the collected character string (with modification, if needed).
+\item When reading an \textit{other}, outputs the collected string (with modification, if needed).
 %</en>
 %<*ja>
 \item letterでもdigitでもない文字が現れた時に，収集した文字列を（必要なら修飾して）出力する．
@@ -6099,7 +6156,7 @@ Roughly speaking, the \Pkg{listings} package processes input as follows:
 %</ja>
 
 %<*en>
-\item When reading a \textit{letter} or a \textit{digit}, outputs the collected character string.
+\item When reading a \textit{letter} or a \textit{digit}, outputs the collected string.
 %</en>
 %<*ja>
 \item letterが出現したら集めた文字列を出力する．
@@ -6113,8 +6170,8 @@ Roughly speaking, the \Pkg{listings} package processes input as follows:
 %</ja>
 \end{enumerate}
 %<*en>
-By the above process, line breaks inside of an identifier are blocked.
-A flag \verb+\lst@ifletter+ indicates whether the previous character can be used
+By the above process, line breaks inside of an identifier is blocked.
+A flag \verb+\lst@ifletter+ shows whether the last character can be used
 for the name of identifiers or not.
 %</en>
 %<*ja>
@@ -6126,14 +6183,14 @@ for the name of identifiers or not.
 For Japanese characters, line breaks are permitted on both sides
 except for parentheses, dashes, etc.
 To process Japanese characters,
-The pacth \Pkg{lltjp-listings.sty} introduces a new flag \verb+\lst@ifkanji+, which indicates
-whether the previous character is Japanese character or not.
+\Pkg{lltjp-listings.sty} introduces a new flag \verb+\lst@kanji+, which indicates
+whether the last character is Japanese character or not.
 For illustration, we introduce the following classes of character:
 %</en>
 %<*ja>
 さて，日本語の処理である．殆どの和文文字の前後では行分割が可能であるが，その一方で
 括弧類や音引きなどでは禁則処理が必要なことから，\Pkg{lltjp-listings.sty} では，
-直前が和文文字であるかを示すフラグ \verb+\lst@ifkanji+ を新たに導入した．
+直前が和文文字であるかを示すフラグ \verb+\lst@kanji+ を新たに導入した．
 以降，説明のために以下のように文字を分類する：
 %</ja>
 \begin{center}
@@ -6163,18 +6220,13 @@ Other according to circumstances.
 For example, let us consider the case an Open comes after a Letter.
 Since an Open represents Japanese open parenthesis,
 it is preferred to be permitted to insert line break after the Letter.
-Therefore, the collected character string is output in this case.
+Therefore, the collected string is output in this case.
+The following table summarizes $5\times 5=25$ cases:
 %</en>
 %<*ja>
 例えば，Letterの直後にOpenが来た場合を考える．
 文字種Openは和文開き括弧類を想定しているので，Letterの直後では行分割が可能であることが望ましい．
 そのため，この場合では，すでに収集されている文字列を出力することで行分割を許容するようにした．
-%</ja>
-
-%<*en>
-The following table summarizes $5\times 5=25$ cases:
-%</en>
-%<*ja>
 同じように，$5\times 5=25$通り全てについて書くと，次のようになる：
 %</ja>
 \begin{center}
@@ -6187,7 +6239,7 @@ The following table summarizes $5\times 5=25$ cases:
 &\hbox to 4em{\hss Kanji\hss}&\hbox to 4em{\hss Open\hss}&Close\\\midrule
 &Letter&collects&\multicolumn{3}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
 &Other&outputs&collects&\multicolumn{2}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
-Prev&Kanji&\multicolumn{4}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
+Last&Kanji&\multicolumn{4}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
 &Open&\multicolumn{5}{c}{\hrulefill \ collects\ \hrulefill}\\
 &Close&\multicolumn{4}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
 %</en>
@@ -6207,10 +6259,10 @@ Prev&Kanji&\multicolumn{4}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
 %<en>In the above table,
 %<ja>上の表において，
 \begin{itemize}
-%<en>\item ``outputs'' means to output the collected character string (i.e., line breaking is permitted there).
+%<en>\item ``outputs'' means to output the collected string (i.e., line breaking is permitted there).
 %<ja>\item 「出力」は，それまでに集めた文字列を出力（≒ここで行分割可能）を意味する．
 
-%<en>\item ``collects'' means to append the next character to the collected character string (i.e., line breaking is prohibited there).
+%<en>\item ``collects'' means to append the next character to the collected string (i.e., line breaking is prohibited there).
 %<ja>\item 「収集」は，後側の文字を，現在収集された文字列に追加（行分割不可）を意味する．
 \end{itemize}
 
@@ -6223,7 +6275,7 @@ Characters are classified according to \Param{jacharrange} parameter (see Sectio
 %<*ja>
 \Pkg{listings} パッケージにおいて和文文字と扱われる
 （前に述べたKanji, Open，あるいは「閉じ括弧類」分類）か否かは，
-通常の\textbf{JAchar}/\textbf{Alchar}の範囲の設定（\Param{jacharrange} パラメータ，\ref{ssec-setrange}節を参照）に従って行われる：
+通常の\textbf{JAchar}/\textbf{Alchar}の範囲の設定（\ref{ssec-setrange}節）に従って行われる：
 %</ja>
 \begin{itemize}
 %<en>\item \textbf{ALchars} above U+0080 are Letter.
@@ -6244,8 +6296,7 @@ Characters are classified according to \Param{jacharrange} parameter (see Sectio
 \end{itemize}
 
 %<*en>
-The width of halfwidth kana (U+FF61--U+FF9F) is same as the width of \textbf{ALchar};
-the width of the other \textbf{JAchars} is double the width of \textbf{ALchar}.
+The width of halfwidth kana (U+FF61--U+FF9F) is same as the width of \textbf{ALchar}; the width of the other \textbf{JAchars} is double the width of \textbf{ALchar}.
 %</en>
 %<*ja>
 なお，半角カナ(U+FF61--U+FF9F)以外の\textbf{JAchar}は欧文文字2文字分の幅をとるものとみなされる．

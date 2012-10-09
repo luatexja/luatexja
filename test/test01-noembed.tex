@@ -59,9 +59,9 @@
 {\noindent\bf\tengt ■{\tt differentjfm}による挙動の違い}
 
 \jfont\tenMa={psft:Ryumin-Light:jfm=ujis}
-\jfont\tenMb={psft:Ryumin-Light:jfm=ujis;jfmvar=a}
+\jfont\tenMb={psft:Ryumin-Light:jfm=jis;jfmvar=a}
 \jfont\tenGa={psft:GothicBBB-Medium:jfm=ujis} at 15pt
-\jfont\tenGb={psft:GothicBBB-Medium:jfm=ujis;jfmvar=a} at 15pt\relax
+\jfont\tenGb={psft:GothicBBB-Medium:jfm=jis;jfmvar=a} at 15pt\relax
 
 \def\djtest{%
 {\tt Ma-Ma}: \setbox0=\hbox{{\tenMa ）}{\tenMa  ・}}\hbox to 90pt{\copy0\hss(\the\wd0)},
@@ -81,13 +81,26 @@
 
 \ltjsetparameter{differentjfm=LARGE}\djtest
 
-{\noindent\bf\tengt {\tt differentjfm=average}（default，平均）}
+
+{\noindent\bf\tengt {\tt differentjfm=average}（平均）}
 
 \ltjsetparameter{differentjfm=AVERAGE}\djtest
 
-{\noindent\bf\tengt {\tt differentjfm=both}（両方挿入）}
+{\noindent\bf\tengt {\tt differentjfm=both}（合計）}
 
 \ltjsetparameter{differentjfm=Both}\djtest
+
+{\noindent\bf\tengt {\tt differentjfm=pleft}（左側の指定で比例配分）}
+
+\ltjsetparameter{differentjfm=pleft}\djtest
+
+{\noindent\bf\tengt {\tt differentjfm=pright}（右側の指定で比例配分）}
+
+\ltjsetparameter{differentjfm=pright}\djtest
+
+{\noindent\bf\tengt {\tt differentjfm=paverage}（default, 左・右それぞれの指定で比例配分した値の平均）}
+
+\ltjsetparameter{differentjfm=paverage}\djtest
 
 
 \bigskip

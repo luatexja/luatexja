@@ -82,12 +82,36 @@
 \expandafter\endinput\fi\relax
 
 %%------------------
+\RequirePackage{expl3}
 %! Main part of luatexja-adjust
 \RequireLuaTeXjaSubmodule{adjust}
 
+% enable/disable ``advanced'' line adjustment
 \protected\def\ltjdisableadjust{\directlua{luatexja.adjust.disable_cb()}}
 \protected\def\ltjenableadjust{\directlua{luatexja.adjust.enable_cb()}}
 \ltjenableadjust
+% there is also a key for \ltjsetparameter, for same effect
+\define@boolkey[ltj]{japaram}{adjust}[true]{%
+  \ifltj@japaram@adjust\ltjenableadjust\else\ltjdisableadjust\fi
+}
+
+\ExplSyntaxOn
+\cs_new:Nn \ltj_adjust_inittable: {
+  % To be filled...
+}
+\cs_new:Nn \ltj_adjust_appendtable:n {
+  % To be filled
+}
+
+\clist_new:N \l_ltj_adjust_priority
+\define@key[ltj]{japaram}{adjustpriority}{% COMMA LIST
+  \clist_set:Nx \l_ltj_adjust_priority {#1}
+  \ltj_adjust_inittable:
+  \clist_map_function:NN \l_ltj_adjust_priority \ltj_adjust_appendtable:n
+}
+
+\ExplSyntaxOff
+
 
 %%------------------ all done
 \ltj@adjust@AtEnd

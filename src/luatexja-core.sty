@@ -341,19 +341,22 @@
 \define@key[ltj]{japaram}{jcharwidowpenalty}{%      %COUNT
   \ltj@@set@stack0,#1:{jwp}{-10000}{10000}}
 
-% differentjfm = { large | small | average | both }
+% differentjfm = { large | small | average | pleft | pright | paverage | both}
 \define@choicekey*+[ltj]{japaram}{differentjfm}[\ltj@temp\ltj@tempr]%
-  {large,small,average,both}{%
+  {large,small,average,pleft,pright,paverage,both}{%
   \ifcase\ltj@tempr
     \directlua{luatexja.jfmglue.diffmet_rule = math.max}\or
     \directlua{luatexja.jfmglue.diffmet_rule = math.min}\or
     \directlua{luatexja.jfmglue.diffmet_rule = math.two_average}\or
+    \directlua{luatexja.jfmglue.diffmet_rule = math.two_pleft}\or
+    \directlua{luatexja.jfmglue.diffmet_rule = math.two_pright}\or
+    \directlua{luatexja.jfmglue.diffmet_rule = math.two_paverage}\or
     \directlua{luatexja.jfmglue.diffmet_rule = math.two_add}
   \fi
 }{\ltj@PackageError{luatexja}{invalid argument `#1' for `differentjfm'}{%
   Argument for `differentjfm' must be one of `large', `small', `average',^^J%
-  and `both'. }}
-  % large, small, average, both
+  `pleft', `pright', 'paverage' or `both'. }}
+  % large, small, average, pleft, pright, paverage, both
 
 
 % jacharrange = { +-<range_number> }

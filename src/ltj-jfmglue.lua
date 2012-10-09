@@ -92,6 +92,14 @@ local function fast_find_char_class(c,m)
    return m.size_cache.chars[c] or 0
 end
 
+-- 文字クラスの決定
+local function slow_find_char_class(c, m, oc)
+   local xc = c or oc
+   local cls = ltjf_find_char_class(xc, m)
+   if xc ~= oc and  cls==0 then cls, xc = ltjf_find_char_class(-xc, m) end
+   return cls, xc
+end
+
 local spec_zero_glue = node_new(id_glue_spec)
    spec_zero_glue.width = 0; spec_zero_glue.stretch_order = 0; spec_zero_glue.stretch = 0
    spec_zero_glue.shrink_order = 0; spec_zero_glue.shrink = 0
@@ -123,9 +131,12 @@ local function add_penalty(p,e)
 end
 
 -- 「異なる JFM」の間の調整方法
-diffmet_rule = math.two_average
+diffmet_rule = math.two_paverage
 function math.two_add(a,b) return a+b end
 function math.two_average(a,b) return (a+b)*0.5 end
+function math.two_paverage(a,b) return (a+b)*0.5 end
+function math.two_pleft(a,b) return a end
+function math.two_pright(a,b) return b end
 
 -------------------- idea
 -- 2 node の間に glue/kern/penalty を挿入する．
@@ -414,9 +425,8 @@ do
    local attr_jchar_class = luatexbase.attributes['ltj@charclass']
    function set_np_xspc_jachar(Nx, x)
       local m = ltjf_font_metric_table[x.font]
-      local c = has_attr(x, attr_orig_char) or x.char
-      local cls = ltjf_find_char_class(x.char, m)
-      if c ~= x.char and  cls==0 then cls = ltjf_find_char_class(-c, m) end
+      local cls, c
+      cls, c = slow_find_char_class(has_attr(x, attr_orig_char), m, x.char)
       Nx.class = cls; set_attr(x, attr_jchar_class, cls)
       Nx.met, Nx.var, Nx.char = m, m.var, c
       Nx.pre = ltjs_fast_get_penalty_table('pre', c) or 0
@@ -536,15 +546,18 @@ end
 local function new_jfm_glue(Nn, bc, ac)
 -- bc, ac: char classes
    local z = Nn.met.size_cache.char_type[bc]
-   local g = z.glue[ac]
+   local g, d = z.glue[ac], 0 
    if g then
-      g = node_copy(g); g.spec = node.copy(g.spec);
+      g,d = node_copy(g[1]), g[2]; g.spec = node.copy(g.spec);
    elseif z.kern[ac] then
       g = node_new(id_kern); --copy_attr(g, Nn.nuc)
-      g.subtype = 1; g.kern = z.kern[ac]
+      g.subtype = 1; g.kern = z.kern[ac][1]
       set_attr(g, attr_icflag, FROM_JFM);
+      d = z.kern[ac][2]
+   else
+      d = 0
    end
-   return g
+   return g, d
 end
 
 -- Nq.last (kern w) .... (glue/kern g) Np.first
@@ -600,39 +613,62 @@ local function get_kanjiskip_jfm()
    return g
 end
 
-local function calc_ja_ja_aux(gb,ga)
+local function calc_ja_ja_aux(gb,ga, db, da)
+   local rbb, rab = (1-db)/2, (1-da)/2 -- 「前の文字」由来のグルーの割合
+   local rba, raa = (1+db)/2, (1+da)/2 -- 「前の文字」由来のグルーの割合
+   if diffmet_rule ~= math.two_pleft and diffmet_rule ~= math.two_pright 
+      and diffmet_rule ~= math.two_paverage then
+      rbb, rab, rba, raa = 1,0,0,1
+   end
    if not gb then 
+      if ga then gb = node_new(id_kern); gb.kern = 0 else return nil end
+   elseif not ga then 
+      ga = node_new(id_kern); ga.kern = 0
+   end
+
+   local k = node.type(gb.id) .. node.type(ga.id)
+   if k == 'glueglue' then 
+      -- 両方とも glue．
+      gb.spec.width   = round(diffmet_rule(
+                                 rbb*gb.spec.width + rba*ga.spec.width,
+                                 rab*gb.spec.width + raa*ga.spec.width ))
+      gb.spec.stretch = round(diffmet_rule(
+                                 rbb*gb.spec.stretch + rba*ga.spec.stretch,
+                                 rab*gb.spec.stretch + raa*ga.spec.stretch ))
+      gb.spec.shrink  = -round(diffmet_rule(
+                                  -rbb*gb.spec.shrink - rba*ga.spec.shrink,
+                                  -rab*gb.spec.shrink - raa*ga.spec.shrink ))
+      node.free(ga)
+      return gb
+   elseif k == 'kernkern' then
+      -- 両方とも kern．
+      gb.kern   = round(diffmet_rule(
+                                 rbb*gb.kern + rba*ga.kern,
+                                 rab*gb.kern + raa*ga.kern ))
+      node.free(ga)
+      return gb
+   elseif k == 'kernglue' then 
+      -- gb: kern, ga: glue
+      ga.spec.width   = round(diffmet_rule(
+                                 rbb*gb.kern + rba*ga.spec.width,
+                                 rab*gb.kern + raa*ga.spec.width ))
+      ga.spec.stretch = round(diffmet_rule(
+                                 rba*ga.spec.stretch, raa*ga.spec.stretch ))
+      ga.spec.shrink  = -round(diffmet_rule(
+                                  -rba*ga.spec.shrink,-raa*ga.spec.shrink ))
+      node.free(gb)
       return ga
    else
-      if not ga then return gb end
-      local k = node.type(gb.id) .. node.type(ga.id)
-      if k == 'glueglue' then 
-	 -- 両方とも glue．
-	 gb.spec.width   = round(diffmet_rule(gb.spec.width, ga.spec.width))
-	 gb.spec.stretch = round(diffmet_rule(gb.spec.stretch,ga.spec.shrink))
-	 gb.spec.shrink  = -round(diffmet_rule(-gb.spec.shrink, -ga.spec.shrink))
-	 node.free(ga)
-	 return gb
-      elseif k == 'kernkern' then
-	 -- 両方とも kern．
-	 gb.kern = round(diffmet_rule(gb.kern, ga.kern))
-	 node.free(ga)
-	 return gb
-      elseif k == 'kernglue' then 
-	 -- gb: kern, ga: glue
-	 ga.spec.width   = round(diffmet_rule(gb.kern,ga.spec.width))
-	 ga.spec.stretch = round(diffmet_rule(ga.spec.stretch, 0))
-	 ga.spec.shrink  = -round(diffmet_rule(-ga.spec.shrink, 0))
-	 node.free(gb)
-	 return ga
-      else
-	 -- gb: glue, ga: kern
-	 gb.spec.width   = round(diffmet_rule(ga.kern, gb.spec.width))
-	 gb.spec.stretch = round(diffmet_rule(gb.spec.stretch, 0))
-	 gb.spec.shrink  = -round(diffmet_rule(-gb.spec.shrink, 0))
-	 node.free(ga)
-	 return gb
-      end
+      -- gb: glue, ga: kern
+      gb.spec.width   = round(diffmet_rule(
+                                 rba*ga.kern + rbb*gb.spec.width,
+                                 raa*ga.kern + rab*gb.spec.width ))
+      gb.spec.stretch = round(diffmet_rule(
+                                 rbb*gb.spec.stretch, rab*gb.spec.stretch ))
+      gb.spec.shrink  = -round(diffmet_rule(
+                                  -rbb*gb.spec.shrink,-rab*gb.spec.shrink ))
+      node.free(ga)
+      return gb
    end
 end
 
@@ -641,8 +677,9 @@ local function calc_ja_ja_glue()
    elseif (Nq.met.size_cache==Np.met.size_cache) and (Nq.var==Np.var) then
       return new_jfm_glue(Nq, Nq.class, Np.class)
    else
-      return calc_ja_ja_aux(new_jfm_glue(Nq, Nq.class, fast_find_char_class('diffmet',Nq.met)),
-			    new_jfm_glue(Np, fast_find_char_class('diffmet',Np.met), Np.class))
+      local gb, db = new_jfm_glue(Nq, Nq.class, ltjf_find_char_class(Np.char, Nq.met))
+      local ga, da = new_jfm_glue(Np, ltjf_find_char_class(Nq.char, Np.met), Np.class)
+      return calc_ja_ja_aux(gb, ga, db, da); 
    end
 end
 

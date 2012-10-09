@@ -105,6 +105,13 @@ function define_jfm(t)
 	 for j in pairs(v.glue) do
 	    if v.kern[j] then defjfm_res= nil; return end
 	 end
+	 for j,x in pairs(v.kern) do
+	    if type(x)=='number' then 
+               v.kern[j] = {x, 0}
+            elseif type(x)=='table' then 
+               v.kern[j] = {x[1], x[2] or 0}
+            end
+	 end
 	 t.char_type[i] = v
 	 t[i] = nil
       end
@@ -139,10 +146,15 @@ local function update_jfm_cache(j,sz)
    for i,v in pairs(t.char_type) do
       if type(i) == 'number' then -- char_type
 	 for k,w in pairs(v.glue) do
-	    local g, h = node.new(id_glue), node_new(id_glue_spec); v.glue[k] = g
+	    local g, h = node.new(id_glue), node_new(id_glue_spec)
+            v.glue[k] = {g, (w[5] and w[5]/sz or 0)}
             h.width, h.stretch, h.shrink = w[1], w[2], w[3]
             h.stretch_order, h.shrink_order = 0, 0
-            g.subtype = 0; g.spec = h; set_attr(g, attr_icflag, FROM_JFM); 
+            g.subtype = 0; g.spec = h; set_attr(g, attr_icflag, FROM_JFM + 
+                                                (w[4] and w[4]/sz or 0)); 
+	 end
+	 for k,w in pairs(v.kern) do
+	    w[2] = w[2]/sz
 	 end
       end
    end
