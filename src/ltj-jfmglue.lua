@@ -407,15 +407,17 @@ do
    local floor = math.floor
    function set_np_xspc_alchar(Nx, c,x, lig)
       if c~=-1 then
-         local xc, xs = x.components and x.subtype
+         local xc, xs = x.components, x.subtype
 	 if lig == ligature_head then
-	    while xc and xs and x%4>=2 do
-	       x = xc; c = x.char
+	    while xc and xs and xs%4>=2 do
+	       x = xc; xc, xs = x.components, x.subtype
 	    end
+            c = x.char
 	 else
 	    while xc and xs and xs%4>=2 do
-	       x = node.tail(xc); c = x.char
+	       x = node.tail(xc); xc, xs = x.components, x.subtype
 	    end
+            c = x.char
 	 end
 	 Nx.pre = ltjs_fast_get_penalty_table('pre', c) or 0
 	 Nx.post = ltjs_fast_get_penalty_table('post', c) or 0
@@ -511,9 +513,9 @@ local function handle_penalty_suppress(post, pre, g)
 end
 
 -- 和文文字間の JFM glue を node 化
-local function new_jfm_glue(Nn, bc, ac)
+local function new_jfm_glue(m, bc, ac)
 -- bc, ac: char classes
-   local z = Nn.met.size_cache.char_type[bc]
+   local z = m.size_cache.char_type[bc]
    local g, d = z.glue[ac], 0 
    if g then
       g,d = node_copy(g[1]), g[2]; 
@@ -640,10 +642,14 @@ local function calc_ja_ja_glue()
    else
       local qm, pm = Nq.met, Np.met
       if (qm.size_cache==pm.size_cache) and (qm.var==pm.var) then
-         return new_jfm_glue(Nq, Nq.class, Np.class)
+         return new_jfm_glue(qm, Nq.class, Np.class)
       else
-         local gb, db = new_jfm_glue(Nq, Nq.class, ltjf_find_char_class(Np.char, qm))
-         local ga, da = new_jfm_glue(Np, ltjf_find_char_class(Nq.char, pm), Np.class)
+         local npn, nqn = Np.nuc, Nq.nuc
+         local gb, db = new_jfm_glue(qm, Nq.class,
+                               slow_find_char_class(has_attr(npn, attr_orig_char), qm, npn.char))
+         local ga, da = new_jfm_glue(pm, 
+                               slow_find_char_class(has_attr(nqn, attr_orig_char), pm, nqn.char),
+                               Np.class)
          return calc_ja_ja_aux(gb, ga, db, da); 
       end
    end
@@ -684,15 +690,17 @@ end
 
 local function get_OA_skip()
    if not ihb_flag then
-      return new_jfm_glue(Np, 
-        fast_find_char_class(((Nq.id == id_math and -1) or 'jcharbdd'), Np.met), Np.class)
+      local pm = Np.met
+      return new_jfm_glue(pm, 
+        fast_find_char_class(((Nq.id == id_math and -1) or 'jcharbdd'), pm), Np.class)
    else return nil
    end
 end
 local function get_OB_skip()
    if not ihb_flag then
-      return new_jfm_glue(Nq, Nq.class, 
-        fast_find_char_class(((Np.id == id_math and -1) or'jcharbdd'), Nq.met))
+      local qm = Nq.met
+      return new_jfm_glue(qm, Nq.class, 
+        fast_find_char_class(((Np.id == id_math and -1) or'jcharbdd'), qm))
    else return nil
    end
 end
@@ -788,8 +796,9 @@ local function handle_list_tail(mode)
       end
    else
       -- the current list is the contents of a hbox
-      if Np.id == id_jglyph or (Np.id==id_pbox and Np.met) then 
-	 local g = new_jfm_glue(Np, Np.class, fast_find_char_class('boxbdd',Np.met))
+      local npi, pm = Np.id, Np.met
+      if npi == id_jglyph or (npi==id_pbox and pm) then 
+	 local g = new_jfm_glue(pm, Np.class, fast_find_char_class('boxbdd', pm))
 	 if g then
 	    set_attr(g, attr_icflag, BOXBDD)
 	    head = node.insert_after(head, Np.last, g)
@@ -800,9 +809,10 @@ end
 
 -- リスト先頭の処理
 local function handle_list_head(par_indented)
-   if Np.id ==  id_jglyph or (Np.id==id_pbox and Np.met) then 
+   local npi, pm = Np.id, Np.met
+   if npi ==  id_jglyph or (npi==id_pbox and pm) then 
       if not ihb_flag then
-	 local g = new_jfm_glue(Np, fast_find_char_class(par_indented, Np.met), Np.class)
+	 local g = new_jfm_glue(pm, fast_find_char_class(par_indented, pm), Np.class)
 	 if g then
 	    set_attr(g, attr_icflag, BOXBDD)
 	    if g.id==id_glue and #Bp==0 then
