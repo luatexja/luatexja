@@ -132,16 +132,16 @@
 \def\ltj@defdimen{0}
 
 %%%%%%%% Attributes for Japanese typesetting.
+\newluatexattribute\ltj@icflag    % attribute for italic correction
 \newluatexattribute\ltj@curjfnt   % index for ``current Japanese font''
-\newluatexattribute\jfam          % index for current jfam
-\newluatexattribute\ltj@charclass % 
 \newluatexattribute\ltj@origchar % 
-\newluatexattribute\ltj@yablshift % attribute for \yabaselineshift
-\newluatexattribute\ltj@ykblshift % attribute for \ykbaselineshift
+\newluatexattribute\ltj@charclass % 
 \newluatexattribute\ltj@autospc   % attribute for autospacing
 \newluatexattribute\ltj@autoxspc  % attribute for autoxspacing
-\newluatexattribute\ltj@icflag    % attribute for italic correction
-\ltj@icflag=0 \ltj@origchar=0
+\newluatexattribute\ltj@yablshift % attribute for \yabaselineshift
+\newluatexattribute\ltj@ykblshift % attribute for \ykbaselineshift
+\newluatexattribute\jfam          % index for current jfam
+\ltj@icflag=0\ltj@origchar=0
 
 %%%%%%%% Attributes for character ranges
 \newcount\ltj@tempcnta

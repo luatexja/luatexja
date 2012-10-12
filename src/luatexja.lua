@@ -181,10 +181,11 @@ function luatexja.ext_get_parameter_binary(k,c)
       c=0
    end
    if k == 'jacharrange' then
-      if c>216 then 
+      if c>=7*ltjc.ATTR_RANGE then 
 	 ltjb.package_error('luatexja',
 			    'invalid character range number (' .. c .. ')',
-			    'A character range number should be in the range 0..216,\n'..
+			    'A character range number should be in the range 0..'
+                               .. 7+ATTR_RANGE-1 .. ",\n"..
 			     'So I changed this one to zero.')
 	 c=0
       end

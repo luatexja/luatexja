@@ -12,16 +12,17 @@ local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
 luatexja.load_module('base');      local ltjb = luatexja.base
 
+ATTR_RANGE = 7
 local floor = math.floor
 local pow = math.pow
 local has_attr = node.has_attribute
 local kcat_attr_table = {}
 local pow_table = {}
-for i = 0, 216 do
+for i = 0, 31*ATTR_RANGE-1 do
    kcat_attr_table[i] = luatexbase.attributes['ltj@kcat'..floor(i/31)]
    pow_table[i] =  pow(2, i%31)
 end
-pow_table[217] = pow(2, 31)
+pow_table[31*ATTR_RANGE] = pow(2, 31)
 
 -- jcr_table_main[chr_code] = index
 -- index : internal 0, 1, 2, ..., 216               0: 'other'
@@ -36,10 +37,11 @@ for i=0x100,ucs_out-1 do jcr_table_main[i]=0 end
 
 -- EXT: add characters to a range
 function add_char_range(b,e,ind) -- ind: external range number
-   if not ind or ind<0 or ind>216 then -- 0 は error にしない（隠し）
+   if not ind or ind<0 or ind>=7*ATTR_RANGE then -- 0 は error にしない（隠し）
       ltjb.package_error('luatexja',
 			 "invalid character range number (" .. ind .. ")",
-			 {"A character range number should be in the range 1..216,",
+			 {"A character range number should be in the range 1.."
+                          .. 7+ATTR_RANGE-1 .. ",",
 			  "ignored."})
       return
    elseif b<0x80 or e>=ucs_out then
@@ -91,7 +93,7 @@ function toggle_char_range(g, i) -- i: external range number
    else
       local kc
       if i>0 then kc=0 else kc=1; i=-i end
-      if i>216 then i=0 end
+      if i>=7*ATTR_RANGE then i=0 end
       local attr = kcat_attr_table[i]
       local a = tex.getattribute(attr)
       tex.setattribute(g,attr,(floor(a/pow_table[i+1])*2+kc)*pow_table[i]+a%pow_table[i])

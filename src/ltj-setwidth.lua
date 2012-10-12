@@ -47,8 +47,8 @@ local PROCESSED_BEGIN_FLAG = 32
 do
    local floor = math.floor
    function get_pr_begin_flag(p)
-      return  floor((has_attr(p, attr_icflag) or 0)
-                 /PROCESSED_BEGIN_FLAG)*PROCESSED_BEGIN_FLAG
+      local i = has_attr(p, attr_icflag) or 0
+      return i - i%PROCESSED_BEGIN_FLAG
    end
 end
 local get_pr_begin_flag = get_pr_begin_flag
@@ -66,24 +66,26 @@ local fshift =  { down = 0, left = 0}
 function capsule_glyph(p, dir, mode, met, class)
    local char_data = met.size_cache.char_type[class]
    if not char_data then return node_next(p) end
-   local fwidth = (char_data.width ~= 'prop') and char_data.width or p.width
+   local fwidth, pwidth = char_data.width, p.width
+   fwidth = (fwidth ~= 'prop') and fwidth or pwidth
    local fheight, fdepth = char_data.height, char_data.depth
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = luatexbase.call_callback("luatexja.set_width", fshift, met, class)
-   if (mode or p.width ~= fwidth or p.height ~= fheight or p.depth ~= fdepth) then
-      local y_shift, total = - p.yoffset + (has_attr(p,attr_ykblshift) or 0), fwidth - p.width
+   if (mode or pwidth ~= fwidth or p.height ~= fheight or p.depth ~= fdepth) then
+      local y_shift, ca
+         = - p.yoffset + (has_attr(p,attr_ykblshift) or 0), char_data.align
       local q; head, q = node.remove(head, p)
       p.yoffset, p.next = -fshift.down, nil
-      if total ~= 0 and char_data.align~='left' then
+      if total ~= 0 and ca~='left'  then
 	 p.xoffset = p.xoffset - fshift.left
-	    + (((char_data.align=='right') and total) or round(total*0.5))
+	    + (((ca=='right') and fwidth - pwidth) or round((fwidth - pwidth)*0.5))
       else
 	 p.xoffset = p.xoffset - fshift.left
       end
       local box = node_new(id_hlist); 
       box.width, box.height, box.depth = fwidth, fheight, fdepth
       box.head, box.shift, box.dir = p, y_shift, (dir or 'TLT')
-      box.glue_set, box.glue_order = 0, 0
+      --box.glue_set, box.glue_order = 0, 0 not needed
       set_attr(box, attr_icflag, PACKED + get_pr_begin_flag(p))
       head = q and node_insert_before(head, q, box) 
                or node_insert_after(head, node_tail(head), box)
@@ -102,8 +104,9 @@ function set_ja_width(ahead, dir)
    while p do
       if (p.id==id_glyph) 
       and ((has_attr(p, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG)<=0 then
-	 if p.font == has_attr(p, attr_curjfnt) then
-	    p = capsule_glyph(p, dir, false, ltjf_font_metric_table[p.font], 
+      local pf = p.font
+	 if pf == has_attr(p, attr_curjfnt) then
+	    p = capsule_glyph(p, dir, false, ltjf_font_metric_table[pf], 
 			      has_attr(p, attr_jchar_class))
 	 else
 	    set_attr(p, attr_icflag, PROCESSED + get_pr_begin_flag(p))

@@ -74,6 +74,9 @@ function define_jfm(t)
 		  defjfm_res= nil; return
 	       end
 	    end
+            if type(v.align)~='string' then 
+               v.align = 'left' -- left
+            end
 	    if real_char then
 	       if not (type(v.width)=='number' or v.width~='prop') then
 		  defjfm_res= nil; return
@@ -92,9 +95,6 @@ function define_jfm(t)
 		  end
 		  if type(v.down)~='number' then 
 		     v.down = 0.0
-		  end
-		  if type(v.align)~='string' then 
-		     v.align = 'left'
 		  end
 	       end
 	    end

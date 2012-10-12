@@ -58,6 +58,7 @@ end
 
 local function get_total_stretched(p)
    local go, gf, gs = p.glue_order, p.glue_set, p.glue_sign
+   local new_ks, new_xs
    local res = {
       [0] = 0,
       glue_set = gf, name = (gs==1) and 'stretch' or 'shrink'
@@ -68,8 +69,16 @@ local function get_total_stretched(p)
    for q in node.traverse_id(id_glue, p.head) do
       local a, ic = get_stretched(q, go, gs), get_attr_icflag(q)
       --print(ic)
-      if   type(res[ic]) == 'number' then res[ic] = res[ic] + a
-      else                                res[0]  = res[0]  + a
+      if   type(res[ic]) == 'number' then 
+         res[ic] = res[ic] + a
+         if ic == KANJI_SKIP then
+            --if not new_ks then new_ks = node_copy(q.spec); end
+            --new_ks.
+            q.spec = node_copy(q.spec); 
+         elseif ic == XKANJI_SKIP then
+            q.spec = node.copy(q.spec)
+         end
+      else res[0]  = res[0]  + a
       end
    end
    return res
