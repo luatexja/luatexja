@@ -21,6 +21,9 @@ local set_attr = node.set_attribute
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
+local node_copy = node.copy
+local node_next = node.next
+local node_free = node.free
 
 local ltjf_font_metric_table = ltjf.font_metric_table
 
@@ -66,21 +69,30 @@ local function get_total_stretched(p)
    for i=1,#priority_table do res[priority_table[i]]=0 end
    if go ~= 0 then return nil end
    if gs ~= 1 and gs ~= 2 then return res end
-   for q in node.traverse_id(id_glue, p.head) do
-      local a, ic = get_stretched(q, go, gs), get_attr_icflag(q)
-      --print(ic)
-      if   type(res[ic]) == 'number' then 
-         res[ic] = res[ic] + a
-         if ic == KANJI_SKIP then
-            --if not new_ks then new_ks = node_copy(q.spec); end
-            --new_ks.
-            q.spec = node_copy(q.spec); 
-         elseif ic == XKANJI_SKIP then
-            q.spec = node.copy(q.spec)
+   q = p.head
+   --luatexja.ext_show_node_list(p.head, '>>> ', print)
+   while q do 
+      if q.id==id_glue then
+         local a, ic = get_stretched(q, go, gs), get_attr_icflag(q)
+         if   type(res[ic]) == 'number' then 
+            -- kanjiskip, xkanjiskip は段落内で spec を共有しているが，
+            -- それはここでは望ましくないので，
+            -- 各行ごとに異なる spec を使うようにする．
+            -- JFM グルーはそれぞれ異なる glue_spec を用いているので，問題ない．
+            res[ic] = res[ic] + a
+            if ic == KANJI_SKIP then
+               q.spec = node_copy(q.spec)
+            elseif ic == XKANJI_SKIP then
+               q.spec = node_copy(q.spec)
+            end
+         else 
+            res[0]  = res[0]  + a
          end
-      else res[0]  = res[0]  + a
       end
+      q = node_next(q)
    end
+   if new_ks then node_free(new_ks); new_ks = nil end
+   if new_xs then node_free(new_xs); new_xs = nil end
    return res
 end
 
@@ -122,11 +134,11 @@ local function aw_step1(p, res, total)
       x = node.prev(node.prev(x)) 
    end
 
-   local xc
-   if x.id == id_glyph and has_attr(x, attr_curjfnt) == x.font then
+   local xi, xc = x.id
+   if xi == id_glyph and has_attr(x, attr_curjfnt) == x.font then
       -- 和文文字
       xc = x
-   elseif x.id == id_hlist and get_attr_icflag(x) == PACKED then
+   elseif xi == id_hlist and get_attr_icflag(x) == PACKED then
       -- packed JAchar
       xc = x.head
    else
