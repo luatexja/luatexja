@@ -10,6 +10,7 @@ luatexbase.provides_module({
 module('luatexja.adjust', package.seeall)
 
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
+luatexja.load_module('jfmglue');   local ltjj = luatexja.jfmglue
 
 local id_glyph = node.id('glyph')
 local id_kern = node.id('kern')
@@ -26,6 +27,7 @@ local node_next = node.next
 local node_free = node.free
 
 local ltjf_font_metric_table = ltjf.font_metric_table
+local spec_zero_glue = ltjj.spec_zero_glue
 
 local PACKED = 2
 local FROM_JFM = 6
@@ -69,6 +71,7 @@ local function get_total_stretched(p)
    for i=1,#priority_table do res[priority_table[i]]=0 end
    if go ~= 0 then return nil end
    if gs ~= 1 and gs ~= 2 then return res end
+   local head = p.head
    q = p.head
    --luatexja.ext_show_node_list(p.head, '>>> ', print)
    while q do 
@@ -78,12 +81,30 @@ local function get_total_stretched(p)
             -- kanjiskip, xkanjiskip は段落内で spec を共有しているが，
             -- それはここでは望ましくないので，
             -- 各行ごとに異なる spec を使うようにする．
+            -- しかしここでは面倒なので，各 glue ごとに別の spec を使っている．
+            -- ぜひなんとかしたい！
             -- JFM グルーはそれぞれ異なる glue_spec を用いているので，問題ない．
             res[ic] = res[ic] + a
             if ic == KANJI_SKIP then
-               q.spec = node_copy(q.spec)
+               if q.spec ~= spec_zero_glue then
+                  if not new_ks then
+                     local ts; q.spec, ts = node_copy(q.spec), q.spec
+                     new_ks, q.spec = node.copy(q), ts
+                  end
+                  local g = node.copy(new_ks)
+                  node.insert_before(head, q, g);
+                  head = node.remove(head, q); node.free(q); q = g
+               end
             elseif ic == XKANJI_SKIP then
-               q.spec = node_copy(q.spec)
+               if q.spec ~= spec_zero_glue then
+                  if not new_xs then
+                     local ts; q.spec, ts = node_copy(q.spec), q.spec
+                     new_xs, q.spec = node.copy(q), ts
+                  end
+                  local g =node.copy(new_xs)
+                  node.insert_before(head, q, g);
+                  head = node.remove(head, q); node.free(q); q = g
+               end
             end
          else 
             res[0]  = res[0]  + a

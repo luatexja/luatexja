@@ -55,8 +55,8 @@ local sid_end_link = node.subtype('pdf_end_link')
 local sid_end_thread = node.subtype('pdf_end_thread')
 
 local ITALIC = 1
+-- 実装予定: non-packed jchar 2
 local PACKED = 2
--- 実装予定: non-packed jchar 3
 local KINSOKU = 3
 local FROM_JFM = 6
 -- FROM_JFM: 4, 5, 6, 7, 8 →優先度高
@@ -98,9 +98,12 @@ local function slow_find_char_class(c, m, oc)
    return cls, xc
 end
 
-local spec_zero_glue = node_new(id_glue_spec)
+local zero_glue = node_new(id_glue)
+spec_zero_glue = node_new(id_glue_spec) -- must be public, since mentioned from other sources
+local spec_zero_glue = spec_zero_glue
    spec_zero_glue.width = 0; spec_zero_glue.stretch_order = 0; spec_zero_glue.stretch = 0
    spec_zero_glue.shrink_order = 0; spec_zero_glue.shrink = 0
+   zero_glue.spec = spec_zero_glue
 
 local function skip_table_to_spec(n)
    local g, st = node_new(id_glue_spec), ltjs.fast_get_skip_table(n)
@@ -396,9 +399,11 @@ do
       local cls, c = slow_find_char_class(has_attr(x, attr_orig_char), m, x.char)
       Nx.class = cls; set_attr(x, attr_jchar_class, cls)
       Nx.met, Nx.char = m, c
-      Nx.pre = ltjs_fast_get_penalty_table('pre', c) or 0
-      Nx.post = ltjs_fast_get_penalty_table('post', c) or 0
-      Nx.xspc = ltjs_fast_get_penalty_table('xsp', c) or 3
+      local t = ltjs.fast_get_penalty_table_parent(c)
+      Nx.pre = t.pre or 0
+      Nx.post = t.post or 0
+      Nx.xspc = t.xsp or 3
+      Nx.kcat = t.kcat or 0
       Nx.auto_kspc, Nx.auto_xspc = (has_attr(x, attr_autospc)==1), (has_attr(x, attr_autoxspc)==1)
    end 
    local set_np_xspc_jachar = set_np_xspc_jachar
@@ -419,14 +424,16 @@ do
 	    end
             c = x.char
 	 end
-	 Nx.pre = ltjs_fast_get_penalty_table('pre', c) or 0
-	 Nx.post = ltjs_fast_get_penalty_table('post', c) or 0
+         local t = ltjs.fast_get_penalty_table_parent(c) 
+	 Nx.pre = t.pre or 0
+	 Nx.post = t.post or 0
+         Nx.xspc = t.xsp or 3
 	 Nx.char = 'jcharbdd'
       else
 	 Nx.pre, Nx.post, Nx.char = 0, 0, -1
+         Nx.xspc = ltjs_fast_get_penalty_table('xsp', -1) or 3
       end
       Nx.met = nil
-      Nx.xspc = ltjs_fast_get_penalty_table('xsp', c) or 3
       Nx.auto_xspc = (has_attr(x, attr_autoxspc)==1)
    end
    local set_np_xspc_alchar = set_np_xspc_alchar
@@ -549,30 +556,30 @@ local function get_kanjiskip_normal()
    if Np.auto_kspc or Nq.auto_kspc then
       return node_copy(kanji_skip)
    else
-      local g = node_new(id_glue); --copy_attr(g, Nq.nuc)
-      g.spec = node_copy(spec_zero_glue)
+      local g = node_copy(zero_glue)
       set_attr(g, attr_icflag, KANJI_SKIP)
       return g
    end
 end
 local function get_kanjiskip_jfm()
-   local g = node_new(id_glue); --copy_attr(g, Nq.nuc)
+   local g
    if Np.auto_kspc or Nq.auto_kspc then
-	 local gx = node_new(id_glue_spec);
-	 gx.stretch_order, gx.shrink_order = 0, 0
-         local pm, qm = Np.met, Nq.met
-	 local bk = qm.size_cache.kanjiskip or {0, 0, 0}
-	 if (pm.size_cache==qm.size_cache) and (qm.var==pm.var) then
-            gx.width = bk[1]; gx.stretch = bk[2]; gx.shrink = bk[3]
-         else
-            local ak = pm.size_cache.kanjiskip or {0, 0, 0}
-            gx.width = round(diffmet_rule(bk[1], ak[1]))
-            gx.stretch = round(diffmet_rule(bk[2], ak[2]))
-            gx.shrink = -round(diffmet_rule(-bk[3], -ak[3]))
-         end
-	 g.spec = gx
+      g = node_new(id_glue); --copy_attr(g, Nq.nuc)
+      local gx = node_new(id_glue_spec);
+      gx.stretch_order, gx.shrink_order = 0, 0
+      local pm, qm = Np.met, Nq.met
+      local bk = qm.size_cache.kanjiskip or {0, 0, 0}
+      if (pm.size_cache==qm.size_cache) and (qm.var==pm.var) then
+         gx.width = bk[1]; gx.stretch = bk[2]; gx.shrink = bk[3]
+      else
+         local ak = pm.size_cache.kanjiskip or {0, 0, 0}
+         gx.width = round(diffmet_rule(bk[1], ak[1]))
+         gx.stretch = round(diffmet_rule(bk[2], ak[2]))
+         gx.shrink = -round(diffmet_rule(-bk[3], -ak[3]))
+      end
+      g.spec = gx
    else
-      g.spec =  node_copy(spec_zero_glue)
+      g =  node_copy(zero_glue)
    end
    set_attr(g, attr_icflag, KANJI_SKIP)
    return g
@@ -663,22 +670,22 @@ local function get_xkanjiskip_normal(Nn)
    if (Nq.xspc>=2) and (Np.xspc%2==1) and (Nq.auto_xspc or Np.auto_xspc) then
       return node_copy(xkanji_skip)
    else
-      local g = node_new(id_glue); --copy_attr(g, Nn.nuc)
-      g.spec = node_copy(spec_zero_glue)
+      local g = node_copy(zero_glue)
       set_attr(g, attr_icflag, XKANJI_SKIP)
       return g
    end
 end
 local function get_xkanjiskip_jfm(Nn)
-   local g = node_new(id_glue); --copy_attr(g, Nn.nuc)
+   local g
    if (Nq.xspc>=2) and (Np.xspc%2==1) and (Nq.auto_xspc or Np.auto_xspc) then
+      g =  node_new(id_glue); --copy_attr(g, Nn.nuc)
       local gx = node_new(id_glue_spec);
       gx.stretch_order, gx.shrink_order = 0, 0
       local bk = Nn.met.size_cache.xkanjiskip or {0, 0, 0}
       gx.width = bk[1]; gx.stretch = bk[2]; gx.shrink = bk[3]
       g.spec = gx
    else
-      g.spec = node_copy(spec_zero_glue)
+      g = node_copy(zero_glue)
    end
    set_attr(g, attr_icflag, XKANJI_SKIP)
    return g
@@ -726,7 +733,7 @@ local function handle_np_jachar(mode)
       end
       real_insert(0, g)
    end
-   if mode and (ltjs_fast_get_penalty_table('kcat', Np.char) or 0)%2~=1 then
+   if mode and Np.kcat%2~=1 then
       widow_Np.first, widow_Bp, Bp = Np.first, Bp, widow_Bp
    end
 end
