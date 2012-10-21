@@ -31,7 +31,7 @@
 %</en>
 %<*ja>
 \usepackage[textwidth=45\zw, lines=45, footskip=6mm]{geometry}
-\usepackage{luatexja-adjust}
+\usepackage{luatexja-adjust}%\ltjdisableadjust
 \advance\leftmargini-1\zw\advance\leftmarginii-1\zw
 %</ja>
 %<*zh>
@@ -6344,16 +6344,42 @@ listing environments.
 行われているとして良い．まず，段落中の行中のグルーを
 \begin{itemize}
 \item 下のどれにも該当しないグルー
-\item 和欧文間空白(\Param{xkanjiskip})
 \item JFMグルー（優先度別にまとめられる）
+\item 和欧文間空白(\Param{xkanjiskip})
 \item 和文間空白(\Param{kanjiskip})
 \end{itemize}
 の$1+1+5+1=8$つに類別し，それぞれの種別ごとに許容されている伸縮度の合計を計算する．
 また，行長と自然長との差の絶対値を計算し，それを\textit{total}とおく．
 
 \subsection{行末文字の位置調整}
-まず，行末が和文文字であった場合，それを動かすことによって，\textbf{JAglue} が負担する調整量を
-少なくしようとする．
+まず，行末が文字クラス$n$の\textbf{Jachar}であった場合，
+それを動かすことによって，\textbf{JAglue} が負担する調整量を少なくしようとする．
+この行末文字の左右の移動可能量は，JFM中にある文字クラス$n$の定義の
+\texttt{end\_stretch},~\texttt{end\_shrink}フィールドに全角単位の値として記述されている．
+
+例えば，行末文字が句点「。」であり，そこで用いられているJFM中に
+\begin{verbatim}
+  [2] = {
+    chars = { '。', ... }, width = 0.5, ...,
+    end_stretch = 0.5, end_shrink = 0.5,
+  }, 
+\end{verbatim}
+という指定があった場合，この行末の句点は
+\begin{itemize}
+\item 通常の\TeX の行分割処理で「半角以上の詰め」が行われていた場合，
+この分の行中の\textbf{JAglue}の負担を軽減するため，
+行末の句点を半角だけ右に移動する（ぶら下げ組を行う）．
+\item 通常の\TeX の行分割処理で「半角以上の空き」が行われていた場合，
+逆に行末句点を半角左に移動させる（見た目的に全角取りとなる）．
+\item 以上のどちらでもない場合，行末句点の位置調整は行わない．
+\end{itemize}
+となる．
+
+行末文字を移動した場合，その分だけ\textit{total}の値を引いておく．
+
+\subsection{グルーの調整}
+\textit{total}の分だけが，行中のグルーの伸縮度に応じて負担されることになる．
+……
 
 %</ja>
 

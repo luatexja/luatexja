@@ -61,9 +61,9 @@ local function get_stretched(q, go, gs)
    end
 end
 
+local new_ks, new_xs
 local function get_total_stretched(p)
    local go, gf, gs = p.glue_order, p.glue_set, p.glue_sign
-   local new_ks, new_xs
    local res = {
       [0] = 0,
       glue_set = gf, name = (gs==1) and 'stretch' or 'shrink'
@@ -112,8 +112,6 @@ local function get_total_stretched(p)
       end
       q = node_next(q)
    end
-   if new_ks then node_free(new_ks); new_ks = nil end
-   if new_xs then node_free(new_xs); new_xs = nil end
    return res
 end
 
@@ -129,15 +127,23 @@ local function clear_stretch(p, ic, name)
    end
 end
 
+local set_stretch_table = {}
 local function set_stretch(p, after, before, ic, name)
    if before > 0 then
       --print (ic, before, after)
       local ratio = after/before
+      for i,_ in pairs(set_stretch_table) do
+         set_stretch_table[i] = nil
+      end
       for q in node.traverse_id(id_glue, p.head) do
          if get_attr_icflag(q) == ic then
-            local qs = q.spec
-            if qs.writable and qs[name..'_order'] == 0 then
-               qs[name] = qs[name]*ratio
+            local qs, do_flag = q.spec, true
+            for i=1,#set_stretch_table do 
+               if set_stretch_table[i]==qs then do_flag = false end 
+            end
+            if qs.writable and qs[name..'_order'] == 0 and do_flag then
+               qs[name] = qs[name]*ratio; 
+               set_stretch_table[#set_stretch_table+1] = qs
             end
          end
       end
@@ -236,6 +242,8 @@ function adjust_width(head)
          local added_flag = aw_step1(p, res, total)
          --print(total, res[0], res[KANJI_SKIP], res[FROM_JFM])
          aw_step2(p, res, total, added_flag)
+         if new_ks then node_free(new_ks); new_ks = nil end
+         if new_xs then node_free(new_xs); new_xs = nil end
       end
    end
    return head
