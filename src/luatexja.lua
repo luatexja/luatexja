@@ -34,6 +34,22 @@ function luatexja.load_lua(fn)
    end
 end
 
+local icflag_table = {}
+luatexja.icflag_table = icflag_table
+icflag_table.ITALIC       = 1
+icflag_table.PACKED       = 2
+icflag_table.KINSOKU      = 3
+icflag_table.FROM_JFM     = 6
+-- FROM_JFM: 4, 5, 6, 7, 8 →優先度高
+-- 6 が標準
+icflag_table.KANJI_SKIP   = 9
+icflag_table.XKANJI_SKIP  = 10
+icflag_table.PROCESSED    = 11
+icflag_table.IC_PROCESSED = 12
+icflag_table.BOXBDD       = 15
+icflag_table.PROCESSED_BEGIN_FLAG = 32
+
+
 local load_module = luatexja.load_module
 load_module('base');      local ltjb = luatexja.base
 load_module('rmlgbm');    local ltjr = luatexja.rmlgbm -- must be 1st
@@ -75,20 +91,6 @@ local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_uniqid = luatexbase.attributes['ltj@uniqid']
 local cat_lp = luatexbase.catcodetables['latex-package']
-
-local ITALIC = 1
-local PACKED = 2
-local KINSOKU = 3
-local FROM_JFM = 6
--- FROM_JFM: 4, 5, 6, 7, 8 →優先度高
--- 6 が標準
-local KANJI_SKIP = 9
-local XKANJI_SKIP = 10
-local PROCESSED = 11
-local IC_PROCESSED = 12
-local BOXBDD = 15
-local PROCESSED_BEGIN_FLAG = 32
-
 
 -- Three aux. functions, bollowed from tex.web
 local unity=65536
@@ -278,7 +280,7 @@ local function debug_show_node_X(p,print_fn)
             for i = 2,  p.glue_order do s = s .. 'l' end
          end
       end
-      if get_attr_icflag(p) == PACKED then
+      if get_attr_icflag(p) == icflag_table.PACKED then
          s = s .. ' (packed)'
       end
       print_fn(s)
@@ -290,11 +292,12 @@ local function debug_show_node_X(p,print_fn)
       debug_depth=k
    elseif pt == 'glue' then
       s = base .. ' ' ..  print_spec(p.spec)
-      if get_attr_icflag(p)>KINSOKU and get_attr_icflag(p)<KANJI_SKIP then
-         s = s .. ' (from JFM: priority ' .. get_attr_icflag(p)-FROM_JFM .. ')'
-      elseif get_attr_icflag(p)==KANJI_SKIP then
+      if get_attr_icflag(p)>icflag_table.KINSOKU 
+         and get_attr_icflag(p)<icflag_table.KANJI_SKIP then
+         s = s .. ' (from JFM: priority ' .. get_attr_icflag(p)-icflag_table.FROM_JFM .. ')'
+      elseif get_attr_icflag(p)==icflag_table.KANJI_SKIP then
 	 s = s .. ' (kanjiskip)'
-      elseif get_attr_icflag(p)==XKANJI_SKIP then
+      elseif get_attr_icflag(p)==icflag_table.XKANJI_SKIP then
 	 s = s .. ' (xkanjiskip)'
       end
       print_fn(s)
@@ -302,17 +305,18 @@ local function debug_show_node_X(p,print_fn)
       s = base .. ' ' .. print_scaled(p.kern) .. 'pt'
       if p.subtype==2 then
 	 s = s .. ' (for accent)'
-      elseif get_attr_icflag(p)==IC_PROCESSED then
+      elseif get_attr_icflag(p)==icflag_table.IC_PROCESSED then
 	 s = s .. ' (italic correction)'
          -- elseif get_attr_icflag(p)==ITALIC then
          --    s = s .. ' (italic correction)'
-      elseif get_attr_icflag(p)>KINSOKU and get_attr_icflag(p)<KANJI_SKIP then
-	 s = s .. ' (from JFM: priority ' .. get_attr_icflag(p)-FROM_JFM .. ')'
+      elseif get_attr_icflag(p)>icflag_table.KINSOKU 
+         and get_attr_icflag(p)<icflag_table.KANJI_SKIP then
+	 s = s .. ' (from JFM: priority ' .. get_attr_icflag(p)-icflag_table.FROM_JFM .. ')'
       end
       print_fn(s)
    elseif pt == 'penalty' then
       s = base .. ' ' .. tostring(p.penalty)
-      if get_attr_icflag(p)==KINSOKU then
+      if get_attr_icflag(p)==icflag_table.KINSOKU then
 	 s = s .. ' (for kinsoku)'
       end
       print_fn(s)

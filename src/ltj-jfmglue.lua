@@ -54,20 +54,16 @@ local sid_start_thread = node.subtype('pdf_start_thread')
 local sid_end_link = node.subtype('pdf_end_link')
 local sid_end_thread = node.subtype('pdf_end_thread')
 
-local ITALIC = 1
--- 実装予定: non-packed jchar 2
-local PACKED = 2
-local KINSOKU = 3
-local FROM_JFM = 6
--- FROM_JFM: 4, 5, 6, 7, 8 →優先度高
--- 6 が標準
-local KANJI_SKIP = 9
-local XKANJI_SKIP = 10
-local PROCESSED = 11
-local IC_PROCESSED = 12
-local BOXBDD = 15
-local PROCESSED_BEGIN_FLAG = 32
-
+local ITALIC       = luatexja.icflag_table.ITALIC
+local PACKED       = luatexja.icflag_table.PACKED
+local KINSOKU      = luatexja.icflag_table.KINSOKU
+local FROM_JFM     = luatexja.icflag_table.FROM_JFM
+local KANJI_SKIP   = luatexja.icflag_table.KANJI_SKIP
+local XKANJI_SKIP  = luatexja.icflag_table.XKANJI_SKIP
+local PROCESSED    = luatexja.icflag_table.PROCESSED
+local IC_PROCESSED = luatexja.icflag_table.IC_PROCESSED
+local BOXBDD       = luatexja.icflag_table.BOXBDD
+local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 local kanji_skip
 local xkanji_skip
 

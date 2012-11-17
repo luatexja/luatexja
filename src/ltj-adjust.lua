@@ -29,10 +29,10 @@ local node_free = node.free
 local ltjf_font_metric_table = ltjf.font_metric_table
 local spec_zero_glue = ltjj.spec_zero_glue
 
-local PACKED = 2
-local FROM_JFM = 6
-local KANJI_SKIP = 9
-local XKANJI_SKIP = 10
+local PACKED       = luatexja.icflag_table.PACKED
+local FROM_JFM     = luatexja.icflag_table.FROM_JFM
+local KANJI_SKIP   = luatexja.icflag_table.KANJI_SKIP
+local XKANJI_SKIP  = luatexja.icflag_table.XKANJI_SKIP
 
 local priority_table = {
    FROM_JFM + 2,
@@ -61,7 +61,7 @@ local function get_stretched(q, go, gs)
    end
 end
 
-local new_ks, new_xs
+-- local new_ks, new_xs
 local function get_total_stretched(p)
    local go, gf, gs = p.glue_order, p.glue_set, p.glue_sign
    local res = {
@@ -79,29 +79,14 @@ local function get_total_stretched(p)
          local a, ic = get_stretched(q, go, gs), get_attr_icflag(q)
          if   type(res[ic]) == 'number' then 
             -- kanjiskip, xkanjiskip は段落内で spec を共有しているが，
-            -- それはここでは望ましくないので，
-            -- 各行ごとに異なる spec を使うようにする．
-            -- しかしここでは面倒なので，各 glue ごとに別の spec を使っている．
-            -- ぜひなんとかしたい！
+            -- それはここでは望ましくないので，各 glue ごとに異なる spec を使う．
             -- JFM グルーはそれぞれ異なる glue_spec を用いているので，問題ない．
             res[ic] = res[ic] + a
-            if ic == KANJI_SKIP then
+            if ic == KANJI_SKIP or ic == XKANJI_SKIP  then
                if q.spec ~= spec_zero_glue then
-                  if not new_ks then
-                     local ts; q.spec, ts = node_copy(q.spec), q.spec
-                     new_ks, q.spec = node.copy(q), ts
-                  end
-                  local g = node.copy(new_ks)
-                  node.insert_before(head, q, g);
-                  head = node.remove(head, q); node.free(q); q = g
-               end
-            elseif ic == XKANJI_SKIP then
-               if q.spec ~= spec_zero_glue then
-                  if not new_xs then
-                     local ts; q.spec, ts = node_copy(q.spec), q.spec
-                     new_xs, q.spec = node.copy(q), ts
-                  end
-                  local g =node.copy(new_xs)
+                  local ts, g; 
+                  q.spec, ts = node_copy(q.spec), q.spec
+                  g = node.copy(q); q.spec = ts
                   node.insert_before(head, q, g);
                   head = node.remove(head, q); node.free(q); q = g
                end
@@ -242,8 +227,6 @@ function adjust_width(head)
          local added_flag = aw_step1(p, res, total)
          --print(total, res[0], res[KANJI_SKIP], res[FROM_JFM])
          aw_step2(p, res, total, added_flag)
-         if new_ks then node_free(new_ks); new_ks = nil end
-         if new_xs then node_free(new_xs); new_xs = nil end
       end
    end
    return head
