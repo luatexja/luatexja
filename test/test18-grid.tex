@@ -1,16 +1,8 @@
 %#!lualatex
-\documentclass{ltjsarticle}
+\documentclass[20pt]{ltjsarticle}
 \usepackage{xcolor,luatexja-adjust}
-\ltjenableadjust
-\usepackage[textwidth=35\zw,lines=40]{geometry}
-
-% 設定
-%\def\ltjgridcolor{cyan!50!white}
-%\def\ltjgridmode{grid} %% grid or line
-
-\def\ltjgridcolor{red}
-\def\ltjgridmode{line} %% grid or line
-
+%\ltjenableadjust
+\usepackage[textwidth=25\zw,lines=30,a5paper]{geometry}
 
 %%%% code
 \makeatletter
@@ -70,7 +62,15 @@
       \box\@tempboxa
       \vskip \headsep
       \copy\@gridbox
-      \box\@outputbox
+      %\box\@outputbox
+      \setbox0=\vbox to\ht\@outputbox{%
+        \fboxrule=\ltjhanmenframewidth\fboxsep=-.5\fboxrule%
+        \textcolor{\ltjhanmenframecolor}{%
+          \hskip-.5\ltjhanmenframewidth\fbox{%
+            \vrule width0pt height0pt depth\dimexpr\Cdp-.2pt
+          \color@hbox\box\@outputbox\color@endbox}%
+        }%
+      }\dp0=0pt\kern-.5\ltjhanmenframewidth\box0\kern.5\ltjhanmenframewidth%
       \baselineskip \footskip
       \color@hbox
         \normalcolor
@@ -90,10 +90,18 @@
   \setbox\@gridbox\vtop to\z@{\hsize=\textwidth
     \vskip\topskip
     \setbox\@tempboxa=\hbox{\smash{%
-        \color@hbox\color{\ltjgridcolor}%
-          \dimen@=\dimexpr\textwidth-\zw\relax\count@1 
-          \csname ltj@@mk@grid@\ltjgridmode\endcsname
-        \color@endbox}}
+        \hbox to\textwidth{%
+          \ifdefined\ltjhanmengridcolor
+            \color@hbox%
+               \color{\ltjhanmengridcolor}\kern.2pt%
+               \dimen@=\dimexpr\textwidth-\zw\relax\count@1 \ltj@@mk@grid@grid
+            \color@endbox\hskip-\textwidth
+          \fi
+          \ifdefined\ltjhanmenlinecolor
+            \dimen@=\dimexpr\textwidth-\zw\relax\count@1 %
+            \color@hbox\color{\ltjhanmenlinecolor}\ltj@@mk@grid@line\color@endbox%
+          \fi
+        \hss}}}
     \loop
       \leavevmode\copy\@tempboxa\par\advance\@tempdima-\baselineskip
     \unless\ifdim\@tempdima<0pt\repeat
@@ -105,7 +113,13 @@
   \unless\ifdim\dimen@<0pt
     \hbox to 1\zw{\hss\fboxsep=-.5\fboxrule\fbox{%
     \@tempcnta\count@\divide\@tempcnta5\multiply\@tempcnta5
-    \ifnum\@tempcnta=\count@ ■\else 　\fi
+    \ifnum\@tempcnta=\count@
+      \vrule width 0pt height .88\zw depth .12\zw%
+      \hskip.1\zw \vrule width .8\zw height .78\zw depth .02\zw\hskip.1\zw
+    \else
+      \vrule width 1\zw height 0pt depth 0pt%
+      \vrule width 0pt height .88\zw depth .12\zw%
+    \fi
     \hskip\dimexpr-.5\zw-.2pt\vrule width.4pt height.08\zw depth.12\zw%
     \hskip\dimexpr.5\zw-.2pt\relax}\hss}%
     \advance\dimen@-\zw\advance\count@1 \expandafter\ltj@@mk@grid@grid
@@ -125,14 +139,32 @@
   \fi
 }
 
+% 標準設定
+\let\ltjhanmengridcolor\undefined
+\let\ltjhanmenlinecolor\undefined
+\def\ltjhanmenframecolor{black}
+\newdimen\ltjhanmenframewidth
+
+% 版面外側の枠
+%% 厳密には版面枠から外れている
+\ltjhanmenframewidth0pt
+
+% マス目
+%\def\ltjhanmengridcolor{cyan!50!white}
+
+% 各行の baseline
+%\def\ltjhanmenlinecolor{red}
+
+
+
 \makeatother
 
-\begin{document}
+\begin{document}\thispagestyle{plain}
 晩の7時15分少し前からWilhelm Weber町29番地の前の歩道を僕は行きつ戻りつし
 ていました．星の見えたのは近日珍らしいが，秋風が冷こくなってリンデの落葉
 が二ひら三ひら散らばっているなどは誂向きの道具立です．
 
-其処で僕は或るFr\"auleinとrendez-vous があったのです．フロイラインという
+其処で僕は或るFr\"auleinとrendez-vousがあったのです．フロイラインという
 のはProf.\ Dr.\ Emmy Noether女史です！
 
 ヒルベルト先生を訪問するのに，僕一人では話が途切れたときに困るだろうとい
