@@ -1,17 +1,15 @@
-\parindent0pt
-\output={\shipout\box255}
-\tt\catcode`\_=12
-\def\{{\char'173 }\def\}{\char'175}
-\toks0={\%}
-\def\postbreakpenalty{\out\toks0={\string\setpostbreakpenalty\{}\count600 }%
-\def\prebreakpenalty{\out\toks0={\string\setprebreakpenalty\{}\count600 }%
-\def\inhibitxspcode{\out\toks0={\string\setinhibitxspcode\{}\count600 }%
-\def\xspcode{\out\toks0={\string\setxspcode\{}\count600 }%
-\catcode`\=13
-\def={\count601 }%\
-\def\out{\par\the\toks0 \the\count600\}\{\the\count601\}}
-\input ukinsoku
-\end
-
-% euptex pte-kinsoku-make ; dvitype -output-level=1 pte-kinsoku-make
-% | grep "\[" | sed "s/\[\(.*\)\]/\1/" > pte-kinsoku.tex
+%#!lualatex --shell-escape luatexja-kinsoku_make.tex
+\documentclass{article}
+\usepackage{luatexja}
+\makeatletter
+\input{luatexja-kinsoku.tex}
+\usepackage{luacode}
+\begin{luacode}
+ s = table.copy(luatexja.stack.charprop_stack_table[0])
+ s[0].jwp, s[0].xsp = nil, nil
+ s.kanjiskip = nil; s.xkanjiskip = nil
+ table.tofile('ltj-kinsoku.out', s, 'return', false, true, false)
+\end{luacode}
+\immediate\write18{texluac -o ltj-kinsoku.lua ltj-kinsoku.out}
+\begin{document}
+\end{document}

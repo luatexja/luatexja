@@ -32,15 +32,19 @@
 \let\mc=\tenmin
 \let\gt=\tengt
 \mc
+
+\directlua{
+  luatexja.stack.charprop_stack_table[0] 
+    = dofile(assert(kpse.find_file('ltj-kinsoku.lua', 'tex'),
+      "File `ltj-kinsoku.lua' not found"))
+}
+
 \ltjsetparameter{kanjiskip=0pt plus 0.4pt minus 0.4pt, 
   xkanjiskip=.25\zw plus 1pt minus 1pt,
   autospacing, autoxspacing, jacharrange={-1}, 
   yalbaselineshift=0pt, yjabaselineshift=0pt,
   jcharwidowpenalty=500, differentjfm=paverage
 }
-
-\input luatexja-kinsoku.tex
-
 
 \ltjdefcharrange{1}{"80-"36F, "1E00-"1EFF} 
 \ltjdefcharrange{2}{"370-"4FF, "1F00-"1FFF} 

@@ -38,6 +38,12 @@
 \usepackage{lltjcore}
 
 %%% default parameters
+\directlua{
+  luatexja.stack.charprop_stack_table[0] 
+    = dofile(assert(kpse.find_file('ltj-kinsoku.lua', 'tex'),
+      "File `ltj-kinsoku.lua' not found"))
+}
+
 \ltjsetparameter{kanjiskip=0pt plus 0.4pt minus 0.4pt,
   xkanjiskip=.25\zw plus 1pt minus 1pt,
   autospacing, autoxspacing, jacharrange={-1},
@@ -45,7 +51,6 @@
   jcharwidowpenalty=500, differentjfm=paverage
 }
 
-\input luatexja-kinsoku.tex
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
 
 %%% patch for packages

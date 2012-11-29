@@ -17,7 +17,9 @@ local id_whatsit = node.id('whatsit')
 local sid_user = node.subtype('user_defined')
 local hmode = 118 -- in luatexref-t.pdf, this must be 127
 
-local charprop_stack_table={}; charprop_stack_table[0]={}
+charprop_stack_table={}; 
+local charprop_stack_table = charprop_stack_table
+charprop_stack_table[0]={}
 
 -- modified from table.fastcopy
 local next = next

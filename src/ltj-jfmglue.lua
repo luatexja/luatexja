@@ -522,7 +522,7 @@ local function new_jfm_glue(m, bc, ac)
    local g, d = z.glue[ac], 0 
    if g then
       g,d = node_copy(g[1]), g[2]; 
-      g.spec = node.copy(g.spec); -- node_copy は spec を copy しない（参照を増やすのみ）
+      g.spec = node_copy(g.spec); -- node_copy は spec をコピーする
    else
       local k = z.kern[ac]
       if k then
