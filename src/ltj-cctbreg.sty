@@ -77,7 +77,7 @@
 \catcode`\_=12
 \gdef\ltj@@cctb@org@def#1{%
   \ifnum\lltxb@catcodetable@alloc<65535\relax
-    \global\advance\lltxb@catcodetable@alloc\@ne
+    \global\advance\lltxb@catcodetable@alloc\tw@
     \allocationnumber\lltxb@catcodetable@alloc
     \global\chardef#1\allocationnumber
     \luatexinitcatcodetable\allocationnumber
