@@ -28,7 +28,10 @@
 \fi                             %</LaTeX>
 
 % LS = Size of storage reserved for luatex-pkg.
-\chardef\ltj@cctb@lower@stor@size=32768
+\chardef\ltj@cctb@lower@stor@size=16384
+
+% LL = (upper bound of cctb index used by luatexbase.sty and luatex.sty) - 1
+\chardef\ltj@cctb@limit=32766
 
 %-------------------
 
@@ -123,6 +126,27 @@
 \unless\ifnum\lltxb@catcodetable@alloc<7 %
   \ltj@@copy@cctb{7}{\ltj@@tempcctb@a}
 \fi
+
+%-------------------
+
+\begingroup
+\endlinechar=13
+\catcode`\_=12
+\gdef\newluatexcatcodetable#1{%
+  \ifnum\lltxb@catcodetable@alloc<\ltj@cctb@limit\relax
+    \global\advance\lltxb@catcodetable@alloc\tw@
+    \allocationnumber\lltxb@catcodetable@alloc
+    \global\chardef#1\allocationnumber
+    \luatexinitcatcodetable\allocationnumber
+    \begingroup\escapechar\m@ne
+    \luatexbase@directlua{luatexbase.catcodetabledef_from_tex(
+      '\luatexluaescapestring{\string#1}', '\number\allocationnumber')}%
+    \endgroup
+    \wlog{\string#1=\string\luatexcatcodetable\the\allocationnumber}%
+  \else
+    \errmessage{No room for a new \string\luatexcatcodetable}%
+  \fi}
+\endgroup
 
 %-------------------
 
