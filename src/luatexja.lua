@@ -165,6 +165,12 @@ function luatexja.ext_get_parameter_unary(k)
 	 tex.write('small')
       elseif luatexja.jfmglue.diffmet_rule == math.two_average then
 	 tex.write('average')
+      elseif luatexja.jfmglue.diffmet_rule == math.two_paverage then
+	 tex.write('paverage')
+      elseif luatexja.jfmglue.diffmet_rule == math.two_pleft then
+	 tex.write('pleft')
+      elseif luatexja.jfmglue.diffmet_rule == math.two_pright then
+	 tex.write('pright')
       elseif luatexja.jfmglue.diffmet_rule == math.two_add then
 	 tex.write('both')
       else -- This can't happen.
