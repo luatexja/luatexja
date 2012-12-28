@@ -4409,7 +4409,7 @@ Like \verb+\fontfamily+, \verb+\selectfont+ is required to take an effect.
 \item[adjustbaseline]
 \ldots
 
-\item[fontfamily\{<family>\}]
+\item[fontfamily\{<fam>\}]
 {\let\item\origitem
 %<*en>
 As in \LaTeXe, this command changes current font family (alphabetic, Japanese,~\emph{or both})
@@ -4427,58 +4427,74 @@ to <family>. Which family will be changed is determined as follows:
 %<*en>
 \item Let current encoding scheme for Japanese fonts be
       <ja-enc>. Current Japanese font family will be changed to
-      <family>, if one of the following two conditions is met:
-%</en>
-%<*ja>
-\item 現在の和文フォントに対するエンコーディングが<ja-enc>であるとしよう．
-  現在の和文フォントファミリは，以下の2つの条件のうちの1つが満たされているときに
-  <family>に変更される：
-%</ja>
-\begin{itemize}
-%<*en>
-\item The family <fam> under the encoding <ja-enc> has been already defined by
+      <family>, if the family <fam> under the encoding <ja-enc> has been already defined by
       \verb+\DeclareKanijFamily+.
 %</en>
 %<*ja>
-\item エンコーディング<ja-enc>におけるファミリ<fam>が既に \verb+\DeclareKanjiFamily+ によって定義されている．
+\item 現在の和文フォントに対するエンコーディングが<ja-enc>であるとしよう．
+  現在の和文フォントファミリは，エンコーディング<ja-enc>におけるファミリ<fam>が
+  既に \verb+\DeclareKanjiFamily+ によって定義されているときに<family>に変更される．
 %</ja>
 %<*en>
-\item A font definition named \texttt{<enc><ja-enc>.fd} (the file name is
-      all lowercase) exists.
+\item Let current encoding scheme for alphabetic fonts be
+      <al-enc>. Current Alphabetic font family will be changed to
+      <fam>, if one of the following two conditions is met
+%</en>
+%<*ja>
+\item 現在の欧文フォントに対するエンコーディングを<al-enc>とする．
+  現在の欧文フォントファミリは，以下の2つの条件のうちの1つが満たされているときに
+  <fam>に変更される：
+%</ja>
+\begin{itemize}
+%<*en>
+\item The family <fam> under the encoding <al-enc> has been already defined by
+      \verb+\DeclareFontFamily+.
+%</en>
+%<*ja>
+\item エンコーディング<al-enc>におけるファミリ<fam>が
+  既に \verb+\DeclareFontFamily+ によって定義されている．
+%</ja>
+%<*en>
+\item A font definition named \texttt{<al-enc><fam>.fd} exists.
 %</en>
 %<*zh>
 \item
 %</zh>
 %<*ja>
-\item フォント定義ファイル\texttt{<enc><ja-enc>.fd}（ファイル名は全て小文字）が存在する．
+\item フォント定義ファイル \texttt{<al-enc><fam>.fd} が存在する．
 %</ja>
 \end{itemize}
-%<*en>
-\item Let current encoding scheme for alphabetic fonts be
-      <al-enc>. For alphabetic font family, the criterion as above is used.
-%</en>
-%<*ja>
-\item 現在の欧文フォントに対するエンコーディングを<al-enc>とする．
-  欧文フォントファミリに対しても，上記の基準が用いられる．
-%</ja>
 %<*en>
 \item There is a case which none of the above applies, that is, the font
       family named <family> doesn't seem to be defined neither under the
       encoding <ja-enc>, nor under <al-enc>.
 In this case, the default family for font substitution is used for
       alphabetic and Japanese fonts. Note that current encoding will not
-      be set to <family>, unlike the original implementation in \LaTeX.
+      be set to <fam>, unlike the original implementation in \LaTeX.
 %</en>
 %<*ja>
 \item 上記のいずれもが適用されない，つまり<family>が<ja-enc>と<al-enc>の
   どちらでも定義されないような場合がある．
   この場合，代替フォントに用いられるデフォルトのフォントファミリが欧文フォントと
   和文フォントに用いられる．\LaTeX のオリジナルの実装とは異なり，
-  現在のエンコーディングは<family>には設定されないことに注意する．
+  現在のエンコーディングは<fam>には設定されないことに注意する．
 %</ja>
 \end{itemize}
 }
 \end{cslist}
+
+  \verb+\fontfamily+ によって和文フォントファミリを変更するかどうかの決定には，
+  フォント定義ファイル \texttt{*.fd} が一切関わらないことに注意．
+  これは「\Pkg{fontspec}パッケージの普及により，\texttt{*.fd} の使用は
+  徐々にされなくなっていくであろう」という勝手な予測に基づいている．
+  また，\verb+\kanjifamily+ で和文フォントファミリを変更した場合でも，
+  \verb+\selectfont+ によって\emph{実際に}変更が反映される際には
+  和文フォント定義ファイル \texttt{*.fd} は読み込まれない．
+%%%% OLD: 
+%%%%  和文フォント用の \texttt{*.fd} をどうしても用いたい場合%
+%%%%  \footnote{例えば，3ウェイト以上を1ファミリにまとめたい場合など．}には，
+%%%%  \verb+\fontfamily+ の代わりに \verb+\kanjifamily+ を用いて
+%%%%  和文フォントファミリを切り替えれば良い．
 
 %<*en>
 As closing this subsection, we shall introduce an example of
