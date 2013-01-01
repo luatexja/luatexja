@@ -49,7 +49,6 @@ icflag_table.IC_PROCESSED = 12
 icflag_table.BOXBDD       = 15
 icflag_table.PROCESSED_BEGIN_FLAG = 32
 
-
 local load_module = luatexja.load_module
 load_module('base');      local ltjb = luatexja.base
 load_module('rmlgbm');    local ltjr = luatexja.rmlgbm -- must be 1st
@@ -253,7 +252,7 @@ luatexbase.add_to_callback('hpack_filter',
 
 -- debug
 local function get_attr_icflag(p)
-   return (has_attr(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
+   return (has_attr(p, attr_icflag) or 0) % icflag_table.PROCESSED_BEGIN_FLAG
 end
 
 local debug_depth

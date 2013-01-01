@@ -3,7 +3,7 @@
 % 
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2011/11/22 Patch to NFSS2 for LuaLaTeX-ja]
+\ProvidesPackage{lltjfont}[2013/01/01 Patch to NFSS2 for LuaLaTeX-ja]
 
 \let\k@encoding\@empty
 \let\ck@encoding\@empty
@@ -461,8 +461,8 @@
        \edef\@templist{\@nameuse{notkfam@list@\k@encoding}}%
        \expandafter\expandafter\expandafter\inlist@\expandafter\tmp@item\expandafter{\@templist}%
        \ifin@\@notkfamtrue\else%
-         \def\@temp##1+{\lowercase{\def\@@temp{##1}}}\expandafter\@temp\k@encoding+%
-         \message{(I search kanjifont definition file: \@@temp#1.fd)}%
+         \def\@temp##1+{\lowercase{\def\@@temp{##1#1.fd}}}\expandafter\@temp\k@encoding+%
+         \message{(I search kanjifont definition file: \@@temp)}%
          \IfFileExists{\@@temp#1.fd}{\@tempswztrue}{\@tempswzfalse}%
          \if@tempswz
            \expandafter\xdef\csname kfam@list@\k@encoding\endcsname
@@ -487,8 +487,8 @@
        \edef\@templist{\@nameuse{notffam@list@\f@encoding}}%
        \expandafter\expandafter\expandafter\inlist@\expandafter\tmp@item\expandafter{\@templist}%
        \ifin@\@notffamtrue\else
-         \def\@temp##1+{\lowercase{\def\@@temp{##1}}}\expandafter\@temp\f@encoding+%
-         \message{(I search font definition file: \@@temp#1.fd)}%
+         \def\@temp##1+{\lowercase{\def\@@temp{##1#1.fd}}}\expandafter\@temp\f@encoding+%
+         \message{(I search font definition file: \@@temp)}%
          \IfFileExists{\@@temp#1.fd}{\@tempswztrue}{\@tempswzfalse}%
          \if@tempswz
            \expandafter\xdef\csname ffam@list@\f@encoding\endcsname
