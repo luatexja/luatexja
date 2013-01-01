@@ -444,34 +444,35 @@
 \newif\if@tempswz
 \DeclareRobustCommand\romanfamily[1]{\edef\f@family{#1}}
 \DeclareRobustCommand\kanjifamily[1]{\edef\k@family{#1}}
+% \notkfam@list@<enc>: list of non-defined kanji families under <enc>
+% \kfam@list@<enc>:    list of kanji families under <enc>, defined in a .fd file
 \DeclareRobustCommand\fontfamily[1]{%
   \@notkfamfalse\@notffamfalse\edef\tmp@item{{#1}}%
   \ifcsname \k@encoding+#1\endcsname % if \k@encoding+#1 is already defined
     \edef\k@family{#1}%
-  \else
-     \@notkfamtrue
-     % \ifcsname kfam@list@\k@encoding\endcsname\else
-     %   \expandafter\gdef\csname kfam@list@\k@encoding\endcsname{}%
-     %   \expandafter\gdef\csname notkfam@list@\k@encoding\endcsname{}%
-     % \fi
-     % \edef\@templist{\@nameuse{kfam@list@\k@encoding}}%
-     % \expandafter\expandafter\expandafter\inlist@\expandafter\tmp@item\expandafter{\@templist}%
-     % \ifin@\edef\k@family{#1}\else%
-     %   \edef\@templist{\@nameuse{notkfam@list@\k@encoding}}%
-     %   \expandafter\expandafter\expandafter\inlist@\expandafter\tmp@item\expandafter{\@templist}%
-     %   \ifin@\@notkfamtrue\else%
-     %     \def\@temp##1+{\lowercase{\def\@@temp{##1}}}\expandafter\@temp\k@encoding+%
-     %     \message{(I search kanjifont definition file: \@@temp#1.fd)}%
-     %     \IfFileExists{\@@temp#1.fd}{\@tempswztrue}{\@tempswzfalse}%
-     %     \if@tempswz
-     %       \expandafter\xdef\csname kfam@list@\k@encoding\endcsname
-     %         {\@nameuse{kfam@list@\k@encoding}\fam@elt<#1>}\edef\k@family{#1}%
-     %     \else
-     %       \expandafter\xdef\csname notkfam@list@\k@encoding\endcsname
-     %         {\@nameuse{notkfam@list@\k@encoding}\fam@elt<#1>}\@notkfamtrue%
-     %     \fi
-     %   \fi
-     % \fi
+  \else % search font definition file...
+     \ifcsname kfam@list@\k@encoding\endcsname\else
+       \expandafter\gdef\csname kfam@list@\k@encoding\endcsname{}%
+       \expandafter\gdef\csname notkfam@list@\k@encoding\endcsname{}%
+     \fi
+     \edef\@templist{\@nameuse{kfam@list@\k@encoding}}%
+     \expandafter\expandafter\expandafter\inlist@\expandafter\tmp@item\expandafter{\@templist}%
+     \ifin@\edef\k@family{#1}\else%
+       \edef\@templist{\@nameuse{notkfam@list@\k@encoding}}%
+       \expandafter\expandafter\expandafter\inlist@\expandafter\tmp@item\expandafter{\@templist}%
+       \ifin@\@notkfamtrue\else%
+         \def\@temp##1+{\lowercase{\def\@@temp{##1}}}\expandafter\@temp\k@encoding+%
+         \message{(I search kanjifont definition file: \@@temp#1.fd)}%
+         \IfFileExists{\@@temp#1.fd}{\@tempswztrue}{\@tempswzfalse}%
+         \if@tempswz
+           \expandafter\xdef\csname kfam@list@\k@encoding\endcsname
+             {\@nameuse{kfam@list@\k@encoding}\fam@elt<#1>}\edef\k@family{#1}%
+         \else
+           \expandafter\xdef\csname notkfam@list@\k@encoding\endcsname
+             {\@nameuse{notkfam@list@\k@encoding}\fam@elt<#1>}\@notkfamtrue%
+         \fi
+       \fi
+     \fi
   \fi
   \ifcsname \f@encoding+#1\endcsname
     \edef\f@family{#1}%
@@ -486,9 +487,9 @@
        \edef\@templist{\@nameuse{notffam@list@\f@encoding}}%
        \expandafter\expandafter\expandafter\inlist@\expandafter\tmp@item\expandafter{\@templist}%
        \ifin@\@notffamtrue\else
-         \def\@temp##1+{\lowercase{\def\@@temp{##1#1.fd}}}\expandafter\@temp\f@encoding+%
-         \message{(I search font definition file. \@@temp)}%
-         \IfFileExists{\@@temp}{\@tempswztrue}{\@tempswzfalse}%
+         \def\@temp##1+{\lowercase{\def\@@temp{##1}}}\expandafter\@temp\f@encoding+%
+         \message{(I search font definition file: \@@temp#1.fd)}%
+         \IfFileExists{\@@temp#1.fd}{\@tempswztrue}{\@tempswzfalse}%
          \if@tempswz
            \expandafter\xdef\csname ffam@list@\f@encoding\endcsname
              {\@nameuse{ffam@list@\f@encoding}\fam@elt<#1>}\edef\f@family{#1}%
@@ -562,32 +563,6 @@
   \vbox{\hrule\@width.3em}}
 
 %%%%%% LuaTeX-ja specific
-\def\try@load@fontshape{%
-   \expandafter
-   \ifx\csname \f@encoding+\f@family\endcsname\relax
-       \edef\tmp@item{{\directlua{%
-         tex.print(luatexbase.catcodetables["latex-package"], '\f@encoding')}%
-       }}%
-       \expandafter\expandafter\expandafter
-       \inlist@\expandafter\tmp@item\expandafter{\kenc@list}%
-\ifin@
-    \@font@warning{We don't search kanjifont definition
-      \MessageBreak for \f@encoding/\f@family}%
-\else
-    \@font@info{Try loading font information for
-                   \f@encoding+\f@family}%
-    \global\expandafter\let
-       \csname\f@encoding+\f@family\endcsname\@empty
-     \nfss@catcodes
-     \let\nfss@catcodes\relax
-     \edef\reserved@a{%
-       \lowercase{%
-         \noexpand\InputIfFileExists{\f@encoding\f@family.fd}}}%
-     \reserved@a\relax
-          {\@input@{\f@encoding\f@family.fd}}%
-\fi
-   \fi}
-
 
 % #1 の展開結果から encoding 部分をとりだし，それが和文用かどうかの結果を \ifin@ に代入
 \def\ltj@@IsFontJapanese#1{%
@@ -598,6 +573,7 @@
   tex.print(luatexbase.catcodetables["latex-package"], '#1')}%
 }}}
 
+
 \let\extract@afont\extract@font
 \def\pickup@jfont{%
     \expandafter \ifx \font@name \relax
@@ -606,6 +582,7 @@
        \let\extract@font\extract@afont
     \fi
     \let\getjfont\font@name}
+
 \def\extract@jfont{%
     \get@external@font
     \expandafter\globaljfont\font@name\external@font\relax
