@@ -166,8 +166,20 @@ local function check_box(box_ptr, box_end)
 	 until p.id~=id_glyph
 	 pid = p.id -- p must be non-nil
       end
-      if pid==id_kern and get_attr_icflag(p)==IC_PROCESSED then
-	 p = node_next(p); 
+      if pid==id_kern then
+	 if get_attr_icflag(p)==IC_PROCESSED then
+	    -- do nothing
+	 elseif p.subtype==2 then
+	    p = node_next(node_next(p)); 
+	    -- Note that another node_next will be executed outside this if-statement.
+	 else
+	    found_visible_node = true
+	    if find_first_char then 
+	       find_first_char = false
+	    else 
+	       last_char = nil
+	    end
+	 end
       elseif pid==id_hlist then
 	 if PACKED == get_attr_icflag(p) then
 	    if find_first_char then
