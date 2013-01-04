@@ -1,4 +1,4 @@
-%#!lualatex --shell-escape luatexja-kinsoku_make.tex
+%#!lualatex luatexja-kinsoku_make.tex
 \documentclass{article}
 \usepackage{luatexja}
 \makeatletter
@@ -8,8 +8,7 @@
  s = table.copy(luatexja.stack.charprop_stack_table[0])
  s[0].jwp, s[0].xsp = nil, nil
  s.kanjiskip = nil; s.xkanjiskip = nil
- table.tofile('ltj-kinsoku.out', s, 'return', false, true, false)
+ table.tofile('ltj-kinsoku.lua', s, 'return', false, true, false)
 \end{luacode}
-\immediate\write18{texluac -o ltj-kinsoku.lua ltj-kinsoku.out}
 \begin{document}
 \end{document}

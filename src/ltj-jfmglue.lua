@@ -184,6 +184,11 @@ local function check_box(box_ptr, box_end)
 	       end
 	    end
 	 end
+      elseif pid==id_math then
+	 if find_first_char then 
+	    first_char = p; find_first_char = false
+	 end
+	 last_char = p; found_visible_node = true
       elseif not (pid==id_ins   or pid==id_mark
 		  or pid==id_adjust or pid==id_whatsit
 		  or pid==id_penalty) then
@@ -202,11 +207,16 @@ end
 function check_box_high(Nx, box_ptr, box_end)
    first_char = nil;  last_char = nil;  find_first_char = true
    if check_box(box_ptr, box_end) then
+      local first_char = first_char
       if first_char then
-         if first_char.font == (has_attr(first_char, attr_curjfnt) or -1) then 
-            set_np_xspc_jachar(Nx, first_char)
-         else
-            set_np_xspc_alchar(Nx, first_char.char,first_char, ligature_head)
+         if first_char.id==glyph_node then
+	    if first_char.font == (has_attr(first_char, attr_curjfnt) or -1) then 
+	       set_np_xspc_jachar(Nx, first_char)
+	    else
+	       set_np_xspc_alchar(Nx, first_char.char,first_char, ligature_head)
+	    end
+	 else -- math_node
+	    set_np_xspc_alchar(Nx, -1,first_char)
          end
       end
    end
@@ -451,10 +461,14 @@ do
    function after_hlist(Nx)
       local s = Nx.last_char
       if s then
-	 if s.font == (has_attr(s, attr_curjfnt) or -1) then 
-	    set_np_xspc_jachar(Nx, s)
+	 if s.id==glyph_node then
+	    if s.font == (has_attr(s, attr_curjfnt) or -1) then 
+	       set_np_xspc_jachar(Nx, s)
+	    else
+	       set_np_xspc_alchar(Nx, s.char, s, ligature_tail)
+	    end
 	 else
-	    set_np_xspc_alchar(Nx, s.char, s, ligature_tail)
+	    set_np_xspc_alchar(Nx, -1, s)
 	 end
       else
 	 Nx.pre, Nx.met = nil, nil
