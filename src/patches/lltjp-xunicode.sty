@@ -86,4 +86,10 @@
 \let\hbar\ltj@tmpa
 \let\iftipaonetoken\ltj@tmpb
 \let\ltj@tmpb\relax % no more an if-token
+
+%% ticket 30501
+{\catcode`\!0\catcode`\\11!catcode`!2 11!catcode`!?11!catcode`!-11
+ !gdef!EU2\nobreakspace{!?-\nobreakspace}%
+}
+
 \endinput
