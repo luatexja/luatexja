@@ -52,7 +52,7 @@ function cid(key)
 	   curjfnt.cidinfo.ordering ~= "Korea1" then
       ltjb.package_error('luatexja-otf',
                          'Current Japanese font (or other CJK font) "'..curjfnt.psname..'" is not a CID-Keyed font (Adobe-Japan1 etc.)', 
-                         'Select a CID-Keyed font using \jfont.')
+                         'Select a CID-Keyed font using \\jfont.')
       return
    end
    local char = curjfnt.unicodes[curjfnt.cidinfo.ordering..'.'..tostring(key)]
