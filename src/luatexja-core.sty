@@ -272,7 +272,8 @@
     {\string#2 is not a control sequence that represents \MessageBreak
      a Japanese font}{}%
   \else
-    \directlua{luatexja.stack.set_stack_font(luatexja.isglobal, luatexja.stack_table_index.#3,
+    \directlua{luatexja.stack.set_stack_font(luatexja.isglobal, 
+    luatexja.stack_table_index.#3,
     \ltj@safe@num@or{nil}{#1}, \the\ltj@curjfnt)}%
   \fi
   \ltj@curjfnt=\ltj@tempcnta

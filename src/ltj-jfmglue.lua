@@ -89,7 +89,7 @@ end
 local function slow_find_char_class(c, m, oc)
    local xc = c or oc
    local cls = ltjf_find_char_class(oc, m)
-   if xc ~= oc and  cls==0 then cls, xc = ltjf_find_char_class(-xc, m) end
+   if xc ~= oc and  cls==0 then cls = ltjf_find_char_class(-xc, m) end
    return cls, xc
 end
 
@@ -396,7 +396,7 @@ function calc_np(lp, last)
       local lpa = has_attr(lp, attr_icflag) or 0
        -- unbox 由来ノードの検出
       if lpa>=PACKED then
-         if lpa == BOXBDD then
+         if lpa%PROCESSED_BEGIN_FLAG == BOXBDD then
 	    local lq = node_next(lp) 
             head = node.remove(head, lp); node.free(lp); lp = lq
          else return calc_np_pbox(lp, last)

@@ -19,8 +19,9 @@
 
 
 \long\def\testbox#1{%
-  \ltjenableadjust\setbox0=\vbox{\hsize=20\zw\parfillskip0pt#1}\outbox{ON}\par
-  \ltjdisableadjust\setbox0=\vbox{\hsize=20\zw\parfillskip0pt#1}\outbox{OFF}\par
+  \textcolor{red!80!black}{\ltjenableadjust\setbox0=\vbox{\hsize=20\zw\parfillskip0pt#1}\outbox{ON}}\par
+  \textcolor{black!90!white}{%
+    \ltjdisableadjust\setbox0=\vbox{\hsize=20\zw\parfillskip0pt#1}\outbox{OFF}}\par\medskip
 }
 
 \parindent0pt

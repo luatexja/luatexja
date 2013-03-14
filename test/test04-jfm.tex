@@ -1,9 +1,9 @@
-%#!luatex test04-jfm ; pdftotext test04-jfm.pdf /tmp/new
+%#!luatex test04-jfm.tex
 \input luatexja-core.sty
 \pdfcompresslevel=0
 \def\head#1{\medskip\penalty-100\noindent{\bf\tengt ■ #1}\par\penalty10000 }
 \jfont\rml={psft:Ryumin-Light:jfm=ujis} at 10pt
-\rml あ\inhibitglue\char"201Cあ・い←Ryumin-Light
+\rml あ\inhibitglue\char"201Cあ・い\inhibitglue （）あ←Ryumin-Light
 
 \jfont\rml={file:ipam.ttf:jfm=ujis} at 10pt
 \rml あ\inhibitglue\char"201Cあ・い←IPA\hbox{}明朝 (ipam)
@@ -72,7 +72,6 @@
 
 {\ltjsetparameter{kanjiskip=3pt}
 あいうえおさしすせそ}\par
-
 
 \vfill\eject\tracingonline=0
 \noindent{\bf\gt  以下はJFMグルー挿入検証}
@@ -277,6 +276,8 @@
 \head{その他: italic correction and accents}
 
 \setbox0=\hbox{\tenrm あ\/j}
+\dumplist0
+\setbox0=\hbox{\tenrm ）\/j}
 \dumplist0
 \setbox0=\hbox{\tenrm\rmlh れ\v{A}）}
 \dumplist0

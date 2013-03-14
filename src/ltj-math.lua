@@ -103,7 +103,7 @@ function (p, sty)
    elseif p.id == id_mchar then
       local fam = has_attr(p, attr_jfam) or -1
       if (not is_math_letters[p.char]) and ltjc.is_ucs_in_japanese_char(p) and fam>=0 then
-	 local f = ltjs.get_penalty_table(MJT + 0x200000 * sty + fam, -1, tex_getcount('ltj@@stack'))
+	 local f = ltjs.get_penalty_table(MJT + 0x100 * sty + fam, -1, tex_getcount('ltj@@stack'))
 	 if f ~= -1 then
 	    local q = node_new(id_sub_box)
 	    local r = node_new(id_glyph); r.next = nil
