@@ -23,7 +23,6 @@ local node_insert_before = node.insert_before
 local node_insert_after = node.insert_after
 local round = tex.round
 
-
 local id_glyph = node.id('glyph')
 local id_kern = node.id('kern')
 local id_hlist = node.id('hlist')
@@ -64,7 +63,7 @@ local fshift =  { down = 0, left = 0}
 
 -- mode: true iff p will be always encapsuled by a hbox
 function capsule_glyph(p, dir, mode, met, class)
-   local char_data = met.size_cache.char_type[class]
+   local char_data = met.char_type[class]
    if not char_data then return node_next(p) end
    local fwidth, pwidth = char_data.width, p.width
    fwidth = (fwidth ~= 'prop') and fwidth or pwidth

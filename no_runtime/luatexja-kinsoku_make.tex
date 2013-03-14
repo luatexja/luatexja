@@ -6,7 +6,6 @@
 \usepackage{luacode}
 \begin{luacode}
  s = table.copy(luatexja.stack.charprop_stack_table[0])
- s[0].jwp, s[0].xsp = nil, nil
  s.kanjiskip = nil; s.xkanjiskip = nil
  table.tofile('ltj-kinsoku.lua', s, 'return', false, true, false)
 \end{luacode}

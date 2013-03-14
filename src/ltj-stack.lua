@@ -83,6 +83,7 @@ end
 
 -- EXT
 function set_stack_table(g,m,c,p,lb,ub)
+   print(g,m,c)
    local i = get_stack_level()
    if type(p)~='number' or p<lb or p>ub then
       ltjb.package_error('luatexja',
@@ -98,14 +99,11 @@ function set_stack_table(g,m,c,p,lb,ub)
 			 "(-1 is used for denoting `math boundary')\n" ..
 			 'So I changed this one to zero.')
       c=0
-   elseif not charprop_stack_table[i][c] then 
-      charprop_stack_table[i][c] = {} 
    end
-   charprop_stack_table[i][c][m] = p
+   charprop_stack_table[i][c+m] = p
   if g=='global' then
      for j,v in pairs(charprop_stack_table) do 
-	if not charprop_stack_table[j][c] then charprop_stack_table[j][c] = {} end
-	charprop_stack_table[j][c][m] = p
+	charprop_stack_table[j][c+m] = p
      end
   end
 end
@@ -119,14 +117,11 @@ function set_stack_font(g,m,c,p)
 			 "The family number should in the range 0 .. 255.\n" ..
 			  "I'm going to use 0 instead of that illegal family number.")
       c=0
-   elseif not charprop_stack_table[i][c] then 
-      charprop_stack_table[i][c] = {} 
    end
-   charprop_stack_table[i][c][m] = p
+   charprop_stack_table[i][c+m] = p
    if g=='global' then
      for j,v in pairs(charprop_stack_table) do 
-	if not charprop_stack_table[j][c] then charprop_stack_table[j][c] = {} end
-	charprop_stack_table[j][c][m] = p
+	charprop_stack_table[j][c+m] = p
      end
   end
 end
@@ -156,7 +151,6 @@ function set_stack_skip(g,m,sp)
 end
 
 -- These three functions are used in ltj-jfmglue.lua.
-local table_current_stack
 function report_stack_level(bsl)
    table_current_stack = charprop_stack_table[bsl]
 end
@@ -164,24 +158,15 @@ function fast_get_skip_table(m)
    return table_current_stack[m] 
       or { width = 0, stretch = 0, shrink = 0, stretch_order = 0, shrink_order = 0 }
 end
-function fast_get_penalty_table(m,c)
-   local i = table_current_stack[c]
-   return (i and i[m])
-end
-
-local empty_table = {}
-function fast_get_penalty_table_parent(c)
-   return table_current_stack[c] or empty_table
-end
 
 -- For other situations, use the following instead:
 function get_skip_table(m, idx)
    return charprop_stack_table[idx][m] 
       or { width = 0, stretch = 0, shrink = 0, stretch_order = 0, shrink_order = 0 }
 end
-function get_penalty_table(m,c,d, idx)
-   local i = charprop_stack_table[idx][c]
-   return (i and i[m]) or d
+function get_penalty_table(mc, d, idx)
+   local i = charprop_stack_table[idx][mc]
+   return i or d
 end
 
 

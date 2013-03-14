@@ -89,6 +89,10 @@ local function conv_jchar_to_hbox(head, sty)
    return head
 end 
 
+local MJT  = luatexja.stack_table_index.MJT
+local MJS  = luatexja.stack_table_index.MJS
+local MJSS = luatexja.stack_table_index.MJSS
+
 conv_jchar_to_hbox_A = 
 function (p, sty)
    if not p then return nil
@@ -99,11 +103,7 @@ function (p, sty)
    elseif p.id == id_mchar then
       local fam = has_attr(p, attr_jfam) or -1
       if (not is_math_letters[p.char]) and ltjc.is_ucs_in_japanese_char(p) and fam>=0 then
-	 local mode = 'mjss'
-	 if sty == 0 then mode = 'mjtext'
-	 elseif sty == 1 then mode = 'mjscr'
-	 end
-	 local f = ltjs.get_penalty_table(mode, fam, -1, tex_getcount('ltj@@stack'))
+	 local f = ltjs.get_penalty_table(MJT + 0x200000 * sty + fam, -1, tex_getcount('ltj@@stack'))
 	 if f ~= -1 then
 	    local q = node_new(id_sub_box)
 	    local r = node_new(id_glyph); r.next = nil

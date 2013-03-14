@@ -173,7 +173,9 @@ luatexbase.create_callback("luatexja.find_char_class", "data",
 function find_char_class(c,m)
 -- c: character code, m: 
    if not m then return 0 end
-   return m.size_cache.chars[c] or 
+--   print("**")
+--   for i,v in pairs(m) do print(i,v) end
+   return m.chars[c] or 
       luatexbase.call_callback("luatexja.find_char_class", 0, m, c)
 end
 
@@ -229,8 +231,12 @@ function jfontdefY() -- for horizontal font
      return 
    end
    update_jfm_cache(j, f.size)
+   local sz = metrics[j].size_cache[f.size]
    local fmtable = { jfm = j, size = f.size, var = jfm_var, 
-		     size_cache = metrics[j].size_cache[f.size] }
+		     zw = sz.zw, zh = sz.zh, 
+		     chars = sz.chars, char_type = sz.char_type,
+		     kanjiskip = sz.kanjiskip, xkanjiskip = sz.xkanjiskip, 
+		    }
    fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
    font_metric_table[fn]=fmtable
    tex.sprint(cat_lp, luatexja.is_global .. '\\protected\\expandafter\\def\\csname ' 
@@ -241,7 +247,7 @@ end
 function load_zw()
    local a = font_metric_table[tex.attribute[attr_curjfnt]]
    if a then
-      tex.setdimen('ltj@zw', a.size_cache.zw)
+      tex.setdimen('ltj@zw', a.zw)
    else 
       tex.setdimen('ltj@zw',0)
    end
@@ -250,7 +256,7 @@ end
 function load_zh()
    local a = font_metric_table[tex.attribute[attr_curjfnt]]
    if a then
-      tex.setdimen('ltj@zh', a.size_cache.zh)
+      tex.setdimen('ltj@zh', a.zh)
    else 
       tex.setdimen('ltj@zh',0)
    end
@@ -306,7 +312,7 @@ function append_italic()
 	 f = has_attr(p, attr_curjfnt)
 	 local j = font_metric_table[f]
 	 local c = find_char_class(p.char, j)
-	 g.kern = j.size_cache.char_type[c].italic
+	 g.kern = j.char_type[c].italic
       else
 	 g.kern = font.fonts[f].characters[p.char].italic
       end

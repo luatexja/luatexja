@@ -157,7 +157,7 @@ local function aw_step1(p, res, total)
      return false-- それ以外は対象外．
    end
    local xk = ltjf_font_metric_table -- 
-     [xc.font].size_cache.char_type[has_attr(xc, attr_jchar_class) or 0]
+     [xc.font].char_type[has_attr(xc, attr_jchar_class) or 0]
      ['end_' .. res.name] or 0
      --print(res.name, total, xk, unicode.utf8.char(xc.char))
 

@@ -12,6 +12,7 @@ local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
 luatexja.load_module('charrange'); local ltjc = luatexja.charrange
 
+local utf = unicode.utf8
 local node_new = node.new
 local id_glyph = node.id('glyph')
 local getcatcode = tex.getcatcode

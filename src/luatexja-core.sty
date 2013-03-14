@@ -243,22 +243,22 @@
 
 % prebreakpenalty = {<char_code>, <penalty>}
 \define@key[ltj]{japaram}{kcatcode}{%
-  \expandafter\ltj@@set@stack#1:{kcat}{0}{0x7FFFFFFF}}
+  \expandafter\ltj@@set@stack#1:{KCAT}{0}{0x7FFFFFFF}}
 \define@key[ltj]{japaram}{prebreakpenalty}{%
-  \expandafter\ltj@@set@stack#1:{pre}{-10000}{10000}}
+  \expandafter\ltj@@set@stack#1:{PRE}{-10000}{10000}}
 \define@key[ltj]{japaram}{postbreakpenalty}{%
-  \expandafter\ltj@@set@stack#1:{post}{-10000}{10000}}
+  \expandafter\ltj@@set@stack#1:{POST}{-10000}{10000}}
 \def\ltj@@set@stack#1,#2:#3#4#5{%
-  \directlua{luatexja.stack.set_stack_table(luatexja.isglobal, \asluastring{#3},
+  \directlua{luatexja.stack.set_stack_table(luatexja.isglobal, luatexja.stack_table_index.#3,
     \ltj@safe@num@or{nil}{#1},\ltj@safe@num@or{nil}{#2},#4,#5)}}
 
 % jatextfont = {<char_code>, <font_cs>}
 \define@key[ltj]{japaram}{jatextfont}{%
-  \expandafter\ltj@@set@stackfont#1:{mjtext}}
+  \expandafter\ltj@@set@stackfont#1:{MJT}}
 \define@key[ltj]{japaram}{jascriptfont}{%
-  \expandafter\ltj@@set@stackfont#1:{mjscr}}
+  \expandafter\ltj@@set@stackfont#1:{MJS}}
 \define@key[ltj]{japaram}{jascriptscriptfont}{%
-  \expandafter\ltj@@set@stackfont#1:{mjss}}
+  \expandafter\ltj@@set@stackfont#1:{MJSS}}
 \protected\def\ltj@@set@stackfont#1,#2:#3{%
   \ltj@reset@globaldefs
   \ltj@tempcnta=\ltj@curjfnt\ltj@curjfnt=-1 #2%
@@ -267,7 +267,7 @@
     {\string#2 is not a control sequence that represents \MessageBreak
      a Japanese font}{}%
   \else
-    \directlua{luatexja.stack.set_stack_font(luatexja.isglobal, \asluastring{#3},
+    \directlua{luatexja.stack.set_stack_font(luatexja.isglobal, luatexja.stack_table_index.#3,
     \ltj@safe@num@or{nil}{#1}, \the\ltj@curjfnt)}%
   \fi
   \ltj@curjfnt=\ltj@tempcnta
@@ -296,7 +296,8 @@
   \def\ltj@tempa{preonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{1}\fi
   \def\ltj@tempa{postonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{2}\fi
   \def\ltj@tempa{allow}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{3}\fi
-  \directlua{luatexja.stack.set_stack_table(luatexja.isglobal, 'xsp', 
+  \directlua{luatexja.stack.set_stack_table(luatexja.isglobal,
+    luatexja.stack_table_index.XSP,
     \ltj@safe@num@or{nil}{#1},
     \ltj@safe@num@or{nil}{\ltj@temp},0,3)}}
 
@@ -311,7 +312,8 @@
   \def\ltj@tempa{preonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{1}\fi
   \def\ltj@tempa{postonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{2}\fi
   \def\ltj@tempa{allow}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{3}\fi
-  \directlua{luatexja.stack.set_stack_table(luatexja.isglobal, 'xsp', 
+  \directlua{luatexja.stack.set_stack_table(luatexja.isglobal,
+    luatexja.stack_table_index.XSP,
     \ltj@safe@num@or{nil}{#1},
     \ltj@safe@num@or{nil}{\ltj@temp},0,3)}}
 
@@ -339,7 +341,7 @@
 
 % jcharwidowpenalty = <count>
 \define@key[ltj]{japaram}{jcharwidowpenalty}{%      %COUNT
-  \ltj@@set@stack0,#1:{jwp}{-10000}{10000}}
+  \ltj@@set@stack0,#1:{JWP}{-10000}{10000}}
 
 % differentjfm = { large | small | average | pleft | pright | paverage | both}
 \define@choicekey*+[ltj]{japaram}{differentjfm}[\ltj@temp\ltj@tempr]%

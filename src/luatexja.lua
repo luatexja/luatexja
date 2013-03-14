@@ -49,6 +49,19 @@ icflag_table.IC_PROCESSED = 12
 icflag_table.BOXBDD       = 15
 icflag_table.PROCESSED_BEGIN_FLAG = 32
 
+local stack_table_index = {}
+luatexja.stack_table_index = stack_table_index
+stack_table_index.PRE  = 0x200000 -- characterごと
+stack_table_index.POST = 0x400000 -- characterごと
+stack_table_index.KCAT = 0x600000 -- characterごと
+stack_table_index.XSP  = 0x800000 -- characterごと
+stack_table_index.JWP  = 0 -- 0のみ
+stack_table_index.MJT  = 0x100 -- 0--255
+stack_table_index.MJS  = 0x200 -- 0--255
+stack_table_index.MJSS = 0x300 -- 0--255
+stack_table_index.KSJ  = 0x400 -- 0--9
+
+
 local load_module = luatexja.load_module
 load_module('base');      local ltjb = luatexja.base
 load_module('rmlgbm');    local ltjr = luatexja.rmlgbm -- must be 1st
@@ -143,16 +156,17 @@ end
 
 -- EXT: print parameters that don't need arguments
 function luatexja.ext_get_parameter_unary(k)
+   local t = tex.getcount('ltj@@stack')
    if k == 'yalbaselineshift' then
       tex.write(print_scaled(tex.getattribute('ltj@yablshift'))..'pt')
    elseif k == 'yjabaselineshift' then
       tex.write(print_scaled(tex.getattribute('ltj@ykblshift'))..'pt')
    elseif k == 'kanjiskip' then
-      tex.write(print_spec(ltjs.get_skip_table('kanjiskip', tex.getcount('ltj@@stack'))))
+      tex.write(print_spec(ltjs.get_skip_table('kanjiskip', t)))
    elseif k == 'xkanjiskip' then
-      tex.write(print_spec(ltjs.get_skip_table('xkanjiskip', tex.getcount('ltj@@stack'))))
+      tex.write(print_spec(ltjs.get_skip_table('xkanjiskip', t)))
    elseif k == 'jcharwidowpenalty' then
-      tex.write(ltjs.get_penalty_table('jwp', 0, 0, tex.getcount('ltj@@stack')))
+      tex.write(ltjs.get_penalty_table(stack_table_index.JWP, 0, t))
    elseif k == 'autospacing' then
       tex.write(tex.getattribute('ltj@autospc'))
    elseif k == 'autoxspacing' then
@@ -181,6 +195,7 @@ end
 
 -- EXT: print parameters that need arguments
 function luatexja.ext_get_parameter_binary(k,c)
+   local t = tex.getcount('ltj@@stack')
    if type(c)~='number' then
       ltjb.package_error('luatexja',
 			 'invalid the second argument (' .. tostring(c) .. ')',
@@ -208,15 +223,15 @@ function luatexja.ext_get_parameter_binary(k,c)
 	 c=0
       end
       if k == 'prebreakpenalty' then
-	 tex.write(ltjs.get_penalty_table('pre', c, 0, tex.getcount('ltj@@stack')))
+	 tex.write(ltjs.get_penalty_table(stack_table_index.PRE + c, 0, t))
       elseif k == 'postbreakpenalty' then
-	 tex.write(ltjs.get_penalty_table('post', c, 0, tex.getcount('ltj@@stack')))
+	 tex.write(ltjs.get_penalty_table(stack_table_index.POST+ c, 0, t))
       elseif k == 'kcatcode' then
-	 tex.write(ltjs.get_penalty_table('kcat', c, 0, tex.getcount('ltj@@stack')))
+	 tex.write(ltjs.get_penalty_table(stack_table_index.KCAT+ c, 0, t))
       elseif k == 'chartorange' then 
 	 tex.write(ltjc.char_to_range(c))
       elseif k == 'jaxspmode' or k == 'alxspmode' then
-	 tex.write(ltjs.get_penalty_table('xsp', c, 3, tex.getcount('ltj@@stack')))
+	 tex.write(ltjs.get_penalty_table(stack_table_index.XSP + c, 3, t))
       end
    end
 end

@@ -112,7 +112,7 @@ local function cid_to_char(fmtable, fn)
    local fi = fonts.ids[fn]
    if fi.cidinfo and fi.cidinfo.ordering == "Japan1" then
       fmtable.cid_char_type = {}
-      for i, v in pairs(fmtable.size_cache.chars) do
+      for i, v in pairs(fmtable.chars) do
 	 local j = string.match(i, "^AJ1%-([0-9]*)")
 	 if j then
 	    j = tonumber(fi.unicodes['Japan1.'..tostring(j)])
