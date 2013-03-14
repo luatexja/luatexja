@@ -161,7 +161,9 @@ local function check_box(box_ptr, box_end)
 	       first_char = p; find_first_char = false
 	    end
 	    last_char = p; found_visible_node = true; p=node_next(p)
-	    if (not p) or p==box_end then return found_visible_node end
+	    if (not p) or p==box_end then 
+               return found_visible_node 
+            end
 	 until p.id~=id_glyph
 	 pid = p.id -- p must be non-nil
       end
@@ -220,7 +222,7 @@ function check_box_high(Nx, box_ptr, box_end)
    if check_box(box_ptr, box_end) then
       local first_char = first_char
       if first_char then
-         if first_char.id==glyph_node then
+         if first_char.id==id_glyph then
 	    if first_char.font == (has_attr(first_char, attr_curjfnt) or -1) then 
 	       set_np_xspc_jachar(Nx, first_char)
 	    else
@@ -278,7 +280,7 @@ end
 
 
 local calc_np_auxtable = {
-   [id_glyph] = function (lp) 
+   [id_glyph] = function (lp)
 		   Np.first, Np.nuc = (Np.first or lp), lp;
 		   Np.id = (lp.font == (has_attr(lp, attr_curjfnt) or -1)) and id_jglyph or id_glyph
 		   --set_attr_icflag_processed(lp) treated in ltj-setwidth.lua
@@ -354,7 +356,7 @@ local calc_np_auxtable = {
 		  if lp.subtype==2 then
 		     set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
 		     set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
-		     set_attr(lp, attr_icflag, PROCESSED); Np = node_next(lp)
+		     set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
 		     set_attr(lp, attr_icflag, PROCESSED); Np.nuc = lp
 		     Np.id = (lp.font == (has_attr(lp, attr_curjfnt) or -1)) and id_jglyph or id_glyph
 		     return true, check_next_ickern(node_next(lp)); 
@@ -392,7 +394,7 @@ function calc_np(lp, last)
    for k = 1,#Bp do Bp[k] = nil end
    while lp ~= last do
       local lpa = has_attr(lp, attr_icflag) or 0
-      -- unbox 由来ノードの検出
+       -- unbox 由来ノードの検出
       if lpa>=PACKED then
          if lpa == BOXBDD then
 	    local lq = node_next(lp) 
@@ -443,7 +445,7 @@ do
    function set_np_xspc_alchar(Nx, c,x, lig)
       if c~=-1 then
          local xc, xs = x.components, x.subtype
-	 if lig == ligature_head then
+	 if lig == 1 then
 	    while xc and xs and xs%4>=2 do
 	       x = xc; xc, xs = x.components, x.subtype
 	    end
@@ -484,7 +486,7 @@ do
    function after_hlist(Nx)
       local s = Nx.last_char
       if s then
-	 if s.id==glyph_node then
+	 if s.id==id_glyph then
 	    if s.font == (has_attr(s, attr_curjfnt) or -1) then 
 	       set_np_xspc_jachar(Nx, s)
 	    else
@@ -960,7 +962,8 @@ function main(ahead, mode)
    end
    lp = calc_np(lp, last)
    while Np do
-      extract_np(); adjust_nq()
+      extract_np();
+      adjust_nq(); 
       local pid, pm = Np.id, Np.met
       -- 挿入部
       if pid == id_jglyph then 

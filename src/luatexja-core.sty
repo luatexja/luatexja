@@ -184,7 +184,6 @@
   \input ltj-base.sty %
 \fi                             %</LaTeX>
 
-
 %%%%%%%% \asluastring
 \def\asluastring#1{'\luaescapestring{\detokenize{#1}}'}
 
@@ -240,6 +239,12 @@
 %%%%%%%% \ltjsetparameter
 \newcount\ltj@@stack \newcount\ltj@@group@level
 \ltj@@group@level=0 \ltj@@stack=0
+
+\setbox0\hbox{%
+  \directlua{% This value depends on the version of LuaTeX.
+    luatexja.stack.hmode = -tex.nest[tex.nest.ptr].mode
+  }
+}
 
 % prebreakpenalty = {<char_code>, <penalty>}
 \define@key[ltj]{japaram}{kcatcode}{%
