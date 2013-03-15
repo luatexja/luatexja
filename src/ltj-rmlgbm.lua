@@ -19,9 +19,99 @@ local path           = {
     systemdir = file.join(kpse.expand_var("$TEXMFSYSVAR"), aux_dir),
 }
 
+local cid_reg, cid_order, cid_supp, cid_name
+local taux_dir = 'luatex-cache/luatexja'
+local cid_replace = {
+   ["Adobe-Japan1"] = "UniJIS2004-UTF32", -- JIS X 0213:2004
+   ["Adobe-Korea1"] = "UniKS-UTF32",
+   ["Adobe-GB1"]    = "UniGB-UTF32",
+   ["Adobe-CNS1"]   = "UniCNS-UTF32",
+}
+
+-- reading CID maps
+local line, fh, tt
+
+local function load_bf_char()
+   local cid, ucs, ucsa
+   line = fh:read("*l")
+   while line do
+      if line == "endcidchar" then 
+	 line = fh:read("*l"); return
+      else -- WMA l is in the form "<%x+>%s%d+"
+	 ucs, cid = string.match(line, "<(%x+)>%s+(%d+)")
+	 cid = tonumber(cid, 10); ucs = tonumber(ucs, 16); 
+	 if not tt[ucs]  then 
+	    tt[ucs] = { index = cid } 
+	 end
+      end
+      line = fh:read("*l")
+   end
+end
+
+local function load_bf_range()
+   local bucs, eucs, cid
+   line = fh:read("*l")
+   while line do
+      if line == "endcidrange" then 
+	 line = fh:read("*l"); return
+      else -- WMA l is in the form "<%x+>%s+<%x+>"
+	 bucs, eucs, cid = string.match(line, "<(%x+)>%s+<(%x+)>%s+(%d+)")
+	 cid = tonumber(cid, 10); bucs = tonumber(bucs, 16); eucs = tonumber(eucs, 16);
+	 for ucs = bucs, eucs do
+	    if not tt[ucs]  then 
+	       tt[ucs] = { index = cid }
+	    end
+	    cid = cid+1
+	 end
+      end
+      line = fh:read("*l")
+   end
+end
+
+local function make_cid_font()
+   cidfont_data[cid_name] = {
+      cidinfo = { ordering=cid_order, registry=cid_reg, supplement=cid_supp },
+      encodingbytes = 2, extend=1000, format = 'opentype',
+      direction = 0, characters = {}, parameters = {}, embedding = "no", cache = "yes", 
+      ascender = 0, descender = 0, factor = 0, hfactor = 0, vfactor = 0, 
+   }
+   tt = {}
+
+   -- Open
+   -- TODO: vertical fonts?
+   fh = io.open(kpse.find_file(cid_replace[cid_name] .. "-H", 'cmap files'), "r")
+   line = fh:read("*l")
+   while line do
+      if string.find(line, "%x+%s+begincidchar") then
+	 load_bf_char()
+      elseif string.find(line, "%x+%s+begincidrange") then
+	 load_bf_range()
+      else
+	 line = fh:read("*l")
+      end
+   end
+   fh:close();  cidfont_data[cid_name].characters = tt
+   cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
+
+   -- Save
+   local savepath  = path.localdir .. '/luatexja/'
+   if not lfs.isdir(savepath) then
+      dir.mkdirs(savepath)
+   end
+   savepath = file.join(savepath, "ltj-cid-auto-" 
+			.. string.lower(cid_name)  .. ".lua")
+   if file.iswritable(savepath) then
+      table.tofile(savepath, cidfont_data[cid_name],'return', false, true, false )
+   else 
+      ltjb.package_warning('luatexja', 
+			   'failed to save informations of non-embedded 2-byte fonts', '')
+   end
+end
+
 -- 
-local function read_cid_font(cid_name)
-   local v = "ltj-cid-" .. string.lower(cid_name) .. ".lua"
+local function read_cid_font()
+   -- local v = "ltj-cid-" .. string.lower(cid_name) .. ".lua"
+   local v = "ltj-cid-auto-" .. string.lower(cid_name) .. ".lua"
    local localpath  = file.join(path.localdir, v)
    local systempath = file.join(path.systemdir, v)
    local kpsefound  = kpse.find_file(v)
@@ -35,16 +125,21 @@ local function read_cid_font(cid_name)
       cidfont_data[cid_name] = require(systempath)
       cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
    end
+   -- Now we must create the virtual metrics from CMap.
+   ltjb.package_info('luatexja', 
+			'I try to generate informations of non-embedded 2-byte fonts...', '')
+   make_cid_font()
+
    if cidfont_data[cid_name] then
       for i,v in pairs(cidfont_data[cid_name].characters) do
          if not v.width then v.width = 655360 end
-	 v.height, v.depth = 576716.8, 78643.2 -- optimized for jfm-ujis.lua
+         v.height, v.depth = 576716.8, 78643.2 -- optimized for jfm-ujis.lua
       end
    end
 end
 
 -- High-level
-local function mk_rml(name, size, id, cid_name)
+local function mk_rml(name, size, id)
    local specification = fonts.define.analyze(name,size)
    specification = fonts.define.specify[':'](specification)
    local features = specification.features.normal
@@ -123,7 +218,6 @@ local dr_orig = fonts.define.read
 function fonts.define.read(name, size, id)
    local p = utf.find(name, ":") or utf.len(name)+1
    if utf.sub(name, 1, p-1) == 'psft' then
-      local cid_reg, cid_order, cid_name
       local s = "Adobe-Japan1-6"
       local basename = utf.sub(name,p+1)
       local p = utf.find(basename, ":")
@@ -144,7 +238,7 @@ function fonts.define.read(name, size, id)
       end
       cid_name = cid_reg .. '-' .. cid_order
       if not cidfont_data[cid_name] then 
-         read_cid_font(cid_name)
+         read_cid_font()
          if not cidfont_data[cid_name] then 
             ltjb.package_error('luatexja',
                                "bad cid key `" .. s .. "'",
@@ -154,11 +248,11 @@ function fonts.define.read(name, size, id)
             cid_name = "Adobe-Japan1"
          end
       end
-      return mk_rml(basename, size, id, cid_name)
+      return mk_rml(basename, size, id)
    else 
       return dr_orig(name, size, id)
    end
 end
 
-
-read_cid_font("Adobe-Japan1")
+cid_reg, cid_order, cid_name = 'Adobe', 'Japan1', 'Adobe-Japan1'
+read_cid_font()
