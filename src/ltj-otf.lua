@@ -33,13 +33,14 @@ local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_find_char_class = ltjf.find_char_class
 
+local OTF = luatexja.userid_table.OTF
 
 -- Append a whatsit node to the list.
 -- This whatsit node will be extracted to a glyph_node
 function append_jglyph(char)
    local p = node_new(id_whatsit,sid_user)
    local v = tex.attribute[attr_curjfnt]
-   p.user_id=30113; p.type=100; p.value=char
+   p.user_id=OTF; p.type=100; p.value=char
    set_attr(p, attr_yablshift, tex.attribute[attr_ykblshift])
    node.write(p)
 end
@@ -70,7 +71,7 @@ function extract(head)
    local v
    while p do
       if p.id==id_whatsit then
-	 if p.subtype==sid_user and p.user_id==30113 then
+	 if p.subtype==sid_user and p.user_id==OTF then
 	    local g = node_new(id_glyph)
 	    g.subtype = 0; g.char = p.value
 	    v = has_attr(p, attr_curjfnt); g.font = v

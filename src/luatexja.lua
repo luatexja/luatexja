@@ -34,6 +34,7 @@ function luatexja.load_lua(fn)
    end
 end
 
+--- 以下は全ファイルで共有される定数
 local icflag_table = {}
 luatexja.icflag_table = icflag_table
 icflag_table.ITALIC       = 1
@@ -61,6 +62,15 @@ stack_table_index.MJS  = 0x200 -- 0--255
 stack_table_index.MJSS = 0x300 -- 0--255
 stack_table_index.KSJ  = 0x400 -- 0--9
 
+local userid_table = {}
+luatexja.userid_table = userid_table
+userid_table.IHB  = 30111 -- \inhibitglue
+userid_table.STCK = 30112 -- スタック管理
+userid_table.OTF  = 30113 -- luatexja-otf
+userid_table.BPAR = 30114 -- 「段落始め」
+
+
+--- 定義終わり
 
 local load_module = luatexja.load_module
 load_module('base');      local ltjb = luatexja.base

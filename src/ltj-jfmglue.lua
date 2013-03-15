@@ -306,7 +306,7 @@ local calc_np_auxtable = {
 	  end,
    [id_whatsit] = function(lp) 
 		  if lp.subtype==sid_user then
-		     if lp.user_id==30111 then
+		     if lp.user_id==luatexja.userid_table.IHB then
 			local lq = node_next(lp); 
 			head = node.remove(head, lp); node.free(lp); ihb_flag = true
 			return false, lq;
@@ -981,50 +981,50 @@ function main(ahead, mode)
    return cleanup(mode, last)
 end
 
--- \inhibitglue
-
-function create_inhibitglue_node()
-   local tn = node_new(id_whatsit, sid_user)
-   tn.user_id=30111; tn.type=100; tn.value=1
-   node.write(tn)
-end
-
--- Node for indicating beginning of a paragraph
--- (for ltjsclasses)
-function create_beginpar_node()
-   local tn = node_new(id_whatsit, sid_user)
-   tn.user_id=30114; tn.type=100; tn.value=1
-   node.write(tn)
-end
-
 do
+   local IHB  = luatexja.userid_table.IHB
+   local BPAR = luatexja.userid_table.BPAR
 
-local function whatsit_callback(Np, lp, Nq)
-   if Np and Np.nuc then return Np 
-   elseif Np and lp.user_id == 30114 then
-      Np.first = lp; Np.nuc = lp; Np.last = lp
-      Np.char = 'parbdd'
-      Np.met = nil
-      Np.pre = 0; Np.post = 0
-      Np.xspc = 0
-      Np.auto_xspc = false
-      return Np
+   -- \inhibitglue
+   function create_inhibitglue_node()
+      local tn = node_new(id_whatsit, sid_user)
+      tn.user_id=IHB; tn.type=100; tn.value=1
+      node.write(tn)
    end
-end
 
-
-local function whatsit_after_callback(s, Nq, Np)
-   if not s and Nq.nuc.user_id == 30114 then
-      local x, y = node.prev(Nq.nuc), Nq.nuc
-      Nq.first, Nq.nuc, Nq.last = x, x, x
-      head = node.remove(head, y)
+   -- Node for indicating beginning of a paragraph
+   -- (for ltjsclasses)
+   function create_beginpar_node()
+      local tn = node_new(id_whatsit, sid_user)
+      tn.user_id=BPAR; tn.type=100; tn.value=1
+      node.write(tn)
    end
-   return s
-end
 
-luatexbase.add_to_callback("luatexja.jfmglue.whatsit_getinfo", whatsit_callback,
-                           "luatexja.beginpar.np_info", 1)
-luatexbase.add_to_callback("luatexja.jfmglue.whatsit_after", whatsit_after_callback,
-                           "luatexja.beginpar.np_info_after", 1)
+   local function whatsit_callback(Np, lp, Nq)
+      if Np and Np.nuc then return Np 
+      elseif Np and lp.user_id == BPAR then
+         Np.first = lp; Np.nuc = lp; Np.last = lp
+         Np.char = 'parbdd'
+         Np.met = nil
+         Np.pre = 0; Np.post = 0
+         Np.xspc = 0
+         Np.auto_xspc = false
+         return Np
+      end
+   end
+
+   local function whatsit_after_callback(s, Nq, Np)
+      if not s and Nq.nuc.user_id == BPAR then
+         local x, y = node.prev(Nq.nuc), Nq.nuc
+         Nq.first, Nq.nuc, Nq.last = x, x, x
+         head = node.remove(head, y)
+      end
+      return s
+   end
+
+   luatexbase.add_to_callback("luatexja.jfmglue.whatsit_getinfo", whatsit_callback,
+                              "luatexja.beginpar.np_info", 1)
+   luatexbase.add_to_callback("luatexja.jfmglue.whatsit_after", whatsit_after_callback,
+                              "luatexja.beginpar.np_info_after", 1)
 
 end

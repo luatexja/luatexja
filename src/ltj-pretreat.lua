@@ -35,6 +35,7 @@ local attr_icflag = luatexbase.attributes['ltj@icflag']
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjc_is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char
 local attr_orig_char = luatexbase.attributes['ltj@origchar']
+local STCK = luatexja.userid_table.STCK
 
 ------------------------------------------------------------------------
 -- MAIN PROCESS STEP 1: replace fonts
@@ -55,7 +56,7 @@ local function suppress_hyphenate_ja(head)
       elseif pid == id_math then 
 	 p = node_next(p) -- skip math on
 	 while p and p.id~=id_math do p = node_next(p) end
-      elseif pid == id_whatsit and p.subtype==sid_user and p.user_id==30112 then
+      elseif pid == id_whatsit and p.subtype==sid_user and p.user_id==STCK then
 	 wt[#wt+1] = p; head = node_remove(head, p)
       end
       p = node_next(p)

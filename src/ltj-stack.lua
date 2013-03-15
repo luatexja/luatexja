@@ -15,6 +15,7 @@ luatexja.load_module('base');      local ltjb = luatexja.base
 local node_new = node.new
 local id_whatsit = node.id('whatsit')
 local sid_user = node.subtype('user_defined')
+local STCK = luatexja.userid_table.STCK
 hmode = 0 -- dummy 
 
 charprop_stack_table={}; 
@@ -40,7 +41,7 @@ function get_stack_level()
       if tex.nest[tex.nest.ptr].mode == hmode or
 	 tex.nest[tex.nest.ptr].mode == -hmode then
 	 local g = node_new(id_whatsit, sid_user)
-	 g.user_id=30112; g.type=100; g.value=j; node.write(g)
+	 g.user_id=STCK; g.type=100; g.value=j; node.write(g)
       end
    end
    return i
