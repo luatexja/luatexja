@@ -101,6 +101,7 @@ local function make_cid_font()
    savepath = file.join(savepath, "ltj-cid-auto-" 
 			.. string.lower(cid_name)  .. ".lua")
    if file.iswritable(savepath) then
+      cidfont_data[cid_name].characters[46].width = 655360/14;
       table.tofile(savepath, cidfont_data[cid_name],'return', false, true, false )
    else 
       ltjb.package_warning('luatexja', 
