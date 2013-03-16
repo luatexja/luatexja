@@ -22,92 +22,120 @@ local path           = {
 local cid_reg, cid_order, cid_supp, cid_name
 local taux_dir = 'luatex-cache/luatexja'
 local cid_replace = {
-   ["Adobe-Japan1"] = "UniJIS2004-UTF32", -- JIS X 0213:2004
-   ["Adobe-Korea1"] = "UniKS-UTF32",
-   ["Adobe-GB1"]    = "UniGB-UTF32",
-   ["Adobe-CNS1"]   = "UniCNS-UTF32",
+   ["Adobe-Japan1"] = {"UniJIS-UTF32", 23057, "UniJIS2004-UTF32"},
+                       -- 基本的には JIS X 0208:1990 に沿ったマッピングだが
+                       -- JIS X 0213:2004 のみにある字はそっちを使う
+   ["Adobe-Korea1"] = {"UniKS-UTF32",  18351},
+   ["Adobe-GB1"]    = {"UniGB-UTF32",  30283},
+   ["Adobe-CNS1"]   = {"UniCNS-UTF32", 19155},
 }
 
 -- reading CID maps
-local line, fh, tt
-
-local function load_bf_char()
-   local cid, ucs, ucsa
-   line = fh:read("*l")
-   while line do
-      if line == "endcidchar" then 
-	 line = fh:read("*l"); return
-      else -- WMA l is in the form "<%x+>%s%d+"
-	 ucs, cid = string.match(line, "<(%x+)>%s+(%d+)")
-	 cid = tonumber(cid, 10); ucs = tonumber(ucs, 16); 
-	 if not tt[ucs]  then 
-	    tt[ucs] = { index = cid } 
-	 end
-      end
+do
+   local line, fh -- line, file handler
+   local tt, cidm  -- characters, cid->glyph_index
+   
+   local function load_bf_char()
+      local cid, ucs, ucsa
       line = fh:read("*l")
-   end
-end
-
-local function load_bf_range()
-   local bucs, eucs, cid
-   line = fh:read("*l")
-   while line do
-      if line == "endcidrange" then 
-	 line = fh:read("*l"); return
-      else -- WMA l is in the form "<%x+>%s+<%x+>"
-	 bucs, eucs, cid = string.match(line, "<(%x+)>%s+<(%x+)>%s+(%d+)")
-	 cid = tonumber(cid, 10); bucs = tonumber(bucs, 16); eucs = tonumber(eucs, 16);
-	 for ucs = bucs, eucs do
-	    if not tt[ucs]  then 
-	       tt[ucs] = { index = cid }
-	    end
-	    cid = cid+1
-	 end
+      while line do
+         if line == "endcidchar" then 
+            line = fh:read("*l"); return
+         else -- WMA l is in the form "<%x+>%s%d+"
+            ucs, cid = string.match(line, "<(%x+)>%s+(%d+)")
+            cid = tonumber(cid, 10); ucs = tonumber(ucs, 16); 
+            if not tt[ucs]  then 
+               tt[ucs] = { index = cid }; cidm[cid]=ucs
+            end
+         end
+         line = fh:read("*l")
       end
+   end
+
+   local function load_bf_range()
+      local bucs, eucs, cid
       line = fh:read("*l")
-   end
-end
-
-local function make_cid_font()
-   cidfont_data[cid_name] = {
-      cidinfo = { ordering=cid_order, registry=cid_reg, supplement=cid_supp },
-      encodingbytes = 2, extend=1000, format = 'opentype',
-      direction = 0, characters = {}, parameters = {}, embedding = "no", cache = "yes", 
-      ascender = 0, descender = 0, factor = 0, hfactor = 0, vfactor = 0, 
-   }
-   tt = {}
-
-   -- Open
-   -- TODO: vertical fonts?
-   fh = io.open(kpse.find_file(cid_replace[cid_name] .. "-H", 'cmap files'), "r")
-   line = fh:read("*l")
-   while line do
-      if string.find(line, "%x+%s+begincidchar") then
-	 load_bf_char()
-      elseif string.find(line, "%x+%s+begincidrange") then
-	 load_bf_range()
-      else
-	 line = fh:read("*l")
+      while line do
+         if line == "endcidrange" then 
+            line = fh:read("*l"); return
+         else -- WMA l is in the form "<%x+>%s+<%x+>"
+            bucs, eucs, cid = string.match(line, "<(%x+)>%s+<(%x+)>%s+(%d+)")
+            cid = tonumber(cid, 10); bucs = tonumber(bucs, 16)
+            eucs = tonumber(eucs, 16);
+            for ucs = bucs, eucs do
+               if not tt[ucs]  then 
+                  tt[ucs] = { index = cid }; cidm[cid]=ucs
+               end
+               cid = cid+1
+            end
+         end
+         line = fh:read("*l")
       end
    end
-   fh:close();  cidfont_data[cid_name].characters = tt
-   cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
 
-   -- Save
-   local savepath  = path.localdir .. '/luatexja/'
-   if not lfs.isdir(savepath) then
-      dir.mkdirs(savepath)
+   local function open_cmap_file(name)
+      fh = io.open(kpse.find_file(name, 'cmap files'), "r")
+      line = fh:read("*l")
+      while line do
+         if string.find(line, "%x+%s+begincidchar") then
+            load_bf_char()
+         elseif string.find(line, "%x+%s+begincidrange") then
+            load_bf_range()
+         else
+            line = fh:read("*l")
+         end
+      end
+      fh:close();  
    end
-   savepath = file.join(savepath, "ltj-cid-auto-" 
-			.. string.lower(cid_name)  .. ".lua")
-   if file.iswritable(savepath) then
-      cidfont_data[cid_name].characters[46].width = 655360/14;
-      table.tofile(savepath, cidfont_data[cid_name],'return', false, true, false )
-   else 
-      ltjb.package_warning('luatexja', 
-			   'failed to save informations of non-embedded 2-byte fonts', '')
+   
+   function make_cid_font()
+      cidfont_data[cid_name] = {
+         cidinfo = { ordering=cid_order, registry=cid_reg, supplement=cid_supp },
+         encodingbytes = 2, extend=1000, format = 'opentype',
+         direction = 0, characters = {}, parameters = {}, embedding = "no", cache = "yes", 
+         ascender = 0, descender = 0, factor = 0, hfactor = 0, vfactor = 0, 
+      }
+      tt, cidm = {}, {}
+      for i = 0,cid_replace[cid_name][2] do cidm[i] = -1 end
+      
+      -- Open
+      -- TODO: vertical fonts?
+      open_cmap_file(cid_replace[cid_name][1] .. "-H")
+      if cid_replace[cid_name][3] then
+         open_cmap_file(cid_replace[cid_name][3] .. "-H")
+      end
+      cidfont_data[cid_name].characters = tt
+      
+      -- Unicode にマップされなかった文字．
+      -- これらは TrueType フォントを使って表示するときはおかしくなる
+      local ttu, pricode = {}, 0xF0000
+      for i,v in ipairs(cidm) do
+         if v==-1 then 
+            tt[pricode], cidm[i], pricode=  { index = i }, pricode, pricode+1;
+         end
+         ttu[cid_order .. '.' .. i] = cidm[i]
+      end
+      cidfont_data[cid_name].unicodes = ttu
+      
+      cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
+      
+      -- Save
+      local savepath  = path.localdir .. '/luatexja/'
+      if not lfs.isdir(savepath) then
+         dir.mkdirs(savepath)
+      end
+      savepath = file.join(savepath, "ltj-cid-auto-" 
+                           .. string.lower(cid_name)  .. ".lua")
+      if file.iswritable(savepath) then
+         cidfont_data[cid_name].characters[46].width = math.floor(655360/14);
+         table.tofile(savepath, cidfont_data[cid_name],'return', false, true, false )
+      else 
+         ltjb.package_warning('luatexja', 
+                              'failed to save informations of non-embedded 2-byte fonts', '')
+      end
    end
 end
+local make_cid_font = make_cid_font
 
 -- 
 local function read_cid_font()
