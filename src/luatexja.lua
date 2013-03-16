@@ -19,7 +19,7 @@ function luatexja.load_module(name)
 	 luatexja.error("File `" .. fn .. "' not found", 
 			{'This file ' .. fn .. ' is required for LuaTeX-ja.', 'Please check your installation.'})
       else 
-	 texio.write('(' .. found .. ')\n')
+	 texio.write_nl('(' .. found .. ')')
 	 dofile(found)
       end
    end
@@ -29,7 +29,7 @@ function luatexja.load_lua(fn)
    if not found then
       error("File `" .. fn .. "' not found")
    else 
-      texio.write('(' .. found .. ')\n')
+      texio.write_nl('(' .. found .. ')')
       dofile(found)
    end
 end
