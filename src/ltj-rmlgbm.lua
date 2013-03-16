@@ -35,52 +35,52 @@ do
    local line, fh -- line, file handler
    local tt, cidm  -- characters, cid->glyph_index
    
-   local function load_bf_char()
+   local function load_cid_char(cid_dec, mke)
       local cid, ucs, ucsa
       line = fh:read("*l")
       while line do
-         if line == "endcidchar" then 
+         if string.find(line, "end...?char") then 
             line = fh:read("*l"); return
          else -- WMA l is in the form "<%x+>%s%d+"
-            ucs, cid = string.match(line, "<(%x+)>%s+(%d+)")
-            cid = tonumber(cid, 10); ucs = tonumber(ucs, 16); 
+            ucs, cid = string.match(line, "<(%x+)>%s+<?(%x+)>?")
+            cid = cid_dec(cid); ucs = tonumber(ucs, 16); 
             if not tt[ucs]  then 
-               tt[ucs] = { index = cid }; cidm[cid]=ucs
+               tt[ucs] = mke(cid); cidm[cid]=ucs
             end
          end
          line = fh:read("*l")
       end
    end
 
-   local function load_bf_range()
+   local function load_cid_range(inc, cid_dec, mke)
       local bucs, eucs, cid
       line = fh:read("*l")
       while line do
-         if line == "endcidrange" then 
+        if string.find(line, "end...?range") then 
             line = fh:read("*l"); return
          else -- WMA l is in the form "<%x+>%s+<%x+>"
-            bucs, eucs, cid = string.match(line, "<(%x+)>%s+<(%x+)>%s+(%d+)")
-            cid = tonumber(cid, 10); bucs = tonumber(bucs, 16)
-            eucs = tonumber(eucs, 16);
+            bucs, eucs, cid = string.match(line, "<(%x+)>%s+<(%x+)>%s+<?(%x+)>?")
+            cid = cid_dec(cid); 
+	    bucs = tonumber(bucs, 16); eucs = tonumber(eucs, 16)
             for ucs = bucs, eucs do
                if not tt[ucs]  then 
-                  tt[ucs] = { index = cid }; cidm[cid]=ucs
+                  tt[ucs] = mke(cid); cidm[cid]=ucs
                end
-               cid = cid+1
+               cid = inc(cid)
             end
          end
          line = fh:read("*l")
       end
    end
 
-   local function open_cmap_file(name)
+   local function open_cmap_file(name, inc, cid_dec, mke)
       fh = io.open(kpse.find_file(name, 'cmap files'), "r")
       line = fh:read("*l")
       while line do
-         if string.find(line, "%x+%s+begincidchar") then
-            load_bf_char()
-         elseif string.find(line, "%x+%s+begincidrange") then
-            load_bf_range()
+         if string.find(line, "%x+%s+begin...?char") then
+            load_cid_char(cid_dec, mke)
+         elseif string.find(line, "%x+%s+begin...?range") then
+            load_cid_range(inc, cid_dec, mke)
          else
             line = fh:read("*l")
          end
@@ -88,25 +88,30 @@ do
       fh:close();  
    end
    
+   local function increment(a) return a+1 end
+   local function entry(a)     return {index = a} end
    function make_cid_font()
       cidfont_data[cid_name] = {
          cidinfo = { ordering=cid_order, registry=cid_reg, supplement=cid_supp },
          encodingbytes = 2, extend=1000, format = 'opentype',
          direction = 0, characters = {}, parameters = {}, embedding = "no", cache = "yes", 
-         ascender = 0, descender = 0, factor = 0, hfactor = 0, vfactor = 0, 
+         ascender = 0, descender = 0, factor = 0, hfactor = 0, vfactor = 0,
+	 tounicode = 1,
       }
+
+      -- CID => Unicode 負号空間
+      -- TODO: vertical fonts?
       tt, cidm = {}, {}
       for i = 0,cid_replace[cid_name][2] do cidm[i] = -1 end
-      
-      -- Open
-      -- TODO: vertical fonts?
-      open_cmap_file(cid_replace[cid_name][1] .. "-H")
+      open_cmap_file(cid_replace[cid_name][1] .. "-H",
+		     increment, tonumber, entry)
       if cid_replace[cid_name][3] then
-         open_cmap_file(cid_replace[cid_name][3] .. "-H")
+         open_cmap_file(cid_replace[cid_name][3] .. "-H",
+			increment, tonumber, entry)
       end
       cidfont_data[cid_name].characters = tt
-      
-      -- Unicode にマップされなかった文字．
+
+      -- Unicode にマップされなかった文字の処理
       -- これらは TrueType フォントを使って表示するときはおかしくなる
       local ttu, pricode = {}, 0xF0000
       for i,v in ipairs(cidm) do
@@ -115,10 +120,29 @@ do
          end
          ttu[cid_order .. '.' .. i] = cidm[i]
       end
-      cidfont_data[cid_name].unicodes = ttu
-      
+      cidfont_data[cid_name].unicodes = ttu      
       cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
-      
+
+      -- tounicode エントリ
+      local cidp = {nil, nil}; local cidmo = cidm
+      tt, ttu, cidm = {}, {}, {}
+      open_cmap_file(cid_name .. "-UCS2",
+		     function(a) 
+			a[2] = a[2] +1 ; return a
+		     end, 
+		     function(a) 
+			cidp[1] = string.upper(string.sub(a,1,string.len(a)-4))
+			cidp[2] = tonumber(string.sub(a,-4),16)
+			return cidp
+		     end,
+		     function(a) return a[1] ..string.format('%04X',a[2])  end)
+      -- tt は cid -> tounicode になっているので cidm -> tounicode に変換
+      for i,v in ipairs(cidmo) do
+	 if v>=0xF0000 then
+	    cidfont_data[cid_name].characters[v].tounicode = tt[i]
+	 end
+      end
+
       -- Save
       local savepath  = path.localdir .. '/luatexja/'
       if not lfs.isdir(savepath) then
@@ -128,6 +152,7 @@ do
                            .. string.lower(cid_name)  .. ".lua")
       if file.iswritable(savepath) then
          cidfont_data[cid_name].characters[46].width = math.floor(655360/14);
+	 -- Standard fonts are ``seriffed''. 
          table.tofile(savepath, cidfont_data[cid_name],'return', false, true, false )
       else 
          ltjb.package_warning('luatexja', 
