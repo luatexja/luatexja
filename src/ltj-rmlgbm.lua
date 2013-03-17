@@ -3,8 +3,8 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.rmlgbm',
-  date = '2012/04/21',
-  version = '0.3',
+  date = '2013/03/17',
+  version = '0.4',
   description = 'Definitions of non-embedded Japanese (or other CJK) fonts',
 })
 module('luatexja.rmlgbm', package.seeall)
@@ -22,12 +22,39 @@ local path           = {
 local cid_reg, cid_order, cid_supp, cid_name
 local taux_dir = 'luatex-cache/luatexja'
 local cid_replace = {
-   ["Adobe-Japan1"] = {"UniJIS-UTF32", 23057, "UniJIS2004-UTF32"},
+   ["Adobe-Japan1"] = {"UniJIS-UTF32", 23057, 
+		       function (i)
+			  if (231<=i and i<=632) or (8718<=i and i<=8719) 
+		             or (12063<=i and i<=12087) then
+			     return 327680 -- 655360/2
+			  elseif 9758<=i and i<=9778 then
+			     return 218453 -- 655360/3
+			  elseif 9738<=i and i<=9757 then
+			     return 163840 -- 655360/4
+			  end
+		       end, 
+		       "UniJIS2004-UTF32"},
                        -- 基本的には JIS X 0208:1990 に沿ったマッピングだが
-                       -- JIS X 0213:2004 のみにある字はそっちを使う
-   ["Adobe-Korea1"] = {"UniKS-UTF32",  18351},
-   ["Adobe-GB1"]    = {"UniGB-UTF32",  30283},
-   ["Adobe-CNS1"]   = {"UniCNS-UTF32", 19155},
+                       -- JIS X 0213:2004 のみにある字も使えるようにする
+   ["Adobe-Korea1"] = {"UniKS-UTF32",  18351,
+		       function (i)
+			  if 8094<=i and i<=8100 then 
+			     return 327680 -- 655360/2
+			  end
+		       end},
+   ["Adobe-GB1"]    = {"UniGB-UTF32",  30283,
+		       function (i)
+			  if (814<=i and i<=939) or (i==7716) 
+		             or (22355<=i and i<=22357) then
+			     return 327680 -- 655360/2
+			  end
+		       end},
+   ["Adobe-CNS1"]   = {"UniCNS-UTF32", 19155,
+		       function (i)
+			  if (13648<=i and i<=13742) or (i==17603) then
+			     return 327680 -- 655360/2
+			  end
+		       end},
 }
 
 -- reading CID maps
@@ -91,25 +118,25 @@ do
    local function increment(a) return a+1 end
    local function entry(a)     return {index = a} end
    function make_cid_font()
-      cidfont_data[cid_name] = {
+      local k = {
          cidinfo = { ordering=cid_order, registry=cid_reg, supplement=cid_supp },
          encodingbytes = 2, extend=1000, format = 'opentype',
          direction = 0, characters = {}, parameters = {}, embedding = "no", cache = "yes", 
          ascender = 0, descender = 0, factor = 0, hfactor = 0, vfactor = 0,
 	 tounicode = 1,
       }
+      local kx = cid_replace[cid_name]
+      cidfont_data[cid_name] = k
 
       -- CID => Unicode 負号空間
       -- TODO: vertical fonts?
       tt, cidm = {}, {}
-      for i = 0,cid_replace[cid_name][2] do cidm[i] = -1 end
-      open_cmap_file(cid_replace[cid_name][1] .. "-H",
-		     increment, tonumber, entry)
-      if cid_replace[cid_name][3] then
-         open_cmap_file(cid_replace[cid_name][3] .. "-H",
-			increment, tonumber, entry)
+      for i = 0,kx[2] do cidm[i] = -1 end
+      open_cmap_file(kx[1] .. "-H", increment, tonumber, entry)
+      if kx[4] then
+         open_cmap_file(kx[4] .. "-H", increment, tonumber, entry)
       end
-      cidfont_data[cid_name].characters = tt
+      k.characters = tt
 
       -- Unicode にマップされなかった文字の処理
       -- これらは TrueType フォントを使って表示するときはおかしくなる
@@ -120,8 +147,8 @@ do
          end
          ttu[cid_order .. '.' .. i] = cidm[i]
       end
-      cidfont_data[cid_name].unicodes = ttu      
-      cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
+      k.unicodes = ttu      
+      cache_chars[cid_name]  = { [655360] = k.characters }
 
       -- tounicode エントリ
       local cidp = {nil, nil}; local cidmo = cidm
@@ -138,8 +165,9 @@ do
 		     function(a) return a[1] ..string.format('%04X',a[2])  end)
       -- tt は cid -> tounicode になっているので cidm -> tounicode に変換
       for i,v in ipairs(cidmo) do
+	 k.characters[v].width = kx[3](i)
 	 if v>=0xF0000 then
-	    cidfont_data[cid_name].characters[v].tounicode = tt[i]
+	    k.characters[v].tounicode = tt[i]
 	 end
       end
 
@@ -151,9 +179,9 @@ do
       savepath = file.join(savepath, "ltj-cid-auto-" 
                            .. string.lower(cid_name)  .. ".lua")
       if file.iswritable(savepath) then
-         cidfont_data[cid_name].characters[46].width = math.floor(655360/14);
+         k.characters[46].width = math.floor(655360/14);
 	 -- Standard fonts are ``seriffed''. 
-         table.tofile(savepath, cidfont_data[cid_name],'return', false, true, false )
+         table.tofile(savepath, k,'return', false, true, false )
       else 
          ltjb.package_warning('luatexja', 
                               'failed to save informations of non-embedded 2-byte fonts', '')
