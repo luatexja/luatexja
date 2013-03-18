@@ -171,6 +171,17 @@ do
 	 end
       end
 
+      -- shared
+      k.shared = {
+         otfdata = { 
+            cidinfo= k.cidinfo, verbose = false, 
+            shared = { featuredata = {}, }, 
+            luatex = { features = {}, defaultwidth=1000, sequences = {  }, },
+         },
+         dynamics = {}, features = {}, processes = {}, 
+      }
+      k.descriptions = {}
+
       -- Save
       local savepath  = path.localdir .. '/luatexja/'
       if not lfs.isdir(savepath) then
