@@ -23,6 +23,7 @@ echo
 git commit -m "Releases $VER" --allow-empty
 git archive --format=tar --prefix=$PROJECT-$VER/ HEAD | (cd $TEMP && tar xf -)
 cd $TEMP
+rm -rf $PROJECT-$VER/test
 rm -rf $PROJECT-$VER-orig
 cp -r $PROJECT-$VER $PROJECT-$VER-orig
 cd $PROJECT-$VER
