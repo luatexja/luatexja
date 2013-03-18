@@ -840,7 +840,7 @@ $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
 \end{flushleft}
 \item 现在\LuaTeX-ja可以在下列仓库和发行版中获取：:
   \begin{itemize}
-  \item CTAN ( \texttt{macros/luatex/generic/luatexja}）
+  \item CTAN (\texttt{macros/luatex/generic/luatexja}）
   \item MiK\TeX\ (\texttt{luatexja.tar.lzma})
   \item \TeX\ Live （\texttt{texmf-dist/tex/luatex/luatexja}）
   \item W32\TeX\ （\texttt{luatexja.tar.xz}）
@@ -1888,7 +1888,7 @@ If you want to use these functions, load \Pkg{luatexja-otf} package.
 森\UTF{9DD7}外と内田百\UTF{9592}とが\UTF{9AD9}島屋に行く。
 
 \CID{7652}飾区の\CID{13706}野家，
-葛飾区の吉野家，
+\CID{1481}城市，葛西駅，
 高崎と\CID{8705}\UTF{FA11}
 
 \aj半角{はんかくカタカナ}
@@ -2887,13 +2887,13 @@ JFMの名前を指定する．もし以前に指定されたJFMが読み込ま�
 \label{tab-difjfm}
 \ltjsetparameter{jacharrange={+3}}
 \begin{center}\small
-\def\r#1{{\jfont\g=psft:Ryumin-Light:jfm=#1 at 14.43324pt \g
+\def\r#1{{\jfont\g=name:IPAMincho:jfm=#1 at 14.43324pt \g
 \setbox0=\vtop{\hsize=7\zw\noindent ◆◆◆◆◆◆◆
 ある日モモちゃんがお使いで迷子になって泣きました．}\copy0
 \vrule height 0pt depth \dp0}}
-\def\s#1{{\jfont\g=psft:Ryumin-Light:jfm=#1 at 14.43324pt \g
+\def\s#1{{\jfont\g=name:IPAMincho:jfm=#1 at 14.43324pt \g
 \setbox0=\vtop{\hsize=7\zw\noindent ちょっと！何}\copy0}}
-\def\t#1{{\jfont\g=psft:Ryumin-Light:jfm=#1 at 19.24432pt \g
+\def\t#1{{\jfont\g=name:IPAMincho:jfm=#1 at 19.24432pt \g
 \setbox0=\hbox{漢}%
 \vrule width 0.4pt height\ht0 depth\dp0\kern-.2pt\copy0
 \kern-\wd0\vrule width\wd0height .2pt depth .2pt
@@ -3224,8 +3224,8 @@ This field is a list of characters which are in this character
 	     \textbf{JAchar}s). In the list, character(s) can be specified in the following form:
 \begin{itemize}
 \item a Unicode code point
-\item the character itself (as a Lua string, like \verb+'あ'+)
-\item a string like \verb+'あ*'+ (the character followed by an asterisk)
+\item the character itself (as a Lua string, like \hbox{\ltjsetparameter{autoxspacing=false}\verb+'あ'+})
+\item a string like \hbox{\ltjsetparameter{autoxspacing=false}\verb+'あ*'+} (the character followed by an asterisk)
 \item several ``imaginary'' characters (We will describe these later.)
 \end{itemize}
 %</en>
@@ -3235,8 +3235,8 @@ This field is a list of characters which are in this character
 除いた全ての\textbf{JAchar}が属するから）．このリスト中で文字を指定するには，以下の方法がある：
 \begin{itemize}
 \item Unicode におけるコード番号
-\item 「\verb+'あ'+」のような，文字それ自体
-\item 「\verb+'あ*'+」のような，文字それ自体の後にアスタリスクをつけたもの
+\item 「\hbox{\ltjsetparameter{autoxspacing=false}\verb+'あ'+}」のような，文字それ自体
+\item 「\hbox{\ltjsetparameter{autoxspacing=false}\verb+'あ*'+}」のような，文字それ自体の後にアスタリスクをつけたもの
 \item いくつかの「仮想的な文字」（後に説明する）
 \end{itemize}
 %</ja>
@@ -3262,7 +3262,7 @@ But there is one exception: if \texttt{'prop'} is specified in \texttt{width} fi
 文字クラス$i$に属する文字の幅，高さ，深さ，イタリック補正の量を指定する．
 文字クラス$i$に属する全ての文字は，その幅，高さ，深さがこのフィールドで指定した
 値であるものとして扱われる．
-しかし，例外が一つある：もし\texttt{'prop'}が\texttt{width}フィールドに
+しかし，例外が一つある：もし \texttt{'prop'} が \texttt{width} フィールドに
 指定された場合，文字の幅はその「実際の」グリフの幅となる．
 %</ja>
 %<*zh>
@@ -3430,7 +3430,7 @@ Furthermore, the glyph is shifted according to values of fields
 \label{fig-pos}
 \end{figure}
 
-\item[kern={\{[$j$]=<kern>, [$j'$]=\{<kern>, [<ratio>]\}...\}}]
+\item[kern={\{[$j$]=<kern>, [$j'$]=\{<kern>, [<ratio>]\}, ...\}}]
 
 \item[glue={\{[$j$]=\{<width>, <stretch>, <shrink>, [<priority>], [<ratio>]\}, ...\}}]
 %<*ja>
@@ -3494,7 +3494,7 @@ Furthermore, the glyph is shifted according to values of fields
 \end{lstlisting}
 句点「。」の幅は二分であるので
 \begin{LTXexample}
-\jfont\a=psft:Ryumin-Light:jfm=test;+vert
+\jfont\a=name:IPAMincho:jfm=test;+vert
 \setbox0\hbox{\a 。\inhibitglue 漢}
 \the\wd0
 \end{LTXexample}
@@ -3510,7 +3510,7 @@ Furthermore, the glyph is shifted according to values of fields
 一方，「\texttt{'、*'}」のようにアスタリスクつきの指定があると，
 状況は異なってくる．
 \begin{LTXexample}
-\jfont\a=psft:Ryumin-Light:jfm=test;+vert
+\jfont\a=name:IPAMincho:jfm=test;+vert
 \a 漢、\inhibitglue 漢
 \end{LTXexample}
 ここで，読点「、」の文字クラスは，以下のようにして決まる．
@@ -3524,7 +3524,7 @@ Furthermore, the glyph is shifted according to values of fields
 
 なお，置換後のグリフで判定した文字クラスの値が0でなければ，そちらをそのまま作用する．
 \begin{LTXexample}
-\jfont\a=psft:Ryumin-Light:jfm=test;+hwid
+\jfont\a=name:IPAMincho:jfm=test;+hwid
 \a 漢ﾋひ
 \end{LTXexample}
 上の例では，
@@ -3628,7 +3628,7 @@ The following is the list of `imaginary characters':
 \texttt{'parbdd'}を入れれば全角下がりとなる．
 
 \begin{LTXexample}
-\jfont\g=psft:Ryumin-Light:jfm=test \g
+\jfont\g=name:IPAMincho:jfm=test \g
 \parindent1\zw\noindent{}◆◆◆◆◆
 \par 「◆◆←二分下がり
 \par 【◆◆←全角下がり
@@ -4293,7 +4293,7 @@ the beginning of a box and `あ', and also between `あ' and `ウ'.
 %</zh>
 
 \begin{LTXexample}
-\jfont\g=psft:Ryumin-Light:jfm=test \g
+\jfont\g=name:IPAMincho:jfm=test \g
 \fbox{\hbox{あウあ\inhibitglue ウ}}
 \inhibitglue\par\noindent あ1
 \par\inhibitglue\noindent あ2
@@ -4599,6 +4599,13 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
 できる．\ref{ssec-psft}節を参照．
 %</ja>
 \end{list}
+
+%<*ja>
+なお，\texttt{luatexja-fontspec.sty} 読み込み時には和文フォント定義ファイル%
+\texttt{<ja-enc><family>.fd}は全く参照されなくなる．
+%</ja>
+
+
 
 \subsection{\texttt{luatexja-otf.sty}}
 
