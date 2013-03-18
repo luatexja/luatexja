@@ -58,7 +58,7 @@
 \DeclareFontShape{ZH}{hei}{m}{n}{<->name:SimHei:jfm=jis}{}
 \DeclareFontShape{ZH}{hei}{bx}{n}{<->ssub*hei/m/n}{}
 \DeclareKanjiFamily{ZH}{mincho}{}
-\DeclareFontShape{ZH}{mincho}{m}{n}{<->psft:KozMinPr6N-Regular:cid=Adobe-Japan1-6;jfm=jis}{}
+\DeclareFontShape{ZH}{mincho}{m}{n}{<->name:KozMinPr6N-Regular:cid=Adobe-Japan1-6;jfm=jis}{}
 \fontencoding{ZH}\selectfont
 \DeclareTextFontCommand{\textsong}{\songfamily}
 \DeclareTextFontCommand{\texthei}{\heifamily}
@@ -133,7 +133,7 @@
 
 %%%%%%%% fonts
 \usepackage{luatexja-otf}
-\usepackage[jis2004]{luatexja-preset}
+\usepackage[jis2004,ipa]{luatexja-preset}
 %<!en>\usepackage{amssymb}
 %<*en>
 \usepackage{unicode-math}
@@ -573,15 +573,6 @@ We say `alphabetic fonts' for fonts used in \textbf{ALchar}, and `Japanese fonts
 \item 用下划线表示的词（如：\Pkg{fontspec}）表示\LaTeX 的宏包或者文档类。
 %</zh>
 
-%<*en>
-\item The word `primitive' is used not only for primitives in \LuaTeX,
-      but also for control sequences that defined in the core module of
-      \LuaTeX-ja.
-%</en>
-%<*ja>
-\item 「プリミティブ」という語を，\LuaTeX のプリミティブだけではなく \LuaTeX-ja
-      のコアモジュールで定義されたコントロールシーケンスに対しても用いる．
-%</ja>
 %<*zh>
 \item “primitive”，该词在本文档中不仅表示\LuaTeX 的基本控制命令，也包括\LuaTeX-ja的相关的基本控制命令
 %</zh>
@@ -692,16 +683,59 @@ To install the \LuaTeX-ja\ package, you will need:
 %</zh>
 \begin{itemize}
 %<*en>
-\item \LuaTeX\ (version 0.65.0-beta or later) and its supporting packages.\\
-If you are using \TeX~Live~2011 or current W32\TeX, you don't have to worry.
+\item \LuaTeX\ (version 0.65.0-beta or later) and its supporting packages.
+
+You might need to add the following lines to 
+\texttt{lualatex.ini} (just before \verb+\dump+ in the last line), 
+if you are using recent \LuaTeX\ whose Lua is 5.2.
 %</en>
 %<*ja>
-\item \LuaTeX（バージョン 0.65.0-beta 以降）とその支援パッケージ．
-      \TeX~Live~2011やW32\TeX の最新版ならば問題ない．
+\item \LuaTeX（バージョン 0.65.0-beta以降）とその支援パッケージ．
+
+Lua 5.2を用いた\LuaTeX（バージョン0.74.0-beta以降）では，\texttt{lualatex.ini}\ 
+に次の行を加える必要があるかもしれない（\verb+\dump+ の前に）．
 %</ja>
+%<*!zh>
+\begin{lstlisting}
+{\catcode`\#=12\catcode`\~=12%
+\global\everyjob\expandafter{\the\everyjob%
+  \directlua{%
+    if not table.maxn then
+      table.maxn = function(t)
+          local r = 0
+          for i,_ in pairs(t) do
+            if type(i)=='number' then
+              if i>r then r=i end
+            end
+          end
+         return r
+      end
+    end
+    if not package.loaders then package.loaders=package.searchers end
+    if not string.explode then
+      string.explode = function (str, separator)
+        if not separator then separator=" +"  end
+        local t, nexti, pos = { }, 1, 1
+        while true do
+          local st, sp = str:find (separator, pos)
+          if not st then break end
+          if pos ~= st then
+            t [ nexti ] = str:sub ( pos , st - 1 )
+            nexti = nexti + 1
+          end
+          pos = sp + 1
+        end
+        t [ nexti ] = str:sub ( pos )
+        return t
+      end
+    end
+  }%
+}}%
+\end{lstlisting}
+%</!zh>
 %<*zh>
-\item \LuaTeX（版本号为大于0.65）和相关支持宏包。\\
-如果用户使用的是\TeX Live2011以及最新版本的W32\TeX，可不考虑此项。
+\item \LuaTeX（版本号为大于0.65）和相关支持宏包。
+%如果用户使用的是\TeX Live2011以及最新版本的W32\TeX，可不考虑此项。
 %</zh>
 %<*en>
 \item The source archive of \LuaTeX-ja, of course\texttt{:)}
@@ -878,6 +912,13 @@ But only the contents in \texttt{src/} are needed to work \LuaTeX-ja.
 %<*zh>
 \item 源文档编码必须是UTF-8。其他的编码，如EUC-JP和Shift-JIS都不被支持。
 %</zh>
+%<*en>
+\item \LuaTeX-ja is very slower than \pTeX. Using LuaJIT\TeX slightly improve the situation.
+%</en>
+%<*ja>
+\item \LuaTeX-jaは動作が\pTeX に比べて非常に遅い．コードを変更して徐々に速くしているが，
+まだ満足できる速度ではない．LuaJIT\TeX を用いると\LuaTeX のだいたい1.3倍の速度で動くようである．
+%</ja>
 \end{itemize}
 
 %<en>\subsection{Using in plain \TeX}
@@ -947,7 +988,7 @@ This does minimal settings (like \texttt{ptex.tex}) for typesetting Japanese doc
 \begin{itemize}
 %<*en>
 \item It is widely accepted that the font `Ryumin-Light' and
-      `GothicBBB-Medium' aren't embedded into PDF files, and PDF reader
+      `GothicBBB-Medium' aren't embedded into PDF files, and a PDF reader
       substitute them by some external Japanese fonts (\textit{e.g.},
       Kozuka Mincho is used for Ryumin-Light in Adobe Reader). We adopt this custom to
       the default setting.
@@ -1138,11 +1179,11 @@ Okumura), namely, \Pkg{ltjclasses} and \Pkg{ltjsclasses}.
 
 \paragraph{plain \TeX}
 %<*en>
-To change Japanese fonts in plain \TeX, you must use the primitive
+To change Japanese fonts in plain \TeX, you must use the control sequence
 \verb+\jfont+. So please see Subsection~\ref{ssec-jfont}.
 %</en>
 %<*ja>
-plain \TeX で和文フォントを変更するためには，\verb+\jfont+ プリミティブを直接用いる．
+plain \TeX で和文フォントを変更するためには，\pTeX のように \verb+\jfont+ 命令を直接用いる．
 \ref{ssec-jfont}節を参照．
 %</ja>
 %<*zh>
@@ -1843,10 +1884,14 @@ If you want to use these functions, load \Pkg{luatexja-otf} package.
 %</zh>
 
 \begin{LTXexample}
+\jfontspec{KozMinPr6N-Regular.otf}
 森\UTF{9DD7}外と内田百\UTF{9592}とが\UTF{9AD9}島屋に行く。
 
 \CID{7652}飾区の\CID{13706}野家，
-葛飾区の吉野家
+葛飾区の吉野家，
+高崎と\CID{8705}\UTF{FA11}
+
+\aj半角{はんかくカタカナ}
 \end{LTXexample}
 %<*zh>
 \egroup
@@ -1899,13 +1944,13 @@ parameters, you have to use commands \verb+\ltjsetparameter+ and
 %<*en>
 To edit the range of \textbf{JAchar}s, you have to assign a non-zero
 natural number which is less than 217 to the character range first. This
-can be done by using \verb+\ltjdefcharrange+ primitive. For example, the
+can be done by using \verb+\ltjdefcharrange+. For example, the
 next line assigns whole characters in Supplementary Ideographic Plane
 and the character `漢' to the range number~100.
 %</en>
 %<*ja>
 \textbf{JAchar}の範囲を設定するためには，まず各文字に0より大きく217より小さいindexを
-割り当てる必要がある．これには \verb+\ltjdefcharrange+ プリミティブを用いる．
+割り当てる必要がある．これには \verb+\ltjdefcharrange+ を用いる．
 例えば，次のように書くことで追加漢字面(SIP)にある全ての文字と`漢'が
 「100番の文字範囲」に属するように設定される．
 %</ja>
@@ -2693,22 +2738,22 @@ xyz漢字
 %<en>\section{Font Metric and Japanese Font}
 %<ja>\section{フォントメトリックと和文フォント}
 %<zh>\section{字体测度和日文字体}
-%<en>\subsection{\texttt{\char92jfont} primitive}
-%<ja>\subsection{\texttt{\char92jfont}プリミティブ}
+%<en>\subsection{\texttt{\char92jfont}}
+%<ja>\subsection{\texttt{\char92jfont} 命令}
 %<zh>\subsection{\texttt{\char92jfont}基本语句}
 \label{ssec-jfont}
 
 %<*en>
 To load a font as a Japanese font, you must use the
-\verb+\jfont+ primitive instead of~\verb+\font+, while
+\verb+\jfont+ instead of~\verb+\font+, while
 \verb+\jfont+ admits the same syntax used in~\verb+\font+.
 \LuaTeX-ja automatically loads \Pkg{luaotfload} package,
 so TrueType/OpenType fonts with features can be used for Japanese fonts:
 %</en>
 %<*ja>
-フォントを和文フォントとして読み込むためには，\verb+\jfont+ プリミティブを
+フォントを和文フォントとして読み込むためには，\verb+\jfont+ を
 \verb+\font+ プリミティブの代わりに用いる．
-\verb+\jfont+ プリミティブの文法は \verb+\font+ と同じである．
+\verb+\jfont+ の文法は \verb+\font+ と同じである．
 \LuaTeX-jaは\Pkg{luaotfload}パッケージを自動的に読み込むので，
 TrueType/OpenTypeフォントにfeatureを指定したものを和文フォントとして用いる
 ことができる：
@@ -2747,13 +2792,13 @@ causes a error.  We denote control sequences which are defined in
 As noted in Introduction, a JFM has measurements of characters and
 glues/kerns that are automatically inserted for Japanese
 typesetting. The structure of JFM will be described in the next
-subsection. At the calling of \verb+\jfont+ primitive, you must specify
+subsection. At the calling of \verb+\jfont+, you must specify
 which JFM will be used for this font by the following keys:
 %</en>
 %<*ja>
 「はじめに」の節で述べたように，JFMは文字と和文組版で自動的に挿入される
 グルー／カーンの寸法情報を持っている．JFMの構造は次の小節で述べる．
-\verb+\jfont+ プリミティブの呼び出しの際には，どのJFMを用いるのかを以下のキーで
+\verb+\jfont+ 命令の呼び出しの際には，どのJFMを用いるのかを以下のキーで
 指定する必要がある：
 %</ja>
 %<*zh>
@@ -2901,12 +2946,12 @@ JFMに基づくグルー／カーンも挿入される場合には2文字間の�
 \begin{itemize}
 %<*en>
 \item You should specify \texttt{-kern} in
-  \verb+jfont+ primitive, when you want to use other font features,
+  \verb+jfont+ when you want to use other font features,
   such as \texttt{script=...}\,.
 %</en>
 %<*ja>
 \item  \texttt{script=...}といったfeatureを使いたい場合には，\verb+\jfont+
-  プリミティブに\texttt{-kern}を指定するべきである．
+  に\texttt{-kern}を指定するべきである．
 %</ja>
 %<*zh>
 \item 当你想使用其他字体特性如\texttt{script=...}的时候，可以在\verb!jfont!基本语句中设置\texttt{-kern}
@@ -2931,29 +2976,36 @@ TODO: kanjiskip?
 %<zh>\subsection{\texttt{psft}前缀}
 \label{ssec-psft}
 %<*en>
-Besides \texttt{file:}\ and \texttt{name:}\ prefixes, one can use \texttt{psft:}\
-prefix in \verb+\jfont+ (and~\verb+\font+) primitive,
+Besides `\texttt{file:}'\ and `\texttt{name:}'\ prefixes, one can use `\texttt{psft:}'\
+prefix in \verb+\jfont+ (and~\verb+\font+),
 to specify a `name-only' Japanese font which
 will not be embedded to PDF. Typical use of this prefix is to specify
 the `standard' Japanese fonts, namely, `Ryumin-Light' and
 `GothicBBB-Medium'.
+\emph{You should not specify any font features, such as `{\tt +jp90}', 
+in the definition of `name-only' fonts using this `{\tt psft:}'\ prefix.}
 %</en>
 %<*ja>
-\texttt{file:}と\texttt{name:}のプリフィックスに加えて，
-\verb+\jfont+ プリミティブ（と \verb+\font+ プリミティブ）では
+\texttt{file:} と \texttt{name:} のプリフィックスに加えて，
+\verb+\jfont+（と \verb+\font+ プリミティブ）では
 \texttt{psft:}プリフィックスを用いることができる．
 このプリフィックスを用いることで，PDFには埋め込まれない「名前だけの」
 和文フォントを指定することができる．「標準的な」和文フォント，
 つまり`Ryumin-Light'と`GothicBBB-Medium'の指定でこのプリフィックスが使われる．
+\textbf{非埋込フォントをPDFに使用すると，実際にどのようなフォントが表示に用いられるか予測できない．
+そのため，本プリフィックス指定時には，\texttt{+jp90} などのfont featureは指定すべきでない．}
 %</ja>
 %<*zh>
 除使用\texttt{file:}和\texttt{name:}外，我们还可以在\verb!\jfont!（以及\verb!\font!）
 中使用\texttt{psft:}来设定一个“名义上”的并不嵌入PDF中的日文字体。
 此前缀的典型使用是定义“标准”日文字体，即“Ryumin-Light”和“GothicBBB-Medium”。
-\paragraph{\texttt{cid}键} 默认使用\texttt{psft:}前缀定义的字体是为Adobe-Japan1-6 CID字体。
-也可以使用\texttt{cid}键来使用其他的CID字体，如中文和韩文。
 %</zh>
 
+%<*zh>
+\paragraph{\texttt{cid}键} 
+默认使用\texttt{psft:}前缀定义的字体是为Adobe-Japan1-6 CID字体。
+也可以使用\texttt{cid}键来使用其他的CID字体，如中文和韩文。
+%</zh>
 %<en>\paragraph{\texttt{cid} key}
 %<ja>\paragraph{\texttt{cid}キー}
 \label{para-cid}
@@ -3629,8 +3681,8 @@ you can set both \verb+\fam+ and \verb+\jfam+ to the same value.
 %</ja>
 
 \begin{table}[!tb]
-%<en>\caption{Primitives for Japanese math fonts.}
-%<ja>\caption{和文数式フォントに対するプリミティブ．}
+%<en>\caption{Control sequences for Japanese math fonts}
+%<ja>\caption{和文数式フォントに対する命令}
 %<zh>\caption{日语数学字体基本语句}
 \label{tab-math}
 \begin{center}
@@ -3895,13 +3947,13 @@ Then, the position of glyphs is shifted up by
 %<en>\section{Parameters}
 %<ja>\section{パラメータ}
 %<zh>\section{参数}
-%<en>\subsection{\texttt{\char92 ltjsetparameter} primitive}
-%<ja>\subsection{\texttt{\char92 ltjsetparameter}プリミティブ}
+%<en>\subsection{\texttt{\char92 ltjsetparameter}}
+%<ja>\subsection{\texttt{\char92 ltjsetparameter}命令}
 %<zh>\subsection{\texttt{\char92 ltjsetparameter}基本参数}
 
 %<*en>
 As noted before, \verb+\ltjsetparameter+ and \verb+\ltjgetparameter+ are
-primitives for accessing most parameters of \LuaTeX-ja. One of the main
+control sequences for accessing most parameters of \LuaTeX-ja. One of the main
 reason that \LuaTeX-ja didn't adopted the syntax similar to that of \pTeX\
 (\textit{e.g.},~\verb+\prebreakpenalty`）=10000+)
 is the position of \verb+hpack_filter+ callback in the source
@@ -3909,14 +3961,14 @@ of \LuaTeX, see Section~\ref{sec-para}.
 %</en>
 %<*ja>
 先に述べたように，\verb+\ltjsetparameter+ と \verb+\ltjgetparameter+ は
-\LuaTeX-jaのほとんどのパラメータにアクセスするためのプリミティブである．
+\LuaTeX-jaのほとんどのパラメータにアクセスするための命令である．
 \LuaTeX-jaが\pTeX のような文法（例えば，\verb+\prebreakpenalty`）=10000+）を
 採用しない理由の一つは，\LuaTeX のソースにおける \verb+hpack_filter+
 コールバックの位置にある．\ref{sec-para}節を参照．
 %</ja>
 
 %<*en>
-\verb+\ltjsetparameter+ and \verb+\ltjglobalsetparameter+ are primitives
+\verb+\ltjsetparameter+ and \verb+\ltjglobalsetparameter+ are control sequences
 for assigning parameters. These take one argument which is a
 \texttt{<key>=<value>} list. Allowed keys are described in the next
 subsection.
@@ -3930,7 +3982,7 @@ like other assignment.
 %</en>
 %<*ja>
 \verb+\ltjsetparameter+ と \verb+\ltjglobalsetparameter+ はパラメータを
-指定するためのプリミティブである．これらは\texttt{<key>=<value>}のリストを
+指定するための命令である．これらは\texttt{<key>=<value>}のリストを
 引数としてとる．許されるキーは次の節に記述する．
 \verb+\ltjsetparameter+ と \verb+\ltjglobalsetparameter+ の違いはスコープの
 違いのみである．
@@ -3940,12 +3992,12 @@ like other assignment.
 %</ja>
 
 %<*en>
-\verb+\ltjgetparameter+ is the primitive for acquiring parameters. It
+\verb+\ltjgetparameter+ is for acquiring parameters. It
 always takes a parameter name as first argument, and also takes the
 additional argument---a character code, for example---in some cases.
 %</en>
 %<*ja>
-\verb+\ltjgetparameter+ はパラメータの値を取得するためのプリミティブであり，
+\verb+\ltjgetparameter+ はパラメータの値を取得するための命令であり，
 常にパラメータの名前を第一引数にとる．
 そして，いくつかの場合には加えてさらに引数（例えば文字コード）をとる．
 %</ja>
@@ -4195,19 +4247,20 @@ JFM（もしくはサイズ）が異なる2つの\textbf{JAchar}の間にグル�
 \end{list}
 
 
-%<en>\section{Other Primitives}
-%<ja>\section{その他のプリミティブ}
+%<en>\section{Other Control Sequences}
+%<ja>\section{その他の命令}
 %<zh>\section{其他基本语句}
-%<en>\subsection{Primitives for Compatibility}
-%<ja>\subsection{互換プリミティブ}
+%<en>\subsection{Control Sequences for Compatibility}
+%<ja>\subsection{\pTeX 互換用命令}
 %<zh>\subsection{基本语句兼容性}
 
 %<*en>
-The following primitives are implemented for compatibility with \pTeX.
-Note that these primitives don't support JIS~X~0213, but only JIS~X~0208.
+The following control sequences are implemented for compatibility with \pTeX.
+Note that these don't support JIS~X~0213, but only JIS~X~0208.
 %</en>
 %<*ja>
-以下のプリミティブは\pTeX との互換性のために実装されている：
+以下の命令は\pTeX との互換性のために実装されている．そのため，JIS~X~0213には対応せず，
+\pTeX と同じようにJIS~X~0208の範囲しかサポートしていない．
 %</ja>
 %<*zh>
 下列基本语句的实现与\pTeX 兼容：
@@ -4221,16 +4274,16 @@ Note that these primitives don't support JIS~X~0213, but only JIS~X~0208.
 \item[kansuji]
 \end{list}
 
-%<en>\subsection{\texttt{\char92 inhibitglue} primitive}
-%<ja>\subsection{\texttt{\char92 inhibitglue}プリミティブ}
+%<en>\subsection{\texttt{\char92 inhibitglue}}
+%<ja>\subsection{\texttt{\char92 inhibitglue}}
 %<zh>\subsection{\texttt{\char92 inhibitglue}基本语句}
 %<*en>
-The primitive \verb+\inhibitglue+ suppresses the insertion of \textbf{JAglue}.
+\verb+\inhibitglue+ suppresses the insertion of \textbf{JAglue}.
 The following is an example, using a special JFM that there will be a glue between
 the beginning of a box and `あ', and also between `あ' and `ウ'.
 %</en>
 %<*ja>
-\verb+\inhibitglue+ プリミティブは\textbf{JAglue}の挿入を抑制する．
+\verb+\inhibitglue+ は\textbf{JAglue}の挿入を抑制する．
 以下は，ボックスの始めと`あ'の間，`あ'と`ウ'の間にグルーが入る特別なJFMを用いた例で
 ある．
 %</ja>
@@ -4294,7 +4347,7 @@ With the help of this example, we remark the specification of \verb+\inhibitglue
 \end{itemize}
 
 %<en>\section{Control Sequences for \LaTeXe}
-%<ja>\section{\LaTeXe 用のコントロールシーケンス}
+%<ja>\section{\LaTeXe 用の命令}
 %<zh>\section{\LaTeXe 下使用的控制序列}
 
 %<en>\subsection{Patch for NFSS2}
@@ -4306,12 +4359,12 @@ With the help of this example, we remark the specification of \verb+\inhibitglue
 As described in Subsection~\ref{ssec-ltx}, \LuaTeX-ja simply adopted
 \texttt{plfonts.dtx} in \pLaTeXe\ for the Japanese patch for NFSS2.
 For an convenience, we will describe
-commands which are not described in Subsection~\ref{ssub-chgfnt}.
+control sequences which are not described in Subsection~\ref{ssub-chgfnt}.
 %</en>
 %<*ja>
 \ref{ssec-ltx}節で述べたように，\LuaTeX-jaはNFSS2への日本語パッチである
 \pLaTeXe の\texttt{plfonts.dtx}を単純に取り入れている．
-便宜のため，ここでは\ref{ssub-chgfnt}節で述べていなかったコマンドについて
+便宜のため，ここでは\ref{ssub-chgfnt}節で述べていなかった命令について
 記述しておく．
 %</ja>
 
@@ -4522,13 +4575,13 @@ the commands of Japanese version:
 
 %<*en>
 These 3 font features correspond to \texttt{cid}, \texttt{jfm} and
-\texttt{jfmvar} keys for \verb+\jfont+ primitive, respectively.
+\texttt{jfmvar} keys for \verb+\jfont+ respectively.
 \texttt{CID} is effective only when with \texttt{NoEmbed}
 described below.
 See Subsections~\ref{ssec-jfont} and \ref{ssec-psft} for details.
 %</en>
 %<*ja>
-これら3つのキーはそれぞれ \verb+\jfont+ プリミティブに対する
+これら3つのキーはそれぞれ \verb+\jfont+ に対する
 \texttt{cid}, \texttt{jfm}, \texttt{jfmvar}キーとそれぞれ対応する．
 \texttt{CID} は下の \texttt{NoEmbed} と合わせて用いられたときのみ有効である．
 \verb+\jfont+ プリミティブに対する
@@ -6837,9 +6890,9 @@ JIS~X~0208にないため\pTeX では使用不能と考えて良いものであ�
 \test{1}\test{2}\test{3}\test{4}\test{5}\test{6}\test{7}\test{8}
 \test{9}\test{10}\test{11}\test{12}\test{13}
 
+%</!zh>
 \errorstopmode
 
-%</!zh>
 \section{Package versions used in this document}
 This document was typeset using the following packages:
 
