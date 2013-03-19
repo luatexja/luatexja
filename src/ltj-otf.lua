@@ -11,6 +11,7 @@ module('luatexja.otf', package.seeall)
 
 luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
+luatexja.load_module('rmlgbm');    local ltjr = luatexja.rmlgbm
 
 local id_glyph = node.id('glyph')
 local id_whatsit = node.id('whatsit')
@@ -32,8 +33,33 @@ local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_find_char_class = ltjf.find_char_class
+local ltjr_cidfont_data = ltjr.cidfont_data
 
 local OTF = luatexja.userid_table.OTF
+
+function get_ucs_from_rmlgbm(c)
+   local v = ltjr_cidfont_data["Adobe-Japan1"].unicodes["Japan1." .. tostring(c)]
+   if not v then -- AJ1 範囲外
+      return 0
+   elseif v<0xF0000 then -- 素直に Unicode にマップ可能
+      return v
+   else
+      local w = ltjr_cidfont_data["Adobe-Japan1"].characters[v]. tounicode
+      -- must be non-nil!
+      local i = string.len(w)
+      if i==4 then -- UCS2
+         return tonumber(w,16)
+      elseif i==8 then 
+         i,w = tonumber(string.sub(w,1,4),16), tonumber(string.sub(w,-4),16)
+         if (w>=0xD800) and (w<=0xDB7F) and (i>=0xDC00) and (i<=0xDFFF) then -- Surrogate pair
+            return (w-0xD800)*0x400 + (i-0xDC00)
+         else
+            return 0
+         end
+      end
+      --print(c, v, w) 
+   end
+end
 
 -- Append a whatsit node to the list.
 -- This whatsit node will be extracted to a glyph_node
@@ -51,16 +77,19 @@ function cid(key)
 	   curjfnt.cidinfo.ordering ~= "GB1" and
 	   curjfnt.cidinfo.ordering ~= "CNS1" and
 	   curjfnt.cidinfo.ordering ~= "Korea1" then
-      ltjb.package_error('luatexja-otf',
-                         'Current Japanese font (or other CJK font) "'..curjfnt.psname..'" is not a CID-Keyed font (Adobe-Japan1 etc.)', 
-                         'Select a CID-Keyed font using \\jfont.')
-      return
+           ltjb.package_warning('luatexja-otf',
+                                'Current Japanese font (or other CJK font) "'
+                                   ..curjfnt.psname..'" is not a CID-Keyed font (Adobe-Japan1 etc.)')
+           return append_jglyph(get_ucs_from_rmlgbm(key))
    end
    local char = curjfnt.unicodes[curjfnt.cidinfo.ordering..'.'..tostring(key)]
    if not char then
       ltjb.package_warning('luatexja-otf',
-                         'Current Japanese font (or other CJK font) "'..curjfnt.psname..'" does not include the specified CID character ('..tostring(key)..')', 
-                         'Use a font including the specified CID character.')
+                           'Current Japanese font (or other CJK font) "'
+                              ..curjfnt.psname..'" does not have the specified CID character ('
+                              ..tostring(key)..')', 
+                           'Use a font including the specified CID character.')
+      char = 0
       return
    end
    append_jglyph(char)

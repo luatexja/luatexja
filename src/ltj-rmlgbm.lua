@@ -12,7 +12,8 @@ local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
 luatexja.load_module('base');      local ltjb = luatexja.base
 
-local cidfont_data = {}
+cidfont_data = {}
+local cidfont_data = cidfont_data
 local cache_chars = {}
 local path           = {
     localdir  = file.join(kpse.expand_var("$TEXMFVAR"), aux_dir),
@@ -60,8 +61,8 @@ local cid_replace = {
 -- reading CID maps
 do
    local line, fh -- line, file handler
-   local tt, cidm  -- characters, cid->glyph_index
-   
+   local tt,cidm -- characters, cid->(Unicode)
+
    local function load_cid_char(cid_dec, mke)
       local cid, ucs, ucsa
       line = fh:read("*l")
