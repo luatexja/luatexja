@@ -133,7 +133,7 @@
 
 %%%%%%%% fonts
 \usepackage{luatexja-otf}
-\usepackage[jis2004,ipa]{luatexja-preset}
+\usepackage[jis2004]{luatexja-preset}
 %<!en>\usepackage{amssymb}
 %<*en>
 \usepackage{unicode-math}
@@ -2256,8 +2256,7 @@ This range consist of the following Unicode ranges, \emph{except characters in t
 "2700--"27BF&Dingbats&
 "2900--"297F&Supplemental Arrows-B\\
 "2980--"29FF&Misc.\ Mathematical Symbols-B&
-"2B00--"2BFF&Miscellaneous Symbols and Arrows\\
-"E000--"F8FF&Private Use Area&
+"2B00--"2BFF&Miscellaneous Symbols and Arrows
 %</en>
 %<*ja>
 "2000--"206F&一般句読点&
@@ -2277,8 +2276,7 @@ This range consist of the following Unicode ranges, \emph{except characters in t
 "2700--"27BF&装飾記号&
 "2900--"297F&補助矢印B\\
 "2980--"29FF&その他の数学記号B&
-"2B00--"2BFF&その他の記号及び矢印\\
-"E000--"F8FF&私用領域（外字領域）&
+"2B00--"2BFF&その他の記号及び矢印
 %</ja>
 %<*zh>
 "2000--"206F&一般标点符号&
@@ -2298,8 +2296,7 @@ This range consist of the following Unicode ranges, \emph{except characters in t
 "2700--"27BF&什锦符号&
 "2900--"297F&补充性箭头-B\\
 "2980--"29FF&混合数学符号-B&
-"2B00--"2BFF&杂项符号和箭头符号\\
-"E000--"F8FF&私用区域&
+"2B00--"2BFF&杂项符号和箭头符号
 %</zh>
 \end{tabular}
 \end{center}
@@ -2324,7 +2321,7 @@ This range consist of the following Unicode ranges, \emph{except characters in t
 \ltjdefcharrange{4}{%
    "500-"10FF, "1200-"1DFF, "2440-"245F, "27C0-"28FF, "2A00-"2AFF,
   "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A82F, "A840-"ABFF, "FB50-"FE0F,
-  "FE20-"FE2F, "FE70-"FEFF, "FB00-"FB4F, "10000-"1FFFF} % non-Japanese
+  "FE20-"FE2F, "FE70-"FEFF, "FB00-"FB4F, "10000-"1FFFF, "E000-"F8FF} % non-Japanese
 \end{lstlisting}
 %<*en>
 \item[Range~5${}^{\text{A}}$] Surrogates and Supplementary Private Use Areas.
@@ -2887,13 +2884,13 @@ JFMの名前を指定する．もし以前に指定されたJFMが読み込ま�
 \label{tab-difjfm}
 \ltjsetparameter{jacharrange={+3}}
 \begin{center}\small
-\def\r#1{{\jfont\g=name:IPAMincho:jfm=#1 at 14.43324pt \g
+\def\r#1{{\jfont\g=psft:Ryumin-Light:jfm=#1 at 14.43324pt \g
 \setbox0=\vtop{\hsize=7\zw\noindent ◆◆◆◆◆◆◆
 ある日モモちゃんがお使いで迷子になって泣きました．}\copy0
 \vrule height 0pt depth \dp0}}
-\def\s#1{{\jfont\g=name:IPAMincho:jfm=#1 at 14.43324pt \g
+\def\s#1{{\jfont\g=psft:Ryumin-Light:jfm=#1 at 14.43324pt \g
 \setbox0=\vtop{\hsize=7\zw\noindent ちょっと！何}\copy0}}
-\def\t#1{{\jfont\g=name:IPAMincho:jfm=#1 at 19.24432pt \g
+\def\t#1{{\jfont\g=psft:Ryumin-Light:jfm=#1 at 19.24432pt \g
 \setbox0=\hbox{漢}%
 \vrule width 0.4pt height\ht0 depth\dp0\kern-.2pt\copy0
 \kern-\wd0\vrule width\wd0height .2pt depth .2pt
@@ -3494,7 +3491,7 @@ Furthermore, the glyph is shifted according to values of fields
 \end{lstlisting}
 句点「。」の幅は二分であるので
 \begin{LTXexample}
-\jfont\a=name:IPAMincho:jfm=test;+vert
+\jfont\a=psft:Ryumin-Light:jfm=test;+vert
 \setbox0\hbox{\a 。\inhibitglue 漢}
 \the\wd0
 \end{LTXexample}
@@ -3510,7 +3507,7 @@ Furthermore, the glyph is shifted according to values of fields
 一方，「\texttt{'、*'}」のようにアスタリスクつきの指定があると，
 状況は異なってくる．
 \begin{LTXexample}
-\jfont\a=name:IPAMincho:jfm=test;+vert
+\jfont\a=psft:Ryumin-Light:jfm=test;+vert
 \a 漢、\inhibitglue 漢
 \end{LTXexample}
 ここで，読点「、」の文字クラスは，以下のようにして決まる．
@@ -3524,7 +3521,7 @@ Furthermore, the glyph is shifted according to values of fields
 
 なお，置換後のグリフで判定した文字クラスの値が0でなければ，そちらをそのまま作用する．
 \begin{LTXexample}
-\jfont\a=name:IPAMincho:jfm=test;+hwid
+\jfont\a=psft:Ryumin-Light:jfm=test;+hwid
 \a 漢ﾋひ
 \end{LTXexample}
 上の例では，
@@ -3628,7 +3625,7 @@ The following is the list of `imaginary characters':
 \texttt{'parbdd'}を入れれば全角下がりとなる．
 
 \begin{LTXexample}
-\jfont\g=name:IPAMincho:jfm=test \g
+\jfont\g=psft:Ryumin-Light:jfm=test \g
 \parindent1\zw\noindent{}◆◆◆◆◆
 \par 「◆◆←二分下がり
 \par 【◆◆←全角下がり
@@ -4293,7 +4290,7 @@ the beginning of a box and `あ', and also between `あ' and `ウ'.
 %</zh>
 
 \begin{LTXexample}
-\jfont\g=name:IPAMincho:jfm=test \g
+\jfont\g=psft:Ryumin-Light:jfm=test \g
 \fbox{\hbox{あウあ\inhibitglue ウ}}
 \inhibitglue\par\noindent あ1
 \par\inhibitglue\noindent あ2
