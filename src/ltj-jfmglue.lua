@@ -1,10 +1,10 @@
 --
--- luatexja/jfmglue.lua
+-- luatexja/ltj-jfmglue.lua
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2012/07/19',
-  version = '0.5',
+  date = '2012/04/05',
+  version = '0.6',
   description = 'Insertion process of JFM glues and kanjiskip',
 })
 module('luatexja.jfmglue', package.seeall)
@@ -734,7 +734,7 @@ local function get_OA_skip()
    if not ihb_flag then
       local pm = Np.met
       return new_jfm_glue(pm, 
-        fast_find_char_class(((Nq.id == id_math and -1) or 'jcharbdd'), pm), Np.class)
+        fast_find_char_class(((Nq.id == id_math and -1) or (type(Nq.char)=='string' and Nq.char or 'jcharbdd')), pm), Np.class)
    else return nil
    end
 end

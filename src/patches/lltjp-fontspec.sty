@@ -1,0 +1,27 @@
+%
+% lltjp-fontspec.sty
+%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{lltjp-fontspec}[2013/04/02 Patch to fontspec for LuaLaTeX-ja]
+
+\RequirePackage{fontspec,luatexja}
+\ExplSyntaxOn
+
+\cs_set:Nn \fontspec_visible_space:
+ {
+  \font_glyph_if_exist:NnTF \font {"2423}
+   { \ltjalchar"2423\scan_stop: }
+   { \fontspec_visible_space_fallback: }
+ }
+\def\verb
+ {
+  \relax\ifmmode\hbox\else\leavevmode\fi % same as lltjcore
+  \bgroup
+    \verb@eol@error \let\do\@makeother \dospecials
+    \verbatim@font\@noligs
+    \@ifstar\__fontspecsverb\@verb
+ }
+
+\ExplSyntaxOff
+\endinput
