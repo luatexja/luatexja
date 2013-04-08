@@ -14,6 +14,14 @@
    { \ltjalchar"2423\scan_stop: }
    { \fontspec_visible_space_fallback: }
  }
+\def\verb
+ {
+  \relax\ifmmode\hbox\else\leavevmode\fi % same as lltjcore
+  \bgroup
+    \verb@eol@error \let\do\@makeother \dospecials
+    \verbatim@font\@noligs
+    \@ifstar\__fontspecsverb\@verb
+ }
 
 \ExplSyntaxOff
 \endinput
