@@ -3,8 +3,8 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.stack',
-  date = '2011/04/01',
-  version = '0.1',
+  date = '2013/03/16',
+  version = '0.4',
   description = 'LuaTeX-ja stack system',
 })
 module('luatexja.stack', package.seeall)

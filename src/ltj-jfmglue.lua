@@ -757,7 +757,7 @@ local function handle_np_jachar(mode)
       local g = get_OA_skip() or get_kanjiskip() -- O_A->K
       handle_penalty_normal(0, Np.pre, g); real_insert(g)
    elseif Nq.pre then 
-      local g = get_OA_skip() or get_xkanjiskip(Np) -- O_A->X
+     local g = get_OA_skip() or get_xkanjiskip(Np) -- O_A->X
       handle_penalty_normal((qid==id_hlist and 0 or Nq.post), Np.pre, g); real_insert(g)
    else
       local g = get_OA_skip() -- O_A

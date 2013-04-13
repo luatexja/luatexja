@@ -1,13 +1,6 @@
 --
--- luatexja/math.lua
+-- luatexja/ltj-math.lua
 --
-luatexbase.provides_module({
-  name = 'luatexja.math',
-  date = '2012/07/19',
-  version = '0.2',
-  description = 'Handling routines for Japanese characters in math mode',
-})
-module('luatexja.math', package.seeall)
 
 luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('charrange'); local ltjc = luatexja.charrange
@@ -41,13 +34,13 @@ local id_frac    = node.id('fraction')
 local id_simple  = node.id('noad')
 local id_sub_mlist = node.id('sub_mlist')
 
-local PROCESSED = 11
+local PROCESSED = luatexja.icflag_table.PROCESSED
 
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_find_char_class = ltjf.find_char_class
 
 -- table of mathematical characters
-is_math_letters = {}
+local is_math_letters = {}
 
 local conv_jchar_to_hbox_A
 
@@ -125,3 +118,5 @@ luatexbase.add_to_callback('mlist_to_hlist',
       head = node.mlist_to_hlist(head, display_type, penalties)
       return head
    end,'ltj.mlist_to_hlist', 1)
+
+luatexja.math = { is_math_letters = is_math_letters }

@@ -1,6 +1,4 @@
-luatexbase.provides_module({
- name = 'luatexja.jisx0208'}) 
-module('luatexja.jisx0208', package.seeall)
+luatexja.jisx0208 = {
 table_jisx0208_uptex = { 
  [0x101] = 0x3000, --(　)
  [0x102] = 0x3001, --(、) 
@@ -6881,4 +6879,4 @@ table_jisx0208_uptex = {
  [0x5404] = 0x7464, --(瑤) 
  [0x5405] = 0x51DC, --(凜)
  [0x5406] = 0x7199, --(熙) 
-}
+}}

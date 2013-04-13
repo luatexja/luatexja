@@ -8,26 +8,24 @@ require('lualibs')
 --    ext_... : called from \directlua{}
 --    int_... : called from other Lua codes, but not from \directlua{}
 --    (other)     : only called from this file
-function luatexja.error(s,t)
-   tex.error('LuaTeX-ja error: ' .. s ,t) 
-end
 function luatexja.load_module(name)
    if not package.loaded['luatexja.' .. name] then
       local fn = 'ltj-' .. name .. '.lua'
       local found = kpse.find_file(fn, 'tex')
       if not found then
-	 luatexja.error("File `" .. fn .. "' not found", 
-			{'This file ' .. fn .. ' is required for LuaTeX-ja.', 'Please check your installation.'})
+	 tex.error("LuaTeX-ja error: File `" .. fn .. "' not found", 
+			{'This file ' .. fn .. ' is required for LuaTeX-ja.', 
+			 'Please check your installation.'})
       else 
 	 texio.write_nl('(' .. found .. ')')
-	 dofile(found)
+	 require(found) -- 2度読み防止; これでいいのか？
       end
    end
 end
 function luatexja.load_lua(fn)
    local found = kpse.find_file(fn, 'tex')
    if not found then
-      error("File `" .. fn .. "' not found")
+      tex.error("LuaTeX-ja error: File `" .. fn .. "' not found")
    else 
       texio.write_nl('(' .. found .. ')')
       dofile(found)

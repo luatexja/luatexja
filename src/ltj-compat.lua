@@ -1,20 +1,11 @@
 --
--- luatexja/compat.lua
+-- luatexja/ltj-compat.lua
 --
-luatexbase.provides_module({
-  name = 'luatexja.compat',
-  date = '2011/06/03',
-  version = '0.1',
-  description = 'Partial implementation of primitives of pTeX',
-})
-module('luatexja.compat', package.seeall)
-local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
-luatexja.load_module('base');      local ltjb = luatexja.base
-luatexja.load_module('stack');     local ltjs = luatexja.stack
+luatexja.load_module('base');  local ltjb = luatexja.base
 
 -- \kuten, \jis, \euc, \sjis, \ucs, \kansuji
-function to_kansuji(num)
+local function to_kansuji(num)
    if not num then num=0; return
    elseif num<0 then 
       num = -num; tex.write('-')
@@ -30,7 +21,7 @@ function to_kansuji(num)
 end
 
 -- \ucs: 単なる identity
-function from_ucs(i)
+local function from_ucs(i)
    if type(i)~='number' then 
       ltjb.package_error('luatexja',
 			 "invalid character code (".. tostring(i) .. ")",
@@ -40,8 +31,8 @@ function from_ucs(i)
    tex.write(i)
 end
 
--- \kuten: 面区点 （それぞれで16進2桁を使用）=> Unicharacter code 符号位置
-function from_kuten(i)
+-- \kuten: 面区点 （それぞれで16進2桁を使用）=> Unicode 符号位置
+local function from_kuten(i)
    if type(i)~='number' then 
       ltjb.package_error('luatexja',
 			 "invalid character code (".. tostring(i) .. ")",
@@ -51,8 +42,8 @@ function from_kuten(i)
    tex.write(tostring(luatexja.jisx0208.table_jisx0208_uptex[i] or 0))
 end
 
--- \euc: EUC-JP による符号位置 => Unicharacter code 符号位置
-function from_euc(i)
+-- \euc: EUC-JP による符号位置 => Unicode 符号位置
+local function from_euc(i)
    if type(i)~='number' then 
       ltjb.package_error('luatexja',
 			 "invalid character code (".. tostring(i) .. ")",
@@ -64,8 +55,8 @@ function from_euc(i)
    from_kuten(i-0xa0a0)
 end
 
--- \jis: ISO-2022-JP による符号位置 => Unicharacter code 符号位置
-function from_jis(i)
+-- \jis: ISO-2022-JP による符号位置 => Unicode 符号位置
+local function from_jis(i)
    if (type(i)~='number') or i>=0x10000 or i<0 then 
       ltjb.package_error('luatexja',
 			 "invalid character code (".. tostring(i) .. ")",
@@ -75,8 +66,8 @@ function from_jis(i)
    from_kuten(i-0x2020)
 end
 
--- \sjis: Shift_JIS による符号位置 => Unicharacter code 符号位置
-function from_sjis(i)
+-- \sjis: Shift_JIS による符号位置 => Unicode 符号位置
+local function from_sjis(i)
    if (type(i)~='number') or i>=0x10000 or i<0 then 
       ltjb.package_error('luatexja',
 			 "invalid character code (".. tostring(i) .. ")",
@@ -111,3 +102,13 @@ function from_sjis(i)
      from_kuten(c2*256+c1)
   end
 end
+
+local t = {
+   from_euc   = from_euc,
+   from_kuten = from_kuten,
+   from_jis   = from_jis,
+   from_sjis  = from_sjis,
+   from_ucs   = from_ucs,
+   to_kansuji = to_kansuji,
+}
+luatexja.compat = t

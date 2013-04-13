@@ -1,14 +1,6 @@
 --
--- luatexja/inputbuf.lua
+-- luatexja/ltj-inputbuf.lua
 --
-luatexbase.provides_module({
-  name = 'luatexja.inputbuf',
-  date = '2011/04/01',
-  version = '0.1',
-  description = 'Supressing a space by newline after Japanese characters',
-})
-module('luatexja.inputbuf', package.seeall)
-local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
 luatexja.load_module('charrange'); local ltjc = luatexja.charrange
 
@@ -20,7 +12,7 @@ local ltjc_is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char
 
 --- the following function is modified from jafontspec.lua (by K. Maeda).
 --- Instead of "%", we use U+FFFFF for suppressing spaces.
-function add_comment(buffer)
+local function add_comment(buffer)
    local i = utf.len(buffer)
    while (i>0) and (getcatcode(utf.byte(buffer, i))==1 
 		 or getcatcode(utf.byte(buffer, i))==2) do
