@@ -1,19 +1,10 @@
 --
--- luatexja/rmlgbm.lua
+-- luatexja/ltj-rmlgbm.lua
 --
-luatexbase.provides_module({
-  name = 'luatexja.rmlgbm',
-  date = '2013/03/17',
-  version = '0.4',
-  description = 'Definitions of non-embedded Japanese (or other CJK) fonts',
-})
-module('luatexja.rmlgbm', package.seeall)
-local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
 luatexja.load_module('base');      local ltjb = luatexja.base
 
-cidfont_data = {}
-local cidfont_data = cidfont_data
+local cidfont_data = {}
 local cache_chars = {}
 local path           = {
     localdir  = file.join(kpse.expand_var("$TEXMFVAR"), aux_dir),
@@ -350,3 +341,7 @@ end
 
 cid_reg, cid_order, cid_name = 'Adobe', 'Japan1', 'Adobe-Japan1'
 read_cid_font()
+
+luatexja.rmlgbm = {
+   cidfont_data = cidfont_data,
+}
