@@ -147,7 +147,7 @@ local first_char, last_char, find_first_char
 local function check_box(box_ptr, box_end)
    local p = box_ptr; local found_visible_node = false
    if not p then 
-      find_first_char = false; first_char = nil; last_char = nil
+      find_first_char = false; last_char = nil
       return true
    end
    while p and p~=box_end do
