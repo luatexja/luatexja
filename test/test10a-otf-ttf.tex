@@ -1,0 +1,32 @@
+%#! luajitlatex
+\documentclass{ltjsarticle}
+\usepackage{luacode}
+\usepackage[ipaex]{luatexja-preset}
+\usepackage{luatexja-otf}
+
+\textwidth=600pt
+\def\ox{\hbox to 10pt{%
+  \CID{\the\tb}\hss}%
+  \global\advance\tb1\relax}
+\def\BOUND{15444}
+
+\catcode`\_=11
+\newcount\tb
+\def\out_one_line{%
+  \par\noindent
+  \hbox to 3\zw{\hfil \the\tb}\quad
+  \ox\ox\ox\ox\ox\ox\ox\ox\ox\ox\quad
+  \ox\ox\ox\ox\ox\ox\ox\ox\ox\ox\quad
+  \ox\ox\ox\ox\ox\ox\ox\ox\ox\ox\quad
+  \ox\ox\ox\ox\ox\ox\ox\ox\ox\ox\par
+}
+\begin{document}
+\paragraph{Adobe-Japan1-4のグリフをIPAex明朝で表示させてみる}
+\
+
+
+\loop
+  \out_one_line
+  \ifnum\tb<\BOUND
+\repeat
+\end{document}
