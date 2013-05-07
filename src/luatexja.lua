@@ -1,7 +1,5 @@
 
-local floor = math.floor
-
-require('lualibs')
+require('lualibs-table')
 
 ------------------------------------------------------------------------
 -- naming:
@@ -9,18 +7,7 @@ require('lualibs')
 --    int_... : called from other Lua codes, but not from \directlua{}
 --    (other)     : only called from this file
 function luatexja.load_module(name)
-   if not package.loaded['luatexja.' .. name] then
-      local fn = 'ltj-' .. name .. '.lua'
-      local found = kpse.find_file(fn, 'tex')
-      if not found then
-	 tex.error("LuaTeX-ja error: File `" .. fn .. "' not found", 
-			{'This file ' .. fn .. ' is required for LuaTeX-ja.', 
-			 'Please check your installation.'})
-      else 
-	 texio.write_nl('(' .. found .. ')')
-	 require(found) -- 2度読み防止; これでいいのか？
-      end
-   end
+   require('ltj-' .. name.. '.lua')
 end
 function luatexja.load_lua(fn)
    local found = kpse.find_file(fn, 'tex')
@@ -83,28 +70,6 @@ load_module('setwidth');  local ltjw = luatexja.setwidth
 load_module('math');      local ltjm = luatexja.math
 load_module('tangle');    local ltjb = luatexja.base
 
-
-local node_type = node.type
-local node_new = node.new
-local node_prev = node.prev
-local node_next = node.next
-local has_attr = node.has_attribute
-local node_insert_before = node.insert_before
-local node_insert_after = node.insert_after
-local node_hpack = node.hpack
-
-local id_penalty = node.id('penalty')
-local id_glyph = node.id('glyph')
-local id_glue_spec = node.id('glue_spec')
-local id_glue = node.id('glue')
-local id_kern = node.id('kern')
-local id_hlist = node.id('hlist')
-local id_vlist = node.id('vlist')
-local id_rule = node.id('rule')
-local id_math = node.id('math')
-local id_whatsit = node.id('whatsit')
-local sid_user = node.subtype('user_defined')
-
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_yablshift = luatexbase.attributes['ltj@yablshift']
@@ -112,8 +77,15 @@ local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_uniqid = luatexbase.attributes['ltj@uniqid']
 local cat_lp = luatexbase.catcodetables['latex-package']
 
+
+---- table: charprop_stack_table [stack_level].{pre|post|xsp}[chr_code]
+
+
 -- Three aux. functions, bollowed from tex.web
+
 local unity=65536
+local floor = math.floor
+
 local function print_scaled(s)
    local out=''
    local delta=10
@@ -144,7 +116,7 @@ local function print_glue(d,order)
    return out
 end
 
-function print_spec(p)
+local function print_spec(p)
    local out=print_scaled(p.width)..'pt'
    if p.stretch~=0 then
       out=out..' plus '..print_glue(p.stretch,p.stretch_order)
@@ -155,8 +127,6 @@ function print_spec(p)
 return out
 end
 
-
----- table: charprop_stack_table [stack_level].{pre|post|xsp}[chr_code]
 
 ------------------------------------------------------------------------
 -- CODE FOR GETTING/SETTING PARAMETERS 
@@ -265,15 +235,46 @@ luatexbase.add_to_callback('pre_linebreak_filter',
       return main_process(head, true, tex.textdir)
    end,'ltj.pre_linebreak_filter',
    luatexbase.priority_in_callback('pre_linebreak_filter',
-				   'luaotfload.pre_linebreak_filter') + 1)
+				   'luaotfload.node_processor') + 1)
 luatexbase.add_to_callback('hpack_filter', 
   function (head,groupcode,size,packtype, dir)
      return main_process(head, false, dir)
   end,'ltj.hpack_filter',
    luatexbase.priority_in_callback('hpack_filter',
-				   'luaotfload.hpack_filter') + 1)
+				   'luaotfload.node_processor') + 1)
+
+-- define_font
+
+local otfl_fdr = fonts.definers.read
+function luatexja.font_callback(name, size, id)
+  return ltjf.font_callback(
+     name, size, id, 
+     function (name, size, id) return ltjr.font_callback(name, size, id, otfl_fdr) end
+  )
+end
+--luatexbase.remove_from_callback('define_font',"luaotfload.define_font")
+luatexbase.add_to_callback('define_font',luatexja.font_callback,"luatexja.font_callback", 1)
+
+
+
+
 
 -- debug
+
+do
+
+local id_penalty = node.id('penalty')
+local id_glyph = node.id('glyph')
+local id_glue_spec = node.id('glue_spec')
+local id_glue = node.id('glue')
+local id_kern = node.id('kern')
+local id_hlist = node.id('hlist')
+local id_vlist = node.id('vlist')
+local id_rule = node.id('rule')
+local id_math = node.id('math')
+local id_whatsit = node.id('whatsit')
+local sid_user = node.subtype('user_defined')
+
 local function get_attr_icflag(p)
    return (has_attr(p, attr_icflag) or 0) % icflag_table.PROCESSED_BEGIN_FLAG
 end
@@ -410,4 +411,6 @@ function luatexja.ext_show_node(head,depth,print_fn)
    else
       print_fn(debug_depth .. ' (null list)')
    end
+end
+
 end

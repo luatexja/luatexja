@@ -173,8 +173,6 @@ luatexbase.create_callback("luatexja.find_char_class", "data",
 function find_char_class(c,m)
 -- c: character code, m: 
    if not m then return 0 end
---   print("**")
---   for i,v in pairs(m) do print(i,v) end
    return m.chars[c] or 
       luatexbase.call_callback("luatexja.find_char_class", 0, m, c)
 end
@@ -236,8 +234,10 @@ function jfontdefY() -- for horizontal font
 		     zw = sz.zw, zh = sz.zh, 
 		     chars = sz.chars, char_type = sz.char_type,
 		     kanjiskip = sz.kanjiskip, xkanjiskip = sz.xkanjiskip, 
-		     mono_flag = not string.match((fonts.ids[fn].name or ''), "+[(pwid)(palt)]"),
 		    }
+   fmtable.mono_flag = fonts.ids[fn].cidinfo
+      and (not string.match((fonts.ids[fn].name or ''), "+[(pwid)(palt)]"))
+      
    fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
    font_metric_table[fn]=fmtable
    tex.sprint(cat_lp, luatexja.is_global .. '\\protected\\expandafter\\def\\csname ' 
@@ -291,11 +291,10 @@ local function extract_metric(name)
 end
 
 -- replace fonts.define.read()
-local ljft_dr_orig = fonts.define.read
-function fonts.define.read(name, size, id)
+function font_callback(name, size, id, fallback)
    extract_metric(name)
    -- In the present imple., we don't remove "jfm=..." from name.
-   return ljft_dr_orig(name, size, id)
+   return fallback(name, size, id)
 end
 
 ------------------------------------------------------------------------

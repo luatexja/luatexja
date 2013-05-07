@@ -92,10 +92,20 @@ local function suppress_hyphenate_ja(head)
 	    p.subtype = floor(p.subtype*0.5)*2
 	    set_attr(p, attr_orig_char, p.char)
 	    if ltjf_font_metric_table[pf] and ltjf_font_metric_table[pf].mono_flag then
-	       local pco = fonts_ids[pf].cidinfo.ordering
+	       local pfd = fonts_ids[pf]
+	       local pco = pfd.cidinfo.ordering
 	       for i,v in pairs(fwglyph) do
-		  if pco == i then
-		     local fwc = fonts_ids[pf].unicodes[pco .. '.'.. tostring(v[p.char])]
+		  if pco == i and pfd.shared.resources then
+		     -- print(pf, pfd.fullname, pfd)
+		     -- for j,w in pairs(pfd.resources) do
+		     -- 	print('["' .. j .. '"] = ' .. tostring(w))
+		     -- 	if type(w) == 'table' and j~='characters' then
+		     -- 	   for k,x in pairs(w) do
+		     -- 	      print('    ["' .. k .. '"] = ' .. tostring(x))
+		     -- 	   end
+		     -- 	end
+		     -- end
+		     local fwc = pfd.shared.resources.unicodes[pco .. '.'.. tostring(v[p.char])]
 		     if fwc then p.char = fwc end
 		     break
 		  end

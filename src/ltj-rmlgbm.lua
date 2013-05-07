@@ -1,10 +1,19 @@
 --
--- luatexja/ltj-rmlgbm.lua
+-- luatexja/rmlgbm.lua
 --
+luatexbase.provides_module({
+  name = 'luatexja.rmlgbm',
+  date = '2013/03/17',
+  version = '0.4',
+  description = 'Definitions of non-embedded Japanese (or other CJK) fonts',
+})
+module('luatexja.rmlgbm', package.seeall)
+local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
 luatexja.load_module('base');      local ltjb = luatexja.base
 
-local cidfont_data = {}
+cidfont_data = {}
+local cidfont_data = cidfont_data
 local cache_chars = {}
 local path           = {
     localdir  = file.join(kpse.expand_var("$TEXMFVAR"), aux_dir),
@@ -14,7 +23,7 @@ local path           = {
 local cid_reg, cid_order, cid_supp, cid_name
 local taux_dir = 'luatex-cache/luatexja'
 local cid_replace = {
-   ["Adobe-Japan1"] = {"UniJIS-UTF32", 23057, 
+   ["Adobe-Japan1"] = {"UniJIS2004-UTF32", 23057, 
 		       function (i)
 			  if (231<=i and i<=632) or (8718<=i and i<=8719) 
 		             or (12063<=i and i<=12087) then
@@ -24,10 +33,8 @@ local cid_replace = {
 			  elseif 9738<=i and i<=9757 then
 			     return 163840 -- 655360/4
 			  end
-		       end, 
-		       "UniJIS2004-UTF32"},
-                       -- 基本的には JIS X 0208:1990 に沿ったマッピングだが
-                       -- JIS X 0213:2004 のみにある字も使えるようにする
+		       end},
+                       -- 基本的には JIS X 0213:2004 に沿ったマッピング
    ["Adobe-Korea1"] = {"UniKS-UTF32",  18351,
 		       function (i)
 			  if 8094<=i and i<=8100 then 
@@ -108,7 +115,9 @@ do
    end
    
    local function increment(a) return a+1 end
-   local function entry(a)     return {index = a} end
+   local function entry(a)     
+      return {index = a} 
+   end
    function make_cid_font()
       local k = {
          cidinfo = { ordering=cid_order, registry=cid_reg, supplement=cid_supp },
@@ -120,14 +129,11 @@ do
       local kx = cid_replace[cid_name]
       cidfont_data[cid_name] = k
 
-      -- CID => Unicode 負号空間
+      -- CID => Unicode 符号空間
       -- TODO: vertical fonts?
       tt, cidm = {}, {}
       for i = 0,kx[2] do cidm[i] = -1 end
       open_cmap_file(kx[1] .. "-H", increment, tonumber, entry)
-      if kx[4] then
-         open_cmap_file(kx[4] .. "-H", increment, tonumber, entry)
-      end
       k.characters = tt
 
       -- Unicode にマップされなかった文字の処理
@@ -135,11 +141,24 @@ do
       local ttu, pricode = {}, 0xF0000
       for i,v in ipairs(cidm) do
          if v==-1 then 
-            tt[pricode], cidm[i], pricode=  { index = i }, pricode, pricode+1;
+            tt[pricode], cidm[i], pricode 
+	       = { index = i }, pricode, pricode+1;
          end
          ttu[cid_order .. '.' .. i] = cidm[i]
       end
-      k.unicodes = ttu      
+      -- shared
+      k.shared = {
+         otfdata = { 
+            cidinfo= k.cidinfo, verbose = false, 
+            shared = { featuredata = {}, }, 
+            luatex = { features = {}, 
+		       defaultwidth=1000, 
+		       sequences = {  }, },
+         },
+         dynamics = {}, features = {}, processes = {}, 
+      }
+      k.resources = { unicodes = ttu, }
+      k.descriptions = {}
       cache_chars[cid_name]  = { [655360] = k.characters }
 
       -- tounicode エントリ
@@ -162,17 +181,6 @@ do
 	    k.characters[v].tounicode = tt[i]
 	 end
       end
-
-      -- shared
-      k.shared = {
-         otfdata = { 
-            cidinfo= k.cidinfo, verbose = false, 
-            shared = { featuredata = {}, }, 
-            luatex = { features = {}, defaultwidth=1000, sequences = {  }, },
-         },
-         dynamics = {}, features = {}, processes = {}, 
-      }
-      k.descriptions = {}
 
       -- Save
       local savepath  = path.localdir .. '/luatexja/'
@@ -225,8 +233,8 @@ end
 
 -- High-level
 local function mk_rml(name, size, id)
-   local specification = fonts.define.analyze(name,size)
-   specification = fonts.define.specify[':'](specification)
+   local specification = fonts.definers.analyze(name,size)
+   specification = fonts.definers.resolve(specification)
    local features = specification.features.normal
 
    local fontdata = {}
@@ -238,7 +246,6 @@ local function mk_rml(name, size, id)
    end
    fontdata.characters = nil
    cachedata.characters = nil
-   fontdata.unicodes = nil
    fontdata.shared = nil
    cachedata.shared = nil
    if s.shared then
@@ -247,9 +254,6 @@ local function mk_rml(name, size, id)
       for k, v in pairs(s.shared) do
 	 shared[k] = v
       end
-      
-      shared.set_dynamics = fonts.otf.set_dynamics 
-      shared.processes, shared.features = fonts.otf.set_features(cachedata,fonts.define.check(features,fonts.otf.features.default))
    end
 
    -- characters & scaling
@@ -280,17 +284,19 @@ local function mk_rml(name, size, id)
    fontdata.hfactor = fontdata.hfactor * scale;     cachedata.hfactor = fontdata.hfactor
    fontdata.vfactor = fontdata.vfactor * scale;     cachedata.vfactor = fontdata.vfactor
    fontdata.size = size;                            cachedata.size = size
-
+   fontdata.resources = s.resources
+   cachedata.resources = s.resources
+   
    -- no embedding
    local var = ''
-   if features.slant then 
-      fontdata.slant = features.slant*1000;         cachedata.slant = fontdata.slant
-      var = var .. 's' .. tostring(features.slant)
-   end
-   if features.extend then 
-      fontdata.extend = features.extend*1000;       cachedata.extend = fontdata.extend
-       var = var .. 'x' .. tostring(features.extend)
-  end
+  --  if features.slant then 
+  --     fontdata.slant = features.slant*1000;         cachedata.slant = fontdata.slant
+  --     var = var .. 's' .. tostring(features.slant)
+  --  end
+  --  if features.extend then 
+  --     fontdata.extend = features.extend*1000;       cachedata.extend = fontdata.extend
+  --      var = var .. 'x' .. tostring(features.extend)
+  --  end
    fontdata.name = specification.name .. size .. var; cachedata.name = fontdata.name
    fontdata.fullname = specification.name .. var; cachedata.fullname = fontdata.fullname
    fontdata.psname = specification.name; cachedata.psname = fontdata.psname
@@ -299,8 +305,7 @@ local function mk_rml(name, size, id)
    return fontdata
 end
 
-local dr_orig = fonts.define.read
-function fonts.define.read(name, size, id)
+function font_callback(name, size, id, fallback)
    local p = utf.find(name, ":") or utf.len(name)+1
    if utf.sub(name, 1, p-1) == 'psft' then
       local s = "Adobe-Japan1-6"
@@ -335,13 +340,9 @@ function fonts.define.read(name, size, id)
       end
       return mk_rml(basename, size, id)
    else 
-      return dr_orig(name, size, id)
+      return fallback(name, size, id)
    end
 end
 
-cid_reg, cid_order, cid_name = 'Adobe', 'Japan1', 'Adobe-Japan1'
+cid_reg, cid_order, cid_name, cid_supp = 'Adobe', 'Japan1', 'Adobe-Japan1'
 read_cid_font()
-
-luatexja.rmlgbm = {
-   cidfont_data = cidfont_data,
-}
