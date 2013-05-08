@@ -1,5 +1,5 @@
 
-require('lualibs-table')
+require('lualibs')
 
 ------------------------------------------------------------------------
 -- naming:
@@ -262,6 +262,10 @@ luatexbase.add_to_callback('define_font',luatexja.font_callback,"luatexja.font_c
 -- debug
 
 do
+
+local node_type = node.type
+local node_next = node.next
+local has_attr = node.has_attribute
 
 local id_penalty = node.id('penalty')
 local id_glyph = node.id('glyph')

@@ -682,85 +682,10 @@ To install the \LuaTeX-ja\ package, you will need:
 安装\LuaTeX-ja之前，需要如下：
 %</zh>
 \begin{itemize}
-%<*en>
-\item \LuaTeX\ (version 0.65.0-beta or later) and its supporting packages.
-
-You might need to add the following lines to 
-\texttt{lualatex.ini} (just before \verb+\dump+ in the last line), 
-if you are using recent \LuaTeX\ whose Lua is 5.2.
-%</en>
-%<*ja>
-\item \LuaTeX（バージョン 0.65.0-beta以降）とその支援パッケージ．
-
-Lua 5.2を用いた\LuaTeX（バージョン0.74.0-beta以降）では，\texttt{lualatex.ini}\ 
-に次の行を加える必要があるかもしれない（\verb+\dump+ の前に）．
-%</ja>
-%<*!zh>
-\begin{lstlisting}
-{\catcode`\#=12\catcode`\~=12%
-\global\everyjob\expandafter{\the\everyjob%
-  \directlua{%
-    if not table.maxn then
-      table.maxn = function(t)
-          local r = 0
-          for i,_ in pairs(t) do
-            if type(i)=='number' then
-              if i>r then r=i end
-            end
-          end
-         return r
-      end
-    end
-    if not package.loaders then package.loaders=package.searchers end
-    if not string.explode then
-      string.explode = function (str, separator)
-        if not separator then separator=" +"  end
-        local t, nexti, pos = { }, 1, 1
-        while true do
-          local st, sp = str:find (separator, pos)
-          if not st then break end
-          if pos ~= st then
-            t [ nexti ] = str:sub ( pos , st - 1 )
-            nexti = nexti + 1
-          end
-          pos = sp + 1
-        end
-        t [ nexti ] = str:sub ( pos )
-        return t
-      end
-    end
-  }%
-}}%
-\end{lstlisting}
-%</!zh>
-%<*zh>
-\item \LuaTeX（版本号为大于0.65）和相关支持宏包。
-%如果用户使用的是\TeX Live2011以及最新版本的W32\TeX，可不考虑此项。
-%</zh>
-%<*en>
-\item The source archive of \LuaTeX-ja, of course\texttt{:)}
-%</en>
-%<*ja>
-\item \LuaTeX-jaのソースアーカイブ（もちろん\texttt{:)}）．
-%</ja>
-%<*zh>
-\item \LuaTeX-ja的源码（当然喽\texttt{:)}）。
-%</zh>
-%<*en>
-\item The \Pkg{xunicode} package, which version is \emph{just v0.981 (2011/09/09)}.\\
-If you have the \Pkg{fontspec} package, this \Pkg{xunicode} package must be exist.
-But be careful about the version; other versions may not work correctly with \LuaTeX-ja.
-%</en>
-%<*ja>
-\item \Pkg{xunicode}パッケージ(\textbf{2011/09/09,~v0.981})．\\
-\Pkg{fontspec}パッケージが導入されていればこのパッケージも導入されているはずであるが，
-このv0.981以外のバージョンでは\LuaTeX-ja上で正しく動作しない危険性がある．
-%</ja>
-%<*zh>
-\Pkg{xunicode}宏包，当前版本必须为\textit{v0.981(2011/09/09)}。\\
-如果你使用\Pkg{fontspec}宏包，\Pkg{xunicode}就必须存在。但是请注意该包的
-版本，其他版本可能不会正常工作。
-%</zh>
+\item \LuaTeX\ beta-0.74.0 (or later)
+\item \Pkg{luaotfload} v2.2~(2013/05/05)
+\item \Pkg{luatexbase} v0.6~(2013/05/04)
+\item \Pkg{xunicode} v0.981~(2011/09/09)
 \end{itemize}
 
 %<*en>
@@ -6421,7 +6346,7 @@ listing environments.
 また，行長と自然長との差の絶対値を計算し，それを\textit{total}とおく．
 
 \subsection{行末文字の位置調整}
-まず，行末が文字クラス$n$の\textbf{Jachar}であった場合，
+まず，行末が文字クラス$n$の\textbf{JAchar}であった場合，
 それを動かすことによって，\textbf{JAglue} が負担する調整量を少なくしようとする．
 この行末文字の左右の移動可能量は，JFM中にある文字クラス$n$の定義の
 \texttt{end\_stretch},~\texttt{end\_shrink}フィールドに全角単位の値として記述されている．

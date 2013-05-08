@@ -38,7 +38,7 @@ local ltjr_cidfont_data = ltjr.cidfont_data
 local OTF = luatexja.userid_table.OTF
 
 function get_ucs_from_rmlgbm(c)
-   local v = ltjr_cidfont_data["Adobe-Japan1"].unicodes["Japan1." .. tostring(c)]
+   local v = ltjr_cidfont_data["Adobe-Japan1"].resources.unicodes["Japan1." .. tostring(c)]
    if not v then -- AJ1 範囲外
       return 0
    elseif v<0xF0000 then -- 素直に Unicode にマップ可能
@@ -72,15 +72,16 @@ function append_jglyph(char)
 end
 
 function cid(key)
+   if key==0 then return append_jglyph(char) end
    local curjfnt = fonts.ids[tex.attribute[attr_curjfnt]]
    if not curjfnt.cidinfo or 
       curjfnt.cidinfo.ordering ~= "Japan1" and
       curjfnt.cidinfo.ordering ~= "GB1" and
       curjfnt.cidinfo.ordering ~= "CNS1" and
       curjfnt.cidinfo.ordering ~= "Korea1" then
-      ltjb.package_warning('luatexja-otf',
-			   'Current Japanese font (or other CJK font) "'
-			      ..curjfnt.psname..'" is not a CID-Keyed font (Adobe-Japan1 etc.)')
+--      ltjb.package_warning('luatexja-otf',
+--			   'Current Japanese font (or other CJK font) "'
+--			      ..curjfnt.psname..'" is not a CID-Keyed font (Adobe-Japan1 etc.)')
       return append_jglyph(get_ucs_from_rmlgbm(key))
    end
    local char = curjfnt.resources.unicodes[curjfnt.cidinfo.ordering..'.'..tostring(key)]
@@ -91,9 +92,8 @@ function cid(key)
                               ..tostring(key)..')', 
                            'Use a font including the specified CID character.')
       char = 0
-      return
    end
-   append_jglyph(char)
+   return append_jglyph(char)
 end
 
 function extract(head)

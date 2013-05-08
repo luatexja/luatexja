@@ -23,7 +23,7 @@ local path           = {
 local cid_reg, cid_order, cid_supp, cid_name
 local taux_dir = 'luatex-cache/luatexja'
 local cid_replace = {
-   ["Adobe-Japan1"] = {"UniJIS2004-UTF32", 23057, 
+   ["Adobe-Japan1"] = {"UniJIS2004-UTF32", 23057, 6,
 		       function (i)
 			  if (231<=i and i<=632) or (8718<=i and i<=8719) 
 		             or (12063<=i and i<=12087) then
@@ -35,20 +35,20 @@ local cid_replace = {
 			  end
 		       end},
                        -- 基本的には JIS X 0213:2004 に沿ったマッピング
-   ["Adobe-Korea1"] = {"UniKS-UTF32",  18351,
+   ["Adobe-Korea1"] = {"UniKS-UTF32",  18351, 2, 
 		       function (i)
 			  if 8094<=i and i<=8100 then 
 			     return 327680 -- 655360/2
 			  end
 		       end},
-   ["Adobe-GB1"]    = {"UniGB-UTF32",  30283,
+   ["Adobe-GB1"]    = {"UniGB-UTF32",  30283, 5, 
 		       function (i)
 			  if (814<=i and i<=939) or (i==7716) 
 		             or (22355<=i and i<=22357) then
 			     return 327680 -- 655360/2
 			  end
 		       end},
-   ["Adobe-CNS1"]   = {"UniCNS-UTF32", 19155,
+   ["Adobe-CNS1"]   = {"UniCNS-UTF32", 19155, 6,
 		       function (i)
 			  if (13648<=i and i<=13742) or (i==17603) then
 			     return 327680 -- 655360/2
@@ -119,14 +119,14 @@ do
       return {index = a} 
    end
    function make_cid_font()
+      local kx = cid_replace[cid_name]
       local k = {
-         cidinfo = { ordering=cid_order, registry=cid_reg, supplement=cid_supp },
+         cidinfo = { ordering=cid_order, registry=cid_reg, supplement=kx[3] },
          encodingbytes = 2, extend=1000, format = 'opentype',
          direction = 0, characters = {}, parameters = {}, embedding = "no", cache = "yes", 
          ascender = 0, descender = 0, factor = 0, hfactor = 0, vfactor = 0,
 	 tounicode = 1,
       }
-      local kx = cid_replace[cid_name]
       cidfont_data[cid_name] = k
 
       -- CID => Unicode 符号空間
@@ -175,8 +175,9 @@ do
 		     end,
 		     function(a) return a[1] ..string.format('%04X',a[2])  end)
       -- tt は cid -> tounicode になっているので cidm -> tounicode に変換
+      local kxf = kx[4]
       for i,v in ipairs(cidmo) do
-	 k.characters[v].width = kx[3](i)
+	 k.characters[v].width = kxf(i)
 	 if v>=0xF0000 then
 	    k.characters[v].tounicode = tt[i]
 	 end
@@ -232,10 +233,12 @@ local function read_cid_font()
 end
 
 -- High-level
+
+local definers = fonts.definers
 local function mk_rml(name, size, id)
-   local specification = fonts.definers.analyze(name,size)
-   specification = fonts.definers.resolve(specification)
-   local features = specification.features.normal
+   local specification = definers.analyze(name,size)
+   specification = definers.resolve(specification)
+   specification.detail = specification.detail or ''
 
    local fontdata = {}
    local cachedata = {}
@@ -259,44 +262,60 @@ local function mk_rml(name, size, id)
    -- characters & scaling
    if size < 0 then size = -size * 655.36 end
    local scale = size / 655360
-   local def_height =  0.88 * size -- character's default height (optimized for jfm-ujis.lua)
-   local def_depth =  0.12 * size  -- and depth.
-   if not cache_chars[cid_name][size] then
-      cache_chars[cid_name][size]  = {}
-      for k, v in pairs(cache_chars[cid_name][655360]) do
-         cache_chars[cid_name][size][k] = { 
-	    index = v.index, width = v.width * scale, 
-	    height = def_height, depth = def_depth, tounicode = v.tounicode,
-	 }
-      end
-   end
-   fontdata.characters = cache_chars[cid_name][size]
-   cachedata.characters = cache_chars[cid_name][size]
 
-   local parameters = {}
-   for k, v in pairs(s.parameters) do
-      parameters[k] = v * scale
+   do
+      local def_height =  0.88 * size 
+      -- character's default height (optimized for jfm-ujis.lua)
+      local def_depth =  0.12 * size  -- and depth.
+      if not cache_chars[cid_name][size] then
+	 cache_chars[cid_name][size]  = {}
+	 for k, v in pairs(cache_chars[cid_name][655360]) do
+	    cache_chars[cid_name][size][k] = { 
+	       index = v.index, width = v.width * scale, 
+	       height = def_height, depth = def_depth, tounicode = v.tounicode,
+	    }
+	 end
+      end
+      fontdata.characters = cache_chars[cid_name][size]
+      cachedata.characters = cache_chars[cid_name][size]
    end
-   fontdata.parameters = parameters;                cachedata.parameters = parameters
-   fontdata.ascender = fontdata.ascender * scale;   cachedata.ascender = fontdata.ascender
-   fontdata.descender = fontdata.descender * scale; cachedata.descender = fontdata.descender
-   fontdata.factor = fontdata.factor * scale;       cachedata.factor = fontdata.factor
-   fontdata.hfactor = fontdata.hfactor * scale;     cachedata.hfactor = fontdata.hfactor
-   fontdata.vfactor = fontdata.vfactor * scale;     cachedata.vfactor = fontdata.vfactor
-   fontdata.size = size;                            cachedata.size = size
-   fontdata.resources = s.resources
-   cachedata.resources = s.resources
-   
+
+   -- other parameters
+   do
+      local parameters = {}
+      for k, v in pairs(s.parameters) do
+	 parameters[k] = v * scale
+      end
+      fontdata.parameters  = parameters
+      fontdata.ascender    = fontdata.ascender * scale
+      fontdata.descender   = fontdata.descender * scale
+      fontdata.factor      = fontdata.factor * scale
+      fontdata.hfactor     = fontdata.hfactor * scale
+      fontdata.vfactor     = fontdata.vfactor * scale
+      fontdata.size        = size
+      fontdata.resources   = s.resources
+      cachedata.parameters = parameters
+      cachedata.ascender   = fontdata.ascender
+      cachedata.descender  = fontdata.descender
+      cachedata.factor     = fontdata.factor
+      cachedata.hfactor    = fontdata.hfactor
+      cachedata.vfactor    = fontdata.vfactor
+      cachedata.size       = size
+      cachedata.resources  = s.resources
+   end
+
    -- no embedding
    local var = ''
-  --  if features.slant then 
-  --     fontdata.slant = features.slant*1000;         cachedata.slant = fontdata.slant
-  --     var = var .. 's' .. tostring(features.slant)
-  --  end
-  --  if features.extend then 
-  --     fontdata.extend = features.extend*1000;       cachedata.extend = fontdata.extend
-  --      var = var .. 'x' .. tostring(features.extend)
-  --  end
+   local s = string.match(specification.detail, 'slant=([+-]*[0-9]*%.[0-9]*)')
+   if s and e~=1  then 
+      s = s * 1000
+      var, fontdata.slant  = var .. 's' .. tostring(s), s
+   end
+   local e = string.match(specification.detail, 'extend=([+-]*[0-9]*%.[0-9]*)')
+   if e and e~=1  then 
+      e = e * 1000
+      var, fontdata.extend  = var .. 'x' .. tostring(e), e
+   end
    fontdata.name = specification.name .. size .. var; cachedata.name = fontdata.name
    fontdata.fullname = specification.name .. var; cachedata.fullname = fontdata.fullname
    fontdata.psname = specification.name; cachedata.psname = fontdata.psname
