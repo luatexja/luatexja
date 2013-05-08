@@ -1527,21 +1527,16 @@ Use the JFM \texttt{jfm-jis.lua}, instead of \texttt{jfm-ujis.lua}, which is the
 %<en>\paragraph{Kozuka fonts}
 %<ja>\paragraph{小塚フォント}
 %<*en>
-When using single weight, we adopt Kozuka~Gothic~M as \textit{gothic},
-because we think that Kozuka~Gothic~R looks thin.
 There is not `Kozuka Maru Gothic', therefore Kozuka~Gothic~H is used
 as a substitute for \textit{rounded gothic}.
 %</en>
 %<*ja>
-まず，小塚フォントを用いる設定を述べる．
-単ウェイト時のゴシック体は小塚ゴシックRでは細いように感じるので，
-小塚ゴシックMに変更している．
-さらに，丸ゴシック体はないので便宜上小塚ゴシックHで代用している．
+丸ゴシック体はないので便宜上小塚ゴシックHで代用している．
 %</ja>
 \begin{center}\small
 \begin{tabular}{llll}
 \toprule
-&\tt kozuka4&\tt kozuka6&\tt kozuka6n\\
+&\tt kozuka-pro&\tt kozuka-pr6&\tt kozuka-pr6n\\
 \midrule
 %<*en>
 \bf mincho medium&Kozuka Mincho Pro R&Kozuka Mincho ProVI R&Kozuka Mincho Pr6N R\\
@@ -1550,7 +1545,7 @@ as a substitute for \textit{rounded gothic}.
 \bf gothic medium\\
   without \texttt{deluxe}
 &Kozuka Gothic Pro M&Kozuka Gothic ProVI M&Kozuka Gothic Pr6N M\\
-  multiple weights
+  with \texttt{deluxe}
 &Kozuka Gothic Pro R&Kozuka Gothic ProVI R&Kozuka Gothic Pr6N R\\
 \midrule
 \bf gothic bold
@@ -1581,28 +1576,25 @@ as a substitute for \textit{rounded gothic}.
 \end{tabular}
 \end{center}
 
-%<en>\paragraph{Hiragino and Morisawa}
-%<ja>\paragraph{ヒラギノ・モリサワ}
-%<*en>
-Settings for Hiragino fonts:
-%</en>
-%<*ja>
-まずヒラギノフォントから：
-%</ja>
-% これらは持っているわけではないので，フォント名が
-% 異なっているかもしれません．確認お願いします．
+%<en>\paragraph{Hiragino and Morisawa}\ 
+%<ja>\paragraph{ヒラギノ・モリサワ}\ 
 \begin{center}\small
 \begin{tabular}{lll}
 \toprule
-&\tt hiragino&\tt hiraginon\\
+&\tt hiragino-pro&\tt hiragino-pron\\
 \midrule
 %<*en>
 \bf mincho medium&
 Hiragino Mincho Pro W3&Hiragino Mincho Pr6N W3\\
 \bf mincho bold&
 Hiragino Mincho Pro W6&Hiragino Mincho Pr6N W6\\
-\bf gothic medium&
-Hiragino Kaku Gothic Pro W3&Hiragino Kaku Gothic ProN W3\\
+\midrule
+\bf gothic medium\\
+  without \texttt{deluxe}
+&Hiragino Kaku Gothic Pro W6&Hiragino Kaku Gothic ProN W6\\
+  with \texttt{deluxe}
+&Hiragino Kaku Gothic Pro W3&Hiragino Kaku Gothic ProN W3\\
+\midrule
 \bf gothic bold&
 Hiragino Kaku Gothic Pro W6&Hiragino Kaku Gothic ProN W6\\
 \bf gothic heavy&
@@ -1615,8 +1607,13 @@ Hiragino Maru Gothic Pro W4&Hiragino Maru Gothic ProN W4\\
 ヒラギノ明朝体Pro~W3&ヒラギノ明朝体Pr6N~W3\\
 \gt 明朝体太字&
 ヒラギノ明朝体Pro~W6&ヒラギノ明朝体Pr6N~W6\\
-\gt ゴシック体細字&
-ヒラギノ角ゴPro~W3&ヒラギノ角ゴProN~W3\\
+\midrule
+\gt ゴシック体細細字\\
+　単ウェイト時
+&ヒラギノ角ゴPro~W6&ヒラギノ角ゴProN~W6\\
+　多ウェイト時
+&ヒラギノ角ゴPro~W3&ヒラギノ角ゴProN~W3\\
+\midrule
 \gt ゴシック体太字&
 ヒラギノ角ゴPro~W6&ヒラギノ角ゴProN~W6\\
 \gt ゴシック体極太&
@@ -1624,19 +1621,9 @@ Hiragino Maru Gothic Pro W4&Hiragino Maru Gothic ProN W4\\
 \gt 丸ゴシック体&
 ヒラギノ丸ゴPro~W4&ヒラギノ丸ゴProN~W4\\
 %</ja>
-\bottomrule
-\end{tabular}
-\end{center}
-%<*en>
-Settings for Morisawa fonts:
-%</en>
-%<*ja>
-次はモリサワフォントを用いる設定である：
-%</ja>
-\begin{center}\small
-\begin{tabular}{lll}
-\toprule
-&\tt morisawa4&\tt morisawa6n\\
+\midrule
+\midrule
+&\tt morisawa-pro&\tt morisawa-pr6n\\
 \midrule
 %<*en>
 \bf mincho medium&
@@ -1715,7 +1702,7 @@ We can use HG~fonts bundled with Microsoft Office for realizing multiple weights
 \begin{center}\small
 \begin{tabular}{llll}
 \toprule
-&\tt ipa-dx&\tt ipaex-dx&\tt ms-dx\\
+&\tt ipa-hg&\tt ipaex-hg&\tt ms-hg\\
 \midrule
 %<*en>
 \bf mincho medium
@@ -4906,15 +4893,15 @@ $i$は7より小さい自然数．
 %<*en>
 Furthermore, \LuaTeX-ja uses several `user-defined' whatsit nodes for
 inrernal processing. All those nodes store a natural number (hence the node's
-\texttt{type} is 100). The following \verb+user_id+s are used:
+\texttt{type} is 100). 
 %</en>
 %<*ja>
-さらに，\LuaTeX-jaはいくつかの「ユーザ定義の」whatsit ノードを内部処理に用いる．
+さらに，\LuaTeX-jaはいくつかの「ユーザ定義の」whatsitノードを内部処理に用いる．
 これらの全てのノードは自然数を格納している（したがってノードの\texttt{type}は
-100である）．次の \verb+user_id+ が使用される：
+100である）．
 %</ja>
 \begin{description}
-\item[30111]
+\item[\texttt{inhibitglue}]
 %<*en>
 Nodes for indicating that \verb+\inhibitglue+ is
 	   specified. The \texttt{value} field of these nodes doesn't matter.
@@ -4924,7 +4911,7 @@ Nodes for indicating that \verb+\inhibitglue+ is
 \texttt{value}フィールドは意味を持たない．
 %</ja>
 
-\item[30112]
+\item[\texttt{stack\_marker}]
 %<*en>
 Nodes for \LuaTeX-ja's stack system (see the next
 	   subsection). The \texttt{value} field of these nodes is
@@ -4935,7 +4922,7 @@ Nodes for \LuaTeX-ja's stack system (see the next
 これらのノードの\texttt{value}フィールドは現在のグループを表す．
 %</ja>
 
-\item[30113]
+\item[\texttt{char\_by\_cid}]
 %<*en>
 Nodes for Japanese Characters which the callback process of
 	   \Pkg{luaotfload} won't be applied, and the character code is
@@ -4952,7 +4939,7 @@ Nodes for Japanese Characters which the callback process of
 \Pkg{luatexja-otf} パッケージでのみ使用される．
 %</ja>
 
-\item[30114]
+\item[\texttt{begin\_par}]
 Nodes for indicating beginning of a paragraph.
 A paragraph which is started by \verb+\item+ in list-like environments has a horizontal box
 for its label before the actual contents. So \dots

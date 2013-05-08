@@ -2,7 +2,8 @@
 -- luatexja/ltj-compat.lua
 --
 
-luatexja.load_module('base');  local ltjb = luatexja.base
+luatexja.load_module('base');   local ltjb = luatexja.base
+luatexja.load_module('stack');  local ltjs = luatexja.stack
 
 -- \kuten, \jis, \euc, \sjis, \ucs, \kansuji
 local function to_kansuji(num)
