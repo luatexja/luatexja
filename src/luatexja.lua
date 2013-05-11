@@ -49,10 +49,10 @@ stack_table_index.KSJ  = 0x400 -- 0--9
 
 local userid_table = {}
 luatexja.userid_table = userid_table
-userid_table.IHB  = luatexbase.newuserwhatsit('inhibitglue',  'luatexja') -- \inhibitglue
-userid_table.STCK = luatexbase.newuserwhatsit('stack_marker', 'luatexja') -- スタック管理
-userid_table.OTF  = luatexbase.newuserwhatsit('char_by_cid',  'luatexja') -- luatexja-otf
-userid_table.BPAR = luatexbase.newuserwhatsit('begin_par',    'luatexja') -- 「段落始め」
+userid_table.IHB  = luatexbase.newuserwhatsitid('inhibitglue',  'luatexja') -- \inhibitglue
+userid_table.STCK = luatexbase.newuserwhatsitid('stack_marker', 'luatexja') -- スタック管理
+userid_table.OTF  = luatexbase.newuserwhatsitid('char_by_cid',  'luatexja') -- luatexja-otf
+userid_table.BPAR = luatexbase.newuserwhatsitid('begin_par',    'luatexja') -- 「段落始め」
 
 --- 定義終わり
 

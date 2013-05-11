@@ -7,7 +7,6 @@ luatexbase.provides_module({
   version = '0.1',
   description = 'The OTF Lua module for LuaTeX-ja',
 })
-module('luatexja.otf', package.seeall)
 
 luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
@@ -37,7 +36,7 @@ local ltjr_cidfont_data = ltjr.cidfont_data
 
 local OTF = luatexja.userid_table.OTF
 
-function get_ucs_from_rmlgbm(c)
+local function get_ucs_from_rmlgbm(c)
    local v = ltjr_cidfont_data["Adobe-Japan1"].resources.unicodes["Japan1." .. tostring(c)]
    if not v then -- AJ1 範囲外
       return 0
@@ -57,13 +56,12 @@ function get_ucs_from_rmlgbm(c)
             return 0
          end
       end
-      --print(c, v, w) 
    end
 end
 
 -- Append a whatsit node to the list.
 -- This whatsit node will be extracted to a glyph_node
-function append_jglyph(char)
+local function append_jglyph(char)
    local p = node_new(id_whatsit,sid_user)
    local v = tex.attribute[attr_curjfnt]
    p.user_id=OTF; p.type=100; p.value=char
@@ -71,7 +69,7 @@ function append_jglyph(char)
    node.write(p)
 end
 
-function cid(key)
+local function cid(key)
    if key==0 then return append_jglyph(char) end
    local curjfnt = fonts.ids[tex.attribute[attr_curjfnt]]
    if not curjfnt.cidinfo or 
@@ -96,7 +94,7 @@ function cid(key)
    return append_jglyph(char)
 end
 
-function extract(head)
+local function extract(head)
    local p = head
    local v
    while p do
@@ -174,4 +172,9 @@ luatexbase.add_to_callback("luatexja.find_char_class",
 			   cid_set_char_class, "ltj.otf.find_char_class", 1)
 
 -------------------- all done
+luatexja.otf = {
+  append_jglyph = append_jglyph,
+  cid = cid,
+}
+
 -- EOF
