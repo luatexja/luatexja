@@ -16,6 +16,7 @@ local node_new = node.new
 local has_attr = node.has_attribute
 local set_attr = node.set_attribute
 local round = tex.round
+local getfont = font.getfont
 
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
@@ -218,7 +219,7 @@ luatexbase.create_callback("luatexja.define_jfont", "data", function (ft, fn) re
 function jfontdefY() -- for horizontal font
    local j = load_jfont_metric()
    local fn = font.id(cstemp)
-   local f = font.fonts[fn]
+   local f = getfont(fn)
    if not j then 
       ltjb.package_error('luatexja',
 			 "bad JFM `" .. jfm_file_name .. "'",
@@ -301,6 +302,7 @@ end
 -- MISC
 ------------------------------------------------------------------------
 
+local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char
 -- EXT: italic correction
 function append_italic()
    local p = tex.nest[tex.nest.ptr].tail
@@ -308,13 +310,18 @@ function append_italic()
       local f = p.font
       local g = node_new(id_kern)
       g.subtype = 1; node.set_attribute(g, attr_icflag, ITALIC)
-      if ltjc.is_ucs_in_japanese_char(p) then
+      if is_ucs_in_japanese_char(p) then
 	 f = has_attr(p, attr_curjfnt)
 	 local j = font_metric_table[f]
-	 local c = find_char_class(p.char, j)
-	 g.kern = j.char_type[c].italic
+	 g.kern = j.char_type[find_char_class(p.char, j)].italic
       else
-	 g.kern = font.fonts[f].characters[p.char].italic
+	 local h = getfont(f)
+	 if h then
+	    g.kern = h.characters[p.char].italic
+	 else
+	    tex.attribute[attr_icflag] = -(0x7FFFFFFF)
+	    return node.free(g)
+	 end
       end
       node.write(g)
       tex.attribute[attr_icflag] = -(0x7FFFFFFF)
