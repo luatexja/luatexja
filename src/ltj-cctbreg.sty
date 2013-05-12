@@ -8,7 +8,7 @@
 %! 筋が良くなく, できるなら避けたいが, 今のままだと LuaTeX-ja を
 %! LaTeX + fontspec で用いた時に確実に影響が出る. また衝突を残した
 %! ままだとカテゴリコードテーブルが実質的に使えない訳で, これも
-%! 残念なことである. 
+%! 残念なことである.
 %! 「近いうちに両パッケージの中で解決される」ことを期待しつつ,
 %! 「衝突がない」という前提で開発を行いたいので, 暫定的処置として,
 %! このモジュールを用意する.
@@ -77,7 +77,6 @@
 
 \begingroup
 \endlinechar=13
-\catcode`\_=12
 \gdef\ltj@@cctb@org@def#1{%
   \ifnum\lltxb@catcodetable@alloc<65535\relax
     \global\advance\lltxb@catcodetable@alloc\tw@
@@ -205,14 +204,11 @@
 \fi
 
 \def\ltj@@cctb@org@def{%
-  \ifnum\CatcodeTableStack<268435454 %
-    \global\advance\CatcodeTableStack by\tw@
+  \ifnum\CatcodeTableStack<65534\relax
+    \global\advance\CatcodeTableStack\tw@
   \else
-    \@PackageError{luatex}{%
-      Catcode table stack overflow%
-    }\@ehd
-  \fi
-}
+    \errmessage{CatcodeTableStack overflow}%
+  \fi}
 \unless\ifx\ltj@@cctb@org@def\IncCatcodeTableStack
   % Failure: luatex-pkg is not of expected version!!
   \ltj@@cctb@failure=100 %
@@ -261,8 +257,8 @@
   \catcode0   12 % nul
   \catcode13  12 % carriage return
   \catcode37  12 % percent
-  \setcatcoderange{65}{90}{12}% A-Z
-  \setcatcoderange{97}{122}{12}% a-z
+  \SetCatcodeRange{65}{90}{12}% A-Z
+  \SetCatcodeRange{97}{122}{12}% a-z
   \catcode92  12 % backslash
   \catcode127 12 }
 \newluatexcatcodetable\CatcodeTableOther
@@ -272,7 +268,7 @@
 \newluatexcatcodetable\CatcodeTableLaTeX
 \setluatexcatcodetable\CatcodeTableLaTeX{%
   \luatexcatcodetable\CatcodeTableIniTeX
-  \setcatcoderange{0}{31}{15}%
+  \SetCatcodeRange{0}{31}{15}%
   \catcode9   10 % tab
   \catcode12  13 % form feed
   \catcode13  5  % carriage return
