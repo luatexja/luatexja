@@ -330,6 +330,11 @@ function font_callback(name, size, id, fallback)
       local s = "Adobe-Japan1-6"
       local basename = utf.sub(name,p+1)
       local p = utf.find(basename, ":")
+      local q = utf.find(basename, "/[BI][BI]?")
+      if q and p and q<=p then
+	 basename = utf.gsub(basename, '/[BI][BI]?', '', 1)
+	 p = utf.find(basename, ":")
+      end
       if p then 
 	 local xname = utf.sub(basename, p+1)
 	 p = 1

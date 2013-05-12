@@ -2,7 +2,7 @@
 \documentclass{article}
 
 \usepackage{luatexja}
-\usepackage{luatexja-fontspec}
+\usepackage{luatexja-fontspec,booktabs,array}
 
 \defaultfontfeatures{Numbers=OldStyle}
 \setmainfont{TeXGyreTermes}
@@ -77,4 +77,19 @@
 \end{itemize}
 \end{itemize}
 \end{itemize}
+
+\newpage
+\section{fontspecによる非埋め込みフォント}
+\newjfontfamily\test[NoEmbed]{Ryumin-Light}
+
+\test
+\begin{tabular}{ll>{\itshape}l>{\slshape}l>{\scshape}l}
+\toprule
+&Upright&Italic&Slanted&Small Caps\\
+\midrule
+Regular&あいうえお&あいうえお&あいうえお&あいうえお\\
+Bold   &\textbf{あいうえお}&\textbf{あいうえお}&\textbf{あいうえお}&\textbf{あいうえお}\\
+\bottomrule
+\end{tabular}
+
 \end{document}
