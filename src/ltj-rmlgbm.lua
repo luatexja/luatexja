@@ -306,12 +306,12 @@ local function mk_rml(name, size, id)
 
    -- no embedding
    local var = ''
-   local s = string.match(specification.detail, 'slant=([+-]*[0-9]*%.[0-9]*)')
-   if s and e~=1  then 
+   local s = string.match(specification.detail, 'slant=([+-]*%d*%.?%d)')
+   if s and e~=0  then 
       s = s * 1000
       var, fontdata.slant  = var .. 's' .. tostring(s), s
    end
-   local e = string.match(specification.detail, 'extend=([+-]*[0-9]*%.[0-9]*)')
+   local e = string.match(specification.detail, 'extend=([+-]*%d*%.?%d)')
    if e and e~=1  then 
       e = e * 1000
       var, fontdata.extend  = var .. 'x' .. tostring(e), e

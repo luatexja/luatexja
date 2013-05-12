@@ -689,10 +689,56 @@ To install the \LuaTeX-ja\ package, you will need:
 \end{itemize}
 
 %<*en>
-The installation methods are as follows:
+\emph{From this version of \LuaTeX-ja, \TeX~Live~2012 (or older version) is
+no longer supported, since \LuaTeX\ binary and \Pkg{luaotfload} is updated in
+\TeX~Live~2013.} 
+And conversely, older versions of \LuaTeX-ja (20130318.1 or earlier) don't work in
+\TeX~Live~2013.
+
+\medskip
+
+Now \LuaTeX-ja is available from the following archive and distributions:
+  \begin{itemize}
+  \item CTAN (in the \texttt{macros/luatex/generic/luatexja} directory)
+  \item MiK\TeX\ (in \texttt{luatexja.tar.lzma})
+  \item \TeX\ Live (in \texttt{texmf-dist/tex/luatex/luatexja})
+  \item W32\TeX\ (in \texttt{luatexja.tar.xz})
+  \end{itemize}
+
+If you are using \TeX~Live~2013, you can install \LuaTeX-ja 
+from \TeX~Live manager (\texttt{tlmgr}):
+\begin{verbatim}
+$ tlmgr install luatexja
+\end{verbatim}
+
+\medskip
+
+If you want to install manually, do the following instruvtions:
 %</en>
 %<*ja>
-インストール方法は以下のようになる：
+\textbf{本バージョン以降の\LuaTeX-jaは\TeX~Live~2012以前では動作しない．}
+これは，\LuaTeX と\Pkg{luaotfload}が\TeX~Live~2013において更新されたことによる．
+逆に，20130318.1以前の\LuaTeX-jaは\TeX~Live~2013では動作しない．
+
+\medskip
+
+現在，\LuaTeX-jaは以下のアーカイブ，およびディストリビューションに収録されている：
+  \begin{itemize}
+  \item CTAN (\texttt{macros/luatex/generic/luatexja})
+  \item MiK\TeX\ (\texttt{luatexja.tar.lzma})
+  \item \TeX\ Live (\texttt{texmf-dist/tex/luatex/luatexja})
+  \item W32\TeX\ (\texttt{luatexja.tar.xz})
+  \end{itemize}
+
+例えば\TeX~Live~2013を利用しているなら，\LuaTeX-jaは\TeX~Live manager (\texttt{tlmgr})を
+使ってインストールすることができる．
+\begin{verbatim}
+$ tlmgr install luatexja
+\end{verbatim}
+
+\medskip
+
+手動でインストールする場合の方法は以下のようになる：
 %</ja>
 %<*zh>
 安装方法如下：
@@ -711,15 +757,7 @@ $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
 \begin{flushleft}
 \url{http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git;a=snapshot;h=HEAD;sf=tgz}.
 \end{flushleft}
-\item Now \LuaTeX-ja is available from the following archive and distributions:
-  \begin{itemize}
-  \item CTAN (in the \texttt{macros/luatex/generic/luatexja} directory)
-  \item MiK\TeX\ (in \texttt{luatexja.tar.lzma})
-  \item \TeX\ Live (in \texttt{texmf-dist/tex/luatex/luatexja})
-  \item W32\TeX\ (in \texttt{luatexja.tar.xz})
-  \end{itemize}
-  These are based on the \texttt{master} branch.
-\end{itemize}
+\end{itemize} 
 
 Note that the \texttt{master} branch, and hence the archive in CTAN, are not updated frequently;
 the forefront of development is not the \texttt{master} branch.
@@ -737,16 +775,7 @@ $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
 \begin{flushleft}
 \url{http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git;a=snapshot;h=HEAD;sf=tgz}.
 \end{flushleft}
-\item 今や，\LuaTeX-jaは以下のアーカイブ，およびディストリビューションにも収録されている：
-  \begin{itemize}
-  \item CTAN (\texttt{macros/luatex/generic/luatexja})
-  \item MiK\TeX\ (\texttt{luatexja.tar.lzma})
-  \item \TeX\ Live (\texttt{texmf-dist/tex/luatex/luatexja})
-  \item W32\TeX\ (\texttt{luatexja.tar.xz})
-  \end{itemize}
-  これらは\texttt{master}ブランチの内容を元にしている．
 \end{itemize}
-
 \texttt{master}ブランチ（従って，CTAN内のアーカイブも）はたまにしか更新されないことに注意．
 主な開発は\texttt{master}の外で行われ，比較的まとまってきたらそれを\texttt{master}に
 反映させることにしている．
@@ -763,16 +792,7 @@ $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
 \begin{flushleft}
 \url{http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git;a=snapshot;h=HEAD;sf=tgz}.
 \end{flushleft}
-\item 现在\LuaTeX-ja可以在下列仓库和发行版中获取：:
-  \begin{itemize}
-  \item CTAN (\texttt{macros/luatex/generic/luatexja}）
-  \item MiK\TeX\ (\texttt{luatexja.tar.lzma})
-  \item \TeX\ Live （\texttt{texmf-dist/tex/luatex/luatexja}）
-  \item W32\TeX\ （\texttt{luatexja.tar.xz}）
-  \end{itemize}
-  这些版本都基于\texttt{master}分支。
 \end{itemize}
-
 注意\texttt{master}分支和CTAN仓库中的版本，升级并不频繁。
 前段开发并未在\texttt{master}分支。
 %</zh>
@@ -798,7 +818,7 @@ But only the contents in \texttt{src/} are needed to work \LuaTeX-ja.
       instead copying is also good.
 %</en>
 %<*ja>
-\item \texttt{src/}の中身を自分の\texttt{TEXMF}ツリーにコピーする．
+\item \texttt{src}の中身を自分の\texttt{TEXMF}ツリーにコピーする．
       場所の例としては，例えば\texttt{TEXMF/tex/luatex/luatexja/}がある．
       シンボリックリンクが利用できる環境で，かつリポジトリを直接取得したのであれば，
       （更新を容易にするために）コピーではなくリンクを貼ることを勧める．
@@ -2891,8 +2911,9 @@ to specify a `name-only' Japanese font which
 will not be embedded to PDF. Typical use of this prefix is to specify
 the `standard' Japanese fonts, namely, `Ryumin-Light' and
 `GothicBBB-Medium'.
-\emph{You should not specify any font features, such as `{\tt +jp90}', 
-in the definition of `name-only' fonts using this `{\tt psft:}'\ prefix.}
+\emph{OpenType font features, such as `{\tt +jp90}', 
+have no meaning in `name-only' fonts using this `{\tt psft:}'\ prefix.
+This is because we can't expect what fonts are actually used by the PDF reader.}
 %</en>
 %<*ja>
 \texttt{file:} と \texttt{name:} のプリフィックスに加えて，
@@ -2902,7 +2923,7 @@ in the definition of `name-only' fonts using this `{\tt psft:}'\ prefix.}
 和文フォントを指定することができる．「標準的な」和文フォント，
 つまり`Ryumin-Light'と`GothicBBB-Medium'の指定でこのプリフィックスが使われる．
 \textbf{非埋込フォントをPDFに使用すると，実際にどのようなフォントが表示に用いられるか予測できない．
-そのため，本プリフィックス指定時には，\texttt{+jp90} などのfont featureは指定すべきでない．}
+本プリフィックス指定時には，\texttt{+jp90} などのOpenType font featureの効力はない．}
 %</ja>
 %<*zh>
 除使用\texttt{file:}和\texttt{name:}外，我们还可以在\verb!\jfont!（以及\verb!\font!）
@@ -2986,6 +3007,40 @@ Please contact the LuaTeX-ja project team.
 %<*ja>
 というエラーが出る．
 %</ja>
+
+%<*ja>
+\paragraph{\texttt{extend}と\texttt{slant}}
+OpenType font featureと見かけ上同じような形式で指定できるものに，
+\begin{description}
+\item[\texttt{extend=}<extend>] 横方向に<extend>倍拡大する．
+\item[\texttt{slant=}<slant>] <slant>に指定された割合だけ傾ける．
+\end{description}  
+の2つがあり，これらだけは\texttt{psft}プリフィックスでも使用可能にしている．
+\texttt{extend}や\texttt{slant}を指定した場合は，それに応じたJFMを指定すべきである%
+\footnote{\LuaTeX-jaでは，これらに対するJFMを特に提供することはしない予定である．}．
+例えば，次の例では無理やり通常のJFMを使っているために，文字間隔やイタリック補正量が
+正しくない：
+%</ja>
+%<*en>
+\paragraph{\texttt{extend} and \texttt{slant}}
+The following setting can be specified as OpenType font features:
+\begin{description}
+\item[\texttt{extend=}<extend>] expand the font horizontally by <extend>.
+\item[\texttt{slant=}<slant>] slant the font.
+\end{description}
+These two settings are also supported with \texttt{psft} prefix.
+Note that \LuaTeX-ja doesn't adjust JFMs by these \texttt{extend} and \texttt{slant}
+settings; you have to write new JFMs on purpose. 
+For example, the following example uses the standard JFM \texttt{jfm-ujis.lua}, hence
+letter-spacing and the width of italic correction are not correct:
+%</en>
+\begin{LTXexample}[width=0.3\textwidth]
+\jfont\E=psft:Ryumin-Light:extend=1.5;jfm=ujis
+\E あいうえお
+
+\jfont\S=psft:Ryumin-Light:slant=1;jfm=ujis
+\S あいう\/ABC
+\end{LTXexample}
 
 %<en>\subsection{Structure of JFM file}
 %<ja>\subsection{JFMファイルの構造}
