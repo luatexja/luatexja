@@ -683,12 +683,12 @@ To install the \LuaTeX-ja\ package, you will need:
 %</zh>
 \begin{itemize}
 \item \LuaTeX\ beta-0.74.0 (or later)
-\item \Pkg{luaotfload} v2.2~(2013/05/05)
+\item \Pkg{luaotfload} v2.2
 \item \Pkg{luatexbase} v0.6~(2013/05/04)
 \item \Pkg{xunicode} v0.981~(2011/09/09)
 \end{itemize}
 
-%<*en>
+%<*!ja>
 \emph{From this version of \LuaTeX-ja, \TeX~Live~2012 (or older version) is
 no longer supported, since \LuaTeX\ binary and \Pkg{luaotfload} is updated in
 \TeX~Live~2013.} 
@@ -713,8 +713,8 @@ $ tlmgr install luatexja
 
 \medskip
 
-If you want to install manually, do the following instruvtions:
-%</en>
+%<en>If you want to install manually, do the following instruvtions:
+%</!ja>
 %<*ja>
 \textbf{本バージョン以降の\LuaTeX-jaは\TeX~Live~2012以前では動作しない．}
 これは，\LuaTeX と\Pkg{luaotfload}が\TeX~Live~2013において更新されたことによる．
@@ -1467,16 +1467,16 @@ featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を�
 另注意，出格特性在这7个命令中默认关闭，因为此特性会与\textbf{JAglue}冲突（参见\ref{para-kern}）。
 %</zh>
 
-%<en>\subsection{Preset}
+%<!ja>\subsection{Preset}
 %<ja>\subsection{プリセット設定}
 \label{ssec-preset}
 
-%<*en>
+%<*!ja>
 To use standard Japanese font settings easily, one can load \Pkg{luatexja-preset}
 package with several options. This package provides functions in a part of
 \Pkg{otf} package and a part of \Pkg{PXchfon} package by Takayuki Yato,
 and loads \Pkg{luatexja-fontspec} internally.
-%</en>
+%</!ja>
 %<*ja>
 よく使われている和文フォント設定を一行で指定できるようにしたのが
 \Pkg{luatexja-preset}パッケージである．このパッケージは，
@@ -1484,11 +1484,11 @@ and loads \Pkg{luatexja-fontspec} internally.
 合わせたような格好をしており，内部で\Pkg{luatexja-fontspec}を読み込んでいる．
 %</ja>
 
-%<en>\paragraph{General options}
+%<!ja>\paragraph{General options}
 %<ja>\paragraph{一般的なオプション}
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
 \item[deluxe]
-%<*en>
+%<*!ja>
 Specifying this option enables us to use \textit{mincho} with two weights (medium~and~bold),
 \textit{gothic} with three weights (medium,~bold and~heavy), and \textit{rounded gothic}%
 \footnote{Provided by \texttt{\char92mgfamily},
@@ -1496,7 +1496,7 @@ because \textit{rounded gothic} is called \textit{maru gothic} (丸ゴシック)
 The heavy weight of \textit{gothic} can be used by ``changing the family'' \verb+\gtebfamily+.
 This is because \Pkg{fontspec} package can handle only medium (\verb+\mdseries+) and
 bold (\verb+\bfseries+).
-%</en>
+%</!ja>
 %<*ja>
 明朝体2ウェイト・ゴシック体3ウェイトと，
 丸ゴシック体 (\verb+\mgfamily+) を使用可能とする．
@@ -1505,39 +1505,25 @@ bold (\verb+\bfseries+).
 このような中途半端な実装になっている．
 %</ja>
 \item[expert]
-%<*en>
+%<*!ja>
 Use horizontal kana alternates, and define a control sequence \verb+\rubyfamily+ to use kana
 characters designed for ruby.
-%</en>
-%<*ja>
-横組専用仮名を用いる．また，\verb+\rubyfamily+ でルビ用仮名が使用可能となる．
-%</ja>
+%</!ja>
+%<ja>横組専用仮名を用いる．また，\verb+\rubyfamily+ でルビ用仮名が使用可能となる．
 \item[bold]
-%<*en>
-Use bold gothic as bold mincho.
-%</en>
-%<*ja>
-明朝の太字をゴシック体の太字とする．
-%</ja>
+%<!ja>Use bold gothic as bold mincho.
+%<ja>明朝の太字をゴシック体の太字とする．
 \item[90jis]
-%<*en>
-Use fonts with 90JIS glyphs if possible.
-%</en>
-%<*ja>
-出来る限り90JISの字形を採用しているフォントを使う．
-%</ja>
+%<!ja>Use 90JIS glyph variants if possible.
+%<ja>出来る限り90JISの字形を使う．
 \item[jis2004]
-%<*en>
-Use fonts with JIS2004 glyphs if possible.
-%</en>
-%<*ja>
-出来る限りJIS2004の字形を採用しているフォントを使う．
-%</ja>
+%<!ja>Use JIS2004 glyph variants if possible.
+%<ja>出来る限りJIS2004の字形を使う．
 \item[jis]
-%<*en>
+%<*!ja>
 Use the JFM \texttt{jfm-jis.lua}, instead of \texttt{jfm-ujis.lua}, which is the default JFM of
 \LuaTeX-ja.
-%</en>
+%</!ja>
 %<*ja>
 用いるJFMを（JISフォントメトリック類似の）\texttt{jfm-jis.lua}にする．このオプションがない時は
 \LuaTeX-ja標準の\texttt{jfm-ujis.lua}が用いられる．
@@ -1558,7 +1544,7 @@ as a substitute for \textit{rounded gothic}.
 \toprule
 &\tt kozuka-pro&\tt kozuka-pr6&\tt kozuka-pr6n\\
 \midrule
-%<*en>
+%<*!ja>
 \bf mincho medium&Kozuka Mincho Pro R&Kozuka Mincho ProVI R&Kozuka Mincho Pr6N R\\
 \bf mincho bold&Kozuka Mincho Pro B&Kozuka Mincho ProVI B&Kozuka Mincho Pr6N B\\
 \midrule
@@ -1574,7 +1560,7 @@ as a substitute for \textit{rounded gothic}.
 &Kozuka Gothic Pro H&Kozuka Gothic ProVI H&Kozuka Gothic Pr6N H\\
 (rounded gothic)
 &Kozuka Gothic Pro H&Kozuka Gothic ProVI H&Kozuka Gothic Pr6N H\\
-%</en>
+%</!ja>
 %<*ja>
 \gt 明朝体細字&小塚明朝Pro~R&小塚明朝ProVI~R&小塚明朝Pr6N~R\\
 \gt 明朝体太字&小塚明朝Pro~B&小塚明朝ProVI~B&小塚明朝Pr6N~B\\
@@ -1603,7 +1589,7 @@ as a substitute for \textit{rounded gothic}.
 \toprule
 &\tt hiragino-pro&\tt hiragino-pron\\
 \midrule
-%<*en>
+%<*!ja>
 \bf mincho medium&
 Hiragino Mincho Pro W3&Hiragino Mincho Pr6N W3\\
 \bf mincho bold&
@@ -1621,7 +1607,7 @@ Hiragino Kaku Gothic Pro W6&Hiragino Kaku Gothic ProN W6\\
 Hiragino Kaku Gothic Std W8&Hiragino Kaku Gothic StdN W8\\
 \bf rounded gothic&
 Hiragino Maru Gothic Pro W4&Hiragino Maru Gothic ProN W4\\
-%</en>
+%</!ja>
 %<*ja>
 \gt 明朝体細字&
 ヒラギノ明朝体Pro~W3&ヒラギノ明朝体Pr6N~W3\\
@@ -1679,12 +1665,12 @@ Jun Pro 101&Jun Pr6N 101\\
 
 %<en>\paragraph{Settings for single weight}
 %<ja>\paragraph{単ウェイト用設定}
-%<*en>
+%<*!ja>
 Next, we describe settings for using only single weight.
 In four settings below, we use same fonts for medium and bold (and heavy) weights.
 (Hence \verb+\mcfamily\bfseries+ and \verb+\mcfamily\mdseries+ yields same Japanese fonts,
 if \texttt{deluxe} option is also specified).
-%</en>
+%</!ja>
 %<*ja>
 次に，単ウェイト用の設定を述べる．この4設定では「細字」「太字」の区別はない．
 また，丸ゴシック体はゴシック体と同じフォントを用いる．
@@ -1694,12 +1680,12 @@ if \texttt{deluxe} option is also specified).
 \toprule
 &\tt noembed&\tt ipa&\tt ipaex&\tt ms\\
 \midrule
-%<*en>
+%<*!ja>
 \bf mincho&Ryumin-Light (non-embedded)
 &IPAMincho&IPAexMincho&MS Mincho\\
 \bf gothic&GothicBBB-Medium (non-embedded)
 &IPAGothic&IPAexGothic&MS Gothic\\
-%</en>
+%</!ja>
 %<*ja>
 \gt 明朝体&Ryumin-Light（非埋込）
 &IPA明朝&IPAex明朝&MS明朝\\
@@ -1710,11 +1696,11 @@ if \texttt{deluxe} option is also specified).
 \end{tabular}
 \end{center}
 
-%<en>\paragraph{Using HG fonts}
+%<!ja>\paragraph{Using HG fonts}
 %<ja>\paragraph{HGフォントの利用}
-%<*en>
+%<*!ja>
 We can use HG~fonts bundled with Microsoft Office for realizing multiple weights in Japanese fonts.
-%</en>
+%</!ja>
 %<*ja>
 すぐ前に書いた単ウェイト用設定を，Microsoft Office等に付属するHGフォントを使って
 多ウェイト化した設定もある．
@@ -1724,7 +1710,7 @@ We can use HG~fonts bundled with Microsoft Office for realizing multiple weights
 \toprule
 &\tt ipa-hg&\tt ipaex-hg&\tt ms-hg\\
 \midrule
-%<*en>
+%<*!ja>
 \bf mincho medium
 &IPAMincho&IPAexMincho&MS Mincho\\\midrule
 \bf mincho bold&
@@ -1743,7 +1729,7 @@ We can use HG~fonts bundled with Microsoft Office for realizing multiple weights
 \multicolumn{3}{c}{HG Soei Kaku Gothic UB}\\\midrule
 \bf rounded gothic&
 \multicolumn{3}{c}{HG Maru Gothic PRO}\\
-%</en>
+%</!ja>
 %<*ja>
 \gt 明朝体細字
 &IPA明朝&IPAex明朝&MS明朝\\\midrule
@@ -1767,7 +1753,7 @@ We can use HG~fonts bundled with Microsoft Office for realizing multiple weights
 \bottomrule
 \end{tabular}
 \end{center}
-%<*en>
+%<*!ja>
 Note that HG~Mincho~E, HG~Gothic~E, HG Soei Kaku Gothic UB and HG Maru Gothic PRO
 are internally specified by:
 \begin{description}
@@ -1775,7 +1761,7 @@ are internally specified by:
 \item[{\tt 90jis}] by filename (\texttt{hgrme.ttc}, \texttt{hgrge.ttc}, \texttt{hgrsgu.ttc}, \texttt{hgrsmp.ttf}).
 \item[{\tt jis2004}] by filename (\texttt{hgrme04.ttc}, \texttt{hgrge04.ttc}, \texttt{hgrsgu04.ttc}, \texttt{hgrsmp04.ttf}).
 \end{description}
-%</en>
+%</!ja>
 %<*ja>
 なお，HG明朝E・HGゴシックE・HG創英角ゴシックUB・HG丸ゴシック体PROの4つについては，内部で
 \begin{description}
@@ -3021,7 +3007,7 @@ OpenType font featureと見かけ上同じような形式で指定できるも�
 例えば，次の例では無理やり通常のJFMを使っているために，文字間隔やイタリック補正量が
 正しくない：
 %</ja>
-%<*en>
+%<*!ja>
 \paragraph{\texttt{extend} and \texttt{slant}}
 The following setting can be specified as OpenType font features:
 \begin{description}
@@ -3033,7 +3019,7 @@ Note that \LuaTeX-ja doesn't adjust JFMs by these \texttt{extend} and \texttt{sl
 settings; you have to write new JFMs on purpose. 
 For example, the following example uses the standard JFM \texttt{jfm-ujis.lua}, hence
 letter-spacing and the width of italic correction are not correct:
-%</en>
+%</!ja>
 \begin{LTXexample}[width=0.3\textwidth]
 \jfont\E=psft:Ryumin-Light:extend=1.5;jfm=ujis
 \E あいうえお
@@ -3987,36 +3973,33 @@ character other than space~`\texttt{\char32}'~(U+0020) has the category code
 %<zh>\subsection{参数一览}
 \label{ssec-param}
 
-%<*en>
+%<*!ja>
 The following is the list of parameters which can be specified by the
 \verb+\ltjsetparameter+ command. [\verb+\cs+] indicates the counterpart
 in \pTeX, and symbols beside each parameter has the following meaning:
-%</en>
+%</!ja>
 %<*ja>
 以下は \verb+\ltjsetparameter+ に指定することができるパラメータの一覧である．
 [\verb+\cs+]は\pTeX における対応物を示す．
 また，それぞれのパラメータの右上にある記号には次の意味がある：
 %</ja>
 \begin{itemize}
-%<*zh>
-\item % avoiding from error ``Something's wrong--perhaps a missing \item.''.
-%</zh>
-%<*en>
+%<*!ja>
 \item No mark: values at the end of the paragraph or the hbox are
       adopted in the whole paragraph/hbox.
-%</en>
+%</!ja>
 %<*ja>
 \item 記号なし：段落や水平ボックスの終端での値がその段落／水平ボックス全体で用いられる．
 %</ja>
-%<*en>
+%<*!ja>
 \item `\ast' : local parameters, which can change everywhere inside a paragraph/hbox.
-%</en>
+%</!ja>
 %<*ja>
 \item `\ast'：ローカルなパラメータであり，段落／水平ボックス内のどこででも値を変えることができる．
 %</ja>
-%<*en>
+%<*!ja>
 \item `\dagger': assignments are always global.
-%</en>
+%</!ja>
 %<*ja>
 \item `\dagger'：指定は常にグローバルになる．
 %</ja>
@@ -4276,7 +4259,7 @@ With the help of this example, we remark the specification of \verb+\inhibitglue
 %</zh>
 \begin{itemize}
 %<*zh>
-\item
+\item ...
 %</zh>
 %<*en>
 \item The call of \verb+\inhibitglue+ in the (internal) vertical mode is
