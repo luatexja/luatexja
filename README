@@ -1,6 +1,6 @@
 The LuaTeX-ja Package $VER$
 --------------------------------
-Copyright (c) 2011--2012 The LuaTeX-ja project
+Copyright (c) 2011--2013 The LuaTeX-ja project
 License: modified BSD (see COPYING)
 
 LuaTeX-ja is a macro package for typesetting Japanese documents with LuaTeX.
@@ -15,7 +15,7 @@ LuaTeX-ja is developed on
 If you have questions or recognize bugs/have feature requests,
 we would like you to create a thread in the forum or a ticket
 in the way which SourceForge.JP supplies, via links found in
-the page above. 
+the page above.
 
 
 Installation
@@ -56,4 +56,3 @@ Simply loading luatexja.sty by \input or \usepackage does the minimal setting.
 
 
 Last commit date: $Format:%cd$
-
