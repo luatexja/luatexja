@@ -194,36 +194,36 @@ do
          k.characters[46].width = math.floor(655360/14);
 	 -- Standard fonts are ``seriffed''. 
          table.tofile(savepath, k,'return', false, true, false )
+         ltjb.package_info_no_line('luatexja', "saved :'" .. savepath .. "'", '')
       else 
-         ltjb.package_warning('luatexja', 
-                              'failed to save informations of non-embedded 2-byte fonts', '')
+         ltjb.package_warning_no_line('luatexja', "failed to save to '" .. savepath .. "'", '')
       end
    end
 end
 local make_cid_font = make_cid_font
 
 -- 
+local function cid_cache_load(fullpath)
+   cidfont_data[cid_name] = require(fullpath)
+   cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
+end
+
 local function read_cid_font()
    -- local v = "ltj-cid-" .. string.lower(cid_name) .. ".lua"
    local v = "ltj-cid-auto-" .. string.lower(cid_name) .. ".lua"
-   local localpath  = file.join(path.localdir, v)
-   local systempath = file.join(path.systemdir, v)
+   local localpath  = file.join(path.localdir .. '/luatexja', v)
+   local systempath = file.join(path.systemdir .. '/luatexja' , v)
    local kpsefound  = kpse.find_file(v)
    if kpsefound and file.isreadable(kpsefound) then
-      cidfont_data[cid_name] = require(kpsefound)
-      cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
+      cid_cache_load(kpsefound)
    elseif file.isreadable(localpath)  then
-      cidfont_data[cid_name] = require(localpath)
-      cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
+      cid_cache_load(localpath)
    elseif file.isreadable(systempath) then
-      cidfont_data[cid_name] = require(systempath)
-      cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
+      cid_cache_load(systempath)
+   else
+      -- Now we must create the virtual metrics from CMap.
+      make_cid_font()
    end
-   -- Now we must create the virtual metrics from CMap.
-   ltjb.package_info('luatexja', 
-			'I try to generate informations of non-embedded 2-byte fonts...', '')
-   make_cid_font()
-
    if cidfont_data[cid_name] then
       for i,v in pairs(cidfont_data[cid_name].characters) do
          if not v.width then v.width = 655360 end
