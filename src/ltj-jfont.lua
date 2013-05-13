@@ -236,8 +236,6 @@ function jfontdefY() -- for horizontal font
 		     chars = sz.chars, char_type = sz.char_type,
 		     kanjiskip = sz.kanjiskip, xkanjiskip = sz.xkanjiskip, 
 		    }
-   fmtable.mono_flag = fonts.ids[fn].cidinfo
-      and (not string.match((fonts.ids[fn].name or ''), "+[(pwid)(palt)]"))
       
    fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
    font_metric_table[fn]=fmtable
