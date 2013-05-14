@@ -223,6 +223,7 @@ scripts for appropriate callbacks.
 
 %<en>\subsection{Major Changes from \pTeX}
 %<ja>\subsection{\pTeX からの主な変更点}
+\label{ssec:chgptex}
 
 %<*en>
 The \LuaTeX-ja package is under much influence of \pTeX\ engine. The initial
@@ -249,15 +250,13 @@ The followings are major changes from \pTeX:
 \begin{itemize}
 %<*en>
 \item A Japanese font is a tuple of a `real' font, a Japanese font
-      metric (\textbf{JFM}, for short), and an optional string called
-      `variation'.
+      metric (\textbf{JFM}, for short).
 %</en>
 %<*ja>
 \item 和文フォントは（小塚明朝，IPA明朝などの）実際のフォント，和文フォン
       トメトリック（JFMと呼ぶ\footnote{混乱を防ぐため，p\TeX の意味での
       JFM (\texttt{min10.tfm}) などは本ドキュメントでは\textbf{和文用
-      TFM}とよぶことにする．}），そして`variation'と呼ばれる文字列の組で
-      ある．
+      TFM}とよぶことにする．}）の組である．
 %</ja>
 
 %<*en>
@@ -316,7 +315,7 @@ The followings are major changes from \pTeX:
       使われていたいくつかの方法は用いることができない．具体的には，次の方法はもはや無効である：}
 %</ja>
 \begin{verbatim}
-　　ちょ{}っと　　ちょ\/っと
+\hskip2\zw ちょ{}っと\hskip2\zw ちょ\/っと
 \end{verbatim}
 %<*en>
       If you want to do so, please put an empty hbox between it instead:
@@ -325,16 +324,16 @@ The followings are major changes from \pTeX:
       もし同じことをやりたければ，空の水平ボックスを間に挟めばよい：
 %</ja>
 \begin{verbatim}
-　　ちょ\hbox{}っと
+\hskip2\zw ちょ\hbox{}っと
 \end{verbatim}
 
 
 %<*en>
 \item In the process, two Japanese fonts which only differ in their `real'
-      fonts are identified.
+      fonts are identified. 
 %</en>
 %<*ja>
-\item 処理中では，2つの和文フォントは，「実際の」フォントのみが異なる場合に同一視
+\item 処理中では，2つの和文フォントは，「実際の」フォントが異なるだけの場合には同一視
       される．
 %</ja>
 \end{itemize}
@@ -1126,7 +1125,8 @@ as a substitute for \textit{rounded gothic}.
 %<*ja>
 丸ゴシック体はないので便宜上小塚ゴシックHで代用している．
 %</ja>
-\begin{center}\small
+\par\nobreak\medskip
+{\centering\small
 \begin{tabular}{llll}
 \toprule
 &\tt kozuka-pro&\tt kozuka-pr6&\tt kozuka-pr6n\\
@@ -1166,12 +1166,12 @@ as a substitute for \textit{rounded gothic}.
 &小塚ゴシックPro~H&小塚ゴシックProVI~H&小塚ゴシックPr6N~H\\
 %</ja>
 \bottomrule
-\end{tabular}
-\end{center}
+\end{tabular}\par\medskip}
 
 %<en>\paragraph{Hiragino and Morisawa}\ 
 %<ja>\paragraph{ヒラギノ・モリサワ}\ 
-\begin{center}\small
+\par\nobreak\medskip
+{\centering\small
 \begin{tabular}{lll}
 \toprule
 &\tt hiragino-pro&\tt hiragino-pron\\
@@ -1247,8 +1247,7 @@ Jun Pro 101&Jun Pr6N 101\\
 じゅんPro 101&じゅんPr6N 101\\
 %</ja>
 \bottomrule
-\end{tabular}
-\end{center}
+\end{tabular}\par\medskip}
 
 %<en>\paragraph{Settings for single weight}
 %<ja>\paragraph{単ウェイト用設定}
@@ -1262,7 +1261,8 @@ if \texttt{deluxe} option is also specified).
 次に，単ウェイト用の設定を述べる．この4設定では「細字」「太字」の区別はない．
 また，丸ゴシック体はゴシック体と同じフォントを用いる．
 %</ja>
-\begin{center}\small
+\par\nobreak\medskip
+{\centering\small
 \begin{tabular}{lllll}
 \toprule
 &\tt noembed&\tt ipa&\tt ipaex&\tt ms\\
@@ -1280,8 +1280,7 @@ if \texttt{deluxe} option is also specified).
 &IPAゴシック&IPAexゴシック&MSゴシック\\
 %</ja>
 \bottomrule
-\end{tabular}
-\end{center}
+\end{tabular}\par\medskip}
 
 %<en>\paragraph{Using HG fonts}
 %<ja>\paragraph{HGフォントの利用}
@@ -1292,7 +1291,8 @@ We can use HG~fonts bundled with Microsoft Office for realizing multiple weights
 すぐ前に書いた単ウェイト用設定を，Microsoft Office等に付属するHGフォントを使って
 多ウェイト化した設定もある．
 %</ja>
-\begin{center}\small
+\par\nobreak\medskip
+{\centering\small
 \begin{tabular}{llll}
 \toprule
 &\tt ipa-hg&\tt ipaex-hg&\tt ms-hg\\
@@ -1338,8 +1338,8 @@ We can use HG~fonts bundled with Microsoft Office for realizing multiple weights
 \multicolumn{3}{c}{HG丸ゴシック体PRO}\\
 %</ja>
 \bottomrule
-\end{tabular}
-\end{center}
+\end{tabular}\par\medskip}
+
 %<*en>
 Note that HG~Mincho~E, HG~Gothic~E, HG Soei Kaku Gothic UB and HG Maru Gothic PRO
 are internally specified by:
@@ -1914,7 +1914,7 @@ so TrueType/OpenType fonts with features can be used for Japanese fonts:
 TrueType/OpenTypeフォントにfeatureを指定したものを和文フォントとして用いる
 ことができる：
 %</ja>
-\begin{LTXexample}
+\begin{LTXexample}[width=0.4\textwidth]
 \jfont\tradgt={file:ipaexg.ttf:script=latn;%
   +trad;-kern;jfm=ujis} at 14pt
 \tradgt{}当／体／医／区
@@ -1959,9 +1959,7 @@ The following JFMs are shipped with \LuaTeX-ja:
 %</en>
 %<*ja>
 JFMの名前を指定する．もし以前に指定されたJFMが読み込まれていなければ，
-\texttt{jfm-<name>.lua}を読み込む．
-
-以下のJFMが\LuaTeX-jaには同梱されている：
+\texttt{jfm-<name>.lua}を読み込む．以下のJFMが\LuaTeX-jaには同梱されている：
 %</ja>
 \begin{description}
 %<*en>
@@ -2001,7 +1999,24 @@ JFMの名前を指定する．もし以前に指定されたJFMが読み込ま�
 %</ja>
 \end{description}
 
+%<*en>
 \item[jfmvar=<string>] Sometimes there is a need that \ldots.
+%</en>
+%<*ja>
+\item[jfmvar=<string>] 標準では，JFMとサイズが同じで，
+  実フォントだけが異なる2つの和文フォントは……
+%</ja>
+\begin{LTXexample}[width=0.4\textwidth]
+\ltjsetparameter{differentjfm=both}
+\jfont\F=file:ipam.ttf:jfm=ujis
+\jfont\G=file:ipag.ttf:jfm=ujis
+\jfont\H=file:ipag.ttf:jfm=ujis;jfmvar=hoge
+
+\F ）{\G 【】}（ % halfwidth space
+   ）{\H 『』}（ % fullwidth space
+
+\ltjsetparameter{differentjfm=paverage}
+\end{LTXexample}
 \end{list}
 
 \begin{table}[t]
@@ -2114,15 +2129,6 @@ The default font defined by using \texttt{psft:} prefix is for Japanese typesett
 it is Adobe-Japan1-6 CID-keyed font.
 One can specify \texttt{cid} key to use other CID-keyed non-embedded fonts
 for Chinese or Korean typesetting.
-\begin{lstlisting}[numbers=left]
-\jfont\testJ={psft:Ryumin-Light:cid=Adobe-Japan1-6;jfm=jis}     % Japanese
-\jfont\testD={psft:Ryumin-Light:jfm=jis}                        % default value is Adobe-Japan1-6
-\jfont\testC={psft:AdobeMingStd-Light:cid=Adobe-CNS1-5;jfm=jis} % Traditional Chinese
-\jfont\testG={psft:SimSun:cid=Adobe-GB1-5;jfm=jis}              % Simplified Chinese
-\jfont\testK={psft:Batang:cid=Adobe-Korea1-2;jfm=jis}           % Korean
-\end{lstlisting}
-Note that the code above specifies \texttt{jfm-jis.lua}, which is for Japanese fonts,
-as JFM for Chinese and Korean fonts.
 %</en>
 %<*ja>
 標準で\texttt{psft:}プリフィックスで定義されるフォントは日本語用のもので
@@ -2131,13 +2137,19 @@ as JFM for Chinese and Korean fonts.
 の対応も必要となった．そのために追加されたのが\texttt{cid}キーである．
 
 \texttt{cid}キーに値を指定すると，そのCIDを持った非埋込フォントを定義することができる：
+%</ja>
 \begin{lstlisting}[numbers=left]
-\jfont\testJ={psft:Ryumin-Light:cid=Adobe-Japan1-6;jfm=jis}     % 日本語
-\jfont\testD={psft:Ryumin-Light:jfm=jis}                        % 無指定時は Adobe-Japan1-6
-\jfont\testC={psft:AdobeMingStd-Light:cid=Adobe-CNS1-5;jfm=jis} % 中国語繁体字
-\jfont\testG={psft:SimSun:cid=Adobe-GB1-5;jfm=jis}              % 中国語簡体字
-\jfont\testK={psft:Batang:cid=Adobe-Korea1-2;jfm=jis}           % 韓国語
+\jfont\testJ={psft:Ryumin-Light:cid=Adobe-Japan1-6;jfm=jis}     % Japanese
+\jfont\testD={psft:Ryumin-Light:jfm=jis}                        % default value is Adobe-Japan1-6
+\jfont\testC={psft:AdobeMingStd-Light:cid=Adobe-CNS1-6;jfm=jis} % Traditional Chinese
+\jfont\testG={psft:SimSun:cid=Adobe-GB1-5;jfm=jis}              % Simplified Chinese
+\jfont\testK={psft:Batang:cid=Adobe-Korea1-2;jfm=jis}           % Korean
 \end{lstlisting}
+%<*en>
+Note that the code above specifies \texttt{jfm-jis.lua}, which is for Japanese fonts,
+as JFM for Chinese and Korean fonts.
+%</en>
+%<*ja>
 上のコードでは中国語・韓国語用フォントに対してもJFMに
 日本語用の\texttt{jfm-jis.lua}を指定しているので注意されたい．
 %</ja>
