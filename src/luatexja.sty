@@ -35,7 +35,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja}[2012/04/20 v0.2]
+  \ProvidesPackage{luatexja}[2013/05/14 Japanese Typesetting with LuaTeX]
 \fi                             %</LaTeX>
 
 \ifnum\catcode`漢=12
@@ -44,8 +44,8 @@
 
 %% Load all sub-packages.
 \ifltj@in@latex                 %<*LaTeX>
-  \RequirePackage{luatexja-core}[2011/04/01]
-  \RequirePackage{luatexja-compat}[2011/04/01]
+  \RequirePackage{luatexja-core}  [2013/05/14]
+  \RequirePackage{luatexja-compat}[2013/05/14]
 \else                           %<*!LaTeX>
   \input luatexja-core.sty %
   \input luatexja-compat.sty %

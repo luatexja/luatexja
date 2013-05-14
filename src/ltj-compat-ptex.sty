@@ -22,15 +22,15 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{ltj-compat-ptex}[2012/04/21 v0.2]
+  \ProvidesPackage{ltj-compat-ptex}[2013/05/14]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
 \endlinechar=13 %
 \ifltj@in@latex                 %<*LaTeX>
   \RequirePackage{infwarerr}  [2010/04/08] % v1.3
-  \RequirePackage{ltxcmds}    [2010/04/26] % v1.7
-  \RequirePackage{xkeyval}    [2008/08/13] % v2.6a
+  \RequirePackage{ltxcmds}    [2011/11/09] % v1.22
+  \RequirePackage{xkeyval}    [2012/10/14] % v2.6b
 \else                           %<*!LaTeX>
   \input infwarerr.sty
   \input ltxcmds.sty

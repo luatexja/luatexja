@@ -120,6 +120,7 @@ do
    end
    function make_cid_font()
       local kx = cid_replace[cid_name]
+      if not kx then return end
       local k = {
          cidinfo = { ordering=cid_order, registry=cid_reg, supplement=kx[3] },
          encodingbytes = 2, extend=1000, format = 'opentype',
