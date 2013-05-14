@@ -1,0 +1,10 @@
+%#! lualatex -shell-escape luatex.ins
+\input docstrip.tex
+\askforoverwritefalse
+\generate{\file{luatexja-ja.tex}{\from{luatexja.dtx}{ja}}
+          \file{luatexja-en.tex}{\from{luatexja.dtx}{en}}
+          \file{showexpl.cfg}{\from{luatexja.dtx}{showexpl}}
+}
+\immediate\write18{lualatex luatexja-ja}
+\immediate\write18{lualatex luatexja-en}
+\endbatchfile
