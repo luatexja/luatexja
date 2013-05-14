@@ -3,10 +3,8 @@
 \askforoverwritefalse
 \generate{\file{luatexja-ja.tex}{\from{luatexja.dtx}{ja}}
           \file{luatexja-en.tex}{\from{luatexja.dtx}{en}}
-          \file{luatexja-zh.tex}{\from{luatexja.dtx}{zh}}
           \file{showexpl.cfg}{\from{luatexja.dtx}{showexpl}}
 }
 \immediate\write18{lualatex luatexja-ja}
 \immediate\write18{lualatex luatexja-en}
-\immediate\write18{lualatex luatexja-zh}
 \endbatchfile
