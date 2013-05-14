@@ -3,8 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.rmlgbm',
-  date = '2013/03/17',
-  version = '0.4',
+  date = '2013/05/14',
   description = 'Definitions of non-embedded Japanese (or other CJK) fonts',
 })
 module('luatexja.rmlgbm', package.seeall)
@@ -120,6 +119,7 @@ do
    end
    function make_cid_font()
       local kx = cid_replace[cid_name]
+      if not kx then return end
       local k = {
          cidinfo = { ordering=cid_order, registry=cid_reg, supplement=kx[3] },
          encodingbytes = 2, extend=1000, format = 'opentype',

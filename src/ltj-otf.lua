@@ -3,8 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.otf',
-  date = '2011/09/09',
-  version = '0.1',
+  date = '2013/05/11',
   description = 'The OTF Lua module for LuaTeX-ja',
 })
 

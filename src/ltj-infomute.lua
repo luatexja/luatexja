@@ -3,8 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.infomute',
-  date = '2011/04/01',
-  version = '0.1',
+  date = '2011/06/05',
   description = '',
 })
 module('luatexja.infomute', package.seeall)

@@ -3,8 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.base',
-  date = '2011/04/01',
-  version = '0.1',
+  date = '2011/11/18',
   description = '',
 })
 module('luatexja.base', package.seeall)

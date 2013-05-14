@@ -3,8 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.debug',
-  date = '2011/04/01',
-  version = '0.1',
+  date = '2011/05/14',
   description = '',
 })
 module('luatexja.debug', package.seeall)
