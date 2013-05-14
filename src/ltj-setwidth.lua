@@ -3,8 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.setwidth',
-  date = '2012/07/19',
-  version = '0.2',
+  date = '2013/03/14',
   description = '',
 })
 module('luatexja.setwidth', package.seeall)

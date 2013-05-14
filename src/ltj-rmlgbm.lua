@@ -3,8 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.rmlgbm',
-  date = '2013/03/17',
-  version = '0.4',
+  date = '2013/05/14',
   description = 'Definitions of non-embedded Japanese (or other CJK) fonts',
 })
 module('luatexja.rmlgbm', package.seeall)

@@ -3,8 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.adjust',
-  date = '2012/09/27',
-  version = '0.1',
+  date = '2013/03/14',
   description = 'Advanced line adjustment for LuaTeX-ja',
 })
 module('luatexja.adjust', package.seeall)
