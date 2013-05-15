@@ -131,8 +131,8 @@
 %%%%%%%% Attributes for Japanese typesetting.
 \newluatexattribute\ltj@icflag    % attribute for italic correction
 \newluatexattribute\ltj@curjfnt   % index for ``current Japanese font''
-\newluatexattribute\ltj@origchar % 
-\newluatexattribute\ltj@charclass % 
+\newluatexattribute\ltj@origchar %
+\newluatexattribute\ltj@charclass %
 \newluatexattribute\ltj@autospc   % attribute for autospacing
 \newluatexattribute\ltj@autoxspc  % attribute for autoxspacing
 \newluatexattribute\ltj@yablshift % attribute for \yabaselineshift
@@ -174,10 +174,8 @@
 
 %%%%%%%% Load all sub-packages.
 \ifltj@in@latex                 %<*LaTeX>
-  \RequirePackage{ltj-cctbreg}[2013/05/14]
   \RequirePackage{ltj-base}   [2013/05/14]
 \else                           %<*!LaTeX>
-  \input ltj-cctbreg.sty %
   \input ltj-base.sty %
 \fi                             %</LaTeX>
 
@@ -206,7 +204,7 @@
 \def\ltj@@ihb{\relax\directlua{luatexja.jfmglue.create_inhibitglue_node()}}
 
 %%%%%%%% \yoko, \tate, \ifydir, \iftdir
-%% At this moment, tategaki mode is not implemented; 
+%% At this moment, tategaki mode is not implemented;
 %% there is only yokogaki mode now.
 \let\yoko\relax
 \let\tate\relax
@@ -269,7 +267,7 @@
     {\string#2 is not a control sequence that represents \MessageBreak
      a Japanese font}{}%
   \else
-    \directlua{luatexja.stack.set_stack_font(luatexja.isglobal, 
+    \directlua{luatexja.stack.set_stack_font(luatexja.isglobal,
     luatexja.stack_table_index.#3,
     \ltj@safe@num@or{nil}{#1}, \the\ltj@curjfnt)}%
   \fi
@@ -280,11 +278,11 @@
 % yalbaselineshift = <dimen>
 % yjabaselineshift = <dimen>
 \define@key[ltj]{japaram}{yalbaselineshift}{%
-  \directlua{tex.setattribute(luatexja.isglobal, 
+  \directlua{tex.setattribute(luatexja.isglobal,
     luatexbase.attributes['ltj@yablshift'],
     \ltj@safe@dimen@or\ltj@defdimen{#1})}}
 \define@key[ltj]{japaram}{yjabaselineshift}{%
-  \directlua{tex.setattribute(luatexja.isglobal, 
+  \directlua{tex.setattribute(luatexja.isglobal,
     luatexbase.attributes['ltj@ykblshift'],
     \ltj@safe@dimen@or\ltj@defdimen{#1})}}
 
