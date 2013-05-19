@@ -1,0 +1,39 @@
+% luatexja-zhfonts.sty
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{luatexja-zhfonts}[2013/05/20 Setting for Chinese fonts]
+\RequirePackage{luatexja-fontspec}
+
+% SinoType 华文字体
+\DeclareOption{SinoType}{
+\setmainjfont[BoldFont=STZhongsong]{STSong}
+\setsansjfont[BoldFont=STXihei]{STXihei}
+\newjfontface\kai{STKaiti}
+\newjfontface\fang{STFangsong}
+}
+
+% ZhongYi 中易字体
+\DeclareOption{ZhongYi}{
+\setmainjfont[BoldFont=SimHei]{SimSun}
+\setsansjfont[BoldFont=SimHei]{SimHei}
+\newjfontface\kai{KaiTi}
+\newjfontface\fang{FangSong}
+}
+
+% Adobe Adobe字体
+\DeclareOption{Adobe}{
+\setmainjfont[BoldFont=AdobeHeitiStd-Regular]{AdobeSongStd-Light}
+\setsansjfont[BoldFont=AdobeHeitiStd-Regular]{AdobeHeitiStd-Regular}
+\newjfontface\kai{AdobeKaitiStd-Regular}
+\newjfontface\fang{AdobeFangsongStd-Regular}
+}
+
+% Founder 方正字体
+\DeclareOption{Founder}{
+\setmainjfont[BoldFont=FZXiaoBiaoSong-B05]{FZShuSong-Z01}
+\setsansjfont[BoldFont=FZHei-B01]{FZHei-B01}
+\newjfontface\kai{FZKai-Z03}
+\newjfontface\fang{FZFangSong-Z02}
+}
+
+\ProcessOptions\relax
+\endinput
