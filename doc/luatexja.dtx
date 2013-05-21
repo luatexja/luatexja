@@ -1,6 +1,11 @@
 %<*!showexpl>
 %#! lualatex -shell-escape
 
+% To typeset this manual, you need following two fonts:
+%  - KozMinPr6N-Regular.otf
+%  - KozGoPr6N-Medium.otf
+
+
 %<en>\documentclass[a4paper,titlepage]{article}
 %<ja>\documentclass[a4paper,titlepage]{ltjsarticle}
 
@@ -80,12 +85,12 @@
 
 %%%%%%%% fonts
 \usepackage{luatexja-otf}
-\usepackage[jis2004]{luatexja-preset}
+\usepackage[kozuka-pr6n,jis2004]{luatexja-preset}
 %<!en>\usepackage{amssymb}
 %<*en>
 \usepackage{unicode-math}
 \setmainfont[Ligatures=TeX]{TeX Gyre Termes}
-\setsansfont[Ligatures=TeX]{TeX Gyre Heros}
+\setsansfont[Scale=0.95,Ligatures=TeX]{TeX Gyre Heros}
 \setmathfont{xits-math.otf}
 \frenchspacing
 %</en>
@@ -143,7 +148,7 @@
 %<*en>
 \textbf{This documentation is far from complete. It may have many
 grammatical (and contextual) errors.} Also, several parts
-(especially, Section~\ref{sec-jfmglue}) are written in Japanese only.
+are written in Japanese only.
 %</en>
 %<*ja>
 \textbf{\large 本ドキュメントはまだまだ未完成です．}
@@ -1149,18 +1154,18 @@ as a substitute for \textit{rounded gothic}.
 &Kozuka Gothic Pro H&Kozuka Gothic ProVI H&Kozuka Gothic Pr6N H\\
 %</en>
 %<*ja>
-\gt 明朝体細字&小塚明朝Pro~R&小塚明朝ProVI~R&小塚明朝Pr6N~R\\
-\gt 明朝体太字&小塚明朝Pro~B&小塚明朝ProVI~B&小塚明朝Pr6N~B\\
+\gtfamily 明朝体細字&小塚明朝Pro~R&小塚明朝ProVI~R&小塚明朝Pr6N~R\\
+\gtfamily 明朝体太字&小塚明朝Pro~B&小塚明朝ProVI~B&小塚明朝Pr6N~B\\
 \midrule
-\gt ゴシック体細字\\
+\gtfamily ゴシック体細字\\
 　単ウェイト時
 &小塚ゴシックPro~M&小塚ゴシックProVI~M&小塚ゴシックPr6N~M\\
 　多ウェイト時
 &小塚ゴシックPro~R&小塚ゴシックProVI~R&小塚ゴシックPr6N~R\\
 \midrule
-\gt ゴシック体太字
+\gtfamily ゴシック体太字
 &小塚ゴシックPro~B&小塚ゴシックProVI~B&小塚ゴシックPr6N~B\\
-\gt ゴシック体極太
+\gtfamily ゴシック体極太
 &小塚ゴシックPro~H&小塚ゴシックProVI~H&小塚ゴシックPr6N~H\\
 \inhibitglue（丸ゴシック体）\inhibitglue
 &小塚ゴシックPro~H&小塚ゴシックProVI~H&小塚ゴシックPr6N~H\\
@@ -1196,22 +1201,22 @@ Hiragino Kaku Gothic Std W8&Hiragino Kaku Gothic StdN W8\\
 Hiragino Maru Gothic Pro W4&Hiragino Maru Gothic ProN W4\\
 %</en>
 %<*ja>
-\gt 明朝体細字&
+\gtfamily 明朝体細字&
 ヒラギノ明朝体Pro~W3&ヒラギノ明朝体Pr6N~W3\\
-\gt 明朝体太字&
+\gtfamily 明朝体太字&
 ヒラギノ明朝体Pro~W6&ヒラギノ明朝体Pr6N~W6\\
 \midrule
-\gt ゴシック体細細字\\
+\gtfamily ゴシック体細細字\\
 　単ウェイト時
 &ヒラギノ角ゴPro~W6&ヒラギノ角ゴProN~W6\\
 　多ウェイト時
 &ヒラギノ角ゴPro~W3&ヒラギノ角ゴProN~W3\\
 \midrule
-\gt ゴシック体太字&
+\gtfamily ゴシック体太字&
 ヒラギノ角ゴPro~W6&ヒラギノ角ゴProN~W6\\
-\gt ゴシック体極太&
+\gtfamily ゴシック体極太&
 ヒラギノ角ゴStd~W8&ヒラギノ角ゴStdN~W8\\
-\gt 丸ゴシック体&
+\gtfamily 丸ゴシック体&
 ヒラギノ丸ゴPro~W4&ヒラギノ丸ゴProN~W4\\
 %</ja>
 \midrule
@@ -1233,17 +1238,17 @@ Midashi Go Pro MB31&Midashi Go Pr6N MB31\\
 Jun Pro 101&Jun Pr6N 101\\
 %</en>
 %<*ja>
-\gt 明朝体細字&
+\gtfamily 明朝体細字&
 リュウミンPro~L-KL&リュウミンPr6N~L-KL\\
-\gt 明朝体太字&
+\gtfamily 明朝体太字&
 太ミンA101~Pro~Bold&太ミンA101~Pr6N~Bold\\
-\gt ゴシック体細字&
+\gtfamily ゴシック体細字&
 中ゴシックBBB~Pro~Med&中ゴシックBBB~Pr6N~Med\\
-\gt ゴシック体太字&
+\gtfamily ゴシック体太字&
 太ゴB101~Pro~Bold&太ゴB101~Pr6N~Bold\\
-\gt ゴシック体極太&
+\gtfamily ゴシック体極太&
 見出ゴPro~MB31&見出ゴPr6N~MB31\\
-\gt 丸ゴシック体&
+\gtfamily 丸ゴシック体&
 じゅんPro 101&じゅんPr6N 101\\
 %</ja>
 \bottomrule
@@ -1274,9 +1279,9 @@ if \texttt{deluxe} option is also specified).
 &IPAGothic&IPAexGothic&MS Gothic\\
 %</en>
 %<*ja>
-\gt 明朝体&Ryumin-Light（非埋込）
+\gtfamily 明朝体&Ryumin-Light（非埋込）
 &IPA明朝&IPAex明朝&MS明朝\\
-\gt ゴシック体&GothicBBB-Medium（非埋込）
+\gtfamily ゴシック体&GothicBBB-Medium（非埋込）
 &IPAゴシック&IPAexゴシック&MSゴシック\\
 %</ja>
 \bottomrule
@@ -1318,11 +1323,11 @@ We can use HG~fonts bundled with Microsoft Office for realizing multiple weights
 \multicolumn{3}{c}{HG Maru Gothic PRO}\\
 %</en>
 %<*ja>
-\gt 明朝体細字
+\gtfamily 明朝体細字
 &IPA明朝&IPAex明朝&MS明朝\\\midrule
-\gt 明朝体太字&
+\gtfamily 明朝体太字&
 \multicolumn{3}{c}{HG明朝E}\\\midrule
-\gt ゴシック体細字\\
+\gtfamily ゴシック体細字\\
 　単ウェイト時
 &IPAゴシック&IPAexゴシック&MSゴシック\\
 　{\tt jis2004}指定時
@@ -1330,11 +1335,11 @@ We can use HG~fonts bundled with Microsoft Office for realizing multiple weights
 \cmidrule(lr){1-4}
 　それ以外の時&
 \multicolumn{3}{c}{HGゴシックM}\\\midrule
-\gt ゴシック体太字&
+\gtfamily ゴシック体太字&
 \multicolumn{3}{c}{HGゴシックE}\\\midrule
-\gt ゴシック体極太&
+\gtfamily ゴシック体極太&
 \multicolumn{3}{c}{HG創英角ゴシックUB}\\\midrule
-\gt 丸ゴシック体&
+\gtfamily 丸ゴシック体&
 \multicolumn{3}{c}{HG丸ゴシック体PRO}\\
 %</ja>
 \bottomrule
@@ -1915,9 +1920,9 @@ TrueType/OpenTypeフォントにfeatureを指定したものを和文フォン�
 ことができる：
 %</ja>
 \begin{LTXexample}[width=0.4\textwidth]
-\jfont\tradgt={file:ipaexg.ttf:script=latn;%
+\jfont\tradgt={file:KozMinPr6N-Regular.otf:script=latn;%
   +trad;-kern;jfm=ujis} at 14pt
-\tradgt{}当／体／医／区
+\tradgt 当／体／医／区
 \end{LTXexample}
 
 %<*en>
@@ -2008,9 +2013,9 @@ JFMの名前を指定する．もし以前に指定されたJFMが読み込ま�
 %</ja>
 \begin{LTXexample}[width=0.4\textwidth]
 \ltjsetparameter{differentjfm=both}
-\jfont\F=file:ipam.ttf:jfm=ujis
-\jfont\G=file:ipag.ttf:jfm=ujis
-\jfont\H=file:ipag.ttf:jfm=ujis;jfmvar=hoge
+\jfont\F=file:KozMinPr6N-Regular.otf:jfm=ujis
+\jfont\G=file:KozGoPr6N-Medium.otf:jfm=ujis
+\jfont\H=file:KozGoPr6N-Medium.otf:jfm=ujis;jfmvar=hoge
 
 \F ）{\G 【】}（ % halfwidth space
    ）{\H 『』}（ % fullwidth space
@@ -2025,13 +2030,13 @@ JFMの名前を指定する．もし以前に指定されたJFMが読み込ま�
 \label{tab-difjfm}
 \ltjsetparameter{jacharrange={+3}}
 \begin{center}\small
-\def\r#1{{\jfont\g=psft:Ryumin-Light:jfm=#1 at 14.43324pt \g
+\def\r#1{{\jfont\g=file:KozMinPr6N-Regular.otf:jfm=#1 at 14.43324pt \g
 \setbox0=\vtop{\hsize=7\zw\noindent ◆◆◆◆◆◆◆
 ある日モモちゃんがお使いで迷子になって泣きました．}\copy0
 \vrule height 0pt depth \dp0}}
-\def\s#1{{\jfont\g=psft:Ryumin-Light:jfm=#1 at 14.43324pt \g
+\def\s#1{{\jfont\g=file:KozMinPr6N-Regular.otf:jfm=#1 at 14.43324pt \g
 \setbox0=\vtop{\hsize=7\zw\noindent ちょっと！何}\copy0}}
-\def\t#1{{\jfont\g=psft:Ryumin-Light:jfm=#1 at 19.24432pt \g
+\def\t#1{{\jfont\g=file:KozMinPr6N-Regular.otf:jfm=#1 at 19.24432pt \g
 \setbox0=\hbox{漢}%
 \vrule width 0.4pt height\ht0 depth\dp0\kern-.2pt\copy0
 \kern-\wd0\vrule width\wd0height .2pt depth .2pt
@@ -2198,6 +2203,13 @@ OpenType font featureと見かけ上同じような形式で指定できるも�
 \footnote{\LuaTeX-jaでは，これらに対するJFMを特に提供することはしない予定である．}．
 例えば，次の例では無理やり通常のJFMを使っているために，文字間隔やイタリック補正量が
 正しくない：
+\begin{LTXexample}[width=0.3\textwidth]
+\jfont\E=psft:Ryumin-Light:extend=1.5;jfm=ujis
+\E あいうえお
+
+\jfont\S=psft:Ryumin-Light:slant=1;jfm=ujis
+\S あいう\/ABC
+\end{LTXexample}
 %</ja>
 %<*en>
 \paragraph{\texttt{extend} and \texttt{slant}}
@@ -2209,16 +2221,7 @@ The following setting can be specified as OpenType font features:
 These two settings are also supported with \texttt{psft} prefix.
 Note that \LuaTeX-ja doesn't adjust JFMs by these \texttt{extend} and \texttt{slant}
 settings; you have to write new JFMs on purpose. 
-For example, the following example uses the standard JFM \texttt{jfm-ujis.lua}, hence
-letter-spacing and the width of italic correction are not correct:
 %</en>
-\begin{LTXexample}[width=0.3\textwidth]
-\jfont\E=psft:Ryumin-Light:extend=1.5;jfm=ujis
-\E あいうえお
-
-\jfont\S=psft:Ryumin-Light:slant=1;jfm=ujis
-\S あいう\/ABC
-\end{LTXexample}
 
 %<en>\subsection{Structure of JFM file}
 %<ja>\subsection{JFMファイルの構造}
@@ -2565,7 +2568,7 @@ Furthermore, the glyph is shifted according to values of fields
 \end{lstlisting}
 句点「。」の幅は二分であるので
 \begin{LTXexample}
-\jfont\a=psft:Ryumin-Light:jfm=test;+vert
+\jfont\a=file:KozMinPr6N-Regular.otf:jfm=test;+vert
 \setbox0\hbox{\a 。\inhibitglue 漢}
 \the\wd0
 \end{LTXexample}
@@ -2580,8 +2583,8 @@ Furthermore, the glyph is shifted according to values of fields
 
 一方，「\texttt{'、*'}」のようにアスタリスクつきの指定があると，
 状況は異なってくる．
-\begin{LTXexample}
-\jfont\a=psft:Ryumin-Light:jfm=test;+vert
+\begin{LTXexample}[width=0.3\textwidth]
+\jfont\a=file:KozMinPr6N-Regular.otf:jfm=test;+vert
 \a 漢、\inhibitglue 漢
 \end{LTXexample}
 ここで，読点「、」の文字クラスは，以下のようにして決まる．
@@ -2594,8 +2597,8 @@ Furthermore, the glyph is shifted according to values of fields
 \end{enumerate}
 
 なお，置換後のグリフで判定した文字クラスの値が0でなければ，そちらをそのまま作用する．
-\begin{LTXexample}
-\jfont\a=psft:Ryumin-Light:jfm=test;+hwid
+\begin{LTXexample}[width=0.3\textwidth]
+\jfont\a=file:KozMinPr6N-Regular.otf:jfm=test;+hwid
 \a 漢ﾋひ
 \end{LTXexample}
 上の例では，
@@ -2684,7 +2687,7 @@ The following is the list of `imaginary characters':
 \texttt{'parbdd'}を入れれば全角下がりとなる．
 
 \begin{LTXexample}
-\jfont\g=psft:Ryumin-Light:jfm=test \g
+\jfont\g=file:KozMinPr6N-Regular.otf:jfm=test \g
 \parindent1\zw\noindent{}◆◆◆◆◆
 \par 「◆◆←二分下がり
 \par 【◆◆←全角下がり
@@ -3294,7 +3297,7 @@ the beginning of a box and `あ', and also between `あ' and `ウ'.
 %</ja>
 
 \begin{LTXexample}
-\jfont\g=psft:Ryumin-Light:jfm=test \g
+\jfont\g=file:KozMinPr6N-Regular.otf:jfm=test \g
 \fbox{\hbox{あウあ\inhibitglue ウ}}
 \inhibitglue\par\noindent あ1
 \par\inhibitglue\noindent あ2
@@ -5421,7 +5424,7 @@ Each character is printed as follows:
 各文字は
 %</ja>
 \begin{center}
-\tt\fboxsep=1pt\fbox{\hbox to \zw{\gt あ\hss}}\,\scriptsize LUP
+\tt\fboxsep=1pt\fbox{\hbox to \zw{\gtfamily あ\hss}}\,\scriptsize LUP
 \end{center}
 %<*ja>
 のように表示しており，各文字は次の意味を持っている．
@@ -5787,7 +5790,7 @@ JIS~X~0208にないため\pTeX では使用不能と考えて良いものであ�
     \ifnum\ltjgetparameter{jacharrange}{\ltjgetparameter{chartorange}{\cntB}}=0
     \def\@@@tmp{white}\else\def\@@@tmp{white!85!blue}\fi
     \fcolorbox{black}{\@@@tmp}{%
-      \hbox to \zw{\gt 　\hskip-\zw\ltjjachar\cntB 　\hss}}\,\scriptsize%
+      \hbox to \zw{\gtfamily 　\hskip-\zw\ltjjachar\cntB 　\hss}}\,\scriptsize%
     \ifnum\catcode\cntB=11 L\else\ \fi
     \chk@in@{\uplist}{\cntA}\ifnum\flag=1 U\else~\fi
     \chk@in@{\plist}{\cntA}\ifnum\flag=1 P\else~\fi
@@ -5796,7 +5799,7 @@ JIS~X~0208にないため\pTeX では使用不能と考えて良いものであ�
   \ifnum\ltjgetparameter{jacharrange}{\ltjgetparameter{chartorange}{\cntB}}=0
   \def\@@@tmp{white}\else\def\@@@tmp{white!85!blue}\fi
   \fcolorbox{black}{\@@@tmp}{\color{red!50!black}%
-     \hbox to \zw{\gt 　\hskip-\zw\ltjjachar\cntB 　\hss}}\,\scriptsize%
+     \hbox to \zw{\gtfamily 　\hskip-\zw\ltjjachar\cntB 　\hss}}\,\scriptsize%
    \ifnum\catcode\cntB=11 L\else~\fi
   \chk@in@{\uplist}{\cntA}\ifnum\flag=1 U\else~\fi-%
 \fi\global\advance\cntA1 }
