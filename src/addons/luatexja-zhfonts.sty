@@ -57,5 +57,13 @@
 \newjfontface\fang{HYD1GFM.ttf}
 }
 
+% cwTeX TrueType (in Debian/Ubuntu)
+\DeclareOption{cwttf}{
+\setmainjfont[BoldFont=cwTeXHeiBold]{cwTeXMing}
+\setsansjfont[BoldFont=cwTeXHeiBold]{cwTeXHeiBold}
+\newjfontface\kai{cwTeXHeiKai}
+\newjfontface\fang{cwTeXFangSong}
+}
+
 \ProcessOptions\relax
 \endinput
