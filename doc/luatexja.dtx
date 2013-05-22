@@ -1919,7 +1919,7 @@ so TrueType/OpenType fonts with features can be used for Japanese fonts:
 TrueType/OpenTypeフォントにfeatureを指定したものを和文フォントとして用いる
 ことができる：
 %</ja>
-\begin{LTXexample}[width=0.4\textwidth]
+\begin{LTXexample}[width=0.3\textwidth]
 \jfont\tradgt={file:KozMinPr6N-Regular.otf:script=latn;%
   +trad;-kern;jfm=ujis} at 14pt
 \tradgt 当／体／医／区
@@ -2011,7 +2011,7 @@ JFMの名前を指定する．もし以前に指定されたJFMが読み込ま�
 \item[jfmvar=<string>] 標準では，JFMとサイズが同じで，
   実フォントだけが異なる2つの和文フォントは……
 %</ja>
-\begin{LTXexample}[width=0.4\textwidth]
+\begin{LTXexample}[width=0.3\textwidth]
 \ltjsetparameter{differentjfm=both}
 \jfont\F=file:KozMinPr6N-Regular.otf:jfm=ujis
 \jfont\G=file:KozGoPr6N-Medium.otf:jfm=ujis
@@ -2100,6 +2100,40 @@ TODO: kanjiskip?
 \end{itemize}
 
 
+%<*ja>
+\paragraph{\texttt{extend}と\texttt{slant}}
+OpenType font featureと見かけ上同じような形式で指定できるものに，
+\begin{description}
+\item[\texttt{extend=}<extend>] 横方向に<extend>倍拡大する．
+\item[\texttt{slant=}<slant>] <slant>に指定された割合だけ傾ける．
+\end{description}  
+の2つがある．
+\texttt{extend}や\texttt{slant}を指定した場合は，それに応じたJFMを指定すべきである%
+\footnote{\LuaTeX-jaでは，これらに対するJFMを特に提供することはしない予定である．}．
+例えば，次の例では無理やり通常のJFMを使っているために，文字間隔やイタリック補正量が
+正しくない：
+%</ja>
+%<*en>
+\paragraph{\texttt{extend} and \texttt{slant}}
+The following setting can be specified as OpenType font features:
+\begin{description}
+\item[\texttt{extend=}<extend>] expand the font horizontally by <extend>.
+\item[\texttt{slant=}<slant>] slant the font.
+\end{description}
+Note that \LuaTeX-ja doesn't adjust JFMs by these \texttt{extend} and \texttt{slant}
+settings; you have to write new JFMs on purpose. 
+For example, the following example uses the standard JFM \texttt{jfm-ujis.lua}, hence
+letter-spacing and the width of italic correction are not correct:
+%</en>
+\begin{LTXexample}[width=0.3\textwidth]
+\jfont\E=file:KozMinPr6N-Regular.otf:extend=1.5;jfm=ujis
+\E あいうえお
+
+\jfont\S=file:KozMinPr6N-Regular.otf:slant=1;jfm=ujis
+\S あいう\/ABC
+\end{LTXexample}
+
+
 %<en>\subsection{Prefix \texttt{psft}}
 %<ja>\subsection{\texttt{psft}プリフィックス}
 \label{ssec-psft}
@@ -2110,9 +2144,12 @@ to specify a `name-only' Japanese font which
 will not be embedded to PDF. Typical use of this prefix is to specify
 the `standard' Japanese fonts, namely, `Ryumin-Light' and
 `GothicBBB-Medium'.
+
 \emph{OpenType font features, such as `{\tt +jp90}', 
 have no meaning in `name-only' fonts using this `{\tt psft:}'\ prefix.
 This is because we can't expect what fonts are actually used by the PDF reader.}
+Note that \texttt{extend}~and~\texttt{slant} settings (see~above) are supported
+with \texttt{psft} prefix, because they are only simple linear transformations.
 %</en>
 %<*ja>
 \texttt{file:} と \texttt{name:} のプリフィックスに加えて，
@@ -2121,8 +2158,13 @@ This is because we can't expect what fonts are actually used by the PDF reader.}
 このプリフィックスを用いることで，PDFには埋め込まれない「名前だけの」
 和文フォントを指定することができる．「標準的な」和文フォント，
 つまり`Ryumin-Light'と`GothicBBB-Medium'の指定でこのプリフィックスが使われる．
-\textbf{非埋込フォントをPDFに使用すると，実際にどのようなフォントが表示に用いられるか予測できない．
-本プリフィックス指定時には，\texttt{+jp90} などのOpenType font featureの効力はない．}
+
+\textbf{\texttt{psft}プリフィックスの下では
+\texttt{+jp90} などのOpenType font featureの効力はない．
+非埋込フォントをPDFに使用すると，実際にどのようなフォントが
+表示に用いられるか予測できないからである．}
+\texttt{extend}と\texttt{slant}指定は単なる変形のため
+\texttt{psft}プリフィックスでも使用可能である．
 %</ja>
 
 %<en>\paragraph{\texttt{cid} key}
@@ -2190,38 +2232,6 @@ I couldn't find any non-embedded font information for the CID
 Please contact the LuaTeX-ja project team.
 ?
 \end{lstlisting}
-
-%<*ja>
-\paragraph{\texttt{extend}と\texttt{slant}}
-OpenType font featureと見かけ上同じような形式で指定できるものに，
-\begin{description}
-\item[\texttt{extend=}<extend>] 横方向に<extend>倍拡大する．
-\item[\texttt{slant=}<slant>] <slant>に指定された割合だけ傾ける．
-\end{description}  
-の2つがあり，これらだけは\texttt{psft}プリフィックスでも使用可能にしている．
-\texttt{extend}や\texttt{slant}を指定した場合は，それに応じたJFMを指定すべきである%
-\footnote{\LuaTeX-jaでは，これらに対するJFMを特に提供することはしない予定である．}．
-例えば，次の例では無理やり通常のJFMを使っているために，文字間隔やイタリック補正量が
-正しくない：
-\begin{LTXexample}[width=0.3\textwidth]
-\jfont\E=psft:Ryumin-Light:extend=1.5;jfm=ujis
-\E あいうえお
-
-\jfont\S=psft:Ryumin-Light:slant=1;jfm=ujis
-\S あいう\/ABC
-\end{LTXexample}
-%</ja>
-%<*en>
-\paragraph{\texttt{extend} and \texttt{slant}}
-The following setting can be specified as OpenType font features:
-\begin{description}
-\item[\texttt{extend=}<extend>] expand the font horizontally by <extend>.
-\item[\texttt{slant=}<slant>] slant the font.
-\end{description}
-These two settings are also supported with \texttt{psft} prefix.
-Note that \LuaTeX-ja doesn't adjust JFMs by these \texttt{extend} and \texttt{slant}
-settings; you have to write new JFMs on purpose. 
-%</en>
 
 %<en>\subsection{Structure of JFM file}
 %<ja>\subsection{JFMファイルの構造}
@@ -3532,9 +3542,10 @@ As closing this subsection, we shall introduce an example of
 紹介しておこう．\verb+\userelfont+ の使用によって，「abc」の部分のフォントが
 Avant Garde (OT1/pag/m/n) に変わっていることがわかる．
 %</ja>
-\begin{LTXexample}
-\kanjifamily{gt}\selectfont あいうxyz
-\SetRelationFont{JY3}{gt}{m}{n}{OT1}{pag}{m}{n}
+\begin{LTXexample}[width=0.3\textwidth]
+\makeatletter
+\SetRelationFont{JY3}{\k@family}{m}{n}{OT1}{pag}{m}{n}
+  % \k@family: current Japanese font family
 \userelfont\selectfont あいうabc
 \end{LTXexample}
 
