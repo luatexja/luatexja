@@ -35,5 +35,27 @@
 \newjfontface\fang{FZFangSong-Z02}
 }
 
+% HanYi-J 汉仪字体-文房字宝-简体
+% HanYi-F 汉仪字体-文房字宝-繁体
+% 书宋一简 HYA9GJM.ttf
+% 中宋简　 HYA3GJM.ttf
+% 中黑简　 HYB1GJM.ttf
+% 粗黑简　 HYB9GJM.ttf
+% 楷体简　 HYC1GJM.ttf
+% 仿宋简　 HYD1GJM.ttf
+\DeclareOption{HanYi-J}{
+\setmainjfont[BoldFont=HYA9GJM.ttf]{HYA3GJM.ttf}
+\setsansjfont[BoldFont=HYB9GJM.ttf]{HYB1GJM.ttf}
+\newjfontface\kai{HYC1GJM.ttf}
+\newjfontface\fang{HYD1GJM.ttf}
+}
+
+\DeclareOption{HanYi-F}{
+\setmainjfont[BoldFont=HYA9GFM.ttf]{HYA3GFM.ttf}
+\setsansjfont[BoldFont=HYB9GFM.ttf]{HYB1GFM.ttf}
+\newjfontface\kai{HYC1GFM.ttf}
+\newjfontface\fang{HYD1GFM.ttf}
+}
+
 \ProcessOptions\relax
 \endinput
