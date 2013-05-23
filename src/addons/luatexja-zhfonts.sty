@@ -65,5 +65,13 @@
 \newjfontface\fang{cwTeXFangSong}
 }
 
+% Fandol fonts http://fandol-doc.googlecode.com/files/fandol-fonts.7z
+\DeclareOption{Fandol}{
+\setmainjfont[BoldFont=FandolSong-Bold]{FandolSong-Regular}
+\setsansjfont[BoldFont=FandolHei-Bold]{FandolHei-Regular}
+\newjfontface\kai{FandolKai-Regular}
+\newjfontface\fang{FandolFang-Regular}
+}
+
 \ProcessOptions\relax
 \endinput
