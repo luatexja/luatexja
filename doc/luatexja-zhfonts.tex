@@ -1,0 +1,250 @@
+\documentclass[DIV=13]{article}
+\usepackage{typearea}
+\usepackage{hologo}
+\def\pTeX{p\TeX}
+\def\LuaTeX{Lua\TeX}
+\def\XeTeX{\hologo{XeTeX}}
+\usepackage{booktabs}
+\usepackage{multicol}
+\usepackage{indentfirst}
+\usepackage{luatexja-fontspec}
+\parindent2\zw
+\setmainjfont[BoldFont={FZXiaoBiaoSong-B05}]{FZShuSong-Z01}
+\title{\LuaTeX-ja简体中文字体配置}
+\author{马起园 苏　杰}
+\date{2013年5月}
+\begin{document}
+\maketitle
+\section{\LuaTeX-ja项目简介}
+\LuaTeX-ja项目旨在将\pTeX 处理汉字的机制移植到\LuaTeX 下，当前项目的成员
+有：北川弘典、前田一貴、八登崇之、黒木裕介 、阿部紀行、山本宗宏、本田知
+亮、齋藤修三郎和馬起園。
+
+\LuaTeX 虽然在编码上支持Unicode，但并不能直接处理汉字断行以及禁则应用，而
+在\pTeX 系列中则能够处理断行并应用禁则，但并不支持pdf输出。\LuaTeX 下处理
+汉字的断行和应用禁则需要使用其内建的诸多callback来进行。\pTeX 扩展TFM为JFM，
+但是JFM抽象程度更高，该文件涉及到的内容是字体的标点压缩，可以用于多个汉字字体。
+
+当前版本的\LuaTeX-ja 可以应用于\TeX\ Live和W32\TeX，但不能在MikTeX下使用，
+因为MikTeX下的\LuaTeX 存在bug。
+\section{字体使用}
+\subsection{关于Lua\TeX-ja的字体调用}
+\XeTeX 在调用字体的时候需要使用freetype和fontconfig库，所以需要更新字体缓
+存，但是在\LuaTeX 下就不太一样。\LuaTeX 只需要在初次使用的时候刷新字体数据
+库即可（此数据库是一个lua文件）。\LuaTeX 下的字体缓存实际上是将字体的各种
+信息导出并保存的文件，在调用一个新字体的时候会生成一个。\LuaTeX 对于字体的
+处理并没有使用freetype，而是使用了fontforge，不过可能由于该库的接口有一些
+问题，导致部分字体无法在\LuaTeX 下使用。
+
+在使用\LuaTeX-ja的时候，需要先刷新字体数据库，该命令的使用方法如下：
+\begin{verbatim}
+Usage: mkluatexfontdb [OPTION]...
+    
+Rebuild the LuaTeX font database.
+
+Valid options:
+  -f --force                   force re-indexing all fonts
+  -q --quiet                   don't output anything
+  -v --verbose=LEVEL           be more verbose (print the searched directories)
+  -vv                          print the loaded fonts
+  -vvv                         print all steps of directory searching
+  -V --version                 print version and exit
+  -h --help                    print this message
+\end{verbatim}
+
+又是可能遇到通不过的字体，需要将这个字体的绝对路径添加到otfl-blacklist.cnf中，
+这个文件的内容如下：
+\begin{verbatim}
+% Tackes ages to load
+LastResort.ttf % a MacOSX font, but also available for free from unicode.org 
+
+% Mac OS X TTC fonts, this list need to be filtered out
+/Library/Fonts/AmericanTypewriter.ttc
+/Library/Fonts/Baskerville.ttc
+/Library/Fonts/Chalkboard.ttc
+/Library/Fonts/Cochin.ttc
+/Library/Fonts/Copperplate.ttc
+/Library/Fonts/Didot.ttc
+/Library/Fonts/Futura.ttc
+/Library/Fonts/GillSans.ttc
+/Library/Fonts/Hoefler Text.ttc
+/Library/Fonts/MarkerFelt.ttc
+/Library/Fonts/Optima.ttc
+/Library/Fonts/Papyrus.ttc
+/Library/Fonts/STHeiti Medium.ttc
+/System/Library/Fonts/AquaKana.ttc
+/System/Library/Fonts/HelveticaNeue.ttc
+/System/Library/Fonts/LucidaGrande.ttc
+/System/Library/Fonts/Menlo.ttc
+/System/Library/Fonts/STHeiti Light.ttc
+\end{verbatim}
+
+Lua\TeX 调用TrueType和OpenType字体并没有固定的方式，\XeTeX 使用了固定的接口，
+而Lua\TeX 需要使用luaotfload包来进行字体的调用。这两种字体一般都有高级特性，
+在\TeX\ Live或者W32\TeX 中可以使用otfinfo命令来查看相关的信息：
+\begin{verbatim}
+'Otfinfo' reports information about an OpenType font to standard output.
+Options specify what information to print.
+
+Usage: otfinfo [-sfzpg | OPTIONS] [OTFFILES...]
+
+Query options:
+  -s, --scripts                Report font's supported scripts.
+  -f, --features               Report font's GSUB/GPOS features.
+  -z, --optical-size           Report font's optical size information.
+  -p, --postscript-name        Report font's PostScript name.
+  -a, --family                 Report font's family name.
+  -v, --font-version           Report font's version information.
+  -i, --info                   Report font's names and designer/vendor info.
+  -g, --glyphs                 Report font's glyph names.
+  -t, --tables                 Report font's OpenType tables.
+  -T, --dump-table NAME        Output font's 'NAME' table.
+
+Other options:
+      --script=SCRIPT[.LANG]   Set script used for --features [latn].
+  -V, --verbose                Print progress information to standard error.
+  -h, --help                   Print this message and exit.
+  -q, --quiet                  Do not generate any error messages.
+      --version                Print version number and exit.
+
+Report bugs to <ekohler@gmail.com>.
+\end{verbatim}
+\subsection{使用字体的方法}
+目前\LuaTeX-ja支持在plain \TeX 和\LaTeX 下使用。如果你使用texinfo，那么很
+不幸，你不太可能使用\LuaTeX-ja来处理中文，因为texinfo是针对pdf\TeX 设计的，
+在\LuaTeX 下使用已经有了一定的不兼容现象，即使完全兼容也需要对texinfo中的
+字体配置进行调整，如果你急需使用texinfo来处理中文，请尝试W32\TeX 下的texinfo，
+这个发行版中的texinfo已经打了补丁。对于Con\TeX t用户，请使用李延瑞的zhfonts模块
+\footnote{见https://github.com/liyanrui/zhfonts}。
+
+在plain \TeX 中使用Lua\TeX-ja可以在源文件中写入：
+\begin{verbatim}
+\input luatexja-core.sty
+\end{verbatim}
+Lua\TeX-ja移植的了\verb!\jfont!命令，在plain \TeX 下需要通过该命令来
+控制输出的汉字字体，例如：
+\begin{verbatim}
+\jfont\song={name:SimSun:jfm=banjiao} at 10pt
+\song 我能吞下玻璃而不伤身体。
+\end{verbatim}
+上文中的\verb!jfm=banjiao!使用来控制标点压缩的，如果此项未设定，则
+使用默认的\verb!ujis!压缩模式，对于简体中文来讲，可用的模式有：
+\texttt{quanjiao，banjiao，kaiming}。
+
+而在\LaTeX 下使用则较为简单，使用：
+\begin{verbatim}
+\usepackage{luatexja-fontspec}
+\end{verbatim}
+这个包对fontspec包进行了封装，令其能够较为便利地设定汉字字体。
+这个包提供的命令如下：
+\begin{table}[htbp]
+  \centering
+    \begin{tabular}{ll}
+    \toprule
+    \multicolumn{1}{c}{\textbf{命令}} & \multicolumn{1}{c}{\textbf{用途}} \\
+    \midrule
+    \verb!\jfontspec! & 改变当前汉字字体 \\
+    \verb!\setmainjfont! & 设定文档主汉字字体 \\
+    \verb!\setsansjfont! & 设定文档的无衬线汉字字体（黑体） \\
+    \verb!\newjfontfamily! & 设定新的汉字字体族命令 \\
+    \verb!\newjfontface! & 设定新的汉字字体命令 \\
+    \verb!\defaultjfontfeatures! & 默认汉字字体的特性 \\
+    \verb!\addjfontfeatures! & 设定当前字体的特性 \\
+    \bottomrule
+    \end{tabular}%
+\end{table}%
+
+
+\subsection{不可用字体系列}
+中文字体在丰度上与日文字体对比并不占优势，所以中文\TeX 文档在使用使用字体
+上没有太大变化。当你想在\LuaTeX-ja下是有部分特色字体的时候，请做好此种字体
+可能无法使用的准备。目前报错明显的字体有数个：
+\begin{itemize}
+\item 灵格斯词典附带的音标字体，这些字体会安装到系统字体文件夹下，在更新
+   字体数据库的时候会出现程序崩溃的情况，这是字体本身的原因，需要添加到黑名单中
+\item 康熙字典体，这是中国大陆一位业余字体设计者所设计的字体，由于该作者
+   缺乏相关技术知识，导致此字体的CMap出错，无论是完全版还是试用版都会出现
+   问题，此外该字体的boundingbox也是错误的，在嵌入pdf文档中十分影响阅读
+\item 信黑体，这个字体也是CMap的问题，无法使用
+\end{itemize}
+\subsection{华文字体系列}
+在微软提供的Office套装中附带了一定数量的中文字体，
+这些字体是常州华文印刷新技术有限公司制造的。
+这些字体安装在系统字体文件夹下，在使用\LuaTeX-ja 的时候
+可以酌情使用。在本文档中，我们推荐简体中文用户使用
+此套字体，从使用率上看，各大学都会装有微软的操作系统
+和微软的Office，可以说已经相当普及，故做推荐。
+
+\begin{table}[htbp]
+  \centering
+    \begin{tabular}{llll}
+    \toprule
+    \multicolumn{1}{c}{\textbf{字体名}} & \multicolumn{1}{c}{\textbf{文件名}} & \multicolumn{1}{c}{\textbf{PostScript名}} & \multicolumn{1}{c}{\textbf{样例}} \\
+    \midrule
+    华文宋体  & \texttt{STSONG.TTF} & STSong & {\jfontspec{STSong}我能吞下玻璃而不伤身体} \\
+    华文中宋  & \texttt{STZHONGS.TTF} & STZhongsong & {\jfontspec{STZhongsong}我能吞下玻璃而不伤身体} \\
+    华文细黑  & \texttt{STXIHEI.TTF} & STXihei & {\jfontspec{STXihei}我能吞下玻璃而不伤身体} \\
+    华文楷体  & \texttt{STKAITI.TTF} & STKaiti & {\jfontspec{STKaiti}我能吞下玻璃而不伤身体} \\
+    华文仿宋  & \texttt{STFANGSO.TTF} & STFangsong & {\jfontspec{STFangsong}我能吞下玻璃而不伤身体} \\
+    \bottomrule
+    \end{tabular}%
+\end{table}%
+\subsection{中易字体系列}
+在Windows系统简体中文版中，附带了数种中文字体。
+这些字体为中易中标电子信息技术有限公司制造的。
+同我们强烈推荐的第一种方案比较，没有中宋。
+如果按照CCT的传统，一般使用黑体替换。
+
+\begin{table}[htbp]
+  \centering
+    \begin{tabular}{llll}
+    \toprule
+    \multicolumn{1}{c}{\textbf{字体名}} & \multicolumn{1}{c}{\textbf{文件名}} & \multicolumn{1}{c}{\textbf{PostScript名}} & \multicolumn{1}{c}{\textbf{样例}} \\
+    \midrule
+    宋体    & \texttt{simsun.ttc} & SimSun & {\jfontspec{SimSun}我能吞下玻璃而不伤身体} \\
+    黑体    & \texttt{simhei.ttf} & SimHei & {\jfontspec{SimHei}我能吞下玻璃而不伤身体} \\
+    楷体    & \texttt{simkai.ttf} & KaiTi & {\jfontspec{KaiTi}我能吞下玻璃而不伤身体} \\
+    仿宋    & \texttt{simkai.ttf} & FangSong & {\jfontspec{FangSong}我能吞下玻璃而不伤身体} \\
+    \bottomrule
+    \end{tabular}%
+\end{table}%
+\subsection{Adobe字体系列}
+在Adobe Reader简体中文版中，附带了宋体和黑体两种字体。
+这两种字体实际上是华文字体，但是和华文字体不能混用，
+因为Adobe Reader中的中文字体的基线都进行了调整，
+不能互相匹配。在Adobe InDesign中还附带了楷体和仿宋体。
+Adobe的中文字体的Postscript名即为文件名去掉后缀名。
+
+\begin{table}[htbp]
+  \centering
+    \begin{tabular}{lll}
+    \toprule
+    \multicolumn{1}{c}{\textbf{字体名}} & \multicolumn{1}{c}{\textbf{文件名}} & \multicolumn{1}{c}{\textbf{样例}} \\
+    \midrule
+    Adobe 宋体 Std & \texttt{AdobeSongStd-Light.otf} & {\jfontspec{AdobeSongStd-Light}我能吞下玻璃而不伤身体} \\
+    Adobe 黑体 Std & \texttt{AdobeHeitiStd-Regular.otf} & {\jfontspec{AdobeHeitiStd-Regular}我能吞下玻璃而不伤身体} \\
+    Adobe 楷体 Std & \texttt{AdobeKaitiStd-Regular.otf} & {\jfontspec{AdobeKaitiStd-Regular}我能吞下玻璃而不伤身体} \\
+    Adobe 仿宋 Std & \texttt{AdobeFangsongStd-Regular.otf} & {\jfontspec{AdobeFangsongStd-Regular}我能吞下玻璃而不伤身体} \\
+    \bottomrule
+    \end{tabular}%
+\end{table}%
+\subsection{方正字体系列}
+方正字体的来源有两种，第一种是使用方正的排版系统的时候会
+安装到Windows系统的字体文件夹下，第二种是针对Linux系统
+来说的，WPS for Linux附带了部分方正字体。
+
+\begin{table}[htbp]
+  \centering
+    \begin{tabular}{llll}
+    \toprule
+    \multicolumn{1}{c}{\textbf{字体名}} & \multicolumn{1}{c}{\textbf{文件名}} & \multicolumn{1}{c}{\textbf{全名}} & \multicolumn{1}{c}{\textbf{样例}} \\
+    \midrule
+    方正书宋\_GBK & \texttt{FZSSK.TTF} & FZShuSong-Z01 & {\jfontspec{FZShuSong-Z01}我能吞下玻璃而不伤身体} \\
+    方正小标宋\_GBK & \texttt{FZXBSK.TTF} & FZXiaoBiaoSong-B05 & {\jfontspec{FZXiaoBiaoSong-B05}我能吞下玻璃而不伤身体} \\
+    方正黑体\_GBK & \texttt{FZHTK.TTF} & FZHei-B01 & {\jfontspec{FZHei-B01}我能吞下玻璃而不伤身体} \\
+    方正楷体\_GBK & \texttt{FZKTK.TTF} & FZKai-Z03 & {\jfontspec{FZKai-Z03}我能吞下玻璃而不伤身体} \\
+    方正仿宋\_GBK & \texttt{FZFSK.TTF} & FZFangSong-Z02 & {\jfontspec{FZFangSong-Z02}我能吞下玻璃而不伤身体} \\
+    \bottomrule
+    \end{tabular}%
+\end{table}%
+\end{document}
