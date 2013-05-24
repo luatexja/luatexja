@@ -152,6 +152,9 @@
 
 \cs_set_eq:NN \addjfontfeature \addjfontfeatures
 
+%%% CJKShape=JIS2004
+\fontspec_define_feature_option:nnnnn{CJKShape}{JIS2004}{20}{5}{+jp04}
+
 \ExplSyntaxOff
 %%%%%%%% Now we completely ignore kanjifont definition file.
 
@@ -223,5 +226,6 @@
           {\@input@{\f@encoding\f@family.fd}}%
 \fi
    \fi}
+
 
 \endinput

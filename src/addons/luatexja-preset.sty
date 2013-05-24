@@ -38,8 +38,8 @@
 
 % 漢字字形
 \tl_new:N \l_ltjpreset_kanji_shape_tl
-\DeclareOption{90jis}{  \tl_set:Nn \l_ltjpreset_kanji_shape_tl { , CJKShape=jp90 }} % 90jis
-\DeclareOption{jis2004}{\tl_set:Nn \l_ltjpreset_kanji_shape_tl { , RawFeature = +jp04 }} % jis2004
+\DeclareOption{90jis}{  \tl_set:Nn \l_ltjpreset_kanji_shape_tl { , CJKShape=JIS1990 }} % 90jis
+\DeclareOption{jis2004}{\tl_set:Nn \l_ltjpreset_kanji_shape_tl { , CJKShape=JIS2004 }} % jis2004
 
 % font preset
 \bool_new:N \l_ltjpreset_office_bool  % MS Office の HG 系フォントを使っているか
@@ -232,7 +232,7 @@
 
 %% KozMinPr6N の場合はjp04 feature がないので，nlck にする
 \clist_if_in:NnT \l_ltjpreset_font_list { KozMinPr6N-Regular.otf } {
-  \tl_set:Nn \l_tmpa_tl {, RawFeature = +jp04}
+  \tl_set:Nn \l_tmpa_tl {, CJKShape=JIS2004 }
   \tl_if_eq:NNT \l_ltjpreset_kanji_shape_tl \l_tmpa_tl {
     \tl_set:Nn \l_ltjpreset_kanji_shape_tl { , CJKShape=NLC }
   }
@@ -271,7 +271,7 @@
 
 %% HG 系フォント + JIS2004/90JIS のときはフォント名を置換
 \bool_if:NT \l_ltjpreset_office_bool {
-  \tl_set:Nn \l_tmpa_tl {, RawFeature = +jp04 }
+  \tl_set:Nn \l_tmpa_tl {, CJKShape=JIS2004 }
   \tl_if_eq:NNT \l_ltjpreset_kanji_shape_tl \l_tmpa_tl { 
     \cs_set:Nx \ltjpreset_font_mc_bx: { hgrme04.ttc }
     \cs_set:Nx \ltjpreset_font_gt_bx: { hgrge04.ttc }
@@ -280,7 +280,7 @@
     \cs_set_eq:NN \ltjpreset_font_gt_m: \ltjpreset_font_gt_n_uni:
     % HG ゴシックM のときはそうはいかないので 1 ウェイト時のゴシック体を使う
   }
-  \tl_set:Nn \l_tmpa_tl {, CJKShape=jp90 }
+  \tl_set:Nn \l_tmpa_tl {, CJKShape=JIS1990 }
   \tl_if_eq:NNT \l_ltjpreset_kanji_shape_tl \l_tmpa_tl { 
     \cs_set:Nx \ltjpreset_font_mc_bx: { hgrme.ttc }
     \cs_set:Nx \ltjpreset_font_gt_bx: { hgrge.ttc }

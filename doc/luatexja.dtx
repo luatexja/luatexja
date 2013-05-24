@@ -32,6 +32,10 @@
 \usepackage[margin=25mm,footskip=6mm]{geometry}
 \usepackage{luatexja-adjust}\ltjdisableadjust
 \parskip=\smallskipamount
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+                                    {3.25ex \@plus1ex \@minus.2ex}%
+                                    {-1em}%
+                                    {\normalfont\normalsize\bfseries\raisebox{.2ex}{$\mdlgblksquare\mkern1mu$}}}
 %</en>
 %<*ja>
 \usepackage[textwidth=45\zw, lines=45, footskip=6mm]{geometry}
@@ -85,7 +89,7 @@
 
 %%%%%%%% fonts
 \usepackage{luatexja-otf}
-\usepackage[kozuka-pr6n,jis2004]{luatexja-preset}
+\usepackage[kozuka-pr6n]{luatexja-preset}
 %<!en>\usepackage{amssymb}
 %<*en>
 \usepackage{unicode-math}
@@ -1035,12 +1039,12 @@ alphabetic fonts
 \end{tabular}
 \end{center}
 %</ja>
-\begin{LTXexample}
+\begin{LTXexample}[width=0.4\textwidth]
 \fontspec[Numbers=OldStyle]{LMSans10-Regular}
 \jfontspec{IPAexMincho}
 JIS~X~0213:2004→辻
 
-\addjfontfeatures{CJKShape=JIS1990}
+\jfontspec[CJKShape=JIS1990]{IPAexMincho}
 JIS~X~0208:1990→辻
 \end{LTXexample}
 

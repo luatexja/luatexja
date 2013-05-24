@@ -1,7 +1,7 @@
 %#!lualatex test16-preset && pdffonts test16-preset.pdf
 \documentclass{ltjsarticle}
 
-\usepackage[ipa-dx,jis2004,deluxe]{luatexja-preset}
+\usepackage[kozuka-pr6n,jis2004,deluxe]{luatexja-preset}
 
 \begin{document}
 \def\r#1#2{ \csname #1family \endcsname \csname #2series \endcsname
@@ -30,5 +30,10 @@
 
 \r{tt}{bf}
 
+\jfontspec{IPAexMincho}
+JIS~X~0213:2004: {\LARGE 辻}
+
+\jfontspec[CJKShape=JIS1990]{IPAexMincho}
+JIS~X~0208:1990: {\LARGE 辻}
 
 \end{document}
