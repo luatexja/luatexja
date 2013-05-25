@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2013/05/14 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2013/05/25 Japanese font presets]
 %% Sync with PXchfon 0.6a
 
 \RequirePackage{expl3}
@@ -306,11 +306,13 @@
 \int_compare:nTF { \l_ltjpreset_deluxe_int ==  2 } {
   \newjfontfamily \mgfamily [
       \tl_use:N \l_ltjpreset_add_features_tl
-      \bool_if:NT \l_ltjpreset_noembed_bool { , NoEmbed }
+      \bool_if:NT \l_ltjpreset_noembed_bool { , NoEmbed }, 
+      \tl_use:N \l_ltjpreset_add_features_tl 
     ] { \ltjpreset_font_mg: }
   \newjfontfamily \gtebfamily [
       \tl_use:N \l_ltjpreset_add_features_tl
-      \bool_if:NT \l_ltjpreset_noembed_bool { , NoEmbed }
+      \bool_if:NT \l_ltjpreset_noembed_bool { , NoEmbed }, 
+      \tl_use:N \l_ltjpreset_add_features_tl 
     ] { \ltjpreset_font_gt_eb: }
   \bool_if:NT \l_ltjpreset_bold_bool {
     \cs_set_eq:NN \ltjpreset_font_mc_bx: \ltjpreset_font_gt_bx:
@@ -328,15 +330,17 @@
 
 %%%% 実際の fontspec の呼びだし
 
-\defaultjfontfeatures{ Kerning=Off, \tl_use:N \l_ltjpreset_add_features_tl }
+\defaultjfontfeatures{ Kerning=Off }
 
 \setmainjfont [ 
   BoldFont = \ltjpreset_font_mc_bx:
-  \bool_if:NT \l_ltjpreset_noembed_bool { , NoEmbed }
+  \bool_if:NT \l_ltjpreset_noembed_bool { , NoEmbed }, 
+  \tl_use:N \l_ltjpreset_add_features_tl 
 ] { \ltjpreset_font_mc_m: }
 \setsansjfont [ 
   BoldFont = \ltjpreset_font_gt_bx: 
-  \bool_if:NT \l_ltjpreset_noembed_bool { , NoEmbed }
+  \bool_if:NT \l_ltjpreset_noembed_bool { , NoEmbed }, 
+  \tl_use:N \l_ltjpreset_add_features_tl 
 ] { \ltjpreset_font_gt_m: }
 
 \ExplSyntaxOff

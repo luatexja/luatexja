@@ -672,11 +672,11 @@ But only the contents in \texttt{src/} are needed to work \LuaTeX-ja.
 %</ja>
 \begin{itemize}
 %<*en>
-\item It is widely accepted that the font `Ryumin-Light' and
+\item It is widely accepted that fonts  `Ryumin-Light' and
       `GothicBBB-Medium' aren't embedded into PDF files, and a PDF reader
       substitute them by some external Japanese fonts (\textit{e.g.},
-      Kozuka Mincho is used for Ryumin-Light in Adobe Reader). We adopt this custom to
-      the default setting.
+      Ryumin-Light is substituted with Kozuka Mincho in Adobe Reader). 
+      We adopt this custom to the default setting.
 %</en>
 %<*ja>
 \item `Ryumin-Light'と`GothicBBB-Medium'はPDFファイルに埋め込まずに
@@ -752,22 +752,46 @@ When vertical typesetting is supported by \LuaTeX-ja in the future, \texttt{JT3}
 %</ja>
 
 %<*en>
-\item Two font families \texttt{mc} and \texttt{gt} are defined:
+\item Traditionally, Japanese documents use two typeface category: \emph{mincho}~(明朝体) and
+ \emph{gothic}~(\textgt{ゴシック体}). \emph{mincho} is used in the main text, while \emph{gothic}
+      is used in the headings or for emphasis.
 \begin{center}\small
-\begin{tabular}{ccccc}
+\begin{tabular}{lllc}
 \toprule
-\textbf{classification}&\textbf{family}&\verb+\mdseries+&\verb+\bfseries+&\textbf{scale}\\\midrule
-\emph{mincho}&\tt mc&Ryumin-Light    &GothicBBB-Medium&0.962216\\
-\emph{gothic}&\tt gt&GothicBBB-Medium&GothicBBB-Medium&0.962216\\
+\textbf{classification}&&&\textbf{family name}\\\midrule
+\emph{mincho} (明朝体)&\verb+\textmc{...}+&\verb+{\mcfamily ...}+&\verb+\mcdefault+\\
+\emph{gothic} (\textgt{ゴシック体})&\verb+\textgt{...}+&\verb+{\gtfamily ...}+&\verb+\gtdefault+\\
 \bottomrule
 \end{tabular}
 \end{center}
-Remark that the bold series in both family are same as the medium series of \emph{gothic} family.
-This is a convention in \pLaTeX. This is a trace that there were only 2~fonts (these are Ryumin-Light
-and GothicBBB-Medium) in early years of DTP.
+\item 
+By default, the following fonts are used for \emph{mincho} and \emph{gothic}:
+\begin{center}\small
+\begin{tabular}{ccccc}
+\toprule
+\textbf{classification}&\textbf{family name}&\verb+\mdseries+&\verb+\bfseries+&\textbf{scale}\\\midrule
+\emph{mincho} (明朝体)&\tt mc&Ryumin-Light    &GothicBBB-Medium&0.962216\\
+\emph{gothic} (\textgt{ゴシック体})&\tt gt&GothicBBB-Medium&GothicBBB-Medium&0.962216\\
+\bottomrule
+\end{tabular}
+\end{center}
+Note that the bold series in both family are same as the medium series of \emph{gothic} family.
+This is a convention in \pLaTeX. This is trace that there were only 2~fonts (these are Ryumin-Light
+and GothicBBB-Medium) in early years of DTP. There is no italic nor slanted shape for
+      these \texttt{mc}~and~\texttt{gt}.
 %</en>
 %<*ja>
-\item 2つのフォントファミリ\texttt{mc}と\texttt{gt}が定義されている：
+\item \pLaTeX と同様に，標準では「明朝体」「ゴシック体」の2種類を用いる：
+\begin{center}\small
+\begin{tabular}{cllc}
+\toprule
+\textbf{字体}&&&\textbf{ファミリ名}\\\midrule
+明朝体&\verb+\textmc{...}+&\verb+{\mcfamily ...}+&\verb+\mcdefault+\\
+\textgt{ゴシック体}&\verb+\textgt{...}+&\verb+{\gtfamily ...}+&\verb+\gtdefault+\\
+\bottomrule
+\end{tabular}
+\end{center}
+\item 標準では，次のフォントファミリが用いられる：
 \begin{center}\small
 \begin{tabular}{ccccc}
 \toprule
@@ -777,14 +801,16 @@ and GothicBBB-Medium) in early years of DTP.
 \bottomrule
 \end{tabular}
 \end{center}
-どちらのファミリにおいても，そのboldシリーズはゴシック体のmediumシリーズで
-あることに注意．これは初期のDTPにおいて和文フォントが2つ（それがちょうど\
+どちらのファミリにおいても，そのboldシリーズで使われるフォントは
+ゴシック体のmediumシリーズで使われるフォントと同じあることに注意．
+これは初期のDTPにおいて和文フォントが2つ（それがちょうど\
 Ryumin-Light, GothicBBB-Mediumだった）しか利用できなかった時の名残であり，\pLaTeX{}
 での標準設定とも同じである．
 %</ja>
 
+
 %<en>\item Japanese characters in math mode are typeset by the font family \texttt{mc}.
-%<ja>\item 数式モード中の和文文字は\texttt{mc}ファミリで出力される．
+%<ja>\item 数式モード中の和文文字は明朝体(\texttt{mc})で出力される．
 \end{itemize}
 
 %<*en>
@@ -829,17 +855,6 @@ For \LaTeXe, \LuaTeX-ja adopted most of the font selection system of \pLaTeXe\ (
 の大部分をそのまま採用している．
 %</ja>
 \begin{itemize}
-%<*en>
-\item Two control sequences \verb+\mcdefault+ and \verb+\gtdefault+ are
-      used to specify the default font families for \emph{mincho} and
-      \emph{gothic}, respectively. Default values: \texttt{mc} for
-      \verb+\mcdefault+ and \texttt{gt} for \verb+\gtdefault+.
-%</en>
-%<*ja>
-\item 2つのコントロールシーケンス \verb+\mcdefault+ と \verb+\gtdefault+ がそれぞ
-      れ明朝体とゴシック体のデフォルトのフォントファミリを指定するために用いられる．
-      初期値：\verb+\mcdefault+ は\texttt{mc}，\verb+\gtdefault+ は\texttt{gt}．
-%</ja>
 %<*en>
 \item Commands \verb+\fontfamily+, \verb+\fontseries+,
       \verb+\fontshape+ and \verb+\selectfont+ can be used to change
@@ -1082,14 +1097,27 @@ and loads \Pkg{luatexja-fontspec} internally.
 %<en>\paragraph{General options}
 %<ja>\paragraph{一般的なオプション}
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
+\item[nodeluxe]
+%<*en>
+Use one-weighted \textit{mincho} and \textit{gothic} font families.
+This means that \verb+\mcfamily\bfseries+, \verb+\gtfamily\bfseries+ and 
+\verb+\gtfamily\mdseries+ use the same font.
+\emph{This option is enabled by default.}
+%</en>
+%<*ja>
+\LaTeXe 環境下での標準設定のように，明朝体・ゴシック体を各1ウェイトで使用する．
+より具体的に言うと，この設定の下では
+\verb+\mcfamily\bfseries+, \verb+\gtfamily\bfseries+, \verb+\gtfamily\mdseries+は
+みな同じフォントとなる．\emph{このオプションは標準で有効になっている．}
+%</ja>
 \item[deluxe]
 %<*en>
-Specifying this option enables us to use \textit{mincho} with two weights (medium~and~bold),
+Use \textit{mincho} with two weights (medium~and~bold),
 \textit{gothic} with three weights (medium,~bold and~heavy), and \textit{rounded gothic}%
 \footnote{Provided by \texttt{\char92mgfamily},
 because \textit{rounded gothic} is called \textit{maru gothic} (丸ゴシック) in Japanese.}.
-The heavy weight of \textit{gothic} can be used by ``changing the family'' \verb+\gtebfamily+.
-This is because \Pkg{fontspec} package can handle only medium (\verb+\mdseries+) and
+The heavy weight of \textit{gothic} can be used by ``changing the family'' \verb+\gtebfamily+,
+because \Pkg{fontspec} package can handle only medium (\verb+\mdseries+) and
 bold (\verb+\bfseries+).
 %</en>
 %<*ja>
@@ -1124,6 +1152,16 @@ Use the JFM \texttt{jfm-jis.lua}, instead of \texttt{jfm-ujis.lua}, which is the
 \LuaTeX-ja標準の\texttt{jfm-ujis.lua}が用いられる．
 %</ja>
 \end{list}
+%<*en>
+Note that \texttt{90jis} and \texttt{jis2004} only affect with \textit{mincho},
+\textit{gothic} (and possibly \textit{rounded gothic}) defined by this package.
+We didn't taken accound of  when both \texttt{90jis} and \texttt{jis2004} are specified.
+%</en>
+%<*ja>
+\texttt{90jis}と\texttt{jis2004}については本パッケージで定義された
+明朝体・ゴシック体（・丸ゴシック体）にのみ有効である．両オプションが
+同時に指定された場合に動作については全く考慮していない．
+%</ja>
 
 %<en>\paragraph{Kozuka fonts}
 %<ja>\paragraph{小塚フォント}
@@ -1264,7 +1302,7 @@ Jun Pro 101&Jun Pr6N 101\\
 Next, we describe settings for using only single weight.
 In four settings below, we use same fonts for medium and bold (and heavy) weights.
 (Hence \verb+\mcfamily\bfseries+ and \verb+\mcfamily\mdseries+ yields same Japanese fonts,
-if \texttt{deluxe} option is also specified).
+even if \texttt{deluxe} option is also specified).
 %</en>
 %<*ja>
 次に，単ウェイト用の設定を述べる．この4設定では「細字」「太字」の区別はない．
