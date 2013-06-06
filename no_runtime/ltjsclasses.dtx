@@ -22,7 +22,7 @@
 %  -----------------------------------------
 %
 % \fi
-% \CheckSum{4976}
+% \CheckSum{4988}
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -50,7 +50,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2012/05/08 ]
+  [2013/06/06 ]
 %<*driver>
 \documentclass{ltjsarticle}
 \usepackage{doc}
@@ -719,20 +719,24 @@
 % 使うことにします。そのためには，$13\,\textrm{Q}/10\,\textrm{pt}\simeq 0.924872$倍
 % すればいいことになります。
 %
+% |\ltj@stdmcfont|,~|\ltj@stdgtfont| による、デフォルトで使われ明朝・ゴシックのフォントの
+% 設定に対応しました。この2つの命令の値はユーザが日々の利用でその都度指定するものではなく、
+% 何らかの理由で非埋め込みフォントが正しく利用できない場合にのみ |luatexja.cfg| によって
+% セットされるものです。
 %
 %    \begin{macrocode}
 %<*!jspf>
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
 \ifmingoth
-  \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] psft:Ryumin-Light:jfm=min}{}
-  \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] psft:GothicBBB-Medium:jfm=min}{}
+  \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] \ltj@stdmcfont:jfm=min}{}
+  \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] \ltj@stdgtfont:jfm=min}{}
 \else
   \ifptexjis
-    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] psft:Ryumin-Light:jfm=jis}{}
-    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] psft:GothicBBB-Medium:jfm=jis}{}
+    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] \ltj@stdmcfont:jfm=jis}{}
+    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] \ltj@stdgtfont:jfm=jis}{}
   \else
-    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] psft:Ryumin-Light:jfm=ujis}{}
-    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] psft:GothicBBB-Medium:jfm=ujis}{}
+    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] \ltj@stdmcfont:jfm=ujis}{}
+    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] \ltj@stdgtfont:jfm=ujis}{}
   \fi
 \fi
 %</!jspf>
@@ -751,15 +755,15 @@
 %<*jspf>
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
 \ifmingoth
-  \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.903375] psft:Ryumin-Light:jfm=min}{}
-  \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.903375] psft:GothicBBB-Medium:jfm=min}{}
+  \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.903375] \ltj@stdmcfont:jfm=min}{}
+  \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.903375] \ltj@stdgtfont:jfm=min}{}
 \else
   \ifptexjis
-    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.903375] psft:Ryumin-Light:jfm=jis}{}
-    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.903375] psft:GothicBBB-Medium:jfm=jis}{}
+    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.903375] \ltj@stdmcfont:jfm=jis}{}
+    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.903375] \ltj@stdgtfont:jfm=jis}{}
   \else
-    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.903375] psft:Ryumin-Light:jfm=ujis}{}
-    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.903375] psft:GothicBBB-Medium:jfm=ujis}{}
+    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.903375] \ltj@stdmcfont:jfm=ujis}{}
+    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.903375] \ltj@stdgtfont:jfm=ujis}{}
   \fi
 \fi
 %</jspf>

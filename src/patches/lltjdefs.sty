@@ -5,6 +5,10 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{lltjdefs}[2013/05/14 Default font settings of LuaTeX-ja]
 
+\def\ltj@stdmcfont{psft:Ryumin-Right}
+\def\ltj@stdgtfont{psft:GothicBBB-Medium}
+\InputIfFileExists{luatexja.cfg}{}{}
+
 \DeclareKanjiEncodingDefaults{}{}
 \DeclareErrorKanjiFont{JY3}{mc}{m}{n}{10}
 \DeclareYokoKanjiEncoding{JY3}{}{}
@@ -20,9 +24,9 @@
 \kanjiencoding{JY3}
 
 \DeclareKanjiFamily{JY3}{mc}{}
-\DeclareFontShape{JY3}{mc}{m}{n}{<-> s*[0.962216] psft:Ryumin-Light:jfm=ujis}{}
+\DeclareFontShape{JY3}{mc}{m}{n}{<-> s*[0.962216] \ltj@stdmcfont:jfm=ujis}{}
 \DeclareKanjiFamily{JY3}{gt}{}
-\DeclareFontShape{JY3}{gt}{m}{n}{<-> s*[0.962216] psft:GothicBBB-Medium:jfm=ujis}{}
+\DeclareFontShape{JY3}{gt}{m}{n}{<-> s*[0.962216] \ltj@stdgtfont:jfm=ujis}{}
 \DeclareFontShape{JY3}{mc}{bx}{n}{<-> ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{gt}{bx}{n}{<-> ssub*gt/m/n}{}
 

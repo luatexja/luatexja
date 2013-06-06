@@ -39,7 +39,7 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjbook}
-  [2012/05/08 v1.6-ltj
+  [2013/06/06 v1.6-ltj-2
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -159,10 +159,10 @@
 \directlua{luatexbase.add_to_callback('luatexja.load_jfm',
   function (ji, jn) ji.chars['parbdd'] = 0; return ji end,
   'ltj.jclasses_load_jfm', 1)}
-{\jfont\g=psft:Ryumin-Light:jfm=min } % loading jfm-min.lua
+{\jfont\g=\ltj@stdmcfont:jfm=min } % loading jfm-min.lua
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
-\DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.962216] psft:Ryumin-Light:jfm=min}{}
-\DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.962216] psft:GothicBBB-Medium:jfm=min;jfmvar=goth}{}
+\DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.962216] \ltj@stdmcfont:jfm=min}{}
+\DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.962216] \ltj@stdgtfont:jfm=min;jfmvar=goth}{}
 \ltjglobalsetparameter{differentjfm=both}
 \directlua{luatexbase.remove_from_callback('luatexja.load_jfm', 'ltj.jclasses_load_jfm')}
 \if@stysize

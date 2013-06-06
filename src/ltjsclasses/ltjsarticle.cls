@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsarticle}
-  [2012/05/08 ]
+  [2013/06/06 ]
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
@@ -285,15 +285,15 @@
 \setlength{\pdfpageheight}{\@tempdimb}
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
 \ifmingoth
-  \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] psft:Ryumin-Light:jfm=min}{}
-  \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] psft:GothicBBB-Medium:jfm=min}{}
+  \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] \ltj@stdmcfont:jfm=min}{}
+  \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] \ltj@stdgtfont:jfm=min}{}
 \else
   \ifptexjis
-    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] psft:Ryumin-Light:jfm=jis}{}
-    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] psft:GothicBBB-Medium:jfm=jis}{}
+    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] \ltj@stdmcfont:jfm=jis}{}
+    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] \ltj@stdgtfont:jfm=jis}{}
   \else
-    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] psft:Ryumin-Light:jfm=ujis}{}
-    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] psft:GothicBBB-Medium:jfm=ujis}{}
+    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] \ltj@stdmcfont:jfm=ujis}{}
+    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] \ltj@stdgtfont:jfm=ujis}{}
   \fi
 \fi
 \DeclareFontShape{JY3}{mc}{bx}{n}{<->ssub*gt/m/n}{}

@@ -13,6 +13,7 @@
 
 \ifltj@in@latex                 %<*LaTeX>
   \NeedsTeXFormat{LaTeX2e}
+  \PackageWarning{ltj-plain}{Don't load this package directly; load luatexja.sty instead.}
   \ProvidesPackage{ltj-plain}[2013/05/14]
 \fi                             %</LaTeX>
 
@@ -22,12 +23,24 @@
 %! ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 % LuaTeX-ja macros against plain TeX
 
-\jfont\tenmin=psft:Ryumin-Light:jfm=ujis at 9.62216pt
-\jfont\sevenmin=psft:Ryumin-Light:jfm=ujis at 6.73551pt
-\jfont\fivemin=psft:Ryumin-Light:jfm=ujis at 4.81108pt
-\jfont\tengt=psft:GothicBBB-Medium:jfm=ujis at 9.62216pt
-\jfont\sevengt=psft:GothicBBB-Medium:jfm=ujis at 6.73551pt
-\jfont\fivegt=psft:GothicBBB-Medium:jfm=ujis at 4.81108pt
+\def\ltj@stdmcfont{psft:Ryumin-Right}
+\def\ltj@stdgtfont{psft:GothicBBB-Medium}
+\newread\ltj@@cfgread
+\openin\ltj@@cfgread{luatexja.cfg}%
+\ifeof\ltj@@cfgread
+  \message{Cannot find file `luatexja.cfg'.}%
+\else
+  \closein\ltj@@cfgread
+  \input luatexja.cfg
+\fi
+\let\ltj@@cfgread\relax\advance\count16by-1\relax
+
+\jfont\tenmin=\ltj@stdmcfont:jfm=ujis at 9.62216pt
+\jfont\sevenmin=\ltj@stdmcfont:jfm=ujis at 6.73551pt
+\jfont\fivemin=\ltj@stdmcfont:jfm=ujis at 4.81108pt
+\jfont\tengt=\ltj@stdgtfont:jfm=ujis at 9.62216pt
+\jfont\sevengt=\ltj@stdgtfont:jfm=ujis at 6.73551pt
+\jfont\fivegt=\ltj@stdgtfont:jfm=ujis at 4.81108pt
 
 \let\mc=\tenmin
 \let\gt=\tengt
