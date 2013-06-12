@@ -3,7 +3,7 @@
 % 
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjdefs}[2013/05/14 Default font settings of LuaTeX-ja]
+\ProvidesPackage{lltjdefs}[2013/06/12 Default font settings of LuaTeX-ja]
 
 \def\ltj@stdmcfont{psft:Ryumin-Right}
 \def\ltj@stdgtfont{psft:GothicBBB-Medium}
@@ -49,8 +49,8 @@
   "2000-"243F, "2500-"27BF, "2900-"29FF, "2B00-"2BFF}
 \ltjdefcharrange{4}{%
    "500-"10FF, "1200-"1DFF, "2440-"245F, "27C0-"28FF, "2A00-"2AFF, 
-  "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A82F, "A840-"ABFF, "FB50-"FE0F, 
-  "FE20-"FE2F, "FE70-"FEFF, "FB00-"FB4F, "10000-"1FFFF, "E000-"F8FF} % non-Japanese
+  "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A82F, "A840-"ABFF, "FB00-"FE0F, 
+  "FE20-"FE2F, "FE70-"FEFF, "10000-"1FFFF, "E000-"F8FF} % non-Japanese
 \ltjdefcharrange{5}{"D800-"DFFF, "E0000-"10FFFF} 
 \ltjdefcharrange{6}{%
   "2460-"24FF, "2E80-"2EFF, "3000-"30FF, "3190-"319F, "31F0-"4DBF, 
@@ -62,6 +62,7 @@
 \ltjsetparameter{jacharrange={-1, +2, +3, -4, -5, +6, +7, +8}}
 
 \directlua{for x=128,255 do luatexja.math.is_math_letters[x] = true end}
+\def\<{\inhibitglue}
 
 % END OF FILE
 \endinput
@@ -83,8 +84,7 @@ MIDDLE
   % Greek and Coptic, Cyrillic, Greek Extended
 
 \ltjdefcharrange{3}{%
-  "2000-"243F, "2500-"27BF, "2900-"29FF, "2B00-"2BFF, "E000-"F8FF, 
-  "FB00-"FB4F} 
+  "2000-"243F, "2500-"27BF, "2900-"29FF, "2B00-"2BFF}
   %   66  "2000-"206F num = 140/112 name = General Punctuation
   %   67  "2070-"209F num = 68/48 name = Superscripts and Subscripts
   %   68  "20A0-"20CF num = 5/48 name = Currency Symbols
@@ -103,15 +103,15 @@ MIDDLE
   %   86  "2900-"297F num = 2 name = Supplemental Arrows-B
   %   87  "2980-"29FF num = 4 name = Miscellaneous Mathematical Symbols-B
   %   89  "2B00-"2BFF num = 3 name = Miscellaneous Symbols and Arrows
-  %  142  "E000-"F8FF num = 5/6400 name = Private Use Area
-  %  144  "FB00-"FB4F num = 20/80 name = Alphabetic Presentation Forms
 
 NEGATIVE
 
 \ltjdefcharrange{4}{%
    "500-"10FF, "1200-"1DFF, "2440-"245F, "27C0-"28FF, "2A00-"2AFF, 
-  "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A82F, "A840-"ABFF, "FB50-"FE0F, 
-  "FE20-"FE2F, "FE70-"FEFF, "10000-"1FFFF} % non-Japanese
+  "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A82F, "A840-"ABFF, "FB00-"FE0F, 
+  "FE20-"FE2F, "FE70-"FEFF, "10000-"1FFFF, "E000-"F8FF}
+} % non-Japanese
+
 \ltjdefcharrange{5}{"D800-"DFFF, "E0000-"10FFFF} 
   % Surrogates, Tags and Variation Selectors Supplement
   %  208  "F0000-"FFFFF num = 0/65536 name = Supplementary Private Use Area-A
