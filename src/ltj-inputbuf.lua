@@ -4,22 +4,26 @@
 
 luatexja.load_module('charrange'); local ltjc = luatexja.charrange
 
-local utf = unicode.utf8
+require("unicode")
+local utflen = unicode.utf8.len
+local utfbyte = unicode.utf8.byte
 local node_new = node.new
+local node_free = node.free
 local id_glyph = node.id('glyph')
 local getcatcode = tex.getcatcode
 local ltjc_is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char
+local FFFFF = string.char(0xF3,0xBF,0xBF,0xBF)
 
 --- the following function is modified from jafontspec.lua (by K. Maeda).
 --- Instead of "%", we use U+FFFFF for suppressing spaces.
 local function add_comment(buffer)
-   local i = utf.len(buffer)
-   while (i>0) and (getcatcode(utf.byte(buffer, i))==1 
-		 or getcatcode(utf.byte(buffer, i))==2) do
+   local i = utflen(buffer)
+   while (i>0) and (getcatcode(utfbyte(buffer, i))==1 
+		 or getcatcode(utfbyte(buffer, i))==2) do
       i=i-1
    end
    if i>0 then
-      local c = utf.byte(buffer, i)
+      local c = utfbyte(buffer, i)
       if c>0x80 then
 	 local ct = getcatcode(c)
 	 local te = tex.endlinechar
@@ -30,9 +34,9 @@ local function add_comment(buffer)
 	    local p = node_new(id_glyph)
 	    p.char = c
 	    if ltjc_is_ucs_in_japanese_char(p) then
-	       buffer = buffer .. string.char(0xF3,0xBF,0xBF,0xBF) -- U+FFFFF
+	       buffer = buffer .. FFFFF -- U+FFFFF
 	    end
-	    node.free(p)
+	    node_free(p)
 	 end
       end
    end
