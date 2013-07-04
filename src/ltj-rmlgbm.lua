@@ -319,7 +319,7 @@ local function mk_rml(name, size, id)
    fontdata.name = specification.name .. size .. var; cachedata.name = fontdata.name
    fontdata.fullname = specification.name .. var; cachedata.fullname = fontdata.fullname
    fontdata.psname = specification.name; cachedata.psname = fontdata.psname
-   fonts.ids[id] = cachedata
+   fonts.hashes.identifiers[id] = cachedata
 
    return fontdata
 end

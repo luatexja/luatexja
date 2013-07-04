@@ -29,7 +29,8 @@ local function print_scaled(s)
    return out
 end
 local function set_valign(fmtable, fn)
-   local fi = fonts.ids[fn]
+   local fi = fonts.hashes.identifiers[fn]
+   if not fi.ascender then fi = fi.parameters end
    local mt = fmtable.char_type[0]
    local ma = mt.height / (mt.height + mt.depth) * (fi.ascender + fi.descender)
    fmtable.down_offset = round(fi.ascender - ma)

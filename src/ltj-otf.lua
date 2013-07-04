@@ -70,7 +70,7 @@ end
 
 local function cid(key)
    if key==0 then return append_jglyph(char) end
-   local curjfnt = fonts.ids[tex.attribute[attr_curjfnt]]
+   local curjfnt = fonts.hashes.identifiers[tex.attribute[attr_curjfnt]]
    if not curjfnt.cidinfo or 
       curjfnt.cidinfo.ordering ~= "Japan1" and
       curjfnt.cidinfo.ordering ~= "GB1" and
@@ -135,9 +135,9 @@ luatexbase.add_to_callback('pre_linebreak_filter',
 --   これらの文字指定は，和文フォント定義ごとに，それぞれのフォントの
 --   CID <-> グリフ 対応状況による変換テーブルが用意される．
 
--- フォント読み込み時に，CID
+-- 和文フォント読み込み時に，CID -> unicode 対応をとっておく．
 local function cid_to_char(fmtable, fn)
-   local fi = fonts.ids[fn]
+   local fi = fonts.hashes.identifiers[fn]
    if fi.cidinfo and fi.cidinfo.ordering == "Japan1" then
       fmtable.cid_char_type = {}
       for i, v in pairs(fmtable.chars) do
