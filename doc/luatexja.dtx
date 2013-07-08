@@ -593,6 +593,20 @@ But only the contents in \texttt{src/} are needed to work \LuaTeX-ja.
 %</ja>
 
 %<*en>
+\item If you downloaded this package from CTAN, you have to process following three
+   files with \LuaLaTeX to generate classes:
+%</en>
+%<*ja>
+\item もしCTANから本パッケージを取得したのであれば，日本語用クラスファイルを
+生成するために，以下の3ファイルを\LuaLaTeX で処理する必要がある：
+%</ja>
+\begin{itemize}
+ \item \texttt{src/ltjclasses/ltjclasses.ins}
+ \item \texttt{src/ltjclasses/ltjltxdoc.ins}
+ \item \texttt{src/ltjsclasses/ltjsclasses.ins}
+\end{itemize}
+
+%<*en>
 \item Copy all the contents of \texttt{src/} into one of your \texttt{TEXMF} tree.
       \texttt{TEXMF/tex/luatex/luatexja/} is an example location.
       If you cloned entire Git repository, making a symbolic link of \texttt{src/}

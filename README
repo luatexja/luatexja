@@ -8,7 +8,9 @@ This package is highly affected by ASCII pTeX engine, but not a porting of it.
 
 Note that this package is still *alpha-stage*; documentations are not complete
 and specifications are subject to change. Documentations are located at
-  doc/luatexja-en.pdf (en), doc/luatexja-ja.pdf (ja), doc/luatexja-zh.pdf (zh).
+  doc/luatexja-en.pdf (en), doc/luatexja-ja.pdf (ja).
+These documents are generated from doc/luatexja.{dtx,ins}. However,
+to produce PDF files, you will need Kozuka fonts (commercial fonts).
 
 LuaTeX-ja is developed on
   <http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage(en)>.
@@ -37,13 +39,19 @@ Installation
       <http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git
                               ;a=snapshot;h=refs/tags/$VER$;sf=tgz>
 
-   b. Extract the archive and put src/ into your TEXMF tree.
+   b. Extract the archive and process following three files by LuaLaTeX
+      to generate classes for Japanese typesetting:
+        src/ltjclasses.ins
+        src/ltjltxdoc.ins
+        src/ltjsclasses.ins
+
+   c. Put src/ into your TEXMF tree.
       An example location is TEXMF/tex/luatex/luatexja.
 
       If you are updating from old version, you MUST remove it before
       extracting the new version of LuaTeX-ja.
 
-   c. You may need to update the filename database, by 'mktexlsr' or something.
+   d. You may need to update the filename database, by 'mktexlsr' or something.
 
 
 Basic Usage

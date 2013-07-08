@@ -1,3 +1,8 @@
+%#!lualatex luatexja-kinsoku_make.tex
+\documentclass{article}
+\usepackage{luatexja}
+\makeatletter
+
 \ltj@tempcnta="0%"
 \loop\ifnum\ltj@tempcnta<"100%"
   \ltjsetparameter{alxspmode={\ltj@tempcnta,0}}%
@@ -440,15 +445,12 @@
 \ltjsetparameter{jaxspmode={`｢,preonly}}
 \ltjsetparameter{jaxspmode={`｣,postonly}}
 
-\endinput 
-cat `locate ukinsoku.tex` \
-  | sed "s/prebreakpenalty\(.*\)=\([0-9]*\)/ltjsetparameter{prebreakpenalty={\1,\2}}/" \
-  | sed "s/postbreakpenalty\(.*\)=\([0-9]*\)/ltjsetparameter{postbreakpenalty={\1,\2}}/" \
-  | sed "s/inhibitxspcode\(.*\)=0/ltjsetparameter{jaxspmode={\1,inhibit}}/" \
-  | sed "s/inhibitxspcode\(.*\)=1/ltjsetparameter{jaxspmode={\1,postonly}}/" \
-  | sed "s/inhibitxspcode\(.*\)=2/ltjsetparameter{jaxspmode={\1,preonly}}/" \
-  | sed "s/inhibitxspcode\(.*\)=3/ltjsetparameter{jaxspmode={\1,allow}}/" \
-  | sed "s/xspcode\(.*\)=0/ltjsetparameter{alxspmode={\1,inhibit}}/" \
-  | sed "s/xspcode\(.*\)=2/ltjsetparameter{alxspmode={\1,postonly}}/" \
-  | sed "s/xspcode\(.*\)=1/ltjsetparameter{alxspmode={\1,preonly}}/" \
-  | sed "s/xspcode\(.*\)=3/ltjsetparameter{alxspmode={\1,allow}}/"  > luatexja-kinsoku.tex
+
+\usepackage{luacode}
+\begin{luacode}
+ s = table.copy(luatexja.stack.charprop_stack_table[0])
+ s.kanjiskip = nil; s.xkanjiskip = nil
+ table.tofile('ltj-kinsoku.lua', s, 'return', false, true, false)
+\end{luacode}
+\begin{document}
+\end{document}
