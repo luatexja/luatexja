@@ -490,6 +490,7 @@ We say `alphabetic fonts' for fonts used in \textbf{ALchar}, and `Japanese fonts
 \item \Pkg{luaotfload} v2.2
 \item \Pkg{luatexbase} v0.6~(2013/05/04)
 \item \Pkg{xunicode} v0.981~(2011/09/09)
+\item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
 \end{itemize}
 
 %<*en>
@@ -593,29 +594,32 @@ But only the contents in \texttt{src/} are needed to work \LuaTeX-ja.
 %</ja>
 
 %<*en>
-\item If you downloaded this package from CTAN, you have to process following three
-   files with \LuaLaTeX to generate classes:
+\item If you downloaded this package from CTAN, you have to run following commands
+    to generate classes 
+    and \texttt{ltj-kinsoku.lua} (the file which stores default ``\textit{kinsoku}'' parameters):
 %</en>
 %<*ja>
-\item もしCTANから本パッケージを取得したのであれば，日本語用クラスファイルを
-生成するために，以下の3ファイルを\LuaLaTeX で処理する必要がある：
-%</ja>
-\begin{itemize}
- \item \texttt{src/ltjclasses/ltjclasses.ins}
- \item \texttt{src/ltjclasses/ltjltxdoc.ins}
- \item \texttt{src/ltjsclasses/ltjsclasses.ins}
-\end{itemize}
-
-%<*en>
-\item If you downloaded this package from CTAN, you also have to process 
-  \texttt{src/ltj-kinsoku\_make.tex} by (plain) \LuaTeX\ to generate 
-  \texttt{ltj-kinsoku.lua}, which stores default ``\textit{kinsoku}'' parameters.
-%</en>
-%<*ja>
-\item もしCTANから本パッケージを取得したのであれば，標準の禁則処理用パラメータを
+\item もしCTANから本パッケージを取得したのであれば，日本語用クラスファイルや
+標準の禁則処理用パラメータを
 格納した \texttt{ltj-kinsoku.lua} を生成するために，
-\texttt{src/ltj-kinsoku\_make.tex} を(plain) \LuaTeX で処理する必要がある．
+以下を実行する必要がある：
 %</ja>
+\begin{verbatim}
+$ cd src
+$ lualatex ltjclasses.ins
+$ lualatex ltjsclasses.ins
+$ lualatex ltjltxdoc.ins
+$ luatex   ltj-kinsoku_make.tex
+\end{verbatim}
+%<*en>
+Note that \texttt{*.\{dtx,ins\}} and \texttt{ltj-kinsoku\_make.tex} are not needed in regular use.
+%</en>
+%<*ja>
+ここで使用した \texttt{*.\{dtx,ins\}} と \texttt{ltj-kinsoku\_make.tex} は
+通常の使用にあたっては必要ない．
+%</ja>
+
+
 
 %<*en>
 \item Copy all the contents of \texttt{src/} into one of your \texttt{TEXMF} tree.
@@ -3418,6 +3422,11 @@ With the help of this example, we remark the specification of \verb+\inhibitglue
 %</en>
 %<*ja>
 \item \verb+\inhibitglue+ を数式モード中で呼び出した場合はただ無視される．
+%</ja>
+
+%<*ja>
+\item \LaTeX で\LuaTeX-ja を使用する場合は，
+\verb+\inhibitglue+ の代わりとして \verb+\<+ を使うことができる．
 %</ja>
 \end{itemize}
 
