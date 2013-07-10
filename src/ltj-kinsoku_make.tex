@@ -1,7 +1,7 @@
-%#!lualatex luatexja-kinsoku_make.tex
-\documentclass{article}
-\usepackage{luatexja}
-\makeatletter
+%#!luatex ltj-kinsoku_make.tex
+\input luatexja.sty
+
+\catcode`\@=11
 
 \ltj@tempcnta="0%"
 \loop\ifnum\ltj@tempcnta<"100%"
@@ -445,12 +445,11 @@
 \ltjsetparameter{jaxspmode={`｢,preonly}}
 \ltjsetparameter{jaxspmode={`｣,postonly}}
 
-
-\usepackage{luacode}
-\begin{luacode}
+\catcode`\_=12
+\directlua{
  s = table.copy(luatexja.stack.charprop_stack_table[0])
  s.kanjiskip = nil; s.xkanjiskip = nil
  table.tofile('ltj-kinsoku.lua', s, 'return', false, true, false)
-\end{luacode}
-\begin{document}
-\end{document}
+}
+
+\bye

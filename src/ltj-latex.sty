@@ -39,9 +39,8 @@
 
 %%% default parameters
 \directlua{
-  luatexja.stack.charprop_stack_table[0] 
-    = dofile(assert(kpse.find_file('ltj-kinsoku.lua', 'tex'),
-      "File `ltj-kinsoku.lua' not found"))
+  local s = kpse.find_file('ltj-kinsoku.lua', 'tex')
+  luatexja.stack.charprop_stack_table[0] = s and dofile(s) or {}
 }
 
 \ltjsetparameter{kanjiskip=0pt plus 0.4pt minus 0.4pt,

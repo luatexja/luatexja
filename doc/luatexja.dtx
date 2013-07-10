@@ -607,6 +607,17 @@ But only the contents in \texttt{src/} are needed to work \LuaTeX-ja.
 \end{itemize}
 
 %<*en>
+\item If you downloaded this package from CTAN, you also have to process 
+  \texttt{src/ltj-kinsoku\_make.tex} by (plain) \LuaTeX\ to generate 
+  \texttt{ltj-kinsoku.lua}, which stores default ``\textit{kinsoku}'' parameters.
+%</en>
+%<*ja>
+\item もしCTANから本パッケージを取得したのであれば，標準の禁則処理用パラメータを
+格納した \texttt{ltj-kinsoku.lua} を生成するために，
+\texttt{src/ltj-kinsoku\_make.tex} を(plain) \LuaTeX で処理する必要がある．
+%</ja>
+
+%<*en>
 \item Copy all the contents of \texttt{src/} into one of your \texttt{TEXMF} tree.
       \texttt{TEXMF/tex/luatex/luatexja/} is an example location.
       If you cloned entire Git repository, making a symbolic link of \texttt{src/}

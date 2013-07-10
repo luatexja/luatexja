@@ -9,8 +9,6 @@ This package is highly affected by ASCII pTeX engine, but not a porting of it.
 Note that this package is still *alpha-stage*; documentations are not complete
 and specifications are subject to change. Documentations are located at
   doc/luatexja-en.pdf (en), doc/luatexja-ja.pdf (ja).
-These documents are generated from doc/luatexja.{dtx,ins}. However,
-to produce PDF files, you will need Kozuka fonts (commercial fonts).
 
 LuaTeX-ja is developed on
   <http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage(en)>.
@@ -28,6 +26,8 @@ Installation
     - LuaTeX beta-0.74.0 or later
     - luaotfload v2.2
     - luatexbase v0.6
+    - Several Adobe CMaps 
+      (e.g., UniJIS2004-UTF32-H, Adobe-Japan1-UCS2 for Japanese)
    Hence this version does not work in TeX Live 2012 (or earlier).
 
 1. If you are using TeX Live 2013 or later, you can install LuaTeX-ja via tlmgr.
@@ -39,11 +39,14 @@ Installation
       <http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git
                               ;a=snapshot;h=refs/tags/$VER$;sf=tgz>
 
-   b. Extract the archive and process following three files by LuaLaTeX
+   b1. Extract the archive and process following three files by LuaLaTeX
       to generate classes for Japanese typesetting:
         src/ltjclasses.ins
         src/ltjltxdoc.ins
         src/ltjsclasses.ins
+
+   b2. Process src/ltj-kinsoku_make.tex by (plain) LuaTeX to generate ltj-kinsoku.lua,
+      which stores default "kinsoku" parameters.
 
    c. Put src/ into your TEXMF tree.
       An example location is TEXMF/tex/luatex/luatexja.
@@ -66,5 +69,17 @@ Simply loading luatexja.sty by \input or \usepackage does the minimal setting.
   It defines control sequences such as \setmainjfont, setsansjfont and
   \jfontspec, which can be used for specifying Japanese fonts.
 
+Notes
+-----
+* This archive contains four .{dtx,ins} pairs:
+    src/ltjclasses.{ins,dtx},  src/ltjltxdoc.{ins,dtx}
+    src/ltjsclasses.{ins,dtx}, doc/luatexja.{ins,dtx}
+  Former three pairs generate class files (see above),
+  while the latter doc/luatexja.{ins,dtx} generates documentations.
+  (You will need Kozuka fonts to regenerate documentaion PDFs.)
+
+  No .{dtx,ins} pair generates .sty files of LuaTeX-ja package.
+
+* src/*.{ins.dtx} and src/ltj-kinsoku_make.tex are not needed in regular use.
 
 Last commit date: $Format:%cd$
