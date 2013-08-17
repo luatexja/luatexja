@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec}[2013/05/14 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec}[2013/08/17 fontspec support of LuaTeX-ja]
 
 \RequirePackage{fontspec,luatexja}
 \ExplSyntaxOn
@@ -81,6 +81,7 @@
   }
   \tl_set:Nx \g_fontspec_default_fontopts_tl
              {JFM=ujis,Scale=\fp_use:N \g_ltj_fontspec_scale_fp,Kerning=Off,\g_ltj_fontspec_default_fontopts_tl}
+  \prop_set_eq:NN \g__fontspec_fontopts_prop \g__ltj_fontspec_fontopts_prop
   \cs_set_eq:NN \DeclareFontFamily \DeclareKanjiFamily
   \fontspec_select:nn{#1}{#2}
   \group_end:
@@ -127,11 +128,25 @@
   \newjfontfamily #1 [ BoldFont={},ItalicFont={},SmallCapsFont={},#2 ] {#3}
 }
 
-\DeclareDocumentCommand \defaultjfontfeatures {m} {
+\tl_new:N \g_ltj_fontspec_default_fontopts_tl
+\prop_new:N \g__ltj_fontspec_fontopts_prop
+\DeclareDocumentCommand \defaultjfontfeatures { o m }
+ {
+  \IfNoValueTF {#1}
+   { \__ltj_fontspec_set_default_features:n {#2} }
+   { \__ltj_fontspec_set_font_default_features:nn {#1} {#2} }
+ }
+\cs_new:Nn \__ltj_fontspec_set_default_features:n
+ {
   \tl_set:Nn \g_ltj_fontspec_default_fontopts_tl {#1,}
-}
-
-\tl_clear:N \g_ltj_fontspec_default_fontopts_tl
+ }
+\cs_new:Nn \__ltj_fontspec_set_font_default_features:nn
+ {
+  \__fontspec_sanitise_fontname:Nn \l__fontspec_tmp_tl {#1}
+  \tl_if_empty:nTF {#2}
+   { \prop_gremove:NV \g__ltj_fontspec_fontopts_prop \l__fontspec_tmp_tl }
+   { \prop_gput:NVn   \g__ltj_fontspec_fontopts_prop \l__fontspec_tmp_tl {#2} }
+ }
 
 \DeclareDocumentCommand \addjfontfeatures {m} {
   \ifcsname zf@family@fontdef\k@family\endcsname
