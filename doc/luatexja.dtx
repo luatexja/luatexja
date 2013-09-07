@@ -1114,14 +1114,27 @@ featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を�
 To use standard Japanese font settings easily, one can load \Pkg{luatexja-preset}
 package with several options. This package provides functions in a part of
 \Pkg{otf} package and a part of \Pkg{PXchfon} package by Takayuki Yato,
-and loads \Pkg{luatexja-fontspec} internally.
+and loads \Pkg{luatexja-fontspec}, hence \Pkg{fontspec} internally.
+
+If you need to pass some options to \Pkg{fontspec}, load \Pkg{fontspec} manually
+before \Pkg{luatexja-preset}:
 %</en>
 %<*ja>
 よく使われている和文フォント設定を一行で指定できるようにしたのが
 \Pkg{luatexja-preset}パッケージである．このパッケージは，
 \Pkg{otf}パッケージの一部機能と八登崇之氏による\Pkg{PXchfon}パッケージの一部機能とを
-合わせたような格好をしており，内部で\Pkg{luatexja-fontspec}を読み込んでいる．
+合わせたような格好をしており，内部で\Pkg{luatexja-fontspec}，従って
+\Pkg{fontspec}を読み込んでいる．
+
+もし\Pkg{fontspec}パッケージに何らかのオプションを渡す必要がある
+\footnote{例えば，数式フォントまで置換されてしまい，\texttt{\char92mathit}によってギリシャ文字の
+斜体大文字が出なくなる，など．}場合は，
+次のように\Pkg{luatexja-preset}の前に\Pkg{fontspec}を手動で読みこめば良い：
 %</ja>
+\begin{verbatim}
+\usepackage[no-math]{fontspec}
+\usepackage[...]{luatexja-preset}
+\end{verbatim}
 
 %<en>\paragraph{General options}
 %<ja>\paragraph{一般的なオプション}
@@ -1143,16 +1156,18 @@ This means that \verb+\mcfamily\bfseries+, \verb+\gtfamily\bfseries+ and
 %<*en>
 Use \textit{mincho} with two weights (medium~and~bold),
 \textit{gothic} with three weights (medium,~bold and~heavy), and \textit{rounded gothic}%
-\footnote{Provided by \texttt{\char92mgfamily},
+\footnote{Provided by \texttt{\char92mgfamily} and \texttt{\char92textmg\{...\}},
 because \textit{rounded gothic} is called \textit{maru gothic} (丸ゴシック) in Japanese.}.
 The heavy weight of \textit{gothic} can be used by ``changing the family'' \verb+\gtebfamily+,
-because \Pkg{fontspec} package can handle only medium (\verb+\mdseries+) and
+or \verb+\textgteb{...}+.
+This is because \Pkg{fontspec} package can handle only medium (\verb+\mdseries+) and
 bold (\verb+\bfseries+).
 %</en>
 %<*ja>
 明朝体2ウェイト・ゴシック体3ウェイトと，
-丸ゴシック体 (\verb+\mgfamily+) を使用可能とする．
-ゴシック体は細字・太字・極太の3ウェイトがあるが，極太ゴシック体はファミリの切り替え (\verb+\gtebfamily+) %
+丸ゴシック体 (\verb+\mgfamily+, \verb+\textmg{...}+) を使用可能とする．
+ゴシック体は細字・太字・極太の3ウェイトがあるが，
+極太ゴシック体はファミリの切り替え (\verb+\gtebfamily+, \verb+\textgteb{...}+) %
 で実現している．\Pkg{fontspec}では通常 (\verb+\mdseries+) と太字 (\verb+\bfseries+) しか扱えないために
 このような中途半端な実装になっている．
 %</ja>
