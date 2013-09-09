@@ -654,12 +654,34 @@ Note that \texttt{*.\{dtx,ins\}} and \texttt{ltj-kinsoku\_make.tex} are not need
       従来日本語の文字コードとして用いられてきたEUC-JPやShift-JISは使用できない．
 %</ja>
 %<*en>
-\item \LuaTeX-ja is very slower than \pTeX. Using LuaJIT\TeX slightly improve the situation.
+\item \LuaTeX-ja is very slower than \pTeX. Using LuaJIT\TeX\ slightly improve the situation.
 %</en>
 %<*ja>
 \item \LuaTeX-jaは動作が\pTeX に比べて非常に遅い．コードを変更して徐々に速くしているが，
 まだ満足できる速度ではない．LuaJIT\TeX を用いると\LuaTeX のだいたい1.3倍の速度で動くようである．
 %</ja>
+
+%<*en>
+\item \emph{Note for MiK\TeX\ users:} \LuaTeX-ja requires that two CMap files, 
+\texttt{UniJIS2004-UTF32-H} and \texttt{Adobe-Japan1-UCS2}, must be found
+by Kpathsearch.
+You can check this by \texttt{kpsewhich} command (the output may be changed): 
+%</en>
+%<*ja>
+\item \textbf{MiK\TeX 利用者への注意：}\LuaTeX-jaが動作するためには，
+\texttt{UniJIS2004-UTF32-H}, \texttt{Adobe-Japan1-UCS2}という2つのCMapが
+Kpathsearchによって見つけられることが必要である．\TeX\ LiveやW32\TeX ユーザは
+普通にインストールすればそのようになっているはずである．
+
+確認するには，以下のように \texttt{kpsewhich} コマンドを実行すればよい：
+%</ja>
+\begin{verbatim}
+$ kpsewhich -format=cmap  UniJIS2004-UTF32-H
+/opt/texlive/2013/texmf-dist/fonts/cmap/adobemapping/aj16/CMap/UniJIS2004-UTF32-H
+$ kpsewhich -format=cmap  Adobe-Japan1-UCS2
+/opt/texlive/2013/texmf-dist/fonts/cmap/adobemapping/ToUnicode/Adobe-Japan1-UCS2
+\end{verbatim}
+
 \end{itemize}
 
 %<en>\subsection{Using in plain \TeX}
@@ -2095,7 +2117,12 @@ JFMの名前を指定する．もし以前に指定されたJFMが読み込ま�
 %</en>
 %<*ja>
 \item[jfmvar=<string>] 標準では，JFMとサイズが同じで，
-  実フォントだけが異なる2つの和文フォントは……
+  実フォントだけが異なる2つの和文フォントは「区別されない」．例えば
+下の例において，最初の「）」と「【」の実フォントは異なるが，
+JFMもサイズも同じなので，普通に「）【」と入力した時と同じように半角空きとなる．
+
+しかし，時には……
+
 %</ja>
 \begin{LTXexample}[width=0.3\textwidth]
 \ltjsetparameter{differentjfm=both}
