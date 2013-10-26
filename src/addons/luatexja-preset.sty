@@ -1,11 +1,12 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2013/05/25 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2013/10/26 Japanese font presets]
 %% Sync with PXchfon 0.6a
 
 \RequirePackage{expl3}
 \RequirePackage{luatexja-fontspec}
 \ExplSyntaxOn
 
+%%%% message
 
 \bool_new:N \l_ltjpreset_bold_bool % bold
 \bool_set_false:N \l_ltjpreset_bold_bool
@@ -37,12 +38,8 @@
 
 % 漢字字形
 \tl_new:N \l_ltjpreset_kanji_shape_tl
-\DeclareOption{90jis}{  
-  \tl_set:Nn \l_ltjpreset_kanji_shape_tl { , CJKShape=JIS1990 }
-} % 90jis
-\DeclareOption{jis2004}{
-  \tl_set:Nn \l_ltjpreset_kanji_shape_tl { , CJKShape=JIS2004 }
-} % jis2004
+\DeclareOption{90jis}{  \tl_set:Nn \l_ltjpreset_kanji_shape_tl { , CJKShape=JIS1990 }} % 90jis
+\DeclareOption{jis2004}{\tl_set:Nn \l_ltjpreset_kanji_shape_tl { , CJKShape=JIS2004 }} % jis2004
 
 % font preset
 \bool_new:N \l_ltjpreset_office_bool  % MS Office の HG 系フォントを使っているか
@@ -138,7 +135,7 @@
 
 
 
-% kozuka
+% 小塚 (Adobe)
 \DeclareOption{kozuka-pro}{
   \ltjpreset_set_multi:n {
     KozMinPro-Regular.otf , KozMinPro-Bold.otf, % mc/m, mc/bx
@@ -164,7 +161,7 @@
   }
 }
 
-% hiragino
+% ヒラギノ (OSX)
 \DeclareOption{hiragino-pro}{
   \ltjpreset_set_multi:n {
     HiraMinPro-W3.otf      , HiraMinPro-W6.otf,   % mc/m, mc/bx
@@ -182,7 +179,7 @@
   }
 }
 
-% morisawa
+% モリサワ
 \DeclareOption{morisawa-pro}{
   \ltjpreset_set_multi:n {
     A-OTF-RyuminPro-Light.otf , A-OTF-FutoMinA101Pro-Bold.otf ,    % mc/m, mc/bx
@@ -197,6 +194,16 @@
     A-OTF-GothicBBBPr6N-Medium.otf , A-OTF-FutoGoB101Pr6N-Bold.otf , % gt/m, gt/bx (multiweight))
     A-OTF-GothicBBBPr6N-Medium.otf , A-OTF-MidashiGoPr6N-MB31.otf ,  % gt/m (uni), gt/eb
     A-OTF-Jun101Pr6N-Light.otf                                       % mg/m
+  }
+}
+
+% 游明朝/游ゴシック (Win8.1)
+\DeclareOption{yu}{
+  \ltjpreset_set_multi:n {
+    yumin.ttf , yumindb.ttf ,     % mc/m, mc/bx
+    yugothic.ttf , yugothib.ttf , % gt/m, gt/bx (multiweight))
+    yugothic.ttf , yugothib.ttf , % gt/m (uni), gt/eb
+    yugothib.ttf                  % mg/m
   }
 }
 
@@ -308,14 +315,14 @@
 %%%% （丸）ゴシック体の設定: bold option もここで
 \int_compare:nTF { \l_ltjpreset_deluxe_int ==  2 } {
 %%% mg
-  \newjfontfamily \mgfamily [
-      BoldFont = \ltjpreset_font_mg:, 
+ \newjfontfamily \mgfamily [
+      BoldFont = \ltjpreset_font_mg:,
       \tl_use:N \l_ltjpreset_add_features_tl
       \bool_if:NT \l_ltjpreset_noembed_bool { , NoEmbed }, 
       \tl_use:N \l_ltjpreset_add_features_tl 
     ] { \ltjpreset_font_mg: }
-  \DeclareTextFontCommand{\textmg}{\mgfamily}
-%%% gteb
+    \DeclareTextFontCommand{\textmg}{\mgfamily}
+%%% gt/eb
   \newjfontfamily \gtebfamily [
       BoldFont = \ltjpreset_font_gt_eb:, 
       \tl_use:N \l_ltjpreset_add_features_tl
@@ -340,6 +347,7 @@
 %%%% 実際の fontspec の呼びだし
 
 \defaultjfontfeatures{ Kerning=Off }
+
 \setmainjfont [ 
   BoldFont = \ltjpreset_font_mc_bx:
   \bool_if:NT \l_ltjpreset_noembed_bool { , NoEmbed }, 
@@ -350,7 +358,6 @@
   \bool_if:NT \l_ltjpreset_noembed_bool { , NoEmbed }, 
   \tl_use:N \l_ltjpreset_add_features_tl 
 ] { \ltjpreset_font_gt_m: }
-
 
 \ExplSyntaxOff
 \endinput

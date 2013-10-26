@@ -51,7 +51,7 @@ do
 end
 local get_pr_begin_flag = get_pr_begin_flag
 
-head = nil
+head = nil;
 
 luatexbase.create_callback("luatexja.set_width", "data", 
 			   function (fstable, fmtable, jchar_class) 
@@ -66,15 +66,17 @@ function capsule_glyph(p, dir, mode, met, class)
    if not char_data then return node_next(p) end
    local fwidth, pwidth = char_data.width, p.width
    fwidth = (fwidth ~= 'prop') and fwidth or pwidth
-   local fheight, fdepth = char_data.height, char_data.depth
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = luatexbase.call_callback("luatexja.set_width", fshift, met, class)
+   local fheight, fdepth = char_data.height, char_data.depth
+   fheight = (fheight ~= 'prop') and fheight or p.height
+   fdepth  = (fdepth  ~= 'prop') and fdepth  or p.depth 
    if (mode or pwidth ~= fwidth or p.height ~= fheight or p.depth ~= fdepth) then
       local y_shift, ca
          = - p.yoffset + (has_attr(p,attr_ykblshift) or 0), char_data.align
       local q; head, q = node.remove(head, p)
       p.yoffset, p.next = -fshift.down, nil
-      if total ~= 0 and ca~='left'  then
+      if ca~='left'  then
 	 p.xoffset = p.xoffset - fshift.left
 	    + (((ca=='right') and fwidth - pwidth) or round((fwidth - pwidth)*0.5))
       else
@@ -100,8 +102,9 @@ function set_ja_width(ahead, dir)
    local p = ahead; head  = ahead
    local m = false -- is in math mode?
    while p do
-      if (p.id==id_glyph) 
-      and ((has_attr(p, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG)<=0 then
+      local pid = p.id
+      if (pid==id_glyph) 
+        and ((has_attr(p, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG)<=0 then
       local pf = p.font
 	 if pf == has_attr(p, attr_curjfnt) then
 	    p = capsule_glyph(p, dir, false, ltjf_font_metric_table[pf], 
@@ -114,9 +117,9 @@ function set_ja_width(ahead, dir)
 	 m = (p.subtype==0); p = node_next(p)
       else
 	 if m then
-	    if p.id==id_hlist or p.id==id_vlist then
+	    if pid==id_hlist or pid==id_vlist then
 	       p.shift = p.shift + (has_attr(p,attr_yablshift) or 0)
-	    elseif p.id==id_rule then
+	    elseif pid==id_rule then
 	       local v = has_attr(p,attr_yablshift) or 0
 	       p.height = p.height - v; p.depth = p.depth + v 
 	    end
