@@ -1,6 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2013/10/26 Japanese font presets]
-%% Sync with PXchfon 0.6a
+\ProvidesPackage{luatexja-preset}[2013/10/28 Japanese font presets]
 
 \RequirePackage{expl3}
 \RequirePackage{luatexja-fontspec}
@@ -64,100 +63,42 @@
   \bool_set_true:N \l_ltjpreset_office_bool
 }
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% OBSOLETE
-% kozuka
-\DeclareOption{kozuka4}{
-  \ltjpreset_set_multi:n {
-    KozMinPro-Regular.otf , KozMinPro-Bold.otf, % mc/m, mc/bx
-    KozGoPro-Regular.otf  , KozGoPro-Bold.otf,  % gt/m, gt/bx (multiweight))
-    KozGoPro-Medium.otf   , KozGoPro-Heavy.otf, % gt/m (uni), gt/eb
-    KozGoPro-Heavy.otf                          % mg/m
-  }
-}
-\DeclareOption{kozuka6}{
-  \ltjpreset_set_multi:n {
-    KozMinProVI-Regular.otf , KozMinProVI-Bold.otf, % mc/m, mc/bx
-    KozGoProVI-Regular.otf  , KozGoProVI-Bold.otf,  % gt/m, gt/bx (multiweight))
-    KozGoProVI-Medium.otf   , KozGoProVI-Heavy.otf, % gt/m (uni), gt/eb
-    KozGoProVI-Heavy.otf                            % mg/m
-  }
-}
-\DeclareOption{kozuka6n}{
-  \ltjpreset_set_multi:n {
-    KozMinPr6N-Regular.otf , KozMinPr6N-Bold.otf, % mc/m, mc/bx
-    KozGoPr6N-Regular.otf  , KozGoPr6N-Bold.otf,  % gt/m, gt/bx (multiweight))
-    KozGoPr6N-Medium.otf   , KozGoPr6N-Heavy.otf, % gt/m (uni), gt/eb
-    KozGoPr6N-Heavy.otf                           % mg/m
-  }
-}
-
-% hiragino
-\DeclareOption{hiragino}{
-  \ltjpreset_set_multi:n {
-    HiraMinPro-W3.otf      , HiraMinPro-W6.otf,   % mc/m, mc/bx
-    HiraKakuPro-W3.otf     , HiraKakuPro-W6.otf,  % gt/m, gt/bx (multiweight))
-    HiraKakuPro-W3.otf     , HiraKakuStd-W8.otf,  % gt/m (uni), gt/eb
-    HiraMaruPro-W4.otf                            % mg/m
-  }
-}
-\DeclareOption{hiraginon}{
-  \ltjpreset_set_multi:n {
-    HiraMinProN-W3.otf      , HiraMinProN-W6.otf,   % mc/m, mc/bx
-    HiraKakuProN-W3.otf     , HiraKakuProN-W6.otf,  % gt/m, gt/bx (multiweight))
-    HiraKakuProN-W3.otf     , HiraKakuStdN-W8.otf,  % gt/m (uni), gt/eb
-    HiraMaruProN-W4.otf                             % mg/m
-  }
-}
-
-% morisawa?
-\DeclareOption{morisawa4}{
-  \ltjpreset_set_multi:n {
-    A-OTF-RyuminPro-Light.otf , A-OTF-FutoMinA101Pro-Bold.otf ,    % mc/m, mc/bx
-    A-OTF-GothicBBBPro-Medium.otf , A-OTF-FutoGoB101Pro-Bold.otf , % gt/m, gt/bx (multiweight))
-    A-OTF-GothicBBBPro-Medium.otf , A-OTF-MidashiGoPro-MB31.otf ,  % gt/m (uni), gt/eb
-    A-OTF-Jun101Pro-Light.otf % mg/m
-  }
-}
-\DeclareOption{morisawa6n}{
-  \ltjpreset_set_multi:n {
-    A-OTF-RyuminPr6N-Light.otf , A-OTF-FutoMinA101Pr6N-Bold.otf ,    % mc/m, mc/bx
-    A-OTF-GothicBBBPr6N-Medium.otf , A-OTF-FutoGoB101Pr6N-Bold.otf , % gt/m, gt/bx (multiweight))
-    A-OTF-GothicBBBPr6N-Medium.otf , A-OTF-MidashiGoPr6N-MB31.otf ,  % gt/m (uni), gt/eb
-    A-OTF-Jun101Pr6N-Light.otf                                       % mg/m
-  }
-}
-
-\DeclareOption{ipaex-dx}{\ltjpreset_set_office:nn { IPAExMincho } { IPAExGothic }}
-\DeclareOption{ipa-dx}  {\ltjpreset_set_office:nn { IPAMincho } { IPAGothic }}
-\DeclareOption{ms-dx}   {\ltjpreset_set_office:nn { MS-Mincho } { MS-Gothic }}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 
 % 小塚 (Adobe)
+%% Pro
 \DeclareOption{kozuka-pro}{
   \ltjpreset_set_multi:n {
-    KozMinPro-Regular.otf , KozMinPro-Bold.otf, % mc/m, mc/bx
-    KozGoPro-Regular.otf  , KozGoPro-Bold.otf,  % gt/m, gt/bx (multiweight))
-    KozGoPro-Medium.otf   , KozGoPro-Heavy.otf, % gt/m (uni), gt/eb
-    KozGoPro-Heavy.otf                          % mg/m
+    KozMinPro-Regular , % mc/m
+    KozMinPro-Bold ,    % mc/bx
+    KozGoPro-Regular , % gt/m  (multi)
+    KozGoPro-Bold ,    % gt/bx
+    KozGoPro-Medium  , % gt/m  (uni)
+    KozGoPro-Heavy ,   % gt/eb
+    KozGoPro-Heavy     % mg/m
   }
 }
+%% Pr6
 \DeclareOption{kozuka-pr6}{
   \ltjpreset_set_multi:n {
-    KozMinProVI-Regular.otf , KozMinProVI-Bold.otf, % mc/m, mc/bx
-    KozGoProVI-Regular.otf  , KozGoProVI-Bold.otf,  % gt/m, gt/bx (multiweight))
-    KozGoProVI-Medium.otf   , KozGoProVI-Heavy.otf, % gt/m (uni), gt/eb
-    KozGoProVI-Heavy.otf                            % mg/m
+    KozMinProVI-Regular , % mc/m
+    KozMinProVI-Bold ,    % mc/bx
+    KozGoProVI-Regular , % gt/m  (multi)
+    KozGoProVI-Bold ,    % gt/bx
+    KozGoProVI-Medium  , % gt/m  (uni)
+    KozGoProVI-Heavy ,   % gt/eb
+    KozGoProVI-Heavy     % mg/m
   }
 }
+%% Pr6N
 \DeclareOption{kozuka-pr6n}{
   \ltjpreset_set_multi:n {
-    KozMinPr6N-Regular.otf , KozMinPr6N-Bold.otf, % mc/m, mc/bx
-    KozGoPr6N-Regular.otf  , KozGoPr6N-Bold.otf,  % gt/m, gt/bx (multiweight))
-    KozGoPr6N-Medium.otf   , KozGoPr6N-Heavy.otf, % gt/m (uni), gt/eb
-    KozGoPr6N-Heavy.otf                           % mg/m
+    KozMinPr6N-Regular , % mc/m
+    KozMinPr6N-Bold ,    % mc/bx
+    KozGoPr6N-Regular , % gt/m  (multi)
+    KozGoPr6N-Bold ,    % gt/bx
+    KozGoPr6N-Medium  , % gt/m  (uni)
+    KozGoPr6N-Heavy ,   % gt/eb
+    KozGoPr6N-Heavy     % mg/m
   }
 }
 
@@ -200,10 +141,10 @@
 % 游明朝/游ゴシック (Win8.1)
 \DeclareOption{yu}{
   \ltjpreset_set_multi:n {
-    yumin.ttf , yumindb.ttf ,     % mc/m, mc/bx
-    yugothic.ttf , yugothib.ttf , % gt/m, gt/bx (multiweight))
-    yugothic.ttf , yugothib.ttf , % gt/m (uni), gt/eb
-    yugothib.ttf                  % mg/m
+    YuMincho-Regular , YuMincho-Demibold , % mc/m, mc/bx
+    YuGothic-Regular , YuGothic-Bold ,     % gt/m, gt/bx (multiweight))
+    YuGothic-Bold    , YuGothic-Bold ,     % gt/m (uni), gt/eb
+    YuGothic-Bold                          % mg/m
   }
 }
 
@@ -241,7 +182,7 @@
 \ProcessOptions*
 
 %% KozMinPr6N の場合はjp04 feature がないので，nlck にする
-\clist_if_in:NnT \l_ltjpreset_font_list { KozMinPr6N-Regular.otf } {
+\clist_if_in:NnT \l_ltjpreset_font_list { KozMinPr6N-Regular } {
   \tl_set:Nn \l_tmpa_tl {, CJKShape=JIS2004 }
   \tl_if_eq:NNT \l_ltjpreset_kanji_shape_tl \l_tmpa_tl {
     \tl_set:Nn \l_ltjpreset_kanji_shape_tl { , CJKShape=NLC }
@@ -299,7 +240,7 @@
   }
 }
 
-%%%% expert 用設定
+% expert 用設定
 \tl_new:N \l_ltjpreset_add_features_tl
 
 \tl_set:Nx \l_ltjpreset_add_features_tl {
@@ -312,9 +253,9 @@
   \tl_put_left:Nn \l_ltjpreset_add_features_tl { Style = HorizontalKana, }
 }
 
-%%%% （丸）ゴシック体の設定: bold option もここで
+% （丸）ゴシック体の設定: bold option もここで
 \int_compare:nTF { \l_ltjpreset_deluxe_int ==  2 } {
-%%% mg
+%% mg
  \newjfontfamily \mgfamily [
       BoldFont = \ltjpreset_font_mg:,
       \tl_use:N \l_ltjpreset_add_features_tl
@@ -322,7 +263,9 @@
       \tl_use:N \l_ltjpreset_add_features_tl 
     ] { \ltjpreset_font_mg: }
     \DeclareTextFontCommand{\textmg}{\mgfamily}
-%%% gt/eb
+%% gt/eb
+%% 注意: ファミリは 'gteb'．シリーズは \mdseries のまま．
+%%       \bfseries を追加したほうが良い？
   \newjfontfamily \gtebfamily [
       BoldFont = \ltjpreset_font_gt_eb:, 
       \tl_use:N \l_ltjpreset_add_features_tl
@@ -344,7 +287,7 @@
 }
 
 
-%%%% 実際の fontspec の呼びだし
+% 実際の fontspec の呼びだし
 
 \defaultjfontfeatures{ Kerning=Off }
 
