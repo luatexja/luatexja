@@ -105,18 +105,24 @@
 % ヒラギノ (OSX)
 \DeclareOption{hiragino-pro}{
   \ltjpreset_set_multi:n {
-    HiraMinPro-W3.otf      , HiraMinPro-W6.otf,   % mc/m, mc/bx
-    HiraKakuPro-W3.otf     , HiraKakuPro-W6.otf,  % gt/m, gt/bx (multiweight))
-    HiraKakuPro-W6.otf     , HiraKakuStd-W8.otf,  % gt/m (uni), gt/eb
-    HiraMaruPro-W4.otf                            % mg/m
+    Hiragino~Mincho~Pro~W3 , 
+    Hiragino~Mincho~Pro~W6 , 
+    Hiragino~Kaku~Gothic~Pro~W3 , % gt/m (multi)
+    Hiragino~Kaku~Gothic~Pro~W6 , 
+    Hiragino~Kaku~Gothic~Pro~W6 , % gt/m (uni)
+    Hiragino~Kaku~Gothic~Std~W8 , 
+    Hiragino~Maru~Gothic~Pro~W4 , 
   }
 }
 \DeclareOption{hiragino-pron}{
   \ltjpreset_set_multi:n {
-    HiraMinProN-W3.otf      , HiraMinProN-W6.otf,   % mc/m, mc/bx
-    HiraKakuProN-W3.otf     , HiraKakuProN-W6.otf,  % gt/m, gt/bx (multiweight))
-    HiraKakuProN-W6.otf     , HiraKakuStdN-W8.otf,  % gt/m (uni), gt/eb
-    HiraMaruProN-W4.otf                             % mg/m
+    Hiragino~Mincho~ProN~W3 , 
+    Hiragino~Mincho~ProN~W6 , 
+    Hiragino~Kaku~Gothic~ProN~W3 , % gt/m (multi)
+    Hiragino~Kaku~Gothic~ProN~W6 , 
+    Hiragino~Kaku~Gothic~ProN~W6 , % gt/m (uni)
+    Hiragino~Kaku~Gothic~StdN~W8 , 
+    Hiragino~Maru~Gothic~ProN~W4 , 
   }
 }
 
@@ -139,7 +145,7 @@
 }
 
 % 游明朝/游ゴシック (Win8.1)
-\DeclareOption{yu}{
+\DeclareOption{yu-win}{
   \ltjpreset_set_multi:n {
     YuMincho-Regular , YuMincho-Demibold , % mc/m, mc/bx
     YuGothic-Regular , YuGothic-Bold ,     % gt/m, gt/bx (multiweight))
@@ -148,6 +154,16 @@
   }
 }
 
+% Yu fonts in OSX
+% according to http://support.apple.com/kb/HT5944
+\DeclareOption{yu-osx}{
+  \ltjpreset_set_multi:n {
+    YuMincho~Medium , YuMincho~Demibold , % mc/m, mc/bx
+    YuGothic~Medium , YuGothic~Bold ,     % gt/m, gt/bx (multiweight))
+    YuGothic~Bold   , YuGothic~Bold ,     % gt/m (uni), gt/eb
+    YuGothic~Bold                          % mg/m
+  }
+}
 
 % ipa, ipaex, ms
 \DeclareOption{ipa}{
