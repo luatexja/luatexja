@@ -34,7 +34,7 @@ local id_frac    = node.id('fraction')
 local id_simple  = node.id('noad')
 local id_sub_mlist = node.id('sub_mlist')
 
-local PROCESSED = luatexja.icflag_table.PROCESSED
+local PROCESSED  = luatexja.icflag_table.PROCESSED
 
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_find_char_class = ltjf.find_char_class
@@ -101,11 +101,13 @@ function (p, sty)
 	    local q = node_new(id_sub_box)
 	    local r = node_new(id_glyph); r.next = nil
 	    r.char = p.char; r.font = f; r.subtype = 256
+	    local k = has_attr(r,attr_ykblshift) or 0
 	    set_attr(r, attr_ykblshift, 0)
 	    set_attr(r, attr_icflag, PROCESSED)
 	    local met = ltjf_font_metric_table[f]
 	    ltjw.head = r; ltjw.capsule_glyph(r, tex.mathdir , true, met, ltjf_find_char_class(p.char, met));
 	    q.head = ltjw.head; node_free(p); p=q;
+	    set_attr(q.head, attr_yablshift, k)
 	 end
       end
    end

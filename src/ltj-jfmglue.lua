@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2013/04/27',
+  date = '2013/12/05',
   description = 'Insertion process of JFM glues and kanjiskip',
 })
 module('luatexja.jfmglue', package.seeall)
@@ -336,11 +336,7 @@ local calc_np_auxtable = {
    [id_math] = function(lp)
 		  Np.first, Np.nuc = (Np.first or lp), lp; 
 		  set_attr(lp, attr_icflag, PROCESSED) -- set_attr_icflag_processed(lp); 
-		  lp  = node_next(lp) 
-		  while lp.id~=id_math do 
-		     set_attr(lp, attr_icflag, PROCESSED) -- set_attr_icflag_processed(lp);
-		     lp  = node_next(lp) 
-		  end
+		  lp  = node.end_of_math(lp) 
 		  set_attr(lp, attr_icflag, PROCESSED) -- set_attr_icflag_processed(lp); 
 		  Np.last, Np.id = lp, id_math;
 		  return true, node_next(lp); 

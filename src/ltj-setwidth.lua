@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.setwidth',
-  date = '2013/03/14',
+  date = '2013/12/05',
   description = '',
 })
 module('luatexja.setwidth', package.seeall)
@@ -37,10 +37,10 @@ local attr_icflag = luatexbase.attributes['ltj@icflag']
 
 local ltjf_font_metric_table = ltjf.font_metric_table
 
-local PACKED = 2
-local PROCESSED = 11
-local IC_PROCESSED = 12
-local PROCESSED_BEGIN_FLAG = 32
+local PACKED       = luatexja.icflag_table.PACKED
+local PROCESSED    = luatexja.icflag_table.PROCESSED
+local IC_PROCESSED = luatexja.icflag_table.IC_PROCESSED
+local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 
 do
    local floor = math.floor
