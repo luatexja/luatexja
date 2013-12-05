@@ -104,8 +104,8 @@ function set_ja_width(ahead, dir)
    while p do
       local pid = p.id
       if (pid==id_glyph) 
-        and ((has_attr(p, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG)<=0 then
-      local pf = p.font
+      and ((has_attr(p, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG)<=0 then
+         local pf = p.font
 	 if pf == has_attr(p, attr_curjfnt) then
 	    p = capsule_glyph(p, dir, false, ltjf_font_metric_table[pf], 
 			      has_attr(p, attr_jchar_class))
@@ -117,8 +117,11 @@ function set_ja_width(ahead, dir)
 	 m = (p.subtype==0); p = node_next(p)
       else
 	 if m then
+            -- 数式の位置補正
 	    if pid==id_hlist or pid==id_vlist then
-	       p.shift = p.shift + (has_attr(p,attr_yablshift) or 0)
+               if (has_attr(p, attr_icflag) or 0) ~= PROCESSED then
+                  p.shift = p.shift + (has_attr(p,attr_yablshift) or 0)
+               end
 	    elseif pid==id_rule then
 	       local v = has_attr(p,attr_yablshift) or 0
 	       p.height = p.height - v; p.depth = p.depth + v 

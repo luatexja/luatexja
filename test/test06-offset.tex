@@ -1,6 +1,8 @@
 %#!luatex
 \input luatexja.sty
 
+\hoffset=-0.5in
+\hsize=\dimexpr 210mm-1in
 \def\gbox#1{\noindent\setbox0=\hbox{\d#1}
   \vrule height 0.2pt depth 0.2pt width \dimexpr \wd0+10pt\relax
   \kern\dimexpr -\wd0-5pt\relax\vrule height\ht0 depth \dp0\hbox{\copy0}%
@@ -51,11 +53,15 @@
 
 \def\frac#1#2{{#1\over#2}}
 \def\D{%
-  \vrule width 40pt height 0.4pt depth 0pt%
+  \vrule width 20pt height 0.4pt depth 0pt%
+  \everymath{\displaystyle}
   積分abc%
-  $\displaystyle あ\vrule width 0.4ptheight 10pt depth 10pt
-  \int_0^x t\,dt = \frac{x^2}2 \hbox{いx}$
-  \vrule width 40pt height 0.4pt depth 0pt\par
+  $\int_0^x t\,dt = \frac{x^2}2$,\ 
+  $\left(\int_D d\omega=\int_{\partial D}\omega\right)$,\ 
+  $Aあ\kern2pt\vrule width 0.4pt height 10pt depth 10pt
+    \kern-2pt\vrule width 4pt height 0.4pt depth 0pt
+    \hbox{\vrule width 20pt height 0.4pt depth 0pt\kern-20pt Bい}$
+  \vrule width 20pt height 0.4pt depth 0pt\par
 }
 \baselineskip=40pt
 

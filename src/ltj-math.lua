@@ -89,26 +89,33 @@ local MJSS = luatexja.stack_table_index.MJSS
 conv_jchar_to_hbox_A = 
 function (p, sty)
    if not p then return nil
-   elseif p.id == id_sub_mlist then
-      if p.head then
-	 p.head = conv_jchar_to_hbox(p.head, sty)
-      end
-   elseif p.id == id_mchar then
-      local fam = has_attr(p, attr_jfam) or -1
-      if (not is_math_letters[p.char]) and ltjc.is_ucs_in_japanese_char(p) and fam>=0 then
-	 local f = ltjs.get_penalty_table(MJT + 0x100 * sty + fam, -1, tex_getcount('ltj@@stack'))
-	 if f ~= -1 then
-	    local q = node_new(id_sub_box)
-	    local r = node_new(id_glyph); r.next = nil
-	    r.char = p.char; r.font = f; r.subtype = 256
-	    local k = has_attr(r,attr_ykblshift) or 0
-	    set_attr(r, attr_ykblshift, 0)
-	    set_attr(r, attr_icflag, PROCESSED)
-	    local met = ltjf_font_metric_table[f]
-	    ltjw.head = r; ltjw.capsule_glyph(r, tex.mathdir , true, met, ltjf_find_char_class(p.char, met));
-	    q.head = ltjw.head; node_free(p); p=q;
-	    set_attr(q.head, attr_yablshift, k)
-	 end
+   else
+      local pid = p.id
+      if pid == id_sub_mlist then
+         if p.head then
+            p.head = conv_jchar_to_hbox(p.head, sty)
+         end
+      elseif pid == id_mchar then
+         local fam = has_attr(p, attr_jfam) or -1
+         if (not is_math_letters[p.char]) and ltjc.is_ucs_in_japanese_char(p) and fam>=0 then
+            local f = ltjs.get_penalty_table(MJT + 0x100 * sty + fam, -1, tex_getcount('ltj@@stack'))
+            if f ~= -1 then
+               local q = node_new(id_sub_box)
+               local r = node_new(id_glyph); r.next = nil
+               r.char = p.char; r.font = f; r.subtype = 256
+               local k = has_attr(r,attr_ykblshift) or 0 
+               set_attr(r, attr_ykblshift, 0)
+               -- ltj-setwidth 内で実際の位置補正はおこなうので，補正量を退避
+               ltjw.head = r; 
+               local met = ltjf_font_metric_table[f]
+               ltjw.capsule_glyph(r, tex.mathdir , true, met, ltjf_find_char_class(p.char, met));
+               q.head = ltjw.head; node_free(p); p=q;
+               set_attr(q.head, attr_yablshift, k)
+            end
+         end
+      elseif pid == id_sub_box and p.head then
+         -- \hbox で直に与えられた内容は上下位置を補正する必要はない
+         set_attr(p.head, attr_icflag, PROCESSED)
       end
    end
    return p
