@@ -102,6 +102,11 @@
 \setmathfont{xits-math.otf}
 \frenchspacing
 %</en>
+\DeclareRobustCommand\ttfamily
+        {\not@math@alphabet\ttfamily\mathtt
+         \romanfamily\ttdefault\ttjfam\selectfont}
+\newjfontfamily\ttjfam{KozGoPr6N-Regular.otf}
+
 
 %%%%%%%% logo
 \usepackage{metalogo}
@@ -2062,20 +2067,20 @@ xyz漢字
 \toprule
 \emph{入力}&\vspace*{-\origbaselineskip}
 \begin{verbatim}
-数式abc: $あa\hbox{い}$, $\int_0^x t\,dt=x^2/2$,
+数式abc: $あa\hbox{い}$, $\int_0^x t\,dt=x^2\!/2$,
 $\Phi\vdash F(x)\ \hbox{for all}\ x\in A$
 \end{verbatim}\\
 \noalign{\vskip-\origbaselineskip}
 \midrule
 \emph{\pTeX}&
 {\ltjsetparameter{yalbaselineshift=10pt}%
-数式abc: $あa\lower10pt\hbox{い}$, $\int_0^x t\,dt=x^2/2$,
-$\Phi\vdash F(x,y)\ \lower10pt\hbox{for all}\ x\in A$
+数式abc: $あa\lower10pt\hbox{い}$, $\int_0^x t\,dt=x^2\!/2$,
+$\Phi\vdash F(x)\ \lower10pt\hbox{for all}\ x\in A$
 \par}\\
 \midrule
 \emph{\LuaTeX-ja}&
 {\ltjsetparameter{yalbaselineshift=10pt}%
-数式abc: $あa\hbox{い}$, $\int_0^x t\,dt=x^2/2$,
+数式abc: $あa\hbox{い}$, $\int_0^x t\,dt=x^2\!/2$,
 $\Phi\vdash F(x)\ \hbox{for all}\ x\in A$
 \par}\\
 \noalign{\vskip-\origbaselineskip}
