@@ -123,8 +123,11 @@ function set_ja_width(ahead, dir)
                   p.shift = p.shift + (has_attr(p,attr_yablshift) or 0)
                end
 	    elseif pid==id_rule then
-	       local v = has_attr(p,attr_yablshift) or 0
-	       p.height = p.height - v; p.depth = p.depth + v 
+	       if (has_attr(p, attr_icflag) or 0) ~= PROCESSED then
+		  local v = has_attr(p,attr_yablshift) or 0
+		  p.height = p.height - v; p.depth = p.depth + v 
+		  set_attr(p, attr_icflag, PROCESSED + get_pr_begin_flag(p))
+	       end
 	    end
 	 end
 	 p = node_next(p)
