@@ -205,6 +205,14 @@
   }
 }
 
+%% HiraMinProN の場合はjp04 feature がない??ので，nlck にする
+\clist_if_in:NnT \l_ltjpreset_font_list { Hiragino~Mincho~ProN~W3 } {
+  \tl_set:Nn \l_tmpa_tl {, CJKShape=JIS2004 }
+  \tl_if_eq:NNT \l_ltjpreset_kanji_shape_tl \l_tmpa_tl {
+    \tl_set:Nn \l_ltjpreset_kanji_shape_tl { , CJKShape=NLC }
+  }
+}
+
 %%%%%%%% main routine
 
 %%%%  リストからの展開
