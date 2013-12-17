@@ -1,0 +1,53 @@
+%#!lualatex
+\documentclass{ltjsarticle}
+\usepackage{luatexja-fontspec,booktabs,array}
+
+\def\MJI[#1]#2{#2\char\numexpr "E0100+#1\relax}%"
+\def\IVSL#1{\directlua{ivs.list_ivs('#1')}}
+\begin{document}
+\jfontspec{ipamjm.ttf} % IPA MJ 明朝
+
+例文はZRさんのブログ記事「ipamjmパッケージでアレしてみた」\footnote{%
+\verb+http://d.hatena.ne.jp/zrbabbler/20131214/1387029624+}より引用．
+
+\paragraph{標準状態では……}
+\begin{quote}
+\LARGE
+渡邉󠄏さんとか   % { } の中は U+9089 U+E010F
+渡𫟪󠄂さんとか。% { } の中は U+2B7EA U+E0102
+\end{quote}
+
+\paragraph{IVS処理コードをここで読み込んだ．}\ 
+\directlua{dofile('ivs.lua')}
+
+\begin{quote}
+\LARGE
+\MJI[15]{邉}\MJI[25]{邉}\MJI[27]{邉}\MJI[26]{邉}\MJI[26]{邉}\MJI[16]{邊}
+\MJI[18]{邊}\MJI[2]{𫟪}\MJI[17]{邊}〓\\
+\MJI[28]{邉}\MJI[29]{邉}\MJI[23]{邉}\MJI[15]{邊}\MJI[8]{邊}\MJI[20]{邉}
+\MJI[24]{邉}\MJI[19]{邉}\MJI[18]{邉}\MJI[16]{邉}\\
+\MJI[14]{邊}\MJI[10]{邊}\MJI[12]{邊}\MJI[11]{邊}\MJI[13]{邊}\MJI[9]{邊}
+\MJI[0]{𫟪}\MJI[1]{𫟪}〓\MJI[21]{邉}
+\end{quote}
+「〓」はMJ番号を直接指定していたところなので，とりあえず無視している．
+なぜか𫟪(U+2B7EA)のIVSが機能していないようだが，フォント側にその記述がない，ということ？
+
+\begin{quote}
+\LARGE
+渡邉󠄏さんとか   % { } の中は U+9089 U+E010F
+渡𫟪󠄂さんとか。% { } の中は U+2B7EA U+E0102
+\end{quote}
+
+\begin{center}
+\Large
+\begin{tabular}{c>{\tt}ll}
+\toprule
+文字&Unicode&IVS\\
+\midrule
+邉&U+9089&\IVSL{邉}\\
+邊&U+908A&\IVSL{邊}\\
+𫟪&U+2B7EA&\IVSL{𫟪}\\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{document}
