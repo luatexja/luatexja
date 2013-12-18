@@ -7,9 +7,13 @@ luatexbase.provides_module({
   description = 'The OTF Lua module for LuaTeX-ja',
 })
 
+require('unicode')
+
+
 luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 luatexja.load_module('rmlgbm');    local ltjr = luatexja.rmlgbm
+luatexja.load_module('charrange'); local ltjc = luatexja.charrange
 
 local id_glyph = node.id('glyph')
 local id_whatsit = node.id('whatsit')
@@ -23,6 +27,7 @@ local has_attr = node.has_attribute
 local set_attr = node.set_attribute
 local unset_attr = node.unset_attribute
 local node_insert_after = node.insert_after
+local identifiers = fonts.hashes.identifiers
 
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
@@ -32,6 +37,7 @@ local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_find_char_class = ltjf.find_char_class
 local ltjr_cidfont_data = ltjr.cidfont_data
+local ltjc_is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char
 
 local OTF = luatexja.userid_table.OTF
 
@@ -70,7 +76,7 @@ end
 
 local function cid(key)
    if key==0 then return append_jglyph(char) end
-   local curjfnt = fonts.hashes.identifiers[tex.attribute[attr_curjfnt]]
+   local curjfnt = identifiers[tex.attribute[attr_curjfnt]]
    if not curjfnt.cidinfo or 
       curjfnt.cidinfo.ordering ~= "Japan1" and
       curjfnt.cidinfo.ordering ~= "GB1" and
@@ -137,7 +143,7 @@ luatexbase.add_to_callback('pre_linebreak_filter',
 
 -- 和文フォント読み込み時に，CID -> unicode 対応をとっておく．
 local function cid_to_char(fmtable, fn)
-   local fi = fonts.hashes.identifiers[fn]
+   local fi = identifiers[fn]
    if fi.cidinfo and fi.cidinfo.ordering == "Japan1" then
       fmtable.cid_char_type = {}
       for i, v in pairs(fmtable.chars) do
@@ -170,9 +176,51 @@ end
 luatexbase.add_to_callback("luatexja.find_char_class", 
 			   cid_set_char_class, "ltj.otf.find_char_class", 1)
 
+-------------------- IVS
+do
+   local get_node_font = function(p)
+      return (ltjc_is_ucs_in_japanese_char(p) and (has_attr(p, attr_curjfnt) or 0) or p.font)
+   end
+   local get_current_font = function() return tex.attribute[attr_curjfnt] or 0 end
+   local function do_ivs_repr(head)
+      local p = head
+      while p do
+	 local pid = p.id
+	 if pid==id_glyph then
+	    local pf = get_node_font(p)
+	    local pt = identifiers[pf]
+	    pt = pt and pt.resources; pt = pt and pt.variants
+	    if pt then
+	       local q = node_next(p) -- the next node of p
+	       if q and q.id==id_glyph then
+		  local qc = q.char
+		  if qc>=0xE0100 and qc<0xE01F0 then -- q is an IVS selector
+		     pt = pt[qc];  pt = pt and  pt[p.char]
+                 if pt then
+                    p.char = pt or p.char
+                 end
+                 head = node_remove(head,q)
+		  end
+	       end
+        end
+	 end
+	 p = node_next(p)
+      end
+      return head
+   end
+   function enable_ivs()
+      luatexbase.add_to_callback('hpack_filter', 
+				 function (head) return do_ivs_repr(head) end,'do_ivs', 1)
+      luatexbase.add_to_callback('pre_linebreak_filter', 
+				 function (head) return do_ivs_repr(head) end, 'do_ivs', 1)
+   end
+
+end
+
 -------------------- all done
 luatexja.otf = {
   append_jglyph = append_jglyph,
+  enable_ivs = enable_ivs,  -- 隠し機能: IVS（TTF しか現状では使えない）
   cid = cid,
 }
 

@@ -1,9 +1,33 @@
 %#!lualatex
 \documentclass{ltjsarticle}
-\usepackage{luatexja-fontspec,booktabs,array}
+\usepackage{luatexja-fontspec,luatexja-otf, luacode, booktabs,array}
+
+\begin{luacode}
+   local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
+   local identifiers = fonts.hashes.identifiers
+   local ubyte = unicode.utf8.byte
+   local uchar = unicode.utf8.char
+   local sort = table.sort
+   function list_ivs(s)
+      local c = ubyte(s)
+      local pt = identifiers[tex.attribute[attr_curjfnt]]
+      pt = pt and pt.resources; pt = pt and pt.variants
+      if pt then
+         local t = {}
+         for i,v in pairs(pt) do
+            if v[c] then t[1+#t]=i end
+         end
+         sort(t)
+         for _,v in ipairs(t) do 
+            tex.sprint('\\oalign{' .. s .. uchar(v) 
+                          .. '\\crcr\\hss\\tiny' .. tostring(v-0xE0100) .. '\\hss\\crcr}') 
+         end
+      end
+   end
+\end{luacode}
 
 \def\MJI[#1]#2{#2\char\numexpr "E0100+#1\relax}%"
-\def\IVSL#1{\directlua{ivs.list_ivs('#1')}}
+\def\IVSL#1{\directlua{list_ivs('#1')}}
 \begin{document}
 \jfontspec{ipamjm.ttf} % IPA MJ 明朝
 
@@ -18,7 +42,7 @@
 \end{quote}
 
 \paragraph{IVS処理コードをここで読み込んだ．}\ 
-\directlua{dofile('ivs.lua')}
+\directlua{luatexja.otf.enable_ivs()}
 
 \begin{quote}
 \LARGE
