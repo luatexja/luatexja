@@ -15,12 +15,12 @@ cidfont_data = {}
 local cidfont_data = cidfont_data
 local cache_chars = {}
 local path           = {
-    localdir  = file.join(kpse.expand_var("$TEXMFVAR"), aux_dir),
-    systemdir = file.join(kpse.expand_var("$TEXMFSYSVAR"), aux_dir),
+    localdir  = kpse.expand_var("$TEXMFVAR"),
+    systemdir = kpse.expand_var("$TEXMFSYSVAR"),
 }
+local cache_dir = '/luatexja'
 
 local cid_reg, cid_order, cid_supp, cid_name
-local taux_dir = 'luatex-cache/luatexja'
 local cid_replace = {
    ["Adobe-Japan1"] = {"UniJIS2004-UTF32", 23057, 6,
 		       function (i)
@@ -184,7 +184,7 @@ do
       end
 
       -- Save
-      local savepath  = path.localdir .. '/luatexja/'
+      local savepath  = path.localdir .. cache_dir
       if not lfs.isdir(savepath) then
          dir.mkdirs(savepath)
       end
@@ -211,8 +211,8 @@ end
 local function read_cid_font()
    -- local v = "ltj-cid-" .. string.lower(cid_name) .. ".lua"
    local v = "ltj-cid-auto-" .. string.lower(cid_name) .. ".lua"
-   local localpath  = file.join(path.localdir .. '/luatexja', v)
-   local systempath = file.join(path.systemdir .. '/luatexja' , v)
+   local localpath  = file.join(path.localdir, cache_dir, v)
+   local systempath = file.join(path.systemdir, cache_dir , v)
    local kpsefound  = kpse.find_file(v)
    if kpsefound and file.isreadable(kpsefound) then
       cid_cache_load(kpsefound)

@@ -1,26 +1,23 @@
 %#!lualatex
 \documentclass{ltjsarticle}
 \usepackage{luatexja-fontspec,luatexja-otf, luacode, booktabs,array}
+\usepackage[scale=0.80]{geometry}
 
 \begin{luacode}
    local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
-   local identifiers = fonts.hashes.identifiers
    local ubyte = unicode.utf8.byte
    local uchar = unicode.utf8.char
    local sort = table.sort
    function list_ivs(s)
       local c = ubyte(s)
-      local pt = identifiers[tex.attribute[attr_curjfnt]]
-      pt = pt and pt.resources; pt = pt and pt.variants
+      local pt = luatexja.otf.font_ivs_table[tex.attribute[attr_curjfnt]][c]
       if pt then
          local t = {}
-         for i,v in pairs(pt) do
-            if v[c] then t[1+#t]=i end
-         end
+         for i,_ in pairs(pt) do t[1+#t]=i end
          sort(t)
-         for _,v in ipairs(t) do 
-            tex.sprint('\\oalign{' .. s .. uchar(v) 
-                          .. '\\crcr\\hss\\tiny' .. tostring(v-0xE0100) .. '\\hss\\crcr}') 
+         for _,i in ipairs(t) do 
+            tex.sprint('\\oalign{' .. s .. uchar(i+0xE0100)
+                          .. '\\crcr\\hss\\tiny' .. tostring(i) .. '\\hss\\crcr}') 
          end
       end
    end
@@ -29,7 +26,7 @@
 \def\MJI[#1]#2{#2\char\numexpr "E0100+#1\relax}%"
 \def\IVSL#1{\directlua{list_ivs('#1')}}
 \begin{document}
-\jfontspec{ipamjm.ttf} % IPA MJ 明朝
+\jfontspec{ipamjm} % IPA MJ 明朝
 
 例文はZRさんのブログ記事「ipamjmパッケージでアレしてみた」\footnote{%
 \verb+http://d.hatena.ne.jp/zrbabbler/20131214/1387029624+}より引用．
@@ -63,6 +60,38 @@
 \end{quote}
 
 \begin{center}
+IPA MJ 明朝\par\medskip
+\Large
+\begin{tabular}{c>{\tt}ll}
+\toprule
+文字&Unicode&IVS\\
+\midrule
+邉&U+9089&\IVSL{邉}\\
+邊&U+908A&\IVSL{邊}\\
+𫟪&U+2B7EA&\IVSL{𫟪}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\jfontspec{kozminpr6n-regular} % 小塚明朝 Pr6N R
+\begin{center}
+小塚明朝 Pr6N R\par\medskip
+\Large
+\begin{tabular}{c>{\tt}ll}
+\toprule
+文字&Unicode&IVS\\
+\midrule
+邉&U+9089&\IVSL{邉}\\
+邊&U+908A&\IVSL{邊}\\
+𫟪&U+2B7EA&\IVSL{𫟪}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+
+\jfontspec{hanamina} % 花園明朝A
+\begin{center}
+花園明朝A\par\medskip
 \Large
 \begin{tabular}{c>{\tt}ll}
 \toprule

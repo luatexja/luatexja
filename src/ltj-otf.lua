@@ -8,6 +8,7 @@ luatexbase.provides_module({
 })
 
 require('unicode')
+require('lualibs')
 
 
 luatexja.load_module('base');      local ltjb = luatexja.base
@@ -177,50 +178,173 @@ luatexbase.add_to_callback("luatexja.find_char_class",
 			   cid_set_char_class, "ltj.otf.find_char_class", 1)
 
 -------------------- IVS
+local font_ivs_table = {} -- key: fontnumber
+local enable_ivs
 do
+   local sort = table.sort
+   local uniq_flag
+   local function add_ivs_table(tg, unitable)
+      for gu, gv in pairs(tg) do
+         local ga = gv.altuni
+         if ga then
+	    for _,at in pairs(ga) do
+	       local bu, vs = at.unicode, (at.variant or 0)-0xE0100
+	       if vs>=0 and vs<0xF0 then
+	          if not ivs[bu] then ivs[bu] = {} end
+	          uniq_flag = true
+                  for i,_ in pairs(ivs[bu]) do
+                     if i==vs then uniq_flag = false; break end
+                  end
+	          if uniq_flag then 
+                     ivs[bu][vs] = unitable[gv.name]
+                  end
+	       end
+	    end
+         end
+      end
+   end
+   local function make_ivs_table(id, fname)
+      ivs = {}
+      local fl = fontloader.open(fname)
+      local ft = fontloader.to_table(fl)
+      local unicodes = id.resources.unicodes
+      add_ivs_table(ft.glyphs, id.resources.unicodes)
+      if ft.subfonts then
+         for _,v in pairs(ft.subfonts) do
+            add_ivs_table(v.glyphs, id.resources.unicodes)
+         end
+      end
+      fontloader.close(fl)
+      return ivs
+   end
+
+-- loading and saving
+   local font_ivs_basename = {} -- key: basename
+   local path           = {
+      localdir  = kpse.expand_var("$TEXMFVAR"),
+      systemdir = kpse.expand_var("$TEXMFSYSVAR"),
+   }
+   local cache_dir = '/luatexja'
+   local checksum = file.checksum
+
+   local function ivs_cache_save(id, fname)
+      local savepath  = path.localdir .. cache_dir
+      if not lfs.isdir(savepath) then dir.mkdirs(savepath) end
+      savepath = file.join(savepath, "ivs_" .. string.lower(file.nameonly(fname)) .. ".lua")
+      local result = make_ivs_table(id, fname)
+      if file.iswritable(savepath) then
+         table.tofile(savepath, { checksum(fname), result },
+           'return', false, true, false )
+         --ltjb.package_info_no_line('luatexja', "saved :'" .. savepath .. "'", '')
+         print("saved :'" .. savepath .. "'", '')
+      else 
+         --ltjb.package_warning_no_line('luatexja', "failed to save to '" .. savepath .. "'", '')
+         print("failed to save to '" .. savepath .. "'", '')
+      end
+      return result
+   end
+
+   local function ivs_cache_load(cname, id, fname)
+      local result = require(cname)
+      local newsum = checksum(fname)
+      if newsum~=result[1] then
+         return ivs_cache_save(id, fname)
+      else
+         return result[2]
+      end
+   end
+
+   local function prepare_ivs_data(n, id)
+      -- test if already loaded
+      if type(id)=='number' then 
+         font_ivs_table[n] = font_ivs_table[id]; return 
+      end
+      local fname = id.filename
+      local bname = file.basename(fname)
+      if not fname then 
+         font_ivs_table[n] = {}; return
+      elseif font_ivs_basename[bname] then 
+         font_ivs_table[n] = font_ivs_basename[bname]; return
+      end
+      
+      -- if cache is present; read them
+      local v = "ivs_" .. string.lower(file.nameonly(fname)) .. ".lua"
+      local localpath  = file.join(path.localdir, cache_dir, v)
+      local systempath = file.join(path.systemdir, cache_dir , v)
+      local kpsefound  = kpse.find_file(v)
+      if kpsefound and file.isreadable(kpsefound) then
+         font_ivs_basename[bname] = ivs_cache_load(kpsefound, id, fname)
+      elseif file.isreadable(localpath)  then
+         font_ivs_basename[bname] = ivs_cache_load(localpath, id, fname)
+      elseif file.isreadable(systempath) then
+         font_ivs_basename[bname] = ivs_cache_load(systempath, id, fname)
+      else
+         font_ivs_basename[bname] = ivs_cache_save(id, fname)
+      end
+      if not font_ivs_basename[bname] then font_ivs_basename[bname] = {} end
+      font_ivs_table[n] = font_ivs_basename[bname]
+   end
+   local ivs = {}
+   ivs.font_ivs_table = font_ivs_table
+   luatexja.ivs = ivs
+
+-- 組版時
    local get_node_font = function(p)
       return (ltjc_is_ucs_in_japanese_char(p) and (has_attr(p, attr_curjfnt) or 0) or p.font)
    end
-   local get_current_font = function() return tex.attribute[attr_curjfnt] or 0 end
    local function do_ivs_repr(head)
       local p = head
       while p do
 	 local pid = p.id
 	 if pid==id_glyph then
-	    local pf = get_node_font(p)
-	    local pt = identifiers[pf]
-	    pt = pt and pt.resources; pt = pt and pt.variants
-	    if pt then
-	       local q = node_next(p) -- the next node of p
-	       if q and q.id==id_glyph then
-		  local qc = q.char
-		  if qc>=0xE0100 and qc<0xE01F0 then -- q is an IVS selector
-		     pt = pt[qc];  pt = pt and  pt[p.char]
-                 if pt then
-                    p.char = pt or p.char
-                 end
-                 head = node_remove(head,q)
-		  end
-	       end
-        end
-	 end
+	    local pt = font_ivs_table[get_node_font(p)]
+            local q = node_next(p) -- the next node of p
+            if q and q.id==id_glyph then
+               local qc = q.char
+               if qc>=0xE0100 and qc<0xE01F0 then -- q is an IVS selector
+                  pt = pt and pt[p.char];  pt = pt and  pt[qc-0xE0100]
+                  if pt then
+                     p.char = pt or p.char
+                  end
+                  head = node_remove(head,q)
+               end
+            end
+         end
 	 p = node_next(p)
       end
       return head
    end
-   function enable_ivs()
+
+   -- font define
+   local function font_callback(name, size, id, fallback)
+      local d = fallback(name, size, id)
+      prepare_ivs_data(id, d)
+      return d
+   end
+
+   enable_ivs = function ()
       luatexbase.add_to_callback('hpack_filter', 
 				 function (head) return do_ivs_repr(head) end,'do_ivs', 1)
       luatexbase.add_to_callback('pre_linebreak_filter', 
 				 function (head) return do_ivs_repr(head) end, 'do_ivs', 1)
+      local ivs_callback = function (name, size, id)
+         return font_callback(
+            name, size, id, 
+            function (name, size, id) return luatexja.font_callback(name, size, id) end
+         )
+      end
+      luatexbase.add_to_callback('define_font',ivs_callback,"luatexja.ivs_font_callback", 1)
+      for i=1,font.nextid()-1 do
+         if identifiers[i] then prepare_ivs_data(i, identifiers[i]) end
+      end
    end
-
 end
 
 -------------------- all done
 luatexja.otf = {
   append_jglyph = append_jglyph,
-  enable_ivs = enable_ivs,  -- 隠し機能: IVS（TTF しか現状では使えない）
+  enable_ivs = enable_ivs,  -- 隠し機能: IVS
+  font_ivs_table = font_ivs_table,
   cid = cid,
 }
 
