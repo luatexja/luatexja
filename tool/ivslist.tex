@@ -1,56 +1,81 @@
 %#!lualatex
-\documentclass[twocolumn]{article}
+\documentclass{article}
 \batchmode
 \usepackage{luaotfload,booktabs,array,luacode,longtable}
-\usepackage[ratio=0.80]{geometry}
+\usepackage[scale=0.8]{geometry}
 \errorstopmode
 
+\ifdefined\myfontname\else
 {\newlinechar=`@
 \message{@Name of the font to test = }
-\read-1 to\fontname \global\let\fontname\fontname}
-\message{@}
-\font\test=\fontname at 12pt
-{\test\directlua{testfn = font.current()}}
+\read-1 to\myfontname \global\let\myfontname\myfontname
+\message{@}}
+\fi
+\font\test=\myfontname\space at 12pt
+{\test\begin{luacode}
+  ident = fonts.hashes.identifiers[font.current()]
+\end{luacode}
+}
 
-\def\FMT#1#2{{\oalign{\test#1\crcr\rm\tiny\hss#2\hss\crcr}}}
+
+\def\FMT#1#2{{\oalign{\test\char#1\crcr\rm\tiny\hss#2\hss\crcr}}}
 \def\OUT#1{\leavevmode\hbox to 7em{{\test\char"#1}\ ({\tt U+#1})\hss}}%"
 \begin{document}
-{\noindent\Large\bf \fontname\\\null\hfill (%
-  \directlua{tex.sprint(fonts.hashes.identifiers[testfn].fullname)}%
+{\noindent\Large\bf \myfontname\\\null\hfill (%
+  \directlua{tex.sprint(ident.fullname)}%
 )}
 
 \bigskip
 \baselineskip18pt
 
-\begin{luacode*}
-   local identifiers = fonts.hashes.identifiers
-   local ubyte = unicode.utf8.byte
-   local uchar = unicode.utf8.char
-   local sort = table.sort
-   local t, ti = {}, {}
-   local sort_func = function(a,b) return a[1]<b[1] end
-   local pt = identifiers[testfn]
-   pt = pt and pt.resources; pt = pt and pt.variants
-   if pt then
-      for vs,v in pairs(pt) do
-         if vs>=0xe0100 and vs<0xe01f0 then
-           for bc, rc in pairs(v) do
-              if not t[bc] then t[bc] = {}; ti[1+#ti] = bc end
-              t[bc][1+#(t[bc])]={ vs-0xe0100, rc }
-           end
-         end
-      end
-      sort(ti)
-      for _,v in pairs(ti) do 
-         local s = '\\OUT{' .. string.format('%X', v) .. '}'
-         local tx = t[v]; sort(tx, sort_func)
-         for _,x in ipairs(tx) do
-           s = s .. '\\FMT{' .. uchar(x[2]) .. '}{' .. tostring(x[1]) .. '}'
-         end
-         tex.sprint(s .. '\\par')
+\begin{luacode}
+local fl = fontloader.open(ident.filename)
+local ft = fontloader.to_table(fl)
+
+local ivs, ivsi = {}, {}
+local uniq_flag
+local function add_ivs_table(tg)
+   for gu, gv in pairs(tg) do
+      local ga = gv.altuni
+      if ga then
+	 for _,at in pairs(ga) do
+	    local bu, vs = at.unicode, (at.variant or 0)-0xE0100
+	    if vs>=0 and vs<0xF0 then
+	       if not ivs[bu] then ivs[bu] = {}; ivsi[1+#ivsi]=bu end
+	       uniq_flag = true
+               for _,v in pairs(ivs[bu]) do
+                  if v[1]==vs then uniq_flag = false; break end
+               end
+	       if uniq_flag then ivs[bu][1+#(ivs[bu])] = { vs, gv.name } end
+	    end
+	 end
       end
    end
-\end{luacode*}
+end
+
+add_ivs_table(ft.glyphs)
+if ft.subfonts then
+   for _,v in pairs(ft.subfonts) do
+      add_ivs_table(v.glyphs)
+   end
+end
+fontloader.close(fl)
+
+local unicodes = ident.resources.unicodes
+local sort = table.sort
+local sortfn = function (a,b) return a[1]<b[1] end
+sort(ivsi)
+for _,v in pairs(ivsi) do 
+   sort(ivs[v], sortfn) 
+   tex.sprint('\\OUT{' .. string.format('%X', v) .. '}\\ ')
+   for _, cn in pairs(ivs[v]) do
+     tex.sprint('\\FMT{' .. tostring(unicodes[cn[2]]) .. '}{' .. cn[1] .. '}' )
+   end
+   tex.sprint('\\par')
+end
+
+
+\end{luacode}
 
 
 \end{document}
