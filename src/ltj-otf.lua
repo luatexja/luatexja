@@ -289,24 +289,36 @@ do
    luatexja.ivs = ivs
 
 -- 組版時
-   local get_node_font = function(p)
-      return (ltjc_is_ucs_in_japanese_char(p) and (has_attr(p, attr_curjfnt) or 0) or p.font)
+   local function ivs_jglyph(char, bp, pf)
+      local p = node_new(id_whatsit,sid_user)
+      p.user_id=OTF; p.type=100; p.value=char
+      set_attr(p, attr_curjfnt, pf)
+      set_attr(p, attr_yablshift, has_attr(bp, attr_ykblshift) or 0)
+      return p
    end
+
    local function do_ivs_repr(head)
       local p = head
       while p do
 	 local pid = p.id
 	 if pid==id_glyph then
-	    local pt = font_ivs_table[get_node_font(p)]
-            local q = node_next(p) -- the next node of p
-            if q and q.id==id_glyph then
-               local qc = q.char
-               if qc>=0xE0100 and qc<0xE01F0 then -- q is an IVS selector
-                  pt = pt and pt[p.char];  pt = pt and  pt[qc-0xE0100]
-                  if pt then
-                     p.char = pt or p.char
+            local pf = p.font
+            if (has_attr(p, attr_curjfnt) or 0) == pf  then
+               -- only works with JAchars
+               local pt = font_ivs_table[pf]
+               local q = node_next(p) -- the next node of p
+               if q and q.id==id_glyph then
+                  local qc = q.char
+                  if qc>=0xE0100 and qc<0xE01F0 then -- q is an IVS selector
+                     pt = pt and pt[p.char];  pt = pt and  pt[qc-0xE0100]
+                     head = node_remove(head,q)
+                     if pt then
+                        local np = ivs_jglyph(pt, p, pf)
+                        head = node_insert_after(head, p, np) 
+                        head = node_remove(head,p)
+                        p = np
+                     end
                   end
-                  head = node_remove(head,q)
                end
             end
          end
