@@ -303,14 +303,14 @@ The followings are major changes from \pTeX:
 
 \begin{itemize}
 %<*en>
-\item As \LuaTeX's internal character handling is `node-based'
+\item As \LuaTeX's internal ligature handling is `node-based'
       (\textit{e.g.}, \verb+of{}fice+ doesn't prevent ligatures), the
       insertion process of \textbf{JAglue} is now `node-based'.
 %</en>
 %<*ja>
-\item \LuaTeX の内部での文字の扱いが「ノードベース」になっているように（例えば，
-      \verb+of{}fice+ で合字は抑制されない），\textbf{JAglue}の挿入処理も
-      「ノードベース」である．
+\item \LuaTeX の内部での合字の扱いは「ノード」を単位として行われるようになっている（例えば，
+      \verb+of{}fice+ で合字は抑制されない）．それに合わせ，\textbf{JAglue}の挿入処理も
+      ノード単位で実行される．
 %</ja>
 
 %<*en>
@@ -389,10 +389,13 @@ In this document, the following terms and notations are used:
 %</ja>
 \begin{itemize}
 %<*en>
-\item Characters are divided into two types:
+\item Characters are classified into following two types.
+      Note that the classification can be customized by a user
+      (see Subsection~\ref{ssec-setrange}).
 %</en>
 %<*ja>
-\item 文字は2種類に分けられる：
+\item 文字は次の2種類に分けられる．この類別はユーザが後から変更可能である
+      （\ref{ssec-setrange}節を参照）．
 %</ja>
 \begin{itemize}
 %<*en>
@@ -404,12 +407,13 @@ In this document, the following terms and notations are used:
       日本語組版に使われる文字のことを指す．
 %</ja>
 
-%<en>\item \textbf{ALchar}: standing for all other characters like alphabets.
-%<ja>\item \textbf{ALchar}: アルファベットを始めとする，その他全ての文字を指す．
+%<en>\item \textbf{ALchar}: standing for all other characters like latin alphabets.
+%<ja>\item \textbf{ALchar}: ラテンアルファベットを始めとする，その他全ての文字を指す．
 \end{itemize}
 
 %<*en>
-We say `alphabetic fonts' for fonts used in \textbf{ALchar}, and `Japanese fonts' for fonts used in \textbf{JAchar}.
+We say `alphabetic fonts' for fonts used in \textbf{ALchar}, 
+and `Japanese fonts' for fonts used in \textbf{JAchar}.
 %</en>
 %<*ja>
 そして，\textbf{ALchar}の出力に用いられるフォントを「欧文フォント」と呼び，
@@ -1373,8 +1377,6 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
  \item[yu-win]  Yu fonts bundled with Windows~8.1. 
 %<en>    \\[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[yu-osx]  Yu fonts bundled with OSX~Mavericks. 
-%<en>They cover Adobe-Japan1-6 character collection.
-%<ja>上の \texttt{yu-win} とはフォント名が微妙に異なることに注意．
 \begin{center}\small
 \begin{tabular}{clll}
 \toprule
@@ -1615,7 +1617,7 @@ specify the above line, then SIP will belong to the range~100 and be
 removed from the range~4.
 %</en>
 %<*ja>
-もし指定されたある文字がある非零番号の範囲に属していたならば，これは新しい設定で
+もし指定されたある文字が既にある番号の範囲に属していたならば，これは新しい設定で
 上書きされる．例えば，SIPは全て\LuaTeX-jaのデフォルトでは4番の文字範囲に
 属しているが，上記の指定を行えばSIPは100番に属すようになり，4番からは除かれる．
 %</ja>
@@ -1627,8 +1629,8 @@ be used to customize which character range will be treated as ranges of
 setting of \LuaTeX-ja):
 %</en>
 %<*ja>
-文字範囲に番号を割り当てた後は，\textsf{jacharrange}パラメータが\textbf{JAchar}と
-して扱われる文字の範囲を設定するために用いられる．例えば，以下は\LuaTeX-jaの
+文字範囲に番号を割り当てた後は，どの文字範囲を\textbf{JAchar}扱いにするかを
+\textsf{jacharrange}パラメータによって設定する．例えば，以下は\LuaTeX-jaの
 初期設定である：
 %</ja>
 \begin{verbatim}
@@ -1638,12 +1640,23 @@ setting of \LuaTeX-ja):
 The argument to \textsf{jacharrange} parameter is a list of integer.
 Negative integer $-n$ in the list means that `the characters that belong to
 range~$n$ are treated as \textbf{ALchar}', and positive integer $+n$ means
-that `the characters that belong to range~$n$ are treated as \textbf{JAchar}'.
+that `\dots\ are treated as \textbf{JAchar}'.
+Hence, above line means that
+\begin{itemize}
+ \item Range of \textbf{ALchar}s are: 1, 4~and~5.
+ \item Range of \textbf{JAchar}s are: 2,~3,6, 7~and~8.
+\end{itemize}
 %</en>
 %<*ja>
-\textsf{jacharrange}パラメータには整数のリストを与える．
+\textsf{jacharrange}パラメータの引数は整数のリストである．
 リスト中の負の整数$-n$は「文字範囲$n$に属する文字は\textbf{ALchar}として
-扱われる」ことを意味し，正の整数$+n$は\textbf{JAchar}として扱うことを意味する．
+扱われる」ことを意味し，正の整数$+n$は「textbf{JAchar}として扱う」ことを意味する．
+従って，上の命令は
+\begin{itemize}
+ \item \textbf{ALchar}の範囲は，1番，4番，5番の文字範囲である．
+ \item \textbf{ALchar}の範囲は，2番，3番，6番，7番，8番の文字範囲である．
+\end{itemize}
+
 %</ja>
 
 %<*en>
@@ -1653,8 +1666,8 @@ determined from the following data:
 %</en>
 %<*ja>
 \paragraph{初期設定}
-\LuaTeX-jaでは8つの文字範囲を設定している．これらは以下のデータに基づいて決定して
-いる．
+\LuaTeX-jaでは8つの文字範囲を予め定義しており，
+これらは以下のデータに基づいて決定している．
 %</ja>
 \begin{itemize}
 %<en>\item Blocks in Unicode~6.0.
@@ -1678,13 +1691,13 @@ number shows whether characters in the range is treated as
 %</ja>
 \begin{description}
 %<*en>
-\item[Range~8${}^{\text{J}}$] Symbols in the intersection of the upper half of ISO~8859-1
+\item[Range~8${}^{\text{J}}$] The intersection of the upper half of ISO~8859-1
 	 (Latin-1 Supplement) and JIS~X~0208 (a basic character set for Japanese). This character range
 	 consists of the following characters:
 %</en>
 %<*ja>
 \item[範囲8${}^{\text{J}}$] ISO~8859-1の上位領域（ラテン1補助）と
-                             JIS~X~0208の共通部分にある記号．この文字範囲は
+                             JIS~X~0208の共通部分．この文字範囲は
                              以下の文字で構成される：
 %</ja>
 \begin{multicols}{2}
@@ -1703,12 +1716,12 @@ number shows whether characters in the range is treated as
 
 %<*en>
 \item[Range~1${}^{\text{A}}$] Latin characters that some of them are included in Adobe-Japan1-6.
-This range consist of the following Unicode ranges, \emph{except characters in the range~8 above}:
+This range consists of the following Unicode ranges, \emph{except characters in the range~8 above}:
 %</en>
 %<*ja>
-\item[範囲1${}^{\text{A}}$] ラテン文字．一部はAdobe-Japan1-6にも含まれている．
-                             この範囲は以下のUnicodeのブロックから構成されている．
-                             \emph{ただし，範囲8は除く．}
+\item[範囲1${}^{\text{A}}$] ラテン文字のうち，Adobe-Japan1-6との共通部分があるもの．
+                             この範囲は以下のUnicodeのブロックのうち
+                             \emph{範囲8を除いた}部分で構成されている：
 %</ja>
 \begin{multicols}{2}
 \begin{itemize}
@@ -1717,8 +1730,8 @@ This range consist of the following Unicode ranges, \emph{except characters in t
 \item \texttt{U+0180}--\texttt{U+024F}: Latin Extended-B
 \item \texttt{U+0250}--\texttt{U+02AF}: IPA Extensions
 \item \texttt{U+02B0}--\texttt{U+02FF}: Spacing Modifier Letters
-\item \texttt{U+0300}--\texttt{U+036F}: Combining Diacritical Marks
-\item \texttt{U+1E00}--\texttt{U+1EFF}: Latin Extended Additional
+\item \texttt{U+0300}--\texttt{U+036F}: \\\null\hfill Combining Diacritical Marks
+\item \texttt{U+1E00}--\texttt{U+1EFF}: \\\null\hfill Latin Extended Additional
 \par\
 \end{itemize}
 \end{multicols}
@@ -1732,16 +1745,9 @@ This range consist of the following Unicode ranges, \emph{except characters in t
 %</ja>
 \begin{multicols}{2}
 \begin{itemize}
-%<*en>
 \item \texttt{U+0370}--\texttt{U+03FF}: Greek and Coptic
 \item \texttt{U+0400}--\texttt{U+04FF}: Cyrillic
 \item \texttt{U+1F00}--\texttt{U+1FFF}: Greek Extended
-%</en>
-%<*ja>
-\item \texttt{U+0370}--\texttt{U+03FF}: ギリシア文字・コプト文字
-\item \texttt{U+0400}--\texttt{U+04FF}: キリル文字
-\item \texttt{U+1F00}--\texttt{U+1FFF}: キリル文字補助
-%</ja>
 \\\
 \end{itemize}
 \end{multicols}
@@ -2092,6 +2098,165 @@ $\Phi\vdash F(x)\ \hbox{for all}\ x\in A$
 %<en>\part{Reference}
 %<ja>\part{リファレンス}
 \label{part-ref}
+
+%<*ja>
+\section{\LuaTeX-jaにおける \texttt{\char92catcode}}
+\subsection{予備知識：\pTeX と\upTeX における \texttt{\char92kcatcode}}
+\pTeX，\upTeX においては，和文文字が制御綴内で利用できるかどうか
+は \verb+\kcatcode+ の値によって決定されるのであった．
+\verb+\kcatcode+ の値によってどのように変わるかは表\ref{table-kcat}を参照されたい．
+
+\begin{table}[t]
+\small
+\caption{\texttt{\char92kcatcode} in \upTeX}
+\label{table-kcat}
+
+\noindent\hfill
+\begin{tabular}{ccccc}
+\toprule
+\bfseries \verb+\kcatcode+&
+\bfseries 意図&
+\bfseries 制御綴中に使用&
+\bfseries 文字ウィドウ処理\hbox{}$^*$&
+\bfseries 直後での改行\\
+\midrule
+15&non-cjk&\multicolumn{3}{c}{(treated as usual \LaTeX)}\\
+16&kanji&Y&Y&ignored\\
+17&kana&Y&Y&ignored\\
+18&other&N&N&ignored\\
+19&hangul&Y&Y&space\\
+\bottomrule
+\end{tabular}\hfill\null
+
+\medskip
+
+文字ウィドウ処理\hbox{}$^*$: 「漢字が一文字だけ次の行に行くのを防ぐ」\ 
+\texttt{\char92 jcharwidowpenalty} が，
+その文字の直前に挿入されうるか否か，を示す．
+\end{table} 
+
+\pTeX では \verb+\kcatcode+ はJIS~X~0208の区単位，
+\upTeX では概ねUnicodeブロック単位\footnote{%
+  U+FF00--U+FFEF (Halfwidth and Fullwidth Forms)は
+  「全角英数字」「半角カナ」「その他」と3つに分割されており，
+  それぞれ別々に \texttt{\char92kcatcode} が指定できるようになっている．
+}で設定可能になっている．そのため，\pTeX と\upTeX の初期状態では
+制御綴内で使用可能な文字が微妙に異なっている．
+
+\subsection{\LuaTeX-jaの場合}
+\LuaTeX-jaでは，従来の\pTeX・\upTeX における \verb+\kcatcode+ の役割を
+分割している：
+\begin{description}
+ \item[欧文/和文の区別 (\upTeX)] 
+\verb+\ltjdefcharrange+ と\textsf{jacharrange}パラメータ（\ref{ssec-setrange}節）
+ \item[制御綴中に使用可か]
+\LuaTeX 自身の \verb+\catcode+ でよい
+ \item[\Param{jcharwidowpenalty}が挿入可か]
+\Param{kcatcode}パラメータの最下位ビット
+ \item[改行をスペースと認識するか]
+現状では日本語しか想定していないので\textbf{JAchar}については一律有効
+\end{description}
+
+
+ネイティブにUnicode全部の文字を扱える\XeTeX や\LuaTeX では，
+文字が制御綴内で使用できるかは通常の欧文文字と同じく \verb+\catcode+
+で指定することとなる．\XeTeX における \verb+\catcode+ の初期設定は\ 
+\texttt{unicode-letters.tex} 中に記述されており，\LuaTeX ではそれを
+元にした \texttt{luatex-unicode-letters.tex} を用いている．
+
+だが，\XeTeX における \verb+\catcode+ の初期設定と
+\LuaTeX におけるそれは一致していない：
+\begin{itemize}
+ \item \texttt{luatex-unicode-letters.tex} の元になった\ 
+\texttt{unicode-letters.tex} が古い
+ \item \texttt{unicode-letters.tex} の後半部では
+\verb+\XeTeXcharclass+ の設定を行なっており，
+それによって漢字や仮名の \verb+\catcode+ が11に設定されている．
+
+しかし，\texttt{luatex-unicode-letters.tex} ではこの「後半部」が
+まるごと省略されており，漢字や仮名の \verb+\catcode+ は12のまま．
+\end{itemize}
+言い換えると，\LuaTeX の初期状態では漢字や仮名を制御綴内に
+使用することはできない．
+
+これでは \pTeX で使用できた \verb+\西暦+ などが使えないこととなり，
+\LuaTeX-jaへの移行で手間が生じる．そのため，\LuaTeX-jaでは
+\texttt{unicode-letters.tex} の後半部にあたる内容を自前でパッチし，
+結果として\textbf{\XeTeX における初期設定と同じになるようにしている．}
+
+\begin{table}
+ \centering\small
+\caption{制御綴中に使用出来るJIS~X~0208非漢字の違い}
+\label{table-kcat-diff}
+\def\D#1#2#3#4{%
+  {\fboxsep0pt\fcolorbox{cyan}{white}%
+  {\large\char"#1#2#3#4}}\ (\texttt{U+#1#2#3#4})} %"
+\leavevmode\hbox to 0pt{\hss\begin{tabular}{cccccc}
+\toprule
+&\bf 区&\bf 点&\bf \pTeX&\bf \upTeX&\fontseries{b}\selectfont\LuaTeX-ja\\
+\midrule
+\D 3000&1&1&×&×&◯\\
+\D 30FB&1&6&×&◯&×\\
+\D 309B&1&11&×&◯&×\\
+\D 309C&1&12&×&◯&×\\
+\D FF40&1&14&×&×&◯\\
+\D FF3E&1&16&×&×&◯\\
+\D FFE3&1&17&×&×&◯\\
+\D FF3F&1&18&×&×&◯\\
+\D 30FD&1&19&×&◯&◯\\
+\D 30FE&1&20&×&◯&◯\\
+\D 309D&1&21&×&◯&◯\\
+\D 309E&1&22&×&◯&◯\\
+\D 3003&1&23&×&×&◯\\
+\D 4EDD&1&24&×&◯&◯\\
+\D 3005&1&25&×&×&◯\\
+\D 3006&1&26&×&×&◯\\
+\D 3007&1&27&×&×&◯\\
+\D 30FC&1&28&×&◯&◯\\
+\bottomrule
+\end{tabular}\qquad
+\begin{tabular}{cccccc}
+\toprule
+&\bf 区&\bf 点&\bf \pTeX&\bf \upTeX&\fontseries{b}\selectfont\LuaTeX-ja\\
+\midrule
+\D FF0F&1&31&×&×&◯\\
+\D FF3C&1&32&×&×&◯\\
+\D FF5C&1&35&×&×&◯\\
+\D FF0B&1&60&×&×&◯\\
+\D FF1D&1&65&×&×&◯\\
+\D FF1C&1&67&×&×&◯\\
+\D FF1E&1&68&×&×&◯\\
+\D FF03&1&84&×&×&◯\\
+\D FF06&1&85&×&×&◯\\
+\D FF0A&1&86&×&×&◯\\
+\D FF20&1&87&×&×&◯\\
+\D 3012&2&9&×&×&◯\\
+\D 3013&2&14&×&×&◯\\
+\D FFE2&2&44&×&×&◯\\
+\D 212B&2&82&×&×&◯\\
+\multicolumn{3}{c}{$\vphantom{\D 3000}$\hbox{}ギリシャ文字（6区）}&◯&×&◯\\
+\multicolumn{3}{c}{$\vphantom{\D 3000}$\hbox{}キリル文字（7区）}&×&×&◯\\
+$\vphantom{\D 3000}$\\
+\bottomrule
+\end{tabular}\hss}\par
+\end{table}
+
+\subsection{制御綴中に使用出来るJIS非漢字の違い}
+
+エンジンが異なるので，\pTeX, \upTeX, \LuaTeX-ja
+において制御綴中に使用可能なJIS~X~0208の文字は異なる．
+異なっているところだけを載せると，表\ref{table-kcat-diff}のようになる．
+「・」「゛」「゜」「゠」を除けば，\LuaTeX-jaでは\upTeX より多くの文字が
+制御綴に使用可能になっている．
+\textbf{特に重要なのは，全角空白(U+3000)が
+\LuaTeX-jaでは制御綴中に使用可能であることである．}
+
+JIS~X~0213の範囲に広げると，差異はさらに大きくなる．
+詳細については例えば \url{https://github.com/h-kitagawa/kct} 中の\ 
+\texttt{kct-uni-out.pdf} などを参照すること．
+%</ja>
+
+
 %<en>\section{Font Metric and Japanese Font}
 %<ja>\section{フォントメトリックと和文フォント}
 %<en>\subsection{\texttt{\char92jfont}}
@@ -3481,14 +3646,24 @@ Note that these don't support JIS~X~0213, but only JIS~X~0208.
 以下の命令は\pTeX との互換性のために実装されている．そのため，JIS~X~0213には対応せず，
 \pTeX と同じようにJIS~X~0208の範囲しかサポートしていない．
 %</ja>
-\begin{list}{}{\def\makelabel{\ttfamily\char92 }\advance\leftmargin1\zw}
-\item[kuten]
-\item[jis]
-\item[euc]
-\item[sjis]
-\item[ucs]
-\item[kansuji]
-\end{list}
+\begin{center}
+\verb+\kuten+, \verb+\jis+, \verb+\euc+, \verb+\sjis+, \verb+\jis+, \verb+\kansuji+
+\end{center}
+%<*en>
+These 6 control sequence takes an internal integer, and returns a \emph{string}.
+%</en>
+%<*ja>
+これら6命令は内部整数を引数とするが，実行結果は\textbf{文字列}であることに注意．
+%</ja>
+\begin{LTXexample}
+\newcount\hoge
+\hoge="2423 %"
+\the\hoge, \kansuji\hoge\\
+\jis\hoge, \char\jis\hoge\\
+\kansuji1701
+\end{LTXexample}
+
+
 
 %<en>\subsection{\texttt{\char92 inhibitglue}}
 %<ja>\subsection{\texttt{\char92 inhibitglue}}
@@ -5607,16 +5782,21 @@ listing environments.
 \begin{thebibliography}{99}
   \addcontentsline{toc}{section}{\refname}
 \bibitem{texbytopic}
-Victor Eijkhout,  \emph{\TeX\ by Topic, A \TeX nician's Reference}, Addison-Wesley, 1992.
-\bibitem{listings} C.\ Heinz, B.\ Moses. The \textsf{Listings} Package.
-\bibitem{jlisting} Thor Watanabe. Listings\ -\ MyTeXpert. \newblock
+Victor Eijkhout. \newblock \emph{\TeX\ by Topic, A \TeX nician's Reference}, Addison-Wesley, 1992.
+\bibitem{listings} C.\ Heinz, B.\ Moses. \newblock The \textsf{Listings} Package.
+\bibitem{uptex} Takuji Tanaka. \newblock
+upTeX---Unicode version of pTeX with CJK extensions, 
+TUG 2013, October 2013.\\\null\hfill
+\url{http://tug.org/tug2013/slides/TUG2013_upTeX.pdf}
+\bibitem{jlisting} Thor Watanabe. \newblock Listings\ -\ MyTeXpert. \\\null\hfill
 \url{http://mytexpert.sourceforge.jp/index.php?Listings}
-\bibitem{min10} 乙部厳己，min10フォントについて．
-\url{http://argent.shinshu-u.ac.jp/~otobe/tex/files/min10.pdf}
-\bibitem{jlreq}  W3C Japanese Layout Task Force~(ed), Requirements for Japanese Text Layout (W3C Working Group Note), 2011, 2012. \newblock
+\bibitem{jlreq}  W3C Japanese Layout Task Force~(ed). \newblock
+Requirements for Japanese Text Layout (W3C Working Group Note), 2011, 2012. \newblock
 \url{http://www.w3.org/TR/jlreq/}%
 %<ja> \\日本語訳の書籍版：W3C日本語組版タスクフォース（編），『W3C技術ノート 日本語組版処理の要件』，東京電機大学出版局，2012．
-\bibitem{x4051} 日本工業規格(Japanese Industrial Standard) JIS~X~4051,
+\bibitem{min10} 乙部厳己，min10フォントについて．\\\null\hfill
+\url{http://argent.shinshu-u.ac.jp/~otobe/tex/files/min10.pdf}
+\bibitem{x4051} 日本工業規格(Japanese Industrial Standard), JIS~X~4051,
 日本語文書の組版方法(Formatting rules for Japanese documents), 1993, 1995, 2004.
 \end{thebibliography}
 
