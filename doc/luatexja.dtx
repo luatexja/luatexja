@@ -4,7 +4,7 @@
 % To typeset this manual, you need following two fonts:
 %  - KozMinPr6N-Regular.otf
 %  - KozGoPr6N-Medium.otf
-
+%  - ipamjm.ttf
 
 %<en>\documentclass[a4paper,titlepage]{article}
 %<ja>\documentclass[a4paper,titlepage]{ltjsarticle}
@@ -89,6 +89,7 @@
 
 %%%%%%%% fonts
 \usepackage{luatexja-otf}
+\directlua{luatexja.otf.enable_ivs()}
 \usepackage[kozuka-pr6n]{luatexja-preset}
 %<*ja>
 \def\emph#1{\textbf{\textgt{#1}}}
@@ -2071,7 +2072,7 @@ xyz漢字
 \origbaselineskip=\baselineskip
 \begin{tabular}{lp{30\zw}}
 \toprule
-\emph{入力}&\vspace*{-\origbaselineskip}
+\emph{入力}&\vspace*{\dimexpr-\origbaselineskip-\smallskipamount}
 \begin{verbatim}
 数式abc: $あa\hbox{い}$, $\int_0^x t\,dt=x^2\!/2$,
 $\Phi\vdash F(x)\ \hbox{for all}\ x\in A$
@@ -2154,7 +2155,7 @@ $\Phi\vdash F(x)\ \hbox{for all}\ x\in A$
  \item[\Param{jcharwidowpenalty}が挿入可か]
 \Param{kcatcode}パラメータの最下位ビット
  \item[改行をスペースと認識するか]
-現状では日本語しか想定していないので\textbf{JAchar}については一律有効
+日本語しか想定していないので\textbf{JAchar}については一律有効
 \end{description}
 
 
@@ -3989,12 +3990,12 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
 
 %<*en>
 This optional package supports typesetting characters in
-Adobe-Japan1. \texttt{luatexja-otf.sty} offers the following 2~low-level
+Adobe-Japan1. the package \Pkg{luatexja-otf} offers the following 2~low-level
 commands:
 %</en>
 %<*ja>
 この追加パッケージはAdobe-Japan1の文字の出力をサポートする．
-\texttt{luatexja-otf.sty}は以下の2つの低レベルコマンドを提供する：
+\Pkg{luatexja-otf}は以下の2つの低レベルコマンドを提供する：
 %</ja>
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
 \item[\char92CID\{<number>\}]
@@ -4050,16 +4051,72 @@ ordinary characters in the following points:
 %<ja>\paragraph{JFMへの記法の追加}
 
 %<*en>
-\texttt{luatexja-otf.sty} extends the syntax of JFM; the entries of \texttt{
+The package \Pkg{luatexja-otf} extends the syntax of JFM; the entries of \texttt{
 chars} table in JFM now allows a string in the form
 \verb+'AJ1-xxx'+, which stands for the character
 whose CID number in Adobe-Japan1 is \verb+xxx+.
 %</en>
 %<*ja>
-\texttt{luatexja-otf.sty}はJFMの記法を拡張する．
+\Pkg{luatexja-otf}パッケージはJFMの記法を拡張する．
 JFMの\texttt{chars}テーブルのエントリとして \verb+'AJ1-xxx'+ の形の文字列が
 使えるようになる．これはAdobe-Japan1におけるCID番号が \verb+xxx+ の文字を表す．
 %</ja>
+
+%<*ja>
+\paragraph{IVSサポート}
+最近のOpenTypeフォントやTrueTypeフォントには，U+E0100--U+E01EFの範囲の「文字」
+（漢字用異体字セレクタ）を後置することによって字形を指定する仕組み(IVS)が含まれている．
+執筆時点の2013年12月では，\Pkg{luaotfload}や\Pkg{fontspec}パッケージ類は
+IVSに対応してはいないようである．これらのパッケージで対応してくれるのが理想的だが，
+それまでのつなぎとして，\Pkg{luatexja-otf}パッケージ内にIVS対応を仕込んでおいた．
+
+\def\IVS#1{\char\numexpr "E0100+#1\relax}%"
+\def\IVSA#1#2#3#4#5{%
+  \textcolor{blue}{\raisebox{3.5pt}{\tt%
+    \fboxsep=1pt\fbox{\tiny \oalign{0#1#2\crcr#3#4#5\crcr}}}}\ignorespaces
+}
+{\catcode`\%=11
+  \gdef\IVSB#1{\expandafter\IVSA\directlua{tex.sprint(string.format('%X', 0xE0100+#1))}}}
+
+\medskip
+
+\emph{IVS対応は試験的なものである．
+有効にするには，\Pkg{luatexja-otf}パッケージを読み込んだ上で以下の命令を実行しなければなら
+ない\footnote{この命令を2回以上実行することは想定していないので注意．}：}
+\begin{verbatim}
+\directlua{luatexja.otf.enable_ivs()}
+\end{verbatim}
+すると，上の命令を実行した箇所以降では，以下のようにIVSによる字形指定が有効となる．
+\begin{LTXexample}[explpreset={escapechar=\'}, preset={\let\IVSB=\IVS\catcode`\'=9 } ]
+\Large
+\jfontspec{ipamjm.ttf}% IPA mj 明朝
+奈良県葛'\IVSB2'城市と，東京都葛'\IVSB3'飾区．\\
+こんにちは，渡%
+邉'\IVSB{15}'邉'\IVSB{16}'邉'\IVSB{17}'邉'\IVSB{18}'邉'\IVSB{19}'%
+邉'\IVSB{20}'邉'\IVSB{21}'邉'\IVSB{22}'邉'\IVSB{23}'邉'\IVSB{24}'%
+邉'\IVSB{25}'邉'\IVSB{26}'邉'\IVSB{27}'邉'\IVSB{28}'邉'\IVSB{29}'%
+さん．
+\end{LTXexample}
+左上側の入力においては，漢字用異体字セレクタを明示するため，
+例えばU+E0102を\IVSB2のように表記している．
+
+\medskip
+
+また，IVSによる字形指定は，font featureによるそれに優先されることとした．
+下の例において，\texttt{jp78}, \texttt{jp90} 指定で字形が変化した文字は
+異体字セレクタが続いていない「葛西」中の「葛」のみである．
+\begin{LTXexample}[explpreset={escapechar=\'}, preset={\let\IVSB=\IVS\catcode`\'=9 } ]
+ \def\TEST#1{%
+   {\jfontspec[#1]{KozMinPr6N-Regular}%
+   葛'\IVSB0'城市，葛'\IVSB1'飾区，葛西}\\}
+ 指定なし：\TEST{}
+ \texttt{jp78}：\TEST{CJKShape=JIS1978}
+ \texttt{jp90}：\TEST{CJKShape=JIS1990}
+\end{LTXexample}
+
+
+%</ja>
+
 
 \subsection{\texttt{luatexja-adjust.sty}}
 \label{ssec-adj}
@@ -4273,6 +4330,7 @@ Glues from an italic correction
 %</en>
 %<*ja>
 イタリック補正(\verb+\/+)によるグルー．このグルーの由来の区別（\verb+\kern+ か
+\hskip\ltjgetparameter{xkanjiskip}
 \verb+\/+ か）は\Param{\hyperlink{fld:xks}{xkanjiskip}}の挿入過程において必要になる．
 %</ja>
 
@@ -5782,13 +5840,17 @@ listing environments.
 \begin{thebibliography}{99}
   \addcontentsline{toc}{section}{\refname}
 \bibitem{texbytopic}
-Victor Eijkhout. \newblock \emph{\TeX\ by Topic, A \TeX nician's Reference}, Addison-Wesley, 1992.
+Victor Eijkhout. \newblock \textit{\TeX\ by Topic, A \TeX nician's Reference}, Addison-Wesley, 1992.
 \bibitem{listings} C.\ Heinz, B.\ Moses. \newblock The \textsf{Listings} Package.
 \bibitem{uptex} Takuji Tanaka. \newblock
 upTeX---Unicode version of pTeX with CJK extensions, 
-TUG 2013, October 2013.\\\null\hfill
+TUG 2013, October 2013.
+%<ja>\newblock
+%<en>\\\null\hfill
 \url{http://tug.org/tug2013/slides/TUG2013_upTeX.pdf}
-\bibitem{jlisting} Thor Watanabe. \newblock Listings\ -\ MyTeXpert. \\\null\hfill
+\bibitem{jlisting} Thor Watanabe. \newblock Listings\ -\ MyTeXpert. 
+%<en>\newblock
+%<ja>\\\null\hfill
 \url{http://mytexpert.sourceforge.jp/index.php?Listings}
 \bibitem{jlreq}  W3C Japanese Layout Task Force~(ed). \newblock
 Requirements for Japanese Text Layout (W3C Working Group Note), 2011, 2012. \newblock
