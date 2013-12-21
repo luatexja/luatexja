@@ -14,11 +14,7 @@ luatexja.load_module('base');      local ltjb = luatexja.base
 cidfont_data = {}
 local cidfont_data = cidfont_data
 local cache_chars = {}
-local path           = {
-    localdir  = kpse.expand_var("$TEXMFVAR"),
-    systemdir = kpse.expand_var("$TEXMFSYSVAR"),
-}
-local cache_dir = '/luatexja'
+local cache_ver = '2'
 
 local cid_reg, cid_order, cid_supp, cid_name
 local cid_replace = {
@@ -184,42 +180,24 @@ do
       end
 
       -- Save
-      local savepath  = path.localdir .. cache_dir
-      if not lfs.isdir(savepath) then
-         dir.mkdirs(savepath)
-      end
-      savepath = file.join(savepath, "ltj-cid-auto-" 
-                           .. string.lower(cid_name)  .. ".lua")
-      if file.iswritable(savepath) then
-         k.characters[46].width = math.floor(655360/14);
-	 -- Standard fonts are ``seriffed''. 
-         table.tofile(savepath, k,'return', false, true, false )
-         ltjb.package_info_no_line('luatexja', "saved :'" .. savepath .. "'", '')
-      else 
-         ltjb.package_warning_no_line('luatexja', "failed to save to '" .. savepath .. "'", '')
-      end
+      k.characters[46].width = math.floor(655360/14);
+      ltjb.save_cache( "ltj-cid-auto-" .. string.lower(cid_name),
+		       {
+			  version = cache_ver,
+			  k,
+		       })
    end
 end
 local make_cid_font = make_cid_font
 
 -- 
-local function cid_cache_load(fullpath)
-   cidfont_data[cid_name] = require(fullpath)
-   cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
-end
-
+local function cid_cache_outdated(t) return t.version~=cache_ver end
 local function read_cid_font()
-   -- local v = "ltj-cid-" .. string.lower(cid_name) .. ".lua"
-   local v = "ltj-cid-auto-" .. string.lower(cid_name) .. ".lua"
-   local localpath  = file.join(path.localdir, cache_dir, v)
-   local systempath = file.join(path.systemdir, cache_dir , v)
-   local kpsefound  = kpse.find_file(v)
-   if kpsefound and file.isreadable(kpsefound) then
-      cid_cache_load(kpsefound)
-   elseif file.isreadable(localpath)  then
-      cid_cache_load(localpath)
-   elseif file.isreadable(systempath) then
-      cid_cache_load(systempath)
+   local dat = ltjb.load_cache("ltj-cid-auto-" .. string.lower(cid_name),
+			       cid_cache_outdated )
+   if dat then 
+      cidfont_data[cid_name] = dat[1]
+      cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
    else
       -- Now we must create the virtual metrics from CMap.
       make_cid_font()

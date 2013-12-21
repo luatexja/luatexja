@@ -438,5 +438,53 @@ function get_cs(s)
    tex.sprint(cat_lp,'\\' .. s)
 end
 
+
+-------------------- cache management
+require('lualibs-lpeg') -- string.split
+do
+   local path = string.split(
+      kpse.expand_var("$TEXMFCACHE;$TEXMFVAR;$TEXMFSYSVAR"), ';'
+   )
+   local cache_dir = '/luatexja'
+   local find_file = kpse.find_file
+   local join, isreadable = file.join, file.isreadable
+
+   -- determine save path
+   local savepath = ''
+   for _,v in pairs(path) do
+      local testpath =  join(v, cache_dir)
+      if not lfs.isdir(testpath) then dir.mkdirs(testpath) end
+      if lfs.isdir(testpath) then savepath = testpath; break end
+   end
+
+   -- filename: WITHOUT suffix '.lua'
+   function load_cache (filename, outdate)
+      local kpsefound = find_file(filename .. '.lua')
+      local result
+      if kpsefound and isreadable(kpsefound) then
+	 result = require(kpsefound)
+      else
+	 for _,v in pairs(path) do
+	    local fn = join(v, cache_dir, filename .. '.lua')
+	    if isreadable(fn) then 
+	       result = require(fn); break
+	    end
+	 end
+      end
+      if (not result) or outdate(result) then 
+	 return nil 
+      else 
+	 return result 
+      end
+   end
+
+   function save_cache(filename, t)
+      local fullpath = savepath .. '/' ..  filename .. '.lua'
+      table.tofile(fullpath, t, 'return', false, true, false )
+      package_info_no_line('luatexja', "save '" .. fullpath .. "'", '')
+   end
+
+end
+
 -------------------- all done
 -- EOF

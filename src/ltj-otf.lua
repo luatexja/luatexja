@@ -181,6 +181,7 @@ luatexbase.add_to_callback("luatexja.find_char_class",
 local font_ivs_table = {} -- key: fontnumber
 local enable_ivs
 do
+   local ivs
    local sort = table.sort
    local uniq_flag
    local function add_ivs_table(tg, unitable)
@@ -188,15 +189,15 @@ do
          local ga = gv.altuni
          if ga then
 	    for _,at in pairs(ga) do
-	       local bu, vs = at.unicode, (at.variant or 0)-0xE0100
-	       if vs>=0 and vs<0xF0 then
+	       local bu, vsel = at.unicode, (at.variant or -1)
+	       if vsel~=-1 then
 	          if not ivs[bu] then ivs[bu] = {} end
 	          uniq_flag = true
                   for i,_ in pairs(ivs[bu]) do
                      if i==vs then uniq_flag = false; break end
                   end
 	          if uniq_flag then 
-                     ivs[bu][vs] = unitable[gv.name]
+                     ivs[bu][vsel] = unitable[gv.name]
                   end
 	       end
 	    end
@@ -220,39 +221,8 @@ do
 
 -- loading and saving
    local font_ivs_basename = {} -- key: basename
-   local path           = {
-      localdir  = kpse.expand_var("$TEXMFVAR"),
-      systemdir = kpse.expand_var("$TEXMFSYSVAR"),
-   }
-   local cache_dir = '/luatexja'
+   local cache_ver = '3'
    local checksum = file.checksum
-
-   local function ivs_cache_save(id, fname)
-      local savepath  = path.localdir .. cache_dir
-      if not lfs.isdir(savepath) then dir.mkdirs(savepath) end
-      savepath = file.join(savepath, "ivs_" .. string.lower(file.nameonly(fname)) .. ".lua")
-      local result = make_ivs_table(id, fname)
-      if file.iswritable(savepath) then
-         table.tofile(savepath, { checksum(fname), result },
-           'return', false, true, false )
-         --ltjb.package_info_no_line('luatexja', "saved :'" .. savepath .. "'", '')
-         print("saved :'" .. savepath .. "'", '')
-      else 
-         --ltjb.package_warning_no_line('luatexja', "failed to save to '" .. savepath .. "'", '')
-         print("failed to save to '" .. savepath .. "'", '')
-      end
-      return result
-   end
-
-   local function ivs_cache_load(cname, id, fname)
-      local result = require(cname)
-      local newsum = checksum(fname)
-      if newsum~=result[1] then
-         return ivs_cache_save(id, fname)
-      else
-         return result[2]
-      end
-   end
 
    local function prepare_ivs_data(n, id)
       -- test if already loaded
@@ -268,25 +238,26 @@ do
       end
       
       -- if cache is present; read them
-      local v = "ivs_" .. string.lower(file.nameonly(fname)) .. ".lua"
-      local localpath  = file.join(path.localdir, cache_dir, v)
-      local systempath = file.join(path.systemdir, cache_dir , v)
-      local kpsefound  = kpse.find_file(v)
-      if kpsefound and file.isreadable(kpsefound) then
-         font_ivs_basename[bname] = ivs_cache_load(kpsefound, id, fname)
-      elseif file.isreadable(localpath)  then
-         font_ivs_basename[bname] = ivs_cache_load(localpath, id, fname)
-      elseif file.isreadable(systempath) then
-         font_ivs_basename[bname] = ivs_cache_load(systempath, id, fname)
+      local newsum = checksum(fname)
+      local v = "ivs_" .. string.lower(file.nameonly(fname))
+      local dat = ltjb.load_cache(v, 
+         function (t) return (t.version~=cache_ver) or (t.chksum~=newsum) end
+      )
+      -- if cache is not found or outdated, save the cache
+      if dat then 
+	 font_ivs_basename[bname] = dat[1] or {}
       else
-         font_ivs_basename[bname] = ivs_cache_save(id, fname)
+	 dat = make_ivs_table(id, fname)
+	 font_ivs_basename[bname] = dat or {}
+	 ltjb.save_cache( v,
+			  {
+			     chksum = checksum(fname), 
+			     version = cache_ver,
+			     dat,
+			  })
       end
-      if not font_ivs_basename[bname] then font_ivs_basename[bname] = {} end
       font_ivs_table[n] = font_ivs_basename[bname]
    end
-   local ivs = {}
-   ivs.font_ivs_table = font_ivs_table
-   luatexja.ivs = ivs
 
 -- 組版時
    local function ivs_jglyph(char, bp, pf)
@@ -309,8 +280,9 @@ do
                local q = node_next(p) -- the next node of p
                if q and q.id==id_glyph then
                   local qc = q.char
-                  if qc>=0xE0100 and qc<0xE01F0 then -- q is an IVS selector
-                     pt = pt and pt[p.char];  pt = pt and  pt[qc-0xE0100]
+                  if (qc>=0xFE00 and qc<=0xFE0F) or (qc>=0xE0100 and qc<0xE01F0) then 
+		     -- q is a variation selector
+                     pt = pt and pt[p.char];  pt = pt and  pt[qc]
                      head = node_remove(head,q)
                      if pt then
                         local np = ivs_jglyph(pt, p, pf)
