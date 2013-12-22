@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.base',
-  date = '2011/11/18',
+  date = '2013/12/22',
   description = '',
 })
 module('luatexja.base', package.seeall)
@@ -440,14 +440,28 @@ end
 
 
 -------------------- cache management
+-- load_cache (filename, outdate)
+--   * filename: without suffix '.lua'
+--   * outdate(t): return true iff the cache is outdated
+--   * return value: non-nil iff the cache is up-to-date
+-- save_cache (filename, t): no return value
+-- save_cache_luc (filename, t): no return value
+--   save_cache always calls save_cache_luc. 
+--   But sometimes we want to create only the precompiled cache,
+--   when its 'text' version is already present in LuaTeX-ja distribution.
+
 require('lualibs-lpeg') -- string.split
+require('lualibs-os')   -- os.type
 do
-   local path = string.split(
-      kpse.expand_var("$TEXMFCACHE;$TEXMFVAR;$TEXMFSYSVAR"), ';'
-   )
+   local path = kpse.expand_var("$TEXMFVAR;$TEXMFSYSVAR;$TEXMFCACHE")
+   if os.type~='windows' then path = string.gsub(path, ':', ';') end
+   path = string.split(path, ';')
+
    local cache_dir = '/luatexja'
    local find_file = kpse.find_file
    local join, isreadable = file.join, file.isreadable
+   local tofile, serialize = table.tofile, table.serialize
+   local luc_suffix = jit and '.lub' or '.luc'
 
    -- determine save path
    local savepath = ''
@@ -457,18 +471,48 @@ do
       if lfs.isdir(testpath) then savepath = testpath; break end
    end
 
-   -- filename: WITHOUT suffix '.lua'
+   function save_cache_luc(filename, t)
+      local fullpath = savepath .. '/' ..  filename .. luc_suffix
+      local s = serialize(t, 'return', false)
+      if s then
+	 local f = io.open(fullpath, 'wb')
+	 if f then 
+	    f:write(string.dump(load(s), true)) 
+	    texio.write('(save cache: ' .. fullpath .. ')')
+	 end
+	 f:close()
+      end
+   end
+
+   function save_cache(filename, t)
+      local fullpath = savepath .. '/' ..  filename .. '.lua'
+      tofile(fullpath, t, 'return', false)
+      texio.write('(save cache: ' .. fullpath .. ')')
+      save_cache_luc(filename, t)
+   end
+
+   local function luc_load (n)
+      texio.write('(load cache: ' .. n .. ')')
+      local f = loadfile(n, 'b'); return f
+   end
    function load_cache (filename, outdate)
-      local kpsefound = find_file(filename .. '.lua')
-      local result
-      if kpsefound and isreadable(kpsefound) then
-	 result = require(kpsefound)
+      local r = load_cache_a(filename ..  luc_suffix, outdate, luc_load)
+      if r then 
+	 return r
       else
-	 for _,v in pairs(path) do
-	    local fn = join(v, cache_dir, filename .. '.lua')
-	    if isreadable(fn) then 
-	       result = require(fn); break
-	    end
+         local r = load_cache_a(filename .. '.lua', outdate, loadfile)
+	 if r then save_cache_luc(filename, r) end -- update the precompiled cache
+	 return r
+      end
+   end
+   
+   function load_cache_a (filename, outdate, loader)
+      local result
+      for _,v in pairs(path) do
+	 local fn = join(v, cache_dir, filename)
+	 if isreadable(fn) then 
+	    result = loader(fn)
+	    if result then result = result(); break end
 	 end
       end
       if (not result) or outdate(result) then 
@@ -476,12 +520,6 @@ do
       else 
 	 return result 
       end
-   end
-
-   function save_cache(filename, t)
-      local fullpath = savepath .. '/' ..  filename .. '.lua'
-      table.tofile(fullpath, t, 'return', false, true, false )
-      package_info_no_line('luatexja', "save '" .. fullpath .. "'", '')
    end
 
 end

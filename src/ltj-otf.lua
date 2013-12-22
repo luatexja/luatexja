@@ -1,15 +1,8 @@
 --
--- luatexja/otf.lua
+-- luatexja/ltj-otf.lua
 --
-luatexbase.provides_module({
-  name = 'luatexja.otf',
-  date = '2013/05/11',
-  description = 'The OTF Lua module for LuaTeX-ja',
-})
-
 require('unicode')
 require('lualibs')
-
 
 luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
@@ -191,6 +184,7 @@ do
 	    for _,at in pairs(ga) do
 	       local bu, vsel = at.unicode, (at.variant or -1)
 	       if vsel~=-1 then
+		  if vsel>=0xE0100 then vsel = vsel - 0xE0100 end
 	          if not ivs[bu] then ivs[bu] = {} end
 	          uniq_flag = true
                   for i,_ in pairs(ivs[bu]) do
@@ -221,12 +215,12 @@ do
 
 -- loading and saving
    local font_ivs_basename = {} -- key: basename
-   local cache_ver = '3'
+   local cache_ver = '4'
    local checksum = file.checksum
 
    local function prepare_ivs_data(n, id)
       -- test if already loaded
-      if type(id)=='number' then 
+      if type(id)=='number' then -- sometimes id is an integer
          font_ivs_table[n] = font_ivs_table[id]; return 
       end
       local fname = id.filename
@@ -237,13 +231,13 @@ do
          font_ivs_table[n] = font_ivs_basename[bname]; return
       end
       
-      -- if cache is present; read them
-      local newsum = checksum(fname)
+      -- if the cache is present, read it
+      local newsum = checksum(fname) -- MD5 checksum of the fontfile
       local v = "ivs_" .. string.lower(file.nameonly(fname))
       local dat = ltjb.load_cache(v, 
          function (t) return (t.version~=cache_ver) or (t.chksum~=newsum) end
       )
-      -- if cache is not found or outdated, save the cache
+      -- if the cache is not found or outdated, save the cache
       if dat then 
 	 font_ivs_basename[bname] = dat[1] or {}
       else
@@ -282,6 +276,7 @@ do
                   local qc = q.char
                   if (qc>=0xFE00 and qc<=0xFE0F) or (qc>=0xE0100 and qc<0xE01F0) then 
 		     -- q is a variation selector
+		     if qc>=0xE0100 then qc = qc - 0xE0100 end
                      pt = pt and pt[p.char];  pt = pt and  pt[qc]
                      head = node_remove(head,q)
                      if pt then
@@ -324,7 +319,6 @@ do
    end
 end
 
--------------------- all done
 luatexja.otf = {
   append_jglyph = append_jglyph,
   enable_ivs = enable_ivs,  -- 隠し機能: IVS

@@ -1,4 +1,5 @@
-luatexja.jisx0208 = {
+return {
+version = 2,
 table_jisx0208_uptex = { 
  [0x101] = 0x3000, --(　)
  [0x102] = 0x3001, --(、) 

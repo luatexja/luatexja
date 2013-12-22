@@ -5,6 +5,17 @@
 luatexja.load_module('base');   local ltjb = luatexja.base
 luatexja.load_module('stack');  local ltjs = luatexja.stack
 
+-- load jisx0208 table
+local cache_ver = 2
+
+local cache_outdate_fn = function (t) return t.version~=cache_ver end
+local jisx0208 = ltjb.load_cache('ltj-jisx0208',cache_outdate_fn)
+if not jisx0208 then -- make cache
+   jisx0208 = require('ltj-jisx0208.lua')
+   ltjb.save_cache_luc('ltj-jisx0208', jisx0208)
+end
+
+
 -- \kuten, \jis, \euc, \sjis, \ucs, \kansuji
 local function to_kansuji(num)
    if not num then num=0; return
@@ -40,7 +51,7 @@ local function from_kuten(i)
 			 "I'm going to use 0 instead of that illegal character code.")
       i=0 
    end
-   tex.write(tostring(luatexja.jisx0208.table_jisx0208_uptex[i] or 0))
+   tex.write(tostring(jisx0208.table_jisx0208_uptex[i] or 0))
 end
 
 -- \euc: EUC-JP による符号位置 => Unicode 符号位置

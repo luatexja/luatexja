@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-compat}[2013/05/14 Compatibility with pTeX]
+  \ProvidesPackage{luatexja-compat}[2013/12/22 Compatibility with pTeX]
 \fi                             %</LaTeX>
 
 % ltj-compat-ptex.sty is not maintained for a long time.
@@ -105,7 +105,6 @@
 % not yet implemented.
 
 %%------------------
-\RequireLuaTeXjaSubmodule{jisx0208}
 \RequireLuaTeXjaSubmodule{compat}
 
 \def\euc{\ltj@code@conv{euc}}
