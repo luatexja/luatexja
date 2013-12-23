@@ -1,18 +1,9 @@
 --
--- luatexja/rmlgbm.lua
+-- luatexja/ltj-rmlgbm.lua
 --
-luatexbase.provides_module({
-  name = 'luatexja.rmlgbm',
-  date = '2013/12/22',
-  description = 'Definitions of non-embedded Japanese (or other CJK) fonts',
-})
-module('luatexja.rmlgbm', package.seeall)
-local err, warn, info, log = luatexbase.errwarinf(_NAME)
-
 luatexja.load_module('base');      local ltjb = luatexja.base
 
-cidfont_data = {}
-local cidfont_data = cidfont_data
+local cidfont_data = {}
 local cache_chars = {}
 local cache_ver = '2'
 
@@ -52,6 +43,7 @@ local cid_replace = {
 }
 
 -- reading CID maps
+local make_cid_font
 do
    local line, fh -- line, file handler
    local tt,cidm -- characters, cid->(Unicode)
@@ -113,7 +105,7 @@ do
    local function entry(a)     
       return {index = a} 
    end
-   function make_cid_font()
+   make_cid_font = function ()
       local kx = cid_replace[cid_name]
       if not kx then return end
       local k = {
@@ -188,7 +180,6 @@ do
 		       })
    end
 end
-local make_cid_font = make_cid_font
 
 -- 
 local function cid_cache_outdated(t) return t.version~=cache_ver end
@@ -302,7 +293,7 @@ local function mk_rml(name, size, id)
    return fontdata
 end
 
-function font_callback(name, size, id, fallback)
+local function font_callback(name, size, id, fallback)
    local p = utf.find(name, ":") or utf.len(name)+1
    if utf.sub(name, 1, p-1) == 'psft' then
       local s = "Adobe-Japan1-6"
@@ -348,3 +339,9 @@ end
 
 cid_reg, cid_order, cid_name, cid_supp = 'Adobe', 'Japan1', 'Adobe-Japan1'
 read_cid_font()
+
+
+luatexja.rmlgbm = {
+   cidfont_data = cidfont_data,
+   font_callback = font_callback,
+}

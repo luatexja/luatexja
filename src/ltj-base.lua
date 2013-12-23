@@ -475,9 +475,10 @@ do
       local fullpath = savepath .. '/' ..  filename .. luc_suffix
       local s = serialize(t, 'return', false)
       if s then
+	 local sa = load(s)
 	 local f = io.open(fullpath, 'wb')
-	 if f then 
-	    f:write(string.dump(load(s), true)) 
+	 if f and sa then 
+	    f:write(string.dump(sa, true)) 
 	    texio.write('(save cache: ' .. fullpath .. ')')
 	 end
 	 f:close()
@@ -495,18 +496,7 @@ do
       texio.write('(load cache: ' .. n .. ')')
       local f = loadfile(n, 'b'); return f
    end
-   function load_cache (filename, outdate)
-      local r = load_cache_a(filename ..  luc_suffix, outdate, luc_load)
-      if r then 
-	 return r
-      else
-         local r = load_cache_a(filename .. '.lua', outdate, loadfile)
-	 if r then save_cache_luc(filename, r) end -- update the precompiled cache
-	 return r
-      end
-   end
-   
-   function load_cache_a (filename, outdate, loader)
+   local function load_cache_a (filename, outdate, loader)
       local result
       for _,v in pairs(path) do
 	 local fn = join(v, cache_dir, filename)
@@ -519,6 +509,16 @@ do
 	 return nil 
       else 
 	 return result 
+      end
+   end
+   function load_cache (filename, outdate)
+      local r = load_cache_a(filename ..  luc_suffix, outdate, luc_load)
+      if r then 
+	 return r
+      else
+         local r = load_cache_a(filename .. '.lua', outdate, loadfile)
+	 if r then save_cache_luc(filename, r) end -- update the precompiled cache
+	 return r
       end
    end
 
