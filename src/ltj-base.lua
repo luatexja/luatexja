@@ -1,14 +1,6 @@
 --
--- luatexja/base.lua
+-- luatexja/ltj-base.lua
 --
-luatexbase.provides_module({
-  name = 'luatexja.base',
-  date = '2013/12/22',
-  description = '',
-})
-module('luatexja.base', package.seeall)
-local err, warn, info, log = luatexbase.errwarinf(_NAME)
-
 local ltb = luatexbase
 local tostring = tostring
 local node, table, tex, token = node, table, tex, token
@@ -17,10 +9,18 @@ local cat_lp = luatexbase.catcodetables['latex-package']
 
 -------------------- 
 
-public_name = 'luatexja'
-public_version = 'alpha'
+local public_name = 'luatexja'
+local public_version = 'alpha'
 
 -------------------- Fully-expandable error messaging
+local _error_set_break, _error_set_message, _error_show
+local generic_error, _generic_warn_info
+local generic_warning, generic_warning_no_line
+local generic_info, generic_info_no_line
+local package_error, package_warning, package_warning_no_line
+local package_info, package_info_no_line
+local ltj_error, ltj_warning_no_line
+
 do
 --! LaTeX 形式のエラーメッセージ(\PackageError 等)を
 --! Lua 関数の呼び出しで行う.
@@ -37,16 +37,16 @@ do
     return str:gsub(err_break, LF):explode(LF)
   end
 
-  function _error_set_break(str)
+  _error_set_break = function (str)
     err_break = str
   end
 
-  function _error_set_message(msgcont, main, help)
+  _error_set_message = function (msgcont, main, help)
     err_main = message_cont(main, msgcont)
     err_help = into_lines(help)
   end
 
-  function _error_show(escchar)
+  _error_show = function (escchar)
     local escapechar = tex.escapechar
     local newlinechar = tex.newlinechar
     local errorcontextlines = tex.errorcontextlines
@@ -61,13 +61,13 @@ do
 
   local message_a = "Type  H <return>  for immediate help"
 
-  function generic_error(msgcont, main, ref, help)
+  generic_error = function (msgcont, main, ref, help)
     local mainref = main..".\n\n"..ref.."\n"..message_a
     _error_set_message(msgcont, mainref, help)
     _error_show(true)
   end
 
-  function _generic_warn_info(msgcont, main, warn, line)
+  _generic_warn_info = function (msgcont, main, warn, line)
     local mainc = message_cont(main, msgcont)
     local br = warn and "\n" or ""
     local out = warn and "term and log" or "log"
@@ -78,79 +78,78 @@ do
     tex.newlinechar = newlinechar
   end
 
-  function generic_warning(msgcont, main)
+  generic_warning = function (msgcont, main)
     _generic_warn_info(msgcont, main, true, true)
   end
-  function generic_warning_no_line(msgcont, main)
+  generic_warning_no_line = function (msgcont, main)
     _generic_warn_info(msgcont, main, true, false)
   end
-  function generic_info(msgcont, main)
+  generic_info = function (msgcont, main)
     _generic_warn_info(msgcont, main, false, true)
   end
-  function generic_info_no_line(msgcont, main)
+  generic_info_no_line = function (msgcont, main)
     _generic_warn_info(msgcont, main, false, false)
   end
 
-  function package_error(pkgname, main, help)
+  package_error = function (pkgname, main, help)
     generic_error("("..pkgname.."                ",
       "Package "..pkgname.." Error: "..main,
       "See the "..pkgname.." package documentation for explanation.",
       help)
   end
-  function package_warning(pkgname, main)
+  package_warning = function (pkgname, main)
     generic_warning("("..pkgname.."                ",
       "Package "..pkgname.." Warning: "..main)
   end
-  function package_warning_no_line(pkgname, main)
+  package_warning_no_line = function (pkgname, main)
     generic_warning_no_line("("..pkgname.."                ",
       "Package "..pkgname.." Warning: "..main)
   end
-  function package_info(pkgname, main)
+  package_info = function (pkgname, main)
     generic_info("("..pkgname.."             ",
       "Package "..pkgname.." Info: "..main)
   end
-  function package_info_no_line(pkgname, main)
+  package_info_no_line = function (pkgname, main)
     generic_info_no_line("("..pkgname.."             ",
       "Package "..pkgname.." Info: "..main)
   end
 
-  function ltj_error(main, help)
+  ltj_error = function (main, help)
     package_error(public_name, main, help)
   end
-  function ltj_warning_no_line(main)
+  ltj_warning_no_line = function (main)
     package_warning_no_line(public_name, main, help)
   end
 
 end
 -------------------- TeX stream I/O
-do
-
 --! ixbase.print() と同じ
-  --- Extension to tex.print(). Each argument string may contain
-  -- newline characters, in which case the string is output (to
-  -- TeX input stream) as multiple lines.
-  -- @param ... (string) string to output 
-  function mprint(...)
-    local arg = {...}
-    local lines = {}
-    if type(arg[1]) == "number" then
+--- Extension to tex.print(). Each argument string may contain
+-- newline characters, in which case the string is output (to
+-- TeX input stream) as multiple lines.
+-- @param ... (string) string to output 
+local function mprint(...)
+   local arg = {...}
+   local lines = {}
+   if type(arg[1]) == "number" then
       table.insert(lines, arg[1])
       table.remove(arg, 1)
-    end
-    for _, cnk in ipairs(arg) do
+   end
+   for _, cnk in ipairs(arg) do
       local ls = cnk:explode("\n")
       if ls[#ls] == "" then
-        table.remove(ls, #ls)
+	 table.remove(ls, #ls)
       end
       for _, l in ipairs(ls) do
-        table.insert(lines, l)
+	 table.insert(lines, l)
       end
-    end
-    return tex.print(unpack(lines))
-  end
-
+   end
+   return tex.print(unpack(lines))
 end
+
 -------------------- Handling of TeX values
+local to_dimen, to_skip, dump_skip 
+
 do
 
   local glue_spec_id = node.id("glue_spec")
@@ -168,7 +167,7 @@ do
   end
 
 --! ixbase.to_dimen() と同じ
-  function to_dimen(val)
+  to_dimen = function (val)
     if val == nil then
       return 0
     elseif type(val) == "number" then
@@ -190,7 +189,7 @@ do
   end
 
 --! ixbase.to_skip() と同じ
-  function to_skip(val)
+  to_skip = function (val)
     if type(val) == "userdata" then
       return val
     end
@@ -218,7 +217,7 @@ do
     return res
   end
 
-  function dump_skip(s)
+  dump_skip = function (s)
     print(("%s+%s<%s>-%s<%s>"):format(
       s.width or 0, s.stretch or 0, s.stretch_order or 0,
       s.shrink or 0, s.shrink_order or 0))
@@ -226,8 +225,9 @@ do
 
 end
 -------------------- Virtual table for LaTeX counters
-do
+local counter
 
+do
 --! ixbase.counter と同じ
   counter = {}
   local mt_counter = {}
@@ -241,9 +241,11 @@ do
   end
 
 --! ixbase.length は tex.skip と全く同じなので不要.
-
 end
+
 -------------------- Number handling in TeX source
+local scan_brace, scan_number 
+
 do
 
   local tok_escape = token.create("ltj@@q@escape")
@@ -252,7 +254,7 @@ do
   local c_id_char_given = token.command_id("char_given")
 
   local function error_scan()
-    _M.package_error("luatexja",
+    package_error("luatexja",
       "Missing number of a permitted form, treated as zero",
       "A number should have been here; I inserted '0'.")
   end
@@ -336,7 +338,7 @@ do
     ltb.add_to_callback("token_filter", proc, "ltj@grab@num", 1)
   end
 
-  function scan_brace()
+  scan_brace = function ()
     scan_with(1, function()
       local next = token.get_next()
       if next[1] == 1 then
@@ -349,7 +351,7 @@ do
     end)
   end
 
-  function scan_number()
+  scan_number = function ()
     scan_with(1, function()
       local next = get_expd_next()
       local res, ok = { tok_num }, false
@@ -386,33 +388,35 @@ do
 
 end
 -------------------- TeX register allocation
+local const_number, count_number, attribute_number, dimen_number, skip_number
+
 do
   local cmod_base_count = token.create('ltj@@count@zero')[2]
   local cmod_base_attr = token.create('ltj@@attr@zero')[2]
   local cmod_base_dimen = token.create('ltj@@dimen@zero')[2]
   local cmod_base_skip = token.create('ltj@@skip@zero')[2]
 
-  function const_number(name)
+  const_number = function (name)
     if name:sub(1, 1) == '\\' then name = name:sub(2) end
     return token.create(name)[2]
   end
 
-  function count_number(name)
+  count_number = function (name)
     if name:sub(1, 1) == '\\' then name = name:sub(2) end
     return token.create(name)[2] - cmod_base_count
   end
 
-  function attribute_number(name)
+  attribute_number = function (name)
     if name:sub(1, 1) == '\\' then name = name:sub(2) end
     return token.create(name)[2] - cmod_base_attr
   end
 
-  function dimen_number(name)
+  dimen_number = function (name)
     if name:sub(1, 1) == '\\' then name = name:sub(2) end
     return token.create(name)[2] - cmod_base_dimen
   end
 
-  function skip_number(name)
+  skip_number = function (name)
     if name:sub(1, 1) == '\\' then name = name:sub(2) end
     return token.create(name)[2] - cmod_base_skip
   end
@@ -420,7 +424,7 @@ do
 end
 -------------------- mock of debug logger
 
-if not _M.debug or _M.debug == _G.debug then
+if not debug or debug == _G.debug then
   local function no_op() end
   debug = no_op
   package_debug = no_op
@@ -432,8 +436,8 @@ if not _M.debug or _M.debug == _G.debug then
 end
 
 -------------------- getting next token
-cstemp = nil
-function get_cs(s)
+local cstemp = nil
+local function get_cs(s)
    cstemp = token.csname_name(token.get_next())
    tex.sprint(cat_lp,'\\' .. s)
 end
@@ -452,6 +456,9 @@ end
 
 require('lualibs-lpeg') -- string.split
 require('lualibs-os')   -- os.type
+
+local load_cache, save_cache_luc, save_cache
+
 do
    local path = kpse.expand_var("$TEXMFVAR;$TEXMFSYSVAR;$TEXMFCACHE")
    if os.type~='windows' then path = string.gsub(path, ':', ';') end
@@ -471,9 +478,9 @@ do
       if lfs.isdir(testpath) then savepath = testpath; break end
    end
 
-   function save_cache_luc(filename, t)
+   save_cache_luc = function (filename, t, serialized)
       local fullpath = savepath .. '/' ..  filename .. luc_suffix
-      local s = serialize(t, 'return', false)
+      local s = serialized or serialize(t, 'return', false)
       if s then
 	 local sa = load(s)
 	 local f = io.open(fullpath, 'wb')
@@ -485,24 +492,28 @@ do
       end
    end
 
-   function save_cache(filename, t)
+   save_cache = function (filename, t)
       local fullpath = savepath .. '/' ..  filename .. '.lua'
-      tofile(fullpath, t, 'return', false)
-      texio.write('(save cache: ' .. fullpath .. ')')
-      save_cache_luc(filename, t)
+      local s = serialize(t, 'return', false)
+      if s then
+	 local f = io.open(fullpath, 'w')
+	 if f then 
+	    f:write(s) 
+	    texio.write('(save cache: ' .. fullpath .. ')')
+	 end
+	 f:close()
+	 save_cache_luc(filename, t, s)
+      end
    end
 
-   local function luc_load (n)
-      texio.write('(load cache: ' .. n .. ')')
-      local f = loadfile(n, 'b'); return f
-   end
-   local function load_cache_a (filename, outdate, loader)
+   local function load_cache_a (filename, outdate)
       local result
       for _,v in pairs(path) do
 	 local fn = join(v, cache_dir, filename)
 	 if isreadable(fn) then 
-	    result = loader(fn)
-	    if result then result = result(); break end
+	    texio.write('(load cache: ' .. fn .. ')')
+	    result = loadfile(fn)
+	    result = result and result(); break
 	 end
       end
       if (not result) or outdate(result) then 
@@ -511,12 +522,12 @@ do
 	 return result 
       end
    end
-   function load_cache (filename, outdate)
-      local r = load_cache_a(filename ..  luc_suffix, outdate, luc_load)
+   load_cache = function (filename, outdate)
+      local r = load_cache_a(filename ..  luc_suffix, outdate)
       if r then 
 	 return r
       else
-         local r = load_cache_a(filename .. '.lua', outdate, loadfile)
+         local r = load_cache_a(filename .. '.lua', outdate)
 	 if r then save_cache_luc(filename, r) end -- update the precompiled cache
 	 return r
       end
@@ -524,5 +535,60 @@ do
 
 end
 
+
+luatexja.base = {
+   public_name = public_name, 
+   public_version = public_version, 
+   --
+   _error_set_break = _error_set_break, 
+   _error_set_message = _error_set_message, 
+   _error_show = _error_show, 
+   _generic_warn_info = _generic_warn_info, 
+   --
+   package_error = package_error, 
+   package_warning = package_warning, 
+   package_warning_no_line = package_warning_no_line, 
+   package_info = package_info, 
+   package_info_no_line = package_info_no_line, 
+   --
+   generic_error = generic_error, 
+   generic_warning = generic_warning, 
+   generic_warning_no_line = generic_warning_no_line, 
+   generic_info = generic_info, 
+   generic_info_no_line = generic_info_no_line, 
+   --
+   ltj_warning_no_line = ltj_warning_no_line, 
+   ltj_error = ltj_error, 
+   --
+   mprint = mprint, 
+   --
+   to_dimen = to_dimen, 
+   dump_skip = dump_skip, 
+   to_skip = to_skip, 
+   --
+   counter = counter, 
+   --
+   scan_brace = scan_brace, 
+   scan_number = scan_number, 
+   --
+   const_number = const_number, 
+   count_number = count_number, 
+   attribute_number = attribute_number, 
+   dimen_number = dimen_number, 
+   skip_number = skip_number, 
+   --
+   get_cs = get_cs, 
+   --
+   load_cache = load_cache, 
+   save_cache_luc = save_cache_luc, 
+   save_cache = save_cache, 
+   --
+   debug = debug, 
+   package_debug = package_debug, 
+   debug_logger = debug_logger, 
+   show_term = show_term, 
+   show_log = show_log, 
+   --
+}
 -------------------- all done
 -- EOF

@@ -174,7 +174,8 @@ luatexbase.add_to_callback("luatexja.find_char_class",
 local font_ivs_table = {} -- key: fontnumber
 local enable_ivs
 do
-   local ivs
+   local is_ivs_enabled = false
+   local ivs -- temp table
    local sort = table.sort
    local uniq_flag
    local function add_ivs_table(tg, unitable)
@@ -215,7 +216,7 @@ do
 
 -- loading and saving
    local font_ivs_basename = {} -- key: basename
-   local cache_ver = '4'
+   local cache_ver = 4
    local checksum = file.checksum
 
    local function prepare_ivs_data(n, id)
@@ -302,19 +303,25 @@ do
    end
 
    enable_ivs = function ()
-      luatexbase.add_to_callback('hpack_filter', 
-				 function (head) return do_ivs_repr(head) end,'do_ivs', 1)
-      luatexbase.add_to_callback('pre_linebreak_filter', 
-				 function (head) return do_ivs_repr(head) end, 'do_ivs', 1)
-      local ivs_callback = function (name, size, id)
-         return font_callback(
-            name, size, id, 
-            function (name, size, id) return luatexja.font_callback(name, size, id) end
-         )
-      end
-      luatexbase.add_to_callback('define_font',ivs_callback,"luatexja.ivs_font_callback", 1)
-      for i=1,font.nextid()-1 do
-         if identifiers[i] then prepare_ivs_data(i, identifiers[i]) end
+      if is_ivs_enabled then
+	 ltjb.package_warning('luatexja-otf',
+			      'luatexja.otf.enable_ivs() was already called, so this call is ignored', '')
+      else
+	 luatexbase.add_to_callback('hpack_filter', 
+				    function (head) return do_ivs_repr(head) end,'do_ivs', 1)
+	 luatexbase.add_to_callback('pre_linebreak_filter', 
+				    function (head) return do_ivs_repr(head) end, 'do_ivs', 1)
+	 local ivs_callback = function (name, size, id)
+	    return font_callback(
+	       name, size, id, 
+	       function (name, size, id) return luatexja.font_callback(name, size, id) end
+	    )
+	 end
+	 luatexbase.add_to_callback('define_font',ivs_callback,"luatexja.ivs_font_callback", 1)
+	 for i=1,font.nextid()-1 do
+	    if identifiers[i] then prepare_ivs_data(i, identifiers[i]) end
+	 end
+	 is_ivs_enabled = true
       end
    end
 end
