@@ -1,9 +1,13 @@
 %#!lualatex
 \documentclass{ltjsarticle}
-\usepackage{luatexja-fontspec,luatexja-otf, luacode, booktabs,array}
+\usepackage{luatexja-fontspec,luatexja-otf, luacode, booktabs,array,xcolor}
 \usepackage[scale=0.80]{geometry}
 
+% \IVS[?] 用
 \begin{luacode}
+   local fallback_color = 'red'  -- IVS がないときは，この色で既定文字を出力
+   local list_color = 'blue!50!black'     -- リスト表示の色
+
    local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
    local ubyte = unicode.utf8.byte
    local uchar = unicode.utf8.char
@@ -14,104 +18,76 @@
       if pt then
          local t = {}
          for i,_ in pairs(pt) do t[1+#t]=i end
-         sort(t)
+         sort(t); tex.sprint('\\textcolor{' .. list_color .. '}{')
          for _,i in ipairs(t) do 
             if i<0xF0 then -- only IVS
                tex.sprint('\\oalign{' .. s .. uchar(i+0xE0100)
                           .. '\\crcr\\hss\\tiny' .. tostring(i) .. '\\hss\\crcr}') 
             end
          end
+         tex.sprint('}')
+      else
+         tex.sprint('\\textcolor{' .. fallback_color .. '}{' .. s .. '}')
       end
    end
 \end{luacode}
 
-\def\MJI[#1]#2{#2\char\numexpr "E0100+#1\relax}%"
-\def\IVSL#1{\directlua{list_ivs('#1')}}
+\makeatletter
+
+%%%%%    \IVS[<selector number>]{<character>}
+%%%%% or \IVS<selector number>{<character>}
+%%%%% (<selector number>: 0--239, or `?')
+\def\ltj@ivs@out#1#2{#2\char\numexpr "E0100+#1\relax} % IVS
+\def\ltj@ivs@list?#1{\directlua{list_ivs('#1')}}
+\def\ltj@ivs@grab@num{\expandafter\expandafter\expandafter\ltj@ivs@out\ltj@grab@num}
+\def\ltj@ivs@nobracket{\@ifnextchar?{\ltj@ivs@list}{\ltj@ivs@grab@num}}
+\def\ltj@ivs@bracket[#1]{\ltj@ivs@nobracket#1}
+\def\IVS{\@ifnextchar[{\ltj@ivs@bracket}{\ltj@ivs@nobracket}}
+
+\let\MJI=\IVS
+
 \begin{document}
-\jfontspec{ipamjm} % IPA MJ 明朝
+\jfontspec{ipamjm} % IPAmj明朝
 
 例文はZRさんのブログ記事「ipamjmパッケージでアレしてみた」\footnote{%
 \verb+http://d.hatena.ne.jp/zrbabbler/20131214/1387029624+}より引用．
 
-\paragraph{標準状態では……}
+\paragraph{標準状態では……} 見事に異体字セレクタの部分が全角空きになっている．
 \begin{quote}
 \LARGE
-渡邉󠄏さんとか   % { } の中は U+9089 U+E010F
+渡邉󠄏さんとか%    { } の中は U+9089 U+E010F
 渡𫟪󠄂さんとか。% { } の中は U+2B7EA U+E0102
 \end{quote}
 
-\paragraph{IVS処理コードをここで読み込んだ．}\ 
+\paragraph{IVS処理コードをここで有効化した．}\ 
 \directlua{luatexja.otf.enable_ivs()}
 
 \begin{quote}
 \LARGE
-\MJI[15]{邉}\MJI[25]{邉}\MJI[27]{邉}\MJI[26]{邉}\MJI[26]{邉}\MJI[16]{邊}
-\MJI[18]{邊}\MJI[2]{𫟪}\MJI[17]{邊}〓\\
-\MJI[28]{邉}\MJI[29]{邉}\MJI[23]{邉}\MJI[15]{邊}\MJI[8]{邊}\MJI[20]{邉}
-\MJI[24]{邉}\MJI[19]{邉}\MJI[18]{邉}\MJI[16]{邉}\\
-\MJI[14]{邊}\MJI[10]{邊}\MJI[12]{邊}\MJI[11]{邊}\MJI[13]{邊}\MJI[9]{邊}
-\MJI[0]{𫟪}\MJI[1]{𫟪}〓\MJI[21]{邉}
+\MJI15{邉}\MJI25{邉}\MJI27{邉}\MJI26{邉}\MJI26{邉}\MJI16{邊}
+\MJI18{邊}\textcolor{blue}{\MJI2{𫟪}}\MJI17{邊}〓\\
+\MJI28{邉}\MJI29{邉}\MJI23{邉}\MJI15{邊}\MJI8{邊}\MJI20{邉}
+\MJI24{邉}\MJI19{邉}\MJI18{邉}\MJI16{邉}\\
+\MJI14{邊}\MJI10{邊}\MJI12{邊}\MJI11{邊}\MJI13{邊}\MJI9{邊}
+\textcolor{blue}{\MJI0{𫟪}}\textcolor{blue}{\MJI1{𫟪}}〓\MJI21{邉}
 \end{quote}
-「〓」はMJ番号を直接指定していたところなので，とりあえず無視している．
-なぜか𫟪(U+2B7EA)のIVSが機能していないようだが，フォント側にその記述がない，ということ？
+MJ番号を直接指定していたところは，このソース中では無視して下駄「〓」にした．
+なぜか青色で示した「𫟪」(U+2B7EA)のIVSが機能していないようだが，フォント側にその記述がない，ということ？
 
+\directlua{luatexja.otf.enable_ivs()}
 \begin{quote}
 \LARGE
-渡邉󠄏さんとか   % { } の中は U+9089 U+E010F
+渡邉󠄏さんとか%    { } の中は U+9089 U+E010F
 渡𫟪󠄂さんとか。% { } の中は U+2B7EA U+E0102
 \end{quote}
 
-\begin{center}
-IPA MJ 明朝\par\medskip
-\Large
-\begin{tabular}{c>{\tt}ll}
-\toprule
-文字&Unicode&IVS\\
-\midrule
-邉&U+9089&\IVSL{邉}\\
-邊&U+908A&\IVSL{邊}\\
-𫟪&U+2B7EA&\IVSL{𫟪}\\
-\bottomrule
-\end{tabular}
-\end{center}
 
-\jfontspec{kozminpr6n-regular} % 小塚明朝 Pr6N R
-\begin{center}
-小塚明朝 Pr6N R\par\medskip
-\Large
-\begin{tabular}{c>{\tt}ll}
-\toprule
-文字&Unicode&IVS\\
-\midrule
-邉&U+9089&\IVSL{邉}\\
-邊&U+908A&\IVSL{邊}\\
-𫟪&U+2B7EA&\IVSL{𫟪}\\
-\bottomrule
-\end{tabular}
-\end{center}
-
-
-\jfontspec{hanamina} % 花園明朝A
-\begin{center}
-花園明朝A\par\medskip
-\Large
-\begin{tabular}{c>{\tt}ll}
-\toprule
-文字&Unicode&IVS\\
-\midrule
-邉&U+9089&\IVSL{邉}\\
-邊&U+908A&\IVSL{邊}\\
-𫟪&U+2B7EA&\IVSL{𫟪}\\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\newpage
 \def\TEST{%
   奈良県葛󠄀城市と東京都葛󠄁飾区．%
   江戸川区葛西はどっち？
 }
 
+\paragraph{IVSとopentype featureの干渉テスト}
 
 \begin{quote}
  \Large
@@ -119,4 +95,29 @@ IPA MJ 明朝\par\medskip
  {\jfontspec[CJKShape=JIS1978]{KozMinPr6N-Regular}\TEST}\\
  {\jfontspec[CJKShape=JIS1990]{KozMinPr6N-Regular}\TEST}
 \end{quote}
+
+\newpage
+\def\TABLE#1#2{%
+   \begin{center}
+   #1\par\medskip
+   \jfontspec{#2}
+   \Large
+   \begin{tabular}{c>{\tt}ll}
+      \toprule
+      文字&Unicode&異体字\\
+      \midrule
+      邉&U+9089&\IVS?{邉}\\
+      邊&U+908A&\IVS?{邊}\\
+      𫟪&U+2B7EA&\IVS?{𫟪}\\
+      葛&U+845B&\IVS?{葛}\\
+      \bottomrule
+   \end{tabular}
+   \end{center}
+}
+
+\TABLE{IPAmj明朝}{ipamjm}
+\TABLE{小塚明朝 Pr6N R}{kozminpr6n-regular}
+\TABLE{花園明朝A}{hanamina}
+\TABLE{花園明朝 OpenType}{hanaminotpr6n-regular}
+
 \end{document}
