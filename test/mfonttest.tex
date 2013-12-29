@@ -1,0 +1,121 @@
+%#!lualatex
+\documentclass{ltjsarticle}
+
+%%% ltj-charrange.lua に本ドキュメント末尾のようなパッチが必要
+
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 42 番の文字範囲を「かな書体」用として宣言
+\ltjdefcharrange{42}{"3000-"30FF, "31F0-"31FF, "FF00-"FFEF, "1B000-"1B0FF}
+% 3000-303F CJK Symbols and Punctuation
+% 3040-309F Hiragana
+% 30A0-30FF Katakana
+% 31F0-31FF Katakana Phonetic Extensions
+% FF00-FFEF Halfwidth and Fullwidth Forms
+% 1B000-1B0FF Kana Supplement
+
+% 42 番の文字範囲を和文文字の範囲とする
+\ltjsetparameter{jacharrange={+42}}
+
+%% 42 にあまり大きい意味はない．既に使われていないもののうち
+%% 適当に大きいものをとった
+
+% 「現在のかな用書体」のフォント番号を格納する attribute
+\newluatexattribute\ltj@curkanafnt
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ここから Lua code
+\usepackage{luacode}
+
+\begin{luacode}
+local ltjc = luatexja.charrange
+
+local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
+local attr_curkfnt = luatexbase.attributes['ltj@curkanafnt']
+local attr_icflag = luatexbase.attributes['ltj@icflag']
+local has_attr = node.has_attribute
+local set_attr = node.set_attribute
+local id_glyph = node.id('glyph')
+
+local function font_replace_42(head)
+   for p in node.traverse_id(id_glyph, head) do
+      if (has_attr(p, attr_icflag) or 0)<=0 and ltjc.jcr_table_main[p.char]==42 then
+         set_attr(p, attr_curjfnt, 
+            has_attr(p, attr_curkfnt) or (has_attr(p, attr_curjfnt) or p.font))
+         -- 42 番の文字範囲に即する文字は，（もし和文ならば）かな書体で組まれる
+      end
+   end
+   return head
+end
+luatexbase.add_to_callback('hyphenate', 
+   function (head,tail)
+      return font_replace_42(head)
+   end,'replace_42', 1)
+
+\end{luacode}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ユーザ命令: \setkanafont <書体選択命令>, \unsetkanafont
+
+\def\setkanafont#1{%
+  \bgroup#1\directlua{luatexja.mfont_temp = \the\ltj@curjfnt}\egroup
+  \ltj@curkanafnt=\directlua{tex.sprint(luatexja.mfont_temp)}\relax
+}
+\def\unsetkanafont{\ltj@curkanafnt=-"7FFFFFFF\relax}%"
+
+\makeatother
+
+\usepackage{luatexja-fontspec}
+\setmainjfont{ipam.ttf}
+\setsansjfont{ipag.ttf}
+\newjfontfamily\kanaX{mogamb.ttc}% かな用書体1: MogaMincho Bold
+%%% ↑Y. Oz Vox (http://yozvox.web.fc2.com/) より入手可能
+\newjfontfamily\kanaY{ipag.ttf}%   かな用書体2: IPA ゴシック
+
+\begin{document}
+% \setkanafont はTeX のグルーピングに従う
+あいう漢字
+{\setkanafont\kanaY あいう漢字}%
+あいう漢字
+{\setkanafont\kanaX あいう漢字
+  {\setkanafont\kanaY あいう漢字}
+あいう漢字}
+
+% \unsetkanafont で解除可能
+{\setkanafont\kanaY あいう漢字
+  {\unsetkanafont あいう漢字}% ここだけ IPA 明朝
+あいう漢字}
+
+
+% ゴシック体に太明朝のカタカナを合わせる
+{\gtfamily\setkanafont\kanaX あいう漢字}
+
+% \setkanafont はメインの和文フォントに追従しない
+% サイズ変更にも追従しないので注意
+{\setkanafont\kanaY あいう漢字\gtfamily あいう漢字\Large あいうえお漢字}
+
+% サイズ変更命令には手動で \setkanafont を実行しないといけない
+{\setkanafont\kanaY あいう漢字\Large\setkanafont\kanaY あいう漢字}
+
+
+\gtfamily\setkanafont\kanaX
+これは，意味のないサンプルテキストです．「スペーシングはうまく行ってるかな？」
+
+\unsetkanafont
+これは，意味のないサンプルテキストです．「スペーシングはうまく行ってるかな？」
+
+\end{document}
+
+
+--- src/ltj-charrange.lua.orig	2013-12-29 16:58:52.482148630 +0900
++++ src/ltj-charrange.lua	2013-12-25 20:26:17.879807073 +0900
+@@ -28,8 +28,7 @@
+ --         external    1  2       216, (out of range): 'other'
+ 
+ -- initialize
+-jcr_table_main = {}
+-local jcr_table_main = jcr_table_main
++local jcr_table_main = {}
+ local jcr_cjk = 0; local jcr_noncjk = 1; local ucs_out = 0x110000
+ 
+ for i=0x80 ,0xFF      do jcr_table_main[i]=1 end

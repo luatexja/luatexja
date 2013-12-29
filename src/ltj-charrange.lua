@@ -28,7 +28,8 @@ pow_table[31*ATTR_RANGE] = pow(2, 31)
 --         external    1  2       216, (out of range): 'other'
 
 -- initialize
-local jcr_table_main = {}
+jcr_table_main = {}
+local jcr_table_main = jcr_table_main
 local jcr_cjk = 0; local jcr_noncjk = 1; local ucs_out = 0x110000
 
 for i=0x80 ,0xFF      do jcr_table_main[i]=1 end
@@ -40,7 +41,7 @@ function add_char_range(b,e,ind) -- ind: external range number
       ltjb.package_error('luatexja',
 			 "invalid character range number (" .. ind .. ")",
 			 "A character range number should be in the range 1.."
-                          .. 7+ATTR_RANGE-1 .. ",\n" ..
+                          .. 7*ATTR_RANGE-1 .. ",\n" ..
 			  "ignored.")
       return
    elseif b<0x80 or e>=ucs_out then
