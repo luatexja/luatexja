@@ -219,41 +219,56 @@ function luatexja.ext_print_global()
 end
 
 -- main process
--- mode = true iff main_process is called from pre_linebreak_filter
-local function main_process(head, mode, dir)
-   local p = head
-   p = ltjj.main(p,mode)
-   if p then p = ltjw.set_ja_width(p, dir) end
-   return p
+do
+   -- mode = true iff main_process is called from pre_linebreak_filter
+   local function main_process(head, mode, dir)
+      local p = head
+      p = ltjj.main(p,mode)
+      if p then p = ltjw.set_ja_width(p, dir) end
+      return p
+   end
+   
+   -- callbacks
+   
+   luatexbase.add_to_callback(
+      'pre_linebreak_filter', 
+      function (head,groupcode)
+	 return main_process(head, true, tex.textdir)
+      end,'ltj.pre_linebreak_filter',
+      luatexbase.priority_in_callback('pre_linebreak_filter',
+				      'luaotfload.node_processor') + 1)
+   luatexbase.add_to_callback(
+      'hpack_filter', 
+      function (head,groupcode,size,packtype, dir)
+	 return main_process(head, false, dir)
+      end,'ltj.hpack_filter',
+      luatexbase.priority_in_callback('hpack_filter',
+				      'luaotfload.node_processor') + 1)
 end
 
--- callbacks
-
-luatexbase.add_to_callback('pre_linebreak_filter', 
-   function (head,groupcode)
-      return main_process(head, true, tex.textdir)
-   end,'ltj.pre_linebreak_filter',
-   luatexbase.priority_in_callback('pre_linebreak_filter',
-				   'luaotfload.node_processor') + 1)
-luatexbase.add_to_callback('hpack_filter', 
-  function (head,groupcode,size,packtype, dir)
-     return main_process(head, false, dir)
-  end,'ltj.hpack_filter',
-   luatexbase.priority_in_callback('hpack_filter',
-				   'luaotfload.node_processor') + 1)
+-- hyphenate
+do
+   local replace_altfont = ltjf.replace_altfont
+   luatexbase.add_to_callback(
+      'hyphenate', 
+      function (head,tail)
+	 return replace_altfont(head)
+      end,'ltj.replace_altfont',
+      luatexbase.priority_in_callback('hyphenate', 'ltj.hyphenate')+1)
+end
 
 -- define_font
-
-local otfl_fdr = fonts.definers.read
-function luatexja.font_callback(name, size, id)
-  return ltjf.font_callback(
-     name, size, id, 
-     function (name, size, id) return ltjr.font_callback(name, size, id, otfl_fdr) end
-  )
+do
+   local otfl_fdr = fonts.definers.read
+   local ltjr_font_callback = ltjr.font_callback
+   function luatexja.font_callback(name, size, id)
+      return ltjf.font_callback(
+	 name, size, id, 
+	 function (name, size, id) return ltjr_font_callback(name, size, id, otfl_fdr) end
+      )
+   end
+   luatexbase.add_to_callback('define_font',luatexja.font_callback,"luatexja.font_callback", 1)
 end
---luatexbase.remove_from_callback('define_font',"luaotfload.define_font")
-luatexbase.add_to_callback('define_font',luatexja.font_callback,"luatexja.font_callback", 1)
-
 
 
 

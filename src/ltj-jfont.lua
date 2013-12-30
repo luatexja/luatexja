@@ -122,49 +122,51 @@ function define_jfm(t)
    defjfm_res = t
 end
 
-local function mult_table(old,scale) -- modified from table.fastcopy
-    if old then
-       local new = { }
-       for k,v in next, old do
-	  if type(v) == "table" then
-	     new[k] = mult_table(v,scale)
-	  elseif type(v) == "number" then
-	     new[k] = round(v*scale)
-          else
-             new[k] = v
-	  end
-       end
-       return new
-    else return nil end
-end
-
-local function update_jfm_cache(j,sz)
-   if metrics[j].size_cache[sz] then return end
-   local t = {}
-   metrics[j].size_cache[sz] = t
-   t.chars = metrics[j].chars
-   t.char_type = mult_table(metrics[j].char_type, sz)
-   for i,v in pairs(t.char_type) do
-      if type(i) == 'number' then -- char_type
-	 for k,w in pairs(v.glue) do
-	    local g, h = node.new(id_glue), node_new(id_glue_spec)
-            v.glue[k] = {g, (w[5] and w[5]/sz or 0)}
-            h.width, h.stretch, h.shrink = w[1], w[2], w[3]
-            h.stretch_order, h.shrink_order = 0, 0
-            g.subtype = 0; g.spec = h; set_attr(g, attr_icflag, FROM_JFM + 
-                                                (w[4] and w[4]/sz or 0)); 
+do
+   local function mult_table(old,scale) -- modified from table.fastcopy
+      if old then
+	 local new = { }
+	 for k,v in next, old do
+	    if type(v) == "table" then
+	       new[k] = mult_table(v,scale)
+	    elseif type(v) == "number" then
+	       new[k] = round(v*scale)
+	    else
+	       new[k] = v
+	    end
 	 end
-	 for k,w in pairs(v.kern) do
-	    w[2] = w[2]/sz
+	 return new
+      else return nil end
+   end
+   
+   function update_jfm_cache(j,sz)
+      if metrics[j].size_cache[sz] then return end
+      local t = {}
+      metrics[j].size_cache[sz] = t
+      t.chars = metrics[j].chars
+      t.char_type = mult_table(metrics[j].char_type, sz)
+      for i,v in pairs(t.char_type) do
+	 if type(i) == 'number' then -- char_type
+	    for k,w in pairs(v.glue) do
+	       local g, h = node.new(id_glue), node_new(id_glue_spec)
+	       v.glue[k] = {g, (w[5] and w[5]/sz or 0)}
+	       h.width, h.stretch, h.shrink = w[1], w[2], w[3]
+	       h.stretch_order, h.shrink_order = 0, 0
+	       g.subtype = 0; g.spec = h; set_attr(g, attr_icflag, FROM_JFM + 
+						      (w[4] and w[4]/sz or 0)); 
+	    end
+	    for k,w in pairs(v.kern) do
+	       w[2] = w[2]/sz
+	    end
 	 end
       end
+      t.kanjiskip = mult_table(metrics[j].kanjiskip, sz)
+      t.xkanjiskip = mult_table(metrics[j].xkanjiskip,sz)
+      t.zw = round(metrics[j].zw*sz)
+      t.zh = round(metrics[j].zh*sz)
    end
-   t.kanjiskip = mult_table(metrics[j].kanjiskip, sz)
-   t.xkanjiskip = mult_table(metrics[j].xkanjiskip,sz)
-   t.zw = round(metrics[j].zw*sz)
-   t.zh = round(metrics[j].zh*sz)
 end
-
+local update_jfm_cache = update_jfm_cache
 luatexbase.create_callback("luatexja.find_char_class", "data", 
 			   function (arg, fmtable, char)
 			      return 0
@@ -177,123 +179,259 @@ function find_char_class(c,m)
       luatexbase.call_callback("luatexja.find_char_class", 0, m, c)
 end
 
-local function load_jfont_metric()
-   if jfm_file_name=='' then 
-      ltjb.package_error('luatexja',
-			 'no JFM specified',
-			 'To load and define a Japanese font, a JFM must be specified.'..
-			  "The JFM 'ujis' will be  used for now.")
-      jfm_file_name='ujis'
-   end
-   for j,v in ipairs(metrics) do 
-      if v.name==jfm_file_name then return j end
-   end
-   luatexja.load_lua('jfm-' .. jfm_file_name .. '.lua')
-   if defjfm_res then
-      defjfm_res.name = jfm_file_name
-      table.insert(metrics, defjfm_res)
-      return #metrics
-   else 
-      return nil
-   end
-end
-
 
 ------------------------------------------------------------------------
 -- LOADING JAPANESE FONTS
 ------------------------------------------------------------------------
-local cstemp
 
--- EXT
-function jfontdefX(g)
-  local t = token.get_next()
-  cstemp=token.csname_name(t)
-  if g then luatexja.is_global = '\\global' else luatexja.is_global = '' end
-  tex.sprint(cat_lp, '\\expandafter\\font\\csname ' .. cstemp .. '\\endcsname')
-end
-
-luatexbase.create_callback("luatexja.define_jfont", "data", function (ft, fn) return ft end)
-
--- EXT
-function jfontdefY() -- for horizontal font
-   local j = load_jfont_metric()
-   local fn = font.id(cstemp)
-   local f = getfont(fn)
-   if not j then 
-      ltjb.package_error('luatexja',
-			 "bad JFM `" .. jfm_file_name .. "'",
-			 'The JFM file you specified is not valid JFM file.\n'..
-			    'So defining Japanese font is cancelled.')
-      tex.sprint(cat_lp, luatexja.is_global .. '\\expandafter\\let\\csname ' ..cstemp 
-             .. '\\endcsname=\\relax')
-     return 
-   end
-   update_jfm_cache(j, f.size)
-   local sz = metrics[j].size_cache[f.size]
-   local fmtable = { jfm = j, size = f.size, var = jfm_var, 
-		     zw = sz.zw, zh = sz.zh, 
-		     chars = sz.chars, char_type = sz.char_type,
-		     kanjiskip = sz.kanjiskip, xkanjiskip = sz.xkanjiskip, 
-		    }
-      
-   fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
-   font_metric_table[fn]=fmtable
-   tex.sprint(cat_lp, luatexja.is_global .. '\\protected\\expandafter\\def\\csname ' 
-          .. cstemp  .. '\\endcsname{\\ltj@curjfnt=' .. fn .. '\\relax}')
-end
-
--- zw, zh
-function load_zw()
-   local a = font_metric_table[tex.attribute[attr_curjfnt]]
-   if a then
-      tex.setdimen('ltj@zw', a.zw)
-   else 
-      tex.setdimen('ltj@zw',0)
-   end
-end
-
-function load_zh()
-   local a = font_metric_table[tex.attribute[attr_curjfnt]]
-   if a then
-      tex.setdimen('ltj@zh', a.zh)
-   else 
-      tex.setdimen('ltj@zh',0)
-   end
-end
-
--- extract jfm_file_name and jfm_var
-local function extract_metric(name)
-   local basename=name
-   local tmp = utf.sub(basename, 1, 5)
-   jfm_file_name = ''; jfm_var = ''
-   if tmp == 'file:' or tmp == 'name:' or tmp == 'psft:' then
-      basename = utf.sub(basename, 6)
-   end
-   local p = utf.find(basename, ":")
-   if p then 
-      basename = utf.sub(basename, p+1)
-   else return 
-   end
-   -- now basename contains 'features' only.
-   p=1
-   while p do
-      local q = utf.find(basename, ";", p+1) or utf.len(basename)+1
-      if utf.sub(basename, p, p+3)=='jfm=' and q>p+4 then
-	 jfm_file_name = utf.sub(basename, p+4, q-1)
-      elseif utf.sub(basename, p, p+6)=='jfmvar=' and q>p+6 then
-	 jfm_var = utf.sub(basename, p+7, q-1)
+do
+   local cstemp
+   local function load_jfont_metric()
+      if jfm_file_name=='' then 
+	 ltjb.package_error('luatexja',
+			    'no JFM specified',
+			    'To load and define a Japanese font, a JFM must be specified.'..
+			    "The JFM 'ujis' will be  used for now.")
+	 jfm_file_name='ujis'
       end
-      if utf.len(basename)+1==q then p = nil else p = q + 1 end
+      for j,v in ipairs(metrics) do 
+	 if v.name==jfm_file_name then return j end
+      end
+      luatexja.load_lua('jfm-' .. jfm_file_name .. '.lua')
+      if defjfm_res then
+	 defjfm_res.name = jfm_file_name
+	 table.insert(metrics, defjfm_res)
+	 return #metrics
+      else 
+	 return nil
+      end
    end
-   return
+
+-- EXT
+   function jfontdefX(g)
+      local t = token.get_next()
+      cstemp=token.csname_name(t)
+      if g then luatexja.is_global = '\\global' else luatexja.is_global = '' end
+      tex.sprint(cat_lp, '\\expandafter\\font\\csname ' .. cstemp .. '\\endcsname')
+   end
+   
+   luatexbase.create_callback("luatexja.define_jfont", "data", function (ft, fn) return ft end)
+
+-- EXT
+   function jfontdefY() -- for horizontal font
+      local j = load_jfont_metric()
+      local fn = font.id(cstemp)
+      local f = getfont(fn)
+      if not j then 
+	 ltjb.package_error('luatexja',
+			    "bad JFM `" .. jfm_file_name .. "'",
+			    'The JFM file you specified is not valid JFM file.\n'..
+			       'So defining Japanese font is cancelled.')
+	 tex.sprint(cat_lp, luatexja.is_global .. '\\expandafter\\let\\csname ' ..cstemp 
+		       .. '\\endcsname=\\relax')
+	 return 
+      end
+      update_jfm_cache(j, f.size)
+      local sz = metrics[j].size_cache[f.size]
+      local fmtable = { jfm = j, size = f.size, var = jfm_var, 
+			zw = sz.zw, zh = sz.zh, 
+			chars = sz.chars, char_type = sz.char_type,
+			kanjiskip = sz.kanjiskip, xkanjiskip = sz.xkanjiskip, 
+      }
+      
+      fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
+      font_metric_table[fn]=fmtable
+      tex.sprint(cat_lp, luatexja.is_global .. '\\protected\\expandafter\\def\\csname ' 
+		    .. cstemp  .. '\\endcsname{\\ltj@curjfnt=' .. fn .. '\\relax}')
+   end
 end
 
--- replace fonts.define.read()
-function font_callback(name, size, id, fallback)
-   extract_metric(name)
-   -- In the present imple., we don't remove "jfm=..." from name.
-   return fallback(name, size, id)
+do
+-- EXT: zw, zh
+   function load_zw()
+      local a = font_metric_table[tex.attribute[attr_curjfnt]]
+      tex.setdimen('ltj@zw', a and a.zw or 0)
+   end
+   
+   function load_zh()
+      local a = font_metric_table[tex.attribute[attr_curjfnt]]
+      tex.setdimen('ltj@zh', a and a.zh or 0)
+   end
 end
+
+do
+   -- extract jfm_file_name and jfm_var
+   local function extract_metric(name)
+      local basename=name
+      local tmp = utf.sub(basename, 1, 5)
+      jfm_file_name = ''; jfm_var = ''
+      if tmp == 'file:' or tmp == 'name:' or tmp == 'psft:' then
+	 basename = utf.sub(basename, 6)
+      end
+      local p = utf.find(basename, ":")
+      if p then 
+	 basename = utf.sub(basename, p+1)
+      else return 
+      end
+      -- now basename contains 'features' only.
+      p=1
+      while p do
+	 local q = utf.find(basename, ";", p+1) or utf.len(basename)+1
+	 if utf.sub(basename, p, p+3)=='jfm=' and q>p+4 then
+	    jfm_file_name = utf.sub(basename, p+4, q-1)
+	 elseif utf.sub(basename, p, p+6)=='jfmvar=' and q>p+6 then
+	    jfm_var = utf.sub(basename, p+7, q-1)
+	 end
+	 if utf.len(basename)+1==q then p = nil else p = q + 1 end
+      end
+      return
+   end
+   
+   -- replace fonts.define.read()
+   function font_callback(name, size, id, fallback)
+      extract_metric(name)
+      -- In the present imple., we don't remove "jfm=..." from name.
+      return fallback(name, size, id)
+   end
+end
+
+------------------------------------------------------------------------
+-- ALTERNATE FONTS
+------------------------------------------------------------------------
+alt_font_table = {}
+local alt_font_table = alt_font_table
+local attr_curaltfnt = {}
+local ucs_out = 0x110000
+
+------ for TeX interface
+-- EXT
+function set_alt_font(b,e,ind,bfnt)
+   -- ind: 新フォント, bfnt: 基底フォント
+  if b<0x80 or e>=ucs_out then
+      ltjb.package_warning('luatexja',
+			 'bad character range ([' .. b .. ',' .. e .. ']). ' ..
+			   'I take the intersection with [0x80, 0x10ffff].')
+   elseif b>e then
+      local j=b; e=b; b=j
+   end
+   if bfnt==ind then ind = nil end -- ind == bfnt の場合はテーブルから削除
+   if not alt_font_table[bfnt] then alt_font_table[bfnt]={} end
+   local t = alt_font_table[bfnt]
+   for i=math.max(0x80,b),math.min(ucs_out-1,e) do
+      t[i]=ind
+   end
+end
+
+-- EXT
+function clear_alt_font(bfnt)
+   if alt_font_table[bfnt] then 
+      local t = alt_font_table[bfnt]
+      for i,_ in pairs(t) do t[i]=nil; end
+   end
+end
+
+------ callback
+function replace_altfont(head)
+   for p in node.traverse_id(id_glyph, head) do
+      local pf = p.font
+      if p.font == (has_attr(p, attr_curjfnt) or 0) then
+         if alt_font_table[pf] and alt_font_table[pf][p.char] then
+            local n = alt_font_table[pf][p.char]
+            if n then 
+               p.font = n; set_attr(p, attr_curjfnt, n)
+            end
+         end
+      end
+   end
+   return head
+end
+
+------ for LaTeX interface
+
+local alt_font_table_latex = {}
+
+-- EXT
+function clear_alt_font_latex(bbase)
+   local t = alt_font_table_latex[bbase]
+   if t then
+      for j,v in pairs(t) do t[j] = nil end 
+   end
+end
+
+-- EXT
+function set_alt_font_latex(b,e,ind,bbase)
+   -- ind: Alt font の enc/fam/ser/shape, bbase: 基底フォントの enc/fam/ser/shape
+  if b<0x80 or e>=ucs_out then
+      ltjb.package_warning('luatexja',
+			 'bad character range ([' .. b .. ',' .. e .. ']). ' ..
+			   'I take the intersection with [0x80, 0x10ffff].')
+   elseif b>e then
+      local j=b; e=b; b=j
+   end
+   if not alt_font_table_latex[bbase] then alt_font_table_latex[bbase]={} end
+   local t = alt_font_table_latex[bbase]
+   if not t[ind] then t[ind] = {} end
+   for i=math.max(0x80,b),math.min(ucs_out-1,e) do
+      for j,v in pairs(t) do
+         if v[i] then -- remove old entry
+            if j~=ind then v[i]=nil end; break
+         end
+      end
+      t[ind][i]=true
+    end
+    -- remove the empty tables
+    for j,v in pairs(t) do
+       local flag_clear = true
+       for k,_ in pairs(v) do flag_clear = false; break end
+       if flag_clear then t[j]=nil end
+    end
+    if ind==bbase  then t[bbase] = nil end
+end
+
+-- ここから先は 新 \selectfont の内部でしか実行されない
+do
+   local alt_font_base, alt_font_base_num
+   
+-- EXT
+   function output_alt_font_cmd(bbase)
+      alt_font_base = bbase
+      alt_font_base_num = tex.getattribute(attr_curjfnt)
+      local t = alt_font_table[alt_font_base_num]
+      if t then 
+	 for i,_ in pairs(t) do t[i]=nil end
+      end
+      t = alt_font_table_latex[bbase]
+      if t then
+	 for i,_ in pairs(t) do
+	    tex.sprint(cat_lp, '\\ltj@pickup@altfont@aux{' .. i .. '}')
+	 end
+      end
+   end
+   
+-- EXT
+   function pickup_alt_font_a(size_str)
+      local t = alt_font_table_latex[alt_font_base]
+      if t then
+	 for i,v in pairs(t) do
+	    tex.sprint(cat_lp, '\\expandafter\\ltj@pickup@altfont@copy'
+			  .. '\\csname ' .. i .. '/' .. size_str .. '\\endcsname{' .. i .. '}')
+	 end
+      end
+   end
+   
+-- EXT
+   function pickup_alt_font_b(afnt_num, afnt_base)
+      local t = alt_font_table[alt_font_base_num] 
+      if not t then t = {}; alt_font_table[alt_font_base_num] = t end
+      for i,v in pairs(alt_font_table_latex[alt_font_base]) do
+	 if i == afnt_base then
+	    for j,_ in pairs(v) do t[j]=afnt_num end
+	    return
+	 end
+      end
+   end
+end
+
 
 ------------------------------------------------------------------------
 -- MISC

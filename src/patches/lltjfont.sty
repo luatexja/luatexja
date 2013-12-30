@@ -641,4 +641,52 @@
     \ifin@\jfam#2\relax\else\mathgroup#2\relax\fi
   \expandafter\math@egroup\fi}%
 
+%%%%%% Alternate Japanese Fonts
+%%%% \DeclareAlternateKanjiFont<Benc><Bfam><Bser><Bshape><Aenc><Afam><Aser><Ashape><range>
+% いつも global
+\def\DeclareAlternateKanjiFont#1#2#3#4#5#6#7#8#9{%
+  {\def\ltj@temp@bfont{#1/#2/#3/#4}\def\ltj@temp@afont{#5/#6/#7/#8}%
+   \expandafter\ltj@@altfont@latex#9,,}\ignorespaces}
+\def\ltj@@altfont@latex#1,{\def\ltj@temp{#1}%
+  \ifx\ltj@temp\empty\let\@next=\relax\else
+  \ltj@@altfont@latexA{#1}\let\@next=\ltj@@altfont@latex\fi\@next}
+\def\ltj@@altfont@latexA#1{\ltj@@altfont@latexB#1--\@nil}
+\def\ltj@@altfont@latexB#1-#2-#3\@nil{\def\ltj@temp{#3}%
+  \ifx\ltj@temp\empty
+    \ltj@tempcnta=#1\relax\ltj@tempcntb=\ltj@tempcnta
+  \else
+    \def\ltj@temp{#1}%
+    \ifx\ltj@temp\empty\ltj@tempcnta='200\else\ltj@tempcnta=#1\fi\relax
+    \def\ltj@temp{#2}%
+    \ifx\ltj@temp\empty\ltj@tempcntb="10FFFF\else\ltj@tempcntb=#2\fi\relax%"
+  \fi
+  \directlua{luatexja.jfont.set_alt_font_latex(
+    \the\ltj@tempcnta,\the\ltj@tempcntb, 
+    '\luatexluaescapestring{\ltj@temp@afont}',
+    '\luatexluaescapestring{\ltj@temp@bfont}')}%
+  }
+
+%%%% \ClearAlternateKanjiFont<Benc><Bfam><Bser><Bshape>
+% いつも global
+\def\ClearAlternateKanjiFont#1#2#3#4{%
+   \directlua{luatexja.jfont.clear_alt_font_latex(
+      '\luatexluaescapestring{#1/#2/#3/#4}')}}
+
+% \selectfont 上書き
+\let\ltj@@alt@selectfont@orig=\selectfont
+\def\selectfont{%
+  \ltj@@alt@selectfont@orig
+  % alt fonts の定義
+  \directlua{luatexja.jfont.output_alt_font_cmd('\luatexluaescapestring{\curr@kfontshape}')}%
+  % 定義した alt fonts のデータを \ltjdeclarealtfont に渡すのと同等の処理をする
+  \directlua{luatexja.jfont.pickup_alt_font_a('\f@size')}%
+}
+\def\ltj@pickup@altfont@aux#1{%
+  {\edef\font@name{\csname #1/\f@size\endcsname}\pickup@jfont}%
+}
+\def\ltj@pickup@altfont@copy#1#2{%
+  \ltj@@getjfontnumber#1%
+  \directlua{luatexja.jfont.pickup_alt_font_b(\the\ltj@tempcntc,'\luatexluaescapestring{#2}')}%
+}
+
 \endinput

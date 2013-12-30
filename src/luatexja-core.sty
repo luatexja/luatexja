@@ -435,6 +435,42 @@
 \protected\def\ltjsetmathletter#1{\directlua{luatexja.math.is_math_letters[#1]=true}}
 \protected\def\ltjunsetmathletter#1{\directlua{luatexja.math.is_math_letters[#1]=false}}
 
+
+%%%%%%%% \ltjdeclarealtfont<base_font_cs><alt_font_cs>{100-200,3000-,5000,...}
+% <base_font_cs> の 第 3 引数の文字達は <alt_font_cs> で組む
+% いつも global
+\def\ltj@@getjfontnumber#1{% result in \ltj@tempcntc 
+  \bgroup#1\directlua{luatexja.__temp = \the\ltj@curjfnt}\egroup
+  \ltj@tempcntc=\directlua{tex.sprint(luatexja.__temp)}\relax}
+\protected\def\ltjdeclarealtfont#1#2#3{%
+  {\ltj@@getjfontnumber#1\@tempcnta=\ltj@tempcntc% \@tempcnta: 基底フォント
+   \ltj@@getjfontnumber#2%
+   \expandafter\ltj@@altfont#3,,}\ignorespaces}
+\def\ltj@@altfont#1,{\def\ltj@temp{#1}%
+  \ifx\ltj@temp\empty\let\@next=\relax\else
+  \ltj@@altfontA{#1}\let\@next=\ltj@@altfont\fi\@next}
+\def\ltj@@altfontA#1{\ltj@@altfontB#1--\@nil}
+\def\ltj@@altfontB#1-#2-#3\@nil{\def\ltj@temp{#3}%
+  \ifx\ltj@temp\empty
+    \ltj@tempcnta=#1 \ltj@tempcntb=\ltj@tempcnta
+  \else
+    \def\ltj@temp{#1}%
+    \ifx\ltj@temp\empty\ltj@tempcnta='200\else\ltj@tempcnta=#1\fi\relax
+    \def\ltj@temp{#2}%
+    \ifx\ltj@temp\empty\ltj@tempcntb="10FFFF\else\ltj@tempcntb=#2\fi\relax%"
+  \fi
+  \directlua{luatexja.jfont.set_alt_font(
+    \the\ltj@tempcnta,\the\ltj@tempcntb,
+    \the\ltj@tempcntc, \the\@tempcnta)}%
+  }
+
+%%%%%%%% \ltjclearaltfont<font_cs>
+% <font_cs> の文字は全部 <font_cs> 本来の文字で組む
+\protected\def\ltjclearaltfont#1{%
+  {\ltj@@getjfontnumber#1%
+   \directlua{luatexja.jfont.clear_alt_font(\the\ltj@tempcntc)}}\ignorespaces}
+
+
 %%------------------ Load module for the format
 
 \ifltj@in@latex                 %<*LaTeX>
