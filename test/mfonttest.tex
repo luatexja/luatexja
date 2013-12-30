@@ -1,15 +1,19 @@
 %#!lualatex
 \documentclass{ltjsarticle}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% TeX interface
+
 \makeatletter
 \def\ltj@@getjfontnumber#1{% result in \ltj@tempcntc 
   \bgroup#1\directlua{luatexja.__temp = \the\ltj@curjfnt}\egroup
   \ltj@tempcntc=\directlua{tex.sprint(luatexja.__temp)}\relax}
 
 %%%%%%%% 公開命令
-%%%% \ltjsetaltfont<base_font_cs><alt_font_cs>{100-200,3000-,5000,...}
+%%%% \ltjdeclarealtfont<base_font_cs><alt_font_cs>{100-200,3000-,5000,...}
 % <base_font_cs> の 第 3 引数の文字達は <alt_font_cs> で組む
-\protected\def\ltjsetaltfont#1#2#3{%
+% いつも global
+\protected\def\ltjdeclarealtfont#1#2#3{%
   {\ltj@@getjfontnumber#1\@tempcnta=\ltj@tempcntc% \@tempcnta: 基底フォント
    \ltj@@getjfontnumber#2%
    \expandafter\ltj@@altfont#3,,}\ignorespaces}
@@ -53,8 +57,8 @@ local set_attr = node.set_attribute
 local id_glyph = node.id('glyph')
 local ltjb = luatexja.base
 
-local function set_alt_font(b,e,ind,fnum)
-   -- ind: 新フォント, fnum: 基底フォント
+local function set_alt_font(b,e,ind,bfnt)
+   -- ind: 新フォント, bfnt: 基底フォント
   if b<0x80 or e>=ucs_out then
       ltjb.package_warning('luatexja',
 			 'bad character range ([' .. b .. ',' .. e .. ']). ' ..
@@ -62,17 +66,18 @@ local function set_alt_font(b,e,ind,fnum)
    elseif b>e then
       local j=b; e=b; b=j
    end
-   if not alt_font_table[fnum] then alt_font_table[fnum]={} end
-   local t = alt_font_table[fnum]
+   if bfnt==ind then ind = nil end -- ind == bfnt の場合はテーブルから削除
+   if not alt_font_table[bfnt] then alt_font_table[bfnt]={} end
+   local t = alt_font_table[bfnt]
    for i=math.max(0x80,b),math.min(ucs_out-1,e) do
       t[i]=ind
    end
 end
 luatexja.jfont.set_alt_font = set_alt_font
 
-local function clear_alt_font(fnum)
-   if alt_font_table[fnum] then 
-      local t = alt_font_table[fnum]
+local function clear_alt_font(bfnt)
+   if alt_font_table[bfnt] then 
+      local t = alt_font_table[bfnt]
       for i,_ in pairs(t) do t[i]=nil; end
    end
 end
@@ -99,24 +104,153 @@ luatexbase.add_to_callback('hyphenate',
  end,'ltj.replace_altfont',
  luatexbase.priority_in_callback('hyphenate', 'ltj.hyphenate')+1)
 
-
 \end{luacode*}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% LaTeX interface
+
+
+\begin{luacode*} -- 113 行目
+local alt_font_table_latex = {}
+local alt_font_table = luatexja.jfont.alt_font_table
+
+local ucs_out = 0x110000
+local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
+local ltjb = luatexja.base
+
+local function set_alt_font_latex(b,e,ind,bbase)
+   -- ind: Alt font の enc/fam/ser/shape, bbase: 基底フォントの enc/fam/ser/shape
+  if b<0x80 or e>=ucs_out then
+      ltjb.package_warning('luatexja',
+			 'bad character range ([' .. b .. ',' .. e .. ']). ' ..
+			   'I take the intersection with [0x80, 0x10ffff].')
+   elseif b>e then
+      local j=b; e=b; b=j
+   end
+   if not alt_font_table_latex[bbase] then alt_font_table_latex[bbase]={} end
+   local t = alt_font_table_latex[bbase]
+   if not t[ind] then t[ind] = {} end
+   for i=math.max(0x80,b),math.min(ucs_out-1,e) do
+      for j,v in pairs(t) do
+         if v[i] then -- remove old entry
+            if j~=ind then v[i]=nil end; break
+         end
+      end
+      t[ind][i]=true
+    end
+    -- remove the empty tables
+    for j,v in pairs(t) do
+       local flag_clear = true
+       for k,_ in pairs(v) do flag_clear = false; break end
+       if flag_clear then t[j]=nil end
+    end
+    if ind==bbase  then t[bbase] = nil end
+end
+luatexja.jfont.set_alt_font_latex = set_alt_font_latex
+
+-- ここから先は 新 \selectfont の内部でしか実行されない
+
+local alt_font_base, alt_font_base_num
+
+local function output_alt_font_cmd(bbase)
+   alt_font_base = bbase
+   alt_font_base_num = tex.getattribute(attr_curjfnt)
+   local t = alt_font_table[alt_font_base_num]
+   if t then 
+      for i,_ in pairs(t) do t[i]=nil end
+   end
+   t = alt_font_table_latex[bbase]
+   if t then
+      for i,_ in pairs(t) do
+         tex.sprint('\\ltj@pickup@altfont@aux{' .. i .. '}')
+      end
+   end
+end
+luatexja.jfont.output_alt_font_cmd = output_alt_font_cmd
+
+local function pickup_alt_font_a(size_str)
+   local t = alt_font_table_latex[alt_font_base]
+   if t then
+      for i,v in pairs(t) do
+         tex.sprint('\\expandafter\\ltj@pickup@altfont@copy'
+            .. '\\csname ' .. i .. '/' .. size_str .. '\\endcsname{' .. i .. '}')
+      end
+   end
+end
+luatexja.jfont.pickup_alt_font_a = pickup_alt_font_a
+
+local function pickup_alt_font_b(afnt_num, afnt_base) -- base font: attr_jfnt の値
+   local t = alt_font_table[alt_font_base_num] 
+   if not t then t = {}; alt_font_table[alt_font_base_num] = t end
+   for i,v in pairs(alt_font_table_latex[alt_font_base]) do
+      if i == afnt_base then
+         for j,_ in pairs(v) do t[j]=afnt_num end
+         return
+      end
+   end
+end
+luatexja.jfont.pickup_alt_font_b = pickup_alt_font_b
+ \end{luacode*}
+
+%%%%%%%% 公開命令
+%%%% \DeclareAlternateKanjiFont<Benc><Bfam><Bser><Bshape><Aenc><Afam><Aser><Ashape><range>
+% いつも global
+\def\DeclareAlternateKanjiFont#1#2#3#4#5#6#7#8#9{%
+  {\def\ltj@temp@bfont{#1/#2/#3/#4}\def\ltj@temp@afont{#5/#6/#7/#8}%
+   \expandafter\ltj@@altfont@latex#9,,}\ignorespaces}
+\def\ltj@@altfont@latex#1,{\def\ltj@temp{#1}%
+  \ifx\ltj@temp\empty\let\@next=\relax\else
+  \ltj@@altfont@latexA{#1}\let\@next=\ltj@@altfont@latex\fi\@next}
+\def\ltj@@altfont@latexA#1{\ltj@@altfont@latexB#1--\@nil}
+\def\ltj@@altfont@latexB#1-#2-#3\@nil{\def\ltj@temp{#3}%
+  \ifx\ltj@temp\empty
+    \ltj@tempcnta=#1\relax\ltj@tempcntb=\ltj@tempcnta
+  \else
+    \def\ltj@temp{#1}%
+    \ifx\ltj@temp\empty\ltj@tempcnta='200\else\ltj@tempcnta=#1\fi\relax
+    \def\ltj@temp{#2}%
+    \ifx\ltj@temp\empty\ltj@tempcntb="10FFFF\else\ltj@tempcntb=#2\fi\relax%"
+  \fi
+  \directlua{luatexja.jfont.set_alt_font_latex(
+    \the\ltj@tempcnta,\the\ltj@tempcntb, 
+    '\luatexluaescapestring{\ltj@temp@afont}',
+    '\luatexluaescapestring{\ltj@temp@bfont}')}%
+  }
+
+% \selectfont 上書き
+\let\ltj@@alt@selectfont@orig=\selectfont
+\def\selectfont{%
+  \ltj@@alt@selectfont@orig
+  % alt fonts の定義
+  \directlua{luatexja.jfont.output_alt_font_cmd('\luatexluaescapestring{\curr@kfontshape}')}%
+  % 定義した alt fonts のデータを \ltjdeclarealtfont に渡すのと同等の処理をする
+  \directlua{luatexja.jfont.pickup_alt_font_a('\f@size')}%
+}
+\def\ltj@pickup@altfont@aux#1{%
+  {\edef\curr@fontshape{#1}\xdef\font@name{\csname #1/\f@size\endcsname}\pickup@jfont}%
+}
+\def\ltj@pickup@altfont@copy#1#2{%
+  \ltj@@getjfontnumber#1%
+  \directlua{luatexja.jfont.pickup_alt_font_b(\the\ltj@tempcntc,'\luatexluaescapestring{#2}')}%
+}
+
+
 \begin{document}
-% test
+
+%%%%%%%% plain TeX
 \jfont\jaA=KozGoPr6N-Regular.otf:jfm=ujis at 9.24872pt
 \jfont\jaB=KozMinPr6N-Bold.otf:jfm=ujis   at 9.24872pt
 \jfont\jaC=KozGoPr6N-Bold.otf:jfm=ujis    at 9.24872pt
 
 \jaA 
 あア漢字% 置換なし
-\ltjsetaltfont\jaA\jaB{"3000-"30FF}
+\ltjdeclarealtfont\jaA\jaB{"3000-"30FF}
 あア漢字% 「あ」のみ置換（setaltfont は段落末尾の状況が全段落で通用）
-\ltjsetaltfont\jaA\jaA{"30A0-"30FF}
+\ltjdeclarealtfont\jaA\jaA{"30A0-"30FF}
 あア漢字% 「あ」のみ置換
 
-\ltjsetaltfont\jaA\jaB{"3000-"30FF}
-\ltjsetaltfont\jaA\jaC{`漢}
+\ltjdeclarealtfont\jaA\jaB{"3000-"30FF}
+\ltjdeclarealtfont\jaA\jaC{`漢}
 あア漢字% 「あ」「ア」「漢」置換
 \mc
 あア漢字% 置換なし
@@ -128,5 +262,15 @@ luatexbase.add_to_callback('hyphenate',
 \ltjclearaltfont\jaA
 あア漢字% 置換なし
 
+%%%%%%%% LaTeX
 
+\DeclareAlternateKanjiFont{JY3}{mc}{m}{n}{JY3}{gt}{m}{n}{`い,`う}
+あいうえお%             \selectfont しないと有効にはならない
+\selectfont あいうえお% 「い」「う」が置換
+
+{%
+  \DeclareAlternateKanjiFont{JY3}{mc}{m}{n}{JY3}{mc}{m}{n}{`い}%
+}% always global
+\DeclareAlternateKanjiFont{JY3}{mc}{m}{n}{JY3}{gt}{m}{n}{`お}
+\selectfont あいうえお% 「う」「お」が置換
 \end{document}
