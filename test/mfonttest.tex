@@ -1,121 +1,132 @@
 %#!lualatex
 \documentclass{ltjsarticle}
 
-%%% ltj-charrange.lua に本ドキュメント末尾のようなパッチが必要
-
 \makeatletter
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 42 番の文字範囲を「かな書体」用として宣言
-\ltjdefcharrange{42}{"3000-"30FF, "31F0-"31FF, "FF00-"FFEF, "1B000-"1B0FF}
-% 3000-303F CJK Symbols and Punctuation
-% 3040-309F Hiragana
-% 30A0-30FF Katakana
-% 31F0-31FF Katakana Phonetic Extensions
-% FF00-FFEF Halfwidth and Fullwidth Forms
-% 1B000-1B0FF Kana Supplement
+\def\ltj@@getjfontnumber#1{% result in \ltj@tempcntc 
+  \bgroup#1\directlua{luatexja.__temp = \the\ltj@curjfnt}\egroup
+  \ltj@tempcntc=\directlua{tex.sprint(luatexja.__temp)}\relax}
 
-% 42 番の文字範囲を和文文字の範囲とする
-\ltjsetparameter{jacharrange={+42}}
+%%%%%%%% 公開命令
+%%%% \ltjsetaltfont<base_font_cs><alt_font_cs>{100-200,3000-,5000,...}
+% <base_font_cs> の 第 3 引数の文字達は <alt_font_cs> で組む
+\protected\def\ltjsetaltfont#1#2#3{%
+  {\ltj@@getjfontnumber#1\@tempcnta=\ltj@tempcntc% \@tempcnta: 基底フォント
+   \ltj@@getjfontnumber#2%
+   \expandafter\ltj@@altfont#3,,}\ignorespaces}
+\def\ltj@@altfont#1,{\def\ltj@temp{#1}%
+  \ifx\ltj@temp\empty\let\@next=\relax\else
+  \ltj@@altfontA{#1}\let\@next=\ltj@@altfont\fi\@next}
+\def\ltj@@altfontA#1{\ltj@@altfontB#1--\@nil}
+\def\ltj@@altfontB#1-#2-#3\@nil{\def\ltj@temp{#3}%
+  \ifx\ltj@temp\empty
+    \ltj@tempcnta=#1 \ltj@tempcntb=\ltj@tempcnta
+  \else
+    \def\ltj@temp{#1}%
+    \ifx\ltj@temp\empty\ltj@tempcnta='200\else\ltj@tempcnta=#1\fi\relax
+    \def\ltj@temp{#2}%
+    \ifx\ltj@temp\empty\ltj@tempcntb="10FFFF\else\ltj@tempcntb=#2\fi\relax%"
+  \fi
+  \directlua{luatexja.jfont.set_alt_font(
+    \the\ltj@tempcnta,\the\ltj@tempcntb,
+    \the\ltj@tempcntc, \the\@tempcnta)}%
+  }
 
-%% 42 にあまり大きい意味はない．既に使われていないもののうち
-%% 適当に大きいものをとった
-
-% 「現在のかな用書体」のフォント番号を格納する attribute
-\newluatexattribute\ltj@curkanafnt
+%%%% \ltjclearaltfont<font_cs>
+% <font_cs> の文字は全部 <font_cs> 本来の文字で組む
+\protected\def\ltjclearaltfont#1{%
+  {\ltj@@getjfontnumber#1%
+   \directlua{luatexja.jfont.clear_alt_font(\the\ltj@tempcntc)}}\ignorespaces}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ここから Lua code
 \usepackage{luacode}
 
-\begin{luacode}
-local ltjc = luatexja.charrange
+\begin{luacode*} -- この行は 47 行目
+local alt_font_table = {}; luatexja.jfont.alt_font_table = alt_font_table
+local attr_curaltfnt = {}
 
+local ucs_out = 0x110000
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
-local attr_curkfnt = luatexbase.attributes['ltj@curkanafnt']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local has_attr = node.has_attribute
 local set_attr = node.set_attribute
 local id_glyph = node.id('glyph')
+local ltjb = luatexja.base
 
-local function font_replace_42(head)
+local function set_alt_font(b,e,ind,fnum)
+   -- ind: 新フォント, fnum: 基底フォント
+  if b<0x80 or e>=ucs_out then
+      ltjb.package_warning('luatexja',
+			 'bad character range ([' .. b .. ',' .. e .. ']). ' ..
+			   'I take the intersection with [0x80, 0x10ffff].')
+   elseif b>e then
+      local j=b; e=b; b=j
+   end
+   if not alt_font_table[fnum] then alt_font_table[fnum]={} end
+   local t = alt_font_table[fnum]
+   for i=math.max(0x80,b),math.min(ucs_out-1,e) do
+      t[i]=ind
+   end
+end
+luatexja.jfont.set_alt_font = set_alt_font
+
+local function clear_alt_font(fnum)
+   if alt_font_table[fnum] then 
+      local t = alt_font_table[fnum]
+      for i,_ in pairs(t) do t[i]=nil; end
+   end
+end
+luatexja.jfont.clear_alt_font = clear_alt_font
+
+--%%%%%%%% callback
+local function replace_altfont(head)
    for p in node.traverse_id(id_glyph, head) do
-      if (has_attr(p, attr_icflag) or 0)<=0 and ltjc.jcr_table_main[p.char]==42 then
-         set_attr(p, attr_curjfnt, 
-            has_attr(p, attr_curkfnt) or (has_attr(p, attr_curjfnt) or p.font))
-         -- 42 番の文字範囲に即する文字は，（もし和文ならば）かな書体で組まれる
+      local pf = p.font
+      if p.font == (has_attr(p, attr_curjfnt) or 0) then
+         if alt_font_table[pf] and alt_font_table[pf][p.char] then
+            local n = alt_font_table[pf][p.char]
+            if n then 
+               p.font = n; set_attr(p, attr_curjfnt, n)
+            end
+         end
       end
    end
    return head
 end
 luatexbase.add_to_callback('hyphenate', 
-   function (head,tail)
-      return font_replace_42(head)
-   end,'replace_42', 1)
+ function (head,tail)
+    return replace_altfont(head)
+ end,'ltj.replace_altfont',
+ luatexbase.priority_in_callback('hyphenate', 'ltj.hyphenate')+1)
 
-\end{luacode}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% ユーザ命令: \setkanafont <書体選択命令>, \unsetkanafont
-
-\def\setkanafont#1{%
-  \bgroup#1\directlua{luatexja.mfont_temp = \the\ltj@curjfnt}\egroup
-  \ltj@curkanafnt=\directlua{tex.sprint(luatexja.mfont_temp)}\relax
-}
-\def\unsetkanafont{\ltj@curkanafnt=-"7FFFFFFF\relax}%"
-
-\makeatother
-
-\usepackage{luatexja-fontspec}
-\setmainjfont{ipam.ttf}
-\setsansjfont{ipag.ttf}
-\newjfontfamily\kanaX{mogamb.ttc}% かな用書体1: MogaMincho Bold
-%%% ↑Y. Oz Vox (http://yozvox.web.fc2.com/) より入手可能
-\newjfontfamily\kanaY{ipag.ttf}%   かな用書体2: IPA ゴシック
+\end{luacode*}
 
 \begin{document}
-% \setkanafont はTeX のグルーピングに従う
-あいう漢字
-{\setkanafont\kanaY あいう漢字}%
-あいう漢字
-{\setkanafont\kanaX あいう漢字
-  {\setkanafont\kanaY あいう漢字}
-あいう漢字}
+% test
+\jfont\jaA=KozGoPr6N-Regular.otf:jfm=ujis at 9.24872pt
+\jfont\jaB=KozMinPr6N-Bold.otf:jfm=ujis   at 9.24872pt
+\jfont\jaC=KozGoPr6N-Bold.otf:jfm=ujis    at 9.24872pt
 
-% \unsetkanafont で解除可能
-{\setkanafont\kanaY あいう漢字
-  {\unsetkanafont あいう漢字}% ここだけ IPA 明朝
-あいう漢字}
+\jaA 
+あア漢字% 置換なし
+\ltjsetaltfont\jaA\jaB{"3000-"30FF}
+あア漢字% 「あ」のみ置換（setaltfont は段落末尾の状況が全段落で通用）
+\ltjsetaltfont\jaA\jaA{"30A0-"30FF}
+あア漢字% 「あ」のみ置換
 
+\ltjsetaltfont\jaA\jaB{"3000-"30FF}
+\ltjsetaltfont\jaA\jaC{`漢}
+あア漢字% 「あ」「ア」「漢」置換
+\mc
+あア漢字% 置換なし
+\jaA 
+あア漢字% 「あ」「ア」「漢」置換
 
-% ゴシック体に太明朝のカタカナを合わせる
-{\gtfamily\setkanafont\kanaX あいう漢字}
+\jaA 
+あア漢字% 置換なし，\ltjclearaltfont の効力はこの段落全部なので
+\ltjclearaltfont\jaA
+あア漢字% 置換なし
 
-% \setkanafont はメインの和文フォントに追従しない
-% サイズ変更にも追従しないので注意
-{\setkanafont\kanaY あいう漢字\gtfamily あいう漢字\Large あいうえお漢字}
-
-% サイズ変更命令には手動で \setkanafont を実行しないといけない
-{\setkanafont\kanaY あいう漢字\Large\setkanafont\kanaY あいう漢字}
-
-
-\gtfamily\setkanafont\kanaX
-これは，意味のないサンプルテキストです．「スペーシングはうまく行ってるかな？」
-
-\unsetkanafont
-これは，意味のないサンプルテキストです．「スペーシングはうまく行ってるかな？」
 
 \end{document}
-
-
---- src/ltj-charrange.lua.orig	2013-12-29 16:58:52.482148630 +0900
-+++ src/ltj-charrange.lua	2013-12-25 20:26:17.879807073 +0900
-@@ -28,8 +28,7 @@
- --         external    1  2       216, (out of range): 'other'
- 
- -- initialize
--jcr_table_main = {}
--local jcr_table_main = jcr_table_main
-+local jcr_table_main = {}
- local jcr_cjk = 0; local jcr_noncjk = 1; local ucs_out = 0x110000
- 
- for i=0x80 ,0xFF      do jcr_table_main[i]=1 end

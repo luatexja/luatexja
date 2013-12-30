@@ -37,11 +37,11 @@ for i=0x100,ucs_out-1 do jcr_table_main[i]=0 end
 
 -- EXT: add characters to a range
 function add_char_range(b,e,ind) -- ind: external range number
-   if not ind or ind<0 or ind>=7*ATTR_RANGE then -- 0 は error にしない（隠し）
+   if not ind or ind<0 or ind>=31*ATTR_RANGE then -- 0 は error にしない（隠し）
       ltjb.package_error('luatexja',
 			 "invalid character range number (" .. ind .. ")",
 			 "A character range number should be in the range 1.."
-                          .. 7*ATTR_RANGE-1 .. ",\n" ..
+                          .. 31*ATTR_RANGE-1 .. ",\n" ..
 			  "ignored.")
       return
    elseif b<0x80 or e>=ucs_out then
