@@ -440,8 +440,17 @@
 % <base_font_cs> の 第 3 引数の文字達は <alt_font_cs> で組む
 % いつも global
 \def\ltj@@getjfontnumber#1{% result in \ltj@tempcntc 
-  \bgroup#1\directlua{luatexja.__temp = \the\ltj@curjfnt}\egroup
-  \ltj@tempcntc=\directlua{tex.sprint(luatexja.__temp)}\relax}
+  \ltj@reset@globaldefs
+  \bgroup\ltj@curjfnt=-1\relax
+  #1\directlua{luatexja.__temp = \the\ltj@curjfnt}\egroup
+  \ltj@tempcntc=\directlua{tex.sprint(luatexja.__temp)}\relax
+  \ifnum\ltj@tempcntc=-1
+    \@PackageError{luatexja-core}%
+    {\string#1 is not a control sequence that represents \MessageBreak
+     a Japanese font}{I'll use the current Japanese font instead.^^J}%
+    \ltj@tempcntc=\ltj@curjfnt
+  \fi\ltj@restore@globaldefs}
+  
 \protected\def\ltjdeclarealtfont#1#2#3{%
   {\ltj@@getjfontnumber#1\@tempcnta=\ltj@tempcntc% \@tempcnta: 基底フォント
    \ltj@@getjfontnumber#2%

@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2011/05/11',
+  date = '2013/12/31',
   description = 'Loader for Japanese fonts',
 })
 module('luatexja.jfont', package.seeall)
@@ -307,18 +307,33 @@ local ucs_out = 0x110000
 -- EXT
 function set_alt_font(b,e,ind,bfnt)
    -- ind: 新フォント, bfnt: 基底フォント
-  if b<0x80 or e>=ucs_out then
-      ltjb.package_warning('luatexja',
-			 'bad character range ([' .. b .. ',' .. e .. ']). ' ..
+   if b>e then b, e = e, b end
+   if b*e<=0 then
+      ltjb.package_eror('luatexja',
+			'bad character range ([' .. b .. ',' .. e .. ']). ' ..
 			   'I take the intersection with [0x80, 0x10ffff].')
-   elseif b>e then
-      local j=b; e=b; b=j
+      b, e = math.max(0x80,b),math.min(ucs_out-1,e)
+   elseif e<0 then -- b<e<0
+      -- do nothing
+   elseif b<0x80 or e>=ucs_out then
+      ltjb.package_warning('luatexja',
+			   'bad character range ([' .. b .. ',' .. e .. ']). ' ..
+			      'I take the intersection with [0x80, 0x10ffff].')
+      b, e = math.max(0x80,b), math.min(ucs_out-1,e)
    end
    if bfnt==ind then ind = nil end -- ind == bfnt の場合はテーブルから削除
    if not alt_font_table[bfnt] then alt_font_table[bfnt]={} end
    local t = alt_font_table[bfnt]
-   for i=math.max(0x80,b),math.min(ucs_out-1,e) do
-      t[i]=ind
+   if e>=0 then -- character range
+      for i=b, e do
+	 t[i]=ind
+      end
+   else
+      b, e = -e, -b
+      local tx = font_metric_table[bfnt].chars
+      for i,v in pairs(tx) do
+	 if b<=v and v<=e then t[i]=ind end
+      end
    end
 end
 
@@ -361,37 +376,45 @@ end
 -- EXT
 function set_alt_font_latex(b,e,ind,bbase)
    -- ind: Alt font の enc/fam/ser/shape, bbase: 基底フォントの enc/fam/ser/shape
-  if b<0x80 or e>=ucs_out then
-      ltjb.package_warning('luatexja',
-			 'bad character range ([' .. b .. ',' .. e .. ']). ' ..
+   if b>e then b, e = e, b end
+   if b*e<=0 then
+      ltjb.package_eror('luatexja',
+			'bad character range ([' .. b .. ',' .. e .. ']). ' ..
 			   'I take the intersection with [0x80, 0x10ffff].')
-   elseif b>e then
-      local j=b; e=b; b=j
+      b, e = math.max(0x80,b),math.min(ucs_out-1,e)
+   elseif e<0 then -- b<e<0
+      -- do nothing
+   elseif b<0x80 or e>=ucs_out then
+      ltjb.package_warning('luatexja',
+			   'bad character range ([' .. b .. ',' .. e .. ']). ' ..
+			      'I take the intersection with [0x80, 0x10ffff].')
+      b, e = math.max(0x80,b), math.min(ucs_out-1,e)
    end
+
    if not alt_font_table_latex[bbase] then alt_font_table_latex[bbase]={} end
    local t = alt_font_table_latex[bbase]
    if not t[ind] then t[ind] = {} end
-   for i=math.max(0x80,b),math.min(ucs_out-1,e) do
+   for i=b, e do
       for j,v in pairs(t) do
          if v[i] then -- remove old entry
             if j~=ind then v[i]=nil end; break
          end
       end
       t[ind][i]=true
-    end
-    -- remove the empty tables
-    for j,v in pairs(t) do
-       local flag_clear = true
-       for k,_ in pairs(v) do flag_clear = false; break end
-       if flag_clear then t[j]=nil end
-    end
-    if ind==bbase  then t[bbase] = nil end
+   end
+   -- remove the empty tables
+   for j,v in pairs(t) do
+      local flag_clear = true
+      for k,_ in pairs(v) do flag_clear = false; break end
+      if flag_clear then t[j]=nil end
+   end
+   if ind==bbase  then t[bbase] = nil end
 end
 
 -- ここから先は 新 \selectfont の内部でしか実行されない
 do
    local alt_font_base, alt_font_base_num
-   
+
 -- EXT
    function output_alt_font_cmd(bbase)
       alt_font_base = bbase
@@ -407,7 +430,7 @@ do
 	 end
       end
    end
-   
+
 -- EXT
    function pickup_alt_font_a(size_str)
       local t = alt_font_table_latex[alt_font_base]
@@ -418,18 +441,35 @@ do
 	 end
       end
    end
-   
+
+   local function pickup_alt_font_class(class, afnt_num)
+      local t  = alt_font_table[alt_font_base_num] 
+      local tx = font_metric_table[alt_font_base_num].chars
+      for i,v in pairs(tx) do
+	 if v==class then t[i]=afnt_num end
+      end
+   end
+
 -- EXT
    function pickup_alt_font_b(afnt_num, afnt_base)
       local t = alt_font_table[alt_font_base_num] 
       if not t then t = {}; alt_font_table[alt_font_base_num] = t end
       for i,v in pairs(alt_font_table_latex[alt_font_base]) do
 	 if i == afnt_base then
-	    for j,_ in pairs(v) do t[j]=afnt_num end
+	    for j,_ in pairs(v) do
+	       if j>=0 then 
+		  t[j]=afnt_num
+	       else  -- -n (n>=1) means that the character class n,
+		     -- which is defined in the JFM 
+		  pickup_alt_font_class(-j, afnt_num) 
+	       end
+	    end
 	    return
 	 end
       end
    end
+
+
 end
 
 

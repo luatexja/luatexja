@@ -1,14 +1,15 @@
 %#!lualatex
 \documentclass{ltjsarticle}
+\usepackage{fontspec}% 欧文フォントを OpenType にしたいだけ
 
 %%% この文書のタイプセットには，
-%%% MogaMincho, MogaGothic 及びそれらの太字が必要．
-%%% Y. Oz Vox (http://yozvox.web.fc2.com/) より入手可能．
+%%% KozMinPr6N-Regular.otf, KozGoPr6N-Medium.otf,
+%%% ipag.ttf が必要
 
 \DeclareKanjiFamily{JY3}{mcX}{}
 \DeclareKanjiFamily{JY3}{gtX}{}
-\DeclareFontShape{JY3}{mcX}{m}{n}{<-> s*[0.962216] MogaMincho:jfm=ujis}{}
-\DeclareFontShape{JY3}{gtX}{m}{n}{<-> s*[0.962216] MogaGothic:jfm=ujis}{}
+\DeclareFontShape{JY3}{mcX}{m}{n}{<-> s*[0.962216] KozMinPr6N-Regular:jfm=ujis}{}
+\DeclareFontShape{JY3}{gtX}{m}{n}{<-> s*[0.962216] KozGoPr6N-Medium:jfm=ujis}{}
 \DeclareFontShape{JY3}{mcX}{bx}{n}{<-> ssub*gtX/m/n}{}
 \def\mcdefault{mcX}
 \def\gtdefault{gtX}
@@ -16,9 +17,9 @@
 \begin{document}
 
 %%%%%%%% plain TeX
-\jfont\jaA={MogaMincho:jfm=ujis} at 9.24872pt
-\jfont\jaB={MogaGothic:jfm=ujis}   at 9.24872pt
-\jfont\jaC={MogaGothic Bold:jfm=ujis}    at 9.24872pt
+\jfont\jaA={KozMinPr6N-Regular:jfm=ujis} at 9.24872pt
+\jfont\jaB={KozGoPr6N-Medium:jfm=ujis}   at 9.24872pt
+\jfont\jaC={IPAGothic:jfm=ujis}          at 9.24872pt
 
 \jaA 
 あア漢字% 置換なし
@@ -41,32 +42,46 @@
 \ltjclearaltfont\jaA
 あア漢字% 置換なし
 
+% 文字クラスベースの指定
+\jfont\jaR={IPAGothic:jfm=ujis;color=FF0000} at 9.24872pt
+\jfont\jaP={IPAGothic:jfm=ujis;color=7F007F} at 9.24872pt
+\jaA 
+\ltjdeclarealtfont\jaA\jaR{{-1}-{-2}}
+\ltjdeclarealtfont\jaA\jaP{{-6}-{-6}}
+この文章は，（あんまり）意味がないサンプルテキストです⁈
+
+\scrollmode
+\font\g=cmr10
+\ltjdeclarealtfont\jaA\g{"3000-"30FF}% error
+\ltjdeclarealtfont\g\jaA{"3000-"30FF}% error
+\errorstopmode
+
 %%%%%%%% LaTeX
 
-\DeclareAlternateKanjiFont{JY3}{mc}{m}{n}{JY3}{gt}{m}{n}{`い,`う}
+\DeclareAlternateKanjiFont{JY3}{mcX}{m}{n}{JY3}{gtX}{m}{n}{`い,`う}
 \mc
 あいうえお%             \selectfont しないと有効にはならない
 \selectfont あいうえお% 「い」「う」が置換
 {\Large  あいうえお}
 
 {%
-  \DeclareAlternateKanjiFont{JY3}{mc}{m}{n}{JY3}{mc}{m}{n}{`い}%
+  \DeclareAlternateKanjiFont{JY3}{mcX}{m}{n}{JY3}{mcX}{m}{n}{`い}%
 }% always global
-\DeclareAlternateKanjiFont{JY3}{mc}{m}{n}{JY3}{gt}{m}{n}{`お}
+\DeclareAlternateKanjiFont{JY3}{mcX}{m}{n}{JY3}{gtX}{m}{n}{`お}
 \selectfont あいうえお% 「う」「お」が置換
 {\Large  あいうえお}
 
-\ClearAlternateKanjiFont{JY3}{mc}{m}{n}
+\ClearAlternateKanjiFont{JY3}{mcX}{m}{n}
 {\Large  あいうえお}%    置換なし
 あいうえお%              まだ「う」「お」が置換のまま 
 
 \section{例1}
 
-% (A) \DeclareFontShape{JY3}{gtX}{an}{n}{<-> s*[0.962216] MogaGothic:jfm=ujis}{}
-% (B) \DeclareFontShape{JY3}{gtX}{an}{n}{<-> ssub*gtX/m/n}{}
-\DeclareFontShape{JY3}{gtX}{an}{n}{<-> s*[0.962216] MogaGothic:jfm=ujis;foo}{}% (C)
+%\DeclareFontShape{JY3}{gtX}{an}{n}{<-> s*[0.962216] KozGoPr6N-Medium:jfm=ujis}{} (A)
+%\DeclareFontShape{JY3}{gtX}{an}{n}{<-> ssub*gtX/m/n}{} (B)
+\DeclareFontShape{JY3}{gtX}{an}{n}{<-> s*[0.962216] KozGoPr6N-Medium:jfm=ujis;foo}{}% (C)
 
-\DeclareFontShape{JY3}{mcX}{bx}{kana}{<-> s*[0.962216] MogaMincho Bold:jfm=ujis}{}
+\DeclareFontShape{JY3}{mcX}{bx}{kana}{<-> s*[0.962216] KozMinPr6N-Regular:jfm=ujis}{}
 \DeclareAlternateKanjiFont{JY3}{gtX}{an}{n}{JY3}{mcX}{bx}{kana}{"3000-"30FF}
 
 % (A), (B) では失敗する．例えばサイズが 10 pt のとき，
@@ -80,10 +95,37 @@
 %%% なんとか解決できないだろうか？
 
 {\Large\gt 
-漢字をゴシック体，仮名を太明朝を使って
+漢字をゴシック体，仮名を明朝を使って
 {\kanjiseries{an}\selectfont このように文章を組む}
-ことが時々ある．}
+ことが可能になった（太さが合わないのは気にしない）．}
 
+\section{例2：メトリックの文字クラスによる指定}
+
+\ClearAlternateKanjiFont{JY3}{gtX}{an}{n}% 一旦リセットして……
+\DeclareFontShape{JY3}{gtX}{m}{red}{<-> s*[0.962216] KozGoPr6N-Medium:jfm=ujis;color=FF0000}{}
+\DeclareFontShape{JY3}{gtX}{m}{blue}{<-> s*[0.962216] KozGoPr6N-Medium:jfm=ujis;color=0000FF}{}
+\DeclareAlternateKanjiFont{JY3}{gtX}{an}{n}{JY3}{gtX}{m}{red}{{-7}-{-7}}% 半角カナ
+% ... {{-7}} のようにはできないので注意
+\DeclareAlternateKanjiFont{JY3}{gtX}{an}{n}{JY3}{gtX}{m}{blue}{{-1}-{-2}}% 括弧類
+
+{\kanjifamily{gtX}\kanjiseries{an}\selectfont
+半角ｶﾀｶﾅとか「括弧類」だけ色を変えてみた（うまくいっているだろうか？）．
+}
+
+\paragraph{fwid feature}
+\DeclareFontShape{JY3}{gtX}{af}{n}{<-> s*[0.962216] KozGoPr6N-Medium:jfm=ujis;foo;+fwid}{}
+  % fwid weature 使用
+
+{\kanjifamily{gtX}\kanjiseries{af}\selectfont
+fwid featureﾉﾀﾒ通常ﾃﾞﾊ半角ｶﾅﾊ全角化ｻﾚﾙ
+
+\DeclareAlternateKanjiFont{JY3}{gtX}{af}{n}{JY3}{gtX}{m}{red}{{-7}-{-7}}% 半角カナ
+\DeclareAlternateKanjiFont{JY3}{gtX}{af}{n}{JY3}{gtX}{m}{blue}{{-1}-{-2}}% 括弧類
+\selectfont
+ｼｶｼ \verb+\DeclareAlternateKanjiFont+ ﾆﾖﾙ置ｷ換ｴﾊfont featureﾆﾖﾙ置換ﾉﾏｴﾆ実施
+ｻﾚﾙ．なおかつ置き換え先のフォントにはfwid featureは設定されていないので，
+ｺﾉﾖｳﾆ半角ｶﾅﾊ赤字・半角ﾉﾏﾏ．
+}
 
 
 \newpage
@@ -93,11 +135,11 @@
 
 \DeclareKanjiFamily{JY3}{edm}{}
 \DeclareFontShape{JY3}{edm}{m}{n}{<-> s*[0.962216] 
-  MogaMincho:jfm=ujis;foo}{} % foo をつけている理由は JY3/gtX/an/n と一緒
+  KozMinPr6N-Regular:jfm=ujis;foo}{} % foo をつけている理由は JY3/gtX/an/n と一緒
 \DeclareFontShape{JY3}{edm}{m}{blue}{<-> s*[0.962216] 
-  MogaGothic:jfm=ujis;color=0000FF}{}
+  KozGoPr6N-Medium:jfm=ujis;color=0000FF}{}
 \DeclareFontShape{JY3}{edm}{m}{green}{<-> s*[0.962216] 
-  MogaMincho:jfm=ujis;color=007F00}{}
+  KozMinPr6N-Regular:jfm=ujis;color=007F00}{}
 
 %%% 16進表記の A--F は大文字で！
 
