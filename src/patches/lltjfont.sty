@@ -583,8 +583,15 @@
     \fi
     \let\getjfont\font@name}
 
+% 異なる和文 enc/fam/ser/shape からは異なるフォント番号が振られるように
+% わざと「ゴミをつける」
+\def\ltj@@patch@external@font#1 at{%
+  #1;\directlua{luatexja.jfont.print_aftl_address(%
+    '\luatexluaescapestring{\f@encoding/\f@family/\f@series/\f@shape}')}\space at%
+}
 \def\extract@jfont{%
     \get@external@font
+    \edef\external@font{\expandafter\ltj@@patch@external@font\external@font}%
     \expandafter\globaljfont\font@name\external@font\relax
     \font@name%\global\zw=\zw\global\zh=\zh
     \csname \f@encoding+\f@family\endcsname

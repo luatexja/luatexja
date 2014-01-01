@@ -16,6 +16,7 @@ local id_kern = node.id('kern')
 local id_hlist = node.id('hlist')
 local id_glue  = node.id('glue')
 local id_glue_spec = node.id('glue_spec')
+local id_whatsit = node.id('whatsit')
 local has_attr = node.has_attribute
 local set_attr = node.set_attribute
 local attr_icflag = luatexbase.attributes['ltj@icflag']
@@ -144,7 +145,6 @@ local function aw_step1(p, res, total)
       -- その前の node が本来の末尾文字となる
       x = node.prev(node.prev(x)) 
    end
-
    local xi, xc = x.id
    if xi == id_glyph and has_attr(x, attr_curjfnt) == x.font then
       -- 和文文字
@@ -152,13 +152,13 @@ local function aw_step1(p, res, total)
    elseif xi == id_hlist and get_attr_icflag(x) == PACKED then
       -- packed JAchar
       xc = x.head
+      while xc.id == id_whatsit do xc = node.next(xc) end
    else
      return false-- それ以外は対象外．
    end
-   local xk = ltjf_font_metric_table -- 
-     [xc.font].char_type[has_attr(xc, attr_jchar_class) or 0]
-     ['end_' .. res.name] or 0
-     --print(res.name, total, xk, unicode.utf8.char(xc.char))
+   local xk = ltjf_font_metric_table[xc.font]
+     xk = xk.char_type[has_attr(xc, attr_jchar_class) or 0]
+     xk = xk['end_' .. res.name] or 0
 
    if xk>0 and total>=xk then
       --print("ADDED")

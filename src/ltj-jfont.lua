@@ -416,6 +416,12 @@ do
    local alt_font_base, alt_font_base_num
 
 -- EXT
+   function print_aftl_address(bbase)
+      local t = alt_font_table_latex[bbase]
+      if not t then t = {}; alt_font_table_latex[bbase] = t end
+      tex.sprint((tostring(t):gsub('table: 0x','ltjaltfont')))
+   end
+-- EXT
    function output_alt_font_cmd(bbase)
       alt_font_base = bbase
       alt_font_base_num = tex.getattribute(attr_curjfnt)

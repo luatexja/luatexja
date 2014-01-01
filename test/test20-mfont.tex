@@ -77,22 +77,9 @@
 
 \section{例1}
 
-%\DeclareFontShape{JY3}{gtX}{an}{n}{<-> s*[0.962216] KozGoPr6N-Medium:jfm=ujis}{} (A)
-%\DeclareFontShape{JY3}{gtX}{an}{n}{<-> ssub*gtX/m/n}{} (B)
-\DeclareFontShape{JY3}{gtX}{an}{n}{<-> s*[0.962216] KozGoPr6N-Medium:jfm=ujis;foo}{}% (C)
-
+\DeclareFontShape{JY3}{gtX}{an}{n}{<-> s*[0.962216] KozGoPr6N-Medium:jfm=ujis}{}
 \DeclareFontShape{JY3}{mcX}{bx}{kana}{<-> s*[0.962216] KozMinPr6N-Regular:jfm=ujis}{}
 \DeclareAlternateKanjiFont{JY3}{gtX}{an}{n}{JY3}{mcX}{bx}{kana}{"3000-"30FF}
-
-% (A), (B) では失敗する．例えばサイズが 10 pt のとき，
-% (A), (B) で定義した JY3/gtX/an/n/10 は JY3/gtX/m/n/10 と
-% （LuaTeX 内部で使われる）フォント番号が全く同じなので，区別できない．
-% そのため，JY3/gtX/an/n に対して行った「仮名は JY3/mcX/bx/kana で」という指定は
-% JY3/gtX/m/n に対しても有効になってしまう．
-
-% 意図したとおりに動作させるためには，(C) のように適当なゴミをくっつけて，
-% 「見た目は全く同じだが，フォント番号は異なる」状況にしないといけない．
-%%% なんとか解決できないだろうか？
 
 {\Large\gt 
 漢字をゴシック体，仮名を明朝を使って
@@ -113,7 +100,7 @@
 }
 
 \paragraph{fwid feature}
-\DeclareFontShape{JY3}{gtX}{af}{n}{<-> s*[0.962216] KozGoPr6N-Medium:jfm=ujis;foo;+fwid}{}
+\DeclareFontShape{JY3}{gtX}{af}{n}{<-> s*[0.962216] KozGoPr6N-Medium:jfm=ujis;+fwid}{}
   % fwid weature 使用
 
 {\kanjifamily{gtX}\kanjiseries{af}\selectfont
@@ -135,7 +122,7 @@ fwid featureﾉﾀﾒ通常ﾃﾞﾊ半角ｶﾅﾊ全角化ｻﾚﾙ
 
 \DeclareKanjiFamily{JY3}{edm}{}
 \DeclareFontShape{JY3}{edm}{m}{n}{<-> s*[0.962216] 
-  KozMinPr6N-Regular:jfm=ujis;foo}{} % foo をつけている理由は JY3/gtX/an/n と一緒
+  KozMinPr6N-Regular:jfm=ujis}{}
 \DeclareFontShape{JY3}{edm}{m}{blue}{<-> s*[0.962216] 
   KozGoPr6N-Medium:jfm=ujis;color=0000FF}{}
 \DeclareFontShape{JY3}{edm}{m}{green}{<-> s*[0.962216] 
