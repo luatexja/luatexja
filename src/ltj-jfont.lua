@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2013/12/31',
+  date = '2014/01/02',
   description = 'Loader for Japanese fonts',
 })
 module('luatexja.jfont', package.seeall)
@@ -324,15 +324,16 @@ function set_alt_font(b,e,ind,bfnt)
    if bfnt==ind then ind = nil end -- ind == bfnt の場合はテーブルから削除
    if not alt_font_table[bfnt] then alt_font_table[bfnt]={} end
    local t = alt_font_table[bfnt]
+   local ac = getfont(ind).characters
    if e>=0 then -- character range
       for i=b, e do
-	 t[i]=ind
+	 if ac[i]then  t[i]=ind end
       end
    else
       b, e = -e, -b
       local tx = font_metric_table[bfnt].chars
       for i,v in pairs(tx) do
-	 if b<=v and v<=e then t[i]=ind end
+	 if b<=v and v<=e and ac[i] then t[i]=ind end
       end
    end
 end
@@ -345,20 +346,14 @@ function clear_alt_font(bfnt)
    end
 end
 
------- callback
-function replace_altfont(head)
-   for p in node.traverse_id(id_glyph, head) do
-      local pf = p.font
-      if p.font == (has_attr(p, attr_curjfnt) or 0) then
-         if alt_font_table[pf] and alt_font_table[pf][p.char] then
-            local n = alt_font_table[pf][p.char]
-            if n then 
-               p.font = n; set_attr(p, attr_curjfnt, n)
-            end
-         end
-      end
+------ used in ltjp.suppress_hyphenate_ja callback
+function replace_altfont(pf, pc)
+   if alt_font_table[pf] and alt_font_table[pf][pc] then
+      print('replace antfont: ', pf, '--> ', alt_font_table[pf][pc] or pf)
+      return alt_font_table[pf][pc] or pf
+   else
+      return pf
    end
-   return head
 end
 
 ------ for LaTeX interface
@@ -448,33 +443,34 @@ do
       end
    end
 
-   local function pickup_alt_font_class(class, afnt_num)
+   local function pickup_alt_font_class(class, afnt_num, afnt_chars)
       local t  = alt_font_table[alt_font_base_num] 
       local tx = font_metric_table[alt_font_base_num].chars
       for i,v in pairs(tx) do
-	 if v==class then t[i]=afnt_num end
+	 if v==class and afnt_chars[i] then t[i]=afnt_num end
       end
    end
 
 -- EXT
    function pickup_alt_font_b(afnt_num, afnt_base)
       local t = alt_font_table[alt_font_base_num] 
+      print(afnt_num, getfont(afnt_num))
+      local ac = getfont(afnt_num).characters
       if not t then t = {}; alt_font_table[alt_font_base_num] = t end
       for i,v in pairs(alt_font_table_latex[alt_font_base]) do
 	 if i == afnt_base then
 	    for j,_ in pairs(v) do
 	       if j>=0 then 
-		  t[j]=afnt_num
+		  if ac[j] then t[j]=afnt_num end
 	       else  -- -n (n>=1) means that the character class n,
 		     -- which is defined in the JFM 
-		  pickup_alt_font_class(-j, afnt_num) 
+		  pickup_alt_font_class(-j, afnt_num, ac) 
 	       end
 	    end
 	    return
 	 end
       end
    end
-
 
 end
 

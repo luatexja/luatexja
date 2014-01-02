@@ -4,6 +4,7 @@
 
 luatexja.load_module('charrange'); local ltjc = luatexja.charrange
 luatexja.load_module('stack');     local ltjs = luatexja.stack
+luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 
 local floor = math.floor
 local has_attr = node.has_attribute
@@ -24,6 +25,7 @@ local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 
 local ltjc_is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char
+local ltjf_replace_altfont = ltjf.replace_altfont
 local attr_orig_char = luatexbase.attributes['ltj@origchar']
 local STCK = luatexja.userid_table.STCK
 
@@ -39,9 +41,12 @@ local function suppress_hyphenate_ja(head)
       local pid = p.id
       if pid == id_glyph then
 	 if (has_attr(p, attr_icflag) or 0)<=0 and ltjc_is_ucs_in_japanese_char(p) then
-	    p.font = has_attr(p, attr_curjfnt) or p.font
+	    local pc = p.char
+	    local pf = ltjf_replace_altfont(has_attr(p, attr_curjfnt) or p.font, pc)
+	    print (p, utf.char(p.char), p.font, has_attr(p, attr_curjfnt), pf)
+	    p.font = pf;  set_attr(p, attr_curjfnt, pf)
 	    p.subtype = floor(p.subtype*0.5)*2
-	    set_attr(p, attr_orig_char, p.char)
+	    set_attr(p, attr_orig_char, pc)
 	 end
       elseif pid == id_math then 
 	 p = node_next(p) -- skip math on

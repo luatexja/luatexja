@@ -246,17 +246,6 @@ do
 				      'luaotfload.node_processor') + 1)
 end
 
--- hyphenate
-do
-   local replace_altfont = ltjf.replace_altfont
-   luatexbase.add_to_callback(
-      'hyphenate', 
-      function (head,tail)
-	 return replace_altfont(head)
-      end,'ltj.replace_altfont',
-      luatexbase.priority_in_callback('hyphenate', 'ltj.hyphenate')+1)
-end
-
 -- define_font
 do
    local otfl_fdr = fonts.definers.read
