@@ -321,10 +321,10 @@ function set_alt_font(b,e,ind,bfnt)
 			      'I take the intersection with [0x80, 0x10ffff].')
       b, e = math.max(0x80,b), math.min(ucs_out-1,e)
    end
-   if bfnt==ind then ind = nil end -- ind == bfnt の場合はテーブルから削除
    if not alt_font_table[bfnt] then alt_font_table[bfnt]={} end
    local t = alt_font_table[bfnt]
    local ac = getfont(ind).characters
+   if bfnt==ind then ind = nil end -- ind == bfnt の場合はテーブルから削除
    if e>=0 then -- character range
       for i=b, e do
 	 if ac[i]then  t[i]=ind end
@@ -348,12 +348,8 @@ end
 
 ------ used in ltjp.suppress_hyphenate_ja callback
 function replace_altfont(pf, pc)
-   if alt_font_table[pf] and alt_font_table[pf][pc] then
-      print('replace antfont: ', pf, '--> ', alt_font_table[pf][pc] or pf)
-      return alt_font_table[pf][pc] or pf
-   else
-      return pf
-   end
+   return (alt_font_table[pf] and alt_font_table[pf][pc]) 
+      and alt_font_table[pf][pc] or pf
 end
 
 ------ for LaTeX interface

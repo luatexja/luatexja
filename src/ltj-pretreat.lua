@@ -43,7 +43,6 @@ local function suppress_hyphenate_ja(head)
 	 if (has_attr(p, attr_icflag) or 0)<=0 and ltjc_is_ucs_in_japanese_char(p) then
 	    local pc = p.char
 	    local pf = ltjf_replace_altfont(has_attr(p, attr_curjfnt) or p.font, pc)
-	    print (p, utf.char(p.char), p.font, has_attr(p, attr_curjfnt), pf)
 	    p.font = pf;  set_attr(p, attr_curjfnt, pf)
 	    p.subtype = floor(p.subtype*0.5)*2
 	    set_attr(p, attr_orig_char, pc)
