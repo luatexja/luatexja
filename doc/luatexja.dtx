@@ -1537,7 +1537,7 @@ are internally specified by:
 
 
 %<*en>
-\subsection{\texttt{\char92 CID}, \texttt{\char92 UTF} and macros in \Pkg{otf} package}
+\subsection{\texttt{\char`\\CID}, \texttt{\char`\\UTF} and macros in \Pkg{otf} package}
 Under \pLaTeX, \Pkg{otf} package (developed by Shuzaburo Saito) is
 used for typesetting characters which is in Adobe-Japan1-6 CID but not
 in JIS~X~0208. Since this package is widely used, \LuaTeX-ja
@@ -1545,7 +1545,7 @@ supports some of functions in \Pkg{otf} package.
 If you want to use these functions, load \Pkg{luatexja-otf} package.
 %</en>
 %<*ja>
-\subsection{\texttt{\char92 CID}, \texttt{\char92 UTF}と\Pkg{otf}パッケージのマクロ}
+\subsection{\texttt{\char`\\CID}, \texttt{\char`\\UTF}と\Pkg{otf}パッケージのマクロ}
 \pLaTeX では，JIS~X~0208にないAdobe-Japan1-6の文字を出力するために，
 齋藤修三郎氏による\Pkg{otf}パッケージが用いられていた．このパッケージは
 広く用いられているため，\LuaTeX-jaにおいても\Pkg{otf}パッケージの機能の
@@ -2139,7 +2139,7 @@ $\Phi\vdash F(x)\ \hbox{for all}\ x\in A$
 \medskip
 
 文字ウィドウ処理\hbox{}$^*$: 「漢字が一文字だけ次の行に行くのを防ぐ」\ 
-\texttt{\char92 jcharwidowpenalty} が，
+\texttt{\char`\\jcharwidowpenalty} が，
 その文字の直前に挿入されうるか否か，を示す．
 \end{table} 
 
@@ -2608,7 +2608,7 @@ Please contact the LuaTeX-ja project team.
 
 %<en>\subsection{Structure of JFM file}
 %<ja>\subsection{JFMファイルの構造}
-
+\label{ssec-jfm-str}
 %<en>A JFM file is a Lua script which has only one function call:
 %<ja>JFMファイルはただ一つの関数呼び出しを含むLuaスクリプトである：
 \begin{verbatim}
@@ -2688,7 +2688,7 @@ Like the \texttt{kanjiskip} field, this field specifies the `ideal'
 \paragraph{Character classes}
 Besides from above fields, a JFM file have several sub-tables those
 indices are natural numbers.  The table indexed by~$i\in\omega$ stores
-information of `character class'~$i$. At least, the character class~0 is
+information of \emph{character class}~$i$. At least, the character class~0 is
 always present, so each JFM file must have a sub-table whose index is
 \texttt{[0]}.  Each sub-table (its numerical index is denoted by $i$) has
 the following fields:
@@ -2696,7 +2696,7 @@ the following fields:
 %<*ja>
 \paragraph{文字クラス}
 上記のフィールドに加えて，JFMファイルはそのインデックスが自然数であるいくつかの
-サブテーブルを持つ．インデックスが$i\in\omega$であるテーブルは「文字クラス」$i$の
+サブテーブルを持つ．インデックスが$i\in\omega$であるテーブルは\emph{文字クラス}$i$の
 情報を格納する．少なくとも，文字クラス0は常に存在するので，JFMファイルはインデックス
 が\texttt{[0]}のサブテーブルを持たなければならない．それぞれのサブテーブル
 （そのインデックスを$i$で表わす）は以下のフィールドを持つ：
@@ -2964,7 +2964,7 @@ used only in line adjustment with priority by \Pkg{luatexja-adjust}
 \setbox0\hbox{\a 。\inhibitglue 漢}
 \the\wd0
 \end{LTXexample}
-では，全角二分(15.0\,pt)とならなければおかしいが，上の実行結果では20\,ptとなっている．
+では，全角二分(15.0\,pt)となるのが自然……と思うかもしれないが，上の実行結果では20\,ptとなっている．
 それは以下の事情によるものである：
 \begin{enumerate}
 \item \verb+vert+ featureによって句点が縦書き用のグリフと置き換わる（\Pkg{luaotfload} による処理）．
@@ -3050,7 +3050,7 @@ The following is the list of imaginary characters:
 \begin{itemize}
 \item 実際に出力される和文フォントのサイズがdesign sizeとなる．
 このため，例えば$1\,\textrm{zw}$がdesign sizeの0.962216倍であるJISフォン
-      トメトリック等を移植する場合は，
+      トメトリック等を移植する場合は，次のようにするべきである：
 \begin{itemize}
 \item JFM中の全ての数値を$1/0.962216$倍しておく．
 \item \TeX ソース中で使用するところで，サイズ指定を0.962216倍にする．
@@ -3078,7 +3078,7 @@ The following is the list of imaginary characters:
 うになった．例えば，\LuaTeX-ja同梱のJFMのように，\texttt{'boxbdd'}と同じ文字クラスに
 \texttt{'parbdd'}を入れれば全角下がりとなる．
 
-\begin{LTXexample}
+\begin{LTXexample}[width=0.4\textwidth]
 \jfont\g=file:KozMinPr6N-Regular.otf:jfm=test \g
 \parindent1\zw\noindent{}◆◆◆◆◆
 \par 「◆◆←二分下がり
@@ -3230,11 +3230,11 @@ You may assume that \verb+jfont_info+ has the following fields:
 \emph{このテーブルを書き換えてはならない}．
 中身はほぼJFMファイルに書かれている唯一のテーブルであるが，次のように若干変わっている：
 \begin{itemize}
-\item 各文字クラス$i$に属する文字達のテーブル
-\texttt{[$i$].chars=\{<character>, ...\}}は，トップレベルにまとめられ，
-\texttt{chars=\{[<character>]=$i$, ...\}}という形になっている．
+\item 各文字クラス$i$に属する文字達のテーブル\
+\texttt{[$i$].chars=\{<character>, ...\}} は，トップレベルにまとめられ，
+\texttt{chars=\{[<character>]=\,$i$, ...\}} という形になっている．
 \item \texttt{zw},~\texttt{zh}, \texttt{kanjiskip},~\texttt{xkanjiskip} の各フィールドの値は，
-実際に使われるフォントサイズに合わせたsp ($1\,\mathrm{sp}=2^{-6}\,\mathrm{pt}$)単位の長さに変わっている．
+実際に使われるフォントサイズに合わせたsp ($1\,\mathrm{sp}=2^{-16}\,\mathrm{pt}$)単位の長さに変わっている．
 \item 各文字クラス$i$の情報を格納したテーブルも，\texttt{char\_type} フィールドの下にまとめられている．
 例えば，文字クラス1に属する文字の高さは \texttt{char\_type[1].height} で参照できる．
 \item \texttt{dir} フィールドはこのテーブルにはない．
@@ -3380,11 +3380,10 @@ Then, the position of glyphs is shifted up by
 
 %<en>\section{Parameters}
 %<ja>\section{パラメータ}
-%<en>\subsection{\texttt{\char92 ltjsetparameter}}
-%<ja>\subsection{\texttt{\char92 ltjsetparameter}命令}
+\subsection{\texttt{\char`\\ltjsetparameter}}
 
 %<*en>
-As noted before, \verb+\ltjsetparameter+ and \verb+\ltjgetparameter+ are
+As described before, \verb+\ltjsetparameter+ and \verb+\ltjgetparameter+ are
 control sequences for accessing most parameters of \LuaTeX-ja. One of the main
 reason that \LuaTeX-ja didn't adopted the syntax similar to that of \pTeX\
 (\textit{e.g.},~\verb+\prebreakpenalty`）=10000+)
@@ -3402,8 +3401,8 @@ of \LuaTeX, see Section~\ref{sec-para}.
 %<*en>
 \verb+\ltjsetparameter+ and \verb+\ltjglobalsetparameter+ are control sequences
 for assigning parameters. These take one argument which is a
-\texttt{<key>=<value>} list. Allowed keys are described in the next
-subsection.
+\texttt{<key>=<value>} list. 
+The list of allowed keys are described in the next subsection.
 The difference between
 \verb+\ltjsetparameter+ and \verb+\ltjglobalsetparameter+ is only the
 scope of assignment;
@@ -3415,9 +3414,9 @@ like other assignment.
 %<*ja>
 \verb+\ltjsetparameter+ と \verb+\ltjglobalsetparameter+ はパラメータを
 指定するための命令である．これらは\texttt{<key>=<value>}のリストを
-引数としてとる．許されるキーは次の節に記述する．
+引数としてとる．許されるキーの一覧は次の節にある．
 \verb+\ltjsetparameter+ と \verb+\ltjglobalsetparameter+ の違いはスコープの
-違いのみである．
+違いのみで，
 \verb+\ltjsetparameter+ はローカルな指定，\verb+\ltjglobalsetparameter+ は
 グローバルな指定を行う．
 これらは他のパラメータ指定と同様に \verb+\globaldefs+ の値に従う．
@@ -3666,8 +3665,8 @@ JFM（もしくはサイズ）が異なる2つの\textbf{JAchar}の間にグル�
 \end{list}
 
 
-%<en>\section{Other Control Sequences}
-%<ja>\section{その他の命令}
+%<en>\section{Other Control Sequences which are available in both plain \TeX\ and \LaTeXe}
+%<ja>\section{plainでも\LaTeX でも利用可能なその他の命令}
 %<en>\subsection{Control Sequences for Compatibility}
 %<ja>\subsection{\pTeX 互換用命令}
 
@@ -3698,8 +3697,8 @@ These 6 control sequence takes an internal integer, and returns a \emph{string}.
 
 
 
-%<en>\subsection{\texttt{\char92 inhibitglue}}
-%<ja>\subsection{\texttt{\char92 inhibitglue}}
+%<en>\subsection{\texttt{\char`\\inhibitglue}}
+%<ja>\subsection{\texttt{\char`\\inhibitglue}}
 %<*en>
 \verb+\inhibitglue+ suppresses the insertion of \textbf{JAglue}.
 The following is an example, using a special JFM that there will be a glue between
@@ -4322,8 +4321,6 @@ for making the difference obvious.
 \item[\char92ltjenableadjust]
 優先順位付きの行長調整を有効化する．
 
-\item[優先度設定……]
-
 \end{list}
 
 
@@ -4352,8 +4349,8 @@ Here the following is the list of dimensions and attributes which are used in \L
 %</ja>
 \begin{list}{}{%
 \def\makelabel{\ttfamily}\advance\leftmargin1\zw
-\def\dim#1{\item[\char92 #1\ \textrm{(dimension)}]}
-\def\attr#1{\item[\char92 #1\ \textrm{(attribute)}]}
+\def\dim#1{\item[\char`\\#1\ \textrm{(dimension)}]}
+\def\attr#1{\item[\char`\\#1\ \textrm{(attribute)}]}
 }
 
 \dim{jQ}
@@ -4603,10 +4600,17 @@ Nodes for Japanese Characters which the callback process of
 %</ja>
 
 \item[\texttt{begin\_par}]
+%<*en>
 Nodes for indicating beginning of a paragraph.
 A paragraph which is started by \verb+\item+ in list-like environments has a horizontal box
 for its label before the actual contents. So \dots
+%</en>
+%<*ja>
+「段落の開始」を意味するノード．
+list環境，itemize環境などにおいて，\verb+\item+ で始まる各項目は……
+%</ja>
 \end{description}
+
 %<*en>
 These whatsits will be removed during the process of inserting \textbf{JAglue}s.
 %</en>
@@ -5381,9 +5385,9 @@ x+y&\text{if\ }\Param{\hyperlink{fld:diffjfm}{diffrentjfm}}=\texttt{both};
 \end{verbatim}
 という3フォントを考え，
 \[
- \overbrace{\Node{glyph}{{\tt\char92 foo}, `あ'}}^{p}
-\longrightarrow \overbrace{\Node{glyph}{{\tt\char92 bar}, `い'}}^{q}
-\longrightarrow \overbrace{\Node{glyph}{{\tt\char92 baz}, `う'}}^{r}
+ \overbrace{\Node{glyph}{{\tt\char`\\foo}, `あ'}}^{p}
+\longrightarrow \overbrace{\Node{glyph}{{\tt\char`\\bar}, `い'}}^{q}
+\longrightarrow \overbrace{\Node{glyph}{{\tt\char`\\baz}, `う'}}^{r}
 \]
 という3ノードを考える（それぞれ単独でクラスタをなす）．
 この場合，$p$と$q$の間は，実フォントが異なるにもかかわらず(2)の状況となる一方で，
@@ -5395,7 +5399,7 @@ $q$と$r$の間は（実フォントが同じなのに）\texttt{jfmvar}キー�
 \begin{enumerate}
 \item 両クラスタ（厳密には$\mathit{Nq}.\mathit{tail}$，$\mathit{Np}.\mathit{head}$）の中身の文字コードに対する
 \Param{autospacing}パラメタが両方ともfalseだった場合は，長さ0のglueとする．
-\item ユーザ側から見た\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}パラメタの自然長が${\tt \char92 maxdimen}=(2^{30}-1)\,{\rm sp}$で
+\item ユーザ側から見た\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}パラメタの自然長が${\tt \char`\\maxdimen}=(2^{30}-1)\,{\rm sp}$で
 なければ，\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}パラメタの値を持つglueを採用する．
 \item 2.でない場合は，\textit{Nq}, \textit{Np}で使われているJFMに指定されている\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}の値を用いる．
 どちらか片方のクラスタだけが和文文字（\textsf{和文A}・\textsf{和文B}）のときは，そちらのクラスタで使われている
@@ -5536,7 +5540,7 @@ If this attempt fails, \LuaTeX-ja use the method `\textsf{\Param{kanjiskip}~[K]}
 \item \textit{Np}の中身の文字コードについて，「直前への\Param{\hyperlink{fld:xks}{xkanjiskip}}の挿入」が禁止されている
 （つまり，\Param{jaxspmode}~(or \Param{alxspmode})パラメタが偶数）．
 \end{itemize}
-\item ユーザ側から見た\Param{\hyperlink{fld:xks}{xkanjiskip}}パラメタの自然長が${\tt \char92 maxdimen}=(2^{30}-1)\,{\rm sp}$で
+\item ユーザ側から見た\Param{\hyperlink{fld:xks}{xkanjiskip}}パラメタの自然長が${\tt \char`\\maxdimen}=(2^{30}-1)\,{\rm sp}$で
 なければ，\Param{\hyperlink{fld:xks}{xkanjiskip}}パラメタの値を持つglueを採用する．
 \item 2.でない場合は，\textit{Nq}, \textit{Np}（\textsf{和文A}/\textsf{和文B}なのは片方だけ）
 で使われているJFMに指定されている\Param{\hyperlink{fld:xks}{xkanjiskip}}の値を用いる．
@@ -5914,12 +5918,17 @@ listing environments.
 べる．大まかに述べると，次のようになる．
 \begin{itemize}
 \item 通常の\TeX の行分割方法に従って，段落を行分割する．この段階では，行
-      長に半端が出た場合，その半端分は\Param{\hyperlink{fld:xks}{xkanjiskip}}，
-      \Param{\hyperlink{fld:kanjiskip}{kanjiskip}}，JFMグルーの全てで（優先順位なく）負担される．
+      長に半端が出た場合，その半端分は\textbf{JAglue}（\Param{\hyperlink{fld:xks}{xkanjiskip}}，
+      \Param{\hyperlink{fld:kanjiskip}{kanjiskip}}，JFMグルー）と
+      それ以外のグルーの全てで（優先順位なく）負担される．
 \item その後，\texttt{post\_linebreak\_filter} callbackを使い，\emph{段
       落中の各行ごとに}，行末文字の位置を調整したり，優先度付きの行長調整
       を実現するためにグルーの伸縮度を調整する．
-\Pkg{luatexja-adjust} の作用は，このcallbackを追加するだけであり，
+      その処理においては，グルーの自然長と\textbf{JAglue}以外の
+      グルーの伸び量・縮み量は変更せず，必要に応じて\textbf{JAglue}の伸び量・縮み量のみを
+      変更する設計とした．
+
+\Pkg{luatexja-adjust} の作用は，この処理を行うcallbackを追加するだけであり，
       この章の残りではcallbackでの処理について解説する．
 \end{itemize}
 
@@ -5931,21 +5940,30 @@ listing environments.
 の行に対しての処理を中止}する．
 
 よって，以降，問題にしている行の行長調整は伸縮度が有限長のグルーを用いて
-行われているとして良い．まず，段落中の行中のグルーを
+行われているとして良い．さらに，簡単のため，この行はグルーが広げられている
+（自然長で組むと望ましい行長よりの短い）場合しか扱わない．
+
+まず，段落中の行中のグルーを
 \begin{itemize}
-\item 下のどれにも該当しないグルー
-\item JFMグルー（優先度別にまとめられる）
+\item \textbf{JAglue}ではないグルー
+\item JFMグルー（\ref{ssec-jfm-str}節にあるように，各JFMグルーには$-2$から2までの
+優先度がついており，優先度別にまとめられる）
 \item 和欧文間空白(\Param{\hyperlink{fld:xks}{xkanjiskip}})
 \item 和文間空白(\Param{\hyperlink{fld:kanjiskip}{kanjiskip}})
 \end{itemize}
-の$1+1+5+1=8$つに類別し，それぞれの種別ごとに許容されている伸縮度の合計を計算する．
-また，行長と自然長との差の絶対値を計算し，それを\textit{total}とおく．
+の$1+1+5+1=8$つに類別し，それぞれの種別ごとに
+許容されている伸び量（\texttt{stretch}の値）の合計を計算する．
+また，行長と自然長との差を計算し，そのを\textit{total}とおく．
 
-\subsection{行末文字の位置調整}
-まず，行末が文字クラス$n$の\textbf{JAchar}であった場合，
-それを動かすことによって，\textbf{JAglue} が負担する調整量を少なくしようとする．
-この行末文字の左右の移動可能量は，JFM中にある文字クラス$n$の定義の
-\texttt{end\_stretch},~\texttt{end\_shrink}フィールドに全角単位の値として記述されている．
+
+\subsection{第1段階：行末文字の位置調整}
+行末が文字クラス$n$の\textbf{JAchar}であった場合，
+それを動かすことによって，\textit{total}のうち
+\textbf{JAglue}が負担する分を少なくしようとする．
+この行末文字の左右の移動可能量は，
+JFM中にある文字クラス$n$の定義の
+\texttt{end\_stretch},~\texttt{end\_shrink}フィールドに
+全角単位の値として記述されている．
 
 例えば，行末文字が句点「。」であり，そこで用いられているJFM中に
 \begin{verbatim}
@@ -5957,7 +5975,7 @@ listing environments.
 という指定があった場合，この行末の句点は
 \begin{itemize}
 \item 通常の\TeX の行分割処理で「半角以上の詰め」が行われていた場合，
-この分の行中の\textbf{JAglue}の負担を軽減するため，
+この行中の\textbf{JAglue}の負担を軽減するため，
 行末の句点を半角だけ右に移動する（ぶら下げ組を行う）．
 \item 通常の\TeX の行分割処理で「半角以上の空き」が行われていた場合，
 逆に行末句点を半角左に移動させる（見た目的に全角取りとなる）．
@@ -5968,12 +5986,66 @@ listing environments.
 行末文字を移動した場合，その分だけ\textit{total}の値を引いておく．
 
 \subsection{グルーの調整}
-\textit{total}の分だけが，行中のグルーの伸縮度に応じて負担されることになる．
-……
+\textit{total}の分だけが，行中のグルーの伸び量に応じて負担されることになる．
+負担するグルーの優先度は以下の順であり，
+できるだけ\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}を自然長のままにすることを
+試みている．
+\begin{enumerate}\def\labelenumi{(\Alph{enumi})}
+ \item \textbf{JAglue}以外のグルー
+ \item 優先度2のJFMグルー
+ \item 優先度1のJFMグルー
+ \item 優先度0のJFMグルー
+ \item 優先度$-1$のJFMグルー
+ \item 優先度$-2$のJFMグルー
+ \item \Param{\hyperlink{fld:xks}{xkanjiskip}}
+ \item \Param{\hyperlink{fld:kanjiskip}{kanjiskip}}
+\end{enumerate}
+\begin{enumerate}
+ \item 行末の和文文字を移動したことで$\textit{total}=0$となれば，
+調整の必要はなく，行が格納されている水平ボックスの
+\texttt{glue\_set}, \texttt{glue\_sign}, \texttt{glue\_order}を再計算すればよい．
+以降，$\textit{total}\neq 0$と仮定する．
+ \item \textit{total}が「\textbf{JAglue}以外のグルーの伸び量の合計」（以下，(A)の伸び量の
+       合計，と称す）よりも小さければ，
+それらのグルーに\textit{total}を負担させ，\textbf{JAglue}達自身は自然長で組むことができる．
+よって，以下の処理を行う：
+\begin{enumerate}
+\item 各\textbf{JAglue}の伸び量を0とする．
+\item 行が格納されている水平ボックスの
+\texttt{glue\_set}, \texttt{glue\_sign}, \texttt{glue\_order}を再計算する．
+これによって，\textit{total}は\textbf{JAglue}以外のグルーによって負担される．
+\end{enumerate}
+\item \textit{total}が「(A)の伸び量の合計」以上ならば，(A)--(H)のどこまで負担すれば
+\textit{total}以上になるかを計算する．
+例えば，
+\[\catcode`\<=12
+ \textit{total} = (\text{(A)--(B)の伸び量の合計}) + p\cdot (\text{(C)の伸び量の合計}),
+ \qquad 0\le p<1
+\]
+であった場合，各グルーは次のように組まれる：
+\begin{itemize}
+ \item (A),~(B)に属するグルーは各グルーで許された伸び量まで伸ばす．
+ \item (C)に属するグルーはそれぞれ$p\times (\text{伸び量})$だけ伸びる．
+ \item (D)--(H)に属するグルーは自然長のまま．
+\end{itemize}
+実際には，前に述べた「設計」に従い，次のように処理している：
+\begin{enumerate}
+\item (C)に属するグルーの伸び量を$p$倍する．
+\item (D)--(H)に属するグルーの伸び量を0とする．
+\item 行が格納されている水平ボックスの
+\texttt{glue\_set}, \texttt{glue\_sign}, \texttt{glue\_order}を再計算する．
+これによって，\textit{total}は\textbf{JAglue}以外のグルーによって負担される．
+\end{enumerate}
+\item \textit{total}が(A)--(H)の伸び量の合計よりも大きい場合，どうしようもないので
+      \verb+^^;+何もせず，何もしない．
+\end{enumerate}
 
 %</ja>
 
-
+%<*ja>
+\section{IVS対応（未完）}
+\section{複数フォントの「合成」（未完）}
+%</ja>
 
 
 \begin{thebibliography}{99}
