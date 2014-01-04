@@ -222,7 +222,8 @@ do
    local function prepare_ivs_data(n, id)
       -- test if already loaded
       if type(id)=='number' then -- sometimes id is an integer
-         font_ivs_table[n] = font_ivs_table[id]; return 
+         font_ivs_table[n] = font_ivs_table[id]; return
+      elseif not id then return
       end
       local fname = id.filename
       local bname = file.basename(fname)
@@ -271,13 +272,13 @@ do
             local pf = p.font
             if (has_attr(p, attr_curjfnt) or 0) == pf  then
                -- only works with JAchars
-               local pt = font_ivs_table[pf]
                local q = node_next(p) -- the next node of p
                if q and q.id==id_glyph then
                   local qc = q.char
                   if (qc>=0xFE00 and qc<=0xFE0F) or (qc>=0xE0100 and qc<0xE01F0) then 
 		     -- q is a variation selector
 		     if qc>=0xE0100 then qc = qc - 0xE0100 end
+                     local pt = font_ivs_table[pf]
                      pt = pt and pt[p.char];  pt = pt and  pt[qc]
                      head = node_remove(head,q)
                      if pt then
