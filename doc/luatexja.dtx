@@ -358,7 +358,7 @@ The followings are major changes from \pTeX:
       fonts are identified. 
 %</en>
 %<*ja>
-\item 処理中では，2つの和文フォントは，「実際の」フォントが異なるだけの場合には同一視
+\item 処理中では，2つの和文フォントは，実フォントが異なるだけの場合には同一視
       される．
 %</ja>
 \end{itemize}
@@ -507,8 +507,8 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %<ja>\LuaTeX-jaパッケージのインストールには，次のものが必要である．
 \begin{itemize}
 \item \LuaTeX\ beta-0.74.0 (or later)
-\item \Pkg{luaotfload} v2.2
-\item \Pkg{luatexbase} v0.6~(2013/05/04)
+\item \Pkg{luaotfload} v2.2 (or later)
+\item \Pkg{luatexbase} v0.6
 \item \Pkg{xunicode} v0.981~(2011/09/09)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
 \end{itemize}
@@ -535,10 +535,6 @@ from \TeX~Live manager (\texttt{tlmgr}):
 \begin{verbatim}
 $ tlmgr install luatexja
 \end{verbatim}
-
-\medskip
-
-If you want to install manually, do the following instruvtions:
 %</en>
 %<*ja>
 \emph{本バージョン以降の\LuaTeX-jaは\TeX~Live~2012以前では動作しない．}
@@ -560,11 +556,11 @@ If you want to install manually, do the following instruvtions:
 \begin{verbatim}
 $ tlmgr install luatexja
 \end{verbatim}
-
-\medskip
-
-手動でインストールする場合の方法は以下のようになる：
 %</ja>
+
+%<en>\paragraph{Manual installation}
+%<ja>\paragraph{手動インストール方法}
+
 \begin{enumerate}
 %<*en>
 \item Download the source archive, by one of the following method.
@@ -661,6 +657,42 @@ Note that \texttt{*.\{dtx,ins\}} and \texttt{ltj-kinsoku\_make.tex} are not need
 %</ja>
 \end{enumerate}
 
+%<*en>
+\paragraph{Note for MiK\TeX\ Users}
+\LuaTeX-ja requires that two CMap files, 
+\texttt{UniJIS2004-UTF32-H} and \texttt{Adobe-Japan1-UCS2},
+must be found from \LuaTeX.
+Strictly speaking, those CMaps are needed 
+only in the first run of \LuaTeX-ja after installing or updating.
+
+But it seems that MiK\TeX\ does not satisfy this condition, 
+so you will encounter an error like the following:
+%</en>
+%<*ja>
+\LuaTeX-jaが動作するためには，\emph{導入・更新後の初回起動時に}
+\texttt{UniJIS2004-UTF32-H}, \texttt{Adobe-Japan1-UCS2}という2つのCMapが
+\LuaTeX によって見つけられることが必要である．
+しかしMiK\TeX ではそのようになっていないので，次のエラーが発生するだろう：
+%</ja>
+\begin{verbatim}
+! LuaTeX error ...iles (x86)/MiKTeX 2.9/tex/luatex/luatexja/ltj-rmlgbm.lua
+bad argument #1 to 'open' (string expected, got nil)
+\end{verbatim}
+
+%<*en>
+If so, please execute a batch file which is written on
+\href{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage%28en%29}{ the Project Wiki (English)}.
+This batch file creates a temporaly directory, copy CMaps in it, 
+run \LuaTeX-ja in this directory, and finally delete the temporaly directory.
+%</en>
+%<*ja>
+そのような場合には，
+\href{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage%28en%29}{%
+  プロジェクトWiki英語版トップページ}中に書かれているバッチファイルを
+実行して欲しい．このバッチファイルは，作業用ディレクトリにCMap達を
+コピーし，その中で\LuaTeX-ja の初回起動を行い，作業用ディレクトリを消す作業をしている．
+%</ja>
+
 %<en>\subsection{Cautions}
 %<ja>\subsection{注意点}
 
@@ -674,34 +706,15 @@ Note that \texttt{*.\{dtx,ins\}} and \texttt{ltj-kinsoku\_make.tex} are not need
       従来日本語の文字コードとして用いられてきたEUC-JPやShift-JISは使用できない．
 %</ja>
 %<*en>
-\item \LuaTeX-ja is very slower than \pTeX. Using LuaJIT\TeX\ slightly improve the situation.
+\item \LuaTeX-ja is very slower than \pTeX. 
+Using LuaJIT\TeX\ usually improve the situation, but not always.
 %</en>
 %<*ja>
-\item \LuaTeX-jaは動作が\pTeX に比べて非常に遅い．コードを変更して徐々に速くしているが，
-まだ満足できる速度ではない．LuaJIT\TeX を用いると\LuaTeX のだいたい1.3倍の速度で動くようである．
+\item \LuaTeX-jaは動作が\pTeX に比べて非常に遅い．
+コードを調整して徐々に速くしているが，まだ満足できる速度ではない．
+LuaJIT\TeX を用いると\LuaTeX のだいたい1.3倍の速度で動くようであるが，
+IPA mj明朝などの大きいフォントを用いた場合には\LuaTeX よりも遅くなることもある．
 %</ja>
-
-%<*en>
-\item \emph{Note for MiK\TeX\ users:} \LuaTeX-ja requires that two CMap files, 
-\texttt{UniJIS2004-UTF32-H} and \texttt{Adobe-Japan1-UCS2}, must be found
-by Kpathsearch.
-You can check this by \texttt{kpsewhich} command (the output may be changed): 
-%</en>
-%<*ja>
-\item \emph{MiK\TeX 利用者への注意：}\LuaTeX-jaが動作するためには，
-\texttt{UniJIS2004-UTF32-H}, \texttt{Adobe-Japan1-UCS2}という2つのCMapが
-Kpathsearchによって見つけられることが必要である．\TeX\ LiveやW32\TeX ユーザは
-普通にインストールすればそのようになっているはずである．
-
-確認するには，以下のように \texttt{kpsewhich} コマンドを実行すればよい：
-%</ja>
-\begin{verbatim}
-$ kpsewhich -format=cmap  UniJIS2004-UTF32-H
-/opt/texlive/2013/texmf-dist/fonts/cmap/adobemapping/aj16/CMap/UniJIS2004-UTF32-H
-$ kpsewhich -format=cmap  Adobe-Japan1-UCS2
-/opt/texlive/2013/texmf-dist/fonts/cmap/adobemapping/ToUnicode/Adobe-Japan1-UCS2
-\end{verbatim}
-
 \end{itemize}
 
 %<en>\subsection{Using in plain \TeX}
@@ -743,7 +756,7 @@ $ kpsewhich -format=cmap  Adobe-Japan1-UCS2
 %</ja>
 \begin{itemize}
 %<*en>
-\item It is widely accepted that fonts  ``Ryumin-Light'' and
+\item It is widely accepted that fonts ``Ryumin-Light'' and
       ``GothicBBB-Medium'' aren't embedded into PDF files, and a PDF reader
       substitute them by some external Japanese fonts (\textit{e.g.},
       Ryumin-Light is substituted with Kozuka Mincho in Adobe Reader). 
@@ -1689,7 +1702,7 @@ number shows whether each character in the range is treated as
 %</en>
 %<*ja>
 以下ではこれら8つの文字範囲について記述する．番号のあとのアルファベット「J」「A」
-は，その文字範囲内の文字ば\textbf{JAchar}か\textbf{ALchar}かを表している．これらの設定は
+は，その文字範囲内の文字が\textbf{JAchar}か\textbf{ALchar}かを表している．これらの設定は
 \texttt{PXbase}バンドルで定義されている\texttt{prefercjk}と類似のものである．
 %</ja>
 \begin{description}
@@ -1937,7 +1950,7 @@ JFMは「望ましい\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}の値」や
 It is not desirable that \Param{\hyperlink{fld:xks}{xkanjiskip}} is inserted into every
 boundary between \textbf{JAchar}s and \textbf{ALchar}s. For example,
 \Param{\hyperlink{fld:xks}{xkanjiskip}} should not be inserted after opening parenthesis
-(\textit{e.g.}, compare ``(あ'' and ``(\hskip\ltjgetparameter{xkanjiskip}あ').
+(\textit{e.g.}, compare ``(あ'' and ``(\hskip\ltjgetparameter{xkanjiskip}あ'').
 \LuaTeX-ja can control whether \Param{\hyperlink{fld:xks}{xkanjiskip}} can be inserted
 before/after a character, by changing \Param{jaxspmode} for \textbf{JAchar}s and
 \Param{alxspmode} parameters \textbf{ALchar}s respectively.
@@ -1957,8 +1970,8 @@ pあq い!う
 \end{LTXexample}
 
 %<*en>
-The second argument \texttt{preonly} means ``the insertion of
-\Param{\hyperlink{fld:xks}{xkanjiskip}} is allowed before this character, but not after''.
+The second argument \texttt{preonly} means that the insertion of
+\Param{\hyperlink{fld:xks}{xkanjiskip}} is allowed before this character, but not after.
 the other possible values are \texttt{postonly}, \texttt{allow} and \texttt{
 inhibit}.
 %</en>
@@ -2532,12 +2545,12 @@ with \texttt{psft} prefix, because they are only simple linear transformations.
 和文フォントを指定することができる．「標準的な」非埋め込み和文フォント，
 つまり「Ryumin-Light」「GothicBBB-Medium」の指定でこのプリフィックスが使われる．
 
-\emph{\texttt{psft}プリフィックスの下では
+\emph{\texttt{psft} プリフィックスの下では
 \texttt{+jp90} などのOpenType font featureの効力はない．
 非埋込フォントをPDFに使用すると，実際にどのようなフォントが
-表示に用いられるか予測できないからである．}
-\texttt{extend}と\texttt{slant}指定は単なる変形のため
-\texttt{psft}プリフィックスでも使用可能である．
+表示に用いられるか予測できないからである．}\
+\texttt{extend} と \texttt{slant} 指定は単なる変形のため
+\texttt{psft} プリフィックスでも使用可能である．
 %</ja>
 
 %<en>\paragraph{\texttt{cid} key}
@@ -2663,10 +2676,9 @@ This field specifies the ``ideal'' amount of \Param{\hyperlink{fld:kanjiskip}{ka
 	     fields are in design-size unit too.
 %</en>
 %<*ja>
-「理想的な」\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}の量を指定する．\ref{subs-kskip}節で述べたように，
+理想的な\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}の量を指定する．\ref{subs-kskip}節で述べたように，
 もし\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}が \verb+\maxdimen+ の値ならば，このフィールドで指定された
-値が実際には用いられる（もしこのフィールドがJFMで指定されていなければ，
-0\,ptであるものとして扱われる）．<stretch>と<shrink>のフィールドもdesign-size
+値が実際には用いられる（指定なしは0\,ptとして扱われる）．<stretch>と<shrink>のフィールドもdesign-size
 が単位であることに注意せよ．
 %</ja>
 
@@ -2679,7 +2691,7 @@ Like the \texttt{kanjiskip} field, this field specifies the ``ideal''
 	     amount of \Param{\hyperlink{fld:xks}{xkanjiskip}}.
 %</en>
 %<*ja>
-\texttt{kanjiskip}フィールドと同様に，\Param{\hyperlink{fld:xks}{xkanjiskip}}の「理想的な」量を
+\texttt{kanjiskip}フィールドと同様に，\Param{\hyperlink{fld:xks}{xkanjiskip}}の理想的な量を
 指定する．
 %</ja>
 \end{list}
@@ -2763,7 +2775,7 @@ These fields are for adjusting the position of the ``real'' glyph. Legal
 The effects of these 3~fields are indicated in Figure~\ref{fig-pos}.
 %</en>
 %<*ja>
-これらのフィールドは「実際の」グリフの位置を調整するためにある．
+これらのフィールドは実際のグリフの位置を調整するためにある．
 \texttt{align}フィールドに指定できる値は\texttt{'left'}, \texttt{'middle'},
 \texttt{'right'}のいずれかである．もしこれら3つのフィールドのうちの1つが省かれた
 場合，\texttt{left}と\texttt{down}は0，\texttt{align}フィールドは
@@ -2863,7 +2875,7 @@ Since the \texttt{align} field is \texttt{'middle'},
 the ``real'' glyph is centered horizontally (the green rectangle).
 %</en>
 %<*ja>
-\texttt{align}フィールドは\texttt{middle}なので，「実際の」グリフは
+\texttt{align}フィールドは\texttt{middle}なので，実際のグリフは
 水平方向の中心に配置される（緑色の長方形）．
 %</ja>
 \item
@@ -2881,7 +2893,7 @@ Furthermore, the glyph is shifted according to values of fields
 \medskip
 
 \caption{%
-%<en>The position of the `real' glyph.
+%<en>The position of the real glyph.
 %<ja>「実際の」グリフの位置．
 }
 \label{fig-pos}
@@ -4265,7 +4277,14 @@ IVSに対応してはいないようである．これらのパッケージで�
  \texttt{jp90}：\TEST{CJKShape=JIS1990}
 \end{LTXexample}
 
-
+現状では，\TeX 側のインターフェースとなる \Pkg{luatexja-otf.sty} は一切変更していない
+ので，ZRさんによる\Pkg{PXipamjm}パッケージ%
+\footnote{\url{https://github.com/zr-tex8r/PXipamjm}. 説明は彼のブログ記事
+「pxipamjm パッケージの説明書のような何か(\url{http://d.hatena.ne.jp/zrbabbler/20131221})」
+にある．}%
+にあるような気の利いた命令はまだない．
+異体字の一覧表示を行いたい場合は，gitリポジトリ内の \texttt{test/test19-ivs.tex} 中にある
+Lua・\TeX コードが参考になるだろう．
 %</ja>
 
 
@@ -6076,8 +6095,175 @@ JFM中にある文字クラス$n$の定義の
 %<*ja>
 \section{IVS対応（未完）}
 \section{複数フォントの「合成」（未完）}
-%</ja>
 
+\section{\LuaTeX-jaにおけるキャッシュ}
+\Pkg{luaotfload}パッケージが，各TrueType・]OpenTypeフォントの情報を
+キャッシュとして保存しているのと同様の方法で，
+\LuaTeX-jaもいくつかのキャッシュファイルを作成するようになった．
+\begin{itemize}
+ \item 通常，キャッシュは\texttt{\$TEXMFVAR/luatexja/}以下に保存され，
+そこから読み込みが行われる．
+ \item 「通常の」テキスト形式のキャッシュ（拡張子は \texttt{.lua}）以外にも，
+それをバイナリ形式（バイトコード）に変換したものもサポートしている．
+\begin{itemize}
+ \item \LuaTeX とLuaJIT\TeX ではバイトコードの形式が異なるため，バイナリ形式の
+キャッシュは共有できない．\LuaTeX 用のバイナリキャッシュは \texttt{.luc}，
+LuaJIT\TeX 用のは \texttt{.lub} と拡張子を変えることで対応している．
+ \item キャッシュを読み込む時，同名のバイナリキャッシュがあれば，
+テキスト形式のものよりそちらを優先して読み込む．
+ \item テキスト形式のキャッシュが更新/作成される際は，そのバイナリ版も
+同時に更新される．
+また，（バイナリ版が見つからず）テキスト形式のキャッシュ側が読み込まれたときは，
+\LuaTeX-jaはバイナリキャッシュを作成する．
+\end{itemize}
+\end{itemize}
+%</ja>
+%<*en>
+\section{Cache Management of \LuaTeX-ja}
+\LuaTeX-ja creates some cache files to reduce the loading time. 
+in a similar way to the \Pkg{luaotfload} package:
+\begin{itemize}
+ \item Cache files are usually stored in (and loaded from)
+\texttt{\$TEXMFVAR/luatexja/}.
+ \item In addition to caches of the text form (the extension is ``\texttt{.lua}''),
+caches of the \emph{binary}, precompiled form are supported.
+\begin{itemize}
+ \item We cannot share same binary cache for \LuaTeX\ and LuaJIT\TeX.
+Hence we distinguish them by their extension, ``\texttt{.luc}'' for \LuaTeX\
+and ``\texttt{.lub}'' for LuaJIT\TeX.
+ \item In loading a cache, the binary cache precedes 
+the text form.
+ \item When \LuaTeX-ja updates a cache \texttt{hoge.lua}, 
+its binary version is also updated.
+\end{itemize}
+\end{itemize}
+%</en>
+
+
+\begin{table}[!tb]
+ \centering
+\caption{\texttt{cid} key and corresponding files}
+\label{tab:cid-cache}
+\vspace*{\medskipamount}
+\begin{tabular}{>{\tt}l>{\tt}l>{\tt}l>{\tt}l}
+\toprule
+\bf \texttt{cid} key&\bf name of the cache &
+\multicolumn{2}{c}{\bf used CMaps}\\
+\midrule
+Adobe-Japan1-*&ltj-cid-auto-adobe-japan1.lua&UniJIS2004-UTF32-H&Adobe-Japan1-UCS2\\
+Adobe-Korea1-*&ltj-cid-auto-adobe-korea1.lua&UniKS-UTF32-H&Adobe-Korea1-UCS2\\
+Adobe-GB1-*&ltj-cid-auto-adobe-gb1.lua&UniGB-UTF32-H&Adobe-GB1-UCS2\\
+Adobe-CNS1-*&ltj-cid-auto-adobe-cns1.lua&UniCNS-UTF32-H&Adobe-CNS1-UCS2\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%<*ja>
+\subsection{キャッシュの使用箇所}
+
+\LuaTeX-ja では以下の3種類のキャッシュを使用している：
+\begin{list}{}%
+{\def\makelabel#1{\ttfamily#1}}
+\item[ltj-cid-auto-adobe-japan1.lua] 
+Ryumin-Lightのような非埋め込みフォントの情報を格納しており，
+（それらが\LuaTeX-jaの標準和文フォントなので）\LuaTeX-jaの読み込み時に自動で読まれる．
+生成には\texttt{UniJIS2004-UTF32-H}, \texttt{Adobe-Japan1-UCS2}という2つの
+CMapが必要である．
+
+\pageref{para-cid}ページで述べたように，\texttt{cid}キーを使って
+非埋め込みの中国語・韓国語フォントを定義する場合，同様のキャッシュが生成される．
+キャッシュの名称，必要となるCMapについては表\ref{tab:cid-cache}を参照して欲しい．
+
+\item[ivs\_***.lua]
+フォント``\texttt{***}''における異体字情報を格納している．構造は以下の通り：
+%</ja>
+%<*en>
+\subsection{Use of Cache}
+
+\LuaTeX-ja uses the following cache:
+\begin{list}{}%
+{\def\makelabel#1{\ttfamily#1}}
+\item[ltj-cid-auto-adobe-japan1.lua] 
+The font table of a CID-keyed non-embedded Japanese font.
+This is loaded in every run.
+It is created from two CMaps, \texttt{UniJIS2004-UTF32-H} and
+	     \texttt{Adobe-Japan1-UCS2}, 
+and this is why these two CMaps are needed in the first run of \LuaTeX-ja.
+
+Similar caches are created as Table~\ref{tab:cid-cache}, 
+if you specified \texttt{cid} key in \verb+\jfont+
+to use other CID-keyed non-embedded fonts for Chinese or Korean,
+as in Page~\pageref{para-cid}.
+
+\item[ivs\_***.lua]
+This file stores the table of Unicode variants in a font ``\texttt{***}''. 
+The structure of the table is the following:
+%</en>
+\begin{lstlisting}
+return {
+ {
+  [10955]={    -- U+2ACB "Subset Of Above Not Equal To"
+   [65024]=983879, -- <2ACB FE00>
+  },
+  [37001]={    -- U+9089 "邉"
+   [0]=37001,  --   <9089 E0100>
+   991049,     --   <9089 E0101>
+   ...
+  },
+  ...
+ },
+ ["chksum"]="FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", -- checksum of the fontfile
+ ["version"]=4, -- version of the cache
+}
+\end{lstlisting}
+%<*ja>
+\item[ltj-jisx0208.\{luc|lub\}]
+\LuaTeX-ja配布中の\texttt{ltj-jisx0208.lua}をバイナリ化したものである．
+これはJIS~X~0208とUnicodeとの変換テーブルであり，
+\pTeX との互換目的の文字コード変換命令で用いられる．
+%</ja>
+%<*en>
+\item[ltj-jisx0208.\{luc|lub\}]
+The binary version of \texttt{ltj-jisx0208.lua}. 
+This is the conversion table between JIS~X~0208 and Unicode
+which is used in Kanji-code conversion control sequences for compatibility with \pTeX.
+%</en>
+\end{list}
+
+%<*en>
+\subsection{Internal}
+Cache management system of \LuaTeX-ja is stored in \texttt{luatexja.base}
+(\texttt{ltj-base.lua}).
+There are three public functions for cache management in \texttt{luatexja.base}, 
+where <filename> stands for the filename \emph{without suffix}:
+\begin{list}{}%
+{\def\makelabel#1{\ttfamily#1}}
+\item[save\_cache(<filename>, <data>)]
+Save a non-nil table <data> into a cache <filename>.
+Both the text form <filename>\texttt{.lua} and its binary version 
+are created or updated.
+
+\item[save\_cache\_luc(<filename>, <data>{[, <serialized\_data>]})]\ 
+
+Same as \texttt{save\_cache}, except that only the binary cache is updated. 
+The third argument <serialized data> is not usually given.
+But if this is given, it is treated as a string representation of <data>.
+
+\item[load\_cache(<filename>, <outdate>)]
+Load the cache <filename>.
+<outdate> is a function which takes one argument (the contents of the cache),
+and its return value is whether the cache is outdated.
+
+\texttt{load\_cache} first tries to 
+read the binary cache <filename>\texttt{.\{luc|lub\}}.
+If its contents is up-to-date, \texttt{load\_cache} returns the contents.
+If the binary cache is not found or 
+its contents is outdated, \texttt{load\_cache} tries to 
+read the text form <filename>\texttt{.lua}.
+Hence, the return value of \texttt{load\_cache} is non-nil,
+if and only if the updated cache is found.
+\end{list}
+%</en>
 
 \begin{thebibliography}{99}
   \addcontentsline{toc}{section}{\refname}

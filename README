@@ -1,6 +1,6 @@
 The LuaTeX-ja Package $VER$
 --------------------------------
-Copyright (c) 2011--2013 The LuaTeX-ja project
+Copyright (c) 2011--2014 The LuaTeX-ja project
 License: modified BSD (see COPYING)
 
 LuaTeX-ja is a macro package for typesetting Japanese documents with LuaTeX.
@@ -26,8 +26,6 @@ Installation
     - LuaTeX beta-0.74.0 or later
     - luaotfload v2.2
     - luatexbase v0.6
-    - Several Adobe CMaps 
-      (e.g., UniJIS2004-UTF32-H, Adobe-Japan1-UCS2 for Japanese)
    Hence this version does not work in TeX Live 2012 (or earlier).
 
 1. If you are using TeX Live 2013 or later, you can install LuaTeX-ja via tlmgr.
