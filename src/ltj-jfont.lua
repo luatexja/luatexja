@@ -410,7 +410,7 @@ do
    function print_aftl_address(bbase)
       local t = alt_font_table_latex[bbase]
       if not t then t = {}; alt_font_table_latex[bbase] = t end
-      tex.sprint((tostring(t):gsub('table: 0x','ltjaltfont')))
+      tex.sprint(cat_lp, (tostring(t):gsub('table: 0x','ltjaltfont')))
    end
 -- EXT
    function output_alt_font_cmd(bbase)
@@ -449,8 +449,7 @@ do
 
 -- EXT
    function pickup_alt_font_b(afnt_num, afnt_base)
-      local t = alt_font_table[alt_font_base_num] 
-      print(afnt_num, getfont(afnt_num))
+      local t = alt_font_table[alt_font_base_num]
       local ac = getfont(afnt_num).characters
       if not t then t = {}; alt_font_table[alt_font_base_num] = t end
       for i,v in pairs(alt_font_table_latex[alt_font_base]) do

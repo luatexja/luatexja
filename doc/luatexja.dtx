@@ -4,7 +4,7 @@
 % To typeset this manual, you need following two fonts:
 %  - KozMinPr6N-Regular.otf
 %  - KozGoPr6N-Medium.otf
-%  - ipamjm.ttf
+%  - KozGoPr6N-Regular.otf
 
 %<en>\documentclass[a4paper,titlepage]{article}
 %<ja>\documentclass[a4paper,titlepage]{ltjsarticle}
@@ -145,6 +145,8 @@
     \hb@xt@\hsize{\hfil\box\@tempboxa\hfil}%
   \fi
   \vskip\belowcaptionskip}
+
+\def\_{\leavevmode \kern .06em\vbox {\hrule \@width .333em}}
 
 %%%%%%%%
 \makeatother
@@ -4223,6 +4225,11 @@ JFMの\texttt{chars}テーブルのエントリとして \verb+'AJ1-xxx'+ の形
 正しく半角幅で組むために利用されている．
 %</ja>
 
+\def\IVS#1{\char\numexpr "E0100+#1\relax}%"
+\def\IVSA#1#2#3#4#5{%
+  \textcolor{blue}{\raisebox{3.5pt}{\tt%
+    \fboxsep=1pt\fbox{\tiny \oalign{0#1#2\crcr#3#4#5\crcr}}}}\ignorespaces
+}
 %<*ja>
 \paragraph{IVSサポート}
 最近のOpenTypeフォントやTrueTypeフォントには，
@@ -4233,11 +4240,6 @@ JFMの\texttt{chars}テーブルのエントリとして \verb+'AJ1-xxx'+ の形
 IVSに対応してはいないようである．これらのパッケージで対応してくれるのが理想的だが，
 それまでのつなぎとして，\Pkg{luatexja-otf}パッケージ内にIVS対応を仕込んでおいた．
 
-\def\IVS#1{\char\numexpr "E0100+#1\relax}%"
-\def\IVSA#1#2#3#4#5{%
-  \textcolor{blue}{\raisebox{3.5pt}{\tt%
-    \fboxsep=1pt\fbox{\tiny \oalign{0#1#2\crcr#3#4#5\crcr}}}}\ignorespaces
-}
 {\catcode`\%=11
   \gdef\IVSB#1{\expandafter\IVSA\directlua{tex.sprint(string.format('%X', 0xE0100+#1))}}}
 
@@ -4597,7 +4599,7 @@ user-defined whatsitを識別するための \texttt{user\_id} は\
 \texttt{luatexbase.newuserwhatsitid} により確保されている．
 %</ja>
 \begin{description}
-\item[\texttt{inhibitglue}]
+\item[\textit{inhibitglue}]
 %<*en>
 Nodes for indicating that \verb+\inhibitglue+ is
 	   specified. The \texttt{value} field of these nodes doesn't matter.
@@ -4607,7 +4609,7 @@ Nodes for indicating that \verb+\inhibitglue+ is
 \texttt{value} フィールドは意味を持たない．
 %</ja>
 
-\item[\texttt{stack\_marker}]
+\item[\textit{stack\_marker}]
 %<*en>
 Nodes for \LuaTeX-ja's stack system (see the next
 	   subsection). The \texttt{value} field of these nodes is
@@ -4618,7 +4620,7 @@ Nodes for \LuaTeX-ja's stack system (see the next
 これらのノードの \texttt{value} フィールドは現在のグループネストレベルを表す．
 %</ja>
 
-\item[\texttt{char\_by\_cid}]
+\item[\textit{char\_by\_cid}]
 %<*en>
 Nodes for Japanese Characters which the callback process of
 	   \Pkg{luaotfload} won't be applied, and the character code is
@@ -4635,7 +4637,7 @@ Nodes of this type is used in \verb+\CID+, \verb+\UTF+ and IVS support.
 \verb+\CID+, \verb+\UTF+やIVS対応処理でこの種類のノードが利用されている．
 %</ja>
 
-\item[\texttt{begin\_par}]
+\item[\textit{begin\_par}]
 %<*en>
 Nodes for indicating beginning of a paragraph.
 A paragraph which is started by \verb+\item+ in list-like environments has a horizontal box
@@ -4955,8 +4957,8 @@ These paths are not shown in the above diagram.
 After that, the state is changed to State~$S$ (skipping blanks) in most cases, but
 to State~$M$ (middle of line) sometimes.
 \end{itemize}
-%<en>\caption{State transitions of \pTeX's input processor.}
-%<ja>\caption{\pTeX の入力処理部の状態遷移．}
+%<en>\caption{State transitions of \pTeX's input processor}
+%<ja>\caption{\pTeX の入力処理部の状態遷移}
 \label{fig-ptexipro}
 \end{figure}
 
@@ -4994,20 +4996,30 @@ process it}, if and only if the following three conditions are satisfied:
 \end{quote}
 
 \paragraph{Remark}
-The following example shows the major difference from the behavior of \pTeX:
+The following example shows the major difference from the behavior of \pTeX.
 \begin{LTXexample}
+\fontspec[Ligatures=TeX]{TeX Gyre Termes}
 \ltjsetparameter{autoxspacing=false}
 \ltjsetparameter{jacharrange={-6}}xあ
-y\ltjsetparameter{jacharrange={+6}}zあ
+y\ltjsetparameter{jacharrange={+6}}zい
 u
 \end{LTXexample}
+It is not strange that ``あ'' does not printed in the above output.
+This is because \TeX\ Gyre\ Termes does not contain ``あ'', and because 
+``あ'' in line~3 is considered as an \textbf{ALchar}.
+
+Note that there is no space before ``y'' in the output, but
+there is a space before ``u''. This follows from following reasons:
 \begin{itemize}
-\item There is no space between ``x''~and~``y'', 
-      since the line~2 ends with a \textbf{JAchar}~``あ''
-(this ``あ'' considered as an \textbf{JAchar} at the ending of line~1).
-\item There is no space between ``あ'' (in the line~3) and ``u'', since the
-      line~3 ends with an \textbf{ALchar}
-(the letter ``あ'' considered as an \textbf{ALchar} at the ending of line~2).
+\item When line~3 is processed by \texttt{process\_input\_buffer} callback,
+``あ'' is considered as an \textbf{JAchar}.
+Since  line~3 ends with an \textbf{JAchar}, 
+the comment character \texttt{U+FFFFF} is appended to this line,
+and hence the linebreak immediately after this line is ignored.
+\item When line~4 is processed by \texttt{process\_input\_buffer} callback,
+``い'' is considered as an \textbf{ALchar}.
+Since  line~4 ends with an \textbf{ALchar}, the linebreak immediately after this line
+emits a space.
 \end{itemize}
 %</en>
 
@@ -5032,8 +5044,8 @@ u
 を末尾に追加する．よって，その場合に改行は空白とは見做されないこととなる．
 \begin{enumerate}
 \item \verb+\endlinechar+の文字\footnote{普通は，改行文字（文字コード13番）である．}
-のカテゴリーコードが5~(end-of-line)である．
-\item \texttt{U+FFFFF}のカテゴリーコードが14~(comment)である．
+のカテゴリーコードが5~(\textit{end-of-line})である．
+\item \texttt{U+FFFFF}のカテゴリーコードが14~(\textit{comment})である．
 \item 入力行は次の「正規表現」にマッチしている：
 \[
   (\text{any char})^*(\textbf{JAchar})
@@ -5042,24 +5054,32 @@ u
 \end{enumerate}
 \end{quote}
 
-この仕様は，前節で述べた\pTeX の仕様にできるだけ近づけたものとなっている．最初の条件は，
+この仕様は，前節で述べた\pTeX の仕様にできるだけ近づけたものとなっている．条件1.は，
 \texttt{verbatim}系環境などの日本語対応マクロを書かなくてすませるためのものである．
-しかしながら，完全に同じ挙動が実現できたわけではない．
-差異は，次の例が示すように，和文文字の範囲を変更した行の改行において見られる：
+
+しかしながら，\pTeX と完全に同じ挙動が実現できたわけではない．
+次のように，和文文字の範囲を変更したちょうどその行においては挙動が異なる：
 \begin{LTXexample}
+\fontspec[Ligatures=TeX]{TeX Gyre Termes}
 \ltjsetparameter{autoxspacing=false}
 \ltjsetparameter{jacharrange={-6}}xあ
-y\ltjsetparameter{jacharrange={+6}}zあ
+y\ltjsetparameter{jacharrange={+6}}zい
 u
 \end{LTXexample}
-もし\pTeX とまったく同じ挙動を示すならば，出力は
-「\hbox{\ltjsetparameter{autoxspacing=false}x yzあu}」となるべきである．しかし，実際には
-上のように異なる挙動となっている．
+上ソース中の「あ」は欧文文字扱いであり．
+ここで使用している欧文フォント\TeX Gyre Termesは「あ」を含まない．
+よって，出力に「あ」は現れないことは不思議ではない．
+それでも，\pTeX とまったく同じ挙動を示すならば，出力は
+「\hbox{\ltjsetparameter{autoxspacing=false}x yzいu}」となるはずである．しかし，実際には
+上のように異なる挙動となっているが，それは以下の理由による：
 \begin{itemize}
-\item 2行目は「あ」という和文文字で終わる（2行目を処理する前の時点では，
-      「あ」は和文文字扱いである）ため，直後の改行文字は無視される．
-\item 3行目は「あ」という欧文文字で終わる（3行目を処理する前の時点では，
-      「あ」は欧文文字扱いである）ため，直後の改行文字は空白に置き換わる．
+\item 3行目を \texttt{process\_input\_buffer} で処理する時点では，
+      「あ」は和文文字扱いである．よって3行目は和文文字で終わることになり，
+      コメント文字 \texttt{U+FFFFF} が追加される．
+      よって，直後の改行文字は無視されることになり，空白は入らない．
+\item 4行目を \texttt{process\_input\_buffer} で処理する時点では，
+      「い」は欧文文字扱いである．よって4行目は欧文文字で終わることになり，
+      直後の改行文字は空白に置き換わる．
 \end{itemize}
 このため，トラブルを避けるために，和文文字の範囲を\verb+\ltjsetparameter+で編集した場合，
 その行はそこで改行するようにした方がいいだろう．
@@ -5297,19 +5317,19 @@ JFMグルーの挿入が行われない（\Param{\hyperlink{fld:xks}{xkanjiskip}
 \paragraph{先頭部の処理}
 まず，段落／水平ボックスの一番最初にあるクラスタ\textit{Np}を探索する．
 水平ボックスの場合は何の問題もないが，段落の場合では以下のノード達を事前に読み飛ばしておく：
-\begin{center}
-\verb+\parindent+ 由来の水平ボックス ($\mathit{subtype}=3$)，
-及び\textit{subtype}が44~(\textit{user\_defined})でないようなwhatsit．
-\end{center}
+\begin{itemize}
+\item \verb+\parindent+ 由来の水平ボックス($\mathit{subtype}=3$)
+\item \textit{subtype}が44~(\textit{user\_defined})でないようなwhatsit
+\end{itemize}
 これは，\verb+\parindent+由来の水平ボックスがクラスタを構成しないようにするためである．
 
 次に，\textit{Np}の直前に空白$g$を必要なら挿入する：
 \begin{enumerate}
 \item この処理が働くような\textit{Np}は\textsf{和文A}である．
 \item 問題のリストが字下げありの段落（\verb+\parindent+ 由来の水平ボックスあり）の場合は，
-この空白$g$は「文字コード\texttt{'parbdd'}の文字」と\textit{Np}の間に入るグルー／カーンである．
+この空白$g$は「文字コード \texttt{'parbdd'} の文字」と\textit{Np}の間に入るグルー／カーンである．
 \item そうでないとき（\verb+noindent+ で開始された段落や水平ボックス）は，
-$g$は「文字コード\texttt{'boxbdd'}の文字」と\textit{Np}の間に入るグルー／カーンである．
+$g$は「文字コード \texttt{'boxbdd'} の文字」と\textit{Np}の間に入るグルー／カーンである．
 \end{enumerate}
 ただし，もし$g$がglueであった場合，この挿入によって\textit{Np}による行分割が新たに可能になるべきではない．
 そこで，以下の場合には，$g$の直前に \verb+\penalty10000+ を挿入する：
@@ -5320,21 +5340,22 @@ $g$は「文字コード\texttt{'boxbdd'}の文字」と\textit{Np}の間に入�
 
 \paragraph{末尾の処理}
 末尾の処理は，問題のリストが段落のものか水平ボックスのものかによって異なる．
-後者の場合は容易い：最後のクラスタを\textit{Nq}とおくと，\textit{Nq}と「文字コード\texttt{'boxbdd'}の文字」の間に入るグルー／カーンを，
+後者の場合は容易い：最後のクラスタを\textit{Nq}とおくと，\textit{Nq}と「文字コード\ 
+\texttt{'boxbdd'} の文字」の間に入るグルー／カーンを，
 \textit{Nq}の直後に挿入するのみである．
 
 一方．前者（段落）の場合は，リストの末尾は常に \verb+\penalty10000+ と，
-\verb+\parfillskip+ 由来のグルーが存在する．よって，最後のクラスタ\textit{Np}は
-この \verb+\parfillskip+ 由来のグルーとなり，実質的な中身の最後はその1つ前のクラスタ\textit{Nq}となる．
-\begin{enumerate}
-\item まず\textit{Nq}の直後に（後に述べる）\textsf{line-end~[E]}によって定まる空白を挿入する．
-\item 次に，段落の最後の「通常の和文文字${}+{}$句点」が独立した行となるのを防ぐために，
+\verb+\parfillskip+ 由来のグルーが存在する．%よって，最後のクラスタ\textit{Np}は
+%この \verb+\parfillskip+ 由来のグルーとなり，実質的な中身の最後はその1つ前のクラスタ\textit{Nq}となる．
+段落の最後の「通常の和文文字${}+{}$句点」が独立した行となるのを防ぐために，
 \Param{jcharwidowpenalty}の値の分だけ適切な場所のペナルティを増やす．
 
-ペナルティ量を増やす場所は，\textit{head}が\textbf{JAchar}であり，かつその文字の\Param{kcatcode}が偶数であるような
-最後のクラスタの直前にあるものたちである\footnote{大雑把に言えば，\Param{kcatcode}が奇数であるような\textbf{JAchar}
-を約物として考えていることになる．\Param{kcatcode}の最下位ビットはこの\Param{jcharwidowpenalty}用にのみ利用される．}．
-\end{enumerate}
+ペナルティ量を増やす場所は，\textit{head}が\textbf{JAchar}であり，
+かつその文字の\Param{kcatcode}が偶数であるような
+最後のクラスタの直前にあるものたちである%
+\footnote{大雑把に言えば，\Param{kcatcode}が奇数であるような\textbf{JAchar}%
+を約物として考えていることになる．
+\Param{kcatcode}の最下位ビットはこの\Param{jcharwidowpenalty}用にのみ利用される．}．
 
 \subsection{概観と典型例：2つの「和文A」の場合}
 \label{ssec-cluster-wa}
@@ -5366,7 +5387,7 @@ $g$は「文字コード\texttt{'boxbdd'}の文字」と\textit{Np}の間に入�
 \item[JFM由来{[M]}] JFMの文字クラス指定によって入る空白を以下によって求める．この段階で空白量が未定義（未指定）だった場合，
       デフォルト値\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}を採用することとなるので，次へ．
 \begin{enumerate}
-\item もし両クラスタの間で\verb+\inhibitglue+が実行されていた場合（証としてwhatsitノードが自動挿入される），
+\item もし両クラスタの間で \verb+\inhibitglue+ が実行されていた場合（証としてwhatsitノードが自動挿入される），
       代わりに\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}が挿入されることとなる．次へ．
 \item \textit{Nq}と\textit{Np}が同じJFM・同じ\texttt{jfmvar}キー・同じサイズの和文フォントであったならば，
       共通に使っているJFM内で挿入される空白（グルーかカーン）が決まっているか調べ，決まっていればそれを採用．
@@ -5385,9 +5406,12 @@ ga&(\inhibitglue 「使用フォントが\textit{Np}のそれと同じで，\hfi
 $\mathit{gb}$,~$\mathit{ga}$それぞれに対する<ratio>の値を$d_b$,~$d_a$とする．
 \begin{itemize}
 \item 
-$\mathit{ga}$と$\mathit{gb}$の両方が未定義であるならば，JFM由来のグルーは挿入されず，\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}を採用することとなる．どちらか片方のみが未定義であるならば，次のステップでその未定義の方は長さ0のkernで，<ratio>の値は0であるかのように扱われる．
+$\mathit{ga}$と$\mathit{gb}$の両方が未定義であるならば，JFM由来のグルーは挿入されず，
+\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}を採用することとなる．
+どちらか片方のみが未定義であるならば，次のステップでその未定義の方は長さ0のkernで，<ratio>の値は0であるかのように扱われる．
 \item 
-\Param{\hyperlink{fld:diffjfm}{diffrentjfm}}の値が\texttt{pleft}, \texttt{pright}, \texttt{paverage}のとき，
+\Param{\hyperlink{fld:diffjfm}{diffrentjfm}}の値が \texttt{pleft}, \texttt{pright},
+      \texttt{paverage} のとき，
 <ratio>の指定に従って比例配分を行う．
 JFM由来のグルー／カーンは以下の値となる：
 \[
@@ -5433,10 +5457,10 @@ x+y&\text{if\ }\Param{\hyperlink{fld:diffjfm}{diffrentjfm}}=\texttt{both};
 \]
 という3ノードを考える（それぞれ単独でクラスタをなす）．
 この場合，$p$と$q$の間は，実フォントが異なるにもかかわらず2.の状況となる一方で，
-$q$と$r$の間は（実フォントが同じなのに）\texttt{jfmvar}キーの内容が異なるので3.の状況となる．
+$q$と$r$の間は（実フォントが同じなのに）\texttt{jfmvar} キーの内容が異なるので3.の状況となる．
 \item[\Param{kanjiskip}~{[K]}] 上の[M]において空白が定まらなかった場合，
 以下で定めた量「右空白」として採用する．
-この段階においては，\verb+\inhibitglue+は効力を持たないため，
+この段階においては，\verb+\inhibitglue+ は効力を持たないため，
 結果として，2つの和文文字間には常に何らかのグルー／カーンが挿入されることとなる．
 \begin{enumerate}
 \item 両クラスタ（厳密には$\mathit{Nq}.\mathit{tail}$，$\mathit{Np}.\mathit{head}$）の中身の文字コードに対する
@@ -5488,8 +5512,8 @@ $a$は禁則処理用に\textit{Nq}と\textit{Np}の間に加えられるべき�
 \def\gkf#1#2#3{\sf$\displaystyle\vphantom{\Bigg(}%
   \frac{\hbox to 4\zw{\hss#2\hss}}{\hbox{#3}}$}
 \begin{table}[t]
-%<en>\caption{Summary of JFM glues.}
-%<ja>\caption{JFM グルーの概要．}
+%<en>\caption{Summary of JFM glues}
+%<ja>\caption{JFM グルーの概要}
 \label{tab-jfmglue}
 \begin{center}
 \small
@@ -5575,7 +5599,7 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 \item そうでなければ，
 \textit{Nq}と「文字コードが {\tt'jcharbdd'} の文字」との間に入るグルー／カーンとして定まる．
 \end{enumerate}
-\item[\Param{\hyperlink{fld:xks}{xkanjiskip}}~{[X]}]
+\item[\Param{xkanjiskip}~{[X]}]
 この段階では，\textsf{\Param{kanjiskip}~[K]}のときと同じように，
 以下で定めた量を「右空白」として採用する．
 \verb+\inhibitglue+ は効力を持たない．
@@ -5610,9 +5634,9 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 \textsf{JFM-origin~[M]}の変種と考えて良い．
 これによって定まる空白の典型例は，欧文文字と和文の開き括弧との間に入る半角アキである．
 \begin{enumerate}
-\item もし両クラスタの間で\verb+\inhibitglue+が実行されていた場合（証としてwhatsitノードが自動挿入される），次へ．
+\item もし両クラスタの間で \verb+\inhibitglue+ が実行されていた場合（証としてwhatsitノードが自動挿入される），次へ．
 \item そうでなければ，
-「文字コードが{\tt'jcharbdd'}の文字」と\textit{Np}との間に入るグルー／カーンとして定まる．
+「文字コードが {\tt'jcharbdd'} の文字」と\textit{Np}との間に入るグルー／カーンとして定まる．
 \end{enumerate}
 \end{description}
 
@@ -5629,11 +5653,11 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 なお，$\mathit{Np}.\mathit{head}$は無意味であるから，
 「$\mathit{Np}.\mathit{head}$に対する\Param{\hyperlink{fld:prebp}{prebreakpenalty}}の値」は0とみなされる．言い換えれば，
 \[
- a:=(\text{\textit{Nq}{\footnotemark}の文字に対する\Param{\hyperlink{fld:postbp}{postbreakpenalty}}の値}).
+ a:=(\text{\textit{Nq}の文字に対する\Param{\hyperlink{fld:postbp}{postbreakpenalty}}の値}).
 \]
 \begin{description}
 \item[箱] \textit{Np}が\textsf{箱}であった場合は，両クラスタの間での行分割は
-（明示的に両クラスタの間に\verb+\penalty10000+があった場合を除き）いつも許容される．そのため，
+（明示的に両クラスタの間に \verb+\penalty10000+ があった場合を除き）いつも許容される．そのため，
 ペナルティ処理は，後に述べる\textsf{P-allow~[PA]}が\textsf{P-normal~[PN]}の代わりに用いられる．
 \item[グルー] \textit{Np}がグルーの場合，ペナルティ処理は\textsf{P-normal~[PN]}を用いる．
 \item[カーン] \textit{Np}がカーンであった場合は，両クラスタの間での行分割は
@@ -5665,7 +5689,7 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 (a)部分にペナルティが存在していない場合，
 \textit{Nq}と\textit{Np}の間の行分割は元々不可能のはずだったのであるが，
 \LuaTeX-ja はそれをわざわざ行分割可能にはしない．
-そのため，「右空白」がglueであれば，その直前に\verb+\penalty10000+を挿入する．
+そのため，「右空白」がglueであれば，その直前に \verb+\penalty10000+ を挿入する．
 \end{description}
 
 なお，「右空白」はカーンの%，「左空白」は未定義の
@@ -5703,7 +5727,7 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 \item 禁則用ペナルティの処理は，\textit{Nq}の種類によって異なる．
 $\mathit{Nq}.\mathit{tail}$は無意味なので，
 \[
- a:=(\text{\textit{Np}{\footnotemark}の文字に対する\Param{\hyperlink{fld:prebp}{prebreakpenalty}}の値}).
+ a:=(\text{\textit{Np}の文字に対する\Param{\hyperlink{fld:prebp}{prebreakpenalty}}の値}).
 \]
 \begin{description}
 \item[箱] \textit{Nq}が\textsf{箱}の場合は，\textsf{P-allow~[PA]}を用いる．
@@ -5756,33 +5780,36 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 It is well-known that the \Pkg{listings} package outputs weird results
 for Japanese input.
 The \Pkg{listings} package makes most of letters active and assigns
-output command for each letter \cite{listings}.
+output command for each letter~(\cite{listings}).
 But Japanese characters are not included in these activated letters.
 For \pTeX{} series, there is no method to make Japanese characters active;
-a patch \Pkg{jlisting.sty} \cite{jlisting} resolves the problem forcibly.
+a patch \Pkg{jlisting.sty}~(\cite{jlisting}) resolves the problem forcibly.
 %</en>
 %<*ja>
 \Pkg{listings} パッケージが，そのままでは日本語をまともに出力できないこと
 はよく知られている．きちんと整形して出力するために，\Pkg{listings}パッケー
 ジは内部で「ほとんどの文字」をアクティブにし，各文字に対してその文字の出
-力命令を割り当てている \cite{listings}．
+力命令を割り当てている(\cite{listings})．
 しかし，そこでアクティブにする文字の中に，和文文
 字がないためである．\pTeX 系列では，和文文字をアクティブにする手法がなく，
-\Pkg{jlisting.sty} というパッチ\cite{jlisting}を用いることで無理やり解決していた．
+\Pkg{jlisting.sty} というパッチ(\cite{jlisting})を用いることで無理やり解決していた．
 %</ja>
 
 %<*en>
-In \LuaTeX-ja, the problem is resolved by using \verb+process_input_buffer+ callback.
-The callback function inserts the output command before each letter above \texttt{U+0080}.
+In \LuaTeX-ja, the problem is resolved by using the \verb+process_input_buffer+ callback.
+The callback function inserts the output command (active character \texttt{U+FFFFF})
+before each letter above \texttt{U+0080}.
 This method can omits the process to make all Japanese characters active
 (most of the activated characters are not used in many cases).
 %</en>
 %<*ja>
 \LuaTeX-jaでは，\verb+process_input_buffer+ コールバックを利用することで，
-「各行に出現する\texttt{U+0080}以降の文字に対して，それらの出力命令を前置する」という方法をとっている．
+「各行に出現する\texttt{U+0080}以降の文字に対して，それらの出力命令を前置する」
+という方法をとっている．出力命令としては，アクティブ文字化した \texttt{U+FFFFF} を用いている．
 これにより，（入力には使用されていないかもしれない）和文文字をもすべてアクティブ化する手間もなく，
 見通しが良い実装になっている．
 %</ja>
+
 
 %<*en>
 If the \Pkg{listings} package  and \LuaTeX-ja were loaded,
@@ -5793,6 +5820,46 @@ then the patch \Pkg{lltjp-listings} is loaded automatically at \verb+\begin{docu
 \Pkg{listings} と\LuaTeX-jaを読み込んでおけば，
 \verb+\begin{document}+ の箇所において自動的に読み込まれるので，通常はあまり
 意識する必要はない．
+%</ja>
+
+%<*en>
+\paragraph{A note to ``Escaping to \LaTeX''}
+We used the \verb+process_input_buffer+ callback to output \textbf{JAchar}s.
+But it has a drawback; any control sequences whose name contains a \textbf{JAchar}
+cannot be used in any ``escape to \LaTeX''.
+
+Consider the following input:
+%</en>
+%<*ja>
+\paragraph{「\LaTeX へのエスケープ」についての注意}
+日本語対応を行うために \verb+process_input_buffer+ を使用したことで，
+\texttt{texcl},~\texttt{escapeinside}といった\emph{「\LaTeX へのエスケープ」中では，
+\textbf{JAchar}を名称の一部に含む制御綴は使用不可能}である．
+例えば次のような入力を考えよう：
+%</ja>
+\begin{verbatim*}
+\begin{lstlisting}[escapechar=`\#]
+#\ほげ xぴよ#
+\end{lstlisting}
+\end{verbatim*}
+%<en>The line~2 is transformed by the callback to
+%<ja>ここで，2行目は \verb+process_input_buffer+ の作用により，
+\begin{lstlisting}[showspaces, escapechar=\!]
+#\!\IVSA FFFFF!ほ!\IVSA FFFFF !げ x!\IVSA FFFFF !ぴ!\IVSA FFFFF !よ#
+\end{lstlisting}
+%<*en>
+before the line is actually processed.
+In the escape (between the character ``\verb+#+''), 
+the category code of \texttt{U+FFFFF} is set to 9~(\emph{ignored}).
+Hence the control symbol ``\verb+\+\IVSA FFFFF'' will be executed,
+instead ``\verb+\ほげ+''.
+%</en>
+%<*ja>
+と変換されてから，実際の処理に回される．
+「\verb+#+」で挟まれた「\LaTeX へのエスケープ」中では\
+\texttt{U+FFFFF} のカテゴリーコードは9~(\textit{ignored})となるので，
+結局「\verb+\ほげ+」の代わりに
+「\verb+\+\IVSA FFFFF」というcontrol symbolが実行されることになる．
 %</ja>
 
 %<en>\paragraph{Class of characters}
@@ -5996,14 +6063,16 @@ listing environments.
 まず，段落中の行中のグルーを
 \begin{itemize}
 \item \textbf{JAglue}ではないグルー
-\item JFMグルー（\ref{ssec-jfm-str}節にあるように，各JFMグルーには$-2$から2までの
-優先度がついており，優先度別にまとめられる）
+\item JFMグルー（優先度\footnote{%
+  \ref{ssec-jfm-str}節にあるように，
+  各JFMグルーには$-2$から2までの優先度がついている．}%
+別にまとめられる）
 \item 和欧文間空白(\Param{\hyperlink{fld:xks}{xkanjiskip}})
 \item 和文間空白(\Param{\hyperlink{fld:kanjiskip}{kanjiskip}})
 \end{itemize}
 の$1+1+5+1=8$つに類別し，それぞれの種別ごとに
 許容されている伸び量（\texttt{stretch}の値）の合計を計算する．
-また，行長と自然長との差を計算し，そのを\textit{total}とおく．
+また，行長と自然長との差を\textit{total}とおく．
 
 
 \subsection{第1段階：行末文字の位置調整}
@@ -6140,23 +6209,6 @@ its binary version is also updated.
 %</en>
 
 
-\begin{table}[!tb]
- \centering
-\caption{\texttt{cid} key and corresponding files}
-\label{tab:cid-cache}
-\vspace*{\medskipamount}
-\begin{tabular}{>{\tt}l>{\tt}l>{\tt}l>{\tt}l}
-\toprule
-\bf \texttt{cid} key&\bf name of the cache &
-\multicolumn{2}{c}{\bf used CMaps}\\
-\midrule
-Adobe-Japan1-*&ltj-cid-auto-adobe-japan1.lua&UniJIS2004-UTF32-H&Adobe-Japan1-UCS2\\
-Adobe-Korea1-*&ltj-cid-auto-adobe-korea1.lua&UniKS-UTF32-H&Adobe-Korea1-UCS2\\
-Adobe-GB1-*&ltj-cid-auto-adobe-gb1.lua&UniGB-UTF32-H&Adobe-GB1-UCS2\\
-Adobe-CNS1-*&ltj-cid-auto-adobe-cns1.lua&UniCNS-UTF32-H&Adobe-CNS1-UCS2\\
-\bottomrule
-\end{tabular}
-\end{table}
 
 %<*ja>
 \subsection{キャッシュの使用箇所}
@@ -6199,6 +6251,25 @@ as in Page~\pageref{para-cid}.
 This file stores the table of Unicode variants in a font ``\texttt{***}''. 
 The structure of the table is the following:
 %</en>
+
+\begin{table}[!tb]
+ \centering
+\caption{\texttt{cid} key and corresponding files}
+\label{tab:cid-cache}
+\vspace*{\medskipamount}
+\begin{tabular}{>{\tt}l>{\tt}l>{\tt}l>{\tt}l}
+\toprule
+\bf \texttt{cid} key&\bf name of the cache &
+\multicolumn{2}{c}{\bf used CMaps}\\
+\midrule
+Adobe-Japan1-*&ltj-cid-auto-adobe-japan1.lua&UniJIS2004-UTF32-H&Adobe-Japan1-UCS2\\
+Adobe-Korea1-*&ltj-cid-auto-adobe-korea1.lua&UniKS-UTF32-H&Adobe-Korea1-UCS2\\
+Adobe-GB1-*&ltj-cid-auto-adobe-gb1.lua&UniGB-UTF32-H&Adobe-GB1-UCS2\\
+Adobe-CNS1-*&ltj-cid-auto-adobe-cns1.lua&UniCNS-UTF32-H&Adobe-CNS1-UCS2\\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \begin{lstlisting}
 return {
  {
