@@ -2,11 +2,30 @@
 % lltjp-listings.sty
 %
 
-%%% TODO: IVS
-
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-listings}[2013/05/14 Patch to listings for LuaTeX-ja]
+\ProvidesPackage{lltjp-listings}[2014/01/07 Patch to listings for LuaTeX-ja]
 \RequirePackage{listings,luatexbase-cctb}
+
+% override
+\def\lst@FillFixed@#1{%
+  \ifx\@empty#1\else\ltj@lst@hss#1#1\expandafter\lst@FillFixed@\fi}
+% First #1 is read by token.get_next() in \ltj@lst@hss
+{\catcode`\~=12
+  \gdef\ltj@lst@hss{%
+    \directlua{
+      local cat_str = luatexbase.catcodetables['string']
+      local cat_lp  = luatexbase.catcodetables['latex-package']
+      local uchar = unicode.utf8.char
+      local t = token.get_next()
+      if (t[1]~=11 and t[1]~=12)
+        or (not (t[2]>=0xE0100 and t[2]<0xE01F0)) 
+      then
+        tex.sprint(cat_lp, string.char(0x5C) .. 'lst@hss ')
+      end
+    }%
+  }
+}
+
 
 % lowest level
 \def\lst@kanjitrue{\let\lst@ifkanji\iftrue}
@@ -44,6 +63,17 @@
   \lst@ifletter\else\lst@lettertrue\fi\lst@kanjitrue}
 
 \def\lst@ProcessJALetter#1{%
+  \ifnum`#1>"E00FF\relax
+    \ifnum`#1<"E01F0\relax
+      \lst@Append#1\advance\lst@length\m@ne
+    \else
+      \lst@ProcessJALetter@aux#1%
+    \fi
+  \else
+    \lst@ProcessJALetter@aux#1%
+  \fi
+}
+\def\lst@ProcessJALetter@aux#1{%
   \lst@whitespacefalse
   \ifnum\ltjgetparameter{jacharrange}{\ltjgetparameter{chartorange}{`#1}}=0
     \ifnum\ltjgetparameter{postbreakpenalty}{`#1}>0
@@ -59,6 +89,7 @@
     \ltj@lst@setletterflag
   \fi
   \lst@Append#1}
+%\let\lst@ProcessJALetter\lst@ProcessJALetter@aux
 
 \def\lst@ProcessJALetterHalf#1{%
   \lst@whitespacefalse

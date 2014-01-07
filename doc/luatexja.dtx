@@ -409,7 +409,7 @@ In this document, the following terms and notations are used:
 \begin{itemize}
 %<*en>
 \item \textbf{JAchar}: standing for characters which used in Japanese typesetting,
-      such as Hiragana, Katakana, Kanji and other Japanese punctuation marks.
+      such as Hiragana,~Katakana, Kanji, and~other Japanese punctuation marks.
 %</en>
 %<*ja>
 \item \textbf{JAchar}: ひらがな，カタカナ，漢字，和文用の約物といった
@@ -818,7 +818,7 @@ for Japanese, you only have to load \texttt{luatexja.sty}:
 \usepackage{luatexja}
 \end{verbatim}
 %<*en>
-It also does minimal settings (counterparts in \pLaTeX\ are \texttt{
+It also does minimal settings (counterparts in \pLaTeX\ are \texttt{%
 plfonts.dtx} and \texttt{pldefs.ltx}):
 %</en>
 %<*ja>
@@ -943,7 +943,7 @@ For \LaTeXe, \LuaTeX-ja adopted most of the font selection system of \pLaTeXe\ (
 \begin{itemize}
 %<*en>
 \item Commands \verb+\fontfamily+, \verb+\fontseries+,
-      \verb+\fontshape+ and \verb+\selectfont+ can be used to change
+      \verb+\fontshape+, and \verb+\selectfont+ can be used to change
       attributes of Japanese fonts.
 %</en>
 %<*ja>
@@ -990,7 +990,7 @@ auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
       \verb+\fontencoding{<encoding>}+ changes the encoding of alphabetic fonts
       or Japanese fonts depending on the argument. For example,
       \verb+\fontencoding{JY3}+ changes the encoding of Japanese fonts to
-      \texttt{JY3} and \verb+\fontencoding{T1}+ changes the encoding of
+      \texttt{JY3}a nd \verb+\fontencoding{T1}+ changes the encoding of
       alphabetic fonts to \texttt{T1}.
       \verb+\fontfamily+ also changes the family of Japanese fonts, alphabetic
       fonts, \emph{or both}. For detail, see Subsection~\ref{ssub-nfsspat}.
@@ -1530,7 +1530,7 @@ We can use HG~fonts bundled with Microsoft~Office for realizing multiple weights
 \end{tabular}\par\medskip}
 
 %<*en>
-Note that HG~Mincho~E, HG~Gothic~E, HG Soei Kaku Gothic UB and HG Maru Gothic PRO
+Note that HG~Mincho~E, HG~Gothic~E, HG Soei Kaku Gothic UB, and HG Maru Gothic PRO
 are internally specified by:
 \begin{description}
 \item[default] by font name (\texttt{HGMinchoE}, etc.).
@@ -1552,7 +1552,7 @@ are internally specified by:
 
 
 %<*en>
-\subsection{\texttt{\char`\\CID}, \texttt{\char`\\UTF} and macros in \Pkg{otf} package}
+\subsection{\texttt{\char`\\CID}, \texttt{\char`\\UTF}, and macros in \Pkg{otf} package}
 Under \pLaTeX, \Pkg{otf} package (developed by Shuzaburo Saito) is
 used for typesetting characters which is in Adobe-Japan1-6 CID but not
 in JIS~X~0208. Since this package is widely used, \LuaTeX-ja
@@ -1650,8 +1650,8 @@ This can be edited by setting the \textsf{jacharrange} parameter.
 For example, this is just the default setting of \LuaTeX-ja, and
 it sets
 \begin{itemize}
- \item a character which belongs character ranges 1, 4~and~5 is \textbf{ALchar},
- \item a character which belongs character ranges 2,~3, 6, 7~and~8 is \textbf{JAchar}.
+ \item a character which belongs character ranges 1,~4, and~5 is \textbf{ALchar},
+ \item a character which belongs character ranges 2,~3, 6, 7, and~8 is \textbf{JAchar}.
 \end{itemize}
 %</en>
 %<*ja>
@@ -1974,7 +1974,7 @@ pあq い!う
 %<*en>
 The second argument \texttt{preonly} means that the insertion of
 \Param{\hyperlink{fld:xks}{xkanjiskip}} is allowed before this character, but not after.
-the other possible values are \texttt{postonly}, \texttt{allow} and \texttt{
+the other possible values are \texttt{postonly}, \texttt{allow}, and \texttt{
 inhibit}.
 %</en>
 %<*ja>
@@ -1985,7 +1985,7 @@ inhibit}.
 
 %<*en>
 \Param{jaxspmode} and \Param{alxspmode} use a same table to store the parameters
-on the current version. Therefore, line 1 in the code above can be rewritten
+on the current version. Therefore, line~1 in the code above can be rewritten
 as follows:
 %</en>
 %<*ja>
@@ -2361,7 +2361,7 @@ JFMの名前を指定する．もし以前に指定されたJFMが読み込ま�
 %</ja>
 %<*en>
 \item[\tt jfm-jis.lua] A counterpart for \verb+jis.tfm+, ``JIS font
-  metric'' which is widely used in \pTeX. A major difference of
+  metric'' which is widely used in \pTeX. A major difference between
   \texttt{jfm-ujis.lua} and this \texttt{jfm-jis.lua} is that
   most characters under \texttt{jfm-ujis.lua} are square-shaped,
   while that under \texttt{jfm-jis.lua} are horizontal
@@ -2753,7 +2753,7 @@ This field is a list of characters which are in this character
 
 %<*en>
 Specifythe width of characters in character class~$i$, the height, the depth and
-the amount of italic correction. All characters in character class~$i$ are regarded that its width, height and depth are
+the amount of italic correction. All characters in character class~$i$ are regarded that its width, height, and depth are
 as values of these fields.
 But there is one exception: if \texttt{'prop'} is specified in \texttt{width} field, width of a character becomes that of its ``real'' glyph.
 %</en>
@@ -2770,7 +2770,7 @@ But there is one exception: if \texttt{'prop'} is specified in \texttt{width} fi
 %<*en>
 These fields are for adjusting the position of the ``real'' glyph. Legal
 	     values of \texttt{align} field are \texttt{'left'},
-	     \texttt{'middle'} and \texttt{'right'}. If one of these
+	     \texttt{'middle'}, and \texttt{'right'}. If one of these
 	     3~fields are omitted, \texttt{left} and \texttt{down} are
 	     treated as~0, and \texttt{align} field is treated as
 	     \texttt{'left'}.
@@ -2778,10 +2778,10 @@ The effects of these 3~fields are indicated in Figure~\ref{fig-pos}.
 %</en>
 %<*ja>
 これらのフィールドは実際のグリフの位置を調整するためにある．
-\texttt{align}フィールドに指定できる値は\texttt{'left'}, \texttt{'middle'},
-\texttt{'right'}のいずれかである．もしこれら3つのフィールドのうちの1つが省かれた
-場合，\texttt{left}と\texttt{down}は0，\texttt{align}フィールドは
-\texttt{'left'}であるものとして扱われる．
+\texttt{align} フィールドに指定できる値は \texttt{'left'}, \texttt{'middle'},
+\texttt{'right'} のいずれかである．もしこれら3つのフィールドのうちの1つが省かれた
+場合，\texttt{left} と \texttt{down} は0，\texttt{align} フィールドは
+\ \texttt{'left'} であるものとして扱われる．
 これら3つのフィールドの意味については図\ref{fig-pos}で説明する．
 %</ja>
 
@@ -2865,7 +2865,7 @@ field is \texttt{'middle'}.
 \item
 %<*en>
 The black rectangle is a frame of the node.
-Its width, height and depth are specified by JFM.
+Its width, height, and depth are specified by JFM.
 %</en>
 %<*ja>
 黒色の長方形はノードの枠である．
@@ -4230,6 +4230,16 @@ JFMの\texttt{chars}テーブルのエントリとして \verb+'AJ1-xxx'+ の形
   \textcolor{blue}{\raisebox{3.5pt}{\tt%
     \fboxsep=1pt\fbox{\tiny \oalign{0#1#2\crcr#3#4#5\crcr}}}}\ignorespaces
 }
+{\catcode`\%=11
+  \gdef\IVSB#1{\expandafter\IVSA\directlua{tex.sprint(string.format('%X', 0xE0100+#1))}}}
+%<*en>
+\paragraph{IVS Support}
+Recent fonts support Ideographic Variation Selector (IVS).
+It seems that \Pkg{luaotfload} and \Pkg{fontspec} packages do not support
+IVS, so we implemented IVS support in \Pkg{luatexja-otf}.
+\emph{IVS support is experimental; if you want to enable this, load
+\Pkg{luatexja-otf} and execute the following:}
+%</en>
 %<*ja>
 \paragraph{IVSサポート}
 最近のOpenTypeフォントやTrueTypeフォントには，
@@ -4240,18 +4250,17 @@ JFMの\texttt{chars}テーブルのエントリとして \verb+'AJ1-xxx'+ の形
 IVSに対応してはいないようである．これらのパッケージで対応してくれるのが理想的だが，
 それまでのつなぎとして，\Pkg{luatexja-otf}パッケージ内にIVS対応を仕込んでおいた．
 
-{\catcode`\%=11
-  \gdef\IVSB#1{\expandafter\IVSA\directlua{tex.sprint(string.format('%X', 0xE0100+#1))}}}
-
 \medskip
 
 \emph{IVS対応は試験的なものである．
 有効にするには，\Pkg{luatexja-otf}パッケージを読み込んだ上で以下の命令を実行する%
 \footnote{この命令を2回以上実行しても意味がない．}：}
+%</ja>
 \begin{verbatim}
 \directlua{luatexja.otf.enable_ivs()}
 \end{verbatim}
-すると，上の命令を実行した箇所以降では，以下のようにIVSによる字形指定が有効となる．
+%<ja> すると，上の命令を実行した箇所以降では，以下のようにIVSによる字形指定が有効となる．
+%<en> After executing the command above, you can use IVS like the following:
 \begin{LTXexample}[explpreset={escapechar=\'}, preset={\let\IVSB=\IVS\catcode`\'=9 } ]
 \Large
 \jfontspec{KozMinPr6N-Regular}
@@ -4262,14 +4271,25 @@ IVSに対応してはいないようである．これらのパッケージで�
 邉'\IVSB{10}'邉'\IVSB{11}'邉'\IVSB{12}'邉'\IVSB{13}'邉'\IVSB{14}'%
 さん．
 \end{LTXexample}
+%<*en>
+In above input, we displayed  \texttt{U+E0102} as \IVSB2, to indicate variation selectors.
+%</en>
+%<*ja>
 左上側の入力においては，漢字用異体字セレクタを明示するため，
-例えば\texttt{U+E0102}を\IVSB2のように表記している．
-
+例えば \texttt{U+E0102} を\IVSB2のように表記している．
+%</ja>
 \medskip
 
+%<*en>
+Specifying glyph variants by IVS precedes glyph replacement by font features.
+For example, only ``葛'' in ``葛西'' is changed by font features
+\texttt{jp78}~or~\texttt{jp90}, which does not followed by any variation selector.
+%</en>
+%<*ja>
 また，IVSによる字形指定は，font featureによるそれに優先されることとした．
 下の例において，\texttt{jp78}, \texttt{jp90} 指定で字形が変化した文字は
 異体字セレクタが続いていない「葛西」中の「葛」のみである．
+%</ja>
 \begin{LTXexample}[explpreset={escapechar=\'}, preset={\let\IVSB=\IVS\catcode`\'=9 } ]
  \def\TEST#1{%
    {\jfontspec[#1]{KozMinPr6N-Regular}%
@@ -4279,11 +4299,12 @@ IVSに対応してはいないようである．これらのパッケージで�
  \texttt{jp90}：\TEST{CJKShape=JIS1990}
 \end{LTXexample}
 
+%<*ja>
 現状では，\TeX 側のインターフェースとなる \Pkg{luatexja-otf.sty} は一切変更していない
 ので，ZRさんによる\Pkg{PXipamjm}パッケージ%
 \footnote{\url{https://github.com/zr-tex8r/PXipamjm}. 説明は彼のブログ記事
 「pxipamjm パッケージの説明書のような何か(\url{http://d.hatena.ne.jp/zrbabbler/20131221})」
-にある．}%
+にある．}
 にあるような気の利いた命令はまだない．
 異体字の一覧表示を行いたい場合は，gitリポジトリ内の \texttt{test/test19-ivs.tex} 中にある
 Lua・\TeX コードが参考になるだろう．
@@ -4855,7 +4876,7 @@ internal states are as follows:
 \item State~$M$: middle of line
 \item State~$K$: after a Japanese character
 \end{itemize}
-The first three states---$N$, $S$~and~$M$---are as same as \TeX's input
+The first three states---$N$,~$S$, and~$M$---are as same as \TeX's input
 processor.  State~$K$ is similar to state~$M$, and is entered after
 Japanese characters.  The diagram of state transitions are indicated in
 Figure~\ref{fig-ptexipro}.  Note that \pTeX\ doesn't leave state~$K$
@@ -4948,7 +4969,7 @@ emits a space, or~\verb+\par+.
 \end{minipage}
 \begin{itemize}
 \item We omitted about category codes
-9~(\textit{ignored}), 14~(\textit{comment})~and~15~(\textit{invalid})
+9~(\textit{ignored}), 14~(\textit{comment}), and~15~(\textit{invalid})
 from the above diagram. We also ignored the input like ``\verb+^+\verb+^A+'' or ``\verb+^+\verb+^df+''.
 \item When a character whose category code is 0 (\textit{escape character}) is seen by \TeX,
 the input processor scans a control sequence (\textsf{scan a c.s.}).
@@ -5067,7 +5088,7 @@ y\ltjsetparameter{jacharrange={+6}}zい
 u
 \end{LTXexample}
 上ソース中の「あ」は欧文文字扱いであり．
-ここで使用している欧文フォント\TeX Gyre Termesは「あ」を含まない．
+ここで使用している欧文フォント\TeX\ Gyre Termesは「あ」を含まない．
 よって，出力に「あ」は現れないことは不思議ではない．
 それでも，\pTeX とまったく同じ挙動を示すならば，出力は
 「\hbox{\ltjsetparameter{autoxspacing=false}x yzいu}」となるはずである．しかし，実際には

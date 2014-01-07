@@ -2,7 +2,9 @@
 \documentclass{article}
 
 \usepackage{luatexja-fontspec}
-\usepackage{listings,color,showexpl}
+\usepackage{listings,color,showexpl,comment}
+\usepackage{luatexja-otf}
+\directlua{luatexja.otf.enable_ivs()}
 \usepackage
 [
 	papersize={100mm,100mm},
@@ -30,12 +32,16 @@
 	}
 	\fi
 }{}
-\DeclareFontShape{JY3}{mc}{m}{sl}{<-> s * [0.92489] psft:Ryumin-Light:jfm=ujis;slant=0.167}{}
-\DeclareFontShape{JY3}{mc}{m}{it}{<-> ssub* mc/m/sl}{}
+\DeclareKanjiFamily{JY3}{koz}{}
+\DeclareFontShape{JY3}{koz}{m}{n}{<-> s * [0.92489] KozMinPr6N-Regular:jfm=ujis}{}
+\DeclareFontShape{JY3}{koz}{m}{sl}{<-> s * [0.92489] psft:Ryumin-Light:jfm=ujis;slant=0.167}{}
+\DeclareFontShape{JY3}{koz}{m}{it}{<-> ssub* koz/m/sl}{}
+\def\mcdefault{koz}
 
 \setmainfont{TeX Gyre Pagella}
 \setmonofont{TeX Gyre Cursor}
 \begin{document}
+
 This test file is based on a.tex\footnote{This can be downloaded from {\tt https://gist.github.com/1574793}.} by x19290.
 
 
@@ -56,14 +62,13 @@ letter/word to 0\,pt.
 #!/bin/sh
 #長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い
 長い長い長い長い長い長い長い長い長い長い長い長い，長い長い長い長い長い長い
+#長い長い長い長い長い長い長い長い長い長い長い長い，長い長い長い長い長い長い
 #I.長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長いI
 長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い
 #IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII
 IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII IIII
 \end{env}
 
-Note that any \emph{kinsoku shori} is not performed inside \textsf{lstlisting} environment,
-as the line~3 in output above. We leave it to further development.
 \newpage
 
 \textbf{SOLVED}: LuaTeX-ja specific problem:
@@ -123,5 +128,13 @@ the first line of the listing is not rendered.
 !あ!漢!α!×!
 \TeX はギリシャ文字のΤ-Ε-Χ（タウ・イプシロン・カイ）であるから、……
 \TeX is an abbreviation of τέχνη (ΤΕΧΝΗ – technē).
+\end{lstlisting}
+
+\newpage
+IVS対応
+
+\begin{lstlisting}[escapechar=\%,basicstyle=\tt]
+1234567890
+1葛󠄀城，葛󠄁飾
 \end{lstlisting}
 \end{document}
