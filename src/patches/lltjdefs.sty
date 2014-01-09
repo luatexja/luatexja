@@ -52,10 +52,10 @@
    "500-"10FF, "1200-"1DFF, "2440-"245F, "27C0-"28FF, "2A00-"2AFF, 
   "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A82F, "A840-"ABFF, "FB00-"FE0F, 
   "FE20-"FE2F, "FE70-"FEFF, "10000-"1FFFF, "E000-"F8FF} % non-Japanese
-\ltjdefcharrange{5}{"D800-"DFFF, "E0000-"10FFFF} 
+\ltjdefcharrange{5}{"D800-"DFFF, "E0000-"E00FF, "E01F0-"10FFFF} 
 \ltjdefcharrange{6}{%
   "2460-"24FF, "2E80-"2EFF, "3000-"30FF, "3190-"319F, "31F0-"4DBF, 
-  "4E00-"9FFF, "F900-"FAFF, "FE10-"FE6F, "20000-"2FFFF}
+  "4E00-"9FFF, "F900-"FAFF, "FE10-"FE6F, "20000-"2FFFF, "E0100-"E01EF}
 \ltjdefcharrange{7}{
   "1100-"11FF, "2F00-"2FFF, "3100-"31EF, "A000-"A4CF, "A830-"A83F, 
   "AC00-"D7FF}
@@ -113,8 +113,8 @@ NEGATIVE
   "FE20-"FE2F, "FE70-"FEFF, "10000-"1FFFF, "E000-"F8FF}
 } % non-Japanese
 
-\ltjdefcharrange{5}{"D800-"DFFF, "E0000-"10FFFF} 
-  % Surrogates, Tags and Variation Selectors Supplement
+\ltjdefcharrange{5}{"D800-"DFFF, "E0000-"E00FF, "E01F0-"10FFFF} 
+  % Surrogates, Tags
   %  208  "F0000-"FFFFF num = 0/65536 name = Supplementary Private Use Area-A
   %  209  "100000-"10FFFF num = 0/65536 name = Supplementary Private Use Area-B
 
@@ -123,7 +123,7 @@ POSITIVE
 % Japanese
 \ltjdefcharrange{6}{%
   "2460-"24FF, "2E80-"2EFF, "3000-"30FF, "3190-"319F, "31F0-"4DBF, 
-  "4E00-"9FFF, "F900-"FAFF, "FE10-"FE6F, "20000-"2FFFF}
+  "4E00-"9FFF, "F900-"FAFF, "FE10-"FE6F, "20000-"2FFFF, "E0100-"E01EF}
 %   77  "2460-"24FF num = 150/160 name = Enclosed Alphanumerics
 %   98  "2E80-"2EFF num = 21 name = CJK Radicals Supplement
 %  101  "3000-"303F num = 144 name = CJK Symbols and Punctuation
@@ -140,6 +140,7 @@ POSITIVE
 %  149  "FE30-"FE4F num = 8/32 name = CJK Compatibility Forms
 %  150  "FE50-"FE6F num = 0/32 name = Small Form Variants
 %  SIP
+%  "E0000-"E01EF Variation Selectors Supplement
 
 \ltjdefcharrange{7}{
   "1100-"11FF, "2F00-"2FFF, "3100-"31EF, "A000-"A4CF, "A830-"A83F, 

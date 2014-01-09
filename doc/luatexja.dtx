@@ -33,9 +33,9 @@
 \usepackage{luatexja-adjust}\ltjdisableadjust
 \parskip=\smallskipamount
 \renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
-                                    {3.25ex \@plus1ex \@minus.2ex}%
-                                    {-1em}%
-                                    {\normalfont\normalsize\bfseries\raisebox{.2ex}{$\mdlgblksquare\mkern1mu$}}}
+    {3.25ex \@plus1ex \@minus.2ex}%
+    {-1em}%
+    {\normalfont\normalsize\bfseries\raisebox{.2ex}{$\mdlgblksquare\mkern1mu$}}}
 %</en>
 %<*ja>
 \usepackage[textwidth=45\zw, lines=45, footskip=6mm]{geometry}
@@ -47,11 +47,25 @@
 \usepackage{booktabs,multicol}
 
 %%%%%%%% listings
+
+%%%%%%%% IVS
+
+\def\IVS#1{\char\numexpr "E0100+#1\relax}%"
+\def\IVSA#1#2#3#4#5{%
+  \textcolor{blue}{\raisebox{3.5pt}{\tt%
+    \fboxsep=0.5pt\fbox{\tiny \oalign{0#1#2\crcr#3#4#5\crcr}}}}%
+}
+{\catcode`\%=11
+  \gdef\IVSB#1{\expandafter\IVSA\directlua{
+    local cat_str = luatexbase.catcodetables['string']
+    tex.sprint(cat_str, string.format('%X', 0xE00EF+#1))
+}}}
+
 \usepackage{listings,showexpl}
 \lstset{
   basicstyle=\ttfamily\small, pos=r, breaklines=true,
   numbers=none, rframe={}, basewidth=0.5em, numberstyle=\tiny, numbersep=0.5em,
-  explpreset={numberstyle=\tiny, numbers=left, numbersep=1em}
+  explpreset={numberstyle=\tiny, numbers=left, numbersep=1em, columns=fixed}
 }
 % Suppress output from showexpl to stdout.
 \let\SX@Info\relax
@@ -160,6 +174,10 @@
 
 
 \begin{document}
+\lstset{
+  vscmd=\IVSB
+}
+
 \catcode`\<=13
 \def<#1>{{\normalfont\rm\itshape$\langle$#1$\rangle$}}
 \maketitle
@@ -1848,7 +1866,8 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 "FE10--"FE1F&Vertical Forms&
 "FE30--"FE4F&CJK Compatibility Forms\\
 "FE50--"FE6F&Small Form Variants&
-"{20}000--"{2F}FFF&(Supplementary Ideographic Plane)
+"{20}000--"{2F}FFF&(Supplementary Ideographic Plane)\\
+"{E0}100--"{E0}1EF&Variation Selectors Supplement
 \end{tabular}
 \end{table}
 %<*en>
@@ -4144,7 +4163,7 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
 
 
 \subsection{\texttt{luatexja-otf.sty}}
-
+\label{ssec-ltjotf}
 %<*en>
 This optional package supports typesetting characters in
 Adobe-Japan1. the package \Pkg{luatexja-otf} offers the following 2~low-level
@@ -4225,13 +4244,6 @@ JFMの\texttt{chars}テーブルのエントリとして \verb+'AJ1-xxx'+ の形
 正しく半角幅で組むために利用されている．
 %</ja>
 
-\def\IVS#1{\char\numexpr "E0100+#1\relax}%"
-\def\IVSA#1#2#3#4#5{%
-  \textcolor{blue}{\raisebox{3.5pt}{\tt%
-    \fboxsep=1pt\fbox{\tiny \oalign{0#1#2\crcr#3#4#5\crcr}}}}\ignorespaces
-}
-{\catcode`\%=11
-  \gdef\IVSB#1{\expandafter\IVSA\directlua{tex.sprint(string.format('%X', 0xE0100+#1))}}}
 %<*en>
 \paragraph{IVS Support}
 Recent fonts support Ideographic Variation Selector (IVS).
@@ -4261,22 +4273,19 @@ IVSに対応してはいないようである．これらのパッケージで�
 \end{verbatim}
 %<ja> すると，上の命令を実行した箇所以降では，以下のようにIVSによる字形指定が有効となる．
 %<en> After executing the command above, you can use IVS like the following:
-\begin{LTXexample}[explpreset={escapechar=\'}, preset={\let\IVSB=\IVS\catcode`\'=9 } ]
+\begin{LTXexample}
 \Large
 \jfontspec{KozMinPr6N-Regular}
-奈良県葛'\IVSB0'城市と，東京都葛'\IVSB1'飾区．\\
-こんにちは，渡%
-邉'\IVSB{00}'邉'\IVSB{01}'邉'\IVSB{02}'邉'\IVSB{03}'邉'\IVSB{04}'%
-邉'\IVSB{05}'邉'\IVSB{06}'邉'\IVSB{07}'邉'\IVSB{08}'邉'\IVSB{09}'%
-邉'\IVSB{10}'邉'\IVSB{11}'邉'\IVSB{12}'邉'\IVSB{13}'邉'\IVSB{14}'%
+奈良県葛󠄀城市と，東京都葛󠄁飾区．\\
+こんにちは，渡
+邉󠄀邉󠄁邉󠄂邉󠄃邉󠄄
+邉󠄅邉󠄆邉󠄇邉󠄈邉󠄉
+邉󠄊邉󠄋邉󠄌邉󠄍邉󠄎
 さん．
 \end{LTXexample}
-%<*en>
-In above input, we displayed  \texttt{U+E0102} as \IVSB2, to indicate variation selectors.
-%</en>
 %<*ja>
 左上側の入力においては，漢字用異体字セレクタを明示するため，
-例えば \texttt{U+E0102} を\IVSB2のように表記している．
+例えばVariation~Selector~18 (\texttt{U+E0101})を\IVSB{18}のように表記している．
 %</ja>
 \medskip
 
@@ -4290,10 +4299,10 @@ For example, only ``葛'' in ``葛西'' is changed by font features
 下の例において，\texttt{jp78}, \texttt{jp90} 指定で字形が変化した文字は
 異体字セレクタが続いていない「葛西」中の「葛」のみである．
 %</ja>
-\begin{LTXexample}[explpreset={escapechar=\'}, preset={\let\IVSB=\IVS\catcode`\'=9 } ]
+\begin{LTXexample}
  \def\TEST#1{%
    {\jfontspec[#1]{KozMinPr6N-Regular}%
-   葛'\IVSB0'城市，葛'\IVSB1'飾区，葛西}\\}
+   葛󠄀城市，葛󠄁飾区，葛西}\\}
  指定なし：\TEST{}
  \texttt{jp78}：\TEST{CJKShape=JIS1978}
  \texttt{jp90}：\TEST{CJKShape=JIS1990}
@@ -5843,8 +5852,10 @@ then the patch \Pkg{lltjp-listings} is loaded automatically at \verb+\begin{docu
 意識する必要はない．
 %</ja>
 
+%<en>\subsection{Notes}
+%<ja>\subsection{注意}
 %<*en>
-\paragraph{A note to ``Escaping to \LaTeX''}
+\paragraph{Escaping to \LaTeX}
 We used the \verb+process_input_buffer+ callback to output \textbf{JAchar}s.
 But it has a drawback; any control sequences whose name contains a \textbf{JAchar}
 cannot be used in any ``escape to \LaTeX''.
@@ -5852,7 +5863,7 @@ cannot be used in any ``escape to \LaTeX''.
 Consider the following input:
 %</en>
 %<*ja>
-\paragraph{「\LaTeX へのエスケープ」についての注意}
+\paragraph{\LaTeX へのエスケープ}
 日本語対応を行うために \verb+process_input_buffer+ を使用したことで，
 \texttt{texcl},~\texttt{escapeinside}といった\emph{「\LaTeX へのエスケープ」中では，
 \textbf{JAchar}を名称の一部に含む制御綴は使用不可能}である．
@@ -5883,8 +5894,50 @@ instead ``\verb+\ほげ+''.
 「\verb+\+\IVSA FFFFF」というcontrol symbolが実行されることになる．
 %</ja>
 
-%<en>\paragraph{Class of characters}
-%<ja>\paragraph{文字種}
+%<*ja>
+\paragraph{異体字セレクタの扱い}
+\texttt{lstlisting} 環境などの内部にある異体字セレクタを扱うため，
+\Pkg{lltjp-listings} では \texttt{vsraw} と \texttt{vscmd} という2つのキーを追加した．
+しかし，\Pkg{lltjp-listings} が実際にロードされるのは \verb+\begin{document}+\ 
+のところであるので，プリアンブル内ではこれらの追加キーは使用できない．
+
+\texttt{ivsraw}は，ブール値の値をとるキーであり，標準ではfalseである．
+\begin{itemize}
+ \item trueの場合は，異体字セレクタは「直前の文字に続けて」出力される．
+もしもIVSサポート（\ref{ssec-ltjotf}節）が有効になっていた場合は，
+以下の例（左側は入力，右側はその出力）のようになる．
+\begin{LTXexample}
+\begin{lstlisting}[vsraw=true]
+葛󠄀城市，葛󠄁飾区，葛西
+\end{lstlisting}
+\end{LTXexample}
+\item falseの場合は，異体字セレクタは適当な命令によって「見える形で」出力される．
+どのような形で出力されるかを規定するのが \texttt{vscmd} キーであり，
+\Pkg{lltjp-listings} の標準設定では以下の例の右側のように出力される．
+\begin{LTXexample}
+\begin{lstlisting}[vsraw=false, 
+   vscmd=\ltjlistingsvsstdcmd]
+葛󠄀城市，葛󠄁飾区，葛西
+\end{lstlisting}
+\end{LTXexample}
+ちなみに，本ドキュメントでは次のようにしている：
+\begin{lstlisting}[numbers=left]
+\def\IVSA#1#2#3#4#5{%
+  \textcolor{blue}{\raisebox{3.5pt}{\tt%
+    \fboxsep=0.5pt\fbox{\tiny \oalign{0#1#2\crcr#3#4#5\crcr}}}}%
+}
+{\catcode`\%=11
+  \gdef\IVSB#1{\expandafter\IVSA\directlua{
+    local cat_str = luatexbase.catcodetables['string']
+    tex.sprint(cat_str, string.format('%X', 0xE00EF+#1))
+}}}
+\lstset{vscmd=\IVSB}
+\end{lstlisting}
+\end{itemize} 
+%</ja>
+
+%<en>\subsection{Class of characters}
+%<ja>\subsection{文字種}
 
 %<en>Roughly speaking, the \Pkg{listings} package processes input as follows:
 %<ja>\Pkg{listings} パッケージの内部では，大雑把に言うと
@@ -5912,11 +5965,11 @@ for the name of identifiers or not.
 
 %<*en>
 For Japanese characters, line breaks are permitted on both sides
-except for parentheses, dashes, etc.
-To process Japanese characters,
-The pacth \Pkg{lltjp-listings} introduces a new flag \verb+\lst@ifkanji+, which indicates
-whether the previous character is Japanese character or not.
-For illustration, we introduce the following classes of character:
+except for brackets, dashes, etc.
+Hence the patch \Pkg{lltjp-listings} introduces 
+a new flag \verb+\lst@ifkanji+, which indicates
+whether the previous character is a Japanese character or not.
+For illustration, we introduce following classes of characters:
 %</en>
 %<*ja>
 さて，日本語の処理である．殆どの和文文字の前後では行分割が可能であるが，その一方で
@@ -5931,7 +5984,8 @@ For illustration, we introduce the following classes of character:
 &Letter&Other&Kanji&Open&Close\\\midrule
 \verb+\lst@ifletter+&T&F&T&F&T\\
 \verb+\lst@ifkanji+&F&F&T&T&F\\
-%<en>Meaning&identifier char&other alphabet&most of Japanese char&open paren&close paren\\
+%<en>Meaning&char in an identifier&other alphabet&%
+%<en>most of Japanese char&opening brackets&closing brackets\\
 %<ja>意図&識別子中の文字&その他欧文文字&殆どの和文文字&開き括弧類&閉じ括弧類\\
 \bottomrule
 \end{tabular}
@@ -5949,7 +6003,7 @@ Other according to circumstances.
 
 %<*en>
 For example, let us consider the case an Open comes after a Letter.
-Since an Open represents Japanese open parenthesis,
+Since an Open represents Japanese open brackets,
 it is preferred to be permitted to insert line break after the Letter.
 Therefore, the collected character string is output in this case.
 %</en>
@@ -6002,39 +6056,36 @@ Prev&Kanji&\multicolumn{4}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
 %<ja>\item 「収集」は，後側の文字を，現在収集された文字列に追加（行分割不可）を意味する．
 \end{itemize}
 
-%<en>\paragraph{Classification of characters}
-%<ja>\paragraph{和文文字扱いとなる文字}
-
-%<*en>
-Characters are classified according to \Param{jacharrange} parameter (see Section \ref{ssec-setrange}):
+%<*en> 
+Charatcers above \texttt{U+0080} \emph{except \texttt{U+E0100}--\texttt{U+E01EF}
+ (Variation Selectors Supplement)} are classified into above 5~classes by the following rules:
 %</en>
 %<*ja>
-\Pkg{listings} パッケージにおいて和文文字と扱われる
-（前に述べたKanji, Open，あるいは「閉じ括弧類」分類）か否かは，
-通常の\textbf{JAchar}/\textbf{Alchar}の範囲の設定（\Param{jacharrange} パラメータ，\ref{ssec-setrange}節を参照）に従って行われる：
+\texttt{U+0080}以降の\emph{漢字用異体字セレクタ以外の}各文字が
+Letter, Other, Kanji, Open, Closeのどれに属するかは次によって決まる：
 %</ja>
 \begin{itemize}
+%<en>\item \textbf{ALchar}s above \texttt{U+0080} are classified as Letter.
+%<ja>\item （\texttt{U+0080}以降の）\textbf{ALchar}は，すべてLetter扱いである．
 
-%<en>\item \textbf{ALchars} above U+0080 are Letter.
-%<ja>\item （U+0080以降の）\textbf{ALchar}は，すべてLetter扱いである．
-
-%<en>\item \textbf{JAchars} are classified in the order as follows:
-%<ja>\item （U+0080以降の）\textbf{JAchar}については，以下の順序に従って文字種を決める：
+%<en>\item \textbf{JAchar}s are classified in the order as follows:
+%<ja>\item \textbf{JAchar}については，以下の順序に従って文字種を決める：
 \begin{enumerate}
-%<en>\item Characters whose \Param{\hyperlink{fld:prebp}{prebreakpenalty}} is greater than or equal to 0 are Open.
+%<en>\item Characters whose \Param{\hyperlink{fld:prebp}{prebreakpenalty}} is greater than or equal to 0 are classified as Open.
 %<ja>\item \Param{\hyperlink{fld:prebp}{prebreakpenalty}}が0以上の文字はOpen扱いである．
 
-%<en>\item Characters whose \Param{\hyperlink{fld:postbp}{postbreakpenalty}} is greater than or equal to 0 are Close.
+%<en>\item Characters whose \Param{\hyperlink{fld:postbp}{postbreakpenalty}} is greater than or equal to 0 are classified as Close.
 %<ja>\item \Param{\hyperlink{fld:postbp}{postbreakpenalty}}が0以上の文字はClose扱いである．
 
-%<en>\item Characters that don't satisfy the above two conditions are Kanji.
-%<ja>\item 上の2条件のどちらにも当てはまらなかった文字は，Kanji扱いである．
+%<en>\item Characters that don't satisfy the above two conditions are classified as Kanji.
+%<ja>\item 上の3条件のどちらにも当てはまらなかった文字は，Kanji扱いである．
 \end{enumerate}
 \end{itemize}
 
 %<*en>
-The width of halfwidth kana (U+FF61--U+FF9F) is same as the width of \textbf{ALchar};
-the width of the other \textbf{JAchars} is double the width of \textbf{ALchar}.
+The width of halfwidth kana (\texttt{U+FF61}--\texttt{U+FF9F}) 
+is same as the width of \textbf{ALchar};
+the width of the other \textbf{JAchar}s is double the width of \textbf{ALchar}.
 %</en>
 %<*ja>
 なお，半角カナ(U+FF61--U+FF9F)以外の\textbf{JAchar}は欧文文字2文字分の幅をとるものとみなされる．
@@ -6042,8 +6093,8 @@ the width of the other \textbf{JAchars} is double the width of \textbf{ALchar}.
 %</ja>
 
 %<*en>
-The classification process is executed every time a character appears in
-listing environments.
+This classification process is executed every time a character appears in
+the \texttt{lstlisting} environment or other environments/commands.
 %</en>
 %<*ja>
 これらの文字種決定は，実際に \texttt{lstlisting} 環境などの内部で文字が出てくるたびに行われる．

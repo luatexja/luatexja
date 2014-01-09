@@ -2,7 +2,7 @@
 \documentclass{article}
 
 \usepackage{luatexja-fontspec}
-\usepackage{listings,color,showexpl,comment}
+\usepackage{listings,color,showexpl}
 \usepackage{luatexja-otf}
 \directlua{luatexja.otf.enable_ivs()}
 \usepackage
@@ -18,7 +18,8 @@
 	language=sh, extendedchars=false,
 	backgroundcolor=\color[gray]{.75},
 	breaklines=true,
-    basewidth={0.55\zw, 0.45em},
+        explpreset={columns=fixed},
+    basewidth={0.5\zw, 0.45em},
 	numbers=left,numberstyle=\tiny, numbersep=2pt,
 }
 
@@ -131,10 +132,24 @@ the first line of the listing is not rendered.
 \end{lstlisting}
 
 \newpage
-IVS対応
+IVS対応1: \texttt{vsraw=false} (default)
 
-\begin{lstlisting}[escapechar=\%,basicstyle=\tt]
+\begin{LTXexample}[escapechar=\%, basicstyle=\tt]
 1234567890
 1葛󠄀城，葛󠄁飾
+󠄀a
+\end{LTXexample}
+
+IVS対応2: \texttt{vsraw=true}
+
+\begin{LTXexample}[escapechar=\%,vsraw, basicstyle=\tt]
+1234567890
+1葛󠄀城，葛󠄁飾ｱｲｳ
+\end{LTXexample}
+
+\begin{lstlisting}[escapechar=\%,vsraw, basewidth=1\zw, basicstyle=\tt]
+1234567890
+1あ，23
+1あ2，3
 \end{lstlisting}
 \end{document}

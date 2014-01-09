@@ -3,77 +3,81 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-listings}[2014/01/07 Patch to listings for LuaTeX-ja]
+\ProvidesPackage{lltjp-listings}[2014/01/09 Patch to listings for LuaTeX-ja]
 \RequirePackage{listings,luatexbase-cctb}
 
-% override
+%%%%%%%%%%%%%%%% Japanese support
+%% IVS support
+\newif\if@ltj@lst@vsraw \@ltj@lst@vsrawfalse
+\def\ltj@lst@vscmd{}
+\lst@Key{vsraw}f[t]{\lstKV@SetIf{#1}\if@ltj@lst@vsraw}
+\lst@Key{vscmd}\relax{\def\ltj@lst@vscmd{#1}}
+
+% 既定の IVS 出力コマンド
+\def\ltjlistingsvsstdcmd#1{\@tempdima=\f@size pt%
+  \smash{\raisebox{.35\@tempdima}{\tt%
+    \fboxsep=.1\@tempdima\fbox{\fontsize{.5\@tempdima}{\z@}\selectfont
+      \oalign{\hss VS\hss\crcr#1\crcr}}}}}
+\def\ltj@lst@vscmd{\ltjlistingsvsstdcmd}
+
+% override \lst@FillFixed@
+% \ltj@hst@hss is \ltj@lst@hss@ivs or \ltj@lst@hss@normal,
+% according to vsraw = true or not.
 \def\lst@FillFixed@#1{%
-  \ifx\@empty#1\else\ltj@lst@hss#1#1\expandafter\lst@FillFixed@\fi}
-% First #1 is read by token.get_next() in \ltj@lst@hss
-{\catcode`\~=12
-  \gdef\ltj@lst@hss{%
-    \directlua{
-      local cat_str = luatexbase.catcodetables['string']
-      local cat_lp  = luatexbase.catcodetables['latex-package']
-      local uchar = unicode.utf8.char
-      local t = token.get_next()
-      if (t[1]~=11 and t[1]~=12)
-        or (not (t[2]>=0xE0100 and t[2]<0xE01F0)) 
-      then
-        tex.sprint(cat_lp, string.char(0x5C) .. 'lst@hss ')
-      end
-    }%
-  }
+  \ifx\@empty#1\else\ltj@lst@hss#1\expandafter\lst@FillFixed@\fi}
+
+\directlua{
+  local cat_str = luatexbase.catcodetables['string']
+  local cat_lp  = luatexbase.catcodetables['latex-package']
+  local ubyte = unicode.utf8.byte
+  luatexja.lst = {}
+  function luatexja.lst.althss(t)
+    t = ubyte(t)
+    if not (t>=0xE0100 and t<0xE01F0) then
+      tex.sprint(cat_lp, string.char(0x5C) .. 'lst@hss')
+    end
+  end
+}
+\gdef\ltj@lst@hss@ivs#1{%
+  \directlua{luatexja.lst.althss('\luatexluaescapestring{#1}')}#1%
 }
 
-
 % lowest level
-\def\lst@kanjitrue{\let\lst@ifkanji\iftrue}
-\def\lst@kanjifalse{\let\lst@ifkanji\iffalse}
-\lst@AddToHook{InitVars}{\lst@kanjifalse}
+\newif\if@ltj@lst@kanji
+\lst@AddToHook{InitVars}{\@ltj@lst@kanjifalse}
 
 \def\lst@AppendLetter{%
     \ltj@lst@setletterflag\lst@Append}
 \def\lst@AppendOther{%
-    \lst@ifletter\lst@Output\lst@letterfalse\fi\lst@kanjifalse
+    \lst@ifletter\lst@Output\lst@letterfalse\fi\@ltj@lst@kanjifalse
     \futurelet\lst@lastother\lst@Append}
 
 \def\ltj@lst@setletterflag{%
   \lst@ifletter
-    \lst@ifkanji\lst@Output\lst@kanjifalse\fi
+    \if@ltj@lst@kanji\lst@Output\@ltj@lst@kanjifalse\fi
   \else
-    \lst@lettertrue\lst@ifkanji\lst@kanjifalse\else\lst@OutputOther\fi
+    \lst@lettertrue\if@ltj@lst@kanji\@ltj@lst@kanjifalse\else\lst@OutputOther\fi
   \fi}
 
 \def\ltj@lst@setkanjiflag{%
   \lst@ifletter
     \lst@Output
   \else
-    \lst@ifkanji\else\lst@OutputOther\fi\lst@lettertrue
+    \if@ltj@lst@kanji\else\lst@OutputOther\fi\lst@lettertrue
   \fi}
 
 \def\ltj@lst@setopenflag{%
   \lst@ifletter
     \lst@letterfalse\lst@Output
   \else
-    \lst@ifkanji\else\lst@OutputOther\fi
-  \fi\lst@kanjitrue}
+    \if@ltj@lst@kanji\else\lst@OutputOther\fi
+  \fi\@ltj@lst@kanjitrue}
 
 \def\ltj@lst@setcloseflag{%
-  \lst@ifletter\else\lst@lettertrue\fi\lst@kanjitrue}
+  \lst@ifletter\else\lst@lettertrue\fi\@ltj@lst@kanjitrue}
 
-\def\lst@ProcessJALetter#1{%
-  \ifnum`#1>"E00FF\relax
-    \ifnum`#1<"E01F0\relax
-      \lst@Append#1\advance\lst@length\m@ne
-    \else
-      \lst@ProcessJALetter@aux#1%
-    \fi
-  \else
-    \lst@ProcessJALetter@aux#1%
-  \fi
-}
-\def\lst@ProcessJALetter@aux#1{%
+% Processing Japanese characters
+\def\ltj@lst@ProcessJALetter#1{%
   \lst@whitespacefalse
   \ifnum\ltjgetparameter{jacharrange}{\ltjgetparameter{chartorange}{`#1}}=0
     \ifnum\ltjgetparameter{postbreakpenalty}{`#1}>0
@@ -89,9 +93,9 @@
     \ltj@lst@setletterflag
   \fi
   \lst@Append#1}
-%\let\lst@ProcessJALetter\lst@ProcessJALetter@aux
 
-\def\lst@ProcessJALetterHalf#1{%
+% 半角カナ処理命令
+\def\ltj@lst@ProcessJALetterHalf#1{%
   \lst@whitespacefalse
   \ifnum\ltjgetparameter{jacharrange}{\ltjgetparameter{chartorange}{`#1}}=0
     \ifnum\ltjgetparameter{postbreakpenalty}{`#1}>0
@@ -108,22 +112,27 @@
   \fi
   \lst@Append#1}
 
-
-% 半角カナの扱い
-
-\def\ltj@@listing@jpsetN#1#2#3{% for (not large) range
-  \@tempcnta=#1 \@tempcntb=\numexpr 1+#2\relax \@temptokena{}%
-  \loop \global\advance\@tempcnta\@ne\ifnum\@tempcnta<\@tempcntb\relax
-    \ltj@@listing@jpsetN@{\@tempcnta}{#3}\repeat
-  \ltj@@listing@jpset@after{#1}
+% 漢字用異体字セレクタ命令
+\def\ltj@lst@ProcessIVS#1{%
+  \lst@whitespacefalse
+  \if@ltj@lst@vsraw
+    \lst@Append#1\advance\lst@length\m@ne
+  \else
+    \lst@TrackNewLines\lst@OutputLostSpace \lst@PrintToken
+    \setbox\@tempboxa\hbox to 2\lst@width{\hss
+       \expandafter\expandafter\expandafter\ltj@lst@vscmd
+       \expandafter{\the\numexpr`#1-"E00EF\relax}%"
+    \hss}%
+    \lst@CalcLostSpaceAndOutput\lst@whitespacefalse
+  \fi
 }
 
-\def\ltj@@listing@jpset@after#1{%
-  \expandafter\edef\csname ltj@@listing@jpcmd@i#1\endcsname{\the\@temptokena}%
-  \toks@\expandafter\expandafter\expandafter\expandafter%
-  \expandafter\expandafter\expandafter{\expandafter\expandafter%
-  \expandafter\the\expandafter\toks@\csname ltj@@listing@jpcmd@i#1\endcsname}%
-  \@temptokena{}%
+
+% 半角カナ，異体字セレクタはアクティブ化
+\def\ltj@@listing@jpsetN#1#2#3{% for (not large) range
+  \@tempcnta=\numexpr#1-1\relax\@tempcntb=\numexpr 1+#2\relax
+  \loop \global\advance\@tempcnta\@ne\ifnum\@tempcnta<\@tempcntb\relax
+    \ltj@@listing@jpsetN@{\@tempcnta}{#3}\repeat
 }
 
 \def\ltj@@listing@jpsetN@#1#2{{%
@@ -133,23 +142,42 @@
   \expandafter\expandafter\expandafter{\expandafter\expandafter%
   \expandafter\the\expandafter\@temptokena\@temp}%
 }
-
-\toks@{}
-\ltj@@listing@jpsetN{65377}{65439}{\lst@ProcessJALetterHalf}
-\edef\ltj@@listing@jpcmd{\the\toks@}\toks@{}
+\@temptokena{}
+\ltj@@listing@jpsetN{65377}{65439}{\ltj@lst@ProcessJALetterHalf}
+\ltj@@listing@jpsetN{917760}{917999}{\ltj@lst@ProcessIVS}
+\xdef\ltj@@listing@jpcmd{\the\@temptokena}\@temptokena{}
 
 % catcode 対策
 \newluatexcatcodetable\CatcodeTableLTJlistings
-\setluatexcatcodetable\CatcodeTableLTJlistings{
+\setluatexcatcodetable\CatcodeTableLTJlistings{%
   \luatexcatcodetable\CatcodeTableLaTeXAtLetter
   \catcode"FFFFF=13%"
-  \SetCatcodeRange{"FF61}{"FF9F}{13}%   半角文字
+  \SetCatcodeRange{"FF61}{"FF9F}{13}%     半角カナ
+  \SetCatcodeRange{"E0100}{"E01EF}{13}%   漢字用異体字セレクタ
 }
+
+% We redefine \lst@BeginDropInput, since now we have
+% two additional `process macros'.
+\def\lst@BeginDropInput#1{%
+    \lst@EnterMode{#1}%
+    {\lst@modetrue
+     \let\lst@OutputBox\@gobble
+     \let\lst@ifdropinput\iftrue
+     \let\lst@ProcessLetter\@gobble
+     \let\lst@ProcessDigit\@gobble
+     \let\lst@ProcessOther\@gobble
+     \let\lst@ProcessSpace\@empty
+     \let\lst@ProcessTabulator\@empty
+     \let\lst@ProcessFormFeed\@empty
+     \let\ltj@lst@ProcessJALetter\@gobble     % added
+     \let\ltj@lst@ProcessJALetterHalf\@gobble % added
+}}
+
 
 % hook!
 \lst@AddToHook{Init}{
   \luatexcatcodetable\CatcodeTableLTJlistings\ltj@@listing@jpcmd
-  \lccode`\~="FFFFF\lowercase{\let~\lst@ProcessJALetter}%"
+  \lccode`\~="FFFFF\lowercase{\def~{\ltj@lst@ProcessJALetter}}%"
   \directlua{luatexbase.add_to_callback('process_input_buffer',
     function(buf)
       local ret = ''
@@ -162,8 +190,17 @@
         ret = ret .. c
       end
       return ret
-    end, 'ltj.listings_unicode', 1)}}
-\lst@AddToHook{ExitVars}{\directlua{luatexbase.remove_from_callback('process_input_buffer', 'ltj.listings_unicode')}}
+    end, 'ltj.listings_unicode', 1)}%
+  \if@ltj@lst@vsraw
+    \let\ltj@lst@hss=\ltj@lst@hss@ivs
+  \else
+    \let\ltj@lst@hss=\lst@hss
+  \fi
+}
+\lst@AddToHook{ExitVars}{%
+  \directlua{luatexbase.remove_from_callback('process_input_buffer', 
+    'ltj.listings_unicode')}%
+}
 
 
 % 白線対策
@@ -184,7 +221,8 @@
      \lst@CalcLostSpaceAndOutput}}%
     \lst@ResetToken}
 
-%
+%%%%%%%%%%%%%%%% escape to \LaTeX
+\lstloadaspects{escape}
 \gdef\lst@Escape#1#2#3#4{%
     \lst@CArgX #1\relax\lst@CDefX
         {}%
@@ -204,9 +242,33 @@
                   \lst@newlines\z@ \lst@whitespacefalse}%
                  {}%
          \fi
-         #3\catcode"FFFFF=9\lst@escapebegin
+         #3\catcode"FFFFF=9\lst@escapebegin%"
          \fi}%
         {}}
+
+%%%%%%%%%%%%%%%%
+\lstloadaspects{writefile}
+\begingroup \catcode`\^^I=11
+\gdef\lst@WFBegin#1#2{%
+    \begingroup
+    \let\lst@OutputBox#1%
+    \def\lst@Append##1{%
+        \advance\lst@length\@ne
+        \expandafter\lst@token\expandafter{\the\lst@token##1}%
+        \ifx ##1\lst@outputspace \else
+            \lst@WFAppend##1%
+        \fi}%
+    \lst@lAddTo\lst@PreGotoTabStop{\lst@WFAppend{^^I}}%
+    \lst@lAddTo\lst@ProcessSpace{\lst@WFAppend{ }}%
+    \def\ltj@lst@ProcessIVS##1{\lst@whitespacefalse\lst@Append##1}
+    \let\lst@DeInit\lst@WFDeInit
+    \let\lst@MProcessListing\lst@WFMProcessListing
+    \lst@WFifopen\else
+        \immediate\openout\lst@WF=#2\relax
+        \global\let\lst@WFifopen\iftrue
+        \@gobbletwo\fi\fi
+    \fi}
+\endgroup
 
 
 %    \begin{修正事項}{1.3} from jlisting.sty

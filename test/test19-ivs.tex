@@ -2,6 +2,8 @@
 \documentclass{ltjsarticle}
 \usepackage{luatexja-fontspec,luatexja-otf, luacode, booktabs,array,xcolor}
 \usepackage[scale=0.80]{geometry}
+\usepackage{listings}
+\setsansjfont{KozGoPr6N-Regular}
 
 % \IVS[?] 用
 \begin{luacode}
@@ -37,7 +39,7 @@
 %%%%%    \IVS[<selector number>]{<character>}
 %%%%% or \IVS<selector number>{<character>}
 %%%%% (<selector number>: 0--239, or `?')
-\def\ltj@ivs@out#1#2{#2\char\numexpr "E0100+#1\relax} % IVS
+\def\ltj@ivs@out#1#2{#2\char\numexpr "E0100+#1\relax} % IVS"
 \def\ltj@ivs@list?#1{\directlua{list_ivs('#1')}}
 \def\ltj@ivs@grab@num{\expandafter\expandafter\expandafter\ltj@ivs@out\ltj@grab@num}
 \def\ltj@ivs@nobracket{\@ifnextchar?{\ltj@ivs@list}{\ltj@ivs@grab@num}}
@@ -117,7 +119,12 @@ MJ番号を直接指定していたところは，このソース中では無視
 
 \TABLE{IPAmj明朝}{ipamjm}
 \TABLE{小塚明朝 Pr6N R}{kozminpr6n-regular}
-\TABLE{花園明朝A}{hanamina}
+%\TABLE{花園明朝A}{hanamina}
 \TABLE{花園明朝 OpenType}{hanaminotpr6n-regular}
+
+\begin{lstlisting}[basicstyle=\tt, columns=fixed, basewidth=.5em]
+奈良県葛󠄀城市と東京都葛󠄁飾区．%
+江戸川区葛西はどっち？
+\end{lstlisting}
 
 \end{document}
