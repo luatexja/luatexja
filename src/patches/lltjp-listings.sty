@@ -17,7 +17,7 @@
 \def\ltjlistingsvsstdcmd#1{\@tempdima=\f@size pt%
   \smash{\raisebox{.35\@tempdima}{\tt%
     \fboxsep=.1\@tempdima\fbox{\fontsize{.5\@tempdima}{\z@}\selectfont
-      \oalign{\hss VS\hss\crcr#1\crcr}}}}}
+      \oalign{\hss VS\hss\crcr\hss#1\hss\crcr}}}}}
 \def\ltj@lst@vscmd{\ltjlistingsvsstdcmd}
 
 % override \lst@FillFixed@
@@ -127,6 +127,21 @@
   \fi
 }
 
+% Variation Selector
+\def\ltj@lst@ProcessVS#1{%
+  \lst@whitespacefalse
+  \if@ltj@lst@vsraw
+    \lst@Append#1\advance\lst@length\m@ne
+  \else
+    \lst@TrackNewLines\lst@OutputLostSpace \lst@PrintToken
+    \setbox\@tempboxa\hbox to 2\lst@width{\hss
+       \expandafter\expandafter\expandafter\ltj@lst@vscmd
+       \expandafter{\the\numexpr`#1-"FDFF\relax}%"
+    \hss}%
+    \lst@CalcLostSpaceAndOutput\lst@whitespacefalse
+  \fi
+}
+
 
 % 半角カナ，異体字セレクタはアクティブ化
 \def\ltj@@listing@jpsetN#1#2#3{% for (not large) range
@@ -144,6 +159,7 @@
 }
 \@temptokena{}
 \ltj@@listing@jpsetN{65377}{65439}{\ltj@lst@ProcessJALetterHalf}
+\ltj@@listing@jpsetN{65024}{65039}{\ltj@lst@ProcessVS}
 \ltj@@listing@jpsetN{917760}{917999}{\ltj@lst@ProcessIVS}
 \xdef\ltj@@listing@jpcmd{\the\@temptokena}\@temptokena{}
 
@@ -154,6 +170,7 @@
   \catcode"FFFFF=13%"
   \SetCatcodeRange{"FF61}{"FF9F}{13}%     半角カナ
   \SetCatcodeRange{"E0100}{"E01EF}{13}%   漢字用異体字セレクタ
+  \SetCatcodeRange{"FE00}{"FE0F}{13}%     Variation Selector
 }
 
 % We redefine \lst@BeginDropInput, since now we have
@@ -260,7 +277,8 @@
         \fi}%
     \lst@lAddTo\lst@PreGotoTabStop{\lst@WFAppend{^^I}}%
     \lst@lAddTo\lst@ProcessSpace{\lst@WFAppend{ }}%
-    \def\ltj@lst@ProcessIVS##1{\lst@whitespacefalse\lst@Append##1}
+    \def\ltj@lst@ProcessIVS##1{\lst@whitespacefalse\lst@Append##1}%
+    \def\ltj@lst@ProcessVS##1{\lst@whitespacefalse\lst@Append##1}%
     \let\lst@DeInit\lst@WFDeInit
     \let\lst@MProcessListing\lst@WFMProcessListing
     \lst@WFifopen\else

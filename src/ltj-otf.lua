@@ -33,7 +33,9 @@ local ltjf_find_char_class = ltjf.find_char_class
 local ltjr_cidfont_data = ltjr.cidfont_data
 local ltjc_is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char
 
-local OTF = luatexja.userid_table.OTF
+luatexja.userid_table.OTF = luatexbase.newuserwhatsitid('char_by_cid',  'luatexja')
+luatexja.userid_table.VSR = luatexbase.newuserwhatsitid('replace_vs',  'luatexja') 
+local OTF, VSR = luatexja.userid_table.OTF, luatexja.userid_table.VSR
 
 local function get_ucs_from_rmlgbm(c)
    local v = ltjr_cidfont_data["Adobe-Japan1"].resources.unicodes["Japan1." .. tostring(c)]
@@ -98,21 +100,26 @@ local function extract(head)
    local v
    while p do
       if p.id==id_whatsit then
-	 if p.subtype==sid_user and p.user_id==OTF then
-	    local g = node_new(id_glyph)
-	    g.subtype = 0; g.char = p.value
-	    v = has_attr(p, attr_curjfnt); g.font = v
-	    set_attr(g, attr_curjfnt, v)
-	    v = has_attr(p, attr_yablshift)
-	    if v then 
-	       set_attr(g, attr_yablshift, v)
-	    else
-	       unset_attr(g, attr_yablshift)
-	    end
-	    head = node_insert_after(head, p, g)
-	    head = node_remove(head, p)
-	    node_free(p); p = g
-	 end
+         if p.subtype==sid_user then
+            local puid = p.user_id
+            if puid==OTF or puid==VSR then
+               local g = node_new(id_glyph)
+               g.subtype = 0; g.char = p.value
+               v = has_attr(p, attr_curjfnt); g.font = v
+               set_attr(g, attr_curjfnt, 
+                        puid==OTF and v or 0)
+               -- VSR yields ALchar
+               v = has_attr(p, attr_yablshift)
+               if v then 
+                  set_attr(g, attr_yablshift, v)
+               else
+                  unset_attr(g, attr_yablshift)
+               end
+               head = node_insert_after(head, p, g)
+               head = node_remove(head, p)
+               node_free(p); p = g
+            end
+         end
       end
       p = node_next(p)
    end
@@ -256,9 +263,9 @@ do
    end
 
 -- 組版時
-   local function ivs_jglyph(char, bp, pf)
+   local function ivs_jglyph(char, bp, pf, uid)
       local p = node_new(id_whatsit,sid_user)
-      p.user_id=OTF; p.type=100; p.value=char
+      p.user_id=uid; p.type=100; p.value=char
       set_attr(p, attr_curjfnt, pf)
       set_attr(p, attr_yablshift, has_attr(bp, attr_ykblshift) or 0)
       return p
@@ -270,23 +277,21 @@ do
 	 local pid = p.id
 	 if pid==id_glyph then
             local pf = p.font
-            if (has_attr(p, attr_curjfnt) or 0) == pf  then
-               -- only works with JAchars
-               local q = node_next(p) -- the next node of p
-               if q and q.id==id_glyph then
-                  local qc = q.char
-                  if (qc>=0xFE00 and qc<=0xFE0F) or (qc>=0xE0100 and qc<0xE01F0) then 
-		     -- q is a variation selector
-		     if qc>=0xE0100 then qc = qc - 0xE0100 end
-                     local pt = font_ivs_table[pf]
-                     pt = pt and pt[p.char];  pt = pt and  pt[qc]
-                     head = node_remove(head,q)
-                     if pt then
-                        local np = ivs_jglyph(pt, p, pf)
-                        head = node_insert_after(head, p, np) 
-                        head = node_remove(head,p)
-                        p = np
-                     end
+            local q = node_next(p) -- the next node of p
+            if q and q.id==id_glyph then
+               local qc = q.char
+               if (qc>=0xFE00 and qc<=0xFE0F) or (qc>=0xE0100 and qc<0xE01F0) then 
+                  -- q is a variation selector
+                  if qc>=0xE0100 then qc = qc - 0xE0100 end
+                  local pt = font_ivs_table[pf]
+                  pt = pt and pt[p.char];  pt = pt and  pt[qc]
+                  head = node_remove(head,q)
+                  if pt then
+                     local np = ivs_jglyph(pt, p, pf,
+                                           (has_attr(p,attr_curjfnt) or 0)==pf and OTF or VSR)
+                     head = node_insert_after(head, p, np) 
+                     head = node_remove(head,p)
+                     p = np
                   end
                end
             end
