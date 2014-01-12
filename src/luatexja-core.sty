@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2013/05/14 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2014/01/13 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -138,7 +138,7 @@
 \newluatexattribute\ltj@yablshift % attribute for \yabaselineshift
 \newluatexattribute\ltj@ykblshift % attribute for \ykbaselineshift
 \newluatexattribute\jfam          % index for current jfam
-\ltj@icflag=0\ltj@origchar=0
+\ltj@icflag=0\ltj@origchar=0\ltj@charclass=0
 
 %%%%%%%% Attributes for character ranges
 \newcount\ltj@tempcnta

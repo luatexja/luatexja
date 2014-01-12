@@ -3,11 +3,11 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2013/12/05',
+  date = '2014/1/12',
   description = 'Insertion process of JFM glues and kanjiskip',
 })
 module('luatexja.jfmglue', package.seeall)
-local err, warn, info, log = luatexbase.errwarinf(_NAME)
+local err, warn, info, log = luatexbase .errwarinf(_NAME)
 
 luatexja.load_module('stack');     local ltjs = luatexja.stack
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
@@ -22,9 +22,6 @@ local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_find_char_class = ltjf.find_char_class
 local node_new = node.new
 local node_copy = node.copy
-
-local ligature_head = 1
-local ligature_tail = 2
 
 local id_glyph = node.id('glyph')
 local id_hlist = node.id('hlist')
@@ -225,7 +222,7 @@ function check_box_high(Nx, box_ptr, box_end)
 	    if first_char.font == (has_attr(first_char, attr_curjfnt) or -1) then 
 	       set_np_xspc_jachar(Nx, first_char)
 	    else
-	       set_np_xspc_alchar(Nx, first_char.char,first_char, ligature_head)
+	       set_np_xspc_alchar(Nx, first_char.char,first_char, 1)
 	    end
 	 else -- math_node
 	    set_np_xspc_alchar(Nx, -1,first_char)
@@ -382,8 +379,8 @@ function calc_np(lp, last)
    -- We clear `predefined' entries of Np before pairs() loop,
    -- because using only pairs() loop is slower.
    Np.post, Np.pre, Np.xspc = nil, nil, nil
-   Np.first, Np.id, Np.last, Np.met = nil, nil, nil
-   Np.auto_kspc, Np.auto_xspc, Np.char, Np.class, Np.nuc = nil, nil, nil, nil, nil
+   Np.first, Np.id, Np.last, Np.met, Np.class= nil, nil, nil, nil
+   Np.auto_kspc, Np.auto_xspc, Np.char, Np.nuc = nil, nil, nil, nil
    for k in pairs(Np) do Np[k] = nil end
 
    for k = 1,#Bp do Bp[k] = nil end
@@ -425,8 +422,8 @@ do
    function set_np_xspc_jachar(Nx, x)
       local m = ltjf_font_metric_table[x.font]
       local cls, c = slow_find_char_class(has_attr(x, attr_orig_char), m, x.char)
-      Nx.class = cls; set_attr(x, attr_jchar_class, cls)
-      Nx.met, Nx.char = m, c
+      Nx.met, Nx.char = m, c; Nx.class = cls; 
+      if cls~=0 then set_attr(x, attr_jchar_class, cls) end
       Nx.pre  = table_current_stack[PRE + c]  or 0
       Nx.post = table_current_stack[POST + c] or 0
       Nx.xspc = table_current_stack[XSP  + c] or 3
@@ -468,7 +465,7 @@ do
    function extract_np()
       local x, i = Np.nuc, Np.id;
       if i ==  id_jglyph then return set_np_xspc_jachar(Np, x)
-      elseif i == id_glyph then return set_np_xspc_alchar(Np, x.char, x, ligature_head)
+      elseif i == id_glyph then return set_np_xspc_alchar(Np, x.char, x, 1)
       elseif i == id_hlist then Np.last_char = check_box_high(Np, x.head, nil)
       elseif i == id_pbox then Np.last_char = check_box_high(Np, Np.first, node_next(Np.last))
       elseif i == id_disc then Np.last_char = check_box_high(Np, x.replace, nil)
@@ -485,7 +482,7 @@ do
 	    if s.font == (has_attr(s, attr_curjfnt) or -1) then 
 	       set_np_xspc_jachar(Nx, s)
 	    else
-	       set_np_xspc_alchar(Nx, s.char, s, ligature_tail)
+	       set_np_xspc_alchar(Nx, s.char, s, 2)
 	    end
 	 else
 	    set_np_xspc_alchar(Nx, -1, s)
@@ -497,7 +494,7 @@ do
    
    function after_alchar(Nx)
       local x = Nx.nuc
-      return set_np_xspc_alchar(Nx, x.char,x, ligature_tail)
+      return set_np_xspc_alchar(Nx, x.char,x, 2)
    end
 
 end

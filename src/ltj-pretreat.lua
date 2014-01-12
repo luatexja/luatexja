@@ -33,30 +33,49 @@ local STCK = luatexja.userid_table.STCK
 -- MAIN PROCESS STEP 1: replace fonts
 ------------------------------------------------------------------------
 local wt
-
-local function suppress_hyphenate_ja(head)
-   local non_math, p = true, head
-   wt = {}
-   while p do
-      local pid = p.id
-      if pid == id_glyph then
-	 if (has_attr(p, attr_icflag) or 0)<=0 and ltjc_is_ucs_in_japanese_char(p) then
-	    local pc = p.char
-	    local pf = ltjf_replace_altfont(has_attr(p, attr_curjfnt) or p.font, pc)
-	    p.font = pf;  set_attr(p, attr_curjfnt, pf)
-	    p.subtype = floor(p.subtype*0.5)*2
-	    set_attr(p, attr_orig_char, pc)
-	 end
-      elseif pid == id_math then 
-	 p = node_next(p) -- skip math on
+do
+   local head
+   local end_math = node.end_of_math or 
+      function(p)
 	 while p and p.id~=id_math do p = node_next(p) end
-      elseif pid == id_whatsit and p.subtype==sid_user and p.user_id==STCK then
+	 return p
+      end
+
+   local suppress_hyphenate_ja_aux = {}
+   suppress_hyphenate_ja_aux[id_glyph] = function(p)
+      if (has_attr(p, attr_icflag) or 0)<=0 and ltjc_is_ucs_in_japanese_char(p) then
+	 local pc = p.char
+	 local pf = ltjf_replace_altfont(has_attr(p, attr_curjfnt) or p.font, pc)
+	 p.font = pf;  set_attr(p, attr_curjfnt, pf)
+	 p.subtype = floor(p.subtype*0.5)*2
+	 set_attr(p, attr_orig_char, pc)
+      end
+      return p
+   end
+   suppress_hyphenate_ja_aux[id_math] = function(p) return end_math(node_next(p)) end
+   suppress_hyphenate_ja_aux[id_whatsit] = function(p)
+      if p.subtype==sid_user and p.user_id==STCK then
 	 wt[#wt+1] = p; head = node_remove(head, p)
       end
-      p = node_next(p)
+      return p
    end
-   lang.hyphenate(head)
-   return head
+
+   local function suppress_hyphenate_ja (h)
+      local p = h
+      wt, head = {}, h
+      while p do
+	 local pfunc = suppress_hyphenate_ja_aux[p.id]
+	 if pfunc then p = pfunc(p) end
+	 p = node_next(p)
+      end
+      lang.hyphenate(head)
+      return head
+   end
+   
+   luatexbase.add_to_callback('hyphenate', 
+			      function (head,tail)
+				 return suppress_hyphenate_ja(head)
+			      end,'ltj.hyphenate')
 end
 
 -- mode: true iff this function is called from hpack_filter
@@ -78,10 +97,6 @@ luatexbase.add_to_callback('pre_linebreak_filter',
   function (head)
      return set_box_stack_level(head, false)
   end,'ltj.pre_linebreak_filter_pre',1)
-luatexbase.add_to_callback('hyphenate', 
- function (head,tail)
-    return suppress_hyphenate_ja(head)
- end,'ltj.hyphenate')
 
 luatexja.pretreat = {
    set_box_stack_level = set_box_stack_level,
