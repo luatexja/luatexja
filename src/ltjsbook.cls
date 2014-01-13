@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsbook}
-  [2013/06/06 ]
+  [2014/01/13 ]
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
@@ -332,7 +332,8 @@
 \AtBeginDocument{%
   \reDeclareMathAlphabet{\mathrm}{\mathrm}{\mathmc}
   \reDeclareMathAlphabet{\mathbf}{\mathbf}{\mathgt}}%
-\ltjsetparameter{jaxspmode={`〒,2}}
+\ltjsetparameter{jaxspmode={`！,2}}
+\ltjsetparameter{jaxspmode={`〒,1}}
 \ltjsetparameter{alxspmode={`+,3}}
 \ltjsetparameter{alxspmode={`\%,3}}
 \def\@{\spacefactor3000\space}
@@ -568,6 +569,7 @@
   \def\@oddhead{%
     \hbox to \fullwidth{\hfil\textbf{\thepage}}\hss}}
 \if@report \let\ps@plain\ps@plainfoot \else \let\ps@plain\ps@plainhead \fi
+\newif\if@omit@number
 \def\ps@headings{%
   \let\@oddfoot\@empty
   \let\@evenfoot\@empty
@@ -582,7 +584,9 @@
   \def\chaptermark##1{\markboth{%
     \ifnum \c@secnumdepth >\m@ne
       \if@mainmatter
-        \@chapapp\thechapter\@chappos\hskip1\zw
+        \if@omit@number\else
+          \@chapapp\thechapter\@chappos\hskip1\zw
+        \fi
       \fi
     \fi
     ##1}{}}%
@@ -901,7 +905,9 @@
   \plainifnotempty % 元: \thispagestyle{plain}
   \global\@topnum\z@
   \if@english \@afterindentfalse \else \@afterindenttrue \fi
-  \secdef\@chapter\@schapter}
+  \secdef
+    {\@omit@numberfalse\@chapter}%
+    {\@omit@numbertrue\@schapter}}
 \def\@chapter[#1]#2{%
   \ifnum \c@secnumdepth >\m@ne
     \if@mainmatter
@@ -909,7 +915,8 @@
       \typeout{\@chapapp\thechapter\@chappos}%
       \addcontentsline{toc}{chapter}%
         {\protect\numberline
-        {\if@english\thechapter\else\@chapapp\thechapter\@chappos\fi}%
+        % {\if@english\thechapter\else\@chapapp\thechapter\@chappos\fi}%
+        {\@chapapp\thechapter\@chappos}%
         #1}%
     \else\addcontentsline{toc}{chapter}{#1}\fi
   \else
@@ -1184,7 +1191,12 @@
 \newcommand\@tocrmarg{2.55em}
 \newcommand\@dotsep{4.5}
 \setcounter{tocdepth}{1}
+\newdimen\js@tocl@width
 \newcommand{\tableofcontents}{%
+  \settowidth\js@tocl@width{\headfont\prechaptername\postchaptername}%
+  \settowidth\@tempdima{\headfont\appendixname}%
+  \ifdim\js@tocl@width<\@tempdima \setlength\js@tocl@width{\@tempdima}\fi
+  \ifdim\js@tocl@width<2\zw \divide\js@tocl@width by 2 \advance\js@tocl@width 1\zw\fi
   \if@twocolumn
     \@restonecoltrue\onecolumn
   \else
@@ -1221,17 +1233,29 @@
       \rightskip\@tocrmarg
       \parfillskip-\rightskip
       \leavevmode\headfont
-      \if@english\setlength\@lnumwidth{5.5em}\else\setlength\@lnumwidth{4.683\zw}\fi
+      % \if@english\setlength\@lnumwidth{5.5em}\else\setlength\@lnumwidth{4.683\zw}\fi
+      \setlength\@lnumwidth{\js@tocl@width}\advance\@lnumwidth 2.683\zw
       \advance\leftskip\@lnumwidth \hskip-\leftskip
       #1\nobreak\hfil\nobreak\hbox to\@pnumwidth{\hss#2}\par
       \penalty\@highpenalty
     \endgroup
   \fi}
-\newcommand*{\l@section}{\@dottedtocline{1}{1\zw}{3.683\zw}}
-\newcommand*{\l@subsection}   {\@dottedtocline{2}{3.8em}{3.2em}}
-\newcommand*{\l@subsubsection}{\@dottedtocline{3}{7.0em}{4.1em}}
-\newcommand*{\l@paragraph}    {\@dottedtocline{4}{10em}{5em}}
-\newcommand*{\l@subparagraph} {\@dottedtocline{5}{12em}{6em}}
+ % \newcommand*{\l@section}{\@dottedtocline{1}{1\zw}{3.683\zw}}
+\newcommand*{\l@section}{%
+          \@tempdima\js@tocl@width \advance\@tempdima -1\zw
+          \@dottedtocline{1}{\@tempdima}{3.683\zw}}
+\newcommand*{\l@subsection}{%
+          \@tempdima\js@tocl@width \advance\@tempdima 2.683\zw
+          \@dottedtocline{2}{\@tempdima}{3.5\zw}}
+\newcommand*{\l@subsubsection}{%
+          \@tempdima\js@tocl@width \advance\@tempdima 6.183\zw
+          \@dottedtocline{3}{\@tempdima}{4.5\zw}}
+\newcommand*{\l@paragraph}{%
+          \@tempdima\js@tocl@width \advance\@tempdima 10.683\zw
+          \@dottedtocline{4}{\@tempdima}{5.5\zw}}
+\newcommand*{\l@subparagraph}{%
+          \@tempdima\js@tocl@width \advance\@tempdima 16.183\zw
+          \@dottedtocline{5}{\@tempdima}{6.5\zw}}
 \newdimen\@lnumwidth
 \def\numberline#1{\hb@xt@\@lnumwidth{#1\hfil}\hspace{0pt}}
 \def\@dottedtocline#1#2#3#4#5{\ifnum #1>\c@tocdepth \else
@@ -1336,6 +1360,9 @@
 \def\footnote{\inhibitglue\footnotes@ve}
 \let\footnotemarks@ve=\footnotemark
 \def\footnotemark{\inhibitglue\footnotemarks@ve}
+\renewcommand\@makefnmark{\hbox{}\hbox{%
+  \ifydir \@textsuperscript{\normalfont\@thefnmark}%
+  \else\hbox{\yoko\@textsuperscript{\normalfont\@thefnmark}}\fi}\hbox{}}
 \def\thefootnote{\ifnum\c@footnote>\z@\leavevmode\lower.5ex\hbox{*}\@arabic\c@footnote\fi}
 \renewcommand{\footnoterule}{%
   \kern-3\p@
@@ -1579,8 +1606,8 @@
 \newcommand{\bibname}{\if@english Bibliography\else 参考文献\fi}
 \newcommand{\indexname}{\if@english Index\else 索引\fi}
 \newcommand{\figurename}{\if@english Fig.~\else 図\fi}
-\newcommand{\tablename}{\if@english Table.~\else 表\fi}
-\newcommand{\appendixname}{\if@english Appendix~\else 付録\fi}
+\newcommand{\tablename}{\if@english Table~\else 表\fi}
+\newcommand{\appendixname}{\if@english \else 付録\fi}
 \newif\if西暦 \西暦true
 \def\西暦{\西暦true}
 \def\和暦{\西暦false}

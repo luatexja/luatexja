@@ -76,7 +76,7 @@
 %   (ありがとうございます、鈴木た＠MILNさん)}
 % \changes{v1.6}{2006/06/27}{フォントコマンドを修正。ありがとう、ymtさん。}
 % \changes{v1.6-ltj}{2011/09/27}{jclasses.dtx v1.6 をベースにLua\LaTeX-ja用に修正。}
-% \changes{v1.6-ltj-2}{2011/09/27}{jclasses.dtx luatexja.cfgに対応．}
+% \changes{v1.6-ltj-2}{2013/06/06}{jclasses.dtx luatexja.cfgに対応．}
 % \fi
 %
 % \iffalse
@@ -113,6 +113,9 @@
 ]
 \documentclass{ltjltxdoc}
 \GetFileInfo{ltjclasses.dtx}
+\usepackage[kozuka-pr6n]{luatexja-preset}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
 \usepackage[unicode]{hyperref}
 \title{Lua\LaTeX-ja用\texttt{jclasses}互換クラス}
 \author{Lua\TeX-jaプロジェクト}

@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsarticle}
-  [2013/06/06 ]
+  [2014/01/13 ]
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
@@ -325,7 +325,8 @@
 \AtBeginDocument{%
   \reDeclareMathAlphabet{\mathrm}{\mathrm}{\mathmc}
   \reDeclareMathAlphabet{\mathbf}{\mathbf}{\mathgt}}%
-\ltjsetparameter{jaxspmode={`〒,2}}
+\ltjsetparameter{jaxspmode={`！,2}}
+\ltjsetparameter{jaxspmode={`〒,1}}
 \ltjsetparameter{alxspmode={`+,3}}
 \ltjsetparameter{alxspmode={`\%,3}}
 \def\@{\spacefactor3000\space}
@@ -1127,7 +1128,12 @@
 \newcommand\@tocrmarg{2.55em}
 \newcommand\@dotsep{4.5}
 \setcounter{tocdepth}{2}
+\newdimen\js@tocl@width
 \newcommand{\tableofcontents}{%
+  \settowidth\js@tocl@width{\headfont\presectionname\postsectionname}%
+  \settowidth\@tempdima{\headfont\appendixname}%
+  \ifdim\js@tocl@width<\@tempdima\relax\setlength\js@tocl@width{\@tempdima}\fi
+  \ifdim\js@tocl@width<2\zw \divide\js@tocl@width by 2 \advance\js@tocl@width 1\zw\fi
   \section*{\contentsname}%
   \@mkboth{\contentsname}{\contentsname}%
   \@starttoc{toc}%
@@ -1156,15 +1162,24 @@
       \rightskip\@tocrmarg
       \parfillskip-\rightskip
       \leavevmode\headfont
-      \setlength\@lnumwidth{4\zw}% 元1.5em [2003-03-02]
+      %\setlength\@lnumwidth{4\zw}% 元1.5em [2003-03-02]
+      \setlength\@lnumwidth{\js@tocl@width}\advance\@lnumwidth 2\zw
       \advance\leftskip\@lnumwidth \hskip-\leftskip
       #1\nobreak\hfil\nobreak\hbox to\@pnumwidth{\hss#2}\par
     \endgroup
   \fi}
-\newcommand*{\l@subsection}   {\@dottedtocline{2}{1\zw}{3\zw}}
-\newcommand*{\l@subsubsection}{\@dottedtocline{3}{2\zw}{3\zw}}
-\newcommand*{\l@paragraph}    {\@dottedtocline{4}{3\zw}{3\zw}}
-\newcommand*{\l@subparagraph} {\@dottedtocline{5}{4\zw}{3\zw}}
+\newcommand*{\l@subsection}{%
+          \@tempdima\js@tocl@width \advance\@tempdima -1\zw
+          \@dottedtocline{2}{\@tempdima}{3\zw}}
+\newcommand*{\l@subsubsection}{%
+          \@tempdima\js@tocl@width \advance\@tempdima 0\zw
+          \@dottedtocline{3}{\@tempdima}{4\zw}}
+\newcommand*{\l@paragraph}{%
+          \@tempdima\js@tocl@width \advance\@tempdima 1\zw
+          \@dottedtocline{4}{\@tempdima}{5\zw}}
+\newcommand*{\l@subparagraph}{%
+          \@tempdima\js@tocl@width \advance\@tempdima 2\zw
+          \@dottedtocline{5}{\@tempdima}{6\zw}}
 \newdimen\@lnumwidth
 \def\numberline#1{\hb@xt@\@lnumwidth{#1\hfil}\hspace{0pt}}
 \def\@dottedtocline#1#2#3#4#5{\ifnum #1>\c@tocdepth \else
@@ -1262,6 +1277,9 @@
 \def\footnote{\inhibitglue\footnotes@ve}
 \let\footnotemarks@ve=\footnotemark
 \def\footnotemark{\inhibitglue\footnotemarks@ve}
+\renewcommand\@makefnmark{\hbox{}\hbox{%
+  \ifydir \@textsuperscript{\normalfont\@thefnmark}%
+  \else\hbox{\yoko\@textsuperscript{\normalfont\@thefnmark}}\fi}\hbox{}}
 \def\thefootnote{\ifnum\c@footnote>\z@\leavevmode\lower.5ex\hbox{*}\@arabic\c@footnote\fi}
 \renewcommand{\footnoterule}{%
   \kern-3\p@
@@ -1502,8 +1520,8 @@
 \newcommand{\bibname}{\if@english Bibliography\else 参考文献\fi}
 \newcommand{\indexname}{\if@english Index\else 索引\fi}
 \newcommand{\figurename}{\if@english Fig.~\else 図\fi}
-\newcommand{\tablename}{\if@english Table.~\else 表\fi}
-\newcommand{\appendixname}{\if@english Appendix~\else 付録\fi}
+\newcommand{\tablename}{\if@english Table~\else 表\fi}
+\newcommand{\appendixname}{\if@english \else 付録\fi}
 \newcommand{\abstractname}{\if@english Abstract\else 概要\fi}
 \newif\if西暦 \西暦true
 \def\西暦{\西暦true}
