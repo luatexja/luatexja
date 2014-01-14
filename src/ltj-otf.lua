@@ -24,7 +24,6 @@ local node_insert_after = node.insert_after
 local identifiers = fonts.hashes.identifiers
 
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
-local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 

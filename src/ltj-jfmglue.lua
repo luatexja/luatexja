@@ -549,20 +549,13 @@ end
 -- 和文文字間の JFM glue を node 化
 local function new_jfm_glue(m, bc, ac)
 -- bc, ac: char classes
-   local z = m.char_type[bc]
-   local g, d = z.glue[ac], 0 
+   local g, d = m.char_type[bc][ac], 0
+   local n
    if g then
-      g,d = node_copy(g[1]), g[2]; 
-      g.spec = node_copy(g.spec); -- node_copy は spec をコピーする
-   else
-      local k = z.kern[ac]
-      if k then
-         g = node_new(id_kern); --copy_attr(g, Nn.nuc)
-         g.subtype = 1; g.kern, d = k[1], k[2]
-         set_attr(g, attr_icflag, FROM_JFM);
-      end
+      n,d = node_copy(g[2]), g[3]; 
+      if g[1] then n.spec = node_copy(n.spec) end
    end
-   return g, d
+   return n, d
 end
 
 -- Nq.last (kern w) .... (glue/kern g) Np.first
@@ -749,7 +742,7 @@ local function handle_np_jachar(mode)
       local g = get_OA_skip() or get_kanjiskip() -- O_A->K
       handle_penalty_normal(0, Np.pre, g); real_insert(g)
    elseif Nq.pre then 
-     local g = get_OA_skip() or get_xkanjiskip(Np) -- O_A->X
+      local g = get_OA_skip() or get_xkanjiskip(Np) -- O_A->X
       handle_penalty_normal((qid==id_hlist and 0 or Nq.post), Np.pre, g); real_insert(g)
    else
       local g = get_OA_skip() -- O_A

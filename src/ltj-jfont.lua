@@ -55,9 +55,7 @@ function define_jfm(t)
 	 else
 	    real_char = false
 	    for j,w in pairs(v.chars) do
-	       if w == 'lineend' then
-		  if #v.chars ~= 1 then defjfm_res= nil; return end
-	       elseif type(w) == 'number' then
+	       if type(w) == 'number' then
 		  real_char = true;
 	       elseif type(w) == 'string' and utf.len(w)==1 then
 		  real_char = true; w = utf.byte(w)
@@ -101,8 +99,7 @@ function define_jfm(t)
 	    end
 	    v.chars = nil
 	 end
-	 if not v.kern then v.kern = {} end
-	 if not v.glue then v.glue = {} end
+	 v.kern = v.kern or {}; v.glue = v.glue or {}
 	 for j in pairs(v.glue) do
 	    if v.kern[j] then defjfm_res= nil; return end
 	 end
@@ -149,14 +146,17 @@ do
 	 if type(i) == 'number' then -- char_type
 	    for k,w in pairs(v.glue) do
 	       local g, h = node.new(id_glue), node_new(id_glue_spec)
-	       v.glue[k] = {g, (w[5] and w[5]/sz or 0)}
+	       v[k] = {true, g, (w[5] and w[5]/sz or 0)}
 	       h.width, h.stretch, h.shrink = w[1], w[2], w[3]
 	       h.stretch_order, h.shrink_order = 0, 0
-	       g.subtype = 0; g.spec = h; set_attr(g, attr_icflag, FROM_JFM + 
-						      (w[4] and w[4]/sz or 0)); 
+	       g.subtype = 0; g.spec = h; 
+	       set_attr(g, attr_icflag, FROM_JFM + (w[4] and w[4]/sz or 0)); 
 	    end
 	    for k,w in pairs(v.kern) do
-	       w[2] = w[2]/sz
+	       local g = node.new(id_kern)
+	       g.kern, g.subtype = w[1], 1 
+	       set_attr(g, attr_icflag, FROM_JFM)
+	       v[k] = {false, g, w[2]/sz}
 	    end
 	 end
       end

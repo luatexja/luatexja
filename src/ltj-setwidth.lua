@@ -69,8 +69,6 @@ function capsule_glyph(p, dir, mode, met, class)
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = luatexbase.call_callback("luatexja.set_width", fshift, met, class)
    local fheight, fdepth = char_data.height, char_data.depth
-   fheight = (fheight ~= 'prop') and fheight or p.height
-   fdepth  = (fdepth  ~= 'prop') and fdepth  or p.depth 
    if (mode or pwidth ~= fwidth or p.height ~= fheight or p.depth ~= fdepth) then
       local y_shift, ca
          = - p.yoffset + (has_attr(p,attr_ykblshift) or 0), char_data.align
