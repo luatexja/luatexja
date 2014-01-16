@@ -460,7 +460,13 @@ require('lualibs-os')   -- os.type
 local load_cache, save_cache_luc, save_cache
 
 do
-   local path = kpse.expand_var("$TEXMFVAR;$TEXMFSYSVAR;$TEXMFCACHE")
+   local kpse_var_value = kpse.var_value
+   local path, pathtmp = kpse_var_value("TEXMFVAR")
+   pathtmp = kpse_var_value("TEXMFSYSVAR")
+   if pathtmp then path = (path and path .. ';' or '') .. pathtmp end
+   pathtmp = kpse_var_value("TEXMFCACHE")
+   if pathtmp then path = (path and path .. ';' or '') .. pathtmp end
+
    if os.type~='windows' then path = string.gsub(path, ':', ';') end
    path = string.split(path, ';')
 
