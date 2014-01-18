@@ -132,39 +132,48 @@ end
 ------------------------------------------------------------------------
 
 -- EXT: print parameters that don't need arguments
-function luatexja.ext_get_parameter_unary(k)
-   local t = tex.getcount('ltj@@stack')
-   if k == 'yalbaselineshift' then
-      tex.write(print_scaled(tex.getattribute('ltj@yablshift'))..'pt')
-   elseif k == 'yjabaselineshift' then
-      tex.write(print_scaled(tex.getattribute('ltj@ykblshift'))..'pt')
-   elseif k == 'kanjiskip' then
-      tex.write(print_spec(ltjs.get_skip_table('kanjiskip', t)))
-   elseif k == 'xkanjiskip' then
-      tex.write(print_spec(ltjs.get_skip_table('xkanjiskip', t)))
-   elseif k == 'jcharwidowpenalty' then
-      tex.write(ltjs.get_penalty_table(stack_table_index.JWP, 0, t))
-   elseif k == 'autospacing' then
-      tex.write(tex.getattribute('ltj@autospc'))
-   elseif k == 'autoxspacing' then
-      tex.write(tex.getattribute('ltj@autoxspc'))
-   elseif k == 'differentjfm' then
-      if luatexja.jfmglue.diffmet_rule == math.max then
-	 tex.write('large')
-      elseif luatexja.jfmglue.diffmet_rule == math.min then
-	 tex.write('small')
-      elseif luatexja.jfmglue.diffmet_rule == math.two_average then
-	 tex.write('average')
-      elseif luatexja.jfmglue.diffmet_rule == math.two_paverage then
-	 tex.write('paverage')
-      elseif luatexja.jfmglue.diffmet_rule == math.two_pleft then
-	 tex.write('pleft')
-      elseif luatexja.jfmglue.diffmet_rule == math.two_pright then
-	 tex.write('pright')
-      elseif luatexja.jfmglue.diffmet_rule == math.two_add then
-	 tex.write('both')
-      else -- This can't happen.
-	 tex.write('???')
+do
+   luatexja.unary_pars = {
+      yalbaselineshift = function(t) 
+	 return print_scaled(tex.getattribute('ltj@yablshift'))..'pt'
+      end,
+      yjabaselineshift = function(t) 
+	 return print_scaled(tex.getattribute('ltj@ykblshift'))..'pt'
+      end,
+      kanjiskip = function(t) 
+	 return print_spec(ltjs.get_skip_table('kanjiskip', t))
+      end,
+      xkanjiskip = function(t) 
+	 return print_spec(ltjs.get_skip_table('xkanjiskip', t))
+      end,
+      jcharwidowpenalty = function(t)
+	 return ltjs.get_penalty_table(stack_table_index.JWP, 0, t)
+      end,
+      autospacing = function(t)
+	 return tex.getattribute('ltj@autospc')
+      end,
+      autoxspacing = function(t)
+	 return tex.getattribute('ltj@autoxspc')
+      end,
+      differentjfm = function(t)
+	 local f, r = luatexja.jfmglue.diffmet_rule, '???'
+	 if f == math.max then r = 'large'
+	 elseif f == math.min then r = 'small'
+	 elseif f == math.two_average then r = 'average'
+	 elseif f == math.two_paverage then r = 'paverage'
+	 elseif f == math.two_pleft then r = 'pleft'
+	 elseif f == math.two_pright then r = 'pright'
+	 elseif f == math.two_add then r = 'both'
+	 end
+	 return r
+      end
+   }
+
+   local unary_pars = luatexja.unary_pars
+   function luatexja.ext_get_parameter_unary(k)
+      local t = tex.getcount('ltj@@stack')
+      if unary_pars[k] then
+	 tex.write(tostring(unary_pars[k](tex.getcount('ltj@@stack'))))
       end
    end
 end
@@ -180,16 +189,17 @@ function luatexja.ext_get_parameter_binary(k,c)
       c=0
    end
    if k == 'jacharrange' then
-      if c>=31*ltjc.ATTR_RANGE then 
+      if c<=0 or c>31*ltjc.ATTR_RANGE then 
 	 ltjb.package_error('luatexja',
 			    'invalid character range number (' .. c .. ')',
-			    'A character range number should be in the range 0..'
-                               .. 31*ltjc.ATTR_RANGE-1 .. ",\n"..
-			     'So I changed this one to zero.')
-	 c=0
+			    'A character range number should be in the range 1..'
+                               .. 31*ltjc.ATTR_RANGE .. ",\n"..
+			     'So I changed this one to ' .. 31*ltjc.ATTR_RANGE .. ".")
+	 c=0 -- external range 217 == internal range 0
+      elseif c==31*ltjc.ATTR_RANGE then c=0
       end
       -- 負の値は <U+0080 の文字の文字範囲，として出てくる．この時はいつも欧文文字なので 1 を返す
-      tex.write( (c<0) and -1 or ltjc.get_range_setting(c))
+      tex.write( (c<0) and 1 or ltjc.get_range_setting(c))
    else
       if c<0 or c>0x10FFFF then
 	 ltjb.package_error('luatexja',

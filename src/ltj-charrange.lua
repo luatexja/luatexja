@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.charrange',
-  date = '2012/10/21',
+  date = '2014/01/19',
   description = 'Handling the range of Japanese characters',
 })
 module('luatexja.charrange', package.seeall)
@@ -24,8 +24,8 @@ end
 pow_table[31*ATTR_RANGE] = pow(2, 31)
 
 -- jcr_table_main[chr_code] = index
--- index : internal 0, 1, 2, ..., 216               0: 'other'
---         external    1  2       216, (out of range): 'other'
+-- index : internal 0,   1, 2, ..., 216               0: 'other'
+--         external 217, 1  2       216, 217 and (out of range): 'other'
 
 -- initialize
 jcr_table_main = {}
@@ -37,11 +37,11 @@ for i=0x100,ucs_out-1 do jcr_table_main[i]=0 end
 
 -- EXT: add characters to a range
 function add_char_range(b,e,ind) -- ind: external range number
-   if not ind or ind<0 or ind>=31*ATTR_RANGE then -- 0 は error にしない（隠し）
+   if not ind or ind<0 or ind>31*ATTR_RANGE then -- 0 はエラーにしない（隠し）
       ltjb.package_error('luatexja',
 			 "invalid character range number (" .. ind .. ")",
 			 "A character range number should be in the range 1.."
-                          .. 31*ATTR_RANGE-1 .. ",\n" ..
+                          .. 31*ATTR_RANGE .. ",\n" ..
 			  "ignored.")
       return
    elseif b<0x80 or e>=ucs_out then
@@ -51,20 +51,24 @@ function add_char_range(b,e,ind) -- ind: external range number
    elseif b>e then
       local j=b; e=b; b=j
    end
+   if ind == 31*ATTR_RANGE then ind=0 end
    for i=math.max(0x80,b),math.min(ucs_out-1,e) do
       jcr_table_main[i]=ind
    end
 end
 
-function char_to_range(c) -- return the (external) range number
+function char_to_range(c) -- return the external range number
    if not c or c<0 or c>0x10FFFF then
 	 ltjb.package_error('luatexja',
 			    'bad character code (' .. tostring(c) .. ')',
 			    'A character number must be between 0 and 0x10ffff.\n' ..
 			     'So I changed this one to zero.')
-	 c=0
+	 return -1
    elseif c<0x80 then return -1
-   else return  jcr_table_main[c] or 0 end
+   else 
+      local r = jcr_table_main[c] or 217
+      return (r and r~=0) and r or 217 
+   end
 end
 
 function get_range_setting(i) -- i: internal range number

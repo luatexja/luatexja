@@ -244,3 +244,7 @@ function disable_cb()
       is_reg = false
    end
 end
+
+luatexja.unary_pars.adjust = function(t)
+   return is_reg and 1 or 0
+end
