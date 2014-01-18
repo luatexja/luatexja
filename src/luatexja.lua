@@ -171,7 +171,6 @@ do
 
    local unary_pars = luatexja.unary_pars
    function luatexja.ext_get_parameter_unary(k)
-      local t = tex.getcount('ltj@@stack')
       if unary_pars[k] then
 	 tex.write(tostring(unary_pars[k](tex.getcount('ltj@@stack'))))
       end
@@ -180,45 +179,48 @@ end
 
 
 -- EXT: print parameters that need arguments
-function luatexja.ext_get_parameter_binary(k,c)
-   local t = tex.getcount('ltj@@stack')
-   if type(c)~='number' then
-      ltjb.package_error('luatexja',
-			 'invalid the second argument (' .. tostring(c) .. ')',
-			 'I changed this one to zero.')
-      c=0
-   end
-   if k == 'jacharrange' then
-      if c<=0 or c>31*ltjc.ATTR_RANGE then 
-	 ltjb.package_error('luatexja',
-			    'invalid character range number (' .. c .. ')',
-			    'A character range number should be in the range 1..'
-                               .. 31*ltjc.ATTR_RANGE .. ",\n"..
-			     'So I changed this one to ' .. 31*ltjc.ATTR_RANGE .. ".")
-	 c=0 -- external range 217 == internal range 0
-      elseif c==31*ltjc.ATTR_RANGE then c=0
-      end
+do
+   luatexja.binary_pars = {
+      jacharrange = function(c, t)
+	 if type(c)~='number' or c<0 or c>31*ltjc.ATTR_RANGE then
+	    -- 0 はエラーにしない（隠し）
+	    ltjb.package_error('luatexja',
+			       'invalid character range number (' .. tostring(c) .. ')',
+			       'A character range number should be in the range 1..'
+				  .. 31*ltjc.ATTR_RANGE .. ",\n"..
+				  'So I changed this one to ' .. 31*ltjc.ATTR_RANGE .. ".")
+	    c=0 -- external range 217 == internal range 0
+	 elseif c==31*ltjc.ATTR_RANGE then c=0
+	 end
       -- 負の値は <U+0080 の文字の文字範囲，として出てくる．この時はいつも欧文文字なので 1 を返す
-      tex.write( (c<0) and 1 or ltjc.get_range_setting(c))
-   else
-      if c<0 or c>0x10FFFF then
-	 ltjb.package_error('luatexja',
-			    'bad character code (' .. c .. ')',
-			    'A character number must be between -1 and 0x10ffff.\n'..
-			       "(-1 is used for denoting `math boundary')\n"..
-			       'So I changed this one to zero.')
-	 c=0
-      end
-      if k == 'prebreakpenalty' then
-	 tex.write(ltjs.get_penalty_table(stack_table_index.PRE + c, 0, t))
-      elseif k == 'postbreakpenalty' then
-	 tex.write(ltjs.get_penalty_table(stack_table_index.POST+ c, 0, t))
-      elseif k == 'kcatcode' then
-	 tex.write(ltjs.get_penalty_table(stack_table_index.KCAT+ c, 0, t))
-      elseif k == 'chartorange' then 
-	 tex.write(ltjc.char_to_range(c))
-      elseif k == 'jaxspmode' or k == 'alxspmode' then
-	 tex.write(ltjs.get_penalty_table(stack_table_index.XSP + c, 3, t))
+	 return (c<0) and 1 or ltjc.get_range_setting(c)
+      end,
+      prebreakpenalty = function(c, t)
+	 return ltjs.get_penalty_table(stack_table_index.PRE 
+					  + ltjb.in_unicode(c, true), 0, t)
+      end,
+      postbreakpenalty = function(c, t)
+	 return ltjs.get_penalty_table(stack_table_index.POST 
+					  + ltjb.in_unicode(c, true), 0, t)
+      end,
+      kcatcode = function(c, t)
+	 return ltjs.get_penalty_table(stack_table_index.KCAT 
+					  + ltjb.in_unicode(c, false), 0, t)
+      end,
+      chartorange = function(c, t)
+	 return ltjc.char_to_range(ltjb.in_unicode(c, false))
+      end,
+      jaxspmode = function(c, t)
+	 return ltjs.get_penalty_table(stack_table_index.XSP
+					  + ltjb.in_unicode(c, true), 3, t)
+      end,
+   }
+   local binary_pars = luatexja.binary_pars 
+
+   binary_pars.alxspmode = binary_pars.jaxspmode
+   function luatexja.ext_get_parameter_binary(k,c)
+      if binary_pars[k] then
+	 tex.write(tostring(binary_pars[k](c,tex.getcount('ltj@@stack'))))
       end
    end
 end

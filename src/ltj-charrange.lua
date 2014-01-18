@@ -58,13 +58,8 @@ function add_char_range(b,e,ind) -- ind: external range number
 end
 
 function char_to_range(c) -- return the external range number
-   if not c or c<0 or c>0x10FFFF then
-	 ltjb.package_error('luatexja',
-			    'bad character code (' .. tostring(c) .. ')',
-			    'A character number must be between 0 and 0x10ffff.\n' ..
-			     'So I changed this one to zero.')
-	 return -1
-   elseif c<0x80 then return -1
+   c=ltjb.in_unicode(c, false)
+   if c<0x80 then return -1
    else 
       local r = jcr_table_main[c] or 217
       return (r and r~=0) and r or 217 

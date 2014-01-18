@@ -61,13 +61,18 @@
   $Aあ\kern2pt\vrule width 0.4pt height 10pt depth 10pt
     \kern-2pt\vrule width 4pt height 0.4pt depth 0pt
     \hbox{\vrule width 20pt height 0.4pt depth 0pt\kern-20pt Bい}$
-  \vrule width 20pt height 0.4pt depth 0pt\par
+  \vrule width 20pt height 0.4pt depth 0pt
 }
 \baselineskip=40pt
 
-\R{ 0pt}{ 0pt}\D
-\R{ 0pt}{10pt}\D
-\R{10pt}{ 0pt}\D
-\R{10pt}{ 5pt}\D
+\R{ 0pt}{ 0pt}\D\par
+\R{ 0pt}{10pt}\D\par
+\R{10pt}{ 0pt}\D\par
+\R{ 0pt}{10pt}\D\hfil\break
+\setbox0=\hbox{\D}\vrule width 20pt height 0.4pt depth 0pt
+\ltjsetparameter{yalbaselineshift=-10pt}
+abc\unhcopy0\vrule width 20pt height 0.4pt depth 0pt\par
+
+
 
 \end

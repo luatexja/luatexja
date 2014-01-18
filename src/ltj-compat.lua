@@ -4,6 +4,7 @@
 
 luatexja.load_module('base');   local ltjb = luatexja.base
 luatexja.load_module('stack');  local ltjs = luatexja.stack
+local stack_table_index = luatexja.stack_table_index
 
 -- load jisx0208 table
 local cache_ver = 2
@@ -114,6 +115,18 @@ local function from_sjis(i)
      from_kuten(c2*256+c1)
   end
 end
+
+luatexja.binary_pars.kansujichar = function(c, t)
+   if type(c)~='number' or c<0 or c>9 then
+      ltjb.package_error('luatexja',
+			 'Invalid KANSUJI number (' .. tostring(c) .. ')',
+			 'A KANSUJI number should be in the range 0..9.\n'..
+			    'So I changed this one to zero.')
+      c=0
+   end
+   return ltjs.get_penalty_table(stack_table_index.KSJ + c, 0, t)
+end
+
 
 local t = {
    from_euc   = from_euc,

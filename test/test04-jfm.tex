@@ -49,16 +49,20 @@
 \ltjgetparameter{jacharrange}{2}
 
 \head{文字コード→文字範囲}
+\ltjgetparameter{chartorange}{`A} % must be 6
 \ltjgetparameter{chartorange}{`い} % must be 6
 \ltjgetparameter{chartorange}{`§} % must be 8
 \ltjgetparameter{chartorange}{"F7} % must be 9
 \ltjgetparameter{chartorange}{-1}  % must be error "
+\ltjgetparameter{chartorange}{"CFFFF}  % must be 217"
 
 \medskip
 \ltjsetparameter{jacharrange={-217}}
-ほとんど欧文扱い．2番は別（「あ」）
+あ\char"CFFFFあ
+\ltjgetparameter{jacharrange}{\ltjgetparameter{chartorange}{"CFFFF}}←CFFFF欧文扱い
 \ltjsetparameter{jacharrange={218}}
-和文扱いにもどる
+あ\char"CFFFFあ
+\ltjgetparameter{jacharrange}{\ltjgetparameter{chartorange}{"CFFFF}}←CFFFF和文扱い
 
 \head{Ticket \#25121}
 \setbox0=\hbox{\ltjsetparameter{kanjiskip=-5pt}

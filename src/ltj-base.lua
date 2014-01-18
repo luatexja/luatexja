@@ -8,9 +8,13 @@ local node, table, tex, token = node, table, tex, token
 local cat_lp = luatexbase.catcodetables['latex-package']
 
 -------------------- 
+luatexja.base = {}
 
 local public_name = 'luatexja'
 local public_version = 'alpha'
+luatexja.base.public_name = public_name
+luatexja.base.public_version = public_version
+
 
 -------------------- Fully-expandable error messaging
 local _error_set_break, _error_set_message, _error_show
@@ -146,10 +150,9 @@ local function mprint(...)
    end
    return tex.print(unpack(lines))
 end
+luatexja.base.mprint = mprint
 
 -------------------- Handling of TeX values
-local to_dimen, to_skip, dump_skip 
-
 do
 
   local glue_spec_id = node.id("glue_spec")
@@ -167,7 +170,7 @@ do
   end
 
 --! ixbase.to_dimen() と同じ
-  to_dimen = function (val)
+  local function to_dimen(val)
     if val == nil then
       return 0
     elseif type(val) == "number" then
@@ -189,7 +192,7 @@ do
   end
 
 --! ixbase.to_skip() と同じ
-  to_skip = function (val)
+  local function to_skip(val)
     if type(val) == "userdata" then
       return val
     end
@@ -217,16 +220,19 @@ do
     return res
   end
 
-  dump_skip = function (s)
+  local function dump_skip(s)
     print(("%s+%s<%s>-%s<%s>"):format(
       s.width or 0, s.stretch or 0, s.stretch_order or 0,
       s.shrink or 0, s.shrink_order or 0))
   end
 
+  luatexja.base.to_dimen = to_dimen
+  luatexja.base.dump_skip = dump_skip
+  luatexja.base.to_skip = to_skip
 end
--------------------- Virtual table for LaTeX counters
-local counter
 
+-------------------- Virtual table for LaTeX counters
+-- not used in current LuaTeX-ja
 do
 --! ixbase.counter と同じ
   counter = {}
@@ -239,13 +245,12 @@ do
   function mt_counter.__newindex(tbl, key, val)
     tex.count['c@'..key] = val
   end
+  luatexja.base.counter = counter
 
 --! ixbase.length は tex.skip と全く同じなので不要.
 end
 
 -------------------- Number handling in TeX source
-local scan_brace, scan_number 
-
 do
 
   local tok_escape = token.create("ltj@@q@escape")
@@ -338,7 +343,7 @@ do
     ltb.add_to_callback("token_filter", proc, "ltj@grab@num", 1)
   end
 
-  scan_brace = function ()
+  local function scan_brace()
     scan_with(1, function()
       local next = token.get_next()
       if next[1] == 1 then
@@ -351,7 +356,7 @@ do
     end)
   end
 
-  scan_number = function ()
+  local function scan_number()
     scan_with(1, function()
       local next = get_expd_next()
       local res, ok = { tok_num }, false
@@ -386,9 +391,12 @@ do
     end)
   end
 
+  luatexja.base.scan_brace = scan_brace
+  luatexja.base.scan_number = scan_number
 end
+
 -------------------- TeX register allocation
-local const_number, count_number, attribute_number, dimen_number, skip_number
+-- not used in current LuaTeX-ja
 
 do
   local cmod_base_count = token.create('ltj@@count@zero')[2]
@@ -396,34 +404,39 @@ do
   local cmod_base_dimen = token.create('ltj@@dimen@zero')[2]
   local cmod_base_skip = token.create('ltj@@skip@zero')[2]
 
-  const_number = function (name)
+  local function const_number(name)
     if name:sub(1, 1) == '\\' then name = name:sub(2) end
     return token.create(name)[2]
   end
 
-  count_number = function (name)
+  local function count_number(name)
     if name:sub(1, 1) == '\\' then name = name:sub(2) end
     return token.create(name)[2] - cmod_base_count
   end
 
-  attribute_number = function (name)
+  local function attribute_number(name)
     if name:sub(1, 1) == '\\' then name = name:sub(2) end
     return token.create(name)[2] - cmod_base_attr
   end
 
-  dimen_number = function (name)
+  local function dimen_number(name)
     if name:sub(1, 1) == '\\' then name = name:sub(2) end
     return token.create(name)[2] - cmod_base_dimen
   end
 
-  skip_number = function (name)
+  local function skip_number(name)
     if name:sub(1, 1) == '\\' then name = name:sub(2) end
     return token.create(name)[2] - cmod_base_skip
   end
 
+  luatexja.base.const_number = const_number
+  luatexja.base.count_number = count_number
+  luatexja.base.attribute_number = attribute_number
+  luatexja.base.dimen_number = dimen_number
+  luatexja.base.skip_number = skip_number
 end
--------------------- mock of debug logger
 
+-------------------- mock of debug logger
 if not debug or debug == _G.debug then
   local function no_op() end
   debug = no_op
@@ -441,7 +454,25 @@ local function get_cs(s)
    cstemp = token.csname_name(token.get_next())
    tex.sprint(cat_lp,'\\' .. s)
 end
+luatexja.base.get_cs = get_cs
 
+-------------------- common error message
+do
+   local function in_unicode(c, admit_math)
+      local low = admit_math and -1 or 0
+      if type(c)~='number' or c<low or c>0x10FFFF then
+	 local s = 'A character number must be between ' .. tostring(low) 
+	    .. ' and 0x10ffff.\n'
+	    .. (admit_math and "(-1 is used for denoting `math boundary')\n" or '')
+	    .. 'So I changed this one to zero.'
+	 package_error('luatexja',
+			    'bad character code (' .. tostring(c) .. ')', s)
+	 c=0
+      end
+      return c
+   end
+   luatexja.base.in_unicode = in_unicode
+end
 
 -------------------- cache management
 -- load_cache (filename, outdate)
@@ -456,8 +487,6 @@ end
 
 require('lualibs-lpeg') -- string.split
 require('lualibs-os')   -- os.type
-
-local load_cache, save_cache_luc, save_cache
 
 do
    local kpse_var_value = kpse.var_value
@@ -528,6 +557,7 @@ do
 	 return result 
       end
    end
+   
    load_cache = function (filename, outdate)
       local r = load_cache_a(filename ..  luc_suffix, outdate)
       if r then 
@@ -539,62 +569,36 @@ do
       end
    end
 
+   luatexja.base.load_cache = load_cache
+   luatexja.base.save_cache_luc = save_cache_luc
+   luatexja.base.save_cache = save_cache
 end
 
+luatexja.base._error_set_break = _error_set_break
+luatexja.base._error_set_message = _error_set_message
+luatexja.base._error_show = _error_show
+luatexja.base._generic_warn_info = _generic_warn_info
 
-luatexja.base = {
-   public_name = public_name, 
-   public_version = public_version, 
-   --
-   _error_set_break = _error_set_break, 
-   _error_set_message = _error_set_message, 
-   _error_show = _error_show, 
-   _generic_warn_info = _generic_warn_info, 
-   --
-   package_error = package_error, 
-   package_warning = package_warning, 
-   package_warning_no_line = package_warning_no_line, 
-   package_info = package_info, 
-   package_info_no_line = package_info_no_line, 
-   --
-   generic_error = generic_error, 
-   generic_warning = generic_warning, 
-   generic_warning_no_line = generic_warning_no_line, 
-   generic_info = generic_info, 
-   generic_info_no_line = generic_info_no_line, 
-   --
-   ltj_warning_no_line = ltj_warning_no_line, 
-   ltj_error = ltj_error, 
-   --
-   mprint = mprint, 
-   --
-   to_dimen = to_dimen, 
-   dump_skip = dump_skip, 
-   to_skip = to_skip, 
-   --
-   counter = counter, 
-   --
-   scan_brace = scan_brace, 
-   scan_number = scan_number, 
-   --
-   const_number = const_number, 
-   count_number = count_number, 
-   attribute_number = attribute_number, 
-   dimen_number = dimen_number, 
-   skip_number = skip_number, 
-   --
-   get_cs = get_cs, 
-   --
-   load_cache = load_cache, 
-   save_cache_luc = save_cache_luc, 
-   save_cache = save_cache, 
-   --
-   debug = debug, 
-   package_debug = package_debug, 
-   debug_logger = debug_logger, 
-   show_term = show_term, 
-   show_log = show_log, 
-   --
-}
+luatexja.base.package_error = package_error
+luatexja.base.package_warning = package_warning
+luatexja.base.package_warning_no_line = package_warning_no_line
+luatexja.base.package_info = package_info
+luatexja.base.package_info_no_line = package_info_no_line
+
+luatexja.base.generic_error = generic_error
+luatexja.base.generic_warning = generic_warning
+luatexja.base.generic_warning_no_line = generic_warning_no_line
+luatexja.base.generic_info = generic_info
+luatexja.base.generic_info_no_line = generic_info_no_line
+
+luatexja.base.ltj_warning_no_line = ltj_warning_no_line
+luatexja.base.ltj_error = ltj_error
+
+luatexja.base.debug = debug
+luatexja.base.package_debug = package_debug
+luatexja.base.debug_logger = debug_logger
+luatexja.base.show_term = show_term
+luatexja.base.show_log = show_log
+
 -------------------- all done
 -- EOF

@@ -71,14 +71,8 @@ function set_stack_table(g,m,c,p,lb,ub)
 			 tostring(ub) .. ".\n" ..
 		      "I'm going to use 0 instead of that illegal code value.")
       p=0
-   elseif type(c)~='number' or c<-1 or c>0x10ffff then
-      ltjb.package_error('luatexja',
-			 'bad character code (' .. tostring(c) .. ')',
-			 'A character number must be between -1 and 0x10ffff.\n' ..
-			 "(-1 is used for denoting `math boundary')\n" ..
-			 'So I changed this one to zero.')
-      c=0
    end
+   c = ltjb.in_unicode(c, true)
    charprop_stack_table[i][c+m] = p
   if g=='global' then
      for j,v in pairs(charprop_stack_table) do 

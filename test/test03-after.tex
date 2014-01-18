@@ -78,6 +78,17 @@ xspmode
 \ltjsetparameter{yalbaselineshift=3pt}
 \dimen255=\yabls\relax\the\dimen255
 
+\char\ltjgetparameter{kansujichar}{0}
+\char\ltjgetparameter{kansujichar}{1}
+\char\ltjgetparameter{kansujichar}{2}
+\char\ltjgetparameter{kansujichar}{3}
+\char\ltjgetparameter{kansujichar}{4}
+\char\ltjgetparameter{kansujichar}{5}
+\char\ltjgetparameter{kansujichar}{6}
+\char\ltjgetparameter{kansujichar}{7}
+\char\ltjgetparameter{kansujichar}{8}
+\char\ltjgetparameter{kansujichar}{9}
+
 \medskip
 {\tengt ■compat: kansuji}
 \kansuji{1}\ 
@@ -107,10 +118,13 @@ xspmode
 {\tengt ■globaldefs}
 
 abc\ltjgetparameter{yalbaselineshift}
-{\globaldefs1\ltjsetparameter{yalbaselineshift=2pt}}% global (by \globaldefs)
+{\globaldefs1 \ltjsetparameter{yalbaselineshift=2pt}}% global (by \globaldefs)
 \ltjgetparameter{yalbaselineshift}
 {\ltjglobalsetparameter{yalbaselineshift=1pt}}% global (explicit)
 \ltjgetparameter{yalbaselineshift}
-{\ltjglobalsetparameter{yalbaselineshift=4pt}}% local
+{\ltjsetparameter{yalbaselineshift=4pt}}% local
 \ltjgetparameter{yalbaselineshift}
+{\globaldefs-4 \ltjglobalsetparameter{yalbaselineshift=-5pt}}% local (by \globaldefs)
+\ltjgetparameter{yalbaselineshift}
+a
 \end
