@@ -468,7 +468,7 @@ do
    if pathtmp then path = (path and path .. ';' or '') .. pathtmp end
 
    if os.type~='windows' then path = string.gsub(path, ':', ';') end
-   path = string.split(path, ';')
+   path = table.unique(string.split(path, ';'))
 
    local cache_dir = '/luatexja'
    local find_file = kpse.find_file

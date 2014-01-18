@@ -186,6 +186,7 @@ end
 
 do
    local cstemp
+   local global_flag -- true if \globaljfont, false if \jfont
    local function load_jfont_metric()
       if jfm_file_name=='' then 
 	 ltjb.package_error('luatexja',
@@ -211,7 +212,7 @@ do
    function jfontdefX(g)
       local t = token.get_next()
       cstemp=token.csname_name(t)
-      if g then luatexja.is_global = '\\global' else luatexja.is_global = '' end
+      global_flag = g and '\\global' or ''
       tex.sprint(cat_lp, '\\expandafter\\font\\csname ' .. cstemp .. '\\endcsname')
    end
    
@@ -227,7 +228,7 @@ do
 			    "bad JFM `" .. jfm_file_name .. "'",
 			    'The JFM file you specified is not valid JFM file.\n'..
 			       'So defining Japanese font is cancelled.')
-	 tex.sprint(cat_lp, luatexja.is_global .. '\\expandafter\\let\\csname ' ..cstemp 
+	 tex.sprint(cat_lp, global_flag .. '\\expandafter\\let\\csname ' ..cstemp 
 		       .. '\\endcsname=\\relax')
 	 return 
       end
@@ -241,7 +242,7 @@ do
       
       fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
       font_metric_table[fn]=fmtable
-      tex.sprint(cat_lp, luatexja.is_global .. '\\protected\\expandafter\\def\\csname ' 
+      tex.sprint(cat_lp, global_flag .. '\\protected\\expandafter\\def\\csname ' 
 		    .. cstemp  .. '\\endcsname{\\ltj@curjfnt=' .. fn .. '\\relax}')
    end
 end
