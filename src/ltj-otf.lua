@@ -184,36 +184,39 @@ do
    local ivs -- temp table
    local sort = table.sort
    local uniq_flag
-   local function add_ivs_table(tg, unitable)
-      for gu, gv in pairs(tg) do
-         local ga = gv.altuni
-         if ga then
-	    for _,at in pairs(ga) do
-	       local bu, vsel = at.unicode, (at.variant or -1)
-	       if vsel~=-1 then
-		  if vsel>=0xE0100 then vsel = vsel - 0xE0100 end
-	          if not ivs[bu] then ivs[bu] = {} end
-	          uniq_flag = true
-                  for i,_ in pairs(ivs[bu]) do
-                     if i==vs then uniq_flag = false; break end
-                  end
-	          if uniq_flag then 
-                     ivs[bu][vsel] = unitable[gv.name]
-                  end
+   local function add_ivs_table(tg, unitable, glyphmax)
+      for i = 0, glyphmax-1 do
+	 if tg[i] then
+	    local gv = tg[i]
+	    if gv.altuni then
+	       for _,at in pairs(gv.altuni) do
+		  local bu, vsel = at.unicode, at.variant
+		  if vsel then
+		     if vsel>=0xE0100 then vsel = vsel - 0xE0100 end
+		     if not ivs[bu] then ivs[bu] = {} end
+		     uniq_flag = true
+		     for i,_ in pairs(ivs[bu]) do
+			if i==vs then uniq_flag = false; break end
+		     end
+		     if uniq_flag then 
+			ivs[bu][vsel] = unitable[gv.name]
+		     end
+		  end
 	       end
 	    end
-         end
+	 end
       end
    end
    local function make_ivs_table(id, fname)
       ivs = {}
       local fl = fontloader.open(fname)
-      local ft = fontloader.to_table(fl)
       local unicodes = id.resources.unicodes
-      add_ivs_table(ft.glyphs, id.resources.unicodes)
-      if ft.subfonts then
-         for _,v in pairs(ft.subfonts) do
-            add_ivs_table(v.glyphs, id.resources.unicodes)
+      if fl.glyphs then
+	 add_ivs_table(fl.glyphs, id.resources.unicodes, fl.glyphmax)
+      end
+      if fl.subfonts then
+         for _,v in pairs(fl.subfonts) do
+            add_ivs_table(v.glyphs, id.resources.unicodes, v.glyphmax)
          end
       end
       fontloader.close(fl)
