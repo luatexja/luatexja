@@ -6,6 +6,9 @@
 %  - KozGoPr6N-Medium.otf
 %  - KozGoPr6N-Regular.otf
 
+%%%%% section ==> 章
+%%%%% subsection => 節
+
 %<en>\documentclass[a4paper,titlepage]{article}
 %<ja>\documentclass[a4paper,titlepage]{ltjsarticle}
 
@@ -179,7 +182,7 @@
 }
 
 \catcode`\<=13
-\def<#1>{{\normalfont\rm\itshape$\langle$#1$\rangle$}}
+\def<#1>{{\normalfont\rm\itshape$\langle$#1\/$\rangle$}}
 \maketitle
 
 \tableofcontents
@@ -2451,7 +2454,7 @@ which JFM will be used for this font by the following keys:
 %</en>
 %<*ja>
 「はじめに」の節で述べたように，JFMは文字と和文組版で自動的に挿入される
-グルー／カーンの寸法情報を持っている．JFMの構造は次の小節で述べる．
+グルー／カーンの寸法情報を持っている．JFMの構造は次の節で述べる．
 \verb+\jfont+ 命令の呼び出しの際には，どのJFMを用いるのかを以下のキーで
 指定する必要がある：
 %</ja>
@@ -3530,7 +3533,7 @@ of \LuaTeX, see Section~\ref{sec-para}.
 \LuaTeX-jaのほとんどのパラメータにアクセスするための命令である．
 \LuaTeX-jaが\pTeX のような文法（例えば，\verb+\prebreakpenalty`）=10000+）を
 採用しない理由の一つは，\LuaTeX のソースにおける \verb+hpack_filter+
-コールバックの位置にある．\ref{sec-para}節を参照．
+コールバックの位置にある．\ref{sec-para}章を参照．
 %</ja>
 
 %<*en>
@@ -3775,6 +3778,7 @@ The default value is \texttt{paverage}. \dots
 \end{list}
 
 \subsection{\texttt{\char`\\ltjgetparameter}}
+\label{ssec-getpar}
 %<*en>
 \verb+\ltjgetparameter+ is a conteol sequence for acquiring parameters. It
 always takes a parameter name as first argument.
@@ -4035,7 +4039,36 @@ With the help of this example, we remark the specification of \verb+\inhibitglue
 
 \subsection{\texttt{\char`\\ltjdeclarealtfont}}
 \label{ssec-altfont}
-%<en>\dots
+%<*en>
+Using \verb+\ltjdeclarealtfont+, one can ``compose'' more than one Japanese fonts.
+This \verb+\ltjdeclarealtfont+ uses in the following form:
+\begin{quote}
+\ttfamily \char`\\ltjdeclarealtfont<base\_font\_cs><alt\_font\_cs>{<range>}
+\end{quote}
+where  <base\_font\_cs>~and~<alt\_font\_cs> are defined by \verb+\jfont+.
+Its meaning is
+\begin{quote}
+If the current Japanese font is <base\_font\_cs>, characters which belong to <range>
+is typeset by another Japanese font <alt\_font\_cs>, instead of <base\_font\_cs>.
+\end{quote}
+
+<range> is a comma-separated list of character codes, but also accepts negative integers:
+$-n$~($n≥1$) means that all characters of character classes~$n$, with respect to JFM used
+by <base\_font\_cs>. Note that characters which do not exist in <alt\_font\_cs> are
+ignored.
+
+For example, if \verb+\hoge+ uses \texttt{jfm-ujis.lua}, the standard JFM of \LuaTeX-ja,
+then 
+\begin{verbatim}
+\ltjdeclarealtfont\hoge\piyo{"3000-"30FF, {-1}-{-1}}
+\end{verbatim}
+does
+\begin{quote}
+If the current Japanese font is \verb+\hoge+, \texttt{U+3000}-\texttt{U+30FF}
+and characters in class~1 (ideographic opening brackets) 
+are typeset by \verb+\piyo+.
+\end{quote}
+%</en>
 %<*ja>
 \verb+\jfont+ の書式を見ればわかるように，基本的には\LuaTeX-jaにおける1つの和文フォントに
 使用出来る「実際のフォント」は1つである．
@@ -4145,7 +4178,7 @@ In NFSS2 under \LuaTeX-ja, distinction between alphabetic font families
 \item[DeclareErrorKanjiFont\{<encoding>\}\{<family>\}\{<series>\}\{<shape>\}\{<size>\}]
 
 %<*en>
-The above 3~commands are just the counterparts for \verb+DeclareFontEncodingDefaults+ and~others.
+The above 3~commands are just the counterparts for \verb+\DeclareFontEncodingDefaults+ and~others.
 %</en>
 %<*ja>
 上記3つのコマンドはちょうど \verb+DeclareFontEncodingDefaults+ などに対応するものである．
@@ -4170,6 +4203,8 @@ The above 3~commands are just the counterparts for \verb+DeclareFontEncodingDefa
 \end{center}
 と定義を行うので，使用には注意が必要である：
 \vspace{-\medskipamount}
+%<en>\advance\linewidth-2em
+%<ja>\advance\linewidth-2\zw
 \begin{itemize}
 \item <al-cmd>,~<ja-cmd>は既に定義されていなければならない．
       \verb+\reDeclareMathAlphabet+\\の後に
@@ -4179,7 +4214,7 @@ The above 3~commands are just the counterparts for \verb+DeclareFontEncodingDefa
 %</ja>
 
 \item[DeclareRelationFont\{<ja-encoding>\}\{<ja-family>\}\{<ja-series>\}\{<ja-shape>\}\\
-  \hfill\{<al-encoding>\}\{<al-family>\}\{<al-series>\}\{<al-shape>\}]
+  \null\hfill\{<al-encoding>\}\{<al-family>\}\{<al-series>\}\{<al-shape>\}]
 %<*en>
 This command sets the ``accompanied'' alphabetic font family (given by the latter 4~arguments)
 with respect to a Japanese font family given by the former 4~arguments.
@@ -4227,6 +4262,8 @@ to <family>. Which family will be changed is determined as follows:
 どのファミリが変更されるかは以下のようにして決定される：
 %</ja>
 {\let\item\origitem
+%<en>\advance\linewidth-2em
+%<ja>\advance\linewidth-2\zw
 \vspace{-\medskipamount}
 \begin{itemize}
 %<*en>
@@ -4283,13 +4320,15 @@ In this case, the default family for font substitution is used for
 }
 
 \item[DeclareAlternateKanjiFont\{<base-encoding>\}\{<base-family>\}\{<base-series>\}\{<base-shape>\}\\
-  \hfill\{<alt-encoding>\}\{<alt-family>\}\{<alt-series>\}\{<alt-shape>\}\{<range>\}]
+  \null\hfill\{<alt-encoding>\}\{<alt-family>\}\{<alt-series>\}\{<alt-shape>\}\{<range>\}]
 %<*ja>
 \ref{ssec-altfont}節の
 \verb+\ltjdeclarealtfont+ と同様に，前半の4引数の和文フォント（基底フォント）のうち<range>中の文字を
 第5--第8引数の和文フォントを使って組むように指示する．使用例を図\ref{fig:altkanji}に載せた．
 
 {\let\item\origitem
+%<en>\advance\linewidth-2em
+%<ja>\advance\linewidth-2\zw
 \vspace{-\medskipamount}
 \begin{itemize}
  \item 
@@ -4303,14 +4342,30 @@ In this case, the default family for font substitution is used for
 <range>に負数$-n$を指定した場合，それが「基底フォントの文字クラス$n$に属する文字全体」
 と解釈されるのは \verb+\ltjdeclarealtfont+ と同じである．
 \end{itemize}%
-%<en>\vspace{-\medskipamount}
 }
 %</ja>
 %<*en>
-As \verb+\ltjdeclarealtfont+, characters in <range> of the Japanese font (we say the \emph{base font})
+As \verb+\ltjdeclarealtfont+~(Subsection~\ref{ssec-altfont}), 
+characters in <range> of the Japanese font (we say the \emph{base font})
 which specified by first 4 arguments are typeset 
-by the Japanese font which specified by fifth to eighth arguments.
+by the Japanese font which specified by fifth to eighth arguments
+(we say the \emph{alternate font}).
 An example is shown in Figure~\ref{fig:altkanji}.
+
+{\let\item\origitem
+%<en>\advance\linewidth-2em
+%<ja>\advance\linewidth-2\zw
+\vspace{-\medskipamount}
+\begin{itemize}
+ \item 
+In \verb+\ltjdeclarealtfont+, the base font and the alternate font must be already defined.
+But this \verb+\DeclareAlternateKanjiFont+ is not so.
+In other words, \verb+\DeclareAlternateKanjiFont+ is effective only after
+current Japanese font is changed, or only after \verb+\selectfont+ is executed.
+ \item \dots
+\end{itemize}%
+\vspace{-\medskipamount}
+}
 %</en>
 \end{cslist}
 
@@ -4600,7 +4655,7 @@ for making the difference obvious.
 ては，このような状況では半端は鍵括弧周辺の空白のみで負担し，その他の和文
 文字はベタ組で組まれる（図\ref{fig-adj}下段）ことになっている．この追加
 パッケージは\cite{jlreq}や\cite{x4051}における規定のような，優先順位付き
-の行長調整を提供する．詳細な仕様については\ref{sec-adjspec}を参照してほしい．
+の行長調整を提供する．詳細な仕様については\ref{sec-adjspec}章を参照してほしい．
 \begin{itemize}
  \item 優先度付き行長調整は，段落を行分割した後に個々の行について行われるものである．
 そのため，行分割の位置は変化することはない．
@@ -4780,69 +4835,36 @@ Glues from an italic correction
 
 \item[\textit{kinsoku} (3)]
 %<*en>
-Penalties inserted for the word-wrapping process of Japanese characters (\emph{kinsoku}).
+Penalties inserted for the word-wrapping process (\emph{kinsoku shori}) of Japanese characters.
 %</en>
-%<*ja>
-和文文字のワードラップ過程において挿入されたペナルティ(\emph{kinsoku})．
-%</ja>
-
+%<ja>禁則処理のために挿入されたペナルティ．
 \item[\textit{from\_jfm} (6)]
-%<*en>
-Glues/kerns from JFM.
-%</en>
-%<*ja>
-JFM由来のグルー／カーン．
-%</ja>
-
-%%\item[\textit{line\_end} (5)]
-%%%<*en>
-%%Kerns for \ldots
-%%%</en>
-%%%<*ja>
-%%和文文字が行末にきたとき，行末との間に挿入されるカーンである．
-%%% ぶら下げ組への応用
-%%%</ja>
-
+%<en>Glues/kerns from JFM.
+%<ja>JFM由来のグルー／カーン．
 \item[\textit{kanji\_skip} (9)]
-%<*en>
-Glues for \Param{\hyperlink{fld:kanjiskip}{kanjiskip}}.
-%</en>
-%<*ja>
-\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}のグルー．
-%</ja>
-
+%<en>Glues for \Param{\hyperlink{fld:kanjiskip}{kanjiskip}}.
+%<ja>\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}のグルー．
 \item[\textit{xkanji\_skip} (10)]
-%<*en>
-Glues for \Param{\hyperlink{fld:xks}{xkanjiskip}}.
-%</en>
-%<*ja>
-\Param{\hyperlink{fld:xks}{xkanjiskip}}のグルー．
-%</ja>
-
+%<en>Glues for \Param{\hyperlink{fld:xks}{xkanjiskip}}.
+%<ja>\Param{\hyperlink{fld:xks}{xkanjiskip}}のグルー．
 \item[\textit{processed} (11)]
-%<*en>
-Nodes which is already processed by \ldots.
-%</en>
-%<*ja>
-\LuaTeX-ja の内部処理によって既に処理されたノード．
-%</ja>
-
+%<en>Nodes which is already processed by \ldots.
+%<ja>\LuaTeX-ja の内部処理によって既に処理されたノード．
 \item[\textit{ic\_processed} (12)]
 %<*en>
-Glues from an italic correction, but also already processed.
+Glues from an italic correction, but already processed in the insertion process of \textbf{JAglue}s.
 %</en>
-%<*ja>
-イタリック補正に由来するグルーであるが，まだ処理されていないもの．
-%</ja>
-
+%<ja>イタリック補正に由来するグルーであって，既に \textbf{JAglue} 挿入処理にかかったもの．
 \item[\textit{boxbdd} (15)]
-%<*en>
-Glues/kerns that inserted just the beginning or the ending of an hbox or a paragraph.
-%</en>
-%<*ja>
-ある水平ボックスか段落の最初か最後に挿入されたグルー／カーン．
-%</ja>
+%<en>Glues/kerns that inserted just the beginning or the ending of an hbox or a paragraph.
+%<ja>ある水平ボックスか段落の最初か最後に挿入されたグルー／カーン．
 \end{description}
+
+%<*ja>
+また，挿入処理の結果であるリストの最初のノードでは，\verb+\ltj@icflag+ の値に
+\textit{processed\_begin\_flag}~(32)が追加される．これによって，\verb+\unhbox+ が
+連続した場合でも「ボックスの境界」が識別できるようになっている．
+%</ja>
 
 \attr{ltj@kcat$i$}
 %<*en>
@@ -4867,7 +4889,8 @@ are allocated by \texttt{luatexbase.newuserwhatsitid}.
 さらに，\LuaTeX-jaはいくつかのuser-defined whatsit nodeを内部処理に用いる．
 これらのwhatsitノードの \texttt{type} は100であり，ノードは自然数を格納している．
 user-defined whatsitを識別するための \texttt{user\_id} は\ 
-\texttt{luatexbase.newuserwhatsitid} により確保されている．
+\texttt{luatexbase.newuserwhatsitid} により確保されており，
+下の見出しは単なる識別用でしかない．
 %</ja>
 \begin{description}
 \item[\textit{inhibitglue}]
@@ -5104,6 +5127,83 @@ To solve this problem, we use another trick: the assignment
 代入は \verb+\globaldefs+ の値によらず常にローカルでなければならないことに注意する．
 この問題は \hbox{\verb+\directlua{tex.globaldefs=0}+}（この代入は常にローカル）を
 用いることで解決している．
+%</ja>
+
+%<*ja>
+\subsection{スタックシステムの使用法}
+未完
+%</ja>
+
+%<*ja>
+\subsection{パラメータの拡張}
+ここでは，\Pkg{luatexja-adjust}で行なっているように，
+\verb+\ltjsetparameter+,~\verb+\ltjgetparameter+に指定可能なパラメータに追加する方法
+を述べる．
+
+\paragraph{パラメータの設定}
+\verb+\ltjsetparameter+ と，\verb+\ltjglobalsetparameter+ の定義は
+\begin{verbatim}
+\protected\def\ltj@setpar@global{%
+  \relax\ifnum\globaldefs>0\directlua{luatexja.isglobal='global'}%
+    \else\directlua{luatexja.isglobal=''}\fi
+}
+\protected\def\ltjsetparameter#1{%
+  \ltj@setpar@global\setkeys[ltj]{japaram}{#1}\ignorespaces}
+\protected\def\ltjglobalsetparameter#1{%
+  \relax\ifnum\globaldefs<0\directlua{luatexja.isglobal=''}%
+    \else\directlua{luatexja.isglobal='global'}\fi%
+  \setkeys[ltj]{japaram}{#1}\ignorespaces}
+\end{verbatim}
+のようになっている．
+本質的なのは最後の \verb+\setkeys+ で，これは\Pkg{xkeyval}パッケージの提供する命令である．
+
+このため，\verb+\ltjsetparameter+ に指定可能なパラメータを追加するには，
+<prefix>を \texttt{ltj}，<family>を \texttt{japaram} としたキーを
+\begin{verbatim}
+\define@key[ltj]{japaram}{...}{...
+\end{verbatim}
+のように定義すれば良いだけである．
+なお，パラメータ指定がグローバル化どうかを示す \texttt{luatexja.isglobal} が，
+\begin{align}
+ \texttt{luatexja.isglobal} = 
+\begin{cases}
+ \texttt{'global'}&\text{パラメータ設定はグローバル}\\
+ \texttt{''}&\text{パラメータ設定はローカル}
+\end{cases}
+\end{align}
+としてセットされる\footnote{命令が \texttt{\char`\\ltjglobalsetparameter} かどうかだけでは
+なく，実行時の \texttt{\char`\\globaldefs} の値にも依存して定まる．}．
+
+\paragraph{パラメータの取得}
+一方，\verb+\ltjgetparameter+ はLuaスクリプトによって実装されている．
+値を取得するのに追加引数の要らないパラメータについては，\verb+luatexja.unary_pars+\ 
+内に処理内容を記述した関数を定義すれば良い．例えば，Luaスクリプトで
+\begin{lstlisting}[numbers=left] 
+function luatexja.unary_pars.hoge (t)
+  return 42
+end
+\end{lstlisting}
+を実行すると，\verb+\ltjgetparameter{hoge}+ は \texttt{42} という\emph{文字列}を返す．
+関数 \verb+luatexja.unary_pars.hoge+ の引数$t$は，\ref{ssec-stack}節で述べた
+\LuaTeX-jaのスタックシステムにおけるスタックレベルである．
+戻り値はいかなる値であっても，最終的には文字列として出力されることに注意．
+
+一方，追加引数（\emph{数値しか許容しない}）が必要なパラメータについては，
+まずLuaスクリプトで処理内容の本体を記述しておく：
+\begin{lstlisting}[numbers=left] 
+function luatexja.binary_pars.fuga (c, t)
+  return tostring(c) .. ', ' .. tostring(42)
+end
+\end{lstlisting}
+引数$t$は，先に述べた通りのスタックレベルである．一方，引数$c$は\ 
+\verb+\ltjgetparameter+ の第2引数を表す数値である．
+しかしこれだけでは駄目で，
+\begin{verbatim}
+\ltj@@decl@array@param{fuga}
+\end{verbatim}
+を実行し，\TeX インターフェース側に
+「\verb+\ltjgetparameter{fuga}+ は追加引数が必要」ということを通知する必要がある．
+
 %</ja>
 
 %<en>\section{Linebreak after a Japanese Character}
@@ -6471,7 +6571,7 @@ JFM中にある文字クラス$n$の定義の
 これによって，\textit{total}は\textbf{JAglue}以外のグルーによって負担される．
 \end{enumerate}
 \item \textit{total}が(A)--(H)の伸び量の合計よりも大きい場合，どうしようもないので
-      \verb+^^;+何もせず，何もしない．
+      \verb+^^;+何もしない．
 \end{enumerate}
 
 %</ja>
@@ -6493,13 +6593,13 @@ font featureの適用（すぐ下）により置換される可能性がある�
 \item[\tt ltj.otf] \texttt{user\_id} が\textit{char\_by\_cid}であるようなuser-defined whatsitを
 きちんと\textit{glyph\_node}に変換する．この処理は，\verb+\CID+, \verb+\UTF+やIVSによる置換が，
 font featureの適用で上書きされてしまうのを防止するためである．
-\item[\tt ltj.main\_process] \textbf{JAglue}の挿入処理（\ref{sec-jfmglue}節）と，
+\item[\tt ltj.main\_process] \textbf{JAglue}の挿入処理（\ref{sec-jfmglue}章）と，
 JFMの指定に従って各\textbf{JAchar}の「寸法を補正」することを行う．
 \end{description}
 
 問題は各フォントの持っているIVS情報をどのように取得するか，である．
 \Pkg{luaotfload} はフォント番号<font\_number>の情報を\ 
-\texttt{fonts.hashes.idenfifiers[<font\_number>]} 以下に格納している．
+\texttt{fonts.hashes.identifiers[<font\_number>]} 以下に格納している．
 しかし，OpenTypeフォントのIVS情報は格納されていないようである%
 \footnote{TrueTypeフォントに関しては，
 \begin{center}
@@ -6512,10 +6612,13 @@ JFMの指定に従って各\textbf{JAchar}の「寸法を補正」すること�
 
 一方，\LuaTeX 内部の \texttt{fontloader} の返すテーブルには
 OpenTypeフォントでもTrueTypeフォントでもIVS情報が格納されている．
-……
-そのため，\LuaTeX-jaのIVS対応においては，\texttt{fontloader} を直接用いることにしている．
+具体的には……
+
+そのため，\LuaTeX-jaのIVS対応においては，\LuaTeX 内部の\ 
+\texttt{fontloader} を直接用いることで，フォントのIVS情報を取得している．
 20140114.0以降でキャッシュを用いるようにした要因はここにあり，
-\texttt{fontloader.to\_table} の呼び出しでかなりメモリと時間を消費することから，
+\texttt{fontloader} の呼び出しでかなり時間を消費することから，
+%%% to_table を使わなくしたことで，メモリ使用量は減った
 IVS情報をキャッシュに保存することで2回目以降の実行時間を節約している．
 
 \section{複数フォントの「合成」（未完）}
@@ -6606,7 +6709,7 @@ The structure of the table is the following:
 %</en>
 
 \begin{table}[!tb]
- \centering
+ \centering\small
 \caption{\texttt{cid} key and corresponding files}
 \label{tab:cid-cache}
 \vspace*{\medskipamount}

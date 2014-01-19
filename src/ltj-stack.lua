@@ -28,7 +28,7 @@ function get_stack_level()
    if j > tex.getcount('ltj@@group@level') then
       i = i+1 -- new stack level
       local gd = tex.globaldefs
-      if gd>0 then tex.globaldefs = 0 end
+      if gd~=0 then tex.globaldefs = 0 end
       --  'tex.globaldefs = 0' is local even if \globaldefs > 0.
       tex.setcount('ltj@@group@level', j)
       for k,v in pairs(charprop_stack_table) do -- clear the stack above i
@@ -36,7 +36,7 @@ function get_stack_level()
       end
       charprop_stack_table[i] = table.fastcopy(charprop_stack_table[i-1])
       tex.setcount('ltj@@stack', i)
-      if gd>0 then tex.globaldefs = gd end
+      if gd~=0 then tex.globaldefs = gd end
       if tex.nest[tex.nest.ptr].mode == hmode or
 	 tex.nest[tex.nest.ptr].mode == -hmode then
 	 local g = node_new(id_whatsit, sid_user)
