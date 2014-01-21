@@ -232,12 +232,16 @@ end
 
 -- main process
 do
+   local Dnode = node.direct or node
+   local nullfunc = function (n) return n end
+   local to_node = (Dnode ~= node) and Dnode.tonode or nullfunc
+   local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
    -- mode = true iff main_process is called from pre_linebreak_filter
    local function main_process(head, mode, dir)
-      local p = head
+      local p = to_direct(head)
       p = ltjj.main(p,mode)
       if p then p = ltjw.set_ja_width(p, dir) end
-      return p
+      return to_node(p)
    end
    
    -- callbacks

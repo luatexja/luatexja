@@ -10,19 +10,19 @@ luatexja.load_module('setwidth');  local ltjw = luatexja.setwidth
 
 local Dnode = node.direct or node
 
-local setfield = (Dnode == node.direct) and Dnode.setfield or function(n, i, c) n[i] = c end
-local getfield = (Dnode == node.direct) and Dnode.getfield or function(n, i) return n[i] end
-local getid = (Dnode == node.direct) and Dnode.getid or function(n) return n.id end
-local getlist = (Dnode == node.direct) and Dnode.getlist or function(n) return n.head end
-local getchar = (Dnode == node.direct) and Dnode.getlist or function(n) return n.char end
+local setfield = (Dnode ~= node) and Dnode.setfield or function(n, i, c) n[i] = c end
+local getfield = (Dnode ~= node) and Dnode.getfield or function(n, i) return n[i] end
+local getid = (Dnode ~= node) and Dnode.getid or function(n) return n.id end
+local getlist = (Dnode ~= node) and Dnode.getlist or function(n) return n.head end
+local getchar = (Dnode ~= node) and Dnode.getchar or function(n) return n.char end
 
 local nullfunc = function(n) return n end
-local to_node = (Dnode == node.direct) and Dnode.tonode or nullfunc
-local to_direct = (Dnode == node.direct) and Dnode.todirect or nullfunc
+local to_node = (Dnode ~= node) and Dnode.tonode or nullfunc
+local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
 
 local node_traverse = Dnode.traverse
 local node_new = Dnode.new
-local node_next = Dnode.next
+local node_next = Dnode.getnext
 local node_free = Dnode.free
 local has_attr = Dnode.has_attribute
 local set_attr = Dnode.set_attribute
@@ -98,6 +98,7 @@ local MJT  = luatexja.stack_table_index.MJT
 local MJS  = luatexja.stack_table_index.MJS
 local MJSS = luatexja.stack_table_index.MJSS
 local capsule_glyph = ltjw.capsule_glyph
+local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
 
 conv_jchar_to_hbox_A = 
 function (p, sty)
@@ -111,7 +112,7 @@ function (p, sty)
       elseif pid == id_mchar then
          local fam = has_attr(p, attr_jfam) or -1
 	 local pc = getchar(p)
-         if (not is_math_letters[pc]) and ltjc.is_ucs_in_japanese_char(to_node(p)) and fam>=0 then
+         if (not is_math_letters[pc]) and is_ucs_in_japanese_char(p) and fam>=0 then
             local f = ltjs.get_penalty_table(MJT + 0x100 * sty + fam, -1, tex_getcount('ltj@@stack'))
             if f ~= -1 then
                local q = node_new(id_sub_box)

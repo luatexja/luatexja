@@ -11,10 +11,14 @@ local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
 luatexja.load_module('base');      local ltjb = luatexja.base
 
+local Dnode = node.direct or node
+local getchar = (Dnode ~= node) and Dnode.getchar or function(n) return n.char end
+local has_attr = Dnode.has_attribute
+local has_attr_node = node.has_attribute
+
 ATTR_RANGE = 7
 local floor = math.floor
 local pow = math.pow
-local has_attr = node.has_attribute
 local kcat_attr_table = {}
 local pow_table = {}
 for i = 0, 31*ATTR_RANGE-1 do
@@ -71,8 +75,21 @@ function get_range_setting(i) -- i: internal range number
 end
 
 --  glyph_node p は和文文字か？
-function is_ucs_in_japanese_char(p)
+
+function is_ucs_in_japanese_char_node(p)
    local c = p.char
+   if c<0x80 then
+      return false
+   else
+      local i=jcr_table_main[c]
+      return (floor(
+		 has_attr_node(p, kcat_attr_table[i])/pow_table[i])%2 ~= jcr_noncjk)
+   end
+end
+is_ucs_in_japanese_char = is_ucs_in_japanese_char_node
+
+function is_ucs_in_japanese_char_direct(p)
+   local c = getchar(p)
    if c<0x80 then
       return false
    else

@@ -7,13 +7,13 @@ luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 
 local Dnode = node.direct or node
 
-local setfield = (Dnode == node.direct) and Dnode.setfield or function(n, i, c) n[i] = c end
-local getfield = (Dnode == node.direct) and Dnode.getfield or function(n, i) return n[i] end
-local getid = (Dnode == node.direct) and Dnode.getid or function(n) return n.id end
-local getfont = (Dnode == node.direct) and Dnode.getfont or function(n) return n.font end
-local getlist = (Dnode == node.direct) and Dnode.getlist or function(n) return n.head end
-local getchar = (Dnode == node.direct) and Dnode.getlist or function(n) return n.char end
-local getsubtype = (Dnode == node.direct) and Dnode.getlist or function(n) return n.subtype end
+local setfield = (Dnode ~= node) and Dnode.setfield or function(n, i, c) n[i] = c end
+local getfield = (Dnode ~= node) and Dnode.getfield or function(n, i) return n[i] end
+local getid = (Dnode ~= node) and Dnode.getid or function(n) return n.id end
+local getfont = (Dnode ~= node) and Dnode.getfont or function(n) return n.font end
+local getlist = (Dnode ~= node) and Dnode.getlist or function(n) return n.head end
+local getchar = (Dnode ~= node) and Dnode.getchar or function(n) return n.char end
+local getsubtype = (Dnode ~= node) and Dnode.getsubtype or function(n) return n.subtype end
 
 local node_traverse = Dnode.traverse
 local node_new = Dnode.new
