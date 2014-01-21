@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2014/1/12',
+  date = '2014/1/21',
   description = 'Insertion process of JFM glues and kanjiskip',
 })
 module('luatexja.jfmglue', package.seeall)
@@ -13,15 +13,31 @@ luatexja.load_module('stack');     local ltjs = luatexja.stack
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 luatexja.load_module('pretreat');  local ltjp = luatexja.pretreat
 
-local has_attr = node.has_attribute
-local set_attr = node.set_attribute
-local insert_before = node.insert_before
-local node_next = node.next
+local Dnode = node -- node.direct or node
+
+local setfield = (Dnode == node.direct) and Dnode.setfield or function(n, i, c) n[i] = c end
+local getfield = (Dnode == node.direct) and Dnode.getfield or function(n, i) return n[i] end
+local getid = (Dnode == node.direct) and Dnode.getid or function(n) return n.id end
+local getfont = (Dnode == node.direct) and Dnode.getfont or function(n) return n.font end
+local getlist = (Dnode == node.direct) and Dnode.getlist or function(n) return n.head end
+local getchar = (Dnode == node.direct) and Dnode.getlist or function(n) return n.char end
+local getsubtype = (Dnode == node.direct) and Dnode.getlist or function(n) return n.subtype end
+
+local has_attr = Dnode.has_attribute
+local set_attr = Dnode.set_attribute
+local insert_before = Dnode.insert_before
+local insert_after = Dnode.insert_after
+local node_next = Dnode.next
 local round = tex.round
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_find_char_class = ltjf.find_char_class
-local node_new = node.new
-local node_copy = node.copy
+local node_new = Dnode.new
+local node_copy = Dnode.copy
+local node_remove = Dnode.remove
+local node_tail = Dnode.tail
+local node_free = Dnode.free
+local node_end_of_math = Dnode.end_of_math
+
 
 local id_glyph = node.id('glyph')
 local id_hlist = node.id('hlist')
@@ -304,7 +320,7 @@ local calc_np_auxtable = {
 		  if lp.subtype==sid_user then
 		     if lp.user_id==luatexja.userid_table.IHB then
 			local lq = node_next(lp); 
-			head = node.remove(head, lp); node.free(lp); ihb_flag = true
+			head = node_remove(head, lp); node_free(lp); ihb_flag = true
 			return false, lq;
 		     else
 			set_attr(lp, attr_icflag, PROCESSED)
@@ -333,7 +349,7 @@ local calc_np_auxtable = {
    [id_math] = function(lp)
 		  Np.first, Np.nuc = (Np.first or lp), lp; 
 		  set_attr(lp, attr_icflag, PROCESSED) -- set_attr_icflag_processed(lp); 
-		  lp  = node.end_of_math(lp) 
+		  lp  = node_end_of_math(lp) 
 		  set_attr(lp, attr_icflag, PROCESSED) -- set_attr_icflag_processed(lp); 
 		  Np.last, Np.id = lp, id_math;
 		  return true, node_next(lp); 
@@ -390,7 +406,7 @@ function calc_np(lp, last)
       if lpa>=PACKED then
          if lpa%PROCESSED_BEGIN_FLAG == BOXBDD then
 	    local lq = node_next(lp) 
-            head = node.remove(head, lp); node.free(lp); lp = lq
+            head = node_remove(head, lp); node_free(lp); lp = lq
          else return calc_np_pbox(lp, last)
          end -- id_pbox
       else
@@ -444,7 +460,7 @@ do
             c = x.char
 	 else
 	    while xc and xs and xs%4>=2 do
-	       x = node.tail(xc); xc, xs = x.components, x.subtype
+	       x = node_tail(xc); xc, xs = x.components, x.subtype
 	    end
             c = x.char
 	 end
@@ -630,14 +646,14 @@ local function calc_ja_ja_aux(gb,ga, db, da)
       gb.spec.shrink  = -round(diffmet_rule(
                                   -rbb*gb.spec.shrink - rba*ga.spec.shrink,
                                   -rab*gb.spec.shrink - raa*ga.spec.shrink ))
-      node.free(ga)
+      node_free(ga)
       return gb
    elseif k == 'kernkern' then
       -- 両方とも kern．
       gb.kern   = round(diffmet_rule(
                                  rbb*gb.kern + rba*ga.kern,
                                  rab*gb.kern + raa*ga.kern ))
-      node.free(ga)
+      node_free(ga)
       return gb
    elseif k == 'kernglue' then 
       -- gb: kern, ga: glue
@@ -648,7 +664,7 @@ local function calc_ja_ja_aux(gb,ga, db, da)
                                  rba*ga.spec.stretch, raa*ga.spec.stretch ))
       ga.spec.shrink  = -round(diffmet_rule(
                                   -rba*ga.spec.shrink,-raa*ga.spec.shrink ))
-      node.free(gb)
+      node_free(gb)
       return ga
    else
       -- gb: glue, ga: kern
@@ -659,7 +675,7 @@ local function calc_ja_ja_aux(gb,ga, db, da)
                                  rbb*gb.spec.stretch, rab*gb.spec.stretch ))
       gb.spec.shrink  = -round(diffmet_rule(
                                   -rbb*gb.spec.shrink,-rab*gb.spec.shrink ))
-      node.free(ga)
+      node_free(ga)
       return gb
    end
 end
@@ -841,7 +857,7 @@ local function handle_list_tail(mode)
 	 local g = new_jfm_glue(pm, Np.class, fast_find_char_class('boxbdd', pm))
 	 if g then
 	    set_attr(g, attr_icflag, BOXBDD)
-	    head = node.insert_after(head, Np.last, g)
+	    head = insert_after(head, Np.last, g)
 	 end
       end
    end
@@ -902,12 +918,12 @@ local function init_var(mode)
 		 or ((lpi==id_hlist) and (lps==3))) do
 	 if (lpi==id_hlist) and (lps==3) then par_indented = 'parbdd' end
 	 lp=node_next(lp); lpi, lps = lp.id, lp.subtype end
-     return lp, node.tail(head), par_indented
+     return lp, node_tail(head), par_indented
    else 
       -- the current list is the contents of a hbox:
       -- insert a sentinel
       local g = node_new(id_kern)
-      node.insert_after(head, node.tail(head), g); last = g
+      insert_after(head, node_tail(head), g); last = g
       return head, g, 'boxbdd'
    end
 end
@@ -915,7 +931,7 @@ end
 local function cleanup(mode, last)
    -- adjust attr_icflag for avoiding error
    tex.setattribute('global', attr_icflag, 0)
-   node.free(kanji_skip); node.free(xkanji_skip)
+   node_free(kanji_skip); node_free(xkanji_skip)
    if mode then
       local h = node_next(head)
       if h.id == id_penalty and h.penalty == 10000 then
@@ -926,7 +942,7 @@ local function cleanup(mode, last)
       end
       return head
    else
-      head = node.remove(head, last); node.free(last);-- remove the sentinel
+      head = node_remove(head, last); node_free(last);-- remove the sentinel
       set_attr(head, attr_icflag, 
                get_attr_icflag(head) + PROCESSED_BEGIN_FLAG);
       return head
@@ -998,11 +1014,12 @@ do
       end
    end
 
+   local node_prev = Dnode.prev
    local function whatsit_after_callback(s, Nq, Np)
       if not s and Nq.nuc.user_id == BPAR then
-         local x, y = node.prev(Nq.nuc), Nq.nuc
+         local x, y = node_prev(Nq.nuc), Nq.nuc
          Nq.first, Nq.nuc, Nq.last = x, x, x
-         head = node.remove(head, y)
+         head = node_remove(head, y)
       end
       return s
    end
