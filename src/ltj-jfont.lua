@@ -369,8 +369,8 @@ end
 
 ------ used in ltjp.suppress_hyphenate_ja callback
 function replace_altfont(pf, pc)
-   return (alt_font_table[pf] and alt_font_table[pf][pc]) 
-      and alt_font_table[pf][pc] or pf
+   local a = alt_font_table[pf]
+   return a and a[pc] or pf
 end
 
 ------ for LaTeX interface
@@ -426,26 +426,30 @@ end
 -- ここから先は 新 \selectfont の内部でしか実行されない
 do
    local alt_font_base, alt_font_base_num
-
--- EXT
-   function print_aftl_address(bbase)
-      local t = alt_font_table_latex[bbase]
-      if not t then t = {}; alt_font_table_latex[bbase] = t end
-      tex.sprint(cat_lp, (tostring(t):gsub('table: ','ltjaltfont')))
+   local aftl_base
+   -- EXT
+   function does_alt_set(bbase)
+      aftl_base = alt_font_table_latex[bbase]
+      tex.sprint(cat_lp, '\\if' .. (aftl_base and 'true' or 'false'))
    end
+   -- EXT
+   function print_aftl_address()
+      tex.sprint(cat_lp, ';ltjaltfont' .. tostring(aftl_base):sub(8))
+   end
+
 -- EXT
    function output_alt_font_cmd(bbase)
       alt_font_base = bbase
       alt_font_base_num = tex.getattribute(attr_curjfnt)
       local t = alt_font_table[alt_font_base_num]
       if t then 
-	 for i,_ in pairs(t) do t[i]=nil end
+         for i,_ in pairs(t) do t[i]=nil end
       end
       t = alt_font_table_latex[bbase]
       if t then
-	 for i,_ in pairs(t) do
-	    tex.sprint(cat_lp, '\\ltj@pickup@altfont@aux{' .. i .. '}')
-	 end
+         for i,_ in pairs(t) do
+            tex.sprint(cat_lp, '\\ltj@pickup@altfont@aux{' .. i .. '}')
+         end
       end
    end
 
@@ -453,18 +457,18 @@ do
    function pickup_alt_font_a(size_str)
       local t = alt_font_table_latex[alt_font_base]
       if t then
-	 for i,v in pairs(t) do
-	    tex.sprint(cat_lp, '\\expandafter\\ltj@pickup@altfont@copy'
-			  .. '\\csname ' .. i .. '/' .. size_str .. '\\endcsname{' .. i .. '}')
-	 end
+         for i,v in pairs(t) do
+            tex.sprint(cat_lp, '\\expandafter\\ltj@pickup@altfont@copy'
+                          .. '\\csname ' .. i .. '/' .. size_str .. '\\endcsname{' .. i .. '}')
+         end
       end
-   end
+   end 
 
    local function pickup_alt_font_class(class, afnt_num, afnt_chars)
       local t  = alt_font_table[alt_font_base_num] 
       local tx = font_metric_table[alt_font_base_num].chars
       for i,v in pairs(tx) do
-	 if v==class and afnt_chars[i] then t[i]=afnt_num end
+         if v==class and afnt_chars[i] then t[i]=afnt_num end
       end
    end
 
@@ -474,17 +478,17 @@ do
       local ac = font_getfont(afnt_num).characters
       if not t then t = {}; alt_font_table[alt_font_base_num] = t end
       for i,v in pairs(alt_font_table_latex[alt_font_base]) do
-	 if i == afnt_base then
-	    for j,_ in pairs(v) do
-	       if j>=0 then 
-		  if ac[j] then t[j]=afnt_num end
-	       else  -- -n (n>=1) means that the character class n,
-		     -- which is defined in the JFM 
-		  pickup_alt_font_class(-j, afnt_num, ac) 
-	       end
-	    end
-	    return
-	 end
+         if i == afnt_base then
+            for j,_ in pairs(v) do
+               if j>=0 then 
+                  if ac[j] then t[j]=afnt_num end
+               else  -- -n (n>=1) means that the character class n,
+                     -- which is defined in the JFM 
+                  pickup_alt_font_class(-j, afnt_num, ac) 
+               end
+            end
+            return
+         end
       end
    end
 

@@ -101,6 +101,11 @@
     {Package loading is aborted now.\MessageBreak}
 \expandafter\endinput\fi\relax
 
+ \@PackageInfo{luatexja-core}
+    {This LuaTeX-ja uses\space%
+  \directlua{if node.direct==node then tex.write('traditional node')
+  else tex:write('DIRECT') end} access model for accessing nodes.}
+
 %! なお、luatexbase-compat の説明に従うと、LuaTeX 拡張プリミティブは
 %! plain/LaTeX の両方で \luatex 付の名前（\directlua はそのまま)
 %! で使えると考えてよい。
@@ -138,7 +143,10 @@
 \newluatexattribute\ltj@yablshift % attribute for \yabaselineshift
 \newluatexattribute\ltj@ykblshift % attribute for \ykbaselineshift
 \newluatexattribute\jfam          % index for current jfam
-\ltj@icflag=0\ltj@origchar=0\ltj@charclass=0
+\ltj@icflag=0
+\ltj@origchar=0
+\ltj@charclass=0
+\ltj@curjfnt=-1
 
 %%%%%%%% Attributes for character ranges
 \newcount\ltj@tempcnta
