@@ -36,6 +36,7 @@ local set_attr = Dnode.set_attribute
 local unset_attr = Dnode.unset_attribute
 local node_insert_after = Dnode.insert_after 
 local node_write = Dnode.write
+local node_traverse_id = Dnode.traverse_id
 
 local identifiers = fonts.hashes.identifiers
 
@@ -296,7 +297,7 @@ do
 
    local function do_ivs_repr(head)
       head = to_direct(head)
-      local p = head
+      local p, r = head
       while p do
 	 local pid = getid(p)
 	 if pid==id_glyph then
@@ -309,18 +310,25 @@ do
                   if qc>=0xE0100 then qc = qc - 0xE0100 end
                   local pt = font_ivs_table[pf]
                   pt = pt and pt[getchar(p)];  pt = pt and  pt[qc]
-                  head = node_remove(head,q)
+                  head, r = node_remove(head,q)
+		  node_free(q)
                   if pt then
                      local np = ivs_jglyph(pt, p, pf,
                                            (has_attr(p,attr_curjfnt) or 0)==pf and OTF or VSR)
                      head = node_insert_after(head, p, np) 
                      head = node_remove(head,p)
-                     p = np
+		     node_free(p)
                   end
+		  p = r
+	       else 
+		  p = q
                end
+	    else
+	       p = node_next(p)
             end
+	 else
+	    p = node_next(p)
          end
-	 p = node_next(p)
       end
       return to_node(head)
    end

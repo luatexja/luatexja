@@ -55,7 +55,8 @@ do
    end
 end
 
-local ltjw = {}
+local head, dir
+local ltjw = {} --export
 luatexja.setwidth = ltjw
 
 luatexbase.create_callback("luatexja.set_width", "data", 
@@ -67,7 +68,7 @@ local call_callback = luatexbase.call_callback
 local fshift =  { down = 0, left = 0}
 
 -- mode: true iff p will be always encapsuled by a hbox
-local function capsule_glyph(p, dir, mode, met, class)
+local function capsule_glyph(p, met, class)
    local char_data = met.char_type[class]
    if not char_data then return node_next(p) end
    local fwidth, pwidth = char_data.width, getfield(p, 'width')
@@ -75,40 +76,68 @@ local function capsule_glyph(p, dir, mode, met, class)
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = call_callback("luatexja.set_width", fshift, met, class)
    local fheight, fdepth = char_data.height, char_data.depth
-   if (mode or pwidth ~= fwidth or getfield(p, 'height') ~= fheight or getfield(p, 'depth') ~= fdepth) then
+   if (pwidth ~= fwidth or getfield(p, 'height') ~= fheight or getfield(p, 'depth') ~= fdepth) then
       local y_shift, ca
          = - getfield(p, 'yoffset') + (has_attr(p,attr_ykblshift) or 0), char_data.align
       local q
-      ltjw.head, q = node_remove(ltjw.head, p)
+      head, q = node_remove(head, p)
       setfield(p, 'yoffset', -fshift.down); setfield(p, 'next', nil)
-      if ca~='left'  then
-	 setfield(p, 'xoffset', getfield(p, 'xoffset') - fshift.left
-		     + (((ca=='right') and fwidth - pwidth) or round((fwidth - pwidth)*0.5)))
-      else
-	 setfield(p, 'xoffset', getfield(p, 'xoffset') - fshift.left)
-      end
+      ca = (ca~='left') 
+	 and -fshift.left + (((ca=='right') and fwidth-pwidth) or round((fwidth-pwidth)*0.5))
+	 or  -fshift.left
+      setfield(p, 'xoffset', getfield(p, 'xoffset') + ca)
       local box = node_new(id_hlist); 
       setfield(box, 'width', fwidth)
       setfield(box, 'height', fheight)
       setfield(box, 'depth', fdepth)
       setfield(box, 'head', p)
       setfield(box, 'shift', y_shift)
-      setfield(box, 'dir', dir or 'TLT')
+      setfield(box, 'dir', dir)
       set_attr(box, attr_icflag, PACKED + get_pr_begin_flag(p))
-      ltjw.head = q and node_insert_before(ltjw.head, q, box) 
-               or node_insert_after(ltjw.head, node_tail(ltjw.head), box)
+      head = q and node_insert_before(head, q, box) 
+               or node_insert_after(head, node_tail(head), box)
       return q
    else
       set_attr(p, attr_icflag, PROCESSED + get_pr_begin_flag(p))
       setfield(p, 'xoffset', getfield(p, 'xoffset') - fshift.left)
-      setfield(p, 'yoffset', getfield(p, 'yoffset') - (has_attr(p, attr_ykblshift) or 0) - fshift.down)
+      setfield(p, 'yoffset', getfield(p, 'yoffset') 
+		  - (has_attr(p, attr_ykblshift) or 0) - fshift.down)
       return node_next(p)
    end
 end
 luatexja.setwidth.capsule_glyph = capsule_glyph
 
-function luatexja.setwidth.set_ja_width(ahead, dir)
-   local p = ahead; ltjw.head  = p
+local function capsule_glyph_math(p, met, class)
+   local char_data = met.char_type[class]
+   if not char_data then return nil end
+   local fwidth, pwidth = char_data.width, getfield(p, 'width')
+   fwidth = (fwidth ~= 'prop') and fwidth or pwidth
+   fshift.down = char_data.down; fshift.left = char_data.left
+   fshift = call_callback("luatexja.set_width", fshift, met, class)
+   local fheight, fdepth = char_data.height, char_data.depth
+   local y_shift, ca
+      = - getfield(p, 'yoffset') + (has_attr(p,attr_ykblshift) or 0), char_data.align
+   setfield(p, 'yoffset', -fshift.down)
+   if ca~='left'  then
+      setfield(p, 'xoffset', getfield(p, 'xoffset') - fshift.left
+		  + (((ca=='right') and fwidth - pwidth) or round((fwidth - pwidth)*0.5)))
+   else
+      setfield(p, 'xoffset', getfield(p, 'xoffset') - fshift.left)
+   end
+   local box = node_new(id_hlist); 
+   setfield(box, 'width', fwidth)
+   setfield(box, 'height', fheight)
+   setfield(box, 'depth', fdepth)
+   setfield(box, 'head', p)
+   setfield(box, 'shift', y_shift)
+   setfield(box, 'dir', tex.mathdir)
+   set_attr(box, attr_icflag, PACKED + get_pr_begin_flag(p))
+   return box
+end
+luatexja.setwidth.capsule_glyph_math = capsule_glyph_math
+
+function luatexja.setwidth.set_ja_width(ahead, adir)
+   local p = ahead; head  = p; dir = adir or 'TLT'
    local m = false -- is in math mode?
    while p do
       local pid = getid(p)
@@ -116,7 +145,7 @@ function luatexja.setwidth.set_ja_width(ahead, dir)
       and ((has_attr(p, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG)<=0 then
          local pf = getfont(p)
 	 if pf == has_attr(p, attr_curjfnt) then
-	    p = capsule_glyph(p, dir, false, ltjf_font_metric_table[pf], 
+	    p = capsule_glyph(p, ltjf_font_metric_table[pf], 
 			      has_attr(p, attr_jchar_class))
 	 else
 	    set_attr(p, attr_icflag, PROCESSED + get_pr_begin_flag(p))
@@ -147,6 +176,6 @@ function luatexja.setwidth.set_ja_width(ahead, dir)
    end
    -- adjust attr_icflag
    tex.setattribute('global', attr_icflag, 0)
-   return ltjw.head
+   return head
 end
 

@@ -523,7 +523,7 @@ local function handle_penalty_normal(post, pre, g)
    local a = (pre or 0) + (post or 0)
    if #Bp == 0 then
       if (a~=0 and not(g and getid(g)==id_kern)) then
-	 local p = node_new(id_penalty); --copy_attr(p, Nq.nuc)
+	 local p = node_new(id_penalty)
 	 if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
 	 setfield(p, 'penalty', a)
 	 head = insert_before(head, Np.first, p)
@@ -538,7 +538,7 @@ local function handle_penalty_always(post, pre, g)
    local a = (pre or 0) + (post or 0)
    if #Bp == 0 then
       if not (g and getid(g)==id_glue) then
-	 local p = node_new(id_penalty); --copy_attr(p, Nq.nuc)
+	 local p = node_new(id_penalty)
 	 if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
 	 setfield(p, 'penalty', a)
 	 head = insert_before(head, Np.first, p)
@@ -553,7 +553,7 @@ local function handle_penalty_suppress(post, pre, g)
    local a = (pre or 0) + (post or 0)
    if #Bp == 0 then
       if g and getid(g)==id_glue then
-	 local p = node_new(id_penalty); --copy_attr(p, Nq.nuc)
+	 local p = node_new(id_penalty)
 	 setfield(p, 'penalty', 10000); head = insert_before(head, Np.first, p)
 	 Bp[1]=p
          set_attr(p, attr_icflag, KINSOKU)
@@ -568,8 +568,13 @@ local function new_jfm_glue(m, bc, ac)
    local g, d = m.char_type[bc][ac], 0
    local n
    if g then
-      n,d = node_copy(g[2]), g[3]; 
-      if g[1] then setfield(n, 'spec', node_copy(getfield(n, 'spec'))) end
+      n,d = node_copy(g[2]), g[3]
+      if g[1] then 
+	 local f = node_new(id_glue)
+	 set_attr(f, attr_icflag, g[4])
+	 setfield(f, 'spec', n)
+	 return f, d
+      end
    end
    return n, d
 end
@@ -643,7 +648,7 @@ do
 	    gb = node_new(id_kern); setfield(gb, 'kern', 0) 
 	 else return nil end
       elseif not ga then 
-	 ga = node_new(id_kern); gsetfield(ga, 'kern', 0)
+	 ga = node_new(id_kern); setfield(ga, 'kern', 0)
       end
       
       local k = 2*getid(gb) - getid(ga)
@@ -1038,6 +1043,7 @@ do
          local x, y = node_prev(Nq.nuc), Nq.nuc
          Nq.first, Nq.nuc, Nq.last = x, x, x
          head = node_remove(head, y)
+	 node_free(y)
       end
       return s
    end

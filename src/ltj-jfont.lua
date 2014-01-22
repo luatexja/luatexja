@@ -11,6 +11,8 @@ module('luatexja.jfont', package.seeall)
 luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('charrange'); local ltjc = luatexja.charrange
 
+local mem_leak_glue, mem_leak_gs, mem_leak_kern = 0, 0, 0
+
 local Dnode = node.direct or node
 
 local setfield = (Dnode ~= node) and Dnode.setfield or function(n, i, c) n[i] = c end
@@ -131,6 +133,7 @@ function define_jfm(t)
    defjfm_res = t
 end
 
+local update_jfm_cache
 do
    local function mult_table(old,scale) -- modified from table.fastcopy
       if old then
@@ -148,7 +151,7 @@ do
       else return nil end
    end
    
-   function update_jfm_cache(j,sz)
+   update_jfm_cache = function (j,sz)
       if metrics[j].size_cache[sz] then return end
       local t = {}
       metrics[j].size_cache[sz] = t
@@ -157,19 +160,18 @@ do
       for i,v in pairs(t.char_type) do
 	 if type(i) == 'number' then -- char_type
 	    for k,w in pairs(v.glue) do
-	       local g, h = node_new(id_glue), node_new(id_glue_spec)
-	       v[k] = {true, g, (w[5] and w[5]/sz or 0)}
+	       local h = node_new(id_glue_spec)
+mem_leak_gs = mem_leak_gs+1
+	       v[k] = {true, h, (w[5] and w[5]/sz or 0), FROM_JFM + (w[4] and w[4]/sz or 0)}
 	       setfield(h, 'width', w[1])
 	       setfield(h, 'stretch', w[2])
 	       setfield(h, 'shrink', w[3])
 	       setfield(h, 'stretch_order', 0)
 	       setfield(h, 'shrink_order', 0)
-	       setfield(g, 'subtype', 0)
-	       setfield(g, 'spec', h)
-	       set_attr(g, attr_icflag, FROM_JFM + (w[4] and w[4]/sz or 0)); 
 	    end
 	    for k,w in pairs(v.kern) do
 	       local g = node_new(id_kern)
+mem_leak_kern = mem_leak_kern +1
 	       setfield(g, 'kern', w[1])
 	       setfield(g, 'subtype', 1)
 	       set_attr(g, attr_icflag, FROM_JFM)
@@ -183,7 +185,7 @@ do
       t.zh = round(metrics[j].zh*sz)
    end
 end
-local update_jfm_cache = update_jfm_cache
+
 luatexbase.create_callback("luatexja.find_char_class", "data", 
 			   function (arg, fmtable, char)
 			      return 0
@@ -250,6 +252,7 @@ do
 	 return 
       end
       update_jfm_cache(j, f.size)
+      --print('MEMORY LEAK (acc): ', mem_leak_glue, mem_leak_gs, mem_leak_kern)
       local sz = metrics[j].size_cache[f.size]
       local fmtable = { jfm = j, size = f.size, var = jfm_var, 
 			zw = sz.zw, zh = sz.zh, 

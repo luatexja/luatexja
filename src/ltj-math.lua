@@ -97,7 +97,7 @@ end
 local MJT  = luatexja.stack_table_index.MJT
 local MJS  = luatexja.stack_table_index.MJS
 local MJSS = luatexja.stack_table_index.MJSS
-local capsule_glyph = ltjw.capsule_glyph
+local capsule_glyph_math = ltjw.capsule_glyph_math
 local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
 
 conv_jchar_to_hbox_A = 
@@ -121,11 +121,10 @@ function (p, sty)
                local k = has_attr(r,attr_ykblshift) or 0 
                set_attr(r, attr_ykblshift, 0)
                -- ltj-setwidth 内で実際の位置補正はおこなうので，補正量を退避
-               ltjw.head = r; 
                local met = ltjf_font_metric_table[f]
-               capsule_glyph(r, tex.mathdir , true, met, ltjf_find_char_class(pc, met));
-               setfield(q, 'head', ltjw.head); node_free(p); p=q;
-               set_attr(getlist(q), attr_yablshift, k)
+               r = capsule_glyph_math(r, met, ltjf_find_char_class(pc, met));
+               setfield(q, 'head', r); node_free(p); p=q;
+               set_attr(r, attr_yablshift, k)
             end
          end
       elseif pid == id_sub_box and getlist(p) then
