@@ -86,19 +86,17 @@ local function get_stretched(q, go, gs)
    end
 end
 
+local res = {}
+
 -- local new_ks, new_xs
 local function get_total_stretched(p)
    local go, gf, gs 
       = getfield(p, 'glue_order'), getfield(p, 'glue_set'), getfield(p, 'glue_sign')
-   local res = {
-      [0] = 0,
-      glue_set = gf, name = (gs==1) and 'stretch' or 'shrink'
-   }
-   local old_spec
+   res[0], res.glue_set, res.name = 0, gf, (gs==1) and 'stretch' or 'shrink'
    for i=1,#priority_table do res[priority_table[i]]=0 end
    if go ~= 0 then return nil end
    if gs ~= 1 and gs ~= 2 then return res end
-   for q in node_traverse_id(getlist(p), id_glue) do
+   for q in node_traverse_id(id_glue, getlist(p)) do
       local a, ic = get_stretched(q, go, gs), get_attr_icflag(q)
       if   type(res[ic]) == 'number' then 
 	 -- kanjiskip, xkanjiskip は段落内で spec を共有しているが，
@@ -119,7 +117,6 @@ local function get_total_stretched(p)
 end
 
 local function clear_stretch(p, ic, name)
-   --print('clear ' .. ic)
    for q in node_traverse_id(id_glue, getlist(p)) do
       if get_attr_icflag(q) == ic then
          local qs = getfield(q, 'spec')
@@ -158,7 +155,7 @@ end
 local function aw_step1(p, res, total)
    local head = getlist(p)
    local x = node_tail(head); if not x then return false end
-   x = node_prev(x)     ; if not x then return false end
+   x = node_prev(x); if not x then return false end
    -- 本当の行末の node を格納
    if getid(x) == id_glue and getsubtype(x) == 15 then 
       -- 段落最終行のときは，\penalty10000 \parfillskip が入るので，
@@ -195,22 +192,22 @@ end
 local function aw_step2(p, res, total, added_flag)
    if total == 0 then -- もともと伸縮の必要なし
       if added_flag then -- 行末に kern 追加したので，それによる補正
-	 --local f = node_hpack(getlist(p), getfield(p, 'width'), 'exactly')
-	 --setfield(f, 'head', nil)
-	 setfield(p, 'glue_set', 0)
-	 setfield(p, 'glue_order', 0)
-	 setfield(p, 'glue_sign', 0)
-	 --node_free(f)
+	 local f = node_hpack(getlist(p), getfield(p, 'width'), 'exactly')
+	 setfield(f, 'head', nil)
+	 setfield(p, 'glue_set', getfield(f, 'glue_set'))
+	 setfield(p, 'glue_order', getfield(f, 'glue_order'))
+	 setfield(p, 'glue_sign', getfield(f, 'glue_sign'))
+	 node_free(f)
 	 return
       end
    elseif total <= res[0] then -- 和文処理グルー以外で足りる
       for _,v in pairs(priority_table) do clear_stretch(p, v, res.name) end
-      --local f = node_hpack(getlist(p), getfield(p, 'width'), 'exactly')
-      -- setfield(f, 'head', nil)
-      setfield(p, 'glue_set', total/res[0])
-      setfield(p, 'glue_order', 0)
-      setfield(p, 'glue_sign', res.name)
-      --node_free(f)
+      local f = node_hpack(getlist(p), getfield(p, 'width'), 'exactly')
+      setfield(f, 'head', nil)
+	 setfield(p, 'glue_set', getfield(f, 'glue_set'))
+	 setfield(p, 'glue_order', getfield(f, 'glue_order'))
+	 setfield(p, 'glue_sign', getfield(f, 'glue_sign'))
+      node_free(f)
    else
       local orig_total, avail = total, res[0]
       total, i = total - res[0], 1
@@ -227,12 +224,12 @@ local function aw_step2(p, res, total, added_flag)
          total, i, avail = total - res[v], i+1, avail + res[v]
       end
       if i == #priority_table + 10 or added_flag then
-	 --local f = node_hpack(getlist(p), getfield(p, 'width'), 'exactly')
-	 --setfield(f, 'head', nil)
-	 setfield(p, 'glue_set', total / avail)
-	 setfield(p, 'glue_order', 0)
-	 setfield(p, 'glue_sign', res.name)
-	 --node_free(f)
+	 local f = node_hpack(getlist(p), getfield(p, 'width'), 'exactly')
+	 setfield(f, 'head', nil)
+	 setfield(p, 'glue_set', getfield(f, 'glue_set'))
+	 setfield(p, 'glue_order', getfield(f, 'glue_order'))
+	 setfield(p, 'glue_sign', getfield(f, 'glue_sign'))
+	 node_free(f)
       end
    end
 end
@@ -242,7 +239,6 @@ function adjust_width(head)
    if not head then return head end
    for p in node_traverse_id(id_hlist, to_direct(head)) do
       local res = get_total_stretched(p)
-      --print(table.serialize(res))
       if res then
          -- 調整量の合計
          local total = 0
