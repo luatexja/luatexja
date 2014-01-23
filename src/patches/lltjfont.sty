@@ -3,7 +3,7 @@
 % 
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2013/05/14 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2014/01/23 Patch to NFSS2 for LuaTeX-ja]
 
 \let\k@encoding\@empty
 \let\ck@encoding\@empty
@@ -27,15 +27,7 @@
 \ifdefined\chs\else\newdimen\chs\fi
 \ifdefined\cHT\else\newdimen\cHT\fi
 %\let\afont\font
-\def\inlist@#1#2{%
-  \def\in@@##1<#1>##2##3\in@@{%
-    \ifx\in@##2\in@false\else\in@true\fi}%
-  \in@@#2<#1>\in@\in@@}
-\def\fam@elt{\noexpand\fam@elt}
-\def\enc@elt{\noexpand\enc@elt}
-\let\kenc@list\@empty
-\let\kyenc@list\@empty
-\let\ktenc@list\@empty
+
 \newbox\tstrutbox
 \newbox\zstrutbox
 \def\strut{\relax
@@ -87,16 +79,13 @@
   \expandafter\endgroup
   \DeclareYokoKanjiEncoding@}
 \def\DeclareYokoKanjiEncoding@#1#2#3{%
-  \expandafter
-  \ifx\csname T@#1\endcsname\relax
+  \expandafter\ifx\csname T@#1\endcsname\relax
     \def\cdp@elt{\noexpand\cdp@elt}%
     \xdef\cdp@list{\cdp@list\cdp@elt{#1}%
                     {\default@k@family}{\default@k@series}%
                     {\default@k@shape}}%
     \expandafter\let\csname#1-cmd\endcsname\@changed@kcmd
-    \def\enc@elt{\noexpand\enc@elt}%
-    \xdef\kyenc@list{\kyenc@list\enc@elt<#1>}%
-    \xdef\kenc@list{\kenc@list\enc@elt<#1>}%
+     \directlua{luatexja.jfont.add_kyenc_list('\luatexluaescapestring{#1}')}%
   \else
     \@font@info{Redeclaring KANJI (yoko) font encoding #1}%
   \fi
@@ -109,16 +98,13 @@
   \expandafter\endgroup
   \DeclareTateKanjiEncoding@}
 \def\DeclareTateKanjiEncoding@#1#2#3{%
-  \expandafter
-  \ifx\csname T@#1\endcsname\relax
+  \expandafter\ifx\csname T@#1\endcsname\relax
     \def\cdp@elt{\noexpand\cdp@elt}%
     \xdef\cdp@list{\cdp@list\cdp@elt{#1}%
                     {\default@k@family}{\default@k@series}%
                     {\default@k@shape}}%
     \expandafter\let\csname#1-cmd\endcsname\@changed@kcmd
-    \def\enc@elt{\noexpand\enc@elt}%
-    \xdef\ktenc@list{\ktenc@list\enc@elt<#1>}%
-    \xdef\kenc@list{\kenc@list\enc@elt<#1>}%
+    \directlua{luatexja.jfont.add_ktenc_list('\luatexluaescapestring{#1}')}%
   \else
     \@font@info{Redeclaring KANJI (tate) font encoding #1}%
   \fi
@@ -211,16 +197,11 @@
       \math@fontsfalse
       \every@math@size{}%
       \fontsize{#6}\z@
-      \edef\tmp@item{{#2}}%
-      \expandafter\expandafter\expandafter
-      \inlist@\expandafter\tmp@item\expandafter{\kyenc@list}%
-      \ifin@
+      \directlua{luatexja.jfont.is_kyenc('\luatexluaescapestring{#2}')}\ifin@%
         \usekanji{#2}{#3}{#4}{#5}%
         \global\let#1\getjfont
       \else
-        %\expandafter\expandafter\expandafter
-        %\inlist@\expandafter\tmp@item\expandafter{\ktenc@list}%
-        %\ifin@
+        %\directlua{luatexja.jfont.is_ktenc('\luatexluaescapestring{#2}')}\ifin@%
         %  \usekanji{#2}{#3}{#4}{#5}%
         %  \let\font\tfont
         %\else
@@ -278,32 +259,22 @@
 \DeclareRobustCommand\selectfont{%
   \let\tmp@error@fontshape\error@fontshape
   \let\error@fontshape\error@kfontshape
-  \edef\tmp@item{{\k@encoding}}%
-  \expandafter\expandafter\expandafter
-  \inlist@\expandafter\tmp@item\expandafter{\kyenc@list}%
-  \ifin@
+  \directlua{luatexja.jfont.is_kyenc('\luatexluaescapestring{\k@encoding}')}\ifin@%
     \let\cy@encoding\k@encoding
     \edef\ct@encoding{\csname t@enc@\k@encoding\endcsname}%
   \else
-    \expandafter\expandafter\expandafter
-    \inlist@\expandafter\tmp@item\expandafter{\ktenc@list}%
-    \ifin@
-      \let\ct@encoding\k@encoding
-      \edef\cy@encoding{\csname y@enc@\k@encoding\endcsname}%
-    \else
+    %\directlua{luatexja.jfont.is_ktenc('\luatexluaescapestring{\k@encoding}')}\ifin@%
+    %  \let\ct@encoding\k@encoding
+    %  \edef\cy@encoding{\csname y@enc@\k@encoding\endcsname}%
+    %\else
       \@latex@error{KANJI Encoding scheme `\k@encoding' unknown}\@eha
-    \fi
+    %\fi
   \fi
-  %\let\font\tfont
-  %\let\k@encoding\ct@encoding
-  %\xdef\font@name{\csname\curr@kfontshape/\f@size\endcsname}%
-  %\pickup@font
-  %\font@name
   \let\k@encoding\cy@encoding
   \xdef\font@name{\csname\curr@kfontshape/\f@size\endcsname}%
   \pickup@jfont
   \font@name
-  \expandafter\def\expandafter\k@encoding\tmp@item
+  \edef\tmp@item{{\k@encoding}}\expandafter\def\expandafter\k@encoding\tmp@item
   \kenc@update
   \let\error@fontshape\tmp@error@fontshape
   \if@knjcmd \@knjcmdfalse
@@ -318,7 +289,6 @@
        \csname rel@\k@encoding/\k@family/\k@series/\k@shape\endcsname
     \fi
   \fi
-  %\let\font\afont
   \xdef\font@name{\csname\curr@fontshape/\f@size\endcsname}%
   \pickup@font
   \font@name
@@ -326,7 +296,15 @@
   \ifx\f@linespread\baselinestretch \else
     \set@fontsize\baselinestretch\f@size\f@baselineskip
   \fi
-  \size@update}
+  \size@update
+% ここからは altfont 用
+  \ltj@@does@alt@set{\curr@kfontshape}%
+    % alt fonts の定義
+    \directlua{luatexja.jfont.output_alt_font_cmd('\luatexluaescapestring{\curr@kfontshape}')}%
+    % 定義した alt fonts のデータを \ltjdeclarealtfont に渡すのと同等の処理をする
+    \directlua{luatexja.jfont.pickup_alt_font_a('\f@size')}%
+  \fi
+}
 \def\KanjiEncodingPair#1#2{\@namedef{t@enc@#1}{#2}\@namedef{y@enc@#2}{#1}}
 \KanjiEncodingPair{JY3}{JT3}
 \def\set@fontsize#1#2#3{%
@@ -397,27 +375,23 @@
     \fi
 }
 \DeclareRobustCommand\fontencoding[1]{%
-  \edef\tmp@item{{#1}}%
-  \expandafter\expandafter\expandafter
-  \inlist@\expandafter\tmp@item\expandafter{\kenc@list}%
-  \ifin@ \kanjiencoding{#1}\else\romanencoding{#1}\fi}
+  \directlua{luatexja.jfont.is_kyenc('\luatexluaescapestring{#1}')}\ifin@%
+  \kanjiencoding{#1}\else\romanencoding{#1}\fi}
 \def\@@kenc@update{%
   \default@KT
   \csname T@\k@encoding\endcsname
   \csname D@\k@encoding\endcsname
   \let\kenc@update\relax
   \let\ck@encoding\k@encoding
-  \edef\tmp@item{{\k@encoding}}%
-  \expandafter\expandafter\expandafter
-  \inlist@\expandafter\tmp@item\expandafter{\kyenc@list}%
-  \ifin@ \let\cy@encoding\k@encoding
+  \edef\tmp@enc{'\luatexluaescapestring{\k@encoding}'}
+  \directlua{luatexja.jfont.is_kyenc(\tmp@enc)}\ifin@%
+    \let\cy@encoding\k@encoding
   \else
-    \expandafter\expandafter\expandafter
-    \inlist@\expandafter\tmp@item\expandafter{\ktenc@list}%
-    \ifin@ \let\ct@encoding\k@encoding
-    \else
+    %\directlua{luatexja.jfont.is_ktenc(\tmp@enc)}\ifin@%
+    %  \let\ct@encoding\k@encoding
+    %\else
       \@latex@error{KANJI Encoding scheme `\k@encoding' unknown}\@eha
-    \fi
+    %\fi
   \fi
 }
 \let\kenc@update\relax
@@ -444,58 +418,47 @@
 \newif\if@tempswz
 \DeclareRobustCommand\romanfamily[1]{\edef\f@family{#1}}
 \DeclareRobustCommand\kanjifamily[1]{\edef\k@family{#1}}
-% \notkfam@list@<enc>: list of non-defined kanji families under <enc>
-% \kfam@list@<enc>:    list of kanji families under <enc>, defined in a .fd file
 \DeclareRobustCommand\fontfamily[1]{%
-  \@notkfamfalse\@notffamfalse\edef\tmp@item{{#1}}%
+  \@notkfamfalse\@notffamfalse
+  \edef\tmp@item{'\luatexluaescapestring{#1}'}%
+  \edef\tmp@enc{'\luatexluaescapestring{\k@encoding}'}%
   \ifcsname \k@encoding+#1\endcsname % if \k@encoding+#1 is already defined
     \edef\k@family{#1}%
   \else % search font definition file...
-     \ifcsname kfam@list@\k@encoding\endcsname\else
-       \expandafter\gdef\csname kfam@list@\k@encoding\endcsname{}%
-       \expandafter\gdef\csname notkfam@list@\k@encoding\endcsname{}%
-     \fi
-     \edef\@templist{\@nameuse{kfam@list@\k@encoding}}%
-     \expandafter\expandafter\expandafter\inlist@\expandafter\tmp@item\expandafter{\@templist}%
+     \directlua{luatexja.jfont.is_kfam(\tmp@enc, \tmp@item)}%
      \ifin@\edef\k@family{#1}\else%
-       \edef\@templist{\@nameuse{notkfam@list@\k@encoding}}%
-       \expandafter\expandafter\expandafter\inlist@\expandafter\tmp@item\expandafter{\@templist}%
+       \directlua{luatexja.jfont.is_Nkfam(\tmp@enc, \tmp@item)}%
        \ifin@\@notkfamtrue\else%
          \def\@temp##1+{\lowercase{\def\@@temp{##1#1.fd}}}\expandafter\@temp\k@encoding+%
          \message{(I search kanjifont definition file: \@@temp)}%
          \IfFileExists{\@@temp#1.fd}{\@tempswztrue}{\@tempswzfalse}%
          \if@tempswz
-           \expandafter\xdef\csname kfam@list@\k@encoding\endcsname
-             {\@nameuse{kfam@list@\k@encoding}\fam@elt<#1>}\edef\k@family{#1}%
+           \directlua{luatexja.jfont.add_kfam_list(\tmp@enc, \tmp@item)}%
+	   \edef\k@family{#1}%
          \else
-           \expandafter\xdef\csname notkfam@list@\k@encoding\endcsname
-             {\@nameuse{notkfam@list@\k@encoding}\fam@elt<#1>}\@notkfamtrue%
+           \directlua{luatexja.jfont.add_Nkfam_list(\tmp@enc, \tmp@item)}%
+	   \@notkfamtrue%
          \fi
        \fi
      \fi
   \fi
+  \edef\tmp@enc{'\luatexluaescapestring{\f@encoding}'}%
   \ifcsname \f@encoding+#1\endcsname
     \edef\f@family{#1}%
   \else % search font definition file...
-     \ifcsname ffam@list@\f@encoding\endcsname\else
-       \expandafter\gdef\csname ffam@list@\f@encoding\endcsname{}%
-       \expandafter\gdef\csname notffam@list@\f@encoding\endcsname{}%
-     \fi
-     \edef\@templist{\@nameuse{ffam@list@\f@encoding}}%
-     \expandafter\expandafter\expandafter\inlist@\expandafter\tmp@item\expandafter{\@templist}%
+     \directlua{luatexja.jfont.is_ffam(\tmp@enc, \tmp@item)}%
      \ifin@\edef\f@family{#1}\else
-       \edef\@templist{\@nameuse{notffam@list@\f@encoding}}%
-       \expandafter\expandafter\expandafter\inlist@\expandafter\tmp@item\expandafter{\@templist}%
+       \directlua{luatexja.jfont.is_Nffam(\tmp@enc, \tmp@item)}%
        \ifin@\@notffamtrue\else
          \def\@temp##1+{\lowercase{\def\@@temp{##1#1.fd}}}\expandafter\@temp\f@encoding+%
          \message{(I search font definition file: \@@temp)}%
          \IfFileExists{\@@temp#1.fd}{\@tempswztrue}{\@tempswzfalse}%
          \if@tempswz
-           \expandafter\xdef\csname ffam@list@\f@encoding\endcsname
-             {\@nameuse{ffam@list@\f@encoding}\fam@elt<#1>}\edef\f@family{#1}%
+           \directlua{luatexja.jfont.add_ffam_list(\tmp@enc, \tmp@item)}%
+	   \edef\f@family{#1}%
          \else
-           \expandafter\xdef\csname notffam@list@\f@encoding\endcsname
-             {\@nameuse{notffam@list@\f@encoding}\fam@elt<#1>}\@notffamtrue%
+           \directlua{luatexja.jfont.add_Nffam_list(\tmp@enc, \tmp@item)}%
+           \@notffamtrue%
          \fi
        \fi
      \fi
@@ -520,10 +483,8 @@
     \romanencoding{#1}\romanfamily{#2}\romanseries{#3}\romanshape{#4}%
     \selectfont\ignorespaces}
 \protected\def\usefont#1#2#3#4{%
-  \edef\tmp@item{{#1}}%
-  \expandafter\expandafter\expandafter
-  \inlist@\expandafter\tmp@item\expandafter{\kenc@list}%
-  \ifin@ \usekanji{#1}{#2}{#3}{#4}%
+  \directlua{luatexja.jfont.is_kenc('\luatexluaescapestring{#1}')}\ifin@%
+  \usekanji{#1}{#2}{#3}{#4}%
   \else\useroman{#1}{#2}{#3}{#4}%
   \fi}
 \DeclareRobustCommand\normalfont{%
@@ -565,12 +526,8 @@
 
 % #1 の展開結果から encoding 部分をとりだし，それが和文用かどうかの結果を \ifin@ に代入
 \def\ltj@@IsFontJapanese#1{%
-  \expandafter\ltj@@IsFontJapaneseX#1//:%
-  \expandafter\expandafter\expandafter
-  \inlist@\expandafter\tmp@item\expandafter{\kenc@list}}
-\def\ltj@@IsFontJapaneseX#1/#2/:{\edef\tmp@item{{\directlua{%
-  tex.print(luatexbase.catcodetables["latex-package"], '#1')}%
-}}}
+  \directlua{luatexja.jfont.is_kenc(string.match(
+      '\luatexluaescapestring{#1}', '[^/]+'))}}
 
 
 \let\extract@afont\extract@font
@@ -585,12 +542,13 @@
 % 異なる和文 enc/fam/ser/shape からは異なるフォント番号が振られるように
 % わざと「ゴミをつける」
 \def\ltj@@patch@external@font#1 at{%
-  #1;\directlua{luatexja.jfont.print_aftl_address(%
-    '\luatexluaescapestring{\f@encoding/\f@family/\f@series/\f@shape}')}\space at%
+  #1\directlua{luatexja.jfont.print_aftl_address()}\space at%
 }
 \def\extract@jfont{%
    \get@external@font
-    \edef\external@font{\expandafter\ltj@@patch@external@font\external@font}%
+    \ltj@@does@alt@set{\f@encoding/\f@family/\f@series/\f@shape}%
+      \edef\external@font{\expandafter\ltj@@patch@external@font\external@font}%
+    \fi
     \expandafter\globaljfont\font@name\external@font\relax
     \font@name%\global\zw=\zw\global\zh=\zh
     \csname \f@encoding+\f@family\endcsname
@@ -605,7 +563,7 @@
     \aftergroup\subst@correction
 }
 \def\do@subst@correction{%
-   \ltj@@IsFontJapanese{\curr@fontshape}\ifin@
+   \ltj@@IsFontJapanese{\curr@fontshape}\ifin@%
      \ltj@@ja@do@subst@correction
    \else
      \ltj@@al@do@subst@correction
@@ -675,18 +633,8 @@
 %%%% \ClearAlternateKanjiFont<Benc><Bfam><Bser><Bshape>
 % いつも global
 \def\ClearAlternateKanjiFont#1#2#3#4{%
-   \directlua{luatexja.jfont.clear_alt_font_latex(
-      '\luatexluaescapestring{#1/#2/#3/#4}')}}
+   \directlua{luatexja.jfont.clear_alt_font_latex('\luatexluaescapestring{#1/#2/#3/#4}')}}
 
-% \selectfont 上書き
-\let\ltj@@alt@selectfont@orig=\selectfont
-\def\selectfont{%
-  \ltj@@alt@selectfont@orig
-  % alt fonts の定義
-  \directlua{luatexja.jfont.output_alt_font_cmd('\luatexluaescapestring{\curr@kfontshape}')}%
-  % 定義した alt fonts のデータを \ltjdeclarealtfont に渡すのと同等の処理をする
-  \directlua{luatexja.jfont.pickup_alt_font_a('\f@size')}%
-}
 \def\ltj@pickup@altfont@aux#1{%
   {\edef\font@name{\csname #1/\f@size\endcsname}\pickup@jfont}%
 }
@@ -694,5 +642,8 @@
   \ltj@@getjfontnumber#1%
   \directlua{luatexja.jfont.pickup_alt_font_b(\the\ltj@tempcntc,'\luatexluaescapestring{#2}')}%
 }
+
+\def\ltj@@does@alt@set#1{%
+  \directlua{luatexja.jfont.does_alt_set'\luatexluaescapestring{#1}'}}
 
 \endinput
