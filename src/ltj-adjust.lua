@@ -10,6 +10,7 @@ module('luatexja.adjust', package.seeall)
 
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 luatexja.load_module('jfmglue');   local ltjj = luatexja.jfmglue
+luatexja.load_module('stack');     local ltjs = luatexja.stack
 
 local Dnode = node.direct or node
 
@@ -87,8 +88,7 @@ local function get_stretched(q, go, gs)
 end
 
 local res = {}
-
--- local new_ks, new_xs
+local is_skip_normal = {}
 local function get_total_stretched(p)
    local go, gf, gs 
       = getfield(p, 'glue_order'), getfield(p, 'glue_set'), getfield(p, 'glue_sign')
@@ -101,11 +101,12 @@ local function get_total_stretched(p)
       if   type(res[ic]) == 'number' then 
 	 -- kanjiskip, xkanjiskip は段落内で spec を共有しているが，
 	 -- それはここでは望ましくないので，各 glue ごとに異なる spec を使う．
+	 -- （この仮定でメモリリークを起こしている！）
 	 -- JFM グルーはそれぞれ異なる glue_spec を用いているので，問題ない．
 	 res[ic] = res[ic] + a
-	 if ic == KANJI_SKIP or ic == XKANJI_SKIP  then
+	 if (ic == KANJI_SKIP or ic == XKANJI_SKIP) and getsubtype(q)==0 then
 	    local qs = getfield(q, 'spec')
-	    if qs ~= spec_zero_glue then
+	    if is_skip_normal[ic] and qs ~= spec_zero_glue then
 	       setfield(q, 'spec', node_copy(qs))
 	    end
 	 end
@@ -237,6 +238,8 @@ end
 
 function adjust_width(head) 
    if not head then return head end
+   is_skip_normal[KANJI_SKIP] = (ltjs.fast_get_skip_table('kanjiskip').width ~= 1073741823)
+   is_skip_normal[XKANJI_SKIP] = (ltjs.fast_get_skip_table('xkanjiskip').width ~= 1073741823)
    for p in node_traverse_id(id_hlist, to_direct(head)) do
       local res = get_total_stretched(p)
       if res then

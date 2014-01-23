@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2014/01/13 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2014/01/24 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -101,10 +101,10 @@
     {Package loading is aborted now.\MessageBreak}
 \expandafter\endinput\fi\relax
 
- \@PackageInfo{luatexja-core}
-    {This LuaTeX-ja uses\space%
+ \@PackageInfoNoLine{luatexja-core}
+    {using\space%
   \directlua{if node.direct==node then tex.write('traditional node')
-  else tex:write('DIRECT') end} access model for accessing nodes.}
+  else tex.write('DIRECT') end} node access model}
 
 %! なお、luatexbase-compat の説明に従うと、LuaTeX 拡張プリミティブは
 %! plain/LaTeX の両方で \luatex 付の名前（\directlua はそのまま)

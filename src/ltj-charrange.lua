@@ -15,15 +15,20 @@ local Dnode = node.direct or node
 local getchar = (Dnode ~= node) and Dnode.getchar or function(n) return n.char end
 local has_attr = Dnode.has_attribute
 local has_attr_node = node.has_attribute
+local tex_getattr = tex.getattribute
 
 ATTR_RANGE = 7
 local floor = math.floor
 local pow = math.pow
 local kcat_attr_table = {}
 local pow_table = {}
+local fn_table = {} -- used in is_ucs_in_japanese_char_direct
 for i = 0, 31*ATTR_RANGE-1 do
    kcat_attr_table[i] = luatexbase.attributes['ltj@kcat'..floor(i/31)]
    pow_table[i] =  pow(2, i%31)
+   fn_table[i] = function(p)
+      return floor(has_attr(p, kcat_attr_table[i])/pow_table[i])%2 ~= jcr_noncjk
+   end
 end
 pow_table[31*ATTR_RANGE] = pow(2, 31)
 
@@ -71,11 +76,10 @@ function char_to_range(c) -- return the external range number
 end
 
 function get_range_setting(i) -- i: internal range number
-   return floor(tex.getattribute(kcat_attr_table[i])/pow_table[i])%2
+   return floor(tex_getattr(kcat_attr_table[i])/pow_table[i])%2
 end
 
 --  glyph_node p は和文文字か？
-
 function is_ucs_in_japanese_char_node(p)
    local c = p.char
    if c<0x80 then
@@ -93,10 +97,13 @@ function is_ucs_in_japanese_char_direct(p)
    if c<0x80 then
       return false
    else
-      local i=jcr_table_main[c]
-      return (floor(
-		 has_attr(p, kcat_attr_table[i])/pow_table[i])%2 ~= jcr_noncjk)
+      return fn_table[jcr_table_main[c]]
    end
+end
+
+function is_japanese_char_curlist(c) -- assume that c>=0x80
+   local i=jcr_table_main[c]
+   return get_range_setting(i)~= jcr_noncjk
 end
 
 -- EXT
@@ -111,7 +118,7 @@ function toggle_char_range(g, i) -- i: external range number
       if i>0 then kc=0 else kc=1; i=-i end
       if i>=7*ATTR_RANGE then i=0 end
       local attr = kcat_attr_table[i]
-      local a = tex.getattribute(attr)
+      local a = tex_getattr(attr)
       tex.setattribute(g,attr,(floor(a/pow_table[i+1])*2+kc)*pow_table[i]+a%pow_table[i])
    end
 end

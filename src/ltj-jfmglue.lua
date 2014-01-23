@@ -316,7 +316,7 @@ local calc_np_auxtable = {
    [id_whatsit] = function(lp) 
       local lps = getsubtype(lp)
       if lps==sid_user then
-	 if getsubtype(lp, 'user_id')==luatexja.userid_table.IHB then
+	 if getfield(lp, 'user_id')==luatexja.userid_table.IHB then
 	    local lq = node_next(lp); 
 	    head = node_remove(head, lp); node_free(lp); ihb_flag = true
 	    return false, lq;

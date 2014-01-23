@@ -11,7 +11,7 @@ local node_new = node.new
 local node_free = node.free
 local id_glyph = node.id('glyph')
 local getcatcode = tex.getcatcode
-local ltjc_is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char
+local ltjc_is_japanese_char_curlist = ltjc.is_japanese_char_curlist
 local FFFFF = string.char(0xF3,0xBF,0xBF,0xBF)
 
 --- the following function is modified from jafontspec.lua (by K. Maeda).
@@ -31,12 +31,9 @@ local function add_comment(buffer)
 	 -- Is the catcode of endline character is 5 (end-of-line)?
 	 -- Is the catcode of U+FFFFF (new comment char) is 14 (comment)?
 	 if ((ct==11) or (ct==12)) and ctl then
-	    local p = node_new(id_glyph)
-	    p.char = c
-	    if ltjc_is_ucs_in_japanese_char(p) then
+	    if ltjc_is_japanese_char_curlist(c) then
 	       buffer = buffer .. FFFFF -- U+FFFFF
 	    end
-	    node_free(p)
 	 end
       end
    end
