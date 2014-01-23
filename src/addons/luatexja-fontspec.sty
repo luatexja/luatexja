@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec}[2013/08/17 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec}[2014/01/23 fontspec support of LuaTeX-ja]
 
 \RequirePackage{fontspec,luatexja}
 \ExplSyntaxOn
@@ -174,38 +174,31 @@
 %%%%%%%% Now we completely ignore kanjifont definition file.
 
 \DeclareRobustCommand\fontfamily[1]{%
-  \@notkfamfalse\@notffamfalse\edef\tmp@item{{#1}}%
+  \@notkfamfalse\@notffamfalse
+  \edef\tmp@item{'\luatexluaescapestring{#1}'}%
+  \edef\tmp@enc{'\luatexluaescapestring{\f@encoding}'}%
   \ifcsname \k@encoding+#1\endcsname % if \k@encoding+#1 is already defined
     \edef\k@family{#1}%
-  \else
-    \def\@temp##1+{\lowercase{\def\@@temp{##1#1.fd}}}\expandafter\@temp\k@encoding+%
-    \@notkfamtrue
-  \fi
+  \else\@notkfamtrue\fi
   \ifcsname \f@encoding+#1\endcsname
     \edef\f@family{#1}%
   \else % search font definition file...
-     \ifcsname ffam@list@\f@encoding\endcsname\else
-       \expandafter\gdef\csname ffam@list@\f@encoding\endcsname{}%
-       \expandafter\gdef\csname notffam@list@\f@encoding\endcsname{}%
-     \fi
-     \edef\@templist{\@nameuse{ffam@list@\f@encoding}}%
-     \expandafter\expandafter\expandafter\inlist@\expandafter\tmp@item\expandafter{\@templist}%
-     \ifin@\edef\f@family{#1}\else
-       \edef\@templist{\@nameuse{notffam@list@\f@encoding}}%
-       \expandafter\expandafter\expandafter\inlist@\expandafter\tmp@item\expandafter{\@templist}%
-       \ifin@\@notffamtrue\else
-         \def\@temp##1+{\lowercase{\def\@@temp{##1#1.fd}}}\expandafter\@temp\f@encoding+%
-         \message{(I search font definition file. \@@temp)}%
-         \IfFileExists{\@@temp}{\@tempswztrue}{\@tempswzfalse}%
-         \if@tempswz
-           \expandafter\xdef\csname ffam@list@\f@encoding\endcsname
-             {\@nameuse{ffam@list@\f@encoding}\fam@elt<#1>}\edef\f@family{#1}%
-         \else
-           \expandafter\xdef\csname notffam@list@\f@encoding\endcsname
-             {\@nameuse{notffam@list@\f@encoding}\fam@elt<#1>}\@notffamtrue%
-         \fi
-       \fi
-     \fi
+    \directlua{luatexja.jfont.is_ffam(\tmp@enc, \tmp@item)}%
+    \ifin@\edef\k@family{#1}\else%
+      \directlua{luatexja.jfont.is_Nffam(\tmp@enc, \tmp@item)}%
+      \ifin@\@notffamtrue\else%
+        \def\@temp##1+{\lowercase{\def\@@temp{##1#1.fd}}}\expandafter\@temp\f@encoding+%
+        \message{(I search kanjifont definition file: \@@temp)}%
+        \IfFileExists{\@@temp#1.fd}{\@tempswztrue}{\@tempswzfalse}%
+        \if@tempswz
+          \directlua{luatexja.jfont.add_ffam_list(\tmp@enc, \tmp@item)}%
+   	  \edef\f@family{#1}%
+        \else
+          \directlua{luatexja.jfont.add_Nffam_list(\tmp@enc, \tmp@item)}%
+	  \@notffamtrue%
+        \fi
+      \fi
+    \fi
   \fi
   \if@notkfam\if@notffam
       {\ifcsname D@\k@encoding\endcsname\@nameuse{D@\k@encoding}\fi
@@ -219,17 +212,12 @@
 \def\try@load@fontshape{%
    \expandafter
    \ifx\csname \f@encoding+\f@family\endcsname\relax
-       \edef\tmp@item{{\directlua{%
-         tex.print(luatexbase.catcodetables["latex-package"], '\f@encoding')}%
-       }}% \f@encoding の展開結果の catcode は 12 であるため，これで補正．
-       \expandafter\expandafter\expandafter
-       \inlist@\expandafter\tmp@item\expandafter{\kenc@list}%
+       \directlua{luatexja.jfont.is_kenc('\luatexluaescapestring{\f@encoding}')}%
 \ifin@ % Japanese font: we don't search fd.
     \@font@warning{We don't search kanjifont definition
       \MessageBreak for \f@encoding/\f@family}%
 \else % Alphabetic font
-    \@font@info{Try loading font information for
-                   \f@encoding+\f@family}%
+    \@font@info{Try loading font information for \f@encoding+\f@family}%
     \global\expandafter\let
        \csname\f@encoding+\f@family\endcsname\@empty
      \nfss@catcodes

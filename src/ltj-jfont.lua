@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2014/01/02',
+  date = '2014/01/23',
   description = 'Loader for Japanese fonts',
 })
 module('luatexja.jfont', package.seeall)
@@ -316,6 +316,56 @@ do
    end
 end
 
+------------------------------------------------------------------------
+-- LATEX INTERFACE
+------------------------------------------------------------------------
+do
+   local kyenc_list, ktenc_list = {}, {}
+   function add_kyenc_list(enc) kyenc_list[enc] = 'true ' end
+   function add_ktenc_list(enc) ktenc_list[enc] = 'true ' end
+   function is_kyenc(enc)
+      tex.sprint(cat_lp, '\\let\\ifin@\\if' .. (kyenc_list[enc] or 'false '))
+   end
+   function is_kyenc(enc) 
+      tex.sprint(cat_lp, '\\let\\ifin@\\if' .. (kyenc_list[enc] or 'false '))
+   end
+   function is_kenc(enc) 
+      tex.sprint(cat_lp, '\\let\\ifin@\\if' 
+		 .. (kyenc_list[enc] or ktenc_list[enc] or 'false '))
+   end
+
+   local kfam_list, Nkfam_list = {}, {}
+   function add_kfam_list(enc, fam)
+      if not kfam_list[enc] then kfam_list[enc] = {} end
+      kfam_list[enc][fam] = 'true '
+   end
+   function add_Nkfam_list(enc, fam)
+      if not Nkfam_list[enc] then Nkfam_list[enc] = {} end
+      Nkfam_list[enc][fam] = 'true '
+   end
+   function is_kfam(enc, fam)
+      tex.sprint(cat_lp, '\\let\\ifin@\\if' 
+		 .. (kfam_list[enc] and kfam_list[enc][fam] or 'false ')) end
+   function is_Nkfam(enc, fam)
+      tex.sprint(cat_lp, '\\let\\ifin@\\if' 
+		 .. (Nkfam_list[enc] and Nkfam_list[enc][fam] or 'false ')) end
+
+   local ffam_list, Nffam_list = {}, {}
+   function add_ffam_list(enc, fam)
+      if not ffam_list[enc] then ffam_list[enc] = {} end
+      ffam_list[enc][fam] = 'true '
+   end
+   function add_Nffam_list(enc, fam)
+      if not Nffam_list[enc] then Nffam_list[enc] = {} end
+      Nffam_list[enc][fam] = 'true '
+   end
+   function is_ffam(enc, fam)
+      tex.sprint(cat_lp, '\\let\\ifin@\\if' 
+		 .. (ffam_list[enc] and ffam_list[enc][fam] or 'false ')) end
+   function is_Nffam(enc, fam)
+      tex.sprint(cat_lp, '\\let\\ifin@\\if' 
+		 .. (Nffam_list[enc] and Nffam_list[enc][fam] or 'false ')) end
+end
 ------------------------------------------------------------------------
 -- ALTERNATE FONTS
 ------------------------------------------------------------------------
