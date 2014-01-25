@@ -121,7 +121,7 @@ setfield(spec_zero_glue, 'shrink_order', 0)
 setfield(zero_glue, 'spec', spec_zero_glue)
 
 local function skip_table_to_spec(n)
-   local g, st = node_new(id_glue_spec), ltjs.fast_get_skip_table(n)
+   local g, st = node_new(id_glue_spec), ltjs.fast_get_stack_skip(n)
    setfield(g, 'width', st.width)
    setfield(g, 'stretch', st.stretch)
    setfield(g, 'shrink', st.shrink)

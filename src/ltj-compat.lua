@@ -26,7 +26,7 @@ local function to_kansuji(num)
    local s = ""
    while num~=0 do
       s = utf.char(
-	 ltjs.get_penalty_table(luatexja.stack_table_index.KSJ + num%10,
+	 ltjs.get_stack_table(luatexja.stack_table_index.KSJ + num%10,
 				'', tex.getcount('ltj@@stack'))) .. s
       num=math.floor(num/10)
    end
@@ -124,7 +124,7 @@ luatexja.binary_pars.kansujichar = function(c, t)
 			    'So I changed this one to zero.')
       c=0
    end
-   return ltjs.get_penalty_table(stack_table_index.KSJ + c, 0, t)
+   return ltjs.get_stack_table(stack_table_index.KSJ + c, 0, t)
 end
 
 

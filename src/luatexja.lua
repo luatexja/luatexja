@@ -141,13 +141,13 @@ do
 	 return print_scaled(tex.getattribute('ltj@ykblshift'))..'pt'
       end,
       kanjiskip = function(t) 
-	 return print_spec(ltjs.get_skip_table('kanjiskip', t))
+	 return print_spec(ltjs.get_stack_skip('kanjiskip', t))
       end,
       xkanjiskip = function(t) 
-	 return print_spec(ltjs.get_skip_table('xkanjiskip', t))
+	 return print_spec(ltjs.get_stack_skip('xkanjiskip', t))
       end,
       jcharwidowpenalty = function(t)
-	 return ltjs.get_penalty_table(stack_table_index.JWP, 0, t)
+	 return ltjs.get_stack_table(stack_table_index.JWP, 0, t)
       end,
       autospacing = function(t)
 	 return tex.getattribute('ltj@autospc')
@@ -196,22 +196,22 @@ do
 	 return (c<0) and 1 or ltjc.get_range_setting(c)
       end,
       prebreakpenalty = function(c, t)
-	 return ltjs.get_penalty_table(stack_table_index.PRE 
+	 return ltjs.get_stack_table(stack_table_index.PRE 
 					  + ltjb.in_unicode(c, true), 0, t)
       end,
       postbreakpenalty = function(c, t)
-	 return ltjs.get_penalty_table(stack_table_index.POST 
+	 return ltjs.get_stack_table(stack_table_index.POST 
 					  + ltjb.in_unicode(c, true), 0, t)
       end,
       kcatcode = function(c, t)
-	 return ltjs.get_penalty_table(stack_table_index.KCAT 
+	 return ltjs.get_stack_table(stack_table_index.KCAT 
 					  + ltjb.in_unicode(c, false), 0, t)
       end,
       chartorange = function(c, t)
 	 return ltjc.char_to_range(ltjb.in_unicode(c, false))
       end,
       jaxspmode = function(c, t)
-	 return ltjs.get_penalty_table(stack_table_index.XSP
+	 return ltjs.get_stack_table(stack_table_index.XSP
 					  + ltjb.in_unicode(c, true), 3, t)
       end,
    }

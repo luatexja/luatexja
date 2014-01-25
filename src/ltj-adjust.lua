@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.adjust',
-  date = '2014/01/23',
+  date = '2014/01/24',
   description = 'Advanced line adjustment for LuaTeX-ja',
 })
 module('luatexja.adjust', package.seeall)
@@ -238,8 +238,8 @@ end
 
 function adjust_width(head) 
    if not head then return head end
-   is_skip_normal[KANJI_SKIP] = (ltjs.fast_get_skip_table('kanjiskip').width ~= 1073741823)
-   is_skip_normal[XKANJI_SKIP] = (ltjs.fast_get_skip_table('xkanjiskip').width ~= 1073741823)
+   is_skip_normal[KANJI_SKIP] = (ltjs.fast_get_stack_skip('kanjiskip').width ~= 1073741823)
+   is_skip_normal[XKANJI_SKIP] = (ltjs.fast_get_stack_skip('xkanjiskip').width ~= 1073741823)
    for p in node_traverse_id(id_hlist, to_direct(head)) do
       local res = get_total_stretched(p)
       if res then
