@@ -342,12 +342,12 @@
 \define@key[ltj]{japaram}{kanjiskip}{%              % SKIP
   \directlua{%
     local d = \ltj@safe@glue{#1}
-    luatexja.stack.set_stack_skip('kanjiskip', d); node.free(d)
+    luatexja.stack.set_stack_skip(luatexja.stack_table_index.KSK, d); node.free(d)
 }}
 \define@key[ltj]{japaram}{xkanjiskip}{%             % SKIP
   \directlua{%
     local d = \ltj@safe@glue{#1}
-    luatexja.stack.set_stack_skip('xkanjiskip', d); node.free(d)
+    luatexja.stack.set_stack_skip(luatexja.stack_table_index.XSK, d); node.free(d)
 }}
 
 % jcharwidowpenalty = <count>

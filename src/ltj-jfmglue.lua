@@ -902,19 +902,21 @@ local init_var
 do
    local KANJI_SKIP   = luatexja.icflag_table.KANJI_SKIP
    local XKANJI_SKIP   = luatexja.icflag_table.XKANJI_SKIP
+   local KSK  = luatexja.stack_table_index.KSK
+   local XSK  = luatexja.stack_table_index.XSK
    init_var = function (mode)
       -- 1073741823: max_dimen
       Bp, widow_Bp, widow_Np = {}, {}, {first = nil}
       table_current_stack = ltjs.table_current_stack
       
       kanji_skip = node_new(id_glue)
-      setfield(kanji_skip, 'spec', skip_table_to_spec('kanjiskip'))
+      setfield(kanji_skip, 'spec', skip_table_to_spec(KSK))
       set_attr(kanji_skip, attr_icflag, KANJI_SKIP)
       get_kanjiskip = (getfield(getfield(kanji_skip, 'spec'), 'width') == 1073741823)
 	 and get_kanjiskip_jfm or get_kanjiskip_normal
       
       xkanji_skip = node_new(id_glue)
-      setfield(xkanji_skip, 'spec', skip_table_to_spec('xkanjiskip'))
+      setfield(xkanji_skip, 'spec', skip_table_to_spec(XSK))
       set_attr(xkanji_skip, attr_icflag, XKANJI_SKIP)
       get_xkanjiskip = (getfield(getfield(xkanji_skip, 'spec'), 'width') == 1073741823)
 	 and get_xkanjiskip_jfm or get_xkanjiskip_normal

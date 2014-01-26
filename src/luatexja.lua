@@ -22,19 +22,19 @@ end
 --- 以下は全ファイルで共有される定数
 local icflag_table = {}
 luatexja.icflag_table = icflag_table
-icflag_table.ITALIC       = 1
-icflag_table.PACKED       = 2
-icflag_table.KINSOKU      = 3
-icflag_table.FROM_JFM     = 6
+icflag_table.ITALIC          = 1
+icflag_table.PACKED          = 2
+icflag_table.KINSOKU         = 3
+icflag_table.FROM_JFM        = 6
 -- FROM_JFM: 4, 5, 6, 7, 8 →優先度高（伸びやすく，縮みやすい）
 -- 6 が標準
-icflag_table.KANJI_SKIP   = 9
-icflag_table.KANJI_SKIP_JFM   = 10
-icflag_table.XKANJI_SKIP  = 11
-icflag_table.XKANJI_SKIP_JFM  = 12
-icflag_table.PROCESSED    = 13
-icflag_table.IC_PROCESSED = 14
-icflag_table.BOXBDD       = 15
+icflag_table.KANJI_SKIP      = 9
+icflag_table.KANJI_SKIP_JFM  = 10
+icflag_table.XKANJI_SKIP     = 11
+icflag_table.XKANJI_SKIP_JFM = 12
+icflag_table.PROCESSED       = 13
+icflag_table.IC_PROCESSED    = 14
+icflag_table.BOXBDD          = 15
 icflag_table.PROCESSED_BEGIN_FLAG = 128
 
 local stack_table_index = {}
@@ -43,7 +43,9 @@ stack_table_index.PRE  = 0x200000 -- characterごと
 stack_table_index.POST = 0x400000 -- characterごと
 stack_table_index.KCAT = 0x600000 -- characterごと
 stack_table_index.XSP  = 0x800000 -- characterごと
-stack_table_index.JWP  = 0 -- 0のみ
+stack_table_index.JWP  = 0 -- これだけ
+stack_table_index.KSK  = 1 -- これだけ
+stack_table_index.XSK  = 2 -- これだけ
 stack_table_index.MJT  = 0x100 -- 0--255
 stack_table_index.MJS  = 0x200 -- 0--255
 stack_table_index.MJSS = 0x300 -- 0--255
@@ -53,7 +55,6 @@ local userid_table = {}
 luatexja.userid_table = userid_table
 userid_table.IHB  = luatexbase.newuserwhatsitid('inhibitglue',  'luatexja') -- \inhibitglue
 userid_table.STCK = luatexbase.newuserwhatsitid('stack_marker', 'luatexja') -- スタック管理
-userid_table.OTF  = luatexbase.newuserwhatsitid('char_by_cid',  'luatexja') -- luatexja-otf
 userid_table.BPAR = luatexbase.newuserwhatsitid('begin_par',    'luatexja') -- 「段落始め」
 
 --- 定義終わり
@@ -143,10 +144,10 @@ do
 	 return print_scaled(tex.getattribute('ltj@ykblshift'))..'pt'
       end,
       kanjiskip = function(t) 
-	 return print_spec(ltjs.get_stack_skip('kanjiskip', t))
+	 return print_spec(ltjs.get_stack_skip(stack_table_index.KSK, t))
       end,
       xkanjiskip = function(t) 
-	 return print_spec(ltjs.get_stack_skip('xkanjiskip', t))
+	 return print_spec(ltjs.get_stack_skip(stack_table_index.XSK, t))
       end,
       jcharwidowpenalty = function(t)
 	 return ltjs.get_stack_table(stack_table_index.JWP, 0, t)
