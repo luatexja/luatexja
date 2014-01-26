@@ -203,7 +203,6 @@
 \protected\def\zw{\directlua{luatexja.jfont.load_zw()}\ltj@zw}
 \protected\def\zh{\directlua{luatexja.jfont.load_zh()}\ltj@zh}
 
-
 %%%%%%%% \inhibitglue
 \protected\def\ltj@reset@globaldefs{%
   \directlua{luatexja.global_temp = tex.globaldefs; tex.globaldefs = 0}}
@@ -246,7 +245,7 @@
 \setbox0\hbox{%
   \directlua{% This value depends on the version of LuaTeX.
     luatexja.stack.hmode = -tex.nest[tex.nest.ptr].mode
-  }
+  }%
 }
 
 % prebreakpenalty = {<char_code>, <penalty>}
@@ -341,9 +340,15 @@
 
 % [x]]kanjiskip = <dimen>
 \define@key[ltj]{japaram}{kanjiskip}{%              % SKIP
-  \directlua{luatexja.stack.set_stack_skip('kanjiskip', \ltj@safe@glue{#1})}}
+  \directlua{%
+    local d = \ltj@safe@glue{#1}
+    luatexja.stack.set_stack_skip('kanjiskip', d); node.free(d)
+}}
 \define@key[ltj]{japaram}{xkanjiskip}{%             % SKIP
-  \directlua{luatexja.stack.set_stack_skip('xkanjiskip', \ltj@safe@glue{#1})}}
+  \directlua{%
+    local d = \ltj@safe@glue{#1}
+    luatexja.stack.set_stack_skip('xkanjiskip', d); node.free(d)
+}}
 
 % jcharwidowpenalty = <count>
 \define@key[ltj]{japaram}{jcharwidowpenalty}{%      %COUNT
