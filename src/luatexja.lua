@@ -26,14 +26,16 @@ icflag_table.ITALIC       = 1
 icflag_table.PACKED       = 2
 icflag_table.KINSOKU      = 3
 icflag_table.FROM_JFM     = 6
--- FROM_JFM: 4, 5, 6, 7, 8 →優先度高
+-- FROM_JFM: 4, 5, 6, 7, 8 →優先度高（伸びやすく，縮みやすい）
 -- 6 が標準
 icflag_table.KANJI_SKIP   = 9
-icflag_table.XKANJI_SKIP  = 10
-icflag_table.PROCESSED    = 11
-icflag_table.IC_PROCESSED = 12
+icflag_table.KANJI_SKIP_JFM   = 10
+icflag_table.XKANJI_SKIP  = 11
+icflag_table.XKANJI_SKIP_JFM  = 12
+icflag_table.PROCESSED    = 13
+icflag_table.IC_PROCESSED = 14
 icflag_table.BOXBDD       = 15
-icflag_table.PROCESSED_BEGIN_FLAG = 32
+icflag_table.PROCESSED_BEGIN_FLAG = 128
 
 local stack_table_index = {}
 luatexja.stack_table_index = stack_table_index
@@ -349,8 +351,12 @@ local function debug_show_node_X(p,print_fn)
          s = s .. ' (from JFM: priority ' .. get_attr_icflag(p)-icflag_table.FROM_JFM .. ')'
       elseif get_attr_icflag(p)==icflag_table.KANJI_SKIP then
 	 s = s .. ' (kanjiskip)'
+      elseif get_attr_icflag(p)==icflag_table.KANJI_SKIP_JFM then
+	 s = s .. ' (kanjiskip, JFM specified)'
       elseif get_attr_icflag(p)==icflag_table.XKANJI_SKIP then
 	 s = s .. ' (xkanjiskip)'
+      elseif get_attr_icflag(p)==icflag_table.XKANJI_SKIP_JFM then
+	 s = s .. ' (xkanjiskip, JFM specified)'
       end
       print_fn(s)
    elseif pt == 'kern' then

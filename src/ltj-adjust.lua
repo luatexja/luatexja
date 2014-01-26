@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.adjust',
-  date = '2014/01/24',
+  date = '2014/01/26',
   description = 'Advanced line adjustment for LuaTeX-ja',
 })
 module('luatexja.adjust', package.seeall)
@@ -54,7 +54,10 @@ local round = tex.round
 local PACKED       = luatexja.icflag_table.PACKED
 local FROM_JFM     = luatexja.icflag_table.FROM_JFM
 local KANJI_SKIP   = luatexja.icflag_table.KANJI_SKIP
+local KANJI_SKIP_JFM = luatexja.icflag_table.KANJI_SKIP_JFM
 local XKANJI_SKIP  = luatexja.icflag_table.XKANJI_SKIP
+local XKANJI_SKIP_JFM  = luatexja.icflag_table.XKANJI_SKIP_JFM
+local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 
 local priority_table = {
    FROM_JFM + 2,
@@ -66,7 +69,6 @@ local priority_table = {
    KANJI_SKIP
 }
 
-local PROCESSED_BEGIN_FLAG = 32
 local function get_attr_icflag(p)
    return (has_attr(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
 end
@@ -88,7 +90,6 @@ local function get_stretched(q, go, gs)
 end
 
 local res = {}
-local is_skip_normal = {}
 local function get_total_stretched(p)
    local go, gf, gs 
       = getfield(p, 'glue_order'), getfield(p, 'glue_set'), getfield(p, 'glue_sign')
@@ -103,13 +104,18 @@ local function get_total_stretched(p)
 	 -- それはここでは望ましくないので，各 glue ごとに異なる spec を使う．
 	 -- （この仮定でメモリリークを起こしている！）
 	 -- JFM グルーはそれぞれ異なる glue_spec を用いているので，問題ない．
-	 res[ic] = res[ic] + a
 	 if (ic == KANJI_SKIP or ic == XKANJI_SKIP) and getsubtype(q)==0 then
 	    local qs = getfield(q, 'spec')
-	    if is_skip_normal[ic] and qs ~= spec_zero_glue then
+	    if qs ~= spec_zero_glue then
+	       local f = node_new(id_glue)
+	       setfield(f, 'spec', qs)
 	       setfield(q, 'spec', node_copy(qs))
+	       node_free(f)
 	    end
+	 elseif ic == KANJI_SKIP_JFM  then ic = KANJI_SKIP
+	 elseif ic == XKANJI_SKIP_JFM  then ic = XKANJI_SKIP
 	 end
+	 res[ic] = res[ic] + a
       else 
 	 res[0]  = res[0]  + a
       end
@@ -138,7 +144,9 @@ local function set_stretch(p, after, before, ic, name)
          set_stretch_table[i] = nil
       end
       for q in node_traverse_id(id_glue, getlist(p)) do
-         if get_attr_icflag(q) == ic then
+	 local f = get_attr_icflag(q)
+         if (f == ic) or ((ic ==KANJI_SKIP) and (f == KANJI_SKIP_JFM)) 
+	   or ((ic ==XKANJI_SKIP) and (f == XKANJI_SKIP_JFM)) then
             local qs, do_flag = getfield(q, 'spec'), true
             for i=1,#set_stretch_table do 
                if set_stretch_table[i]==qs then do_flag = false end 
@@ -236,12 +244,12 @@ local function aw_step2(p, res, total, added_flag)
 end
 
 
-function adjust_width(head) 
+local ltjs_fast_get_stack_skip = ltjs.fast_get_stack_skip
+local function adjust_width(head) 
    if not head then return head end
-   is_skip_normal[KANJI_SKIP] = (ltjs.fast_get_stack_skip('kanjiskip').width ~= 1073741823)
-   is_skip_normal[XKANJI_SKIP] = (ltjs.fast_get_stack_skip('xkanjiskip').width ~= 1073741823)
    for p in node_traverse_id(id_hlist, to_direct(head)) do
-      local res = get_total_stretched(p)
+      local res = get_total_stretched(p) 
+        -- this is the same table as the table which is def'd in l. 92
       if res then
          -- 調整量の合計
          local total = 0
@@ -250,25 +258,26 @@ function adjust_width(head)
                total = total + v
             end
          end; total = round(total * res.glue_set)
-         local added_flag = aw_step1(p, res, total)
-         --print(total, res[0], res[KANJI_SKIP], res[FROM_JFM])
-         aw_step2(p, res, total, added_flag)
+         aw_step2(p, res, total, aw_step1(p, res, total))
       end
    end
    return to_node(head)
 end
 
-local is_reg = false
-function enable_cb()
-   if not is_reg then
-      luatexbase.add_to_callback('post_linebreak_filter', adjust_width, 'Adjust width', 100)
-      is_reg = true
+do
+   local is_reg = false
+   function enable_cb()
+      if not is_reg then
+	 luatexbase.add_to_callback('post_linebreak_filter', 
+				    adjust_width, 'Adjust width', 100)
+	 is_reg = true
+      end
    end
-end
-function disable_cb()
-   if is_reg then
-      luatexbase.remove_from_callback('post_linebreak_filter', 'Adjust width')
-      is_reg = false
+   function disable_cb()
+      if is_reg then
+	 luatexbase.remove_from_callback('post_linebreak_filter', 'Adjust width')
+	 is_reg = false
+      end
    end
 end
 

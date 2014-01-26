@@ -73,8 +73,6 @@ local ITALIC       = luatexja.icflag_table.ITALIC
 local PACKED       = luatexja.icflag_table.PACKED
 local KINSOKU      = luatexja.icflag_table.KINSOKU
 local FROM_JFM     = luatexja.icflag_table.FROM_JFM
-local KANJI_SKIP   = luatexja.icflag_table.KANJI_SKIP
-local XKANJI_SKIP  = luatexja.icflag_table.XKANJI_SKIP
 local PROCESSED    = luatexja.icflag_table.PROCESSED
 local IC_PROCESSED = luatexja.icflag_table.IC_PROCESSED
 local BOXBDD       = luatexja.icflag_table.BOXBDD
@@ -581,41 +579,45 @@ end
 
 -- get kanjiskip
 local get_kanjiskip
+local get_kanjiskip_normal, get_kanjiskip_jfm
+do
+   local KANJI_SKIP   = luatexja.icflag_table.KANJI_SKIP
+   local KANJI_SKIP_JFM   = luatexja.icflag_table.KANJI_SKIP_JFM
+   get_kanjiskip_normal = function ()
+      if Np.auto_kspc or Nq.auto_kspc then
+	 return node_copy(kanji_skip)
+      else
+	 local g = node_copy(zero_glue)
+	 set_attr(g, attr_icflag, KANJI_SKIP)
+	 return g
+      end
+   end
 
-local function get_kanjiskip_normal()
-   if Np.auto_kspc or Nq.auto_kspc then
-      return node_copy(kanji_skip)
-   else
-      local g = node_copy(zero_glue)
-      set_attr(g, attr_icflag, KANJI_SKIP)
+   get_kanjiskip_jfm = function ()
+      local g
+      if Np.auto_kspc or Nq.auto_kspc then
+	 g = node_new(id_glue); --copy_attr(g, Nq.nuc)
+	 local gx = node_new(id_glue_spec);
+	 setfield(gx, 'stretch_order', 0); setfield(gx, 'shrink_order', 0)
+	 local pm, qm = Np.met, Nq.met
+	 local bk = qm.kanjiskip or {0, 0, 0}
+	 if (pm.char_type==qm.char_type) and (qm.var==pm.var) then
+	    setfield(gx, 'width', bk[1])
+	    setfield(gx, 'stretch', bk[2])
+	    setfield(gx, 'shrink', bk[3])
+	 else
+	    local ak = pm.kanjiskip or {0, 0, 0}
+	    setfield(gx, 'width', round(diffmet_rule(bk[1], ak[1])))
+	    setfield(gx, 'stretch', round(diffmet_rule(bk[2], ak[2])))
+	    setfield(gx, 'shrink', -round(diffmet_rule(-bk[3], -ak[3])))
+	 end
+	 setfield(g, 'spec', gx)
+      else
+	 g =  node_copy(zero_glue)
+      end
+      set_attr(g, attr_icflag, KANJI_SKIP_JFM)
       return g
    end
-end
-
-local function get_kanjiskip_jfm()
-   local g
-   if Np.auto_kspc or Nq.auto_kspc then
-      g = node_new(id_glue); --copy_attr(g, Nq.nuc)
-      local gx = node_new(id_glue_spec);
-      setfield(gx, 'stretch_order', 0); setfield(gx, 'shrink_order', 0)
-      local pm, qm = Np.met, Nq.met
-      local bk = qm.kanjiskip or {0, 0, 0}
-      if (pm.char_type==qm.char_type) and (qm.var==pm.var) then
-	 setfield(gx, 'width', bk[1])
-	 setfield(gx, 'stretch', bk[2])
-	 setfield(gx, 'shrink', bk[3])
-      else
-         local ak = pm.kanjiskip or {0, 0, 0}
-	 setfield(gx, 'width', round(diffmet_rule(bk[1], ak[1])))
-	 setfield(gx, 'stretch', round(diffmet_rule(bk[2], ak[2])))
-	 setfield(gx, 'shrink', -round(diffmet_rule(-bk[3], -ak[3])))
-      end
-      setfield(g, 'spec', gx)
-   else
-      g =  node_copy(zero_glue)
-   end
-   set_attr(g, attr_icflag, KANJI_SKIP)
-   return g
 end
 
 local calc_ja_ja_aux
@@ -708,32 +710,37 @@ end
 
 -- get xkanjiskip
 local get_xkanjiskip
-local function get_xkanjiskip_normal(Nn)
-   if (Nq.xspc>=2) and (Np.xspc%2==1) and (Nq.auto_xspc or Np.auto_xspc) then
-      local f = node_copy(xkanji_skip)
-      return f
-   else
-      local g = node_copy(zero_glue)
-      set_attr(g, attr_icflag, XKANJI_SKIP)
+local get_xkanjiskip_normal, get_xkanjiskip_jfm
+do
+   local XKANJI_SKIP   = luatexja.icflag_table.XKANJI_SKIP
+   local XKANJI_SKIP_JFM   = luatexja.icflag_table.XKANJI_SKIP_JFM
+   get_xkanjiskip_normal = function (Nn)
+      if (Nq.xspc>=2) and (Np.xspc%2==1) and (Nq.auto_xspc or Np.auto_xspc) then
+	 local f = node_copy(xkanji_skip)
+	 return f
+      else
+	 local g = node_copy(zero_glue)
+	 set_attr(g, attr_icflag, XKANJI_SKIP)
+	 return g
+      end
+   end
+   get_xkanjiskip_jfm = function (Nn)
+      local g
+      if (Nq.xspc>=2) and (Np.xspc%2==1) and (Nq.auto_xspc or Np.auto_xspc) then
+	 g = node_new(id_glue)
+	 local gx = node_new(id_glue_spec);
+	 setfield(gx, 'stretch_order', 0); setfield(gx, 'shrink_order', 0)
+	 local bk = Nn.met.xkanjiskip or {0, 0, 0}
+	 setfield(gx, 'width', bk[1])
+	 setfield(gx, 'stretch', bk[2])
+	 setfield(gx, 'shrink', bk[3])
+	 setfield(g, 'spec', gx)
+      else
+	 g = node_copy(zero_glue)
+      end
+      set_attr(g, attr_icflag, XKANJI_SKIP_JFM)
       return g
    end
-end
-local function get_xkanjiskip_jfm(Nn)
-   local g
-   if (Nq.xspc>=2) and (Np.xspc%2==1) and (Nq.auto_xspc or Np.auto_xspc) then
-      g = node_new(id_glue)
-      local gx = node_new(id_glue_spec);
-      setfield(gx, 'stretch_order', 0); setfield(gx, 'shrink_order', 0)
-      local bk = Nn.met.xkanjiskip or {0, 0, 0}
-      setfield(gx, 'width', bk[1])
-      setfield(gx, 'stretch', bk[2])
-      setfield(gx, 'shrink', bk[3])
-      setfield(g, 'spec', gx)
-   else
-      g = node_copy(zero_glue)
-   end
-   set_attr(g, attr_icflag, XKANJI_SKIP)
-   return g
 end
 
 -------------------- 隣接した「塊」間の処理
@@ -891,46 +898,49 @@ end
 
 -- initialize
 -- return value: (the initial cursor lp), (last node)
-local function init_var(mode)
-   -- 1073741823: max_dimen
-   Bp, widow_Bp, widow_Np = {}, {}, {first = nil}
-   table_current_stack = ltjs.table_current_stack
-
-   kanji_skip = node_new(id_glue)
-   setfield(kanji_skip, 'spec', skip_table_to_spec('kanjiskip'))
-   set_attr(kanji_skip, attr_icflag, KANJI_SKIP)
-   get_kanjiskip = (getfield(getfield(kanji_skip, 'spec'), 'width') == 1073741823)
-      and get_kanjiskip_jfm or get_kanjiskip_normal
-
-   xkanji_skip = node_new(id_glue)
-   setfield(xkanji_skip, 'spec', skip_table_to_spec('xkanjiskip'))
-   set_attr(xkanji_skip, attr_icflag, XKANJI_SKIP)
-   get_xkanjiskip = (getfield(getfield(xkanji_skip, 'spec'), 'width') == 1073741823)
-      and get_xkanjiskip_jfm or get_xkanjiskip_normal
-
-   Np = {
-      auto_kspc=nil, auto_xspc=nil, char=nil, class=nil, 
-      first=nil, id=nil, last=nil, met=nil, nuc=nil, 
-      post=nil, pre=nil, xspc=nil, 
-   }
-   Nq = {
-      auto_kspc=nil, auto_xspc=nil, char=nil, class=nil, 
-      first=nil, id=nil, last=nil, met=nil, nuc=nil, 
-      post=nil, pre=nil, xspc=nil, 
-   }
-   if mode then 
-      -- the current list is to be line-breaked:
-      -- hbox from \parindent is skipped.
-      local lp, par_indented, lpi, lps  = head, 'boxbdd', getid(head), getsubtype(head)
-      while lp and ((lpi==id_whatsit and lps~=sid_user) 
-		 or ((lpi==id_hlist) and (lps==3))) do
-	 if (lpi==id_hlist) and (lps==3) then par_indented = 'parbdd' end
-	 lp=node_next(lp); lpi, lps = getid(lp), getsubtype(lp) end
-     return lp, par_indented
-     -- return lp, node_tail(head), par_indented
-   else 
-      -- the current list is the contents of a hbox:
-      return head, 'boxbdd'
+local init_var
+do
+   local KANJI_SKIP   = luatexja.icflag_table.KANJI_SKIP
+   local XKANJI_SKIP   = luatexja.icflag_table.XKANJI_SKIP
+   init_var = function (mode)
+      -- 1073741823: max_dimen
+      Bp, widow_Bp, widow_Np = {}, {}, {first = nil}
+      table_current_stack = ltjs.table_current_stack
+      
+      kanji_skip = node_new(id_glue)
+      setfield(kanji_skip, 'spec', skip_table_to_spec('kanjiskip'))
+      set_attr(kanji_skip, attr_icflag, KANJI_SKIP)
+      get_kanjiskip = (getfield(getfield(kanji_skip, 'spec'), 'width') == 1073741823)
+	 and get_kanjiskip_jfm or get_kanjiskip_normal
+      
+      xkanji_skip = node_new(id_glue)
+      setfield(xkanji_skip, 'spec', skip_table_to_spec('xkanjiskip'))
+      set_attr(xkanji_skip, attr_icflag, XKANJI_SKIP)
+      get_xkanjiskip = (getfield(getfield(xkanji_skip, 'spec'), 'width') == 1073741823)
+	 and get_xkanjiskip_jfm or get_xkanjiskip_normal
+      
+      Np = {
+	 auto_kspc=nil, auto_xspc=nil, char=nil, class=nil, 
+	 first=nil, id=nil, last=nil, met=nil, nuc=nil, 
+	 post=nil, pre=nil, xspc=nil, 
+      }
+      Nq = {
+	 auto_kspc=nil, auto_xspc=nil, char=nil, class=nil, 
+	 first=nil, id=nil, last=nil, met=nil, nuc=nil, 
+	 post=nil, pre=nil, xspc=nil, 
+      }
+      if mode then 
+	 -- the current list is to be line-breaked:
+	 -- hbox from \parindent is skipped.
+	 local lp, par_indented, lpi, lps  = head, 'boxbdd', getid(head), getsubtype(head)
+	 while lp and ((lpi==id_whatsit and lps~=sid_user) 
+		       or ((lpi==id_hlist) and (lps==3))) do
+	    if (lpi==id_hlist) and (lps==3) then par_indented = 'parbdd' end
+	    lp=node_next(lp); lpi, lps = getid(lp), getsubtype(lp) end
+	 return lp, par_indented
+      else 
+	 return head, 'boxbdd'
+      end
    end
 end
 
