@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2014/1/21',
+  date = '2014/02/01',
   description = 'Insertion process of JFM glues and kanjiskip',
 })
 module('luatexja.jfmglue', package.seeall)
@@ -37,7 +37,7 @@ local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_find_char_class = ltjf.find_char_class
 local node_new = Dnode.new
 local node_copy = Dnode.copy
-local node_remove = Dnode.remove
+local node_remove = luatexja.Dnode_remove -- Dnode.remove
 local node_tail = Dnode.tail
 local node_free = Dnode.free
 local node_end_of_math = Dnode.end_of_math
@@ -189,7 +189,9 @@ local function check_box(box_ptr, box_end)
 	 pid = getid(p) -- p must be non-nil
       end
       if pid==id_kern then
-	 if get_attr_icflag(p)==IC_PROCESSED then
+	 local pa = get_attr_icflag(p)
+	 --if pa==IC_PROCESSED or pa == PACKED then
+	 if pa==IC_PROCESSED then
 	    -- do nothing
 	 elseif getsubtype(p)==2 then
 	    p = node_next(node_next(p)); 
@@ -216,6 +218,7 @@ local function check_box(box_ptr, box_end)
 	    first_char = p; find_first_char = false
 	 end
 	 last_char = p; found_visible_node = true
+	 --elseif pid==id_rule and get_attr_icflag(p)==PACKED then -- do nothing
       elseif not (pid==id_ins   or pid==id_mark
 		  or pid==id_adjust or pid==id_whatsit
 		  or pid==id_penalty) then

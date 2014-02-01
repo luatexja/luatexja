@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2014/01/23',
+  date = '2014/02/01',
   description = 'Loader for Japanese fonts',
 })
 module('luatexja.jfont', package.seeall)
@@ -158,6 +158,8 @@ do
       t.chars = metrics[j].chars
       t.char_type = mult_table(metrics[j].char_type, sz)
       for i,v in pairs(t.char_type) do
+	 v.align = (v.align=='left') and 0 or 
+	    ((v.align=='right') and 1 or 0.5)
 	 if type(i) == 'number' then -- char_type
 	    for k,w in pairs(v.glue) do
 	       local h = node_new(id_glue_spec)
@@ -268,15 +270,14 @@ do
 end
 
 do
--- EXT: zw, zh
-   function load_zw()
+   -- PUBLIC function
+   function get_zw() 
       local a = font_metric_table[tex.attribute[attr_curjfnt]]
-      tex.setdimen('ltj@zw', a and a.zw or 0)
+      return a and a.zw or 0
    end
-   
-   function load_zh()
+   function get_zh() 
       local a = font_metric_table[tex.attribute[attr_curjfnt]]
-      tex.setdimen('ltj@zh', a and a.zh or 0)
+      return a and a.zw or 0
    end
 end
 
@@ -320,6 +321,7 @@ end
 -- LATEX INTERFACE
 ------------------------------------------------------------------------
 do
+   -- these function are called from ltj-latex.sty
    local kyenc_list, ktenc_list = {}, {}
    function add_kyenc_list(enc) kyenc_list[enc] = 'true ' end
    function add_ktenc_list(enc) ktenc_list[enc] = 'true ' end

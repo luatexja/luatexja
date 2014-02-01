@@ -57,6 +57,44 @@ userid_table.IHB  = luatexbase.newuserwhatsitid('inhibitglue',  'luatexja') -- \
 userid_table.STCK = luatexbase.newuserwhatsitid('stack_marker', 'luatexja') -- スタック管理
 userid_table.BPAR = luatexbase.newuserwhatsitid('begin_par',    'luatexja') -- 「段落始め」
 
+do
+   local node_remove, node_next, node_prev = node.remove, node.next, node.prev
+   function luatexja.node_remove (head, current)
+      if head==current then
+	 local q, r = node_next(current), node_prev(current)
+	 current.next = nil
+	 if q then q.prev = r end
+	 if r and node_next(r)==current then
+	    -- r is "real prev"
+	    r.next = q
+	 end
+	 return q, node_next(q)
+      else
+	 return node_remove(head, current)
+      end
+   end
+
+   local Dnode = node.direct or node
+   local Dnode_remove, Dnode_next, Dnode_prev = Dnode.remove, Dnode.getnext, Dnode.getprev
+   local getfield = (Dnode ~= node) and Dnode.getfield or function(n, i) return n[i] end
+   local setfield = (Dnode ~= node) and Dnode.setfield or function(n, i, c) n[i] = c end
+   function luatexja.Dnode_remove (head, current)
+      if head==current then
+	 local q, r = Dnode_next(current), Dnode_prev(current)
+	 setfield(current, 'next', nil)
+	 if q then setfield(q, 'prev', r) end
+	 if r and Dnode_next(r) == current then
+	    -- r is "real prev"
+	    setfield(r, 'next', q)
+	 end
+	 return q, Dnode_next(q)
+      else
+	 return Dnode_remove(head, current)
+      end
+   end
+
+end
+
 --- 定義終わり
 
 local load_module = luatexja.load_module

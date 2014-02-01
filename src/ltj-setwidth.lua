@@ -6,7 +6,6 @@ luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 
 local Dnode = node.direct or node
-
 local setfield = (Dnode ~= node) and Dnode.setfield or function(n, i, c) n[i] = c end
 local getfield = (Dnode ~= node) and Dnode.getfield or function(n, i) return n[i] end
 local getid = (Dnode ~= node) and Dnode.getid or function(n) return n.id end
@@ -17,7 +16,7 @@ local getsubtype = (Dnode ~= node) and Dnode.getsubtype or function(n) return n.
 
 local node_traverse = Dnode.traverse
 local node_new = Dnode.new
-local node_remove = Dnode.remove
+local node_remove = luatexja.Dnode_remove -- Dnode.remove
 local node_tail = Dnode.tail
 local node_next = Dnode.getnext
 local has_attr = Dnode.has_attribute
@@ -77,16 +76,13 @@ local function capsule_glyph(p, met, class)
    fshift = call_callback("luatexja.set_width", fshift, met, class)
    local fheight, fdepth = char_data.height, char_data.depth
    if (pwidth ~= fwidth or getfield(p, 'height') ~= fheight or getfield(p, 'depth') ~= fdepth) then
-      local y_shift, ca
-         = - getfield(p, 'yoffset') + (has_attr(p,attr_ykblshift) or 0), char_data.align
+      local y_shift
+         = - getfield(p, 'yoffset') + (has_attr(p,attr_ykblshift) or 0)
       local q
       head, q = node_remove(head, p)
       setfield(p, 'yoffset', -fshift.down); setfield(p, 'next', nil)
-      ca = (ca~='left') 
-	 and -fshift.left + (((ca=='right') and fwidth-pwidth) or round((fwidth-pwidth)*0.5))
-	 or  -fshift.left
-      setfield(p, 'xoffset', getfield(p, 'xoffset') + ca)
-      local box = node_new(id_hlist); 
+      setfield(p, 'xoffset', getfield(p, 'xoffset') + char_data.align*(fwidth-pwidth))
+      local box = node_new(id_hlist)
       setfield(box, 'width', fwidth)
       setfield(box, 'height', fheight)
       setfield(box, 'depth', fdepth)

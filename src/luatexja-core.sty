@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2014/01/24 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2014/02/01 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -200,8 +200,8 @@
 \def\ltj@@jfont{\directlua{luatexja.jfont.jfontdefY()}}
 
 %%%%%%%% \zw, \zh
-\protected\def\zw{\directlua{luatexja.jfont.load_zw()}\ltj@zw}
-\protected\def\zh{\directlua{luatexja.jfont.load_zh()}\ltj@zh}
+\protected\def\zw{\directlua{tex.setdimen('ltj@zw', luatexja.jfont.get_zw())}\ltj@zw}
+\protected\def\zh{\directlua{tex.setdimen('ltj@zh', luatexja.jfont.get_zh())}\ltj@zh}
 
 %%%%%%%% \inhibitglue
 \protected\def\ltj@reset@globaldefs{%

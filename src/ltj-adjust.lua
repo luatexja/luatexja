@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.adjust',
-  date = '2014/01/26',
+  date = '2014/02/01',
   description = 'Advanced line adjustment for LuaTeX-ja',
 })
 module('luatexja.adjust', package.seeall)
@@ -49,7 +49,7 @@ local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 
 local ltjf_font_metric_table = ltjf.font_metric_table
 local spec_zero_glue = ltjj.spec_zero_glue
-local round = tex.round
+local round, pairs = tex.round, pairs
 
 local PACKED       = luatexja.icflag_table.PACKED
 local FROM_JFM     = luatexja.icflag_table.FROM_JFM
@@ -57,7 +57,6 @@ local KANJI_SKIP   = luatexja.icflag_table.KANJI_SKIP
 local KANJI_SKIP_JFM = luatexja.icflag_table.KANJI_SKIP_JFM
 local XKANJI_SKIP  = luatexja.icflag_table.XKANJI_SKIP
 local XKANJI_SKIP_JFM  = luatexja.icflag_table.XKANJI_SKIP_JFM
-local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 
 local priority_table = {
    FROM_JFM + 2,
@@ -69,8 +68,12 @@ local priority_table = {
    KANJI_SKIP
 }
 
-local function get_attr_icflag(p)
-   return (has_attr(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
+local get_attr_icflag
+do
+   local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
+   get_attr_icflag = function(p)
+      return (has_attr(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
+   end
 end
 
 -- box 内で伸縮された glue の合計値を計算
@@ -90,37 +93,43 @@ local function get_stretched(q, go, gs)
 end
 
 local res = {}
-local function get_total_stretched(p)
+local gs_used_line = {}
+local function get_total_stretched(p, line)
    local go, gf, gs 
       = getfield(p, 'glue_order'), getfield(p, 'glue_set'), getfield(p, 'glue_sign')
+   if go ~= 0 then return nil end
    res[0], res.glue_set, res.name = 0, gf, (gs==1) and 'stretch' or 'shrink'
    for i=1,#priority_table do res[priority_table[i]]=0 end
-   if go ~= 0 then return nil end
-   if gs ~= 1 and gs ~= 2 then return res end
+   if gs ~= 1 and gs ~= 2 then return res, 0 end
+   local total = 0
    for q in node_traverse_id(id_glue, getlist(p)) do
       local a, ic = get_stretched(q, go, gs), get_attr_icflag(q)
       if   type(res[ic]) == 'number' then 
 	 -- kanjiskip, xkanjiskip は段落内で spec を共有しているが，
 	 -- それはここでは望ましくないので，各 glue ごとに異なる spec を使う．
-	 -- （この仮定でメモリリークを起こしている！）
+	 -- 本当は各行ごとに glue_spec を共有させたかったが，安直にやると
+	 -- ref_count が 0 なので Double-free が発生する．どうする？
 	 -- JFM グルーはそれぞれ異なる glue_spec を用いているので，問題ない．
 	 if (ic == KANJI_SKIP or ic == XKANJI_SKIP) and getsubtype(q)==0 then
 	    local qs = getfield(q, 'spec')
 	    if qs ~= spec_zero_glue then
-	       local f = node_new(id_glue)
-	       setfield(f, 'spec', qs)
-	       setfield(q, 'spec', node_copy(qs))
-	       node_free(f)
+	       if (gs_used_line[qs] or 0)<line  then
+		  setfield(q, 'spec', node_copy(qs))
+		  local f = node_new(id_glue); setfield(f, 'spec', qs); node_free(f)
+		  -- decrese qs's reference count
+	       else
+		  gs_used_line[qs] = line
+	       end
 	    end
 	 elseif ic == KANJI_SKIP_JFM  then ic = KANJI_SKIP
 	 elseif ic == XKANJI_SKIP_JFM  then ic = XKANJI_SKIP
 	 end
-	 res[ic] = res[ic] + a
+	 res[ic], total = res[ic] + a, total + a
       else 
-	 res[0]  = res[0]  + a
+	 res[0], total = res[0]  + a, total + a
       end
    end
-   return res
+   return res, total
 end
 
 local function clear_stretch(p, ic, name)
@@ -138,7 +147,6 @@ end
 local set_stretch_table = {}
 local function set_stretch(p, after, before, ic, name)
    if before > 0 then
-      --print (ic, before, after)
       local ratio = after/before
       for i,_ in pairs(set_stretch_table) do
          set_stretch_table[i] = nil
@@ -171,6 +179,11 @@ local function aw_step1(p, res, total)
       -- その前の node が本来の末尾文字となる
       x = node_prev(node_prev(x)) 
    end
+   -- local xi = getid(x)
+   -- while (get_attr_icflag(x) == PACKED) 
+   --    and  ((xi == id_penalty) or (xi == id_kern) or (xi == id_kern)) do
+   --       x = node_prev(x); xi = getid(x)
+   -- end
    local xi, xc = getid(x)
    if xi == id_glyph and has_attr(x, attr_curjfnt) == getfont(x) then
       -- 和文文字
@@ -213,33 +226,28 @@ local function aw_step2(p, res, total, added_flag)
       for _,v in pairs(priority_table) do clear_stretch(p, v, res.name) end
       local f = node_hpack(getlist(p), getfield(p, 'width'), 'exactly')
       setfield(f, 'head', nil)
-	 setfield(p, 'glue_set', getfield(f, 'glue_set'))
-	 setfield(p, 'glue_order', getfield(f, 'glue_order'))
-	 setfield(p, 'glue_sign', getfield(f, 'glue_sign'))
+      setfield(p, 'glue_set', getfield(f, 'glue_set'))
+      setfield(p, 'glue_order', getfield(f, 'glue_order'))
+      setfield(p, 'glue_sign', getfield(f, 'glue_sign'))
       node_free(f)
    else
-      local orig_total, avail = total, res[0]
-      total, i = total - res[0], 1
-      while i <= #priority_table do
+      total = total - res[0]
+      for i = 1, #priority_table do
          local v = priority_table[i]
          if total <= res[v] then
             for j = i+1,#priority_table do
                clear_stretch(p, priority_table[j], res.name)
             end
-            set_stretch(p, total, res[v], v, res.name)
-	    avail = avail + total
-            i = #priority_table + 9 -- ループから抜けさせたいため
+            set_stretch(p, total, res[v], v, res.name); break
          end
-         total, i, avail = total - res[v], i+1, avail + res[v]
+         total = total - res[v]
       end
-      if i == #priority_table + 10 or added_flag then
-	 local f = node_hpack(getlist(p), getfield(p, 'width'), 'exactly')
-	 setfield(f, 'head', nil)
-	 setfield(p, 'glue_set', getfield(f, 'glue_set'))
-	 setfield(p, 'glue_order', getfield(f, 'glue_order'))
-	 setfield(p, 'glue_sign', getfield(f, 'glue_sign'))
-	 node_free(f)
-      end
+      local f = node_hpack(getlist(p), getfield(p, 'width'), 'exactly')
+      setfield(f, 'head', nil)
+      setfield(p, 'glue_set', getfield(f, 'glue_set'))
+      setfield(p, 'glue_order', getfield(f, 'glue_order'))
+      setfield(p, 'glue_sign', getfield(f, 'glue_sign'))
+      node_free(f)
    end
 end
 
@@ -247,19 +255,18 @@ end
 local ltjs_fast_get_stack_skip = ltjs.fast_get_stack_skip
 local function adjust_width(head) 
    if not head then return head end
+   local line = 1
    for p in node_traverse_id(id_hlist, to_direct(head)) do
-      local res = get_total_stretched(p) 
+      line = line + 1
+      local res, total = get_total_stretched(p, line) 
         -- this is the same table as the table which is def'd in l. 92
-      if res then
-         -- 調整量の合計
-         local total = 0
-         for i,v in pairs(res) do 
-            if type(i)=='number' then
-               total = total + v
-            end
-         end; total = round(total * res.glue_set)
+      if res and res.glue_set<1 then
+	 total = round(total * res.glue_set)
          aw_step2(p, res, total, aw_step1(p, res, total))
       end
+   end
+   for i,_ in pairs(gs_used_line) do
+      gs_used_line[i]  = nil
    end
    return to_node(head)
 end
