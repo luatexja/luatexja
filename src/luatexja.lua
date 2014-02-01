@@ -64,11 +64,10 @@ do
 	 local q, r = node_next(current), node_prev(current)
 	 current.next = nil
 	 if q then q.prev = r end
-	 if r and node_next(r)==current then
-	    -- r is "real prev"
+	 if r and node_next(r)==current then -- r is "real prev"
 	    r.next = q
 	 end
-	 return q, node_next(q)
+	 return q, q
       else
 	 return node_remove(head, current)
       end
@@ -83,11 +82,10 @@ do
 	 local q, r = Dnode_next(current), Dnode_prev(current)
 	 setfield(current, 'next', nil)
 	 if q then setfield(q, 'prev', r) end
-	 if r and Dnode_next(r) == current then
-	    -- r is "real prev"
+	 if r and Dnode_next(r) == current then -- r is "real prev"
 	    setfield(r, 'next', q)
 	 end
-	 return q, Dnode_next(q)
+	 return q, q
       else
 	 return Dnode_remove(head, current)
       end
