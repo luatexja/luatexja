@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2014/02/01',
+  date = '2014/02/02',
   description = 'Insertion process of JFM glues and kanjiskip',
 })
 module('luatexja.jfmglue', package.seeall)
@@ -31,7 +31,7 @@ local has_attr = Dnode.has_attribute
 local set_attr = Dnode.set_attribute
 local insert_before = Dnode.insert_before
 local insert_after = Dnode.insert_after
-local node_next = Dnode.getnext
+local node_next = (Dnode ~= node) and Dnode.getnext or node.next
 local round = tex.round
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_find_char_class = ltjf.find_char_class
@@ -271,7 +271,7 @@ local function set_attr_icflag_processed(p)
 end
 
 local function check_next_ickern(lp)
-   if getid(lp) == id_kern and ITALIC == get_attr_icflag(lp) then
+   if lp and getid(lp) == id_kern and ITALIC == get_attr_icflag(lp) then
       set_attr(lp, attr_icflag, IC_PROCESSED)
       Np.last = lp; return node_next(lp)
    else 
@@ -284,7 +284,7 @@ local function calc_np_pbox(lp)
    local lpa, nc = KINSOKU, nil
    set_attr(lp, attr_icflag, get_attr_icflag(lp));
    while lp and (lpa>=PACKED) and (lpa<BOXBDD) do
-      nc, lp = lp, node_next(lp); lpa = has_attr(lp, attr_icflag) or 0
+      nc, lp = lp, node_next(lp); lpa = lp and has_attr(lp, attr_icflag) or 0
      -- get_attr_icflag() ではいけない！
    end
    Np.nuc = nc
@@ -974,7 +974,7 @@ end
 function main(ahead, mode)
    if not ahead then return ahead end
    head = ahead;
-   local lp, par_indented = init_var(mode); 
+   local lp, par_indented = init_var(mode)
    lp = calc_np(lp, last)
    if Np then 
       extract_np(); handle_list_head(par_indented)
@@ -1006,7 +1006,7 @@ end
 do
    local IHB  = luatexja.userid_table.IHB
    local BPAR = luatexja.userid_table.BPAR
-   local node_prev = Dnode.getprev
+   local node_prev = (Dnode ~= node) and Dnode.getprev or node.prev
    local node_write = Dnode.write
 
    -- \inhibitglue

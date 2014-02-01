@@ -18,7 +18,7 @@ local node_traverse = Dnode.traverse
 local node_new = Dnode.new
 local node_remove = luatexja.Dnode_remove -- Dnode.remove
 local node_tail = Dnode.tail
-local node_next = Dnode.getnext
+local node_next = (Dnode ~= node) and Dnode.getnext or node.next
 local has_attr = Dnode.has_attribute
 local set_attr = Dnode.set_attribute
 local node_insert_before = Dnode.insert_before

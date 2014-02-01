@@ -74,21 +74,25 @@ do
    end
 
    local Dnode = node.direct or node
-   local Dnode_remove, Dnode_next, Dnode_prev = Dnode.remove, Dnode.getnext, Dnode.getprev
-   local getfield = (Dnode ~= node) and Dnode.getfield or function(n, i) return n[i] end
-   local setfield = (Dnode ~= node) and Dnode.setfield or function(n, i, c) n[i] = c end
-   function luatexja.Dnode_remove (head, current)
-      if head==current then
-	 local q, r = Dnode_next(current), Dnode_prev(current)
-	 setfield(current, 'next', nil)
-	 if q then setfield(q, 'prev', r) end
-	 if r and Dnode_next(r) == current then -- r is "real prev"
-	    setfield(r, 'next', q)
+   if Dnode~=node then
+      local Dnode_remove = Dnode.remove
+      local Dnode_next, Dnode_prev = Dnode.getnext, node.getprev
+      local getfield, setfield = Dnode.getfield, Dnode.setfield
+      function luatexja.Dnode_remove (head, current)
+	 if head==current then
+	    local q, r = Dnode_next(current), Dnode_prev(current)
+	    setfield(current, 'next', nil)
+	    if q then setfield(q, 'prev', r) end
+	    if r and Dnode_next(r) == current then -- r is "real prev"
+	       setfield(r, 'next', q)
+	    end
+	    return q, q
+	 else
+	    return Dnode_remove(head, current)
 	 end
-	 return q, q
-      else
-	 return Dnode_remove(head, current)
       end
+   else
+      luatexja.Dnode_remove = luatexja.node_remove 
    end
 
 end

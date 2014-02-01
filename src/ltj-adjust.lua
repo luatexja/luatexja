@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.adjust',
-  date = '2014/02/01',
+  date = '2014/02/02',
   description = 'Advanced line adjustment for LuaTeX-ja',
 })
 module('luatexja.adjust', package.seeall)
@@ -29,9 +29,9 @@ local node_traverse_id = Dnode.traverse_id
 local node_new = Dnode.new
 local node_copy = Dnode.copy
 local node_hpack = Dnode.hpack
-local node_next = Dnode.getnext
+local node_next = (Dnode ~= node) and Dnode.getnext or node.next
 local node_free = Dnode.free
-local node_prev = Dnode.getprev
+local node_prev = (Dnode ~= node) and Dnode.getprev or node.prev
 local node_tail = Dnode.tail
 local has_attr = Dnode.has_attribute
 local set_attr = Dnode.set_attribute
