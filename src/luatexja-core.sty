@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2014/01/13 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2014/02/01 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -100,6 +100,11 @@
      at least beta-0.74.0 is needed}
     {Package loading is aborted now.\MessageBreak}
 \expandafter\endinput\fi\relax
+
+ \@PackageInfoNoLine{luatexja-core}
+    {using\space%
+  \directlua{if node.direct==node then tex.write('traditional node')
+  else tex.write('DIRECT') end} node access model}
 
 %! なお、luatexbase-compat の説明に従うと、LuaTeX 拡張プリミティブは
 %! plain/LaTeX の両方で \luatex 付の名前（\directlua はそのまま)
@@ -138,7 +143,10 @@
 \newluatexattribute\ltj@yablshift % attribute for \yabaselineshift
 \newluatexattribute\ltj@ykblshift % attribute for \ykbaselineshift
 \newluatexattribute\jfam          % index for current jfam
-\ltj@icflag=0\ltj@origchar=0\ltj@charclass=0
+\ltj@icflag=0
+\ltj@origchar=0
+\ltj@charclass=0
+\ltj@curjfnt=-1
 
 %%%%%%%% Attributes for character ranges
 \newcount\ltj@tempcnta
@@ -192,9 +200,8 @@
 \def\ltj@@jfont{\directlua{luatexja.jfont.jfontdefY()}}
 
 %%%%%%%% \zw, \zh
-\protected\def\zw{\directlua{luatexja.jfont.load_zw()}\ltj@zw}
-\protected\def\zh{\directlua{luatexja.jfont.load_zh()}\ltj@zh}
-
+\protected\def\zw{\directlua{tex.setdimen('ltj@zw', luatexja.jfont.get_zw())}\ltj@zw}
+\protected\def\zh{\directlua{tex.setdimen('ltj@zh', luatexja.jfont.get_zh())}\ltj@zh}
 
 %%%%%%%% \inhibitglue
 \protected\def\ltj@reset@globaldefs{%
@@ -238,7 +245,7 @@
 \setbox0\hbox{%
   \directlua{% This value depends on the version of LuaTeX.
     luatexja.stack.hmode = -tex.nest[tex.nest.ptr].mode
-  }
+  }%
 }
 
 % prebreakpenalty = {<char_code>, <penalty>}
@@ -249,7 +256,7 @@
 \define@key[ltj]{japaram}{postbreakpenalty}{%
   \expandafter\ltj@@set@stack#1:{POST}{-10000}{10000}}
 \def\ltj@@set@stack#1,#2:#3#4#5{%
-  \directlua{luatexja.stack.set_stack_table(luatexja.isglobal, luatexja.stack_table_index.#3,
+  \directlua{luatexja.stack.set_stack_perchar(luatexja.stack_table_index.#3,
     \ltj@safe@num@or{nil}{#1},\ltj@safe@num@or{nil}{#2},#4,#5)}}
 
 % jatextfont = {<char_code>, <font_cs>}
@@ -267,8 +274,7 @@
     {\string#2 is not a control sequence that represents \MessageBreak
      a Japanese font}{}%
   \else
-    \directlua{luatexja.stack.set_stack_font(luatexja.isglobal,
-    luatexja.stack_table_index.#3,
+    \directlua{luatexja.stack.set_stack_font(luatexja.stack_table_index.#3,
     \ltj@safe@num@or{nil}{#1}, \the\ltj@curjfnt)}%
   \fi
   \ltj@curjfnt=\ltj@tempcnta
@@ -297,8 +303,7 @@
   \def\ltj@tempa{preonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{1}\fi
   \def\ltj@tempa{postonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{2}\fi
   \def\ltj@tempa{allow}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{3}\fi
-  \directlua{luatexja.stack.set_stack_table(luatexja.isglobal,
-    luatexja.stack_table_index.XSP,
+  \directlua{luatexja.stack.set_stack_perchar(luatexja.stack_table_index.XSP,
     \ltj@safe@num@or{nil}{#1},
     \ltj@safe@num@or{nil}{\ltj@temp},0,3)}}
 
@@ -313,8 +318,7 @@
   \def\ltj@tempa{preonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{1}\fi
   \def\ltj@tempa{postonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{2}\fi
   \def\ltj@tempa{allow}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{3}\fi
-  \directlua{luatexja.stack.set_stack_table(luatexja.isglobal,
-    luatexja.stack_table_index.XSP,
+  \directlua{luatexja.stack.set_stack_perchar(luatexja.stack_table_index.XSP,
     \ltj@safe@num@or{nil}{#1},
     \ltj@safe@num@or{nil}{\ltj@temp},0,3)}}
 
@@ -336,9 +340,15 @@
 
 % [x]]kanjiskip = <dimen>
 \define@key[ltj]{japaram}{kanjiskip}{%              % SKIP
-  \directlua{luatexja.stack.set_stack_skip(luatexja.isglobal, 'kanjiskip', \ltj@safe@glue{#1})}}
+  \directlua{%
+    local d = \ltj@safe@glue{#1}
+    luatexja.stack.set_stack_skip(luatexja.stack_table_index.KSK, d); node.free(d)
+}}
 \define@key[ltj]{japaram}{xkanjiskip}{%             % SKIP
-  \directlua{luatexja.stack.set_stack_skip(luatexja.isglobal, 'xkanjiskip', \ltj@safe@glue{#1})}}
+  \directlua{%
+    local d = \ltj@safe@glue{#1}
+    luatexja.stack.set_stack_skip(luatexja.stack_table_index.XSK, d); node.free(d)
+}}
 
 % jcharwidowpenalty = <count>
 \define@key[ltj]{japaram}{jcharwidowpenalty}{%      %COUNT

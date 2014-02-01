@@ -22,18 +22,20 @@ end
 --- 以下は全ファイルで共有される定数
 local icflag_table = {}
 luatexja.icflag_table = icflag_table
-icflag_table.ITALIC       = 1
-icflag_table.PACKED       = 2
-icflag_table.KINSOKU      = 3
-icflag_table.FROM_JFM     = 6
--- FROM_JFM: 4, 5, 6, 7, 8 →優先度高
+icflag_table.ITALIC          = 1
+icflag_table.PACKED          = 2
+icflag_table.KINSOKU         = 3
+icflag_table.FROM_JFM        = 6
+-- FROM_JFM: 4, 5, 6, 7, 8 →優先度高（伸びやすく，縮みやすい）
 -- 6 が標準
-icflag_table.KANJI_SKIP   = 9
-icflag_table.XKANJI_SKIP  = 10
-icflag_table.PROCESSED    = 11
-icflag_table.IC_PROCESSED = 12
-icflag_table.BOXBDD       = 15
-icflag_table.PROCESSED_BEGIN_FLAG = 32
+icflag_table.KANJI_SKIP      = 9
+icflag_table.KANJI_SKIP_JFM  = 10
+icflag_table.XKANJI_SKIP     = 11
+icflag_table.XKANJI_SKIP_JFM = 12
+icflag_table.PROCESSED       = 13
+icflag_table.IC_PROCESSED    = 14
+icflag_table.BOXBDD          = 15
+icflag_table.PROCESSED_BEGIN_FLAG = 128
 
 local stack_table_index = {}
 luatexja.stack_table_index = stack_table_index
@@ -41,7 +43,9 @@ stack_table_index.PRE  = 0x200000 -- characterごと
 stack_table_index.POST = 0x400000 -- characterごと
 stack_table_index.KCAT = 0x600000 -- characterごと
 stack_table_index.XSP  = 0x800000 -- characterごと
-stack_table_index.JWP  = 0 -- 0のみ
+stack_table_index.JWP  = 0 -- これだけ
+stack_table_index.KSK  = 1 -- これだけ
+stack_table_index.XSK  = 2 -- これだけ
 stack_table_index.MJT  = 0x100 -- 0--255
 stack_table_index.MJS  = 0x200 -- 0--255
 stack_table_index.MJSS = 0x300 -- 0--255
@@ -51,8 +55,47 @@ local userid_table = {}
 luatexja.userid_table = userid_table
 userid_table.IHB  = luatexbase.newuserwhatsitid('inhibitglue',  'luatexja') -- \inhibitglue
 userid_table.STCK = luatexbase.newuserwhatsitid('stack_marker', 'luatexja') -- スタック管理
-userid_table.OTF  = luatexbase.newuserwhatsitid('char_by_cid',  'luatexja') -- luatexja-otf
 userid_table.BPAR = luatexbase.newuserwhatsitid('begin_par',    'luatexja') -- 「段落始め」
+
+do
+   local node_remove, node_next, node_prev = node.remove, node.next, node.prev
+   function luatexja.node_remove (head, current)
+      if head==current then
+	 local q, r = node_next(current), node_prev(current)
+	 current.next = nil
+	 if q then q.prev = r end
+	 if r and node_next(r)==current then -- r is "real prev"
+	    r.next = q
+	 end
+	 return q, q
+      else
+	 return node_remove(head, current)
+      end
+   end
+
+   local Dnode = node.direct or node
+   if Dnode~=node then
+      local Dnode_remove = Dnode.remove
+      local Dnode_next, Dnode_prev = Dnode.getnext, node.getprev
+      local getfield, setfield = Dnode.getfield, Dnode.setfield
+      function luatexja.Dnode_remove (head, current)
+	 if head==current then
+	    local q, r = Dnode_next(current), Dnode_prev(current)
+	    setfield(current, 'next', nil)
+	    if q then setfield(q, 'prev', r) end
+	    if r and Dnode_next(r) == current then -- r is "real prev"
+	       setfield(r, 'next', q)
+	    end
+	    return q, q
+	 else
+	    return Dnode_remove(head, current)
+	 end
+      end
+   else
+      luatexja.Dnode_remove = luatexja.node_remove 
+   end
+
+end
 
 --- 定義終わり
 
@@ -141,13 +184,13 @@ do
 	 return print_scaled(tex.getattribute('ltj@ykblshift'))..'pt'
       end,
       kanjiskip = function(t) 
-	 return print_spec(ltjs.get_skip_table('kanjiskip', t))
+	 return print_spec(ltjs.get_stack_skip(stack_table_index.KSK, t))
       end,
       xkanjiskip = function(t) 
-	 return print_spec(ltjs.get_skip_table('xkanjiskip', t))
+	 return print_spec(ltjs.get_stack_skip(stack_table_index.XSK, t))
       end,
       jcharwidowpenalty = function(t)
-	 return ltjs.get_penalty_table(stack_table_index.JWP, 0, t)
+	 return ltjs.get_stack_table(stack_table_index.JWP, 0, t)
       end,
       autospacing = function(t)
 	 return tex.getattribute('ltj@autospc')
@@ -196,22 +239,22 @@ do
 	 return (c<0) and 1 or ltjc.get_range_setting(c)
       end,
       prebreakpenalty = function(c, t)
-	 return ltjs.get_penalty_table(stack_table_index.PRE 
+	 return ltjs.get_stack_table(stack_table_index.PRE 
 					  + ltjb.in_unicode(c, true), 0, t)
       end,
       postbreakpenalty = function(c, t)
-	 return ltjs.get_penalty_table(stack_table_index.POST 
+	 return ltjs.get_stack_table(stack_table_index.POST 
 					  + ltjb.in_unicode(c, true), 0, t)
       end,
       kcatcode = function(c, t)
-	 return ltjs.get_penalty_table(stack_table_index.KCAT 
+	 return ltjs.get_stack_table(stack_table_index.KCAT 
 					  + ltjb.in_unicode(c, false), 0, t)
       end,
       chartorange = function(c, t)
 	 return ltjc.char_to_range(ltjb.in_unicode(c, false))
       end,
       jaxspmode = function(c, t)
-	 return ltjs.get_penalty_table(stack_table_index.XSP
+	 return ltjs.get_stack_table(stack_table_index.XSP
 					  + ltjb.in_unicode(c, true), 3, t)
       end,
    }
@@ -232,12 +275,16 @@ end
 
 -- main process
 do
+   local Dnode = node.direct or node
+   local nullfunc = function (n) return n end
+   local to_node = (Dnode ~= node) and Dnode.tonode or nullfunc
+   local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
    -- mode = true iff main_process is called from pre_linebreak_filter
    local function main_process(head, mode, dir)
-      local p = head
+      local p = to_direct(head)
       p = ltjj.main(p,mode)
       if p then p = ltjw.set_ja_width(p, dir) end
-      return p
+      return to_node(p)
    end
    
    -- callbacks
@@ -345,8 +392,12 @@ local function debug_show_node_X(p,print_fn)
          s = s .. ' (from JFM: priority ' .. get_attr_icflag(p)-icflag_table.FROM_JFM .. ')'
       elseif get_attr_icflag(p)==icflag_table.KANJI_SKIP then
 	 s = s .. ' (kanjiskip)'
+      elseif get_attr_icflag(p)==icflag_table.KANJI_SKIP_JFM then
+	 s = s .. ' (kanjiskip, JFM specified)'
       elseif get_attr_icflag(p)==icflag_table.XKANJI_SKIP then
 	 s = s .. ' (xkanjiskip)'
+      elseif get_attr_icflag(p)==icflag_table.XKANJI_SKIP_JFM then
+	 s = s .. ' (xkanjiskip, JFM specified)'
       end
       print_fn(s)
    elseif pt == 'kern' then

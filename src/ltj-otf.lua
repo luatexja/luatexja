@@ -13,14 +13,31 @@ local id_glyph = node.id('glyph')
 local id_whatsit = node.id('whatsit')
 local sid_user = node.subtype('user_defined')
 
-local node_new = node.new
-local node_remove = node.remove
-local node_next = node.next
-local node_free = node.free
-local has_attr = node.has_attribute
-local set_attr = node.set_attribute
-local unset_attr = node.unset_attribute
-local node_insert_after = node.insert_after
+local Dnode = node.direct or node
+
+local setfield = (Dnode ~= node) and Dnode.setfield or function(n, i, c) n[i] = c end
+local getfield = (Dnode ~= node) and Dnode.getfield or function(n, i) return n[i] end
+local getid = (Dnode ~= node) and Dnode.getid or function(n) return n.id end
+local getfont = (Dnode ~= node) and Dnode.getfont or function(n) return n.font end
+--local getlist = (Dnode ~= node) and Dnode.getlist or function(n) return n.head end
+local getchar = (Dnode ~= node) and Dnode.getchar or function(n) return n.char end
+local getsubtype = (Dnode ~= node) and Dnode.getsubtype or function(n) return n.subtype end
+
+local nullfunc = function(n) return n end
+local to_node = (Dnode ~= node) and Dnode.tonode or nullfunc
+local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
+
+local node_new = Dnode.new
+local node_remove = luatexja.Dnode_remove -- Dnode.remove
+local node_next = (Dnode ~= node) and Dnode.getnext or node.next
+local node_free = Dnode.free
+local has_attr = Dnode.has_attribute
+local set_attr = Dnode.set_attribute
+local unset_attr = Dnode.unset_attribute
+local node_insert_after = Dnode.insert_after 
+local node_write = Dnode.write
+local node_traverse_id = Dnode.traverse_id
+
 local identifiers = fonts.hashes.identifiers
 
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
@@ -64,9 +81,11 @@ end
 local function append_jglyph(char)
    local p = node_new(id_whatsit,sid_user)
    local v = tex.attribute[attr_curjfnt]
-   p.user_id=OTF; p.type=100; p.value=char
+   setfield(p, 'user_id', OTF)
+   setfield(p, 'type', 100)
+   setfield(p, 'value', char)
    set_attr(p, attr_yablshift, tex.attribute[attr_ykblshift])
-   node.write(p)
+   node_write(p)
 end
 
 local function cid(key)
@@ -95,18 +114,19 @@ local function cid(key)
 end
 
 local function extract(head)
+   head = to_direct(head)
    local p = head
    local v
    while p do
-      if p.id==id_whatsit then
-         if p.subtype==sid_user then
-            local puid = p.user_id
+      if getid(p)==id_whatsit then
+         if getsubtype(p)==sid_user then
+            local puid = getfield(p, 'user_id')
             if puid==OTF or puid==VSR then
                local g = node_new(id_glyph)
-               g.subtype = 0; g.char = p.value
-               v = has_attr(p, attr_curjfnt); g.font = v
-               set_attr(g, attr_curjfnt, 
-                        puid==OTF and v or 0)
+               setfield(g, 'subtype', 0)
+	       setfield(g, 'char', getfield(p, 'value'))
+               v = has_attr(p, attr_curjfnt); setfield(g, 'font',v)
+               set_attr(g, attr_curjfnt, puid==OTF and v or -1)
                -- VSR yields ALchar
                v = has_attr(p, attr_yablshift)
                if v then 
@@ -122,15 +142,15 @@ local function extract(head)
       end
       p = node_next(p)
    end
-   return head
+   return to_node(head)
 end
 
-luatexbase.add_to_callback('hpack_filter', 
-   function (head) return extract(head) end,'ltj.hpack_filter_otf',
+luatexbase.add_to_callback('hpack_filter', extract,
+			   'ltj.hpack_filter_otf',
    luatexbase.priority_in_callback('pre_linebreak_filter',
 				   'ltj.pre_linebreak_filter'))
-luatexbase.add_to_callback('pre_linebreak_filter', 
-   function (head) return extract(head) end, 'ltj.pre_linebreak_filter_otf',
+luatexbase.add_to_callback('pre_linebreak_filter', extract,
+			   'ltj.pre_linebreak_filter_otf',
    luatexbase.priority_in_callback('pre_linebreak_filter',
 				   'ltj.pre_linebreak_filter'))
 
@@ -267,40 +287,50 @@ do
 -- 組版時
    local function ivs_jglyph(char, bp, pf, uid)
       local p = node_new(id_whatsit,sid_user)
-      p.user_id=uid; p.type=100; p.value=char
+      setfield(p, 'user_id', uid)
+      setfield(p, 'type', 100)
+      setfield(p, 'value', char)
       set_attr(p, attr_curjfnt, pf)
       set_attr(p, attr_yablshift, has_attr(bp, attr_ykblshift) or 0)
       return p
    end
 
    local function do_ivs_repr(head)
-      local p = head
+      head = to_direct(head)
+      local p, r = head
       while p do
-	 local pid = p.id
+	 local pid = getid(p)
 	 if pid==id_glyph then
-            local pf = p.font
+            local pf = getfont(p)
             local q = node_next(p) -- the next node of p
-            if q and q.id==id_glyph then
-               local qc = q.char
+            if q and getid(q)==id_glyph then
+               local qc = getchar(q)
                if (qc>=0xFE00 and qc<=0xFE0F) or (qc>=0xE0100 and qc<0xE01F0) then 
                   -- q is a variation selector
                   if qc>=0xE0100 then qc = qc - 0xE0100 end
                   local pt = font_ivs_table[pf]
-                  pt = pt and pt[p.char];  pt = pt and  pt[qc]
-                  head = node_remove(head,q)
+                  pt = pt and pt[getchar(p)];  pt = pt and  pt[qc]
+                  head, r = node_remove(head,q)
+		  node_free(q)
                   if pt then
                      local np = ivs_jglyph(pt, p, pf,
                                            (has_attr(p,attr_curjfnt) or 0)==pf and OTF or VSR)
                      head = node_insert_after(head, p, np) 
                      head = node_remove(head,p)
-                     p = np
+		     node_free(p)
                   end
+		  p = r
+	       else 
+		  p = q
                end
+	    else
+	       p = node_next(p)
             end
+	 else
+	    p = node_next(p)
          end
-	 p = node_next(p)
       end
-      return head
+      return to_node(head)
    end
 
    -- font define
@@ -316,9 +346,9 @@ do
 			      'luatexja.otf.enable_ivs() was already called, so this call is ignored', '')
       else
 	 luatexbase.add_to_callback('hpack_filter', 
-				    function (head) return do_ivs_repr(head) end,'do_ivs', 1)
+				    do_ivs_repr,'do_ivs', 1)
 	 luatexbase.add_to_callback('pre_linebreak_filter', 
-				    function (head) return do_ivs_repr(head) end, 'do_ivs', 1)
+				    do_ivs_repr, 'do_ivs', 1)
 	 local ivs_callback = function (name, size, id)
 	    return font_callback(
 	       name, size, id, 

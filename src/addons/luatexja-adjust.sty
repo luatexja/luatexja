@@ -82,7 +82,6 @@
 \expandafter\endinput\fi\relax
 
 %%------------------
-\RequirePackage{expl3}
 %! Main part of luatexja-adjust
 \RequireLuaTeXjaSubmodule{adjust}
 
@@ -95,23 +94,23 @@
   \ifltj@japaram@adjust\ltjenableadjust\else\ltjdisableadjust\fi
 }
 
-\ExplSyntaxOn
-\cs_new:Nn \ltj_adjust_inittable: {
-  % To be filled...
-}
-\cs_new:Nn \ltj_adjust_appendtable:n {
-  % To be filled
-}
-
-\clist_new:N \l_ltj_adjust_priority
-\define@key[ltj]{japaram}{adjustpriority}{% COMMA LIST
-  \clist_set:Nx \l_ltj_adjust_priority {#1}
-  \ltj_adjust_inittable:
-  \clist_map_function:NN \l_ltj_adjust_priority \ltj_adjust_appendtable:n
-}
-
-\ExplSyntaxOff
-
+\ifltj@in@latex
+  \RequirePackage{expl3}
+  \ExplSyntaxOn
+  \cs_new:Nn \ltj_adjust_inittable: {
+    % To be filled...
+  }
+  \cs_new:Nn \ltj_adjust_appendtable:n {
+    % To be filled
+  }
+  \clist_new:N \l_ltj_adjust_priority
+  \define@key[ltj]{japaram}{adjustpriority}{% COMMA LIST
+    \clist_set:Nx \l_ltj_adjust_priority {#1}
+    \ltj_adjust_inittable:
+    \clist_map_function:NN \l_ltj_adjust_priority \ltj_adjust_appendtable:n
+  }
+  \ExplSyntaxOff
+\fi
 
 %%------------------ all done
 \ltj@adjust@AtEnd
