@@ -18,6 +18,7 @@ local has_attr_node = node.has_attribute
 local tex_getattr = tex.getattribute
 
 ATTR_RANGE = 7
+local jcr_cjk, jcr_noncjk = 0, 1
 local floor = math.floor
 local pow = math.pow
 local kcat_attr_table = {}
@@ -39,7 +40,7 @@ pow_table[31*ATTR_RANGE] = pow(2, 31)
 -- initialize
 jcr_table_main = {}
 local jcr_table_main = jcr_table_main
-local jcr_cjk = 0; local jcr_noncjk = 1; local ucs_out = 0x110000
+local ucs_out = 0x110000
 
 for i=0x80 ,0xFF      do jcr_table_main[i]=1 end
 for i=0x100,ucs_out-1 do jcr_table_main[i]=0 end

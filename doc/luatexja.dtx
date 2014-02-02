@@ -546,7 +546,7 @@ since \LuaTeX\ binary and \Pkg{luaotfload} is updated in
 Now \LuaTeX-ja is available from the following archive and distributions:
   \begin{itemize}
   \item CTAN (in the \texttt{macros/luatex/generic/luatexja} directory)
-  \item MiK\TeX\ (in \texttt{luatexja.tar.lzma})
+  \item MiK\TeX\ (in \texttt{luatexja.tar.lzma}); see the next subsection
   \item \TeX\ Live (in \texttt{texmf-dist/tex/luatex/luatexja})
   \item W32\TeX\ (in \texttt{luatexja.tar.xz})
   \end{itemize}
@@ -677,14 +677,37 @@ Note that \texttt{*.\{dtx,ins\}} and \texttt{ltj-kinsoku\_make.tex} are not need
 %</ja>
 \end{enumerate}
 
+%<en>\subsection{Cautions}
+%<ja>\subsection{注意点}
+
+\begin{itemize}
 %<*en>
-\paragraph{Note for MiK\TeX\ users}
+\item The encoding of your source file must be UTF-8. No other
+      encodings, such as EUC-JP or Shift-JIS, are not supported.
+%</en>
+%<*ja>
+\item 原稿のソースファイルの文字コードはUTF-8固定である．
+      従来日本語の文字コードとして用いられてきたEUC-JPやShift-JISは使用できない．
+%</ja>
+%<*en>
+\item \LuaTeX-ja is very slower than \pTeX. 
+Generally speaking, LuaJIT\TeX\ processes \LuaTeX-ja 
+about 30\% faster than \LuaTeX, but not always.
+%</en>
+%<*ja>
+\item \LuaTeX-jaは動作が\pTeX に比べて非常に遅い．
+コードを調整して徐々に速くしているが，まだ満足できる速度ではない．
+LuaJIT\TeX を用いると\LuaTeX のだいたい1.3倍の速度で動くようであるが，
+IPA mj明朝などの大きいフォントを用いた場合には\LuaTeX よりも遅くなることもある．
+%</ja>
+\item%
+%<*en>
+\textbf{Note for MiK\TeX\ users}\quad
 \LuaTeX-ja requires that several CMap files%
 \footnote{\texttt{UniJIS2004-UTF32-H} and \texttt{Adobe-Japan1-UCS2}.}
 must be found from \LuaTeX.
 Strictly speaking, those CMaps are needed 
 only in the first run of \LuaTeX-ja after installing or updating.
-
 But it seems that MiK\TeX\ does not satisfy this condition, 
 so you will encounter an error like the following:
 %</en>
@@ -713,29 +736,6 @@ run \LuaTeX-ja in this directory, and finally delete the temporaly directory.
 コピーし，その中で\LuaTeX-ja の初回起動を行い，作業用ディレクトリを消す作業をしている．
 %</ja>
 
-%<en>\subsection{Cautions}
-%<ja>\subsection{注意点}
-
-\begin{itemize}
-%<*en>
-\item The encoding of your source file must be UTF-8. No other
-      encodings, such as EUC-JP or Shift-JIS, are not supported.
-%</en>
-%<*ja>
-\item 原稿のソースファイルの文字コードはUTF-8固定である．
-      従来日本語の文字コードとして用いられてきたEUC-JPやShift-JISは使用できない．
-%</ja>
-%<*en>
-\item \LuaTeX-ja is very slower than \pTeX. 
-Generally speaking, LuaJIT\TeX\ processes \LuaTeX-ja 
-about 30\% faster than \LuaTeX, but not always.
-%</en>
-%<*ja>
-\item \LuaTeX-jaは動作が\pTeX に比べて非常に遅い．
-コードを調整して徐々に速くしているが，まだ満足できる速度ではない．
-LuaJIT\TeX を用いると\LuaTeX のだいたい1.3倍の速度で動くようであるが，
-IPA mj明朝などの大きいフォントを用いた場合には\LuaTeX よりも遅くなることもある．
-%</ja>
 \end{itemize}
 
 %<en>\subsection{Using in plain \TeX}
@@ -3381,8 +3381,8 @@ An example of this callback is the \texttt{ltjarticle} class, with
 \texttt{jfm-min.lua}中の\texttt{'parbdd'}を強制的にクラス0に割り当てている．
 %</ja>
 
-%<en>\item[\texttt{luatexja.define\_font} callback]
-%<ja>\item[\texttt{luatexja.define\_font}コールバック]
+%<en>\item[\texttt{luatexja.define\_jfont} callback]
+%<ja>\item[\texttt{luatexja.define\_jfont}コールバック]
 %<*en>
 This callback and the next callback form a pair, and you can assign letters which don't have
 	     fixed code points in Unicode to non-zero character classes.
@@ -3399,54 +3399,101 @@ function (<table> jfont_info, <number> font_number)
   return <table> new_jfont_info
 end
 \end{lstlisting}
-
 %<*en>
-You may assume that \verb+jfont_info+ has the following fields:
-%</en>
-%<*ja>
-\verb+jfont_info+ は以下の2フィールドを持つ：
-%</ja>
+\verb+jfont_info+ has the following fields,
+\emph{which may not overwritten by a user}:
 \begin{description}
-\item[\tt size\_cache]
-%<*ja>
-使用されているJFMの情報が格納されているテーブルで，
-\emph{このテーブルを書き換えてはならない}．
-中身はほぼJFMファイルに書かれている唯一のテーブルであるが，次のように若干変わっている：
+\item[\texttt{size}]
+The font size specified at \verb+\jfont+ in scaled points ($1\,\mathrm{sp}=2^{-16}\,\mathrm{pt}$).
+\item[\texttt{zw}, \texttt{zh}, \texttt{kanjiskip}, \texttt{xkanjiskip}]
+These are scaled value of those specified by the JFM, by the font size.
+\item[\texttt{jfm}]
+The internal number of the JFM.
+\item[\texttt{var}]
+The value of \texttt{jfmvar}~key, which is specified at \verb+\jfont+.
+The default value is the empty string.
+\item[\texttt{chars}]
+The mapping table from character codes to its character classes.\\
+The specification \texttt{[i].chars=\{<character>, ...\}} in the JFM will be  stored in this
+	   field as \texttt{chars=\{[<character>]=\,$i$, ...\}}.
+\item[\texttt{char\_type}]
+For $i\in\omega$, \texttt{char\_type[$i$]} is information of characters whose class is
+	   $i$, and has the following fields:
 \begin{itemize}
-\item 各文字クラス$i$に属する文字達のテーブル\
-\texttt{[$i$].chars=\{<character>, ...\}} は，トップレベルにまとめられ，
-\texttt{chars=\{[<character>]=\,$i$, ...\}} という形になっている．
-\item \texttt{zw},~\texttt{zh}, \texttt{kanjiskip},~\texttt{xkanjiskip} の各フィールドの値は，
-実際に使われるフォントサイズに合わせたsp ($1\,\mathrm{sp}=2^{-16}\,\mathrm{pt}$)単位の長さに変わっている．
-\item 各文字クラス$i$の情報を格納したテーブルも，\texttt{char\_type} フィールドの下にまとめられている．
-例えば，文字クラス1に属する文字の高さは \texttt{char\_type[1].height} で参照できる．
-\item \texttt{dir} フィールドはこのテーブルにはない．
-\end{itemize}
-%</ja>
-%<*en>
-A table which contains the information of a JFM, and \emph{this table must not be changed}.
-The contents of this table are similar to that which is written is the JFM file, but
-the following differ:
-\begin{itemize}
-\item There is a \texttt{chars} table, \dots
-\item The value in \texttt{zw},~\texttt{zh}, \texttt{kanjiskip},~\texttt{xkanjiskip} fields are
-now scaled by real font size, and in scaled-pont unit.
-\item ...
-\item There is no \texttt{dir} field in this table.
-\end{itemize}
-%</en>
+ \item \texttt{width},~\texttt{height}, \texttt{depth}, 
+  \texttt{italic}, \texttt{down},~\texttt{left}\ are just 
+       scaled value of those specified by the JFM, by the font size.
+ \item \texttt{align} is a number which is determined from \texttt{align}~field in the JFM:
+\[
+ \begin{cases}
+  0&\text{\texttt{'left'} and the default value}\\0.5&\text{\tt 'middle'}\\1&\text{\tt 'right'}
+ \end{cases}
+\]
+\item For $j\in \omega$, \texttt{[$j$]} stores a kern or a glue which will be inserted 
+between character class~$i$ and class~$j$.
 
-\item[\tt var]
-%<en>The value specified in \texttt{jfmvar=...} at a call of \verb+\jfont+.
-%<ja>\verb+\jfont+ の呼び出しの際に\texttt{jfmvar=...}で指定された値．
+If a kern will be inserted, the value of this field is \texttt{[$j$]=\{false, <kern\_node>, <ratio>\}},
+where <kern\_node> is a node\footnote{%
+ This version of \LuaTeX-ja uses ``direct access
+      model'' for accessing nodes, if possible. }.
+If a glue will be inserted, we have \texttt{[$j$]=\{false, <spec\_node>, <ratio>, <icflag>\}},
+where <spec\_node> is also a node, and $\text{<icflag>}=\textit{from\_jfm}+\text{<priority>}$.
+\end{itemize}
 \end{description}
+%</en>
+%<*ja>
+\verb+jfont_info+ は最低限以下のフィールドを持つが，これらを書き換えてはならない：
+\begin{description}
+\item[\texttt{size}]
+実際に使われるフォントサイズ（sp単位）．$1\,\mathrm{sp}=2^{-16}\,\mathrm{pt}$．
+\item[\texttt{zw}, \texttt{zh}, \texttt{kanjiskip}, \texttt{xkanjiskip}]
+JFMファイルで指定されているそれぞれの値をフォントサイズに合わせてスケーリングしたものを
+sp単位で格納している．
+\item[\texttt{jfm}]
+利用されているJFMを識別するための番号．
+\item[\texttt{var}]
+\verb+\jfont+で指定された \texttt{jfmvar} キーの値（未指定のときは空文字列）．
+\item[\texttt{chars}]
+文字コードから文字クラスへの対応が記述されたテーブル．\\
+JFM内の \texttt{[i].chars=\{<character>, ...\}} という指定は\ 
+\texttt{chars=\{[<character>]=\,$i$, ...\}} という形式に変換されている．
+\item[\texttt{char\_type}]
+$i\in\omega$に対して，\texttt{char\_type[$i$]} は文字クラス$i$の文字の寸法を格納しており，
+以下のフィールドを持つ．
+\begin{itemize}
+ \item \texttt{width},~\texttt{height}, \texttt{depth}, 
+  \texttt{italic}, \texttt{down},~\texttt{left}\ は
+JFMで指定されているそれぞれの値をスケーリングしたものである．
+ \item \texttt{align} はJFMで指定されている値によって，
+\[
+ \begin{cases}
+  0&\text{\texttt{'left'}や省略時}\\0.5&\text{\tt 'middle'}\\1&\text{\tt 'right'}
+ \end{cases}
+\]
+のいずれかの値をとる．
+\item $j\in \omega$に対して，\texttt{[$j$]} は文字クラス$i$の文字と$j$の文字の間に挿入されるkern
+      やglueを格納している．
+間に入るものがkernであれば，このフィールドの値は\ 
+\texttt{[$j$]=\{false, <kern\_node>, <ratio>\}} である．
+<kern\_node>はkernを表すノードそのものである\footnote{%
+本バージョンでは利用可能ならばノードのアクセス手法にdirect access
+      modelを用いている．そのため，例えば\LuaTeX\ beta-0.78.2では，単なる自然数のようにし
+      か見えないことに注意．
+}．
+glueであれば，\texttt{[$j$]=\{false, <spec\_node>, <ratio>, <icflag>\}} である．
+<spec\_node>はglueの長さを表すノードそのものであり，
+      $\text{<icflag>}=\textit{from\_jfm}+\text{<priority>}$である．
+\end{itemize}
+\end{description}
+%</ja>
 
 %<*en>
-The returned table \verb+new_jfont_info+ also should include these two fields.
+The returned table \verb+new_jfont_info+ also should include these fields, but
+you are free to add more fields (to use them in the \texttt{luatexja.find\_char\_class} callback).
 The \verb+font_number+ is a font number.
 %</en>
 %<*ja>
-戻り値の \verb+new_jfont_info+ テーブルもこれら2つのフィールドを含まなければならないが，
+戻り値の \verb+new_jfont_info+ テーブルも上に述べたフィールドをそのまま含まなければならないが，
 それ以外にユーザが勝手にフィールドを付け加えることは自由である．
 \verb+font_number+ はフォント番号である．
 %</ja>

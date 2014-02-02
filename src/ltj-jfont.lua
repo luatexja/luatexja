@@ -180,6 +180,7 @@ mem_leak_kern = mem_leak_kern +1
 	       v[k] = {false, g, w[2]/sz}
 	    end
 	 end
+	 v.glue, v.kern = nil, nil
       end
       t.kanjiskip = mult_table(metrics[j].kanjiskip, sz)
       t.xkanjiskip = mult_table(metrics[j].xkanjiskip,sz)
