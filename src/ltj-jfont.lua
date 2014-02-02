@@ -321,10 +321,7 @@ end
 -- LATEX INTERFACE
 ------------------------------------------------------------------------
 do
-<<<<<<< HEAD
-=======
    -- these function are called from ltj-latex.sty
->>>>>>> kitagawa_direct
    local kyenc_list, ktenc_list = {}, {}
    function add_kyenc_list(enc) kyenc_list[enc] = 'true ' end
    function add_ktenc_list(enc) ktenc_list[enc] = 'true ' end

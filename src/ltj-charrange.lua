@@ -97,7 +97,7 @@ function is_ucs_in_japanese_char_direct(p)
    if c<0x80 then
       return false
    else
-      return fn_table[jcr_table_main[c]]
+      return fn_table[jcr_table_main[c]](p)
    end
 end
 

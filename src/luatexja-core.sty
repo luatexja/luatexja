@@ -444,9 +444,14 @@
 \def\ltj@@alchar{{\directlua{tex.globaldefs = 0}\ltj@allalchar\ltj@@origchar\ltj@tempcnta}}
 
 %%%%%%%% \ltjsetmathletter<number>, \ltjunsetmathletter<number>
-\protected\def\ltjsetmathletter#1{\directlua{luatexja.math.is_math_letters[#1]=true}}
-\protected\def\ltjunsetmathletter#1{\directlua{luatexja.math.is_math_letters[#1]=false}}
-
+\protected\def\ltjsetmathletter#1{%
+  \ltj@tempcnta=#1
+  \directlua{luatexja.math.is_math_letters[\the\ltj@tempcnta]=true}%
+}
+\protected\def\ltjunsetmathletter#1{%
+  \ltj@tempcnta=#1
+  \directlua{luatexja.math.is_math_letters[\the\ltj@tempcnta]=false}%
+}
 
 %%%%%%%% \ltjdeclarealtfont<base_font_cs><alt_font_cs>{100-200,3000-,5000,...}
 % <base_font_cs> の 第 3 引数の文字達は <alt_font_cs> で組む

@@ -3033,7 +3033,8 @@ Furthermore, the glyph is shifted according to values of fields
              <priority>は \Pkg{luatexja-adjust} による優先順位付き
 	     行長調整（\ref{ssec-adj}節）が有効なときのみ意味を持つ．
 このフィールドは省略可能であり，行調整処理におけるこのglueの優先
-             度を$-2$から$+2$の間の整数で指定する．<priority>の省略時の値
+             度を$-2$から$+2$の間の整数で指定する．大きい値ほど「伸びやすく，縮みやすい」
+             ことを意味する．省略時の値
              は0であり，範囲外の値が指定されたときの動作は未定義である．
 
 <ratio>も省略可能フィールドであり，$-1$から$+1$の実数値をとる．省略時の値は0である．
@@ -3062,7 +3063,8 @@ between characters in character class~$i$ and those in character class~$j$.
 
 <priority> is an integer in $[-2,2]$ (treated as 0 if omitted), and this is
 used only in line adjustment with priority by \Pkg{luatexja-adjust}
-(see Subsection~\ref{ssec-adj}). 
+(see Subsection~\ref{ssec-adj}). Higher value means the glue is easy to shretch,
+and is also easy to shrink.
 
 <ratio> is \dots
 %</en>
@@ -3260,7 +3262,7 @@ The following is the list of imaginary characters:
 \texttt{'parbdd'}を入れれば全角下がりとなる．
 
 \begin{LTXexample}[width=0.4\textwidth]
-\jfont\g=file:KozMinPr6N-Regular.otf:jfm=test \g
+\jfont\g=KozMinPr6N-Regular:jfm=test \g
 \parindent1\zw\noindent{}◆◆◆◆◆
 \par 「◆◆←二分下がり
 \par 【◆◆←全角下がり
@@ -4883,19 +4885,19 @@ Glues from an italic correction
 Penalties inserted for the word-wrapping process (\emph{kinsoku shori}) of Japanese characters.
 %</en>
 %<ja>禁則処理のために挿入されたペナルティ．
-\item[\textit{from\_jfm} (6)]
+\item[$(\textit{from\_jfm}-2)$--$(\textit{from\_jfm}+2)$~(4--8)]
 %<en>Glues/kerns from JFM.
 %<ja>JFM由来のグルー／カーン．
-\item[\textit{kanji\_skip} (9)]
-%<en>Glues for \Param{\hyperlink{fld:kanjiskip}{kanjiskip}}.
-%<ja>\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}のグルー．
-\item[\textit{xkanji\_skip} (10)]
-%<en>Glues for \Param{\hyperlink{fld:xks}{xkanjiskip}}.
-%<ja>\Param{\hyperlink{fld:xks}{xkanjiskip}}のグルー．
-\item[\textit{processed} (11)]
+\item[\textit{kanji\_skip}~(9), \textit{kanji\_skip\_jfm}~(10)]
+%<en>Glues from \Param{\hyperlink{fld:kanjiskip}{kanjiskip}}.
+%<ja>和文間空白\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}を表すグルー．
+\item[\textit{xkanji\_skip}~(11), \textit{xkanji\_skip\_jfm}~(12)]
+%<en>Glues from \Param{\hyperlink{fld:xks}{xkanjiskip}}.
+%<ja>和欧文間空白\Param{\hyperlink{fld:xks}{xkanjiskip}}を表すグルー．
+\item[\textit{processed} (13)]
 %<en>Nodes which is already processed by \ldots.
 %<ja>\LuaTeX-ja の内部処理によって既に処理されたノード．
-\item[\textit{ic\_processed} (12)]
+\item[\textit{ic\_processed} (14)]
 %<*en>
 Glues from an italic correction, but already processed in the insertion process of \textbf{JAglue}s.
 %</en>
@@ -4907,7 +4909,7 @@ Glues from an italic correction, but already processed in the insertion process 
 
 %<*ja>
 また，挿入処理の結果であるリストの最初のノードでは，\verb+\ltj@icflag+ の値に
-\textit{processed\_begin\_flag}~(32)が追加される．これによって，\verb+\unhbox+ が
+\textit{processed\_begin\_flag}~(128)が追加される．これによって，\verb+\unhbox+ が
 連続した場合でも「ボックスの境界」が識別できるようになっている．
 %</ja>
 
@@ -4961,7 +4963,7 @@ Nodes for \LuaTeX-ja's stack system (see the next
 
 \item[\textit{char\_by\_cid}]
 %<*en>
-Nodes for Japanese Characters which the callback process of
+Nodes for \textbf{JAchar} which the callback process of
 	   \Pkg{luaotfload} won't be applied, and the character code is
 	   stored in the \texttt{value} field. Each node of this type are 
            converted to a \textit{glyph\_node} \emph{after}
@@ -4969,11 +4971,23 @@ Nodes for Japanese Characters which the callback process of
 Nodes of this type is used in \verb+\CID+, \verb+\UTF+ and IVS support.
 %</en>
 %<*ja>
-\Pkg{luaotfload}のコールバックによる処理が適用されない和文文字のためのノードで，
+\Pkg{luaotfload}のコールバックによる処理が適用されない\textbf{JAchar}のためのノードで，
 \texttt{value} フィールドに文字コードが格納されている．
 この種類のノードはそれぞれが\Pkg{luaotfload}のコールバックの処理の
 \emph{後で}\textit{glyph\_node}に変換される．
 \verb+\CID+, \verb+\UTF+やIVS対応処理でこの種類のノードが利用されている．
+%</ja>
+
+\item[\textit{replace\_vs}]
+%<*en>
+Similar to \textit{char\_by\_cid} whatsits above.
+These nodes are for \textbf{ALchar} which the callback process of
+	   \Pkg{luaotfload} won't be applied.
+%</en>
+%<*ja>
+上の\textit{char\_by\_cid}と同様に，
+これらのノードは\Pkg{luaotfload}のコールバックによる処理が適用されない\textbf{ALchar}のた
+	   めものである．
 %</ja>
 
 \item[\textit{begin\_par}]
