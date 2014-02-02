@@ -106,8 +106,8 @@ function (p, sty)
    else
       local pid = getid(p)
       if pid == id_sub_mlist then
-         if getlist(p) then
-            setfield(p, 'head', conv_jchar_to_hbox(getlist(p), sty))
+         if getfield(p, 'head') then
+            setfield(p, 'head', conv_jchar_to_hbox(getfield(p, 'head'), sty))
          end
       elseif pid == id_mchar then
          local fam = has_attr(p, attr_jfam) or -1

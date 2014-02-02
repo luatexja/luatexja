@@ -378,11 +378,9 @@ local function debug_show_node_X(p,print_fn)
       if get_attr_icflag(p) == icflag_table.PACKED then
          s = s .. ' (packed)'
       end
-      print_fn(s)
-      local q = p.head
-      debug_depth=debug_depth.. '.'
-      while q do 
-         debug_show_node_X(q, print_fn); q = node_next(q)
+      print_fn(s); debug_depth=debug_depth.. '.'
+      for q in node.traverse(p.head) do
+         debug_show_node_X(q, print_fn)
       end
       debug_depth=k
    elseif pt == 'glue' then
@@ -454,10 +452,13 @@ local function debug_show_node_X(p,print_fn)
    elseif pt=='math_char' then
       s = base .. ' fam: ' .. p.fam .. ' , char = ' .. utf.char(p.char)
       print_fn(s)
-   elseif pt=='sub_box' then
+   elseif pt=='sub_box' or pt=='sub_mlist' then
       print_fn(base)
       if p.head then
-         debug_depth = k .. '.'; debug_show_node_X(p.head, print_fn); 
+         debug_depth = k .. '.'; 
+	 for q in node.traverse(p.head) do
+	    debug_show_node_X(q, print_fn)
+	 end
       end
    else
       print_fn(base)
