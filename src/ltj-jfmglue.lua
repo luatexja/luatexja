@@ -279,11 +279,11 @@ local function check_next_ickern(lp)
    end
 end
 
-local function calc_np_pbox(lp)
+local function calc_np_pbox(lp, last)
    Np.first = Np.first or lp; Np.id = id_pbox
    local lpa, nc = KINSOKU, nil
    set_attr(lp, attr_icflag, get_attr_icflag(lp));
-   while lp and (lpa>=PACKED) and (lpa<BOXBDD) do
+   while lp ~=last and (lpa>=PACKED) and (lpa<BOXBDD) do
       nc, lp = lp, node_next(lp); lpa = lp and has_attr(lp, attr_icflag) or 0
      -- get_attr_icflag() ではいけない！
    end
@@ -384,7 +384,7 @@ calc_np_auxtable[id_adjust] = calc_np_auxtable.skip
 calc_np_auxtable[id_disc]   = calc_np_auxtable.discglue
 calc_np_auxtable[id_glue]   = calc_np_auxtable.discglue
 
-function calc_np(lp)
+function calc_np(lp, last)
    local k
    -- We assume lp = node_next(Np.last)
    Np, Nq, ihb_flag = Nq, Np, nil
@@ -396,14 +396,14 @@ function calc_np(lp)
    for k in pairs(Np) do Np[k] = nil end
 
    for k = 1,#Bp do Bp[k] = nil end
-   while lp  do
+   while lp ~= last  do
       local lpa = has_attr(lp, attr_icflag) or 0
        -- unbox 由来ノードの検出
       if lpa>=PACKED then
          if lpa%PROCESSED_BEGIN_FLAG == BOXBDD then
 	    local lq = node_next(lp) 
             head = node_remove(head, lp); node_free(lp); lp = lq
-         else return calc_np_pbox(lp)
+         else return calc_np_pbox(lp, last)
          end -- id_pbox
       else
 	 k, lp = calc_np_auxtable[getid(lp)](lp)
@@ -942,9 +942,9 @@ do
 		       or ((lpi==id_hlist) and (lps==3))) do
 	    if (lpi==id_hlist) and (lps==3) then par_indented = 'parbdd' end
 	    lp=node_next(lp); lpi, lps = getid(lp), getsubtype(lp) end
-	 return lp, par_indented
+	 return lp, node_tail(head), par_indented
       else 
-	 return head, 'boxbdd'
+	 return head, nil, 'boxbdd'
       end
    end
 end
@@ -974,14 +974,14 @@ end
 function main(ahead, mode)
    if not ahead then return ahead end
    head = ahead;
-   local lp, par_indented = init_var(mode)
+   local lp, last, par_indented = init_var(mode)
    lp = calc_np(lp, last)
    if Np then 
       extract_np(); handle_list_head(par_indented)
    else
-      return cleanup(mode, last)
+      return cleanup(mode)
    end
-   lp = calc_np(lp)
+   lp = calc_np(lp, last)
    while Np do
       extract_np();
       adjust_nq(); 
@@ -996,7 +996,7 @@ function main(ahead, mode)
          if Nq.id==id_hlist then handle_nq_ja_hlist()
          else handle_nq_jachar() end
       end
-      lp = calc_np(lp)
+      lp = calc_np(lp, last)
    end
    handle_list_tail(mode)
    return cleanup(mode)

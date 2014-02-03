@@ -172,8 +172,8 @@ end
 local function aw_step1(p, res, total)
    local head = getlist(p)
    local x = node_tail(head); if not x then return false end
+   -- x: \rightskip
    x = node_prev(x); if not x then return false end
-   -- 本当の行末の node を格納
    if getid(x) == id_glue and getsubtype(x) == 15 then 
       -- 段落最終行のときは，\penalty10000 \parfillskip が入るので，
       -- その前の node が本来の末尾文字となる
@@ -196,8 +196,8 @@ local function aw_step1(p, res, total)
      return false-- それ以外は対象外．
    end
    local xk = ltjf_font_metric_table[getfont(xc)]
-     xk = xk.char_type[has_attr(xc, attr_jchar_class) or 0]
-     xk = xk['end_' .. res.name] or 0
+   xk = xk.char_type[has_attr(xc, attr_jchar_class) or 0]
+   xk = xk['end_' .. res.name] or 0
 
    if xk>0 and total>=xk then
       total = total - xk
