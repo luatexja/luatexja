@@ -13,7 +13,7 @@ local Dnode = node.direct or node
 local setfield = (Dnode ~= node) and Dnode.setfield or function(n, i, c) n[i] = c end
 local getfield = (Dnode ~= node) and Dnode.getfield or function(n, i) return n[i] end
 local getid = (Dnode ~= node) and Dnode.getid or function(n) return n.id end
-local getlist = (Dnode ~= node) and Dnode.getlist or function(n) return n.head end
+-- getlist cannot be used for sub_box nodes. Use instead λp. getfield(p, 'head')
 local getchar = (Dnode ~= node) and Dnode.getchar or function(n) return n.char end
 
 local nullfunc = function(n) return n end
@@ -127,9 +127,9 @@ function (p, sty)
                set_attr(r, attr_yablshift, k)
             end
          end
-      elseif pid == id_sub_box and getlist(p) then
+      elseif pid == id_sub_box and getfield(p, 'head') then
          -- \hbox で直に与えられた内容は上下位置を補正する必要はない
-         set_attr(getlist(p), attr_icflag, PROCESSED)
+         set_attr(getfield(p, 'head'), attr_icflag, PROCESSED)
       end
    end
    return p

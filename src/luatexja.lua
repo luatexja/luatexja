@@ -65,7 +65,6 @@ do
    function luatexja.node_remove (head, current)
       if head==current then
          local q, r = node_next(current), node_prev(current)
-         current.next = nil
          if q then q.prev = r end
          if r and node_next(r)==current then 
             r.next = q
@@ -77,13 +76,11 @@ do
    end
    local Dnode = node.direct or node
    if Dnode~=node then
-      local Dnode_remove = Dnode.remove
-      local Dnode_next, Dnode_prev = Dnode.getnext, node.getprev
-      local getfield, setfield = Dnode.getfield, Dnode.setfield
+      local Dnode_remove, setfield = Dnode.remove, Dnode.setfield
+      local Dnode_next, Dnode_prev = Dnode.getnext, Dnode.getprev
       function luatexja.Dnode_remove (head, current)
          if head==current then
             local q, r = Dnode_next(current), Dnode_prev(current)
-            setfield(current, 'next', nil)
             if q then setfield(q, 'prev', r) end
             if r and Dnode_next(r) == current then
                setfield(r, 'next', q)

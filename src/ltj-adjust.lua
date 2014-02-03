@@ -170,8 +170,7 @@ end
 
 -- step 1: 行末に kern を挿入（句読点，中点用）
 local function aw_step1(p, res, total)
-   local head = getlist(p)
-   local x = node_tail(head); if not x then return false end
+   local x = node_tail(getlist(p)); if not x then return false end
    -- x: \rightskip
    x = node_prev(x); if not x then return false end
    if getid(x) == id_glue and getsubtype(x) == 15 then 
