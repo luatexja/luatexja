@@ -1956,8 +1956,11 @@ adopted in the whole paragraph or the whole hbox.
 \ltjsetparameter{kanjiskip={0pt plus 0.4pt minus 0.4pt},
                  xkanjiskip={0.25\zw plus 1pt minus 1pt}}
 \end{lstlisting}
-
 %<*en>
+Here \verb+\zw+ is a internal dimension 
+which stores fullwidth of the current Japanese font.
+This \verb+\zw+ can be used as the unit \texttt{zw} in \pTeX.
+
 It may occur that JFM contains the data of ``ideal width of 
 \Param{\hyperlink{fld:kanjiskip}{kanjiskip}}''
 and/or ``ideal width of \Param{\hyperlink{fld:xks}{xkanjiskip}}''.
@@ -1965,6 +1968,9 @@ To use these data from JFM, set the value of \Param{\hyperlink{fld:kanjiskip}{ka
 \Param{\hyperlink{fld:xks}{xkanjiskip}} to \verb+\maxdimen+.
 %</en>
 %<*ja>
+ここで，\verb+\zw+ は現在の和文フォントの全角幅を表す長さであり，
+\pTeX における長さ単位 \texttt{zw} と同じように使用できる．
+
 JFMは「望ましい\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}の値」や
 「望ましい\Param{\hyperlink{fld:xks}{xkanjiskip}}の値」を持っていることがある．
 これらのデータを使うためには，\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}や%
@@ -2641,7 +2647,6 @@ letter-spacing and the width of italic correction are not correct:
 \jfont\S=file:KozMinPr6N-Regular.otf:slant=1;jfm=ujis
 \S あいう\/ABC
 \end{LTXexample}
-
 
 %<en>\subsection{Prefix \texttt{psft}}
 %<ja>\subsection{\texttt{psft}プリフィックス}
@@ -4479,10 +4484,21 @@ Avant Garde (OT1/pag/m/n) に変わっていることがわかる．
 \userelfont\selectfont あいうabc
 \end{LTXexample}
 
-%<en>\section{Extensions}
-%<ja>\section{拡張}
+%<*en>
+\section{Addons}
+\LuaTeX-ja has several addon packages. 
+These addons are written as \LaTeX\ packages, but 
+\Pkg{luatexja-otf}~and~\Pkg{luatexja-adjust} can be loaded in plain \LuaTeX
+by \verb+\input+.
+%</en>
+%<*ja>
+\section{拡張}
+\LuaTeX-jaには（動作には必須ではないが）自由に読み込める拡張が付属している．
+これらは\LaTeX のパッケージとして制作しているが，
+\Pkg{luatexja-otf}と\Pkg{luatexja-adjust}についてはplain \LuaTeX でも\ 
+\verb+\input+ で読み込み可能である．
+%</ja>
 \subsection{\texttt{luatexja-fontspec.sty}}
-
 %<*en>
 As described in Subsection~\ref{ssec-fontspec}, this optional package
 provides the counterparts for several commands defined in the
@@ -4542,11 +4558,14 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
 \label{ssec-ltjotf}
 %<*en>
 This optional package supports typesetting characters in
-Adobe-Japan1. the package \Pkg{luatexja-otf} offers the following 2~low-level
+Adobe-Japan1 character collection 
+(or other CID character collecton, if the font is supported). 
+The package \Pkg{luatexja-otf} offers the following 2~low-level
 commands:
 %</en>
 %<*ja>
-この追加パッケージはAdobe-Japan1の文字の出力をサポートする．
+この追加パッケージはAdobe-Japan1（フォント自身が持っていれば，
+別のCID文字セットでも可）の文字の出力をサポートする．
 \Pkg{luatexja-otf}は以下の2つの低レベルコマンドを提供する：
 %</ja>
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
@@ -4569,6 +4588,13 @@ but please remind remarks below.
 このコマンドは \verb+\char"+<hex\_number>と似ているが，下の記述に注意すること．%"
 %</ja>
 \end{list}
+
+%<*ja>
+このパッケージは，\texttt{ajmacros.sty}（\Pkg{otf}パッケージ付属のマクロ集，井上浩一氏作）から
+漢字コードをUTF8にしたり，plain \LuaTeX でも利用可能するという
+修正を加えた \texttt{luatexja-ajmacros.sty} も自動的に読み込む．
+そのため，マクロ集にある \verb+\aj半角+ などのマクロもそのまま使用可能である．
+%</ja>
 
 %<en>\paragraph{Remarks}
 %<ja>\paragraph{注意}
@@ -4597,7 +4623,6 @@ ordinary characters in the following points:
   \Pkg{luaotfload}パッケージのコードはこれらの文字には働かない．
 %</ja>
 \end{itemize}
-
 
 %<en>\paragraph{Additional syntax of JFM}
 %<ja>\paragraph{JFMへの記法の追加}

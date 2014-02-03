@@ -57,44 +57,45 @@ userid_table.IHB  = luatexbase.newuserwhatsitid('inhibitglue',  'luatexja') -- \
 userid_table.STCK = luatexbase.newuserwhatsitid('stack_marker', 'luatexja') -- スタック管理
 userid_table.BPAR = luatexbase.newuserwhatsitid('begin_par',    'luatexja') -- 「段落始め」
 
+------------------------------------------------------------------------
+-- FIX node.remove
+------------------------------------------------------------------------
 do
    local node_remove, node_next, node_prev = node.remove, node.next, node.prev
    function luatexja.node_remove (head, current)
       if head==current then
-	 local q, r = node_next(current), node_prev(current)
-	 current.next = nil
-	 if q then q.prev = r end
-	 if r and node_next(r)==current then -- r is "real prev"
-	    r.next = q
-	 end
-	 return q, q
+         local q, r = node_next(current), node_prev(current)
+         current.next = nil
+         if q then q.prev = r end
+         if r and node_next(r)==current then 
+            r.next = q
+         end
+         return q, q
       else
-	 return node_remove(head, current)
+         return node_remove(head, current)
       end
    end
-
    local Dnode = node.direct or node
    if Dnode~=node then
       local Dnode_remove = Dnode.remove
       local Dnode_next, Dnode_prev = Dnode.getnext, node.getprev
       local getfield, setfield = Dnode.getfield, Dnode.setfield
       function luatexja.Dnode_remove (head, current)
-	 if head==current then
-	    local q, r = Dnode_next(current), Dnode_prev(current)
-	    setfield(current, 'next', nil)
-	    if q then setfield(q, 'prev', r) end
-	    if r and Dnode_next(r) == current then -- r is "real prev"
-	       setfield(r, 'next', q)
-	    end
-	    return q, q
-	 else
-	    return Dnode_remove(head, current)
-	 end
+         if head==current then
+            local q, r = Dnode_next(current), Dnode_prev(current)
+            setfield(current, 'next', nil)
+            if q then setfield(q, 'prev', r) end
+            if r and Dnode_next(r) == current then
+               setfield(r, 'next', q)
+            end
+            return q, q
+         else
+            return Dnode_remove(head, current)
+         end
       end
    else
       luatexja.Dnode_remove = luatexja.node_remove 
    end
-
 end
 
 --- 定義終わり
@@ -118,10 +119,6 @@ local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_uniqid = luatexbase.attributes['ltj@uniqid']
 local cat_lp = luatexbase.catcodetables['latex-package']
-
-
----- table: charprop_stack_table [stack_level].{pre|post|xsp}[chr_code]
-
 
 -- Three aux. functions, bollowed from tex.web
 
