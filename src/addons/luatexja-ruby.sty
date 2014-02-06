@@ -1,0 +1,188 @@
+%
+% luatexja-ruby.sty
+%
+
+% LaTeX only!
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{luatexja-ruby}[2012/4/21 v0.1]
+\RequirePackage{luatexja}
+
+%%------------------
+\newluatexattribute\ltj@rubyattr
+\RequireLuaTeXjaSubmodule{ruby}
+
+% ltjset/getparameter への追加設定
+% これらは段落単位の設定．
+
+%% 引数：ルビ全角を単位とした実数
+%% この文字への pre-, post-intrusion の許容量
+\define@key[ltj]{japaram}{rubypreintrusion}{%
+  \expandafter\ltj@@set@stack@real#1:{ripre}{0}{0x7FFFFFFF}}
+\define@key[ltj]{japaram}{rubypostintrusion}{%
+  \expandafter\ltj@@set@stack@real#1:{ripost}{0}{0x7FFFFFFF}}
+\def\ltj@@set@stack@real#1,#2:#3#4#5{%
+  \directlua{luatexja.stack.set_stack_table(luatexja.isglobal, \asluastring{#3},
+    \ltj@safe@num@or\ltj@defnum{#1},\ltj@safe@real{#2},#4,#5)}}
+
+% ルビ用のキー設定
+\def\ltj@@rkeydef#1{
+  \define@key[ltj]{ruby}{#1}{\expandafter\def\csname ltj@@rubyip@#1\endcsname{##1}}
+}
+%% attr_ruby_mode
+%% bit 0: intrusion を有効にするか（1: 有効）
+%% bit 1: 前後の intrusion 許容量を小さい方に揃える (1: yes)
+%% bit 2, 3: intrusion をどう使って親文字を配置する 
+%%   00: intrusion なしでとりあえず計算し，左右の突出分を進入に割り当てる
+%%   01: pre-intrusion でまかなえるだけまかない，無理なら post- も使う
+%%   10: post を優先
+%%   11: 2 min (pre,post) までは pre, post に均等配分しようとする
+%%     >=01 で，intrusion で賄えきれなかった場合はいつものように伸長する．
+%% bit 4: 熟語ルビの際の処理方法（0: 常にグループ，1: 可能な限りブロックごとに）
+%%        ↑bit 4 は今は無効
+\ltj@@rkeydef{mode}
+%% intrusion 量強制固定（bit 0, bit 1 より優先，負数で「自動」）
+%% attr は sp 単位だが，ユーザーはルビ全角単位で指定する
+%% attr_ruby_maxprep, attr_ruby_maxpostp
+\ltj@@rkeydef{intrusionpre}
+\ltj@@rkeydef{intrusionpost}
+%% 親文字伸長の際の比，{0}{1}{1} などと0--7 の数 3 つで指定
+%% attr_ruby_stretch (head left,middle,right)(end)(middle) 27-bits 
+\ltj@@rkeydef{stretchhead} % 行頭形
+\ltj@@rkeydef{stretchend}  % 行末形
+\ltj@@rkeydef{stretch}     % 行中形
+%% ルビが伸長するときの比 {1}{2}{1} などと0--7 の数 3 つで指定
+%% attr_ruby_mode 上位部分
+\ltj@@rkeydef{stretchruby}
+%% ルビ<親のとき，ルビと親文字の端の最大値 
+%% attr_ruby_maxmargin
+%% attr は sp 単位だが，ユーザーは親文字全角単位で指定
+\ltj@@rkeydef{maxmargin}
+\savekeys[ltj]{ruby}{%
+  mode, intrusionpre, intrusionpost, 
+  stretchhead, stretchend, stretch, stretchruby, 
+  maxmargin, rubysize, 
+}
+
+%%%%%%%% setkeys の別名
+\protected\def\ltjsetruby{\setkeys[ltj]{ruby}}
+
+% ここからは ruby マクロ内でなんとかされる事項
+%% ルビと親文字の大きさの比
+\ltj@@rkeydef{rubysize}
+
+% 肩つき用簡易設定．
+\define@key[ltj]{ruby}{kata}[none]{\setkeys[ltj]{ruby}{mode=9,stretchruby=001}}
+% 拡張肩つき用簡易設定．
+\define@key[ltj]{ruby}{ekata}[none]{\setkeys[ltj]{ruby}{stretch=001,stretchruby=001}}
+
+%%%%%%%% 補助関数
+
+% Lua ソースに渡す table 生成
+\def\ltj@@ruby@create@table#1{% #1: ルビ全角
+    \string{
+      rubyzw = \ltj@safe@dimen{#1}, 
+      maxmargin = \ltj@safe@dimen{\ltj@@rubyip@maxmargin\zw},
+      intrusionpre = \ltj@safe@dimen{\ltj@@rubyip@intrusionpre#1},
+      intrusionpost = \ltj@safe@dimen{\ltj@@rubyip@intrusionpost#1},
+      stretch 
+        = 262144 * \expandafter\ltj@@ruby@cts\ltj@@rubyip@stretchhead
+	  + 512 * \expandafter\ltj@@ruby@cts\ltj@@rubyip@stretchend
+	  + \expandafter\ltj@@ruby@cts\ltj@@rubyip@stretch,
+      mode 
+        = 2097152 * \expandafter\ltj@@ruby@cts\ltj@@rubyip@stretchruby
+          + \ltj@safe@num{\ltj@@rubyip@mode},
+    \string}
+}
+\def\ltj@@ruby@cts#1#2#3{%
+  ((\ltj@safe@num{#1}) * 64 + (\ltj@safe@num{#2}) * 8 + \ltj@safe@num{#3})%
+}
+
+
+%%%%%%%% ZR さんの PXrubrica パッケージ中のコードから引用・改変
+% \pxrr@decompbar: a|bc -> \ltj@@ruby@mark{a}\ltj@@ruby@mark{bc}
+\let\pxrr@res\empty
+\def\pxrr@ifx#1{%
+  \ifx#1\expandafter\@firstoftwo
+  \else\expandafter\@secondoftwo
+  \fi
+}
+\def\pxrr@nil{\noexpand\pxrr@nil}
+\def\pxrr@end{\noexpand\pxrr@end}
+\def\pxrr@appto#1#2{%
+  \expandafter\def\expandafter#1\expandafter{#1#2}%
+}
+\def\pxrr@decompbar#1{%
+  \let\pxrr@res\@empty
+  \pxrr@decompbar@loopa\pxrr@nil#1|\pxrr@end|%
+}
+\def\pxrr@decompbar@loopa#1|{%
+  \expandafter\pxrr@decompbar@loopb\expandafter{\@gobble#1}%
+}
+\def\pxrr@decompbar@loopb#1{%
+  \pxrr@decompbar@loopc#1\relax\pxrr@nil{#1}%
+}
+\def\pxrr@decompbar@loopc#1#2\pxrr@nil#3{%
+  \pxrr@ifx{#1\pxrr@end}{}{%
+    \ifx\pxrr@res\@empty
+      \def\pxrr@res{\ltj@@ruby@mark}%
+    \else
+      \pxrr@appto\pxrr@res{\ltj@@ruby@mark}%
+    \fi
+    \pxrr@appto\pxrr@res{{#3}}%
+    \pxrr@decompbar@loopa\pxrr@nil
+  }%
+}
+%%%%%%%% ここまで
+
+%%%%%%%% TeX command
+\protected\def\ltjruby{\@ifnextchar[\ltj@@ruby{\ltj@@ruby[]}}%]
+\let\ruby=\ltjruby
+\def\ltj@@ruby[#1]#2#3{{% #1: option #2: 親文字群，#3: ルビ文字列群，共に| 区切り
+  \setkeys[ltj]{ruby}{#1}%
+  \directlua{ruby_tmplist_r = \string{\string}; ruby_tmplist_p = \string{\string}}%
+  \leavevmode\dimen0=\f@size pt\dimen1=\ltj@@rubyip@rubysize\dimen0%
+  % 引数展開，テーブルにセット
+  \pxrr@decompbar{#2}{\let\ltj@@ruby@mark\ltj@@ruby@sp\pxrr@res}%
+  \pxrr@decompbar{#3}{\let\ltj@@ruby@mark\ltj@@ruby@sr\pxrr@res}%
+  {\fontsize{\ltj@@rubyip@rubysize\dimen0}\z@\selectfont\global\dimen1=\zw}%
+  \directlua{%
+    luatexja.ruby.texiface(\ltj@@ruby@create@table{\dimen1},
+    ruby_tmplist_r, ruby_tmplist_p)}%
+}}
+
+\def\ltj@@ruby@sr#1{%
+  \setbox0=\hbox{\fontsize{\dimen1}\z@\selectfont#1}%
+  \directlua{table.insert(ruby_tmplist_r, node.copy(tex.box[0]))}%
+}
+\def\ltj@@ruby@sp#1{%
+  \setbox0=\hbox{\selectfont#1}%
+  \directlua{table.insert(ruby_tmplist_p, node.copy(tex.box[0]))}%
+}
+
+% 初期値．要調整
+%% ひらがな
+\count@="3040\loop\relax\ifnum \count@<"30A0
+  \ltjsetparameter{rubypreintrusion={\the\count@,1}, 
+    rubypostintrusion={\the\count@,1}}
+  \advance\count@1\repeat
+%% 「」
+\ltjsetparameter{rubypreintrusion={`「,1}, 
+  rubypostintrusion={`」,1}}
+%% ，、
+\ltjsetparameter{rubypreintrusion={`，,1}, 
+  rubypostintrusion={`，,1}}
+\ltjsetparameter{rubypreintrusion={`、,1}, 
+  rubypostintrusion={`、,1}}
+%% ・
+\ltjsetparameter{rubypreintrusion={`・,1}, 
+  rubypostintrusion={`・,1}}
+
+\setkeys[ltj]{ruby}{
+  maxmargin=0.5, 
+  stretchruby={1}{2}{1}, stretch = {1}{2}{1},
+  stretchhead = {0}{1}{1}, stretchend = {1}{1}{0},
+  intrusionpre = -1, intrusionpost = -1, 
+  mode = 1, rubysize = 0.5
+}
+
+\endinput

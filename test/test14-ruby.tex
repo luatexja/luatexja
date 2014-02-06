@@ -1,0 +1,511 @@
+%#! lualatex
+%%% a test of ruby.
+\documentclass[b5paper,10pt]{ltjsarticle}
+\usepackage{fontspec,luacode,luatexja-otf,amsmath}
+\usepackage{unicode-math}
+\setmathfont{XITS Math}
+\setmainfont{TeX Gyre Termes}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{LMMono10-Regular}
+\usepackage{luatexja-ruby,showexpl,booktabs}
+\lstset{preset=\huge,basicstyle=\ttfamily}
+\fboxsep=0mm
+%\usepackage{lua-visual-debug}
+
+\def\kata{\ltjsetruby{kata}} 
+% 肩つきルビ用簡易設定．グループルビでは使用しないこと
+\def\notalign{\setkeys[ltj]{ruby}{stretchhead = {1}{2}{1}, stretchend = {1}{2}{1}}}
+% 行頭・行末で揃えない
+
+\def\Node#1#2{\,\vcenter{\hbox{\fboxsep=1pt\fbox{\vbox{\small\halign{\hfil##\hfil\cr
+  #1\mathstrut\cr\noalign{\hrule height.4pt}\strut#2\cr}}}}\,}}
+\def\LuaTeX{Lua\TeX}
+
+% 三分ルビ用
+\DeclareFontShape{JY3}{mc}{mc}{n}{<-> [0.92487] 
+  psft:Ryumin-Light:extend=0.67;jfm=ujisc33}{}
+
+\title{ルビ実装のサンプル}
+\begin{document}
+\maketitle
+
+\section{使い方}
+\begin{itemize}
+\item パッケージ読み込み：\verb+\usepackage{luatexja-ruby}+のみ．\LaTeXe のみサポート．
+\item 命令：
+\begin{itemize}
+\item \verb+\ltjruby[option]{親|文|字}{おや|も|じ}+
+\item \verb|\ltjsetruby{option}|
+\end{itemize}
+\item \verb|\ltjsetparameter|に追加のキー
+\begin{itemize}
+\item \verb+rubypreintrusion={char_code, pre_int}+：全角単位
+\item \verb+rubypostintrusion={char_code, post_int}+：全角単位
+\end{itemize}
+\item \verb|\ltjsetruby{option}|他でサポートするオプション：後ろに指定したものが優先
+\begin{itemize}
+\item \verb+mode+：進入処理のモードを表すbit vector．意味はluatexja-ruby.sty参照．
+\item \verb+intrusionpre=<real>+：前進入量指定．ルビ全角単位で指定．
+負の長さは文字種に応じた自動指定を意味．
+\item \verb+intrusionpost=<real>+：後進入量指定．
+\item \verb+stretchhead={left}{middle}{right}+：行頭形でルビ文字の合計長が親文字の合計長より
+長い時に，親文字間に入れる空白の割合．それぞれ0--7の自然数で指定．
+\item \verb+stretchend={left}{middle}{right}+：行末形〜．
+\item \verb+stretch={left}{middle}{right}+：行中形〜．
+\item \verb+stretchruby={left}{middle}{right}+：ルビ文字の方が長い時の空白の割合．
+\item \verb+maxmargin=<real>+：親文字の方がルビより長い時に，ルビの先頭と親文字の先頭に許される
+最大の空白量．親文字全角単位．
+\item \verb+rubysize=<real>+：ルビ文字の親文字に対する大きさ．
+\end{itemize}
+\end{itemize}
+
+\section{実装の大まかな方法}
+次の例で説明する．
+\begin{LTXexample}
+……を\ruby{流|暢}{りゆう|ちよう}に……
+\end{LTXexample}
+
+\begin{enumerate}
+\item \verb|\ruby|コマンド自体は，一旦次のnode listを値とするwhatsit~$W$を作って，
+現在の水平リストへと挿入する（必要ならば\verb|\leavevmode|も実行）：
+\[
+ \Node{whatsit $w$}{value: 2}\longrightarrow 
+ \Node{hlist $r_1$}{「りゆう」}\longrightarrow
+ \Node{hlist $p_1$}{「流」}\longrightarrow
+ \Node{hlist $r_2$}{「ちよう」}\longrightarrow
+ \Node{hlist $p_2$}{「暢」}
+\]
+ここで，最初の$w$の値2は，ルビが2つのパーツ「\ruby{流}{りゆう}」「\ruby{暢}{ちよう}」からなっていることを
+表している．$r_i$達の中の文字は既にルビの大きさである．この値を$\mathit{cmp}$とおこう．
+\item \LuaTeX-jaの和文処理グルー挿入処理においては，「先頭が『流』，最後が『暢』であるようなhboxを\verb|\unhbox|で展開したもの」と扱われる．
+言い換えれば，ルビ部分を無視した単なる「流暢」という和文文字の並びとして扱われる\footnote{「流」「暢」の間のグルーは既に入っている，と扱われる．}．
+次のサンプルを参照
+\begin{LTXexample}
+\leavevmode\hbox{．}A\\
+%↑xkanjiskip 
+\ruby{．}{}A
+%↑2分
+\end{LTXexample}
+\item 和文処理グルーの挿入が終わった後で，可動グループルビのためのノードの挿入に入る．
+\begin{enumerate}
+\item $W$の周辺は次のようなノード列になる．
+\begin{align*}
+ (\text{other nodes})&\longrightarrow
+ \Node{glue $g_0$}{}\longrightarrow \Node{whatsit~$W$}{元からある}\longrightarrow \Node{rule $r_1$}{}
+\\&\longrightarrow
+ \Node{glue $g_1$}{}\longrightarrow \Node{rule $r_2$}{}\longrightarrow 
+ \Node{glue $g_2$}{}\longrightarrow (\text{other nodes})
+\end{align*}
+$W$の前後に$2\mathit{cmp}+1=5$個のノードが挿入される．
+
+\item このようにノードを挿入する目的は，\TeX の行分割処理自体に影響を加えずに可動グループルビ
+を実現させることにある．
+\begin{gather*}
+ (\text{other nodes})\longrightarrow
+ \Node{glue $g_0$}{}\longrightarrow \Node{whatsit~$W$}{元からある}\longrightarrow \Node{rule $r_1$}{}\\
+\noalign{\hrulefill 行の境目\hrulefill}
+\Node{rule $r_2$}{}\longrightarrow 
+ \Node{glue $g_2$}{}\longrightarrow (\text{other nodes})
+\end{gather*}
+のようになったとしたら，「\ruby{流}{りゆう}」「\ruby{暢}{ちよう}」の間で行分割が起きた，ということがわかり，
+$g_i$,~$r_i$達のノードを適切に置き換えればよい（後で詳しく説明する）．
+
+\item なお，$r_i$達の高さ・深さは組み上がった後のそれであり，現状では親文字部分の高さ・深さと一致する．
+$g_i$,~$r_i$達の幅は，以下の対応に沿って計算される．
+
+\begin{center}\small
+\begin{tabular}{cllll}
+\toprule
+\multicolumn{1}{c}{\sf node名}&\multicolumn{1}{c}{\sf 組み方}&\multicolumn{1}{c}{\sf サンプル}%
+&\multicolumn{1}{c}{\sf 対応するノード並び}\\
+\midrule
+$n_1$&行末1グループ&
+\huge
+\fbox{を}{\color{blue}\gt\ruby[intrusionpre=1,mode=5,stretch=110]{流}{りゆう}}\vrule
+&
+$g_0\rightarrow W\rightarrow r_1$\\
+$n_2$&行末2グループ&
+\huge
+\fbox{を}{\color{blue}\gt\ruby[intrusionpre=1,mode=1,stretch=110]{流|暢}{りゆう|ちよう}}\vrule
+&
+$g_0\rightarrow W\rightarrow r_1\rightarrow g_2 \rightarrow r_2$\\
+$n_3$&行頭1グループ&
+\huge
+\vrule{\color{blue}\gt\ruby[intrusionpost=1,mode=1,stretch=011]{暢}{ちよう}}\fbox{に}
+&
+$r_2\rightarrow g_2$\\
+$n_4$&行頭2グループ&
+\huge
+\vrule{\color{blue}\gt\ruby[intrusionpost=1,mode=1,stretch=011]{流|暢}{りゆう|ちよう}}\fbox{に}
+&
+$W\rightarrow r_1\rightarrow g_2 \rightarrow r_2\rightarrow g_2$\\
+$n_5$&行中&
+\huge
+\fbox{を}{\color{blue}\gt\ruby[intrusionpost=0.5,intrusionpre=0.5,mode=1]{流|暢}{りゆう|ちよう}}\fbox{に}
+&
+$g_0\rightarrow W\rightarrow r_1\rightarrow g_2 \rightarrow r_2\rightarrow g_2$\\
+
+\bottomrule
+\end{tabular}
+\end{center}
+
+
+この5元連立方程式を解いて$g_i$,~$r_i$達の幅を求める．
+なお，進入長は予め計算しておく．例えばこの場合，
+\[
+ g_0+r_1+g_2+r_2+g_2 = 3\,\mathrm{zw}-(0.25\,\mathrm{zw}\times 2)=2.5\,\mathrm{zw}
+\]
+である（zwは親文字全角の幅）．
+
+\item また，ルビ処理を統括しているwhatsit~$W$の値も
+\[
+ \Node{whatsit $w$}{value: 2}\longrightarrow 
+ \Node{vlist $n_1$}{末1}\longrightarrow
+ \Node{vlist $n_2$}{末2}\longrightarrow
+ \Node{vlist $n_3$}{頭1}\longrightarrow
+ \Node{vlist $n_4$}{頭2}\longrightarrow
+ \Node{vlist $n_5$}{中}
+\]
+に置き換えておく．
+\end{enumerate}
+\item \LuaTeX の行分割処理を普通に行う．
+\item 行分割の結果に従って，$g_i$,~$r_i$達を適切に置換する．
+
+例えば行分割の結果
+\begin{gather*}
+ (\text{other nodes})\longrightarrow
+ \Node{glue $g_0$}{}\longrightarrow \Node{whatsit~$W$}{元からある}\longrightarrow \Node{rule $r_1$}{}
+  \tag{行A}\\
+\noalign{\hrulefill 行の境目\hrulefill}
+\Node{rule $r_2$}{}\longrightarrow 
+ \Node{glue $g_2$}{}\longrightarrow (\text{other nodes})\tag{行B}
+\end{gather*}
+のようになったとしよう．
+\begin{enumerate}
+\item 処理は段落の上の行から順番に行われる．行Aの処理がまわってきたとしよう．
+
+\item 行Aの先頭から順番に眺めていく．すると「whatsit~$W$由来」のノード，$g_0$,~$W$,~$r_1$が見つかり，
+行Aはここで終わっている．
+
+まず，行Aのhboxの中身からwhatsit~$W$を消去（リストから取り除くだけで，$W$のメモリを解放するわけではない）する．
+$g_0$,~($W$,)~$r_1$というノードの並びは，「行末1グループ」$n_1$に対応しているので，
+$g_0$,~$r_1$を行Aから除去・メモリ解放し，代わりに$n_1$を行Aの中身に追加する．
+
+\item 次に行Bの処理にうつる．行Aでルビの処理は完了していない（2パーツのルビなのにまだ1パーツ目しか使っていないからである）ので，
+「whatsit~$W$由来」のノードがいくつか残っているはずである．
+
+案の定，$r_2$,~$g_2$というノード列が見つかった．これは「行頭1グループ」$n_3$に対応しているので，
+$r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_3$を行Bの中身に挿入する．
+
+\item これで2パーツとも使い切ったことになるので，
+隔離しておいた$W$を，（使われなかった$n_2$,~$n_4$,~$n_5$などと共に）メモリ解放する．結果として
+次のようになった：
+\begin{gather*}
+ (\text{other nodes})\longrightarrow
+ \Node{vlist $n_1$}{末1}\tag{行A}\\
+\noalign{\hrulefill 行の境目\hrulefill}
+\Node{vlist $n_3$}{頭1}\longrightarrow (\text{other nodes})\tag{行B}
+\end{gather*}
+\end{enumerate}
+\end{enumerate}
+
+\section{TODO}
+\begin{itemize}
+\item 熟語ルビの配置が「モノルビの連続」「グループルビ」のどちらかしかない（行分割は可能）．
+「一字だけかけても良い」なんてどうやるんだろう．
+\item 図3.82のように，ルビ文字のはみ出しが繋がらないようにする処理が不安定である．
+例えば，
+\begin{center}\Large
+\ruby{陵}{りよう}と\ruby{陵}{みささぎ}
+\end{center}
+において，後者の「\ruby{陵}{みささぎ}」のルビは前の「と」にかかっていない．
+これは次の理由によるものである：
+\begin{enumerate}
+\item ルビのところで行分割を正しく実装するためには，行分割前に行頭・行中・行末形の幅を
+決定しておかねばならない．
+\item 「\ruby{陵}{りよう}」の後側進入量は，行頭形のとき（ルビ全角）が最大となる．
+\item 「\ruby{陵}{みささぎ}」のルビ文字のはみ出しが重ならないように，前側進入許容量は
+\[
+ \underbrace{0.5\,\mathrm{zw}}_{\text{元々の許容量}}
+-\underbrace{0.5\,\mathrm{zw}}_{\text{前のルビの後側進入量の最大値}}=0
+\]
+となる．そのため，「\ruby{陵}{みささぎ}」のルビ文字は「と」にはかからない．
+\end{enumerate}
+1パスでは厳しいだろうが，2パスでなら
+全てのルビにおいて「どの形で出力されたか」をauxに保存することでは改善されると思う．
+しかし，どのように保存するか
+（具体的には，各\verb|\ruby|命令の呼びだしをどういうキーに変換するか）が問題だ．
+\item 実装方法の都合上，ルビの直前・直後・途中で2箇所以上の改行が起きる場合（以下のパーツの組み方が出てくる）に対応できない．
+\begin{center}\small
+\begin{tabular}{ll}
+\toprule
+\multicolumn{1}{c}{\sf 組み方}&\multicolumn{1}{c}{\sf サンプル}\\
+\midrule
+単独1&
+\huge
+\vrule{\color{blue}\gt\ruby[]{流}{りゆう}}\vrule\\
+単独2&
+\huge
+\vrule{\color{blue}\gt\ruby[]{暢}{ちよう}}\vrule\\
+単独$(1+2)$&
+\huge
+\vrule{\color{blue}\gt\ruby[stretch=010]{流|暢}{りゆう|ちよう}}\vrule\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{itemize}
+
+\paragraph{進入(intrusion)と突出(protrusion)}\ 
+
+進入ありの例：\quad と\ruby{暁}{あかつき}の
+
+進入なしの例：\quad {\setkeys[ltj]{ruby}{mode=0}と\ruby{暁}{あかつき}の}
+
+突出ありの例：\quad {\setkeys[ltj]{ruby}{stretch={1}{2}{1}}\ruby{聴衆}{ちようしゆう}}
+
+突出なしの例：\quad {\setkeys[ltj]{ruby}{stretch={0}{2}{0}}\ruby{聴衆}{ちようしゆう}}
+
+
+\paragraph{mode}\ 
+
+mode 00xx: {\setkeys[ltj]{ruby}{mode=1}は\ruby{美}{うつく}しい
+  \quad は\ruby{聴衆}{ちようしゆう}と}
+
+mode 01xx: {\setkeys[ltj]{ruby}{mode=5}は\ruby{美}{うつく}しい
+  \quad は\ruby{聴衆}{ちようしゆう}と}
+
+mode 10xx: {\setkeys[ltj]{ruby}{mode=9}は\ruby{美}{うつく}しい
+  \quad は\ruby{聴衆}{ちようしゆう}と}
+
+mode 11xx: {\setkeys[ltj]{ruby}{mode=13}%
+\ltjsetparameter{rubypreintrusion={`立,0.5}, 
+  rubypostintrusion={`立,0.5}}は\ruby{暁}{あかつき}立\quad
+は\ruby{聴衆}{ちようしゆう}立\par}
+↑ここでは「立」には0.5字がけを許容
+
+中付きでは00xx, 11xxを選択して下さい
+
+
+\section{いくつかの例}
+\def\rubytest{\ruby{黄金橋}{ゴールデンゲートブリッジ}\relax}
+
+\setbox0=\vbox{\hsize=22\zw%
+ああああ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこ}
+%\directlua{ltj.ext_show_node_list(tex.box[0], '? ', print)}
+\fbox{\box0}
+
+\def\rubytest{\ruby{国府津}{こうづ}\relax}
+% グループルビ
+
+\setbox0=\vbox{\hsize=18\zw%
+あ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこ}
+%\directlua{ltj.ext_show_node_list(tex.box[0], '? ', print)}
+\fbox{\box0}
+
+\def\rubytest{\ruby{●●|◆}{◆◆◆◆◆◆|●●●}\relax}
+\setbox0=\vbox{\hsize=19\zw%
+あ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこイ
+あ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこウ
+あ\rubytest いうえおかきくけこエ
+あ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこ}
+%\directlua{ltj.ext_show_node_list(tex.box[0], '? ', print)}
+\fbox{\box0}
+
+\def\rubytest{\ruby{●●|□}{◆◆◆|●●●}\relax}
+\setbox0=\vbox{\hsize=19\zw%
+あ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこイ
+あ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこウ
+あ\rubytest いうえおかきくけこエ
+あ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこ
+あ\rubytest いうえおかきくけこ}
+%\directlua{ltj.ext_show_node_list(tex.box[0], '? ', print)}
+\fbox{\box0}
+
+\def\rubytest{\ruby{異|様}{い|よう}\relax}
+\setbox0=\vbox{\hsize=19\zw%
+あ\rubytest いうえくけこ
+あ\rubytest いうえくけこ
+あ\rubytest いうえくけこ
+あ\rubytest いうえくけこイ
+あ\rubytest いうえおかきくけこ}
+%\directlua{ltj.ext_show_node_list(tex.box[0], '? ', print)}
+\fbox{\box0}
+
+\def\rubytest{\ruby{□|■|□}{■■|□□□|■■}\relax}
+
+\setbox0=\vbox{\hsize=23\zw%
+あ\rubytest いうえおかきくけこうえおかきくけこ
+あ\rubytest いうえおかきくけこうえおかきくけこ
+あ\rubytest いう□おかきくけこうえおかきくけこ
+あ\rubytest いう□おかきくけこうえおかきくけこ
+あ\rubytest いう□おかきくけこうえおかきくけこ
+あ\rubytest いうえおかきくけこ}
+\fbox{\box0}
+
+\begin{description}
+\def\sample{又\ruby{承}{うけたまわ}る\quad \ruby{疎}{そ}\quad は\ruby{俄}{にわか}勉強
+  \quad 後\ruby{俄}{にわか}勉強}
+\item[標準] \sample
+\item[肩つき] {\kata\sample}
+\item[拡張肩つき]{\ltjsetruby{ekata}\sample}
+\end{description}
+
+
+\newpage
+\section{jlreq 20120403の例}
+
+\obeylines\newcommand*{\噂}{\CID{7642}}
+%================================== 横組
+\paragraph{3.3.1節}\ \par
+3.49 \ruby{君|子}{くん|し}は\ruby{和}{わ}して\ruby{同}{どう}ぜず
+3.50 \ruby{人}{ひと}に\ruby{誨}{おし}えて\ruby{倦}{う}まず\par% 中付き
+3.51 \ruby{鬼}{き}\ruby{門}{もん}の\ruby{方}{ほう}\ruby{角}{がく}を% モノ中付き
+\ruby{凝}{ぎょう}\ruby{視}{し}する
+3.52 \ruby{鬼|門}{き|もん}の\ruby{方|角}{ほう|がく}を% 熟語（グループ扱い）
+\ruby{凝|視}{ぎよう|し}する
+3.53 \ruby{茅場町}{かやばちよう}\quad\ruby{茅場}{かやば}\ruby{町}{ちよう}\par% 複合語
+3.54 \ruby{紫陽花}{あじさい}\quad\ruby{坩堝}{るつぼ}\quad\ruby{田舎}{いなか}\par% 熟字訓 
+3.55 \ruby{模型}{モデル}\quad\ruby{顧客}{クライアント}\quad% カタカナルビ
+\ruby{境界面}{インターフエース}\quad\ruby{避難所}{アジール}
+3.56 \ruby{編集者}{editor}\quad \ruby{editor}{エディター}% 欧文
+
+\paragraph{3.3.3節}\ \par
+3.58 に\ruby{幟}{のぼり}を\quad{\kata に\ruby{幟}{のぼり}を}%
+  \quad \ruby{韋}{い}\ruby{編}{へん}\ruby{三}{さん}\ruby{絶}{ぜつ}
+3.59 に\ruby{幟}{\kanjiseries{mc}\selectfont のぼり}を
+3.60 \ruby{韋}{い}\ruby{編}{へん}\ruby{三}{さん}\ruby{絶}{ぜつ}\quad%
+{\setkeys[ltj]{ruby}{rubysize=0.4}% 文字サイズ変更
+  \ruby{韋}{い}\ruby{編}{へん}\ruby{三}{さん}\ruby{絶}{ぜつ}}
+
+\paragraph{3.3.4節}\ \par
+3.61図（両側ルビ）はまだ未サポートにより省略
+
+\paragraph{3.3.5節 モノルビ}\ \par
+3.62 の\ruby{葯}{やく}に
+3.63 版面の\ruby{地}{ち}に\quad{\kata 版面の\ruby{地}{ち}に}
+3.64× {\kata 版面の\ruby{地}{ち}に}（まだ縦組み未サポート）\par% 横組み肩つき
+3.65 の\ruby{砦}{とりで}に\quad{\kata の\ruby{砦}{とりで}に}
+{\kata 3.66上 の\ruby{旬}{しゆん}に\quad 後\ruby{旬}{しゆん}に
+3.66下 の\ruby{旬}{しゆん}又\quad 後\ruby{旬}{しゆん}又\par}
+
+
+\paragraph{3.3.6節 グループルビ}\ \par
+3.67 は\ruby{冊子体}{コーデツクス}と
+3.68 \ruby{模型}{モデル}\quad \ruby{利用許諾}{ライセンス}
+3.69 {\setkeys[ltj]{ruby}{stretchruby=010}% 両端を揃える流儀
+  \ruby{模型}{モデル}\quad \ruby{利用許諾}{ライセンス}}
+3.70 \ruby{なげきの聖母像}{ビエタ}←自動調整
+3.71 \ruby{顧客}{クライアント}\quad \ruby{境界面}{インターフエース}
+3.72 {\setkeys[ltj]{ruby}{stretch=010, stretchhead = 010, stretchend = 010}% はみ出さない流儀
+  \ruby{顧客}{クライアント}\quad \ruby{境界面}{インターフエース}}
+
+
+\paragraph{3.3.7節 熟語ルビ}\ \par
+3.73左 \ruby{杞|憂}{き|ゆう}\quad \ruby{畏|怖}{い|ふ}
+3.73右 {\kata\ruby{杞|憂}{き|ゆう}\quad \ruby{畏|怖}{い|ふ}}
+3.74 の\ruby{流|儀}{りゆう|ぎ}を\quad の\ruby{無|常}{む|じよう}を\quad%
+の\ruby{成|就}{じよう|じゆ}を\quad
+3.74 の\ruby{紋|章}{もん|しよう}を\quad の\ruby{象|徴}{しよう|ちよう}を
+
+要調整3.75 {\kata の\ruby{流|儀}{りゆう|ぎ}を\quad の\ruby{無|常}{む|じよう}を\quad%
+の\ruby{成|就}{じよう|じゆ}を\quad 
+要調整3.75 の\ruby{紋|章}{もん|しよう}を\quad の\ruby{象|徴}{しよう|ちよう}を}
+
+3.76× の\ruby{流}{りゆう}\ruby{儀}{ぎ}を\quad の\ruby{無}{む}\ruby{常}{じよう}を\quad%
+
+3.77\ {\notalign%この図では揃えない
+\hbox{\vrule\vbox{\hsize=5\zw ……の\ruby{流|儀}{りゆう|ぎ}を}\vrule}\quad%
+% ↑どうすれば改行されるのだろう
+\hbox{\vrule\vbox{\hsize=5\zw ……の\ruby{無|常}{む|じよう}を}\vrule}}
+
+\paragraph{3.3.8節 ルビはみ出し}\ \par
+3.78 \ruby{人}{ひと}は\ruby{死}{し}して\ruby{名}{な}を\ruby{残}{のこ}す\par% ベタ
+要調整3.79 漢字の部首には\ruby{偏}{へん}・\ruby{冠}{かんむり}・\ruby{脚}{きやく}・%
+\ruby{旁}{つくり}がある
+要調整3.79 漢字の部首には\ruby{偏}{へん}，\ruby{冠}{かんむり}，\ruby{脚}{きやく}，%
+\ruby{旁}{つくり}がある
+3.79 この\ruby{\噂}{うわさ}の好きな人は%
+\ruby{懐}{ふところ}ぐあいもよく、\ruby{檜}{ひのき}を
+3.80 漢字の部首には「\ruby{偏}{へん}」「\ruby{冠}{かんむり}」「\ruby{脚}{きやく}」%
+「\ruby{旁}{つくり}」がある
+3.80 この\ruby{\噂}{うわさ}好きな人は\ruby{懐}{ふところ}具合もよく、\ruby{檜}{ひのき}材を
+要調整3.81× に\ruby{暁}{あかつき}の\kern-1\zw の\ruby{趣}{おもむき}を
+3.82 に\ruby{暁}{あかつき}の\ruby{趣}{おもむき}を
+{%
+  \ltjsetparameter{rubypostintrusion={`好,0.5}}
+  \ltjsetparameter{rubypostintrusion={`具,0.5}}
+  \ltjsetparameter{rubypostintrusion={`材,0.5}}
+3,83 この\ruby{\噂}{うわさ}の好きな人は\ruby{懐}{ふところ}ぐあいもよく、\ruby{檜}{ひのき}を
+3.83 この\ruby{\噂}{うわさ}好きな人は\ruby{懐}{ふところ}具合もよく、\ruby{檜}{ひのき}材を
+}
+{%
+  \makeatletter\count@="3040\loop\relax\ifnum \count@<"30A0%
+  \ltjsetparameter{rubypreintrusion={\the\count@,0}, %
+    rubypostintrusion={\the\count@,0}}%
+  \advance\count@1 \repeat
+3.84 この\ruby{\噂}{うわさ}の好きな人は\ruby{懐}{ふところ}ぐあいもよく、\ruby{檜}{ひのき}を
+3.84 この\ruby{\噂}{うわさ}好きな人は\ruby{懐}{ふところ}具合もよく、\ruby{檜}{ひのき}材を
+}
+要調整3.85\ {\notalign%この図では揃えない
+\hbox{\vrule\vbox{\hsize=15\zw% なぜ行末形にならない！
+あああああああああああの\penalty10000\ruby{徑}{こみち}をあああああああ%
+ああああああああああああああああいの\ruby{徑}{こみち}}\vrule}}
+
+3.86\ %
+\hbox{\vrule\vbox{\hsize=15\zw
+ああああああああああああの\ruby{徑}{こみち}をあああああああ%
+あああああああ\ruby{徑}{こみち}を}\vrule}
+
+
+\newpage
+{\Large 要調整}
+
+\paragraph{F.1--2節}\ \par
+
+F.01 {\kata\ruby{治|癒}{ち|ゆ}\quad\ruby{模|索}{も|さく}\quad%
+\ruby{遷|移}{せん|い}\quad\ruby{混|沌}{こん|とん}}
+F.01中 \ruby{治|癒}{ち|ゆ}\quad\ruby{模|索}{も|さく}\quad%
+\ruby{遷|移}{せん|い}\quad\ruby{混|沌}{こん|とん}
+
+F.02 \ruby{橋|頭|堡}{きよう|とう|ほ}
+
+F.03 {\kata\ruby{凝|視}{ぎよう|し}\quad\ruby{調|理|師}{ちよう|り|し}\quad%
+\ruby{思|春|期}{し|しゆん|き}\quad\ruby{管|状|花}{かん|じよう|か}\quad%
+\ruby{蒸|気|船}{じよう|き|せん}}
+F.03 \ruby{凝|視}{ぎよう|し}\quad\ruby{調|理|師}{ちよう|り|し}\quad%
+\ruby{思|春|期}{し|しゆん|き}\quad\ruby{管|状|花}{かん|じよう|か}\quad%
+\ruby{蒸|気|船}{じよう|き|せん}
+
+F.04 {\kata\ruby{未|熟}{み|じゆく}\quad\ruby{法|華|経}{ほ|け|きよう}\quad%
+\ruby{顕|微|鏡}{けん|び|きよう}\quad\ruby{課|徴|金}{か|ちよう|きん}\quad%
+\ruby{古|戦|場}{こ|せん|じよう}}
+F.04 \ruby{未|熟}{み|じゆく}\quad\ruby{法|華|経}{ほ|け|きよう}\quad%
+\ruby{顕|微|鏡}{けん|び|きよう}\quad\ruby{課|徴|金}{か|ちよう|きん}\quad%
+\ruby{古|戦|場}{こ|せん|じよう}
+
+F.05 の\ruby{峻|別}{しゆん|べつ}は
+
+F.06以降は未チェック
+\end{document}
