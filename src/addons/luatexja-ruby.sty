@@ -4,7 +4,7 @@
 
 % LaTeX only!
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-ruby}[2012/4/21 v0.1]
+\ProvidesPackage{luatexja-ruby}[2014/02/06 v0.1]
 \RequirePackage{luatexja}
 
 %%------------------
@@ -17,11 +17,11 @@
 %% 引数：ルビ全角を単位とした実数
 %% この文字への pre-, post-intrusion の許容量
 \define@key[ltj]{japaram}{rubypreintrusion}{%
-  \expandafter\ltj@@set@stack@real#1:{ripre}{0}{0x7FFFFFFF}}
+  \expandafter\ltj@@set@stack@real#1:{RIPRE}{0}{0x7FFFFFFF}}
 \define@key[ltj]{japaram}{rubypostintrusion}{%
-  \expandafter\ltj@@set@stack@real#1:{ripost}{0}{0x7FFFFFFF}}
+  \expandafter\ltj@@set@stack@real#1:{RIPOST}{0}{0x7FFFFFFF}}
 \def\ltj@@set@stack@real#1,#2:#3#4#5{%
-  \directlua{luatexja.stack.set_stack_table(luatexja.isglobal, \asluastring{#3},
+  \directlua{luatexja.stack.set_stack_perchar(luatexja.stack_table_index.#3,
     \ltj@safe@num@or\ltj@defnum{#1},\ltj@safe@real{#2},#4,#5)}}
 
 % ルビ用のキー設定
@@ -31,7 +31,7 @@
 %% attr_ruby_mode
 %% bit 0: intrusion を有効にするか（1: 有効）
 %% bit 1: 前後の intrusion 許容量を小さい方に揃える (1: yes)
-%% bit 2, 3: intrusion をどう使って親文字を配置する 
+%% bit 2, 3: intrusion をどう使って親文字を配置するか
 %%   00: intrusion なしでとりあえず計算し，左右の突出分を進入に割り当てる
 %%   01: pre-intrusion でまかなえるだけまかない，無理なら post- も使う
 %%   10: post を優先
@@ -152,11 +152,11 @@
 
 \def\ltj@@ruby@sr#1{%
   \setbox0=\hbox{\fontsize{\dimen1}\z@\selectfont#1}%
-  \directlua{table.insert(ruby_tmplist_r, node.copy(tex.box[0]))}%
+  \directlua{table.insert(ruby_tmplist_r, luatexja.ruby.cpbox())}%
 }
 \def\ltj@@ruby@sp#1{%
   \setbox0=\hbox{\selectfont#1}%
-  \directlua{table.insert(ruby_tmplist_p, node.copy(tex.box[0]))}%
+  \directlua{table.insert(ruby_tmplist_p, luatexja.ruby.cpbox())}%
 }
 
 % 初期値．要調整

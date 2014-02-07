@@ -420,7 +420,8 @@ local calc_np = calc_np
 -- We think that "Np is a Japanese character" if Np.met~=nil,
 --            "Np is an alphabetic character" if Np.pre~=nil,
 --            "Np is not a character" otherwise.
-local after_hlist, after_alchar, extract_np
+after_hlist = nil -- global
+local after_alchar, extract_np
 do
   local PRE  = luatexja.stack_table_index.PRE
   local POST = luatexja.stack_table_index.POST

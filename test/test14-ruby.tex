@@ -1,4 +1,4 @@
-%#! lualatex
+%#! luajitlatex
 %%% a test of ruby.
 \documentclass[b5paper,10pt]{ltjsarticle}
 \usepackage{fontspec,luacode,luatexja-otf,amsmath}
@@ -27,6 +27,10 @@
 
 \title{ルビ実装のサンプル}
 \begin{document}
+%\fontsize{13.19873}{10}\selectfont%
+%
+%を\hbox{\ruby{凝}{ぎょう}}あ\ruby{視}{し}する
+%\end{document}
 \maketitle
 
 \section{使い方}
@@ -386,6 +390,7 @@ mode 11xx: {\setkeys[ltj]{ruby}{mode=13}%
 3.52 \ruby{鬼|門}{き|もん}の\ruby{方|角}{ほう|がく}を% 熟語（グループ扱い）
 \ruby{凝|視}{ぎよう|し}する
 3.53 \ruby{茅場町}{かやばちよう}\quad\ruby{茅場}{かやば}\ruby{町}{ちよう}\par% 複合語
+% 3.53右の説明はこれでいいのか？
 3.54 \ruby{紫陽花}{あじさい}\quad\ruby{坩堝}{るつぼ}\quad\ruby{田舎}{いなか}\par% 熟字訓 
 3.55 \ruby{模型}{モデル}\quad\ruby{顧客}{クライアント}\quad% カタカナルビ
 \ruby{境界面}{インターフエース}\quad\ruby{避難所}{アジール}
@@ -416,7 +421,7 @@ mode 11xx: {\setkeys[ltj]{ruby}{mode=13}%
 3.68 \ruby{模型}{モデル}\quad \ruby{利用許諾}{ライセンス}
 3.69 {\setkeys[ltj]{ruby}{stretchruby=010}% 両端を揃える流儀
   \ruby{模型}{モデル}\quad \ruby{利用許諾}{ライセンス}}
-3.70 \ruby{なげきの聖母像}{ビエタ}←自動調整
+3.70 \ruby{なげきの聖母像}{ピエタ}←自動調整
 3.71 \ruby{顧客}{クライアント}\quad \ruby{境界面}{インターフエース}
 3.72 {\setkeys[ltj]{ruby}{stretch=010, stretchhead = 010, stretchend = 010}% はみ出さない流儀
   \ruby{顧客}{クライアント}\quad \ruby{境界面}{インターフエース}}
@@ -429,13 +434,13 @@ mode 11xx: {\setkeys[ltj]{ruby}{mode=13}%
 の\ruby{成|就}{じよう|じゆ}を\quad
 3.74 の\ruby{紋|章}{もん|しよう}を\quad の\ruby{象|徴}{しよう|ちよう}を
 
-要調整3.75 {\kata の\ruby{流|儀}{りゆう|ぎ}を\quad の\ruby{無|常}{む|じよう}を\quad%
+3.75 {\kata の\ruby{流|儀}{りゆう|ぎ}を\quad の\ruby{無|常}{む|じよう}を\quad%
 の\ruby{成|就}{じよう|じゆ}を\quad 
-要調整3.75 の\ruby{紋|章}{もん|しよう}を\quad の\ruby{象|徴}{しよう|ちよう}を}
+3.75 の\ruby{紋|章}{もん|しよう}を\quad の\ruby{象|徴}{しよう|ちよう}を}
 
 3.76× の\ruby{流}{りゆう}\ruby{儀}{ぎ}を\quad の\ruby{無}{む}\ruby{常}{じよう}を\quad%
 
-3.77\ {\notalign%この図では揃えない
+要調整 3.77\ {\notalign%この図では揃えない
 \hbox{\vrule\vbox{\hsize=5\zw ……の\ruby{流|儀}{りゆう|ぎ}を}\vrule}\quad%
 % ↑どうすれば改行されるのだろう
 \hbox{\vrule\vbox{\hsize=5\zw ……の\ruby{無|常}{む|じよう}を}\vrule}}
@@ -470,13 +475,18 @@ mode 11xx: {\setkeys[ltj]{ruby}{mode=13}%
 }
 要調整3.85\ {\notalign%この図では揃えない
 \hbox{\vrule\vbox{\hsize=15\zw% なぜ行末形にならない！
-あああああああああああの\penalty10000\ruby{徑}{こみち}をあああああああ%
+あああああああああああああの\ruby{徑}{こみち}\penalty-1000をあああああああ%
 ああああああああああああああああいの\ruby{徑}{こみち}}\vrule}}
 
 3.86\ %
 \hbox{\vrule\vbox{\hsize=15\zw
 ああああああああああああの\ruby{徑}{こみち}をあああああああ%
 あああああああ\ruby{徑}{こみち}を}\vrule}
+
+要調整3.87\ %
+\hbox{\vrule\vbox{\hsize=15\zw% なぜ行末形にならない！
+ああああああああああああの\ruby{飾り}{アクセサリー}等あああああああ%
+あああああああああああああああ共\ruby{飾り}{アクセサリー}}\vrule}
 
 
 \newpage
