@@ -22,7 +22,7 @@
 %  -----------------------------------------
 %
 % \fi
-% \CheckSum{5163}
+% \CheckSum{5199}
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -50,7 +50,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2014/01/13 ]
+  [2014/02/07 ]
 %<*driver>
 \documentclass{ltjsarticle}
 \usepackage{doc}
@@ -130,7 +130,7 @@
 %   これがあると |grfext.sty| を読み込んだ際にエラーを引き起こすので削除しました。
 % \end{itemize}
 %
-% [2014-01-13] jsclasses 2014-01-02 ベースにしました．
+% [2014-02-07] jsclasses 2014-02-07 ベースにしました．
 %
 % \StopEventually{}
 %
@@ -321,6 +321,10 @@
 \DeclareOption{43pt}{\renewcommand{\@ptsize}{33}}
 \DeclareOption{12Q}{\renewcommand{\@ptsize}{1200}}
 \DeclareOption{14Q}{\renewcommand{\@ptsize}{1400}}
+\DeclareOption{10ptj}{\renewcommand{\@ptsize}{1001}}
+\DeclareOption{10.5ptj}{\renewcommand{\@ptsize}{1051}}
+\DeclareOption{11ptj}{\renewcommand{\@ptsize}{1101}}
+\DeclareOption{12ptj}{\renewcommand{\@ptsize}{1201}}
 %    \end{macrocode}
 %
 % \paragraph{トンボオプション}
@@ -674,6 +678,22 @@
 \ifnum\@ptsize=1400
   \mag 1077
   \def\inv@mag{0.928505}
+\fi
+\ifnum\@ptsize=1001
+  \mag 1085
+  \def\inv@mag{0.921659}
+\fi
+\ifnum\@ptsize=1051
+  \mag 1139
+  \def\inv@mag{0.877963}
+\fi
+\ifnum\@ptsize=1101
+  \mag 1194
+  \def\inv@mag{0.837521}
+\fi
+\ifnum\@ptsize=1201
+  \mag 1302
+  \def\inv@mag{0.768049}
 \fi
 %<*kiyou>
 \mag 977
