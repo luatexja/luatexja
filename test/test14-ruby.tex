@@ -4,9 +4,9 @@
 \usepackage{fontspec,luacode,luatexja-otf,amsmath}
 \usepackage{unicode-math}
 \setmathfont{XITS Math}
-\setmainfont{TeX Gyre Termes}
-\setsansfont{TeX Gyre Heros}
-\setmonofont{LMMono10-Regular}
+\setmainfont[Ligatures=TeX]{TeX Gyre Termes}
+\setsansfont[Ligatures=TeX]{TeX Gyre Heros}
+\setmonofont[Ligatures=TeX]{LMMono10-Regular}
 \usepackage{luatexja-ruby,showexpl,booktabs}
 \lstset{preset=\huge,basicstyle=\ttfamily}
 \fboxsep=0mm
@@ -27,15 +27,13 @@
 
 \title{ルビ実装のサンプル}
 \begin{document}
-%\fontsize{13.19873}{10}\selectfont%
-%
-%を\hbox{\ruby{凝}{ぎょう}}あ\ruby{視}{し}する
-%\end{document}
+%\fontsize{13.19873}{15}\selectfont%
+
 \maketitle
 
 \section{使い方}
 \begin{itemize}
-\item パッケージ読み込み：\verb+\usepackage{luatexja-ruby}+のみ．\LaTeXe のみサポート．
+\item パッケージ読み込み：\verb+\usepackage{luatexja-ruby}+ のみ．\LaTeXe のみサポート．
 \item 命令：
 \begin{itemize}
 \item \verb+\ltjruby[option]{親|文|字}{おや|も|じ}+
@@ -43,10 +41,11 @@
 \end{itemize}
 \item \verb|\ltjsetparameter|に追加のキー
 \begin{itemize}
-\item \verb+rubypreintrusion={char_code, pre_int}+：全角単位
-\item \verb+rubypostintrusion={char_code, post_int}+：全角単位
+\item \verb+rubypreintrusion={<char_code>, <pre_int>}+：ルビ全角単位．
+\verb+<char_code>+ の文字に掛けられる前のルビ文字列の最大長．
+\item \verb+rubypostintrusion={<char_code>, <post_int>}+：ルビ全角単位．
 \end{itemize}
-\item \verb|\ltjsetruby{option}|他でサポートするオプション：後ろに指定したものが優先
+\item \verb|\ltjsetruby{option}| 他でサポートするオプション：後ろに指定したものが優先
 \begin{itemize}
 \item \verb+mode+：進入処理のモードを表すbit vector．意味はluatexja-ruby.sty参照．
 \item \verb+intrusionpre=<real>+：前進入量指定．ルビ全角単位で指定．
@@ -62,6 +61,57 @@
 \item \verb+rubysize=<real>+：ルビ文字の親文字に対する大きさ．
 \end{itemize}
 \end{itemize}
+\section{TODO}
+\begin{itemize}
+\item 熟語ルビの配置が「モノルビの連続」「グループルビ」のどちらかしかない（行分割は可能）．
+「一字だけかけても良い」なんてどうやるんだろう．
+\item ルビ文字のはみ出しが繋がらないようにする処理（図3.82）には注意．
+例えば，
+\begin{center}\Large
+\ltjsetparameter{rubypreintrusion={`◆,1}, 
+  rubypostintrusion={`◆,1}}
+\ruby{陵}{りよう}◆\ruby{陵}{みささぎ}
+\end{center}
+において，後者の「\ruby{陵}{みささぎ}」のルビが前の「◆」にかかる量は次のように決まる：
+\begin{enumerate}
+\item 1回目の実行では，行分割前に「\ruby{陵}{りよう}」の後側進入量は前もって知ることはでき
+      ない．なので，「\ruby{陵}{りよう}」は行中形で組まれるものとして
+「\ruby{陵}{みささぎ}」前側進入許容量は
+\[
+ \underbrace{0.5\,\mathrm{zw}}_{\text{元々の許容量}}
+-\underbrace{0.25\,\mathrm{zw}}_{\text{前のルビの後側進入量}}=0.25\,\mathrm{zw}
+\]
+となる．なお，行分割後，「\ruby{陵}{りよう}」が実際に組まれた時に使われた後側進入量は
+auxファイルに記述される．
+\item 2回目以降の実行では，auxファイルに保存された「\ruby{陵}{りよう}」の後側進入量
+を用いて，「\ruby{陵}{みささぎ}」前側進入許容量を計算する．
+\end{enumerate}
+なお，auxファイルに保存する際，各 \verb+\ruby+ 命令の呼び出しを識別するキーが必要になるが，
+そのキーとしては単純に「何個目の \verb+\ruby+ 命令か」である．
+
+\item 実装方法の都合上，ルビの直前・直後・途中で2箇所以上の改行が起きる場合
+（以下のパーツの組み方が出てくる）に対応できない．
+\begin{center}\small
+\begin{tabular}{ll}
+\toprule
+\multicolumn{1}{c}{\sf 組み方}&\multicolumn{1}{c}{\sf サンプル}\\
+\midrule
+単独1&
+\huge
+\vrule{\color{blue}\gt\ruby[]{流}{りゆう}}\vrule\\
+単独2&
+\huge
+\vrule{\color{blue}\gt\ruby[]{暢}{ちよう}}\vrule\\
+単独$(1+2)$&
+\huge
+\vrule{\color{blue}\gt\ruby[stretch=010]{流|暢}{りゆう|ちよう}}\vrule\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\item 段落最終行の \verb+\parfillskip+ が（伸縮の結果）0\,pt以下であり，かつ
+その直前がルビだった場合，該当のルビは行末形になる．
+\end{itemize}
 
 \section{実装の大まかな方法}
 次の例で説明する．
@@ -74,14 +124,17 @@
 現在の水平リストへと挿入する（必要ならば\verb|\leavevmode|も実行）：
 \[
  \Node{whatsit $w$}{value: 2}\longrightarrow 
- \Node{hlist $r_1$}{「りゆう」}\longrightarrow
+ \Node{hlist $s_1$}{「りゆう」}\longrightarrow
  \Node{hlist $p_1$}{「流」}\longrightarrow
- \Node{hlist $r_2$}{「ちよう」}\longrightarrow
+ \Node{hlist $s_2$}{「ちよう」}\longrightarrow
  \Node{hlist $p_2$}{「暢」}
 \]
 ここで，最初の$w$の値2は，ルビが2つのパーツ「\ruby{流}{りゆう}」「\ruby{暢}{ちよう}」からなっていることを
-表している．$r_i$達の中の文字は既にルビの大きさである．この値を$\mathit{cmp}$とおこう．
-\item \LuaTeX-jaの和文処理グルー挿入処理においては，「先頭が『流』，最後が『暢』であるようなhboxを\verb|\unhbox|で展開したもの」と扱われる．
+表している．この値を$\mathit{cmp}$とおこう．
+$s_i$達の中の文字は既にルビの大きさである．
+\item \LuaTeX-jaの和文処理グルー挿入処理において，
+whatsit~$W$は，
+「先頭が『流』，最後が『暢』であるようなhboxを\verb|\unhbox|で展開したもの」と扱われる．
 言い換えれば，ルビ部分を無視した単なる「流暢」という和文文字の並びとして扱われる\footnote{「流」「暢」の間のグルーは既に入っている，と扱われる．}．
 次のサンプルを参照
 \begin{LTXexample}
@@ -114,8 +167,8 @@ $W$の前後に$2\mathit{cmp}+1=5$個のノードが挿入される．
 のようになったとしたら，「\ruby{流}{りゆう}」「\ruby{暢}{ちよう}」の間で行分割が起きた，ということがわかり，
 $g_i$,~$r_i$達のノードを適切に置き換えればよい（後で詳しく説明する）．
 
-\item なお，$r_i$達の高さ・深さは組み上がった後のそれであり，現状では親文字部分の高さ・深さと一致する．
-$g_i$,~$r_i$達の幅は，以下の対応に沿って計算される．
+\item なお，$r_i$達の高さ・深さは組み上がった後のそれである．
+$g_i$,~$r_i$達の幅は，以下の対応に沿って算出する．
 
 \begin{center}\small
 \begin{tabular}{cllll}
@@ -153,14 +206,15 @@ $g_0\rightarrow W\rightarrow r_1\rightarrow g_2 \rightarrow r_2\rightarrow g_2$\
 \end{tabular}
 \end{center}
 
+\medskip
 
-この5元連立方程式を解いて$g_i$,~$r_i$達の幅を求める．
-なお，進入長は予め計算しておく．例えばこの場合，
+例えばこの場合，$n_5$に対して
 \[
  g_0+r_1+g_2+r_2+g_2 = 3\,\mathrm{zw}-(0.25\,\mathrm{zw}\times 2)=2.5\,\mathrm{zw}
 \]
-である（zwは親文字全角の幅）．
-
+という方程式が立つ（zwは親文字全角の幅，進入量込）．
+$n_1$から$n_5$まで計5本の方程式が立つが，これらはGau\ss の消去法で解くことができて
+$g_i$,~$r_i$達の幅が求まる．
 \item また，ルビ処理を統括しているwhatsit~$W$の値も
 \[
  \Node{whatsit $w$}{value: 2}\longrightarrow 
@@ -213,52 +267,6 @@ $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_3$を行B�
 \end{enumerate}
 \end{enumerate}
 
-\section{TODO}
-\begin{itemize}
-\item 熟語ルビの配置が「モノルビの連続」「グループルビ」のどちらかしかない（行分割は可能）．
-「一字だけかけても良い」なんてどうやるんだろう．
-\item 図3.82のように，ルビ文字のはみ出しが繋がらないようにする処理が不安定である．
-例えば，
-\begin{center}\Large
-\ruby{陵}{りよう}と\ruby{陵}{みささぎ}
-\end{center}
-において，後者の「\ruby{陵}{みささぎ}」のルビは前の「と」にかかっていない．
-これは次の理由によるものである：
-\begin{enumerate}
-\item ルビのところで行分割を正しく実装するためには，行分割前に行頭・行中・行末形の幅を
-決定しておかねばならない．
-\item 「\ruby{陵}{りよう}」の後側進入量は，行頭形のとき（ルビ全角）が最大となる．
-\item 「\ruby{陵}{みささぎ}」のルビ文字のはみ出しが重ならないように，前側進入許容量は
-\[
- \underbrace{0.5\,\mathrm{zw}}_{\text{元々の許容量}}
--\underbrace{0.5\,\mathrm{zw}}_{\text{前のルビの後側進入量の最大値}}=0
-\]
-となる．そのため，「\ruby{陵}{みささぎ}」のルビ文字は「と」にはかからない．
-\end{enumerate}
-1パスでは厳しいだろうが，2パスでなら
-全てのルビにおいて「どの形で出力されたか」をauxに保存することでは改善されると思う．
-しかし，どのように保存するか
-（具体的には，各\verb|\ruby|命令の呼びだしをどういうキーに変換するか）が問題だ．
-\item 実装方法の都合上，ルビの直前・直後・途中で2箇所以上の改行が起きる場合（以下のパーツの組み方が出てくる）に対応できない．
-\begin{center}\small
-\begin{tabular}{ll}
-\toprule
-\multicolumn{1}{c}{\sf 組み方}&\multicolumn{1}{c}{\sf サンプル}\\
-\midrule
-単独1&
-\huge
-\vrule{\color{blue}\gt\ruby[]{流}{りゆう}}\vrule\\
-単独2&
-\huge
-\vrule{\color{blue}\gt\ruby[]{暢}{ちよう}}\vrule\\
-単独$(1+2)$&
-\huge
-\vrule{\color{blue}\gt\ruby[stretch=010]{流|暢}{りゆう|ちよう}}\vrule\\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\end{itemize}
 
 \paragraph{進入(intrusion)と突出(protrusion)}\ 
 
@@ -441,7 +449,8 @@ mode 11xx: {\setkeys[ltj]{ruby}{mode=13}%
 3.76× の\ruby{流}{りゆう}\ruby{儀}{ぎ}を\quad の\ruby{無}{む}\ruby{常}{じよう}を\quad%
 
 要調整 3.77\ {\notalign%この図では揃えない
-\hbox{\vrule\vbox{\hsize=5\zw ……の\ruby{流|儀}{りゆう|ぎ}を}\vrule}\quad%
+\hbox{\vrule\vbox{\hsize=10\zw あああああああの%
+  \ruby{流|儀}{りゆう|ぎ}がある．}\vrule}\quad%
 % ↑どうすれば改行されるのだろう
 \hbox{\vrule\vbox{\hsize=5\zw ……の\ruby{無|常}{む|じよう}を}\vrule}}
 
@@ -476,15 +485,15 @@ mode 11xx: {\setkeys[ltj]{ruby}{mode=13}%
 要調整3.85\ {\notalign%この図では揃えない
 \hbox{\vrule\vbox{\hsize=15\zw% なぜ行末形にならない！
 あああああああああああああの\ruby{徑}{こみち}\penalty-1000をあああああああ%
-ああああああああああああああああいの\ruby{徑}{こみち}}\vrule}}
+あああああああああああああああああいの\ruby{徑}{こみち}ああ}\vrule}}
 
 3.86\ %
 \hbox{\vrule\vbox{\hsize=15\zw
 ああああああああああああの\ruby{徑}{こみち}をあああああああ%
 あああああああ\ruby{徑}{こみち}を}\vrule}
 
-要調整3.87\ %
-\hbox{\vrule\vbox{\hsize=15\zw% なぜ行末形にならない！
+3.87\ %
+\hbox{\vrule\vbox{\hsize=15\zw%
 ああああああああああああの\ruby{飾り}{アクセサリー}等あああああああ%
 あああああああああああああああ共\ruby{飾り}{アクセサリー}}\vrule}
 
@@ -518,4 +527,5 @@ F.04 \ruby{未|熟}{み|じゆく}\quad\ruby{法|華|経}{ほ|け|きよう}\qua
 F.05 の\ruby{峻|別}{しゆん|べつ}は
 
 F.06以降は未チェック
+
 \end{document}
