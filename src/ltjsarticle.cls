@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsarticle}
-  [2014/01/13 ]
+  [2014/02/07 ]
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
@@ -113,6 +113,10 @@
 \DeclareOption{43pt}{\renewcommand{\@ptsize}{33}}
 \DeclareOption{12Q}{\renewcommand{\@ptsize}{1200}}
 \DeclareOption{14Q}{\renewcommand{\@ptsize}{1400}}
+\DeclareOption{10ptj}{\renewcommand{\@ptsize}{1001}}
+\DeclareOption{10.5ptj}{\renewcommand{\@ptsize}{1051}}
+\DeclareOption{11ptj}{\renewcommand{\@ptsize}{1101}}
+\DeclareOption{12ptj}{\renewcommand{\@ptsize}{1201}}
 \hour\time \divide\hour by 60\relax
 \@tempcnta\hour \multiply\@tempcnta 60\relax
 \minute\time \advance\minute-\@tempcnta
@@ -272,6 +276,22 @@
 \ifnum\@ptsize=1400
   \mag 1077
   \def\inv@mag{0.928505}
+\fi
+\ifnum\@ptsize=1001
+  \mag 1085
+  \def\inv@mag{0.921659}
+\fi
+\ifnum\@ptsize=1051
+  \mag 1139
+  \def\inv@mag{0.877963}
+\fi
+\ifnum\@ptsize=1101
+  \mag 1194
+  \def\inv@mag{0.837521}
+\fi
+\ifnum\@ptsize=1201
+  \mag 1302
+  \def\inv@mag{0.768049}
 \fi
 \setlength\paperwidth{\inv@mag\paperwidth}%
 \setlength\paperheight{\inv@mag\paperheight}%
