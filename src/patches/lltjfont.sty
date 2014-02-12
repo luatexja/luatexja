@@ -431,7 +431,7 @@
        \ifin@\@notkfamtrue\else%
          \def\@temp##1+{\lowercase{\def\@@temp{##1#1.fd}}}\expandafter\@temp\k@encoding+%
          \message{(I search kanjifont definition file: \@@temp)}%
-         \IfFileExists{\@@temp#1.fd}{\@tempswztrue}{\@tempswzfalse}%
+         \IfFileExists{\@@temp}{\@tempswztrue}{\@tempswzfalse}%
          \if@tempswz
            \directlua{luatexja.jfont.add_kfam_list(\tmp@enc, \tmp@item)}%
 	   \edef\k@family{#1}%
@@ -452,7 +452,7 @@
        \ifin@\@notffamtrue\else
          \def\@temp##1+{\lowercase{\def\@@temp{##1#1.fd}}}\expandafter\@temp\f@encoding+%
          \message{(I search font definition file: \@@temp)}%
-         \IfFileExists{\@@temp#1.fd}{\@tempswztrue}{\@tempswzfalse}%
+         \IfFileExists{\@@temp}{\@tempswztrue}{\@tempswzfalse}%
          \if@tempswz
            \directlua{luatexja.jfont.add_ffam_list(\tmp@enc, \tmp@item)}%
 	   \edef\f@family{#1}%
