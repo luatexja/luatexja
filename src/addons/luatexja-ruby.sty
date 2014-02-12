@@ -58,10 +58,13 @@
 %% attr_ruby_maxmargin
 %% attr は sp 単位だが，ユーザーは親文字全角単位で指定
 \ltj@@rkeydef{maxmargin}
+
+\ltj@@rkeydef{kenten}%% 圏点文字
+
 \savekeys[ltj]{ruby}{%
   mode, intrusionpre, intrusionpost, 
   stretchhead, stretchend, stretch, stretchruby, 
-  maxmargin, rubysize, 
+  maxmargin, rubysize, kenten, 
 }
 
 %%%%%%%% setkeys の別名
@@ -71,10 +74,13 @@
 %% ルビと親文字の大きさの比
 \ltj@@rkeydef{rubysize}
 
+% 中つき用簡易設定．
+\define@key[ltj]{ruby}{kata}[none]{\setkeys[ltj]{ruby}{mode=1, stretch=121, stretchruby=121}}
 % 肩つき用簡易設定．
-\define@key[ltj]{ruby}{kata}[none]{\setkeys[ltj]{ruby}{mode=9,stretchruby=001}}
+\define@key[ltj]{ruby}{kata}[none]{\setkeys[ltj]{ruby}{mode=9, stretch=121, stretchruby=001}}
 % 拡張肩つき用簡易設定．
-\define@key[ltj]{ruby}{ekata}[none]{\setkeys[ltj]{ruby}{stretch=001,stretchruby=001}}
+\define@key[ltj]{ruby}{ekata}[none]{\setkeys[ltj]{ruby}{%
+  intrusionpre=0, mode=1, stretch=001,stretchruby=001}}
 
 %%%%%%%% 補助関数
 
@@ -160,6 +166,13 @@
   \directlua{table.insert(ruby_tmplist_p, luatexja.ruby.cpbox())}%
 }
 
+\protected\def\ltjkenten{\@ifnextchar[\ltj@@kenten{\ltj@@kenten[]}}%]
+\let\kenten=\ltjkenten
+\def\ltj@@kenten[#1]#2{{%
+  \setkeys[ltj]{ruby}{#1, stretchruby=101}%
+  \@tfor\ltj@@kenten@temp:=#2\do{\ltj@@ruby[]{\ltj@@kenten@temp}{\ltj@@rubyip@kenten}}%
+}}
+
 % 初期値．要調整
 %% ひらがな
 \count@="3040\loop\relax\ifnum \count@<"30A0
@@ -179,11 +192,10 @@
   rubypostintrusion={`・,1}}
 
 \setkeys[ltj]{ruby}{
-  maxmargin=0.5, 
   stretchruby={1}{2}{1}, stretch = {1}{2}{1},
   stretchhead = {0}{1}{1}, stretchend = {1}{1}{0},
-  intrusionpre = -1, intrusionpost = -1, 
-  mode = 1, rubysize = 0.5
+  intrusionpre = -1, intrusionpost = -1, maxmargin=0.5, 
+  mode = 1, rubysize = 0.5, kenten=\ltjalchar`•
 }
 
 \endinput

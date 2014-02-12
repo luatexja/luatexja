@@ -440,6 +440,14 @@ local function pre_low_cal_box(w, cmp)
    return coef
 end
 
+
+local function first_whatsit(n) -- n 以後で最初の whatsit
+   for h in Dnode.traverse_id(id_whatsit, n) do
+      return h
+   end
+   return nil
+end
+
 -- ノード追加
 local function pre_low_app_node(head, w, cmp, coef, ht, dp)
    -- メインの node list 更新
@@ -471,41 +479,37 @@ local function pre_low_app_node(head, w, cmp, coef, ht, dp)
    end
    tex.setattribute(attr_ruby, -0x7FFFFFFF)
    setfield(w, 'user_id', RUBY_POST)
-   return head, node_next(nt)
+   return head, first_whatsit(node_next(nt))
 end
 
 local function pre_high(ahead)
    if not ahead then return ahead end
    local head = to_direct(ahead)
    post_intrusion_backup = 0
-   local n = head
+   local n = first_whatsit(head)
    while n do
-      if getid(n) == id_whatsit then
-         if getsubtype(n) == sid_user and getfield(n, 'user_id') == RUBY_PRE then
-            local nv = getfield(n, 'value')
-            max_allow_pre = has_attr(nv, attr_ruby_maxprep) or 0
-	    local atr = has_attr(n, attr_ruby) or 0
-	    if atr >0 then 
-	       -- 直前のルビで intrusion がおこる可能性あり．
-	       -- 前 run のデータが残っていればそれを使用，
-	       -- そうでなければ行中形のデータを利用する
-	       local op = old_break_info[atr] or post_intrusion_backup
-	       max_allow_pre = max(0, max_allow_pre - op)
-	    end
-	    post_intrusion_backup = 0
-            max_allow_post = has_attr(nv, attr_ruby_maxpostp) or 0
-            max_margin = has_attr(nv, attr_ruby_maxmargin) or 0
-	    local coef = pre_low_cal_box(n, getfield(nv, 'value'))
-	    local s = node_tail(nv) --ルビ文字
-	    head, n = pre_low_app_node(
-	       head, n, getfield(nv, 'value'), coef, 
-               getfield(s, 'height'), getfield(s, 'depth')
-	    )
-         else 
-            n = node_next(n)
+      if getsubtype(n) == sid_user and getfield(n, 'user_id') == RUBY_PRE then
+         local nv = getfield(n, 'value')
+         max_allow_pre = has_attr(nv, attr_ruby_maxprep) or 0
+         local atr = has_attr(n, attr_ruby) or 0
+         if atr >0 then 
+            -- 直前のルビで intrusion がおこる可能性あり．
+            -- 前 run のデータが残っていればそれを使用，
+            -- そうでなければ行中形のデータを利用する
+            local op = old_break_info[atr] or post_intrusion_backup
+            max_allow_pre = max(0, max_allow_pre - op)
          end
+         post_intrusion_backup = 0
+         max_allow_post = has_attr(nv, attr_ruby_maxpostp) or 0
+         max_margin = has_attr(nv, attr_ruby_maxmargin) or 0
+         local coef = pre_low_cal_box(n, getfield(nv, 'value'))
+         local s = node_tail(nv) --ルビ文字
+         head, n = pre_low_app_node(
+            head, n, getfield(nv, 'value'), coef, 
+            getfield(s, 'height'), getfield(s, 'depth')
+         )
       else
-         n = node_next(n)
+         n = first_whatsit(node_next(n))
       end
    end
    return to_node(head)
@@ -572,27 +576,27 @@ do
    end
 end
 
-local function is_zero_parfillskip(h,n)
-   if getid(n)==id_glue then
-      if getsubtype(n)==15 then
-	 local ns = getfield(n, 'spec')
-	 local n_width = getfield(ns, 'width')
-	 if getfield(h, 'glue_sign')==1 
-	    and getfield(h, 'glue_order') == getfield(ns, 'stretch_order') then
-	       n_width = n_width 
-		  + round(getfield(h, 'glue_set')*getfield(ns, 'stretch'))
-	 elseif getfield(h, 'glue_sign')==2
-	    and getfield(h, 'glue_order') == getfield(ns, 'shrink_order') then
-	       n_width = n_width 
-		  - round(getfield(h, 'glue_set')*getfield(n,s 'shrink'))
-	 end
-	 n = node_next(n) -- rightskip 未完
-	 return (n_width <= 0)
-      else return false
-      end
-   else return false
-   end
-end
+-- local function is_zero_parfillskip(h,n)
+--    if getid(n)==id_glue then
+--       if getsubtype(n)==15 then
+-- 	 local ns = getfield(n, 'spec')
+-- 	 local n_width = getfield(ns, 'width')
+-- 	 if getfield(h, 'glue_sign')==1 
+-- 	    and getfield(h, 'glue_order') == getfield(ns, 'stretch_order') then
+-- 	       n_width = n_width 
+-- 		  + round(getfield(h, 'glue_set')*getfield(ns, 'stretch'))
+-- 	 elseif getfield(h, 'glue_sign')==2
+-- 	    and getfield(h, 'glue_order') == getfield(ns, 'shrink_order') then
+-- 	       n_width = n_width 
+-- 		  - round(getfield(h, 'glue_set')*getfield(n,s 'shrink'))
+-- 	 end
+-- 	 n = node_next(n) -- rightskip 未完
+-- 	 return (n_width <= 0)
+--       else return false
+--       end
+--    else return false
+--    end
+-- end
 
 local function post_high_break(head)
    local rs = {}   -- rs: sequence of ruby_nodes, 
@@ -613,19 +617,19 @@ local function post_high_break(head)
 	    for i = 2, #rs do rs[i] = nil end -- rs[1] is set by the next statement
 	    rs[1], rw = ha, nil; ha = node_next(ha)
 	 elseif i==2*cmp+2 then
-	    local par_not_end = true
-	    local hn = node_next(ha)
-	    if hn and getid(hn)==id_penalty and getfield(hn, 'penalty')==10000 then
-	       local hm = node_next(hn)
-	       if is_zero_parfillskip(h,hm) then
-		  par_not_end = false
-	       end
-	    end
-	    if par_not_end then
-	       rs[#rs+1] = ha; ha = hn
-	    else
-	       setfield(h, 'head', node_remove(getlist(h), ha)); break
-	    end
+	    -- local par_not_end = true
+	    -- local hn = node_next(ha)
+	    -- if hn and getid(hn)==id_penalty and getfield(hn, 'penalty')==10000 then
+	    --    local hm = node_next(hn)
+	    --    if is_zero_parfillskip(h,hm) then
+	    --       par_not_end = false
+	    --    end
+	    -- end
+	    -- if par_not_end then
+	       rs[#rs+1] = ha; ha = node_next(ha)
+	    -- else
+	    --   setfield(h, 'head', node_remove(getlist(h), ha)); break
+	    -- end
 	 elseif i>=3 then 
 	    rs[#rs+1] = ha; ha = node_next(ha)
 	 elseif i==2 then 
