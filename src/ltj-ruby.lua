@@ -176,11 +176,10 @@ do
       local hh, hd = getfield(box, 'height'), getfield(box, 'depth')
       local hx = h
       while hx do
-	 if has_attr(hx, attr_icflag) == KANJI_SKIP
-	    or has_attr(hx, attr_icflag) == KANJI_SKIP_JFM
-	    or has_attr(hx, attr_icflag) == XKANJI_SKIP
-	    or has_attr(hx, attr_icflag) == XKANJI_SKIP_JFM
-	    or has_attr(hx, attr_icflag) == FROM_JFM then
+         local hic = has_attr(hx, attr_icflag)
+	 if (hic == KANJI_SKIP) or (hic == KANJI_SKIP_JFM)
+            or (hic == XKANJI_SKIP) or (hic == XKANJI_SKIP_JFM)
+            or ((hic<=FROM_JFM+2) and (hic>=FROM_JFM-2)) then
 	    -- この 5 種類の空白をのばす
 	       if getid(hx) == id_kern then
 		  local k = node_new(id_glue)
