@@ -383,7 +383,7 @@ function set_alt_font(b,e,ind,bfnt)
    -- ind: 新フォント, bfnt: 基底フォント
    if b>e then b, e = e, b end
    if b*e<=0 then
-      ltjb.package_eror('luatexja',
+      ltjb.package_error('luatexja',
 			'bad character range ([' .. b .. ',' .. e .. ']). ' ..
 			   'I take the intersection with [0x80, 0x10ffff].')
       b, e = math.max(0x80,b),math.min(ucs_out-1,e)
@@ -443,7 +443,7 @@ function set_alt_font_latex(b,e,ind,bbase)
    -- ind: Alt font の enc/fam/ser/shape, bbase: 基底フォントの enc/fam/ser/shape
    if b>e then b, e = e, b end
    if b*e<=0 then
-      ltjb.package_eror('luatexja',
+      ltjb.package_error('luatexja',
 			'bad character range ([' .. b .. ',' .. e .. ']). ' ..
 			   'I take the intersection with [0x80, 0x10ffff].')
       b, e = math.max(0x80,b),math.min(ucs_out-1,e)
