@@ -3,19 +3,20 @@
 -- based on upnmlminr-h.tfm (a metric in UTF/OTF package used by upTeX).
 
 -- JIS X 4051:2004 では，行末の句読点や中点はベタなのでそれに従う
--- kanjiskip: 0pt plus .25zw minus 0pt
+-- kanjiskip:    0pt plus .25zw minus 0pt
 -- xkanjiskip: .25zw plus .25zw (or .0833zw) minus .125zw
 
 
 luatexja.jfont.define_jfm {
    dir = 'yoko',
    zw = 1.0, zh = 1.0,
-   kanjiskip =  {0.0, 0.05, 0},
+   kanjiskip =  {0.0, 0.25, 0},
    xkanjiskip = {0.25, 0.25, .125},
    [0] = {
       align = 'left', left = 0.0, down = 0.0,
       width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
       glue = {
+	 -- [index] = { width, stretch, shrink, [priority, [ratio]] }
 	 [1] = { 0.5 , 0.0, 0.5,  0, 1 },
 	 [2] = {0, 0, 0},
 	 [3] = { 0.25, 0.0, 0.25, 1, 1 },

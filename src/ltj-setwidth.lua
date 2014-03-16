@@ -81,7 +81,7 @@ local function capsule_glyph(p, met, class)
       local q
       head, q = node_remove(head, p)
       setfield(p, 'yoffset', -fshift.down); setfield(p, 'next', nil)
-      setfield(p, 'xoffset', getfield(p, 'xoffset') + char_data.align*(fwidth-pwidth))
+      setfield(p, 'xoffset', getfield(p, 'xoffset') + char_data.align*(fwidth-pwidth) - fshift.left)
       local box = node_new(id_hlist)
       setfield(box, 'width', fwidth)
       setfield(box, 'height', fheight)
@@ -114,12 +114,7 @@ local function capsule_glyph_math(p, met, class)
    local y_shift, ca
       = - getfield(p, 'yoffset') + (has_attr(p,attr_ykblshift) or 0), char_data.align
    setfield(p, 'yoffset', -fshift.down)
-   if ca~='left'  then
-      setfield(p, 'xoffset', getfield(p, 'xoffset') - fshift.left
-		  + (((ca=='right') and fwidth - pwidth) or round((fwidth - pwidth)*0.5)))
-   else
-      setfield(p, 'xoffset', getfield(p, 'xoffset') - fshift.left)
-   end
+   setfield(p, 'xoffset', getfield(p, 'xoffset') + char_data.align*(fwidth-pwidth) - fshift.left)
    local box = node_new(id_hlist); 
    setfield(box, 'width', fwidth)
    setfield(box, 'height', fheight)
