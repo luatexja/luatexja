@@ -1040,7 +1040,7 @@ auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
 \item 和文フォントのシェイプを定義するには，通常の \verb+\DeclareFontShape+ を使えば良い：
 %</ja>
 \begin{verbatim}
-\DeclareFontShape{JY3}{mc}{bx}{n}{<-> s*KozMinPr6N-Bold:jfm=ujis}{}
+\DeclareFontShape{JY3}{mc}{bx}{n}{<-> s*KozMinPr6N-Bold:jfm=ujis;-kern}{}
     % Kozuka Mincho Pr6N Bold
 \end{verbatim}
 %<*ja>
@@ -1184,15 +1184,17 @@ JIS~X~0208:1990→辻
 %<*en>
 Note that there is no command named \verb+\setmonojfont+, since it is
 popular for Japanese fonts that nearly all Japanese glyphs have same
-widths.  Also note that the kerning feature is set off by default in
-these seven commands, since this feature and \textbf{JAglue} will clash (see
-\ref{para-kern}).
+widths.  Also note that kerning information in a font is not used
+(that is, \texttt{kern} feature is set off) by default in these seven commands.
+This is because of the compatibility with previous versions of \LuaTeX-ja
+(see \ref{para-kern}).
 %</en>
 %<*ja>
 和文フォントについては全ての和文文字のグリフがほぼ等幅であるのが普通であるため，
 \verb+\setmonojfont+ コマンドは存在しないことに注意．また，これらの和文用の7つのコマ
-ンドではKerning featureはデフォルトではoffとなっている．これはこの
-featureが\textbf{JAglue}と衝突するためである（\ref{para-kern}節を参照）．
+ンドではフォント内のペアカーニング情報は標準では使用されない，
+言い換えれば \texttt{kern} featureは標準では無効化となっている．
+これは以前のバージョンの\LuaTeX-jaとの互換性のためである（\ref{para-kern}節を参照）．
 %</ja>
 
 %<en>\subsection{Presets}
@@ -1423,7 +1425,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \midrule
 %<en>\textit{rounded gothic}
 %<ja>\gt 丸ゴシック
-&&A-OTF-Jun101Pro-Light.otf&A-OTF-Jun101Pr6N-Light.otf\\
+&&A-OTF-Jun101Pro-Light.otf&A-OTF-ShinMGoPr6N-Light.otf\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1613,7 +1615,7 @@ If you want to use these functions, load \Pkg{luatexja-otf} package.
 
 これら3オプションについては，
 \Pkg{luatexja-preset} パッケージにプリセットを使う時に一緒に指定するか，
-あるいは対応する内容を\ref{ssub-chgfnt}節 (NFSS2) や
+あるいは対応する内容を\ref{ssub-chgfnt}節，\ref{ssub-nfsspat}節 (NFSS2) や
 \ref{ssec-fontspec}節 (\Pkg{fontspec}) の方法で手動で指定する必要がある．
 %</ja>
 
@@ -2321,6 +2323,7 @@ for \LuaTeX, \emph{to match the \texttt{\textbackslash catcode} setting with tha
  \centering\small
 %<en>\caption{Difference of the set of non-kanji JIS~X~0208 characters which can be used in a control word}
 %<ja>\caption{制御綴中に使用出来るJIS~X~0208非漢字の違い}
+%<en>\medskip
 \label{table-kcat-diff}
 \def\D#1#2#3#4{%
   {\fboxsep0pt\fcolorbox{cyan}{white}%
@@ -2467,6 +2470,44 @@ which JFM will be used for this font by the following keys:
 指定する必要がある：
 %</ja>
 
+
+\begin{table}[t]
+%<en>\caption{Differences between JFMs shipped with \LuaTeX-ja}
+%<ja>\caption{\LuaTeX-ja に同梱されている JFM の違い}
+%<en>\medskip
+\label{tab-difjfm}
+\ltjsetparameter{jacharrange={+3}}
+\centering\small
+\def\r#1{{\jfont\g=file:KozMinPr6N-Regular.otf:jfm=#1 at 14.43324pt \g
+\setbox0=\vtop{\hsize=7\zw\noindent ◆◆◆◆◆◆◆
+ある日モモちゃんがお使いで迷子になって泣きました．}\copy0
+\vrule height 0pt depth \dp0}}
+\def\s#1{{\jfont\g=file:KozMinPr6N-Regular.otf:jfm=#1 at 14.43324pt \g
+\setbox0=\vtop{\hsize=7\zw\noindent ちょっと！何}\copy0}}
+\def\t#1{{\jfont\g=file:KozMinPr6N-Regular.otf:jfm=#1 at 19.24432pt \g
+\setbox0=\hbox{漢}%
+\vrule width 0.4pt height\ht0 depth\dp0\kern-.2pt\copy0
+\kern-\wd0\vrule width\wd0height .2pt depth .2pt
+\kern-\wd0\raise\ht0\hbox{\vrule width\wd0height .2pt depth .2pt}%
+\kern-\wd0\lower\dp0\hbox{\vrule width\wd0height .2pt depth .2pt}%
+\kern-.2pt\vrule width 0.4pt height\ht0 depth \dp0}}
+\begin{tabular}{rccc}
+\toprule
+&\tt jfm-ujis.lua&\tt jfm-jis.lua&\tt jfm-min.lua\\
+\midrule
+%<en>Example~1\cite{min10}
+%<ja>例1\cite{min10}
+&\r{ujis}&\r{jis}&\r{min}\\
+%<en>Example~2
+%<ja>例2
+&\s{ujis}&\s{jis}&\s{min}\\
+Bounding Box&\t{ujis}&\t{jis}&\t{min}\\
+\bottomrule
+\end{tabular}
+\ltjsetparameter{jacharrange={-3}}
+\end{table}
+
+
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
 \item[jfm=<name>]
 %<*en>
@@ -2542,80 +2583,60 @@ JFMもサイズも同じなので，普通に「）【」と入力した時と�
 \end{LTXexample}
 \end{list}
 
-\begin{table}[t]
-%<en>\caption{Differences between JFMs shipped with \LuaTeX-ja}
-%<ja>\caption{\LuaTeX-ja に同梱されている JFM の違い}
-\label{tab-difjfm}
-\ltjsetparameter{jacharrange={+3}}
-\centering\small
-\def\r#1{{\jfont\g=file:KozMinPr6N-Regular.otf:jfm=#1 at 14.43324pt \g
-\setbox0=\vtop{\hsize=7\zw\noindent ◆◆◆◆◆◆◆
-ある日モモちゃんがお使いで迷子になって泣きました．}\copy0
-\vrule height 0pt depth \dp0}}
-\def\s#1{{\jfont\g=file:KozMinPr6N-Regular.otf:jfm=#1 at 14.43324pt \g
-\setbox0=\vtop{\hsize=7\zw\noindent ちょっと！何}\copy0}}
-\def\t#1{{\jfont\g=file:KozMinPr6N-Regular.otf:jfm=#1 at 19.24432pt \g
-\setbox0=\hbox{漢}%
-\vrule width 0.4pt height\ht0 depth\dp0\kern-.2pt\copy0
-\kern-\wd0\vrule width\wd0height .2pt depth .2pt
-\kern-\wd0\raise\ht0\hbox{\vrule width\wd0height .2pt depth .2pt}%
-\kern-\wd0\lower\dp0\hbox{\vrule width\wd0height .2pt depth .2pt}%
-\kern-.2pt\vrule width 0.4pt height\ht0 depth \dp0}}
-\begin{tabular}{rccc}
-\toprule
-&\tt jfm-ujis.lua&\tt jfm-jis.lua&\tt jfm-min.lua\\
-\midrule
-%<en>Example~1\cite{min10}
-%<ja>例1\cite{min10}
-&\r{ujis}&\r{jis}&\r{min}\\
-%<en>Example~2
-%<ja>例2
-&\s{ujis}&\s{jis}&\s{min}\\
-Bounding Box&\t{ujis}&\t{jis}&\t{min}\\
-\bottomrule
-\end{tabular}
-\ltjsetparameter{jacharrange={-3}}
-\end{table}
+\begin{figure}
+\begin{LTXexample}[pos=t]
+\newcommand\test{\vrule ダイナミックダイクマ\vrule\\}
+\jfont\KMFW = KozMinPr6N-Regular:jfm=prop;-kern at 17pt
+\jfont\KMFK = KozMinPr6N-Regular:jfm=prop at 17pt % kern is activated
+\jfont\KMPW = KozMinPr6N-Regular:jfm=prop;script=dflt;+pwid;-kern at 17pt
+\jfont\KMPK = KozMinPr6N-Regular:jfm=prop;script=dflt;+pwid;+kern at 17pt
+\begin{multicols}{2}
+\ltjsetparameter{kanjiskip=0pt}
+{\KMFW\test \KMFK\test \KMPW\test \KMPK\test}
 
-%<en>\paragraph{Note: \texttt{kern} feature}
-%<ja>\paragraph{注意：\texttt{kern} feature}
+\ltjsetparameter{kanjiskip=3pt}
+{\KMFW\test \KMFK\test \KMPW\test \KMPK\test}
+\end{multicols}
+\end{LTXexample}
+\caption{Kerning information and \Param{kanjiskip}}
+\label{fig:kern-jfm}
+\end{figure}
+
+%<en>\paragraph{Using kerning information in a font}
+%<ja>\paragraph{ペアカーニング情報の使用}
 \label{para-kern}
 %<*en>
-Some fonts have information for inter-glyph spacing. However, this
-information is not well-compatible with \LuaTeX-ja.  More concretely,
-this kerning space from this information are inserted \emph{before} the
-insertion process of \textbf{JAglue}, and this causes incorrect spacing
-between two characters when both a glue/kern from the data in the font
-and it from JFM are present.
-%</en>
-%<*ja>
-いくつかのフォントはグリフ間のスペースについての情報を持っている．しかし，
-この情報は\LuaTeX-ja とはあまり相性がよくない．具体的には，この情報に基づいて挿入
-されるカーニングスペースは\textbf{JAglue}の挿入過程の\textbf{前に}挿入され，
-JFMに基づくグルー／カーンも挿入される場合には2文字間の意図しないスペースの原因と
-なる．
-%</ja>
-\begin{itemize}
-%<*en>
-\item You should specify \texttt{-kern} in
-  \verb+jfont+ when you want to use other font features,
-  such as \texttt{script=...}\,.
-%</en>
-%<*ja>
-\item  \texttt{script=...}といったfeatureを使いたい場合には，\verb+\jfont+
-  に\texttt{-kern}を指定するべきである．
-%</ja>
-%<*en>
-\item If you want to use Japanese fonts in proportional width, and use
-      information from this font, use \texttt{jfm-prop.lua} for its JFM, and\,\ldots.
-%</en>
-%<*ja>
-\item もしプロポーショナル幅の和文フォントをそのフォントの情報に基づいて使いたい
-  ならば，\texttt{jfm-prop.lua}をJFMとして指定し，……
-%</ja>
-TODO: kanjiskip?
-\end{itemize}
+Some fonts have information for inter-glyph spacing. 
+This version of \LuaTeX-ja treats kerning spaces like an italic correction;
+any glue and/or kern from the JFM and a kerning space can coexist.
+See Figure~\ref{fig:kern-jfm} for detail.
 
+Note that in \verb+\setmainjfont+ etc.\ which are provided by \Pkg{luatexja-fontspec}
+package, kerning option is set \emph{off} (\texttt{Kerning=Off}) by default,
+because of the compatibility with previous versions of \LuaTeX-ja.
+%</en>
+%<*ja>
+いくつかのフォントはグリフ間のスペースについての情報を持っている．
+このカーニング情報は以前の\LuaTeX-ja とはあまり相性が良くなかったが，
+本バージョンではカーニングによる空白はイタリック補正と同様に扱うことになっている．
+つまり，カーニング由来の空白とJFM由来のグルー・カーンは同時に入りうる．
+図\ref{fig:kern-jfm}を参照．
+\begin{itemize}
+ \item \emph{\texttt{\textbackslash jfont} や，
+NFSS2用の命令（\ref{ssub-chgfnt}節，\ref{ssub-nfsspat}節）における指定では
+カーニング情報は標準で使用する}ことになっているようである．
+言い換えれば，カーニング情報を使用しない設定にするには，面倒でも
+\begin{verbatim}
+\jfont\hoge=KozMinPr6N-Regular:jfm=ujis;-kern at 3.5mm
+\DeclareFontShape{JY3}{fuga}{m}{n} {<-> s*KozMinPr6N-Regular:jfm=ujis;-kern}{}
+\end{verbatim}
+のように，\texttt{-kern} という指定を自分で追架しなければいけない．
+ \item 
+一方，\emph{\Pkg{luatexja-fontspec} の提供する \texttt{\textbackslash setmainjfont}\ 
+などの命令の標準設定ではカーニング情報は使用しない}（\texttt{Kerning=Off}）
+ことになっている．これは以前のバージョンの\LuaTeX-jaとの互換性のためである．
+\end{itemize}
+%</ja>
 
 %<*ja>
 \paragraph{\texttt{extend}と\texttt{slant}}
@@ -2643,10 +2664,10 @@ For example, the following example uses the standard JFM \texttt{jfm-ujis.lua}, 
 letter-spacing and the width of italic correction are not correct:
 %</en>
 \begin{LTXexample}[width=0.3\textwidth]
-\jfont\E=file:KozMinPr6N-Regular.otf:extend=1.5;jfm=ujis
+\jfont\E=file:KozMinPr6N-Regular.otf:extend=1.5;jfm=ujis;-kern
 \E あいうえお
 
-\jfont\S=file:KozMinPr6N-Regular.otf:slant=1;jfm=ujis
+\jfont\S=file:KozMinPr6N-Regular.otf:slant=1;jfm=ujis;-kern
 \S あいう\/ABC
 \end{LTXexample}
 
@@ -2885,14 +2906,18 @@ This field is a list of characters which are in this character
 Specifythe width of characters in character class~$i$, the height, the depth and
 the amount of italic correction. All characters in character class~$i$ are regarded that its width, height, and depth are
 as values of these fields.
-But there is one exception: if \texttt{'prop'} is specified in \texttt{width} field, width of a character becomes that of its ``real'' glyph.
+
+But there is one exception: \texttt{width} field can be \texttt{'prop'}. 
+This means that width of a character becomes that of its ``real'' glyph.
 %</en>
 %<*ja>
 文字クラス$i$に属する文字の幅，高さ，深さ，イタリック補正の量を指定する．
 文字クラス$i$に属する全ての文字は，その幅，高さ，深さがこのフィールドで指定した
 値であるものとして扱われる．
-しかし，例外が一つある：もし \texttt{'prop'} が \texttt{width} フィールドに
-指定された場合，文字の幅はその「実際の」グリフの幅となる．
+
+例外として，\emph{\texttt{width} フィールドには数値以外に \texttt{'prop'} が指定可能である}．
+この場合，文字の幅はその「実際の」グリフの幅となる．OpenTypeの \texttt{prop} featureと併用
+	     すれば，これによってプロポーショナル組を行うことができる．
 %</ja>
 
 \item[left=<length>, down=<length>, align=<align>]\
@@ -4230,9 +4255,9 @@ are typeset by \verb+\piyo+.
 \begin{figure}[!tb]
 \begin{lstlisting}[numberstyle=\tiny, numbers=left, numbersep=1em]
 \DeclareKanjiFamily{JY3}{edm}{}
-\DeclareFontShape{JY3}{edm}{m}{n}    {<-> s*IPAexMincho:jfm=ujis}{}
-\DeclareFontShape{JY3}{edm}{m}{green}{<-> s*IPAexMincho:jfm=ujis;color=007F00}{}
-\DeclareFontShape{JY3}{edm}{m}{blue} {<-> s*IPAexMincho:jfm=ujis;color=0000FF}{}
+\DeclareFontShape{JY3}{edm}{m}{n}    {<-> s*KozMinPr6N-Regular:jfm=ujis;-kern}{}
+\DeclareFontShape{JY3}{edm}{m}{green}{<-> s*KozMinPr6N-Regular:jfm=ujis;-kern;color=007F00}{}
+\DeclareFontShape{JY3}{edm}{m}{blue} {<-> s*KozMinPr6N-Regular:jfm=ujis;-kern;color=0000FF}{}
 \DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{green}{"4E00-"67FF,{-2}-{-2}}
 \DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{blue}{ "6800-"9FFF}
 {\kanjifamily{edm}\selectfont
@@ -4240,9 +4265,9 @@ are typeset by \verb+\piyo+.
 \end{lstlisting}
 \begin{quote}
 \DeclareKanjiFamily{JY3}{edm}{}
-\DeclareFontShape{JY3}{edm}{m}{n}    {<-> s*KozMinPr6N-Regular:jfm=ujis}{}
-\DeclareFontShape{JY3}{edm}{m}{green}{<-> s*KozMinPr6N-Regular:jfm=ujis;color=007F00}{}
-\DeclareFontShape{JY3}{edm}{m}{blue} {<-> s*KozMinPr6N-Regular:jfm=ujis;color=0000FF}{}
+\DeclareFontShape{JY3}{edm}{m}{n}    {<-> s*KozMinPr6N-Regular:jfm=ujis;-kern}{}
+\DeclareFontShape{JY3}{edm}{m}{green}{<-> s*KozMinPr6N-Regular:jfm=ujis;-kern;color=007F00}{}
+\DeclareFontShape{JY3}{edm}{m}{blue} {<-> s*KozMinPr6N-Regular:jfm=ujis;-kern;color=0000FF}{}
 \DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{green}{"4E00-"67FF,{-2}-{-2}}
 \DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{blue}{ "6800-"9FFF}
 
@@ -6131,9 +6156,9 @@ x+y&\text{if\ }\Param{\hyperlink{fld:diffjfm}{diffrentjfm}}=\texttt{both};
 
 例えば，
 \begin{verbatim}
-\jfont\foo=psft:Ryumin-Light:jfm=ujis
-\jfont\bar=psft:GothicBBB-Medium:jfm=ujis
-\jfont\baz=psft:GothicBBB-Medium:jfm=ujis;jfmvar=piyo
+\jfont\foo=psft:Ryumin-Light:jfm=ujis;-kern
+\jfont\bar=psft:GothicBBB-Medium:jfm=ujis;-kern
+\jfont\baz=psft:GothicBBB-Medium:jfm=ujis;jfmvar=piyo;-kern
 \end{verbatim}
 という3フォントを考え，
 \[
