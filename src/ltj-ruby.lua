@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.ruby',
-  date = '2014/02/06',
+  date = '2014/03/19',
   description = 'Ruby',
 })
 module('luatexja.ruby', package.seeall)
@@ -53,6 +53,7 @@ local attr_ruby_maxmargin = luatexbase.attributes['ltj@kcat1']
 local attr_ruby_stretch = luatexbase.attributes['ltj@kcat2']
 local attr_ruby_mode = luatexbase.attributes['ltj@kcat3']
 local attr_ruby_id = luatexbase.attributes['ltj@kcat4'] -- uniq id
+local attr_ruby_intergap = luatexbase.attributes['ltj@kcat5']
 local attr_ruby = luatexbase.attributes['ltj@rubyattr']
 -- ルビ内部処理用，以下のようにノードによって使われ方が異なる
 -- * (whatsit) では JAglue 処理時に，
@@ -246,8 +247,9 @@ local function texiface_low(rst, rtlr, rtlp)
    setfield(wv, 'value', floor(#rtlr))
    set_attr(wv, attr_ruby, rst.rubyzw)
    set_attr(wv, attr_ruby_maxmargin, rst.maxmargin)
-   set_attr(wv, attr_ruby_maxprep, rst.intrusionpre)
-   set_attr(wv, attr_ruby_maxpostp, rst.intrusionpost)
+   set_attr(wv, attr_ruby_maxprep, rst.pre)
+   set_attr(wv, attr_ruby_maxpostp, rst.post)
+   set_attr(wv, attr_ruby_intergap, rst.intergap)
    set_attr(wv, attr_ruby_stretch, rst.stretch)
    set_attr(wv, attr_ruby_mode, rst.mode)
    local n = wv
@@ -334,8 +336,14 @@ end
 -- returned value: <new box>, <ruby width>, <post_intrusion>
 local max_margin
 local function new_ruby_box(r, p, ppre, pmid, ppost, 
-			    rpre, rmid, rpost, mapre, mapost, intmode)
+			    mapre, mapost, imode, rgap)
    local post_intrusion = 0
+   local intmode = imode%4
+   local rpre, rmid, rpost, rsmash
+   imode = floor(imode/262144); rsmash = (imode%2 ==1)
+   imode = floor(imode/2); rpost = imode%8;
+   imode = (imode-rpost)/8;  rmid  = imode%8;
+   imode = (imode-rmid)/8;   rpre  = imode%8
    if getfield(r, 'width') > getfield(p, 'width') then  -- change the width of p
       r, p, post_intrusion  = enlarge_parent(r, p, ppre, pmid, ppost, mapre, mapost, intmode)
    elseif getfield(r, 'width') < getfield(p, 'width') then -- change the width of r
@@ -359,15 +367,20 @@ local function new_ruby_box(r, p, ppre, pmid, ppost,
 	 setfield(rt, 'head', nil); node_free(rt);
       end
    end
-   local a = node_new(id_rule)
-   setfield(a, 'width', 0)
-   setfield(a, 'height', 0)
-   setfield(a, 'depth', 0)
-   insert_after(r, r, a); insert_after(r, a, p)
-   setfield(p, 'next', nil)
-   a = Dnode.vpack(r)
-   setfield(a, 'shift', 0)
+   local a, k = node_new(id_rule), node_new(id_kern)
+   setfield(a, 'width', 0); setfield(a, 'height', 0)
+   setfield(a, 'depth', 0); setfield(k, 'kern', rgap)
+   insert_after(r, r, a); insert_after(r, a, k);
+   insert_after(r, k, p); setfield(p, 'next', nil)
+   a = Dnode.vpack(r); setfield(a, 'shift', 0)
    set_attr(a, attr_ruby, post_intrusion)
+   if rsmash or getfield(a, 'height')<getfield(p, 'height') then
+      local k = node_new(id_kern)
+      setfield(k, 'kern', -getfield(a, 'height')+getfield(p, 'height'))
+      setfield(a, 'head', k); insert_before(r, r, k)
+      setfield(a, 'height', getfield(p, 'height'))
+   end
+
    return a, getfield(r, 'width'), post_intrusion
 end
 
@@ -390,8 +403,8 @@ local function pre_low_cal_box(w, cmp)
    local mdt -- nt*: node temp
    local coef = {} -- 連立一次方程式の拡大係数行列
    local rtb = expand_3bits(has_attr(wv, attr_ruby_stretch))
-   local rtc = expand_3bits(has_attr(wv, attr_ruby_mode))
-   local intmode = floor(has_attr(wv, attr_ruby_mode)/4)%4
+   local rgap = has_attr(wv, attr_ruby_intergap)
+   local intmode = floor(has_attr(wv, attr_ruby_mode)/4)
 
    -- node list 展開・行末形の計算
    local nt, nta, ntb = wv, nil, nil -- nt*: node temp
@@ -403,8 +416,7 @@ local function pre_low_cal_box(w, cmp)
       for j = 2*i+1, 2*cmp+1 do coef[i][j] = 0 end
       kf[i], coef[i][2*cmp+2]
 	 = new_ruby_box(node_copy(nta), node_copy(ntb), 
-			rtb[6], rtb[5], rtb[4], rtc[10], rtc[9], rtc[8], 
-			max_allow_pre, 0, intmode)
+			rtb[6], rtb[5], rtb[4], max_allow_pre, 0, intmode, rgap)
    end
    node_free(nta); node_free(ntb)
 
@@ -417,8 +429,7 @@ local function pre_low_cal_box(w, cmp)
       nta = concat(node_copy(rb[i]), nta); ntb = concat(node_copy(pb[i]), ntb)
       kf[cmp+i], coef[cmp+i][2*cmp+2]
 	 = new_ruby_box(node_copy(nta), node_copy(ntb), 
-			rtb[9], rtb[8], rtb[7], rtc[10], rtc[9], rtc[8], 
-			0, max_allow_post, intmode)
+			rtb[9], rtb[8], rtb[7], 0, max_allow_post, intmode, rgap)
    end
 
    -- ここで，nta, ntb には全 container を連結した box が入っているので
@@ -426,9 +437,8 @@ local function pre_low_cal_box(w, cmp)
    coef[2*cmp+1] = {}
    for j = 1, 2*cmp+1 do coef[2*cmp+1][j] = 1 end
    kf[2*cmp+1], coef[2*cmp+1][2*cmp+2], post_intrusion_backup
-      = new_ruby_box(nta, ntb,
-		     rtb[3], rtb[2], rtb[1], rtc[10], rtc[9], rtc[8], 
-		     max_allow_pre, max_allow_post, intmode)
+      = new_ruby_box(nta, ntb, rtb[3], rtb[2], rtb[1], 
+                     max_allow_pre, max_allow_post, intmode, rgap)
 
    -- w.value の node list 更新．
    local nt = wv
@@ -476,7 +486,7 @@ local function pre_low_app_node(head, w, cmp, coef, ht, dp)
       set_attr(nt, attr_ruby, 2*i+2)
       insert_after(head, nta, nt)
    end
-   tex.setattribute(attr_ruby, -0x7FFFFFFF)
+   tex.setattribute('global', attr_ruby, -0x7FFFFFFF)
    setfield(w, 'user_id', RUBY_POST)
    return head, first_whatsit(node_next(nt))
 end
