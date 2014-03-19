@@ -301,7 +301,7 @@
 \dumplist0}
 
 \vfill\eject
-\noindent{\gt\bf paragraph, hbox and math boundary}
+\head{その他: paragraph, hbox and math boundary}
 
 \setbox1=\vbox{\parindent19.2pt \rmlh\hsize=100pt\parfillskip=30pt
 かエ\par\global\setbox0=\lastbox}
@@ -341,4 +341,18 @@
 
 \setbox0=\hbox{\tenmin ．\fivemin ・}
 \dumplist0
+
+\head{その他: JFM and kerning}
+\jfont\kmd=KozMinPr6N-Regular.otf:jfm=test;+kern
+\jfont\kmn=KozMinPr6N-Regular.otf:jfm=test;-kern
+
+\setbox0=\hbox{\kmd タノタイクノ}
+\dumplist0
+
+\setbox0=\hbox{\kmn タノタイクノ}
+\dumplist0
+
+\setbox0=\hbox{\kmd タ\/ノ}
+\dumplist0
+
 \end
