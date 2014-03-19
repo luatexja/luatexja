@@ -277,12 +277,20 @@ do
    local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
    -- mode = true iff main_process is called from pre_linebreak_filter
    local function main_process(head, mode, dir)
+      tex.setattribute('global', attr_icflag, 0)
       local p = to_direct(head)
       p = ltjj.main(p,mode)
       if p then p = ltjw.set_ja_width(p, dir) end
       return to_node(p)
    end
-   
+
+   local function adjust_icflag(h)
+      -- kern from luaotfload will have icflag = 1
+      -- (same as italic correction)
+      tex.setattribute('global', attr_icflag, 1)
+      return h
+   end
+
    -- callbacks
    
    luatexbase.add_to_callback(
@@ -299,6 +307,9 @@ do
       end,'ltj.hpack_filter',
       luatexbase.priority_in_callback('hpack_filter',
 				      'luaotfload.node_processor') + 1)
+   luatexbase.add_to_callback('pre_linebreak_filter', adjust_icflag, 'adjust_icflag', 1)
+   luatexbase.add_to_callback('hpack_filter', adjust_icflag, 'adjust_icflag', 1)
+
 end
 
 -- define_font
