@@ -501,12 +501,16 @@ local function pre_high(ahead)
          local nv = getfield(n, 'value')
          max_allow_pre = has_attr(nv, attr_ruby_maxprep) or 0
          local atr = has_attr(n, attr_ruby) or 0
-         if atr >0 then 
-            -- 直前のルビで intrusion がおこる可能性あり．
-            -- 前 run のデータが残っていればそれを使用，
-            -- そうでなければ行中形のデータを利用する
-            local op = old_break_info[atr] or post_intrusion_backup
-            max_allow_pre = max(0, max_allow_pre - op)
+         if max_allow_pre < 0 then
+            if atr>0 then
+               -- 直前のルビで intrusion がおこる可能性あり．
+               -- 前 run のデータが残っていればそれを使用，
+               -- そうでなければ行中形のデータを利用する
+               local op = old_break_info[atr] or post_intrusion_backup
+               max_allow_pre = max(0, -max_allow_pre - op)
+            else
+               max_allow_pre = -max_allow_pre
+            end
          end
          post_intrusion_backup = 0
          max_allow_post = has_attr(nv, attr_ruby_maxpostp) or 0
@@ -585,28 +589,6 @@ do
    end
 end
 
--- local function is_zero_parfillskip(h,n)
---    if getid(n)==id_glue then
---       if getsubtype(n)==15 then
--- 	 local ns = getfield(n, 'spec')
--- 	 local n_width = getfield(ns, 'width')
--- 	 if getfield(h, 'glue_sign')==1 
--- 	    and getfield(h, 'glue_order') == getfield(ns, 'stretch_order') then
--- 	       n_width = n_width 
--- 		  + round(getfield(h, 'glue_set')*getfield(ns, 'stretch'))
--- 	 elseif getfield(h, 'glue_sign')==2
--- 	    and getfield(h, 'glue_order') == getfield(ns, 'shrink_order') then
--- 	       n_width = n_width 
--- 		  - round(getfield(h, 'glue_set')*getfield(n,s 'shrink'))
--- 	 end
--- 	 n = node_next(n) -- rightskip 未完
--- 	 return (n_width <= 0)
---       else return false
---       end
---    else return false
---    end
--- end
-
 local function post_high_break(head)
    local rs = {}   -- rs: sequence of ruby_nodes, 
    local rw = nil  -- rw: main whatsit
@@ -625,20 +607,6 @@ local function post_high_break(head)
 	    setfield(h, 'head', post_lown(rs, rw, cmp, getlist(h)))
 	    for i = 2, #rs do rs[i] = nil end -- rs[1] is set by the next statement
 	    rs[1], rw = ha, nil; ha = node_next(ha)
-	 elseif i==2*cmp+2 then
-	    -- local par_not_end = true
-	    -- local hn = node_next(ha)
-	    -- if hn and getid(hn)==id_penalty and getfield(hn, 'penalty')==10000 then
-	    --    local hm = node_next(hn)
-	    --    if is_zero_parfillskip(h,hm) then
-	    --       par_not_end = false
-	    --    end
-	    -- end
-	    -- if par_not_end then
-	       rs[#rs+1] = ha; ha = node_next(ha)
-	    -- else
-	    --   setfield(h, 'head', node_remove(getlist(h), ha)); break
-	    -- end
 	 elseif i>=3 then 
 	    rs[#rs+1] = ha; ha = node_next(ha)
 	 elseif i==2 then 
@@ -700,18 +668,32 @@ do
          local lpv = getfield(lp, 'value')
          local x = node_next(node_next(lpv))
          Np.last_char = luatexja.jfmglue.check_box_high(Np, getlist(x), nil)
-         if Nq.id ~=id_pbox_w and  type(Nq.char)=='number' then
-	    -- Nq is a JAchar
-            if has_attr(lpv, attr_ruby_maxprep) < 0 then -- auto
-               local p = round((ltjs.table_current_stack[RIPRE + Nq.char] or 0)
-                                  *has_attr(lpv, attr_ruby))
-               if has_attr(lpv, attr_ruby_mode)%2 == 0 then -- intrusion 無効
-                  p = 0
+         if Nq.id ~=id_pbox_w then
+            if type(Nq.char)=='number' then
+               -- Nq is a JAchar
+               if has_attr(lpv, attr_ruby_maxprep) < 0 then -- auto
+                  local p = round((ltjs.table_current_stack[RIPRE + Nq.char] or 0)
+                                     *has_attr(lpv, attr_ruby))
+                  if has_attr(lpv, attr_ruby_mode)%2 == 0 then -- intrusion 無効
+                     p = 0
+                  end
+                  set_attr(lpv, attr_ruby_maxprep, -p)
                end
-               set_attr(lpv, attr_ruby_maxprep, p)
-            end
-            if Nq.prev_ruby then
-               set_attr(lp, attr_ruby, Nq.prev_ruby)
+               if Nq.prev_ruby then
+                  set_attr(lp, attr_ruby, Nq.prev_ruby)
+               end
+            elseif has_attr(lpv, attr_ruby_maxprep) < 0 then -- auto
+               if Nq.char == 'parbdd' then
+                  local p = round((ltjs.table_current_stack[RIPRE-1] or 0)
+                                     *has_attr(lpv, attr_ruby))
+                  p = min(p, Nq.width)
+                 if has_attr(lpv, attr_ruby_mode)%2 == 0 then -- intrusion 無効
+                     p = 0
+                  end
+                  set_attr(lpv, attr_ruby_maxprep, p)
+               else
+                  set_attr(lpv, attr_ruby_maxprep, 0)
+               end
             end
          elseif has_attr(lpv, attr_ruby_maxprep) < 0 then -- auto
             set_attr(lpv, attr_ruby_maxprep, 0)
@@ -759,9 +741,6 @@ do
 	       if has_attr(nqnv, attr_ruby_mode)%4 >= 2 then
 		  set_attr(nqnv, attr_ruby_maxprep, 0)
 	       end
-	       --if Np and Np.id == id_pbox_w then
-		--  set_attr(nqnv, attr_ruby_maxprep, 0)
-	       --end
 	    end
          end
 	 return true

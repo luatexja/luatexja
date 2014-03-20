@@ -146,7 +146,7 @@
 
 %%%%%%%% TeX command
 \protected\def\ltjruby{\@ifnextchar[\ltj@@ruby{\ltj@@ruby[]}}%]
-\let\ruby=\ltjruby
+\AtBeginDocument{\ifdefined\ruby\else\let\ruby=\ltjruby\fi}
 \def\ltj@@ruby[#1]#2#3{{% #1: option #2: 親文字群，#3: ルビ文字列群，共に| 区切り
   \setkeys[ltj]{ruby}{#1}%
   \directlua{ruby_tmplist_r = \string{\string}; ruby_tmplist_p = \string{\string}}%
@@ -193,12 +193,14 @@
 %% ・
 \ltjsetparameter{rubypreintrusion={`・,1}, 
   rubypostintrusion={`・,1}}
+%% 段落インデント部分
+\ltjsetparameter{rubypreintrusion={-1,1}}
 
 \setkeys[ltj]{ruby}{
-  pre = -1, post = -1, mode = 1, 
+  pre=-1, post=-1, mode=1, 
   stretchruby={1}{2}{1}, stretch = {1}{2}{1},
-  stretchhead = {0}{1}{1}, stretchend = {1}{1}{0},
-  maxmargin=0.5, size = 0.5, intergap=0, rubysmash = false,
+  stretchhead={0}{1}{1}, stretchend={1}{1}{0},
+  maxmargin=0.5, size=0.5, intergap=0, rubysmash=false,
   kenten=\ltjalchar`•, fontcmd=\relax
 }
 
