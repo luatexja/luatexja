@@ -187,9 +187,10 @@
     \ifin@\edef\k@family{#1}\else%
       \directlua{luatexja.jfont.is_Nffam(\tmp@enc, \tmp@item)}%
       \ifin@\@notffamtrue\else%
-        \def\@temp##1+{\lowercase{\def\@@temp{##1#1.fd}}}\expandafter\@temp\f@encoding+%
-        \message{(I search kanjifont definition file: \@@temp)}%
-        \IfFileExists{\@@temp}{\@tempswztrue}{\@tempswzfalse}%
+        % filename of font definition file is always lowercase
+        \edef\@temp{\lowercase{\noexpand\IfFileExists{\f@encoding#1.fd}}}%
+        \message{(I search font definition file)}%
+        \@temp{\@tempswztrue}{\@tempswzfalse}%
         \if@tempswz
           \directlua{luatexja.jfont.add_ffam_list(\tmp@enc, \tmp@item)}%
    	  \edef\f@family{#1}%
