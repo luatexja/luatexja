@@ -2176,7 +2176,7 @@ For the detail, see Table~\ref{table-kcat}.
 \small
 \caption{\texttt{\textbackslash kcatcode} in \upTeX}
 \label{table-kcat}
-\medskip
+%<en>\medskip
 
 \noindent\hfill
 \begin{tabular}{ccccc}
@@ -2541,22 +2541,44 @@ JFMの名前を指定する．もし以前に指定されたJFMが読み込ま�
 %</en>
 %<*ja>
 \item[\tt jfm-jis.lua] \pTeX で広く用いられている「JISフォントメトリック」
-  \verb+jis.tfm+ に相当するJFMである．\texttt{jfm-ujis.lua}とこの
-  \texttt{jfm-jis.lua}の主な違いは，\texttt{jfm-ujis.lua}ではほとんどの文字が
-  正方形状であるのに対し，\texttt{jfm-jis.lua}では横長の長方形状である．
+  \verb+jis.tfm+ に相当するJFMである．\texttt{jfm-ujis.lua} とこの
+  \texttt{jfm-jis.lua} の主な違いは，\texttt{jfm-ujis.lua} ではほとんどの文字が
+  正方形状であるのに対し，\texttt{jfm-jis.lua} では横長の長方形状であることと，
+  \texttt{jfm-ujis.lua} では「？」「！」の直後に半角空白が挿入されることである．
 %</ja>
 %<*en>
 \item[\tt jfm-min.lua] A counterpart for \verb+min10.tfm+, which is one
-  of the default Japanese font metric shipped with \pTeX. There
-  are notable difference between this JFM and other 2~JFMs, as
-  shown in Table~\ref{tab-difjfm}.
+  of the default Japanese font metric shipped with \pTeX. 
 %</en>
-%<*ja>
+%<*ja> 
 \item[\tt jfm-min.lua] \pTeX に同梱されているデフォルトの和文用TFM
-  である \verb+min10.tfm+ に相当するJFMである．このJFMと他の2つのJFMの間には
-  表\ref{tab-difjfm}に示すような特筆すべき違いがある．
+  である \verb+min10.tfm+ に相当する．
 %</ja>
 \end{description}
+%<*en>
+The difference among these three~JFMs is  shown in Table~\ref{tab-difjfm}.
+%</en>
+%<*ja>
+これら3つのJFMの違いは表\ref{tab-difjfm}に示した．
+%</ja>
+
+\begin{figure}
+\begin{LTXexample}[width=0.3\textwidth]
+\ltjsetparameter{differentjfm=both}
+\jfont\F=file:KozMinPr6N-Regular.otf:jfm=ujis
+\jfont\G=file:KozGoPr6N-Medium.otf:jfm=ujis
+\jfont\H=file:KozGoPr6N-Medium.otf:jfm=ujis;jfmvar=hoge
+\F ）{\G 【】}（ % halfwidth space
+   ）{\H 『』}（ % fullwidth space
+
+ほげ，{\G 「ほげ」}（ほげ）\par
+ほげ，{\H 「ほげ」}（ほげ）% pTeX-like
+
+\ltjsetparameter{differentjfm=paverage}
+\end{LTXexample}
+\caption{Example of \texttt{jfmvar} key}
+\label{fig:jfmvar}
+\end{figure}
 
 %<*en>
 \item[jfmvar=<string>] Sometimes there is a need that \ldots.
@@ -2564,23 +2586,15 @@ JFMの名前を指定する．もし以前に指定されたJFMが読み込ま�
 %<*ja>
 \item[jfmvar=<string>] 標準では，JFMとサイズが同じで，
   実フォントだけが異なる2つの和文フォントは「区別されない」．例えば
-下の例において，最初の「）」と「【」の実フォントは異なるが，
+図\ref{fig:jfmvar}において，最初の「）」と「【」の実フォントは異なるが，
 JFMもサイズも同じなので，普通に「）【」と入力した時と同じように半角空きとなる．
 
-しかし，時には……
-
+しかし，JFMとサイズが同じであっても，\texttt{jfmvar} キーの異なる
+2つの和文フォント，例えば図\ref{fig:jfmvar}で言う \verb+\F+ と \verb+\H+，
+は「区別される」．異なる和文フォントに異なる \texttt{jfmvar} キーを割り当て，
+かつ\Param{differentjfm}パラメータを \texttt{both} に設定すれば，
+\pTeX と似た状況で組版されることになる．
 %</ja>
-\begin{LTXexample}[width=0.3\textwidth]
-\ltjsetparameter{differentjfm=both}
-\jfont\F=file:KozMinPr6N-Regular.otf:jfm=ujis
-\jfont\G=file:KozGoPr6N-Medium.otf:jfm=ujis
-\jfont\H=file:KozGoPr6N-Medium.otf:jfm=ujis;jfmvar=hoge
-
-\F ）{\G 【】}（ % halfwidth space
-   ）{\H 『』}（ % fullwidth space
-
-\ltjsetparameter{differentjfm=paverage}
-\end{LTXexample}
 \end{list}
 
 \begin{figure}
@@ -3050,8 +3064,8 @@ Furthermore, the glyph is shifted according to values of fields
 \medskip
 
 \caption{%
-%<en>The position of the real glyph.
-%<ja>「実際の」グリフの位置．
+%<en>The position of the real glyph
+%<ja>「実際の」グリフの位置
 }
 \label{fig-pos}
 \end{figure}
@@ -3357,6 +3371,7 @@ you can set both \verb+\fam+ and \verb+\jfam+ to the same value.
 %<en>\caption{Commands for Japanese math fonts}
 %<ja>\caption{和文数式フォントに対する命令}
 \label{tab-math}
+%<en>\medskip
 \centering
 \def\{{\char`\{}\def\}{\char`\}}\small
 \begin{tabular}{ll}
@@ -5053,15 +5068,15 @@ assigned to this attribute:
 \begin{description}
 \item[\textit{italic} (1)]
 %<*en>
-Glues from an italic correction
-	   (\verb+\/+). This distinction of origins of glues
-	   (from explicit \verb+\kern+, or from \verb+\/+)
-	   is needed in the insertion process of \Param{\hyperlink{fld:xks}{xkanjiskip}}.
+Kerns from italic correction (\verb+\/+), or from kerning information of a Japanese font.
+These kerns are ``ignored'' in the insertion process of \textbf{JAglue},
+unlike explicit \verb+\kern+.
 %</en>
 %<*ja>
-イタリック補正(\verb+\/+)によるグルー．このグルーの由来の区別（\verb+\kern+ か
-\hskip\ltjgetparameter{xkanjiskip}
-\verb+\/+ か）は\Param{\hyperlink{fld:xks}{xkanjiskip}}の挿入過程において必要になる．
+イタリック補正(\verb+\/+)によるカーン，
+または \Pkg{luaotfload} によって挿入されたフォントのカーニング情報由来のカーン．
+これらのカーンは通常の \verb+\kern+ とは異なり，
+\textbf{JAglue}の挿入処理においては透過する．
 %</ja>
 
 \item[\textit{packed} (2)]
@@ -6226,6 +6241,7 @@ $a$は禁則処理用に\textit{Nq}と\textit{Np}の間に加えられるべき�
 %<en>\caption{Summary of JFM glues}
 %<ja>\caption{JFM グルーの概要}
 \label{tab-jfmglue}
+%<en>\medskip
 \begin{center}
 \small
 \begin{tabular}{c|cccccc}
@@ -6582,7 +6598,7 @@ instead of ``\verb+\ほげ+''.
 しかし，\Pkg{lltjp-listings} が実際にロードされるのは \verb+\begin{document}+\ 
 のところであるので，プリアンブル内ではこれらの追加キーは使用できない．
 
-\texttt{ivsraw}は，ブール値の値をとるキーであり，標準ではfalseである．
+\texttt{vsraw}は，ブール値の値をとるキーであり，標準ではfalseである．
 \begin{itemize}
  \item trueの場合は，異体字セレクタは「直前の文字に続けて」出力される．
 もしもIVSサポート（\ref{ssec-ltjotf}節）が有効になっていた場合は，
@@ -6614,7 +6630,9 @@ instead of ``\verb+\ほげ+''.
 }}}
 \lstset{vscmd=\IVSB}
 \end{lstlisting}
-\end{itemize} 
+\end{itemize}
+既定の出力命令を復活させたい場合は\ \verb+vsraw=\ltjlistingsvsstdcmd+\ 
+とすれば良い．
 %</ja>
 
 %<en>\subsection{Class of Characters}
@@ -6915,7 +6933,7 @@ JFM中にある文字クラス$n$の定義の
 %</ja>
 
 %<*ja>
-\section{IVS対応（未完）}
+\section{IVS対応}
 \verb+luatexja.otf.enable_ivs()+ を実行し，IVS対応を有効にした状態では，
 \verb+pre_linebreak_filter+ や \verb+hpack_filter+ コールバックには
 次の4つが順に実行される状態となっている：
@@ -6958,6 +6976,7 @@ OpenTypeフォントでもTrueTypeフォントでもIVS情報が格納されて�
 \texttt{fontloader} の呼び出しでかなり時間を消費することから，
 %%% to_table を使わなくしたことで，メモリ使用量は減った
 IVS情報をキャッシュに保存することで2回目以降の実行時間を節約している．
+
 
 \section{複数フォントの「合成」（未完）}
 
