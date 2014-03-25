@@ -332,6 +332,7 @@
 %% \DeclareFontShape{JT3}{gt}{m}{sl}{<->ssub*gt/m/n}{}
 %% \DeclareFontShape{JT3}{mc}{bx}{it}{<->ssub*gt/m/n}{}
 %% \DeclareFontShape{JT3}{mc}{bx}{sl}{<->ssub*gt/m/n}{}
+\renewcommand\jttdefault{\gtdefault}
 \DeclareRobustCommand\rmfamily
         {\not@math@alphabet\rmfamily\mathrm
          \romanfamily\rmdefault\kanjifamily\mcdefault\selectfont}
@@ -340,7 +341,7 @@
          \romanfamily\sfdefault\kanjifamily\gtdefault\selectfont}
 \DeclareRobustCommand\ttfamily
         {\not@math@alphabet\ttfamily\mathtt
-         \romanfamily\ttdefault\kanjifamily\gtdefault\selectfont}
+         \romanfamily\ttdefault\kanjifamily\jttdefault\selectfont}
 %%
 \AtBeginDocument{%
   \reDeclareMathAlphabet{\mathrm}{\mathrm}{\mathmc}

@@ -130,7 +130,7 @@
 %   これがあると |grfext.sty| を読み込んだ際にエラーを引き起こすので削除しました。
 % \end{itemize}
 %
-% [2014-02-07] jsclasses 2014-02-07 ベースにしました．
+% [2014-02-07 LTJ] jsclasses 2014-02-07 ベースにしました．
 %
 % \StopEventually{}
 %
@@ -797,6 +797,10 @@
 % 和文でイタリック体，斜体，サンセリフ体，
 % タイプライタ体の代わりにゴシック体を使うことにします。
 %
+% [2014-03-25 LTJ] タイプライタ体に合わせるファミリを |\jttdefault| とし，
+% 通常のゴシック体と別にできるようにしました．|\jttdefault| は，標準で
+% |\gtdefault| と定義しています．
+%
 % [2003-03-16] イタリック体，斜体について，和文でゴシックを当てていましたが，
 % 数学の定理環境などで多量のイタリック体を使うことがあり，ゴシックに
 % すると黒々となってしまうという弊害がありました。
@@ -827,6 +831,7 @@
 %% \DeclareFontShape{JT3}{gt}{m}{sl}{<->ssub*gt/m/n}{}
 %% \DeclareFontShape{JT3}{mc}{bx}{it}{<->ssub*gt/m/n}{}
 %% \DeclareFontShape{JT3}{mc}{bx}{sl}{<->ssub*gt/m/n}{}
+\renewcommand\jttdefault{\gtdefault}
 \DeclareRobustCommand\rmfamily
         {\not@math@alphabet\rmfamily\mathrm
          \romanfamily\rmdefault\kanjifamily\mcdefault\selectfont}
@@ -835,7 +840,7 @@
          \romanfamily\sfdefault\kanjifamily\gtdefault\selectfont}
 \DeclareRobustCommand\ttfamily
         {\not@math@alphabet\ttfamily\mathtt
-         \romanfamily\ttdefault\kanjifamily\gtdefault\selectfont}
+         \romanfamily\ttdefault\kanjifamily\jttdefault\selectfont}
 %    \end{macrocode}
 %%
 % Lua\TeX-jaでは和文組版に伴うグルーはノードベースで挿入するようになり，また
@@ -1589,7 +1594,7 @@
 % はトンボの内側に |1in| のスペース（|1truein| ではなく）を挿入するので，
 % 場合分けしています。
 %
-% [2011-10-03] Lua\TeX{} (pdf\TeX？) では |1truein| ではなく
+% [2011-10-03 LTJ] Lua\TeX{} (pdf\TeX？) では |1truein| ではなく
 % |1in| になるようです。
 %
 %    \begin{macrocode}
@@ -1634,7 +1639,7 @@
 % [2003-06-26] |\headheight| を |\topskip| に直しました。
 % 以前はこの二つは値が同じであったので，変化はないはずです。
 %
-% [2011-10-03] ここも |\oddsidemargin| のときと同様に |-\inv@mag in| ではなく
+% [2011-10-03 LTJ] ここも |\oddsidemargin| のときと同様に |-\inv@mag in| ではなく
 % |-1in| にします。
 %
 %    \begin{macrocode}
@@ -2434,7 +2439,7 @@
 % 二つ挿入した |\everyparhook| のうち後者が |\paragraph| 類の後で2回実行され，
 % それ以降は前者が実行されます。
 %
-% [2011-10-05] Lua\TeX-jaでは |\everyparhook| は不要なので削除。
+% [2011-10-05 LTJ] Lua\TeX-jaでは |\everyparhook| は不要なので削除。
 %
 %    \begin{macrocode}
 \def\@xsect#1{%
@@ -4711,7 +4716,7 @@
 %
 % 段落頭のかぎかっこなどを見かけ1字半下げから全角1字下げに直します。
 %
-% [2012-04-24] LuaTeX-jaではJFMに段落開始時の括弧類の字下げ幅をコントロール
+% [2012-04-24 LTJ] LuaTeX-jaではJFMに段落開始時の括弧類の字下げ幅をコントロール
 % する機能がありますが，|\item| 直後ではラベル用のボックスが段落先頭になる
 % ため，うまく働きませんでした．形を変えて復活させます．
 %

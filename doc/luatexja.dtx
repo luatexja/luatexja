@@ -108,7 +108,9 @@
 \usepackage{luatexja-otf}
 %<ja>\usepackage{lmodern}
 \directlua{luatexja.otf.enable_ivs()}
+\usepackage[match]{luatexja-fontspec}
 \usepackage[kozuka-pr6n]{luatexja-preset}
+\setmonojfont{KozGoPr6N-Regular.otf}
 %<*ja>
 \def\emph#1{\textbf{\textgt{#1}}}
 \def\headfont{\normalfont\bfseries\gtfamily}
@@ -121,11 +123,6 @@
 \setmathfont{xits-math.otf}
 \frenchspacing
 %</en>
-\DeclareRobustCommand\ttfamily
-        {\not@math@alphabet\ttfamily\mathtt
-         \romanfamily\ttdefault\ttjfam\selectfont}
-\newjfontfamily\ttjfam{KozGoPr6N-Regular.otf}
-
 
 %%%%%%%% logo
 \usepackage{metalogo}
@@ -932,7 +929,7 @@ Okumura), namely, \Pkg{ltjclasses} and \Pkg{ltjsclasses}.
 日本語文書を組版するためには，\texttt{article.cls}, \texttt{book.cls}といった
 欧文用のクラスファイルではなく，和文用のクラスファイルを用いた方がよい．
 現時点では，\Pkg{jclasses}（\pLaTeX の標準クラス）と\Pkg{jsclasses}
-（奥村晴彦氏によるクラスファイル）に対応するものとして，\Pkg{ltjclasses}，
+（奥村晴彦氏による「\pLaTeXe 新ドキュメントクラス」）に対応するものとして，\Pkg{ltjclasses}，
 \Pkg{ltjsclasses}がそれぞれ用意されている．
 %</ja>
 
@@ -1114,13 +1111,21 @@ this chapter. For the method, please see Subsection~\ref{ssec-math}.
 \label{ssec-fontspec}
 %<*en>
 To coexist with the \Pkg{fontspec} package, it is needed to load
-\Pkg{luatexja-fontspec} package in the preamble. This additional
-package automatically loads \Pkg{luatexja} and \Pkg{fontspec}
+\Pkg{luatexja-fontspec} package in the preamble, as follows:
+\begin{quote}
+\ttfamily \textbackslash usepackage[<options>]\{luatexja-fontspec\}
+\end{quote}
+This \Pkg{luatexja-fontspec} package 
+automatically loads \Pkg{luatexja} and \Pkg{fontspec}
 package, if needed.
 %</en>
 %<*ja>
-\Pkg{fontspec}パッケージと同様の機能を和文フォントに対しても用いるためには，
-\Pkg{luatexja-fontspec}パッケージをプリアンブルで読み込む必要がある．このパッケージ
+\Pkg{fontspec}パッケージと同様の機能を和文フォントに対しても用いる場合，
+\Pkg{luatexja-fontspec}パッケージを読み込む：
+\begin{quote}
+\ttfamily \textbackslash usepackage[<options>]\{luatexja-fontspec\}
+\end{quote}
+このパッケージ
 は必要ならば自動で\Pkg{luatexja}パッケージと\Pkg{fontspec}パッケージを読み込む．
 %</ja>
 
@@ -1132,20 +1137,21 @@ counterparts of original commands in the \Pkg{fontspec} package:
 \Pkg{luatexja-fontspec}パッケージでは，以下の7つのコマンドを\Pkg{fontspec}
 パッケージの元のコマンドに対応するものとして定義している：
 %</ja>
-
 %<*en>
 \begin{center}\small
 \begin{tabular}{ccccc}
 \toprule
 Japanese fonts
-&\verb+\jfontspec+&\verb+\setmainjfont+&\verb+\setsansjfont+&\verb+\newjfontfamily+\\
+&\verb+\jfontspec+&\verb+\setmainjfont+&\verb+\setsansjfont+&\verb+\setmonojfont+$^*$\\
 alphabetic fonts
-&\verb+\fontspec+&\verb+\setmainfont+&\verb+\setsansfont+&\verb+\newfontfamily+\\
+&\verb+\fontspec+&\verb+\setmainfont+&\verb+\setsansfont+&\verb+\setmonofont+\\
 \midrule
 Japanese fonts
-&\verb+\newjfontface+&\verb+\defaultjfontfeatures+&\verb+\addjfontfeatures+\\
+&\verb+\newjfontfamily+&\verb+\newjfontface+
+&\verb+\defaultjfontfeatures+&\verb+\addjfontfeatures+\\
 alphabetic fonts
-&\verb+\newfontface+&\verb+\defaultfontfeatures+&\verb+\addfontfeatures+\\
+&\verb+\newfontfamily+&\verb+\newfontface+
+&\verb+\defaultfontfeatures+&\verb+\addfontfeatures+\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1172,6 +1178,45 @@ alphabetic fonts
 \end{tabular}
 \end{center}
 %</ja>
+%<*en>
+The package option of \Pkg{luatexja-fontspec} are the followings:
+\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
+ \item[match] If this option is specified, usual family-changing commands such as
+\verb+\rmfamily+,~\verb+\textrm+, \verb+\sffamily+,~\dots\ also change Japanese font family.
+
+Note that \emph{\texttt{\textup{\textbackslash setmonojfont}} is defined 
+if and only if this \texttt{\textup{match}} option is specified}.
+
+ \item[pass=<opts>] 
+Specify options <opts> which will be passed to the \Pkg{fontspec} package.
+\end{list} 
+The reason that \verb+\setmonojfont+ is not defined by default is that
+it is popular for Japanese fonts that nearly all Japanese glyphs have same
+widths.  Also note that kerning information in a font is not used
+(that is, \texttt{kern} feature is set off) by default in these seven (or~eight) commands.
+This is because of the compatibility with previous versions of \LuaTeX-ja
+(see \ref{para-kern}).
+%</en>
+%<*ja>
+\Pkg{luatexja-fontspec} パッケージのオプションは以下の通りである：
+\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
+ \item[match] このオプションが指定されると，「\pLaTeXe 新ドキュメントクラス」のように\
+\verb+\rmfamily+, \verb+\textrm{...}+, \verb+\sffamily+ 等が
+欧文フォントだけでなく和文フォントも変更するようになる．
+
+\emph{なお，{\tt \textbackslash setmonojfont} はこの \texttt{match} オプションが
+指定された時のみ定義される．}この命令は標準の「タイプライタ体に対応する和文フォント」を指定する．
+
+ \item[pass=<opts>] 
+\Pkg{fontspec} パッケージに渡すオプション <opts> を指定する．
+\end{list}
+標準で \verb+\setmonojfont+ コマンドが定義されないのは，
+和文フォントではほぼ全ての和文文字のグリフが等幅であるのが伝統的であったことによる．
+また，これらの和文用のコマンドではフォント内のペアカーニング情報は標準では使用されない，
+言い換えれば \texttt{kern} featureは標準では無効化となっている．
+これは以前のバージョンの\LuaTeX-jaとの互換性のためである（\ref{para-kern}節を参照）．
+%</ja>
+
 \begin{LTXexample}[width=0.4\textwidth]
 \fontspec[Numbers=OldStyle]{LMSans10-Regular}
 \jfontspec[CJKShape=NLC]{KozMinPr6N-Regular}
@@ -1180,22 +1225,6 @@ JIS~X~0213:2004→辻
 \jfontspec[CJKShape=JIS1990]{KozMinPr6N-Regular}
 JIS~X~0208:1990→辻
 \end{LTXexample}
-
-%<*en>
-Note that there is no command named \verb+\setmonojfont+, since it is
-popular for Japanese fonts that nearly all Japanese glyphs have same
-widths.  Also note that kerning information in a font is not used
-(that is, \texttt{kern} feature is set off) by default in these seven commands.
-This is because of the compatibility with previous versions of \LuaTeX-ja
-(see \ref{para-kern}).
-%</en>
-%<*ja>
-和文フォントについては全ての和文文字のグリフがほぼ等幅であるのが普通であるため，
-\verb+\setmonojfont+ コマンドは存在しないことに注意．また，これらの和文用の7つのコマ
-ンドではフォント内のペアカーニング情報は標準では使用されない，
-言い換えれば \texttt{kern} featureは標準では無効化となっている．
-これは以前のバージョンの\LuaTeX-jaとの互換性のためである（\ref{para-kern}節を参照）．
-%</ja>
 
 %<en>\subsection{Presets}
 %<ja>\subsection{プリセット設定}
@@ -4620,6 +4649,7 @@ by \verb+\input+.
 \verb+\input+ で読み込み可能である．
 %</ja>
 \subsection{\texttt{luatexja-fontspec.sty}}
+\label{ssec-fontspec2}
 %<*en>
 As described in Subsection~\ref{ssec-fontspec}, this optional package
 provides the counterparts for several commands defined in the

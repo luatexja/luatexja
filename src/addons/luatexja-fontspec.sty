@@ -3,10 +3,40 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec}[2014/01/23 fontspec support of LuaTeX-ja]
-
-\RequirePackage{fontspec,luatexja}
+\ProvidesPackage{luatexja-fontspec}[2014/03/25 fontspec support of LuaTeX-ja]
+\RequirePackage{l3keys2e,luatexja}
 \ExplSyntaxOn
+
+\bool_new:N \ltj_fontspec_match
+\cs_set:Nn  \ltj_fontspec_pass_opts: {}
+\keys_define:nn { luatexja-fontspec }
+  {
+    match .bool_set:N = \ltj_fontspec_match,
+    match .default:n  = true,
+    pass .code:n = \cs_set:Nn \ltj_fontspec_pass_opts: {#1},
+  }
+\ProcessKeysOptions { luatexja-fontspec }
+\RequirePackage[\ltj_fontspec_pass_opts:]{fontspec}
+
+%%%%%%%% Change Japanese font family by \rmfamily or not
+\bool_if:NTF  \ltj_fontspec_match 
+{
+  \renewcommand\jttdefault{\gtdefault}
+  \DeclareRobustCommand\rmfamily
+  {\not@math@alphabet\rmfamily\mathrm
+     \romanfamily\rmdefault\kanjifamily\mcdefault\selectfont}
+  \DeclareRobustCommand\sffamily
+  {\not@math@alphabet\sffamily\mathsf
+     \romanfamily\sfdefault\kanjifamily\gtdefault\selectfont}
+  \DeclareRobustCommand\ttfamily
+  {\not@math@alphabet\ttfamily\mathtt
+     \romanfamily\ttdefault\kanjifamily\jttdefault\selectfont}
+  \DeclareDocumentCommand \setmonojfont { O{} m } {
+    \ltj_fontspec_set_family:Nnn \jttdefault {#1}{#2}
+    \normalfont
+  }
+}{
+}
 
 %%%%%%%% Messages
 \cs_new:Npn \ltj_fontspec_warning:n   { \msg_warning:nn   {ltj-fontspec} }
