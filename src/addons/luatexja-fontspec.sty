@@ -81,8 +81,51 @@
   }
 }
 
+%% Alternate Fonts
+\bool_new:N \l_fontspec_alt_bool
+\tl_clear:N \ltj_fontspec_fontname_alt_tl
+\tl_clear:N \ltj_fontspec_fontfeat_alt_clist
+\tl_clear:N \ltj_fontspec_altrange_clist
+
+\cs_new:Nn \__ltj_fontspec_altfontrange_key_code:n
+ {
+  \bool_if:NF \l_fontspec_firsttime_bool
+   {
+    \tl_set:Nn \ltj_fontspec_altrange_clist {#1}
+   }
+ }
+\cs_new:Nn \__ltj_fontspec_altfontfeature_key_code:n
+ {
+  \bool_if:NF \l_fontspec_firsttime_bool
+   {
+     \tl_if_empty:nTF {#1}
+      { \bool_set_false:N \ltj_fontspec_alt_bool }
+      { \bool_set_true:N \ltj_fontspec_alt_bool  }
+    \tl_set:Nn \ltj_fontspec_fontfeat_alt_clist {, #1}
+    \fontspec_update_fontid:n {altfeat:#1}
+   }
+ }
+\cs_new:Nn \__ltj_fontspec_altfont_key_code:n
+ {
+  \tl_if_empty:nF {#1}
+   {
+    \fontspec_complete_fontname:Nn \ltj_fontspec_fontname_alt_tl {#1}
+    \fontspec_update_fontid:n {alt:#1}
+   }
+ }
+
 \cs_new:Nn \ltj_fontspec_select:nn {
   \group_begin:
+  \bool_set_false:N \ltj_fontspec_alt_bool
+  \ltj_fontspec_define_option:nn {AltFont} {
+    \__ltj_fontspec_altfont_key_code:n { ##1 }
+  }
+  \ltj_fontspec_define_option:nn {AltFontFeatures} {
+    \__ltj_fontspec_altfontfeature_key_code:n { ##1 }
+  }
+  \ltj_fontspec_define_option:nn {AltFontRange} {
+    \__ltj_fontspec_altfontrange_key_code:n { ##1 }
+  }
   \ltj_fontspec_define_option:nn {CID} {
     \fontspec_update_fontid:n  {+cid=##1}
     \fontspec_update_featstr:n {cid=##1}
@@ -110,8 +153,10 @@
     \tl_set:Nn \zf@enc {JY3}
   }
   \tl_set:Nx \g_fontspec_default_fontopts_tl
-             {JFM=ujis,Scale=\fp_use:N \g_ltj_fontspec_scale_fp,Kerning=Off,\g_ltj_fontspec_default_fontopts_tl}
+             {JFM=ujis, Scale=\fp_use:N \g_ltj_fontspec_scale_fp,
+              Kerning=Off, \g_ltj_fontspec_default_fontopts_tl}
   \prop_set_eq:NN \g__fontspec_fontopts_prop \g__ltj_fontspec_fontopts_prop
+  \cs_set_eq:NN \fontspec_make_font_shapes:nnnn \ltj_fontspec_make_font_shapes:nnnn
   \cs_set_eq:NN \DeclareFontFamily \DeclareKanjiFamily
   \fontspec_select:nn{#1}{#2}
   \group_end:
@@ -124,6 +169,45 @@
   \ltj_fontspec_select:nn{#2}{#3}
   \tl_set_eq:NN #1 \l_fontspec_family_tl
 }
+\cs_set_eq:NN \ltj_orig_fontspec_make_font_shapes:nnnn \fontspec_make_font_shapes:nnnn
+\cs_set_eq:NN \ltj_fontspec_orig_DeclareFontShape \DeclareFontShape
+\def \ltj_fontspec_dummy_DeclareFontShape #1#2#3#4#5#6 {}
+\cs_new:Nn \ltj_fontspec_make_font_shapes:nnnn {
+  \ltj_orig_fontspec_make_font_shapes:nnnn {#1} {#2} {#3} {#4}
+  \group_begin:
+    \__fontspec_load_fontname:n {#1}
+    \cs_set_eq:NN \DeclareFontShape \ltj_fontspec_dummy_DeclareFontShape
+    \fontspec_declare_shape:nnn {#2}{#3}
+     { \quark_if_no_value:NF \l__fontspec_fontopts_clist {\l__fontspec_fontopts_clist,} #4 }
+    \cs_set_eq:NN \DeclareFontShape \ltj_fontspec_orig_DeclareFontShape
+    \typeout{2: #2, 3: #3, \l_fontspec_family_tl, \ltj_fontspec_altrange_clist.}
+    \typeout{<\bool_if:NTF \ltj_fontspec_alt_bool T F >, 
+      < \ltj_fontspec_fontname_alt_tl >, < \ltj_fontspec_fontfeat_alt_clist > }
+    \tl_if_empty:NTF \ltj_fontspec_fontname_alt_tl
+     {
+      \bool_if:NT \ltj_fontspec_alt_bool
+       {
+         \fontspec_declare_shape:nnn {#2} { #3 _alt }
+          {
+            \quark_if_no_value:NF \l__fontspec_fontopts_clist {\l__fontspec_fontopts_clist,}
+            #4 , \ltj_fontspec_fontfeat_alt_clist
+          }
+          \DeclareAlternateKanjiFont {JY3}{ \l_fontspec_family_tl }{#2}{#3}%
+            {JY3}{ \l_fontspec_family_tl }{#2}{ #3 _alt }{ \ltj_fontspec_altrange_clist }
+       }
+     }
+     {
+       \__fontspec_load_fontname:n {\ltj_fontspec_fontname_alt_tl}
+       \fontspec_declare_shape:nnn {#2} { #3 _alt }
+        {
+          \quark_if_no_value:NF \l__fontspec_fontopts_clist {\l__fontspec_fontopts_clist,}
+          #4 , \ltj_fontspec_fontfeat_alt_clist
+        }
+        \DeclareAlternateKanjiFont {JY3}{ \l_fontspec_family_tl }{#2}{#3}%
+          {JY3}{ \l_fontspec_family_tl }{#2}{ #3 _alt }{ \ltj_fontspec_altrange_clist }
+     }
+  \group_end:
+ }
 
 %%%%%%%% User commands
 \DeclareDocumentCommand \jfontspec { O{} m } {

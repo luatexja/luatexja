@@ -941,10 +941,13 @@ do
 	 local lp, par_indented, lpi, lps  = head, 'boxbdd', getid(head), getsubtype(head)
 	 while lp and ((lpi==id_whatsit and lps~=sid_user) 
 		       or ((lpi==id_hlist) and (lps==3))) do
-	    if (lpi==id_hlist) and (lps==3) then par_indented = 'parbdd' end
+	    if (lpi==id_hlist) and (lps==3) then 
+               Np.char, par_indented = 'parbdd', 'parbdd'
+               Np.width = getfield(lp, 'width')
+            end
 	    lp=node_next(lp); lpi, lps = getid(lp), getsubtype(lp) end
 	 return lp, node_tail(head), par_indented
-      else 
+      else
 	 return head, nil, 'boxbdd'
       end
    end

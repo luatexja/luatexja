@@ -1,0 +1,40 @@
+%#!luajitlatex
+\documentclass{ltjsarticle}
+\usepackage{luatexja-fontspec,luatexja-otf}
+\setmainjfont[
+  AltFontFeatures={ Color=00003F, CharacterWidth=Half },
+  BoldFont = { KozMinPr6N-Bold.otf }, 
+  BoldFeatures = { AltFont={ KozGoPr6N-Bold.otf } }, 
+  AltFontRange = { "3000-"30FF }, 
+]{KozMinPr6N-Regular.otf}
+
+\setsansjfont{KozGoPr6N-Regular.otf}
+
+\long\def\test{%
+  あいうえお医学アイウエオ医学
+  \textbf{あいうえお医学アイウエオ医学}
+  \textgt{あいうえお医学アイウエオ医学}\par
+%
+  日本国民は、正当に選挙された国会における代表者を通じて行動し、
+  われらとわれらの子孫のために、諸国民との協和による成果と、
+  わが国全土にわたつて自由のもたらす恵沢を確保し、政府の行為によつて
+  再び戦争の惨禍が起ることのないやうにすることを決意し、
+  ここに主権が国民に存することを宣言し、この憲法を確定する。
+  そもそも国政は、国民の厳粛な信託によるものであつて、その権威は国民に由来し、
+  その権力は国民の代表者がこれを行使し、その福利は国民がこれを享受する。
+  これは人類普遍の原理であり、この憲法は、かかる原理に基くものである。
+  われらは、これに反する一切の憲法、法令及び詔勅を排除する。
+}
+\begin{document}
+
+\test
+
+\paragraph{addfontfeatures}\ \par
+\addjfontfeatures{
+  AltFontFeatures={ Color=0000FF }, AltFontRange= { "3040-"304F },
+  Color=001F00, CJKShape=Traditional
+}
+% AltFontFeature, AltFontRange は累積しない
+\test
+
+\end{document}
