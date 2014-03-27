@@ -16,7 +16,7 @@
     pass .code:n = \cs_set:Nn \ltj_fontspec_pass_opts: {#1},
   }
 \ProcessKeysOptions { luatexja-fontspec }
-\RequirePackage[\ltj_fontspec_pass_opts:]{fontspec}
+\RequirePackage[\ltj_fontspec_pass_opts:]{fontspec}[2011/09/13]
 
 %%%%%%%% Change Japanese font family by \rmfamily or not
 \bool_if:NTF  \ltj_fontspec_match 
@@ -49,13 +49,6 @@
 
 \cs_generate_variant:Nn \prg_new_conditional:Nnn {Nnx}
 
-%%%%%%%% For compatibility with old fontspec.
-\prg_new_conditional:Nnx \ltj_fontspec_if_liiikeys: {TF,F} {
-  \@ifpackagelater {fontspec} {2011/09/13}
-  { \exp_not:N \prg_return_true: }  % fontspec >= 2.2 (l3keys)
-  { \exp_not:N \prg_return_false: } % fontspec <  2.2 (xkeyval)
-}
-
 %%%%%%%% \g_ltj_fontspec_scale_fp
 %% Default scale value for jfont.
 \group_begin:
@@ -66,19 +59,11 @@
 %%%%%%%% Internal control sequences
 %% Each CS is ltj_fontspec version that corresponds to original CS of fontspec.
 \cs_new:Nn \ltj_fontspec_define_option:nn {
-  \ltj_fontspec_if_liiikeys:TF {
-    \keys_define:nn {fontspec} { #1 .code:n = {#2}}
-  } {
-    \define@key[zf]{options}{#1}{#2}
-  }
+  \keys_define:nn {fontspec} { #1 .code:n = {#2}}
 }
 
 \cs_new:Nn \ltj_fontspec_define_preparse_external:nn {
-  \ltj_fontspec_if_liiikeys:TF {
-    \keys_define:nn {fontspec-preparse-external} { #1 .code:n = {#2}}
-  } {
-    \define@key[zf]{preparse-external}{#1}{#2}
-  }
+  \keys_define:nn {fontspec-preparse-external} { #1 .code:n = {#2}}
 }
 
 %% Alternate Fonts
@@ -96,13 +81,13 @@
  }
 \cs_new:Nn \__ltj_fontspec_altfontfeature_key_code:n
  {
+  \fontspec_update_fontid:n {altfeat:#1}
   \bool_if:NF \l_fontspec_firsttime_bool
    {
      \tl_if_empty:nTF {#1}
       { \bool_set_false:N \ltj_fontspec_alt_bool }
       { \bool_set_true:N \ltj_fontspec_alt_bool  }
-    \tl_set:Nn \ltj_fontspec_fontfeat_alt_clist {, #1}
-    \fontspec_update_fontid:n {altfeat:#1}
+     \tl_set:Nn \ltj_fontspec_fontfeat_alt_clist {, #1}
    }
  }
 \cs_new:Nn \__ltj_fontspec_altfont_key_code:n
@@ -147,11 +132,7 @@
     \fontspec_update_fontid:n  {-kern}
     \fontspec_update_featstr:n {-kern}
   }
-  \ltj_fontspec_if_liiikeys:TF {
-    \tl_set:Nn \g_fontspec_encoding_tl {JY3}
-  } {
-    \tl_set:Nn \zf@enc {JY3}
-  }
+  \tl_set:Nn \g_fontspec_encoding_tl {JY3}
   \tl_set:Nx \g_fontspec_default_fontopts_tl
              {JFM=ujis, Scale=\fp_use:N \g_ltj_fontspec_scale_fp,
               Kerning=Off, \g_ltj_fontspec_default_fontopts_tl}
@@ -160,9 +141,6 @@
   \cs_set_eq:NN \DeclareFontFamily \DeclareKanjiFamily
   \fontspec_select:nn{#1}{#2}
   \group_end:
-  \ltj_fontspec_if_liiikeys:F {
-    \tl_set_eq:NN \l_fontspec_family_tl \zf@family
-  }
 }
 
 \cs_new:Nn \ltj_fontspec_set_family:Nnn {
@@ -175,14 +153,12 @@
 \cs_new:Nn \ltj_fontspec_make_font_shapes:nnnn {
   \ltj_orig_fontspec_make_font_shapes:nnnn {#1} {#2} {#3} {#4}
   \group_begin:
+    %% Parse font features. However, we have to avoid redefine already defined shape.
     \__fontspec_load_fontname:n {#1}
     \cs_set_eq:NN \DeclareFontShape \ltj_fontspec_dummy_DeclareFontShape
     \fontspec_declare_shape:nnn {#2}{#3}
      { \quark_if_no_value:NF \l__fontspec_fontopts_clist {\l__fontspec_fontopts_clist,} #4 }
     \cs_set_eq:NN \DeclareFontShape \ltj_fontspec_orig_DeclareFontShape
-    \typeout{2: #2, 3: #3, \l_fontspec_family_tl, \ltj_fontspec_altrange_clist.}
-    \typeout{<\bool_if:NTF \ltj_fontspec_alt_bool T F >, 
-      < \ltj_fontspec_fontname_alt_tl >, < \ltj_fontspec_fontfeat_alt_clist > }
     \tl_if_empty:NTF \ltj_fontspec_fontname_alt_tl
      {
       \bool_if:NT \ltj_fontspec_alt_bool

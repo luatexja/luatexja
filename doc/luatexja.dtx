@@ -937,7 +937,7 @@ Okumura), namely, \Pkg{ltjclasses} and \Pkg{ltjsclasses}.
 %<ja>\section{フォントの変更}
 
 \subsection{plain \TeX~and~\LaTeXe}
-\label{ssub-chgfnt}
+\label{ssec-chgfnt}
 
 \paragraph{plain \TeX}
 %<*en>
@@ -1011,7 +1011,7 @@ auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
       alphabetic fonts to \texttt{T1}.
       \verb+\fontfamily+ also changes the current Japanese font family, 
       the current alphabetic font family, \emph{or both}. 
-      For the detail, see Subsection~\ref{ssub-nfsspat}.
+      For the detail, see Subsection~\ref{ssec-nfsspat}.
 %</en>
 %<*ja>
       ここで，\verb+\fontencoding{+<encoding>\verb+}+ は，引数により和文側か欧文
@@ -1020,7 +1020,7 @@ auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
       \texttt{JY3}に変更し，\verb+\fontencoding{T1}+ は欧文フォント側を
       \texttt{T1}へと変更する．\verb+\fontfamily+ も引数により和文側，欧文
       側，\emph{あるいは両方}のフォントファミリを変更する．詳細は
-      \ref{ssub-nfsspat}節を参照すること．
+      \ref{ssec-nfsspat}節を参照すること．
 %</ja>
 
 %<*en>
@@ -1043,7 +1043,7 @@ auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
 %<*ja>
 仮名書体を使う場合など，複数の和文フォントを組み合わせて使いたい場合は
 \ref{ssec-altfont}節の \verb+\ltjdeclarealtfont+ と，その\LaTeX 版の\ 
-\verb+\DeclareAlternateKanjiFont+（\ref{ssub-nfsspat}節）を参照せよ．
+\verb+\DeclareAlternateKanjiFont+（\ref{ssec-nfsspat}節）を参照せよ．
 %</ja>
 \end{itemize}
 
@@ -1644,7 +1644,7 @@ If you want to use these functions, load \Pkg{luatexja-otf} package.
 
 これら3オプションについては，
 \Pkg{luatexja-preset} パッケージにプリセットを使う時に一緒に指定するか，
-あるいは対応する内容を\ref{ssub-chgfnt}節，\ref{ssub-nfsspat}節 (NFSS2) や
+あるいは対応する内容を\ref{ssec-chgfnt}節，\ref{ssec-nfsspat}節 (NFSS2) や
 \ref{ssec-fontspec}節 (\Pkg{fontspec}) の方法で手動で指定する必要がある．
 %</ja>
 
@@ -2666,7 +2666,7 @@ because of the compatibility with previous versions of \LuaTeX-ja.
 図\ref{fig:kern-jfm}を参照．
 \begin{itemize}
  \item \emph{\texttt{\textbackslash jfont} や，
-NFSS2用の命令（\ref{ssub-chgfnt}節，\ref{ssub-nfsspat}節）における指定では
+NFSS2用の命令（\ref{ssec-chgfnt}節，\ref{ssec-nfsspat}節）における指定では
 カーニング情報は標準で使用する}ことになっているようである．
 言い換えれば，カーニング情報を使用しない設定にするには，面倒でも
 \begin{verbatim}
@@ -4294,30 +4294,19 @@ are typeset by \verb+\piyo+.
 
 %<en>\subsection{Patch for NFSS2}
 %<ja>\subsection{NFSS2へのパッチ}
-\label{ssub-nfsspat}
+\label{ssec-nfsspat}
 
 \begin{figure}[!tb]
-\begin{lstlisting}[numberstyle=\tiny, numbers=left, numbersep=1em]
+\begin{LTXexample}[pos=b]
 \DeclareKanjiFamily{JY3}{edm}{}
-\DeclareFontShape{JY3}{edm}{m}{n}    {<-> s*KozMinPr6N-Regular:jfm=ujis;-kern}{}
-\DeclareFontShape{JY3}{edm}{m}{green}{<-> s*KozMinPr6N-Regular:jfm=ujis;-kern;color=007F00}{}
-\DeclareFontShape{JY3}{edm}{m}{blue} {<-> s*KozMinPr6N-Regular:jfm=ujis;-kern;color=0000FF}{}
+\DeclareFontShape{JY3}{edm}{m}{n}    {<-> s*KozMinPr6N-Regular:jfm=ujis;}{}
+\DeclareFontShape{JY3}{edm}{m}{green}{<-> s*KozMinPr6N-Regular:jfm=ujis;color=007F00}{}
+\DeclareFontShape{JY3}{edm}{m}{blue} {<-> s*KozMinPr6N-Regular:jfm=ujis;color=0000FF}{}
 \DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{green}{"4E00-"67FF,{-2}-{-2}}
 \DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{blue}{ "6800-"9FFF}
 {\kanjifamily{edm}\selectfont
 日本国民は、正当に選挙された国会における代表者を通じて行動し、……}
-\end{lstlisting}
-\begin{quote}
-\DeclareKanjiFamily{JY3}{edm}{}
-\DeclareFontShape{JY3}{edm}{m}{n}    {<-> s*KozMinPr6N-Regular:jfm=ujis;-kern}{}
-\DeclareFontShape{JY3}{edm}{m}{green}{<-> s*KozMinPr6N-Regular:jfm=ujis;-kern;color=007F00}{}
-\DeclareFontShape{JY3}{edm}{m}{blue} {<-> s*KozMinPr6N-Regular:jfm=ujis;-kern;color=0000FF}{}
-\DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{green}{"4E00-"67FF,{-2}-{-2}}
-\DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{blue}{ "6800-"9FFF}
-
-{\kanjifamily{edm}\selectfont
-日本国民は、正当に選挙された国会における代表者を通じて行動し、……}
-\end{quote}
+\end{LTXexample}
 %<ja>\caption{\texttt{\textbackslash DeclareAlternateKanjiFont} の使用例}
 %<en>\caption{An example of \texttt{\textbackslash DeclareAlternateKanjiFont}}
 \label{fig:altkanji}
@@ -4327,13 +4316,13 @@ are typeset by \verb+\piyo+.
 Japanese patch for NFSS2 in \LuaTeX-ja
 is based on \texttt{plfonts.dtx} which plays the same role in \pLaTeXe.
 We will describe
-commands which are not described in Subsection~\ref{ssub-chgfnt}.
+commands which are not described in Subsection~\ref{ssec-chgfnt}.
 %</en>
 %<*ja>
 \LuaTeX-jaのNFSS2への日本語パッチは
 \pLaTeXe で同様の役割を果たす \texttt{plfonts.dtx} をベースに，
 和文エンコーディングの管理等をLuaで書きなおしたものである．
-ここでは\ref{ssub-chgfnt}節で述べていなかった命令について
+ここでは\ref{ssec-chgfnt}節で述べていなかった命令について
 記述しておく．
 %</ja>
 
@@ -4571,7 +4560,7 @@ In this case, the default family for font substitution is used for
 \item[DeclareAlternateKanjiFont\{<base-encoding>\}\{<base-family>\}\{<base-series>\}\{<base-shape>\}\\
   \null\hfill\{<alt-encoding>\}\{<alt-family>\}\{<alt-series>\}\{<alt-shape>\}\{<range>\}]
 %<*ja>
-\ref{ssec-altfont}節の
+\ref{ssec-altfont}節の\
 \verb+\ltjdeclarealtfont+ と同様に，前半の4引数の和文フォント（基底フォント）のうち<range>中の文字を
 第5--第8引数の和文フォントを使って組むように指示する．使用例を図\ref{fig:altkanji}に載せた．
 
@@ -4696,13 +4685,56 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
 これを指定することで，PDFに埋め込まれない「名前だけ」のフォントを指定することが
 できる．\ref{ssec-psft}節を参照．
 %</ja>
+
+
+\begin{figure}[!tb]
+\begin{LTXexample}[width=0.35\textwidth]
+\jfontspec[
+  AltFontFeatures={ Color=00003F, CharacterWidth=Half }, 
+  AltFont = KozMinPr6N-Regular.otf, 
+  AltFontRange={ "3000-"30FF },
+]{KozGoPr6N-Regular.otf}
+  あいうえお医学アイウエオ医学\par
+\addjfontfeatures{ AltFontFeatures={ Color=0000FF } }     
+  あいうえお医学アイウエオ医学\par
+\addjfontfeatures{JFM=prop,CharacterWidth=Proportional }
+  あいうえお医学アイウエオ医学
+\end{LTXexample}
+%<ja>\caption{\texttt{AltFont}, \texttt{AltFontRange}, \texttt{AltFontFeatures} の使用例}
+%<en>\caption{An example of \texttt{AltFont}, \texttt{AltFontRange}~and~\texttt{AltFontFeatures}}
+\label{fig:altkanji-fontspec}
+\end{figure}
+
+\item[AltFont=<font\ name>]
+\item[AltFontFeatures=\{<features>\}]
+\item[AltFontRange=<range>]\ 
+
+%<*en>
+As \verb+\ltjdeclarealtfont+~(Subsection~\ref{ssec-altfont}) and
+\verb+\DeclareAlternateKanjiFont+~(Subsection~\ref{ssec-nfsspat}),
+these three keys make that characters in <range> of the Japanese font
+are typeset by a different font and/or using different features.
+%</en>
+%<*ja>
+\ref{ssec-altfont}節の \verb+\ltjdeclarealtfont+ や，
+\ref{ssec-nfsspat}節の \verb+\DeclareAlternateKanjiFont+ のように，
+これらのキーを用いると<range>内の文字は異なったフォントやfont featureを使って組まれる．
+\texttt{AltFont} と \texttt{AltFontFeatures} はどちらか片方指定指定してあればよい．
+
+また，図\ref{fig:altkanji-fontspec}に示すように，
+\begin{itemize}
+ \item \texttt{AltFontFeatures} の指定は\emph{累積しない}．
+ \item \texttt{AltFontFeatures} が指定されたフォントを使用中に，
+\verb+\addjfontfeatures+ で追加の属性を指定した場合は，\verb+\addjfontfeatures+ の指定が
+優先適用となる．
+\end{itemize}
+%</ja>
 \end{list}
 
 %<*ja>
 なお，\Pkg{luatexja-fontspec} 読み込み時には和文フォント定義ファイル%
 \texttt{<ja-enc><family>.fd}は全く参照されなくなる．
 %</ja>
-
 
 
 \subsection{\texttt{luatexja-otf.sty}}

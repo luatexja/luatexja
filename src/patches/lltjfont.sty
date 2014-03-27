@@ -611,8 +611,11 @@
 %%%% \DeclareAlternateKanjiFont<Benc><Bfam><Bser><Bshape><Aenc><Afam><Aser><Ashape><range>
 % いつも global
 \def\DeclareAlternateKanjiFont#1#2#3#4#5#6#7#8#9{%
-  {\def\ltj@temp@bfont{#1/#2/#3/#4}\def\ltj@temp@afont{#5/#6/#7/#8}%
-   \expandafter\ltj@@altfont@latex#9,,}\ignorespaces}
+  \edef\@temp{#9}%
+  \ifx\@temp\@empty\else
+    {\def\ltj@temp@bfont{#1/#2/#3/#4}\def\ltj@temp@afont{#5/#6/#7/#8}%
+     \expandafter\ltj@@altfont@latex#9,,}\ignorespaces
+  \fi}
 \def\ltj@@altfont@latex#1,{\def\ltj@temp{#1}%
   \ifx\ltj@temp\empty\let\@next=\relax\else
   \ltj@@altfont@latexA{#1}\let\@next=\ltj@@altfont@latex\fi\@next}
