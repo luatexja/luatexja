@@ -108,7 +108,9 @@
 \usepackage{luatexja-otf}
 %<ja>\usepackage{lmodern}
 \directlua{luatexja.otf.enable_ivs()}
+\usepackage[match]{luatexja-fontspec}
 \usepackage[kozuka-pr6n]{luatexja-preset}
+\setmonojfont{KozGoPr6N-Regular.otf}
 %<*ja>
 \def\emph#1{\textbf{\textgt{#1}}}
 \def\headfont{\normalfont\bfseries\gtfamily}
@@ -121,11 +123,6 @@
 \setmathfont{xits-math.otf}
 \frenchspacing
 %</en>
-\DeclareRobustCommand\ttfamily
-        {\not@math@alphabet\ttfamily\mathtt
-         \romanfamily\ttdefault\ttjfam\selectfont}
-\newjfontfamily\ttjfam{KozGoPr6N-Regular.otf}
-
 
 %%%%%%%% logo
 \usepackage{metalogo}
@@ -932,7 +929,7 @@ Okumura), namely, \Pkg{ltjclasses} and \Pkg{ltjsclasses}.
 日本語文書を組版するためには，\texttt{article.cls}, \texttt{book.cls}といった
 欧文用のクラスファイルではなく，和文用のクラスファイルを用いた方がよい．
 現時点では，\Pkg{jclasses}（\pLaTeX の標準クラス）と\Pkg{jsclasses}
-（奥村晴彦氏によるクラスファイル）に対応するものとして，\Pkg{ltjclasses}，
+（奥村晴彦氏による「\pLaTeXe 新ドキュメントクラス」）に対応するものとして，\Pkg{ltjclasses}，
 \Pkg{ltjsclasses}がそれぞれ用意されている．
 %</ja>
 
@@ -940,7 +937,7 @@ Okumura), namely, \Pkg{ltjclasses} and \Pkg{ltjsclasses}.
 %<ja>\section{フォントの変更}
 
 \subsection{plain \TeX~and~\LaTeXe}
-\label{ssub-chgfnt}
+\label{ssec-chgfnt}
 
 \paragraph{plain \TeX}
 %<*en>
@@ -1014,7 +1011,7 @@ auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
       alphabetic fonts to \texttt{T1}.
       \verb+\fontfamily+ also changes the current Japanese font family, 
       the current alphabetic font family, \emph{or both}. 
-      For the detail, see Subsection~\ref{ssub-nfsspat}.
+      For the detail, see Subsection~\ref{ssec-nfsspat}.
 %</en>
 %<*ja>
       ここで，\verb+\fontencoding{+<encoding>\verb+}+ は，引数により和文側か欧文
@@ -1023,7 +1020,7 @@ auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
       \texttt{JY3}に変更し，\verb+\fontencoding{T1}+ は欧文フォント側を
       \texttt{T1}へと変更する．\verb+\fontfamily+ も引数により和文側，欧文
       側，\emph{あるいは両方}のフォントファミリを変更する．詳細は
-      \ref{ssub-nfsspat}節を参照すること．
+      \ref{ssec-nfsspat}節を参照すること．
 %</ja>
 
 %<*en>
@@ -1046,7 +1043,7 @@ auto select&\verb+\fontencoding+&\verb+\fontfamily+&---&---&\verb+\usefont+\\
 %<*ja>
 仮名書体を使う場合など，複数の和文フォントを組み合わせて使いたい場合は
 \ref{ssec-altfont}節の \verb+\ltjdeclarealtfont+ と，その\LaTeX 版の\ 
-\verb+\DeclareAlternateKanjiFont+（\ref{ssub-nfsspat}節）を参照せよ．
+\verb+\DeclareAlternateKanjiFont+（\ref{ssec-nfsspat}節）を参照せよ．
 %</ja>
 \end{itemize}
 
@@ -1114,13 +1111,21 @@ this chapter. For the method, please see Subsection~\ref{ssec-math}.
 \label{ssec-fontspec}
 %<*en>
 To coexist with the \Pkg{fontspec} package, it is needed to load
-\Pkg{luatexja-fontspec} package in the preamble. This additional
-package automatically loads \Pkg{luatexja} and \Pkg{fontspec}
+\Pkg{luatexja-fontspec} package in the preamble, as follows:
+\begin{quote}
+\ttfamily \textbackslash usepackage[<options>]\{luatexja-fontspec\}
+\end{quote}
+This \Pkg{luatexja-fontspec} package 
+automatically loads \Pkg{luatexja} and \Pkg{fontspec}
 package, if needed.
 %</en>
 %<*ja>
-\Pkg{fontspec}パッケージと同様の機能を和文フォントに対しても用いるためには，
-\Pkg{luatexja-fontspec}パッケージをプリアンブルで読み込む必要がある．このパッケージ
+\Pkg{fontspec}パッケージと同様の機能を和文フォントに対しても用いる場合，
+\Pkg{luatexja-fontspec}パッケージを読み込む：
+\begin{quote}
+\ttfamily \textbackslash usepackage[<options>]\{luatexja-fontspec\}
+\end{quote}
+このパッケージ
 は必要ならば自動で\Pkg{luatexja}パッケージと\Pkg{fontspec}パッケージを読み込む．
 %</ja>
 
@@ -1132,20 +1137,21 @@ counterparts of original commands in the \Pkg{fontspec} package:
 \Pkg{luatexja-fontspec}パッケージでは，以下の7つのコマンドを\Pkg{fontspec}
 パッケージの元のコマンドに対応するものとして定義している：
 %</ja>
-
 %<*en>
 \begin{center}\small
 \begin{tabular}{ccccc}
 \toprule
 Japanese fonts
-&\verb+\jfontspec+&\verb+\setmainjfont+&\verb+\setsansjfont+&\verb+\newjfontfamily+\\
+&\verb+\jfontspec+&\verb+\setmainjfont+&\verb+\setsansjfont+&\verb+\setmonojfont+$^*$\\
 alphabetic fonts
-&\verb+\fontspec+&\verb+\setmainfont+&\verb+\setsansfont+&\verb+\newfontfamily+\\
+&\verb+\fontspec+&\verb+\setmainfont+&\verb+\setsansfont+&\verb+\setmonofont+\\
 \midrule
 Japanese fonts
-&\verb+\newjfontface+&\verb+\defaultjfontfeatures+&\verb+\addjfontfeatures+\\
+&\verb+\newjfontfamily+&\verb+\newjfontface+
+&\verb+\defaultjfontfeatures+&\verb+\addjfontfeatures+\\
 alphabetic fonts
-&\verb+\newfontface+&\verb+\defaultfontfeatures+&\verb+\addfontfeatures+\\
+&\verb+\newfontfamily+&\verb+\newfontface+
+&\verb+\defaultfontfeatures+&\verb+\addfontfeatures+\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1172,6 +1178,45 @@ alphabetic fonts
 \end{tabular}
 \end{center}
 %</ja>
+%<*en>
+The package option of \Pkg{luatexja-fontspec} are the followings:
+\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
+ \item[match] If this option is specified, usual family-changing commands such as
+\verb+\rmfamily+,~\verb+\textrm+, \verb+\sffamily+,~\dots\ also change Japanese font family.
+
+Note that \emph{\texttt{\textup{\textbackslash setmonojfont}} is defined 
+if and only if this \texttt{\textup{match}} option is specified}.
+
+ \item[pass=<opts>] 
+Specify options <opts> which will be passed to the \Pkg{fontspec} package.
+\end{list} 
+The reason that \verb+\setmonojfont+ is not defined by default is that
+it is popular for Japanese fonts that nearly all Japanese glyphs have same
+widths.  Also note that kerning information in a font is not used
+(that is, \texttt{kern} feature is set off) by default in these seven (or~eight) commands.
+This is because of the compatibility with previous versions of \LuaTeX-ja
+(see \ref{para-kern}).
+%</en>
+%<*ja>
+\Pkg{luatexja-fontspec} パッケージのオプションは以下の通りである：
+\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
+ \item[match] このオプションが指定されると，「\pLaTeXe 新ドキュメントクラス」のように\
+\verb+\rmfamily+, \verb+\textrm{...}+, \verb+\sffamily+ 等が
+欧文フォントだけでなく和文フォントも変更するようになる．
+
+\emph{なお，{\tt \textbackslash setmonojfont} はこの \texttt{match} オプションが
+指定された時のみ定義される．}この命令は標準の「タイプライタ体に対応する和文フォント」を指定する．
+
+ \item[pass=<opts>] 
+\Pkg{fontspec} パッケージに渡すオプション <opts> を指定する．
+\end{list}
+標準で \verb+\setmonojfont+ コマンドが定義されないのは，
+和文フォントではほぼ全ての和文文字のグリフが等幅であるのが伝統的であったことによる．
+また，これらの和文用のコマンドではフォント内のペアカーニング情報は標準では使用されない，
+言い換えれば \texttt{kern} featureは標準では無効化となっている．
+これは以前のバージョンの\LuaTeX-jaとの互換性のためである（\ref{para-kern}節を参照）．
+%</ja>
+
 \begin{LTXexample}[width=0.4\textwidth]
 \fontspec[Numbers=OldStyle]{LMSans10-Regular}
 \jfontspec[CJKShape=NLC]{KozMinPr6N-Regular}
@@ -1180,22 +1225,6 @@ JIS~X~0213:2004→辻
 \jfontspec[CJKShape=JIS1990]{KozMinPr6N-Regular}
 JIS~X~0208:1990→辻
 \end{LTXexample}
-
-%<*en>
-Note that there is no command named \verb+\setmonojfont+, since it is
-popular for Japanese fonts that nearly all Japanese glyphs have same
-widths.  Also note that kerning information in a font is not used
-(that is, \texttt{kern} feature is set off) by default in these seven commands.
-This is because of the compatibility with previous versions of \LuaTeX-ja
-(see \ref{para-kern}).
-%</en>
-%<*ja>
-和文フォントについては全ての和文文字のグリフがほぼ等幅であるのが普通であるため，
-\verb+\setmonojfont+ コマンドは存在しないことに注意．また，これらの和文用の7つのコマ
-ンドではフォント内のペアカーニング情報は標準では使用されない，
-言い換えれば \texttt{kern} featureは標準では無効化となっている．
-これは以前のバージョンの\LuaTeX-jaとの互換性のためである（\ref{para-kern}節を参照）．
-%</ja>
 
 %<en>\subsection{Presets}
 %<ja>\subsection{プリセット設定}
@@ -1615,7 +1644,7 @@ If you want to use these functions, load \Pkg{luatexja-otf} package.
 
 これら3オプションについては，
 \Pkg{luatexja-preset} パッケージにプリセットを使う時に一緒に指定するか，
-あるいは対応する内容を\ref{ssub-chgfnt}節，\ref{ssub-nfsspat}節 (NFSS2) や
+あるいは対応する内容を\ref{ssec-chgfnt}節，\ref{ssec-nfsspat}節 (NFSS2) や
 \ref{ssec-fontspec}節 (\Pkg{fontspec}) の方法で手動で指定する必要がある．
 %</ja>
 
@@ -2176,7 +2205,7 @@ For the detail, see Table~\ref{table-kcat}.
 \small
 \caption{\texttt{\textbackslash kcatcode} in \upTeX}
 \label{table-kcat}
-\medskip
+%<en>\medskip
 
 \noindent\hfill
 \begin{tabular}{ccccc}
@@ -2541,22 +2570,44 @@ JFMの名前を指定する．もし以前に指定されたJFMが読み込ま�
 %</en>
 %<*ja>
 \item[\tt jfm-jis.lua] \pTeX で広く用いられている「JISフォントメトリック」
-  \verb+jis.tfm+ に相当するJFMである．\texttt{jfm-ujis.lua}とこの
-  \texttt{jfm-jis.lua}の主な違いは，\texttt{jfm-ujis.lua}ではほとんどの文字が
-  正方形状であるのに対し，\texttt{jfm-jis.lua}では横長の長方形状である．
+  \verb+jis.tfm+ に相当するJFMである．\texttt{jfm-ujis.lua} とこの
+  \texttt{jfm-jis.lua} の主な違いは，\texttt{jfm-ujis.lua} ではほとんどの文字が
+  正方形状であるのに対し，\texttt{jfm-jis.lua} では横長の長方形状であることと，
+  \texttt{jfm-ujis.lua} では「？」「！」の直後に半角空白が挿入されることである．
 %</ja>
 %<*en>
 \item[\tt jfm-min.lua] A counterpart for \verb+min10.tfm+, which is one
-  of the default Japanese font metric shipped with \pTeX. There
-  are notable difference between this JFM and other 2~JFMs, as
-  shown in Table~\ref{tab-difjfm}.
+  of the default Japanese font metric shipped with \pTeX. 
 %</en>
-%<*ja>
+%<*ja> 
 \item[\tt jfm-min.lua] \pTeX に同梱されているデフォルトの和文用TFM
-  である \verb+min10.tfm+ に相当するJFMである．このJFMと他の2つのJFMの間には
-  表\ref{tab-difjfm}に示すような特筆すべき違いがある．
+  である \verb+min10.tfm+ に相当する．
 %</ja>
 \end{description}
+%<*en>
+The difference among these three~JFMs is  shown in Table~\ref{tab-difjfm}.
+%</en>
+%<*ja>
+これら3つのJFMの違いは表\ref{tab-difjfm}に示した．
+%</ja>
+
+\begin{figure}
+\begin{LTXexample}[width=0.3\textwidth]
+\ltjsetparameter{differentjfm=both}
+\jfont\F=file:KozMinPr6N-Regular.otf:jfm=ujis
+\jfont\G=file:KozGoPr6N-Medium.otf:jfm=ujis
+\jfont\H=file:KozGoPr6N-Medium.otf:jfm=ujis;jfmvar=hoge
+\F ）{\G 【】}（ % halfwidth space
+   ）{\H 『』}（ % fullwidth space
+
+ほげ，{\G 「ほげ」}（ほげ）\par
+ほげ，{\H 「ほげ」}（ほげ）% pTeX-like
+
+\ltjsetparameter{differentjfm=paverage}
+\end{LTXexample}
+\caption{Example of \texttt{jfmvar} key}
+\label{fig:jfmvar}
+\end{figure}
 
 %<*en>
 \item[jfmvar=<string>] Sometimes there is a need that \ldots.
@@ -2564,23 +2615,15 @@ JFMの名前を指定する．もし以前に指定されたJFMが読み込ま�
 %<*ja>
 \item[jfmvar=<string>] 標準では，JFMとサイズが同じで，
   実フォントだけが異なる2つの和文フォントは「区別されない」．例えば
-下の例において，最初の「）」と「【」の実フォントは異なるが，
+図\ref{fig:jfmvar}において，最初の「）」と「【」の実フォントは異なるが，
 JFMもサイズも同じなので，普通に「）【」と入力した時と同じように半角空きとなる．
 
-しかし，時には……
-
+しかし，JFMとサイズが同じであっても，\texttt{jfmvar} キーの異なる
+2つの和文フォント，例えば図\ref{fig:jfmvar}で言う \verb+\F+ と \verb+\H+，
+は「区別される」．異なる和文フォントに異なる \texttt{jfmvar} キーを割り当て，
+かつ\Param{differentjfm}パラメータを \texttt{both} に設定すれば，
+\pTeX と似た状況で組版されることになる．
 %</ja>
-\begin{LTXexample}[width=0.3\textwidth]
-\ltjsetparameter{differentjfm=both}
-\jfont\F=file:KozMinPr6N-Regular.otf:jfm=ujis
-\jfont\G=file:KozGoPr6N-Medium.otf:jfm=ujis
-\jfont\H=file:KozGoPr6N-Medium.otf:jfm=ujis;jfmvar=hoge
-
-\F ）{\G 【】}（ % halfwidth space
-   ）{\H 『』}（ % fullwidth space
-
-\ltjsetparameter{differentjfm=paverage}
-\end{LTXexample}
 \end{list}
 
 \begin{figure}
@@ -2623,7 +2666,7 @@ because of the compatibility with previous versions of \LuaTeX-ja.
 図\ref{fig:kern-jfm}を参照．
 \begin{itemize}
  \item \emph{\texttt{\textbackslash jfont} や，
-NFSS2用の命令（\ref{ssub-chgfnt}節，\ref{ssub-nfsspat}節）における指定では
+NFSS2用の命令（\ref{ssec-chgfnt}節，\ref{ssec-nfsspat}節）における指定では
 カーニング情報は標準で使用する}ことになっているようである．
 言い換えれば，カーニング情報を使用しない設定にするには，面倒でも
 \begin{verbatim}
@@ -3050,8 +3093,8 @@ Furthermore, the glyph is shifted according to values of fields
 \medskip
 
 \caption{%
-%<en>The position of the real glyph.
-%<ja>「実際の」グリフの位置．
+%<en>The position of the real glyph
+%<ja>「実際の」グリフの位置
 }
 \label{fig-pos}
 \end{figure}
@@ -3357,6 +3400,7 @@ you can set both \verb+\fam+ and \verb+\jfam+ to the same value.
 %<en>\caption{Commands for Japanese math fonts}
 %<ja>\caption{和文数式フォントに対する命令}
 \label{tab-math}
+%<en>\medskip
 \centering
 \def\{{\char`\{}\def\}{\char`\}}\small
 \begin{tabular}{ll}
@@ -4250,30 +4294,19 @@ are typeset by \verb+\piyo+.
 
 %<en>\subsection{Patch for NFSS2}
 %<ja>\subsection{NFSS2へのパッチ}
-\label{ssub-nfsspat}
+\label{ssec-nfsspat}
 
 \begin{figure}[!tb]
-\begin{lstlisting}[numberstyle=\tiny, numbers=left, numbersep=1em]
+\begin{LTXexample}[pos=b]
 \DeclareKanjiFamily{JY3}{edm}{}
-\DeclareFontShape{JY3}{edm}{m}{n}    {<-> s*KozMinPr6N-Regular:jfm=ujis;-kern}{}
-\DeclareFontShape{JY3}{edm}{m}{green}{<-> s*KozMinPr6N-Regular:jfm=ujis;-kern;color=007F00}{}
-\DeclareFontShape{JY3}{edm}{m}{blue} {<-> s*KozMinPr6N-Regular:jfm=ujis;-kern;color=0000FF}{}
+\DeclareFontShape{JY3}{edm}{m}{n}    {<-> s*KozMinPr6N-Regular:jfm=ujis;}{}
+\DeclareFontShape{JY3}{edm}{m}{green}{<-> s*KozMinPr6N-Regular:jfm=ujis;color=007F00}{}
+\DeclareFontShape{JY3}{edm}{m}{blue} {<-> s*KozMinPr6N-Regular:jfm=ujis;color=0000FF}{}
 \DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{green}{"4E00-"67FF,{-2}-{-2}}
 \DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{blue}{ "6800-"9FFF}
 {\kanjifamily{edm}\selectfont
 日本国民は、正当に選挙された国会における代表者を通じて行動し、……}
-\end{lstlisting}
-\begin{quote}
-\DeclareKanjiFamily{JY3}{edm}{}
-\DeclareFontShape{JY3}{edm}{m}{n}    {<-> s*KozMinPr6N-Regular:jfm=ujis;-kern}{}
-\DeclareFontShape{JY3}{edm}{m}{green}{<-> s*KozMinPr6N-Regular:jfm=ujis;-kern;color=007F00}{}
-\DeclareFontShape{JY3}{edm}{m}{blue} {<-> s*KozMinPr6N-Regular:jfm=ujis;-kern;color=0000FF}{}
-\DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{green}{"4E00-"67FF,{-2}-{-2}}
-\DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{blue}{ "6800-"9FFF}
-
-{\kanjifamily{edm}\selectfont
-日本国民は、正当に選挙された国会における代表者を通じて行動し、……}
-\end{quote}
+\end{LTXexample}
 %<ja>\caption{\texttt{\textbackslash DeclareAlternateKanjiFont} の使用例}
 %<en>\caption{An example of \texttt{\textbackslash DeclareAlternateKanjiFont}}
 \label{fig:altkanji}
@@ -4283,13 +4316,13 @@ are typeset by \verb+\piyo+.
 Japanese patch for NFSS2 in \LuaTeX-ja
 is based on \texttt{plfonts.dtx} which plays the same role in \pLaTeXe.
 We will describe
-commands which are not described in Subsection~\ref{ssub-chgfnt}.
+commands which are not described in Subsection~\ref{ssec-chgfnt}.
 %</en>
 %<*ja>
 \LuaTeX-jaのNFSS2への日本語パッチは
 \pLaTeXe で同様の役割を果たす \texttt{plfonts.dtx} をベースに，
 和文エンコーディングの管理等をLuaで書きなおしたものである．
-ここでは\ref{ssub-chgfnt}節で述べていなかった命令について
+ここでは\ref{ssec-chgfnt}節で述べていなかった命令について
 記述しておく．
 %</ja>
 
@@ -4527,7 +4560,7 @@ In this case, the default family for font substitution is used for
 \item[DeclareAlternateKanjiFont\{<base-encoding>\}\{<base-family>\}\{<base-series>\}\{<base-shape>\}\\
   \null\hfill\{<alt-encoding>\}\{<alt-family>\}\{<alt-series>\}\{<alt-shape>\}\{<range>\}]
 %<*ja>
-\ref{ssec-altfont}節の
+\ref{ssec-altfont}節の\
 \verb+\ltjdeclarealtfont+ と同様に，前半の4引数の和文フォント（基底フォント）のうち<range>中の文字を
 第5--第8引数の和文フォントを使って組むように指示する．使用例を図\ref{fig:altkanji}に載せた．
 
@@ -4605,6 +4638,7 @@ by \verb+\input+.
 \verb+\input+ で読み込み可能である．
 %</ja>
 \subsection{\texttt{luatexja-fontspec.sty}}
+\label{ssec-fontspec2}
 %<*en>
 As described in Subsection~\ref{ssec-fontspec}, this optional package
 provides the counterparts for several commands defined in the
@@ -4651,13 +4685,56 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
 これを指定することで，PDFに埋め込まれない「名前だけ」のフォントを指定することが
 できる．\ref{ssec-psft}節を参照．
 %</ja>
+
+
+\begin{figure}[!tb]
+\begin{LTXexample}[width=0.35\textwidth]
+\jfontspec[
+  AltFontFeatures={ Color=00003F, CharacterWidth=Half }, 
+  AltFont = KozMinPr6N-Regular.otf, 
+  AltFontRange={ "3000-"30FF },
+]{KozGoPr6N-Regular.otf}
+  あいうえお医学アイウエオ医学\par
+\addjfontfeatures{ AltFontFeatures={ Color=0000FF } }     
+  あいうえお医学アイウエオ医学\par
+\addjfontfeatures{JFM=prop,CharacterWidth=Proportional }
+  あいうえお医学アイウエオ医学
+\end{LTXexample}
+%<ja>\caption{\texttt{AltFont}, \texttt{AltFontRange}, \texttt{AltFontFeatures} の使用例}
+%<en>\caption{An example of \texttt{AltFont}, \texttt{AltFontRange}~and~\texttt{AltFontFeatures}}
+\label{fig:altkanji-fontspec}
+\end{figure}
+
+\item[AltFont=<font\ name>]
+\item[AltFontFeatures=\{<features>\}]
+\item[AltFontRange=<range>]\ 
+
+%<*en>
+As \verb+\ltjdeclarealtfont+~(Subsection~\ref{ssec-altfont}) and
+\verb+\DeclareAlternateKanjiFont+~(Subsection~\ref{ssec-nfsspat}),
+these three keys make that characters in <range> of the Japanese font
+are typeset by a different font and/or using different features.
+%</en>
+%<*ja>
+\ref{ssec-altfont}節の \verb+\ltjdeclarealtfont+ や，
+\ref{ssec-nfsspat}節の \verb+\DeclareAlternateKanjiFont+ のように，
+これらのキーを用いると<range>内の文字は異なったフォントやfont featureを使って組まれる．
+\texttt{AltFont} と \texttt{AltFontFeatures} はどちらか片方指定指定してあればよい．
+
+また，図\ref{fig:altkanji-fontspec}に示すように，
+\begin{itemize}
+ \item \texttt{AltFontFeatures} の指定は\emph{累積しない}．
+ \item \texttt{AltFontFeatures} が指定されたフォントを使用中に，
+\verb+\addjfontfeatures+ で追加の属性を指定した場合は，\verb+\addjfontfeatures+ の指定が
+優先適用となる．
+\end{itemize}
+%</ja>
 \end{list}
 
 %<*ja>
 なお，\Pkg{luatexja-fontspec} 読み込み時には和文フォント定義ファイル%
 \texttt{<ja-enc><family>.fd}は全く参照されなくなる．
 %</ja>
-
 
 
 \subsection{\texttt{luatexja-otf.sty}}
@@ -5053,15 +5130,15 @@ assigned to this attribute:
 \begin{description}
 \item[\textit{italic} (1)]
 %<*en>
-Glues from an italic correction
-	   (\verb+\/+). This distinction of origins of glues
-	   (from explicit \verb+\kern+, or from \verb+\/+)
-	   is needed in the insertion process of \Param{\hyperlink{fld:xks}{xkanjiskip}}.
+Kerns from italic correction (\verb+\/+), or from kerning information of a Japanese font.
+These kerns are ``ignored'' in the insertion process of \textbf{JAglue},
+unlike explicit \verb+\kern+.
 %</en>
 %<*ja>
-イタリック補正(\verb+\/+)によるグルー．このグルーの由来の区別（\verb+\kern+ か
-\hskip\ltjgetparameter{xkanjiskip}
-\verb+\/+ か）は\Param{\hyperlink{fld:xks}{xkanjiskip}}の挿入過程において必要になる．
+イタリック補正(\verb+\/+)によるカーン，
+または \Pkg{luaotfload} によって挿入されたフォントのカーニング情報由来のカーン．
+これらのカーンは通常の \verb+\kern+ とは異なり，
+\textbf{JAglue}の挿入処理においては透過する．
 %</ja>
 
 \item[\textit{packed} (2)]
@@ -6226,6 +6303,7 @@ $a$は禁則処理用に\textit{Nq}と\textit{Np}の間に加えられるべき�
 %<en>\caption{Summary of JFM glues}
 %<ja>\caption{JFM グルーの概要}
 \label{tab-jfmglue}
+%<en>\medskip
 \begin{center}
 \small
 \begin{tabular}{c|cccccc}
@@ -6582,7 +6660,7 @@ instead of ``\verb+\ほげ+''.
 しかし，\Pkg{lltjp-listings} が実際にロードされるのは \verb+\begin{document}+\ 
 のところであるので，プリアンブル内ではこれらの追加キーは使用できない．
 
-\texttt{ivsraw}は，ブール値の値をとるキーであり，標準ではfalseである．
+\texttt{vsraw}は，ブール値の値をとるキーであり，標準ではfalseである．
 \begin{itemize}
  \item trueの場合は，異体字セレクタは「直前の文字に続けて」出力される．
 もしもIVSサポート（\ref{ssec-ltjotf}節）が有効になっていた場合は，
@@ -6614,7 +6692,9 @@ instead of ``\verb+\ほげ+''.
 }}}
 \lstset{vscmd=\IVSB}
 \end{lstlisting}
-\end{itemize} 
+\end{itemize}
+既定の出力命令を復活させたい場合は\ \verb+vsraw=\ltjlistingsvsstdcmd+\ 
+とすれば良い．
 %</ja>
 
 %<en>\subsection{Class of Characters}
@@ -6915,7 +6995,7 @@ JFM中にある文字クラス$n$の定義の
 %</ja>
 
 %<*ja>
-\section{IVS対応（未完）}
+\section{IVS対応}
 \verb+luatexja.otf.enable_ivs()+ を実行し，IVS対応を有効にした状態では，
 \verb+pre_linebreak_filter+ や \verb+hpack_filter+ コールバックには
 次の4つが順に実行される状態となっている：
@@ -6958,6 +7038,7 @@ OpenTypeフォントでもTrueTypeフォントでもIVS情報が格納されて�
 \texttt{fontloader} の呼び出しでかなり時間を消費することから，
 %%% to_table を使わなくしたことで，メモリ使用量は減った
 IVS情報をキャッシュに保存することで2回目以降の実行時間を節約している．
+
 
 \section{複数フォントの「合成」（未完）}
 
