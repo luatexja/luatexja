@@ -4,7 +4,7 @@
 
 % LaTeX only!
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-ruby}[2014/03/19 v0.2]
+\ProvidesPackage{luatexja-ruby}[2014/03/28 v0.21]
 \RequirePackage{luatexja}
 
 %%------------------
@@ -47,9 +47,9 @@
 \ltj@@rkeydef{pre}
 \ltj@@rkeydef{post}
 %% 親文字伸長の際の比，{0}{1}{1} などと0--7 の数 3 つで指定
-%% attr_ruby_stretch (head left,middle,right)(end)(middle) 27-bits 
-\ltj@@rkeydef{stretchhead} % 行頭形
-\ltj@@rkeydef{stretchend}  % 行末形
+%% attr_ruby_stretch (bol left,middle,right)(eol)(middle) 27-bits 
+\ltj@@rkeydef{stretchbol} % 行頭形
+\ltj@@rkeydef{stretcheol}  % 行末形
 \ltj@@rkeydef{stretch}     % 行中形
 %% ルビが伸長するときの比 {1}{2}{1} などと0--7 の数 3 つで指定
 %% attr_ruby_mode 上位部分
@@ -91,8 +91,8 @@
       post = \ltj@safe@dimen{\ltj@@rubyip@post#1},
       intergap =  \ltj@safe@dimen{\ltj@@rubyip@intergap\zw},
       stretch 
-        = 262144 * \expandafter\ltj@@ruby@cts\ltj@@rubyip@stretchhead
-	  + 512 * \expandafter\ltj@@ruby@cts\ltj@@rubyip@stretchend
+        = 262144 * \expandafter\ltj@@ruby@cts\ltj@@rubyip@stretchbol
+	  + 512 * \expandafter\ltj@@ruby@cts\ltj@@rubyip@stretcheol
 	  + \expandafter\ltj@@ruby@cts\ltj@@rubyip@stretch,
       mode 
         = 2097152 * \expandafter\ltj@@ruby@cts\ltj@@rubyip@stretchruby
@@ -199,7 +199,7 @@
 \setkeys[ltj]{ruby}{
   pre=-1, post=-1, mode=1, 
   stretchruby={1}{2}{1}, stretch = {1}{2}{1},
-  stretchhead={0}{1}{1}, stretchend={1}{1}{0},
+  stretchbol={0}{1}{1}, stretcheol={1}{1}{0},
   maxmargin=0.5, size=0.5, intergap=0, rubysmash=false,
   kenten=\ltjalchar`•, fontcmd=\relax
 }

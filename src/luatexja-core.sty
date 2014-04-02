@@ -458,8 +458,8 @@
 % いつも global
 \def\ltj@@getjfontnumber#1{% result in \ltj@tempcntc 
   \ltj@reset@globaldefs
-  \bgroup\ltj@curjfnt=-1\relax
-  #1\directlua{luatexja.__temp = \the\ltj@curjfnt}\egroup
+  \begingroup\ltj@curjfnt=-1\relax
+  #1\directlua{luatexja.__temp = \the\ltj@curjfnt}\endgroup
   \ltj@tempcntc=\directlua{tex.sprint(luatexja.__temp)}\relax
   \ifnum\ltj@tempcntc=-1
     \@PackageError{luatexja-core}%

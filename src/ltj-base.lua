@@ -210,11 +210,11 @@ do
         p, m = nil, t[3]
       end
       res.width = tex.sp(t[1])
-      if t[3] then
-        res.stretch, res.stretch_order = parse_dimen(t[3])
+      if p then
+        res.stretch, res.stretch_order = parse_dimen(p)
       end
-      if t[5] then
-        res.shrink, res.shrink_order = parse_dimen(t[5])
+      if m then
+        res.shrink, res.shrink_order = parse_dimen(m)
       end
     end
     return res

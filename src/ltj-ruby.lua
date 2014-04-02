@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.ruby',
-  date = '2014/03/19',
+  date = '2014/04/02',
   description = 'Ruby',
 })
 module('luatexja.ruby', package.seeall)
@@ -109,8 +109,21 @@ local function gauss(coef)
    end
 end
 
+local function solve_1(coef)
+   local a, b, c = coef[1][4], coef[2][4], coef[3][4]
+   coef[1][4], coef[2][4], coef[3][4] = c-b, a+b-c, c-a
+   return coef
+end
+
+local function solve_2(coef)
+   local a, b, c, d, e = coef[1][6], coef[2][6], coef[3][6], coef[4][6], coef[5][6]
+   coef[1][6], coef[2][6], coef[3][6], coef[4][6], coef[5][6]
+      = e-c, a+c-e, e-a-d, b+d-e, e-b
+   return coef
+end
+
+
 -- 実行回数 + ルビ中身 から uniq_id を作る関数
--- 未実装．これを使えば 2 回目以降の組版に 1 回目の情報が使える
 old_break_info = {} -- public, 前 run 時の分割情報
 local make_uniq_id
 do
@@ -445,16 +458,23 @@ local function pre_low_cal_box(w, cmp)
    Dnode.flush_list(node_next(wv))
    for i = 1, 2*cmp+1 do setfield(nt, 'next', kf[i]); nt = kf[i]  end
 
-   gauss(coef) -- 掃きだし法で連立方程式形 coef を解く
+   if cmp==1 then     solve_1(coef)
+   elseif cmp==2 then solve_2(coef)
+   else
+      gauss(coef) -- 掃きだし法で連立方程式形 coef を解く
+   end
    return coef
 end
 
-
-local function first_whatsit(n) -- n 以後で最初の whatsit
-   for h in Dnode.traverse_id(id_whatsit, n) do
-      return h
+local first_whatsit
+do
+   local traverse_id = Dnode.traverse_id
+   function first_whatsit(n) -- n 以後で最初の whatsit
+      for h in traverse_id(id_whatsit, n) do
+         return h
+      end
+      return nil
    end
-   return nil
 end
 
 -- ノード追加
@@ -498,7 +518,7 @@ local function pre_high(ahead)
    local n = first_whatsit(head)
    while n do
       if getsubtype(n) == sid_user and getfield(n, 'user_id') == RUBY_PRE then
-         local nv = getfield(n, 'value')
+        local nv = getfield(n, 'value')
          max_allow_pre = has_attr(nv, attr_ruby_maxprep) or 0
          local atr = has_attr(n, attr_ruby) or 0
          if max_allow_pre < 0 then
@@ -598,24 +618,24 @@ local function post_high_break(head)
       local ha = getlist(h)
       while ha do
 	 local hai = getid(ha)
-	 local i = (((hai == id_glue and getsubtype(ha)==0) 
-			or (hai == id_rule and getsubtype(ha)==0)
-			or (hai == id_whatsit and getsubtype(ha)==sid_user 
-			       and getfield(ha, 'user_id')==RUBY_POST))
-		       and has_attr(ha, attr_ruby)) or 0
-	 if i==1 then 
+	 local i = ((hai == id_glue and getsubtype(ha)==0) 
+                       or (hai == id_rule and getsubtype(ha)==0)
+                       or (hai == id_whatsit and getsubtype(ha)==sid_user 
+                              and getfield(ha, 'user_id', RUBY_POST)))
+            and has_attr(ha, attr_ruby) or 0
+	 if i==0 then 
+            ha = node_next(ha)
+         elseif i==1 then
 	    setfield(h, 'head', post_lown(rs, rw, cmp, getlist(h)))
 	    for i = 2, #rs do rs[i] = nil end -- rs[1] is set by the next statement
 	    rs[1], rw = ha, nil; ha = node_next(ha)
-	 elseif i>=3 then 
-	    rs[#rs+1] = ha; ha = node_next(ha)
 	 elseif i==2 then 
 	    rw = ha
 	    cmp = getfield(getfield(rw, 'value'), 'value')
 	    local hb, hc =  node_remove(getlist(h), rw)
 	    setfield(h, 'head', hb); ha = hc
-	 else
-	    ha = node_next(ha)
+	 else -- i>=3 
+	    rs[#rs+1] = ha; ha = node_next(ha)
 	 end
       end
       setfield(h, 'head', post_lown(rs, rw, cmp, getlist(h)))
@@ -630,23 +650,23 @@ local function post_high_hbox(ahead)
    local cmp
    while ha do
       local hai = getid(ha)
-      local i = (((hai == id_glue and getsubtype(ha)==0) 
-                     or (hai == id_rule and getsubtype(ha)==0)
-                     or (hai == id_whatsit and getsubtype(ha)==sid_user 
-                            and getfield(ha, 'user_id', RUBY_POST)))
-                    and has_attr(ha, attr_ruby)) or 0
-      if i==1 then 
+      local i = ((hai == id_glue and getsubtype(ha)==0) 
+                    or (hai == id_rule and getsubtype(ha)==0)
+                    or (hai == id_whatsit and getsubtype(ha)==sid_user 
+                           and getfield(ha, 'user_id', RUBY_POST)))
+         and has_attr(ha, attr_ruby) or 0
+      if i==0 then
+         ha = node_next(ha)
+      elseif i==1 then 
          head = post_lown(rs, rw, cmp, head)
          for i = 2, #rs do rs[i] = nil end -- rs[1] is set by the next statement
 	 rs[1], rw = ha, nil; ha = node_next(ha)
-      elseif i>=3 then 
-         rs[#rs+1] = ha; ha = node_next(ha)
       elseif i==2 then 
          rw = ha
 	 cmp = getfield(getfield(rw, 'value'), 'value')
 	 head, ha = node_remove(head, rw)
-      else
-         ha = node_next(ha)
+      else -- i >= 3
+         rs[#rs+1] = ha; ha = node_next(ha)
       end
    end
    return to_node(post_lown(rs, rw, cmp, head))
