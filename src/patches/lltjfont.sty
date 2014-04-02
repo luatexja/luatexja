@@ -641,7 +641,7 @@
    \directlua{luatexja.jfont.clear_alt_font_latex('\luatexluaescapestring{#1/#2/#3/#4}')}}
 
 \def\ltj@pickup@altfont@aux#1{%
-  {\edef\font@name{\csname #1/\f@size\endcsname}\pickup@jfont}%
+  \begingroup\edef\font@name{\csname #1/\f@size\endcsname}\pickup@jfont\endgroup%
 }
 \def\ltj@pickup@altfont@copy#1#2{%
   \ltj@@getjfontnumber#1%
