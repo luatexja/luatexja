@@ -2,27 +2,22 @@
 \documentclass{ltjsarticle}
 \usepackage{luatexja-fontspec,luatexja-otf}
 
-\newjfontfamily\fuga[
-  AltFontFeatures = { { Color=7F0000, CharacterWidth=Half } },
-%   AltFontFeatures = { Color=7F0000, CharacterWidth=Half }, ではいけない
-  AltFontRange = { "3000-"30FF } , 
-  AltFont = JJSYuGothicPr6N-M 
-]{JJSYuMinchoPr6N-R}
 
 \newjfontfamily\hoge[
-  AltFontFeatures = { { Color=00007F, CharacterWidth=Half }, { Color=7F0000 } },
-  AltFontRange = { { "3000-"307F }, { "3080-"30FF } }, 
-  AltFont = { ,  JJSYuGothicPr6N-M},
-  BoldFont = { JJSYuGothicPr6N-M }, 
-  BoldFeatures = { AltFont={ ,  } }, 
+  AltFont={ 
+    {Range="3000-"307F, Font=JJSYuGothicPr6N-M, Color=00007F, CharacterWidth=Half},
+    {Range="3080-"30FF, Color=7F0000},
+  },
+  BoldFont={ JJSYuGothicPr6N-M }, 
 ]{JJSYuMinchoPr6N-R}
 
 \newjfontfamily\piyo[
+  AltFont={ 
+    {Range="3000-"309F, CharacterWidth=Half},
+    {Range="30A0-"30FF, Font=JJSYuGothicPr6N-M}
+  }
 % カタカナ は JJSYuGothicPr6N-M
-% ひらがな は JJSYuMinchoPr6N-R #00007F, 半角
-  AltFontFeatures = { { Color=00007F, CharacterWidth=Half } },
-  AltFontRange = { { "3000-"309F }, { "3080-"30FF } }, 
-  AltFont = { ,  JJSYuGothicPr6N-M},
+% ひらがな は JJSYuMinchoPr6N-R 半角
 ]{JJSYuMinchoPr6N-R}
 
 \setsansjfont{KozGoPr6N-Medium}
@@ -43,20 +38,13 @@
 }
 \begin{document}
 
-\fuga\test
-
-\medskip
 \hoge\test
 
 \medskip\piyo\test
 
 \paragraph{addfontfeatures}\ \par
 \addjfontfeatures{
-  AltFontFeatures={Color=0000FF}, 
-  AltFontRange={"3040-"304F,"3080-"30FF},
-% { {"3040-"304F}, {"3080-"30FF} } の意味になるので，
-% 3040-304F: 青，
-% 3080-30FF: ゴチ（addjfontfeatures 前でそのような指定があるため）
+  AltFont={ {Range="4F00-"6FFF, Color=0000FF}, },
   Color=001F00,CJKShape=Traditional
 % AltFontFeature, AltFontRange は累積しない
 }
@@ -64,9 +52,10 @@
 
 \typeout{5号かな}
 \jfontspec[
-  AltFont={JJSYuMin5goKn-R,DejaVuSans },
-  AltFontFeatures={,{Color=0000FF,JFM=prop }},
-  AltFontRange={"3000-"30FF,{"21B3,"21B5 }}%"
+  AltFont={
+    {Font=JJSYuMin5goKn-R,Range="3000-"30FF, Color=007F00},
+    {Font=DejaVuSans, Range={"21B3,"21B5},Color=0000FF,JFM=prop  },
+  }
 ]{JJSYuMinchoPr6N-R}
 
 日本国民は、正当に選挙された国会における代表者を通じて行動し、

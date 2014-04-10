@@ -66,48 +66,33 @@
   \keys_define:nn {fontspec-preparse-external} { #1 .code:n = {#2}}
 }
 
+\cs_new:Nn \ltj_fontspec_define_altfont_option:nn {
+  \keys_define:nn {fontspec-ltjaltfont} { #1 .code:n = {#2}}
+}
+
 %% Alternate Fonts
-\bool_new:N \l_fontspec_alt_bool
-\seq_clear_new:N \ltj_fontspec_fontname_alt_seq
-\seq_clear_new:N \ltj_fontspec_fontfeat_alt_seq
-\seq_clear_new:N \ltj_fontspec_altrange_seq
-\tl_clear_new:N \ltj_fontspec_fontname_alt_tl
-\tl_clear_new:N \ltj_fontspec_fontfeat_alt_tl
-\tl_clear_new:N \ltj_fontspec_altrange_tl
+%% Spec: AltFont = {
+%%   ...
+%%   { Range = <range>, <font features> },
+%%   { Range = <range>, Font = <font name>, <font features> },
+%%   { Range = <range>, Font = <font name> },
+%%   ...
+%% }
+\tl_new:N  \ltj_fontspec_altrange_tl
+\tl_new:N  \ltj_fontspec_altfont_clist
+\tl_new:N  \ltj_fontspec_altfont_leftover_clist
 
-\cs_new:Nn \__ltj_fontspec_altfontrange_key_code:n
- {
-  \fontspec_update_fontid:n {altfrange:#1}
-  \bool_if:NF \l_fontspec_firsttime_bool
-   {
-    \seq_set_split:Nnn \ltj_fontspec_altrange_seq , {#1}
-   }
- }
-\cs_new:Nn \__ltj_fontspec_altfontfeature_key_code:n
- {
-  \fontspec_update_fontid:n {altfeat:#1}
-  \bool_if:NF \l_fontspec_firsttime_bool
-   {
-     \seq_set_split:Nnn \ltj_fontspec_fontfeat_alt_seq ,  {#1}
-   }
- }
-
-
-\cs_new:Nn \__ltj_fontspec_altfont_map:n {
-  \fontspec_complete_fontname:Nn \l_tmpb_tl {#1}
-  \seq_put_right:No \l_tmpa_seq \l_tmpb_tl 
+\ltj_fontspec_define_altfont_option:nn {Range} {
+  \tl_set:Nn \ltj_fontspec_altrange_tl {#1}
+}
+\ltj_fontspec_define_altfont_option:nn {Font} {
+  \fontspec_complete_fontname:Nn \ltj_fontspec_altname_tl {#1}
 }
 
 \cs_new:Nn \__ltj_fontspec_altfont_key_code:n
  {
-  \tl_if_empty:nF {#1}
-   {
-     \seq_set_split:Nnn \ltj_fontspec_fontname_alt_seq , {#1}
-     \seq_clear:N \l_tmpa_seq
-     \seq_map_function:NN \ltj_fontspec_fontname_alt_seq \__ltj_fontspec_altfont_map:n
-     \seq_set_eq:NN \ltj_fontspec_fontname_alt_seq \l_tmpa_seq
-     \fontspec_update_fontid:n {alt:#1}
-   }
+  \clist_set:Nn \ltj_fontspec_altfont_clist  {#1}
+  \fontspec_update_fontid:n {alt:#1}
  }
 
 \cs_new:Nn \ltj_fontspec_select:nn {
@@ -115,12 +100,6 @@
   \bool_set_false:N \ltj_fontspec_alt_bool
   \ltj_fontspec_define_option:nn {AltFont} {
     \__ltj_fontspec_altfont_key_code:n { ##1 }
-  }
-  \ltj_fontspec_define_option:nn {AltFontFeatures} {
-    \__ltj_fontspec_altfontfeature_key_code:n { ##1 }
-  }
-  \ltj_fontspec_define_option:nn {AltFontRange} {
-    \__ltj_fontspec_altfontrange_key_code:n { ##1 }
   }
   \ltj_fontspec_define_option:nn {CID} {
     \fontspec_update_fontid:n  {+cid=##1}
@@ -171,36 +150,27 @@
      { \quark_if_no_value:NF \l__fontspec_fontopts_clist {\l__fontspec_fontopts_clist,} #4 }
     \cs_set_eq:NN \DeclareFontShape \ltj_fontspec_orig_DeclareFontShape
     %%
-    \bool_if:NF {
-        \int_compare_p:nNn { \seq_count:N \ltj_fontspec_fontfeat_alt_seq } 
-	  < { \seq_count:N \ltj_fontspec_altrange_seq }
- 	  ||
-        \int_compare_p:nNn { \seq_count:N \ltj_fontspec_fontname_alt_seq } 
-	  < { \seq_count:N \ltj_fontspec_altrange_seq }
-    } {
+    \clist_if_empty:NF \ltj_fontspec_altfont_clist {
       \int_zero:N \l_tmpa_int
-      \bool_until_do:nn { \seq_if_empty_p:N \ltj_fontspec_altrange_seq  } {
-        \seq_pop:NN \ltj_fontspec_altrange_seq \ltj_fontspec_altrange_tl
-        \seq_pop:NN \ltj_fontspec_fontfeat_alt_seq \ltj_fontspec_fontfeat_alt_tl
-        \seq_pop:NN \ltj_fontspec_fontname_alt_seq \ltj_fontspec_fontname_alt_tl
+      \clist_map_inline:Nn \ltj_fontspec_altfont_clist {
+        \tl_clear:N  \ltj_fontspec_altrange_tl
+	\tl_set:Nn \ltj_fontspec_altname_tl { #1 }
+
+        \keys_set_known:nxN {fontspec-ltjaltfont} { \exp_after:wN \use:n ##1 }
+          \ltj_fontspec_altfont_leftover_clist
+
+        %\tl_if_empty:NT \ltj_fontspec_altrange_tl { ... }% 警告
         \group_begin:
-          \__fontspec_load_fontname:n { 
-	    \quark_if_no_value:NTF \ltj_fontspec_fontname_alt_tl 
-	     { #1 } {
-               \tl_if_empty:NTF \ltj_fontspec_fontname_alt_tl 
-	        {#1} \ltj_fontspec_fontname_alt_tl
-	     }
-          }
+          \__fontspec_load_fontname:n { \ltj_fontspec_altname_tl }
           \fontspec_declare_shape:nnn {#2}{#3 _ alt \int_use:N \l_tmpa_int } { 
-            \quark_if_no_value:NF \l__fontspec_fontopts_clist {\l__fontspec_fontopts_clist,} 
-            #4 , 
-            \quark_if_no_value:NF \ltj_fontspec_fontfeat_alt_tl \ltj_fontspec_fontfeat_alt_tl
-          }
-          \DeclareAlternateKanjiFont 
-            {JY3}{ \l_fontspec_family_tl }{#2}{#3}%
-            {JY3}{ \l_fontspec_family_tl }{#2}{ #3 _alt\int_use:N \l_tmpa_int }
-            { \ltj_fontspec_altrange_tl }
-        \group_end:
+              \quark_if_no_value:NF \l__fontspec_fontopts_clist {\l__fontspec_fontopts_clist,} 
+              #4 , \ltj_fontspec_altfont_leftover_clist
+            }
+	\group_end:
+        \DeclareAlternateKanjiFont 
+          {JY3}{ \l_fontspec_family_tl }{#2}{#3}%
+          {JY3}{ \l_fontspec_family_tl }{#2}{ #3 _alt\int_use:N \l_tmpa_int }
+          { \ltj_fontspec_altrange_tl }
         \int_incr:N \l_tmpa_int
       }
     }
