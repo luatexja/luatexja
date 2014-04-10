@@ -68,15 +68,19 @@
 
 %% Alternate Fonts
 \bool_new:N \l_fontspec_alt_bool
-\tl_clear:N \ltj_fontspec_fontname_alt_tl
-\tl_clear:N \ltj_fontspec_fontfeat_alt_clist
-\tl_clear:N \ltj_fontspec_altrange_clist
+\seq_clear_new:N \ltj_fontspec_fontname_alt_seq
+\seq_clear_new:N \ltj_fontspec_fontfeat_alt_seq
+\seq_clear_new:N \ltj_fontspec_altrange_seq
+\tl_clear_new:N \ltj_fontspec_fontname_alt_tl
+\tl_clear_new:N \ltj_fontspec_fontfeat_alt_tl
+\tl_clear_new:N \ltj_fontspec_altrange_tl
 
 \cs_new:Nn \__ltj_fontspec_altfontrange_key_code:n
  {
+  \fontspec_update_fontid:n {altfrange:#1}
   \bool_if:NF \l_fontspec_firsttime_bool
    {
-    \tl_set:Nn \ltj_fontspec_altrange_clist {#1}
+    \seq_set_split:Nnn \ltj_fontspec_altrange_seq , {#1}
    }
  }
 \cs_new:Nn \__ltj_fontspec_altfontfeature_key_code:n
@@ -84,18 +88,25 @@
   \fontspec_update_fontid:n {altfeat:#1}
   \bool_if:NF \l_fontspec_firsttime_bool
    {
-     \tl_if_empty:nTF {#1}
-      { \bool_set_false:N \ltj_fontspec_alt_bool }
-      { \bool_set_true:N \ltj_fontspec_alt_bool  }
-     \tl_set:Nn \ltj_fontspec_fontfeat_alt_clist {, #1}
+     \seq_set_split:Nnn \ltj_fontspec_fontfeat_alt_seq ,  {#1}
    }
  }
+
+
+\cs_new:Nn \__ltj_fontspec_altfont_map:n {
+  \fontspec_complete_fontname:Nn \l_tmpb_tl {#1}
+  \seq_put_right:No \l_tmpa_seq \l_tmpb_tl 
+}
+
 \cs_new:Nn \__ltj_fontspec_altfont_key_code:n
  {
   \tl_if_empty:nF {#1}
    {
-    \fontspec_complete_fontname:Nn \ltj_fontspec_fontname_alt_tl {#1}
-    \fontspec_update_fontid:n {alt:#1}
+     \seq_set_split:Nnn \ltj_fontspec_fontname_alt_seq , {#1}
+     \seq_clear:N \l_tmpa_seq
+     \seq_map_function:NN \ltj_fontspec_fontname_alt_seq \__ltj_fontspec_altfont_map:n
+     \seq_set_eq:NN \ltj_fontspec_fontname_alt_seq \l_tmpa_seq
+     \fontspec_update_fontid:n {alt:#1}
    }
  }
 
@@ -159,29 +170,40 @@
     \fontspec_declare_shape:nnn {#2}{#3}
      { \quark_if_no_value:NF \l__fontspec_fontopts_clist {\l__fontspec_fontopts_clist,} #4 }
     \cs_set_eq:NN \DeclareFontShape \ltj_fontspec_orig_DeclareFontShape
-    \tl_if_empty:NTF \ltj_fontspec_fontname_alt_tl
-     {
-      \bool_if:NT \ltj_fontspec_alt_bool
-       {
-         \fontspec_declare_shape:nnn {#2} { #3 _alt }
-          {
-            \quark_if_no_value:NF \l__fontspec_fontopts_clist {\l__fontspec_fontopts_clist,}
-            #4 , \ltj_fontspec_fontfeat_alt_clist
+    %%
+    \bool_if:NF {
+        \int_compare_p:nNn { \seq_count:N \ltj_fontspec_fontfeat_alt_seq } 
+	  < { \seq_count:N \ltj_fontspec_altrange_seq }
+ 	  ||
+        \int_compare_p:nNn { \seq_count:N \ltj_fontspec_fontname_alt_seq } 
+	  < { \seq_count:N \ltj_fontspec_altrange_seq }
+    } {
+      \int_zero:N \l_tmpa_int
+      \bool_until_do:nn { \seq_if_empty_p:N \ltj_fontspec_altrange_seq  } {
+        \seq_pop:NN \ltj_fontspec_altrange_seq \ltj_fontspec_altrange_tl
+        \seq_pop:NN \ltj_fontspec_fontfeat_alt_seq \ltj_fontspec_fontfeat_alt_tl
+        \seq_pop:NN \ltj_fontspec_fontname_alt_seq \ltj_fontspec_fontname_alt_tl
+        \group_begin:
+          \__fontspec_load_fontname:n { 
+	    \quark_if_no_value:NTF \ltj_fontspec_fontname_alt_tl 
+	     { #1 } {
+               \tl_if_empty:NTF \ltj_fontspec_fontname_alt_tl 
+	        {#1} \ltj_fontspec_fontname_alt_tl
+	     }
           }
-          \DeclareAlternateKanjiFont {JY3}{ \l_fontspec_family_tl }{#2}{#3}%
-            {JY3}{ \l_fontspec_family_tl }{#2}{ #3 _alt }{ \ltj_fontspec_altrange_clist }
-       }
-     }
-     {
-       \__fontspec_load_fontname:n {\ltj_fontspec_fontname_alt_tl}
-       \fontspec_declare_shape:nnn {#2} { #3 _alt }
-        {
-          \quark_if_no_value:NF \l__fontspec_fontopts_clist {\l__fontspec_fontopts_clist,}
-          #4 , \ltj_fontspec_fontfeat_alt_clist
-        }
-        \DeclareAlternateKanjiFont {JY3}{ \l_fontspec_family_tl }{#2}{#3}%
-          {JY3}{ \l_fontspec_family_tl }{#2}{ #3 _alt }{ \ltj_fontspec_altrange_clist }
-     }
+          \fontspec_declare_shape:nnn {#2}{#3 _ alt \int_use:N \l_tmpa_int } { 
+            \quark_if_no_value:NF \l__fontspec_fontopts_clist {\l__fontspec_fontopts_clist,} 
+            #4 , 
+            \quark_if_no_value:NF \ltj_fontspec_fontfeat_alt_tl \ltj_fontspec_fontfeat_alt_tl
+          }
+          \DeclareAlternateKanjiFont 
+            {JY3}{ \l_fontspec_family_tl }{#2}{#3}%
+            {JY3}{ \l_fontspec_family_tl }{#2}{ #3 _alt\int_use:N \l_tmpa_int }
+            { \ltj_fontspec_altrange_tl }
+        \group_end:
+        \int_incr:N \l_tmpa_int
+      }
+    }
   \group_end:
  }
 
@@ -320,6 +342,5 @@
           {\@input@{\f@encoding\f@family.fd}}%
 \fi
    \fi}
-
 
 \endinput

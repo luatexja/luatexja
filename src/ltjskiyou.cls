@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjskiyou}
-  [2014/02/07 ]
+  [2014/03/28 ]
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage

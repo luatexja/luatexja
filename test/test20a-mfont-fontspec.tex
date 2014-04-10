@@ -1,19 +1,35 @@
-%#!luajitlatex
+%#!lualatex test20a-mfont-fontspec.tex
 \documentclass{ltjsarticle}
 \usepackage{luatexja-fontspec,luatexja-otf}
-\setmainjfont[
-  AltFontFeatures={ Color=00003F, CharacterWidth=Half },
-  BoldFont = { KozMinPr6N-Bold.otf }, 
-  BoldFeatures = { AltFont={ KozGoPr6N-Bold.otf } }, 
-  AltFontRange = { "3000-"30FF }, 
-]{KozMinPr6N-Regular.otf}
 
-\setsansjfont{KozGoPr6N-Regular.otf}
+\newjfontfamily\fuga[
+  AltFontFeatures = { { Color=7F0000, CharacterWidth=Half } },
+%   AltFontFeatures = { Color=7F0000, CharacterWidth=Half }, ではいけない
+  AltFontRange = { "3000-"30FF } , 
+  AltFont = JJSYuGothicPr6N-M 
+]{JJSYuMinchoPr6N-R}
+
+\newjfontfamily\hoge[
+  AltFontFeatures = { { Color=00007F, CharacterWidth=Half }, { Color=7F0000 } },
+  AltFontRange = { { "3000-"307F }, { "3080-"30FF } }, 
+  AltFont = { ,  JJSYuGothicPr6N-M},
+  BoldFont = { JJSYuGothicPr6N-M }, 
+  BoldFeatures = { AltFont={ ,  } }, 
+]{JJSYuMinchoPr6N-R}
+
+\newjfontfamily\piyo[
+% カタカナ は JJSYuGothicPr6N-M
+% ひらがな は JJSYuMinchoPr6N-R #00007F, 半角
+  AltFontFeatures = { { Color=00007F, CharacterWidth=Half } },
+  AltFontRange = { { "3000-"309F }, { "3080-"30FF } }, 
+  AltFont = { ,  JJSYuGothicPr6N-M},
+]{JJSYuMinchoPr6N-R}
+
+\setsansjfont{KozGoPr6N-Medium}
 
 \long\def\test{%
   あいうえお医学アイウエオ医学
-  \textbf{あいうえお医学アイウエオ医学}
-  \textgt{あいうえお医学アイウエオ医学}\par
+  \textbf{あいうえお医学アイウエオ医学}\par
 %
   日本国民は、正当に選挙された国会における代表者を通じて行動し、
   われらとわれらの子孫のために、諸国民との協和による成果と、
@@ -27,14 +43,34 @@
 }
 \begin{document}
 
-\test
+\fuga\test
+
+\medskip
+\hoge\test
+
+\medskip\piyo\test
 
 \paragraph{addfontfeatures}\ \par
 \addjfontfeatures{
-  AltFontFeatures={ Color=0000FF }, AltFontRange= { "3040-"304F },
-  Color=001F00, CJKShape=Traditional
-}
+  AltFontFeatures={Color=0000FF}, 
+  AltFontRange={"3040-"304F,"3080-"30FF},
+% { {"3040-"304F}, {"3080-"30FF} } の意味になるので，
+% 3040-304F: 青，
+% 3080-30FF: ゴチ（addjfontfeatures 前でそのような指定があるため）
+  Color=001F00,CJKShape=Traditional
 % AltFontFeature, AltFontRange は累積しない
+}
 \test
 
+\typeout{5号かな}
+\jfontspec[
+  AltFont={JJSYuMin5goKn-R,DejaVuSans },
+  AltFontFeatures={,{Color=0000FF,JFM=prop }},
+  AltFontRange={"3000-"30FF,{"21B3,"21B5 }}%"
+]{JJSYuMinchoPr6N-R}
+
+日本国民は、正当に選挙された国会における代表者を通じて行動し、
+（\ltjjachar"21B3）
+（\ltjjachar"21B4）
+（\ltjjachar"21B5）
 \end{document}
