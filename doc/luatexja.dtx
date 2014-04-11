@@ -180,6 +180,7 @@
 
 \catcode`\<=13
 \def<#1>{{\normalfont\rm\itshape$\langle$#1\/$\rangle$}}
+\let\LARG=<
 \maketitle
 
 \tableofcontents
@@ -4688,46 +4689,55 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
 
 
 \begin{figure}[!tb]
-\begin{LTXexample}[width=0.35\textwidth]
+\begin{LTXexample}[pos=b]
 \jfontspec[
-  AltFontFeatures={ Color=00003F, CharacterWidth=Half }, 
-  AltFont = KozMinPr6N-Regular.otf, 
-  AltFontRange={ "3000-"30FF },
-]{KozGoPr6N-Regular.otf}
-  あいうえお医学アイウエオ医学\par
-\addjfontfeatures{ AltFontFeatures={ Color=0000FF } }     
-  あいうえお医学アイウエオ医学\par
-\addjfontfeatures{JFM=prop,CharacterWidth=Proportional }
-  あいうえお医学アイウエオ医学
+  AltFont={
+    {Range="4E00-"67FF, Color=007F00},
+    {Range="6800-"9EFF, Color=0000FF},
+    {Range="3040-"306F, Font=KozGoPr6N-Regular},
+  }
+]{KozMinPr6N-Regular}
+日本国民は、正当に選挙された国会における代表者を通じて行動し、われらとわれらの子孫のために、
+諸国民との協和による成果と、わが国全土にわたつて自由のもたらす恵沢を確保し、……
 \end{LTXexample}
-%<ja>\caption{\texttt{AltFont}, \texttt{AltFontRange}, \texttt{AltFontFeatures} の使用例}
-%<en>\caption{An example of \texttt{AltFont}, \texttt{AltFontRange}~and~\texttt{AltFontFeatures}}
+%<ja>\caption{\texttt{AltFont} の使用例}
+%<en>\caption{An example of \texttt{AltFont}}
 \label{fig:altkanji-fontspec}
 \end{figure}
 
-\item[AltFont=<font\ name>]
-\item[AltFontFeatures=\{<features>\}]
-\item[AltFontRange=<range>]\ 
+\item[AltFont]\ 
 
 %<*en>
 As \verb+\ltjdeclarealtfont+~(Subsection~\ref{ssec-altfont}) and
 \verb+\DeclareAlternateKanjiFont+~(Subsection~\ref{ssec-nfsspat}),
-these three keys make that characters in <range> of the Japanese font
-are typeset by a different font and/or using different features.
+with this key, one can typeset some Japanese characters 
+by a different font and/or using different features.
+The \texttt{AltFont} feature takes a comma-separated list of comma-separated lists,
+as the following:
 %</en>
 %<*ja>
 \ref{ssec-altfont}節の \verb+\ltjdeclarealtfont+ や，
-\ref{ssec-nfsspat}節の \verb+\DeclareAlternateKanjiFont+ のように，
-これらのキーを用いると<range>内の文字は異なったフォントやfont featureを使って組まれる．
-\texttt{AltFont} と \texttt{AltFontFeatures} はどちらか片方指定指定してあればよい．
-
-また，図\ref{fig:altkanji-fontspec}に示すように，
-\begin{itemize}
- \item \texttt{AltFontFeatures} の指定は\emph{累積しない}．
- \item \texttt{AltFontFeatures} が指定されたフォントを使用中に，
-\verb+\addjfontfeatures+ で追加の属性を指定した場合は，\verb+\addjfontfeatures+ の指定が
-優先適用となる．
-\end{itemize}
+\ref{ssec-nfsspat}節の \verb+\DeclareAlternateKanjiFont+ と同様に，
+このキーを用いると一部の文字を異なったフォントやfont featureを使って組むことができる．
+\texttt{AltFont} に指定する値は，次のように二重のコンマ区切りリストである：
+%</ja>
+\begin{lstlisting}[escapechar=\#]
+AltFont = {
+  ...
+  { Range=#\LARG range>#, #\LARG features>#},
+  { Range=#\LARG range>#, Font=#\LARG font~name>#, #\LARG features># },
+  { Range=#\LARG range>#, Font=#\LARG font~name># },
+  ...
+}
+\end{lstlisting}
+%<*en>
+Each sublist should have the \texttt{Range} key. 
+A demonstrartion is shown in Figure~\ref{fig:altkanji-fontspec}.
+%</en>
+%<*ja>
+各部分リストには \texttt{Range} キーが必須である．\texttt{Font} キーとその他font featuresの
+指定は任意であるが，両者とも指定しないのは無駄に時間とメモリを消費するだけである．
+指定例は図\ref{fig:altkanji-fontspec}に示した．
 %</ja>
 \end{list}
 
@@ -6629,7 +6639,7 @@ Consider the following input:
 例えば次のような入力を考えよう：
 %</ja>
 \begin{verbatim*}
-\begin{lstlisting}[escapechar=`\#]
+\begin{lstlisting}[escapechar=\#]
 #\ほげ xぴよ#
 \end{lstlisting}
 \end{verbatim*}
