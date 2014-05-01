@@ -47,7 +47,7 @@
 %</ja>
 
 \usepackage{amsmath,array,tikz,pict2e,multienum,float}
-\usepackage{booktabs,multicol}
+\usepackage{booktabs,multicol,luatexja-ruby}
 
 %%%%%%%% listings
 
@@ -4731,12 +4731,13 @@ AltFont = {
 }
 \end{lstlisting}
 %<*en>
-Each sublist should have the \texttt{Range} key. 
+Each sublist should have the \texttt{Range} key
+(sublist which does not contain \texttt{Range} key is simply ignored).
 A demonstrartion is shown in Figure~\ref{fig:altkanji-fontspec}.
 %</en>
 %<*ja>
-各部分リストには \texttt{Range} キーが必須である．\texttt{Font} キーとその他font featuresの
-指定は任意であるが，両者とも指定しないのは無駄に時間とメモリを消費するだけである．
+各部分リストには \texttt{Range} キーが必須である（含まれない部分リストは
+単純に無視される）．
 指定例は図\ref{fig:altkanji-fontspec}に示した．
 %</ja>
 \end{list}
@@ -4991,15 +4992,113 @@ for making the difference obvious.
 \item[\textsf{adjust}\,=<bool>] \verb+\ltjsetparameter+ で指定可能な追加パラメータであり，
 <bool>が\textit{true}なら \verb+\ltjenableadjust+ を，
 そうでなければ \verb+\ltjdisableadjust+ を実行する．
-
-
 \end{list}
-
-
-
-
-
 %</ja>
+
+\subsection{\texttt{luatexja-ruby.sty}}
+%<*en>
+This addon package provides functionality of ``ruby'' (\emph{furigana}) annotations 
+using callbacks of \LuaTeX-ja. 
+There is no detailed manual of \Pkg{luatexja-ruby.sty} in English.
+(Japanese manual is another PDF file, \url{luatexja-ruby.pdf}.) 
+%</en>
+%<*ja>
+この追加パッケージは，\LuaTeX-jaの機能を利用したルビ（振り仮名）の組版機能を提供する．
+前後の文字種に応じた前後への自動進入や，
+行頭形・行中形・行末形の自動的な使い分けが特徴である．
+
+ルビ組版に設定可能な項目や注意事項が多いため，本追加パッケージの詳細な説明は
+使用例と共に \url{luatexja-ruby.pdf}\ という別ファイルに載せている．
+この節では簡単な使用方法のみ述べる．
+%</ja>
+
+\begin{description}
+%<*en>
+ \item[Group-ruby]
+By default, ruby characters (the second argument of \verb+\ruby+)
+are attached to base characters (the first argument), as one object.
+This type of ruby is called \emph{group-ruby}.
+%</en>
+%<*ja>
+ \item[グループルビ] 標準ではグループルビの形で組まれる．第1引数に親文字，
+第2引数にルビを記述する．
+%</ja>
+\begin{LTXexample}[width=0.3\textwidth]
+東西線\ruby{妙典}{みようでん}駅は……\\
+東西線の\ruby{妙典}{みようでん}駅は……\\
+東西線の\ruby{妙典}{みようでん}という駅……\\
+東西線\ruby{葛西}{かさい}駅は……
+\end{LTXexample}
+%<*en> 
+As the above example, ruby hangover is allowed on the Hiragana before/after 
+its base characters.
+%</en>
+%<ja> この例のように，標準では前後の平仮名にルビ全角までかかるようになっている．
+
+%<*en>
+\item[Mono-ruby]
+To attach ruby characters to each base characters (\emph{mono-ruby}),
+one should use \verb+\ruby+ multiple times:
+%</en>
+%<*ja>
+ \item[モノルビ] 親文字を1文字にするとモノルビとなる．
+2文字以上の熟語をモノルビの形で組みたい場合は，面倒でも
+その数だけ \verb+\ruby+ を書く必要がある．
+%</ja>
+\begin{LTXexample}[width=0.3\textwidth]
+東西線の\ruby{妙}{みよう}\ruby{典}{でん}駅は……
+\end{LTXexample}
+
+%<*en>
+ \item[Jukugo-ruby]
+Vertical bar~\verb+|+ denotes a boundary of \emph{groups}.
+%</en>
+%<*ja>
+ \item[熟語ルビ] 引数内の縦棒 \verb+|+ はグループの区切りを表し，
+複数グループのルビは熟語ルビとして組まれる．
+\cite{x4051}にあるように，
+どのグループでも「親文字」が対応するルビ以上の長さの場合は
+各グループごとに，そうでないときは全体をまとめて1つのグループルビとして組まれる．
+\cite{jlreq}で規定されている組み方とは異なるので注意．
+%</ja>
+\begin{LTXexample}
+\ruby{妙|典}{みよう|でん}\
+\ruby{葛|西}{か|さい}\
+\ruby{神楽|坂}{かぐら|ざか}
+\end{LTXexample}
+%<*en>
+If there are multiple groups in one \verb+\ruby+ call,
+A linebreak between two groups is allowed.
+%</en>
+%<ja> 複数ルビではグループとグループの間で改行が可能である．
+\begin{LTXexample}[width=0.3\textwidth]
+\vbox{\hsize=6\zw\noindent
+  \hbox to 2.5\zw{}\ruby{京|急|蒲|田}{けい|きゆう|かま|た}
+  \hbox to 2.5\zw{}\ruby{京|急|蒲|田}{けい|きゆう|かま|た}
+  \hbox to   3\zw{}\ruby{京|急|蒲|田}{けい|きゆう|かま|た}
+}
+\end{LTXexample}
+\end{description}
+
+%<*en>
+If the width of ruby characters are longer than that of base characters,
+\verb+\ruby+ automatically selects the appropriate form
+among the line-head form, the line-middle form, and the line-end form.
+%</en>
+%<*ja>
+また，ルビ文字のほうが親文字よりも長い場合は，自動的に
+行頭形・行中形・行末形のいずれか適切なものを選択する．
+%</ja>
+\begin{LTXexample}[width=0.3\textwidth]
+\vbox{\hsize=8\zw\noindent
+\null\kern3\zw ……を\ruby{承}{うけたまわ}る
+     \kern1\zw ……を\ruby{承}{うけたまわ}る\\
+\null\kern5\zw ……を\ruby{承}{うけたまわ}る
+}
+\end{LTXexample}
+
+
+
 
 
 
