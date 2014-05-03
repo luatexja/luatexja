@@ -2,19 +2,13 @@
 %%% a test of ruby.
 \documentclass[a4paper,10pt]{ltjsarticle}
 \usepackage{luatexja-otf,amsmath}
-
+\usepackage[match]{luatexja-fontspec}
 \usepackage[kozuka-pr6n]{luatexja-preset}\normalsize
 \def\emph#1{\textbf{\textgt{#1}}}
 \def\headfont{\normalfont\bfseries\gtfamily}
-\makeatletter
-\DeclareRobustCommand\ttfamily
-        {\not@math@alphabet\ttfamily\mathtt
-         \romanfamily\ttdefault\ttjfam\selectfont}
-\makeatother
-\newjfontfamily\ttjfam{KozGoPr6N-Regular.otf}
+\setmonojfont{KozGoPr6N-Regular.otf}
 
 \usepackage[textwidth=45\zw, lines=45, footskip=6mm]{geometry}
-\usepackage{luatexja-adjust}%\ltjdisableadjust
 \advance\leftmargini-1\zw\advance\leftmarginii-1\zw
 
 
@@ -23,6 +17,7 @@
   preset=\normalsize, basicstyle=\small\ttfamily, basewidth=0.5em,
   explpreset={numberstyle=\tiny, numbers=left, numbersep=1em, columns=fixed},
 }
+\makeatletter\let\SX@Info=\relax\makeatother
 \fboxsep=0mm
 
 \usepackage{hyperref,bookmark,xcolor}
@@ -33,11 +28,6 @@
 	allcolors=blue,
 	pdftitle={luatexja-ruby.sty}
 }
-
-
-\def\kata{\ltjsetruby{kata}} 
-\def\notalign{\setkeys[ltj]{ruby}{stretchhead = {1}{2}{1}, stretchend = {1}{2}{1}}}
-% 行頭・行末で揃えない
 
 \def\Node#1#2{\,\vcenter{\hbox{\fboxsep=1pt\fbox{\vbox{\small\halign{\hfil##\hfil\cr
   #1\mathstrut\cr\noalign{\hrule height.4pt}\strut#2\cr}}}}\,}}
@@ -171,9 +161,9 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 \item[後突出禁止] \verb+{1}{1}{0}+
 \end{description}
 
-\item[stretchhead=\{<left>\}\{<middle>\}\{<right>\}] 行頭形〜．
+\item[stretchbol=\{<left>\}\{<middle>\}\{<right>\}] 行頭形〜．
 既定値は\ \verb+{0}{1}{1}+ である．
-\item[stretchend=\{<left>\}\{<middle>\}\{<right>\}] 行末形〜．
+\item[stretcheol=\{<left>\}\{<middle>\}\{<right>\}] 行末形〜．
 既定値は\ \verb+{1}{1}{0}+ である．
 
 \item[maxmargin=<real>] 親文字の方がルビより長い時に，ルビの先頭と親文字の先頭，及び
@@ -198,9 +188,18 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 
 \item[kenten=<command>]各文字につく圏点の出力命令を指定する．既定値は「\verb+\ltjalchar`•+」
 であり，\texttt{U+2022} (Bullet)を\textbf{ALchar}として出力することを指定している．
+
 \item[fontcmd=<command>]ルビ用のフォント切り替え命令を指定する．
 このキーの内容が実行された後に\ \verb+\fontsize...\selectfont+\ が実行されるので，
 このキーの指定では最後に\ \verb+\selectfont+ を加える必要はない．
+
+この \texttt{fontcmd} キーの内容は多くの回数実行される．
+例えば，\texttt{luatexja-fontspec}パッケージを用いてOpenTypeフォントを用いる場合，
+\begin{lstlisting}
+ fontcmd=\addjfontfeatures{Style=Ruby}
+\end{lstlisting}
+のようにしてルビ用字形を用いることが可能だが，現在の実装ではタイプセットに時間がかかるようになる．
+
 
 \end{description}
 
@@ -226,7 +225,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \begin{verbatim}
   pre=-1, post=-1, mode=1, 
   stretchruby={1}{2}{1}, stretch = {1}{2}{1},
-  stretchhead={0}{1}{1}, stretchend={1}{1}{0},
+  stretchbol={0}{1}{1}, stretcheol={1}{1}{0},
   maxmargin=0.5, size=0.5, intergap=0, rubysmash=false,
   kenten=\ltjalchar`•, fontcmd=\relax
 \end{verbatim}
@@ -629,7 +628,7 @@ $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_3$を行B�
   は\ruby{俄}{にわか}に
   \quad \ruby{休|憩|中}{きゆう|けい|ちゆう}かつ\ruby{視|聴|中}{し|ちよう|ちゆう}}
 \item[標準] \sample
-\item[肩つき] {\kata\sample}
+\item[肩つき] {\ltjsetruby{kata}\sample}
 \end{description}
 
 \newpage
@@ -712,7 +711,7 @@ $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_3$を行B�
      \ruby[maxmargin=0.75]{なげきの聖母像}{ピエタ}% ルビ全角1.5倍まで
 % ルビが長い場合
 3.71 \ruby{顧客}{クライアント}\quad \ruby{境界面}{インターフエース}
-3.72 {\ltjsetruby{stretch=010, stretchhead=010, stretchend=010}% はみ出さない流儀
+3.72 {\ltjsetruby{stretch=010, stretchbol=010, stretcheol=010}% はみ出さない流儀
      \ruby{顧客}{クライアント}\quad \ruby{境界面}{インターフエース}}
 \end{LTXexample} 
 
@@ -734,7 +733,7 @@ $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_3$を行B�
 % モノルビ配置．望ましくない
 3.76× の\ruby{流}{りゆう}\ruby{儀}{ぎ}を\quad の\ruby{無}{む}\ruby{常}{じよう}を\quad%
 
-要調整 3.77\ {\ltjsetruby{stretchhead=121, stretchend=121}% 行頭・行末揃えず
+要調整 3.77\ {\ltjsetruby{stretchbol=121, stretcheol=121}% 行頭・行末揃えず
      \hbox{\vrule\vbox{\hsize=10\zw ああああああああの%
         \ruby{流|儀}{りゆう|ぎ}がある．}\vrule}\textbf{←なぜ改行できない}\quad%
      \hbox{\vrule\vbox{\hsize=5\zw ……等の\ruby{無|常}{む|じよう}を}\vrule}}
@@ -784,7 +783,7 @@ $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_3$を行B�
 \end{LTXexample}
 \begin{LTXexample}[pos=t]
 \obeylines
-3.85\ {\ltjsetruby{stretchhead=121, stretchend=121}% 行頭・行末揃えず
+3.85\ {\ltjsetruby{stretchbol=121, stretcheol=121}% 行頭・行末揃えず
 \hbox{\vrule\vbox{\hsize=15\zw
 　\hskip9.5\zw……の\ruby{徑}{こみち}を……%
 \hskip9\zw……の\ruby{徑}{こみち}を……}\vrule}}
