@@ -1,0 +1,83 @@
+%#!luatex
+
+\input luatexja.sty
+%\input lua-visual-debug.sty
+
+\catcode`\@=11
+\newdimen\@tempdima
+\newbox\@tempboxa
+\newdimen\fboxrule
+\newdimen\fboxsep
+\fboxrule=0.4pt\fboxsep=0pt
+\long\def\fbox#1{%
+  \leavevmode
+  \setbox\@tempboxa\hbox{\kern\fboxsep{#1}\kern\fboxsep}%
+  \@frameb@x\relax}
+\def\@frameb@x#1{%
+  \@tempdima\fboxrule
+  \advance\@tempdima\fboxsep
+  \advance\@tempdima\dp\@tempboxa
+  \hbox{%
+    \lower\@tempdima\hbox{%
+      \vbox{%
+        \hrule height\fboxrule
+        \hbox{%
+          \vrule width\fboxrule
+          #1%
+          \vbox{%
+            \vskip\fboxsep
+            \box\@tempboxa
+            \vskip\fboxsep}%
+          #1%
+          \vrule width\fboxrule}%
+        \hrule height\fboxrule}%
+                          }%
+        }%
+}
+
+\hbox{\yoko
+横水平Hxy\hbox{\yoko 横水平Hxy}かき◆
+\hbox{\tate 縦水平Hxy}◆おおおお
+\vbox{\yoko\hsize=30mm 横垂直Hxyああああああああああ}かき◆
+\vbox{\tate\hsize=30mm  縦垂直Hxy\hfill ああ\break ああああああああ}◆ああああ
+}
+\vfill\eject
+\hbox{\tate
+縦水平Hxy\hbox{\yoko 横水平Hxy}かき◆
+\hbox{\tate 縦水平Hxy}◆おおおお
+\vbox{\yoko\hsize=30mm 横垂直Hxyああああああああああ}かき◆
+\vbox{\tate\hsize=30mm  縦垂直Hxy\hfill ああ\break ああああああああ}◆ああああ
+}
+
+\vfill\eject
+
+
+\setbox0=\vbox{\yoko\hsize=100mm
+横垂直Hxy\hbox{\yoko 横水平Hxy}かき◆
+これは，意味のないサンプルテキストです．
+\hbox{\tate 縦水平Hxy}◆おおおお
+これは，意味のないサンプルテキストです．
+\vbox{\yoko\hsize=50mm 横垂直Hxyあああああああああああああああああああ}かき◆
+これは，意味のないサンプルテキストです．
+\vbox{\tate\hsize=50mm 縦垂直Hxyあああああああああああああああああああ}◆ああああ
+これは，意味のないサンプルテキスト\hbox{\tate 縦水平Hxy}◆おおおおです．
+}
+\copy0
+%{\showboxbreadth10000\showboxdepth10000
+%\showbox0}
+
+\vfill\eject
+\vbox{\tate\hsize=100mm
+縦垂直Hxy\hbox{\yoko 横水平Hxy}かき◆
+これは，意味のないサンプルテキストです．
+\hbox{\tate 縦水平Hxy}◆おおおお
+これは，意味のないサンプルテキストです．
+\vbox{\yoko\hsize=50mm 横垂直Hxyあああああああああああああああああああ}かき◆
+これは，意味のないサンプルテキストです．
+\vbox{\tate\hsize=50mm  縦垂直Hxyあああああああああああああああああああ}◆ああああ
+これは，意味のないサンプルテキスト\hbox{\tate 縦水平Hxy}◆おおおお
+です．
+}
+
+\end
+

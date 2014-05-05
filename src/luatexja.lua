@@ -48,6 +48,7 @@ stack_table_index.RIPOST = 0xC00000 -- characterごと，ruby post
 stack_table_index.JWP  = 0 -- これだけ
 stack_table_index.KSK  = 1 -- これだけ
 stack_table_index.XSK  = 2 -- これだけ
+stack_table_index.DIR  = 3 -- これだけ
 stack_table_index.MJT  = 0x100 -- 0--255
 stack_table_index.MJS  = 0x200 -- 0--255
 stack_table_index.MJSS = 0x300 -- 0--255
@@ -58,6 +59,7 @@ luatexja.userid_table = userid_table
 userid_table.IHB  = luatexbase.newuserwhatsitid('inhibitglue',  'luatexja') -- \inhibitglue
 userid_table.STCK = luatexbase.newuserwhatsitid('stack_marker', 'luatexja') -- スタック管理
 userid_table.BPAR = luatexbase.newuserwhatsitid('begin_par',    'luatexja') -- 「段落始め」
+userid_table.DIR  = luatexbase.newuserwhatsitid('direction',    'luatexja') -- 組方向
 
 ------------------------------------------------------------------------
 -- FIX node.remove
@@ -111,12 +113,14 @@ load_module('jfmglue');   local ltjj = luatexja.jfmglue
 load_module('setwidth');  local ltjw = luatexja.setwidth
 load_module('math');      local ltjm = luatexja.math
 load_module('tangle');    local ltjb = luatexja.base
+load_module('direction'); local ltjd = luatexja.direction
 
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_uniqid = luatexbase.attributes['ltj@uniqid']
+local attr_dir = luatexbase.attributes['ltj@dir']
 local cat_lp = luatexbase.catcodetables['latex-package']
 
 -- Three aux. functions, bollowed from tex.web
@@ -360,6 +364,7 @@ local function debug_show_node_X(p,print_fn)
    local pt=node_type(p.id)
    local base = debug_depth .. string.format('%X', get_attr_icflag(p))
    .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
+      .. ' dir=' .. tostring(has_attr(p, attr_dir)) .. ' '
    if pt == 'glyph' then
       s = base .. ' ' .. utf.char(p.char) .. ' '  .. tostring(p.font)
          .. ' (' .. print_scaled(p.height) .. '+' 
@@ -425,7 +430,7 @@ local function debug_show_node_X(p,print_fn)
       end
       print_fn(s)
    elseif pt == 'whatsit' then
-      s = base .. ' subtype: ' ..  tostring(p.subtype)
+      s = base
       if p.subtype==sid_user then
          if p.type ~= 110 then 
             s = s .. ' user_id: ' .. p.user_id .. ' ' .. p.value

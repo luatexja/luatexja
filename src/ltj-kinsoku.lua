@@ -1,5 +1,20 @@
 return {
  [0]=500,
+ {
+  ["shrink"]=26214,
+  ["shrink_order"]=0,
+  ["stretch"]=26214,
+  ["stretch_order"]=0,
+  ["width"]=0,
+ },
+ {
+  ["shrink"]=65536,
+  ["shrink_order"]=0,
+  ["stretch"]=65536,
+  ["stretch_order"]=0,
+  ["width"]=157649,
+ },
+ 4,
  [1024]=12295,
  [1025]=19968,
  [1026]=20108,

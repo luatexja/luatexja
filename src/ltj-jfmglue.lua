@@ -11,6 +11,7 @@ local err, warn, info, log = luatexbase .errwarinf(_NAME)
 
 luatexja.load_module('stack');     local ltjs = luatexja.stack
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
+luatexja.load_module('direction'); local ltjd = luatexja.direction
 local pairs = pairs
 
 local Dnode = node.direct or node
@@ -80,6 +81,7 @@ local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 local kanji_skip
 local xkanji_skip
 local table_current_stack
+local list_dir
 
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
@@ -300,15 +302,18 @@ local calc_np_auxtable = {
       return true, check_next_ickern(node_next(lp)); 
    end,
    [id_hlist] = function(lp) 
-      Np.first = Np.first or lp; Np.last = lp; Np.nuc = lp; 
-      set_attr(lp, attr_icflag, PROCESSED)
-      Np.id = (getfield(lp, 'shift')~=0) and id_box_like or id_hlist
-      return true, node_next(lp)
+      local op, flag
+      head, lp, op, flag = ltjd.make_dir_node(head, lp, list_dir)
+      Np.first = Np.first or op; Np.last = op; Np.nuc = op; 
+      Np.id = (flag or getfield(op, 'shift')~=0) and id_box_like or id_hlist
+      return true, lp
    end,
    box_like = function(lp)
-      Np.first = Np.first or lp; Np.nuc = lp; Np.last = lp;
-      Np.id = id_box_like; set_attr(lp, attr_icflag, PROCESSED)
-      return true, node_next(lp);
+      local op
+      head, lp, op = ltjd.make_dir_node(head, lp, list_dir)
+      Np.first = Np.first or op; Np.last = op; Np.nuc = op; 
+      Np.id = id_box_like;
+      return true, lp
    end,
    skip = function(lp) 
       set_attr(lp, attr_icflag, PROCESSED)
@@ -908,11 +913,13 @@ do
    local XKANJI_SKIP   = luatexja.icflag_table.XKANJI_SKIP
    local KSK  = luatexja.stack_table_index.KSK
    local XSK  = luatexja.stack_table_index.XSK
+   local DIR  = luatexja.stack_table_index.DIR
    init_var = function (mode)
       -- 1073741823: max_dimen
       Bp, widow_Bp, widow_Np = {}, {}, {first = nil}
       table_current_stack = ltjs.table_current_stack
-      
+
+      list_dir = table_current_stack[DIR]
       kanji_skip = node_new(id_glue)
       setfield(kanji_skip, 'spec', skip_table_to_spec(KSK))
       set_attr(kanji_skip, attr_icflag, KANJI_SKIP)
