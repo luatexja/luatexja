@@ -104,6 +104,21 @@ end
 local load_module = luatexja.load_module
 load_module('base');      local ltjb = luatexja.base
 load_module('rmlgbm');    local ltjr = luatexja.rmlgbm -- must be 1st
+
+-- define_font
+do
+   local otfl_fdr = fonts.definers.read
+   local ltjr_font_callback = ltjr.font_callback
+   function luatexja.font_callback(name, size, id)
+      local res =  ltjr_font_callback(name, size, id, otfl_fdr) 
+      luatexbase.call_callback('luatexja.define_font', res, name, size, id)
+      return res
+   end
+   luatexbase.create_callback('luatexja.define_font', 'simple', function (n) return n end)
+   luatexbase.add_to_callback('define_font',luatexja.font_callback,"luatexja.font_callback", 1)
+end
+
+
 load_module('charrange'); local ltjc = luatexja.charrange
 load_module('jfont');     local ltjf = luatexja.jfont
 load_module('inputbuf');  local ltji = luatexja.inputbuf
@@ -315,22 +330,6 @@ do
    luatexbase.add_to_callback('hpack_filter', adjust_icflag, 'adjust_icflag', 1)
 
 end
-
--- define_font
-do
-   local otfl_fdr = fonts.definers.read
-   local ltjr_font_callback = ltjr.font_callback
-   function luatexja.font_callback(name, size, id)
-      return ltjf.font_callback(
-	 name, size, id, 
-	 function (name, size, id) return ltjr_font_callback(name, size, id, otfl_fdr) end
-      )
-   end
-   luatexbase.add_to_callback('define_font',luatexja.font_callback,"luatexja.font_callback", 1)
-end
-
-
-
 
 -- debug
 

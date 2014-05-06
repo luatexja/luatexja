@@ -161,12 +161,10 @@ do
 	     setfield(b, 'head', node_next(bh))
 	    set_attr(b, attr_icflag, PROCESSED)
 	     node_free(bh)
-	     print('FROM WHATSit')
       else
-	 old_dir = has_attr(b, attr_dir)
-	 if old_dir==0 then old_dir =4 end
+	 old_dir = has_attr(b, attr_dir) or dir_yoko
+	 if old_dir==0 then old_dir =dir_yoko end
       end
-      print(old_dir, new_dir)
       if old_dir==new_dir  then 
 	 set_attr(b, attr_icflag, PROCESSED)
 	 return head, node_next(b), b, false
@@ -229,7 +227,7 @@ do
    end
    local function process_dir_node(head)
       local h = to_direct(head)
-      local x, new_dir = h, ltjs.table_current_stack[DIR]
+      local x, new_dir = h, ltjs.table_current_stack[DIR] or dir_yoko 
       while x do
 	 local xid = getid(x)
 	 if (xid==id_hlist and has_attr(x, attr_icflag)~=PACKED) or xid==id_vlist then
@@ -243,4 +241,61 @@ do
    luatexja.direction.make_dir_node = make_dir_node
    luatexbase.add_to_callback('vpack_filter', 
 			      process_dir_node, 'ltj.dir_node', 10001)
+end
+
+local font_vert_table = {} -- key: fontnumber
+do
+   local font_vert_basename = {} -- key: basename
+
+   local function add_feature_table(tname, src, dest)
+      for i,v in pairs(src) do
+	 if type(v.slookups)=='table' then
+	    local s = v.slookups[tname]
+	    if s and not dest[i] then
+	       dest[i] = s
+	    end
+	 end
+      end
+   end
+
+   local function prepare_vert_data(n, id)
+      -- test if already loaded
+      if type(id)=='number' then -- sometimes id is an integer
+         font_vert_table[n] = font_vert_table[id]; return
+      elseif not id then return
+      end
+
+      local fname = id.filename
+      local bname = file.basename(fname)
+      if not fname then 
+         font_vert_table[n] = {}; return
+      elseif font_vert_basename[bname] then 
+         font_vert_table[n] = font_vert_basename[bname]; return
+      end
+
+      local vtable = {}
+      local a = id.resources.sequences
+      if a then
+	 local s = id.shared.rawdata.descriptions
+	 for i,v in pairs(a) do
+	    if v.features.vert or v.features.vrt2 then 
+	       add_feature_table(v.subtables[1], s, vtable)
+	    end
+	 end
+      end
+      font_vert_basename[bname] = vtable
+      font_vert_table[n] = vtable
+   end
+   
+   function luatexja.direction.get_vert_glyph(n, chr)
+      local fn = font_vert_table[n]
+      return (fn and fn[chr]) or chr
+   end
+
+   luatexbase.add_to_callback('luatexja.define_font',
+			      function (res, name, size, id)
+				 prepare_vert_data(id, res)
+			      end,
+			      'prepare_vert_data', 1)
+   
 end

@@ -111,8 +111,11 @@ do
       local k = {
          cidinfo = { ordering=cid_order, registry=cid_reg, supplement=kx[3] },
          encodingbytes = 2, extend=1000, format = 'opentype',
-         direction = 0, characters = {}, parameters = {}, embedding = "no", cache = "yes", 
-         ascender = 0, descender = 0, factor = 0, hfactor = 0, vfactor = 0,
+         direction = 0, characters = {}, parameters = {
+	    ascender = 655360*0.88,
+	    descender = 655360*0.12,
+	 },
+	 embedding = "no", cache = "yes", factor = 0, hfactor = 0, vfactor = 0, 
 	 tounicode = 1,
       }
       cidfont_data[cid_name] = k
@@ -256,19 +259,9 @@ local function mk_rml(name, size, id)
 	 parameters[k] = v * scale
       end
       fontdata.parameters  = parameters
-      fontdata.ascender    = fontdata.ascender * scale
-      fontdata.descender   = fontdata.descender * scale
-      fontdata.factor      = fontdata.factor * scale
-      fontdata.hfactor     = fontdata.hfactor * scale
-      fontdata.vfactor     = fontdata.vfactor * scale
       fontdata.size        = size
       fontdata.resources   = s.resources
       cachedata.parameters = parameters
-      cachedata.ascender   = fontdata.ascender
-      cachedata.descender  = fontdata.descender
-      cachedata.factor     = fontdata.factor
-      cachedata.hfactor    = fontdata.hfactor
-      cachedata.vfactor    = fontdata.vfactor
       cachedata.size       = size
       cachedata.resources  = s.resources
    end

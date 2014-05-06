@@ -135,7 +135,8 @@
 
 %%%%%%%% Attributes for Japanese typesetting.
 \newluatexattribute\ltj@icflag    % attribute for italic correction
-\newluatexattribute\ltj@curjfnt   % index for ``current Japanese font''
+\newluatexattribute\ltj@curjfnt   % index for ``current horizontal Japanese font''
+\newluatexattribute\ltj@curtfnt   % index for ``current vertical Japanese font''
 \newluatexattribute\ltj@origchar  %
 \newluatexattribute\ltj@charclass %
 \newluatexattribute\ltj@autospc   % attribute for autospacing
@@ -200,7 +201,14 @@
 \protected\def\jfont{\afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false)}}
 \protected\def\globaljfont{%
   \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true)}}
-\def\ltj@@jfont{\directlua{luatexja.jfont.jfontdefY()}}
+\def\ltj@@jfont{\directlua{luatexja.jfont.jfontdefY('yoko')}}
+
+%%%%%%%% \tfont\CS={...:...;jfm=metric;...}, \globaltfont
+\protected\def\tfont{\afterassignment\ltj@@tfont\directlua{luatexja.jfont.jfontdefX(false)}}
+\protected\def\globaltfont{%
+  \afterassignment\ltj@@tfont\directlua{luatexja.jfont.jfontdefX(true)}}
+\def\ltj@@tfont{\directlua{luatexja.jfont.jfontdefY('tate')}}
+
 
 %%%%%%%% \zw, \zh
 \protected\def\zw{\directlua{tex.setdimen('ltj@zw', luatexja.jfont.get_zw())}\ltj@zw}

@@ -3,7 +3,9 @@
 --
 
 luatexja.load_module('base');      local ltjb = luatexja.base
+luatexja.load_module('stack');     local ltjs = luatexja.stack
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
+luatexja.load_module('direction'); local ltjd = luatexja.direction
 
 local Dnode = node.direct or node
 local setfield = (Dnode ~= node) and Dnode.setfield or function(n, i, c) n[i] = c end
@@ -31,6 +33,13 @@ local id_hlist = node.id('hlist')
 local id_vlist = node.id('vlist')
 local id_rule = node.id('rule')
 local id_math = node.id('math')
+local id_whatsit = node.id('whatsit')
+local sid_save = node.subtype('pdf_save')
+local sid_restore = node.subtype('pdf_restore')
+local sid_matrix = node.subtype('pdf_setmatrix')
+local dir_tate = 3
+local dir_yoko = 4
+local DIR = luatexja.stack_table_index.DIR
 
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
@@ -66,8 +75,7 @@ local call_callback = luatexbase.call_callback
 
 local fshift =  { down = 0, left = 0}
 
--- mode: true iff p will be always encapsuled by a hbox
-local function capsule_glyph(p, met, class)
+local function capsule_glyph_yoko(p, met, class)
    local char_data = met.char_type[class]
    if not char_data then return node_next(p) end
    local fwidth, pwidth = char_data.width, getfield(p, 'width')
@@ -101,7 +109,51 @@ local function capsule_glyph(p, met, class)
       return node_next(p)
    end
 end
-luatexja.setwidth.capsule_glyph = capsule_glyph
+local function capsule_glyph_tate(p, met, class)
+   local char_data = met.char_type[class]
+   if not char_data then return node_next(p) end
+   local ascent, descent = met.ascent, met.descent
+   local fwidth, pwidth = char_data.width, ascent + descent
+   fwidth = (fwidth ~= 'prop') and fwidth or pwidth
+   fshift.down = char_data.down; fshift.left = char_data.left
+   fshift = call_callback("luatexja.set_width", fshift, met, class)
+   local fheight, fdepth = char_data.height, char_data.depth
+   
+   setfield(p, 'char', ltjd.get_vert_glyph(getfont(p), getchar(p)))
+
+      local y_shift
+         = - getfield(p, 'yoffset') + (has_attr(p,attr_ykblshift) or 0)
+      local q
+      head, q = node_remove(head, p)
+      local box = node_new(id_hlist)
+      setfield(box, 'width', fwidth)
+      setfield(box, 'height', fheight)
+      setfield(box, 'depth', fdepth)
+      setfield(box, 'shift', y_shift)
+      setfield(box, 'dir', dir)
+
+      local k1 = node_new(id_kern)
+      setfield(k1, 'kern', 
+	       getfield(p, 'xoffset') + ascent
+		  + char_data.align*(fwidth-pwidth) - fshift.left)
+      local ws = node_new(id_whatsit, sid_save)
+      local wm = node_new(id_whatsit, sid_matrix)
+      setfield(wm, 'data', '0 1 -1 0')
+      local k2 = node_new(id_kern)
+      setfield(k2, 'kern', -fshift.down - fdepth)
+      local k3 = node_new(id_kern)
+      setfield(k3, 'kern', - getfield(p, 'width') +fshift.down + fdepth)
+      local wr = node_new(id_whatsit, sid_restore)
+      setfield(box, 'head', k1); setfield(k1, 'next', ws)
+      setfield(ws, 'next', wm);  setfield(wm, 'next', k2); 
+      setfield(k2, 'next', p);   setfield(p, 'next', k3); 
+      setfield(k3, 'next', wr); 
+
+      set_attr(box, attr_icflag, PACKED + get_pr_begin_flag(p))
+      head = q and node_insert_before(head, q, box) 
+               or node_insert_after(head, node_tail(head), box)
+      return q
+end
 
 local function capsule_glyph_math(p, met, class)
    local char_data = met.char_type[class]
@@ -130,6 +182,8 @@ luatexja.setwidth.capsule_glyph_math = capsule_glyph_math
 function luatexja.setwidth.set_ja_width(ahead, adir)
    local p = ahead; head  = p; dir = adir or 'TLT'
    local m = false -- is in math mode?
+   local capsule_glyph = (ltjs.table_current_stack[DIR]==dir_yoko)
+      and capsule_glyph_yoko or capsule_glyph_tate
    while p do
       local pid = getid(p)
       if (pid==id_glyph) 

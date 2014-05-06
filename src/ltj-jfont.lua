@@ -52,10 +52,11 @@ luatexbase.create_callback("luatexja.load_jfm", "data", function (ft, jn) return
 
 local jfm_file_name, jfm_var
 local defjfm_res
+local jfm_dir
 
 function define_jfm(t)
    local real_char -- Does current character class have the 'real' character?
-   if t.dir~='yoko' then
+   if t.dir~=jfm_dir then
       defjfm_res= nil; return
    elseif type(t.zw)~='number' or type(t.zh)~='number' then 
       defjfm_res= nil; return
@@ -91,7 +92,8 @@ function define_jfm(t)
                v.align = 'left' -- left
             end
 	    if real_char then
-	       if not (type(v.width)=='number' or v.width~='prop') then
+	       if not (type(v.width)=='number' 
+		       or (jfm_dir=='yoko' and v.width~='prop')) then
 		  defjfm_res= nil; return
 	       else
 		  if type(v.height)~='number' then
@@ -163,7 +165,6 @@ do
 	 if type(i) == 'number' then -- char_type
 	    for k,w in pairs(v.glue) do
 	       local h = node_new(id_glue_spec)
-mem_leak_gs = mem_leak_gs+1
 	       v[k] = {true, h, (w[5] and w[5]/sz or 0), FROM_JFM + (w[4] and w[4]/sz or 0)}
 	       setfield(h, 'width', w[1])
 	       setfield(h, 'stretch', w[2])
@@ -173,7 +174,6 @@ mem_leak_gs = mem_leak_gs+1
 	    end
 	    for k,w in pairs(v.kern) do
 	       local g = node_new(id_kern)
-mem_leak_kern = mem_leak_kern +1
 	       setfield(g, 'kern', w[1])
 	       setfield(g, 'subtype', 1)
 	       set_attr(g, attr_icflag, FROM_JFM)
@@ -241,8 +241,10 @@ do
    luatexbase.create_callback("luatexja.define_jfont", "data", function (ft, fn) return ft end)
 
 -- EXT
-   function jfontdefY() -- for horizontal font
-      local j = load_jfont_metric()
+   local identifiers = fonts.hashes.identifiers
+   function jfontdefY(dir)
+      jfm_dir = dir
+      local j = load_jfont_metric(dir)
       local fn = font.id(cstemp)
       local f = font_getfont(fn)
       if not j then 
@@ -255,18 +257,21 @@ do
 	 return 
       end
       update_jfm_cache(j, f.size)
-      --print('MEMORY LEAK (acc): ', mem_leak_glue, mem_leak_gs, mem_leak_kern)
+      local ad = identifiers[fn].parameters
       local sz = metrics[j].size_cache[f.size]
       local fmtable = { jfm = j, size = f.size, var = jfm_var, 
-			zw = sz.zw, zh = sz.zh, 
+			zw = sz.zw, zh = sz.zh,
+			ascent = ad.ascender,
+			descent = ad.descender, 
 			chars = sz.chars, char_type = sz.char_type,
-			kanjiskip = sz.kanjiskip, xkanjiskip = sz.xkanjiskip, 
+			kanjiskip = sz.kanjiskip, xkanjiskip = sz.xkanjiskip,
       }
       
       fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
       font_metric_table[fn]=fmtable
       tex.sprint(cat_lp, global_flag .. '\\protected\\expandafter\\def\\csname ' 
-		    .. cstemp  .. '\\endcsname{\\ltj@curjfnt=' .. fn .. '\\relax}')
+		    .. cstemp  .. '\\endcsname{\\ltj@cur'
+		    .. (dir == 'yoko' and 'j' or 't') .. 'fnt=' .. fn .. '\\relax}')
    end
 end
 
@@ -311,11 +316,11 @@ do
    end
    
    -- replace fonts.define.read()
-   function font_callback(name, size, id, fallback)
-      extract_metric(name)
-      -- In the present imple., we don't remove "jfm=..." from name.
-      return fallback(name, size, id)
-   end
+   luatexbase.add_to_callback('luatexja.define_font', 
+			      function (res, name)
+				 extract_metric(name)
+			      end,
+			      'extract_jfm_name', 1)
 end
 
 ------------------------------------------------------------------------

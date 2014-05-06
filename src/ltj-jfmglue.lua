@@ -43,6 +43,8 @@ local node_tail = Dnode.tail
 local node_free = Dnode.free
 local node_end_of_math = Dnode.end_of_math
 
+local dir_tate = 3
+local dir_yoko  = 4
 
 local id_glyph = node.id('glyph')
 local id_hlist = node.id('hlist')
@@ -84,6 +86,7 @@ local table_current_stack
 local list_dir
 
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
+local attr_dir = luatexbase.attributes['ltj@dir']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 
 local function get_attr_icflag(p)
@@ -440,7 +443,15 @@ do
    local attr_autoxspc = luatexbase.attributes['ltj@autoxspc']
    function set_np_xspc_jachar(Nx, x)
       local m = ltjf_font_metric_table[getfont(x)]
-      local cls, c = slow_find_char_class(has_attr(x, attr_orig_char), m, getchar(x))
+      local cls, c
+      if list_dir == dir_tate then
+	 local c1, c2 = getchar(x), has_attr(x, attr_orig_char)
+	 c = has_attr(x, attr_dir) or c1 or c2
+	 cls = ltjf_find_char_class(c, m)
+	 if cls==0 then cls = slow_find_char_class(c2, m, c1) end
+      else
+	 cls, c = slow_find_char_class(has_attr(x, attr_orig_char), m, getchar(x))
+      end
       Nx.met, Nx.char = m, c; Nx.class = cls; 
       if cls~=0 then set_attr(x, attr_jchar_class, cls) end
       Nx.pre  = table_current_stack[PRE + c]  or 0
@@ -919,7 +930,7 @@ do
       Bp, widow_Bp, widow_Np = {}, {}, {first = nil}
       table_current_stack = ltjs.table_current_stack
 
-      list_dir = table_current_stack[DIR]
+      list_dir = table_current_stack[DIR] or dir_yoko
       kanji_skip = node_new(id_glue)
       setfield(kanji_skip, 'spec', skip_table_to_spec(KSK))
       set_attr(kanji_skip, attr_icflag, KANJI_SKIP)

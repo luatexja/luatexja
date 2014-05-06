@@ -42,9 +42,16 @@
 \jfont\sevengt=\ltj@stdgtfont:jfm=ujis at 6.73551pt
 \jfont\fivegt=\ltj@stdgtfont:jfm=ujis at 4.81108pt
 
+\tfont\tentmin=\ltj@stdmcfont:jfm=ujisv at 9.62216pt
+\tfont\seventmin=\ltj@stdmcfont:jfm=ujisv at 6.73551pt
+\tfont\fivetmin=\ltj@stdmcfont:jfm=ujisv at 4.81108pt
+\tfont\tentgt=\ltj@stdgtfont:jfm=ujisv at 9.62216pt
+\tfont\seventgt=\ltj@stdgtfont:jfm=ujisv at 6.73551pt
+\tfont\fivetgt=\ltj@stdgtfont:jfm=ujisv at 4.81108pt
+
 \let\mc=\tenmin
 \let\gt=\tengt
-\mc
+\mc\tentmin
 
 \directlua{
   local s = kpse.find_file('ltj-kinsoku.lua', 'tex')

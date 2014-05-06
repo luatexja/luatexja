@@ -333,13 +333,6 @@ do
       return to_node(head)
    end
 
-   -- font define
-   local function font_callback(name, size, id, fallback)
-      local d = fallback(name, size, id)
-      prepare_ivs_data(id, d)
-      return d
-   end
-
    enable_ivs = function ()
       if is_ivs_enabled then
 	 ltjb.package_warning('luatexja-otf',
@@ -355,7 +348,11 @@ do
 	       function (name, size, id) return luatexja.font_callback(name, size, id) end
 	    )
 	 end
-	 luatexbase.add_to_callback('define_font',ivs_callback,"luatexja.ivs_font_callback", 1)
+	 luatexbase.add_to_callback('luatexja.define_font',
+				    function (res, name, size, id)
+				       prepare_ivs_data(id, res)
+				    end,
+				    'prepare_ivs_data', 1)
 	 for i=1,font.nextid()-1 do
 	    if identifiers[i] then prepare_ivs_data(i, identifiers[i]) end
 	 end
