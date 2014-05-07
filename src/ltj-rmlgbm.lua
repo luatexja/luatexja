@@ -5,7 +5,7 @@ luatexja.load_module('base');      local ltjb = luatexja.base
 
 local cidfont_data = {}
 local cache_chars = {}
-local cache_ver = '2'
+local cache_ver = '3'
 
 local cid_reg, cid_order, cid_supp, cid_name
 local cid_replace = {
@@ -121,40 +121,48 @@ do
       cidfont_data[cid_name] = k
 
       -- CID => Unicode 符号空間
-      -- TODO: vertical fonts?
-      tt, cidm = {}, {}
+      local tth, cidmo = {}, {}
+      tt, cidm = tth, cidmo
       for i = 0,kx[2] do cidm[i] = -1 end
       open_cmap_file(kx[1] .. "-H", increment, tonumber, entry)
-      k.characters = tt
+      k.characters = tth
 
       -- Unicode にマップされなかった文字の処理
       -- これらは TrueType フォントを使って表示するときはおかしくなる
       local ttu, pricode = {}, 0xF0000
-      for i,v in ipairs(cidm) do
+      for i,v in ipairs(cidmo) do
          if v==-1 then 
-            tt[pricode], cidm[i], pricode 
+            tth[pricode], cidmo[i], pricode 
 	       = { index = i }, pricode, pricode+1;
          end
-         ttu[cid_order .. '.' .. i] = cidm[i]
+         ttu[cid_order .. '.' .. i] = cidmo[i]
       end
+
+      -- 縦書用字形
+      tt, cidm = {}, {}
+      for i = 0,kx[2] do cidm[i] = -1 end
+      open_cmap_file(kx[1] .. "-V", increment, tonumber, entry)
+      local ttv = {}
+      for i,v in pairs(tt) do ttv[i] =  cidmo[v.index] end
+
       -- shared
       k.shared = {
          otfdata = { 
             cidinfo= k.cidinfo, verbose = false, 
             shared = { featuredata = {}, }, 
-            luatex = { features = {}, 
+	    luatex = { features = {}, 
 		       defaultwidth=1000, 
-		       sequences = {  }, },
+		     },
          },
          dynamics = {}, features = {}, processes = {}, 
+	 ltj_vert_table = ttv
       }
       k.resources = { unicodes = ttu, }
       k.descriptions = {}
       cache_chars[cid_name]  = { [655360] = k.characters }
 
       -- tounicode エントリ
-      local cidp = {nil, nil}; local cidmo = cidm
-      tt, ttu, cidm = {}, {}, {}
+      local cidp = {nil, nil}; tt, ttu, cidm = {}, {}, {}
       open_cmap_file(cid_name .. "-UCS2",
 		     function(a) 
 			a[2] = a[2] +1 ; return a
@@ -215,6 +223,7 @@ local function mk_rml(name, size, id)
    local fontdata = {}
    local cachedata = {}
    local s = cidfont_data[cid_name]
+   luatexja.rmlgbm.vert_addfunc(id, s.shared.ltj_vert_table)
    for k, v in pairs(s) do
       fontdata[k] = v
       cachedata[k] = v
@@ -330,11 +339,13 @@ local function font_callback(name, size, id, fallback)
    end
 end
 
+luatexja.rmlgbm = {
+   cidfont_data = cidfont_data,
+   font_callback = font_callback,
+   vert_addfunc = function () end, -- dummy, set in ltj-direction.lua
+}
+
 cid_reg, cid_order, cid_name, cid_supp = 'Adobe', 'Japan1', 'Adobe-Japan1'
 read_cid_font()
 
 
-luatexja.rmlgbm = {
-   cidfont_data = cidfont_data,
-   font_callback = font_callback,
-}

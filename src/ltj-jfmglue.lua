@@ -34,6 +34,7 @@ local insert_before = Dnode.insert_before
 local insert_after = Dnode.insert_after
 local node_next = (Dnode ~= node) and Dnode.getnext or node.next
 local round = tex.round
+local ltjd_make_dir_node = ltjd.make_dir_node
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_find_char_class = ltjf.find_char_class
 local node_new = Dnode.new
@@ -306,14 +307,14 @@ local calc_np_auxtable = {
    end,
    [id_hlist] = function(lp) 
       local op, flag
-      head, lp, op, flag = ltjd.make_dir_node(head, lp, list_dir)
+      head, lp, op, flag = ltjd_make_dir_node(head, lp, list_dir, 'jfm hlist')
       Np.first = Np.first or op; Np.last = op; Np.nuc = op; 
       Np.id = (flag or getfield(op, 'shift')~=0) and id_box_like or id_hlist
       return true, lp
    end,
    box_like = function(lp)
       local op
-      head, lp, op = ltjd.make_dir_node(head, lp, list_dir)
+      head, lp, op = ltjd_make_dir_node(head, lp, list_dir, 'jfm:' .. getid(lp))
       Np.first = Np.first or op; Np.last = op; Np.nuc = op; 
       Np.id = id_box_like;
       return true, lp

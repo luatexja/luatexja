@@ -45,6 +45,8 @@ local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
+local attr_tablshift = luatexbase.attributes['ltj@tablshift']
+local attr_tkblshift = luatexbase.attributes['ltj@tkblshift']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 
 local ltjf_font_metric_table = ltjf.font_metric_table
@@ -122,7 +124,7 @@ local function capsule_glyph_tate(p, met, class)
    setfield(p, 'char', ltjd.get_vert_glyph(getfont(p), getchar(p)))
 
       local y_shift
-         = - getfield(p, 'yoffset') + (has_attr(p,attr_ykblshift) or 0)
+         = - getfield(p, 'yoffset') + (has_attr(p,attr_tkblshift) or 0)
       local q
       head, q = node_remove(head, p)
       local box = node_new(id_hlist)
@@ -182,8 +184,9 @@ luatexja.setwidth.capsule_glyph_math = capsule_glyph_math
 function luatexja.setwidth.set_ja_width(ahead, adir)
    local p = ahead; head  = p; dir = adir or 'TLT'
    local m = false -- is in math mode?
-   local capsule_glyph = (ltjs.table_current_stack[DIR]==dir_yoko)
-      and capsule_glyph_yoko or capsule_glyph_tate
+   local is_dir_tate = ltjs.table_current_stack[DIR]==dir_tate
+   local capsule_glyph = is_dir_tate and capsule_glyph_tate or capsule_glyph_yoko
+   local attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
    while p do
       local pid = getid(p)
       if (pid==id_glyph) 
@@ -195,7 +198,7 @@ function luatexja.setwidth.set_ja_width(ahead, adir)
 	 else
 	    set_attr(p, attr_icflag, PROCESSED + get_pr_begin_flag(p))
 	    setfield(p, 'yoffset',
-		     getfield(p, 'yoffset') - (has_attr(p,attr_yablshift) or 0))
+		     getfield(p, 'yoffset') - (has_attr(p,attr_ablshift) or 0))
 	    p = node_next(p)
 	 end
       elseif pid==id_math then

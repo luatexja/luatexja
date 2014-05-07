@@ -141,8 +141,10 @@
 \newluatexattribute\ltj@charclass %
 \newluatexattribute\ltj@autospc   % attribute for autospacing
 \newluatexattribute\ltj@autoxspc  % attribute for autoxspacing
-\newluatexattribute\ltj@yablshift % attribute for \yabaselineshift
-\newluatexattribute\ltj@ykblshift % attribute for \ykbaselineshift
+\newluatexattribute\ltj@yablshift % attribute for yalbaselineshift
+\newluatexattribute\ltj@ykblshift % attribute for yjabaselineshift
+\newluatexattribute\ltj@tablshift % attribute for talbaselineshift
+\newluatexattribute\ltj@tkblshift % attribute for tjabaselineshift
 \newluatexattribute\jfam          % index for current jfam
 \newluatexattribute\ltj@dir       % temp attr for indicating box direction
 
@@ -293,6 +295,16 @@
 \define@key[ltj]{japaram}{yjabaselineshift}{%
   \directlua{tex.setattribute(luatexja.isglobal,
     luatexbase.attributes['ltj@ykblshift'],
+    \ltj@safe@dimen@or\ltj@defdimen{#1})}}
+% talbaselineshift = <dimen>
+% tjabaselineshift = <dimen>
+\define@key[ltj]{japaram}{talbaselineshift}{%
+  \directlua{tex.setattribute(luatexja.isglobal,
+    luatexbase.attributes['ltj@tablshift'],
+    \ltj@safe@dimen@or\ltj@defdimen{#1})}}
+\define@key[ltj]{japaram}{tjabaselineshift}{%
+  \directlua{tex.setattribute(luatexja.isglobal,
+    luatexbase.attributes['ltj@tkblshift'],
     \ltj@safe@dimen@or\ltj@defdimen{#1})}}
 
 % jaxspmode = {<char_code>, <mode>}

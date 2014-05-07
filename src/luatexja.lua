@@ -198,6 +198,12 @@ do
       yjabaselineshift = function(t) 
 	 return print_scaled(tex.getattribute('ltj@ykblshift'))..'pt'
       end,
+      talbaselineshift = function(t) 
+	 return print_scaled(tex.getattribute('ltj@tablshift'))..'pt'
+      end,
+      tjabaselineshift = function(t) 
+	 return print_scaled(tex.getattribute('ltj@tkblshift'))..'pt'
+      end,
       kanjiskip = function(t) 
 	 return print_spec(ltjs.get_stack_skip(stack_table_index.KSK, t))
       end,
@@ -295,7 +301,8 @@ do
    local to_node = (Dnode ~= node) and Dnode.tonode or nullfunc
    local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
    -- mode = true iff main_process is called from pre_linebreak_filter
-   local function main_process(head, mode, dir)
+   local function main_process(head, mode, dir, gc)
+      --print('main_process', gc, mode, tex.getcount('ltj@@stack'))
       tex.setattribute('global', attr_icflag, 0)
       local p = to_direct(head)
       p = ltjj.main(p,mode)
@@ -315,14 +322,14 @@ do
    luatexbase.add_to_callback(
       'pre_linebreak_filter', 
       function (head,groupcode)
-	 return main_process(head, true, tex.textdir)
+	 return main_process(head, true, tex.textdir, groupcode)
       end,'ltj.pre_linebreak_filter',
       luatexbase.priority_in_callback('pre_linebreak_filter',
 				      'luaotfload.node_processor') + 1)
    luatexbase.add_to_callback(
       'hpack_filter', 
       function (head,groupcode,size,packtype, dir)
-	 return main_process(head, false, dir)
+	 return main_process(head, false, dir, groupcode)
       end,'ltj.hpack_filter',
       luatexbase.priority_in_callback('hpack_filter',
 				      'luaotfload.node_processor') + 1)
@@ -363,16 +370,15 @@ local function debug_show_node_X(p,print_fn)
    local pt=node_type(p.id)
    local base = debug_depth .. string.format('%X', get_attr_icflag(p))
    .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
-      .. ' dir=' .. tostring(has_attr(p, attr_dir)) .. ' '
    if pt == 'glyph' then
       s = base .. ' ' .. utf.char(p.char) .. ' '  .. tostring(p.font)
          .. ' (' .. print_scaled(p.height) .. '+' 
          .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
       print_fn(s)
-   elseif pt=='hlist' or pt=='vlist' then
+   elseif pt=='hlist' or pt=='vlist' or pt=='unset' then
       s = base .. '(' .. print_scaled(p.height) .. '+' 
          .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width) .. p.dir
-      if p.shift~=0 then
+      if p.shift or 0~=0 then
          s = s .. ', shifted ' .. print_scaled(p.shift)
       end
       if p.glue_sign >= 1 then 
@@ -429,7 +435,7 @@ local function debug_show_node_X(p,print_fn)
       end
       print_fn(s)
    elseif pt == 'whatsit' then
-      s = base
+      s = base .. '(' .. node.whatsits()[p.subtype] .. ') '
       if p.subtype==sid_user then
          if p.type ~= 110 then 
             s = s .. ' user_id: ' .. p.user_id .. ' ' .. p.value
