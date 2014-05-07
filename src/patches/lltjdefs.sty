@@ -1,6 +1,6 @@
 %
 % lltjdefs.sty
-% 
+%
 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{lltjdefs}[2013/06/12 Default font settings of LuaTeX-ja]
@@ -13,7 +13,8 @@
 \DeclareErrorKanjiFont{JY3}{mc}{m}{n}{10}
 \DeclareYokoKanjiEncoding{JY3}{}{}
 \DeclareKanjiSubstitution{JY3}{mc}{m}{n}
-%JT3
+\DeclareTateKanjiEncoding{JT3}{}{}
+\DeclareKanjiSubstitution{JT3}{mc}{m}{n}
 
 \newcommand\mcdefault{mc}
 \newcommand\gtdefault{gt}
@@ -31,6 +32,15 @@
 \DeclareFontShape{JY3}{mc}{bx}{n}{<-> ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{gt}{bx}{n}{<-> ssub*gt/m/n}{}
 
+\kanjiencoding{JT3}
+
+\DeclareKanjiFamily{JT3}{mc}{}
+\DeclareFontShape{JT3}{mc}{m}{n}{<-> s*[0.962216] \ltj@stdmcfont:jfm=ujis}{}
+\DeclareKanjiFamily{JT3}{gt}{}
+\DeclareFontShape{JT3}{gt}{m}{n}{<-> s*[0.962216] \ltj@stdgtfont:jfm=ujis}{}
+\DeclareFontShape{JT3}{mc}{bx}{n}{<-> ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{gt}{bx}{n}{<-> ssub*gt/m/n}{}
+
 \kanjiencoding{JY3}\selectfont\adjustbaseline
 
 \DeclareTextFontCommand{\textmc}{\mcfamily}
@@ -44,20 +54,20 @@
 \DeclareSymbolFontAlphabet{\mathmc}{mincho}
 \DeclareMathAlphabet{\mathgt}{JY3}{gt}{m}{n}
 
-\ltjdefcharrange{1}{"80-"36F, "1E00-"1EFF} 
-\ltjdefcharrange{2}{"370-"4FF, "1F00-"1FFF} 
+\ltjdefcharrange{1}{"80-"36F, "1E00-"1EFF}
+\ltjdefcharrange{2}{"370-"4FF, "1F00-"1FFF}
 \ltjdefcharrange{3}{%
   "2000-"243F, "2500-"27BF, "2900-"29FF, "2B00-"2BFF}
 \ltjdefcharrange{4}{%
-   "500-"10FF, "1200-"1DFF, "2440-"245F, "27C0-"28FF, "2A00-"2AFF, 
-  "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A82F, "A840-"ABFF, "FB00-"FE0F, 
+   "500-"10FF, "1200-"1DFF, "2440-"245F, "27C0-"28FF, "2A00-"2AFF,
+  "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A82F, "A840-"ABFF, "FB00-"FE0F,
   "FE20-"FE2F, "FE70-"FEFF, "10000-"1FFFF, "E000-"F8FF} % non-Japanese
-\ltjdefcharrange{5}{"D800-"DFFF, "E0000-"E00FF, "E01F0-"10FFFF} 
+\ltjdefcharrange{5}{"D800-"DFFF, "E0000-"E00FF, "E01F0-"10FFFF}
 \ltjdefcharrange{6}{%
-  "2460-"24FF, "2E80-"2EFF, "3000-"30FF, "3190-"319F, "31F0-"4DBF, 
+  "2460-"24FF, "2E80-"2EFF, "3000-"30FF, "3190-"319F, "31F0-"4DBF,
   "4E00-"9FFF, "F900-"FAFF, "FE10-"FE6F, "20000-"2FFFF, "E0100-"E01EF}
 \ltjdefcharrange{7}{
-  "1100-"11FF, "2F00-"2FFF, "3100-"31EF, "A000-"A4CF, "A830-"A83F, 
+  "1100-"11FF, "2F00-"2FFF, "3100-"31EF, "A000-"A4CF, "A830-"A83F,
   "AC00-"D7FF}
 \ltjdefcharrange{8}{"A7, "A8, "B0, "B1, "B4, "B6, "D7, "F7}
 \ltjsetparameter{jacharrange={-1, +2, +3, -4, -5, +6, +7, +8}}
@@ -72,7 +82,7 @@
 
 MIDDLE
 
-\ltjdefcharrange{1}{"80-"36F, "1E00-"1EFF} 
+\ltjdefcharrange{1}{"80-"36F, "1E00-"1EFF}
   %   2  "80-"FF num = 471/128 name = Latin-1 Supplement
   %   3  "100-"17F num = 484/128 name = Latin Extended-A
   %   4  "180-"24F num = 87/208 name = Latin Extended-B
@@ -81,7 +91,7 @@ MIDDLE
   %   7  "300-"36F num = 98/112 name = Combining Diacritical Marks
   %  64  "1E00-"1EFF num = 16/256 name = Latin Extended Additional
 
-\ltjdefcharrange{2}{"370-"4FF, "1F00-"1FFF} 
+\ltjdefcharrange{2}{"370-"4FF, "1F00-"1FFF}
   % Greek and Coptic, Cyrillic, Greek Extended
 
 \ltjdefcharrange{3}{%
@@ -108,12 +118,12 @@ MIDDLE
 NEGATIVE
 
 \ltjdefcharrange{4}{%
-   "500-"10FF, "1200-"1DFF, "2440-"245F, "27C0-"28FF, "2A00-"2AFF, 
-  "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A82F, "A840-"ABFF, "FB00-"FE0F, 
+   "500-"10FF, "1200-"1DFF, "2440-"245F, "27C0-"28FF, "2A00-"2AFF,
+  "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A82F, "A840-"ABFF, "FB00-"FE0F,
   "FE20-"FE2F, "FE70-"FEFF, "10000-"1FFFF, "E000-"F8FF}
 } % non-Japanese
 
-\ltjdefcharrange{5}{"D800-"DFFF, "E0000-"E00FF, "E01F0-"10FFFF} 
+\ltjdefcharrange{5}{"D800-"DFFF, "E0000-"E00FF, "E01F0-"10FFFF}
   % Surrogates, Tags
   %  208  "F0000-"FFFFF num = 0/65536 name = Supplementary Private Use Area-A
   %  209  "100000-"10FFFF num = 0/65536 name = Supplementary Private Use Area-B
@@ -122,7 +132,7 @@ POSITIVE
 
 % Japanese
 \ltjdefcharrange{6}{%
-  "2460-"24FF, "2E80-"2EFF, "3000-"30FF, "3190-"319F, "31F0-"4DBF, 
+  "2460-"24FF, "2E80-"2EFF, "3000-"30FF, "3190-"319F, "31F0-"4DBF,
   "4E00-"9FFF, "F900-"FAFF, "FE10-"FE6F, "20000-"2FFFF, "E0100-"E01EF}
 %   77  "2460-"24FF num = 150/160 name = Enclosed Alphanumerics
 %   98  "2E80-"2EFF num = 21 name = CJK Radicals Supplement
@@ -143,7 +153,7 @@ POSITIVE
 %  "E0000-"E01EF Variation Selectors Supplement
 
 \ltjdefcharrange{7}{
-  "1100-"11FF, "2F00-"2FFF, "3100-"31EF, "A000-"A4CF, "A830-"A83F, 
+  "1100-"11FF, "2F00-"2FFF, "3100-"31EF, "A000-"A4CF, "A830-"A83F,
   "AC00-"D7FF}
   %   35  "1100-"11FF num = 1 name = Hangul Jamo
   %   99  "2F00-"2FDF num = 0/224 name = Kangxi Radicals

@@ -379,10 +379,10 @@
 % \changes{v1.1d}{1997/02/05}{開始ページがおかしくなるのを修正}
 % \changes{v1.1f}{1997/07/08}{縦組時にベースラインがおかしくなるのを修正}
 %    \begin{macrocode}
-%% \DeclareOption{tate}{%
-%%   \AtBeginDocument{\tate\message{《縦組モード》}%
-%%                    \adjustbaseline}%
-%% }
+\DeclareOption{tate}{%
+  \AtBeginDocument{\tate\message{《縦組モード》}%
+                   \adjustbaseline}%
+}
 %    \end{macrocode}
 %
 % \subsection{両面、片面オプション}
@@ -527,7 +527,7 @@
 % 設定に対応しました。この2つの命令の値はユーザが日々の利用でその都度指定するものではなく、
 % 何らかの理由で非埋め込みフォントが正しく利用できない場合にのみ |luatexja.cfg| によって
 % セットされるものです。
-% 
+%
 %
 %    \begin{macrocode}
 %<*article|report|book>

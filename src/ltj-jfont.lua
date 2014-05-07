@@ -58,7 +58,7 @@ function define_jfm(t)
    local real_char -- Does current character class have the 'real' character?
    if t.dir~=jfm_dir then
       defjfm_res= nil; return
-   elseif type(t.zw)~='number' or type(t.zh)~='number' then 
+   elseif type(t.zw)~='number' or type(t.zh)~='number' then
       defjfm_res= nil; return
    end
    t.char_type = {}; t.chars = {}
@@ -76,23 +76,23 @@ function define_jfm(t)
 		  real_char = true; w = utf.byte(w)
 	       elseif type(w) == 'string' and utf.len(w)==2 and utf.sub(w,2) == '*' then
 		  real_char = true; w = utf.byte(utf.sub(w,1,1))
-                  if not t.chars[-w] then 
+                  if not t.chars[-w] then
                      t.chars[-w] = i
-                  else 
+                  else
                      defjfm_res= nil; return
                   end
 	       end
 	       if not t.chars[w] then
 		  t.chars[w] = i
-	       else 
+	       else
 		  defjfm_res= nil; return
 	       end
 	    end
-            if type(v.align)~='string' then 
+            if type(v.align)~='string' then
                v.align = 'left' -- left
             end
 	    if real_char then
-	       if not (type(v.width)=='number' 
+	       if not (type(v.width)=='number'
 		       or (jfm_dir=='yoko' and v.width~='prop')) then
 		  defjfm_res= nil; return
 	       else
@@ -102,13 +102,13 @@ function define_jfm(t)
 		  if type(v.depth)~='number' then
 		     v.depth = 0.0
 		  end
-		  if type(v.italic)~='number' then 
+		  if type(v.italic)~='number' then
 		     v.italic = 0.0
 		  end
-		  if type(v.left)~='number' then 
+		  if type(v.left)~='number' then
 		     v.left = 0.0
 		  end
-		  if type(v.down)~='number' then 
+		  if type(v.down)~='number' then
 		     v.down = 0.0
 		  end
 	       end
@@ -120,9 +120,9 @@ function define_jfm(t)
 	    if v.kern[j] then defjfm_res= nil; return end
 	 end
 	 for j,x in pairs(v.kern) do
-	    if type(x)=='number' then 
+	    if type(x)=='number' then
                v.kern[j] = {x, 0}
-            elseif type(x)=='table' then 
+            elseif type(x)=='table' then
                v.kern[j] = {x[1], x[2] or 0}
             end
 	 end
@@ -152,7 +152,7 @@ do
 	 return new
       else return nil end
    end
-   
+
    update_jfm_cache = function (j,sz)
       if metrics[j].size_cache[sz] then return end
       local t = {}
@@ -160,7 +160,7 @@ do
       t.chars = metrics[j].chars
       t.char_type = mult_table(metrics[j].char_type, sz)
       for i,v in pairs(t.char_type) do
-	 v.align = (v.align=='left') and 0 or 
+	 v.align = (v.align=='left') and 0 or
 	    ((v.align=='right') and 1 or 0.5)
 	 if type(i) == 'number' then -- char_type
 	    for k,w in pairs(v.glue) do
@@ -189,15 +189,15 @@ do
    end
 end
 
-luatexbase.create_callback("luatexja.find_char_class", "data", 
+luatexbase.create_callback("luatexja.find_char_class", "data",
 			   function (arg, fmtable, char)
 			      return 0
 			   end)
 
 function find_char_class(c,m)
--- c: character code, m: 
+-- c: character code, m:
    if not m then return 0 end
-   return m.chars[c] or 
+   return m.chars[c] or
       luatexbase.call_callback("luatexja.find_char_class", 0, m, c)
 end
 
@@ -210,14 +210,14 @@ do
    local cstemp
    local global_flag -- true if \globaljfont, false if \jfont
    local function load_jfont_metric()
-      if jfm_file_name=='' then 
+      if jfm_file_name=='' then
 	 ltjb.package_error('luatexja',
 			    'no JFM specified',
 			    'To load and define a Japanese font, a JFM must be specified.'..
 			    "The JFM 'ujis' will be  used for now.")
 	 jfm_file_name='ujis'
       end
-      for j,v in ipairs(metrics) do 
+      for j,v in ipairs(metrics) do
 	 if v.name==jfm_file_name then return j end
       end
       luatexja.load_lua('jfm-' .. jfm_file_name .. '.lua')
@@ -225,7 +225,7 @@ do
 	 defjfm_res.name = jfm_file_name
 	 table.insert(metrics, defjfm_res)
 	 return #metrics
-      else 
+      else
 	 return nil
       end
    end
@@ -237,7 +237,7 @@ do
       global_flag = g and '\\global' or ''
       tex.sprint(cat_lp, '\\expandafter\\font\\csname ' .. cstemp .. '\\endcsname')
    end
-   
+
    luatexbase.create_callback("luatexja.define_jfont", "data", function (ft, fn) return ft end)
 
 -- EXT
@@ -247,29 +247,29 @@ do
       local j = load_jfont_metric(dir)
       local fn = font.id(cstemp)
       local f = font_getfont(fn)
-      if not j then 
+      if not j then
 	 ltjb.package_error('luatexja',
 			    "bad JFM `" .. jfm_file_name .. "'",
 			    'The JFM file you specified is not valid JFM file.\n'..
 			       'So defining Japanese font is cancelled.')
-	 tex.sprint(cat_lp, global_flag .. '\\expandafter\\let\\csname ' ..cstemp 
+	 tex.sprint(cat_lp, global_flag .. '\\expandafter\\let\\csname ' ..cstemp
 		       .. '\\endcsname=\\relax')
-	 return 
+	 return
       end
       update_jfm_cache(j, f.size)
       local ad = identifiers[fn].parameters
       local sz = metrics[j].size_cache[f.size]
-      local fmtable = { jfm = j, size = f.size, var = jfm_var, 
+      local fmtable = { jfm = j, size = f.size, var = jfm_var,
 			zw = sz.zw, zh = sz.zh,
 			ascent = ad.ascender,
-			descent = ad.descender, 
+			descent = ad.descender,
 			chars = sz.chars, char_type = sz.char_type,
 			kanjiskip = sz.kanjiskip, xkanjiskip = sz.xkanjiskip,
       }
-      
+
       fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
       font_metric_table[fn]=fmtable
-      tex.sprint(cat_lp, global_flag .. '\\protected\\expandafter\\def\\csname ' 
+      tex.sprint(cat_lp, global_flag .. '\\protected\\expandafter\\def\\csname '
 		    .. cstemp  .. '\\endcsname{\\ltj@cur'
 		    .. (dir == 'yoko' and 'j' or 't') .. 'fnt=' .. fn .. '\\relax}')
    end
@@ -277,11 +277,11 @@ end
 
 do
    -- PUBLIC function
-   function get_zw() 
+   function get_zw()
       local a = font_metric_table[tex.attribute[attr_curjfnt]]
       return a and a.zw or 0
    end
-   function get_zh() 
+   function get_zh()
       local a = font_metric_table[tex.attribute[attr_curjfnt]]
       return a and a.zw or 0
    end
@@ -297,9 +297,9 @@ do
 	 basename = utf.sub(basename, 6)
       end
       local p = utf.find(basename, ":")
-      if p then 
+      if p then
 	 basename = utf.sub(basename, p+1)
-      else return 
+      else return
       end
       -- now basename contains 'features' only.
       p=1
@@ -314,9 +314,9 @@ do
       end
       return
    end
-   
+
    -- replace fonts.define.read()
-   luatexbase.add_to_callback('luatexja.define_font', 
+   luatexbase.add_to_callback('luatexja.define_font',
 			      function (res, name)
 				 extract_metric(name)
 			      end,
@@ -334,11 +334,11 @@ do
    function is_kyenc(enc)
       tex.sprint(cat_lp, '\\let\\ifin@\\if' .. (kyenc_list[enc] or 'false '))
    end
-   function is_kyenc(enc) 
-      tex.sprint(cat_lp, '\\let\\ifin@\\if' .. (kyenc_list[enc] or 'false '))
+   function is_ktenc(enc)
+      tex.sprint(cat_lp, '\\let\\ifin@\\if' .. (ktenc_list[enc] or 'false '))
    end
-   function is_kenc(enc) 
-      tex.sprint(cat_lp, '\\let\\ifin@\\if' 
+   function is_kenc(enc)
+      tex.sprint(cat_lp, '\\let\\ifin@\\if'
 		 .. (kyenc_list[enc] or ktenc_list[enc] or 'false '))
    end
 
@@ -352,10 +352,10 @@ do
       Nkfam_list[enc][fam] = 'true '
    end
    function is_kfam(enc, fam)
-      tex.sprint(cat_lp, '\\let\\ifin@\\if' 
+      tex.sprint(cat_lp, '\\let\\ifin@\\if'
 		 .. (kfam_list[enc] and kfam_list[enc][fam] or 'false ')) end
    function is_Nkfam(enc, fam)
-      tex.sprint(cat_lp, '\\let\\ifin@\\if' 
+      tex.sprint(cat_lp, '\\let\\ifin@\\if'
 		 .. (Nkfam_list[enc] and Nkfam_list[enc][fam] or 'false ')) end
 
    local ffam_list, Nffam_list = {}, {}
@@ -368,10 +368,10 @@ do
       Nffam_list[enc][fam] = 'true '
    end
    function is_ffam(enc, fam)
-      tex.sprint(cat_lp, '\\let\\ifin@\\if' 
+      tex.sprint(cat_lp, '\\let\\ifin@\\if'
 		 .. (ffam_list[enc] and ffam_list[enc][fam] or 'false ')) end
    function is_Nffam(enc, fam)
-      tex.sprint(cat_lp, '\\let\\ifin@\\if' 
+      tex.sprint(cat_lp, '\\let\\ifin@\\if'
 		 .. (Nffam_list[enc] and Nffam_list[enc][fam] or 'false ')) end
 end
 ------------------------------------------------------------------------
@@ -419,7 +419,7 @@ end
 
 -- EXT
 function clear_alt_font(bfnt)
-   if alt_font_table[bfnt] then 
+   if alt_font_table[bfnt] then
       local t = alt_font_table[bfnt]
       for i,_ in pairs(t) do t[i]=nil; end
    end
@@ -439,7 +439,7 @@ local alt_font_table_latex = {}
 function clear_alt_font_latex(bbase)
    local t = alt_font_table_latex[bbase]
    if t then
-      for j,v in pairs(t) do t[j] = nil end 
+      for j,v in pairs(t) do t[j] = nil end
    end
 end
 
@@ -500,7 +500,7 @@ do
       alt_font_base = bbase
       alt_font_base_num = tex.getattribute(attr_curjfnt)
       local t = alt_font_table[alt_font_base_num]
-      if t then 
+      if t then
          for i,_ in pairs(t) do t[i]=nil end
       end
       t = alt_font_table_latex[bbase]
@@ -520,10 +520,10 @@ do
                           .. '\\csname ' .. i .. '/' .. size_str .. '\\endcsname{' .. i .. '}')
          end
       end
-   end 
+   end
 
    local function pickup_alt_font_class(class, afnt_num, afnt_chars)
-      local t  = alt_font_table[alt_font_base_num] 
+      local t  = alt_font_table[alt_font_base_num]
       local tx = font_metric_table[alt_font_base_num].chars
       for i,v in pairs(tx) do
          if v==class and afnt_chars[i] then t[i]=afnt_num end
@@ -538,11 +538,11 @@ do
       for i,v in pairs(alt_font_table_latex[alt_font_base]) do
          if i == afnt_base then
             for j,_ in pairs(v) do
-               if j>=0 then 
+               if j>=0 then
                   if ac[j] then t[j]=afnt_num end
                else  -- -n (n>=1) means that the character class n,
-                     -- which is defined in the JFM 
-                  pickup_alt_font_class(-j, afnt_num, ac) 
+                     -- which is defined in the JFM
+                  pickup_alt_font_class(-j, afnt_num, ac)
                end
             end
             return
