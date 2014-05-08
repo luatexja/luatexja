@@ -153,6 +153,7 @@
 \ltj@origchar=0
 \ltj@charclass=0
 \ltj@curjfnt=-1
+\ltj@curtfnt=-1
 
 %%%%%%%% Attributes for character ranges
 \newcount\ltj@tempcnta
@@ -265,6 +266,7 @@
     \ltj@safe@num@or{nil}{#1},\ltj@safe@num@or{nil}{#2},#4,#5)}}
 
 % jatextfont = {<char_code>, <font_cs>}
+% only horizontal font is supported
 \define@key[ltj]{japaram}{jatextfont}{%
   \expandafter\ltj@@set@stackfont#1:{MJT}}
 \define@key[ltj]{japaram}{jascriptfont}{%
@@ -473,13 +475,13 @@
 % いつも global
 \def\ltj@@getjfontnumber#1{% result in \ltj@tempcntc 
   \ltj@reset@globaldefs
-  \begingroup\ltj@curjfnt=-1\relax
-  #1\directlua{luatexja.__temp = \the\ltj@curjfnt}\endgroup
+  \begingroup\ltj@curjfnt=-1 \ltj@curtfnt=-1\relax
+  #1\directlua{luatexja.__temp = -\the\ltj@curjfnt*\the\ltj@curtfnt}\endgroup
   \ltj@tempcntc=\directlua{tex.sprint(luatexja.__temp)}\relax
   \ifnum\ltj@tempcntc=-1
     \@PackageError{luatexja-core}%
     {\string#1 is not a control sequence that represents \MessageBreak
-     a Japanese font}{I'll use the current Japanese font instead.^^J}%
+     a Japanese font}{I'll use the current horizontal Japanese font instead.^^J}%
     \ltj@tempcntc=\ltj@curjfnt
   \fi\ltj@restore@globaldefs}
   
@@ -512,6 +514,19 @@
    \directlua{luatexja.jfont.clear_alt_font(\the\ltj@tempcntc)}}\ignorespaces}
 
 
+%%%%%%%% \yoko, \tate, \ifydir, \iftdir
+\newif\ifydir
+\newif\iftdir
+\protected\def\tate{%
+  \directlua{luatexja.direction.set_list_direction(3, 'tate')}%
+  \ltj@dir=3 \tdirtrue\ydirfalse
+}
+\protected\def\yoko{%
+  \directlua{luatexja.direction.set_list_direction(4, 'yoko')}%
+  \ltj@dir=4 \ydirtrue\tdirfalse
+}
+\yoko
+
 %%------------------ Load module for the format
 
 \ifltj@in@latex                 %<*LaTeX>
@@ -528,19 +543,6 @@
 \ltj@overwrite@catcodetable\CatcodeTableLaTeX
 \ltj@overwrite@catcodetable\CatcodeTableLaTeXAtLetter
 \ltj@overwrite@catcodetable\CatcodeTableExpl
-
-%%%%%%%% \yoko, \tate, \ifydir, \iftdir
-\protected\def\tate{%
-  \directlua{luatexja.direction.set_list_direction(3, 'tate')}%
-  \ltj@dir=3 
-}
-\protected\def\yoko{%
-  \directlua{luatexja.direction.set_list_direction(4, 'yoko')}%
-  \ltj@dir=4 
-}
-\yoko
-\newif\ifydir\ydirtrue
-\newif\iftdir\tdirfalse
 
 
 %%------------------ all done

@@ -23,7 +23,6 @@
 \newcommand\kanjifamilydefault{\mcdefault}
 \newcommand\kanjiseriesdefault{\mddefault}
 \newcommand\kanjishapedefault{\updefault}
-\kanjiencoding{JY3}
 
 \DeclareKanjiFamily{JY3}{mc}{}
 \DeclareFontShape{JY3}{mc}{m}{n}{<-> s*[0.962216] \ltj@stdmcfont:jfm=ujis}{}
@@ -32,14 +31,13 @@
 \DeclareFontShape{JY3}{mc}{bx}{n}{<-> ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{gt}{bx}{n}{<-> ssub*gt/m/n}{}
 
-\kanjiencoding{JT3}
-
 \DeclareKanjiFamily{JT3}{mc}{}
-\DeclareFontShape{JT3}{mc}{m}{n}{<-> s*[0.962216] \ltj@stdmcfont:jfm=ujis}{}
+\DeclareFontShape{JT3}{mc}{m}{n}{<-> s*[0.962216] \ltj@stdmcfont:jfm=ujisv}{}
 \DeclareKanjiFamily{JT3}{gt}{}
-\DeclareFontShape{JT3}{gt}{m}{n}{<-> s*[0.962216] \ltj@stdgtfont:jfm=ujis}{}
+\DeclareFontShape{JT3}{gt}{m}{n}{<-> s*[0.962216] \ltj@stdgtfont:jfm=ujisv}{}
 \DeclareFontShape{JT3}{mc}{bx}{n}{<-> ssub*gt/m/n}{}
 \DeclareFontShape{JT3}{gt}{bx}{n}{<-> ssub*gt/m/n}{}
+\KanjiEncodingPair{JY3}{JT3}
 
 \kanjiencoding{JY3}\selectfont\adjustbaseline
 
