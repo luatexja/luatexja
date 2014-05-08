@@ -1,6 +1,6 @@
 %
 % lltjfont.sty: derived from plfonts.dtx in pLaTeX.
-% 
+%
 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{lltjfont}[2014/01/23 Patch to NFSS2 for LuaTeX-ja]
@@ -213,7 +213,7 @@
   }
 \def\DLMfontsw@standard#1#2#3{#1{#2{#3}}}
 \def\reDeclareMathAlphabet#1#2#3{%
-  \ifdefined#2 
+  \ifdefined#2
     \@temptokena\expandafter{#2}%
   \else
     \@temptokena{#2}%
@@ -263,12 +263,12 @@
     \let\cy@encoding\k@encoding
     \edef\ct@encoding{\csname t@enc@\k@encoding\endcsname}%
   \else
-    %\directlua{luatexja.jfont.is_ktenc('\luatexluaescapestring{\k@encoding}')}\ifin@%
-    %  \let\ct@encoding\k@encoding
-    %  \edef\cy@encoding{\csname y@enc@\k@encoding\endcsname}%
-    %\else
+    \directlua{luatexja.jfont.is_ktenc('\luatexluaescapestring{\k@encoding}')}\ifin@%
+     \let\ct@encoding\k@encoding
+     \edef\cy@encoding{\csname y@enc@\k@encoding\endcsname}%
+    \else
       \@latex@error{KANJI Encoding scheme `\k@encoding' unknown}\@eha
-    %\fi
+    \fi
   \fi
   \let\k@encoding\cy@encoding
   \xdef\font@name{\csname\curr@kfontshape/\f@size\endcsname}%
@@ -630,7 +630,7 @@
     \ifx\ltj@temp\empty\ltj@tempcntb="10FFFF\else\ltj@tempcntb=#2\fi\relax%"
   \fi
   \directlua{luatexja.jfont.set_alt_font_latex(
-    \the\ltj@tempcnta,\the\ltj@tempcntb, 
+    \the\ltj@tempcnta,\the\ltj@tempcntb,
     '\luatexluaescapestring{\ltj@temp@afont}',
     '\luatexluaescapestring{\ltj@temp@bfont}')}%
   }

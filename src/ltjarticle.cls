@@ -115,10 +115,10 @@
   \tombowtrue \tombowdatefalse
   \setlength{\@tombowwidth}{\z@}%
   \maketombowbox}
-%% \DeclareOption{tate}{%
-%%   \AtBeginDocument{\tate\message{《縦組モード》}%
-%%                    \adjustbaseline}%
-%% }
+\DeclareOption{tate}{%
+  \AtBeginDocument{\tate\message{《縦組モード》}%
+                   \adjustbaseline}%
+}
 \DeclareOption{oneside}{\@twosidefalse}
 \DeclareOption{twoside}{\@twosidetrue}
 \DeclareOption{onecolumn}{\@twocolumnfalse}

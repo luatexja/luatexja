@@ -1,17 +1,17 @@
 %%
-%% This is file `ltjbook.cls',
+%% This is file `ltjtarticle.cls',
 %% generated with the docstrip utility.
 %%
 %% The original source files were:
 %%
-%% ltjclasses.dtx  (with options: `book,yoko')
+%% ltjclasses.dtx  (with options: `article,tate')
 %% 
 %% IMPORTANT NOTICE:
 %% 
 %% For the copyright see the source file.
 %% 
 %% Any modified versions of this file must be renamed
-%% with new filenames distinct from ltjbook.cls.
+%% with new filenames distinct from ltjtarticle.cls.
 %% 
 %% For distribution of the original source see the terms
 %% for copying and modification in the file ltjclasses.dtx.
@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 %%
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{ltjbook}
+\ProvidesClass{ltjtarticle}
   [2013/06/06 v1.6-ltj-2
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
@@ -47,9 +47,7 @@
 \newcommand{\@ptsize}{}
 \newif\if@restonecol
 \newif\if@titlepage
-\@titlepagetrue
-\newif\if@openright
-\newif\if@mainmatter \@mainmattertrue
+\@titlepagefalse
 \hour\time \divide\hour by 60\relax
 \@tempcnta\hour \multiply\@tempcnta 60\relax
 \minute\time \advance\minute-\@tempcnta
@@ -127,12 +125,6 @@
 \DeclareOption{twocolumn}{\@twocolumntrue}
 \DeclareOption{titlepage}{\@titlepagetrue}
 \DeclareOption{notitlepage}{\@titlepagefalse}
-\if@compatibility
-\@openrighttrue
-\else
-\DeclareOption{openright}{\@openrighttrue}
-\DeclareOption{openany}{\@openrightfalse}
-\fi
 \DeclareOption{leqno}{\input{leqno.clo}}
 \DeclareOption{fleqn}{\input{fleqn.clo}}
 \DeclareOption{openbib}{%
@@ -153,9 +145,10 @@
 \fi
 \DeclareOption{draft}{\setlength\overfullrule{5pt}}
 \DeclareOption{final}{\setlength\overfullrule{0pt}}
-\ExecuteOptions{a4paper,10pt,twoside,onecolumn,final,openright}
+\ExecuteOptions{a4paper,10pt,oneside,onecolumn,final,tate}
 \ProcessOptions\relax
-\input{ltjbk1\@ptsize.clo}
+\input{ltjtsize1\@ptsize.clo}
+%\RequirePackage{plext}
 \directlua{luatexbase.add_to_callback('luatexja.load_jfm',
   function (ji, jn) ji.chars['parbdd'] = 0; return ji end,
   'ltj.jclasses_load_jfm', 1)}
@@ -166,7 +159,7 @@
 \ltjglobalsetparameter{differentjfm=both}
 \directlua{luatexbase.remove_from_callback('luatexja.load_jfm', 'ltj.jclasses_load_jfm')}
 \if@stysize
-  \setlength\columnsep{2\Cwd}
+  \setlength\columnsep{3\Cwd}
 \else
   \setlength\columnsep{10\p@}
 \fi
@@ -206,89 +199,72 @@
 \let\ps@jpl@in\ps@plain
 \def\ps@headnombre{\let\@mkboth\@gobbletwo
     \let\ps@jpl@in\ps@headnombre
-  \def\@evenhead{\thepage\hfil}%
-  \def\@oddhead{\hfil\thepage}%
+  \def\@evenhead{\hfil\thepage}%
+  \def\@oddhead{\thepage\hfil}%
   \let\@oddfoot\@empty\let\@evenfoot\@empty}
 \def\ps@footnombre{\let\@mkboth\@gobbletwo
     \let\ps@jpl@in\ps@footnombre
-  \def\@evenfoot{\thepage\hfil}%
-  \def\@oddfoot{\hfil\thepage}%
+  \def\@evenfoot{\hfil\thepage}%
+  \def\@oddfoot{\thepage\hfil}%
   \let\@oddhead\@empty\let\@evenhead\@empty}
 \if@twoside
   \def\ps@headings{\let\ps@jpl@in\ps@headnombre
     \let\@oddfoot\@empty\let\@evenfoot\@empty
-    \def\@evenhead{\thepage\hfil\leftmark}%
-    \def\@oddhead{{\rightmark}\hfil\thepage}%
+    \def\@evenhead{{\leftmark}\hfil\thepage}%
+    \def\@oddhead{\thepage\hfil\rightmark}%
     \let\@mkboth\markboth
-  \def\chaptermark##1{\markboth{%
-     \ifnum \c@secnumdepth >\m@ne
-         \if@mainmatter
-         \@chapapp\thechapter\@chappos\hskip1\zw
-         \fi
-     \fi
-     ##1}{}}%
-  \def\sectionmark##1{\markright{%
-     \ifnum \c@secnumdepth >\z@ \thesection.\hskip1\zw\fi
-     ##1}}%
+    \def\sectionmark##1{\markboth{%
+       \ifnum \c@secnumdepth >\z@ \thesection.\hskip1\zw\fi
+       ##1}{}}%
+    \def\subsectionmark##1{\markright{%
+       \ifnum \c@secnumdepth >\@ne \thesubsection.\hskip1\zw\fi
+       ##1}}%
   }
 \else % if not twoside
   \def\ps@headings{\let\ps@jpl@in\ps@headnombre
     \let\@oddfoot\@empty
-    \def\@oddhead{{\rightmark}\hfil\thepage}%
+    \def\@oddhead{\thepage\hfil\rightmark}%
     \let\@mkboth\markboth
-\def\chaptermark##1{\markright{%
-   \ifnum \c@secnumdepth >\m@ne
-         \if@mainmatter
-       \@chapapp\thechapter\@chappos\hskip1\zw
-         \fi
-   \fi
-   ##1}}%
+  \def\sectionmark##1{\markright{%
+     \ifnum \c@secnumdepth >\m@ne \thesection.\hskip1\zw\fi
+     ##1}}%
   }
 \fi
 \if@twoside
   \def\ps@bothstyle{\let\ps@jpl@in\ps@footnombre
-    \def\@evenhead{\leftmark\hfil}% right page
-    \def\@evenfoot{\thepage\hfil}% right page
-    \def\@oddhead{\hfil\rightmark}% left page
-    \def\@oddfoot{\hfil\thepage}% left page
+    \def\@evenhead{\hfil\leftmark}% right page
+    \def\@evenfoot{\hfil\thepage}% right page
+    \def\@oddhead{\rightmark\hfil}% left page
+    \def\@oddfoot{\thepage\hfil}% left page
   \let\@mkboth\markboth
-\def\chaptermark##1{\markboth{%
-     \ifnum \c@secnumdepth >\m@ne
-         \if@mainmatter
-         \@chapapp\thechapter\@chappos\hskip1\zw
-         \fi
-     \fi
-     ##1}{}}%
-  \def\sectionmark##1{\markright{%
+  \def\sectionmark##1{\markboth{%
      \ifnum \c@secnumdepth >\z@ \thesection.\hskip1\zw\fi
+     ##1}{}}%
+  \def\subsectionmark##1{\markright{%
+     \ifnum \c@secnumdepth >\@ne \thesubsection.\hskip1\zw\fi
      ##1}}%
   }
 \else % if one column
   \def\ps@bothstyle{\let\ps@jpl@in\ps@footnombre
-    \def\@oddhead{\hfil\rightmark}%
-    \def\@oddfoot{\hfil\thepage}%
+    \def\@oddhead{\rightmark\hfil}%
+    \def\@oddfoot{\thepage\hfil}%
     \let\@mkboth\markboth
-  \def\chaptermark##1{\markright{%
-     \ifnum \c@secnumdepth >\m@ne
-         \if@mainmatter
-         \@chapapp\thechapter\@chappos\hskip1\zw
-         \fi
-     \fi
+  \def\sectionmark##1{\markright{%
+     \ifnum \c@secnumdepth >\m@ne \thesection.\hskip1\zw\fi
      ##1}}%
   }
 \fi
 \def\ps@myheadings{\let\ps@jpl@in\ps@plain%
   \let\@oddfoot\@empty\let\@evenfoot\@empty
-  \def\@evenhead{\thepage\hfil\leftmark}%
-  \def\@oddhead{{\rightmark}\hfil\thepage}%
+  \def\@evenhead{{\leftmark}\hfil\thepage}%
+  \def\@oddhead{\thepage\hfil\rightmark}%
   \let\@mkboth\@gobbletwo
-  \let\chaptermark\@gobble
   \let\sectionmark\@gobble
+  \let\subsectionmark\@gobble
 }
 \if@compatibility
 \newenvironment{titlepage}
     {%
-      \cleardoublepage
      \if@twocolumn\@restonecoltrue\onecolumn
      \else\@restonecolfalse\newpage\fi
      \thispagestyle{empty}%
@@ -299,7 +275,6 @@
 \else
 \newenvironment{titlepage}
     {%
-      \cleardoublepage
       \if@twocolumn
         \@restonecoltrue\onecolumn
       \else
@@ -321,7 +296,9 @@
   \newcommand{\maketitle}{\begin{titlepage}%
   \let\footnotesize\small
   \let\footnoterule\relax
+  \let\thanks\p@thanks
   \let\footnote\thanks
+  \vbox to\textheight\bgroup\tate\hsize\textwidth
   \null\vfil
   \vskip 60\p@
   \begin{center}%
@@ -335,7 +312,8 @@
       \vskip 1.5em%
     {\large \@date \par}%       % Set date in \large size.
   \end{center}\par
-  \@thanks\vfil\null
+  \vfil{\centering\@thanks}\vfil\null
+  \egroup
   \end{titlepage}%
   \setcounter{footnote}{0}%
   \global\let\thanks\relax
@@ -356,8 +334,8 @@
     \renewcommand{\thefootnote}{\fnsymbol{footnote}}%
     \def\@makefnmark{\hbox{\ifydir $\m@th^{\@thefnmark}$
       \else\hbox{\yoko$\m@th^{\@thefnmark}$}\fi}}%
-     \long\def\@makefntext##1{\parindent 1em\noindent
-       \hbox to1.8em{\hss$\m@th^{\@thefnmark}$}##1}%
+    \long\def\@makefntext##1{\parindent 1\zw\noindent
+       \hbox to 2\zw{\hss\@makefnmark}##1}%
     \if@twocolumn
       \ifnum \col@number=\@ne \@maketitle
       \else \twocolumn[\@maketitle]%
@@ -386,7 +364,7 @@
   \newpage\null
   \vskip 2em%
   \begin{center}%
-  \let\footnote\thanks
+  \let\footnote\p@thanks
     {\LARGE \@title \par}%
     \vskip 1.5em%
     {\large
@@ -399,116 +377,69 @@
   \end{center}%
   \par\vskip 1.5em}
 \fi
-\newcommand*{\chaptermark}[1]{}
-\setcounter{secnumdepth}{2}
+\if@titlepage
+  \newenvironment{abstract}{%
+      \titlepage
+      \null\vfil
+      \@beginparpenalty\@lowpenalty
+      \begin{center}%
+        {\bfseries\abstractname}%
+        \@endparpenalty\@M
+      \end{center}}%
+      {\par\vfil\null\endtitlepage}
+\else
+  \newenvironment{abstract}{%
+    \if@twocolumn
+      \section*{\abstractname}%
+    \else
+      \small
+      \begin{center}%
+        {\bfseries\abstractname\vspace{-.5em}\vspace{\z@}}%
+      \end{center}%
+      \quotation
+    \fi}{\if@twocolumn\else\endquotation\fi}
+\fi
+\setcounter{secnumdepth}{3}
 \newcounter{part}
-\newcounter{chapter}
-\newcounter{section}[chapter]
+\newcounter{section}
 \newcounter{subsection}[section]
 \newcounter{subsubsection}[subsection]
 \newcounter{paragraph}[subsubsection]
 \newcounter{subparagraph}[paragraph]
-\renewcommand{\thepart}{\@Roman\c@part}
-\renewcommand{\thechapter}{\@arabic\c@chapter}
-\renewcommand{\thesection}{\thechapter.\@arabic\c@section}
-\renewcommand{\thesubsection}{\thesection.\@arabic\c@subsection}
+\renewcommand{\thepart}{\rensuji{\@Roman\c@part}}
+\renewcommand{\thesection}{\rensuji{\@arabic\c@section}}
+\renewcommand{\thesubsection}{\thesection・\rensuji{\@arabic\c@subsection}}
 \renewcommand{\thesubsubsection}{%
-   \thesubsection.\@arabic\c@subsubsection}
+   \thesubsection・\rensuji{\@arabic\c@subsubsection}}
 \renewcommand{\theparagraph}{%
-   \thesubsubsection.\@arabic\c@paragraph}
+   \thesubsubsection・\rensuji{\@arabic\c@paragraph}}
 \renewcommand{\thesubparagraph}{%
-   \theparagraph.\@arabic\c@subparagraph}
-\newcommand{\@chapapp}{\prechaptername}
-\newcommand{\@chappos}{\postchaptername}
-\newcommand\frontmatter{%
-  \if@openright \cleardoublepage \else \clearpage \fi
-  \@mainmatterfalse\pagenumbering{roman}}
-\newcommand{\mainmatter}{%
-  \if@openright \cleardoublepage \else \clearpage \fi
-  \@mainmattertrue\pagenumbering{arabic}}
-\newcommand{\backmatter}{%
-  \if@openright \cleardoublepage \else \clearpage \fi
-  \@mainmatterfalse}
-\newcommand{\part}{%
-  \if@openright \cleardoublepage \else \clearpage \fi
-  \thispagestyle{empty}%
-  \if@twocolumn\onecolumn\@tempswatrue\else\@tempswafalse\fi
-  \null\vfil
+   \theparagraph・\rensuji{\@arabic\c@subparagraph}}
+\newcommand{\part}{\par\addvspace{4ex}%
+  \@afterindenttrue
   \secdef\@part\@spart}
 \def\@part[#1]#2{%
-  \ifnum \c@secnumdepth >-2\relax
+  \ifnum \c@secnumdepth >\m@ne
     \refstepcounter{part}%
     \addcontentsline{toc}{part}{%
-       \prepartname\thepart\postpartname\hspace{1em}#1}%
+       \prepartname\thepart\postpartname\hspace{1\zw}#1}%
   \else
     \addcontentsline{toc}{part}{#1}%
   \fi
   \markboth{}{}%
-  {\centering
+  {\parindent\z@\raggedright
    \interlinepenalty\@M\reset@font
-   \ifnum \c@secnumdepth >-2\relax
-     \huge\bfseries\prepartname\thepart\postpartname
-     \par\vskip20\p@
-   \fi
-   \Huge\bfseries#2\par}%
-   \@endpart}
-\def\@spart#1{{%
-  \centering
-  \interlinepenalty\@M\reset@font
-  \Huge\bfseries#1\par}%
-  \@endpart}
-\def\@endpart{\vfil\newpage
-   \if@twoside\null\thispagestyle{empty}\newpage\fi
-   \if@tempswa\twocolumn\fi}
-\newcommand{\chapter}{%
-  \if@openright\cleardoublepage\else\clearpage\fi
-  \thispagestyle{jpl@in}%
-  \global\@topnum\z@
-  \@afterindenttrue
-  \secdef\@chapter\@schapter}
-\def\@chapter[#1]#2{%
-  \ifnum \c@secnumdepth >\m@ne
-    \if@mainmatter
-    \refstepcounter{chapter}%
-    \typeout{\@chapapp\space\thechapter\space\@chappos}%
-    \addcontentsline{toc}{chapter}%
-      {\protect\numberline{\@chapapp\thechapter\@chappos}#1}%
-    \else\addcontentsline{toc}{chapter}{#1}\fi
-  \else
-    \addcontentsline{toc}{chapter}{#1}%
-  \fi
-  \chaptermark{#1}%
-  \addtocontents{lof}{\protect\addvspace{10\p@}}%
-  \addtocontents{lot}{\protect\addvspace{10\p@}}%
-  \@makechapterhead{#2}\@afterheading}
-\def\@makechapterhead#1{\hbox{}%
-  \vskip2\Cvs
-  {\parindent\z@
-   \raggedright
-   \reset@font\huge\bfseries
-   \leavevmode
    \ifnum \c@secnumdepth >\m@ne
-     \setlength\@tempdima{\linewidth}%
-    \if@mainmatter
-     \setbox\z@\hbox{\@chapapp\thechapter\@chappos\hskip1\zw}%
-     \addtolength\@tempdima{-\wd\z@}%
-     \unhbox\z@\nobreak
-    \fi
-     \vtop{\hsize\@tempdima#1}%
-   \else
-     #1\relax
-   \fi}\nobreak\vskip3\Cvs}
-\def\@schapter#1{%
-  \@makeschapterhead{#1}\@afterheading
-}
-\def\@makeschapterhead#1{\hbox{}%
-  \vskip2\Cvs
-  {\parindent\z@
-   \raggedright
-   \reset@font\huge\bfseries
-   \leavevmode
-   \setlength\@tempdima{\linewidth}%
-   \vtop{\hsize\@tempdima#1}}\vskip3\Cvs}
+     \Large\bfseries\prepartname\thepart\postpartname
+     \par\nobreak
+   \fi
+   \huge\bfseries#2\par}%
+  \nobreak\vskip3ex\@afterheading}
+\def\@spart#1{{%
+  \parindent\z@\raggedright
+  \interlinepenalty\@M\reset@font
+  \huge\bfseries#1\par}%
+  \nobreak\vskip3ex\@afterheading}
 \newcommand{\section}{\@startsection{section}{1}{\z@}%
    {1.5\Cvs \@plus.5\Cvs \@minus.2\Cvs}%
    {.5\Cvs \@plus.3\Cvs}%
@@ -530,11 +461,9 @@
    {-1em}%
    {\reset@font\normalsize\bfseries}}
 \newcommand{\appendix}{\par
-  \setcounter{chapter}{0}%
   \setcounter{section}{0}%
-  \renewcommand{\@chapapp}{\appendixname}%
-  \renewcommand{\@chappos}\space%
-  \renewcommand{\thechapter}{\@Alph\c@chapter}}
+  \setcounter{subsection}{0}%
+  \renewcommand{\thesection}{\rensuji{\@Alph\c@section}}}
 \if@twocolumn
   \setlength\leftmargini {2em}
 \else
@@ -556,14 +485,14 @@
 \@beginparpenalty -\@lowpenalty
 \@endparpenalty   -\@lowpenalty
 \@itempenalty     -\@lowpenalty
-\renewcommand{\theenumi}{\@arabic\c@enumi}
-\renewcommand{\theenumii}{\@alph\c@enumii}
-\renewcommand{\theenumiii}{\@roman\c@enumiii}
-\renewcommand{\theenumiv}{\@Alph\c@enumiv}
-\newcommand{\labelenumi}{\theenumi.}
-\newcommand{\labelenumii}{(\theenumii)}
-\newcommand{\labelenumiii}{\theenumiii.}
-\newcommand{\labelenumiv}{\theenumiv.}
+\renewcommand{\theenumi}{\rensuji{\@arabic\c@enumi}}
+\renewcommand{\theenumii}{\rensuji{(\@alph\c@enumii)}}
+\renewcommand{\theenumiii}{\rensuji{\@roman\c@enumiii}}
+\renewcommand{\theenumiv}{\rensuji{\@Alph\c@enumiv}}
+\newcommand{\labelenumi}{\theenumi}
+\newcommand{\labelenumii}{\theenumii}
+\newcommand{\labelenumiii}{\theenumiii}
+\newcommand{\labelenumiv}{\theenumiv}
 \renewcommand{\p@enumii}{\theenumi}
 \renewcommand{\p@enumiii}{\theenumi(\theenumii)}
 \renewcommand{\p@enumiv}{\p@enumiii\theenumiii}
@@ -637,26 +566,24 @@
 \newenvironment{quote}
   {\list{}{\rightmargin\leftmargin}%
            \item\relax}{\endlist}
-\newcounter{figure}[chapter]
-\renewcommand{\thefigure}{%
-  \ifnum\c@chapter>\z@\thechapter.\fi\@arabic\c@figure}
+\newcounter{figure}
+\renewcommand{\thefigure}{\rensuji{\@arabic\c@figure}}
 \def\fps@figure{tbp}
 \def\ftype@figure{1}
 \def\ext@figure{lof}
-\def\fnum@figure{\figurename~\thefigure}
+\def\fnum@figure{\figurename\thefigure}
 \newenvironment{figure}
                {\@float{figure}}
                {\end@float}
 \newenvironment{figure*}
                {\@dblfloat{figure}}
                {\end@dblfloat}
-\newcounter{table}[chapter]
-\renewcommand{\thetable}{%
-  \ifnum\c@chapter>\z@\thechapter.\fi\@arabic\c@table}
+\newcounter{table}
+\renewcommand{\thetable}{\rensuji{\@arabic\c@table}}
 \def\fps@table{tbp}
 \def\ftype@table{2}
 \def\ext@table{lot}
-\def\fnum@table{\tablename~\thetable}
+\def\fnum@table{\tablename\thetable}
 \newenvironment{table}
                {\@float{table}}
                {\end@float}
@@ -688,9 +615,7 @@
 \skip\@mpfootins = \skip\footins
 \setlength\fboxsep{3\p@}
 \setlength\fboxrule{.4\p@}
-\@addtoreset{equation}{chapter}
-\renewcommand{\theequation}{%
-  \ifnum\c@chapter>\z@\thechapter.\fi \@arabic\c@equation}
+\renewcommand{\theequation}{\@arabic\c@equation}
 \if@compatibility\else
   \DeclareSymbolFont{mincho}{JY3}{mc}{m}{n}
   \DeclareSymbolFontAlphabet{\mathmc}{mincho}
@@ -715,12 +640,12 @@
 \DeclareOldFontCommand{\sc}{\normalfont\scshape}{\@nomath\sc}
 \DeclareRobustCommand*{\cal}{\@fontswitch\relax\mathcal}
 \DeclareRobustCommand*{\mit}{\@fontswitch\relax\mathnormal}
-\setcounter{tocdepth}{2}
+\setcounter{tocdepth}{3}
 \newcommand{\@pnumwidth}{1.55em}
 \newcommand{\@tocrmarg}{2.55em}
 \newcommand{\@dotsep}{4.5}
 \newdimen\toclineskip
-\setlength\toclineskip{\z@}
+\setlength\toclineskip{2\p@}
 \newdimen\@lnumwidth
 \def\numberline#1{\hbox to\@lnumwidth{#1\hfil}}
 \def\@dottedtocline#1#2#3#4#5{%
@@ -741,21 +666,18 @@
 \def\addcontentsline#1#2#3{%
   \protected@write\@auxout
     {\let\label\@gobble \let\index\@gobble \let\glossary\@gobble
-\@temptokena{\thepage}}%
+\@temptokena{\rensuji{\thepage}}}%
     {\string\@writefile{#1}%
        {\protect\contentsline{#2}{#3}{\the\@temptokena}}}%
 }
 \newcommand{\tableofcontents}{%
-  \if@twocolumn\@restonecoltrue\onecolumn
-  \else\@restonecolfalse\fi
-  \chapter*{\contentsname
+  \section*{\contentsname
     \@mkboth{\contentsname}{\contentsname}%
   }\@starttoc{toc}%
-  \if@restonecol\twocolumn\fi
 }
 \newcommand*{\l@part}[2]{%
   \ifnum \c@tocdepth >-2\relax
-    \addpenalty{-\@highpenalty}%
+    \addpenalty{\@secpenalty}%
     \addvspace{2.25em \@plus\p@}%
     \begingroup
     \parindent\z@\rightskip\@pnumwidth
@@ -765,51 +687,45 @@
      #1\hfil\nobreak
      \hbox to\@pnumwidth{\hss#2}}\par
     \nobreak
+    \if@compatibility
     \global\@nobreaktrue
     \everypar{\global\@nobreakfalse\everypar{}}%
+    \fi
      \endgroup
   \fi}
-\newcommand*{\l@chapter}[2]{%
-  \ifnum \c@tocdepth >\m@ne
-    \addpenalty{-\@highpenalty}%
+\newcommand*{\l@section}[2]{%
+  \ifnum \c@tocdepth >\z@
+    \addpenalty{\@secpenalty}%
     \addvspace{1.0em \@plus\p@}%
     \begingroup
       \parindent\z@ \rightskip\@pnumwidth \parfillskip-\rightskip
       \leavevmode\bfseries
-      \setlength\@lnumwidth{4\zw}%
+      \setlength\@lnumwidth{1.5em}%
       \advance\leftskip\@lnumwidth \hskip-\leftskip
       #1\nobreak\hfil\nobreak\hbox to\@pnumwidth{\hss#2}\par
-      \penalty\@highpenalty
     \endgroup
   \fi}
-\newcommand*{\l@section}{\@dottedtocline{1}{1.5em}{2.3em}}
-\newcommand*{\l@subsection}   {\@dottedtocline{2}{3.8em}{3.2em}}
-\newcommand*{\l@subsubsection}{\@dottedtocline{3}{7.0em}{4.1em}}
-\newcommand*{\l@paragraph}    {\@dottedtocline{4}{10em}{5em}}
-\newcommand*{\l@subparagraph} {\@dottedtocline{5}{12em}{6em}}
+\newcommand*{\l@subsection}   {\@dottedtocline{2}{1\zw}{4\zw}}
+\newcommand*{\l@subsubsection}{\@dottedtocline{3}{2\zw}{6\zw}}
+\newcommand*{\l@paragraph}    {\@dottedtocline{4}{3\zw}{8\zw}}
+\newcommand*{\l@subparagraph} {\@dottedtocline{5}{4\zw}{9\zw}}
 \newcommand{\listoffigures}{%
-  \if@twocolumn\@restonecoltrue\onecolumn
-  \else\@restonecolfalse\fi
-  \chapter*{\listfigurename
+    \section*{\listfigurename
   \@mkboth{\listfigurename}{\listfigurename}}%
   \@starttoc{lof}%
-  \if@restonecol\twocolumn\fi
 }
-\newcommand*{\l@figure}{\@dottedtocline{1}{1.5em}{2.3em}}
+\newcommand*{\l@figure}{\@dottedtocline{1}{1\zw}{4\zw}}
 \newcommand{\listoftables}{%
-  \if@twocolumn\@restonecoltrue\onecolumn
-  \else\@restonecolfalse\fi
-  \chapter*{\listtablename
+    \section*{\listtablename
   \@mkboth{\listtablename}{\listtablename}}%
   \@starttoc{lot}%
-  \if@restonecol\twocolumn\fi
 }
 \let\l@table\l@figure
 \newdimen\bibindent
 \setlength\bibindent{1.5em}
 \newcommand{\newblock}{\hskip .11em\@plus.33em\@minus.07em}
 \newenvironment{thebibliography}[1]
-{\chapter*{\bibname\@mkboth{\bibname}{\bibname}}%
+{\section*{\refname\@mkboth{\refname}{\refname}}%
    \list{\@biblabel{\@arabic\c@enumiv}}%
         {\settowidth\labelwidth{\@biblabel{#1}}%
          \leftmargin\labelwidth
@@ -830,7 +746,7 @@
 \newenvironment{theindex}
   {\if@twocolumn\@restonecolfalse\else\@restonecoltrue\fi
    \columnseprule\z@ \columnsep 35\p@
-   \twocolumn[\@makeschapterhead{\indexname}]%
+   \twocolumn[\section*{\indexname}]%
    \@mkboth{\indexname}{\indexname}%
    \thispagestyle{jpl@in}\parindent\z@
    \parskip\z@ \@plus .3\p@\relax
@@ -844,9 +760,8 @@
   \kern-3\p@
   \hrule width .4\columnwidth
   \kern 2.6\p@}
-\@addtoreset{footnote}{chapter}
-\newcommand\@makefntext[1]{\parindent 1em
-  \noindent\hbox to 1.8em{\hss\@makefnmark}#1}
+\newcommand\@makefntext[1]{\parindent 1\zw
+  \noindent\hbox to 2\zw{\hss\@makefnmark}#1}
 \newif\if西暦 \西暦false
 \def\西暦{\西暦true}
 \def\和暦{\西暦false}
@@ -875,17 +790,16 @@
   \fi}}
 \newcommand{\prepartname}{第}
 \newcommand{\postpartname}{部}
-\newcommand{\prechaptername}{第}
-\newcommand{\postchaptername}{章}
 \newcommand{\contentsname}{目 次}
 \newcommand{\listfigurename}{図 目 次}
 \newcommand{\listtablename}{表 目 次}
-\newcommand{\bibname}{関連図書}
+\newcommand{\refname}{参考文献}
 \newcommand{\indexname}{索 引}
 \newcommand{\figurename}{図}
 \newcommand{\tablename}{表}
 \newcommand{\appendixname}{付 録}
-\pagestyle{headings}
+\newcommand{\abstractname}{概 要}
+\pagestyle{plain}
 \pagenumbering{arabic}
 \raggedbottom
 \if@twocolumn
@@ -894,11 +808,8 @@
 \else
   \onecolumn
 \fi
-\if@twoside
-  \@mparswitchtrue
-\else
-  \@mparswitchfalse
-\fi
+\normalmarginpar
+\@mparswitchfalse
 \endinput
 %%
-%% End of file `ltjbook.cls'.
+%% End of file `ltjtarticle.cls'.
