@@ -170,7 +170,8 @@ local ihb_flag -- JFM グルー挿入抑止用 flag
 -------------------- hlist 内の文字の検索
 
 local first_char, last_char, find_first_char
-
+do
+local ltjd_glyph_from_packed = ltjd.glyph_from_packed
 local function check_box(box_ptr, box_end)
    local p = box_ptr; local found_visible_node = false
    if not p then
@@ -208,10 +209,11 @@ local function check_box(box_ptr, box_end)
 	 end
       elseif pid==id_hlist then
 	 if PACKED == get_attr_icflag(p) then
+	    local s = ltjd_glyph_from_packed(p)
 	    if find_first_char then
-	       first_char = getlist(p); find_first_char = false
+	       first_char = s; find_first_char = false
 	    end
-	    last_char = getlist(p); found_visible_node = true
+	    last_char = s; found_visible_node = true
 	 else
 	    if getfield(p, 'shift')==0 then
 	       if check_box(getlist(p), nil) then found_visible_node = true end
@@ -254,7 +256,7 @@ function check_box_high(Nx, box_ptr, box_end)
    end
    return last_char
 end
-
+end
 -------------------- Np の計算と情報取得
 
 luatexbase.create_callback("luatexja.jfmglue.whatsit_getinfo", "data",

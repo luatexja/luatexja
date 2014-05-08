@@ -47,6 +47,7 @@ local wh_DIR = luatexja.userid_table.DIR
 local dir_tate = 3
 local dir_yoko = 4
 
+-- \tate, \yoko
 do
   local node_next = node.next
   local function set_list_direction(v, name)
@@ -62,6 +63,7 @@ do
   luatexja.direction.set_list_direction = set_list_direction
 end
 
+-- ボックスに dir whatsit を追加
 do
    local tex_getcount = tex.getcount
    local function set_dir_flag(h, gc)
@@ -108,6 +110,8 @@ do
 			      end, 'ltj.set_dir_flag', 100)
 
 end
+
+
 
 local make_dir_node
 do
@@ -166,25 +170,32 @@ do
       },
    }
 
-   remove_dir_whatsit = function (head, b)
+   clean_dir_whatsit = function(b)
       local bh = getlist(b)
-      if bh and getid(bh)==id_whatsit and getsubtype(bh)==sid_user
-          and getfield(bh, 'user_id')==wh_DIR then
-	     setfield(b, 'head', node_next(bh))
+      local dir
+      for x in traverse_id(id_whatsit, bh) do
+	 if getsubtype(bh)==sid_user and getfield(bh, 'user_id')==wh_DIR then
+	     setfield(b, 'head', (node_remove(bh, x)))
+	     dir = getfield(bh, 'value')
+	     set_attr(b, attr_dir, dir)
 	     set_attr(b, attr_icflag, PROCESSED)
+	     node_free(x); break
+	 end
       end
-      return head, node_next(b)
+      return dir
    end
+   luatexja.direction.clean_dir_whatsit = clean_dir_whatsit
    make_dir_node = function (head, b, new_dir, origin)
       -- head: list head, b: box
       -- origin: コール元 (for debug)
       -- return value: (new head), (next of b), (new b), (is_b_dir_node)
       -- (new b): b か dir_node に被せられた b
-      local old_dir= nil
+      local old_dir
       local bh = getlist(b)
       for x in traverse_id(id_whatsit, bh) do
 	 if getsubtype(bh)==sid_user and getfield(bh, 'user_id')==wh_DIR then
 	     old_dir = getfield(bh, 'value')
+	     set_attr(b, attr_dir, old_dir)
 	     setfield(b, 'head', (node_remove(bh, x)))
 	     set_attr(b, attr_icflag, PROCESSED)
 	     node_free(x); break
@@ -272,6 +283,8 @@ do
 			      process_dir_node, 'ltj.dir_node', 10001)
 end
 
+
+-- 縦書き用字形への変換テーブル
 local font_vert_table = {} -- key: fontnumber
 do
    local font_vert_basename = {} -- key: basename
@@ -292,7 +305,6 @@ do
          font_vert_table[n] = font_vert_table[id]; return
       elseif (not id) or font_vert_table[n]  then return
       end
-
       local fname = id.filename
       local bname = file.basename(fname)
       if not fname then
@@ -300,7 +312,6 @@ do
       elseif font_vert_basename[bname] then
          font_vert_table[n] = font_vert_basename[bname]; return
       end
-
       local vtable = {}
       local a = id.resources.sequences
       if a then
@@ -314,12 +325,11 @@ do
       font_vert_basename[bname] = vtable
       font_vert_table[n] = vtable
    end
-
+   -- 縦書き用字形への変換
    function luatexja.direction.get_vert_glyph(n, chr)
       local fn = font_vert_table[n]
       return fn and fn[chr] or chr
    end
-
    luatexbase.add_to_callback('luatexja.define_font',
 			      function (res, name, size, id)
 				 prepare_vert_data(id, res)
@@ -330,3 +340,15 @@ do
    luatexja.rmlgbm.vert_addfunc = a
 
 end
+
+-- PACKED の hbox から文字を取り出す
+-- luatexja.jfmglue.check_box などで使用
+do
+   local function glyph_from_packed(h)
+      local b = getlist(h)
+      return (getid(b)==id_kern) 
+	 and node_next(node_next(node_next(node_next(b)))) or b
+   end
+   luatexja.direction.glyph_from_packed = glyph_from_packed
+end
+
