@@ -302,9 +302,9 @@ do
    local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
    -- mode = true iff main_process is called from pre_linebreak_filter
    local function main_process(head, mode, dir, gc)
+      tex.setattribute('global', attr_icflag, 0)
       if gc == 'fin_row' then return head
       else
-	    tex.setattribute('global', attr_icflag, 0)
 	    local p = to_direct(head)
 	    p = ltjj.main(p,mode)
 	    if p then p = ltjw.set_ja_width(p, dir) end
