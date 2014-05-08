@@ -87,8 +87,8 @@ do
       lang.hyphenate(head)
       return head
    end
-   
-   luatexbase.add_to_callback('hyphenate', 
+
+   luatexbase.add_to_callback('hyphenate',
 			      function (head,tail)
 				 return suppress_hyphenate_ja(head)
 			      end,'ltj.hyphenate')
@@ -108,7 +108,7 @@ local function set_box_stack_level(head, mode)
 	 local pfn = has_attr(p, jfntattr) or getfont(p)
 	 local pc = getchar(p)
 	 local pf = ltjf_replace_altfont(pfn, pc)
-	 if is_dir_tate then 
+	 if is_dir_tate then
 	    set_attr(p, attr_dir, pc)
 	    pc = ltjd_get_vert_glyph(pf, pc) or pc
 	 end
@@ -120,11 +120,11 @@ local function set_box_stack_level(head, mode)
 end
 
 -- CALLBACKS
-luatexbase.add_to_callback('hpack_filter', 
+luatexbase.add_to_callback('hpack_filter',
    function (head)
      return set_box_stack_level(head, true)
    end,'ltj.hpack_filter_pre',1)
-luatexbase.add_to_callback('pre_linebreak_filter', 
+luatexbase.add_to_callback('pre_linebreak_filter',
   function (head)
      return set_box_stack_level(head, false)
   end,'ltj.pre_linebreak_filter_pre',1)

@@ -11,7 +11,7 @@ local cid_reg, cid_order, cid_supp, cid_name
 local cid_replace = {
    ["Adobe-Japan1"] = {"UniJIS2004-UTF32", 23057, 6,
 		       function (i)
-			  if (231<=i and i<=632) or (8718<=i and i<=8719) 
+			  if (231<=i and i<=632) or (8718<=i and i<=8719)
 		             or (12063<=i and i<=12087) then
 			     return 327680 -- 655360/2
 			  elseif 9758<=i and i<=9778 then
@@ -21,15 +21,15 @@ local cid_replace = {
 			  end
 		       end},
                        -- 基本的には JIS X 0213:2004 に沿ったマッピング
-   ["Adobe-Korea1"] = {"UniKS-UTF32",  18351, 2, 
+   ["Adobe-Korea1"] = {"UniKS-UTF32",  18351, 2,
 		       function (i)
-			  if 8094<=i and i<=8100 then 
+			  if 8094<=i and i<=8100 then
 			     return 327680 -- 655360/2
 			  end
 		       end},
-   ["Adobe-GB1"]    = {"UniGB-UTF32",  30283, 5, 
+   ["Adobe-GB1"]    = {"UniGB-UTF32",  30283, 5,
 		       function (i)
-			  if (814<=i and i<=939) or (i==7716) 
+			  if (814<=i and i<=939) or (i==7716)
 		             or (22355<=i and i<=22357) then
 			     return 327680 -- 655360/2
 			  end
@@ -52,12 +52,12 @@ do
       local cid, ucs, ucsa
       line = fh:read("*l")
       while line do
-         if string.find(line, "end...?char") then 
+         if string.find(line, "end...?char") then
             line = fh:read("*l"); return
          else -- WMA l is in the form "<%x+>%s%d+"
             ucs, cid = string.match(line, "<(%x+)>%s+<?(%x+)>?")
-            cid = cid_dec(cid); ucs = tonumber(ucs, 16); 
-            if not tt[ucs]  then 
+            cid = cid_dec(cid); ucs = tonumber(ucs, 16);
+            if not tt[ucs]  then
                tt[ucs] = mke(cid); cidm[cid]=ucs
             end
          end
@@ -69,14 +69,14 @@ do
       local bucs, eucs, cid
       line = fh:read("*l")
       while line do
-        if string.find(line, "end...?range") then 
+        if string.find(line, "end...?range") then
             line = fh:read("*l"); return
          else -- WMA l is in the form "<%x+>%s+<%x+>"
             bucs, eucs, cid = string.match(line, "<(%x+)>%s+<(%x+)>%s+<?(%x+)>?")
-            cid = cid_dec(cid); 
+            cid = cid_dec(cid);
 	    bucs = tonumber(bucs, 16); eucs = tonumber(eucs, 16)
             for ucs = bucs, eucs do
-               if not tt[ucs]  then 
+               if not tt[ucs]  then
                   tt[ucs] = mke(cid); cidm[cid]=ucs
                end
                cid = inc(cid)
@@ -98,12 +98,12 @@ do
             line = fh:read("*l")
          end
       end
-      fh:close();  
+      fh:close();
    end
-   
+
    local function increment(a) return a+1 end
-   local function entry(a)     
-      return {index = a} 
+   local function entry(a)
+      return {index = a}
    end
    make_cid_font = function ()
       local kx = cid_replace[cid_name]
@@ -115,7 +115,7 @@ do
 	    ascender = 655360*0.88,
 	    descender = 655360*0.12,
 	 },
-	 embedding = "no", cache = "yes", factor = 0, hfactor = 0, vfactor = 0, 
+	 embedding = "no", cache = "yes", factor = 0, hfactor = 0, vfactor = 0,
 	 tounicode = 1,
       }
       cidfont_data[cid_name] = k
@@ -131,8 +131,8 @@ do
       -- これらは TrueType フォントを使って表示するときはおかしくなる
       local ttu, pricode = {}, 0xF0000
       for i,v in ipairs(cidmo) do
-         if v==-1 then 
-            tth[pricode], cidmo[i], pricode 
+         if v==-1 then
+            tth[pricode], cidmo[i], pricode
 	       = { index = i }, pricode, pricode+1;
          end
          ttu[cid_order .. '.' .. i] = cidmo[i]
@@ -147,14 +147,14 @@ do
 
       -- shared
       k.shared = {
-         otfdata = { 
-            cidinfo= k.cidinfo, verbose = false, 
-            shared = { featuredata = {}, }, 
-	    luatex = { features = {}, 
-		       defaultwidth=1000, 
+         otfdata = {
+            cidinfo= k.cidinfo, verbose = false,
+            shared = { featuredata = {}, },
+	    luatex = { features = {},
+		       defaultwidth=1000,
 		     },
          },
-         dynamics = {}, features = {}, processes = {}, 
+         dynamics = {}, features = {}, processes = {},
 	 ltj_vert_table = ttv
       }
       k.resources = { unicodes = ttu, }
@@ -164,10 +164,10 @@ do
       -- tounicode エントリ
       local cidp = {nil, nil}; tt, ttu, cidm = {}, {}, {}
       open_cmap_file(cid_name .. "-UCS2",
-		     function(a) 
+		     function(a)
 			a[2] = a[2] +1 ; return a
-		     end, 
-		     function(a) 
+		     end,
+		     function(a)
 			cidp[1] = string.upper(string.sub(a,1,string.len(a)-4))
 			cidp[2] = tonumber(string.sub(a,-4),16)
 			return cidp
@@ -192,12 +192,12 @@ do
    end
 end
 
--- 
+--
 local function cid_cache_outdated(t) return t.version~=cache_ver end
 local function read_cid_font()
    local dat = ltjb.load_cache("ltj-cid-auto-" .. string.lower(cid_name),
 			       cid_cache_outdated )
-   if dat then 
+   if dat then
       cidfont_data[cid_name] = dat[1]
       cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
    else
@@ -245,14 +245,14 @@ local function mk_rml(name, size, id)
    local scale = size / 655360
 
    do
-      local def_height =  0.88 * size 
+      local def_height =  0.88 * size
       -- character's default height (optimized for jfm-ujis.lua)
       local def_depth =  0.12 * size  -- and depth.
       if not cache_chars[cid_name][size] then
 	 cache_chars[cid_name][size]  = {}
 	 for k, v in pairs(cache_chars[cid_name][655360]) do
-	    cache_chars[cid_name][size][k] = { 
-	       index = v.index, width = v.width * scale, 
+	    cache_chars[cid_name][size][k] = {
+	       index = v.index, width = v.width * scale,
 	       height = def_height, depth = def_depth, tounicode = v.tounicode,
 	    }
 	 end
@@ -278,12 +278,12 @@ local function mk_rml(name, size, id)
    -- no embedding
    local var = ''
    local s = string.match(specification.detail, 'slant=([+-]*%d*%.?%d)')
-   if s and e~=0  then 
+   if s and e~=0  then
       s = s * 1000
       var, fontdata.slant  = var .. 's' .. tostring(s), s
    end
    local e = string.match(specification.detail, 'extend=([+-]*%d*%.?%d)')
-   if e and e~=1  then 
+   if e and e~=1  then
       e = e * 1000
       var, fontdata.extend  = var .. 'x' .. tostring(e), e
    end
@@ -306,7 +306,7 @@ local function font_callback(name, size, id, fallback)
 	 basename = utf.gsub(basename, '/[BI][BI]?', '', 1)
 	 p = utf.find(basename, ":")
       end
-      if p then 
+      if p then
 	 local xname = utf.sub(basename, p+1)
 	 p = 1
 	 while p do
@@ -318,13 +318,13 @@ local function font_callback(name, size, id, fallback)
 	 end
       end
       cid_reg, cid_order = string.match(s, "^(.-)%-(.-)%-(%d-)$")
-      if not cid_reg then 
+      if not cid_reg then
          cid_reg, cid_order = string.match(s, "^(.-)%-(.-)$")
       end
       cid_name = cid_reg .. '-' .. cid_order
-      if not cidfont_data[cid_name] then 
+      if not cidfont_data[cid_name] then
          read_cid_font()
-         if not cidfont_data[cid_name] then 
+         if not cidfont_data[cid_name] then
             ltjb.package_error('luatexja',
                                "bad cid key `" .. s .. "'",
                                "I couldn't find any non-embedded font information for the CID\n" ..
@@ -334,7 +334,7 @@ local function font_callback(name, size, id, fallback)
          end
       end
       return mk_rml(basename, size, id)
-   else 
+   else
       return fallback(name, size, id)
    end
 end

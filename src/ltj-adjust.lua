@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.adjust',
-  date = '2014/02/02',
+  date = '2014/05/08',
   description = 'Advanced line adjustment for LuaTeX-ja',
 })
 module('luatexja.adjust', package.seeall)
@@ -82,11 +82,11 @@ local function get_stretched(q, go, gs)
    local qs = getfield(q, 'spec')
    if not getfield(qs, 'writable') then return 0 end
    if gs == 1 then -- stretching
-      if getfield(qs, 'stretch_order') == go then 
-	 return getfield(qs, 'stretch') 
+      if getfield(qs, 'stretch_order') == go then
+	 return getfield(qs, 'stretch')
       end
    else -- shrinking
-      if getfield(qs, 'shrink_order') == go then 
+      if getfield(qs, 'shrink_order') == go then
 	 return getfield(qs, 'shrink')
       end
    end
@@ -95,7 +95,7 @@ end
 local res = {}
 local gs_used_line = {}
 local function get_total_stretched(p, line)
-   local go, gf, gs 
+   local go, gf, gs
       = getfield(p, 'glue_order'), getfield(p, 'glue_set'), getfield(p, 'glue_sign')
    if go ~= 0 then return nil end
    res[0], res.glue_set, res.name = 0, gf, (gs==1) and 'stretch' or 'shrink'
@@ -104,7 +104,7 @@ local function get_total_stretched(p, line)
    local total = 0
    for q in node_traverse_id(id_glue, getlist(p)) do
       local a, ic = get_stretched(q, go, gs), get_attr_icflag(q)
-      if   type(res[ic]) == 'number' then 
+      if   type(res[ic]) == 'number' then
 	 -- kanjiskip, xkanjiskip は段落内で spec を共有しているが，
 	 -- それはここでは望ましくないので，各 glue ごとに異なる spec を使う．
 	 -- 本当は各行ごとに glue_spec を共有させたかったが，安直にやると
@@ -125,7 +125,7 @@ local function get_total_stretched(p, line)
 	 elseif ic == XKANJI_SKIP_JFM  then ic = XKANJI_SKIP
 	 end
 	 res[ic], total = res[ic] + a, total + a
-      else 
+      else
 	 res[0], total = res[0]  + a, total + a
       end
    end
@@ -153,11 +153,11 @@ local function set_stretch(p, after, before, ic, name)
       end
       for q in node_traverse_id(id_glue, getlist(p)) do
 	 local f = get_attr_icflag(q)
-         if (f == ic) or ((ic ==KANJI_SKIP) and (f == KANJI_SKIP_JFM)) 
+         if (f == ic) or ((ic ==KANJI_SKIP) and (f == KANJI_SKIP_JFM))
 	   or ((ic ==XKANJI_SKIP) and (f == XKANJI_SKIP_JFM)) then
             local qs, do_flag = getfield(q, 'spec'), true
-            for i=1,#set_stretch_table do 
-               if set_stretch_table[i]==qs then do_flag = false end 
+            for i=1,#set_stretch_table do
+               if set_stretch_table[i]==qs then do_flag = false end
             end
             if getfield(qs, 'writable') and getfield(qs, name..'_order')==0 and do_flag then
                setfield(qs, name, getfield(qs, name)*ratio)
@@ -173,13 +173,13 @@ local function aw_step1(p, res, total)
    local x = node_tail(getlist(p)); if not x then return false end
    -- x: \rightskip
    x = node_prev(x); if not x then return false end
-   if getid(x) == id_glue and getsubtype(x) == 15 then 
+   if getid(x) == id_glue and getsubtype(x) == 15 then
       -- 段落最終行のときは，\penalty10000 \parfillskip が入るので，
       -- その前の node が本来の末尾文字となる
-      x = node_prev(node_prev(x)) 
+      x = node_prev(node_prev(x))
    end
    -- local xi = getid(x)
-   -- while (get_attr_icflag(x) == PACKED) 
+   -- while (get_attr_icflag(x) == PACKED)
    --    and  ((xi == id_penalty) or (xi == id_kern) or (xi == id_kern)) do
    --       x = node_prev(x); xi = getid(x)
    -- end
@@ -252,12 +252,12 @@ end
 
 
 local ltjs_fast_get_stack_skip = ltjs.fast_get_stack_skip
-local function adjust_width(head) 
+local function adjust_width(head)
    if not head then return head end
    local line = 1
    for p in node_traverse_id(id_hlist, to_direct(head)) do
       line = line + 1
-      local res, total = get_total_stretched(p, line) 
+      local res, total = get_total_stretched(p, line)
         -- this is the same table as the table which is def'd in l. 92
       if res and res.glue_set<1 then
 	 total = round(total * res.glue_set)
@@ -274,7 +274,7 @@ do
    local is_reg = false
    function enable_cb()
       if not is_reg then
-	 luatexbase.add_to_callback('post_linebreak_filter', 
+	 luatexbase.add_to_callback('post_linebreak_filter',
 				    adjust_width, 'Adjust width', 100)
 	 is_reg = true
       end

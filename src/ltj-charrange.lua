@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.charrange',
-  date = '2014/01/19',
+  date = '2014/05/08',
   description = 'Handling the range of Japanese characters',
 })
 module('luatexja.charrange', package.seeall)
@@ -70,9 +70,9 @@ end
 function char_to_range(c) -- return the external range number
    c=ltjb.in_unicode(c, false)
    if c<0x80 then return -1
-   else 
+   else
       local r = jcr_table_main[c] or 217
-      return (r and r~=0) and r or 217 
+      return (r and r~=0) and r or 217
    end
 end
 

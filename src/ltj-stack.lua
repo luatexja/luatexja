@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.stack',
-  date = '2014/01/24',
+  date = '2014/05/08',
   description = 'LuaTeX-ja stack system',
 })
 module('luatexja.stack', package.seeall)
@@ -15,9 +15,9 @@ local node_new = node.new
 local id_whatsit = node.id('whatsit')
 local sid_user = node.subtype('user_defined')
 local STCK = luatexja.userid_table.STCK
-hmode = 0 -- dummy 
+hmode = 0 -- dummy
 
-charprop_stack_table={}; 
+charprop_stack_table={};
 local charprop_stack_table = charprop_stack_table
 charprop_stack_table[0]={}
 
@@ -46,7 +46,7 @@ function get_stack_level(is_v)
    return i
 end
 
--- local function table_to_str(v) 
+-- local function table_to_str(v)
 --    local s = ''
 --    for i, a in pairs(v) do
 --       s = s .. i .. "=" .. tostring(a) .. ', '
@@ -64,7 +64,7 @@ function set_stack_table(m,p, is_v)
    local i = get_stack_level(is_v)
    charprop_stack_table[i][m] = p
    if luatexja.isglobal=='global' then
-      for j,v in pairs(charprop_stack_table) do 
+      for j,v in pairs(charprop_stack_table) do
          charprop_stack_table[j][m] = p
       end
    end
@@ -86,7 +86,7 @@ end
 
 -- EXT
 function set_stack_font(m,c,p)
-   if type(c)~='number' or c<0 or c>255 then 
+   if type(c)~='number' or c<0 or c>255 then
       ltjb.package_error('luatexja',
 			 "invalid family number (".. tostring(c) .. ")",
 			 "The family number should in the range 0 .. 255.\n" ..
@@ -100,8 +100,8 @@ end
 function set_stack_skip(m,sp)
   local i = get_stack_level()
   if not sp then return end
-  if not charprop_stack_table[i][m] then 
-     charprop_stack_table[i][m] = {} 
+  if not charprop_stack_table[i][m] then
+     charprop_stack_table[i][m] = {}
   end
   charprop_stack_table[i][m].width   = sp.width
   charprop_stack_table[i][m].stretch = sp.stretch
@@ -109,7 +109,7 @@ function set_stack_skip(m,sp)
   charprop_stack_table[i][m].stretch_order = sp.stretch_order
   charprop_stack_table[i][m].shrink_order  = sp.shrink_order
   if luatexja.isglobal=='global' then
-     for j,v in pairs(charprop_stack_table) do 
+     for j,v in pairs(charprop_stack_table) do
 	if not charprop_stack_table[j][m] then charprop_stack_table[j][m] = {} end
 	charprop_stack_table[j][m].width   = sp.width
 	charprop_stack_table[j][m].stretch = sp.stretch
@@ -126,13 +126,13 @@ function report_stack_level(bsl)
    return bsl
 end
 function fast_get_stack_skip(m)
-   return table_current_stack[m] 
+   return table_current_stack[m]
       or { width = 0, stretch = 0, shrink = 0, stretch_order = 0, shrink_order = 0 }
 end
 
 -- For other situations, use the following instead:
 function get_stack_skip(m, idx)
-   return charprop_stack_table[idx][m] 
+   return charprop_stack_table[idx][m]
       or { width = 0, stretch = 0, shrink = 0, stretch_order = 0, shrink_order = 0 }
 end
 function get_stack_table(mc, d, idx)

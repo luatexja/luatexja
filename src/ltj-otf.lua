@@ -34,7 +34,7 @@ local node_free = Dnode.free
 local has_attr = Dnode.has_attribute
 local set_attr = Dnode.set_attribute
 local unset_attr = Dnode.unset_attribute
-local node_insert_after = Dnode.insert_after 
+local node_insert_after = Dnode.insert_after
 local node_write = Dnode.write
 local node_traverse_id = Dnode.traverse_id
 
@@ -50,7 +50,7 @@ local ltjr_cidfont_data = ltjr.cidfont_data
 local ltjc_is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char
 
 luatexja.userid_table.OTF = luatexbase.newuserwhatsitid('char_by_cid',  'luatexja')
-luatexja.userid_table.VSR = luatexbase.newuserwhatsitid('replace_vs',  'luatexja') 
+luatexja.userid_table.VSR = luatexbase.newuserwhatsitid('replace_vs',  'luatexja')
 local OTF, VSR = luatexja.userid_table.OTF, luatexja.userid_table.VSR
 
 local function get_ucs_from_rmlgbm(c)
@@ -65,7 +65,7 @@ local function get_ucs_from_rmlgbm(c)
       local i = string.len(w)
       if i==4 then -- UCS2
          return tonumber(w,16)
-      elseif i==8 then 
+      elseif i==8 then
          i,w = tonumber(string.sub(w,1,4),16), tonumber(string.sub(w,-4),16)
          if (w>=0xD800) and (w<=0xDB7F) and (i>=0xDC00) and (i<=0xDFFF) then -- Surrogate pair
             return (w-0xD800)*0x400 + (i-0xDC00)
@@ -91,7 +91,7 @@ end
 local function cid(key)
    if key==0 then return append_jglyph(char) end
    local curjfnt = identifiers[tex.attribute[attr_curjfnt]]
-   if not curjfnt.cidinfo or 
+   if not curjfnt.cidinfo or
       curjfnt.cidinfo.ordering ~= "Japan1" and
       curjfnt.cidinfo.ordering ~= "GB1" and
       curjfnt.cidinfo.ordering ~= "CNS1" and
@@ -106,7 +106,7 @@ local function cid(key)
       ltjb.package_warning('luatexja-otf',
                            'Current Japanese font (or other CJK font) "'
                               ..curjfnt.psname..'" does not have the specified CID character ('
-                              ..tostring(key)..')', 
+                              ..tostring(key)..')',
                            'Use a font including the specified CID character.')
       char = 0
    end
@@ -129,7 +129,7 @@ local function extract(head)
                set_attr(g, attr_curjfnt, puid==OTF and v or -1)
                -- VSR yields ALchar
                v = has_attr(p, attr_yablshift)
-               if v then 
+               if v then
                   set_attr(g, attr_yablshift, v)
                else
                   unset_attr(g, attr_yablshift)
@@ -171,14 +171,14 @@ local function cid_to_char(fmtable, fn)
 	 if j then
 	    j = tonumber(fi.resources.unicodes['Japan1.'..tostring(j)])
 	    if j then
-	       fmtable.cid_char_type[j] = v 
+	       fmtable.cid_char_type[j] = v
 	    end
 	 end
       end
    end
    return fmtable
 end
-luatexbase.add_to_callback("luatexja.define_jfont", 
+luatexbase.add_to_callback("luatexja.define_jfont",
 			   cid_to_char, "ltj.otf.define_jfont", 1)
 --  既に読み込まれているフォントに対しても，同じことをやらないといけない
 for fn, v in pairs(ltjf_font_metric_table) do
@@ -193,7 +193,7 @@ local function cid_set_char_class(arg, fmtable, char)
    else return 0
    end
 end
-luatexbase.add_to_callback("luatexja.find_char_class", 
+luatexbase.add_to_callback("luatexja.find_char_class",
 			   cid_set_char_class, "ltj.otf.find_char_class", 1)
 
 -------------------- IVS
@@ -218,7 +218,7 @@ do
 		     for i,_ in pairs(ivs[bu]) do
 			if i==vs then uniq_flag = false; break end
 		     end
-		     if uniq_flag then 
+		     if uniq_flag then
 			ivs[bu][vsel] = unitable[gv.name]
 		     end
 		  end
@@ -256,27 +256,27 @@ do
       end
       local fname = id.filename
       local bname = file.basename(fname)
-      if not fname then 
+      if not fname then
          font_ivs_table[n] = {}; return
-      elseif font_ivs_basename[bname] then 
+      elseif font_ivs_basename[bname] then
          font_ivs_table[n] = font_ivs_basename[bname]; return
       end
-      
+
       -- if the cache is present, read it
       local newsum = checksum(fname) -- MD5 checksum of the fontfile
       local v = "ivs_" .. string.lower(file.nameonly(fname))
-      local dat = ltjb.load_cache(v, 
+      local dat = ltjb.load_cache(v,
          function (t) return (t.version~=cache_ver) or (t.chksum~=newsum) end
       )
       -- if the cache is not found or outdated, save the cache
-      if dat then 
+      if dat then
 	 font_ivs_basename[bname] = dat[1] or {}
       else
 	 dat = make_ivs_table(id, fname)
 	 font_ivs_basename[bname] = dat or {}
 	 ltjb.save_cache( v,
 			  {
-			     chksum = checksum(fname), 
+			     chksum = checksum(fname),
 			     version = cache_ver,
 			     dat,
 			  })
@@ -305,7 +305,7 @@ do
             local q = node_next(p) -- the next node of p
             if q and getid(q)==id_glyph then
                local qc = getchar(q)
-               if (qc>=0xFE00 and qc<=0xFE0F) or (qc>=0xE0100 and qc<0xE01F0) then 
+               if (qc>=0xFE00 and qc<=0xFE0F) or (qc>=0xE0100 and qc<0xE01F0) then
                   -- q is a variation selector
                   if qc>=0xE0100 then qc = qc - 0xE0100 end
                   local pt = font_ivs_table[pf]
@@ -315,12 +315,12 @@ do
                   if pt then
                      local np = ivs_jglyph(pt, p, pf,
                                            (has_attr(p,attr_curjfnt) or 0)==pf and OTF or VSR)
-                     head = node_insert_after(head, p, np) 
+                     head = node_insert_after(head, p, np)
                      head = node_remove(head,p)
 		     node_free(p)
                   end
 		  p = r
-	       else 
+	       else
 		  p = q
                end
 	    else
@@ -338,13 +338,13 @@ do
 	 ltjb.package_warning('luatexja-otf',
 			      'luatexja.otf.enable_ivs() was already called, so this call is ignored', '')
       else
-	 luatexbase.add_to_callback('hpack_filter', 
+	 luatexbase.add_to_callback('hpack_filter',
 				    do_ivs_repr,'do_ivs', 1)
-	 luatexbase.add_to_callback('pre_linebreak_filter', 
+	 luatexbase.add_to_callback('pre_linebreak_filter',
 				    do_ivs_repr, 'do_ivs', 1)
 	 local ivs_callback = function (name, size, id)
 	    return font_callback(
-	       name, size, id, 
+	       name, size, id,
 	       function (name, size, id) return luatexja.font_callback(name, size, id) end
 	    )
 	 end

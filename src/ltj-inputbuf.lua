@@ -18,7 +18,7 @@ local FFFFF = string.char(0xF3,0xBF,0xBF,0xBF)
 --- Instead of "%", we use U+FFFFF for suppressing spaces.
 local function add_comment(buffer)
    local i = utflen(buffer)
-   while (i>0) and (getcatcode(utfbyte(buffer, i))==1 
+   while (i>0) and (getcatcode(utfbyte(buffer, i))==1
 		 or getcatcode(utfbyte(buffer, i))==2) do
       i=i-1
    end
@@ -40,7 +40,7 @@ local function add_comment(buffer)
    return buffer
 end
 
-luatexbase.add_to_callback('process_input_buffer', 
+luatexbase.add_to_callback('process_input_buffer',
    add_comment,'ltj.process_input_buffer')
 
 --EOF

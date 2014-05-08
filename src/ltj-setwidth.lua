@@ -69,9 +69,9 @@ local head, dir
 local ltjw = {} --export
 luatexja.setwidth = ltjw
 
-luatexbase.create_callback("luatexja.set_width", "data", 
-			   function (fstable, fmtable, jchar_class) 
-			      return fstable 
+luatexbase.create_callback("luatexja.set_width", "data",
+			   function (fstable, fmtable, jchar_class)
+			      return fstable
 			   end)
 local call_callback = luatexbase.call_callback
 
@@ -100,13 +100,13 @@ local function capsule_glyph_yoko(p, met, class)
       setfield(box, 'shift', y_shift)
       setfield(box, 'dir', dir)
       set_attr(box, attr_icflag, PACKED + get_pr_begin_flag(p))
-      head = q and node_insert_before(head, q, box) 
+      head = q and node_insert_before(head, q, box)
                or node_insert_after(head, node_tail(head), box)
       return q
    else
       set_attr(p, attr_icflag, PROCESSED + get_pr_begin_flag(p))
       setfield(p, 'xoffset', getfield(p, 'xoffset') - fshift.left)
-      setfield(p, 'yoffset', getfield(p, 'yoffset') 
+      setfield(p, 'yoffset', getfield(p, 'yoffset')
 		  - (has_attr(p, attr_ykblshift) or 0) - fshift.down)
       return node_next(p)
    end
@@ -120,41 +120,41 @@ local function capsule_glyph_tate(p, met, class)
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = call_callback("luatexja.set_width", fshift, met, class)
    local fheight, fdepth = char_data.height, char_data.depth
-   
+
    setfield(p, 'char', ltjd.get_vert_glyph(getfont(p), getchar(p)))
 
-      local y_shift
-         = - getfield(p, 'yoffset') + (has_attr(p,attr_tkblshift) or 0)
-      local q
-      head, q = node_remove(head, p)
-      local box = node_new(id_hlist)
-      setfield(box, 'width', fwidth)
-      setfield(box, 'height', fheight)
-      setfield(box, 'depth', fdepth)
-      setfield(box, 'shift', y_shift)
-      setfield(box, 'dir', dir)
+   local y_shift
+      = - getfield(p, 'yoffset') + (has_attr(p,attr_tkblshift) or 0)
+   local q
+   head, q = node_remove(head, p)
+   local box = node_new(id_hlist)
+   setfield(box, 'width', fwidth)
+   setfield(box, 'height', fheight)
+   setfield(box, 'depth', fdepth)
+   setfield(box, 'shift', y_shift)
+   setfield(box, 'dir', dir)
 
-      local k1 = node_new(id_kern)
-      setfield(k1, 'kern', 
-	       getfield(p, 'xoffset') + ascent
-		  + char_data.align*(fwidth-pwidth) - fshift.left)
-      local ws = node_new(id_whatsit, sid_save)
-      local wm = node_new(id_whatsit, sid_matrix)
-      setfield(wm, 'data', '0 1 -1 0')
-      local k2 = node_new(id_kern)
-      setfield(k2, 'kern', -fshift.down - fdepth)
-      local k3 = node_new(id_kern)
-      setfield(k3, 'kern', - getfield(p, 'width') +fshift.down + fdepth)
-      local wr = node_new(id_whatsit, sid_restore)
-      setfield(box, 'head', k1); setfield(k1, 'next', ws)
-      setfield(ws, 'next', wm);  setfield(wm, 'next', k2); 
-      setfield(k2, 'next', p);   setfield(p, 'next', k3); 
-      setfield(k3, 'next', wr); 
+   local k1 = node_new(id_kern)
+   setfield(k1, 'kern',
+	    getfield(p, 'xoffset') + ascent
+	       + char_data.align*(fwidth-pwidth) - fshift.left)
+   local ws = node_new(id_whatsit, sid_save)
+   local wm = node_new(id_whatsit, sid_matrix)
+   setfield(wm, 'data', '0 1 -1 0')
+   local k2 = node_new(id_kern)
+   setfield(k2, 'kern', -fshift.down - fdepth)
+   local k3 = node_new(id_kern)
+   setfield(k3, 'kern', - getfield(p, 'width') +fshift.down + fdepth)
+   local wr = node_new(id_whatsit, sid_restore)
+   setfield(box, 'head', k1); setfield(k1, 'next', ws)
+   setfield(ws, 'next', wm);  setfield(wm, 'next', k2);
+   setfield(k2, 'next', p);   setfield(p, 'next', k3);
+   setfield(k3, 'next', wr);
 
-      set_attr(box, attr_icflag, PACKED + get_pr_begin_flag(p))
-      head = q and node_insert_before(head, q, box) 
-               or node_insert_after(head, node_tail(head), box)
-      return q
+   set_attr(box, attr_icflag, PACKED + get_pr_begin_flag(p))
+   head = q and node_insert_before(head, q, box)
+      or node_insert_after(head, node_tail(head), box)
+   return q
 end
 
 local function capsule_glyph_math(p, met, class)
@@ -169,7 +169,7 @@ local function capsule_glyph_math(p, met, class)
       = - getfield(p, 'yoffset') + (has_attr(p,attr_ykblshift) or 0), char_data.align
    setfield(p, 'yoffset', -fshift.down)
    setfield(p, 'xoffset', getfield(p, 'xoffset') + char_data.align*(fwidth-pwidth) - fshift.left)
-   local box = node_new(id_hlist); 
+   local box = node_new(id_hlist);
    setfield(box, 'width', fwidth)
    setfield(box, 'height', fheight)
    setfield(box, 'depth', fdepth)
@@ -189,11 +189,11 @@ function luatexja.setwidth.set_ja_width(ahead, adir)
    local attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
    while p do
       local pid = getid(p)
-      if (pid==id_glyph) 
+      if (pid==id_glyph)
       and ((has_attr(p, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG)<=0 then
          local pf = getfont(p)
 	 if pf == has_attr(p, attr_curjfnt) then
-	    p = capsule_glyph(p, ltjf_font_metric_table[pf], 
+	    p = capsule_glyph(p, ltjf_font_metric_table[pf],
 			      has_attr(p, attr_jchar_class))
 	 else
 	    set_attr(p, attr_icflag, PROCESSED + get_pr_begin_flag(p))

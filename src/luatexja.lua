@@ -320,7 +320,7 @@ do
    end
 
    -- callbacks
-  
+
    luatexbase.add_to_callback(
       'pre_linebreak_filter',
       function (head,groupcode)

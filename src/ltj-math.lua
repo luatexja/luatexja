@@ -90,9 +90,9 @@ local function conv_jchar_to_hbox(head, sty)
 	 else sty = 2
 	 end
        end
-   end 
+   end
    return head
-end 
+end
 
 local MJT  = luatexja.stack_table_index.MJT
 local MJS  = luatexja.stack_table_index.MJS
@@ -100,7 +100,7 @@ local MJSS = luatexja.stack_table_index.MJSS
 local capsule_glyph_math = ltjw.capsule_glyph_math
 local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
 
-conv_jchar_to_hbox_A = 
+conv_jchar_to_hbox_A =
 function (p, sty)
    if not p then return nil
    else
@@ -118,7 +118,7 @@ function (p, sty)
                local q = node_new(id_sub_box)
                local r = node_new(id_glyph); setfield(r, 'next', nil)
                setfield(r, 'char', pc); setfield(r, 'font', f); setfield(r, 'subtype', 256)
-               local k = has_attr(r,attr_ykblshift) or 0 
+               local k = has_attr(r,attr_ykblshift) or 0
                set_attr(r, attr_ykblshift, 0)
                -- ltj-setwidth 内で実際の位置補正はおこなうので，補正量を退避
                local met = ltjf_font_metric_table[f]
@@ -135,7 +135,7 @@ function (p, sty)
    return p
 end
 
-luatexbase.add_to_callback('mlist_to_hlist', 
+luatexbase.add_to_callback('mlist_to_hlist',
    function (n, display_type, penalties)
       local head = to_node(conv_jchar_to_hbox(to_direct(n), 0))
       head = node.mlist_to_hlist(head, display_type, penalties)

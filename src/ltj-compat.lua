@@ -20,7 +20,7 @@ end
 -- \kuten, \jis, \euc, \sjis, \ucs, \kansuji
 local function to_kansuji(num)
    if not num then num=0; return
-   elseif num<0 then 
+   elseif num<0 then
       num = -num; tex.write('-')
    end
    local s = ""
@@ -35,34 +35,34 @@ end
 
 -- \ucs: 単なる identity
 local function from_ucs(i)
-   if type(i)~='number' then 
+   if type(i)~='number' then
       ltjb.package_error('luatexja',
 			 "invalid character code (".. tostring(i) .. ")",
 			 "I'm going to use 0 instead of that illegal character code.")
-      i=0 
+      i=0
    end
    tex.write(i)
 end
 
 -- \kuten: 面区点 （それぞれで16進2桁を使用）=> Unicode 符号位置
 local function from_kuten(i)
-   if type(i)~='number' then 
+   if type(i)~='number' then
       ltjb.package_error('luatexja',
 			 "invalid character code (".. tostring(i) .. ")",
 			 "I'm going to use 0 instead of that illegal character code.")
-      i=0 
+      i=0
    end
    tex.write(tostring(jisx0208.table_jisx0208_uptex[i] or 0))
 end
 
 -- \euc: EUC-JP による符号位置 => Unicode 符号位置
 local function from_euc(i)
-   if type(i)~='number' then 
+   if type(i)~='number' then
       ltjb.package_error('luatexja',
 			 "invalid character code (".. tostring(i) .. ")",
 			 "I'm going to use 0 instead of that illegal character code.")
       i=0
-   elseif i>=0x10000 or i<0xa0a0 then 
+   elseif i>=0x10000 or i<0xa0a0 then
       i=0
    end
    from_kuten(i-0xa0a0)
@@ -70,7 +70,7 @@ end
 
 -- \jis: ISO-2022-JP による符号位置 => Unicode 符号位置
 local function from_jis(i)
-   if (type(i)~='number') or i>=0x10000 or i<0 then 
+   if (type(i)~='number') or i>=0x10000 or i<0 then
       ltjb.package_error('luatexja',
 			 "invalid character code (".. tostring(i) .. ")",
 			 "I'm going to use 0 instead of that illegal character code.")
@@ -81,19 +81,19 @@ end
 
 -- \sjis: Shift_JIS による符号位置 => Unicode 符号位置
 local function from_sjis(i)
-   if (type(i)~='number') or i>=0x10000 or i<0 then 
+   if (type(i)~='number') or i>=0x10000 or i<0 then
       ltjb.package_error('luatexja',
 			 "invalid character code (".. tostring(i) .. ")",
 			 "I'm going to use 0 instead of that illegal character code.")
-      tex.write('0'); return 
+      tex.write('0'); return
    end
    local c2 = math.floor(i/256)
    local c1 = i%256
    local shift_jisx0213_s1a3_table = {
-      { [false]= 1, [true]= 8}, 
-      { [false]= 3, [true]= 4}, 
-      { [false]= 5, [true]=12}, 
-      { [false]=13, [true]=14}, 
+      { [false]= 1, [true]= 8},
+      { [false]= 3, [true]= 4},
+      { [false]= 5, [true]=12},
+      { [false]=13, [true]=14},
       { [false]=15 } }
    if c2 >= 0x81 then
       if c2 >= 0xF0 then -- this if block won't be true
