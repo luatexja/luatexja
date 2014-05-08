@@ -1,5 +1,5 @@
 -- -*- coding: utf-8 -*-
--- jfm-ujis.lua: LuaTeX-ja 標準 JFM
+-- jfm-ujisv.lua: LuaTeX-ja 標準 JFM（縦組み用）
 -- based on upnmlminr-h.tfm (a metric in UTF/OTF package used by upTeX).
 
 -- JIS X 4051:2004 では，行末の句読点や中点はベタなのでそれに従う
