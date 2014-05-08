@@ -312,12 +312,17 @@ local calc_np_auxtable = {
       Np.id = (flag or getfield(op, 'shift')~=0) and id_box_like or id_hlist
       return true, lp
    end,
-   box_like = function(lp)
+   [id_vlist] =  function(lp)
       local op
       head, lp, op = ltjd_make_dir_node(head, lp, list_dir, 'jfm:' .. getid(lp))
       Np.first = Np.first or op; Np.last = op; Np.nuc = op; 
       Np.id = id_box_like;
       return true, lp
+   end,
+   box_like = function(lp)
+      Np.first = Np.first or lp; Np.last = lp; Np.nuc = lp; 
+      Np.id = id_box_like;
+      return true, node_next(lp)
    end,
    skip = function(lp) 
       set_attr(lp, attr_icflag, PROCESSED)
@@ -384,7 +389,6 @@ local calc_np_auxtable = {
       return false, node_next(lp)
    end,
 }
-calc_np_auxtable[id_vlist]  = calc_np_auxtable.box_like
 calc_np_auxtable[id_rule]   = calc_np_auxtable.box_like
 calc_np_auxtable[13]        = calc_np_auxtable.box_like
 calc_np_auxtable[id_ins]    = calc_np_auxtable.skip

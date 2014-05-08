@@ -532,9 +532,11 @@
 %%%%%%%% \yoko, \tate, \ifydir, \iftdir
 \protected\def\tate{%
   \directlua{luatexja.direction.set_list_direction(3, 'tate')}%
+  \ltj@dir=3 
 }
 \protected\def\yoko{%
   \directlua{luatexja.direction.set_list_direction(4, 'yoko')}%
+  \ltj@dir=4 
 }
 \yoko
 \newif\ifydir\ydirtrue

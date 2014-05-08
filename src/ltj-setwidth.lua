@@ -208,7 +208,7 @@ function luatexja.setwidth.set_ja_width(ahead, adir)
             -- 数式の位置補正
 	    if pid==id_hlist or pid==id_vlist then
                if (has_attr(p, attr_icflag) or 0) ~= PROCESSED then
-                  setfield(p, 'shift', getfield(p, 'shift') +  (has_attr(p,attr_yablshift) or 0))
+                  setfield(p, 'shift', getfield(p, 'shift') +  (has_attr(p,attr_ablshift) or 0))
                end
 	    elseif pid==id_rule then
 	       if (has_attr(p, attr_icflag) or 0) ~= PROCESSED then

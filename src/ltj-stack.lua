@@ -123,6 +123,7 @@ end
 -- These three functions are used in ltj-jfmglue.lua.
 function report_stack_level(bsl)
    table_current_stack = charprop_stack_table[bsl]
+   return bsl
 end
 function fast_get_stack_skip(m)
    return table_current_stack[m] 

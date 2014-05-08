@@ -62,9 +62,16 @@
   xkanjiskip=.25\zw plus 1pt minus 1pt,
   autospacing, autoxspacing, jacharrange={-1}, 
   yalbaselineshift=0pt, yjabaselineshift=0pt,
-  talbaselineshift=0pt, tjabaselineshift=0pt,
-  jcharwidowpenalty=500, differentjfm=paverage
+  jcharwidowpenalty=500, differentjfm=paverage,
+  jatextfont={0, \tenmin}, jascriptfont={0, \sevenmin}, 
+  jascriptscriptfont={0, \fivemin},
 }
+\setbox0=\hbox{M}
+\jfam0
+\ltjsetparameter{
+  talbaselineshift=0.5\ht0, tjabaselineshift=0pt,
+}
+\jfam0
 
 \ltjdefcharrange{1}{"80-"36F, "1E00-"1EFF} 
 \ltjdefcharrange{2}{"370-"4FF, "1F00-"1FFF} 

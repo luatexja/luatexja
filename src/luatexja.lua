@@ -13,7 +13,7 @@ function luatexja.load_lua(fn)
    local found = kpse.find_file(fn, 'tex')
    if not found then
       tex.error("LuaTeX-ja error: File `" .. fn .. "' not found")
-   else 
+   else
       texio.write_nl('(' .. found .. ')')
       dofile(found)
    end
@@ -70,7 +70,7 @@ do
       if head==current then
          local q, r = node_next(current), node_prev(current)
          if q then q.prev = r end
-         if r and node_next(r)==current then 
+         if r and node_next(r)==current then
             r.next = q
          end
          return q, q
@@ -95,7 +95,7 @@ do
          end
       end
    else
-      luatexja.Dnode_remove = luatexja.node_remove 
+      luatexja.Dnode_remove = luatexja.node_remove
    end
 end
 
@@ -110,7 +110,7 @@ do
    local otfl_fdr = fonts.definers.read
    local ltjr_font_callback = ltjr.font_callback
    function luatexja.font_callback(name, size, id)
-      local res =  ltjr_font_callback(name, size, id, otfl_fdr) 
+      local res =  ltjr_font_callback(name, size, id, otfl_fdr)
       luatexbase.call_callback('luatexja.define_font', res, name, size, id)
       return res
    end
@@ -146,14 +146,14 @@ local floor = math.floor
 local function print_scaled(s)
    local out=''
    local delta=10
-   if s<0 then 
+   if s<0 then
       out=out..'-'; s=-s
    end
    out=out..tostring(floor(s/unity)) .. '.'
    s=10*(s%unity)+5
    repeat
       if delta>unity then s=s+32768-50000 end
-      out=out .. tostring(floor(s/unity)) 
+      out=out .. tostring(floor(s/unity))
       s=10*(s%unity)
       delta=delta*10
    until s<=delta
@@ -167,7 +167,7 @@ local function print_glue(d,order)
       while order>1 do
 	 out=out..'l'; order=order-1
       end
-   else 
+   else
       out=out..'pt'
    end
    return out
@@ -186,28 +186,28 @@ end
 
 
 ------------------------------------------------------------------------
--- CODE FOR GETTING/SETTING PARAMETERS 
+-- CODE FOR GETTING/SETTING PARAMETERS
 ------------------------------------------------------------------------
 
 -- EXT: print parameters that don't need arguments
 do
    luatexja.unary_pars = {
-      yalbaselineshift = function(t) 
+      yalbaselineshift = function(t)
 	 return print_scaled(tex.getattribute('ltj@yablshift'))..'pt'
       end,
-      yjabaselineshift = function(t) 
+      yjabaselineshift = function(t)
 	 return print_scaled(tex.getattribute('ltj@ykblshift'))..'pt'
       end,
-      talbaselineshift = function(t) 
+      talbaselineshift = function(t)
 	 return print_scaled(tex.getattribute('ltj@tablshift'))..'pt'
       end,
-      tjabaselineshift = function(t) 
+      tjabaselineshift = function(t)
 	 return print_scaled(tex.getattribute('ltj@tkblshift'))..'pt'
       end,
-      kanjiskip = function(t) 
+      kanjiskip = function(t)
 	 return print_spec(ltjs.get_stack_skip(stack_table_index.KSK, t))
       end,
-      xkanjiskip = function(t) 
+      xkanjiskip = function(t)
 	 return print_spec(ltjs.get_stack_skip(stack_table_index.XSK, t))
       end,
       jcharwidowpenalty = function(t)
@@ -260,15 +260,15 @@ do
 	 return (c<0) and 1 or ltjc.get_range_setting(c)
       end,
       prebreakpenalty = function(c, t)
-	 return ltjs.get_stack_table(stack_table_index.PRE 
+	 return ltjs.get_stack_table(stack_table_index.PRE
 					  + ltjb.in_unicode(c, true), 0, t)
       end,
       postbreakpenalty = function(c, t)
-	 return ltjs.get_stack_table(stack_table_index.POST 
+	 return ltjs.get_stack_table(stack_table_index.POST
 					  + ltjb.in_unicode(c, true), 0, t)
       end,
       kcatcode = function(c, t)
-	 return ltjs.get_stack_table(stack_table_index.KCAT 
+	 return ltjs.get_stack_table(stack_table_index.KCAT
 					  + ltjb.in_unicode(c, false), 0, t)
       end,
       chartorange = function(c, t)
@@ -279,7 +279,7 @@ do
 					  + ltjb.in_unicode(c, true), 3, t)
       end,
    }
-   local binary_pars = luatexja.binary_pars 
+   local binary_pars = luatexja.binary_pars
 
    binary_pars.alxspmode = binary_pars.jaxspmode
    function luatexja.ext_get_parameter_binary(k,c)
@@ -302,12 +302,14 @@ do
    local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
    -- mode = true iff main_process is called from pre_linebreak_filter
    local function main_process(head, mode, dir, gc)
-      --print('main_process', gc, mode, tex.getcount('ltj@@stack'))
-      tex.setattribute('global', attr_icflag, 0)
-      local p = to_direct(head)
-      p = ltjj.main(p,mode)
-      if p then p = ltjw.set_ja_width(p, dir) end
-      return to_node(p)
+      if gc == 'fin_row' then return head
+      else
+	    tex.setattribute('global', attr_icflag, 0)
+	    local p = to_direct(head)
+	    p = ltjj.main(p,mode)
+	    if p then p = ltjw.set_ja_width(p, dir) end
+	    return to_node(p)
+      end
    end
 
    local function adjust_icflag(h)
@@ -318,16 +320,16 @@ do
    end
 
    -- callbacks
-   
+  
    luatexbase.add_to_callback(
-      'pre_linebreak_filter', 
+      'pre_linebreak_filter',
       function (head,groupcode)
 	 return main_process(head, true, tex.textdir, groupcode)
       end,'ltj.pre_linebreak_filter',
       luatexbase.priority_in_callback('pre_linebreak_filter',
 				      'luaotfload.node_processor') + 1)
    luatexbase.add_to_callback(
-      'hpack_filter', 
+      'hpack_filter',
       function (head,groupcode,size,packtype, dir)
 	 return main_process(head, false, dir, groupcode)
       end,'ltj.hpack_filter',
@@ -372,22 +374,22 @@ local function debug_show_node_X(p,print_fn)
    .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
    if pt == 'glyph' then
       s = base .. ' ' .. utf.char(p.char) .. ' '  .. tostring(p.font)
-         .. ' (' .. print_scaled(p.height) .. '+' 
+         .. ' (' .. print_scaled(p.height) .. '+'
          .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
       print_fn(s)
    elseif pt=='hlist' or pt=='vlist' or pt=='unset' then
-      s = base .. '(' .. print_scaled(p.height) .. '+' 
+      s = base .. '(' .. print_scaled(p.height) .. '+'
          .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width) .. p.dir
       if p.shift or 0~=0 then
          s = s .. ', shifted ' .. print_scaled(p.shift)
       end
-      if p.glue_sign >= 1 then 
+      if p.glue_sign >= 1 then
          s = s .. ' glue set '
          if p.glue_sign == 2 then s = s .. '-' end
          s = s .. tostring(floor(p.glue_set*10000)/10000)
-         if p.glue_order == 0 then 
-            s = s .. 'pt' 
-         else 
+         if p.glue_order == 0 then
+            s = s .. 'pt'
+         else
             s = s .. 'fi'
             for i = 2,  p.glue_order do s = s .. 'l' end
          end
@@ -402,7 +404,7 @@ local function debug_show_node_X(p,print_fn)
       debug_depth=k
    elseif pt == 'glue' then
       s = base .. ' ' ..  print_spec(p.spec)
-      if get_attr_icflag(p)>icflag_table.KINSOKU 
+      if get_attr_icflag(p)>icflag_table.KINSOKU
          and get_attr_icflag(p)<icflag_table.KANJI_SKIP then
          s = s .. ' (from JFM: priority ' .. get_attr_icflag(p)-icflag_table.FROM_JFM .. ')'
       elseif get_attr_icflag(p)==icflag_table.KANJI_SKIP then
@@ -423,7 +425,7 @@ local function debug_show_node_X(p,print_fn)
 	 s = s .. ' (italic correction)'
          -- elseif get_attr_icflag(p)==ITALIC then
          --    s = s .. ' (italic correction)'
-      elseif get_attr_icflag(p)>icflag_table.KINSOKU 
+      elseif get_attr_icflag(p)>icflag_table.KINSOKU
          and get_attr_icflag(p)<icflag_table.KANJI_SKIP then
 	 s = s .. ' (from JFM: priority ' .. get_attr_icflag(p)-icflag_table.FROM_JFM .. ')'
       end
@@ -437,7 +439,7 @@ local function debug_show_node_X(p,print_fn)
    elseif pt == 'whatsit' then
       s = base .. '(' .. node.whatsits()[p.subtype] .. ') '
       if p.subtype==sid_user then
-         if p.type ~= 110 then 
+         if p.type ~= 110 then
             s = s .. ' user_id: ' .. p.user_id .. ' ' .. p.value
             print_fn(s)
          else
@@ -445,7 +447,7 @@ local function debug_show_node_X(p,print_fn)
             print_fn(s)
             local q = p.value
             debug_depth=debug_depth.. '.'
-            while q do 
+            while q do
                debug_show_node_X(q, print_fn); q = node_next(q)
             end
             debug_depth=k
@@ -457,13 +459,13 @@ local function debug_show_node_X(p,print_fn)
    elseif pt=='noad' then
       s = base ; print_fn(s)
       if p.nucleus then
-         debug_depth = k .. 'N'; debug_show_node_X(p.nucleus, print_fn); 
+         debug_depth = k .. 'N'; debug_show_node_X(p.nucleus, print_fn);
       end
       if p.sup then
-         debug_depth = k .. '^'; debug_show_node_X(p.sup, print_fn); 
+         debug_depth = k .. '^'; debug_show_node_X(p.sup, print_fn);
       end
       if p.sub then
-         debug_depth = k .. '_'; debug_show_node_X(p.sub, print_fn); 
+         debug_depth = k .. '_'; debug_show_node_X(p.sub, print_fn);
       end
       debug_depth = k;
    elseif pt=='math_char' then
@@ -472,7 +474,7 @@ local function debug_show_node_X(p,print_fn)
    elseif pt=='sub_box' or pt=='sub_mlist' then
       print_fn(base)
       if p.head then
-         debug_depth = k .. '.'; 
+         debug_depth = k .. '.';
 	 for q in node.traverse(p.head) do
 	    debug_show_node_X(q, print_fn)
 	 end
