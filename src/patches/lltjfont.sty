@@ -259,7 +259,9 @@
 
 
 \RequirePackage{everysel}
+\let\ltj@@EverySelectfont@Init=\@EverySelectfont@Init
 \@EverySelectfont@Init
+\let\@EverySelectfont@Init=\ltj@@EverySelectfont@Init
 \def\ltj@selectfont@patch{%
  \let\tmp@error@fontshape\error@fontshape
   \let\error@fontshape\error@kfontshape
@@ -317,7 +319,6 @@
   \fi
 }
 \EverySelectfont{\ltj@selectfont@patch}
-\def\@EverySelectfont@Init{\let\@EverySelectfont@Init\undefined}
 
 \def\KanjiEncodingPair#1#2{\@namedef{t@enc@#1}{#2}\@namedef{y@enc@#2}{#1}}
 \def\set@fontsize#1#2#3{%

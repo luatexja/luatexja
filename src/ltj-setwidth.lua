@@ -184,7 +184,7 @@ luatexja.setwidth.capsule_glyph_math = capsule_glyph_math
 function luatexja.setwidth.set_ja_width(ahead, adir)
    local p = ahead; head  = p; dir = adir or 'TLT'
    local m = false -- is in math mode?
-   local is_dir_tate = ltjs.table_current_stack[DIR]==dir_tate
+   local is_dir_tate = ltjs.list_dir==dir_tate
    local capsule_glyph = is_dir_tate and capsule_glyph_tate or capsule_glyph_yoko
    local attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
    while p do

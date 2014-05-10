@@ -146,7 +146,9 @@
 \newluatexattribute\ltj@tablshift % attribute for talbaselineshift
 \newluatexattribute\ltj@tkblshift % attribute for tjabaselineshift
 \newluatexattribute\jfam          % index for current jfam
-\newluatexattribute\ltj@dir       % temp attr for indicating box direction
+
+\newcount\ltj@dir@count           % counter for indicating direction
+\newluatexattribute\ltj@dir
 
 \ltj@dir=0
 \ltj@icflag=0
@@ -519,11 +521,11 @@
 \newif\iftdir
 \protected\def\tate{%
   \directlua{luatexja.direction.set_list_direction(3, 'tate')}%
-  \ltj@dir=3 \tdirtrue\ydirfalse
+  \ltj@dir@count=3 \tdirtrue\ydirfalse
 }
 \protected\def\yoko{%
   \directlua{luatexja.direction.set_list_direction(4, 'yoko')}%
-  \ltj@dir=4 \ydirtrue\tdirfalse
+  \ltj@dir@count=4 \ydirtrue\tdirfalse
 }
 \yoko
 

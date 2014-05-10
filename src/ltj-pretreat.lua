@@ -46,7 +46,7 @@ local ltjd_get_vert_glyph = ltjd.get_vert_glyph
 local ltjf_replace_altfont = ltjf.replace_altfont
 local attr_orig_char = luatexbase.attributes['ltj@origchar']
 local STCK = luatexja.userid_table.STCK
-local DIR = luatexja.stack_table_index.DIR
+local DIR = luatexja.userid_table.DIR
 
 local dir_tate = 3
 local dir_yoko = 4
@@ -58,29 +58,42 @@ local wt
 do
    local head
    local is_dir_tate
+   local dir_frozen
    local suppress_hyphenate_ja_aux = {}
    suppress_hyphenate_ja_aux[id_glyph] = function(p)
       if (has_attr(p, attr_icflag) or 0)<=0 and is_ucs_in_japanese_char(p) then
-	 local pf = has_attr(p, attr_curjfnt) or getfont(p)
+         local pc = getchar(p)
+	 local pf = ltjf_replace_altfont(has_attr(p, attr_curjfnt) or getfont(p), pc)
 	 setfield(p, 'font', pf);  set_attr(p, attr_curjfnt, pf)
 	 setfield(p, 'subtype', floor(getsubtype(p)*0.5)*2)
+         set_attr(p, attr_orig_char, pc)
       end
       return p
    end
-   suppress_hyphenate_ja_aux[id_math] = function(p) return node_end_of_math(node_next(p)) end
+   suppress_hyphenate_ja_aux[id_math] = function(p) 
+      dir_frozen = true
+      return node_end_of_math(node_next(p)) end
+   suppress_hyphenate_ja_aux[50] = function(p) return p end
    suppress_hyphenate_ja_aux[id_whatsit] = function(p)
-      if getsubtype(p)==sid_user and getfield(p, 'user_id')==STCK then
-	 wt[#wt+1] = p; head = node_remove(head, p)
+      if getsubtype(p)==sid_user then 
+         local uid = getfield(p, 'user_id')
+         if uid==STCK then
+            wt[#wt+1] = p; head = node_remove(head, p)
+         elseif uid==DIR and not dir_frozen then
+            ltjs.list_dir = getfield(p, 'value')
+         end
+         dir_frozen = true
       end
       return p
    end
 
    local function suppress_hyphenate_ja (h)
       local p = to_direct(h)
-      wt, head = {}, p
+      wt, head, dir_frozen = {}, p, false
+      ltjs.list_dir=ltjd.get_dir_count()
       while p do
 	 local pfunc = suppress_hyphenate_ja_aux[getid(p)]
-	 if pfunc then p = pfunc(p) end
+	 if pfunc then p = pfunc(p) else dir_frozen = true end
 	 p = node_next(p)
       end
       head = to_node(head)
@@ -101,19 +114,18 @@ local function set_box_stack_level(head, mode)
       if mode and getfield(p, 'value')==cl then box_set = 1 end; node_free(p)
    end
    ltjs.report_stack_level(tex_getcount('ltj@@stack') + box_set)
-   is_dir_tate = ltjs.table_current_stack[DIR] == dir_tate
-   local jfntattr = is_dir_tate and attr_curtfnt or attr_curjfnt
-   for p in Dnode.traverse_id(id_glyph,to_direct(head)) do
-      if has_attr(p, attr_curjfnt)==getfont(p) then
-	 local pfn = has_attr(p, jfntattr) or getfont(p)
-	 local pc = getchar(p)
-	 local pf = ltjf_replace_altfont(pfn, pc)
-	 if is_dir_tate then
+   is_dir_tate = ltjs.list_dir == dir_tate
+   if is_dir_tate then
+      for p in Dnode.traverse_id(id_glyph,to_direct(head)) do
+         if (has_attr(p, attr_icflag) or 0)<=0 and has_attr(p, attr_curjfnt)==getfont(p) then
+            local pfn = has_attr(p, attr_curtfnt) or getfont(p)
+            local pc = getchar(p)
+            local pf = ltjf_replace_altfont(pfn, pc)
 	    set_attr(p, attr_dir, pc)
 	    pc = ltjd_get_vert_glyph(pf, pc) or pc
-	 end
-	 setfield(p, 'char', pc); set_attr(p, attr_orig_char, pc)
-	 setfield(p, 'font', pf); set_attr(p, attr_curjfnt, pf)
+            setfield(p, 'char', pc); set_attr(p, attr_orig_char, pc)
+            setfield(p, 'font', pf); set_attr(p, attr_curjfnt, pf)
+         end
       end
    end
    return head

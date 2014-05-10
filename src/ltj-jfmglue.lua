@@ -937,7 +937,7 @@ do
       Bp, widow_Bp, widow_Np = {}, {}, {first = nil}
       table_current_stack = ltjs.table_current_stack
 
-      list_dir = table_current_stack[DIR] or dir_yoko
+      list_dir = ltjs.list_dir or dir_yoko
       kanji_skip = node_new(id_glue)
       setfield(kanji_skip, 'spec', skip_table_to_spec(KSK))
       set_attr(kanji_skip, attr_icflag, KANJI_SKIP)

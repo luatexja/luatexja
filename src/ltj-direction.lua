@@ -47,18 +47,46 @@ local wh_DIR = luatexja.userid_table.DIR
 local dir_tate = 3
 local dir_yoko = 4
 
+
+local get_dir_count 
+do
+   local gc = tex.getcount
+   get_dir_count = function() return gc('ltj@dir@count') end
+end
+luatexja.direction.get_dir_count = get_dir_count 
+
 -- \tate, \yoko
 do
   local node_next = node.next
   local function set_list_direction(v, name)
-    if node.next(tex.nest[tex.nest.ptr].head) then
-      ltjb.package_error('luatexja',
-			 "Use `\\" .. name .. "' at top of list",
-			 'Direction change command by LuaTeX-ja is available\n'
-			    .. 'only while current list is null.')
-    else
-       ltjs.set_stack_table(luatexja.stack_table_index.DIR, v, true)
-    end
+     local lv, w = tex.nest[tex.nest.ptr], tex.lists.page_head
+     if lv.mode == 1 and w then
+        if w.id==id_whatsit and w.subtype==sid_user
+        and w.user_id==wh_DIR then
+           w.value=v
+        end
+     else
+        local w = node_next(to_direct(lv.head))
+        if to_node(w) then
+           if getid(w)==id_whatsit and getsubtype(w)==sid_user
+           and getfield('user_id', wh_DIR) then
+              setfield(w, 'value', v)
+           else
+              ltjb.package_error(
+                 'luatexja',
+                 "Use `\\" .. name .. "' at top of list",
+                 'Direction change command by LuaTeX-ja is available\n'
+                 .. 'only while current list is null.')
+           end
+        else
+           local w = node_new(id_whatsit, sid_user)
+           setfield(w, 'next', hd)
+           setfield(w, 'user_id', wh_DIR)
+           setfield(w, 'type', 100)
+           setfield(w, 'value', v)
+           Dnode.write(w)
+        end
+     end
   end
   luatexja.direction.set_list_direction = set_list_direction
 end
@@ -70,39 +98,42 @@ do
       if gc=='fin_row' or gc == 'preamble'  then
 	 return h
       else
-	 local hd, new_dir = to_direct(h), ltjs.table_current_stack[DIR]
+	 local hd = to_direct(h)
 	 local w
 	 if hd and getid(hd)==id_whatsit and getsubtype(hd)==sid_user
 	 and getfield(hd, 'user_id')==wh_DIR then
-	    w = hd
+	    return h
 	 else
 	    w = node_new(id_whatsit, sid_user)
 	    setfield(w, 'next', hd)
+            setfield(w, 'user_id', wh_DIR)
+            setfield(w, 'type', 100)
+            setfield(w, 'value', ltjs.list_dir)
+            return to_node(w)
 	 end
-	 setfield(w, 'user_id', wh_DIR)
-	 setfield(w, 'type', 100)
-	 setfield(w, 'value', new_dir)
-	 return to_node(w)
       end
    end
    luatexbase.add_to_callback('hpack_filter', set_dir_flag, 'ltj.set_dir_flag', 10000)
-   luatexbase.add_to_callback('vpack_filter',
-			      function (h, gc)
-				 local box_set, cl = 0, tex.currentgrouplevel + 1
-				 local hd = to_direct(h)
-				 for w in traverse_id(id_whatsit, hd) do
-				    if getsubtype(w)==sid_user and
-				    getfield(w, 'user_id')==STCK and
-				    getfield(w, 'value')==cl then box_set = 1;
-				       hd = node_remove(hd, w); node_free(w); break
-				    end
-				 end
-				ltjs.report_stack_level(tex_getcount('ltj@@stack') + box_set)
-				return set_dir_flag(to_node(hd), gc)
-			      end, 'ltj.set_dir_flag', 1)
+
+   local function set_dir_flag_vbox(h, gc)
+      local w = to_direct(h)
+      ltjs.list_dir = get_dir_count()
+      if getid(w)==id_whatsit and getsubtype(w)==sid_user
+      and getfield(w, 'user_id')==wh_DIR then
+         ltjs.list_dir = getfield(w, 'value')
+      --print('VB', gc, ltjs.list_dir)
+      --luatexja.ext_show_node_list(h, '   > ', print)
+         return h
+      else
+      --print('VB', gc, ltjs.list_dir)
+      --luatexja.ext_show_node_list(h, '   > ', print)
+         return set_dir_flag(h, gc)
+      end
+   end
+   luatexbase.add_to_callback('vpack_filter', set_dir_flag_vbox, 'ltj.set_dir_flag', 1)
    luatexbase.add_to_callback('post_linebreak_filter',
 			      function (h)
-				 local new_dir = ltjs.table_current_stack[DIR]
+				 local new_dir = ltjs.list_dir
 				 for line in traverse_id(id_hlist, to_direct(h)) do
 				    set_attr(line, attr_dir, new_dir)
 				 end
@@ -197,13 +228,14 @@ do
 	     old_dir = getfield(bh, 'value')
 	     set_attr(b, attr_dir, old_dir)
 	     setfield(b, 'head', (node_remove(bh, x)))
-	     set_attr(b, attr_icflag, PROCESSED)
 	     node_free(x); break
 	 end
       end
       if not old_dir then
-	 old_dir = has_attr(b, attr_dir) or dir_yoko
-	 if old_dir==0 then old_dir =dir_yoko end
+	 old_dir = has_attr(b, attr_dir) or 0
+         if old_dir ==0 then
+            old_dir = ltjs.list_dir
+         end
       end
       if old_dir==new_dir then
 	 set_attr(b, attr_icflag, PROCESSED)
@@ -267,7 +299,7 @@ do
    end
    local function process_dir_node(head, gc)
       local h = to_direct(head)
-      local x, new_dir = h, ltjs.table_current_stack[DIR] or dir_yoko
+      local x, new_dir = h, ltjs.list_dir or dir_yoko
       while x do
 	 local xid = getid(x)
 	 if (xid==id_hlist and has_attr(x, attr_icflag)~=PACKED) or xid==id_vlist then
@@ -351,4 +383,3 @@ do
    end
    luatexja.direction.glyph_from_packed = glyph_from_packed
 end
-
