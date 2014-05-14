@@ -9,6 +9,7 @@ luatexbase.provides_module({
 module('luatexja.jfmglue', package.seeall)
 local err, warn, info, log = luatexbase .errwarinf(_NAME)
 
+luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('stack');     local ltjs = luatexja.stack
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 local pairs = pairs
@@ -100,11 +101,16 @@ local function fast_find_char_class(c,m)
 end
 
 -- 文字クラスの決定
-local function slow_find_char_class(c, m, oc)
-   local xc = c or oc
-   local cls = ltjf_find_char_class(oc, m)
-   if xc ~= oc and  cls==0 then cls = ltjf_find_char_class(-xc, m) end
-   return cls, xc
+local slow_find_char_class
+do
+   slow_find_char_class = function (c, m, oc)
+      local cls = ltjf_find_char_class(oc, m)
+      if not c and  cls==0 then 
+	 return ltjf_find_char_class(-c, m), oc
+      else
+	 return cls, oc
+      end
+   end
 end
 
 local zero_glue = node_new(id_glue)
