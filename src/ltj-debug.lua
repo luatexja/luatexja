@@ -110,9 +110,9 @@ do
       end
       table.sort(temp, function (a,b) return (a[4]>b[4]) end)
       print()
-      print('desc', 'ave.', 'times', 'total')
+      print('desc', 'ave. (us)', 'times', 'total (ms)')
       for _,v in ipairs(temp) do
-	 print ((v[1] .. '                '):sub(1,16), v[4], v[2], v[3])
+	 print ((v[1] .. '                '):sub(1,16), 1000000*v[4], v[2], 1000*v[3])
       end
    end
    if luatexja.base then

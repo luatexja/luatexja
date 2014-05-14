@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsarticle}
-  [2014/03/28 ]
+  [2014/05/14 ]
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
@@ -363,9 +363,12 @@
       \parindent=1\zw
     \fi
   \fi
-  \ltjsetparameter{kanjiskip={0\zw plus .1\zw minus .01\zw}}
-  \if@slide \ltjsetparameter{xkanjiskip={0.1em}} \else
-    \ltjsetparameter{xkanjiskip={0.25em plus 0.15em minus 0.06em}}
+  \ltj@setpar@global
+  \ltjsetkanjiskip{0pt plus .1\zw minus .01\zw}
+  \if@slide
+    \ltjsetxkanjiskip{0.1em}
+  \else
+    \ltjsetxkanjiskip{0.25em plus 0.15em minus 0.06em}
   \fi}
 \emergencystretch 3\zw
 \newif\ifnarrowbaselines
@@ -1580,7 +1583,8 @@
   \renewcommand\kanjifamilydefault{\gtdefault}
   \renewcommand\familydefault{\sfdefault}
   \raggedright
-  \ltjsetparameter{xkanjiskip={0.1em}}\relax
+  \ltj@setpar@global
+  \ltjsetxkanjiskip{0.1em}\relax
 \fi
 \endinput
 %%

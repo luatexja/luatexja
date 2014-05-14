@@ -346,7 +346,7 @@
 \newbox\adjust@box
 \newdimen\adjust@dimen
 \def\adjustbaseline{%
-    \setbox\adjust@box\hbox{\ltjsetparameter{yjabaselineshift=\z@}あ}%
+    \setbox\adjust@box\hbox{\ltj@ykblshift=0あ}%
     \cht\ht\adjust@box
     \cdp\dp\adjust@box
     \cwd\wd\adjust@box
@@ -354,15 +354,15 @@
     \chs\cwd
     \cHT\cht \advance\cHT\cdp
     %\iftdir
-      \setbox0\hbox{\tate\ltjsetparameter{tjabaselineshift=\z@}あ}%
-      \setbox\adjust@box\hbox{\tate\ltjsetparameter{talbaselineshift=\z@}M}%
+      \setbox0\hbox{\tate\ltj@tkblshift=0あ}%
+      \setbox\adjust@box\hbox{\tate\ltj@tablshift=0M}%
       \adjust@dimen\ht\adjust@box
       \advance\adjust@dimen\dp\adjust@box
       \advance\adjust@dimen-\ht0
       \divide\adjust@dimen\tw@
       \advance\adjust@dimen0.5\dp0
       \advance\adjust@dimen-\dp\adjust@box
-      \ltjsetparameter{talbaselineshift=\adjust@dimen}
+      \ltj@tablshift=\adjust@dimen
     %\fi
   }
 \DeclareRobustCommand\romanencoding[1]{%

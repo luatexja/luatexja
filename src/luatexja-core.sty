@@ -358,16 +358,19 @@
   \fi}
 
 % [x]]kanjiskip = <dimen>
-\define@key[ltj]{japaram}{kanjiskip}{%              % SKIP
+\define@key[ltj]{japaram}{kanjiskip}{\ltjsetkanjiskip{#1}}
+\define@key[ltj]{japaram}{xkanjiskip}{\ltjsetxkanjiskip{#1}}
+\protected\def\ltjsetkanjiskip#1{%                  % SKIP
   \directlua{%
     local d = \ltj@safe@glue{#1}
     luatexja.stack.set_stack_skip(luatexja.stack_table_index.KSK, d); node.free(d)
 }}
-\define@key[ltj]{japaram}{xkanjiskip}{%             % SKIP
+\protected\def\ltjsetxkanjiskip#1{%                  % SKIP
   \directlua{%
     local d = \ltj@safe@glue{#1}
     luatexja.stack.set_stack_skip(luatexja.stack_table_index.XSK, d); node.free(d)
 }}
+
 
 % jcharwidowpenalty = <count>
 \define@key[ltj]{japaram}{jcharwidowpenalty}{%      %COUNT
@@ -406,11 +409,17 @@
     \else\directlua{luatexja.isglobal=''}\fi
 }
 \protected\def\ltjsetparameter#1{%
-  \ltj@setpar@global\setkeys[ltj]{japaram}{#1}\ignorespaces}
+  \directlua{luatexja.base.start_time_measure('set_par')}%
+  \ltj@setpar@global\setkeys[ltj]{japaram}{#1}%
+  \directlua{luatexja.base.stop_time_measure('set_par')}%
+  \ignorespaces}
 \protected\def\ltjglobalsetparameter#1{%
   \relax\ifnum\globaldefs<0\directlua{luatexja.isglobal=''}%
     \else\directlua{luatexja.isglobal='global'}\fi%
-  \setkeys[ltj]{japaram}{#1}\ignorespaces}
+  \directlua{luatexja.base.start_time_measure('set_par')}%
+  \setkeys[ltj]{japaram}{#1}%
+  \directlua{luatexja.base.stop_time_measure('set_par')}%
+  \ignorespaces}
 
 %%%%%%%% \ltjgetparameter
 \def\ltj@@decl@array@param#1{%
@@ -424,6 +433,7 @@
 \ltj@@decl@array@param{jacharrange}
 \ltj@@decl@array@param{chartorange}
 \def\ltjgetparameter#1{%
+  \directlua{luatexja.base.start_time_measure('get_par')}%
   \ifcsname ltj@@array@param/#1\endcsname
     \expandafter\ltx@firstoftwo
   \else
@@ -433,9 +443,12 @@
   {\ltj@@getparam@one{#1}}%
 }
 \def\ltj@@getparam@one#1{%
-  \directlua{luatexja.ext_get_parameter_unary('#1')}}%
+  \directlua{luatexja.ext_get_parameter_unary('#1')}%
+  \directlua{luatexja.base.stop_time_measure('get_par')}%
+}%
 \def\ltj@@getparam@two#1#2{%
   \directlua{luatexja.ext_get_parameter_binary('#1', \ltj@safe@num@or{nil}{#2})}%
+  \directlua{luatexja.base.stop_time_measure('get_par')}%
 }
 
 %%%%%%%% \ltjalchar<number>, \ltjjachar<number>
