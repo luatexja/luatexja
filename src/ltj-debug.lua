@@ -1,15 +1,9 @@
 --
 -- luatexja/debug.lua
 --
-luatexbase.provides_module({
-  name = 'luatexja.debug',
-  date = '2011/05/14',
-  description = '',
-})
-module('luatexja.debug', package.seeall)
-local err, warn, info, log = luatexbase.errwarinf(_NAME)
-
-local table = table
+local ltjdbg = {}
+luatexja.debug = ltjdbg
+local table, string = table, string
 
 -------------------- pretty-print
 
@@ -32,7 +26,7 @@ local function normal_serialize(t)
   return ret
 end
 
-function table_tosource(t)
+local function table_tosource(t)
   if not next(t) then return "{}" end
   local res_n = "\127"..normal_serialize({t}).."\127"
   local s, e, cap = res_n:find("\127{\n ({ .* }),\n}\127")
@@ -40,15 +34,17 @@ function table_tosource(t)
   else return normal_serialize(t)
   end
 end
+ltjdbg.table_tosource = table_tosource
 
-function function_tosource(f)
+local function function_tosource(f)
   local res = normal_serialize({f})
   return res:sub(4, res:len() - 3)
 end
+ltjdbg.function_tosource = function_tosource
 
 --! 値 v をそれを表すソース文字列に変換する.
 --! lualibs の table.serialize() の処理を利用している.
-function tosource(v)
+local function tosource(v)
   local tv = type(v)
   if tv == "function" then return function_tosource(v)
   elseif tv == "table" then return table_tosource(v)
@@ -56,6 +52,7 @@ function tosource(v)
   else return tostring(v)
   end
 end
+ltjdbg.tosource = tosource
 
 local function coerce(f, v)
   if f == "q" then return "s", tosource(v)
@@ -79,26 +76,64 @@ end
 --!  - %q は全ての型について tosource() に変換
 --!  - <%> の代わりに <`> も使える (TeX での使用のため)
 --!  - %d, %s 等でキャストを行う
-function pformat(fmt, ...)
+local function pformat(fmt, ...)
   if type(fmt) == "string" then
     return do_pformat(fmt, ...)
   else 
     return tosource(fmt)
   end
 end
+ltjdbg.pformat = pformat
+
+-------------------- 所要時間合計
+require("socket")
+do
+   local gettime = socket.gettime
+   local time_stat = {}
+   local function start_time_measure(n)
+      if not time_stat[n] then
+	 time_stat[n] = {1, -gettime()}
+      else
+	 local t = time_stat[n]
+	 t[1], t[2] = t[1]+1, t[2]-gettime()
+      end
+   end
+   local function stop_time_measure(n)
+      local t = time_stat[n]
+      t[2] = t[2] + gettime()
+   end
+
+   local function print_measure()
+      for i,v in pairs(time_stat) do
+	 print (i, tostring(v[1]) .. ' times', tostring(v[2]) .. ' sec.')
+      end
+   end
+   if luatexja.base then
+      luatexja.base.start_time_measure = start_time_measure
+      luatexja.base.stop_time_measure = stop_time_measure
+      luatexbase.add_to_callback('stop_run', print_measure, 'luatexja.time_measure', 1)
+      luatexbase.add_to_callback('pre_linebreak_filter', 
+				 function(p) 
+				    start_time_measure('tex_linebreak'); return p 
+				 end, 
+				 'measure_tex_linebreak', 20000)
+   end
+end
 
 -------------------- debug logging
-
+do
 local debug_show_term = true
 local debug_show_log = true
 --! デバッグログを端末に出力するか
-function show_term(v)
+local function show_term(v)
   debug_show_term = v
 end
+ltjdbg.show_term = show_term
 --! デバッグログをログファイルに出力するか
 function show_log(v)
   debug_show_log = v
 end
+ltjdbg.show_log = show_log
 
 local function write_debug_log(s)
   local target
@@ -112,30 +147,31 @@ local function write_debug_log(s)
 end
 
 --! デバッグログ出力. 引数は pformat() と同じ.
-function debug(...)
+local function out_debug(...)
   if debug_show_term or debug_show_log then
     write_debug_log("%DEBUG:"..pformat(...))
   end
 end
 
 --! デバッグログ出力, パッケージ名付き.
-function package_debug(pkg, ...)
+local function package_debug(pkg, ...)
   if debug_show_term or debug_show_log then
     write_debug_log("%DEBUG("..pkg.."):"..pformat(...))
   end
 end
 
 --! パッケージ名付きデバッグログ出力器を得る.
-function debug_logger(pkg)
+local function debug_logger(pkg)
   return function(...) package_debug(pkg, ...) end
 end
 
 if luatexja.base then
-  luatexja.base.debug = debug
+  luatexja.base.out_debug = out_debug
   luatexja.base.package_debug = package_debug
   luatexja.base.debug_logger = debug_logger
   luatexja.base.show_term = show_term
   luatexja.base.show_log = show_log
+end
 end
 
 -------------------- all done

@@ -310,6 +310,7 @@ local calc_np_auxtable = {
    [id_hlist] = function(lp)
       local op, flag
       head, lp, op, flag = ltjd_make_dir_node(head, lp, list_dir, 'jfm hlist')
+      set_attr(op, attr_icflag, PROCESSED)
       Np.first = Np.first or op; Np.last = op; Np.nuc = op;
       Np.id = (flag or getfield(op, 'shift')~=0) and id_box_like or id_hlist
       return true, lp

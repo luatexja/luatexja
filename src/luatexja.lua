@@ -119,6 +119,8 @@ do
 end
 
 
+--load_module('debug')
+
 load_module('charrange'); local ltjc = luatexja.charrange
 load_module('jfont');     local ltjf = luatexja.jfont
 load_module('inputbuf');  local ltji = luatexja.inputbuf
@@ -296,18 +298,24 @@ end
 
 -- main process
 do
+   local start_time_measure, stop_time_measure 
+      = ltjb.start_time_measure, ltjb.stop_time_measure
    local Dnode = node.direct or node
    local nullfunc = function (n) return n end
    local to_node = (Dnode ~= node) and Dnode.tonode or nullfunc
    local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
+   local time_jfm, time_width = 0,0 
    -- mode = true iff main_process is called from pre_linebreak_filter
    local function main_process(head, mode, dir, gc)
       tex.setattribute('global', attr_icflag, 0)
       if gc == 'fin_row' then return head
       else
 	    local p = to_direct(head)
+	    start_time_measure('jfmglue')
 	    p = ltjj.main(p,mode)
+	    stop_time_measure('jfmglue'); start_time_measure('setwidth')
 	    if p then p = ltjw.set_ja_width(p, dir) end
+	    stop_time_measure('setwidth')
 	    return to_node(p)
       end
    end

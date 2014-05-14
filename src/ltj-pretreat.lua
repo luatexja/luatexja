@@ -2,6 +2,7 @@
 -- luatexja/ltj-pretreat.lua
 --
 
+luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('charrange'); local ltjc = luatexja.charrange
 luatexja.load_module('stack');     local ltjs = luatexja.stack
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
@@ -56,6 +57,8 @@ local dir_yoko = 4
 ------------------------------------------------------------------------
 local wt
 do
+   local start_time_measure, stop_time_measure 
+      = ltjb.start_time_measure, ltjb.stop_time_measure
    local head
    local is_dir_tate
    local dir_frozen
@@ -88,6 +91,7 @@ do
    end
 
    local function suppress_hyphenate_ja (h)
+      start_time_measure('ltj_hyphenate')
       local p = to_direct(h)
       wt, head, dir_frozen = {}, p, false
       ltjs.list_dir=ltjd.get_dir_count()
@@ -97,7 +101,9 @@ do
 	 p = node_next(p)
       end
       head = to_node(head)
+      stop_time_measure('ltj_hyphenate'); start_time_measure('tex_hyphenate')
       lang.hyphenate(head)
+      stop_time_measure('tex_hyphenate')
       return head
    end
 

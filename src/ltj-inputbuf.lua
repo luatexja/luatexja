@@ -2,6 +2,7 @@
 -- luatexja/ltj-inputbuf.lua
 --
 
+luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('charrange'); local ltjc = luatexja.charrange
 
 require("unicode")
@@ -16,7 +17,12 @@ local FFFFF = string.char(0xF3,0xBF,0xBF,0xBF)
 
 --- the following function is modified from jafontspec.lua (by K. Maeda).
 --- Instead of "%", we use U+FFFFF for suppressing spaces.
+--DEBUG require"socket"
+local time_line = 0
+local start_time_measure, stop_time_measure 
+   = ltjb.start_time_measure, ltjb.stop_time_measure
 local function add_comment(buffer)
+   start_time_measure('inputbuf')
    local i = utflen(buffer)
    while (i>0) and (getcatcode(utfbyte(buffer, i))==1
 		 or getcatcode(utfbyte(buffer, i))==2) do
@@ -37,10 +43,15 @@ local function add_comment(buffer)
 	 end
       end
    end
+   stop_time_measure('inputbuf')
    return buffer
 end
 
 luatexbase.add_to_callback('process_input_buffer',
    add_comment,'ltj.process_input_buffer')
+
+   luatexbase.add_to_callback('stop_run', function()
+				 print(time_line) 
+					  end, 'adjust_icflag', 1)
 
 --EOF

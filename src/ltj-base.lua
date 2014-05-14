@@ -8,12 +8,13 @@ local node, table, tex, token = node, table, tex, token
 local cat_lp = luatexbase.catcodetables['latex-package']
 
 -------------------- 
-luatexja.base = {}
+local ltjb = {}
+luatexja.base = ltjb
 
 local public_name = 'luatexja'
 local public_version = 'alpha'
-luatexja.base.public_name = public_name
-luatexja.base.public_version = public_version
+ltjb.public_name = public_name
+ltjb.public_version = public_version
 
 
 -------------------- Fully-expandable error messaging
@@ -150,7 +151,7 @@ local function mprint(...)
    end
    return tex.print(unpack(lines))
 end
-luatexja.base.mprint = mprint
+ltjb.mprint = mprint
 
 -------------------- Handling of TeX values
 do
@@ -226,9 +227,9 @@ do
       s.shrink or 0, s.shrink_order or 0))
   end
 
-  luatexja.base.to_dimen = to_dimen
-  luatexja.base.dump_skip = dump_skip
-  luatexja.base.to_skip = to_skip
+  ltjb.to_dimen = to_dimen
+  ltjb.dump_skip = dump_skip
+  ltjb.to_skip = to_skip
 end
 
 -------------------- Virtual table for LaTeX counters
@@ -245,7 +246,7 @@ do
   function mt_counter.__newindex(tbl, key, val)
     tex.count['c@'..key] = val
   end
-  luatexja.base.counter = counter
+  ltjb.counter = counter
 
 --! ixbase.length は tex.skip と全く同じなので不要.
 end
@@ -391,8 +392,8 @@ do
     end)
   end
 
-  luatexja.base.scan_brace = scan_brace
-  luatexja.base.scan_number = scan_number
+  ltjb.scan_brace = scan_brace
+  ltjb.scan_number = scan_number
 end
 
 -------------------- TeX register allocation
@@ -429,23 +430,11 @@ do
     return token.create(name)[2] - cmod_base_skip
   end
 
-  luatexja.base.const_number = const_number
-  luatexja.base.count_number = count_number
-  luatexja.base.attribute_number = attribute_number
-  luatexja.base.dimen_number = dimen_number
-  luatexja.base.skip_number = skip_number
-end
-
--------------------- mock of debug logger
-if not debug or debug == _G.debug then
-  local function no_op() end
-  debug = no_op
-  package_debug = no_op
-  show_term = no_op
-  show_log = no_op
-  function debug_logger()
-    return no_op
-  end
+  ltjb.const_number = const_number
+  ltjb.count_number = count_number
+  ltjb.attribute_number = attribute_number
+  ltjb.dimen_number = dimen_number
+  ltjb.skip_number = skip_number
 end
 
 -------------------- getting next token
@@ -454,7 +443,7 @@ local function get_cs(s)
    cstemp = token.csname_name(token.get_next())
    tex.sprint(cat_lp,'\\' .. s)
 end
-luatexja.base.get_cs = get_cs
+ltjb.get_cs = get_cs
 
 -------------------- common error message
 do
@@ -471,7 +460,7 @@ do
       end
       return c
    end
-   luatexja.base.in_unicode = in_unicode
+   ltjb.in_unicode = in_unicode
 end
 
 -------------------- cache management
@@ -569,36 +558,42 @@ do
       end
    end
 
-   luatexja.base.load_cache = load_cache
-   luatexja.base.save_cache_luc = save_cache_luc
-   luatexja.base.save_cache = save_cache
+   ltjb.load_cache = load_cache
+   ltjb.save_cache_luc = save_cache_luc
+   ltjb.save_cache = save_cache
 end
 
-luatexja.base._error_set_break = _error_set_break
-luatexja.base._error_set_message = _error_set_message
-luatexja.base._error_show = _error_show
-luatexja.base._generic_warn_info = _generic_warn_info
+ltjb._error_set_break = _error_set_break
+ltjb._error_set_message = _error_set_message
+ltjb._error_show = _error_show
+ltjb._generic_warn_info = _generic_warn_info
 
-luatexja.base.package_error = package_error
-luatexja.base.package_warning = package_warning
-luatexja.base.package_warning_no_line = package_warning_no_line
-luatexja.base.package_info = package_info
-luatexja.base.package_info_no_line = package_info_no_line
+ltjb.package_error = package_error
+ltjb.package_warning = package_warning
+ltjb.package_warning_no_line = package_warning_no_line
+ltjb.package_info = package_info
+ltjb.package_info_no_line = package_info_no_line
 
-luatexja.base.generic_error = generic_error
-luatexja.base.generic_warning = generic_warning
-luatexja.base.generic_warning_no_line = generic_warning_no_line
-luatexja.base.generic_info = generic_info
-luatexja.base.generic_info_no_line = generic_info_no_line
+ltjb.generic_error = generic_error
+ltjb.generic_warning = generic_warning
+ltjb.generic_warning_no_line = generic_warning_no_line
+ltjb.generic_info = generic_info
+ltjb.generic_info_no_line = generic_info_no_line
 
-luatexja.base.ltj_warning_no_line = ltj_warning_no_line
-luatexja.base.ltj_error = ltj_error
+ltjb.ltj_warning_no_line = ltj_warning_no_line
+ltjb.ltj_error = ltj_error
 
-luatexja.base.debug = debug
-luatexja.base.package_debug = package_debug
-luatexja.base.debug_logger = debug_logger
-luatexja.base.show_term = show_term
-luatexja.base.show_log = show_log
+-------------------- mock of debug logger
+if not ltjb.out_debug then
+   local function no_op() end
+   ltjb.start_time_measure = no_op
+   ltjb.stop_time_measure = no_op
+   ltjb.out_debug = no_op
+   ltjb.package_debug = no_op
+   ltjb.debug_logger = function() return no_op end
+   ltjb.show_term = no_op
+   ltjb.show_log = no_op
+end
 
 -------------------- all done
 -- EOF

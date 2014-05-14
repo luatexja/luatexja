@@ -29,6 +29,8 @@ local node_free = Dnode.free
 local node_remove = Dnode.remove
 local node_next = (Dnode ~= node) and Dnode.getnext or node.next
 local traverse_id = Dnode.traverse_id
+local start_time_measure, stop_time_measure 
+   = ltjb.start_time_measure, ltjb.stop_time_measure
 
 local id_kern = node.id('kern')
 local id_hlist = node.id('hlist')
@@ -114,25 +116,22 @@ do
       end
    end
    luatexbase.add_to_callback('hpack_filter', set_dir_flag, 'ltj.set_dir_flag', 10000)
-
    local function set_dir_flag_vbox(h, gc)
       local w = to_direct(h)
       ltjs.list_dir = get_dir_count()
       if getid(w)==id_whatsit and getsubtype(w)==sid_user
       and getfield(w, 'user_id')==wh_DIR then
          ltjs.list_dir = getfield(w, 'value')
-      --print('VB', gc, ltjs.list_dir)
-      --luatexja.ext_show_node_list(h, '   > ', print)
          return h
       else
-      --print('VB', gc, ltjs.list_dir)
-      --luatexja.ext_show_node_list(h, '   > ', print)
          return set_dir_flag(h, gc)
       end
    end
    luatexbase.add_to_callback('vpack_filter', set_dir_flag_vbox, 'ltj.set_dir_flag', 1)
    luatexbase.add_to_callback('post_linebreak_filter',
 			      function (h)
+				 stop_time_measure('tex_linebreak')
+				 -- start 側は ltj-debug.lua に
 				 local new_dir = ltjs.list_dir
 				 for line in traverse_id(id_hlist, to_direct(h)) do
 				    set_attr(line, attr_dir, new_dir)
@@ -205,7 +204,7 @@ do
       local bh = getlist(b)
       local dir
       for x in traverse_id(id_whatsit, bh) do
-	 if getsubtype(bh)==sid_user and getfield(bh, 'user_id')==wh_DIR then
+	 if getsubtype(x)==sid_user and getfield(x, 'user_id')==wh_DIR then
 	     setfield(b, 'head', (node_remove(bh, x)))
 	     dir = getfield(bh, 'value')
 	     set_attr(b, attr_dir, dir)
@@ -217,28 +216,22 @@ do
    end
    luatexja.direction.clean_dir_whatsit = clean_dir_whatsit
    make_dir_node = function (head, b, new_dir, origin)
+      
       -- head: list head, b: box
       -- origin: コール元 (for debug)
       -- return value: (new head), (next of b), (new b), (is_b_dir_node)
       -- (new b): b か dir_node に被せられた b
-      local old_dir
+      local old_dir = has_attr(b, attr_dir) or 0
       local bh = getlist(b)
-      for x in traverse_id(id_whatsit, bh) do
+      if old_dir ==0 then
 	 if getsubtype(bh)==sid_user and getfield(bh, 'user_id')==wh_DIR then
-	     old_dir = getfield(bh, 'value')
-	     set_attr(b, attr_dir, old_dir)
-	     setfield(b, 'head', (node_remove(bh, x)))
-	     node_free(x); break
+	    old_dir = getfield(bh, 'value')
+	    set_attr(b, attr_dir, old_dir)
+	    setfield(b, 'head', (node_remove(bh, bh)))
 	 end
-      end
-      if not old_dir then
-	 old_dir = has_attr(b, attr_dir) or 0
-         if old_dir ==0 then
-            old_dir = ltjs.list_dir
-         end
+	 if old_dir ==0 then old_dir = ltjs.list_dir end
       end
       if old_dir==new_dir then
-	 set_attr(b, attr_icflag, PROCESSED)
 	 return head, node_next(b), b, false
       elseif  -old_dir == new_dir  then
 	 return head, node_next(b), b, true
@@ -298,6 +291,7 @@ do
       end
    end
    local function process_dir_node(head, gc)
+      start_time_measure('direction_vpack')
       local h = to_direct(head)
       local x, new_dir = h, ltjs.list_dir or dir_yoko
       while x do
@@ -308,11 +302,13 @@ do
 	    x = node_next(x)
 	 end
       end
+      stop_time_measure('direction_vpack')
       return to_node(h)
    end
    luatexja.direction.make_dir_node = make_dir_node
    luatexbase.add_to_callback('vpack_filter',
 			      process_dir_node, 'ltj.dir_node', 10001)
+
 end
 
 
