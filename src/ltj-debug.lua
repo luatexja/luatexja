@@ -104,8 +104,15 @@ do
    end
 
    local function print_measure()
+      local temp = {}
       for i,v in pairs(time_stat) do
-	 print (i, tostring(v[1]) .. ' times', tostring(v[2]) .. ' sec.')
+	 temp[#temp+1] = { i, v[1], v[2], v[2]/v[1] }
+      end
+      table.sort(temp, function (a,b) return (a[4]>b[4]) end)
+      print()
+      print('desc', 'ave.', 'times', 'total')
+      for _,v in ipairs(temp) do
+	 print ((v[1] .. '                '):sub(1,16), v[4], v[2], v[3])
       end
    end
    if luatexja.base then

@@ -47,11 +47,4 @@ local function add_comment(buffer)
    return buffer
 end
 
-luatexbase.add_to_callback('process_input_buffer',
-   add_comment,'ltj.process_input_buffer')
-
-   luatexbase.add_to_callback('stop_run', function()
-				 print(time_line) 
-					  end, 'adjust_icflag', 1)
-
 --EOF
