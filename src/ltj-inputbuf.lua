@@ -47,4 +47,7 @@ local function add_comment(buffer)
    return buffer
 end
 
+luatexbase.add_to_callback('process_input_buffer',
+   add_comment,'ltj.process_input_buffer')
+
 --EOF
