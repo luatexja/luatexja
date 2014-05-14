@@ -260,8 +260,13 @@
 
 \RequirePackage{everysel}
 \let\ltj@@EverySelectfont@Init=\@EverySelectfont@Init
+\expandafter\expandafter\expandafter\let
+\expandafter\expandafter\csname ltj@@orig@selectfont\endcsname\csname selectfont\space\endcsname
 \@EverySelectfont@Init
-\let\@EverySelectfont@Init=\ltj@@EverySelectfont@Init
+\def\@EverySelectfont@Init{%
+  \expandafter\let\csname selectfont\space \endcsname \ltj@@orig@selectfont
+  \ltj@@EverySelectfont@Init
+}
 \def\ltj@selectfont@patch{%
  \let\tmp@error@fontshape\error@fontshape
   \let\error@fontshape\error@kfontshape
