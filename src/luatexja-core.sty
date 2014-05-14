@@ -345,12 +345,12 @@
   \directlua{%
     local d = \ltj@safe@glue{#1}
     luatexja.stack.set_stack_skip(luatexja.stack_table_index.KSK, d); node.free(d)
-}}
+}\ignorespaces}
 \protected\def\ltjsetxkanjiskip#1{%                  % SKIP
   \directlua{%
     local d = \ltj@safe@glue{#1}
     luatexja.stack.set_stack_skip(luatexja.stack_table_index.XSK, d); node.free(d)
-}}
+}\ignorespaces}
 
 
 % jcharwidowpenalty = <count>
@@ -501,7 +501,6 @@
 \protected\def\ltjclearaltfont#1{%
   {\ltj@@getjfontnumber#1%
    \directlua{luatexja.jfont.clear_alt_font(\the\ltj@tempcntc)}}\ignorespaces}
-
 
 %%------------------ Load module for the format
 
