@@ -28,6 +28,7 @@ local set_attr = Dnode.set_attribute
 local node_traverse = Dnode.traverse
 local node_remove =luatexja.Dnode_remove -- Dnode.remove
 local node_next = (Dnode ~= node) and Dnode.getnext or node.next
+local node_prev = (Dnode ~= node) and Dnode.getprev or node.prev
 local node_free = Dnode.free
 local node_end_of_math = Dnode.end_of_math
 local tex_getcount = tex.getcount
@@ -48,6 +49,7 @@ local ltjf_replace_altfont = ltjf.replace_altfont
 local attr_orig_char = luatexbase.attributes['ltj@origchar']
 local STCK = luatexja.userid_table.STCK
 local DIR = luatexja.userid_table.DIR
+local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 
 local dir_tate = 3
 local dir_yoko = 4
@@ -55,13 +57,12 @@ local dir_yoko = 4
 ------------------------------------------------------------------------
 -- MAIN PROCESS STEP 1: replace fonts
 ------------------------------------------------------------------------
-local wt
+local wt, wtd
 do
    local start_time_measure, stop_time_measure 
       = ltjb.start_time_measure, ltjb.stop_time_measure
    local head
    local is_dir_tate
-   local dir_frozen
    local suppress_hyphenate_ja_aux = {}
    suppress_hyphenate_ja_aux[id_glyph] = function(p)
       if (has_attr(p, attr_icflag) or 0)<=0 and is_ucs_in_japanese_char(p) then
@@ -73,8 +74,7 @@ do
       end
       return p
    end
-   suppress_hyphenate_ja_aux[id_math] = function(p) 
-      dir_frozen = true
+   suppress_hyphenate_ja_aux[id_math] = function(p)
       return node_end_of_math(node_next(p)) end
    suppress_hyphenate_ja_aux[50] = function(p) return p end
    suppress_hyphenate_ja_aux[id_whatsit] = function(p)
@@ -82,10 +82,14 @@ do
          local uid = getfield(p, 'user_id')
          if uid==STCK then
             wt[#wt+1] = p; head = node_remove(head, p)
-         elseif uid==DIR and not dir_frozen then
-            ltjs.list_dir = getfield(p, 'value')
+         elseif uid==DIR then
+	    if has_attr(p, attr_icflag)<PROCESSED_BEGIN_FLAG  then
+	       ltjs.list_dir = getfield(p, 'value')
+	    else
+	       local q
+	       wtd[#wtd+1] = p; head, q = node_remove(head, p)
+	    end
          end
-         dir_frozen = true
       end
       return p
    end
@@ -93,11 +97,11 @@ do
    local function suppress_hyphenate_ja (h)
       start_time_measure('ltj_hyphenate')
       local p = to_direct(h)
-      wt, head, dir_frozen = {}, p, false
+      wt, wtd, head = {}, {}, p
       ltjs.list_dir=ltjd.get_dir_count()
       while p do
 	 local pfunc = suppress_hyphenate_ja_aux[getid(p)]
-	 if pfunc then p = pfunc(p) else dir_frozen = true end
+	 if pfunc then p = pfunc(p) end
 	 p = node_next(p)
       end
       head = to_node(head)
@@ -118,6 +122,9 @@ local function set_box_stack_level(head, mode)
    local box_set, cl = 0, tex.currentgrouplevel + 1
    for _,p  in pairs(wt) do
       if mode and getfield(p, 'value')==cl then box_set = 1 end; node_free(p)
+   end
+   for _,p  in pairs(wtd) do
+      node_free(p)
    end
    ltjs.report_stack_level(tex_getcount('ltj@@stack') + box_set)
    is_dir_tate = ltjs.list_dir == dir_tate

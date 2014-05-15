@@ -42,6 +42,7 @@ local sid_matrix = node.subtype('pdf_setmatrix')
 local sid_user = node.subtype('user_defined')
 
 local PROCESSED    = luatexja.icflag_table.PROCESSED
+local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 local PACKED       = luatexja.icflag_table.PACKED
 local DIR = luatexja.stack_table_index.DIR
 local STCK = luatexja.userid_table.STCK
@@ -60,19 +61,20 @@ luatexja.direction.get_dir_count = get_dir_count
 -- \tate, \yoko
 do
   local node_next = node.next
+  local node_set_attr = node.set_attribute
   local function set_list_direction(v, name)
      local lv, w = tex.nest[tex.nest.ptr], tex.lists.page_head
      if lv.mode == 1 and w then
         if w.id==id_whatsit and w.subtype==sid_user
         and w.user_id==wh_DIR then
-           w.value=v
+	   w.value = v
         end
      else
         local w = node_next(to_direct(lv.head))
         if to_node(w) then
            if getid(w)==id_whatsit and getsubtype(w)==sid_user
-           and getfield('user_id', wh_DIR) then
-              setfield(w, 'value', v)
+           and getfield(w, 'user_id')==wh_DIR  then
+	      setfield(w, 'value', v)
            else
               ltjb.package_error(
                  'luatexja',
@@ -98,20 +100,34 @@ do
    local tex_getcount = tex.getcount
    local function set_dir_flag(h, gc)
       if gc=='fin_row' or gc == 'preamble'  then
+	 local hd = to_direct(h)
+	 if hd  then
+	    set_attr(hd, attr_icflag, PROCESSED_BEGIN_FLAG)
+	    tex.setattribute('global', attr_icflag, 0)
+	 end
 	 return h
       else
 	 local hd = to_direct(h)
-	 local w
 	 if hd and getid(hd)==id_whatsit and getsubtype(hd)==sid_user
 	 and getfield(hd, 'user_id')==wh_DIR then
+	    set_attr(hd, attr_icflag, PROCESSED_BEGIN_FLAG)
+	    tex.setattribute('global', attr_icflag, 0)
+	    hd = node_next(hd)
+	    if hd then
+	       set_attr(hd, attr_icflag, (has_attr(hd, attr_icflag) or 0) + PROCESSED_BEGIN_FLAG)
+	       tex.setattribute('global', attr_icflag, 0)
+	    end
 	    return h
 	 else
-	    w = node_new(id_whatsit, sid_user)
+	    local w = node_new(id_whatsit, sid_user)
 	    setfield(w, 'next', hd)
-            setfield(w, 'user_id', wh_DIR)
-            setfield(w, 'type', 100)
-            setfield(w, 'value', ltjs.list_dir)
-            return to_node(w)
+	    setfield(w, 'user_id', wh_DIR)
+	    setfield(w, 'type', 100)
+	    setfield(w, 'value', ltjs.list_dir)
+	    set_attr(w, attr_icflag, PROCESSED_BEGIN_FLAG)
+	    set_attr(hd, attr_icflag, (has_attr(hd, attr_icflag) or 0) + PROCESSED_BEGIN_FLAG)
+	    tex.setattribute('global', attr_icflag, 0)
+	    return to_node(w)
 	 end
       end
    end
@@ -129,21 +145,20 @@ do
    end
    luatexbase.add_to_callback('vpack_filter', set_dir_flag_vbox, 'ltj.set_dir_flag', 1)
    luatexbase.add_to_callback('post_linebreak_filter',
-			      function (h)
+			      function (h, gc)
 				 stop_time_measure('tex_linebreak')
 				 -- start 側は ltj-debug.lua に
 				 local new_dir = ltjs.list_dir
 				 for line in traverse_id(id_hlist, to_direct(h)) do
 				    set_attr(line, attr_dir, new_dir)
 				 end
-				 return set_dir_flag(h, tostring(gc))
+				 return set_dir_flag(h, gc)
 			      end, 'ltj.set_dir_flag', 100)
 
 end
 
 
-
-local make_dir_node
+local dir_node_aux
 do
    local get_h =function (w,h,d) return h end
    local get_d =function (w,h,d) return d end
@@ -154,7 +169,7 @@ do
    local get_w_neg_half =function (w,h,d) return -0.5*w end
    local get_w_neg =function (w,h,d) return -w end
    local get_w =function (w,h,d) return w end
-   local dir_node_aux = {
+   dir_node_aux = {
       [dir_yoko] = { -- yoko を tate 中で組む
 	 width  = get_h_d,
 	 height = get_w_half,
@@ -199,24 +214,65 @@ do
 	 },
       },
    }
+end
 
-   clean_dir_whatsit = function(b)
-      local bh = getlist(b)
-      local dir
-      for x in traverse_id(id_whatsit, bh) do
-	 if getsubtype(x)==sid_user and getfield(x, 'user_id')==wh_DIR then
-	     setfield(b, 'head', (node_remove(bh, x)))
-	     dir = getfield(bh, 'value')
-	     set_attr(b, attr_dir, dir)
-	     set_attr(b, attr_icflag, PROCESSED)
-	     node_free(x); break
+local function clean_dir_whatsit(b)
+   local bh = getlist(b)
+   local dir = has_attr(b, attr_dir)
+   for x in traverse_id(id_whatsit, bh) do
+      if getsubtype(x)==sid_user and getfield(x, 'user_id')==wh_DIR then
+	 local nh = node_remove(bh, x)
+	 setfield(b, 'head', nh)
+	 dir = getfield(bh, 'value')
+	 set_attr(b, attr_dir, dir)
+	 node_free(x); break
+      end
+   end
+   return dir
+end
+luatexja.direction.clean_dir_whatsit = clean_dir_whatsit
+
+-- \wd, \ht, \dp の代わり
+do
+   local getbox = tex.getbox
+   local function get_box_dim(key, n)
+      local gt = tex.globaldefs; tex.globaldefs = 0
+      local s = getbox(n)
+      if s then
+	 s = to_direct(s)
+	 local s_dir, l_dir = clean_dir_whatsit(s), get_dir_count()
+	 if s_dir ~= l_dir then
+	    local w = getfield(s, 'width')
+	    local h = getfield(s, 'height')
+	    local d = getfield(s, 'depth')
+	    tex.setdimen('ltj@tempdima', dir_node_aux[s_dir][key](w,h,d))
+	 else
+	    tex.setdimen('ltj@tempdima', getfield(s, key))
+	 end
+      else
+	    tex.setdimen('ltj@tempdima', 0)
+      end
+	 tex.globaldefs = gt
+   end
+   luatexja.direction.get_box_dim = get_box_dim
+   local function set_box_dim(key)
+      local n = tex.getcount('ltj@tempcnta')
+      local s = getbox(n)
+      if s then
+	 s = to_direct(s)
+	 local s_dir, l_dir = clean_dir_whatsit(s), get_dir_count()
+	 if s_dir ~= l_dir then
+	    print('setting ' .. key .. ' of different direction box is not supported')
+	 else
+	    setfield(s, key, tex.getdimen('ltj@tempdima'))
 	 end
       end
-      return dir
    end
-   luatexja.direction.clean_dir_whatsit = clean_dir_whatsit
+end
+
+local make_dir_node
+do
    make_dir_node = function (head, b, new_dir, origin)
-      
       -- head: list head, b: box
       -- origin: コール元 (for debug)
       -- return value: (new head), (next of b), (new b), (is_b_dir_node)
@@ -227,7 +283,8 @@ do
 	 if getsubtype(bh)==sid_user and getfield(bh, 'user_id')==wh_DIR then
 	    old_dir = getfield(bh, 'value')
 	    set_attr(b, attr_dir, old_dir)
-	    setfield(b, 'head', (node_remove(bh, bh)))
+	    local nh = node_remove(bh, bh)
+	    setfield(b, 'head', nh)
 	 end
 	 if old_dir ==0 then old_dir = ltjs.list_dir end
       end
@@ -296,7 +353,8 @@ do
       local x, new_dir = h, ltjs.list_dir or dir_yoko
       while x do
 	 local xid = getid(x)
-	 if (xid==id_hlist and has_attr(x, attr_icflag)~=PACKED) or xid==id_vlist then
+	 if (xid==id_hlist and has_attr(x, attr_icflag)%PROCESSED_BEGIN_FLAG~=PACKED) 
+	 or xid==id_vlist then
 	    h, x = make_dir_node(h, x, new_dir, 'process_dir_node:' .. gc)
 	 else
 	    x = node_next(x)
@@ -308,9 +366,7 @@ do
    luatexja.direction.make_dir_node = make_dir_node
    luatexbase.add_to_callback('vpack_filter',
 			      process_dir_node, 'ltj.dir_node', 10001)
-
 end
-
 
 -- 縦書き用字形への変換テーブル
 local font_vert_table = {} -- key: fontnumber

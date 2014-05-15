@@ -222,7 +222,7 @@
 %%%%%%%% \inhibitglue
 \protected\def\ltj@reset@globaldefs{%
   \directlua{luatexja.global_temp = tex.globaldefs; tex.globaldefs = 0}}
-\protected\def\ltj@restore@globaldefs{\directlua{tex.globaldefs = luatexja.global_temp}}
+\protected\def\ltj@restore@globaldefs{\directlua{tex.globaldefs = luatexja.global_temp}\relax}
 \protected\def\inhibitglue{\ifhmode\ltj@@ihb\fi}
 \def\ltj@@ihb{\relax\directlua{luatexja.jfmglue.create_inhibitglue_node()}}
 
@@ -543,7 +543,38 @@
 \yoko
 
 %%%%%%%% \ifybox, \iftbox
-%%%%%%%% \ltjgetwd{<box_num>}
+%%%%%%%% \ltjgetwd{<box_num>} etc. （\dimexpr 内で使うためには，\ltj@grab@num は使えない）
+\def\ltjgetwd#1{%
+  \directlua{luatexja.direction.get_box_dim('width', \the\numexpr#1\relax)}%
+  \ltj@tempdima%
+}
+\def\ltjgetht#1{%
+  \directlua{luatexja.direction.get_box_dim('height', \the\numexpr#1\relax)}%
+  \ltj@tempdima%
+}
+\def\ltjgetdp#1{%
+  \directlua{luatexja.direction.get_box_dim('depth', \the\numexpr#1\relax)}%
+  \ltj@tempdima%
+}
+
+\protected\def\ltjsetwd{\begingroup
+  \ltj@reset@globaldefs\afterassignment\ltj@@setwd@a\@tempcnta}
+\def\ltj@@setwd@a{\afterassignment\ltj@@setwd@b\@tempdima}
+\def\ltj@@setwd@b{%
+  \directlua{luatexja.direction.set_box_dim('width')}%
+  \ltj@restore@globaldefs\endgroup}
+\protected\def\ltjsetht{\begingroup
+  \ltj@reset@globaldefs\afterassignment\ltj@@setht@a\@tempcnta}
+\def\ltj@@setht@a{\afterassignment\ltj@@setht@b\@tempdima}
+\def\ltj@@setht@b{%
+  \directlua{luatexja.direction.set_box_dim('height')}%
+  \ltj@restore@globaldefs\endgroup}
+\protected\def\ltjsetdp{\begingroup
+  \ltj@reset@globaldefs\afterassignment\ltj@@setdp@a\@tempcnta}
+\def\ltj@@setdp@a{\afterassignment\ltj@@setdp@b\@tempdima}
+\def\ltj@@setdp@b{%
+  \directlua{luatexja.direction.set_box_dim('depth')}%
+  \ltj@restore@globaldefs\endgroup}
 
 
 

@@ -1002,12 +1002,8 @@ local function cleanup(mode)
 	    return false
 	 end
       end
-      return head
-   else
-      set_attr(head, attr_icflag,
-               get_attr_icflag(head) + PROCESSED_BEGIN_FLAG);
-      return head
    end
+   return head
 end
 -------------------- 外部から呼ばれる関数
 

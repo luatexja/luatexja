@@ -99,12 +99,12 @@ local function capsule_glyph_yoko(p, met, class)
       setfield(box, 'head', p)
       setfield(box, 'shift', y_shift)
       setfield(box, 'dir', dir)
-      set_attr(box, attr_icflag, PACKED + get_pr_begin_flag(p))
+      set_attr(box, attr_icflag, PACKED)
       head = q and node_insert_before(head, q, box)
                or node_insert_after(head, node_tail(head), box)
       return q
    else
-      set_attr(p, attr_icflag, PROCESSED + get_pr_begin_flag(p))
+      set_attr(p, attr_icflag, PROCESSED)
       setfield(p, 'xoffset', getfield(p, 'xoffset') - fshift.left)
       setfield(p, 'yoffset', getfield(p, 'yoffset')
 		  - (has_attr(p, attr_ykblshift) or 0) - fshift.down)
@@ -151,7 +151,7 @@ local function capsule_glyph_tate(p, met, class)
    setfield(k2, 'next', p);   setfield(p, 'next', k3);
    setfield(k3, 'next', wr);
 
-   set_attr(box, attr_icflag, PACKED + get_pr_begin_flag(p))
+   set_attr(box, attr_icflag, PACKED)
    head = q and node_insert_before(head, q, box)
       or node_insert_after(head, node_tail(head), box)
    return q
@@ -176,7 +176,7 @@ local function capsule_glyph_math(p, met, class)
    setfield(box, 'head', p)
    setfield(box, 'shift', y_shift)
    setfield(box, 'dir', tex.mathdir)
-   set_attr(box, attr_icflag, PACKED + get_pr_begin_flag(p))
+   set_attr(box, attr_icflag, PACKED)
    return box
 end
 luatexja.setwidth.capsule_glyph_math = capsule_glyph_math
@@ -196,7 +196,7 @@ function luatexja.setwidth.set_ja_width(ahead, adir)
 	    p = capsule_glyph(p, ltjf_font_metric_table[pf],
 			      has_attr(p, attr_jchar_class))
 	 else
-	    set_attr(p, attr_icflag, PROCESSED + get_pr_begin_flag(p))
+	    set_attr(p, attr_icflag, PROCESSED)
 	    setfield(p, 'yoffset',
 		     getfield(p, 'yoffset') - (has_attr(p,attr_ablshift) or 0))
 	    p = node_next(p)
@@ -215,7 +215,7 @@ function luatexja.setwidth.set_ja_width(ahead, adir)
 		  local v = has_attr(p,attr_yablshift) or 0
                   setfield(p, 'height', getfield(p, 'height')-v)
                   setfield(p, 'depth', getfield(p, 'depth')+v)
-		  set_attr(p, attr_icflag, PROCESSED + get_pr_begin_flag(p))
+		  set_attr(p, attr_icflag, PROCESSED)
 	       end
 	    end
 	 end

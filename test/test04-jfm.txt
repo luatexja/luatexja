@@ -1,0 +1,1134 @@
+あ“あ・い
+（）あ← Ryumin-Light
+あ“あ・い← IPA明朝 (ipam)
+あ “あ・い← KozMinPr6N-Regular
+あ“あ ・ い← IPA P明朝 (ipamp)
+あ 123 \relax
+こ こ から は， 欧文文字フ ォ ン ト は IPA EX ゴシッ ク
+■ 文字範囲の代入/取得テスト
+「ô 」 は 9 番の文字範囲な ので， 和文扱いのはず
+iso8859-1 和文扱い:0 § ¶ ° £ ¥ ô
+iso8859-1 欧文扱い:1§ ¶ ° £ ¥ ô
+標準:1 § ¶ ° £ ¥ ô
+■ 文字範囲の状況取得
+010
+■ 文字コード→文字範囲
+-1 6 8 9 -1 217
+
+あ あ 1 ← CFFFF 欧文扱いあ
+
+あ 0 ← CFFFF 和文扱い
+
+■ Ticket #25121
+あいうえおか き く
+け こさしすせそ a
+あいう え おかき く け こ さ し すせそ
+あいう え おさ し すせそ
+
+1
+
+以下は JFM グルー挿入検証
+■ JA–JA (pen なし)
+
+あ
+
+ア
+
+あイ
+あ
+
+ウ
+
+い
+
+ア
+
+F
+D
+6
+D
+F
+D
+9
+D
+F
+D
+6
+D
+
+glue 0 9.4pt plus 2.3pt minus 4.5pt
+glyph 256 あ 69 (8.8+1.2)x10.0
+kern 1 20.0pt (from JFM: priority 0)
+glyph 256 ア 69 (8.8+1.2)x10.0
+glue 0 9.4pt plus 2.3pt minus 4.5pt
+glyph 256 あ 69 (8.8+1.2)x10.0
+glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+glyph 256 イ 69 (8.8+1.2)x10.0
+glue 0 9.4pt plus 2.3pt minus 4.5pt
+glyph 256 あ 69 (8.8+1.2)x10.0
+glue 0 14.1pt (from JFM: priority 0)
+glyph 256 ウ 69 (8.8+1.2)x10.0
+
+D glyph 256 い 69 (8.8+1.2)x10.0
+6 kern 1 20.0pt (from JFM: priority 0)
+D glyph 256 ア 69 (8.8+1.2)x10.0
+
+いイ
+
+D glyph 256 い 69 (8.8+1.2)x10.0
+9 glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256 イ 69 (8.8+1.2)x10.0
+
+い
+
+D glyph 256 い 69 (8.8+1.2)x10.0
+6 glue 0 14.1pt (from JFM: priority 0)
+D glyph 256 ウ 69 (8.8+1.2)x10.0
+
+ウ
+
+■ JA–EN (pen なし)
+
+あ
+
+a
+
+F
+D
+6
+D
+
+glue 0 9.4pt plus 2.3pt minus 4.5pt
+glyph 256 あ 69 (8.8+1.2)x10.0
+kern 1 12.1pt (from JFM: priority 0)
+glyph 256 a 68 (5.2002+0.03906)x5.49805
+
+いa
+
+D glyph 256 い 69 (8.8+1.2)x10.0
+B glue 0 2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 256 a 68 (5.2002+0.03906)x5.49805
+
+う
+
+a
+
+D glyph 256 う 69 (8.8+1.2)x10.0
+6 glue 0 17.3pt (from JFM: priority 0)
+D glyph 256 a 68 (5.2002+0.03906)x5.49805
+
+a
+
+D glyph 256 え 69 (8.8+1.2)x10.0
+6 kern 1 17.3pt (from JFM: priority 0)
+D glyph 256 a 68 (5.2002+0.03906)x5.49805
+
+え
+
+D glyph 256 お 69 (8.8+1.2)x10.0
+B glue 0 2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 256 a 68 (5.2002+0.03906)x5.49805
+
+おa
+■ EN–JA (pen なし)
+
+aあ
+
+D glyph 256 a 68 (5.2002+0.03906)x5.49805
+B glue 0 2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 256 あ 69 (8.8+1.2)x10.0
+
+a
+
+D glyph 256 a 68 (5.2002+0.03906)x5.49805
+6 glue 0 14.1pt (from JFM: priority 0)
+D glyph 256 い 69 (8.8+1.2)x10.0
+
+い
+う
+
+a
+
+D glyph 256 a 68 (5.2002+0.03906)x5.49805
+6 kern 1 20.0pt (from JFM: priority 0)
+D glyph 256 う 69 (8.8+1.2)x10.0
+
+■ JA–明 kern (pen なし)
+F
+D
+6
+D
+
+あ
+
+glue 0 9.4pt plus 2.3pt minus 4.5pt
+glyph 256 あ 69 (8.8+1.2)x10.0
+kern 1 12.1pt (from JFM: priority 0)
+kern 1 3.0pt
+
+い
+
+D glyph 256 い 69 (8.8+1.2)x10.0
+D kern 1 3.0pt
+
+う
+
+D
+3
+6
+D
+
+glyph 256 う 69 (8.8+1.2)x10.0
+penalty 0 10000 (for kinsoku)
+glue 0 17.3pt (from JFM: priority 0)
+kern 1 3.0pt
+
+■ 明 kern–JA (pen なし)
+
+あ
+い
+う
+
+D
+D
+D
+3
+6
+D
+D
+6
+D
+
+kern 1 3.0pt
+glyph 256 あ 69 (8.8+1.2)x10.0
+kern 1 3.0pt
+penalty 0 10000 (for kinsoku)
+glue 0 14.1pt (from JFM: priority 0)
+glyph 256 い 69 (8.8+1.2)x10.0
+kern 1 3.0pt
+kern 1 20.0pt (from JFM: priority 0)
+glyph 256 う 69 (8.8+1.2)x10.0
+
+2
+
+■ JA–hbox (pen なし)
+
+あ
+い
+う
+え
+
+あ
+
+ア
+
+あ
+
+a
+
+F glue 0 9.4pt plus 2.3pt minus 4.5pt
+D glyph 256 あ 69 (8.8+1.2)x10.0
+3 penalty 0 0 (for kinsoku)
+6 kern 1 12.1pt (from JFM: priority 0)
+D hlist 2 (0.0+0.0)x0.0TLT, shifted 0.0
+D glyph 256 い 69 (8.8+1.2)x10.0
+3 penalty 0 0 (for kinsoku)
+D hlist 2 (0.0+0.0)x0.0TLT, shifted 0.0
+D glyph 256 う 69 (8.8+1.2)x10.0
+6 glue 0 17.3pt (from JFM: priority 0)
+D hlist 2 (0.0+0.0)x0.0TLT, shifted 0.0
+D glyph 256 え 69 (8.8+1.2)x10.0
+3 penalty 0 0 (for kinsoku)
+6 kern 1 17.3pt (from JFM: priority 0)
+D hlist 2 (0.0+0.0)x0.0TLT, shifted 0.0
+F glue 0 9.4pt plus 2.3pt minus 4.5pt
+D glyph 256 あ 69 (8.8+1.2)x10.0
+6 kern 1 12.1pt (from JFM: priority 0)
+D hlist 2 (8.8+1.2)x10.0TLT, shifted 0.0
+.D glyph 256 ア 69 (8.8+1.2)x10.0
+F glue 0 9.4pt plus 2.3pt minus 4.5pt
+D glyph 256 あ 69 (8.8+1.2)x10.0
+6 kern 1 12.1pt (from JFM: priority 0)
+D hlist 2 (5.2002+0.03906)x5.49805TLT, shifted 0.0
+.D glyph 256 a 68 (5.2002+0.03906)x5.49805
+D glyph 256 い 69 (8.8+1.2)x10.0
+B glue 0 2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D hlist 2 (5.2002+0.03906)x5.49805TLT, shifted 0.0
+.D glyph 256 a 68 (5.2002+0.03906)x5.49805
+
+いa
+■ hbox–JA (pen なし)
+
+あ
+い
+う
+
+D
+3
+D
+D
+6
+D
+D
+3
+6
+D
+
+hlist 2 (0.0+0.0)x0.0TLT, shifted
+penalty 0 0 (for kinsoku)
+glyph 256 あ 69 (8.8+1.2)x10.0
+hlist 2 (0.0+0.0)x0.0TLT, shifted
+glue 0 14.1pt (from JFM: priority
+glyph 256 い 69 (8.8+1.2)x10.0
+hlist 2 (0.0+0.0)x0.0TLT, shifted
+penalty 0 0 (for kinsoku)
+kern 1 20.0pt (from JFM: priority
+glyph 256 う 69 (8.8+1.2)x10.0
+
+0.0
+
+0.0
+0)
+0.0
+0)
+
+3
+
+■ JA–JA (pen あり)
+F
+D
+6
+D
+
+glue 0 9.4pt plus 2.3pt minus 4.5pt
+glyph 256 あ 69 (8.8+1.2)x10.0
+kern 1 20.0pt (from JFM: priority 0)
+glyph 256 ア 69 (8.8+1.2)x10.0
+
+あイ
+
+F
+D
+3
+9
+D
+
+glue 0 9.4pt plus 2.3pt minus 4.5pt
+glyph 256 あ 69 (8.8+1.2)x10.0
+penalty 0 123 (for kinsoku)
+glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+glyph 256 イ 69 (8.8+1.2)x10.0
+
+あ
+
+F
+D
+3
+6
+D
+
+glue 0 9.4pt plus 2.3pt minus 4.5pt
+glyph 256 あ 69 (8.8+1.2)x10.0
+penalty 0 123 (for kinsoku)
+glue 0 14.1pt (from JFM: priority 0)
+glyph 256 ウ 69 (8.8+1.2)x10.0
+
+あ
+
+ア
+
+ウ
+
+い
+
+ア
+
+D glyph 256 い 69 (8.8+1.2)x10.0
+6 kern 1 20.0pt (from JFM: priority 0)
+D glyph 256 ア 69 (8.8+1.2)x10.0
+
+いイ
+
+D
+3
+9
+D
+
+glyph 256 い 69 (8.8+1.2)x10.0
+penalty 0 123 (for kinsoku)
+glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+glyph 256 イ 69 (8.8+1.2)x10.0
+
+い
+
+D
+3
+6
+D
+
+glyph 256 い 69 (8.8+1.2)x10.0
+penalty 0 123 (for kinsoku)
+glue 0 14.1pt (from JFM: priority 0)
+glyph 256 ウ 69 (8.8+1.2)x10.0
+
+F
+D
+6
+D
+
+glue 0 9.4pt plus 2.3pt minus 4.5pt
+glyph 256 あ 69 (8.8+1.2)x10.0
+kern 1 12.1pt (from JFM: priority 0)
+glyph 256 a 68 (5.2002+0.03906)x5.49805
+
+いa
+
+D
+3
+B
+D
+
+glyph 256 い 69 (8.8+1.2)x10.0
+penalty 0 123 (for kinsoku)
+glue 0 2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+glyph 256 a 68 (5.2002+0.03906)x5.49805
+
+う
+
+a
+
+D
+3
+6
+D
+
+glyph 256 う 69 (8.8+1.2)x10.0
+penalty 0 123 (for kinsoku)
+glue 0 17.3pt (from JFM: priority 0)
+glyph 256 a 68 (5.2002+0.03906)x5.49805
+
+a
+
+D glyph 256 え 69 (8.8+1.2)x10.0
+6 kern 1 17.3pt (from JFM: priority 0)
+D glyph 256 a 68 (5.2002+0.03906)x5.49805
+
+ウ
+
+■ JA–EN (pen あり)
+
+あ
+
+え
+
+a
+
+D
+3
+B
+D
+
+glyph 256 お 69 (8.8+1.2)x10.0
+penalty 0 123 (for kinsoku)
+glue 0 2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+glyph 256 a 68 (5.2002+0.03906)x5.49805
+
+aあ
+
+D
+3
+B
+D
+
+glyph 256 a 68 (5.2002+0.03906)x5.49805
+penalty 0 321 (for kinsoku)
+glue 0 2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+glyph 256 あ 69 (8.8+1.2)x10.0
+
+a
+
+D
+3
+6
+D
+
+glyph 256 a 68 (5.2002+0.03906)x5.49805
+penalty 0 892 (for kinsoku)
+glue 0 14.1pt (from JFM: priority 0)
+glyph 256 い 69 (8.8+1.2)x10.0
+
+おa
+■ EN–JA (pen あり)
+
+い
+う
+
+a
+
+D glyph 256 a 68 (5.2002+0.03906)x5.49805
+6 kern 1 20.0pt (from JFM: priority 0)
+D glyph 256 う 69 (8.8+1.2)x10.0
+
+■ JA–hbox (pen あり)
+
+あ
+
+あ
+
+いa
+
+ア
+
+F glue 0 9.4pt plus 2.3pt minus 4.5pt
+D glyph 256 あ 69 (8.8+1.2)x10.0
+6 kern 1 12.1pt (from JFM: priority 0)
+D hlist 2 (8.8+1.2)x10.0TLT, shifted 0.0
+.D glyph 256 ア 69 (8.8+1.2)x10.0
+
+a
+
+F glue 0 9.4pt plus 2.3pt minus 4.5pt
+D glyph 256 あ 69 (8.8+1.2)x10.0
+6 kern 1 12.1pt (from JFM: priority 0)
+D hlist 2 (5.2002+0.03906)x5.49805TLT, shifted 0.0
+.D glyph 256 a 68 (5.2002+0.03906)x5.49805
+D glyph 256 い 69 (8.8+1.2)x10.0
+3 penalty 0 123 (for kinsoku)
+B glue 0 2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D hlist 2 (5.2002+0.03906)x5.49805TLT, shifted 0.0
+.D glyph 256 a 68 (5.2002+0.03906)x5.49805
+
+4
+
+（
+
+い）
+
+D hlist 2 (8.8+1.2)x10.0TLT, shifted 0.0
+.D glyph 256 （ 69 (8.8+1.2)x10.0
+3 penalty 0 571 (for kinsoku)
+6 glue 0 14.1pt (from JFM: priority 0)
+D glyph 256 い 69 (8.8+1.2)x10.0
+3 penalty 0 123 (for kinsoku)
+9 glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D hlist 2 (8.8+1.2)x10.0TLT, shifted 0.0
+.D glyph 256 ） 69 (8.8+1.2)x10.0
+
+■ italic correction
+
+f （あ
+
+D glyph 256 f 37 (6.94444+1.94444)x3.06665
+3 penalty 0 123 (for kinsoku)
+6 glue 0 5.0pt minus 5.0pt (from JFM: priority 0)
+2 hlist 0 (8.8+1.2)x5.0TLT, shifted 0.0 (packed)
+.0 glyph 256 （ 66 (8.32031+0.71777)x5.09766
+E kern 1 0.0pt (italic correction)
+3 penalty 0 10000 (for kinsoku)
+6 glue 0 0.0pt (from JFM: priority 0)
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 あ 66 (8.11035+0.36133)x8.99902
+
+5
+
+[x]kanjiskip の挿入
+■ kanjiskip from JFM, autospacing (JA–JA)
+
+ああ
+ああ
+
+はあ
+
+あああ
+
+F
+D
+9
+D
+F
+D
+A
+D
+
+glue 0 9.4pt
+glyph 256 あ
+glue 0 0.0pt
+glyph 256 あ
+glue 0 9.4pt
+glyph 256 あ
+glue 0 1.0pt
+glyph 256 あ
+
+plus 2.3pt minus 4.5pt
+69 (8.8+1.2)x10.0
+plus 0.4pt minus 0.4pt (kanjiskip)
+69 (8.8+1.2)x10.0
+plus 2.3pt minus 4.5pt
+69 (8.8+1.2)x10.0
+plus 0.4pt minus 0.5pt (kanjiskip, JFM specified)
+69 (8.8+1.2)x10.0
+
+D
+A
+D
+F
+D
+9
+D
+9
+D
+
+glyph 256 は
+glue 0 1.1pt
+glyph 256 あ
+glue 0 9.4pt
+glyph 256 あ
+glue 0 0.0pt
+glyph 256 あ
+glue 0 0.0pt
+glyph 256 あ
+
+72 (10.56+1.44)x12.0
+plus 0.44pt minus 0.55pt (kanjiskip, JFM specified)
+69 (8.8+1.2)x10.0
+plus 2.3pt minus 4.5pt
+69 (8.8+1.2)x10.0
+plus 0.4pt minus 0.4pt (kanjiskip)
+69 (8.8+1.2)x10.0
+(kanjiskip)
+69 (8.8+1.2)x10.0
+
+■ kanjiskip from JFM/autoxspacing (JA–EN)
+
+まx
+
+D glyph 256 ま 69 (8.8+1.2)x10.0
+B glue 0 2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 256 x 68 (5.07813+0.0)x4.8877
+
+まx
+
+D glyph 256 ま 69 (8.8+1.2)x10.0
+B glue 0 2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 256 x 68 (5.07813+0.0)x4.8877
+
+まx
+
+D glyph 256 ま 69 (8.8+1.2)x10.0
+B glue 0 0.0pt (xkanjiskip)
+D glyph 256 x 68 (5.07813+0.0)x4.8877
+
+まx
+
+D glyph 256 ま 69 (8.8+1.2)x10.0
+C glue 0 3.1pt plus 0.45pt minus 0.57pt (xkanjiskip, JFM specified)
+D glyph 256 x 68 (5.07813+0.0)x4.8877
+
+まx
+
+D glyph 256 ま 69 (8.8+1.2)x10.0
+B glue 0 0.0pt (xkanjiskip)
+D glyph 256 x 68 (5.07813+0.0)x4.8877
+
+まx
+
+D glyph 256 ま 69 (8.8+1.2)x10.0
+B glue 0 0.0pt (xkanjiskip)
+D glyph 256 x 68 (5.07813+0.0)x4.8877
+
+■ xkanjiskip from JFM/autoxspacing (EN–JA)
+
+xま
+
+D glyph 256 x 68 (5.07813+0.0)x4.8877
+B glue 0 2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 256 ま 69 (8.8+1.2)x10.0
+
+xま
+
+D glyph 256 x 68 (5.07813+0.0)x4.8877
+B glue 0 2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 256 ま 69 (8.8+1.2)x10.0
+
+xま
+
+D glyph 256 x 68 (5.07813+0.0)x4.8877
+B glue 0 0.0pt (xkanjiskip)
+D glyph 256 ま 69 (8.8+1.2)x10.0
+
+xま
+
+D glyph 256 x 68 (5.07813+0.0)x4.8877
+C glue 0 3.1pt plus 0.45pt minus 0.57pt (xkanjiskip, JFM specified)
+D glyph 256 ま 69 (8.8+1.2)x10.0
+
+xま
+
+D glyph 256 x 68 (5.07813+0.0)x4.8877
+B glue 0 0.0pt (xkanjiskip)
+D glyph 256 ま 69 (8.8+1.2)x10.0
+
+xまおx
+
+D
+B
+D
+9
+D
+B
+D
+
+glyph 256 x 68 (5.07813+0.0)x4.8877
+glue 0 0.0pt (xkanjiskip)
+glyph 256 ま 69 (8.8+1.2)x10.0
+glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+glyph 256 お 69 (8.8+1.2)x10.0
+glue 0 0.0pt (xkanjiskip)
+glyph 256 x 68 (5.07813+0.0)x4.8877
+
+■ more than one penalty
+
+おい
+
+D
+D
+D
+D
+9
+D
+
+glyph 256 お 69 (8.8+1.2)x10.0
+penalty 0 1701
+penalty 0 1701
+penalty 0 1701
+glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+glyph 256 い 69 (8.8+1.2)x10.0
+
+おお
+
+D
+D
+D
+D
+9
+D
+
+glyph 256 お 69 (8.8+1.2)x10.0
+penalty 0 1701
+penalty 0 1701
+penalty 0 1701
+glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+glyph 256 お 69 (8.8+1.2)x10.0
+
+6
+
+あい
+
+F
+D
+D
+D
+D
+9
+D
+
+glue 0 9.4pt plus 2.3pt minus 4.5pt
+glyph 256 あ 69 (8.8+1.2)x10.0
+penalty 0 1701
+penalty 0 1701
+penalty 0 1701
+glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+glyph 256 い 69 (8.8+1.2)x10.0
+
+あお
+
+F
+D
+D
+D
+D
+9
+D
+
+glue 0 9.4pt plus 2.3pt minus 4.5pt
+glyph 256 あ 69 (8.8+1.2)x10.0
+penalty 0 1701
+penalty 0 1701
+penalty 0 1701
+glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+glyph 256 お 69 (8.8+1.2)x10.0
+
+■ その他: italic correction and accents
+
+あj
+
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 あ 66 (8.11035+0.36133)x8.99902
+E kern 1 0.0pt (italic correction)
+B glue 0 2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 256 j 1 (6.67859+1.94444)x3.05557
+
+） j
+
+2 hlist 0 (8.8+1.2)x5.0TLT, shifted 0.0 (packed)
+.0 glyph 256 ） 66 (8.32031+0.71777)x5.09766
+E kern 1 0.0pt (italic correction)
+6 glue 0 5.0pt minus 5.0pt (from JFM: priority 0)
+D glyph 256 j 1 (6.67859+1.94444)x3.05557
+
+ˇ
+れ A）
+
+D glyph 256 れ 69 (8.8+1.2)x10.0
+B glue 0 2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D kern 2 1.25pt (for accent)
+D hlist 0 (6.28473+0.0)x5.00002TLT, shifted -2.52777
+.0 glyph 0 ˇ 1 (6.28473+0.0)x5.00002
+D kern 2 -6.25002pt (for accent)
+D glyph 256 A 1 (6.83331+0.0)x7.50002
+3 penalty 0 10000 (for kinsoku)
+B glue 0 0.0pt (xkanjiskip)
+D glyph 256 ） 69 (8.8+1.2)x10.0
+
+■ その他: box boundary
+
+かあか
+
+a かあか a
+
+a
+
+き
+
+か a
+
+か ききき
+
+F
+D
+9
+D
+9
+D
+F
+
+glue 0 10.3pt
+glyph 256 か 69 (8.8+1.2)x10.0
+glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+glyph 256 あ 69 (8.8+1.2)x10.0
+glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+glyph 256 か 69 (8.8+1.2)x10.0
+kern 1 8.5pt
+
+D
+B
+D
+9
+D
+9
+D
+B
+D
+
+glyph 256 a 68 (5.2002+0.03906)x5.49805
+glue 0 2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+glyph 512 か 69 (8.8+1.2)x10.0
+glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+glyph 512 あ 69 (8.8+1.2)x10.0
+glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+glyph 512 か 69 (8.8+1.2)x10.0
+glue 0 2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+glyph 256 a 68 (5.2002+0.03906)x5.49805
+
+D glyph 256 a 68 (5.2002+0.03906)x5.49805
+D hlist 2 (8.8+1.2)x28.8TLT, shifted 0.0
+.F glue 0 10.3pt
+.D glyph 256 か 69 (8.8+1.2)x10.0
+.F kern 1 8.5pt
+D glyph 256 a 68 (5.2002+0.03906)x5.49805
+D glyph 256 き 69 (8.8+1.2)x10.0
+3 penalty 0 0 (for kinsoku)
+D hlist 2 (8.8+1.2)x28.8TLT, shifted 0.0
+.F glue 0 10.3pt
+.D glyph 256 か 69 (8.8+1.2)x10.0
+.F kern 1 8.5pt
+3 penalty 0 0 (for kinsoku)
+D glyph 256 き 69 (8.8+1.2)x10.0
+9 glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D hlist 2 (8.8+1.2)x10.0TLT, shifted 0.0
+.D glyph 256 き 69 (8.8+1.2)x10.0
+9 glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256 き 69 (8.8+1.2)x10.0
+
+7
+
+あ（あ （あ
+
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 あ 66 (8.11035+0.36133)x8.99902
+3 penalty 0 1000 (for kinsoku)
+9 glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D hlist 2 (8.8+1.2)x5.0TLT, shifted 0.0
+.2 hlist 0 (8.8+1.2)x5.0TLT, shifted 0.0 (packed)
+..0 glyph 256 （ 66 (8.32031+0.71777)x5.09766
+3 penalty 0 1000 (for kinsoku)
+9 glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 あ 66 (8.11035+0.36133)x8.99902
+3 penalty 0 1000 (for kinsoku)
+6 glue 0 5.0pt minus 5.0pt (from JFM: priority 0)
+2 hlist 0 (8.8+1.2)x5.0TLT, shifted 0.0 (packed)
+.0 glyph 256 （ 66 (8.32031+0.71777)x5.09766
+3 penalty 0 10000 (for kinsoku)
+6 glue 0 0.0pt (from JFM: priority 0)
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 あ 66 (8.11035+0.36133)x8.99902
+
+8
+
+■ その他: paragraph, hbox and math boundary
+
+か
+
+か
+
+エ
+
+エ
+
+かエ
+
+あ
+
+a さaか
+
+0
+0
+F
+D
+3
+9
+D
+D
+0
+0
+0
+F
+D
+3
+9
+D
+D
+0
+0
+F
+D
+9
+D
+F
+F
+D
+6
+D
+D
+D
+6
+D
+B
+D
+D
+D
+B
+D
+F
+
+whatsit 6 6
+hlist 3 (0.0+0.0)x19.2TLT, shifted 0.0
+glue 0 6.8pt plus 0.2pt minus 0.4pt
+glyph 256 か 69 (8.8+1.2)x10.0
+penalty 0 500 (for kinsoku)
+glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+glyph 256 エ 69 (8.8+1.2)x10.0
+penalty 0 10000
+glue 15 30.0pt
+glue 9 0.0pt
+whatsit 6 6
+glue 0 10.3pt
+glyph 256 か 69 (8.8+1.2)x10.0
+penalty 0 500 (for kinsoku)
+glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+glyph 256 エ 69 (8.8+1.2)x10.0
+penalty 0 10000
+glue 15 30.0pt
+glue 9 0.0pt
+glue 0 10.3pt
+glyph 256 か 69 (8.8+1.2)x10.0
+glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+glyph 256 エ 69 (8.8+1.2)x10.0
+glue 0 7.8pt
+glue 0 9.4pt plus 2.3pt minus 4.5pt
+glyph 256 あ 69 (8.8+1.2)x10.0
+glue 0 12.5pt plus 4.3pt minus 8.7pt (from JFM: priority 0)
+math 0
+glyph 256 a 7 (4.30554+0.0)x5.28589
+math 1
+glue 0 6.8pt plus 0.2pt minus 0.4pt (from JFM: priority 0)
+glyph 256 さ 69 (8.8+1.2)x10.0
+glue 0 2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+math 0
+glyph 256 a 7 (4.30554+0.0)x5.28589
+math 1
+glue 0 2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+glyph 256 か 69 (8.8+1.2)x10.0
+kern 1 8.5pt
+
+■ その他: unhbox の連続
+）a
+）a
+
+（）（）「」
+
+2 hlist 0 (8.4675+1.15466)x4.81108TLT, shifted 0.0 (packed)
+.0 glyph 256 ） 51 (8.4675+1.15466)x9.62216
+6 glue 0 4.81108pt minus 4.81108pt (from JFM: priority 0)
+D glyph 512 a 68 (5.2002+0.03906)x5.49805
+2 hlist 0 (8.4675+1.15466)x4.81108TLT, shifted 0.0 (packed)
+.0 glyph 256 ） 51 (8.4675+1.15466)x9.62216
+6 glue 0 4.81108pt minus 4.81108pt (from JFM: priority 0)
+D glyph 512 a 68 (5.2002+0.03906)x5.49805
+2 hlist 0 (8.4675+1.15466)x4.81108TLT, shifted 0.0 (packed)
+.0 glyph 256 （ 51 (8.4675+1.15466)x9.62216
+3 penalty 0 10000 (for kinsoku)
+6 glue 0 0.0pt (from JFM: priority 0)
+2 hlist 0 (8.4675+1.15466)x4.81108TLT, shifted 0.0 (packed)
+.0 glyph 256 ） 51 (8.4675+1.15466)x9.62216
+6 glue 0 4.81108pt minus 4.81108pt (from JFM: priority 0)
+2 hlist 0 (8.4675+1.15466)x4.81108TLT, shifted 0.0 (packed)
+.0 glyph 256 （ 51 (8.4675+1.15466)x9.62216
+3 penalty 0 10000 (for kinsoku)
+6 glue 0 0.0pt (from JFM: priority 0)
+2 hlist 0 (8.4675+1.15466)x4.81108TLT, shifted 0.0 (packed)
+.0 glyph 256 ） 51 (8.4675+1.15466)x9.62216
+6 glue 0 4.81108pt minus 4.81108pt (from JFM: priority 0)
+2 hlist 0 (8.4675+1.15466)x4.81108TLT, shifted 0.0 (packed)
+.0 glyph 256 「 51 (8.4675+1.15466)x9.62216
+3 penalty 0 10000 (for kinsoku)
+6 glue 0 0.0pt (from JFM: priority 0)
+2 hlist 0 (8.4675+1.15466)x4.81108TLT, shifted 0.0 (packed)
+.0 glyph 256 」 51 (8.4675+1.15466)x9.62216
+
+あい
+
+D glyph 256 あ 51 (8.4675+1.15466)x9.62216
+9 glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256 い 51 (8.4675+1.15466)x9.62216
+
+あい
+
+D glyph 256 あ 51 (8.4675+1.15466)x9.62216
+9 glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256 い 51 (8.4675+1.15466)x9.62216
+
+■ その他: 「前由来」「後由来」JFM 由来グルー
+あ（
+（
+
+あ
+
+D glyph 256 あ 51 (8.4675+1.15466)x9.62216
+6 glue 0 2.40555pt minus 2.40555pt (from JFM: priority 0)
+2 hlist 0 (4.23375+0.57733)x2.40555TLT, shifted 0.0 (packed)
+.0 glyph 256 （ 53 (4.23375+0.57733)x4.81108
+D glyph 256 あ 53 (4.23375+0.57733)x4.81108
+6 glue 0 4.81108pt minus 4.81108pt (from JFM: priority 0)
+2 hlist 0 (8.4675+1.15466)x4.81108TLT, shifted 0.0 (packed)
+.0 glyph 256 （ 51 (8.4675+1.15466)x9.62216
+
+9
+
+・
+
+．
+
+．・
+
+2 hlist 0 (4.23375+0.57733)x2.40555TLT, shifted 0.0 (packed)
+.0 glyph 256 ． 53 (4.23375+0.57733)x4.81108
+3 penalty 0 10000 (for kinsoku)
+7 glue 0 4.81108pt minus 1.6037pt (from JFM: priority 1)
+2 hlist 0 (8.4675+1.15466)x4.81108TLT, shifted 0.0 (packed)
+.0 glyph 256 ・ 51 (8.4675+1.15466)x9.62216
+2 hlist 0 (8.4675+1.15466)x4.81108TLT, shifted 0.0 (packed)
+.0 glyph 256 ． 51 (8.4675+1.15466)x9.62216
+3 penalty 0 10000 (for kinsoku)
+7 glue 0 6.01385pt minus 2.00462pt (from JFM: priority 1)
+2 hlist 0 (4.23375+0.57733)x2.40555TLT, shifted 0.0 (packed)
+.0 glyph 256 ・ 53 (4.23375+0.57733)x4.81108
+
+■ その他: JFM and kerning
+
+タノタイクノ
+
+タノタイクノ
+
+タノ
+
+」󱃫．
+
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 タ 73 (8.12+0.44)x10.0
+E kern 1 -0.5pt (italic correction)
+9 glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 ノ 73 (7.83+0.38)x10.0
+9 glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 タ 73 (8.12+0.44)x10.0
+E kern 1 -0.09999pt (italic correction)
+9 glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 イ 73 (8.08+0.42)x10.0
+E kern 1 -0.2pt (italic correction)
+9 glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 ク 73 (8.19+0.44)x10.0
+E kern 1 -0.79999pt (italic correction)
+9 glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 ノ 73 (7.83+0.38)x10.0
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 タ 74 (8.12+0.44)x10.0
+9 glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 ノ 74 (7.83+0.38)x10.0
+9 glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 タ 74 (8.12+0.44)x10.0
+9 glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 イ 74 (8.08+0.42)x10.0
+9 glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 ク 74 (8.19+0.44)x10.0
+9 glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 ノ 74 (7.83+0.38)x10.0
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 タ 73 (8.12+0.44)x10.0
+E kern 1 0.0pt (italic correction)
+9 glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 ノ 73 (7.83+0.38)x10.0
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 」 73 (6.68+0.83)x10.0
+9 glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 73 (8.24+0.27)x10.0
+3 penalty 0 10000 (for kinsoku)
+9 glue 0 0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0TLT, shifted 0.0 (packed)
+.0 glyph 256 ． 73 (1.35+0.0)x10.0
+
+10
+
+

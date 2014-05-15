@@ -83,9 +83,11 @@
 \font\sixtt=cmtt10 at 6pt
 
 \def\dumplist#1{\par\noindent\leavevmode
+{\dimen0=\ltjgetwd{#1}}%
 \hbox to 0.2\hsize{\copy#1\hss}%
 \vbox{\hsize=0.6\hsize\sixtt\baselineskip=7.2pt\sixgt\let\\=\relax
-\directlua{luatexja.ext_show_node_list(tex.getbox(#1).head, '\\par ', tex.print)}\hrule}}
+\directlua{luatexja.ext_show_node_list(tex.getbox(#1).head, '\\par ', tex.print)}\hrule}%
+}
 
 %\tracingonline=1\tracingoutput=1\showboxdepth=3\showboxbreadth=100
 
@@ -318,6 +320,7 @@
 \dumplist0
 
 \head{その他: unhbox の連続}
+\message{HOGE}
 \setbox0=\hbox{\tenmin\setbox1=\hbox{）}\setbox2=\hbox{a}\unhbox1\unhbox2}
 \dumplist0
 
@@ -327,6 +330,12 @@
 
 \setbox0=\hbox{\tenmin\setbox1=\hbox{（）}\setbox2=\hbox{「」}%
   \unhcopy1\unhbox1\unhbox2}
+\dumplist0
+
+\setbox0=\hbox{\tenmin\setbox1=\hbox{}あ\unhbox1い}
+\dumplist0
+
+\setbox0=\hbox{\tenmin\setbox1=\hbox{\tate }あ\unhbox1い}
 \dumplist0
 
 \head{その他: 「前由来」「後由来」JFM由来グルー}
@@ -343,7 +352,7 @@
 \dumplist0
 
 \head{その他: JFM and kerning}
-\jfont\kmd=KozMinPr6N-Regular.otf:jfm=test;+kern
+\jfont\kmd=KozMinPr6N-Regular.otf:jfm=test;script=latn;+kern;+liga
 \jfont\kmn=KozMinPr6N-Regular.otf:jfm=test;-kern
 
 \setbox0=\hbox{\kmd タノタイクノ}
@@ -353,6 +362,9 @@
 \dumplist0
 
 \setbox0=\hbox{\kmd タ\/ノ}
+\dumplist0
+
+\setbox0=\hbox{\kmd 」カ゚．}
 \dumplist0
 
 \end

@@ -445,13 +445,13 @@ local function debug_show_node_X(p,print_fn)
       end
       print_fn(s)
    elseif pt == 'whatsit' then
-      s = base .. '(' .. node.whatsits()[p.subtype] .. ') '
+      s = base -- .. '(' .. node.whatsits()[p.subtype] .. ') '
       if p.subtype==sid_user then
          if p.type ~= 110 then
-            s = s .. ' user_id: ' .. p.user_id .. ' ' .. p.value
+            s = s .. ' userid: ' .. p.user_id .. ' ' .. p.value
             print_fn(s)
          else
-            s = s .. ' user_id: ' .. p.user_id .. ' (node list)'
+            s = s .. ' userid: ' .. p.user_id .. ' (node list)'
             print_fn(s)
             local q = p.value
             debug_depth=debug_depth.. '.'
