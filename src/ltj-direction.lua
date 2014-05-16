@@ -49,6 +49,7 @@ local STCK = luatexja.userid_table.STCK
 local DIR  = luatexja.userid_table.DIR
 local dir_tate = luatexja.dir_table.dir_tate
 local dir_yoko = luatexja.dir_table.dir_yoko
+local dir_dtou = luatexja.dir_table.dir_dtou
 
 
 local get_dir_count 
@@ -113,6 +114,8 @@ local function create_dir_whatsit(hd, gc, new_dir)
       return w
 end
 
+-- hpack_filter, vpack_filter, post_line_break_filter
+-- の結果を組方向を明示するため，先頭に dir_node を設置
 do
    local tex_getcount = tex.getcount
    local function create_dir_whatsit_hpack(h, gc)
@@ -165,18 +168,20 @@ do
 
 end
 
-
+-- dir_node に包む方法を書いたテーブル
 local dir_node_aux
 do
    local get_h =function (w,h,d) return h end
    local get_d =function (w,h,d) return d end
    local get_h_d =function (w,h,d) return h+d end
+   local get_h_d_neg =function (w,h,d) return -h-d end
    local get_h_neg =function (w,h,d) return -h end
    local get_d_neg =function (w,h,d) return -d end
    local get_w_half =function (w,h,d) return 0.5*w end
    local get_w_neg_half =function (w,h,d) return -0.5*w end
    local get_w_neg =function (w,h,d) return -w end
    local get_w =function (w,h,d) return w end
+   local zero = function() return 0 end
    dir_node_aux = {
       [dir_yoko] = { -- yoko を 
 	 [dir_tate] = { -- tate 中で組む
@@ -184,20 +189,37 @@ do
 	    height = get_w_half,
 	    depth  = get_w_half,
 	    [id_hlist] = {
-	       { 'kern', get_h },
 	       { 'whatsit', sid_save },
 	       { 'rotate', '0 1 -1 0' },
 	       { 'kern', get_w_neg_half },
-	       { 'box' },
+	       { 'box' , get_h },
 	       { 'kern', get_w_neg_half },
 	       { 'whatsit', sid_restore },
 	    },
 	    [id_vlist] = {
-	       { 'kern', get_w},
 	       { 'whatsit', sid_save },
 	       { 'rotate', '0 1 -1 0' },
+	       { 'box' , get_w_neg },
+	       { 'kern', get_h_d_neg},
+	       { 'whatsit', sid_restore },
+	    },
+	 },
+	 [dir_dtou] = { -- dtou 中で組む
+	    width  = get_h_d,
+	    height = get_w,
+	    depth  = zero,
+	    [id_hlist] = {
+	       { 'whatsit', sid_save },
+	       { 'rotate', '0 -1 1 0' },
+	       { 'kern', get_w_neg },
+	       { 'box', get_d_neg },
+	       { 'whatsit', sid_restore },
+	    },
+	    [id_vlist] = {
+	       { 'whatsit', sid_save },
+	       { 'rotate', '0 -1 1 0' },
+	       { 'kern', get_h_d_neg },
 	       { 'box' },
-	       { 'kern', get_h_neg},
 	       { 'whatsit', sid_restore },
 	    },
 	 },
@@ -206,7 +228,7 @@ do
 	 [dir_yoko] = { -- yoko 中で組む
 	    width  = get_h_d,
 	    height = get_w,
-	    depth  = function() return 0 end,
+	    depth  = zero,
 	    [id_hlist] = {
 	       { 'kern', get_d },
 	       { 'whatsit', sid_save },
@@ -224,12 +246,75 @@ do
 	       { 'whatsit', sid_restore },
 	    },
 	 },
+	 [dir_dtou] = { -- dtou 中で組む
+	    width  = get_w,
+	    height = get_d,
+	    depth  = get_h,
+	    [id_hlist] = {
+	       { 'whatsit', sid_save },
+	       { 'rotate', '-1 0 0 -1' },
+	       { 'kern', get_w_neg },
+	       { 'box' },
+	       { 'whatsit', sid_restore },
+	    },
+	    [id_vlist] = {
+	       { 'whatsit', sid_save },
+	       { 'rotate', '-1 0 0 -1' },
+	       { 'kern', get_h_d_neg },
+	       { 'box', get_w_neg },
+	       { 'whatsit', sid_restore },
+	    },
+         },
+      },
+      [dir_dtou] = { -- dtou を
+	 [dir_yoko] = { -- yoko 中で組む
+	    width  = get_h_d,
+	    height = zero,
+	    depth  = get_w,
+	    [id_hlist] = {
+	       { 'kern', get_h },
+	       { 'whatsit', sid_save },
+	       { 'rotate', '0 1 -1 0' },
+               { 'kern', get_w_neg },
+	       { 'box' },
+	       { 'whatsit', sid_restore },
+	    },
+	    [id_vlist] = {
+               { 'kern', get_w },
+	       { 'whatsit', sid_save },
+	       { 'rotate', '0 1 -1 0' },
+	       { 'box' },
+	       { 'kern', get_h_neg },
+	       { 'kern', get_d_neg },
+	       { 'whatsit', sid_restore },
+	    },
+	 },
+	 [dir_tate] = { -- tate 中で組む
+	    width  = get_w,
+	    height = get_d,
+	    depth  = get_h,
+	    [id_hlist] = {
+	       { 'whatsit', sid_save },
+	       { 'rotate', '-1 0 0 -1' },
+	       { 'kern', get_w_neg },
+	       { 'box' },
+	       { 'whatsit', sid_restore },
+	    },
+	    [id_vlist] = {-- TODO
+	       { 'whatsit', sid_save },
+	       { 'rotate', ' -1 0 0 -1' },
+	       { 'kern', get_h_d_neg }, 
+	       { 'box', get_w_neg },
+	       { 'whatsit', sid_restore },
+	    },
+	 },
       },
    }
 end
 
+-- b に DIR whatsit があればその内容を attr_dir にうつす (1st ret val)
+-- 2nd ret val はその DIR whatsit
 local function get_box_dir(b, default)
-   -- b に DIR whatsit があればその内容を attr_dir にうつす (1st ret val)
    local dir = has_attr(b, attr_dir) or 0
    local bh = getlist(b)
    local c
@@ -245,6 +330,8 @@ local function get_box_dir(b, default)
    return (dir==0 and default or dir), c
 end
 
+-- dir_node に包まれている「本来の中身」を取り出し，
+-- dir_node 自体は DIR whatsit にカプセル化する
 local function unwrap_dir_node(b, head)
    -- head: nil or nil-nil
    -- if head is non-nil, return values are (new head), (next of b), (contents)
@@ -258,8 +345,9 @@ local function unwrap_dir_node(b, head)
    end
    setfield(b, 'list', nil); Dnode.flush_list(bh)
    local d, wh = get_box_dir(bc, 0)
-   if not wh then 
+   if not wh then
       wh = create_dir_whatsit(getlist(bc), 'unwrap', d)
+      setfield(bc, 'head', wh)
    end
    local h = getfield(wh, 'value')
    if h then setfield(b, 'next', h) end
@@ -267,58 +355,24 @@ local function unwrap_dir_node(b, head)
    return nh, nb, bc
 end
 
-
--- \wd, \ht, \dp の代わり
-do
-   local getbox = tex.getbox
-   local function get_box_dim(key, n)
-      local gt = tex.globaldefs; tex.globaldefs = 0
-      local s = getbox(n)
-      if s then
-	 s = to_direct(s)
-	 local s_dir, wh = get_box_dir(s, dir_yoko)
-	 local l_dir = get_dir_count()
-	 if s_dir ~= l_dir then
-	    local not_found = true
-	    for x in traverse(getfield(wh, 'value')) do
-	       if l_dir == -has_attr(x, attr_dir) then
-		  tex.setdimen('ltj@tempdima', getfield(x, key))
-		  not_found = false; break
-	       end
-	    end
-	    if not_found then
-	       local w = getfield(s, 'width')
-	       local h = getfield(s, 'height')
-	       local d = getfield(s, 'depth')
-	       tex.setdimen('ltj@tempdima', dir_node_aux[s_dir][l_dir][key](w,h,d))
-	    end
-	 else
-	    tex.setdimen('ltj@tempdima', getfield(s, key))
-	 end
-      else
-	    tex.setdimen('ltj@tempdima', 0)
-      end
-	 tex.globaldefs = gt
-   end
-   luatexja.direction.get_box_dim = get_box_dim
-   local function set_box_dim(key)
-      local n = tex.getcount('ltj@tempcnta')
-      local s = getbox(n)
-      if s then
-	 s = to_direct(s)
-	 local s_dir, wh = get_box_dir(s, dir_yoko)
-	 local l_dir = get_dir_count()
-	 if s_dir ~= l_dir then
-	    print('setting ' .. key .. ' of different direction box is not supported')
-	    -- TODO
-	 else
-	    setfield(s, key, tex.getdimen('ltj@tempdima'))
-	 end
-      end
-   end
-   luatexja.direction.set_box_dim = set_box_dim
+local function create_dir_node(b, b_dir, new_dir)
+   local info = dir_node_aux[b_dir][new_dir]
+   local w = getfield(b, 'width')
+   local h = getfield(b, 'height')
+   local d = getfield(b, 'depth')
+   local db = node_new(getid(b))
+   set_attr(db, attr_dir, -new_dir)
+   set_attr(db, attr_icflag, PROCESSED)
+   set_attr(b, attr_icflag, PROCESSED)
+   setfield(db, 'dir', getfield(b, 'dir'))
+   setfield(db, 'shift', 0)
+   setfield(db, 'width',  info.width(w,h,d))
+   setfield(db, 'height', info.height(w,h,d))
+   setfield(db, 'depth',  info.depth(w,h,d))
+   return db
 end
 
+-- 異方向のボックスの処理
 local make_dir_whatsit
 do
    make_dir_whatsit = function (head, b, new_dir, origin)
@@ -326,7 +380,6 @@ do
       -- origin: コール元 (for debug)
       -- return value: (new head), (next of b), (new b), (is_b_dir_node)
       -- (new b): b か dir_node に被せられた b
-      local box_dir = has_attr(b, attr_dir) or 0
       local bh = getlist(b)
       local box_dir, dn =  get_box_dir(b, ltjs.list_dir)
       -- 既に b の中身にあるwhatsit
@@ -335,45 +388,43 @@ do
       elseif  -box_dir == new_dir  then
 	 return head, node_next(b), b, true
       else
-	 local nh, nb, ret, flag
-	 if box_dir < 0 then
-	    -- b itself is a dir node; just unwrap
-	    nh, nb, ret = unwrap_dir_node(b,head)
-	    flag = false
-	 else
-	    local bid = getid(b)
-	    local db = node_new(bid) -- dir node
-	    nh, nb =  insert_before(head, b, db), nil
-	    nh, nb = node_remove(nh, b)
-	    local w = getfield(b, 'width')
-	    local h = getfield(b, 'height')
-	    local d = getfield(b, 'depth')
-	    local info = dir_node_aux[box_dir][new_dir]
-	    set_attr(db, attr_dir, -new_dir)
-	    set_attr(b, attr_icflag, PROCESSED)
-	    set_attr(db, attr_icflag, PROCESSED)
-	    setfield(db, 'dir', getfield(b, 'dir'))
-	    setfield(db, 'shift', 0)
-	    setfield(db, 'width',  info.width(w,h,d))
-	    setfield(db, 'height', info.height(w,h,d))
-	    setfield(db, 'depth',  info.depth(w,h,d))
-	    local db_head, db_tail  = nil
-	    for _,v in ipairs(info[bid]) do
-	       local cmd, arg, nn = v[1], v[2]
-	       if cmd=='kern' then
-		  nn = node_new(id_kern)
-		  setfield(nn, 'kern', arg(w, h, d))
-	       elseif cmd=='whatsit' then
-		  nn = node_new(id_whatsit, arg)
-	       elseif cmd=='rotate' then
-		  nn = node_new(id_whatsit, sid_matrix)
-		  setfield(nn, 'data', arg)
-	       elseif cmd=='box' then
-		  nn = b; setfield(b, 'next', nil)
-	       end
-	       if db_head then
-		  insert_after(db_head, db_tail, nn)
-		  db_tail = nn
+         local nh, nb, ret, flag
+	 if box_dir < 0 then -- unwrap
+            nh, nb, ret = unwrap_dir_node(b,head)
+            flag = false
+         else
+            local db
+            local dnh = getfield(dn, 'value')
+            for x in traverse(dnh) do
+               if has_attr(x, attr_dir) == -new_dir then
+                  setfield(dn, 'value', to_node(node_remove(dnh, x)))
+                  db=x; break
+               end
+            end
+            db = db or create_dir_node(b, box_dir, new_dir)
+            local w = getfield(b, 'width')
+            local h = getfield(b, 'height')
+            local d = getfield(b, 'depth')
+            nh, nb =  insert_before(head, b, db), nil
+            nh, nb = node_remove(nh, b)
+            local db_head, db_tail  = nil
+            for _,v in ipairs(dir_node_aux[box_dir][new_dir][getid(b)]) do
+               local cmd, arg, nn = v[1], v[2]
+               if cmd=='kern' then
+                  nn = node_new(id_kern)
+                  setfield(nn, 'kern', arg(w, h, d))
+               elseif cmd=='whatsit' then
+                  nn = node_new(id_whatsit, arg)
+               elseif cmd=='rotate' then
+                  nn = node_new(id_whatsit, sid_matrix)
+                  setfield(nn, 'data', arg)
+               elseif cmd=='box' then
+                  nn = b; setfield(b, 'next', nil)
+                  if arg then setfield(nn, 'shift', arg(w,h,d)) end
+               end
+               if db_head then
+                  insert_after(db_head, db_tail, nn)
+                  db_tail = nn
 	       else
 		  db_head, db_tail = nn, nn
 	       end
@@ -403,6 +454,100 @@ do
    luatexja.direction.make_dir_whatsit = make_dir_whatsit
    luatexbase.add_to_callback('vpack_filter',
 			      process_dir_node, 'ltj.dir_whatsit', 10001)
+end
+
+-- \wd, \ht, \dp の代わり
+do
+   local getbox = tex.getbox
+   local function get_box_dim_common(key, s, l_dir)
+      local s_dir, wh = get_box_dir(s, dir_yoko)
+      if s_dir ~= l_dir then
+         local not_found = true
+         for x in traverse(getfield(wh, 'value')) do
+            if l_dir == -has_attr(x, attr_dir) then
+               tex.setdimen('ltj@tempdima', getfield(x, key))
+               not_found = false; break
+            end
+         end
+         if not_found then
+            local w = getfield(s, 'width')
+            local h = getfield(s, 'height')
+            local d = getfield(s, 'depth')
+            tex.setdimen('ltj@tempdima', 
+                         dir_node_aux[s_dir][l_dir][key](w,h,d))
+         end
+      else
+         tex.setdimen('ltj@tempdima', getfield(s, key))
+      end
+   end
+   local function get_box_dim(key, n)
+      local gt = tex.globaldefs; tex.globaldefs = 0
+      local s = getbox(n)
+      if s then
+         local l_dir = get_dir_count()
+         s = to_direct(s)
+         local b_dir = has_attr(s, attr_dir) or 0
+         if b_dir>=0 then
+            get_box_dim_common(key, s, l_dir)
+         elseif b_dir==-l_dir then -- dir_node case 1
+            tex.setdimen('ltj@tempdima', getfield(s, key))
+         else
+            get_box_dim_common(
+               key, 
+               node_next(node_next(node_next(node_next(getlist(s))))),
+               l_dir)
+         end
+      else
+         tex.setdimen('ltj@tempdima', 0)
+      end
+      tex.globaldefs = gt
+   end
+   luatexja.direction.get_box_dim = get_box_dim
+
+   local function set_box_dim_common(key, s, l_dir)
+      local s_dir, wh = get_box_dir(s, dir_yoko)
+      if s_dir ~= l_dir then
+         if not wh then
+            wh = create_dir_whatsit(getlist(s), 'set_box_dim', s_dir)
+            setfield(s, 'head', wh)
+         end
+         local db
+         local dnh = getfield(wh, 'value')
+         for x in traverse(dnh) do
+            if has_attr(x, attr_dir)==-l_dir then
+               db = x; break
+            end
+         end
+         if not db then
+            db = create_dir_node(s, s_dir, l_dir)
+            setfield(db, 'next', dnh)
+            setfield(wh, 'value',to_node(db))
+         end
+         setfield(db, key, tex.getdimen('ltj@tempdima'))
+      else
+         setfield(s, key, tex.getdimen('ltj@tempdima'))
+      end
+   end
+   local function set_box_dim(key)
+      local n = tex.getcount('ltj@tempcnta')
+      local s = getbox(n)
+      if s then
+	 local l_dir = get_dir_count()
+	 s = to_direct(s)
+         local b_dir = has_attr(s, attr_dir) or 0
+         if b_dir>=0 then
+            set_box_dim_common(key, s, l_dir)
+            elseif b_dir == -l_dir then
+               setfield(s, key, tex.getdimen('ltj@tempdima'))
+         else
+            set_box_dim_common(
+               key, 
+               node_next(node_next(node_next(node_next(getlist(s))))),
+               l_dir)
+         end
+      end
+   end
+   luatexja.direction.set_box_dim = set_box_dim
 end
 
 -- 縦書き用字形への変換テーブル

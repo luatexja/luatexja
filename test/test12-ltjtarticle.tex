@@ -1,0 +1,44 @@
+%#!lualatex
+\documentclass{ltjtarticle}
+\usepackage[margin=20mm]{geometry}
+
+\makeatletter
+\newif\ifnot@advanceline
+\newskip\rensujiskip
+\rensujiskip=0.25\chs plus.25\zw minus.25\zw
+\DeclareRobustCommand\rensuji{%
+  \@ifstar{\not@advancelinetrue\@rensuji}{\@rensuji}}
+\def\@rensuji{\@ifnextchar[{\@@rensuji}{\@@rensuji[c]}}
+\def\@@rensuji[#1]#2{\ifydir\hbox{#2}\else
+  \hskip\rensujiskip
+  \ifvmode\leavevmode\fi
+  \ifnot@advanceline\not@advancelinefalse\else
+    \setbox\z@\hbox{\yoko#2}%
+    \@tempdima\ht\z@ \advance\@tempdima\dp\z@
+    \if #1c\relax\vrule\@width\z@ \@height.5\@tempdima \@depth.5\@tempdima
+    \else\if #1r\relax\vrule\@width\z@\@height\z@ \@depth\@tempdima
+    \else\vrule\@width\z@ \@height\@tempdima \@depth\z@
+    \fi\fi
+  \fi
+  \if #1c\relax\hbox to1zw{\yoko\hss#2\hss}%
+  \else\if #1r\relax\vbox{\hbox to1zw{\yoko\hss#2}}%
+  \else\vtop{\hbox to1zw{\yoko#2\hss}}%
+  \fi\fi
+  \hskip\rensujiskip
+\fi}
+\let\Rensuji\rensuji
+\let\prensuji\rensuji
+
+\begin{document}
+酵素（こうそ）とは、生体で起こる化学反応に対して触媒として機能する分子である。酵素によって触媒される反応を“酵素的”反応という。
+
+酵素は生物が物質を消化する段階から吸収・輸送・代謝・排泄に至るまでのあらゆる過程に関与しており、生体が物質をj変化させて利用するのに欠かせない。したがって、酵素は生化学研究における一大分野であり、早い段階から研究対象になっている。
+
+多くの酵素は生体内で作り出されるタンパク質を基にして構成されている。したがって、生体内での生成や分布の特性、熱や pH によって変性して活性を失う（失活）といった特性などは、他のタンパク質と同様である。
+
+生体を機関に例えると、核酸塩基配列が表すゲノムが設計図に相当するのに対して、生体内における酵素は組立て工具に相当する。酵素の特徴である作用する物質（基質）をえり好みする性質（基質特異性）と目的の反応だけを進行させる性質（反応選択性）などによって、生命維持に必要なさまざまな化学変化を起こさせるのである。
+
+古来から人類は発酵という形で酵素を利用してきた。今日では、酵素の利用は食品製造だけにとどまらず、化学工業製品の製造や日用品の機能向上など、広い分野に応用されている。医療においても、酵素量を検査して診断したり、酵素作用を調節する治療薬を用いるなど、酵素が深く関っている。
+
+
+\end{document}

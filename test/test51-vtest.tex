@@ -45,48 +45,125 @@
 
 \tentgt
 
+\def\H{\vrule width 2pt height 10pt depth 0pt%
+\vrule width 4pt height 0pt depth 4pt}
+
+\message{^^JTATE, DTOU IN YOKO (HMODE))^^J}
 \hbox{\yoko
-横水平Hxy\hbox{\yoko 横水平Hxy}かき◆
-\hbox{\tate 縦水平Hxy}◆おおおお
-\vbox{\yoko\hsize=30mm 横垂直Hxyああああああああああ}かき◆
-\vbox{\tate\hsize=30mm  縦垂直Hxy\hfill ああ\break ああああああああ}◆ああああ
+  横水平\H\vrule\hbox{\yoko 横水平\H }\vrule かき◆
+  \vrule\hbox{\tate 縦水平\H }◆おおおお\vrule
+  \vbox{\yoko\hsize=30mm 横垂直\H ああああああああああ\hfill\H}かき◆%
+  \vrule
+  \vbox{\tate\hsize=30mm 縦垂直\H ああああああああああ\hfill\H}%
+  \vrule ◆ああああ
+}
+\hbox{\yoko\vrule
+  横水平\H\vrule\hbox{\dtou 下水平\H }\vrule ◆おおおお
+  \H\vrule
+  \vbox{\dtou\hsize=30mm 下垂直\H ああああああああああ\hfill\H}%
+  \vrule かき◆
 }
 \vfill\eject
+
+\message{^^JYOKO, DTOU IN TATE (HMODE)^^J}
+\leavevmode
 \hbox{\tate
-縦水平Hxy\hbox{\yoko 横水平Hxy}かき◆
-\hbox{\tate 縦水平Hxy}◆おおおお
-\vbox{\yoko\hsize=30mm 横垂直Hxyああああああああああ}かき◆
-\vbox{\tate\hsize=30mm  縦垂直Hxy\hfill ああ\break ああああああああ}◆ああああ}
+縦水平\H\vrule \hbox{\yoko 横水平\H }\vrule かき◆\vrule
+\hbox{\tate 縦水平\H }\vrule◆おおおお\H\vrule
+\vbox{\yoko\hsize=30mm 横垂直\H ああああああああああ\hfill\H}\vrule
+かき◆\H\vrule
+\vbox{\tate\hsize=30mm 縦垂直\H ああああああああああ\hfill\H}\vrule
+◆ああああ}
+\hbox{\tate
+縦水平\H\vrule\hbox{\dtou 下水平\H }\vrule ◆おおおお\H\vrule
+\vbox{\dtou\hsize=30mm 下垂直\H ああああああああああ\hfill\H}%
+\vrule\H ◆ああああ}
+
+\vfill\eject
+
+\message{^^JYOKO, TATE IN DTOU (HMODE)^^J}
+\leavevmode
+\hbox{\dtou
+下水平\H\vrule\hbox{\yoko 横水平\H }\vrule かき◆\H\vrule
+\hbox{\tate 縦水平\H }\vrule ◆おおおお\H\vrule
+\vbox{\yoko\hsize=30mm 横垂直\H ああああああああああ\hfill\H}%
+\vrule かき◆あおう\H\vrule
+\vbox{\tate\hsize=30mm 縦垂直\H ああああああああああ\hfill\H}%
+\vrule ◆ああああ
+}
+\hbox{\dtou
+下水平\H\vrule\hbox{\dtou 下水平\H }\vrule◆おおおお\vrule
+\vbox{\dtou\hsize=30mm 下垂直\H ああああああああああ\hfill\H}%
+\vrule ◆ああああ}
 
 
 \vfill\eject
 
 
+\message{^^JTATE, DTOU IN YOKO (VMODE)^^J}
 \setbox0=\vbox{\yoko\hsize=100mm
-横垂直Hxy\hbox{\yoko 横水平Hxy}かき◆
+横垂直\H\vrule \hbox{\yoko 横水平\H }\vrule\H かき◆
 これは，意味のないサンプルテキストです．
-\hbox{\tate 縦水平Hxy}◆おおおお
+\vrule\hbox{\tate 縦水平\H }\vrule\H おおおお
+これは，意味のないサンプルテキストです．\vrule
+\vbox{\yoko\hsize=50mm 横垂直\H ああああああああああ%
+  あああああああああ\hfill\H}%
+\vrule\H かき◆
+これは，意味のないサンプルテキストです．\vrule
+\vbox{\tate\hsize=50mm 縦垂直\H ああああああああああ%
+  あああああああああ\hfill\H}%
+\vrule\H ◆ああああ
+これは，意味のないサンプルテキストです．\vrule
+\hbox{\dtou 下水平\H }\vrule\H おおおお
 これは，意味のないサンプルテキストです．
-\vbox{\yoko\hsize=50mm 横垂直Hxyあああああああああああああああああああ}かき◆
-これは，意味のないサンプルテキストです．
-\vbox{\tate\hsize=50mm 縦垂直Hxyあああああああああああああああああああ}◆ああああ
-これは，意味のないサンプルテキスト\hbox{\tate 縦水平Hxy}◆おおおおです．
+\vrule\vbox{\dtou\hsize=50mm 縦垂直\H ああああああああああ%
+  あああああああああ\hfill\H}%
+\vrule\H これは，意味のないサンプルテキストです．
 }
 \copy0
-%{\showboxbreadth10000\showboxdepth10000
-%\showbox0}
-
 \vfill\eject
+
+\message{^^JYOKO, DTOU IN TATE (VMODE)^^J}
 \vbox{\tate\hsize=100mm
-◆◆◆Hxy\hbox{\yoko 横水平Hxy}かき◆
+縦垂直\H\vrule\hbox{\yoko 横水平\H }\vrule\H かき◆
 これは，意味のないサンプルテキストです．
-\hbox{\tate 縦水平Hxy}◆おおおお
+\vrule\hbox{\tate 縦水平\H }\vrule\H おおおお
+これは，意味のないサンプルテキストです．\vrule
+\vbox{\yoko\hsize=50mm 横垂直\H ああああああああああ%
+  あああああああああ\hfill\H}%
+\vrule\H かき◆
+これは，意味のないサンプルテキストです．\vrule
+\vbox{\tate\hsize=50mm 縦垂直\H ああああああああああ%
+  あああああああああ\hfill\H}%
+\vrule\H ◆ああああ
+これは，意味のないサンプルテキストです．\vrule
+\hbox{\dtou 下水平\H }\vrule\H おおおお
 これは，意味のないサンプルテキストです．
-\vbox{\yoko\hsize=50mm 横垂直Hxyあああああああああああああああああああ}かき◆
+\vrule\vbox{\dtou\hsize=50mm 縦垂直\H ああああああああああ%
+  あああああああああ\hfill\H}%
+\vrule\H これは，意味のないサンプルテキストです．
+}
+\vfill\eject
+
+\message{^^JYOKO, TATE IN DTOU (VMODE)^^J}
+\vbox{\dtou\hsize=100mm
+下垂直\H\vrule\hbox{\yoko 横水平\H }\vrule\H かき◆
 これは，意味のないサンプルテキストです．
-\vbox{\tate\hsize=50mm  縦垂直Hxyあああああああああああああああああああ}◆ああああ
-これは，意味のないサンプルテキスト\hbox{\tate 縦水平Hxy}◆おおおお
-です．
+\vrule\hbox{\tate 縦水平\H }\vrule\H おおおお
+これは，意味のないサンプルテキストです．\vrule
+\vbox{\yoko\hsize=50mm 横垂直\H ああああああああああ%
+  あああああああああ\hfill\H}%
+\vrule\H かき◆
+これは，意味のないサンプルテキストです．\vrule
+\vbox{\tate\hsize=50mm 縦垂直\H ああああああああああ%
+  あああああああああ\hfill\H}%
+\vrule\H ◆ああああ
+これは，意味のないサンプルテキストです．\vrule
+\hbox{\dtou 下水平\H }\vrule\H おおおお
+これは，意味のないサンプルテキストです．
+\vrule\vbox{\dtou\hsize=50mm 縦垂直\H ああああああああああ%
+  あああああああああ\hfill\H}%
+\vrule\H これは，意味のないサンプルテキストです．
 }
 
 
@@ -204,8 +281,8 @@ abc&かきくけこ&xyz\cr}}%
 \setbox1=\hbox{\yoko\box0}
 \unhcopy1
 \setbox1=\lastbox %% box1: dir_node
-\dp1=100pt
-\setbox2=\hbox{\tate \copy1}%% unwrap
+\ltjsetdp1=100pt
+\setbox2=\hbox{\tate \ltjsetdp1=42pt\copy1}%% unwrap
 
 {\obeylines\tentt
 \directlua{luatexja.ext_show_node_list(tex.box[2], 'A> ', tex.print)}}
@@ -214,7 +291,6 @@ abc&かきくけこ&xyz\cr}}%
 {\obeylines\tentt
 \directlua{luatexja.ext_show_node_list(tex.box[1], 'B> ', tex.print)}}
 
-\the\ltjgetdp{1}
-
+\the\ltjgetdp{1}\hbox{\tate \the\ltjgetdp{1}}
 \end
 

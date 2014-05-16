@@ -63,6 +63,7 @@ userid_table.DNODE= luatexbase.newuserwhatsitid('dir_node',    'luatexja')  -- d
 
 local dir_table = {}
 luatexja.dir_table = dir_table
+dir_table.dir_dtou = 1
 dir_table.dir_tate = 3
 dir_table.dir_yoko = 4
 
