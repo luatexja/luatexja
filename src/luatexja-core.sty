@@ -558,20 +558,20 @@
 }
 
 \protected\def\ltjsetwd{\begingroup
-  \ltj@reset@globaldefs\afterassignment\ltj@@setwd@a\@tempcnta}
-\def\ltj@@setwd@a{\afterassignment\ltj@@setwd@b\@tempdima}
+  \ltj@reset@globaldefs\afterassignment\ltj@@setwd@a\ltj@tempcnta}
+\def\ltj@@setwd@a{\afterassignment\ltj@@setwd@b\ltj@tempdima}
 \def\ltj@@setwd@b{%
   \directlua{luatexja.direction.set_box_dim('width')}%
   \ltj@restore@globaldefs\endgroup}
 \protected\def\ltjsetht{\begingroup
-  \ltj@reset@globaldefs\afterassignment\ltj@@setht@a\@tempcnta}
-\def\ltj@@setht@a{\afterassignment\ltj@@setht@b\@tempdima}
+  \ltj@reset@globaldefs\afterassignment\ltj@@setht@a\ltj@tempcnta}
+\def\ltj@@setht@a{\afterassignment\ltj@@setht@b\ltj@tempdima}
 \def\ltj@@setht@b{%
   \directlua{luatexja.direction.set_box_dim('height')}%
   \ltj@restore@globaldefs\endgroup}
 \protected\def\ltjsetdp{\begingroup
-  \ltj@reset@globaldefs\afterassignment\ltj@@setdp@a\@tempcnta}
-\def\ltj@@setdp@a{\afterassignment\ltj@@setdp@b\@tempdima}
+  \ltj@reset@globaldefs\afterassignment\ltj@@setdp@a\ltj@tempcnta}
+\def\ltj@@setdp@a{\afterassignment\ltj@@setdp@b\ltj@tempdima}
 \def\ltj@@setdp@b{%
   \directlua{luatexja.direction.set_box_dim('depth')}%
   \ltj@restore@globaldefs\endgroup}

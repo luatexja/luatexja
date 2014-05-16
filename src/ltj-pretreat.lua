@@ -47,12 +47,12 @@ local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
 local ltjd_get_vert_glyph = ltjd.get_vert_glyph
 local ltjf_replace_altfont = ltjf.replace_altfont
 local attr_orig_char = luatexbase.attributes['ltj@origchar']
-local STCK = luatexja.userid_table.STCK
-local DIR = luatexja.userid_table.DIR
+local STCK  = luatexja.userid_table.STCK
+local DIR   = luatexja.userid_table.DIR
+local DNODE = luatexja.userid_table.DNODE
 local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 
-local dir_tate = 3
-local dir_yoko = 4
+local dir_tate = luatexja.dir_table.dir_tate
 
 ------------------------------------------------------------------------
 -- MAIN PROCESS STEP 1: replace fonts
@@ -84,11 +84,11 @@ do
             wt[#wt+1] = p; head = node_remove(head, p)
          elseif uid==DIR then
 	    if has_attr(p, attr_icflag)<PROCESSED_BEGIN_FLAG  then
-	       ltjs.list_dir = getfield(p, 'value')
-	    else
-	       local q
-	       wtd[#wtd+1] = p; head, q = node_remove(head, p)
+	       ltjs.list_dir = has_attr(p, attr_dir)
 	    end
+	    wtd[#wtd+1] = p; head = node_remove(head, p)
+         elseif uid==DNODE then
+	    wtd[#wtd+1] = p; head = node_remove(head, p)
          end
       end
       return p

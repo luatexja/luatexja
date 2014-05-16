@@ -35,7 +35,7 @@ local insert_before = Dnode.insert_before
 local insert_after = Dnode.insert_after
 local node_next = (Dnode ~= node) and Dnode.getnext or node.next
 local round = tex.round
-local ltjd_make_dir_node = ltjd.make_dir_node
+local ltjd_make_dir_whatsit = ltjd.make_dir_whatsit
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_find_char_class = ltjf.find_char_class
 local node_new = Dnode.new
@@ -44,9 +44,6 @@ local node_remove = luatexja.Dnode_remove -- Dnode.remove
 local node_tail = Dnode.tail
 local node_free = Dnode.free
 local node_end_of_math = Dnode.end_of_math
-
-local dir_tate = 3
-local dir_yoko  = 4
 
 local id_glyph = node.id('glyph')
 local id_hlist = node.id('hlist')
@@ -303,7 +300,12 @@ local function calc_np_pbox(lp, last)
    local lpa, nc = KINSOKU, nil
    set_attr(lp, attr_icflag, get_attr_icflag(lp));
    while lp ~=last and (lpa>=PACKED) and (lpa<BOXBDD) do
-      nc, lp = lp, node_next(lp); lpa = lp and has_attr(lp, attr_icflag) or 0
+      if getid(lp)==id_hlist or getid(lp)==id_vlist then
+	 head, lp, nc = ltjd_make_dir_whatsit(head, lp, list_dir, 'jfm pbox')
+      else
+	 nc, lp = lp, node_next(lp)
+      end
+      lpa = lp and has_attr(lp, attr_icflag) or 0
      -- get_attr_icflag() ではいけない！
    end
    Np.nuc = nc
@@ -320,7 +322,7 @@ local calc_np_auxtable = {
    end,
    [id_hlist] = function(lp)
       local op, flag
-      head, lp, op, flag = ltjd_make_dir_node(head, lp, list_dir, 'jfm hlist')
+      head, lp, op, flag = ltjd_make_dir_whatsit(head, lp, list_dir, 'jfm hlist')
       set_attr(op, attr_icflag, PROCESSED)
       Np.first = Np.first or op; Np.last = op; Np.nuc = op;
       Np.id = (flag or getfield(op, 'shift')~=0) and id_box_like or id_hlist
@@ -328,7 +330,7 @@ local calc_np_auxtable = {
    end,
    [id_vlist] =  function(lp)
       local op
-      head, lp, op = ltjd_make_dir_node(head, lp, list_dir, 'jfm:' .. getid(lp))
+      head, lp, op = ltjd_make_dir_whatsit(head, lp, list_dir, 'jfm:' .. getid(lp))
       Np.first = Np.first or op; Np.last = op; Np.nuc = op;
       Np.id = id_box_like;
       return true, lp
@@ -454,6 +456,7 @@ do
   local POST = luatexja.stack_table_index.POST
   local KCAT = luatexja.stack_table_index.KCAT
   local XSP  = luatexja.stack_table_index.XSP
+  local dir_tate = luatexja.dir_table.dir_tate
 
 -- 和文文字のデータを取得
    local attr_jchar_class = luatexbase.attributes['ltj@charclass']
@@ -943,7 +946,7 @@ do
    local XKANJI_SKIP   = luatexja.icflag_table.XKANJI_SKIP
    local KSK  = luatexja.stack_table_index.KSK
    local XSK  = luatexja.stack_table_index.XSK
-   local DIR  = luatexja.stack_table_index.DIR
+   local dir_yoko = luatexja.dir_table.dir_yoko
    init_var = function (mode)
       -- 1073741823: max_dimen
       Bp, widow_Bp, widow_Np = {}, {}, {first = nil}

@@ -88,6 +88,7 @@ ltjdbg.pformat = pformat
 -------------------- 所要時間合計
 require("socket")
 do
+   local max = math.max
    local gettime = socket.gettime
    local time_stat = {}
    local function start_time_measure(n)
@@ -100,7 +101,7 @@ do
    end
    local function stop_time_measure(n)
       local t = time_stat[n]
-      t[2] = t[2] + gettime()
+      t[2] = max(t[2] + gettime(), 0)
    end
 
    local function print_measure()

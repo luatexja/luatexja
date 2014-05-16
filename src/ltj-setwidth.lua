@@ -37,9 +37,7 @@ local id_whatsit = node.id('whatsit')
 local sid_save = node.subtype('pdf_save')
 local sid_restore = node.subtype('pdf_restore')
 local sid_matrix = node.subtype('pdf_setmatrix')
-local dir_tate = 3
-local dir_yoko = 4
-local DIR = luatexja.stack_table_index.DIR
+local dir_tate = luatexja.dir_table.dir_tate
 
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']

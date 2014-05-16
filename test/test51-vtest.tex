@@ -1,5 +1,6 @@
 %#!luatex
 
+\directlua{luatexja_debug = 1}
 \input luatexja.sty
 %\input lua-visual-debug.sty
 
@@ -46,7 +47,7 @@
 
 \hbox{\yoko
 横水平Hxy\hbox{\yoko 横水平Hxy}かき◆
-\hbox{\tate 縦垂平Hxy}◆おおおお
+\hbox{\tate 縦水平Hxy}◆おおおお
 \vbox{\yoko\hsize=30mm 横垂直Hxyああああああああああ}かき◆
 \vbox{\tate\hsize=30mm  縦垂直Hxy\hfill ああ\break ああああああああ}◆ああああ
 }
@@ -55,8 +56,8 @@
 縦水平Hxy\hbox{\yoko 横水平Hxy}かき◆
 \hbox{\tate 縦水平Hxy}◆おおおお
 \vbox{\yoko\hsize=30mm 横垂直Hxyああああああああああ}かき◆
-\vbox{\tate\hsize=30mm  縦垂直Hxy\hfill ああ\break ああああああああ}◆ああああ
-}
+\vbox{\tate\hsize=30mm  縦垂直Hxy\hfill ああ\break ああああああああ}◆ああああ}
+
 
 \vfill\eject
 
@@ -117,5 +118,103 @@ PDFなどの表示形式を出力として得ることが挙げられる。
 作成し、\TeX 形式で出力することも可能である。
 
 }
+
+\message{^^Jget/set box dimension^^J}
+
+\def\\{\hfill\break}
+\setbox12288=\hbox{%
+  \tate\ltjsetparameter{talbaselineshift=0pt}Htp}
+縦ボックス\hbox{\vrule\copy12288\vrule}寸法\quad
+\vbox{\hsize=80pt\yoko\noindent
+  WD: \the\ltjgetwd{12288}, \\HT: \the\ltjgetht{12288}, \\DP: \the\ltjgetdp{12288}%
+}
+\vbox{\hsize=80pt\tate\noindent
+  WD: \the\ltjgetwd{12288}, \\HT: \the\ltjgetht{12288}, \\DP: \the\ltjgetdp{12288}%
+}
+\ltjsetwd12288=100pt
+\setbox0=\hbox{\tate\ltjsetht12288=10pt}
+\vbox{\hsize=80pt\yoko\noindent
+  WD: \the\ltjgetwd{12288}, \\HT: \the\ltjgetht{12288}, \\DP: \the\ltjgetdp{12288}%
+}
+\vbox{\hsize=80pt\tate\noindent
+  WD: \the\ltjgetwd{12288}, \\HT: \the\ltjgetht{12288}, \\DP: \the\ltjgetdp{12288}%
+}
+
+
+
+\setbox12288=\hbox{%
+  \yoko\ltjsetparameter{yalbaselineshift=0pt}Htp}
+横ボックス\hbox{\vrule\copy12288\vrule}寸法\quad
+\vbox{\hsize=80pt\yoko\noindent
+  WD: \the\ltjgetwd{12288}, \\HT: \the\ltjgetht{12288}, \\DP: \the\ltjgetdp{12288}%
+}
+\vbox{\hsize=80pt\tate\noindent
+  WD: \the\ltjgetwd{12288}, \\HT: \the\ltjgetht{12288}, \\DP: \the\ltjgetdp{12288}%
+}
+\ltjsetwd12288=100pt
+\setbox0=\hbox{\tate\ltjsetht12288=10pt}
+\vbox{\hsize=80pt\yoko\noindent
+  WD: \the\ltjgetwd{12288}, \\HT: \the\ltjgetht{12288}, \\DP: \the\ltjgetdp{12288}%
+}
+\vbox{\hsize=80pt\tate\noindent
+  WD: \the\ltjgetwd{12288}, \\HT: \the\ltjgetht{12288}, \\DP: \the\ltjgetdp{12288}%
+}
+
+dimexpr でも使えるかな？\the \dimexpr2\ltjgetwd{`　}+\ltjgetwd{200}+1pt\relax
+
+\vfill\eject
+
+\message{^^Jalign^^J}
+
+\parindent0pt
+\hrule width 40mm
+
+\hbox{\yoko\hsize40mm\baselineskip20pt 横水平
+\valign{A#\hfil&B#\hfil&C#\hfill\vrule\cr
+あいうえお&ABC&XYZ\cr
+abc&かきくけこ&xyz\cr}横水平}
+\moveright40mm\hbox{\vrule width 40mm height.4pt}
+
+\hbox{\tate\hsize40mm\baselineskip20pt 縦水平
+\valign{甲#\hfil&乙#\hfil&丙#\hfill\vrule\cr
+あいうえお&ABC&XYZ\cr
+abc&かきくけこ&xyz\cr}}%
+%\tracingonline\showboxdepth2\showboxbreadth1000\showlists}
+\moveright40mm\hbox{\vrule width 40mm height.4pt}
+
+\vfill\eject
+
+\vbox{\yoko\hsize40mm\baselineskip20pt  横垂直
+\halign{A#\hfil&B#\hfil&C#\hfill\vrule\cr
+あいうえお&ABC&XYZ\cr
+abc&かきくけこ&xyz\cr}}%
+\moveright40mm\hbox{\vrule width 40mm height.4pt}
+
+\vbox{\tate\baselineskip20pt  縦垂直
+\halign{甲#\hfil&乙#\hfil&丙#\hfill\vrule\cr
+あいうえお&ABC&XYZ\cr
+abc&かきくけこ&xyz\cr}}%
+\moveright40mm\hbox{\vrule width 40mm height.4pt}
+
+\vfill\eject
+
+\message{^^Jdir node^^J}
+
+\setbox0=\hbox{\tate ABCD}
+\setbox1=\hbox{\yoko\box0}
+\unhcopy1
+\setbox1=\lastbox %% box1: dir_node
+\dp1=100pt
+\setbox2=\hbox{\tate \copy1}%% unwrap
+
+{\obeylines\tentt
+\directlua{luatexja.ext_show_node_list(tex.box[2], 'A> ', tex.print)}}
+
+\setbox2=\hbox{\tate \unhbox2\global\setbox1=\lastbox}%% unwrap
+{\obeylines\tentt
+\directlua{luatexja.ext_show_node_list(tex.box[1], 'B> ', tex.print)}}
+
+\the\ltjgetdp{1}
+
 \end
 

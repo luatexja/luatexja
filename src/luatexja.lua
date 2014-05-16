@@ -48,7 +48,6 @@ stack_table_index.RIPOST = 0xC00000 -- characterごと，ruby post
 stack_table_index.JWP  = 0 -- これだけ
 stack_table_index.KSK  = 1 -- これだけ
 stack_table_index.XSK  = 2 -- これだけ
-stack_table_index.DIR  = 3 -- これだけ
 stack_table_index.MJT  = 0x100 -- 0--255
 stack_table_index.MJS  = 0x200 -- 0--255
 stack_table_index.MJSS = 0x300 -- 0--255
@@ -60,6 +59,12 @@ userid_table.IHB  = luatexbase.newuserwhatsitid('inhibitglue',  'luatexja') -- \
 userid_table.STCK = luatexbase.newuserwhatsitid('stack_marker', 'luatexja') -- スタック管理
 userid_table.BPAR = luatexbase.newuserwhatsitid('begin_par',    'luatexja') -- 「段落始め」
 userid_table.DIR  = luatexbase.newuserwhatsitid('direction',    'luatexja') -- 組方向
+userid_table.DNODE= luatexbase.newuserwhatsitid('dir_node',    'luatexja')  -- dir_node
+
+local dir_table = {}
+luatexja.dir_table = dir_table
+dir_table.dir_tate = 3
+dir_table.dir_yoko = 4
 
 ------------------------------------------------------------------------
 -- FIX node.remove
@@ -118,9 +123,7 @@ do
    luatexbase.add_to_callback('define_font',luatexja.font_callback,"luatexja.font_callback", 1)
 end
 
-
---load_module('debug')
-
+if luatexja_debug then load_module('debug') end
 load_module('charrange'); local ltjc = luatexja.charrange
 load_module('jfont');     local ltjf = luatexja.jfont
 load_module('inputbuf');  local ltji = luatexja.inputbuf
@@ -387,8 +390,9 @@ local function debug_show_node_X(p,print_fn)
       print_fn(s)
    elseif pt=='hlist' or pt=='vlist' or pt=='unset' then
       s = base .. '(' .. print_scaled(p.height) .. '+'
-         .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width) .. p.dir
-      if p.shift or 0~=0 then
+         .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width) 
+	 .. ', dir=' .. tostring(node.has_attribute(p, attr_dir))
+      if (p.shift or 0)~=0 then
          s = s .. ', shifted ' .. print_scaled(p.shift)
       end
       if p.glue_sign >= 1 then
@@ -445,18 +449,19 @@ local function debug_show_node_X(p,print_fn)
       end
       print_fn(s)
    elseif pt == 'whatsit' then
-      s = base -- .. '(' .. node.whatsits()[p.subtype] .. ') '
+      s = base
       if p.subtype==sid_user then
+	 local t = tostring(p.user_id) .. ' (' .. 
+	    luatexbase.get_user_whatsit_name(p.user_id) .. ') '
          if p.type ~= 110 then
-            s = s .. ' userid: ' .. p.user_id .. ' ' .. p.value
+            s = s .. ' userid:' .. t .. p.value
             print_fn(s)
          else
-            s = s .. ' userid: ' .. p.user_id .. ' (node list)'
+            s = s .. ' userid:' .. t .. '(node list)'
             print_fn(s)
-            local q = p.value
             debug_depth=debug_depth.. '.'
-            while q do
-               debug_show_node_X(q, print_fn); q = node_next(q)
+            for q in node.traverse(p.value) do
+               debug_show_node_X(q, print_fn)
             end
             debug_depth=k
          end

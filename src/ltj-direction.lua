@@ -28,6 +28,7 @@ local node_tail = Dnode.tail
 local node_free = Dnode.free
 local node_remove = Dnode.remove
 local node_next = (Dnode ~= node) and Dnode.getnext or node.next
+local traverse = Dnode.traverse
 local traverse_id = Dnode.traverse_id
 local start_time_measure, stop_time_measure 
    = ltjb.start_time_measure, ltjb.stop_time_measure
@@ -44,11 +45,10 @@ local sid_user = node.subtype('user_defined')
 local PROCESSED    = luatexja.icflag_table.PROCESSED
 local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 local PACKED       = luatexja.icflag_table.PACKED
-local DIR = luatexja.stack_table_index.DIR
 local STCK = luatexja.userid_table.STCK
-local wh_DIR = luatexja.userid_table.DIR
-local dir_tate = 3
-local dir_yoko = 4
+local DIR  = luatexja.userid_table.DIR
+local dir_tate = luatexja.dir_table.dir_tate
+local dir_yoko = luatexja.dir_table.dir_yoko
 
 
 local get_dir_count 
@@ -66,16 +66,18 @@ do
      local lv, w = tex.nest[tex.nest.ptr], tex.lists.page_head
      if lv.mode == 1 and w then
         if w.id==id_whatsit and w.subtype==sid_user
-        and w.user_id==wh_DIR then
-	   w.value = v
+        and w.user_id==DIR then
+	   node_set_attr(w, attr_dir, v)
+	   
         end
      else
         local w = node_next(to_direct(lv.head))
         if to_node(w) then
            if getid(w)==id_whatsit and getsubtype(w)==sid_user
-           and getfield(w, 'user_id')==wh_DIR  then
-	      setfield(w, 'value', v)
-           else
+           and getfield(w, 'user_id')==DIR  then
+	      set_attr(w, attr_dir, v)
+	      tex.setattribute('global', attr_dir, 0)  
+	   else
               ltjb.package_error(
                  'luatexja',
                  "Use `\\" .. name .. "' at top of list",
@@ -85,75 +87,81 @@ do
         else
            local w = node_new(id_whatsit, sid_user)
            setfield(w, 'next', hd)
-           setfield(w, 'user_id', wh_DIR)
-           setfield(w, 'type', 100)
-           setfield(w, 'value', v)
+           setfield(w, 'user_id', DIR)
+           setfield(w, 'type', 110)
+           set_attr(w, attr_dir, v)
            Dnode.write(w)
+	   tex.setattribute('global', attr_dir, 0)
         end
+	tex.setattribute('global', attr_icflag, 0)
      end
   end
   luatexja.direction.set_list_direction = set_list_direction
 end
 
 -- ボックスに dir whatsit を追加
+local function create_dir_whatsit(hd, gc, new_dir)
+      local w = node_new(id_whatsit, sid_user)
+      setfield(w, 'next', hd)
+      setfield(w, 'user_id', DIR)
+      setfield(w, 'type', 110)
+      set_attr(w, attr_dir, new_dir)
+      tex.setattribute('global', attr_dir, 0)  
+      set_attr(w, attr_icflag, PROCESSED_BEGIN_FLAG)
+      set_attr(hd, attr_icflag, (has_attr(hd, attr_icflag) or 0) + PROCESSED_BEGIN_FLAG)
+      tex.setattribute('global', attr_icflag, 0)
+      return w
+end
+
 do
    local tex_getcount = tex.getcount
-   local function set_dir_flag(h, gc)
+   local function create_dir_whatsit_hpack(h, gc)
+      local hd = to_direct(h)
       if gc=='fin_row' or gc == 'preamble'  then
-	 local hd = to_direct(h)
 	 if hd  then
 	    set_attr(hd, attr_icflag, PROCESSED_BEGIN_FLAG)
 	    tex.setattribute('global', attr_icflag, 0)
 	 end
 	 return h
       else
-	 local hd = to_direct(h)
-	 if hd and getid(hd)==id_whatsit and getsubtype(hd)==sid_user
-	 and getfield(hd, 'user_id')==wh_DIR then
+	 return to_node(create_dir_whatsit(hd, gc, ltjs.list_dir))
+      end
+   end
+
+   luatexbase.add_to_callback('hpack_filter', 
+			      create_dir_whatsit_hpack, 'ltj.create_dir_whatsit', 10000)
+
+   local function create_dir_whatsit_vbox(h, gc)
+      local hd= to_direct(h)
+      ltjs.list_dir = get_dir_count()
+      if getid(hd)==id_whatsit and getsubtype(hd)==sid_user
+      and getfield(hd, 'user_id')==DIR then
+         ltjs.list_dir = has_attr(hd, attr_dir)
+         return h
+      elseif gc=='fin_row' or gc == 'preamble'  then
+	 if hd  then
 	    set_attr(hd, attr_icflag, PROCESSED_BEGIN_FLAG)
 	    tex.setattribute('global', attr_icflag, 0)
-	    hd = node_next(hd)
-	    if hd then
-	       set_attr(hd, attr_icflag, (has_attr(hd, attr_icflag) or 0) + PROCESSED_BEGIN_FLAG)
-	       tex.setattribute('global', attr_icflag, 0)
-	    end
-	    return h
-	 else
-	    local w = node_new(id_whatsit, sid_user)
-	    setfield(w, 'next', hd)
-	    setfield(w, 'user_id', wh_DIR)
-	    setfield(w, 'type', 100)
-	    setfield(w, 'value', ltjs.list_dir)
-	    set_attr(w, attr_icflag, PROCESSED_BEGIN_FLAG)
-	    set_attr(hd, attr_icflag, (has_attr(hd, attr_icflag) or 0) + PROCESSED_BEGIN_FLAG)
-	    tex.setattribute('global', attr_icflag, 0)
-	    return to_node(w)
 	 end
-      end
-   end
-   luatexbase.add_to_callback('hpack_filter', set_dir_flag, 'ltj.set_dir_flag', 10000)
-   local function set_dir_flag_vbox(h, gc)
-      local w = to_direct(h)
-      ltjs.list_dir = get_dir_count()
-      if getid(w)==id_whatsit and getsubtype(w)==sid_user
-      and getfield(w, 'user_id')==wh_DIR then
-         ltjs.list_dir = getfield(w, 'value')
-         return h
+	 return h
       else
-         return set_dir_flag(h, gc)
+         return to_node(create_dir_whatsit(hd, gc, ltjs.list_dir))
       end
    end
-   luatexbase.add_to_callback('vpack_filter', set_dir_flag_vbox, 'ltj.set_dir_flag', 1)
+   luatexbase.add_to_callback('vpack_filter', 
+			      create_dir_whatsit_vbox, 'ltj.create_dir_whatsit', 1)
+
+   local function create_dir_whatsit_parbox(h, gc)
+      stop_time_measure('tex_linebreak')
+      -- start 側は ltj-debug.lua に
+      local new_dir, hd = ltjs.list_dir, to_direct(h)
+      for line in traverse_id(id_hlist, hd) do
+	 set_attr(line, attr_dir, new_dir)
+      end
+      return to_node(create_dir_whatsit(hd, gc, new_dir))
+   end
    luatexbase.add_to_callback('post_linebreak_filter',
-			      function (h, gc)
-				 stop_time_measure('tex_linebreak')
-				 -- start 側は ltj-debug.lua に
-				 local new_dir = ltjs.list_dir
-				 for line in traverse_id(id_hlist, to_direct(h)) do
-				    set_attr(line, attr_dir, new_dir)
-				 end
-				 return set_dir_flag(h, gc)
-			      end, 'ltj.set_dir_flag', 100)
+			      create_dir_whatsit_parbox, 'ltj.create_dir_whatsit', 10000)
 
 end
 
@@ -170,67 +178,95 @@ do
    local get_w_neg =function (w,h,d) return -w end
    local get_w =function (w,h,d) return w end
    dir_node_aux = {
-      [dir_yoko] = { -- yoko を tate 中で組む
-	 width  = get_h_d,
-	 height = get_w_half,
-	 depth  = get_w_half,
-	 [id_hlist] = {
-	    { 'kern', get_h },
-	    { 'whatsit', sid_save },
-	    { 'rotate', '0 1 -1 0' },
-	    { 'kern', get_w_neg_half },
-	    { 'box' },
-	    { 'kern', get_w_neg_half },
-	    { 'whatsit', sid_restore },
-	 },
-	 [id_vlist] = {
-	    { 'kern', get_w},
-	    { 'whatsit', sid_save },
-	    { 'rotate', '0 1 -1 0' },
-	    { 'box' },
-	    { 'kern', get_h_neg},
-	    { 'whatsit', sid_restore },
+      [dir_yoko] = { -- yoko を 
+	 [dir_tate] = { -- tate 中で組む
+	    width  = get_h_d,
+	    height = get_w_half,
+	    depth  = get_w_half,
+	    [id_hlist] = {
+	       { 'kern', get_h },
+	       { 'whatsit', sid_save },
+	       { 'rotate', '0 1 -1 0' },
+	       { 'kern', get_w_neg_half },
+	       { 'box' },
+	       { 'kern', get_w_neg_half },
+	       { 'whatsit', sid_restore },
+	    },
+	    [id_vlist] = {
+	       { 'kern', get_w},
+	       { 'whatsit', sid_save },
+	       { 'rotate', '0 1 -1 0' },
+	       { 'box' },
+	       { 'kern', get_h_neg},
+	       { 'whatsit', sid_restore },
+	    },
 	 },
       },
-      [dir_tate] = { -- tate を yoko 中で組む
-	 width  = get_h_d,
-	 height = get_w,
-	 depth  = function() return 0 end,
-	 [id_hlist] = {
-	    { 'kern', get_d },
-	    { 'whatsit', sid_save },
-	    { 'rotate', '0 -1 1 0' },
-	    { 'kern', get_w_neg },
-	    { 'box' },
-	    { 'whatsit', sid_restore },
-	 },
-	 [id_vlist] = {
-	    { 'whatsit', sid_save },
-	    { 'rotate', '0 -1 1 0' },
-	    { 'kern', get_h_neg },
-	    { 'kern', get_d_neg },
-	    { 'box' },
-	    { 'whatsit', sid_restore },
+      [dir_tate] = { -- tate を
+	 [dir_yoko] = { -- yoko 中で組む
+	    width  = get_h_d,
+	    height = get_w,
+	    depth  = function() return 0 end,
+	    [id_hlist] = {
+	       { 'kern', get_d },
+	       { 'whatsit', sid_save },
+	       { 'rotate', '0 -1 1 0' },
+	       { 'kern', get_w_neg },
+	       { 'box' },
+	       { 'whatsit', sid_restore },
+	    },
+	    [id_vlist] = {
+	       { 'whatsit', sid_save },
+	       { 'rotate', '0 -1 1 0' },
+	       { 'kern', get_h_neg },
+	       { 'kern', get_d_neg },
+	       { 'box' },
+	       { 'whatsit', sid_restore },
+	    },
 	 },
       },
    }
 end
 
-local function clean_dir_whatsit(b)
+local function get_box_dir(b, default)
+   -- b に DIR whatsit があればその内容を attr_dir にうつす (1st ret val)
+   local dir = has_attr(b, attr_dir) or 0
    local bh = getlist(b)
-   local dir = has_attr(b, attr_dir)
-   for x in traverse_id(id_whatsit, bh) do
-      if getsubtype(x)==sid_user and getfield(x, 'user_id')==wh_DIR then
-	 local nh = node_remove(bh, x)
-	 setfield(b, 'head', nh)
-	 dir = getfield(bh, 'value')
+   local c
+   if bh and getid(bh)==id_whatsit
+   and getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR then
+     c = bh
+      if dir==0 then
+	 dir = has_attr(bh, attr_dir)
 	 set_attr(b, attr_dir, dir)
-	 node_free(x); break
+	 tex.setattribute('global', attr_dir, 0)
       end
    end
-   return dir
+   return (dir==0 and default or dir), c
 end
-luatexja.direction.clean_dir_whatsit = clean_dir_whatsit
+
+local function unwrap_dir_node(b, head)
+   -- head: nil or nil-nil
+   -- if head is non-nil, return values are (new head), (next of b), (contents)
+   local bh = getlist(b)
+   local bc = node_next(node_next(node_next(node_next(bh))))
+   local nh, nb
+   node_remove(bh, bc); 
+   if head then
+      nh = insert_before(head, b, bc)
+      nh, nb = node_remove(nh, b)
+   end
+   setfield(b, 'list', nil); Dnode.flush_list(bh)
+   local d, wh = get_box_dir(bc, 0)
+   if not wh then 
+      wh = create_dir_whatsit(getlist(bc), 'unwrap', d)
+   end
+   local h = getfield(wh, 'value')
+   if h then setfield(b, 'next', h) end
+   setfield(wh, 'value', to_node(b))
+   return nh, nb, bc
+end
+
 
 -- \wd, \ht, \dp の代わり
 do
@@ -240,12 +276,22 @@ do
       local s = getbox(n)
       if s then
 	 s = to_direct(s)
-	 local s_dir, l_dir = clean_dir_whatsit(s), get_dir_count()
+	 local s_dir, wh = get_box_dir(s, dir_yoko)
+	 local l_dir = get_dir_count()
 	 if s_dir ~= l_dir then
-	    local w = getfield(s, 'width')
-	    local h = getfield(s, 'height')
-	    local d = getfield(s, 'depth')
-	    tex.setdimen('ltj@tempdima', dir_node_aux[s_dir][key](w,h,d))
+	    local not_found = true
+	    for x in traverse(getfield(wh, 'value')) do
+	       if l_dir == -has_attr(x, attr_dir) then
+		  tex.setdimen('ltj@tempdima', getfield(x, key))
+		  not_found = false; break
+	       end
+	    end
+	    if not_found then
+	       local w = getfield(s, 'width')
+	       local h = getfield(s, 'height')
+	       local d = getfield(s, 'depth')
+	       tex.setdimen('ltj@tempdima', dir_node_aux[s_dir][l_dir][key](w,h,d))
+	    end
 	 else
 	    tex.setdimen('ltj@tempdima', getfield(s, key))
 	 end
@@ -260,49 +306,40 @@ do
       local s = getbox(n)
       if s then
 	 s = to_direct(s)
-	 local s_dir, l_dir = clean_dir_whatsit(s), get_dir_count()
+	 local s_dir, wh = get_box_dir(s, dir_yoko)
+	 local l_dir = get_dir_count()
 	 if s_dir ~= l_dir then
 	    print('setting ' .. key .. ' of different direction box is not supported')
+	    -- TODO
 	 else
 	    setfield(s, key, tex.getdimen('ltj@tempdima'))
 	 end
       end
    end
+   luatexja.direction.set_box_dim = set_box_dim
 end
 
-local make_dir_node
+local make_dir_whatsit
 do
-   make_dir_node = function (head, b, new_dir, origin)
+   make_dir_whatsit = function (head, b, new_dir, origin)
       -- head: list head, b: box
       -- origin: コール元 (for debug)
       -- return value: (new head), (next of b), (new b), (is_b_dir_node)
       -- (new b): b か dir_node に被せられた b
-      local old_dir = has_attr(b, attr_dir) or 0
+      local box_dir = has_attr(b, attr_dir) or 0
       local bh = getlist(b)
-      if old_dir ==0 then
-	 if getsubtype(bh)==sid_user and getfield(bh, 'user_id')==wh_DIR then
-	    old_dir = getfield(bh, 'value')
-	    set_attr(b, attr_dir, old_dir)
-	    local nh = node_remove(bh, bh)
-	    setfield(b, 'head', nh)
-	 end
-	 if old_dir ==0 then old_dir = ltjs.list_dir end
-      end
-      if old_dir==new_dir then
+      local box_dir, dn =  get_box_dir(b, ltjs.list_dir)
+      -- 既に b の中身にあるwhatsit
+      if box_dir==new_dir then
 	 return head, node_next(b), b, false
-      elseif  -old_dir == new_dir  then
+      elseif  -box_dir == new_dir  then
 	 return head, node_next(b), b, true
       else
 	 local nh, nb, ret, flag
-	 if old_dir < 0 then
+	 if box_dir < 0 then
 	    -- b itself is a dir node; just unwrap
-	    local bc = node_next(node_next(
-				    node_next(node_next(bh))))
-	    node_remove(bh, bc);
-	    nh, nb =  insert_before(head, b, bc), nil
-	    nh, nb = node_remove(head, b)
-	    setfield(b, 'next', nil); Dnode.flush_list(b)
-	    ret, flag = bc, false
+	    nh, nb, ret = unwrap_dir_node(b,head)
+	    flag = false
 	 else
 	    local bid = getid(b)
 	    local db = node_new(bid) -- dir node
@@ -311,7 +348,7 @@ do
 	    local w = getfield(b, 'width')
 	    local h = getfield(b, 'height')
 	    local d = getfield(b, 'depth')
-	    local info = dir_node_aux[old_dir]
+	    local info = dir_node_aux[box_dir][new_dir]
 	    set_attr(db, attr_dir, -new_dir)
 	    set_attr(b, attr_icflag, PROCESSED)
 	    set_attr(db, attr_icflag, PROCESSED)
@@ -355,7 +392,7 @@ do
 	 local xid = getid(x)
 	 if (xid==id_hlist and has_attr(x, attr_icflag)%PROCESSED_BEGIN_FLAG~=PACKED) 
 	 or xid==id_vlist then
-	    h, x = make_dir_node(h, x, new_dir, 'process_dir_node:' .. gc)
+	    h, x = make_dir_whatsit(h, x, new_dir, 'process_dir_node:' .. gc)
 	 else
 	    x = node_next(x)
 	 end
@@ -363,9 +400,9 @@ do
       stop_time_measure('direction_vpack')
       return to_node(h)
    end
-   luatexja.direction.make_dir_node = make_dir_node
+   luatexja.direction.make_dir_whatsit = make_dir_whatsit
    luatexbase.add_to_callback('vpack_filter',
-			      process_dir_node, 'ltj.dir_node', 10001)
+			      process_dir_node, 'ltj.dir_whatsit', 10001)
 end
 
 -- 縦書き用字形への変換テーブル
