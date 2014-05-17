@@ -532,27 +532,32 @@
 %%%%%%%% \yoko, \tate, \ifydir, \iftdir
 \newif\ifydir
 \newif\iftdir
+\newif\ifddir
 \protected\def\tate{%
   \directlua{luatexja.direction.set_list_direction(3, 'tate')}%
-  \ltj@dir@count=3 \tdirtrue\ydirfalse
-}
+  \ltj@dir@count=3\tdirtrue\ydirfalse\ddirfalse}
 \protected\def\yoko{%
   \directlua{luatexja.direction.set_list_direction(4, 'yoko')}%
-  \ltj@dir@count=4 \ydirtrue\tdirfalse
-}
+  \ltj@dir@count=4\ydirtrue\tdirfalse\ddirfalse}
+\protected\def\dtou{%
+  \directlua{luatexja.direction.set_list_direction(1, 'dtou')}%
+  \ltj@dir@count=1\ydirfalse\tdirfalse\ddirtrue}
 \yoko
 
 %%%%%%%% \ifybox, \iftbox
-%%%%%%%% \ltjgetwd{<box_num>} etc. （\dimexpr 内で使うためには，\ltj@grab@num は使えない）
-\def\ltjgetwd#1{%
+%%%%%%%% \ltjgetwd{<box_num>} etc. 
+\def\ltjgetwd{\expandafter\expandafter\expandafter\ltj@@getwd\ltj@grab@num}
+\def\ltjgetht{\expandafter\expandafter\expandafter\ltj@@getht\ltj@grab@num}
+\def\ltjgetdp{\expandafter\expandafter\expandafter\ltj@@getdp\ltj@grab@num}
+\def\ltj@@getwd#1{%
   \directlua{luatexja.direction.get_box_dim('width', \the\numexpr#1\relax)}%
   \ltj@tempdima%
 }
-\def\ltjgetht#1{%
+\def\ltj@@getht#1{%
   \directlua{luatexja.direction.get_box_dim('height', \the\numexpr#1\relax)}%
   \ltj@tempdima%
 }
-\def\ltjgetdp#1{%
+\def\ltj@@getdp#1{%
   \directlua{luatexja.direction.get_box_dim('depth', \the\numexpr#1\relax)}%
   \ltj@tempdima%
 }

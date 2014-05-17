@@ -194,6 +194,8 @@ function luatexja.setwidth.set_ja_width(ahead, adir)
 	    p = capsule_glyph(p, ltjf_font_metric_table[pf],
 			      has_attr(p, attr_jchar_class))
 	 else
+	    -- TODO: neg. offset does not increase depth
+	    --local d = getfield(p, 'yoffset') - (has_attr(p,attr_ablshift) or 0)
 	    set_attr(p, attr_icflag, PROCESSED)
 	    setfield(p, 'yoffset',
 		     getfield(p, 'yoffset') - (has_attr(p,attr_ablshift) or 0))

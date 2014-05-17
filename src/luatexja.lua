@@ -66,6 +66,9 @@ luatexja.dir_table = dir_table
 dir_table.dir_dtou = 1
 dir_table.dir_tate = 3
 dir_table.dir_yoko = 4
+dir_table.dir_node_auto   = 16 -- 組方向を合わせるために自動で作られたもの
+dir_table.dir_node_manual = 32 -- 寸法代入によって作られたもの
+
 
 ------------------------------------------------------------------------
 -- FIX node.remove

@@ -1,6 +1,6 @@
 %#!luatex
 
-\directlua{luatexja_debug = 1}
+%\directlua{luatexja_debug = 1}
 \input luatexja.sty
 %\input lua-visual-debug.sty
 
@@ -43,7 +43,7 @@
         \kern-.15em%
         \TeX}
 
-\tentgt
+\tentgt\hfuzz10000 \vfuzz10000
 
 \def\H{\vrule width 2pt height 10pt depth 0pt%
 \vrule width 4pt height 0pt depth 4pt}
@@ -279,9 +279,10 @@ abc&かきくけこ&xyz\cr}}%
 
 \setbox0=\hbox{\tate ABCD}
 \setbox1=\hbox{\yoko\box0}
-\unhcopy1
-\setbox1=\lastbox %% box1: dir_node
-\ltjsetdp1=100pt
+\fbox{\copy1}
+\unhcopy1\setbox1=\lastbox %% box1: dir_node
+\setbox0=\hbox{\tate \ltjsetwd1=50pt}
+{\fbox{\copy1}}
 \setbox2=\hbox{\tate \ltjsetdp1=42pt\copy1}%% unwrap
 
 {\obeylines\tentt
@@ -291,6 +292,33 @@ abc&かきくけこ&xyz\cr}}%
 {\obeylines\tentt
 \directlua{luatexja.ext_show_node_list(tex.box[1], 'B> ', tex.print)}}
 
-\the\ltjgetdp{1}\hbox{\tate \the\ltjgetdp{1}}
+
+
+\setbox0\hbox{\yoko a あ }\setbox1=\hbox{\tate\ltjsetht0=2pt}
+
+\fbox{\copy0}
+\message{Y\the\ltjgetwd0, \the\ltjgetht0, \the\ltjgetdp0}
+\hbox{\tate
+  \message{T\the\ltjgetwd0, \the\ltjgetht0, \the\ltjgetdp0}
+}
+\hbox{\dtou
+  \message{D\the\ltjgetwd0, \the\ltjgetht0, \the\ltjgetdp0}
+}
+\ltjsetwd0=40pt
+\message{Y\the\ltjgetwd0, \the\ltjgetht0, \the\ltjgetdp0}
+\hbox{\tate
+  \message{T\the\ltjgetwd0, \the\ltjgetht0, \the\ltjgetdp0}
+}
+\hbox{\dtou
+  \message{D\the\ltjgetwd0, \the\ltjgetht0, \the\ltjgetdp0}
+}
+
+% pTeX bug (2011-02-24)
+\setbox0=\hbox{\tate a}
+\hbox{\yoko\ltjsetht0=30pt
+\hbox{\dtou\dimen0=\ltjgetht0}
+\message{\the\ltjgetht0}}% OK. 30pt
+
+
 \end
 
