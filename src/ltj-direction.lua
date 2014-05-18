@@ -621,6 +621,29 @@ do
    luatexja.direction.set_box_dim = set_box_dim
 end
 
+-- \ifydir, \iftdir, \ifddir
+do
+   local cat_lp = luatexbase.catcodetables['latex-package']
+   local getbox = tex.getbox
+   local function dir_conditional(n, mode)
+      local s = getbox(n)
+      local res = false
+      if s then
+         s = to_direct(s)
+         local b_dir = get_box_dir(s, dir_yoko)
+         if b_dir<dir_node_auto then
+	    res = (b_dir==mode)
+         else
+	    local b_dir = get_box_dir(
+	       node_next(node_next(node_next(getlist(s)))), dir_yoko)
+	    res = (b_dir==mode)
+         end
+      end
+      tex.sprint(cat_lp, '\\if' .. tostring(res))
+   end
+   luatexja.direction.dir_conditional = dir_conditional
+end
+
 -- 縦書き用字形への変換テーブル
 local font_vert_table = {} -- key: fontnumber
 do

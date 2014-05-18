@@ -544,11 +544,10 @@
   \ltj@dir@count=1\ydirfalse\tdirfalse\ddirtrue}
 \yoko
 
-%%%%%%%% \ifybox, \iftbox
-%%%%%%%% \ltjgetwd{<box_num>} etc. 
-\def\ltjgetwd{\expandafter\expandafter\expandafter\ltj@@getwd\ltj@grab@num}
-\def\ltjgetht{\expandafter\expandafter\expandafter\ltj@@getht\ltj@grab@num}
-\def\ltjgetdp{\expandafter\expandafter\expandafter\ltj@@getdp\ltj@grab@num}
+%%%%%%%% \ltjgetwd<box_num> etc.
+%\def\ltjgetwd{\expandafter\expandafter\expandafter\ltj@@getwd\ltj@grab@num}
+%\def\ltjgetht{\expandafter\expandafter\expandafter\ltj@@getht\ltj@grab@num}
+%\def\ltjgetdp{\expandafter\expandafter\expandafter\ltj@@getdp\ltj@grab@num}
 \def\ltj@@getwd#1{%
   \directlua{luatexja.direction.get_box_dim('width', \the\numexpr#1\relax)}%
   \ltj@tempdima%
@@ -561,7 +560,9 @@
   \directlua{luatexja.direction.get_box_dim('depth', \the\numexpr#1\relax)}%
   \ltj@tempdima%
 }
+\let\ltjgetwd=\ltj@@getwd\let\ltjgetht=\ltj@@getht\let\ltjgetdp=\ltj@@getdp
 
+%%%%%%%% \ltjsetwd<box_num>=<dimen> etc.
 \protected\def\ltjsetwd{\begingroup
   \ltj@reset@globaldefs\afterassignment\ltj@@setwd@a\ltj@tempcnta}
 \def\ltj@@setwd@a{\afterassignment\ltj@@setwd@b\ltj@tempdima}
@@ -581,7 +582,14 @@
   \directlua{luatexja.direction.set_box_dim('depth')}%
   \ltj@restore@globaldefs\endgroup}
 
-
+%%%%%%%% \ifybox, \iftbox, \ifdbox
+\def\ltj@@box@cond#1#2\fi{\fi\csname if#1\endcsname}
+\def\ifybox#1{\directlua{luatexja.direction.dir_conditional(\the\numexpr #1\relax, 4)}%
+  \ltj@@box@cond{true}\else\ltj@@box@cond{false}\fi}
+\def\iftbox#1{\directlua{luatexja.direction.dir_conditional(\the\numexpr #1\relax, 3)}%
+  \ltj@@box@cond{true}\else\ltj@@box@cond{false}\fi}
+\def\ifdbox#1{\directlua{luatexja.direction.dir_conditional(\the\numexpr #1\relax, 1)}%
+  \ltj@@box@cond{true}\else\ltj@@box@cond{false}\fi}
 
 %%------------------ Load module for the format
 

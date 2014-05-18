@@ -857,8 +857,8 @@ plfonts.dtx} and \texttt{pldefs.ltx}):
 
 \begin{itemize}
 %<*en>
-\item The font encoding for Japanese fonts (in horizontal direction) is \texttt{JY3}.\\
-\texttt{JT3} is used for Japanese fonts in vertical diraction.
+\item The font encoding for Japanese fonts (fot horizontal direction) is \texttt{JY3}.\\
+\texttt{JT3} is used for Japanese fonts for vertical diraction.
 %</en>
 %<*ja>
 \item 和文フォントのエンコーディングとしては，横組用には \texttt{JY3}，縦組用には\ 
@@ -2770,27 +2770,30 @@ Down-TO-Upの意味なのだろう．\verb+\dtou+ を使用する機会はない
 
 \begin{cslist}
 
- \item[ltjgetwd<num>\textrm{, }\textbackslash ltjgetht<num>\textrm{, }%
-  \textbackslash ltjgetdp<num>] 
+ \item[ltjgetwd\{<num>\}\textrm{, }\textbackslash ltjgetht\{<num>\}\textrm{, }%
+  \textbackslash ltjgetdp\{<num>\}] 
 現在の組方向に応じたボックスの寸法の取得を行う．結果は内部長さであるため，
 {\let\item=\origitem
 \begin{verbatim}
-\dimexpr 2\ltjgetwd42-3pt\relax, \the\ltjgetwd1701
+\dimexpr 2\ltjgetwd{42}-3pt\relax, \the\ltjgetwd{1701}
 \end{verbatim}
-のように \verb+\wd+<num> の代わりとして扱うことができる．使用例は以下の通りである．
+のように \verb+\wd+<num> の代わりとして扱うことができる．引数が1桁の場合は，
+\verb+\ltjgetwd3+ のように引数をグループで括らなくても良いが，そうでない場合は
+（通常の命令への引数のように）\verb+\ltjgetwd{42}+ とグループに括る必要がある．
+使用例は以下の通りである．
 \begin{LTXexample}[width=0.3\textwidth]
 \parindent0pt
 \setbox32767=\hbox{\yoko よこぐみ}
 \fboxsep=0mm\fbox{\copy32767}
 \vbox{\hsize=20mm 
-\yoko YOKO \the\ltjgetwd32767, \\
-  \the\ltjgetht32767, \\ \the\ltjgetdp32767.}
+\yoko YOKO \the\ltjgetwd{32767}, \\
+  \the\ltjgetht{32767}, \\ \the\ltjgetdp{32767}.}
 \vbox{\hsize=20mm\raggedleft
-\tate TATE \the\ltjgetwd32767, \\
-  \the\ltjgetht32767, \\ \the\ltjgetdp32767.}
+\tate TATE \the\ltjgetwd{32767}, \\
+  \the\ltjgetht{32767}, \\ \the\ltjgetdp{32767}.}
 \vbox{\hsize=20mm\raggedleft
-\dtou DTOU \the\ltjgetwd32767, \\
-  \the\ltjgetht32767, \\ \the\ltjgetdp32767.}
+\dtou DTOU \the\ltjgetwd{32767}, \\
+  \the\ltjgetht{32767}, \\ \the\ltjgetdp{32767}.}
 \end{LTXexample}}
 
  \item[ltjsetwd<num>=<dimen>\textrm{, }\textbackslash ltjsetht<num>=<dimen>\textrm{, }%
@@ -2799,16 +2802,30 @@ Down-TO-Upの意味なのだろう．\verb+\dtou+ を使用する機会はない
 実装しているので，次の4通りは全て同じ意味である．
 {\let\item=\origitem
 \begin{verbatim}
- \ltjsetwd42 20pt,  \ltjsetwd42=20pt,  \ltjsetwd=42 20pt,  \ltjsetwd=42=20pt
+\ltjsetwd42 20pt,  \ltjsetwd42=20pt,  \ltjsetwd=42 20pt,  \ltjsetwd=42=20pt
 \end{verbatim}
 }%
 
-
 設定値は組方向ごとに独立して記録される．
 
-
-
 \end{cslist} 
+
+\subsection{組方向の取得・条件判断}
+「現在の組方向」や「<num>番のボックスの組方向」は，以下の命令によって
+知ることができる．
+
+\begin{cslist}
+ \item[ifydir\textrm{, }\textbackslash iftdir\textrm{, }\textbackslash ifddir]
+現在の組方向が横組(\verb+\yoko+)，縦組(\verb+\tate+)，\verb+\dtou+ 方向であるかを
+それぞれ判定する．
+
+ \item[ifybox\{<num>\}\textrm{, }\textbackslash iftbox\{<num>\}\textrm{, }%
+  \textbackslash ifdbox\{<num>\}]
+<num>番のレジスタの中身が横組ボックス，縦組ボックス，\verb+\dtou+ 方向の
+ボックスか否かをそれぞれ判定する．
+
+\end{cslist}
+
 %</ja>
 
 %<en>\section{Font Metric and Japanese Font}
@@ -5521,6 +5538,7 @@ Here the following is the list of dimensions and attributes which are used in \L
 \begin{list}{}{%
 \def\makelabel{\ttfamily}\advance\leftmargin1\zw
 \def\dim#1{\item[\textbackslash #1\ \textrm{(dimension)}]}
+\def\cnt#1{\item[\textbackslash #1\ \textrm{(counter)}]}
 \def\attr#1{\item[\textbackslash #1\ \textrm{(attribute)}]}
 }
 
@@ -5582,10 +5600,18 @@ Current number of Japanese font family for math formulas.
 
 \attr{ltj@curjfnt}
 %<*en>
-The font index of current Japanese font.
+The font index of current Japanese font for horizontal direction.
 %</en>
 %<*ja>
-現在の和文フォントのフォント番号．
+現在の横組用和文フォントのフォント番号．
+%</ja>
+
+\attr{ltj@curtfnt}
+%<*en>
+The font index of current Japanese font for vertical direction.
+%</en>
+%<*ja>
+現在の縦組用和文フォントのフォント番号．
 %</ja>
 
 \attr{ltj@charclass}
@@ -5611,6 +5637,9 @@ The amount of shifting the baseline of Japanese fonts in scaled point ($2^{-16}\
 %<*ja>
 スケールド・ポイント($2^{-16}\,\textrm{pt}$)を単位とした和文フォントのベースラインの移動量．
 %</ja>
+
+\attr{ltj@tablshift}
+\attr{ltj@tkblshift}
 
 \attr{ltj@autospc}
 %<*en>
@@ -5695,18 +5724,42 @@ $i$は7より小さい自然数．
 これら7つの属性レジスタは，どの文字ブロックが\textbf{JAchar}のブロックとして
 扱われるかを示すビットベクトルを格納する．
 %</ja>
+
+\cnt{ltj@dir@count}
+%<*ja>
+現在の組方向を表す．
+%</ja>
+\begin{description}
+\item[\textit{dir\_dtou} (1)]
+\item[\textit{dir\_tate} (3)]
+\item[\textit{dir\_yoko} (4)]
+\end{description}
+
+\attr{ltj@dir}
+%<*ja>
+ボックスにおける組方向を示す．上記の3つの値(1,~3,~4)の他に，
+それらに次を加えた値(17,~19, 20, 33, 35,~36)もとり得る．
+%</ja>
+\begin{description}
+\item[\textit{dir\_node\_auto} (16)]
+\item[\textit{dir\_node\_manual} (32)]
+\end{description}
+
+
 \end{list}
 
 %<*en>
 Furthermore, \LuaTeX-ja uses several user-defined whatsit nodes for
-inrernal processing. All those nodes store a natural number (hence the node's
-\texttt{type} is 100). 
+inrernal processing. All those nodes except \emph{direction} whatsits 
+store a natural number (hence its \texttt{type} is 100). 
+\emph{direction} whatsits store a node list, hence its \texttt{type} is 110.
 Their \texttt{user\_id} (used for distinguish user-defined whatsits) 
 are allocated by \texttt{luatexbase.newuserwhatsitid}.
 %</en>
 %<*ja>
 さらに，\LuaTeX-jaはいくつかのuser-defined whatsit nodeを内部処理に用いる．
-これらのwhatsitノードの \texttt{type} は100であり，ノードは自然数を格納している．
+\textit{direction} whatsitはノードリストを格納するが，
+それ以外のwhatsitノードの \texttt{type} は100であり，ノードは自然数を格納している．
 user-defined whatsitを識別するための \texttt{user\_id} は\ 
 \texttt{luatexbase.newuserwhatsitid} により確保されており，
 下の見出しは単なる識別用でしかない．
@@ -5772,6 +5825,9 @@ for its label before the actual contents. So \dots
 「段落の開始」を意味するノード．
 list環境，itemize環境などにおいて，\verb+\item+ で始まる各項目は……
 %</ja>
+
+\item[\textit{direction}]
+
 \end{description}
 
 %<*en>
