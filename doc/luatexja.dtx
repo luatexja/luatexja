@@ -48,6 +48,7 @@
 
 \usepackage{amsmath,array,tikz,pict2e,multienum,float}
 \usepackage{booktabs,multicol,luatexja-ruby}
+\usepackage{xy}
 
 %%%%%%%% listings
 
@@ -390,12 +391,10 @@ The followings are major changes from \pTeX:
 但し，制御綴中に使える和文文字が\pTeX・\upTeX と全く同じではないことに注意すること．
 %</ja>
 
-%<*en>
-\item At the present, vertical typesetting (\emph{tategaki}), is not
-      supported in \LuaTeX-ja.
-%</en>
 %<*ja>
-\item 現時点では，縦書きは\LuaTeX-jaではサポートされていない．
+\item ****版からは，不安定ながらも\LuaTeX-ja における縦組みをサポートしている．
+\LuaTeX のコールバックの制限などにより，特に異なった組方向のボックスを扱う場合には
+仕様が異なるので注意すること．
 %</ja>
 \end{itemize}
 
@@ -533,6 +532,7 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 \item \Pkg{luatexbase} v0.6
 \item \Pkg{xunicode} v0.981~(2011/09/09)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
+\item \Pkg{everysel}
 \end{itemize}
 
 %<*en>
@@ -570,7 +570,7 @@ $ tlmgr install luatexja
   \item W32\TeX\ (\texttt{luatexja.tar.xz})
   \end{itemize}
 
-例えば\TeX~Live~2013を利用しているなら，\LuaTeX-jaは\TeX~Live manager (\texttt{tlmgr})を
+例えば\TeX~Live~2013以降を利用しているなら，\LuaTeX-jaは\TeX~Live manager (\texttt{tlmgr})を
 使ってインストールすることができる．
 \begin{verbatim}
 $ tlmgr install luatexja
@@ -703,7 +703,7 @@ IPA mj明朝などの大きいフォントを用いた場合には\LuaTeX より
 %<*en>
 \textbf{Note for MiK\TeX\ users}\quad
 \LuaTeX-ja requires that several CMap files%
-\footnote{\texttt{UniJIS2004-UTF32-H} and \texttt{Adobe-Japan1-UCS2}.}
+\footnote{\texttt{UniJIS2004-UTF32-\{H,V\}} and \texttt{Adobe-Japan1-UCS2}.}
 must be found from \LuaTeX.
 Strictly speaking, those CMaps are needed 
 only in the first run of \LuaTeX-ja after installing or updating.
@@ -712,7 +712,7 @@ so you will encounter an error like the following:
 %</en>
 %<*ja>
 \LuaTeX-jaが動作するためには，\emph{導入・更新後の初回起動時に}
-\texttt{UniJIS2004-UTF32-H}, \texttt{Adobe-Japan1-UCS2}という2つのCMapが
+\texttt{UniJIS2004-UTF32-\{H,V\}}, \texttt{Adobe-Japan1-UCS2}という3つのCMapが
 \LuaTeX によって見つけられることが必要である．
 しかしMiK\TeX ではそのようになっていないので，次のエラーが発生するだろう：
 %</ja>
@@ -751,25 +751,36 @@ run \LuaTeX-ja in this directory, and finally delete the temporaly directory.
 
 \begin{itemize}
 %<*en>
-\item The following 6~Japanese fonts are preloaded:
+\item The following 12~Japanese fonts are preloaded:
 \begin{center}\small
-\begin{tabular}{ccccc}
+\begin{tabular}{cccccc}
 \toprule
+\textbf{direction}&
 \textbf{classification}&\textbf{font name}&\bf `10\,pt'&\bf`7\,pt'&\bf`5\,pt'\\\midrule
+\smash{\raisebox{-1ex}{\emph{yoko} (horizontal)}}&
 \emph{mincho}&Ryumin-Light    &\verb+\tenmin+&\verb+\sevenmin+&\verb+\fivemin+\\
 \emph{gothic}&GothicBBB-Medium&\verb+\tengt+ &\verb+\sevengt+ &\verb+\fivegt+\\
+\midrule
+\smash{\raisebox{-1ex}{\emph{tate} (vertical)}}&
+\emph{mincho}&Ryumin-Light    &\verb+\tentmin+&\verb+\seventmin+&\verb+\fivetmin+\\
+\emph{gothic}&GothicBBB-Medium&\verb+\tentgt+ &\verb+\seventgt+ &\verb+\fivetgt+\\
 \bottomrule
 \end{tabular}
 \end{center}
 %</en>
 %<*ja>
-\item 以下の6つの和文フォントが定義される：
+\item 以下の12個の和文フォントが定義される：
 \begin{center}\small
-\begin{tabular}{ccccc}
+\begin{tabular}{cccccc}
 \toprule
-\emph{字体}&\emph{フォント名}&\bf `10\,pt'&\bf`7\,pt'&\bf`5\,pt'\\\midrule
+\emph{組方向}&\emph{字体}&\emph{フォント名}&\bf `10\,pt'&\bf`7\,pt'&\bf`5\,pt'\\\midrule
+\smash{\raisebox{-1ex}{横組}}&
 明朝体&Ryumin-Light    &\verb+\tenmin+&\verb+\sevenmin+&\verb+\fivemin+\\
 ゴシック体&GothicBBB-Medium&\verb+\tengt+ &\verb+\sevengt+ &\verb+\fivegt+\\
+\midrule
+\smash{\raisebox{-1ex}{縦組}}&
+明朝体&Ryumin-Light    &\verb+\tentmin+&\verb+\seventmin+&\verb+\fivetmin+\\
+ゴシック体&GothicBBB-Medium&\verb+\tentgt+ &\verb+\seventgt+ &\verb+\fivetgt+\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -846,13 +857,12 @@ plfonts.dtx} and \texttt{pldefs.ltx}):
 
 \begin{itemize}
 %<*en>
-\item \texttt{JY3} is the font encoding for Japanese fonts (in horizontal direction).\\
-When vertical typesetting is supported by \LuaTeX-ja in the future, \texttt{JT3} will be used for vertical fonts.
+\item The font encoding for Japanese fonts (in horizontal direction) is \texttt{JY3}.\\
+\texttt{JT3} is used for Japanese fonts in vertical diraction.
 %</en>
 %<*ja>
-\item \texttt{JY3}は和文フォント用のフォントエンコーディングである（横書き用）．\\
-将来的に，\LuaTeX-jaで縦書きがサポートされる際には，\texttt{JT3}を縦書き用として
-用いる予定である．
+\item 和文フォントのエンコーディングとしては，横組用には \texttt{JY3}，縦組用には\ 
+\texttt{JT3}が用いられる．
 %</ja>
 
 %<*en>
@@ -943,10 +953,11 @@ Okumura), namely, \Pkg{ltjclasses} and \Pkg{ltjsclasses}.
 \paragraph{plain \TeX}
 %<*en>
 To change Japanese fonts in plain \TeX, you must use the command
-\verb+\jfont+. So please see Subsection~\ref{ssec-jfont}.
+\verb+\jfont+~and~\verb+\tfont+. So please see Subsection~\ref{ssec-jfont}.
 %</en>
 %<*ja>
-plain \TeX で和文フォントを変更するためには，\pTeX のように \verb+\jfont+ 命令を直接用いる．
+plain \TeX で和文フォントを変更するためには，
+\pTeX のように \verb+\jfont+ 命令や \verb+\tfont+ 命令を直接用いる．
 \ref{ssec-jfont}節を参照．
 %</ja>
 
@@ -2443,6 +2454,363 @@ JIS~X~0213の範囲に広げると，差異はさらに大きくなる．
 %</ja>
 
 
+
+
+%<*ja>
+\section{縦組}
+\label{sec-direction}
+\LuaTeX 本体でも，$\Omega$・$\aleph$由来の機能として，複数の組方向をサポートしている．
+しかし，\LuaTeX がサポートするのは \texttt{TLT},~\texttt{TRT}, \texttt{RTT},~\texttt{LTL}\ 
+のみであり，日本語の縦書きに使うのは望ましくない\footnote{%
+和文文字だけならば \texttt{RTT} を使えばなんとかなると思うが，
+欧文文字が入ってきた場合はうまくいかず，\texttt{RTR} という組方向が必要になる．
+}．そのため，\LuaTeX-jaでは横組(\texttt{TLT})で組んだボックスを回転させる方式で
+縦組を実装した．
+
+\subsection{サポートする組方向}
+\begin{table}[t]
+\caption{\LuaTeX-ja のサポートする組方向}
+%<en>\medskip
+\label{tab-dir}
+\centering\small
+\def\obox#1{%
+  \setbox0=\hbox{\yoko\hbox{#1%
+  \large\ltjsetparameter{talbaselineshift=0pt}%
+  \vrule height 25pt width 0.4pt depth 15pt\kern-.2pt%
+  \raise25pt\hbox to 0pt{\hss\composite{*r^@{>>}}\hss}%
+  \raise-15pt\hbox to 0pt{\hss\composite{*l^@{>|}}\hss}\kern.2pt%
+  \vrule height.2pt depth.2pt width 60pt\hbox to 0pt{\hss\composite{*d^@{>}}\hss}\kern-60pt
+  \hbox to 60pt{\,銀は、Ag\hss}}}%
+  \raise\dimexpr 0.5\ltjgetdp0-0.5\ltjgetht0\box0%
+}
+\begin{tabular}{>{\bfseries}lccc}
+\toprule
+&\texttt{\textbackslash yoko}（横組）&\texttt{\textbackslash tate}（縦組）
+ &\texttt{\textbackslash dtou}\\
+\midrule
+字送り方向&水平右向き（→）&垂直下向き（↓）&垂直上向き（↑）\\
+行送り方向&垂直下向き（↓）&水平左向き（←）&水平右向き（→）\\
+使用する和文フォント&横組用(\verb+\jfont+)&縦組用(\verb+\tfont+)&横組用(\verb+\jfont+)の
+	     $90^\circ$回転\\[\smallskipamount]
+組版例\null $^*$ &\obox{\yoko}&\obox{\tate}&\obox{\dtou}\\
+\noalign{\medskip}
+\bottomrule
+\end{tabular}
+
+\medskip\raggedright
+\def\R#1{%
+  \raise0.38\zw\hbox{%
+    \vrule height.2pt  depth.2pt width2\zw%
+    \hbox to 0pt{\hss\composite{*d^@{#1}}\hss}%
+  }%
+}
+$^*$\ 幅(width)，高さ(height)，深さ(depth)の増加方向を，
+それぞれ「\R{>}」，「\R{>>}」，「\R{>|}」で表している．
+\raggedright
+
+\end{table}
+
+\LuaTeX-jaがサポートする組方向は表\ref{tab-dir}に示す3つである．
+4列目の \verb+\dtou+ は聞き慣れない命令だと思うが，
+実は\pTeX に同名の命令が（ドキュメントには書かれていないが）存在する．
+Down-TO-Upの意味なのだろう．\verb+\dtou+ を使用する機会はないだろうが，
+\LuaTeX-jaではデバッグ用に実装している．
+
+
+組方向は，\verb+\yoko+,~\verb+\tate+,~\verb+\dtou+ をそれぞれ使用することで，
+現在作成中のリストやボックスが空の時にのみ変更可能である．
+
+
+\subsection{異方向のボックス}
+
+縦組の中に「42」などの2桁以上の算用数字を横組で組むなど，
+異なる組方向を混在させることがしばしば行われる．
+組方向の混在も\pTeX と同じようにできる：
+\begin{LTXexample}
+ここは横組%     yoko
+\hbox{\tate %   tate
+  \hbox{縦組}%  tate
+  の中に
+  \hbox{\yoko 横組の内容}% yoko
+  を挿入する
+}
+また横組に戻る% yoko
+\end{LTXexample}
+
+異なる組方向のボックスを配置した場合にどう組まれるかの仕様も，\pTeX を
+踏襲している．表\ref{tab-diffdir}に示す．
+
+\begin{table}[t]
+\caption{異方向のボックスの配置}
+%<en>\medskip
+\label{tab-diffdir}
+ \centering\small\unitlength3mm
+ \def\TATEeg{%
+   \hbox{\smash{\begin{picture}(0,0)(-2,0)
+     \thicklines
+     \polyline(-2,0)(-2,-7)(5,-7)(5,0)
+     \put(0,0){\circle*{0.3}}
+     \put(0,0){\vector(1,0){5}} \put(2.5,-0.2){\makebox(0,0)[t]{$h_{\mathrm{T}}$}}
+     \put(0,0){\vector(-1,0){2}}\put(-1,-0.2){\makebox(0,0)[t]{$d_{\mathrm{T}}$}}
+     \put(0,0){\vector(0,-1){7}}\put(0.2,-3.5){\makebox(0,0)[l]{$w_{\mathrm{T}}$}}
+   \end{picture}}}
+ }
+ \def\DTOUeg{%
+   \hbox{\smash{\begin{picture}(0,0)(-5,0)
+     \thicklines
+     \polyline(-5,0)(-5,7)(2,7)(2,0)
+     \put(0,0){\circle*{0.3}}
+     \put(0,0){\vector(-1,0){5}} \put(-2.5,0.3){\makebox(0,0)[b]{$h_{\mathrm{D}}$}}
+     \put(0,0){\vector(1,0){2}}\put(1,0.3){\makebox(0,0)[b]{$d_{\mathrm{D}}$}}
+     \put(0,0){\vector(0,1){7}}\put(-0.2,3.5){\makebox(0,0)[r]{$w_{\mathrm{D}}$}}
+   \end{picture}}}
+ }
+ \def\YOKOeg{%
+   \hbox{\smash{\begin{picture}(0,0)
+     \thicklines
+     \polyline(0,5)(7,5)(7,-2)(0,-2)
+     \put(0,0){\circle*{0.3}}
+     \put(0,0){\vector(0,1){5}} \put(0.3,2.5){\makebox(0,0)[l]{$h_{\mathrm{Y}}$}}
+     \put(0,0){\vector(0,-1){2}}\put(0.3,-1){\makebox(0,0)[l]{$d_{\mathrm{Y}}$}}
+     \put(0,0){\vector(1,0){7}}\put(3.5,0.2){\makebox(0,0)[b]{$w_{\mathrm{Y}}$}}
+   \end{picture}}}
+ }
+\begin{tabular}{ccc}
+\toprule
+\emph{横組中に配置}&\emph{縦組中に配置}&%
+\emph{組方向\hskip\ltjgetparameter{xkanjiskip}\texttt{\textbackslash dtou}中に配置}\\
+\midrule
+ \parbox[c]{15\unitlength}{\begin{picture}(15,15)(0,-4)
+   \put(0,0){\line(1,0){3.8}}
+   \put(4,7){\TATEeg}
+   \put(11.2,0){\line(1,0){3.8}}
+%
+   \put(2,7){\line(1,0){1.8}}
+   \put(3,3.5){\vector(0,1){3.5}\vector(0,-1){3.5}}
+   \put(2.8,3.5){\makebox(0,0)[r]{$H_{\mathrm{Y}}$}}
+   \put(3,-2){\vector(0,1){2}}
+   \put(2.8,-1){\makebox(0,0)[r]{$D_{\mathrm{Y}}$}}
+%
+   \put(4,7.2){\line(0,1){1.8}}
+   \put(11,7.2){\line(0,1){1.8}}
+   \put(6,8){\vector(-1,0){2}}
+   \put(9,8){\vector(1,0){2}}
+   \put(7.5,8){\makebox(0,0){$W_{\mathrm{Y}}$}}
+%
+ \end{picture}\vspace{-\baselineskip}
+   \begin{align*}
+   W_{\mathrm{Y}} &= h_{\mathrm{T}}+d_{\mathrm{T}},\\
+   H_{\mathrm{Y}} &= w_{\mathrm{T}},\\
+   D_{\mathrm{Y}} &=0\,\mathrm{pt}
+   \end{align*}%
+ }&
+ \parbox[c]{15\unitlength}{\begin{picture}(15,15)(0,-4)
+   \put(7.5,-0.2){\line(0,-1){2.8}}
+   \put(4,2){\YOKOeg}
+   \put(7.5, 7.2){\line(0,1){3.8}}
+%
+   \put(2,7){\line(1,0){1.8}}
+   \put(2,0){\line(1,0){1.8}}
+   \put(3,5){\vector(0,1){2}}
+   \put(3,2){\vector(0,-1){2}}
+   \put(3,3.5){\makebox(0,0){$W_{\mathrm{T}}$}}
+%
+   \put(4,7.2){\line(0,1){1.8}}
+   \put(11,7.2){\line(0,1){1.8}}
+   \put(8,8){\vector(-1,0){0.5}\vector(1,0){3}}
+   \put(7,8){\vector(-1,0){3}\vector(1,0){0.5}}
+   \put(9.25,8.2){\makebox(0,0)[b]{$H_{\mathrm{T}}$}}
+   \put(5.75,8.2){\makebox(0,0)[b]{$D_{\mathrm{T}}$}}
+%
+ \end{picture}\vspace{-\baselineskip}
+   \begin{align*}
+   W_{\mathrm{T}} &= h_{\mathrm{Y}}+d_{\mathrm{Y}},\\
+   H_{\mathrm{T}} &= w_{\mathrm{Y}}/2,\\
+   D_{\mathrm{T}} &= w_{\mathrm{Y}}/2
+   \end{align*}%
+ }&
+ \parbox[c]{15\unitlength}{\begin{picture}(15,15)(0,-4)
+   \put(11,-0.2){\line(0,-1){2.8}}
+   \put(4,2){\YOKOeg}
+   \put(11, 7.2){\line(0,1){3.8}}
+%
+   \put(2,7){\line(1,0){1.8}}
+   \put(2,0){\line(1,0){1.8}}
+   \put(3,5){\vector(0,1){2}}
+   \put(3,2){\vector(0,-1){2}}
+   \put(3,3.5){\makebox(0,0){$W_{\mathrm{D}}$}}
+%
+   \put(4,7.2){\line(0,1){1.8}}
+   \put(11,7.2){\line(0,1){1.8}}
+   \put(7.5,8){\vector(-1,0){3.5}\vector(1,0){3.5}}
+   \put(13,8){\vector(-1,0){2}}
+   \put(7.5,8.2){\makebox(0,0)[b]{$H_{\mathrm{D}}$}}
+   \put(12,8.2){\makebox(0,0)[b]{$D_{\mathrm{D}}$}}
+%
+ \end{picture}\vspace{-\baselineskip}
+   \begin{align*}
+   W_{\mathrm{D}} &= h_{\mathrm{Y}}+d_{\mathrm{Y}},\\
+   H_{\mathrm{D}} &= w_{\mathrm{Y}},\\
+   D_{\mathrm{D}} &= 0\,\mathrm{pt}
+   \end{align*}%
+ }%
+\\\midrule
+ \parbox[c]{15\unitlength}{\begin{picture}(15,15)(0,-4)
+   \put(0,0){\line(1,0){3.8}}
+   \put(4,0){\DTOUeg}
+   \put(11.2,0){\line(1,0){3.8}}
+%
+   \put(2,7){\line(1,0){1.8}}
+   \put(3,3.5){\vector(0,1){3.5}\vector(0,-1){3.5}}
+   \put(2.8,3.5){\makebox(0,0)[r]{$H_{\mathrm{Y}}$}}
+   \put(3,-2){\vector(0,1){2}}
+   \put(2.8,-1){\makebox(0,0)[r]{$D_{\mathrm{Y}}$}}
+%
+   \put(4,7.2){\line(0,1){1.8}}
+   \put(11,7.2){\line(0,1){1.8}}
+   \put(6,8){\vector(-1,0){2}}
+   \put(9,8){\vector(1,0){2}}
+   \put(7.5,8){\makebox(0,0){$W_{\mathrm{Y}}$}}
+%
+ \end{picture}\vspace{-\baselineskip}
+   \begin{align*}
+   W_{\mathrm{Y}} &= h_{\mathrm{D}}+d_{\mathrm{D}},\\
+   H_{\mathrm{Y}} &= w_{\mathrm{D}},\\
+   D_{\mathrm{Y}} &= 0\,pt
+   \end{align*}%
+ }&
+ \parbox[c]{15\unitlength}{\begin{picture}(15,15)(0,-4)
+   \put(9,-0.2){\line(0,-1){2.8}}
+   \put(4,0){\DTOUeg}
+   \put(9, 7.2){\line(0,1){3.8}}
+%
+   \put(2,7){\line(1,0){1.8}}
+   \put(2,0){\line(1,0){1.8}}
+   \put(3,5){\vector(0,1){2}}
+   \put(3,2){\vector(0,-1){2}}
+   \put(3,3.5){\makebox(0,0){$W_{\mathrm{T}}$}}
+%
+   \put(4,7.2){\line(0,1){1.8}}
+   \put(11,7.2){\line(0,1){1.8}}
+   \put(6.5,8){\vector(-1,0){2.5}\vector(1,0){2.5}}
+   \put(10,8){\vector(-1,0){1}\vector(1,0){1}}
+   \put(10,8.2){\makebox(0,0)[b]{$H_{\mathrm{T}}$}}
+   \put(6.5,8.2){\makebox(0,0)[b]{$D_{\mathrm{T}}$}}
+%
+ \end{picture}\vspace{-\baselineskip}
+   \begin{align*}
+   W_{\mathrm{T}} &= h_{\mathrm{D}}+d_{\mathrm{D}},\\
+   H_{\mathrm{T}} &= d_{\mathrm{D}},\\
+   D_{\mathrm{T}} &= h_{\mathrm{D}}
+   \end{align*}%
+ }&
+ \parbox[c]{15\unitlength}{\begin{picture}(15,15)(0,-4)
+   \put(6,-0.2){\line(0,-1){2.8}}
+   \put(4,7){\TATEeg}
+   \put(6, 7.2){\line(0,1){3.8}}
+%
+   \put(2,7){\line(1,0){1.8}}
+   \put(2,0){\line(1,0){1.8}}
+   \put(3,5){\vector(0,1){2}}
+   \put(3,2){\vector(0,-1){2}}
+   \put(3,3.5){\makebox(0,0){$W_{\mathrm{D}}$}}
+%
+   \put(4,7.2){\line(0,1){1.8}}
+   \put(11,7.2){\line(0,1){1.8}}
+   \put(5,8){\vector(-1,0){1}\vector(1,0){1}}
+   \put(8.5,8){\vector(-1,0){2.5}\vector(1,0){2.5}}
+   \put(5,8.2){\makebox(0,0)[b]{$H_{\mathrm{D}}$}}
+   \put(8.5,8.2){\makebox(0,0)[b]{$D_{\mathrm{D}}$}}
+%
+ \end{picture}\vspace{-\baselineskip}
+   \begin{align*}
+   W_{\mathrm{D}} &= w_{\mathrm{T}},\\
+   H_{\mathrm{D}} &= d_{\mathrm{T}},\\
+   D_{\mathrm{D}} &= h_{\mathrm{T}}
+   \end{align*}%
+ }\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\paragraph{\texttt{\textbackslash wd} は組方向には対応しない}
+ボックスレジスタ \verb+\box+<num> にセットされているボックスの幅・高さ・深さの取得や
+変更にはそれぞれ \verb+\wd+,~\verb+\ht+,~\verb+\dp+ プリミティブを用いるのであった．
+\pTeX ではこれらのプリミティブは，「現在の組方向におけるボックスの寸法」を指すものであった．
+
+\LuaTeX-jaにおいては状況が異なり，\verb+\wd+,~\verb+\ht+,~\verb+\dp+ は\emph{組方向が
+混在する状況においては正しく機能しない}．まず，現在の組方向に依存しないことが挙げられる．
+\begin{LTXexample}
+% yoko direction
+\setbox0=\hbox to 20pt{foo}
+\the\wd0,~\hbox{\tate\vrule\the\wd0}
+\wd0=100pt
+\the\wd0,~\hbox{\tate \the\wd0}
+\end{LTXexample}
+また，異方向のボックスの配置処理の関係で，
+\verb+\lastbox+ を駆使してボックスのコピーを
+作成した場合でも，\verb+\wd+ 等の値が異なる場合もある．
+例えば，下の実行例における \verb+\wd1+ の値は，「縦組で組んだ時の \verb+\box0+ の
+専有する幅」となる．
+\begin{LTXexample}
+% yoko direction
+\setbox0=\hbox to 20pt{Xy}
+\the\wd0,
+\setbox0=\hbox{\tate\copy0}
+\setbox0=\hbox{\tate\unhbox0
+  \global\setbox1\lastbox}
+\the\wd1
+\end{LTXexample}
+
+\paragraph{\texttt{\textbackslash wd} 等の代替命令}
+
+\pTeX のように現在の組方向に応じたボックスの寸法の取得・設定を行うため，
+次の命令を新設した．
+
+\begin{cslist}
+
+ \item[ltjgetwd<num>\textrm{, }\textbackslash ltjgetht<num>\textrm{, }%
+  \textbackslash ltjgetdp<num>] 
+現在の組方向に応じたボックスの寸法の取得を行う．結果は内部長さであるため，
+{\let\item=\origitem
+\begin{verbatim}
+\dimexpr 2\ltjgetwd42-3pt\relax, \the\ltjgetwd1701
+\end{verbatim}
+のように \verb+\wd+<num> の代わりとして扱うことができる．使用例は以下の通りである．
+\begin{LTXexample}[width=0.3\textwidth]
+\parindent0pt
+\setbox32767=\hbox{\yoko よこぐみ}
+\fboxsep=0mm\fbox{\copy32767}
+\vbox{\hsize=20mm 
+\yoko YOKO \the\ltjgetwd32767, \\
+  \the\ltjgetht32767, \\ \the\ltjgetdp32767.}
+\vbox{\hsize=20mm\raggedleft
+\tate TATE \the\ltjgetwd32767, \\
+  \the\ltjgetht32767, \\ \the\ltjgetdp32767.}
+\vbox{\hsize=20mm\raggedleft
+\dtou DTOU \the\ltjgetwd32767, \\
+  \the\ltjgetht32767, \\ \the\ltjgetdp32767.}
+\end{LTXexample}}
+
+ \item[ltjsetwd<num>=<dimen>\textrm{, }\textbackslash ltjsetht<num>=<dimen>\textrm{, }%
+  \textbackslash ltjsetdp<num>=<dimen>]
+現在の組方向に応じたボックスの寸法の設定を行う．\verb+\afterassignment+ を2回利用して
+実装しているので，次の4通りは全て同じ意味である．
+{\let\item=\origitem
+\begin{verbatim}
+ \ltjsetwd42 20pt,  \ltjsetwd42=20pt,  \ltjsetwd=42 20pt,  \ltjsetwd=42=20pt
+\end{verbatim}
+}%
+
+
+設定値は組方向ごとに独立して記録される．
+
+
+
+\end{cslist} 
+%</ja>
+
 %<en>\section{Font Metric and Japanese Font}
 %<ja>\section{フォントメトリックと和文フォント}
 %<en>\subsection{\texttt{\textbackslash jfont}}
@@ -2450,14 +2818,14 @@ JIS~X~0213の範囲に広げると，差異はさらに大きくなる．
 \label{ssec-jfont}
 
 %<*en>
-To load a font as a Japanese font, you must use the
+To load a font as a Japanese font (for horizontal direction), you must use the
 \verb+\jfont+ instead of~\verb+\font+, while
 \verb+\jfont+ admits the same syntax used in~\verb+\font+.
 \LuaTeX-ja automatically loads \Pkg{luaotfload} package,
 so TrueType/OpenType fonts with features can be used for Japanese fonts:
 %</en>
 %<*ja>
-フォントを和文フォントとして読み込むためには，\verb+\jfont+ を
+フォントを（横組用）和文フォントとして読み込むためには，\verb+\jfont+ を
 \verb+\font+ プリミティブの代わりに用いる．
 \verb+\jfont+ の文法は \verb+\font+ と同じである．
 \LuaTeX-jaは\Pkg{luaotfload}パッケージを自動的に読み込むので，
@@ -2525,8 +2893,8 @@ which JFM will be used for this font by the following keys:
 \toprule
 &\tt jfm-ujis.lua&\tt jfm-jis.lua&\tt jfm-min.lua\\
 \midrule
-%<en>Example~1\cite{min10}
-%<ja>例1\cite{min10}
+%<en>Example~1~\cite{min10}
+%<ja>例1~\cite{min10}
 &\r{ujis}&\r{jis}&\r{min}\\
 %<en>Example~2
 %<ja>例2
@@ -2541,14 +2909,15 @@ Bounding Box&\t{ujis}&\t{jis}&\t{min}\\
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
 \item[jfm=<name>]
 %<*en>
-Specify the name of JFM. If specified JFM has not been loaded, \LuaTeX-ja search and load
+Specify the name of (horizontal) JFM. 
+If specified JFM has not been loaded, \LuaTeX-ja search and load
 a file named \texttt{jfm-<name>.lua}.
 
 The following JFMs are shipped with \LuaTeX-ja:
 %</en>
 %<*ja>
-JFMの名前を指定する．もし以前に指定されたJFMが読み込まれていなければ，
-\texttt{jfm-<name>.lua}を読み込む．以下のJFMが\LuaTeX-jaには同梱されている：
+用いる（横組用）JFMの名前を指定する．もし以前に指定されたJFMが読み込まれていなければ，
+\texttt{jfm-<name>.lua}を読み込む．以下の横組用JFMが\LuaTeX-jaには同梱されている：
 %</ja>
 \begin{description}
 %<*en>
@@ -2715,6 +3084,30 @@ letter-spacing and the width of italic correction are not correct:
 \S あいう\/ABC
 \end{LTXexample}
 
+%<en>\subsection{\texttt{\textbackslash tfont}}
+%<ja>\subsection{\texttt{\textbackslash tfont} 命令}
+
+%<*en>
+...
+%</en>
+%<*ja>
+\verb+\tfont+ はフォントを縦組用の和文フォントとして読み込む命令であり，
+\verb+\jfont+ の文法は \verb+\jfont+ と同じである．
+\verb+\tfont+ で定義された縦組用和文フォントは，
+以下の点が \verb+\jfont+ による横組用和文フォントとは異なる：
+\begin{itemize}
+ \item 出力時に，自動的に「\verb+vert+ feature相当」のグリフ置換が行われる．
+       これは，\Pkg{luaotfload}による各種featureのサポートとは全く別個に行われるもので，
+       いちいち \verb+vert+ featureを指定する必要はない．
+\begin{verbatim}
+\tfont\S=file:KozMinPr6N-Regular.otf:jfm=ujis % OK
+\end{verbatim}
+ \item \ref{ssec-math}節で述べる，数式中の和文フォントには縦組用和文フォントは指定できない．
+ \item \texttt{jfm=<name>}\ の部分には縦組用JFMを指定する．現在同梱されているのは，
+OTFパッケージの \verb+upnmlminr-v.tfm+ を元にした\texttt{jfm-ujisv.lua}\ のみである．
+\end{itemize}
+%</ja>
+
 %<en>\subsection{Prefix \texttt{psft}}
 %<ja>\subsection{\texttt{psft}プリフィックス}
 \label{ssec-psft}
@@ -2843,8 +3236,13 @@ floating-point numbers in design-size unit.
 %<en>(required)
 %<ja>（必須）
 
-%<en>The direction of JFM. At the present, only \texttt{'yoko'} is supported.
-%<ja>JFMの書字方向．現時点では横書き(\texttt{'yoko'})のみがサポートされる．
+%<*en>
+The direction of JFM. \texttt{'yoko'}~(horizontal)
+or \texttt{'tate'}~(vertical) are supported.
+%</en>
+%<*ja>
+JFMの書字方向．\texttt{'yoko'}（横組）と \texttt{'tate'}（縦組）がサポートされる．
+%</ja>
 
 \item[zw=<length>]
 %<en>(required)
@@ -3852,6 +4250,8 @@ for the same character.
 %<ja>[\TeX の \verb+\scriptscriptfont+]
 \item[\Param{yjabaselineshift}\,=<dimen>]\
 \item[\Param{yalbaselineshift}\,=<dimen>] [\verb+\ybaselineshift+]
+\item[\Param{tjabaselineshift}\,=<dimen>]\
+\item[\Param{talbaselineshift}\,=<dimen>] [\verb+\tbaselineshift+]
 
 \item[\Param{jaxspmode}\,=\{<chr\_code>,<mode>\}$^\ast$]
 
@@ -4369,22 +4769,23 @@ but on the other hand \verb+\zw+~and~\verb+\zh+ are specified by JFM.
 
 
 \item[DeclareYokoKanjiEncoding\{<encoding>\}\{<text-settings>\}\{<math-settings>\}]
+\item[DeclareYokoKanjiEncoding\{<encoding>\}\{<text-settings>\}\{<math-settings>\}]
 
 %<*en>
 In NFSS2 under \LuaTeX-ja, distinction between alphabetic font families
 	     and Japanese font families are only made by their
 	     encodings. For example, encodings OT1 and T1 are for
 	     alphabetic font families, and a Japanese font family cannot
-	     have these encodings. This command defines a new encoding
-	     scheme for Japanese font family (in horizontal direction).
+	     have these encodings. These command define a new encoding
+	     scheme for Japanese font family.
 %</en>
 %<*ja>
 \LuaTeX-jaのNFSS2においては，欧文フォントファミリと和文フォントファミリは
 そのエンコーディングによってのみ区別される．
 例えば，OT1とT1のエンコーディングは欧文フォントファミリに対するものであり，
 和文フォントファミリはこれらのエンコーディングを持つことはできない．
-このコマンドは横書き用和文フォントのための新しいエンコーディングを
-定義する．
+これらコマンドは横組用・縦組用和文フォントのための新しいエンコーディングを
+それぞれ定義する．
 %</ja>
 
 \item[DeclareKanjiEncodingDefaults\{<text-settings>\}\{<math-settings>\}]
@@ -4472,9 +4873,7 @@ to match the vertical center of ``M'' and that of ``あ''  in vertical typesetti
   + d_{\text{あ}} - d_{\text{M}},
 \]
 where $h_{a}$~and~$d_{a}$ denote the height of ``$a$'' and the depth, respectively.
-
-Current \LuaTeX-ja does not support vertical typesetting, so
-this \verb+\adjustbaseline+ has almost no effect.
+In \LuaTeX-ja, this \verb+\adjustbaseline+ does same task.
 %</en>
 %<*ja>
 \pLaTeXe では，\verb+\adjustbaseline+ は縦書時に「M」と「あ」の中心線を一致させるために，
@@ -4485,9 +4884,7 @@ this \verb+\adjustbaseline+ has almost no effect.
   + d_{\text{あ}} - d_{\text{M}},
 \]
 ここで，$h_{a}$,~$d_{a}$はそれぞれ「$a$」の高さ・深さを表す．
-
-現在の\LuaTeX-jaは縦書きをサポートしていないので，この \verb+\adjustbaseline+ は
-ほとんど何もしていない．
+\LuaTeX-jaにおいても\verb+\adjustbaseline+ は同様の処理を行っている．
 %</ja>
 
 \item[fontfamily\{<family>\}]
@@ -4521,7 +4918,8 @@ to <family>. Which family will be changed is determined as follows:
       \verb+\DeclareKanijFamily+.
 %</en>
 %<*ja>
-\item エンコーディング<ja-enc>におけるファミリ<family>が既に \verb+\DeclareKanjiFamily+ によって定義されている．
+\item エンコーディング<ja-enc>におけるファミリ<family>が
+既に \verb+\DeclareKanjiFamily+ によって定義されている．
 %</ja>
 %<*en>
 \item A font definition named \texttt{<ja-enc><family>.fd} (the file name is
@@ -4562,8 +4960,10 @@ In this case, the default family for font substitution is used for
   \null\hfill\{<alt-encoding>\}\{<alt-family>\}\{<alt-series>\}\{<alt-shape>\}\{<range>\}]
 %<*ja>
 \ref{ssec-altfont}節の\
-\verb+\ltjdeclarealtfont+ と同様に，前半の4引数の和文フォント（基底フォント）のうち<range>中の文字を
-第5--第8引数の和文フォントを使って組むように指示する．使用例を図\ref{fig:altkanji}に載せた．
+\verb+\ltjdeclarealtfont+ と同様に，前半の4引数の
+和文フォント（基底フォント）のうち<range>中の文字を
+第5--第8引数の和文フォントを使って組むように指示する．
+使用例を図\nobreak\ref{fig:altkanji}に載せた．
 
 {\let\item\origitem
 %<en>\advance\linewidth-2em
@@ -7354,6 +7754,13 @@ nilでない<data>をキャッシュ<filename>に保存する．
 \end{list}
 %</ja>
 
+
+%<*ja>
+\section{縦組の実装}
+
+
+%</ja>
+
 \begin{thebibliography}{99}
   \addcontentsline{toc}{section}{\refname}
 \bibitem{texbytopic}
@@ -7373,10 +7780,14 @@ TUG 2013, October 2013.
 Requirements for Japanese Text Layout (W3C Working Group Note), 2011, 2012. \newblock
 \url{http://www.w3.org/TR/jlreq/}%
 %<ja> \\日本語訳の書籍版：W3C日本語組版タスクフォース（編），『W3C技術ノート 日本語組版処理の要件』，東京電機大学出版局，2012．
-\bibitem{min10} 乙部厳己，min10フォントについて．\\\null\hfill
+\bibitem{min10} 乙部厳己．min10フォントについて．\\\null\hfill
 \url{http://argent.shinshu-u.ac.jp/~otobe/tex/files/min10.pdf}
-\bibitem{x4051} 日本工業規格(Japanese Industrial Standard), JIS~X~4051,
+\bibitem{x4051} 日本工業規格(Japanese Industrial Standard). JIS~X~4051,
 日本語文書の組版方法(Formatting rules for Japanese documents), 1993, 1995, 2004.
+\bibitem{ptexdoc} 濱野尚人，田村明史，倉沢良一．\TeX の出版への応用—縦組み機能の組み込み—．
+\\\null\hfill\texttt{.../texmf-dist/doc/ptex/base/ptexdoc.pdf}
+\bibitem{ptextug} Hisato Hamano. \newblock 
+\textit{Vertical Typesetting with \TeX}, TUGBoat~\textbf{11}(3), 346--352, 1990.
 \end{thebibliography}
 
 \newpage

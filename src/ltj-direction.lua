@@ -270,20 +270,21 @@ do
       [dir_dtou] = { -- dtou を
 	 [dir_yoko] = { -- yoko 中で組む
 	    width  = get_h_d,
-	    height = zero,
-	    depth  = get_w,
+	    height = get_w, 
+	    depth  = zero,
 	    [id_hlist] = {
 	       { 'whatsit', sid_save },
 	       { 'rotate', '0 1 -1 0' },
-               { 'kern', get_w_neg },
+	       { 'kern', zero },
 	       { 'box', get_h },
+	       { 'kern', get_w_neg },
 	       { 'whatsit', sid_restore },
 	    },
 	    [id_vlist] = {
-               { 'kern', get_w },
+               { 'kern', zero },
 	       { 'whatsit', sid_save },
 	       { 'rotate', '0 1 -1 0' },
-	       { 'box', zero },
+	       { 'box', get_w_neg },
 	       { 'kern', get_h_d_neg },
 	       { 'whatsit', sid_restore },
 	    },
@@ -331,9 +332,9 @@ end
 
 -- dir_node に包まれている「本来の中身」を取り出し，
 -- dir_node を全部消去
-local function unwrap_dir_node(b, head)
-   -- head: nil or nil-nil
-   -- if head is non-nil, return values are (new head), (next of b), (contents)
+local function unwrap_dir_node(b, head, box_dir)
+   -- b: dir_node, head: the head of list, box_dir: 
+   -- return values are (new head), (next of b), (contents), (dir of contents)
    local bh = getlist(b)
    local bc = node_next(node_next(node_next(bh)))
    local nh, nb
@@ -344,15 +345,24 @@ local function unwrap_dir_node(b, head)
       nh, nb = node_remove(nh, b)
       setfield(b, 'next', nil)
       setfield(b, 'head', nil)
-      luatexja.ext_show_node(to_node(b), ' ', print)
-      --node_free(b) -- TODO: これを入れると test51-vtest が途中で泊まる
+      node_free(b)
    end
-   local d, wh = get_box_dir(bc, 0)
+   local shift_old, b_dir, wh = nil, get_box_dir(bc, 0)
    if wh then
       Dnode.flush_list(getfield(wh, 'value'))
       setfield(wh, 'value', nil)
    end
-   return nh, nb, bc
+   -- recalc. info
+   local info = dir_node_aux[b_dir][box_dir%dir_node_auto][getid(bc)]
+   for _,v in ipairs(info) do 
+      if v[1]=='box' then
+	 shift_old = v[2](
+	    getfield(bc,'width'), getfield(bc, 'height'), getfield(bc, 'depth'))
+	 break
+      end
+   end
+   setfield(bc, 'shift', getfield(bc, 'shift') - shift_old)
+   return nh, nb, bc, b_dir
 end
 
 -- is_manual: 寸法変更に伴うものか？
@@ -388,19 +398,23 @@ do
       if box_dir==new_dir then
 	 return head, node_next(b), b, false
       elseif  box_dir%dir_node_auto == new_dir  then
--- TODO. we have to free  all other ...
+	 local bc = node_next(node_next(node_next(bh)))
+	 local _, dnc = get_box_dir(b, 0)
+	 if dnc then -- free all other dir_node
+	    Dnode.flush_list(getfield(dnc, 'value'))
+	    setfield(dnc, 'value', nil)
+	 end
 	 set_attr(b, attr_dir, box_dir%dir_node_auto + dir_node_auto)
 	 return head, node_next(b), b, true
       else
          local nh, nb, ret, flag
 	 if box_dir>= dir_node_auto then -- unwrap
-            nh, nb, ret = unwrap_dir_node(b, head)
-	    head, b = nh, ret; 
-	    bh = getlist(b); 
-	    box_dir, dn =  get_box_dir(b, ltjs.list_dir)
-	    if box_dir==new_dir then
-	       return head, nb, b, fals
-	    end
+	    local b_dir
+            head, nb, b, b_dir = unwrap_dir_node(b, head, box_dir)
+	    bh = getlist(b)
+	    if b_dir==new_dir then -- no need to create new dir_node
+	       return head, nb, b, false 
+	    else box_dir = b_dir end
 	 end
             local db
             local dnh = getfield(dn, 'value')
@@ -410,6 +424,7 @@ do
                   db=x; break
                end
             end
+	    Dnode.flush_list(dnh)
             db = db or create_dir_node(b, box_dir, new_dir, false)
             local w = getfield(b, 'width')
             local h = getfield(b, 'height')
@@ -501,10 +516,8 @@ do
          elseif b_dir%dir_node_auto==l_dir then
             setdimen('ltj@tempdima', getfield(s, key))
          else
-            get_box_dim_common(
-               key, 
-               node_next(node_next(node_next(getlist(s)))),
-               l_dir)
+            get_box_dim_common(key, 
+			       node_next(node_next(node_next(getlist(s)))), l_dir)
          end
       else
          setdimen('ltj@tempdima', 0)
@@ -566,6 +579,8 @@ do
 	 elseif b_dir%dir_node_auto == l_dir then
 	    setfield(s, key, tex.getdimen('ltj@tempdima'))
 	    if b_dir<dir_node_manual then
+	       set_attr(s, attr_dir, b_dir%dir_node_auto + dir_node_manual)
+	       tex_set_attr('global', attr_dir, 0)
 	    end
          else
 	    local sid, sl = getid(s), getlist(s)
@@ -582,7 +597,7 @@ do
            if set_box_dim_common(key, b, l_dir) then
 	       local bw, bh, bd 
 		  = getfield(b,'width'), getfield(b, 'height'), getfield(b, 'depth')
-	       -- re-calculate shifting info
+	       -- re-calculate shift
 	       for i,v in ipairs(info[sid]) do 
 		  if getid(sl)==id_kern then
 		     setfield(sl, 'kern', v[2](bw,bh,bd) )

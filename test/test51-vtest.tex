@@ -43,7 +43,7 @@
         \kern-.15em%
         \TeX}
 
-\tentgt\hfuzz10000 \vfuzz10000
+\tentgt\hfuzz10000pt\relax\vfuzz10000pt
 
 \def\H{\vrule width 2pt height 10pt depth 0pt%
 \vrule width 4pt height 0pt depth 4pt}
@@ -276,48 +276,54 @@ abc&かきくけこ&xyz\cr}}%
 \vfill\eject
 
 \message{^^Jdir node^^J}
+\font\seventt=cmtt10 at 7pt
 
-\setbox0=\hbox{\tate ABCD}
-\setbox1=\hbox{\yoko\box0}
+\setbox0=\hbox{\yoko pF}
+\setbox1=\hbox{\tate\box0}
 \fbox{\copy1}
 \unhcopy1\setbox1=\lastbox %% box1: dir_node
+\setbox0=\hbox{\yoko \ltjsetwd1=50pt}
+\setbox0=\hbox{\dtou \ltjsetwd1=2pt}
+{\obeylines\seventt\baselineskip=10pt
+\directlua{luatexja.ext_show_node_list(tex.box[1], 'dir node>  ', tex.print)}\par}
+
+\setbox0=\hbox{\yoko \ltjsetht1=30pt}
+{\obeylines\seventt\baselineskip=10pt
+\directlua{luatexja.ext_show_node_list(tex.box[1], 'alter Yht> ', tex.print)}\par}
+
 \setbox0=\hbox{\tate \ltjsetwd1=50pt}
-{\fbox{\copy1}}
-\setbox2=\hbox{\tate \ltjsetdp1=42pt\copy1}%% unwrap
+{\obeylines\seventt\baselineskip=10pt
+\directlua{luatexja.ext_show_node_list(tex.box[1], 'alter Twd> ', tex.print)}\par}
 
-{\obeylines\tentt
-\directlua{luatexja.ext_show_node_list(tex.box[2], 'A> ', tex.print)}}
+\setbox0=\hbox{\yoko \ltjsetht1=70pt}
+{\obeylines\seventt\baselineskip=10pt
+\directlua{luatexja.ext_show_node_list(tex.box[1], 'alter Yht> ', tex.print)}\par}
 
-\setbox2=\hbox{\tate \unhbox2\global\setbox1=\lastbox}%% unwrap
-{\obeylines\tentt
-\directlua{luatexja.ext_show_node_list(tex.box[1], 'B> ', tex.print)}}
+%% unwrap
+\setbox2=\hbox{\yoko \copy1}
+\setbox2=\hbox{\yoko \unhbox2\global\setbox1=\lastbox}
+{\obeylines\seventt
+\directlua{luatexja.ext_show_node_list(tex.box[1], 'unwrapped> ', tex.print)}}
 
 
 
 \setbox0\hbox{\yoko a あ }\setbox1=\hbox{\tate\ltjsetht0=2pt}
 
 \fbox{\copy0}
-\message{Y\the\ltjgetwd0, \the\ltjgetht0, \the\ltjgetdp0}
-\hbox{\tate
-  \message{T\the\ltjgetwd0, \the\ltjgetht0, \the\ltjgetdp0}
-}
-\hbox{\dtou
-  \message{D\the\ltjgetwd0, \the\ltjgetht0, \the\ltjgetdp0}
-}
+\vbox{\yoko\hsize=60pt\noindent\the\ltjgetwd0,\\\the\ltjgetht0,\\\the\ltjgetdp0}
+\vbox{\tate\hsize=60pt\noindent\the\ltjgetwd0,\\\the\ltjgetht0,\\\the\ltjgetdp0}
+\vbox{\dtou\hsize=60pt\noindent\the\ltjgetwd0,\\\the\ltjgetht0,\\\the\ltjgetdp0}
+%
 \ltjsetwd0=40pt
-\message{Y\the\ltjgetwd0, \the\ltjgetht0, \the\ltjgetdp0}
-\hbox{\tate
-  \message{T\the\ltjgetwd0, \the\ltjgetht0, \the\ltjgetdp0}
-}
-\hbox{\dtou
-  \message{D\the\ltjgetwd0, \the\ltjgetht0, \the\ltjgetdp0}
-}
+\vbox{\yoko\hsize=60pt\noindent\the\ltjgetwd0,\\\the\ltjgetht0,\\\the\ltjgetdp0}
+\vbox{\tate\hsize=60pt\noindent\the\ltjgetwd0,\\\the\ltjgetht0,\\\the\ltjgetdp0}
+\vbox{\dtou\hsize=60pt\noindent\the\ltjgetwd0,\\\the\ltjgetht0,\\\the\ltjgetdp0}
 
-% pTeX bug (2011-02-24)
-\setbox0=\hbox{\tate a}
+p\kern-.15em\TeX\ bug (2011-02-24)
+\setbox0=\hbox{\tate a}\fbox{\copy0}%
 \hbox{\yoko\ltjsetht0=30pt
 \hbox{\dtou\dimen0=\ltjgetht0}
-\message{\the\ltjgetht0}}% OK. 30pt
+\the\ltjgetht0}% OK. 30pt
 
 
 \end

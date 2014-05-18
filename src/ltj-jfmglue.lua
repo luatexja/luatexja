@@ -205,7 +205,6 @@ local function check_box(box_ptr, box_end)
       end
       if pid==id_kern then
 	 local pa = get_attr_icflag(p)
-	 --if pa==IC_PROCESSED or pa == PACKED then
 	 if pa==IC_PROCESSED then
 	    -- do nothing
 	 elseif getsubtype(p)==2 then
@@ -296,16 +295,17 @@ local function check_next_ickern(lp)
 end
 
 local function calc_np_pbox(lp, last)
+   local first, lpa, nc = (not Np.first), KINSOKU, nil
    Np.first = Np.first or lp; Np.id = id_pbox
-   local lpa, nc = KINSOKU, nil
    set_attr(lp, attr_icflag, get_attr_icflag(lp));
    while lp ~=last and (lpa>=PACKED) and (lpa<BOXBDD) do
       if getid(lp)==id_hlist or getid(lp)==id_vlist then
 	 head, lp, nc = ltjd_make_dir_whatsit(head, lp, list_dir, 'jfm pbox')
+	 if first then Np.first = nc end
       else
 	 nc, lp = lp, node_next(lp)
       end
-      lpa = lp and has_attr(lp, attr_icflag) or 0
+      first, lpa = false, (lp and has_attr(lp, attr_icflag) or 0)
      -- get_attr_icflag() ではいけない！
    end
    Np.nuc = nc
@@ -432,7 +432,8 @@ function calc_np(lp, last)
          if lpa%PROCESSED_BEGIN_FLAG == BOXBDD then
 	    local lq = node_next(lp)
             head = node_remove(head, lp); node_free(lp); lp = lq
-         else return calc_np_pbox(lp, last)
+         else 
+	    return calc_np_pbox(lp, last)
          end -- id_pbox
       else
 	 k, lp = calc_np_auxtable[getid(lp)](lp)
