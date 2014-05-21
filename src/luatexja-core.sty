@@ -255,6 +255,11 @@
     luatexja.stack.hmode = -tex.nest[tex.nest.ptr].mode
   }%
 }
+\setbox0\vbox{%
+  \directlua{% This value depends on the version of LuaTeX.
+    luatexja.stack.vmode = -tex.nest[tex.nest.ptr].mode
+  }%
+}
 
 % prebreakpenalty = {<char_code>, <penalty>}
 \define@key[ltj]{japaram}{kcatcode}{%
