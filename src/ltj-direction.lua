@@ -80,7 +80,6 @@ do
 	    if getid(w)==id_whatsit and getsubtype(w)==sid_user
 	    and getfield(w, 'user_id')==DIR  then
 	       set_attr(w, attr_dir, v)
-	       tex_set_attr('global', attr_dir, 0)  
 	    else
               ltjb.package_error(
                  'luatexja',
@@ -95,10 +94,10 @@ do
 	    setfield(w, 'type', 110)
 	    set_attr(w, attr_dir, v)
 	    Dnode.write(w)
-	    tex_set_attr('global', attr_dir, 0)
 	 end
 	 tex_set_attr('global', attr_icflag, 0)
       end
+      tex_set_attr('global', attr_dir, 0)
    end
    luatexja.direction.set_list_direction = set_list_direction
 end
@@ -176,6 +175,8 @@ do
 
    local function create_dir_whatsit_parbox(h, gc)
       stop_time_measure('tex_linebreak')
+      print('BEGIN POST_LINEBREAK', gc)
+      luatexja.ext_show_node_list(h, '   ', print)
       -- start 側は ltj-debug.lua に
       local new_dir, hd = ltjs.list_dir, to_direct(h)
       for line in traverse_id(id_hlist, hd) do
@@ -396,6 +397,7 @@ local function create_dir_node(b, b_dir, new_dir, is_manual)
    local db = node_new(getid(b))
    set_attr(db, attr_dir, 
 	    new_dir + (is_manual and dir_node_manual or dir_node_auto))
+   tex_set_attr('global', attr_dir, 0)
    set_attr(db, attr_icflag, PROCESSED)
    set_attr(b, attr_icflag, PROCESSED)
    setfield(db, 'dir', getfield(b, 'dir'))
