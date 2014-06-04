@@ -148,6 +148,7 @@
 \newluatexattribute\jfam          % index for current jfam
 
 \newcount\ltj@dir@count           % counter for indicating direction
+\newcount\ltj@adjdir@count        % counter for indicating direction (for vadjust)
 \newluatexattribute\ltj@dir
 
 \ltj@dir=0
@@ -540,14 +541,20 @@
 \newif\ifddir
 \protected\def\tate{%
   \directlua{luatexja.direction.set_list_direction(3, 'tate')}%
-  \ltj@dir@count=3\tdirtrue\ydirfalse\ddirfalse}
+  \ltj@dir@count=3\relax\ifvmode\ltj@adjdir@count=3\fi\tdirtrue\ydirfalse\ddirfalse}
 \protected\def\yoko{%
   \directlua{luatexja.direction.set_list_direction(4, 'yoko')}%
-  \ltj@dir@count=4\ydirtrue\tdirfalse\ddirfalse}
+  \ltj@dir@count=4\relax\ifvmode\ltj@adjdir@count=4\fi\ydirtrue\tdirfalse\ddirfalse}
 \protected\def\dtou{%
   \directlua{luatexja.direction.set_list_direction(1, 'dtou')}%
-  \ltj@dir@count=1\ydirfalse\tdirfalse\ddirtrue}
+  \ltj@dir@count=1\relax\ifvmode\ltj@adjdir@count=1\fi\ydirfalse\tdirfalse\ddirtrue}
 \yoko
+%%%% vadjust
+\let\ltj@@orig@vadjust=\vadjust
+\protected\def\vadjust{%
+  \ltj@@orig@vadjust\bgroup\aftergroup\egroup
+  \ifcase\ltj@adjdir@count\or\dtou\or\or\tate\or\yoko\fi
+}
 
 %%%%%%%% \ltjgetwd<box_num> etc.
 %\def\ltjgetwd{\expandafter\expandafter\expandafter\ltj@@getwd\ltj@grab@num}

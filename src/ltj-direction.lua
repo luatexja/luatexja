@@ -175,8 +175,6 @@ do
 
    local function create_dir_whatsit_parbox(h, gc)
       stop_time_measure('tex_linebreak')
-      print('BEGIN POST_LINEBREAK', gc)
-      luatexja.ext_show_node_list(h, '   ', print)
       -- start 側は ltj-debug.lua に
       local new_dir, hd = ltjs.list_dir, to_direct(h)
       for line in traverse_id(id_hlist, hd) do
