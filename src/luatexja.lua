@@ -461,6 +461,9 @@ local function debug_show_node_X(p,print_fn)
             print_fn(s)
          else
             s = s .. ' userid:' .. t .. '(node list)'
+	    if p.user_id==userid_table.DIR then
+	       s = s .. ' dir: ' .. tostring(node.has_attribute(p, attr_dir))
+	    end
             print_fn(s)
             debug_depth=debug_depth.. '.'
             for q in node.traverse(p.value) do

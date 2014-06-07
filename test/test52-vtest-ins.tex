@@ -1,0 +1,26 @@
+%#!luajitlatex
+\directlua{luatexja_debug=1}
+\documentclass{ltjsarticle}
+
+\def\showdir{{\fboxsep1pt\fbox{\sf \ifydir Y\fi\iftdir T\fi\ifddir D\fi}}}
+\begin{document}
+\hsize=100mm\vsize=100mm
+あいうえお\insert\footins{\tate TATE}\showdir\insert\footins{\yoko YOKO2}
+\typeout{FUGA}
+
+\vbox{\tate
+\the\globaldefs まみむ\showdir
+
+  \hbox{\yoko ABCあいう\showdir
+    \vadjust{insertion感じ\showdir
+      \hbox{\dtou hboxあいう\showdir}
+    }
+  }
+
+かきくけこ\typeout{HOGE}\vadjust{insertion\showdir}
+\vadjust{}
+{\nonstopmode\vadjust{\yoko ins感じ\showdir}}
+}
+
+
+\end{document}

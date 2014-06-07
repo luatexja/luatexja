@@ -59,7 +59,6 @@ local dir_node_manual = luatexja.dir_table.dir_node_manual
 local get_dir_count
 -- \tate, \yoko
 do
-   local abs = math.abs
    function get_dir_count()
       return tex_getcount('ltj@dir@count')
    end
@@ -75,10 +74,11 @@ do
 	    node_set_attr(w, attr_dir, v)
 	 end
       else
-	 local w = node_next(to_direct(lv.head))
-	 if to_node(w) then
+	 local w = node_next(lv.head)
+	 if w then
+	    w = to_direct(w)
 	    if getid(w)==id_whatsit and getsubtype(w)==sid_user
-	    and getfield(w, 'user_id')==DIR  then
+	    and getfield(w, 'user_id')==DIR then
 	       set_attr(w, attr_dir, v)
 	    else
               ltjb.package_error(
@@ -100,6 +100,11 @@ do
       tex_set_attr('global', attr_dir, 0)
    end
    luatexja.direction.set_list_direction = set_list_direction
+end
+
+function luatexja.direction.freeze_list_dir()
+   local w = to_direct(tex.nest[tex.nest.ptr].tail)
+   set_attr(w, attr_dir, -has_attr(w, attr_dir))
 end
 
 -- ボックスに dir whatsit を追加
@@ -147,7 +152,7 @@ do
      	 end
       end
       if hd==wh[1] then
-	 ltjs.list_dir = has_attr(hd,attr_dir)
+	 ltjs.list_dir =has_attr(hd,attr_dir)
 	 local x = node_next(hd)
 	 if getid(x)==id_glue and getsubtype(x)==sid_parskip then
 	    node_remove(hd,x); node_free(x)
@@ -334,7 +339,8 @@ end
 -- 2nd ret val はその DIR whatsit
 local function get_box_dir(b, default)
    local dir = has_attr(b, attr_dir) or 0
-   local bh = getlist(b)
+   local bh = getfield(b,'head') 
+   -- b は insert node となりうるので getlist() は使えない
    local c
    for i=1,2 do
       if bh and getid(bh)==id_whatsit
@@ -349,6 +355,20 @@ local function get_box_dir(b, default)
       bh = node_next(bh)
    end
    return (dir==0 and default or dir), c
+end
+
+function luatexja.direction.check_dir(reg_num)
+   local list_dir = get_dir_count()
+   local b = tex.getbox(reg_num)
+   if b then
+      local box_dir = get_box_dir(to_direct(b), dir_yoko)
+      if box_dir%dir_node_auto ~= list_dir%dir_node_auto then
+	 ltjb.package_error(
+                 'luatexja',
+                 "Incompatible direction list can't be unboxed",
+		 'I refuse to unbox a box in differrent direction.')
+      end
+   end
 end
 
 -- dir_node に包まれている「本来の中身」を取り出し，
@@ -731,4 +751,22 @@ do
 	 and node_next(node_next(node_next(node_next(b)))) or b
    end
    luatexja.direction.glyph_from_packed = glyph_from_packed
+end
+
+-- adjust and insertion
+local id_adjust = node.id('adjust')
+function luatexja.direction.check_adjust_direction()
+   local list_dir = tex_getcount('ltj@adjdir@count')
+   local a = tex.nest[tex.nest.ptr].tail
+   local ad = to_direct(a)
+   if a and getid(ad)==id_adjust then
+      local adj_dir = get_box_dir(ad)
+      if list_dir~=adj_dir then
+         ltjb.package_error(
+                 'luatexja',
+                 'Direction Incompatible',
+                 "\\vadjust's argument and outer vlist must have same direction.")
+         Dnode.last_node()
+      end
+   end
 end

@@ -101,10 +101,11 @@ do
    end
    local function stop_time_measure(n)
       local t = time_stat[n]
-      t[2] = max(t[2] + gettime(), 0)
+      t[2] = t[2] + gettime()
    end
 
    local function print_measure()
+      stop_time_measure('RUN')
       local temp = {}
       for i,v in pairs(time_stat) do
 	 temp[#temp+1] = { i, v[1], v[2], v[2]/v[1] }
