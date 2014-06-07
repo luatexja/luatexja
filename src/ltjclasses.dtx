@@ -76,7 +76,8 @@
 %   (ありがとうございます、鈴木た＠MILNさん)}
 % \changes{v1.6}{2006/06/27}{フォントコマンドを修正。ありがとう、ymtさん。}
 % \changes{v1.6-ltj}{2011/09/27}{jclasses.dtx v1.6 をベースにLua\LaTeX-ja用に修正。}
-% \changes{v1.6-ltj-2}{2013/06/06}{jclasses.dtx luatexja.cfgに対応．}
+% \changes{v1.6-ltj-2}{2013/06/06}{luatexja.cfgに対応．}
+% \changes{v1.6-ltj-3}{2014/06/08}{縦組みクラスの時のgeometry.styに対応．}
 % \fi
 %
 % \iffalse
@@ -106,7 +107,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2013/06/06 v1.6-ltj-2
+  [2014/06/08 v1.6-ltj-3
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -163,6 +164,7 @@
 % \end{quotation}
 % のエラーが起こった場合は、|lualatex-math|パッケージを読み込んでみて下さい。
 % \item 出力PDFの用紙サイズが自動的に設定されるようにしてあります。
+% \item 縦組みクラスにおいて、|geometry|パッケージを読み込んだときに意図通りにならない問題に対応しました。
 % \end{itemize}
 %
 % \section{Lua\TeX-ja の読み込み}
@@ -170,6 +172,10 @@
 %    \begin{macrocode}
 %<*article|report|book>
 \RequirePackage{luatexja}
+%    \end{macrocode}
+% 縦組みの場合は|geometry|対応のために|filehook|も読み込んでおきます。
+%    \begin{macrocode}
+\RequirePackage{filehook}
 %    \end{macrocode}
 %
 % \section{オプションスイッチ}
@@ -314,6 +320,15 @@
   \setlength\paperheight {257mm}
   \setlength\paperwidth  {182mm}}
 %    \end{macrocode}
+% 縦組みクラスについて、|geometry|パッケージが読み込まれると|\textwidth|と|\textheight|が
+% ひっくり返ってしまう問題に対処します。
+%    \begin{macrocode}
+%<*tate>
+\AtEndOfPackageFile{geometry}{%
+    \setlength{\@tempdima}{\textheight}%
+    \setlength{\textheight}{\textwidth}%
+    \setlength{\textwidth}{\@tempdima}}
+%</tate>
 %
 % \subsection{サイズオプション}
 % 基準となるフォントの大きさを指定するオプションです。
@@ -374,7 +389,6 @@
 %
 % \subsection{組方向オプション}
 % このオプションが指定されると、縦組で組版をします。
-% しかしLua\TeX-jaではまだ縦組は未対応なのでコメントアウトします。
 % \changes{v1.0g}{1997/01/25}{Insert \cs{hbox}, to switch tate-mode.}
 % \changes{v1.1d}{1997/02/05}{開始ページがおかしくなるのを修正}
 % \changes{v1.1f}{1997/07/08}{縦組時にベースラインがおかしくなるのを修正}

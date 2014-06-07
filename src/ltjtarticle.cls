@@ -39,9 +39,10 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjtarticle}
-  [2013/06/06 v1.6-ltj-2
+  [2014/06/08 v1.6-ltj-3
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
+\RequirePackage{filehook}
 \newcounter{@paper}
 \newif\if@landscape \@landscapefalse
 \newcommand{\@ptsize}{}
@@ -89,6 +90,10 @@
 \DeclareOption{b5p}{\setcounter{@paper}{4}\@stysizetrue
   \setlength\paperheight {257mm}
   \setlength\paperwidth  {182mm}}
+\AtEndOfPackageFile{geometry}{%
+    \setlength{\@tempdima}{\textheight}%
+    \setlength{\textheight}{\textwidth}%
+    \setlength{\textwidth}{\@tempdima}}
 \if@compatibility
   \renewcommand{\@ptsize}{0}
 \else

@@ -39,9 +39,10 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjreport}
-  [2013/06/06 v1.6-ltj-2
+  [2014/06/08 v1.6-ltj-3
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
+\RequirePackage{filehook}
 \newcounter{@paper}
 \newif\if@landscape \@landscapefalse
 \newcommand{\@ptsize}{}
