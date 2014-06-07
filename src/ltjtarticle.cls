@@ -91,9 +91,13 @@
   \setlength\paperheight {257mm}
   \setlength\paperwidth  {182mm}}
 \AtEndOfPackageFile{geometry}{%
+  \setlength{\@tempdima}{\textheight}%
+  \setlength{\textheight}{\textwidth}%
+  \setlength{\textwidth}{\@tempdima}%
+  \expandafter\def\expandafter\Gm@process\expandafter{\Gm@process
     \setlength{\@tempdima}{\textheight}%
     \setlength{\textheight}{\textwidth}%
-    \setlength{\textwidth}{\@tempdima}}
+    \setlength{\textwidth}{\@tempdima}}}
 \if@compatibility
   \renewcommand{\@ptsize}{0}
 \else
