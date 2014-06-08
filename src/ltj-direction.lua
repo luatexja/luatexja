@@ -102,11 +102,6 @@ do
    luatexja.direction.set_list_direction = set_list_direction
 end
 
-function luatexja.direction.freeze_list_dir()
-   local w = to_direct(tex.nest[tex.nest.ptr].tail)
-   set_attr(w, attr_dir, -has_attr(w, attr_dir))
-end
-
 -- ボックスに dir whatsit を追加
 local function create_dir_whatsit(hd, gc, new_dir)
       local w = node_new(id_whatsit, sid_user)
@@ -139,11 +134,28 @@ do
 
    luatexbase.add_to_callback('hpack_filter', 
 			      create_dir_whatsit_hpack, 'ltj.create_dir_whatsit', 10000)
+end
 
+do
+   local function create_dir_whatsit_parbox(h, gc)
+      stop_time_measure('tex_linebreak')
+      -- start 側は ltj-debug.lua に
+      local new_dir, hd = ltjs.list_dir, to_direct(h)
+      for line in traverse_id(id_hlist, hd) do
+	 set_attr(line, attr_dir, new_dir)
+      end
+      tex_set_attr('global', attr_dir, 0)
+      return to_node(create_dir_whatsit(hd, gc, new_dir))
+   end
+   luatexbase.add_to_callback('post_linebreak_filter', 
+			      create_dir_whatsit_parbox, 'ltj.create_dir_whatsit', 10000)
+end
+
+local create_dir_whatsit_vbox
+do
    local wh = {}
    local id_glue, sid_parskip = node.id('glue'), 3
-   local function create_dir_whatsit_vbox(h, gc)
-      local hd = to_direct(h)
+   create_dir_whatsit_vbox = function (hd, gc)
       ltjs.list_dir = get_dir_count()
       -- remove dir whatsit
       for x in traverse_id(id_whatsit, hd) do
@@ -158,39 +170,25 @@ do
 	    node_remove(hd,x); node_free(x)
 	 end
       end
-      for i=1,#wh do  hd = node_remove(hd, wh[i]); node_free(wh[i]); wh[i] = nil end
+      for i=1,#wh do  
+	 hd = node_remove(hd, wh[i]); node_free(wh[i]); wh[i] = nil 
+      end
       if gc=='fin_row' or gc == 'preamble'  then
 	 if hd  then
 	    set_attr(hd, attr_icflag, PROCESSED_BEGIN_FLAG)
 	    tex_set_attr('global', attr_icflag, 0)
 	 end
-	 return to_node(hd)
+	 return hd
       elseif gc=='vtop' then
 	 local w = create_dir_whatsit(hd, gc, ltjs.list_dir)
 	 -- move  dir whatsit after hd
 	 local n = getfield(hd, 'next')
 	 setfield(hd, 'next', w); setfield(w, 'next', n)
-         return to_node(hd)
+         return hd
       else
-         return to_node(create_dir_whatsit(hd, gc, ltjs.list_dir))
+         return create_dir_whatsit(hd, gc, ltjs.list_dir)
       end
    end
-   luatexbase.add_to_callback('vpack_filter', 
-			      create_dir_whatsit_vbox, 'ltj.create_dir_whatsit', 1)
-
-   local function create_dir_whatsit_parbox(h, gc)
-      stop_time_measure('tex_linebreak')
-      -- start 側は ltj-debug.lua に
-      local new_dir, hd = ltjs.list_dir, to_direct(h)
-      for line in traverse_id(id_hlist, hd) do
-	 set_attr(line, attr_dir, new_dir)
-      end
-      tex_set_attr('global', attr_dir, 0)
-      return to_node(create_dir_whatsit(hd, gc, new_dir))
-   end
-   luatexbase.add_to_callback('post_linebreak_filter', 
-			      create_dir_whatsit_parbox, 'ltj.create_dir_whatsit', 10000)
-
 end
 
 -- dir_node に包む方法を書いたテーブル
@@ -427,7 +425,7 @@ local function create_dir_node(b, b_dir, new_dir, is_manual)
 end
 
 -- 異方向のボックスの処理
-local make_dir_whatsit
+local make_dir_whatsit, process_dir_node
 do
    make_dir_whatsit = function (head, b, new_dir, origin)
       -- head: list head, b: box
@@ -501,26 +499,23 @@ do
 	 return nh, nb, ret, flag
       end
    end
-   local function process_dir_node(head, gc)
+   process_dir_node = function (hd, gc)
       start_time_measure('direction_vpack')
-      local h = to_direct(head)
-      local x, new_dir = h, ltjs.list_dir or dir_yoko
+      local x, new_dir = hd, ltjs.list_dir or dir_yoko
       while x do
 	 local xid = getid(x)
 	 if (xid==id_hlist and has_attr(x, attr_icflag)%PROCESSED_BEGIN_FLAG~=PACKED) 
 	 or xid==id_vlist then
-	    h, x = make_dir_whatsit(h, x, new_dir, 'process_dir_node:' .. gc)
+	    hd, x = make_dir_whatsit(hd, x, new_dir, 'process_dir_node:' .. gc)
 	 else
 	    x = node_next(x)
 	 end
       end
       stop_time_measure('direction_vpack')
-      return to_node(h)
+      return hd
    end
-   luatexja.direction.make_dir_whatsit = make_dir_whatsit
-   luatexbase.add_to_callback('vpack_filter',
-			      process_dir_node, 'ltj.dir_whatsit', 10001)
 end
+luatexja.direction.make_dir_whatsit = make_dir_whatsit
 
 -- \wd, \ht, \dp の代わり
 do
@@ -769,4 +764,38 @@ function luatexja.direction.check_adjust_direction()
          Dnode.last_node()
       end
    end
+end
+
+-- vsplit
+do
+   local split_dir_whatsit
+   local function dir_adjust_vpack(h, gc)
+      local hd = to_direct(h)
+      if gc=='split_keep' then
+	 -- supply dir_whatsit
+	 hd = create_dir_whatsit_vbox(hd, gc)
+	 split_dir_whatsit = hd
+      elseif gc=='split_off'  then
+	 local bh=hd
+	 for i=1,2 do
+	    if bh and getid(bh)==id_whatsit
+	    and getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR then
+	       ltjs.list_dir  = has_attr(bh, attr_dir); break
+	    end
+	    bh = node_next(bh)
+	 end
+	 if split_dir_whatsit then
+	    -- adjust direction of 'split_keep'
+	    set_attr(split_dir_whatsit, attr_dir, ltjs.list_dir)
+	    tex_set_attr('global', attr_dir, 0)
+	 end
+	 split_dir_whatsit=nil
+      else
+	 hd = process_dir_node(create_dir_whatsit_vbox(hd, gc), gc)
+      end
+      return to_node(hd)
+   end
+   luatexbase.add_to_callback('vpack_filter', 
+			      dir_adjust_vpack,
+			      'ltj.direction', 10000)
 end
