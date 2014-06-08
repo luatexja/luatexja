@@ -555,9 +555,9 @@
 
 \newcount\ltj@adjdir@count@backup
 %%%% insert
-\let\orig@insert=\insert
-\protected\def\insert{\begingroup\afterassignment\ltj@@insert@A\ltj@tempcnta}
-\protected\def\ltj@@insert@A{\orig@insert\ltj@tempcnta\bgroup\aftergroup\endgroup\let\next}
+%\let\orig@insert=\insert
+%\protected\def\insert{\begingroup\afterassignment\ltj@@insert@A\ltj@tempcnta}
+%\protected\def\ltj@@insert@A{\orig@insert\ltj@tempcnta\bgroup\aftergroup\endgroup\let\next}
 %%%% vadjust
 \let\ltj@@orig@vadjust=\vadjust
 \protected\def\vadjust{%
@@ -578,6 +578,11 @@
 \protected\def\ltj@@unvbox{%
   \directlua{luatexja.direction.check_dir(\the\ltj@tempcnta)}%
   \ltj@@orig@unvbox\ltj@tempcnta\endgroup}
+%%%% lastbox
+\let\ltj@@orig@lastbox=\lastbox
+\protected\def\lastbox{%
+  \directlua{luatexja.direction.lastbox_hook()}\ltj@@orig@lastbox
+}
 
 %%%%%%%% \ltjgetwd<box_num> etc.
 %\def\ltjgetwd{\expandafter\expandafter\expandafter\ltj@@getwd\ltj@grab@num}

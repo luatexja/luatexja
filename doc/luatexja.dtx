@@ -2740,27 +2740,13 @@ Down-TO-Upの意味なのだろう．\verb+\dtou+ を使用する機会はない
 \pTeX ではこれらのプリミティブは，「現在の組方向におけるボックスの寸法」を指すものであった．
 
 \LuaTeX-jaにおいては状況が異なり，\verb+\wd+,~\verb+\ht+,~\verb+\dp+ は\emph{組方向が
-混在する状況においては正しく機能しない}．まず，現在の組方向に依存しないことが挙げられる．
+混在する状況においては正しく機能しない}．具体的には，現在の組方向に依存しないことが挙げられる．
 \begin{LTXexample}
 % yoko direction
 \setbox0=\hbox to 20pt{foo}
 \the\wd0,~\hbox{\tate\vrule\the\wd0}
 \wd0=100pt
 \the\wd0,~\hbox{\tate \the\wd0}
-\end{LTXexample}
-また，異方向のボックスの配置処理の関係で，
-\verb+\lastbox+ を駆使してボックスのコピーを
-作成した場合でも，\verb+\wd+ 等の値が異なる場合もある．
-例えば，下の実行例における \verb+\wd1+ の値は，「縦組で組んだ時の \verb+\box0+ の
-専有する幅」となる．
-\begin{LTXexample}
-% yoko direction
-\setbox0=\hbox to 20pt{Xy}
-\the\wd0,
-\setbox0=\hbox{\tate\copy0}
-\setbox0=\hbox{\tate\unhbox0
-  \global\setbox1\lastbox}
-\the\wd1
 \end{LTXexample}
 
 \paragraph{\texttt{\textbackslash wd} 等の代替命令}
@@ -2824,6 +2810,22 @@ Down-TO-Upの意味なのだろう．\verb+\dtou+ を使用する機会はない
 <num>番のレジスタの中身が横組ボックス，縦組ボックス，\verb+\dtou+ 方向の
 ボックスか否かをそれぞれ判定する．
 
+\end{cslist}
+
+\subsection{プリミティブの再定義}
+異なる組方向に対応するために，以下に挙げるプリミティブは
+\LuaTeX-jaによる前処理もしくは後処理が行われるように
+\ \verb+\protected\def+ により再定義してある．
+\begin{cslist}
+ \item[unhbox<num>\textrm{, }\textbackslash unvbox<num>]
+ ボックスの組方向が現在のリストと異なる場合は事前にエラーメッセージを出力する．
+ \pTeX と異なり，エラーを無視して無理矢理 \verb+\unhbox+, \verb+\unvbox+ を
+ 続行させることもできるが，その場合の組版結果は保証しない．
+ \item[vadjust\{<material>\}] 一旦プリミティブ本来の挙動を行う．その後，<material>の組方向が
+ 周囲の垂直リストの組方向と一致しない場合にエラーを出力し，
+ 該当の \verb+\vadjust+ を無効にする．
+ \item[lastbox] 異なる組方向のボックスを配置した場合に位置合わせ用に作られるノード類を
+ 除去し，正しく「中身」のボックスが返されるように前処理をする．
 \end{cslist}
 
 %</ja>
@@ -5737,14 +5739,18 @@ $i$は7より小さい自然数．
 
 \attr{ltj@dir}
 %<*ja>
-ボックスにおける組方向を示す．上記の3つの値(1,~3,~4)の他に，
-それらに次を加えた値(17,~19, 20, 33, 35,~36)もとり得る．
+ボックスにおける組方向を示す．通常のボックスでは上記の3つの値(1,~3,~4)をとり得るが，
+内部処理によりそれらに次を加えた値(17,~19, 20, 33, 35,~36)をとるボックスが作られることもあ
+			 る（\ref{sec-dir-imp}章参照）．
 %</ja>
 \begin{description}
 \item[\textit{dir\_node\_auto} (16)]
+%<ja> 異なる組方向に配置するために自動的に作られたボックス．
 \item[\textit{dir\_node\_manual} (32)]
+%<ja> \verb+\ltjsetwd+ によって「ボックスの本来の組方向とは異なる組方向での寸法」を
+%<ja> 設定したときに，それを記録するためのボックス．
 \end{description}
-
+%<ja> \TeX 側から見える値，つまり \verb+\the\ltj@dir+ の値は常に0である．
 
 \end{list}
 
@@ -7813,6 +7819,46 @@ nilでない<data>をキャッシュ<filename>に保存する．
 
 %<*ja>
 \section{縦組の実装}
+\label{sec-dir-imp}
+\ref{sec-direction}章の最初でも述べたように，
+\LuaTeX-jaは横組(\texttt{TLT})で組んだボックスを回転させる方式で
+縦組を実装している．
+
+\LuaTeX-jaにおける縦組の実装は
+\pTeX における実装(\cite{ptexdoc,ptextug})をベースにしており，……
+
+\subsection{\textit{direction}~whatsit}
+\textit{direction}~whatsitとは，\textit{direction}という特定の \verb+user_id+ を持つ
+whatsitのことである．このwhatsitは，以下の3つの役割がある．
+\begin{enumerate}
+\def\labelenumi{(\roman{enumi})}
+ \item 「現在作成中のリストの組方向が \verb+\tate+ 等により変更された」ことを表す．\\
+「現在の組方向」は \verb+\ltj@dir@count+ というカウンタに格納されているが，それだけでは
+\verb+hpack_filter+コールバックなどから正しく処理対象のリストの組方向を正しく取得すること
+       はできない（\ref{ssec-stack}節参照）ため，このように別途whatsitを用いている．
+ \item \verb+\hbox+,~\verb+\vbox+によって作成されたボックスの組方向を表す．\\
+原則として，ボックスの組方向はattribute \verb+\ltj@dir+ に格納されることになっている．しか
+       し，新規に作成されるボックスのattributeをコールバックの内部から制御するには，
+\verb+tex.setattribute+ による方法しかなく，これは不安定……
+ \item 「異方向における寸法」の記録用
+\end{enumerate}
+このように複数の役割をもたせているので，
+\begin{verbatim}
+% yoko direction
+\setbox0=\hbox{\tate B}
+\noindent \unhbox0 A
+\end{verbatim}
+のような場合に，「(ii)の役割の\textit{direction}~whatsitが(i)の役割として認識され，
+このリストは縦組とみなされるのではないか？」と思うかもしれない．しかし，
+(i)の役割と(ii)の枠割の\textit{direction}~whatsitは \verb+\ltj@icflag+ の値により
+区別されているので，そのような混乱は起こらない．
+
+
+\subsection{異方向のボックスの整合処理}
+縦中横など異方向のボックスを配置する場合に，周囲の組方向と大きさを整合させるため，
+\LuaTeX-jaでは \verb+\ltj@dir+ が16以降の\textit{hlist\_node}, \textit{vlist\_node}を
+用いる．
+
 
 
 %</ja>

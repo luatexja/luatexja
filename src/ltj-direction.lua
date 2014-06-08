@@ -42,6 +42,7 @@ local sid_restore = node.subtype('pdf_restore')
 local sid_matrix = node.subtype('pdf_setmatrix')
 local sid_user = node.subtype('user_defined')
 
+local tex_nest = tex.nest
 local tex_getcount = tex.getcount
 local tex_set_attr = tex.setattribute
 local PROCESSED    = luatexja.icflag_table.PROCESSED
@@ -67,7 +68,7 @@ do
    local node_next = node.next
    local node_set_attr = node.set_attribute
    local function set_list_direction(v, name)
-      local lv, w = tex.nest[tex.nest.ptr], tex.lists.page_head
+      local lv, w = tex_nest[tex_nest.ptr], tex.lists.page_head
       if lv.mode == 1 and w then
 	 if w.id==id_whatsit and w.subtype==sid_user
 	 and w.user_id==DIR then
@@ -336,6 +337,7 @@ end
 -- b に DIR whatsit があればその内容を attr_dir にうつす (1st ret val)
 -- 2nd ret val はその DIR whatsit
 local function get_box_dir(b, default)
+   start_time_measure('get_box_dir')
    local dir = has_attr(b, attr_dir) or 0
    local bh = getfield(b,'head') 
    -- b は insert node となりうるので getlist() は使えない
@@ -352,21 +354,28 @@ local function get_box_dir(b, default)
       end
       bh = node_next(bh)
    end
+   stop_time_measure('get_box_dir')
    return (dir==0 and default or dir), c
 end
 
-function luatexja.direction.check_dir(reg_num)
-   local list_dir = get_dir_count()
-   local b = tex.getbox(reg_num)
-   if b then
-      local box_dir = get_box_dir(to_direct(b), dir_yoko)
-      if box_dir%dir_node_auto ~= list_dir%dir_node_auto then
-	 ltjb.package_error(
-                 'luatexja',
-                 "Incompatible direction list can't be unboxed",
-		 'I refuse to unbox a box in differrent direction.')
+do
+   local getbox = tex.getbox
+   local function check_dir(reg_num)
+      start_time_measure('box_primitive_hook')
+      local list_dir = get_dir_count()
+      local b = tex.getbox(tex_getcount('ltj@tempcnta'))
+      if b then
+	 local box_dir = get_box_dir(to_direct(b), dir_yoko)
+	 if box_dir%dir_node_auto ~= list_dir%dir_node_auto then
+	    ltjb.package_error(
+	       'luatexja',
+	       "Incompatible direction list can't be unboxed",
+	       'I refuse to unbox a box in differrent direction.')
+	 end
       end
+      stop_time_measure('box_primitive_hook')
    end
+   luatexja.direction.check_dir = check_dir
 end
 
 -- dir_node に包まれている「本来の中身」を取り出し，
@@ -492,15 +501,13 @@ do
 	       else
 		  db_head, db_tail = nn, nn
 	       end
-	    --end
-	    setfield(db, 'head', db_head)
-	    ret, flag = db, true
+	       setfield(db, 'head', db_head)
+	       ret, flag = db, true
 	 end
 	 return nh, nb, ret, flag
       end
    end
    process_dir_node = function (hd, gc)
-      start_time_measure('direction_vpack')
       local x, new_dir = hd, ltjs.list_dir or dir_yoko
       while x do
 	 local xid = getid(x)
@@ -511,11 +518,34 @@ do
 	    x = node_next(x)
 	 end
       end
-      stop_time_measure('direction_vpack')
       return hd
    end
+
+   -- lastbox
+   local node_prev = (Dnode~=node) and Dnode.getprev or node.prev
+   local function lastbox_hook()
+      start_time_measure('box_primitive_hook')
+      local bn = tex_nest[tex_nest.ptr].tail
+      if bn then
+	 local b, head = to_direct(bn), to_direct(tex_nest[tex_nest.ptr].head)
+	 local bid = getid(b)
+	 if bid==id_hlist or bid==id_vlist then
+	    local box_dir =  get_box_dir(b, 0)
+	    if box_dir>= dir_node_auto then -- unwrap
+	       local p = node_prev(b)
+	       local dummy1, dummy2, nb = unwrap_dir_node(b, nil, box_dir)
+	       setfield(p, 'next', nb);  tex_nest[tex_nest.ptr].tail = to_node(nb)
+	       setfield(b, 'next', nil); setfield(b, 'head', nil)
+	       node_free(b)
+	    end
+	 end
+      end
+      stop_time_measure('box_primitive_hook')
+   end
+
+   luatexja.direction.make_dir_whatsit = make_dir_whatsit
+   luatexja.direction.lastbox_hook = lastbox_hook
 end
-luatexja.direction.make_dir_whatsit = make_dir_whatsit
 
 -- \wd, \ht, \dp の代わり
 do
@@ -751,8 +781,9 @@ end
 -- adjust and insertion
 local id_adjust = node.id('adjust')
 function luatexja.direction.check_adjust_direction()
+   start_time_measure('box_primitive_hook')
    local list_dir = tex_getcount('ltj@adjdir@count')
-   local a = tex.nest[tex.nest.ptr].tail
+   local a = tex_nest[tex_nest.ptr].tail
    local ad = to_direct(a)
    if a and getid(ad)==id_adjust then
       local adj_dir = get_box_dir(ad)
@@ -764,12 +795,14 @@ function luatexja.direction.check_adjust_direction()
          Dnode.last_node()
       end
    end
+   stop_time_measure('box_primitive_hook')
 end
 
 -- vsplit
 do
    local split_dir_whatsit
    local function dir_adjust_vpack(h, gc)
+      start_time_measure('direction_vpack')
       local hd = to_direct(h)
       if gc=='split_keep' then
 	 -- supply dir_whatsit
@@ -792,7 +825,9 @@ do
 	 split_dir_whatsit=nil
       else
 	 hd = process_dir_node(create_dir_whatsit_vbox(hd, gc), gc)
+	 split_dir_whatsit=nil
       end
+      stop_time_measure('direction_vpack')
       return to_node(hd)
    end
    luatexbase.add_to_callback('vpack_filter', 
