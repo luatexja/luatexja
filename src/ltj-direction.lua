@@ -367,6 +367,7 @@ do
       if b then
 	 local box_dir = get_box_dir(to_direct(b), dir_yoko)
 	 if box_dir%dir_node_auto ~= list_dir%dir_node_auto then
+            --print('unbox', reg_num, box_dir, list_dir)
 	    ltjb.package_error(
 	       'luatexja',
 	       "Incompatible direction list can't be unboxed",
@@ -833,4 +834,14 @@ do
    luatexbase.add_to_callback('vpack_filter', 
 			      dir_adjust_vpack,
 			      'ltj.direction', 10000)
+end
+
+do
+   local function dir_adjust_pre_output(h, gc)
+      return to_node(create_dir_whatsit_vbox(to_direct(h), gc))
+   end
+   luatexbase.add_to_callback('pre_output_filter', 
+			      dir_adjust_pre_output,
+			      'ltj.direction', 10000)
+
 end
