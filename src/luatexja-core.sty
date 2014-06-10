@@ -567,6 +567,19 @@
 \protected\def\ltj@@vadjust@check@dir{%
   \directlua{luatexja.direction.check_adjust_direction()}%
 }
+
+%%%% setbox
+\let\ltj@@orig@setbox=\setbox
+%\protected\def\setbox{%
+%  \afterassignment\ltj@@setbox@A\ltj@tempcnta
+%}
+\protected\def\ltj@@setbox@A{%
+  \afterassignment\ltj@@setbox@B
+  \ltj@@orig@setbox\ltj@tempcnta
+}
+\protected\def\ltj@@setbox@B{%
+  \directlua{luatexja.direction.hook_empty_box()}%
+}
 %%%% unhbox and unvbox
 \let\ltj@@orig@unhbox=\unhbox
 \let\ltj@@orig@unvbox=\unvbox

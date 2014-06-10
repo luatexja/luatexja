@@ -799,6 +799,22 @@ function luatexja.direction.check_adjust_direction()
    stop_time_measure('box_primitive_hook')
 end
 
+-- setbox
+local id_adjust = node.id('adjust')
+function luatexja.direction.hook_empty_box()
+   start_time_measure('box_primitive_hook')
+   local reg_num =  tex_getcount('ltj@tempcnta')
+   local list_dir = get_dir_count()
+   local h = tex.getbox(reg_num)
+   if h then
+      if not h.head then
+         h.head = to_node(create_dir_whatsit(nil, nil, get_dir_count()))
+         luatexja.ext_show_node(h, '> ', print)
+      end
+   end
+   stop_time_measure('box_primitive_hook')
+end
+
 -- vsplit
 do
    local split_dir_whatsit
