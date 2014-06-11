@@ -19,7 +19,7 @@
 \RequirePackage[\ltj_fontspec_pass_opts:]{fontspec}[2011/09/13]
 
 %%%%%%%% Change Japanese font family by \rmfamily or not
-\bool_if:NTF  \ltj_fontspec_match 
+\bool_if:NTF  \ltj_fontspec_match
 {
   \renewcommand\jttdefault{\gtdefault}
   \DeclareRobustCommand\rmfamily
@@ -133,13 +133,20 @@
     \fontspec_update_fontid:n  {-kern}
     \fontspec_update_featstr:n {-kern}
   }
+  \prop_set_eq:NN \g__fontspec_fontopts_prop \g__ltj_fontspec_fontopts_prop
+  \cs_set_eq:NN \fontspec_make_font_shapes:nnnn \ltj_fontspec_make_font_shapes:nnnn
+  \cs_set_eq:NN \DeclareFontFamily \DeclareKanjiFamily
   \tl_set:Nn \g_fontspec_encoding_tl {JY3}
   \tl_set:Nx \g_fontspec_default_fontopts_tl
              {JFM=ujis, Scale=\fp_use:N \g_ltj_fontspec_scale_fp,
               Kerning=Off, \g_ltj_fontspec_default_fontopts_tl}
-  \prop_set_eq:NN \g__fontspec_fontopts_prop \g__ltj_fontspec_fontopts_prop
-  \cs_set_eq:NN \fontspec_make_font_shapes:nnnn \ltj_fontspec_make_font_shapes:nnnn
-  \cs_set_eq:NN \DeclareFontFamily \DeclareKanjiFamily
+  \fontspec_select:nn{#1}{#2}
+  \tl_set:Nn \g_fontspec_encoding_tl {JT3}
+  \tl_set:Nx \g_fontspec_default_fontopts_tl
+             {JFM=ujisv, Scale=\fp_use:N \g_ltj_fontspec_scale_fp,
+              Kerning=Off, \g_ltj_fontspec_default_fontopts_tl}
+  \prg_set_conditional:Nnn \fontspec_save_family:n {T} { \prg_return_true: }
+  \cs_set:Nn \fontspec_save_fontinfo:nn {}
   \fontspec_select:nn{#1}{#2}
   \group_end:
 }
@@ -183,13 +190,13 @@
             \group_begin:
               \__fontspec_load_fontname:n { \l_ltj_fontspec_altname_tl }
               \fontspec_declare_shape:nnn {#2}
-                {#3 _ alt \int_use:N \g_ltj_fontspec_altnumber_int } 
-                { 
-                  \quark_if_no_value:NF \l__fontspec_fontopts_clist {\l__fontspec_fontopts_clist,} 
+                {#3 _ alt \int_use:N \g_ltj_fontspec_altnumber_int }
+                {
+                  \quark_if_no_value:NF \l__fontspec_fontopts_clist {\l__fontspec_fontopts_clist,}
                   #4 , \l_ltj_fontspec_altfont_leftover_clist
                 }
             \group_end:
-            \DeclareAlternateKanjiFont 
+            \DeclareAlternateKanjiFont
               {JY3}{ \l_fontspec_family_tl }{#2}{#3}%
               {JY3}{ \l_fontspec_family_tl }{#2}
               { #3 _alt \int_use:N \g_ltj_fontspec_altnumber_int }
