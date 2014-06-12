@@ -1,6 +1,6 @@
 %#!luatex
 
-%\directlua{luatexja_debug = 1}
+\directlua{luatexja_debug = 1}
 \input luatexja.sty
 %\input lua-visual-debug.sty
 
@@ -51,7 +51,7 @@
 \message{^^JTATE, DTOU IN YOKO (HMODE))^^J}
 \hbox{\yoko
   横水平\H\vrule\hbox{\yoko 横水平\H }\vrule かき◆
-  \vrule\hbox{\tate 縦水平\H }◆おおおお\vrule
+  \vrule\hbox{\tate 縦水平\H }\message{HOGE}◆おおおお\vrule
   \vbox{\yoko\hsize=30mm 横垂直\H ああああああああああ\hfill\H}かき◆%
   \vrule
   \vbox{\tate\hsize=30mm 縦垂直\H ああああああああああ\hfill\H}%
@@ -63,6 +63,11 @@
   \vbox{\dtou\hsize=30mm 下垂直\H ああああああああああ\hfill\H}%
   \vrule かき◆
 }
+\hbox{\yoko
+  ああ\setbox0=\vtop{\yoko\hsize=30mm \ifhmode\message{H}\else\message{V}\fi 横垂直\H ああああああああああ\hfill\H}%
+  {\tracingonline1\showboxdepth2\showboxbreadth100\showbox0}かき◆\copy0 ◆
+}
+
 \vfill\eject
 
 \message{^^JYOKO, DTOU IN TATE (HMODE)^^J}
@@ -291,8 +296,10 @@ abc&かきくけこ&xyz\cr}}%
 {\obeylines\seventt\baselineskip=10pt
 \directlua{luatexja.ext_show_node_list(tex.box[1], 'alter Yht> ', tex.print)}\par}
 
-\setbox0=\hbox{\tate \ltjsetwd1=50pt}
-{\obeylines\seventt\baselineskip=10pt
+\message{HOGE}
+\setbox0=\hbox{\tate \ltjsetwd1=50pt\immediate\message{PIYO}}
+
+{\obeylines\seventt\baselineskip=10pt\message{HOGE}\hbox{a}\message{HOGE}
 \directlua{luatexja.ext_show_node_list(tex.box[1], 'alter Twd> ', tex.print)}\par}
 
 \setbox0=\hbox{\yoko \ltjsetht1=70pt}
@@ -325,6 +332,9 @@ p\kern-.15em\TeX\ bug (2011-02-24)
 \hbox{\dtou\dimen0=\ltjgetht0}
 \the\ltjgetht0}% OK. 30pt
 
+\def\R{０１２３４５６７８９０１２３４５６７８９０１２３４５６７８９}
+\vbox{\tate\hsize=4\zw\R\R\R\R}
+ABCDE
 
 \end
 

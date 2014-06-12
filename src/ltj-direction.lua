@@ -847,17 +847,36 @@ do
       stop_time_measure('direction_vpack')
       return to_node(hd)
    end
-   luatexbase.add_to_callback('vpack_filter', 
+   luatexbase.add_to_callback('vpack_filter',
 			      dir_adjust_vpack,
 			      'ltj.direction', 10000)
 end
 
+-- supply direction whatsit to the main vertical list "of the next page"
 do
    local function dir_adjust_pre_output(h, gc)
       return to_node(create_dir_whatsit_vbox(to_direct(h), gc))
    end
-   luatexbase.add_to_callback('pre_output_filter', 
+   luatexbase.add_to_callback('pre_output_filter',
 			      dir_adjust_pre_output,
 			      'ltj.direction', 10000)
+end
 
+-- 
+do
+   local function dir_adjust_buildpage(info)
+      if info=='box' then
+	 local head = to_direct(tex.lists.contrib_head)
+	 local nb
+	 head, _, nb
+	    = make_dir_whatsit(head, 
+			       node_tail(head),
+			       get_dir_count(), 
+			       'buildpage')
+	 tex.lists.contrib_head = to_node(head)
+      end
+   end
+   luatexbase.add_to_callback('buildpage_filter',
+			      dir_adjust_buildpage,
+			      'ltj.direction', 10000)
 end
