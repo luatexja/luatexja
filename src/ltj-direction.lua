@@ -90,7 +90,7 @@ do
 	    end
 	 else
 	    local w = node_new(id_whatsit, sid_user)
-	    setfield(w, 'next', hd)
+	    setfield(w, 'next', nil)
 	    setfield(w, 'user_id', DIR)
 	    setfield(w, 'type', 110)
 	    set_attr(w, attr_dir, v)
@@ -146,7 +146,7 @@ do
 	 set_attr(line, attr_dir, new_dir)
       end
       tex_set_attr('global', attr_dir, 0)
-      return to_node(create_dir_whatsit(hd, gc, new_dir))
+      return h --to_node(create_dir_whatsit(hd, gc, new_dir))
    end
    luatexbase.add_to_callback('post_linebreak_filter', 
 			      create_dir_whatsit_parbox, 'ltj.create_dir_whatsit', 10000)
@@ -367,7 +367,6 @@ do
       if b then
 	 local box_dir = get_box_dir(to_direct(b), dir_yoko)
 	 if box_dir%dir_node_auto ~= list_dir%dir_node_auto then
-            --print('unbox', reg_num, box_dir, list_dir)
 	    ltjb.package_error(
 	       'luatexja',
 	       "Incompatible direction list can't be unboxed",
@@ -799,22 +798,6 @@ function luatexja.direction.check_adjust_direction()
    stop_time_measure('box_primitive_hook')
 end
 
--- setbox
-local id_adjust = node.id('adjust')
-function luatexja.direction.hook_empty_box()
-   start_time_measure('box_primitive_hook')
-   local reg_num =  tex_getcount('ltj@tempcnta')
-   local list_dir = get_dir_count()
-   local h = tex.getbox(reg_num)
-   if h then
-      if not h.head then
-         h.head = to_node(create_dir_whatsit(nil, nil, get_dir_count()))
-         luatexja.ext_show_node(h, '> ', print)
-      end
-   end
-   stop_time_measure('box_primitive_hook')
-end
-
 -- vsplit
 do
    local split_dir_whatsit
@@ -852,14 +835,24 @@ do
 			      'ltj.direction', 10000)
 end
 
--- supply direction whatsit to the main vertical list "of the next page"
 do
+   -- supply direction whatsit to the main vertical list "of the next page"
    local function dir_adjust_pre_output(h, gc)
       return to_node(create_dir_whatsit_vbox(to_direct(h), gc))
    end
    luatexbase.add_to_callback('pre_output_filter',
 			      dir_adjust_pre_output,
 			      'ltj.direction', 10000)
+
+   function luatexja.direction.remove_end_whatsit()
+      local h=tex.lists.page_head
+      if (not h.next) and
+	 h.id==id_whatsit and h.subtype==sid_user and
+         h.user_id == DIR then
+	    tex.lists.page_head = nil
+	    node.free(h)
+      end
+   end
 end
 
 -- 

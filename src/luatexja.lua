@@ -349,8 +349,8 @@ do
       end,'ltj.hpack_filter',
       luatexbase.priority_in_callback('hpack_filter',
 				      'luaotfload.node_processor') + 1)
-   luatexbase.add_to_callback('pre_linebreak_filter', adjust_icflag, 'adjust_icflag', 1)
-   luatexbase.add_to_callback('hpack_filter', adjust_icflag, 'adjust_icflag', 1)
+   luatexbase.add_to_callback('pre_linebreak_filter', adjust_icflag, 'ltj.adjust_icflag', 1)
+   luatexbase.add_to_callback('hpack_filter', adjust_icflag, 'ltj.adjust_icflag', 1)
 
 end
 

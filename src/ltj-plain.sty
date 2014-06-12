@@ -93,6 +93,10 @@
 
 \directlua{for x=128,255 do luatexja.math.is_math_letters[x] = true end}
 
+\let\ltj@@orig@end=\end
+\outer\protected\def\end{%
+  \directlua{luatexja.direction.remove_end_whatsit()}\ltj@@orig@end}
+
 %%------------------ all done
 \ltj@plain@AtEnd
 \endinput
