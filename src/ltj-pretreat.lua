@@ -26,7 +26,6 @@ local floor = math.floor
 local has_attr = Dnode.has_attribute
 local set_attr = Dnode.set_attribute
 local node_traverse = Dnode.traverse
-local node_traverse_id = Dnode.traverse_id
 local node_remove =luatexja.Dnode_remove -- Dnode.remove
 local node_next = (Dnode ~= node) and Dnode.getnext or node.next
 local node_prev = (Dnode ~= node) and Dnode.getprev or node.prev
@@ -57,51 +56,50 @@ local dir_tate = luatexja.dir_table.dir_tate
 ------------------------------------------------------------------------
 -- MAIN PROCESS STEP 1: replace fonts
 ------------------------------------------------------------------------
-local wt, wtd = {}, {}
+local wt, wtd
 do
    local start_time_measure, stop_time_measure 
       = ltjb.start_time_measure, ltjb.stop_time_measure
    local head
    local is_dir_tate
-   local suppress_hyphenate_ja_aux_glyph = function(p)
+   local suppress_hyphenate_ja_aux = {}
+   suppress_hyphenate_ja_aux[id_glyph] = function(p)
       if (has_attr(p, attr_icflag) or 0)<=0 and is_ucs_in_japanese_char(p) then
          local pc = getchar(p)
-         local pof, pcj = getfont(p), has_attr(p, attr_curjfnt)
-	 local pf = ltjf_replace_altfont(pcj or pof, pc)
-         if pof~=pf then setfield(p, 'font', pf) end
-         if pcj~=pf then set_attr(p, attr_curjfnt, pf) end
+	 local pf = ltjf_replace_altfont(has_attr(p, attr_curjfnt) or getfont(p), pc)
+	 setfield(p, 'font', pf);  set_attr(p, attr_curjfnt, pf)
 	 setfield(p, 'subtype', floor(getsubtype(p)*0.5)*2)
          set_attr(p, attr_orig_char, pc)
       end
+      return p
    end
-   local suppress_hyphenate_ja_aux_whatsit = function(p)
+   suppress_hyphenate_ja_aux[id_math] = function(p)
+      return node_end_of_math(node_next(p)) end
+   suppress_hyphenate_ja_aux[50] = function(p) return p end
+   suppress_hyphenate_ja_aux[id_whatsit] = function(p)
       if getsubtype(p)==sid_user then 
          local uid = getfield(p, 'user_id')
          if uid==STCK then
-            wt[#wt+1] = p
+            wt[#wt+1] = p; head = node_remove(head, p)
          elseif uid==DIR then
 	    if has_attr(p, attr_icflag)<PROCESSED_BEGIN_FLAG  then
 	       ltjs.list_dir = has_attr(p, attr_dir)
 	    end
-            wtd[#wtd+1] = p
+	    wtd[#wtd+1] = p; head = node_remove(head, p)
          end
       end
+      return p
    end
 
    local function suppress_hyphenate_ja (h)
       start_time_measure('ltj_hyphenate')
-      head = to_direct(h)
-      for i=1,#wt do wt[i]=nil end; for i=1,#wtd do wtd[i]=nil end
+      local p = to_direct(h)
+      wt, wtd, head = {}, {}, p
       ltjs.list_dir=ltjd.get_dir_count()
-      for p in node_traverse_id(id_glyph, head) do --while p do
-	 suppress_hyphenate_ja_aux_glyph(p)
-      end
-      for p in node_traverse_id(id_whatsit, head) do --while p do
-	 suppress_hyphenate_ja_aux_whatsit(p)
-      end
-      for i=1,#wt  do head = node_remove(head, wt[i]) end
-      for i=1,#wtd do 
-         local q = wtd[i]; head = node_remove(head, q); node_free(q)
+      while p do
+	 local pfunc = suppress_hyphenate_ja_aux[getid(p)]
+	 if pfunc then p = pfunc(p) end
+	 p = node_next(p)
       end
       head = to_node(head)
       stop_time_measure('ltj_hyphenate'); start_time_measure('tex_hyphenate')
@@ -119,14 +117,16 @@ end
 -- mode: true iff this function is called from hpack_filter
 local function set_box_stack_level(head, mode)
    local box_set, cl = 0, tex.currentgrouplevel + 1
-   for i=1,#wt do
-      local p = wt[i]
+   for _,p  in pairs(wt) do
       if mode and getfield(p, 'value')==cl then box_set = 1 end; node_free(p)
+   end
+   for _,p  in pairs(wtd) do
+      node_free(p)
    end
    ltjs.report_stack_level(tex_getcount('ltj@@stack') + box_set)
    is_dir_tate = ltjs.list_dir == dir_tate
    if is_dir_tate then
-      for p in node_traverse_id(id_glyph,to_direct(head)) do
+      for p in Dnode.traverse_id(id_glyph,to_direct(head)) do
          if (has_attr(p, attr_icflag) or 0)<=0 and has_attr(p, attr_curjfnt)==getfont(p) then
             local pfn = has_attr(p, attr_curtfnt) or getfont(p)
             local pc = getchar(p)
