@@ -569,13 +569,12 @@
 }
 
 %%%% hbox, vbox, vtop
-% The below code does not work
-%\everyhbox{\immediate\message{HBOX(\the\ltj@dir@count)}%
-%  \ifcase\ltj@dir@count\or\dtou\or\or\tate\or\yoko\fi
-%}
-%\everyvbox{\immediate\message{VBOX}%
-%  \ifcase\ltj@dir@count\or\dtou\or\or\tate\or\yoko\fi
-%}
+\everyhbox{%
+  \ifcase\ltj@dir@count\or\dtou\or\or\tate\or\yoko\fi
+}
+\everyvbox{%
+  \ifcase\ltj@dir@count\or\dtou\or\or\tate\or\yoko\fi
+}
 
 %%%% unhbox and unvbox
 \let\ltj@@orig@unhbox=\unhbox
@@ -588,6 +587,8 @@
 \protected\def\ltj@@unvbox{%
   \directlua{luatexja.direction.check_dir(\the\ltj@tempcnta)}%
   \ltj@@orig@unvbox\ltj@tempcnta\endgroup}
+
+
 %%%% lastbox
 \let\ltj@@orig@lastbox=\lastbox
 \protected\def\lastbox{%

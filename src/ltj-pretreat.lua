@@ -56,11 +56,11 @@ local dir_tate = luatexja.dir_table.dir_tate
 ------------------------------------------------------------------------
 -- MAIN PROCESS STEP 1: replace fonts
 ------------------------------------------------------------------------
-local wt, wtd
+local wt, wtd = {}, {}
 do
    local start_time_measure, stop_time_measure 
       = ltjb.start_time_measure, ltjb.stop_time_measure
-   local head
+   local head, real_head
    local is_dir_tate
    local suppress_hyphenate_ja_aux = {}
    suppress_hyphenate_ja_aux[id_glyph] = function(p)
@@ -80,12 +80,15 @@ do
       if getsubtype(p)==sid_user then 
          local uid = getfield(p, 'user_id')
          if uid==STCK then
-            wt[#wt+1] = p; head = node_remove(head, p)
+            wt[#wt+1] = p; node_remove(head, p)
          elseif uid==DIR then
 	    if has_attr(p, attr_icflag)<PROCESSED_BEGIN_FLAG  then
 	       ltjs.list_dir = has_attr(p, attr_dir)
+	       if not node_next(p) and real_head==p then
+		  return p, true
+	       end
 	    end
-	    wtd[#wtd+1] = p; head = node_remove(head, p)
+	    wtd[#wtd+1] = p; node_remove(head, p)
          end
       end
       return p
@@ -93,19 +96,25 @@ do
 
    local function suppress_hyphenate_ja (h)
       start_time_measure('ltj_hyphenate')
-      local p = to_direct(h)
-      wt, wtd, head = {}, {}, p
+      head = to_direct(h); real_head = node_next(head)
+      local p = head
+      for i = 1,#wt do wt[i]=nil end
+      for i = 1,#wtd do wtd[i]=nil end
       ltjs.list_dir=ltjd.get_dir_count()
       while p do
+	 local flag
 	 local pfunc = suppress_hyphenate_ja_aux[getid(p)]
-	 if pfunc then p = pfunc(p) end
+	 if pfunc then p, flag = pfunc(p) end
+	 if flag then 
+	    stop_time_measure('ltj_hyphenate')
+	    return h
+	 end
 	 p = node_next(p)
       end
-      head = to_node(head)
       stop_time_measure('ltj_hyphenate'); start_time_measure('tex_hyphenate')
-      lang.hyphenate(head)
+      lang.hyphenate(h)
       stop_time_measure('tex_hyphenate')
-      return head
+      return h
    end
 
    luatexbase.add_to_callback('hyphenate',
@@ -120,10 +129,10 @@ local function set_box_stack_level(head, mode)
    for _,p  in pairs(wt) do
       if mode and getfield(p, 'value')==cl then box_set = 1 end; node_free(p)
    end
+   ltjs.report_stack_level(tex_getcount('ltj@@stack') + box_set)
    for _,p  in pairs(wtd) do
       node_free(p)
    end
-   ltjs.report_stack_level(tex_getcount('ltj@@stack') + box_set)
    is_dir_tate = ltjs.list_dir == dir_tate
    if is_dir_tate then
       for p in Dnode.traverse_id(id_glyph,to_direct(head)) do

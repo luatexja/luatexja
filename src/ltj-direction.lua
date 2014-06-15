@@ -128,6 +128,13 @@ do
 	    tex_set_attr('global', attr_icflag, 0)
 	 end
 	 return h
+      elseif
+	 not node_next(hd) and getid(hd)==id_whatsit and getsubtype(hd)==sid_user
+         and getfield(hd, 'user_id')==DIR then
+	    -- avoid double whatsit
+	    set_attr(hd, attr_icflag, PROCESSED_BEGIN_FLAG)
+	    tex_set_attr('global', attr_icflag, 0)
+	    return h
       else
 	 return to_node(create_dir_whatsit(hd, gc, ltjs.list_dir))
       end
@@ -180,14 +187,16 @@ do
 	    tex_set_attr('global', attr_icflag, 0)
 	 end
 	 return hd
-      elseif gc=='vtop' then
-	 local w = create_dir_whatsit(hd, gc, ltjs.list_dir)
-	 -- move  dir whatsit after hd
-	 local n = getfield(hd, 'next')
-	 setfield(hd, 'next', w); setfield(w, 'next', n)
-         return hd
       else
-         return create_dir_whatsit(hd, gc, ltjs.list_dir)
+	 local n =node_next(hd)
+	 if gc=='vtop' and n then
+	    local w = create_dir_whatsit(hd, gc, ltjs.list_dir)
+	    -- move  dir whatsit after hd
+	    setfield(hd, 'next', w); setfield(w, 'next', n)
+	    return hd
+	 else
+	    return create_dir_whatsit(hd, gc, ltjs.list_dir)
+	 end
       end
    end
 end
