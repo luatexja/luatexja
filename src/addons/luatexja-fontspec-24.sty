@@ -1,0 +1,327 @@
+%
+% luatexja-fontspec-24.sty
+%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{luatexja-fontspec-24}[2014/06/19 fontspec support of LuaTeX-ja]
+\RequirePackage{l3keys2e,luatexja}
+\ExplSyntaxOn
+
+%%%%%%%% Change Japanese font family by \rmfamily or not
+\bool_if:NTF  \ltj_fontspec_match
+{
+  \renewcommand\jttdefault{\gtdefault}
+  \DeclareRobustCommand\rmfamily
+  {\not@math@alphabet\rmfamily\mathrm
+     \romanfamily\rmdefault\kanjifamily\mcdefault\selectfont}
+  \DeclareRobustCommand\sffamily
+  {\not@math@alphabet\sffamily\mathsf
+     \romanfamily\sfdefault\kanjifamily\gtdefault\selectfont}
+  \DeclareRobustCommand\ttfamily
+  {\not@math@alphabet\ttfamily\mathtt
+     \romanfamily\ttdefault\kanjifamily\jttdefault\selectfont}
+  \DeclareDocumentCommand \setmonojfont { O{} m } {
+    \__ltj_fontspec_set_family:Nnn \jttdefault {#1}{#2}
+    \normalfont
+  }
+}{
+}
+
+%%%%%%%% Messages
+
+\msg_new:nnn {luatexja-fontspec} {addjfontfeatures-ignored}
+{
+  \string\addjfontfeature (s)~ ignored;\\
+  it~ cannot~ be~ used~ with~ a~ font~ that~ wasn't~ selected~ by~ luatexja-fontspec.
+}
+
+\msg_new:nnn {luatexja-fontspec} {altfont-ignored-by-norange}
+{
+  ignored~ sublist~ `#1'~ in~ AltFont~ (no~ range~ is~ specified).
+}
+
+\msg_new:nnn {luatexja-fontspec} {altfont-ignored-by-rangeonly}
+{
+  ignored~ sublist~ `#1'~ in~ AltFont~ (only~ range~ is~ specified).
+}
+
+\cs_generate_variant:Nn \prg_new_conditional:Nnn {Nnx}
+
+%%%%%%%% \g_ltj_fontspec_scale_fp
+%% Default scale value for jfont.
+\fp_new:N \g_ltj_fontspec_scale_fp
+\group_begin:
+\fontsize{10}{10}\selectfont
+\fp_gset:Nn \g_ltj_fontspec_scale_fp {\zw / 10}
+\group_end:
+
+%%%%%%%% Internal control sequences
+%% Each CS is ltj_fontspec version that corresponds to original CS of fontspec.
+\cs_new:Nn \ltj_fontspec_define_option:nn {
+  \__fontspec_keys_define_code:nnn {fontspec} {#1} {#2}
+}
+
+\cs_new:Nn \ltj_fontspec_define_preparse_external:nn {
+  \keys_define:nn {fontspec-preparse-external} { #1 .code:n = {#2}}
+}
+
+\cs_new:Nn \ltj_fontspec_define_altfont_option:nn {
+  \keys_define:nn {fontspec-ltjaltfont} { #1 .code:n = {#2}}
+}
+
+%% Alternate Fonts
+%% Spec: AltFont = {
+%%   ...
+%%   { Range = <range>, <font features> },
+%%   { Range = <range>, Font = <font name>, <font features> },
+%%   { Range = <range>, Font = <font name> },
+%%   ...
+%% }
+\tl_new:N  \l_ltj_fontspec_altname_tl
+\tl_new:N  \l_ltj_fontspec_altrange_tl
+\clist_new:N  \l_ltj_fontspec_altfont_clist
+\clist_new:N  \l_ltj_fontspec_altfont_leftover_clist
+\int_new:N \g_ltj_fontspec_altnumber_int
+
+\ltj_fontspec_define_altfont_option:nn {Range} {
+  \tl_set:Nn \l_ltj_fontspec_altrange_tl {#1}
+}
+\ltj_fontspec_define_altfont_option:nn {Font} {
+  \fontspec_complete_fontname:Nn \l_ltj_fontspec_altname_tl {#1}
+}
+
+\cs_new:Nn \__ltj_fontspec_altfont_key_code:n
+ {
+  \clist_set:Nn \l_ltj_fontspec_altfont_clist  {#1}
+  \fontspec_update_fontid:n {alt:#1}
+ }
+
+\cs_new:Nn \ltj_fontspec_select:nn {
+  \group_begin:
+  \ltj_fontspec_define_option:nn {AltFont} {
+    \__ltj_fontspec_altfont_key_code:n { ##1 }
+  }
+  \ltj_fontspec_define_option:nn {CID} {
+    \__fontspec_update_featstr:n {cid=##1}
+  }
+  \ltj_fontspec_define_option:nn {JFM} {
+    \__fontspec_update_featstr:n {jfm=##1}
+  }
+
+  \ltj_fontspec_define_option:nn {JFM-var} {
+    \__fontspec_update_featstr:n {jfmvar=##1}
+  }
+  \ltj_fontspec_define_preparse_external:nn {NoEmbed} {
+    \cs_set:Nn \fontspec_namewrap:n {psft:####1}
+  }
+  %% Omit the warning message
+  %% "OpenType feature 'Kerning=Off' (-kern) not available ..."
+  \ltj_fontspec_define_option:nn {Kerning/Off} {
+    \__fontspec_update_featstr:n {-kern}
+  }
+  \tl_set:Nn \g_fontspec_encoding_tl {JY3}
+  \clist_set:Nx \g__fontspec_default_fontopts_clist%\g__fontspec_default_fontopts_tl
+             {JFM=ujis, Scale=\fp_use:N \g_ltj_fontspec_scale_fp,
+              Kerning=Off, \g_ltj_fontspec_default_fontopts_tl}
+  \prop_set_eq:NN \g__fontspec_fontopts_prop \g__ltj_fontspec_fontopts_prop
+  \cs_set_eq:NN \fontspec_make_font_shapes:nnnn \ltj_fontspec_make_font_shapes:nnnn
+  \cs_set_eq:NN \DeclareFontFamily \DeclareKanjiFamily
+  \fontspec_select:nn{#1}{#2}
+  \group_end:
+}
+
+\cs_new:Nn \__ltj_fontspec_set_family:Nnn {
+  \ltj_fontspec_select:nn{#2}{#3}
+  \tl_set_eq:NN #1 \l_fontspec_family_tl
+}
+\cs_set_eq:NN \__ltj_orig_fontspec_make_font_shapes:nnnn \fontspec_make_font_shapes:nnnn
+\cs_set_eq:NN \__ltj_fontspec_orig_DeclareFontShape \DeclareFontShape
+\cs_new:Nn \ltj_fontspec_make_font_shapes:nnnn {
+  \__ltj_orig_fontspec_make_font_shapes:nnnn {#1} {#2} {#3} {#4}
+  \group_begin:
+    %% Parse font features. However, we have to avoid redefine already defined shape.
+    \__fontspec_load_fontname:n {#1}
+    \cs_set_eq:NN \DeclareFontShape \use_none:nnnnnn
+    \fontspec_declare_shape:nnn {#2}{#3}
+     { \quark_if_no_value:NF \l__fontspec_fontopts_clist {\l__fontspec_fontopts_clist,} #4 }
+    \cs_set_eq:NN \DeclareFontShape \__ltj_fontspec_orig_DeclareFontShape
+    %%
+    \clist_if_empty:NF \l_ltj_fontspec_altfont_clist {
+      \int_gzero:N \g_ltj_fontspec_altnumber_int
+      \clist_map_inline:Nn \l_ltj_fontspec_altfont_clist {
+        \tl_clear:N  \l_ltj_fontspec_altrange_tl
+        \tl_set:Nn \l_ltj_fontspec_altname_tl { #1 }
+        \tl_set:Nn \l_tmpa_tl { #1 }
+
+        \keys_set_known:nxN {fontspec-ltjaltfont} { \exp_after:wN \use:n ##1 }
+          \l_ltj_fontspec_altfont_leftover_clist
+
+        \tl_if_empty:NT \l_ltj_fontspec_altrange_tl {
+          \msg_warning:nnn  {luatexja-fontspec} {altfont-ignored-by-norange} { ##1 }
+        } {
+          \bool_if:nTF {
+            \tl_if_eq_p:NN \l_ltj_fontspec_altname_tl \l_tmpa_tl
+            &&
+            \tl_if_empty_p:N \l_ltj_fontspec_altfont_leftover_clist
+          } {
+            \msg_warning:nnn  {luatexja-fontspec} {altfont-ignored-by-rangeonly} { ##1 }
+          } {
+            \group_begin:
+              \__fontspec_load_fontname:n { \l_ltj_fontspec_altname_tl }
+              \fontspec_declare_shape:nnn {#2}
+                {#3 _ alt \int_use:N \g_ltj_fontspec_altnumber_int }
+                {
+                  \quark_if_no_value:NF \l__fontspec_fontopts_clist {\l__fontspec_fontopts_clist,}
+                  #4 , \l_ltj_fontspec_altfont_leftover_clist
+                }
+            \group_end:
+            \DeclareAlternateKanjiFont
+              {JY3}{ \l_fontspec_family_tl }{#2}{#3}%
+              {JY3}{ \l_fontspec_family_tl }{#2}
+              { #3 _alt \int_use:N \g_ltj_fontspec_altnumber_int }
+              { \l_ltj_fontspec_altrange_tl }
+            \int_gincr:N \g_ltj_fontspec_altnumber_int
+          }
+        }
+      }
+    }
+  \group_end:
+ }
+
+%%%%%%%% User commands
+\DeclareDocumentCommand \jfontspec { O{} m } {
+  \__ltj_fontspec_set_family:Nnn \k@family {#1}{#2}
+  \selectfont
+  \ignorespaces
+}
+
+\DeclareDocumentCommand \setmainjfont { O{} m } {
+  \__ltj_fontspec_set_family:Nnn \mcdefault {#1}{#2}
+  \DeclareSymbolFont{mincho}{JY3}{\l_fontspec_family_tl}{m}{n}
+  \SetSymbolFont{mincho}{bold}{JY3}{\l_fontspec_family_tl}{bx}{n}
+  \normalfont
+}
+
+\DeclareDocumentCommand \setsansjfont { O{} m } {
+  \__ltj_fontspec_set_family:Nnn \gtdefault {#1}{#2}
+  \DeclareMathAlphabet{\mathgt}{JY3}{\l_fontspec_family_tl}{m}{n}
+  \normalfont
+}
+
+\DeclareDocumentCommand \newjfontfamily { m O{} m } {
+  \ltj_fontspec_select:nn{#2}{#3}
+  \use:x {
+    \exp_not:N \DeclareRobustCommand \exp_not:N #1 {
+      \exp_not:N \kanjifamily {\l_fontspec_family_tl} \exp_not:N \selectfont
+    }
+  }
+}
+
+\DeclareDocumentCommand \newjfontface { m O{} m } {
+  \newjfontfamily #1 [ BoldFont={},ItalicFont={},SmallCapsFont={},#2 ] {#3}
+}
+
+\tl_new:N \g_ltj_fontspec_default_fontopts_tl
+\prop_new:N \g__ltj_fontspec_fontopts_prop
+\DeclareDocumentCommand \defaultjfontfeatures { o m }
+ {
+  \IfNoValueTF {#1}
+   { \__ltj_fontspec_set_default_features:n {#2} }
+   { \__ltj_fontspec_set_font_default_features:nn {#1} {#2} }
+ }
+\cs_new:Nn \__ltj_fontspec_set_default_features:n
+ {
+  \tl_set:Nn \g_ltj_fontspec_default_fontopts_tl {#1,}
+ }
+\cs_new:Nn \__ltj_fontspec_set_font_default_features:nn
+ {
+  \__fontspec_sanitise_fontname:Nn \l__fontspec_tmp_tl {#1}
+  \tl_if_empty:nTF {#2}
+   { \prop_gremove:NV \g__ltj_fontspec_fontopts_prop \l__fontspec_tmp_tl }
+   { \prop_gput:NVn   \g__ltj_fontspec_fontopts_prop \l__fontspec_tmp_tl {#2} }
+ }
+
+\DeclareDocumentCommand \addjfontfeatures {m} {
+  \ifcsname zf@family@fontdef\k@family\endcsname
+    \group_begin:
+      \tl_clear:N \g_ltj_fontspec_default_fontopts_tl
+      \use:x {
+        \exp_not:N\ltj_fontspec_select:nn
+          {\csname zf@family@options\k@family\endcsname,#1}
+          {\csname zf@family@fontname\k@family\endcsname}
+      }
+    \group_end:
+    \fontfamily\l_fontspec_family_tl\selectfont
+  \else
+    \msg_warning:nn  {luatexja-fontspec} {addjfontfeatures-ignored}
+  \fi
+  \ignorespaces
+}
+
+\cs_set_eq:NN \addjfontfeature \addjfontfeatures
+
+%%% CJKShape=JIS2004
+\__fontspec_define_feature_option:nnnnn{CJKShape}{JIS2004}{20}{5}{+jp04}
+
+\ExplSyntaxOff
+%%%%%%%% Now we completely ignore kanjifont definition file.
+
+\DeclareRobustCommand\fontfamily[1]{%
+  \@notkfamfalse\@notffamfalse
+  \edef\tmp@item{'\luatexluaescapestring{#1}'}%
+  \edef\tmp@enc{'\luatexluaescapestring{\f@encoding}'}%
+  \ifcsname \k@encoding+#1\endcsname % if \k@encoding+#1 is already defined
+    \edef\k@family{#1}%
+  \else\@notkfamtrue\fi
+  \ifcsname \f@encoding+#1\endcsname
+    \edef\f@family{#1}%
+  \else % search font definition file...
+    \directlua{luatexja.jfont.is_ffam(\tmp@enc, \tmp@item)}%
+    \ifin@\edef\k@family{#1}\else%
+      \directlua{luatexja.jfont.is_Nffam(\tmp@enc, \tmp@item)}%
+      \ifin@\@notffamtrue\else%
+        % filename of font definition file is always lowercase
+        \edef\@temp{\lowercase{\noexpand\IfFileExists{\f@encoding#1.fd}}}%
+        \message{(I search font definition file)}%
+        \@temp{\@tempswztrue}{\@tempswzfalse}%
+        \if@tempswz
+          \directlua{luatexja.jfont.add_ffam_list(\tmp@enc, \tmp@item)}%
+   	  \edef\f@family{#1}%
+        \else
+          \directlua{luatexja.jfont.add_Nffam_list(\tmp@enc, \tmp@item)}%
+	  \@notffamtrue%
+        \fi
+      \fi
+    \fi
+  \fi
+  \if@notkfam\if@notffam
+      {\ifcsname D@\k@encoding\endcsname\@nameuse{D@\k@encoding}\fi
+        \xdef\@@temp{\default@family}}\edef\k@family{\@@temp}%
+      {\ifcsname D@\f@encoding\endcsname\@nameuse{D@\f@encoding}\fi
+        \xdef\@@temp{\default@family}}\edef\f@family{\@@temp}%
+  \fi\fi
+}
+
+% We must redefine \try@load@fontshape to ignore kanjifont definitions at all.
+\def\try@load@fontshape{%
+   \expandafter
+   \ifx\csname \f@encoding+\f@family\endcsname\relax
+       \directlua{luatexja.jfont.is_kenc('\luatexluaescapestring{\f@encoding}')}%
+\ifin@ % Japanese font: we don't search fd.
+    \@font@warning{We don't search kanjifont definition
+      \MessageBreak for \f@encoding/\f@family}%
+\else % Alphabetic font
+    \@font@info{Try loading font information for \f@encoding+\f@family}%
+    \global\expandafter\let
+       \csname\f@encoding+\f@family\endcsname\@empty
+     \nfss@catcodes
+     \let\nfss@catcodes\relax
+     \edef\reserved@a{%
+       \lowercase{%
+         \noexpand\InputIfFileExists{\f@encoding\f@family.fd}}}%
+     \reserved@a\relax
+          {\@input@{\f@encoding\f@family.fd}}%
+\fi
+   \fi}
+
+\endinput
