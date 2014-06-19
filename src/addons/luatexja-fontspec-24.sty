@@ -62,11 +62,11 @@
 }
 
 \cs_new:Nn \ltj_fontspec_define_preparse_external:nn {
-  \keys_define:nn {fontspec-preparse-external} { #1 .code:n = {#2}}
+  \__fontspec_keys_define_code:nnn {fontspec-preparse-external} {#1} {#2}
 }
 
 \cs_new:Nn \ltj_fontspec_define_altfont_option:nn {
-  \keys_define:nn {fontspec-ltjaltfont} { #1 .code:n = {#2}}
+  \__fontspec_keys_define_code:nnn {fontspec-ltjaltfont} {#1} {#2}
 }
 
 %% Alternate Fonts
@@ -120,7 +120,7 @@
     \__fontspec_update_featstr:n {-kern}
   }
   \tl_set:Nn \g_fontspec_encoding_tl {JY3}
-  \clist_set:Nx \g__fontspec_default_fontopts_clist%\g__fontspec_default_fontopts_tl
+  \clist_set:Nx \g__fontspec_default_fontopts_clist
              {JFM=ujis, Scale=\fp_use:N \g_ltj_fontspec_scale_fp,
               Kerning=Off, \g_ltj_fontspec_default_fontopts_tl}
   \prop_set_eq:NN \g__fontspec_fontopts_prop \g__ltj_fontspec_fontopts_prop
