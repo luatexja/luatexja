@@ -525,12 +525,13 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %<en>\subsection{Installation}
 %<ja>\subsection{インストール}
 
-%<en>To install the \LuaTeX-ja\ package, you will need:
+%<en>To install the \LuaTeX-ja\ package, you will need the following engine and packages:
 %<ja>\LuaTeX-jaパッケージのインストールには，次のものが必要である．
 \begin{itemize}
 \item \LuaTeX\ beta-0.74.0 (or later)
 \item \Pkg{luaotfload} v2.2 (or later)
-\item \Pkg{luatexbase} v0.6
+\item \Pkg{luatexbase} v0.6 (or later)
+\item \Pkg{everysel} v1.2 (or later)
 \item \Pkg{xunicode} v0.981~(2011/09/09)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
 \end{itemize}
@@ -550,7 +551,7 @@ Now \LuaTeX-ja is available from the following archive and distributions:
   \item W32\TeX\ (in \texttt{luatexja.tar.xz})
   \end{itemize}
 
-If you are using \TeX~Live~2013, you can install \LuaTeX-ja 
+If you are using \TeX~Live~2014, you can install \LuaTeX-ja 
 from \TeX~Live manager (\texttt{tlmgr}):
 \begin{verbatim}
 $ tlmgr install luatexja
@@ -570,7 +571,7 @@ $ tlmgr install luatexja
   \item W32\TeX\ (\texttt{luatexja.tar.xz})
   \end{itemize}
 
-例えば\TeX~Live~2013を利用しているなら，\LuaTeX-jaは\TeX~Live manager (\texttt{tlmgr})を
+例えば\TeX~Live~2014を利用しているなら，\LuaTeX-jaは\TeX~Live manager (\texttt{tlmgr})を
 使ってインストールすることができる．
 \begin{verbatim}
 $ tlmgr install luatexja
@@ -3471,9 +3472,9 @@ An example of this callback is the \texttt{ltjarticle} class, with
 %<en>\item[\texttt{luatexja.define\_jfont} callback]
 %<ja>\item[\texttt{luatexja.define\_jfont}コールバック]
 %<*en>
-This callback and the next callback form a pair, and you can assign characters 
- which do not have fixed code points in Unicode to non-zero character classes.
-This \texttt{luatexja.define\_font} callback is called just when new Japanese font is loaded.
+This callback and the next callback form a pair, and you can assign characters
+ which do not have fixed code points in Unicode to non-zero character classes.\\
+This \texttt{luatexja.define\_jfont} callback is called just when new Japanese font is loaded.
 %</en>
 %<*ja>
 このコールバックと次のコールバックは組をなしており，Unicode中に固定された文字コード
@@ -4107,6 +4108,56 @@ by the following:
 
 \end{itemize}
 
+\subsection{\texttt{\textbackslash ltjsetkanjiskip}, \texttt{\textbackslash ltjsetxkanjiskip}}
+%<*ja>
+\verb+\ltjsetparameter+ と \verb+\ltjglobalsetparameter+ は，引数が常にkey-valueリストであ
+るため，一回の実行に時間がかかるという難点がある．特にクラス \Pkg{ltjsclasses} においては，
+フォントサイズの設定(\verb+\@setfontsize+)ごとに毎回
+\Param{kanjiskip}と\Param{xkanjiskip}が設定されるため，
+それによる速度低下が顕著なものとなっていた．
+
+これを解決するため，より内部に近い命令として\ 
+\verb+\ltjsetkanjiskip{+<skip>\verb+}+ と\\
+\verb+\ltjsetxkanjiskip{+<skip>\verb+}+\ を
+用意した．これらの実行の前には，\TeX の \verb+\globaldefs+ の値を反映させるために\ 
+\verb+\ltj@setpar@global+\ の実行を必要とし，
+\begin{lstlisting}
+\ltj@setpar@global
+\ltjsetkanjiskip{0pt plus .1\zw minus .01\zw}
+\ltjsetxkanjiskip{0.25em plus 0.15em minus 0.06em} 
+\end{lstlisting}
+と
+\begin{lstlisting}
+\ltjsetparemeter{%
+  kanjiskip=0pt plus .1\zw minus .01\zw, 
+  xkanjiskip=0.25em plus 0.15em minus 0.06em}
+\end{lstlisting}
+は同じ意味を持つ．
+%</ja>
+%<*en>
+\verb+\ltjsetparameter+ and \verb+\ltjglobalsetparameter+ are slow, 
+since their argument is a key-value list. 
+This can be a problem in \Pkg{ltjsclasses}, because 
+\Param{kanjiskip} and \Param{xkanjiskip} are set in every font resizing commands
+(\verb+\@setfontsize+). To overcome this problem,
+this version of \LuaTeX-ja provides two more internal commands, namely
+\verb+\ltjsetkanjiskip{+<skip>\verb+}+ and \verb+\ltjsetxkanjiskip{+<skip>\verb+}+.
+
+Note that \verb+\ltj@setpar@global+ command is needed before these two commands
+to reflect  \TeX's internal parameter \verb+\globaldefs+.
+\begin{lstlisting}
+\ltj@setpar@global
+\ltjsetkanjiskip{0pt plus .1\zw minus .01\zw}
+\ltjsetxkanjiskip{0.25em plus 0.15em minus 0.06em} 
+\end{lstlisting}
+and
+\begin{lstlisting}
+\ltjsetparemeter{%
+  kanjiskip=0pt plus .1\zw minus .01\zw, 
+  xkanjiskip=0.25em plus 0.15em minus 0.06em}
+\end{lstlisting}
+have the same meaning.
+%</en>
 
 
 
