@@ -91,10 +91,9 @@
 }
 
 \cs_new:Nn \__ltj_fontspec_altfont_key_code:n
- {
+{
   \clist_set:Nn \l_ltj_fontspec_altfont_clist  {#1}
-  \fontspec_update_fontid:n {alt:#1}
- }
+}
 
 \cs_new:Nn \ltj_fontspec_select:nn {
   \group_begin:
@@ -112,7 +111,7 @@
     \__fontspec_update_featstr:n {jfmvar=##1}
   }
   \ltj_fontspec_define_preparse_external:nn {NoEmbed} {
-    \cs_set:Nn \fontspec_namewrap:n {psft:####1}
+    \cs_set:Nn \__fontspec_namewrap:n {psft:####1}
   }
   %% Omit the warning message
   %% "OpenType feature 'Kerning=Off' (-kern) not available ..."
@@ -124,7 +123,7 @@
              {JFM=ujis, Scale=\fp_use:N \g_ltj_fontspec_scale_fp,
               Kerning=Off, \g_ltj_fontspec_default_fontopts_tl}
   \prop_set_eq:NN \g__fontspec_fontopts_prop \g__ltj_fontspec_fontopts_prop
-  \cs_set_eq:NN \fontspec_make_font_shapes:nnnn \ltj_fontspec_make_font_shapes:nnnn
+  \cs_set_eq:NN \__fontspec_make_font_shapes:Nnnnn \ltj_fontspec_make_font_shapes:Nnnnn
   \cs_set_eq:NN \DeclareFontFamily \DeclareKanjiFamily
   \fontspec_select:nn{#1}{#2}
   \group_end:
@@ -134,16 +133,15 @@
   \ltj_fontspec_select:nn{#2}{#3}
   \tl_set_eq:NN #1 \l_fontspec_family_tl
 }
-\cs_set_eq:NN \__ltj_orig_fontspec_make_font_shapes:nnnn \fontspec_make_font_shapes:nnnn
+\cs_set_eq:NN \__ltj_orig_fontspec_make_font_shapes:Nnnnn \__fontspec_make_font_shapes:Nnnnn
 \cs_set_eq:NN \__ltj_fontspec_orig_DeclareFontShape \DeclareFontShape
-\cs_new:Nn \ltj_fontspec_make_font_shapes:nnnn {
-  \__ltj_orig_fontspec_make_font_shapes:nnnn {#1} {#2} {#3} {#4}
+\cs_new:Nn \ltj_fontspec_make_font_shapes:Nnnnn {
+  \__ltj_orig_fontspec_make_font_shapes:Nnnnn {#1} {#2} {#3} {#4} {#5}
   \group_begin:
     %% Parse font features. However, we have to avoid redefine already defined shape.
     \__fontspec_load_fontname:n {#1}
     \cs_set_eq:NN \DeclareFontShape \use_none:nnnnnn
-    \fontspec_declare_shape:nnn {#2}{#3}
-     { \quark_if_no_value:NF \l__fontspec_fontopts_clist {\l__fontspec_fontopts_clist,} #4 }
+    \__fontspec_declare_shape:nnxx {#2} {#3} { \l__fontspec_fontopts_clist, #4 } {#5}
     \cs_set_eq:NN \DeclareFontShape \__ltj_fontspec_orig_DeclareFontShape
     %%
     \clist_if_empty:NF \l_ltj_fontspec_altfont_clist {
@@ -168,12 +166,10 @@
           } {
             \group_begin:
               \__fontspec_load_fontname:n { \l_ltj_fontspec_altname_tl }
-              \fontspec_declare_shape:nnn {#2}
+              \__fontspec_declare_shape:nnxx {#2}
                 {#3 _ alt \int_use:N \g_ltj_fontspec_altnumber_int }
-                {
-                  \quark_if_no_value:NF \l__fontspec_fontopts_clist {\l__fontspec_fontopts_clist,}
-                  #4 , \l_ltj_fontspec_altfont_leftover_clist
-                }
+                {\l__fontspec_fontopts_clist, #4 , \l_ltj_fontspec_altfont_leftover_clist}
+                {#5}
             \group_end:
             \DeclareAlternateKanjiFont
               {JY3}{ \l_fontspec_family_tl }{#2}{#3}%
