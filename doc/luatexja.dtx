@@ -142,7 +142,7 @@
   \parindent=0pt\def\makelabel##1{{\tt\textbackslash ##1}}
   \def\{{\char`\{}\def\}{\char`\}}
   \let\origitem=\item
-  \def\item[##1]{\par\smallskip\par\hskip-\leftskip\makelabel{##1}\par}
+  \def\item[##1]{\par\smallskip\par\hskip-\leftskip\makelabel{##1}\par\nobreak}
   \@totalleftmargin\leftskip
 }{\par%
 %<en>\medskip
@@ -2118,12 +2118,12 @@ Here the horizontal line in above is the baseline of a line.
 
 %<*en>
 There is an interesting side-effect: characters in different size can be
-vertically aligned center in a line, by setting two parameters appropriately.
+``vertically aligned center'' in a line, by setting two parameters appropriately.
 The following is an example (beware the value is not well tuned):
 %</en>
 %<*ja>
 この機能には面白い使い方がある：2つのパラメータを適切に設定することで，サイズの
-異なる文字を中心線に揃えることができる．
+異なる文字を「中心線」に揃えることができる．
 以下は一つの例である（値はあまり調整されていないことに注意）：
 %</ja>
 \begin{LTXexample}
@@ -2134,6 +2134,33 @@ xyz漢字
   XYZひらがな
 }abcかな
 \end{LTXexample}
+
+%<*en>
+Note that setting a positive value to \Param{yalbaselineshift} does not 
+increase the depth of \textbf{ALchar}, as shown below.
+This is because \Param{yalbaselineshift} is implemented by setting \verb+xoffset+
+field of a glyph node, and this does not increase the depth of the glyph.
+This problem does not apply for \Param{yjabaselineshift}, since
+\Param{yjabaselineshift} uses a different implementation method.
+%</en>
+%<*ja>
+なお，\Param{yalbaselineshift}パラメータに正の値を指定しても，
+下の例のように\textbf{ALchar}の深さは増加しないことに注意．
+\Param{yjabaselineshift}パラメータは別の方法を使って実装しているので，
+このような問題は起こらない．
+%</ja>
+\begin{LTXexample}[width=.3\textwidth]
+\leavevmode\fboxsep=0pt
+ \ltjsetparameter{yjabaselineshift=0pt,
+    yalbaselineshift=0pt}
+\vrule width 105pt height 0.4pt depth 0pt \hskip-95pt
+\fbox{\ltjsetparameter{yalbaselineshift=10pt}あいうxyz}
+\fbox{\ltjsetparameter{yalbaselineshift=-10pt}あいうxyz}\\
+\vrule width 105pt height 0.4pt depth 0pt \hskip-95pt
+\fbox{\ltjsetparameter{yjabaselineshift=10pt}あいうxyz}
+\fbox{\ltjsetparameter{yjabaselineshift=-10pt}あいうxyz}
+\end{LTXexample}
+
 
 
 %<*ja>
@@ -4382,7 +4409,7 @@ commands which are not described in Subsection~\ref{ssec-chgfnt}.
 \par\smallskip\par\hskip-\leftskip{\bfseries%
 %<ja>追加の長さ変数達
 %<en>additonal dimensions
-}\par
+}\par\nobreak
 
 %<*en>
 Like \pLaTeXe, \LuaTeX-ja defines the following dimensions 
