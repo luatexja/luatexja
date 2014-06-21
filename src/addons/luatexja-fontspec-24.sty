@@ -95,6 +95,7 @@
   \clist_set:Nn \l_ltj_fontspec_altfont_clist  {#1}
 }
 
+\cs_set_eq:NN \__ltj_orig_fontspec_select:nn \fontspec_select:nn
 \cs_new:Nn \ltj_fontspec_select:nn {
   \group_begin:
   \ltj_fontspec_define_option:nn {AltFont} {
@@ -125,7 +126,7 @@
   \prop_set_eq:NN \g__fontspec_fontopts_prop \g__ltj_fontspec_fontopts_prop
   \cs_set_eq:NN \__fontspec_make_font_shapes:Nnnnn \ltj_fontspec_make_font_shapes:Nnnnn
   \cs_set_eq:NN \DeclareFontFamily \DeclareKanjiFamily
-  \fontspec_select:nn{#1}{#2}
+  \__ltj_orig_fontspec_select:nn{#1}{#2}
   \group_end:
 }
 
@@ -238,23 +239,27 @@
  }
 
 \DeclareDocumentCommand \addjfontfeatures {m} {
-  \ifcsname zf@family@fontdef\k@family\endcsname
+  \ltj_fontspec_if_fontspec_font:TF
+   {
     \group_begin:
-      \tl_clear:N \g_ltj_fontspec_default_fontopts_tl
-      \use:x {
-        \exp_not:N\ltj_fontspec_select:nn
-          {\csname zf@family@options\k@family\endcsname,#1}
-          {\csname zf@family@fontname\k@family\endcsname}
-      }
+      \tl_set_eq:NN \f@family \k@family
+      \cs_set_eq:NN \fontspec_select:nn \ltj_fontspec_select:nn
+      \addfontfeatures {#1}
     \group_end:
     \fontfamily\l_fontspec_family_tl\selectfont
-  \else
+   }{
     \msg_warning:nn  {luatexja-fontspec} {addjfontfeatures-ignored}
-  \fi
+   }
   \ignorespaces
 }
 
 \cs_set_eq:NN \addjfontfeature \addjfontfeatures
+
+\prg_new_conditional:Nnn \ltj_fontspec_if_fontspec_font: {TF,T,F}
+{
+  \cs_if_exist:cTF {g__fontspec_ \k@family _prop} \prg_return_true: \prg_return_false:
+}
+
 
 %%% CJKShape=JIS2004
 \__fontspec_define_feature_option:nnnnn{CJKShape}{JIS2004}{20}{5}{+jp04}
