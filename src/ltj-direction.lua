@@ -121,6 +121,13 @@ end
 
 -- ボックスに dir whatsit を追加
 local function create_dir_whatsit(hd, gc, new_dir)
+   if getid(hd)==id_whatsit and 
+	    getsubtype(hd)==sid_user and getfield(hd, 'user_id')==DIR then
+      set_attr(hd, attr_icflag, 
+	       (has_attr(hd, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG 
+		  + PROCESSED_BEGIN_FLAG)
+      return hd
+   else
       local w = node_new(id_whatsit, sid_user)
       setfield(w, 'next', hd)
       setfield(w, 'user_id', DIR)
@@ -128,9 +135,12 @@ local function create_dir_whatsit(hd, gc, new_dir)
       set_attr(w, attr_dir, new_dir)
       tex_set_attr('global', attr_dir, 0)  
       set_attr(w, attr_icflag, PROCESSED_BEGIN_FLAG)
-      set_attr(hd, attr_icflag, (has_attr(hd, attr_icflag) or 0) + PROCESSED_BEGIN_FLAG)
+      set_attr(hd, attr_icflag, 
+	       (has_attr(hd, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG 
+		  + PROCESSED_BEGIN_FLAG)
       tex_set_attr('global', attr_icflag, 0)
       return w
+   end
 end
 
 -- hpack_filter, vpack_filter, post_line_break_filter
@@ -146,16 +156,7 @@ do
 	 return h
       else
 	 adjust_badness(hd)
-	 if (c=='hbox' or gc=='adjusted_hbox') and 
-	    not node_next(hd) and getid(hd)==id_whatsit and 
-	    getsubtype(hd)==sid_user and getfield(hd, 'user_id')==DIR then
-	       -- avoid double whatsit
-	       set_attr(hd, attr_icflag, PROCESSED_BEGIN_FLAG)
-	       tex_set_attr('global', attr_icflag, 0)
-	       return h
-	 else
-	    return to_node(create_dir_whatsit(hd, gc, ltjs.list_dir))
-	 end
+	 return to_node(create_dir_whatsit(hd, gc, ltjs.list_dir))
       end
    end
 
@@ -208,13 +209,14 @@ do
 	 return hd
       else
 	 local n =node_next(hd)
-	 if gc=='vtop' and n then
+	 if gc=='vtop' then
 	    local w = create_dir_whatsit(hd, gc, ltjs.list_dir)
 	    -- move  dir whatsit after hd
 	    setfield(hd, 'next', w); setfield(w, 'next', n)
 	    return hd
 	 else
-	    return create_dir_whatsit(hd, gc, ltjs.list_dir)
+	    hd = create_dir_whatsit(hd, gc, ltjs.list_dir)
+	    return hd
 	 end
       end
    end
