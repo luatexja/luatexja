@@ -10,6 +10,7 @@ luatexja.direction = {}
 local attr_dir = luatexbase.attributes['ltj@dir']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 
+local cat_lp = luatexbase.catcodetables['latex-package']
 local Dnode = node.direct or node
 local nullfunc = function (n) return n end
 local to_node = (Dnode ~= node) and Dnode.tonode or nullfunc
@@ -56,6 +57,21 @@ local dir_dtou = luatexja.dir_table.dir_dtou
 local dir_node_auto   = luatexja.dir_table.dir_node_auto
 local dir_node_manual = luatexja.dir_table.dir_node_manual
 
+
+--
+local function adjust_badness(hd)
+   if not node_next(hd) and getid(hd)==id_whatsit and getsubtype(hd)==sid_user
+   and getfield(hd, 'user_id')==DIR then
+      -- avoid double whatsit
+      luatexja.global_temp=tex.globaldefs; tex.globaldefs=0
+      luatexja.hbadness_temp=tex.hbadness; tex.hbadness=10000
+      luatexja.vbadness_temp=tex.vbadness; tex.vbadness=10000
+   else
+      luatexja.global_temp = nil
+      luatexja.hbadness_temp=nil
+      luatexja.vbadness_temp=nil
+   end
+end
 
 local get_dir_count
 -- \tate, \yoko
@@ -128,15 +144,18 @@ do
 	    tex_set_attr('global', attr_icflag, 0)
 	 end
 	 return h
-      elseif
-	 not node_next(hd) and getid(hd)==id_whatsit and getsubtype(hd)==sid_user
-         and getfield(hd, 'user_id')==DIR then
-	    -- avoid double whatsit
-	    set_attr(hd, attr_icflag, PROCESSED_BEGIN_FLAG)
-	    tex_set_attr('global', attr_icflag, 0)
-	    return h
       else
-	 return to_node(create_dir_whatsit(hd, gc, ltjs.list_dir))
+	 adjust_badness(hd)
+	 if (c=='hbox' or gc=='adjusted_hbox') and 
+	    not node_next(hd) and getid(hd)==id_whatsit and 
+	    getsubtype(hd)==sid_user and getfield(hd, 'user_id')==DIR then
+	       -- avoid double whatsit
+	       set_attr(hd, attr_icflag, PROCESSED_BEGIN_FLAG)
+	       tex_set_attr('global', attr_icflag, 0)
+	       return h
+	 else
+	    return to_node(create_dir_whatsit(hd, gc, ltjs.list_dir))
+	 end
       end
    end
 
@@ -698,7 +717,6 @@ end
 
 -- \ifydir, \iftdir, \ifddir
 do
-   local cat_lp = luatexbase.catcodetables['latex-package']
    local getbox = tex.getbox
    local function dir_conditional(n, mode)
       local s = getbox(n)
@@ -833,6 +851,7 @@ do
 	 end
 	 split_dir_whatsit=nil
       else
+	 adjust_badness(hd)
 	 hd = process_dir_node(create_dir_whatsit_vbox(hd, gc), gc)
 	 split_dir_whatsit=nil
       end

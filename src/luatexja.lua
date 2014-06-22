@@ -113,12 +113,19 @@ local load_module = luatexja.load_module
 load_module('base');      local ltjb = luatexja.base
 load_module('rmlgbm');    local ltjr = luatexja.rmlgbm -- must be 1st
 
+if luatexja_debug then load_module('debug') end
+
+load_module('charrange'); local ltjc = luatexja.charrange
+load_module('jfont');     local ltjf = luatexja.jfont
+
 -- define_font
 do
    local otfl_fdr = fonts.definers.read
    local ltjr_font_callback = ltjr.font_callback
+   local ltjf_extract_metric = ltjf.extract_metric
    function luatexja.font_callback(name, size, id)
-      local res =  ltjr_font_callback(name, size, id, otfl_fdr)
+      local new_name = ltjf_extract_metric(name)
+      local res =  ltjr_font_callback(new_name, size, id, otfl_fdr)
       luatexbase.call_callback('luatexja.define_font', res, name, size, id)
       return res
    end
@@ -126,9 +133,7 @@ do
    luatexbase.add_to_callback('define_font',luatexja.font_callback,"luatexja.font_callback", 1)
 end
 
-if luatexja_debug then load_module('debug') end
-load_module('charrange'); local ltjc = luatexja.charrange
-load_module('jfont');     local ltjf = luatexja.jfont
+
 load_module('inputbuf');  local ltji = luatexja.inputbuf
 load_module('stack');     local ltjs = luatexja.stack
 load_module('pretreat');  local ltjp = luatexja.pretreat
@@ -302,6 +307,7 @@ function luatexja.ext_print_global()
    if luatexja.isglobal=='global' then tex.sprint(cat_lp, '\\global') end
 end
 
+
 -- main process
 do
    local start_time_measure, stop_time_measure 
@@ -310,10 +316,10 @@ do
    local nullfunc = function (n) return n end
    local to_node = (Dnode ~= node) and Dnode.tonode or nullfunc
    local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
-   local time_jfm, time_width = 0,0 
+   local tex_set_attr = tex.setattribute
    -- mode = true iff main_process is called from pre_linebreak_filter
    local function main_process(head, mode, dir, gc)
-      tex.setattribute('global', attr_icflag, 0)
+      tex_set_attr('global', attr_icflag, 0)
       if gc == 'fin_row' then return head
       else
 	    local p = to_direct(head)
@@ -329,7 +335,7 @@ do
    local function adjust_icflag(h)
       -- kern from luaotfload will have icflag = 1
       -- (same as italic correction)
-      tex.setattribute('global', attr_icflag, 1)
+      tex_set_attr('global', attr_icflag, 1)
       return h
    end
 
@@ -523,3 +529,4 @@ function luatexja.ext_show_node(head,depth,print_fn)
 end
 
 end
+

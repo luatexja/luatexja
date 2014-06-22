@@ -40,7 +40,7 @@ local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_find_char_class = ltjf.find_char_class
 local node_new = Dnode.new
 local node_copy = Dnode.copy
-local node_remove = luatexja.Dnode_remove -- Dnode.remove
+local node_remove = Dnode.remove
 local node_tail = Dnode.tail
 local node_free = Dnode.free
 local node_end_of_math = Dnode.end_of_math
@@ -994,9 +994,10 @@ do
    end
 end
 
+local tex_set_attr = tex.setattribute
 local function cleanup(mode)
    -- adjust attr_icflag for avoiding error
-   tex.setattribute('global', attr_icflag, 0)
+   tex_set_attr('global', attr_icflag, 0)
    node_free(kanji_skip); node_free(xkanji_skip)
    if mode then
       local h = node_next(head)

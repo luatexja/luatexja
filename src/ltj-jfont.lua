@@ -289,38 +289,49 @@ end
 
 do
    -- extract jfm_file_name and jfm_var
+   -- normalize position of 'jfm=' and 'jfmvar=' keys
    local function extract_metric(name)
-      local basename=name
-      local tmp = utf.sub(basename, 1, 5)
       jfm_file_name = ''; jfm_var = ''
+      local tmp, index = name:sub(1, 5), 1
       if tmp == 'file:' or tmp == 'name:' or tmp == 'psft:' then
-	 basename = utf.sub(basename, 6)
+	 index = 6
       end
-      local p = utf.find(basename, ":")
-      if p then
-	 basename = utf.sub(basename, p+1)
-      else return
-      end
-      -- now basename contains 'features' only.
-      p=1
-      while p do
-	 local q = utf.find(basename, ";", p+1) or utf.len(basename)+1
-	 if utf.sub(basename, p, p+3)=='jfm=' and q>p+4 then
-	    jfm_file_name = utf.sub(basename, p+4, q-1)
-	 elseif utf.sub(basename, p, p+6)=='jfmvar=' and q>p+6 then
-	    jfm_var = utf.sub(basename, p+7, q-1)
+      local p = name:find(":", index); index = p and (p+1) or index
+      while index do
+	 local l = name:len()+1
+	 local q = name:find(";", index+1) or l
+	 if name:sub(index, index+3)=='jfm=' and q>index+4 then
+	    jfm_file_name = name:sub(index+4, q-1)
+	    if l~=q then
+	       name = name:sub(1,index-1) .. name:sub(q+1)
+	    else
+	       name = name:sub(1,index-1)
+	       index = nil
+	    end
+	 elseif name:sub(index, index+6)=='jfmvar=' and q>index+6 then
+	    jfm_var = name:sub(index+7, q-1)
+	    if l~=q then
+	       name = name:sub(1,index-1) .. name:sub(q+1)
+	    else
+	       name = name:sub(1,index-1)
+	       index = nil
+	    end
+	 else
+	    index = (l~=q) and (q+1) or nil
 	 end
-	 if utf.len(basename)+1==q then p = nil else p = q + 1 end
       end
-      return
+      if jfm_file_name~='' then
+	 local l = name:sub(-1)
+	 name = name 
+	    .. ((l==':' or l==';') and '' or ';')
+	    .. 'jfm=' .. jfm_file_name
+	 if jfm_var~='' then
+	    name = name .. 'jfmvar=' .. jfm_var
+	 end
+      end
+      return name
    end
-
-   -- replace fonts.define.read()
-   luatexbase.add_to_callback('luatexja.define_font',
-			      function (res, name)
-				 extract_metric(name)
-			      end,
-			      'extract_jfm_name', 1)
+   luatexja.jfont.extract_metric = extract_metric
 end
 
 ------------------------------------------------------------------------

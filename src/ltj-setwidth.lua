@@ -18,7 +18,7 @@ local getsubtype = (Dnode ~= node) and Dnode.getsubtype or function(n) return n.
 
 local node_traverse = Dnode.traverse
 local node_new = Dnode.new
-local node_remove = luatexja.Dnode_remove -- Dnode.remove
+local node_remove = Dnode.remove
 local node_tail = Dnode.tail
 local node_next = (Dnode ~= node) and Dnode.getnext or node.next
 local has_attr = Dnode.has_attribute
@@ -179,6 +179,7 @@ local function capsule_glyph_math(p, met, class)
 end
 luatexja.setwidth.capsule_glyph_math = capsule_glyph_math
 
+local tex_set_attr = tex.setattribute
 function luatexja.setwidth.set_ja_width(ahead, adir)
    local p = ahead; head  = p; dir = adir or 'TLT'
    local m = false -- is in math mode?
@@ -223,7 +224,7 @@ function luatexja.setwidth.set_ja_width(ahead, adir)
       end
    end
    -- adjust attr_icflag
-   tex.setattribute('global', attr_icflag, 0)
+   tex_set_attr('global', attr_icflag, 0)
    return head
 end
 

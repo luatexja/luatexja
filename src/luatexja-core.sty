@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2014/02/01 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2014/06/22 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -100,11 +100,6 @@
      at least beta-0.74.0 is needed}
     {Package loading is aborted now.\MessageBreak}
 \expandafter\endinput\fi\relax
-
- \@PackageInfoNoLine{luatexja-core}
-    {using\space%
-  \directlua{if node.direct==node then tex.write('traditional node')
-  else tex.write('DIRECT') end} node access model}
 
 %! なお、luatexbase-compat の説明に従うと、LuaTeX 拡張プリミティブは
 %! plain/LaTeX の両方で \luatex 付の名前（\directlua はそのまま)
@@ -571,10 +566,22 @@
 %%%% hbox, vbox, vtop
 \everyhbox{%
   \ifcase\ltj@dir@count\or\dtou\or\or\tate\or\yoko\fi
+  \aftergroup\ltj@@reset@badness
 }
 \everyvbox{%
   \ifcase\ltj@dir@count\or\dtou\or\or\tate\or\yoko\fi
+  \aftergroup\ltj@@reset@badness
 }
+\protected\def\ltj@@reset@badness{%
+  \directlua{%
+    if luatexja.global_temp then
+      tex.hbadness= tex.hbadness or luatexja.hbadness_temp
+      tex.vbadness= tex.vbadness or luatexja.vbadness_temp
+      tex.globaldefs= luatexja.global_temp or tex.globaldefs
+    end
+  }%
+}
+
 
 %%%% unhbox and unvbox
 \let\ltj@@orig@unhbox=\unhbox

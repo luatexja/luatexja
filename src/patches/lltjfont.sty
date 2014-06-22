@@ -268,6 +268,7 @@
   \ltj@@EverySelectfont@Init
 }
 \def\ltj@selectfont@patch{%
+ \directlua{luatexja.base.start_time_measure('selectfont')}%
  \let\tmp@error@fontshape\error@fontshape
   \let\error@fontshape\error@kfontshape
   \directlua{luatexja.jfont.is_kyenc('\luatexluaescapestring{\k@encoding}')}\ifin@%
@@ -322,6 +323,7 @@
        % 警告: 再び \selectfont を呼んでいる．無限ループの可能性あり
     \fi
   \fi
+  \directlua{luatexja.base.stop_time_measure('selectfont')}%
 }
 \EverySelectfont{\ltj@selectfont@patch}
 
@@ -578,7 +580,7 @@
     \ltj@@does@alt@set{\f@encoding/\f@family/\f@series/\f@shape}%
       \edef\external@font{\expandafter\ltj@@patch@external@font\external@font}%
     \fi
-    \expandafter\globaljfont\font@name\external@font\relax
+    \expandafter\globaljfont\font@name\external@font\relax% ここで時間がかかる
     \font@name%\global\zw=\zw\global\zh=\zh
     \csname \f@encoding+\f@family\endcsname
     \csname\curr@fontshape\endcsname}
