@@ -126,7 +126,7 @@ do
    function luatexja.font_callback(name, size, id)
       local new_name = ltjf_extract_metric(name)
       local res =  ltjr_font_callback(new_name, size, id, otfl_fdr)
-      luatexbase.call_callback('luatexja.define_font', res, name, size, id)
+      luatexbase.call_callback('luatexja.define_font', res, new_name, size, id)
       return res
    end
    luatexbase.create_callback('luatexja.define_font', 'simple', function (n) return n end)

@@ -11,7 +11,6 @@ module('luatexja.jfont', package.seeall)
 luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('charrange'); local ltjc = luatexja.charrange
 
-local mem_leak_glue, mem_leak_gs, mem_leak_kern = 0, 0, 0
 
 local Dnode = node.direct or node
 
@@ -235,7 +234,7 @@ do
       local t = token.get_next()
       cstemp=token.csname_name(t)
       global_flag = g and '\\global' or ''
-      tex.sprint(cat_lp, '\\expandafter\\font\\csname ' .. cstemp .. '\\endcsname')
+      tex.sprint(cat_lp, '\\expandafter\\font\\csname ', cstemp, '\\endcsname')
    end
 
    luatexbase.create_callback("luatexja.define_jfont", "data", function (ft, fn) return ft end)
@@ -252,8 +251,8 @@ do
 			    "bad JFM `" .. jfm_file_name .. "'",
 			    'The JFM file you specified is not valid JFM file.\n'..
 			       'So defining Japanese font is cancelled.')
-	 tex.sprint(cat_lp, global_flag .. '\\expandafter\\let\\csname ' ..cstemp
-		       .. '\\endcsname=\\relax')
+	 tex.sprint(cat_lp, global_flag, '\\expandafter\\let\\csname ', cstemp,
+		       '\\endcsname=\\relax')
 	 return
       end
       update_jfm_cache(j, f.size)
@@ -269,9 +268,9 @@ do
 
       fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
       font_metric_table[fn]=fmtable
-      tex.sprint(cat_lp, global_flag .. '\\protected\\expandafter\\def\\csname '
-		    .. cstemp  .. '\\endcsname{\\ltj@cur'
-		    .. (dir == 'yoko' and 'j' or 't') .. 'fnt=' .. fn .. '\\relax}')
+      tex.sprint(cat_lp, global_flag, '\\protected\\expandafter\\def\\csname ',
+		    cstemp , '\\endcsname{\\ltj@cur'..
+		    (dir == 'yoko' and 'j' or 't') .. 'fnt', fn, '\\relax}')
    end
 end
 

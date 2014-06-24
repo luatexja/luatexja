@@ -199,7 +199,8 @@
 \protected\def\/{\relax\directlua{luatexja.jfont.append_italic()}}
 
 %%%%%%%% \jfont\CS={...:...;jfm=metric;...}, \globaljfont
-\protected\def\jfont{\afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false)}}
+\protected\def\jfont{%
+  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false)}}
 \protected\def\globaljfont{%
   \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true)}}
 \def\ltj@@jfont{\directlua{luatexja.jfont.jfontdefY('yoko')}}

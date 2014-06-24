@@ -296,25 +296,25 @@ local function mk_rml(name, size, id)
 end
 
 local function font_callback(name, size, id, fallback)
-   local p = utf.find(name, ":") or utf.len(name)+1
-   if utf.sub(name, 1, p-1) == 'psft' then
+   local p = name:find(":") or name:len()+1
+   if name:sub(1, p-1) == 'psft' then
       local s = "Adobe-Japan1-6"
-      local basename = utf.sub(name,p+1)
-      local p = utf.find(basename, ":")
-      local q = utf.find(basename, "/[BI][BI]?")
+      local basename = name:sub(p+1)
+      local p = basename:find(":")
+      local q = basename:find("/[BI][BI]?")
       if q and p and q<=p then
-	 basename = utf.gsub(basename, '/[BI][BI]?', '', 1)
-	 p = utf.find(basename, ":")
+	 basename = basename:gsub('/[BI][BI]?', '', 1)
+	 p = basename:find(":")
       end
       if p then
-	 local xname = utf.sub(basename, p+1)
+	 local xname = basename:sub(p+1)
 	 p = 1
 	 while p do
-	    local q = utf.find(xname, ";", p+1) or utf.len(xname)+1
-	    if utf.sub(xname, p, p+3)=='cid=' and q>p+4 then
-	       s = utf.sub(xname, p+4, q-1)
+	    local q = xname:find(";", p+1) or xname:len()+1
+	    if xname:sub(p, p+3)=='cid=' and q>p+4 then
+	       s = xname:sub(p+4, q-1)
 	    end
-	    if utf.len(xname)+1==q then p = nil else p = q + 1 end
+	    if xname:len()+1==q then p = nil else p = q + 1 end
 	 end
       end
       cid_reg, cid_order = string.match(s, "^(.-)%-(.-)%-(%d-)$")
