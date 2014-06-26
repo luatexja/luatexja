@@ -84,11 +84,9 @@ do
          elseif uid==DIR then
 	    if has_attr(p, attr_icflag)<PROCESSED_BEGIN_FLAG  then
 	       ltjs.list_dir = has_attr(p, attr_dir)
-	       if not node_next(p) and real_head==p then
-		  return p, true
-	       end
+	    else
+	       wtd[#wtd+1] = p; node_remove(head, p)
 	    end
-	    wtd[#wtd+1] = p; node_remove(head, p)
          end
       end
       return p
@@ -104,11 +102,7 @@ do
       while p do
 	 local flag
 	 local pfunc = suppress_hyphenate_ja_aux[getid(p)]
-	 if pfunc then p, flag = pfunc(p) end
-	 if flag then 
-	    stop_time_measure('ltj_hyphenate')
-	    return h
-	 end
+	 if pfunc then p = pfunc(p) end
 	 p = node_next(p)
       end
       stop_time_measure('ltj_hyphenate'); start_time_measure('tex_hyphenate')

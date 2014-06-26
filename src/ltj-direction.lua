@@ -90,6 +90,12 @@ do
 	 and w.user_id==DIR then
 	    node_set_attr(w, attr_dir, v)
 	 end
+      elseif tex.currentgrouptype==6 then
+	 ltjb.package_error(
+                 'luatexja',
+                 "You can't use `\\" .. name .. "' in an align",
+		 "To change direction in an align, \n"
+		    .. "you shold use \\hbox or \\vbox.")
       else
 	 local w = node_next(lv.head)
 	 if w then
@@ -126,6 +132,7 @@ local function create_dir_whatsit(hd, gc, new_dir)
       set_attr(hd, attr_icflag, 
 	       (has_attr(hd, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG 
 		  + PROCESSED_BEGIN_FLAG)
+      tex_set_attr('global', attr_icflag, 0)
       return hd
    else
       local w = node_new(id_whatsit, sid_user)
@@ -133,11 +140,11 @@ local function create_dir_whatsit(hd, gc, new_dir)
       setfield(w, 'user_id', DIR)
       setfield(w, 'type', 110)
       set_attr(w, attr_dir, new_dir)
-      tex_set_attr('global', attr_dir, 0)  
       set_attr(w, attr_icflag, PROCESSED_BEGIN_FLAG)
       set_attr(hd, attr_icflag, 
 	       (has_attr(hd, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG 
 		  + PROCESSED_BEGIN_FLAG)
+      tex_set_attr('global', attr_dir, 0)
       tex_set_attr('global', attr_icflag, 0)
       return w
    end
@@ -170,10 +177,12 @@ do
       -- start 側は ltj-debug.lua に
       local new_dir, hd = ltjs.list_dir, to_direct(h)
       for line in traverse_id(id_hlist, hd) do
+         local nh = getlist(line)
+	 setfield(line, 'head', create_dir_whatsit(nh, gc, new_dir) )
 	 set_attr(line, attr_dir, new_dir)
       end
       tex_set_attr('global', attr_dir, 0)
-      return h --to_node(create_dir_whatsit(hd, gc, new_dir))
+      return h 
    end
    luatexbase.add_to_callback('post_linebreak_filter', 
 			      create_dir_whatsit_parbox, 'ltj.create_dir_whatsit', 10000)
@@ -364,7 +373,7 @@ do
    }
 end
 
--- b に DIR whatsit があればその内容を attr_dir にうつす (1st ret val)
+-- 1st ret val: b の組方向
 -- 2nd ret val はその DIR whatsit
 local function get_box_dir(b, default)
    start_time_measure('get_box_dir')
@@ -376,11 +385,7 @@ local function get_box_dir(b, default)
       if bh and getid(bh)==id_whatsit
       and getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR then
 	 c = bh
-	 if dir==0 then
-	    dir = has_attr(bh, attr_dir)
-	    set_attr(b, attr_dir, dir)
-	    tex_set_attr('global', attr_dir, 0)
-	 end
+	 dir = (dir==0) and has_attr(bh, attr_dir) or dir
       end
       bh = node_next(bh)
    end
@@ -397,6 +402,8 @@ do
       if b then
 	 local box_dir = get_box_dir(to_direct(b), dir_yoko)
 	 if box_dir%dir_node_auto ~= list_dir%dir_node_auto then
+	    luatexja.ext_show_node_list(tex.nest[tex.nest.ptr].head, 'LIST> ', print)
+	    luatexja.ext_show_node_list(b, 'BOX> ', print)
 	    ltjb.package_error(
 	       'luatexja',
 	       "Incompatible direction list can't be unboxed",
@@ -449,12 +456,13 @@ local function create_dir_node(b, b_dir, new_dir, is_manual)
    local w = getfield(b, 'width')
    local h = getfield(b, 'height')
    local d = getfield(b, 'depth')
-   local db = node_new(getid(b))
+   local db = node_new(getid(b)) -- dir_node
    set_attr(db, attr_dir, 
 	    new_dir + (is_manual and dir_node_manual or dir_node_auto))
-   tex_set_attr('global', attr_dir, 0)
    set_attr(db, attr_icflag, PROCESSED)
    set_attr(b, attr_icflag, PROCESSED)
+   tex_set_attr('global', attr_dir, 0)
+   tex_set_attr('global', attr_icflag, 0)
    setfield(db, 'dir', getfield(b, 'dir'))
    setfield(db, 'shift', 0)
    setfield(db, 'width',  info.width(w,h,d))
@@ -474,9 +482,12 @@ do
       local bh = getlist(b)
       local box_dir, dn =  get_box_dir(b, ltjs.list_dir)
       -- 既に b の中身にあるwhatsit
+
       if box_dir==new_dir then
+	 -- 組方向が一緒のボックスなので，何もしなくて良い
 	 return head, node_next(b), b, false
       elseif  box_dir%dir_node_auto == new_dir  then
+	 -- dir_node としてカプセル化されている
 	 local bc = node_next(node_next(node_next(bh)))
 	 local _, dnc = get_box_dir(b, 0)
 	 if dnc then -- free all other dir_node
@@ -486,12 +497,14 @@ do
 	 set_attr(b, attr_dir, box_dir%dir_node_auto + dir_node_auto)
 	 return head, node_next(b), b, true
       else
+	 -- 組方向を合わせる必要あり
          local nh, nb, ret, flag
 	 if box_dir>= dir_node_auto then -- unwrap
 	    local b_dir
             head, nb, b, b_dir = unwrap_dir_node(b, head, box_dir)
 	    bh = getlist(b)
-	    if b_dir==new_dir then -- no need to create new dir_node
+	    if b_dir==new_dir then
+	       -- dir_node の中身が周囲の組方向とあっている
 	       return head, nb, b, false 
 	    else box_dir = b_dir end
 	 end
@@ -561,12 +574,17 @@ do
 	 local bid = getid(b)
 	 if bid==id_hlist or bid==id_vlist then
 	    local box_dir =  get_box_dir(b, 0)
-	    if box_dir>= dir_node_auto then -- unwrap
+	    if box_dir>= dir_node_auto then -- unwrap dir_node
 	       local p = node_prev(b)
 	       local dummy1, dummy2, nb = unwrap_dir_node(b, nil, box_dir)
 	       setfield(p, 'next', nb);  tex_nest[tex_nest.ptr].tail = to_node(nb)
 	       setfield(b, 'next', nil); setfield(b, 'head', nil)
-	       node_free(b)
+	       node_free(b); b = nb
+	    end
+	    local _, wh =  get_box_dir(b, 0) -- clean dir_node attached to the box
+	    if wh then
+	       Dnode.flush_list(getfield('value', wh))
+	       setfield(wh, 'value', nil)
 	    end
 	 end
       end
@@ -607,7 +625,7 @@ do
       if s then
          local l_dir = get_dir_count()
          s = to_direct(s)
-         local b_dir = has_attr(s, attr_dir) or 0
+         local b_dir = get_box_dir(s,dir_yoko)
          if b_dir<dir_node_auto then
             get_box_dim_common(key, s, l_dir)
          elseif b_dir%dir_node_auto==l_dir then
@@ -670,10 +688,11 @@ do
       if s then
 	 local l_dir = get_dir_count()
 	 s = to_direct(s)
-         local b_dir = has_attr(s, attr_dir) or 0
+         local b_dir = get_box_dir(s,dir_yoko)
          if b_dir<dir_node_auto then
             set_box_dim_common(key, s, l_dir)
 	 elseif b_dir%dir_node_auto == l_dir then
+	    -- s is dir_node
 	    setfield(s, key, tex.getdimen('ltj@tempdima'))
 	    if b_dir<dir_node_manual then
 	       set_attr(s, attr_dir, b_dir%dir_node_auto + dir_node_manual)
@@ -681,7 +700,7 @@ do
          else
 	    local sid, sl = getid(s), getlist(s)
 	    local b = node_next(node_next(node_next(sl)))
-	    local info = dir_node_aux[get_box_dir(b)][b_dir%dir_node_auto]
+	    local info = dir_node_aux[get_box_dir(b,dir_yoko)][b_dir%dir_node_auto]
 	    local shift_old
 	    for _,v in ipairs(info[sid]) do 
 	       if v[1]=='box' then
@@ -849,8 +868,9 @@ do
 	 if split_dir_whatsit then
 	    -- adjust direction of 'split_keep'
 	    set_attr(split_dir_whatsit, attr_dir, ltjs.list_dir)
-	    tex_set_attr('global', attr_dir, 0)
 	 end
+	 split_dir_whatsit=nil
+      elseif gc=='preamble' then
 	 split_dir_whatsit=nil
       else
 	 adjust_badness(hd)
