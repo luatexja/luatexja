@@ -11,6 +11,9 @@ local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
 luatexja.load_module('base');      local ltjb = luatexja.base
 
+--------------------------------------------------------------------------------
+-- stack table (obeys TeX's grouping)
+--------------------------------------------------------------------------------
 local node_new = node.new
 local id_whatsit = node.id('whatsit')
 local sid_user = node.subtype('user_defined')
@@ -45,20 +48,6 @@ function get_stack_level(is_v)
    end
    return i
 end
-
--- local function table_to_str(v)
---    local s = ''
---    for i, a in pairs(v) do
---       s = s .. i .. "=" .. tostring(a) .. ', '
---    end
---    return s
--- end
--- function print_stack_table(i)
---    print('\n>>> get_stack_level:')
---    for k, v in pairs(charprop_stack_table[i]) do
---       print("  " , k, type(k), table_to_str(v));
---    end
--- end
 
 function set_stack_table(m,p, is_v)
    local i = get_stack_level(is_v)
@@ -139,6 +128,13 @@ function get_stack_table(mc, d, idx)
    local i = charprop_stack_table[idx][mc]
    return i or d
 end
+
+
+--------------------------------------------------------------------------------
+-- nest table (obeys TeX's semantic nest)
+--------------------------------------------------------------------------------
+nest_table = {}
+local nest_table = nest_table
 
 
 -- EOF

@@ -57,7 +57,7 @@ local dir_dtou = luatexja.dir_table.dir_dtou
 local dir_node_auto   = luatexja.dir_table.dir_node_auto
 local dir_node_manual = luatexja.dir_table.dir_node_manual
 
-
+local page_direction
 --
 local function adjust_badness(hd)
    if not node_next(hd) and getid(hd)==id_whatsit and getsubtype(hd)==sid_user
@@ -76,20 +76,41 @@ end
 local get_dir_count
 -- \tate, \yoko
 do
+   local function get_dir_count_inner(h)
+      if h then
+	 if h.id==id_whatsit and h.subtype==sid_user and h.user_id==DIR then
+	       local ic = node.has_attribute(h, attr_icflag)
+	       return (ic<PROCESSED_BEGIN_FLAG) and (node.has_attribute(h,attr_dir)%dir_node_auto) or 0
+	 else
+	    return 0
+	 end
+      else
+	 return 0
+      end
+   end
    function get_dir_count()
-      return tex_getcount('ltj@dir@count')
+      for i=tex_nest.ptr, 1, -1 do
+	 local h = tex_nest[i].head.next
+	 --luatexja.ext_show_node_list(h, 'GDR'..  i .. '> ', print)
+	 if h then
+	    local t = get_dir_count_inner(h)
+	    if t~=0 then return t end
+	 end
+      end
+      return page_direction
    end
    luatexja.direction.get_dir_count = get_dir_count 
 
    local node_next = node.next
    local node_set_attr = node.set_attribute
    local function set_list_direction(v, name)
-      local lv, w = tex_nest[tex_nest.ptr], tex.lists.page_head
-      if lv.mode == 1 and w then
+      local lv, w = tex_nest.ptr, tex.lists.page_head
+      if lv==0 and w then
 	 if w.id==id_whatsit and w.subtype==sid_user
 	 and w.user_id==DIR then
 	    node_set_attr(w, attr_dir, v)
 	 end
+	 page_direction = v
       elseif tex.currentgrouptype==6 then
 	 ltjb.package_error(
                  'luatexja',
@@ -97,7 +118,7 @@ do
 		 "To change direction in an align, \n"
 		    .. "you shold use \\hbox or \\vbox.")
       else
-	 local w = node_next(lv.head)
+	 local w = node_next(tex_nest[lv].head)
 	 if w then
 	    w = to_direct(w)
 	    if getid(w)==id_whatsit and getsubtype(w)==sid_user
@@ -452,6 +473,7 @@ end
 
 -- is_manual: 寸法変更に伴うものか？
 local function create_dir_node(b, b_dir, new_dir, is_manual)
+   print('create new node', b_dir, new_dir)
    local info = dir_node_aux[b_dir][new_dir]
    local w = getfield(b, 'width')
    local h = getfield(b, 'height')
@@ -497,6 +519,7 @@ do
 	 set_attr(b, attr_dir, box_dir%dir_node_auto + dir_node_auto)
 	 return head, node_next(b), b, true
       else
+	 --luatexja.ext_show_node_list(to_node(b), 'mkd> ', print)
 	 -- 組方向を合わせる必要あり
          local nh, nb, ret, flag
 	 if box_dir>= dir_node_auto then -- unwrap
@@ -911,12 +934,14 @@ do
       if info=='box' then
 	 local head = to_direct(tex.lists.contrib_head)
 	 local nb
-	 head, _, nb
-	    = make_dir_whatsit(head, 
-			       node_tail(head),
-			       get_dir_count(), 
-			       'buildpage')
-	 tex.lists.contrib_head = to_node(head)
+	 if head then
+	    head, _, nb
+	       = make_dir_whatsit(head, 
+				  node_tail(head),
+				  get_dir_count(), 
+				  'buildpage')
+	    tex.lists.contrib_head = to_node(head)
+	 end
       end
    end
    luatexbase.add_to_callback('buildpage_filter',
