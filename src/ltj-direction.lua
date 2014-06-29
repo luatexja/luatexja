@@ -74,13 +74,13 @@ local function adjust_badness(hd)
 end
 
 local get_dir_count
--- \tate, \yoko
 do
    local function get_dir_count_inner(h)
       if h then
 	 if h.id==id_whatsit and h.subtype==sid_user and h.user_id==DIR then
 	       local ic = node.has_attribute(h, attr_icflag)
-	       return (ic<PROCESSED_BEGIN_FLAG) and (node.has_attribute(h,attr_dir)%dir_node_auto) or 0
+	       return (ic<PROCESSED_BEGIN_FLAG) 
+		  and (node.has_attribute(h,attr_dir)%dir_node_auto) or 0
 	 else
 	    return 0
 	 end
@@ -99,18 +99,36 @@ do
       end
       return page_direction
    end
-   luatexja.direction.get_dir_count = get_dir_count 
+   luatexja.direction.get_dir_count = get_dir_count
+end
 
+-- \ifydir etc.
+do
+   local cs_true, cs_false = '\\iftrue', '\\iffalse'
+   luatexja.direction.dir_conditional = function(v)
+      local d = get_dir_count()
+      print(d,v)
+      tex.sprint(cat_lp, (d==v) and cs_true or cs_false )
+   end
+end
+
+-- \tate, \yoko
+do
    local node_next = node.next
    local node_set_attr = node.set_attribute
    local function set_list_direction(v, name)
       local lv, w = tex_nest.ptr, tex.lists.page_head
       if lv==0 and w then
-	 if w.id==id_whatsit and w.subtype==sid_user
-	 and w.user_id==DIR then
-	    node_set_attr(w, attr_dir, v)
+	 if (not w.next) and 
+	    w.id==id_whatsit and w.subtype==sid_user and w.user_id==DIR then
+	    node_set_attr(w, attr_dir, v); page_direction = v
+	 else
+              ltjb.package_error(
+                 'luatexja',
+                 "Use `\\" .. name .. "' at top of list",
+                 'Direction change command by LuaTeX-ja is available\n'
+		    .. 'only when the current list is null.')
 	 end
-	 page_direction = v
       elseif tex.currentgrouptype==6 then
 	 ltjb.package_error(
                  'luatexja',
@@ -118,12 +136,12 @@ do
 		 "To change direction in an align, \n"
 		    .. "you shold use \\hbox or \\vbox.")
       else
-	 local w = node_next(tex_nest[lv].head)
+	 print(v, name, tex_nest[lv].head.next)
+	 local w = tex_nest[lv].head.next
 	 if w then
-	    w = to_direct(w)
-	    if getid(w)==id_whatsit and getsubtype(w)==sid_user
-	    and getfield(w, 'user_id')==DIR then
-	       set_attr(w, attr_dir, v)
+	    if (not w.next) and 
+	       w.id==id_whatsit and w.subtype==sid_user and w.user_id==DIR then
+	       node_set_attr(w, attr_dir, v)
 	    else
               ltjb.package_error(
                  'luatexja',
@@ -473,7 +491,7 @@ end
 
 -- is_manual: 寸法変更に伴うものか？
 local function create_dir_node(b, b_dir, new_dir, is_manual)
-   print('create new node', b_dir, new_dir)
+   --print('create new node', b_dir, new_dir)
    local info = dir_node_aux[b_dir][new_dir]
    local w = getfield(b, 'width')
    local h = getfield(b, 'height')
@@ -762,7 +780,7 @@ end
 -- \ifydir, \iftdir, \ifddir
 do
    local getbox = tex.getbox
-   local function dir_conditional(n, mode)
+   local function box_dir_conditional(n, mode)
       local s = getbox(n)
       local res = false
       if s then
@@ -778,7 +796,7 @@ do
       end
       tex.sprint(cat_lp, '\\if' .. tostring(res))
    end
-   luatexja.direction.dir_conditional = dir_conditional
+   luatexja.direction.box_dir_conditional = box_dir_conditional
 end
 
 -- 縦書き用字形への変換テーブル

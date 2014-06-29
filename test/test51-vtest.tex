@@ -1,8 +1,9 @@
-%#!luatex
+%#!luajittex
 
 \directlua{luatexja_debug = 1}
 \input luatexja.sty
 %\input lua-visual-debug.sty
+
 
 \catcode`\@=11
 \newdimen\@tempdima
@@ -49,6 +50,7 @@
 \vrule width 4pt height 0pt depth 4pt}
 
 \message{^^JTATE, DTOU IN YOKO (HMODE))^^J}
+\yoko
 \hbox{\yoko
   横水平\H\vrule\hbox{\yoko 横水平\H }\vrule かき◆
   \vrule\hbox{\tate 縦水平\H }\message{HOGE}◆おおおお\vrule
@@ -65,7 +67,8 @@
 }
 \hbox{\yoko
   ああ\setbox0=\vtop{\yoko\hsize=30mm \ifhmode\message{H}\else\message{V}\fi 横垂直\H ああああああああああ\hfill\H}%
-  {\tracingonline1\showboxdepth2\showboxbreadth100\showbox0}かき◆\copy0 ◆
+  {\tracingonline1\showboxdepth2\showboxbreadth100\showbox0}%
+  かき◆\copy0 ◆
 }
 
 \vfill\eject
@@ -176,7 +179,7 @@
 \vbox{\tate\hsize100mm
 \tfont\f=KozMinPr6N-Regular.otf:+vert;jfm=ujisv \f
 
-\ltjsetparameter{yalbaselineshift=.25em}\baselineskip15pt
+\ltjsetparameter{yalbaselineshift=.25em}\baselineskip15pt\parindent\zw
 \LaTeX の特徴として、テキストファイルであるソースコードを入力として処理することでDVIや
 PDFなどの表示形式を出力として得ることが挙げられる。
 
@@ -193,7 +196,7 @@ PDFなどの表示形式を出力として得ることが挙げられる。
 変えることができるなど、文書内容データの再利用性が高い。一度スタイル設定を決めてしまえば、
 あとは文書内容の記述に専念することができるという利点もある。論文などの投稿では、学術雑
 誌のスタイルを記述したファイル（パッケージファイル）を Web からダウンロードして利用するこ
-とで、統一されたスタイルで論文xを投稿することができ、論文の投稿者と雑誌の編集者とのやり取り
+とで、統一されたスタイルで論文を投稿することができ、論文の投稿者と雑誌の編集者とのやり取り
 を簡略化できる。Kile、TeXShop、TeXworks、EasyTeX、WinShell などの \TeX 用エ
 ディタや、野鳥（やてふ、YaTeX）、TeXlipse、KaTeX（花鳥、かてふ）、祝鳥
 （のりてふ）、M's TeX Helper 2など の\TeX 用テキストエディタマクロを兼用することに
@@ -287,11 +290,15 @@ abc&かきくけこ&xyz\cr}}%
 \setbox0=\hbox{\yoko pF}
 \setbox1=\hbox{\tate\box0}
 \fbox{\copy1}
-\unhcopy1\setbox1=\lastbox %% box1: dir_node
+\unhcopy1\setbox1=\lastbox
+{\obeylines\seventt\baselineskip=10pt
+\directlua{luatexja.ext_show_node_list(tex.box[1], 'lastbox>   ', tex.print)}\par}
 \setbox0=\hbox{\yoko \ltjsetwd1=50pt}
+{\obeylines\seventt\baselineskip=10pt
+\directlua{luatexja.ext_show_node_list(tex.box[1], 'dir node1> ', tex.print)}\par}
 \setbox0=\hbox{\dtou \ltjsetwd1=2pt}
 {\obeylines\seventt\baselineskip=10pt
-\directlua{luatexja.ext_show_node_list(tex.box[1], 'dir node>  ', tex.print)}\par}
+\directlua{luatexja.ext_show_node_list(tex.box[1], 'dir node2> ', tex.print)}\par}
 
 \setbox0=\hbox{\yoko \ltjsetht1=30pt}
 {\obeylines\seventt\baselineskip=10pt
@@ -336,6 +343,9 @@ p\kern-.15em\TeX\ bug (2011-02-24)
 \def\R{０１２３４５６７８９０１２３４５６７８９０１２３４５６７８９}
 \vbox{\tate\hsize=4\zw\R\R\R\R}
 ABCDE
+
+%\tracingall
+\hbox{\tate {\dtou 感じ\ifddir D\fi\iftdir T\fi}\ifddir D\fi\iftdir T\fi}
 
 \end
 

@@ -532,22 +532,20 @@
 
 
 %%%%%%%% \yoko, \tate, \ifydir, \iftdir
-\newif\ifydir
-\newif\iftdir
-\newif\ifddir
 \protected\def\tate{%
   \directlua{luatexja.direction.set_list_direction(3, 'tate')}%
-  \ltj@reset@globaldefs\ltj@dir@count=3\relax
-  \ifvmode\ltj@adjdir@count=3\fi\tdirtrue\ydirfalse\ddirfalse\ltj@restore@globaldefs}
+}
 \protected\def\yoko{%
   \directlua{luatexja.direction.set_list_direction(4, 'yoko')}%
-  \ltj@reset@globaldefs\ltj@dir@count=4\relax
-  \ifvmode\ltj@adjdir@count=4\fi\ydirtrue\tdirfalse\ddirfalse\ltj@restore@globaldefs}
+}
 \protected\def\dtou{%
   \directlua{luatexja.direction.set_list_direction(1, 'dtou')}%
-  \ltj@reset@globaldefs\ltj@dir@count=1\relax
-  \ifvmode\ltj@adjdir@count=1\fi\ydirfalse\tdirfalse\ddirtrue\ltj@restore@globaldefs}
+}
 \yoko
+
+\protected\def\ifydir{\directlua{luatexja.direction.dir_conditional(4)}}
+\protected\def\iftdir{\directlua{luatexja.direction.dir_conditional(3)}}
+\protected\def\ifddir{\directlua{luatexja.direction.dir_conditional(1)}}
 
 \newcount\ltj@adjdir@count@backup
 %%%% insert
@@ -643,11 +641,11 @@
 
 %%%%%%%% \ifybox, \iftbox, \ifdbox
 \def\ltj@@box@cond#1#2\fi{\fi\csname if#1\endcsname}
-\def\ifybox#1{\directlua{luatexja.direction.dir_conditional(\the\numexpr #1\relax, 4)}%
+\def\ifybox#1{\directlua{luatexja.direction.box_dir_conditional(\the\numexpr #1\relax, 4)}%
   \ltj@@box@cond{true}\else\ltj@@box@cond{false}\fi}
-\def\iftbox#1{\directlua{luatexja.direction.dir_conditional(\the\numexpr #1\relax, 3)}%
+\def\iftbox#1{\directlua{luatexja.direction.box_dir_conditional(\the\numexpr #1\relax, 3)}%
   \ltj@@box@cond{true}\else\ltj@@box@cond{false}\fi}
-\def\ifdbox#1{\directlua{luatexja.direction.dir_conditional(\the\numexpr #1\relax, 1)}%
+\def\ifdbox#1{\directlua{luatexja.direction.box_dir_conditional(\the\numexpr #1\relax, 1)}%
   \ltj@@box@cond{true}\else\ltj@@box@cond{false}\fi}
 
 %%------------------ Load module for the format
