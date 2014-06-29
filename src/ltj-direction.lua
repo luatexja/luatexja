@@ -102,16 +102,9 @@ do
    luatexja.direction.get_dir_count = get_dir_count
 end
 
--- \ifydir etc.
-do
-   local cs_true, cs_false = '\\iftrue', '\\iffalse'
-   luatexja.direction.dir_conditional = function(v)
-      local d = get_dir_count()
-      tex.sprint(cat_lp, (d==v) and cs_true or cs_false )
-   end
-end
 
 -- \tate, \yoko
+local reset_dir_conditional
 do
    local node_next = node.next
    local node_set_attr = node.set_attribute
@@ -127,7 +120,6 @@ do
       else
 	 local w = (lv==0) and tex.lists.page_head or tex_nest[lv].head.next
 	 if w then
-	    --luatexja.ext_show_node_list(w, 'set_dir', print)
 	    if (not w.next) and 
 	       w.id==id_whatsit and w.subtype==sid_user and w.user_id==DIR then
 	       node_set_attr(w, attr_dir, v)
@@ -149,7 +141,7 @@ do
 	    Dnode.write(w)
 	    if lv==0 then page_direction = v end
 	 end
-	 tex_set_attr('global', attr_icflag, 0)
+	 reset_dir_conditional(); tex_set_attr('global', attr_icflag, 0)
       end
       tex_set_attr('global', attr_dir, 0)
    end
@@ -769,8 +761,20 @@ do
    luatexja.direction.set_box_dim = set_box_dim
 end
 
--- \ifydir, \iftdir, \ifddir
 do
+   -- \ifydir, \iftdir, \ifddir
+   local cs_true, cs_false = '\\iftrue', '\\iffalse'
+   --local function dir_conditional(v)
+   --   local d = get_dir_count()
+   --   tex.sprint(cat_lp, (d==v) and cs_true or cs_false )
+   --end
+   reset_dir_conditional = function()
+      local d = get_dir_count()
+      tex.sprint(cat_lp, '\\global\\ddir' .. tostring(d==dir_dtou))
+      tex.sprint(cat_lp, '\\global\\tdir' .. tostring(d==dir_tate))
+      tex.sprint(cat_lp, '\\global\\ydir' .. tostring(d==dir_yoko))
+   end
+   -- \ifybox, \iftbox, \ifdbox
    local getbox = tex.getbox
    local function box_dir_conditional(n, mode)
       local s = getbox(n)
@@ -786,8 +790,10 @@ do
 	    res = (b_dir==mode)
          end
       end
-      tex.sprint(cat_lp, '\\if' .. tostring(res))
+      tex.sprint(cat_lp, res and cs_true or cs_false)
    end
+   luatexja.direction.reset_dir_conditional = reset_dir_conditional
+   --luatexja.direction.dir_conditional = dir_conditional
    luatexja.direction.box_dir_conditional = box_dir_conditional
 end
 
@@ -877,6 +883,7 @@ function luatexja.direction.check_adjust_direction()
       end
    end
    stop_time_measure('box_primitive_hook')
+   reset_dir_conditional()
 end
 
 -- vsplit

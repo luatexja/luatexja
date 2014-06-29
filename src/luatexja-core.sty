@@ -532,6 +532,9 @@
 
 
 %%%%%%%% \yoko, \tate, \ifydir, \iftdir
+\newif\ifydir
+\newif\iftdir
+\newif\ifddir
 \protected\def\tate{%
   \directlua{luatexja.direction.set_list_direction(3, 'tate')}%
 }
@@ -543,9 +546,9 @@
 }
 \yoko
 
-\protected\def\ifydir{\directlua{luatexja.direction.dir_conditional(4)}}
-\protected\def\iftdir{\directlua{luatexja.direction.dir_conditional(3)}}
-\protected\def\ifddir{\directlua{luatexja.direction.dir_conditional(1)}}
+%\def\ifydir{\directlua{luatexja.direction.dir_conditional(4)}}
+%\def\iftdir{\directlua{luatexja.direction.dir_conditional(3)}}
+%\def\ifddir{\directlua{luatexja.direction.dir_conditional(1)}}
 
 \newcount\ltj@adjdir@count@backup
 %%%% insert
@@ -573,6 +576,7 @@
 }
 \protected\def\ltj@@reset@badness{%
   \directlua{%
+    luatexja.direction.reset_dir_conditional()
     if luatexja.global_temp then
       tex.hbadness= tex.hbadness or luatexja.hbadness_temp
       tex.vbadness= tex.vbadness or luatexja.vbadness_temp
@@ -641,12 +645,9 @@
 
 %%%%%%%% \ifybox, \iftbox, \ifdbox
 \def\ltj@@box@cond#1#2\fi{\fi\csname if#1\endcsname}
-\def\ifybox#1{\directlua{luatexja.direction.box_dir_conditional(\the\numexpr #1\relax, 4)}%
-  \ltj@@box@cond{true}\else\ltj@@box@cond{false}\fi}
-\def\iftbox#1{\directlua{luatexja.direction.box_dir_conditional(\the\numexpr #1\relax, 3)}%
-  \ltj@@box@cond{true}\else\ltj@@box@cond{false}\fi}
-\def\ifdbox#1{\directlua{luatexja.direction.box_dir_conditional(\the\numexpr #1\relax, 1)}%
-  \ltj@@box@cond{true}\else\ltj@@box@cond{false}\fi}
+\def\ifybox#1{\directlua{luatexja.direction.box_dir_conditional(\the\numexpr #1\relax, 4)}}
+\def\iftbox#1{\directlua{luatexja.direction.box_dir_conditional(\the\numexpr #1\relax, 3)}}
+\def\ifdbox#1{\directlua{luatexja.direction.box_dir_conditional(\the\numexpr #1\relax, 1)}}
 
 %%------------------ Load module for the format
 
