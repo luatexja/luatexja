@@ -478,7 +478,16 @@ local function debug_show_node_X(p,print_fn)
             debug_depth=k
          end
       else
-         s = s .. node.subtype(p.subtype); print_fn(s)
+         s = s .. node.subtype(p.subtype)
+	 if p.subtype==1 then
+	    s = s .. ' stream=' .. p.stream
+	    print_fn(s)
+	    for i=1,#p.data do
+	       print_fn(base .. ' [' .. i .. '] = ' .. tostring(p.data[i]))
+	    end
+	 else
+	    print_fn(s)
+	 end
       end
    -------- math node --------
    elseif pt=='noad' then

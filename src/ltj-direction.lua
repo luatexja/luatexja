@@ -127,10 +127,12 @@ do
       else
 	 local w = (lv==0) and tex.lists.page_head or tex_nest[lv].head.next
 	 if w then
-	    luatexja.ext_show_node_list(w, 'set_dir', print)
+	    --luatexja.ext_show_node_list(w, 'set_dir', print)
 	    if (not w.next) and 
 	       w.id==id_whatsit and w.subtype==sid_user and w.user_id==DIR then
 	       node_set_attr(w, attr_dir, v)
+	    elseif lv==0 and not page_direction then
+	       page_direction = v -- for first call of \yoko (in luatexja-core.sty)
 	    else
               ltjb.package_error(
                  'luatexja',
