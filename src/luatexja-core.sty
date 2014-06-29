@@ -564,11 +564,11 @@
 
 %%%% hbox, vbox, vtop
 \everyhbox{%
-  \ifcase\ltj@dir@count\or\dtou\or\or\tate\or\yoko\fi
+  \directlua{luatexja.direction.set_list_direction()}%
   \aftergroup\ltj@@reset@badness
 }
 \everyvbox{%
-  \ifcase\ltj@dir@count\or\dtou\or\or\tate\or\yoko\fi
+  \directlua{luatexja.direction.set_list_direction()}%
   \aftergroup\ltj@@reset@badness
 }
 \protected\def\ltj@@reset@badness{%

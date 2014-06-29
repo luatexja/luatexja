@@ -107,7 +107,6 @@ do
    local cs_true, cs_false = '\\iftrue', '\\iffalse'
    luatexja.direction.dir_conditional = function(v)
       local d = get_dir_count()
-      print(d,v)
       tex.sprint(cat_lp, (d==v) and cs_true or cs_false )
    end
 end
@@ -118,27 +117,17 @@ do
    local node_set_attr = node.set_attribute
    local function set_list_direction(v, name)
       local lv, w = tex_nest.ptr, tex.lists.page_head
-      if lv==0 and w then
-	 if (not w.next) and 
-	    w.id==id_whatsit and w.subtype==sid_user and w.user_id==DIR then
-	    node_set_attr(w, attr_dir, v); page_direction = v
-	 else
-              ltjb.package_error(
-                 'luatexja',
-                 "Use `\\" .. name .. "' at top of list",
-                 'Direction change command by LuaTeX-ja is available\n'
-		    .. 'only when the current list is null.')
-	 end
-      elseif tex.currentgrouptype==6 then
+      if not v then v,name  = get_dir_count(), nil end
+      if tex.currentgrouptype==6 then
 	 ltjb.package_error(
                  'luatexja',
                  "You can't use `\\" .. name .. "' in an align",
 		 "To change direction in an align, \n"
 		    .. "you shold use \\hbox or \\vbox.")
       else
-	 print(v, name, tex_nest[lv].head.next)
-	 local w = tex_nest[lv].head.next
+	 local w = (lv==0) and tex.lists.page_head or tex_nest[lv].head.next
 	 if w then
+	    luatexja.ext_show_node_list(w, 'set_dir', print)
 	    if (not w.next) and 
 	       w.id==id_whatsit and w.subtype==sid_user and w.user_id==DIR then
 	       node_set_attr(w, attr_dir, v)
@@ -156,6 +145,7 @@ do
 	    setfield(w, 'type', 110)
 	    set_attr(w, attr_dir, v)
 	    Dnode.write(w)
+	    if lv==0 then page_direction = v end
 	 end
 	 tex_set_attr('global', attr_icflag, 0)
       end
