@@ -39,7 +39,7 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjreport}
-  [2014/06/08 v1.6-ltj-3
+  [2014/06/30 v1.6-ltj-4
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -117,8 +117,7 @@
   \setlength{\@tombowwidth}{\z@}%
   \maketombowbox}
 \DeclareOption{tate}{%
-  \AtBeginDocument{\tate\message{《縦組モード》}%
-                   \adjustbaseline}%
+  \tate\AtBeginDocument{\message{《縦組モード》}\adjustbaseline}%
 }
 \DeclareOption{oneside}{\@twosidefalse}
 \DeclareOption{twoside}{\@twosidetrue}
