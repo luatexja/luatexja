@@ -50,7 +50,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2014/05/14 ]
+  [2014/07/02 ]
 %<*driver>
 \documentclass{ltjsarticle}
 \usepackage{doc}
@@ -4601,9 +4601,11 @@
 %
 % [2013-05-14] plcore.ltx に倣った形に書き直しました（Thanks: 北川さん）。
 %
+% [2014-07-02 LTJ] |\ifydir| を使わない形に書換えました．
+%
 %    \begin{macrocode}
 \renewcommand\@makefnmark{\hbox{}\hbox{%
-  \ifydir \@textsuperscript{\normalfont\@thefnmark}%
+  \unless\ifnum\ltjgetparameter{direction}=3 \@textsuperscript{\normalfont\@thefnmark}%
   \else\hbox{\yoko\@textsuperscript{\normalfont\@thefnmark}}\fi}\hbox{}}
 %    \end{macrocode}
 % \end{macro}

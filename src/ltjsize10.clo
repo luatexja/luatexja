@@ -39,7 +39,7 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesFile{ltjsize10.clo}
-  [2014/06/30 v1.6-ltj-4
+  [2014/07/02 v1.6-ltj-5
   Standard LuaLaTeX-ja file (size option)]
 \renewcommand{\normalsize}{%
     \@setfontsize\normalsize\@xpt{15}%

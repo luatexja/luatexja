@@ -243,7 +243,9 @@ do
 	 elseif f == math.two_add then r = 'both'
 	 end
 	 return r
-      end
+      end,
+      direction = ltjd.get_dir_count,
+      adjustdir = ltjd.get_adjust_dir_count,
    }
 
    local unary_pars = luatexja.unary_pars
@@ -290,6 +292,16 @@ do
       jaxspmode = function(c, t)
 	 return ltjs.get_stack_table(stack_table_index.XSP
 					  + ltjb.in_unicode(c, true), 3, t)
+      end,
+      boxdir = function(c, t)
+	 if type(c)~='number' or c<0 or c>65535 then
+            ltjb.package_error('luatexja',
+                               'Bad register code (' .. tostring(c) .. ')',
+                               'A register must be between 0 and 65535.\n'..
+                                  'I changed this one to zero.')
+            c=0
+         end
+         return ltjd.get_register_dir(c)
       end,
    }
    local binary_pars = luatexja.binary_pars

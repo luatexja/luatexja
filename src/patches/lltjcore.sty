@@ -89,7 +89,7 @@
 \newdimen\@@topmargin
 \def\@outputpage{%
 \begingroup % the \endgroup is put in by \aftergroup
-  \iftdir
+  \ifnum\ltjgetparameter{direction}=3 
     \dimen\z@\textwidth \textwidth\textheight \textheight\dimen\z@
   \fi
   \let \protect \noexpand
@@ -106,11 +106,11 @@
      \fi
      \if@twoside
        \ifodd\count\z@ \let\@thehead\@oddhead \let\@thefoot\@oddfoot
-          \iftdir\let\@themargin\evensidemargin
+          \ifnum\ltjgetparameter{direction}=3 \let\@themargin\evensidemargin
           \else\let\@themargin\oddsidemargin\fi
        \else \let\@thehead\@evenhead
           \let\@thefoot\@evenfoot
-           \iftdir\let\@themargin\oddsidemargin
+           \ifnum\ltjgetparameter{direction}=3 \let\@themargin\oddsidemargin
            \else\let\@themargin\evensidemargin\fi
      \fi\fi
      \@@topmargin\topmargin

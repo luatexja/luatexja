@@ -73,7 +73,7 @@ local function adjust_badness(hd)
    end
 end
 
-local get_dir_count
+local get_dir_count, get_adjust_dir_count
 do
    local function get_dir_count_inner(h)
       if h then
@@ -99,18 +99,34 @@ do
       end
       return page_direction
    end
+   local abs = math.abs
+   function get_adjust_dir_count()
+      for i=tex_nest.ptr, 1, -1 do
+         local v = tex_nest[i]
+	 local h, m = v.head.next, v.mode
+	 if abs(m)== ltjs.vmode and h then
+	    local t = get_dir_count_inner(h)
+	    if t~=0 then return t end
+	 end
+      end
+      return page_direction
+   end
    luatexja.direction.get_dir_count = get_dir_count
+   luatexja.direction.get_adjust_dir_count = get_adjust_dir_count
 end
 
 
 -- \tate, \yoko
-local reset_dir_conditional
 do
    local node_next = node.next
    local node_set_attr = node.set_attribute
    local function set_list_direction(v, name)
       local lv, w = tex_nest.ptr, tex.lists.page_head
-      if not v then v,name  = get_dir_count(), nil end
+      if not v then 
+         v,name  = get_dir_count(), nil 
+      elseif v=='adj' then
+         v,name = get_adjust_dir_count(), nil
+      end
       if tex.currentgrouptype==6 then
 	 ltjb.package_error(
                  'luatexja',
@@ -123,6 +139,7 @@ do
 	    if (not w.next) and 
 	       w.id==id_whatsit and w.subtype==sid_user and w.user_id==DIR then
 	       node_set_attr(w, attr_dir, v)
+               if lv==0 then page_direction = v end
 	    elseif lv==0 and not page_direction then
 	       page_direction = v -- for first call of \yoko (in luatexja-core.sty)
 	    else
@@ -141,7 +158,7 @@ do
 	    Dnode.write(w)
 	    if lv==0 then page_direction = v end
 	 end
-	 reset_dir_conditional(); tex_set_attr('global', attr_icflag, 0)
+         tex_set_attr('global', attr_icflag, 0)
       end
       tex_set_attr('global', attr_dir, 0)
    end
@@ -425,8 +442,11 @@ do
       if b then
 	 local box_dir = get_box_dir(to_direct(b), dir_yoko)
 	 if box_dir%dir_node_auto ~= list_dir%dir_node_auto then
-	    luatexja.ext_show_node_list(tex.nest[tex.nest.ptr].head, 'LIST> ', print)
-	    luatexja.ext_show_node_list(b, 'BOX> ', print)
+            print('NEST', tex_nest.ptr, tex_getcount('ltj@tempcnta'))
+	    luatexja.ext_show_node_list(
+               (tex_nest.ptr==0) and tex.lists.page_head or tex_nest[tex_nest.ptr].head,
+               'LIST' .. tostring(list_dir) .. '> ', print)
+	    luatexja.ext_show_node_list(b, 'BOX' .. tostring(box_dir) .. '> ', print)
 	    ltjb.package_error(
 	       'luatexja',
 	       "Incompatible direction list can't be unboxed",
@@ -762,39 +782,24 @@ do
 end
 
 do
-   -- \ifydir, \iftdir, \ifddir
-   local cs_true, cs_false = '\\iftrue', '\\iffalse'
-   --local function dir_conditional(v)
-   --   local d = get_dir_count()
-   --   tex.sprint(cat_lp, (d==v) and cs_true or cs_false )
-   --end
-   reset_dir_conditional = function()
-      local d = get_dir_count()
-      tex.sprint(cat_lp, '\\global\\ddir' .. tostring(d==dir_dtou))
-      tex.sprint(cat_lp, '\\global\\tdir' .. tostring(d==dir_tate))
-      tex.sprint(cat_lp, '\\global\\ydir' .. tostring(d==dir_yoko))
-   end
-   -- \ifybox, \iftbox, \ifdbox
    local getbox = tex.getbox
-   local function box_dir_conditional(n, mode)
+   local function get_register_dir(n)
       local s = getbox(n)
-      local res = false
       if s then
          s = to_direct(s)
          local b_dir = get_box_dir(s, dir_yoko)
          if b_dir<dir_node_auto then
-	    res = (b_dir==mode)
+	    return b_dir
          else
 	    local b_dir = get_box_dir(
 	       node_next(node_next(node_next(getlist(s)))), dir_yoko)
-	    res = (b_dir==mode)
+	    return b_dir
          end
+      else
+         return 0
       end
-      tex.sprint(cat_lp, res and cs_true or cs_false)
    end
-   luatexja.direction.reset_dir_conditional = reset_dir_conditional
-   --luatexja.direction.dir_conditional = dir_conditional
-   luatexja.direction.box_dir_conditional = box_dir_conditional
+   luatexja.direction.get_register_dir = get_register_dir
 end
 
 -- 縦書き用字形への変換テーブル
@@ -869,7 +874,7 @@ end
 local id_adjust = node.id('adjust')
 function luatexja.direction.check_adjust_direction()
    start_time_measure('box_primitive_hook')
-   local list_dir = tex_getcount('ltj@adjdir@count')
+   local list_dir = get_adjust_dir_count()
    local a = tex_nest[tex_nest.ptr].tail
    local ad = to_direct(a)
    if a and getid(ad)==id_adjust then
@@ -883,7 +888,6 @@ function luatexja.direction.check_adjust_direction()
       end
    end
    stop_time_measure('box_primitive_hook')
-   reset_dir_conditional()
 end
 
 -- vsplit

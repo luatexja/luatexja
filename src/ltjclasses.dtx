@@ -78,6 +78,8 @@
 % \changes{v1.6-ltj}{2011/09/27}{jclasses.dtx v1.6 をベースにLua\LaTeX-ja用に修正。}
 % \changes{v1.6-ltj-2}{2013/06/06}{luatexja.cfgに対応．}
 % \changes{v1.6-ltj-3}{2014/06/08}{縦組みクラスの時のgeometry.styに対応．}
+% \changes{v1.6-ltj-4}{2014/06/30}{組方向の変更箇所を現行の\LuaTeX-jaの仕様に合うように修正．}
+% \changes{v1.6-ltj-5}{2014/07/02}{\cs{ifydir}, \cs{iftdir}を使わないように修正．}
 % \fi
 %
 % \iffalse
@@ -107,7 +109,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2014/06/08 v1.6-ltj-3
+  [2014/07/02 v1.6-ltj-5
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -396,10 +398,12 @@
 % \changes{v1.0g}{1997/01/25}{Insert \cs{hbox}, to switch tate-mode.}
 % \changes{v1.1d}{1997/02/05}{開始ページがおかしくなるのを修正}
 % \changes{v1.1f}{1997/07/08}{縦組時にベースラインがおかしくなるのを修正}
+%
+% \changes{v1.6-ltj-4}{2014/06/30}{本文の組方向を \cs{AtBeginDocument} で
+%   変更することができなくなったことに対応}
 %    \begin{macrocode}
 \DeclareOption{tate}{%
-  \AtBeginDocument{\tate\message{《縦組モード》}%
-                   \adjustbaseline}%
+  \tate\AtBeginDocument{\message{《縦組モード》}\adjustbaseline}%
 }
 %    \end{macrocode}
 %
@@ -2141,7 +2145,7 @@
   \newcommand{\maketitle}{\par
   \begingroup
     \renewcommand{\thefootnote}{\fnsymbol{footnote}}%
-    \def\@makefnmark{\hbox{\ifydir $\m@th^{\@thefnmark}$
+    \def\@makefnmark{\hbox{\unless\ifnum\ltjgetparameter{direction}=3 $\m@th^{\@thefnmark}$
       \else\hbox{\yoko$\m@th^{\@thefnmark}$}\fi}}%
 %<*tate>
     \long\def\@makefntext##1{\parindent 1\zw\noindent
@@ -3058,7 +3062,7 @@
    \advance\@enumdepth\@ne
    \edef\@enumctr{enum\romannumeral\the\@enumdepth}%
    \list{\csname label\@enumctr\endcsname}{%
-      \iftdir
+      \ifnum\ltjgetparameter{direction}=3 
          \ifnum \@listdepth=\@ne \topsep.5\normalbaselineskip
            \else\topsep\z@\fi
          \parskip\z@ \itemsep\z@ \parsep\z@
@@ -3086,7 +3090,7 @@
 %    \begin{macrocode}
 \newcommand{\labelitemi}{\textbullet}
 \newcommand{\labelitemii}{%
-  \iftdir
+  \ifnum\ltjgetparameter{direction}=3 
      {\textcircled{~}}
   \else
      {\normalfont\bfseries\textendash}
@@ -3111,7 +3115,7 @@
    \edef\@itemitem{labelitem\romannumeral\the\@itemdepth}%
    \expandafter
    \list{\csname \@itemitem\endcsname}{%
-      \iftdir
+      \ifnum\ltjgetparameter{direction}=3 
          \ifnum \@listdepth=\@ne \topsep.5\normalbaselineskip
            \else\topsep\z@\fi
          \parskip\z@ \itemsep\z@ \parsep\z@
@@ -3136,7 +3140,7 @@
 %    \begin{macrocode}
 \newenvironment{description}
   {\list{}{\labelwidth\z@ \itemindent-\leftmargin
-   \iftdir
+   \ifnum\ltjgetparameter{direction}=3 
      \leftmargin\leftskip \advance\leftmargin3\Cwd
      \rightmargin\rightskip
      \labelsep=1\zw \itemsep\z@
@@ -3373,11 +3377,11 @@
 %    \begin{macrocode}
 \long\def\@makecaption#1#2{%
   \vskip\abovecaptionskip
-  \iftdir\sbox\@tempboxa{#1\hskip1\zw#2}%
+  \ifnum\ltjgetparameter{direction}=3 \sbox\@tempboxa{#1\hskip1\zw#2}%
     \else\sbox\@tempboxa{#1: #2}%
   \fi
   \ifdim \wd\@tempboxa >\hsize
-    \iftdir #1\hskip1\zw#2\relax\par
+    \ifnum\ltjgetparameter{direction}=3  #1\hskip1\zw#2\relax\par
       \else #1: #2\relax\par\fi
   \else
     \global \@minipagefalse
@@ -4084,7 +4088,7 @@
 % 縦組の場合は、漢数字で出力します。
 %    \begin{macrocode}
 \def\today{{%
-  \iftdir
+  \ifnum\ltjgetparameter{direction}=3
     \if西暦
       \kansuji\number\year 年
       \kansuji\number\month 月

@@ -31,7 +31,7 @@
 \newbox\tstrutbox
 \newbox\zstrutbox
 \def\strut{\relax
-  \ifydir
+  \unless\ifnum\ltjgetparameter{direction}=3 
     \ifmmode\copy\strutbox\else\unhcopy\strutbox\fi
   \else
     \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi
@@ -360,17 +360,15 @@
     \cvs\normalbaselineskip
     \chs\cwd
     \cHT\cht \advance\cHT\cdp
-    %\iftdir
-      \setbox0\hbox{\tate\ltj@tkblshift=0あ}%
-      \setbox\adjust@box\hbox{\tate\ltj@tablshift=0M}%
-      \adjust@dimen\ht\adjust@box
-      \advance\adjust@dimen\dp\adjust@box
-      \advance\adjust@dimen-\ht0
-      \divide\adjust@dimen\tw@
-      \advance\adjust@dimen0.5\dp0
-      \advance\adjust@dimen-\dp\adjust@box
-      \ltj@tablshift=\adjust@dimen
-    %\fi
+    \setbox0\hbox{\tate\ltj@tkblshift=0あ}%
+    \setbox\adjust@box\hbox{\tate\ltj@tablshift=0M}%
+    \adjust@dimen\ht\adjust@box
+    \advance\adjust@dimen\dp\adjust@box
+    \advance\adjust@dimen-\ht0
+    \divide\adjust@dimen\tw@
+    \advance\adjust@dimen0.5\dp0
+    \advance\adjust@dimen-\dp\adjust@box
+    \ltj@tablshift=\adjust@dimen
   }
 \DeclareRobustCommand\romanencoding[1]{%
     \expandafter\ifx\csname T@#1\endcsname\relax
@@ -543,7 +541,6 @@
 \@onlypreamble\kanjiprocess@table
 \DeclareTextCommandDefault{\textunderscore}{%
   \leavevmode\kern.06em
-  %\iftdir\raise-\tbaselineshift\fi
   \vbox{\hrule\@width.3em}}
 
 %%%%%% LuaTeX-ja specific

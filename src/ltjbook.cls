@@ -39,7 +39,7 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjbook}
-  [2014/06/30 v1.6-ltj-4
+  [2014/07/02 v1.6-ltj-5
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -353,7 +353,7 @@
   \newcommand{\maketitle}{\par
   \begingroup
     \renewcommand{\thefootnote}{\fnsymbol{footnote}}%
-    \def\@makefnmark{\hbox{\ifydir $\m@th^{\@thefnmark}$
+    \def\@makefnmark{\hbox{\unless\ifnum\ltjgetparameter{direction}=3 $\m@th^{\@thefnmark}$
       \else\hbox{\yoko$\m@th^{\@thefnmark}$}\fi}}%
      \long\def\@makefntext##1{\parindent 1em\noindent
        \hbox to1.8em{\hss$\m@th^{\@thefnmark}$}##1}%
@@ -571,7 +571,7 @@
    \advance\@enumdepth\@ne
    \edef\@enumctr{enum\romannumeral\the\@enumdepth}%
    \list{\csname label\@enumctr\endcsname}{%
-      \iftdir
+      \ifnum\ltjgetparameter{direction}=3
          \ifnum \@listdepth=\@ne \topsep.5\normalbaselineskip
            \else\topsep\z@\fi
          \parskip\z@ \itemsep\z@ \parsep\z@
@@ -585,7 +585,7 @@
    \fi}{\endlist}
 \newcommand{\labelitemi}{\textbullet}
 \newcommand{\labelitemii}{%
-  \iftdir
+  \ifnum\ltjgetparameter{direction}=3
      {\textcircled{~}}
   \else
      {\normalfont\bfseries\textendash}
@@ -599,7 +599,7 @@
    \edef\@itemitem{labelitem\romannumeral\the\@itemdepth}%
    \expandafter
    \list{\csname \@itemitem\endcsname}{%
-      \iftdir
+      \ifnum\ltjgetparameter{direction}=3
          \ifnum \@listdepth=\@ne \topsep.5\normalbaselineskip
            \else\topsep\z@\fi
          \parskip\z@ \itemsep\z@ \parsep\z@
@@ -612,7 +612,7 @@
    \fi}{\endlist}
 \newenvironment{description}
   {\list{}{\labelwidth\z@ \itemindent-\leftmargin
-   \iftdir
+   \ifnum\ltjgetparameter{direction}=3
      \leftmargin\leftskip \advance\leftmargin3\Cwd
      \rightmargin\rightskip
      \labelsep=1\zw \itemsep\z@
@@ -668,11 +668,11 @@
 \setlength\belowcaptionskip{0\p@}
 \long\def\@makecaption#1#2{%
   \vskip\abovecaptionskip
-  \iftdir\sbox\@tempboxa{#1\hskip1\zw#2}%
+  \ifnum\ltjgetparameter{direction}=3 \sbox\@tempboxa{#1\hskip1\zw#2}%
     \else\sbox\@tempboxa{#1: #2}%
   \fi
   \ifdim \wd\@tempboxa >\hsize
-    \iftdir #1\hskip1\zw#2\relax\par
+    \ifnum\ltjgetparameter{direction}=3  #1\hskip1\zw#2\relax\par
       \else #1: #2\relax\par\fi
   \else
     \global \@minipagefalse
@@ -851,7 +851,7 @@
 \def\和暦{\西暦false}
 \newcount\heisei \heisei\year \advance\heisei-1988\relax
 \def\today{{%
-  \iftdir
+  \ifnum\ltjgetparameter{direction}=3
     \if西暦
       \kansuji\number\year 年
       \kansuji\number\month 月

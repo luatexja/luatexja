@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjskiyou}
-  [2014/05/14 ]
+  [2014/07/02 ]
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
@@ -1289,7 +1289,7 @@
 \let\footnotemarks@ve=\footnotemark
 \def\footnotemark{\inhibitglue\footnotemarks@ve}
 \renewcommand\@makefnmark{\hbox{}\hbox{%
-  \ifydir \@textsuperscript{\normalfont\@thefnmark}%
+  \unless\ifnum\ltjgetparameter{direction}=3 \@textsuperscript{\normalfont\@thefnmark}%
   \else\hbox{\yoko\@textsuperscript{\normalfont\@thefnmark}}\fi}\hbox{}}
 \def\thefootnote{\ifnum\c@footnote>\z@\leavevmode\lower.5ex\hbox{*}\@arabic\c@footnote\fi}
 \renewcommand{\footnoterule}{%

@@ -142,8 +142,6 @@
 \newluatexattribute\ltj@tkblshift % attribute for tjabaselineshift
 \newluatexattribute\jfam          % index for current jfam
 
-\newcount\ltj@dir@count           % counter for indicating direction
-\newcount\ltj@adjdir@count        % counter for indicating direction (for vadjust)
 \newluatexattribute\ltj@dir
 
 \ltj@dir=0
@@ -434,6 +432,7 @@
 \ltj@@decl@array@param{kcatcode}
 \ltj@@decl@array@param{jacharrange}
 \ltj@@decl@array@param{chartorange}
+\ltj@@decl@array@param{boxdir}
 \def\ltjgetparameter#1{%
   \directlua{luatexja.base.start_time_measure('get_par')}%
   \ifcsname ltj@@array@param/#1\endcsname
@@ -531,10 +530,7 @@
    \directlua{luatexja.jfont.clear_alt_font(\the\ltj@tempcntc)}}\ignorespaces}
 
 
-%%%%%%%% \yoko, \tate, \ifydir, \iftdir
-\newif\ifydir
-\newif\iftdir
-\newif\ifddir
+%%%%%%%% \yoko, \tate,\dtou
 \protected\def\tate{%
   \directlua{luatexja.direction.set_list_direction(3, 'tate')}%
 }
@@ -544,13 +540,12 @@
 \protected\def\dtou{%
   \directlua{luatexja.direction.set_list_direction(1, 'dtou')}%
 }
+\define@key[ltj]{japaram}{direction}{%% always local
+  \directlua{luatexja.direction.set_list_direction(1, 'ltjsetparameter')}%
+}
+
 \yoko
 
-%\def\ifydir{\directlua{luatexja.direction.dir_conditional(4)}}
-%\def\iftdir{\directlua{luatexja.direction.dir_conditional(3)}}
-%\def\ifddir{\directlua{luatexja.direction.dir_conditional(1)}}
-
-\newcount\ltj@adjdir@count@backup
 %%%% insert
 %\let\orig@insert=\insert
 %\protected\def\insert{\begingroup\afterassignment\ltj@@insert@A\ltj@tempcnta}
@@ -559,7 +554,7 @@
 \let\ltj@@orig@vadjust=\vadjust
 \protected\def\vadjust{%
   \ltj@@orig@vadjust\bgroup
-  \ifcase\ltj@adjdir@count\or\dtou\or\or\tate\or\yoko\fi
+  \directlua{luatexja.direction.set_list_direction('adj')}%
   \aftergroup\ltj@@vadjust@check@dir\let\next}
 \protected\def\ltj@@vadjust@check@dir{%
   \directlua{luatexja.direction.check_adjust_direction()}%
@@ -576,7 +571,6 @@
 }
 \protected\def\ltj@@reset@badness{%
   \directlua{%
-    luatexja.direction.reset_dir_conditional()
     if luatexja.global_temp then
       tex.hbadness= tex.hbadness or luatexja.hbadness_temp
       tex.vbadness= tex.vbadness or luatexja.vbadness_temp
@@ -643,11 +637,6 @@
   \directlua{luatexja.direction.set_box_dim('depth')}%
   \ltj@restore@globaldefs\endgroup}
 
-%%%%%%%% \ifybox, \iftbox, \ifdbox
-\def\ltj@@box@cond#1#2\fi{\fi\csname if#1\endcsname}
-\def\ifybox#1{\directlua{luatexja.direction.box_dir_conditional(\the\numexpr #1\relax, 4)}}
-\def\iftbox#1{\directlua{luatexja.direction.box_dir_conditional(\the\numexpr #1\relax, 3)}}
-\def\ifdbox#1{\directlua{luatexja.direction.box_dir_conditional(\the\numexpr #1\relax, 1)}}
 
 %%------------------ Load module for the format
 

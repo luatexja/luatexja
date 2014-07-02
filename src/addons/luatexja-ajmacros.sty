@@ -87,7 +87,7 @@
 \gdef\shift@CID#1#2{{\@tempcnta#1\advance\@tempcnta#2\CID{\@tempcnta}}}
 \gdef\ajTsumesuji{\@ifstar{\@@ajTsumesuji}{\@ajTsumesuji}}
 \global\let\ajTumesuji\ajTsumesuji
-\gdef\@ajTsumesuji#1#2{{\@tempcnta\ifydir\ifcase#1\or780\or247\or9758\or9738\fi
+\gdef\@ajTsumesuji#1#2{{\@tempcnta\unless\ifnum\ltjgetparameter{direction}=3 \ifcase#1\or780\or247\or9758\or9738\fi
 	\else\ifcase#1\or8736\or8966\or13274\or13254\fi\fi
 	\aj@expand\aj@Tsumesuji#2\@nil}}
 \gdef\@@ajTsumesuji#1{\@ajTsumesuji{\aj@expand\aj@count@toks#14321\@nil}{#1}}
@@ -226,15 +226,15 @@
 %
 \gdef\ajTsumekakko#1{\aj@expand\@ajTsumekakko#1\@nil}
 \global\let\ajTumekakko\ajTsumekakko
-\gdef\@ajTsumekakko#1#2{\ifx\@nil#2\mbox{\ifydir\rlap{\CID{10233}}\shift@CID{#1}{9872}%
+\gdef\@ajTsumekakko#1#2{\ifx\@nil#2\mbox{\unless\ifnum\ltjgetparameter{direction}=3 \rlap{\CID{10233}}\shift@CID{#1}{9872}%
 	\else\CID{13268}\shift@CID{#1}{10185}\CID{13269}\fi}%
 	\expandafter\@gobble
-	\else\shift@CID{#1}{\ifydir10152\else10174\fi}%
+	\else\shift@CID{#1}{\unless\ifnum\ltjgetparameter{direction}=3 10152\else10174\fi}%
 	\expandafter\aj@Tsumekakko
 	\fi#2}
-\gdef\aj@Tsumekakko#1#2{\ifx\@nil#2\shift@CID{#1}{\ifydir10162\else10196\fi}%
+\gdef\aj@Tsumekakko#1#2{\ifx\@nil#2\shift@CID{#1}{\unless\ifnum\ltjgetparameter{direction}=3 10162\else10196\fi}%
 	\expandafter\@gobble
-	\else\shift@CID{#1}{\ifydir247\else10185\fi}%
+	\else\shift@CID{#1}{\unless\ifnum\ltjgetparameter{direction}=3 247\else10185\fi}%
 	\expandafter\aj@Tsumekakko
 	\fi#2}
 \gdef\ajNenrei#1{\ifcase#1\relax\expandafter\ajTsumekakko\or\expandafter\aj@NenreiTu
@@ -242,14 +242,14 @@
 	\or\expandafter\aj@Nenrei@Sai
 	\fi}
 \gdef\aj@NenreiTu#1{\aj@expand\@aj@NenreiTu#1\@nil}
-\gdef\@aj@NenreiTu#1#2{\shift@CID{#1}{\ifydir10152\else10174\fi}%
-	\ifx\@nil#2\CID{\ifydir10172\else10206\fi}\expandafter\@gobble
+\gdef\@aj@NenreiTu#1#2{\shift@CID{#1}{\unless\ifnum\ltjgetparameter{direction}=3 10152\else10174\fi}%
+	\ifx\@nil#2\CID{\unless\ifnum\ltjgetparameter{direction}=3 10172\else10206\fi}\expandafter\@gobble
 	\else\expandafter\aj@Tsumekakko
 	\fi#2}
 \gdef\aj@NenreiSai#1{\aj@expand\@aj@NenreiSai#1\@nil}
-\gdef\@aj@NenreiSai#1{\shift@CID{#1}{\ifydir10152\else10174\fi}\@aj@NenreiSai@}
-\gdef\@aj@NenreiSai@#1{\ifx\@nil#1\CID{\ifydir10173\else10207\fi}%
-	\else\shift@CID{#1}{\ifydir247\else10185\fi}%
+\gdef\@aj@NenreiSai#1{\shift@CID{#1}{\unless\ifnum\ltjgetparameter{direction}=3 10152\else10174\fi}\@aj@NenreiSai@}
+\gdef\@aj@NenreiSai@#1{\ifx\@nil#1\CID{\unless\ifnum\ltjgetparameter{direction}=3 10173\else10207\fi}%
+	\else\shift@CID{#1}{\unless\ifnum\ltjgetparameter{direction}=3 247\else10185\fi}%
 	\expandafter\@aj@NenreiSai@\fi}
 \gdef\aj@Nenrei@Tu#1{\ifnum#1<10 \shift@CID{#1}{10174}\CID{10206}%
 	\else\expandafter\@aj@Nenrei@Tu\number#1%
@@ -327,7 +327,7 @@
 %
 \def\@aj半角def#1{\ifx\@nil#1\else
 	\expandafter\xdef\csname aj半角@#1\endcsname{\noexpand\CID
-		{\noexpand\ifydir\number\@tempcnta\noexpand\else\number\@tempcntb\noexpand\fi}}%
+		{\noexpand\unless\noexpand\ifnum\noexpand\ltjgetparameter\noexpand{direction\noexpand}=3 \number\@tempcnta\noexpand\else\number\@tempcntb\noexpand\fi}}%
 	\advance\@tempcnta\@ne\advance\@tempcntb\@ne
 	\expandafter\@aj半角def\fi}
 \@tempcnta326
@@ -347,7 +347,7 @@
 	\@ajligdef{#1}{\number\@tempcnta}\advance\@tempcnta\@ne
 	\expandafter\@ajligaturedef\fi}
 \def\@aj@ligdef#1#2#3{\expandafter\xdef\csname ajLig\@ajmojifam#1\endcsname
-	{\noexpand\CID{\noexpand\ifydir#2\noexpand\else#3\noexpand\fi}}}
+	{\noexpand\CID{\noexpand\unless\noexpand\ifnum\noexpand\ltjgetparameter\noexpand{direction\noexpand}=3 #2\noexpand\else#3\noexpand\fi}}}
 \def\@aj@ligaturedef#1{\ifx\@nil#1\else
 	\@aj@ligdef{#1}{\number\@tempcnta}{\number\@tempcntb}%
 	\advance\@tempcnta\@ne\advance\@tempcntb\@ne
@@ -506,10 +506,10 @@
 \def\@ajkanadef#1#2#3#4#5#6#7{\expandafter\gdef\csname ajLig#1\endcsname
 	{\if@kana\def\reserved@a{ruby}%
 		\ifx\k@family\reserved@a
-			\ifydir\CID{#6}\else\CID{#7}\fi
-		\else\ifydir\CID{#4}\else\CID{#5}\fi
+			\unless\ifnum\ltjgetparameter{direction}=3 \CID{#6}\else\CID{#7}\fi
+		\else\unless\ifnum\ltjgetparameter{direction}=3 \CID{#4}\else\CID{#5}\fi
 		\fi
-	\else\ifydir\CID{#2}\else\CID{#3}\fi
+	\else\unless\ifnum\ltjgetparameter{direction}=3 \CID{#2}\else\CID{#3}\fi
 	\fi}}
 \newcount\@tempcntc
 \newcount\@tempcntd
@@ -793,7 +793,7 @@
 %
 \gdef\ajLeader{\@ifnextchar[{\aj@Leader}{\aj@Leader[\z@ plus1fill]}}
 \gdef\aj@Leader[#1]#2{{\@tempcnta#2\multiply\@tempcnta\tw@
-	\advance\@tempcnta1221\ifhmode\ifydir4\else5\fi\else\ifydir5\else4\fi\fi
+	\advance\@tempcnta1221\ifhmode\unless\ifnum\ltjgetparameter{direction}=3 4\else5\fi\else\unless\ifnum\ltjgetparameter{direction}=3 5\else4\fi\fi
 	\leaders\hbox{\CID{\@tempcnta}}\ifhmode\hskip\else\vskip\fi#1}}
 %
 %
@@ -827,9 +827,9 @@
 * * * *
 \def\@removetop#1{\toks#1\expandafter\expandafter\expandafter{\expandafter\@gobble\the\toks#1}}
 \@removetop0\@removetop1\@removetop2\@removetop3
-\xdef\ajQuote#1#2{\noexpand\CID{\noexpand\ifydir\noexpand\ifcase#1 \the\toks0
+\xdef\ajQuote#1#2{\noexpand\CID{\noexpand\unless\noexpand\ifnum\noexpand\ltjgetparameter\noexpand{direction\noexpand}=3 \noexpand\ifcase#1 \the\toks0
 	\noexpand\fi\noexpand\else\noexpand\ifcase#1 \the\toks2
-	\noexpand\fi\noexpand\fi}#2\inhibitglue\noexpand\CID{\noexpand\ifydir\noexpand\ifcase#1 \the\toks1
+	\noexpand\fi\noexpand\fi}#2\inhibitglue\noexpand\CID{\noexpand\unless\noexpand\ifnum\noexpand\ltjgetparameter\noexpand{direction\noexpand}=3 \noexpand\ifcase#1 \the\toks1
 	\noexpand\fi\noexpand\else\noexpand\ifcase#1 \the\toks3
 	\noexpand\fi\noexpand\fi}}
 }
