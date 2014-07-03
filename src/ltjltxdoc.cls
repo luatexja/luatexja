@@ -84,6 +84,9 @@
   \hss\vrule width.1pt\egroup}
 \ltjsetparameter{alxspmode={"5C,3}} %% \
 \ltjsetparameter{alxspmode={"22,3}} %% "
+\def\mod@math@codes{\mathcode`\|="207C \mathcode`\&="2026
+                    \mathcode`\-="702D \mathcode`\+="702B
+                    \mathcode`\:="703A \mathcode`\=="703D }
 \endinput
 %%
 %% End of file `ltjltxdoc.cls'.

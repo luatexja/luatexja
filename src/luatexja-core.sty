@@ -583,14 +583,14 @@
 %%%% unhbox and unvbox
 \let\ltj@@orig@unhbox=\unhbox
 \let\ltj@@orig@unvbox=\unvbox
-\protected\def\unhbox{\begingroup\afterassignment\ltj@@unhbox\ltj@tempcnta}
-\protected\def\unvbox{\begingroup\afterassignment\ltj@@unvbox\ltj@tempcnta}
+\protected\def\unhbox{\ltj@reset@globaldefs\afterassignment\ltj@@unhbox\ltj@tempcnta}
+\protected\def\unvbox{\ltj@reset@globaldefs\afterassignment\ltj@@unvbox\ltj@tempcnta}
 \protected\def\ltj@@unhbox{%
   \directlua{luatexja.direction.check_dir(\the\ltj@tempcnta)}%
-  \ltj@@orig@unhbox\ltj@tempcnta\endgroup}
+  \ltj@@orig@unhbox\ltj@tempcnta}
 \protected\def\ltj@@unvbox{%
   \directlua{luatexja.direction.check_dir(\the\ltj@tempcnta)}%
-  \ltj@@orig@unvbox\ltj@tempcnta\endgroup}
+  \ltj@@orig@unvbox\ltj@tempcnta}
 
 
 %%%% lastbox

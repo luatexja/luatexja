@@ -10,7 +10,7 @@
 %
 % \fi
 %
-% \CheckSum{137}
+% \CheckSum{151}
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -36,6 +36,7 @@
 %     合わせて修正}
 % \changes{v1.0b}{1997/07/29}{\cs{}と\texttt{"}の\cs{xspcode}を変更}
 % \changes{v1.0b-ltj}{2011/09/27}{Lua\LaTeX-ja 用に修正}
+% \changes{v1.0b-ltj-2}{2014/07/03}{orを意味する縦棒の出力が異常だったので修正}
 % \fi
 %
 % \iffalse
@@ -189,6 +190,16 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{mod@math@codes}
+% docパッケージでは，ドライバ指定の表示の部分における\texttt{\char`\|}の
+% \cs{mathcode}は\texttt{"226A}になっており，これにより\texttt{\char`\|}が小文字のjで表示されて
+% しまう状況になっています．改善するため，\texttt{"207C}に変更します．
+%    \begin{macrocode}
+\def\mod@math@codes{\mathcode`\|="207C \mathcode`\&="2026
+                    \mathcode`\-="702D \mathcode`\+="702B
+                    \mathcode`\:="703A \mathcode`\=="703D }
+%    \end{macrocode}
+% \end{macro}
 % \Finale
 %
 \endinput

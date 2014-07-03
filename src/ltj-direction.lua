@@ -453,6 +453,7 @@ do
 	       'I refuse to unbox a box in differrent direction.')
 	 end
       end
+      tex.globaldefs = luatexja.global_temp
       stop_time_measure('box_primitive_hook')
    end
    luatexja.direction.check_dir = check_dir
