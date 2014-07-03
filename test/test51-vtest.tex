@@ -345,7 +345,8 @@ p\kern-.15em\TeX\ bug (2011-02-24)
 ABCDE
 
 %\tracingall
-\hbox{\tate {\dtou 感じ\ifddir D\fi\iftdir T\fi}\ifddir D\fi\iftdir T\fi}
-
+\def\showdir{\ifcase\ltjgetparameter{direction} ?\or D\or ?\or T\or Y\fi}
+\showdir
+\hbox{\tate {\dtou 感じ\showdir}\showdir}
+\showdir
 \end
-

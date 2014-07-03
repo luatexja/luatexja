@@ -2,13 +2,16 @@
 \directlua{luatexja_debug=1}
 \documentclass{ltjsarticle}
 
-\def\showdir{{\fboxsep1pt\fbox{\sf \ifydir Y\fi\iftdir T\fi\ifddir D\fi}}}
+\def\showdir{%
+  {\fboxsep1pt\fbox{\sf \ifcase\ltjgetparameter{direction}?\or D\or ?\or T\or Y\fi}}%
+}
 \begin{document}
 \hsize=100mm\vsize=100mm
-あいうえお\insert\footins{\tate TATE}\showdir\insert\footins{\yoko YOKO2}
+あいうえお%\insert\footins{\tate TATE}\showdir
+\insert\footins{\yoko YOKO2}
 \typeout{FUGA}
 
-\vbox{\tate
+\vbox{\tate\hsize=50mm
 \the\globaldefs まみむ\showdir
 
   \hbox{\yoko ABCあいう\showdir
@@ -17,9 +20,9 @@
     }
   }
 
-かきくけこ\typeout{HOGE}\vadjust{insertion\showdir}
-\vadjust{}
-{\nonstopmode\vadjust{\yoko ins感じ\showdir}}
+かきくけこ\typeout{HOGE}
+\vadjust{insertion HOGE\showdir}% OK
+\vadjust{\yoko insertion\showdir}% must be an error
 }
 
 \newpage
@@ -132,4 +135,9 @@ est laborum.
 \hrule
 \box0
 
+\setbox0=\hbox{\tate a}
+\setbox1=\hbox{\box0}
+\leavevmode\unhbox1\setbox0\lastbox
+{\tracingonline1\showboxbreadth100\showboxdepth100\showbox0}
+a\box0 a
 \end{document}
