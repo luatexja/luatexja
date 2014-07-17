@@ -206,7 +206,7 @@ end
 local definers = fonts.definers
 local function mk_rml(name, size, id)
    local specification = definers.analyze(name,size)
-   specification = definers.resolve(specification)
+   --specification = definers.resolve(specification) (not needed)
    specification.detail = specification.detail or ''
 
    local fontdata = {}
