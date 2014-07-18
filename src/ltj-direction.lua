@@ -438,22 +438,24 @@ do
    local function check_dir(reg_num)
       start_time_measure('box_primitive_hook')
       local list_dir = get_dir_count()
-      local b = tex.getbox(tex_getcount('ltj@tempcnta'))
+      local b = getbox(tex_getcount('ltj@tempcnta'))
       if b then
 	 local box_dir = get_box_dir(to_direct(b), dir_yoko)
-	 if box_dir%dir_node_auto ~= list_dir%dir_node_auto then
-            print('NEST', tex_nest.ptr, tex_getcount('ltj@tempcnta'))
-	    luatexja.ext_show_node_list(
-               (tex_nest.ptr==0) and tex.lists.page_head or tex_nest[tex_nest.ptr].head,
-               'LIST' .. tostring(list_dir) .. '> ', print)
-	    luatexja.ext_show_node_list(b, 'BOX' .. tostring(box_dir) .. '> ', print)
+	 if box_dir%dir_node_auto ~= list_dir then
+	--    print('NEST', tex_nest.ptr, tex_getcount('ltj@tempcnta'))
+	--    luatexja.ext_show_node_list(
+        --       (tex_nest.ptr==0) and tex.lists.page_head or tex_nest[tex_nest.ptr].head,
+        --       'LIST' .. tostring(list_dir) .. '> ', print)
+	--   luatexja.ext_show_node_list(b, 'BOX' .. tostring(box_dir) .. '> ', print)
 	    ltjb.package_error(
 	       'luatexja',
 	       "Incompatible direction list can't be unboxed",
 	       'I refuse to unbox a box in differrent direction.')
 	 end
       end
-      tex.globaldefs = luatexja.global_temp
+      if luatexja.global_temp and tex.globaldefs~=luatexja.global_temp then 
+	 tex.globaldefs = luatexja.global_temp
+      end
       stop_time_measure('box_primitive_hook')
    end
    luatexja.direction.check_dir = check_dir
@@ -801,6 +803,30 @@ do
       end
    end
    luatexja.direction.get_register_dir = get_register_dir
+end
+
+-- raise, lower
+do
+   local getbox, setbox, copy_list = tex.getbox, tex.setbox, Dnode.copy_list
+   function luatexja.direction.raise_box()
+      start_time_measure('box_primitive_hook')
+      local list_dir = get_dir_count()
+      local s = getbox('ltj@afbox')
+      if s then
+	 local sd = to_direct(s)
+	 local box_dir = get_box_dir(sd, dir_yoko)
+	 if box_dir%dir_node_auto ~= list_dir then
+	    setbox(
+	       'ltj@afbox', 
+	       to_node(
+		  copy_list(make_dir_whatsit(sd, sd, list_dir, 'box_move'))
+		  -- without copy_list, we get a segfault
+	       )
+	    )
+	 end
+      end
+      stop_time_measure('box_primitive_hook')
+   end
 end
 
 -- 縦書き用字形への変換テーブル

@@ -23,8 +23,8 @@
 \newcount\ltj@tempcntb
 \newcount\ltj@tempcntc
 \newdimen\ltj@tempdima
-\newskip\ltj@tempskipa
-\newtoks\ltj@temptoks
+% \newskip\ltj@tempskipa unused
+% \newtoks\ltj@temptoks unused
 
 \countdef\ltj@@count@zero=0 %
 \luatexattributedef\ltj@@attr@zero=0 %
@@ -511,6 +511,33 @@ luatexja.base._error_show(true)% and many spaces trail!
 \def\ltj@debug@logger#1#2{
   \def#1{\ltj@package@debug{#2}}
 }
+
+%% \ltj@afterbox <token><box>
+%% -> \setbox\ltj@afbox<box><token>
+%% from Sonja Maus, ``Looking Ahead for a <box>'',
+%%      TUGBoat, 11, No. 4, 1990.
+\newbox\ltj@afbox
+\protected\def\ltj@afterbox#1{%
+  \def\ltj@afb@xarg{#1}%
+  \afterassignment\ltj@afb@x
+  \chardef\next`.}
+\def\ltj@afb@x{\futurelet\next\ltj@afb@xtest}
+\def\ltj@afb@xtest{%
+  \ifcase\ifx\next\hbox\tw@\fi
+         \ifx\next\vbox\tw@\fi
+         \ifx\next\vtop\tw@\fi
+         \ifx\next\box\@ne\fi
+         \ifx\next\copy\@ne\fi
+         \ifx\next\vsplit\@ne\fi
+         \ifx\next\lastbox\@ne\fi
+         0% ``A <box> was ...'' error will be causes by \setbox later anyway.
+  \or\afterassignment\ltj@afb@xarg
+  \or\afterassignment\ltj@afb@xagarg
+  \fi
+  \setbox\ltj@afbox
+}
+\def\ltj@afb@xagarg{\aftergroup\ltj@afb@xarg}
+
 
 %%------------------ all done
 \ltj@base@AtEnd

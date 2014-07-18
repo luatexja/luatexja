@@ -560,7 +560,7 @@
   \directlua{luatexja.direction.check_adjust_direction()}%
 }
 
-%%%% hbox, vbox, vtop
+%%%% \hbox, \vbox, \vtop
 \everyhbox{%
   \directlua{luatexja.direction.set_list_direction()}%
   \aftergroup\ltj@@reset@badness
@@ -578,6 +578,28 @@
     end
   }%
 }
+
+%%%% \raise, \lower, \moveleft, \moveright
+\let\ltj@@orig@raise=\raise
+\let\ltj@@orig@lower=\lower
+\protected\def\raise{\ltj@reset@globaldefs\afterassignment\ltj@@raise\ltj@tempdima}
+\protected\def\lower{\ltj@reset@globaldefs\afterassignment\ltj@@raise\ltj@tempdima-}
+\protected\def\ltj@@raise{%
+  \ltj@restore@globaldefs
+  \edef\ltj@@raise@a{%
+    \noexpand\directlua{luatexja.direction.raise_box()}%
+    \ltj@@orig@raise\the\ltj@tempdima\noexpand\box\ltj@afbox
+  }\ltj@afterbox\ltj@@raise@a}
+\let\ltj@@orig@moveleft=\moveleft
+\let\ltj@@orig@moveright=\moveright
+\protected\def\moveleft{\ltj@reset@globaldefs\afterassignment\ltj@@moveleft\ltj@tempdima}
+\protected\def\moveright{\ltj@reset@globaldefs\afterassignment\ltj@@moveleft\ltj@tempdima-}
+\protected\def\ltj@@moveleft{%
+  \ltj@restore@globaldefs
+  \edef\ltj@@moveleft@a{%
+    \noexpand\directlua{luatexja.direction.raise_box()}%
+    \ltj@@orig@moveleft\the\ltj@tempdima\noexpand\box\ltj@afbox
+  }\ltj@afterbox\ltj@@moveleft@a}
 
 
 %%%% unhbox and unvbox

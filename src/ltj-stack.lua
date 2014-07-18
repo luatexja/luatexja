@@ -85,7 +85,7 @@ function set_stack_font(m,c,p)
    set_stack_table(m+c, p)
 end
 
--- EXT: store \ltj@tempskipa
+-- EXT: sp: glue_spec
 function set_stack_skip(m,sp)
   local i = get_stack_level()
   if not sp then return end
