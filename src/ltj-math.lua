@@ -30,6 +30,7 @@ local set_attr = Dnode.set_attribute
 local tex_getcount = tex.getcount
 
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
+local attr_dir = luatexbase.attributes['ltj@dir']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_jfam = luatexbase.attributes['jfam']
@@ -145,7 +146,8 @@ luatexbase.add_to_callback('mlist_to_hlist',
       n = to_direct(n)
       if getid(n)==id_whatsit and getsubtype(n)==sid_user and
       getfield(n, 'user_id') == DIR then
-	 local old_n = n; n = node_remove(n, n); node_free(old_n)
+	 local old_n = n; n = node_remove(n, n)
+	 node_free(old_n)
       end
       return node.mlist_to_hlist(
 	 to_node(conv_jchar_to_hbox(n, 0)),

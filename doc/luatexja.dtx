@@ -170,7 +170,8 @@
 \def\Node#1#2{\,\vcenter{\hbox{\fboxsep=1pt\fbox{\vbox{\small\halign{\hfil##\hfil\cr
   #1\mathstrut\cr\noalign{\hrule height.4pt}\strut#2\cr}}}}\,}}
 
-\protected\def\Param#1{\textsf{#1}} % parameter name
+\protected\def\Param#1{\hyperlink{fld:#1}{\textsf{#1}}} % parameter name
+\protected\def\DParam#1{\hypertarget{fld:#1}{\textsf{#1}}} % parameter name (definition)
 \protected\def\Pkg#1{\underline{\smash{\texttt{#1}}}} % packages/classes
 
 
@@ -447,12 +448,12 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 \textbf{JAchar}の出力に用いられるフォントを\emph{和文フォント}と呼ぶ．
 %</ja>
 %<*en>
-\item A word in a sans-serif font (like \Param{\hyperlink{fld:prebp}{prebreakpenalty}})
+\item A word in a sans-serif font (like \Param{prebreakpenalty})
       means an internal parameter for Japanese typesetting, and it
       is used as a key in \verb+\ltjsetparameter+ command.
 %</en>
 %<*ja>
-\item サンセリフ体で書かれた語（例：\Param{\hyperlink{fld:prebp}{prebreakpenalty}}）は日本語組版用の
+\item サンセリフ体で書かれた語（例：\Param{prebreakpenalty}）は日本語組版用の
       パラメータを表し，これらは \verb+\ltjsetparameter+ コマンドのキーとして
       用いられる．
 %</ja>
@@ -817,10 +818,10 @@ run \LuaTeX-ja in this directory, and finally delete the temporary directory.
 
 %<*en>
 \item The amount of glue that are inserted between a \textbf{JAchar} and
-      an \textbf{ALchar} (the parameter \Param{\hyperlink{fld:xks}{xkanjiskip}}) is set to
+      an \textbf{ALchar} (the parameter \Param{xkanjiskip}) is set to
 %</en>
 %<*ja>
-\item \textbf{JAchar}と\textbf{ALchar}の間に入るグルー(\Param{\hyperlink{fld:xks}{xkanjiskip}})の
+\item \textbf{JAchar}と\textbf{ALchar}の間に入るグルー(\Param{xkanjiskip})の
       量は次のように設定されている：
 %</ja>
 \[
@@ -1976,25 +1977,25 @@ The block list is indicated in Table~\ref{table-rng7}.
       kanjiskip}).
 %</en>
 %<*ja>
-\item デフォルトで2つの\textbf{JAchar}の間に挿入されるグルー(\Param{\hyperlink{fld:kanjiskip}{kanjiskip}})．
+\item デフォルトで2つの\textbf{JAchar}の間に挿入されるグルー(\Param{kanjiskip})．
 %</ja>
 %<*en>
 \item The default glue which inserted between a \textbf{JAchar} and an
-      \textbf{ALchar} (\Param{\hyperlink{fld:xks}{xkanjiskip}}).
+      \textbf{ALchar} (\Param{xkanjiskip}).
 %</en>
 %<*ja>
-\item デフォルトで\textbf{JAchar}と\textbf{ALchar}の間に挿入されるグルー(\Param{\hyperlink{fld:xks}{xkanjiskip}})．
+\item デフォルトで\textbf{JAchar}と\textbf{ALchar}の間に挿入されるグルー(\Param{xkanjiskip})．
 %</ja>
 \end{itemize}
 %<*en>
-The value (a skip) of \Param{\hyperlink{fld:kanjiskip}{kanjiskip}} or
-\Param{\hyperlink{fld:xks}{xkanjiskip}} can be changed as the following.
+The value (a skip) of \Param{kanjiskip} or
+\Param{xkanjiskip} can be changed as the following.
 Note that only their values \emph{at the end of a paragraph or a hbox are
 adopted in the whole paragraph or the whole hbox.
 }
 %</en>
 %<*ja>
-\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}や\Param{\hyperlink{fld:xks}{xkanjiskip}}の値
+\Param{kanjiskip}や\Param{xkanjiskip}の値
 は以下のようにして変更可能である．
 %</ja>
 \begin{lstlisting}
@@ -2006,40 +2007,56 @@ Here \verb+\zw+ is a internal dimension
 which stores fullwidth of the current Japanese font.
 This \verb+\zw+ can be used as the unit \texttt{zw} in \pTeX.
 
-It may occur that JFM contains the data of ``ideal width of
-\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}''
-and/or ``ideal width of \Param{\hyperlink{fld:xks}{xkanjiskip}}''.
-To use these data from JFM, set the value of \Param{\hyperlink{fld:kanjiskip}{kanjiskip}} or
-\Param{\hyperlink{fld:xks}{xkanjiskip}} to \verb+\maxdimen+.
+The value of these parameter can be get by \verb+\ltjgetparameter+.
+Note that the result by \verb+\ltjgetparameter+ is \emph{not} the internal quantities,
+but \emph{a string} (hence \verb+\the+ cannot be prefixed).
 %</en>
 %<*ja>
 ここで，\verb+\zw+ は現在の和文フォントの全角幅を表す長さであり，
 \pTeX における長さ単位 \texttt{zw} と同じように使用できる．
 
-JFMは「望ましい\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}の値」や
-「望ましい\Param{\hyperlink{fld:xks}{xkanjiskip}}の値」を持っていることがある．
-これらのデータを使うためには，\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}や%
-\Param{\hyperlink{fld:xks}{xkanjiskip}}の値を \verb+\maxdimen+ の値に設定すればよい．
+これらのパラメータの値は以下のように取得できる．
+戻り値は内部値ではなく\emph{文字列}である（\verb+\the+ は前置できない）ことに注意してほしい：
+%</ja>
+\begin{LTXexample}
+kanjiskip: \ltjgetparameter{kanjiskip},\\
+xkanjiskip: \ltjgetparameter{xkanjiskip}
+\end{LTXexample}
+
+%<*en>
+It may occur that JFM contains the data of ``ideal width of
+\Param{kanjiskip}''
+and/or ``ideal width of \Param{xkanjiskip}''.
+To use these data from JFM, set the value of \Param{kanjiskip} or
+\Param{xkanjiskip} to \verb+\maxdimen+
+(these ``ideal width'' cannot be retrived by \verb+\ltjgetparameter+).
+%</en>
+%<*ja>
+JFMは「望ましい\Param{kanjiskip}の値」や
+「望ましい\Param{xkanjiskip}の値」を持っていることがある．
+これらのデータを使うためには，\Param{kanjiskip}や%
+\Param{xkanjiskip}の値を \verb+\maxdimen+ の値に設定すればよいが，
+\verb+\ltjgetparameter+ によって取得することはできないので注意が必要である．
 %</ja>
 
 %<en>\subsection{Insertion Setting of \Param{xkanjiskip}}
 %<ja>\subsection{\Param{xkanjiskip} の挿入設定}
 
 %<*en>
-It is not desirable that \Param{\hyperlink{fld:xks}{xkanjiskip}} is inserted into every
+It is not desirable that \Param{xkanjiskip} is inserted into every
 boundary between \textbf{JAchar}s and \textbf{ALchar}s. For example,
-\Param{\hyperlink{fld:xks}{xkanjiskip}} should not be inserted after opening parenthesis
+\Param{xkanjiskip} should not be inserted after opening parenthesis
 (\textit{e.g.}, compare ``(あ'' and ``(\hskip\ltjgetparameter{xkanjiskip}あ'').
-\LuaTeX-ja can control whether \Param{\hyperlink{fld:xks}{xkanjiskip}} can be inserted
+\LuaTeX-ja can control whether \Param{xkanjiskip} can be inserted
 before/after a character, by changing \Param{jaxspmode} for \textbf{JAchar}s and
 \Param{alxspmode} parameters \textbf{ALchar}s respectively.
 %</en>
 %<*ja>
-\Param{\hyperlink{fld:xks}{xkanjiskip}}がすべての\textbf{JAchar}と\textbf{ALchar}の境界に
-挿入されるのは望ましいことではない．例えば，\Param{\hyperlink{fld:xks}{xkanjiskip}}は開き括弧の
+\Param{xkanjiskip}がすべての\textbf{JAchar}と\textbf{ALchar}の境界に
+挿入されるのは望ましいことではない．例えば，\Param{xkanjiskip}は開き括弧の
 後には挿入されるべきではない（「(あ」と「(\hskip\ltjgetparameter{xkanjiskip}あ」を
 比べてみよ）．
-\LuaTeX-jaでは\Param{\hyperlink{fld:xks}{xkanjiskip}}をある文字の前／後に挿入するかどうかを，
+\LuaTeX-jaでは\Param{xkanjiskip}をある文字の前／後に挿入するかどうかを，
 \textbf{JAchar}に対しては\Param{jaxspmode}を，\textbf{ALchar}に対しては
 \Param{alxspmode}をそれぞれ変えることで制御することができる．
 %</ja>
@@ -2050,11 +2067,11 @@ pあq い!う
 
 %<*en>
 The second argument \texttt{preonly} means that the insertion of
-\Param{\hyperlink{fld:xks}{xkanjiskip}} is allowed before this character, but not after.
+\Param{xkanjiskip} is allowed before this character, but not after.
 the other possible values are \texttt{postonly}, \texttt{allow}, and \texttt{inhibit}.
 %</en>
 %<*ja>
-2つ目の引数の \texttt{preonly}は「\Param{\hyperlink{fld:xks}{xkanjiskip}}の挿入はこの文字の
+2つ目の引数の \texttt{preonly}は「\Param{xkanjiskip}の挿入はこの文字の
 前でのみ許され，後では許さない」ことを意味する．他に指定可能な値は
 \texttt{postonly}, \texttt{allow}, \texttt{inhibit}である．
 %</ja>
@@ -2080,12 +2097,12 @@ One can use also numbers to specify these two parameters (see Subsection~\ref{ss
 %</ja>
 
 %<*en>
-If you want to enable/disable all insertions of \Param{\hyperlink{fld:kanjiskip}{kanjiskip}} and
-\Param{\hyperlink{fld:xks}{xkanjiskip}}, set \Param{autospacing} and \Param{autoxspacing}
+If you want to enable/disable all insertions of \Param{kanjiskip} and
+\Param{xkanjiskip}, set \Param{autospacing} and \Param{autoxspacing}
 parameters to \texttt{true}/\texttt{false}, respectively.
 %</en>
 %<*ja>
-もし全ての\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}と\Param{\hyperlink{fld:xks}{xkanjiskip}}の挿入を有効化／無効化
+もし全ての\Param{kanjiskip}と\Param{xkanjiskip}の挿入を有効化／無効化
 したければ，それぞれ\Param{autospacing}と\Param{autoxspacing}を
 \texttt{true}/\texttt{false}に設定すればよい．
 %</ja>
@@ -2483,16 +2500,17 @@ JIS~X~0213の範囲に広げると，差異はさらに大きくなる．
   \hbox to 60pt{\,銀は、Ag\hss}}}%
   \raise\dimexpr 0.5\ltjgetdp0-0.5\ltjgetht0\box0%
 }
-\begin{tabular}{>{\bfseries}lccc}
+\begin{tabular}{>{\bfseries}lcccc}
 \toprule
 &\texttt{\textbackslash yoko}（横組）&\texttt{\textbackslash tate}（縦組）
- &\texttt{\textbackslash dtou}\\
+ &\texttt{\textbackslash dtou}&\texttt{\textbackslash utod}\\
 \midrule
-字送り方向&水平右向き（→）&垂直下向き（↓）&垂直上向き（↑）\\
-行送り方向&垂直下向き（↓）&水平左向き（←）&水平右向き（→）\\
-使用する和文フォント&横組用(\verb+\jfont+)&縦組用(\verb+\tfont+)&横組用(\verb+\jfont+)の
-	     $90^\circ$回転\\[\smallskipamount]
-組版例\null $^*$ &\obox{\yoko}&\obox{\tate}&\obox{\dtou}\\
+字送り方向&水平右向き（→）&垂直下向き（↓）&垂直上向き（↑）&垂直下向き（↓）\\
+行送り方向&垂直下向き（↓）&水平左向き（←）&水平右向き（→）&水平左向き（←）\\
+使用する和文フォント&横組用(\verb+\jfont+)&縦組用(\verb+\tfont+)&
+\multicolumn{2}{c}{%
+  横組用(\texttt{\textbackslash jfont})の$90^\circ$回転}\\[\smallskipamount]
+組版例\null $^*$ &\obox{\yoko}&\obox{\tate}&\obox{\dtou}&\obox{\utod}\\
 \noalign{\medskip}
 \bottomrule
 \end{tabular}
@@ -2510,16 +2528,16 @@ $^*$\ 幅(width)，高さ(height)，深さ(depth)の増加方向を，
 
 \end{table}
 
-\LuaTeX-jaがサポートする組方向は表\ref{tab-dir}に示す3つである．
+\LuaTeX-jaがサポートする組方向は表\ref{tab-dir}に示す4つである．
 4列目の \verb+\dtou+ は聞き慣れない命令だと思うが，
 実は\pTeX に同名の命令が（ドキュメントには書かれていないが）存在する．
 Down-TO-Upの意味なのだろう．\verb+\dtou+ を使用する機会はないだろうが，
 \LuaTeX-jaではデバッグ用に実装している．
+5列目の \verb+\utod+ は，\pTeX で言う「縦数式ディレクション」に相当するものである．
 
-
-組方向は，\verb+\yoko+,~\verb+\tate+,~\verb+\dtou+ をそれぞれ使用することで，
+組方向は，\verb+\yoko+,~\verb+\tate+, \verb+\dtou+,~\verb+\utod+ をそれぞれ使用することで，
 現在作成中のリストやボックスが空の時にのみ変更可能である．
-
+また，縦組中の数式内のボックスは\pTeX と同じように組方向が \verb+\utod+ となる．
 
 \subsection{異方向のボックス}
 
@@ -2796,21 +2814,31 @@ Down-TO-Upの意味なのだろう．\verb+\dtou+ を使用する機会はない
 
 \end{cslist}
 
-\subsection{組方向の取得・条件判断}
-「現在の組方向」や「<num>番のボックスの組方向」は，以下の命令によって
-知ることができる．
+\subsection{組方向の取得}
+「現在の組方向」や「<num>番のボックスの組方向」は，
+\pTeX では\verb+\ifydir+ や \verb+\ifybox+<num> といった条件判断文を使って
+判断することができた．
+しかし，\LuaTeX-jaはあくまでも\TeX マクロとLuaコードで
+記述されており，それでは新たな条件判断命令を作るのは難しい．
 
-\begin{cslist}
- \item[ifydir\textrm{, }\textbackslash iftdir\textrm{, }\textbackslash ifddir]
-現在の組方向が横組(\verb+\yoko+)，縦組(\verb+\tate+)，\verb+\dtou+ 方向であるかを
-それぞれ判定する．
+\LuaTeX-jaでは，\Param{direction}パラメータで現在の組方向を，
+\Param{boxdir}パラメータによってボックスの組方向をそれぞれ取得できるようにした．
+戻り値は1文字の数字（文字列）であり，1は \verb+\dtou+ 方向を，
+3は縦組を，4は横組，11は \verb+\utod+ 方向を表す：
+\begin{LTXexample}[width=0.3\textwidth]
+\leavevmode\def\DIR{\ltjgetparameter{direction}}
+\hbox{\yoko \DIR}, \hbox{\tate\DIR}, \hbox{\dtou\DIR}, \hbox{\utod\DIR}
 
- \item[ifybox\{<num>\}\textrm{, }\textbackslash iftbox\{<num>\}\textrm{, }%
-  \textbackslash ifdbox\{<num>\}]
-<num>番のレジスタの中身が横組ボックス，縦組ボックス，\verb+\dtou+ 方向の
-ボックスか否かをそれぞれ判定する．
+\setbox2=\hbox{\tate}\ltjgetparameter{boxdir}{2}
+\end{LTXexample}
 
-\end{cslist}
+これらを用いれば，例えば
+\pTeX の \verb+\ifydir+, \verb+\iftbox200+ と同等の条件判断を
+\begin{verbatim}
+\ifnum\ltjgetparameter{direction}=4
+\ifnum\ltjgetparameter{boxdir}{200}=3
+\end{verbatim}
+のように行うことができる．
 
 \subsection{プリミティブの再定義}
 異なる組方向に対応するために，以下に挙げるプリミティブは
@@ -3282,16 +3310,16 @@ JFMの書字方向．\texttt{'yoko'}（横組）と \texttt{'tate'}（縦組）�
 %<ja>（任意）
 
 %<*en>
-This field specifies the ``ideal'' amount of \Param{\hyperlink{fld:kanjiskip}{kanjiskip}}. As noted
+This field specifies the ``ideal'' amount of \Param{kanjiskip}. As noted
 	     in Subsection~\ref{subs-kskip}, if the parameter
-	     \Param{\hyperlink{fld:kanjiskip}{kanjiskip}} is \verb+\maxdimen+, the value specified
+	     \Param{kanjiskip} is \verb+\maxdimen+, the value specified
 	     in this field is actually used (if this field is not specified in
 	     JFM, it is regarded as 0\,pt). Note that <stretch> and <shrink>
 	     fields are in design-size unit too.
 %</en>
 %<*ja>
-理想的な\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}の量を指定する．\ref{subs-kskip}節で述べたように，
-もし\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}が \verb+\maxdimen+ の値ならば，このフィールドで指定された
+理想的な\Param{kanjiskip}の量を指定する．\ref{subs-kskip}節で述べたように，
+もし\Param{kanjiskip}が \verb+\maxdimen+ の値ならば，このフィールドで指定された
 値が実際には用いられる（指定なしは0\,ptとして扱われる）．<stretch>と<shrink>のフィールドもdesign-size
 が単位であることに注意せよ．
 %</ja>
@@ -3302,10 +3330,10 @@ This field specifies the ``ideal'' amount of \Param{\hyperlink{fld:kanjiskip}{ka
 
 %<*en>
 Like the \texttt{kanjiskip} field, this field specifies the ``ideal''
-	     amount of \Param{\hyperlink{fld:xks}{xkanjiskip}}.
+	     amount of \Param{xkanjiskip}.
 %</en>
 %<*ja>
-\texttt{kanjiskip}フィールドと同様に，\Param{\hyperlink{fld:xks}{xkanjiskip}}の理想的な量を
+\texttt{kanjiskip}フィールドと同様に，\Param{xkanjiskip}の理想的な量を
 指定する．
 %</ja>
 \end{list}
@@ -3537,7 +3565,7 @@ Furthermore, the glyph is shifted according to values of fields
 \item それ以外の値は，「前の文字」由来のグルーと「後の文字」由来の
 グルーが混合されていることを示す．
 \end{itemize}
-なお，このフィールドの値は\Param{\hyperlink{fld:diffjfm}{differentjfm}}の値が
+なお，このフィールドの値は\Param{differentjfm}の値が
 \texttt{pleft},~\texttt{pright},~\texttt{paverage}の値のときのみ実際に用いられる．
 
 例えば，\cite{x4051}では，句点と中点の間には，
@@ -4184,7 +4212,7 @@ adopted in the whole paragraph or the whole hbox.
 \end{itemize}
 
 \begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
-\item[\Param{jcharwidowpenalty}\,=<penalty>$^\ast$] [\verb+\jcharwidowpenalty+]
+\item[\DParam{jcharwidowpenalty}\,=<penalty>$^\ast$] [\verb+\jcharwidowpenalty+]
 %<*en>
 Penalty value for suppressing orphans. This penalty is inserted just
 	     after the last \textbf{JAchar} which is not regarded as a
@@ -4196,7 +4224,7 @@ Penalty value for suppressing orphans. This penalty is inserted just
 挿入される．
 %</ja>
 
-\item[\Param{kcatcode}\,=\{<chr\_code>,<natural number>\}$^\ast$]\
+\item[\DParam{kcatcode}\,=\{<chr\_code>,<natural number>\}$^\ast$]\
 %<*en>
 An additional attributes which each character whose character code is <chr\_code> has.
 At the present version, the lowermost bit of <natural number> indicates
@@ -4209,7 +4237,7 @@ At the present version, the lowermost bit of <natural number> indicates
 みなされるかどうかを表している（上の\Param{jcharwidowpenalty}の記述を参照）．
 %</ja>
 
-\item[\Param{\hypertarget{fld:prebp}{prebreakpenalty}}\,=\{<chr\_code>,<penalty>\}$^\ast$] [\verb+\prebreakpenalty+]\
+\item[\DParam{prebreakpenalty}\,=\{<chr\_code>,<penalty>\}$^\ast$] [\verb+\prebreakpenalty+]\
 %<*ja>
 文字コード<chr\_code>の\textbf{JAchar}が行頭にくることを抑止するために，
 	     この文字の前に挿入/追加されるペナルティの量を指定する．
@@ -4233,7 +4261,7 @@ by default.
 %</en>
 
 
-\item[\Param{\hypertarget{fld:postbp}{postbreakpenalty}}\,=\{<chr\_code>,<penalty>\}$^\ast$] [\verb+\postbreakpenalty+]
+\item[\DParam{postbreakpenalty}\,=\{<chr\_code>,<penalty>\}$^\ast$] [\verb+\postbreakpenalty+]
 %<*ja>
 文字コード<chr\_code>の\textbf{JAchar}が行末にくることを抑止するために，
 	     この文字の後に挿入/追加されるペナルティの量を指定する．
@@ -4258,40 +4286,40 @@ for the same character.
 \end{itemize}
 %</en>
 
-\item[\Param{jatextfont}\,=\{<jfam>,<jfont\_cs>\}$^\ast$]
+\item[\DParam{jatextfont}\,=\{<jfam>,<jfont\_cs>\}$^\ast$]
 %<en>[\verb+\textfont+ in \TeX]
 %<ja>[\TeX の \verb+\textfont+]
-\item[\Param{jascriptfont}\,=\{<jfam>,<jfont\_cs>\}$^\ast$]
+\item[\DParam{jascriptfont}\,=\{<jfam>,<jfont\_cs>\}$^\ast$]
 %<en>[\verb+\scriptfont+ in \TeX]
 %<ja>[\TeX の \verb+\scriptfont+]
-\item[\Param{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}$^\ast$]
+\item[\DParam{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}$^\ast$]
 %<en>[\verb+\scriptscriptfont+ in \TeX]
 %<ja>[\TeX の \verb+\scriptscriptfont+]
-\item[\Param{yjabaselineshift}\,=<dimen>]\
-\item[\Param{yalbaselineshift}\,=<dimen>] [\verb+\ybaselineshift+]
-\item[\Param{tjabaselineshift}\,=<dimen>]\
-\item[\Param{talbaselineshift}\,=<dimen>] [\verb+\tbaselineshift+]
+\item[\DParam{yjabaselineshift}\,=<dimen>]\
+\item[\DParam{yalbaselineshift}\,=<dimen>] [\verb+\ybaselineshift+]
+\item[\DParam{tjabaselineshift}\,=<dimen>]\
+\item[\DParam{talbaselineshift}\,=<dimen>] [\verb+\tbaselineshift+]
 
-\item[\Param{jaxspmode}\,=\{<chr\_code>,<mode>\}$^\ast$]
+\item[\DParam{jaxspmode}\,=\{<chr\_code>,<mode>\}$^\ast$]
 
 %<*en>
-Setting whether inserting \Param{\hyperlink{fld:xks}{xkanjiskip}} is allowed before/after a \textbf{JAchar} whose character code is <chr\_code>.
+Setting whether inserting \Param{xkanjiskip} is allowed before/after a \textbf{JAchar} whose character code is <chr\_code>.
 The followings are allowed for <mode>:
 %</en>
 %<*ja>
-文字コードが<chr\_code>の\textbf{JAchar}の前／後ろに\Param{\hyperlink{fld:xks}{xkanjiskip}}の
+文字コードが<chr\_code>の\textbf{JAchar}の前／後ろに\Param{xkanjiskip}の
 挿入を許すかどうかの設定．
 以下の<mode>が許される：
 %</ja>
 \begin{description}
-%<en>\item[0, \texttt{inhibit}] Insertion of \Param{\hyperlink{fld:xks}{xkanjiskip}} is inhibited before the character, nor after the character.
-%<ja>\item[0, \texttt{inhibit}] \Param{\hyperlink{fld:xks}{xkanjiskip}}の挿入は文字の前／後ろのいずれでも禁止される．
-%<en>\item[1, \texttt{preonly}] Insertion of \Param{\hyperlink{fld:xks}{xkanjiskip}} is allowed before the character, but not after.
-%<ja>\item[1, \texttt{preonly}] \Param{\hyperlink{fld:xks}{xkanjiskip}}の挿入は文字の前では許されるが，後ろでは許されない．
-%<en>\item[2, \texttt{postonly}] Insertion of \Param{\hyperlink{fld:xks}{xkanjiskip}} is allowed after the character, but not before.
-%<ja>\item[2, \texttt{postonly}] \Param{\hyperlink{fld:xks}{xkanjiskip}}の挿入は文字の後ろでは許されるが，前では許されない．
-%<en>\item[3, \texttt{allow}] Insertion of \Param{\hyperlink{fld:xks}{xkanjiskip}} is allowed both before the character and after the character. This is the default value.
-%<ja>\item[3, \texttt{allow}] \Param{\hyperlink{fld:xks}{xkanjiskip}}の挿入は文字の前／後ろのいずれでも許される．これがデフォルトの値である．
+%<en>\item[0, \texttt{inhibit}] Insertion of \Param{xkanjiskip} is inhibited before the character, nor after the character.
+%<ja>\item[0, \texttt{inhibit}] \Param{xkanjiskip}の挿入は文字の前／後ろのいずれでも禁止される．
+%<en>\item[1, \texttt{preonly}] Insertion of \Param{xkanjiskip} is allowed before the character, but not after.
+%<ja>\item[1, \texttt{preonly}] \Param{xkanjiskip}の挿入は文字の前では許されるが，後ろでは許されない．
+%<en>\item[2, \texttt{postonly}] Insertion of \Param{xkanjiskip} is allowed after the character, but not before.
+%<ja>\item[2, \texttt{postonly}] \Param{xkanjiskip}の挿入は文字の後ろでは許されるが，前では許されない．
+%<en>\item[3, \texttt{allow}] Insertion of \Param{xkanjiskip} is allowed both before the character and after the character. This is the default value.
+%<ja>\item[3, \texttt{allow}] \Param{xkanjiskip}の挿入は文字の前／後ろのいずれでも許される．これがデフォルトの値である．
 \end{description}
 %<*en>
 This parameter is similar to the \verb+\inhibitxspcode+ primitive of \pTeX, but not compatible with \verb+\inhibitxspcode+.
@@ -4300,27 +4328,27 @@ This parameter is similar to the \verb+\inhibitxspcode+ primitive of \pTeX, but 
 このパラメータは\pTeX の \verb+\inhibitxspcode+ プリミティブと似ているが，
 互換性はない．
 %</ja>
-\item[\Param{alxspmode}\,=\{<chr\_code>,<mode>\}$^\ast$] [\verb+\xspcode+]
+\item[\DParam{alxspmode}\,=\{<chr\_code>,<mode>\}$^\ast$] [\verb+\xspcode+]
 
 %<*en>
-Setting whether inserting \Param{\hyperlink{fld:xks}{xkanjiskip}} is allowed before/after a
+Setting whether inserting \Param{xkanjiskip} is allowed before/after a
 	     \textbf{ALchar} whose character code is <chr\_code>.
              The followings are allowed for <mode>:
 %</en>
 %<*ja>
-文字コードが<chr\_code>の\textbf{ALchar}の前／後ろに\Param{\hyperlink{fld:xks}{xkanjiskip}}の
+文字コードが<chr\_code>の\textbf{ALchar}の前／後ろに\Param{xkanjiskip}の
 挿入を許すかどうかの設定．
 以下の<mode>が許される：
 %</ja>
 \begin{description}
-%<en>\item[0, \texttt{inhibit}] Insertion of \Param{\hyperlink{fld:xks}{xkanjiskip}} is inhibited before the character, nor after the character.
-%<ja>\item[0, \texttt{inhibit}] \Param{\hyperlink{fld:xks}{xkanjiskip}}の挿入は文字の前／後ろのいずれでも禁止される．
-%<en>\item[1, \texttt{preonly}] Insertion of \Param{\hyperlink{fld:xks}{xkanjiskip}} is allowed before the character, but not after.
-%<ja>\item[1, \texttt{preonly}] \Param{\hyperlink{fld:xks}{xkanjiskip}}の挿入は文字の前では許されるが，後ろでは許されない．
-%<en>\item[2, \texttt{postonly}] Insertion of \Param{\hyperlink{fld:xks}{xkanjiskip}} is allowed after the character, but not before.
-%<ja>\item[2, \texttt{postonly}] \Param{\hyperlink{fld:xks}{xkanjiskip}}の挿入は文字の後ろでは許されるが，前では許されない．
-%<en>\item[3, \texttt{allow}] Insertion of \Param{\hyperlink{fld:xks}{xkanjiskip}} is allowed before the character and after the character. This is the default value.
-%<ja>\item[3, \texttt{allow}] \Param{\hyperlink{fld:xks}{xkanjiskip}}の挿入は文字の前／後ろのいずれでも許される．これがデフォルトの値である．
+%<en>\item[0, \texttt{inhibit}] Insertion of \Param{xkanjiskip} is inhibited before the character, nor after the character.
+%<ja>\item[0, \texttt{inhibit}] \Param{xkanjiskip}の挿入は文字の前／後ろのいずれでも禁止される．
+%<en>\item[1, \texttt{preonly}] Insertion of \Param{xkanjiskip} is allowed before the character, but not after.
+%<ja>\item[1, \texttt{preonly}] \Param{xkanjiskip}の挿入は文字の前では許されるが，後ろでは許されない．
+%<en>\item[2, \texttt{postonly}] Insertion of \Param{xkanjiskip} is allowed after the character, but not before.
+%<ja>\item[2, \texttt{postonly}] \Param{xkanjiskip}の挿入は文字の後ろでは許されるが，前では許されない．
+%<en>\item[3, \texttt{allow}] Insertion of \Param{xkanjiskip} is allowed before the character and after the character. This is the default value.
+%<ja>\item[3, \texttt{allow}] \Param{xkanjiskip}の挿入は文字の前／後ろのいずれでも許される．これがデフォルトの値である．
 \end{description}
 %<*en>
 Note that parameters \Param{jaxspmode} and \Param{alxspmode} share a common table, hence these two parameters are synonyms of each other.
@@ -4330,9 +4358,9 @@ Note that parameters \Param{jaxspmode} and \Param{alxspmode} share a common tabl
 これら2つのパラメータは互いの異名となっていることに注意する．
 %</ja>
 
-\item[\Param{autospacing}\,=<bool>] [\verb+\autospacing+]
-\item[\Param{autoxspacing}\,=<bool>] [\verb+\autoxspacing+]
-\item[\Param{\hypertarget{fld:kanjiskip}{kanjiskip}}\,=<skip>$^\ast$] [\verb+\kanjiskip+]
+\item[\DParam{autospacing}\,=<bool>] [\verb+\autospacing+]
+\item[\DParam{autoxspacing}\,=<bool>] [\verb+\autoxspacing+]
+\item[\DParam{kanjiskip}\,=<skip>$^\ast$] [\verb+\kanjiskip+]
 %<*ja>
 デフォルトで2つの\textbf{JAchar}の間に挿入されるグルーである．
 通常では，\pTeX と同じようにフォントサイズに比例して変わることはない．
@@ -4340,15 +4368,15 @@ Note that parameters \Param{jaxspmode} and \Param{alxspmode} share a common tabl
 値を採用（こちらはフォントサイズに比例）することになっている．
 %</ja>
 
-\item[\Param{\hypertarget{fld:xks}{xkanjiskip}}\,=<skip>$^\ast$] [\verb+\xkanjiskip+]
+\item[\DParam{xkanjiskip}\,=<skip>$^\ast$] [\verb+\xkanjiskip+]
 %<*ja>
 デフォルトで\textbf{JAchar}と\textbf{ALchar}の間に挿入されるグルーである．
-\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}と同じように，通常ではフォントサイズに比例して変わることはないが，
+\Param{kanjiskip}と同じように，通常ではフォントサイズに比例して変わることはないが，
 自然長が \verb+\maxdimen+ の場合が例外である．
 %</ja>
 
 
-\item[\Param{\hypertarget{fld:diffjfm}{differentjfm}}\,=<mode>$^\dagger$]
+\item[\DParam{differentjfm}\,=<mode>$^\dagger$]
 
 %<*en>
 Specify how glues/kerns between two \textbf{JAchar}s whose JFM (or size) are different.
@@ -4376,8 +4404,18 @@ The default value is \texttt{paverage}. \dots
 各々の値による差異の詳細は\ref{ssec-cluster-wa}節の「『右空白』の算出」を参照してほしい．
 %</ja>
 
-\item[\Param{jacharrange}\,=<ranges>]
-\item[\Param{kansujichar}\,=\{<digit>, <chr\_code>\}$^\ast$] [\verb+\kansujichar+]
+\item[\DParam{jacharrange}\,=<ranges>]
+\item[\DParam{kansujichar}\,=\{<digit>, <chr\_code>\}$^\ast$] [\verb+\kansujichar+]
+
+\item[\DParam{direction}\,=<dir>\ \hbox{\rm (always local)}]
+
+%<*ja>
+組方向を変更する \verb+\yoko+~(if $\hbox{<dir>}=4$), \verb+\tate+~(if $\hbox{<dir>}=3$),
+\verb+\dtou+~(if $\hbox{<dir>}=1$), \verb+\utod+~(if $\hbox{<dir>}=11$) と同じ役割を持つ．
+利用可能な状況もこれら4命令と同一である．引数<dir>が4,~3, 1,~11のいずれでも無いときの
+動作は未定義である．
+%</ja>
+
 \end{list}
 
 \subsection{\texttt{\textbackslash ltjgetparameter}}
@@ -4422,7 +4460,7 @@ following, no  additional argument is needed.
 \begin{quote}
 \sffamily
 jcharwidowpenalty, yjabaselineshift, yalbaselineshift, autospacing, autoxspacing,\\
-kanjiskip, xkanjiskip, differentjfm
+kanjiskip, xkanjiskip, differentjfm, direction
 \end{quote}
 %<*en>
 Note that \verb+\ltjgetparameter{autospacing}+~and~\verb+\ltjgetparameter{autoxspacing}+
@@ -4482,6 +4520,32 @@ of the result of \verb+\kansuji+<digit>.
      る文字の文字コードを返す．
 %</ja>
 
+\item
+%<*en>
+\verb+\ltjgetparameter{adjustdir}+ returns a integer which represents
+the direction of the surrounding vertical list.
+As \Param{direction}, the return value 1 means \emph{down-to-up} direction,
+3 means \emph{tate} direction (vertical typesetting),
+and 4 means \emph{yoko} direction (horizontal typesetting).
+%</en>
+%<*ja>
+\verb+\ltjgetparameter{adjustdir}+ は，周囲のvboxの組方向（言い換えれば，
+\verb+\vadjust+ で用いられる組方向）を表す数値を返す．
+\Param{direction}と同様に，1は \verb+\dtou+ 方向を，
+3は縦組みを，4は横組みを表す．
+%</ja>
+
+\item
+%<*en>
+For an integer~<reg\_num> between 0~and~65535,
+\verb+\ltjgetparameter{boxdim}{+<reg\_num>\verb+}+ returns the direction of
+\verb+\box+<reg\_num>. If this box is void, the returned value is zero.
+%</en>
+%<*ja>
+0--65535の数<reg\_num>に対して，
+\verb+\ltjgetparameter{boxdim}{+<reg\_num>\verb+}+ は，\verb+\box+<reg\_num>に
+格納されているボックスの組方向を表す．もしこのレジスタが空の場合は，0が返される．
+%</ja>
 
 \item
 %<*en>
@@ -5152,7 +5216,7 @@ AltFont = {
 %<*en>
 Each sublist should have the \texttt{Range} key
 (sublist which does not contain \texttt{Range} key is simply ignored).
-A demonstration is shown in Figure~\ref{fig:altkanji-fontspec}.
+A demonstrarion is shown in Figure~\ref{fig:altkanji-fontspec}.
 %</en>
 %<*ja>
 各部分リストには \texttt{Range} キーが必須である（含まれない部分リストは
@@ -5369,7 +5433,7 @@ with priority&%
 \smallskip
 
 Note: the value of
-\Param{\hyperlink{fld:kanjiskip}{kanjiskip}} is 0\,pt${}^{+1/5\,\mathrm{em}}_{-1/5\,\mathrm{em}}$ in this figure,
+\Param{kanjiskip} is 0\,pt${}^{+1/5\,\mathrm{em}}_{-1/5\,\mathrm{em}}$ in this figure,
 for making the difference obvious.
 %<ja>\caption{行長調整}\label{fig-adj}
 %<en>\caption{Line adjustment}\label{fig-adj}
@@ -5382,7 +5446,7 @@ for making the difference obvious.
 %<*ja>
 \pTeX では，行長調整において優先度の概念が存在しなかったため，図
 \ref{fig-adj}上段における半角分の半端は，図\ref{fig-adj}中段のように，鍵
-括弧周辺の空白と和文間空白(\Param{\hyperlink{fld:kanjiskip}{kanjiskip}})の両方によって負担される．し
+括弧周辺の空白と和文間空白(\Param{kanjiskip})の両方によって負担される．し
 かし，「日本語組版処理の要件」\cite{jlreq}やJIS~X~4051~\cite{x4051}におい
 ては，このような状況では半端は鍵括弧周辺の空白のみで負担し，その他の和文
 文字はベタ組で組まれる（図\ref{fig-adj}下段）ことになっている．この追加
@@ -5645,18 +5709,18 @@ The amount of shifting the baseline of Japanese fonts in scaled point ($2^{-16}\
 
 \attr{ltj@autospc}
 %<*en>
-Whether the auto insertion of \Param{\hyperlink{fld:kanjiskip}{kanjiskip}} is allowed at the node.
+Whether the auto insertion of \Param{kanjiskip} is allowed at the node.
 %</en>
 %<*ja>
-そのノードで\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}の自動挿入が許されるかどうか．
+そのノードで\Param{kanjiskip}の自動挿入が許されるかどうか．
 %</ja>
 
 \attr{ltj@autoxspc}
 %<*en>
-Whether the auto insertion of \Param{\hyperlink{fld:xks}{xkanjiskip}} is allowed at the node.
+Whether the auto insertion of \Param{xkanjiskip} is allowed at the node.
 %</en>
 %<*ja>
-そのノードで\Param{\hyperlink{fld:xks}{xkanjiskip}}の自動挿入が許されるかどうか．
+そのノードで\Param{xkanjiskip}の自動挿入が許されるかどうか．
 %</ja>
 
 \attr{ltj@icflag}
@@ -5692,11 +5756,11 @@ Penalties inserted for the word-wrapping process (\emph{kinsoku shori}) of Japan
 %<en>Glues/kerns from JFM.
 %<ja>JFM由来のグルー／カーン．
 \item[\textit{kanji\_skip}~(9), \textit{kanji\_skip\_jfm}~(10)]
-%<en>Glues from \Param{\hyperlink{fld:kanjiskip}{kanjiskip}}.
-%<ja>和文間空白\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}を表すグルー．
+%<en>Glues from \Param{kanjiskip}.
+%<ja>和文間空白\Param{kanjiskip}を表すグルー．
 \item[\textit{xkanji\_skip}~(11), \textit{xkanji\_skip\_jfm}~(12)]
-%<en>Glues from \Param{\hyperlink{fld:xks}{xkanjiskip}}.
-%<ja>和欧文間空白\Param{\hyperlink{fld:xks}{xkanjiskip}}を表すグルー．
+%<en>Glues from \Param{xkanjiskip}.
+%<ja>和欧文間空白\Param{xkanjiskip}を表すグルー．
 \item[\textit{processed} (13)]
 %<en>Nodes which is already processed by \ldots.
 %<ja>\LuaTeX-ja の内部処理によって既に処理されたノード．
@@ -5727,20 +5791,15 @@ $i$は7より小さい自然数．
 扱われるかを示すビットベクトルを格納する．
 %</ja>
 
-\cnt{ltj@dir@count}
+\attr{ltj@dir}
 %<*ja>
-現在の組方向を表す．
-%</ja>
+ボックスにおける組方向を示す．通常のボックスでは
 \begin{description}
 \item[\textit{dir\_dtou} (1)]
 \item[\textit{dir\_tate} (3)]
 \item[\textit{dir\_yoko} (4)]
 \end{description}
-
-\attr{ltj@dir}
-%<*ja>
-ボックスにおける組方向を示す．通常のボックスでは上記の3つの値(1,~3,~4)をとり得るが，
-内部処理によりそれらに次を加えた値(17,~19, 20, 33, 35,~36)をとるボックスが作られることもあ
+のいずれかに次を加えた値(17,~19, 20, 33, 35,~36)をとるボックスが作られることもあ
 			 る（\ref{sec-dir-imp}章参照）．
 %</ja>
 \begin{description}
@@ -5852,13 +5911,13 @@ These whatsits will be removed during the process of inserting \textbf{JAglue}s.
 %<*en>
 \LuaTeX-ja has its own stack system, and most parameters of \LuaTeX-ja
 are stored in it. To clarify the reason, imagine the parameter
-\Param{\hyperlink{fld:kanjiskip}{kanjiskip}} is stored by a skip, and consider the following
+\Param{kanjiskip} is stored by a skip, and consider the following
 source:
 %</en>
 %<*ja>
 \LuaTeX-jaは独自のスタックシステムを持ち，\LuaTeX-jaのほとんどのパラメータは
 これを用いて保持されている．その理由を明らかにするために，
-\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}パラメータがスキップレジスタで保持されているとし，
+\Param{kanjiskip}パラメータがスキップレジスタで保持されているとし，
 以下のコードを考えてみよう：
 %</ja>
 \begin{LTXexample}
@@ -5870,16 +5929,16 @@ source:
 
 %<*en>
 As described in Subsection~\ref{ssec-param}, the only effective value of
-\Param{\hyperlink{fld:kanjiskip}{kanjiskip}} in an hbox is the latest value, so the value of
-\Param{\hyperlink{fld:kanjiskip}{kanjiskip}} which applied in the entire hbox should be 5\,pt.
+\Param{kanjiskip} in an hbox is the latest value, so the value of
+\Param{kanjiskip} which applied in the entire hbox should be 5\,pt.
 However, by the implementation method of \LuaTeX, this ``5\,pt'' cannot be
 known from any callbacks.  In the \texttt{tex/packaging.w}, which is a
 file in the source of \LuaTeX, there are the following codes:
 %</en>
 %<*ja>
 \ref{ssec-param}節で述べたように，あるhboxの中で効力を持つ
-\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}の値は最後に現れた値のみであり，したがってボックス全体に適用される
-\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}は5\,ptであるべきである．しかし，\LuaTeX の実
+\Param{kanjiskip}の値は最後に現れた値のみであり，したがってボックス全体に適用される
+\Param{kanjiskip}は5\,ptであるべきである．しかし，\LuaTeX の実
 装を観察すると，この5\,ptという長さはどのコールバックからも知ることはできないことがわかる．
 \LuaTeX のソースファイルの1つ \texttt{tex/packaging.w} の中に，
 以下のコードがある：
@@ -6457,12 +6516,12 @@ u
 \begin{itemize}
 \item JFMグルーの挿入は，和文文字を表すトークンを元に水平リストに（文字を表す）<char\_node>を
 追加する過程で行われる．
-\item \Param{\hyperlink{fld:xks}{xkanjiskip}}の挿入は，hboxへのパッケージングや行分割前に行われる．
-\item \Param{\hyperlink{fld:kanjiskip}{kanjiskip}}はノードとしては挿入されない．パッケージングや行分割の計算時に
-「和文文字を表す2つの<char\_node>の間には\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}がある」ものとみなされる．
+\item \Param{xkanjiskip}の挿入は，hboxへのパッケージングや行分割前に行われる．
+\item \Param{kanjiskip}はノードとしては挿入されない．パッケージングや行分割の計算時に
+「和文文字を表す2つの<char\_node>の間には\Param{kanjiskip}がある」ものとみなされる．
 \end{itemize}
 しかし，\LuaTeX-jaでは，hboxへのパッケージングや行分割前に全ての
-\textbf{JAglue}，即ちJFMグルー・\Param{\hyperlink{fld:xks}{xkanjiskip}}・\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}の
+\textbf{JAglue}，即ちJFMグルー・\Param{xkanjiskip}・\Param{kanjiskip}の
 3種類を一度に挿入することになっている．これは，\LuaTeX において欧文の合字・
 カーニング処理がノードベースになったことに対応する変更である．
 
@@ -6513,7 +6572,7 @@ with the \textit{id} of it:
 \item A \textit{glyph\_node}~$p$ with nodes which relate with it:
 %</en>
 %<*ja>
-\item \textit{glyph\_node}~$p$とそれに関係するノード：
+\item \textit{glpyh\_node}~$p$とそれに関係するノード：
 %</ja>
 \begin{enumerate}
 %<*en>
@@ -6655,7 +6714,7 @@ $\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$の算出は，
 \textit{id}が\textit{id\_pbox}であって$\mathit{Np}.\mathit{head}$が\textbf{JAchar}であるとき．
 
 \item[和文B] リスト中のhboxの中身の先頭として出現した和文文字．和文Aとの違いは，これの前に
-JFMグルーの挿入が行われない（\Param{\hyperlink{fld:xks}{xkanjiskip}},~\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}は入り得る）ことである．\\
+JFMグルーの挿入が行われない（\Param{xkanjiskip},~\Param{kanjiskip}は入り得る）ことである．\\
 \textit{id}が\textit{id\_hlist}か\textit{id\_disc}であって$\mathit{Np}.\mathit{head}$が\textbf{JAchar}であるとき．
 
 \item[欧文] リスト中に直接／hboxの中身として出現している欧文文字．次の3つの場合が該当：
@@ -6744,10 +6803,10 @@ $g$は「文字コード \texttt{'boxbdd'} の文字」と\textit{Np}の間に�
 まず，「右空白」にあたる量を算出する．通常はこれが，隣り合った2つの和文文字間に入る空白量となる．
 \begin{description}
 \item[JFM由来{[M]}] JFMの文字クラス指定によって入る空白を以下によって求める．この段階で空白量が未定義（未指定）だった場合，
-      デフォルト値\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}を採用することとなるので，次へ．
+      デフォルト値\Param{kanjiskip}を採用することとなるので，次へ．
 \begin{enumerate}
 \item もし両クラスタの間で \verb+\inhibitglue+ が実行されていた場合（証としてwhatsitノードが自動挿入される），
-      代わりに\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}が挿入されることとなる．次へ．
+      代わりに\Param{kanjiskip}が挿入されることとなる．次へ．
 \item \textit{Nq}と\textit{Np}が同じJFM・同じ\texttt{jfmvar}キー・同じサイズの和文フォントであったならば，
       共通に使っているJFM内で挿入される空白（グルーかカーン）が決まっているか調べ，決まっていればそれを採用．
 \item 1.でも2.でもない場合は，JFM・\texttt{jfmvar}・サイズの3つ組は\textit{Nq}と\textit{Np}で異なる．
@@ -6766,10 +6825,10 @@ $\mathit{gb}$,~$\mathit{ga}$それぞれに対する<ratio>の値を$d_b$,~$d_a$
 \begin{itemize}
 \item
 $\mathit{ga}$と$\mathit{gb}$の両方が未定義であるならば，JFM由来のグルーは挿入されず，
-\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}を採用することとなる．
+\Param{kanjiskip}を採用することとなる．
 どちらか片方のみが未定義であるならば，次のステップでその未定義の方は長さ0のkernで，<ratio>の値は0であるかのように扱われる．
 \item
-\Param{\hyperlink{fld:diffjfm}{diffrentjfm}}の値が \texttt{pleft}, \texttt{pright},
+\Param{diffrentjfm}の値が \texttt{pleft}, \texttt{pright},
       \texttt{paverage} のとき，
 <ratio>の指定に従って比例配分を行う．
 JFM由来のグルー／カーンは以下の値となる：
@@ -6780,9 +6839,9 @@ JFM由来のグルー／カーンは以下の値となる：
 ここで．$f(x,y)$は
 \[
  f(x,y)=\begin{cases}
-x&\text{if\ }\Param{\hyperlink{fld:diffjfm}{diffrentjfm}}=\texttt{pleft};\\
-y&\text{if\ }\Param{\hyperlink{fld:diffjfm}{diffrentjfm}}=\texttt{pright};\\
-(x+y)/2&\text{if\ }\Param{\hyperlink{fld:diffjfm}{diffrentjfm}}=\texttt{paverage};
+x&\text{if\ }\Param{diffrentjfm}=\texttt{pleft};\\
+y&\text{if\ }\Param{diffrentjfm}=\texttt{pright};\\
+(x+y)/2&\text{if\ }\Param{diffrentjfm}=\texttt{paverage};
 \end{cases}.
 \]
 \item
@@ -6793,10 +6852,10 @@ y&\text{if\ }\Param{\hyperlink{fld:diffjfm}{diffrentjfm}}=\texttt{pright};\\
 ここで．$f(x,y)$は
 \[
  f(x,y)=\begin{cases}
-\min(x,y)&\text{if\ }\Param{\hyperlink{fld:diffjfm}{diffrentjfm}}=\texttt{small};\\
-\max(x,y)&\text{if\ }\Param{\hyperlink{fld:diffjfm}{diffrentjfm}}=\texttt{large};\\
-(x+y)/2&\text{if\ }\Param{\hyperlink{fld:diffjfm}{diffrentjfm}}=\texttt{average};\\
-x+y&\text{if\ }\Param{\hyperlink{fld:diffjfm}{diffrentjfm}}=\texttt{both};
+\min(x,y)&\text{if\ }\Param{diffrentjfm}=\texttt{small};\\
+\max(x,y)&\text{if\ }\Param{diffrentjfm}=\texttt{large};\\
+(x+y)/2&\text{if\ }\Param{diffrentjfm}=\texttt{average};\\
+x+y&\text{if\ }\Param{diffrentjfm}=\texttt{both};
 \end{cases}.
 \]
 \end{itemize}
@@ -6824,9 +6883,9 @@ $q$と$r$の間は（実フォントが同じなのに）\texttt{jfmvar} キー�
 \begin{enumerate}
 \item 両クラスタ（厳密には$\mathit{Nq}.\mathit{tail}$，$\mathit{Np}.\mathit{head}$）の中身の文字コードに対する
 \Param{autospacing}パラメタが両方ともfalseだった場合は，長さ0のglueとする．
-\item ユーザ側から見た\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}パラメタの自然長が${\tt \textbackslash maxdimen}=(2^{30}-1)\,{\rm sp}$で
-なければ，\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}パラメタの値を持つglueを採用する．
-\item 2.でない場合は，\textit{Nq}, \textit{Np}で使われているJFMに指定されている\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}の値を用いる．
+\item ユーザ側から見た\Param{kanjiskip}パラメタの自然長が${\tt \textbackslash maxdimen}=(2^{30}-1)\,{\rm sp}$で
+なければ，\Param{kanjiskip}パラメタの値を持つglueを採用する．
+\item 2.でない場合は，\textit{Nq}, \textit{Np}で使われているJFMに指定されている\Param{kanjiskip}の値を用いる．
 どちらか片方のクラスタだけが和文文字（\textsf{和文A}・\textsf{和文B}）のときは，そちらのクラスタで使われている
 JFM由来の値だけを用いる．もし両者で使われているJFMが異なった場合は，上の[M]~3.と同様の方法を用いて調整する．
 \end{enumerate}
@@ -6838,8 +6897,8 @@ JFM由来の値だけを用いる．もし両者で使われているJFMが異�
 \paragraph{禁則用ペナルティの挿入}
 まず，
 \[
- a:=(\text{\textit{Nq}{\footnotemark}の文字に対する\Param{\hyperlink{fld:postbp}{postbreakpenalty}}の値})
-+(\text{\textit{Np}{\footnotemark}の文字に対する\Param{\hyperlink{fld:prebp}{prebreakpenalty}}の値})
+ a:=(\text{\textit{Nq}{\footnotemark}の文字に対する\Param{postbreakpenalty}の値})
++(\text{\textit{Np}{\footnotemark}の文字に対する\Param{prebreakpenalty}の値})
 \]
 とおく\footnotetext{厳密にはそれぞれ$\mathit{Nq}.\mathit{tail}$，$\mathit{Np}.\mathit{head}$．}．
 ペナルティは通常$[-10000,10000]$の整数値をとり，また$\pm 10000$は正負の無限大を意味することになっているが，この$a$の
@@ -6944,7 +7003,7 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 \textit{Nq}が\textsf{和文A}で，\textit{Np}が\textsf{欧文}の場合，JFMグルー挿入処理は次のようにして行われる．
 \begin{itemize}
 \item 「右空白」については，まず以下に述べる\textsf{Boundary-B~[\OB]}により空白を決定しようと試みる．
-それが失敗した場合は，\textsf{\Param{\hyperlink{fld:xks}{xkanjiskip}}~[X]}によって定める．
+それが失敗した場合は，\textsf{\Param{xkanjiskip}~[X]}によって定める．
 %\item 「左空白」については，既に述べた\textsf{line-end~[E]}をそのまま採用する．それに伴う「右空白」の補正も%同じ．
 \item 禁則用ペナルティも，以前述べた\textsf{P-normal~[PN]}と同じである．
 \end{itemize}
@@ -6964,18 +7023,18 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 以下で定めた量を「右空白」として採用する．
 \verb+\inhibitglue+ は効力を持たない．
 \begin{enumerate}
-\item 以下のいずれかの場合は，\Param{\hyperlink{fld:xks}{xkanjiskip}}の挿入は抑止される．しかし，実際には行分割を許容するために，長さ0のglueを採用する：
+\item 以下のいずれかの場合は，\Param{xkanjiskip}の挿入は抑止される．しかし，実際には行分割を許容するために，長さ0のglueを採用する：
 \begin{itemize}
 \item 両クラスタにおいて，それらの中身の文字コードに対する\Param{autoxspacing}パラメタが共にfalseである．
-\item \textit{Nq}の中身の文字コードについて，「直後への\Param{\hyperlink{fld:xks}{xkanjiskip}}の挿入」が禁止されている
+\item \textit{Nq}の中身の文字コードについて，「直後への\Param{xkanjiskip}の挿入」が禁止されている
 （つまり，\Param{jaxspmode}~(or \Param{alxspmode})パラメタが2以上）．
-\item \textit{Np}の中身の文字コードについて，「直前への\Param{\hyperlink{fld:xks}{xkanjiskip}}の挿入」が禁止されている
+\item \textit{Np}の中身の文字コードについて，「直前への\Param{xkanjiskip}の挿入」が禁止されている
 （つまり，\Param{jaxspmode}~(or \Param{alxspmode})パラメタが偶数）．
 \end{itemize}
-\item ユーザ側から見た\Param{\hyperlink{fld:xks}{xkanjiskip}}パラメタの自然長が${\tt \textbackslash maxdimen}=(2^{30}-1)\,{\rm sp}$で
-なければ，\Param{\hyperlink{fld:xks}{xkanjiskip}}パラメタの値を持つglueを採用する．
+\item ユーザ側から見た\Param{xkanjiskip}パラメタの自然長が${\tt \textbackslash maxdimen}=(2^{30}-1)\,{\rm sp}$で
+なければ，\Param{xkanjiskip}パラメタの値を持つglueを採用する．
 \item 2.でない場合は，\textit{Nq}, \textit{Np}（\textsf{和文A}/\textsf{和文B}なのは片方だけ）
-で使われているJFMに指定されている\Param{\hyperlink{fld:xks}{xkanjiskip}}の値を用いる．
+で使われているJFMに指定されている\Param{xkanjiskip}の値を用いる．
 \end{enumerate}
 \end{description}
 
@@ -6984,7 +7043,7 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 \textsf{和文A}のクラスタが逆になるので，\textsf{Boundary-A~[\OA]}の部分が変わるだけ．
 \begin{itemize}
 \item 「右空白」については，まず以下に述べる\textsf{Boundary-A~[\OA]}により空白を決定しようと試みる．
-それが失敗した場合は，\textsf{\Param{\hyperlink{fld:xks}{xkanjiskip}}~[X]}によって定める．
+それが失敗した場合は，\textsf{\Param{xkanjiskip}~[X]}によって定める．
 %\item \textit{Nq}が和文でないので，「左空白」は算出されない．
 \item 禁則用ペナルティは，以前述べた\textsf{P-normal~[PN]}と同じである．
 \end{itemize}
@@ -7011,9 +7070,9 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 %\item 「左空白」については，既に述べた\textsf{line-end~[E]}の算出方法をそのまま採用する．それに伴う「右空白」の補正も同じ．
 \item 禁則用ペナルティの処理は，後ろのクラスタ\textit{Np}の種類によって異なる．
 なお，$\mathit{Np}.\mathit{head}$は無意味であるから，
-「$\mathit{Np}.\mathit{head}$に対する\Param{\hyperlink{fld:prebp}{prebreakpenalty}}の値」は0とみなされる．言い換えれば，
+「$\mathit{Np}.\mathit{head}$に対する\Param{prebreakpenalty}の値」は0とみなされる．言い換えれば，
 \[
- a:=(\text{\textit{Nq}の文字に対する\Param{\hyperlink{fld:postbp}{postbreakpenalty}}の値}).
+ a:=(\text{\textit{Nq}の文字に対する\Param{postbreakpenalty}の値}).
 \]
 \begin{description}
 \item[箱] \textit{Np}が\textsf{箱}であった場合は，両クラスタの間での行分割は
@@ -7057,7 +7116,7 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
  \overbrace{\Node{glyph}{`あ'}}^{\mathit{Nq}}\longrightarrow \overbrace{\Node{glue}{1\,pt}}^{\mathit{Np}}
 \]
 のような状況を考える．
-このとき，$a$，即ち「あ」の\Param{\hyperlink{fld:postbp}{postbreakpenalty}}がいかなる値であっても，
+このとき，$a$，即ち「あ」の\Param{postbreakpenalty}がいかなる値であっても，
 この2クラスタ間は最終的に
 \begin{equation}
  \overbrace{\Node{glyph}{`あ'}}^{\mathit{Nq}}\longrightarrow
@@ -7065,7 +7124,7 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 \label{eq-gref}
 \end{equation}
 となり，$a$分のペナルティは挿入されないことに注意して欲しい．
-\Param{\hyperlink{fld:postbp}{postbreakpenalty}}は（$a$は）殆どの場合が非負の値と考えられ，そのような場合では
+\Param{postbreakpenalty}は（$a$は）殆どの場合が非負の値と考えられ，そのような場合では
 \eqref{eq-gref}と
 \[
  \overbrace{\Node{glyph}{`あ'}}^{\mathit{Nq}}\longrightarrow
@@ -7087,7 +7146,7 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 \item 禁則用ペナルティの処理は，\textit{Nq}の種類によって異なる．
 $\mathit{Nq}.\mathit{tail}$は無意味なので，
 \[
- a:=(\text{\textit{Np}の文字に対する\Param{\hyperlink{fld:prebp}{prebreakpenalty}}の値}).
+ a:=(\text{\textit{Np}の文字に対する\Param{prebreakpenalty}の値}).
 \]
 \begin{description}
 \item[箱] \textit{Nq}が\textsf{箱}の場合は，\textsf{P-allow~[PA]}を用いる．
@@ -7113,7 +7172,7 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 \item \textsf{和文B}と箱・グルー・カーンが隣接したとき（どちらが前かは関係ない），間にJFMグルー・ペナルティの挿入は一切しない．
 \item \textsf{和文B}と\textsf{和文B}，また\textsf{和文B}と\textsf{欧文}とが隣接した時は，禁則用ペナルティ挿入処理は
 \textsf{P-suppress~[PS]}が用いられる．
-\item \textsf{和文B}の文字に対する\Param{\hyperlink{fld:prebp}{prebreakpenalty}},~\Param{\hyperlink{fld:postbp}{postbreakpenalty}}の値は使われず，0として計算される．
+\item \textsf{和文B}の文字に対する\Param{prebreakpenalty},~\Param{postbreakpenalty}の値は使われず，0として計算される．
 \end{itemize}
 
 
@@ -7125,9 +7184,9 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 \end{LTXexample}
 \begin{itemize}
 \item 1行目の\verb+\inhibitglue+は\textsf{Boundary-B~[\OB]}の処理のみを抑止するので，ピリオドと「A」の間には
-\Param{\hyperlink{fld:xks}{xkanjiskip}}（四分アキ）が入ることに注意．
+\Param{xkanjiskip}（四分アキ）が入ることに注意．
 \item 2行目のピリオドと「A」の間においては，前者が\textsf{和文B}となる（hboxの中身の末尾として登場しているから）ので，
-そもそも\textsf{Boundary-B~[\OB]}の処理は行われない．よって，\Param{\hyperlink{fld:xks}{xkanjiskip}}が入ることとなる．
+そもそも\textsf{Boundary-B~[\OB]}の処理は行われない．よって，\Param{xkanjiskip}が入ることとなる．
 \item 3行目では，ピリオドの属するクラスタは\textsf{和文A}である．これによって，
 ピリオドと「A」の間には\textsf{Boundary-B~[\OB]}由来の半角アキが入ることになる．
 \end{itemize}
@@ -7403,11 +7462,11 @@ Letter, Other, Kanji, Open, Closeのどれに属するかは次によって決�
 %<en>\item \textbf{JAchar}s are classified in the order as follows:
 %<ja>\item \textbf{JAchar}については，以下の順序に従って文字種を決める：
 \begin{enumerate}
-%<en>\item Characters whose \Param{\hyperlink{fld:prebp}{prebreakpenalty}} is greater than or equal to 0 are classified as Open.
-%<ja>\item \Param{\hyperlink{fld:prebp}{prebreakpenalty}}が0以上の文字はOpen扱いである．
+%<en>\item Characters whose \Param{prebreakpenalty} is greater than or equal to 0 are classified as Open.
+%<ja>\item \Param{prebreakpenalty}が0以上の文字はOpen扱いである．
 
-%<en>\item Characters whose \Param{\hyperlink{fld:postbp}{postbreakpenalty}} is greater than or equal to 0 are classified as Close.
-%<ja>\item \Param{\hyperlink{fld:postbp}{postbreakpenalty}}が0以上の文字はClose扱いである．
+%<en>\item Characters whose \Param{postbreakpenalty} is greater than or equal to 0 are classified as Close.
+%<ja>\item \Param{postbreakpenalty}が0以上の文字はClose扱いである．
 
 %<en>\item Characters that don't satisfy the above two conditions are classified as Kanji.
 %<ja>\item 上の3条件のどちらにも当てはまらなかった文字は，Kanji扱いである．
@@ -7439,8 +7498,8 @@ the \texttt{lstlisting} environment or other environments/commands.
 べる．大まかに述べると，次のようになる．
 \begin{itemize}
 \item 通常の\TeX の行分割方法に従って，段落を行分割する．この段階では，行
-      長に半端が出た場合，その半端分は\textbf{JAglue}（\Param{\hyperlink{fld:xks}{xkanjiskip}}，
-      \Param{\hyperlink{fld:kanjiskip}{kanjiskip}}，JFMグルー）と
+      長に半端が出た場合，その半端分は\textbf{JAglue}（\Param{xkanjiskip}，
+      \Param{kanjiskip}，JFMグルー）と
       それ以外のグルーの全てで（優先順位なく）負担される．
 \item その後，\texttt{post\_linebreak\_filter} callbackを使い，\emph{段
       落中の各行ごとに}，行末文字の位置を調整したり，優先度付きの行長調整
@@ -7471,8 +7530,8 @@ the \texttt{lstlisting} environment or other environments/commands.
   \ref{ssec-jfm-str}節にあるように，
   各JFMグルーには$-2$から2までの優先度がついている．}%
 別にまとめられる）
-\item 和欧文間空白(\Param{\hyperlink{fld:xks}{xkanjiskip}})
-\item 和文間空白(\Param{\hyperlink{fld:kanjiskip}{kanjiskip}})
+\item 和欧文間空白(\Param{xkanjiskip})
+\item 和文間空白(\Param{kanjiskip})
 \end{itemize}
 の$1+1+5+1=8$つに類別し，それぞれの種別ごとに
 許容されている伸び量（\texttt{stretch}の値）の合計を計算する．
@@ -7511,7 +7570,7 @@ JFM中にある文字クラス$n$の定義の
 \subsection{グルーの調整}
 \textit{total}の分だけが，行中のグルーの伸び量に応じて負担されることになる．
 負担するグルーの優先度は以下の順であり，
-できるだけ\Param{\hyperlink{fld:kanjiskip}{kanjiskip}}を自然長のままにすることを
+できるだけ\Param{kanjiskip}を自然長のままにすることを
 試みている．
 \begin{enumerate}\def\labelenumi{(\Alph{enumi})}
  \item \textbf{JAglue}以外のグルー
@@ -7520,8 +7579,8 @@ JFM中にある文字クラス$n$の定義の
  \item 優先度0のJFMグルー
  \item 優先度$-1$のJFMグルー
  \item 優先度$-2$のJFMグルー
- \item \Param{\hyperlink{fld:xks}{xkanjiskip}}
- \item \Param{\hyperlink{fld:kanjiskip}{kanjiskip}}
+ \item \Param{xkanjiskip}
+ \item \Param{kanjiskip}
 \end{enumerate}
 \begin{enumerate}
  \item 行末の和文文字を移動したことで$\textit{total}=0$となれば，
@@ -7839,8 +7898,13 @@ whatsitのことである．このwhatsitは，以下の3つの役割がある�
  \item \verb+\hbox+,~\verb+\vbox+によって作成されたボックスの組方向を表す．\\
 原則として，ボックスの組方向はattribute \verb+\ltj@dir+ に格納されることになっている．しか
        し，新規に作成されるボックスのattributeをコールバックの内部から制御するには，
-\verb+tex.setattribute+ による方法しかなく，これは不安定……
- \item 「異方向における寸法」の記録用
+\verb+tex.setattribute+ による方法しかなく，これは不安定である．
+
+なお，この役割のdirection whatsitは，次の(iii)の役割も一緒に持っている．
+ \item 「異方向における寸法」の記録用．\\
+例えば \verb+\box0+ に横組のボックスが格納されている時，縦組や \verb+\dtou+ 方向
+における寸法値は（(ii)の役割として作成された）direction~whatsitが
+格納しているノードリストに格納される．
 \end{enumerate}
 このように複数の役割をもたせているので，
 \begin{verbatim}
@@ -7853,13 +7917,27 @@ whatsitのことである．このwhatsitは，以下の3つの役割がある�
 (i)の役割と(ii)の枠割の\textit{direction}~whatsitは \verb+\ltj@icflag+ の値により
 区別されているので，そのような混乱は起こらない．
 
+\medskip
+(ii)の役割のdirection whatsitは，各ボックスの内容を表すリストの先頭に挿入されるが，
+例外が以下の2つある：
+\begin{itemize}
+ \item \verb+\hbox{}+, \verb+\vbox{}+ といった，
+\begin{itemize}
+ \item \verb+\tate+ 等によりボックス内部の組方向を変更していない
+ \item ボックスの中身のリストが空である
+\end{itemize}
+場合は，\LuaTeX の \verb+hpack_filter+, \verb+vpack_filter+ といった
+callbackに処理が回らないので，この場合にはdirection whatsitは挿入されない．
+ \item \verb+\vtop{...}+ の場合は，先頭にdirection whatsitを置くと
+ボックスの高さが正しく設定されない．そのため，この場合に限っては
+direction whatsitはリストの2番目に挿入されることとなる．
+\end{itemize}
 
 \subsection{異方向のボックスの整合処理}
 縦中横など異方向のボックスを配置する場合に，周囲の組方向と大きさを整合させるため，
-\LuaTeX-jaでは \verb+\ltj@dir+ が16以降の\textit{hlist\_node}, \textit{vlist\_node}を
-用いる．
-
-
+\LuaTeX-jaでは \verb+\ltj@dir+ が128以降の\textit{hlist\_node}, \textit{vlist\_node}を
+用いる．これらは\pTeX における\textit{dir\_node}の役割と同じ果たしており，
+この文章中でも\textit{dir\_node}と呼称する．
 
 %</ja>
 

@@ -65,9 +65,11 @@ luatexja.dir_table = dir_table
 dir_table.dir_dtou = 1
 dir_table.dir_tate = 3
 dir_table.dir_yoko = 4
-dir_table.dir_utod = 11 -- 「縦数式ディレクション」 in pTeX
+dir_table.dir_math_mod    = 8 -- 組方向を合わせるために自動で作られたもの
 dir_table.dir_node_auto   = 128 -- 組方向を合わせるために自動で作られたもの
 dir_table.dir_node_manual = 256 -- 寸法代入によって作られたもの
+dir_table.dir_utod = dir_table.dir_tate + dir_table.dir_math_mod
+   -- 「縦数式ディレクション」 in pTeX
 
 
 ------------------------------------------------------------------------
@@ -245,7 +247,13 @@ do
 	 end
 	 return r
       end,
-      direction = ltjd.get_dir_count,
+      direction = function() 
+	 local v = ltjd.get_dir_count()
+	 if math.abs(tex.nest[tex.nest.ptr].mode) == ltjs.mmode and v == dir_table.dir_tate then
+	    v = dir_table.dir_utod
+	 end
+	 return v
+      end,
       adjustdir = ltjd.get_adjust_dir_count,
    }
 

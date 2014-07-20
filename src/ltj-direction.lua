@@ -56,6 +56,7 @@ local dir_tate = luatexja.dir_table.dir_tate
 local dir_yoko = luatexja.dir_table.dir_yoko
 local dir_dtou = luatexja.dir_table.dir_dtou
 local dir_utod = luatexja.dir_table.dir_utod
+local dir_math_mod    = luatexja.dir_table.dir_math_mod
 local dir_node_auto   = luatexja.dir_table.dir_node_auto
 local dir_node_manual = luatexja.dir_table.dir_node_manual
 
@@ -93,7 +94,6 @@ do
    function get_dir_count()
       for i=tex_nest.ptr, 1, -1 do
 	 local h = tex_nest[i].head.next
-	 --luatexja.ext_show_node_list(h, 'GDR'..  i .. '> ', print)
 	 if h then
 	    local t = get_dir_count_inner(h)
 	    if t~=0 then return t end
@@ -117,7 +117,7 @@ do
 end
 
 
--- \tate, \yoko
+-- \tate, \yoko，\dtou, \utod
 do
    local node_next = node.next
    local node_set_attr = node.set_attribute
@@ -125,13 +125,11 @@ do
       local lv, w = tex_nest.ptr, tex.lists.page_head
       if not v then 
          v,name  = get_dir_count(), nil
-      elseif v=='adj' then
-         v,name = get_adjust_dir_count(), nil
-      elseif v=='math' then
-	 v,name  = get_dir_count(), nil
-	 if abs(tex_nest[lv].mode) == ltjs.mmode and v == dir_tate then
+	 if lv>=1 and abs(tex_nest[lv-1].mode) == ltjs.mmode and v == dir_tate then
 	    v = dir_utod
 	 end
+      elseif v=='adj' then
+         v,name = get_adjust_dir_count(), nil
       end
       if tex.currentgrouptype==6 then
 	 ltjb.package_error(
@@ -151,7 +149,7 @@ do
 	    else
               ltjb.package_error(
                  'luatexja',
-                 "Use `\\" .. name .. "' at top of list",
+                 "Use `\\" .. tostring(name) .. "' at top of list",
                  'Direction change command by LuaTeX-ja is available\n'
 		    .. 'only when the current list is null.')
 	    end
@@ -373,25 +371,6 @@ do
 	       { 'whatsit', sid_restore },
 	    },
          },
-	 [dir_utod] = { -- utod 中で組む
-	    width  = get_w,
-	    height = get_h,
-	    depth  = get_d,
-	    [id_hlist] = {
-	       { 'nop' },
-	       { 'nop' },
-	       { 'nop' },
-	       { 'box', zero },
-	       { 'nop' },
-	    },
-	    [id_vlist] = {
-	       { 'nop' },
-	       { 'nop' },
-	       { 'nop' },
-	       { 'box', zero },
-	       { 'nop' },
-	    },
-	 }
       },
       [dir_dtou] = { -- dtou を
 	 [dir_yoko] = { -- yoko 中で組む
@@ -436,10 +415,6 @@ do
 	 },
       },
    }
-   dir_node_aux[dir_yoko][dir_utod] = dir_node_aux[dir_yoko][dir_tate]
-   dir_node_aux[dir_dtou][dir_utod] = dir_node_aux[dir_dtou][dir_tate]
-   dir_node_aux[dir_tate][dir_tate] = dir_node_aux[dir_tate][dir_utod]
-   dir_node_aux[dir_utod] = dir_node_aux[dir_tate]
 end
 
 -- 1st ret val: b の組方向
@@ -513,7 +488,7 @@ local function unwrap_dir_node(b, head, box_dir)
       setfield(wh, 'value', nil)
    end
    -- recalc. info
-   local info = dir_node_aux[b_dir][box_dir%dir_node_auto][getid(bc)]
+   local info = dir_node_aux[b_dir%dir_math_mod][box_dir%dir_math_mod][getid(bc)]
    for _,v in ipairs(info) do 
       if v[1]=='box' then
 	 shift_old = v[2](
@@ -527,8 +502,7 @@ end
 
 -- is_manual: 寸法変更に伴うものか？
 local function create_dir_node(b, b_dir, new_dir, is_manual)
-   --print('create new node', b_dir, new_dir)
-   local info = dir_node_aux[b_dir][new_dir]
+   local info = dir_node_aux[b_dir%dir_math_mod][new_dir%dir_math_mod]
    local w = getfield(b, 'width')
    local h = getfield(b, 'height')
    local d = getfield(b, 'depth')
@@ -551,6 +525,7 @@ end
 local make_dir_whatsit, process_dir_node
 do
    make_dir_whatsit = function (head, b, new_dir, origin)
+      new_dir = new_dir%dir_math_mod
       -- head: list head, b: box
       -- origin: コール元 (for debug)
       -- return value: (new head), (next of b), (new b), (is_b_dir_node)
@@ -559,73 +534,72 @@ do
       local box_dir, dn =  get_box_dir(b, ltjs.list_dir)
       -- 既に b の中身にあるwhatsit
 
-      if box_dir==new_dir then
-	 -- 組方向が一緒のボックスなので，何もしなくて良い
-	 return head, node_next(b), b, false
-      elseif  box_dir%dir_node_auto == new_dir  then
-	 -- dir_node としてカプセル化されている
-	 local bc = node_next(node_next(node_next(bh)))
-	 local _, dnc = get_box_dir(b, 0)
-	 if dnc then -- free all other dir_node
-	    Dnode.flush_list(getfield(dnc, 'value'))
-	    setfield(dnc, 'value', nil)
+      if box_dir%dir_math_mod==new_dir then
+	 if box_dir>=dir_node_auto then
+	    -- dir_node としてカプセル化されている
+	    local bc = node_next(node_next(node_next(bh)))
+	    local _, dnc = get_box_dir(b, 0)
+	    if dnc then -- free all other dir_node
+	       Dnode.flush_list(getfield(dnc, 'value'))
+	       setfield(dnc, 'value', nil)
+	    end
+	    set_attr(b, attr_dir, box_dir%dir_math_mod + dir_node_auto)
+	    return head, node_next(b), b, true
+	 else
+	    -- 組方向が一緒 (up to math dir) のボックスなので，何もしなくて良い
+	    return head, node_next(b), b, false
 	 end
-	 set_attr(b, attr_dir, box_dir%dir_node_auto + dir_node_auto)
-	 return head, node_next(b), b, true
       else
-	 --luatexja.ext_show_node_list(to_node(b), 'mkd> ', print)
 	 -- 組方向を合わせる必要あり
          local nh, nb, ret, flag
 	 if box_dir>= dir_node_auto then -- unwrap
 	    local b_dir
             head, nb, b, b_dir = unwrap_dir_node(b, head, box_dir)
 	    bh = getlist(b)
-	    if b_dir==new_dir then
+	    if b_dir%dir_math_mod==new_dir then
 	       -- dir_node の中身が周囲の組方向とあっている
 	       return head, nb, b, false 
 	    else box_dir = b_dir end
 	 end
-            local db
-            local dnh = getfield(dn, 'value')
-            for x in traverse(dnh) do
-               if has_attr(x, attr_dir)%dir_node_auto == new_dir then
-                  setfield(dn, 'value', to_node(node_remove(dnh, x)))
-                  db=x; break
-               end
-            end
-	    Dnode.flush_list(dnh)
-            db = db or create_dir_node(b, box_dir, new_dir, false)
-            local w = getfield(b, 'width')
-            local h = getfield(b, 'height')
-            local d = getfield(b, 'depth')
-            nh, nb =  insert_before(head, b, db), nil
-            nh, nb = node_remove(nh, b)
-            local db_head, db_tail  = nil
-            for _,v in ipairs(dir_node_aux[box_dir][new_dir][getid(b)]) do
-               local cmd, arg, nn = v[1], v[2]
-               if cmd=='kern' then
-                  nn = node_new(id_kern)
-                  setfield(nn, 'kern', arg(w, h, d))
-               elseif cmd=='whatsit' then
-                  nn = node_new(id_whatsit, arg)
-               elseif cmd=='rotate' then
-                  nn = node_new(id_whatsit, sid_matrix)
-                  setfield(nn, 'data', arg)
-               elseif cmd=='box' then
-                  nn = b; setfield(b, 'next', nil)
-		  setfield(nn, 'shift', getfield(nn, 'shift') + arg(w,h,d))
-	       elseif cmd=='nop' then
-                  nn = node_new(id_kern)
-                  setfield(nn, 'kern', 0)
-               end
-               if db_head then
-                  insert_after(db_head, db_tail, nn)
-                  db_tail = nn
-	       else
-		  db_head, db_tail = nn, nn
-	       end
-	       setfield(db, 'head', db_head)
-	       ret, flag = db, true
+	 box_dir = box_dir%dir_math_mod
+	 local db
+	 local dnh = getfield(dn, 'value')
+	 for x in traverse(dnh) do
+	    if has_attr(x, attr_dir) == new_dir then
+	       setfield(dn, 'value', to_node(node_remove(dnh, x)))
+	       db=x; break
+	    end
+	 end
+	 Dnode.flush_list(dnh)
+	 db = db or create_dir_node(b, box_dir, new_dir, false)
+	 local w = getfield(b, 'width')
+	 local h = getfield(b, 'height')
+	 local d = getfield(b, 'depth')
+	 nh, nb =  insert_before(head, b, db), nil
+	 nh, nb = node_remove(nh, b)
+	 local db_head, db_tail  = nil
+	 for _,v in ipairs(dir_node_aux[box_dir][new_dir][getid(b)]) do
+	    local cmd, arg, nn = v[1], v[2]
+	    if cmd=='kern' then
+	       nn = node_new(id_kern)
+	       setfield(nn, 'kern', arg(w, h, d))
+	    elseif cmd=='whatsit' then
+	       nn = node_new(id_whatsit, arg)
+	    elseif cmd=='rotate' then
+	       nn = node_new(id_whatsit, sid_matrix)
+	       setfield(nn, 'data', arg)
+	    elseif cmd=='box' then
+	       nn = b; setfield(b, 'next', nil)
+	       setfield(nn, 'shift', getfield(nn, 'shift') + arg(w,h,d))
+	    end
+	    if db_head then
+	       insert_after(db_head, db_tail, nn)
+	       db_tail = nn
+	    else
+	       db_head, db_tail = nn, nn
+	    end
+	    setfield(db, 'head', db_head)
+	    ret, flag = db, true
 	 end
 	 return nh, nb, ret, flag
       end
@@ -679,7 +653,9 @@ end
 do
    local getbox, setdimen = tex.getbox, tex.setdimen
    local function get_box_dim_common(key, s, l_dir)
+      -- s: not dir_node.
       local s_dir, wh = get_box_dir(s, dir_yoko)
+      s_dir = s_dir%dir_math_mod
       if s_dir ~= l_dir then
          local not_found = true
          for x in traverse(getfield(wh, 'value')) do
@@ -703,12 +679,12 @@ do
       local gt = tex.globaldefs; tex.globaldefs = 0
       local s = getbox(n)
       if s then
-         local l_dir = get_dir_count()
+         local l_dir = (get_dir_count())%dir_math_mod
          s = to_direct(s)
          local b_dir = get_box_dir(s,dir_yoko)
          if b_dir<dir_node_auto then
             get_box_dim_common(key, s, l_dir)
-         elseif b_dir%dir_node_auto==l_dir then
+         elseif b_dir%dir_math_mod==l_dir then
             setdimen('ltj@tempdima', getfield(s, key))
          else
             get_box_dim_common(key, 
@@ -724,6 +700,7 @@ do
    -- return value: (changed dimen of box itself?)
    local function set_box_dim_common(key, s, l_dir)
       local s_dir, wh = get_box_dir(s, dir_yoko)
+      s_dir = s_dir%dir_math_mod
       if s_dir ~= l_dir then
          if not wh then
             wh = create_dir_whatsit(getlist(s), 'set_box_dim', s_dir)
@@ -766,12 +743,12 @@ do
       local n = tex_getcount('ltj@tempcnta')
       local s = getbox(n)
       if s then
-	 local l_dir = get_dir_count()
+	 local l_dir = (get_dir_count())%dir_math_mod
 	 s = to_direct(s)
          local b_dir = get_box_dir(s,dir_yoko)
          if b_dir<dir_node_auto then
             set_box_dim_common(key, s, l_dir)
-	 elseif b_dir%dir_node_auto == l_dir then
+	 elseif b_dir%dir_math_mod == l_dir then
 	    -- s is dir_node
 	    setfield(s, key, tex.getdimen('ltj@tempdima'))
 	    if b_dir<dir_node_manual then
@@ -779,8 +756,8 @@ do
 	    end
          else
 	    local sid, sl = getid(s), getlist(s)
-	    local b = node_next(node_next(node_next(sl)))
-	    local info = dir_node_aux[get_box_dir(b,dir_yoko)][b_dir%dir_node_auto]
+	    local b = node_next(node_next(node_next(sl))) -- 本来の box
+	    local info = dir_node_aux[get_box_dir(b,dir_yoko)%dir_math_mod][b_dir%dir_node_auto]
 	    local shift_old
 	    for _,v in ipairs(info[sid]) do 
 	       if v[1]=='box' then
@@ -847,7 +824,7 @@ do
       if s then
 	 local sd = to_direct(s)
 	 local box_dir = get_box_dir(sd, dir_yoko)
-	 if box_dir%dir_node_auto ~= list_dir then
+	 if box_dir%dir_math_mod ~= list_dir then
 	    setbox(
 	       'ltj@afbox', 
 	       to_node(

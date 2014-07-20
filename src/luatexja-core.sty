@@ -584,14 +584,6 @@
     end
   }%
 }
-%%%% 縦数式ディレクションの実装
-\everymath{%
-  \directlua{luatexja.direction.set_list_direction('math')}%
-}
-\everydisplay{%
-  \directlua{luatexja.direction.set_list_direction('math')}%
-}
-
 
 %%%% \raise, \lower, \moveleft, \moveright
 \let\ltj@@orig@raise=\raise
