@@ -249,6 +249,9 @@
   \directlua{% This value depends on the version of LuaTeX.
     luatexja.stack.hmode = -tex.nest[tex.nest.ptr].mode
   }%
+  $\directlua{% This value depends on the version of LuaTeX.
+    luatexja.stack.mmode = -tex.nest[tex.nest.ptr].mode
+  }$% 
 }
 \setbox0\vbox{%
   \directlua{% This value depends on the version of LuaTeX.
@@ -540,6 +543,9 @@
 \protected\def\dtou{%
   \directlua{luatexja.direction.set_list_direction(1, 'dtou')}%
 }
+\protected\def\utod{% 「縦数式ディレクション」
+  \directlua{luatexja.direction.set_list_direction(11, 'utod')}%
+}
 \define@key[ltj]{japaram}{direction}{%% always local
   \directlua{luatexja.direction.set_list_direction(1, 'ltjsetparameter')}%
 }
@@ -578,6 +584,14 @@
     end
   }%
 }
+%%%% 縦数式ディレクションの実装
+\everymath{%
+  \directlua{luatexja.direction.set_list_direction('math')}%
+}
+\everydisplay{%
+  \directlua{luatexja.direction.set_list_direction('math')}%
+}
+
 
 %%%% \raise, \lower, \moveleft, \moveright
 \let\ltj@@orig@raise=\raise
@@ -602,7 +616,7 @@
   }\ltj@afterbox\ltj@@moveleft@a}
 
 
-%%%% unhbox and unvbox
+%%%% \unhbox and \unvbox
 \let\ltj@@orig@unhbox=\unhbox
 \let\ltj@@orig@unvbox=\unvbox
 \protected\def\unhbox{\ltj@reset@globaldefs\afterassignment\ltj@@unhbox\ltj@tempcnta}

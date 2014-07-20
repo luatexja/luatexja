@@ -33,6 +33,7 @@ local traverse = Dnode.traverse
 local traverse_id = Dnode.traverse_id
 local start_time_measure, stop_time_measure 
    = ltjb.start_time_measure, ltjb.stop_time_measure
+local abs = math.abs
 
 local id_kern = node.id('kern')
 local id_hlist = node.id('hlist')
@@ -54,6 +55,7 @@ local DIR  = luatexja.userid_table.DIR
 local dir_tate = luatexja.dir_table.dir_tate
 local dir_yoko = luatexja.dir_table.dir_yoko
 local dir_dtou = luatexja.dir_table.dir_dtou
+local dir_utod = luatexja.dir_table.dir_utod
 local dir_node_auto   = luatexja.dir_table.dir_node_auto
 local dir_node_manual = luatexja.dir_table.dir_node_manual
 
@@ -99,7 +101,6 @@ do
       end
       return page_direction
    end
-   local abs = math.abs
    function get_adjust_dir_count()
       for i=tex_nest.ptr, 1, -1 do
          local v = tex_nest[i]
@@ -123,9 +124,14 @@ do
    local function set_list_direction(v, name)
       local lv, w = tex_nest.ptr, tex.lists.page_head
       if not v then 
-         v,name  = get_dir_count(), nil 
+         v,name  = get_dir_count(), nil
       elseif v=='adj' then
          v,name = get_adjust_dir_count(), nil
+      elseif v=='math' then
+	 v,name  = get_dir_count(), nil
+	 if abs(tex_nest[lv].mode) == ltjs.mmode and v == dir_tate then
+	    v = dir_utod
+	 end
       end
       if tex.currentgrouptype==6 then
 	 ltjb.package_error(
@@ -367,6 +373,25 @@ do
 	       { 'whatsit', sid_restore },
 	    },
          },
+	 [dir_utod] = { -- utod 中で組む
+	    width  = get_w,
+	    height = get_h,
+	    depth  = get_d,
+	    [id_hlist] = {
+	       { 'nop' },
+	       { 'nop' },
+	       { 'nop' },
+	       { 'box', zero },
+	       { 'nop' },
+	    },
+	    [id_vlist] = {
+	       { 'nop' },
+	       { 'nop' },
+	       { 'nop' },
+	       { 'box', zero },
+	       { 'nop' },
+	    },
+	 }
       },
       [dir_dtou] = { -- dtou を
 	 [dir_yoko] = { -- yoko 中で組む
@@ -411,6 +436,10 @@ do
 	 },
       },
    }
+   dir_node_aux[dir_yoko][dir_utod] = dir_node_aux[dir_yoko][dir_tate]
+   dir_node_aux[dir_dtou][dir_utod] = dir_node_aux[dir_dtou][dir_tate]
+   dir_node_aux[dir_tate][dir_tate] = dir_node_aux[dir_tate][dir_utod]
+   dir_node_aux[dir_utod] = dir_node_aux[dir_tate]
 end
 
 -- 1st ret val: b の組方向
@@ -585,6 +614,9 @@ do
                elseif cmd=='box' then
                   nn = b; setfield(b, 'next', nil)
 		  setfield(nn, 'shift', getfield(nn, 'shift') + arg(w,h,d))
+	       elseif cmd=='nop' then
+                  nn = node_new(id_kern)
+                  setfield(nn, 'kern', 0)
                end
                if db_head then
                   insert_after(db_head, db_tail, nn)

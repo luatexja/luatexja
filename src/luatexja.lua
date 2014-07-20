@@ -65,8 +65,9 @@ luatexja.dir_table = dir_table
 dir_table.dir_dtou = 1
 dir_table.dir_tate = 3
 dir_table.dir_yoko = 4
-dir_table.dir_node_auto   = 16 -- 組方向を合わせるために自動で作られたもの
-dir_table.dir_node_manual = 32 -- 寸法代入によって作られたもの
+dir_table.dir_utod = 11 -- 「縦数式ディレクション」 in pTeX
+dir_table.dir_node_auto   = 128 -- 組方向を合わせるために自動で作られたもの
+dir_table.dir_node_manual = 256 -- 寸法代入によって作られたもの
 
 
 ------------------------------------------------------------------------

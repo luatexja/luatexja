@@ -13,6 +13,7 @@ local Dnode = node.direct or node
 local setfield = (Dnode ~= node) and Dnode.setfield or function(n, i, c) n[i] = c end
 local getfield = (Dnode ~= node) and Dnode.getfield or function(n, i) return n[i] end
 local getid = (Dnode ~= node) and Dnode.getid or function(n) return n.id end
+local getsubtype = (Dnode ~= node) and Dnode.getsubtype or function(n) return n.subtype end
 -- getlist cannot be used for sub_box nodes. Use instead λp. getfield(p, 'head')
 local getchar = (Dnode ~= node) and Dnode.getchar or function(n) return n.char end
 
@@ -46,6 +47,9 @@ local id_style   = node.id('style')
 local id_frac    = node.id('fraction')
 local id_simple  = node.id('noad')
 local id_sub_mlist = node.id('sub_mlist')
+local id_whatsit = node.id('whatsit')
+local sid_user = node.subtype('user_defined')
+local DIR  = luatexja.userid_table.DIR
 
 local PROCESSED  = luatexja.icflag_table.PROCESSED
 
@@ -135,11 +139,17 @@ function (p, sty)
    return p
 end
 
+local node_remove = Dnode.remove
 luatexbase.add_to_callback('mlist_to_hlist',
    function (n, display_type, penalties)
-      local head = to_node(conv_jchar_to_hbox(to_direct(n), 0))
-      head = node.mlist_to_hlist(head, display_type, penalties)
-      return head
+      n = to_direct(n)
+      if getid(n)==id_whatsit and getsubtype(n)==sid_user and
+      getfield(n, 'user_id') == DIR then
+	 local old_n = n; n = node_remove(n, n); node_free(old_n)
+      end
+      return node.mlist_to_hlist(
+	 to_node(conv_jchar_to_hbox(n, 0)),
+	 display_type, penalties)
    end,'ltj.mlist_to_hlist', 1)
 
 luatexja.math = { is_math_letters = is_math_letters }
