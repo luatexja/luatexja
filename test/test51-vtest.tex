@@ -49,7 +49,7 @@
 \def\H{\vrule width 2pt height 10pt depth 0pt%
 \vrule width 4pt height 0pt depth 4pt}
 
-\message{^^JTATE, DTOU IN YOKO (HMODE))^^J}
+\message{^^JTATE, DTOU, UTOD IN YOKO (HMODE))^^J}
 \yoko
 \hbox{\yoko
   横水平\H\vrule\hbox{\yoko 横水平\H }\vrule かき◆
@@ -65,15 +65,21 @@
   \vbox{\dtou\hsize=30mm 下垂直\H ああああああああああ\hfill\H}%
   \vrule かき◆
 }
+\hbox{\yoko\vrule
+  横水平\H\vrule\hbox{\utod 上水平\H }\vrule ◆おおおお
+  \H\vrule
+  \vbox{\utod\hsize=30mm 上垂直\H ああああああああああ\hfill\H}%
+  \vrule かき◆
+}
 \hbox{\yoko
   ああ\setbox0=\vtop{\yoko\hsize=30mm \ifhmode\message{H}\else\message{V}\fi 横垂直\H ああああああああああ\hfill\H}%
-  {\tracingonline1\showboxdepth2\showboxbreadth100\showbox0}%
+%  {\tracingonline1\showboxdepth2\showboxbreadth100\showbox0}%
   かき◆\copy0 ◆
 }
 
 \vfill\eject
 
-\message{^^JYOKO, DTOU IN TATE (HMODE)^^J}
+\message{^^JYOKO, DTOU, UTOD IN TATE (HMODE)^^J}
 \leavevmode
 \hbox{\tate
 縦水平\H\vrule \hbox{\yoko 横水平\H }\vrule かき◆\vrule
@@ -86,10 +92,34 @@
 縦水平\H\vrule\hbox{\dtou 下水平\H }\vrule ◆おおおお\H\vrule
 \vbox{\dtou\hsize=30mm 下垂直\H ああああああああああ\hfill\H}%
 \vrule\H ◆ああああ}
+\hbox{\tate
+縦水平\H\vrule\hbox{\utod 上水平\H }\vrule ◆おおおお\H\vrule
+\vbox{\utod\hsize=30mm 上垂直\H ああああああああああ\hfill\H}%
+\vrule\H ◆ああああ}
+
+\vfill\eject
+\message{^^JYOKO, TATE, DTOU,IN UTOD (HMODE)^^J}
+\leavevmode
+\hbox{\utod
+上水平\H\vrule \hbox{\yoko 横水平\H }\vrule かき◆\vrule
+\hbox{\tate 縦水平\H }\vrule◆おおおお\H\vrule
+\vbox{\yoko\hsize=30mm 横垂直\H ああああああああああ\hfill\H}\vrule
+かき◆\H\vrule
+\vbox{\tate\hsize=30mm 縦垂直\H ああああああああああ\hfill\H}\vrule
+◆ああああ}
+\hbox{\utod
+上水平\H\vrule\hbox{\dtou 下水平\H }\vrule ◆おおおお\H\vrule
+\vbox{\dtou\hsize=30mm 下垂直\H ああああああああああ\hfill\H}%
+\vrule\H ◆ああああ}
+\hbox{\utod
+上水平\H\vrule\hbox{\utod 上水平\H }\vrule ◆おおおお\H\vrule
+\vbox{\utod\hsize=30mm 上垂直\H ああああああああああ\hfill\H}%
+\vrule\H ◆ああああ}
 
 \vfill\eject
 
-\message{^^JYOKO, TATE IN DTOU (HMODE)^^J}
+
+\message{^^JYOKO, TATE, UTOD IN DTOU (HMODE)^^J}
 \leavevmode
 \hbox{\dtou
 下水平\H\vrule\hbox{\yoko 横水平\H }\vrule かき◆\H\vrule
@@ -102,6 +132,10 @@
 \hbox{\dtou
 下水平\H\vrule\hbox{\dtou 下水平\H }\vrule◆おおおお\vrule
 \vbox{\dtou\hsize=30mm 下垂直\H ああああああああああ\hfill\H}%
+\vrule ◆ああああ}
+\hbox{\dtou
+下水平\H\vrule\hbox{\utod 上水平\H }\vrule◆おおおお\vrule
+\vbox{\utod\hsize=30mm 上垂直\H ああああああああああ\hfill\H}%
 \vrule ◆ああああ}
 
 
@@ -286,6 +320,7 @@ abc&かきくけこ&xyz\cr}}%
 
 \message{^^Jdir node^^J}
 \font\seventt=cmtt10 at 7pt
+\font\fivett=cmtt10 at 5pt
 
 \setbox0=\hbox{\yoko pF}
 \setbox1=\hbox{\tate\box0}
@@ -304,11 +339,13 @@ abc&かきくけこ&xyz\cr}}%
 {\obeylines\seventt\baselineskip=10pt
 \directlua{luatexja.ext_show_node_list(tex.box[1], 'alter Yht> ', tex.print)}\par}
 
-\message{HOGE}
-\setbox0=\hbox{\tate \ltjsetwd1=50pt\immediate\message{PIYO}}
-
-{\obeylines\seventt\baselineskip=10pt\message{HOGE}\hbox{a}\message{HOGE}
+\setbox0=\hbox{\tate \ltjsetwd1=50pt}
+{\obeylines\seventt\baselineskip=10pt
 \directlua{luatexja.ext_show_node_list(tex.box[1], 'alter Twd> ', tex.print)}\par}
+
+\setbox0=\hbox{\utod \ltjsetht1=50pt}
+{\obeylines\seventt\baselineskip=10pt
+\directlua{luatexja.ext_show_node_list(tex.box[1], 'alter Uht> ', tex.print)}\par}
 
 \setbox0=\hbox{\yoko \ltjsetht1=70pt}
 {\obeylines\seventt\baselineskip=10pt
@@ -320,6 +357,10 @@ abc&かきくけこ&xyz\cr}}%
 {\obeylines\seventt
 \directlua{luatexja.ext_show_node_list(tex.box[1], 'unwrapped> ', tex.print)}}
 
+\setbox0=\hbox{\utod \ltjsetht1=50pt}
+{\obeylines\seventt\baselineskip=10pt
+\directlua{luatexja.ext_show_node_list(tex.box[1], 'alter Uht> ', tex.print)}\par}
+
 
 
 \setbox0\hbox{\yoko a あ }\setbox1=\hbox{\tate\ltjsetht0=2pt}
@@ -328,11 +369,18 @@ abc&かきくけこ&xyz\cr}}%
 \vbox{\yoko\hsize=60pt\noindent\the\ltjgetwd0,\\\the\ltjgetht0,\\\the\ltjgetdp0}
 \vbox{\tate\hsize=60pt\noindent\the\ltjgetwd0,\\\the\ltjgetht0,\\\the\ltjgetdp0}
 \vbox{\dtou\hsize=60pt\noindent\the\ltjgetwd0,\\\the\ltjgetht0,\\\the\ltjgetdp0}
+\vbox{\utod\hsize=60pt\noindent\the\ltjgetwd0,\\\the\ltjgetht0,\\\the\ltjgetdp0}
 %
 \ltjsetwd0=40pt
+\setbox9\hbox{\utod \ltjsetdp0=10pt}
 \vbox{\yoko\hsize=60pt\noindent\the\ltjgetwd0,\\\the\ltjgetht0,\\\the\ltjgetdp0}
 \vbox{\tate\hsize=60pt\noindent\the\ltjgetwd0,\\\the\ltjgetht0,\\\the\ltjgetdp0}
 \vbox{\dtou\hsize=60pt\noindent\the\ltjgetwd0,\\\the\ltjgetht0,\\\the\ltjgetdp0}
+\vbox{\utod\hsize=60pt\noindent\the\ltjgetwd0,\\\the\ltjgetht0,\\\the\ltjgetdp0}
+
+\vfill\eject
+\message{^^Jothers^^J}
+
 
 p\kern-.15em\TeX\ bug (2011-02-24)
 \setbox0=\hbox{\tate a}\fbox{\copy0}%
@@ -342,11 +390,34 @@ p\kern-.15em\TeX\ bug (2011-02-24)
 
 \def\R{０１２３４５６７８９０１２３４５６７８９０１２３４５６７８９}
 \vbox{\tate\hsize=4\zw\R\R\R\R}
-ABCDE
+
 
 %\tracingall
-\def\showdir{\ifcase\ltjgetparameter{direction} ?\or D\or ?\or T\or Y\fi}
+\def\showdir{\ifcase\ltjgetparameter{direction} %
+?\or D\or ?\or T\or Y\or ?\or ?\or?\or?\or?\or?\or U\fi}
 \showdir
 \hbox{\tate {\dtou 感じ\showdir}\showdir}
 \showdir
+
+
+\vbox{\tate\hsize=100mm
+日本語中に数式を打ってみる%
+$\ltjgetparameter{talbaselineshift}abc\hbox{にほんごABC\hbox{\tate たて\showdir}}\showdir$
+$$
+ \ltjgetparameter{talbaselineshift}abc\hbox{にほんごABC\hbox{\tate たて\showdir}}\showdir
+$$
+あいうえお}
+
+\vsize250mm
+\def\F#1{%
+\medskip
+\setbox0=\hbox{\csname #1\endcsname
+   \hbox{\yoko Y}\hbox{\tate T}\hbox{\dtou D}\hbox{\utod U}}
+{\obeylines\fivett\baselineskip=7pt
+\directlua{luatexja.ext_show_node_list(tex.box[0], 'hbox #1> ', tex.print)}\par}}
+
+\F{yoko}
+\F{tate}
+\F{dtou}
+\F{utod}
 \end

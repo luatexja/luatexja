@@ -441,16 +441,16 @@ do
    local getbox = tex.getbox
    local function check_dir(reg_num)
       start_time_measure('box_primitive_hook')
-      local list_dir = get_dir_count()
+      local list_dir = get_dir_count()%dir_math_mod
       local b = getbox(tex_getcount('ltj@tempcnta'))
       if b then
 	 local box_dir = get_box_dir(to_direct(b), dir_yoko)
-	 if box_dir%dir_node_auto ~= list_dir then
-	--    print('NEST', tex_nest.ptr, tex_getcount('ltj@tempcnta'))
-	--    luatexja.ext_show_node_list(
-        --       (tex_nest.ptr==0) and tex.lists.page_head or tex_nest[tex_nest.ptr].head,
-        --       'LIST' .. tostring(list_dir) .. '> ', print)
-	--   luatexja.ext_show_node_list(b, 'BOX' .. tostring(box_dir) .. '> ', print)
+	 if box_dir%dir_math_mod ~= list_dir then
+	    print('NEST', tex_nest.ptr, tex_getcount('ltj@tempcnta'))
+	    luatexja.ext_show_node_list(
+               (tex_nest.ptr==0) and tex.lists.page_head or tex_nest[tex_nest.ptr].head,
+               'LIST' .. tostring(list_dir) .. '> ', print)
+	   luatexja.ext_show_node_list(b, 'BOX' .. tostring(box_dir) .. '> ', print)
 	    ltjb.package_error(
 	       'luatexja',
 	       "Incompatible direction list can't be unboxed",
