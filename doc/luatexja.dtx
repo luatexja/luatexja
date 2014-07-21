@@ -3426,7 +3426,8 @@ These fields are for adjusting the position of the ``real'' glyph. Legal
 	     3~fields are omitted, \texttt{left} and \texttt{down} are
 	     treated as~0, and \texttt{align} field is treated as
 	     \texttt{'left'}.
-The effects of these 3~fields are indicated in Figure~\ref{fig-pos}.
+The effects of these 3~fields are indicated in 
+Figures \ref{fig-pos}~and~\ref{fig-pos-tate}.
 %</en>
 %<*ja>
 これらのフィールドは実際のグリフの位置を調整するためにある．
@@ -3434,7 +3435,8 @@ The effects of these 3~fields are indicated in Figure~\ref{fig-pos}.
 \texttt{'right'} のいずれかである．もしこれら3つのフィールドのうちの1つが省かれた
 場合，\texttt{left} と \texttt{down} は0，\texttt{align} フィールドは
 \ \texttt{'left'} であるものとして扱われる．
-これら3つのフィールドの意味については図\ref{fig-pos}で説明する．
+これら3つのフィールドの意味については図\ref{fig-pos}（横組用和文フォント），
+図\ref{fig-pos-tate}（縦組用和文フォント）で説明する．
 %</ja>
 
 %<*en>
@@ -3455,10 +3457,10 @@ when the current character class is the class for opening delimiters'.
 \begin{minipage}{0.4\textwidth}%
 \begin{center}\unitlength=10pt\small
 \begin{picture}(15,12)(-1,-4)
-\color{black!10!white}% real glyph :step1
+\color{black!10!white}% jfm
 \put(0,0){\vrule width 12\unitlength height 8\unitlength depth 3\unitlength}
 
-\color{red!20!white}% real glyph :step1
+\color{red!20!white}% step1
 \put(-1,-1.5){\vrule width 6\unitlength height 7\unitlength depth 2.5\unitlength}
 
 \color{red}% real glyph
@@ -3468,10 +3470,10 @@ when the current character class is the class for opening delimiters'.
 \put(-1,5.5){\line(1,0){6}}
 \put(-1,-4){\line(1,0){6}}
 
-\color{green!20!white}% real glyph :step1
+\color{green!20!white}% real glyph
 \put(3,0){\vrule width 6\unitlength height 7\unitlength depth 2.5\unitlength}
 
-\color{black}% real glyph :step1
+\color{black}% jfm
 \thicklines
 \put(0,0){\vector(0,1){8}\line(0,-1){3}\vector(1,0){12}}
 \put(12,0){\line(0,1){8}\vector(0,-1){3}}
@@ -3481,7 +3483,7 @@ when the current character class is the class for opening delimiters'.
 \put(12.2,-1.5){\makebox(0,0)[l]{\texttt{depth}}}
 \put(6,0.2){\makebox(0,0)[b]{\texttt{width}}}
 
-\color{green!50!black}% real glyph :step1
+\color{green!50!black}% step1
 \thicklines
 \put(3,0){\vector(0,1){7}\vector(0,-1){2.5}\vector(1,0){6}}
 \put(9,0){\line(0,1){7}\line(0,-1){2.5}}
@@ -3506,31 +3508,32 @@ when the current character class is the class for opening delimiters'.
 \end{minipage}%
 \begin{minipage}{0.6\textwidth}%
 %<*en>
-Consider a node containing Japanese character whose value of the \texttt{align}
+Consider a  Japanese character node which belongs to 
+a character class whose the \texttt{align}
 field is \texttt{'middle'}.
 %</en>
 %<*ja>
-\texttt{align}フィールドの値が\texttt{'middle'}である和文文字を含むノードを
-考えよう．
+\texttt{align}フィールドの値が\texttt{'middle'}であるような文字クラスに属する
+和文文字ノードを考えよう．
 %</ja>
 \begin{itemize}
 \item
 %<*en>
-The black rectangle is a frame of the node.
+The black rectangle is the imaginary body of the node.
 Its width, height, and depth are specified by JFM.
 %</en>
 %<*ja>
-黒色の長方形はノードの枠である．
-その幅，高さ，深さはJFMによって指定される．
+黒色の長方形はノードの枠であり，
+その幅，高さ，深さはJFMによって指定されている．
 %</ja>
 \item
 %<*en>
 Since the \texttt{align} field is \texttt{'middle'},
-the ``real'' glyph is centered horizontally (the green rectangle).
+the ``real'' glyph is centered horizontally (the green rectangle) first.
 %</en>
 %<*ja>
-\texttt{align}フィールドは\texttt{middle}なので，実際のグリフは
-水平方向の中心に配置される（緑色の長方形）．
+\texttt{align}フィールドは\texttt{middle}なので，
+実際のグリフの位置はまず水平方向に中央揃えしたものとなる（緑色の長方形）．
 %</ja>
 \item
 %<*en>
@@ -3539,7 +3542,7 @@ Furthermore, the glyph is shifted according to values of fields
       glyph is indicated by the red rectangle.
 %</en>
 %<*ja>
-さらに，グリフは\texttt{left}と\texttt{down}の値に従ってシフトされる．
+さらに，グリフは \texttt{left} と \texttt{down} の値に従ってシフトされる．
 最終的な実際のグリフの位置は赤色の長方形で示された位置になる．
 %</ja>
 \end{itemize}
@@ -3547,10 +3550,92 @@ Furthermore, the glyph is shifted according to values of fields
 \medskip
 
 \caption{%
-%<en>The position of the real glyph
-%<ja>「実際の」グリフの位置
+%<en>The position of the real glyph (horizontal Japanese fonts)
+%<ja>横組和文フォントにおける「実際の」グリフの位置
 }
 \label{fig-pos}
+\end{figure}
+\begin{figure}[!tb]
+\begin{minipage}{0.4\textwidth}%
+\begin{center}\unitlength=10pt\small
+\begin{picture}(15,12)(-6,0)
+\color{black!10!white}% jfm
+\put(-6,0){\vrule width 12\unitlength height 11\unitlength}
+
+\color{red!20!white}% real glyph
+\put(-6.5,5.5){\vrule width 8\unitlength height 6\unitlength depth 3\unitlength}
+
+\color{red}% real glyph
+\thicklines
+\put(-6.5,5.5){\vector(0,1){6}\vector(0,-1){3}\vector(1,0){8}}
+\put( 1.5,5.5){\line(0,1){6}\line(0,-1){3}}
+\put(-6.5,11.5){\line(1,0){8}}
+\put(-6.5,2.5){\line(1,0){8}}
+
+\color{green!20!white}% step1
+\put(-4,3){\vrule width 8\unitlength height 6\unitlength depth 3\unitlength}
+
+\color{black}% jfm
+\thicklines
+\put(0,11){\vector(1,0){6}\vector(-1,0){6}\vector(0,-1){11}}
+\put(0,0){\line(1,0){6}\line(-1,0){6}}
+\put(-6,0){\line(0,1){11}}
+\put( 6,0){\line(0,1){11}}
+\put( 3,10.8){\makebox(0,0)[t]{\texttt{height}}}
+\put(-3,10.8){\makebox(0,0)[t]{\texttt{depth}}}
+\put(0.2,5.5){\makebox(0,0)[l]{\texttt{width}}}
+
+\color{green!50!black}% step1
+\thicklines
+\put(-4,3){\vector(0,1){6}\vector(0,-1){3}\vector(1,0){8}}
+\put( 4,3){\line(0,1){6}\line(0,-1){3}}
+\put(-4,9){\line(1,0){8}}
+\put(-4,0){\line(1,0){8}}
+\savebox{\eqdist}(0,0)[b]{%
+  \thinlines
+  \put(-0.08,0.2){\line(0,-1){0.4}}%
+  \put(0.08,0.2){\line(0,-1){0.4}}}
+\put(2,9){\usebox{\eqdist}}
+\put(-2,9){\usebox{\eqdist}}
+
+
+\color{blue}% shifted
+\thicklines
+\put(-4,3){\vector(0,1){2.5}}
+\put(-3.8,4.25){\makebox(0,0)[l]{\texttt{left}}}
+\put(-4,5.5){\vector(-1,0){2.5}}
+\put(-5.,5.7){\makebox(0,0)[b]{\texttt{down}}}
+\end{picture}
+\end{center}
+\end{minipage}%
+\begin{minipage}{0.6\textwidth}%
+%<*en>
+(\dots)
+%</en>
+%<*ja>
+\texttt{align}フィールドの値が\texttt{'right'}であるような文字クラスに属する
+和文文字を考えよう．
+\begin{itemize}
+\item
+実際のグリフの「垂直位置」は，ベースラインが文字の物理的な左右方向の中央を通る
+位置となる．
+\item 
+また，この場合\texttt{align}フィールドは\texttt{middle}なので，
+「水平位置」は字送り方向に「右寄せ」したものとなる（緑色の長方形）．
+その際，高さ・深さは，実フォントのascender, descenderの値が使われる．
+\item 
+その後さらに \texttt{left} と \texttt{down} の値に従ってシフトされる
+のは横組用和文フォントと変わらない．
+\end{itemize}
+%</ja>
+\end{minipage}
+\medskip
+
+\caption{%
+%<en>The position of the real glyph (vertical Japanese fonts)
+%<ja>縦組和文フォントにおける「実際の」グリフの位置
+}
+\label{fig-pos-tate}
 \end{figure}
 
 \item[kern={\{[$j$]=<kern>, [$j'$]=\{<kern>, [<ratio>]\}, ...\}}]
