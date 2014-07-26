@@ -318,6 +318,8 @@
     \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] \ltj@stdgtfont:jfm=ujis}{}
   \fi
 \fi
+\DeclareFontShape{JT3}{mc}{m}{n}{<-> s * [0.924872] \ltj@stdmcfont:jfm=ujisv}{}
+\DeclareFontShape{JT3}{gt}{m}{n}{<-> s * [0.924872] \ltj@stdgtfont:jfm=ujisv}{}
 \DeclareFontShape{JY3}{mc}{bx}{n}{<->ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{gt}{bx}{n}{<->ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{mc}{m}{it}{<->ssub*mc/m/n}{}

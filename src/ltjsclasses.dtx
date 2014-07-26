@@ -22,7 +22,7 @@
 %  -----------------------------------------
 %
 % \fi
-% \CheckSum{5205}
+% \CheckSum{5213}
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -131,6 +131,7 @@
 % \end{itemize}
 %
 % [2014-02-07 LTJ] jsclasses 2014-02-07 ベースにしました．
+% [2014-07-26 LTJ] 縦組用和文フォントの設定を加えました．
 %
 % \StopEventually{}
 %
@@ -749,6 +750,8 @@
 % 何らかの理由で非埋め込みフォントが正しく利用できない場合にのみ |luatexja.cfg| によって
 % セットされるものです。
 %
+% [2014-07-26 LTJ] なお，現状のところ，縦組用JFMは |jfm-ujisv.lua| しか準備していません．
+%
 %    \begin{macrocode}
 %<*!jspf>
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
@@ -764,6 +767,8 @@
     \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] \ltj@stdgtfont:jfm=ujis}{}
   \fi
 \fi
+\DeclareFontShape{JT3}{mc}{m}{n}{<-> s * [0.924872] \ltj@stdmcfont:jfm=ujisv}{}
+\DeclareFontShape{JT3}{gt}{m}{n}{<-> s * [0.924872] \ltj@stdgtfont:jfm=ujisv}{}
 %</!jspf>
 %    \end{macrocode}
 %
@@ -791,6 +796,8 @@
     \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.903375] \ltj@stdgtfont:jfm=ujis}{}
   \fi
 \fi
+\DeclareFontShape{JT3}{mc}{m}{n}{<-> s * [0.903375] \ltj@stdmcfont:jfm=ujisv}{}
+\DeclareFontShape{JT3}{gt}{m}{n}{<-> s * [0.903375] \ltj@stdgtfont:jfm=ujisv}{}
 %</jspf>
 %    \end{macrocode}
 %

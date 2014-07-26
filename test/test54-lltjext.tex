@@ -12,16 +12,16 @@
 \usepackage[a6paper,landscape,margin=10mm,top=5mm]{geometry}
 \let\mcdefault\gtdefault
 \let\rmdefault\sfdefault
-\newdimen\WIDTH\WIDTH30\Cwd
+\newdimen\WIDTH\WIDTH30\cwd
 
 \def\AX{\adjustbaseline
   \ifdefined\directlua\ltjsetparameter{autospacing=false, autoxspacing=false}%
   \else\noautospacing\noautoxspacing\fi}
 \def\TEST#1#2{\newpage
-\hbox to 40\Cwd{\hss\vtop{\hsize=\WIDTH#1
+\hbox to 40\cwd{\hss\vtop{\hsize=\WIDTH#1
 \normalsize
 \section{組方向: \string#1，ボックス: #2}
-\adjustbaseline
+\AX
 \paragraph{tabular}\
 
 あいうxyz%
@@ -57,63 +57,67 @@
 }}
 
 \newpage
-\hbox to 40\Cwd{\hss\vtop{\hsize=\WIDTH#1
+\hbox to 40\cwd{\hss\vtop{\hsize=\WIDTH#1
 \AX
 
 \paragraph{minipage}\
 
 あいうxyz%
-\begin{minipage}<#2>[t]{10\Cwd}
+\begin{minipage}<#2>[t]{10\cwd}
 そのため、
 仮に区単位でカテゴリコードを変更できるようにしても、SJIS版
 \end{minipage}あいうxyz%
-\begin{minipage}<#2>[c]{10\Cwd}
+\begin{minipage}<#2>[c]{10\cwd}
 そのため、
 仮に区単位でカテゴリコードを変更できるようにしても、SJIS版
 \end{minipage}\hfil\penalty0\hfilneg あいうxyz%
-\begin{minipage}<#2>[b]{10\Cwd}
+\begin{minipage}<#2>[b]{10\cwd}
 そのため、
 仮に区単位でカテゴリコードを変更できるようにしても、SJIS版
 \end{minipage}あいうxyz
 }}
 
 \newpage
-\hbox to 40\Cwd{\hss\vtop{\hsize=\WIDTH#1
+\hbox to 40\cwd{\hss\vtop{\hsize=\WIDTH#1
 \subsection*{組方向: \string#1，ボックス: #2 後半}
 \AX
 \paragraph{parbox}\
 
 あいうxyz\nobreak%
-\parbox<#2>[t]{10\Cwd}{%
+\parbox<#2>[t]{10\cwd}{%
 そのため、
 仮に区単位でカテゴリコードを変更できるようにしても、SJIS版}%
 えおabc\hfil\penalty0\hfilneg あいうxyz\nobreak%
-\parbox<#2>[c]{10\Cwd}{%
+\parbox<#2>[c]{10\cwd}{%
 そのため、
 仮に区単位でカテゴリコードを変更できるようにしても、SJIS版}%
 えおabc\hfil\penalty0\hfilneg あいうxyz\nobreak%
-\parbox<#2>[b]{10\Cwd}{%
+\parbox<#2>[b]{10\cwd}{%
 そのため、
 仮に区単位でカテゴリコードを変更できるようにしても、SJIS版}%
 えおabc
 }}
 
 \newpage
-\hbox to 40\Cwd{\hss\vtop{\hsize=\WIDTH#1
+\hbox to 40\cwd{\hss\vtop{\hsize=\WIDTH#1
 
 \paragraph{pbox}\
 
 \AX\noindent
-あいうxyz\nobreak\pbox<#2>[20\Cwd][l]{%
+あいうxyz\nobreak\pbox<#2>[20\cwd][l]{\AX%
   計算機科学（Computer Science）}えおabc\hfil\penalty0\hfilneg
-あいうxyz\nobreak\pbox<#2>[20\Cwd][c]{%
+あいうxyz\nobreak\pbox<#2>[20\cwd][c]{\AX%
   計算機科学（Computer Science）}えおabc\hfil\penalty0\hfilneg
-あいうxyz\nobreak\pbox<#2>[20\Cwd][r]{%
+あいうxyz\nobreak\pbox<#2>[20\cwd][r]{\AX%
   計算機科学（Computer Science）}えおabc
 
 }}}
 \begin{document}
-
+\ifdefined\directlua
+\message{\the\dimexpr 1\zw}%
+\else
+\message{\the\dimexpr 1zw}%
+\fi
 %\tracingifs2\tracingonline2
 \TEST{\yoko}{y}
 \TEST{\yoko}{t}
