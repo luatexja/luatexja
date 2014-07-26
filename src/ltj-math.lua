@@ -3,6 +3,7 @@
 --
 
 luatexja.load_module('base');      local ltjb = luatexja.base
+luatexja.load_module('direction'); local ltjd = luatexja.direction
 luatexja.load_module('charrange'); local ltjc = luatexja.charrange
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 luatexja.load_module('stack');     local ltjs = luatexja.stack
@@ -56,6 +57,8 @@ local PROCESSED  = luatexja.icflag_table.PROCESSED
 
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_find_char_class = ltjf.find_char_class
+local ltjd_get_dir_count = ltjd.get_dir_count
+local ltjd_make_dir_whatsit = ltjd.make_dir_whatsit
 
 -- table of mathematical characters
 local is_math_letters = {}
@@ -104,6 +107,7 @@ local MJS  = luatexja.stack_table_index.MJS
 local MJSS = luatexja.stack_table_index.MJSS
 local capsule_glyph_math = ltjw.capsule_glyph_math
 local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
+local list_dir
 
 conv_jchar_to_hbox_A =
 function (p, sty)
@@ -134,7 +138,10 @@ function (p, sty)
          end
       elseif pid == id_sub_box and getfield(p, 'head') then
          -- \hbox で直に与えられた内容は上下位置を補正する必要はない
-         set_attr(getfield(p, 'head'), attr_icflag, PROCESSED)
+	 local h = getfield(p, 'head')
+	 h = ltjd_make_dir_whatsit(h, h, list_dir, 'math')
+	 setfield(p, 'head', h)
+         set_attr(h, attr_icflag, PROCESSED)
       end
    end
    return p
@@ -143,7 +150,7 @@ end
 local node_remove = Dnode.remove
 luatexbase.add_to_callback('mlist_to_hlist',
    function (n, display_type, penalties)
-      n = to_direct(n)
+      n = to_direct(n); list_dir = ltjd_get_dir_count()
       if getid(n)==id_whatsit and getsubtype(n)==sid_user and
       getfield(n, 'user_id') == DIR then
 	 local old_n = n; n = node_remove(n, n)

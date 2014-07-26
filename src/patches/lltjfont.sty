@@ -28,14 +28,17 @@
 \ifdefined\cHT\else\newdimen\cHT\fi
 %\let\afont\font
 
+\newbox\dstrutbox
 \newbox\tstrutbox
 \newbox\zstrutbox
 \def\strut{\relax
-  \unless\ifnum\ltjgetparameter{direction}=3 
+  \ifnum\ltjgetparameter{direction}=1 % dtou
+    \ifmmode\copy\dstrutbox\else\unhcopy\dstrutbox\fi
+  \else\ifnum\ltjgetparameter{direction}=4 % yoko
     \ifmmode\copy\strutbox\else\unhcopy\strutbox\fi
-  \else
+  \else % tate and utod
     \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi
-  \fi
+  \fi\fi
 }
 \def\tstrut{\relax\hbox{\tate
    \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi}}
@@ -340,36 +343,39 @@
       \baselineskip\f@linespread\baselineskip
       \normalbaselineskip\baselineskip
       \adjustbaseline
-      \setbox\strutbox\hbox{%\yoko
+      \setbox\strutbox\hbox{\yoko
           \vrule\@width\z@
                 \@height.7\baselineskip \@depth.3\baselineskip}%
-      \setbox\tstrutbox\hbox{%\tate
+      \setbox\dstrutbox\hbox{\dtou
+          \vrule\@width\z@
+                \@height.7\baselineskip \@depth.3\baselineskip}%
+      \setbox\tstrutbox\hbox{\tate
           \vrule\@width\z@
                 \@height.5\baselineskip \@depth.5\baselineskip}%
-      \setbox\zstrutbox\hbox{%\tate
+      \setbox\zstrutbox\hbox{\tate
           \vrule\@width\z@
                 \@height.7\baselineskip \@depth.3\baselineskip}%
         \let\size@update\relax}}
 \newbox\adjust@box
 \newdimen\adjust@dimen
 \def\adjustbaseline{%
-    \setbox\adjust@box\hbox{\ltj@ykblshift=0あ}%
+    \setbox\adjust@box\hbox{%
+      \ltj@ykblshift=0 \ltj@tkblshift=0あ}%
     \cht\ht\adjust@box
     \cdp\dp\adjust@box
     \cwd\wd\adjust@box
     \cvs\normalbaselineskip
     \chs\cwd
     \cHT\cht \advance\cHT\cdp
-    \setbox0\hbox{\tate\ltj@tkblshift=0あ}%
-    \setbox\adjust@box\hbox{\tate\ltj@tablshift=0M}%
+    \setbox0\hbox{\tate\ltj@tkblshift=0 あ}%
+    \setbox\adjust@box\hbox{\tate\ltj@tablshift=0 M}%
     \adjust@dimen\ht\adjust@box
     \advance\adjust@dimen\dp\adjust@box
     \advance\adjust@dimen-\ht0
     \divide\adjust@dimen\tw@
     \advance\adjust@dimen0.5\dp0
     \advance\adjust@dimen-\dp\adjust@box
-    \ltj@tablshift=\adjust@dimen
-  }
+    \ltj@tablshift=\adjust@dimen}
 \DeclareRobustCommand\romanencoding[1]{%
     \expandafter\ifx\csname T@#1\endcsname\relax
       \@latex@error{Encoding scheme `#1' unknown}\@eha

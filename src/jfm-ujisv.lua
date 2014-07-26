@@ -13,7 +13,7 @@ luatexja.jfont.define_jfm {
    kanjiskip =  {0.0, 0.25, 0},
    xkanjiskip = {0.25, 0.25, .125},
    [0] = {
-      align = 'middle', left = 0.0, down = 0.0,
+      align = 'middle', left = 0.00, down = 0.00,
       width = 1.0, height = 0.50, depth = 0.50, italic=0.0,
       glue = {
 	 -- [index] = { width, stretch, shrink, [priority, [ratio]] }

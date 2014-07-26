@@ -18,6 +18,7 @@ local getsubtype = (Dnode ~= node) and Dnode.getsubtype or function(n) return n.
 
 local node_traverse = Dnode.traverse
 local node_new = Dnode.new
+local node_copy = Dnode.copy
 local node_remove = Dnode.remove
 local node_tail = Dnode.tail
 local node_next = (Dnode ~= node) and Dnode.getnext or node.next
@@ -136,13 +137,14 @@ local function capsule_glyph_tate(p, met, class)
    setfield(k1, 'kern',
 	    getfield(p, 'xoffset') + ascent
 	       + char_data.align*(fwidth-pwidth) - fshift.left)
+   setfield(p, 'xoffset', -fshift.down)
+   setfield(p, 'yoffset', 0)
    local ws = node_new(id_whatsit, sid_save)
    local wm = node_new(id_whatsit, sid_matrix)
    setfield(wm, 'data', '0 1 -1 0')
-   local k2 = node_new(id_kern)
-   setfield(k2, 'kern', -fshift.down - fdepth)
-   local k3 = node_new(id_kern)
-   setfield(k3, 'kern', - getfield(p, 'width') +fshift.down + fdepth)
+   local pwnh = - 0.5*getfield(p, 'width')
+   local k2 = node_new(id_kern); setfield(k2, 'kern', - 0.5*getfield(p, 'width'))
+   local k3 = node_copy(k2)
    local wr = node_new(id_whatsit, sid_restore)
    setfield(box, 'head', k1); setfield(k1, 'next', ws)
    setfield(ws, 'next', wm);  setfield(wm, 'next', k2);
