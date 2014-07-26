@@ -1,0 +1,146 @@
+%#!luajitlatex
+\ifdefined\directlua
+  \documentclass{ltjsarticle}
+  \usepackage{lltjext}
+\else
+  \documentclass{jsarticle}
+  \usepackage{plext}
+  \usepackage{otf}
+\fi
+\pagestyle{empty}
+\usepackage[T1]{fontenc}
+\usepackage[a6paper,landscape,margin=10mm,top=5mm]{geometry}
+\let\mcdefault\gtdefault
+\let\rmdefault\sfdefault
+\newdimen\WIDTH\WIDTH30\Cwd
+
+\def\AX{\adjustbaseline
+  \ifdefined\directlua\ltjsetparameter{autospacing=false, autoxspacing=false}%
+  \else\noautospacing\noautoxspacing\fi}
+\def\TEST#1#2{\newpage
+\hbox to 40\Cwd{\hss\vtop{\hsize=\WIDTH#1
+\normalsize
+\section{組方向: \string#1，ボックス: #2}
+\adjustbaseline
+\paragraph{tabular}\
+
+あいうxyz%
+\begin{tabular}<#2>[t]{ll}
+\hline
+上(\texttt{t} opt)，罫あり&T\\
+\hline
+\end{tabular}
+えおabc\hfil\penalty0\hfilneg あいうxyz%
+\begin{tabular}<#2>[c]{l}
+\hline
+中央(\texttt{c} opt)，罫あり\\
+\hline
+\end{tabular}
+えおabc\hfil\penalty0\hfilneg あいうxyz%
+\begin{tabular}<#2>[b]{l}
+\hline
+下(\texttt{b} opt)，罫あり\\
+\hline
+\end{tabular}
+えおabc\hfil\penalty0\hfilneg あいうxyz
+\begin{tabular}<#2>[t]{l}
+上(\texttt{t} opt)，罫なし\\
+\end{tabular}えおabc\hfil\penalty0\hfilneg 
+あいうxyz%
+\begin{tabular}<#2>[c]{l}
+中央(\texttt{c} opt)，罫なし\\
+\end{tabular}えおabc\hfil\penalty0\hfilneg 
+あいうxyz%
+\begin{tabular}<#2>[b]{l}
+下(\texttt{b} opt)，罫なし\\
+\end{tabular}あいうxyz
+}}
+
+\newpage
+\hbox to 40\Cwd{\hss\vtop{\hsize=\WIDTH#1
+\AX
+
+\paragraph{minipage}\
+
+あいうxyz%
+\begin{minipage}<#2>[t]{10\Cwd}
+そのため、
+仮に区単位でカテゴリコードを変更できるようにしても、SJIS版
+\end{minipage}あいうxyz%
+\begin{minipage}<#2>[c]{10\Cwd}
+そのため、
+仮に区単位でカテゴリコードを変更できるようにしても、SJIS版
+\end{minipage}\hfil\penalty0\hfilneg あいうxyz%
+\begin{minipage}<#2>[b]{10\Cwd}
+そのため、
+仮に区単位でカテゴリコードを変更できるようにしても、SJIS版
+\end{minipage}あいうxyz
+}}
+
+\newpage
+\hbox to 40\Cwd{\hss\vtop{\hsize=\WIDTH#1
+\subsection*{組方向: \string#1，ボックス: #2 後半}
+\AX
+\paragraph{parbox}\
+
+あいうxyz\nobreak%
+\parbox<#2>[t]{10\Cwd}{%
+そのため、
+仮に区単位でカテゴリコードを変更できるようにしても、SJIS版}%
+えおabc\hfil\penalty0\hfilneg あいうxyz\nobreak%
+\parbox<#2>[c]{10\Cwd}{%
+そのため、
+仮に区単位でカテゴリコードを変更できるようにしても、SJIS版}%
+えおabc\hfil\penalty0\hfilneg あいうxyz\nobreak%
+\parbox<#2>[b]{10\Cwd}{%
+そのため、
+仮に区単位でカテゴリコードを変更できるようにしても、SJIS版}%
+えおabc
+}}
+
+\newpage
+\hbox to 40\Cwd{\hss\vtop{\hsize=\WIDTH#1
+
+\paragraph{pbox}\
+
+\AX\noindent
+あいうxyz\nobreak\pbox<#2>[20\Cwd][l]{%
+  計算機科学（Computer Science）}えおabc\hfil\penalty0\hfilneg
+あいうxyz\nobreak\pbox<#2>[20\Cwd][c]{%
+  計算機科学（Computer Science）}えおabc\hfil\penalty0\hfilneg
+あいうxyz\nobreak\pbox<#2>[20\Cwd][r]{%
+  計算機科学（Computer Science）}えおabc
+
+}}}
+\begin{document}
+
+%\tracingifs2\tracingonline2
+\TEST{\yoko}{y}
+\TEST{\yoko}{t}
+\TEST{\yoko}{z}
+\TEST{\tate}{y}
+\TEST{\tate}{t}
+\TEST{\tate}{z}
+
+\ifdefined\directlua
+\TEST{\yoko}{d}
+\TEST{\yoko}{u}
+
+\TEST{\tate}{d}
+\TEST{\tate}{u}
+
+\TEST{\dtou}{y}
+\TEST{\dtou}{t}
+\TEST{\dtou}{z}
+\TEST{\dtou}{d}
+\TEST{\dtou}{u}
+
+\TEST{\utod}{y}
+\TEST{\utod}{t}
+\TEST{\utod}{z}
+\TEST{\utod}{d}
+\TEST{\utod}{u}
+\fi
+\end{document}
+
+

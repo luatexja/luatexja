@@ -278,14 +278,17 @@ end
 -- dir_node に包む方法を書いたテーブル
 local dir_node_aux
 do
+   local floor = math.floor
    local get_h =function (w,h,d) return h end
    local get_d =function (w,h,d) return d end
    local get_h_d =function (w,h,d) return h+d end
    local get_h_d_neg =function (w,h,d) return -h-d end
    local get_h_neg =function (w,h,d) return -h end
    local get_d_neg =function (w,h,d) return -d end
-   local get_w_half =function (w,h,d) return 0.5*w end
-   local get_w_neg_half =function (w,h,d) return -0.5*w end
+   local get_w_half =function (w,h,d) return floor(0.5*w) end
+   local get_w_neg_half =function (w,h,d) return floor(-0.5*w) end
+   local get_w_half_rem =function (w,h,d) return w-floor(0.5*w) end
+   local get_w_neg_half_rem =function (w,h,d) return -w-floor(-0.5*w) end
    local get_w_neg =function (w,h,d) return -w end
    local get_w =function (w,h,d) return w end
    local zero = function() return 0 end
@@ -294,13 +297,13 @@ do
 	 [dir_tate] = { -- tate 中で組む
 	    width  = get_h_d,
 	    height = get_w_half,
-	    depth  = get_w_half,
+	    depth  = get_w_half_rem,
 	    [id_hlist] = {
 	       { 'whatsit', sid_save },
 	       { 'rotate', '0 1 -1 0' },
 	       { 'kern', get_w_neg_half },
 	       { 'box' , get_h },
-	       { 'kern', get_w_neg_half },
+	       { 'kern', get_w_neg_half_rem },
 	       { 'whatsit', sid_restore },
 	    },
 	    [id_vlist] = {
