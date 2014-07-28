@@ -4,8 +4,10 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{lltjext}
    [2014/07/26 v1.2-ltj-1 ...]
+\RequirePackage{luatexja}
 
 \newif\if@rotsw
+%%% array and tabular
 \def\array{\let\@acol\@arrayacol \let\@classz\@arrayclassz
  \let\@classiv\@arrayclassiv
  \let\\\@arraycr\let\@halignto\@empty\X@tabarray}
@@ -26,7 +28,7 @@
 \def\p@array<#1>[#2]#3{%
   \let\box@dir\relax
   \if #1z\relax
-    \ifnum\ltjgetparameter{direction}=3 \relax
+    \ifnum\ltjgetparameter{direction}=3\relax
       \let\box@dir\utod\@tempcnta=\zstrutbox
     \fi
   \else
@@ -161,6 +163,8 @@
   \fi\fi
 \fi\fi%
 }
+
+%%% caption
 \newbox\@floatbox
 \newdimen\floatwidth
 \newdimen\floatheight
@@ -181,10 +185,10 @@
   \setbox\z@\hbox{#4}%
   \floatwidth=#1 \floatheight=#2 \edef\float@pos{#3}%
   \ifdim\floatwidth<\z@
-     \floatwidth\wd\z@\floatruletick\z@
+     \floatwidth\ltjgetwd\z@\floatruletick\z@
   \fi
   \ifdim\floatheight<\z@
-     \floatheight\ht\z@\advance\floatheight\dp\z@\relax
+     \floatheight\ltjgetht\z@\advance\floatheight\ltjgetdp\z@\relax
      \floatruletick\z@
   \fi
   \setbox\@floatbox\vbox to\floatheight{\offinterlineskip
@@ -253,20 +257,20 @@
   \@tempswafalse
   % tempswa\hline 基本組の組方向とキャプションの組方向が直交するか？
   \if y\caption@dir \let\captiondir\yoko
-    \ifodd\ltjgetparameter{direction}\@tempswatrue\fi
+    \ifodd\ltjgetparameter{direction}\relax\@tempswatrue\fi
   \else\if z\caption@dir \let\captiondir\relax
-    \ifnum\ltjgetparameter{direction}=3 \let\captiondir\utod\fi
+    \ifnum\ltjgetparameter{direction}=3\relax\let\captiondir\utod\fi
   \else\if d\caption@dir \let\captiondir\dtou
-    \ifeven\ltjgetparameter{direction}\@tempswatrue\fi
+    \ifodd\ltjgetparameter{direction}\else\@tempswatrue\fi
   \else\if u\caption@dir \let\captiondir\utod
-    \ifeven\ltjgetparameter{direction}\@tempswatrue\fi
-  \else\let\captiondir\tate
-    \ifeven\ltjgetparameter{direction}\@tempswatrue\fi
-  \fi\fi\fi\fi% t -> tate
+    \ifodd\ltjgetparameter{direction}\else\@tempswatrue\fi
+  \else\if t\caption@dir \let\captiondir\tate
+    \ifodd\ltjgetparameter{direction}\else\@tempswatrue\fi
+  \fi\fi\fi\fi\fi
   \setbox0\hbox{\hbox{\captiondir
      \captionfontsetup\parindent\z@\inhibitglue
-     \csname fnum@\@captype\endcsname\char\euc"A1A1\relax#1}}%
-  \if@tempswa \@tempdima\ltjgetht0 \else\@tempdima\ltjgetwd0 \fi
+     \csname fnum@\@captype\endcsname 　#1}}%"
+  \if@tempswa\@tempdima\ltjgetht0\relax\else\@tempdima\ltjgetwd0\relax\fi
   \ifdim\@tempdima>\captionwidth \@tempdima\captionwidth \fi
   \@pboxswfalse
   \setbox0\hbox{%
@@ -279,7 +283,7 @@
     {\hsize\@tempdima\kern\z@
     \vbox{\captiondir\hsize\@tempdima
       \captionfontsetup\parindent\z@\inhibitglue
-      \csname fnum@\@captype\endcsname\char\euc"A1A1\relax#1}\kern\z@
+      \csname fnum@\@captype\endcsname 　#1}\kern\z@
     }\if@pboxsw \m@th$\fi}%
   \let\to@captionboxwidth\relax
   \if l\caption@posb \else\if r\caption@posb\else
@@ -288,6 +292,8 @@
      \if t\caption@posa\else\hss\fi
      \unhbox0\relax
      \if b\caption@posa\else\hss\fi}}
+
+%%% minipage and parbox
 \def\minipage{\@ifnextchar<%>
    {\X@minipage}{\X@minipage<Z>}}
 \def\X@minipage<#1>{\@ifnextchar[%]
@@ -486,6 +492,8 @@
   \fi\fi
 \fi\fi%
 }
+
+%%% pbox
 \def\pbox{\leavevmode\@ifnextchar<{\X@makePbox}{\X@makePbox<Z>}}
 \def\X@makePbox<#1>{%
   \@ifnextchar[{\@imakePbox<#1>}{\@imakePbox<#1>[-5\p@]}}
@@ -517,6 +525,8 @@
                \if #3l\relax\else\hss\fi
                #4\relax
                \if #3r\relax\else\hss\fi}\fi\egroup}
+
+%%% picture
 \def\picture{\@ifnextchar<%>
    {\X@picture}{\X@picture<Z>}}
 \def\X@picture<#1>(#2,#3){\@ifnextchar(%)
@@ -566,66 +576,85 @@
 \def\oval{\ybaselineshift\z@\tbaselineshift\z@\org@oval}
 \let\org@circle\circle
 \def\circle{\ybaselineshift\z@\tbaselineshift\z@\org@circle}
+
+%%% rensuji
 \newif\ifnot@advanceline
 \newskip\rensujiskip
 \rensujiskip=0.25\chs plus.25\zw minus.25\zw
 \DeclareRobustCommand\rensuji{%
   \@ifstar{\not@advancelinetrue\@rensuji}{\@rensuji}}
 \def\@rensuji{\@ifnextchar[{\@@rensuji}{\@@rensuji[c]}}
-\def\@@rensuji[#1]#2{\ifydir\hbox{#2}\else
+\def\@@rensuji[#1]#2{\ifnum\ltjgetparameter{direction}=4\relax%
+  \hbox{#2}\else
   \hskip\rensujiskip
   \ifvmode\leavevmode\fi
   \ifnot@advanceline\not@advancelinefalse\else
     \setbox\z@\hbox{\yoko#2}%
-    \@tempdima\ht\z@ \advance\@tempdima\dp\z@
-    \if #1c\relax\vrule\@width\z@ \@height.5\@tempdima \@depth.5\@tempdima
-    \else\if #1r\relax\vrule\@width\z@\@height\z@ \@depth\@tempdima
-    \else\vrule\@width\z@ \@height\@tempdima \@depth\z@
+    \@tempdima\ltjgetht\z@ \advance\@tempdima\ltjgetdp\z@
+    \ifnum\ltjgetparameter{direction}=1\relax
+      \if #1c\relax\vrule \@width \z@ \@height.5\@tempdima \@depth.5\@tempdima
+      \else\if #1l\relax\vrule\@width \z@\@height\z@ \@depth\@tempdima
+      \else\vrule\@width \z@ \@height\@tempdima \@depth\z@
+      \fi\fi
+    \else
+      \if #1c\relax\vrule \@width \z@ \@height.5\@tempdima \@depth.5\@tempdima
+      \else\if #1r\relax\vrule\@width \z@\@height\z@ \@depth\@tempdima
+      \else\vrule\@width \z@ \@height\@tempdima \@depth\z@
+      \fi\fi
+    \fi
+  \fi
+  \ifnum\ltjgetparameter{direction}=1\relax
+    \if #1c\relax\hbox to\zw{\yoko\hss#2\hss}%
+    \else\if #1r\relax\vbox{\hbox to\zw{\yoko\hss#2}\kern\z@}%
+    \else\vtop{\kern\z@\hbox to\zw{\yoko#2\hss}}%
+    \fi\fi
+  \else
+    \if #1c\relax\hbox to\zw{\yoko\hss#2\hss}%
+    \else\if #1r\relax\vtop{\kern\z@\hbox to\zw{\yoko\hss#2}}%
+    \else\vbox{\hbox to\zw{\yoko #2\hss}\kern\z@}%
     \fi\fi
   \fi
-  \if #1c\relax\hbox to1zw{\yoko\hss#2\hss}%
-  \else\if #1r\relax\vbox{\hbox to1zw{\yoko\hss#2}}%
-  \else\vtop{\hbox to1zw{\yoko#2\hss}}%
-  \fi\fi
   \hskip\rensujiskip
 \fi}
 \let\Rensuji\rensuji
 \let\prensuji\rensuji
+
+%%% kanji
 \def\Kanji#1{\expandafter\@Kanji\csname c@#1\endcsname}
 \def\@Kanji#1{\expandafter\kansuji\number #1}
 \def\kanji{\iftdir\expandafter\kansuji\fi}
+
+%%% bou
+%%% 
 \def\boutenchar{\char\euc"A1A2}
 \def\bou#1{\ifvmode\leavevmode\fi\@bou#1\end}
 \def\@bou#1{%
   \ifx#1\end \let\next=\relax
   \else
-    \iftdir\if@rotsw
+    \ifnum\ltjgetparameter{direction}=3\relax
       \hbox to\z@{\vbox to\z@{\boxmaxdepth\maxdimen
-        \vss\moveleft-0.2zw\hbox{\boutenchar}\nointerlineskip
+        \vss\moveleft0.2\zw\hbox{\yoko\boutenchar}\nointerlineskip
         \hbox{\char\euc"A1A1}}\hss}\nobreak#1\relax
     \else
       \hbox to\z@{\vbox to\z@{\boxmaxdepth\maxdimen
-        \vss\moveleft0.2zw\hbox{\yoko\boutenchar}\nointerlineskip
-        \hbox{\char\euc"A1A1}}\hss}\nobreak#1\relax
-    \fi\else
-      \hbox to\z@{\vbox to\z@{%
-        \vss\moveleft-0.2zw\hbox{\yoko\boutenchar}\nointerlineskip
+        \vss\moveleft-0.2\zw\hbox{\boutenchar}\nointerlineskip
         \hbox{\char\euc"A1A1}}\hss}\nobreak#1\relax
     \fi
     \let\next=\@bou
   \fi\next}
+
+%%% kasen
 \def\kasen#1{%
-  \ifydir\underline{#1}%
-  \else\if@rotsw\underline{#1}\else
-    \setbox\z@\hbox{#1}\leavevmode\raise.7zw
+  \ifnum\ltjgetparameter{direction}=3\relax
+    \setbox\z@\hbox{#1}\leavevmode\raise.7\zw
     \hbox to\z@{\vrule\@width\wd\z@ \@depth\z@ \@height.4\p@\hss}%
     \box\z@
-  \fi\fi}
+  \else\underline{#1}\fi}
+
+%%% references
 \def\@eqnnum{{\reset@font\rmfamily \normalcolor
-  \iftdir\raise.25zh\hbox{\yoko(\theequation)}%
+  \ifnum\ltjgetparameter{direction}=3 \raise.25\zh\hbox{\yoko(\theequation)}%
   \else (\theequation)\fi}}
 \def\@thecounter#1{\noexpand\rensuji{\noexpand\arabic{#1}}}
 \def\@thmcounter#1{\noexpand\rensuji{\noexpand\arabic{#1}}}
 \endinput
-%%
-%% End of file `plext.sty'.

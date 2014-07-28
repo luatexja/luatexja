@@ -607,6 +607,13 @@
     \ltj@@orig@moveleft\the\ltj@tempdima\noexpand\box\ltj@afbox
   }\ltj@afterbox\ltj@@moveleft@a}
 
+%%%% \vcenter
+\let\ltj@@orig@vcenter=\vcenter
+\protected\def\vcenter{\ltj@afterbox\ltj@@vcenter\vbox}
+\protected\def\ltj@@vcenter{%
+  \directlua{luatexja.direction.raise_box()}%
+  \ltj@@orig@vcenter{\box\ltj@afbox}%
+}
 
 %%%% \unhbox and \unvbox
 \let\ltj@@orig@unhbox=\unhbox

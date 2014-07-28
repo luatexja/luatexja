@@ -254,7 +254,7 @@ do
       for i=1,#wh do  
 	 hd = node_remove(hd, wh[i]); node_free(wh[i]); wh[i] = nil 
       end
-      if gc=='fin_row' or gc == 'preamble'  then
+      if gc=='fin_row' then -- gc == 'preamble' case is treated in dir_adjust_vpack
 	 if hd  then
 	    set_attr(hd, attr_icflag, PROCESSED_BEGIN_FLAG)
 	    tex_set_attr('global', attr_icflag, 0)
@@ -449,11 +449,11 @@ do
       if b then
 	 local box_dir = get_box_dir(to_direct(b), dir_yoko)
 	 if box_dir%dir_math_mod ~= list_dir then
-	    print('NEST', tex_nest.ptr, tex_getcount('ltj@tempcnta'))
-	    luatexja.ext_show_node_list(
-               (tex_nest.ptr==0) and tex.lists.page_head or tex_nest[tex_nest.ptr].head,
-               'LIST' .. tostring(list_dir) .. '> ', print)
-	   luatexja.ext_show_node_list(b, 'BOX' .. tostring(box_dir) .. '> ', print)
+	   --  print('NEST', tex_nest.ptr, tex_getcount('ltj@tempcnta'))
+	   --  luatexja.ext_show_node_list(
+           --     (tex_nest.ptr==0) and tex.lists.page_head or tex_nest[tex_nest.ptr].head,
+           --     'LIST' .. tostring(list_dir) .. '> ', print)
+	   -- luatexja.ext_show_node_list(b, 'BOX' .. tostring(box_dir) .. '> ', print)
 	    ltjb.package_error(
 	       'luatexja',
 	       "Incompatible direction list can't be unboxed",
@@ -817,9 +817,9 @@ do
    luatexja.direction.get_register_dir = get_register_dir
 end
 
--- raise, lower
 do
    local getbox, setbox, copy_list = tex.getbox, tex.setbox, Dnode.copy_list
+   -- raise, lower
    function luatexja.direction.raise_box()
       start_time_measure('box_primitive_hook')
       local list_dir = get_dir_count()

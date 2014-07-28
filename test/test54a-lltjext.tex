@@ -1,0 +1,94 @@
+%#!luajitlatex
+\newif\ifTATE
+\TATEtrue
+\ifdefined\directlua
+  \ifTATE\documentclass{ltjtarticle}\else\documentclass{article}\fi
+  \usepackage{luatexja, lltjext}
+  \pdfpagewidth=105mm\pdfpageheight=74mm
+  \ltjsetparameter{autospacing=false, autoxspacing=false}
+\else
+  \ifTATE\documentclass{tarticle}\else\documentclass{article}\fi
+  \usepackage{plext,otf}
+  \normalsize
+  \newdimen\zw \zw=1zw
+  \AtBeginDvi{\special{pdf:pagesize width 105mm height 74mm}}
+  \noautospacing\noautoxspacing
+\fi
+\topmargin-1in
+\oddsidemargin-1in
+\textwidth105mm
+\textheight74mm
+\headheight0pt
+\headsep0pt
+\topskip0pt
+\baselineskip15pt
+
+\usepackage[T1]{fontenc}
+\usepackage{float}
+\pagestyle{empty}
+\catcode`\_=12
+\makeatletter
+
+\@tfor\dir:=ytzn\do{%
+  \@tfor\posa:=ctb\do{%
+    \@tfor\posb:=udlr\do{%
+      \edef\float_name{tf_\dir\posa\posb}
+      \newfloat{\float_name}{th}{lof}
+      \DeclareLayoutCaption{\float_name}<\dir>(8\zw)[\posa\posb]
+      \floatname{\float_name}{
+       \leavevmode\rensuji{\dir\posa\posb}}
+      \@namedef{the\float_name}{}
+    }
+  }
+}
+\ifdefined\directlua
+\@tfor\dir:=ud\do{%
+  \@tfor\posa:=ctb\do{%
+    \@tfor\posb:=udlr\do{%
+      \edef\float_name{tf_\dir\posa\posb}
+      \newfloat{\float_name}{th}{lof}
+      \DeclareLayoutCaption{\float_name}<\dir>(8\zw)[\posa\posb]
+      \floatname{\float_name}{
+       \leavevmode\rensuji{\dir\posa\posb}}
+      \@namedef{the\float_name}{}
+    }
+  }
+}
+\fi
+\begin{document}
+\makeatletter
+\@tfor\dir:=ytzn\do{%
+  \@tfor\posa:=ctb\do{%
+    \@tfor\posb:=udlr\do{%
+      \clearpage
+      \begin{tf_\dir\posa\posb}[t]
+      \layoutfloat(10\zw, 20mm){%
+        ほげabcdefふが\medskip
+
+        組方向: \texttt{\dir}，位置: \texttt{\posa\posb}\medskip
+
+      }
+      \pcaption{文字列testあああああああ\the\hsize}
+      \end{tf_\dir\posa\posb}
+    }
+  }
+}
+\ifdefined\directlua
+\@tfor\dir:=ud\do{%
+  \@tfor\posa:=ctb\do{%
+    \@tfor\posb:=udlr\do{%
+      \clearpage
+      \begin{tf_\dir\posa\posb}[t]
+      \layoutfloat(10\zw, 20mm){%
+        ほげabcdefふが\medskip
+
+        組方向: \texttt{\dir}，位置: \texttt{\posa\posb}\medskip
+
+      }
+      \pcaption{文字列testあああああああ\the\hsize}
+      \end{tf_\dir\posa\posb}
+    }
+  }
+}
+\fi
+\end{document}

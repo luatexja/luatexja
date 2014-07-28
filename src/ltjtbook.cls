@@ -39,7 +39,7 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjtbook}
-  [2014/07/02 v1.6-ltj-5
+  [2014/07/28 v1.6-ltj-6
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \RequirePackage{filehook}
@@ -164,7 +164,7 @@
 \ExecuteOptions{a4paper,10pt,twoside,onecolumn,final,openright,tate}
 \ProcessOptions\relax
 \input{ltjtbk1\@ptsize.clo}
-%\RequirePackage{plext}
+\RequirePackage{lltjext}
 \directlua{luatexbase.add_to_callback('luatexja.load_jfm',
   function (ji, jn) ji.chars['parbdd'] = 0; return ji end,
   'ltj.jclasses_load_jfm', 1)}

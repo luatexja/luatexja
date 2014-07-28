@@ -15,6 +15,7 @@ local setfield = (Dnode ~= node) and Dnode.setfield or function(n, i, c) n[i] = 
 local getfield = (Dnode ~= node) and Dnode.getfield or function(n, i) return n[i] end
 local getid = (Dnode ~= node) and Dnode.getid or function(n) return n.id end
 local getsubtype = (Dnode ~= node) and Dnode.getsubtype or function(n) return n.subtype end
+local getlist = (Dnode ~= node) and Dnode.getlist or function(n) return n.head end
 -- getlist cannot be used for sub_box nodes. Use instead λp. getfield(p, 'head')
 local getchar = (Dnode ~= node) and Dnode.getchar or function(n) return n.char end
 
@@ -25,6 +26,7 @@ local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
 local node_traverse = Dnode.traverse
 local node_new = Dnode.new
 local node_next = (Dnode ~= node) and Dnode.getnext or node.next
+local node_remove = Dnode.remove
 local node_free = Dnode.free
 local has_attr = Dnode.has_attribute
 local set_attr = Dnode.set_attribute
@@ -52,6 +54,7 @@ local id_sub_mlist = node.id('sub_mlist')
 local id_whatsit = node.id('whatsit')
 local sid_user = node.subtype('user_defined')
 local DIR  = luatexja.userid_table.DIR
+local dir_node_auto   = luatexja.dir_table.dir_node_auto
 
 local PROCESSED  = luatexja.icflag_table.PROCESSED
 
@@ -62,6 +65,21 @@ local ltjd_make_dir_whatsit = ltjd.make_dir_whatsit
 
 -- table of mathematical characters
 local is_math_letters = {}
+local list_dir
+
+local function conv_vcenter(sb)
+   local h = getfield(sb, 'head');local hd = getlist(h)
+   if getid(hd)==id_whatsit and 
+   getsubtype(hd)==sid_user and getfield(hd, 'user_id')==DIR then
+      local d = node_next(hd)
+      if getid(d)==id_vlist and has_attr(d, attr_dir)>=dir_node_auto then
+	 node_free(hd); setfield(h, 'head', nil); node_free(h)
+	 setfield(sb, 'head', d); h = d
+      end
+   end
+   set_attr(h, attr_icflag, PROCESSED)
+   return sb
+end
 
 local conv_jchar_to_hbox_A
 
@@ -70,7 +88,11 @@ local function conv_jchar_to_hbox(head, sty)
    for p in node_traverse(head) do
       local pid = getid(p)
       if pid == id_simple or pid == id_accent then
-	 setfield(p, 'nucleus', conv_jchar_to_hbox_A(getfield(p, 'nucleus'), sty))
+	 if getsubtype(p)==12 then
+	    conv_vcenter(getfield(p, 'nucleus'))
+	 else
+	    setfield(p, 'nucleus', conv_jchar_to_hbox_A(getfield(p, 'nucleus'), sty))
+	 end
 	 setfield(p, 'sub', conv_jchar_to_hbox_A(getfield(p, 'sub'), sty+1))
 	 setfield(p, 'sup', conv_jchar_to_hbox_A(getfield(p, 'sup'), sty+1))
       elseif pid == id_choice then
@@ -107,7 +129,6 @@ local MJS  = luatexja.stack_table_index.MJS
 local MJSS = luatexja.stack_table_index.MJSS
 local capsule_glyph_math = ltjw.capsule_glyph_math
 local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
-local list_dir
 
 conv_jchar_to_hbox_A =
 function (p, sty)

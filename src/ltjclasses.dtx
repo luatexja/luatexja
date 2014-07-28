@@ -80,6 +80,7 @@
 % \changes{v1.6-ltj-3}{2014/06/08}{縦組みクラスの時のgeometry.styに対応．}
 % \changes{v1.6-ltj-4}{2014/06/30}{組方向の変更箇所を現行の\LuaTeX-jaの仕様に合うように修正．}
 % \changes{v1.6-ltj-5}{2014/07/02}{\cs{ifydir}, \cs{iftdir}を使わないように修正．}
+% \changes{v1.6-ltj-6}{2014/07/28}{縦組みクラスでlltjext.styを読み込むように修正．}
 % \fi
 %
 % \iffalse
@@ -109,7 +110,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2014/07/02 v1.6-ltj-5
+  [2014/07/28 v1.6-ltj-6
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -523,11 +524,12 @@
 %<book&yoko>\input{ltjbk1\@ptsize.clo}
 %<!book&yoko>\input{ltjsize1\@ptsize.clo}
 %    \end{macrocode}
-% 縦組用クラスファイルの場合は、ここで\file{plext.sty}が読み込まれていました。
-% Lua\TeX-jaでどうなるかは未定です。
+% 縦組用クラスファイルの場合は、ここで\file{plext.sty}も読み込みます。
 % \changes{v1.0e}{1996/03/21}{\cs{usepackage} to \cs{RequirePackage}}
+% \changes{v1.6-ltj-6}{2014/07/28}{Lua\TeX-jaでは，代わりに\file{lltjext.sty}を読み込みま
+% す．これは\file{plext.sty}をLua\TeX-ja用に書きなおしたものです．}
 %    \begin{macrocode}
-%<tate>%\RequirePackage{plext}
+%<tate>\RequirePackage{lltjext}
 %</article|report|book>
 %    \end{macrocode}
 %

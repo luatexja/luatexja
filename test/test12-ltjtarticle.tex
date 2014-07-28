@@ -1,35 +1,8 @@
 %#!lualatex
 \documentclass{ltjtarticle}
 \usepackage[b5j,margin=40mm]{geometry}
-
-\makeatletter
-\newif\ifnot@advanceline
-\newskip\rensujiskip
-\rensujiskip=0.25\chs plus.25\zw minus.25\zw
-\DeclareRobustCommand\rensuji{%
-  \@ifstar{\not@advancelinetrue\@rensuji}{\@rensuji}}
-\def\@rensuji{\@ifnextchar[{\@@rensuji}{\@@rensuji[c]}}
-\def\@@rensuji[#1]#2{\ifnum\ltjgetparameter{direction}=3\hbox{#2}\else
-  \hskip\rensujiskip
-  \ifvmode\leavevmode\fi
-  \ifnot@advanceline\not@advancelinefalse\else
-    \setbox\z@\hbox{\yoko#2}%
-    \@tempdima\ht\z@ \advance\@tempdima\dp\z@
-    \if #1c\relax\vrule\@width\z@ \@height.5\@tempdima \@depth.5\@tempdima
-    \else\if #1r\relax\vrule\@width\z@\@height\z@ \@depth\@tempdima
-    \else\vrule\@width\z@ \@height\@tempdima \@depth\z@
-    \fi\fi
-  \fi
-  \if #1c\relax\hbox to1zw{\yoko\hss#2\hss}%
-  \else\if #1r\relax\vbox{\hbox to1zw{\yoko\hss#2}}%
-  \else\vtop{\hbox to1zw{\yoko#2\hss}}%
-  \fi\fi
-  \hskip\rensujiskip
-\fi}
-\let\Rensuji\rensuji
-\let\prensuji\rensuji
-
 \begin{document}
+\ltjgetparameter{talbaselineshift}
 酵素（こうそ）とは、生体で起こる化学反応に対して触媒として機能する分子である。酵素によって触媒される反応を“酵素的”反応という。
 
 酵素は生物が物質を消化する段階から吸収・輸送・代謝・排泄に至るまでのあらゆる過程に関与しており、生体が物質をj変化させて利用するのに欠かせない。したがって、酵素は生化学研究における一大分野であり、早い段階から研究対象になっている。
@@ -47,7 +20,7 @@
 \def\R{０１２３４５６７８９０１２３４５６７８９}
 \def\S{\R\R\R\R\R\R\R\R\R\R\R\R\R\R\R\R\R\R\R\R\par}
 
-\S\S
+連数字のテスト\rensuji{42}\S\S
 \leavevmode \leaders\hbox{2}\hskip2pt
 
 \end{document}
