@@ -1,0 +1,159 @@
+%#!lualatex
+
+\ifdefined\directlua
+  \documentclass{ltjsarticle}
+  \usepackage{xcolor}
+\else
+  \documentclass{jsarticle}
+  \usepackage[dvipdfmx]{xcolor}
+  \let\ltjsetwd=\wd
+  \let\ltjsetht=\ht
+  \let\ltjsetdp=\dp
+\fi
+\fboxsep0pt
+\begin{document}
+
+\hbox{\yoko %yoko 
+\setbox0=\hbox{\tate\large tate directionあ}\setbox1=\copy0
+そのまま：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetwd0=40pt
+wd設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetht0=16pt
+ht設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetdp0=16pt
+dp設定後：\fbox{\box0}
+}
+
+\vskip100pt
+
+\vskip100pt
+\hbox{\yoko %yoko 
+\setbox0=\hbox{\dtou\large dtou direction}\setbox1=\copy0
+そのまま：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetwd0=40pt
+wd設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetht0=16pt
+ht設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetdp0=16pt
+dp設定後：\fbox{\box0}
+}
+
+\hbox{\yoko%
+\hbox{\tate\normalsize %tate
+\setbox0=\hbox{\dtou\large dtou direction}\setbox1=\copy0
+そのまま：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetwd0=40pt
+wd設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetht0=16pt
+ht設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetdp0=16pt
+dp設定後：\fbox{\box0}
+}\hskip100pt\hbox{\tate\normalsize %tate
+\setbox0=\hbox{\yoko\large yoko direction}\setbox1=\copy0
+そのまま：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetwd0=40pt
+wd設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetht0=16pt
+ht設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetdp0=16pt
+dp設定後：\fbox{\box0}
+}}
+
+
+
+\hbox{\yoko%
+\hbox{\dtou\normalsize %dtou
+\setbox0=\hbox{\tate\large tate directionあ}\setbox1=\copy0
+そのまま：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetwd0=40pt
+wd設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetht0=16pt
+ht設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetdp0=16pt
+dp設定後：\fbox{\box0}
+}\hskip100pt\hbox{\dtou\normalsize %dtou
+\setbox0=\hbox{\yoko\large yoko direction}\setbox1=\copy0
+そのまま：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetwd0=40pt
+wd設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetht0=16pt
+ht設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetdp0=16pt
+dp設定後：\fbox{\box0}
+}}
+
+\newpage
+
+\gt\sf
+
+
+\hbox{\yoko %yoko 
+\setbox0=\vbox{\tate\hbox{\large tate directionあ}}\setbox1=\copy0
+そのまま：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetwd0=40pt
+wd設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetht0=16pt
+ht設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetdp0=16pt
+dp設定後：\fbox{\box0}
+}
+
+\vskip100pt
+
+\vskip100pt
+\hbox{\yoko %yoko 
+\setbox0=\vbox{\dtou\hbox{\large dtou direction}}\setbox1=\copy0
+そのまま：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetwd0=40pt
+wd設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetht0=16pt
+ht設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetdp0=16pt
+dp設定後：\fbox{\box0}
+}
+
+\hbox{\yoko%
+\hbox{\tate\normalsize %tate
+\setbox0=\vbox{\dtou\hbox{\large dtou directionあ}}\setbox1=\copy0
+そのまま：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetwd0=40pt
+wd設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetht0=16pt
+ht設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetdp0=16pt
+dp設定後：\fbox{\box0}
+}\hskip100pt\hbox{\tate\normalsize %tate
+\setbox0=\vbox{\yoko\hbox{\large yoko direction}}\setbox1=\copy0
+そのまま：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetwd0=40pt
+wd設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetht0=16pt
+ht設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetdp0=16pt
+dp設定後：\fbox{\box0}
+}}
+
+
+
+\hbox{\yoko%
+\hbox{\dtou\normalsize %dtou
+\setbox0=\vbox{\tate\hbox{\large tate directionあ}}\setbox1=\copy0
+そのまま：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetwd0=40pt
+wd設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetht0=16pt
+ht設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetdp0=16pt
+dp設定後：\fbox{\box0}
+}\hskip100pt\hbox{\dtou\normalsize %dtou
+\setbox0=\vbox{\yoko\hbox{\large yoko direction}}\setbox1=\copy0
+そのまま：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetwd0=40pt
+wd設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetht0=16pt
+ht設定後：\fbox{\box0}，
+\setbox0=\copy1 \ltjsetdp0=16pt
+dp設定後：\fbox{\box0}
+}}
+
+\end{document}
