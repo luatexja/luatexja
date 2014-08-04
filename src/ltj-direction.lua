@@ -568,12 +568,12 @@ do
 	 local db
 	 local dnh = getfield(dn, 'value')
 	 for x in traverse(dnh) do
-	    if has_attr(x, attr_dir) == new_dir then
+	    if has_attr(x, attr_dir)%dir_math_mod == new_dir then
 	       setfield(dn, 'value', to_node(node_remove(dnh, x)))
 	       db=x; break
 	    end
 	 end
-	 Dnode.flush_list(dnh)
+	 Dnode.flush_list(getfield(dn, 'value'))
 	 db = db or create_dir_node(b, box_dir, new_dir, false)
 	 local w = getfield(b, 'width')
 	 local h = getfield(b, 'height')
