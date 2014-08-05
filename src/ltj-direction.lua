@@ -283,12 +283,9 @@ do
    local get_d =function (w,h,d) return d end
    local get_h_d =function (w,h,d) return h+d end
    local get_h_d_neg =function (w,h,d) return -h-d end
-   local get_h_neg =function (w,h,d) return -h end
    local get_d_neg =function (w,h,d) return -d end
    local get_w_half =function (w,h,d) return floor(0.5*w) end
-   local get_w_neg_half =function (w,h,d) return floor(-0.5*w) end
    local get_w_half_rem =function (w,h,d) return w-floor(0.5*w) end
-   local get_w_neg_half_rem =function (w,h,d) return -w-floor(-0.5*w) end
    local get_w_neg =function (w,h,d) return -w end
    local get_w =function (w,h,d) return w end
    local zero = function() return 0 end
@@ -301,16 +298,16 @@ do
 	    [id_hlist] = {
 	       { 'whatsit', sid_save },
 	       { 'rotate', '0 1 -1 0' },
-	       { 'kern', get_w_neg_half },
-	       { 'box' , get_h },
-	       { 'kern', get_w_neg_half_rem },
+	       { 'kern', function(w,h,d,nw,nh,nd) return -nd end },
+	       { 'box' , get_h},
+	       { 'kern', function(w,h,d,nw,nh,nd) return nd-w end },
 	       { 'whatsit', sid_restore },
 	    },
 	    [id_vlist] = {
 	       { 'whatsit', sid_save },
 	       { 'rotate', '0 1 -1 0' },
 	       { 'kern' , zero },
-	       { 'box' , get_w_neg },
+	       { 'box' , function(w,h,d,nw,nh,nd) return -nh-nd end },
 	       { 'kern', get_h_d_neg},
 	       { 'whatsit', sid_restore },
 	    },
@@ -322,8 +319,9 @@ do
 	    [id_hlist] = {
 	       { 'whatsit', sid_save },
 	       { 'rotate', '0 -1 1 0' },
-	       { 'kern', get_w_neg },
+	       { 'kern', function(w,h,d,nw,nh,nd) return -nh end },
 	       { 'box', get_d_neg },
+	       { 'kern', function(w,h,d,nw,nh,nd) return nh-w end },
 	       { 'whatsit', sid_restore },
 	    },
 	    [id_vlist] = {
@@ -343,8 +341,9 @@ do
 	    [id_hlist] = {
 	       { 'whatsit', sid_save },
 	       { 'rotate', '0 -1 1 0' },
-	       { 'kern', get_w_neg },
+	       { 'kern', function (w,h,d,nw,nh,nd) return -nh end },
 	       { 'box' , get_d_neg },
+	       { 'kern', function (w,h,d,nw,nh,nd) return nh-w end },
 	       { 'whatsit', sid_restore },
 	    },
 	    [id_vlist] = {
@@ -363,7 +362,7 @@ do
 	       { 'whatsit', sid_save },
 	       { 'rotate', '-1 0 0 -1' },
 	       { 'kern', get_w_neg },
-	       { 'box', zero },
+	       { 'box',  function (w,h,d,nw,nh,nd) return h-nd end },
 	       { 'whatsit', sid_restore },
 	    },
 	    [id_vlist] = {
@@ -383,16 +382,16 @@ do
 	    [id_hlist] = {
 	       { 'whatsit', sid_save },
 	       { 'rotate', '0 1 -1 0' },
-	       { 'kern', zero },
+	       { 'kern', function (w,h,d,nw,nh,nd) return -nd end },
 	       { 'box', get_h },
-	       { 'kern', get_w_neg },
+	       { 'kern', function (w,h,d,nw,nh,nd) return nd-w end },
 	       { 'whatsit', sid_restore },
 	    },
 	    [id_vlist] = {
                { 'kern', zero },
 	       { 'whatsit', sid_save },
 	       { 'rotate', '0 1 -1 0' },
-	       { 'box', get_w_neg },
+	       { 'box', function (w,h,d,nw,nh,nd) return -nd-nh end },
 	       { 'kern', get_h_d_neg },
 	       { 'whatsit', sid_restore },
 	    },
@@ -405,14 +404,15 @@ do
 	       { 'whatsit', sid_save },
 	       { 'rotate', '-1 0 0 -1' },
 	       { 'kern', get_w_neg },
-	       { 'box', zero },
+	       { 'box', function (w,h,d,nw,nh,nd) return h-nd end },
 	       { 'whatsit', sid_restore },
 	    },
 	    [id_vlist] = {
 	       { 'whatsit', sid_save },
 	       { 'rotate', ' -1 0 0 -1' },
-	       { 'kern', get_h_d_neg }, 
+	       { 'kern', function (w,h,d,nw,nh,nd) return -nh-nd end }, 
 	       { 'box', get_w_neg },
+	       { 'kern', function (w,h,d,nw,nh,nd) return nh+nd-h-d end }, 
 	       { 'whatsit', sid_restore },
 	    },
 	 },
@@ -490,16 +490,7 @@ local function unwrap_dir_node(b, head, box_dir)
       Dnode.flush_list(getfield(wh, 'value'))
       setfield(wh, 'value', nil)
    end
-   -- recalc. info
-   local info = dir_node_aux[b_dir%dir_math_mod][box_dir%dir_math_mod][getid(bc)]
-   for _,v in ipairs(info) do 
-      if v[1]=='box' then
-	 shift_old = v[2](
-	    getfield(bc,'width'), getfield(bc, 'height'), getfield(bc, 'depth'))
-	 break
-      end
-   end
-   setfield(bc, 'shift', getfield(bc, 'shift') - shift_old)
+   setfield(bc, 'shift', 0)
    return nh, nb, bc, b_dir
 end
 
@@ -578,6 +569,9 @@ do
 	 local w = getfield(b, 'width')
 	 local h = getfield(b, 'height')
 	 local d = getfield(b, 'depth')
+	 local dn_w = getfield(db, 'width')
+	 local dn_h = getfield(db, 'height')
+	 local dn_d = getfield(db, 'depth')
 	 nh, nb =  insert_before(head, b, db), nil
 	 nh, nb = node_remove(nh, b)
 	 local db_head, db_tail  = nil
@@ -585,7 +579,7 @@ do
 	    local cmd, arg, nn = v[1], v[2]
 	    if cmd=='kern' then
 	       nn = node_new(id_kern)
-	       setfield(nn, 'kern', arg(w, h, d))
+	       setfield(nn, 'kern', arg(w, h, d, dn_w, dn_h, dn_d))
 	    elseif cmd=='whatsit' then
 	       nn = node_new(id_whatsit, arg)
 	    elseif cmd=='rotate' then
@@ -593,7 +587,7 @@ do
 	       setfield(nn, 'data', arg)
 	    elseif cmd=='box' then
 	       nn = b; setfield(b, 'next', nil)
-	       setfield(nn, 'shift', getfield(nn, 'shift') + arg(w,h,d))
+	       setfield(nn, 'shift', arg(w, h, d, dn_w, dn_h, dn_d))
 	    end
 	    if db_head then
 	       insert_after(db_head, db_tail, nn)
@@ -757,29 +751,38 @@ do
 	    if b_dir<dir_node_manual then
 	       set_attr(s, attr_dir, b_dir%dir_node_auto + dir_node_manual)
 	    end
+	    -- re-calculate shift and kern (TODO)
+	    local sid, sl = getid(s), getlist(s)
+	    local b = node_next(node_next(node_next(sl))) -- 本来の box
+	    local info = dir_node_aux[get_box_dir(b,dir_yoko)%dir_math_mod][b_dir%dir_node_auto]
+	    local bw, bh, bd 
+	       = getfield(b,'width'), getfield(b, 'height'), getfield(b, 'depth')
+	    local sw, sh, sd 
+	       = getfield(s,'width'), getfield(s, 'height'), getfield(s, 'depth')
+	    -- re-calculate shift and kern
+	    for i,v in ipairs(info[sid]) do 
+	       if getid(sl)==id_kern then
+		  setfield(sl, 'kern', v[2](bw,bh,bd,sw,sh,sd) )
+	       elseif getid(sl)==sid then
+		  setfield(sl, 'shift', v[2](bw,bh,bd,sw,sh,sd) )
+	       end
+	       sl = node_next(sl)
+	    end
          else
 	    local sid, sl = getid(s), getlist(s)
 	    local b = node_next(node_next(node_next(sl))) -- 本来の box
 	    local info = dir_node_aux[get_box_dir(b,dir_yoko)%dir_math_mod][b_dir%dir_node_auto]
-	    local shift_old
-	    for _,v in ipairs(info[sid]) do 
-	       if v[1]=='box' then
-		  shift_old = v[2](
-		     getfield(b,'width'), getfield(b, 'height'), getfield(b, 'depth'))
-		  break
-	       end
-	    end
-           if set_box_dim_common(key, b, l_dir) then
-	       local bw, bh, bd 
-		  = getfield(b,'width'), getfield(b, 'height'), getfield(b, 'depth')
-	       -- re-calculate shift
+	    local bw, bh, bd 
+	       = getfield(b,'width'), getfield(b, 'height'), getfield(b, 'depth')
+	    local sw, sh, sd 
+	       = getfield(s,'width'), getfield(s, 'height'), getfield(s, 'depth')
+	    if set_box_dim_common(key, b, l_dir) then
+	       -- re-calculate shift and kern
 	       for i,v in ipairs(info[sid]) do 
 		  if getid(sl)==id_kern then
-		     setfield(sl, 'kern', v[2](bw,bh,bd) )
+		     setfield(sl, 'kern', v[2](bw,bh,bd,sw,sh,sd) )
 		  elseif getid(sl)==sid then
-		     local d = getfield(sl, 'shift')
-		     setfield(sl, 'shift', 
-			      getfield(sl, 'shift') - shift_old + v[2](bw,bh,bd) )
+		     setfield(sl, 'shift', v[2](bw,bh,bd,sw,sh,sd) )
 		  end
 		  sl = node_next(sl)
 	       end
