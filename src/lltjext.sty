@@ -531,51 +531,71 @@
    {\X@picture}{\X@picture<Z>}}
 \def\X@picture<#1>(#2,#3){\@ifnextchar(%)
    {\@@picture<#1>(#2,#3)}{\@@picture<#1>(#2,#3)(0,0)}}
-\newdimen\save@ybaselineshift
-\newdimen\save@tbaselineshift
 \newdimen\@picwd
+\def\ltj@@pic@reset@blshift{%
+  \ltj@yablshift\z@\ltj@ykblshift\z@
+  \ltj@tablshift\z@\ltj@tkblshift\z@
+}%
 \def\@@picture<#1>(#2,#3)(#4,#5){%
-  \save@ybaselineshift\ybaselineshift
-  \save@tbaselineshift\tbaselineshift
-  \iftdir
-    \if#1y\let\box@dir\yoko
-      \@picwd=#3\unitlength \@picht=#2\unitlength
-      \@tempdima=#5\unitlength \@tempdimb=#4\unitlength
-    \else\let\box@dir\tate
-      \@picwd=#2\unitlength \@picht=#3\unitlength
-      \@tempdima=#4\unitlength \@tempdimb=#5\unitlength
+  \edef\ltj@@pic@save@blshift{%
+    \noexpand\ltj@yablshift\the\ltj@yablshift\noexpand\relax
+    \noexpand\ltj@ykblshift\the\ltj@ykblshift\noexpand\relax
+    \noexpand\ltj@tablshift\the\ltj@tablshift\noexpand\relax
+    \noexpand\ltj@tkblshift\the\ltj@tkblshift\noexpand\relax
+  }%
+  \bgroup\let\box@dir\relax
+  \if #1z\relax
+    \ifnum\ltjgetparameter{direction}=3 \relax
+      \let\box@dir\utod
     \fi
   \else
-    \if#1t\let\box@dir\tate
-      \@picwd=#3\unitlength \@picht=#2\unitlength
-      \@tempdima=#5\unitlength \@tempdimb=#4\unitlength
-    \else\let\box@dir\yoko
-      \@picwd=#2\unitlength \@picht=#3\unitlength
-      \@tempdima=#4\unitlength \@tempdimb=#5\unitlength
+    \if #1y\relax     \let\box@dir\yoko
+    \else\if #1t\relax\let\box@dir\tate
+    \else\if #1d\relax\let\box@dir\dtou
+    \else\if #1u\relax\let\box@dir\utod
+    \fi\fi\fi\fi
+  \fi
+  \ifx\box@dir\relax
+    \ifcase\ltjgetparameter{direction}
+       \or   \let\box@dir\dtou
+       \or\or\let\box@dir\tate
+       \or   \let\box@dir\yoko
+       \else \let\box@dir\utod
     \fi
   \fi
+  \@picwd=#2\unitlength \@picht=#3\unitlength
   \setbox\@picbox\hbox to\@picwd\bgroup\box@dir
-  \hskip-\@tempdima\lower\@tempdimb\hbox\bgroup
-  \ybaselineshift\z@ \tbaselineshift\z@
+  \hskip-#4\unitlength\lower#5\unitlength\hbox\bgroup
+  \ltj@@pic@reset@blshift
   \ignorespaces}
 \def\endpicture{%
   \egroup\hss\egroup
-  \ht\@picbox\@picht \wd\@picbox\@picwd \dp\@picbox\z@
+  \setbox0=\hbox{\box@dir%
+    \ltjsetht\@picbox\@picht \ltjsetdp\@picbox\z@
+  }%
+  \@tempswafalse
+  \ifnum\ltjgetparameter{direction}=3  \@tempswatrue\fi
+  \ifnum\ltjgetparameter{direction}=11  \@tempswatrue\fi
+  \if@tempswa
+    \ifx\box@dir\yoko % この場合だけ垂直位置補正が必要
+     \ltjsetht\@picbox\dimexpr\ltjgetht\@picbox+\ltjgetdp\@picbox\relax
+      \ltjsetdp\@picbox\z@
+    \fi
+  \fi
   \mbox{\box\@picbox}%
-  \ybaselineshift\save@ybaselineshift
-  \tbaselineshift\save@tbaselineshift}
+  \egroup\ltj@@pic@save@blshift}
 \let\org@put\put
-\def\put{\ybaselineshift\z@\tbaselineshift\z@\org@put}
+\def\put{\ltj@@pic@reset@blshift\org@put}
 \let\org@line\line
-\def\line{\ybaselineshift\z@\tbaselineshift\z@\org@line}
+\def\line{\ltj@@pic@reset@blshift\org@line}
 \let\org@vector\vector
-\def\vector{\ybaselineshift\z@\tbaselineshift\z@\org@vector}
+\def\vector{\ltj@@pic@reset@blshift\org@vector}
 \let\org@dashbox\dashbox
-\def\dashbox{\ybaselineshift\z@\tbaselineshift\z@\org@dashbox}
+\def\dashbox{\ltj@@pic@reset@blshift\org@dashbox}
 \let\org@oval\oval
-\def\oval{\ybaselineshift\z@\tbaselineshift\z@\org@oval}
+\def\oval{\ltj@@pic@reset@blshift\org@oval}
 \let\org@circle\circle
-\def\circle{\ybaselineshift\z@\tbaselineshift\z@\org@circle}
+\def\circle{\ltj@@pic@reset@blshift\org@circle}
 
 %%% rensuji
 \newif\ifnot@advanceline

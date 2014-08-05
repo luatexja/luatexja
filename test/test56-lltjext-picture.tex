@@ -1,0 +1,109 @@
+%#!luajitlatex
+\ifdefined\directlua
+\documentclass[twocolumn]{ltjarticle}
+\usepackage{lltjext}
+\usepackage[]{xcolor}
+\else
+\documentclass[twocolumn]{jarticle}
+\usepackage{plext}
+\usepackage[dvipdfmx]{xcolor}
+\fi
+\usepackage[margin=20mm]{geometry}
+\unitlength6mm\fboxsep0mm
+
+
+\def\TEST#1#2#3{%
+  \hbox{#1\color{#3}%
+    \vrule width 150pt height .2pt depth .2pt\kern-150pt
+    \normalsize あいうABCxyz%
+    \fbox{\begin{picture}<#2>(5,4)(1,2)
+      \put(0,0){\circle*{0.2}}
+      \put(0,0){\vector(0,1){1}}
+      \put(1,0){\makebox(0,0)[l]{\scriptsize$x$}}
+      \put(0,1){\makebox(0,0)[b]{\scriptsize$y$}}
+      \put(1,2){\circle{0.2}}
+      \put(1,2){\vector(0,1){4}}
+      \put(1,2){\makebox(0,0)[lb]{\scriptsize\tt 周囲：\string#1，本環境：#2}}
+      \thicklines
+      \put(1,2){\vector(1,0){5}}
+      \put(0,0){\vector(1,0){1}}
+    \end{picture}}}}
+\begin{document}
+
+\parindent0pt
+\TEST{\yoko}{}{green!50!black}
+\vfill
+\TEST{\yoko}y{blue}
+\vfill
+\TEST{\yoko}t{red}
+\vfill
+
+\newpage
+\TEST{\tate}{}{green!50!black}
+\vfill
+\TEST{\tate}y{blue}
+\vfill
+\TEST{\tate}t{red}
+\vfill
+
+\ifdefined\directlua\else\end{document}\fi
+
+\newpage
+
+\TEST{\yoko}{}{green!50!black}
+\vfill
+\TEST{\yoko}d{purple}
+\vfill
+\TEST{\yoko}u{blue!50!green}
+\vfill
+
+\newpage
+
+\TEST{\tate}{}{green!50!black}
+\vfill
+\TEST{\tate}d{purple}
+\vfill
+\TEST{\tate}u{blue!50!green}
+\vfill
+
+%________
+\newpage
+
+\parindent0pt
+\TEST{\dtou}{}{green!50!black}
+\vfill
+\TEST{\dtou}y{blue}
+\vfill
+\TEST{\dtou}t{red}
+\vfill
+
+\newpage
+\TEST{\utod}{}{green!50!black}
+\vfill
+\TEST{\utod}y{blue}
+\vfill
+\TEST{\utod}t{red}
+\vfill
+
+\ifdefined\directlua\else\end{document}\fi
+
+\newpage
+
+\TEST{\dtou}{}{green!50!black}
+\vfill
+\TEST{\dtou}d{purple}
+\vfill
+\TEST{\dtou}u{blue!50!green}
+\vfill
+
+\newpage
+
+\TEST{\utod}{}{green!50!black}
+\vfill
+\TEST{\utod}d{purple}
+\vfill
+\TEST{\utod}u{blue!50!green}
+\vfill
+
+
+\end{document}
