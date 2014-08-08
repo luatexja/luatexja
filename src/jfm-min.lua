@@ -1,6 +1,6 @@
 -- -*- coding: utf-8 -*-
 -- jfm-min.lua: min10 互換
--- Besed on umin10.tfm (a counterpart of min10.tfm for upTeX).
+-- Based on umin10.tfm (a counterpart of min10.tfm for upTeX).
 
 local vscale = 0.916443 / 0.962216
 local vht = 0.777588 / 0.962216
@@ -9,7 +9,8 @@ local vdp = 0.138855 / 0.962216
 luatexja.jfont.define_jfm {
    dir = 'yoko',
    zw = 1.0, zh = vscale,
-
+   kanjiskip = { 0.0, 0.091641/0.962216, 0.0 },
+   xkanjiskip = { 0.229101/0.962216, 0.183283/0.962216, 0.114551/0.962216 },
    [0] = {
       align = 'left', left = 0.0, down = 0.0,
       width = 1.0, height = vht, depth = vdp, italic=0.0,

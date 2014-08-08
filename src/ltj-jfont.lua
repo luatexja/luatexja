@@ -32,6 +32,7 @@ local font_getfont = font.getfont
 
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
+local attr_curtfnt = luatexbase.attributes['ltj@curtfnt']
 local id_glyph = node.id('glyph')
 local id_kern = node.id('kern')
 local id_glue_spec = node.id('glue_spec')
@@ -69,7 +70,7 @@ function define_jfm(t)
 	 else
 	    real_char = false
 	    for j,w in pairs(v.chars) do
-	       if type(w) == 'number' then
+	       if type(w) == 'number' and w~=-1 then
 		  real_char = true;
 	       elseif type(w) == 'string' and utf.len(w)==1 then
 		  real_char = true; w = utf.byte(w)
@@ -91,10 +92,13 @@ function define_jfm(t)
                v.align = 'left' -- left
             end
 	    if real_char then
-	       if not (type(v.width)=='number'
-		       or (jfm_dir=='yoko' and v.width~='prop')) then
+	       print(i, v.width)
+	       if type(v.width)~='number' and v.width~='prop' then
 		  defjfm_res= nil; return
 	       else
+		  if v.width=='prop' and jfm_dir=='tate' then
+		     v.width = 1.0
+		  end
 		  if type(v.height)~='number' then
 		     v.height = 0.0
 		  end
@@ -506,17 +510,21 @@ do
    end
 
 -- EXT
-   function output_alt_font_cmd(bbase)
+   function output_alt_font_cmd(dir, bbase)
       alt_font_base = bbase
-      alt_font_base_num = tex.getattribute(attr_curjfnt)
+      if dir == 't' then
+	 alt_font_base_num = tex.getattribute(attr_curtfnt)
+      else
+	 alt_font_base_num = tex.getattribute(attr_curjfnt)
+      end	    
       local t = alt_font_table[alt_font_base_num]
       if t then
          for i,_ in pairs(t) do t[i]=nil end
       end
       t = alt_font_table_latex[bbase]
       if t then
-         for i,_ in pairs(t) do
-            tex.sprint(cat_lp, '\\ltj@pickup@altfont@aux{' .. i .. '}')
+       for i,_ in pairs(t) do
+            tex.sprint(cat_lp, '\\ltj@pickup@altfont@aux' .. dir .. '{' .. i .. '}')
          end
       end
    end

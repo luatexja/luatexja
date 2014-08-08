@@ -292,7 +292,7 @@
   \font@name
   \ltj@@does@alt@set{\curr@kfontshape}%
     % alt fonts の定義
-    \directlua{luatexja.jfont.output_alt_font_cmd('\luatexluaescapestring{\curr@kfontshape}')}%
+    \directlua{luatexja.jfont.output_alt_font_cmd('t', '\luatexluaescapestring{\curr@kfontshape}')}%
     % 定義した alt fonts のデータを \ltjdeclarealtfont に渡すのと同等の処理をする
     \directlua{luatexja.jfont.pickup_alt_font_a('\f@size')}%
   \fi
@@ -303,7 +303,7 @@
   \font@name
   \ltj@@does@alt@set{\curr@kfontshape}%
     % alt fonts の定義
-    \directlua{luatexja.jfont.output_alt_font_cmd('\luatexluaescapestring{\curr@kfontshape}')}%
+    \directlua{luatexja.jfont.output_alt_font_cmd('y', '\luatexluaescapestring{\curr@kfontshape}')}%
     % 定義した alt fonts のデータを \ltjdeclarealtfont に渡すのと同等の処理をする
     \directlua{luatexja.jfont.pickup_alt_font_a('\f@size')}%
   \fi
@@ -681,8 +681,11 @@
 \def\ClearAlternateKanjiFont#1#2#3#4{%
    \directlua{luatexja.jfont.clear_alt_font_latex('\luatexluaescapestring{#1/#2/#3/#4}')}}
 
-\def\ltj@pickup@altfont@aux#1{%
+\def\ltj@pickup@altfont@auxy#1{%
   \begingroup\edef\font@name{\csname #1/\f@size\endcsname}\pickup@jfont\endgroup%
+}
+\def\ltj@pickup@altfont@auxt#1{%
+  \begingroup\edef\font@name{\csname #1/\f@size\endcsname}\pickup@tfont\endgroup%
 }
 \def\ltj@pickup@altfont@copy#1#2{%
   \ltj@@getjfontnumber#1%
