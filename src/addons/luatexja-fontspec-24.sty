@@ -88,12 +88,13 @@
 \ltj_fontspec_define_altfont_option:nn {Font} {
   \fontspec_complete_fontname:Nn \l_ltj_fontspec_altname_tl {#1}
 }
-
 \cs_new:Nn \__ltj_fontspec_altfont_key_code:n
 {
-  \clist_set:Nn \l_ltj_fontspec_altfont_clist  {#1}
+  \clist_put_right:Nn \l_ltj_fontspec_altfont_clist  {#1}
 }
-
+\__fontspec_keys_define_code:nnn {fontspec-ltjaltfont-reparse} {AltFont} {
+  \__ltj_fontspec_altfont_key_code:n { #1 }
+}
 %% 
 \clist_new:N \l_ltj_fontspec_fontfeat_yoko_clist
 \clist_new:N \l_ltj_fontspec_fontfeat_tate_clist
@@ -207,6 +208,7 @@
     \cs_set_eq:NN \__fontspec_declare_shape:nnxx \ltj_fontspec_declare_shape:nnxx
     \__ltj_orig_fontspec_make_font_shapes:Nnnnn {#1} {#2} {#3} {#4} {#5}
     %%
+    \keys_set_known:nn {fontspec-ltjaltfont-reparse} { #4 }
     \clist_if_empty:NF \l_ltj_fontspec_altfont_clist {
       \int_gzero:N \g_ltj_fontspec_altnumber_int
       \clist_map_inline:Nn \l_ltj_fontspec_altfont_clist {

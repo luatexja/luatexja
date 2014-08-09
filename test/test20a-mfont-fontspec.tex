@@ -50,16 +50,9 @@
 
 \medskip\piyo\test
 
-\paragraph{addfontfeatures}\ \par
-\typeout{addjfontfeatures}
-\addjfontfeatures{
-  AltFont={ {Range="4F00-"6FFF, Color=0000FF}, },
-  Color=001F00,CJKShape=Traditional
-% AltFontFeature, AltFontRange は累積しない
-}
-\makeatletter\k@family\test
-
-\typeout{5号かな}
+\newpage
+\section{5号かな}
+{%
 \jfontspec[
   AltFont={
     {Font=JJSYuMin5goKn-R,Range="3000-"30FF, Color=007F00},
@@ -67,8 +60,74 @@
   }
 ]{JJSYuMinchoPr6N-R}
 
+\makeatletter\k@family
 日本国民は、正当に選挙された国会における代表者を通じて行動し、
 （\ltjjachar"21B3）
 （\ltjjachar"21B4）
-（\ltjjachar"21B5）
+（\ltjjachar"21B5）%"
+}
+
+\section{addfontfeatures}
+\addjfontfeatures{
+  AltFont={ {Range="4F00-"6FFF, Color=0000FF}, },
+  Color=001F00,CJKShape=Traditional
+% AltFontFeature, AltFontRange は累積しない
+}
+\makeatletter\k@family\test
+
+\paragraph{うまくいかない例: YokoFeatures等の中にAltFont}
+{%
+\addjfontfeature{
+  YokoFeatures = {
+    AltFont={
+      {Font=JJSYuMin5goKn-D,Range="3000-"30FF, Color=003F3F},
+    }, JFM=min,
+  },
+  TateFeatures = {
+    AltFont={
+      {Font=JJSYuMin5goKn-R,Range="3000-"304F, Color=7F0000, JFM=tmin },
+      {Font=JJSYuMin5goKn-R,Range="3050-"30FF, Color=00007F},
+    },
+  }  
+}
+\makeatletter\k@family\test
+}
+\paragraph{うまくいかない例: AltFontの中にYokoFeature}
+{%
+\addjfontfeature{
+  %YokoFeatures = { JFM=min },
+  AltFont={
+    { 
+      YokoFeatures = { Font=JJSYuMin5goKn-D, Color=FF3F3F },
+      TateFeatures = { Font=JJSYuMin5goKn-R, Color=7F0000, JFM=tmin  },
+      Range="3000-"304F, 
+    },
+    { 
+      YokoFeatures = { Font=JJSYuMin5goKn-D, Color=FF3F3F },
+      TateFeatures = { Font=JJSYuMin5goKn-R, Color=00007F },
+      Range="3050-"30FF, 
+    },
+  }
+}
+\makeatletter\k@family\test
+}
+
+どっちかではうまくいくようにしたいが……
+
+
+\paragraph{BoldFeaturesとAltFontその1}
+\jfontspec
+[
+  AltFont = { { Color=0000FF,  Range="4000-"9FFF } },
+  BoldFont=KozMinPr6N-Bold,
+  UprightFeatures = {
+    AltFont = { { Font=KozGoPr6N-Light, Range="3000-"30FF } },
+  },
+  BoldFeatures = { Color=006F00,
+    AltFont = { { Font=KozGoPr6N-Bold, Range="3000-"30FF } },
+  }, 
+]{KozMinPr6N-Light}
+\test
+\bfseries\test
+
 \end{document}
