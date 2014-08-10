@@ -29,7 +29,7 @@ luatexja.jfont.define_jfm {
 	 '，', '．'
       },
       align = 'left', left = 0.00, down = 0.00,
-      width = 1.0, height = vht, depth = vht, italic=0.0,
+      width = 0.5, height = vht, depth = vht, italic=0.0,
       glue = {
 	 [0] = { 0.5, 0.190480, 0.5 },
 	 [1] = { 0, 0, 0 },
@@ -48,7 +48,7 @@ luatexja.jfont.define_jfm {
 	 '、', '。'
       },
       align = 'left', left = 0.00, down = 0.00,
-      width = 1.0, height = vht, depth = vht, italic=0.0,
+      width = 0.5, height = vht, depth = vht, italic=0.0,
       glue = {
 	 [0] = { 0.5, 0.190480, 0.5 },
 	 [1] = { 0, 0, 0 },

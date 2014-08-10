@@ -88,12 +88,19 @@
 \ltj_fontspec_define_altfont_option:nn {Font} {
   \fontspec_complete_fontname:Nn \l_ltj_fontspec_altname_tl {#1}
 }
-\cs_new:Nn \__ltj_fontspec_altfont_key_code:n
-{
-  \clist_put_right:Nn \l_ltj_fontspec_altfont_clist  {#1}
-}
 \__fontspec_keys_define_code:nnn {fontspec-ltjaltfont-reparse} {AltFont} {
-  \__ltj_fontspec_altfont_key_code:n { #1 }
+  \clist_put_right:Nn \l_ltj_fontspec_altfont_clist  { #1 }
+}
+\__fontspec_keys_define_code:nnn {fontspec-ltjaltfont-reparse} {YokoFeatures} {
+  \clist_put_right:Nn \l_ltj_fontspec_fontfeat_yoko_clist { #1 }
+}
+\__fontspec_keys_define_code:nnn {fontspec-ltjaltfont-reparse} {TateFeatures} {
+  \clist_put_right:Nn \l_ltj_fontspec_fontfeat_tate_clist { #1 }
+}
+\__fontspec_keys_define_code:nnn {fontspec-ltjaltfont-reparse} {TateFont} {
+  \tl_if_empty:nF {#1} {
+    \fontspec_complete_fontname:Nn \l_ltj_fontspec_fontname_tate_tl {#1}
+  }
 }
 %% 
 \clist_new:N \l_ltj_fontspec_fontfeat_yoko_clist
@@ -109,7 +116,7 @@
 \cs_new:Nn \ltj_fontspec_select:nn {
   \group_begin:
   \ltj_fontspec_define_option:nn {AltFont} {
-    \__ltj_fontspec_altfont_key_code:n { ##1 }
+    \clist_put_right:Nn \l_ltj_fontspec_altfont_clist  {##1}
   }
   \ltj_fontspec_define_option:nn {CID} {
     \__fontspec_update_featstr:n {cid=##1}
@@ -155,10 +162,20 @@
 }
 
 %% declare_shape
-\cs_new:Nn \ltj_fontspec_declare_shape:nnnn {
-  \ltj_fontspec_declare_shape_aux:nnxxnn {#1} {#2} {#3} {#4} { JY3 } { \l_ltj_fontspec_fontfeat_yoko_clist }
-  \ltj_fontspec_declare_shape_aux:nnxxnn {#1} {#2} {#3} {#4} { JT3 } { \l_ltj_fontspec_fontfeat_tate_clist }
+
+\cs_new:Nn \ltj_fontspec_declare_shape_yoko:nnnn {
+  \ltj_fontspec_declare_shape_aux:nnnnnn {#1} {#2} {#3} {#4} { JY3 } { \l_ltj_fontspec_fontfeat_yoko_clist }
 }
+\cs_new:Nn \ltj_fontspec_declare_shape_tate:nnnn {
+  \ltj_fontspec_declare_shape_aux:nnnnnn {#1} {#2} {#3} {#4} { JT3 } { \l_ltj_fontspec_fontfeat_tate_clist }
+}
+\cs_new:Nn \ltj_fontspec_declare_shape:nnnn {
+  \ltj_fontspec_declare_shape_yoko:nnnn {#1} {#2} {#3} {#4}
+  \ltj_fontspec_declare_shape_tate:nnnn {#1} {#2} {#3} {#4}
+}
+\cs_generate_variant:Nn \ltj_fontspec_declare_shape:nnnn {nnxx}
+\cs_generate_variant:Nn \ltj_fontspec_declare_shape_yoko:nnnn {nnxx}
+\cs_generate_variant:Nn \ltj_fontspec_declare_shape_tate:nnnn {nnxx}
 
 \cs_new:Nn \ltj_fontspec_declare_shape_aux:nnnnnn
  {
@@ -190,8 +207,6 @@
   \__fontspec_declare_shapes_normal:nn  {#1} {#2}
   \__fontspec_declare_shape_slanted:nn  {#1} {#2}
  }
-\cs_generate_variant:Nn \ltj_fontspec_declare_shape:nnnn {nnxx}
-\cs_generate_variant:Nn \ltj_fontspec_declare_shape_aux:nnnnnn {nnxxnn}
 
 \cs_new:Nn \ltj_fontspec_set_family:Nnn {
   \cs_set_eq:NN \fontspec_select:nn \ltj_fontspec_select:nn
@@ -203,11 +218,27 @@
 \cs_set_eq:NN \__ltj_fontspec_orig_DeclareFontShape \DeclareFontShape
 \cs_new:Nn \ltj_fontspec_make_font_shapes:Nnnnn {
   \group_begin:
+    %% 基底フォント
     \cs_set_eq:NN \__fontspec_font_set:Nnn \use_none:nnn
     \cs_set_eq:NN \__fontspec_font_if_null:NT \use_none:nn
     \cs_set_eq:NN \__fontspec_declare_shape:nnxx \ltj_fontspec_declare_shape:nnxx
     \__ltj_orig_fontspec_make_font_shapes:Nnnnn {#1} {#2} {#3} {#4} {#5}
     %%
+    \ltj_fontspec_make_font_shapes_alt:Nnnnnn {#1}{#2}{#3}
+     {#4, \l_ltj_fontspec_fontfeat_yoko_clist}{#5} {JY3 }
+    \ltj_fontspec_make_font_shapes_alt:Nnnnnn {#1}{#2}{#3}
+     {#4, \l_ltj_fontspec_fontfeat_tate_clist}{#5} {JT3}
+  \group_end:
+ }
+
+%%% Altfont 内部処理部
+\cs_new:Nn \ltj_fontspec_make_font_shapes_alt:Nnnnnn {
+  \group_begin:
+    \str_if_eq:nnTF { #6 } { JY3 } {
+      \cs_set_eq:NN \__fontspec_declare_shape:nnxx \ltj_fontspec_declare_shape_yoko:nnxx
+    }{
+      \cs_set_eq:NN \__fontspec_declare_shape:nnxx \ltj_fontspec_declare_shape_tate:nnxx
+    }
     \keys_set_known:nn {fontspec-ltjaltfont-reparse} { #4 }
     \clist_if_empty:NF \l_ltj_fontspec_altfont_clist {
       \int_gzero:N \g_ltj_fontspec_altnumber_int
@@ -218,6 +249,7 @@
 
         \keys_set_known:nxN {fontspec-ltjaltfont} { \exp_after:wN \use:n ##1 }
           \l_ltj_fontspec_altfont_leftover_clist
+        \keys_set_known:nn {fontspec-ltjaltfont-reparse} { \exp_after:wN \use:n ##1 }
 
         \tl_if_empty:NT \l_ltj_fontspec_altrange_tl {
           \msg_warning:nnn  {luatexja-fontspec} {altfont-ignored-by-norange} { ##1 }
@@ -229,19 +261,15 @@
           } {
             \msg_warning:nnn  {luatexja-fontspec} {altfont-ignored-by-rangeonly} { ##1 }
           } {
+            \typeout{LEFT:~<\l_ltj_fontspec_altfont_leftover_clist>~vs~4~<#4>}
             \__ltj_orig_fontspec_make_font_shapes:Nnnnn 
                 { \l_ltj_fontspec_altname_tl } {#2} 
                 {#3 _ alt \int_use:N \g_ltj_fontspec_altnumber_int } 
                 {#4, \l_ltj_fontspec_altfont_leftover_clist }
                 {#5}
             \DeclareAlternateKanjiFont
-              {JY3}{ \l_fontspec_family_tl }{#2}{#3}%
-              {JY3}{ \l_fontspec_family_tl }{#2}
-              { #3 _alt \int_use:N \g_ltj_fontspec_altnumber_int }
-              { \l_ltj_fontspec_altrange_tl }
-            \DeclareAlternateKanjiFont
-              {JT3}{ \l_fontspec_family_tl }{#2}{#3}%
-              {JT3}{ \l_fontspec_family_tl }{#2}
+              { #6 }{ \l_fontspec_family_tl }{#2}{#3}%
+              { #6 }{ \l_fontspec_family_tl }{#2}
               { #3 _alt \int_use:N \g_ltj_fontspec_altnumber_int }
               { \l_ltj_fontspec_altrange_tl }
             \int_gincr:N \g_ltj_fontspec_altnumber_int
@@ -250,7 +278,8 @@
       }
     }
   \group_end:
- }
+}
+
 
 %%%%%%%% User commands
 \DeclareDocumentCommand \jfontspec { O{} m O{} } {

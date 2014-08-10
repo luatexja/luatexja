@@ -92,7 +92,6 @@ function define_jfm(t)
                v.align = 'left' -- left
             end
 	    if real_char then
-	       print(i, v.width)
 	       if type(v.width)~='number' and v.width~='prop' then
 		  defjfm_res= nil; return
 	       else

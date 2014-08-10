@@ -2,11 +2,20 @@
 \documentclass{ltjsarticle}
 \usepackage{luatexja-fontspec,luatexja-otf}
 
+\makeatletter
+\let\ltj@orig@DeclareFontShape@=\DeclareFontShape@
+\def\DeclareFontShape@#1#2#3#4#5#6{%
+\immediate\typeout{DFS |#1|#2|#3|#4|#5|#6|}%
+\ltj@orig@DeclareFontShape@{#1}{#2}{#3}{#4}{#5}{#6}%
+}
+\makeatother
+
+
 
 \newjfontfamily\hoge[
   AltFont={ 
     {Range="3000-"307F, Font=JJSYuGothicPr6N-M, Color=00007F, CharacterWidth=Half},
-    {Range="3080-"30FF, Color=7F0000},
+    {Range="3080-"30FF, Color=7F0000,}
   },
   BoldFont={ JJSYuGothicPr6N-M }, 
 ]{JJSYuMinchoPr6N-R}
@@ -56,7 +65,7 @@
 \jfontspec[
   AltFont={
     {Font=JJSYuMin5goKn-R,Range="3000-"30FF, Color=007F00},
-    {Font=DejaVuSans, Range={"21B3,"21B5},Color=0000FF,JFM=prop  },
+    {Font=DejaVuSans, Range={"21B3,"21B5},Color=0000FF,YokoFeatures={JFM=prop} },
   }
 ]{JJSYuMinchoPr6N-R}
 
@@ -68,16 +77,18 @@
 }
 
 \section{addfontfeatures}
+\piyo\test
 \addjfontfeatures{
   AltFont={ {Range="4F00-"6FFF, Color=0000FF}, },
-  Color=001F00,CJKShape=Traditional
-% AltFontFeature, AltFontRange は累積しない
+  Color=003F00,CJKShape=Traditional
+%% AltFont は累積する
 }
 \makeatletter\k@family\test
 
+\section{YokoFeaturesなどとの関係}
 \paragraph{うまくいかない例: YokoFeatures等の中にAltFont}
 {%
-\addjfontfeature{
+\jfontspec[
   YokoFeatures = {
     AltFont={
       {Font=JJSYuMin5goKn-D,Range="3000-"30FF, Color=003F3F},
@@ -88,27 +99,27 @@
       {Font=JJSYuMin5goKn-R,Range="3000-"304F, Color=7F0000, JFM=tmin },
       {Font=JJSYuMin5goKn-R,Range="3050-"30FF, Color=00007F},
     },
-  }  
-}
+  }
+]{JJSYuMinchoPr6N-R}
 \makeatletter\k@family\test
 }
-\paragraph{うまくいかない例: AltFontの中にYokoFeature}
+\paragraph{うまくいく例: AltFontの中にYokoFeature}
 {%
-\addjfontfeature{
+\jfontspec[
   %YokoFeatures = { JFM=min },
   AltFont={
     { 
-      YokoFeatures = { Font=JJSYuMin5goKn-D, Color=FF3F3F },
-      TateFeatures = { Font=JJSYuMin5goKn-R, Color=7F0000, JFM=tmin  },
+      Font=JJSYuMin5goKn-D, YokoFeatures = { Color=FF3F3F },
+      TateFont = JJSYuMin5goKn-R, TateFeatures = { Color=7F0000, JFM=tmin  },
       Range="3000-"304F, 
     },
     { 
-      YokoFeatures = { Font=JJSYuMin5goKn-D, Color=FF3F3F },
-      TateFeatures = { Font=JJSYuMin5goKn-R, Color=00007F },
+      Font=JJSYuMin5goKn-D, YokoFeatures = { Color=4F3F3F },
+      TateFont=JJSYuMin5goKn-R, TateFeatures = { Color=00007F },
       Range="3050-"30FF, 
     },
   }
-}
+]{JJSYuMinchoPr6N-R}
 \makeatletter\k@family\test
 }
 
@@ -118,10 +129,13 @@
 \paragraph{BoldFeaturesとAltFontその1}
 \jfontspec
 [
-  AltFont = { { Color=0000FF,  Range="4000-"9FFF } },
+  AltFont = { { Color=0000FF,  Range="6000-"9FFF } },
   BoldFont=KozMinPr6N-Bold,
   UprightFeatures = {
-    AltFont = { { Font=KozGoPr6N-Light, Range="3000-"30FF } },
+    AltFont = {
+      { Font=KozGoPr6N-Light, Range="3000-"30FF, TateFont = KozGoPr6N-Heavy,
+        YokoFeatures={ Color=4F0000} } 
+    },
   },
   BoldFeatures = { Color=006F00,
     AltFont = { { Font=KozGoPr6N-Bold, Range="3000-"30FF } },
