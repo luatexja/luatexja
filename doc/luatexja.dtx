@@ -48,7 +48,7 @@
 
 \usepackage{amsmath,array,tikz,pict2e,multienum,float}
 \usepackage{booktabs,multicol,luatexja-ruby}
-\usepackage{xy}
+\usepackage{xy,lltjext}
 
 %%%%%%%% listings
 
@@ -65,7 +65,7 @@
     tex.sprint(cat_str, string.format('%X', 0xE00EF+#1))
 }}}
 
-\usepackage{listings,showexpl}
+\usepackage{listings,showexpl,enumitem}
 \lstset{
   basicstyle=\ttfamily\small, pos=r, breaklines=true,
   numbers=none, rframe={}, basewidth=0.5em, numberstyle=\tiny, numbersep=0.5em,
@@ -137,16 +137,12 @@
 \DeclareRobustCommand\epTeX{\ensuremath{\varepsilon}-\kern-.125em\pTeX}
 
 %%%%%%%% other macros
-\newenvironment{cslist}{%
-%<ja>  \leftskip2\zw
-%<en>  \leftskip2em
-  \parindent=0pt\def\makelabel##1{\cs{##1}}
-  \def\{{\char`\{}\def\}{\char`\}}
-  \let\origitem=\item
-  \def\item[##1]{\par\smallskip\par\hskip-\leftskip\makelabel{##1}\par}
-  \@totalleftmargin\leftskip
-}{\par%
-%<en>\medskip
+\newlist{cslist}{description}{1}
+\setlist[cslist]{%
+    style=nextline,font=\mdseries\ttfamily,
+    before*=\def\<{\char`\<}\def\>{\char`\>}\def\{{\char`\{}\def\}{\char`\}},
+%<ja> leftmargin=2\zw,
+%<en> leftmargin=2em,
 }
 
 \def\labelenumii{(\arabic{enumii})}
@@ -552,7 +548,7 @@ Now \LuaTeX-ja is available from the following archive and distributions:
   \item W32\TeX\ (in \texttt{luatexja.tar.xz})
   \end{itemize}
 
-If you are using \TeX~Live~2013, you can install \LuaTeX-ja
+If you are using \TeX~Live~2014, you can install \LuaTeX-ja
 from \TeX~Live manager (\texttt{tlmgr}):
 \begin{verbatim}
 $ tlmgr install luatexja
@@ -572,7 +568,7 @@ $ tlmgr install luatexja
   \item W32\TeX\ (\texttt{luatexja.tar.xz})
   \end{itemize}
 
-例えば\TeX~Live~2013以降を利用しているなら，\LuaTeX-jaは\TeX~Live manager (\texttt{tlmgr})を
+例えば\TeX~Live~2014を利用しているなら，\LuaTeX-jaは\TeX~Live manager (\texttt{tlmgr})を
 使ってインストールすることができる．
 \begin{verbatim}
 $ tlmgr install luatexja
@@ -761,11 +757,11 @@ run \LuaTeX-ja in this directory, and finally delete the temporary directory.
 \textbf{classification}&\textbf{font name}&\bf `10\,pt'&\bf`7\,pt'&\bf`5\,pt'\\\midrule
 \smash{\raisebox{-1ex}{\emph{yoko} (horizontal)}}&
 \emph{mincho}&Ryumin-Light    &\cs{tenmin}&\cs{sevenmin}&\cs{fivemin}\\
-\emph{gothic}&GothicBBB-Medium&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
+&\emph{gothic}&GothicBBB-Medium&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
 \midrule
 \smash{\raisebox{-1ex}{\emph{tate} (vertical)}}&
 \emph{mincho}&Ryumin-Light    &\cs{tentmin}&\cs{seventmin}&\cs{fivetmin}\\
-\emph{gothic}&GothicBBB-Medium&\cs{tentgt} &\cs{seventgt} &\cs{fivetgt}\\
+&\emph{gothic}&GothicBBB-Medium&\cs{tentgt} &\cs{seventgt} &\cs{fivetgt}\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -778,11 +774,11 @@ run \LuaTeX-ja in this directory, and finally delete the temporary directory.
 \emph{組方向}&\emph{字体}&\emph{フォント名}&\bf `10\,pt'&\bf`7\,pt'&\bf`5\,pt'\\\midrule
 \smash{\raisebox{-1ex}{横組}}&
 明朝体&Ryumin-Light    &\cs{tenmin}&\cs{sevenmin}&\cs{fivemin}\\
-ゴシック体&GothicBBB-Medium&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
+&ゴシック体&GothicBBB-Medium&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
 \midrule
 \smash{\raisebox{-1ex}{縦組}}&
 明朝体&Ryumin-Light    &\cs{tentmin}&\cs{seventmin}&\cs{fivetmin}\\
-ゴシック体&GothicBBB-Medium&\cs{tentgt} &\cs{seventgt} &\cs{fivetgt}\\
+&ゴシック体&GothicBBB-Medium&\cs{tentgt} &\cs{seventgt} &\cs{fivetgt}\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -859,8 +855,8 @@ plfonts.dtx} and \texttt{pldefs.ltx}):
 
 \begin{itemize}
 %<*en>
-\item The font encoding for Japanese fonts (for horizontal direction) is \texttt{JY3}.\\
-\texttt{JT3} is used for Japanese fonts for vertical direction.
+\item Font encodings for Japanese fonts is \texttt{JY3}~(for horizontal direction) and
+\texttt{JT3}~(for vertical direction).
 %</en>
 %<*ja>
 \item 和文フォントのエンコーディングとしては，横組用には \texttt{JY3}，縦組用には\
@@ -868,7 +864,7 @@ plfonts.dtx} and \texttt{pldefs.ltx}):
 %</ja>
 
 %<*en>
-\item Traditionally, Japanese documents use two typeface category: \emph{mincho}~(明朝体) and
+\item Traditionally, Japanese documents use two typeface categories: \emph{mincho}~(明朝体) and
  \emph{gothic}~(\textgt{ゴシック体}). \emph{mincho} is used in the main text, while \emph{gothic}
       is used in the headings or for emphasis.
 \begin{center}\small
@@ -935,15 +931,26 @@ documents. To typeset Japanese-based documents, you are better to use
 class files other than \texttt{article.cls}, \texttt{book.cls}, and so on.  At
 the present, we have the counterparts of \Pkg{jclasses} (standard
 classes in \pLaTeX) and \Pkg{jsclasses} (classes by Haruhiko
-Okumura), namely, \Pkg{ltjclasses} and \Pkg{ltjsclasses}.
+Okumura), namely, \Pkg{ltjclasses}\footnote{%
+  \texttt{ltjarticle.cls},~\texttt{ltjbook.cls}, \texttt{ltjreport.cls},
+  \texttt{ltjtarticle.cls}, \texttt{ltjtbook.cls}, \texttt{ltjtreport.cls}.
+  The latter \texttt{ltjt*.cls} are for vertically writtened Japanese documents.
+} and \Pkg{ltjsclasses}\footnote{%
+  \texttt{ltjsarticle.cls},~\texttt{ltjsbook.cls},~\texttt{ltjskiyou.cls}.}.
 %</en>
 %<*ja>
 しかしながら，上記の設定は日本語の文書にとって十分とは言えない．
 日本語文書を組版するためには，\texttt{article.cls}, \texttt{book.cls}といった
 欧文用のクラスファイルではなく，和文用のクラスファイルを用いた方がよい．
 現時点では，\Pkg{jclasses}（\pLaTeX の標準クラス）と\Pkg{jsclasses}
-（奥村晴彦氏による「\pLaTeXe 新ドキュメントクラス」）に対応するものとして，\Pkg{ltjclasses}，
-\Pkg{ltjsclasses}がそれぞれ用意されている．
+（奥村晴彦氏による「\pLaTeXe 新ドキュメントクラス」）に対応するものとして，
+\Pkg{ltjclasses}\footnote{%
+  横組用は \texttt{ltjarticle.cls},~\texttt{ltjbook.cls}, \texttt{ltjreport.cls} であり，
+  縦組用は \texttt{ltjtarticle.cls}, \texttt{ltjtbook.cls}, \texttt{ltjtreport.cls} である．
+}，
+\Pkg{ltjsclasses}\footnote{%
+  \texttt{ltjsarticle.cls},~\texttt{ltjsbook.cls},~\texttt{ltjskiyou.cls}.}%
+がそれぞれ用意されている．
 %</ja>
 
 %<en>\section{Changing Fonts}
@@ -1194,8 +1201,9 @@ alphabetic fonts
 %</ja>
 %<*en>
 The package option of \Pkg{luatexja-fontspec} are the followings:
-\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
- \item[match] If this option is specified, usual family-changing commands such as
+\begin{cslist}
+ \item[match]
+If this option is specified, usual family-changing commands such as
 \cs{rmfamily},~\cs{textrm}, \cs{sffamily},~\dots\ also change Japanese font family.
 
 Note that \emph{\cs{setmonojfont} is defined
@@ -1203,7 +1211,7 @@ if and only if this \texttt{\textup{match}} option is specified}.
 
  \item[pass=<opts>]
 Specify options <opts> which will be passed to the \Pkg{fontspec} package.
-\end{list}
+\end{cslist}
 The reason that \cs{setmonojfont} is not defined by default is that
 it is popular for Japanese fonts that nearly all Japanese glyphs have same
 widths.  Also note that kerning information in a font is not used
@@ -1213,8 +1221,9 @@ This is because of the compatibility with previous versions of \LuaTeX-ja
 %</en>
 %<*ja>
 \Pkg{luatexja-fontspec} パッケージのオプションは以下の通りである：
-\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
- \item[match] このオプションが指定されると，「\pLaTeXe 新ドキュメントクラス」のように\
+\begin{cslist}
+ \item[match]
+このオプションが指定されると，「\pLaTeXe 新ドキュメントクラス」のように\
 \cs{rmfamily}, \verb+\textrm{...}+, \cs{sffamily} 等が
 欧文フォントだけでなく和文フォントも変更するようになる．
 
@@ -1223,7 +1232,7 @@ This is because of the compatibility with previous versions of \LuaTeX-ja
 
  \item[pass=<opts>]
 \Pkg{fontspec} パッケージに渡すオプション <opts> を指定する．
-\end{list}
+\end{cslist}
 標準で \cs{setmonojfont} コマンドが定義されないのは，
 和文フォントではほぼ全ての和文文字のグリフが等幅であるのが伝統的であったことによる．
 また，これらの和文用のコマンドではフォント内のペアカーニング情報は標準では使用されない，
@@ -1272,7 +1281,8 @@ before \Pkg{luatexja-preset}:
 
 %<en>\paragraph{General options}
 %<ja>\paragraph{一般的なオプション}
-\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
+\begin{cslist}
+
 \item[nodeluxe]
 %<*en>
 Use one-weighted \textit{mincho} and \textit{gothic} font families.
@@ -1283,8 +1293,9 @@ This means that \verb+\mcfamily\bfseries+, \verb+\gtfamily\bfseries+ and
 %<*ja>
 \LaTeXe 環境下での標準設定のように，明朝体・ゴシック体を各1ウェイトで使用する．
 より具体的に言うと，この設定の下では
-\verb+\mcfamily\bfseries+, \verb+\gtfamily\bfseries+, \verb+\gtfamily\mdseries+は
-みな同じフォントとなる．\emph{このオプションは標準で有効になっている．}
+\ \verb+\mcfamily\bfseries+, \verb+\gtfamily\bfseries+, 
+\verb+\gtfamily\mdseries+はみな同じフォントとなる．
+\emph{このオプションは標準で有効になっている．}
 %</ja>
 \item[deluxe]
 %<*en>
@@ -1329,7 +1340,7 @@ Use the JFM \texttt{jfm-jis.lua}, instead of \texttt{jfm-ujis.lua}, which is the
 用いるJFMを（JISフォントメトリック類似の）\texttt{jfm-jis.lua}にする．このオプションがない時は
 \LuaTeX-ja標準の\texttt{jfm-ujis.lua}が用いられる．
 %</ja>
-\end{list}
+\end{cslist}
 %<*en>
 Note that \texttt{90jis} and \texttt{jis2004} only affect with \textit{mincho},
 \textit{gothic} (and possibly \textit{rounded gothic}) defined by this package.
@@ -1341,6 +1352,7 @@ We didn't taken account of  when both \texttt{90jis} and \texttt{jis2004} are sp
 同時に指定された場合の動作については全く考慮していない．
 %</ja>
 
+\newpage
 %<en>\paragraph{Presets for multi weight}
 %<ja>\paragraph{多ウェイト用プリセットの一覧}
 %<*en>
@@ -1351,11 +1363,11 @@ fonts are specified by font name, not by file name.
 \texttt{morisawa-pro}, \texttt{morisawa-pr6n}以外はフォントの指定は
 （ファイル名でなく）フォント名で行われる．
 %</ja>
-\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
+\begin{cslist}[style=standard]
  \item[kozuka-pro] Kozuka Pro (Adobe-Japan1-4) fonts.
-%<en>    \\[-\dimexpr\medskipamount+\baselineskip\relax]
+%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[kozuka-pr6] Kozuka Pr6 (Adobe-Japan1-6)  fonts.
-%<en>    \\[-\dimexpr\medskipamount+\baselineskip\relax]
+%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[kozuka-pr6n] Kozuka Pr6N (Adobe-Japan1-6, JIS04-savvy) fonts.
 
 %<*en>
@@ -1404,7 +1416,7 @@ In above table, starred fonts (KozGo\dots-Regular) are used for medium series of
 %<ja>\medskip
 
  \item[hiragino-pro]  Hiragino Pro (Adobe-Japan1-5) fonts.
-%<en>    \\[-\dimexpr\medskipamount+\baselineskip\relax]
+%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[hiragino-pron] Hiragino ProN (Adobe-Japan1-5, JIS04-savvy) fonts.
 
 %<*en>
@@ -1447,8 +1459,9 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<ja>\medskip
 
  \item[morisawa-pro]  Morisawa Pro (Adobe-Japan1-4) fonts.
-%<en>    \\[-\dimexpr\medskipamount+\baselineskip\relax]
+%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[morisawa-pr6n]  Morisawa Pr6N (Adobe-Japan1-6, JIS04-savvy) fonts.
+
 \begin{center}\small
 \begin{tabular}{cl>{\tt}l>{\tt}l}
 \toprule
@@ -1473,9 +1486,11 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{tabular}
 \end{center}
 
+\newpage
  \item[yu-win]  Yu fonts bundled with Windows~8.1.
-%<en>    \\[-\dimexpr\medskipamount+\baselineskip\relax]
+%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[yu-osx]  Yu fonts bundled with OSX~Mavericks.
+
 \begin{center}\small
 \begin{tabular}{clll}
 \toprule
@@ -1502,7 +1517,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{tabular}
 \end{center}
 
-\end{list}
+\end{cslist} 
 %<en>\paragraph{Presets for single weight}
 %<ja>\paragraph{単ウェイト用プリセット一覧}
 %<*en>
@@ -1647,11 +1662,12 @@ If you want to use these functions, load \Pkg{luatexja-otf} package.
 
 %<*ja>
 \Pkg{otf}パッケージでは，それぞれ次のようなオプションが存在した：
-\begin{description}
-\item[\texttt{deluxe}] 明朝体・ゴシック体各2ウェイトと，丸ゴシック体を扱えるようになる．
-\item[\texttt{expert}] 仮名が横組・縦組専用のものに切り替わり，ルビ用仮名も扱えるようになる．
-\item[\texttt{bold}] ゴシック体を標準で太いウェイトのものに設定する．
-\end{description}
+\begin{cslist}
+\item[\cs{deluxe}] 明朝体・ゴシック体各2ウェイトと，丸ゴシック体を扱えるようになる．
+\item[\cs{expert}] 仮名が横組・縦組専用のものに切り替わり，ルビ用仮名も
+\ \cs{rubyfamily}\ によって扱えるようになる．
+\item[\cs{bold}] ゴシック体を標準で太いウェイトのものに設定する．
+\end{cslist}
 しかしこれらのオプションは\Pkg{luatexja-otf}パッケージには存在しない．
 \Pkg{otf}パッケージが文書中で使用する和文用TFMを自前の物に置き換えていたのに対し，
 \Pkg{luatexja-otf}パッケージでは，そのようなことは行わないからである．
@@ -1781,6 +1797,7 @@ these eight ranges belongs to the character range~217.
 %</ja>
 \begin{description}
 %<*en>
+\newpage
 \item[Range~8${}^{\text{J}}$] The intersection of the upper half of ISO~8859-1
 	 (Latin-1 Supplement) and JIS~X~0208 (a basic character set for Japanese). This character range
 	 consists of the following characters:
@@ -1850,7 +1867,7 @@ This range consists of the following Unicode ranges, \emph{except characters in 
                              に示してある．
 %</ja>
 \begin{table}[!tb]
-%<en>\caption{Unicode blocks in predefined character range~3.}
+%<en>\caption{Unicode blocks in predefined character range~3.}\medskip
 %<ja>\caption{文字範囲3に指定されているUnicodeブロック．}
 \label{table-rng3}
 \catcode`\"=13\def"#1#2#3#4{\texttt{U+#1#2#3#4}}%"
@@ -1899,7 +1916,7 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 %<en>\item[Range~6${}^{\text{J}}$] Characters used in Japanese. The block list is indicated in Table~\ref{table-rng6}.
 %<ja>\item[範囲6${}^{\text{J}}$] 日本語で用いられる文字．ブロックのリストは表\ref{table-rng6}に示す．
 \begin{table}[!tb]
-%<en>\caption{Unicode blocks in predefined character range~6.}
+%<en>\caption{Unicode blocks in predefined character range~6.}\medskip
 %<ja>\caption{文字範囲6に指定されているUnicodeブロック．}
 \label{table-rng6}
 \catcode`\"=13\def"#1#2#3#4{\texttt{U+#1#2#3#4}}%"
@@ -1934,7 +1951,7 @@ The block list is indicated in Table~\ref{table-rng7}.
                             ブロックのリストは表\ref{table-rng7}に示す．
 %</ja>
 \begin{table}[!tb]
-%<en>\caption{Unicode blocks in predefined character range~7.}
+%<en>\caption{Unicode blocks in predefined character range~7.}\medskip
 %<ja>\caption{文字範囲7に指定されているUnicodeブロック．}
 \label{table-rng7}
 \catcode`\"=13\def"#1#2#3#4{\texttt{U+#1#2#3#4}}%"
@@ -1957,7 +1974,7 @@ The block list is indicated in Table~\ref{table-rng7}.
 \end{description}
 
 
-%<en>\subsection{\Param{kanjiskip} and \Param{xkanjiskip}}
+%<en>\newpage\subsection{\Param{kanjiskip} and \Param{xkanjiskip}}
 %<ja>\subsection{\Param{kanjiskip}と\Param{xkanjiskip}}
 \label{subs-kskip}
 
@@ -2113,14 +2130,26 @@ parameters to \texttt{true}/\texttt{false}, respectively.
 %<*en>
 To make a match between a Japanese font and an alphabetic font, sometimes
 shifting of the baseline of one of the pair is needed. In \pTeX, this is achieved
-by setting \cs{ybaselineshift} to a non-zero length (the
+by setting \cs{ybaselineshift} (or \cs{tbaselineshift}) to a non-zero length (the
 baseline of \textbf{ALchar} is shifted below). However, for documents
 whose main language is not Japanese, it is good to shift the baseline of
 Japanese fonts, but not that of alphabetic fonts.
 Because of this, \LuaTeX-ja can independently set the shifting amount
-of the baseline of alphabetic fonts (\Param{yalbaselineshift}
-parameter) and that of Japanese fonts (\Param{yjabaselineshift}
-parameter).
+of the baseline of alphabetic fonts and that of Japanese fonts.
+\begin{center}
+ \small
+\begin{tabular}{>{\bfseries}lcc}
+\toprule
+&\bfseries Horizontal writing (\emph{yoko} direction) etc.
+&\bfseries Vertical writing(\emph{tate} direction)\\
+\midrule
+Alphabetic fonts&\Param{yalbaselineshift}
+     parameter&\Param{talbaselineshift} parameter\\
+Japanese fonts&\Param{yjabaselineshift}
+     parameter&\Param{tjabaselineshift} parameter\\
+\bottomrule
+\end{tabular}
+\end{center}
 %</en>
 %<*ja>
 和文フォントと欧文フォントを合わせるためには，時々どちらかのベースラインの移動が
@@ -2128,21 +2157,33 @@ parameter).
 なされていた（\textbf{ALchar}のベースラインがその分だけ下がる）．しかし，日本語が主ではない
 文書に対しては，欧文フォントではなく和文フォントのベースラインを移動した方がよい．
 このため，\LuaTeX-jaでは欧文フォントのベースラインのシフト量
-（\Param{yalbaselineshift}パラメータ）と和文フォントのベースラインのシフト量
-（\Param{yjabaselineshift}パラメータ）を独立に設定できるようになっている．
+と和文フォントのベースラインのシフト量を独立に設定できるようになっている．
+\begin{center}
+ \small
+\begin{tabular}{>{\bfseries}lcc}
+\toprule
+&\bfseries 横組など&\bfseries 縦組\\
+\midrule
+欧文フォントのシフト量&\Param{yalbaselineshift}
+     parameter&\Param{talbaselineshift} parameter\\
+和文フォントのシフト量&\Param{yjabaselineshift}
+     parameter&\Param{tjabaselineshift} parameter\\
+\bottomrule
+\end{tabular}
+\end{center}
 %</ja>
 
+%<*en>
+Here the horizontal line in the below example is the baseline of a line.
+%</en>
+%<*ja>
+下の例において引かれている水平線がベースラインである．
+%</ja>
 \begin{LTXexample}
 \vrule width 150pt height 0.4pt depth 0pt \hskip-120pt
 \ltjsetparameter{yjabaselineshift=0pt, yalbaselineshift=0pt}abcあいう
 \ltjsetparameter{yjabaselineshift=5pt, yalbaselineshift=2pt}abcあいう
 \end{LTXexample}
-%<*en>
-Here the horizontal line in above is the baseline of a line.
-%</en>
-%<*ja>
-上の例において引かれている水平線がベースラインである．
-%</ja>
 
 %<*en>
 There is an interesting side-effect: characters in different size can be
@@ -2212,10 +2253,11 @@ $\Phi\vdash F(x)\ \hbox{for all}\ x\in A$
 \end{table}
 %</ja>
 
+\clearpage
 %<en>\part{Reference}
 %<ja>\part{リファレンス}
 \label{part-ref}
-
+\suppressfloats[t]
 %<*ja>
 \section{\LuaTeX-jaにおける \cs{catcode}}
 \subsection{予備知識：\pTeX と\upTeX における \cs{kcatcode}}
@@ -2472,8 +2514,13 @@ JIS~X~0213の範囲に広げると，差異はさらに大きくなる．
 %</ja>
 
 
-
-
+%<*en>
+\section{Directions}
+\LuaTeX\ supports four $\Omega$-style directions: \texttt{TLT},~\texttt{TRT}, \texttt{RTT}
+and \texttt{LTL}.
+However, neither directions are not well-suited for typesetting Japanese vertically, hence we
+implemented vertical writing by rotating \texttt{TLT}-box by 90~degrees.
+%</en>
 %<*ja>
 \section{縦組}
 \label{sec-direction}
@@ -2484,10 +2531,12 @@ JIS~X~0213の範囲に広げると，差異はさらに大きくなる．
 欧文文字が入ってきた場合はうまくいかず，\texttt{RTR} という組方向が必要になる．
 }．そのため，\LuaTeX-jaでは横組(\texttt{TLT})で組んだボックスを回転させる方式で
 縦組を実装した．
+%</ja>
 
-\subsection{サポートする組方向}
+%<ja>\subsection{サポートする組方向}
 \begin{table}[t]
-\caption{\LuaTeX-ja のサポートする組方向}
+%<ja>\caption{\LuaTeX-ja のサポートする組方向}
+%<en>\caption{Directions supported by \LuaTeX-ja}
 %<en>\medskip
 \label{tab-dir}
 \centering\small
@@ -2501,11 +2550,12 @@ JIS~X~0213の範囲に広げると，差異はさらに大きくなる．
   \hbox to 60pt{\,銀は、Ag\hss}}}%
   \raise\dimexpr 0.5\ltjgetdp0-0.5\ltjgetht0\box0%
 }
+%<*ja>
 \begin{tabular}{>{\bfseries}lcccc}
 \toprule
-&\cs{yoko}（横組）&\cs{tate}（縦組）
- &\cs{dtou}&\cs{utod}\\
+&横組&縦組 &\cs{dtou}「dtou方向」&「utod方向」\\
 \midrule
+命令&\cs{yoko}&\cs{tate}&\cs{dtou}&\cs{utod}\\
 字送り方向&水平右向き（→）&垂直下向き（↓）&垂直上向き（↑）&垂直下向き（↓）\\
 行送り方向&垂直下向き（↓）&水平左向き（←）&水平右向き（→）&水平左向き（←）\\
 使用する和文フォント&横組用(\cs{jfont})&縦組用(\cs{tfont})&
@@ -2526,9 +2576,51 @@ JIS~X~0213の範囲に広げると，差異はさらに大きくなる．
 $^*$\ 幅(width)，高さ(height)，深さ(depth)の増加方向を，
 それぞれ「\R{>}」，「\R{>>}」，「\R{>|}」で表している．
 \raggedright
+%</ja>
 
+%<*en>
+\begin{tabular}{>{\bfseries}lcccc}
+\toprule
+&horizontal (\emph{yoko}~direction)&vertical (\emph{tate}~direction)&%
+  \emph{dtou} direction&\emph{utod} direction\\
+\midrule
+Commands&\cs{yoko}&\cs{tate}&\cs{dtou}&\cs{utod}\\
+Beginning of the page&Top&Right&Left&Right\\
+Beginning of the line&Left&Top&Bottom&Top\\
+Used Japanese font&horizontal (\cs{jfont})&vertical (\cs{tfont})&
+\multicolumn{2}{c}{%
+  horizontal ($90^\circ$ rotated)}\\[\smallskipamount]
+Example&\obox{\yoko}&\obox{\tate}&\obox{\dtou}&\obox{\utod}\\
+\noalign{\medskip}
+(Notation used in $\Omega$)&TLT&RTR, RTT&LBL&RTR\\
+\bottomrule
+\end{tabular}
+
+\medskip\raggedright
+\def\R#1{%
+  \raise0.38\zw\hbox{%
+    \vrule height.2pt  depth.2pt width2\zw%
+    \hbox to 0pt{\hss\composite{*d^@{#1}}\hss}%
+  }%
+}
+\raggedright
+%</en>
 \end{table}
 
+%<*en>
+\LuaTeX-ja supports four directions, as shown in Table~\ref{tab-dir}.
+The second column (\emph{yoko} direction) is just horizontal writing, 
+and the third column (\emph{tate} direction) is vertical writing.
+The fourth column (\emph{dtou} direction) is actually a hidden feature of \pTeX.
+We implemented this for debugging purpose.
+The fifth column (\emph{utod} direction) corresponds the ``\texttt{tate (math) direction}'' of \pTeX.
+
+Directions can be changed by \cs{yoko},~\cs{tate}, \cs{dtou},~\cs{utod},
+only when the current list is null. Also, the direction of a math formula is changed to
+\emph{utod}, when the direction outside the math formula is \emph{tate} (vertical writing).
+%</en>
+
+%<*ja>
 \LuaTeX-jaがサポートする組方向は表\ref{tab-dir}に示す4つである．
 4列目の \cs{dtou} は聞き慣れない命令だと思うが，
 実は\pTeX に同名の命令が（ドキュメントには書かれていないが）存在する．
@@ -2539,7 +2631,28 @@ Down-TO-Upの意味なのだろう．\cs{dtou} を使用する機会はないだ
 組方向は，\cs{yoko},~\cs{tate}, \cs{dtou},~\cs{utod} をそれぞれ使用することで，
 現在作成中のリストやボックスが空の時にのみ変更可能である．
 また，縦組中の数式内のボックスは\pTeX と同じように組方向が \cs{utod} となる．
+%</ja>
 
+%<*en>
+\subsection{Boxes in different direction}
+
+As in \pTeX, one can use boxes of different direction in one document.
+The below is an example.
+\begin{LTXexample}
+ここは横組%     yoko
+\hbox{\tate %   tate
+  \hbox{縦組}%  tate
+  の中に
+  \hbox{\yoko 横組の内容}% yoko
+  を挿入する
+}
+また横組に戻る% yoko
+\end{LTXexample}
+
+Table~\ref{tab-diffdir} shows how a box is arranged when
+the direction  inside the box and that outside the box differ.
+%</en>
+%<*ja>
 \subsection{異方向のボックス}
 
 縦組の中に「42」などの2桁以上の算用数字を横組で組むなど，
@@ -2558,13 +2671,11 @@ Down-TO-Upの意味なのだろう．\cs{dtou} を使用する機会はないだ
 
 異なる組方向のボックスを配置した場合にどう組まれるかの仕様も，\pTeX を
 踏襲している．表\ref{tab-diffdir}に示す．
-この表\ref{tab-diffdir}では \cs{utod} 方向についての記述を省略しているが，
-それは縦組の場合と全く同じであるためである．
-内部では，異なる組方向のボックスを配置補正用のボックス
-（本ドキュメントでは\textit{dir\_node}と呼ぶ）に包む形態をとっている．
+%</ja>
 
 \begin{table}[t]
-\caption{異方向のボックスの配置}
+%<ja>\caption{異方向のボックスの配置}
+%<en>\caption{Boxes in different direction}
 %<en>\medskip
 \label{tab-diffdir}
  \centering\small\unitlength3mm
@@ -2573,6 +2684,7 @@ Down-TO-Upの意味なのだろう．\cs{dtou} を使用する機会はないだ
      \thicklines
      \polyline(-2,0)(-2,-7)(5,-7)(5,0)
      \put(0,0){\circle*{0.3}}
+     \put(2.5,-4){\makebox(0,0){\hbox{\tate\bfseries \emph{tate}/\emph{utod}}}}
      \put(0,0){\vector(1,0){5}} \put(2.5,-0.2){\makebox(0,0)[t]{$h_{\mathrm{T}}$}}
      \put(0,0){\vector(-1,0){2}}\put(-1,-0.2){\makebox(0,0)[t]{$d_{\mathrm{T}}$}}
      \put(0,0){\vector(0,-1){7}}\put(0.2,-3.5){\makebox(0,0)[l]{$w_{\mathrm{T}}$}}
@@ -2583,6 +2695,7 @@ Down-TO-Upの意味なのだろう．\cs{dtou} を使用する機会はないだ
      \thicklines
      \polyline(-5,0)(-5,7)(2,7)(2,0)
      \put(0,0){\circle*{0.3}}
+     \put(-2.5,4){\makebox(0,0){\hbox{\dtou\bfseries \emph{dtou}}}}
      \put(0,0){\vector(-1,0){5}} \put(-2.5,0.3){\makebox(0,0)[b]{$h_{\mathrm{D}}$}}
      \put(0,0){\vector(1,0){2}}\put(1,0.3){\makebox(0,0)[b]{$d_{\mathrm{D}}$}}
      \put(0,0){\vector(0,1){7}}\put(-0.2,3.5){\makebox(0,0)[r]{$w_{\mathrm{D}}$}}
@@ -2592,6 +2705,7 @@ Down-TO-Upの意味なのだろう．\cs{dtou} を使用する機会はないだ
    \hbox{\smash{\begin{picture}(0,0)
      \thicklines
      \polyline(0,5)(7,5)(7,-2)(0,-2)
+     \put(4,2.5){\makebox(0,0){\hbox{\yoko\bfseries \emph{yoko}}}}
      \put(0,0){\circle*{0.3}}
      \put(0,0){\vector(0,1){5}} \put(0.3,2.5){\makebox(0,0)[l]{$h_{\mathrm{Y}}$}}
      \put(0,0){\vector(0,-1){2}}\put(0.3,-1){\makebox(0,0)[l]{$d_{\mathrm{Y}}$}}
@@ -2600,8 +2714,11 @@ Down-TO-Upの意味なのだろう．\cs{dtou} を使用する機会はないだ
  }
 \begin{tabular}{ccc}
 \toprule
-\emph{横組中に配置}&\emph{縦組中に配置}&%
-\emph{組方向 \cs{dtou} 中に配置}\\
+%<ja>\emph{横組中に配置}&\emph{縦組中に配置}&%
+%<ja>\emph{組方向 \cs{dtou} 中に配置}\\
+%<en>\textbf{typeset in \emph{yoko} direction}
+%<en>&\textbf{typeset in \emph{tate} or \emph{utod} direction}
+%<en>&\textbf{typeset in \emph{dtou} direction}\\
 \midrule
  \parbox[c]{15\unitlength}{\begin{picture}(15,15)(0,-4)
    \put(0,0){\line(1,0){3.8}}
@@ -2757,13 +2874,15 @@ Down-TO-Upの意味なのだろう．\cs{dtou} を使用する機会はないだ
 \end{table}
 
 
-\paragraph{\cs{wd} は組方向には対応しない}
-ボックスレジスタ \cs{box}<num> にセットされているボックスの幅・高さ・深さの取得や
-変更にはそれぞれ \cs{wd},~\cs{ht},~\cs{dp} プリミティブを用いるのであった．
-\pTeX ではこれらのプリミティブは，「現在の組方向におけるボックスの寸法」を指すものであった．
 
-\LuaTeX-jaにおいては状況が異なり，\cs{wd},~\cs{ht},~\cs{dp} は\emph{組方向が
-混在する状況においては正しく機能しない}．具体的には，現在の組方向に依存しないことが挙げられる．
+%<*en>
+\paragraph{\cs{wd} and direction}
+In \pTeX, \cs{wd},~\cs{ht},~\cs{dp} means the dimensions of a box register
+\emph{with respact to the current direction}.
+This means that the value of \cs{wd0} etc.\ might differ when the current direction is
+different, even if \cs{box0} stores the same box.
+However, this no longer applies in \LuaTeX-ja.
+
 \begin{LTXexample}
 % yoko direction
 \setbox0=\hbox to 20pt{foo}
@@ -2772,17 +2891,71 @@ Down-TO-Upの意味なのだろう．\cs{dtou} を使用する機会はないだ
 \the\wd0,~\hbox{\tate \the\wd0}
 \end{LTXexample}
 
-\paragraph{\cs{wd} 等の代替命令}
+To access box dimensions \emph{with respect to current direction}, 
+one have to use the following commands instead of \cs{wd} wtc.
+\begin{cslist}
 
-\pTeX のように現在の組方向に応じたボックスの寸法の取得・設定を行うため，
-次の命令を新設した．
+ \item[\cs{ltjgetwd}\{<num>\}\textrm{, }\cs{ltjgetht}\{<num>\}\textrm{, }%
+  \cs{ltjgetdp}\{<num>\}]
+These commands return \emph{an internal dimension} of \cs{box<num>} with respect to 
+the current direction. One can use these in \cs{dimexpr} primitive, as the followings.
+\begin{verbatim}
+\dimexpr 2\ltjgetwd{42}-3pt\relax, \the\ltjgetwd{1701}
+\end{verbatim}
+By implementaion,  the argument must be grouped as \verb+\ltjgetwd{42}+,
+if the argument consists of more than one token.
+\begin{LTXexample}[width=0.3\textwidth]
+\parindent0pt
+\setbox32767=\hbox{\yoko よこぐみ}
+\fboxsep=0mm\fbox{\copy32767}
+\vbox{\hsize=20mm
+\yoko YOKO \the\ltjgetwd{32767}, \\
+  \the\ltjgetht{32767}, \\ \the\ltjgetdp{32767}.}
+\vbox{\hsize=20mm\raggedleft
+\tate TATE \the\ltjgetwd{32767}, \\
+  \the\ltjgetht{32767}, \\ \the\ltjgetdp{32767}.}
+\vbox{\hsize=20mm\raggedleft
+\dtou DTOU \the\ltjgetwd{32767}, \\
+  \the\ltjgetht{32767}, \\ \the\ltjgetdp{32767}.}
+\end{LTXexample}
+
+ \item[\cs{ltjsetwd}<num>=<dimen>\textrm{, }\cs{ltjsetht}<num>=<dimen>\textrm{, }%
+  \cs{ltjsetdp}<num>=<dimen>]
+These commands set the dimension of \cs{box<num>}. Unlike \cs{ltjgetwd}, one does not need
+	to group the argument <num>; four calls of \cs{ltjsetwd} below have the same meaning.
+\begin{verbatim}
+\ltjsetwd42 20pt,  \ltjsetwd42=20pt,  \ltjsetwd=42 20pt,  \ltjsetwd=42=20pt
+\end{verbatim}
+
+\end{cslist}
+%</en>
+%<*ja>
+\paragraph{\cs{wd} 達と組方向}
+ボックスレジスタ \cs{box}<num> にセットされているボックスの幅・高さ・深さの取得や
+変更にはそれぞれ \cs{wd},~\cs{ht},~\cs{dp} プリミティブを用いるのであった．
+\pTeX ではこれらのプリミティブは，「現在の組方向におけるボックスの寸法」を指すもので，
+同じボックスに対しても現在の組方向によって返る値は異なるもであった．
+
+\LuaTeX-jaにおいては状況が異なり，\cs{wd},~\cs{ht},~\cs{dp} が返す値は
+現在の組方向には依存しない．下の例のように，横組のボックスが格納されていれば
+\cs{wd}等は常に「横組におけるボックスの寸法」を意味する．
+
+\begin{LTXexample}
+% yoko direction
+\setbox0=\hbox to 20pt{foo}
+\the\wd0,~\hbox{\tate\vrule\the\wd0}
+\wd0=100pt
+\the\wd0,~\hbox{\tate \the\wd0}
+\end{LTXexample}
+
+\pTeX のように現在の組方向に応じたボックスの寸法の取得・設定を行うには，
+代わりに次の命令を使用する．
 
 \begin{cslist}
 
- \item[ltjgetwd\{<num>\}\textrm{, }\cs{ltjgetht}\{<num>\}\textrm{, }%
+ \item[\cs{ltjgetwd}\{<num>\}\textrm{, }\cs{ltjgetht}\{<num>\}\textrm{, }%
   \cs{ltjgetdp}\{<num>\}]
 現在の組方向に応じたボックスの寸法の取得を行う．結果は内部長さであるため，
-{\let\item=\origitem
 \begin{verbatim}
 \dimexpr 2\ltjgetwd{42}-3pt\relax, \the\ltjgetwd{1701}
 \end{verbatim}
@@ -2803,23 +2976,50 @@ Down-TO-Upの意味なのだろう．\cs{dtou} を使用する機会はないだ
 \vbox{\hsize=20mm\raggedleft
 \dtou DTOU \the\ltjgetwd{32767}, \\
   \the\ltjgetht{32767}, \\ \the\ltjgetdp{32767}.}
-\end{LTXexample}}
+\end{LTXexample}
 
- \item[ltjsetwd<num>=<dimen>\textrm{, }\cs{ltjsetht}<num>=<dimen>\textrm{, }%
+ \item[\cs{ltjsetwd}<num>=<dimen>\textrm{, }\cs{ltjsetht}<num>=<dimen>\textrm{, }%
   \cs{ltjsetdp}<num>=<dimen>]
 現在の組方向に応じたボックスの寸法の設定を行う．\cs{afterassignment} を2回利用して
 実装しているので，次の4通りは全て同じ意味である．
-{\let\item=\origitem
 \begin{verbatim}
 \ltjsetwd42 20pt,  \ltjsetwd42=20pt,  \ltjsetwd=42 20pt,  \ltjsetwd=42=20pt
 \end{verbatim}
-}%
 
 設定値は「横組」「縦組及び \cs{utod} 方向」「\cs{dtou} 方向」
-の3種ごとに独立して記録される．
+の3種ごとに独立して記録される．……のときにどのようにボックスが配置されるか
+は，Gitリポジトリ内の \verb+test/test55-boxdim_diffdir.{tex,pdf}+ を
+参照してほしい．
 
 \end{cslist}
+%</ja>
 
+%<*en>
+\subsection{Getting current direction}
+The \Param{direction} parameter returns the current direction, and
+the \Param{boxdir} parameter (with the argumant <num>)
+returns the direction of a box register \cs{box}<num>.
+The returned value of these parameters are a \emph{string}:
+\begin{center}
+\small
+\begin{tabular}{>{\bfseries}lccccc}
+\toprule
+Direction&\emph{yoko}&\emph{tate}&\emph{dtou}&\emph{utod}&(empty)\\
+\midrule
+Returned value&\texttt{4}&\texttt{3}&\texttt{1}&\texttt{11}&\texttt{0}\\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{LTXexample}[width=0.3\textwidth]
+\leavevmode\def\DIR{\ltjgetparameter{direction}}
+\hbox{\yoko \DIR}, \hbox{\tate\DIR},
+\hbox{\dtou\DIR}, \hbox{\utod\DIR},
+\hbox{\tate$\hbox{tate math: \DIR}$}
+
+\setbox2=\hbox{\tate}\ltjgetparameter{boxdir}{2}
+\end{LTXexample}
+%</en>
+%<*ja>
 \subsection{組方向の取得}
 「現在の組方向」や「<num>番のボックスの組方向」は，
 \pTeX では\cs{ifydir} や \cs{ifybox}<num> といった条件判断文を使って
@@ -2828,12 +3028,25 @@ Down-TO-Upの意味なのだろう．\cs{dtou} を使用する機会はないだ
 記述されており，それでは新たな条件判断命令を作るのは難しい．
 
 \LuaTeX-jaでは，\Param{direction}パラメータで現在の組方向を，
-\Param{boxdir}パラメータによってボックスの組方向をそれぞれ取得できるようにした．
-戻り値は1文字の数字（文字列）であり，1は \cs{dtou} 方向を，
-3は縦組を，4は横組，11は \cs{utod} 方向を表す：
+\Param{boxdir}パラメータ（と追加の引数<num>）によって
+\cs{box}<num>の組方向をそれぞれ取得できるようにした．
+戻り値は文字列である：
+\begin{center}
+\small
+\begin{tabular}{>{\bfseries}lccccc}
+\toprule
+組方向&\emph{横組}&\emph{tate縦組}&\emph{dtou方向}&\emph{utod方向}&(未割り当て)\\
+\midrule
+戻り値&\texttt{4}&\texttt{3}&\texttt{1}&\texttt{11}&\texttt{0}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
 \begin{LTXexample}[width=0.3\textwidth]
 \leavevmode\def\DIR{\ltjgetparameter{direction}}
-\hbox{\yoko \DIR}, \hbox{\tate\DIR}, \hbox{\dtou\DIR}, \hbox{\utod\DIR}
+\hbox{\yoko\DIR}, \hbox{\tate\DIR},
+\hbox{\dtou\DIR}, \hbox{\utod\DIR},
+\hbox{\tate$\hbox{tate math: \DIR}$}
 
 \setbox2=\hbox{\tate}\ltjgetparameter{boxdir}{2}
 \end{LTXexample}
@@ -2845,25 +3058,40 @@ Down-TO-Upの意味なのだろう．\cs{dtou} を使用する機会はないだ
 \ifnum\ltjgetparameter{boxdir}{200}=3
 \end{verbatim}
 のように行うことができる．
+%</ja>
 
+%<*en>
+\subsection{Overridden box primitives}
+To cope with multiple directions, the following primitives are
+overridden by \LuaTeX-ja, using~\verb+\protected\def+.
+\begin{cslist}[style=standard]
+ \item[\cs{unhbox}<num>\textrm{, }\cs{unvbox}<num>]
+ \item[\cs{vadjust}\{<material>\}]
+ \item[\cs{lastbox}]
+ \item[\cs{raise}<dimen><box>\textrm{, }\cs{lower}<dimen><box>\textrm{\ etc., }\cs{vcenter}] 
+ \item[\cs{vcenter}]
+\end{cslist}
+%</en>
+%<*ja>
 \subsection{プリミティブの再定義}
 異なる組方向に対応するために，以下に挙げるプリミティブは
 \LuaTeX-jaによる前処理もしくは後処理が行われるように
 \ \verb+\protected\def+ により再定義してある．
+
 \begin{cslist}
- \item[unhbox<num>\textrm{, }\cs{unvbox}<num>]
+ \item[\cs{unhbox}<num>\textrm{, }\cs{unvbox}<num>]
  ボックスの組方向が現在のリストと異なる場合は事前にエラーメッセージを出力する．
  \pTeX と異なり，エラーを無視して無理矢理 \cs{unhbox}, \cs{unvbox} を
  続行させることもできるが，その場合の組版結果は保証しない．
- \item[vadjust\{<material>\}] 一旦プリミティブ本来の挙動を行う．その後，<material>の組方向が
+ \item[\cs{vadjust}\{<material>\}] 一旦プリミティブ本来の挙動を行う．その後，<material>の組方向が
  周囲の垂直リストの組方向と一致しない場合にエラーを出力し，
  該当の \cs{vadjust} を無効にする．
- \item[lastbox] 必要ならばボックスの「中身」を包んでいる\textit{dir\_node}を除去し，
+ \item[\cs{lastbox}] ボックスの「中身」を現在の組方向に合わせるためのノード
+	      （\textit{dir\_node}という）を必要ならば除去し，
  正しく「中身」のボックスが返されるように前処理をする．
- \item[raise<dimen><box>\textrm{, }lower<dimen><box>\textrm{\ etc.}] 
+ \item[\cs{raise}<dimen><box>\textrm{, }\cs{lower}<dimen><box>\textrm{\ etc., }\cs{vcenter}]
  一方，こちらでは必要に応じて\textit{dir\_node}を作成する前処理を追加している．
 \end{cslist}
-
 %</ja>
 
 %<en>\section{Font Metric and Japanese Font}
@@ -2961,7 +3189,7 @@ Bounding Box&\t{ujis}&\t{jis}&\t{min}\\
 \end{table}
 
 
-\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
+\begin{cslist}
 \item[jfm=<name>]
 %<*en>
 Specify the name of (horizontal) JFM.
@@ -3035,10 +3263,12 @@ The difference among these three~JFMs is  shown in Table~\ref{tab-difjfm}.
 \end{figure}
 
 %<*en>
-\item[jfmvar=<string>] Sometimes there is a need that \ldots.
+\item[jfmvar=<string>]
+Sometimes there is a need that \ldots.
 %</en>
 %<*ja>
-\item[jfmvar=<string>] 標準では，JFMとサイズが同じで，
+\item[jfmvar=<string>]
+標準では，JFMとサイズが同じで，
   実フォントだけが異なる2つの和文フォントは「区別されない」．例えば
 図\ref{fig:jfmvar}において，最初の「）」と「【」の実フォントは異なるが，
 JFMもサイズも同じなので，普通に「）【」と入力した時と同じように半角空きとなる．
@@ -3049,7 +3279,7 @@ JFMもサイズも同じなので，普通に「）【」と入力した時と�
 かつ\Param{differentjfm}パラメータを \texttt{both} に設定すれば，
 \pTeX と似た状況で組版されることになる．
 %</ja>
-\end{list}
+\end{cslist}
 
 \begin{figure}
 \begin{LTXexample}[pos=t]
@@ -3122,10 +3352,10 @@ OpenType font featureと見かけ上同じような形式で指定できるも�
 %<*en>
 \paragraph{\texttt{extend} and \texttt{slant}}
 The following setting can be specified as OpenType font features:
-\begin{description}
-\item[\texttt{extend=}<extend>] expand the font horizontally by <extend>.
-\item[\texttt{slant=}<slant>] slant the font.
-\end{description}
+\begin{cslist}[style=standard]
+\item[\cs{extend=}<extend>] expand the font horizontally by <extend>.
+\item[\cs{slant=}<slant>] slant the font.
+\end{cslist}
 Note that \LuaTeX-ja doesn't adjust JFMs by these \texttt{extend} and \texttt{slant}
 settings; you have to write new JFMs on purpose.
 For example, the following example uses the standard JFM \texttt{jfm-ujis.lua}, hence
@@ -3285,7 +3515,7 @@ floating-point numbers in design-size unit.
 注意する．
 %</ja>
 
-\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
+\begin{cslist}[style=standard]
 
 \item[dir=<direction>]
 %<en>(required)
@@ -3304,7 +3534,7 @@ JFMの書字方向．\texttt{'yoko'}（横組）と \texttt{'tate'}（縦組）�
 %<ja>（必須）
 
 %<en>The amount of the length of the ``full-width''.
-%<ja>「全角幅」の長さ．
+%<ja>「全角幅」の長さ．この量が \cs{zw} の長さを決定する．
 
 \item[zh=<length>]
 %<en>(required)
@@ -3344,7 +3574,7 @@ Like the \texttt{kanjiskip} field, this field specifies the ``ideal''
 \texttt{kanjiskip}フィールドと同様に，\Param{xkanjiskip}の理想的な量を
 指定する．
 %</ja>
-\end{list}
+\end{cslist}
 
 %<*en>
 \paragraph{Character classes}
@@ -3364,7 +3594,7 @@ the following fields:
 （そのインデックスを$i$で表わす）は以下のフィールドを持つ：
 %</ja>
 
-\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
+\begin{cslist}[style=standard]
 \item[chars=\{<character>, ...\}]
 %<en>(required except character class~0)
 %<ja>（文字クラス0を除いて必須）
@@ -3393,7 +3623,7 @@ This field is a list of characters which are in this character
 \item 「\hbox{\ltjsetparameter{autoxspacing=false}\verb+'あ*'+}」のような，文字それ自体の後にアスタリスクをつけたもの
 \item いくつかの「仮想的な文字」（後に説明する）
 \end{itemize}
-%</ja>
+%</ja> 
 
 \item[width=<length>, height=<length>, depth=<length>, italic=<length>]
 %<en>(required)
@@ -3640,8 +3870,9 @@ Furthermore, the glyph is shifted according to values of fields
 
 \item[kern={\{[$j$]=<kern>, [$j'$]=\{<kern>, [<ratio>]\}, ...\}}]
 
-\item[glue={\{[$j$]=\{<width>, <stretch>, <shrink>, [<priority>], [<ratio>]\}, ...\}}]
+\item[glue={\{[$j$]=\{<width>, <stretch>, <shrink>, [<priority>], [<ratio>]\}, ...\}}]\
 %<*ja>
+
 文字クラス$i$の文字と$j$の文字の間に挿入されるkernやglueの量を指定する．
 
              <priority>は \Pkg{luatexja-adjust} による優先順位付き
@@ -3694,16 +3925,16 @@ we specify <ratio> to
 %</en>
 
 
-\item[end\_stretch=<kern>]
-\item[end\_shrink=<kern>]
+\item[end\_stretch=<kern>, end\_shrink=<kern>]
 %<*ja>
-これらのフィールドは省略可能である．
+（任意）
+
 優先順位付き行長調整が有効であり，かつ現在の文字クラスの文字が行
 	     末に来た時に，行長を詰める調整・伸ばす調整のた
              めにこの文字と行末の間に挿入可能なカーンの大きさを指定する．
 %</ja>
 
-\end{list}
+\end{cslist}
 
 %<*ja>
 \paragraph{文字クラスの決定}
@@ -3821,7 +4052,7 @@ The following is the list of imaginary characters:
 い組版調整ができるようになっている．以下でその一覧を述べる：
 %</ja>
 
-\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
+\begin{cslist}
 %%\item['diffmet']
 %%<en>Used at a boundary between two \textbf{JAchar}s whose JFM or size is different.
 %%<ja>JFMやサイズが異なる2つの\textbf{JAchar}の間の境界として用いられる．
@@ -3841,7 +4072,7 @@ The following is the list of imaginary characters:
 \item[$-1$]
 %<en>The left/right boundary of an inline math formula.
 %<ja>行中数式と地の文との境界．
-\end{list}
+\end{cslist}
 
 %<en>\paragraph{Porting JFM from \pTeX}
 %<ja>\paragraph{\pTeX 用和文用TFMの移植}
@@ -3967,8 +4198,7 @@ be accessed via \verb+luatexbase.add_to_callback+ function and so on, as other c
 これらのコールバックには，他のコールバックと同様に \verb+luatexbase.add_to_callback+
 関数などを用いることでアクセスすることができる．
 %</ja>
-\begin{list}{}%
-{\def\makelabel#1{\bfseries#1}}
+\begin{description}[font=\bfseries, style=nextline]
 %<en>\item[\texttt{luatexja.load\_jfm} callback]
 %<ja>\item[\texttt{luatexja.load\_jfm}コールバック]
 %<*en>
@@ -4068,21 +4298,21 @@ where <spec\_node> is also a node, and $\text{<icflag>}=\textit{from\_jfm}+\text
 %</en>
 %<*ja>
 \verb+jfont_info+ は最低限以下のフィールドを持つが，これらを書き換えてはならない：
-\begin{description}
-\item[\texttt{size}]
+\begin{cslist}
+\item[size]
 実際に使われるフォントサイズ（sp単位）．$1\,\mathrm{sp}=2^{-16}\,\mathrm{pt}$．
-\item[\texttt{zw}, \texttt{zh}, \texttt{kanjiskip}, \texttt{xkanjiskip}]
+\item[zw\textrm{, }zh\textrm{, }kanjiskip\textrm{, }xkanjiskip]
 JFMファイルで指定されているそれぞれの値をフォントサイズに合わせてスケーリングしたものを
 sp単位で格納している．
-\item[\texttt{jfm}]
+\item[jfm]
 利用されているJFMを識別するための番号．
-\item[\texttt{var}]
-\cs{jfont}で指定された \texttt{jfmvar} キーの値（未指定のときは空文字列）．
-\item[\texttt{chars}]
+\item[var]
+\cs{jfont},~\cs{tfont} で指定された \texttt{jfmvar} キーの値（未指定のときは空文字列）．
+\item[chars]
 文字コードから文字クラスへの対応が記述されたテーブル．\\
 JFM内の \texttt{[i].chars=\{<character>, ...\}} という指定は\
 \texttt{chars=\{[<character>]=\,$i$, ...\}} という形式に変換されている．
-\item[\texttt{char\_type}]
+\item[char\_type]
 $i\in\omega$に対して，\texttt{char\_type[$i$]} は文字クラス$i$の文字の寸法を格納しており，
 以下のフィールドを持つ．
 \begin{itemize}
@@ -4109,7 +4339,7 @@ glueであれば，\texttt{[$j$]=\{false, <spec\_node>, <ratio>, <icflag>\}} で
 <spec\_node>はglueの長さを表すノードそのものであり，
       $\text{<icflag>}=\textit{from\_jfm}+\text{<priority>}$である．
 \end{itemize}
-\end{description}
+\end{cslist}
 %</ja>
 
 %<*en>
@@ -4229,7 +4459,7 @@ Then, the position of glyphs is shifted up by
 \[
  \frac{88x}{88x+12x} (28y+5y) - 28y = \frac{26}{25}y= 1.04y.
 \]
-\end{list}
+\end{description}
 
 
 
@@ -4304,8 +4534,9 @@ adopted in the whole paragraph or the whole hbox.
 %</ja>
 \end{itemize}
 
-\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
-\item[\DParam{jcharwidowpenalty}\,=<penalty>$^\ast$] [\cs{jcharwidowpenalty}]
+\begin{description}[font=\mdseries]
+\item[\DParam{jcharwidowpenalty}\,=<penalty>$^\ast$] [\cs{jcharwidowpenalty}]\ 
+
 %<*en>
 Penalty value for suppressing orphans. This penalty is inserted just
 	     after the last \textbf{JAchar} which is not regarded as a
@@ -4318,6 +4549,7 @@ Penalty value for suppressing orphans. This penalty is inserted just
 %</ja>
 
 \item[\DParam{kcatcode}\,=\{<chr\_code>,<natural number>\}$^\ast$]\
+
 %<*en>
 An additional attributes which each character whose character code is <chr\_code> has.
 At the present version, the lowermost bit of <natural number> indicates
@@ -4331,6 +4563,7 @@ At the present version, the lowermost bit of <natural number> indicates
 %</ja>
 
 \item[\DParam{prebreakpenalty}\,=\{<chr\_code>,<penalty>\}$^\ast$] [\cs{prebreakpenalty}]\
+
 %<*ja>
 文字コード<chr\_code>の\textbf{JAchar}が行頭にくることを抑止するために，
 	     この文字の前に挿入/追加されるペナルティの量を指定する．
@@ -4354,7 +4587,9 @@ by default.
 %</en>
 
 
-\item[\DParam{postbreakpenalty}\,=\{<chr\_code>,<penalty>\}$^\ast$] [\cs{postbreakpenalty}]
+\item[\DParam{postbreakpenalty}\,=\{<chr\_code>,<penalty>\}$^\ast$]
+	   [\cs{postbreakpenalty}]\
+
 %<*ja>
 文字コード<chr\_code>の\textbf{JAchar}が行末にくることを抑止するために，
 	     この文字の後に挿入/追加されるペナルティの量を指定する．
@@ -4393,7 +4628,7 @@ for the same character.
 \item[\DParam{tjabaselineshift}\,=<dimen>]\
 \item[\DParam{talbaselineshift}\,=<dimen>] [\cs{tbaselineshift}]
 
-\item[\DParam{jaxspmode}\,=\{<chr\_code>,<mode>\}$^\ast$]
+\item[\DParam{jaxspmode}\,=\{<chr\_code>,<mode>\}$^\ast$]\
 
 %<*en>
 Setting whether inserting \Param{xkanjiskip} is allowed before/after a \textbf{JAchar} whose character code is <chr\_code>.
@@ -4421,7 +4656,7 @@ This parameter is similar to the \cs{inhibitxspcode} primitive of \pTeX, but not
 このパラメータは\pTeX の \cs{inhibitxspcode} プリミティブと似ているが，
 互換性はない．
 %</ja>
-\item[\DParam{alxspmode}\,=\{<chr\_code>,<mode>\}$^\ast$] [\cs{xspcode}]
+\item[\DParam{alxspmode}\,=\{<chr\_code>,<mode>\}$^\ast$] [\cs{xspcode}]\
 
 %<*en>
 Setting whether inserting \Param{xkanjiskip} is allowed before/after a
@@ -4453,7 +4688,8 @@ Note that parameters \Param{jaxspmode} and \Param{alxspmode} share a common tabl
 
 \item[\DParam{autospacing}\,=<bool>] [\cs{autospacing}]
 \item[\DParam{autoxspacing}\,=<bool>] [\cs{autoxspacing}]
-\item[\DParam{kanjiskip}\,=<skip>$^\ast$] [\cs{kanjiskip}]
+\item[\DParam{kanjiskip}\,=<skip>$^\ast$] [\cs{kanjiskip}]\
+
 %<*ja>
 デフォルトで2つの\textbf{JAchar}の間に挿入されるグルーである．
 通常では，\pTeX と同じようにフォントサイズに比例して変わることはない．
@@ -4461,7 +4697,8 @@ Note that parameters \Param{jaxspmode} and \Param{alxspmode} share a common tabl
 値を採用（こちらはフォントサイズに比例）することになっている．
 %</ja>
 
-\item[\DParam{xkanjiskip}\,=<skip>$^\ast$] [\cs{xkanjiskip}]
+\item[\DParam{xkanjiskip}\,=<skip>$^\ast$] [\cs{xkanjiskip}]\
+
 %<*ja>
 デフォルトで\textbf{JAchar}と\textbf{ALchar}の間に挿入されるグルーである．
 \Param{kanjiskip}と同じように，通常ではフォントサイズに比例して変わることはないが，
@@ -4469,7 +4706,7 @@ Note that parameters \Param{jaxspmode} and \Param{alxspmode} share a common tabl
 %</ja>
 
 
-\item[\DParam{differentjfm}\,=<mode>$^\dagger$]
+\item[\DParam{differentjfm}\,=<mode>$^\dagger$]\
 
 %<*en>
 Specify how glues/kerns between two \textbf{JAchar}s whose JFM (or size) are different.
@@ -4500,8 +4737,15 @@ The default value is \texttt{paverage}. \dots
 \item[\DParam{jacharrange}\,=<ranges>]
 \item[\DParam{kansujichar}\,=\{<digit>, <chr\_code>\}$^\ast$] [\cs{kansujichar}]
 
-\item[\DParam{direction}\,=<dir>\ \hbox{\rm (always local)}]
+\item[\DParam{direction}\,=<dir>\ \hbox{\rm (always local)}]\ 
 
+%<*en>
+Assigning to this parameter has the same effect as
+\cs{yoko}~(if $\hbox{<dir>}=4$), \cs{tate}~(if $\hbox{<dir>}=3$),
+\cs{dtou}~(if $\hbox{<dir>}=1$) or \cs{utod}~(if $\hbox{<dir>}=11$).
+If the argument <dir> is not one of 4,~3, 1~nor~11, 
+the behavior of this assignment is undefined.
+%</en>
 %<*ja>
 組方向を変更する \cs{yoko}~(if $\hbox{<dir>}=4$), \cs{tate}~(if $\hbox{<dir>}=3$),
 \cs{dtou}~(if $\hbox{<dir>}=1$), \cs{utod}~(if $\hbox{<dir>}=11$) と同じ役割を持つ．
@@ -4509,7 +4753,7 @@ The default value is \texttt{paverage}. \dots
 動作は未定義である．
 %</ja>
 
-\end{list}
+\end{description}
 
 \subsection{\cs{ltjgetparameter}}
 \label{ssec-getpar}
@@ -4591,7 +4835,7 @@ returns 0,~1, 2,~or~3, instead of \texttt{preonly} etc.
 %<*en>
 \verb+\ltjgetparameter{jacharrange}{+<range>\verb+}+ returns \texttt{0}
 if ``characters which belong to the character range~<range> are \textbf{JAchar}'',
-\texttt{1} if ``\dots are \textbf{ALchar}''.
+\texttt{1} if ``\dots~are \textbf{ALchar}''.
 Although there is no character range~$-1$, specifying $-1$ to <range> does not cause an
       error (returns 1).
 %</en>
@@ -4632,7 +4876,7 @@ and 4 means \emph{yoko} direction (horizontal typesetting).
 %<*en>
 For an integer~<reg\_num> between 0~and~65535,
 \verb+\ltjgetparameter{boxdim}{+<reg\_num>\verb+}+ returns the direction of
-\cs{box}<reg\_num>. If this box is void, the returned value is zero.
+\cs{box}<reg\_num>. If this box register is void, the returned value is zero.
 %</en>
 %<*ja>
 0--65535の数<reg\_num>に対して，
@@ -4872,22 +5116,6 @@ are typeset by \cs{piyo}.
 %<ja>\subsection{NFSS2へのパッチ}
 \label{ssec-nfsspat}
 
-\begin{figure}[!tb]
-\begin{LTXexample}[pos=b]
-\DeclareKanjiFamily{JY3}{edm}{}
-\DeclareFontShape{JY3}{edm}{m}{n}    {<-> s*KozMinPr6N-Regular:jfm=ujis;}{}
-\DeclareFontShape{JY3}{edm}{m}{green}{<-> s*KozMinPr6N-Regular:jfm=ujis;color=007F00}{}
-\DeclareFontShape{JY3}{edm}{m}{blue} {<-> s*KozMinPr6N-Regular:jfm=ujis;color=0000FF}{}
-\DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{green}{"4E00-"67FF,{-2}-{-2}}
-\DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{blue}{ "6800-"9FFF}
-{\kanjifamily{edm}\selectfont
-日本国民は、正当に選挙された国会における代表者を通じて行動し、……}
-\end{LTXexample}
-%<ja>\caption{\cs{DeclareAlternateKanjiFont} の使用例}
-%<en>\caption{An example of \cs{DeclareAlternateKanjiFont}}
-\label{fig:altkanji}
-\end{figure}
-
 %<*en>
 Japanese patch for NFSS2 in \LuaTeX-ja
 is based on \texttt{plfonts.dtx} which plays the same role in \pLaTeXe.
@@ -4903,11 +5131,10 @@ commands which are not described in Subsection~\ref{ssec-chgfnt}.
 %</ja>
 
 \begin{cslist}%
-\par\smallskip\par\hskip-\leftskip{\bfseries%
+\item[\normalfont\bfseries %
 %<ja>追加の長さ変数達
 %<en>additonal dimensions
-}\par
-
+]
 %<*en>
 Like \pLaTeXe, \LuaTeX-ja defines the following dimensions
 for information of current Japanese font:
@@ -4915,20 +5142,18 @@ for information of current Japanese font:
 %<*ja>
 \pLaTeXe と同様に，\LuaTeX-jaは「現在の和文フォントの情報」を格納する長さ変数
 %</ja>
-{\let\item=\origitem
 \begin{quote}
  \cs{cht}~(height), \cs{cdp}~(depth), \cs{cHT}~(sum of former two),\\
  \cs{cwd}~(width), \cs{cvs}~(lineskip), \cs{chs}~(equals to \cs{cwd})
-\end{quote}}
+\end{quote}
 %<en>and its \cs{normalsize} version:
 %<ja>と，その \cs{normalsize} 版である
-{\let\item=\origitem
 \begin{quote}
  \cs{Cht}~(height), \cs{Cdp}~(depth),
  \cs{Cwd}~(width), \\\cs{Cvs}~(equals to \cs{baselineskip}),
  \cs{Chs}~(equals to \cs{cwd})%
 %<en>.
-\end{quote}}
+\end{quote}
 %<*ja>
 を定義している．なお，\cs{cwd} と \cs{zw}，また
 \cs{cHT} と \cs{zh} は一致しない可能性がある．なぜなら，
@@ -4943,8 +5168,10 @@ but on the other hand \cs{zw}~and~\cs{zh} are specified by JFM.
 %</en>
 
 
-\item[DeclareYokoKanjiEncoding\{<encoding>\}\{<text-settings>\}\{<math-settings>\}]
-\item[DeclareYokoKanjiEncoding\{<encoding>\}\{<text-settings>\}\{<math-settings>\}]
+\item[\cs{DeclareYokoKanjiEncoding}\{<encoding>\}\{<text-settings>\}\{<math-settings>\}]
+%<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
+%<ja>\ \\[\dimexpr-2\baselineskip\relax]
+\item[\cs{DeclareTateKanjiEncoding}\{<encoding>\}\{<text-settings>\}\{<math-settings>\}]
 
 %<*en>
 In NFSS2 under \LuaTeX-ja, distinction between alphabetic font families
@@ -4952,7 +5179,7 @@ In NFSS2 under \LuaTeX-ja, distinction between alphabetic font families
 	     encodings. For example, encodings OT1 and T1 are for
 	     alphabetic font families, and a Japanese font family cannot
 	     have these encodings. These command define a new encoding
-	     scheme for Japanese font family.
+	     scheme for Japanese font families.
 %</en>
 %<*ja>
 \LuaTeX-jaのNFSS2においては，欧文フォントファミリと和文フォントファミリは
@@ -4963,9 +5190,13 @@ In NFSS2 under \LuaTeX-ja, distinction between alphabetic font families
 それぞれ定義する．
 %</ja>
 
-\item[DeclareKanjiEncodingDefaults\{<text-settings>\}\{<math-settings>\}]
-\item[DeclareKanjiSubstitution\{<encoding>\}\{<family>\}\{<series>\}\{<shape>\}]
-\item[DeclareErrorKanjiFont\{<encoding>\}\{<family>\}\{<series>\}\{<shape>\}\{<size>\}]
+\item[\cs{DeclareKanjiEncodingDefaults}\{<text-settings>\}\{<math-settings>\}]
+%<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
+%<ja>\ \\[\dimexpr-2\baselineskip\relax]
+\item[\cs{DeclareKanjiSubstitution}\{<encoding>\}\{<family>\}\{<series>\}\{<shape>\}]
+%<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
+%<ja>\ \\[\dimexpr-2\baselineskip\relax]
+\item[\cs{DeclareErrorKanjiFont}\{<encoding>\}\{<family>\}\{<series>\}\{<shape>\}\{<size>\}]
 
 %<*en>
 The above 3~commands are just the counterparts for \cs{DeclareFontEncodingDefaults} and~others.
@@ -4974,7 +5205,7 @@ The above 3~commands are just the counterparts for \cs{DeclareFontEncodingDefaul
 上記3つのコマンドはちょうど \cs{DeclareFontEncodingDefaults} などに対応するものである．
 %</ja>
 
-\item[reDeclareMathAlphabet\{<unified-cmd>\}\{<al-cmd>\}\{<ja-cmd>\}]
+\item[\cs{reDeclareMathAlphabet}\{<unified-cmd>\}\{<al-cmd>\}\{<ja-cmd>\}]
 
 % ToDo: en
 %<*ja>
@@ -4986,24 +5217,21 @@ The above 3~commands are just the counterparts for \cs{DeclareFontEncodingDefaul
 	     更させるようにするのが一般的と思われる．
 
 本命令は
-{\let\item=\origitem
 \begin{center}\tt
 <unified-cmd>\{<arg>\}\quad$\longrightarrow$\quad
 (<al-cmd>の1段展開結果)\{<ja-cmd>の1段展開結果)\{<arg>\}\}
 \end{center}
 と定義を行うので，使用には注意が必要である：
-\vspace{-\medskipamount}
-%<en>\advance\linewidth-2em
-%<ja>\advance\linewidth-2\zw
+%<en>\vspace{-\medskipamount}
 \begin{itemize}
 \item <al-cmd>,~<ja-cmd>は既に定義されていなければならない．
       \cs{reDeclareMathAlphabet}\\の後に
 両命令の内容を再定義しても，<unified-cmd>の内容にそれは反映されない．
 \item <al-cmd>,~<ja-cmd>に\verb+\@mathrm+などと \texttt{@} をつけた命令を指定した時の動作は保証できない．
-\end{itemize}}
+\end{itemize}
 %</ja>
 
-\item[DeclareRelationFont\{<ja-encoding>\}\{<ja-family>\}\{<ja-series>\}\{<ja-shape>\}\\*
+\item[\cs{DeclareRelationFont}\{<ja-encoding>\}\{<ja-family>\}\{<ja-series>\}\{<ja-shape>\}\\*
   \null\hfill\{<al-encoding>\}\{<al-family>\}\{<al-series>\}\{<al-shape>\}]
 %<*en>
 This command sets the ``accompanied'' alphabetic font family (given by the latter 4~arguments)
@@ -5013,7 +5241,7 @@ with respect to a Japanese font family given by the former 4~arguments.
 いわゆる「従属欧文」を設定するための命令である．前半の4引数で表される和文フォントファミリに対して，
 そのフォントに対応する「従属欧文」のフォントファミリを後半の4引数により与える．
 %</ja>
-\item[SetRelationFont]
+\item[\cs{SetRelationFont}]
 %<*en>
 This command is almost same as \cs{DeclareRelationFont}, except that this command does a local
 assignment, where \cs{DeclareRelationFont} does a global assignment.
@@ -5023,7 +5251,7 @@ assignment, where \cs{DeclareRelationFont} does a global assignment.
 ほとんど同じである（\cs{DeclareRelationFont} はグローバル）．
 %</ja>
 
-\item[userelfont]
+\item[\cs{userelfont}]
 %<*en>
 Change current alphabetic font encoding/family/\dots\ to the `accompanied' alphabetic
 	     font family with respect to current Japanese font family,
@@ -5038,7 +5266,7 @@ Like \cs{fontfamily}, \cs{selectfont} is required to take an effect.
 \cs{fontfamily} のように，有効にするためには \cs{selectfont} が必要である．
 %</ja>
 
-\item[adjustbaseline]
+\item[\cs{adjustbaseline}]
 %<*en>
 In \pLaTeXe, \cs{adjustbaseline} sets \cs{tbaselineshift}
 to match the vertical center of ``M'' and that of ``あ''  in vertical typesetting:
@@ -5062,7 +5290,7 @@ In \LuaTeX-ja, this \cs{adjustbaseline} does same task.
 \LuaTeX-jaにおいても\cs{adjustbaseline} は同様の処理を行っている．
 %</ja>
 
-\item[fontfamily\{<family>\}]
+\item[\cs{fontfamily}\{<family>\}]
 %<*en>
 As in \LaTeXe, this command changes current font family (alphabetic, Japanese,~\emph{or both})
 to <family>. Which family will be changed is determined as follows:
@@ -5072,10 +5300,6 @@ to <family>. Which family will be changed is determined as follows:
 和文，\emph{もしくは両方}）を<family>に変更する．
 どのファミリが変更されるかは以下のようにして決定される：
 %</ja>
-{\let\item\origitem
-%<en>\advance\linewidth-2em
-%<ja>\advance\linewidth-2\zw
-\vspace{-\medskipamount}
 \begin{itemize}
 %<*en>
 \item Let current encoding scheme for Japanese fonts be
@@ -5129,21 +5353,33 @@ In this case, the default family for font substitution is used for
 %</ja>
 \end{itemize}%
 %<en>\vspace{-\medskipamount}
-}
 
-\item[DeclareAlternateKanjiFont\{<base-encoding>\}\{<base-family>\}\{<base-series>\}\{<base-shape>\}\\
+
+\begin{figure}[!tb]
+\begin{LTXexample}[pos=b]
+\DeclareKanjiFamily{JY3}{edm}{}
+\DeclareFontShape{JY3}{edm}{m}{n}    {<-> s*KozMinPr6N-Regular:jfm=ujis;}{}
+\DeclareFontShape{JY3}{edm}{m}{green}{<-> s*KozMinPr6N-Regular:jfm=ujis;color=007F00}{}
+\DeclareFontShape{JY3}{edm}{m}{blue} {<-> s*KozMinPr6N-Regular:jfm=ujis;color=0000FF}{}
+\DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{green}{"4E00-"67FF,{-2}-{-2}}
+\DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{blue}{ "6800-"9FFF}
+{\kanjifamily{edm}\selectfont
+日本国民は、正当に選挙された国会における代表者を通じて行動し、……}
+\end{LTXexample}
+%<ja>\caption{\cs{DeclareAlternateKanjiFont} の使用例}
+%<en>\caption{An example of \cs{DeclareAlternateKanjiFont}}
+\label{fig:altkanji}
+\end{figure}
+
+\item[\cs{DeclareAlternateKanjiFont}\{<base-encoding>\}\{<base-family>\}\{<base-series>\}\{<base-shape>\}\\
   \null\hfill\{<alt-encoding>\}\{<alt-family>\}\{<alt-series>\}\{<alt-shape>\}\{<range>\}]
 %<*ja>
 \ref{ssec-altfont}節の\
 \cs{ltjdeclarealtfont} と同様に，前半の4引数の
 和文フォント（基底フォント）のうち<range>中の文字を
-第5--第8引数の和文フォントを使って組むように指示する．
+第5から第8引数の和文フォントを使って組むように指示する．
 使用例を図\nobreak\ref{fig:altkanji}に載せた．
 
-{\let\item\origitem
-%<en>\advance\linewidth-2em
-%<ja>\advance\linewidth-2\zw
-\vspace{-\medskipamount}
 \begin{itemize}
  \item
 \cs{ltjdeclarealtfont} では基底フォント・置き換え先和文フォントはあらかじめ定義されてい
@@ -5156,7 +5392,6 @@ In this case, the default family for font substitution is used for
 <range>に負数$-n$を指定した場合，それが「基底フォントの文字クラス$n$に属する文字全体」
 と解釈されるのは \cs{ltjdeclarealtfont} と同じである．
 \end{itemize}%
-}
 %</ja>
 %<*en>
 As \cs{ltjdeclarealtfont}~(Subsection~\ref{ssec-altfont}),
@@ -5166,10 +5401,6 @@ by the Japanese font which specified by fifth to eighth arguments
 (we say the \emph{alternate font}).
 An example is shown in Figure~\ref{fig:altkanji}.
 
-{\let\item\origitem
-%<en>\advance\linewidth-2em
-%<ja>\advance\linewidth-2\zw
-\vspace{-\medskipamount}
 \begin{itemize}
  \item
 In \cs{ltjdeclarealtfont}, the base font and the alternate font must be already defined.
@@ -5179,7 +5410,6 @@ current Japanese font is changed, or only after \cs{selectfont} is executed.
  \item \dots
 \end{itemize}%
 \vspace{-\medskipamount}
-}
 %</en>
 \end{cslist}
 
@@ -5231,25 +5461,31 @@ the commands of Japanese version:
 %</ja>
 
 
-\begin{list}{}{\def\makelabel{\ttfamily}\def\{{\char`\{}\def\}{\char`\}}\advance\leftmargin1\zw}
-\item[CID=<name>]
-\item[JFM=<name>]
-\item[JFM-var=<name>] \
+\begin{cslist}
+\item[CID=<name>\textrm{, }JFM=<name>\textrm{, }JFM-var=<name>]
 
 %<*en>
 These 3 keys correspond to \texttt{cid}, \texttt{jfm} and
-\texttt{jfmvar} keys for \cs{jfont} respectively.
-\texttt{CID} is effective only when with \texttt{NoEmbed}
-described below.
-See Subsections~\ref{ssec-jfont} and \ref{ssec-psft} for details.
+\texttt{jfmvar} keys for \cs{jfont}~and~\cs{tfont} respectively.
+See Subsections~\ref{ssec-jfont} and \ref{ssec-psft} for details
+ of \texttt{cid}, \texttt{jfm} and
+\texttt{jfmvar} keys.
+
+The \texttt{CID} key is effective only when with \texttt{NoEmbed}
+described below. The same JFM cannot be used in both horizontal Japanese fonts and
+	     vertical Japanese fonts, hence the \texttt{JFM} key 
+will be actually used in \texttt{YokoFeatures}~and~\texttt{TateFeatures} keys.
 %</en>
 %<*ja>
-これら3つのキーはそれぞれ \cs{jfont} に対する
+これら3つのキーはそれぞれ \cs{jfont},~\cs{tfont}に対する
 \texttt{cid}, \texttt{jfm}, \texttt{jfmvar}キーとそれぞれ対応する．
-\texttt{CID} は下の \texttt{NoEmbed} と合わせて用いられたときのみ有効である．
-\cs{jfont} プリミティブに対する
 \texttt{cid}, \texttt{jfm}, \texttt{jfmvar}キーの詳細は\ref{ssec-jfont}節
 	     と\ref{ssec-psft}節を参照．
+
+\texttt{CID} キーは下の \texttt{NoEmbed} と合わせて用いられたときのみ有効である．
+また，横組用JFMと縦組用JFMは共用できないため，実際に \texttt{JFM} キーを用いる際は
+後に述べる\ \texttt{YokoFeatures},~\texttt{TateFeatures}\ の中で用いる
+ことになる．
 %</ja>
 
 \item[NoEmbed]
@@ -5260,6 +5496,31 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
 %<*ja>
 これを指定することで，PDFに埋め込まれない「名前だけ」のフォントを指定することが
 できる．\ref{ssec-psft}節を参照．
+%</ja>
+
+\begin{figure}[!tb]
+\begin{LTXexample}
+\jfontspec[
+  YokoFeatures={Color=007F00},
+  TateFeatures={Color=00007F},
+  TateFont=KozGoPr6N-Regular
+]{KozMinPr6N-Regular}
+\parbox<y>{2\zw}[b]{横組のテスト}
+\parbox<t>{2\zw}[b]{縦組のテスト}
+\end{LTXexample}
+%<ja>\caption{\texttt{TateFeatures} 等の使用例}
+%<en>\caption{An example of \texttt{TateFeatures} etc.}
+\label{fig:yokotate-fontspec}
+\end{figure}
+
+\item[TateFeatures=\{<features>\}\textrm{, }TateFont=<font>]
+%<en> ...
+%<*ja>
+%</ja>
+
+\item[YokoFeatures=\{<features>\}]
+%<en> ...
+%<*ja>
 %</ja>
 
 
@@ -5280,7 +5541,7 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
 \label{fig:altkanji-fontspec}
 \end{figure}
 
-\item[AltFont]\
+\item[AltFont]
 
 %<*en>
 As \cs{ltjdeclarealtfont}~(Subsection~\ref{ssec-altfont}) and
@@ -5294,7 +5555,7 @@ as the following:
 \ref{ssec-altfont}節の \cs{ltjdeclarealtfont} や，
 \ref{ssec-nfsspat}節の \cs{DeclareAlternateKanjiFont} と同様に，
 このキーを用いると一部の文字を異なったフォントやfont featureを使って組むことができる．
-\texttt{AltFont} に指定する値は，次のように二重のコンマ区切りリストである：
+\texttt{AltFont} キーに指定する値は，次のように二重のコンマ区切りリストである：
 %</ja>
 \begin{lstlisting}[escapechar=\#]
 AltFont = {
@@ -5312,14 +5573,68 @@ A demonstrarion is shown in Figure~\ref{fig:altkanji-fontspec}.
 %</en>
 %<*ja>
 各部分リストには \texttt{Range} キーが必須である（含まれない部分リストは
-単純に無視される）．
-指定例は図\ref{fig:altkanji-fontspec}に示した．
+単純に無視される）．指定例は図\ref{fig:altkanji-fontspec}に示した．
 %</ja>
-\end{list}
+\end{cslist}
 
 %<*ja>
 なお，\Pkg{luatexja-fontspec} 読み込み時には和文フォント定義ファイル%
 \texttt{<ja-enc><family>.fd}は全く参照されなくなる．
+%</ja>
+
+
+%<*en>
+\paragraph{Remark on \texttt{AltFont}, \texttt{YokoFeatures}, \texttt{TateFeatures} keys}
+In \texttt{AltFont},~\texttt{YokoFeatures},~\texttt{TateFeatures} keys,
+one cannot specify per-shape settings such as \texttt{BoldFeatures}.
+For example, 
+\begin{lstlisting}
+AltFont = {
+  { Font=HogeraMin-Light, BoldFont=HogeraMin-Bold, 
+    Range="3000-"30FF, BoldFeatures={Color=007F00} }
+}
+\end{lstlisting}
+does \emph{not} work. Instead, one have to write
+\begin{lstlisting}
+UprightFeatures = {
+  AltFont = { { Font=HogeraMin-Light, Range="3000-"30FF, } },
+},
+BoldFeatures = {
+  AltFont =  { { Font=HogeraMin-Bold, Range="3000-"30FF, Color=007F00 } },
+}
+\end{lstlisting}
+
+On the other hand, \texttt{YokoFeatures}, \texttt{TateFeatures} and  \texttt{TateFont}
+keys can be specified in each list in the \texttt{AltFont} key. Also, 
+one can specify \texttt{AltFont} inside \texttt{YokoFeatures},~\texttt{TateFeatures}.
+%</en>
+%<*ja>
+\paragraph{\texttt{AltFont}, \texttt{YokoFeatures}, \texttt{TateFeatures} 等の制限}
+\texttt{AltFont},~\texttt{YokoFeatures},~\texttt{TateFeatures}の各キーは
+シェイプ別に指定されるべきものであり，
+内部では \texttt{BoldFeatures} などのシェイプ別の指定は行うことが出来ない．
+例えば．
+\begin{lstlisting}
+AltFont = {
+  { Font=HogeraMin-Light, BoldFont=HogeraMin-Bold, 
+    Range="3000-"30FF, BoldFeatures={Color=007F00} }
+}
+\end{lstlisting}
+のように指定することは出来ず，
+\begin{lstlisting}
+UprightFeatures = {
+  AltFont = { { Font=HogeraMin-Light, Range="3000-"30FF, } },
+},
+BoldFeatures = {
+  AltFont =  { { Font=HogeraMin-Bold, Range="3000-"30FF, Color=007F00 } },
+}
+\end{lstlisting}
+のように指定しなければならない．
+
+一方，\texttt{AltFont} キー内の各リストでは
+\ \texttt{YokoFeatures},~\texttt{TateFeatures} 及び \texttt{TateFont} キーを
+指定することは可能であり．また\ \texttt{YokoFeatures},~\texttt{TateFeatures} キーの
+中身に \texttt{AltFont} を指定することができる．
 %</ja>
 
 
@@ -5338,7 +5653,7 @@ commands:
 \Pkg{luatexja-otf}は以下の2つの低レベルコマンドを提供する：
 %</ja>
 \begin{cslist}
-\item[CID\{<number>\}]
+\item[\cs{CID}\{<number>\}]
 %<*en>
 Typeset a character whose CID number is <number>.
 %</en>
@@ -5346,7 +5661,7 @@ Typeset a character whose CID number is <number>.
 CID番号が<number>の文字を出力する．
 %</ja>
 
-\item[UTF\{<hex\_number>\}]
+\item[\cs{UTF}\{<hex\_number>\}]
 %<*en>
 Typeset a character whose character code is <hex\_number> (in hexadecimal).
 This command is similar to \verb+\char"+<hex\_number>,\ %"
@@ -5558,13 +5873,13 @@ for making the difference obvious.
 \Pkg{luatexja-adjust} は，以下の命令を提供する．これらはすべてグローバルに効力を発揮する．
 
 \begin{cslist}
-\item[ltjdisableadjust]
+\item[\cs{ltjdisableadjust}]
 優先順位付きの行長調整を無効化する．
 
-\item[ltjenableadjust]
+\item[\cs{ltjenableadjust}]
 優先順位付きの行長調整を有効化する．
 
-\origitem[\textsf{adjust}\,=<bool>] \cs{ltjsetparameter} で指定可能な追加パラメータであり，
+\item[\textsf{adjust}\,=<bool>] \cs{ltjsetparameter} で指定可能な追加パラメータであり，
 <bool>が\textit{true}なら \cs{ltjenableadjust} を，
 そうでなければ \cs{ltjdisableadjust} を実行する．
 \end{cslist}
@@ -5673,7 +5988,136 @@ among the line-head form, the line-middle form, and the line-end form.
 \end{LTXexample}
 
 
+%<*ja>
+\subsection{\texttt{lltjext.sty}}
+\pLaTeX では縦組用の拡張として \Pkg{plext} パッケージが用意されていたが，
+それを\LuaTeX-ja用に書きなおしたものが本追加パッケージ \Pkg{lltjext} である．
 
+従来の \Pkg{plext} パッケージとの違いは，
+{\catcode`\<=12
+\begin{itemize}
+ \item 組方向オプション \texttt{<y>}（横組），\texttt{<t>}（縦組），
+\texttt{<z>}\ の他に\ \texttt{<d>}（dtou方向），\texttt{<u>}（utod方向）を追加した．
+\texttt{<z>} と \texttt{<u>} の違いは，\texttt{<z>} が周囲の組方向が縦組のときにしか意味を持たない
+       のに対し，\texttt{<u>} にはそのような制限がないことである．
+
+ \item \Pkg{plext} パッケージでは，表組（\texttt{tabular} 環境，\texttt{align} 環境等）や
+\texttt{minipage} 環境，\cs{parbox} 命令において，
+垂直位置指定 \texttt{[t]},~\texttt{[b]} の挙動が非読み込み時と微妙に変わることがあった．
+
+\Pkg{lltjext} パッケージでは，垂直位置指定が\LaTeXe と同様の挙動（以下に示す）に
+なるように修正した．
+\begin{itemize}
+ \item \texttt{[t]} オプション指定時は，ボックスのベースラインが中身の1行目のベースライン
+       （1行目の上に罫線などが来た時は，ボックスの上端）に一致するように配置する．
+ \item \texttt{[b]} オプション指定時は，ボックスのベースラインが中身の最終行のベースライン
+       （中身の最後が罫線などの時は，ボックスの下端）に一致するように配置する．
+ \item それ以外のときは，ボックスの中央が「数式の軸」に一致するように配置する．
+\end{itemize}
+特に縦組の場合，「数式の軸」は……
+
+ \item 連数字用命令 \cs{rensuji} における位置合わせオプション……
+\end{itemize}
+}
+%</ja>
+%<*en>
+\subsection{\texttt{lltjext.sty}}
+\pLaTeX\ supplies additional macros for vertical writing in the \Pkg{plext} package.
+The \Pkg{lltjext} package which we want to describe here is the \LuaTeX-ja
+counterpart of the \Pkg{plext} package.
+%</en>
+
+%<*ja>
+念の為，本 \Pkg{lltjext} パッケージで追加・変更している命令の一覧を載せておく．
+\begin{cslist}
+\item[tabular\textrm{, }array\textrm{, }minipage環境]
+これらの環境は，
+\begin{verbatim}
+\begin{tabular}<dir>[pos]{table spec} ... \end{tabular}
+\begin{array}<dir>[pos]{table spec}   ... \end{array}
+\begin{minipage}<dir>[pos]{width}     ... \end{minipage}
+\end{verbatim}
+のように，組方向オプション \texttt{\<dir\>} が拡張されている．
+既に述べたように，組方向オプションに指定できる値は以下の5つであり，
+それ以外を指定した時や無指定時は周囲の組方向と同じ組方向になる．
+\begin{description}
+ \item[y] 横組(\cs{yoko})
+ \item[t] 縦組(\cs{tate})
+ \item[z] 周囲が縦組の時はutod方向，それ以外はそのまま
+ \item[d] dtou方向
+ \item[u] utod方向
+\end{description}
+\item[\cs{parbox}\<<dir>\>{[<pos>]}\{<width>\}\{<contents>\}]
+\cs{parbox} 命令も同様に，組方向の指定ができるように拡張されている．
+
+\item[\cs{pbox}\<<dir>\>{[<width>][<pos>]}\{<contents>\}]
+組方向<dir>で<contents>の中身をLRモードで組む命令である．
+<width>が正の値であるときは，ボックス全体の幅がその値となる．
+その際，中身は<pos>の値に従い，左寄せ(\texttt{l})，右揃え(\texttt{r})，
+中央揃え（それ以外）される．
+\item[picture環境]
+図表作成に用いる \texttt{picture} 環境も，
+\begin{verbatim}
+\begin{picture}<dir>(x_size, y_size)(x_offset,y_offset)
+  ...
+\end{picture}
+\end{verbatim}
+と組方向が指定できるように拡張されている．
+$x$成分の増加方向は字送り方向，$y$成分の増加方向は行送り方向の\emph{反対方向}となる．
+\Pkg{plext} パッケージと同様に
+内部ではベースライン補正（\Param{yalbaselineshift}パラメータなど）の影響を受けないように，
+\cs{put},~\cs{line}, \cs{vector}, \cs{dashbox}, \cs{oval},~\cs{circle}も
+ベースライン補正を受けないように再定義されている．
+
+\item[\cs{rensuji}{[<pos>]}\{<contents>\}\textrm{, }\cs{rensujiskip}]
+
+\item[\cs{Kanji}\{<counter\_name>\}]
+
+\item[\cs{kasen}\{<contents>\}\textrm{, }\cs{bou}\{<contents>\}\textrm{,
+		     }\cs{boutenchar}]
+
+\item[参照番号]
+\end{cslist}
+%</ja>
+%<*en>
+\begin{cslist}
+\item[tabular\textrm{, }array\textrm{, }minipage\textrm{ environments}]
+These environments are extended by \texttt{\<dir\>}, which specifies the direction,
+as follows:
+\begin{verbatim}
+\begin{tabular}<dir>[pos]{table spec} ... \end{tabular}
+\begin{array}<dir>[pos]{table spec}   ... \end{array}
+\begin{minipage}<dir>[pos]{width}     ... \end{minipage}
+\end{verbatim}
+This option permits one of the following five values. If none of them is specified,
+the direction inside the environment is same as that outside the enviromnent.
+\begin{description}
+ \item[y] \emph{yoko} direction (horizontal writing)
+ \item[t] \emph{tate} direction (vertical writing)
+ \item[z] \emph{utod} direction if direction outside the env.\ is \emph{tate}.
+ \item[d] \emph{dtou} direction
+ \item[u] \emph{utod} direction
+\end{description}
+\item[\cs{parbox}\<<dir>\>{[<pos>]}\{<width>\}\{<contents>\}]
+\cs{parbox} command is also extended by \texttt{\<dir\>}.
+
+\item[\cs{pbox}\<<dir>\>{[<width>][<pos>]}\{<contents>\}]
+This commands typeset <contents> in LR-mode, in <dir> direction.
+If <width> is positive, the width of the box becomes this <width>.
+In this case, <contents> will be aligned \dots
+
+\item[picture\textrm{environment}]
+
+\item[\cs{rensuji}{[<pos>]}\{<contents>\}\textrm{, }\cs{rensujiskip}]
+
+\item[\cs{Kanji}\{<counter\_name>\}]
+
+\item[\cs{kasen}\{<contents>\}\textrm{, }\cs{bou}\{<contents>\}\textrm{,
+		     }\cs{boutenchar}]
+
+\item[参照番号]
+\end{cslist}
+%</en>
 
 
 
@@ -5886,18 +6330,17 @@ $i$は7より小さい自然数．
 \attr{ltj@dir}
 %<*ja>
 ボックスにおける組方向を示す．通常のボックスでは
-\begin{description}
-\item[\textit{dir\_dtou} (1)]
-\item[\textit{dir\_tate} (3)]
-\item[\textit{dir\_yoko} (4)]
-\end{description}
-のいずれかに次を加えた値(17,~19, 20, 33, 35,~36)をとるボックスが作られることもあ
+\begin{quote}
+ \textit{dir\_dtou} (1), \textit{dir\_tate} (3), 
+ \textit{dir\_yoko} (4), \textit{dir\_utod} (11)
+\end{quote}
+のいずれかであり，これらに次を加えた値をとるボックスが作られることもあ
 			 る（\ref{sec-dir-imp}章参照）．
 %</ja>
 \begin{description}
-\item[\textit{dir\_node\_auto} (16)]
+\item[\textit{dir\_node\_auto} (128)]
 %<ja> 異なる組方向に配置するために自動的に作られたボックス．
-\item[\textit{dir\_node\_manual} (32)]
+\item[\textit{dir\_node\_manual} (256)]
 %<ja> \cs{ltjsetwd} によって「ボックスの本来の組方向とは異なる組方向での寸法」を
 %<ja> 設定したときに，それを記録するためのボックス．
 \end{description}
@@ -6311,6 +6754,40 @@ but also by the value of \cs{globaldefs}.
 なく，実行時の \cs{globaldefs} の値にも依存して定まる．}．
 %</ja>
 
+%<*en>
+\paragraph{Getting parameters}
+\cs{ltjgetparameter} is implemented by a Lua script.
+
+For parameters that do not need additional arguments, one only have to
+define a function in the table \verb+luatexja.unary_pars+.
+For example, with the following function, 
+\verb+\ltjgetparameter{hoge}+ returns a \emph{string} \texttt{42}.
+\begin{lstlisting}[numbers=left]
+function luatexja.unary_pars.hoge (t)
+  return 42
+end
+\end{lstlisting}
+Here the argument of \verb+luatexja.unary_pars.hoge+ is
+the stack level of \LuaTeX-ja's stack system (see Subsection~\ref{ssec-stack}).
+
+On the other hand, for parameters that need an additional argument
+(this must be an integer), one have to define a function in
+\verb+luatexja.binary_pars+ first. For example,
+\begin{lstlisting}[numbers=left]
+function luatexja.binary_pars.fuga (c, t)
+  return tostring(c) .. ', ' .. tostring(42)
+end
+\end{lstlisting}
+Here the first argument $t$ is the stack level, as before.
+The second argument $c$ is just the second argument of \cs{ltjgetparameter}.
+
+For parameters that need an additional argument, one also have to 
+execute the \TeX\ code like
+\begin{verbatim}
+\ltj@@decl@array@param{fuga}
+\end{verbatim}
+to indicate that ``the parameter \texttt{fuga} needs an additional argument''.
+%</en>
 %<*ja>
 \paragraph{パラメータの取得}
 一方，\cs{ltjgetparameter} はLuaスクリプトによって実装されている．
@@ -7358,7 +7835,7 @@ Consider the following input:
 %<en>The line~2 is transformed by the callback to
 %<ja>ここで，2行目は \verb+process_input_buffer+ の作用により，
 \begin{lstlisting}[showspaces, escapechar=\!]
-#\!\IVSA FFFFF!ほ!\IVSA FFFFF !げ x!\IVSA FFFFF !ぴ!\IVSA FFFFF !よ#
+#\!\IVSA FFFFF!ほ!\IVSA FFFFF!げ x!\IVSA FFFFF!ぴ!\IVSA FFFFF!よ#
 \end{lstlisting}
 %<*en>
 before the line is actually processed.
@@ -7811,12 +8288,11 @@ its binary version is also updated.
 \subsection{キャッシュの使用箇所}
 
 \LuaTeX-ja では以下の3種類のキャッシュを使用している：
-\begin{list}{}%
-{\def\makelabel#1{\ttfamily#1}}
+\begin{cslist}
 \item[ltj-cid-auto-adobe-japan1.lua]
 Ryumin-Lightのような非埋め込みフォントの情報を格納しており，
 （それらが\LuaTeX-jaの標準和文フォントなので）\LuaTeX-jaの読み込み時に自動で読まれる．
-生成には\texttt{UniJIS2004-UTF32-H}, \texttt{Adobe-Japan1-UCS2}という2つの
+生成には\texttt{UniJIS2004-UTF32-\{H, V\}}, \texttt{Adobe-Japan1-UCS2}という3つの
 CMapが必要である．
 
 \pageref{para-cid}ページで述べたように，\texttt{cid}キーを使って
@@ -7830,8 +8306,7 @@ CMapが必要である．
 \subsection{Use of Cache}
 
 \LuaTeX-ja uses the following cache:
-\begin{list}{}%
-{\def\makelabel#1{\ttfamily#1}}
+\begin{cslist}
 \item[ltj-cid-auto-adobe-japan1.lua]
 The font table of a CID-keyed non-embedded Japanese font.
 This is loaded in every run.
@@ -7896,7 +8371,7 @@ The binary version of \texttt{ltj-jisx0208.lua}.
 This is the conversion table between JIS~X~0208 and Unicode
 which is used in Kanji-code conversion commands for compatibility with \pTeX.
 %</en>
-\end{list}
+\end{cslist}
 
 %<*en>
 \subsection{Internal}
@@ -7904,14 +8379,13 @@ Cache management system of \LuaTeX-ja is stored in \texttt{luatexja.base}
 (\texttt{ltj-base.lua}).
 There are three public functions for cache management in \texttt{luatexja.base},
 where <filename> stands for the file name \emph{without suffix}:
-\begin{list}{}%
-{\def\makelabel#1{\ttfamily#1}}
+\begin{cslist}
 \item[save\_cache(<filename>, <data>)]
 Save a non-nil table <data> into a cache <filename>.
 Both the text form <filename>\texttt{.lua} and its binary version
 are created or updated.
 
-\item[save\_cache\_luc(<filename>, <data>{[, <serialized\_data>]})]\
+\item[save\_cache\_luc(<filename>, <data>{[, <serialized\_data>]})]
 
 Same as \texttt{save\_cache}, except that only the binary cache is updated.
 The third argument <serialized\_data> is not usually given.
@@ -7930,21 +8404,20 @@ its contents is outdated, \texttt{load\_cache} tries to
 read the text form <filename>\texttt{.lua}.
 Hence, the return value of \texttt{load\_cache} is non-nil,
 if and only if the updated cache is found.
-\end{list}
+\end{cslist}
 %</en>
 %<*ja>
 \subsection{内部命令}
 \LuaTeX-jaにおけるキャッシュ管理は，\texttt{luatexja.base}~(\texttt{ltj-base.lua})に
 実装しており，以下の3関数が公開されている．
 ここで，<filename>は保存するキャッシュのファイル名を\emph{拡張子なしで}指定する．
-\begin{list}{}%
-{\def\makelabel#1{\ttfamily#1}}
+\begin{cslist}
 \item[save\_cache(<filename>, <data>)]
 nilでない<data>をキャッシュ<filename>に保存する．
 テキスト形式の<filename>\texttt{.lua}のみならず，
 そのバイナリ版も作成/更新される．
 
-\item[save\_cache\_luc(<filename>, <data>{[, <serialized\_data>]})]\
+\item[save\_cache\_luc(<filename>, <data>{[, <serialized\_data>]})]
 
 \texttt{save\_cache}と同様だが，バイナリキャッシュのみが更新される．
 第3引数<serialized\_data>が与えられた場合，それを
@@ -7964,7 +8437,7 @@ nilでない<data>をキャッシュ<filename>に保存する．
 
 以上より，\texttt{load\_cache}自体がnilでない値を返すのは，ちょうど「新しい」キャッシュが
 見つかった場合である．
-\end{list}
+\end{cslist}
 %</ja>
 
 

@@ -126,7 +126,7 @@
   }
   % vary by shape
   \ltj_fontspec_define_option:nn {YokoFeatures} {
-    \clist_set:Nn \l_ltj_fontspec_fontfeat_yoko_clist { ##1 }
+    \clist_put_right:Nn \l_ltj_fontspec_fontfeat_yoko_clist { ##1 }
   }
   \ltj_fontspec_define_option:nn {TateFeatures} {
     \clist_put_right:Nn \l_ltj_fontspec_fontfeat_tate_clist { ##1 }
@@ -261,7 +261,6 @@
           } {
             \msg_warning:nnn  {luatexja-fontspec} {altfont-ignored-by-rangeonly} { ##1 }
           } {
-            \typeout{LEFT:~<\l_ltj_fontspec_altfont_leftover_clist>~vs~4~<#4>}
             \__ltj_orig_fontspec_make_font_shapes:Nnnnn 
                 { \l_ltj_fontspec_altname_tl } {#2} 
                 {#3 _ alt \int_use:N \g_ltj_fontspec_altnumber_int } 
