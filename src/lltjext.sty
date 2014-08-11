@@ -3,10 +3,12 @@
 %
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{lltjext}
-   [2014/07/26 v1.2-ltj-1 ...]
+   [2014/08/11 v1.2-ltj-2 Macros for vertical writing]
 \RequirePackage{luatexja}
 
-\newif\if@rotsw
+\let\ltj@lltjext@orig@tabular=\tabular
+\let\ltj@lltjext@orig@array=\array
+
 %%% array and tabular
 \def\array{\let\@acol\@arrayacol \let\@classz\@arrayclassz
  \let\@classiv\@arrayclassiv
@@ -56,15 +58,14 @@
           \@depth\arraystretch\ltjgetdp\@tempcnta \@width\z@}%
   \fork@array@option<#1>[#2]%
   \@mkpream{#3}\edef\@preamble{\ialign \noexpand\@halignto
-  \bgroup \tabskip\z@skip \@arstrut \@preamble \tabskip\z@skip \cr}%
-  \let\@startpbox\@@startpbox \let\@endpbox\@@endpbox
-  \let\tabularnewline\\%
+  \bgroup\@arstrut \@preamble \tabskip\z@skip \cr}%
+   \let\tabularnewline\\%
   \@begin@alignbox\bgroup\box@dir\adjustbaseline
     \let\par\@empty
     \let\@sharp##\let\protect\relax
     \lineskip\z@skip\baselineskip\z@skip\@preamble}
 \def\endarray{\crcr\egroup\egroup\@end@alignbox}
-\def\endtabular{\crcr\egroup\egroup\@end@alignbox$\egroup}
+\def\endtabular{\endarray$\egroup}
 \expandafter \let \csname endtabular*\endcsname = \endtabular
 \def\fork@array@option<#1>[#2]{%
 \ifnum\ltjgetparameter{direction}=4 % yoko
@@ -645,8 +646,8 @@
 \def\kanji{\iftdir\expandafter\kansuji\fi}
 
 %%% bou
-%%% 
-\def\boutenchar{\char\euc"A1A2}
+%%%
+\def\boutenchar{\char\euc"A1A2}%"
 \def\bou#1{\ifvmode\leavevmode\fi\@bou#1\end}
 \def\@bou#1{%
   \ifx#1\end \let\next=\relax
@@ -677,4 +678,72 @@
   \else (\theequation)\fi}}
 \def\@thecounter#1{\noexpand\rensuji{\noexpand\arabic{#1}}}
 \def\@thmcounter#1{\noexpand\rensuji{\noexpand\arabic{#1}}}
+
+%% Compatibility with array package
+
+\def\ltj@lltjext@patch@array{%
+  \def\@startpbox##1{\bgroup
+   \box@dir\adjustbaseline%%% これを追加
+   \hsize=##1\@arrayparboxrestore
+     \everypar{%
+        \vrule \@height \ltjgetht\@arstrutbox \@width \z@
+        \everypar{}}%
+     }
+  \def\@tabarray{\@ifnextchar<\p@tabarray{\p@tabarray<Z>}}
+  \def\p@array<##1>[##2]##3{%
+    \let\box@dir\relax
+    \if ##1z\relax
+      \ifnum\ltjgetparameter{direction}=3\relax
+        \let\box@dir\utod\@tempcnta=\zstrutbox
+      \fi
+    \else
+      \if ##1y\relax
+        \let\box@dir\yoko\@tempcnta=\strutbox
+      \else\if ##1t\relax
+        \let\box@dir\tate\@tempcnta=\tstrutbox
+      \else\if ##1d\relax
+         \let\box@dir\dtou\@tempcnta=\dstrutbox
+      \else\if ##1u\relax
+         \let\box@dir\utod\@tempcnta=\zstrutbox
+      \fi\fi\fi\fi
+    \fi
+    \ifx\box@dir\relax
+      \ifcase\ltjgetparameter{direction}
+         \or   \let\box@dir\dtou\@tempcnta=\tabskip \z@\tabskip \z@\dstrutbox% dtou
+         \or\or\let\box@dir\tate\@tempcnta=\tstrutbox% tate
+         \or   \let\box@dir\yoko\@tempcnta=\strutbox% yoko
+         \else \let\box@dir\utod\@tempcnta=\zstrutbox% utod
+      \fi
+    \fi
+    \setbox \@arstrutbox \hbox{\box@dir\vrule
+               \@height \arraystretch
+                 \dimexpr \ltjgetht\@tempcnta+\extrarowheight\relax
+               \@depth \arraystretch \ltjgetdp \@tempcnta
+               \@width \z@}%
+    \fork@array@option<##1>[##2]%
+    \begingroup
+    \@mkpream{##3}%
+    \xdef\@preamble{\ialign \noexpand \@halignto
+                    \bgroup \tabskip \z@skip \@arstrut \@preamble
+                            \tabskip \z@ \cr}%
+    \endgroup
+    \@arrayleft
+    \@begin@alignbox\bgroup\box@dir\adjustbaseline
+      \let\par\@empty
+      \let\@sharp####\let\protect\relax
+      \let\\\@arraycr\let\tabularnewline\\\let\par\@empty
+     \lineskip\z@skip\baselineskip\z@skip\@preamble}
+  \def\endarray{\crcr\egroup\egroup\@end@alignbox}
+}
+
+\@ifpackageloaded{array}{%
+  \let\tabular=\ltj@lltjext@orig@tabular
+  \let\array=\ltj@lltjext@orig@array
+  \ltj@lltjext@patch@array
+}{%
+  \let\ltj@lltjext@orig@tabular\relax
+  \let\ltj@lltjext@orig@array\relax
+  \RequirePackage{filehook}
+  \AtEndOfPackageFile{array}{\ltj@lltjext@patch@array}
+}
 \endinput
