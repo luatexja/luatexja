@@ -11,6 +11,7 @@ module('luatexja.adjust', package.seeall)
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 luatexja.load_module('jfmglue');   local ltjj = luatexja.jfmglue
 luatexja.load_module('stack');     local ltjs = luatexja.stack
+luatexja.load_module('direction'); local ltjd = luatexja.direction
 
 local Dnode = node.direct or node
 
@@ -169,6 +170,7 @@ local function set_stretch(p, after, before, ic, name)
 end
 
 -- step 1: 行末に kern を挿入（句読点，中点用）
+local ltjd_glyph_from_packed = ltjd.glyph_from_packed
 local function aw_step1(p, res, total)
    local x = node_tail(getlist(p)); if not x then return false end
    -- x: \rightskip
@@ -189,7 +191,7 @@ local function aw_step1(p, res, total)
       xc = x
    elseif xi == id_hlist and get_attr_icflag(x) == PACKED then
       -- packed JAchar
-      xc = getlist(x)
+      xc = ltjd_glyph_from_packed(x)
       while getid(xc) == id_whatsit do xc = node_next(xc) end
    else
      return false-- それ以外は対象外．

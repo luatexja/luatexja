@@ -119,32 +119,15 @@ load_module('rmlgbm');    local ltjr = luatexja.rmlgbm -- must be 1st
 if luatexja_debug then load_module('debug') end
 
 load_module('charrange'); local ltjc = luatexja.charrange
-load_module('jfont');     local ltjf = luatexja.jfont
-
--- define_font
-do
-   local otfl_fdr = fonts.definers.read
-   local ltjr_font_callback = ltjr.font_callback
-   local ltjf_extract_metric = ltjf.extract_metric
-   function luatexja.font_callback(name, size, id)
-      local new_name = ltjf_extract_metric(name)
-      local res =  ltjr_font_callback(new_name, size, id, otfl_fdr)
-      luatexbase.call_callback('luatexja.define_font', res, new_name, size, id)
-      return res
-   end
-   luatexbase.create_callback('luatexja.define_font', 'simple', function (n) return n end)
-   luatexbase.add_to_callback('define_font',luatexja.font_callback,"luatexja.font_callback", 1)
-end
-
-
-load_module('inputbuf');  local ltji = luatexja.inputbuf
 load_module('stack');     local ltjs = luatexja.stack
+load_module('direction'); local ltjd = luatexja.direction
+load_module('jfont');     local ltjf = luatexja.jfont
+load_module('inputbuf');  local ltji = luatexja.inputbuf
 load_module('pretreat');  local ltjp = luatexja.pretreat
 load_module('jfmglue');   local ltjj = luatexja.jfmglue
 load_module('setwidth');  local ltjw = luatexja.setwidth
 load_module('math');      local ltjm = luatexja.math
 load_module('tangle');    local ltjb = luatexja.base
-load_module('direction'); local ltjd = luatexja.direction
 
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']

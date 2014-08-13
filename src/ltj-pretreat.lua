@@ -44,7 +44,7 @@ local attr_curtfnt = luatexbase.attributes['ltj@curtfnt']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 
 local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
-local ltjd_get_vert_glyph = ltjd.get_vert_glyph
+local ltjf_get_vert_glyph = ltjf.get_vert_glyph
 local ltjf_replace_altfont = ltjf.replace_altfont
 local attr_orig_char = luatexbase.attributes['ltj@origchar']
 local STCK  = luatexja.userid_table.STCK
@@ -58,6 +58,7 @@ local dir_tate = luatexja.dir_table.dir_tate
 ------------------------------------------------------------------------
 local wt, wtd = {}, {}
 do
+   local ltjd_get_dir_count = ltjd.get_dir_count
    local start_time_measure, stop_time_measure 
       = ltjb.start_time_measure, ltjb.stop_time_measure
    local head, real_head
@@ -98,7 +99,7 @@ do
       local p = head
       for i = 1,#wt do wt[i]=nil end
       for i = 1,#wtd do wtd[i]=nil end
-      ltjs.list_dir=ltjd.get_dir_count()
+      ltjs.list_dir=ltjd_get_dir_count()
       while p do
 	 local flag
 	 local pfunc = suppress_hyphenate_ja_aux[getid(p)]
@@ -135,7 +136,7 @@ local function set_box_stack_level(head, mode)
             local pc = getchar(p)
             local pf = ltjf_replace_altfont(pfn, pc)
 	    set_attr(p, attr_dir, pc)
-	    pc = ltjd_get_vert_glyph(pf, pc) or pc
+	    pc = ltjf_get_vert_glyph(pf, pc) or pc
             setfield(p, 'char', pc); set_attr(p, attr_orig_char, pc)
             setfield(p, 'font', pf); set_attr(p, attr_curjfnt, pf)
          end

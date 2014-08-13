@@ -557,7 +557,7 @@ local post_lown
 do
    local function write_aux(wv, num)
       local id = has_attr(wv, attr_ruby_id)
-      if id>0 then
+      if false and id>0 then
 	 tex.sprint(cat_lp,
 		    '\\write\\@mainaux{\\string\\directlua{luatexja.ruby.old_break_info['
 		       .. tostring(id) .. ']=' .. num

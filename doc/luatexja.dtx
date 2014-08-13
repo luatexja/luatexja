@@ -74,6 +74,19 @@
 % Suppress output from showexpl to stdout.
 \let\SX@Info\relax
 
+%%%%%%%% colors
+%% modified from http://jfly.iam.u-tokyo.ac.jp/colorset/
+\usepackage{transparent}
+\definecolor{red}{rgb}{1, 0.16, 0}
+\definecolor{blue}{rgb}{0, 0.25, 1}
+\definecolor{gray}{rgb}{.50, .53, .56}
+\definecolor{green}{rgb}{.21, .63, .42}
+\definecolor{cyan}{rgb}{0.40, .80, 1}
+\definecolor{b_gray}{rgb}{0.78, 0.78, 0.80}
+\definecolor{b_pink}{rgb}{1, 0.82, 0.82}
+\definecolor{b_green}{rgb}{.53, .91, .69}
+\definecolor{b_cyan}{rgb}{0.70, .92, 98}
+
 %%%%%%%% hyperref
 \usepackage{hyperref,bookmark}
 %<*en>
@@ -2987,9 +3000,8 @@ These commands set the dimension of \cs{box<num>}. Unlike \cs{ltjgetwd}, one doe
 \end{verbatim}
 
 設定値は「横組」「縦組及び \cs{utod} 方向」「\cs{dtou} 方向」
-の3種ごとに独立して記録される．……のときにどのようにボックスが配置されるか
-は，Gitリポジトリ内の \verb+test/test55-boxdim_diffdir.{tex,pdf}+ を
-参照してほしい．
+の3種ごとに独立して記録される．参考として，Gitリポジトリ内の
+	      \verb+test/test55-boxdim_diffdir.{tex,pdf}+ を挙げておく．
 
 \end{cslist}
 %</ja>
@@ -3153,41 +3165,53 @@ which JFM will be used for this font by the following keys:
 
 
 \begin{table}[t]
-%<en>\caption{Differences between JFMs shipped with \LuaTeX-ja}
-%<ja>\caption{\LuaTeX-ja に同梱されている JFM の違い}
+%<en>\caption{Differences between horizontal JFMs shipped with \LuaTeX-ja}
+%<ja>\caption{\LuaTeX-ja に同梱されている横組用JFMの違い}
 %<en>\medskip
 \label{tab-difjfm}
 \ltjsetparameter{jacharrange={+3}}
 \centering\small
-\def\r#1{{\jfont\g=file:KozMinPr6N-Regular.otf:jfm=#1 at 14.43324pt \g
-\setbox0=\vtop{\hsize=7\zw\noindent ◆◆◆◆◆◆◆
-ある日モモちゃんがお使いで迷子になって泣きました．}\copy0
-\vrule height 0pt depth \dp0}}
-\def\s#1{{\jfont\g=file:KozMinPr6N-Regular.otf:jfm=#1 at 14.43324pt \g
-\setbox0=\vtop{\hsize=7\zw\noindent ちょっと！何}\copy0}}
-\def\t#1{{\jfont\g=file:KozMinPr6N-Regular.otf:jfm=#1 at 19.24432pt \g
-\setbox0=\hbox{漢}%
-\vrule width 0.4pt height\ht0 depth\dp0\kern-.2pt\copy0
-\kern-\wd0\vrule width\wd0height .2pt depth .2pt
-\kern-\wd0\raise\ht0\hbox{\vrule width\wd0height .2pt depth .2pt}%
-\kern-\wd0\lower\dp0\hbox{\vrule width\wd0height .2pt depth .2pt}%
-\kern-.2pt\vrule width 0.4pt height\ht0 depth \dp0}}
-\begin{tabular}{rccc}
-\toprule
-&\tt jfm-ujis.lua&\tt jfm-jis.lua&\tt jfm-min.lua\\
-\midrule
-%<en>Example~1~\cite{min10}
-%<ja>例1~\cite{min10}
-&\r{ujis}&\r{jis}&\r{min}\\
-%<en>Example~2
-%<ja>例2
-&\s{ujis}&\s{jis}&\s{min}\\
-Bounding Box&\t{ujis}&\t{jis}&\t{min}\\
-\bottomrule
-\end{tabular}
+\def\r#1#2{%
+  \hbox{\Large\vrule
+  \parbox[b]{7\zw}{%
+    \addjfontfeatures{YokoFeatures={Opacity=0.5, Color=#2, JFM=#1}}\noindent
+    ◆◆◆◆◆◆◆
+    ある日モモちゃんがお使いで迷子になって泣きました．
+  }\vrule}}
+\def\s#1#2{%
+  \Large
+  \parbox[b]{7\zw}{%
+    \addjfontfeatures{YokoFeatures={Opacity=0.5, Color=#2, JFM=#1}}\noindent
+    ちょっと！何
+  }}
+\def\t#1#2#3{\hbox to 0pt{\hss%
+  \setbox0=\hbox{\addjfontfeatures{YokoFeatures={JFM=#1}}\huge #3}%
+  \textcolor{#2}{\transparent{0.5}\vrule width 0.4pt height\ht0 depth\dp0}\kern-.2pt\copy0
+  \textcolor{#2}{\transparent{0.5}\kern-\wd0\vrule width\wd0height .2pt depth .2pt
+  \kern-\wd0\raise\ht0\hbox{\vrule width\wd0height .2pt depth .2pt}%
+  \kern-\wd0\lower\dp0\hbox{\vrule width\wd0height .2pt depth .2pt}%
+  \kern-.2pt\vrule width 0.4pt height\ht0 depth \dp0}\hss}}
+{\Large\tabcolsep0pt
+\begin{tabular}{m{8\zw}m{8\zw}m{8\zw}}
+\leavevmode\hbox to 0pt{\r{ujis}{blue}\hss}\r{jis}{black}&
+\leavevmode\hbox to 0pt{\r{jis}{black}\hss}\r{min}{red}&
+\leavevmode\hbox to 0pt{\r{ujis}{blue}\hss}\r{min}{red}\\
+\leavevmode\hbox to 0pt{\s{ujis}{blue}\hss}\s{jis}{black}&
+\leavevmode\hbox to 0pt{\s{jis}{black}\hss}\s{min}{red}&
+\leavevmode\hbox to 0pt{\s{ujis}{blue}\hss}\s{min}{red}\\
+\leavevmode\qquad\t{ujis}{blue}{漢}\t{jis}{black}{漢}\qquad
+           \t{ujis}{blue}{っ}\t{jis}{black}{っ}&
+\leavevmode\qquad\t{jis}{black}{漢}\t{min}{red}{漢}\qquad
+           \t{jis}{black}{っ}\t{min}{red}{っ}&
+\leavevmode\qquad\t{ujis}{blue}{漢}\t{min}{red}{漢}\qquad
+           \t{ujis}{blue}{っ}\t{min}{red}{っ}\\
+\end{tabular}\par}
+
+(\textcolor{blue}{Blue: \texttt{jfm-ujis.lua}},
+\textcolor{black}{Black: \texttt{jfm-jis.lua}},
+\textcolor{red}{Red: \texttt{jfm-min.lua}})
 \ltjsetparameter{jacharrange={-3}}
 \end{table}
-
 
 \begin{cslist}
 \item[jfm=<name>]
@@ -3372,12 +3396,57 @@ letter-spacing and the width of italic correction are not correct:
 %<en>\subsection{\cs{tfont}}
 %<ja>\subsection{\cs{tfont} 命令}
 
+
+\begin{table}[t]
+%<en>\caption{Differences between vertical JFMs shipped with \LuaTeX-ja}
+%<ja>\caption{\LuaTeX-ja に同梱されている縦組用 JFM の違い}
+%<en>\medskip
+\label{tab-difjfm-tate}
+\catcode`\<=12\catcode`\>=12
+\ltjsetparameter{jacharrange={+3}}
+\small
+
+\def\r#1#2{%
+  \hbox{\tate\Large\vrule
+  \parbox{7\zw}{%
+    \addjfontfeatures{TateFeatures={Opacity=0.5, Color=#2, JFM=#1}}\noindent
+    ◆◆◆◆◆◆◆
+    ある日モモちゃんがお使いで迷子になって泣きました．
+  }\vrule}}
+\def\s#1#2{%
+  \hbox{\tate\Large
+  \parbox{7\zw}{%
+    \addjfontfeatures{TateFeatures={Opacity=0.5, Color=#2, JFM=#1}}\noindent
+    ちょっと！何
+  }}}
+\def\t#1#2#3{\hbox to 0pt{\hss%
+  \setbox0=\hbox{\addjfontfeatures{TateFeatures={JFM=#1}}\huge #3}%
+  \textcolor{#2}{\transparent{0.5}\vrule width 0.4pt height\ht0 depth\dp0}\kern-.2pt\copy0
+  \textcolor{#2}{\transparent{0.5}\kern-\wd0\vrule width\wd0height .2pt depth .2pt
+  \kern-\wd0\raise\ht0\hbox{\vrule width\wd0height .2pt depth .2pt}%
+  \kern-\wd0\lower\dp0\hbox{\vrule width\wd0height .2pt depth .2pt}%
+  \kern-.2pt\vrule width 0.4pt height\ht0 depth \dp0}\hss}}
+
+\begin{minipage}{.7\textwidth}
+\centering
+\leavevmode\hbox to 0pt{\r{ujisv}{blue}\hss}\r{tmin}{red}\quad
+\leavevmode\hbox to 0pt{\s{ujisv}{blue}\hss}\s{tmin}{red}\quad
+\raise4\zw\hbox{\tate\Large\t{ujisv}{black}{漢}\t{tmin}{red}{漢}\qquad
+           \t{ujisv}{black}{っ}\t{tmin}{red}{っ}}
+\end{minipage}%
+\begin{minipage}{.3\textwidth}
+\textcolor{blue}{Blue: \texttt{jfm-ujisv.lua}}\\
+\textcolor{red}{Red: \texttt{jfm-tmin.lua}}
+\end{minipage}
+\ltjsetparameter{jacharrange={-3}}
+\end{table}
+
 %<*en>
 ...
 %</en>
 %<*ja>
 \cs{tfont} はフォントを縦組用の和文フォントとして読み込む命令であり，
-\cs{jfont} の文法は \cs{jfont} と同じである．
+\cs{tfont} の文法は \cs{jfont} と同じである．
 \cs{tfont} で定義された縦組用和文フォントは，
 以下の点が \cs{jfont} による横組用和文フォントとは異なる：
 \begin{itemize}
@@ -3388,9 +3457,19 @@ letter-spacing and the width of italic correction are not correct:
 \tfont\S=file:KozMinPr6N-Regular.otf:jfm=ujis % OK
 \end{verbatim}
  \item \ref{ssec-math}節で述べる，数式中の和文フォントには縦組用和文フォントは指定できない．
- \item \texttt{jfm=<name>}\ の部分には縦組用JFMを指定する．現在同梱されているのは，
-OTFパッケージの \verb+upnmlminr-v.tfm+ を元にした\texttt{jfm-ujisv.lua}\ のみである．
+ \item \texttt{jfm=<name>}\ の部分には縦組用JFMを指定する．
+以下の縦組用JFMが\LuaTeX-jaには同梱されており，違いを表\ref{tab-difjfm-tate}に示した．
+\begin{description}
+\item[\tt jfm-ujis.lua] \LuaTeX-jaの標準縦組用JFMである．このJFMは\upTeX で
+  用いられるUTF/OTFパッケージ用の和文用TFMである \verb+upnmlminr-v.tfm+ を
+  元にしている．
+\item[\tt jfm-min.lua] \pTeX に同梱されているデフォルトの和文用縦組TFM
+  である \verb+tmin10.tfm+ に相当する．
+\end{description}
 \end{itemize}
+
+なお，\pTeX では，\cs{font},~\cs{jfont},~\cs{tfont}のどれでも欧文フォント・横組用和文フォン
+ト・縦組用和文フォントの定義が可能であったが，\LuaTeX-jaではそうでないので注意．
 %</ja>
 
 %<en>\subsection{Prefix \texttt{psft}}
@@ -3687,10 +3766,10 @@ when the current character class is the class for opening delimiters'.
 \begin{minipage}{0.4\textwidth}%
 \begin{center}\unitlength=10pt\small
 \begin{picture}(15,12)(-1,-4)
-\color{black!10!white}% jfm
+\color{b_gray}% jfm
 \put(0,0){\vrule width 12\unitlength height 8\unitlength depth 3\unitlength}
 
-\color{red!20!white}% step1
+\color{b_pink}% step1
 \put(-1,-1.5){\vrule width 6\unitlength height 7\unitlength depth 2.5\unitlength}
 
 \color{red}% real glyph
@@ -3700,7 +3779,7 @@ when the current character class is the class for opening delimiters'.
 \put(-1,5.5){\line(1,0){6}}
 \put(-1,-4){\line(1,0){6}}
 
-\color{green!20!white}% real glyph
+\color{b_green}% real glyph
 \put(3,0){\vrule width 6\unitlength height 7\unitlength depth 2.5\unitlength}
 
 \color{black}% jfm
@@ -3713,7 +3792,7 @@ when the current character class is the class for opening delimiters'.
 \put(12.2,-1.5){\makebox(0,0)[l]{\texttt{depth}}}
 \put(6,0.2){\makebox(0,0)[b]{\texttt{width}}}
 
-\color{green!50!black}% step1
+\color{green}% step1
 \thicklines
 \put(3,0){\vector(0,1){7}\vector(0,-1){2.5}\vector(1,0){6}}
 \put(9,0){\line(0,1){7}\line(0,-1){2.5}}
@@ -3789,10 +3868,10 @@ Furthermore, the glyph is shifted according to values of fields
 \begin{minipage}{0.4\textwidth}%
 \begin{center}\unitlength=10pt\small
 \begin{picture}(15,12)(-6,0)
-\color{black!10!white}% jfm
+\color{b_gray}% jfm
 \put(-6,0){\vrule width 12\unitlength height 11\unitlength}
 
-\color{red!20!white}% real glyph
+\color{b_pink}% real glyph
 \put(-6.5,5.5){\vrule width 8\unitlength height 6\unitlength depth 3\unitlength}
 
 \color{red}% real glyph
@@ -3802,7 +3881,7 @@ Furthermore, the glyph is shifted according to values of fields
 \put(-6.5,11.5){\line(1,0){8}}
 \put(-6.5,2.5){\line(1,0){8}}
 
-\color{green!20!white}% step1
+\color{b_green}% step1
 \put(-4,3){\vrule width 8\unitlength height 6\unitlength depth 3\unitlength}
 
 \color{black}% jfm
@@ -3815,7 +3894,7 @@ Furthermore, the glyph is shifted according to values of fields
 \put(-3,10.8){\makebox(0,0)[t]{\texttt{depth}}}
 \put(0.2,5.5){\makebox(0,0)[l]{\texttt{width}}}
 
-\color{green!50!black}% step1
+\color{green}% step1
 \thicklines
 \put(-4,3){\vector(0,1){6}\vector(0,-1){3}\vector(1,0){8}}
 \put( 4,3){\line(0,1){6}\line(0,-1){3}}
@@ -5498,6 +5577,7 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
 できる．\ref{ssec-psft}節を参照．
 %</ja>
 
+{\catcode`\<=12\catcode`\>=12
 \begin{figure}[!tb]
 \begin{LTXexample}
 \jfontspec[
@@ -5512,6 +5592,7 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
 %<en>\caption{An example of \texttt{TateFeatures} etc.}
 \label{fig:yokotate-fontspec}
 \end{figure}
+}
 
 \item[TateFeatures=\{<features>\}\textrm{, }TateFont=<font>]
 %<en> ...
@@ -5819,7 +5900,7 @@ Lua・\TeX コードが参考になるだろう．
 \def\outbox#1{{\Large%
   \ltjsetparameter{kanjiskip=0pt plus .2\zw minus .2\zw}%
   \setbox\gridbox=\hbox to 20\zw{\sq\sq\sq\sq\sb\sq\sq\sq\sq\sb\sq\sq\sq\sq\sb\sq\sq\sq\sq\sb}%
-  \hbox{\textcolor{cyan!50!white}{\copy\gridbox}\hskip-20\zw%
+  \hbox{\textcolor{cyan}{\copy\gridbox}\hskip-20\zw%
   \vbox{\hsize=20\zw\noindent\leftskip0pt\rightskip0pt\parfillskip0pt#1}\vrule}%
 }}
 
@@ -6885,11 +6966,11 @@ after ``beginning/ending of a group'' characters.
   ->, auto, shorten >=1pt
 ]
 \node [shape=rectangle, font=\scriptsize] (init) at (2,7) {start};
-\node [shape=circle,draw, fill=blue!20] (newline) at (4,7) {$N$};
-\node [shape=circle,draw, fill=blue!20] (midline) at (4,4) {$M$};
-\node [shape=circle,draw, fill=blue!20] (skipspc) at (8,7) {$S$};
-\node [shape=circle,draw, fill=red!20]  (kanji) at (8,4) {$K$};
-\node [shape=rectangle,draw, fill=green!20] (scanacs) at (6,8) {scan a c.s.};
+\node [shape=circle,draw, fill=b_cyan] (newline) at (4,7) {$N$};
+\node [shape=circle,draw, fill=b_cyan] (midline) at (4,4) {$M$};
+\node [shape=circle,draw, fill=b_cyan] (skipspc) at (8,7) {$S$};
+\node [shape=circle,draw, fill=b_pink]  (kanji) at (8,4) {$K$};
+\node [shape=rectangle,draw, fill=b_green] (scanacs) at (6,8) {scan a c.s.};
 \node (endk) at (8,2.5) {} ;
 \node (endm) at (4,2.5) {} ;
 \node (ends) at (8,8.5) {} ;

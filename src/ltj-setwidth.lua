@@ -49,6 +49,7 @@ local attr_tkblshift = luatexbase.attributes['ltj@tkblshift']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 
 local ltjf_font_metric_table = ltjf.font_metric_table
+local ltjf_get_vert_glyph = ltjf.get_vert_glyph
 
 local PACKED       = luatexja.icflag_table.PACKED
 local PROCESSED    = luatexja.icflag_table.PROCESSED
@@ -120,7 +121,7 @@ local function capsule_glyph_tate(p, met, class)
    fshift = call_callback("luatexja.set_width", fshift, met, class)
    local fheight, fdepth = char_data.height, char_data.depth
 
-   setfield(p, 'char', ltjd.get_vert_glyph(getfont(p), getchar(p)))
+   setfield(p, 'char', ltjf_get_vert_glyph(getfont(p), getchar(p)))
 
    local y_shift
       = - getfield(p, 'yoffset') + (has_attr(p,attr_tkblshift) or 0)

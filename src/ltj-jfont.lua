@@ -3,13 +3,15 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2014/02/01',
+  date = '2014/08/12',
   description = 'Loader for Japanese fonts',
 })
 module('luatexja.jfont', package.seeall)
 
 luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('charrange'); local ltjc = luatexja.charrange
+luatexja.load_module('rmlgbm');    local ltjr = luatexja.rmlgbm
+luatexja.load_module('direction'); local ltjd = luatexja.direction
 
 
 local Dnode = node.direct or node
@@ -278,13 +280,18 @@ do
 end
 
 do
+   local get_dir_count = ltjd.get_dir_count
+   local dir_tate = luatexja.dir_table.dir_tate
+   local tex_get_attr = tex.getattribute
    -- PUBLIC function
    function get_zw()
-      local a = font_metric_table[tex.attribute[attr_curjfnt]]
+      local a = font_metric_table[
+	 tex_get_attr((get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)]
       return a and a.zw or 0
    end
    function get_zh()
-      local a = font_metric_table[tex.attribute[attr_curjfnt]]
+      local a = font_metric_table[
+	 tex_get_attr((get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)]
       return a and a.zw or 0
    end
 end
@@ -333,7 +340,18 @@ do
       end
       return name
    end
-   luatexja.jfont.extract_metric = extract_metric
+
+   -- define_font callback
+   local otfl_fdr = fonts.definers.read
+   local ltjr_font_callback = ltjr.font_callback
+   function luatexja.font_callback(name, size, id)
+      local new_name = extract_metric(name)
+      local res =  ltjr_font_callback(new_name, size, id, otfl_fdr)
+      luatexbase.call_callback('luatexja.define_font', res, new_name, size, id)
+      return res
+   end
+   luatexbase.create_callback('luatexja.define_font', 'simple', function (n) return n end)
+   luatexbase.add_to_callback('define_font',luatexja.font_callback,"luatexja.font_callback", 1)
 end
 
 ------------------------------------------------------------------------
@@ -571,32 +589,93 @@ end
 
 
 ------------------------------------------------------------------------
--- MISC
+-- 縦書き用字形への変換テーブル
 ------------------------------------------------------------------------
-
-local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
--- EXT: italic correction
-function append_italic()
-   local p = to_direct(tex.nest[tex.nest.ptr].tail)
-   if p and getid(p)==id_glyph then
-      local f = getfont(p)
-      local g = node_new(id_kern)
-      setfield(g, 'subtype', 1)
-      set_attr(g, attr_icflag, ITALIC)
-      if is_ucs_in_japanese_char(p) then
-	 f = has_attr(p, attr_curjfnt)
-	 local j = font_metric_table[f]
-	 setfield(g, 'kern', j.char_type[find_char_class(getchar(p), j)].italic)
-      else
-	 local h = font_getfont(f)
-	 if h then
-	    setfield(g, 'kern', h.characters[getchar(p)].italic)
-	 else
-	    tex.attribute[attr_icflag] = 0
-	    return node_free(g)
+local font_vert_table = {} -- key: fontnumber
+do
+   local font_vert_basename = {} -- key: basename
+   local function add_feature_table(tname, src, dest)
+      for i,v in pairs(src) do
+	 if type(v.slookups)=='table' then
+	    local s = v.slookups[tname]
+	    if s and not dest[i] then
+	       dest[i] = s
+	    end
 	 end
       end
-      node_write(g)
-      tex.attribute[attr_icflag] = 0
+   end
+
+   local function prepare_vert_data(n, id)
+      -- test if already loaded
+      if type(id)=='number' then -- sometimes id is an integer
+         font_vert_table[n] = font_vert_table[id]; return
+      elseif (not id) or font_vert_table[n]  then return
+      end
+      local fname = id.filename
+      local bname = file.basename(fname)
+      if not fname then
+         font_vert_table[n] = {}; return
+      elseif font_vert_basename[bname] then
+         font_vert_table[n] = font_vert_basename[bname]; return
+      end
+      local vtable = {}
+      local a = id.resources.sequences
+      if a then
+	 local s = id.shared.rawdata.descriptions
+	 for i,v in pairs(a) do
+	    if v.features.vert or v.features.vrt2 then
+	       add_feature_table(v.subtables[1], s, vtable)
+	    end
+	 end
+      end
+      font_vert_basename[bname] = vtable
+      font_vert_table[n] = vtable
+   end
+   -- 縦書き用字形への変換
+   function get_vert_glyph(n, chr)
+      local fn = font_vert_table[n]
+      return fn and fn[chr] or chr
+   end
+   luatexbase.add_to_callback('luatexja.define_font',
+			      function (res, name, size, id)
+				 prepare_vert_data(id, res)
+			      end,
+			      'prepare_vert_data', 1)
+
+   local function a (n, dat) font_vert_table[n] = dat end
+   ltjr.vert_addfunc = a
+
+end
+
+------------------------------------------------------------------------
+-- MISC
+------------------------------------------------------------------------
+do
+   local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
+   local tex_set_attr = tex.setattribute
+   -- EXT: italic correction
+   function append_italic()
+      local p = to_direct(tex.nest[tex.nest.ptr].tail)
+      if p and getid(p)==id_glyph then
+	 local f = getfont(p)
+	 local g = node_new(id_kern)
+	 setfield(g, 'subtype', 1)
+	 set_attr(g, attr_icflag, ITALIC)
+	 if is_ucs_in_japanese_char(p) then
+	    f = has_attr(p, attr_curjfnt)
+	    local j = font_metric_table[f]
+	    setfield(g, 'kern', j.char_type[find_char_class(getchar(p), j)].italic)
+	 else
+	    local h = font_getfont(f)
+	    if h then
+	       setfield(g, 'kern', h.characters[getchar(p)].italic)
+	    else
+	       tex_set_attr(attr_icflag, 0)
+	       return node_free(g)
+	    end
+	 end
+	 node_write(g)
+	 tex_set_attr(attr_icflag, 0)
+      end
    end
 end

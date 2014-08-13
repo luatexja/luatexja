@@ -4,7 +4,6 @@
 
 luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('stack');     local ltjs = luatexja.stack
-luatexja.load_module('rmlgbm');    local ltjr = luatexja.rmlgbm
 luatexja.direction = {}
 
 local attr_dir = luatexbase.attributes['ltj@dir']
@@ -842,63 +841,6 @@ do
       end
       stop_time_measure('box_primitive_hook')
    end
-end
-
--- 縦書き用字形への変換テーブル
-local font_vert_table = {} -- key: fontnumber
-do
-   local font_vert_basename = {} -- key: basename
-   local function add_feature_table(tname, src, dest)
-      for i,v in pairs(src) do
-	 if type(v.slookups)=='table' then
-	    local s = v.slookups[tname]
-	    if s and not dest[i] then
-	       dest[i] = s
-	    end
-	 end
-      end
-   end
-
-   local function prepare_vert_data(n, id)
-      -- test if already loaded
-      if type(id)=='number' then -- sometimes id is an integer
-         font_vert_table[n] = font_vert_table[id]; return
-      elseif (not id) or font_vert_table[n]  then return
-      end
-      local fname = id.filename
-      local bname = file.basename(fname)
-      if not fname then
-         font_vert_table[n] = {}; return
-      elseif font_vert_basename[bname] then
-         font_vert_table[n] = font_vert_basename[bname]; return
-      end
-      local vtable = {}
-      local a = id.resources.sequences
-      if a then
-	 local s = id.shared.rawdata.descriptions
-	 for i,v in pairs(a) do
-	    if v.features.vert or v.features.vrt2 then
-	       add_feature_table(v.subtables[1], s, vtable)
-	    end
-	 end
-      end
-      font_vert_basename[bname] = vtable
-      font_vert_table[n] = vtable
-   end
-   -- 縦書き用字形への変換
-   function luatexja.direction.get_vert_glyph(n, chr)
-      local fn = font_vert_table[n]
-      return fn and fn[chr] or chr
-   end
-   luatexbase.add_to_callback('luatexja.define_font',
-			      function (res, name, size, id)
-				 prepare_vert_data(id, res)
-			      end,
-			      'prepare_vert_data', 1)
-
-   local function a (n, dat) font_vert_table[n] = dat end
-   luatexja.rmlgbm.vert_addfunc = a
-
 end
 
 -- PACKED の hbox から文字を取り出す
