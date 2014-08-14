@@ -211,7 +211,7 @@
 \vfill\eject
 
 \vbox{\tate\hsize100mm
-\tfont\f=KozMinPr6N-Regular.otf:+vert;jfm=ujisv \f
+\tfont\f=KozMinPr6N-Regular.otf:-vert;jfm=ujisv \f
 
 \ltjsetparameter{yalbaselineshift=.25em}\baselineskip15pt\parindent\zw
 \LaTeX の特徴として、テキストファイルであるソースコードを入力として処理することでDVIや
@@ -237,6 +237,8 @@ PDFなどの表示形式を出力として得ることが挙げられる。
 よって、より効率的な文章作成が可能ともなる。またMapleやMathematicaなどでドキュメントを
 作成し、\TeX 形式で出力することも可能である。
 
+\null\hfill
+（Wikipediaの「\LaTeX」の記事より．8/13現在）
 }
 
 \message{^^Jget/set box dimension^^J}
@@ -420,4 +422,7 @@ $$
 \F{tate}
 \F{dtou}
 \F{utod}
+
+\hbox{\inhibitglue\tate}
+\hbox{\ltjsetparameter{kanjiskip=0pt}\tate}
 \end

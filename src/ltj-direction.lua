@@ -49,7 +49,6 @@ local tex_set_attr = tex.setattribute
 local PROCESSED    = luatexja.icflag_table.PROCESSED
 local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 local PACKED       = luatexja.icflag_table.PACKED
-local STCK = luatexja.userid_table.STCK
 local DIR  = luatexja.userid_table.DIR
 local dir_tate = luatexja.dir_table.dir_tate
 local dir_yoko = luatexja.dir_table.dir_yoko
@@ -120,8 +119,41 @@ end
 do
    local node_next = node.next
    local node_set_attr = node.set_attribute
+   local node_traverse = node.traverse
+   local STCK = luatexja.userid_table.STCK
+   local IHB = luatexja.userid_table.IHB
+
+   local function test_list(h, lv)
+      if not h then 
+	 return 2 -- need to create dir_whatsit
+      else
+	 local flag = 2 -- need to create dir_whatsit
+	 local w
+	 for p in node_traverse(h) do
+	    if p.id==id_whatsit then
+	       if p.subtype==sid_user then
+		  local uid= p.user_id
+		  if uid==DIR then
+		     flag = 1; w = w or p -- found
+		  elseif not(uid==IHB or uid==STCK) then
+		     flag = 0; break -- error
+		  end
+	       else
+		  flag = 0; break
+	       end
+	    else
+	       flag = 0; break
+	    end
+	 end
+	 if flag==1 then -- move dir_whatsit w
+	    return 1,w -- TODO
+	 else 
+	    return flag
+	 end
+      end
+   end
    local function set_list_direction(v, name)
-      local lv, w = tex_nest.ptr, tex.lists.page_head
+      local lv = tex_nest.ptr
       if not v then 
          v,name  = get_dir_count(), nil
 	 if lv>=1 and abs(tex_nest[lv-1].mode) == ltjs.mmode and v == dir_tate then
@@ -137,13 +169,10 @@ do
 		 "To change direction in an align, \n"
 		    .. "you shold use \\hbox or \\vbox.")
       else
-	 local w = (lv==0) and tex.lists.page_head or tex_nest[lv].head.next
-	 if w then
-	    if (not w.next) and 
-	       w.id==id_whatsit and w.subtype==sid_user and w.user_id==DIR then
-	       node_set_attr(w, attr_dir, v)
-               if lv==0 then page_direction = v end
-	    elseif lv==0 and not page_direction then
+	 local h = (lv==0) and tex.lists.page_head or tex_nest[lv].head.next
+	 local flag,w = test_list(h,lv)
+	 if flag==0 then
+	    if lv==0 and not page_direction then
 	       page_direction = v -- for first call of \yoko (in luatexja-core.sty)
 	    else
               ltjb.package_error(
@@ -152,6 +181,9 @@ do
                  'Direction change command by LuaTeX-ja is available\n'
 		    .. 'only when the current list is null.')
 	    end
+	 elseif flag==1 then 
+	    node_set_attr(w, attr_dir, v)
+	    if lv==0 then page_direction = v end
 	 else
 	    local w = node_new(id_whatsit, sid_user)
 	    setfield(w, 'next', nil)
