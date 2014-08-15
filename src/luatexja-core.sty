@@ -626,6 +626,16 @@
 \protected\def\ltj@@unvbox{%
   \directlua{luatexja.direction.check_dir(\the\ltj@tempcnta)}%
   \ltj@@orig@unvbox\ltj@tempcnta}
+\let\ltj@@orig@unhcopy=\unhcopy
+\let\ltj@@orig@unvcopy=\unvcopy
+\protected\def\unhcopy{\ltj@reset@globaldefs\afterassignment\ltj@@unhcopy\ltj@tempcnta}
+\protected\def\unvcopy{\ltj@reset@globaldefs\afterassignment\ltj@@unvcopy\ltj@tempcnta}
+\protected\def\ltj@@unhcopy{%
+  \directlua{luatexja.direction.check_dir(\the\ltj@tempcnta)}%
+  \ltj@@orig@unhcopy\ltj@tempcnta}
+\protected\def\ltj@@unvcopy{%
+  \directlua{luatexja.direction.check_dir(\the\ltj@tempcnta)}%
+  \ltj@@orig@unvcopy\ltj@tempcnta}
 
 
 %%%% lastbox

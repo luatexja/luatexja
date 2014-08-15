@@ -3077,7 +3077,7 @@ Returned value&\texttt{4}&\texttt{3}&\texttt{1}&\texttt{11}&\texttt{0}\\
 To cope with multiple directions, the following primitives are
 overridden by \LuaTeX-ja, using~\verb+\protected\def+.
 \begin{cslist}[style=standard]
- \item[\cs{unhbox}<num>\textrm{, }\cs{unvbox}<num>]
+ \item[\cs{unhbox}<num>\textrm{, }\cs{unvbox}<num>\textrm{, }\cs{unhcopy}<num>\textrm{, }\cs{unvcopy}<num>]
  \item[\cs{vadjust}\{<material>\}]
  \item[\cs{lastbox}]
  \item[\cs{raise}<dimen><box>\textrm{, }\cs{lower}<dimen><box>\textrm{\ etc., }\cs{vcenter}] 
@@ -3091,7 +3091,7 @@ overridden by \LuaTeX-ja, using~\verb+\protected\def+.
 \ \verb+\protected\def+ により再定義してある．
 
 \begin{cslist}
- \item[\cs{unhbox}<num>\textrm{, }\cs{unvbox}<num>]
+ \item[\cs{unhbox}<num>\textrm{, }\cs{unvbox}<num>\textrm{, }\cs{unhcopy}<num>\textrm{, }\cs{unvcopy}<num>]
  ボックスの組方向が現在のリストと異なる場合は事前にエラーメッセージを出力する．
  \pTeX と異なり，エラーを無視して無理矢理 \cs{unhbox}, \cs{unvbox} を
  続行させることもできるが，その場合の組版結果は保証しない．
@@ -3121,7 +3121,7 @@ so TrueType/OpenType fonts with features can be used for Japanese fonts:
 %</en>
 %<*ja>
 フォントを（横組用）和文フォントとして読み込むためには，\cs{jfont} を
-\cs{font} プリミティブの代わりに用いる．
+\ \cs{font} プリミティブの代わりに用いる．
 \cs{jfont} の文法は \cs{font} と同じである．
 \LuaTeX-jaは\Pkg{luaotfload}パッケージを自動的に読み込むので，
 TrueType/OpenTypeフォントにfeatureを指定したものを和文フォントとして用いる
@@ -3258,14 +3258,16 @@ The following JFMs are shipped with \LuaTeX-ja:
 %</en>
 %<*ja>
 \item[\tt jfm-min.lua] \pTeX に同梱されているデフォルトの和文用TFM
-  である \verb+min10.tfm+ に相当する．
+(\verb+min10.tfm+)に相当し，行末で文字が揃うようにするために「っ」など一部の文字幅が変わっ
+	   ている．\verb+min10.tfm+ については\cite{min10}が詳しい．
 %</ja>
 \end{description}
 %<*en>
 The difference among these three~JFMs is  shown in Table~\ref{tab-difjfm}.
 %</en>
 %<*ja>
-これら3つのJFMの違いは表\ref{tab-difjfm}に示した．
+これら3つのJFMの違いは表\ref{tab-difjfm}に示した．表中の文例の一部には，
+\cite{min10}の図3,~4のものを用いた．
 %</ja>
 
 \begin{figure}
@@ -3386,10 +3388,10 @@ For example, the following example uses the standard JFM \texttt{jfm-ujis.lua}, 
 letter-spacing and the width of italic correction are not correct:
 %</en>
 \begin{LTXexample}[width=0.3\textwidth]
-\jfont\E=file:KozMinPr6N-Regular.otf:extend=1.5;jfm=ujis;-kern
+\jfont\E=KozMinPr6N-Regular:extend=1.5;jfm=ujis;-kern
 \E あいうえお
 
-\jfont\S=file:KozMinPr6N-Regular.otf:slant=1;jfm=ujis;-kern
+\jfont\S=KozMinPr6N-Regular:slant=1;jfm=ujis;-kern
 \S あいう\/ABC
 \end{LTXexample}
 
@@ -3464,7 +3466,8 @@ letter-spacing and the width of italic correction are not correct:
   用いられるUTF/OTFパッケージ用の和文用TFMである \verb+upnmlminr-v.tfm+ を
   元にしている．
 \item[\tt jfm-min.lua] \pTeX に同梱されているデフォルトの和文用縦組TFM
-  である \verb+tmin10.tfm+ に相当する．
+  である \verb+tmin10.tfm+ に相当し，\texttt{min10.tfm} と同様に
+  「っ」など一部の文字幅が狭められている．
 \end{description}
 \end{itemize}
 
@@ -3822,7 +3825,7 @@ a character class whose the \texttt{align}
 field is \texttt{'middle'}.
 %</en>
 %<*ja>
-\texttt{align}フィールドの値が\texttt{'middle'}であるような文字クラスに属する
+\texttt{align}フィールドの値が \texttt{'middle'} であるような文字クラスに属する
 和文文字ノードを考えよう．
 %</ja>
 \begin{itemize}
@@ -3841,7 +3844,7 @@ Since the \texttt{align} field is \texttt{'middle'},
 the ``real'' glyph is centered horizontally (the green rectangle) first.
 %</en>
 %<*ja>
-\texttt{align}フィールドは\texttt{middle}なので，
+\texttt{align}フィールドは \texttt{'middle'} なので，
 実際のグリフの位置はまず水平方向に中央揃えしたものとなる（緑色の長方形）．
 %</ja>
 \item
@@ -3922,14 +3925,14 @@ Furthermore, the glyph is shifted according to values of fields
 (\dots)
 %</en>
 %<*ja>
-\texttt{align}フィールドの値が\texttt{'right'}であるような文字クラスに属する
+\texttt{align}フィールドの値が \texttt{'right'} であるような文字クラスに属する
 和文文字を考えよう．
 \begin{itemize}
 \item
 実際のグリフの「垂直位置」は，ベースラインが文字の物理的な左右方向の中央を通る
 位置となる．
 \item 
-また，この場合\texttt{align}フィールドは\texttt{middle}なので，
+また，この場合\texttt{align}フィールドは \texttt{'right'} なので，
 「水平位置」は字送り方向に「右寄せ」したものとなる（緑色の長方形）．
 その際，高さ・深さは，実フォントのascender, descenderの値が使われる．
 \item 
@@ -5527,7 +5530,7 @@ by \cs{input}.
 %<*en>
 As described in Subsection~\ref{ssec-fontspec}, this optional package
 provides the counterparts for several commands defined in the
-\Pkg{fontspec} package．
+\Pkg{fontspec} package (recommends v2.4).
 In addition to OpenType font features in the original \Pkg{fontspec},
 the following ``font features'' specifications are allowed for
 the commands of Japanese version:
@@ -5535,6 +5538,9 @@ the commands of Japanese version:
 %<*ja>
 \ref{ssec-fontspec}節で述べたように，この追加パッケージは\Pkg{fontspec}
 パッケージで定義されているコマンドに対応する和文フォント用のコマンドを提供する．
+\Pkg{fontspec} パッケージが2.3であっても動作するが，
+\emph{以降の説明は \Pkg{fontspec}~v2.4 使用時にのみ当てはまる．}
+
 \Pkg{fontspec}パッケージで指定可能な各種font featureに加えて，和文版のコマンドには
 以下の``font feature''を指定することができる：
 %</ja>
@@ -5563,7 +5569,7 @@ will be actually used in \texttt{YokoFeatures}~and~\texttt{TateFeatures} keys.
 
 \texttt{CID} キーは下の \texttt{NoEmbed} と合わせて用いられたときのみ有効である．
 また，横組用JFMと縦組用JFMは共用できないため，実際に \texttt{JFM} キーを用いる際は
-後に述べる\ \texttt{YokoFeatures},~\texttt{TateFeatures}\ の中で用いる
+後に述べる\ \texttt{YokoFeatures} キーや \texttt{TateFeatures}\ の中で用いる
 ことになる．
 %</ja>
 
@@ -5577,7 +5583,6 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
 できる．\ref{ssec-psft}節を参照．
 %</ja>
 
-{\catcode`\<=12\catcode`\>=12
 \begin{figure}[!tb]
 \begin{LTXexample}
 \jfontspec[
@@ -5585,23 +5590,27 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
   TateFeatures={Color=00007F},
   TateFont=KozGoPr6N-Regular
 ]{KozMinPr6N-Regular}
-\parbox<y>{2\zw}[b]{横組のテスト}
-\parbox<t>{2\zw}[b]{縦組のテスト}
+\hbox{\yoko 横組のテスト}
+\hbox{\tate 縦組のテスト}
 \end{LTXexample}
 %<ja>\caption{\texttt{TateFeatures} 等の使用例}
 %<en>\caption{An example of \texttt{TateFeatures} etc.}
 \label{fig:yokotate-fontspec}
 \end{figure}
-}
+
 
 \item[TateFeatures=\{<features>\}\textrm{, }TateFont=<font>]
 %<en> ...
 %<*ja>
+縦組において使用されるフォントや，縦組においてのみ適用されるfeature達を
+指定する．使用例は図\ref{fig:yokotate-fontspec}参照．
 %</ja>
 
 \item[YokoFeatures=\{<features>\}]
 %<en> ...
 %<*ja>
+横組においてのみ適用されるfeature達を
+指定する．使用例は図\ref{fig:yokotate-fontspec}参照．
 %</ja>
 
 
@@ -6397,7 +6406,7 @@ Glues from an italic correction, but already processed in the insertion process 
 連続した場合でも「ボックスの境界」が識別できるようになっている．
 %</ja>
 
-\attr{ltj@kcat$i$}
+\attr{ltj@kcat\,$i$}
 %<*en>
 Where $i$~is a natural number which is less than~7.
 These 7~attributes store bit~vectors indicating which character block is regarded as a block of \textbf{JAchar}s.
