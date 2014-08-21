@@ -125,6 +125,15 @@ end
 
 -- 実行回数 + ルビ中身 から uniq_id を作る関数
 old_break_info = {} -- public, 前 run 時の分割情報
+local cache_handle
+function read_old_break_info()
+   if  tex.jobname then
+      local fname = tex.jobname .. '.ltjruby'
+      local real_file = kpse.find_file(fname)
+      if real_file then dofile(real_file) end
+      cache_handle = io.open(fname, 'w')
+   end
+end
 local make_uniq_id
 do
    local exec_count = 0
@@ -477,6 +486,7 @@ do
    end
 end
 
+local next_cluster_array = {}
 -- ノード追加
 local function pre_low_app_node(head, w, cmp, coef, ht, dp)
    -- メインの node list 更新
@@ -497,17 +507,21 @@ local function pre_low_app_node(head, w, cmp, coef, ht, dp)
       insert_after(head, nt, nta)
       set_attr(nta, attr_ruby, 2*i+1)
       -- glue
-      nt = node_new(id_glue)
-      local ntb = node_new(id_glue_spec);
+       local ntb = node_new(id_glue_spec);
       setfield(ntb, 'width', coef[i*2+1][2*cmp+2])
       setfield(ntb, 'stretch_order', 0); setfield(ntb, 'stretch', 0)
       setfield(ntb, 'shrink_order', 0); setfield(ntb, 'shrink', 0)
+      if i~=cmp or not next_cluster_array[w] then
+	 nt = node_new(id_glue); insert_after(head, nta, nt)
+      else
+	 nt = next_cluster_array[w]
+      end
       setfield(nt, 'subtype', 0); setfield(nt, 'spec', ntb)
       set_attr(nt, attr_ruby, 2*i+2)
-      insert_after(head, nta, nt)
    end
    tex.setattribute('global', attr_ruby, -0x7FFFFFFF)
    setfield(w, 'user_id', RUBY_POST)
+   next_cluster_array[w]=nil
    return head, first_whatsit(node_next(nt))
 end
 
@@ -558,10 +572,10 @@ do
    local function write_aux(wv, num)
       local id = has_attr(wv, attr_ruby_id)
       if id>0 then
-	 tex.sprint(cat_lp, 
-		    '\\write\\@mainaux{\\string\\directlua{luatexja.ruby.old_break_info[' 
-		       .. tostring(id) .. ']=' .. num 
-		       .. '}}')
+	 cache_handle:write(
+		    'luatexja.ruby.old_break_info['
+		       .. tostring(id) .. ']=' .. num
+		       .. '\n')
       end
    end
 
@@ -575,7 +589,7 @@ do
 	 if fn==2*cmp+2 then
 	    local hn = node_tail(wv)
 	    node_remove(wv, hn)
-	    insert_after(ch, rs[#rs], hn)
+	    insert_after(ch, rs[1], hn)
 	    set_attr(hn, attr_icflag,  PROCESSED)
 	    write_aux(wv, has_attr(hn, attr_ruby))-- 行中形
 	 else
@@ -583,7 +597,7 @@ do
 	    for i = 1, deg do hn = node_next(hn) end; 
 	    node_remove(wv, hn)
 	    setfield(hn, 'next', nil)
-	    insert_after(ch, rs[#rs], hn)
+	    insert_after(ch, rs[1], hn)
 	    set_attr(hn, attr_icflag,  PROCESSED)
 	    write_aux(wv, has_attr(hn, attr_ruby))
 	 end
@@ -593,7 +607,7 @@ do
 	 -- -1 is needed except the case hn = 3, 
 	 --   because a ending-line form is removed already from the list
 	 node_remove(wv, hn); setfield(hn, 'next', nil)
-	 insert_after(ch, rs[#rs], hn)
+	 insert_after(ch, rs[1], hn)
 	 set_attr(hn, attr_icflag,  PROCESSED)
 	 if fn == 2*cmp-1 then
 	    write_aux(wv, has_attr(hn, attr_ruby))
@@ -727,8 +741,15 @@ end
 
 do
    local RIPOST = luatexja.stack_table_index.RIPOST
-   local function whatsit_after_callback(s, Nq, Np, bsl)
+   local function whatsit_after_callback(s, Nq, Np)
       if not s and  getfield(Nq.nuc, 'user_id') == RUBY_PRE then
+	 if Np then
+	    local last_glue = node_new(id_glue)
+	    set_attr(last_glue, attr_icflag, 0)
+	    insert_before(Nq.nuc, Np.first, last_glue)
+	    Np.first = last_glue
+	    next_cluster_array[Nq.nuc] = last_glue -- ルビ処理用のグルー
+	 end
          local nqnv = getfield(Nq.nuc, 'value')
          local x =  node_next(node_next(nqnv))
          for i = 2, getfield(nqnv, 'value') do x = node_next(node_next(x)) end

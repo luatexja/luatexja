@@ -146,7 +146,10 @@
 
 %%%%%%%% TeX command
 \protected\def\ltjruby{\@ifnextchar[\ltj@@ruby{\ltj@@ruby[]}}%]
-\AtBeginDocument{\ifdefined\ruby\else\let\ruby=\ltjruby\fi}
+\AtBeginDocument{%
+  \ifdefined\ruby\else\let\ruby=\ltjruby\fi
+  \directlua{luatexja.ruby.read_old_break_info()}%
+}
 \def\ltj@@ruby[#1]#2#3{{% #1: option #2: 親文字群，#3: ルビ文字列群，共に| 区切り
   \setkeys[ltj]{ruby}{#1}%
   \directlua{ruby_tmplist_r = \string{\string}; ruby_tmplist_p = \string{\string}}%
