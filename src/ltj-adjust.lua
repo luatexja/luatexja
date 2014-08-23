@@ -82,12 +82,14 @@ local function get_stretched(q, go, gs)
    local qs = getfield(q, 'spec')
    if not getfield(qs, 'writable') then return 0 end
    if gs == 1 then -- stretching
-      if getfield(qs, 'stretch_order') == go then 
-	 return getfield(qs, 'stretch') 
+      if getfield(qs, 'stretch_order') == go then
+	 return getfield(qs, 'stretch')
+      else return 0
       end
    else -- shrinking
       if getfield(qs, 'shrink_order') == go then 
 	 return getfield(qs, 'shrink')
+      else return 0
       end
    end
 end
