@@ -85,10 +85,12 @@ local function get_stretched(q, go, gs)
    if gs == 1 then -- stretching
       if getfield(qs, 'stretch_order') == go then
 	 return getfield(qs, 'stretch')
+      else return 0
       end
    else -- shrinking
       if getfield(qs, 'shrink_order') == go then
 	 return getfield(qs, 'shrink')
+      else return 0
       end
    end
 end
