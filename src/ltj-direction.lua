@@ -57,6 +57,9 @@ local dir_utod = luatexja.dir_table.dir_utod
 local dir_math_mod    = luatexja.dir_table.dir_math_mod
 local dir_node_auto   = luatexja.dir_table.dir_node_auto
 local dir_node_manual = luatexja.dir_table.dir_node_manual
+local function get_attr_icflag(p)
+   return (has_attr(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
+end
 
 local page_direction
 --
@@ -79,7 +82,7 @@ do
    local function get_dir_count_inner(h)
       if h then
 	 if h.id==id_whatsit and h.subtype==sid_user and h.user_id==DIR then
-	       local ic = node.has_attribute(h, attr_icflag)
+	       local ic = node.has_attribute(h, attr_icflag) or 0
 	       return (ic<PROCESSED_BEGIN_FLAG) 
 		  and (node.has_attribute(h,attr_dir)%dir_node_auto) or 0
 	 else
@@ -205,8 +208,7 @@ local function create_dir_whatsit(hd, gc, new_dir)
    if getid(hd)==id_whatsit and 
 	    getsubtype(hd)==sid_user and getfield(hd, 'user_id')==DIR then
       set_attr(hd, attr_icflag, 
-	       (has_attr(hd, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG 
-		  + PROCESSED_BEGIN_FLAG)
+	       get_attr_icflag(hd) + PROCESSED_BEGIN_FLAG)
       tex_set_attr('global', attr_icflag, 0)
       return hd
    else
@@ -636,7 +638,7 @@ do
       local x, new_dir = hd, ltjs.list_dir or dir_yoko
       while x do
 	 local xid = getid(x)
-	 if (xid==id_hlist and has_attr(x, attr_icflag)%PROCESSED_BEGIN_FLAG~=PACKED) 
+	 if (xid==id_hlist and get_attr_icflag(x)~=PACKED)
 	 or xid==id_vlist then
 	    hd, x = make_dir_whatsit(hd, x, new_dir, 'process_dir_node:' .. gc)
 	 else
@@ -956,7 +958,7 @@ do
 
    function luatexja.direction.remove_end_whatsit()
       local h=tex.lists.page_head
-      if (not h.next) and
+      if h and (not h.next) and
 	 h.id==id_whatsit and h.subtype==sid_user and
          h.user_id == DIR then
 	    tex.lists.page_head = nil

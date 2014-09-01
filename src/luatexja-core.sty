@@ -249,9 +249,6 @@
   \directlua{% This value depends on the version of LuaTeX.
     luatexja.stack.hmode = -tex.nest[tex.nest.ptr].mode
   }%
-  $\directlua{% This value depends on the version of LuaTeX.
-    luatexja.stack.mmode = -tex.nest[tex.nest.ptr].mode
-  }$% 
 }
 \setbox0\vbox{%
   \directlua{% This value depends on the version of LuaTeX.
@@ -584,6 +581,12 @@
     end
   }%
 }
+\setbox0\hbox{%
+  $\directlua{% This value depends on the version of LuaTeX.
+    luatexja.stack.mmode = -tex.nest[tex.nest.ptr].mode
+  }$%
+}
+
 
 %%%% \raise, \lower, \moveleft, \moveright
 \let\ltj@@orig@raise=\raise
