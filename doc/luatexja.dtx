@@ -3034,7 +3034,7 @@ Returned value&\texttt{4}&\texttt{3}&\texttt{1}&\texttt{11}&\texttt{0}\\
 %<*ja>
 \subsection{組方向の取得}
 「現在の組方向」や「<num>番のボックスの組方向」は，
-\pTeX では\cs{ifydir} や \cs{ifybox}<num> といった条件判断文を使って
+\pTeX では \cs{ifydir} や \cs{ifybox}<num> といった条件判断文を使って
 判断することができた．
 しかし，\LuaTeX-jaはあくまでも\TeX マクロとLuaコードで
 記述されており，それでは新たな条件判断命令を作るのは難しい．
@@ -3064,12 +3064,18 @@ Returned value&\texttt{4}&\texttt{3}&\texttt{1}&\texttt{11}&\texttt{0}\\
 \end{LTXexample}
 
 これらを用いれば，例えば
-\pTeX の \cs{ifydir}, \cs{iftbox200} と同等の条件判断を
+\pTeX の \cs{ifydir},~\cs{ifybox200} と同等の条件判断を
 \begin{verbatim}
 \ifnum\ltjgetparameter{direction}=4
-\ifnum\ltjgetparameter{boxdir}{200}=3
+\ifnum\ltjgetparameter{boxdir}{200}=4
 \end{verbatim}
 のように行うことができる．
+\cs{iftdir} は少々面倒であるが
+\begin{verbatim}
+\ifnum\numexpr 
+  \ltjgetparameter{direction}-(\ltjgetparameter{direction}/8)*8=3
+\end{verbatim}
+とすればよい．
 %</ja>
 
 %<*en>
@@ -4240,12 +4246,18 @@ Table~\ref{tab-math} shows counterparts to \TeX's primitives for math
 font families. There is no relation between the value of
 \cs{fam} and that of \cs{jfam}; with appropriate settings,
 you can set both \cs{fam} and \cs{jfam} to the same value.
+Here <jfont\_cs> in the argument of \Param{jatextfont} etc.\ is
+a control sequence which is defined by \cs{jfont}, i.e.,
+a \emph{horizontal} Japanese font. 
 %</en>
 %<*ja>
 \LuaTeX-jaの数式中での和文フォントの扱いも同様である．
 表\ref{tab-math}は数式フォントファミリに対する \TeX のプリミティブと対応する
 ものを示している．\cs{fam} と \cs{jfam} の値の間には関係はなく，
 適切な設定の下では \cs{fam} と \cs{jfam} の両方に同じ値を設定することができる．
+\Param{jatextfont} 他の第2引数<jfont\_cs>は，\cs{jfont} で定義された
+\emph{横組用}和文フォントである．\cs{tfont} で定義された
+\emph{縦組用}和文フォントを指定することは想定していない．
 %</ja>
 
 \begin{table}[!tb]
@@ -4559,8 +4571,8 @@ is the position of \verb+hpack_filter+ callback in the source
 of \LuaTeX, see Section~\ref{sec-para}.
 %</en>
 %<*ja>
-先に述べたように，\cs{ltjsetparameter} と \cs{ltjgetparameter} は
-\LuaTeX-jaのほとんどのパラメータにアクセスするための命令である．
+先に述べたように，\LuaTeX-jaのほとんどの内部パラメータにアクセスするには
+\cs{ltjsetparameter} と \cs{ltjgetparameter} を用いる．
 \LuaTeX-jaが\pTeX のような文法（例えば，\verb+\prebreakpenalty`）=10000+）を
 採用しない理由の一つは，\LuaTeX のソースにおける \verb+hpack_filter+
 コールバックの位置にある．\ref{sec-para}章を参照．
@@ -4616,7 +4628,7 @@ adopted in the whole paragraph or the whole hbox.
 %</ja>
 \end{itemize}
 
-\begin{description}[font=\mdseries]
+\begin{cslist}[style=standard]
 \item[\DParam{jcharwidowpenalty}\,=<penalty>$^\ast$] [\cs{jcharwidowpenalty}]\ 
 
 %<*en>
@@ -4765,7 +4777,7 @@ Note that parameters \Param{jaxspmode} and \Param{alxspmode} share a common tabl
 %</en>
 %<*ja>
 \Param{jaxspmode}と\Param{alxspmode}は共通のテーブルを用いているため，
-これら2つのパラメータは互いの異名となっていることに注意する．
+これら2つのパラメータは互いの別名となっていることに注意する．
 %</ja>
 
 \item[\DParam{autospacing}\,=<bool>] [\cs{autospacing}]
@@ -4835,7 +4847,7 @@ the behavior of this assignment is undefined.
 動作は未定義である．
 %</ja>
 
-\end{description}
+\end{cslist}
 
 \subsection{\cs{ltjgetparameter}}
 \label{ssec-getpar}
@@ -5530,7 +5542,7 @@ by \cs{input}.
 %<*en>
 As described in Subsection~\ref{ssec-fontspec}, this optional package
 provides the counterparts for several commands defined in the
-\Pkg{fontspec} package (recommends v2.4).
+\Pkg{fontspec} package (requires \Pkg{fontspec}~v2.4).
 In addition to OpenType font features in the original \Pkg{fontspec},
 the following ``font features'' specifications are allowed for
 the commands of Japanese version:
@@ -5538,8 +5550,7 @@ the commands of Japanese version:
 %<*ja>
 \ref{ssec-fontspec}節で述べたように，この追加パッケージは\Pkg{fontspec}
 パッケージで定義されているコマンドに対応する和文フォント用のコマンドを提供する．
-\Pkg{fontspec} パッケージが2.3であっても動作するが，
-\emph{以降の説明は \Pkg{fontspec}~v2.4 使用時にのみ当てはまる．}
+\emph{以下に述べる和文版の命令の説明は \Pkg{fontspec}~v2.4 使用時にのみ当てはまる．}
 
 \Pkg{fontspec}パッケージで指定可能な各種font featureに加えて，和文版のコマンドには
 以下の``font feature''を指定することができる：
@@ -5765,9 +5776,9 @@ but please remind remarks below.
 
 %<*ja>
 このパッケージは，\texttt{ajmacros.sty}（\Pkg{otf}パッケージ付属のマクロ集，井上浩一氏作）から
-漢字コードをUTF8にしたり，plain \LuaTeX でも利用可能するという
+漢字コードをUTF8にしたり，plain \LuaTeX でも利用可能にするという
 修正を加えた \texttt{luatexja-ajmacros.sty} も自動的に読み込む．
-そのため，マクロ集にある \verb+\aj半角+ などのマクロもそのまま使用可能である．
+そのため，\texttt{ajmacros.sty} マクロ集にある \verb+\aj半角+ などのマクロもそのまま使用可能である．
 %</ja>
 
 %<en>\paragraph{Remarks}
@@ -6088,7 +6099,8 @@ among the line-head form, the line-middle form, and the line-end form.
 \begin{itemize}
  \item 組方向オプション \texttt{<y>}（横組），\texttt{<t>}（縦組），
 \texttt{<z>}\ の他に\ \texttt{<d>}（dtou方向），\texttt{<u>}（utod方向）を追加した．
-\texttt{<z>} と \texttt{<u>} の違いは，\texttt{<z>} が周囲の組方向が縦組のときにしか意味を持たない
+\texttt{<z>} と \texttt{<u>} の違いは，\texttt{<z>} が（\Pkg{plext} パッケージと同様に）
+周囲の組方向が縦組のときにしか意味を持たない
        のに対し，\texttt{<u>} にはそのような制限がないことである．
 
  \item \Pkg{plext} パッケージでは，表組（\texttt{tabular} 環境，\texttt{align} 環境等）や
@@ -6104,7 +6116,6 @@ among the line-head form, the line-middle form, and the line-end form.
        （中身の最後が罫線などの時は，ボックスの下端）に一致するように配置する．
  \item それ以外のときは，ボックスの中央が「数式の軸」に一致するように配置する．
 \end{itemize}
-特に縦組の場合，「数式の軸」は……
 
  \item 連数字用命令 \cs{rensuji} における位置合わせオプション……
 \end{itemize}
