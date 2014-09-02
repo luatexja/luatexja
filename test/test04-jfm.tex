@@ -49,7 +49,7 @@
 \ltjgetparameter{jacharrange}{2}
 
 \head{文字コード→文字範囲}
-\ltjgetparameter{chartorange}{`A} % must be 6
+\ltjgetparameter{chartorange}{`A} % must be -1
 \ltjgetparameter{chartorange}{`い} % must be 6
 \ltjgetparameter{chartorange}{`§} % must be 8
 \ltjgetparameter{chartorange}{"F7} % must be 9
@@ -67,7 +67,7 @@
 \head{Ticket \#25121}
 \setbox0=\hbox{\ltjsetparameter{kanjiskip=-5pt}
 あいうえお\hbox{\ltjsetparameter{kanjiskip=12pt}かきくけこ}さしすせそ\par a}\copy0
-\tracingonline=0\showboxdepth=10000\showboxbreadth=10000\tracingonline=1\showbox0
+
 
 {\ltjsetparameter{kanjiskip=3pt}
 あいうえお{\ltjsetparameter{kanjiskip=-5pt}% this setting is ignored
@@ -82,11 +82,19 @@
 \jfont\sixgt={psft:GothicBBB-Medium:jfm=ujis} at 6pt
 \font\sixtt=cmtt10 at 6pt
 
+{\let\\=\relax
+\directlua{function print_fn(...)
+  print(...)
+  tex.print('\\par ', ...)
+end}}
+\unless\ifdefined\ltjgetwd \def\ltjgetwd#1{\wd#1}\fi
 \def\dumplist#1{\par\noindent\leavevmode
 {\dimen0=\ltjgetwd{#1}}%
 \hbox to 0.2\hsize{\copy#1\hss}%
 \vbox{\hsize=0.6\hsize\sixtt\baselineskip=7.2pt\sixgt\let\\=\relax
-\directlua{luatexja.ext_show_node_list(tex.getbox(#1).head, '\\par ', tex.print)}\hrule}%
+\directlua{print('======')
+  luatexja.ext_show_node_list(tex.getbox(#1).head, '', print_fn)
+  print('======')}\hrule}%
 }
 
 %\tracingonline=1\tracingoutput=1\showboxdepth=3\showboxbreadth=100
@@ -210,6 +218,14 @@
 
 \head{JA--hbox (penあり)}
 
+\setbox0=\hbox{\rmlh あ\hbox{}}\dumplist0
+
+\setbox0=\hbox{\rmlh い\hbox{}}\dumplist0
+
+\setbox0=\hbox{\rmlh う\hbox{}}\dumplist0
+
+\setbox0=\hbox{\rmlh え\hbox{}}\dumplist0
+
 \setbox0=\hbox{\rmlh あ\hbox{ア}}\dumplist0
 
 \setbox0=\hbox{\rmlh あ\hbox{a}}\dumplist0
@@ -217,6 +233,14 @@
 \setbox0=\hbox{\rmlh い\hbox{a}}\dumplist0
 
 \setbox0=\hbox{\rmlh \hbox{（}い\hbox{）}}\dumplist0
+
+\head{hbox--JA (penあり)}
+
+\setbox0=\hbox{\rmlh \hbox{}あ}\dumplist0
+
+\setbox0=\hbox{\rmlh \hbox{}い}\dumplist0
+
+\setbox0=\hbox{\rmlh \hbox{}う}\dumplist0
 
 \head{italic correction}
 

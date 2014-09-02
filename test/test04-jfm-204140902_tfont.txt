@@ -1,0 +1,996 @@
+This is LuaTeX, Version beta-0.79.1 (TeX Live 2014/dev) (rev 5041) 
+ restricted \write18 enabled.
+(./test04-jfm.tex
+(/opt/texlive/texmf-local/tex/luatex/luatexja/luatexja-core.sty
+(/opt/texlive/2014/texmf-dist/tex/luatex/luaotfload/luaotfload.sty
+(/opt/texlive/2014/texmf-dist/tex/luatex/luatexbase/luatexbase.sty
+Package: luatexbase 2013/05/11 v0.6 Resource management for the LuaTeX macro pr
+ogrammer
+(/opt/texlive/2014/texmf-dist/tex/generic/oberdiek/ifluatex.sty)
+(/opt/texlive/2014/texmf-dist/tex/generic/oberdiek/luatex.sty
+(/opt/texlive/2014/texmf-dist/tex/generic/oberdiek/infwarerr.sty)
+(/opt/texlive/2014/texmf-dist/tex/generic/oberdiek/ifluatex.sty)
+(/opt/texlive/2014/texmf-dist/tex/generic/oberdiek/luatex-loader.sty
+(/opt/texlive/2014/texmf-dist/scripts/oberdiek/oberdiek.luatex.lua)))
+(/opt/texlive/2014/texmf-dist/tex/luatex/luatexbase/luatexbase-compat.sty
+Package: luatexbase-compat 2011/05/24 v0.4 Compatibility tools for LuaTeX
+(/opt/texlive/2014/texmf-dist/tex/generic/oberdiek/ifluatex.sty))
+(/opt/texlive/2014/texmf-dist/tex/luatex/luatexbase/luatexbase-modutils.sty
+Package: luatexbase-modutils 2013/05/11 v0.6 Module utilities for LuaTeX
+(/opt/texlive/2014/texmf-dist/tex/generic/oberdiek/ifluatex.sty)
+(/opt/texlive/2014/texmf-dist/tex/luatex/luatexbase/luatexbase-loader.sty
+Package: luatexbase-loader 2013/05/11 v0.6 Lua module loader for LuaTeX
+(/opt/texlive/2014/texmf-dist/tex/generic/oberdiek/ifluatex.sty)
+(/opt/texlive/2014/texmf-dist/tex/luatex/luatexbase/luatexbase-compat.sty)
+(/opt/texlive/2014/texmf-dist/tex/luatex/luatexbase/luatexbase.loader.lua))
+(/opt/texlive/2014/texmf-dist/tex/luatex/luatexbase/modutils.lua))
+(/opt/texlive/2014/texmf-dist/tex/luatex/luatexbase/luatexbase-loader.sty)
+(/opt/texlive/2014/texmf-dist/tex/luatex/luatexbase/luatexbase-regs.sty
+Package: luatexbase-regs 2011/05/24 v0.4 Registers allocation for LuaTeX
+(/opt/texlive/2014/texmf-dist/tex/generic/oberdiek/ifluatex.sty))
+(/opt/texlive/2014/texmf-dist/tex/luatex/luatexbase/luatexbase-attr.sty
+Package: luatexbase-attr 2013/05/11 v0.6 Attributes allocation for LuaTeX
+(/opt/texlive/2014/texmf-dist/tex/generic/oberdiek/ifluatex.sty)
+(/opt/texlive/2014/texmf-dist/tex/luatex/luatexbase/luatexbase-modutils.sty)
+(/opt/texlive/2014/texmf-dist/tex/generic/oberdiek/luatex.sty)
+(/opt/texlive/2014/texmf-dist/tex/luatex/luatexbase/attr.lua))
+(/opt/texlive/2014/texmf-dist/tex/luatex/luatexbase/luatexbase-cctb.sty
+Package: luatexbase-cctb 2013/05/11 v0.6 Catcodetable allocation for LuaTeX
+(/opt/texlive/2014/texmf-dist/tex/generic/oberdiek/ifluatex.sty)
+(/opt/texlive/2014/texmf-dist/tex/luatex/luatexbase/luatexbase-modutils.sty)
+(/opt/texlive/2014/texmf-dist/tex/luatex/luatexbase/cctb.lua))
+(/opt/texlive/2014/texmf-dist/tex/luatex/luatexbase/luatexbase-mcb.sty
+Package: luatexbase-mcb 2013/05/11 v0.6 Callback management for LuaTeX
+(/opt/texlive/2014/texmf-dist/tex/generic/oberdiek/ifluatex.sty)
+(/opt/texlive/2014/texmf-dist/tex/luatex/luatexbase/luatexbase-modutils.sty)
+(/opt/texlive/2014/texmf-dist/tex/luatex/luatexbase/mcb.lua)))
+(/opt/texlive/2014/texmf-dist/tex/luatex/luaotfload/luaotfload-main.lua)
+(/opt/texlive/2014/texmf-dist/tex/luatex/luaotfload/luaotfload-log.lua)
+(/opt/texlive/2014/texmf-dist/tex/luatex/luaotfload/luaotfload-fontloader.lua)(u
+sing write cache: /home/h7k/.texlive2014/texmf-var/luatex-cache/generic)(using r
+ead cache: /opt/texlive/2014/texmf-var/luatex-cache/generic /home/h7k/.texlive20
+14/texmf-var/luatex-cache/generic)
+luaotfload | main : fontloader loaded in 0.025 seconds
+(/opt/texlive/2014/texmf-dist/tex/luatex/luaotfload/luaotfload-override.lua)
+(/opt/texlive/2014/texmf-dist/tex/luatex/luaotfload/luaotfload-parsers.lua)
+(/opt/texlive/2014/texmf-dist/tex/luatex/luaotfload/luaotfload-configuration.lua
+)
+(/opt/texlive/2014/texmf-dist/tex/luatex/luaotfload/luaotfload-status.lua)
+(/opt/texlive/2014/texmf-dist/tex/luatex/luaotfload/luaotfload-loaders.lua)
+(/opt/texlive/2014/texmf-dist/tex/luatex/luaotfload/luaotfload-database.lua)
+(/opt/texlive/2014/texmf-dist/tex/luatex/luaotfload/luaotfload-colors.lua)
+(/opt/texlive/2014/texmf-dist/tex/luatex/luaotfload/luaotfload-features.lua)
+(/opt/texlive/2014/texmf-dist/tex/luatex/luaotfload/luaotfload-letterspace.lua)
+(/opt/texlive/2014/texmf-dist/tex/luatex/luaotfload/luaotfload-auxiliary.lua))
+(/opt/texlive/2014/texmf-dist/tex/generic/oberdiek/infwarerr.sty)
+(/opt/texlive/2014/texmf-dist/tex/generic/oberdiek/ltxcmds.sty)
+(/opt/texlive/2014/texmf-dist/tex/generic/oberdiek/pdftexcmds.sty
+(/opt/texlive/2014/texmf-dist/tex/generic/oberdiek/ifpdf.sty)
+(/opt/texlive/2014/texmf-dist/scripts/oberdiek/pdftexcmds.lua))
+(/opt/texlive/2014/texmf-dist/tex/generic/xkeyval/xkeyval.tex
+(/opt/texlive/2014/texmf-dist/tex/generic/xkeyval/xkvutils.tex
+(/opt/texlive/2014/texmf-dist/tex/generic/xkeyval/keyval.tex))
+2014/05/25 v2.7 key=value parser (HA)
+(/opt/texlive/2014/texmf-dist/tex/generic/xkeyval/xkvtxhdr.tex
+2005/02/22 v1.1 xkeyval TeX header (HA)))
+(/opt/texlive/2014/texmf-dist/tex/luatex/lualibs/lualibs.lua)
+(/opt/texlive/texmf-local/tex/luatex/luatexja/ltj-base.lua)
+(/opt/texlive/2014/texmf-dist/tex/luatex/lualibs/lualibs-lpeg.lua)
+(/opt/texlive/2014/texmf-dist/tex/luatex/lualibs/lualibs-os.lua)
+(/opt/texlive/texmf-local/tex/luatex/luatexja/ltj-rmlgbm.lua)(load cache: /home/
+h7k/.texlive2014/texmf-var/luatexja/ltj-cid-auto-adobe-japan1.luc)
+(/opt/texlive/texmf-local/tex/luatex/luatexja/ltj-charrange.lua)
+(/opt/texlive/texmf-local/tex/luatex/luatexja/ltj-stack.lua)
+(/opt/texlive/texmf-local/tex/luatex/luatexja/ltj-direction.lua)
+(/opt/texlive/texmf-local/tex/luatex/luatexja/ltj-jfont.lua)
+Module luatexbase-mcb warning: several functions in 'define_font',
+(luatexbase-mcb)               only one will be active.
+
+(/opt/texlive/texmf-local/tex/luatex/luatexja/ltj-inputbuf.lua)
+(/opt/texlive/texmf-local/tex/luatex/luatexja/ltj-pretreat.lua)
+(/opt/texlive/texmf-local/tex/luatex/luatexja/ltj-jfmglue.lua)
+(/opt/texlive/texmf-local/tex/luatex/luatexja/ltj-setwidth.lua)
+(/opt/texlive/texmf-local/tex/luatex/luatexja/ltj-math.lua)
+(/opt/texlive/texmf-local/tex/luatex/luatexja/ltj-tangle.lua)
+(/opt/texlive/texmf-local/tex/luatex/luatexja/ltj-base.sty)
+(/opt/texlive/texmf-local/tex/luatex/luatexja/ltj-plain.sty
+Cannot find file `luatexja.cfg'.
+(/opt/texlive/texmf-local/tex/luatex/luatexja/jfm-ujis.lua)
+(/opt/texlive/texmf-local/tex/luatex/luatexja/jfm-ujisv.lua)))(compiling luc: /o
+pt/texlive/2014/texmf-var/luatex-cache/generic/fonts/otf/ipam.luc)(load luc: /ho
+me/h7k/.texlive2014/texmf-var/luatex-cache/generic/fonts/otf/ipam.luc)(compiling
+ luc: /opt/texlive/2014/texmf-var/luatex-cache/generic/fonts/otf/kozminpr6n-regu
+lar.luc)(load luc: /home/h7k/.texlive2014/texmf-var/luatex-cache/generic/fonts/o
+tf/kozminpr6n-regular.luc)(compiling luc: /opt/texlive/2014/texmf-var/luatex-cac
+he/generic/fonts/otf/ipamp.luc)(load luc: /home/h7k/.texlive2014/texmf-var/luate
+x-cache/generic/fonts/otf/ipamp.luc)
+(./jfm-bad.lua)
+! Package luatexja Error: bad JFM `bad'.
+
+See the luatexja package documentation for explanation.
+Type  H <return>  for immediate help.
+\ltj@@jfont ... {luatexja.jfont.jfontdefY('yoko')}
+                                                  
+l.18 }
+    
+(compiling luc: /opt/texlive/2014/texmf-var/luatex-cache/generic/fonts/otf/ipaex
+g.luc)(load luc: /home/h7k/.texlive2014/texmf-var/luatex-cache/generic/fonts/otf
+/ipaexg.luc)
+! Package luatexja Error: bad character code (-1).
+
+See the luatexja package documentation for explanation.
+Type  H <return>  for immediate help.
+\ltj@@getparam@two ...\ltj@safe@num@or {nil}{#2})}
+                                                  \directlua {luatexja.base....
+l.56 \ltjgetparameter{chartorange}{-1}
+                                      % must be error "
+[1{/home/h7k/.texlive2014/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+(./jfm-test.lua)======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  9.4pt plus 2.3pt minus 4.5pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+6 kern 1  20.0pt (from JFM: priority 0)
+D glyph 256  ア 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  9.4pt plus 2.3pt minus 4.5pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256  イ 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  9.4pt plus 2.3pt minus 4.5pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+6 glue 0  14.1pt (from JFM: priority 0)
+D glyph 256  ウ 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  い 69 (8.8+1.2)x10.0
+6 kern 1  20.0pt (from JFM: priority 0)
+D glyph 256  ア 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  い 69 (8.8+1.2)x10.0
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256  イ 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  い 69 (8.8+1.2)x10.0
+6 glue 0  14.1pt (from JFM: priority 0)
+D glyph 256  ウ 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  9.4pt plus 2.3pt minus 4.5pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+6 kern 1  12.1pt (from JFM: priority 0)
+D glyph 256  a 68 (5.2002+0.03906)x5.49805
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  い 69 (8.8+1.2)x10.0
+B glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 256  a 68 (5.2002+0.03906)x5.49805
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  う 69 (8.8+1.2)x10.0
+6 glue 0  17.3pt (from JFM: priority 0)
+D glyph 256  a 68 (5.2002+0.03906)x5.49805
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  え 69 (8.8+1.2)x10.0
+6 kern 1  17.3pt (from JFM: priority 0)
+D glyph 256  a 68 (5.2002+0.03906)x5.49805
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  お 69 (8.8+1.2)x10.0
+B glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 256  a 68 (5.2002+0.03906)x5.49805
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  a 68 (5.2002+0.03906)x5.49805
+B glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 256  あ 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  a 68 (5.2002+0.03906)x5.49805
+6 glue 0  14.1pt (from JFM: priority 0)
+D glyph 256  い 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  a 68 (5.2002+0.03906)x5.49805
+6 kern 1  20.0pt (from JFM: priority 0)
+D glyph 256  う 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  9.4pt plus 2.3pt minus 4.5pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+6 kern 1  12.1pt (from JFM: priority 0)
+D kern 1  3.0pt
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  い 69 (8.8+1.2)x10.0
+D kern 1  3.0pt
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  う 69 (8.8+1.2)x10.0
+3 penalty 0  10000 (for kinsoku)
+6 glue 0  17.3pt (from JFM: priority 0)
+D kern 1  3.0pt
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D kern 1  3.0pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+======
+ [2]======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D kern 1  3.0pt
+3 penalty 0  10000 (for kinsoku)
+6 glue 0  14.1pt (from JFM: priority 0)
+D glyph 256  い 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D kern 1  3.0pt
+6 kern 1  20.0pt (from JFM: priority 0)
+D glyph 256  う 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  9.4pt plus 2.3pt minus 4.5pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+3 penalty 0  0 (for kinsoku)
+6 kern 1  12.1pt (from JFM: priority 0)
+D hlist 2 (0.0+0.0)x0.0, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  い 69 (8.8+1.2)x10.0
+3 penalty 0  0 (for kinsoku)
+D hlist 2 (0.0+0.0)x0.0, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  う 69 (8.8+1.2)x10.0
+6 glue 0  17.3pt (from JFM: priority 0)
+D hlist 2 (0.0+0.0)x0.0, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  え 69 (8.8+1.2)x10.0
+3 penalty 0  0 (for kinsoku)
+6 kern 1  17.3pt (from JFM: priority 0)
+D hlist 2 (0.0+0.0)x0.0, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  9.4pt plus 2.3pt minus 4.5pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+6 kern 1  12.1pt (from JFM: priority 0)
+D hlist 2 (8.8+1.2)x10.0, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+.D glyph 256  ア 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  9.4pt plus 2.3pt minus 4.5pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+6 kern 1  12.1pt (from JFM: priority 0)
+D hlist 2 (5.2002+0.03906)x5.49805, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+.D glyph 256  a 68 (5.2002+0.03906)x5.49805
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  い 69 (8.8+1.2)x10.0
+B glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D hlist 2 (5.2002+0.03906)x5.49805, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+.D glyph 256  a 68 (5.2002+0.03906)x5.49805
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D hlist 2 (0.0+0.0)x0.0, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+3 penalty 0  0 (for kinsoku)
+D glyph 256  あ 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D hlist 2 (0.0+0.0)x0.0, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+6 glue 0  14.1pt (from JFM: priority 0)
+D glyph 256  い 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D hlist 2 (0.0+0.0)x0.0, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+3 penalty 0  0 (for kinsoku)
+6 kern 1  20.0pt (from JFM: priority 0)
+D glyph 256  う 69 (8.8+1.2)x10.0
+======
+ [3]======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  9.4pt plus 2.3pt minus 4.5pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+6 kern 1  20.0pt (from JFM: priority 0)
+D glyph 256  ア 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  9.4pt plus 2.3pt minus 4.5pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+3 penalty 0  123 (for kinsoku)
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256  イ 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  9.4pt plus 2.3pt minus 4.5pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+3 penalty 0  123 (for kinsoku)
+6 glue 0  14.1pt (from JFM: priority 0)
+D glyph 256  ウ 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  い 69 (8.8+1.2)x10.0
+6 kern 1  20.0pt (from JFM: priority 0)
+D glyph 256  ア 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  い 69 (8.8+1.2)x10.0
+3 penalty 0  123 (for kinsoku)
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256  イ 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  い 69 (8.8+1.2)x10.0
+3 penalty 0  123 (for kinsoku)
+6 glue 0  14.1pt (from JFM: priority 0)
+D glyph 256  ウ 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  9.4pt plus 2.3pt minus 4.5pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+6 kern 1  12.1pt (from JFM: priority 0)
+D glyph 256  a 68 (5.2002+0.03906)x5.49805
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  い 69 (8.8+1.2)x10.0
+3 penalty 0  123 (for kinsoku)
+B glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 256  a 68 (5.2002+0.03906)x5.49805
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  う 69 (8.8+1.2)x10.0
+3 penalty 0  123 (for kinsoku)
+6 glue 0  17.3pt (from JFM: priority 0)
+D glyph 256  a 68 (5.2002+0.03906)x5.49805
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  え 69 (8.8+1.2)x10.0
+6 kern 1  17.3pt (from JFM: priority 0)
+D glyph 256  a 68 (5.2002+0.03906)x5.49805
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  お 69 (8.8+1.2)x10.0
+3 penalty 0  123 (for kinsoku)
+B glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 256  a 68 (5.2002+0.03906)x5.49805
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  a 68 (5.2002+0.03906)x5.49805
+3 penalty 0  321 (for kinsoku)
+B glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 256  あ 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  a 68 (5.2002+0.03906)x5.49805
+3 penalty 0  892 (for kinsoku)
+6 glue 0  14.1pt (from JFM: priority 0)
+D glyph 256  い 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  a 68 (5.2002+0.03906)x5.49805
+6 kern 1  20.0pt (from JFM: priority 0)
+D glyph 256  う 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  9.4pt plus 2.3pt minus 4.5pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+3 penalty 0  123 (for kinsoku)
+6 kern 1  12.1pt (from JFM: priority 0)
+D hlist 2 (0.0+0.0)x0.0, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  い 69 (8.8+1.2)x10.0
+3 penalty 0  123 (for kinsoku)
+D hlist 2 (0.0+0.0)x0.0, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+======
+ [4]======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  う 69 (8.8+1.2)x10.0
+3 penalty 0  123 (for kinsoku)
+6 glue 0  17.3pt (from JFM: priority 0)
+D hlist 2 (0.0+0.0)x0.0, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  え 69 (8.8+1.2)x10.0
+3 penalty 0  123 (for kinsoku)
+6 kern 1  17.3pt (from JFM: priority 0)
+D hlist 2 (0.0+0.0)x0.0, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  9.4pt plus 2.3pt minus 4.5pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+6 kern 1  12.1pt (from JFM: priority 0)
+D hlist 2 (8.8+1.2)x10.0, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+.D glyph 256  ア 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  9.4pt plus 2.3pt minus 4.5pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+6 kern 1  12.1pt (from JFM: priority 0)
+D hlist 2 (5.2002+0.03906)x5.49805, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+.D glyph 256  a 68 (5.2002+0.03906)x5.49805
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  い 69 (8.8+1.2)x10.0
+3 penalty 0  123 (for kinsoku)
+B glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D hlist 2 (5.2002+0.03906)x5.49805, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+.D glyph 256  a 68 (5.2002+0.03906)x5.49805
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D hlist 2 (8.8+1.2)x10.0, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+.D glyph 256  （ 69 (8.8+1.2)x10.0
+3 penalty 0  571 (for kinsoku)
+6 glue 0  14.1pt (from JFM: priority 0)
+D glyph 256  い 69 (8.8+1.2)x10.0
+3 penalty 0  123 (for kinsoku)
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D hlist 2 (8.8+1.2)x10.0, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+.D glyph 256  ） 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D hlist 2 (0.0+0.0)x0.0, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+3 penalty 0  0 (for kinsoku)
+D glyph 256  あ 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D hlist 2 (0.0+0.0)x0.0, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+3 penalty 0  571 (for kinsoku)
+6 glue 0  14.1pt (from JFM: priority 0)
+D glyph 256  い 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D hlist 2 (0.0+0.0)x0.0, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+3 penalty 0  0 (for kinsoku)
+6 kern 1  20.0pt (from JFM: priority 0)
+D glyph 256  う 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  f 37 (6.94444+1.94444)x3.06665
+3 penalty 0  123 (for kinsoku)
+6 glue 0  5.0pt minus 5.0pt (from JFM: priority 0)
+2 hlist 0 (8.8+1.2)x5.0, dir=0 (packed)
+.0 glyph 256  （ 66 (8.32031+0.71777)x5.09766
+E kern 1  0.0pt (italic correction)
+3 penalty 0  10000 (for kinsoku)
+6 glue 0  0.0pt (from JFM: priority 0)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ 66 (8.11035+0.36133)x8.99902
+======
+ [5]======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  9.4pt plus 2.3pt minus 4.5pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256  あ 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  9.4pt plus 2.3pt minus 4.5pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+A glue 0  1.0pt plus 0.4pt minus 0.5pt (kanjiskip, JFM specified)
+D glyph 256  あ 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  は 72 (10.56+1.44)x12.0
+A glue 0  1.1pt plus 0.44pt minus 0.55pt (kanjiskip, JFM specified)
+D glyph 256  あ 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  9.4pt plus 2.3pt minus 4.5pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256  あ 69 (8.8+1.2)x10.0
+9 glue 0  0.0pt (kanjiskip)
+D glyph 256  あ 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  ま 69 (8.8+1.2)x10.0
+B glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 256  x 68 (5.07813+0.0)x4.8877
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  ま 69 (8.8+1.2)x10.0
+B glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 256  x 68 (5.07813+0.0)x4.8877
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  ま 69 (8.8+1.2)x10.0
+B glue 0  0.0pt (xkanjiskip)
+D glyph 256  x 68 (5.07813+0.0)x4.8877
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  ま 69 (8.8+1.2)x10.0
+C glue 0  3.1pt plus 0.45pt minus 0.57pt (xkanjiskip, JFM specified)
+D glyph 256  x 68 (5.07813+0.0)x4.8877
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  ま 69 (8.8+1.2)x10.0
+B glue 0  0.0pt (xkanjiskip)
+D glyph 256  x 68 (5.07813+0.0)x4.8877
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  ま 69 (8.8+1.2)x10.0
+B glue 0  0.0pt (xkanjiskip)
+D glyph 256  x 68 (5.07813+0.0)x4.8877
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  x 68 (5.07813+0.0)x4.8877
+B glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 256  ま 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  x 68 (5.07813+0.0)x4.8877
+B glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 256  ま 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  x 68 (5.07813+0.0)x4.8877
+B glue 0  0.0pt (xkanjiskip)
+D glyph 256  ま 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  x 68 (5.07813+0.0)x4.8877
+C glue 0  3.1pt plus 0.45pt minus 0.57pt (xkanjiskip, JFM specified)
+D glyph 256  ま 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  x 68 (5.07813+0.0)x4.8877
+B glue 0  0.0pt (xkanjiskip)
+D glyph 256  ま 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  x 68 (5.07813+0.0)x4.8877
+B glue 0  0.0pt (xkanjiskip)
+D glyph 256  ま 69 (8.8+1.2)x10.0
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256  お 69 (8.8+1.2)x10.0
+B glue 0  0.0pt (xkanjiskip)
+D glyph 256  x 68 (5.07813+0.0)x4.8877
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  お 69 (8.8+1.2)x10.0
+D penalty 0  1701
+D penalty 0  1701
+D penalty 0  1701
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256  い 69 (8.8+1.2)x10.0
+======
+ [6]======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  お 69 (8.8+1.2)x10.0
+D penalty 0  1701
+D penalty 0  1701
+D penalty 0  1701
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256  お 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  9.4pt plus 2.3pt minus 4.5pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+D penalty 0  1701
+D penalty 0  1701
+D penalty 0  1701
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256  い 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  9.4pt plus 2.3pt minus 4.5pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+D penalty 0  1701
+D penalty 0  1701
+D penalty 0  1701
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256  お 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ 66 (8.11035+0.36133)x8.99902
+E kern 1  0.0pt (italic correction)
+B glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 256  j 1 (6.67859+1.94444)x3.05557
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+2 hlist 0 (8.8+1.2)x5.0, dir=0 (packed)
+.0 glyph 256  ） 66 (8.32031+0.71777)x5.09766
+E kern 1  0.0pt (italic correction)
+6 glue 0  5.0pt minus 5.0pt (from JFM: priority 0)
+D glyph 256  j 1 (6.67859+1.94444)x3.05557
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  れ 69 (8.8+1.2)x10.0
+B glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D kern 2  1.25pt (for accent)
+D hlist 0 (6.28473+0.0)x5.00002, dir=0, shifted -2.52777
+.0 glyph 0   1 (6.28473+0.0)x5.00002
+D kern 2  -6.25002pt (for accent)
+D glyph 256  A 1 (6.83331+0.0)x7.50002
+3 penalty 0  10000 (for kinsoku)
+B glue 0  0.0pt (xkanjiskip)
+D glyph 256  ） 69 (8.8+1.2)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  10.3pt
+D glyph 256  か 69 (8.8+1.2)x10.0
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256  あ 69 (8.8+1.2)x10.0
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256  か 69 (8.8+1.2)x10.0
+F kern 1  8.5pt
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  a 68 (5.2002+0.03906)x5.49805
+B glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 512  か 69 (8.8+1.2)x10.0
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 512  あ 69 (8.8+1.2)x10.0
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 512  か 69 (8.8+1.2)x10.0
+B glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 256  a 68 (5.2002+0.03906)x5.49805
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  a 68 (5.2002+0.03906)x5.49805
+D hlist 2 (8.8+1.2)x28.8, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+.F glue 0  10.3pt
+.D glyph 256  か 69 (8.8+1.2)x10.0
+.F kern 1  8.5pt
+D glyph 256  a 68 (5.2002+0.03906)x5.49805
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  き 69 (8.8+1.2)x10.0
+3 penalty 0  0 (for kinsoku)
+D hlist 2 (8.8+1.2)x28.8, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+.F glue 0  10.3pt
+.D glyph 256  か 69 (8.8+1.2)x10.0
+.F kern 1  8.5pt
+3 penalty 0  0 (for kinsoku)
+D glyph 256  き 69 (8.8+1.2)x10.0
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D hlist 2 (8.8+1.2)x10.0, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+.D glyph 256  き 69 (8.8+1.2)x10.0
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256  き 69 (8.8+1.2)x10.0
+======
+ [7]======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ 66 (8.11035+0.36133)x8.99902
+3 penalty 0  1000 (for kinsoku)
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D hlist 2 (8.8+1.2)x5.0, dir=0
+.D whatsit 44  userid:4 (direction) (node list) dir: 4
+.2 hlist 0 (8.8+1.2)x5.0, dir=0 (packed)
+..0 glyph 256  （ 66 (8.32031+0.71777)x5.09766
+3 penalty 0  1000 (for kinsoku)
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ 66 (8.11035+0.36133)x8.99902
+3 penalty 0  1000 (for kinsoku)
+6 glue 0  5.0pt minus 5.0pt (from JFM: priority 0)
+2 hlist 0 (8.8+1.2)x5.0, dir=0 (packed)
+.0 glyph 256  （ 66 (8.32031+0.71777)x5.09766
+3 penalty 0  10000 (for kinsoku)
+6 glue 0  0.0pt (from JFM: priority 0)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ 66 (8.11035+0.36133)x8.99902
+======
+ [8]======
+0 whatsit 44  userid:4 (direction) (node list) dir: 4
+0 whatsit 6 6
+0 hlist 3 (0.0+0.0)x19.2, dir=0
+F glue 0  6.8pt plus 0.2pt minus 0.4pt
+D glyph 256  か 69 (8.8+1.2)x10.0
+3 penalty 0  500 (for kinsoku)
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256  エ 69 (8.8+1.2)x10.0
+D penalty 0  10000
+0 glue 15  30.0pt
+0 glue 9  0.0pt
+======
+======
+0 whatsit 44  userid:4 (direction) (node list) dir: 4
+0 whatsit 6 6
+F glue 0  10.3pt
+D glyph 256  か 69 (8.8+1.2)x10.0
+3 penalty 0  500 (for kinsoku)
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256  エ 69 (8.8+1.2)x10.0
+D penalty 0  10000
+0 glue 15  30.0pt
+0 glue 9  0.0pt
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  10.3pt
+D glyph 256  か 69 (8.8+1.2)x10.0
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256  エ 69 (8.8+1.2)x10.0
+F glue 0  7.8pt
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+F glue 0  9.4pt plus 2.3pt minus 4.5pt
+D glyph 256  あ 69 (8.8+1.2)x10.0
+6 glue 0  12.5pt plus 4.3pt minus 8.7pt (from JFM: priority 0)
+D math 0 
+D glyph 256  a 7 (4.30554+0.0)x5.28589
+D math 1 
+6 glue 0  6.8pt plus 0.2pt minus 0.4pt (from JFM: priority 0)
+D glyph 256  さ 69 (8.8+1.2)x10.0
+B glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D math 0 
+D glyph 256  a 7 (4.30554+0.0)x5.28589
+D math 1 
+B glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+D glyph 256  か 69 (8.8+1.2)x10.0
+F kern 1  8.5pt
+======
+ HOGE======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+2 hlist 0 (8.4675+1.15466)x4.81108, dir=0 (packed)
+.0 glyph 256  ） 51 (8.4675+1.15466)x9.62216
+D glyph 512  a 68 (5.2002+0.03906)x5.49805
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+2 hlist 0 (8.4675+1.15466)x4.81108, dir=0 (packed)
+.0 glyph 256  ） 51 (8.4675+1.15466)x9.62216
+D glyph 512  a 68 (5.2002+0.03906)x5.49805
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+2 hlist 0 (8.4675+1.15466)x4.81108, dir=0 (packed)
+.0 glyph 256  （ 51 (8.4675+1.15466)x9.62216
+3 penalty 0  10000 (for kinsoku)
+6 glue 0  0.0pt (from JFM: priority 0)
+2 hlist 0 (8.4675+1.15466)x4.81108, dir=0 (packed)
+.0 glyph 256  ） 51 (8.4675+1.15466)x9.62216
+2 hlist 0 (8.4675+1.15466)x4.81108, dir=0 (packed)
+.0 glyph 256  （ 51 (8.4675+1.15466)x9.62216
+3 penalty 0  10000 (for kinsoku)
+6 glue 0  0.0pt (from JFM: priority 0)
+2 hlist 0 (8.4675+1.15466)x4.81108, dir=0 (packed)
+.0 glyph 256  ） 51 (8.4675+1.15466)x9.62216
+2 hlist 0 (8.4675+1.15466)x4.81108, dir=0 (packed)
+.0 glyph 256  「 51 (8.4675+1.15466)x9.62216
+3 penalty 0  10000 (for kinsoku)
+6 glue 0  0.0pt (from JFM: priority 0)
+2 hlist 0 (8.4675+1.15466)x4.81108, dir=0 (packed)
+.0 glyph 256  」 51 (8.4675+1.15466)x9.62216
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  あ 51 (8.4675+1.15466)x9.62216
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256  い 51 (8.4675+1.15466)x9.62216
+======
+
+! Package luatexja Error: Incompatible direction list can't be unboxed.
+
+See the luatexja package documentation for explanation.
+Type  H <return>  for immediate help.
+\ltj@@unhbox ...on.check_dir(\the \ltj@tempcnta )}
+                                                  \ltj@@orig@unhbox \ltj@tem...
+l.362 ...\tenmin\setbox1=\hbox{\tate }あ\unhbox1い
+                                                  }󿿿
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  あ 51 (8.4675+1.15466)x9.62216
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+D glyph 256  い 51 (8.4675+1.15466)x9.62216
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  あ 51 (8.4675+1.15466)x9.62216
+6 glue 0  2.40555pt minus 2.40555pt (from JFM: priority 0)
+2 hlist 0 (4.23375+0.57733)x2.40555, dir=0 (packed)
+.0 glyph 256  （ 53 (4.23375+0.57733)x4.81108
+======
+[9]======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+D glyph 256  あ 53 (4.23375+0.57733)x4.81108
+6 glue 0  4.81108pt minus 4.81108pt (from JFM: priority 0)
+2 hlist 0 (8.4675+1.15466)x4.81108, dir=0 (packed)
+.0 glyph 256  （ 51 (8.4675+1.15466)x9.62216
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+2 hlist 0 (4.23375+0.57733)x2.40555, dir=0 (packed)
+.0 glyph 256  ． 53 (4.23375+0.57733)x4.81108
+3 penalty 0  10000 (for kinsoku)
+7 glue 0  4.81108pt minus 1.6037pt (from JFM: priority 1)
+2 hlist 0 (8.4675+1.15466)x4.81108, dir=0 (packed)
+.0 glyph 256  ・ 51 (8.4675+1.15466)x9.62216
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+2 hlist 0 (8.4675+1.15466)x4.81108, dir=0 (packed)
+.0 glyph 256  ． 51 (8.4675+1.15466)x9.62216
+3 penalty 0  10000 (for kinsoku)
+7 glue 0  6.01385pt minus 2.00462pt (from JFM: priority 1)
+2 hlist 0 (4.23375+0.57733)x2.40555, dir=0 (packed)
+.0 glyph 256  ・ 53 (4.23375+0.57733)x4.81108
+======
+
+luaotfload | db : Reload initiated (formats: otf,ttf,ttc,dfont); reason: "Font KozMinPr6N-Regular.otf not found.".======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  タ 73 (8.12+0.44)x10.0
+E kern 1  -0.5pt (italic correction)
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  ノ 73 (7.83+0.38)x10.0
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  タ 73 (8.12+0.44)x10.0
+E kern 1  -0.09999pt (italic correction)
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  イ 73 (8.08+0.42)x10.0
+E kern 1  -0.2pt (italic correction)
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  ク 73 (8.19+0.44)x10.0
+E kern 1  -0.79999pt (italic correction)
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  ノ 73 (7.83+0.38)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  タ 74 (8.12+0.44)x10.0
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  ノ 74 (7.83+0.38)x10.0
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  タ 74 (8.12+0.44)x10.0
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  イ 74 (8.08+0.42)x10.0
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  ク 74 (8.19+0.44)x10.0
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  ノ 74 (7.83+0.38)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  タ 73 (8.12+0.44)x10.0
+E kern 1  0.0pt (italic correction)
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  ノ 73 (7.83+0.38)x10.0
+======
+======
+D whatsit 44  userid:4 (direction) (node list) dir: 4
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  」 73 (6.68+0.83)x10.0
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  󱃫 73 (8.24+0.27)x10.0
+3 penalty 0  10000 (for kinsoku)
+9 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  ． 73 (1.35+0.0)x10.0
+======
+ [10])
+(see the transcript file for additional information)</opt/texlive/texmf-local/fo
+nts/truetype/mine/ipaexg.ttf></opt/texlive/texmf-local/fonts/truetype/mine/ipamp
+.ttf></opt/texlive/texmf-local/fonts/truetype/mine/kozuka/KozMinPr6N-Regular.otf
+></usr/share/fonts/cjk/ipam.ttf><</opt/texlive/2014/texmf-dist/fonts/type1/publi
+c/amsfonts/cm/cmbx10.pfb><</opt/texlive/2014/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmmi10.pfb><</opt/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/
+cmr10.pfb><</opt/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.p
+fb><</opt/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on test04-jfm.pdf (10 pages, 502505 bytes).
+Transcript written on test04-jfm.log.
