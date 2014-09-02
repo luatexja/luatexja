@@ -6651,11 +6651,11 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 
 (a)部分にペナルティが存在していない場合，
 \LuaTeX-ja は\textit{Nq}と\textit{Np}の間の行分割を可能にしようとする．
-そのために，以下の場合に$a$をもつ\textit{penalty\_node}を作って
+そのために，以下のいずれかの場合に$a$をもつ\textit{penalty\_node}を作って
 「右空白」の（もし未定義なら\textit{Np}の）直前に挿入する：
 \begin{itemize}
 \item 「右空白」がグルーでない（カーンか未定義）であるとき．
-%\item 「左空白」がカーンとしてきっちり定義されている時．
+\item $a\neq 0$のときは，「右空白」がグルーであっても\textit{penalty\_node}を作る．
 \end{itemize}
 
 \item[P-suppress~{[PS]}]

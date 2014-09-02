@@ -534,7 +534,7 @@ end
 local function handle_penalty_always(post, pre, g)
    local a = (pre or 0) + (post or 0)
    if #Bp == 0 then
-      if not (g and getid(g)==id_glue) then
+      if not (g and getid(g)==id_glue) or a~=0 then
 	 local p = node_new(id_penalty)
 	 if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
 	 setfield(p, 'penalty', a)
