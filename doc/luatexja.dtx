@@ -1331,10 +1331,10 @@ bold (\cs{bfseries}).
 %</ja>
 \item[expert]
 %<*en>
-Use horizontal kana alternates, and define a command \cs{rubyfamily} to use kana
+Use horizontal/vertical kana alternates, and define a command \cs{rubyfamily} to use kana
 characters designed for ruby.
 %</en>
-%<ja>横組専用仮名を用いる．また，\cs{rubyfamily} でルビ用仮名が使用可能となる．
+%<ja>横組・縦組専用仮名を用いる．また，\cs{rubyfamily} でルビ用仮名が使用可能となる．
 \item[bold]
 %<en>Substitute bold series of \textit{gothic} for  bold series of \textit{mincho}.
 %<ja>「明朝の太字」をゴシック体の太字によって代替する．
@@ -2217,6 +2217,37 @@ xyz漢字
 }abcかな
 \end{LTXexample}
 
+%<*en>
+Note that setting a positive value to 
+\Param{yalbaselineshift}~or~\Param{talbaselineshift} does not 
+increase the depth of \textbf{ALchar}, as shown below.
+This is because these parameters are implemented by setting \verb+yoffset+
+field of a glyph node, and this does not increase the depth of the glyph.
+This problem does not apply for \Param{yjabaselineshift}, since
+\Param{yjabaselineshift}~and~\Param{tjabaselineshift}
+use a different implementation method.
+%</en>
+%<*ja>
+なお，\Param{yalbaselineshift},~\Param{talbaselineshift}パラメータに
+正の値を指定しても，
+下の例のように\textbf{ALchar}の深さは増加しないことに注意．
+これは，2パラメータがglyph~nodeの\verb+yoffset+を使って
+実装されているためである．
+\Param{yjabaselineshift},~\Param{tjabaselineshift}パラメータは
+別の方法を使って実装しているので，
+このような問題は起こらない．
+%</ja>
+\begin{LTXexample}[width=.3\textwidth]
+\leavevmode\fboxsep=0pt
+ \ltjsetparameter{yjabaselineshift=0pt,
+    yalbaselineshift=0pt}
+\vrule width 105pt height 0.4pt depth 0pt \hskip-95pt
+\fbox{\ltjsetparameter{yalbaselineshift=10pt}あいうxyz}
+\fbox{\ltjsetparameter{yalbaselineshift=-10pt}あいうxyz}\\
+\vrule width 105pt height 0.4pt depth 0pt \hskip-95pt
+\fbox{\ltjsetparameter{yjabaselineshift=10pt}あいうxyz}
+\fbox{\ltjsetparameter{yjabaselineshift=-10pt}あいうxyz}
+\end{LTXexample}
 
 %<*ja>
 \paragraph{数式における挙動：\pTeX との違い}

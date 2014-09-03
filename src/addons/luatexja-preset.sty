@@ -273,8 +273,11 @@
 }
 
 \bool_if:NT \l_ltjpreset_expert_bool {
-  \cs_set:Npn \rubyfamily { \addfontfeatures { Style = Ruby} }
-  \tl_put_left:Nn \l_ltjpreset_add_features_tl { Style = HorizontalKana, }
+  \cs_set:Npn \rubyfamily { \addjfontfeatures { Style = Ruby} }
+  \tl_put_left:Nn \l_ltjpreset_add_features_tl { 
+    YokoFeatures = {Style = HorizontalKana}, 
+    TateFeatures = {Style = VerticalKana}, 
+  }
 }
 
 % （丸）ゴシック体の設定: bold option もここで
