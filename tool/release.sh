@@ -41,8 +41,9 @@ echo "  git push && git tag $VER && git push origin $VER"
 echo
 echo Informations for submitting CTAN: 
 echo "  CONTRIBUTION: LuaTeX-ja"
+echo "  AUTHOR:       The LuaTeX-ja project"
 echo "  SUMMARY:      Typeset Japanese documents with Lua(La)TeX."
 echo "  DIRECTORY:    macros/luatex/generic/luatexja"
-echo "  LICENSE:      free/other-free"
+echo "  LICENSE:      bsd3 (3-clause BSD License)"
 echo "  FILE:         $DIR/$PROJECT-$VER.tar.gz"
 
