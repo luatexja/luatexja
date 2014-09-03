@@ -571,7 +571,7 @@ local post_lown
 do
    local function write_aux(wv, num)
       local id = has_attr(wv, attr_ruby_id)
-      if id>0 then
+      if id>0 and cache_handle then
 	 cache_handle:write(
 		    'luatexja.ruby.old_break_info['
 		       .. tostring(id) .. ']=' .. num
