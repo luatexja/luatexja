@@ -44,6 +44,6 @@ echo "  CONTRIBUTION: LuaTeX-ja"
 echo "  AUTHOR:       The LuaTeX-ja project"
 echo "  SUMMARY:      Typeset Japanese documents with Lua(La)TeX."
 echo "  DIRECTORY:    macros/luatex/generic/luatexja"
-echo "  LICENSE:      bsd3 (3-clause BSD License)"
+echo "  LICENSE:      bsd (BSD-like License)"
 echo "  FILE:         $DIR/$PROJECT-$VER.tar.gz"
 
