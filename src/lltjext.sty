@@ -617,17 +617,17 @@
     \@tempdima\ltjgetht\z@ \advance\@tempdima\ltjgetdp\z@
     \ifnum\ltjgetparameter{direction}=1\relax
       % 周囲が dtou の場合には，高さ \ltjgetht\tw@, 深さ \ltjgetdp\tw@ のボックスを基準としている．
-      \if #1c\relax\vrule \@width 1pt \@height\dimexpr.5\@tempdima+.5\ltjgetht\tw@-.5\ltjgetdp\tw@
+      \if #1c\relax\vrule \@width \z@ \@height\dimexpr.5\@tempdima+.5\ltjgetht\tw@-.5\ltjgetdp\tw@
                           \@depth\dimexpr.5\@tempdima-.5\ltjgetht\tw@+.5\ltjgetdp\tw@
-      \else\if #1l\relax\vrule\@width 1pt\@height\ltjgetht\tw@ \@depth\dimexpr\@tempdima-\ltjgetht\tw@
-      \else\vrule\@width 1pt \@height\dimexpr\@tempdima-\ltjgetdp\tw@ \@depth\ltjgetdp\tw@
+      \else\if #1l\relax\vrule\@width \z@\@height\ltjgetht\tw@ \@depth\dimexpr\@tempdima-\ltjgetht\tw@
+      \else\vrule\@width \z@ \@height\dimexpr\@tempdima-\ltjgetdp\tw@ \@depth\ltjgetdp\tw@
       \fi\fi
     \else
       % 周囲が tate, utod の場合も同じ
-      \if #1c\relax\vrule \@width 1pt \@height\dimexpr.5\@tempdima+.5\ltjgetht\tw@-.5\ltjgetdp\tw@
+      \if #1c\relax\vrule \@width \z@ \@height\dimexpr.5\@tempdima+.5\ltjgetht\tw@-.5\ltjgetdp\tw@
                           \@depth\dimexpr.5\@tempdima-.5\ltjgetht\tw@+.5\ltjgetdp\tw@
-      \else\if #1r\relax\vrule\@width 1pt\@height\ltjgetht\tw@ \@depth\dimexpr\@tempdima-\ltjgetht\tw@
-      \else\vrule\@width 1pt \@height\dimexpr\@tempdima-\ltjgetdp\tw@ \@depth\ltjgetdp\tw@
+      \else\if #1r\relax\vrule\@width \z@\@height\ltjgetht\tw@ \@depth\dimexpr\@tempdima-\ltjgetht\tw@
+      \else\vrule\@width \z@ \@height\dimexpr\@tempdima-\ltjgetdp\tw@ \@depth\ltjgetdp\tw@
       \fi\fi
     \fi
   \fi
