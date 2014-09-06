@@ -1,9 +1,10 @@
 %
 % lltjext.sty: derived from plext.sty in pLaTeX.
 %
+
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{lltjext}
-   [2014/08/11 v1.2-ltj-2 Macros for vertical writing]
+   [2014/09/06 v1.2-ltj-3 Macros for vertical writing]
 \RequirePackage{luatexja}
 
 \let\ltj@lltjext@orig@tabular=\tabular
@@ -609,30 +610,39 @@
   \hbox{#2}\else
   \hskip\rensujiskip
   \ifvmode\leavevmode\fi
+  \setbox\tw@\hbox{漢}% 「あ」では仮名書体使用時がまずそう
+  \@tempdimb\ltjgetht\tw@ \advance\@tempdimb\ltjgetdp\tw@
   \ifnot@advanceline\not@advancelinefalse\else
     \setbox\z@\hbox{\yoko#2}%
     \@tempdima\ltjgetht\z@ \advance\@tempdima\ltjgetdp\z@
     \ifnum\ltjgetparameter{direction}=1\relax
-      \if #1c\relax\vrule \@width \z@ \@height.5\@tempdima \@depth.5\@tempdima
-      \else\if #1l\relax\vrule\@width \z@\@height\z@ \@depth\@tempdima
-      \else\vrule\@width \z@ \@height\@tempdima \@depth\z@
+      % 周囲が dtou の場合には，高さ \ltjgetht\tw@, 深さ \ltjgetdp\tw@ のボックスを基準としている．
+      \if #1c\relax\vrule \@width 1pt \@height\dimexpr.5\@tempdima+.5\ltjgetht\tw@-.5\ltjgetdp\tw@
+                          \@depth\dimexpr.5\@tempdima-.5\ltjgetht\tw@+.5\ltjgetdp\tw@
+      \else\if #1l\relax\vrule\@width 1pt\@height\ltjgetht\tw@ \@depth\dimexpr\@tempdima-\ltjgetht\tw@
+      \else\vrule\@width 1pt \@height\dimexpr\@tempdima-\ltjgetdp\tw@ \@depth\ltjgetdp\tw@
       \fi\fi
     \else
-      \if #1c\relax\vrule \@width \z@ \@height.5\@tempdima \@depth.5\@tempdima
-      \else\if #1r\relax\vrule\@width \z@\@height\z@ \@depth\@tempdima
-      \else\vrule\@width \z@ \@height\@tempdima \@depth\z@
+      % 周囲が tate, utod の場合も同じ
+      \if #1c\relax\vrule \@width 1pt \@height\dimexpr.5\@tempdima+.5\ltjgetht\tw@-.5\ltjgetdp\tw@
+                          \@depth\dimexpr.5\@tempdima-.5\ltjgetht\tw@+.5\ltjgetdp\tw@
+      \else\if #1r\relax\vrule\@width 1pt\@height\ltjgetht\tw@ \@depth\dimexpr\@tempdima-\ltjgetht\tw@
+      \else\vrule\@width 1pt \@height\dimexpr\@tempdima-\ltjgetdp\tw@ \@depth\ltjgetdp\tw@
       \fi\fi
     \fi
   \fi
   \ifnum\ltjgetparameter{direction}=1\relax
-    \if #1c\relax\hbox to\zw{\yoko\hss#2\hss}%
-    \else\if #1r\relax\vbox{\hbox to\zw{\yoko\hss#2}\kern\z@}%
-    \else\vtop{\kern\z@\hbox to\zw{\yoko#2\hss}}%
+    \if #1c\relax\hbox to\@tempdimb{\yoko\hss#2\hss\kern-\ltjgetdp\tw@}%
+    \else\if #1r\relax\vbox{\hbox to\@tempdimb{\yoko\hss#2\kern-\ltjgetdp\tw@}}%
+    \else\lower\ltjgetdp\tw@\vtop{\hbox to\@tempdimb{\yoko#2\hss}}%
     \fi\fi
   \else
-    \if #1c\relax\hbox to\zw{\yoko\hss#2\hss}%
-    \else\if #1r\relax\vtop{\kern\z@\hbox to\zw{\yoko\hss#2}}%
-    \else\vbox{\hbox to\zw{\yoko #2\hss}\kern\z@}%
+    \if #1c\relax\raise\dimexpr.5\@tempdimb-\ltjgetdp\tw@
+        \hbox to\@tempdimb{\yoko \hss#2\hss}%
+    \else\if #1r\relax\raise\dimexpr.5\@tempdimb-\ltjgetdp\tw@
+        \vbox{\hbox to\@tempdimb{\yoko\hss#2}}%
+    \else\raise\dimexpr.5\@tempdimb-\ltjgetdp\tw@
+         \vtop{\hbox to\@tempdimb{\yoko #2\hss}}%
     \fi\fi
   \fi
   \hskip\rensujiskip
@@ -746,4 +756,6 @@
   \RequirePackage{filehook}
   \AtEndOfPackageFile{array}{\ltj@lltjext@patch@array}
 }
+
+
 \endinput

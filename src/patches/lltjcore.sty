@@ -6,7 +6,18 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{lltjcore}[2013/05/14 Patch to LaTeX2e Kernel for LuaTeX-ja]
 
-\makeatletter
+\def\cleardoublepage{\clearpage\if@twoside
+  \ifodd\c@page
+    \ifnum\ltjgetparameter{direction}=3
+      \hbox{}\thispagestyle{empty}\newpage
+      \if@twocolumn\hbox{}\newpage\fi
+    \fi
+  \else
+    \ifnum\ltjgetparameter{direction}=4
+      \hbox{}\thispagestyle{empty}\newpage
+      \if@twocolumn\hbox{}\newpage\fi
+    \fi
+  \fi\fi}
 \newif\iftombow \tombowfalse
 \newif\iftombowdate \tombowdatetrue
 \newdimen\@tombowwidth
@@ -153,7 +164,35 @@
   \stepcounter{page}%
   \let\firstmark\botmark
 }
-
+\renewcommand\@makefnmark{\hbox{%
+  \unless\ifnum\ltjgetparameter{direction}=3
+    \@textsuperscript{\normalfont\@thefnmark}%
+  \else\hbox{\yoko \@textsuperscript{\normalfont\@thefnmark}}\fi}}
+\long\def\@footnotetext#1{%
+  \ifcase\ltjgetparameter{direction}%
+    \or   \let\@tempa\dtou
+    \or\or\let\@tempa\tate
+    \or   \let\@tempa\yoko
+    \else \let\@tempa\utod
+  \fi
+  \insert\footins{\@tempa%
+    \reset@font\footnotesize
+    \interlinepenalty\interfootnotelinepenalty
+    \splittopskip\footnotesep
+    \splitmaxdepth \dp\strutbox \floatingpenalty \@MM
+    \hsize\columnwidth \@parboxrestore
+    \protected@edef\@currentlabel{%
+       \csname p@footnote\endcsname\@thefnmark
+    }%
+    \color@begingroup
+      \@makefntext{%
+        \rule\z@\footnotesep\ignorespaces#1\@finalstrut\strutbox}%
+    \color@endgroup}}
+\def\@footnotemark{\leavevmode
+  \ifhmode\edef\@x@sf{\the\spacefactor}\nobreak\fi
+  \unless\ifnum\ltjgetparameter{direction}=3 \@makefnmark
+  \else\hbox to\z@{\hskip-.25\zw\raise.9\zh\@makefnmark\hss}\fi
+  \ifhmode\spacefactor\@x@sf\fi\relax}
 \def\@setref#1#2#3{%
   \ifx#1\relax
     \protect\G@refundefinedtrue
@@ -169,7 +208,6 @@
     \verb@eol@error \let\do\@makeother \dospecials
     \verbatim@font\@noligs
     \@ifstar\@sverb\@verb}
-\def\@makefnmark{\hbox{}\hbox{\@textsuperscript{\normalfont\@thefnmark}}\hbox{}}
 \fi
 \gdef\@stopfield{\null\color@endgroup\egroup}
 \newcount\hour
