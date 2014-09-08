@@ -1,0 +1,49 @@
+%
+% lltjp-stfloats.sty
+%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{lltjp-stfloats}[2014/09/08 Patch to stfloats for LuaTeX-ja]
+
+\RequirePackage{stfloats,luatexja}
+
+\let\ltj@fn@makecol=\fn@makecol
+
+\gdef\fn@makecol{%
+   \setbox\@outputbox \box\@cclv
+   \let\@elt\relax
+   \xdef\@freelist{\@freelist\@midlist}%
+   \global \let \@midlist \@empty
+   \@combinefloats
+   \ifvoid\footins
+   \else
+     \setbox\@outputbox \vbox {%
+       \boxmaxdepth \@maxdepth
+       \unvbox \@outputbox
+       \vskip \skip\footins
+       \color@begingroup
+         \normalcolor
+         \footnoterule
+         \unvbox \footins
+       \color@endgroup
+       }%
+   \fi
+   \ifvbox\@kludgeins
+     \@makespecialcolbox
+   \else
+     \setbox\@outputbox \vbox to\@colht {%
+       \@texttop
+       \dimen@ \ltjgetdp\@outputbox
+       \unvbox \@outputbox
+       \ifnum\ltjgetparameter{direction}=3 \hskip\z@\else\vskip -\dimen@\fi
+       \@textbottom
+       }%
+   \fi
+   \global \maxdepth \@maxdepth
+  }
+
+\ifx\@makecol\ltj@fn@makecol
+  \message{TRUE}
+  \global\let\@makecol\fn@makecol
+\fi
+\endinput

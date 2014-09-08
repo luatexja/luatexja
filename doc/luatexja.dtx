@@ -844,8 +844,6 @@ run \LuaTeX-ja in this directory, and finally delete the temporary directory.
 %<ja>\subsection{\LaTeX で使う}
 \label{ssec-ltx}
 
-\paragraph{\LaTeXe}
-
 %<*en>
 Using in \LaTeXe\ is basically same. To set up the minimal environment
 for Japanese, you only have to load \texttt{luatexja.sty}:
@@ -966,8 +964,49 @@ Okumura), namely, \Pkg{ltjclasses}\footnote{%
 がそれぞれ用意されている．
 %</ja>
 
+%<*ja>
+\paragraph{脚注とボトムフロートの出力順序}
+オリジナルの\LaTeX では脚注がボトムフロートの上に来るようになっており，
+\pLaTeX では脚注がボトムフロートの下に来るように変更されている．
+
+\LuaTeX-jaでは「欧文クラスの中にちょっとだけ日本語を入れる」という利用も考慮し，
+脚注とボトムフロートの順序は\LaTeX 通りとした．もし\pLaTeX の出力順序が好みならば，
+\Pkg{stfloats}パッケージを利用して
+\begin{lstlisting}
+ \usepackage{stfloats} \fnbelowfloat
+\end{lstlisting}
+のようにすればよい．\Pkg{footmisc}パッケージを \texttt{bottom}\ オプションを指定して
+読み込むという方法もあるが，それだとボトムフロートと脚注の間が開いてしまう．
+%</ja>
+
 %<en>\section{Changing Fonts}
 %<ja>\section{フォントの変更}
+
+%<*en>
+\subsection{Notes on  ``default'' fonts of \LuaTeX-ja}
+As described earlier, default fonts of \LuaTeX-ja are non-embedded fonts,
+namely ``Ryumin-Light'' and ``GothicBBB-Medium''. 
+However, using these non-embedded fonts makes that the output PDF does \emph{not} follow
+the standard ISO32000-1:2008~(\cite{pdfstd}).
+%</en>
+%<*ja>
+\subsection{\LuaTeX-ja 標準フォントについて}
+\label{ssec:stdfnt}
+既に説明したように，\LuaTeX-jaの標準和文フォントは``Ryumin-Light''と``GothicBBB-Medium''%
+という非埋め込みフォントである．しかし，現行の\LuaTeX で非埋め込みフォントを用いたPDFを
+作成すると，エンコーディングがIdentity-Hとなってしまい，
+PDFの標準規格ISO32000-1:2008~(\cite{pdfstd})に非準拠になってしまっている．
+
+この状況を解決する方法として正当的なのは，本章の残りに示すようにドキュメント中にフォント変更命令を記述する方
+法だが，\texttt{luatexja.cfg} を作成するという方法もある．例えば \texttt{luatexja.cfg} に
+\begin{lstlisting}
+\def\ltj@stdmcfont{IPAMincho}
+\def\ltj@stdgtfont{IPAGothic}
+\end{lstlisting}
+と記述しておけば，plain~\TeX, \LaTeXe における標準和文フォントがIPA明朝・IPAゴシックへと変
+更される．
+%</ja>
+
 
 \subsection{plain \TeX~and~\LaTeXe}
 \label{ssec-chgfnt}
@@ -1365,7 +1404,6 @@ We didn't taken account of  when both \texttt{90jis} and \texttt{jis2004} are sp
 同時に指定された場合の動作については全く考慮していない．
 %</ja>
 
-\newpage
 %<en>\paragraph{Presets for multi weight}
 %<ja>\paragraph{多ウェイト用プリセットの一覧}
 %<*en>
@@ -1469,7 +1507,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{tabular}
 \end{center}
 
-%<ja>\medskip
+%<ja>\newpage
 
  \item[morisawa-pro]  Morisawa Pro (Adobe-Japan1-4) fonts.
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
@@ -1499,7 +1537,6 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{tabular}
 \end{center}
 
-\newpage
  \item[yu-win]  Yu fonts bundled with Windows~8.1.
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[yu-osx]  Yu fonts bundled with OSX~Mavericks.
@@ -1563,6 +1600,11 @@ even if \texttt{deluxe} option is also specified).
 %</ja>
 \bottomrule
 \end{tabular}\par\medskip}
+%<*ja>
+なお，\ref{ssec:stdfnt}節にあるように \texttt{luatexja.cfg} を利用して\LuaTeX-jaの標準和文
+フォントを変更しても，上記 \texttt{noembed} オプションを使うとRyumin-Light,
+GothicBBB-Mediumを非埋め込みで用いることになるので注意してほしい．
+%</ja>
 
 
 %<en>\paragraph{Using HG fonts}
@@ -1633,6 +1675,7 @@ are internally specified by:
 \end{description}
 %</en>
 %<*ja>
+\newpage
 なお，HG明朝E・HGゴシックE・HG創英角ゴシックUB・HG丸ゴシック体PROの4つについては，内部で
 \begin{description}
 \item[標準] フォント名（\texttt{HGMinchoE} など）
@@ -1985,7 +2028,6 @@ The block list is indicated in Table~\ref{table-rng7}.
 \end{tabular}
 \end{table}
 \end{description}
-
 
 %<en>\newpage\subsection{\Param{kanjiskip} and \Param{xkanjiskip}}
 %<ja>\subsection{\Param{kanjiskip}と\Param{xkanjiskip}}
@@ -3653,14 +3695,22 @@ JFMの書字方向．\texttt{'yoko'}（横組）と \texttt{'tate'}（縦組）�
 %<ja>（必須）
 
 %<en>The amount of the length of the ``full-width''.
-%<ja>「全角幅」の長さ．この量が \cs{zw} の長さを決定する．
+%<*ja>
+「全角幅」の長さ．この量が \cs{zw} の長さとなる．\pTeX では
+「全角幅」\texttt{1zw} は「文字クラス0の文字」の幅と決められていたが，
+\LuaTeX-jaではここで指定する．
+%</ja>
 
 \item[zh=<length>]
 %<en>(required)
 %<ja>（必須）
 
 %<en>The amount of the ``full-height'' (height + depth).
-%<ja>「全角高さ」(height + depth)の長さ．通常は全角幅と同じ長さになるだろう．
+%<*ja>
+「全角高さ」(height + depth)の長さ．通常は全角幅と同じ長さになるだろう．
+\pTeX では 「全角高さ」\texttt{1zh} は「文字クラス0の文字」の高さと深さの和と決められていたが，
+\LuaTeX-jaではここで指定する．
+%</ja>
 
 \item[kanjiskip=\{<natural>, <stretch>, <shrink>\}]
 %<en>(optional)
@@ -6148,7 +6198,9 @@ among the line-head form, the line-middle form, and the line-end form.
  \item それ以外のときは，ボックスの中央が「数式の軸」に一致するように配置する．
 \end{itemize}
 
- \item 連数字用命令 \cs{rensuji} における位置合わせオプション……
+ \item 連数字用命令 \cs{rensuji} における位置合わせオプション \texttt{[l]}, \texttt{[c]},
+       \texttt{[r]} の挙動を若干変更した．
+
 \end{itemize}
 }
 %</ja>
