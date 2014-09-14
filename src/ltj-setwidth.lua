@@ -134,12 +134,13 @@ local function capsule_glyph_tate(p, met, class)
    setfield(box, 'shift', y_shift)
    setfield(box, 'dir', dir)
 
-   local k1 = node_new(id_kern)
-   setfield(k1, 'kern',
-	    getfield(p, 'xoffset') + ascent
-	       + char_data.align*(fwidth-pwidth) - fshift.left)
+   --local k1 = node_new(id_kern)
+   --setfield(k1, 'kern',
+   --    getfield(p, 'xoffset') + ascent
+   --       + char_data.align*(fwidth-pwidth) - fshift.left)
    setfield(p, 'xoffset', -fshift.down)
-   setfield(p, 'yoffset', 0)
+   setfield(p, 'yoffset', - (getfield(p, 'xoffset') + ascent
+                                + char_data.align*(fwidth-pwidth) - fshift.left) )
    local ws = node_new(id_whatsit, sid_save)
    local wm = node_new(id_whatsit, sid_matrix)
    setfield(wm, 'data', '0 1 -1 0')
@@ -147,7 +148,8 @@ local function capsule_glyph_tate(p, met, class)
    local k2 = node_new(id_kern); setfield(k2, 'kern', - 0.5*getfield(p, 'width'))
    local k3 = node_copy(k2)
    local wr = node_new(id_whatsit, sid_restore)
-   setfield(box, 'head', k1); setfield(k1, 'next', ws)
+   --setfield(box, 'head', k1); setfield(k1, 'next', ws)
+   setfield(box, 'head', ws)
    setfield(ws, 'next', wm);  setfield(wm, 'next', k2);
    setfield(k2, 'next', p);   setfield(p, 'next', k3);
    setfield(k3, 'next', wr);
@@ -230,4 +232,3 @@ function luatexja.setwidth.set_ja_width(ahead, adir)
    tex_set_attr('global', attr_icflag, 0)
    return head
 end
-
