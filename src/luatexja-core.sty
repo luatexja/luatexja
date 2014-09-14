@@ -77,12 +77,15 @@
   \RequirePackage{ltxcmds}    [2011/11/09] % v1.22
   \RequirePackage{pdftexcmds} [2011/11/29] % v0.20
   \RequirePackage{xkeyval}    [2012/10/14] % v2.6b
+  \RequirePackage{atbegshi}
 \else                           %<*!LaTeX>
   \input luaotfload.sty
   \input infwarerr.sty
   \input ltxcmds.sty
   \input pdftexcmds.sty
   \input xkeyval
+  \input atbegshi.sty
+  \AtBeginShipoutInit
 \fi                             %</LaTeX>
 \endlinechar=-1 %
 
@@ -489,7 +492,7 @@
 %%%%%%%% \ltjdeclarealtfont<base_font_cs><alt_font_cs>{100-200,3000-,5000,...}
 % <base_font_cs> の 第 3 引数の文字達は <alt_font_cs> で組む
 % いつも global
-\def\ltj@@getjfontnumber#1{% result in \ltj@tempcntc 
+\def\ltj@@getjfontnumber#1{% result in \ltj@tempcntc
   \ltj@reset@globaldefs
   \begingroup\ltj@curjfnt=-1 \ltj@curtfnt=-1\relax
   #1\directlua{luatexja.__temp = -(\the\ltj@curjfnt)*(\the\ltj@curtfnt)}\endgroup
@@ -500,7 +503,7 @@
      a Japanese font}{I'll use the current horizontal Japanese font instead.^^J}%
     \ltj@tempcntc=\ltj@curjfnt
   \fi\ltj@restore@globaldefs}
-  
+
 \protected\def\ltjdeclarealtfont#1#2#3{%
   {\ltj@@getjfontnumber#1\@tempcnta=\ltj@tempcntc% \@tempcnta: 基底フォント
    \ltj@@getjfontnumber#2%
@@ -586,7 +589,7 @@
     luatexja.stack.mmode = -tex.nest[tex.nest.ptr].mode
   }$%
 }
-
+\AtBeginShipout{\directlua{luatexja.direction.finalize()}}
 
 %%%% \raise, \lower, \moveleft, \moveright
 \let\ltj@@orig@raise=\raise

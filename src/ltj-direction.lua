@@ -30,7 +30,7 @@ local node_remove = Dnode.remove
 local node_next = (Dnode ~= node) and Dnode.getnext or node.next
 local traverse = Dnode.traverse
 local traverse_id = Dnode.traverse_id
-local start_time_measure, stop_time_measure 
+local start_time_measure, stop_time_measure
    = ltjb.start_time_measure, ltjb.stop_time_measure
 local abs = math.abs
 
@@ -83,7 +83,7 @@ do
       if h then
 	 if h.id==id_whatsit and h.subtype==sid_user and h.user_id==DIR then
 	       local ic = node.has_attribute(h, attr_icflag) or 0
-	       return (ic<PROCESSED_BEGIN_FLAG) 
+	       return (ic<PROCESSED_BEGIN_FLAG)
 		  and (node.has_attribute(h,attr_dir)%dir_node_auto) or 0
 	 else
 	    return 0
@@ -127,7 +127,7 @@ do
    local IHB = luatexja.userid_table.IHB
 
    local function test_list(h, lv)
-      if not h then 
+      if not h then
 	 return 2 -- need to create dir_whatsit
       else
 	 local flag = 2 -- need to create dir_whatsit
@@ -150,14 +150,14 @@ do
 	 end
 	 if flag==1 then -- move dir_whatsit w
 	    return 1,w -- TODO
-	 else 
+	 else
 	    return flag
 	 end
       end
    end
    local function set_list_direction(v, name)
       local lv = tex_nest.ptr
-      if not v then 
+      if not v then
          v,name  = get_dir_count(), nil
 	 if lv>=1 and abs(tex_nest[lv-1].mode) == ltjs.mmode and v == dir_tate then
 	    v = dir_utod
@@ -184,7 +184,7 @@ do
                  'Direction change command by LuaTeX-ja is available\n'
 		    .. 'only when the current list is null.')
 	    end
-	 elseif flag==1 then 
+	 elseif flag==1 then
 	    node_set_attr(w, attr_dir, v)
 	    if lv==0 then page_direction = v end
 	 else
@@ -205,9 +205,9 @@ end
 
 -- ボックスに dir whatsit を追加
 local function create_dir_whatsit(hd, gc, new_dir)
-   if getid(hd)==id_whatsit and 
+   if getid(hd)==id_whatsit and
 	    getsubtype(hd)==sid_user and getfield(hd, 'user_id')==DIR then
-      set_attr(hd, attr_icflag, 
+      set_attr(hd, attr_icflag,
 	       get_attr_icflag(hd) + PROCESSED_BEGIN_FLAG)
       tex_set_attr('global', attr_icflag, 0)
       return hd
@@ -218,8 +218,8 @@ local function create_dir_whatsit(hd, gc, new_dir)
       setfield(w, 'type', 110)
       set_attr(w, attr_dir, new_dir)
       set_attr(w, attr_icflag, PROCESSED_BEGIN_FLAG)
-      set_attr(hd, attr_icflag, 
-	       (has_attr(hd, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG 
+      set_attr(hd, attr_icflag,
+	       (has_attr(hd, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG
 		  + PROCESSED_BEGIN_FLAG)
       tex_set_attr('global', attr_dir, 0)
       tex_set_attr('global', attr_icflag, 0)
@@ -244,7 +244,7 @@ do
       end
    end
 
-   luatexbase.add_to_callback('hpack_filter', 
+   luatexbase.add_to_callback('hpack_filter',
 			      create_dir_whatsit_hpack, 'ltj.create_dir_whatsit', 10000)
 end
 
@@ -259,9 +259,9 @@ do
 	 set_attr(line, attr_dir, new_dir)
       end
       tex_set_attr('global', attr_dir, 0)
-      return h 
+      return h
    end
-   luatexbase.add_to_callback('post_linebreak_filter', 
+   luatexbase.add_to_callback('post_linebreak_filter',
 			      create_dir_whatsit_parbox, 'ltj.create_dir_whatsit', 10000)
 end
 
@@ -284,8 +284,8 @@ do
 	    node_remove(hd,x); node_free(x)
 	 end
       end
-      for i=1,#wh do  
-	 hd = node_remove(hd, wh[i]); node_free(wh[i]); wh[i] = nil 
+      for i=1,#wh do
+	 hd = node_remove(hd, wh[i]); node_free(wh[i]); wh[i] = nil
       end
       if gc=='fin_row' then -- gc == 'preamble' case is treated in dir_adjust_vpack
 	 if hd  then
@@ -323,7 +323,7 @@ do
    local get_w =function (w,h,d) return w end
    local zero = function() return 0 end
    dir_node_aux = {
-      [dir_yoko] = { -- yoko を 
+      [dir_yoko] = { -- yoko を
 	 [dir_tate] = { -- tate 中で組む
 	    width  = get_h_d,
 	    height = get_w_half,
@@ -410,7 +410,7 @@ do
       [dir_dtou] = { -- dtou を
 	 [dir_yoko] = { -- yoko 中で組む
 	    width  = get_h_d,
-	    height = get_w, 
+	    height = get_w,
 	    depth  = zero,
 	    [id_hlist] = {
 	       { 'whatsit', sid_save },
@@ -443,9 +443,9 @@ do
 	    [id_vlist] = {
 	       { 'whatsit', sid_save },
 	       { 'rotate', ' -1 0 0 -1' },
-	       { 'kern', function (w,h,d,nw,nh,nd) return -nh-nd end }, 
+	       { 'kern', function (w,h,d,nw,nh,nd) return -nh-nd end },
 	       { 'box', get_w_neg },
-	       { 'kern', function (w,h,d,nw,nh,nd) return nh+nd-h-d end }, 
+	       { 'kern', function (w,h,d,nw,nh,nd) return nh+nd-h-d end },
 	       { 'whatsit', sid_restore },
 	    },
 	 },
@@ -458,7 +458,7 @@ end
 local function get_box_dir(b, default)
    start_time_measure('get_box_dir')
    local dir = has_attr(b, attr_dir) or 0
-   local bh = getfield(b,'head') 
+   local bh = getfield(b,'head')
    -- b は insert node となりうるので getlist() は使えない
    local c
    for i=1,2 do
@@ -493,7 +493,7 @@ do
 	       'I refuse to unbox a box in differrent direction.')
 	 end
       end
-      if luatexja.global_temp and tex.globaldefs~=luatexja.global_temp then 
+      if luatexja.global_temp and tex.globaldefs~=luatexja.global_temp then
 	 tex.globaldefs = luatexja.global_temp
       end
       stop_time_measure('box_primitive_hook')
@@ -504,27 +504,23 @@ end
 -- dir_node に包まれている「本来の中身」を取り出し，
 -- dir_node を全部消去
 local function unwrap_dir_node(b, head, box_dir)
-   -- b: dir_node, head: the head of list, box_dir: 
+   -- b: dir_node, head: the head of list, box_dir:
    -- return values are (new head), (next of b), (contents), (dir of contents)
+               luatexja.ext_show_node(to_node(b), '>> ', print)
    local bh = getlist(b)
-   local bc = node_next(node_next(node_next(bh)))
    local nh, nb
-   node_remove(bh, bc); 
-   Dnode.flush_list(bh)
    if head then
-      nh = insert_before(head, b, bc)
+      nh = insert_before(head, b, bh)
       nh, nb = node_remove(nh, b)
       setfield(b, 'next', nil)
-      setfield(b, 'head', nil)
       node_free(b)
    end
-   local shift_old, b_dir, wh = nil, get_box_dir(bc, 0)
+   local shift_old, b_dir, wh = nil, get_box_dir(bh, 0)
    if wh then
       Dnode.flush_list(getfield(wh, 'value'))
       setfield(wh, 'value', nil)
    end
-   setfield(bc, 'shift', 0)
-   return nh, nb, bc, b_dir
+   return nh, nb, bh, b_dir
 end
 
 -- is_manual: 寸法変更に伴うものか？
@@ -534,7 +530,7 @@ local function create_dir_node(b, b_dir, new_dir, is_manual)
    local h = getfield(b, 'height')
    local d = getfield(b, 'depth')
    local db = node_new(getid(b)) -- dir_node
-   set_attr(db, attr_dir, 
+   set_attr(db, attr_dir,
 	    new_dir + (is_manual and dir_node_manual or dir_node_auto))
    set_attr(db, attr_icflag, PROCESSED)
    set_attr(b, attr_icflag, PROCESSED)
@@ -564,7 +560,6 @@ do
       if box_dir%dir_math_mod==new_dir then
 	 if box_dir>=dir_node_auto then
 	    -- dir_node としてカプセル化されている
-	    local bc = node_next(node_next(node_next(bh)))
 	    local _, dnc = get_box_dir(b, 0)
 	    if dnc then -- free all other dir_node
 	       Dnode.flush_list(getfield(dnc, 'value'))
@@ -585,7 +580,7 @@ do
 	    bh = getlist(b)
 	    if b_dir%dir_math_mod==new_dir then
 	       -- dir_node の中身が周囲の組方向とあっている
-	       return head, nb, b, false 
+	       return head, nb, b, false
 	    else box_dir = b_dir end
 	 end
 	 box_dir = box_dir%dir_math_mod
@@ -607,30 +602,8 @@ do
 	 local dn_d = getfield(db, 'depth')
 	 nh, nb =  insert_before(head, b, db), nil
 	 nh, nb = node_remove(nh, b)
-	 local db_head, db_tail  = nil
-	 for _,v in ipairs(dir_node_aux[box_dir][new_dir][getid(b)]) do
-	    local cmd, arg, nn = v[1], v[2]
-	    if cmd=='kern' then
-	       nn = node_new(id_kern)
-	       setfield(nn, 'kern', arg(w, h, d, dn_w, dn_h, dn_d))
-	    elseif cmd=='whatsit' then
-	       nn = node_new(id_whatsit, arg)
-	    elseif cmd=='rotate' then
-	       nn = node_new(id_whatsit, sid_matrix)
-	       setfield(nn, 'data', arg)
-	    elseif cmd=='box' then
-	       nn = b; setfield(b, 'next', nil)
-	       setfield(nn, 'shift', arg(w, h, d, dn_w, dn_h, dn_d))
-	    end
-	    if db_head then
-	       insert_after(db_head, db_tail, nn)
-	       db_tail = nn
-	    else
-	       db_head, db_tail = nn, nn
-	    end
-	    setfield(db, 'head', db_head)
-	    ret, flag = db, true
-	 end
+         setfield(b, 'next', nil); setfield(db, 'head', b)
+         ret, flag = db, true
 	 return nh, nb, ret, flag
       end
    end
@@ -698,7 +671,7 @@ do
             local w = getfield(s, 'width')
             local h = getfield(s, 'height')
             local d = getfield(s, 'depth')
-            setdimen('ltj@tempdima', 
+            setdimen('ltj@tempdima',
                          dir_node_aux[s_dir][l_dir][key](w,h,d))
          end
       else
@@ -717,8 +690,7 @@ do
          elseif b_dir%dir_math_mod==l_dir then
             setdimen('ltj@tempdima', getfield(s, key))
          else
-            get_box_dim_common(key, 
-			       node_next(node_next(node_next(getlist(s)))), l_dir)
+            get_box_dim_common(key, getlist(s), l_dir)
          end
       else
          setdimen('ltj@tempdima', 0)
@@ -754,7 +726,7 @@ do
          setfield(s, key, tex.getdimen('ltj@tempdima'))
 	 if wh then
 	    -- change dimension of dir_nodes which are created "automatically"
-	       local bw, bh, bd 
+	       local bw, bh, bd
 		  = getfield(s,'width'), getfield(s, 'height'), getfield(s, 'depth')
 	    for x in traverse(getfield(wh, 'value')) do
 	       local x_dir = has_attr(x, attr_dir)
@@ -784,41 +756,14 @@ do
 	    if b_dir<dir_node_manual then
 	       set_attr(s, attr_dir, b_dir%dir_node_auto + dir_node_manual)
 	    end
-	    -- re-calculate shift and kern (TODO)
-	    local sid, sl = getid(s), getlist(s)
-	    local b = node_next(node_next(node_next(sl))) -- 本来の box
-	    local info = dir_node_aux[get_box_dir(b,dir_yoko)%dir_math_mod][b_dir%dir_node_auto]
-	    local bw, bh, bd 
-	       = getfield(b,'width'), getfield(b, 'height'), getfield(b, 'depth')
-	    local sw, sh, sd 
-	       = getfield(s,'width'), getfield(s, 'height'), getfield(s, 'depth')
-	    -- re-calculate shift and kern
-	    for i,v in ipairs(info[sid]) do 
-	       if getid(sl)==id_kern then
-		  setfield(sl, 'kern', v[2](bw,bh,bd,sw,sh,sd) )
-	       elseif getid(sl)==sid then
-		  setfield(sl, 'shift', v[2](bw,bh,bd,sw,sh,sd) )
-	       end
-	       sl = node_next(sl)
-	    end
          else
-	    local sid, sl = getid(s), getlist(s)
-	    local b = node_next(node_next(node_next(sl))) -- 本来の box
+	    local sid, b = getid(s), getlist(s)
 	    local info = dir_node_aux[get_box_dir(b,dir_yoko)%dir_math_mod][b_dir%dir_node_auto]
-	    local bw, bh, bd 
+	    local bw, bh, bd
 	       = getfield(b,'width'), getfield(b, 'height'), getfield(b, 'depth')
-	    local sw, sh, sd 
+	    local sw, sh, sd
 	       = getfield(s,'width'), getfield(s, 'height'), getfield(s, 'depth')
-	    if set_box_dim_common(key, b, l_dir) then
-	       -- re-calculate shift and kern
-	       for i,v in ipairs(info[sid]) do 
-		  if getid(sl)==id_kern then
-		     setfield(sl, 'kern', v[2](bw,bh,bd,sw,sh,sd) )
-		  elseif getid(sl)==sid then
-		     setfield(sl, 'shift', v[2](bw,bh,bd,sw,sh,sd) )
-		  end
-		  sl = node_next(sl)
-	       end
+	    if set_box_dim_common(key, b, l_dir) and b_dir<dir_node_manual then
 	       -- re-calculate dimension of s, if s is created "automatically"
 	       if b_dir<dir_node_manual then
 		  setfield(s, 'width',  info.width(bw,bh,bd))
@@ -865,7 +810,7 @@ do
 	 local box_dir = get_box_dir(sd, dir_yoko)
 	 if box_dir%dir_math_mod ~= list_dir then
 	    setbox(
-	       'ltj@afbox', 
+	       'ltj@afbox',
 	       to_node(
 		  copy_list(make_dir_whatsit(sd, sd, list_dir, 'box_move'))
 		  -- without copy_list, we get a segfault
@@ -882,7 +827,7 @@ end
 do
    local function glyph_from_packed(h)
       local b = getlist(h)
-      return (getid(b)==id_kern) 
+      return (getid(b)==id_kern)
 	 and node_next(node_next(node_next(node_next(b)))) or b
    end
    luatexja.direction.glyph_from_packed = glyph_from_packed
@@ -967,7 +912,7 @@ do
    end
 end
 
--- 
+-- buildpage filter
 do
    local function dir_adjust_buildpage(info)
       if info=='box' then
@@ -975,9 +920,9 @@ do
 	 local nb
 	 if head then
 	    head, _, nb
-	       = make_dir_whatsit(head, 
+	       = make_dir_whatsit(head,
 				  node_tail(head),
-				  get_dir_count(), 
+				  get_dir_count(),
 				  'buildpage')
 	    tex.lists.contrib_head = to_node(head)
 	 end
@@ -986,4 +931,62 @@ do
    luatexbase.add_to_callback('buildpage_filter',
 			      dir_adjust_buildpage,
 			      'ltj.direction', 10000)
+end
+
+-- finalize (executed just before \shipout)
+-- we supply correct pdfsavematrix nodes etc. inside dir_node
+do
+   local finalize_inner
+   local function finalize_dir_node(db,new_dir)
+      local b = getlist(db)
+      finalize_inner(b)
+      local box_dir = get_box_dir(b, dir_yoko)%dir_math_mod
+      setfield(db, 'head', nil)
+      local w = getfield(b, 'width')
+      local h = getfield(b, 'height')
+      local d = getfield(b, 'depth')
+      local dn_w = getfield(db, 'width')
+      local dn_h = getfield(db, 'height')
+      local dn_d = getfield(db, 'depth')
+      local db_head, db_tail  = nil
+      for _,v in ipairs(dir_node_aux[box_dir][new_dir][getid(b)]) do
+         local cmd, arg, nn = v[1], v[2]
+         if cmd=='kern' then
+            nn = node_new(id_kern)
+            setfield(nn, 'kern', arg(w, h, d, dn_w, dn_h, dn_d))
+         elseif cmd=='whatsit' then
+            nn = node_new(id_whatsit, arg)
+         elseif cmd=='rotate' then
+            nn = node_new(id_whatsit, sid_matrix)
+            setfield(nn, 'data', arg)
+         elseif cmd=='box' then
+            nn = b; setfield(b, 'next', nil)
+            setfield(nn, 'shift', arg(w, h, d, dn_w, dn_h, dn_d))
+         end
+         if db_head then
+            insert_after(db_head, db_tail, nn)
+            db_tail = nn
+         else
+            db_head, db_tail = nn, nn
+         end
+         setfield(db, 'head', db_head)
+      end
+   end
+   finalize_inner = function (box)
+      for n in traverse(getlist(box)) do
+         local nid = getid(n)
+         if (nid==id_hlist or nid==id_vlist) then
+            local ndir = get_box_dir(n, dir_yoko)
+            if ndir>=dir_node_auto then -- n is dir_node
+               finalize_dir_node(n, ndir%dir_math_mod)
+            else
+               finalize_inner(n)
+            end
+         end
+      end
+   end
+   local getbox = tex.getbox
+   function luatexja.direction.finalize()
+      finalize_inner(to_direct(tex.getbox("AtBeginShipoutBox")))
+   end
 end
