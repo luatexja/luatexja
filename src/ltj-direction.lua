@@ -475,22 +475,40 @@ end
 
 do
    local getbox = tex.getbox
-   local function check_dir(reg_num)
+   local dir_backup
+   function luatexja.direction.unbox_check_dir(is_copy)
       start_time_measure('box_primitive_hook')
       local list_dir = get_dir_count()%dir_math_mod
       local b = getbox(tex_getcount('ltj@tempcnta'))
       if b then
 	 local box_dir = get_box_dir(to_direct(b), dir_yoko)
 	 if box_dir%dir_math_mod ~= list_dir then
-	   --  print('NEST', tex_nest.ptr, tex_getcount('ltj@tempcnta'))
-	   --  luatexja.ext_show_node_list(
-           --     (tex_nest.ptr==0) and tex.lists.page_head or tex_nest[tex_nest.ptr].head,
-           --     'LIST' .. tostring(list_dir) .. '> ', print)
-	   -- luatexja.ext_show_node_list(b, 'BOX' .. tostring(box_dir) .. '> ', print)
 	    ltjb.package_error(
 	       'luatexja',
 	       "Incompatible direction list can't be unboxed",
 	       'I refuse to unbox a box in differrent direction.')
+            tex.sprint(cat_lp, '\\@gobbletwo')
+	 else
+	    dir_backup = nil
+	    local bd = to_direct(b)
+	    local hd = getlist(bd)
+	    local nh = hd
+	    while hd do
+	       if getid(hd)==id_whatsit and getsubtype(hd)==sid_user
+		  and getfield(hd, 'user_id')==DIR then
+		     local d = hd
+		     nh, hd = node_remove(nh, hd)
+		     if is_copy and (not dir_backup) then
+			dir_backup = d
+			setfield(dir_backup, 'next', nil)
+		     else
+			node_free(d)
+		     end
+	       else
+		  hd = node_next(hd)
+	       end
+	    end
+	    setfield(bd, 'head', nh)
 	 end
       end
       if luatexja.global_temp and tex.globaldefs~=luatexja.global_temp then
@@ -498,7 +516,17 @@ do
       end
       stop_time_measure('box_primitive_hook')
    end
-   luatexja.direction.check_dir = check_dir
+   function luatexja.direction.uncopy_restore_whatsit()
+      local b = getbox(tex_getcount('ltj@tempcnta'))
+      if b then
+	 local bd = to_direct(b)
+	 if dir_backup then
+	    setfield(dir_backup, 'next', getlist(bd))
+	    setfield(bd, 'head', dir_backup)
+	    dir_backup = nil
+	 end
+      end
+   end
 end
 
 -- dir_node に包まれている「本来の中身」を取り出し，
@@ -506,7 +534,6 @@ end
 local function unwrap_dir_node(b, head, box_dir)
    -- b: dir_node, head: the head of list, box_dir:
    -- return values are (new head), (next of b), (contents), (dir of contents)
-               luatexja.ext_show_node(to_node(b), '>> ', print)
    local bh = getlist(b)
    local nh, nb
    if head then

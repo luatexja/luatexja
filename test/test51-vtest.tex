@@ -325,9 +325,9 @@ abc&かきくけこ&xyz\cr}}%
 \font\fivett=cmtt10 at 5pt
 
 \setbox0=\hbox{\yoko pF}
-\setbox1=\hbox{\tate\box0}
+\setbox1=\hbox{\tate\copy0}
 \fbox{\copy1}
-\unhcopy1\setbox1=\lastbox
+\setbox1=\copy0
 {\obeylines\seventt\baselineskip=10pt
 \directlua{luatexja.ext_show_node_list(tex.box[1], 'lastbox>   ', tex.print)}\par}
 \setbox0=\hbox{\yoko \ltjsetwd1=50pt}
@@ -425,4 +425,8 @@ $$
 
 \hbox{\inhibitglue\tate}
 \hbox{\ltjsetparameter{kanjiskip=0pt}\tate}
+
+\leavevmode\hbox{A}%
+\setbox0\hbox{}%
+\setbox1=\lastbox\the\wd1
 \end
