@@ -256,7 +256,7 @@ do
       for line in traverse_id(id_hlist, hd) do
          local nh = getlist(line)
 	 setfield(line, 'head', create_dir_whatsit(nh, gc, new_dir) )
-	 set_attr(line, attr_dir, new_dir)
+	 --set_attr(line, attr_dir, new_dir)
       end
       tex_set_attr('global', attr_dir, 0)
       return h
@@ -620,6 +620,7 @@ do
 	    end
 	 end
 	 Dnode.flush_list(getfield(dn, 'value'))
+	 setfield(dn, 'value', nil)
 	 db = db or create_dir_node(b, box_dir, new_dir, false)
 	 local w = getfield(b, 'width')
 	 local h = getfield(b, 'height')
@@ -837,11 +838,9 @@ do
 	 local box_dir = get_box_dir(sd, dir_yoko)
 	 if box_dir%dir_math_mod ~= list_dir then
 	    setbox(
-	       'ltj@afbox',
-	       to_node(
-		  copy_list(make_dir_whatsit(sd, sd, list_dir, 'box_move'))
-		  -- without copy_list, we get a segfault
-	       )
+	       'ltj@afbox', 
+	       to_node(copy_list(make_dir_whatsit(sd, sd, list_dir, 'box_move')))
+	       -- copy_list しないとリストの整合性が崩れる……？
 	    )
 	 end
       end
@@ -854,7 +853,7 @@ end
 do
    local function glyph_from_packed(h)
       local b = getlist(h)
-      return (getid(b)==id_kern)
+      return (getid(b)==id_kern or (getid(b)==id_whatsit and getsubtype(b)==sid_save) )
 	 and node_next(node_next(node_next(node_next(b)))) or b
    end
    luatexja.direction.glyph_from_packed = glyph_from_packed
