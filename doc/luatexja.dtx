@@ -48,7 +48,8 @@
 
 \usepackage{amsmath,array,tikz,pict2e,multienum,float}
 \usepackage{booktabs,multicol,luatexja-ruby}
-\usepackage{xy,lltjext}
+\usepackage[all]{xy}
+\usepackage{lltjext,alltt}
 
 %%%%%%%% listings
 
@@ -178,7 +179,11 @@
 %%%%%%%%
 
 \def\Node#1#2{\,\vcenter{\hbox{\fboxsep=1pt\fbox{\vbox{\small\halign{\hfil##\hfil\cr
-  #1\mathstrut\cr\noalign{\hrule height.4pt}\strut#2\cr}}}}\,}}
+  #1\mathstrut\cr\noalign{\vskip1pt\hrule height.4pt\vskip1pt}\strut#2\cr}}}}}\,}
+\def\HNode#1#2#3#4{\,\vcenter{\hbox{\fboxsep=1pt\fbox{\vbox{\small\halign{\hfil##\hfil\cr
+  #1\mathstrut\cr\noalign{\vskip1pt\hrule height.4pt\vskip1pt}%
+  width:\hfill\ #2\cr height:\hfill\ #3\cr depth:\hfill\ #4\cr
+  }}}}}\,}
 
 \protected\def\Param#1{\hyperlink{fld:#1}{\textsf{#1}}} % parameter name
 \protected\def\DParam#1{\hypertarget{fld:#1}{\textsf{#1}}} % parameter name (definition)
@@ -372,18 +377,18 @@ The followings are major changes from \pTeX:
 \item \emph{注意：上の2つの変更により，従来\textbf{JAglue}の挿入処理を分断するのに
       使われていたいくつかの方法は用いることができない．具体的には，次の方法はもはや無効である：}
 %</ja>
-\begin{verbatim}
+\begin{lstlisting}
 ちょ{}っと    ちょ\/っと
-\end{verbatim}
+\end{lstlisting}
 %<*en>
       If you want to do so, please put an empty horizontal box (hbox) between it instead:
 %</en>
 %<*ja>
       もし同じことをやりたければ，空の水平ボックス(hbox)を間に挟めばよい：
 %</ja>
-\begin{verbatim}
+\begin{lstlisting}
 ちょ\hbox{}っと
-\end{verbatim}
+\end{lstlisting}
 
 
 %<*en>
@@ -563,9 +568,9 @@ Now \LuaTeX-ja is available from the following archive and distributions:
 
 If you are using \TeX~Live~2014, you can install \LuaTeX-ja
 from \TeX~Live manager (\texttt{tlmgr}):
-\begin{verbatim}
+\begin{lstlisting}
 $ tlmgr install luatexja
-\end{verbatim}
+\end{lstlisting}
 %</en>
 %<*ja>
 \emph{本バージョンの\LuaTeX-jaは\TeX~Live~2012以前では動作しない．}
@@ -583,9 +588,9 @@ $ tlmgr install luatexja
 
 例えば\TeX~Live~2014を利用しているなら，\LuaTeX-jaは\TeX~Live manager (\texttt{tlmgr})を
 使ってインストールすることができる．
-\begin{verbatim}
+\begin{lstlisting}
 $ tlmgr install luatexja
-\end{verbatim}
+\end{lstlisting}
 %</ja>
 
 %<en>\paragraph{Manual installation}
@@ -598,9 +603,9 @@ $ tlmgr install luatexja
 
 \begin{itemize}
 \item Copy the Git repository:
-\begin{verbatim}
+\begin{lstlisting}
 $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
-\end{verbatim}
+\end{lstlisting}
 \item Download the \texttt{tar.gz} archive of HEAD in the \texttt{master} branch from
 \begin{flushleft}
 \url{http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git;a=snapshot;h=HEAD;sf=tgz}.
@@ -616,9 +621,9 @@ the forefront of development is not the \texttt{master} branch.
 
 \begin{itemize}
 \item Gitリポジトリの内容をコピーする：
-\begin{verbatim}
+\begin{lstlisting}
 $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
-\end{verbatim}
+\end{lstlisting}
 \item \texttt{master}ブランチのスナップショット（\texttt{tar.gz}形式）をダウンロードする．
 \begin{flushleft}
 \url{http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git;a=snapshot;h=HEAD;sf=tgz}.
@@ -650,13 +655,13 @@ But only the contents in \texttt{src/} are needed to work \LuaTeX-ja.
 格納した \texttt{ltj-kinsoku.lua} を生成するために，
 以下を実行する必要がある：
 %</ja>
-\begin{verbatim}
+\begin{lstlisting}
 $ cd src
 $ lualatex ltjclasses.ins
 $ lualatex ltjsclasses.ins
 $ lualatex ltjltxdoc.ins
 $ luatex   ltj-kinsoku_make.tex
-\end{verbatim}
+\end{lstlisting}
 %<*en>
 Note that \texttt{*.\{dtx,ins\}} and \texttt{ltj-kinsoku\_make.tex} are not needed in regular use.
 %</en>
@@ -727,10 +732,10 @@ so you will encounter an error like the following:
 \LuaTeX によって見つけられることが必要である．
 しかしMiK\TeX ではそのようになっていないので，次のエラーが発生するだろう：
 %</ja>
-\begin{verbatim}
+\begin{lstlisting}
 ! LuaTeX error ...iles (x86)/MiKTeX 2.9/tex/luatex/luatexja/ltj-rmlgbm.lua
 bad argument #1 to 'open' (string expected, got nil)
-\end{verbatim}
+\end{lstlisting}
 
 %<*en>
 If so, please execute a batch file which is written on
@@ -754,9 +759,9 @@ run \LuaTeX-ja in this directory, and finally delete the temporary directory.
 
 %<en>To use \LuaTeX-ja in plain \TeX, simply put the following at the beginning of the document:
 %<ja>\LuaTeX-jaを plain \TeX で使うためには，単に次の行をソースファイルの冒頭に追加すればよい：
-\begin{verbatim}
+\begin{lstlisting}
 \input luatexja.sty
-\end{verbatim}
+\end{lstlisting}
 %<en>This does minimal settings (like \texttt{ptex.tex}) for typesetting Japanese documents:
 %<ja>これで（\texttt{ptex.tex}のように）日本語組版のための最低限の設定がなされる：
 
@@ -852,9 +857,9 @@ for Japanese, you only have to load \texttt{luatexja.sty}:
 \LaTeXe を用いる場合も基本的には同じである．日本語組版のための最低限の環境を
 設定するためには，\texttt{luatexja.sty}を読み込むだけでよい：
 %</ja>
-\begin{verbatim}
+\begin{lstlisting}
 \usepackage{luatexja}
-\end{verbatim}
+\end{lstlisting}
 %<*en>
 It also does minimal settings (counterparts in \pLaTeX\ are \texttt{%
 plfonts.dtx} and \texttt{pldefs.ltx}):
@@ -1109,10 +1114,10 @@ auto select&\cs{fontencoding}&\cs{fontfamily}&---&---&\cs{usefont}\\
       実装では \cs{DeclareFontFamily} を用いても問題は生じない．
 \item 和文フォントのシェイプを定義するには，通常の \cs{DeclareFontShape} を使えば良い：
 %</ja>
-\begin{verbatim}
+\begin{lstlisting}
 \DeclareFontShape{JY3}{mc}{bx}{n}{<-> s*KozMinPr6N-Bold:jfm=ujis;-kern}{}
     % Kozuka Mincho Pr6N Bold
-\end{verbatim}
+\end{lstlisting}
 %<*ja>
 仮名書体を使う場合など，複数の和文フォントを組み合わせて使いたい場合は
 \ref{ssec-altfont}節の \cs{ltjdeclarealtfont} と，その\LaTeX 版の\
@@ -1326,10 +1331,10 @@ before \Pkg{luatexja-preset}:
 斜体大文字が出なくなる，など．}場合は，
 次のように\Pkg{luatexja-preset}の前に\Pkg{fontspec}を手動で読みこめば良い：
 %</ja>
-\begin{verbatim}
+\begin{lstlisting}
 \usepackage[no-math]{fontspec}
 \usepackage[...]{luatexja-preset}
-\end{verbatim}
+\end{lstlisting}
 
 %<en>\paragraph{General options}
 %<ja>\paragraph{一般的なオプション}
@@ -1803,9 +1808,9 @@ it sets
  \item 2番，3番，6番，7番，8番の文字範囲に属する文字は\textbf{JAchar}．
 \end{itemize}
 %</ja>
-\begin{verbatim}
+\begin{lstlisting}
 \ltjsetparameter{jacharrange={-1, +2, +3, -4, -5, +6, +7, +8}}
-\end{verbatim}
+\end{lstlisting}
 %<*en>
 The argument to \textsf{jacharrange} parameter is a list of non-zero integer.
 Negative integer $-n$ in the list means that ``each character in the range~$n$ is an
@@ -2159,9 +2164,9 @@ as follows:
 仕様では，\Param{jaxspmode}, \Param{alxspmode}はテーブルを共有しており，
 上のコードの1行目を次のように変えても同じことになる：
 %</ja>
-\begin{verbatim}
+\begin{lstlisting}
 \ltjsetparameter{alxspmode={`あ,preonly}, jaxspmode={`\!,postonly}}
-\end{verbatim}
+\end{lstlisting}
 %<*en>
 One can use also numbers to specify these two parameters (see Subsection~\ref{ssec-param}).
 %</en>
@@ -2316,10 +2321,10 @@ use a different implementation method.
 \begin{tabular}{lp{30\zw}}
 \toprule
 \emph{入力}&\vspace*{\dimexpr-\origbaselineskip-\smallskipamount}
-\begin{verbatim}
+\begin{lstlisting}
 数式abc: $あa\hbox{い}$, $\int_0^x t\,dt=x^2\!/2$,
 $\Phi\vdash F(x)\ \hbox{for all}\ x\in A$
-\end{verbatim}\\
+\end{lstlisting}\\
 \noalign{\vskip-\origbaselineskip}
 \midrule
 \emph{\pTeX}&
@@ -2985,9 +2990,9 @@ one have to use the following commands instead of \cs{wd} wtc.
   \cs{ltjgetdp}\{<num>\}]
 These commands return \emph{an internal dimension} of \cs{box<num>} with respect to 
 the current direction. One can use these in \cs{dimexpr} primitive, as the followings.
-\begin{verbatim}
+\begin{lstlisting}
 \dimexpr 2\ltjgetwd{42}-3pt\relax, \the\ltjgetwd{1701}
-\end{verbatim}
+\end{lstlisting}
 By implementaion,  the argument must be grouped as \verb+\ltjgetwd{42}+,
 if the argument consists of more than one token.
 \begin{LTXexample}[width=0.3\textwidth]
@@ -3009,9 +3014,9 @@ if the argument consists of more than one token.
   \cs{ltjsetdp}<num>=<dimen>]
 These commands set the dimension of \cs{box<num>}. Unlike \cs{ltjgetwd}, one does not need
 	to group the argument <num>; four calls of \cs{ltjsetwd} below have the same meaning.
-\begin{verbatim}
+\begin{lstlisting}
 \ltjsetwd42 20pt,  \ltjsetwd42=20pt,  \ltjsetwd=42 20pt,  \ltjsetwd=42=20pt
-\end{verbatim}
+\end{lstlisting}
 
 \end{cslist}
 %</en>
@@ -3042,9 +3047,9 @@ These commands set the dimension of \cs{box<num>}. Unlike \cs{ltjgetwd}, one doe
  \item[\cs{ltjgetwd}\{<num>\}\textrm{, }\cs{ltjgetht}\{<num>\}\textrm{, }%
   \cs{ltjgetdp}\{<num>\}]
 現在の組方向に応じたボックスの寸法の取得を行う．結果は内部長さであるため，
-\begin{verbatim}
+\begin{lstlisting}
 \dimexpr 2\ltjgetwd{42}-3pt\relax, \the\ltjgetwd{1701}
-\end{verbatim}
+\end{lstlisting}
 のように \cs{wd}<num> の代わりとして扱うことができる．引数が1桁の場合は，
 \cs{ltjgetwd3} のように引数をグループで括らなくても良いが，そうでない場合は
 （通常の命令への引数のように）\verb+\ltjgetwd{42}+ とグループに括る必要がある．
@@ -3068,9 +3073,9 @@ These commands set the dimension of \cs{box<num>}. Unlike \cs{ltjgetwd}, one doe
   \cs{ltjsetdp}<num>=<dimen>]
 現在の組方向に応じたボックスの寸法の設定を行う．\cs{afterassignment} を2回利用して
 実装しているので，次の4通りは全て同じ意味である．
-\begin{verbatim}
+\begin{lstlisting}
 \ltjsetwd42 20pt,  \ltjsetwd42=20pt,  \ltjsetwd=42 20pt,  \ltjsetwd=42=20pt
-\end{verbatim}
+\end{lstlisting}
 
 設定値は「横組」「縦組及び \cs{utod} 方向」「\cs{dtou} 方向」
 の3種ごとに独立して記録される．参考として，Gitリポジトリ内の
@@ -3138,16 +3143,16 @@ Returned value&\texttt{4}&\texttt{3}&\texttt{1}&\texttt{11}&\texttt{0}\\
 
 これらを用いれば，例えば
 \pTeX の \cs{ifydir},~\cs{ifybox200} と同等の条件判断を
-\begin{verbatim}
+\begin{lstlisting}
 \ifnum\ltjgetparameter{direction}=4
 \ifnum\ltjgetparameter{boxdir}{200}=4
-\end{verbatim}
+\end{lstlisting}
 のように行うことができる．
 \cs{iftdir} は少々面倒であるが
-\begin{verbatim}
+\begin{lstlisting}
 \ifnum\numexpr 
   \ltjgetparameter{direction}-(\ltjgetparameter{direction}/8)*8=3
-\end{verbatim}
+\end{lstlisting}
 とすればよい．
 %</ja>
 
@@ -3178,10 +3183,10 @@ overridden by \LuaTeX-ja, using~\verb+\protected\def+.
  周囲の垂直リストの組方向と一致しない場合にエラーを出力し，
  該当の \cs{vadjust} を無効にする．
  \item[\cs{lastbox}] ボックスの「中身」を現在の組方向に合わせるためのノード
-	      （\textit{dir\_node}という）を必要ならば除去し，
+	      （\textit{dir\_box}という）を必要ならば除去し，
  正しく「中身」のボックスが返されるように前処理をする．
  \item[\cs{raise}<dimen><box>\textrm{, }\cs{lower}<dimen><box>\textrm{\ etc., }\cs{vcenter}]
- 一方，こちらでは必要に応じて\textit{dir\_node}を作成する前処理を追加している．
+ 一方，こちらでは必要に応じて\textit{dir\_box}を作成する前処理を追加している．
 \end{cslist}
 %</ja>
 
@@ -3429,10 +3434,10 @@ because of the compatibility with previous versions of \LuaTeX-ja.
 NFSS2用の命令（\ref{ssec-chgfnt}節，\ref{ssec-nfsspat}節）における指定では
 カーニング情報は標準で使用する}ことになっているようである．
 言い換えれば，カーニング情報を使用しない設定にするには，面倒でも
-\begin{verbatim}
+\begin{lstlisting}
 \jfont\hoge=KozMinPr6N-Regular:jfm=ujis;-kern at 3.5mm
 \DeclareFontShape{JY3}{fuga}{m}{n} {<-> s*KozMinPr6N-Regular:jfm=ujis;-kern}{}
-\end{verbatim}
+\end{lstlisting}
 のように，\texttt{-kern} という指定を自分で追加しなければいけない．
  \item
 一方，\emph{\Pkg{luatexja-fontspec} の提供する \cs{setmainjfont}\
@@ -3534,9 +3539,9 @@ letter-spacing and the width of italic correction are not correct:
  \item 出力時に，自動的に「\verb+vert+ feature相当」のグリフ置換が行われる．
        これは，\Pkg{luaotfload}による各種featureのサポートとは全く別個に行われるもので，
        いちいち \verb+vert+ featureを指定する必要はない．
-\begin{verbatim}
+\begin{lstlisting}
 \tfont\S=file:KozMinPr6N-Regular.otf:jfm=ujis % OK
-\end{verbatim}
+\end{lstlisting}
  \item \ref{ssec-math}節で述べる，数式中の和文フォントには縦組用和文フォントは指定できない．
  \item \texttt{jfm=<name>}\ の部分には縦組用JFMを指定する．
 以下の縦組用JFMが\LuaTeX-jaには同梱されており，違いを表\ref{tab-difjfm-tate}に示した．
@@ -3660,9 +3665,9 @@ Please contact the LuaTeX-ja project team.
 \label{ssec-jfm-str}
 %<en>A JFM file is a Lua script which has only one function call:
 %<ja>JFMファイルはただ一つの関数呼び出しを含むLuaスクリプトである：
-\begin{verbatim}
+\begin{lstlisting}
 luatexja.jfont.define_jfm { ... }
-\end{verbatim}
+\end{lstlisting}
 %<*en>
 Real data are stored in the table which indicated above by
 \verb+{ ... }+.  So, the rest of this subsection are devoted to describe the
@@ -4262,9 +4267,9 @@ See Japanese version of this manual.
 \item JFM中の全ての数値を$1/0.962216$倍しておく．
 \item \TeX ソース中で使用するところで，サイズ指定を0.962216倍にする．
       \LaTeX でのフォント宣言なら，例えば次のように：
-\begin{verbatim}
+\begin{lstlisting}
 \DeclareFontShape{JY3}{mc}{m}{n}{<-> s*[0.962216] psft:Ryumin-Light:jfm=jis}{}
-\end{verbatim}
+\end{lstlisting}
 \end{itemize}
 \item 上に述べた特殊文字は，\texttt{'boxbdd'}を除き文字クラスを全部0とする
       （JFM中に単に書かなければよい）．
@@ -4744,9 +4749,9 @@ At the present version, the lowermost bit of <natural number> indicates
 	     この文字の前に挿入/追加されるペナルティの量を指定する．
 
 例えば閉じ括弧「〗」は絶対に行頭にきてはならないので，
-\begin{verbatim}
+\begin{lstlisting}
 \ltjsetparameter{prebreakpenalty={`〙,10000}}
-\end{verbatim}
+\end{lstlisting}
 と，最大値の10000が標準で指定されている．他にも，小書きのカナなど，絶対禁止とい
 	     うわけではないができれば行頭にはきて欲しくない場合に，0と
 	     10000の間の値を指定するのも有用であろう.
@@ -4755,9 +4760,9 @@ At the present version, the lowermost bit of <natural number> indicates
 Set a penalty which is inserted automatically before the character <chr\_code>,
 to prevent a line starts from this character. For example, a line cannot started
 with one of closing brackets ``〗'', so \LuaTeX-ja sets
-\begin{verbatim}
+\begin{lstlisting}
 \ltjsetparameter{prebreakpenalty={`〙,10000}}
-\end{verbatim}
+\end{lstlisting}
 by default.
 %</en>
 
@@ -5237,9 +5242,9 @@ ignored.
 
 For example, if \cs{hoge} uses \texttt{jfm-ujis.lua}, the standard JFM of \LuaTeX-ja,
 then
-\begin{verbatim}
+\begin{lstlisting}
 \ltjdeclarealtfont\hoge\piyo{"3000-"30FF, {-1}-{-1}}
-\end{verbatim}
+\end{lstlisting}
 does
 \begin{quote}
 If the current Japanese font is \cs{hoge}, \texttt{U+3000}--\texttt{U+30FF}
@@ -5271,9 +5276,9 @@ are typeset by \cs{piyo}.
 
 例えば，\cs{hoge} のJFMが\LuaTeX-ja標準の
 \ \texttt{jfm-ujis.lua} であった場合，
-\begin{verbatim}
+\begin{lstlisting}
 \ltjdeclarealtfont\hoge\piyo{"3000-"30FF, {-1}-{-1}}
-\end{verbatim}
+\end{lstlisting}
 は「\cs{hoge} を利用しているとき，
 \texttt{U+3000}--\texttt{U+30FF}と
 文字クラス1（開き括弧類）中の文字だけは \cs{piyo} を用いる」
@@ -5935,9 +5940,9 @@ IVSに対応してはいないようである．これらのパッケージで�
 有効にするには，\Pkg{luatexja-otf}パッケージを読み込んだ上で以下の命令を実行する%
 \footnote{この命令を2回以上実行しても意味がない．}：}
 %</ja>
-\begin{verbatim}
+\begin{lstlisting}
 \directlua{luatexja.otf.enable_ivs()}
-\end{verbatim}
+\end{lstlisting}
 %<ja> すると，上の命令を実行した箇所以降では，以下のようにIVSによる字形指定が有効となる．
 %<en> After executing the command above, you can use IVS like the following:
 \begin{LTXexample}
@@ -6216,11 +6221,11 @@ counterpart of the \Pkg{plext} package.
 \begin{cslist}
 \item[tabular\textrm{, }array\textrm{, }minipage環境]
 これらの環境は，
-\begin{verbatim}
+\begin{lstlisting}
 \begin{tabular}<dir>[pos]{table spec} ... \end{tabular}
 \begin{array}<dir>[pos]{table spec}   ... \end{array}
 \begin{minipage}<dir>[pos]{width}     ... \end{minipage}
-\end{verbatim}
+\end{lstlisting}
 のように，組方向オプション \texttt{\<dir\>} が拡張されている．
 既に述べたように，組方向オプションに指定できる値は以下の5つであり，
 それ以外を指定した時や無指定時は周囲の組方向と同じ組方向になる．
@@ -6241,11 +6246,11 @@ counterpart of the \Pkg{plext} package.
 中央揃え（それ以外）される．
 \item[picture環境]
 図表作成に用いる \texttt{picture} 環境も，
-\begin{verbatim}
+\begin{lstlisting}
 \begin{picture}<dir>(x_size, y_size)(x_offset,y_offset)
   ...
 \end{picture}
-\end{verbatim}
+\end{lstlisting}
 と組方向が指定できるように拡張されている．
 $x$成分の増加方向は字送り方向，$y$成分の増加方向は行送り方向の\emph{反対方向}となる．
 \Pkg{plext} パッケージと同様に
@@ -6268,11 +6273,11 @@ $x$成分の増加方向は字送り方向，$y$成分の増加方向は行送�
 \item[tabular\textrm{, }array\textrm{, }minipage\textrm{ environments}]
 These environments are extended by \texttt{\<dir\>}, which specifies the direction,
 as follows:
-\begin{verbatim}
+\begin{lstlisting}
 \begin{tabular}<dir>[pos]{table spec} ... \end{tabular}
 \begin{array}<dir>[pos]{table spec}   ... \end{array}
 \begin{minipage}<dir>[pos]{width}     ... \end{minipage}
-\end{verbatim}
+\end{lstlisting}
 This option permits one of the following five values. If none of them is specified,
 the direction inside the environment is same as that outside the enviromnent.
 \begin{description}
@@ -6513,13 +6518,13 @@ $i$は7より小さい自然数．
 
 \attr{ltj@dir}
 %<*ja>
-ボックスにおける組方向を示す．通常のボックスでは
+\textit{direction}~whatsit（後述）において組方向を示すために，あるいは\textit{dir\_box}の
+			 組方向を用いる．\textit{direction}~whatsitにおいては値は
 \begin{quote}
  \textit{dir\_dtou} (1), \textit{dir\_tate} (3), 
  \textit{dir\_yoko} (4), \textit{dir\_utod} (11)
 \end{quote}
-のいずれかであり，これらに次を加えた値をとるボックスが作られることもあ
-			 る（\ref{sec-dir-imp}章参照）．
+のいずれかであり，\textit{dir\_box}ではこれらに次を加えた値をとる（\ref{sec-dir-imp}章参照）．
 %</ja>
 \begin{description}
 \item[\textit{dir\_node\_auto} (128)]
@@ -6814,9 +6819,9 @@ store some data which obeys the grouping of \TeX.
 
 %<*en>
 The following function can be used to store data into a stack:
-\begin{verbatim}
+\begin{lstlisting}
 luatexja.stack.set_stack_table(index, <any> data)
-\end{verbatim}
+\end{lstlisting}
 Any values which except \texttt{nil}~and~NaN are usable as \textit{index}.
 However, a user should use only negative integers or strings as \textit{index},
 since natural numbers are used by \LuaTeX-ja itself.
@@ -6826,9 +6831,9 @@ is determined by \texttt{luatexja.isglobal}
 %</en>
 %<*ja>
 スタックに値を設定するには，以下のLua関数を呼び出せば良い：
-\begin{verbatim}
+\begin{lstlisting}
 luatexja.stack.set_stack_table(<any> index, <any> data)
-\end{verbatim}
+\end{lstlisting}
 直感的には，スタックテーブル中のインデックス\textit{index}の値を\textit{data}にする，という意味である．
 \textit{index}の値としては \texttt{nil} とNaN以外の任意の値を使えるが，
 自然数は\LuaTeX-jaが使用する（将来の拡張用も含む）ので，
@@ -6839,18 +6844,18 @@ luatexja.stack.set_stack_table(<any> index, <any> data)
 
 %<*en>
 Stored data can be obtained as the return value of
-\begin{verbatim}
+\begin{lstlisting}
 luatexja.stack.get_stack_table(index, <any> default, <number> level)
-\end{verbatim}
+\end{lstlisting}
 where \textit{level} is the stack level, which is usually the value of \verb+\ltj@@stack+,
 and \textit{default} is the default value which will be returned if no values are stored
 in the stack table whose level is \textit{level}.
 %</en>
 %<*ja>
 スタックの値は，
-\begin{verbatim}
+\begin{lstlisting}
 luatexja.stack.get_stack_table(<any> index, <any> default, <number> level)
-\end{verbatim}
+\end{lstlisting}
 の戻り値で取得できる．\textit{level}はスタックレベルであり，
 通常は \verb+\ltj@@stack+ の値を指定することになるだろう．
 \textit{default}はレベル\textit{level}のスタックに値が設定されていなかった場合に
@@ -6897,9 +6902,9 @@ which is offered by the \Pkg{xkeyval} package.
 
 Hence, to add a key in \cs{ltjsetparameter}, one only have to add a key
 whose prefix is \texttt{ltj} and whose family is \texttt{japaram}, as the following.
-\begin{verbatim}
+\begin{lstlisting}
 \define@key[ltj]{japaram}{...}{...}
-\end{verbatim}
+\end{lstlisting}
 
 \cs{ltjsetparameter}~and~\cs{ltjglobalsetparameter} automatically sets
 \texttt{luatexja.isglobal}. Its meaning is the following.
@@ -6922,9 +6927,9 @@ but also by the value of \cs{globaldefs}.
 
 このため，\cs{ltjsetparameter} に指定可能なパラメータを追加するには，
 <prefix>を \texttt{ltj}，<family>を \texttt{japaram} としたキーを
-\begin{verbatim}
+\begin{lstlisting}
 \define@key[ltj]{japaram}{...}{...}
-\end{verbatim}
+\end{lstlisting}
 のように定義すれば良いだけである．
 なお，パラメータ指定がグローバルかローカルかどうかを示す \texttt{luatexja.isglobal} が，
 \begin{align}
@@ -6967,9 +6972,9 @@ The second argument $c$ is just the second argument of \cs{ltjgetparameter}.
 
 For parameters that need an additional argument, one also have to 
 execute the \TeX\ code like
-\begin{verbatim}
+\begin{lstlisting}
 \ltj@@decl@array@param{fuga}
-\end{verbatim}
+\end{lstlisting}
 to indicate that ``the parameter \texttt{fuga} needs an additional argument''.
 %</en>
 %<*ja>
@@ -6997,9 +7002,9 @@ end
 引数$t$は，先に述べた通りのスタックレベルである．一方，引数$c$は\
 \cs{ltjgetparameter} の第2引数を表す数値である．
 しかしこれだけでは駄目で，
-\begin{verbatim}
+\begin{lstlisting}
 \ltj@@decl@array@param{fuga}
-\end{verbatim}
+\end{lstlisting}
 を実行し，\TeX インターフェース側に
 「\verb+\ltjgetparameter{fuga}+ は追加引数が必要」ということを通知する必要がある．
 %</ja>
@@ -7226,7 +7231,7 @@ emits a space.
 \end{quote}
 
 この仕様は，前節で述べた\pTeX の仕様にできるだけ近づけたものとなっている．条件1.は，
-\texttt{verbatim}系環境などの日本語対応マクロを書かなくてすませるためのものである．
+\texttt{lstlisting}系環境などの日本語対応マクロを書かなくてすませるためのものである．
 
 しかしながら，\pTeX と完全に同じ挙動が実現できたわけではない．
 次のように，和文文字の範囲を変更したちょうどその行においては挙動が異なる：
@@ -7429,9 +7434,9 @@ $\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$は，その和文文字
 先頭・末尾のノードである．
 \begin{itemize}
 \item 状況によっては，\TeX ソースで言うと
-\begin{verbatim}
+\begin{lstlisting}
 \hbox{\hbox{abc}...\hbox{\lower1pt\hbox{xyz}}}
-\end{verbatim}
+\end{lstlisting}
 のように，$p$の内容が別のhboxで開始・終了している可能性も十分あり得る．そのような場合，
 $\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$の算出は，
 \emph{垂直方向にシフトされていない}hboxの
@@ -7615,11 +7620,11 @@ x+y&\text{if\ }\Param{diffrentjfm}=\texttt{both};
 \end{enumerate}
 
 例えば，
-\begin{verbatim}
+\begin{lstlisting}
 \jfont\foo=psft:Ryumin-Light:jfm=ujis;-kern
 \jfont\bar=psft:GothicBBB-Medium:jfm=ujis;-kern
 \jfont\baz=psft:GothicBBB-Medium:jfm=ujis;jfmvar=piyo;-kern
-\end{verbatim}
+\end{lstlisting}
 という3フォントを考え，
 \[
  \overbrace{\Node{glyph}{\cs{ foo}, `あ'}}^{p}
@@ -8301,12 +8306,12 @@ JFM中にある文字クラス$n$の定義の
 全角単位の値として記述されている．
 
 例えば，行末文字が句点「。」であり，そこで用いられているJFM中に
-\begin{verbatim}
+\begin{lstlisting}
   [2] = {
     chars = { '。', ... }, width = 0.5, ...,
     end_stretch = 0.5, end_shrink = 0.5,
   },
-\end{verbatim}
+\end{lstlisting}
 という指定があった場合，この行末の句点は
 \begin{itemize}
 \item 通常の\TeX の行分割処理で「半角以上の詰め」が行われていた場合，
@@ -8633,63 +8638,209 @@ nilでない<data>をキャッシュ<filename>に保存する．
 縦組を実装している．
 
 \LuaTeX-jaにおける縦組の実装は
-\pTeX における実装(\cite{ptexdoc,ptextug})をベースにしており，……
+\pTeX における実装(\cite{ptexdoc,ptextug})をベースにしている．
 
-\subsection{\textit{direction}~whatsit}
+\subsection{direction~whatsit}
 \textit{direction}~whatsitとは，\textit{direction}という特定の \verb+user_id+ を持つ
-whatsitのことである．このwhatsitは，以下の3つの役割がある．
-\begin{enumerate}
-\def\labelenumi{(\roman{enumi})}
- \item 「現在作成中のリストの組方向が \cs{tate} 等により変更された」ことを表す．\\
-「現在の組方向」は \verb+\ltj@dir@count+ というカウンタに格納されているが，それだけでは
-\verb+hpack_filter+コールバックなどから正しく処理対象のリストの組方向を正しく取得すること
-       はできない（\ref{ssec-stack}節参照）ため，このように別途whatsitを用いている．
- \item \cs{hbox},~\cs{vbox}によって作成されたボックスの組方向を表す．\\
-原則として，ボックスの組方向はattribute \verb+\ltj@dir+ に格納されることになっている．しか
-       し，新規に作成されるボックスのattributeをコールバックの内部から制御するには，
-\verb+tex.setattribute+ による方法しかなく，これは不安定である．
-
-なお，この役割のdirection whatsitは，次の(iii)の役割も一緒に持っている．
- \item 「異方向における寸法」の記録用．\\
-例えば \cs{box0} に横組のボックスが格納されている時，縦組や \cs{dtou} 方向
-における寸法値は（(ii)の役割として作成された）direction~whatsitが
-格納しているノードリストに格納される．
-\end{enumerate}
-このように複数の役割をもたせているので，
-\begin{verbatim}
-% yoko direction
-\setbox0=\hbox{\tate B}
-\noindent \unhbox0 A
-\end{verbatim}
-のような場合に，「(ii)の役割の\textit{direction}~whatsitが(i)の役割として認識され，
-このリストは縦組とみなされるのではないか？」と思うかもしれない．しかし，
-(i)の役割と(ii)の枠割の\textit{direction}~whatsitは \verb+\ltj@icflag+ の値により
-区別されているので，そのような混乱は起こらない．
-
-\medskip
-(ii)の役割のdirection whatsitは，各ボックスの内容を表すリストの先頭に挿入されるが，
-例外が以下の2つある：
+whatsitのことであり，以下のタイミングで作られる．
 \begin{itemize}
- \item \verb+\hbox{}+, \verb+\vbox{}+ といった，
+ \item 組方向を \cs{tate} 等で変更したとき．
+ \item \cs{hbox}, \cs{vbox}, \cs{vtop} による明示的なボックスの開始時．\\
+\verb+\hbox{}+, \verb+\vbox{}+ といった，
 \begin{itemize}
  \item \cs{tate} 等によりボックス内部の組方向を変更していない
  \item ボックスの中身のリストが空である
 \end{itemize}
 場合は，\LuaTeX の \verb+hpack_filter+, \verb+vpack_filter+ といった
-callbackに処理が回らないので，この場合にはdirection whatsitは挿入されない．
- \item \verb+\vtop{...}+ の場合は，先頭にdirection whatsitを置くと
-ボックスの高さが正しく設定されない．そのため，この場合に限っては
-direction whatsitはリストの2番目に挿入されることとなる．
+callbackに処理が回らない．そこで，\LuaTeX-ja では，\cs{everyhbox}, \cs{everyvbox} を利用す
+       ることで各ボックスの先頭に確実に追加するようにしている\footnote{%
+  問題は \cs{hbox to 25pt\{\}} という状況である．実際のこのボックスの中身は空でない（少な
+       くともdirection whatsitがある）ため，何も対策をしなければhpack時にUnderfill警告が発
+       生してしまうことになる．\LuaTeX-jaではそうならないように「\cs{hbadness},
+       \cs{vbadness} を一時的に10000に変更し，hpack, vpack後に元の値に戻す」処理を行ってい
+       る．
+}．
+ \item \cs{vsplit}によってvboxを分割した時の「残り」．
+ \item \LuaTeX-ja読み込み前に作成したボックスの寸法を \cs{ltjsetwd} 等によって変更した時．
 \end{itemize}
+なお，\verb+\vtop{...}+ の場合は，先頭にdirection whatsitを置くと
+ボックスの高さが常に0\,ptになるという問題が発生する．そのため，この場合に限っては
+vpack時にdirection whatsitをリストの2番目に移動させている．
 
-\subsection{異方向のボックスの整合処理}
+direction whatsitはあくまでも組方向処理のための補助的なノードであるので，
+\cs{unhbox}, \cs{unhcopy} によってボックスの中身が展開される時には展開直前に削除される．
+これは
+\begin{lstlisting}
+ % yoko direction
+\setbox0=\hbox{\tate B}
+\noindent % 水平モードに入る．この時点でのリストの中身は空
+\unhbox0 A
+\end{lstlisting}
+といった場合に，段落が縦組で組まれたり，あるいは
+\begin{lstlisting}
+\setbox0=\hbox{}
+\leavevmode \hbox{A}\unhbox0
+\setbox1=\lastbox % \box1 はどうなる？
+\end{lstlisting}
+で \cs{box1} が \cs{hbox\{A\}} でなく空になってしまうことを防ぐためである．
+
+
+\subsection{\textit{dir\_box}}
 縦中横など異方向のボックスを配置する場合に，周囲の組方向と大きさを整合させるため，
 \LuaTeX-jaでは \verb+\ltj@dir+ が128以降の\textit{hlist\_node}, \textit{vlist\_node}を
 用いる．これらは\pTeX における\textit{dir\_node}の役割と同じ果たしており，
-この文章中でも\textit{dir\_node}と呼称する．
+この文章中では\textit{dir\_box}と呼称する．
 
+\subsubsection{異方向のボックスの整合}
+\textit{dir\_box}の第一の使用目的は，異方向のボックスの大きさを整合させることである．
+例えば，
+\begin{lstlisting}
+ % yoko direction
+平成\hbox{\tate 26}年
+\end{lstlisting}
+は段落中で
+\[
+ \xymatrix{
+   {}\Node{glyph}{`平'}\ar[r]&{}\Node{glyph}{`成'}\ar[r]&
+   {}\HNode{hlist}{10.00003}{3.02779}{0.0}\ar[r]\ar[d]^{\text{中身}}&{}\Node{glyph}{`年'}\\
+   &&{}\Node{whatsit}{\cs{tate}}\ar[r]&{}\Node{glyph}{`2'}\ar[r]&{}\Node{glyph}{`6'}
+ }
+\]
+というリストを作る．その後，この段落が終了したときに，
+\LuaTeX-jaの\textbf{JAglue}挿入処理が行われ
+\[
+ \xymatrix{
+   {}\Node{glyph}{`平'}\ar[r]
+  &{}\textcolor{blue}{\Node{glue}{\Param{xkanjiskip}}}\ar[r]
+  &{}\Node{glyph}{`成'}\ar[r]
+  &{}\textcolor{blue}{\Node{penalty}{0}}
+    \ar`r[d] `[l] `[ddll] `[dl] [dl]
+  \\
+  &&{}\textcolor{red}{\HNode{hlist}{3.02779}{10.00003}{0.0}}\ar[r]\ar[d]^{\text{中身}}
+  &{}\textcolor{blue}{\Node{penalty}{0}}\ar[r]
+  &{}\Node{glyph}{`年'}\\
+  &&{}\HNode{\textit{dir\_box} (\cs{yoko})}{10.00003}{3.02779}{0.0}\ar[d]^{\text{中身}}\\
+  &&{}\Node{whatsit}{\cs{tate}}\ar[r]&{}\Node{glyph}{`2'}\ar[r]&{}\Node{glyph}{`6'}
+ }
+\]
+のようになる（青字は\textbf{JAglue}，赤字が整合処理のための\textit{dir\_box}である）．
+\TeX の \cs{showbox} 形式で書けば
+
+\medskip{\narrowbaselines\ttfamily\obeylines\parindent0pt
+\catcode`\@=0 @catcode`@\=12
+.\tenmin 平
+@textcolor{blue}{.\glue 0.0 plus 0.4 minus 0.4}
+.\tenmin 成
+@textcolor{blue}{.\penalty 0}
+@textcolor{red}{.\hbox(10.00003+0.0)x3.02779, direction TLT}
+..\hbox(3.02779+0.0)x10.00003, direction TLT
+...\whatsit4=[]
+...\tenrm 2
+...\tenrm 6
+@textcolor{blue}{.\penalty 0}
+.\tenmin 年
+}\medskip
+
+\noindent である．
+
+なお，\cs{raise},~\cs{lower}, \cs{moveleft},~\cs{moveright} といったボックス移動命令では．
+移動を正しく表現するために段落やボックスの途中でも異方向のボックスは\textit{dir\_box}にカ
+プセル化している．
+例えば
+\begin{lstlisting}
+ % yoko direction
+平成\raise1pt\hbox{\tate 26}年\showlists
+\end{lstlisting}
+は以下のような結果を得る．
+
+\medskip{\narrowbaselines\ttfamily\obeylines\parindent0pt
+\catcode`\@=0 @catcode`@\=12
+（前略）
+\tenrm 平
+\tenrm 成
+@textcolor{red}{\hbox(10.00003+0.0)x3.02779, shifted -1.0, direction TLT}
+.\hbox(3.02779+0.0)x10.00003, direction TLT
+..\whatsit4=[]
+..\tenrm 2
+..\tenrm 6
+\tenrm 年
+}\medskip
+
+また，メインの垂直リストに異方向のボックスが追加される場合にも同様に即座に
+\textit{dir\_box}にカプセル化している．ページ分割のタイミングを正
+しく\TeX が判断するためである．
+\cs{lastbox} によるボックスの取得では，\textit{dir\_box}は削除される．
+
+\subsubsection{異方向のボックス寸法の格納}
+第二の使用目的は，現在の組方向がボックス本来の組方向とは異なる状況で，
+\cs{ltjsetwd} によってボックス寸法を設定されたことを記録することである．
+
+例えば
+\begin{lstlisting}[numbers=left]
+\setbox0=\hbox{\vrule width 10pt height 5pt depth 2pt}
+\setbox1=\hbox{\tate\ltjsetwd0=20pt}
+\wd0=9pt
+\setbox1=\hbox{\dtou\ltjsetwd0=20pt}
+\setbox0=\hbox{\dtou a\box0}
+\end{lstlisting}
+というコードを考える．1行目で \cs{box0} には横組の
+幅10\,pt，高さ5\,pt，深さ2\,ptのボックスが代入される．
+よって，
+\begin{itemize}
+ \item 縦組下では \cs{box0} は幅7\,pt，高さ・深さ5\,ptのボックスとして扱われる．
+ \item \cs{dtou} 下では \cs{box0} は幅7\,pt，高さ10\,pt，深さ0\,ptのボックスとして扱われる．
+\end{itemize}
+このとき，\cs{box0} の\emph{中身}は
+\[
+ \xymatrix{
+   {}\Node{whatsit}{\cs{yoko}}\ar[r]&{}\Node{rule}{}
+ }
+\]
+である．
+
+さて，2行目で縦組時の \cs{box0} の幅が20\,ptに設定される．この情報が
+direction~whatsit内部のノードリストに，\textit{dir\_box}として格納される：
+\[
+ \xymatrix{
+   {}\Node{whatsit}{\cs{yoko}}\ar[r]\ar[d]_{\text{中身}}&{}\Node{rule}{}\\
+   {}\textcolor{red}{\HNode{\textit{dir\_box} (\cs{tate})}{20.0}{5.0}{5.0}}
+ }
+\]
+
+次に，3行目では横組時の，つまり \cs{box0} 本来の組方向での深さが9\,ptに変更される．
+このとき，\cs{box0} は
+\begin{itemize}
+ \item 縦組下では寸法代入が既に行われているので，2行目で作成された\textit{dir\_box}の通り
+       に幅20\,pt，高さ・深さ5\,ptのボックスとして扱われる．
+ \item \cs{dtou} 下ではまだ寸法代入が行われていないので，
+\cs{box0} の寸法変更に追従し，幅7\,pt，高さ9\,pt，深さ0\,ptのボックスとして扱われる．
+\end{itemize}
+
+4行目では \cs{dtou} 下での\cs{box0} の幅が20\,ptに設定されるので，2行目と同じように
+\[
+ \xymatrix{
+   {}\Node{whatsit}{\cs{yoko}}\ar[r]\ar[d]_{\text{中身}}&{}\Node{rule}{}\\
+   {}\textcolor{red}{\HNode{\textit{dir\_box} (\cs{dtou})}{20.0}{9.0}{0.0}}\ar[r]&
+   {}\HNode{\textit{dir\_box} (\cs{tate})}{20.0}{5.0}{5.0}
+ }
+\]
+と\textit{dir\_box}が作成される．
+
+このように寸法代入によってつくられた\textit{dir\_box}は，前節の整合過程のときに再利用され
+る．上記の例でいえば，5行目を実行した後の \cs{box0} の内容は
+\[
+ \xymatrix{
+   {}\Node{whatsit}{\cs{dtou}}\ar[r]&
+   {}\Node{glyph}{`a'}\ar[r]&
+   {}\textcolor{red}{\HNode{\textit{dir\_box} (\cs{dtou})}{20.0}{9.0}{0.0}}\ar[d]_{\text{中身}}\\
+   &&{}\HNode{hlist}{9.0}{5.0}{2.0}\ar[d]_{\text{中身}}\\
+   &&{}\Node{whatsit}{\cs{yoko}}\ar[r]&{}\Node{rule}{}
+ }
+\]
+のようになる．
 %</ja>
 
+\newpage
 \begin{thebibliography}{99}
   \addcontentsline{toc}{section}{\refname}
 \bibitem{texbytopic}
