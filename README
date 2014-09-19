@@ -22,10 +22,12 @@ Installation
 ------------
 
 0. Please make sure that your TeX distribution is up-to-date.
-   This version of LuaTeX-ja requires 
+   This version of LuaTeX-ja requires
     - LuaTeX beta-0.74.0 or later
     - luaotfload v2.2
     - luatexbase v0.6
+    - everysel package
+    - IPAex fonts (http://ipafont.ipa.go.jp/)
    Hence this version does not work in TeX Live 2012 (or earlier).
 
 1. If you are using TeX Live 2013 or later, you can install LuaTeX-ja via tlmgr.

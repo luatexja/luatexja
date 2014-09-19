@@ -540,6 +540,8 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 \item \Pkg{xunicode} v0.981~(2011/09/09)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
 \item \Pkg{everysel}
+%<en>\item \emph{IPAex fonts(\url{http://ipafont.ipa.go.jp/})}
+%<ja>\item \emph{IPAexフォント(\url{http://ipafont.ipa.go.jp/})}
 \end{itemize}
 
 %<*en>
@@ -549,13 +551,15 @@ since \LuaTeX\ binary and \Pkg{luaotfload} is updated in
 
 \medskip
 
-Now \LuaTeX-ja is available from the following archive and distributions:
+Now \LuaTeX-ja is available from 
+CTAN (in the \texttt{macros/luatex/generic/luatexja} directory), and
+the following distributions:
   \begin{itemize}
-  \item CTAN (in the \texttt{macros/luatex/generic/luatexja} directory)
   \item MiK\TeX\ (in \texttt{luatexja.tar.lzma}); see the next subsection
   \item \TeX\ Live (in \texttt{texmf-dist/tex/luatex/luatexja})
   \item W32\TeX\ (in \texttt{luatexja.tar.xz})
   \end{itemize}
+IPAex fonts are also available in these distributions.
 
 If you are using \TeX~Live~2014, you can install \LuaTeX-ja
 from \TeX~Live manager (\texttt{tlmgr}):
@@ -569,13 +573,15 @@ $ tlmgr install luatexja
 
 \medskip
 
-現在，\LuaTeX-jaは以下のアーカイブ，およびディストリビューションに収録されている：
+現在，\LuaTeX-jaはCTAN (\texttt{macros/luatex/generic/luatexja})に収録されている他，
+以下のディストリビューションにも収録されている：
   \begin{itemize}
-  \item CTAN (\texttt{macros/luatex/generic/luatexja})
   \item MiK\TeX\ (\texttt{luatexja.tar.lzma})
   \item \TeX\ Live (\texttt{texmf-dist/tex/luatex/luatexja})
   \item W32\TeX\ (\texttt{luatexja.tar.xz})
   \end{itemize}
+これらのディストリビューションはIPAexフォントも収録している．
+W32\TeX においてはIPAexフォントは \texttt{luatexja.tar.xz} 内にある．
 
 例えば\TeX~Live~2014を利用しているなら，\LuaTeX-jaは\TeX~Live manager (\texttt{tlmgr})を
 使ってインストールすることができる．
@@ -765,8 +771,8 @@ run \LuaTeX-ja in this directory, and finally delete the temporary directory.
 \textbf{direction}&
 \textbf{classification}&\textbf{font name}&\bf `10\,pt'&\bf`7\,pt'&\bf`5\,pt'\\\midrule
 \smash{\raisebox{-1ex}{\emph{yoko} (horizontal)}}&
-\emph{mincho}&Ryumin-Light    &\cs{tenmin}&\cs{sevenmin}&\cs{fivemin}\\
-&\emph{gothic}&GothicBBB-Medium&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
+\emph{mincho}&IPAex Mincho&\cs{tenmin}&\cs{sevenmin}&\cs{fivemin}\\
+&\emph{gothic}&IPAex Gothic&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -776,28 +782,22 @@ run \LuaTeX-ja in this directory, and finally delete the temporary directory.
 \begin{center}\small
 \begin{tabular}{cccccc}
 \toprule
-&\emph{字体}&\emph{フォント名}&\bf `10\,pt'&\bf`7\,pt'&\bf`5\,pt'\\\midrule
+&\emph{字体}&\emph{フォント}&\bf `10\,pt'&\bf`7\,pt'&\bf`5\,pt'\\\midrule
 &
-明朝体&Ryumin-Light    &\cs{tenmin}&\cs{sevenmin}&\cs{fivemin}\\
-&ゴシック体&GothicBBB-Medium&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
+明朝体&IPex明朝&\cs{tenmin}&\cs{sevenmin}&\cs{fivemin}\\
+&ゴシック体&IPAexゴシック&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
 \bottomrule
 \end{tabular}
 \end{center}
 %</ja>
 \begin{itemize}
 %<*en>
-\item It is widely accepted that fonts ``Ryumin-Light'' and
-      ``GothicBBB-Medium'' aren't embedded into PDF files, and a PDF reader
-      substitute them by some external Japanese fonts (\textit{e.g.},
-      Ryumin-Light is substituted with Kozuka Mincho in Adobe Reader).
-      We adopt this custom to the default setting.
+\item With \texttt{luatexja.cfg}, one can use other fonts 
+as ``default'' Japanese fonts (Subsection~\ref{ssec-cfg}).
 %</en>
 %<*ja>
-\item ``Ryumin-Light''と``GothicBBB-Medium''はPDFファイルに埋め込まずに
-      名前参照のみで用いることが広く受け入れられており，この場合PDFリーダーが
-      適切な外部フォントで代用する（例えば，Adobe ReaderではRyumin-Lightは
-      小塚明朝で代替される）．そこで，これらを引き続きデフォルトのフォントと
-      して採用する．
+\item \texttt{luatexja.cfg} を用いることによって，標準和文フォントを
+IPAexフォントから別のフォントに置き換えることができる．\ref{ssec-cfg}節を参照．
 %</ja>
 
 %<*en>
@@ -831,8 +831,6 @@ run \LuaTeX-ja in this directory, and finally delete the temporary directory.
 %<en>\subsection{Using in \LaTeX}
 %<ja>\subsection{\LaTeX で使う}
 \label{ssec-ltx}
-
-\paragraph{\LaTeXe}
 
 %<*en>
 Using in \LaTeXe\ is basically same. To set up the minimal environment
@@ -883,15 +881,14 @@ By default, the following fonts are used for \emph{mincho} and \emph{gothic}:
 \begin{center}\small
 \begin{tabular}{ccccc}
 \toprule
-\textbf{classification}&\textbf{family name}&\cs{mdseries}&\cs{bfseries}&\textbf{scale}\\\midrule
-\emph{mincho} (明朝体)&\tt mc&Ryumin-Light    &GothicBBB-Medium&0.962216\\
-\emph{gothic} (\textgt{ゴシック体})&\tt gt&GothicBBB-Medium&GothicBBB-Medium&0.962216\\
+\textbf{classification}&\textbf{family}&\cs{mdseries}&\cs{bfseries}&\textbf{scale}\\\midrule
+\emph{mincho} (明朝体)&\tt mc&IPAex Mincho&IPAex Gothic&0.962216\\
+\emph{gothic} (\textgt{ゴシック体})&\tt gt&IPAex Gothic&IPAex Gothic&0.962216\\
 \bottomrule
 \end{tabular}
 \end{center}
-Note that the bold series in both family are same as the medium series of \emph{gothic} family.
-This is a convention in \pLaTeX. This is trace that there were only 2~fonts (these are Ryumin-Light
-and GothicBBB-Medium) in early years of DTP. There is no italic nor slanted shape for
+Note that the bold series in both family are same as the medium series of \emph{gothic}
+     family. There is no italic nor slanted shape for
       these \texttt{mc}~and~\texttt{gt}.
 %</en>
 %<*ja>
@@ -910,16 +907,14 @@ and GothicBBB-Medium) in early years of DTP. There is no italic nor slanted shap
 \begin{tabular}{ccccc}
 \toprule
 \emph{字体}&\emph{ファミリ}&\cs{mdseries}&\cs{bfseries}&\emph{スケール}\\\midrule
-明朝体&\tt mc&Ryumin-Light    &GothicBBB-Medium&0.962216\\
-ゴシック体&\tt gt&GothicBBB-Medium&GothicBBB-Medium&0.962216\\
+明朝体&\tt mc&IPAex明朝&IPAexゴシック&0.962216\\
+ゴシック体&\tt gt&IPAexゴシック&IPAexゴシック&0.962216\\
 \bottomrule
 \end{tabular}
 \end{center}
 どちらのファミリにおいても，そのboldシリーズで使われるフォントは
-ゴシック体のmediumシリーズで使われるフォントと同じあることに注意．
-これは初期のDTPにおいて和文フォントが2つ（それがちょうど\
-Ryumin-Light, GothicBBB-Mediumだった）しか利用できなかった時の名残であり，\pLaTeX{}
-での標準設定とも同じである．
+ゴシック体のmediumシリーズで使われるフォントと同じであることに注意．
+また，どちらのファミリでもイタリック体・スラント体は定義されない．
 %</ja>
 
 
@@ -950,6 +945,21 @@ Okumura), namely, \Pkg{ltjclasses}\footnote{%
 \Pkg{ltjsclasses}\footnote{%
   \texttt{ltjsarticle.cls},~\texttt{ltjsbook.cls},~\texttt{ltjskiyou.cls}.}%
 がそれぞれ用意されている．
+%</ja>
+
+%<*ja>
+\paragraph{脚注とボトムフロートの出力順序}
+オリジナルの\LaTeX では脚注がボトムフロートの上に来るようになっており，
+\pLaTeX では脚注がボトムフロートの下に来るように変更されている．
+
+\LuaTeX-jaでは「欧文クラスの中にちょっとだけ日本語を入れる」という利用も考慮し，
+脚注とボトムフロートの順序は\LaTeX 通りとした．もし\pLaTeX の出力順序が好みならば，
+\Pkg{stfloats}パッケージを利用して
+\begin{lstlisting}
+ \usepackage{stfloats} \fnbelowfloat
+\end{lstlisting}
+のようにすればよい．\Pkg{footmisc}パッケージを \texttt{bottom}\ オプションを指定して
+読み込むという方法もあるが，それだとボトムフロートと脚注の間が開いてしまう．
 %</ja>
 
 %<en>\section{Changing Fonts}
@@ -1351,6 +1361,7 @@ We didn't taken account of  when both \texttt{90jis} and \texttt{jis2004} are sp
 同時に指定された場合の動作については全く考慮していない．
 %</ja>
 
+
 \newpage
 %<en>\paragraph{Presets for multi weight}
 %<ja>\paragraph{多ウェイト用プリセットの一覧}
@@ -1537,9 +1548,9 @@ even if \texttt{deluxe} option is also specified).
 \midrule
 %<*en>
 \it mincho&Ryumin-Light (non-embedded)
-&IPAMincho&IPAexMincho&MS Mincho\\
+&IPA Mincho&IPAex Mincho&MS Mincho\\
 \it gothic&GothicBBB-Medium (non-embedded)
-&IPAGothic&IPAexGothic&MS Gothic\\
+&IPA Gothic&IPAex Gothic&MS Gothic\\
 %</en>
 %<*ja>
 \gtfamily 明朝体&Ryumin-Light（非埋込）
@@ -1568,14 +1579,14 @@ We can use HG~fonts bundled with Microsoft~Office for realizing multiple weights
 \midrule
 %<*en>
 \bf mincho medium
-&IPAMincho&IPAexMincho&MS Mincho\\\midrule
+&IPA Mincho&IPAex Mincho&MS Mincho\\\midrule
 \bf mincho bold&
 \multicolumn{3}{c}{HG Mincho E}\\\midrule
 \bf Gothic medium\\
 ~~without \texttt{deluxe}
-&IPAGothic&IPAexGothic&MS Gothic\\
+&IPAG othic&IPAex Gothic&MS Gothic\\
 ~~with {\tt jis2004}
-&IPAGothic&IPAexGothic&MS Gothic\\
+&IPA Gothic&IPAex Gothic&MS Gothic\\
 \cmidrule(lr){1-4}
 ~~otherwise&
 \multicolumn{3}{c}{HG Gothic M}\\\midrule
@@ -1675,6 +1686,59 @@ If you want to use these functions, load \Pkg{luatexja-otf} package.
 \Pkg{luatexja-preset} パッケージにプリセットを使う時に一緒に指定するか，
 あるいは対応する内容を\ref{ssec-chgfnt}節，\ref{ssec-nfsspat}節 (NFSS2) や
 \ref{ssec-fontspec}節 (\Pkg{fontspec}) の方法で手動で指定する必要がある．
+%</ja>
+
+%<en>\subsection{Changing default Japanese fonts}
+%<ja>\subsection{標準和文フォントの変更}
+\label{ssec-cfg}
+%<*en>
+If \texttt{luatexja.cfg} can be seen from \LuaTeX, \LuaTeX-ja automatically reads it.
+The main use of \texttt{luatexja.cfg} is for changing default Japanese fonts,
+when IPAex fonts cannot be installed in \TeX~system.
+One should not overuse this \texttt{luatexja.cfg}; fonts which will be used in 
+a document should be specified in its source. 
+
+For example,
+\begin{lstlisting}
+\def\ltj@stdmcfont{IPAMincho}
+\def\ltj@stdgtfont{IPAGothic}
+\end{lstlisting}
+makes that IPA~Mincho and IPA~Gothic will be used as default Japanese fonts, instead of
+IPAex~Mincho and IPAex~Gothic.
+
+For another example, the following two lines makes that
+non-embedded fonts Ryumin-Light~and~GothicBBB-Medium as default Japanese fonts
+(as the earlier version of \LuaTeX-ja):
+\begin{lstlisting}
+\def\ltj@stdmcfont{psft:Ryumin-Light}
+\def\ltj@stdgtfont{psft:GothicBBB-Medium}
+\end{lstlisting}
+%</en>
+%<*ja>
+\LuaTeX から見える位置に \texttt{luatexja.cfg} があれば，\LuaTeX-jaはそれを読み込む．
+このファイルを用いるとplain~\TeX, \LaTeXe における標準和文フォントを
+IPAex明朝・IPAexゴシックから変更することがdできる．
+しかし，基本的には\emph{文章中で用いるフォントは（例えば \Pkg{luatexja-preset} などで）
+文書ソース内で指定するべき}であり，この \texttt{luatexja.cfg} は，
+「IPAexフォントがインストールできない」など，IPAexフォントが使用できない場合にのみ
+応急処置的に用いるべきである．
+
+例えば
+\begin{lstlisting}
+\def\ltj@stdmcfont{IPAMincho}
+\def\ltj@stdgtfont{IPAGothic}
+\end{lstlisting}
+と記述しておけば，標準和文フォントがIPA明朝・IPAゴシックへと変
+更される．
+
+
+なお，20140906.0以前のバージョンのように，
+Ryumin-Light, GothicBBB-Mediumという名前の非埋込フォントを用いる場合は
+\begin{lstlisting}
+\def\ltj@stdmcfont{psft:Ryumin-Light}
+\def\ltj@stdgtfont{psft:GothicBBB-Medium}
+\end{lstlisting}
+と記述すればよい．
 %</ja>
 
 
@@ -1796,7 +1860,7 @@ these eight ranges belongs to the character range~217.
 %</ja>
 \begin{description}
 %<*en>
-\newpage
+
 \item[Range~8${}^{\text{J}}$] The intersection of the upper half of ISO~8859-1
 	 (Latin-1 Supplement) and JIS~X~0208 (a basic character set for Japanese). This character range
 	 consists of the following characters:
@@ -1973,7 +2037,7 @@ The block list is indicated in Table~\ref{table-rng7}.
 \end{description}
 
 
-%<en>\newpage\subsection{\Param{kanjiskip} and \Param{xkanjiskip}}
+%<en>\subsection{\Param{kanjiskip} and \Param{xkanjiskip}}
 %<ja>\subsection{\Param{kanjiskip}と\Param{xkanjiskip}}
 \label{subs-kskip}
 
@@ -2814,9 +2878,9 @@ Besides ``\texttt{file:}''\ and ``\texttt{name:}''\ prefixes which
 are introduced in the \Pkg{luaotfload} package,
 \LuaTeX-ja adds ``\texttt{psft:}''\ prefix in \cs{jfont} (and~\cs{font}),
 to specify a ``name-only'' Japanese font which
-will not be embedded to PDF. Typical use of this prefix is to specify
-standard, non-embedded Japanese fonts, namely, ``Ryumin-Light'' and
-``GothicBBB-Medium''.
+will not be embedded to PDF.
+Note that these non-embedded fonts under current \LuaTeX\ has Identity-H encoding,
+and this violates the standard ISO32000-1:2008~(\cite{pdfstd}).
 
 \emph{OpenType font features, such as ``{\tt +jp90}'',
 have no meaning in name-only fonts using ``{\tt psft:}''\ prefix,
@@ -2830,8 +2894,10 @@ with \texttt{psft} prefix, because they are only simple linear transformations.
 \cs{jfont}（と \cs{font} プリミティブ）では
 \texttt{psft:}プリフィックスを用いることができる．
 このプリフィックスを用いることで，PDFには埋め込まれない「名前だけの」
-和文フォントを指定することができる．「標準的な」非埋め込み和文フォント，
-つまり「Ryumin-Light」「GothicBBB-Medium」の指定でこのプリフィックスが使われる．
+和文フォントを指定することができる．
+なお，現行の\LuaTeX で非埋め込みフォントを作成するとPDF内でのエンコーディングが
+Identity-Hとなり，PDFの標準規格ISO32000-1:2008~(\cite{pdfstd})に非準拠になってしまう
+ので注意してほしい．
 
 \emph{\texttt{psft} プリフィックスの下では
 \texttt{+jp90} などのOpenType font featureの効力はない．
@@ -7558,6 +7624,11 @@ Requirements for Japanese Text Layout (W3C Working Group Note), 2011, 2012. \new
 \\\null\hfill\texttt{.../texmf-dist/doc/ptex/base/ptexdoc.pdf}
 \bibitem{ptextug} Hisato Hamano. \newblock
 \textit{Vertical Typesetting with \TeX}, TUGBoat~\textbf{11}(3), 346--352, 1990.
+\bibitem{pdfstd} International Organization for Standardization. \newblock
+ISO 32000-1:2008, \textit{Document management -- Portable document format -- Part 1: PDF
+      1.7}, 2008. \newblock
+\\\null\hfill
+\url{http://www.iso.org/iso/iso\_catalogue/catalogue_tc/catalogue\_detail.htm?csnumber=51502}
 \end{thebibliography}
 
 \newpage
