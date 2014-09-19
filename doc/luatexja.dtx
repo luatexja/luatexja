@@ -549,6 +549,8 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 \item \Pkg{xunicode} v0.981~(2011/09/09)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
 \item \Pkg{everysel}
+%<en>\item \emph{IPAex fonts(\url{http://ipafont.ipa.go.jp/})}
+%<ja>\item \emph{IPAexフォント(\url{http://ipafont.ipa.go.jp/})}
 \end{itemize}
 
 %<*en>
@@ -558,13 +560,15 @@ since \LuaTeX\ binary and \Pkg{luaotfload} is updated in
 
 \medskip
 
-Now \LuaTeX-ja is available from the following archive and distributions:
+Now \LuaTeX-ja is available from
+CTAN (in the \texttt{macros/luatex/generic/luatexja} directory), and
+the following distributions:
   \begin{itemize}
-  \item CTAN (in the \texttt{macros/luatex/generic/luatexja} directory)
   \item MiK\TeX\ (in \texttt{luatexja.tar.lzma}); see the next subsection
   \item \TeX\ Live (in \texttt{texmf-dist/tex/luatex/luatexja})
   \item W32\TeX\ (in \texttt{luatexja.tar.xz})
   \end{itemize}
+IPAex fonts are also available in these distributions.
 
 If you are using \TeX~Live~2014, you can install \LuaTeX-ja
 from \TeX~Live manager (\texttt{tlmgr}):
@@ -578,13 +582,15 @@ $ tlmgr install luatexja
 
 \medskip
 
-現在，\LuaTeX-jaは以下のアーカイブ，およびディストリビューションに収録されている：
+現在，\LuaTeX-jaはCTAN (\texttt{macros/luatex/generic/luatexja})に収録されている他，
+以下のディストリビューションにも収録されている：
   \begin{itemize}
-  \item CTAN (\texttt{macros/luatex/generic/luatexja})
   \item MiK\TeX\ (\texttt{luatexja.tar.lzma})
   \item \TeX\ Live (\texttt{texmf-dist/tex/luatex/luatexja})
   \item W32\TeX\ (\texttt{luatexja.tar.xz})
   \end{itemize}
+これらのディストリビューションはIPAexフォントも収録している．
+W32\TeX においてはIPAexフォントは \texttt{luatexja.tar.xz} 内にある．
 
 例えば\TeX~Live~2014を利用しているなら，\LuaTeX-jaは\TeX~Live manager (\texttt{tlmgr})を
 使ってインストールすることができる．
@@ -774,12 +780,12 @@ run \LuaTeX-ja in this directory, and finally delete the temporary directory.
 \textbf{direction}&
 \textbf{classification}&\textbf{font name}&\bf `10\,pt'&\bf`7\,pt'&\bf`5\,pt'\\\midrule
 \smash{\raisebox{-1ex}{\emph{yoko} (horizontal)}}&
-\emph{mincho}&Ryumin-Light    &\cs{tenmin}&\cs{sevenmin}&\cs{fivemin}\\
-&\emph{gothic}&GothicBBB-Medium&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
+\emph{mincho}&IPAex Mincho&\cs{tenmin}&\cs{sevenmin}&\cs{fivemin}\\
+&\emph{gothic}&IPAex Gothic&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
 \midrule
 \smash{\raisebox{-1ex}{\emph{tate} (vertical)}}&
-\emph{mincho}&Ryumin-Light    &\cs{tentmin}&\cs{seventmin}&\cs{fivetmin}\\
-&\emph{gothic}&GothicBBB-Medium&\cs{tentgt} &\cs{seventgt} &\cs{fivetgt}\\
+\emph{mincho}&IPAex Mincho&\cs{tentmin}&\cs{seventmin}&\cs{fivetmin}\\
+&\emph{gothic}&IPAex Gothic&\cs{tentgt} &\cs{seventgt} &\cs{fivetgt}\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -791,30 +797,24 @@ run \LuaTeX-ja in this directory, and finally delete the temporary directory.
 \toprule
 \emph{組方向}&\emph{字体}&\emph{フォント名}&\bf `10\,pt'&\bf`7\,pt'&\bf`5\,pt'\\\midrule
 \smash{\raisebox{-1ex}{横組}}&
-明朝体&Ryumin-Light    &\cs{tenmin}&\cs{sevenmin}&\cs{fivemin}\\
-&ゴシック体&GothicBBB-Medium&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
+明朝体&IPAex明朝&\cs{tenmin}&\cs{sevenmin}&\cs{fivemin}\\
+&ゴシック体&IPAexゴシック&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
 \midrule
 \smash{\raisebox{-1ex}{縦組}}&
-明朝体&Ryumin-Light    &\cs{tentmin}&\cs{seventmin}&\cs{fivetmin}\\
-&ゴシック体&GothicBBB-Medium&\cs{tentgt} &\cs{seventgt} &\cs{fivetgt}\\
+明朝体&IPAex明朝&\cs{tentmin}&\cs{seventmin}&\cs{fivetmin}\\
+&ゴシック体&IPAexゴシック&\cs{tentgt} &\cs{seventgt} &\cs{fivetgt}\\
 \bottomrule
 \end{tabular}
 \end{center}
 %</ja>
 \begin{itemize}
 %<*en>
-\item It is widely accepted that fonts ``Ryumin-Light'' and
-      ``GothicBBB-Medium'' aren't embedded into PDF files, and a PDF reader
-      substitute them by some external Japanese fonts (\textit{e.g.},
-      Ryumin-Light is substituted with Kozuka Mincho in Adobe Reader).
-      We adopt this custom to the default setting.
+\item With \texttt{luatexja.cfg}, one can use other fonts
+as ``default'' Japanese fonts (Subsection~\ref{ssec-cfg}).
 %</en>
 %<*ja>
-\item ``Ryumin-Light''と``GothicBBB-Medium''はPDFファイルに埋め込まずに
-      名前参照のみで用いることが広く受け入れられており，この場合PDFリーダーが
-      適切な外部フォントで代用する（例えば，Adobe ReaderではRyumin-Lightは
-      小塚明朝で代替される）．そこで，これらを引き続きデフォルトのフォントと
-      して採用する．
+\item \texttt{luatexja.cfg} を用いることによって，標準和文フォントを
+IPAexフォントから別のフォントに置き換えることができる．\ref{ssec-cfg}節を参照．
 %</ja>
 
 %<*en>
@@ -897,15 +897,14 @@ By default, the following fonts are used for \emph{mincho} and \emph{gothic}:
 \begin{center}\small
 \begin{tabular}{ccccc}
 \toprule
-\textbf{classification}&\textbf{family name}&\cs{mdseries}&\cs{bfseries}&\textbf{scale}\\\midrule
-\emph{mincho} (明朝体)&\tt mc&Ryumin-Light    &GothicBBB-Medium&0.962216\\
-\emph{gothic} (\textgt{ゴシック体})&\tt gt&GothicBBB-Medium&GothicBBB-Medium&0.962216\\
+\textbf{classification}&\textbf{family}&\cs{mdseries}&\cs{bfseries}&\textbf{scale}\\\midrule
+\emph{mincho} (明朝体)&\tt mc&IPAex Mincho&IPAex Gothic&0.962216\\
+\emph{gothic} (\textgt{ゴシック体})&\tt gt&IPAex Gothic&IPAex Gothic&0.962216\\
 \bottomrule
 \end{tabular}
 \end{center}
-Note that the bold series in both family are same as the medium series of \emph{gothic} family.
-This is a convention in \pLaTeX. This is trace that there were only 2~fonts (these are Ryumin-Light
-and GothicBBB-Medium) in early years of DTP. There is no italic nor slanted shape for
+Note that the bold series in both family are same as the medium series of \emph{gothic}
+     family. There is no italic nor slanted shape for
       these \texttt{mc}~and~\texttt{gt}.
 %</en>
 %<*ja>
@@ -924,16 +923,14 @@ and GothicBBB-Medium) in early years of DTP. There is no italic nor slanted shap
 \begin{tabular}{ccccc}
 \toprule
 \emph{字体}&\emph{ファミリ}&\cs{mdseries}&\cs{bfseries}&\emph{スケール}\\\midrule
-明朝体&\tt mc&Ryumin-Light    &GothicBBB-Medium&0.962216\\
-ゴシック体&\tt gt&GothicBBB-Medium&GothicBBB-Medium&0.962216\\
+明朝体&\tt mc&IPAex明朝&IPAexゴシック&0.962216\\
+ゴシック体&\tt gt&IPAexゴシック&IPAexゴシック&0.962216\\
 \bottomrule
 \end{tabular}
 \end{center}
 どちらのファミリにおいても，そのboldシリーズで使われるフォントは
-ゴシック体のmediumシリーズで使われるフォントと同じあることに注意．
-これは初期のDTPにおいて和文フォントが2つ（それがちょうど\
-Ryumin-Light, GothicBBB-Mediumだった）しか利用できなかった時の名残であり，\pLaTeX{}
-での標準設定とも同じである．
+ゴシック体のmediumシリーズで使われるフォントと同じであることに注意．
+また，どちらのファミリでもイタリック体・スラント体は定義されない．
 %</ja>
 
 
@@ -986,32 +983,6 @@ Okumura), namely, \Pkg{ltjclasses}\footnote{%
 
 %<en>\section{Changing Fonts}
 %<ja>\section{フォントの変更}
-
-%<*en>
-\subsection{Notes on  ``default'' fonts of \LuaTeX-ja}
-As described earlier, default fonts of \LuaTeX-ja are non-embedded fonts,
-namely ``Ryumin-Light'' and ``GothicBBB-Medium''. 
-However, using these non-embedded fonts makes that the output PDF does \emph{not} follow
-the standard ISO32000-1:2008~(\cite{pdfstd}).
-%</en>
-%<*ja>
-\subsection{\LuaTeX-ja 標準フォントについて}
-\label{ssec:stdfnt}
-既に説明したように，\LuaTeX-jaの標準和文フォントは``Ryumin-Light''と``GothicBBB-Medium''%
-という非埋め込みフォントである．しかし，現行の\LuaTeX で非埋め込みフォントを用いたPDFを
-作成すると，エンコーディングがIdentity-Hとなってしまい，
-PDFの標準規格ISO32000-1:2008~(\cite{pdfstd})に非準拠になってしまっている．
-
-この状況を解決する方法として正当的なのは，本章の残りに示すようにドキュメント中にフォント変更命令を記述する方
-法だが，\texttt{luatexja.cfg} を作成するという方法もある．例えば \texttt{luatexja.cfg} に
-\begin{lstlisting}
-\def\ltj@stdmcfont{IPAMincho}
-\def\ltj@stdgtfont{IPAGothic}
-\end{lstlisting}
-と記述しておけば，plain~\TeX, \LaTeXe における標準和文フォントがIPA明朝・IPAゴシックへと変
-更される．
-%</ja>
-
 
 \subsection{plain \TeX~and~\LaTeXe}
 \label{ssec-chgfnt}
@@ -1350,7 +1321,7 @@ This means that \verb+\mcfamily\bfseries+, \verb+\gtfamily\bfseries+ and
 %<*ja>
 \LaTeXe 環境下での標準設定のように，明朝体・ゴシック体を各1ウェイトで使用する．
 より具体的に言うと，この設定の下では
-\ \verb+\mcfamily\bfseries+, \verb+\gtfamily\bfseries+, 
+\ \verb+\mcfamily\bfseries+, \verb+\gtfamily\bfseries+,
 \verb+\gtfamily\mdseries+はみな同じフォントとなる．
 \emph{このオプションは標準で有効になっている．}
 %</ja>
@@ -1572,7 +1543,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{tabular}
 \end{center}
 
-\end{cslist} 
+\end{cslist}
 %<en>\paragraph{Presets for single weight}
 %<ja>\paragraph{単ウェイト用プリセット一覧}
 %<*en>
@@ -1593,9 +1564,9 @@ even if \texttt{deluxe} option is also specified).
 \midrule
 %<*en>
 \it mincho&Ryumin-Light (non-embedded)
-&IPAMincho&IPAexMincho&MS Mincho\\
+&IPA Mincho&IPAex Mincho&MS Mincho\\
 \it gothic&GothicBBB-Medium (non-embedded)
-&IPAGothic&IPAexGothic&MS Gothic\\
+&IPA Gothic&IPAex Gothic&MS Gothic\\
 %</en>
 %<*ja>
 \gtfamily 明朝体&Ryumin-Light（非埋込）
@@ -1605,12 +1576,6 @@ even if \texttt{deluxe} option is also specified).
 %</ja>
 \bottomrule
 \end{tabular}\par\medskip}
-%<*ja>
-なお，\ref{ssec:stdfnt}節にあるように \texttt{luatexja.cfg} を利用して\LuaTeX-jaの標準和文
-フォントを変更しても，上記 \texttt{noembed} オプションを使うとRyumin-Light,
-GothicBBB-Mediumを非埋め込みで用いることになるので注意してほしい．
-%</ja>
-
 
 %<en>\paragraph{Using HG fonts}
 %<ja>\paragraph{HGフォントの利用}
@@ -1629,14 +1594,14 @@ We can use HG~fonts bundled with Microsoft~Office for realizing multiple weights
 \midrule
 %<*en>
 \bf mincho medium
-&IPAMincho&IPAexMincho&MS Mincho\\\midrule
+&IPA Mincho&IPAex Mincho&MS Mincho\\\midrule
 \bf mincho bold&
 \multicolumn{3}{c}{HG Mincho E}\\\midrule
 \bf Gothic medium\\
 ~~without \texttt{deluxe}
-&IPAGothic&IPAexGothic&MS Gothic\\
+&IPA Gothic&IPAex Gothic&MS Gothic\\
 ~~with {\tt jis2004}
-&IPAGothic&IPAexGothic&MS Gothic\\
+&IPA Gothic&IPAex Gothic&MS Gothic\\
 \cmidrule(lr){1-4}
 ~~otherwise&
 \multicolumn{3}{c}{HG Gothic M}\\\midrule
@@ -1737,6 +1702,59 @@ If you want to use these functions, load \Pkg{luatexja-otf} package.
 \Pkg{luatexja-preset} パッケージにプリセットを使う時に一緒に指定するか，
 あるいは対応する内容を\ref{ssec-chgfnt}節，\ref{ssec-nfsspat}節 (NFSS2) や
 \ref{ssec-fontspec}節 (\Pkg{fontspec}) の方法で手動で指定する必要がある．
+%</ja>
+
+%<en>\subsection{Changing default Japanese fonts}
+%<ja>\subsection{標準和文フォントの変更}
+\label{ssec-cfg}
+%<*en>
+If \texttt{luatexja.cfg} can be seen from \LuaTeX, \LuaTeX-ja automatically reads it.
+The main use of \texttt{luatexja.cfg} is for changing default Japanese fonts,
+when IPAex fonts cannot be installed in \TeX~system.
+One should not overuse this \texttt{luatexja.cfg}; fonts which will be used in
+a document should be specified in its source.
+
+For example,
+\begin{lstlisting}
+\def\ltj@stdmcfont{IPAMincho}
+\def\ltj@stdgtfont{IPAGothic}
+\end{lstlisting}
+makes that IPA~Mincho and IPA~Gothic will be used as default Japanese fonts, instead of
+IPAex~Mincho and IPAex~Gothic.
+
+For another example, the following two lines makes that
+non-embedded fonts Ryumin-Light~and~GothicBBB-Medium as default Japanese fonts
+(as the earlier version of \LuaTeX-ja):
+\begin{lstlisting}
+\def\ltj@stdmcfont{psft:Ryumin-Light}
+\def\ltj@stdgtfont{psft:GothicBBB-Medium}
+\end{lstlisting}
+%</en>
+%<*ja>
+\LuaTeX から見える位置に \texttt{luatexja.cfg} があれば，\LuaTeX-jaはそれを読み込む．
+このファイルを用いるとplain~\TeX, \LaTeXe における標準和文フォントを
+IPAex明朝・IPAexゴシックから変更することがdできる．
+しかし，基本的には\emph{文章中で用いるフォントは（例えば \Pkg{luatexja-preset} などで）
+文書ソース内で指定するべき}であり，この \texttt{luatexja.cfg} は，
+「IPAexフォントがインストールできない」など，IPAexフォントが使用できない場合にのみ
+応急処置的に用いるべきである．
+
+例えば
+\begin{lstlisting}
+\def\ltj@stdmcfont{IPAMincho}
+\def\ltj@stdgtfont{IPAGothic}
+\end{lstlisting}
+と記述しておけば，標準和文フォントがIPA明朝・IPAゴシックへと変
+更される．
+
+
+なお，20140906.0以前のバージョンのように，
+Ryumin-Light, GothicBBB-Mediumという名前の非埋込フォントを用いる場合は
+\begin{lstlisting}
+\def\ltj@stdmcfont{psft:Ryumin-Light}
+\def\ltj@stdgtfont{psft:GothicBBB-Medium}
+\end{lstlisting}
+と記述すればよい．
 %</ja>
 
 
@@ -1858,7 +1876,7 @@ these eight ranges belongs to the character range~217.
 %</ja>
 \begin{description}
 %<*en>
-\newpage
+
 \item[Range~8${}^{\text{J}}$] The intersection of the upper half of ISO~8859-1
 	 (Latin-1 Supplement) and JIS~X~0208 (a basic character set for Japanese). This character range
 	 consists of the following characters:
@@ -2034,7 +2052,7 @@ The block list is indicated in Table~\ref{table-rng7}.
 \end{table}
 \end{description}
 
-%<en>\newpage\subsection{\Param{kanjiskip} and \Param{xkanjiskip}}
+%<en>\subsection{\Param{kanjiskip} and \Param{xkanjiskip}}
 %<ja>\subsection{\Param{kanjiskip}と\Param{xkanjiskip}}
 \label{subs-kskip}
 
@@ -2265,8 +2283,8 @@ xyz漢字
 \end{LTXexample}
 
 %<*en>
-Note that setting a positive value to 
-\Param{yalbaselineshift}~or~\Param{talbaselineshift} does not 
+Note that setting a positive value to
+\Param{yalbaselineshift}~or~\Param{talbaselineshift} does not
 increase the depth of \textbf{ALchar}, as shown below.
 This is because these parameters are implemented by setting \verb+yoffset+
 field of a glyph node, and this does not increase the depth of the glyph.
@@ -2700,7 +2718,7 @@ Example&\obox{\yoko}&\obox{\tate}&\obox{\dtou}&\obox{\utod}\\
 
 %<*en>
 \LuaTeX-ja supports four directions, as shown in Table~\ref{tab-dir}.
-The second column (\emph{yoko} direction) is just horizontal writing, 
+The second column (\emph{yoko} direction) is just horizontal writing,
 and the third column (\emph{tate} direction) is vertical writing.
 The fourth column (\emph{dtou} direction) is actually a hidden feature of \pTeX.
 We implemented this for debugging purpose.
@@ -2982,13 +3000,13 @@ However, this no longer applies in \LuaTeX-ja.
 \the\wd0,~\hbox{\tate \the\wd0}
 \end{LTXexample}
 
-To access box dimensions \emph{with respect to current direction}, 
+To access box dimensions \emph{with respect to current direction},
 one have to use the following commands instead of \cs{wd} wtc.
 \begin{cslist}
 
  \item[\cs{ltjgetwd}\{<num>\}\textrm{, }\cs{ltjgetht}\{<num>\}\textrm{, }%
   \cs{ltjgetdp}\{<num>\}]
-These commands return \emph{an internal dimension} of \cs{box<num>} with respect to 
+These commands return \emph{an internal dimension} of \cs{box<num>} with respect to
 the current direction. One can use these in \cs{dimexpr} primitive, as the followings.
 \begin{lstlisting}
 \dimexpr 2\ltjgetwd{42}-3pt\relax, \the\ltjgetwd{1701}
@@ -3150,7 +3168,7 @@ Returned value&\texttt{4}&\texttt{3}&\texttt{1}&\texttt{11}&\texttt{0}\\
 のように行うことができる．
 \cs{iftdir} は少々面倒であるが
 \begin{lstlisting}
-\ifnum\numexpr 
+\ifnum\numexpr
   \ltjgetparameter{direction}-(\ltjgetparameter{direction}/8)*8=3
 \end{lstlisting}
 とすればよい．
@@ -3164,7 +3182,7 @@ overridden by \LuaTeX-ja, using~\verb+\protected\def+.
  \item[\cs{unhbox}<num>\textrm{, }\cs{unvbox}<num>\textrm{, }\cs{unhcopy}<num>\textrm{, }\cs{unvcopy}<num>]
  \item[\cs{vadjust}\{<material>\}]
  \item[\cs{lastbox}]
- \item[\cs{raise}<dimen><box>\textrm{, }\cs{lower}<dimen><box>\textrm{\ etc., }\cs{vcenter}] 
+ \item[\cs{raise}<dimen><box>\textrm{, }\cs{lower}<dimen><box>\textrm{\ etc., }\cs{vcenter}]
  \item[\cs{vcenter}]
 \end{cslist}
 %</en>
@@ -3567,9 +3585,9 @@ Besides ``\texttt{file:}''\ and ``\texttt{name:}''\ prefixes which
 are introduced in the \Pkg{luaotfload} package,
 \LuaTeX-ja adds ``\texttt{psft:}''\ prefix in \cs{jfont} (and~\cs{font}),
 to specify a ``name-only'' Japanese font which
-will not be embedded to PDF. Typical use of this prefix is to specify
-standard, non-embedded Japanese fonts, namely, ``Ryumin-Light'' and
-``GothicBBB-Medium''.
+will not be embedded to PDF.
+Note that these non-embedded fonts under current \LuaTeX\ has Identity-H encoding,
+and this violates the standard ISO32000-1:2008~(\cite{pdfstd}).
 
 \emph{OpenType font features, such as ``{\tt +jp90}'',
 have no meaning in name-only fonts using ``{\tt psft:}''\ prefix,
@@ -3583,8 +3601,10 @@ with \texttt{psft} prefix, because they are only simple linear transformations.
 \cs{jfont}（と \cs{font} プリミティブ）では
 \texttt{psft:}プリフィックスを用いることができる．
 このプリフィックスを用いることで，PDFには埋め込まれない「名前だけの」
-和文フォントを指定することができる．「標準的な」非埋め込み和文フォント，
-つまり「Ryumin-Light」「GothicBBB-Medium」の指定でこのプリフィックスが使われる．
+和文フォントを指定することができる．
+なお，現行の\LuaTeX で非埋め込みフォントを作成するとPDF内でのエンコーディングが
+Identity-Hとなり，PDFの標準規格ISO32000-1:2008~(\cite{pdfstd})に非準拠になってしまう
+ので注意してほしい．
 
 \emph{\texttt{psft} プリフィックスの下では
 \texttt{+jp90} などのOpenType font featureの効力はない．
@@ -3797,7 +3817,7 @@ This field is a list of characters which are in this character
 \item 「\hbox{\ltjsetparameter{autoxspacing=false}\verb+'あ*'+}」のような，文字それ自体の後にアスタリスクをつけたもの
 \item いくつかの「仮想的な文字」（後に説明する）
 \end{itemize}
-%</ja> 
+%</ja>
 
 \item[width=<length>, height=<length>, depth=<length>, italic=<length>]
 %<en>(required)
@@ -3830,7 +3850,7 @@ These fields are for adjusting the position of the ``real'' glyph. Legal
 	     3~fields are omitted, \texttt{left} and \texttt{down} are
 	     treated as~0, and \texttt{align} field is treated as
 	     \texttt{'left'}.
-The effects of these 3~fields are indicated in 
+The effects of these 3~fields are indicated in
 Figures \ref{fig-pos}~and~\ref{fig-pos-tate}.
 %</en>
 %<*ja>
@@ -3912,7 +3932,7 @@ when the current character class is the class for opening delimiters'.
 \end{minipage}%
 \begin{minipage}{0.6\textwidth}%
 %<*en>
-Consider a  Japanese character node which belongs to 
+Consider a  Japanese character node which belongs to
 a character class whose the \texttt{align}
 field is \texttt{'middle'}.
 %</en>
@@ -4023,11 +4043,11 @@ Furthermore, the glyph is shifted according to values of fields
 \item
 実際のグリフの「垂直位置」は，ベースラインが文字の物理的な左右方向の中央を通る
 位置となる．
-\item 
+\item
 また，この場合\texttt{align}フィールドは \texttt{'right'} なので，
 「水平位置」は字送り方向に「右寄せ」したものとなる（緑色の長方形）．
 その際，高さ・深さは，実フォントのascender, descenderの値が使われる．
-\item 
+\item
 その後さらに \texttt{left} と \texttt{down} の値に従ってシフトされる
 のは横組用和文フォントと変わらない．
 \end{itemize}
@@ -4334,7 +4354,7 @@ font families. There is no relation between the value of
 you can set both \cs{fam} and \cs{jfam} to the same value.
 Here <jfont\_cs> in the argument of \Param{jatextfont} etc.\ is
 a control sequence which is defined by \cs{jfont}, i.e.,
-a \emph{horizontal} Japanese font. 
+a \emph{horizontal} Japanese font.
 %</en>
 %<*ja>
 \LuaTeX-jaの数式中での和文フォントの扱いも同様である．
@@ -4715,7 +4735,7 @@ adopted in the whole paragraph or the whole hbox.
 \end{itemize}
 
 \begin{cslist}[style=standard]
-\item[\DParam{jcharwidowpenalty}\,=<penalty>$^\ast$] [\cs{jcharwidowpenalty}]\ 
+\item[\DParam{jcharwidowpenalty}\,=<penalty>$^\ast$] [\cs{jcharwidowpenalty}]\
 
 %<*en>
 Penalty value for suppressing orphans. This penalty is inserted just
@@ -4917,13 +4937,13 @@ The default value is \texttt{paverage}. \dots
 \item[\DParam{jacharrange}\,=<ranges>]
 \item[\DParam{kansujichar}\,=\{<digit>, <chr\_code>\}$^\ast$] [\cs{kansujichar}]
 
-\item[\DParam{direction}\,=<dir>\ \hbox{\rm (always local)}]\ 
+\item[\DParam{direction}\,=<dir>\ \hbox{\rm (always local)}]\
 
 %<*en>
 Assigning to this parameter has the same effect as
 \cs{yoko}~(if $\hbox{<dir>}=4$), \cs{tate}~(if $\hbox{<dir>}=3$),
 \cs{dtou}~(if $\hbox{<dir>}=1$) or \cs{utod}~(if $\hbox{<dir>}=11$).
-If the argument <dir> is not one of 4,~3, 1~nor~11, 
+If the argument <dir> is not one of 4,~3, 1~nor~11,
 the behavior of this assignment is undefined.
 %</en>
 %<*ja>
@@ -5655,7 +5675,7 @@ See Subsections~\ref{ssec-jfont} and \ref{ssec-psft} for details
 
 The \texttt{CID} key is effective only when with \texttt{NoEmbed}
 described below. The same JFM cannot be used in both horizontal Japanese fonts and
-	     vertical Japanese fonts, hence the \texttt{JFM} key 
+	     vertical Japanese fonts, hence the \texttt{JFM} key
 will be actually used in \texttt{YokoFeatures}~and~\texttt{TateFeatures} keys.
 %</en>
 %<*ja>
@@ -5774,10 +5794,10 @@ A demonstrarion is shown in Figure~\ref{fig:altkanji-fontspec}.
 \paragraph{Remark on \texttt{AltFont}, \texttt{YokoFeatures}, \texttt{TateFeatures} keys}
 In \texttt{AltFont},~\texttt{YokoFeatures},~\texttt{TateFeatures} keys,
 one cannot specify per-shape settings such as \texttt{BoldFeatures}.
-For example, 
+For example,
 \begin{lstlisting}
 AltFont = {
-  { Font=HogeraMin-Light, BoldFont=HogeraMin-Bold, 
+  { Font=HogeraMin-Light, BoldFont=HogeraMin-Bold,
     Range="3000-"30FF, BoldFeatures={Color=007F00} }
 }
 \end{lstlisting}
@@ -5792,7 +5812,7 @@ BoldFeatures = {
 \end{lstlisting}
 
 On the other hand, \texttt{YokoFeatures}, \texttt{TateFeatures} and  \texttt{TateFont}
-keys can be specified in each list in the \texttt{AltFont} key. Also, 
+keys can be specified in each list in the \texttt{AltFont} key. Also,
 one can specify \texttt{AltFont} inside \texttt{YokoFeatures},~\texttt{TateFeatures}.
 %</en>
 %<*ja>
@@ -5803,7 +5823,7 @@ one can specify \texttt{AltFont} inside \texttt{YokoFeatures},~\texttt{TateFeatu
 例えば．
 \begin{lstlisting}
 AltFont = {
-  { Font=HogeraMin-Light, BoldFont=HogeraMin-Bold, 
+  { Font=HogeraMin-Light, BoldFont=HogeraMin-Bold,
     Range="3000-"30FF, BoldFeatures={Color=007F00} }
 }
 \end{lstlisting}
@@ -6521,7 +6541,7 @@ $i$は7より小さい自然数．
 \textit{direction}~whatsit（後述）において組方向を示すために，あるいは\textit{dir\_box}の
 			 組方向を用いる．\textit{direction}~whatsitにおいては値は
 \begin{quote}
- \textit{dir\_dtou} (1), \textit{dir\_tate} (3), 
+ \textit{dir\_dtou} (1), \textit{dir\_tate} (3),
  \textit{dir\_yoko} (4), \textit{dir\_utod} (11)
 \end{quote}
 のいずれかであり，\textit{dir\_box}ではこれらに次を加えた値をとる（\ref{sec-dir-imp}章参照）．
@@ -6949,7 +6969,7 @@ but also by the value of \cs{globaldefs}.
 
 For parameters that do not need additional arguments, one only have to
 define a function in the table \verb+luatexja.unary_pars+.
-For example, with the following function, 
+For example, with the following function,
 \verb+\ltjgetparameter{hoge}+ returns a \emph{string} \texttt{42}.
 \begin{lstlisting}[numbers=left]
 function luatexja.unary_pars.hoge (t)
@@ -6970,7 +6990,7 @@ end
 Here the first argument $t$ is the stack level, as before.
 The second argument $c$ is just the second argument of \cs{ltjgetparameter}.
 
-For parameters that need an additional argument, one also have to 
+For parameters that need an additional argument, one also have to
 execute the \TeX\ code like
 \begin{lstlisting}
 \ltj@@decl@array@param{fuga}
@@ -8868,6 +8888,11 @@ Requirements for Japanese Text Layout (W3C Working Group Note), 2011, 2012. \new
 \\\null\hfill\texttt{.../texmf-dist/doc/ptex/base/ptexdoc.pdf}
 \bibitem{ptextug} Hisato Hamano. \newblock
 \textit{Vertical Typesetting with \TeX}, TUGBoat~\textbf{11}(3), 346--352, 1990.
+\bibitem{pdfstd} International Organization for Standardization. \newblock
+ISO 32000-1:2008, \textit{Document management -- Portable document format -- Part 1: PDF
+      1.7}, 2008. \newblock
+\\\null\hfill
+\url{http://www.iso.org/iso/iso\_catalogue/catalogue_tc/catalogue\_detail.htm?csnumber=51502}
 \end{thebibliography}
 
 \newpage
