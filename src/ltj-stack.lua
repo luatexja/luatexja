@@ -25,7 +25,7 @@ local charprop_stack_table = charprop_stack_table
 charprop_stack_table[0]={}
 
 
-function get_stack_level(is_v)
+function get_stack_level()
    local i = tex.getcount('ltj@@stack')
    local j = tex.currentgrouplevel
    if j > tex.getcount('ltj@@group@level') then
@@ -40,8 +40,7 @@ function get_stack_level(is_v)
       charprop_stack_table[i] = table.fastcopy(charprop_stack_table[i-1])
       tex.setcount('ltj@@stack', i)
       if gd~=0 then tex.globaldefs = gd end
-      if  is_v or tex.nest[tex.nest.ptr].mode == hmode or
-          tex.nest[tex.nest.ptr].mode == -hmode then
+      if  tex.nest[tex.nest.ptr].mode == -hmode then -- rest. hmode のみ
 	 local g = node_new(id_whatsit, sid_user)
 	 g.user_id=STCK; g.type=100; g.value=j; node.write(g)
       end
@@ -49,8 +48,8 @@ function get_stack_level(is_v)
    return i
 end
 
-function set_stack_table(m,p, is_v)
-   local i = get_stack_level(is_v)
+function set_stack_table(m, p)
+   local i = get_stack_level()
    charprop_stack_table[i][m] = p
    if luatexja.isglobal=='global' then
       for j,v in pairs(charprop_stack_table) do
