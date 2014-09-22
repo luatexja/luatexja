@@ -148,13 +148,35 @@ do
 	       flag = 0; break
 	    end
 	 end
-	 if flag==1 then -- move dir_whatsit w
-	    return 1,w -- TODO
+	 if flag==1 then -- dir_whatsit already exists
+	    return 1,w
 	 else
 	    return flag
 	 end
       end
    end
+   function luatexja.direction.set_list_direction_hook(v)
+      local lv = tex_nest.ptr -- must be >= 1
+      if not v then
+         v = get_dir_count()
+	 if abs(tex_nest[lv-1].mode) == ltjs.mmode and v == dir_tate then
+	    v = dir_utod
+	 end
+      elseif v=='adj' then
+         v = get_adjust_dir_count()
+      end
+      local h = to_direct(tex_nest[lv].head)
+      local w = node_new(id_whatsit, sid_user)
+      setfield(w, 'next', nil)
+      setfield(w, 'user_id', DIR)
+      setfield(w, 'type', 110)
+      set_attr(w, attr_dir, v)
+      insert_after(h, h, w)
+      tex_nest[lv].tail = to_node(node_tail(w))
+      tex_set_attr('global', attr_icflag, 0)
+      tex_set_attr('global', attr_dir, 0)
+   end
+
    local function set_list_direction(v, name)
       local lv = tex_nest.ptr
       if not v then
@@ -838,7 +860,7 @@ do
 	 local box_dir = get_box_dir(sd, dir_yoko)
 	 if box_dir%dir_math_mod ~= list_dir then
 	    setbox(
-	       'ltj@afbox', 
+	       'ltj@afbox',
 	       to_node(copy_list(make_dir_whatsit(sd, sd, list_dir, 'box_move')))
 	       -- copy_list しないとリストの整合性が崩れる……？
 	    )

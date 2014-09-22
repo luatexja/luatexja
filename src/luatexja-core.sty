@@ -560,7 +560,7 @@
 \let\ltj@@orig@vadjust=\vadjust
 \protected\def\vadjust{%
   \ltj@@orig@vadjust\bgroup
-  \directlua{luatexja.direction.set_list_direction('adj')}%
+  \directlua{luatexja.direction.set_list_direction_hook('adj')}%
   \aftergroup\ltj@@vadjust@check@dir\let\next}
 \protected\def\ltj@@vadjust@check@dir{%
   \directlua{luatexja.direction.check_adjust_direction()}%
@@ -568,11 +568,11 @@
 
 %%%% \hbox, \vbox, \vtop
 \everyhbox{%
-  \directlua{luatexja.direction.set_list_direction()}%
+  \directlua{luatexja.direction.set_list_direction_hook()}%
   \aftergroup\ltj@@reset@badness
 }
 \everyvbox{%
-  \directlua{luatexja.direction.set_list_direction()}%
+  \directlua{luatexja.direction.set_list_direction_hook()}%
   \aftergroup\ltj@@reset@badness
 }
 \protected\def\ltj@@reset@badness{%
