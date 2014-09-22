@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.stack',
-  date = '2014/01/24',
+  date = '2014/09/24',
   description = 'LuaTeX-ja stack system',
 })
 module('luatexja.stack', package.seeall)
@@ -37,8 +37,7 @@ function get_stack_level()
       charprop_stack_table[i] = table.fastcopy(charprop_stack_table[i-1])
       tex.setcount('ltj@@stack', i)
       if gd~=0 then tex.globaldefs = gd end
-      if tex.nest[tex.nest.ptr].mode == hmode or
-	 tex.nest[tex.nest.ptr].mode == -hmode then
+      if  tex.nest[tex.nest.ptr].mode == -hmode then -- rest. hmode のみ
 	 local g = node_new(id_whatsit, sid_user)
 	 g.user_id=STCK; g.type=100; g.value=j; node.write(g)
       end
@@ -46,21 +45,7 @@ function get_stack_level()
    return i
 end
 
--- local function table_to_str(v) 
---    local s = ''
---    for i, a in pairs(v) do
---       s = s .. i .. "=" .. tostring(a) .. ', '
---    end
---    return s
--- end
--- function print_stack_table(i)
---    print('\n>>> get_stack_level:')
---    for k, v in pairs(charprop_stack_table[i]) do
---       print("  " , k, type(k), table_to_str(v));
---    end
--- end
-
-function set_stack_table(m,p)
+function set_stack_table(m, p)
    local i = get_stack_level()
    charprop_stack_table[i][m] = p
    if luatexja.isglobal=='global' then
