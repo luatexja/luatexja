@@ -540,15 +540,13 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %<en>\subsection{Installation}
 %<ja>\subsection{インストール}
 
-%<en>To install the \LuaTeX-ja\ package, you will need:
-%<ja>\LuaTeX-jaパッケージのインストールには，次のものが必要である．
+%<en>The following packages are needed for the \LuaTeX-ja\ package.
+%<ja>\LuaTeX-jaパッケージには，次のパッケージ類が必要である．
 \begin{itemize}
 \item \LuaTeX\ beta-0.74.0 (or later)
 \item \Pkg{luaotfload} v2.2 (or later)
-\item \Pkg{luatexbase} v0.6
-\item \Pkg{xunicode} v0.981~(2011/09/09)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
-\item \Pkg{everysel}
+\item \Pkg{everysel} (if you want to use \LuaTeX-ja with \LaTeXe)
 %<en>\item \emph{IPAex fonts(\url{http://ipafont.ipa.go.jp/})}
 %<ja>\item \emph{IPAexフォント(\url{http://ipafont.ipa.go.jp/})}
 \end{itemize}
@@ -686,7 +684,11 @@ Note that \texttt{*.\{dtx,ins\}} and \texttt{ltj-kinsoku\_make.tex} are not need
 %</en>
 %<*ja>
 \item \texttt{src}の中身を自分の\texttt{TEXMF}ツリーにコピーする．
-      場所の例としては，例えば\texttt{TEXMF/tex/luatex/luatexja/}がある．
+      場所の例としては，例えば
+\begin{quote}
+ \texttt{TEXMF/tex/luatex/luatexja/}
+\end{quote}
+      がある．
       シンボリックリンクが利用できる環境で，かつリポジトリを直接取得したのであれば，
       （更新を容易にするために）コピーではなくリンクを貼ることを勧める．
 %</ja>
@@ -1309,7 +1311,7 @@ before \Pkg{luatexja-preset}:
 
 %<en>\paragraph{General options}
 %<ja>\paragraph{一般的なオプション}
-\begin{cslist}
+\begin{cslist}[before*=]
 
 \item[nodeluxe]
 %<*en>
@@ -1689,10 +1691,10 @@ If you want to use these functions, load \Pkg{luatexja-otf} package.
 %<*ja>
 \Pkg{otf}パッケージでは，それぞれ次のようなオプションが存在した：
 \begin{cslist}
-\item[\cs{deluxe}] 明朝体・ゴシック体各2ウェイトと，丸ゴシック体を扱えるようになる．
-\item[\cs{expert}] 仮名が横組・縦組専用のものに切り替わり，ルビ用仮名も
+\item[deluxe] 明朝体・ゴシック体各2ウェイトと，丸ゴシック体を扱えるようになる．
+\item[expert] 仮名が横組・縦組専用のものに切り替わり，ルビ用仮名も
 \ \cs{rubyfamily}\ によって扱えるようになる．
-\item[\cs{bold}] ゴシック体を標準で太いウェイトのものに設定する．
+\item[bold] ゴシック体を標準で太いウェイトのものに設定する．
 \end{cslist}
 しかしこれらのオプションは\Pkg{luatexja-otf}パッケージには存在しない．
 \Pkg{otf}パッケージが文書中で使用する和文用TFMを自前の物に置き換えていたのに対し，
@@ -1733,7 +1735,7 @@ non-embedded fonts Ryumin-Light~and~GothicBBB-Medium as default Japanese fonts
 %<*ja>
 \LuaTeX から見える位置に \texttt{luatexja.cfg} があれば，\LuaTeX-jaはそれを読み込む．
 このファイルを用いるとplain~\TeX, \LaTeXe における標準和文フォントを
-IPAex明朝・IPAexゴシックから変更することがdできる．
+IPAex明朝・IPAexゴシックから変更することができる．
 しかし，基本的には\emph{文章中で用いるフォントは（例えば \Pkg{luatexja-preset} などで）
 文書ソース内で指定するべき}であり，この \texttt{luatexja.cfg} は，
 「IPAexフォントがインストールできない」など，IPAexフォントが使用できない場合にのみ

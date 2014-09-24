@@ -65,22 +65,22 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2014/06/22 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2014/09/24 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
 \endlinechar=13 %
+\newif\ifltj@everyhook@avail\ltj@everyhook@availfalse
 %! 外部パッケージは普通の \endlinechar で読まないと危険.
 \ifltj@in@latex                 %<*LaTeX>
   \RequirePackage{luaotfload} [2013/05/10] % v2.2
-  \RequirePackage{infwarerr}  [2010/04/08] % v1.3
   \RequirePackage{ltxcmds}    [2011/11/09] % v1.22
   \RequirePackage{pdftexcmds} [2011/11/29] % v0.20
   \RequirePackage{xkeyval}    [2012/10/14] % v2.6b
   \RequirePackage{atbegshi}
+  \IfFileExists{everyhook.sty}{\RequirePackage{everyhook}\ltj@everyhook@availtrue}{}
 \else                           %<*!LaTeX>
   \input luaotfload.sty
-  \input infwarerr.sty
   \input ltxcmds.sty
   \input pdftexcmds.sty
   \input xkeyval
@@ -567,14 +567,35 @@
 }
 
 %%%% \hbox, \vbox, \vtop
-\everyhbox{%
-  \directlua{luatexja.direction.set_list_direction()}%
-  \aftergroup\ltj@@reset@badness
+\setbox0\hbox{%
+  $\directlua{% This value depends on the version of LuaTeX.
+    luatexja.stack.mmode = -tex.nest[tex.nest.ptr].mode
+  }$%
 }
-\everyvbox{%
-  \directlua{luatexja.direction.set_list_direction()}%
-  \aftergroup\ltj@@reset@badness
-}
+\ifltj@everyhook@avail
+  \PushPreHook{hbox}{%
+    \directlua{luatexja.direction.set_list_direction()}%
+    \aftergroup\ltj@@reset@badness
+  }
+  \PushPreHook{vbox}{%
+    \directlua{luatexja.direction.set_list_direction()}%
+    \aftergroup\ltj@@reset@badness
+  }
+\else
+  {\catcode`\!=0\catcode`\\=12
+  !@PackageWarningNoLine{luatexja-core}{%
+  I will use \everyhbox and \everyvbox directly !MessageBreak
+  for  supporting multiple directions, !MessageBreak
+  since everyhook.sty is not available}}
+  \everyhbox{%
+    \directlua{luatexja.direction.set_list_direction()}%
+    \aftergroup\ltj@@reset@badness
+  }
+  \everyvbox{%
+    \directlua{luatexja.direction.set_list_direction()}%
+    \aftergroup\ltj@@reset@badness
+  }
+\fi
 \protected\def\ltj@@reset@badness{%
   \directlua{%
     if luatexja.global_temp then
@@ -583,11 +604,6 @@
       tex.globaldefs= luatexja.global_temp or tex.globaldefs
     end
   }%
-}
-\setbox0\hbox{%
-  $\directlua{% This value depends on the version of LuaTeX.
-    luatexja.stack.mmode = -tex.nest[tex.nest.ptr].mode
-  }$%
 }
 \AtBeginShipout{\directlua{luatexja.direction.finalize()}}
 

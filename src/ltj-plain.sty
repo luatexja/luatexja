@@ -28,7 +28,7 @@
 \newread\ltj@@cfgread
 \openin\ltj@@cfgread{luatexja.cfg}%
 \ifeof\ltj@@cfgread
-  \message{Cannot find file `luatexja.cfg'.}%
+  \@PackageInfoNoLine{ltj-plain}{Cannot find file `luatexja.cfg'}%
 \else
   \closein\ltj@@cfgread
   \input luatexja.cfg
