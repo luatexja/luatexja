@@ -3,11 +3,13 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjdefs}[2014/09/19 Default font settings of LuaTeX-ja]
+\ProvidesPackage{lltjdefs}[2014/09/24 Default font settings of LuaTeX-ja]
 
 \def\ltj@stdmcfont{IPAExMincho}
 \def\ltj@stdgtfont{IPAExGothic}
-\InputIfFileExists{luatexja.cfg}{}{}
+\InputIfFileExists{luatexja.cfg}{}{%
+  \PackageInfo{lltjdefs}{Cannot find file `luatexja.cfg'\@gobble}%
+}
 
 \DeclareKanjiEncodingDefaults{}{}
 \DeclareErrorKanjiFont{JY3}{mc}{m}{n}{10}
