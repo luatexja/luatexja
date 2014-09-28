@@ -18,6 +18,8 @@ local node_new = node.new
 local id_whatsit = node.id('whatsit')
 local sid_user = node.subtype('user_defined')
 local STCK = luatexja.userid_table.STCK
+local fastcopy = table.fastcopy
+local setcount = tex.setcount
 hmode = 0 -- dummy
 
 charprop_stack_table={};
@@ -33,12 +35,12 @@ function get_stack_level()
       local gd = tex.globaldefs
       if gd~=0 then tex.globaldefs = 0 end
       --  'tex.globaldefs = 0' is local even if \globaldefs > 0.
-      tex.setcount('ltj@@group@level', j)
+      setcount('ltj@@group@level', j)
       for k,v in pairs(charprop_stack_table) do -- clear the stack above i
 	 if k>=i then charprop_stack_table[k]=nil end
       end
-      charprop_stack_table[i] = table.fastcopy(charprop_stack_table[i-1])
-      tex.setcount('ltj@@stack', i)
+      charprop_stack_table[i] = fastcopy(charprop_stack_table[i-1])
+      setcount('ltj@@stack', i)
       if gd~=0 then tex.globaldefs = gd end
       if  tex.nest[tex.nest.ptr].mode == -hmode then -- rest. hmode のみ
 	 local g = node_new(id_whatsit, sid_user)

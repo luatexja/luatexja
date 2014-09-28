@@ -245,6 +245,7 @@ do
       if unary_pars[k] then
 	 tex.write(tostring(unary_pars[k](tex.getcount('ltj@@stack'))))
       end
+      ltjb.stop_time_measure('get_par')
    end
 end
 
@@ -303,6 +304,7 @@ do
       if binary_pars[k] then
 	 tex.write(tostring(binary_pars[k](c,tex.getcount('ltj@@stack'))))
       end
+      ltjb.stop_time_measure('get_par')
    end
 end
 

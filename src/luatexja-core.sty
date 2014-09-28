@@ -438,6 +438,7 @@
 \ltj@@decl@array@param{boxdir}
 \def\ltjgetparameter#1{%
   \directlua{luatexja.base.start_time_measure('get_par')}%
+  % stop call is moved in luatexja.lua
   \ifcsname ltj@@array@param/#1\endcsname
     \expandafter\ltx@firstoftwo
   \else
@@ -448,11 +449,9 @@
 }
 \def\ltj@@getparam@one#1{%
   \directlua{luatexja.ext_get_parameter_unary('#1')}%
-  \directlua{luatexja.base.stop_time_measure('get_par')}%
 }%
 \def\ltj@@getparam@two#1#2{%
   \directlua{luatexja.ext_get_parameter_binary('#1', \ltj@safe@num@or{nil}{#2})}%
-  \directlua{luatexja.base.stop_time_measure('get_par')}%
 }
 
 %%%%%%%% \ltjalchar<number>, \ltjjachar<number>
