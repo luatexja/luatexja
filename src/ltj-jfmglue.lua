@@ -84,6 +84,10 @@ local kanji_skip
 local xkanji_skip
 local table_current_stack
 local list_dir
+local capsule_glyph
+local tex_dir
+local attr_ablshift
+local set_np_xspc_jachar
 
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_dir = luatexbase.attributes['ltj@dir']
@@ -321,10 +325,17 @@ local function calc_np_aux_glyph_common(lp)
       Np.id = npi
       if npi==id_jglyph then
 	 set_np_xspc_jachar(Np, lp)
+	 lp, head, npi = capsule_glyph(lp, Np.met, Np.class, head, tex_dir)
+	 Np.first = (Np.first~=Np.nuc) and Np.first or npi
+	 Np.nuc = npi
       else
 	 set_np_xspc_alchar(Np, getchar(lp), lp, 1)
+	 set_attr(lp, attr_icflag, PROCESSED)
+	 setfield(lp, 'yoffset',
+		     getfield(lp, 'yoffset') - (has_attr(lp,attr_ablshift) or 0))
+	 lp = node_next(lp)
       end
-      return true, check_next_ickern(node_next(lp));
+      return true, check_next_ickern(lp);
 end
 local calc_np_auxtable = {
    [id_glyph] = function (lp)
@@ -479,26 +490,32 @@ do
    local attr_orig_char = luatexbase.attributes['ltj@origchar']
    local attr_autospc = luatexbase.attributes['ltj@autospc']
    local attr_autoxspc = luatexbase.attributes['ltj@autoxspc']
-   function set_np_xspc_jachar(Nx, x)
+   function set_np_xspc_jachar_yoko(Nx, x)
       local m = ltjf_font_metric_table[getfont(x)]
-      local cls, c
-      if list_dir == dir_tate then
-	 local c1, c2 = getchar(x), has_attr(x, attr_orig_char)
-	 c = has_attr(x, attr_dir) or c1 or c2
-	 cls = ltjf_find_char_class(c, m)
-	 if cls==0 then cls = slow_find_char_class(c2, m, c1) end
-      else
-	 cls, c = slow_find_char_class(has_attr(x, attr_orig_char), m, getchar(x))
-      end
+      local cls, c = slow_find_char_class(has_attr(x, attr_orig_char), m, getchar(x))
       Nx.met, Nx.char = m, c; Nx.class = cls;
-      if cls~=0 then set_attr(x, attr_jchar_class, cls) end
+      --if cls~=0 then set_attr(x, attr_jchar_class, cls) end
       Nx.pre  = table_current_stack[PRE + c]  or 0
       Nx.post = table_current_stack[POST + c] or 0
       Nx.xspc = table_current_stack[XSP  + c] or 3
       Nx.kcat = table_current_stack[KCAT + c] or 0
       Nx.auto_kspc, Nx.auto_xspc = (has_attr(x, attr_autospc)==1), (has_attr(x, attr_autoxspc)==1)
    end
-   local set_np_xspc_jachar = set_np_xspc_jachar
+   function set_np_xspc_jachar_tate(Nx, x)
+      local m = ltjf_font_metric_table[getfont(x)]
+      local cls, c
+      local c1, c2 = getchar(x), has_attr(x, attr_orig_char)
+      c = has_attr(x, attr_dir) or c1 or c2
+      cls = ltjf_find_char_class(c, m)
+      if cls==0 then cls = slow_find_char_class(c2, m, c1) end
+      Nx.met, Nx.char = m, c; Nx.class = cls;
+      --if cls~=0 then set_attr(x, attr_jchar_class, cls) end
+      Nx.pre  = table_current_stack[PRE + c]  or 0
+      Nx.post = table_current_stack[POST + c] or 0
+      Nx.xspc = table_current_stack[XSP  + c] or 3
+      Nx.kcat = table_current_stack[KCAT + c] or 0
+      Nx.auto_kspc, Nx.auto_xspc = (has_attr(x, attr_autospc)==1), (has_attr(x, attr_autoxspc)==1)
+   end
 
 -- 欧文文字のデータを取得
    local floor = math.floor
@@ -963,12 +980,22 @@ do
    local KSK  = luatexja.stack_table_index.KSK
    local XSK  = luatexja.stack_table_index.XSK
    local dir_yoko = luatexja.dir_table.dir_yoko
-   init_var = function (mode)
+   local dir_tate = luatexja.dir_table.dir_tate
+   local attr_yablshift = luatexbase.attributes['ltj@yablshift']
+   local attr_tablshift = luatexbase.attributes['ltj@tablshift']
+   init_var = function (mode,dir)
       -- 1073741823: max_dimen
       Bp, widow_Bp, widow_Np = {}, {}, {first = nil}
       table_current_stack = ltjs.table_current_stack
 
       list_dir = ltjs.list_dir or dir_yoko
+      local is_dir_tate = list_dir==dir_tate
+      capsule_glyph = is_dir_tate and ltjw.capsule_glyph_tate or ltjw.capsule_glyph_yoko
+      attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
+      set_np_xspc_jachar = is_dir_tate and set_np_xspc_jachar_tate or set_np_xspc_jachar_yoko
+
+      
+      tex_dir = dir or 'TLT'
       kanji_skip = node_new(id_glue)
       setfield(kanji_skip, 'spec', skip_table_to_spec(KSK))
       set_attr(kanji_skip, attr_icflag, KANJI_SKIP)
@@ -1028,10 +1055,10 @@ end
 -------------------- 外部から呼ばれる関数
 
 -- main interface
-function main(ahead, mode)
+function main(ahead, mode, dir)
    if not ahead then return ahead end
    head = ahead;
-   local lp, last, par_indented = init_var(mode)
+   local lp, last, par_indented = init_var(mode,dir)
    lp = calc_np(lp, last)
    if Np then
       extract_np(); handle_list_head(par_indented)

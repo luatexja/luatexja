@@ -330,10 +330,9 @@ do
       else
 	    local p = to_direct(head)
 	    start_time_measure('jfmglue')
-	    p = ltjj.main(p,mode)
-	    stop_time_measure('jfmglue'); start_time_measure('setwidth')
+	    p = ltjj.main(p,mode, dir)
 	    if p then p = ltjw.set_ja_width(p, dir) end
-	    stop_time_measure('setwidth')
+	    stop_time_measure('jfmglue')
 	    return to_node(p)
       end
    end

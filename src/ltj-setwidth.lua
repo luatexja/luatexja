@@ -16,6 +16,7 @@ local getlist = (Dnode ~= node) and Dnode.getlist or function(n) return n.head e
 local getchar = (Dnode ~= node) and Dnode.getchar or function(n) return n.char end
 local getsubtype = (Dnode ~= node) and Dnode.getsubtype or function(n) return n.subtype end
 
+local node_traverse_id = Dnode.traverse_id
 local node_traverse = Dnode.traverse
 local node_new = Dnode.new
 local node_copy = Dnode.copy
@@ -78,7 +79,7 @@ local fshift =  { down = 0, left = 0}
 
 local function capsule_glyph_yoko(p, met, class, head, dir)
    local char_data = met.char_type[class]
-   if not char_data then return node_next(p), head end
+   if not char_data then return node_next(p), head, p end
    local fwidth, pwidth = char_data.width, getfield(p, 'width')
    fwidth = (fwidth ~= 'prop') and fwidth or pwidth
    fshift.down = char_data.down; fshift.left = char_data.left
@@ -103,15 +104,17 @@ local function capsule_glyph_yoko(p, met, class, head, dir)
       set_attr(box, attr_icflag, PACKED)
       head = q and node_insert_before(head, q, box)
                or node_insert_after(head, node_tail(head), box)
-      return q, head
+      return q, head, box
    else
       set_attr(p, attr_icflag, PROCESSED)
       setfield(p, 'xoffset', getfield(p, 'xoffset') - fshift.left)
       setfield(p, 'yoffset', getfield(p, 'yoffset')
 		  - (has_attr(p, attr_ykblshift) or 0) - fshift.down)
-      return node_next(p), head
+      return node_next(p), head, p
    end
 end
+luatexja.setwidth.capsule_glyph_yoko = capsule_glyph_yoko
+
 local function capsule_glyph_tate(p, met, class, head, dir)
    local char_data = met.char_type[class]
    if not char_data then return node_next(p), head end
@@ -158,8 +161,9 @@ local function capsule_glyph_tate(p, met, class, head, dir)
    set_attr(box, attr_icflag, PACKED)
    head = q and node_insert_before(head, q, box)
       or node_insert_after(head, node_tail(head), box)
-   return q, head
+   return q, head, box
 end
+luatexja.setwidth.capsule_glyph_tate = capsule_glyph_tate
 
 local function capsule_glyph_math(p, met, class)
    local char_data = met.char_type[class]
@@ -186,38 +190,16 @@ end
 luatexja.setwidth.capsule_glyph_math = capsule_glyph_math
 
 local tex_set_attr = tex.setattribute
-function luatexja.setwidth.set_ja_width(ahead, adir)
-   local p = ahead; head  = p; dir = adir or 'TLT'
-   local m = false -- is in math mode?
-   local is_dir_tate = ltjs.list_dir==dir_tate
-   local capsule_glyph = is_dir_tate and capsule_glyph_tate or capsule_glyph_yoko
-   local attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
---   local attr_ablshift = (ltjs.list_dir==dir_tate) and attr_tablshift or attr_yablshift
-   while p do
-      local pid = getid(p)
-      if (pid==id_glyph)
-      and ((has_attr(p, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG)<=0 then
-         local pf = getfont(p)
-	 if pf == has_attr(p, attr_curjfnt) then
-	    p, head = capsule_glyph(p, ltjf_font_metric_table[pf],
-			      has_attr(p, attr_jchar_class), head, dir)
-	 else
---	 if pf ~= has_attr(p, attr_curjfnt) then
-	    -- TODO: neg. offset does not increase depth
-	    --local d = getfield(p, 'yoffset') - (has_attr(p,attr_ablshift) or 0)
-	    set_attr(p, attr_icflag, PROCESSED)
-	    setfield(p, 'yoffset',
-		     getfield(p, 'yoffset') - (has_attr(p,attr_ablshift) or 0))
-	    p = node_next(p)
---	 else
---	    p = node_next(p)
-	 end
-      elseif pid==id_math then
-	 m = (getsubtype(p)==0); p = node_next(p)
-      else
-	 if m then
-            -- 数式の位置補正
-	    if pid==id_hlist or pid==id_vlist then
+function luatexja.setwidth.set_ja_width(head)
+   local attr_ablshift = (ltjs.list_dir==dir_tate) and attr_tablshift or attr_yablshift
+   for m in node_traverse_id(id_math, head) do
+      if getsubtype(m)==0 then
+	 -- 数式の位置補正
+	 for p in node_traverse(m) do
+	    local pid = getid(p)
+	    if pid==id_math  and getsubtype(p)==1 then 
+	       break
+	    elseif pid==id_hlist or pid==id_vlist then
                if (has_attr(p, attr_icflag) or 0) ~= PROCESSED then
                   setfield(p, 'shift', getfield(p, 'shift') +  (has_attr(p,attr_ablshift) or 0))
                end
@@ -230,7 +212,6 @@ function luatexja.setwidth.set_ja_width(ahead, adir)
 	       end
 	    end
 	 end
-	 p = node_next(p)
       end
    end
    -- adjust attr_icflag
