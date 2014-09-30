@@ -65,7 +65,6 @@ do
    end
 end
 
-local head, dir
 local ltjw = {} --export
 luatexja.setwidth = ltjw
 
@@ -77,21 +76,23 @@ local call_callback = luatexbase.call_callback
 
 local fshift =  { down = 0, left = 0}
 
-local function capsule_glyph_yoko(p, met, class)
+local function capsule_glyph_yoko(p, met, class, head, dir)
    local char_data = met.char_type[class]
-   if not char_data then return node_next(p) end
+   if not char_data then return node_next(p), head end
    local fwidth, pwidth = char_data.width, getfield(p, 'width')
    fwidth = (fwidth ~= 'prop') and fwidth or pwidth
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = call_callback("luatexja.set_width", fshift, met, class)
    local fheight, fdepth = char_data.height, char_data.depth
-   if (pwidth ~= fwidth or getfield(p, 'height') ~= fheight or getfield(p, 'depth') ~= fdepth) then
+   if (pwidth ~= fwidth or getfield(p, 'height') ~= fheight 
+         or getfield(p, 'depth') ~= fdepth) then
       local y_shift
          = - getfield(p, 'yoffset') + (has_attr(p,attr_ykblshift) or 0)
       local q
       head, q = node_remove(head, p)
       setfield(p, 'yoffset', -fshift.down); setfield(p, 'next', nil)
-      setfield(p, 'xoffset', getfield(p, 'xoffset') + char_data.align*(fwidth-pwidth) - fshift.left)
+      setfield(p, 'xoffset', getfield(p, 'xoffset') 
+		  + char_data.align*(fwidth-pwidth) - fshift.left)
       local box = node_new(id_hlist)
       setfield(box, 'width', fwidth)
       setfield(box, 'height', fheight)
@@ -102,18 +103,18 @@ local function capsule_glyph_yoko(p, met, class)
       set_attr(box, attr_icflag, PACKED)
       head = q and node_insert_before(head, q, box)
                or node_insert_after(head, node_tail(head), box)
-      return q
+      return q, head
    else
       set_attr(p, attr_icflag, PROCESSED)
       setfield(p, 'xoffset', getfield(p, 'xoffset') - fshift.left)
       setfield(p, 'yoffset', getfield(p, 'yoffset')
 		  - (has_attr(p, attr_ykblshift) or 0) - fshift.down)
-      return node_next(p)
+      return node_next(p), head
    end
 end
-local function capsule_glyph_tate(p, met, class)
+local function capsule_glyph_tate(p, met, class, head, dir)
    local char_data = met.char_type[class]
-   if not char_data then return node_next(p) end
+   if not char_data then return node_next(p), head end
    local ascent, descent = met.ascent, met.descent
    local fwidth, pwidth = char_data.width, ascent + descent
    fwidth = (fwidth ~= 'prop') and fwidth or pwidth
@@ -157,7 +158,7 @@ local function capsule_glyph_tate(p, met, class)
    set_attr(box, attr_icflag, PACKED)
    head = q and node_insert_before(head, q, box)
       or node_insert_after(head, node_tail(head), box)
-   return q
+   return q, head
 end
 
 local function capsule_glyph_math(p, met, class)
@@ -191,21 +192,25 @@ function luatexja.setwidth.set_ja_width(ahead, adir)
    local is_dir_tate = ltjs.list_dir==dir_tate
    local capsule_glyph = is_dir_tate and capsule_glyph_tate or capsule_glyph_yoko
    local attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
+--   local attr_ablshift = (ltjs.list_dir==dir_tate) and attr_tablshift or attr_yablshift
    while p do
       local pid = getid(p)
       if (pid==id_glyph)
       and ((has_attr(p, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG)<=0 then
          local pf = getfont(p)
 	 if pf == has_attr(p, attr_curjfnt) then
-	    p = capsule_glyph(p, ltjf_font_metric_table[pf],
-			      has_attr(p, attr_jchar_class))
+	    p, head = capsule_glyph(p, ltjf_font_metric_table[pf],
+			      has_attr(p, attr_jchar_class), head, dir)
 	 else
+--	 if pf ~= has_attr(p, attr_curjfnt) then
 	    -- TODO: neg. offset does not increase depth
 	    --local d = getfield(p, 'yoffset') - (has_attr(p,attr_ablshift) or 0)
 	    set_attr(p, attr_icflag, PROCESSED)
 	    setfield(p, 'yoffset',
 		     getfield(p, 'yoffset') - (has_attr(p,attr_ablshift) or 0))
 	    p = node_next(p)
+--	 else
+--	    p = node_next(p)
 	 end
       elseif pid==id_math then
 	 m = (getsubtype(p)==0); p = node_next(p)

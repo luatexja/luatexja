@@ -13,6 +13,7 @@ luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('stack');     local ltjs = luatexja.stack
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 luatexja.load_module('direction'); local ltjd = luatexja.direction
+luatexja.load_module('setwidth');      local ltjw = luatexja.setwidth
 local pairs = pairs
 
 local Dnode = node.direct or node
@@ -313,19 +314,33 @@ local function calc_np_pbox(lp, last)
 end
 
 
+local function calc_np_aux_glyph_common(lp)
+   Np.nuc = lp
+   local npi = (getfont(lp) == (has_attr(lp, attr_curjfnt) or -1))
+	 and id_jglyph or id_glyph
+      Np.id = npi
+      if npi==id_jglyph then
+	 set_np_xspc_jachar(Np, lp)
+      else
+	 set_np_xspc_alchar(Np, getchar(lp), lp, 1)
+      end
+      return true, check_next_ickern(node_next(lp));
+end
 local calc_np_auxtable = {
    [id_glyph] = function (lp)
-      Np.first, Np.nuc = (Np.first or lp), lp;
-      Np.id = (getfont(lp) == (has_attr(lp, attr_curjfnt) or -1))
-	 and id_jglyph or id_glyph
-      return true, check_next_ickern(node_next(lp));
+      Np.first= (Np.first or lp)
+      return calc_np_aux_glyph_common(lp)
    end,
    [id_hlist] = function(lp)
       local op, flag
       head, lp, op, flag = ltjd_make_dir_whatsit(head, lp, list_dir, 'jfm hlist')
       set_attr(op, attr_icflag, PROCESSED)
       Np.first = Np.first or op; Np.last = op; Np.nuc = op;
-      Np.id = (flag or getfield(op, 'shift')~=0) and id_box_like or id_hlist
+      local npi = (flag or getfield(op, 'shift')~=0) and id_box_like or id_hlist
+      Np.id = npi
+      if npi==id_hlist then
+	 Np.last_char = check_box_high(Np, getlist(lp), nil)
+      end
       return true, lp
    end,
    [id_vlist] =  function(lp)
@@ -376,6 +391,7 @@ local calc_np_auxtable = {
    [id_math] = function(lp)
       Np.first, Np.nuc = (Np.first or lp), lp;
       set_attr(lp, attr_icflag, PROCESSED)
+      set_np_xspc_alchar(Np, -1, lp)
       lp  = node_end_of_math(lp)
       set_attr(lp, attr_icflag, PROCESSED)
       Np.last, Np.id = lp, id_math;
@@ -392,9 +408,8 @@ local calc_np_auxtable = {
 	 set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
 	 set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
 	 set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
-	 set_attr(lp, attr_icflag, PROCESSED); Np.nuc = lp
-	 Np.id = (getfont(lp) == (has_attr(lp, attr_curjfnt) or -1)) and id_jglyph or id_glyph
-	 return true, check_next_ickern(node_next(lp));
+	 set_attr(lp, attr_icflag, PROCESSED); 
+	 return calc_np_aux_glyph_common(lp)
       else
 	 Np.id = id_kern; set_attr(lp, attr_icflag, PROCESSED)
 	 Np.last = lp; return true, node_next(lp)
@@ -511,12 +526,12 @@ do
 -- Np の情報取得メインルーチン
    extract_np = function ()
       local x, i = Np.nuc, Np.id;
-      if i ==  id_jglyph then return set_np_xspc_jachar(Np, x)
-      elseif i == id_glyph then return set_np_xspc_alchar(Np, getchar(x), x, 1)
-      elseif i == id_hlist then Np.last_char = check_box_high(Np, getlist(x), nil)
-      elseif i == id_pbox then Np.last_char = check_box_high(Np, Np.first, node_next(Np.last))
+--      if i ==  id_jglyph then return set_np_xspc_jachar(Np, x)
+--      elseif i == id_glyph then return set_np_xspc_alchar(Np, getchar(x), x, 1)
+--      if i == id_hlist then Np.last_char = check_box_high(Np, getlist(x), nil)
+      if i == id_pbox then Np.last_char = check_box_high(Np, Np.first, node_next(Np.last))
       elseif i == id_disc then Np.last_char = check_box_high(Np, getfield(x, 'replace'), nil)
-      elseif i == id_math then return set_np_xspc_alchar(Np, -1, x)
+--      elseif i == id_math then return set_np_xspc_alchar(Np, -1, x)
       end
    end
 
