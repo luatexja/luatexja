@@ -199,15 +199,14 @@ local function aw_step1(p, res, total)
      return false-- それ以外は対象外．
    end
    local xk = ltjf_font_metric_table[getfont(xc)]
-   xk = xk.char_type[has_attr(xc, attr_jchar_class) or 0]
-   xk = xk['end_' .. res.name] or 0
+           .char_type[has_attr(xc, attr_jchar_class) or 0]['end_' .. res.name] or 0
 
    if xk>0 and total>=xk then
       total = total - xk
       local kn = node_new(id_kern)
       setfield(kn, 'kern', (res.name=='shrink' and -1 or 1) * xk)
       set_attr(kn, attr_icflag, FROM_JFM)
-      insert_after(head, x, kn)
+      insert_after(p, x, kn)
       return true
    else return false
    end

@@ -317,7 +317,7 @@ local function calc_np_pbox(lp, last)
    return check_next_ickern(lp)
 end
 
-
+local ltjw_apply_ashift_math = ltjw.apply_ashift_math
 local function calc_np_aux_glyph_common(lp)
    Np.nuc = lp
    local npi = (getfont(lp) == (has_attr(lp, attr_curjfnt) or -1))
@@ -403,10 +403,11 @@ local calc_np_auxtable = {
       Np.first, Np.nuc = (Np.first or lp), lp;
       set_attr(lp, attr_icflag, PROCESSED)
       set_np_xspc_alchar(Np, -1, lp)
-      lp  = node_end_of_math(lp)
-      set_attr(lp, attr_icflag, PROCESSED)
-      Np.last, Np.id = lp, id_math;
-      return true, node_next(lp);
+      local end_math  = node_end_of_math(lp)
+      ltjw_apply_ashift_math(lp, end_math, attr_ablshift)
+      set_attr(end_math, attr_icflag, PROCESSED)
+      Np.last, Np.id = end_math, id_math;
+      return true, node_next(end_math);
    end,
    discglue = function(lp)
       Np.first, Np.nuc, Np.last = (Np.first or lp), lp, lp;
@@ -494,7 +495,7 @@ do
       local m = ltjf_font_metric_table[getfont(x)]
       local cls, c = slow_find_char_class(has_attr(x, attr_orig_char), m, getchar(x))
       Nx.met, Nx.char = m, c; Nx.class = cls;
-      --if cls~=0 then set_attr(x, attr_jchar_class, cls) end
+      if cls~=0 then set_attr(x, attr_jchar_class, cls) end
       Nx.pre  = table_current_stack[PRE + c]  or 0
       Nx.post = table_current_stack[POST + c] or 0
       Nx.xspc = table_current_stack[XSP  + c] or 3
@@ -509,7 +510,7 @@ do
       cls = ltjf_find_char_class(c, m)
       if cls==0 then cls = slow_find_char_class(c2, m, c1) end
       Nx.met, Nx.char = m, c; Nx.class = cls;
-      --if cls~=0 then set_attr(x, attr_jchar_class, cls) end
+      if cls~=0 then set_attr(x, attr_jchar_class, cls) end
       Nx.pre  = table_current_stack[PRE + c]  or 0
       Nx.post = table_current_stack[POST + c] or 0
       Nx.xspc = table_current_stack[XSP  + c] or 3

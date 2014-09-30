@@ -328,10 +328,8 @@ do
       tex_set_attr('global', attr_icflag, 0)
       if gc == 'fin_row' then return head
       else
-	    local p = to_direct(head)
 	    start_time_measure('jfmglue')
-	    p = ltjj.main(p,mode, dir)
-	    if p then p = ltjw.set_ja_width(p, dir) end
+	    local p = ltjj.main(to_direct(head),mode, dir)
 	    stop_time_measure('jfmglue')
 	    return to_node(p)
       end
@@ -388,13 +386,13 @@ local function get_attr_icflag(p)
    return (has_attr(p, attr_icflag) or 0) % icflag_table.PROCESSED_BEGIN_FLAG
 end
 
-local debug_depth
+local prefix, inner_depth
 
-local function debug_show_node_X(p,print_fn)
-   local k = debug_depth
+local function debug_show_node_X(p,print_fn, limit)
+   local k = prefix
    local s
    local pt=node_type(p.id)
-   local base = debug_depth .. string.format('%X', get_attr_icflag(p))
+   local base = prefix .. string.format('%X', get_attr_icflag(p))
    .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
    if pt == 'glyph' then
       s = base .. ' ' .. utf.char(p.char) .. ' '
@@ -423,11 +421,15 @@ local function debug_show_node_X(p,print_fn)
       if get_attr_icflag(p) == icflag_table.PACKED then
          s = s .. ' (packed)'
       end
-      print_fn(s); debug_depth=debug_depth.. '.'
-      for q in node.traverse(p.head) do
-         debug_show_node_X(q, print_fn)
+      print_fn(s); 
+      local bid = inner_depth
+      prefix, inner_depth = prefix.. '.', inner_depth + 1
+      if inner_depth < limit then
+	 for q in node.traverse(p.head) do
+	    debug_show_node_X(q, print_fn, limit)
+	 end
       end
-      debug_depth=k
+      prefix=k
    elseif pt == 'glue' then
       s = base .. ' ' ..  print_spec(p.spec)
       if get_attr_icflag(p)>icflag_table.KINSOKU
@@ -476,11 +478,14 @@ local function debug_show_node_X(p,print_fn)
 	       s = s .. ' dir: ' .. tostring(node.has_attribute(p, attr_dir))
 	    end
             print_fn(s)
-            debug_depth=debug_depth.. '.'
-            for q in node.traverse(p.value) do
-               debug_show_node_X(q, print_fn)
-            end
-            debug_depth=k
+	    local bid = inner_depth
+            prefix, inner_depth =prefix.. '.', inner_depth + 1
+            if inner_depth < limit then
+	       for q in node.traverse(p.value) do
+		  debug_show_node_X(q, print_fn, limit)
+	       end
+	    end
+            prefix, inner_depth = k, bid
          end
       else
          s = s .. node.subtype(p.subtype)
@@ -498,22 +503,22 @@ local function debug_show_node_X(p,print_fn)
    elseif pt=='noad' then
       s = base ; print_fn(s)
       if p.nucleus then
-         debug_depth = k .. 'N'; debug_show_node_X(p.nucleus, print_fn);
+         prefix = k .. 'N'; debug_show_node_X(p.nucleus, print_fn);
       end
       if p.sup then
-         debug_depth = k .. '^'; debug_show_node_X(p.sup, print_fn);
+         prefix = k .. '^'; debug_show_node_X(p.sup, print_fn);
       end
       if p.sub then
-         debug_depth = k .. '_'; debug_show_node_X(p.sub, print_fn);
+         prefix = k .. '_'; debug_show_node_X(p.sub, print_fn);
       end
-      debug_depth = k;
+      prefix = k;
    elseif pt=='math_char' then
       s = base .. ' fam: ' .. p.fam .. ' , char = ' .. utf.char(p.char)
       print_fn(s)
    elseif pt=='sub_box' or pt=='sub_mlist' then
       print_fn(base)
       if p.head then
-         debug_depth = k .. '.';
+         prefix = k .. '.';
 	 for q in node.traverse(p.head) do
 	    debug_show_node_X(q, print_fn)
 	 end
@@ -523,22 +528,24 @@ local function debug_show_node_X(p,print_fn)
    end
    p=node_next(p)
 end
-function luatexja.ext_show_node_list(head,depth,print_fn)
-   debug_depth = depth
+function luatexja.ext_show_node_list(head,depth,print_fn, lim)
+   prefix = depth
+   inner_depth = 0
    if head then
       while head do
-         debug_show_node_X(head, print_fn); head = node_next(head)
+         debug_show_node_X(head, print_fn, lim or 1/0); head = node_next(head)
       end
    else
-      print_fn(debug_depth .. ' (null list)')
+      print_fn(prefix .. ' (null list)')
    end
 end
-function luatexja.ext_show_node(head,depth,print_fn)
-   debug_depth = depth
+function luatexja.ext_show_node(head,depth,print_fn, lim)
+   prefix = depth
+   inner_depth = 0
    if head then
-      debug_show_node_X(head, print_fn)
+      debug_show_node_X(head, print_fn, lim or 1/0)
    else
-      print_fn(debug_depth .. ' (null list)')
+      print_fn(prefix .. ' (null list)')
    end
 end
 

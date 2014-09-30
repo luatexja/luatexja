@@ -41,11 +41,8 @@ local sid_restore = node.subtype('pdf_restore')
 local sid_matrix = node.subtype('pdf_setmatrix')
 local dir_tate = luatexja.dir_table.dir_tate
 
-local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
-local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
-local attr_tablshift = luatexbase.attributes['ltj@tablshift']
 local attr_tkblshift = luatexbase.attributes['ltj@tkblshift']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 
@@ -138,10 +135,6 @@ local function capsule_glyph_tate(p, met, class, head, dir)
    setfield(box, 'shift', y_shift)
    setfield(box, 'dir', dir)
 
-   --local k1 = node_new(id_kern)
-   --setfield(k1, 'kern',
-   --    getfield(p, 'xoffset') + ascent
-   --       + char_data.align*(fwidth-pwidth) - fshift.left)
    setfield(p, 'xoffset', -fshift.down)
    setfield(p, 'yoffset', - (getfield(p, 'xoffset') + ascent
                                 + char_data.align*(fwidth-pwidth) - fshift.left) )
@@ -152,7 +145,6 @@ local function capsule_glyph_tate(p, met, class, head, dir)
    local k2 = node_new(id_kern); setfield(k2, 'kern', - 0.5*getfield(p, 'width'))
    local k3 = node_copy(k2)
    local wr = node_new(id_whatsit, sid_restore)
-   --setfield(box, 'head', k1); setfield(k1, 'next', ws)
    setfield(box, 'head', ws)
    setfield(ws, 'next', wm);  setfield(wm, 'next', k2);
    setfield(k2, 'next', p);   setfield(p, 'next', k3);
@@ -189,32 +181,26 @@ local function capsule_glyph_math(p, met, class)
 end
 luatexja.setwidth.capsule_glyph_math = capsule_glyph_math
 
-local tex_set_attr = tex.setattribute
-function luatexja.setwidth.set_ja_width(head)
-   local attr_ablshift = (ltjs.list_dir==dir_tate) and attr_tablshift or attr_yablshift
-   for m in node_traverse_id(id_math, head) do
-      if getsubtype(m)==0 then
-	 -- 数式の位置補正
-	 for p in node_traverse(m) do
-	    local pid = getid(p)
-	    if pid==id_math  and getsubtype(p)==1 then 
-	       break
-	    elseif pid==id_hlist or pid==id_vlist then
-               if (has_attr(p, attr_icflag) or 0) ~= PROCESSED then
-                  setfield(p, 'shift', getfield(p, 'shift') +  (has_attr(p,attr_ablshift) or 0))
-               end
-	    elseif pid==id_rule then
-	       if (has_attr(p, attr_icflag) or 0) ~= PROCESSED then
-		  local v = has_attr(p,attr_yablshift) or 0
-                  setfield(p, 'height', getfield(p, 'height')-v)
-                  setfield(p, 'depth', getfield(p, 'depth')+v)
-		  set_attr(p, attr_icflag, PROCESSED)
-	       end
-	    end
+-- 数式の位置補正
+function luatexja.setwidth.apply_ashift_math(head, last, attr_ablshift)
+   for p in node_traverse(head) do
+      local pid = getid(p)
+      if p==last then 
+	 return
+      elseif (has_attr(p, attr_icflag) or 0) ~= PROCESSED then
+	 if pid==id_hlist or pid==id_vlist then
+	    setfield(p, 'shift', getfield(p, 'shift') +  (has_attr(p,attr_ablshift) or 0))
+	 elseif pid==id_rule then
+	    local v = has_attr(p,attr_ablshift) or 0
+	    setfield(p, 'height', getfield(p, 'height')-v)
+	    setfield(p, 'depth', getfield(p, 'depth')+v)
+	    set_attr(p, attr_icflag, PROCESSED)
+	 elseif pid==id_glyph then
+	    -- 欧文文字; 和文文字は pid == i_hlist の場合で処理される
+	    -- (see conv_jchar_to_hbox_A in ltj-math.lua)
+	    setfield(p, 'yoffset',
+		     getfield(p, 'yoffset') - (has_attr(p,attr_ablshift) or 0))
 	 end
       end
    end
-   -- adjust attr_icflag
-   tex_set_attr('global', attr_icflag, 0)
-   return head
 end
