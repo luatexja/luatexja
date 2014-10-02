@@ -119,12 +119,13 @@ do
 end
 
 -- mode: true iff this function is called from hpack_filter
+local ltjs_report_stack_level = ltjs.report_stack_level
 local function set_box_stack_level(head, mode)
    local box_set, cl = 0, tex.currentgrouplevel + 1
    for _,p  in pairs(wt) do
       if mode and getfield(p, 'value')==cl then box_set = 1 end; node_free(p)
    end
-   ltjs.report_stack_level(tex_getcount('ltj@@stack') + box_set)
+   ltjs_report_stack_level(tex_getcount('ltj@@stack') + box_set)
    for _,p  in pairs(wtd) do
       node_free(p)
    end

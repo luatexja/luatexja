@@ -320,22 +320,23 @@ end
 local ltjw_apply_ashift_math = ltjw.apply_ashift_math
 local function calc_np_aux_glyph_common(lp)
    Np.nuc = lp
-   local npi = (getfont(lp) == (has_attr(lp, attr_curjfnt) or -1))
-	 and id_jglyph or id_glyph
-      Np.id = npi
-      if npi==id_jglyph then
-	 set_np_xspc_jachar(Np, lp)
-	 lp, head, npi = capsule_glyph(lp, Np.met, Np.class, head, tex_dir)
-	 Np.first = (Np.first~=Np.nuc) and Np.first or npi
-	 Np.nuc = npi
-      else
-	 set_np_xspc_alchar(Np, getchar(lp), lp, 1)
-	 set_attr(lp, attr_icflag, PROCESSED)
-	 setfield(lp, 'yoffset',
-		     getfield(lp, 'yoffset') - (has_attr(lp,attr_ablshift) or 0))
-	 lp = node_next(lp)
-      end
-      return true, check_next_ickern(lp);
+   Np.id = npi
+   if (getfont(lp) == (has_attr(lp, attr_curjfnt) or -1)) then
+      Np.id = id_jglyph
+      set_np_xspc_jachar(Np, lp)
+      local npi
+      lp, head, npi = capsule_glyph(lp, Np.met, Np.class, head, tex_dir)
+      Np.first = (Np.first~=Np.nuc) and Np.first or npi
+      Np.nuc = npi
+   else
+      Np.id = id_glyph
+      set_np_xspc_alchar(Np, getchar(lp), lp, 1)
+      set_attr(lp, attr_icflag, PROCESSED)
+      setfield(lp, 'yoffset',
+	       getfield(lp, 'yoffset') - (has_attr(lp,attr_ablshift) or 0))
+      lp = node_next(lp)
+   end
+   return true, check_next_ickern(lp);
 end
 local calc_np_auxtable = {
    [id_glyph] = function (lp)
@@ -347,10 +348,11 @@ local calc_np_auxtable = {
       head, lp, op, flag = ltjd_make_dir_whatsit(head, lp, list_dir, 'jfm hlist')
       set_attr(op, attr_icflag, PROCESSED)
       Np.first = Np.first or op; Np.last = op; Np.nuc = op;
-      local npi = (flag or getfield(op, 'shift')~=0) and id_box_like or id_hlist
-      Np.id = npi
-      if npi==id_hlist then
-	 Np.last_char = check_box_high(Np, getlist(lp), nil)
+      if (flag or getfield(op, 'shift')~=0) then
+	 Np.id = id_box_like
+      else
+	 Np.id = id_hlist
+	 Np.last_char = check_box_high(Np, getlist(op), nil)
       end
       return true, lp
    end,

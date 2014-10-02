@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.adjust',
-  date = '2014/05/08',
+  date = '2014/09/30',
   description = 'Advanced line adjustment for LuaTeX-ja',
 })
 module('luatexja.adjust', package.seeall)
@@ -178,29 +178,29 @@ local function aw_step1(p, res, total)
    local x = node_tail(head); if not x then return false end
    -- x: \rightskip
    x = node_prev(x); if not x then return false end
-   if getid(x) == id_glue and getsubtype(x) == 15 then
+   local xi, xc = getid(x)
+   if xi == id_glue and getsubtype(x) == 15 then
       -- 段落最終行のときは，\penalty10000 \parfillskip が入るので，
       -- その前の node が本来の末尾文字となる
-      x = node_prev(node_prev(x))
+      x = node_prev(node_prev(x)); xi = getid(x)
    end
    -- local xi = getid(x)
    -- while (get_attr_icflag(x) == PACKED)
    --    and  ((xi == id_penalty) or (xi == id_kern) or (xi == id_kern)) do
    --       x = node_prev(x); xi = getid(x)
    -- end
-   local xi, xc = getid(x)
    if xi == id_glyph and has_attr(x, attr_curjfnt) == getfont(x) then
       -- 和文文字
       xc = x
    elseif xi == id_hlist and get_attr_icflag(x) == PACKED then
       -- packed JAchar
       xc = ltjd_glyph_from_packed(x)
-      while getid(xc) == id_whatsit do xc = node_next(xc) end
+      while getid(xc) == id_whatsit do xc = node_next(xc) end -- これはなんのために？
    else
      return false-- それ以外は対象外．
    end
    local xk = ltjf_font_metric_table[getfont(xc)]
-           .char_type[has_attr(xc, attr_jchar_class) or 0]['end_' .. res.name] or 0
+     .char_type[has_attr(xc, attr_jchar_class) or 0]['end_' .. res.name] or 0
 
    if xk>0 and total>=xk then
       total = total - xk

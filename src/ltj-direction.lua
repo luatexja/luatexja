@@ -876,7 +876,7 @@ do
    local function glyph_from_packed(h)
       local b = getlist(h)
       return (getid(b)==id_kern or (getid(b)==id_whatsit and getsubtype(b)==sid_save) )
-	 and node_next(node_next(node_next(node_next(b)))) or b
+	 and node_next(node_next(node_next(b))) or b
    end
    luatexja.direction.glyph_from_packed = glyph_from_packed
 end
