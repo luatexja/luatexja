@@ -116,7 +116,7 @@ do
    slow_find_char_class = function (c, m, oc)
       start_time_measure('slow_find_chr')
       local cls = ltjf_find_char_class(oc, m)
-      if not c and  cls==0 then 
+      if cls==0 then 
 	 stop_time_measure('slow_find_chr')
 	 return ltjf_find_char_class(-c, m), oc
       else
