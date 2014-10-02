@@ -105,7 +105,7 @@ local slow_find_char_class
 do
    slow_find_char_class = function (c, m, oc)
       local cls = ltjf_find_char_class(oc, m)
-      if not c and  cls==0 then 
+      if cls==0 then 
 	 return ltjf_find_char_class(-c, m), oc
       else
 	 return cls, oc
