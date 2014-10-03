@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2014/08/12',
+  date = '2014/10/03',
   description = 'Loader for Japanese fonts',
 })
 module('luatexja.jfont', package.seeall)
@@ -197,12 +197,25 @@ luatexbase.create_callback("luatexja.find_char_class", "data",
 			   function (arg, fmtable, char)
 			      return 0
 			   end)
-
-function find_char_class(c,m)
--- c: character code, m:
-   if not m then return 0 end
-   return m.chars[c] or
-      luatexbase.call_callback("luatexja.find_char_class", 0, m, c)
+do
+   local start_time_measure = ltjb.start_time_measure
+   local stop_time_measure = ltjb.stop_time_measure
+   local fcc_temp = { chars_cbcache = {} }
+   setmetatable(
+      fcc_temp.chars_cbcache,
+      {
+         __index = function () return 0 end,
+      })
+   function find_char_class(c,m)
+      -- c: character code, m:
+      local r = (m or fcc_temp).chars_cbcache[c]
+      if not r then
+         r = m.chars[c] or
+            luatexbase.call_callback("luatexja.find_char_class", 0, m, c)
+         m.chars_cbcache[c] = r
+      end
+      return r
+   end
 end
 
 
@@ -269,6 +282,7 @@ do
 			descent = ad.descender,
 			chars = sz.chars, char_type = sz.char_type,
 			kanjiskip = sz.kanjiskip, xkanjiskip = sz.xkanjiskip,
+                        chars_cbcache = {},
       }
 
       fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
@@ -331,7 +345,7 @@ do
       end
       if jfm_file_name~='' then
 	 local l = name:sub(-1)
-	 name = name 
+	 name = name
 	    .. ((l==':' or l==';') and '' or ';')
 	    .. 'jfm=' .. jfm_file_name
 	 if jfm_var~='' then
@@ -533,7 +547,7 @@ do
 	 alt_font_base_num = tex.getattribute(attr_curtfnt)
       else
 	 alt_font_base_num = tex.getattribute(attr_curjfnt)
-      end	    
+      end
       local t = alt_font_table[alt_font_base_num]
       if t then
          for i,_ in pairs(t) do t[i]=nil end

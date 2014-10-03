@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2014/02/02',
+  date = '2014/10/03',
   description = 'Insertion process of JFM glues and kanjiskip',
 })
 module('luatexja.jfmglue', package.seeall)
@@ -114,13 +114,10 @@ do
    local start_time_measure = ltjb.start_time_measure
    local stop_time_measure = ltjb.stop_time_measure
    slow_find_char_class = function (c, m, oc)
-      start_time_measure('slow_find_chr')
       local cls = ltjf_find_char_class(oc, m)
-      if cls==0 then 
-	 stop_time_measure('slow_find_chr')
+      if oc~=c and cls==0 then
 	 return ltjf_find_char_class(-c, m), oc
       else
-	 stop_time_measure('slow_find_chr')
 	 return cls, oc
       end
    end
@@ -422,7 +419,7 @@ local calc_np_auxtable = {
 	 set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
 	 set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
 	 set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
-	 set_attr(lp, attr_icflag, PROCESSED); 
+	 set_attr(lp, attr_icflag, PROCESSED);
 	 return calc_np_aux_glyph_common(lp)
       else
 	 Np.id = id_kern; set_attr(lp, attr_icflag, PROCESSED)
@@ -461,7 +458,7 @@ function calc_np(lp, last)
          if lpa%PROCESSED_BEGIN_FLAG == BOXBDD then
 	    local lq = node_next(lp)
             head = node_remove(head, lp); node_free(lp); lp = lq
-         else 
+         else
 	    return calc_np_pbox(lp, last)
          end -- id_pbox
       else
@@ -997,7 +994,7 @@ do
       attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
       set_np_xspc_jachar = is_dir_tate and set_np_xspc_jachar_tate or set_np_xspc_jachar_yoko
 
-      
+
       tex_dir = dir or 'TLT'
       kanji_skip = node_new(id_glue)
       setfield(kanji_skip, 'spec', skip_table_to_spec(KSK))
