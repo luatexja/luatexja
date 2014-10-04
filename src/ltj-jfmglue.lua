@@ -149,16 +149,15 @@ end
 local function add_penalty(p,e)
    local pp = getfield(p, 'penalty')
    if pp>=10000 then
-      if e<=-10000 then pp = 0 end
+      if e<=-10000 then setfield(p, 'penalty', 0) end
    elseif pp<=-10000 then
-      if e>=10000 then pp = 0 end
+      if e>=10000 then  setfield(p, 'penalty', 0) end
    else
       pp = pp + e
       if pp>=10000 then      setfield(p, 'penalty', 10000)
       elseif pp<=-10000 then setfield(p, 'penalty', -10000)
       else                   setfield(p, 'penalty', pp) end
    end
-   return
 end
 
 -- 「異なる JFM」の間の調整方法
@@ -235,7 +234,8 @@ local function check_box(box_ptr, box_end)
 	    first_char = p; find_first_char = false
 	 end
 	 last_char = p; found_visible_node = true
-	 --elseif pid==id_rule and get_attr_icflag(p)==PACKED then -- do nothing
+      elseif pid==id_rule and get_attr_icflag(p)==PACKED then 
+	 -- do nothing
       elseif not (pid==id_ins   or pid==id_mark
 		  or pid==id_adjust or pid==id_whatsit
 		  or pid==id_penalty) then
@@ -321,9 +321,9 @@ local function calc_np_aux_glyph_common(lp)
    if (getfont(lp) == (has_attr(lp, attr_curjfnt) or -1)) then
       Np.id = id_jglyph
       set_np_xspc_jachar(Np, lp)
-      local npi
-      lp, head, npi = capsule_glyph(lp, Np.met, Np.class, head, tex_dir)
-      Np.first = (Np.first~=Np.nuc) and Np.first or npi
+      local npi, npf
+      lp, head, npi, npf = capsule_glyph(lp, Np.met, Np.class, head, tex_dir)
+      Np.first = (Np.first~=Np.nuc) and Np.first or npf or npi
       Np.nuc = npi
    else
       Np.id = id_glyph
@@ -791,8 +791,7 @@ do
    local XKANJI_SKIP_JFM   = luatexja.icflag_table.XKANJI_SKIP_JFM
    get_xkanjiskip_normal = function (Nn)
       if (Nq.xspc>=2) and (Np.xspc%2==1) and (Nq.auto_xspc or Np.auto_xspc) then
-	 local f = node_copy(xkanji_skip)
-	 return f
+	 return node_copy(xkanji_skip)
       else
 	 local g = node_copy(zero_glue)
 	 set_attr(g, attr_icflag, XKANJI_SKIP)

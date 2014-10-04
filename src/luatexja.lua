@@ -65,7 +65,7 @@ luatexja.dir_table = dir_table
 dir_table.dir_dtou = 1
 dir_table.dir_tate = 3
 dir_table.dir_yoko = 4
-dir_table.dir_math_mod    = 8 -- 組方向を合わせるために自動で作られたもの
+dir_table.dir_math_mod    = 8
 dir_table.dir_node_auto   = 128 -- 組方向を合わせるために自動で作られたもの
 dir_table.dir_node_manual = 256 -- 寸法代入によって作られたもの
 dir_table.dir_utod = dir_table.dir_tate + dir_table.dir_math_mod
@@ -430,6 +430,11 @@ local function debug_show_node_X(p,print_fn, limit)
 	 end
       end
       prefix=k
+   elseif pt=='rule' then
+      s = base .. '(' .. print_scaled(p.height) .. '+'
+         .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width) 
+	 .. ', dir=' .. tostring(node.has_attribute(p, attr_dir))
+      print_fn(s)
    elseif pt == 'glue' then
       s = base .. ' ' ..  print_spec(p.spec)
       if get_attr_icflag(p)>icflag_table.KINSOKU

@@ -74,18 +74,48 @@ local call_callback = luatexbase.call_callback
 
 local fshift =  { down = 0, left = 0}
 
+local min = math.min
 local function capsule_glyph_yoko(p, met, class, head, dir)
    local char_data = met.char_type[class]
    if not char_data then return node_next(p), head, p end
+   -- f*: whd specified in JFM
    local fwidth, pwidth = char_data.width, getfield(p, 'width')
    fwidth = (fwidth ~= 'prop') and fwidth or pwidth
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = call_callback("luatexja.set_width", fshift, met, class)
    local fheight, fdepth = char_data.height, char_data.depth
-   if (pwidth ~= fwidth or getfield(p, 'height') ~= fheight 
-         or getfield(p, 'depth') ~= fdepth) then
-      local y_shift
-         = - getfield(p, 'yoffset') + (has_attr(p,attr_ykblshift) or 0)
+   local kbl = has_attr(p, attr_ykblshift) or 0
+   -- 
+   local need_hbox
+   if pwidth==fwidth then
+      -- 補正後glyph node は ht: p.height - kbl - down, dp: p.depth + min(0, kbl+down) を持つ
+      -- 設定されるべき寸法: ht: fheight - kbl, dp: fdepth + kbl
+      local ht_diff = fheight + fshift.down - getfield(p, 'height') 
+      local dp_diff = fdepth  + kbl - getfield(p, 'depth') - min(kbl + fshift.down, 0)
+      if  ht_diff == 0 and dp_diff ==0 then -- offset only
+	 set_attr(p, attr_icflag, PROCESSED)
+	 setfield(p, 'xoffset', getfield(p, 'xoffset') - fshift.left)
+	 setfield(p, 'yoffset', - kbl - fshift.down)
+	 return node_next(p), head, p
+      elseif ht_diff >= 0 and dp_diff >=0 then -- rule
+	 local box = node_new(id_rule)
+	 setfield(p, 'yoffset', - kbl - fshift.down)
+	 setfield(box, 'width', 0)
+	 setfield(box, 'height', fheight - kbl)
+	 setfield(box, 'depth', fdepth + kbl)
+	 setfield(box, 'dir', dir)
+	 set_attr(box, attr_icflag, PACKED)
+	 head = p and node_insert_before(head, p, box)
+	    or node_insert_after(head, node_tail(head), box)
+	 return node_next(p), head, p, box
+      else
+	 need_hbox = true
+      end
+   else 
+      need_hbox = true
+   end
+
+   if need_hbox then
       local q
       head, q = node_remove(head, p)
       setfield(p, 'yoffset', -fshift.down); setfield(p, 'next', nil)
@@ -96,20 +126,15 @@ local function capsule_glyph_yoko(p, met, class, head, dir)
       setfield(box, 'height', fheight)
       setfield(box, 'depth', fdepth)
       setfield(box, 'head', p)
-      setfield(box, 'shift', y_shift)
+      setfield(box, 'shift', kbl)
       setfield(box, 'dir', dir)
       set_attr(box, attr_icflag, PACKED)
       head = q and node_insert_before(head, q, box)
                or node_insert_after(head, node_tail(head), box)
       return q, head, box
-   else
-      set_attr(p, attr_icflag, PROCESSED)
-      setfield(p, 'xoffset', getfield(p, 'xoffset') - fshift.left)
-      setfield(p, 'yoffset', getfield(p, 'yoffset')
-		  - (has_attr(p, attr_ykblshift) or 0) - fshift.down)
-      return node_next(p), head, p
    end
 end
+
 luatexja.setwidth.capsule_glyph_yoko = capsule_glyph_yoko
 
 local function capsule_glyph_tate(p, met, class, head, dir)
@@ -196,7 +221,7 @@ function luatexja.setwidth.apply_ashift_math(head, last, attr_ablshift)
 	    setfield(p, 'depth', getfield(p, 'depth')+v)
 	    set_attr(p, attr_icflag, PROCESSED)
 	 elseif pid==id_glyph then
-	    -- 欧文文字; 和文文字は pid == i_hlist の場合で処理される
+	    -- 欧文文字; 和文文字は pid == id_hlist の場合で処理される
 	    -- (see conv_jchar_to_hbox_A in ltj-math.lua)
 	    setfield(p, 'yoffset',
 		     getfield(p, 'yoffset') - (has_attr(p,attr_ablshift) or 0))

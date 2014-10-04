@@ -212,7 +212,7 @@ do
       if not r then
          r = m.chars[c] or
             luatexbase.call_callback("luatexja.find_char_class", 0, m, c)
-         m.chars_cbcache[c] = r
+         m.chars_cbcache[c or 0] = r
       end
       return r
    end

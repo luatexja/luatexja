@@ -1030,7 +1030,7 @@ do
             else
                finalize_inner(n)
             end
-         end
+	 end
       end
    end
    local getbox = tex.getbox
