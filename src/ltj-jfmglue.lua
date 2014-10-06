@@ -281,6 +281,7 @@ luatexbase.create_callback("luatexja.jfmglue.whatsit_after", "data",
 -- calc next Np
 do
 
+local traverse = Dnode.traverse
 local function set_attr_icflag_processed(p)
    if get_attr_icflag(p)<= ITALIC then
       set_attr(p, attr_icflag, PROCESSED)
@@ -315,6 +316,7 @@ local function calc_np_pbox(lp, last)
 end
 
 local ltjw_apply_ashift_math = ltjw.apply_ashift_math
+local min, max = math.min, math.max
 local function calc_np_aux_glyph_common(lp)
    Np.nuc = lp
    Np.id = npi
@@ -325,15 +327,75 @@ local function calc_np_aux_glyph_common(lp)
       lp, head, npi, npf = capsule_glyph(lp, Np.met, Np.class, head, tex_dir)
       Np.first = (Np.first~=Np.nuc) and Np.first or npf or npi
       Np.nuc = npi
+      return true, check_next_ickern(lp);
    else
       Np.id = id_glyph
       set_np_xspc_alchar(Np, getchar(lp), lp, 1)
-      set_attr(lp, attr_icflag, PROCESSED)
-      setfield(lp, 'yoffset',
-	       getfield(lp, 'yoffset') - (has_attr(lp,attr_ablshift) or 0))
+      -- loop
+      local first_glyph, last_glyph = lp
+      set_attr(lp, attr_icflag, PROCESSED); Np.last = lp
+      local y_adjust = has_attr(lp,attr_ablshift) or 0
+      local node_depth = getfield(lp, 'depth') + min(y_adjust, 0)
+      local adj_depth = (y_adjust>0) and (getfield(lp, 'depth') + y_adjust) or 0
+      setfield(lp, 'yoffset', getfield(lp, 'yoffset') - y_adjust)
       lp = node_next(lp)
+      for lp in traverse(lp) do
+	 if lp==last or  get_attr_icflag(lp)>=PACKED then
+	    break
+	 else
+	    local lid = getid(lp)
+	    if lid==id_glyph and not (getfont(lp) == (has_attr(lp, attr_curjfnt) or -1)) then
+	       -- 欧文文字
+	       last_glyph = lp; set_attr(lp, attr_icflag, PROCESSED); Np.last = lp
+	       y_adjust = has_attr(lp,attr_ablshift) or 0
+	       node_depth = max(getfield(lp, 'depth') + min(y_adjust, 0), node_depth)
+	       adj_depth = (y_adjust>0) and adj_depth or max(getfield(lp, 'depth') + y_adjust, adj_depth)
+	       setfield(lp, 'yoffset', getfield(lp, 'yoffset') - y_adjust)
+	    elseif lid==id_kern and getsubtype(lp)==2 then -- アクセント用の kern
+	       set_attr(lp, attr_icflag, PROCESSED)
+	       lp = node_next(lp) -- lp: アクセント本体
+	       setfield(lp, 'yoffset', getfield(lp, 'yoffset') - (has_attr(lp,attr_ablshift) or 0))
+	       lp = node_next(node_next(lp))
+	    else
+	       break
+	    end
+	 end
+	 -- イタリック補正はあんまり使わない，と考えてループ継続条件に入れない．
+      end
+      if last_glyph then
+	 Np.last_char = last_glyph
+	 if adj_depth>node_depth then
+	    local r = node_new(id_rule)
+	    setfield(r, 'width', 0); setfield(r, 'height', 0)
+	    setfield(r, 'depth',adj_depth); setfield(r, 'dir', tex_dir)
+	    set_attr(r, attr_icflag, PROCESSED)
+	    insert_after(head, first_glyph, r)
+	 end
+      else
+	 local npn = Np.nuc
+	 Np.last_char = npn
+	 if adj_depth>node_depth then
+	    local nf, nc = getfont(npn), getchar(npn)
+	    local left_protru = (font.getfont(nf) or font.fonts[nf] ).characters[nc].left_protruding or 0
+	    -- lpcode が 0 なら，直前に補正用 rule を挿入する．
+	    -- なお，rpcode 判定ではうまくいかない（LuaTeX のバグ？）
+	    if left_protru ==0 then
+	       local r = node_new(id_rule)
+	       setfield(r, 'width', 0); setfield(r, 'height', 0)
+	       setfield(r, 'depth',adj_depth); setfield(r, 'dir', tex_dir)
+	       set_attr(r, attr_icflag, PROCESSED)
+	       head = insert_before(head, first_glyph, r)
+	       Np.first = (Np.first==npn) and r or npn
+	    else
+	       ltjb.package_warning_no_line(
+		  'luatexja',
+		  'Check depth of ' .. tostring(npn) .. '(font=' .. nf
+		     .. ', char=' .. nc .. '), because its \\lpcode is ' .. tostring(left_protru))
+	    end
+	 end
+      end
+      return true, check_next_ickern(lp)
    end
-   return true, check_next_ickern(lp);
 end
 local calc_np_auxtable = {
    [id_glyph] = function (lp)
@@ -572,7 +634,7 @@ do
    end
 
    after_alchar = function (Nx)
-      local x = Nx.nuc
+      local x = Nx.last_char
       return set_np_xspc_alchar(Nx, getchar(x), x, 2)
    end
 
@@ -904,10 +966,7 @@ end
 -- Nq が前側のクラスタとなることによる修正
 do
    local adjust_nq_aux = {
-      [id_glyph] = function()
-		      local x = Nq.nuc
-		      return set_np_xspc_alchar(Nq, getchar(x),x, 2)
-		   end, -- after_alchar(Nq)
+      [id_glyph] = function() after_alchar(Nq) end, -- after_alchar(Nq)
       [id_hlist]  = function() after_hlist(Nq) end,
       [id_pbox]  = function() after_hlist(Nq) end,
       [id_disc]  = function() after_hlist(Nq) end,

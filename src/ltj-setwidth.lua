@@ -41,7 +41,6 @@ local sid_restore = node.subtype('pdf_restore')
 local sid_matrix = node.subtype('pdf_setmatrix')
 local dir_tate = luatexja.dir_table.dir_tate
 
-local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 local attr_tkblshift = luatexbase.attributes['ltj@tkblshift']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
