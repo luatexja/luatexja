@@ -349,7 +349,7 @@ local function calc_np_aux_glyph_common(lp)
 	       last_glyph = lp; set_attr(lp, attr_icflag, PROCESSED); Np.last = lp
 	       y_adjust = has_attr(lp,attr_ablshift) or 0
 	       node_depth = max(getfield(lp, 'depth') + min(y_adjust, 0), node_depth)
-	       adj_depth = (y_adjust>0) and adj_depth or max(getfield(lp, 'depth') + y_adjust, adj_depth)
+	       adj_depth = (y_adjust>0) and max(getfield(lp, 'depth') + y_adjust, adj_depth) or adj_depth
 	       setfield(lp, 'yoffset', getfield(lp, 'yoffset') - y_adjust)
 	    elseif lid==id_kern and getsubtype(lp)==2 then -- アクセント用の kern
 	       set_attr(lp, attr_icflag, PROCESSED)
@@ -362,35 +362,34 @@ local function calc_np_aux_glyph_common(lp)
 	 end
 	 -- イタリック補正はあんまり使わない，と考えてループ継続条件に入れない．
       end
-      if last_glyph then
-	 Np.last_char = last_glyph
-	 if adj_depth>node_depth then
-	    local r = node_new(id_rule)
+      local r
+      if adj_depth>node_depth then
+	    r = node_new(id_rule)
 	    setfield(r, 'width', 0); setfield(r, 'height', 0)
 	    setfield(r, 'depth',adj_depth); setfield(r, 'dir', tex_dir)
 	    set_attr(r, attr_icflag, PROCESSED)
-	    insert_after(head, first_glyph, r)
-	 end
+      end
+      if last_glyph then
+	 Np.last_char = last_glyph
+	 if r then insert_after(head, first_glyph, r) end
       else
 	 local npn = Np.nuc
 	 Np.last_char = npn
-	 if adj_depth>node_depth then
+	 if r then
 	    local nf, nc = getfont(npn), getchar(npn)
-	    local left_protru = (font.getfont(nf) or font.fonts[nf] ).characters[nc].left_protruding or 0
-	    -- lpcode が 0 なら，直前に補正用 rule を挿入する．
-	    -- なお，rpcode 判定ではうまくいかない（LuaTeX のバグ？）
-	    if left_protru ==0 then
-	       local r = node_new(id_rule)
-	       setfield(r, 'width', 0); setfield(r, 'height', 0)
-	       setfield(r, 'depth',adj_depth); setfield(r, 'dir', tex_dir)
-	       set_attr(r, attr_icflag, PROCESSED)
-	       head = insert_before(head, first_glyph, r)
+	    local ct = (font.getfont(nf) or font.fonts[nf] ).characters[nc]
+	    if (ct.left_protruding or 0) == 0 then
+	       head = insert_before(head, npn, r)
 	       Np.first = (Np.first==npn) and r or npn
+	    elseif (ct.right_protruding or 0) == 0 then
+	       insert_after(head, npn, r); Np.last, lp = r, r
 	    else
 	       ltjb.package_warning_no_line(
 		  'luatexja',
-		  'Check depth of ' .. tostring(npn) .. '(font=' .. nf
-		     .. ', char=' .. nc .. '), because its \\lpcode is ' .. tostring(left_protru))
+		  'Check depth of glyph node ' .. tostring(npn) .. '(font=' .. nf
+		     .. ', char=' .. nc .. '),    because its \\lpcode is ' .. tostring(ct.left_protruding)
+		     .. ' and its \\rpcode is ' .. tostring(ct.right_protruding)
+	       ); node_free(r)
 	    end
 	 end
       end

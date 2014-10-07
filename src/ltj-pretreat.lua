@@ -28,7 +28,6 @@ local set_attr = Dnode.set_attribute
 local node_traverse = Dnode.traverse
 local node_remove = Dnode.remove
 local node_next = (Dnode ~= node) and Dnode.getnext or node.next
-local node_prev = (Dnode ~= node) and Dnode.getprev or node.prev
 local node_free = Dnode.free
 local node_end_of_math = Dnode.end_of_math
 local tex_getcount = tex.getcount
@@ -52,7 +51,7 @@ local DIR   = luatexja.userid_table.DIR
 local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 
 local dir_tate = luatexja.dir_table.dir_tate
-
+local lang_ja = token.create('ltj@japanese')[2]
 ------------------------------------------------------------------------
 -- MAIN PROCESS STEP 1: replace fonts
 ------------------------------------------------------------------------
@@ -61,7 +60,7 @@ do
    local ltjd_get_dir_count = ltjd.get_dir_count
    local start_time_measure, stop_time_measure 
       = ltjb.start_time_measure, ltjb.stop_time_measure
-   local head, real_head
+   local head
    local is_dir_tate
    local suppress_hyphenate_ja_aux = {}
    suppress_hyphenate_ja_aux[id_glyph] = function(p)
@@ -69,7 +68,8 @@ do
          local pc = getchar(p)
 	 local pf = ltjf_replace_altfont(has_attr(p, attr_curjfnt) or getfont(p), pc)
 	 setfield(p, 'font', pf);  set_attr(p, attr_curjfnt, pf)
-	 setfield(p, 'subtype', floor(getsubtype(p)*0.5)*2)
+	 setfield(p, 'lang', lang_ja)
+	 --setfield(p, 'subtype', floor(getsubtype(p)*0.5)*2)
          set_attr(p, attr_orig_char, pc)
       end
       return p
@@ -93,21 +93,19 @@ do
       return p
    end
 
-   local function suppress_hyphenate_ja (h)
+   local function suppress_hyphenate_ja (h,t)
       start_time_measure('ltj_hyphenate')
-      head = to_direct(h); real_head = node_next(head)
+      head = to_direct(h)
       local p = head
       for i = 1,#wt do wt[i]=nil end
       for i = 1,#wtd do wtd[i]=nil end
       ltjs.list_dir=ltjd_get_dir_count()
-      while p do
-	 local flag
+      while p and p~=t do
 	 local pfunc = suppress_hyphenate_ja_aux[getid(p)]
-	 if pfunc then p = pfunc(p) end
-	 p = node_next(p)
+	 p = pfunc and node_next(pfunc(p)) or node_next(p)
       end
       stop_time_measure('ltj_hyphenate'); start_time_measure('tex_hyphenate')
-      lang.hyphenate(h)
+      lang.hyphenate(h, t)
       stop_time_measure('tex_hyphenate')
       return h
    end
