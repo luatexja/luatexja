@@ -102,7 +102,7 @@ do
       ltjs.list_dir=ltjd_get_dir_count()
       while p and p~=t do
 	 local pfunc = suppress_hyphenate_ja_aux[getid(p)]
-	 p = pfunc and node_next(pfunc(p)) or node_next(p)
+	 p = node_next(pfunc and pfunc(p) or p)
       end
       stop_time_measure('ltj_hyphenate'); start_time_measure('tex_hyphenate')
       lang.hyphenate(h, t)

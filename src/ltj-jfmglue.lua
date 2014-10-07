@@ -340,7 +340,8 @@ local function calc_np_aux_glyph_common(lp)
       setfield(lp, 'yoffset', getfield(lp, 'yoffset') - y_adjust)
       lp = node_next(lp)
       for lp in traverse(lp) do
-	 if lp==last or  get_attr_icflag(lp)>=PACKED then
+	 local lai = get_attr_icflag(lp)
+	 if lp==last or  lai>=PACKED then
 	    break
 	 else
 	    local lid = getid(lp)
@@ -351,11 +352,18 @@ local function calc_np_aux_glyph_common(lp)
 	       node_depth = max(getfield(lp, 'depth') + min(y_adjust, 0), node_depth)
 	       adj_depth = (y_adjust>0) and max(getfield(lp, 'depth') + y_adjust, adj_depth) or adj_depth
 	       setfield(lp, 'yoffset', getfield(lp, 'yoffset') - y_adjust)
-	    elseif lid==id_kern and getsubtype(lp)==2 then -- アクセント用の kern
-	       set_attr(lp, attr_icflag, PROCESSED)
-	       lp = node_next(lp) -- lp: アクセント本体
-	       setfield(lp, 'yoffset', getfield(lp, 'yoffset') - (has_attr(lp,attr_ablshift) or 0))
-	       lp = node_next(node_next(lp))
+	    elseif lid==id_kern then
+	       local ls = getsubtype(lp)
+	       if ls==2 then -- アクセント用の kern
+		  set_attr(lp, attr_icflag, PROCESSED)
+		  lp = node_next(lp) -- lp: アクセント本体
+		  setfield(lp, 'yoffset', getfield(lp, 'yoffset') - (has_attr(lp,attr_ablshift) or 0))
+		  lp = node_next(node_next(lp))
+	       elseif ls==0 or (ls==1 and lai==ITALIC) then
+		  Np.last = lp
+	       else
+		  break
+	       end
 	    else
 	       break
 	    end
@@ -393,7 +401,7 @@ local function calc_np_aux_glyph_common(lp)
 	    end
 	 end
       end
-      return true, check_next_ickern(lp)
+      return true, lp
    end
 end
 local calc_np_auxtable = {
