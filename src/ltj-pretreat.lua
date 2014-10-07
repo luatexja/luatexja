@@ -42,6 +42,7 @@ local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
 local ltjf_replace_altfont = ltjf.replace_altfont
 local attr_orig_char = luatexbase.attributes['ltj@origchar']
 local STCK = luatexja.userid_table.STCK
+local lang_ja = token.create('ltj@japanese')[2]
 
 ------------------------------------------------------------------------
 -- MAIN PROCESS STEP 1: replace fonts
@@ -56,7 +57,8 @@ do
 	 local pc = getchar(p)
 	 local pf = ltjf_replace_altfont(has_attr(p, attr_curjfnt) or getfont(p), pc)
 	 setfield(p, 'font', pf);  set_attr(p, attr_curjfnt, pf)
-	 setfield(p, 'subtype', floor(getsubtype(p)*0.5)*2)
+	 setfield(p, 'lang', lang_ja)
+	 -- setfield(p, 'subtype', floor(getsubtype(p)*0.5)*2)
 	 set_attr(p, attr_orig_char, pc)
       end
       return p
@@ -74,8 +76,7 @@ do
       wt, head = {}, p
       while p do
 	 local pfunc = suppress_hyphenate_ja_aux[getid(p)]
-	 if pfunc then p = pfunc(p) end
-	 p = node_next(p)
+	 p = node_next(pfunc and pfunc(p) or p)
       end
       head = to_node(head)
       lang.hyphenate(head)

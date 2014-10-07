@@ -553,6 +553,7 @@ end
 ------------------------------------------------------------------------
 
 local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
+local font = font
 -- EXT: italic correction
 function append_italic()
    local p = to_direct(tex.nest[tex.nest.ptr].tail)
@@ -566,7 +567,7 @@ function append_italic()
 	 local j = font_metric_table[f]
 	 setfield(g, 'kern', j.char_type[find_char_class(getchar(p), j)].italic)
       else
-	 local h = font_getfont(f)
+	 local h = font_getfont(f) or font.fonts[f]
 	 if h then
 	    setfield(g, 'kern', h.characters[getchar(p)].italic)
 	 else
