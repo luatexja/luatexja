@@ -104,6 +104,7 @@ local function capsule_glyph_yoko(p, met, class, head, dir)
 	 setfield(box, 'depth', fdepth + kbl)
 	 setfield(box, 'dir', dir)
 	 set_attr(box, attr_icflag, PACKED)
+	 set_attr(p, attr_icflag, PACKED)
 	 head = p and node_insert_before(head, p, box)
 	    or node_insert_after(head, node_tail(head), box)
 	 return node_next(p), head, p, box
