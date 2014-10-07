@@ -404,13 +404,21 @@ The followings are major changes from \pTeX:
 %<*ja>
 \item \LuaTeX-jaでは，\pTeX と同様に漢字・仮名を制御綴内に用いることができ，
 \cs{西暦} などが正しく動作するようにしている．
-但し，制御綴中に使える和文文字が\pTeX・\upTeX と全く同じではないことに注意すること．
+但し，制御綴中に使える和文文字が\pTeX・\upTeX と全く同じではない（\ref{sec-catcode}章参照）．
 %</ja>
 
 %<*ja>
 \item ****版からは，不安定ながらも\LuaTeX-ja における縦組みをサポートしている．
 \LuaTeX のコールバックの制限などにより，特に異なった組方向のボックスを扱う場合には
-仕様が異なるので注意すること．
+仕様が異なるので注意．
+%</ja>
+
+%<*en>
+\item Japanese characters in discretionary break (\cs{discretionary}) is not supported.
+%</en>
+%<*ja>
+\item \cs{discretionary} 内に直接和文文字を記述することはサポートされない．和文文字をどう
+      しても使いたい場合は \cs{hbox} で括ること．
 %</ja>
 \end{itemize}
 
@@ -2285,36 +2293,29 @@ xyz漢字
 \end{LTXexample}
 
 %<*en>
-Note that setting a positive value to
-\Param{yalbaselineshift}~or~\Param{talbaselineshift} does not
-increase the depth of \textbf{ALchar}, as shown below.
-This is because these parameters are implemented by setting \verb+yoffset+
-field of a glyph node, and this does not increase the depth of the glyph.
-This problem does not apply for \Param{yjabaselineshift}, since
-\Param{yjabaselineshift}~and~\Param{tjabaselineshift}
-use a different implementation method.
+Note that setting positive \Param{yalbaselineshift}~or~\Param{talbaselineshift}
+parameters does not increase the depth of one-letter ``syllable'' $p$ of \textbf{Alchar}, if
+its left-protrusion~(\cs{lpcode}) and right-protrusion~(\cs{rpcode}) are both non-zero.
+This is because 
+\begin{itemize}
+\item These two parameters are implemented by setting yoffset field of a
+glyph node, and this does not increase the depth of the glyph.
+\item To cope with the above situation, \LuaTeX-ja automatically supplies 
+a rule in every ``syllable''. 
+\item However, we cannot use this ``supplying a rule'' method if \dots
+\end{itemize}
+
+This problem does not apply for \Param{yjabaselineshift}~nor~\Param{tjabaselineshift}.
 %</en>
 %<*ja>
-なお，\Param{yalbaselineshift},~\Param{talbaselineshift}パラメータに
-正の値を指定しても，
-下の例のように\textbf{ALchar}の深さは増加しないことに注意．
-これは，2パラメータがglyph~nodeの\verb+yoffset+を使って
-実装されているためである．
-\Param{yjabaselineshift},~\Param{tjabaselineshift}パラメータは
-別の方法を使って実装しているので，
-このような問題は起こらない．
+なお，以下の場合には1文字の\textbf{ALchar}からなる「音節」の深さは増加しないことに注意．
+\begin{itemize}
+ \item \Param{yalbaselineshift},~\Param{talbaselineshift}パラメータが正になっている．
+ \item 「音節」を構成する唯一の文字$p$の
+左余白への突出量(\cs{lpcode})，右余白への突出量(\cs{rpcode})がどちらも非零である．
+\end{itemize} 
+\Param{yjabaselineshift},~\Param{tjabaselineshift}パラメータについてはこのような問題は起こらない．
 %</ja>
-\begin{LTXexample}[width=.3\textwidth]
-\leavevmode\fboxsep=0pt
- \ltjsetparameter{yjabaselineshift=0pt,
-    yalbaselineshift=0pt}
-\vrule width 105pt height 0.4pt depth 0pt \hskip-95pt
-\fbox{\ltjsetparameter{yalbaselineshift=10pt}あいうxyz}
-\fbox{\ltjsetparameter{yalbaselineshift=-10pt}あいうxyz}\\
-\vrule width 105pt height 0.4pt depth 0pt \hskip-95pt
-\fbox{\ltjsetparameter{yjabaselineshift=10pt}あいうxyz}
-\fbox{\ltjsetparameter{yjabaselineshift=-10pt}あいうxyz}
-\end{LTXexample}
 
 %<*ja>
 \paragraph{数式における挙動：\pTeX との違い}
@@ -2371,6 +2372,7 @@ $\Phi\vdash F(x)\ \hbox{for all}\ x\in A$
 \suppressfloats[t]
 %<*ja>
 \section{\LuaTeX-jaにおける \cs{catcode}}
+\label{sec-catcode}
 \subsection{予備知識：\pTeX と\upTeX における \cs{kcatcode}}
 \pTeX，\upTeX においては，和文文字が制御綴内で利用できるかどうか
 は \cs{kcatcode} の値によって決定されるのであった．
@@ -2378,6 +2380,7 @@ $\Phi\vdash F(x)\ \hbox{for all}\ x\in A$
 %</ja>
 %<*en>
 \section{\cs{catcode} in \LuaTeX-ja}
+\label{sec-catcode}
 \subsection{Preliminaries: \cs{kcatcode} in \pTeX\ and \upTeX}
 In \pTeX~and~\upTeX, the value of \cs{kcatcode} determines
 whether a Japanese character can be used in a control word.
@@ -7319,54 +7322,54 @@ u
 \def\OB{$\text{\sf O}_{\text{\sf B}}$}
 \begin{defn}
 %<*en>
-A \emph{cluster} is a list of consecutive nodes in one of the following forms,
+A \emph{cluster} is consecutive nodes in one of the following forms,
 with the \textit{id} of it:
 %</en>
 %<*ja>
-\emph{クラスタ}は以下の形のうちのどれかひとつをとる連続的なノードのリストである：
+\emph{クラスタ}は以下の形のうちのどれかひとつをとるノードのリストである：
 %</ja>
 \begin{enumerate}
 %<*en>
 \item Nodes whose value of\ \verb+\ltj@icflag+ is in $[3,15)$.  These
       nodes come from a hbox which is already packaged, by unpackaging
       (\cs{unhbox}).
-      The \textit{id} is \textit{id\_pbox}.
+      The \textit{id} of the cluster is \textit{id\_pbox}.
 %</en>
 %<*ja>
 \item その \verb+\ltj@icflag+ の値が$[3,15)$に入るノードのリスト．
   これらのノードはある既にパッケージングされたhboxから \cs{unhbox} で
   アンパックされたものである．
-  その\textit{id}は\textit{id\_pbox}である．
+  この場合，クラスタの\textit{id}は\textit{id\_pbox}である．
 %</ja>
 
 %<*en>
 \item A inline math formula, including two \textit{math\_node}s at the boundary of it.
-      The \textit{id} is \textit{id\_math}.
+      The \textit{id} of the cluster is \textit{id\_math}.
 %</en>
 %<*ja>
 \item インライン数式でその境界に2つの\textit{math\_node}を含むもの．
-  その\textit{id}は\textit{id\_math}である．
+  この場合，クラスタの\textit{id}は\textit{id\_math}である．
 %</ja>
 
 %<*en>
-\item A \textit{glyph\_node}~$p$ with nodes which relate with it:
+\item A \textit{glyph\_node}~$p$, which represents a \textbf{JAchar}, with nodes which relate with it:
 %</en>
 %<*ja>
-\item \textit{glpyh\_node}~$p$とそれに関係するノード：
+\item \textbf{JAchar}を表す\textit{glyph\_node}~$p$とそれに関係するノード：
 %</ja>
 \begin{enumerate}
 %<*en>
-\item A kern for the italic correction of~$p$.
+\item[(a)] A kern for the italic correction of~$p$.
 %</en>
 %<*ja>
-\item $p$のイタリック補正のためのカーン．
+\item[(a)] $p$のイタリック補正のためのカーン．
 %</ja>
 
 %<*en>
-\item An accent attached to $p$ by \cs{accent}.
+\item[(b)] An accent attached to $p$ by \cs{accent}.
 %</en>
 %<*ja>
-\item \cs{accent} による$p$に付随したアクセント．
+\item[(b)] \cs{accent} による$p$に付随したアクセント．
 %</ja>
 \end{enumerate}
 \[
@@ -7384,41 +7387,51 @@ with the \textit{id} of it:
 \]
 
 %<*en>
-The \textit{id} is \textit{id\_jglyph} or
-\textit{id\_glyph}, according to whether the \textit{glyph\_node}
-represents a Japanese character or not.
+In this case, the \textit{id} is \textit{id\_jglyph}.
 %</en>
 %<*ja>
-\textit{id}は\textit{glyph\_node}が和文文字を表すかどうかによって
-\textit{id\_jglyph}，もしくは\textit{id\_glyph}となる．
+この場合の\textit{id}は\textit{id\_jglyph}である．
+%</ja>
+
+%<*en>
+\item A list which begins from a \textit{glyph\_node} which represents a \textbf{ALchar},
+      and consists of \textbf{ALchar} \textit{glyph\_node}s, 
+      kerns for adjusting accents~(its subtype is 2), kerns for italic corrections and
+      kerns which are automatically inserted by \LuaTeX~or~luaotfload.
+      In this case, the \textit{id} is \textit{id\_glyph}.
+%</en>
+%<*ja>
+\item \textbf{ALchar}を表す\textit{glyph\_node}，\cs{accent} によるアクセント位置補正用の
+      カーン(subtypeが2)，そしてイタリック補正・カーニングによって挿入されたカーン達が連続
+      したもの．この場合の\textit{id}は\textit{id\_glyph}である．
 %</ja>
 
 %<*en>
 \item An box-like node, that is, an hbox, a vbox, a rule (\cs{vrule}) and an \textit{unset\_node}.
-The \textit{id} is \textit{id\_hlist} if the node is an
+The \textit{id} of the cluster is \textit{id\_hlist} if the node is an
       hbox which is not shifted vertically, or \textit{id\_box\_like}
       otherwise.
 %</en>
 %<*ja>
-\item ボックス様のノード，つまり水平ボックス，垂直ボックス，罫線 (\cs{vrule})，
+\item 水平ボックス(hbox)，垂直ボックス，罫線 (\cs{vrule})，
   そして\textit{unset\_node}．
-  その\textit{id}は垂直に移動していないhboxならば\textit{id\_hlist}，
+  クラスタの\textit{id}は垂直に移動していないhboxならば\textit{id\_hlist}，
   そうでなければ\textit{id\_box\_like}となる．
 %</ja>
 
 %<*en>
 \item A glue, a kern whose subtype is not 2~(\textit{accent}), and a discretionary break.
-The \textit{id} is \textit{id\_glue}, \textit{id\_kern}
+The \textit{id} of the cluster is \textit{id\_glue}, \textit{id\_kern}
       and \textit{id\_disc}, respectively.
 %</en>
 %<*ja>
-\item グルー，subtypeが 2~(\textit{accent})ではないカーン，そして任意改行．
-  その\textit{id}はそれぞれ\textit{id\_glue}, \textit{id\_kern}，そして
+\item グルー，subtypeが 2~(\textit{accent})ではないカーン，そしてdiscretionary break．
+  その\textit{id} of the clusterはそれぞれ\textit{id\_glue}, \textit{id\_kern}，そして
   \textit{id\_disc}である．
 %</ja>
 \end{enumerate}
 %<*en>
-Let \textit{Np}, \textit{Nq} and \textit{Nr} denote a cluster.
+We use \textit{Np}, \textit{Nq} and \textit{Nr} to denote a cluster.
 %</en>
 %<*ja>
 以下では\textit{Np}, \textit{Nq}, \textit{Nr}でクラスタを表す．
@@ -7454,6 +7467,7 @@ $\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$は，その和文文字
 \item[\textit{id\_hlist}] 縦方向にシフトされていないhbox．\\
 この場合，$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$はそれぞれ$p$の内容を表すリストの，
 先頭・末尾のノードである．
+\medskip
 \begin{itemize}
 \item 状況によっては，\TeX ソースで言うと
 \begin{lstlisting}

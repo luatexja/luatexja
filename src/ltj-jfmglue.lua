@@ -316,6 +316,7 @@ local function calc_np_pbox(lp, last)
 end
 
 local ltjw_apply_ashift_math = ltjw.apply_ashift_math
+local ltjw_apply_ashift_disc = ltjw.apply_ashift_disc
 local min, max = math.min, math.max
 local function calc_np_aux_glyph_common(lp)
    Np.nuc = lp
@@ -477,9 +478,15 @@ local calc_np_auxtable = {
       Np.last, Np.id = end_math, id_math;
       return true, node_next(end_math);
    end,
-   discglue = function(lp)
+   [id_glue] = function(lp)
       Np.first, Np.nuc, Np.last = (Np.first or lp), lp, lp;
       Np.id = getid(lp); set_attr(lp, attr_icflag, PROCESSED)
+      return true, node_next(lp)
+   end,
+   [id_disc] = function(lp)
+      Np.first, Np.nuc, Np.last = (Np.first or lp), lp, lp;
+      Np.id = getid(lp); set_attr(lp, attr_icflag, PROCESSED)
+      ltjw_apply_ashift_disc(lp, (list_dir==dir_tate), tex_dir)
       return true, node_next(lp)
    end,
    [id_kern] = function(lp)
@@ -505,8 +512,6 @@ calc_np_auxtable[13]        = calc_np_auxtable.box_like
 calc_np_auxtable[id_ins]    = calc_np_auxtable.skip
 calc_np_auxtable[id_mark]   = calc_np_auxtable.skip
 calc_np_auxtable[id_adjust] = calc_np_auxtable.skip
-calc_np_auxtable[id_disc]   = calc_np_auxtable.discglue
-calc_np_auxtable[id_glue]   = calc_np_auxtable.discglue
 
 function calc_np(lp, last)
    local k

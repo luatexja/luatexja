@@ -73,7 +73,9 @@ local call_callback = luatexbase.call_callback
 
 local fshift =  { down = 0, left = 0}
 
-local min = math.min
+local min, max = math.min, math.max
+
+-- 和文文字の位置補正（横）
 local function capsule_glyph_yoko(p, met, class, head, dir)
    local char_data = met.char_type[class]
    if not char_data then return node_next(p), head, p end
@@ -137,6 +139,7 @@ end
 
 luatexja.setwidth.capsule_glyph_yoko = capsule_glyph_yoko
 
+-- 和文文字の位置補正（縦）
 local function capsule_glyph_tate(p, met, class, head, dir)
    local char_data = met.char_type[class]
    if not char_data then return node_next(p), head end
@@ -227,5 +230,42 @@ function luatexja.setwidth.apply_ashift_math(head, last, attr_ablshift)
 		     getfield(p, 'yoffset') - (has_attr(p,attr_ablshift) or 0))
 	 end
       end
+   end
+end
+
+-- discretionary の位置補正
+do
+   local attr_yablshift = luatexbase.attributes['ltj@yablshift']
+   local attr_tablshift = luatexbase.attributes['ltj@tablshift']
+   local attr_ablshift
+   local disc, tex_dir
+   local function ashift_disc_inner(field)
+      local head = getfield(disc, field)
+      if not head then return end
+      local y_adjust, node_depth, adj_depth = 0, 0, 0
+      for lp in node_traverse_id(id_glyph, head) do
+	 y_adjust = has_attr(lp,attr_ablshift) or 0
+	 node_depth = max(getfield(lp, 'depth') + min(y_adjust, 0), node_depth)
+	 adj_depth = (y_adjust>0) and max(getfield(lp, 'depth') + y_adjust, adj_depth) or adj_depth
+	 setfield(lp, 'yoffset', getfield(lp, 'yoffset') - y_adjust)
+      end
+      if adj_depth>node_depth then
+	 local r = node_new(id_rule)
+	 setfield(r, 'width', 0); setfield(r, 'height', 0)
+	 setfield(r, 'depth', adj_depth); setfield(r, 'dir', tex_dir)
+	 set_attr(r, attr_icflag, PROCESSED)
+	 if field=='post' then
+	    node_insert_after(head, head, r)
+	 else
+	    setfield(disc, field, (node_insert_before(head, head, r)))
+	 end
+      end
+   end
+   function luatexja.setwidth.apply_ashift_disc(d, is_dir_tate, dir)
+      attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
+      disc, tex_dir = d, dir
+      ashift_disc_inner('pre')
+      ashift_disc_inner('post')
+      ashift_disc_inner('replace')
    end
 end
