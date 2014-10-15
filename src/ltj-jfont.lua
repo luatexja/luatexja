@@ -622,7 +622,7 @@ do
    local function prepare_vert_data(n, id)
       -- test if already loaded
       if type(id)=='number' then -- sometimes id is an integer
-         font_vert_table[n] = font_vert_table[id]; return
+         return
       elseif (not id) or font_vert_table[n]  then return
       end
       local fname = id.filename
@@ -637,7 +637,7 @@ do
       if a then
 	 local s = id.shared.rawdata.descriptions
 	 for i,v in pairs(a) do
-	    if v.features.vert or v.features.vrt2 then
+	    if v.features.vert then
 	       add_feature_table(v.subtables[1], s, vtable)
 	    end
 	 end
