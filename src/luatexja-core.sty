@@ -552,9 +552,12 @@
 \yoko
 
 %%%% insert
-%\let\orig@insert=\insert
-%\protected\def\insert{\begingroup\afterassignment\ltj@@insert@A\ltj@tempcnta}
-%\protected\def\ltj@@insert@A{\orig@insert\ltj@tempcnta\bgroup\aftergroup\endgroup\let\next}
+\let\orig@insert=\insert
+\protected\def\insert{\begingroup\afterassignment\ltj@@insert@A\ltj@tempcnta}
+\protected\def\ltj@@insert@A{\orig@insert\ltj@tempcnta\bgroup
+  \aftergroup\ltj@@insert@B\let\next}
+\protected\def\ltj@@insert@B{\directlua{luatexja.direction.populate_insertion_dir_whatsit()}\endgroup}
+
 %%%% vadjust
 \let\ltj@@orig@vadjust=\vadjust
 \protected\def\vadjust{%

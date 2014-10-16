@@ -483,14 +483,20 @@ local function get_box_dir(b, default)
    local bh = getfield(b,'head')
    -- b は insert node となりうるので getlist() は使えない
    local c
-   for i=1,2 do
-      if bh and getid(bh)==id_whatsit
-      and getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR then
+   for bh in traverse_id(id_whatsit, bh) do
+      if getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR then
 	 c = bh
-	 dir = (dir==0) and has_attr(bh, attr_dir) or dir
+    	 dir = (dir==0) and has_attr(bh, attr_dir) or dir
       end
-      bh = node_next(bh)
    end
+   -- for i=1,2 do
+   --    if bh and getid(bh)==id_whatsit
+   --    and getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR then
+   -- 	 c = bh
+   -- 	 dir = (dir==0) and has_attr(bh, attr_dir) or dir
+   --    end
+   --    bh = node_next(bh)
+   -- end
    stop_time_measure('get_box_dir')
    return (dir==0 and default or dir), c
 end
@@ -881,24 +887,59 @@ do
    luatexja.direction.glyph_from_packed = glyph_from_packed
 end
 
--- adjust and insertion
-local id_adjust = node.id('adjust')
-function luatexja.direction.check_adjust_direction()
-   start_time_measure('box_primitive_hook')
-   local list_dir = get_adjust_dir_count()
-   local a = tex_nest[tex_nest.ptr].tail
-   local ad = to_direct(a)
-   if a and getid(ad)==id_adjust then
-      local adj_dir = get_box_dir(ad)
-      if list_dir~=adj_dir then
-         ltjb.package_error(
-                 'luatexja',
-                 'Direction Incompatible',
-                 "\\vadjust's argument and outer vlist must have same direction.")
-         Dnode.last_node()
+-- adjust
+do
+   local id_adjust = node.id('adjust')
+   function luatexja.direction.check_adjust_direction()
+      start_time_measure('box_primitive_hook')
+      local list_dir = get_adjust_dir_count()
+      local a = tex_nest[tex_nest.ptr].tail
+      local ad = to_direct(a)
+      if a and getid(ad)==id_adjust then
+	 local adj_dir = get_box_dir(ad)
+	 if list_dir~=adj_dir then
+	    ltjb.package_error(
+	       'luatexja',
+	       'Direction Incompatible',
+	       "\\vadjust's argument and outer vlist must have same direction.")
+	    Dnode.last_node()
+	 end
       end
+      stop_time_measure('box_primitive_hook')
    end
-   stop_time_measure('box_primitive_hook')
+end
+
+-- insert
+do
+   local id_ins = node.id('ins')
+   local id_rule = node.id('rule')
+   function luatexja.direction.populate_insertion_dir_whatsit()
+      start_time_measure('box_primitive_hook')
+      local list_dir = get_dir_count()
+      local a = tex_nest[tex_nest.ptr].tail
+      local ad = to_direct(a)
+      if a and getid(ad)==id_ins then
+	 local h = getfield(ad, 'head')
+	 if getid(h)==id_whatsit and
+	    getsubtype(h)==sid_user and getfield(h, 'user_id')==DIR then
+	       local n = h; h = node_remove(h,h)
+	       node_free(n)
+	 end
+	 for box_rule in traverse(h) do
+	    if getid(box_rule)<id_rule then
+	       local w = node_new(id_whatsit, sid_user)
+	       setfield(w, 'next', nil)
+	       setfield(w, 'user_id', DIR)
+	       setfield(w, 'type', 110)
+	       set_attr(w, attr_dir, list_dir)
+	       h = insert_before(h, box_rule, w)
+	    end
+	 end
+	 tex_set_attr('global', attr_dir, 0)
+	 setfield(ad, 'head', h)
+      end
+      stop_time_measure('box_primitive_hook')
+   end
 end
 
 -- vsplit
@@ -912,14 +953,19 @@ do
 	 hd = create_dir_whatsit_vbox(hd, gc)
 	 split_dir_whatsit = hd
       elseif gc=='split_off'  then
-	 local bh=hd
-	 for i=1,2 do
-	    if bh and getid(bh)==id_whatsit
-	    and getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR then
+	 for  bh in traverse_id(id_whatsit, hd) do
+	    if getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR then
 	       ltjs.list_dir  = has_attr(bh, attr_dir); break
 	    end
-	    bh = node_next(bh)
 	 end
+	 -- local bh=hd
+	 -- for i=1,2 do
+	 --    if bh and getid(bh)==id_whatsit
+	 --    and getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR then
+	 --       ltjs.list_dir  = has_attr(bh, attr_dir); break
+	 --    end
+	 --    bh = node_next(bh)
+	 -- end
 	 if split_dir_whatsit then
 	    -- adjust direction of 'split_keep'
 	    set_attr(split_dir_whatsit, attr_dir, ltjs.list_dir)

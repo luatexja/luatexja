@@ -400,14 +400,20 @@ local function debug_show_node_X(p,print_fn, limit)
          .. ' (' .. print_scaled(p.height) .. '+'
          .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
       print_fn(s)
-   elseif pt=='hlist' or pt=='vlist' or pt=='unset' then
-      s = base .. '(' .. print_scaled(p.height) .. '+'
-         .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width) 
-	 .. ', dir=' .. tostring(node.has_attribute(p, attr_dir))
+   elseif pt=='hlist' or pt=='vlist' or pt=='unset'or pt=='ins' then
+      if pt=='ins' then
+	 s = base .. '(' .. print_scaled(p.height) .. '+'
+	    .. print_scaled(p.depth) .. ')'
+	    .. ', dir=' .. tostring(node.has_attribute(p, attr_dir))
+      else
+	 s = base .. '(' .. print_scaled(p.height) .. '+'
+	    .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width) 
+	    .. ', dir=' .. tostring(node.has_attribute(p, attr_dir))
+      end
       if (p.shift or 0)~=0 then
          s = s .. ', shifted ' .. print_scaled(p.shift)
       end
-      if p.glue_sign >= 1 then
+      if p.glue_sign or 0>= 1 then
          s = s .. ' glue set '
          if p.glue_sign == 2 then s = s .. '-' end
          s = s .. tostring(floor(p.glue_set*10000)/10000)
