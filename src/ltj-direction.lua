@@ -1066,6 +1066,11 @@ do
          setfield(db, 'head', db_head)
       end
    end
+
+   local shipout_temp =  node_new(id_hlist)
+   set_attr(shipout_temp, attr_dir, dir_yoko)
+   tex_set_attr('global', attr_dir, 0)
+
    finalize_inner = function (box)
       for n in traverse(getlist(box)) do
          local nid = getid(n)
@@ -1081,6 +1086,16 @@ do
    end
    local getbox = tex.getbox
    function luatexja.direction.finalize()
-      finalize_inner(to_direct(tex.getbox("AtBeginShipoutBox")))
+      local a = to_direct(tex.getbox("AtBeginShipoutBox"))
+      local a_dir = get_box_dir(a, dir_yoko)
+      if a_dir~=dir_yoko then
+         local b = create_dir_node(a, a_dir, dir_yoko, false)
+         setfield(b, 'head', a); a = b
+      end
+      setfield(shipout_temp, 'head', a)
+      finalize_inner(shipout_temp)
+      luatexja.ext_show_node(to_node(shipout_temp), '> ', print,4)
+      Dnode.setbox('global', "AtBeginShipoutBox", Dnode.copy(getlist(shipout_temp)))
+      setfield(shipout_temp, 'head',nil)
    end
 end
