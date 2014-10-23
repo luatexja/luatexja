@@ -340,36 +340,37 @@ local function calc_np_aux_glyph_common(lp)
       local adj_depth = (y_adjust>0) and (getfield(lp, 'depth') + y_adjust) or 0
       setfield(lp, 'yoffset', getfield(lp, 'yoffset') - y_adjust)
       lp = node_next(lp)
-      for lp in traverse(lp) do
-	 local lai = get_attr_icflag(lp)
-	 if lp==last or  lai>=PACKED then
-	    break
+      for lx in traverse(lp) do
+	 local lai = get_attr_icflag(lx)
+	 if lx==last or  lai>=PACKED then
+	    lp=lx; break
 	 else
-	    local lid = getid(lp)
-	    if lid==id_glyph and not (getfont(lp) == (has_attr(lp, attr_curjfnt) or -1)) then
+	    local lid = getid(lx)
+	    if lid==id_glyph and not(getfont(lx) == (has_attr(lx, attr_curjfnt) or -1)) then
 	       -- 欧文文字
-	       last_glyph = lp; set_attr(lp, attr_icflag, PROCESSED); Np.last = lp
-	       y_adjust = has_attr(lp,attr_ablshift) or 0
-	       node_depth = max(getfield(lp, 'depth') + min(y_adjust, 0), node_depth)
+	       last_glyph = lx; set_attr(lx, attr_icflag, PROCESSED); Np.last = lx
+	       y_adjust = has_attr(lx,attr_ablshift) or 0
+	       node_depth = max(getfield(lx, 'depth') + min(y_adjust, 0), node_depth)
 	       adj_depth = (y_adjust>0) and max(getfield(lp, 'depth') + y_adjust, adj_depth) or adj_depth
-	       setfield(lp, 'yoffset', getfield(lp, 'yoffset') - y_adjust)
+	       setfield(lx, 'yoffset', getfield(lx, 'yoffset') - y_adjust)
 	    elseif lid==id_kern then
-	       local ls = getsubtype(lp)
+	       local ls = getsubtype(lx)
 	       if ls==2 then -- アクセント用の kern
-		  set_attr(lp, attr_icflag, PROCESSED)
-		  lp = node_next(lp) -- lp: アクセント本体
-		  setfield(lp, 'yoffset', getfield(lp, 'yoffset') - (has_attr(lp,attr_ablshift) or 0))
-		  lp = node_next(node_next(lp))
-	       elseif ls==0 or (ls==1 and lai==ITALIC) then
-		  Np.last = lp
+		  set_attr(lx, attr_icflag, PROCESSED)
+		  lx = node_next(lx) -- lp: アクセント本体
+		  setfield(lx, 'yoffset', getfield(lp, 'yoffset') - (has_attr(lx,attr_ablshift) or 0))
+		  lx = node_next(node_next(lx))
+	       elseif ls==0  then
+		  Np.last = lx
+	       elseif (ls==1 and lai==ITALIC) then
+		  Np.last = lx; set_attr(lx, attr_icflag, IC_PROCESSED)
 	       else
-		  break
+		  lp=lx; break
 	       end
 	    else
-	       break
+	       lp=lx; break
 	    end
 	 end
-	 -- イタリック補正はあんまり使わない，と考えてループ継続条件に入れない．
       end
       local r
       if adj_depth>node_depth then
