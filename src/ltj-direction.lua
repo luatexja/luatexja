@@ -1085,6 +1085,7 @@ do
       end
    end
    local getbox = tex.getbox
+   local setbox, copy = Dnode.setbox, Dnode.copy
    function luatexja.direction.finalize()
       local a = to_direct(tex.getbox("AtBeginShipoutBox"))
       local a_dir = get_box_dir(a, dir_yoko)
@@ -1094,8 +1095,8 @@ do
       end
       setfield(shipout_temp, 'head', a)
       finalize_inner(shipout_temp)
-      luatexja.ext_show_node(to_node(shipout_temp), '> ', print,4)
-      Dnode.setbox('global', "AtBeginShipoutBox", Dnode.copy(getlist(shipout_temp)))
+      --luatexja.ext_show_node(to_node(shipout_temp), '> ', print,4)
+      setbox('global', "AtBeginShipoutBox", copy(getlist(shipout_temp)))
       setfield(shipout_temp, 'head',nil)
    end
 end
