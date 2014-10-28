@@ -67,7 +67,7 @@ do
       if (has_attr(p, attr_icflag) or 0)<=0 and is_ucs_in_japanese_char(p) then
          local pc = getchar(p)
 	 local pf = ltjf_replace_altfont(has_attr(p, attr_curjfnt) or getfont(p), pc)
-	 setfield(p, 'font', pf);  --set_attr(p, attr_curjfnt, pf)
+	 setfield(p, 'font', pf);  set_attr(p, attr_curjfnt, pf)
 	 setfield(p, 'lang', lang_ja)
          set_attr(p, attr_orig_char, pc)
       end
@@ -129,14 +129,14 @@ local function set_box_stack_level(head, mode)
    is_dir_tate = ltjs.list_dir == dir_tate
    if is_dir_tate then
       for p in Dnode.traverse_id(id_glyph,to_direct(head)) do
-         if (has_attr(p, attr_icflag) or 0)<=0 and getfield(p, 'lang')==lang_ja then
+         if (has_attr(p, attr_icflag) or 0)<=0 and has_attr(p, attr_curjfnt)==getfont(p) then
             local pfn = has_attr(p, attr_curtfnt) or getfont(p)
             local pc = getchar(p)
             local pf = ltjf_replace_altfont(pfn, pc)
 	    set_attr(p, attr_dir, pc)
 	    pc = ltjf_get_vert_glyph(pf, pc) or pc
             setfield(p, 'char', pc); set_attr(p, attr_orig_char, pc)
-            setfield(p, 'font', pf); --set_attr(p, attr_curjfnt, pf)
+            setfield(p, 'font', pf); set_attr(p, attr_curjfnt, pf)
          end
       end
    end

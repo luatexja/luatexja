@@ -66,6 +66,7 @@ local id_box_like  = 256 -- vbox, shifted hbox
 local id_pbox      = 257 -- already processed nodes (by \unhbox)
 local id_pbox_w    = 258 -- cluster which consists of a whatsit
 local sid_user = node.subtype('user_defined')
+local lang_ja = token.create('ltj@@japanese')[2]
 
 local sid_start_link = node.subtype('pdf_start_link')
 local sid_start_thread = node.subtype('pdf_start_thread')
@@ -89,7 +90,6 @@ local tex_dir
 local attr_ablshift
 local set_np_xspc_jachar
 
-local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_dir = luatexbase.attributes['ltj@dir']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 
@@ -98,10 +98,6 @@ local function get_attr_icflag(p)
 end
 
 -------------------- Helper functions
-
-local function copy_attr(new, old)
-  -- 仕様が決まるまで off にしておく
-end
 
 -- This function is called only for acquiring `special' characters.
 local function fast_find_char_class(c,m)
@@ -234,7 +230,7 @@ local function check_box(box_ptr, box_end)
 	    first_char = p; find_first_char = false
 	 end
 	 last_char = p; found_visible_node = true
-      elseif pid==id_rule and get_attr_icflag(p)==PACKED then 
+      elseif pid==id_rule and get_attr_icflag(p)==PACKED then
 	 -- do nothing
       elseif not (pid==id_ins   or pid==id_mark
 		  or pid==id_adjust or pid==id_whatsit
@@ -253,7 +249,7 @@ function check_box_high(Nx, box_ptr, box_end)
       local first_char = first_char
       if first_char then
          if getid(first_char)==id_glyph then
-	    if getfont(first_char) == (has_attr(first_char, attr_curjfnt) or -1) then
+	    if getfield(first_char, 'lang') == lang_ja then
 	       set_np_xspc_jachar(Nx, first_char)
 	    else
 	       set_np_xspc_alchar(Nx, getchar(first_char),first_char, 1)
@@ -321,7 +317,7 @@ local min, max = math.min, math.max
 local function calc_np_aux_glyph_common(lp)
    Np.nuc = lp
    Np.id = npi
-   if (getfont(lp) == (has_attr(lp, attr_curjfnt) or -1)) then
+   if getfield(lp, 'lang') == lang_ja then
       Np.id = id_jglyph
       set_np_xspc_jachar(Np, lp)
       local npi, npf
@@ -346,12 +342,12 @@ local function calc_np_aux_glyph_common(lp)
 	    lp=lx; break
 	 else
 	    local lid = getid(lx)
-	    if lid==id_glyph and not(getfont(lx) == (has_attr(lx, attr_curjfnt) or -1)) then
+	    if lid==id_glyph and getfield(lx, 'lang') ~= lang_ja then
 	       -- 欧文文字
 	       last_glyph = lx; set_attr(lx, attr_icflag, PROCESSED); Np.last = lx
 	       y_adjust = has_attr(lx,attr_ablshift) or 0
 	       node_depth = max(getfield(lx, 'depth') + min(y_adjust, 0), node_depth)
-	       adj_depth = (y_adjust>0) and max(getfield(lp, 'depth') + y_adjust, adj_depth) or adj_depth
+	       adj_depth = (y_adjust>0) and max(getfield(lx, 'depth') + y_adjust, adj_depth) or adj_depth
 	       setfield(lx, 'yoffset', getfield(lx, 'yoffset') - y_adjust)
 	    elseif lid==id_kern then
 	       local ls = getsubtype(lx)
@@ -633,7 +629,7 @@ do
       local s = Nx.last_char
       if s then
 	 if getid(s)==id_glyph then
-	    if getfont(s) == (has_attr(s, attr_curjfnt) or -1) then
+	    if getfield(s, 'lang') == lang_ja then
 	       set_np_xspc_jachar(Nx, s)
 	    else
 	       set_np_xspc_alchar(Nx, getchar(s), s, 2)

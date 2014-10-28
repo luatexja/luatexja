@@ -665,6 +665,7 @@ end
 -- MISC
 ------------------------------------------------------------------------
 do
+   local get_dir_count = ltjd.get_dir_count
    local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
    local tex_set_attr = tex.setattribute
    local font = font
@@ -677,7 +678,7 @@ do
 	 setfield(g, 'subtype', 1)
 	 set_attr(g, attr_icflag, ITALIC)
 	 if is_ucs_in_japanese_char(p) then
-	    f = has_attr(p, attr_curjfnt)
+	    f = has_attr(p, (get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
 	    local j = font_metric_table[f]
 	    setfield(g, 'kern', j.char_type[find_char_class(getchar(p), j)].italic)
 	 else

@@ -46,7 +46,7 @@ local id_glue_spec = node.id('glue_spec')
 local id_whatsit = node.id('whatsit')
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
-local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
+local lang_ja = token.create('ltj@@japanese')[2]
 
 local ltjf_font_metric_table = ltjf.font_metric_table
 local spec_zero_glue = ltjj.spec_zero_glue
@@ -189,7 +189,7 @@ local function aw_step1(p, res, total)
    --    and  ((xi == id_penalty) or (xi == id_kern) or (xi == id_kern)) do
    --       x = node_prev(x); xi = getid(x)
    -- end
-   if xi == id_glyph and has_attr(x, attr_curjfnt) == getfont(x) then
+   if xi == id_glyph and getfield(x, 'lang')==lang_ja then
       -- 和文文字
       xc = x
    elseif xi == id_hlist and get_attr_icflag(x) == PACKED then

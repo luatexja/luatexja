@@ -8,6 +8,8 @@ luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 luatexja.load_module('rmlgbm');    local ltjr = luatexja.rmlgbm
 luatexja.load_module('charrange'); local ltjc = luatexja.charrange
+luatexja.load_module('direction'); local ltjd = luatexja.direction
+luatexja.load_module('stack');     local ltjs = luatexja.stack
 
 local id_glyph = node.id('glyph')
 local id_whatsit = node.id('whatsit')
@@ -41,13 +43,18 @@ local node_traverse_id = Dnode.traverse_id
 local identifiers = fonts.hashes.identifiers
 
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
+local attr_curtfnt = luatexbase.attributes['ltj@curtfnt']
 local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
+local attr_tablshift = luatexbase.attributes['ltj@tablshift']
+local attr_tkblshift = luatexbase.attributes['ltj@tkblshift']
+local lang_ja = token.create('ltj@@japanese')[2]
 
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_find_char_class = ltjf.find_char_class
 local ltjr_cidfont_data = ltjr.cidfont_data
 local ltjc_is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char
+local ltjd_get_dir_count = ltjd.get_dir_count
 
 luatexja.userid_table.OTF = luatexbase.newuserwhatsitid('char_by_cid',  'luatexja')
 luatexja.userid_table.VSR = luatexbase.newuserwhatsitid('replace_vs',  'luatexja')
@@ -80,43 +87,51 @@ end
 -- This whatsit node will be extracted to a glyph_node
 local function append_jglyph(char)
    local p = node_new(id_whatsit,sid_user)
-   local v = tex.attribute[attr_curjfnt]
    setfield(p, 'user_id', OTF)
    setfield(p, 'type', 100)
    setfield(p, 'value', char)
-   set_attr(p, attr_yablshift, tex.attribute[attr_ykblshift])
    node_write(p)
 end
 
-local function cid(key)
-   if key==0 then return append_jglyph(char) end
-   local curjfnt = identifiers[tex.attribute[attr_curjfnt]]
-   if not curjfnt.cidinfo or
-      curjfnt.cidinfo.ordering ~= "Japan1" and
-      curjfnt.cidinfo.ordering ~= "GB1" and
-      curjfnt.cidinfo.ordering ~= "CNS1" and
-      curjfnt.cidinfo.ordering ~= "Korea1" then
---      ltjb.package_warning('luatexja-otf',
---			   'Current Japanese font (or other CJK font) "'
---			      ..curjfnt.psname..'" is not a CID-Keyed font (Adobe-Japan1 etc.)')
-      return append_jglyph(get_ucs_from_rmlgbm(key))
+local cid
+do
+   local dir_tate = luatexja.dir_table.dir_tate
+   local tex_get_attr = tex.getattribute
+   cid = function (key)
+      if key==0 then return append_jglyph(char) end
+      local curjfnt = identifiers[tex_get_attr((ltjd_get_dir_count()==dir_tate)
+                                                  and attr_curtfnt or attr_curjfnt)]
+      if not curjfnt.cidinfo or
+         curjfnt.cidinfo.ordering ~= "Japan1" and
+         curjfnt.cidinfo.ordering ~= "GB1" and
+         curjfnt.cidinfo.ordering ~= "CNS1" and
+         curjfnt.cidinfo.ordering ~= "Korea1" then
+         --      ltjb.package_warning('luatexja-otf',
+         --			   'Current Japanese font (or other CJK font) "'
+         --			      ..curjfnt.psname..'" is not a CID-Keyed font (Adobe-Japan1 etc.)')
+            return append_jglyph(get_ucs_from_rmlgbm(key))
+      end
+      local char = curjfnt.resources.unicodes[curjfnt.cidinfo.ordering..'.'..tostring(key)]
+      if not char then
+         ltjb.package_warning('luatexja-otf',
+                              'Current Japanese font (or other CJK font) "'
+                                 ..curjfnt.psname..'" does not have the specified CID character ('
+                                 ..tostring(key)..')',
+                              'Use a font including the specified CID character.')
+         char = 0
+      end
+      return append_jglyph(char)
    end
-   local char = curjfnt.resources.unicodes[curjfnt.cidinfo.ordering..'.'..tostring(key)]
-   if not char then
-      ltjb.package_warning('luatexja-otf',
-                           'Current Japanese font (or other CJK font) "'
-                              ..curjfnt.psname..'" does not have the specified CID character ('
-                              ..tostring(key)..')',
-                           'Use a font including the specified CID character.')
-      char = 0
-   end
-   return append_jglyph(char)
 end
 
 local function extract(head)
    head = to_direct(head)
    local p = head
    local v
+   local is_dir_tate = ltjs.list_dir == dir_tate
+   local attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
+   local attr_kblshift = is_dir_tate and attr_tkblshift or attr_ykblshift
+   local attr_curfnt =   is_dir_tate and attr_curtfnt or attr_curjfnt
    while p do
       if getid(p)==id_whatsit then
          if getsubtype(p)==sid_user then
@@ -125,14 +140,12 @@ local function extract(head)
                local g = node_new(id_glyph)
                setfield(g, 'subtype', 0)
 	       setfield(g, 'char', getfield(p, 'value'))
-               v = has_attr(p, attr_curjfnt); setfield(g, 'font',v)
-               set_attr(g, attr_curjfnt, puid==OTF and v or -1)
-               -- VSR yields ALchar
-               v = has_attr(p, attr_yablshift)
-               if v then
-                  set_attr(g, attr_yablshift, v)
+               v = has_attr(p, attr_curfnt); setfield(g, 'font',v)
+               if puid==OTF then
+                  setfield(g, 'lang', lang_ja)
+                  set_attr(g, attr_kblshift, has_attr(p, attr_kblshift))
                else
-                  unset_attr(g, attr_yablshift)
+                  set_attr(g, attr_ablshift, has_attr(p, attr_ablshift))
                end
                head = node_insert_after(head, p, g)
                head = node_remove(head, p)
@@ -290,8 +303,6 @@ do
       setfield(p, 'user_id', uid)
       setfield(p, 'type', 100)
       setfield(p, 'value', char)
-      set_attr(p, attr_curjfnt, pf)
-      set_attr(p, attr_yablshift, has_attr(bp, attr_ykblshift) or 0)
       return p
    end
 
@@ -314,7 +325,7 @@ do
 		  node_free(q)
                   if pt then
                      local np = ivs_jglyph(pt, p, pf,
-                                           (has_attr(p,attr_curjfnt) or 0)==pf and OTF or VSR)
+                                           (getfield(p, 'lang') or 0)==lang_ja and OTF or VSR)
                      head = node_insert_after(head, p, np)
                      head = node_remove(head,p)
 		     node_free(p)
