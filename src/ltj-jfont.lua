@@ -601,64 +601,147 @@ do
 
 end
 
+------------------------------------------------------------------------
+-- 追加のフォント情報
+------------------------------------------------------------------------
+font_extra_info = {}
+local font_extra_info = font_extra_info -- key: fontnumber
 
-------------------------------------------------------------------------
--- 縦書き用字形への変換テーブル
-------------------------------------------------------------------------
-local font_vert_table = {} -- key: fontnumber
+-- IVS and vertical metrics
+local prepare_fl_data
 do
-   local font_vert_basename = {} -- key: basename
+   local ivs -- temp table
+   local sort = table.sort
+   local function add_fl_table(dest, tg, unitable, glyphmax)
+      for i = 0, glyphmax-1 do
+	 if tg[i] then
+	    local gv = tg[i]
+	    if gv.altuni then
+	       for _,at in pairs(gv.altuni) do
+		  local bu, vsel = at.unicode, at.variant
+		  if vsel then
+		     if vsel>=0xE0100 then vsel = vsel - 0xE0100 end
+		     dest = dest or {}; dest[bu] = dest[bu] or {}
+		     local uniq_flag = true
+		     for i,_ in pairs(dest[bu]) do
+			if i==vs then uniq_flag = false; break end
+		     end
+		     if uniq_flag then
+			dest[bu][vsel] = unitable[gv.name]
+		     end
+		  end
+	       end
+	    end
+	 end
+      end
+      return dest
+   end
+   prepare_fl_data = function (dest, id, fname)
+      local fl = fontloader.open(fname)
+      local unicodes = id.resources.unicodes
+      if fl.glyphs then
+	 dest = add_fl_table(dest, fl.glyphs, id.resources.unicodes, fl.glyphmax)
+      end
+      if fl.subfonts then
+         for _,v in pairs(fl.subfonts) do
+            dest = add_fl_table(dest, v.glyphs, id.resources.unicodes, v.glyphmax)
+         end
+      end
+      fontloader.close(fl)
+      return dest
+   end
+end
+
+-- 縦書き用字形への変換テーブル
+local prepare_vert_data
+do
    local function add_feature_table(tname, src, dest)
       for i,v in pairs(src) do
 	 if type(v.slookups)=='table' then
 	    local s = v.slookups[tname]
-	    if s and not dest[i] then
-	       dest[i] = s
+	    if s  then
+	       if not dest then dest = {} end
+	       if not dest[i] then dest[i] = {} end
+	       dest[i].vert = dest[i].vert or s
 	    end
 	 end
       end
+      return dest
    end
-
-   local function prepare_vert_data(n, id)
-      -- test if already loaded
-      if type(id)=='number' then -- sometimes id is an integer
-         return
-      elseif (not id) or font_vert_table[n]  then return
-      end
-      local fname = id.filename
-      local bname = file.basename(fname)
-      if not fname then
-         font_vert_table[n] = {}; return
-      elseif font_vert_basename[bname] then
-         font_vert_table[n] = font_vert_basename[bname]; return
-      end
-      local vtable = {}
+   prepare_vert_data = function (dest, id) 
       local a = id.resources.sequences
       if a then
 	 local s = id.shared.rawdata.descriptions
 	 for i,v in pairs(a) do
-	    if v.features.vert then
-	       add_feature_table(v.subtables[1], s, vtable)
+	    if v.features.vert or v.features.vrt2 then
+	       dest= add_feature_table(v.subtables[1], s, dest)
 	    end
 	 end
       end
-      font_vert_basename[bname] = vtable
-      font_vert_table[n] = vtable
+      return dest
    end
    -- 縦書き用字形への変換
    function get_vert_glyph(n, chr)
-      local fn = font_vert_table[n]
-      return fn and fn[chr] or chr
+      local fn = font_extra_info[n]
+      return (fn and fn[chr] and fn[chr].vert) or chr
+   end
+end
+
+-- 
+do
+   local font_extra_basename = {} -- key: basename
+   local cache_ver = 2
+   local checksum = file.checksum
+
+   local function prepare_extra_data(n, id)
+      -- test if already loaded
+      if type(id)=='number' then -- sometimes id is an integer
+         return
+      elseif (not id) or font_extra_info[n]  then return
+      end
+      local fname = id.filename
+      local bname = file.basename(fname)
+      if not fname then
+         font_extra_info[n] = {}; return
+      elseif font_extra_basename[bname] then
+         font_extra_info[n] = font_extra_basename[bname]; return
+      end
+      -- if the cache is present, read it
+      local newsum = checksum(fname) -- MD5 checksum of the fontfile
+      local v = "extra_" .. string.lower(file.nameonly(fname))
+      local dat = ltjb.load_cache(v,
+         function (t) return (t.version~=cache_ver) or (t.chksum~=newsum) end
+      )
+      -- if the cache is not found or outdated, save the cache
+      if dat then
+	 font_extra_basename[bname] = dat[1] or {}
+      else
+	 local dat = nil
+	 dat = prepare_vert_data(dat, id)
+	 dat = prepare_fl_data(dat, id, fname)
+	 font_extra_basename[bname] = dat or {}
+	 ltjb.save_cache( v,
+			  {
+			     chksum = checksum(fname),
+			     version = cache_ver,
+			     dat,
+			  })
+      end
+      font_extra_info[n] = font_extra_basename[bname]
    end
    luatexbase.add_to_callback('luatexja.define_font',
 			      function (res, name, size, id)
-				 prepare_vert_data(id, res)
+				 prepare_extra_data(id, res)
 			      end,
-			      'prepare_vert_data', 1)
+			      'ltj.prepare_extra_data', 1)
 
-   local function a (n, dat) font_vert_table[n] = dat end
+   local function a (n, dat) font_extra_info[n] = dat end
    ltjr.vert_addfunc = a
 
+   local identifiers = fonts.hashes.identifiers
+   for i=1,font.nextid()-1 do
+      if identifiers[i] then prepare_extra_data(i, identifiers[i]) end
+   end
 end
 
 ------------------------------------------------------------------------
@@ -695,3 +778,4 @@ do
       end
    end
 end
+

@@ -40,7 +40,6 @@ local node_insert_after = Dnode.insert_after
 local node_write = Dnode.write
 local node_traverse_id = Dnode.traverse_id
 
-local identifiers = fonts.hashes.identifiers
 
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_curtfnt = luatexbase.attributes['ltj@curtfnt']
@@ -49,8 +48,10 @@ local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 local attr_tablshift = luatexbase.attributes['ltj@tablshift']
 local attr_tkblshift = luatexbase.attributes['ltj@tkblshift']
 local lang_ja = token.create('ltj@@japanese')[2]
+local identifiers = fonts.hashes.identifiers
 
 local ltjf_font_metric_table = ltjf.font_metric_table
+local ltjf_font_extra_info = ltjf.font_extra_info
 local ltjf_find_char_class = ltjf.find_char_class
 local ltjr_cidfont_data = ltjr.cidfont_data
 local ltjc_is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char
@@ -210,93 +211,9 @@ luatexbase.add_to_callback("luatexja.find_char_class",
 			   cid_set_char_class, "ltj.otf.find_char_class", 1)
 
 -------------------- IVS
-local font_ivs_table = {} -- key: fontnumber
 local enable_ivs
 do
    local is_ivs_enabled = false
-   local ivs -- temp table
-   local sort = table.sort
-   local uniq_flag
-   local function add_ivs_table(tg, unitable, glyphmax)
-      for i = 0, glyphmax-1 do
-	 if tg[i] then
-	    local gv = tg[i]
-	    if gv.altuni then
-	       for _,at in pairs(gv.altuni) do
-		  local bu, vsel = at.unicode, at.variant
-		  if vsel then
-		     if vsel>=0xE0100 then vsel = vsel - 0xE0100 end
-		     if not ivs[bu] then ivs[bu] = {} end
-		     uniq_flag = true
-		     for i,_ in pairs(ivs[bu]) do
-			if i==vs then uniq_flag = false; break end
-		     end
-		     if uniq_flag then
-			ivs[bu][vsel] = unitable[gv.name]
-		     end
-		  end
-	       end
-	    end
-	 end
-      end
-   end
-   local function make_ivs_table(id, fname)
-      ivs = {}
-      local fl = fontloader.open(fname)
-      local unicodes = id.resources.unicodes
-      if fl.glyphs then
-	 add_ivs_table(fl.glyphs, id.resources.unicodes, fl.glyphmax)
-      end
-      if fl.subfonts then
-         for _,v in pairs(fl.subfonts) do
-            add_ivs_table(v.glyphs, id.resources.unicodes, v.glyphmax)
-         end
-      end
-      fontloader.close(fl)
-      return ivs
-   end
-
--- loading and saving
-   local font_ivs_basename = {} -- key: basename
-   local cache_ver = 4
-   local checksum = file.checksum
-
-   local function prepare_ivs_data(n, id)
-      -- test if already loaded
-      if type(id)=='number' then -- sometimes id is an integer
-         font_ivs_table[n] = font_ivs_table[id]; return
-      elseif not id then return
-      end
-      local fname = id.filename
-      local bname = file.basename(fname)
-      if not fname then
-         font_ivs_table[n] = {}; return
-      elseif font_ivs_basename[bname] then
-         font_ivs_table[n] = font_ivs_basename[bname]; return
-      end
-
-      -- if the cache is present, read it
-      local newsum = checksum(fname) -- MD5 checksum of the fontfile
-      local v = "ivs_" .. string.lower(file.nameonly(fname))
-      local dat = ltjb.load_cache(v,
-         function (t) return (t.version~=cache_ver) or (t.chksum~=newsum) end
-      )
-      -- if the cache is not found or outdated, save the cache
-      if dat then
-	 font_ivs_basename[bname] = dat[1] or {}
-      else
-	 dat = make_ivs_table(id, fname)
-	 font_ivs_basename[bname] = dat or {}
-	 ltjb.save_cache( v,
-			  {
-			     chksum = checksum(fname),
-			     version = cache_ver,
-			     dat,
-			  })
-      end
-      font_ivs_table[n] = font_ivs_basename[bname]
-   end
-
 -- 組版時
    local function ivs_jglyph(char, bp, pf, uid)
       local p = node_new(id_whatsit,sid_user)
@@ -323,7 +240,7 @@ do
                if (qc>=0xFE00 and qc<=0xFE0F) or (qc>=0xE0100 and qc<0xE01F0) then
                   -- q is a variation selector
                   if qc>=0xE0100 then qc = qc - 0xE0100 end
-                  local pt = font_ivs_table[pf]
+                  local pt = ltjf_font_extra_info[pf]
                   pt = pt and pt[getchar(p)];  pt = pt and  pt[qc]
                   head, r = node_remove(head,q)
 		  node_free(q)
@@ -366,20 +283,6 @@ do
 				    do_ivs_repr, 'do_ivs', 
 				    luatexbase.priority_in_callback('pre_linebreak_filter',
 								    'ltj.pre_linebreak_filter_pre')+1)
-	 local ivs_callback = function (name, size, id)
-	    return font_callback(
-	       name, size, id,
-	       function (name, size, id) return luatexja.font_callback(name, size, id) end
-	    )
-	 end
-	 luatexbase.add_to_callback('luatexja.define_font',
-				    function (res, name, size, id)
-				       prepare_ivs_data(id, res)
-				    end,
-				    'prepare_ivs_data', 1)
-	 for i=1,font.nextid()-1 do
-	    if identifiers[i] then prepare_ivs_data(i, identifiers[i]) end
-	 end
 	 is_ivs_enabled = true
       end
    end
@@ -388,7 +291,6 @@ end
 luatexja.otf = {
   append_jglyph = append_jglyph,
   enable_ivs = enable_ivs,  -- 隠し機能: IVS
-  font_ivs_table = font_ivs_table,
   cid = cid,
 }
 
