@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec-24}[2014/06/25 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec-24}[2014/10/29 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e,luatexja}
 \ExplSyntaxOn
 
@@ -363,52 +363,14 @@
 
 \ExplSyntaxOff
 %%%%%%%% Now we completely ignore kanjifont definition file.
-
-\DeclareRobustCommand\fontfamily[1]{%
-  \@notkfamfalse\@notffamfalse
-  \edef\tmp@item{'\luatexluaescapestring{#1}'}%
-  \edef\tmp@enc{'\luatexluaescapestring{\f@encoding}'}%
-  \ifcsname \k@encoding+#1\endcsname % if \k@encoding+#1 is already defined
-    \edef\k@family{#1}%
-  \else\@notkfamtrue\fi
-  \ifcsname \f@encoding+#1\endcsname
-    \edef\f@family{#1}%
-  \else % search font definition file...
-    \directlua{luatexja.jfont.is_ffam(\tmp@enc, \tmp@item)}%
-    \ifin@\edef\k@family{#1}\else%
-      \directlua{luatexja.jfont.is_Nffam(\tmp@enc, \tmp@item)}%
-      \ifin@\@notffamtrue\else%
-        % filename of font definition file is always lowercase
-        \edef\@temp{\lowercase{\noexpand\IfFileExists{\f@encoding#1.fd}}}%
-        \message{(I search font definition file)}%
-        \@temp{\@tempswztrue}{\@tempswzfalse}%
-        \if@tempswz
-          \directlua{luatexja.jfont.add_ffam_list(\tmp@enc, \tmp@item)}%
-   	  \edef\f@family{#1}%
-        \else
-          \directlua{luatexja.jfont.add_Nffam_list(\tmp@enc, \tmp@item)}%
-	  \@notffamtrue%
-        \fi
-      \fi
-    \fi
-  \fi
-  \if@notkfam\if@notffam
-      {\ifcsname D@\k@encoding\endcsname\@nameuse{D@\k@encoding}\fi
-        \xdef\@@temp{\default@family}}\edef\k@family{\@@temp}%
-      {\ifcsname D@\f@encoding\endcsname\@nameuse{D@\f@encoding}\fi
-        \xdef\@@temp{\default@family}}\edef\f@family{\@@temp}%
-  \fi\fi
-}
+\@ltj@use@fdfalse
 
 % We must redefine \try@load@fontshape to ignore kanjifont definitions at all.
 \def\try@load@fontshape{%
    \expandafter
    \ifx\csname \f@encoding+\f@family\endcsname\relax
        \directlua{luatexja.jfont.is_kenc('\luatexluaescapestring{\f@encoding}')}%
-\ifin@ % Japanese font: we don't search fd.
-    \@font@warning{We don't search kanjifont definition
-      \MessageBreak for \f@encoding/\f@family}%
-\else % Alphabetic font
+\ifin@\else % Alphabetic font
     \@font@info{Try loading font information for \f@encoding+\f@family}%
     \global\expandafter\let
        \csname\f@encoding+\f@family\endcsname\@empty

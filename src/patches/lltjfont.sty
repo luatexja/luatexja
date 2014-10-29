@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2014/01/23 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2014/10/29 Patch to NFSS2 for LuaTeX-ja]
 
 \let\k@encoding\@empty
 \let\ck@encoding\@empty
@@ -443,6 +443,8 @@
 \newif\if@notkfam
 \newif\if@notffam
 \newif\if@tempswz
+\newif\if@ltj@use@fd
+\@ltj@use@fdtrue
 \DeclareRobustCommand\romanfamily[1]{\edef\f@family{#1}}
 \DeclareRobustCommand\kanjifamily[1]{\edef\k@family{#1}}
 \DeclareRobustCommand\fontfamily[1]{%
@@ -451,7 +453,8 @@
   \edef\tmp@enc{'\luatexluaescapestring{\k@encoding}'}%
   \ifcsname \k@encoding+#1\endcsname % if \k@encoding+#1 is already defined
     \edef\k@family{#1}%
-  \else % search font definition file...
+  \else\if@ltj@use@fd
+     % search font definition file...
      \directlua{luatexja.jfont.is_kfam(\tmp@enc, \tmp@item)}%
      \ifin@\edef\k@family{#1}\else%
        \directlua{luatexja.jfont.is_Nkfam(\tmp@enc, \tmp@item)}%
@@ -469,7 +472,9 @@
          \fi
        \fi
      \fi
-  \fi
+  \else % do not use font definition file
+     \@notkfamtrue%
+  \fi\fi
   \edef\tmp@enc{'\luatexluaescapestring{\f@encoding}'}%
   \ifcsname \f@encoding+#1\endcsname
     \edef\f@family{#1}%
