@@ -190,6 +190,7 @@ do
       t.xkanjiskip = mult_table(metrics[j].xkanjiskip,sz)
       t.zw = round(metrics[j].zw*sz)
       t.zh = round(metrics[j].zh*sz)
+      t.size = sz
    end
 end
 
@@ -610,12 +611,23 @@ local font_extra_info = font_extra_info -- key: fontnumber
 -- IVS and vertical metrics
 local prepare_fl_data
 do
-   local ivs -- temp table
+
+   local fields = fontloader.fields
+   local function glyph_vmetric(glyph)
+      local flds = fields(glyph)
+      local vw, tsb = nil, nil
+      for _,i in ipairs(flds) do
+	 if i=='vwidth' then vw = glyph.vwidth end
+	 if i=='tsidebearing' then tsb = glyph.tsidebearing end
+      end
+      return vw, tsb
+   end
+
    local sort = table.sort
-   local function add_fl_table(dest, tg, unitable, glyphmax)
+   local function add_fl_table(dest, tg, unitable, glyphmax, asc_des, units)
       for i = 0, glyphmax-1 do
-	 if tg[i] then
-	    local gv = tg[i]
+	 local gv = tg[i]
+	 if gv then
 	    if gv.altuni then
 	       for _,at in pairs(gv.altuni) do
 		  local bu, vsel = at.unicode, at.variant
@@ -632,6 +644,15 @@ do
 		  end
 	       end
 	    end
+	    local vw, tsb = glyph_vmetric(gv)
+	    if vw and vw~=asc_des then
+	    local gi = unitable[gv.name]
+	       -- We do not use tsidebearing, since fontloader does not read 
+	       -- VORG table. We assume that vertical origin == ascender
+	       -- (see capsule_glyph_tate in ltj-setwidth.lua)
+	       dest = dest or {}; dest[gi] = dest[gi] or {}
+	       dest[gi].vwidth = vw/units
+	    end
 	 end
       end
       return dest
@@ -640,11 +661,13 @@ do
       local fl = fontloader.open(fname)
       local unicodes = id.resources.unicodes
       if fl.glyphs then
-	 dest = add_fl_table(dest, fl.glyphs, id.resources.unicodes, fl.glyphmax)
+	 dest = add_fl_table(dest, fl.glyphs, id.resources.unicodes, fl.glyphmax,
+			     fl.ascent + fl.descent, fl.units_per_em)
       end
       if fl.subfonts then
          for _,v in pairs(fl.subfonts) do
-            dest = add_fl_table(dest, v.glyphs, id.resources.unicodes, v.glyphmax)
+            dest = add_fl_table(dest, v.glyphs, id.resources.unicodes, v.glyphmax,
+				fl.ascent + fl.descent, fl.units_per_em)
          end
       end
       fontloader.close(fl)

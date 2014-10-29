@@ -46,6 +46,7 @@ local attr_tkblshift = luatexbase.attributes['ltj@tkblshift']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 
 local ltjf_font_metric_table = ltjf.font_metric_table
+local ltjf_font_extra_info = ltjf.font_extra_info
 local ltjf_get_vert_glyph = ltjf.get_vert_glyph
 
 local PACKED       = luatexja.icflag_table.PACKED
@@ -144,13 +145,19 @@ local function capsule_glyph_tate(p, met, class, head, dir)
    local char_data = met.char_type[class]
    if not char_data then return node_next(p), head end
    local ascent, descent = met.ascent, met.descent
-   local fwidth, pwidth = char_data.width, ascent + descent
+   local fwidth, pwidth = char_data.width
+   do
+      local pf = getfont(p)
+      local pc = ltjf_get_vert_glyph(pf, getchar(p))
+      setfield(p, 'char', pc)
+      pwidth = ltjf_font_extra_info[pf] and   ltjf_font_extra_info[pf][pc] 
+	 and ltjf_font_extra_info[pf][pc].vwidth 
+	 and ltjf_font_extra_info[pf][pc].vwidth * met.size or (ascent+descent)
+   end
    fwidth = (fwidth ~= 'prop') and fwidth or pwidth
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = call_callback("luatexja.set_width", fshift, met, class)
    local fheight, fdepth = char_data.height, char_data.depth
-
-   setfield(p, 'char', ltjf_get_vert_glyph(getfont(p), getchar(p)))
 
    local y_shift
       = - getfield(p, 'yoffset') + (has_attr(p,attr_tkblshift) or 0)
