@@ -55,6 +55,7 @@ local ltjf_find_char_class = ltjf.find_char_class
 local ltjr_cidfont_data = ltjr.cidfont_data
 local ltjc_is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char
 local ltjd_get_dir_count = ltjd.get_dir_count
+local dir_tate = luatexja.dir_table.dir_tate
 
 luatexja.userid_table.OTF = luatexbase.newuserwhatsitid('char_by_cid',  'luatexja')
 luatexja.userid_table.VSR = luatexbase.newuserwhatsitid('replace_vs',  'luatexja')
@@ -95,7 +96,6 @@ end
 
 local cid
 do
-   local dir_tate = luatexja.dir_table.dir_tate
    local tex_get_attr = tex.getattribute
    cid = function (key)
       if key==0 then return append_jglyph(char) end
@@ -309,6 +309,10 @@ do
    local function do_ivs_repr(head)
       head = to_direct(head)
       local p, r = head
+      local is_dir_tate = ltjs.list_dir == dir_tate
+      local attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
+      local attr_kblshift = is_dir_tate and attr_tkblshift or attr_ykblshift
+      local attr_curfnt =   is_dir_tate and attr_curtfnt or attr_curjfnt
       while p do
 	 local pid = getid(p)
 	 if pid==id_glyph then
@@ -324,8 +328,13 @@ do
                   head, r = node_remove(head,q)
 		  node_free(q)
                   if pt then
+		     local is_jachar = (getfield(p, 'lang')==lang_ja)
                      local np = ivs_jglyph(pt, p, pf,
-                                           (getfield(p, 'lang') or 0)==lang_ja and OTF or VSR)
+                                           is_jachar and OTF or VSR)
+		     if is_jachar then
+			set_attr(np, attr_curfnt, pf)
+			set_attr(np, attr_kblshift, has_attr(p, attr_kblshift))
+		     end
                      head = node_insert_after(head, p, np)
                      head = node_remove(head,p)
 		     node_free(p)
@@ -350,9 +359,13 @@ do
 			      'luatexja.otf.enable_ivs() was already called, so this call is ignored', '')
       else
 	 luatexbase.add_to_callback('hpack_filter',
-				    do_ivs_repr,'do_ivs', 1)
+				    do_ivs_repr,'do_ivs', 
+				    luatexbase.priority_in_callback('hpack_filter',
+								    'ltj.hpack_filter_pre')+1)
 	 luatexbase.add_to_callback('pre_linebreak_filter',
-				    do_ivs_repr, 'do_ivs', 1)
+				    do_ivs_repr, 'do_ivs', 
+				    luatexbase.priority_in_callback('pre_linebreak_filter',
+								    'ltj.pre_linebreak_filter_pre')+1)
 	 local ivs_callback = function (name, size, id)
 	    return font_callback(
 	       name, size, id,

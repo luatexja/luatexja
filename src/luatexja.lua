@@ -413,7 +413,7 @@ local function debug_show_node_X(p,print_fn, limit)
       if (p.shift or 0)~=0 then
          s = s .. ', shifted ' .. print_scaled(p.shift)
       end
-      if p.glue_sign or 0>= 1 then
+      if p.glue_set and p.glue_sign ==2 or ( p.glue_sign==1 and p.glue_set>0) then
          s = s .. ' glue set '
          if p.glue_sign == 2 then s = s .. '-' end
          s = s .. tostring(floor(p.glue_set*10000)/10000)

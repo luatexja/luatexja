@@ -1095,7 +1095,6 @@ do
       end
       setfield(shipout_temp, 'head', a)
       finalize_inner(shipout_temp)
-      --luatexja.ext_show_node(to_node(shipout_temp), '> ', print,4)
       setbox('global', "AtBeginShipoutBox", copy(getlist(shipout_temp)))
       setfield(shipout_temp, 'head',nil)
    end

@@ -43,6 +43,7 @@ local attr_curtfnt = luatexbase.attributes['ltj@curtfnt']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 
 local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
+--local ltjs_orig_char_table = ltjs.orig_char_table
 local ltjf_get_vert_glyph = ltjf.get_vert_glyph
 local ltjf_replace_altfont = ltjf.replace_altfont
 local attr_orig_char = luatexbase.attributes['ltj@origchar']
@@ -61,15 +62,14 @@ do
    local start_time_measure, stop_time_measure
       = ltjb.start_time_measure, ltjb.stop_time_measure
    local head
-   local is_dir_tate
    local suppress_hyphenate_ja_aux = {}
    suppress_hyphenate_ja_aux[id_glyph] = function(p)
       if (has_attr(p, attr_icflag) or 0)<=0 and is_ucs_in_japanese_char(p) then
          local pc = getchar(p)
 	 local pf = ltjf_replace_altfont(has_attr(p, attr_curjfnt) or getfont(p), pc)
-	 setfield(p, 'font', pf);  --set_attr(p, attr_curjfnt, pf)
+	 setfield(p, 'font', pf)
 	 setfield(p, 'lang', lang_ja)
-         set_attr(p, attr_orig_char, pc)
+	 set_attr(p, attr_orig_char, pc)
       end
       return p
    end
@@ -126,8 +126,7 @@ local function set_box_stack_level(head, mode)
    for _,p  in pairs(wtd) do
       node_free(p)
    end
-   is_dir_tate = ltjs.list_dir == dir_tate
-   if is_dir_tate then
+   if ltjs.list_dir == dir_tate then
       for p in Dnode.traverse_id(id_glyph,to_direct(head)) do
          if (has_attr(p, attr_icflag) or 0)<=0 and getfield(p, 'lang')==lang_ja then
             local pfn = has_attr(p, attr_curtfnt) or getfont(p)
@@ -155,4 +154,5 @@ luatexbase.add_to_callback('pre_linebreak_filter',
 
 luatexja.pretreat = {
    set_box_stack_level = set_box_stack_level,
+   orig_char_table = orig_char_table,
 }

@@ -300,7 +300,7 @@ local function calc_np_pbox(lp, last)
    while lp ~=last and (lpa>=PACKED) and (lpa<BOXBDD) do
       if getid(lp)==id_hlist or getid(lp)==id_vlist then
 	 head, lp, nc = ltjd_make_dir_whatsit(head, lp, list_dir, 'jfm pbox')
-	 if first then Np.first = nc end
+	 Np.first = first and nc or Np.first
       else
 	 nc, lp = lp, node_next(lp)
       end
@@ -308,7 +308,9 @@ local function calc_np_pbox(lp, last)
      -- get_attr_icflag() ではいけない！
    end
    Np.nuc = nc
-   return check_next_ickern(lp)
+   lp = check_next_ickern(lp)
+   Np.last_char = check_box_high(Np, Np.first, lp)
+   return lp
 end
 
 local ltjw_apply_ashift_math = ltjw.apply_ashift_math
@@ -484,6 +486,7 @@ local calc_np_auxtable = {
       Np.first, Np.nuc, Np.last = (Np.first or lp), lp, lp;
       Np.id = getid(lp); set_attr(lp, attr_icflag, PROCESSED)
       ltjw_apply_ashift_disc(lp, (list_dir==dir_tate), tex_dir)
+      Np.last_char = check_box_high(Np, getfield(lp, 'replace'), nil)
       return true, node_next(lp)
    end,
    [id_kern] = function(lp)
@@ -610,18 +613,6 @@ do
       Nx.auto_xspc = (has_attr(x, attr_autoxspc)==1)
    end
    local set_np_xspc_alchar = set_np_xspc_alchar
-
--- Np の情報取得メインルーチン
-   extract_np = function ()
-      local x, i = Np.nuc, Np.id;
---      if i ==  id_jglyph then return set_np_xspc_jachar(Np, x)
---      elseif i == id_glyph then return set_np_xspc_alchar(Np, getchar(x), x, 1)
---      if i == id_hlist then Np.last_char = check_box_high(Np, getlist(x), nil)
-      if i == id_pbox then Np.last_char = check_box_high(Np, Np.first, node_next(Np.last))
-      elseif i == id_disc then Np.last_char = check_box_high(Np, getfield(x, 'replace'), nil)
---      elseif i == id_math then return set_np_xspc_alchar(Np, -1, x)
-      end
-   end
 
    -- change the information for the next loop
    -- (will be done if Nx is an alphabetic character or a hlist)
@@ -1128,13 +1119,12 @@ function main(ahead, mode, dir)
    local lp, last, par_indented = init_var(mode,dir)
    lp = calc_np(lp, last)
    if Np then
-      extract_np(); handle_list_head(par_indented)
+      handle_list_head(par_indented)
    else
       return cleanup(mode)
    end
    lp = calc_np(lp, last)
    while Np do
-      extract_np();
       adjust_nq();
       local pid, pm = Np.id, Np.met
       -- 挿入部

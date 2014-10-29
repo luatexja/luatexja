@@ -127,4 +127,18 @@ MJ番号を直接指定していたところは，このソース中では無視
 江戸川区葛西はどっち？
 \end{lstlisting}
 
+
+\def\test{あいうえお
+  {\ltjsetparameter{yjabaselineshift=-2pt,tjabaselineshift=2pt}%
+  \vrule 葛葛󠄀城市と葛󠄁飾区\CID{200}}あ}
+\catcode`\@=11
+\ltjsetparameter{kanjiskip=4pt}
+
+\hbox{\jfont\F=KozMinPr6N-Regular:jfm=ujis at 12pt \F\CID{200}\test}
+
+\hrule
+
+\hbox{\tate\tfont\F=KozMinPr6N-Regular:jfm=ujisv at 12pt \F\CID{200}\test}
+
+
 \end{document}
