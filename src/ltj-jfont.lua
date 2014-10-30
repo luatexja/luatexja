@@ -671,8 +671,8 @@ do
       end
       return dest
    end
-   prepare_fl_data = function (dest, id, fname)
-      local fl = fontloader.open(fname)
+   prepare_fl_data = function (dest, id)
+      local fl = fontloader.open(id.filename)
       local unicodes = id.resources.unicodes
       if fl.glyphs then
 	 dest = add_fl_table(dest, fl.glyphs, id.resources.unicodes, fl.glyphmax,
@@ -687,24 +687,20 @@ do
       fontloader.close(fl)
       return dest
    end
-   -- supply vkern table: TODO
-   supply_vkern_table = function(id)
-      -- if not id then return end
-      -- local fname = id.filename
-      -- if not fname then return end
-      -- local bx = font_extra_basename[file.basename(fname)].vkerns
-      -- local desc = id.shared.rawdata.descriptions
-      -- if bx then
-      -- 	 for i,v in pairs(bx) do
-      -- 	    print(i)
-      -- 	    id.shared.rawdata.resources.lookuphash[i]
-      -- 	       =id.shared.rawdata.resources.lookuphash[i] or v
-      -- 	    for j,w in pairs(v) do
-      -- 	       desc[j].kerns = desc[j].kerns or {}
-      -- 	       desc[j].kerns[i] = w
-      -- 	    end
-      -- 	 end
-      -- end
+   -- supply vkern table
+   supply_vkern_table = function(id, bname)
+      local bx = font_extra_basename[bname].vkerns
+      local lookuphash =  id.resources.lookuphash
+      local desc = id.shared.rawdata.descriptions
+      if bx then
+	 for i,v in pairs(bx) do
+	    lookuphash[i] = lookuphash[i] or v
+	    for j,w in pairs(v) do
+	       desc[j].kerns = desc[j].kerns or {}
+	       desc[j].kerns[i] = w
+	    end
+	 end
+      end
    end
 end
 
@@ -748,48 +744,56 @@ do
    local cache_ver = 3
    local checksum = file.checksum
 
-   local function prepare_extra_data(n, id)
-      -- test if already loaded
-      if (not id) or font_extra_info[n]  then return
+   local function prepare_extra_data_base(id)
+      if not id or not id.resources then return end
+      local bname = file.nameonly(id.filename or '')
+	    print(bname, font_extra_basename[bname])
+      if bname and not font_extra_basename[bname] then
+	 -- if the cache is present, read it
+	 local newsum = checksum(id.filename) -- MD5 checksum of the fontfile
+	 local v = "extra_" .. string.lower(file.nameonly(id.filename))
+	 print(v)
+	 local dat = ltjb.load_cache(
+	    v,
+	    function (t) return (t.version~=cache_ver) or (t.chksum~=newsum) end
+	 )
+	 -- if the cache is not found or outdated, save the cache
+	 if dat then
+	    font_extra_basename[bname] = dat[1] or {}
+	 else
+	    local dat = nil
+	    dat = prepare_vert_data(dat, id)
+	    dat = prepare_fl_data(dat, id)
+	    font_extra_basename[bname] = dat or {}
+	    ltjb.save_cache( v,
+			     {
+				chksum = checksum(fname),
+				version = cache_ver,
+				dat,
+			     })
+	 end
+	 return bname
       end
-      local fname = id.filename
-      local bname = file.basename(fname)
-      if not fname then
-         font_extra_info[n] = {}; return
-      elseif font_extra_basename[bname] then
-         font_extra_info[n] = font_extra_basename[bname]; return
-      end
-      -- if the cache is present, read it
-      local newsum = checksum(fname) -- MD5 checksum of the fontfile
-      local v = "extra_" .. string.lower(file.nameonly(fname))
-      local dat = ltjb.load_cache(v,
-         function (t) return (t.version~=cache_ver) or (t.chksum~=newsum) end
-      )
-      -- if the cache is not found or outdated, save the cache
-      if dat then
-	 font_extra_basename[bname] = dat[1] or {}
-      else
-	 local dat = nil
-	 dat = prepare_vert_data(dat, id)
-	 dat = prepare_fl_data(dat, id, fname)
-	 font_extra_basename[bname] = dat or {}
-	 ltjb.save_cache( v,
-			  {
-			     chksum = checksum(fname),
-			     version = cache_ver,
-			     dat,
-			  })
-      end
-      font_extra_info[n] = font_extra_basename[bname]
    end
-   luatexbase.add_to_callback('luatexja.define_font',
-			      function (res, name, size, id)
-				 if type(res)~='number' then
-				    prepare_extra_data(id, res)
-				    supply_vkern_table(res)
-				 end
-			      end,
-			      'ltj.prepare_extra_data', 1)
+   local function prepare_extra_data_font(id, res)
+      if type(res)=='table' and res.filename then 
+	 font_extra_info[id] = font_extra_basename[file.nameonly(res.filename)]
+      end
+   end
+    luatexbase.add_to_callback(
+       'luaotfload.patch_font',
+       function (tfmdata)
+	  -- these function is executed one time per one fontfile
+	  local bname = prepare_extra_data_base(tfmdata)
+	  if bname then supply_vkern_table(tfmdata, bname) end
+       end,
+       'ltj.prepare_extra_data', 1)
+   luatexbase.add_to_callback(
+      'luatexja.define_font',
+      function (res, name, size, id)
+	 prepare_extra_data_font(id, res)
+      end,
+      'ltj.prepare_extra_data', 1)
 
    local function a (n, dat) font_extra_info[n] = dat end
    ltjr.vert_addfunc = a
@@ -797,8 +801,8 @@ do
    local identifiers = fonts.hashes.identifiers
    for i=1,font.nextid()-1 do
       if identifiers[i] then 
-	 prepare_extra_data(i, identifiers[i])
-	 supply_vkern_table(identifiers[i])
+	 prepare_extra_data_base(identifiers[i])
+	 prepare_extra_data_font(i,identifiers[i])
       end
    end
 end

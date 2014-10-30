@@ -156,7 +156,6 @@ local function capsule_glyph_tate(p, met, class, head, dir)
 	 and ltjf_font_extra_info[pf][pc].vwidth 
 	 and ltjf_font_extra_info[pf][pc].vwidth * met.size or (ascent+descent)
       pwidth = pwidth + (met.v_advance and met.v_advance[pc] or 0)
-      print(pc, met.v_advance[pc], getfield(p, 'yoffset'))
    end
    fwidth = (fwidth ~= 'prop') and fwidth or pwidth
    fshift.down = char_data.down; fshift.left = char_data.left
