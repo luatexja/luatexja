@@ -336,7 +336,9 @@ local function font_callback(name, size, id, fallback)
       return mk_rml(basename, size, id)
    else
       local tfmdata=fallback(name, size, id)
-      luatexbase.call_callback ("luaotfload.patch_font", tfmdata, name)
+      if type (tfmdata) == "table" and tfmdata.shared then
+        luatexbase.call_callback("luaotfload.patch_font", tfmdata, name)
+      end
       return tfmdata
    end
 end

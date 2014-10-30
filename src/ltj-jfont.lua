@@ -745,14 +745,12 @@ do
    local checksum = file.checksum
 
    local function prepare_extra_data_base(id)
-      if not id or not id.resources then return end
+      if not id then return end
       local bname = file.nameonly(id.filename or '')
-	    print(bname, font_extra_basename[bname])
-      if bname and not font_extra_basename[bname] then
+      if not font_extra_basename[bname] then
 	 -- if the cache is present, read it
 	 local newsum = checksum(id.filename) -- MD5 checksum of the fontfile
 	 local v = "extra_" .. string.lower(file.nameonly(id.filename))
-	 print(v)
 	 local dat = ltjb.load_cache(
 	    v,
 	    function (t) return (t.version~=cache_ver) or (t.chksum~=newsum) end
@@ -767,7 +765,7 @@ do
 	    font_extra_basename[bname] = dat or {}
 	    ltjb.save_cache( v,
 			     {
-				chksum = checksum(fname),
+				chksum = checksum(id.filename),
 				version = cache_ver,
 				dat,
 			     })
@@ -776,7 +774,7 @@ do
       end
    end
    local function prepare_extra_data_font(id, res)
-      if type(res)=='table' and res.filename then 
+      if type(res)=='table' and res.shared then 
 	 font_extra_info[id] = font_extra_basename[file.nameonly(res.filename)]
       end
    end
@@ -784,8 +782,8 @@ do
        'luaotfload.patch_font',
        function (tfmdata)
 	  -- these function is executed one time per one fontfile
-	  local bname = prepare_extra_data_base(tfmdata)
-	  if bname then supply_vkern_table(tfmdata, bname) end
+          local bname = prepare_extra_data_base(tfmdata)
+          if bname then supply_vkern_table(tfmdata, bname) end
        end,
        'ltj.prepare_extra_data', 1)
    luatexbase.add_to_callback(
