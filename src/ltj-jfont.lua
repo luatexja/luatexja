@@ -607,22 +607,24 @@ end
 ------------------------------------------------------------------------
 font_extra_info = {}
 local font_extra_info = font_extra_info -- key: fontnumber
+local font_extra_basename = {} -- key: basename
 
 -- IVS and vertical metrics
 local prepare_fl_data
+local supply_vkern_table
 do
-
    local fields = fontloader.fields
    local function glyph_vmetric(glyph)
       local flds = fields(glyph)
-      local vw, tsb = nil, nil
+      local vw, tsb, vk = nil, nil, nil
       for _,i in ipairs(flds) do
 	 if i=='vwidth' then vw = glyph.vwidth end
 	 if i=='tsidebearing' then tsb = glyph.tsidebearing end
+	 if i=='vkerns' then vk = glyph.vkerns end
       end
-      return vw, tsb
+      return vw, tsb, vk
    end
-
+   
    local sort = table.sort
    local function add_fl_table(dest, tg, unitable, glyphmax, asc_des, units)
       for i = 0, glyphmax-1 do
@@ -644,14 +646,26 @@ do
 		  end
 	       end
 	    end
-	    local vw, tsb = glyph_vmetric(gv)
-	    if vw and vw~=asc_des then
+	    -- vertical metric
+	    local vw, tsb, vk = glyph_vmetric(gv)
 	    local gi = unitable[gv.name]
-	       -- We do not use tsidebearing, since fontloader does not read 
-	       -- VORG table. We assume that vertical origin == ascender
+	    if vw and vw~=asc_des then
+	       -- We do not use tsidebearing, since (1) fontloader does not read VORG table
+	       -- and (2) 'tsidebearing' doea not appear in the returned table by fontloader.fields.
+	       -- Hence, we assume that vertical origin == ascender
 	       -- (see capsule_glyph_tate in ltj-setwidth.lua)
 	       dest = dest or {}; dest[gi] = dest[gi] or {}
 	       dest[gi].vwidth = vw/units
+	    end
+	    -- vertical kern
+	    if vk then
+	       dest = dest or {}; 
+	       local dest_vk = dest.vkerns or {}; dest.vkerns = dest_vk
+	       for _,v in pairs(vk) do
+		  dest_vk[v.lookup] = dest_vk[v.lookup] or {}
+		  dest_vk[v.lookup][gi] = dest_vk[v.lookup][gi] or {}
+		  dest_vk[v.lookup][gi][unitable[v.char]] = v.off
+	       end
 	    end
 	 end
       end
@@ -673,6 +687,25 @@ do
       fontloader.close(fl)
       return dest
    end
+   -- supply vkern table: TODO
+   supply_vkern_table = function(id)
+      -- if not id then return end
+      -- local fname = id.filename
+      -- if not fname then return end
+      -- local bx = font_extra_basename[file.basename(fname)].vkerns
+      -- local desc = id.shared.rawdata.descriptions
+      -- if bx then
+      -- 	 for i,v in pairs(bx) do
+      -- 	    print(i)
+      -- 	    id.shared.rawdata.resources.lookuphash[i]
+      -- 	       =id.shared.rawdata.resources.lookuphash[i] or v
+      -- 	    for j,w in pairs(v) do
+      -- 	       desc[j].kerns = desc[j].kerns or {}
+      -- 	       desc[j].kerns[i] = w
+      -- 	    end
+      -- 	 end
+      -- end
+   end
 end
 
 -- 縦書き用字形への変換テーブル
@@ -683,8 +716,8 @@ do
 	 if type(v.slookups)=='table' then
 	    local s = v.slookups[tname]
 	    if s  then
-	       if not dest then dest = {} end
-	       if not dest[i] then dest[i] = {} end
+	       dest = dest or {}
+	       dest[i] = dest[i]  or {}
 	       dest[i].vert = dest[i].vert or s
 	    end
 	 end
@@ -712,15 +745,12 @@ end
 
 -- 
 do
-   local font_extra_basename = {} -- key: basename
-   local cache_ver = 2
+   local cache_ver = 3
    local checksum = file.checksum
 
    local function prepare_extra_data(n, id)
       -- test if already loaded
-      if type(id)=='number' then -- sometimes id is an integer
-         return
-      elseif (not id) or font_extra_info[n]  then return
+      if (not id) or font_extra_info[n]  then return
       end
       local fname = id.filename
       local bname = file.basename(fname)
@@ -754,7 +784,10 @@ do
    end
    luatexbase.add_to_callback('luatexja.define_font',
 			      function (res, name, size, id)
-				 prepare_extra_data(id, res)
+				 if type(res)~='number' then
+				    prepare_extra_data(id, res)
+				    supply_vkern_table(res)
+				 end
 			      end,
 			      'ltj.prepare_extra_data', 1)
 
@@ -763,10 +796,56 @@ do
 
    local identifiers = fonts.hashes.identifiers
    for i=1,font.nextid()-1 do
-      if identifiers[i] then prepare_extra_data(i, identifiers[i]) end
+      if identifiers[i] then 
+	 prepare_extra_data(i, identifiers[i])
+	 supply_vkern_table(identifiers[i])
+      end
    end
 end
 
+
+------------------------------------------------------------------------
+-- calculate vadvance
+------------------------------------------------------------------------
+do
+   local function acc_feature(table_vadv, subtables, ft)
+      for char_num,v in pairs(ft.shared.rawdata.descriptions) do
+	 if v.slookups then
+	    for sn, sv in pairs(v.slookups) do
+	       if subtables[sn] and type(sv)=='table' and sv[4]~=0 then
+		  table_vadv[char_num] 
+		     = (table_vadv[char_num] or 0) + sv[4]
+	       end
+	    end
+	 end
+      end
+   end
+
+luatexbase.add_to_callback(
+   "luatexja.define_jfont", 
+   function (fmtable, fnum)
+      local vadv = {}; fmtable.v_advance = vadv
+      local ft = font_getfont(fnum)
+      local subtables = {}
+      for feat_name,v in pairs(ft.specification.features.normal) do
+      	 if v then
+      	    for _,i in pairs(ft.resources.sequences) do
+      	       if i.order[1]== feat_name and i.type == 'gpos_single' then
+		  for _,st in pairs(i.subtables) do
+		     subtables[st] = true
+		  end
+	       end
+      	    end
+      	 end
+      end
+      acc_feature(vadv, subtables, ft)
+      for i,v in pairs(vadv) do
+	 vadv[i]=vadv[i]/ft.units_per_em*fmtable.size
+      end
+      return fmtable 
+   end, 1, 'ltj.v_advance'
+)
+end
 ------------------------------------------------------------------------
 -- MISC
 ------------------------------------------------------------------------

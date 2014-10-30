@@ -328,6 +328,7 @@ do
       tex_set_attr('global', attr_icflag, 0)
       if gc == 'fin_row' then return head
       else
+            --luatexja.ext_show_node_list(head, 'T> ', print)
 	    start_time_measure('jfmglue')
 	    local p = ltjj.main(to_direct(head),mode, dir)
 	    stop_time_measure('jfmglue')

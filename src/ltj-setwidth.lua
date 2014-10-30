@@ -97,11 +97,11 @@ local function capsule_glyph_yoko(p, met, class, head, dir)
       if  ht_diff == 0 and dp_diff ==0 then -- offset only
 	 set_attr(p, attr_icflag, PROCESSED)
 	 setfield(p, 'xoffset', getfield(p, 'xoffset') - fshift.left)
-	 setfield(p, 'yoffset', - kbl - fshift.down)
+	 setfield(p, 'yoffset', getfield(p, 'yoffset') - kbl - fshift.down)
 	 return node_next(p), head, p
       elseif ht_diff >= 0 and dp_diff >=0 then -- rule
 	 local box = node_new(id_rule)
-	 setfield(p, 'yoffset', - kbl - fshift.down)
+	 setfield(p, 'yoffset', getfield(p, 'yoffset') - kbl - fshift.down)
 	 setfield(box, 'width', 0)
 	 setfield(box, 'height', fheight - kbl)
 	 setfield(box, 'depth', fdepth + kbl)
@@ -121,7 +121,9 @@ local function capsule_glyph_yoko(p, met, class, head, dir)
    if need_hbox then
       local q
       head, q = node_remove(head, p)
-      setfield(p, 'yoffset', -fshift.down); setfield(p, 'next', nil)
+      local box = node_new(id_hlist)
+      setfield(p, 'yoffset', getfield(p, 'yoffset') -fshift.down);
+      setfield(p, 'next', nil)
       setfield(p, 'xoffset', getfield(p, 'xoffset') 
 		  + char_data.align*(fwidth-pwidth) - fshift.left)
       local box = node_new(id_hlist)
@@ -148,11 +150,13 @@ local function capsule_glyph_tate(p, met, class, head, dir)
    local fwidth, pwidth = char_data.width
    do
       local pf = getfont(p)
-      local pc = ltjf_get_vert_glyph(pf, getchar(p))
+      local pc = getchar(p) -- ltjf_get_vert_glyph(pf, getchar(p))
       setfield(p, 'char', pc)
-      pwidth = ltjf_font_extra_info[pf] and   ltjf_font_extra_info[pf][pc] 
+      pwidth = ltjf_font_extra_info[pf] and  ltjf_font_extra_info[pf][pc] 
 	 and ltjf_font_extra_info[pf][pc].vwidth 
 	 and ltjf_font_extra_info[pf][pc].vwidth * met.size or (ascent+descent)
+      pwidth = pwidth + (met.v_advance and met.v_advance[pc] or 0)
+      print(pc, met.v_advance[pc], getfield(p, 'yoffset'))
    end
    fwidth = (fwidth ~= 'prop') and fwidth or pwidth
    fshift.down = char_data.down; fshift.left = char_data.left
@@ -160,7 +164,7 @@ local function capsule_glyph_tate(p, met, class, head, dir)
    local fheight, fdepth = char_data.height, char_data.depth
 
    local y_shift
-      = - getfield(p, 'yoffset') + (has_attr(p,attr_tkblshift) or 0)
+      = getfield(p, 'xoffset') + (has_attr(p,attr_tkblshift) or 0)
    local q
    head, q = node_remove(head, p)
    local box = node_new(id_hlist)
@@ -170,8 +174,8 @@ local function capsule_glyph_tate(p, met, class, head, dir)
    setfield(box, 'shift', y_shift)
    setfield(box, 'dir', dir)
 
-   setfield(p, 'xoffset', -fshift.down)
-   setfield(p, 'yoffset', - (getfield(p, 'xoffset') + ascent
+   setfield(p, 'xoffset', - fshift.down)
+   setfield(p, 'yoffset', getfield(p, 'yoffset') -(ascent
                                 + char_data.align*(fwidth-pwidth) - fshift.left) )
    local ws = node_new(id_whatsit, sid_save)
    local wm = node_new(id_whatsit, sid_matrix)

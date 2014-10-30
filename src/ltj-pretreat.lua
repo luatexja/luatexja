@@ -139,6 +139,7 @@ local function set_box_stack_level(head, mode)
          end
       end
    end
+   --luatexja.ext_show_node_list(head, 'S> ', print)
    return head
 end
 
