@@ -829,20 +829,22 @@ luatexbase.add_to_callback(
       local vadv = {}; fmtable.v_advance = vadv
       local ft = font_getfont(fnum)
       local subtables = {}
-      for feat_name,v in pairs(ft.specification.features.normal) do
-      	 if v then
-      	    for _,i in pairs(ft.resources.sequences) do
-      	       if i.order[1]== feat_name and i.type == 'gpos_single' then
-		  for _,st in pairs(i.subtables) do
-		     subtables[st] = true
+      if ft.specification then
+	 for feat_name,v in pairs(ft.specification.features.normal) do
+	    if v then
+	       for _,i in pairs(ft.resources.sequences) do
+		  if i.order[1]== feat_name and i.type == 'gpos_single' then
+		     for _,st in pairs(i.subtables) do
+			subtables[st] = true
+		     end
 		  end
 	       end
-      	    end
-      	 end
-      end
-      acc_feature(vadv, subtables, ft)
-      for i,v in pairs(vadv) do
-	 vadv[i]=vadv[i]/ft.units_per_em*fmtable.size
+	    end
+	 end
+	 acc_feature(vadv, subtables, ft)
+	 for i,v in pairs(vadv) do
+	    vadv[i]=vadv[i]/ft.units_per_em*fmtable.size
+	 end
       end
       return fmtable 
    end, 1, 'ltj.v_advance'

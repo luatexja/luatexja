@@ -111,6 +111,10 @@ function set_stack_skip(m,sp)
 end
 
 -- These three functions are used in ltj-jfmglue.lua.
+-- list_dir and orig_char_table are used in other lua files.
+orig_char_table = {}
+list_dir = nil -- dummy
+table_current_stack = nil -- dummy
 function report_stack_level(bsl)
    table_current_stack = charprop_stack_table[bsl]
    return bsl
@@ -129,12 +133,6 @@ function get_stack_table(mc, d, idx)
    local i = charprop_stack_table[idx][mc]
    return i or d
 end
-
---------------------------------------------------------------------------------
--- nest table (obeys TeX's semantic nest)
---------------------------------------------------------------------------------
-nest_table = {}
-local nest_table = nest_table
 
 
 -- EOF

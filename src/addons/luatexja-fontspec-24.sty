@@ -359,7 +359,12 @@
 }
 
 %%% CJKShape=JIS2004
-\__fontspec_define_feature_option:nnnnn{CJKShape}{JIS2004}{20}{5}{+jp04}
+\__fontspec_define_feature_option:nnnnn{CJKShape}{JIS2004}{20}{100}{+jp04}
+%%% CharacterWidth={VerticalAlternateProportional, VerticalAlternateHalf}
+\__fontspec_define_feature_option:nnnnn{CharacterWidth}{VerticalAlternateProportional}{22}{100}{+vpal}
+\__fontspec_define_feature_option:nnnnn{CharacterWidth}{VerticalAlternateHalf}{22}{101}{+vhal}
+\__fontspec_define_feature_option:nnnnn{Kerning}{Vertical}       {}{}{+vkrn}
+
 
 \ExplSyntaxOff
 %%%%%%%% Now we completely ignore kanjifont definition file.

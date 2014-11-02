@@ -43,7 +43,7 @@ local attr_curtfnt = luatexbase.attributes['ltj@curtfnt']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 
 local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
---local ltjs_orig_char_table = ltjs.orig_char_table
+local ltjs_orig_char_table = ltjs.orig_char_table
 local ltjf_get_vert_glyph = ltjf.get_vert_glyph
 local ltjf_replace_altfont = ltjf.replace_altfont
 local attr_orig_char = luatexbase.attributes['ltj@origchar']
@@ -67,9 +67,8 @@ do
       if (has_attr(p, attr_icflag) or 0)<=0 and is_ucs_in_japanese_char(p) then
          local pc = getchar(p)
 	 local pf = ltjf_replace_altfont(has_attr(p, attr_curjfnt) or getfont(p), pc)
-	 setfield(p, 'font', pf)
-	 setfield(p, 'lang', lang_ja)
-	 set_attr(p, attr_orig_char, pc)
+	 setfield(p, 'font', pf); setfield(p, 'lang', lang_ja)
+	 ltjs_orig_char_table[p] = pc
       end
       return p
    end
@@ -98,6 +97,9 @@ do
       local p = head
       for i = 1,#wt do wt[i]=nil end
       for i = 1,#wtd do wtd[i]=nil end
+      for i,_ in pairs(ltjs_orig_char_table) do
+	 ltjs_orig_char_table[i] = nil
+      end
       ltjs.list_dir=ltjd_get_dir_count()
       while p and p~=t do
 	 local pfunc = suppress_hyphenate_ja_aux[getid(p)]
@@ -130,13 +132,13 @@ local function set_box_stack_level(head, mode)
       for p in Dnode.traverse_id(id_glyph,to_direct(head)) do
          if (has_attr(p, attr_icflag) or 0)<=0 and getfield(p, 'lang')==lang_ja then
             local pfn = has_attr(p, attr_curtfnt) or getfont(p)
-            local pc = getchar(p)
+            local pc = ltjs_orig_char_table[p]
             local pf = ltjf_replace_altfont(pfn, pc)
-	    set_attr(p, attr_dir, pc)
-	    pc = ltjf_get_vert_glyph(pf, pc) or pc
-            setfield(p, 'char', pc); set_attr(p, attr_orig_char, pc)
-            setfield(p, 'font', pf); --set_attr(p, attr_curjfnt, pf)
-         end
+	    ltjs_orig_char_table[p] = { pc, ltjs_orig_char_table[p] }
+	    local xc = ltjf_get_vert_glyph(pf, pc) or pc
+            setfield(p, 'char', xc); setfield(p, 'font', pf);
+	    ltjs_orig_char_table[p] = { pc, xc }
+	 end
       end
    end
    --luatexja.ext_show_node_list(head, 'S> ', print)

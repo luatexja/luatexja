@@ -90,8 +90,8 @@ local tex_dir
 local attr_ablshift
 local set_np_xspc_jachar
 
-local attr_dir = luatexbase.attributes['ltj@dir']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
+local ltjs_orig_char_table = ltjs.orig_char_table
 
 local function get_attr_icflag(p)
    return (has_attr(p, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG
@@ -169,8 +169,8 @@ local head -- the head of current list
 local Np, Nq, Bp
 local widow_Bp, widow_Np -- \jcharwidowpenalty 挿入位置管理用
 
-local ihb_flag -- JFM グルー挿入抑止用 flag
-               -- on: \inhibitglue 指定時，hlist の周囲
+local non_ihb_flag -- JFM グルー挿入抑止用 flag
+-- false: \inhibitglue 指定時 true: それ以外
 
 -------------------- hlist 内の文字の検索
 
@@ -250,7 +250,7 @@ function check_box_high(Nx, box_ptr, box_end)
       if first_char then
          if getid(first_char)==id_glyph then
 	    if getfield(first_char, 'lang') == lang_ja then
-	       set_np_xspc_jachar(Nx, first_char)
+	       set_np_xspc_jachar_hbox(Nx, first_char)
 	    else
 	       set_np_xspc_alchar(Nx, getchar(first_char),first_char, 1)
 	    end
@@ -319,11 +319,11 @@ local min, max = math.min, math.max
 local function calc_np_aux_glyph_common(lp)
    Np.nuc = lp
    Np.id = npi
-   if getfield(lp, 'lang') == lang_ja then
+   if ltjs_orig_char_table[lp] then
       Np.id = id_jglyph
       set_np_xspc_jachar(Np, lp)
       local npi, npf
-      lp, head, npi, npf = capsule_glyph(lp, Np.met, Np.class, head, tex_dir)
+      lp, head, npi, npf = capsule_glyph(lp, Np.met, Np.class, head, tex_dir, lp)
       Np.first = (Np.first~=Np.nuc) and Np.first or npf or npi
       Np.nuc = npi
       return true, check_next_ickern(lp);
@@ -344,7 +344,7 @@ local function calc_np_aux_glyph_common(lp)
 	    lp=lx; break
 	 else
 	    local lid = getid(lx)
-	    if lid==id_glyph and getfield(lx, 'lang') ~= lang_ja then
+	    if lid==id_glyph and not ltjs_orig_char_table[lx] then
 	       -- 欧文文字
 	       last_glyph = lx; set_attr(lx, attr_icflag, PROCESSED); Np.last = lx
 	       y_adjust = has_attr(lx,attr_ablshift) or 0
@@ -443,7 +443,7 @@ local calc_np_auxtable = {
       if lps==sid_user then
 	 if getfield(lp, 'user_id')==luatexja.userid_table.IHB then
 	    local lq = node_next(lp);
-	    head = node_remove(head, lp); node_free(lp); ihb_flag = true
+	    head = node_remove(head, lp); node_free(lp); non_ihb_flag = false
 	    return false, lq;
 	 else
 	    set_attr(lp, attr_icflag, PROCESSED)
@@ -516,7 +516,7 @@ calc_np_auxtable[id_adjust] = calc_np_auxtable.skip
 function calc_np(lp, last)
    local k
    -- We assume lp = node_next(Np.last)
-   Np, Nq, ihb_flag = Nq, Np, nil
+   Np, Nq, non_ihb_flag = Nq, Np, true
    -- We clear `predefined' entries of Np before pairs() loop,
    -- because using only pairs() loop is slower.
    Np.post, Np.pre, Np.xspc = nil, nil, nil
@@ -561,13 +561,12 @@ do
 
 -- 和文文字のデータを取得
    local attr_jchar_class = luatexbase.attributes['ltj@charclass']
-   local attr_orig_char = luatexbase.attributes['ltj@origchar']
    local attr_autospc = luatexbase.attributes['ltj@autospc']
    local attr_autoxspc = luatexbase.attributes['ltj@autoxspc']
    function set_np_xspc_jachar_yoko(Nx, x)
       local m = ltjf_font_metric_table[getfont(x)]
-      local cls, c = slow_find_char_class(has_attr(x, attr_orig_char), m, getchar(x))
-      Nx.met, Nx.char = m, c; Nx.class = cls;
+      local cls, c = slow_find_char_class(ltjs_orig_char_table[x], m, getchar(x))
+      Nx.met = m; Nx.class = cls
       if cls~=0 then set_attr(x, attr_jchar_class, cls) end
       Nx.pre  = table_current_stack[PRE + c]  or 0
       Nx.post = table_current_stack[POST + c] or 0
@@ -578,12 +577,22 @@ do
    function set_np_xspc_jachar_tate(Nx, x)
       local m = ltjf_font_metric_table[getfont(x)]
       local cls, c
-      local c1, c2 = getchar(x), has_attr(x, attr_orig_char)
-      c = has_attr(x, attr_dir) or c1 or c2
+      local c1, c2 = getchar(x), ltjs_orig_char_table[x][1]
+      c = ltjs_orig_char_table[x][2] or c1 or c2
       cls = ltjf_find_char_class(c, m)
       if cls==0 then cls = slow_find_char_class(c2, m, c1) end
-      Nx.met, Nx.char = m, c; Nx.class = cls;
+      Nx.met = m; Nx.class = cls;
       if cls~=0 then set_attr(x, attr_jchar_class, cls) end
+      Nx.pre  = table_current_stack[PRE + c]  or 0
+      Nx.post = table_current_stack[POST + c] or 0
+      Nx.xspc = table_current_stack[XSP  + c] or 3
+      Nx.kcat = table_current_stack[KCAT + c] or 0
+      Nx.auto_kspc, Nx.auto_xspc = (has_attr(x, attr_autospc)==1), (has_attr(x, attr_autoxspc)==1)
+   end
+   local function set_np_xspc_jachar_hbox(Nx, x)
+      local m = ltjf_font_metric_table[getfont(x)]
+      local c = getchar(x)
+      Nx.met = m; Nx.class = has_attr(x, attr_jchar_class) or 0;
       Nx.pre  = table_current_stack[PRE + c]  or 0
       Nx.post = table_current_stack[POST + c] or 0
       Nx.xspc = table_current_stack[XSP  + c] or 3
@@ -604,9 +613,8 @@ do
 	 Nx.pre  = table_current_stack[PRE + c]  or 0
 	 Nx.post = table_current_stack[POST + c] or 0
 	 Nx.xspc = table_current_stack[XSP  + c] or 3
-	 Nx.char = 'jcharbdd'
       else
-	 Nx.pre, Nx.post, Nx.char = 0, 0, -1
+	 Nx.pre, Nx.post = 0, 0
          Nx.xspc = table_current_stack[XSP - 1] or 3
       end
       Nx.met = nil
@@ -621,7 +629,7 @@ do
       if s then
 	 if getid(s)==id_glyph then
 	    if getfield(s, 'lang') == lang_ja then
-	       set_np_xspc_jachar(Nx, s)
+	       set_np_xspc_jachar_hbox(Nx, s)
 	    else
 	       set_np_xspc_alchar(Nx, getchar(s), s, 2)
 	    end
@@ -824,22 +832,19 @@ do
 end
 
 local function calc_ja_ja_glue()
-   if  ihb_flag then return nil
+   local qm, pm = Nq.met, Np.met
+   if (qm.char_type==pm.char_type) and (qm.var==pm.var) then
+      return new_jfm_glue(qm, Nq.class, Np.class)
    else
-      local qm, pm = Nq.met, Np.met
-      if (qm.char_type==pm.char_type) and (qm.var==pm.var) then
-         return new_jfm_glue(qm, Nq.class, Np.class)
-      else
-         local npn, nqn = Np.nuc, Nq.nuc
-         local gb, db = new_jfm_glue(qm, Nq.class,
-				     slow_find_char_class(has_attr(npn, attr_orig_char),
-							  qm, getchar(npn)))
-         local ga, da = new_jfm_glue(pm,
-				     slow_find_char_class(has_attr(nqn, attr_orig_char),
-							  pm, getchar(nqn)),
-                               Np.class)
-         return calc_ja_ja_aux(gb, ga, db, da);
-      end
+      local npn, nqn = Np.nuc, Nq.nuc
+      local gb, db = new_jfm_glue(qm, Nq.class,
+				  slow_find_char_class(ltjs_orig_char_table[npn],
+						       qm, getchar(npn)))
+      local ga, da = new_jfm_glue(pm,
+				  slow_find_char_class(ltjs_orig_char_table[nqn],
+						       pm, getchar(nqn)),
+				  Np.class)
+      return calc_ja_ja_aux(gb, ga, db, da);
    end
 end
 
@@ -882,36 +887,30 @@ end
 -------------------- 隣接した「塊」間の処理
 
 local function get_OA_skip()
-   if not ihb_flag then
-      local pm = Np.met
-      return new_jfm_glue(pm,
-        fast_find_char_class(((Nq.id == id_math and -1) or (type(Nq.char)=='string' and Nq.char or 'jcharbdd')), pm), Np.class)
-   else return nil
-   end
+   local pm = Np.met
+   return new_jfm_glue(pm,
+		       fast_find_char_class((Nq.id == id_math and -1 or 'jcharbdd'), pm), Np.class)
 end
 local function get_OB_skip()
-   if not ihb_flag then
-      local qm = Nq.met
-      return new_jfm_glue(qm, Nq.class,
-        fast_find_char_class(((Np.id == id_math and -1) or'jcharbdd'), qm))
-   else return nil
-   end
+   local qm = Nq.met
+   return new_jfm_glue(qm, Nq.class,
+		       fast_find_char_class((Np.id == id_math and -1 or'jcharbdd'), qm))
 end
 
 -- (anything) .. jachar
 local function handle_np_jachar(mode)
    local qid = Nq.id
    if qid==id_jglyph or ((qid==id_pbox or qid==id_pbox_w) and Nq.met) then
-      local g = calc_ja_ja_glue() or get_kanjiskip() -- M->K
+      local g = non_ihb_flag and calc_ja_ja_glue() or get_kanjiskip() -- M->K
       handle_penalty_normal(Nq.post, Np.pre, g); real_insert(g)
    elseif Nq.met then  -- qid==id_hlist
-      local g = get_OA_skip() or get_kanjiskip() -- O_A->K
+      local g = non_ihb_flag and get_OA_skip() or get_kanjiskip() -- O_A->K
       handle_penalty_normal(0, Np.pre, g); real_insert(g)
    elseif Nq.pre then
-      local g = get_OA_skip() or get_xkanjiskip(Np) -- O_A->X
+      local g = non_ihb_flag and get_OA_skip() or get_xkanjiskip(Np) -- O_A->X
       handle_penalty_normal((qid==id_hlist and 0 or Nq.post), Np.pre, g); real_insert(g)
    else
-      local g = get_OA_skip() -- O_A
+      local g = non_ihb_flag and get_OA_skip() -- O_A
       if qid==id_glue then handle_penalty_normal(0, Np.pre, g)
       elseif qid==id_kern then handle_penalty_suppress(0, Np.pre, g)
       else handle_penalty_always(0, Np.pre, g)
@@ -927,10 +926,10 @@ end
 -- jachar .. (anything)
 local function handle_nq_jachar()
     if Np.pre then
-      local g = get_OB_skip() or get_xkanjiskip(Nq) -- O_B->X
+      local g = non_ihb_flag and get_OB_skip() or get_xkanjiskip(Nq) -- O_B->X
       handle_penalty_normal(Nq.post, (Np.id==id_hlist and 0 or Np.pre), g); real_insert(g)
    else
-      local g = get_OB_skip() -- O_B
+      local g =non_ihb_flag and  get_OB_skip() -- O_B
       if Np.id==id_glue then handle_penalty_normal(Nq.post, 0, g)
       elseif Np.id==id_kern then handle_penalty_suppress(Nq.post, 0, g)
       else handle_penalty_always(Nq.post, 0, g)
@@ -943,7 +942,7 @@ end
 local function handle_np_ja_hlist()
    local qid = Nq.id
    if qid==id_jglyph or ((qid==id_pbox or Nq.id == id_pbox_w) and Nq.met) then
-      local g = get_OB_skip() or get_kanjiskip() -- O_B->K
+      local g = non_ihb_flag and get_OB_skip() or get_kanjiskip() -- O_B->K
       handle_penalty_normal(Nq.post, 0, g); real_insert(g)
    elseif Nq.met then  -- Nq.id==id_hlist
       local g = get_kanjiskip() -- K
@@ -1015,7 +1014,7 @@ end
 local function handle_list_head(par_indented)
    local npi, pm = Np.id, Np.met
    if npi ==  id_jglyph or (npi==id_pbox and pm) then
-      if not ihb_flag then
+      if non_ihb_flag then
 	 local g = new_jfm_glue(pm, fast_find_char_class(par_indented, pm), Np.class)
 	 if g then
 	    set_attr(g, attr_icflag, BOXBDD)
