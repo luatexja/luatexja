@@ -89,6 +89,7 @@ local capsule_glyph
 local tex_dir
 local attr_ablshift
 local set_np_xspc_jachar
+local set_np_xspc_jachar_hbox
 
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local ltjs_orig_char_table = ltjs.orig_char_table
@@ -589,7 +590,7 @@ do
       Nx.kcat = table_current_stack[KCAT + c] or 0
       Nx.auto_kspc, Nx.auto_xspc = (has_attr(x, attr_autospc)==1), (has_attr(x, attr_autoxspc)==1)
    end
-   local function set_np_xspc_jachar_hbox(Nx, x)
+   function set_np_xspc_jachar_hbox(Nx, x)
       local m = ltjf_font_metric_table[getfont(x)]
       local c = getchar(x)
       Nx.met = m; Nx.class = has_attr(x, attr_jchar_class) or 0;
