@@ -662,9 +662,18 @@ do
 	       dest = dest or {}; 
 	       local dest_vk = dest.vkerns or {}; dest.vkerns = dest_vk
 	       for _,v in pairs(vk) do
-		  dest_vk[v.lookup] = dest_vk[v.lookup] or {}
-		  dest_vk[v.lookup][gi] = dest_vk[v.lookup][gi] or {}
-		  dest_vk[v.lookup][gi][unitable[v.char]] = v.off
+		  local vl = v.lookup
+		  if type(vl)=='table' then
+		     for _,vlt in pairs(vl) do
+			dest_vk[vlt] = dest_vk[vlt] or {}
+			dest_vk[vlt][gi] = dest_vk[vlt][gi] or {}
+			dest_vk[vlt][gi][unitable[v.char]] = v.off
+		     end
+		  else
+		     dest_vk[vl] = dest_vk[vl] or {}
+		     dest_vk[vl][gi] = dest_vk[vl][gi] or {}
+		     dest_vk[vl][gi][unitable[v.char]] = v.off
+		  end
 	       end
 	    end
 	 end
@@ -784,6 +793,7 @@ do
 	  -- these function is executed one time per one fontfile
           local bname = prepare_extra_data_base(tfmdata)
           if bname then supply_vkern_table(tfmdata, bname) end
+	  return tfmdata
        end,
        'ltj.prepare_extra_data', 1)
    luatexbase.add_to_callback(
