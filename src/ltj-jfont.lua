@@ -820,7 +820,7 @@ end
 -- calculate vadvance
 ------------------------------------------------------------------------
 do
-   local function acc_feature(table_vadv, table_vorg, subtables, ft)
+   local function acc_feature(table_vadv, table_vorg, subtables, ft,  already_vert)
       for char_num,v in pairs(ft.shared.rawdata.descriptions) do
 	 if v.slookups then
 	    for sn, sv in pairs(v.slookups) do
@@ -829,7 +829,7 @@ do
 		     table_vadv[char_num] 
 			= (table_vadv[char_num] or 0) + sv[4]
 		  end
-		  if sv[2]~=0 then 
+		  if sv[2]~=0 and not already_vert then 
 		     table_vorg[char_num] 
 			= (table_vorg[char_num] or 0) + sv[2]
 		  end
@@ -847,8 +847,6 @@ luatexbase.add_to_callback(
       local ft = font_getfont(fnum)
       local subtables = {}
       if ft.specification then
-	 ft.specification.features.normal.vrt2 = true
-	 ft.specification.features.normal.vert = true
 	 for feat_name,v in pairs(ft.specification.features.normal) do
 	    if v==true then
 	       for _,i in pairs(ft.resources.sequences) do
@@ -860,7 +858,8 @@ luatexbase.add_to_callback(
 	       end
 	    end
 	 end
-	 acc_feature(vadv, vorg, subtables, ft)
+	 acc_feature(vadv, vorg, subtables, ft, 
+		     ft.specification.features.normal.vrt2 or ft.specification.features.normal.vert)
 	 for i,v in pairs(vadv) do
 	    vadv[i]=vadv[i]/ft.units_per_em*fmtable.size
 	 end

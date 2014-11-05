@@ -110,7 +110,7 @@ local slow_find_char_class
 do
    local start_time_measure = ltjb.start_time_measure
    local stop_time_measure = ltjb.stop_time_measure
-   slow_find_char_class = function (c, m, oc,t )
+   slow_find_char_class = function (c, m, oc)
       local cls = ltjf_find_char_class(oc, m)
       if oc~=c and cls==0 then
 	 return ltjf_find_char_class(-c, m), oc
