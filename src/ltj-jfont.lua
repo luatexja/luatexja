@@ -750,7 +750,7 @@ end
 
 -- 
 do
-   local cache_ver = 3
+   local cache_ver = 5
    local checksum = file.checksum
 
    local function prepare_extra_data_base(id)
@@ -820,13 +820,19 @@ end
 -- calculate vadvance
 ------------------------------------------------------------------------
 do
-   local function acc_feature(table_vadv, subtables, ft)
+   local function acc_feature(table_vadv, table_vorg, subtables, ft)
       for char_num,v in pairs(ft.shared.rawdata.descriptions) do
 	 if v.slookups then
 	    for sn, sv in pairs(v.slookups) do
-	       if subtables[sn] and type(sv)=='table' and sv[4]~=0 then
-		  table_vadv[char_num] 
-		     = (table_vadv[char_num] or 0) + sv[4]
+	       if subtables[sn] and type(sv)=='table' then
+		  if sv[4]~=0 then 
+		     table_vadv[char_num] 
+			= (table_vadv[char_num] or 0) + sv[4]
+		  end
+		  if sv[2]~=0 then 
+		     table_vorg[char_num] 
+			= (table_vorg[char_num] or 0) + sv[2]
+		  end
 	       end
 	    end
 	 end
@@ -837,11 +843,14 @@ luatexbase.add_to_callback(
    "luatexja.define_jfont", 
    function (fmtable, fnum)
       local vadv = {}; fmtable.v_advance = vadv
+      local vorg = {}; fmtable.v_origin = vorg
       local ft = font_getfont(fnum)
       local subtables = {}
       if ft.specification then
+	 ft.specification.features.normal.vrt2 = true
+	 ft.specification.features.normal.vert = true
 	 for feat_name,v in pairs(ft.specification.features.normal) do
-	    if v then
+	    if v==true then
 	       for _,i in pairs(ft.resources.sequences) do
 		  if i.order[1]== feat_name and i.type == 'gpos_single' then
 		     for _,st in pairs(i.subtables) do
@@ -851,9 +860,12 @@ luatexbase.add_to_callback(
 	       end
 	    end
 	 end
-	 acc_feature(vadv, subtables, ft)
+	 acc_feature(vadv, vorg, subtables, ft)
 	 for i,v in pairs(vadv) do
 	    vadv[i]=vadv[i]/ft.units_per_em*fmtable.size
+	 end
+	 for i,v in pairs(vorg) do
+	    vorg[i]=vorg[i]/ft.units_per_em*fmtable.size
 	 end
       end
       return fmtable 

@@ -169,7 +169,7 @@ luatexja.jfont.define_jfm {
 	 "AJ1-593", "AJ1-594", "AJ1-595", "AJ1-596", "AJ1-597", "AJ1-598",
       },
       align = 'left', left = 0.0, down = 0.0,
-      width = 0.5, height = 0.50, depth = 0.50, italic=0.0,
+      width = 0.5, height = 0.5, depth = 0.5, italic=0.0,
       glue = {
 	 [1] = { 0.5 , 0.0, 0.5, 0, 1 },
 	 [2] = {0, 0, 0},

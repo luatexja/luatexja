@@ -44,7 +44,6 @@ local attr_icflag = luatexbase.attributes['ltj@icflag']
 
 local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
 local ltjs_orig_char_table = ltjs.orig_char_table
-local ltjf_get_vert_glyph = ltjf.get_vert_glyph
 local ltjf_replace_altfont = ltjf.replace_altfont
 local attr_orig_char = luatexbase.attributes['ltj@origchar']
 local STCK  = luatexja.userid_table.STCK
@@ -133,11 +132,7 @@ local function set_box_stack_level(head, mode)
          if (has_attr(p, attr_icflag) or 0)<=0 and getfield(p, 'lang')==lang_ja then
             local pfn = has_attr(p, attr_curtfnt) or getfont(p)
             local pc = ltjs_orig_char_table[p]
-            local pf = ltjf_replace_altfont(pfn, pc)
-	    ltjs_orig_char_table[p] = { pc, ltjs_orig_char_table[p] }
-	    local xc = ltjf_get_vert_glyph(pf, pc) or pc
-            setfield(p, 'char', xc); setfield(p, 'font', pf);
-	    ltjs_orig_char_table[p] = { pc, xc }
+	    setfield(p, 'font', ltjf_replace_altfont(pfn, pc))
 	 end
       end
    end

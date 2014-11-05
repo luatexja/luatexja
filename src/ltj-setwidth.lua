@@ -150,12 +150,13 @@ local function capsule_glyph_tate(p, met, class, head, dir)
    local fwidth, pwidth = char_data.width
    do
       local pf = getfont(p)
-      local pc = getchar(p) -- ltjf_get_vert_glyph(pf, getchar(p))
+      local pc = getchar(p)
       setfield(p, 'char', pc)
       pwidth = ltjf_font_extra_info[pf] and  ltjf_font_extra_info[pf][pc] 
 	 and ltjf_font_extra_info[pf][pc].vwidth 
 	 and ltjf_font_extra_info[pf][pc].vwidth * met.size or (ascent+descent)
-      pwidth = pwidth + (met.v_advance and met.v_advance[pc] or 0)
+      pwidth = pwidth + (met.v_advance[pc] or 0)
+      ascent = met.v_origin[pc] and ascent - met.v_origin[pc] or ascent
    end
    fwidth = (fwidth ~= 'prop') and fwidth or pwidth
    fshift.down = char_data.down; fshift.left = char_data.left
