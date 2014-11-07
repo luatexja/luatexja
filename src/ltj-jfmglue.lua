@@ -902,7 +902,7 @@ end
 local function handle_np_jachar(mode)
    local qid = Nq.id
    if qid==id_jglyph or ((qid==id_pbox or qid==id_pbox_w) and Nq.met) then
-      local g = non_ihb_flag and calc_ja_ja_glue() or get_kanjiskip() -- M->K
+       local g = non_ihb_flag and calc_ja_ja_glue() or get_kanjiskip() -- M->K
       handle_penalty_normal(Nq.post, Np.pre, g); real_insert(g)
    elseif Nq.met then  -- qid==id_hlist
       local g = non_ihb_flag and get_OA_skip() or get_kanjiskip() -- O_A->K
@@ -1173,11 +1173,6 @@ do
       if Np and Np.nuc then return Np
       elseif Np and getfield(lp, 'user_id') == BPAR then
          Np.first = lp; Np.nuc = lp; Np.last = lp
-         Np.char = 'parbdd'
-         Np.met = nil
-         Np.pre = 0; Np.post = 0
-         Np.xspc = 0
-         Np.auto_xspc = false
          return Np
       end
    end
@@ -1186,6 +1181,11 @@ do
        if not s and getfield(Nq.nuc, 'user_id') == BPAR then
          local x, y = node_prev(Nq.nuc), Nq.nuc
          Nq.first, Nq.nuc, Nq.last = x, x, x
+         if Np.met then
+            Nq.class = fast_find_char_class('parbdd', Np.met)
+         end
+         Nq.met = Np.met; Nq.pre = 0; Nq.post = 0; Nq.xspc = 0
+         Nq.auto_xspc = false
          head = node_remove(head, y)
 	 node_free(y)
       end
