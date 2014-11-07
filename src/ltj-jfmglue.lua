@@ -112,7 +112,7 @@ do
    local stop_time_measure = ltjb.stop_time_measure
    slow_find_char_class = function (c, m, oc)
       local cls = ltjf_find_char_class(oc, m)
-      if oc~=c and cls==0 then
+      if c and oc~=c and cls==0 then
 	 return ltjf_find_char_class(-c, m), oc
       else
 	 return cls, oc
@@ -320,7 +320,7 @@ local min, max = math.min, math.max
 local function calc_np_aux_glyph_common(lp)
    Np.nuc = lp
    Np.id = npi
-   if ltjs_orig_char_table[lp] then
+   if getfield(lp, 'lang') == lang_ja then
       Np.id = id_jglyph
       set_np_xspc_jachar(Np, lp)
       local npi, npf
@@ -345,7 +345,7 @@ local function calc_np_aux_glyph_common(lp)
 	    lp=lx; break
 	 else
 	    local lid = getid(lx)
-	    if lid==id_glyph and not ltjs_orig_char_table[lx] then
+	    if lid==id_glyph and getfield(lx, 'lang') ~= lang_ja then
 	       -- 欧文文字
 	       last_glyph = lx; set_attr(lx, attr_icflag, PROCESSED); Np.last = lx
 	       y_adjust = has_attr(lx,attr_ablshift) or 0
