@@ -47,7 +47,6 @@ local attr_icflag = luatexbase.attributes['ltj@icflag']
 
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_font_extra_info = ltjf.font_extra_info
-local ltjf_get_vert_glyph = ltjf.get_vert_glyph
 
 local PACKED       = luatexja.icflag_table.PACKED
 local PROCESSED    = luatexja.icflag_table.PROCESSED
@@ -87,12 +86,12 @@ local function capsule_glyph_yoko(p, met, class, head, dir)
    fshift = call_callback("luatexja.set_width", fshift, met, class)
    local fheight, fdepth = char_data.height, char_data.depth
    local kbl = has_attr(p, attr_ykblshift) or 0
-   -- 
+   --
    local need_hbox
    if pwidth==fwidth then
       -- 補正後glyph node は ht: p.height - kbl - down, dp: p.depth + min(0, kbl+down) を持つ
       -- 設定されるべき寸法: ht: fheight - kbl, dp: fdepth + kbl
-      local ht_diff = fheight + fshift.down - getfield(p, 'height') 
+      local ht_diff = fheight + fshift.down - getfield(p, 'height')
       local dp_diff = fdepth  + kbl - getfield(p, 'depth') - min(kbl + fshift.down, 0)
       if  ht_diff == 0 and dp_diff ==0 then -- offset only
 	 set_attr(p, attr_icflag, PROCESSED)
@@ -114,7 +113,7 @@ local function capsule_glyph_yoko(p, met, class, head, dir)
       else
 	 need_hbox = true
       end
-   else 
+   else
       need_hbox = true
    end
 
@@ -124,7 +123,7 @@ local function capsule_glyph_yoko(p, met, class, head, dir)
       local box = node_new(id_hlist)
       setfield(p, 'yoffset', getfield(p, 'yoffset') -fshift.down);
       setfield(p, 'next', nil)
-      setfield(p, 'xoffset', getfield(p, 'xoffset') 
+      setfield(p, 'xoffset', getfield(p, 'xoffset')
 		  + char_data.align*(fwidth-pwidth) - fshift.left)
       local box = node_new(id_hlist)
       setfield(box, 'width', fwidth)
@@ -152,8 +151,8 @@ local function capsule_glyph_tate(p, met, class, head, dir)
       local pf = getfont(p)
       local pc = getchar(p)
       setfield(p, 'char', pc)
-      pwidth = ltjf_font_extra_info[pf] and  ltjf_font_extra_info[pf][pc] 
-	 and ltjf_font_extra_info[pf][pc].vwidth 
+      pwidth = ltjf_font_extra_info[pf] and  ltjf_font_extra_info[pf][pc]
+	 and ltjf_font_extra_info[pf][pc].vwidth
 	 and ltjf_font_extra_info[pf][pc].vwidth * met.size or (ascent+descent)
       pwidth = pwidth + (met.v_advance[pc] or 0)
       ascent = met.v_origin[pc] and ascent - met.v_origin[pc] or ascent
@@ -224,7 +223,7 @@ luatexja.setwidth.capsule_glyph_math = capsule_glyph_math
 function luatexja.setwidth.apply_ashift_math(head, last, attr_ablshift)
    for p in node_traverse(head) do
       local pid = getid(p)
-      if p==last then 
+      if p==last then
 	 return
       elseif (has_attr(p, attr_icflag) or 0) ~= PROCESSED then
 	 if pid==id_hlist or pid==id_vlist then

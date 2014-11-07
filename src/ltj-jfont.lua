@@ -54,7 +54,7 @@ luatexbase.create_callback("luatexja.load_jfm", "data", function (ft, jn) return
 
 local jfm_file_name, jfm_var
 local defjfm_res
-local jfm_dir
+local jfm_dir, is_def_jfont
 
 function define_jfm(t)
    local real_char -- Does current character class have the 'real' character?
@@ -249,7 +249,8 @@ do
    end
 
 -- EXT
-   function jfontdefX(g)
+   function jfontdefX(g, dir)
+      jfm_dir, is_def_jfont = dir, true
       local t = token.get_next()
       cstemp=token.csname_name(t)
       global_flag = g and '\\global' or ''
@@ -260,9 +261,8 @@ do
 
 -- EXT
    local identifiers = fonts.hashes.identifiers
-   function jfontdefY(dir)
-      jfm_dir = dir
-      local j = load_jfont_metric(dir)
+   function jfontdefY()
+      local j = load_jfont_metric(jfm_dir)
       local fn = font.id(cstemp)
       local f = font_getfont(fn)
       if not j then
@@ -290,7 +290,7 @@ do
       font_metric_table[fn]=fmtable
       tex.sprint(cat_lp, global_flag, '\\protected\\expandafter\\def\\csname ',
 		    cstemp , '\\endcsname{\\ltj@cur'..
-		    (dir == 'yoko' and 'j' or 't') .. 'fnt', fn, '\\relax}')
+		    (jfm_dir == 'yoko' and 'j' or 't') .. 'fnt', fn, '\\relax}')
    end
 end
 
@@ -353,6 +353,11 @@ do
 	    name = name .. 'jfmvar=' .. jfm_var
 	 end
       end
+      if jfm_dir == 'tate' then
+         if not name:match('vert') and not name:match('vrt2') then
+            name = name .. ';vrt2'
+         end
+      end
       return name
    end
 
@@ -360,9 +365,11 @@ do
    local otfl_fdr = fonts.definers.read
    local ltjr_font_callback = ltjr.font_callback
    function luatexja.font_callback(name, size, id)
-      local new_name = extract_metric(name)
+      local new_name = is_def_jfont and extract_metric(name) or name
+      is_def_jfont = false
       local res =  ltjr_font_callback(new_name, size, id, otfl_fdr)
       luatexbase.call_callback('luatexja.define_font', res, new_name, size, id)
+      -- this callback processes variation selector, so we execute it always
       return res
    end
    luatexbase.create_callback('luatexja.define_font', 'simple', function (n) return n end)
@@ -624,7 +631,7 @@ do
       end
       return vw, tsb, vk
    end
-   
+
    local sort = table.sort
    local function add_fl_table(dest, tg, unitable, glyphmax, asc_des, units)
       for i = 0, glyphmax-1 do
@@ -659,7 +666,7 @@ do
 	    end
 	    -- vertical kern
 	    if vk then
-	       dest = dest or {}; 
+	       dest = dest or {};
 	       local dest_vk = dest.vkerns or {}; dest.vkerns = dest_vk
 	       for _,v in pairs(vk) do
 		  local vl = v.lookup
@@ -729,7 +736,7 @@ do
       end
       return dest
    end
-   prepare_vert_data = function (dest, id) 
+   prepare_vert_data = function (dest, id)
       local a = id.resources.sequences
       if a then
 	 local s = id.shared.rawdata.descriptions
@@ -741,16 +748,16 @@ do
       end
       return dest
    end
-   -- 縦書き用字形への変換
-   function get_vert_glyph(n, chr)
-      local fn = font_extra_info[n]
-      return (fn and fn[chr] and fn[chr].vert) or chr
-   end
+   -- -- 縦書き用字形への変換
+   -- function get_vert_glyph(n, chr)
+   --    local fn = font_extra_info[n]
+   --    return (fn and fn[chr] and fn[chr].vert) or chr
+   -- end
 end
 
--- 
+--
 do
-   local cache_ver = 5
+   local cache_ver = 6
    local checksum = file.checksum
 
    local function prepare_extra_data_base(id)
@@ -769,7 +776,6 @@ do
 	    font_extra_basename[bname] = dat[1] or {}
 	 else
 	    local dat = nil
-	    dat = prepare_vert_data(dat, id)
 	    dat = prepare_fl_data(dat, id)
 	    font_extra_basename[bname] = dat or {}
 	    ltjb.save_cache( v,
@@ -783,7 +789,7 @@ do
       end
    end
    local function prepare_extra_data_font(id, res)
-      if type(res)=='table' and res.shared then 
+      if type(res)=='table' and res.shared then
 	 font_extra_info[id] = font_extra_basename[file.nameonly(res.filename)]
       end
    end
@@ -808,7 +814,7 @@ do
 
    local identifiers = fonts.hashes.identifiers
    for i=1,font.nextid()-1 do
-      if identifiers[i] then 
+      if identifiers[i] then
 	 prepare_extra_data_base(identifiers[i])
 	 prepare_extra_data_font(i,identifiers[i])
       end
@@ -825,12 +831,12 @@ do
 	 if v.slookups then
 	    for sn, sv in pairs(v.slookups) do
 	       if subtables[sn] and type(sv)=='table' then
-		  if sv[4]~=0 then 
-		     table_vadv[char_num] 
+		  if sv[4]~=0 then
+		     table_vadv[char_num]
 			= (table_vadv[char_num] or 0) + sv[4]
 		  end
-		  if sv[2]~=0 and not already_vert then 
-		     table_vorg[char_num] 
+		  if sv[2]~=0 and not already_vert then
+		     table_vorg[char_num]
 			= (table_vorg[char_num] or 0) + sv[2]
 		  end
 	       end
@@ -840,7 +846,7 @@ do
    end
 
 luatexbase.add_to_callback(
-   "luatexja.define_jfont", 
+   "luatexja.define_jfont",
    function (fmtable, fnum)
       local vadv = {}; fmtable.v_advance = vadv
       local vorg = {}; fmtable.v_origin = vorg
@@ -858,7 +864,7 @@ luatexbase.add_to_callback(
 	       end
 	    end
 	 end
-	 acc_feature(vadv, vorg, subtables, ft, 
+	 acc_feature(vadv, vorg, subtables, ft,
 		     ft.specification.features.normal.vrt2 or ft.specification.features.normal.vert)
 	 for i,v in pairs(vadv) do
 	    vadv[i]=vadv[i]/ft.units_per_em*fmtable.size
@@ -867,7 +873,7 @@ luatexbase.add_to_callback(
 	    vorg[i]=vorg[i]/ft.units_per_em*fmtable.size
 	 end
       end
-      return fmtable 
+      return fmtable
    end, 1, 'ltj.v_advance'
 )
 end
@@ -905,4 +911,3 @@ do
       end
    end
 end
-

@@ -564,7 +564,7 @@ do
    local attr_jchar_class = luatexbase.attributes['ltj@charclass']
    local attr_autospc = luatexbase.attributes['ltj@autospc']
    local attr_autoxspc = luatexbase.attributes['ltj@autoxspc']
-   local ltjf_get_vert_glyph = ltjf.get_vert_glyph
+   --local ltjf_get_vert_glyph = ltjf.get_vert_glyph
    function set_np_xspc_jachar_yoko(Nx, x)
       local m = ltjf_font_metric_table[getfont(x)]
       local cls, c = slow_find_char_class(ltjs_orig_char_table[x], m, getchar(x))
@@ -581,7 +581,7 @@ do
       local xf = getfont(x)
       local m = ltjf_font_metric_table[xf]
       local cls = slow_find_char_class(c, m, c_glyph)
-      setfield(x, 'char', ltjf_get_vert_glyph(xf, c_glyph) or c_glyph)
+      --setfield(x, 'char', ltjf_get_vert_glyph(xf, c_glyph) or c_glyph)
       Nx.met = m; Nx.class = cls;
       if cls~=0 then set_attr(x, attr_jchar_class, cls) end
       Nx.pre  = table_current_stack[PRE + c]  or 0

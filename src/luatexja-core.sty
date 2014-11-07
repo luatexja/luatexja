@@ -201,16 +201,17 @@
 
 %%%%%%%% \jfont\CS={...:...;jfm=metric;...}, \globaljfont
 \protected\def\jfont{%
-  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false)}}
+  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false, 'yoko')}}
 \protected\def\globaljfont{%
-  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true)}}
-\def\ltj@@jfont{\directlua{luatexja.jfont.jfontdefY('yoko')}}
+  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true,  'yoko')}}
+\def\ltj@@jfont{\directlua{luatexja.jfont.jfontdefY()}}
 
 %%%%%%%% \tfont\CS={...:...;jfm=metric;...}, \globaltfont
-\protected\def\tfont{\afterassignment\ltj@@tfont\directlua{luatexja.jfont.jfontdefX(false)}}
+\protected\def\tfont{%
+  \afterassignment\ltj@@tfont\directlua{luatexja.jfont.jfontdefX(false, 'tate')}}
 \protected\def\globaltfont{%
-  \afterassignment\ltj@@tfont\directlua{luatexja.jfont.jfontdefX(true)}}
-\def\ltj@@tfont{\directlua{luatexja.jfont.jfontdefY('tate')}}
+  \afterassignment\ltj@@tfont\directlua{luatexja.jfont.jfontdefX(true,  'tate')}}
+\def\ltj@@tfont{\directlua{luatexja.jfont.jfontdefY()}}
 
 
 %%%%%%%% \zw, \zh
