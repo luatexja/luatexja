@@ -102,7 +102,7 @@
     \fontspec_complete_fontname:Nn \l_ltj_fontspec_fontname_tate_tl {#1}
   }
 }
-%% 
+%%
 \clist_new:N \l_ltj_fontspec_fontfeat_yoko_clist
 \clist_new:N \l_ltj_fontspec_fontfeat_tate_clist
 \tl_new:N    \l_ltj_fontspec_fontname_tate_tl
@@ -149,8 +149,8 @@
     \__fontspec_update_featstr:n {-kern}
   }
   \clist_set:Nx \g__fontspec_default_fontopts_clist {
-    YokoFeatures = { JFM=ujis }, TateFeatures = { RawFeature=vrt2, JFM=ujisv },
-    Scale=\fp_use:N \g_ltj_fontspec_scale_fp, Kerning=Off, 
+    YokoFeatures = { JFM=ujis }, TateFeatures = { JFM=ujisv },
+    Scale=\fp_use:N \g_ltj_fontspec_scale_fp, Kerning=Off,
     \g__ltj_fontspec_default_fontopts_clist
   }
   \prop_set_eq:NN \g__fontspec_fontopts_prop \g__ltj_fontspec_fontopts_prop
@@ -261,9 +261,9 @@
           } {
             \msg_warning:nnn  {luatexja-fontspec} {altfont-ignored-by-rangeonly} { ##1 }
           } {
-            \__ltj_orig_fontspec_make_font_shapes:Nnnnn 
-                { \l_ltj_fontspec_altname_tl } {#2} 
-                {#3 _ alt \int_use:N \g_ltj_fontspec_altnumber_int } 
+            \__ltj_orig_fontspec_make_font_shapes:Nnnnn
+                { \l_ltj_fontspec_altname_tl } {#2}
+                {#3 _ alt \int_use:N \g_ltj_fontspec_altnumber_int }
                 {#4, \l_ltj_fontspec_altfont_leftover_clist }
                 {#5}
             \DeclareAlternateKanjiFont
