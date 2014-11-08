@@ -16,21 +16,6 @@
 \makeatletter
 %%%%%%%%
 
-%%%%%%%% record loaded packages
-\let\ltjpkglist\empty
-\newif\if@real@append@list
-\def\@append@newentry#1#2{{%
-  \@real@append@listtrue \def\@tempa{#2}%
-  \let\@pkglist\@append@newentry@pkglist#1%
-  \if@real@append@list
-    \let\@pkglist=\relax\xdef#1{#1\@pkglist{#2}}%
-  \fi}}
-\def\@append@newentry@pkglist#1{%
-  \def\@tempb{#1}%
-  \ifx\@tempa\@tempb\@real@append@listfalse\fi}
-\def\@addtofilelist#1{\@append@newentry\ltjpkglist{#1}}
-\let\@listfiles\empty
-
 %<*en>
 \usepackage[margin=25mm,lmargin=30mm,rmargin=30mm,footskip=6mm]{geometry}
 \usepackage{luatexja-adjust}\ltjdisableadjust
@@ -2296,12 +2281,12 @@ xyz漢字
 Note that setting positive \Param{yalbaselineshift}~or~\Param{talbaselineshift}
 parameters does not increase the depth of one-letter ``syllable'' $p$ of \textbf{Alchar}, if
 its left-protrusion~(\cs{lpcode}) and right-protrusion~(\cs{rpcode}) are both non-zero.
-This is because 
+This is because
 \begin{itemize}
 \item These two parameters are implemented by setting yoffset field of a
 glyph node, and this does not increase the depth of the glyph.
-\item To cope with the above situation, \LuaTeX-ja automatically supplies 
-a rule in every ``syllable''. 
+\item To cope with the above situation, \LuaTeX-ja automatically supplies
+a rule in every ``syllable''.
 \item However, we cannot use this ``supplying a rule'' method if \dots
 \end{itemize}
 
@@ -2313,7 +2298,7 @@ This problem does not apply for \Param{yjabaselineshift}~nor~\Param{tjabaselines
  \item \Param{yalbaselineshift},~\Param{talbaselineshift}パラメータが正になっている．
  \item 「音節」を構成する唯一の文字$p$の
 左余白への突出量(\cs{lpcode})，右余白への突出量(\cs{rpcode})がどちらも非零である．
-\end{itemize} 
+\end{itemize}
 \Param{yjabaselineshift},~\Param{tjabaselineshift}パラメータについてはこのような問題は起こらない．
 %</ja>
 
@@ -4147,93 +4132,79 @@ using  \texttt{jfm-test.lua} which contains the following:
 %</en>
 \begin{lstlisting}
    [0] = {
-      chars = { '漢', 'ヒ*' },
+      chars = { '漢' },
       align = 'left', left = 0.0, down = 0.0,
       width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
    },
    [2000] = {
-      chars = { '。', '、*', 'ﾋ' },
+      chars = { '。', 'ﾋ' },
       align = 'left', left = 0.0, down = 0.0,
       width = 0.5, height = 0.88, depth = 0.12, italic=0.0,
    },
 \end{lstlisting}
-%<ja>句点「。」の幅は二分であるので
+%<ja>ここで，次のような入力とその実行結果を考える：
 %<en>Now consider the following input/output:
 \begin{LTXexample}[width=0.3\textwidth]
-\jfont\a=file:KozMinPr6N-Regular.otf:jfm=test;+vert
-\setbox0\hbox{\a 。\inhibitglue 漢}
+\jfont\a=file:KozMinPr6N-Regular.otf:jfm=test;+hwid
+\setbox0\hbox{\a ヒ漢}
 \the\wd0
 \end{LTXexample}
 %<*en>
-Now we look why the above source outputs 20\,pt, not 15\,pt.
+Now we look why the above source outputs 15\,pt.
 \begin{enumerate}
-\item The ideographic full stop ``。'' is converted to its vertical form ``\char"FE12''~(\texttt{U+FE12}), %"
-by \verb+vert+ feature.
-\item The character class of ``\char"FE12'' is zero, hence its width is fullwidth.%"
-\item The character class of ``漢'', hence its width is fullwidth.
-\item \cs{inhibitglue} makes that no glue will be inserted between ``。'' and ``漢''.
-\item Hence the width of \cs{hbox} equals to 20\,pt.
+\item The character ``ヒ'' is converted to its half width  form ``ﾋ'' by \verb+hwid+ feature.
+\item According to the JFM, the character class of ``ﾋ'' is 2000, hence its width is halfwidth.
+\item The character class of ``漢'' is zero,  hence its width is fullwidth.
+\item Hence the width of \cs{hbox} equals to 15\,pt.
 \end{enumerate}
-This example shows that the character class of a character is determined \emph{after
+This example shows that the character class of a character is generally determined \emph{after
 applying font features by \Pkg{luaotfload}}.
 %</en>
 %<*ja>
-では，全角二分(15.0\,pt)となるのが自然……と思うかもしれないが，上の実行結果では20\,ptとなっている．
-それは以下の事情によるものである：
+上記の出力結果が，15\,ptとなっているのは理由によるものである：
 \begin{enumerate}
-\item \verb+vert+ featureによって句点(\texttt{U+3002})が縦組用のグリフと置き換わる（\Pkg{luaotfload} による処理）．
-\item この縦組用句点のグリフは \texttt{U+FE12} であるため，その文字クラスは0となる．
-\item 以上により文字クラス0とみなされるため，結果として「。」の幅は全角だと認識されてしまう．
+\item \verb+hwid+ featureによって「ヒ」が半角幅のグリフ「ﾋ」と置き換わる（\Pkg{luaotfload} による処理）．
+\item JFMによれば，この「ﾋ」のグリフの文字クラスは2000である．
+\item 以上により文字クラス2000とみなされるため，結果として「ﾋ」の幅は半角だと認識される．
 \end{enumerate}
 この例は，\emph{文字クラスの決定はfont featureの適用によるグリフ置換の後に行われる}ことを
 示している．
 %</ja>
 
 %<*en>
-However, a starred specification like ``\texttt{'、*'}'' changes the rule.
+However, ...
 Consider the following input:
 %</en>
 %<*ja>
-但し，「\texttt{'、*'}」のようにアスタリスクつきの指定があると，
+但し，JFMによって決まる置換後のグリフの文字クラスが0である場合は，
 状況は異なる．
 %</ja>
 \begin{LTXexample}[width=0.3\textwidth]
 \jfont\a=file:KozMinPr6N-Regular.otf:jfm=test;+vert
-\a 漢、\inhibitglue 漢
+\a 漢。\inhibitglue 漢
 \end{LTXexample}
 %<*en>
-Here, the character class of the ideographic comma ``、''~(\texttt{U+3001}) is determined
+Here, the character class of the ideographic full stop ``。''~(\texttt{U+3002}) is determined
 as following:
 \begin{enumerate}
-\item As the case of ``。'', the ideographic comma ``、'' is converted to its vertical
-      form ``\char"FE11''~(\texttt{U+FE11}).%"
-\item The character class of ``\char"FE11'' is zero.
-\item However, \LuaTeX-ja remembers that this ``\char"FE11'' is obtained from ``、'' by
-      font features. The character class of ``、'' is \emph{non-zero value}, namely, 2000.
-\item Hence the ideographic comma ``、'' in above belongs the character class~2000.
+\item As the case of ``ヒ'', the ideographic full stop ``。'' is converted to its vertical
+      form ``\char"FE12''~(\texttt{U+FE12}).%"
+\item The character class of ``\char"FE12'' is \emph{zero}.
+\item However, \LuaTeX-ja remembers that this ``\char"FE12'' is obtained from ``。'' by
+      font features. The character class of ``。'' is \emph{non-zero value}, namely, 2000.
+\item Hence the ideographic full stop ``。'' in above belongs the character class~2000.
 \end{enumerate}
 %</en>
 %<*ja>
-ここで，読点「、」(\texttt{U+3001})の文字クラスは，以下のようにして決まる．
+ここで，句点「。」(\texttt{U+3002})の文字クラスは，以下のようにして決まる．
 \begin{enumerate}
-\item とりあえず句点の時と同じように，\Pkg{luaotfload} によって縦組用読点のグリフに置き換わる．
-\item 置換後のグリフは \texttt{U+FE11} であり，そのままでは文字クラスは0と判定される．
-\item ところが，JFMには「\texttt{'、*'}」指定があるので，置換前の横組用読点のグリフによって文字クラスを判定する．
-\item 結果として，上の出力例中の読点の文字クラスは2000となる．
+\item \Pkg{luaotfload} によって縦組用句点のグリフに置き換わる．
+\item 置換後のグリフは \texttt{U+FE12} であり，JFMに従えば文字クラスは\emph{0}と判定される．
+\item この場合，置換前の横組用句点のグリフによって文字クラスを判定する．
+\item 結果として，上の出力例中の句点の文字クラスは2000となる．
 \end{enumerate}
 %</ja>
 
-%<*ja>
-なお，「\texttt{'\hbox{}ヒ*'}」のようにアスタリスクつきの指定があっても，
-置換後のグリフで判定した文字クラスの値が0でなければ，そちらをそのまま作用する．
-\begin{LTXexample}[width=0.3\textwidth]
-\jfont\a=file:KozMinPr6N-Regular.otf:jfm=test;+hwid
-\a 漢ヒひ
-\end{LTXexample}
-上の例では，
-\texttt{hwid} featureにより，「ヒ」が半角の「ﾋ」に置き換わるが，
-文字クラスは「ヒ」の属する0\emph{ではなく}，「ﾋ」の属する2000となる．
-%</ja>
 
 %<ja>\paragraph{仮想的な文字}
 %<en>\paragraph{Imaginary characters}
@@ -7395,7 +7366,7 @@ In this case, the \textit{id} is \textit{id\_jglyph}.
 
 %<*en>
 \item A list which begins from a \textit{glyph\_node} which represents a \textbf{ALchar},
-      and consists of \textbf{ALchar} \textit{glyph\_node}s, 
+      and consists of \textbf{ALchar} \textit{glyph\_node}s,
       kerns for adjusting accents~(its subtype is 2), kerns for italic corrections and
       kerns which are automatically inserted by \LuaTeX~or~luaotfload.
       In this case, the \textit{id} is \textit{id\_glyph}.
@@ -8911,29 +8882,6 @@ ISO 32000-1:2008, \textit{Document management -- Portable document format -- Par
 \url{http://www.iso.org/iso/iso\_catalogue/catalogue_tc/catalogue\_detail.htm?csnumber=51502}
 \end{thebibliography}
 
-\newpage
-\appendix
-
-\section{Package versions used in this document}
-This document was typeset using the following packages:
-
-\medskip
-
-{\makeatletter\tt\footnotesize
-  \def\@pkglist#1{%
-    \filename@parse{#1}\def\@temp{sty}
-    \ifx\@temp\filename@ext
-      \edef\reserved@a{%
-        \filename@base.%
-        \ifx\filename@ext\relax tex\else\filename@ext\fi}%
-      \leavevmode\hskip-13em\hbox to 13em{\filename@area\reserved@a\hss}%
-      \csname ver@\reserved@a\endcsname\par
-    \fi
-  }%
-\parindent0pt\leftskip13em
-\ltjpkglist
-
-\makeatother}
 \end{document}
 %</!showexpl>
 %<*showexpl>

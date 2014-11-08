@@ -78,11 +78,6 @@ function define_jfm(t)
 		  real_char = true; w = utf.byte(w)
 	       elseif type(w) == 'string' and utf.len(w)==2 and utf.sub(w,2) == '*' then
 		  real_char = true; w = utf.byte(utf.sub(w,1,1))
-                  if not t.chars[-w] then
-                     t.chars[-w] = i
-                  else
-                     defjfm_res= nil; return
-                  end
 	       end
 	       if not t.chars[w] then
 		  t.chars[w] = i
@@ -355,7 +350,7 @@ do
       end
       if jfm_dir == 'tate' then
          if not name:match('vert') and not name:match('vrt2') then
-            name = name .. ';vrt2'
+            name = name .. ';vert;vrt2'
          end
       end
       return name
@@ -723,31 +718,31 @@ end
 -- 縦書き用字形への変換テーブル
 local prepare_vert_data
 do
-   local function add_feature_table(tname, src, dest)
-      for i,v in pairs(src) do
-	 if type(v.slookups)=='table' then
-	    local s = v.slookups[tname]
-	    if s  then
-	       dest = dest or {}
-	       dest[i] = dest[i]  or {}
-	       dest[i].vert = dest[i].vert or s
-	    end
-	 end
-      end
-      return dest
-   end
-   prepare_vert_data = function (dest, id)
-      local a = id.resources.sequences
-      if a then
-	 local s = id.shared.rawdata.descriptions
-	 for i,v in pairs(a) do
-	    if v.features.vert or v.features.vrt2 then
-	       dest= add_feature_table(v.subtables[1], s, dest)
-	    end
-	 end
-      end
-      return dest
-   end
+   -- local function add_feature_table(tname, src, dest)
+   --    for i,v in pairs(src) do
+   --       if type(v.slookups)=='table' then
+   --          local s = v.slookups[tname]
+   --          if s  then
+   --             dest = dest or {}
+   --             dest[i] = dest[i]  or {}
+   --             dest[i].vert = dest[i].vert or s
+   --          end
+   --       end
+   --    end
+   --    return dest
+   -- end
+   -- prepare_vert_data = function (dest, id)
+   --    local a = id.resources.sequences
+   --    if a then
+   --       local s = id.shared.rawdata.descriptions
+   --       for i,v in pairs(a) do
+   --          if v.features.vert or v.features.vrt2 then
+   --             dest= add_feature_table(v.subtables[1], s, dest)
+   --          end
+   --       end
+   --    end
+   --    return dest
+   -- end
    -- -- 縦書き用字形への変換
    -- function get_vert_glyph(n, chr)
    --    local fn = font_extra_info[n]
@@ -809,8 +804,8 @@ do
       end,
       'ltj.prepare_extra_data', 1)
 
-   local function a (n, dat) font_extra_info[n] = dat end
-   ltjr.vert_addfunc = a
+   local nulltable = {} -- dummy
+   ltjr.vert_addfunc = function (n) font_extra_info[n] = nulltable end
 
    local identifiers = fonts.hashes.identifiers
    for i=1,font.nextid()-1 do

@@ -5,7 +5,7 @@ luatexja.load_module('base');      local ltjb = luatexja.base
 
 local cidfont_data = {}
 local cache_chars = {}
-local cache_ver = '3'
+local cache_ver = '4'
 
 local cid_reg, cid_order, cid_supp, cid_name
 local cid_replace = {
@@ -138,28 +138,29 @@ do
          ttu[cid_order .. '.' .. i] = cidmo[i]
       end
 
-      -- 縦書用字形
-      tt, cidm = {}, {}
-      for i = 0,kx[2] do cidm[i] = -1 end
-      open_cmap_file(kx[1] .. "-V", increment, tonumber, entry)
-      local ttv = {}
-      for i,v in pairs(tt) do ttv[i] =  cidmo[v.index] end
-
       -- shared
       k.shared = {
          otfdata = {
             cidinfo= k.cidinfo, verbose = false,
             shared = { featuredata = {}, },
-	    luatex = { features = {},
+ 	    luatex = { features = {},
 		       defaultwidth=1000,
 		     },
          },
          dynamics = {}, features = {}, processes = {},
-	 ltj_vert_table = ttv
-      }
+         --rawdata = { descriptions = {} },
+     }
       k.resources = { unicodes = ttu, }
       k.descriptions = {}
       cache_chars[cid_name]  = { [655360] = k.characters }
+
+      -- 縦書用字形
+      tt, cidm = {}, {}
+      for i = 0,kx[2] do cidm[i] = -1 end
+      open_cmap_file(kx[1] .. "-V", increment, tonumber, entry)
+      for i,v in pairs(tt) do
+         ttv[i] =  cidmo[v.index]
+      end
 
       -- tounicode エントリ
       local cidp = {nil, nil}; tt, ttu, cidm = {}, {}, {}
@@ -223,7 +224,7 @@ local function mk_rml(name, size, id)
    local fontdata = {}
    local cachedata = {}
    local s = cidfont_data[cid_name]
-   luatexja.rmlgbm.vert_addfunc(id, s.shared.ltj_vert_table)
+   luatexja.rmlgbm.vert_addfunc(id)
    for k, v in pairs(s) do
       fontdata[k] = v
       cachedata[k] = v
@@ -351,5 +352,3 @@ luatexja.rmlgbm = {
 
 cid_reg, cid_order, cid_name, cid_supp = 'Adobe', 'Japan1', 'Adobe-Japan1'
 read_cid_font()
-
-
