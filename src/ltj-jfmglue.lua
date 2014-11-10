@@ -1181,11 +1181,13 @@ do
        if not s and getfield(Nq.nuc, 'user_id') == BPAR then
          local x, y = node_prev(Nq.nuc), Nq.nuc
          Nq.first, Nq.nuc, Nq.last = x, x, x
-         if Np.met then
-            Nq.class = fast_find_char_class('parbdd', Np.met)
+         if Np then
+            if Np.met then
+               Nq.class = fast_find_char_class('parbdd', Np.met)
+            end
+            Nq.met = Np.met; Nq.pre = 0; Nq.post = 0; Nq.xspc = 0
+            Nq.auto_xspc = false
          end
-         Nq.met = Np.met; Nq.pre = 0; Nq.post = 0; Nq.xspc = 0
-         Nq.auto_xspc = false
          head = node_remove(head, y)
 	 node_free(y)
       end

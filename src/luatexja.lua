@@ -230,7 +230,7 @@ do
 	 end
 	 return r
       end,
-      direction = function() 
+      direction = function()
 	 local v = ltjd.get_dir_count()
 	 if math.abs(tex.nest[tex.nest.ptr].mode) == ltjs.mmode and v == dir_table.dir_tate then
 	    v = dir_table.dir_utod
@@ -316,7 +316,7 @@ end
 
 -- main process
 do
-   local start_time_measure, stop_time_measure 
+   local start_time_measure, stop_time_measure
       = ltjb.start_time_measure, ltjb.stop_time_measure
    local Dnode = node.direct or node
    local nullfunc = function (n) return n end
@@ -408,7 +408,7 @@ local function debug_show_node_X(p,print_fn, limit)
 	    .. ', dir=' .. tostring(node.has_attribute(p, attr_dir))
       else
 	 s = base .. '(' .. print_scaled(p.height) .. '+'
-	    .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width) 
+	    .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
 	    .. ', dir=' .. tostring(node.has_attribute(p, attr_dir))
       end
       if (p.shift or 0)~=0 then
@@ -428,7 +428,7 @@ local function debug_show_node_X(p,print_fn, limit)
       if get_attr_icflag(p) == icflag_table.PACKED then
          s = s .. ' (packed)'
       end
-      print_fn(s); 
+      print_fn(s);
       local bid = inner_depth
       prefix, inner_depth = prefix.. '.', inner_depth + 1
       if inner_depth < limit then
@@ -439,7 +439,7 @@ local function debug_show_node_X(p,print_fn, limit)
       prefix=k
    elseif pt=='rule' then
       s = base .. '(' .. print_scaled(p.height) .. '+'
-         .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width) 
+         .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
 	 .. ', dir=' .. tostring(node.has_attribute(p, attr_dir))
       print_fn(s)
    elseif pt == 'glue' then
@@ -479,7 +479,7 @@ local function debug_show_node_X(p,print_fn, limit)
    elseif pt == 'whatsit' then
       s = base
       if p.subtype==sid_user then
-	 local t = tostring(p.user_id) .. ' (' .. 
+	 local t = tostring(p.user_id) .. ' (' ..
 	    luatexbase.get_user_whatsit_name(p.user_id) .. ') '
          if p.type ~= 110 then
             s = s .. ' userid:' .. t .. p.value
@@ -505,7 +505,7 @@ local function debug_show_node_X(p,print_fn, limit)
 	    s = s .. ' stream=' .. p.stream
 	    print_fn(s)
 	    for i=1,#p.data do
-	       print_fn(base .. ' [' .. i .. '] = ' .. tostring(p.data[i]))
+	       print_fn(s .. '  [' .. i .. '] = ' .. tostring(token.command_name(p.data[i])))
 	    end
 	 else
 	    print_fn(s)
@@ -562,4 +562,3 @@ function luatexja.ext_show_node(head,depth,print_fn, lim)
 end
 
 end
-
