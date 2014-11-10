@@ -5,7 +5,8 @@ luatexja.load_module('base');      local ltjb = luatexja.base
 
 local cidfont_data = {}
 local cache_chars = {}
-local cache_ver = '4'
+local cache_ver = 5
+local identifiers = fonts.hashes.identifiers
 
 local cid_reg, cid_order, cid_supp, cid_name
 local cid_replace = {
@@ -143,9 +144,6 @@ do
          otfdata = {
             cidinfo= k.cidinfo, verbose = false,
             shared = { featuredata = {}, },
- 	    luatex = { features = {},
-		       defaultwidth=1000,
-		     },
          },
          dynamics = {}, features = {}, processes = {},
          --rawdata = { descriptions = {} },
@@ -156,6 +154,7 @@ do
 
       -- 縦書用字形
       tt, cidm = {}, {}
+      local ttv = {}; k.shared.ltj_vert_table = ttv
       for i = 0,kx[2] do cidm[i] = -1 end
       open_cmap_file(kx[1] .. "-V", increment, tonumber, entry)
       for i,v in pairs(tt) do
@@ -194,6 +193,26 @@ do
 end
 
 --
+local cidf_vert_processor
+do
+   local traverse_id = node.traverse_id
+   local id_glyph = node.id('glyph')
+   cidf_vert_processor = {
+      function (head, fnum)
+         local fontdata = identifiers[fnum]
+         if fontdata.is_ltj_vert then
+            local vt = fontdata.shared.ltj_vert_table
+            for n in traverse_id(id_glyph, head) do
+               if n.font==fnum then
+                  n.char = vt[n.char] or n.char
+               end
+            end
+            return head, false
+         end
+      end
+   }
+end
+
 local function cid_cache_outdated(t) return t.version~=cache_ver end
 local function read_cid_font()
    local dat = ltjb.load_cache("ltj-cid-auto-" .. string.lower(cid_name),
@@ -206,6 +225,7 @@ local function read_cid_font()
       make_cid_font()
    end
    if cidfont_data[cid_name] then
+      cidfont_data[cid_name].shared.processes = cidf_vert_processor
       for i,v in pairs(cidfont_data[cid_name].characters) do
          if not v.width then v.width = 655360 end
          v.height, v.depth = 576716.8, 78643.2 -- optimized for jfm-ujis.lua
@@ -288,10 +308,13 @@ local function mk_rml(name, size, id)
       e = e * 1000
       var, fontdata.extend  = var .. 'x' .. tostring(e), e
    end
+   if string.match(specification.detail, '(%+?vert)') then
+      cachedata.is_ltj_vert = true
+   end
    fontdata.name = specification.name .. size .. var; cachedata.name = fontdata.name
    fontdata.fullname = specification.name .. var; cachedata.fullname = fontdata.fullname
    fontdata.psname = specification.name; cachedata.psname = fontdata.psname
-   fonts.hashes.identifiers[id] = cachedata
+   identifiers[id] = cachedata
 
    return fontdata
 end
