@@ -15,7 +15,7 @@
 %%%%%%%%
 \makeatletter
 %%%%%%%%
-
+\directlua{if jit then jit.on() end}
 %<*en>
 \usepackage[margin=25mm,lmargin=30mm,rmargin=30mm,footskip=6mm]{geometry}
 \usepackage{luatexja-adjust}\ltjdisableadjust
@@ -230,7 +230,7 @@ Japanese processing in computers (\textit{e.g.}, the UTF-8 encoding).
 ASCII \pTeX やそれの拡張物が用いられることが一般的であった．\pTeX は\TeX
 のエンジン拡張であり，（少々仕様上不便な点はあるものの）商業印刷の分野に
 も用いられるほどの高品質な日本語組版を可能としている．だが，それは弱点に
-もなってしまった：\pTeX という（組版的に）満足なものがあったため，海外で
+もなってしまった．\pTeX という（組版的に）満足なものがあったため，海外で
 行われている数々の\TeX の拡張――例えば\eTeX や\pdfTeX ――や，TrueType,
 OpenType, Unicodeといった計算機で日本語を扱う際の状況の変化に追従すること
 を怠ってしまったのだ．
@@ -297,28 +297,55 @@ The followings are major changes from \pTeX:
 
 \begin{itemize}
 %<*en>
-\item A Japanese font is a tuple of a ``real'' font, a Japanese font
-      metric (\emph{JFM}, for short).
+\item \emph{\LuaTeX-ja does all process only with Lua and \TeX\ macros},
+while \pTeX\  is an engine extension of \TeX82.
+This means that several features of \pTeX\ are not completely implemented
+in \LuaTeX-ja.
 %</en>
 %<*ja>
-\item 和文フォントは（小塚明朝，IPA明朝などの）実際のフォント，和文フォン
-      トメトリック（JFMと呼ぶ\footnote{混乱を防ぐため，p\TeX の意味での
-      JFM (\texttt{min10.tfm}) などは本ドキュメントでは\emph{和文用
-      TFM}とよぶことにする．}）の組である．
+\item \pTeX はエンジン拡張であったのに対し，
+\emph{\LuaTeX-jaはLuaコードと\TeX マクロを用いて全てを実装している}．
+そのため，\pTeX のいくつかの機能は\LuaTeX-ja に（そのままの形では）実装していない．
 %</ja>
+\begin{itemize}
+%<*en>
+ \item \pTeX\ addes several primitives, such as \cs{kanjiskip}, 
+\cs{prebreakpenalty},~and,~\cs{ifydir}. They can be used as follows:
+%</en>
+%<*ja>
+ \item 例えば\pTeX で追加された次のようなプリミティブ
+%</ja>
+\begin{verbatim}
+\kanjiskip=10pt  \dimen0=kanjiskip
+\prebreakpenalty`ぁ=100
+\ifydir ... \fi
+\end{verbatim}
+%<en> However, we cannot use them under \LuaTeX-ja. 
+%<en> Instead of them, we have to write as the following.
+%<ja> は\LuaTeX-jaには存在しない．\LuaTeX-jaでは以下のように記述することになる．
+\begin{verbatim}
+\ltjsetparameter{kanjiskip}  \dimen0=\ltjgetparameter{kanjiskip}
+\ltjsetparameter{prebreakpenalty={`ぁ,100}}
+\ifnum\ltjgetparemeter{direction}=4 ... \fi
+\end{verbatim}
 
 %<*en>
 \item In \pTeX, a line break after Japanese character is ignored (and
       doesn't yield a space), since line breaks (in source files) are
       permitted almost everywhere in Japanese texts. However, \LuaTeX-ja
-      doesn't have this function completely, because of a specification
-      of \LuaTeX.
+      doesn't have this feature completely, because of a specification
+      of \LuaTeX. For the detail, see Section~\ref{sec-lbreak}.
 %</en>
 %<*ja>
 \item 日本語の文書中では改行はほとんどどこでも許されるので，\pTeX では和文文字
       直後の改行は無視される（スペースが入らない）ようになっていた．しかし，
       \LuaTeX-ja では \LuaTeX の仕様のためにこの機能は完全には実装されていない．
+      詳しくは\ref{sec-lbreak}章を参照．
 %</ja>
+
+\end{itemize}
+
+
 
 %<*en>
 \item The insertion process of glues/kerns between two Japanese
@@ -385,12 +412,6 @@ The followings are major changes from \pTeX:
       される．
 %</ja>
 \end{itemize}
-
-%<*ja>
-\item \LuaTeX-jaでは，\pTeX と同様に漢字・仮名を制御綴内に用いることができ，
-\cs{西暦} などが正しく動作するようにしている．
-但し，制御綴中に使える和文文字が\pTeX・\upTeX と全く同じではない（\ref{sec-catcode}章参照）．
-%</ja>
 
 %<*ja>
 \item ****版からは，不安定ながらも\LuaTeX-ja における縦組みをサポートしている．
@@ -536,8 +557,8 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %<en>The following packages are needed for the \LuaTeX-ja\ package.
 %<ja>\LuaTeX-jaパッケージには，次のパッケージ類が必要である．
 \begin{itemize}
-\item \LuaTeX\ beta-0.74.0 (or later)
-\item \Pkg{luaotfload} v2.2 (or later)
+\item \LuaTeX\ snapshot rev~5024 (or later)
+\item \Pkg{luaotfload} v2.5 (or later)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
 \item \Pkg{everysel} (if you want to use \LuaTeX-ja with \LaTeXe)
 %<en>\item \emph{IPAex fonts(\url{http://ipafont.ipa.go.jp/})}
@@ -545,9 +566,9 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 \end{itemize}
 
 %<*en>
-\emph{This version of \LuaTeX-ja no longer supports \TeX~Live~2012 (or older version),
-since \LuaTeX\ binary and \Pkg{luaotfload} is updated in
-\TeX~Live~2013.}
+\emph{This version of \LuaTeX-ja no longer supports \TeX~Live~2013 (or older version).
+If you want to use this version with \TeX~Live~2014, you have to build a development
+version of \LuaTeX\ from its source.}
 
 \medskip
 
@@ -560,16 +581,10 @@ the following distributions:
   \item W32\TeX\ (in \texttt{luatexja.tar.xz})
   \end{itemize}
 IPAex fonts are also available in these distributions.
-
-If you are using \TeX~Live~2014, you can install \LuaTeX-ja
-from \TeX~Live manager (\texttt{tlmgr}):
-\begin{lstlisting}
-$ tlmgr install luatexja
-\end{lstlisting}
 %</en>
 %<*ja>
-\emph{本バージョンの\LuaTeX-jaは\TeX~Live~2012以前では動作しない．}
-これは，\LuaTeX と\Pkg{luaotfload}が\TeX~Live~2013において更新されたことによる．
+\emph{本バージョンの\LuaTeX-jaは\TeX~Live~2013以前では動作しない．\TeX~Live~2014で
+用いたい場合は，自力で\LuaTeX 開発版をソースからビルドする必要がある．}
 
 \medskip
 
@@ -582,24 +597,33 @@ $ tlmgr install luatexja
   \end{itemize}
 これらのディストリビューションはIPAexフォントも収録している．
 W32\TeX においてはIPAexフォントは \texttt{luatexja.tar.xz} 内にある．
-
-例えば\TeX~Live~2014を利用しているなら，\LuaTeX-jaは\TeX~Live manager (\texttt{tlmgr})を
-使ってインストールすることができる．
-\begin{lstlisting}
-$ tlmgr install luatexja
-\end{lstlisting}
 %</ja>
+
+% %<*ja>
+% 例えば\TeX~Live~2015を利用しているなら，\LuaTeX-jaは\TeX~Live manager (\texttt{tlmgr})を
+% 使ってインストールすることができる．
+% \begin{lstlisting}
+% $ tlmgr install luatexja
+% \end{lstlisting}
+% %</ja>
+% %<*en>
+% If you are using \TeX~Live~2015, you can install \LuaTeX-ja
+% from \TeX~Live manager (\texttt{tlmgr}):
+% \begin{lstlisting}
+% $ tlmgr install luatexja
+% \end{lstlisting}
+% %</en>
 
 %<en>\paragraph{Manual installation}
 %<ja>\paragraph{手動インストール方法}
 
 \begin{enumerate}
 %<*en>
-\item Download the source archive, by one of the following method.
+\item Download the source, by one of the following method.
       At the present, \LuaTeX-ja has no \emph{stable} release.
 
 \begin{itemize}
-\item Copy the Git repository:
+\item Clone the Git repository:
 \begin{lstlisting}
 $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
 \end{lstlisting}
@@ -613,11 +637,11 @@ Note that the \texttt{master} branch, and hence the archive in CTAN, are not upd
 the forefront of development is not the \texttt{master} branch.
 %</en>
 %<*ja>
-\item ソースアーカイブを以下のいずれかの方法で取得する．現在公開されているのはあくまでも
+\item ソースを以下のいずれかの方法で取得する．現在公開されているのはあくまでも
       開発版であって，安定版でないことに注意．
 
 \begin{itemize}
-\item Gitリポジトリの内容をコピーする：
+\item Gitリポジトリをクローンする：
 \begin{lstlisting}
 $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
 \end{lstlisting}
@@ -636,7 +660,7 @@ $ git clone git://git.sourceforge.jp/gitroot/luatex-ja/luatexja.git
 But only the contents in \texttt{src/} are needed to work \LuaTeX-ja.
 %</en>
 %<*ja>
-\item 「Gitリポジトリをコピー」以外の方法でアーカイブを取得したならば，それを展開する．
+\item 「Gitリポジトリをクローン」以外の方法でアーカイブを取得したならば，それを展開する．
       \texttt{src/}をはじめとしたいくつかのディレクトリができるが，
       動作には\texttt{src/}以下の内容だけで十分．
 %</ja>
@@ -3001,7 +3025,7 @@ the current direction. One can use these in \cs{dimexpr} primitive, as the follo
 \begin{lstlisting}
 \dimexpr 2\ltjgetwd{42}-3pt\relax, \the\ltjgetwd{1701}
 \end{lstlisting}
-By implementaion,  the argument must be grouped as \verb+\ltjgetwd{42}+,
+By its implementaion,  the argument must be grouped as \verb+\ltjgetwd{42}+,
 if the argument consists of more than one token.
 \begin{LTXexample}[width=0.3\textwidth]
 \parindent0pt
@@ -3060,7 +3084,10 @@ These commands set the dimension of \cs{box<num>}. Unlike \cs{ltjgetwd}, one doe
 \end{lstlisting}
 のように \cs{wd}<num> の代わりとして扱うことができる．引数が1桁の場合は，
 \cs{ltjgetwd3} のように引数をグループで括らなくても良いが，そうでない場合は
-（通常の命令への引数のように）\verb+\ltjgetwd{42}+ とグループに括る必要がある．
+（通常の命令への引数のように）\verb+\ltjgetwd{42}+ とグループに括る必要がある%
+\footnote{\cs{afterassignment} を利用して実装すればグループに括る必要がなくなるのでは，と思
+	      うかもしれないが，それでは本文中に書いた例のように \cs{dimexpr} 中で使用でき
+	      なくなってしまう．}．
 使用例は以下の通りである．
 \begin{LTXexample}[width=0.3\textwidth]
 \parindent0pt
@@ -3141,7 +3168,7 @@ Returned value&\texttt{4}&\texttt{3}&\texttt{1}&\texttt{11}&\texttt{0}\\
 \end{center}
 
 \begin{LTXexample}[width=0.3\textwidth]
-\leavevmode\def\DIR{\ltjgetparameter{direction}}
+\leavevmode\def\DIR{\ltjgetparameter{ direction}}
 \hbox{\yoko\DIR}, \hbox{\tate\DIR},
 \hbox{\dtou\DIR}, \hbox{\utod\DIR},
 \hbox{\tate$\hbox{tate math: \DIR}$}
@@ -3171,6 +3198,7 @@ overridden by \LuaTeX-ja, using~\verb+\protected\def+.
 \begin{cslist}[style=standard]
  \item[\cs{unhbox}<num>\textrm{, }\cs{unvbox}<num>\textrm{, }\cs{unhcopy}<num>\textrm{, }\cs{unvcopy}<num>]
  \item[\cs{vadjust}\{<material>\}]
+ \item[\cs{insert}<number>\{<material>\}]
  \item[\cs{lastbox}]
  \item[\cs{raise}<dimen><box>\textrm{, }\cs{lower}<dimen><box>\textrm{\ etc., }\cs{vcenter}]
  \item[\cs{vcenter}]
@@ -3190,6 +3218,9 @@ overridden by \LuaTeX-ja, using~\verb+\protected\def+.
  \item[\cs{vadjust}\{<material>\}] 一旦プリミティブ本来の挙動を行う．その後，<material>の組方向が
  周囲の垂直リストの組方向と一致しない場合にエラーを出力し，
  該当の \cs{vadjust} を無効にする．
+ \item[\cs{insert}<number>\{<material>\}]
+ 一旦プリミティブ本来の挙動を行い，その後<material>内の各ボックス・罫線の直前に組方向を示
+	      すdirection whatsitを挿入する．
  \item[\cs{lastbox}] ボックスの「中身」を現在の組方向に合わせるためのノード
 	      （\textit{dir\_box}という）を必要ならば除去し，
  正しく「中身」のボックスが返されるように前処理をする．
@@ -3242,14 +3273,14 @@ causes a error.  We denote control sequences which are defined in
 
 \paragraph{JFM}
 %<*en>
-As noted in Introduction, a JFM has measurements of characters and
+a JFM has measurements of characters and
 glues/kerns that are automatically inserted for Japanese
 typesetting. The structure of JFM will be described in the next
 subsection. At the calling of \cs{jfont}, you must specify
 which JFM will be used for this font by the following keys:
 %</en>
 %<*ja>
-「はじめに」の節で述べたように，JFMは文字と和文組版で自動的に挿入される
+JFMは文字と和文組版で自動的に挿入される
 グルー／カーンの寸法情報を持っている．JFMの構造は次の節で述べる．
 \cs{jfont} 命令の呼び出しの際には，どのJFMを用いるのかを以下のキーで
 指定する必要がある：
@@ -3544,20 +3575,22 @@ letter-spacing and the width of italic correction are not correct:
 \cs{tfont} で定義された縦組用和文フォントは，
 以下の点が \cs{jfont} による横組用和文フォントとは異なる：
 \begin{itemize}
- \item 出力時に，自動的に「\verb+vert+ feature相当」のグリフ置換が行われる．
-       これは，\Pkg{luaotfload}による各種featureのサポートとは全く別個に行われるもので，
-       いちいち \verb+vert+ featureを指定する必要はない．
+ \item 自動的に \texttt{vert}, \texttt{vrt2} の両OpenType featureが有効化される．
+但し，以下の例の3行目に示すように，明示的に \texttt{vert}, \texttt{vrt2}（のいずれか）の
+有効・無効を指定した場合は別である．
 \begin{lstlisting}
-\tfont\S=file:KozMinPr6N-Regular.otf:jfm=ujis % OK
+\tfont\S=file:KozMinPr6N-Regular.otf:jfm=ujisv 
+    % vert and vrt2 are automatically activated
+\tfont\T=file:KozMinPr6N-Regular.otf:jfm=ujisv;-vert % vert and vrt2 are not activated
 \end{lstlisting}
  \item \ref{ssec-math}節で述べる，数式中の和文フォントには縦組用和文フォントは指定できない．
  \item \texttt{jfm=<name>}\ の部分には縦組用JFMを指定する．
 以下の縦組用JFMが\LuaTeX-jaには同梱されており，違いを表\ref{tab-difjfm-tate}に示した．
 \begin{description}
-\item[\tt jfm-ujis.lua] \LuaTeX-jaの標準縦組用JFMである．このJFMは\upTeX で
+\item[\tt jfm-ujisv.lua] \LuaTeX-jaの標準縦組用JFMである．このJFMは\upTeX で
   用いられるUTF/OTFパッケージ用の和文用TFMである \verb+upnmlminr-v.tfm+ を
   元にしている．
-\item[\tt jfm-min.lua] \pTeX に同梱されているデフォルトの和文用縦組TFM
+\item[\tt jfm-tmin.lua] \pTeX に同梱されているデフォルトの和文用縦組TFM
   である \verb+tmin10.tfm+ に相当し，\texttt{min10.tfm} と同様に
   「っ」など一部の文字幅が狭められている．
 \end{description}
@@ -4031,12 +4064,11 @@ Furthermore, the glyph is shifted according to values of fields
 和文文字を考えよう．
 \begin{itemize}
 \item
-実際のグリフの「垂直位置」は，ベースラインが文字の物理的な左右方向の中央を通る
+実際のグリフの「垂直位置」は，まずベースラインが文字の物理的な左右方向の中央を通る
 位置となる．
 \item
-また，この場合\texttt{align}フィールドは \texttt{'right'} なので，
+また，この場合 \texttt{align} フィールドは \texttt{'right'} なので，
 「水平位置」は字送り方向に「右寄せ」したものとなる（緑色の長方形）．
-その際，高さ・深さは，実フォントのascender, descenderの値が使われる．
 \item
 その後さらに \texttt{left} と \texttt{down} の値に従ってシフトされる
 のは横組用和文フォントと変わらない．
@@ -4507,7 +4539,7 @@ JFMで指定されているそれぞれの値をスケーリングしたもの�
 間に入るものがkernであれば，このフィールドの値は\
 \texttt{[$j$]=\{false, <kern\_node>, <ratio>\}} である．
 <kern\_node>はkernを表すノードそのものである\footnote{%
-本バージョンでは利用可能ならばノードのアクセス手法にdirect access
+本バージョンではノードのアクセス手法にdirect access
       modelを用いている．そのため，例えば\LuaTeX\ beta-0.78.2では，単なる自然数のようにし
       か見えないことに注意．
 }．
@@ -4515,6 +4547,10 @@ glueであれば，\texttt{[$j$]=\{false, <spec\_node>, <ratio>, <icflag>\}} で
 <spec\_node>はglueの長さを表すノードそのものであり，
       $\text{<icflag>}=\textit{from\_jfm}+\text{<priority>}$である．
 \end{itemize}
+\item[ascent\textrm{, }descent]
+……
+\item[chars\_cbcache] 
+……
 \end{cslist}
 %</ja>
 
@@ -5181,7 +5217,9 @@ With the help of this example, we remark the specification of \cs{inhibitglue}:
       simply ignored.
 %</en>
 %<*ja>
-\item \cs{inhibitglue} の垂直モード中での呼び出しは意味を持たない．
+\item \emph{\cs{inhibitglue} の垂直モード中での呼び出しは意味を持たない}\footnote{%
+  この点は\TeX~Live~2014での\pTeX における \cs{inhibitglue} の仕様変更と同じである．
+}．
 4行目の入力で有効にならないのは，\cs{inhibitglue} の時点では垂直モードであり，
 \cs{noindent} の時点で水平モードになるからである．
 %</ja>
@@ -7876,30 +7914,6 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 そのため，「右空白」がglueであれば，その直前に \cs{penalty10000} を挿入する．
 \end{description}
 
-なお，「右空白」はカーンの%，「左空白」は未定義の
-\[
- \overbrace{\Node{glyph}{`あ'}}^{\mathit{Nq}}\longrightarrow \overbrace{\Node{glue}{1\,pt}}^{\mathit{Np}}
-\]
-のような状況を考える．
-このとき，$a$，即ち「あ」の\Param{postbreakpenalty}がいかなる値であっても，
-この2クラスタ間は最終的に
-\begin{equation}
- \overbrace{\Node{glyph}{`あ'}}^{\mathit{Nq}}\longrightarrow
-\Node{kern}{右空白}\longrightarrow \overbrace{\Node{glue}{1\,pt}}^{\mathit{Np}}
-\label{eq-gref}
-\end{equation}
-となり，$a$分のペナルティは挿入されないことに注意して欲しい．
-\Param{postbreakpenalty}は（$a$は）殆どの場合が非負の値と考えられ，そのような場合では
-\eqref{eq-gref}と
-\[
- \overbrace{\Node{glyph}{`あ'}}^{\mathit{Nq}}\longrightarrow
-\Node{penalty}{$a$}\longrightarrow
-\Node{kern}{右空白}\longrightarrow \overbrace{\Node{glue}{1\,pt}}^{\mathit{Np}}
-\]
-との間に差異は生じない%
-\footnote{kern$\rightarrow$glueが1つの行分割可能点(行分割に伴うペナルティは0)
-であるため，たとえ$a=10000$であっても，\textit{Nq}と\textit{Np}の間で行分割を禁止することはできない．}．
-
 \paragraph{箱・グルー・カーンと和文Aの間}
 \textit{Np}が\textsf{箱}・グルー・カーンのいずれかで，\textit{Np}が\textsf{和文A}であった場合は，
 すぐ上の（\textit{Nq}と\textit{Np}の順序が逆になっている）場合と同じである．
@@ -7955,6 +7969,69 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 \item 3行目では，ピリオドの属するクラスタは\textsf{和文A}である．これによって，
 ピリオドと「A」の間には\textsf{Boundary-B~[\OB]}由来の半角アキが入ることになる．
 \end{itemize}
+%</ja>
+
+%<*ja>
+\section{ベースライン補正の方法}
+\subsection{\texttt{yoffset} フィールド}
+\Param{yalbaselineshift}等のベースライン補正は，基本的には対象となっている
+\textit{glyph\_node}の \texttt{yoffset} フィールドの値を増減することによって
+実装されている．なお，\texttt{yoffset} の値は上方向への移動量であるのに対し，
+\Param{yalbaselineshift}などは下方向への移動量である．
+
+さて，\texttt{yoffset} の増減によって見かけのグリフ位置は上下に移動するが，
+仮想ボディの高さ$h$，深さ$d$については
+\begin{description}
+\catcode`\<=12\catcode`\>=12
+ \item[$\texttt{yoffset}\geq 0$のとき] 
+$h = \max(\texttt{height} + \texttt{yoffset}, 0)$, 
+$d = \max(\texttt{depth} - \texttt{yoffset}, 0)$, 
+ \item[$\texttt{yoffset}<0$のとき] 
+$h = \max(\texttt{height} + \texttt{yoffset}, 0)$, $d=\texttt{depth}$.
+\end{description}
+という仕様になっている．つまり，\texttt{yoffset} が負（グリフを下ける）の場合に深さは増加しな
+い（表\ref{tab:yoffset_and_im}参照）．
+
+\begin{table}[t]
+\caption{\texttt{yoffset} and imaginary body}
+\label{tab:yoffset_and_im}
+\centering\small
+\fboxsep0pt
+\def\T#1#2{\fcolorbox{blue}{white}{%
+  \setbox0=\hbox{\LARGE #1%
+    \directlua{
+      local p = tex.nest[tex.nest.ptr].tail
+      p.yoffset = #2 * 65536
+    }%
+  }%
+  \copy0\kern-\wd0\smash{\color{red}\vrule width \wd0 height 0.2pt depth 0.2pt}%
+}}
+\begin{tabular}{>{\bfseries}lccccc}
+\toprule
+\texttt{yoffset}&10\,pt&5\,pt&0&$-5$\,pt&$-10$\,pt\\
+\midrule
+仮想ボディ&\T{y}{10}, \T{H}{10}&\T{y}{5}, \T{H}{5}&\T{y}{0}, \T{H}{0}%
+&\T{y}{-5}, \T{H}{-5}&\T{y}{-10}, \T{H}{-10}\\[10pt]
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{\textbf{ALchar}の補正}
+上記の問題について，\textbf{ALchar}のベースライン補正では
+「正しい深さ」を持った罫線(rule)を補うという対応策をとった．
+この罫線による補正は，\textit{id}が\textit{id\_glyph}であるクラスタ単位，
+大雑把に言えば音節単位で行われる．
+文字列``Typeset''を
+\begin{itemize}
+ \item フォントはLatin Modern Roman (\texttt{lmroman10-regular.otf}) 10\,pt
+ \item \Param{yalbaselineshift}は5\,pt
+\end{itemize}
+という状況で組んだ場合を例にとって説明しよう．
+
+\LuaTeX・\Pkg{luaotfload}によるカーニング・ハイフネーションが終わった段階では，
+
+
+
 %</ja>
 
 %<en>\section{Patch for the \Pkg{listings} Package}
@@ -8495,8 +8572,9 @@ CMapが必要である．
 非埋め込みの中国語・韓国語フォントを定義する場合，同様のキャッシュが生成される．
 キャッシュの名称，必要となるCMapについては表\ref{tab:cid-cache}を参照して欲しい．
 
-\item[ivs\_***.lua]
-フォント``\texttt{***}''における異体字情報を格納している．構造は以下の通り：
+\item[extra\_***.lua]
+フォント``\texttt{***}''における異体字セレクタの情報，縦組用字形への変換テーブル，そして
+縦組時における幅を格納している．構造は以下の通り：
 %</ja>
 %<*en>
 \subsection{Use of Cache}
@@ -8515,9 +8593,15 @@ if you specified \texttt{cid} key in \cs{jfont}
 to use other CID-keyed non-embedded fonts for Chinese or Korean,
 as in Page~\pageref{para-cid}.
 
-\item[ivs\_***.lua]
-This file stores the table of Unicode variants in a font ``\texttt{***}''.
-The structure of the table is the following:
+\item[extra\_***.lua]
+This file stores the table which stores the following.
+\begin{itemize}
+ \item unicode variants in a font ``\texttt{***}''
+ \item vertical width of glyphs, if it is not equal to the sum of 
+the height of ascender and the depth of descender
+ \item vertical variants
+\end{itemize}
+The following is the structure of the that table.
 %</en>
 
 \begin{table}[!tb]
@@ -8543,16 +8627,18 @@ return {
  {
   [10955]={    -- U+2ACB "Subset Of Above Not Equal To"
    [65024]=983879, -- <2ACB FE00>
+   ["vwidth"]=0.98, -- vertical width
   },
   [37001]={    -- U+9089 "邉"
    [0]=37001,  --   <9089 E0100>
    991049,     --   <9089 E0101>
    ...
+   ["vert"]=995025, -- vertical variant
   },
   ...
  },
  ["chksum"]="FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", -- checksum of the fontfile
- ["version"]=4, -- version of the cache
+ ["version"]=2, -- version of the cache
 }
 \end{lstlisting}
 %<*ja>
@@ -8667,8 +8753,13 @@ callbackに処理が回らない．そこで，\LuaTeX-ja では，\cs{everyhbox
        \cs{vbadness} を一時的に10000に変更し，hpack, vpack後に元の値に戻す」処理を行ってい
        る．
 }．
- \item \cs{vsplit}によってvboxを分割した時の「残り」．
+ \item \cs{vsplit}によってvboxを分割した時の「残り」の先頭．
  \item \LuaTeX-ja読み込み前に作成したボックスの寸法を \cs{ltjsetwd} 等によって変更した時．
+ \item \cs{insert} によるinsertionでは，中身の先頭に\textit{direction}~whatsitは作られず，
+その代わりに中身の各ボックス・罫線の直前に作られる\footnote{%
+ これは，ページ分割の過程でinsertionが分割される時，「現在のページで出力される部分」が空と
+       なることがあることによる．先頭にwhatsitを置くと，最悪でも「現在のページにwhatsitが
+       残る」ことになってしまう．}．
 \end{itemize}
 なお，\verb+\vtop{...}+ の場合は，先頭にdirection whatsitを置くと
 ボックスの高さが常に0\,ptになるという問題が発生する．そのため，この場合に限っては
