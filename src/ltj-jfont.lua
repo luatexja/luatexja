@@ -695,7 +695,7 @@ do
 				fl.ascent + fl.descent, fl.units_per_em)
          end
       end
-      fontloader.close(fl)
+      fontloader.close(fl); collectgarbage("collect")
       return dest
    end
    -- supply vkern table
