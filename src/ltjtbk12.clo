@@ -39,7 +39,7 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesFile{ltjtbk12.clo}
-  [2014/07/28 v1.6-ltj-6
+  [2014/11/15 v1.6-ltj-7
   Standard LuaLaTeX-ja file (size option)]
 \renewcommand{\normalsize}{%
     \@setfontsize\normalsize\@xiipt{18}%

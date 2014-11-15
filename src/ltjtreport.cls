@@ -39,7 +39,7 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjtreport}
-  [2014/07/28 v1.6-ltj-6
+  [2014/11/15 v1.6-ltj-7
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \RequirePackage{filehook}
@@ -128,6 +128,17 @@
 \DeclareOption{tate}{%
   \tate\AtBeginDocument{\message{《縦組モード》}\adjustbaseline}%
 }
+\AtEndOfPackageFile{everyshi}{%
+  \def\@EveryShipout@Output{%
+    \setbox8\vbox{%
+      \yoko
+      \@EveryShipout@Hook
+      \@EveryShipout@AtNextHook
+      \global\setbox\luatexoutputbox=\box\luatexoutputbox
+    }%
+    \gdef\@EveryShipout@AtNextHook{}%
+    \@EveryShipout@Org@Shipout\box\luatexoutputbox
+  }}
 \DeclareOption{oneside}{\@twosidefalse}
 \DeclareOption{twoside}{\@twosidetrue}
 \DeclareOption{onecolumn}{\@twocolumnfalse}
