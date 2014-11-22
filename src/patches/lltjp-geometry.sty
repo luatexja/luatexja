@@ -32,9 +32,9 @@
     \ifx\Gm@bmargin\@undefined\else\advance\@tempcnta1\relax\fi
     \Gm@cnth\@tempcnta
   \else
-    \ifx\Gm@lmargin\@undefined\else\advance\@tempcnta4\relax\fi
+    \ifx\Gm@rmargin\@undefined\else\advance\@tempcnta4\relax\fi
     \ifGm@vbody\advance\@tempcnta2\relax\fi
-    \ifx\Gm@rmargin\@undefined\else\advance\@tempcnta1\relax\fi
+    \ifx\Gm@lmargin\@undefined\else\advance\@tempcnta1\relax\fi
     \Gm@cntv\@tempcnta
   \fi
   \ifcase\@tempcnta
@@ -82,6 +82,22 @@
                   ^^J\@spaces `#2' (\@nameuse{Gm@#2}) is ignored}%
     \Gm@detiv{#2}{#3}{#4}{#2}%
   \else\fi}%
+\def\Gm@clean{%
+  \ifnum\Gm@cnth<4\let\Gm@tmargin\@undefined\fi
+  \ifodd\Gm@cnth\else\let\Gm@bmargin\@undefined\fi
+  \ifnum\Gm@cntv<4\let\Gm@rmargin\@undefined\fi
+  \ifodd\Gm@cntv\else\let\Gm@lmargin\@undefined\fi
+  \ifGm@hbody\else
+    \let\Gm@hscale\@undefined
+    \let\Gm@width\@undefined
+    \let\Gm@textwidth\@undefined
+  \fi
+  \ifGm@vbody\else
+    \let\Gm@vscale\@undefined
+    \let\Gm@height\@undefined
+    \let\Gm@textheight\@undefined
+  \fi
+  }%
 \def\Gm@adjustpaper{%
   \ifdim\paperwidth>\p@\else
     \PackageError{geometry}{%
@@ -109,7 +125,7 @@
   \Gm@adjustmp
   \Gm@adjustbody
   \Gm@detall{h}{width}{tmargin}{bmargin}%
-  \Gm@detall{v}{height}{lmargin}{rmargin}%
+  \Gm@detall{v}{height}{rmargin}{lmargin}%
   \setlength\textwidth{\Gm@width}%
   \setlength\textheight{\Gm@height}%
   \setlength\topmargin{\Gm@tmargin}%
