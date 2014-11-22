@@ -82,6 +82,7 @@
 % \changes{v1.6-ltj-5}{2014/07/02}{\cs{ifydir}, \cs{iftdir}を使わないように修正．}
 % \changes{v1.6-ltj-6}{2014/07/28}{縦組クラスでlltjext.styを読み込むように修正．}
 % \changes{v1.6-ltj-7}{2014/11/15}{縦組クラスとeveryshi.styとの相性が悪い問題を修正．}
+% \changes{v1.6-ltj-8}{2014/11/22}{縦組時のgeometry.styへの対応を別ファイル(lltjp-geometry.sty)に分離．それに伴いv1.6-ltj-3での変更を削除．}
 % \fi
 %
 % \iffalse
@@ -176,10 +177,6 @@
 %    \begin{macrocode}
 %<*article|report|book>
 \RequirePackage{luatexja}
-%    \end{macrocode}
-% 縦組みの場合は|geometry|対応のために|filehook|も読み込んでおきます。
-%    \begin{macrocode}
-%<tate>\RequirePackage{filehook}
 %    \end{macrocode}
 %
 % \section{オプションスイッチ}
@@ -324,19 +321,6 @@
   \setlength\paperheight {257mm}
   \setlength\paperwidth  {182mm}}
 %    \end{macrocode}
-% 縦組クラスについて、|geometry|パッケージが読み込まれると|\textwidth|と|\textheight|が
-% ひっくり返ってしまう問題に対処します。
-%    \begin{macrocode}
-%<*tate>
-\AtEndOfPackageFile{geometry}{%
-  \setlength{\@tempdima}{\textheight}%
-  \setlength{\textheight}{\textwidth}%
-  \setlength{\textwidth}{\@tempdima}%
-  \expandafter\def\expandafter\Gm@process\expandafter{\Gm@process
-    \setlength{\@tempdima}{\textheight}%
-    \setlength{\textheight}{\textwidth}%
-    \setlength{\textwidth}{\@tempdima}}}
-%</tate>
 %
 % \subsection{サイズオプション}
 % 基準となるフォントの大きさを指定するオプションです。
@@ -3083,7 +3067,7 @@
    \advance\@enumdepth\@ne
    \edef\@enumctr{enum\romannumeral\the\@enumdepth}%
    \list{\csname label\@enumctr\endcsname}{%
-      \ifnum\ltjgetparameter{direction}=3 
+      \ifnum\ltjgetparameter{direction}=3
          \ifnum \@listdepth=\@ne \topsep.5\normalbaselineskip
            \else\topsep\z@\fi
          \parskip\z@ \itemsep\z@ \parsep\z@
@@ -3111,7 +3095,7 @@
 %    \begin{macrocode}
 \newcommand{\labelitemi}{\textbullet}
 \newcommand{\labelitemii}{%
-  \ifnum\ltjgetparameter{direction}=3 
+  \ifnum\ltjgetparameter{direction}=3
      {\textcircled{~}}
   \else
      {\normalfont\bfseries\textendash}
@@ -3136,7 +3120,7 @@
    \edef\@itemitem{labelitem\romannumeral\the\@itemdepth}%
    \expandafter
    \list{\csname \@itemitem\endcsname}{%
-      \ifnum\ltjgetparameter{direction}=3 
+      \ifnum\ltjgetparameter{direction}=3
          \ifnum \@listdepth=\@ne \topsep.5\normalbaselineskip
            \else\topsep\z@\fi
          \parskip\z@ \itemsep\z@ \parsep\z@
@@ -3161,7 +3145,7 @@
 %    \begin{macrocode}
 \newenvironment{description}
   {\list{}{\labelwidth\z@ \itemindent-\leftmargin
-   \ifnum\ltjgetparameter{direction}=3 
+   \ifnum\ltjgetparameter{direction}=3
      \leftmargin\leftskip \advance\leftmargin3\Cwd
      \rightmargin\rightskip
      \labelsep=1\zw \itemsep\z@

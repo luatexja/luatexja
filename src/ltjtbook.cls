@@ -42,7 +42,6 @@
   [2014/11/15 v1.6-ltj-7
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
-\RequirePackage{filehook}
 \newcounter{@paper}
 \newif\if@landscape \@landscapefalse
 \newcommand{\@ptsize}{}
@@ -92,14 +91,6 @@
 \DeclareOption{b5p}{\setcounter{@paper}{4}\@stysizetrue
   \setlength\paperheight {257mm}
   \setlength\paperwidth  {182mm}}
-\AtEndOfPackageFile{geometry}{%
-  \setlength{\@tempdima}{\textheight}%
-  \setlength{\textheight}{\textwidth}%
-  \setlength{\textwidth}{\@tempdima}%
-  \expandafter\def\expandafter\Gm@process\expandafter{\Gm@process
-    \setlength{\@tempdima}{\textheight}%
-    \setlength{\textheight}{\textwidth}%
-    \setlength{\textwidth}{\@tempdima}}}
 \if@compatibility
   \renewcommand{\@ptsize}{0}
 \else

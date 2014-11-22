@@ -1,0 +1,171 @@
+%
+% lltjp-geometry.sty
+%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{lltjp-geometry}[2014/11/22 Patch to geometry for LuaTeX-ja with vertical writing mode]
+\RequirePackage{luatexja}
+\RequirePackage{filehook}
+
+\AtEndOfPackageFile{geometry}{%
+\ifnum\ltjgetparameter{direction}=3%
+\define@key{Gm}{hdivide}{\Gm@parse@divide{#1}{tmargin}{width}{bmargin}}%
+\define@key{Gm}{vdivide}{\Gm@parse@divide{#1}{rmargin}{height}{lmargin}}%
+\define@key{Gm}{divide}{\Gm@parse@divide{#1}{lmargin}{width}{rmargin}%
+  \Gm@parse@divide{#1}{rmargin}{height}{lmargin}}%
+\define@key{Gm}{hmargin}{\Gm@branch{#1}{tmargin}{bmargin}}%
+\define@key{Gm}{vmargin}{\Gm@branch{#1}{rmargin}{lmargin}}%
+\define@key{Gm}{margin}{\Gm@branch{#1}{tmargin}{rmargin}%
+  \Gm@branch{#1}{bmargin}{lmargin}}%
+\def\Gm@detall#1#2#3#4{%
+  \@tempcnta\z@
+  \if#1h
+    \let\Gm@mratio\Gm@hmarginratio
+    \edef\Gm@Dmratio{\if@twoside\Gm@Dhratiotwo\else\Gm@Dhratio\fi}%
+  \else
+    \let\Gm@mratio\Gm@vmarginratio
+    \edef\Gm@Dmratio{\Gm@Dvratio}%
+  \fi
+  \if#1h
+    \ifx\Gm@tmargin\@undefined\else\advance\@tempcnta4\relax\fi
+    \ifGm@hbody\advance\@tempcnta2\relax\fi
+    \ifx\Gm@bmargin\@undefined\else\advance\@tempcnta1\relax\fi
+    \Gm@cnth\@tempcnta
+  \else
+    \ifx\Gm@lmargin\@undefined\else\advance\@tempcnta4\relax\fi
+    \ifGm@vbody\advance\@tempcnta2\relax\fi
+    \ifx\Gm@rmargin\@undefined\else\advance\@tempcnta1\relax\fi
+    \Gm@cntv\@tempcnta
+  \fi
+  \ifcase\@tempcnta
+    \if#1h
+      \Gm@defbylen{width}{\Gm@Dhscale\Gm@layoutwidth}%
+    \else
+      \Gm@defbylen{height}{\Gm@Dvscale\Gm@layoutheight}%
+    \fi
+    \Gm@detiiandiii{#2}{#3}{#4}%
+  \or
+    \ifx\Gm@mratio\@undefined
+      \if#1h
+        \Gm@defbylen{width}{\Gm@Dhscale\Gm@layoutwidth}%
+      \else
+        \Gm@defbylen{height}{\Gm@Dvscale\Gm@layoutheight}%
+      \fi
+      \setlength\@tempdimc{\@nameuse{Gm@#4}}%
+      \Gm@detiiandiii{#2}{#3}{#4}%
+      \expandafter\let\csname Gm@#2\endcsname\@undefined
+      \Gm@defbylen{#4}{\@tempdimc}%
+    \else
+      \Gm@setbyratio[f]{#1}{#4}{#3}%
+    \fi
+    \Gm@detiv{#2}{#3}{#4}{#2}%
+  \or\Gm@detiiandiii{#2}{#3}{#4}%
+  \or\Gm@detiv{#2}{#2}{#4}{#3}%
+  \or
+    \ifx\Gm@mratio\@undefined
+      \if#1h
+        \Gm@defbylen{width}{\Gm@Dhscale\Gm@layoutwidth}%
+      \else
+        \Gm@defbylen{height}{\Gm@Dvscale\Gm@layoutheight}%
+      \fi
+      \setlength\@tempdimc{\@nameuse{Gm@#3}}%
+      \Gm@detiiandiii{#2}{#4}{#3}%
+      \expandafter\let\csname Gm@#2\endcsname\@undefined
+      \Gm@defbylen{#3}{\@tempdimc}%
+    \else
+      \Gm@setbyratio[b]{#1}{#3}{#4}%
+    \fi
+    \Gm@detiv{#2}{#3}{#4}{#2}%
+  \or\Gm@detiv{#2}{#3}{#4}{#2}%
+  \or\Gm@detiv{#2}{#2}{#3}{#4}%
+  \or\Gm@warning{Over-specification in `#1'-direction.%
+                  ^^J\@spaces `#2' (\@nameuse{Gm@#2}) is ignored}%
+    \Gm@detiv{#2}{#3}{#4}{#2}%
+  \else\fi}%
+\def\Gm@adjustpaper{%
+  \ifdim\paperwidth>\p@\else
+    \PackageError{geometry}{%
+    \string\paperwidth\space(\the\paperwidth) too short}{%
+    Set a paper type (e.g., `a4paper').}%
+  \fi
+  \ifdim\paperheight>\p@\else
+    \PackageError{geometry}{%
+    \string\paperheight\space(\the\paperheight) too short}{%
+    Set a paper type (e.g., `a4paper').}%
+  \fi
+  \ifGm@swap@papersize
+    \setlength\@tempdima{\paperwidth}%
+    \setlength\paperwidth{\paperheight}%
+    \setlength\paperheight{\@tempdima}%
+  \fi
+  \ifGm@layout\else
+    \setlength\Gm@layoutwidth{\paperheight}%
+    \setlength\Gm@layoutheight{\paperwidth}%
+  \fi}%
+\def\Gm@@process{%
+  \Gm@expandlengths
+  \Gm@adjustpaper
+  \addtolength\Gm@layoutwidth{-\Gm@bindingoffset}%
+  \Gm@adjustmp
+  \Gm@adjustbody
+  \Gm@detall{h}{width}{tmargin}{bmargin}%
+  \Gm@detall{v}{height}{lmargin}{rmargin}%
+  \setlength\textwidth{\Gm@width}%
+  \setlength\textheight{\Gm@height}%
+  \setlength\topmargin{\Gm@tmargin}%
+  \setlength\oddsidemargin{\Gm@lmargin}%
+  \addtolength\oddsidemargin{-1\Gm@truedimen in}%
+  \ifGm@includemp
+    \advance\textheight-\Gm@wd@mp
+    \advance\oddsidemargin\Gm@odd@mp
+  \fi
+  \if@mparswitch
+    \setlength\evensidemargin{\Gm@rmargin}%
+    \addtolength\evensidemargin{-1\Gm@truedimen in}%
+    \ifGm@includemp
+      \advance\evensidemargin\Gm@even@mp
+    \fi
+  \else
+    \evensidemargin\oddsidemargin
+  \fi
+  \advance\oddsidemargin\Gm@bindingoffset
+  \addtolength\topmargin{-1\Gm@truedimen in}%
+  \ifGm@includehead
+    \addtolength\textwidth{-\headheight}%
+    \addtolength\textwidth{-\headsep}%
+  \else
+    \addtolength\topmargin{-\headheight}%
+    \addtolength\topmargin{-\headsep}%
+  \fi
+  \ifGm@includefoot
+    \addtolength\textwidth{-\footskip}%
+  \fi
+  \ifGm@heightrounded
+    \setlength\@tempdima{\textheight}%
+    \addtolength\@tempdima{-\topskip}%
+    \@tempcnta\@tempdima
+    \@tempcntb\baselineskip
+    \divide\@tempcnta\@tempcntb
+    \setlength\@tempdimb{\baselineskip}%
+    \multiply\@tempdimb\@tempcnta
+    \advance\@tempdima-\@tempdimb
+    \multiply\@tempdima\tw@
+    \ifdim\@tempdima>\baselineskip
+      \addtolength\@tempdimb{\baselineskip}%
+    \fi
+    \addtolength\@tempdimb{\topskip}%
+    \textheight\@tempdimb
+  \fi
+  \advance\oddsidemargin\Gm@layoutvoffset%
+  \advance\evensidemargin\Gm@layoutvoffset%
+  \advance\topmargin\Gm@layouthoffset%
+  \addtolength\Gm@layoutheight{\Gm@bindingoffset}%
+}% end of \Gm@@process
+\Gm@initall
+\Gm@processconfig
+\ProcessOptionsKV[c]{Gm}%
+\Gm@setdefaultpaper
+\ProcessOptionsKV[p]{Gm}%
+\Gm@process
+\fi}
+\endinput
