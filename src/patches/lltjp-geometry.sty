@@ -118,6 +118,55 @@
     \setlength\Gm@layoutwidth{\paperheight}%
     \setlength\Gm@layoutheight{\paperwidth}%
   \fi}%
+\def\Gm@adjustbody{
+  \ifGm@hbody
+    \ifx\Gm@width\@undefined
+      \ifx\Gm@hscale\@undefined
+        \Gm@defbylen{width}{\Gm@Dhscale\Gm@layoutwidth}%
+      \else
+        \Gm@defbylen{width}{\Gm@hscale\Gm@layoutwidth}%
+      \fi
+    \fi
+    \ifx\Gm@textwidth\@undefined\else
+      \setlength\@tempdima{\Gm@textwidth}%
+      \ifGm@includemp
+        \advance\@tempdima\Gm@wd@mp
+      \fi
+      \ifGm@includehead
+        \addtolength\@tempdima{\headheight}%
+        \addtolength\@tempdima{\headsep}%
+      \fi
+      \ifGm@includefoot
+        \addtolength\@tempdima{\footskip}%
+      \fi
+      \edef\Gm@width{\the\@tempdima}%
+    \fi
+  \fi
+  \ifGm@vbody
+    \ifx\Gm@height\@undefined
+      \ifx\Gm@vscale\@undefined
+        \Gm@defbylen{height}{\Gm@Dvscale\Gm@layoutheight}%
+      \else
+        \Gm@defbylen{height}{\Gm@vscale\Gm@layoutheight}%
+      \fi
+    \fi
+    \ifx\Gm@lines\@undefined\else
+      \ifdim\topskip<\ht\strutbox
+        \setlength\@tempdima{\topskip}%
+        \setlength\topskip{\ht\strutbox}%
+        \Gm@warning{\noexpand\topskip was changed from \the\@tempdima\space
+        to \the\topskip}%
+      \fi
+      \setlength\@tempdima{\baselineskip}%
+      \multiply\@tempdima\Gm@lines
+      \addtolength\@tempdima{\topskip}%
+      \addtolength\@tempdima{-\baselineskip}%
+      \edef\Gm@textheight{\the\@tempdima}%
+    \fi
+    \ifx\Gm@textheight\@undefined\else
+      \edef\Gm@height{\the\textheight}%
+    \fi
+  \fi}%
 \def\Gm@@process{%
   \Gm@expandlengths
   \Gm@adjustpaper
