@@ -6,6 +6,7 @@
 \ProvidesPackage{lltjp-geometry}[2014/11/23 Patch to geometry for LuaTeX-ja with vertical writing mode]
 \RequirePackage{ifluatex}
 
+\newdimen\ltj@@geometry@topskip@backup
 \newif\if@ltj@@geometry@tate
 \@ltj@@geometry@tatefalse
 \ifluatex\else % pTeX
@@ -18,7 +19,9 @@
 
 \RequirePackage{filehook}
 
-
+\AtBeginOfPackageFile{geometry}{%
+  \ltj@@geometry@topskip@backup=\topskip
+}
 \AtEndOfPackageFile{geometry}{%
 \ifluatex
   \ifnum\ltjgetparameter{direction}=3 \@ltj@@geometry@tatetrue\fi
@@ -165,16 +168,20 @@
         \Gm@defbylen{height}{\Gm@vscale\Gm@layoutheight}%
       \fi
     \fi
+    \setlength\topskip\ltj@@geometry@topskip@backup
     \ifx\Gm@lines\@undefined\else
       \setlength\maxdepth{1\Cht}%
-      \setlength\topskip{.5\maxdepth}%
       \setbox\z@=\hbox{\tate% next \ifdim must be executed in tate dir.
         \ifdim\topskip<\ht\tstrutbox
-          \global\@tempdima\topskip 
+          \@tempdima\topskip
           \global\topskip\ht\tstrutbox
-          \Gm@warning{\noexpand\topskip was changed from \the\@tempdima\space
-            to \the\topskip}
-        \fi}
+          \PackageWarningNoLine{lltjp-geometry}%
+           {do not worry about  `\noexpand\topskip was changed ...'\MessageBreak
+              warning above}
+          \PackageWarningNoLine{lltjp-geometry}%
+            {\noexpand\topskip was changed from \the\@tempdima\space
+              to \the\topskip}
+        \fi}%
       \setlength\@tempdima{\baselineskip}%
       \multiply\@tempdima\Gm@lines
       \addtolength\@tempdima{\topskip}%

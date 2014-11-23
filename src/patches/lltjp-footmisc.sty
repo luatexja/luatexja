@@ -1,0 +1,58 @@
+%
+% lltjp-footmiscs.sty
+%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{lltjp-footmisc}[2014/11/23 Patch to footmisc for LuaTeX-ja]
+\RequirePackage{footmisc}
+
+\let  \if@tempswa  \ifFN@bottom
+\ifFN@para    \@tempswatrue \fi
+\if@tempswa
+  \ifFN@bottom
+    \toks@{\setbox\@outputbox \box\@cclv
+      \xdef\@freelist{\@freelist\@midlist}%
+      \global\let\@midlist\@empty
+      \@combinefloats
+      \ifvoid\footins
+      \else
+        \setbox\@outputbox \vbox\bgroup
+          \boxmaxdepth\@maxdepth
+          \unvbox\@outputbox
+          \vfill\relax
+    }
+    \the\FN@temptoken
+    \toks@\expandafter{\the\toks@\egroup\fi}
+  \else
+    \toks@{\ifvoid\footins
+        \setbox\@outputbox\box\@cclv
+      \else
+        \setbox\@outputbox \vbox\bgroup
+        \boxmaxdepth\@maxdepth
+        \unvbox\@cclv
+    }
+    \the\FN@temptoken
+    \toks@\expandafter{\the\toks@
+      \egroup
+      \fi
+      \xdef\@freelist{\@freelist\@midlist}%
+      \global\let\@midlist\@empty
+      \@combinefloats
+    }%
+  \fi
+  \toks@\expandafter{\the\toks@
+    \ifvbox\@kludgeins
+      \@makespecialcolbox
+    \else
+      \setbox\@outputbox \vbox to\@colht{%
+        \@texttop \dimen@\dp\@outputbox
+        \unvbox\@outputbox
+        \ifnum\ltjgetparameter{direction}=3 \hskip\z@\fi %%% LuaTeX-ja
+        \vskip -\dimen@\@textbottom
+      }%
+    \fi
+    \global\maxdepth\@maxdepth
+  }
+  \edef\@makecol{\the\toks@}
+\fi
+\endinput

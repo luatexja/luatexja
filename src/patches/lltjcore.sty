@@ -219,4 +219,39 @@
     \vbox{\yoko\unvbox \@begindvibox #1}%
 }
 
+%%% @makecol
+\gdef \@makecol {%
+   \ifvoid\footins
+     \setbox\@outputbox \box\@cclv
+   \else
+     \setbox\@outputbox \vbox {%
+       \boxmaxdepth \@maxdepth
+       \unvbox \@cclv
+       \vskip \skip\footins
+       \color@begingroup
+         \normalcolor
+         \footnoterule
+         \unvbox \footins
+       \color@endgroup
+       }%
+   \fi
+   \let\@elt\relax
+   \xdef\@freelist{\@freelist\@midlist}%
+   \global \let \@midlist \@empty
+   \@combinefloats
+   \ifvbox\@kludgeins
+     \@makespecialcolbox
+   \else
+     \setbox\@outputbox \vbox to\@colht {%
+       \@texttop
+       \dimen@ \dp\@outputbox
+       \unvbox \@outputbox
+       \ifnum\ltjgetparameter{direction}=3 \hskip\z@\fi %%% LuaTeX-ja
+       \vskip -\dimen@
+       \@textbottom
+       }%
+   \fi
+   \global \maxdepth \@maxdepth
+}
+
 \endinput
