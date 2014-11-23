@@ -213,4 +213,10 @@
 \newcount\hour
 \newcount\minute
 
+%%% AtBeginDvi
+\def \AtBeginDvi #1{%
+  \global \setbox \@begindvibox
+    \vbox{\yoko\unvbox \@begindvibox #1}%
+}
+
 \endinput

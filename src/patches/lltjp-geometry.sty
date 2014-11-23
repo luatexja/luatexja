@@ -23,7 +23,6 @@
 \ifluatex
   \ifnum\ltjgetparameter{direction}=3 \@ltj@@geometry@tatetrue\fi
 \fi
-\typeout{\meaning\if@ltj@@geometry@tate}
 \if@ltj@@geometry@tate
 \define@key{Gm}{hdivide}{\Gm@parse@divide{#1}{tmargin}{width}{bmargin}}%
 \define@key{Gm}{vdivide}{\Gm@parse@divide{#1}{rmargin}{height}{lmargin}}%
@@ -169,12 +168,13 @@
     \ifx\Gm@lines\@undefined\else
       \setlength\maxdepth{1\Cht}%
       \setlength\topskip{.5\maxdepth}%
-      \ifdim\topskip<\ht\tstrutbox
-        \setlength\@tempdima{\topskip}%
-        \setlength\topskip{\ht\tstrutbox}%
-        \Gm@warning{\noexpand\topskip was changed from \the\@tempdima\space
-          to \the\topskip}%
-      \fi
+      \setbox\z@=\hbox{\tate% next \ifdim must be executed in tate dir.
+        \ifdim\topskip<\ht\tstrutbox
+          \global\@tempdima\topskip 
+          \global\topskip\ht\tstrutbox
+          \Gm@warning{\noexpand\topskip was changed from \the\@tempdima\space
+            to \the\topskip}
+        \fi}
       \setlength\@tempdima{\baselineskip}%
       \multiply\@tempdima\Gm@lines
       \addtolength\@tempdima{\topskip}%
