@@ -3,12 +3,28 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-geometry}[2014/11/22 Patch to geometry for LuaTeX-ja with vertical writing mode]
-\RequirePackage{luatexja}
+\ProvidesPackage{lltjp-geometry}[2014/11/23 Patch to geometry for LuaTeX-ja with vertical writing mode]
+\RequirePackage{ifluatex}
+
+\newif\if@ltj@@geometry@tate
+\@ltj@@geometry@tatefalse
+\ifluatex\else % pTeX
+  \@ltj@@geometry@tatetrue
+\def \AtBeginDvi #1{%
+  \global \setbox \@begindvibox
+    \vbox{\yoko\unvbox \@begindvibox #1}%
+}
+\fi
+
 \RequirePackage{filehook}
 
+
 \AtEndOfPackageFile{geometry}{%
-\ifnum\ltjgetparameter{direction}=3
+\ifluatex
+  \ifnum\ltjgetparameter{direction}=3 \@ltj@@geometry@tatetrue\fi
+\fi
+\typeout{\meaning\if@ltj@@geometry@tate}
+\if@ltj@@geometry@tate
 \define@key{Gm}{hdivide}{\Gm@parse@divide{#1}{tmargin}{width}{bmargin}}%
 \define@key{Gm}{vdivide}{\Gm@parse@divide{#1}{rmargin}{height}{lmargin}}%
 \define@key{Gm}{divide}{\Gm@parse@divide{#1}{tmargin}{width}{bmargin}%
