@@ -70,7 +70,7 @@
 
 %% Load prerequisite packages.
 \endlinechar=13 %
-%%% \newif\ifltj@everyhook@avail\ltj@everyhook@availfalse
+\newif\ifltj@everyhook@avail\ltj@everyhook@availfalse
 %! 外部パッケージは普通の \endlinechar で読まないと危険.
 \ifltj@in@latex                 %<*LaTeX>
   \RequirePackage{luaotfload} [2013/05/10] % v2.2
@@ -78,7 +78,7 @@
   \RequirePackage{pdftexcmds} [2011/11/29] % v0.20
   \RequirePackage{xkeyval}    [2012/10/14] % v2.6b
   \RequirePackage{atbegshi}
-%%%  \IfFileExists{everyhook.sty}{\RequirePackage{everyhook}\ltj@everyhook@availtrue}{}
+  \IfFileExists{everyhook.sty}{\RequirePackage{everyhook}\ltj@everyhook@availtrue}{}
 \else                           %<*!LaTeX>
   \input luaotfload.sty
   \input ltxcmds.sty
@@ -575,40 +575,28 @@
     luatexja.stack.mmode = -tex.nest[tex.nest.ptr].mode
   }$%
 }
-% \ifltj@everyhook@avail
-%   \PushPreHook{hbox}{%
-%     \directlua{luatexja.direction.set_list_direction_hook()}%
-%     \aftergroup\ltj@@reset@badness
-%   }
-%   \PushPreHook{vbox}{%
-%     \directlua{luatexja.direction.set_list_direction_hook()}%
-%     \aftergroup\ltj@@reset@badness
-%   }
-% \else
-%   {\catcode`\!=0\catcode`\\=12
-%   !@PackageWarningNoLine{luatexja-core}{%
-%   I will use \everyhbox and \everyvbox directly !MessageBreak
-%   for  supporting multiple directions, !MessageBreak
-%   since everyhook.sty is not available}}
-%   \everyhbox{%
-%     \directlua{luatexja.direction.set_list_direction_hook()}%
-%     \aftergroup\ltj@@reset@badness
-%   }
-%   \everyvbox{%
-%     \directlua{luatexja.direction.set_list_direction_hook()}%
-%     \aftergroup\ltj@@reset@badness
-%   }
-% \fi
-
-\let\ltj@@everyhbox=\everyhbox\let\ltj@@everyvbox=\everyvbox
-\newtoks\ltj@@i@everyhbox\newtoks\ltj@@i@everyvbox
-\let\everyhbox=\ltj@@i@everyhbox\let\everyvbox=\ltj@@i@everyvbox
-\ltj@@everyhbox{%
-  \directlua{luatexja.direction.set_list_direction_hook()}%
-  \aftergroup\ltj@@reset@badness\the\ltj@@i@everyhbox}
-\ltj@@everyvbox{%
-  \directlua{luatexja.direction.set_list_direction_hook()}%
-  \aftergroup\ltj@@reset@badness\the\ltj@@i@everyvbox}
+\ifltj@everyhook@avail% using everyhook package
+  \PushPreHook{hbox}{%
+    \directlua{luatexja.direction.set_list_direction_hook()}%
+    \aftergroup\ltj@@reset@badness
+  }
+  \PushPreHook{vbox}{%
+    \directlua{luatexja.direction.set_list_direction_hook()}%
+    \aftergroup\ltj@@reset@badness
+  }
+\else
+  \let\ltj@@everyhbox=\everyhbox\let\ltj@@everyvbox=\everyvbox
+  \newtoks\ltj@@i@everyhbox\newtoks\ltj@@i@everyvbox
+  \let\everyhbox=\ltj@@i@everyhbox\let\everyvbox=\ltj@@i@everyvbox
+  \ltj@@everyhbox{%
+    \directlua{luatexja.direction.set_list_direction_hook()}%
+    \aftergroup\ltj@@reset@badness
+    \the\ltj@@i@everyhbox}
+  \ltj@@everyvbox{%
+    \directlua{luatexja.direction.set_list_direction_hook()}%
+    \aftergroup\ltj@@reset@badness
+    \the\ltj@@i@everyvbox}
+\fi
 
 \protected\def\ltj@@reset@badness{%
   \directlua{%
