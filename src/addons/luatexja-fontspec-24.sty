@@ -3,13 +3,12 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec-24}[2014/10/29 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec-24}[2014/12/03 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e,luatexja}
 \ExplSyntaxOn
 
 %%%%%%%% Change Japanese font family by \rmfamily or not
-\bool_if:NTF  \ltj_fontspec_match
-{
+\cs_new:Npn \ltj_fontspec_match_cmd {
   \renewcommand\jttdefault{\gtdefault}
   \DeclareRobustCommand\rmfamily
   {\not@math@alphabet\rmfamily\mathrm
@@ -21,12 +20,11 @@
   {\not@math@alphabet\ttfamily\mathtt
      \romanfamily\ttdefault\kanjifamily\jttdefault\selectfont}
   \DeclareDocumentCommand \setmonojfont { O{} m } {
-    \ltj_fontspec_set_family:Nnn \jttdefault {#1}{#2}
+    \ltj_fontspec_set_family:Nnn \jttdefault {##1}{##2}
     \normalfont
   }
-}{
 }
-
+\bool_if:NT  \ltj_fontspec_match_bool \ltj_fontspec_match_cmd
 %%%%%%%% Messages
 
 \msg_new:nnn {luatexja-fontspec} {addjfontfeatures-ignored}
