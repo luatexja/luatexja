@@ -952,9 +952,25 @@ Note that the bold series in both family are same as the medium series of \emph{
 また，どちらのファミリでもイタリック体・スラント体は定義されない．
 %</ja>
 
-
 %<en>\item Japanese characters in math mode are typeset by the font family \texttt{mc}.
 %<ja>\item 数式モード中の和文文字は明朝体(\texttt{mc})で出力される．
+
+%<*en>
+\item If you use the \Pkg{beamer} class with the default font theme (which uses sans serif
+      fonts) and with \LuaTeX-ja, you might want to change default Japanese fonts to
+      \emph{gothic} family. The following line  changes  the default Japanese font family
+      to \emph{gothic}:
+%</en>
+%<*ja>
+\item \Pkg{beamer}クラスを既定のフォント設定で使う場合，既定欧文フォントがサンセリフなの
+      で，既定和文フォントもゴシック体にしたいと思うかもしれない．その場合はプリアンブルに
+次を書けばよい：
+%</ja>
+\begin{lstlisting}
+ \renewcommand{\kanjifamilydefault}{\gtdefault}
+\end{lstlisting}
+
+
 \end{itemize}
 
 %<*en>
@@ -1113,6 +1129,7 @@ auto select&\cs{fontencoding}&\cs{fontfamily}&---&---&\cs{usefont}\\
 \ref{ssec-altfont}節の \cs{ltjdeclarealtfont} と，その\LaTeX 版の\
 \cs{DeclareAlternateKanjiFont}（\ref{ssec-nfsspat}節）を参照せよ．
 %</ja>
+
 \end{itemize}
 
 %<*en>
