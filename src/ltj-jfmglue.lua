@@ -568,7 +568,7 @@ do
    function set_np_xspc_jachar_yoko(Nx, x)
       local m = ltjf_font_metric_table[getfont(x)]
       local cls, c = slow_find_char_class(ltjs_orig_char_table[x], m, getchar(x))
-      Nx.met = m; Nx.class = cls
+      Nx.met, Nx.class, Nx.char = m, cls, c;
       if cls~=0 then set_attr(x, attr_jchar_class, cls) end
       Nx.pre  = table_current_stack[PRE + c]  or 0
       Nx.post = table_current_stack[POST + c] or 0
@@ -582,7 +582,7 @@ do
       local m = ltjf_font_metric_table[xf]
       local cls = slow_find_char_class(c, m, c_glyph)
       --setfield(x, 'char', ltjf_get_vert_glyph(xf, c_glyph) or c_glyph)
-      Nx.met = m; Nx.class = cls;
+      Nx.met, Nx.class, Nx.char = m, cls, c;
       if cls~=0 then set_attr(x, attr_jchar_class, cls) end
       Nx.pre  = table_current_stack[PRE + c]  or 0
       Nx.post = table_current_stack[POST + c] or 0
@@ -593,7 +593,7 @@ do
    function set_np_xspc_jachar_hbox(Nx, x)
       local m = ltjf_font_metric_table[getfont(x)]
       local c = getchar(x)
-      Nx.met = m; Nx.class = has_attr(x, attr_jchar_class) or 0;
+      Nx.met, Nx.char  = m, c; Nx.class = has_attr(x, attr_jchar_class) or 0;
       Nx.pre  = table_current_stack[PRE + c]  or 0
       Nx.post = table_current_stack[POST + c] or 0
       Nx.xspc = table_current_stack[XSP  + c] or 3
