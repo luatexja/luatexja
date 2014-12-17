@@ -1,0 +1,92 @@
+%
+% lltjp-tascmac.sty
+% \tbaselineshift=\z@ ==> \ltj@tablshift=\z@
+% \dimen...=\tbaselineshift ==> \dimen...=\ltj@tablshift sp
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{lltjp-tascmac}[2014/12/17 Patch to (t)ascmac for LuaTeX-ja]
+
+\RequirePackage{tascmac,luatexja}
+
+%% boxnote environment
+\def\boxnote{\par\vspace{\baselineskip}
+\@savetbaselineshift\ltj@tablshift sp\ltj@tablshift\z@
+\setbox\@nbox=\hbox{\@ascgrp\vrule width1.08pt depth35pt b\hss a\hss b}
+\@whiledim \wd\@nbox<\hsize \do{
+\setbox\@nbox=\hbox{\@ascgrp\unhbox\@nbox \hss a\hss b}}
+\setbox\@nbox=\hbox to\hsize{\@ascgrp\unhbox\@nbox \hss a\hss b%
+\vrule width1.08pt depth35pt}
+\@bw=\wd\@nbox\advance\@bw -40pt
+\begin{lrbox}{\@nbody}\begin{minipage}{\@bw}% (KN:1998/02/27)
+  \ltj@tablshift\@savetbaselineshift}%
+
+%% screen environment
+\def\screen{%
+\@savetbaselineshift\ltj@tablshift sp\ltj@tablshift\z@
+\@ifnextchar[{\@screen}{\@screen[0]}}
+\def\@screen[#1]{\ifcase#1\def\@r{20}\def\@s{9.8pt}\def\@sx{10pt}\or
+\def\@r{18}\def\@s{8.8pt}\def\@sx{9pt}\or
+\def\@r{16}\def\@s{7.8pt}\def\@sx{8pt}\or
+\def\@r{14}\def\@s{6.8pt}\def\@sx{7pt}\or
+\def\@r{12}\def\@s{5.8pt}\def\@sx{6pt}\or
+\def\@r{10}\def\@s{4.8pt}\def\@sx{5pt}\or
+\def\@r{8}\def\@s{3.8pt}\def\@sx{4pt}\or
+\def\@r{6}\def\@s{2.8pt}\def\@sx{3pt}\else
+\def\@r{4}\def\@s{1.8pt}\def\@sx{2pt}\fi
+\par\vspace{.3\baselineskip}\@scw\linewidth \advance\@scw -\@r pt
+\setbox\scb@x=\hbox to\@scw\bgroup\begin{minipage}{\@scw}% (KN:1998/02/27)
+  \ltj@tablshift\@savetbaselineshift}%
+
+%% itembox environment
+\def\@itembox[#1]#2{%
+  \@savetbaselineshift\ltj@tablshift sp\ltj@tablshift\z@
+  \par\vspace{.3\baselineskip}%
+  \setbox\@iboxstr=\hbox{#2}\@itemh\ht\@iboxstr\advance\@itemh\dp\@iboxstr
+  \vspace{.5\@itemh}\bgroup\@scw\linewidth
+  \advance\@scw-20pt\@iboxpos={#1}%
+  \setbox\scb@x=\hbox to\@scw\bgroup\begin{minipage}{\@scw}%
+  \ltj@tablshift\@savetbaselineshift
+  \vspace*{.5\@itemh}}%
+
+%% \keytop
+\def\@keytop[#1]#2{\ltj@tablshift\z@
+{\setbox0=\hbox{\shortstack{#2}}%
+\dimen0=\wd0\advance\dimen0 5pt\dimen1=\dp0\advance\dimen1 2.5pt%
+\setbox\scscb@x=\hbox to\dimen0{%
+\iftdir\tate\else\yoko\fi
+\@scw\wd0\hfil\vtop{\offinterlineskip
+\thinlines\setlength{\unitlength}{1pt}\hrule\kern2.3pt\@hobox{tl}{tr}5%
+\kern-2.4pt\box0\@hobox{bl}{br}5\kern-.25pt\hrule}\hfil}\dimen0=\dp\scscb@x%
+\setbox0=\vbox{\hbox{\hbox to0pt{\hss\vtop to\dimen0{\@vrf@{2.5pt}{.4pt}}}%
+\box\scscb@x\hbox to.2pt{\hss\vtop to\dimen0{\@vrf@{2.5pt}{.4pt}}}}}%
+\if #1c $\vcenter{\box0}$ \else \if #1t\else\if #1b\boxmaxdepth=0pt\else
+\boxmaxdepth=\dimen1\fi\fi \mbox{}\vbox{\box0}\fi}}
+
+%% \mask
+\def\mask#1#2{\ltj@tablshift\z@
+{\setbox\@bwsp=\hbox{#1}\setbox0=\hbox{\@ascgrp#2}%
+\dimen0=\wd\@bwsp\dimen1=\ht\@bwsp\advance\dimen1\dp\@bwsp\dimen2=-\dimen1
+\setdim@{\dimen0}{\wd0}\setdim@{\dimen1}{\ht0}%
+\setbox\@@bwsp=\hbox to\dimen0{\leaders
+\vtop to\dimen1{\leaders\hbox{\@ascgrp#2}\vfil}\hfil}%
+\advance\dimen2\dp\@@bwsp\divide\dimen2 2
+\advance\dimen2\dp\@bwsp\boxmaxdepth=\dimen2
+\setbox\@@bwsp=\vbox{\box\@@bwsp}%
+\mbox{}\hbox to\wd\@@bwsp{\hbox to0pt{\box\@@bwsp\hss}\hss\unhbox\@bwsp\hss}}}
+
+%% \maskbox
+\def\Maskbox#1#2#3#4#5#6{{\ltj@tablshift\z@
+\setbox0=\hbox{\@ascgrp#3}%
+\dimen0=#1\@setdim{\dimen0}{\wd0}\dimen1=#2\@setdim{\dimen1}{\ht0}%
+\ifx#4c\skip0=0pt plus1fil\skip1=\skip0\fi
+\ifx#4r\skip0=0pt plus1fil\skip1=0pt\fi
+\ifx#4l\skip1=0pt plus1fil\skip0=0pt\fi
+\hbox{\hbox to0pt{\hbox to\dimen0{\leaders\vbox to\dimen1{\leaders
+\hbox{\@ascgrp#3}\vfil}\hfil}\hss}%
+\vrule width#5\vbox to\dimen1{\hrule height#5\vfil
+\dimen3=#5\advance\dimen0-2\dimen3\advance\dimen0 .15pt
+\hbox to\dimen0{\hskip\skip0\relax#6\hskip\skip1}%
+\vfil\hrule height#5}\vrule width#5}}}
+
+
+\endinput

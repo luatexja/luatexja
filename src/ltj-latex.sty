@@ -64,6 +64,9 @@
 \ltj@pkgpatch{fontspec}
 \ltj@pkgpatch{stfloats}
 \ltj@pkgpatch{footmisc}
+\ltj@pkgpatch{tascmac}
+\ltj@AtBeginDocument{\@ifpackageloaded{ascmac}{\input{lltjp-tascmac.sty}}{}}% ascmac
+
 \RequirePackage{lltjp-geometry}
 
 
