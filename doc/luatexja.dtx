@@ -275,13 +275,16 @@ scripts for appropriate callbacks.
 
 %<*en>
 The \LuaTeX-ja package is under much influence of \pTeX\ engine. The initial
-target of development was to implement features of \pTeX. However,
-\emph{\LuaTeX-ja is not a just porting of \pTeX; unnatural
+target of development was to implement features of \pTeX. However, 
+implementing all feature of \pTeX\ is impossible, 
+since all process of \LuaTeX-ja must be implemented only by Lua and \TeX\ macros.
+Hence \emph{\LuaTeX-ja is not a just porting of \pTeX; unnatural
 specifications/behaviors of \pTeX\ were not adopted}.
 %</en>
 %<*ja>
 \LuaTeX-jaは，\pTeX に多大な影響を受けている．初期の開発目標は，\pTeX の機
-能をLuaコードにより実装することであった．しかし，開発が進むにつれ，\pTeX
+能をLuaコードにより実装することであった．しかし，（\pTeX はエンジン拡張であったのに対し）
+\LuaTeX-jaはLuaコードと\TeX マクロを用いて全てを実装していなければならないため，\pTeX
 の完全な移植は不可能であり，また\pTeX における実装がいささか不可解になっ
 ているような状況も発見された．そのため，\emph{\LuaTeX-jaは，もはや
 \pTeX の完全な移植は目標とはしない．\pTeX における不自然な仕様・挙動があ
@@ -289,34 +292,25 @@ specifications/behaviors of \pTeX\ were not adopted}.
 %</ja>
 
 %<*en>
-The followings are major changes from \pTeX:
+The followings are major changes from \pTeX.
+For more detailed information, see Part~\ref{part-imp} or other sections of this manual.
 %</en>
 %<*ja>
 以下は \pTeX からの主な変更点である．
+より詳細については第\ref{part-imp}部など本文書の残りを参照．
 %</ja>
 
-\begin{itemize}
 %<*en>
-\item \emph{\LuaTeX-ja does all process only with Lua and \TeX\ macros},
-while \pTeX\  is an engine extension of \TeX82.
-This means that several features of \pTeX\ are not completely implemented
-in \LuaTeX-ja.
-%</en>
-%<*ja>
-\item \pTeX はエンジン拡張であったのに対し，
-\emph{\LuaTeX-jaはLuaコードと\TeX マクロを用いて全てを実装している}．
-そのため，\pTeX のいくつかの機能は\LuaTeX-ja に（そのままの形では）実装していない．
-%</ja>
-\begin{itemize}
-%<*en>
- \item \pTeX\ addes several primitives, such as \cs{kanjiskip}, 
+\paragraph{Command names} \pTeX\ addes several primitives, such as \cs{kanjiskip}, 
 \cs{prebreakpenalty},~and,~\cs{ifydir}. They can be used as follows:
 %</en>
 %<*ja>
- \item 例えば\pTeX で追加された次のようなプリミティブ
+\paragraph{命令の名称} 例えば\pTeX で追加された次のようなプリミティブ
 %</ja>
 \begin{verbatim}
 \kanjiskip=10pt  \dimen0=kanjiskip
+\tbaselineshift=0.1zw
+\dimen0=\tbaselineshift
 \prebreakpenalty`ぁ=100
 \ifydir ... \fi
 \end{verbatim}
@@ -324,37 +318,48 @@ in \LuaTeX-ja.
 %<en> Instead of them, we have to write as the following.
 %<ja> は\LuaTeX-jaには存在しない．\LuaTeX-jaでは以下のように記述することになる．
 \begin{verbatim}
-\ltjsetparameter{kanjiskip}  \dimen0=\ltjgetparameter{kanjiskip}
+\ltjsetparameter{kanjiskip=10pt}  \dimen0=\ltjgetparameter{kanjiskip}
+\ltjsetparameter{talbaselineshift=0.1\zw}
+\dimen0=\ltjgetparameter{talbaselineshift}
 \ltjsetparameter{prebreakpenalty={`ぁ,100}}
 \ifnum\ltjgetparemeter{direction}=4 ... \fi
 \end{verbatim}
+%<*en> 
+Note that \pTeX\ adds new two useful units, namely \texttt{zw}~and~\texttt{zh}.
+As shown above, they are changed by \cs{zw}~and\cs{zh} respectively, in \LuaTeX-ja.
+%</en>
+%<*ja>
+特に注意してほしいのは，\pTeX で追加された \texttt{zw} と \texttt{zh} という単位を
+\LuaTeX-ja で扱うには，\cs{zw}, \cs{zh} と制御綴の形にしないといけないという点である．
+%</ja>
 
 %<*en>
-\item In \pTeX, a line break after Japanese character is ignored (and
+\paragraph{Linebreak after a Japanese character}
+In \pTeX, a line break after Japanese character is ignored (and
       doesn't yield a space), since line breaks (in source files) are
       permitted almost everywhere in Japanese texts. However, \LuaTeX-ja
       doesn't have this feature completely, because of a specification
       of \LuaTeX. For the detail, see Section~\ref{sec-lbreak}.
 %</en>
 %<*ja>
-\item 日本語の文書中では改行はほとんどどこでも許されるので，\pTeX では和文文字
+\paragraph{和文文字直後の改行}
+日本語の文書中では改行はほとんどどこでも許されるので，\pTeX では和文文字
       直後の改行は無視される（スペースが入らない）ようになっていた．しかし，
       \LuaTeX-ja では \LuaTeX の仕様のためにこの機能は完全には実装されていない．
       詳しくは\ref{sec-lbreak}章を参照．
 %</ja>
 
-\end{itemize}
-
-
-
 %<*en>
-\item The insertion process of glues/kerns between two Japanese
+
+\paragraph{Spaces related to Japanese characters}
+The insertion process of glues/kerns between two Japanese
       characters and between a Japanese character and other characters
       (we refer glues/kerns of both kinds as \textbf{JAglue}) is rewritten from
       scratch.
 %</en>
 %<*ja>
-\item 2つの和文文字の間や，和文文字と欧文文字の間に入るグルー／カーン
+\paragraph{和文関連の空白}
+2つの和文文字の間や，和文文字と欧文文字の間に入るグルー／カーン
       （両者をあわせて\textbf{JAglue}と呼ぶ）の挿入処理が0から書き直されている．
 %</ja>
 
@@ -402,7 +407,6 @@ in \LuaTeX-ja.
 ちょ\hbox{}っと
 \end{lstlisting}
 
-
 %<*en>
 \item In the process, two Japanese fonts which only differ in their ``real''
       fonts are identified.
@@ -413,27 +417,33 @@ in \LuaTeX-ja.
 %</ja>
 \end{itemize}
 
+%<*en>
+\paragraph{Directions}
+From version ********, \LuaTeX-ja supports vertical writing;
+but this feature must \emph{not} be confused with $\Omega$-style direction support of \LuaTeX\
+itself. ...
+%</en>
 %<*ja>
-\item ****版からは，不安定ながらも\LuaTeX-ja における縦組みをサポートしている．
-\LuaTeX のコールバックの制限などにより，特に異なった組方向のボックスを扱う場合には
-仕様が異なるので注意．
+\paragraph{組方向}
+****版からは，不安定ながらも\LuaTeX-ja における縦組みをサポートしている．
+なお，\LuaTeX 本体も，$\Omega$流の組方向をサポートしているが，それとは全くの別物であること
+に注意してほしい．
+\LuaTeX のコールバックや実装により，特に異なった組方向のボックスを扱う場合には
+\cs{wd}, \cs{ht}, \cs{dp}等の仕様が異なるので注意．詳細は第\ref{sec-direction}節を参照．
 %</ja>
 
 %<*en>
-\item Japanese characters in discretionary break (\cs{discretionary}) is not supported.
+\paragraph{\cs{discretionary}}
+Japanese characters in discretionary break (\cs{discretionary}) is not supported.
 %</en>
 %<*ja>
-\item \cs{discretionary} 内に直接和文文字を記述することはサポートされない．和文文字をどう
+\paragraph{\cs{discretionary}}
+ \cs{discretionary} 内に直接和文文字を記述することは，\pTeX においても想定されていなかった
+ 感があるが．\LuaTeX-jaにおいても想定していない．和文文字をどう
       しても使いたい場合は \cs{hbox} で括ること．
 %</ja>
-\end{itemize}
 
-%<*en>
-For detailed information, see Part~\ref{part-imp}.
-%</en>
-%<*ja>
-詳細については第\ref{part-imp}部を参照．
-%</ja>
+
 
 %<en>\subsection{Notations}
 %<ja>\subsection{用語と記法}
@@ -451,12 +461,12 @@ In this document, the following terms and notations are used:
       (see Subsection~\ref{ssec-setrange}).
 %</en>
 %<*ja>
-\item 文字は次の2種類に分けられる．この類別はユーザが後から変更可能である
+\item 文字は次の2種類に分けられる．この類別は固定されているものではなく，ユーザが後から変更可能である
       （\ref{ssec-setrange}節を参照）．
 %</ja>
 \begin{itemize}
 %<*en>
-\item \textbf{JAchar}: standing for characters which used in Japanese typesetting,
+\item \textbf{JAchar}: standing for characters which is used in Japanese typesetting,
       such as Hiragana,~Katakana, Kanji, and~other Japanese punctuation marks.
 %</en>
 %<*ja>
@@ -717,9 +727,15 @@ Note that \texttt{*.\{dtx,ins\}} and \texttt{ltj-kinsoku\_make.tex} are not need
 %</ja>
 \end{enumerate}
 
-%<en>\subsection{Cautions}
-%<ja>\subsection{注意点}
-
+%<*en>
+\subsection{Cautions}
+For changes from \pTeX, see Subsection~\ref{ssec:chgptex}.
+%</en>
+%<*ja>
+\subsection{注意点}
+\pTeX からの変更点として，\ref{ssec:chgptex}節も熟読するのが望ましい．
+ここでは一般的な注意点を述べる．
+%</ja>
 \begin{itemize}
 %<*en>
 \item The encoding of your source file must be UTF-8. No other
@@ -1010,11 +1026,12 @@ Okumura), namely, \Pkg{ltjclasses}\footnote{%
 脚注とボトムフロートの順序は\LaTeX 通りとした．もし\pLaTeX の出力順序が好みならば，
 \Pkg{stfloats}パッケージを利用して
 \begin{lstlisting}
- \usepackage{stfloats} \fnbelowfloat
+ \usepackage{stfloats}\fnbelowfloat
 \end{lstlisting}
 のようにすればよい．\Pkg{footmisc}パッケージを \texttt{bottom}\ オプションを指定して
 読み込むという方法もあるが，それだとボトムフロートと脚注の間が開いてしまう．
 %</ja>
+%%% ↑は英訳しない
 
 %<en>\section{Changing Fonts}
 %<ja>\section{フォントの変更}
@@ -1472,7 +1489,7 @@ In above table, starred fonts (KozGo\dots-Regular) are used for medium series of
 \emph{if and only if \texttt{deluxe} option is specified}.
 %</en>
 %<*ja>
-上の表において，*つきのフォント(KozGo\dots-Regular)は，\emph{\texttt{deluxe}オプション非指定時に}
+上の表において，*つきのフォント(KozGo\dots-Regular)は，\emph{\texttt{deluxe}オプション指定時に}
 ゴシック体細字として用いられる．
 %</ja>
 
@@ -2390,6 +2407,7 @@ $\Phi\vdash F(x)\ \hbox{for all}\ x\in A$
 \end{tabular}
 \end{table}
 %</ja>
+
 
 \clearpage
 %<en>\part{Reference}
