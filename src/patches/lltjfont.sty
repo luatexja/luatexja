@@ -361,15 +361,15 @@
 \newdimen\adjust@dimen
 \def\adjustbaseline{%
     \setbox\adjust@box\hbox{%
-      \ltj@ykblshift=0 \ltj@tkblshift=0漢}%
+      \ltj@ykblshift\z@\ltj@tkblshift\z@ 漢}%
     \cht\ht\adjust@box
     \cdp\dp\adjust@box
     \cwd\wd\adjust@box
     \cvs\normalbaselineskip
     \chs\cwd
     \cHT\cht \advance\cHT\cdp
-    \setbox\adjust@box@aux\hbox{\tate\ltj@tkblshift=0漢}%
-    \setbox\adjust@box\hbox{\tate\ltj@tablshift=0 M}%
+    \setbox\adjust@box@aux\hbox{\tate\ltj@tkblshift\z@ 漢}%
+    \setbox\adjust@box\hbox{\tate\ltj@tablshift\z@ M}%
     \adjust@dimen\ht\adjust@box
     \advance\adjust@dimen\dp\adjust@box
     \advance\adjust@dimen-\ht\adjust@box@aux
