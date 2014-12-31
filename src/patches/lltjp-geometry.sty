@@ -29,13 +29,22 @@
 \fi
 \if@ltj@@geometry@tate
 
+% TODO: 
+%  * pTeX, LuaTeX ともに landscape, truedimen が正しく動作しない
+%  * pTeX  resetpaper が正しく動作しない
+% 
 % `h', `v' は「水平」「垂直」を意味するが：
 % ユーザー側では「紙の物理的な水平方向」「物理的な垂直方向」を，
 % しかしパッケージ内部処理では「字送り方向」「行送り方向」を表す．
 % そのため，key-value interface 内で h, v の交換を行う必要がある．
 
-\define@key{Gm}{vdivide}{\Gm@parse@divide{#1}{tmargin}{width}{bmargin}}%
+% twoside 指定時は，lmargin は小口側，rmargin はノド側の余白を指す．
+% また，bindingoffset 偶数ページを右に，奇数ページを左にずらす．
 \define@key{Gm}{hdivide}{\Gm@parse@divide{#1}{lmargin}{height}{rmargin}}%
+
+\define@key{Gm}{vscale}{\Gm@hbodytrue\edef\Gm@hscale{#1}}%
+\define@key{Gm}{hscale}{\Gm@vbodytrue\edef\Gm@vscale{#1}}%
+\define@key{Gm}{vdivide}{\Gm@parse@divide{#1}{tmargin}{width}{bmargin}}%
 \define@key{Gm}{divide}{\Gm@parse@divide{#1}{tmargin}{width}{bmargin}%
   \Gm@parse@divide{#1}{lmargin}{height}{rmargin}}%
 \define@key{Gm}{vmargin}{\Gm@branch{#1}{tmargin}{bmargin}}%
@@ -44,8 +53,16 @@
   \Gm@branch{#1}{bmargin}{rmargin}}%
 \define@key{Gm}{headsep}{\Gm@defbylen{ltj@headsep}{#1}}%
 \define@key{Gm}{footskip}{\Gm@defbylen{ltj@footskip}{#1}}%
+\let\KV@Gm@foot\KV@Gm@footskip
 \define@key{Gm}{vmarginratio}{\edef\Gm@hmarginratio{#1}}%
 \define@key{Gm}{hmarginratio}{\edef\Gm@vmarginratio{#1}}%
+\define@key{Gm}{nohead}[true]{\Gm@doifelse{nohead}{#1}%
+  {\Gm@setlength\headheight\z@\Gm@defbylen{ltj@headsep}\z@}{}}%
+\define@key{Gm}{nofoot}[true]{\Gm@doifelse{nofoot}{#1}%
+  {\Gm@defbylen{ltj@footskip}\z@}{}}%
+\define@key{Gm}{noheadfoot}[true]{\Gm@doifelse{noheadfoot}{#1}%
+  {\Gm@setlength\headheight\z@\Gm@defbylen{ltj@headsep}\z@
+  \Gm@defbylen{ltj@footskip}\z@}{}}%
 
 % \@mparswitch は傍注の出力位置を左右ページで変えるスイッチだが，
 % geometry.sty はこれを左右ページのレイアウトを変えるか否かの判定にも使っている．
@@ -60,9 +77,13 @@
 \define@key{Gm}{asymmetric}[true]{\Gm@doifelse{asymmetric}{#1}%
   {\@twosidetrue\Gm@ltj@layoutswitchfalse}{}}%
 
-  \def\Gm@Dhratio{2:3}% = top:bottom default
-  \def\Gm@Dvratio{1:1}% = left:right default for oneside
-  \def\Gm@Dvratiotwo{2:3}% = inner:outer default for twoside.
+% includemp 指定時は，\headsep (if reversemp || twocolumn) や，
+% \footskip (if !reversemp || twocolumn) を傍注幅だけ増加させる．
+
+
+\def\Gm@Dhratio{2:3}% = top:bottom default
+\def\Gm@Dvratio{1:1}% = left:right default for oneside
+\def\Gm@Dvratiotwo{3:2}% = inner:outer default for twoside.
 
 % save length
 \def\Gm@save{%
@@ -143,10 +164,10 @@
   \@tempcnta\z@
   \if#1h
     \let\Gm@mratio\Gm@hmarginratio
-    \edef\Gm@Dmratio{\if@twoside\Gm@Dhratiotwo\else\Gm@Dhratio\fi}%
+    \edef\Gm@Dmratio{\Gm@Dhratio}%
   \else
     \let\Gm@mratio\Gm@vmarginratio
-    \edef\Gm@Dmratio{\Gm@Dvratio}%
+    \edef\Gm@Dmratio{\if@twoside\Gm@Dvratiotwo\else\Gm@Dvratio\fi}%
   \fi
   \if#1h
     \ifx\Gm@tmargin\@undefined\else\advance\@tempcnta4\relax\fi
@@ -154,9 +175,9 @@
     \ifx\Gm@bmargin\@undefined\else\advance\@tempcnta1\relax\fi
     \Gm@cnth\@tempcnta
   \else
-    \ifx\Gm@rmargin\@undefined\else\advance\@tempcnta4\relax\fi
+    \ifx\Gm@lmargin\@undefined\else\advance\@tempcnta4\relax\fi
     \ifGm@vbody\advance\@tempcnta2\relax\fi
-    \ifx\Gm@lmargin\@undefined\else\advance\@tempcnta1\relax\fi
+    \ifx\Gm@rmargin\@undefined\else\advance\@tempcnta1\relax\fi
     \Gm@cntv\@tempcnta
   \fi
   \ifcase\@tempcnta
@@ -207,8 +228,8 @@
 \def\Gm@clean{%
   \ifnum\Gm@cnth<4\let\Gm@tmargin\@undefined\fi
   \ifodd\Gm@cnth\else\let\Gm@bmargin\@undefined\fi
-  \ifnum\Gm@cntv<4\let\Gm@rmargin\@undefined\fi
-  \ifodd\Gm@cntv\else\let\Gm@lmargin\@undefined\fi
+  \ifnum\Gm@cntv<4\let\Gm@lmargin\@undefined\fi
+  \ifodd\Gm@cntv\else\let\Gm@rmargin\@undefined\fi
   \ifGm@hbody\else
     \let\Gm@hscale\@undefined
     \let\Gm@width\@undefined
@@ -297,34 +318,19 @@
     \fi
   \fi}%
 
-\def\Gm@adjustmp{%%%% TODO %%%%%%%
+\def\Gm@adjustmp{%
   \ifGm@includemp
     \@tempdimb\marginparwidth
     \advance\@tempdimb\marginparsep
     \Gm@wd@mp\@tempdimb
-    \Gm@odd@mp\z@
-    \Gm@even@mp\z@
     \if@twocolumn
       \Gm@wd@mp2\@tempdimb
-      \Gm@odd@mp\@tempdimb
-      \Gm@even@mp\@tempdimb
-    \else
-      \if@reversemargin
-        \Gm@odd@mp\@tempdimb
-        \if@mparswitch\else
-          \Gm@even@mp\@tempdimb
-        \fi
-      \else
-        \if@mparswitch
-          \Gm@even@mp\@tempdimb
-        \fi
-      \fi
     \fi
   \fi}%
 \def\Gm@@process{%
   \Gm@expandlengths
   \Gm@adjustpaper
-  \addtolength\Gm@layoutwidth{-\Gm@bindingoffset}%
+  \addtolength\Gm@layoutheight{-\Gm@bindingoffset}%
   \Gm@adjustmp
   \Gm@adjustbody
   \Gm@detall{h}{width}{tmargin}{bmargin}%
@@ -342,7 +348,7 @@
   \else
     \evensidemargin\oddsidemargin
   \fi
-  \advance\oddsidemargin\Gm@bindingoffset
+  \advance\evensidemargin\Gm@bindingoffset
   \addtolength\topmargin{-1\Gm@truedimen in}%
   \ifGm@includehead
     \addtolength\textwidth{-\headheight}%
@@ -356,11 +362,14 @@
   \fi
   \ifGm@includemp
     \advance\textwidth-\Gm@wd@mp
-    \if@reversemargin
+    \if@twocolumn
+      \advance\headsep.5\Gm@wd@mp
+      \advance\footskip.5\Gm@wd@mp
+    \else\if@reversemargin
       \advance\headsep\Gm@wd@mp
     \else
       \advance\footskip\Gm@wd@mp
-    \fi
+    \fi\fi
   \fi
   \ifGm@heightrounded
     \setlength\@tempdima{\textheight}%
