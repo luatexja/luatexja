@@ -6,7 +6,6 @@
 \ProvidesPackage{lltjp-geometry}[2014/11/23 Patch to geometry for LuaTeX-ja with vertical writing mode]
 \RequirePackage{ifluatex}
 
-\newdimen\ltj@@geometry@topskip@backup
 \newif\if@ltj@@geometry@tate
 \@ltj@@geometry@tatefalse
 \ifluatex\else % pTeX
@@ -20,7 +19,9 @@
 \RequirePackage{filehook}
 
 \AtBeginOfPackageFile{geometry}{%
-  \ltj@@geometry@topskip@backup=\topskip
+  \edef\Gm@ltj@topskip{\the\topskip}
+  \edef\Gm@ltj@headsep{\the\headsep}
+  \edef\Gm@ltj@footskip{\the\footskip}
 }
 \AtEndOfPackageFile{geometry}{%
 \ifluatex
@@ -35,6 +36,80 @@
 \define@key{Gm}{vmargin}{\Gm@branch{#1}{rmargin}{lmargin}}%
 \define@key{Gm}{margin}{\Gm@branch{#1}{tmargin}{rmargin}%
   \Gm@branch{#1}{bmargin}{lmargin}}%
+\define@key{Gm}{headsep}{\Gm@defbylen{ltj@headsep}{#1}}%
+\define@key{Gm}{footskip}{\Gm@defbylen{ltj@footskip}{#1}}%
+
+% save length
+\def\Gm@save{%
+  \Gm@savelength{paperwidth}%
+  \Gm@savelength{paperheight}%
+  \Gm@savelength{textwidth}%
+  \Gm@savelength{textheight}%
+  \Gm@savelength{evensidemargin}%
+  \Gm@savelength{oddsidemargin}%
+  \Gm@savelength{topmargin}%
+  \Gm@savelength{headheight}%
+  %\Gm@savelength{headsep}%
+  \Gm@savelength{topskip}%
+  %\Gm@savelength{footskip}%
+  \Gm@savelength{baselineskip}%
+  \Gm@savelength{marginparwidth}%
+  \Gm@savelength{marginparsep}%
+  \Gm@savelength{columnsep}%
+  \Gm@savelength{hoffset}%
+  \Gm@savelength{voffset}
+  \Gm@savelength{Gm@layoutwidth}%
+  \Gm@savelength{Gm@layoutheight}%
+  \Gm@savelength{Gm@layouthoffset}%
+  \Gm@savelength{Gm@layoutvoffset}%
+  \Gm@saveboolean{@twocolumn}%
+  \Gm@saveboolean{@twoside}%
+  \Gm@saveboolean{@mparswitch}%
+  \Gm@saveboolean{@reversemargin}}%
+
+% frame
+\renewcommand*{\Gm@pageframes}{%
+  \vb@xt@\z@{%
+   \ifGm@showcrop
+    \vb@xt@\z@{\vskip-1\Gm@truedimen in\vskip\Gm@layoutvoffset%
+     \hb@xt@\z@{\hskip-1\Gm@truedimen in\hskip\Gm@layouthoffset%
+      \vb@xt@\Gm@layoutheight{%
+       \let\protect\relax
+       \hb@xt@\Gm@layoutwidth{\Gm@cropmark(-1,1,-3,3)\hfil\Gm@cropmark(1,1,3,3)}%
+       \vfil
+       \hb@xt@\Gm@layoutwidth{\Gm@cropmark(-1,-1,-3,-3)\hfil\Gm@cropmark(1,-1,3,-3)}}%
+     \hss}%
+    \vss}%
+   \fi%
+   \ifGm@showframe
+    \if@twoside
+     \ifodd\count\z@
+       \let\@themargin\oddsidemargin
+     \else
+       \let\@themargin\evensidemargin
+     \fi
+    \fi
+    \moveright\@themargin%
+    \vb@xt@\z@{%
+     \vskip\topmargin\vb@xt@\z@{\vss\Gm@hrule}%
+     \vskip\headheight\vb@xt@\z@{\vss\Gm@hruled}%
+     \vskip\headsep\vb@xt@\z@{\vss\Gm@hrule}%
+     \if@reversemargin\vb@xt@\z@{%
+       \vss\vb@xt@\z@{\vss\Gm@hrule}%
+       \vskip\marginparwidth\vb@xt@\z@{\vss\Gm@hrule}%
+       \vskip\marginparsep
+     }\fi
+     \hb@xt@\textwidth{\llap{\Gm@vrule}\hfil\Gm@vrule}%
+     \vb@xt@\z@{\vss\Gm@hruled}%
+     \unless\if@reversemargin\vb@xt@\z@{%
+       \vskip\marginparsep\vb@xt@\z@{\vss\Gm@hrule}%
+       \vskip\marginparwidth\vb@xt@\z@{\vss\Gm@hruled}%
+     }\fi%
+     \vskip\footskip\vb@xt@\z@{\vss\Gm@hruled}%
+     \vss}%
+    \fi%
+  }}%
+
 \def\Gm@detall#1#2#3#4{%
   \@tempcnta\z@
   \if#1h
@@ -168,7 +243,7 @@
         \Gm@defbylen{height}{\Gm@vscale\Gm@layoutheight}%
       \fi
     \fi
-    \setlength\topskip\ltj@@geometry@topskip@backup
+    \setlength\topskip\Gm@ltj@topskip
     \ifx\Gm@lines\@undefined\else
       \setlength\maxdepth{1\Cht}%
       \setbox\z@=\hbox{\tate% next \ifdim must be executed in tate dir.
@@ -202,13 +277,11 @@
   \Gm@detall{v}{height}{rmargin}{lmargin}%
   \setlength\textwidth{\Gm@width}%
   \setlength\textheight{\Gm@height}%
+  \setlength\headsep{\Gm@ltj@headsep}%
+  \setlength\footskip{\Gm@ltj@footskip}%
   \setlength\topmargin{\Gm@tmargin}%
   \setlength\oddsidemargin{\Gm@lmargin}%
   \addtolength\oddsidemargin{-1\Gm@truedimen in}%
-  \ifGm@includemp
-    \advance\textheight-\Gm@wd@mp
-    \advance\oddsidemargin\Gm@odd@mp
-  \fi
   \if@mparswitch
     \setlength\evensidemargin{\Gm@rmargin}%
     \addtolength\evensidemargin{-1\Gm@truedimen in}%
@@ -229,6 +302,14 @@
   \fi
   \ifGm@includefoot
     \addtolength\textwidth{-\footskip}%
+  \fi
+  \ifGm@includemp
+    \advance\textwidth-\Gm@wd@mp
+    \if@reversemargin
+      \advance\headsep\Gm@wd@mp
+    \else
+      \advance\footskip\Gm@wd@mp
+    \fi
   \fi
   \ifGm@heightrounded
     \setlength\@tempdima{\textheight}%
