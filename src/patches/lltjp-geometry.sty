@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-geometry}[2014/11/23 Patch to geometry for LuaTeX-ja with vertical writing mode]
+\ProvidesPackage{lltjp-geometry}[2015/01/01 Patch to geometry for LuaTeX-ja with vertical writing mode]
 \RequirePackage{ifluatex}
 
 \ifdefined\if@ltj@@geometry@tate\expandafter\endinput\fi
@@ -26,18 +26,21 @@
   \edef\Gm@ltj@topskip{\the\topskip}
   \edef\Gm@ltj@headsep{\the\headsep}
   \edef\Gm@ltj@footskip{\the\footskip}
-  \let\PackageWarningNoLine\@gobbletwo
-}
-\AtEndOfPackageFile{geometry}{%
-\let\PackageWarningNoLine=\orig@PackageWarningNoLine
 \ifluatex
   \ifnum\ltjgetparameter{direction}=3 \@ltj@@geometry@tatetrue\fi
 \fi
 \if@ltj@@geometry@tate
+  \let\PackageWarningNoLine\@gobbletwo% 警告抑止
+\fi
+}
+\AtEndOfPackageFile{geometry}{%
+\let\PackageWarningNoLine=\orig@PackageWarningNoLine
+\if@ltj@@geometry@tate
+  \let\PackageWarningNoLine=\orig@PackageWarningNoLine
 %%% ここからパッチ開始
 
 % TODO: 
-%  * pTeX, LuaTeX ともに landscape, truedimen が正しく動作しない
+%  * pTeX, LuaTeX ともに truedimen が正しく動作しない
 %  * pTeX  resetpaper が正しく動作しない
 % 
 % `h', `v' は「水平」「垂直」を意味するが：
@@ -91,7 +94,7 @@
 \def\Gm@Dvratio{1:1}% = left:right default for oneside
 \def\Gm@Dvratiotwo{3:2}% = inner:outer default for twoside.
 \ifGm@swap@papersize
-  % geometry.sty ロード時に landscpae オプションが指定されていた場合，
+  % geometry.sty ロード時に landscape オプションが指定されていた場合，
   % それによって用紙サイズの縦横が入れ替わってしまっているので補正する．
   \setlength\@tempdima{\paperwidth}%
   \setlength\paperwidth{\paperheight}%
