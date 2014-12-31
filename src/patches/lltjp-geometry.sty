@@ -28,16 +28,41 @@
   \ifnum\ltjgetparameter{direction}=3 \@ltj@@geometry@tatetrue\fi
 \fi
 \if@ltj@@geometry@tate
-\define@key{Gm}{hdivide}{\Gm@parse@divide{#1}{tmargin}{width}{bmargin}}%
-\define@key{Gm}{vdivide}{\Gm@parse@divide{#1}{rmargin}{height}{lmargin}}%
+
+% `h', `v' は「水平」「垂直」を意味するが：
+% ユーザー側では「紙の物理的な水平方向」「物理的な垂直方向」を，
+% しかしパッケージ内部処理では「字送り方向」「行送り方向」を表す．
+% そのため，key-value interface 内で h, v の交換を行う必要がある．
+
+\define@key{Gm}{vdivide}{\Gm@parse@divide{#1}{tmargin}{width}{bmargin}}%
+\define@key{Gm}{hdivide}{\Gm@parse@divide{#1}{lmargin}{height}{rmargin}}%
 \define@key{Gm}{divide}{\Gm@parse@divide{#1}{tmargin}{width}{bmargin}%
-  \Gm@parse@divide{#1}{rmargin}{height}{lmargin}}%
-\define@key{Gm}{hmargin}{\Gm@branch{#1}{tmargin}{bmargin}}%
-\define@key{Gm}{vmargin}{\Gm@branch{#1}{rmargin}{lmargin}}%
-\define@key{Gm}{margin}{\Gm@branch{#1}{tmargin}{rmargin}%
-  \Gm@branch{#1}{bmargin}{lmargin}}%
+  \Gm@parse@divide{#1}{lmargin}{height}{rmargin}}%
+\define@key{Gm}{vmargin}{\Gm@branch{#1}{tmargin}{bmargin}}%
+\define@key{Gm}{hmargin}{\Gm@branch{#1}{lmargin}{rmargin}}%
+\define@key{Gm}{margin}{\Gm@branch{#1}{tmargin}{lmargin}%
+  \Gm@branch{#1}{bmargin}{rmargin}}%
 \define@key{Gm}{headsep}{\Gm@defbylen{ltj@headsep}{#1}}%
 \define@key{Gm}{footskip}{\Gm@defbylen{ltj@footskip}{#1}}%
+\define@key{Gm}{vmarginratio}{\edef\Gm@hmarginratio{#1}}%
+\define@key{Gm}{hmarginratio}{\edef\Gm@vmarginratio{#1}}%
+
+% \@mparswitch は傍注の出力位置を左右ページで変えるスイッチだが，
+% geometry.sty はこれを左右ページのレイアウトを変えるか否かの判定にも使っている．
+% 縦組クラスの場合は \@mparswitch は常に偽でないとおかしなことになるので
+% \@mparswitch -> \Gm@ltj@layoutswitch と名称変更する．
+
+\newif\ifGm@ltj@layoutswitch
+\let\Gm@ltj@layoutswitch\@mparswitch
+\@mparswitchfalse
+\define@key{Gm}{twoside}[true]{\Gm@doifelse{twoside}{#1}%
+  {\@twosidetrue\Gm@ltj@layoutswitchtrue}{\@twosidefalse\Gm@ltj@layoutswitchfalse}}%
+\define@key{Gm}{asymmetric}[true]{\Gm@doifelse{asymmetric}{#1}%
+  {\@twosidetrue\Gm@ltj@layoutswitchfalse}{}}%
+
+  \def\Gm@Dhratio{2:3}% = top:bottom default
+  \def\Gm@Dvratio{1:1}% = left:right default for oneside
+  \def\Gm@Dvratiotwo{2:3}% = inner:outer default for twoside.
 
 % save length
 \def\Gm@save{%
@@ -64,12 +89,17 @@
   \Gm@savelength{Gm@layoutvoffset}%
   \Gm@saveboolean{@twocolumn}%
   \Gm@saveboolean{@twoside}%
-  \Gm@saveboolean{@mparswitch}%
+  \Gm@saveboolean{Gm@ltj@layoutswitch}%
   \Gm@saveboolean{@reversemargin}}%
 
 % frame
+\ifluatex
+  \def\Gm@pageframe@cmd{\vb@xt@\z@}
+\else
+  \def\Gm@pageframe@cmd{\vb@xt@\z@\bgroup\yoko\aftergroup\egroup}
+\fi
 \renewcommand*{\Gm@pageframes}{%
-  \vb@xt@\z@{%
+  \Gm@pageframe@cmd{%
    \ifGm@showcrop
     \vb@xt@\z@{\vskip-1\Gm@truedimen in\vskip\Gm@layoutvoffset%
      \hb@xt@\z@{\hskip-1\Gm@truedimen in\hskip\Gm@layouthoffset%
@@ -108,8 +138,7 @@
      \vskip\footskip\vb@xt@\z@{\vss\Gm@hruled}%
      \vss}%
     \fi%
-  }}%
-
+  }}
 \def\Gm@detall#1#2#3#4{%
   \@tempcnta\z@
   \if#1h
@@ -267,6 +296,31 @@
       \edef\Gm@height{\Gm@textheight}%
     \fi
   \fi}%
+
+\def\Gm@adjustmp{%%%% TODO %%%%%%%
+  \ifGm@includemp
+    \@tempdimb\marginparwidth
+    \advance\@tempdimb\marginparsep
+    \Gm@wd@mp\@tempdimb
+    \Gm@odd@mp\z@
+    \Gm@even@mp\z@
+    \if@twocolumn
+      \Gm@wd@mp2\@tempdimb
+      \Gm@odd@mp\@tempdimb
+      \Gm@even@mp\@tempdimb
+    \else
+      \if@reversemargin
+        \Gm@odd@mp\@tempdimb
+        \if@mparswitch\else
+          \Gm@even@mp\@tempdimb
+        \fi
+      \else
+        \if@mparswitch
+          \Gm@even@mp\@tempdimb
+        \fi
+      \fi
+    \fi
+  \fi}%
 \def\Gm@@process{%
   \Gm@expandlengths
   \Gm@adjustpaper
@@ -274,7 +328,7 @@
   \Gm@adjustmp
   \Gm@adjustbody
   \Gm@detall{h}{width}{tmargin}{bmargin}%
-  \Gm@detall{v}{height}{rmargin}{lmargin}%
+  \Gm@detall{v}{height}{lmargin}{rmargin}%
   \setlength\textwidth{\Gm@width}%
   \setlength\textheight{\Gm@height}%
   \setlength\headsep{\Gm@ltj@headsep}%
@@ -282,12 +336,9 @@
   \setlength\topmargin{\Gm@tmargin}%
   \setlength\oddsidemargin{\Gm@lmargin}%
   \addtolength\oddsidemargin{-1\Gm@truedimen in}%
-  \if@mparswitch
+  \ifGm@ltj@layoutswitch
     \setlength\evensidemargin{\Gm@rmargin}%
     \addtolength\evensidemargin{-1\Gm@truedimen in}%
-    \ifGm@includemp
-      \advance\evensidemargin\Gm@even@mp
-    \fi
   \else
     \evensidemargin\oddsidemargin
   \fi
@@ -332,6 +383,64 @@
   \advance\topmargin\Gm@layouthoffset%
   \addtolength\Gm@layoutheight{\Gm@bindingoffset}%
 }% end of \Gm@@process
+
+% log
+\def\Gm@logcontent#1{%
+  *geometry* verbose mode - [ #1 ] result:^^J%
+  \ifGm@pass * pass: disregarded the geometry package!^^J%
+  \else
+  * driver: \if\Gm@driver<none>\else\Gm@driver\fi^^J%
+  * paper: \ifx\Gm@paper\@undefined<default>\else\Gm@paper\fi^^J%
+  * layout: \ifGm@layout<custom>\else<same size as paper>\fi^^J%
+  \ifGm@layout
+  * layout(width,height): (\the\Gm@layoutwidth,\the\Gm@layoutheight)^^J%
+  \fi
+  * layoutoffset:(h,v)=(\the\Gm@layouthoffset,\the\Gm@layoutvoffset)^^J%
+  \@ifundefined{Gm@lines}{}{* lines: \Gm@lines^^J}%
+  \@ifundefined{Gm@hmarginratio}{}{* hratio: \Gm@hmarginratio^^J}%
+  \@ifundefined{Gm@vmarginratio}{}{* vratio: \Gm@vmarginratio^^J}%
+  \ifdim\Gm@bindingoffset=\z@\else
+  * bindingoffset: \the\Gm@bindingoffset^^J\fi
+  * modes: %
+   \Gm@showbool{landscape}%
+   \Gm@showbool{includehead}%
+   \Gm@showbool{includefoot}%
+   \Gm@showbool{includemp}%
+   \if@twoside twoside\space\fi%
+   \ifGm@ltj@layoutswitch\else\if@twoside asymmetric\space\fi\fi%
+   \Gm@showbool{heightrounded}%
+   \ifx\Gm@truedimen\@empty\else truedimen\space\fi%
+   \Gm@showbool{showframe}%
+   \Gm@showbool{showcrop}%
+  ^^J%
+  * h-part:(L,W,R)=(\Gm@lmargin, \Gm@height, \Gm@rmargin)^^J%
+  * v-part:(T,H,B)=(\Gm@tmargin, \Gm@width, \Gm@bmargin)^^J%
+  \fi
+  \Gm@showdim{\paperwidth}%
+  \Gm@showdim{\paperheight}%
+  \Gm@showdim{\textwidth}%
+  \Gm@showdim{\textheight}%
+  \Gm@showdim{\oddsidemargin}%
+  \Gm@showdim{\evensidemargin}%
+  \Gm@showdim{\topmargin}%
+  \Gm@showdim{\headheight}%
+  \Gm@showdim{\headsep}%
+  \Gm@showdim{\topskip}%
+  \Gm@showdim{\footskip}%
+  \Gm@showdim{\marginparwidth}%
+  \Gm@showdim{\marginparsep}%
+  \Gm@showdim{\columnsep}%
+  * \string\skip\string\footins=\the\skip\footins^^J%
+  \Gm@showdim{\hoffset}%
+  \Gm@showdim{\voffset}%
+  \Gm@showdim{\mag}%
+  * \string\@twocolumn\if@twocolumn true\else false\fi^^J%
+  * \string\@twoside\if@twoside true\else false\fi^^J%
+  * \string\@mparswitch\if@mparswitch true\else false\fi^^J%
+  * \string\@reversemargin\if@reversemargin true\else false\fi^^J%
+  * (1in=72.27pt=25.4mm, 1cm=28.453pt)^^J}%
+
+
 \Gm@initall
 \Gm@processconfig
 \ProcessOptionsKV[c]{Gm}%
