@@ -17,6 +17,7 @@
 \fi
 
 \RequirePackage{filehook}
+\newif\ifGm@ltj@layoutswitch
 
 \AtBeginOfPackageFile{geometry}{%
   \edef\Gm@ltj@topskip{\the\topskip}
@@ -69,7 +70,6 @@
 % 縦組クラスの場合は \@mparswitch は常に偽でないとおかしなことになるので
 % \@mparswitch -> \Gm@ltj@layoutswitch と名称変更する．
 
-\newif\ifGm@ltj@layoutswitch
 \let\Gm@ltj@layoutswitch\@mparswitch
 \@mparswitchfalse
 \define@key{Gm}{twoside}[true]{\Gm@doifelse{twoside}{#1}%
@@ -392,7 +392,6 @@
   \advance\topmargin\Gm@layouthoffset%
   \addtolength\Gm@layoutheight{\Gm@bindingoffset}%
 }% end of \Gm@@process
-
 % log
 \def\Gm@logcontent#1{%
   *geometry* verbose mode - [ #1 ] result:^^J%
