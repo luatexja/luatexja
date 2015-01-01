@@ -39,7 +39,7 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjtreport}
-  [2014/11/15 v1.6-ltj-7
+  [2015/01/01 v1.6-ltj-9
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -865,13 +865,13 @@
 \def\today{{%
   \ifnum\ltjgetparameter{direction}=3
     \if西暦
-      \kansuji\number\year 年
-      \kansuji\number\month 月
-      \kansuji\number\day 日
+      \kansuji\year 年
+      \kansuji\month 月
+      \kansuji\day 日
     \else
-      平成\ifnum\heisei=1 元年\else\kansuji\number\heisei 年\fi
-      \kansuji\number\month 月
-      \kansuji\number\day 日
+      平成\ifnum\heisei=1 元年\else\kansuji\heisei 年\fi
+      \kansuji\month 月
+      \kansuji\day 日
     \fi
   \else
     \if西暦

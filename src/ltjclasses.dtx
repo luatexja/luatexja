@@ -10,7 +10,7 @@
 %
 % \fi
 %
-% \CheckSum{4533}
+% \CheckSum{4499}
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -78,11 +78,12 @@
 % \changes{v1.6-ltj}{2011/09/27}{jclasses.dtx v1.6 をベースにLua\LaTeX-ja用に修正。}
 % \changes{v1.6-ltj-2}{2013/06/06}{luatexja.cfgに対応．}
 % \changes{v1.6-ltj-3}{2014/06/08}{縦組クラスの時のgeometry.styに対応．}
-% \changes{v1.6-ltj-4}{2014/06/30}{組方向の変更箇所を現行の\LuaTeX-jaの仕様に合うように修正．}
+% \changes{v1.6-ltj-4}{2014/06/30}{組方向の変更箇所を現行のLua\TeX-jaの仕様に合うように修正．}
 % \changes{v1.6-ltj-5}{2014/07/02}{\cs{ifydir}, \cs{iftdir}を使わないように修正．}
 % \changes{v1.6-ltj-6}{2014/07/28}{縦組クラスでlltjext.styを読み込むように修正．}
 % \changes{v1.6-ltj-7}{2014/11/15}{縦組クラスとeveryshi.styとの相性が悪い問題を修正．}
 % \changes{v1.6-ltj-8}{2014/11/22}{縦組時のgeometry.styへの対応を別ファイル(lltjp-geometry.sty)に分離．それに伴いv1.6-ltj-3での変更を削除．}
+% \changes{v1.6-ltj-9}{2015/01/01}{縦組クラスの日付出力でエラーになるのを修正．}
 % \fi
 %
 % \iffalse
@@ -112,7 +113,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2014/11/15 v1.6-ltj-7
+  [2015/01/01 v1.6-ltj-9
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -4091,17 +4092,20 @@
 %
 % \begin{macro}{\today}
 % 縦組の場合は、漢数字で出力します。
+%
+% \changes{v1.6-ltj-9}{2015/01/01}{縦組では，この漢数字による日付出力でエラーになりました．
+% Lua\TeX-ja では，\cs{kansuji}の後に\cs{number}を続けることは出来ないので\cs{number}を削除しました．}
 %    \begin{macrocode}
 \def\today{{%
   \ifnum\ltjgetparameter{direction}=3
     \if西暦
-      \kansuji\number\year 年
-      \kansuji\number\month 月
-      \kansuji\number\day 日
+      \kansuji\year 年
+      \kansuji\month 月
+      \kansuji\day 日
     \else
-      平成\ifnum\heisei=1 元年\else\kansuji\number\heisei 年\fi
-      \kansuji\number\month 月
-      \kansuji\number\day 日
+      平成\ifnum\heisei=1 元年\else\kansuji\heisei 年\fi
+      \kansuji\month 月
+      \kansuji\day 日
     \fi
   \else
     \if西暦
