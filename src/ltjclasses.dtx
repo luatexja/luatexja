@@ -83,7 +83,7 @@
 % \changes{v1.6-ltj-6}{2014/07/28}{縦組クラスでlltjext.styを読み込むように修正．}
 % \changes{v1.6-ltj-7}{2014/11/15}{縦組クラスとeveryshi.styとの相性が悪い問題を修正．}
 % \changes{v1.6-ltj-8}{2014/11/22}{縦組時のgeometry.styへの対応を別ファイル(lltjp-geometry.sty)に分離．それに伴いv1.6-ltj-3での変更を削除．}
-% \changes{v1.6-ltj-9}{2015/01/01}{縦組クラスの日付出力でエラーになるのを修正．}
+% \changes{v1.6-ltj-9}{2015/01/01}{縦組クラスの日付出力でエラーになることなどを修正．}
 % \fi
 %
 % \iffalse
@@ -506,6 +506,42 @@
 %</article|report|book>
 %    \end{macrocode}
 %
+% \subsection{フォントメトリックの変更}
+% 
+% Lua\LaTeX-jaの標準では、OTFパッケージ由来のメトリックが使われるようになっています。
+% 本クラスでは、「p\TeX の組版と互換性をできるだけ持たせる」例を提示するため、
+% \begin{itemize}
+% \item メトリックを\texttt{min10.tfm}ベースの\texttt{jfm-min.lua}に変更。
+% \item 明朝とゴシックは両方とも\texttt{jfm-min.lua}を用いるが、
+%   和文処理用グルー挿入時には「違うメトリックを使用」として思わせる。
+% \item p\TeX と同様に、「異なるメトリックの2つの和文文字」の間には、両者から定める
+%   グルーを両方挿入する。
+% \item calllbackを利用し、標準で用いる\texttt{jfm-min.lua}を、段落始めの括弧が全角二分下がりになるように内部で変更している。
+%
+% \end{itemize}
+%
+% |\ltj@stdmcfont|,~|\ltj@stdgtfont| による、デフォルトで使われ明朝・ゴシックのフォントの
+% 設定に対応しました。この2つの命令の値はユーザが日々の利用でその都度指定するものではなく、
+% 何らかの理由で非埋め込みフォントが正しく利用できない場合にのみ |luatexja.cfg| によって
+% セットされるものです。
+%
+% \changes{v1.6-ltj-9}{2015/01/01}{サイズクラスのロード前にメトリックの変更を行わないと，
+% \cs{Cht}等の値が反映されないのでこの場所に移動させました．}
+% 
+%    \begin{macrocode}
+%<*article|report|book>
+\directlua{luatexbase.add_to_callback('luatexja.load_jfm',
+  function (ji, jn) ji.chars['parbdd'] = 0; return ji end,
+  'ltj.jclasses_load_jfm', 1)}
+{\jfont\g=\ltj@stdmcfont:jfm=min } % loading jfm-min.lua
+\expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
+\DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.962216] \ltj@stdmcfont:jfm=min}{}
+\DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.962216] \ltj@stdgtfont:jfm=min;jfmvar=goth}{}
+\ltjglobalsetparameter{differentjfm=both}
+\directlua{luatexbase.remove_from_callback('luatexja.load_jfm', 'ltj.jclasses_load_jfm')}
+%</article|report|book>
+%    \end{macrocode}
+%
 % \subsection{オプションの実行}
 % オプションの実行、およびサイズクラスのロードを行ないます。
 %    \begin{macrocode}
@@ -538,38 +574,6 @@
 %    \end{macrocode}
 %
 % \section{フォント}
-%
-% Lua\LaTeX-jaの標準では、OTFパッケージ由来のメトリックが使われるようになっています。
-% 本クラスでは、「p\TeX の組版と互換性をできるだけ持たせる」例を提示するため、
-% \begin{itemize}
-% \item メトリックを\texttt{min10.tfm}ベースの\texttt{jfm-min.lua}に変更。
-% \item 明朝とゴシックは両方とも\texttt{jfm-min.lua}を用いるが、
-%   和文処理用グルー挿入時には「違うメトリックを使用」として思わせる。
-% \item p\TeX と同様に、「異なるメトリックの2つの和文文字」の間には、両者から定める
-%   グルーを両方挿入する。
-% \item calllbackを利用し、標準で用いる\texttt{jfm-min.lua}を、段落始めの括弧が全角二分下がりになるように内部で変更している。
-%
-% \end{itemize}
-%
-% |\ltj@stdmcfont|,~|\ltj@stdgtfont| による、デフォルトで使われ明朝・ゴシックのフォントの
-% 設定に対応しました。この2つの命令の値はユーザが日々の利用でその都度指定するものではなく、
-% 何らかの理由で非埋め込みフォントが正しく利用できない場合にのみ |luatexja.cfg| によって
-% セットされるものです。
-%
-%
-%    \begin{macrocode}
-%<*article|report|book>
-\directlua{luatexbase.add_to_callback('luatexja.load_jfm',
-  function (ji, jn) ji.chars['parbdd'] = 0; return ji end,
-  'ltj.jclasses_load_jfm', 1)}
-{\jfont\g=\ltj@stdmcfont:jfm=min } % loading jfm-min.lua
-\expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
-\DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.962216] \ltj@stdmcfont:jfm=min}{}
-\DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.962216] \ltj@stdgtfont:jfm=min;jfmvar=goth}{}
-\ltjglobalsetparameter{differentjfm=both}
-\directlua{luatexbase.remove_from_callback('luatexja.load_jfm', 'ltj.jclasses_load_jfm')}
-%</article|report|book>
-%    \end{macrocode}
 %
 % ここでは、\LaTeX{}のフォントサイズコマンドの定義をしています。
 % フォントサイズコマンドの定義は、次のコマンドを用います。

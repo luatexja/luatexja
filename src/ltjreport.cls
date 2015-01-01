@@ -150,9 +150,6 @@
 \fi
 \DeclareOption{draft}{\setlength\overfullrule{5pt}}
 \DeclareOption{final}{\setlength\overfullrule{0pt}}
-\ExecuteOptions{a4paper,10pt,oneside,onecolumn,final,openany}
-\ProcessOptions\relax
-\input{ltjsize1\@ptsize.clo}
 \directlua{luatexbase.add_to_callback('luatexja.load_jfm',
   function (ji, jn) ji.chars['parbdd'] = 0; return ji end,
   'ltj.jclasses_load_jfm', 1)}
@@ -162,6 +159,9 @@
 \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.962216] \ltj@stdgtfont:jfm=min;jfmvar=goth}{}
 \ltjglobalsetparameter{differentjfm=both}
 \directlua{luatexbase.remove_from_callback('luatexja.load_jfm', 'ltj.jclasses_load_jfm')}
+\ExecuteOptions{a4paper,10pt,oneside,onecolumn,final,openany}
+\ProcessOptions\relax
+\input{ltjsize1\@ptsize.clo}
 \if@stysize
   \setlength\columnsep{2\Cwd}
 \else

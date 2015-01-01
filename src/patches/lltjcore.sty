@@ -100,7 +100,7 @@
 \newdimen\@@topmargin
 \def\@outputpage{%
 \begingroup % the \endgroup is put in by \aftergroup
-  \ifnum\ltjgetparameter{direction}=3 
+  \ifnum\ltjgetparameter{direction}=4\else
     \dimen\z@\textwidth \textwidth\textheight \textheight\dimen\z@
   \fi
   \let \protect \noexpand
@@ -246,7 +246,7 @@
        \@texttop
        \dimen@ \dp\@outputbox
        \unvbox \@outputbox
-       \ifnum\ltjgetparameter{direction}=3 \hskip\z@\fi %%% LuaTeX-ja
+       \ifnum\ltjgetparameter{direction}=4\else\hskip\z@\fi %%% LuaTeX-ja
        \vskip -\dimen@
        \@textbottom
        }%

@@ -311,14 +311,22 @@
     \fi
     \setlength\topskip\Gm@ltj@topskip
     \ifx\Gm@lines\@undefined\else
-      \setlength\maxdepth{1\Cht}%
+      \@tempdima=\f@size\p@ \@tempdima=.5\@tempdima
+      \ifluatex
+        \advance\@tempdima\ltjgetparameter{talbaselineshift}%
+      \else
+        \advance\@tempdima\tbaselineshift
+      \fi
+      \ifdim\maxdepth<\@tempdima
+        \PackageWarningNoLine{lltjp-geometry}%
+          {\noexpand\maxdepth was changed from \the\maxdepth\space
+            to \the\@tempdima}
+        \maxdepth\@tempdima
+      \fi
       \setbox\z@=\hbox{\tate% next \ifdim must be executed in tate dir.
         \ifdim\topskip<\ht\tstrutbox
           \@tempdima\topskip
           \global\topskip\ht\tstrutbox
-          \PackageWarningNoLine{lltjp-geometry}%
-           {do not worry about  `\noexpand\topskip was changed ...'\MessageBreak
-              warning above}
           \PackageWarningNoLine{lltjp-geometry}%
             {\noexpand\topskip was changed from \the\@tempdima\space
               to \the\topskip}

@@ -1,0 +1,192 @@
+%#! luajitlatex
+\documentclass[a4paper,10pt]{ltjsarticle}
+\usepackage[textwidth=45\zw, lines=45, columnsep=3\zw,
+   footskip=3\zw, showframe]{geometry}
+\usepackage{listings,amsmath,booktabs,lltjext}
+\usepackage[match]{luatexja-fontspec}
+\usepackage[kozuka-pr6n]{luatexja-preset}\normalsize
+\def\emph#1{\textbf{\textgt{\mathversion{bold}#1}}}
+\def\headfont{\normalfont\bfseries\gtfamily}
+\def\pTeX{p\kern-.05em\TeX}
+\def\cs#1{\text{\texttt{\char`\\#1}}}
+
+\lstset{
+  basicstyle=\ttfamily, basewidth=0.5em,
+}
+\makeatletter\let\SX@Info=\relax\makeatother
+\fboxsep=0mm
+
+\usepackage{hyperref,bookmark,xcolor}
+\hypersetup{%
+	unicode,
+	colorlinks,
+	allbordercolors=1 1 1,
+	allcolors=blue,
+	pdftitle={lltjp-geometry.sty}
+}
+
+\def\LuaTeX{Lua\TeX}
+
+\title{\texttt{lltjp-geometry.sty}}
+\author{\LuaTeX-jaプロジェクト}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+ページレイアウトの設定として，\textsf{geometry}パッケージが有名であるが，
+これはp\LaTeX・\LuaTeX-jaの縦組クラスでは利用が不可能という問題があった．
+本文書で解説する\texttt{lltjp-geometry.sty} は，\textsf{geometry}パッケージを
+縦組クラスでも利用可能にするためのパッチである．
+\end{abstract}
+
+\section{利用方法}
+\texttt{lltjp-geometry.sty} は，\LuaTeX-jaに標準で含まれている．
+本パッケージの動作には\textsf{ifluatex}, \textsf{filehook}パッケージが必要である．
+
+\subsection{\LuaTeX-ja}
+\LuaTeX-jaの縦組クラス，\textsf{ltjtarticle}, \textsf{ltjtbook}, 
+\textsf{ltjtreport}では自動的に \texttt{lltjp-geometry.sty} が読み込まれる．
+ユーザは何もしなくても良い．
+
+\subsection{\pTeX 系列}
+\pTeX 系列では，\textsf{tarticle}, \textsf{tbook}, \textsf{treport}といった
+\emph{縦組クラスを使う場合}にのみ，
+\begin{lstlisting}
+\usepackage{lltjp-geometry}
+\usepackage[...]{geometry}
+\end{lstlisting}
+のように\emph{\textsf{geometry}パッケージの前}に読み込む．
+パッケージオプションは存在しない．
+
+\section{注意事項}
+\subsection{\texttt{twoside}指定時}
+\texttt{twoside} オプション指定時は，
+\texttt{left}, \texttt{lmargin} は小口側の余白，
+\texttt{right}, \texttt{rmargin} はノド側の余白を指す．
+縦組の本は通常右綴じであることを反映させたものである．
+その他にも，
+\begin{itemize}
+\item 左右余白比 \texttt{hmarginratio} の標準値は$3:2$に変更．
+\item \texttt{bindingoffset} は\emph{右側}に余白を確保する．
+\end{itemize}
+
+\subsection{傍注}
+縦組の場合，傍注は本文の上下に配置される\footnote{%
+  二段組の場合は上下共に，一段組の場合は標準では下側だが，
+  \texttt{reversemp} が指定されたときには上側に配置される．
+}．これにより，\emph{\texttt{includemp}（や \texttt{includeall}）が
+未指定の場合，傍注はヘッダやフッタに重なる}．
+\texttt{includemp} 指定時は，\cs{footskip}, \cs{headsep} のいずれか
+（二段組の場合は両方）を$\cs{marginparwidth} + \cs{marginparsep}$だけ
+増加させる．
+
+\subsection{\texttt{lines}オプション指定時の \cs{maxdepth} 調整}
+\LaTeX では，
+最後の行の深さ\rensuji{$d$}と
+本文領域の上端から最後の行のベースラインまでの距離\rensuji{$f$}に対し，
+\[
+ \cs{textheight} = f+\max(0, d-\cs{maxdepth})
+\]
+が成り立つ．
+
+\pTeX 系列の標準縦組クラス\textsf{[u]tarticle}等，
+及びそれを\LuaTeX-ja用に移植した\textsf{ltjtarticle}等では，
+ \cs{topskip} は\emph{横組時における}全角空白の高さ7.77588\,pt\footnote{%
+  標準の\texttt{10pt}オプション指定時．以下同じ．
+  ところで，この量は公称フォントサイズの10\,ptか，もしくは
+  全角空白の高さと深さを合わせた値の9.16446\,ptの間違いではないか，と筆者は考えている．
+  なお，奥村晴彦氏のp\LaTeXe 新ドキュメントクラスでは公称ポイントサイズ10\,ptに設定されている．
+}であり，\cs{maxdepth} はその半分3.88794\,ptである．
+
+いくつかのフォントについて，その中の文字の深さの最大値を見てみると
+表\ref{tab:baseline}のようになっている．
+\begin{table}[tb]
+ \layoutfloat[c]{%
+ \begin{tabular}<y>{ll}
+  \toprule
+  \bfseries フォント(10\,pt)&\bfseries 深さ（pt単位）\\
+  \midrule
+  多くの横組用和文フォント(\pTeX)&1.38855\\
+  多くの縦組用和文フォント(\pTeX)&4.58221\\
+  \midrule
+  Computer Modern Roman 10\,pt&2.5\\
+  Computer Modern Sans Serif 10\,pt&2.5\\
+  Times Roman (\texttt{ptmr8t})&2.16492\\
+  Helvetica Bold Oblique (\texttt{phvbo8t})&2.22491\\
+  Palatino (\texttt{pplr8t})&2.75989\\
+  \bottomrule
+ \end{tabular}}
+ \pcaption{いくつかのフォント中の，文字の深さの最大値
+    \label{tab:baseline}}
+\end{table}
+欧文フォントのベースラインは，そのままでは和文との組み合わせが悪いので，
+さらに$\textsf{tbaselineshift}=3.41666\,\textrm{pt}$だけ下がることを考えると，
+最後の行に和文文字が来た場合はほぼ確実に深さが \cs{maxdepth} を超えてしまうことになる．
+従って，本文領域を「\rensuji{$n$}行分」として指定するときによく使われる
+\begin{equation}
+   \cs{textheight} = \cs{topskip} + (n-1)\cs{baselineskip}
+ \label{eq:nline}
+\end{equation}
+は\textsf{tarticle}クラスのデフォルトでは通用しない．
+
+通常の地の文のみの文章においてほぼ確実に\eqref{eq:nline}が成り立つようにするため，
+\texttt{lltjp-geometry.sty} では\emph{\texttt{lines}オプション指定時のみ} \cs{maxdepth} の値が
+最低でも
+\begin{quote}
+公称ポイントサイズの半分に，欧文ベースラインのシフト量を加えた値%
+\footnote{\textsf{tarticle}の場合だと，
+$5\,\textrm{pt} + 3.41666\,\textrm{pt}=8.41666\,\textrm{pt}$である．}
+\end{quote}
+になるようにしている．
+
+
+\subsection{\texttt{lines} オプション指定時の見かけ上の基本版面の位置}
+\LaTeX では，
+本文の一行目のベースラインは，本文領域の「上端」から
+ \ \cs{topskip}\ だけ「下がった」ところに来ることになっている．
+あまり \cs{topskip} が小さいと，ユーザが大きい文字サイズを指定した時に1行目のベースライン
+位置が狂う危険があるため，
+\textsf{geometry}パッケージでは
+\begin{quote}
+ \texttt{lines} オプション指定時，\cs{topskip} の値を最低でも
+ \cs{strutbox} の高さ($0.7\cs{baselineskip}$)まで引き上げる
+\end{quote}
+という仕様になっている．
+
+縦組の場合は，\cs{strutbox} に対応するボックスは \cs{tstrutbox} であるため，
+\begin{quote}
+ \texttt{lines} オプション指定時，\cs{topskip} の値を最低でも
+ \emph{\cs{tstrutbox} の高さ($\cs{baselineskip}/2$)}まで引き上げる
+\end{quote}
+という挙動にした．見かけ上は \cs{topskip} の値制限が緩くなったが，前節で述べたように
+欧文フォントのベースラインは和文に合うように下にずらされるので，
+実用上は問題は起きないだろう．
+
+前節の \cs{maxdepth} の調整も考え合わせると，\emph{\LaTeX が認識する本文領域と，
+実際の見た目の基本版面の位置とは異なる}ことに注意してほしい．
+
+例えばA4縦，公称フォントサイズ10\,pt，行送り18\,pt，30行左右中央
+\begin{lstlisting}
+\baselineskip=18pt
+\usepackage{lltjp-geometry}
+\usepackage[a4paper,hcentering,lines=30]{geometry}
+\end{lstlisting}
+と指定すると，以下のように設定される．
+\begin{itemize}
+ \item \cs{topskip} は \cs{tstrutbox} の高さ8.5\,ptに設定される．
+ \item 本文領域の「高さ」 \cs{textheight} は 
+\[
+ \cs{topskip} + (30-1)\cs{baselineskip} = 530.5\,\textrm{pt}.
+\]
+ \item 従って，左余白と右余白は
+\[
+ \frac{210\,\textrm{mm}-\cs{textheight}}2 = 33.50394\,\textrm{pt}.
+\]
+\end{itemize}
+しかし，実際にはページの最初の行のベースラインは，本文領域の右端から
+\ \cs{topskip} だけ左にずれたところにあり，
+一方ページの最終行のベースラインは本文領域の左端にある．
+従って，\emph{見た目で言えば，右余白の方が$\cs{topskip} =8.5\,\textrm{pt}$だけ
+大きい}ということになってしまう．
+
+\end{document}
