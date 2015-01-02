@@ -1,9 +1,12 @@
 %#! luajitlatex
 \documentclass[a4paper,10pt]{ltjsarticle}
-\usepackage[textwidth=45\zw, lines=45, columnsep=3\zw,
-   footskip=3\zw, showframe]{geometry}
+\usepackage[textwidth=45\zw, lines=45, footskip=2\zh, verbose]{geometry}
 \usepackage{listings,amsmath,booktabs,lltjext}
 \usepackage[match]{luatexja-fontspec}
+\usepackage{unicode-math}
+\setmathfont{XITS Math}
+\setmainfont{TeX Gyre Termes}
+\setsansfont[Scale=0.95]{TeX Gyre Heros}
 \usepackage[kozuka-pr6n]{luatexja-preset}\normalsize
 \def\emph#1{\textbf{\textgt{\mathversion{bold}#1}}}
 \def\headfont{\normalfont\bfseries\gtfamily}
@@ -22,31 +25,36 @@
 	colorlinks,
 	allbordercolors=1 1 1,
 	allcolors=blue,
-	pdftitle={lltjp-geometry.sty}
+	pdftitle={lltjp-geometryパッケージ}
 }
 
 \def\LuaTeX{Lua\TeX}
+\definecolor{blue}{rgb}{0, 0.25, 1}
 
-\title{\texttt{lltjp-geometry.sty}}
-\author{\LuaTeX-jaプロジェクト}
+\title{\textsf{lltjp-geometry}パッケージ}
+\author{\LuaTeX-jaプロジェクト%
+  \thanks{\url{http://sourceforge.jp/projects/luatex-ja/wiki/FrontPage}}}
 \begin{document}
 \maketitle
 
-\begin{abstract}
-ページレイアウトの設定として，\textsf{geometry}パッケージが有名であるが，
+ページレイアウトの設定として，\href{http://www.ctan.org/pkg/geometry}%
+{\textsf{geometry}パッケージ}が有名であるが，
 これはp\LaTeX・\LuaTeX-jaの縦組クラスでは利用が不可能という問題があった．
-本文書で解説する\texttt{lltjp-geometry.sty} は，\textsf{geometry}パッケージを
-縦組クラスでも利用可能にするためのパッチである．
-\end{abstract}
+本文書で解説する\textsf{lltjp-geometry}パッケージは，\textsf{geometry}パッケージを
+縦組クラスに対応させるパッチである．
+
 
 \section{利用方法}
-\texttt{lltjp-geometry.sty} は，\LuaTeX-jaに標準で含まれている．
-本パッケージの動作には\textsf{ifluatex}, \textsf{filehook}パッケージが必要である．
+\textsf{lltjp-geometry}パッケージは，\LuaTeX-jaに標準で含まれている．
+本パッケージの動作には\href{http://www.ctan.org/pkg/ifluatex}{\textsf{ifluatex}}, 
+\href{http://www.ctan.org/pkg/filehook}{\textsf{filehook}}パッケージが必要である．
 
 \subsection{\LuaTeX-ja}
-\LuaTeX-jaの縦組クラス，\textsf{ltjtarticle}, \textsf{ltjtbook}, 
-\textsf{ltjtreport}では自動的に \texttt{lltjp-geometry.sty} が読み込まれる．
-ユーザは何もしなくても良い．
+\LuaTeX-jaでは，\textsf{geometry}パッケージ読み込み時に
+自動的に\textsf{lltjp-geometry}パッケージが読み込まれ，ユーザは何もしなくても良い．
+\LuaTeX-jaで横組クラスを利用する時でも，
+\textsf{lltjp-geometry}パッケージは自動的に動作を停止するので，横組時の挙動が
+変わってしまうことはない．
 
 \subsection{\pTeX 系列}
 \pTeX 系列では，\textsf{tarticle}, \textsf{tbook}, \textsf{treport}といった
@@ -56,19 +64,24 @@
 \usepackage[...]{geometry}
 \end{lstlisting}
 のように\emph{\textsf{geometry}パッケージの前}に読み込む．
+\pTeX 系列では使用クラスが横組か縦組かの自動判定を行えない\footnote{%
+  標準縦組クラスでは，\cs{begin\{document\}} の内部で組方向を縦組に変更するので，
+  プリアンブル中で判定できない．
+}ので，\emph{横組クラスで読み込んではならない}．
+
 パッケージオプションは存在しない．
 
 \section{注意事項}
 \subsection{\texttt{twoside}指定時}
-\texttt{twoside} オプション指定時は，
-\texttt{left}, \texttt{lmargin} は小口側の余白，
-\texttt{right}, \texttt{rmargin} はノド側の余白を指す．
-縦組の本は通常右綴じであることを反映させたものである．
-その他にも，
+縦組の本は通常右綴じである．これを反映し，
+\textsf{lltjp-geometry}では，\texttt{twoside} オプション指定時には
 \begin{itemize}
+\item \texttt{left}, \texttt{lmargin} は小口側の余白，
+\texttt{right}, \texttt{rmargin} はノド側の余白を指す．
 \item 左右余白比 \texttt{hmarginratio} の標準値は$3:2$に変更．
 \item \texttt{bindingoffset} は\emph{右側}に余白を確保する．
 \end{itemize}
+と変更している．
 
 \subsection{傍注}
 縦組の場合，傍注は本文の上下に配置される\footnote{%
@@ -95,8 +108,9 @@
   標準の\texttt{10pt}オプション指定時．以下同じ．
   ところで，この量は公称フォントサイズの10\,ptか，もしくは
   全角空白の高さと深さを合わせた値の9.16446\,ptの間違いではないか，と筆者は考えている．
-  なお，奥村晴彦氏のp\LaTeXe 新ドキュメントクラスでは公称ポイントサイズ10\,ptに設定されている．
-}であり，\cs{maxdepth} はその半分3.88794\,ptである．
+  なお，奥村晴彦氏の\href{https://oku.edu.mie-u.ac.jp/~okumura/jsclasses/}%
+  {p\LaTeXe 新ドキュメントクラス}では公称ポイントサイズ10\,ptに設定されている．
+}であり，\cs{maxdepth} はその半分の値（従って3.88794\,pt）である．
 
 いくつかのフォントについて，その中の文字の深さの最大値を見てみると
 表\ref{tab:baseline}のようになっている．
@@ -106,8 +120,8 @@
   \toprule
   \bfseries フォント(10\,pt)&\bfseries 深さ（pt単位）\\
   \midrule
-  多くの横組用和文フォント(\pTeX)&1.38855\\
-  多くの縦組用和文フォント(\pTeX)&4.58221\\
+  横組用の標準和文フォント(\pTeX)&1.38855\\
+  縦組用の標準和文フォント(\pTeX)&4.58221\\
   \midrule
   Computer Modern Roman 10\,pt&2.5\\
   Computer Modern Sans Serif 10\,pt&2.5\\
@@ -130,14 +144,15 @@
 は\textsf{tarticle}クラスのデフォルトでは通用しない．
 
 通常の地の文のみの文章においてほぼ確実に\eqref{eq:nline}が成り立つようにするため，
-\texttt{lltjp-geometry.sty} では\emph{\texttt{lines}オプション指定時のみ} \cs{maxdepth} の値が
+\textsf{lltjp-geometry}では\emph{\texttt{lines}オプション指定時のみ} \cs{maxdepth} の値が
 最低でも
 \begin{quote}
 公称ポイントサイズの半分に，欧文ベースラインのシフト量を加えた値%
 \footnote{\textsf{tarticle}の場合だと，
 $5\,\textrm{pt} + 3.41666\,\textrm{pt}=8.41666\,\textrm{pt}$である．}
 \end{quote}
-になるようにしている．
+になるようにしている．\texttt{lines} オプション非指定時にはこのような調整は
+行われない．
 
 
 \subsection{\texttt{lines} オプション指定時の見かけ上の基本版面の位置}
@@ -154,6 +169,7 @@ $5\,\textrm{pt} + 3.41666\,\textrm{pt}=8.41666\,\textrm{pt}$である．}
 という仕様になっている．
 
 縦組の場合は，\cs{strutbox} に対応するボックスは \cs{tstrutbox} であるため，
+\textsf{lltjp-geometry}では
 \begin{quote}
  \texttt{lines} オプション指定時，\cs{topskip} の値を最低でも
  \emph{\cs{tstrutbox} の高さ($\cs{baselineskip}/2$)}まで引き上げる
@@ -165,13 +181,16 @@ $5\,\textrm{pt} + 3.41666\,\textrm{pt}=8.41666\,\textrm{pt}$である．}
 前節の \cs{maxdepth} の調整も考え合わせると，\emph{\LaTeX が認識する本文領域と，
 実際の見た目の基本版面の位置とは異なる}ことに注意してほしい．
 
-例えばA4縦，公称フォントサイズ10\,pt，行送り18\,pt，30行左右中央
+\medskip
+例えばA4縦を縦組で，公称フォントサイズ10\,pt，行送り18\,pt，30行左右中央
+というレイアウトにするため，
 \begin{lstlisting}
-\baselineskip=18pt
+\documentclass{tarticle}
 \usepackage{lltjp-geometry}
+\baselineskip=18pt
 \usepackage[a4paper,hcentering,lines=30]{geometry}
 \end{lstlisting}
-と指定すると，以下のように設定される．
+と指定すると，実際には以下のように設定される．
 \begin{itemize}
  \item \cs{topskip} は \cs{tstrutbox} の高さ8.5\,ptに設定される．
  \item 本文領域の「高さ」 \cs{textheight} は 
@@ -186,7 +205,12 @@ $5\,\textrm{pt} + 3.41666\,\textrm{pt}=8.41666\,\textrm{pt}$である．}
 しかし，実際にはページの最初の行のベースラインは，本文領域の右端から
 \ \cs{topskip} だけ左にずれたところにあり，
 一方ページの最終行のベースラインは本文領域の左端にある．
+縦組和文フォントのベースラインは文字の左右中央を通ることから，
 従って，\emph{見た目で言えば，右余白の方が$\cs{topskip} =8.5\,\textrm{pt}$だけ
-大きい}ということになってしまう．
+大きい}ということになってしまう\footnote{%
+  同様に，横組で \texttt{vcentering} を指定すると，見かけでは
+  $\cs{topskip}-\cs{Cht}+\cs{Cdp}$だけ上余白が大きいように見える．
+}．
+
 
 \end{document}
