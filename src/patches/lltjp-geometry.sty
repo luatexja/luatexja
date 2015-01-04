@@ -20,7 +20,8 @@
 \RequirePackage{filehook}
 \newif\ifGm@ltj@layoutswitch
 \let\orig@PackageWarningNoLine=\PackageWarningNoLine
-\ifdefined\ifGm@swap@papersize\else\newif\ifGm@swap@papersize\fi
+% define ifGm@swap@papersize if it is undefined
+\expandafter\newif\csname ifGm@swap@papersize\endcsname
 
 \AtBeginOfPackageFile{geometry}{%
   \edef\Gm@ltj@topskip{\the\topskip}
