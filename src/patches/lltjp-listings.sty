@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-listings}[2014/01/09 Patch to listings for LuaTeX-ja]
+\ProvidesPackage{lltjp-listings}[2015/01/07 Patch to listings for LuaTeX-ja]
 \RequirePackage{listings,luatexbase-cctb}
 
 %%%%%%%%%%%%%%%% Japanese support
@@ -192,7 +192,7 @@
 
 
 % hook!
-\lst@AddToHook{Init}{
+\lst@AddToHook{Init}{%
   \luatexcatcodetable\CatcodeTableLTJlistings\ltj@@listing@jpcmd
   \lccode`\~="FFFFF\lowercase{\def~{\ltj@lst@ProcessJALetter}}%"
   \directlua{luatexbase.add_to_callback('process_input_buffer',
