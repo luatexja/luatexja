@@ -173,12 +173,15 @@
   \SetCatcodeRange{"FE00}{"FE0F}{13}%     Variation Selector
 }
 
-% redefine \lstinline
+% redefine \lstinline@ and \lst@InlineG
 % because \lstinline!あ...! causes ``Runaway argument?'' Error
-\let\ltj@lstinline@=\lstinline@
 \def\lstinline@#1{%
     \lst@Init\relax
     \ltj@lst@check@inline{\lst@InlineM#1}{\lst@InlineJ#1}}
+\def\lst@InlineG{%
+    \lst@Init\relax
+    \ltj@lst@check@inline{\lst@InlineM\}}%
+                         {\let\lst@arg\@empty \lst@InlineGJ}}
 
 \def\ltj@lst@check@inline#1#2#3{%
     \begingroup \lccode`\~=`#3\lowercase{\endgroup
