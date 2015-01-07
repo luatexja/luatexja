@@ -571,7 +571,7 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 \item \Pkg{luaotfload} v2.5 (or later)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
 \item \Pkg{everysel} (if you want to use \LuaTeX-ja with \LaTeXe)
-%<en>\item \emph{IPAex fonts(\url{http://ipafont.ipa.go.jp/})}
+%<en>\item \emph{IPAex fonts}(\url{http://ipafont.ipa.go.jp/})
 %<ja>\item \emph{IPAexフォント(\url{http://ipafont.ipa.go.jp/})}
 \end{itemize}
 
@@ -1032,6 +1032,37 @@ Okumura), namely, \Pkg{ltjclasses}\footnote{%
 読み込むという方法もあるが，それだとボトムフロートと脚注の間が開いてしまう．
 %</ja>
 %%% ↑は英訳しない
+
+%<*en>
+\paragraph{\Pkg{geometry} package and classes for vertical writing}
+It is well-known that the \Pkg{geometry} package produces the following error, when classes for
+vertical writing is used:
+%</en>
+%<*ja>
+\paragraph{縦組での\Pkg{geometry}パッケージ}
+\pLaTeX の縦組用標準クラスファイルでは\Pkg{geometry}パッケージを利用することは出来ず，
+%</ja>
+\begin{lstlisting}
+! Incompatible direction list can't be unboxed.
+\@begindvi ->\unvbox \@begindvibox 
+                                   \global \let \@begindvi \@empty 
+\end{lstlisting}
+%<*en>
+Now, \LuaTeX-ja automatically applies the patch \Pkg{lltjp-geometry} to the
+\Pkg{geometry} package, when the direction of the document is \emph{tate} (vertical
+writing).
+This patch \Pkg{lltjp-geometry} also can be used in \pLaTeX; for the detail, please refer 
+\url{lltjp-geometry.pdf}~(Japanese).
+%</en>
+%<*ja>
+というようなエラーが発生することが知られている．
+\LuaTeX-jaでは， \texttt{ltjtarticle.cls} といった縦組クラスの下でも
+\Pkg{geometry}パッケージが利用できるようにパッチ\Pkg{lltjp-geometry}パッケージを自動的に当てている．
+
+なお，\Pkg{lltjp-geometry}パッケージは\pTeX 系列でも明示的に読み込むことによって
+使用可能である．詳細や注意事項は \url{lltjp-geometry.pdf} を参照のこと．
+%</ja>
+
 
 %<en>\section{Changing Fonts}
 %<ja>\section{フォントの変更}
@@ -2284,7 +2315,7 @@ Japanese fonts&\Param{yjabaselineshift}
 %</en>
 %<*ja>
 和文フォントと欧文フォントを合わせるためには，時々どちらかのベースラインの移動が
-必要になる．\pTeX ではこれは \cs{ybaselineshift} を設定することで
+必要になる．\pTeX ではこれは \cs{ybaselineshift}（または\cs{tbaselineshift}）を設定することで
 なされていた（\textbf{ALchar}のベースラインがその分だけ下がる）．しかし，日本語が主ではない
 文書に対しては，欧文フォントではなく和文フォントのベースラインを移動した方がよい．
 このため，\LuaTeX-jaでは欧文フォントのベースラインのシフト量
@@ -4725,7 +4756,7 @@ of \LuaTeX, see Section~\ref{sec-para}.
 %</en>
 %<*ja>
 先に述べたように，\LuaTeX-jaのほとんどの内部パラメータにアクセスするには
-\cs{ltjsetparameter} と \cs{ltjgetparameter} を用いる．
+\cs{ltjsetparameter}（または \cs{ltjglobalsetparameter}）と \cs{ltjgetparameter} を用いる．
 \LuaTeX-jaが\pTeX のような文法（例えば，\verb+\prebreakpenalty`）=10000+）を
 採用しない理由の一つは，\LuaTeX のソースにおける \verb+hpack_filter+
 コールバックの位置にある．\ref{sec-para}章を参照．
@@ -4735,24 +4766,22 @@ of \LuaTeX, see Section~\ref{sec-para}.
 \cs{ltjsetparameter} and \cs{ltjglobalsetparameter} are commands
 for assigning parameters. These take one argument which is a
 \texttt{<key>=<value>} list.
-The list of allowed keys are described in the next subsection.
 The difference between
 \cs{ltjsetparameter} and \cs{ltjglobalsetparameter} is only the
 scope of assignment;
 \cs{ltjsetparameter} does a local assignment and
 \cs{ltjglobalsetparameter} does a global one.
-They also obey the value of \cs{globaldefs},
-like other assignment.
+They also obey the value of \cs{globaldefs}, like other assignments.
 %</en>
 %<*ja>
 \cs{ltjsetparameter} と \cs{ltjglobalsetparameter} はパラメータを
-指定するための命令である．これらは\texttt{<key>=<value>}のリストを
-引数としてとる．許されるキーの一覧は次の節にある．
+指定するための命令で，\texttt{<key>=<value>}のリストを
+引数としてとる．
 \cs{ltjsetparameter} と \cs{ltjglobalsetparameter} の違いはスコープの
 違いのみで，
-\cs{ltjsetparameter} はローカルな指定，\cs{ltjglobalsetparameter} は
-グローバルな指定を行う．
-これらは他のパラメータ指定と同様に \cs{globaldefs} の値に従う．
+\cs{ltjsetparameter} はローカルな設定を行うのに対し，
+\cs{ltjglobalsetparameter} はグローバルな設定を行う．
+また，他のパラメータ指定と同様に \cs{globaldefs} の値にも従う．
 %</ja>
 
 %<*en>
@@ -4763,7 +4792,7 @@ in \pTeX, and symbols beside each parameter has the following meaning:
 %<*ja>
 以下は \cs{ltjsetparameter} に指定することができるパラメータの一覧である．
 [\cs{cs}]は\pTeX における対応物を示す．
-また，それぞれのパラメータの右上にある記号には次の意味がある：
+また，それぞれのパラメータの右上の記号には次の意味がある：
 %</ja>
 \begin{itemize}
 %<*en>
@@ -4804,7 +4833,7 @@ At the present version, the lowermost bit of <natural number> indicates
 	     (see the description of \Param{jcharwidowpenalty} above).
 %</en>
 %<*ja>
-文字コードが<chr\_code>の文字が持つ付加的な属性値(attribute)．
+文字コードが<chr\_code>の文字が持つ付加的な属性値．
 現在のバージョンでは，<natural number>の最下位ビットが，その文字が句読点と
 みなされるかどうかを表している（上の\Param{jcharwidowpenalty}の記述を参照）．
 %</ja>
@@ -4843,9 +4872,9 @@ by default.
 
 \pTeX では，\cs{prebreakpenalty}, \cs{postbreakpenalty}において，
 \begin{itemize}
-\item 一つの文字に対して，pre, postどちらか一つしか指定することができなかっ
-      た（後から指定した方で上書きされる）．
-\item pre, post合わせて256文字分の情報を格納することしかできなかった．
+\item 一つの文字に対して，pre, postどちらか一つしか指定することができない%
+  \footnote{後から指定した方で上書きされる．}
+\item pre, post合わせて256文字分の情報を格納することしかできない
 \end{itemize}
 という制限があったが，\LuaTeX-jaではこれらの制限は解消されている．
 %</ja>
@@ -4857,7 +4886,7 @@ but they don't exist in \LuaTeX-ja:
 \begin{itemize}
  \item Both \cs{prebreakpenalty} and \cs{postbreakpenalty} cannot be set
 for the same character.
- \item We can set \cs{prebreakpenalty} and \cs{postbreakpenalty}  up to 256~characters.
+ \item We can set \cs{prebreakpenalty} and \cs{postbreakpenalty} up to 256~characters.
 \end{itemize}
 %</en>
 
@@ -5002,6 +5031,7 @@ the behavior of this assignment is undefined.
 
 \end{cslist}
 
+
 \subsection{\cs{ltjgetparameter}}
 \label{ssec-getpar}
 %<*en>
@@ -5021,8 +5051,8 @@ always takes a parameter name as first argument.
 
 %<*en>
 \emph{The return value of\/ \cs{ltjgetparameter} is
-always a string}. This is outputted by \texttt{tex.write()}, so any
-character other than space~``\texttt{\char32}''~(\texttt{U+0020}) has the category code
+always a string}, which is outputted by \texttt{tex.write()}.
+Hence any character other than space~``\texttt{\char32}''~(\texttt{U+0020}) has the category code
 12~(other), while the space has 10~(space).
 %</en>
 %<*ja>
@@ -5054,7 +5084,7 @@ returns 1 or 0, not
 %<*ja>
 \verb+\ltjgetparameter{autospacing}+ と \verb+\ltjgetparameter{autoxspacing}+ は，
 \texttt{true}や\texttt{false}を返すの\emph{ではなく}，
-1と0のいずれかを返すことに注意，
+1か0のいずれかを返すことに注意，
 %</ja>
 
 \item
@@ -5063,7 +5093,7 @@ If first argument is one of the
 following, an additional argument---a character code, for example---is needed.
 %</en>
 %<*ja>
-第1引数が次のいずれかの場合には，さらに文字コードを第二引数としてとる．
+第1引数が次のいずれかの場合には，さらに文字コードを第2引数としてとる．
 %</ja>
 \begin{quote}
 \sffamily
@@ -5172,9 +5202,133 @@ by the following:
   <chr\_code>\verb+}}+\\\null\hfill\verb+% 0 if JAchar, 1 if ALchar+
 \end{quote}
 
+%<*en>
+\item Because the returned value is string, the following conditionals do not work
+if \Param{kanjiskip} (or~\Param{xkanjiskip}) has the stretch part or the shrink part.
+\begin{lstlisting}
+\ifdim\ltjgetparameter{kanjiskip}>\z@ ... \fi
+\ifdim\ltjgetparameter{xkanjiskip}>\z@ ... \fi
+\end{lstlisting}
+The correct way is using a temporary register.
+\begin{lstlisting}
+\@tempskipa=\ltjgetparameter{kanjiskip} \ifdim\@tempskipa>\z@ ... \fi
+\@tempskipa=\ltjgetparameter{xkanjiskip}\ifdim\@tempskipa>\z@ ... \fi
+\end{lstlisting}
+%</en>
+%<*ja>
+\item 返り値が文字列であることから，\Param{kanjiskip}や\Param{xkanjiskip}を直接
+\ \cs{ifdim} を使って比較することは望ましくない．伸び量や縮み量を持っている時には，
+次はエラーを発生させる：
+\begin{lstlisting}
+\ifdim\ltjgetparameter{kanjiskip}>\z@ ... \fi
+\ifdim\ltjgetparameter{xkanjiskip}>\z@ ... \fi
+\end{lstlisting}
+レジスタに一旦代入するのが良い：
+\begin{lstlisting}
+\@tempskipa=\ltjgetparameter{kanjiskip} \ifdim\@tempskipa>\z@ ... \fi
+\@tempskipa=\ltjgetparameter{xkanjiskip}\ifdim\@tempskipa>\z@ ... \fi
+\end{lstlisting}
+%</ja>
+
 \end{itemize}
 
+%<*ja>
+\subsection{\cs{ltjsetparameter} の代替}
+原則として各種内部パラメータの設定には \cs{ltjsetparameter} もしくは
+\ \cs{ltjglobalsetparameter}\ を用いることになるが，
+\cs{ltjsetparameter} の実行には時間がかかるという難点があり，
+\LuaTeX-ja の内部ではより高速に実行できる別の形式を用いている．
+\emph{本節は一般利用者むけの内容ではない．}
 
+\paragraph{\Param{kanjiskip}, \Param{xkanjiskip} の設定}
+\pLaTeXe 新ドキュメントクラスでは，
+\begin{lstlisting}
+\def\@setfontsize#1#2#3{%
+  ...
+  \kanjiskip=0zw plus .1zw minus .01zw
+  \ifdim\xkanjiskip>\z@
+    \if@slide \xkanjiskip=0.1em \else
+      \xkanjiskip=0.25em plus 0.15em minus 0.06em
+    \fi
+  \fi}
+\end{lstlisting}
+と，フォントサイズを変更するごとに \cs{kanjiskip}, \cs{xkanjiskip} を変更している．
+この \cs{@setfontsize} は文書の中で多数回実行されるので．
+\LuaTeX-ja 用に素直に書き換えた
+\begin{lstlisting}
+  \ltjsetparameter{kanjiskip=0\zw plus .1\zw minus .01\zw}
+  \@tempskipa=\ltjgetparameter{xkanjiskip}
+  \ifdim\@tempskipa>\z@
+    \if@slide 
+      \ltjsetparameter{xkanjiskip=0.1em}
+    \else
+      \ltjsetparameter{xkanjiskip=0.25em plus 0.15em minus 0.06em}
+    \fi
+  \fi
+\end{lstlisting}
+としたのではタイプセットが遅くなってしまう．
+そこで，\cs{ltjsetparameter} の中で
+\begin{itemize}
+\item \cs{globaldefs} の値を読み取る \cs{ltj@setpar@global}
+\item \Param{kanjiskip} の設定を行う \cs{ltjsetkanjiskip}
+\item \Param{xkanjiskip} の設定を行う \cs{ltjsetxkanjiskip}
+\end{itemize}
+を独立させ，\Pkg{ltjsclasses}では，
+\begin{lstlisting}
+  \ltj@setpar@global
+  \ltjsetkanjiskip{\z@ plus .1\zw minus .01\zw}
+  \@tempskipa=\ltjgetparameter{xkanjiskip}
+  \ifdim\@tempskipa>\z@
+    \if@slide 
+      \ltjsetxkanjiskip{0.1em}
+    \else
+      \ltjsetxkanjiskip{0.25em plus 0.15em minus 0.06em}
+    \fi
+  \fi
+\end{lstlisting}
+としている．
+\cs{ltj@setpar@global}を直前に実行せず，単独で
+\cs{ltjsetkanjiskip}, \cs{ltjsetxkanjiskip}を実行することは想定されていないので注意．
+
+
+
+\paragraph{ベースライン補正量の設定}
+\pLaTeX の\Pkg{ascmac}パッケージでは，縦組の欧文ベースライン補正量の一時待避・復帰処理に
+\ \cs{@saveybaselineshift}\ という寸法レジスタを用い
+\begin{lstlisting}
+\@savetbaselineshift\tbaselineshift\tbaselineshift\z@
+...
+\tbaselineshift\@savetbaselineshift
+\end{lstlisting}
+という処理を行っている．
+
+これを\LuaTeX-ja 用に \cs{ltjsetparameter} を使って書き直すと，
+\begin{lstlisting}
+\@savetbaselineshift\ltjgetparameter{talbaselineshift}
+\ltjsetparameter{talbaselineshift=\z@}
+...
+\ltjsetparameter{talbaselineshift=\@savetbaselineshift}
+\end{lstlisting}
+となる．
+
+さて，縦組の欧文ベースライン補正量\Param{talbaselineshift}は，
+実際には \cs{ltj@tablshift} という属性レジスタに格納されている
+（\ref{sec-para}\nobreak 節参照）．属性レジスタは長さではなく整数値を格納する\footnote{%
+  従って，\texttt{\textbackslash @savetbaselineshift=\textbackslash ltj@tablshift}\ 
+  のように記述することはできない．属性レジスタを \cs{tbaselineshift} という名称にしなかっ
+  たのはそのためである．
+}ものであり，\cs{ltj@tablshift} は補正量を sp 単位で保持することから，
+上記のコードと同じ内容をより速い以下のコードで実現することができる．
+\begin{lstlisting}
+\@savetbaselineshift\ltj@tablshift sp%
+\ltj@tablshift\z@
+...
+\ltj@tablshift\@savetbaselineshift
+\end{lstlisting}
+この手法は \Pkg{ascmac} パッケージの\LuaTeX-ja対応パッチ \Pkg{lltjp-tascmac.sty} で
+実際に用いられている．\Pkg{lltjp-tascmac.sty} は自動的に読み込まれるので，
+ユーザは何も気にせず普通に \Pkg{ascmac} パッケージを \cs{usepackage} で読みこめば良い．
+%</ja>
 
 
 %<en>\section{Other Commands for plain \TeX\ and \LaTeXe}
@@ -8325,7 +8479,7 @@ Prev&Kanji&\multicolumn{4}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
 \end{itemize}
 
 %<*en>
-Characters above \texttt{U+0080} \emph{except Variation Selectors}
+Characters above or equal to~\texttt{U+0080} \emph{except Variation Selectors}
 are classified into above 5~classes by the following rules:
 %</en>
 %<*ja>

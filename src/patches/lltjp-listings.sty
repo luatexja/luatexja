@@ -221,7 +221,7 @@
       for i = 1, utf.len(buf) do
         local c = utf.sub(buf, i, i)
         local cu = utf.byte(c)
-        if cu > 0x80 and tex.getcatcode(cu) \string~= 13 then
+        if cu >= 0x80 and tex.getcatcode(cu) \string~= 13 then
           ret = ret .. utf.char(1048575) % U+FFFFF
         end
         ret = ret .. c

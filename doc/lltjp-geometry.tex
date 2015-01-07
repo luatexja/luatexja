@@ -71,10 +71,11 @@
 
 パッケージオプションは存在しない．
 
-\section{注意事項}
+\section{\textsf{lltjp-geometry}使用時の注意事項}
+
 \subsection{\texttt{twoside}指定時}
 縦組の本は通常右綴じである．これを反映し，
-\textsf{lltjp-geometry}では，\texttt{twoside} オプション指定時には
+\texttt{twoside} オプション指定時には
 \begin{itemize}
 \item \texttt{left}, \texttt{lmargin} は小口側の余白，
 \texttt{right}, \texttt{rmargin} はノド側の余白を指す．
@@ -93,7 +94,46 @@
 （二段組の場合は両方）を$\cs{marginparwidth} + \cs{marginparsep}$だけ
 増加させる．
 
-\subsection{\texttt{lines}オプション指定時の \cs{maxdepth} 調整}
+\section{\texttt{lines}オプションに関する注意事項}
+本節の内容は，\textsf{lltjp-geometry}パッケージを読み込まない場合，
+つまり，横組クラスで\textsf{geometry}パッケージを普通に使用した場合にも
+当てはまる注意事項である．
+
+\subsection{\textsf{fontspec}パッケージとの干渉}
+\pTeX 系列では，次のように\textsf{fontenc}パッケージ読み込み直後に
+\textsf{geometry}パッケージを用いてレイアウトを設定すると，
+\texttt{lines} による指定が正しく働かないという症状が生じる：
+\begin{lstlisting}
+\documentclass{article}
+\usepackage{geometry}
+\usepackage{fontspec}
+\geometry{lines=20}
+\begin{document}
+hoge\typeout{\the\topskip, \the\baselineskip, \the\textheight}
+\end{document}
+\end{lstlisting}
+\cs{typeout} で \cs{topskip}, \cs{baselineskip}, \cs{textheight} の値を調べると
+\[
+ \frac{\cs{textheight} - \cs{topskip}}{\cs{baselineskip}} = 15.8\dot 3
+\]
+となることがわかるから，1ページには16行分入らないことがわかる．
+
+これは，\textsf{fontspec} の読み込みによって \cs{baselineskip} がなぜか
+10\,ptに変えられてしまい，\cs{geometry} 命令はその値に従って本文領域の高さを計算するためで
+ある．とりあえずの対策は，
+\cs{normalsize} によって \cs{baselineskip} を正しい値に再設定し，その後
+レイアウトを設定すれば良い：
+\begin{lstlisting}
+\usepackage{geometry}
+\usepackage{fontspec}
+\normalsize\geometry{lines=20}
+\end{lstlisting}
+
+なお，同様の症状は\textsf{newtxtext}パッケージなどでも発生するようなので，
+\pTeX 系列といえども無縁ではない．
+
+
+\subsection{\cs{maxdepth} の調整}
 \LaTeX では，
 最後の行の深さ\rensuji{$d$}と
 本文領域の上端から最後の行のベースラインまでの距離\rensuji{$f$}に対し，
@@ -155,7 +195,7 @@ $5\,\textrm{pt} + 3.41666\,\textrm{pt}=8.41666\,\textrm{pt}$である．}
 行われない．
 
 
-\subsection{\texttt{lines} オプション指定時の見かけ上の基本版面の位置}
+\subsection{見かけ上の基本版面の位置}
 \LaTeX では，
 本文の一行目のベースラインは，本文領域の「上端」から
  \ \cs{topskip}\ だけ「下がった」ところに来ることになっている．
