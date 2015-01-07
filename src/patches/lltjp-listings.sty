@@ -173,6 +173,23 @@
   \SetCatcodeRange{"FE00}{"FE0F}{13}%     Variation Selector
 }
 
+% redefine \lstinline
+% because \lstinline!あ...! causes ``Runaway argument?'' Error
+\let\ltj@lstinline@=\lstinline@
+\def\lstinline@#1{%
+    \lst@Init\relax
+    \ltj@lst@check@inline{\lst@InlineM#1}{\lst@InlineJ#1}}
+
+\def\ltj@lst@check@inline#1#2#3{%
+    \begingroup \lccode`\~=`#3\lowercase{\endgroup
+    \ifx~}#3%
+        \def\lst@next{#1}%
+    \else\ifnum`#3>127\relax
+        \def\lst@next{#1}%
+    \else
+        \def\lst@next{#2}%
+    \fi\fi\lst@next #3}
+
 % We redefine \lst@BeginDropInput, since now we have
 % two additional `process macros'.
 \def\lst@BeginDropInput#1{%
