@@ -22,7 +22,7 @@
 %  -----------------------------------------
 %
 % \fi
-% \CheckSum{5220}
+% \CheckSum{5223}
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -50,7 +50,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2014/12/24 ]
+  [2015/01/07 ]
 %<*driver>
 \documentclass{ltjsarticle}
 \usepackage{doc}
@@ -1023,6 +1023,9 @@
 %
 % TODO: Hasumiさん [qa:54539] のご指摘は考慮中です。
 %
+% [2015-01-07 LTJ] 遅くなりましたが，
+% \url{http://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=1005} にあったZRさんのパッチを取り込みました．
+%
 %    \begin{macrocode}
 \newif\ifnarrowbaselines
 \if@english
@@ -1040,6 +1043,11 @@
   \belowdisplayskip=\skip4
   \belowdisplayshortskip=\skip6\relax}
 \def\widebaselines{\narrowbaselinesfalse\@currsize\selectfont}
+\def\ltj@@ifnarrowbaselines{%
+  \ifnarrowbaselines\expandafter\@firstoftwo
+  \else \expandafter\@secondoftwo
+  \fi
+}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1064,11 +1072,9 @@
 %
 %    \begin{macrocode}
 \renewcommand{\normalsize}{%
-  \ifnarrowbaselines
-    \@setfontsize\normalsize\@xpt\@xiipt
-  \else
-    \@setfontsize\normalsize\@xpt{\n@baseline}%
-  \fi
+  \ltj@@ifnarrowbaselines
+    {\@setfontsize\normalsize\@xpt\@xiipt}%
+    {\@setfontsize\normalsize\@xpt{\n@baseline}}%
 %    \end{macrocode}
 %
 % 数式の上のアキ（|\abovedisplayskip|），
@@ -1139,13 +1145,11 @@
 %
 %    \begin{macrocode}
 \newcommand{\small}{%
-  \ifnarrowbaselines
-%<!kiyou>    \@setfontsize\small\@ixpt{11}%
-%<kiyou>    \@setfontsize\small{8.8888}{11}%
-  \else
-%<!kiyou>    \@setfontsize\small\@ixpt{13}%
-%<kiyou>    \@setfontsize\small{8.8888}{13.2418}%
-  \fi
+  \ltj@@ifnarrowbaselines
+%<!kiyou>    {\@setfontsize\small\@ixpt{11}}%
+%<kiyou>    {\@setfontsize\small{8.8888}{11}}%
+%<!kiyou>    {\@setfontsize\small\@ixpt{13}}%
+%<kiyou>    {\@setfontsize\small{8.8888}{13.2418}}%
   \abovedisplayskip 9\p@ \@plus3\p@ \@minus4\p@
   \abovedisplayshortskip  \z@ \@plus3\p@
   \belowdisplayskip \abovedisplayskip
@@ -1165,13 +1169,11 @@
 %
 %    \begin{macrocode}
 \newcommand{\footnotesize}{%
-  \ifnarrowbaselines
-%<!kiyou>    \@setfontsize\footnotesize\@viiipt{9.5}%
-%<kiyou>    \@setfontsize\footnotesize{8.8888}{11}%
-  \else
-%<!kiyou>    \@setfontsize\footnotesize\@viiipt{11}%
-%<kiyou>    \@setfontsize\footnotesize{8.8888}{13.2418}%
-  \fi
+  \ltj@@ifnarrowbaselines
+%<!kiyou>    {\@setfontsize\footnotesize\@viiipt{9.5}}%
+%<kiyou>    {\@setfontsize\footnotesize{8.8888}{11}}%
+%<!kiyou>    {\@setfontsize\footnotesize\@viiipt{11}}%
+%<kiyou>    {\@setfontsize\footnotesize{8.8888}{13.2418}}%
   \abovedisplayskip 6\p@ \@plus2\p@ \@minus3\p@
   \abovedisplayshortskip  \z@ \@plus2\p@
   \belowdisplayskip \abovedisplayskip

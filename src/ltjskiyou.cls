@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjskiyou}
-  [2014/12/24 ]
+  [2015/01/07 ]
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
@@ -394,12 +394,15 @@
   \belowdisplayskip=\skip4
   \belowdisplayshortskip=\skip6\relax}
 \def\widebaselines{\narrowbaselinesfalse\@currsize\selectfont}
-\renewcommand{\normalsize}{%
-  \ifnarrowbaselines
-    \@setfontsize\normalsize\@xpt\@xiipt
-  \else
-    \@setfontsize\normalsize\@xpt{\n@baseline}%
+\def\ltj@@ifnarrowbaselines{%
+  \ifnarrowbaselines\expandafter\@firstoftwo
+  \else \expandafter\@secondoftwo
   \fi
+}
+\renewcommand{\normalsize}{%
+  \ltj@@ifnarrowbaselines
+    {\@setfontsize\normalsize\@xpt\@xiipt}%
+    {\@setfontsize\normalsize\@xpt{\n@baseline}}%
   \abovedisplayskip 11\p@ \@plus3\p@ \@minus4\p@
   \abovedisplayshortskip \z@ \@plus3\p@
   \belowdisplayskip 9\p@ \@plus3\p@ \@minus4\p@
@@ -413,11 +416,9 @@
 \setlength\Cvs{\baselineskip}
 \setlength\Chs{\wd0}
 \newcommand{\small}{%
-  \ifnarrowbaselines
-    \@setfontsize\small{8.8888}{11}%
-  \else
-    \@setfontsize\small{8.8888}{13.2418}%
-  \fi
+  \ltj@@ifnarrowbaselines
+    {\@setfontsize\small{8.8888}{11}}%
+    {\@setfontsize\small{8.8888}{13.2418}}%
   \abovedisplayskip 9\p@ \@plus3\p@ \@minus4\p@
   \abovedisplayshortskip  \z@ \@plus3\p@
   \belowdisplayskip \abovedisplayskip
@@ -427,11 +428,9 @@
               \parsep \z@
               \itemsep \parsep}}
 \newcommand{\footnotesize}{%
-  \ifnarrowbaselines
-    \@setfontsize\footnotesize{8.8888}{11}%
-  \else
-    \@setfontsize\footnotesize{8.8888}{13.2418}%
-  \fi
+  \ltj@@ifnarrowbaselines
+    {\@setfontsize\footnotesize{8.8888}{11}}%
+    {\@setfontsize\footnotesize{8.8888}{13.2418}}%
   \abovedisplayskip 6\p@ \@plus2\p@ \@minus3\p@
   \abovedisplayshortskip  \z@ \@plus2\p@
   \belowdisplayskip \abovedisplayskip
