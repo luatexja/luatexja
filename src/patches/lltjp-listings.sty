@@ -7,8 +7,12 @@
 \RequirePackage{listings,luatexbase-cctb}
 
 %%%%%%%%%%%%%%%% Japanese support
+%% whether letter-space in a fixed mode box is doubled or not
+\newif\if@ltj@lst@double
+\lst@Key{doubleletterspace}f[t]{\lstKV@SetIf{#1}\if@ltj@lst@double}
+
 %% IVS support
-\newif\if@ltj@lst@vsraw \@ltj@lst@vsrawfalse
+\newif\if@ltj@lst@vsraw
 \def\ltj@lst@vscmd{}
 \lst@Key{vsraw}f[t]{\lstKV@SetIf{#1}\if@ltj@lst@vsraw}
 \lst@Key{vscmd}\relax{\def\ltj@lst@vscmd{#1}}
@@ -30,17 +34,19 @@
   local cat_str = luatexbase.catcodetables['string']
   local cat_lp  = luatexbase.catcodetables['latex-package']
   local ubyte = unicode.utf8.byte
+  local spccmd = string.char(0x5C) .. 'ltj@lst@hss@normal'
   luatexja.lst = {}
   function luatexja.lst.althss(t)
     t = ubyte(t)
     if not (t>=0xE0100 and t<0xE01F0) then
-      tex.sprint(cat_lp, string.char(0x5C) .. 'lst@hss')
+      tex.sprint(cat_lp, spccmd)
     end
   end
 }
-\gdef\ltj@lst@hss@ivs#1{%
+\def\ltj@lst@hss@ivs#1{%
   \directlua{luatexja.lst.althss('\luatexluaescapestring{#1}')}#1%
 }
+\def\ltj@lst@hss@double{\lst@hss\lst@hss}
 
 % lowest level
 \newif\if@ltj@lst@kanji
@@ -64,7 +70,7 @@
     \lst@Output
   \else
     \if@ltj@lst@kanji\else\lst@OutputOther\fi\lst@lettertrue
-  \fi}
+  \fi\@ltj@lst@kanjitrue}
 
 \def\ltj@lst@setopenflag{%
   \lst@ifletter
@@ -228,10 +234,15 @@
       end
       return ret
     end, 'ltj.listings_unicode', 1)}%
+  \if@ltj@lst@double
+    \let\ltj@lst@hss@normal=\ltj@lst@hss@double
+  \else
+    \let\ltj@lst@hss@normal=\lst@hss
+  \fi
   \if@ltj@lst@vsraw
     \let\ltj@lst@hss=\ltj@lst@hss@ivs
   \else
-    \let\ltj@lst@hss=\lst@hss
+    \let\ltj@lst@hss=\ltj@lst@hss@normal
   \fi
 }
 \lst@AddToHook{ExitVars}{%
