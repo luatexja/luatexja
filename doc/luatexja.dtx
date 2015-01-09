@@ -8272,7 +8272,7 @@ then the patch \Pkg{lltjp-listings} is loaded automatically at \verb+\begin{docu
 意識する必要はない．
 %</ja>
 
-%<en>\subsection{Notes}
+%<en>\subsection{Notes and additional keys}
 %<ja>\subsection{注意}
 %<*en>
 \paragraph{Escaping to \LaTeX}
@@ -8314,6 +8314,20 @@ instead of ``\verb+\ほげ+''.
 「\cs{}\IVSA FFFFF」というcontrol symbolが実行されることになる．
 %</ja>
 
+%<*en>
+\paragraph{Variation selectors}
+\Pkg{lltjp-listings} add two keys, namely \texttt{vsraw}~and~\texttt{vscmd},
+which specify how variation selectors are treated in 
+\texttt{lstlisting} or other enviroments.
+Note that these additional keys are not usable in the preamble, 
+since \Pkg{lltjp-listings} is loaded at \verb+\begin{document}+.
+
+\texttt{vsraw} is a key which takes a boolean value, and its default value is
+false.
+\begin{itemize}
+ \item If the \texttt{vsraw} key is true, then
+variation selectors are ``combined'' with the previous character.
+%</en>
 %<*ja>
 \paragraph{異体字セレクタの扱い}
 \texttt{lstlisting} 環境などの内部にある異体字セレクタを扱うため，
@@ -8326,21 +8340,31 @@ instead of ``\verb+\ほげ+''.
  \item trueの場合は，異体字セレクタは「直前の文字に続けて」出力される．
 もしもIVSサポート（\ref{ssec-ltjotf}節）が有効になっていた場合は，
 以下の例（左側は入力，右側はその出力）のようになる．
+%</ja>
 \begin{LTXexample}
 \begin{lstlisting}[vsraw=true]
 葛󠄀城市，葛󠄁飾区，葛西
 \end{lstlisting}
 \end{LTXexample}
+%<*en>
+\item If the \texttt{vsraw} key is false, then 
+variation selectors are typeset by an appropriate command, which is specified by
+      the \texttt{vscmd} key.
+The default setting of the \texttt{vscmd} key produces the following.
+%</en>
+%<*ja>
 \item falseの場合は，異体字セレクタは適当な命令によって「見える形で」出力される．
 どのような形で出力されるかを規定するのが \texttt{vscmd} キーであり，
 \Pkg{lltjp-listings} の標準設定では以下の例の右側のように出力される．
+%</ja>
 \begin{LTXexample}
 \begin{lstlisting}[vsraw=false,
    vscmd=\ltjlistingsvsstdcmd]
 葛󠄀城市，葛󠄁飾区，葛西
 \end{lstlisting}
 \end{LTXexample}
-ちなみに，本ドキュメントでは次のようにしている：
+%<ja> ちなみに，本ドキュメントでは次のようにしている：
+%<en> For example, the following code is the setting of the \texttt{vscmd} key in this document.
 \begin{lstlisting}[numbers=left]
 \def\IVSA#1#2#3#4#5{%
   \textcolor{blue}{\raisebox{3.5pt}{\tt%
@@ -8354,8 +8378,54 @@ instead of ``\verb+\ほげ+''.
 \lstset{vscmd=\IVSB}
 \end{lstlisting}
 \end{itemize}
-既定の出力命令を復活させたい場合は\ \verb+vsraw=\ltjlistingsvsstdcmd+\
+%<*en>
+The default output command of variation selectors is stored in \verb+\ltjlistingsvsstdcmd+.
+%</en>
+%<*ja>
+既定の出力命令を復活させたい場合は\ \verb+vscmd=\ltjlistingsvsstdcmd+\
 とすれば良い．
+%</ja>
+
+%<*en>
+\paragraph{The \texttt{doubleletterspace} key}
+Even the column format is \texttt{[c]fixed}, sometimes characters are not vertically aligned.
+The following example  is typeset with \texttt{basewidth=2em}, and
+you'll see the leftmost ``\texttt{H}'' are not vertically aligned.
+\begin{lstlisting}[basewidth=2em, basicstyle=\tt,numbers=left]
+:H:
+:HHHH:
+\end{lstlisting}
+
+\Pkg{lltjp-listing} adds the \texttt{doubleletterspace} key (not activated by default, for
+compatibility) to
+improve the situation, namely doubles inter-character space in each output unit.
+With this key, the above input now produces better output.
+\begin{lstlisting}[basewidth=2em, basicstyle=\tt,numbers=left, doubleletterspace]
+:H:
+:HHHH:
+\end{lstlisting}
+%</en>
+%<*ja>
+\paragraph{\texttt{doubleletterspace}キー}
+\Pkg{listings}パッケージで列揃えが \texttt{[c]fixed} となっている場合でも，
+場合によっては文字が縦に揃わない場合もある．
+例を以下に示そう．これは強調するために \texttt{basewidth=2em} を設定している．
+\begin{lstlisting}[basewidth=2em, basicstyle=\tt,numbers=left]
+:H:
+:HHHH:
+\end{lstlisting}
+1行目と2行目の「\texttt{H}」の位置が揃っていないが，
+これは出力単位ごとに，先頭・末尾・各文字間に同じ量の空白を挿入することによる．
+
+\Pkg{lltjp-listing}では，このような症状を改善させるために \texttt{doubleletterspace} キー
+を追加した（標準では互換性のために無効になっている）．このキーを有効にすると，
+出力単位中の各文字間の空白を2倍にすることで文字を揃いやすくしている．
+上と同じものを \texttt{doubleletterspace} キーを有効にして組んだものが以下であり，
+きちんと「\texttt{H}」の位置が揃っていることが分かる．
+\begin{lstlisting}[basewidth=2em, basicstyle=\tt,numbers=left, doubleletterspace]
+:H:
+:HHHH:
+\end{lstlisting}
 %</ja>
 
 %<en>\subsection{Class of Characters}
@@ -8487,7 +8557,7 @@ are classified into above 5~classes by the following rules:
 Letter, Other, Kanji, Open, Closeのどれに属するかは次によって決まる：
 %</ja>
 \begin{itemize}
-%<en>\item \textbf{ALchar}s above \texttt{U+0080} are classified as Letter.
+%<en>\item \textbf{ALchar}s above or equal to~\texttt{U+0080} are classified as Letter.
 %<ja>\item （\texttt{U+0080}以降の）\textbf{ALchar}は，すべてLetter扱いである．
 
 %<en>\item \textbf{JAchar}s are classified in the order as follows:
@@ -8699,10 +8769,11 @@ OpenTypeフォントでもTrueTypeフォントでもIVS情報が格納されて�
 \texttt{fontloader} の呼び出しでかなり時間を消費することから，
 %%% to_table を使わなくしたことで，メモリ使用量は減った
 IVS情報をキャッシュに保存することで2回目以降の実行時間を節約している．
+%</ja>
 
 
+%<*ja>
 \section{複数フォントの「合成」（未完）}
-
 \section{\LuaTeX-jaにおけるキャッシュ}
 \Pkg{luaotfload}パッケージが，各TrueType・OpenTypeフォントの情報を
 キャッシュとして保存しているのと同様の方法で，
