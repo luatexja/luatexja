@@ -319,7 +319,7 @@ local ltjw_apply_ashift_disc = ltjw.apply_ashift_disc
 local min, max = math.min, math.max
 local function calc_np_aux_glyph_common(lp)
    Np.nuc = lp
-   Np.id = npi
+   Np.first= (Np.first or lp)
    if getfield(lp, 'lang') == lang_ja then
       Np.id = id_jglyph
       set_np_xspc_jachar(Np, lp)
@@ -406,10 +406,7 @@ local function calc_np_aux_glyph_common(lp)
    end
 end
 local calc_np_auxtable = {
-   [id_glyph] = function (lp)
-      Np.first= (Np.first or lp)
-      return calc_np_aux_glyph_common(lp)
-   end,
+   [id_glyph] = calc_np_aux_glyph_common,
    [id_hlist] = function(lp)
       local op, flag
       head, lp, op, flag = ltjd_make_dir_whatsit(head, lp, list_dir, 'jfm hlist')
@@ -491,7 +488,6 @@ local calc_np_auxtable = {
       return true, node_next(lp)
    end,
    [id_kern] = function(lp)
-      Np.first = Np.first or lp
       if getsubtype(lp)==2 then
 	 set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
 	 set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
@@ -499,6 +495,7 @@ local calc_np_auxtable = {
 	 set_attr(lp, attr_icflag, PROCESSED);
 	 return calc_np_aux_glyph_common(lp)
       else
+	 Np.first = Np.first or lp
 	 Np.id = id_kern; set_attr(lp, attr_icflag, PROCESSED)
 	 Np.last = lp; return true, node_next(lp)
       end

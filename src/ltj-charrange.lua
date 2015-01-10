@@ -31,6 +31,7 @@ for i = 0, 31*ATTR_RANGE-1 do
       return floor(has_attr(p, kcat_attr_table[i])/pow_table[i])%2 ~= jcr_noncjk
    end
 end
+fn_table[-1]= function() return false end -- for char --U+007F
 pow_table[31*ATTR_RANGE] = pow(2, 31)
 
 -- jcr_table_main[chr_code] = index
@@ -42,6 +43,7 @@ jcr_table_main = {}
 local jcr_table_main = jcr_table_main
 local ucs_out = 0x110000
 
+for i=0x0 ,0x7F       do jcr_table_main[i]=-1 end
 for i=0x80 ,0xFF      do jcr_table_main[i]=1 end
 for i=0x100,ucs_out-1 do jcr_table_main[i]=0 end
 
@@ -92,14 +94,10 @@ function is_ucs_in_japanese_char_node(p)
    end
 end
 is_ucs_in_japanese_char = is_ucs_in_japanese_char_node
+-- only ltj-otf.lua uses this version
 
-function is_ucs_in_japanese_char_direct(p)
-   local c = getchar(p)
-   if c<0x80 then
-      return false
-   else
-      return fn_table[jcr_table_main[c]](p)
-   end
+function is_ucs_in_japanese_char_direct(p ,c)
+   return fn_table[jcr_table_main[c or getchar(p)]](p)
 end
 
 function is_japanese_char_curlist(c) -- assume that c>=0x80
