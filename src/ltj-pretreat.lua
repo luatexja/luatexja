@@ -62,16 +62,6 @@ do
       = ltjb.start_time_measure, ltjb.stop_time_measure
    local head
    local suppress_hyphenate_ja_aux = {
-      [id_glyph] = function(p)
-	 local pc = getchar(p)
-	 if (has_attr(p, attr_icflag) or 0)<=0 and is_ucs_in_japanese_char(p, pc) then
-	    setfield(p, 'font', 
-		     ltjf_replace_altfont(has_attr(p, attr_curjfnt) or getfont(p), pc))
-	    setfield(p, 'lang', lang_ja)
-	    ltjs_orig_char_table[p] = pc
-	 end
-	 return node_next(p)
-      end,
       [id_math] = function(p) return node_next(node_end_of_math(node_next(p))) end,
       [id_whatsit] = function(p)
 	 if getsubtype(p)==sid_user then
@@ -93,8 +83,6 @@ do
 		{
 		   __index = function() return node_next end,
 		})
-   local function suppress_hyphenate_ja_iter(_,p)
-      return (suppress_hyphenate_ja_aux[getid(p)])(p) end
    local function suppress_hyphenate_ja (h)
       start_time_measure('ltj_hyphenate')
       head = to_direct(h)
@@ -104,7 +92,23 @@ do
 	 ltjs_orig_char_table[i] = nil
       end
       ltjs.list_dir=ltjd_get_dir_count()
-      for p in suppress_hyphenate_ja_iter, nil, head do end
+      do
+	 local p = head
+	 while p do
+	    local pid = getid(p)
+	    while pid==id_glyph do
+	       local pc = getchar(p)
+	       if (has_attr(p, attr_icflag) or 0)<=0 and is_ucs_in_japanese_char(p, pc) then
+		  setfield(p, 'font', 
+			   ltjf_replace_altfont(has_attr(p, attr_curjfnt) or getfont(p), pc))
+		  setfield(p, 'lang', lang_ja)
+		  ltjs_orig_char_table[p] = pc
+	       end
+	       p = node_next(p); pid = getid(p)
+	    end
+	    p = (suppress_hyphenate_ja_aux[pid])(p)
+	 end
+      end
       stop_time_measure('ltj_hyphenate'); start_time_measure('tex_hyphenate')
       lang.hyphenate(h, nil)
       stop_time_measure('tex_hyphenate')

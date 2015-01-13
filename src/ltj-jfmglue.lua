@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2014/10/03',
+  date = '2015/01/13',
   description = 'Insertion process of JFM glues and kanjiskip',
 })
 module('luatexja.jfmglue', package.seeall)
@@ -112,10 +112,10 @@ do
    local stop_time_measure = ltjb.stop_time_measure
    slow_find_char_class = function (c, m, oc)
       local cls = ltjf_find_char_class(oc, m)
-      if c and oc~=c and cls==0 then
-	 return ltjf_find_char_class(c, m), oc
+      if oc~=c and c and cls==0 then
+	 return ltjf_find_char_class(c, m)
       else
-	 return cls, oc
+	 return cls
       end
    end
 end
@@ -276,6 +276,7 @@ luatexbase.create_callback("luatexja.jfmglue.whatsit_after", "data",
 			   function (stat, Nq, Np) return false end)
 
 -- calc next Np
+local calc_np 
 do
 
 local traverse = Dnode.traverse
@@ -322,9 +323,9 @@ local function calc_np_aux_glyph_common(lp)
    Np.first= (Np.first or lp)
    if getfield(lp, 'lang') == lang_ja then
       Np.id = id_jglyph
-      set_np_xspc_jachar(Np, lp)
+      local m, cls = set_np_xspc_jachar(Np, lp)
       local npi, npf
-      lp, head, npi, npf = capsule_glyph(lp, Np.met, Np.class, head, tex_dir, lp)
+      lp, head, npi, npf = capsule_glyph(lp, m, cls, head, tex_dir, lp)
       Np.first = (Np.first~=Np.nuc) and Np.first or npf or npi
       Np.nuc = npi
       return true, check_next_ickern(lp);
@@ -511,7 +512,7 @@ calc_np_auxtable[id_ins]    = calc_np_auxtable.skip
 calc_np_auxtable[id_mark]   = calc_np_auxtable.skip
 calc_np_auxtable[id_adjust] = calc_np_auxtable.skip
 
-function calc_np(lp, last)
+function calc_np(last, lp)
    local k
    -- We assume lp = node_next(Np.last)
    Np, Nq, non_ihb_flag = Nq, Np, true
@@ -538,11 +539,8 @@ function calc_np(lp, last)
 	 if k then return lp end
       end
    end
-   Np = nil; return lp
 end
-
 end
-local calc_np = calc_np
 
 -- extract informations from Np
 -- We think that "Np is a Japanese character" if Np.met~=nil,
@@ -576,6 +574,7 @@ do
       Nx.xspc = table_current_stack[XSP  + c] or 3
       Nx.kcat = table_current_stack[KCAT + c] or 0
       Nx.auto_kspc, Nx.auto_xspc = (has_attr(x, attr_autospc)==1), (has_attr(x, attr_autoxspc)==1)
+      return m, cls
    end
    function set_np_xspc_jachar_hbox(Nx, x)
       local m = ltjf_font_metric_table[getfont(x)]
@@ -761,8 +760,8 @@ do
    local bk_ak = 2*id_kern - id_kern
 
    calc_ja_ja_aux = function (gb,ga, db, da)
-      local rbb, rab = (1-db)/2, (1-da)/2 -- 「前の文字」由来のグルーの割合
-      local rba, raa = (1+db)/2, (1+da)/2 -- 「前の文字」由来のグルーの割合
+      local rbb, rab = 0.5*(1-db), 0.5*(1-da) -- 「前の文字」由来のグルーの割合
+      local rba, raa = 0.5*(1+db), 0.5*(1+da) -- 「前の文字」由来のグルーの割合
       if diffmet_rule ~= math.two_pleft and diffmet_rule ~= math.two_pright
           and diffmet_rule ~= math.two_paverage then
 	 rbb, rab, rba, raa = 1,0,0,1
@@ -826,10 +825,10 @@ local function calc_ja_ja_glue()
    else
       local npn, nqn = Np.nuc, Nq.nuc
       local gb, db = new_jfm_glue(qm, Nq.class,
-				  slow_find_char_class(ltjs_orig_char_table[npn],
+				  slow_find_char_class(Np.char,
 						       qm, getchar(npn)))
       local ga, da = new_jfm_glue(pm,
-				  slow_find_char_class(ltjs_orig_char_table[nqn],
+				  slow_find_char_class(Nq.char,
 						       pm, getchar(nqn)),
 				  Np.class)
       return calc_ja_ja_aux(gb, ga, db, da);
@@ -1102,29 +1101,25 @@ function main(ahead, mode, dir)
    if not ahead then return ahead end
    head = ahead;
    local lp, last, par_indented = init_var(mode,dir)
-   lp = calc_np(lp, last)
-   if Np then
+   lp = calc_np(last,lp)
+   if lp then
       handle_list_head(par_indented)
-   else
-      return cleanup(mode)
-   end
-   lp = calc_np(lp, last)
-   while Np do
-      adjust_nq();
-      local pid, pm = Np.id, Np.met
-      -- 挿入部
-      if pid == id_jglyph then
-         handle_np_jachar(mode)
-      elseif pm then
-         if pid==id_hlist then handle_np_ja_hlist()
-         else handle_np_jachar() end
-      elseif Nq.met then
-         if Nq.id==id_hlist then handle_nq_ja_hlist()
-         else handle_nq_jachar() end
+      for lp in calc_np, last, lp do
+	 adjust_nq();
+	 local pid, pm = Np.id, Np.met
+	 -- 挿入部
+	 if pid == id_jglyph then
+	    handle_np_jachar(mode)
+	 elseif pm then
+	    if pid==id_hlist then handle_np_ja_hlist()
+	    else handle_np_jachar() end
+	 elseif Nq.met then
+	    if Nq.id==id_hlist then handle_nq_ja_hlist()
+	    else handle_nq_jachar() end
+	 end
       end
-      lp = calc_np(lp, last)
+      handle_list_tail(mode)
    end
-   handle_list_tail(mode)
    return cleanup(mode)
 end
 end
