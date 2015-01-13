@@ -130,6 +130,7 @@ load_module('math');      local ltjm = luatexja.math
 load_module('tangle');    local ltjb = luatexja.base
 
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
+local attr_jchar_code = luatexbase.attributes['ltj@charcode']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 local attr_icflag = luatexbase.attributes['ltj@icflag']

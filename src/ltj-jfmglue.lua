@@ -559,28 +559,18 @@ do
 
 -- 和文文字のデータを取得
    local attr_jchar_class = luatexbase.attributes['ltj@charclass']
+   local attr_jchar_code = luatexbase.attributes['ltj@charcode']
    local attr_autospc = luatexbase.attributes['ltj@autospc']
    local attr_autoxspc = luatexbase.attributes['ltj@autoxspc']
    --local ltjf_get_vert_glyph = ltjf.get_vert_glyph
-   function set_np_xspc_jachar_yoko(Nx, x)
+   function set_np_xspc_jachar(Nx, x)
       local m = ltjf_font_metric_table[getfont(x)]
-      local cls, c = slow_find_char_class(ltjs_orig_char_table[x], m, getchar(x))
-      Nx.met, Nx.class, Nx.char = m, cls, c;
-      if cls~=0 then set_attr(x, attr_jchar_class, cls) end
-      Nx.pre  = table_current_stack[PRE + c]  or 0
-      Nx.post = table_current_stack[POST + c] or 0
-      Nx.xspc = table_current_stack[XSP  + c] or 3
-      Nx.kcat = table_current_stack[KCAT + c] or 0
-      Nx.auto_kspc, Nx.auto_xspc = (has_attr(x, attr_autospc)==1), (has_attr(x, attr_autoxspc)==1)
-   end
-   function set_np_xspc_jachar_tate(Nx, x)
       local c, c_glyph = ltjs_orig_char_table[x], getchar(x)
-      local xf = getfont(x)
-      local m = ltjf_font_metric_table[xf]
+      c = c or c_glyph
       local cls = slow_find_char_class(c, m, c_glyph)
-      --setfield(x, 'char', ltjf_get_vert_glyph(xf, c_glyph) or c_glyph)
       Nx.met, Nx.class, Nx.char = m, cls, c;
       if cls~=0 then set_attr(x, attr_jchar_class, cls) end
+      if c~=c_glyph then set_attr(x, attr_jchar_code, c) end
       Nx.pre  = table_current_stack[PRE + c]  or 0
       Nx.post = table_current_stack[POST + c] or 0
       Nx.xspc = table_current_stack[XSP  + c] or 3
@@ -589,7 +579,7 @@ do
    end
    function set_np_xspc_jachar_hbox(Nx, x)
       local m = ltjf_font_metric_table[getfont(x)]
-      local c = getchar(x)
+      local c = has_attr(x, attr_jchar_code) or getchar(x)
       Nx.met, Nx.char  = m, c; Nx.class = has_attr(x, attr_jchar_class) or 0;
       Nx.pre  = table_current_stack[PRE + c]  or 0
       Nx.post = table_current_stack[POST + c] or 0
@@ -1047,8 +1037,6 @@ do
       local is_dir_tate = list_dir==dir_tate
       capsule_glyph = is_dir_tate and ltjw.capsule_glyph_tate or ltjw.capsule_glyph_yoko
       attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
-      set_np_xspc_jachar = is_dir_tate and set_np_xspc_jachar_tate or set_np_xspc_jachar_yoko
-
 
       tex_dir = dir or 'TLT'
       kanji_skip = node_new(id_glue)
