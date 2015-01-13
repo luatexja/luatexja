@@ -87,7 +87,6 @@ local function capsule_glyph_yoko(p, met, class, head, dir)
    local fheight, fdepth = char_data.height, char_data.depth
    local kbl = has_attr(p, attr_ykblshift) or 0
    --
-   local need_hbox
    if pwidth==fwidth then
       -- 補正後glyph node は ht: p.height - kbl - down, dp: p.depth + min(0, kbl+down) を持つ
       -- 設定されるべき寸法: ht: fheight - kbl, dp: fdepth + kbl
@@ -110,33 +109,27 @@ local function capsule_glyph_yoko(p, met, class, head, dir)
 	 head = p and node_insert_before(head, p, box)
 	    or node_insert_after(head, node_tail(head), box)
 	 return node_next(p), head, p, box
-      else
-	 need_hbox = true
       end
-   else
-      need_hbox = true
    end
 
-   if need_hbox then
-      local q
-      head, q = node_remove(head, p)
-      local box = node_new(id_hlist)
-      setfield(p, 'yoffset', getfield(p, 'yoffset') -fshift.down);
-      setfield(p, 'next', nil)
-      setfield(p, 'xoffset', getfield(p, 'xoffset')
-		  + char_data.align*(fwidth-pwidth) - fshift.left)
-      local box = node_new(id_hlist)
-      setfield(box, 'width', fwidth)
-      setfield(box, 'height', fheight)
-      setfield(box, 'depth', fdepth)
-      setfield(box, 'head', p)
-      setfield(box, 'shift', kbl)
-      setfield(box, 'dir', dir)
-      set_attr(box, attr_icflag, PACKED)
-      head = q and node_insert_before(head, q, box)
-               or node_insert_after(head, node_tail(head), box)
-      return q, head, box
-   end
+   local q
+   head, q = node_remove(head, p)
+   local box = node_new(id_hlist)
+   setfield(p, 'yoffset', getfield(p, 'yoffset') -fshift.down);
+   setfield(p, 'next', nil)
+   setfield(p, 'xoffset', getfield(p, 'xoffset')
+	       + char_data.align*(fwidth-pwidth) - fshift.left)
+   local box = node_new(id_hlist)
+   setfield(box, 'width', fwidth)
+   setfield(box, 'height', fheight)
+   setfield(box, 'depth', fdepth)
+   setfield(box, 'head', p)
+   setfield(box, 'shift', kbl)
+   setfield(box, 'dir', dir)
+   set_attr(box, attr_icflag, PACKED)
+   head = q and node_insert_before(head, q, box)
+      or node_insert_after(head, node_tail(head), box)
+   return q, head, box
 end
 
 luatexja.setwidth.capsule_glyph_yoko = capsule_glyph_yoko

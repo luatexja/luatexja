@@ -539,6 +539,7 @@ function calc_np(last, lp)
 	 if k then return lp end
       end
    end
+   Np=nil
 end
 end
 
@@ -1101,10 +1102,10 @@ function main(ahead, mode, dir)
    if not ahead then return ahead end
    head = ahead;
    local lp, last, par_indented = init_var(mode,dir)
-   lp = calc_np(last,lp)
+   lp = calc_np(last, lp)
    if lp then
       handle_list_head(par_indented)
-      for lp in calc_np, last, lp do
+      lp = calc_np(last,lp); while Np do
 	 adjust_nq();
 	 local pid, pm = Np.id, Np.met
 	 -- 挿入部
@@ -1117,6 +1118,7 @@ function main(ahead, mode, dir)
 	    if Nq.id==id_hlist then handle_nq_ja_hlist()
 	    else handle_nq_jachar() end
 	 end
+	 lp = calc_np(last,lp)
       end
       handle_list_tail(mode)
    end
