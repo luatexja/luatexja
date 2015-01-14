@@ -241,6 +241,11 @@ local function create_dir_whatsit(hd, gc, new_dir)
 	    getsubtype(hd)==sid_user and getfield(hd, 'user_id')==DIR then
       set_attr(hd, attr_icflag,
 	       get_attr_icflag(hd) + PROCESSED_BEGIN_FLAG)
+      local n = node_next(hd)
+      if n then
+	 set_attr(n, attr_icflag,
+		  get_attr_icflag(n) + PROCESSED_BEGIN_FLAG)
+      end
       ensure_tex_attr(attr_icflag, 0)
       return hd
    else
@@ -253,6 +258,8 @@ local function create_dir_whatsit(hd, gc, new_dir)
       set_attr(hd, attr_icflag,
 	       (has_attr(hd, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG
 		  + PROCESSED_BEGIN_FLAG)
+      set_attr(hd, attr_icflag,
+	       get_attr_icflag(hd) + PROCESSED_BEGIN_FLAG)
       ensure_tex_attr(attr_icflag, 0)
       ensure_tex_attr(attr_dir, 0)
       return w

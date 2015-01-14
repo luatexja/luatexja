@@ -71,7 +71,7 @@ do
 	    elseif uid==DIR then
 	       if has_attr(p, attr_icflag)<PROCESSED_BEGIN_FLAG  then
 		  ltjs.list_dir = has_attr(p, attr_dir)
-	       else
+	       else -- こっちのケースは通常使用では起こらない
 		  wtd[#wtd+1] = p; node_remove(head, p)
 	       end
 	    end

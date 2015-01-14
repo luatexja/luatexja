@@ -82,10 +82,15 @@ local IC_PROCESSED = luatexja.icflag_table.IC_PROCESSED
 local BOXBDD       = luatexja.icflag_table.BOXBDD
 local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 
+local attr_icflag = luatexbase.attributes['ltj@icflag']
 local kanji_skip = node_new(id_glue)
 local xkanji_skip = node_new(id_glue)
-set_attr(kanji_skip, attr_icflag, KANJI_SKIP)
-set_attr(xkanji_skip, attr_icflag, XKANJI_SKIP)
+do
+   local KANJI_SKIP   = luatexja.icflag_table.KANJI_SKIP
+   local XKANJI_SKIP   = luatexja.icflag_table.XKANJI_SKIP
+   set_attr(kanji_skip, attr_icflag, KANJI_SKIP)
+   set_attr(xkanji_skip, attr_icflag, XKANJI_SKIP)
+end
 
 local table_current_stack
 local list_dir
@@ -95,7 +100,6 @@ local attr_ablshift
 local set_np_xspc_jachar
 local set_np_xspc_jachar_hbox
 
-local attr_icflag = luatexbase.attributes['ltj@icflag']
 local ltjs_orig_char_table = ltjs.orig_char_table
 
 local function get_attr_icflag(p)
@@ -494,6 +498,7 @@ local calc_np_auxtable = {
    end,
    [id_kern] = function(lp)
       if getsubtype(lp)==2 then
+	 Np.first = Np.first or lp
 	 set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
 	 set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
 	 set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
@@ -1104,7 +1109,7 @@ function main(ahead, mode, dir)
    head = ahead;
    local lp, last, par_indented = init_var(mode,dir)
    lp = calc_np(last, lp)
-   if lp then
+   if Np then
       handle_list_head(par_indented)
       lp = calc_np(last,lp); while Np do
 	 adjust_nq();
