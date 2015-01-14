@@ -62,16 +62,29 @@ end
 
 local page_direction
 --
-local ensure_tex_attr
+local ensure_tex_attr, copy_dir_pool
 do
    local tex_set_attr = tex.setattribute
-   local tex_get_attr = tex.getattribute
+   local tex_get_attr, node_copy = tex.getattribute, Dnode.copy
    function ensure_tex_attr(a, v)
       if tex_get_attr(a)~=v then
 	 tex_set_attr('global', a, v)
       end
    end
+   local dir_pool = {}
+   for _,i in pairs({dir_tate, dir_yoko, dir_dtou, dir_utod}) do
+      local w = node_new(id_whatsit, sid_user)
+      set_attr(w, attr_dir, i)
+      setfield(w, 'user_id', DIR)
+      setfield(w, 'type', 110)
+      setfield(w, 'next', nil)
+      dir_pool[i] = w
+   end
+   function copy_dir_pool(d)
+      return node_copy(dir_pool[d])
+   end
 end
+
 
 local function adjust_badness(hd)
    if not node_next(hd) and getid(hd)==id_whatsit and getsubtype(hd)==sid_user
@@ -176,11 +189,7 @@ do
          v = get_adjust_dir_count()
       end
       local h = to_direct(tex_nest[lv].head)
-      local w = node_new(id_whatsit, sid_user)
-      setfield(w, 'next', nil)
-      setfield(w, 'user_id', DIR)
-      setfield(w, 'type', 110)
-      set_attr(w, attr_dir, v)
+      local w = copy_dir_pool(v)
       insert_after(h, h, w)
       tex_nest[lv].tail = to_node(node_tail(w))
       ensure_tex_attr(attr_icflag, 0)
@@ -220,11 +229,7 @@ do
 	    node_set_attr(w, attr_dir, v)
 	    if lv==0 then page_direction = v end
 	 else
-	    local w = node_new(id_whatsit, sid_user)
-	    setfield(w, 'next', nil)
-	    setfield(w, 'user_id', DIR)
-	    setfield(w, 'type', 110)
-	    set_attr(w, attr_dir, v)
+	    local w = copy_dir_pool(v)
 	    Dnode.write(w)
 	    if lv==0 then page_direction = v end
 	 end
@@ -249,11 +254,8 @@ local function create_dir_whatsit(hd, gc, new_dir)
       ensure_tex_attr(attr_icflag, 0)
       return hd
    else
-      local w = node_new(id_whatsit, sid_user)
+      local w = copy_dir_pool(new_dir)
       setfield(w, 'next', hd)
-      setfield(w, 'user_id', DIR)
-      setfield(w, 'type', 110)
-      set_attr(w, attr_dir, new_dir)
       set_attr(w, attr_icflag, PROCESSED_BEGIN_FLAG)
       set_attr(hd, attr_icflag,
 	       get_attr_icflag(hd) + PROCESSED_BEGIN_FLAG)
@@ -941,11 +943,7 @@ do
 	 end
 	 for box_rule in traverse(h) do
 	    if getid(box_rule)<id_rule then
-	       local w = node_new(id_whatsit, sid_user)
-	       setfield(w, 'next', nil)
-	       setfield(w, 'user_id', DIR)
-	       setfield(w, 'type', 110)
-	       set_attr(w, attr_dir, list_dir)
+	       local w = copy_dir_pool(list_dir)
 	       h = insert_before(h, box_rule, w)
 	    end
 	 end
