@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.ruby',
-  date = '2014/05/08',
+  date = '2015/01/14',
   description = 'Ruby annotation',
 })
 module('luatexja.ruby', package.seeall)
@@ -26,7 +26,7 @@ local getchar = (Dnode ~= node) and Dnode.getchar or function(n) return n.char e
 local getsubtype = (Dnode ~= node) and Dnode.getsubtype or function(n) return n.subtype end
 
 local node_new = Dnode.new
-local node_remove = luatexja.Dnode_remove -- Dnode.remove
+local node_remove = Dnode.remove
 local node_next = (Dnode ~= node) and Dnode.getnext or node.next
 local node_copy, node_free, node_tail = Dnode.copy, Dnode.free, Dnode.tail
 local has_attr, set_attr = Dnode.has_attribute, Dnode.set_attribute

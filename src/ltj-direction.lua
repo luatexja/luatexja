@@ -45,7 +45,6 @@ local sid_user = node.subtype('user_defined')
 
 local tex_nest = tex.nest
 local tex_getcount = tex.getcount
-local tex_set_attr = tex.setattribute
 local PROCESSED    = luatexja.icflag_table.PROCESSED
 local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 local PACKED       = luatexja.icflag_table.PACKED
@@ -63,6 +62,17 @@ end
 
 local page_direction
 --
+local ensure_tex_attr
+do
+   local tex_set_attr = tex.setattribute
+   local tex_get_attr = tex.getattribute
+   function ensure_tex_attr(a, v)
+      if tex_get_attr(a)~=v then
+	 tex_set_attr('global', a, v)
+      end
+   end
+end
+
 local function adjust_badness(hd)
    if not node_next(hd) and getid(hd)==id_whatsit and getsubtype(hd)==sid_user
    and getfield(hd, 'user_id')==DIR then
@@ -173,8 +183,8 @@ do
       set_attr(w, attr_dir, v)
       insert_after(h, h, w)
       tex_nest[lv].tail = to_node(node_tail(w))
-      tex_set_attr('global', attr_icflag, 0)
-      tex_set_attr('global', attr_dir, 0)
+      ensure_tex_attr(attr_icflag, 0)
+      ensure_tex_attr(attr_dir, 0)
    end
 
    local function set_list_direction(v, name)
@@ -218,9 +228,9 @@ do
 	    Dnode.write(w)
 	    if lv==0 then page_direction = v end
 	 end
-         tex_set_attr('global', attr_icflag, 0)
+         ensure_tex_attr(attr_icflag, 0)
       end
-      tex_set_attr('global', attr_dir, 0)
+      ensure_tex_attr(attr_dir, 0)
    end
    luatexja.direction.set_list_direction = set_list_direction
 end
@@ -231,7 +241,7 @@ local function create_dir_whatsit(hd, gc, new_dir)
 	    getsubtype(hd)==sid_user and getfield(hd, 'user_id')==DIR then
       set_attr(hd, attr_icflag,
 	       get_attr_icflag(hd) + PROCESSED_BEGIN_FLAG)
-      tex_set_attr('global', attr_icflag, 0)
+      ensure_tex_attr(attr_icflag, 0)
       return hd
    else
       local w = node_new(id_whatsit, sid_user)
@@ -243,8 +253,8 @@ local function create_dir_whatsit(hd, gc, new_dir)
       set_attr(hd, attr_icflag,
 	       (has_attr(hd, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG
 		  + PROCESSED_BEGIN_FLAG)
-      tex_set_attr('global', attr_dir, 0)
-      tex_set_attr('global', attr_icflag, 0)
+      ensure_tex_attr(attr_icflag, 0)
+      ensure_tex_attr(attr_dir, 0)
       return w
    end
 end
@@ -257,7 +267,7 @@ do
       if gc=='fin_row' or gc == 'preamble'  then
 	 if hd  then
 	    set_attr(hd, attr_icflag, PROCESSED_BEGIN_FLAG)
-	    tex_set_attr('global', attr_icflag, 0)
+	    ensure_tex_attr(attr_icflag, 0)
 	 end
 	 return h
       else
@@ -280,7 +290,7 @@ do
 	 setfield(line, 'head', create_dir_whatsit(nh, gc, new_dir) )
 	 --set_attr(line, attr_dir, new_dir)
       end
-      tex_set_attr('global', attr_dir, 0)
+      ensure_tex_attr(attr_dir, 0)
       return h
    end
    luatexbase.add_to_callback('post_linebreak_filter',
@@ -312,7 +322,7 @@ do
       if gc=='fin_row' then -- gc == 'preamble' case is treated in dir_adjust_vpack
 	 if hd  then
 	    set_attr(hd, attr_icflag, PROCESSED_BEGIN_FLAG)
-	    tex_set_attr('global', attr_icflag, 0)
+	    ensure_tex_attr(attr_icflag, 0)
 	 end
 	 return hd
       else
@@ -589,8 +599,8 @@ local function create_dir_node(b, b_dir, new_dir, is_manual)
 	    new_dir + (is_manual and dir_node_manual or dir_node_auto))
    set_attr(db, attr_icflag, PROCESSED)
    set_attr(b, attr_icflag, PROCESSED)
-   tex_set_attr('global', attr_dir, 0)
-   tex_set_attr('global', attr_icflag, 0)
+   ensure_tex_attr(attr_dir, 0)
+   ensure_tex_attr(attr_icflag, 0)
    setfield(db, 'dir', getfield(b, 'dir'))
    setfield(db, 'shift', 0)
    setfield(db, 'width',  info.width(w,h,d))
@@ -935,7 +945,7 @@ do
 	       h = insert_before(h, box_rule, w)
 	    end
 	 end
-	 tex_set_attr('global', attr_dir, 0)
+	 ensure_tex_attr(attr_dir, 0)
 	 setfield(ad, 'head', h)
       end
       stop_time_measure('box_primitive_hook')
@@ -1067,9 +1077,9 @@ do
       end
    end
 
+   tex.setattribute(attr_dir, dir_yoko)
    local shipout_temp =  node_new(id_hlist)
-   set_attr(shipout_temp, attr_dir, dir_yoko)
-   tex_set_attr('global', attr_dir, 0)
+   tex.setattribute(attr_dir, 0)
 
    finalize_inner = function (box)
       for n in traverse(getlist(box)) do
@@ -1097,5 +1107,6 @@ do
       finalize_inner(shipout_temp)
       setbox('global', "AtBeginShipoutBox", copy(getlist(shipout_temp)))
       setfield(shipout_temp, 'head',nil)
+      --print('MM', collectgarbage('count'))
    end
 end

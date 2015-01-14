@@ -30,7 +30,7 @@ local to_node = (Dnode ~= node) and Dnode.tonode or nullfunc
 local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
 
 local node_new = Dnode.new
-local node_remove = luatexja.Dnode_remove -- Dnode.remove
+local node_remove = Dnode.remove
 local node_next = (Dnode ~= node) and Dnode.getnext or node.next
 local node_free = Dnode.free
 local has_attr = Dnode.has_attribute

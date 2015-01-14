@@ -70,46 +70,6 @@ dir_table.dir_node_auto   = 128 -- 組方向を合わせるために自動で作
 dir_table.dir_node_manual = 256 -- 寸法代入によって作られたもの
 dir_table.dir_utod = dir_table.dir_tate + dir_table.dir_math_mod
    -- 「縦数式ディレクション」 in pTeX
-
-
-------------------------------------------------------------------------
--- FIX node.remove
-------------------------------------------------------------------------
-do
-   local node_remove, node_next, node_prev = node.remove, node.next, node.prev
-   function luatexja.node_remove (head, current)
-      if head==current then
-         local q, r = node_next(current), node_prev(current)
-         if q then q.prev = r end
-         if r and node_next(r)==current then
-            r.next = q
-         end
-         return q, q
-      else
-         return node_remove(head, current)
-      end
-   end
-   local Dnode = node.direct or node
-   if Dnode~=node then
-      local Dnode_remove, setfield = Dnode.remove, Dnode.setfield
-      local Dnode_next, Dnode_prev = Dnode.getnext, Dnode.getprev
-      function luatexja.Dnode_remove (head, current)
-         if head==current then
-            local q, r = Dnode_next(current), Dnode_prev(current)
-            if q then setfield(q, 'prev', r) end
-            if r and Dnode_next(r) == current then
-               setfield(r, 'next', q)
-            end
-            return q, q
-         else
-            return Dnode_remove(head, current)
-         end
-      end
-   else
-      luatexja.Dnode_remove = luatexja.node_remove
-   end
-end
-
 --- 定義終わり
 
 local load_module = luatexja.load_module
@@ -120,14 +80,15 @@ if luatexja_debug then load_module('debug') end
 
 load_module('charrange'); local ltjc = luatexja.charrange
 load_module('stack');     local ltjs = luatexja.stack
-load_module('direction'); local ltjd = luatexja.direction
+load_module('direction'); local ltjd = luatexja.direction -- +1 hlist +1 attr_list
 load_module('jfont');     local ltjf = luatexja.jfont
 load_module('inputbuf');  local ltji = luatexja.inputbuf
 load_module('pretreat');  local ltjp = luatexja.pretreat
-load_module('jfmglue');   local ltjj = luatexja.jfmglue
 load_module('setwidth');  local ltjw = luatexja.setwidth
+load_module('jfmglue');   local ltjj = luatexja.jfmglue -- +1 glue +1 gs +1 attr_list
 load_module('math');      local ltjm = luatexja.math
 load_module('tangle');    local ltjb = luatexja.base
+
 
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_jchar_code = luatexbase.attributes['ltj@charcode']

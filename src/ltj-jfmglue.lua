@@ -81,8 +81,12 @@ local PROCESSED    = luatexja.icflag_table.PROCESSED
 local IC_PROCESSED = luatexja.icflag_table.IC_PROCESSED
 local BOXBDD       = luatexja.icflag_table.BOXBDD
 local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
-local kanji_skip
-local xkanji_skip
+
+local kanji_skip = node_new(id_glue)
+local xkanji_skip = node_new(id_glue)
+set_attr(kanji_skip, attr_icflag, KANJI_SKIP)
+set_attr(xkanji_skip, attr_icflag, XKANJI_SKIP)
+
 local table_current_stack
 local list_dir
 local capsule_glyph
@@ -709,7 +713,7 @@ end
 
 
 -------------------- 和文文字間空白量の決定
-
+local null_skip_table = {0, 0, 0}
 -- get kanjiskip
 local get_kanjiskip
 local get_kanjiskip_normal, get_kanjiskip_jfm
@@ -733,13 +737,13 @@ do
 	 local gx = node_new(id_glue_spec);
 	 setfield(gx, 'stretch_order', 0); setfield(gx, 'shrink_order', 0)
 	 local pm, qm = Np.met, Nq.met
-	 local bk = qm.kanjiskip or {0, 0, 0}
+	 local bk = qm.kanjiskip or null_skip_table
 	 if (pm.char_type==qm.char_type) and (qm.var==pm.var) then
 	    setfield(gx, 'width', bk[1])
 	    setfield(gx, 'stretch', bk[2])
 	    setfield(gx, 'shrink', bk[3])
 	 else
-	    local ak = pm.kanjiskip or {0, 0, 0}
+	    local ak = pm.kanjiskip or null_skip_table
 	    setfield(gx, 'width', round(diffmet_rule(bk[1], ak[1])))
 	    setfield(gx, 'stretch', round(diffmet_rule(bk[2], ak[2])))
 	    setfield(gx, 'shrink', -round(diffmet_rule(-bk[3], -ak[3])))
@@ -859,7 +863,7 @@ do
 	 g = node_new(id_glue)
 	 local gx = node_new(id_glue_spec);
 	 setfield(gx, 'stretch_order', 0); setfield(gx, 'shrink_order', 0)
-	 local bk = Nn.met.xkanjiskip or {0, 0, 0}
+	 local bk = Nn.met.xkanjiskip or null_skip_table
 	 setfield(gx, 'width', bk[1])
 	 setfield(gx, 'stretch', bk[2])
 	 setfield(gx, 'shrink', bk[3])
@@ -1028,39 +1032,35 @@ do
    local dir_tate = luatexja.dir_table.dir_tate
    local attr_yablshift = luatexbase.attributes['ltj@yablshift']
    local attr_tablshift = luatexbase.attributes['ltj@tablshift']
+   local table_pool = {
+      {}, {}, {first=nil},
+      { auto_kspc=nil, auto_xspc=nil, char=nil, class=nil,
+	first=nil, id=nil, last=nil, met=nil, nuc=nil,
+	post=nil, pre=nil, xspc=nil, }, 
+      { auto_kspc=nil, auto_xspc=nil, char=nil, class=nil,
+	first=nil, id=nil, last=nil, met=nil, nuc=nil,
+	post=nil, pre=nil, xspc=nil, },
+   }
    init_var = function (mode,dir)
       -- 1073741823: max_dimen
-      Bp, widow_Bp, widow_Np = {}, {}, {first = nil}
+      Bp, widow_Bp, widow_Np, Np, Nq
+	 = table_pool[1], table_pool[2], table_pool[3], table_pool[4], table_pool[5]
+      for i=1,5 do for j,_ in pairs(table_pool[i]) do table_pool[i][j]=nil end end
       table_current_stack = ltjs.table_current_stack
 
-      list_dir = ltjs.list_dir or dir_yoko
+      list_dir, tex_dir = (ltjs.list_dir or dir_yoko), (dir or 'TLT')
       local is_dir_tate = list_dir==dir_tate
       capsule_glyph = is_dir_tate and ltjw.capsule_glyph_tate or ltjw.capsule_glyph_yoko
       attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
 
-      tex_dir = dir or 'TLT'
-      kanji_skip = node_new(id_glue)
       setfield(kanji_skip, 'spec', skip_table_to_spec(KSK))
-      set_attr(kanji_skip, attr_icflag, KANJI_SKIP)
       get_kanjiskip = (getfield(getfield(kanji_skip, 'spec'), 'width') == 1073741823)
 	 and get_kanjiskip_jfm or get_kanjiskip_normal
 
-      xkanji_skip = node_new(id_glue)
       setfield(xkanji_skip, 'spec', skip_table_to_spec(XSK))
-      set_attr(xkanji_skip, attr_icflag, XKANJI_SKIP)
       get_xkanjiskip = (getfield(getfield(xkanji_skip, 'spec'), 'width') == 1073741823)
 	 and get_xkanjiskip_jfm or get_xkanjiskip_normal
 
-      Np = {
-	 auto_kspc=nil, auto_xspc=nil, char=nil, class=nil,
-	 first=nil, id=nil, last=nil, met=nil, nuc=nil,
-	 post=nil, pre=nil, xspc=nil,
-      }
-      Nq = {
-	 auto_kspc=nil, auto_xspc=nil, char=nil, class=nil,
-	 first=nil, id=nil, last=nil, met=nil, nuc=nil,
-	 post=nil, pre=nil, xspc=nil,
-      }
       if mode then
 	 -- the current list is to be line-breaked:
 	 -- hbox from \parindent is skipped.
@@ -1082,8 +1082,9 @@ end
 local tex_set_attr = tex.setattribute
 local function cleanup(mode)
    -- adjust attr_icflag for avoiding error
-   tex_set_attr('global', attr_icflag, 0)
-   node_free(kanji_skip); node_free(xkanji_skip)
+   if tex.getattribute(attr_icflag)~=0 then tex_set_attr('global', attr_icflag, 0) end
+   node_free(getfield(kanji_skip, 'spec'))
+   node_free(getfield(xkanji_skip, 'spec'))
    if mode then
       local h = node_next(head)
       if getid(h) == id_penalty and getfield(h, 'penalty') == 10000 then

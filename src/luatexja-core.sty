@@ -214,7 +214,6 @@
   \afterassignment\ltj@@tfont\directlua{luatexja.jfont.jfontdefX(true,  'tate')}}
 \def\ltj@@tfont{\directlua{luatexja.jfont.jfontdefY()}}
 
-
 %%%%%%%% \zw, \zh
 \protected\def\zw{\directlua{tex.setdimen('ltj@zw', luatexja.jfont.get_zw())}\ltj@zw}
 \protected\def\zh{\directlua{tex.setdimen('ltj@zh', luatexja.jfont.get_zh())}\ltj@zh}
@@ -248,18 +247,19 @@
 
 %%%%%%%% \ltjsetparameter
 \newcount\ltj@@stack \newcount\ltj@@group@level
-\ltj@@group@level=0 \ltj@@stack=0
+\ltj@@group@level\z@\ltj@@stack\z@
 
-\setbox0\hbox{%
+\setbox\z@\hbox{%
   \directlua{% This value depends on the version of LuaTeX.
     luatexja.stack.hmode = -tex.nest[tex.nest.ptr].mode
   }%
 }
-\setbox0\vbox{%
+\setbox\z@\vbox{%
   \directlua{% This value depends on the version of LuaTeX.
     luatexja.stack.vmode = -tex.nest[tex.nest.ptr].mode
   }%
 }
+\setbox\z@\box\voidb@x
 
 % prebreakpenalty = {<char_code>, <penalty>}
 \define@key[ltj]{japaram}{kcatcode}{%
@@ -571,11 +571,12 @@
 }
 
 %%%% \hbox, \vbox, \vtop
-\setbox0\hbox{%
+\setbox\z@\hbox{%
   $\directlua{% This value depends on the version of LuaTeX.
     luatexja.stack.mmode = -tex.nest[tex.nest.ptr].mode
   }$%
 }
+\setbox\z@\box\voidb@x
 \ifltj@everyhook@avail% using everyhook package
   \PushPreHook{hbox}{%
     \directlua{luatexja.direction.set_list_direction_hook()}%
@@ -665,7 +666,6 @@
   \ltj@@orig@unvcopy\ltj@tempcnta
   \directlua{luatexja.direction.uncopy_restore_whatsit()}}
 
-
 %%%% lastbox
 \let\ltj@@orig@lastbox=\lastbox
 \protected\def\lastbox{%
@@ -706,7 +706,6 @@
 \def\ltj@@setdp@b{%
   \directlua{luatexja.direction.set_box_dim('depth')}%
   \ltj@restore@globaldefs\endgroup}
-
 
 %%------------------ Load module for the format
 

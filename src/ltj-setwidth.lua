@@ -92,7 +92,7 @@ local function capsule_glyph_yoko(p, met, class, head, dir)
       -- 設定されるべき寸法: ht: fheight - kbl, dp: fdepth + kbl
       local ht_diff = fheight + fshift.down - getfield(p, 'height')
       local dp_diff = fdepth  + kbl - getfield(p, 'depth') - min(kbl + fshift.down, 0)
-      if  ht_diff == 0 and dp_diff ==0 then -- offset only
+      if ht_diff == 0 and dp_diff ==0 then -- offset only
 	 set_attr(p, attr_icflag, PROCESSED)
 	 setfield(p, 'xoffset', getfield(p, 'xoffset') - fshift.left)
 	 setfield(p, 'yoffset', getfield(p, 'yoffset') - kbl - fshift.down)
@@ -114,7 +114,6 @@ local function capsule_glyph_yoko(p, met, class, head, dir)
 
    local q
    head, q = node_remove(head, p)
-   local box = node_new(id_hlist)
    setfield(p, 'yoffset', getfield(p, 'yoffset') -fshift.down);
    setfield(p, 'next', nil)
    setfield(p, 'xoffset', getfield(p, 'xoffset')
