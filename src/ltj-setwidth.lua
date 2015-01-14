@@ -74,6 +74,9 @@ local call_callback = luatexbase.call_callback
 local fshift =  { down = 0, left = 0}
 
 local min, max = math.min, math.max
+local pack_rule, pack_box = node_new(id_rule), node_new(id_hlist)
+set_attr(pack_rule, attr_icflag, PACKED)
+set_attr(pack_box, attr_icflag, PACKED)
 
 -- 和文文字の位置補正（横）
 local function capsule_glyph_yoko(p, met, class, head, dir)
@@ -98,13 +101,13 @@ local function capsule_glyph_yoko(p, met, class, head, dir)
 	 setfield(p, 'yoffset', getfield(p, 'yoffset') - kbl - fshift.down)
 	 return node_next(p), head, p
       elseif ht_diff >= 0 and dp_diff >=0 then -- rule
-	 local box = node_new(id_rule)
+	 local box = node_copy(pack_rule)
 	 setfield(p, 'yoffset', getfield(p, 'yoffset') - kbl - fshift.down)
 	 setfield(box, 'width', 0)
 	 setfield(box, 'height', fheight - kbl)
 	 setfield(box, 'depth', fdepth + kbl)
 	 setfield(box, 'dir', dir)
-	 set_attr(box, attr_icflag, PACKED)
+	 --set_attr(box, attr_icflag, PACKED)
 	 set_attr(p, attr_icflag, PACKED)
 	 head = p and node_insert_before(head, p, box)
 	    or node_insert_after(head, node_tail(head), box)
@@ -118,18 +121,19 @@ local function capsule_glyph_yoko(p, met, class, head, dir)
    setfield(p, 'next', nil)
    setfield(p, 'xoffset', getfield(p, 'xoffset')
 	       + char_data.align*(fwidth-pwidth) - fshift.left)
-   local box = node_new(id_hlist)
+   local box = node_copy(pack_box)
    setfield(box, 'width', fwidth)
    setfield(box, 'height', fheight)
    setfield(box, 'depth', fdepth)
    setfield(box, 'head', p)
    setfield(box, 'shift', kbl)
    setfield(box, 'dir', dir)
-   set_attr(box, attr_icflag, PACKED)
+   --set_attr(box, attr_icflag, PACKED)
    head = q and node_insert_before(head, q, box)
       or node_insert_after(head, node_tail(head), box)
    return q, head, box
 end
+
 
 luatexja.setwidth.capsule_glyph_yoko = capsule_glyph_yoko
 
@@ -158,7 +162,7 @@ local function capsule_glyph_tate(p, met, class, head, dir)
       = getfield(p, 'xoffset') + (has_attr(p,attr_tkblshift) or 0)
    local q
    head, q = node_remove(head, p)
-   local box = node_new(id_hlist)
+   local box = node_copy(pack_box)
    setfield(box, 'width', fwidth)
    setfield(box, 'height', fheight)
    setfield(box, 'depth', fdepth)
@@ -179,8 +183,6 @@ local function capsule_glyph_tate(p, met, class, head, dir)
    setfield(ws, 'next', wm);  setfield(wm, 'next', k2);
    setfield(k2, 'next', p);   setfield(p, 'next', k3);
    setfield(k3, 'next', wr);
-
-   set_attr(box, attr_icflag, PACKED)
    head = q and node_insert_before(head, q, box)
       or node_insert_after(head, node_tail(head), box)
    return q, head, box
@@ -199,14 +201,13 @@ local function capsule_glyph_math(p, met, class)
       = - getfield(p, 'yoffset') + (has_attr(p,attr_ykblshift) or 0), char_data.align
    setfield(p, 'yoffset', -fshift.down)
    setfield(p, 'xoffset', getfield(p, 'xoffset') + char_data.align*(fwidth-pwidth) - fshift.left)
-   local box = node_new(id_hlist);
+   local box = node_copy(pack_box)
    setfield(box, 'width', fwidth)
    setfield(box, 'height', fheight)
    setfield(box, 'depth', fdepth)
    setfield(box, 'head', p)
    setfield(box, 'shift', y_shift)
    setfield(box, 'dir', tex.mathdir)
-   set_attr(box, attr_icflag, PACKED)
    return box
 end
 luatexja.setwidth.capsule_glyph_math = capsule_glyph_math
