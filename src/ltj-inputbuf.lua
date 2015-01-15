@@ -30,7 +30,7 @@ local function add_comment(buffer)
    end
    if i>0 then
       local c = utfbyte(buffer, i)
-      if c>0x80 then
+      if c>=0x80 then
 	 local ct = getcatcode(c)
 	 local te = tex.endlinechar
 	 local ctl = (te ~= -1) and (getcatcode(te)==5) and (getcatcode(0xFFFFF)==14)

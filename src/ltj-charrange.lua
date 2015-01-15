@@ -24,14 +24,16 @@ local pow = math.pow
 local kcat_attr_table = {}
 local pow_table = {}
 local fn_table = {} -- used in is_ucs_in_japanese_char_direct
+local nfn_table = {} -- used in is_ucs_in_japanese_char_node
 for i = 0, 31*ATTR_RANGE-1 do
-   kcat_attr_table[i] = luatexbase.attributes['ltj@kcat'..floor(i/31)]
-   pow_table[i] =  pow(2, i%31)
-   fn_table[i] = function(p)
-      return floor(has_attr(p, kcat_attr_table[i])/pow_table[i])%2 ~= jcr_noncjk
-   end
+   local ka, pw = luatexbase.attributes['ltj@kcat'..floor(i/31)], pow(2, i%31)
+   local jcr_noncjk = jcr_noncjk
+   kcat_attr_table[i], pow_table[i] = ka, pw
+   fn_table[i] = function(p) return floor(has_attr(p, ka)/pw)%2 ~= jcr_noncjk end
+   nfn_table[i] = function(p) return floor(has_attr_node(p, ka)/pw)%2 ~= jcr_noncjk end
 end
-fn_table[-1]= function() return false end -- for char --U+007F
+fn_table[-1] = function() return false end -- for char --U+007F
+nfn_table[-1] = function() return false end -- for char --U+007F
 pow_table[31*ATTR_RANGE] = pow(2, 31)
 
 -- jcr_table_main[chr_code] = index
@@ -70,12 +72,8 @@ function add_char_range(b,e,ind) -- ind: external range number
 end
 
 function char_to_range(c) -- return the external range number
-   c=ltjb.in_unicode(c, false)
-   if c<0x80 then return -1
-   else
-      local r = jcr_table_main[c] or 217
-      return (r and r~=0) and r or 217
-   end
+   local r = jcr_table_main[ltjb.in_unicode(c, false)] or 217
+   return (r~=0) and r or 217
 end
 
 function get_range_setting(i) -- i: internal range number
@@ -84,14 +82,7 @@ end
 
 --  glyph_node p は和文文字か？
 function is_ucs_in_japanese_char_node(p)
-   local c = p.char
-   if c<0x80 then
-      return false
-   else
-      local i=jcr_table_main[c]
-      return (floor(
-		 has_attr_node(p, kcat_attr_table[i])/pow_table[i])%2 ~= jcr_noncjk)
-   end
+   return nfn_table[jcr_table_main[c or p.char]](p)
 end
 is_ucs_in_japanese_char = is_ucs_in_japanese_char_node
 -- only ltj-otf.lua uses this version
@@ -101,8 +92,7 @@ function is_ucs_in_japanese_char_direct(p ,c)
 end
 
 function is_japanese_char_curlist(c) -- assume that c>=0x80
-   local i=jcr_table_main[c]
-   return get_range_setting(i)~= jcr_noncjk
+   return get_range_setting(jcr_table_main[c])~= jcr_noncjk
 end
 
 -- EXT
@@ -118,7 +108,8 @@ function toggle_char_range(g, i) -- i: external range number
       if i>=7*ATTR_RANGE then i=0 end
       local attr = kcat_attr_table[i]
       local a = tex_getattr(attr)
-      tex.setattribute(g,attr,(floor(a/pow_table[i+1])*2+kc)*pow_table[i]+a%pow_table[i])
+      tex.setattribute(g, attr,
+		       (floor(a/pow_table[i+1])*2+kc)*pow_table[i]+a%pow_table[i])
    end
 end
 
