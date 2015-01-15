@@ -45,6 +45,7 @@ local sid_user = node.subtype('user_defined')
 
 local tex_nest = tex.nest
 local tex_getcount = tex.getcount
+local ensure_tex_attr = ltjb.ensure_tex_attr
 local PROCESSED    = luatexja.icflag_table.PROCESSED
 local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 local PACKED       = luatexja.icflag_table.PACKED
@@ -62,26 +63,17 @@ end
 
 local page_direction
 --
-local ensure_tex_attr, copy_dir_pool
+local dir_pool
 do
-   local tex_set_attr = tex.setattribute
-   local tex_get_attr, node_copy = tex.getattribute, Dnode.copy
-   function ensure_tex_attr(a, v)
-      if tex_get_attr(a)~=v then
-	 tex_set_attr('global', a, v)
-      end
-   end
-   local dir_pool = {}
+   local node_copy = Dnode.copy
+   dir_pool = {}
    for _,i in pairs({dir_tate, dir_yoko, dir_dtou, dir_utod}) do
       local w = node_new(id_whatsit, sid_user)
       set_attr(w, attr_dir, i)
       setfield(w, 'user_id', DIR)
       setfield(w, 'type', 110)
       setfield(w, 'next', nil)
-      dir_pool[i] = w
-   end
-   function copy_dir_pool(d)
-      return node_copy(dir_pool[d])
+      dir_pool[i] = function () return node_copy(w) end
    end
 end
 
@@ -189,7 +181,7 @@ do
          v = get_adjust_dir_count()
       end
       local h = to_direct(tex_nest[lv].head)
-      local w = copy_dir_pool(v)
+      local w = dir_pool[v]()
       insert_after(h, h, w)
       tex_nest[lv].tail = to_node(node_tail(w))
       ensure_tex_attr(attr_icflag, 0)
@@ -229,8 +221,7 @@ do
 	    node_set_attr(w, attr_dir, v)
 	    if lv==0 then page_direction = v end
 	 else
-	    local w = copy_dir_pool(v)
-	    Dnode.write(w)
+	    Dnode.write(dir_pool[v]())
 	    if lv==0 then page_direction = v end
 	 end
          ensure_tex_attr(attr_icflag, 0)
@@ -254,7 +245,7 @@ local function create_dir_whatsit(hd, gc, new_dir)
       ensure_tex_attr(attr_icflag, 0)
       return hd
    else
-      local w = copy_dir_pool(new_dir)
+      local w = dir_pool[new_dir]()
       setfield(w, 'next', hd)
       set_attr(w, attr_icflag, PROCESSED_BEGIN_FLAG)
       set_attr(hd, attr_icflag,
@@ -290,11 +281,9 @@ do
    local function create_dir_whatsit_parbox(h, gc)
       stop_time_measure('tex_linebreak')
       -- start 側は ltj-debug.lua に
-      local new_dir, hd = ltjs.list_dir, to_direct(h)
-      for line in traverse_id(id_hlist, hd) do
-         local nh = getlist(line)
-	 setfield(line, 'head', create_dir_whatsit(nh, gc, new_dir) )
-	 --set_attr(line, attr_dir, new_dir)
+      local new_dir =  ltjs.list_dir
+      for line in traverse_id(id_hlist, to_direct(h)) do
+	 setfield(line, 'head', create_dir_whatsit(getlist(line), gc, new_dir) )
       end
       ensure_tex_attr(attr_dir, 0)
       return h
@@ -943,8 +932,7 @@ do
 	 end
 	 for box_rule in traverse(h) do
 	    if getid(box_rule)<id_rule then
-	       local w = copy_dir_pool(list_dir)
-	       h = insert_before(h, box_rule, w)
+	       h = insert_before(h, box_rule, dir_pool[list_dir]())
 	    end
 	 end
 	 ensure_tex_attr(attr_dir, 0)
@@ -1023,10 +1011,8 @@ do
    local function dir_adjust_buildpage(info)
       if info=='box' then
 	 local head = to_direct(tex.lists.contrib_head)
-	 local nb
 	 if head then
-	    head, _, nb
-	       = make_dir_whatsit(head,
+	    head = make_dir_whatsit(head,
 				  node_tail(head),
 				  get_dir_count(),
 				  'buildpage')
@@ -1046,16 +1032,15 @@ do
    local function finalize_dir_node(db,new_dir)
       local b = getlist(db)
       finalize_inner(b)
-      local box_dir = get_box_dir(b, dir_yoko)%dir_math_mod
-      setfield(db, 'head', nil)
       local w = getfield(b, 'width')
       local h = getfield(b, 'height')
       local d = getfield(b, 'depth')
       local dn_w = getfield(db, 'width')
       local dn_h = getfield(db, 'height')
       local dn_d = getfield(db, 'depth')
-      local db_head, db_tail  = nil
-      for _,v in ipairs(dir_node_aux[box_dir][new_dir][getid(b)]) do
+      local db_head, db_tail
+      for _,v in ipairs(dir_node_aux
+			[get_box_dir(b, dir_yoko)%dir_math_mod][new_dir][getid(b)]) do
          local cmd, arg, nn = v[1], v[2]
          if cmd=='kern' then
             nn = node_new(id_kern)
@@ -1073,9 +1058,9 @@ do
             insert_after(db_head, db_tail, nn)
             db_tail = nn
          else
+	    setfield(db, 'head', nn)
             db_head, db_tail = nn, nn
          end
-         setfield(db, 'head', db_head)
       end
    end
 
@@ -1098,6 +1083,7 @@ do
    end
    local getbox = tex.getbox
    local setbox, copy = Dnode.setbox, Dnode.copy
+   local lua_mem_kb = 0
    function luatexja.direction.finalize()
       local a = to_direct(tex.getbox("AtBeginShipoutBox"))
       local a_dir = get_box_dir(a, dir_yoko)
@@ -1109,6 +1095,12 @@ do
       finalize_inner(shipout_temp)
       setbox('global', "AtBeginShipoutBox", copy(getlist(shipout_temp)))
       setfield(shipout_temp, 'head',nil)
-      --print('MM', collectgarbage('count'))
+
+      -- garbage collect
+      --local m = collectgarbage('count')
+      --if m>lua_mem_kb+20480 then
+      --   collectgarbage(); lua_mem_kb = collectgarbage('count')
+      --end
+      --print('Lua Memory Usage', lua_mem_kb)
    end
 end

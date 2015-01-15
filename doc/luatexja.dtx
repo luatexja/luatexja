@@ -1086,8 +1086,7 @@ plain \TeX で和文フォントを変更するためには，
 For \LaTeXe, \LuaTeX-ja adopted most of the font selection system of \pLaTeXe\ (in \texttt{plfonts.dtx}).
 %</en>
 %<*ja>
-\LaTeXe については，\LuaTeX-jaではフォント選択システムを\pLaTeXe\ (\texttt{plfonts.dtx})
-の大部分をそのまま採用している．
+\LaTeX で用いる際には，\pLaTeXe\ (\texttt{plfonts.dtx})用のフォント選択機構の大部分を流用している．
 %</ja>
 \begin{itemize}
 %<*en>
@@ -1096,8 +1095,8 @@ For \LaTeXe, \LuaTeX-ja adopted most of the font selection system of \pLaTeXe\ (
       attributes of Japanese fonts.
 %</en>
 %<*ja>
-\item \cs{fontfamily}, \cs{fontseries}, \cs{fontshape}, そして
-      \cs{selectfont} が和文フォントの属性を変更するために使用できる．
+\item 和文フォントの属性を変更するには，\cs{fontfamily}, \cs{fontseries}, \cs{fontshape}, そして
+      \cs{selectfont} を用いる．
 %</ja>
 
 %<*en>
@@ -2439,6 +2438,48 @@ $\Phi\vdash F(x)\ \hbox{for all}\ x\in A$
 \end{table}
 %</ja>
 
+%<*en>
+\subsection{\emph{kinsoku} parameters and OpenType features}
+Among parameters which related to Japanese word-wrapping process (\emph{kinsoku shori}),
+\begin{quote}
+ \Param{jaxspmode},~\Param{alxspmode}, \Param{prebreakpenalty}, 
+ \Param{postbreakpenalty}~and~\Param{kcatcode}
+\end{quote}
+are stored by each character codes. ...
+
+For example, a fullwidth katakana ``ア'' on line~10 in the below input is replaced to
+its halfwidth variant ``ｱ'', by \verb+hwid+ feature. 
+However, the penalty inserted after it is 10 which is the \Param{postbreakpenalty} of
+``ア'', not 20.
+%</en>
+%<*ja>
+\subsection{禁則処理関連パラメータとfont feature}
+禁則処理や \Param{kanjiskip}, \Param{xkanjiskip} の挿入に関連したパラメータのうち
+\begin{quote}
+ \Param{jaxspmode},~\Param{alxspmode}, \Param{prebreakpenalty},
+ \Param{postbreakpenalty}, \Param{kcatcode}
+\end{quote}
+は，文字コードごとに設定する量である．
+
+\Pkg{fontspec}パッケージを使う（\ref{ssec-fontspec}節）場合など，
+各種のOpenType featureを適用することもあると思うが，前段落に述べたパラメータ類は，
+\emph{OpenType featureの適用前の文字コードによって判定される．}
+例えば，以下の例において10行目の「ア」は，\verb+hwid+ featureの適用により半角カタカナの「ｱ」
+に置き換わる．しかし，その直後に挿入される \Param{postbreakpenalty}は，置換前の「ア」に対する値10である．
+%</ja>
+
+\begin{LTXexample}[width=0.2\textwidth]
+\ltjsetparameter{postbreakpenalty={`ア, 10}}
+\ltjsetparameter{postbreakpenalty={`ｱ, 20}}
+
+\newcommand\showpostpena[1]{%
+  \leavevmode\setbox0=\hbox{#1\hbox{}}%
+  \unhbox0\setbox0=\lastbox\the\lastpenalty}
+
+\showpostpena{ア},
+\showpostpena{ｱ},
+{\addjfontfeatures{CharacterWidth=Half}\showpostpena{ア}}
+\end{LTXexample}
 
 \clearpage
 %<en>\part{Reference}
@@ -4220,8 +4261,8 @@ we specify <ratio> to
 
 %<*ja>
 \paragraph{文字クラスの決定}
-文字からその文字の属する文字クラスを算出する過程は少々複雑である．
-次の内容を一部に含んだ \texttt{jfm-test.lua} を用いて説明する．
+文字からその文字の属する文字クラスを算出する過程について，
+次の内容を含んだ \texttt{jfm-test.lua} を用いて説明する．
 %</ja>
 %<*en>
 \paragraph{Character to character classes}
@@ -4265,17 +4306,17 @@ applying font features by \Pkg{luaotfload}}.
 \item JFMによれば，この「ﾋ」のグリフの文字クラスは2000である．
 \item 以上により文字クラス2000とみなされるため，結果として「ﾋ」の幅は半角だと認識される．
 \end{enumerate}
-この例は，\emph{文字クラスの決定はfont featureの適用によるグリフ置換の後に行われる}ことを
+この例は，\emph{文字クラスの決定はfont featureの適用によるグリフ置換の結果に基づく}ことを
 示している．
 %</ja>
 
 %<*en>
-However, ...
-Consider the following input:
+However, if the class determined by the glyph after application of features is zero,
+\LuaTeX-ja adopts the class determined by the glyph \emph{before} application of features.
+The following input is an example.
 %</en>
 %<*ja>
-但し，JFMによって決まる置換後のグリフの文字クラスが0である場合は，
-状況は異なる．
+但し，JFMによって決まる置換後のグリフの文字クラスが0である場合は，置換前の文字クラスを採用する．
 %</ja>
 \begin{LTXexample}[width=0.3\textwidth]
 \jfont\a=file:KozMinPr6N-Regular.otf:jfm=test;+vert
@@ -4283,11 +4324,11 @@ Consider the following input:
 \end{LTXexample}
 %<*en>
 Here, the character class of the ideographic full stop ``。''~(\texttt{U+3002}) is determined
-as following:
+as follows:
 \begin{enumerate}
 \item As the case of ``ヒ'', the ideographic full stop ``。'' is converted to its vertical
-      form ``\char"FE12''~(\texttt{U+FE12}).%"
-\item The character class of ``\char"FE12'' is \emph{zero}.
+      form ``\char"FE12''~(\texttt{U+FE12}) by \verb+vert+ feature.%"
+\item The character class of ``\char"FE12'', according to the JFM  is \emph{zero}.
 \item However, \LuaTeX-ja remembers that this ``\char"FE12'' is obtained from ``。'' by
       font features. The character class of ``。'' is \emph{non-zero value}, namely, 2000.
 \item Hence the ideographic full stop ``。'' in above belongs the character class~2000.
@@ -4755,7 +4796,7 @@ is the position of \verb+hpack_filter+ callback in the source
 of \LuaTeX, see Section~\ref{sec-para}.
 %</en>
 %<*ja>
-先に述べたように，\LuaTeX-jaのほとんどの内部パラメータにアクセスするには
+先に述べたように，\LuaTeX-jaの内部パラメータにアクセスするには
 \cs{ltjsetparameter}（または \cs{ltjglobalsetparameter}）と \cs{ltjgetparameter} を用いる．
 \LuaTeX-jaが\pTeX のような文法（例えば，\verb+\prebreakpenalty`）=10000+）を
 採用しない理由の一つは，\LuaTeX のソースにおける \verb+hpack_filter+
@@ -4850,25 +4891,7 @@ At the present version, the lowermost bit of <natural number> indicates
 \end{lstlisting}
 と，最大値の10000が標準で指定されている．他にも，小書きのカナなど，絶対禁止とい
 	     うわけではないができれば行頭にはきて欲しくない場合に，0と
-	     10000の間の値を指定するのも有用であろう.
-%</ja>
-%<*en>
-Set a penalty which is inserted automatically before the character <chr\_code>,
-to prevent a line starts from this character. For example, a line cannot started
-with one of closing brackets ``〗'', so \LuaTeX-ja sets
-\begin{lstlisting}
-\ltjsetparameter{prebreakpenalty={`〙,10000}}
-\end{lstlisting}
-by default.
-%</en>
-
-
-\item[\DParam{postbreakpenalty}\,=\{<chr\_code>,<penalty>\}$^\ast$]
-	   [\cs{postbreakpenalty}]\
-
-%<*ja>
-文字コード<chr\_code>の\textbf{JAchar}が行末にくることを抑止するために，
-	     この文字の後に挿入/追加されるペナルティの量を指定する．
+	     10000の間の値を指定するのも有用であろう．
 
 \pTeX では，\cs{prebreakpenalty}, \cs{postbreakpenalty}において，
 \begin{itemize}
@@ -4879,8 +4902,14 @@ by default.
 という制限があったが，\LuaTeX-jaではこれらの制限は解消されている．
 %</ja>
 %<*en>
-Set a penalty which is inserted automatically after the character <chr\_code>,
-to prevent a line ends with this character.
+Set a penalty which is inserted automatically before the character <chr\_code>,
+to prevent a line starts from this character. For example, a line cannot started
+with one of closing brackets ``〗'', so \LuaTeX-ja sets
+\begin{lstlisting}
+\ltjsetparameter{prebreakpenalty={`〙,10000}}
+\end{lstlisting}
+by default.
+
 \pTeX\ has following restrictions on \cs{prebreakpenalty} and \cs{postbreakpenalty},
 but they don't exist in \LuaTeX-ja:
 \begin{itemize}
@@ -4888,6 +4917,18 @@ but they don't exist in \LuaTeX-ja:
 for the same character.
  \item We can set \cs{prebreakpenalty} and \cs{postbreakpenalty} up to 256~characters.
 \end{itemize}
+%</en>
+
+\item[\DParam{postbreakpenalty}\,=\{<chr\_code>,<penalty>\}$^\ast$]
+	   [\cs{postbreakpenalty}]\
+
+%<*ja>
+文字コード<chr\_code>の\textbf{JAchar}が行末にくることを抑止するために，
+	     この文字の後に挿入/追加されるペナルティの量を指定する．
+%</ja>
+%<*en>
+Set a penalty which is inserted automatically after the character <chr\_code>,
+to prevent a line ends with this character.
 %</en>
 
 \item[\DParam{jatextfont}\,=\{<jfam>,<jfont\_cs>\}$^\ast$]

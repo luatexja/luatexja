@@ -285,9 +285,12 @@ do
    local to_node = (Dnode ~= node) and Dnode.tonode or nullfunc
    local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
    local tex_set_attr = tex.setattribute
+   local tex_get_attr, node_copy = tex.getattribute, Dnode.copy
+   local ensure_tex_attr = ltjb.ensure_tex_attr
+
    -- mode = true iff main_process is called from pre_linebreak_filter
    local function main_process(head, mode, dir, gc)
-      tex_set_attr('global', attr_icflag, 0)
+      ensure_tex_attr(attr_icflag, 0)
       if gc == 'fin_row' then return head
       else
             --luatexja.ext_show_node_list(head, 'T> ', print)
@@ -301,7 +304,7 @@ do
    local function adjust_icflag(h)
       -- kern from luaotfload will have icflag = 1
       -- (same as italic correction)
-      tex_set_attr('global', attr_icflag, 1)
+      ensure_tex_attr(attr_icflag, 1)
       return h
    end
 

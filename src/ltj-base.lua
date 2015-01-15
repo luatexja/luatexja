@@ -563,6 +563,19 @@ do
    ltjb.save_cache = save_cache
 end
 
+
+----
+do
+   local tex_set_attr, tex_get_attr = tex.setattribute, tex.getattribute
+   function ltjb.ensure_tex_attr(a, v)
+      if tex_get_attr(a)~=v then
+	 tex_set_attr(a, v)
+      end
+   end
+end
+
+----
+
 ltjb._error_set_break = _error_set_break
 ltjb._error_set_message = _error_set_message
 ltjb._error_show = _error_show

@@ -136,6 +136,11 @@ end
 
 local update_jfm_cache
 do
+   local node_copy = Dnode.copy
+   local kern_skel = node_new(id_kern)
+   set_attr(kern_skel, attr_icflag, FROM_JFM)
+   setfield(kern_skel, 'subtype', 1)
+
    local function mult_table(old,scale) -- modified from table.fastcopy
       if old then
 	 local new = { }
@@ -172,10 +177,8 @@ do
 	       setfield(h, 'shrink_order', 0)
 	    end
 	    for k,w in pairs(v.kern) do
-	       local g = node_new(id_kern)
+	       local g = node_copy(kern_skel)
 	       setfield(g, 'kern', w[1])
-	       setfield(g, 'subtype', 1)
-	       set_attr(g, attr_icflag, FROM_JFM)
 	       v[k] = {false, g, w[2]/sz}
 	    end
 	 end
@@ -878,7 +881,7 @@ end
 do
    local get_dir_count = ltjd.get_dir_count
    local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
-   local tex_set_attr = tex.setattribute
+   local ensure_tex_attr = ltjb.ensure_tex_attr
    local font = font
    -- EXT: italic correction
    function append_italic()
@@ -897,12 +900,12 @@ do
 	    if h then
 	       setfield(g, 'kern', h.characters[getchar(p)].italic)
 	    else
-	       tex_set_attr(attr_icflag, 0)
+	       ensure_tex_attr(attr_icflag, 0)
 	       return node_free(g)
 	    end
 	 end
 	 node_write(g)
-	 tex_set_attr(attr_icflag, 0)
+	 ensure_tex_attr(attr_icflag, 0)
       end
    end
 end

@@ -700,17 +700,17 @@ do
    end
    function new_jfm_glue(m, bc, ac)
       -- bc, ac: char classes
-      local g, d = m.char_type[bc][ac], 0
-      local n
+      local g = m.char_type[bc][ac]
       if g then
-	 n,d = node_copy(g[2]), g[3]
 	 if g[1] then
 	    local f = node_copy(glue_skel[g[4]])
-	    setfield(f, 'spec', n)
-	    return f, d
+	    setfield(f, 'spec', node_copy(g[2]))
+	    return f, g[3]
+	 else
+	    return node_copy(g[2]), g[3]
 	 end
       end
-      return n, d
+      return nil, 0
    end
 end
 
