@@ -654,7 +654,7 @@ do
 	    -- vertical metric
 	    local vw, tsb, vk = glyph_vmetric(gv)
 	    local gi = unitable[gv.name]
-	    if vw and vw~=asc_des then
+	    if gi and vw and vw~=asc_des then
 	       -- We do not use tsidebearing, since (1) fontloader does not read VORG table
 	       -- and (2) 'tsidebearing' doea not appear in the returned table by fontloader.fields.
 	       -- Hence, we assume that vertical origin == ascender
@@ -663,7 +663,7 @@ do
 	       dest[gi].vwidth = vw/units
 	    end
 	    -- vertical kern
-	    if vk then
+	    if gi and vk then
 	       dest = dest or {};
 	       local dest_vk = dest.vkerns or {}; dest.vkerns = dest_vk
 	       for _,v in pairs(vk) do
