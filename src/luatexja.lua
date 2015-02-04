@@ -284,8 +284,6 @@ do
    local nullfunc = function (n) return n end
    local to_node = (Dnode ~= node) and Dnode.tonode or nullfunc
    local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
-   local tex_set_attr = tex.setattribute
-   local tex_get_attr, node_copy = tex.getattribute, Dnode.copy
    local ensure_tex_attr = ltjb.ensure_tex_attr
 
    -- mode = true iff main_process is called from pre_linebreak_filter

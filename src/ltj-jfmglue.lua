@@ -76,21 +76,15 @@ local sid_end_thread = node.subtype('pdf_end_thread')
 local ITALIC       = luatexja.icflag_table.ITALIC
 local PACKED       = luatexja.icflag_table.PACKED
 local KINSOKU      = luatexja.icflag_table.KINSOKU
+local FROM_JFM     = luatexja.icflag_table.FROM_JFM
 local PROCESSED    = luatexja.icflag_table.PROCESSED
 local IC_PROCESSED = luatexja.icflag_table.IC_PROCESSED
 local BOXBDD       = luatexja.icflag_table.BOXBDD
 local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 
 local attr_icflag = luatexbase.attributes['ltj@icflag']
-local kanji_skip = node_new(id_glue)
-local xkanji_skip = node_new(id_glue)
-do
-   local KANJI_SKIP   = luatexja.icflag_table.KANJI_SKIP
-   local XKANJI_SKIP   = luatexja.icflag_table.XKANJI_SKIP
-   set_attr(kanji_skip, attr_icflag, KANJI_SKIP)
-   set_attr(xkanji_skip, attr_icflag, XKANJI_SKIP)
-end
-
+local kanji_skip
+local xkanji_skip
 local table_current_stack
 local list_dir
 local capsule_glyph
@@ -647,18 +641,16 @@ end
 -------------------- 最下層の処理
 
 -- change penalties (or create a new penalty, if needed)
-local pen_skel = node_new(id_penalty)
-set_attr(pen_skel, attr_icflag, KINSOKU)
-
 local function handle_penalty_normal(post, pre, g)
    local a = (pre or 0) + (post or 0)
    if #Bp == 0 then
       if (a~=0 and not(g and getid(g)==id_kern)) then
-	 local p = node_copy(pen_skel)
+	 local p = node_new(id_penalty)
 	 if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
 	 setfield(p, 'penalty', a)
 	 head = insert_before(head, Np.first, p)
 	 Bp[1]=p;
+	 set_attr(p, attr_icflag, KINSOKU)
       end
    else for _, v in pairs(Bp) do add_penalty(v,a) end
    end
@@ -668,11 +660,12 @@ local function handle_penalty_always(post, pre, g)
    local a = (pre or 0) + (post or 0)
    if #Bp == 0 then
       if not (g and getid(g)==id_glue) or a~=0 then
-	 local p = node_copy(pen_skel)
+	 local p = node_new(id_penalty)
 	 if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
 	 setfield(p, 'penalty', a)
 	 head = insert_before(head, Np.first, p)
 	 Bp[1]=p
+         set_attr(p, attr_icflag, KINSOKU)
       end
    else for _, v in pairs(Bp) do add_penalty(v,a) end
    end
@@ -682,36 +675,30 @@ local function handle_penalty_suppress(post, pre, g)
    local a = (pre or 0) + (post or 0)
    if #Bp == 0 then
       if g and getid(g)==id_glue then
-	 local p = node_copy(pen_skel)
+	 local p = node_new(id_penalty)
 	 setfield(p, 'penalty', 10000); head = insert_before(head, Np.first, p)
 	 Bp[1]=p
+         set_attr(p, attr_icflag, KINSOKU)
       end
    else for _, v in pairs(Bp) do add_penalty(v,a) end
    end
 end
 
 -- 和文文字間の JFM glue を node 化
-local new_jfm_glue
-do
-   local FROM_JFM = luatexja.icflag_table.FROM_JFM
-   local glue_skel = {}
-   for i=FROM_JFM-2,FROM_JFM+2 do
-      glue_skel[i]= node_new(id_glue); set_attr(glue_skel[i], attr_icflag, i)
-   end
-   function new_jfm_glue(m, bc, ac)
-      -- bc, ac: char classes
-      local g = m.char_type[bc][ac]
-      if g then
-	 if g[1] then
-	    local f = node_copy(glue_skel[g[4]])
-	    setfield(f, 'spec', node_copy(g[2]))
-	    return f, g[3]
-	 else
-	    return node_copy(g[2]), g[3]
-	 end
+local function new_jfm_glue(m, bc, ac)
+-- bc, ac: char classes
+   local g = m.char_type[bc][ac]
+   if g then
+      if g[1] then
+	 local f = node_new(id_glue)
+	 set_attr(f, attr_icflag, g[4])
+	 setfield(f, 'spec', node_copy(g[2]))
+	 return f, g[3]
+      else
+	 return node_copy(g[2]), g[3]
       end
-      return nil, 0
    end
+   return nil, 0
 end
 
 -- Nq.last (kern w) .... (glue/kern g) Np.first
@@ -904,7 +891,7 @@ end
 local function handle_np_jachar(mode)
    local qid = Nq.id
    if qid==id_jglyph or ((qid==id_pbox or qid==id_pbox_w) and Nq.met) then
-      local g = non_ihb_flag and calc_ja_ja_glue() or get_kanjiskip() -- M->K
+       local g = non_ihb_flag and calc_ja_ja_glue() or get_kanjiskip() -- M->K
       handle_penalty_normal(Nq.post, Np.pre, g); real_insert(g)
    elseif Nq.met then  -- qid==id_hlist
       local g = non_ihb_flag and get_OA_skip() or get_kanjiskip() -- O_A->K
@@ -997,7 +984,7 @@ local function handle_list_tail(mode)
       -- Insert \jcharwidowpenalty
       Bp = widow_Bp; Np = widow_Np
       if Np.first then
-	 handle_penalty_normal(0,table_current_stack[JWP] or 0)
+	 handle_penalty_normal(0, table_current_stack[JWP] or 0)
       end
    else
       -- the current list is the contents of a hbox
@@ -1063,10 +1050,12 @@ do
       capsule_glyph = is_dir_tate and ltjw.capsule_glyph_tate or ltjw.capsule_glyph_yoko
       attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
 
+      kanji_skip = node_new(id_glue); set_attr(kanji_skip, attr_icflag, KANJI_SKIP)
       setfield(kanji_skip, 'spec', skip_table_to_spec(KSK))
       get_kanjiskip = (getfield(getfield(kanji_skip, 'spec'), 'width') == 1073741823)
 	 and get_kanjiskip_jfm or get_kanjiskip_normal
 
+      xkanji_skip = node_new(id_glue); set_attr(xkanji_skip, attr_icflag, XKANJI_SKIP)
       setfield(xkanji_skip, 'spec', skip_table_to_spec(XSK))
       get_xkanjiskip = (getfield(getfield(xkanji_skip, 'spec'), 'width') == 1073741823)
 	 and get_xkanjiskip_jfm or get_xkanjiskip_normal
@@ -1089,12 +1078,11 @@ do
    end
 end
 
-local tex_set_attr = tex.setattribute
+local ensure_tex_attr = ltjb.ensure_tex_attr
 local function cleanup(mode)
    -- adjust attr_icflag for avoiding error
-   if tex.getattribute(attr_icflag)~=0 then tex_set_attr('global', attr_icflag, 0) end
-   node_free(getfield(kanji_skip, 'spec'))
-   node_free(getfield(xkanji_skip, 'spec'))
+   if tex.getattribute(attr_icflag)~=0 then ensure_tex_attr('global', attr_icflag, 0) end
+   node_free(kanji_skip); node_free(xkanji_skip)
    if mode then
       local h = node_next(head)
       if getid(h) == id_penalty and getfield(h, 'penalty') == 10000 then
@@ -1117,19 +1105,19 @@ function main(ahead, mode, dir)
    if Np then
       handle_list_head(par_indented)
       lp = calc_np(last,lp); while Np do
-      	 adjust_nq();
-      	 local pid, pm = Np.id, Np.met
-      	 -- 挿入部
-      	 if pid == id_jglyph then
-      	    handle_np_jachar(mode)
-      	 elseif pm then
-      	    if pid==id_hlist then handle_np_ja_hlist()
-      	    else handle_np_jachar() end
-      	 elseif Nq.met then
-      	    if Nq.id==id_hlist then handle_nq_ja_hlist()
-      	    else handle_nq_jachar() end
-      	 end
-      	 lp = calc_np(last,lp)
+	 adjust_nq();
+	 local pid, pm = Np.id, Np.met
+	 -- 挿入部
+	 if pid == id_jglyph then
+	    handle_np_jachar(mode)
+	 elseif pm then
+	    if pid==id_hlist then handle_np_ja_hlist()
+	    else handle_np_jachar() end
+	 elseif Nq.met then
+	    if Nq.id==id_hlist then handle_nq_ja_hlist()
+	    else handle_nq_jachar() end
+	 end
+	 lp = calc_np(last,lp)
       end
       handle_list_tail(mode)
    end

@@ -136,11 +136,6 @@ end
 
 local update_jfm_cache
 do
-   local node_copy = Dnode.copy
-   local kern_skel = node_new(id_kern)
-   set_attr(kern_skel, attr_icflag, FROM_JFM)
-   setfield(kern_skel, 'subtype', 1)
-
    local function mult_table(old,scale) -- modified from table.fastcopy
       if old then
 	 local new = { }
@@ -177,8 +172,10 @@ do
 	       setfield(h, 'shrink_order', 0)
 	    end
 	    for k,w in pairs(v.kern) do
-	       local g = node_copy(kern_skel)
+	       local g = node_new(id_kern)
 	       setfield(g, 'kern', w[1])
+	       setfield(g, 'subtype', 1)
+	       set_attr(g, attr_icflag, FROM_JFM)
 	       v[k] = {false, g, w[2]/sz}
 	    end
 	 end

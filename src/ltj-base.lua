@@ -563,7 +563,6 @@ do
    ltjb.save_cache = save_cache
 end
 
-
 ----
 do
    local tex_set_attr, tex_get_attr = tex.setattribute, tex.getattribute
@@ -573,7 +572,6 @@ do
       end
    end
 end
-
 ----
 
 ltjb._error_set_break = _error_set_break
