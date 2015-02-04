@@ -603,6 +603,28 @@ do
    end
 
 end
+------------------------------------------------------------------------
+-- 終了時に各種ノードを破棄
+------------------------------------------------------------------------
+do
+   function cleanup_size_cache()
+      --local gs, ke = 0, 0
+      for _,n in pairs(metrics) do
+	 for i,t in pairs(n.size_cache) do
+	    for _,v in pairs(t.char_type) do
+	       for k,w in pairs(v) do
+		  if type(k)=='number' then
+		     --if w[1] then gs = gs + 1 else ke = ke + 1 end
+		     node_free(w[2])
+		  end
+	       end
+	    end
+	    n.size_cache[i]=nil
+	 end
+      end
+      --print('glue spec: ', gs, 'kern: ', ke)
+   end
+end
 
 ------------------------------------------------------------------------
 -- 追加のフォント情報
@@ -713,41 +735,6 @@ do
 	 end
       end
    end
-end
-
--- 縦書き用字形への変換テーブル
-local prepare_vert_data
-do
-   -- local function add_feature_table(tname, src, dest)
-   --    for i,v in pairs(src) do
-   --       if type(v.slookups)=='table' then
-   --          local s = v.slookups[tname]
-   --          if s  then
-   --             dest = dest or {}
-   --             dest[i] = dest[i]  or {}
-   --             dest[i].vert = dest[i].vert or s
-   --          end
-   --       end
-   --    end
-   --    return dest
-   -- end
-   -- prepare_vert_data = function (dest, id)
-   --    local a = id.resources.sequences
-   --    if a then
-   --       local s = id.shared.rawdata.descriptions
-   --       for i,v in pairs(a) do
-   --          if v.features.vert or v.features.vrt2 then
-   --             dest= add_feature_table(v.subtables[1], s, dest)
-   --          end
-   --       end
-   --    end
-   --    return dest
-   -- end
-   -- -- 縦書き用字形への変換
-   -- function get_vert_glyph(n, chr)
-   --    local fn = font_extra_info[n]
-   --    return (fn and fn[chr] and fn[chr].vert) or chr
-   -- end
 end
 
 --

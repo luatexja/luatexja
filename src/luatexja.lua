@@ -326,6 +326,13 @@ do
 
 end
 
+-- cleanup process
+function luatexja.ext_cleanup()
+   ltjf.cleanup_size_cache()
+   ltjd.remove_end_whatsit()
+end
+
+
 -- debug
 
 do

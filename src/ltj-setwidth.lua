@@ -50,11 +50,10 @@ local ltjf_font_extra_info = ltjf.font_extra_info
 
 local PACKED       = luatexja.icflag_table.PACKED
 local PROCESSED    = luatexja.icflag_table.PROCESSED
-local IC_PROCESSED = luatexja.icflag_table.IC_PROCESSED
-local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 
 local get_pr_begin_flag
 do
+   local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
    local floor = math.floor
    get_pr_begin_flag = function (p)
       local i = has_attr(p, attr_icflag) or 0
