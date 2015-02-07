@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2015/01/13',
+  date = '2015/02/07'
   description = 'Insertion process of JFM glues and kanjiskip',
 })
 module('luatexja.jfmglue', package.seeall)
@@ -281,12 +281,6 @@ local calc_np
 do
 
 local traverse = Dnode.traverse
-local function set_attr_icflag_processed(p)
-   if get_attr_icflag(p)<= ITALIC then
-      set_attr(p, attr_icflag, PROCESSED)
-   end
-end
-
 local function check_next_ickern(lp)
    if lp and getid(lp) == id_kern and ITALIC == get_attr_icflag(lp) then
       set_attr(lp, attr_icflag, IC_PROCESSED)
@@ -1050,15 +1044,21 @@ do
       capsule_glyph = is_dir_tate and ltjw.capsule_glyph_tate or ltjw.capsule_glyph_yoko
       attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
 
-      kanji_skip = node_new(id_glue); set_attr(kanji_skip, attr_icflag, KANJI_SKIP)
-      setfield(kanji_skip, 'spec', skip_table_to_spec(KSK))
-      get_kanjiskip = (getfield(getfield(kanji_skip, 'spec'), 'width') == 1073741823)
-	 and get_kanjiskip_jfm or get_kanjiskip_normal
+      do
+	 kanji_skip = node_new(id_glue); set_attr(kanji_skip, attr_icflag, KANJI_SKIP)
+	 local s = skip_table_to_spec(KSK)
+	 setfield(kanji_skip, 'spec', s)
+	 get_kanjiskip = (getfield(s, 'width') == 1073741823)
+	    and get_kanjiskip_jfm or get_kanjiskip_normal
+      end
 
-      xkanji_skip = node_new(id_glue); set_attr(xkanji_skip, attr_icflag, XKANJI_SKIP)
-      setfield(xkanji_skip, 'spec', skip_table_to_spec(XSK))
-      get_xkanjiskip = (getfield(getfield(xkanji_skip, 'spec'), 'width') == 1073741823)
-	 and get_xkanjiskip_jfm or get_xkanjiskip_normal
+      do
+	 xkanji_skip = node_new(id_glue); set_attr(xkanji_skip, attr_icflag, XKANJI_SKIP)
+	 local s = skip_table_to_spec(XSK)
+	 setfield(xkanji_skip, 'spec', s)
+	 get_xkanjiskip = (getfield(s, 'width') == 1073741823)
+	    and get_xkanjiskip_jfm or get_xkanjiskip_normal
+      end
 
       if mode then
 	 -- the current list is to be line-breaked:
@@ -1081,8 +1081,9 @@ end
 local ensure_tex_attr = ltjb.ensure_tex_attr
 local function cleanup(mode)
    -- adjust attr_icflag for avoiding error
-   if tex.getattribute(attr_icflag)~=0 then ensure_tex_attr('global', attr_icflag, 0) end
+   if tex.getattribute(attr_icflag)~=0 then ensure_tex_attr(attr_icflag, 0) end
    node_free(kanji_skip); node_free(xkanji_skip)
+   
    if mode then
       local h = node_next(head)
       if getid(h) == id_penalty and getfield(h, 'penalty') == 10000 then
