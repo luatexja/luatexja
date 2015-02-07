@@ -1043,6 +1043,9 @@ do
       local is_dir_tate = list_dir==dir_tate
       capsule_glyph = is_dir_tate and ltjw.capsule_glyph_tate or ltjw.capsule_glyph_yoko
       attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
+      local TEMP = node_new(id_glue) 
+      -- TEMP is a dummy node, which will be freed at the end of the callback. 
+      -- ithout this node, set_attr(kanji_skip, ...) somehow creates an "orphaned"  attribute list.
 
       do
 	 kanji_skip = node_new(id_glue); set_attr(kanji_skip, attr_icflag, KANJI_SKIP)
@@ -1071,18 +1074,18 @@ do
                Np.width = getfield(lp, 'width')
             end
 	    lp=node_next(lp); lpi, lps = getid(lp), getsubtype(lp) end
-	 return lp, node_tail(head), par_indented
+	 return lp, node_tail(head), par_indented, TEMP
       else
-	 return head, nil, 'boxbdd'
+	 return head, nil, 'boxbdd', TEMP
       end
    end
 end
 
 local ensure_tex_attr = ltjb.ensure_tex_attr
-local function cleanup(mode)
+local function cleanup(mode, TEMP)
    -- adjust attr_icflag for avoiding error
    if tex.getattribute(attr_icflag)~=0 then ensure_tex_attr(attr_icflag, 0) end
-   node_free(kanji_skip); node_free(xkanji_skip)
+   node_free(kanji_skip); node_free(xkanji_skip); node_free(TEMP)
    
    if mode then
       local h = node_next(head)
@@ -1101,7 +1104,7 @@ end
 function main(ahead, mode, dir)
    if not ahead then return ahead end
    head = ahead;
-   local lp, last, par_indented = init_var(mode,dir)
+   local lp, last, par_indented, TEMP = init_var(mode,dir)
    lp = calc_np(last, lp)
    if Np then
       handle_list_head(par_indented)
@@ -1122,7 +1125,7 @@ function main(ahead, mode, dir)
       end
       handle_list_tail(mode)
    end
-   return cleanup(mode)
+   return cleanup(mode, TEMP)
 end
 end
 
