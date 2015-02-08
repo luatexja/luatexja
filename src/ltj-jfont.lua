@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2014/10/03',
+  date = '2015/02/08',
   description = 'Loader for Japanese fonts',
 })
 module('luatexja.jfont', package.seeall)
@@ -18,8 +18,6 @@ local Dnode = node.direct or node
 
 local setfield = (Dnode ~= node) and Dnode.setfield or function(n, i, c) n[i] = c end
 local getid = (Dnode ~= node) and Dnode.getid or function(n) return n.id end
-local getfont = (Dnode ~= node) and Dnode.getfont or function(n) return n.font end
-local getchar = (Dnode ~= node) and Dnode.getchar or function(n) return n.char end
 
 local nullfunc = function(n) return n end
 local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
@@ -28,7 +26,6 @@ local node_new = Dnode.new
 local node_free = Dnode.free
 local has_attr = Dnode.has_attribute
 local set_attr = Dnode.set_attribute
-local node_write = Dnode.write
 local round = tex.round
 local font_getfont = font.getfont
 
@@ -40,7 +37,6 @@ local id_kern = node.id('kern')
 local id_glue_spec = node.id('glue_spec')
 local id_glue = node.id('glue')
 local cat_lp = luatexbase.catcodetables['latex-package']
-local ITALIC       = luatexja.icflag_table.ITALIC
 local FROM_JFM     = luatexja.icflag_table.FROM_JFM
 
 ------------------------------------------------------------------------
@@ -154,6 +150,7 @@ do
 
    update_jfm_cache = function (j,sz)
       if metrics[j].size_cache[sz] then return end
+      --local TEMP = node_new(id_kern)
       local t = {}
       metrics[j].size_cache[sz] = t
       t.chars = metrics[j].chars
@@ -186,6 +183,7 @@ do
       t.zw = round(metrics[j].zw*sz)
       t.zh = round(metrics[j].zh*sz)
       t.size = sz
+      --node_free(TEMP)
    end
 end
 
@@ -863,33 +861,38 @@ end
 -- MISC
 ------------------------------------------------------------------------
 do
+   local getfont = (Dnode ~= node) and Dnode.getfont or function(n) return n.font end
+   local getchar = (Dnode ~= node) and Dnode.getchar or function(n) return n.char end
    local get_dir_count = ltjd.get_dir_count
    local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
    local ensure_tex_attr = ltjb.ensure_tex_attr
+   local node_write = Dnode.write
    local font = font
+   local ITALIC       = luatexja.icflag_table.ITALIC
    -- EXT: italic correction
    function append_italic()
       local p = to_direct(tex.nest[tex.nest.ptr].tail)
+      local TEMP = node_new(id_kern)
       if p and getid(p)==id_glyph then
-	 local f = getfont(p)
-	 local g = node_new(id_kern)
-	 setfield(g, 'subtype', 1)
-	 set_attr(g, attr_icflag, ITALIC)
 	 if is_ucs_in_japanese_char(p) then
-	    f = has_attr(p, (get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
-	    local j = font_metric_table[f]
+	    local j = font_metric_table[
+	       has_attr(p, (get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
+	       ]
+	    local g = node_new(id_kern)
+	    setfield(g, 'subtype', 1); set_attr(g, attr_icflag, ITALIC)
 	    setfield(g, 'kern', j.char_type[find_char_class(getchar(p), j)].italic)
+	    node_write(g); ensure_tex_attr(attr_icflag, 0)
 	 else
+	    local f = getfont(p)
 	    local h = font_getfont(f) or font.fonts[f]
 	    if h then
+	       local g = node_new(id_kern)
+	       setfield(g, 'subtype', 1); set_attr(g, attr_icflag, ITALIC)
 	       setfield(g, 'kern', h.characters[getchar(p)].italic)
-	    else
-	       ensure_tex_attr(attr_icflag, 0)
-	       return node_free(g)
+	       node_write(g); ensure_tex_attr(attr_icflag, 0)
 	    end
 	 end
-	 node_write(g)
-	 ensure_tex_attr(attr_icflag, 0)
       end
+      node_free(TEMP)
    end
 end
