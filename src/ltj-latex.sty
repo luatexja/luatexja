@@ -15,9 +15,9 @@
 \ProvidesPackage{ltj-latex}[2013/05/14 LaTeX support of LuaTeX-ja]
 
 % cleanup at end of the document
-\let\ltj@@orig@end=\@@end
-\protected\def\@@end{%
-  \directlua{luatexja.ext_cleanup()}\ltj@@orig@end}
+%\let\ltj@@orig@end=\@@end
+%\protected\def\@@end{%
+%  \directlua{luatexja.ext_cleanup()}\ltj@@orig@end}
 
 % Globally add to the head of a macro (cf. LaTeX2e's \g@addto@macro)
 \long\def\ltj@g@addto@macro#1#2{
