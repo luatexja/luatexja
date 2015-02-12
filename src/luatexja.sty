@@ -1,7 +1,6 @@
 %
 % luatexja.sty
 %
-
 %! 外から読まれるので多少仰々しくなってます
 %% Avoid multiple loading.
 \csname\if11luatexjaLoaded\fi\endcsname
@@ -38,9 +37,7 @@
   \ProvidesPackage{luatexja}[2013/05/14 Japanese Typesetting with LuaTeX]
 \fi                             %</LaTeX>
 
-\ifnum\catcode`漢=12
-  \input ltj-unicode-ccfix.tex
-\fi
+\directlua{require('ltj-unicode-ccfix.lua')}% catcode of ideographs
 
 %% Load all sub-packages.
 \ifltj@in@latex                 %<*LaTeX>
@@ -50,7 +47,6 @@
   \input luatexja-core.sty %
   \input luatexja-compat.sty %
 \fi                             %</LaTeX>
-
 
 \directlua{luatexja.base.start_time_measure('RUN')}
 %% all done

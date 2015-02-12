@@ -128,7 +128,6 @@ end
 local function extract(head)
    head = to_direct(head)
    local p = head
-   local v
    local is_dir_tate = ltjs.list_dir == dir_tate
    local attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
    local attr_kblshift = is_dir_tate and attr_tkblshift or attr_ykblshift
@@ -141,7 +140,7 @@ local function extract(head)
                local g = node_new(id_glyph)
                setfield(g, 'subtype', 0)
 	       setfield(g, 'char', getfield(p, 'value'))
-               v = has_attr(p, attr_curfnt); setfield(g, 'font',v)
+               local v = has_attr(p, attr_curfnt); setfield(g, 'font',v)
                if puid==OTF then
                   setfield(g, 'lang', lang_ja)
                   set_attr(g, attr_kblshift, has_attr(p, attr_kblshift))
@@ -179,12 +178,12 @@ luatexbase.add_to_callback('pre_linebreak_filter', extract,
 local function cid_to_char(fmtable, fn)
    local fi = identifiers[fn]
    if fi.cidinfo and fi.cidinfo.ordering == "Japan1" then
-      fmtable.cid_char_type = {}
       for i, v in pairs(fmtable.chars) do
 	 local j = string.match(i, "^AJ1%-([0-9]*)")
 	 if j then
 	    j = tonumber(fi.resources.unicodes['Japan1.'..tostring(j)])
 	    if j then
+	       fmtable.cid_char_type = fmtable.cid_char_type  or {}
 	       fmtable.cid_char_type[j] = v
 	    end
 	 end
