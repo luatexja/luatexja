@@ -222,6 +222,7 @@ local function check_box(box_ptr, box_end)
 	    last_char = s; found_visible_node = true
 	 else
 	    if getfield(p, 'shift')==0 then
+	       last_char = nil
 	       if check_box(getlist(p), nil) then found_visible_node = true end
 	    else
 	       find_first_char = false; last_char = nil
