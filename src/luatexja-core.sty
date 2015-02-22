@@ -718,24 +718,18 @@
 %%%%%%%% \ltjgetwd<box_num> etc.
 \ifltj@token@avail@scan %%%%%%%%%%%%%%%%%%%%%%%% new tokenlib
 \def\ltj@@getwd{%
-  \directlua{luatexja.direction.get_box_dim('width', luatexja.token.scan_int())}%
-  \ltj@tempdima}
+  \directlua{luatexja.direction.get_box_dim('width', luatexja.token.scan_int())}}
 \def\ltj@@getht{%
-  \directlua{luatexja.direction.get_box_dim('height', luatexja.token.scan_int()}%
-  \ltj@tempdima}
+  \directlua{luatexja.direction.get_box_dim('height', luatexja.token.scan_int())}}
 \def\ltj@@getdp{%
-  \directlua{luatexja.direction.get_box_dim('depth', luatexja.token.scan_int())}%
-  \ltj@tempdima}
+  \directlua{luatexja.direction.get_box_dim('depth', luatexja.token.scan_int())}}
 \else %%%%%%%%%%%%%%%%%%%%%%%% old tokenlib
 \def\ltj@@getwd#1{%
-  \directlua{luatexja.direction.get_box_dim('width', \the\numexpr#1\relax)}%
-  \ltj@tempdima}
+  \directlua{luatexja.direction.get_box_dim('width', \the\numexpr#1\relax)}}
 \def\ltj@@getht#1{%
-  \directlua{luatexja.direction.get_box_dim('height', \the\numexpr#1\relax)}%
-  \ltj@tempdima}
+  \directlua{luatexja.direction.get_box_dim('height', \the\numexpr#1\relax)}}
 \def\ltj@@getdp#1{%
-  \directlua{luatexja.direction.get_box_dim('depth', \the\numexpr#1\relax)}%
-  \ltj@tempdima}
+  \directlua{luatexja.direction.get_box_dim('depth', \the\numexpr#1\relax)}}
 \fi %%%%%%%%%%%%%%%%%%%%%%%%
 \let\ltjgetwd=\ltj@@getwd\let\ltjgetht=\ltj@@getht\let\ltjgetdp=\ltj@@getdp
 

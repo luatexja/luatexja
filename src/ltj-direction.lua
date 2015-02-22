@@ -755,6 +755,7 @@ do
       else
          setdimen('ltj@tempdima', 0)
       end
+      tex.sprint(cat_lp, '\\ltj@tempdima')
       tex.globaldefs = gt
    end
    luatexja.direction.get_box_dim = get_box_dim

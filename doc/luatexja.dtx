@@ -419,13 +419,13 @@ The insertion process of glues/kerns between two Japanese
 
 %<*en>
 \paragraph{Directions}
-From version ********, \LuaTeX-ja supports vertical writing;
+From this version, \LuaTeX-ja supports vertical writing;
 but this feature must \emph{not} be confused with $\Omega$-style direction support of \LuaTeX\
 itself. ...
 %</en>
 %<*ja>
 \paragraph{組方向}
-****版からは，不安定ながらも\LuaTeX-ja における縦組みをサポートしている．
+本版からは，不安定ながらも\LuaTeX-ja における縦組みをサポートしている．
 なお，\LuaTeX 本体も，$\Omega$流の組方向をサポートしているが，それとは全くの別物であること
 に注意してほしい．
 \LuaTeX のコールバックや実装により，特に異なった組方向のボックスを扱う場合には
@@ -567,7 +567,7 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %<en>The following packages are needed for the \LuaTeX-ja\ package.
 %<ja>\LuaTeX-jaパッケージには，次のパッケージ類が必要である．
 \begin{itemize}
-\item \LuaTeX\ snapshot rev~5106 (or later)
+\item \LuaTeX\ 0.80 (or later)
 \item \Pkg{luaotfload} v2.5 (or later)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
 \item \Pkg{everysel} (if you want to use \LuaTeX-ja with \LaTeXe)
@@ -3125,28 +3125,27 @@ To access box dimensions \emph{with respect to current direction},
 one have to use the following commands instead of \cs{wd} wtc.
 \begin{cslist}
 
- \item[\cs{ltjgetwd}\{<num>\}\textrm{, }\cs{ltjgetht}\{<num>\}\textrm{, }%
-  \cs{ltjgetdp}\{<num>\}]
+ \item[\cs{ltjgetwd}<num>\textrm{, }\cs{ltjgetht}<num>\textrm{, }%
+  \cs{ltjgetdp}<num>]
 These commands return \emph{an internal dimension} of \cs{box<num>} with respect to
 the current direction. One can use these in \cs{dimexpr} primitive, as the followings.
 \begin{lstlisting}
-\dimexpr 2\ltjgetwd{42}-3pt\relax, \the\ltjgetwd{1701}
+\dimexpr 2\ltjgetwd42-3pt\relax, \the\ltjgetwd1701
 \end{lstlisting}
-By its implementaion,  the argument must be grouped as \verb+\ltjgetwd{42}+,
-if the argument consists of more than one token.
+The following is an example.
 \begin{LTXexample}[width=0.3\textwidth]
 \parindent0pt
 \setbox32767=\hbox{\yoko よこぐみ}
 \fboxsep=0mm\fbox{\copy32767}
 \vbox{\hsize=20mm
-\yoko YOKO \the\ltjgetwd{32767}, \\
-  \the\ltjgetht{32767}, \\ \the\ltjgetdp{32767}.}
+\yoko YOKO \the\ltjgetwd32767, \\
+  \the\ltjgetht32767, \\ \the\ltjgetdp32767.}
 \vbox{\hsize=20mm\raggedleft
-\tate TATE \the\ltjgetwd{32767}, \\
-  \the\ltjgetht{32767}, \\ \the\ltjgetdp{32767}.}
+\tate TATE \the\ltjgetwd32767, \\
+  \the\ltjgetht32767, \\ \the\ltjgetdp32767.}
 \vbox{\hsize=20mm\raggedleft
-\dtou DTOU \the\ltjgetwd{32767}, \\
-  \the\ltjgetht{32767}, \\ \the\ltjgetdp{32767}.}
+\dtou DTOU \the\ltjgetwd32767, \\
+  \the\ltjgetht32767, \\ \the\ltjgetdp32767.}
 \end{LTXexample}
 
  \item[\cs{ltjsetwd}<num>=<dimen>\textrm{, }\cs{ltjsetht}<num>=<dimen>\textrm{, }%
@@ -3183,32 +3182,27 @@ These commands set the dimension of \cs{box<num>}. Unlike \cs{ltjgetwd}, one doe
 
 \begin{cslist}
 
- \item[\cs{ltjgetwd}\{<num>\}\textrm{, }\cs{ltjgetht}\{<num>\}\textrm{, }%
-  \cs{ltjgetdp}\{<num>\}]
+ \item[\cs{ltjgetwd}<num>\textrm{, }\cs{ltjgetht}<num>\textrm{, }%
+  \cs{ltjgetdp}<num>]
 現在の組方向に応じたボックスの寸法の取得を行う．結果は内部長さであるため，
 \begin{lstlisting}
-\dimexpr 2\ltjgetwd{42}-3pt\relax, \the\ltjgetwd{1701}
+\dimexpr 2\ltjgetwd42-3pt\relax, \the\ltjgetwd1701
 \end{lstlisting}
-のように \cs{wd}<num> の代わりとして扱うことができる．引数が1桁の場合は，
-\cs{ltjgetwd3} のように引数をグループで括らなくても良いが，そうでない場合は
-（通常の命令への引数のように）\verb+\ltjgetwd{42}+ とグループに括る必要がある%
-\footnote{\cs{afterassignment} を利用して実装すればグループに括る必要がなくなるのでは，と思
-	      うかもしれないが，それでは本文中に書いた例のように \cs{dimexpr} 中で使用でき
-	      なくなってしまう．}．
+のように \cs{wd}<num> の代わりとして扱うことができる．
 使用例は以下の通りである．
 \begin{LTXexample}[width=0.3\textwidth]
 \parindent0pt
 \setbox32767=\hbox{\yoko よこぐみ}
 \fboxsep=0mm\fbox{\copy32767}
 \vbox{\hsize=20mm
-\yoko YOKO \the\ltjgetwd{32767}, \\
-  \the\ltjgetht{32767}, \\ \the\ltjgetdp{32767}.}
+\yoko YOKO \the\ltjgetwd32767, \\
+  \the\ltjgetht32767, \\ \the\ltjgetdp32767.}
 \vbox{\hsize=20mm\raggedleft
-\tate TATE \the\ltjgetwd{32767}, \\
-  \the\ltjgetht{32767}, \\ \the\ltjgetdp{32767}.}
+\tate TATE \the\ltjgetwd32767, \\
+  \the\ltjgetht32767, \\ \the\ltjgetdp32767.}
 \vbox{\hsize=20mm\raggedleft
-\dtou DTOU \the\ltjgetwd{32767}, \\
-  \the\ltjgetht{32767}, \\ \the\ltjgetdp{32767}.}
+\dtou DTOU \the\ltjgetwd32767, \\
+  \the\ltjgetht32767, \\ \the\ltjgetdp32767.}
 \end{LTXexample}
 
  \item[\cs{ltjsetwd}<num>=<dimen>\textrm{, }\cs{ltjsetht}<num>=<dimen>\textrm{, }%
@@ -5321,9 +5315,9 @@ The correct way is using a temporary register.
   \@tempskipa=\ltjgetparameter{xkanjiskip}
   \ifdim\@tempskipa>\z@
     \if@slide 
-      \ltjsetxkanjiskip{0.1em}
+      \ltjsetxkanjiskip.1em
     \else
-      \ltjsetxkanjiskip{0.25em plus 0.15em minus 0.06em}
+      \ltjsetxkanjiskip.25em plus .15em minus .06em
     \fi
   \fi
 \end{lstlisting}
