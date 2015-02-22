@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2014/09/24 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2015/02/22 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -73,7 +73,7 @@
 \newif\ifltj@everyhook@avail\ltj@everyhook@availfalse
 %! 外部パッケージは普通の \endlinechar で読まないと危険.
 \ifltj@in@latex                 %<*LaTeX>
-  \RequirePackage{luaotfload} [2013/05/10] % v2.2
+  \RequirePackage{luaotfload} [2013/12/31] % v2.3
   \RequirePackage{ltxcmds}    [2011/11/09] % v1.22
   \RequirePackage{pdftexcmds} [2011/11/29] % v0.20
   \RequirePackage{xkeyval}    [2012/10/14] % v2.6b
@@ -176,6 +176,16 @@
   dofile(assert(kpse.find_file('luatexja.lua', 'tex'),
       "File `luatexja.lua' not found"))
 }
+
+
+%%% true if we can use [new]token.scan_int and co.
+\newif\ifltj@token@avail@scan
+\directlua{%
+  local bs = string.char(92)
+  if luatexja.token  then tex.sprint(bs .. 'ltj@token@avail@scantrue') end
+  print (luatexja.token)
+}
+
 
 %% \RequireLuaTeXjaSubmodule{name}[date]
 % A TeX version of luatexja.load_module(name)
@@ -295,6 +305,22 @@
   \ltj@restore@globaldefs
   }
 
+\ifltj@token@avail@scan %%%%%%%%%%%%%%%%%%%%%%%% new tokenlib
+% {y,t}{ja,al}baselineshift = <dimen>
+% yjabaselineshift = <dimen>
+\define@key[ltj]{japaram}{yalbaselineshift}{
+  \directlua{tex.setattribute(luatexja.isglobal,
+    luatexbase.attributes['ltj@yablshift'], luatexja.token.scan_dimen())}#1}
+\define@key[ltj]{japaram}{yjabaselineshift}{
+  \directlua{tex.setattribute(luatexja.isglobal,
+    luatexbase.attributes['ltj@ykblshift'], luatexja.token.scan_dimen())}#1}
+\define@key[ltj]{japaram}{talbaselineshift}{
+  \directlua{tex.setattribute(luatexja.isglobal,
+    luatexbase.attributes['ltj@tablshift'], luatexja.token.scan_dimen())}#1}
+\define@key[ltj]{japaram}{tjabaselineshift}{
+  \directlua{tex.setattribute(luatexja.isglobal,
+    luatexbase.attributes['ltj@tkblshift'], luatexja.token.scan_dimen())}#1}
+\else %%%%%%%%%%%%%%%%%%%%%%%% old tokenlib
 % yalbaselineshift = <dimen>
 % yjabaselineshift = <dimen>
 \define@key[ltj]{japaram}{yalbaselineshift}{%
@@ -315,6 +341,7 @@
   \directlua{tex.setattribute(luatexja.isglobal,
     luatexbase.attributes['ltj@tkblshift'],
     \ltj@safe@dimen@or\ltj@defdimen{#1})}}
+\fi %%%%%%%%%%%%%%%%%%%%%%%%
 
 % jaxspmode = {<char_code>, <mode>}
 % mode: inhibit, preonly, postonly, allow
@@ -362,19 +389,35 @@
     \directlua{luatexja.ext_print_global()}\ltj@autoxspc=0
   \fi}
 
-% [x]]kanjiskip = <dimen>
-\define@key[ltj]{japaram}{kanjiskip}{\ltjsetkanjiskip{#1}}
-\define@key[ltj]{japaram}{xkanjiskip}{\ltjsetxkanjiskip{#1}}
-\protected\def\ltjsetkanjiskip#1{%                  % SKIP
-  \directlua{%
-    local d = \ltj@safe@glue{#1}
-    luatexja.stack.set_stack_skip(luatexja.stack_table_index.KSK, d); node.free(d)
-}\ignorespaces}
-\protected\def\ltjsetxkanjiskip#1{%                  % SKIP
-  \directlua{%
-    local d = \ltj@safe@glue{#1}
-    luatexja.stack.set_stack_skip(luatexja.stack_table_index.XSK, d); node.free(d)
-}\ignorespaces}
+% [x]]kanjiskip = <skip>
+\ifltj@token@avail@scan %%%%%%%%%%%%%%%%%%%%%%%% new tokenlib
+  \define@key[ltj]{japaram}{kanjiskip}{\message{<#1>}\ltjsetkanjiskip #1}
+  \define@key[ltj]{japaram}{xkanjiskip}{\ltjsetxkanjiskip #1}
+  \protected\def\ltjsetkanjiskip{%                  % SKIP
+    \directlua{%
+      local d = luatexja.token.scan_glue()
+      luatexja.stack.set_stack_skip(luatexja.stack_table_index.KSK, d); node.free(d)
+  }}
+  \protected\def\ltjsetxkanjiskip{%                  % SKIP
+    \directlua{%
+      local d = luatexja.token.scan_glue()
+      luatexja.stack.set_stack_skip(luatexja.stack_table_index.XSK, d); node.free(d)
+  }}
+\else %%%%%%%%%%%%%%%%%%%%%%%% old tokenlib
+  \define@key[ltj]{japaram}{kanjiskip}{\ltjsetkanjiskip{#1}}
+  \define@key[ltj]{japaram}{xkanjiskip}{\ltjsetxkanjiskip{#1}}
+  \protected\def\ltjsetkanjiskip#1{%                  % SKIP
+    \directlua{%
+      local d = \ltj@safe@glue{#1}
+      luatexja.stack.set_stack_skip(luatexja.stack_table_index.KSK, d); node.free(d)
+  }\ignorespaces}
+  \protected\def\ltjsetxkanjiskip#1{%                  % SKIP
+    \directlua{%
+      local d = \ltj@safe@glue{#1}
+      luatexja.stack.set_stack_skip(luatexja.stack_table_index.XSK, d); node.free(d)
+  }\ignorespaces}
+\else
+\fi %%%%%%%%%%%%%%%%%%%%%%%%
 
 
 % jcharwidowpenalty = <count>
@@ -673,18 +716,27 @@
 }
 
 %%%%%%%% \ltjgetwd<box_num> etc.
+\ifltj@token@avail@scan %%%%%%%%%%%%%%%%%%%%%%%% new tokenlib
+\def\ltj@@getwd{%
+  \directlua{luatexja.direction.get_box_dim('width', luatexja.token.scan_int())}%
+  \ltj@tempdima}
+\def\ltj@@getht{%
+  \directlua{luatexja.direction.get_box_dim('height', luatexja.token.scan_int()}%
+  \ltj@tempdima}
+\def\ltj@@getdp{%
+  \directlua{luatexja.direction.get_box_dim('depth', luatexja.token.scan_int())}%
+  \ltj@tempdima}
+\else %%%%%%%%%%%%%%%%%%%%%%%% old tokenlib
 \def\ltj@@getwd#1{%
   \directlua{luatexja.direction.get_box_dim('width', \the\numexpr#1\relax)}%
-  \ltj@tempdima%
-}
+  \ltj@tempdima}
 \def\ltj@@getht#1{%
   \directlua{luatexja.direction.get_box_dim('height', \the\numexpr#1\relax)}%
-  \ltj@tempdima%
-}
+  \ltj@tempdima}
 \def\ltj@@getdp#1{%
   \directlua{luatexja.direction.get_box_dim('depth', \the\numexpr#1\relax)}%
-  \ltj@tempdima%
-}
+  \ltj@tempdima}
+\fi %%%%%%%%%%%%%%%%%%%%%%%%
 \let\ltjgetwd=\ltj@@getwd\let\ltjgetht=\ltj@@getht\let\ltjgetdp=\ltj@@getdp
 
 %%%%%%%% \ltjsetwd<box_num>=<dimen> etc.

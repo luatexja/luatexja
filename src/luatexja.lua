@@ -19,6 +19,16 @@ function luatexja.load_lua(fn)
    end
 end
 
+-- check token library
+if newtoken then
+   luatexja.token = newtoken
+else
+   local luatex_version = status.list().luatex_version
+   if luatex_version >80 then
+      luatexja.token = token
+   end
+end
+
 --- 以下は全ファイルで共有される定数
 local icflag_table = {}
 luatexja.icflag_table = icflag_table

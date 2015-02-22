@@ -366,13 +366,25 @@
     \fi
   \fi
   \ltj@setpar@global
-  \ltjsetkanjiskip{\z@ plus .1\zw minus .01\zw}
-  \@tempskipa=\ltjgetparameter{xkanjiskip}
-  \ifdim\@tempskipa>\z@
-    \if@slide
-      \ltjsetxkanjiskip{0.1em}
-    \else
-      \ltjsetxkanjiskip{0.25em plus 0.15em minus 0.06em}
+  \ifltj@token@avail@scan
+    \ltjsetkanjiskip\z@ plus .1\zw minus .01\zw
+    \@tempskipa=\ltjgetparameter{xkanjiskip}
+    \ifdim\@tempskipa>\z@
+      \if@slide
+        \ltjsetxkanjiskip .1em
+      \else
+       \ltjsetxkanjiskip .25em plus .15em minus .06em
+      \fi
+    \fi
+  \else
+    \ltjsetkanjiskip{\z@ plus .1\zw minus .01\zw}
+    \@tempskipa=\ltjgetparameter{xkanjiskip}
+    \ifdim\@tempskipa>\z@
+      \if@slide
+        \ltjsetxkanjiskip{.1em}
+      \else
+        \ltjsetxkanjiskip{.25em plus .15em minus .06em}
+      \fi
     \fi
   \fi}
 \emergencystretch 3\zw

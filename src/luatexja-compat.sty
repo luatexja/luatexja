@@ -65,22 +65,8 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-compat}[2013/12/22 Compatibility with pTeX]
+  \ProvidesPackage{luatexja-compat}[2015/02/22 Compatibility with pTeX]
 \fi                             %</LaTeX>
-
-% ltj-compat-ptex.sty is not maintained for a long time.
-% %% If the engine is pTeX, then load the module for it and exit.
-% \edef\ltj@@tempa{\string\kansuji}
-% \edef\ltj@@tempb{\meaning\kansuji}
-% \ifx\ltj@@tempa\ltj@@tempb      %<*pTeX>
-%   \let\ltj@@compat@pTeX=t
-%   \ifltj@in@latex                 %<*LaTeX>
-%     \RequirePackage{ltj-compat-ptex}[2012/04/21]
-%   \else                           %<*!LaTeX>
-%     \input ltj-compat-ptex.sty %
-%   \fi                             %</LaTeX>
-%   \ltj@compat@AtEnd
-% \expandafter\endinput\fi\relax  %</pTeX>
 
 % Load core module if not yet.
 \ifx\luatexjacoreLoaded\@undefined
@@ -113,6 +99,11 @@
 \def\sjis{\ltj@code@conv{sjis}}
 \def\ucs{\ltj@code@conv{ucs}}
 
+\ifltj@token@avail@scan %%%%%%%%%%%%%%%%%%%%%%%% new tokenlib
+\def\ltj@code@conv#1{%
+  \directlua{luatexja.compat.from_#1(luatexja.token.scan_int())}%
+}
+\else %%%%%%%%%%%%%%%%%%%%%%%% old tokenlib
 \def\ltj@code@conv#1{%
   \directlua{luatexja._cc_next = luatexja.compat.from_#1 }%
   \ltj@code@convA
@@ -124,7 +115,14 @@
 \def\ltj@code@convB#1{%
   \directlua{luatexja._cc_next(\ltj@safe@num@or{nil}{#1}) }%
 }
+\fi %%%%%%%%%%%%%%%%%%%%%%%%
 
+
+\ifltj@token@avail@scan %%%%%%%%%%%%%%%%%%%%%%%% new tokenlib
+\def\kansuji{%
+  \directlua{luatexja.compat.to_kansuji(luatexja.token.scan_int())}%
+}
+\else %%%%%%%%%%%%%%%%%%%%%%%% old tokenlib
 \def\kansuji{%
   \expandafter\expandafter\expandafter
    \ltj@kansujiA\ltj@grab@num
@@ -132,6 +130,8 @@
 \def\ltj@kansujiA#1{%
   \directlua{luatexja.compat.to_kansuji(\ltj@safe@num{#1}) }%
 }
+\fi %%%%%%%%%%%%%%%%%%%%%%%%
+
 \define@key[ltj]{japaram}{kansujichar}{%
   \expandafter\ltj@@set@stack#1:{KSJ}{0}{0x7FFFFFFF}}
 
