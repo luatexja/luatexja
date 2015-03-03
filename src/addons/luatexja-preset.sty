@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2013/10/28 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2014/12/03 Japanese font presets]
 
 \RequirePackage{expl3}
 \RequirePackage{luatexja-fontspec}
@@ -195,6 +195,14 @@
 }
 
 \ExecuteOptions{ipaex}
+
+% match 
+\DeclareOption{match} {
+  \bool_if:NF  \ltj_fontspec_match_bool {
+    \ltj_fontspec_match_cmd
+    \bool_set_true:N \ltj_fontspec_match_bool
+  }
+}
 \ProcessOptions*
 
 %% KozMinPr6N の場合はjp04 feature がないので，nlck にする
