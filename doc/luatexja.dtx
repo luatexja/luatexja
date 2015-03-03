@@ -2664,7 +2664,7 @@ for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 %<en>&\bf row&\bf col.&\bf \pTeX&\bf \upTeX&\bf\LuaTeX-ja\\
 %<ja>&\bf 区&\bf 点&\bf \pTeX&\bf \upTeX&\fontseries{b}\selectfont\LuaTeX-ja\\
 \midrule
-\D 3000&1&1&N&N&Y\\
+%\D 3000&1&1&N&N&Y\\
 \D 30FB&1&6&N&Y&N\\
 \D 309B&1&11&N&Y&N\\
 \D 309C&1&12&N&Y&N\\
@@ -2672,16 +2672,18 @@ for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 \D FF3E&1&16&N&N&Y\\
 \D FFE3&1&17&N&N&Y\\
 \D FF3F&1&18&N&N&Y\\
-\D 30FD&1&19&N&Y&Y\\
-\D 30FE&1&20&N&Y&Y\\
-\D 309D&1&21&N&Y&Y\\
-\D 309E&1&22&N&Y&Y\\
+%\D 30FD&1&19&N&Y&Y\\
+%\D 30FE&1&20&N&Y&Y\\
+%\D 309D&1&21&N&Y&Y\\
+%\D 309E&1&22&N&Y&Y\\
 \D 3003&1&23&N&N&Y\\
 \D 4EDD&1&24&N&Y&Y\\
 \D 3005&1&25&N&N&Y\\
 \D 3006&1&26&N&N&Y\\
 \D 3007&1&27&N&N&Y\\
 \D 30FC&1&28&N&Y&Y\\
+\D FF0F&1&31&N&N&Y\\
+\D FF3C&1&32&N&N&Y\\
 \bottomrule
 \end{tabular}\qquad
 \begin{tabular}{cccccc}
@@ -2689,8 +2691,6 @@ for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 %<en>&\bf row&\bf col.&\bf \pTeX&\bf \upTeX&\bf\LuaTeX-ja\\
 %<ja>&\bf 区&\bf 点&\bf \pTeX&\bf \upTeX&\fontseries{b}\selectfont\LuaTeX-ja\\
 \midrule
-\D FF0F&1&31&N&N&Y\\
-\D FF3C&1&32&N&N&Y\\
 \D FF5C&1&35&N&N&Y\\
 \D FF0B&1&60&N&N&Y\\
 \D FF1D&1&65&N&N&Y\\
@@ -2708,7 +2708,6 @@ for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 %<en>\multicolumn{3}{c}{$\vphantom{\D 3000}$\hbox{}Cyrillic letters (row 7)}&N&N&Y\\
 %<ja>\multicolumn{3}{c}{$\vphantom{\D 3000}$\hbox{}ギリシャ文字（6区）}&Y&N&Y\\
 %<ja>\multicolumn{3}{c}{$\vphantom{\D 3000}$\hbox{}キリル文字（7区）}&N&N&Y\\
-$\vphantom{\D 3000}$\\
 \bottomrule
 \end{tabular}\hss}\par
 \end{table}
@@ -2735,8 +2734,6 @@ For the detail, see \url{https://github.com/h-kitagawa/kct}.
 異なっているところだけを載せると，表\ref{table-kcat-diff}のようになる．
 「・」「゛」「゜」「゠」を除けば，\LuaTeX-jaでは\upTeX より多くの文字が
 制御綴に使用可能になっている．
-\textbf{特に重要なのは，全角空白(\texttt{U+3000})が
-\LuaTeX-jaでは制御綴中に使用可能であることである．}
 
 JIS~X~0213の範囲に広げると，差異はさらに大きくなる．
 詳細については例えば \url{https://github.com/h-kitagawa/kct} 中の\
