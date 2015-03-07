@@ -1,6 +1,6 @@
 The LuaTeX-ja Package $VER$
 --------------------------------
-Copyright (c) 2011--2014 The LuaTeX-ja project
+Copyright (c) 2011--2015 The LuaTeX-ja project
 License: modified BSD (see COPYING)
 
 LuaTeX-ja is a macro package for typesetting Japanese documents with LuaTeX.
@@ -39,22 +39,22 @@ Installation
       <http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git
                               ;a=snapshot;h=refs/tags/$VER$;sf=tgz>
 
-   b1. Extract the archive and process following three files by LuaLaTeX
+   b. Extract the archive and process following three files by LuaLaTeX
       to generate classes for Japanese typesetting:
         src/ltjclasses.ins
         src/ltjltxdoc.ins
         src/ltjsclasses.ins
 
-   b2. Process src/ltj-kinsoku_make.tex by (plain) LuaTeX to generate ltj-kinsoku.lua,
+   c. Process src/ltj-kinsoku_make.tex by (plain) LuaTeX to generate ltj-kinsoku.lua,
       which stores default "kinsoku" parameters.
 
-   c. Put src/ into your TEXMF tree.
+   d. Put src/ into your TEXMF tree.
       An example location is TEXMF/tex/luatex/luatexja.
 
       If you are updating from old version, you MUST remove it before
       extracting the new version of LuaTeX-ja.
 
-   d. You may need to update the filename database, by 'mktexlsr' or something.
+   e. You may need to update the filename database, by 'mktexlsr' or something.
 
 
 Basic Usage
