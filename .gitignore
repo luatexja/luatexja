@@ -4,3 +4,9 @@
 *.out
 *.tmp
 *~
+*.synctex*
+*.ltjruby
+doc/Makefile
+doc/showexpl.cfg
+doc/luatexja-ja.tex
+doc/luatexja-en.tex
