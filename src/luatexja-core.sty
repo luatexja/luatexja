@@ -148,21 +148,21 @@
 
 \newluatexattribute\ltj@dir
 \newlanguage\ltj@@japanese
-\ltj@dir=0
-\ltj@icflag=0
-\ltj@origchar=0
-\ltj@charclass=0
-\ltj@curjfnt=-1
-\ltj@curtfnt=-1
+\ltj@dir\z@
+\ltj@icflag\z@
+\ltj@origchar\z@
+\ltj@charclass\z@
+\ltj@curjfnt\m@ne
+\ltj@curtfnt\m@ne
 
 %%%%%%%% Attributes for character ranges
 \newcount\ltj@tempcnta
-\ltj@tempcnta=0
+\ltj@tempcnta\z@
 \loop\ifnum\ltj@tempcnta<7
   \expandafter\newluatexattribute%
     \csname ltj@kcat\the\ltj@tempcnta\endcsname
   \csname ltj@kcat\the\ltj@tempcnta\endcsname=0
-  \advance\ltj@tempcnta by1
+  \advance\ltj@tempcnta\@ne
 \repeat
 
 
@@ -292,8 +292,8 @@
   \expandafter\ltj@@set@stackfont#1:{MJSS}}
 \protected\def\ltj@@set@stackfont#1,#2:#3{%
   \ltj@reset@globaldefs
-  \ltj@tempcnta=\ltj@curjfnt\ltj@curjfnt=-1 #2%
-  \ifnum\ltj@curjfnt=-1
+  \ltj@tempcnta=\ltj@curjfnt\ltj@curjfnt\m@ne#2%
+  \ifnum\ltj@curjfnt=\m@ne
     \@PackageError{luatexja-core}%
     {\string#2 is not a control sequence that represents \MessageBreak
      a Japanese font}{}%
@@ -358,6 +358,7 @@
     \ltj@safe@num@or{nil}{#1},
     \ltj@safe@num@or{nil}{\ltj@temp},0,3)}}
 
+
 % alxspmode = {<char_code>, <mode>}
 % mode: inhibit, preonly, postonly, allow
 %    or       0        1         2      3
@@ -376,22 +377,22 @@
 % autospacing = <bool> (default: true)
 \define@boolkey[ltj]{japaram}{autospacing}[true]{%
   \ifltj@japaram@autospacing
-    \directlua{luatexja.ext_print_global()}\ltj@autospc=1
+    \directlua{luatexja.ext_print_global()}\ltj@autospc\@ne
   \else
-    \directlua{luatexja.ext_print_global()}\ltj@autospc=0
+    \directlua{luatexja.ext_print_global()}\ltj@autospc\z@
   \fi}
 
 % autoxspacing = <bool> (default: true)
 \define@boolkey[ltj]{japaram}{autoxspacing}[true]{%
   \ifltj@japaram@autoxspacing
-    \directlua{luatexja.ext_print_global()}\ltj@autoxspc=1
+    \directlua{luatexja.ext_print_global()}\ltj@autoxspc\@ne
   \else
-    \directlua{luatexja.ext_print_global()}\ltj@autoxspc=0
+    \directlua{luatexja.ext_print_global()}\ltj@autoxspc\z@
   \fi}
 
 % [x]]kanjiskip = <skip>
 \ifltj@token@avail@scan %%%%%%%%%%%%%%%%%%%%%%%% new tokenlib
-  \define@key[ltj]{japaram}{kanjiskip}{\message{<#1>}\ltjsetkanjiskip #1}
+  \define@key[ltj]{japaram}{kanjiskip}{\ltjsetkanjiskip #1}
   \define@key[ltj]{japaram}{xkanjiskip}{\ltjsetxkanjiskip #1}
   \protected\def\ltjsetkanjiskip{%                  % SKIP
     \directlua{%
@@ -502,13 +503,13 @@
 %%%%%%%% \ltjalchar<number>, \ltjjachar<number>
 \let\ltj@@origchar=\char
 \protected\def\ltj@alljachar{\relax
-    \csname ltj@kcat0\endcsname=0
-    \csname ltj@kcat1\endcsname=0
-    \csname ltj@kcat2\endcsname=0
-    \csname ltj@kcat3\endcsname=0
-    \csname ltj@kcat4\endcsname=0
-    \csname ltj@kcat5\endcsname=0
-    \csname ltj@kcat6\endcsname=0 }
+    \csname ltj@kcat0\endcsname\z@
+    \csname ltj@kcat1\endcsname\z@
+    \csname ltj@kcat2\endcsname\z@
+    \csname ltj@kcat3\endcsname\z@
+    \csname ltj@kcat4\endcsname\z@
+    \csname ltj@kcat5\endcsname\z@
+    \csname ltj@kcat6\endcsname\z@}
 \protected\def\ltj@allalchar{\relax
     \csname ltj@kcat0\endcsname="7FFFFFFF %"
     \csname ltj@kcat1\endcsname="7FFFFFFF %"
@@ -538,10 +539,10 @@
 % いつも global
 \def\ltj@@getjfontnumber#1{% result in \ltj@tempcntc
   \ltj@reset@globaldefs
-  \begingroup\ltj@curjfnt=-1 \ltj@curtfnt=-1\relax
+  \begingroup\ltj@curjfnt\m@ne\ltj@curtfnt\m@ne\relax
   #1\directlua{luatexja.__temp = -(\the\ltj@curjfnt)*(\the\ltj@curtfnt)}\endgroup
   \ltj@tempcntc=\directlua{tex.sprint(luatexja.__temp)}\relax
-  \ifnum\ltj@tempcntc=-1
+  \ifnum\ltj@tempcntc=\m@ne
     \@PackageError{luatexja-core}%
     {\string#1 is not a control sequence that represents \MessageBreak
      a Japanese font}{I'll use the current horizontal Japanese font instead.^^J}%

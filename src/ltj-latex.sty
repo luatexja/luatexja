@@ -8,11 +8,11 @@
 \edef\ltj@latex@AtEnd{%
 \endlinechar=\the\endlinechar
 \relax}
-\endlinechar=-1 %
+\endlinechar\m@ne%
 \def\luatexjalatexLoaded{\endinput}
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{ltj-latex}[2013/05/14 LaTeX support of LuaTeX-ja]
+\ProvidesPackage{ltj-latex}[2015/02/22 LaTeX support of LuaTeX-ja]
 
 % cleanup at end of the document
 %\let\ltj@@orig@end=\@@end
@@ -20,7 +20,7 @@
 %  \directlua{luatexja.ext_cleanup()}\ltj@@orig@end}
 
 % Globally add to the head of a macro (cf. LaTeX2e's \g@addto@macro)
-\long\def\ltj@g@addto@macro#1#2{
+\long\def\ltj@g@addto@macro#1#2{%
   \begingroup
     \def\ltj@tmpa{#2}
     \toks@\expandafter\expandafter\expandafter{\expandafter\ltj@tmpa#1}
@@ -48,10 +48,10 @@
   luatexja.stack.charprop_stack_table[0] = s and dofile(s) or {}
 }
 
-\ltjsetparameter{kanjiskip=0pt plus 0.4pt minus 0.4pt,
+\ltjsetparameter{kanjiskip=\z@ plus .4pt minus .4pt,
   xkanjiskip=.25\zw plus 1pt minus 1pt,
   autospacing, autoxspacing, jacharrange={-1},
-  yalbaselineshift=0pt, yjabaselineshift=0pt,
+  yalbaselineshift=\z@, yjabaselineshift=\z@,
   jcharwidowpenalty=500, differentjfm=paverage
 }
 

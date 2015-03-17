@@ -14,7 +14,7 @@
 \ifltj@in@latex                 %<*LaTeX>
   \NeedsTeXFormat{LaTeX2e}
   \PackageWarning{ltj-plain}{Don't load this package directly; load luatexja.sty instead.}
-  \ProvidesPackage{ltj-plain}[2014/09/19]
+  \ProvidesPackage{ltj-plain}[2015/02/22]
 \fi                             %</LaTeX>
 
 %%------------------
@@ -33,7 +33,7 @@
   \closein\ltj@@cfgread
   \input luatexja.cfg
 \fi
-\let\ltj@@cfgread\relax\advance\count16by-1\relax
+\let\ltj@@cfgread\relax\advance\count16\m@ne\relax
 
 \jfont\tenmin=\ltj@stdmcfont:jfm=ujis at 9.62216pt
 \jfont\sevenmin=\ltj@stdmcfont:jfm=ujis at 6.73551pt
@@ -58,20 +58,17 @@
   luatexja.stack.charprop_stack_table[0] = s and dofile(s) or {}
 }
 
-\ltjsetparameter{kanjiskip=0pt plus 0.4pt minus 0.4pt,
+\ltjsetparameter{kanjiskip=\z@ plus .4pt minus .4pt,
   xkanjiskip=.25\zw plus 1pt minus 1pt,
   autospacing, autoxspacing, jacharrange={-1},
-  yalbaselineshift=0pt, yjabaselineshift=0pt,
+  yalbaselineshift=\z@, yjabaselineshift=\z@,
   jcharwidowpenalty=500, differentjfm=paverage,
   jatextfont={0, \tenmin}, jascriptfont={0, \sevenmin},
   jascriptscriptfont={0, \fivemin},
 }
-\setbox0=\hbox{M}
-\jfam0
-\ltjsetparameter{
-  talbaselineshift=0.5\ht0, tjabaselineshift=0pt,
-}
-\jfam0
+\setbox\z@=\hbox{M}
+\jfam\z@
+\ltjsetparameter{talbaselineshift=.5\ht0, tjabaselineshift=\z@}
 
 \ltjdefcharrange{1}{"80-"36F, "1E00-"1EFF}
 \ltjdefcharrange{2}{"370-"4FF, "1F00-"1FFF}
