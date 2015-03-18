@@ -207,7 +207,7 @@
 
 \DeclareDocumentCommand \newjfontfamily { m O{} m O{} } {
   \cs_set_eq:NN \fontspec_set_family:Nnn \ltj_fontspec_set_family:Nnn
-  \newfontfamily #1 [#2] {#3} [#4]
+  \newfontfamily #1 [#2,#4] {#3}
   \cs_set_eq:NN \fontspec_set_family:Nnn \__ltj_orig_fontspec_set_family:Nnn
 }
 
