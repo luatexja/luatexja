@@ -308,16 +308,16 @@
 \ifltj@token@avail@scan %%%%%%%%%%%%%%%%%%%%%%%% new tokenlib
 % {y,t}{ja,al}baselineshift = <dimen>
 % yjabaselineshift = <dimen>
-\define@key[ltj]{japaram}{yalbaselineshift}{
+\define@key[ltj]{japaram}{yalbaselineshift}{%
   \directlua{tex.setattribute(luatexja.isglobal,
     luatexbase.attributes['ltj@yablshift'], luatexja.token.scan_dimen())}#1}
-\define@key[ltj]{japaram}{yjabaselineshift}{
+\define@key[ltj]{japaram}{yjabaselineshift}{%
   \directlua{tex.setattribute(luatexja.isglobal,
     luatexbase.attributes['ltj@ykblshift'], luatexja.token.scan_dimen())}#1}
-\define@key[ltj]{japaram}{talbaselineshift}{
+\define@key[ltj]{japaram}{talbaselineshift}{%
   \directlua{tex.setattribute(luatexja.isglobal,
     luatexbase.attributes['ltj@tablshift'], luatexja.token.scan_dimen())}#1}
-\define@key[ltj]{japaram}{tjabaselineshift}{
+\define@key[ltj]{japaram}{tjabaselineshift}{%
   \directlua{tex.setattribute(luatexja.isglobal,
     luatexbase.attributes['ltj@tkblshift'], luatexja.token.scan_dimen())}#1}
 \else %%%%%%%%%%%%%%%%%%%%%%%% old tokenlib
