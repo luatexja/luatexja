@@ -16,6 +16,31 @@
 \makeatletter
 %%%%%%%%
 \directlua{if jit then jit.on() end}
+
+\usepackage{amsmath,array,tikz,pict2e,multienum,float}
+\usepackage{booktabs,multicol,luatexja-ruby}
+\usepackage[all]{xy}
+\usepackage{lltjext,alltt}
+
+%%%%%%%% fonts
+\usepackage{luatexja-otf}
+\directlua{luatexja.otf.enable_ivs()}
+\usepackage[match]{luatexja-fontspec}
+\usepackage[kozuka-pr6n]{luatexja-preset}
+\usepackage{unicode-math}
+\setmainfont[Ligatures=TeX]{Linux Libertine O}
+\setsansfont[Scale=0.95,Ligatures=TeX]{TeX Gyre Heros}
+\setmonofont[Scale=MatchLowercase, ItalicFont=lmmono10-italic.otf,
+  BoldFont=lmmonolt10-bold.otf, BoldItalicFont=lmmonolt10-boldoblique.otf
+]{lmmono10-regular.otf}
+\setmonojfont{KozGoPr6N-Regular.otf}
+\setmathfont[Scale=MatchLowercase]{xits-math.otf}
+%<*ja>
+\def\emph#1{\textbf{\textgt{#1}}}
+\def\headfont{\normalfont\bfseries\gtfamily}\normalsize
+%</ja>
+%<en>\frenchspacing
+
 %<*en>
 \usepackage[margin=25mm,lmargin=30mm,rmargin=30mm,footskip=6mm]{geometry}
 \usepackage{luatexja-adjust}\ltjdisableadjust
@@ -30,11 +55,6 @@
 \usepackage{luatexja-adjust}%\ltjdisableadjust
 \advance\leftmargini-1\zw\advance\leftmarginii-1\zw
 %</ja>
-
-\usepackage{amsmath,array,tikz,pict2e,multienum,float}
-\usepackage{booktabs,multicol,luatexja-ruby}
-\usepackage[all]{xy}
-\usepackage{lltjext,alltt}
 
 %%%%%%%% listings
 
@@ -104,26 +124,6 @@
 %<en>\newtheorem{defn}{Definition}
 %<ja>\newtheorem{defn}{定義}
 
-%%%%%%%% fonts
-\usepackage{luatexja-otf}
-%<ja>\usepackage{lmodern}
-\directlua{luatexja.otf.enable_ivs()}
-\usepackage[match]{luatexja-fontspec}
-\usepackage[kozuka-pr6n]{luatexja-preset}
-\setmonojfont{KozGoPr6N-Regular.otf}
-%<*ja>
-\def\emph#1{\textbf{\textgt{#1}}}
-\def\headfont{\normalfont\bfseries\gtfamily}
-\usepackage{amssymb}
-%</ja>
-%<*en>
-\usepackage{unicode-math}
-\setmainfont[Ligatures=TeX]{TeX Gyre Termes}
-\setsansfont[Scale=0.95,Ligatures=TeX]{TeX Gyre Heros}
-\setmathfont{xits-math.otf}
-\frenchspacing
-%</en>
-
 %%%%%%%% logo
 \usepackage{metalogo}
 \DeclareRobustCommand\eTeX{\ensuremath{\varepsilon}-\kern-.125em\TeX}
@@ -133,7 +133,7 @@
 \DeclareRobustCommand\upTeX{up\kern-.15em\TeX}
 \DeclareRobustCommand\pLaTeX{p\kern-.05em\LaTeX}
 \DeclareRobustCommand\pLaTeXe{p\kern-.05em\LaTeXe}
-\DeclareRobustCommand\epTeX{\ensuremath{\varepsilon}-\kern-.125em\pTeX}
+\DeclareRobustCommand\epTeX{\ensuremath{\varepsilon}-\pTeX}
 
 %%%%%%%% other macros
 \newlist{cslist}{description}{1}
@@ -567,7 +567,7 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %<en>The following packages are needed for the \LuaTeX-ja\ package.
 %<ja>\LuaTeX-jaパッケージには，次のパッケージ類が必要である．
 \begin{itemize}
-\item \LuaTeX\ 0.80 (or later)
+\item \LuaTeX\ beta-0.80.0 (or later)
 \item \Pkg{luaotfload} v2.5 (or later)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
 \item \Pkg{everysel} (if you want to use \LuaTeX-ja with \LaTeXe)
@@ -1095,8 +1095,8 @@ For \LaTeXe, \LuaTeX-ja adopted most of the font selection system of \pLaTeXe\ (
       attributes of Japanese fonts.
 %</en>
 %<*ja>
-\item 和文フォントの属性を変更するには，\cs{fontfamily}, \cs{fontseries}, \cs{fontshape}, そして
-      \cs{selectfont} を用いる．
+\item 和文フォントの属性を変更するには，\cs{fontfamily}, \cs{fontseries}, \cs{fontshape},
+      そしてそれらを反映させるために \cs{selectfont} を用いればよい．
 %</ja>
 
 %<*en>
@@ -1329,6 +1329,8 @@ widths.  Also note that kerning information in a font is not used
 (that is, \texttt{kern} feature is set off) by default in these seven (or~eight) commands.
 This is because of the compatibility with previous versions of \LuaTeX-ja
 (see \ref{para-kern}).
+
+Below is an example of \cs{jfontspec}.
 %</en>
 %<*ja>
 \Pkg{luatexja-fontspec} パッケージのオプションは以下の通りである：
@@ -1349,13 +1351,13 @@ This is because of the compatibility with previous versions of \LuaTeX-ja
 また，これらの和文用のコマンドではフォント内のペアカーニング情報は標準では使用されない，
 言い換えれば \texttt{kern} featureは標準では無効化となっている．
 これは以前のバージョンの\LuaTeX-jaとの互換性のためである（\ref{para-kern}節を参照）．
+
+以下に\cs{jfontspec}の使用例を示す．
 %</ja>
 
 \begin{LTXexample}[width=0.4\textwidth]
-\fontspec[Numbers=OldStyle]{LMSans10-Regular}
 \jfontspec[CJKShape=NLC]{KozMinPr6N-Regular}
-JIS~X~0213:2004→辻
-
+JIS~X~0213:2004→辻\par
 \jfontspec[CJKShape=JIS1990]{KozMinPr6N-Regular}
 JIS~X~0208:1990→辻
 \end{LTXexample}
@@ -1960,12 +1962,12 @@ these eight ranges belongs to the character range~217.
 \begin{description}
 %<*en>
 
-\item[Range~8${}^{\text{J}}$] The intersection of the upper half of ISO~8859-1
+\item[Range~8${}^{\kern.1em\text{J}}$] The intersection of the upper half of ISO~8859-1
 	 (Latin-1 Supplement) and JIS~X~0208 (a basic character set for Japanese). This character range
 	 consists of the following characters:
 %</en>
 %<*ja>
-\item[範囲8${}^{\text{J}}$] ISO~8859-1の上位領域（ラテン1補助）と
+\item[範囲8${}^{\kern.1em\text{J}}$] ISO~8859-1の上位領域（ラテン1補助）と
                              JIS~X~0208の共通部分．この文字範囲は
                              以下の文字で構成される：
 %</ja>
@@ -2005,11 +2007,11 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 \end{itemize}
 \end{multicols}
 %<*en>
-\item[Range~2${}^{\text{J}}$] Greek and Cyrillic letters. JIS~X~0208 (hence most of Japanese
+\item[Range~2${}^{\text{\kern.1emJ}}$] Greek and Cyrillic letters. JIS~X~0208 (hence most of Japanese
 	   fonts) has some of these characters.
 %</en>
 %<*ja>
-\item[範囲2${}^{\text{J}}$] ギリシャ文字とキリル文字．JIS~X~0208（したがってほとんどの
+\item[範囲2${}^{\text{\kern.1emJ}}$] ギリシャ文字とキリル文字．JIS~X~0208（したがってほとんどの
                              和文フォント）はこれらの文字を持つ．
 %</ja>
 \begin{multicols}{2}
@@ -2021,11 +2023,11 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 \end{itemize}
 \end{multicols}
 %<*en>
-\item[Range~3${}^{\text{J}}$] Punctuations and Miscellaneous symbols. The block list is
+\item[Range~3${}^{\text{\kern.1emJ}}$] Punctuations and Miscellaneous symbols. The block list is
 	   indicated in Table~\ref{table-rng3}.
 %</en>
 %<*ja>
-\item[範囲3${}^{\text{J}}$] 句読点と記号類．ブロックのリストは表\ref{table-rng3}%
+\item[範囲3${}^{\text{\kern.1emJ}}$] 句読点と記号類．ブロックのリストは表\ref{table-rng3}%
                              に示してある．
 %</ja>
 \begin{table}[!tb]
@@ -2075,8 +2077,8 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 \end{lstlisting}
 %<en>\item[Range~5${}^{\text{A}}$] Surrogates and Supplementary Private Use Areas.
 %<ja>\item[範囲5${}^{\text{A}}$] 代用符号と補助私用領域．
-%<en>\item[Range~6${}^{\text{J}}$] Characters used in Japanese. The block list is indicated in Table~\ref{table-rng6}.
-%<ja>\item[範囲6${}^{\text{J}}$] 日本語で用いられる文字．ブロックのリストは表\ref{table-rng6}に示す．
+%<en>\item[Range~6${}^{\text{\kern.1emJ}}$] Characters used in Japanese. The block list is indicated in Table~\ref{table-rng6}.
+%<ja>\item[範囲6${}^{\text{\kern.1emJ}}$] 日本語で用いられる文字．ブロックのリストは表\ref{table-rng6}に示す．
 \begin{table}[!tb]
 %<en>\caption{Unicode blocks in predefined character range~6.}\medskip
 %<ja>\caption{文字範囲6に指定されているUnicodeブロック．}
@@ -2104,11 +2106,11 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 \end{tabular}
 \end{table}
 %<*en>
-\item[Range~7${}^{\text{J}}$] Characters used in CJK languages, but not included in  Adobe-Japan1-6.
+\item[Range~7${}^{\text{\kern.1emJ}}$] Characters used in CJK languages, but not included in  Adobe-Japan1-6.
 The block list is indicated in Table~\ref{table-rng7}.
 %</en>
 %<*ja>
-\item[範囲7${}^{\text{J}}$] CJK言語で用いられる文字のうち，Adobe-Japan1-6に
+\item[範囲7${}^{\text{\kern.1emJ}}$] CJK言語で用いられる文字のうち，Adobe-Japan1-6に
                             含まれていないもの．
                             ブロックのリストは表\ref{table-rng7}に示す．
 %</ja>
@@ -2780,7 +2782,7 @@ implemented vertical writing by rotating \texttt{TLT}-box by 90~degrees.
 %<*ja>
 \begin{tabular}{>{\bfseries}lcccc}
 \toprule
-&横組&縦組 &\cs{dtou}「dtou方向」&「utod方向」\\
+&横組&縦組 &「dtou方向」&「utod方向」\\
 \midrule
 命令&\cs{yoko}&\cs{tate}&\cs{dtou}&\cs{utod}\\
 字送り方向&水平右向き（→）&垂直下向き（↓）&垂直上向き（↑）&垂直下向き（↓）\\
@@ -3266,7 +3268,7 @@ Returned value&\texttt{4}&\texttt{3}&\texttt{1}&\texttt{11}&\texttt{0}\\
 \end{center}
 
 \begin{LTXexample}[width=0.3\textwidth]
-\leavevmode\def\DIR{\ltjgetparameter{ direction}}
+\leavevmode\def\DIR{\ltjgetparameter{direction}}
 \hbox{\yoko\DIR}, \hbox{\tate\DIR},
 \hbox{\dtou\DIR}, \hbox{\utod\DIR},
 \hbox{\tate$\hbox{tate math: \DIR}$}
@@ -3281,7 +3283,7 @@ Returned value&\texttt{4}&\texttt{3}&\texttt{1}&\texttt{11}&\texttt{0}\\
 \ifnum\ltjgetparameter{boxdir}{200}=4
 \end{lstlisting}
 のように行うことができる．
-\cs{iftdir} は少々面倒であるが
+\cs{iftdir} は少々面倒であるが，8で割った余りが3であるか否かを判断すれば良いから
 \begin{lstlisting}
 \ifnum\numexpr
   \ltjgetparameter{direction}-(\ltjgetparameter{direction}/8)*8=3
@@ -7429,7 +7431,7 @@ process it}, if and only if the following three conditions are satisfied:
 \paragraph{Remark}
 The following example shows the major difference from the behavior of \pTeX.
 \begin{LTXexample}
-\fontspec[Ligatures=TeX]{TeX Gyre Termes}
+\fontspec[Ligatures=TeX]{Linux Libertine O}
 \ltjsetparameter{autoxspacing=false}
 \ltjsetparameter{jacharrange={-6}}xあ
 y\ltjsetparameter{jacharrange={+6}}zい
