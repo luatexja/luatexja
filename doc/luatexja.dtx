@@ -1243,17 +1243,17 @@ this chapter. For the method, please see Subsection~\ref{ssec-math}.
 \label{ssec-fontspec}
 %<*en>
 To coexist with the \Pkg{fontspec} package, it is needed to load
-\Pkg{luatexja-fontspec} package in the preamble, as follows:
+the \Pkg{luatexja-fontspec} package in the preamble, as follows:
 \begin{quote}
 \ttfamily \textbackslash usepackage[<options>]\{luatexja-fontspec\}
 \end{quote}
 This \Pkg{luatexja-fontspec} package
 automatically loads \Pkg{luatexja} and \Pkg{fontspec}
-package, if needed.
+packages, if needed.
 %</en>
 %<*ja>
 \Pkg{fontspec}パッケージと同様の機能を和文フォントに対しても用いる場合，
-\Pkg{luatexja-fontspec}パッケージを読み込む：
+\Pkg{luatexja-fontspec}パッケージを読み込めばよい．
 \begin{quote}
 \ttfamily \textbackslash usepackage[<options>]\{luatexja-fontspec\}
 \end{quote}
@@ -1262,7 +1262,7 @@ package, if needed.
 %</ja>
 
 %<*en>
-In \Pkg{luatexja-fontspec} package, the following seven~commands are defined as
+In the \Pkg{luatexja-fontspec} package, the following seven~commands are defined as
 counterparts of original commands in the \Pkg{fontspec} package:
 %</en>
 %<*ja>
@@ -1367,20 +1367,35 @@ JIS~X~0208:1990→辻
 \label{ssec-preset}
 
 %<*en>
-To use standard Japanese font settings easily, one can load \Pkg{luatexja-preset}
+To use standard Japanese font settings easily, one can load the \Pkg{luatexja-preset}
 package with several options. This package provides functions in a part of
-\Pkg{japanese-otf} package and a part of \Pkg{PXchfon} package by Takayuki Yato,
-and loads \Pkg{luatexja-fontspec}, hence \Pkg{fontspec} internally.
-
-If you need to pass some options to \Pkg{fontspec}, load \Pkg{fontspec} manually
-before \Pkg{luatexja-preset}:
+\Pkg{japanese-otf} package and a part of \Pkg{PXchfon} package by Takayuki Yato.
 %</en>
 %<*ja>
 よく使われている和文フォント設定を一行で指定できるようにしたのが
 \Pkg{luatexja-preset}パッケージである．このパッケージは，
 \Pkg{otf}パッケージの一部機能と八登崇之氏による\Pkg{PXchfon}パッケージの一部機能とを
-合わせたような格好をしており，内部で\Pkg{luatexja-fontspec}，従って
-\Pkg{fontspec}を読み込んでいる．
+合わせたような格好をしている．
+%</ja>
+
+%<en>\paragraph{General options}
+%<ja>\paragraph{一般的なオプション}
+\begin{cslist}[before*=]
+
+\item[fontspec]
+%<*en>
+With this option, Japanese fonts are selected using functionality of 
+the \Pkg{luatexja-fontspec} package. This means that the \Pkg{fontspec} package is
+	     automatically loaded by this package.
+\emph{This option is enabled by default.}
+
+If you need to pass some options to \Pkg{fontspec}, load \Pkg{fontspec} manually
+before \Pkg{luatexja-preset}:
+%</en>
+%<*ja>
+\Pkg{luatexja-fontspec}パッケージの機能を用いて和文フォントを選択する．
+これは，\Pkg{fontspec}パッケージが自動で読み込まれることを意味する．
+\emph{このオプションは標準で有効になっている．}
 
 もし\Pkg{fontspec}パッケージに何らかのオプションを渡す必要がある
 \footnote{例えば，数式フォントまで置換されてしまい，\cs{mathit}によってギリシャ文字の
@@ -1392,9 +1407,18 @@ before \Pkg{luatexja-preset}:
 \usepackage[...]{luatexja-preset}
 \end{lstlisting}
 
-%<en>\paragraph{General options}
-%<ja>\paragraph{一般的なオプション}
-\begin{cslist}[before*=]
+\item[nfssonly]
+%<*ja>
+\LaTeX 標準のフォント選択機構(NFSS2)を用いて
+\texttt{ltjpm}（明朝），\texttt{ltjpg}（ゴシック），それに後に述べる \texttt{deluxe} オプ
+	     ションが指定された場合には \texttt{ltjpmg}（丸ゴシック）という
+3つの和文フォントファミリを定義し，これらを用いる．
+
+このオプションは，単に和文フォントを選択できればよく，\Pkg{fontspec}パッケージの機能を全く使わない
+場合のみ指定すべきである．パッケージ読み込み時に既に\Pkg{fontspec}パッケージが読み込まれて
+	     いた場合は無視される．
+
+%</ja>
 
 \item[nodeluxe]
 %<*en>
@@ -1404,7 +1428,7 @@ This means that \verb+\mcfamily\bfseries+, \verb+\gtfamily\bfseries+ and
 \emph{This option is enabled by default.}
 %</en>
 %<*ja>
-\LaTeXe 環境下での標準設定のように，明朝体・ゴシック体を各1ウェイトで使用する．
+\LaTeXe 環境下の標準設定のように，明朝体・ゴシック体を各1ウェイトで使用する．
 より具体的に言うと，この設定の下では
 \ \verb+\mcfamily\bfseries+, \verb+\gtfamily\bfseries+,
 \verb+\gtfamily\mdseries+はみな同じフォントとなる．
@@ -1470,10 +1494,14 @@ We didn't taken account of  when both \texttt{90jis} and \texttt{jis2004} are sp
 %<*en>
 Besides \texttt{morisawa-pro}~and~\texttt{morisawa-pr6n} presets,
 fonts are specified by font name, not by file name.
+In following tables, starred fonts (e.g.~KozGo\dots-Regular) are used for medium series of \textit{gothic},
+\emph{if and only if \texttt{deluxe} option is specified}.
 %</en>
 %<*ja>
 \texttt{morisawa-pro}, \texttt{morisawa-pr6n}以外はフォントの指定は
 （ファイル名でなく）フォント名で行われる．
+以下の表において，*\,つきのフォント(e,g,~KozGo\dots-Regular)は，\emph{\texttt{deluxe}オプション指定時に}
+ゴシック体細字として用いられるものを示している．
 %</ja>
 \begin{cslist}[style=standard]
  \item[kozuka-pro] Kozuka Pro (Adobe-Japan1-4) fonts.
@@ -1516,16 +1544,7 @@ There is not rounded gothic family in Kozuka fonts.
 \end{tabular}
 \end{center}
 
-%<*en>
-In above table, starred fonts (KozGo\dots-Regular) are used for medium series of \textit{gothic},
-\emph{if and only if \texttt{deluxe} option is specified}.
-%</en>
-%<*ja>
-上の表において，*つきのフォント(KozGo\dots-Regular)は，\emph{\texttt{deluxe}オプション指定時に}
-ゴシック体細字として用いられる．
-%</ja>
-
-%<ja>\medskip
+%<ja>\newpage
 
  \item[hiragino-pro]  Hiragino Pro (Adobe-Japan1-5) fonts.
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
@@ -1568,7 +1587,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{tabular}
 \end{center}
 
-%<ja>\newpage
+%<ja>\medskip
 
  \item[morisawa-pro]  Morisawa Pro (Adobe-Japan1-4) fonts.
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
@@ -1730,7 +1749,6 @@ are internally specified by:
 \end{description}
 %</en>
 %<*ja>
-\newpage
 なお，HG明朝E・HGゴシックE・HG創英角ゴシックUB・HG丸ゴシック体PROの4つについては，内部で
 \begin{description}
 \item[標準] フォント名（\texttt{HGMinchoE} など）
@@ -2739,7 +2757,7 @@ For the detail, see \url{https://github.com/h-kitagawa/kct}.
 
 JIS~X~0213の範囲に広げると，差異はさらに大きくなる．
 詳細については例えば \url{https://github.com/h-kitagawa/kct} 中の\
-\texttt{kct-uni-out.pdf} などを参照すること．
+\texttt{kct-out.pdf} などを参照すること．
 %</ja>
 
 
@@ -8878,7 +8896,7 @@ CMapが必要である．
 \item[ltj-cid-auto-adobe-japan1.lua]
 The font table of a CID-keyed non-embedded Japanese font.
 This is loaded in every run.
-It is created from two CMaps, \texttt{UniJIS2004-UTF32-H} and
+It is created from three CMaps, \texttt{UniJIS2004-UTF32-\{H,V\}} and
 	     \texttt{Adobe-Japan1-UCS2},
 and this is why these two CMaps are needed in the first run of \LuaTeX-ja.
 
@@ -8908,10 +8926,10 @@ The following is the structure of the that table.
 \bf \texttt{cid} key&\bf name of the cache &
 \multicolumn{2}{c}{\bf used CMaps}\\
 \midrule
-Adobe-Japan1-*&ltj-cid-auto-adobe-japan1.lua&UniJIS2004-UTF32-H&Adobe-Japan1-UCS2\\
-Adobe-Korea1-*&ltj-cid-auto-adobe-korea1.lua&UniKS-UTF32-H&Adobe-Korea1-UCS2\\
-Adobe-GB1-*&ltj-cid-auto-adobe-gb1.lua&UniGB-UTF32-H&Adobe-GB1-UCS2\\
-Adobe-CNS1-*&ltj-cid-auto-adobe-cns1.lua&UniCNS-UTF32-H&Adobe-CNS1-UCS2\\
+Adobe-Japan1-*&ltj-cid-auto-adobe-japan1.lua&UniJIS2004-UTF32-*&Adobe-Japan1-UCS2\\
+Adobe-Korea1-*&ltj-cid-auto-adobe-korea1.lua&UniKS-UTF32-*&Adobe-Korea1-UCS2\\
+Adobe-GB1-*&ltj-cid-auto-adobe-gb1.lua&UniGB-UTF32-*&Adobe-GB1-UCS2\\
+Adobe-CNS1-*&ltj-cid-auto-adobe-cns1.lua&UniCNS-UTF32-*&Adobe-CNS1-UCS2\\
 \bottomrule
 \end{tabular}
 \end{table}
