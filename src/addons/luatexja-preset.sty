@@ -2,12 +2,14 @@
 \ProvidesPackage{luatexja-preset}[2015/04/05 Japanese font presets]
 
 \RequirePackage{expl3}
+\RequirePackage{luatexja}
 \ExplSyntaxOn
 
 %%%% message
 \bool_new:N \l_ltjpreset_nfssonly_bool % nfssonly
 \bool_set_false:N \l_ltjpreset_nfssonly_bool
 \DeclareOption{nfssonly}  {\bool_set_true:N \l_ltjpreset_nfssonly_bool}
+\DeclareOption{fontspec}  {\bool_set_false:N \l_ltjpreset_nfssonly_bool}
 
 \bool_new:N \l_ltjpreset_bold_bool % bold
 \bool_set_false:N \l_ltjpreset_bold_bool
@@ -42,7 +44,7 @@
 \clist_new:N \l_ltjpreset_font_list
 
 \cs_new:Npn \ltjpreset_set_uni:nn #1#2 {
-  \ltjpreset_set_multi:n { #1, #1, #2, #2, #2, #2, #1 }
+  \ltjpreset_set_multi:n { #1, #2, #2, #2, #2, #2, #2 }
 }
 \cs_new:Npn \ltjpreset_set_multi:n #1 {
   \clist_set:Nn \l_ltjpreset_font_list { #1 }
@@ -203,8 +205,17 @@
 
 %%%%%%%% main routine
 
-\bool_new:N \l_ltjpreset_shape_nlck_bool
+\msg_new:nnn { luatexja-preset }{ ltj-fontspec }{
+  The~ luatexja-fontspec~ package~ is~ loaded~ already.~
+  Hence~ we~ ignore~ `nfssonly'~option.
+}
+\@ifpackageloaded{luatexja-fontspec}{
+  \bool_if:NT \l_ltjpreset_nfssonly_bool
+    { \msg_warning:nn { luatexja-preset }{ ltj-fontspec } }
+  \bool_set_false:N \l_ltjpreset_nfssonly_bool
+}{}
 
+\bool_new:N \l_ltjpreset_shape_nlck_bool
 %% KozMinPr6N, HiraMinProN-W3 の場合はjp04 feature がないので，nlck にする
 \tl_set:Nn \l_tmpa_tl {, CJKShape=JIS2004 }
 \tl_if_eq:NNT \l_ltjpreset_kanji_shape_tl \l_tmpa_tl {
@@ -287,7 +298,6 @@
 %%%%%%%% nfss only
 \bool_if:NTF \l_ltjpreset_nfssonly_bool {
 
-\message{NFSS}
 \fp_new:N \l_ltjpreset_scale_fp
 \group_begin:
 \fontsize{10}{10}\selectfont
@@ -360,9 +370,11 @@
   \DeclareKanjiFamily{JY3}{ltjpmg}{}\DeclareKanjiFamily{JT3}{ltjpmg}{}
   \ltj_preset_define_family:nnn {ltjpmg} {m}  {\ltjpreset_font_mg:} 
   \ltj_preset_define_family:nnn {ltjpg}  {eb} {\ltjpreset_font_gt_eb:}
-  \DeclareRobustCommand\gtebfamily { \kanjifamily{ltjpg}\kanjiseries{eb}\selectfont }
+  \def\ebdefault{eb}
+  \DeclareRobustCommand\ebseries { \not@math@alphabet\ebseries\relaxfontseries\ebdefault\selectfont }
+  \DeclareRobustCommand\gtebfamily { \kanjifamily{ltjpg}\fontseries{eb}\selectfont }
   \DeclareTextFontCommand{\textgteb}{\gtebfamily}
-  \DeclareRobustCommand\mgfamily { \kanjifamily{ltjpmg}\selectfont }
+  \DeclareRobustCommand\mgfamily { \not@math@alphabet\mgfamily\relax\kanjifamily{ltjpmg}\selectfont }
   \DeclareTextFontCommand{\textmg}{\mgfamily}
 }
 

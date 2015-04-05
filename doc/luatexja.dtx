@@ -1414,10 +1414,15 @@ before \Pkg{luatexja-preset}:
 	     ションが指定された場合には \texttt{ltjpmg}（丸ゴシック）という
 3つの和文フォントファミリを定義し，これらを用いる．
 
-このオプションは，単に和文フォントを選択できればよく，\Pkg{fontspec}パッケージの機能を全く使わない
-場合のみ指定すべきである．パッケージ読み込み時に既に\Pkg{fontspec}パッケージが読み込まれて
-	     いた場合は無視される．
-
+欧文フォントの指定で\Pkg{fontspec}パッケージを読み込んでいる場合でも
+\begin{lstlisting}
+\usepackage{fontspec}
+\usepackage[hiragino-pron,nfssonly]{luatexja-preset}
+\end{lstlisting}
+のように「和文側では\Pkg{fontspec}の機能は使わない，つまり\Pkg{luatexja-fontspec}は読み込
+	     まない」ことは可能である．一方，，
+パッケージ読み込み時に既に\Pkg{luatexja-fontspec}パッケージが読み込まれて
+	     いる場合は \texttt{nfssonly} オプションは無視される．
 %</ja>
 
 \item[nodeluxe]
@@ -1442,23 +1447,32 @@ Use \textit{mincho} with two weights (medium~and~bold),
 because \textit{rounded gothic} is called \textit{maru gothic} (丸ゴシック) in Japanese.}.
 The heavy weight of \textit{gothic} can be used by ``changing the family'' \cs{gtebfamily},
 or \verb+\textgteb{...}+.
-This is because \Pkg{fontspec} package can handle only medium (\cs{mdseries}) and
+This is because the \Pkg{fontspec} package can handle only medium (\cs{mdseries}) and
 bold (\cs{bfseries}).
 %</en>
 %<*ja>
 明朝体2ウェイト・ゴシック体3ウェイトと，
 丸ゴシック体 (\cs{mgfamily}, \verb+\textmg{...}+) を使用可能とする．
-ゴシック体は細字・太字・極太の3ウェイトがあるが，
-極太ゴシック体はファミリの切り替え (\cs{gtebfamily}, \verb+\textgteb{...}+) %
-で実現している．\Pkg{fontspec}では通常 (\cs{mdseries}) と太字 (\cs{bfseries}) しか扱えないために
-このような中途半端な実装になっている．
+ゴシック体は中字・太字・極太の3ウェイトがあるが，
+極太ゴシック体を使う場合，
+\begin{itemize}
+ \item \cs{gtebfamily}, \verb+\textgteb{...}+
+ \item \cs{ebseries} （周囲がゴシック体のとき，\texttt{nfssonly} オプション指定時のみ）
+\end{itemize}
+のいずれかを用いる．標準で \cs{ebseries} が準備されていないのは，バージョンが古い
+\Pkg{fontspec}では中字(\cs{mdseries})と太字(\cs{bfseries})しか扱えなかった名残である．
 %</ja>
 \item[expert]
 %<*en>
 Use horizontal/vertical kana alternates, and define a command \cs{rubyfamily} to use kana
 characters designed for ruby.
 %</en>
-%<ja>横組・縦組専用仮名を用いる．また，\cs{rubyfamily} でルビ用仮名が使用可能となる．
+%<*ja>
+横組・縦組専用仮名を用いる．また，\cs{rubyfamily} でルビ用仮名が使用可能となる\footnote{%
+  \cs{rubyfamily}とはいいつつ，実際にはフォントファミリを切り替えるのではない（通常では
+  font featureの追加，\texttt{nfssonly} 指定時にはシェイプを \texttt{rb} に切り替え）．
+}．
+%</ja>
 \item[bold]
 %<en>Substitute bold series of \textit{gothic} for  bold series of \textit{mincho}.
 %<ja>「明朝の太字」をゴシック体の太字によって代替する．
@@ -1652,13 +1666,10 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<ja>\paragraph{単ウェイト用プリセット一覧}
 %<*en>
 Next, we describe settings for using only single weight.
-In four settings below, we use same fonts for medium and bold (and heavy) weights.
-(Hence \verb+\mcfamily\bfseries+ and \verb+\mcfamily\mdseries+ yields same Japanese fonts,
-even if \texttt{deluxe} option is also specified).
 %</en>
 %<*ja>
-次に，単ウェイト用の設定を述べる．この4設定では「細字」「太字」の区別はない．
-また，丸ゴシック体はゴシック体と同じフォントを用いる．
+次に，単ウェイト用の設定を述べる．この4設定では
+明朝体太字・丸ゴシック体はゴシック体と同じフォントが用いられる．
 %</ja>
 \par\nobreak\medskip
 {\centering\small
@@ -1717,11 +1728,11 @@ We can use HG~fonts bundled with Microsoft~Office for realizing multiple weights
 \multicolumn{3}{c}{HG Maru Gothic PRO}\\
 %</en>
 %<*ja>
-\gtfamily 明朝体細字
+\gtfamily 明朝体中字
 &IPA明朝&IPAex明朝&MS明朝\\\midrule
 \gtfamily 明朝体太字&
 \multicolumn{3}{c}{HG明朝E}\\\midrule
-\gtfamily ゴシック体細字\\
+\gtfamily ゴシック体中字\\
 　単ウェイト時
 &IPAゴシック&IPAexゴシック&MSゴシック\\
 　{\tt jis2004}指定時
@@ -1766,16 +1777,15 @@ are internally specified by:
 Under \pLaTeX, \Pkg{japanese-otf} package (developed by Shuzaburo Saito) is
 used for typesetting characters which is in Adobe-Japan1-6 CID but not
 in JIS~X~0208. Since this package is widely used, \LuaTeX-ja
-supports some of functions in \Pkg{japanese-otf} package.
-If you want to use these functions, load \Pkg{luatexja-otf} package.
+supports some of functions in the \Pkg{japanese-otf} package, 
+as an external package \Pkg{luatexja-otf}.
 %</en>
 %<*ja>
 \subsection{\cs{CID}, \cs{UTF}と\Pkg{otf}パッケージのマクロ}
 \pLaTeX では，JIS~X~0208にないAdobe-Japan1-6の文字を出力するために，
 齋藤修三郎氏による\Pkg{otf}パッケージが用いられていた．このパッケージは
 広く用いられているため，\LuaTeX-jaにおいても\Pkg{otf}パッケージの機能の
-一部をサポートしている．これらの機能を用いるためには\Pkg{luatexja-otf}パッケージ
-を読み込めばよい．
+一部を（\Pkg{luatexja-otf}という別のパッケージとして）実装した．
 %</ja>
 
 \begin{LTXexample}
@@ -1792,7 +1802,7 @@ If you want to use these functions, load \Pkg{luatexja-otf} package.
 %<*ja>
 \Pkg{otf}パッケージでは，それぞれ次のようなオプションが存在した：
 \begin{cslist}
-\item[deluxe] 明朝体・ゴシック体各2ウェイトと，丸ゴシック体を扱えるようになる．
+\item[deluxe] 明朝体・ゴシック体各3ウェイトと，丸ゴシック体を扱えるようになる．
 \item[expert] 仮名が横組・縦組専用のものに切り替わり，ルビ用仮名も
 \ \cs{rubyfamily}\ によって扱えるようになる．
 \item[bold] ゴシック体を標準で太いウェイトのものに設定する．

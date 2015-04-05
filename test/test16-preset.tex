@@ -1,15 +1,16 @@
-%#!lualatex test16-preset && pdffonts test16-preset.pdf
+%#!luajitlatex test16-preset && pdffonts test16-preset.pdf
 \documentclass{ltjsarticle}
+\usepackage{fontspec}
 \usepackage[hiragino-pron,jis2004,deluxe,expert,nfssonly]{luatexja-preset}
 \begin{document}
 \makeatletter
 \def\r#1#2{ \csname #1family \endcsname \csname #2series \endcsname
   %\addjfontfeature {CJKShape=JIS1983}
-  \texttt{<\k@family><\k@series><\k@shape>}\\
+  {\romanfamily{\ttdefault}\selectfont<\k@family><\k@series><\k@shape>}\\
   {\tt#1, #2\ \ \ \ \ }: あいうえおabc漢字，あ！い，辻\\
   {\tt#1, #2 (rb)}: {\rubyfamily あいうえおabc漢字，あ！い，辻}
 }
-
+\@namedef{..series}{\relax}
 
 \r{mc}{md}
 
@@ -26,19 +27,14 @@
 \fi
 
 \ifdefined\gtebfamily
-\r{gteb}{md}
+\r{gteb}{..}
 \fi
 
 \r{tt}{md}
 
 \r{tt}{bf}
-%\jfontspec{IPAexMincho}
-
-JIS~X~0213:2004: {\LARGE 辻}
-
-%\jfontspec[CJKShape=JIS1990]{IPAexMincho}
-JIS~X~0208:1990: {\LARGE 辻}
-
 
 $あいう\mathgt{あいう}$
 \end{document}
+
+3.88
