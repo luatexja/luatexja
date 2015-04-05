@@ -684,17 +684,19 @@ do
 	       dest = dest or {};
 	       local dest_vk = dest.vkerns or {}; dest.vkerns = dest_vk
 	       for _,v in pairs(vk) do
-		  local vl = v.lookup
-		  if type(vl)=='table' then
-		     for _,vlt in pairs(vl) do
-			dest_vk[vlt] = dest_vk[vlt] or {}
-			dest_vk[vlt][gi] = dest_vk[vlt][gi] or {}
-			dest_vk[vlt][gi][unitable[v.char]] = v.off
+		  if unitable[v.char] then
+		     local vl = v.lookup
+		     if type(vl)=='table' then
+			for _,vlt in pairs(vl) do
+			   dest_vk[vlt] = dest_vk[vlt] or {}
+			   dest_vk[vlt][gi] = dest_vk[vlt][gi] or {}
+			   dest_vk[vlt][gi][unitable[v.char]] = v.off
+			end
+		     else
+			dest_vk[vl] = dest_vk[vl] or {}
+			dest_vk[vl][gi] = dest_vk[vl][gi] or {}
+			dest_vk[vl][gi][unitable[v.char]] = v.off
 		     end
-		  else
-		     dest_vk[vl] = dest_vk[vl] or {}
-		     dest_vk[vl][gi] = dest_vk[vl][gi] or {}
-		     dest_vk[vl][gi][unitable[v.char]] = v.off
 		  end
 	       end
 	    end

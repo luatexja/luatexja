@@ -26,11 +26,11 @@ local pow_table = {}
 local fn_table = {} -- used in is_ucs_in_japanese_char_direct
 local nfn_table = {} -- used in is_ucs_in_japanese_char_node
 for i = 0, 31*ATTR_RANGE-1 do
-   local ka, pw = luatexbase.attributes['ltj@kcat'..floor(i/31)], pow(2, i%31)
+   local ka, pw = luatexbase.attributes['ltj@kcat'..floor(i/31)], 1/pow(2, i%31)
    local jcr_noncjk = jcr_noncjk
-   kcat_attr_table[i], pow_table[i] = ka, pw
-   fn_table[i] = function(p) return floor(has_attr(p, ka)/pw)%2 ~= jcr_noncjk end
-   nfn_table[i] = function(p) return floor(has_attr_node(p, ka)/pw)%2 ~= jcr_noncjk end
+   kcat_attr_table[i], pow_table[i] = ka, pow(2, i%31)
+   fn_table[i] = function(p) return floor(has_attr(p, ka)*pw)%2 ~= jcr_noncjk end
+   nfn_table[i] = function(p) return floor(has_attr_node(p, ka)*pw)%2 ~= jcr_noncjk end
 end
 fn_table[-1] = function() return false end -- for char --U+007F
 nfn_table[-1] = function() return false end -- for char --U+007F
