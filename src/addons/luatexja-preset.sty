@@ -156,12 +156,23 @@
 % according to http://support.apple.com/kb/HT5944
 \DeclareOption{yu-osx}{
   \ltjpreset_set_multi:n {
-    YuMincho~Medium , YuMincho~Demibold , % mc/m, mc/bx
-    YuGothic~Medium , YuGothic~Bold ,     % gt/m, gt/bx (multiweight))
-    YuGothic~Bold   , YuGothic~Bold ,     % gt/m (uni), gt/eb
-    YuGothic~Bold                          % mg/m
+    "YuMincho~Medium" , "YuMincho~Demibold" , % mc/m, mc/bx
+    "YuGothic~Medium" , "YuGothic~Bold" ,     % gt/m, gt/bx (multiweight))
+    "YuGothic~Bold"   , "YuGothic~Bold" ,     % gt/m (uni), gt/eb
+    "YuGothic~Bold"                          % mg/m
   }
 }
+
+% moga-mobo
+\DeclareOption{moga-mobo}{
+  \ltjpreset_set_multi:n {
+    Moga90Mincho, "Moga90Mincho~Bold" ,       % mc/m, mc/bx
+    Moga90Gothic, "Moga90Gothic~Bold" ,       % gt/m, gt/bx (multiweight))
+    "Moga90Gothic~Bold", "Moga90Gothic~Bold", % gt/m (uni), gt/eb
+    Mobo90Gothic                            % mg/m
+  }
+}
+
 
 % ipa, ipaex, ms
 \DeclareOption{ipa}{
@@ -223,6 +234,9 @@
    { \bool_set_true:N \l_ltjpreset_shape_nlck_bool }
   \clist_if_in:NnT \l_ltjpreset_font_list { HiraMinProN-W3 }
    { \bool_set_true:N \l_ltjpreset_shape_nlck_bool }
+   \clist_if_in:NnT \l_ltjpreset_font_list { Moga90Mincho }
+   { \tl_remove_all:Nn \l_ltjpreset_font_list {90} }%%% これでいいのか？
+ 
 }
 
 %%%%  リストからの展開
