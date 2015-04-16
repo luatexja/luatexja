@@ -47,7 +47,7 @@ local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 local attr_tablshift = luatexbase.attributes['ltj@tablshift']
 local attr_tkblshift = luatexbase.attributes['ltj@tkblshift']
-local lang_ja = token.create('ltj@@japanese')[2]
+local lang_ja = luatexja.lang_ja
 local identifiers = fonts.hashes.identifiers
 
 local ltjf_font_metric_table = ltjf.font_metric_table

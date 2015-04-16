@@ -66,7 +66,7 @@ local id_box_like  = 256 -- vbox, shifted hbox
 local id_pbox      = 257 -- already processed nodes (by \unhbox)
 local id_pbox_w    = 258 -- cluster which consists of a whatsit
 local sid_user = node.subtype('user_defined')
-local lang_ja = token.create('ltj@@japanese')[2]
+local lang_ja = luatexja.lang_ja
 
 local sid_start_link = node.subtype('pdf_start_link')
 local sid_start_thread = node.subtype('pdf_start_thread')

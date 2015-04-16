@@ -172,19 +172,11 @@
 \protected\def\ltj@@q@escapenum{\ltj@@q@escapenum@}
 
 \directlua{%
-  luatexja = {}
+  luatexja = {};
+  luatexja.lang_ja = \the\ltj@@japanese;
   dofile(assert(kpse.find_file('luatexja.lua', 'tex'),
       "File `luatexja.lua' not found"))
 }
-
-
-%%% true if we can use [new]token.scan_int and co.
-\newif\ifltj@token@avail@scan
-\directlua{%
-  local bs = string.char(92)
-  if luatexja.token  then tex.sprint(bs .. 'ltj@token@avail@scantrue') end
-}
-
 
 %% \RequireLuaTeXjaSubmodule{name}[date]
 % A TeX version of luatexja.load_module(name)
@@ -304,7 +296,6 @@
   \ltj@restore@globaldefs
   }
 
-\ifltj@token@avail@scan %%%%%%%%%%%%%%%%%%%%%%%% new tokenlib
 % {y,t}{ja,al}baselineshift = <dimen>
 % yjabaselineshift = <dimen>
 \define@key[ltj]{japaram}{yalbaselineshift}{%
@@ -319,28 +310,6 @@
 \define@key[ltj]{japaram}{tjabaselineshift}{%
   \directlua{tex.setattribute(luatexja.isglobal,
     luatexbase.attributes['ltj@tkblshift'], luatexja.token.scan_dimen())}#1}
-\else %%%%%%%%%%%%%%%%%%%%%%%% old tokenlib
-% yalbaselineshift = <dimen>
-% yjabaselineshift = <dimen>
-\define@key[ltj]{japaram}{yalbaselineshift}{%
-  \directlua{tex.setattribute(luatexja.isglobal,
-    luatexbase.attributes['ltj@yablshift'],
-    \ltj@safe@dimen@or\ltj@defdimen{#1})}}
-\define@key[ltj]{japaram}{yjabaselineshift}{%
-  \directlua{tex.setattribute(luatexja.isglobal,
-    luatexbase.attributes['ltj@ykblshift'],
-    \ltj@safe@dimen@or\ltj@defdimen{#1})}}
-% talbaselineshift = <dimen>
-% tjabaselineshift = <dimen>
-\define@key[ltj]{japaram}{talbaselineshift}{%
-  \directlua{tex.setattribute(luatexja.isglobal,
-    luatexbase.attributes['ltj@tablshift'],
-    \ltj@safe@dimen@or\ltj@defdimen{#1})}}
-\define@key[ltj]{japaram}{tjabaselineshift}{%
-  \directlua{tex.setattribute(luatexja.isglobal,
-    luatexbase.attributes['ltj@tkblshift'],
-    \ltj@safe@dimen@or\ltj@defdimen{#1})}}
-\fi %%%%%%%%%%%%%%%%%%%%%%%%
 
 % jaxspmode = {<char_code>, <mode>}
 % mode: inhibit, preonly, postonly, allow
@@ -390,7 +359,6 @@
   \fi}
 
 % [x]]kanjiskip = <skip>
-\ifltj@token@avail@scan %%%%%%%%%%%%%%%%%%%%%%%% new tokenlib
   \define@key[ltj]{japaram}{kanjiskip}{\ltjsetkanjiskip #1}
   \define@key[ltj]{japaram}{xkanjiskip}{\ltjsetxkanjiskip #1}
   \protected\def\ltjsetkanjiskip{%                  % SKIP
@@ -403,22 +371,6 @@
       local d = luatexja.token.scan_glue()
       luatexja.stack.set_stack_skip(luatexja.stack_table_index.XSK, d); node.free(d)
   }}
-\else %%%%%%%%%%%%%%%%%%%%%%%% old tokenlib
-  \define@key[ltj]{japaram}{kanjiskip}{\ltjsetkanjiskip{#1}}
-  \define@key[ltj]{japaram}{xkanjiskip}{\ltjsetxkanjiskip{#1}}
-  \protected\def\ltjsetkanjiskip#1{%                  % SKIP
-    \directlua{%
-      local d = \ltj@safe@glue{#1}
-      luatexja.stack.set_stack_skip(luatexja.stack_table_index.KSK, d); node.free(d)
-  }\ignorespaces}
-  \protected\def\ltjsetxkanjiskip#1{%                  % SKIP
-    \directlua{%
-      local d = \ltj@safe@glue{#1}
-      luatexja.stack.set_stack_skip(luatexja.stack_table_index.XSK, d); node.free(d)
-  }\ignorespaces}
-\else
-\fi %%%%%%%%%%%%%%%%%%%%%%%%
-
 
 % jcharwidowpenalty = <count>
 \define@key[ltj]{japaram}{jcharwidowpenalty}{%      %COUNT
@@ -716,21 +668,12 @@
 }
 
 %%%%%%%% \ltjgetwd<box_num> etc.
-\ifltj@token@avail@scan %%%%%%%%%%%%%%%%%%%%%%%% new tokenlib
 \def\ltj@@getwd{%
   \directlua{luatexja.direction.get_box_dim('width', luatexja.token.scan_int())}}
 \def\ltj@@getht{%
   \directlua{luatexja.direction.get_box_dim('height', luatexja.token.scan_int())}}
 \def\ltj@@getdp{%
   \directlua{luatexja.direction.get_box_dim('depth', luatexja.token.scan_int())}}
-\else %%%%%%%%%%%%%%%%%%%%%%%% old tokenlib
-\def\ltj@@getwd#1{%
-  \directlua{luatexja.direction.get_box_dim('width', \the\numexpr#1\relax)}}
-\def\ltj@@getht#1{%
-  \directlua{luatexja.direction.get_box_dim('height', \the\numexpr#1\relax)}}
-\def\ltj@@getdp#1{%
-  \directlua{luatexja.direction.get_box_dim('depth', \the\numexpr#1\relax)}}
-\fi %%%%%%%%%%%%%%%%%%%%%%%%
 \let\ltjgetwd=\ltj@@getwd\let\ltjgetht=\ltj@@getht\let\ltjgetdp=\ltj@@getdp
 
 %%%%%%%% \ltjsetwd<box_num>=<dimen> etc.

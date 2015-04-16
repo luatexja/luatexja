@@ -46,7 +46,7 @@ local id_glue_spec = node.id('glue_spec')
 local id_whatsit = node.id('whatsit')
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
-local lang_ja = token.create('ltj@@japanese')[2]
+local lang_ja = luatexja.lang_ja
 
 local ltjf_font_metric_table = ltjf.font_metric_table
 local spec_zero_glue = ltjj.spec_zero_glue

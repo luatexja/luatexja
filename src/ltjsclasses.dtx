@@ -989,25 +989,13 @@
     \fi
   \fi
   \ltj@setpar@global
-  \ifltj@token@avail@scan
-    \ltjsetkanjiskip\z@ plus .1\zw minus .01\zw
-    \@tempskipa=\ltjgetparameter{xkanjiskip}
-    \ifdim\@tempskipa>\z@
-      \if@slide 
-        \ltjsetxkanjiskip .1em
-      \else
-       \ltjsetxkanjiskip .25em plus .15em minus .06em
-      \fi
-    \fi
-  \else
-    \ltjsetkanjiskip{\z@ plus .1\zw minus .01\zw}
-    \@tempskipa=\ltjgetparameter{xkanjiskip}
-    \ifdim\@tempskipa>\z@
-      \if@slide 
-        \ltjsetxkanjiskip{.1em}
-      \else
-        \ltjsetxkanjiskip{.25em plus .15em minus .06em}
-      \fi
+  \ltjsetkanjiskip\z@ plus .1\zw minus .01\zw
+  \@tempskipa=\ltjgetparameter{xkanjiskip}
+  \ifdim\@tempskipa>\z@
+    \if@slide 
+      \ltjsetxkanjiskip .1em
+    \else
+     \ltjsetxkanjiskip .25em plus .15em minus .06em
     \fi
   \fi}
 %    \end{macrocode}

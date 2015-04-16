@@ -51,7 +51,8 @@ local DIR   = luatexja.userid_table.DIR
 local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 
 local dir_tate = luatexja.dir_table.dir_tate
-local lang_ja = token.create('ltj@@japanese')[2]
+local lang_ja = luatexja.lang_ja
+
 ------------------------------------------------------------------------
 -- MAIN PROCESS STEP 1: replace fonts
 ------------------------------------------------------------------------
