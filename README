@@ -1,6 +1,6 @@
 The LuaTeX-ja Package $VER$
 --------------------------------
-Copyright (c) 2011--2014 The LuaTeX-ja project
+Copyright (c) 2011--2015 The LuaTeX-ja project
 License: modified BSD (see COPYING)
 
 LuaTeX-ja is a macro package for typesetting Japanese documents with LuaTeX.
@@ -23,14 +23,14 @@ Installation
 
 0. Please make sure that your TeX distribution is up-to-date.
    This version of LuaTeX-ja requires
-    - LuaTeX beta-0.74.0 or later
-    - luaotfload v2.2
-    - luatexbase v0.6
+    - LuaTeX beta-0.80.0 or later
+    - luaotfload v2.5
+    - adobemapping (Adobe CMap files)
     - everysel package
     - IPAex fonts (http://ipafont.ipa.go.jp/)
-   Hence this version does not work in TeX Live 2012 (or earlier).
+   Hence this version does not work in TeX Live 2014 (or earlier).
 
-1. If you are using TeX Live 2013 or later, you can install LuaTeX-ja via tlmgr.
+1. If you are using TeX Live 2015 or later, you can install LuaTeX-ja via tlmgr.
 
 2. If you must/want to install manually:
 
@@ -39,22 +39,22 @@ Installation
       <http://git.sourceforge.jp/view?p=luatex-ja/luatexja.git
                               ;a=snapshot;h=refs/tags/$VER$;sf=tgz>
 
-   b1. Extract the archive and process following three files by LuaLaTeX
+   b. Extract the archive and process following three files by LuaLaTeX
       to generate classes for Japanese typesetting:
         src/ltjclasses.ins
         src/ltjltxdoc.ins
         src/ltjsclasses.ins
 
-   b2. Process src/ltj-kinsoku_make.tex by (plain) LuaTeX to generate ltj-kinsoku.lua,
+   c. Process src/ltj-kinsoku_make.tex by (plain) LuaTeX to generate ltj-kinsoku.lua,
       which stores default "kinsoku" parameters.
 
-   c. Put src/ into your TEXMF tree.
+   d. Put src/ into your TEXMF tree.
       An example location is TEXMF/tex/luatex/luatexja.
 
       If you are updating from old version, you MUST remove it before
       extracting the new version of LuaTeX-ja.
 
-   d. You may need to update the filename database, by 'mktexlsr' or something.
+   e. You may need to update the filename database, by mktexlsr (or by another program).
 
 
 Basic Usage
@@ -65,9 +65,9 @@ Simply loading luatexja.sty by \input or \usepackage does the minimal setting.
 
 - If you want to create Japanese-based documents, you can consider the use of
   ltj{article,book,report}.cls or ltjs{article,book}.cls.
-- If you want to use the fontspec package, please load luatexja-fontspec.sty.
-  It defines control sequences such as \setmainjfont, setsansjfont and
-  \jfontspec, which can be used for specifying Japanese fonts.
+- If you want to use functionality of the fontspec package with Japanese fonts,
+  load luatexja-fontspec.sty. It defines control sequences such as \setmainjfont,
+  \setsansjfont and  \jfontspec, which can be used for specifying Japanese fonts.
 
 Notes
 -----
