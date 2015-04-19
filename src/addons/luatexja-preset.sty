@@ -156,19 +156,19 @@
 % according to http://support.apple.com/kb/HT5944
 \DeclareOption{yu-osx}{
   \ltjpreset_set_multi:n {
-    "YuMincho~Medium" , "YuMincho~Demibold" , % mc/m, mc/bx
-    "YuGothic~Medium" , "YuGothic~Bold" ,     % gt/m, gt/bx (multiweight))
-    "YuGothic~Bold"   , "YuGothic~Bold" ,     % gt/m (uni), gt/eb
-    "YuGothic~Bold"                          % mg/m
+    YuMincho~Medium , YuMincho~Demibold , % mc/m, mc/bx
+    YuGothic~Medium , YuGothic~Bold ,     % gt/m, gt/bx (multiweight))
+    YuGothic~Bold   , YuGothic~Bold ,     % gt/m (uni), gt/eb
+    YuGothic~Bold                         % mg/m
   }
 }
 
 % moga-mobo
 \DeclareOption{moga-mobo}{
   \ltjpreset_set_multi:n {
-    Moga90Mincho, "Moga90Mincho~Bold" ,       % mc/m, mc/bx
-    Moga90Gothic, "Moga90Gothic~Bold" ,       % gt/m, gt/bx (multiweight))
-    "Moga90Gothic~Bold", "Moga90Gothic~Bold", % gt/m (uni), gt/eb
+    Moga90Mincho, Moga90Mincho~Bold ,       % mc/m, mc/bx
+    Moga90Gothic, Moga90Gothic~Bold ,       % gt/m, gt/bx (multiweight))
+    Moga90Gothic~Bold, Moga90Gothic~Bold,   % gt/m (uni), gt/eb
     Mobo90Gothic                            % mg/m
   }
 }
@@ -324,23 +324,23 @@
 
 \cs_new:Nn \ltj_preset_define_family:nnn {
   \DeclareFontShape{JY3}{#1}{#2}{n}{ <-> s*[\fp_use:N \l_ltjpreset_scale_fp] 
-    {\bool_if:NT \l_ltjpreset_noembed_bool {psft:} #3
+    {\bool_if:NT \l_ltjpreset_noembed_bool {psft:} "#3"
     : jfm=\ltjpreset_use_jfm: ;-kern;\tl_use:N \l_ltjpreset_kanji_shape_tl
     ; script=latn \bool_if:NT \l_ltjpreset_expert_bool { ;+hkna }}
   } {}
   \DeclareFontShape{JT3}{#1}{#2}{n}{ <-> s*[\fp_use:N \l_ltjpreset_scale_fp] 
-    {\bool_if:NT \l_ltjpreset_noembed_bool {psft:} #3
+    {\bool_if:NT \l_ltjpreset_noembed_bool {psft:} "#3"
     : jfm=ujisv ;-kern;\tl_use:N \l_ltjpreset_kanji_shape_tl
     ; script=latn \bool_if:NT \l_ltjpreset_expert_bool { ;+vkna }}
   } {}
   \bool_if:NT \l_ltjpreset_expert_bool { 
     \DeclareFontShape{JY3}{#1}{#2}{rb}{ <-> s*[\fp_use:N \l_ltjpreset_scale_fp] 
-      {\bool_if:NT \l_ltjpreset_noembed_bool {psft:} #3
+      {\bool_if:NT \l_ltjpreset_noembed_bool {psft:} "#3"
       : jfm=\ltjpreset_use_jfm: ;-kern;\tl_use:N \l_ltjpreset_kanji_shape_tl ;+ruby
       ; script=kana}
     } {}
     \DeclareFontShape{JT3}{#1}{#2}{rb}{ <-> s*[\fp_use:N \l_ltjpreset_scale_fp] 
-      {\bool_if:NT \l_ltjpreset_noembed_bool {psft:} #3
+      {\bool_if:NT \l_ltjpreset_noembed_bool {psft:} "#3"
       : jfm=ujisv ;-kern;\tl_use:N \l_ltjpreset_kanji_shape_tl ;+ruby
       ; script=kana}
     } {}
@@ -426,8 +426,7 @@
 %% mg
  \newjfontfamily \mgfamily [
       BoldFont = \ltjpreset_font_mg:,
-      \tl_use:N \l_ltjpreset_add_features_tl
-      \bool_if:NT \l_ltjpreset_noembed_bool { , NoEmbed }, 
+      \bool_if:NT \l_ltjpreset_noembed_bool { NoEmbed,  }
       \tl_use:N \l_ltjpreset_add_features_tl 
     ] { \ltjpreset_font_mg: }
     \DeclareTextFontCommand{\textmg}{\mgfamily}
@@ -435,9 +434,8 @@
 %% 注意: ファミリは 'gteb'．シリーズは \mdseries のまま．
 %%       \bfseries を追加したほうが良い？
   \newjfontfamily \gtebfamily [
-      BoldFont = \ltjpreset_font_gt_eb:, 
-      \tl_use:N \l_ltjpreset_add_features_tl
-      \bool_if:NT \l_ltjpreset_noembed_bool { , NoEmbed }, 
+      BoldFont = \ltjpreset_font_gt_eb:,
+      \bool_if:NT \l_ltjpreset_noembed_bool { NoEmbed,  }
       \tl_use:N \l_ltjpreset_add_features_tl 
     ] { \ltjpreset_font_gt_eb: }
   \DeclareTextFontCommand{\textgteb}{\gtebfamily}
