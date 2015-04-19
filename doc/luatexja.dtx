@@ -29,19 +29,18 @@
 \usepackage[kozuka-pr6n]{luatexja-preset}
 \usepackage{unicode-math}
 \setmainfont[Ligatures=TeX]{Linux Libertine O}
-\setsansfont[Scale=0.95,Ligatures=TeX]{TeX Gyre Heros}
 \setmonofont[Scale=MatchLowercase, ItalicFont=lmmono10-italic.otf,
   BoldFont=lmmonolt10-bold.otf, BoldItalicFont=lmmonolt10-boldoblique.otf
 ]{lmmono10-regular.otf}
 \setmonojfont{KozGoPr6N-Regular.otf}
 \setmathfont[Scale=MatchLowercase]{xits-math.otf}
+\setsansfont[Scale=MatchLowercase,Ligatures=TeX]{Linux Biolinum O}
 %<*ja>
 \def\emph#1{\textbf{\textgt{#1}}}
 \def\headfont{\normalfont\bfseries\gtfamily}\normalsize
 %</ja>
-%<en>\frenchspacing
-
 %<*en>
+\frenchspacing
 \usepackage[margin=25mm,lmargin=30mm,rmargin=30mm,footskip=6mm]{geometry}
 \usepackage{luatexja-adjust}\ltjdisableadjust
 \parskip=\smallskipamount
@@ -157,7 +156,7 @@
   \vskip\belowcaptionskip}
 
 \def\_{\leavevmode \kern .06em\vbox {\hrule \@width .333em}}
-\def\cs#1{\texttt{\upshape\textbackslash #1}}
+\def\cs#1{\texttt{\upshape\textbackslash\ltjsetparameter{autoxspacing=false}#1}}
 
 %%%%%%%%
 \makeatother
@@ -326,7 +325,7 @@ For more detailed information, see Part~\ref{part-imp} or other sections of this
 \end{verbatim}
 %<*en> 
 Note that \pTeX\ adds new two useful units, namely \texttt{zw}~and~\texttt{zh}.
-As shown above, they are changed by \cs{zw}~and\cs{zh} respectively, in \LuaTeX-ja.
+As shown above, they are changed by \cs{zw}~and~\cs{zh} respectively, in \LuaTeX-ja.
 %</en>
 %<*ja>
 特に注意してほしいのは，\pTeX で追加された \texttt{zw} と \texttt{zh} という単位を
@@ -365,9 +364,9 @@ The insertion process of glues/kerns between two Japanese
 
 \begin{itemize}
 %<*en>
-\item As \LuaTeX's internal ligature handling is ``node-based''
+\item As \LuaTeX's internal ligature handling is \emph{node-based}
       (\textit{e.g.}, \verb+of{}fice+ doesn't prevent ligatures), the
-      insertion process of \textbf{JAglue} is now ``node-based''.
+      insertion process of \textbf{JAglue} is now \emph{node-based}.
 %</en>
 %<*ja>
 \item \LuaTeX の内部での合字の扱いは「ノード」を単位として行われるようになっている（例えば，
@@ -429,7 +428,7 @@ itself. ...
 なお，\LuaTeX 本体も，$\Omega$流の組方向をサポートしているが，それとは全くの別物であること
 に注意してほしい．
 \LuaTeX のコールバックや実装により，特に異なった組方向のボックスを扱う場合には
-\cs{wd}, \cs{ht}, \cs{dp}等の仕様が異なるので注意．詳細は第\ref{sec-direction}節を参照．
+\cs{wd}, \cs{ht}, \cs{dp}等の仕様が異なるので注意．詳細は第\ref{sec-direction}章を参照．
 %</ja>
 
 %<*en>
@@ -565,23 +564,23 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %<ja>\subsection{インストール}
 
 %<en>The following packages are needed for the \LuaTeX-ja\ package.
-%<ja>\LuaTeX-jaパッケージには，次のパッケージ類が必要である．
+%*ja>\LuaTeX-jaパッケージの動作には次のパッケージ類が必要である．
 \begin{itemize}
 \item \LuaTeX\ beta-0.80.0 (or later)
 \item \Pkg{luaotfload} v2.5 (or later)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
 \item \Pkg{everysel} (if you want to use \LuaTeX-ja with \LaTeXe)
-%<en>\item \emph{IPAex fonts}(\url{http://ipafont.ipa.go.jp/})
+%<en>\item \emph{IPAex fonts} (\url{http://ipafont.ipa.go.jp/})
 %<ja>\item \emph{IPAexフォント(\url{http://ipafont.ipa.go.jp/})}
 \end{itemize}
+%<en>In summary, this version of \LuaTeX-ja no longer supports \TeX~Live~2014 (or older version).
+%<*ja>
+要約すると，本バージョンの\LuaTeX-jaは\TeX~Live~2014以前では動作しない\footnote{%
+  もっとも，自分で\LuaTeX のバイナリをSubversionリポジトリからビルドしていれば話は別である．
+}．
+%</ja>
 
 %<*en>
-\emph{This version of \LuaTeX-ja no longer supports \TeX~Live~2013 (or older version).
-If you want to use this version with \TeX~Live~2014, you have to build a development
-version of \LuaTeX\ from its source.}
-
-\medskip
-
 Now \LuaTeX-ja is available from
 CTAN (in the \texttt{macros/luatex/generic/luatexja} directory), and
 the following distributions:
@@ -593,11 +592,6 @@ the following distributions:
 IPAex fonts are also available in these distributions.
 %</en>
 %<*ja>
-\emph{本バージョンの\LuaTeX-jaは\TeX~Live~2013以前では動作しない．\TeX~Live~2014で
-用いたい場合は，自力で\LuaTeX 開発版をソースからビルドする必要がある．}
-
-\medskip
-
 現在，\LuaTeX-jaはCTAN (\texttt{macros/luatex/generic/luatexja})に収録されている他，
 以下のディストリビューションにも収録されている：
   \begin{itemize}
@@ -694,9 +688,11 @@ $ lualatex ltjltxdoc.ins
 $ luatex   ltj-kinsoku_make.tex
 \end{lstlisting}
 %<*en>
-Note that \texttt{*.\{dtx,ins\}} and \texttt{ltj-kinsoku\_make.tex} are not needed in regular use.
+\emph{Do not forget The last line (processing \texttt{ltj-kinsoku\_make.tex})}.
+\texttt{*.\{dtx,ins\}} and \texttt{ltj-kinsoku\_make.tex} used here are not needed in regular use.
 %</en>
 %<*ja>
+\emph{最後の \texttt{ltj-kinsoku\_make.tex} の実行を忘れないように注意}．
 ここで使用した \texttt{*.\{dtx,ins\}} と \texttt{ltj-kinsoku\_make.tex} は
 通常の使用にあたっては必要ない．
 %</ja>
@@ -723,7 +719,7 @@ Note that \texttt{*.\{dtx,ins\}} and \texttt{ltj-kinsoku\_make.tex} are not need
 \item If \texttt{mktexlsr} is needed to update the file name database, make it so.
 %</en>
 %<*ja>
-\item 必要があれば，\texttt{mktexlsr}を実行する．
+\item 必要があれば，\texttt{mktexlsr} を実行する．
 %</ja>
 \end{enumerate}
 
@@ -758,7 +754,7 @@ IPA mj明朝などの大きいフォントを用いた場合には\LuaTeX より
 %</ja>
 \item%
 %<*en>
-\textbf{Note for MiK\TeX\ users}\quad
+\textbf{Outdated note for MiK\TeX\ users}\quad
 \LuaTeX-ja requires that several CMap files%
 \footnote{\texttt{UniJIS2004-UTF32-\{H,V\}} and \texttt{Adobe-Japan1-UCS2}.}
 must be found from \LuaTeX.
@@ -771,7 +767,7 @@ so you will encounter an error like the following:
 \LuaTeX-jaが動作するためには，\emph{導入・更新後の初回起動時に}
 \texttt{UniJIS2004-UTF32-\{H,V\}}, \texttt{Adobe-Japan1-UCS2}という3つのCMapが
 \LuaTeX によって見つけられることが必要である．
-しかしMiK\TeX ではそのようになっていないので，次のエラーが発生するだろう：
+しかしやや古いMiK\TeX ではそのようになっていないので，次のエラーが発生するだろう：
 %</ja>
 \begin{lstlisting}
 ! LuaTeX error ...iles (x86)/MiKTeX 2.9/tex/luatex/luatexja/ltj-rmlgbm.lua
@@ -813,7 +809,7 @@ run \LuaTeX-ja in this directory, and finally delete the temporary directory.
 \begin{tabular}{cccccc}
 \toprule
 \textbf{direction}&
-\textbf{classification}&\textbf{font name}&\bf `10\,pt'&\bf`7\,pt'&\bf`5\,pt'\\\midrule
+\textbf{classification}&\textbf{font name}&\bf ``10\,pt''&\bf``7\,pt''&\bf``5\,pt''\\\midrule
 \smash{\raisebox{-1ex}{\emph{yoko} (horizontal)}}&
 \emph{mincho}&IPAex Mincho&\cs{tenmin}&\cs{sevenmin}&\cs{fivemin}\\
 &\emph{gothic}&IPAex Gothic&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
@@ -830,7 +826,7 @@ run \LuaTeX-ja in this directory, and finally delete the temporary directory.
 \begin{center}\small
 \begin{tabular}{cccccc}
 \toprule
-\emph{組方向}&\emph{字体}&\emph{フォント名}&\bf `10\,pt'&\bf`7\,pt'&\bf`5\,pt'\\\midrule
+\emph{組方向}&\emph{字体}&\emph{フォント名}&\bf ``10\,pt''&\bf``7\,pt''&\bf``5\,pt''\\\midrule
 \smash{\raisebox{-1ex}{横組}}&
 明朝体&IPAex明朝&\cs{tenmin}&\cs{sevenmin}&\cs{fivemin}\\
 &ゴシック体&IPAexゴシック&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
@@ -1408,6 +1404,19 @@ before \Pkg{luatexja-preset}:
 \end{lstlisting}
 
 \item[nfssonly]
+%<*en>
+With this option,selecting Japanese fonts won't be performed using  the functionality of
+	     the \Pkg{fontspec} package, but only standard NFSS2.
+
+This option will be disabled when \Pkg{luatexja-fontspec} package is loaded.
+Note that the \Pkg{fontspec} can coexist with the option as the following:
+\begin{lstlisting}
+\usepackage{fontspec}
+\usepackage[hiragino-pron,nfssonly]{luatexja-preset}
+\end{lstlisting}
+Note that the functionality of the \Pkg{luatexja-fontspec} package, such as
+	     \cs{setmainjfont}, cannot be used in the example above.
+%</en>
 %<*ja>
 \LaTeX 標準のフォント選択機構(NFSS2)を用いて
 \texttt{ltjpm}（明朝），\texttt{ltjpg}（ゴシック），それに後に述べる \texttt{deluxe} オプ
@@ -1419,8 +1428,7 @@ before \Pkg{luatexja-preset}:
 \usepackage{fontspec}
 \usepackage[hiragino-pron,nfssonly]{luatexja-preset}
 \end{lstlisting}
-のように「和文側では\Pkg{fontspec}の機能は使わない，つまり\Pkg{luatexja-fontspec}は読み込
-	     まない」ことは可能である．一方，，
+のようにこのオプションを指定することは可能である．一方，
 パッケージ読み込み時に既に\Pkg{luatexja-fontspec}パッケージが読み込まれて
 	     いる場合は \texttt{nfssonly} オプションは無視される．
 %</ja>
@@ -1515,7 +1523,7 @@ In following tables, starred fonts (e.g.~KozGo\dots-Regular) are used for medium
 \texttt{morisawa-pro}, \texttt{morisawa-pr6n}以外はフォントの指定は
 （ファイル名でなく）フォント名で行われる．
 以下の表において，*\,つきのフォント(e,g,~KozGo\dots-Regular)は，\emph{\texttt{deluxe}オプション指定時に}
-ゴシック体細字として用いられるものを示している．
+ゴシック体中字として用いられるものを示している．
 %</ja>
 \begin{cslist}[style=standard]
  \item[kozuka-pro] Kozuka Pro (Adobe-Japan1-4) fonts.
@@ -1596,7 +1604,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \midrule
 %<en>\textit{rounded gothic}
 %<ja>\gt 丸ゴシック
-&&Hiragino~Maru~Gothic~ProN~W4&Hiragino~Maru~Gothic~ProN~W4\\
+&&Hiragino~Maru~Gothic~Pro~W4&Hiragino~Maru~Gothic~ProN~W4\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1662,8 +1670,8 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{center}
 
  \item[moga-mobo]  MogaMincho, MogaGothic, and MoboGothic.
-These fonts can be downloaded from
-\url{http://yozvox.web.fc2.com/82A882B782B782DF8374834883938367.html}.
+%<en>These fonts can be downloaded from\\\hfill \url{http://yozvox.web.fc2.com/}.
+%<ja>これらのフォントは \url{http://yozvox.web.fc2.com/} からダウンロードできる．
 
 \begin{center}\small
 \begin{tabular}{clll}
@@ -1902,11 +1910,11 @@ Ryumin-Light, GothicBBB-Mediumという名前の非埋込フォントを用い�
 %</ja>
 
 
-%<en>\section{Changing Parameters}
+%<en>\section{Changing Internal Parameters}
 %<ja>\section{パラメータの変更}
 
 %<*en>
-There are many parameters in \LuaTeX-ja. And due to the behavior of \LuaTeX,
+There are many internal parameters in \LuaTeX-ja. And due to the behavior of \LuaTeX,
 most of them are not stored as internal register of \TeX, but as an
 original storage system in \LuaTeX-ja. Hence, to assign or acquire those
 parameters, you have to use commands \cs{ltjsetparameter} and
@@ -2205,11 +2213,11 @@ The block list is indicated in Table~\ref{table-rng7}.
 \begin{itemize}
 %<*en>
 \item Glues/kerns specified in JFM. If \cs{inhibitglue} is issued
-      around a Japanese character, this glue will not be inserted at the
+      around a \textbf{JAchar}, this glue will not be inserted at the
       place.
 %</en>
 %<*ja>
-\item JFMで指定されたグルー／カーン．もし \cs{inhibitglue} が和文文字の周りで
+\item JFMで指定されたグルー／カーン．もし \cs{inhibitglue} が\textbf{JAchar}の周りで
       発行されていれば，このグルーは挿入されない．
 %</ja>
 %<*en>
@@ -4428,7 +4436,7 @@ The following is the list of imaginary characters:
 
 \item['jcharbdd']
 %<en>A boundary between \textbf{JAchar} and anything else (such as \textbf{ALchar}, kern, glue,\,\ldots).
-%<ja>和文文字と「その他のもの」（欧文文字，glue，kern等）との境界．
+%<ja>\textbf{JAchar}と「その他のもの」（欧文文字，glue，kern等）との境界．
 
 \item[$-1$]
 %<en>The left/right boundary of an inline math formula.
@@ -4648,7 +4656,7 @@ For $i\in\omega$, \texttt{char\_type[$i$]} is information of characters whose cl
  \item \texttt{align} is a number which is determined from \texttt{align}~field in the JFM:
 \[
  \begin{cases}
-  0&\text{\texttt{'left'} and the default value}\\0.5&\text{\tt 'middle'}\\1&\text{\tt 'right'}
+  0&\text{\texttt{'left'} (default)}\\0.5&\text{\tt 'middle'}\\1&\text{\tt 'right'}
  \end{cases}
 \]
 \item For $j\in \omega$, \texttt{[$j$]} stores a kern or a glue which will be inserted
@@ -4859,8 +4867,7 @@ of \LuaTeX, see Section~\ref{sec-para}.
 \cs{ltjsetparameter} and \cs{ltjglobalsetparameter} are commands
 for assigning parameters. These take one argument which is a
 \texttt{<key>=<value>} list.
-The difference between
-\cs{ltjsetparameter} and \cs{ltjglobalsetparameter} is only the
+The difference between these two commands is the
 scope of assignment;
 \cs{ltjsetparameter} does a local assignment and
 \cs{ltjglobalsetparameter} does a global one.
@@ -4869,9 +4876,7 @@ They also obey the value of \cs{globaldefs}, like other assignments.
 %<*ja>
 \cs{ltjsetparameter} と \cs{ltjglobalsetparameter} はパラメータを
 指定するための命令で，\texttt{<key>=<value>}のリストを
-引数としてとる．
-\cs{ltjsetparameter} と \cs{ltjglobalsetparameter} の違いはスコープの
-違いのみで，
+引数としてとる．両者の違いはスコープであり，
 \cs{ltjsetparameter} はローカルな設定を行うのに対し，
 \cs{ltjglobalsetparameter} はグローバルな設定を行う．
 また，他のパラメータ指定と同様に \cs{globaldefs} の値にも従う．
@@ -5000,7 +5005,7 @@ to prevent a line ends with this character.
 \item[\DParam{jaxspmode}\,=\{<chr\_code>,<mode>\}$^\ast$]\
 
 %<*en>
-Setting whether inserting \Param{xkanjiskip} is allowed before/after a \textbf{JAchar} whose character code is <chr\_code>.
+Set whether inserting \Param{xkanjiskip} is allowed before/after a \textbf{JAchar} whose character code is <chr\_code>.
 The followings are allowed for <mode>:
 %</en>
 %<*ja>
@@ -5028,7 +5033,7 @@ This parameter is similar to the \cs{inhibitxspcode} primitive of \pTeX, but not
 \item[\DParam{alxspmode}\,=\{<chr\_code>,<mode>\}$^\ast$] [\cs{xspcode}]\
 
 %<*en>
-Setting whether inserting \Param{xkanjiskip} is allowed before/after a
+Set whether inserting \Param{xkanjiskip} is allowed before/after a
 	     \textbf{ALchar} whose character code is <chr\_code>.
              The followings are allowed for <mode>:
 %</en>
@@ -5065,6 +5070,13 @@ Note that parameters \Param{jaxspmode} and \Param{alxspmode} share a common tabl
 しかし，自然長が \cs{maxdimen} の場合は，例外的に和文フォントのJFM側で指定されている
 値を採用（こちらはフォントサイズに比例）することになっている．
 %</ja>
+%<*en>
+The default glue which inserted between two \textbf{JAchar}s.
+Changing current Japanese font does not alter this parameter, as \pTeX.
+
+If the natural width of this parameter is \cs{maxdimen}, \LuaTeX-ja uses
+the value which is specified in the JFM for current Japanese font (See Subsection~\ref{ssec-jfm-str}).
+%</en>
 
 \item[\DParam{xkanjiskip}\,=<skip>$^\ast$] [\cs{xkanjiskip}]\
 
@@ -5073,6 +5085,14 @@ Note that parameters \Param{jaxspmode} and \Param{alxspmode} share a common tabl
 \Param{kanjiskip}と同じように，通常ではフォントサイズに比例して変わることはないが，
 自然長が \cs{maxdimen} の場合が例外である．
 %</ja>
+%<*en>
+The default glue which inserted between a \textbf{JAchar} and an
+      \textbf{ALchar}.
+Changing current font does not alter this parameter, as \pTeX.
+
+As \Param{kanjiskip}, if the natural width of this parameter is \cs{maxdimen}, \LuaTeX-ja uses
+the value which is specified in the JFM for current Japanese font (See Subsection~\ref{ssec-jfm-str}).
+%</en>
 
 
 \item[\DParam{differentjfm}\,=<mode>$^\dagger$]\
@@ -5997,14 +6017,14 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
 %</ja>
 
 \begin{figure}[!tb]
-\begin{LTXexample}
+\begin{LTXexample}[width=0.25\textwidth]
 \jfontspec[
-  YokoFeatures={Color=007F00},
-  TateFeatures={Color=00007F},
+  YokoFeatures={Color=007F00}, TateFeatures={Color=00007F},
   TateFont=KozGoPr6N-Regular
 ]{KozMinPr6N-Regular}
-\hbox{\yoko 横組のテスト}
-\hbox{\tate 縦組のテスト}
+\hbox{\yoko 横組のテスト}\hbox{\tate 縦組のテスト}
+\addjfontfeatures{Color=FF0000}
+\hbox{\yoko 横組}\hbox{\tate 縦組}
 \end{LTXexample}
 %<ja>\caption{\texttt{TateFeatures} 等の使用例}
 %<en>\caption{An example of \texttt{TateFeatures} etc.}
@@ -6013,16 +6033,26 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
 
 
 \item[TateFeatures=\{<features>\}\textrm{, }TateFont=<font>]
-%<en> ...
+%<*en>
+The \texttt{TateFeatures} key specifies font features which are only turned~on in
+vertical writing, such as \texttt{Style=VerticalKana}~(\texttt{vkna} feature). 
+Similarly, the \texttt{TateFont} key specifies the Japanese font which will be used only
+	     in vertical writing.
+A demonstrarion is shown in Figure~\ref{fig:yokotate-fontspec}.
+%</en>
 %<*ja>
 縦組において使用されるフォントや，縦組においてのみ適用されるfeature達を
 指定する．使用例は図\ref{fig:yokotate-fontspec}参照．
 %</ja>
 
 \item[YokoFeatures=\{<features>\}]
-%<en> ...
+%<*en>
+The \texttt{YokoFeatures} key specifies font features which are only turned~on in
+horizontal writing,.
+A demonstrarion is shown in Figure~\ref{fig:yokotate-fontspec}.
+%</en>
 %<*ja>
-横組においてのみ適用されるfeature達を
+同様に，横組においてのみ適用されるfeature達を
 指定する．使用例は図\ref{fig:yokotate-fontspec}参照．
 %</ja>
 
@@ -6110,6 +6140,12 @@ BoldFeatures = {
 On the other hand, \texttt{YokoFeatures}, \texttt{TateFeatures} and  \texttt{TateFont}
 keys can be specified in each list in the \texttt{AltFont} key. Also,
 one can specify \texttt{AltFont} inside \texttt{YokoFeatures},~\texttt{TateFeatures}.
+
+Note that features which are specified in \texttt{YokoFeatures}~and~\texttt{TateFeatures}
+are always interpreted \emph{after} other ``direction-independent'' features.
+This explains why \cs{addjfontfeatures} at~line~6 in~Figure~\ref{fig:yokotate-fontspec}
+has no effect, because a color specification is already done in
+\texttt{YokoFeatures}~and~\texttt{TateFeatures} keys.
 %</en>
 %<*ja>
 \paragraph{\texttt{AltFont}, \texttt{YokoFeatures}, \texttt{TateFeatures} 等の制限}
@@ -6138,6 +6174,12 @@ BoldFeatures = {
 \ \texttt{YokoFeatures},~\texttt{TateFeatures} 及び \texttt{TateFont} キーを
 指定することは可能であり．また\ \texttt{YokoFeatures},~\texttt{TateFeatures} キーの
 中身に \texttt{AltFont} を指定することができる．
+
+また，図\ref{fig:yokotate-fontspec}後半部では6行目の色の指定が効かず，
+2行目で指定した\ \texttt{YokoFeatures},~\texttt{TateFeatures}\ による色の指定が有効になっ
+たままである．これは\emph{\ \texttt{YokoFeatures},~\texttt{TateFeatures}\ によるfeature指定は
+組方向に依存しないfeature指定より後に解釈される}からである．
+
 %</ja>
 
 
@@ -6172,16 +6214,24 @@ but please remind remarks below.
 %</en>
 %<*ja>
 文字コードが（16進で）<hex\_number>の文字を出力する．
-このコマンドは \verb+\char"+<hex\_number>と似ているが，下の記述に注意すること．%"
+このコマンドは \verb+\char"+<hex\_number>と似ているが，下の注意を参照すること．%"
 %</ja>
 \end{cslist}
 
 %<*ja>
-このパッケージは，\texttt{ajmacros.sty}（\Pkg{otf}パッケージ付属のマクロ集，井上浩一氏作）から
-漢字コードをUTF8にしたり，plain \LuaTeX でも利用可能にするという
-修正を加えた \texttt{luatexja-ajmacros.sty} も自動的に読み込む．
-そのため，\texttt{ajmacros.sty} マクロ集にある \verb+\aj半角+ などのマクロもそのまま使用可能である．
+このパッケージは，マクロ集 \texttt{luatexja-ajmacros.sty}\footnote{\Pkg{otf}パッケージ付属の井上浩一氏によるマクロ集
+\texttt{ajmacros.sty} に対して
+漢字コードをUTF-8にしたり，plain \LuaTeX でも利用可能にするという
+修正を加えたものである．}\ も自動的に読み込む．
+\texttt{luatexja-ajmacros.sty} は，
+そのため，\Pkg{luatexja-otf} を読みこめば \texttt{ajmacros.sty} マクロ集にある \cs{aj半角} などのマクロもそのまま使うことができる．
 %</ja>
+%<*en>
+This package automatically loads \texttt{luatexja-ajmacros.sty}, which is slightly
+modified version of \texttt{ajmacros.sty}\footnote{Useful macros by iNOUE Koich!, for the
+\Pkg{japanese-otf} package.}.
+Hence one can use macros which sre defined in \texttt{ajmacros.sty}, such as~\cs{aj半角}.
+%</en>
 
 %<en>\paragraph{Remarks}
 %<ja>\paragraph{注意}
@@ -6611,7 +6661,7 @@ This commands typeset <contents> in LR-mode, in <dir> direction.
 If <width> is positive, the width of the box becomes this <width>.
 In this case, <contents> will be aligned \dots
 
-\item[picture\textrm{environment}]
+\item[picture\textrm{\ environment}]
 
 \item[\cs{rensuji}{[<pos>]}\{<contents>\}\textrm{, }\cs{rensujiskip}]
 
@@ -6723,10 +6773,11 @@ The font index of current Japanese font for vertical direction.
 
 \attr{ltj@charclass}
 %<*en>
-The character class of Japanese \textit{glyph\_node}.
+The character class of a \textbf{JAchar}. This attribute is only set on a
+			 \textit{glyph\_node} which contains a \textbf{JAchar}.
 %</en>
 %<*ja>
-和文文字の\textit{glyph\_node}の文字クラス．
+\textbf{JAchar}の文字クラス．\textbf{JAchar}が格納された\textit{glyph\_node}でのみ使われる．
 %</ja>
 
 \attr{ltj@yablshift}
@@ -7210,7 +7261,7 @@ as in \Pkg{luatexja-adjust}.
 
 %<*en>
 \paragraph{Setting parameters}
-Figure~\ref{fig:setpar-def} shows the ``most outer'' definition of
+Figure~\ref{fig:setpar-def} shows the \emph{most outer} definition of
 two commands,
 \cs{ltjsetparameter} and \cs{ltjglobalsetparameter}.
 Most important part is the last \cs{setkeys},
@@ -7550,7 +7601,7 @@ emits a space.
 \texttt{lstlisting}系環境などの日本語対応マクロを書かなくてすませるためのものである．
 
 しかしながら，\pTeX と完全に同じ挙動が実現できたわけではない．
-次のように，和文文字の範囲を変更したちょうどその行においては挙動が異なる：
+次のように，\textbf{JAchar}の範囲を変更したちょうどその行においては挙動が異なる：
 \begin{LTXexample}
 \fontspec[Ligatures=TeX]{TeX Gyre Termes}
 \ltjsetparameter{autoxspacing=false}
@@ -7558,7 +7609,7 @@ emits a space.
 y\ltjsetparameter{jacharrange={+6}}zい
 u
 \end{LTXexample}
-上ソース中の「あ」は欧文文字扱いであり．
+上ソース中の「あ」は\textbf{ALchar}（欧文扱い）であり．
 ここで使用している欧文フォント\TeX\ Gyre Termesは「あ」を含まない．
 よって，出力に「あ」は現れないことは不思議ではない．
 それでも，\pTeX とまったく同じ挙動を示すならば，出力は
@@ -7566,14 +7617,14 @@ u
 上のように異なる挙動となっているが，それは以下の理由による：
 \begin{itemize}
 \item 3行目を \texttt{process\_input\_buffer} で処理する時点では，
-      「あ」は和文文字扱いである．よって3行目は和文文字で終わることになり，
+      「あ」は\textbf{JAchar}（和文扱い）である．よって3行目は\textbf{JAchar}で終わることになり，
       コメント文字 \texttt{U+FFFFF} が追加される．
       よって，直後の改行文字は無視されることになり，空白は入らない．
 \item 4行目を \texttt{process\_input\_buffer} で処理する時点では，
-      「い」は欧文文字扱いである．よって4行目は欧文文字で終わることになり，
+      「い」は\textbf{ALchar}である．よって4行目は\textbf{ALchar}で終わることになり，
       直後の改行文字は空白に置き換わる．
 \end{itemize}
-このため，トラブルを避けるために，和文文字の範囲を\cs{ltjsetparameter}で編集した場合，
+このため，トラブルを避けるために，\textbf{JAchar}の範囲を\cs{ltjsetparameter}で編集した場合，
 その行はそこで改行するようにした方がいいだろう．
 %</ja>
 
@@ -7738,11 +7789,11 @@ $\mathit{Np}.\mathit{id}$の意味を述べるとともに，
 説明用に準備した概念であって，実際のLuaコード中にそのように書かれているわけではないことに注意．
 
 \begin{description}
-\item[\textit{id\_jglyph}] 和文文字．\\
-$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$は，その和文文字を表している
+\item[\textit{id\_jglyph}] \textbf{JAchar}（和文文字）．\\
+$\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$は，その\textbf{JAchar}を表している
 \textit{glyph\_node}そのものである．
-\item[\textit{id\_glyph}] 和文文字を表していない\textit{glyph\_node}~$p$．\\
-多くの場合，$p$は欧文文字を格納しているが，「ffi」などの合字によって作られた
+\item[\textit{id\_glyph}] \textbf{JAchar}（和文文字）以外のものを表す\textit{glyph\_node}~$p$．\\
+多くの場合，$p$は\textbf{ALchar}（欧文文字）を格納しているが，「ffi」などの合字によって作られた
 \textit{glyph\_node}である可能性もある．
 前者の場合，$\mathit{Np}.\mathit{head}$,~$\mathit{Np}.\mathit{tail} = p$である．
 一方，後者の場合，
@@ -7794,15 +7845,15 @@ $\mathit{Np}.\mathit{head}$, $\mathit{Np}.\mathit{tail}$の算出は，
 空白等の実際の挿入を行うことは前に書いたが，ここでの説明では，問題にしているクラスタ\textit{Np}は「後ろ側」のクラスタである
 とする．「前側」のクラスタについては，以下の説明で\textit{head}が\textit{last}に置き換わることに注意すること．
 \begin{description}
-\item[和文A] リスト中に直接出現している和文文字．
+\item[和文A] リスト中に直接出現している\textbf{JAchar}．
 \textit{id}が\textit{id\_jglyph}であるか，\\
 \textit{id}が\textit{id\_pbox}であって$\mathit{Np}.\mathit{head}$が\textbf{JAchar}であるとき．
 
-\item[和文B] リスト中のhboxの中身の先頭として出現した和文文字．和文Aとの違いは，これの前に
+\item[和文B] リスト中のhboxの中身の先頭として出現した\textbf{JAchar}．和文Aとの違いは，これの前に
 JFMグルーの挿入が行われない（\Param{xkanjiskip},~\Param{kanjiskip}は入り得る）ことである．\\
 \textit{id}が\textit{id\_hlist}か\textit{id\_disc}であって$\mathit{Np}.\mathit{head}$が\textbf{JAchar}であるとき．
 
-\item[欧文] リスト中に直接／hboxの中身として出現している欧文文字．次の3つの場合が該当：
+\item[欧文] リスト中に直接／hboxの中身として出現している「\textbf{JAchar}以外の文字」．次の3つの場合が該当：
 \begin{itemize}
 \item \textit{id}が\textit{id\_glyph}である．
 \item \textit{id}が\textit{id\_math}である．
@@ -7850,7 +7901,7 @@ $g$は「文字コード \texttt{'boxbdd'} の文字」と\textit{Np}の間に�
 一方．前者（段落）の場合は，リストの末尾は常に \cs{penalty10000} と，
 \cs{parfillskip} 由来のグルーが存在する．%よって，最後のクラスタ\textit{Np}は
 %この \cs{parfillskip} 由来のグルーとなり，実質的な中身の最後はその1つ前のクラスタ\textit{Nq}となる．
-段落の最後の「通常の和文文字${}+{}$句点」が独立した行となるのを防ぐために，
+段落の最後の「通常の\textbf{JAchar}${}+{}$句点」が独立した行となるのを防ぐために，
 \Param{jcharwidowpenalty}の値の分だけ適切な場所のペナルティを増やす．
 
 ペナルティ量を増やす場所は，\textit{head}が\textbf{JAchar}であり，
@@ -7885,7 +7936,7 @@ $g$は「文字コード \texttt{'boxbdd'} の文字」と\textit{Np}の間に�
 この場合が全ての場合の基本となる．
 
 \paragraph{「右空白」の算出}
-まず，「右空白」にあたる量を算出する．通常はこれが，隣り合った2つの和文文字間に入る空白量となる．
+まず，「右空白」にあたる量を算出する．通常はこれが，隣り合った2つの\textbf{JAchar}間に入る空白量となる．
 \begin{description}
 \item[JFM由来{[M]}] JFMの文字クラス指定によって入る空白を以下によって求める．この段階で空白量が未定義（未指定）だった場合，
       デフォルト値\Param{kanjiskip}を採用することとなるので，次へ．
@@ -7964,14 +8015,14 @@ $q$と$r$の間は（実フォントが同じなのに）\texttt{jfmvar} キー�
 \item[\Param{kanjiskip}~{[K]}] 上の[M]において空白が定まらなかった場合，
 以下で定めた量「右空白」として採用する．
 この段階においては，\cs{inhibitglue} は効力を持たないため，
-結果として，2つの和文文字間には常に何らかのグルー／カーンが挿入されることとなる．
+結果として，2つの\textbf{JAchar}間には常に何らかのグルー／カーンが挿入されることとなる．
 \begin{enumerate}
 \item 両クラスタ（厳密には$\mathit{Nq}.\mathit{tail}$，$\mathit{Np}.\mathit{head}$）の中身の文字コードに対する
 \Param{autospacing}パラメタが両方ともfalseだった場合は，長さ0のglueとする．
 \item ユーザ側から見た\Param{kanjiskip}パラメタの自然長が$\cs{maxdimen}=(2^{30}-1)\,{\rm sp}$で
 なければ，\Param{kanjiskip}パラメタの値を持つglueを採用する．
 \item 2.でない場合は，\textit{Nq}, \textit{Np}で使われているJFMに指定されている\Param{kanjiskip}の値を用いる．
-どちらか片方のクラスタだけが和文文字（\textsf{和文A}・\textsf{和文B}）のときは，そちらのクラスタで使われている
+どちらか片方のクラスタだけが\textbf{JAchar}（\textsf{和文A}・\textsf{和文B}）のときは，そちらのクラスタで使われている
 JFM由来の値だけを用いる．もし両者で使われているJFMが異なった場合は，上の[M]~3.と同様の方法を用いて調整する．
 \end{enumerate}
 \end{description}
@@ -8093,7 +8144,7 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 \item 禁則用ペナルティも，以前述べた\textsf{P-normal~[PN]}と同じである．
 \end{itemize}
 \begin{description}
-\item[Boundary-B~{[\OB]}] 和文文字と「和文でないもの」との間に入る空白を以下によって求め，
+\item[Boundary-B~{[\OB]}] \textbf{JAchar}と「\textbf{JAchar}でないもの」との間に入る空白を以下によって求め，
 未定義でなければそれを「右空白」として採用する．
 \textsf{JFM-origin~[M]}の変種と考えて良い．
 これによって定まる空白の典型例は，和文の閉じ括弧と欧文文字の間に入る半角アキである．
@@ -8133,7 +8184,7 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 \item 禁則用ペナルティは，以前述べた\textsf{P-normal~[PN]}と同じである．
 \end{itemize}
 \begin{description}
-\item[Boundary-A~{[\OA]}] 「和文でないもの」と和文文字との間に入る空白を以下によって求め，
+\item[Boundary-A~{[\OA]}] 「\textbf{JAchar}でないもの」と\textbf{JAchar}との間に入る空白を以下によって求め，
 未定義でなければそれを「右空白」として採用する．
 \textsf{JFM-origin~[M]}の変種と考えて良い．
 これによって定まる空白の典型例は，欧文文字と和文の開き括弧との間に入る半角アキである．
@@ -8218,7 +8269,7 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 
 \paragraph{和文Aと和文Bの違い}
 先に述べたように，\textsf{和文B}はhboxの中身の先頭（or 末尾）として出現している
-和文文字である．リスト内に直接ノードとして現れている和文文字（\textsf{和文A}）との違いは，
+\textbf{JAchar}である．リスト内に直接ノードとして現れている\textbf{JAchar}（\textsf{和文A}）との違いは，
 \begin{itemize}
 \item \textsf{和文B}に対しては，JFMの文字クラス指定から定まる空白
 \textsf{JFM-origin~[M]}，\textsf{Boundary-A~[\OA]}，\textsf{Boundary-B~[\OB]}）の挿入は行われない．
@@ -8310,7 +8361,7 @@ $h = \max(\texttt{height} + \texttt{yoffset}, 0)$, $d=\texttt{depth}$.
 \end{itemize}
 という状況で組んだ場合を例にとって説明しよう．
 
-\LuaTeX・\Pkg{luaotfload}によるカーニング・ハイフネーションが終わった段階では，
+\LuaTeX・\Pkg{luaotfload}によるカーニング・ハイフネーションが終わった段階では，……
 
 
 
@@ -8777,7 +8828,7 @@ JFM中にある文字クラス$n$の定義の
  \item \Param{kanjiskip}
 \end{enumerate}
 \begin{enumerate}
- \item 行末の和文文字を移動したことで$\textit{total}=0$となれば，
+ \item 行末の\textbf{JAchar}を移動したことで$\textit{total}=0$となれば，
 調整の必要はなく，行が格納されているhboxの
 \texttt{glue\_set}, \texttt{glue\_sign}, \texttt{glue\_order}を再計算すればよい．
 以降，$\textit{total}\neq 0$と仮定する．
@@ -9153,7 +9204,7 @@ direction whatsitはあくまでも組方向処理のための補助的なノー
 \[
  \xymatrix{
    {}\Node{glyph}{`平'}\ar[r]&{}\Node{glyph}{`成'}\ar[r]&
-   {}\HNode{hlist}{10.00003}{3.02779}{0.0}\ar[r]\ar[d]^{\text{中身}}&{}\Node{glyph}{`年'}\\
+   {}\HNode{hbox}{10.00003}{3.02779}{0.0}\ar[r]\ar[d]^{\text{中身}}&{}\Node{glyph}{`年'}\\
    &&{}\Node{whatsit}{\cs{tate}}\ar[r]&{}\Node{glyph}{`2'}\ar[r]&{}\Node{glyph}{`6'}
  }
 \]
@@ -9167,10 +9218,10 @@ direction whatsitはあくまでも組方向処理のための補助的なノー
   &{}\textcolor{blue}{\Node{penalty}{0}}
     \ar`r[d] `[l] `[ddll] `[dl] [dl]
   \\
-  &&{}\textcolor{red}{\HNode{hlist}{3.02779}{10.00003}{0.0}}\ar[r]\ar[d]^{\text{中身}}
+  &&{}\textcolor{red}{\HNode{\textit{dir\_box} (\cs{yoko})}{3.02779}{10.00003}{0.0}}\ar[r]\ar[d]^{\text{中身}}
   &{}\textcolor{blue}{\Node{penalty}{0}}\ar[r]
   &{}\Node{glyph}{`年'}\\
-  &&{}\HNode{\textit{dir\_box} (\cs{yoko})}{10.00003}{3.02779}{0.0}\ar[d]^{\text{中身}}\\
+  &&{}\HNode{hbox}{10.00003}{3.02779}{0.0}\ar[d]^{\text{中身}}\\
   &&{}\Node{whatsit}{\cs{tate}}\ar[r]&{}\Node{glyph}{`2'}\ar[r]&{}\Node{glyph}{`6'}
  }
 \]
@@ -9284,7 +9335,7 @@ direction~whatsit内部のノードリストに，\textit{dir\_box}として格�
    {}\Node{whatsit}{\cs{dtou}}\ar[r]&
    {}\Node{glyph}{`a'}\ar[r]&
    {}\textcolor{red}{\HNode{\textit{dir\_box} (\cs{dtou})}{20.0}{9.0}{0.0}}\ar[d]_{\text{中身}}\\
-   &&{}\HNode{hlist}{9.0}{5.0}{2.0}\ar[d]_{\text{中身}}\\
+   &&{}\HNode{hbox}{9.0}{5.0}{2.0}\ar[d]_{\text{中身}}\\
    &&{}\Node{whatsit}{\cs{yoko}}\ar[r]&{}\Node{rule}{}
  }
 \]
