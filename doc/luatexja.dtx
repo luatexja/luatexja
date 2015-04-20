@@ -570,6 +570,7 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 \item \Pkg{luaotfload} v2.5 (or later)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
 \item \Pkg{everysel} (if you want to use \LuaTeX-ja with \LaTeXe)
+\item \Pkg{fontspec} v2.4
 %<en>\item \emph{IPAex fonts} (\url{http://ipafont.ipa.go.jp/})
 %<ja>\item \emph{IPAexフォント(\url{http://ipafont.ipa.go.jp/})}
 \end{itemize}
@@ -1134,7 +1135,7 @@ auto select&\cs{fontencoding}&\cs{fontfamily}&---&---&\cs{usefont}\\
       \verb+\fontencoding{+<encoding>\verb+}+ changes the encoding of alphabetic fonts
       or Japanese fonts depending on the argument. For example,
       \verb+\fontencoding{JY3}+ changes the encoding of Japanese fonts to
-      \texttt{JY3},and \verb+\fontencoding{T1}+ changes the encoding of
+      \texttt{JY3}, and \verb+\fontencoding{T1}+ changes the encoding of
       alphabetic fonts to \texttt{T1}.
       \cs{fontfamily} also changes the current Japanese font family,
       the current alphabetic font family, \emph{or both}.
@@ -2436,18 +2437,20 @@ xyz漢字
 
 %<*en>
 Note that setting positive \Param{yalbaselineshift}~or~\Param{talbaselineshift}
-parameters does not increase the depth of one-letter ``syllable'' $p$ of \textbf{Alchar}, if
+parameters does not increase the depth of one-letter \emph{syllable} $p$ of \textbf{Alchar}, if
 its left-protrusion~(\cs{lpcode}) and right-protrusion~(\cs{rpcode}) are both non-zero.
 This is because
 \begin{itemize}
-\item These two parameters are implemented by setting yoffset field of a
+\item These two parameters are implemented by setting \texttt{yoffset} field of a
 glyph node, and this does not increase the depth of the glyph.
 \item To cope with the above situation, \LuaTeX-ja automatically supplies
-a rule in every ``syllable''.
-\item However, we cannot use this ``supplying a rule'' method if \dots
+a rule in every syllable.
+\item However, we cannot use this ``supplying a rule'' method if a syllable comprises just
+      one letter whose \cs{lpcode}~and~\cs{rpcode} are both non-zero.
 \end{itemize}
 
-This problem does not apply for \Param{yjabaselineshift}~nor~\Param{tjabaselineshift}.
+This problem does not apply for \Param{yjabaselineshift}~nor~\Param{tjabaselineshift},
+becuse a \emph{JAchar} is encapsulated by a horizontal box if needed.
 %</en>
 %<*ja>
 なお，以下の場合には1文字の\textbf{ALchar}からなる「音節」の深さは増加しないことに注意．
@@ -2456,6 +2459,7 @@ This problem does not apply for \Param{yjabaselineshift}~nor~\Param{tjabaselines
  \item 「音節」を構成する唯一の文字$p$の
 左余白への突出量(\cs{lpcode})，右余白への突出量(\cs{rpcode})がどちらも非零である．
 \end{itemize}
+\emph{JAchar}は必要に応じて1文字ずつボックスにカプセル化されるため，
 \Param{yjabaselineshift},~\Param{tjabaselineshift}パラメータについてはこのような問題は起こらない．
 %</ja>
 
@@ -2639,7 +2643,7 @@ and \LuaTeX-ja can control these four kinds separately:
 \begin{itemize}
  \item
 \emph{Distinction between \textbf{JAchar} or \textbf{ALchar}}
-is controlled by using the character range, see Subsection~\ref{ssec-setrange}.
+is controlled by the character range, see Subsection~\ref{ssec-setrange}.
  \item
 \emph{Whether the character can be used in a control word}
 is controlled by setting \cs{catcode} to 11~(enabled) or 12~(disabled), as usual.
@@ -2647,7 +2651,7 @@ is controlled by setting \cs{catcode} to 11~(enabled) or 12~(disabled), as usual
 \emph{Whether \Param{jcharwidowpenalty} can be inserted before the character}
 is controlled by the lowermost bit of the \Param{kcatcode} parameter.
  \item
-\emph{Ignoring linebreak after a \textbf{JAchar}} is always ignored.
+\emph{Linebreak after a \textbf{JAchar}} does not produce a space.
 \end{itemize}
 %</en>
 %<*ja>
@@ -2661,25 +2665,26 @@ is controlled by the lowermost bit of the \Param{kcatcode} parameter.
 \LuaTeX 自身の \cs{catcode} でよい
  \item[\Param{jcharwidowpenalty}が挿入可か]
 \Param{kcatcode}パラメータの最下位ビット
- \item[直後の改行の無視]
-日本語しか想定していないので\textbf{JAchar}については一律有効
+ \item[直後の改行]
+日本語しか想定していないので，\textbf{JAchar}直後の改行で半角スペースが挿入されることはない．
 \end{description}
 %</ja>
 
 %<*en>
-Default setting of \cs{catcode} of \LuaTeX\ can be found
-in \texttt{luatex-unicode-letters.tex},
-which is based on \texttt{unicode-letters.tex} (for \XeTeX).
+Default setting of \cs{catcode} of Unicode characters are located in
+\begin{description}
+ \item[plain \LuaTeX] \texttt{luatex-unicode-letters.tex}, which is based on \texttt{unicode-letters.tex}
+(for \XeTeX).
+ \item[\LuaLaTeX] now included in \LaTeX\ kernel  as~\texttt{unicode-letters.def}.
+\end{description}
 However, the default setting of \cs{catcode} differs
 between \XeTeX\ and \LuaTeX, by the following reasons:
 \begin{itemize}
- \item \texttt{luatex-unicode-letters.tex} is based on old \texttt{unicode-letters.tex}.
- \item The latter half of \texttt{unicode-letters.tex} sets
-\cs{catcode} of Kanji and kana characters to 11,
-via setting \cs{XeTeXcharclass}.
+ \item (plain format) \texttt{luatex-unicode-letters.tex} is based on old \texttt{unicode-letters.tex}.
+ \item The latter half of \texttt{unicode-letters.tex}~and~\texttt{unicode-letters.def}
+sets\cs{catcode} of Kanji and kana characters to 11, via setting \cs{XeTeXcharclass}.
 
-However, this latter half is simply omitted in
-\texttt{luatex-unicode-letters.tex}, hence
+However, this latter half does not exist (plain case), or not executed (\LaTeX~case) in \LuaTeX, hence
 \cs{catcode} of Kanji and kana characters remains 12 in \LuaTeX.
 \end{itemize}
 In other words, Kanji nor kana characters cannot be used in
@@ -2694,21 +2699,25 @@ for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 %<*ja>
 ネイティブにUnicode全部の文字を扱える\XeTeX や\LuaTeX では，
 文字が制御綴内で使用できるかは通常の欧文文字と同じく \cs{catcode}
-で指定することとなる．\XeTeX における \cs{catcode} の初期設定は\
-\texttt{unicode-letters.tex} 中に記述されており，\LuaTeX ではそれを
+で指定することとなる．plain \XeTeX における \cs{catcode} の初期設定は\
+\texttt{unicode-letters.tex} 中に記述されており，plain \LuaTeX ではそれを
 元にした \texttt{luatex-unicode-letters.tex} を用いている．
+\LaTeX では \cs{catcode} の設定はカーネルに \texttt{unicode-letters.def} として統合され．
+このファイルを\XeLaTeX, \LuaLaTeX の両方が用いている．
+
 
 だが，\XeTeX における \cs{catcode} の初期設定と
 \LuaTeX におけるそれは一致していない：
 \begin{itemize}
  \item \texttt{luatex-unicode-letters.tex} の元になった\
 \texttt{unicode-letters.tex} が古い
- \item \texttt{unicode-letters.tex} の後半部では
+ \item \texttt{unicode-letters.tex} 後半部や \texttt{unicode-letters.def} 後半部では
 \cs{XeTeXcharclass} の設定を行なっており，
 それによって漢字や仮名の \cs{catcode} が11に設定されている．
 
 しかし，\texttt{luatex-unicode-letters.tex} ではこの「後半部」が
-まるごと省略されており，漢字や仮名の \cs{catcode} は12のまま．
+まるごと省略されており，また\LuaLaTeX でも \texttt{unicode-letters.def} 後半部は実行されな
+       い．従って漢字や仮名の \cs{catcode} は12のままになっている．
 \end{itemize}
 言い換えると，\LuaTeX の初期状態では漢字や仮名を制御綴内に
 使用することはできない．
@@ -2788,8 +2797,6 @@ which can be used in a control word differ in \pTeX, in \upTeX,~and~in \LuaTeX-j
 Table~\ref{table-kcat-diff} shows the difference.
 Except for four characters ``・'',~``゛'', ``゜'',~``゠'',
 \LuaTeX-ja admits more characters in a control word than \upTeX.
-\emph{Note that the ideographic space~\texttt{U+3000} can be used
-in a control word in \LuaTeX-ja.}
 
 Difference becomes larger, if we consider
 non-kanji JIS~X~0213 characters.
@@ -3216,7 +3223,7 @@ The following is an example.
 
  \item[\cs{ltjsetwd}<num>=<dimen>\textrm{, }\cs{ltjsetht}<num>=<dimen>\textrm{, }%
   \cs{ltjsetdp}<num>=<dimen>]
-These commands set the dimension of \cs{box<num>}. Unlike \cs{ltjgetwd}, one does not need
+These commands set the dimension of \cs{box<num>}. One does not need
 	to group the argument <num>; four calls of \cs{ltjsetwd} below have the same meaning.
 \begin{lstlisting}
 \ltjsetwd42 20pt,  \ltjsetwd42=20pt,  \ltjsetwd=42 20pt,  \ltjsetwd=42=20pt
@@ -3289,7 +3296,7 @@ These commands set the dimension of \cs{box<num>}. Unlike \cs{ltjgetwd}, one doe
 %<*en>
 \subsection{Getting current direction}
 The \Param{direction} parameter returns the current direction, and
-the \Param{boxdir} parameter (with the argumant <num>)
+the \Param{boxdir} parameter (with the argument <num>)
 returns the direction of a box register \cs{box}<num>.
 The returned value of these parameters are a \emph{string}:
 \begin{center}
@@ -5690,18 +5697,18 @@ but on the other hand \cs{zw}~and~\cs{zh} are specified by JFM.
 \item[\cs{DeclareTateKanjiEncoding}\{<encoding>\}\{<text-settings>\}\{<math-settings>\}]
 
 %<*en>
-In NFSS2 under \LuaTeX-ja, distinction between alphabetic font families
-	     and Japanese font families are only made by their
-	     encodings. For example, encodings OT1 and T1 are for
-	     alphabetic font families, and a Japanese font family cannot
+In NFSS2 under \LuaTeX-ja, distinction between alphabetic fonts
+	     and Japanese fonts are only made by their
+	     encodings. For example, encodings OT1 and T1 are encodings for
+	     alphabetic fonts, and Japanese fonts cannot
 	     have these encodings. These command define a new encoding
 	     scheme for Japanese font families.
 %</en>
 %<*ja>
-\LuaTeX-jaのNFSS2においては，欧文フォントファミリと和文フォントファミリは
+\LuaTeX-jaのNFSS2においては，欧文フォントと和文フォントは
 そのエンコーディングによってのみ区別される．
-例えば，OT1とT1のエンコーディングは欧文フォントファミリに対するものであり，
-和文フォントファミリはこれらのエンコーディングを持つことはできない．
+例えば，OT1とT1のエンコーディングは欧文フォントのエンコーディングであり，
+和文フォントはこれらのエンコーディングを持つことはできない．
 これらコマンドは横組用・縦組用和文フォントのための新しいエンコーディングを
 それぞれ定義する．
 %</ja>
@@ -5718,7 +5725,7 @@ In NFSS2 under \LuaTeX-ja, distinction between alphabetic font families
 The above 3~commands are just the counterparts for \cs{DeclareFontEncodingDefaults} and~others.
 %</en>
 %<*ja>
-上記3つのコマンドはちょうど \cs{DeclareFontEncodingDefaults} などに対応するものである．
+上記3つのコマンドはちょうどNFSS2 の \cs{DeclareFontEncodingDefaults} などに対応するものである．
 %</ja>
 
 \item[\cs{reDeclareMathAlphabet}\{<unified-cmd>\}\{<al-cmd>\}\{<ja-cmd>\}]
@@ -5750,12 +5757,12 @@ The above 3~commands are just the counterparts for \cs{DeclareFontEncodingDefaul
 \item[\cs{DeclareRelationFont}\{<ja-encoding>\}\{<ja-family>\}\{<ja-series>\}\{<ja-shape>\}\\*
   \null\hfill\{<al-encoding>\}\{<al-family>\}\{<al-series>\}\{<al-shape>\}]
 %<*en>
-This command sets the ``accompanied'' alphabetic font family (given by the latter 4~arguments)
-with respect to a Japanese font family given by the former 4~arguments.
+This command sets the ``accompanied'' alphabetic font (given by the latter 4~arguments)
+with respect to a Japanese font given by the former 4~arguments.
 %</en>
 %<*ja>
-いわゆる「従属欧文」を設定するための命令である．前半の4引数で表される和文フォントファミリに対して，
-そのフォントに対応する「従属欧文」のフォントファミリを後半の4引数により与える．
+いわゆる「従属欧文」を設定するための命令である．前半の4引数で表される和文フォントに対して，
+そのフォントに対応する「従属欧文」のフォントを後半の4引数により与える．
 %</ja>
 \item[\cs{SetRelationFont}]
 %<*en>
@@ -5778,7 +5785,7 @@ Like \cs{fontfamily}, \cs{selectfont} is required to take an effect.
 %<*ja>
 現在の欧文フォントのエンコーディング／ファミリ／…… を，
 \cs{DeclareRelationFont} か \cs{SetRelationFont} で指定された
-現在の和文フォントファミリに対応する「従属欧文」フォントファミリに変更する．
+現在の和文フォントに対応する「従属欧文」フォントに変更する．
 \cs{fontfamily} のように，有効にするためには \cs{selectfont} が必要である．
 %</ja>
 
@@ -5792,7 +5799,8 @@ to match the vertical center of ``M'' and that of ``あ''  in vertical typesetti
   + d_{\text{あ}} - d_{\text{M}},
 \]
 where $h_{a}$~and~$d_{a}$ denote the height of ``$a$'' and the depth, respectively.
-In \LuaTeX-ja, this \cs{adjustbaseline} does same task.
+In \LuaTeX-ja, this \cs{adjustbaseline} does same task, namely setting the
+	     \Param{talbaselineshift} parameter.
 %</en>
 %<*ja>
 \pLaTeXe では，\cs{adjustbaseline} は縦組時に「M」と「あ」の中心線を一致させるために，
@@ -5803,7 +5811,11 @@ In \LuaTeX-ja, this \cs{adjustbaseline} does same task.
   + d_{\text{あ}} - d_{\text{M}},
 \]
 ここで，$h_{a}$,~$d_{a}$はそれぞれ「$a$」の高さ・深さを表す．
-\LuaTeX-jaにおいても\cs{adjustbaseline} は同様の処理を行っている．
+\LuaTeX-jaにおいても\cs{adjustbaseline} は同様に\Param{talbaselineshift}パラメータの調整処
+	     理を行っている．
+
+同時に，これも\pLaTeXe の \cs{adjustbaseline} で行われていたが，
+「漢」の寸法を元に，（本節の最初に述べた，小文字で始まる）\cs{cht}, \cs{cwd} といった長さ変数を設定する．
 %</ja>
 
 \item[\cs{fontfamily}\{<family>\}]
@@ -5970,9 +5982,8 @@ the following ``font features'' specifications are allowed for
 the commands of Japanese version:
 %</en>
 %<*ja>
-\ref{ssec-fontspec}節で述べたように，この追加パッケージは\Pkg{fontspec}
+\ref{ssec-fontspec}節で述べたように，この追加パッケージは\Pkg{fontspec}%
 パッケージで定義されているコマンドに対応する和文フォント用のコマンドを提供する．
-\emph{以下に述べる和文版の命令の説明は \Pkg{fontspec}~v2.4 使用時にのみ当てはまる．}
 
 \Pkg{fontspec}パッケージで指定可能な各種font featureに加えて，和文版のコマンドには
 以下の``font feature''を指定することができる：
