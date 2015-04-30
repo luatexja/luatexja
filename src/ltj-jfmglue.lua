@@ -382,9 +382,12 @@ local function calc_np_aux_glyph_common(lp)
 	 local npn = Np.nuc
 	 Np.last_char = npn
 	 if r then
+	    print(getfield(r, 'depth'))
 	    local nf, nc = getfont(npn), getchar(npn)
 	    local ct = (font.getfont(nf) or font.fonts[nf] ).characters[nc]
-	    if (ct.left_protruding or 0) == 0 then
+	    if not ct then -- variation selector
+	       node_free(r)
+	    elseif (ct.left_protruding or 0) == 0 then
 	       head = insert_before(head, npn, r)
 	       Np.first = (Np.first==npn) and r or npn
 	    elseif (ct.right_protruding or 0) == 0 then
