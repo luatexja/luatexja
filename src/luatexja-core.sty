@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2015/02/22 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2015/05/03 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -196,23 +196,23 @@
 \fi                             %</LaTeX>
 
 %%%%%%%% \asluastring
-\def\asluastring#1{'\luaescapestring{\detokenize{#1}}'}
+\def\asluastring#1{'\luatexluaescapestring{\detokenize{#1}}'}
 
 %%%%%%%% Redefine \/
 \protected\def\/{\relax\directlua{luatexja.jfont.append_italic()}}
 
 %%%%%%%% \jfont\CS={...:...;jfm=metric;...}, \globaljfont
-\protected\def\jfont{%
-  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false, 'yoko')}}
-\protected\def\globaljfont{%
-  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true,  'yoko')}}
+\protected\def\jfont#1{%
+  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false, 'yoko','\luatexluaescapestring{\noexpand#1}')}}
+\protected\def\globaljfont#1{%
+  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true,  'yoko','\luatexluaescapestring{\noexpand#1}')}}
 \def\ltj@@jfont{\directlua{luatexja.jfont.jfontdefY()}}
 
 %%%%%%%% \tfont\CS={...:...;jfm=metric;...}, \globaltfont
-\protected\def\tfont{%
-  \afterassignment\ltj@@tfont\directlua{luatexja.jfont.jfontdefX(false, 'tate')}}
-\protected\def\globaltfont{%
-  \afterassignment\ltj@@tfont\directlua{luatexja.jfont.jfontdefX(true,  'tate')}}
+\protected\def\tfont#1{%
+  \afterassignment\ltj@@tfont\directlua{luatexja.jfont.jfontdefX(false, 'tate','\luatexluaescapestring{\noexpand#1}')}}
+\protected\def\globaltfont#1{%
+  \afterassignment\ltj@@tfont\directlua{luatexja.jfont.jfontdefX(true,  'tate','\luatexluaescapestring{\noexpand#1}')}}
 \def\ltj@@tfont{\directlua{luatexja.jfont.jfontdefY()}}
 
 %%%%%%%% \zw, \zh

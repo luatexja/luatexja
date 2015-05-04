@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2015/02/08',
+  date = '2015/05/03',
   description = 'Loader for Japanese fonts',
 })
 module('luatexja.jfont', package.seeall)
@@ -38,7 +38,7 @@ local id_glue_spec = node.id('glue_spec')
 local id_glue = node.id('glue')
 local cat_lp = luatexbase.catcodetables['latex-package']
 local FROM_JFM     = luatexja.icflag_table.FROM_JFM
-
+local tokenlib = luatexja.token
 ------------------------------------------------------------------------
 -- LOADING JFM
 ------------------------------------------------------------------------
@@ -242,12 +242,14 @@ do
    end
 
 -- EXT
-   function jfontdefX(g, dir)
+   local utf8 = unicode.utf8
+   function jfontdefX(g, dir, csname)
       jfm_dir, is_def_jfont = dir, true
-      local t = token.get_next()
-      cstemp=token.csname_name(t)
+      cstemp = csname:sub( (utf8.byte(csname,1,1) == tex.escapechar) and 2 or 1, -1)
+      cstemp = cstemp:sub(1, ((cstemp:sub(-1,-1)==' ') and (cstemp:len()>=2)) and -2 or -1)
       global_flag = g and '\\global' or ''
-      tex.sprint(cat_lp, '\\expandafter\\font\\csname ', cstemp, '\\endcsname')
+      tex.sprint(cat_lp, '\\expandafter\\font\\csname ', 
+		 (cstemp==' ') and '\\space' or cstemp, '\\endcsname')
    end
 
    luatexbase.create_callback("luatexja.define_jfont", "data", function (ft, fn) return ft end)
@@ -263,7 +265,8 @@ do
 			    "bad JFM `" .. jfm_file_name .. "'",
 			    'The JFM file you specified is not valid JFM file.\n'..
 			       'So defining Japanese font is cancelled.')
-	 tex.sprint(cat_lp, global_flag, '\\expandafter\\let\\csname ', cstemp,
+	 tex.sprint(cat_lp, global_flag, '\\expandafter\\let\\csname ', 
+		    (cstemp==' ') and '\\space' or cstemp,
 		       '\\endcsname=\\relax')
 	 return
       end
@@ -282,7 +285,7 @@ do
       fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
       font_metric_table[fn]=fmtable
       tex.sprint(cat_lp, global_flag, '\\protected\\expandafter\\def\\csname ',
-		    cstemp , '\\endcsname{\\ltj@cur'..
+		    (cstemp==' ') and '\\space' or cstemp, '\\endcsname{\\ltj@cur'..
 		    (jfm_dir == 'yoko' and 'j' or 't') .. 'fnt', fn, '\\relax}')
    end
 end

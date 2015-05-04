@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2015/02/07',
+  date = '2015/05/03',
   description = 'Insertion process of JFM glues and kanjiskip',
 })
 module('luatexja.jfmglue', package.seeall)
@@ -382,7 +382,6 @@ local function calc_np_aux_glyph_common(lp)
 	 local npn = Np.nuc
 	 Np.last_char = npn
 	 if r then
-	    print(getfield(r, 'depth'))
 	    local nf, nc = getfont(npn), getchar(npn)
 	    local ct = (font.getfont(nf) or font.fonts[nf] ).characters[nc]
 	    if not ct then -- variation selector
