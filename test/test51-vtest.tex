@@ -211,7 +211,7 @@
 \vfill\eject
 
 \vbox{\tate\hsize100mm
-\tfont\f=KozMinPr6N-Regular.otf:-vert;jfm=ujisv \f
+\tfont\f=KozMinPr6N-Regular.otf:jfm=ujisv \f
 
 \ltjsetparameter{yalbaselineshift=.25em}\baselineskip15pt\parindent\zw
 \LaTeX の特徴として、テキストファイルであるソースコードを入力として処理することでDVIや
@@ -248,18 +248,18 @@ PDFなどの表示形式を出力として得ることが挙げられる。
   \tate\ltjsetparameter{talbaselineshift=0pt}Htp}
 縦ボックス\hbox{\vrule\copy12288\vrule}寸法\quad
 \vbox{\hsize=80pt\yoko\noindent
-  WD: \the\ltjgetwd{12288}, \\HT: \the\ltjgetht{12288}, \\DP: \the\ltjgetdp{12288}%
+  WD: \the\ltjgetwd12288, \\HT: \the\ltjgetht12288, \\DP: \the\ltjgetdp12288%
 }
 \vbox{\hsize=80pt\tate\noindent
-  WD: \the\ltjgetwd{12288}, \\HT: \the\ltjgetht{12288}, \\DP: \the\ltjgetdp{12288}%
+  WD: \the\ltjgetwd12288, \\HT: \the\ltjgetht12288, \\DP: \the\ltjgetdp12288%
 }
 \ltjsetwd12288=100pt
 \setbox0=\hbox{\tate\ltjsetht12288=10pt}
 \vbox{\hsize=80pt\yoko\noindent
-  WD: \the\ltjgetwd{12288}, \\HT: \the\ltjgetht{12288}, \\DP: \the\ltjgetdp{12288}%
+  WD: \the\ltjgetwd12288, \\HT: \the\ltjgetht12288, \\DP: \the\ltjgetdp12288%
 }
 \vbox{\hsize=80pt\tate\noindent
-  WD: \the\ltjgetwd{12288}, \\HT: \the\ltjgetht{12288}, \\DP: \the\ltjgetdp{12288}%
+  WD: \the\ltjgetwd12288, \\HT: \the\ltjgetht12288, \\DP: \the\ltjgetdp12288%
 }
 
 
@@ -268,21 +268,21 @@ PDFなどの表示形式を出力として得ることが挙げられる。
   \yoko\ltjsetparameter{yalbaselineshift=0pt}Htp}
 横ボックス\hbox{\vrule\copy12288\vrule}寸法\quad
 \vbox{\hsize=80pt\yoko\noindent
-  WD: \the\ltjgetwd{12288}, \\HT: \the\ltjgetht{12288}, \\DP: \the\ltjgetdp{12288}%
+  WD: \the\ltjgetwd12288, \\HT: \the\ltjgetht12288, \\DP: \the\ltjgetdp12288%
 }
 \vbox{\hsize=80pt\tate\noindent
-  WD: \the\ltjgetwd{12288}, \\HT: \the\ltjgetht{12288}, \\DP: \the\ltjgetdp{12288}%
+  WD: \the\ltjgetwd12288, \\HT: \the\ltjgetht12288, \\DP: \the\ltjgetdp12288%
 }
 \ltjsetwd12288=100pt
 \setbox0=\hbox{\tate\ltjsetht12288=10pt}
 \vbox{\hsize=80pt\yoko\noindent
-  WD: \the\ltjgetwd{12288}, \\HT: \the\ltjgetht{12288}, \\DP: \the\ltjgetdp{12288}%
+  WD: \the\ltjgetwd12288, \\HT: \the\ltjgetht12288, \\DP: \the\ltjgetdp12288%
 }
 \vbox{\hsize=80pt\tate\noindent
-  WD: \the\ltjgetwd{12288}, \\HT: \the\ltjgetht{12288}, \\DP: \the\ltjgetdp{12288}%
+  WD: \the\ltjgetwd12288, \\HT: \the\ltjgetht12288, \\DP: \the\ltjgetdp12288%
 }
 
-dimexpr でも使えるかな？\the \dimexpr2\ltjgetwd{`　}+\ltjgetwd{200}+1pt\relax
+dimexpr でも使えるかな？\the \dimexpr2\ltjgetwd`　+\ltjgetwd200+1pt\relax
 
 \vfill\eject
 

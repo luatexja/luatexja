@@ -761,6 +761,8 @@ do
    luatexja.direction.get_box_dim = get_box_dim
 
    -- return value: (changed dimen of box itself?)
+   local scan_dimen, scan_int = luatexja.token.scan_dimen, luatexja.token.scan_int
+   local scan_keyword = luatexja.token.scan_keyword
    local function set_box_dim_common(key, s, l_dir)
       local s_dir, wh = get_box_dir(s, dir_yoko)
       s_dir = s_dir%dir_math_mod
@@ -781,10 +783,10 @@ do
             setfield(db, 'next', dnh)
             setfield(wh, 'value',to_node(db))
          end
-         setfield(db, key, tex.getdimen('ltj@tempdima'))
+         setfield(db, key, scan_dimen())
 	 return false
       else
-         setfield(s, key, tex.getdimen('ltj@tempdima'))
+         setfield(s, key, scan_dimen())
 	 if wh then
 	    -- change dimension of dir_nodes which are created "automatically"
 	       local bw, bh, bd
@@ -803,8 +805,7 @@ do
       end
    end
    local function set_box_dim(key)
-      local n = tex_getcount('ltj@tempcnta')
-      local s = getbox(n)
+      local s = getbox(scan_int()); scan_keyword('=')
       if s then
 	 local l_dir = (get_dir_count())%dir_math_mod
 	 s = to_direct(s)
@@ -813,7 +814,7 @@ do
             set_box_dim_common(key, s, l_dir)
 	 elseif b_dir%dir_math_mod == l_dir then
 	    -- s is dir_node
-	    setfield(s, key, tex.getdimen('ltj@tempdima'))
+	    setfield(s, key, scan_dimen())
 	    if b_dir<dir_node_manual then
 	       set_attr(s, attr_dir, b_dir%dir_node_auto + dir_node_manual)
 	    end

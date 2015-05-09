@@ -18,12 +18,12 @@
 %% 引数：ルビ全角を単位とした実数
 %% この文字への pre-, post-intrusion の許容量
 \define@key[ltj]{japaram}{rubypreintrusion}{%
-  \expandafter\ltj@@set@stack@real#1:{RIPRE}{0}{0x7FFFFFFF}}
+  \ltj@@set@stack@real{RIPRE}{0}{0x7FFFFFFF}#1 }
 \define@key[ltj]{japaram}{rubypostintrusion}{%
-  \expandafter\ltj@@set@stack@real#1:{RIPOST}{0}{0x7FFFFFFF}}
-\def\ltj@@set@stack@real#1,#2:#3#4#5{%
-  \directlua{luatexja.stack.set_stack_perchar(luatexja.stack_table_index.#3,
-    \ltj@safe@num@or\ltj@defnum{#1},\ltj@safe@real{#2},#4,#5)}}
+  \ltj@@set@stack@real{RIPOST}{0}{0x7FFFFFFF}#1 }
+\def\ltj@@set@stack@real#1#2#3{%
+  \directlua{luatexja.stack.set_stack_perchar(luatexja.stack_table_index.#1,
+    #2, #3, luatexja.token.scan_word)}}
 
 % ルビ用のキー設定
 \def\ltj@@rkeydef#1{

@@ -107,8 +107,7 @@
   \directlua{luatexja.compat.to_kansuji(luatexja.token.scan_int())}%
 }
 
-\define@key[ltj]{japaram}{kansujichar}{%
-  \expandafter\ltj@@set@stack#1:{KSJ}{0}{0x7FFFFFFF}}
+\define@key[ltj]{japaram}{kansujichar}{\ltj@@set@stack{KSJ}{0}{0x7FFFFFFF}#1 }
 
 \ltjsetparameter{kansujichar={0,`〇}}
 \ltjsetparameter{kansujichar={1,`一}}

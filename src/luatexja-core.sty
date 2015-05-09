@@ -263,15 +263,14 @@
 \setbox\z@\box\voidb@x
 
 % prebreakpenalty = {<char_code>, <penalty>}
-\define@key[ltj]{japaram}{kcatcode}{%
-  \expandafter\ltj@@set@stack#1:{KCAT}{0}{0x7FFFFFFF}}
-\define@key[ltj]{japaram}{prebreakpenalty}{%
-  \expandafter\ltj@@set@stack#1:{PRE}{-10000}{10000}}
-\define@key[ltj]{japaram}{postbreakpenalty}{%
-  \expandafter\ltj@@set@stack#1:{POST}{-10000}{10000}}
-\def\ltj@@set@stack#1,#2:#3#4#5{%
-  \directlua{luatexja.stack.set_stack_perchar(luatexja.stack_table_index.#3,
-    \ltj@safe@num@or{nil}{#1},\ltj@safe@num@or{nil}{#2},#4,#5)}}
+\define@key[ltj]{japaram}{kcatcode}{\ltj@@set@stack{KCAT}{0}{0x7FFFFFFF}#1 }
+\define@key[ltj]{japaram}{prebreakpenalty}{\ltj@@set@stack{PRE}{-10000}{10000}#1}
+\define@key[ltj]{japaram}{postbreakpenalty}{\ltj@@set@stack{POST}{-10000}{10000}#1 }
+\def\ltj@@set@stack#1#2#3{%
+  \directlua{luatexja.stack.set_stack_perchar(luatexja.stack_table_index.#1,#2,#3)}}
+%\def\ltj@@set@stack#1,#2:#3#4#5{%
+%  \directlua{luatexja.stack.set_stack_perchar(luatexja.stack_table_index.#3,
+%    \ltj@safe@num@or{nil}{#1},\ltj@safe@num@or{nil}{#2},#4,#5)}}
 
 % jatextfont = {<char_code>, <font_cs>}
 % only horizontal font is supported
@@ -322,25 +321,13 @@
   \def\ltj@tempa{preonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{1}\fi
   \def\ltj@tempa{postonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{2}\fi
   \def\ltj@tempa{allow}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{3}\fi
-  \directlua{luatexja.stack.set_stack_perchar(luatexja.stack_table_index.XSP,
-    \ltj@safe@num@or{nil}{#1},
-    \ltj@safe@num@or{nil}{\ltj@temp},0,3)}}
-
+  \ltj@@set@stack{XSP}03#1 \ltj@temp}
 
 % alxspmode = {<char_code>, <mode>}
 % mode: inhibit, preonly, postonly, allow
 %    or       0        1         2      3
 \define@key[ltj]{japaram}{alxspmode}{%        \inhibitxspcode
-  \expandafter\ltj@set@alxspmode#1:\relax}
-\def\ltj@set@alxspmode#1,#2:{%
-  \lowercase{\edef\ltj@temp{#2}}%
-  \def\ltj@tempa{inhibit}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{0}\fi
-  \def\ltj@tempa{preonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{1}\fi
-  \def\ltj@tempa{postonly}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{2}\fi
-  \def\ltj@tempa{allow}\ifx\ltj@temp\ltj@tempa\def\ltj@temp{3}\fi
-  \directlua{luatexja.stack.set_stack_perchar(luatexja.stack_table_index.XSP,
-    \ltj@safe@num@or{nil}{#1},
-    \ltj@safe@num@or{nil}{\ltj@temp},0,3)}}
+  \expandafter\ltj@set@jaxspmode#1:\relax}% same code as jaxspmode
 
 % autospacing = <bool> (default: true)
 \define@boolkey[ltj]{japaram}{autospacing}[true]{%
@@ -359,8 +346,8 @@
   \fi}
 
 % [x]]kanjiskip = <skip>
-  \define@key[ltj]{japaram}{kanjiskip}{\ltjsetkanjiskip #1}
-  \define@key[ltj]{japaram}{xkanjiskip}{\ltjsetxkanjiskip #1}
+  \define@key[ltj]{japaram}{kanjiskip}{\ltjsetkanjiskip#1}
+  \define@key[ltj]{japaram}{xkanjiskip}{\ltjsetxkanjiskip#1}
   \protected\def\ltjsetkanjiskip{%                  % SKIP
     \directlua{%
       local d = luatexja.token.scan_glue()
@@ -374,7 +361,7 @@
 
 % jcharwidowpenalty = <count>
 \define@key[ltj]{japaram}{jcharwidowpenalty}{%      %COUNT
-  \ltj@@set@stack0,#1:{JWP}{-10000}{10000}}
+  \ltj@@set@stack{JWP}{-10000}{10000}\z@#1 }
 
 % differentjfm = { large | small | average | pleft | pright | paverage | both}
 \define@choicekey*+[ltj]{japaram}{differentjfm}[\ltj@temp\ltj@tempr]%
@@ -471,18 +458,16 @@
     \csname ltj@kcat6\endcsname="7FFFFFFF }%"
 
 \protected\def\ltjjachar{\afterassignment\ltj@@jachar\ltj@tempcnta}
-\def\ltj@@jachar{{\directlua{tex.globaldefs = 0}\ltj@alljachar\ltj@@origchar\ltj@tempcnta}}
+\def\ltj@@jachar{{\directlua{tex.globaldefs=0}\ltj@alljachar\ltj@@origchar\ltj@tempcnta}}
 \protected\def\ltjalchar{\afterassignment\ltj@@alchar\ltj@tempcnta}
-\def\ltj@@alchar{{\directlua{tex.globaldefs = 0}\ltj@allalchar\ltj@@origchar\ltj@tempcnta}}
+\def\ltj@@alchar{{\directlua{tex.globaldefs=0}\ltj@allalchar\ltj@@origchar\ltj@tempcnta}}
 
 %%%%%%%% \ltjsetmathletter<number>, \ltjunsetmathletter<number>
 \protected\def\ltjsetmathletter#1{%
-  \ltj@tempcnta=#1
-  \directlua{luatexja.math.is_math_letters[\the\ltj@tempcnta]=true}%
+  \directlua{luatexja.math.is_math_letters[luatexja.token.scan_int()]=true}#1 %
 }
 \protected\def\ltjunsetmathletter#1{%
-  \ltj@tempcnta=#1
-  \directlua{luatexja.math.is_math_letters[\the\ltj@tempcnta]=false}%
+  \directlua{luatexja.math.is_math_letters[luatexja.token.scan_int()]=false}#1 %
 }
 
 %%%%%%%% \ltjdeclarealtfont<base_font_cs><alt_font_cs>{100-200,3000-,5000,...}
@@ -677,24 +662,9 @@
 \let\ltjgetwd=\ltj@@getwd\let\ltjgetht=\ltj@@getht\let\ltjgetdp=\ltj@@getdp
 
 %%%%%%%% \ltjsetwd<box_num>=<dimen> etc.
-\protected\def\ltjsetwd{\begingroup
-  \ltj@reset@globaldefs\afterassignment\ltj@@setwd@a\ltj@tempcnta}
-\def\ltj@@setwd@a{\afterassignment\ltj@@setwd@b\ltj@tempdima}
-\def\ltj@@setwd@b{%
-  \directlua{luatexja.direction.set_box_dim('width')}%
-  \ltj@restore@globaldefs\endgroup}
-\protected\def\ltjsetht{\begingroup
-  \ltj@reset@globaldefs\afterassignment\ltj@@setht@a\ltj@tempcnta}
-\def\ltj@@setht@a{\afterassignment\ltj@@setht@b\ltj@tempdima}
-\def\ltj@@setht@b{%
-  \directlua{luatexja.direction.set_box_dim('height')}%
-  \ltj@restore@globaldefs\endgroup}
-\protected\def\ltjsetdp{\begingroup
-  \ltj@reset@globaldefs\afterassignment\ltj@@setdp@a\ltj@tempcnta}
-\def\ltj@@setdp@a{\afterassignment\ltj@@setdp@b\ltj@tempdima}
-\def\ltj@@setdp@b{%
-  \directlua{luatexja.direction.set_box_dim('depth')}%
-  \ltj@restore@globaldefs\endgroup}
+\protected\def\ltjsetwd{\directlua{luatexja.direction.set_box_dim('width')}}
+\protected\def\ltjsetht{\directlua{luatexja.direction.set_box_dim('height')}}
+\protected\def\ltjsetdp{\directlua{luatexja.direction.set_box_dim('depth')}}
 
 %%------------------ Load module for the format
 

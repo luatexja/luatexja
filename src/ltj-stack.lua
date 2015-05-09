@@ -20,6 +20,7 @@ local sid_user = node.subtype('user_defined')
 local STCK = luatexja.userid_table.STCK
 local fastcopy = table.fastcopy
 local setcount = tex.setcount
+local scan_int, scan_keyword = luatexja.token.scan_int, luatexja.token.scan_keyword
 hmode = 0 -- dummy
 
 charprop_stack_table={};
@@ -62,8 +63,11 @@ end
 local set_stack_table = set_stack_table
 
 -- EXT
-function set_stack_perchar(m,c,p,lb,ub)
-   if type(p)~='number' or p<lb or p>ub then
+function set_stack_perchar(m,lb,ub, getter)
+   local c = scan_int()
+   scan_keyword(',')
+   local p = tonumber((getter or scan_int)())
+   if p<lb or p>ub then
       ltjb.package_error('luatexja',
 			 "invalid code (".. tostring(p) .. ")",
 			 "The code should in the range "..tostring(lb) .. '..' ..
