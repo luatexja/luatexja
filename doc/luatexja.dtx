@@ -418,13 +418,13 @@ The insertion process of glues/kerns between two Japanese
 
 %<*en>
 \paragraph{Directions}
-From this version, \LuaTeX-ja supports vertical writing;
+From version~20150420.0, \LuaTeX-ja supports vertical writing;
 but this feature must \emph{not} be confused with $\Omega$-style direction support of \LuaTeX\
 itself. ...
 %</en>
 %<*ja>
 \paragraph{組方向}
-本版からは，不安定ながらも\LuaTeX-ja における縦組みをサポートしている．
+20150420.0版からは，不安定ながらも\LuaTeX-ja における縦組みをサポートしている．
 なお，\LuaTeX 本体も，$\Omega$流の組方向をサポートしているが，それとは全くの別物であること
 に注意してほしい．
 \LuaTeX のコールバックや実装により，特に異なった組方向のボックスを扱う場合には
@@ -743,6 +743,20 @@ For changes from \pTeX, see Subsection~\ref{ssec:chgptex}.
       従来日本語の文字コードとして用いられてきたEUC-JPやShift-JISは使用できない．
 %</ja>
 %<*en>
+\item By default, \LuaTeX-ja uses Japanese fonts to typeset Greek and Cyrillic letters,
+      and some Unicode symbols such as \P~and~\S. To change this behavior, 
+      put \lstinline!\ltjsetparameter{jacharrange={-2,-3,-8}}! in the preamble.
+      For the detailed description, see Subsection~\ref{ssec-setrange}.
+%</en>
+%<*ja>
+\item 
+標準では，\LuaTeX-jaはギリシャ文字やキリル文字，それに\P や\S などの記号を和文フォントを使っ
+      て組む．ギリシャ語などを本格的に組むなどこの状況が望ましくない場合，
+      プリアンブルに \lstinline!\ltjsetparameter{jacharrange={-2,-3,-8}}! を入れると
+      上記種類の文字は欧文フォントを用いて組まれるようになる．
+      詳しい説明は\ref{ssec-setrange}節を参照してほしい．
+%</ja>
+%<*en>
 \item \LuaTeX-ja is very slower than \pTeX.
 Generally speaking, LuaJIT\TeX\ processes \LuaTeX-ja
 about 30\% faster than \LuaTeX, but not always.
@@ -753,9 +767,10 @@ about 30\% faster than \LuaTeX, but not always.
 LuaJIT\TeX を用いると\LuaTeX のだいたい1.3倍の速度で動くようであるが，
 IPA mj明朝などの大きいフォントを用いた場合には\LuaTeX よりも遅くなることもある．
 %</ja>
+
 \item%
 %<*en>
-\textbf{Outdated note for MiK\TeX\ users}\quad
+\textbf{(Outdated) note for MiK\TeX\ users}\quad
 \LuaTeX-ja requires that several CMap files%
 \footnote{\texttt{UniJIS2004-UTF32-\{H,V\}} and \texttt{Adobe-Japan1-UCS2}.}
 must be found from \LuaTeX.
@@ -768,7 +783,7 @@ so you will encounter an error like the following:
 \LuaTeX-jaが動作するためには，\emph{導入・更新後の初回起動時に}
 \texttt{UniJIS2004-UTF32-\{H,V\}}, \texttt{Adobe-Japan1-UCS2}という3つのCMapが
 \LuaTeX によって見つけられることが必要である．
-しかしやや古いMiK\TeX ではそのようになっていないので，次のエラーが発生するだろう：
+しかし古いバージョンのMiK\TeX ではそのようになっていないので，次のエラーが発生するだろう：
 %</ja>
 \begin{lstlisting}
 ! LuaTeX error ...iles (x86)/MiKTeX 2.9/tex/luatex/luatexja/ltj-rmlgbm.lua
@@ -779,7 +794,8 @@ bad argument #1 to 'open' (string expected, got nil)
 If so, please execute a batch file which is written on
 \href{https://osdn.jp/projects/luatex-ja/wiki/FrontPage%28en%29}{ the Project Wiki (English)}.
 This batch file creates a temporary directory, copy CMaps in it,
-run \LuaTeX-ja in this directory, and finally delete the temporary directory.
+run a test file which loads \LuaTeX-ja in this directory, 
+and finally delete the temporary directory.
 %</en>
 %<*ja>
 そのような場合には，
@@ -1928,8 +1944,8 @@ parameters, you have to use commands \cs{ltjsetparameter} and
 用いる．
 %</ja>
 
-%<en>\subsection{Editing the Range of \textbf{JAchar}s}
-%<ja>\subsection{\textbf{JAchar}の範囲の設定}
+%<en>\subsection{Range of \textbf{JAchar}s}
+%<ja>\subsection{\textbf{JAchar}の範囲}
 \label{ssec-setrange}
 
 %<*en>
