@@ -124,6 +124,7 @@ end
 
 -- mode: true iff this function is called from hpack_filter
 local ltjs_report_stack_level = ltjs.report_stack_level
+local ltjf_vert_form_table    = ltjf.vert_form_table
 local function set_box_stack_level(head, mode)
    local box_set, cl = 0, tex.currentgrouplevel + 1
    for _,p  in pairs(wt) do
@@ -138,7 +139,10 @@ local function set_box_stack_level(head, mode)
          if (has_attr(p, attr_icflag) or 0)<=0 and getfield(p, 'lang')==lang_ja then
             local pfn = has_attr(p, attr_curtfnt) or getfont(p)
             local pc = ltjs_orig_char_table[p]
-	    setfield(p, 'font', ltjf_replace_altfont(pfn, pc))
+	    local nf = ltjf_replace_altfont(pfn, pc)
+	    setfield(p, 'font', nf)
+	    pc = ltjf_vert_form_table [getchar(p)]
+	    if font.getfont(nf).characters[pc] then setfield(p, 'char', pc) end
 	 end
       end
    end
