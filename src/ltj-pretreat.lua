@@ -125,6 +125,7 @@ end
 -- mode: true iff this function is called from hpack_filter
 local ltjs_report_stack_level = ltjs.report_stack_level
 local ltjf_vert_form_table    = ltjf.vert_form_table
+local ltjf_font_metric_table  = ltjf.font_metric_table
 local function set_box_stack_level(head, mode)
    local box_set, cl = 0, tex.currentgrouplevel + 1
    for _,p  in pairs(wt) do
@@ -141,8 +142,10 @@ local function set_box_stack_level(head, mode)
             local pc = ltjs_orig_char_table[p]
 	    local nf = ltjf_replace_altfont(pfn, pc)
 	    setfield(p, 'font', nf)
-	    pc = ltjf_vert_form_table [getchar(p)]
-	    if font.getfont(nf).characters[pc] then setfield(p, 'char', pc) end
+	    if ltjf_font_metric_table[nf].vert_activated then
+	       pc = ltjf_vert_form_table [getchar(p)]
+	       if font.getfont(nf).characters[pc] then setfield(p, 'char', pc) end
+	    end
 	 end
       end
    end

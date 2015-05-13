@@ -50,7 +50,7 @@ luatexbase.create_callback("luatexja.load_jfm", "data", function (ft, jn) return
 
 local jfm_file_name, jfm_var
 local defjfm_res
-local jfm_dir, is_def_jfont
+local jfm_dir, is_def_jfont, is_vert_enabled
 
 function define_jfm(t)
    local real_char -- Does current character class have the 'real' character?
@@ -280,6 +280,7 @@ do
 			chars = sz.chars, char_type = sz.char_type,
 			kanjiskip = sz.kanjiskip, xkanjiskip = sz.xkanjiskip,
                         chars_cbcache = {},
+			vert_activated = is_vert_enabled,
       }
 
       fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
@@ -350,9 +351,12 @@ do
 	 end
       end
       if jfm_dir == 'tate' then
+	 is_vert_enabled = (not name:match('-vert')) and (not  name:match('-vrt2'))
          if not name:match('vert') and not name:match('vrt2') then
             name = name .. ';vert;vrt2'
          end
+      else
+	 is_vert_enabled = nil
       end
       return name
    end
