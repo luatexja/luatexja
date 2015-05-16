@@ -263,9 +263,9 @@
 \setbox\z@\box\voidb@x
 
 % prebreakpenalty = {<char_code>, <penalty>}
-\define@key[ltj]{japaram}{kcatcode}{\ltj@@set@stack{KCAT}{0}{0x7FFFFFFF}#1 }
-\define@key[ltj]{japaram}{prebreakpenalty}{\ltj@@set@stack{PRE}{-10000}{10000}#1}
-\define@key[ltj]{japaram}{postbreakpenalty}{\ltj@@set@stack{POST}{-10000}{10000}#1 }
+\define@key[ltj]{japaram}{kcatcode}{\ltj@@set@stack{KCAT}{0}{0x7FFFFFFF}#1\relax}
+\define@key[ltj]{japaram}{prebreakpenalty}{\ltj@@set@stack{PRE}{-10000}{10000}#1\relax}
+\define@key[ltj]{japaram}{postbreakpenalty}{\ltj@@set@stack{POST}{-10000}{10000}#1\relax}
 \def\ltj@@set@stack#1#2#3{%
   \directlua{luatexja.stack.set_stack_perchar(luatexja.stack_table_index.#1,#2,#3)}}
 %\def\ltj@@set@stack#1,#2:#3#4#5{%
@@ -299,16 +299,16 @@
 % yjabaselineshift = <dimen>
 \define@key[ltj]{japaram}{yalbaselineshift}{%
   \directlua{tex.setattribute(luatexja.isglobal,
-    luatexbase.attributes['ltj@yablshift'], luatexja.token.scan_dimen())}#1}
+    luatexbase.attributes['ltj@yablshift'], luatexja.token.scan_dimen())}#1\relax}
 \define@key[ltj]{japaram}{yjabaselineshift}{%
   \directlua{tex.setattribute(luatexja.isglobal,
-    luatexbase.attributes['ltj@ykblshift'], luatexja.token.scan_dimen())}#1}
+    luatexbase.attributes['ltj@ykblshift'], luatexja.token.scan_dimen())}#1\relax}
 \define@key[ltj]{japaram}{talbaselineshift}{%
   \directlua{tex.setattribute(luatexja.isglobal,
-    luatexbase.attributes['ltj@tablshift'], luatexja.token.scan_dimen())}#1}
+    luatexbase.attributes['ltj@tablshift'], luatexja.token.scan_dimen())}#1\relax}
 \define@key[ltj]{japaram}{tjabaselineshift}{%
   \directlua{tex.setattribute(luatexja.isglobal,
-    luatexbase.attributes['ltj@tkblshift'], luatexja.token.scan_dimen())}#1}
+    luatexbase.attributes['ltj@tkblshift'], luatexja.token.scan_dimen())}#1\relax}
 
 % jaxspmode = {<char_code>, <mode>}
 % mode: inhibit, preonly, postonly, allow
@@ -464,10 +464,10 @@
 
 %%%%%%%% \ltjsetmathletter<number>, \ltjunsetmathletter<number>
 \protected\def\ltjsetmathletter#1{%
-  \directlua{luatexja.math.is_math_letters[luatexja.token.scan_int()]=true}#1 %
+  \directlua{luatexja.math.is_math_letters[luatexja.token.scan_int()]=true}#1\relax
 }
 \protected\def\ltjunsetmathletter#1{%
-  \directlua{luatexja.math.is_math_letters[luatexja.token.scan_int()]=false}#1 %
+  \directlua{luatexja.math.is_math_letters[luatexja.token.scan_int()]=false}#1\relax
 }
 
 %%%%%%%% \ltjdeclarealtfont<base_font_cs><alt_font_cs>{100-200,3000-,5000,...}
