@@ -353,8 +353,8 @@ local function calc_np_aux_glyph_common(lp)
 	       local ls = getsubtype(lx)
 	       if ls==2 then -- アクセント用の kern
 		  set_attr(lx, attr_icflag, PROCESSED)
-		  lx = node_next(lx) -- lp: アクセント本体
-		  setfield(lx, 'yoffset', getfield(lp, 'yoffset') - (has_attr(lx,attr_ablshift) or 0))
+		  lx = node_next(lx) -- lx: アクセント本体
+		  setfield(lx, 'yoffset', getfield(lx, 'yoffset') - (has_attr(lx,attr_ablshift) or 0))
 		  lx = node_next(node_next(lx))
 	       elseif ls==0  then
 		  Np.last = lx
