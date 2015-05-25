@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsarticle}
-  [2015/01/07 ]
+  [2015/05/26 ]
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
@@ -1137,9 +1137,9 @@
   \advance\leftskip .0628\linewidth
   \advance\rightskip .0628\linewidth
   \vskip\abovecaptionskip
-  \sbox\@tempboxa{#1\hskip1\zw\relax #2}%
+  \sbox\@tempboxa{#1{\hskip1\zw}#2}%
   \ifdim \wd\@tempboxa <\hsize \centering \fi
-  #1\hskip1\zw\relax #2\par
+  #1{\hskip1\zw}#2\par
   \vskip\belowcaptionskip}}
 \DeclareOldFontCommand{\mc}{\normalfont\mcfamily}{\mathmc}
 \DeclareOldFontCommand{\gt}{\normalfont\gtfamily}{\mathgt}
