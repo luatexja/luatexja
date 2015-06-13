@@ -230,10 +230,18 @@ local function read_cid_font()
          if not v.width then v.width = 655360 end
          v.height, v.depth = 576716.8, 78643.2 -- optimized for jfm-ujis.lua
       end
+      return cidfont_data[cid_name]
+   else
+      return nil
    end
 end
 
 -- High-level
+local function prepare_cid_font(reg, ord)
+   cid_reg, cid_order, cid_name, cid_supp = reg, ord, reg .. '-' .. ord
+   return cidfont_data[cid_name] or read_cid_font()
+end
+
 
 local definers = fonts.definers
 local function mk_rml(name, size, id)
@@ -345,17 +353,13 @@ local function font_callback(name, size, id, fallback)
       if not cid_reg then
          cid_reg, cid_order = string.match(s, "^(.-)%-(.-)$")
       end
-      cid_name = cid_reg .. '-' .. cid_order
-      if not cidfont_data[cid_name] then
-         read_cid_font()
-         if not cidfont_data[cid_name] then
-            ltjb.package_error('luatexja',
-                               "bad cid key `" .. s .. "'",
-                               "I couldn't find any non-embedded font information for the CID\n" ..
-                                  '`' .. s .. "'. For now, I'll use `Adobe-Japan1-6'.\n"..
-                                  'Please contact the LuaTeX-ja project team.')
-            cid_name = "Adobe-Japan1"
-         end
+      if not prepare_cid_font(cid_reg, cid_order) then
+	 ltjb.package_error('luatexja',
+			    "bad cid key `" .. s .. "'",
+			    "I couldn't find any non-embedded font information for the CID\n" ..
+			       '`' .. s .. "'. For now, I'll use `Adobe-Japan1-6'.\n"..
+			       'Please contact the LuaTeX-ja project team.')
+	 cid_name = "Adobe-Japan1"
       end
       return mk_rml(basename, size, id)
    else
@@ -368,10 +372,10 @@ local function font_callback(name, size, id, fallback)
 end
 
 luatexja.rmlgbm = {
+   prepare_cid_font = prepare_cid_font,
    cidfont_data = cidfont_data,
    font_callback = font_callback,
    vert_addfunc = function () end, -- dummy, set in ltj-direction.lua
 }
 
-cid_reg, cid_order, cid_name, cid_supp = 'Adobe', 'Japan1', 'Adobe-Japan1'
-read_cid_font()
+prepare_cid_font('Adobe', 'Japan1')

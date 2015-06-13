@@ -866,6 +866,34 @@ luatexbase.add_to_callback(
    end, 1, 'ltj.v_advance'
 )
 end
+
+------------------------------------------------------------------------
+-- supply tounicode entries
+------------------------------------------------------------------------
+do
+  local ltjr_prepare_cid_font = ltjr.prepare_cid_font
+  luatexbase.add_to_callback(
+     'luaotfload.patch_font',
+     function (tfmdata)
+	if tfmdata.cidinfo then
+	   local rd = ltjr_prepare_cid_font(tfmdata.cidinfo.registry, tfmdata.cidinfo.ordering)
+	   if rd then
+	      local ru, rc = rd.resources.unicodes, rd.characters
+	      for i,v in pairs(tfmdata.characters) do
+		 local w = ru["Japan1." .. tostring(v.index)]
+		 if w then
+		    v.tounicode = v.tounicode or rc[w]. tounicode
+		 end
+	      end
+	   end
+	end
+
+	return tfmdata
+     end,
+     'ltj.supply_tounicode', 1)  
+end
+
+
 ------------------------------------------------------------------------
 -- MISC
 ------------------------------------------------------------------------
