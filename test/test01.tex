@@ -109,4 +109,21 @@
 \test{ujis}
 \test{jis}
 \test{min}
+
+\bigskip
+{\noindent\bf\tengt ■pdftotext}
+\jfont\jisnorm={file:KozMinPr6N-Regular.otf:script=latn;color=0000007f;jfm=ujis}
+\jfont\jishkna={file:KozMinPr6N-Regular.otf:script=latn;+hkna;color=ff00007f;jfm=ujis}
+\jfont\jisvkna={file:KozMinPr6N-Regular.otf:script=latn;+vkna;color=0000ff7f;jfm=ujis}
+
+\setbox0=\hbox{\jisnorm あいうえお}
+\setbox2=\hbox{\jishkna あいうえお}
+\setbox4=\hbox{\jisvkna あいうえお}
+
+\leavevmode \copy0 \rlap{\copy0}\copy2 \copy2
+
+\leavevmode \rlap{\copy0}\copy4 \rlap{\copy2}\copy4
+
+\leavevmode \copy4
+
 \end
