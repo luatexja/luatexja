@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec-24}[2015/01/15 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec-24}[2015/06/28 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e,luatexja}
 \ExplSyntaxOn
 
@@ -44,14 +44,6 @@
 }
 
 \cs_generate_variant:Nn \prg_new_conditional:Nnn {Nnx}
-
-%%%%%%%% \g_ltj_fontspec_scale_fp
-%% Default scale value for jfont.
-\fp_new:N \g_ltj_fontspec_scale_fp
-\group_begin:
-\fontsize{10}{10}\selectfont
-\fp_gset:Nn \g_ltj_fontspec_scale_fp {\zw / 10}
-\group_end:
 
 %%%%%%%% Internal control sequences
 %% Each CS is ltj_fontspec version that corresponds to original CS of fontspec.

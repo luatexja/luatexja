@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2015/04/05 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2015/06/28 Japanese font presets]
 
 \RequirePackage{expl3}
 \RequirePackage{luatexja}
@@ -26,6 +26,7 @@
 \DeclareOption{deluxe}{\int_set:Nn \l_ltjpreset_deluxe_int { 2 }}   % 6 fonts
 \DeclareOption{nodeluxe}{\int_set:Nn \l_ltjpreset_deluxe_int { 0 }} % 2 fonts
 
+\DeclareOption*{\PassOptionsToPackage{\CurrentOption}{luatexja-fontspec}}
 % JFM
 \cs_set:Npn \ltjpreset_use_jfm: {ujis}  % 使用する JFM
 %%% \DeclareOption{min}{\cs_set:Npn  \ltjpreset_use_jfm: {min}} % min
@@ -205,13 +206,6 @@
 
 \ExecuteOptions{ipaex}
 
-% match 
-\DeclareOption{match} {
-  \bool_if:NF  \ltj_fontspec_match_bool {
-    \ltj_fontspec_match_cmd
-    \bool_set_true:N \ltj_fontspec_match_bool
-  }
-}
 \ProcessOptions*
 
 %%%%%%%% main routine

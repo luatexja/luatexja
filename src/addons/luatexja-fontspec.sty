@@ -3,20 +3,30 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec}[2015/01/15 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec}[2015/06/28 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e,luatexja}
 \ExplSyntaxOn
 
+%%%%%%%% \g_ltj_fontspec_scale_fp
+%% Default scale value for jfont.
+\fp_new:N \g_ltj_fontspec_scale_fp
+\group_begin:
+\fontsize{10}{10}\selectfont
+\fp_gset:Nn \g_ltj_fontspec_scale_fp {\zw / 10}
+\group_end:
+
 \bool_new:N \ltj_fontspec_match
-\cs_set:Nn  \ltj_fontspec_pass_opts: {}
 \keys_define:nn { luatexja-fontspec }
   {
     match .bool_set:N = \ltj_fontspec_match_bool,
     match .default:n  = true,
-    pass .code:n = \cs_set:Nn \ltj_fontspec_pass_opts: {#1},% 互換性
+    pass .code:n = \PassOptionsToPackage{#1} {fontspec},
+      % 互換性のために残したオプション
+    scale .fp_gset:N = \g_ltj_fontspec_scale_fp,
+    unknown .code:n = \PassOptionsToPackage { \l_keys_key_tl } {fontspec},
   }
-\ProcessKeysOptions { luatexja-fontspec }
-\RequirePackage[\ltj_fontspec_pass_opts:]{fontspec}[2014/06/01]% v2.4
+\ProcessKeysOptions{ luatexja-fontspec }
+\RequirePackage{fontspec}[2014/06/01]% v2.4
 \RequirePackage{luatexja-fontspec-24}
 
 \ExplSyntaxOff
