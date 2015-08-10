@@ -655,8 +655,9 @@ do
    end
 
    local sort = table.sort
-   local function add_fl_table(dest, tg, unitable, glyphmax, asc_des, units)
-      for i = 0, glyphmax-1 do
+   local function add_fl_table(dest, glyphs, unitable, asc_des, units)
+      local tg, glyphmin, glyphmax = glyphs.glyphs, glyphs.glyphmin or 0, glyphs.glyphmax
+      for i = glyphmin, glyphmax-1 do
 	 local gv = tg[i]
 	 if gv then
 	    if gv.altuni then
@@ -715,12 +716,12 @@ do
       local fl = fontloader.open(id.filename)
       local unicodes = id.resources.unicodes
       if fl.glyphs then
-	 dest = add_fl_table(dest, fl.glyphs, id.resources.unicodes, fl.glyphmax,
+	 dest = add_fl_table(dest, fl, unicodes,
 			     fl.ascent + fl.descent, fl.units_per_em)
       end
       if fl.subfonts then
          for _,v in pairs(fl.subfonts) do
-            dest = add_fl_table(dest, v.glyphs, id.resources.unicodes, v.glyphmax,
+            dest = add_fl_table(dest, v, unicodes, 
 				fl.ascent + fl.descent, fl.units_per_em)
          end
       end
