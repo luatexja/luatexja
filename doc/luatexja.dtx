@@ -44,6 +44,7 @@
 \usepackage[margin=25mm,lmargin=30mm,rmargin=30mm,footskip=6mm]{geometry}
 \usepackage{luatexja-adjust}\ltjdisableadjust
 \parskip=\smallskipamount
+\makeatletter
 \renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
     {3.25ex \@plus1ex \@minus.2ex}%
     {-1em}%
@@ -77,6 +78,7 @@
   explpreset={numberstyle=\tiny, numbers=left, numbersep=1em, columns=fixed}
 }
 % Suppress output from showexpl to stdout.
+\makeatletter
 \let\SX@Info\relax
 
 %%%%%%%% colors
