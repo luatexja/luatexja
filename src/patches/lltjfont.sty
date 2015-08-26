@@ -44,6 +44,13 @@
    \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi}}
 \def\zstrut{\relax\hbox{\tate
    \ifmmode\copy\zstrutbox\else\unhcopy\zstrutbox\fi}}
+
+{%
+  \def\cdp@elt#1#2#3#4{%
+    \directlua{luatexja.jfont.add_fenc_list('\luatexluaescapestring{#1}')}}%
+  \cdp@list%
+}
+
 \def\DeclareFontEncoding{%
   \begingroup
   \nfss@catcodes
@@ -57,7 +64,7 @@
                     {\default@family}{\default@series}%
                     {\default@shape}}%
      \expandafter\let\csname#1-cmd\endcsname\@changed@cmd
-     \def\enc@elt{\noexpand\enc@elt}%
+     \directlua{luatexja.jfont.add_fenc_list('\luatexluaescapestring{#1}')}%
   \else
      \@font@info{Redeclaring font encoding #1}%
   \fi
@@ -88,7 +95,7 @@
                     {\default@k@family}{\default@k@series}%
                     {\default@k@shape}}%
     \expandafter\let\csname#1-cmd\endcsname\@changed@kcmd
-     \directlua{luatexja.jfont.add_kyenc_list('\luatexluaescapestring{#1}')}%
+    \directlua{luatexja.jfont.add_kyenc_list('\luatexluaescapestring{#1}')}%
   \else
     \@font@info{Redeclaring KANJI (yoko) font encoding #1}%
   \fi
@@ -145,6 +152,7 @@
               \@empty
             \else \reserved@a
             \fi
+     \directlua{luatexja.jfont.add_ffam('\luatexluaescapestring{#2}')}%
     }%
 }
 \def\DeclareKanjiFamily#1#2#3{%
@@ -157,6 +165,7 @@
               \@empty
             \else \reserved@a
             \fi
+     \directlua{luatexja.jfont.add_kfam('\luatexluaescapestring{#2}')}%
      }%
 }
 \def\DeclareKanjiSubstitution#1#2#3#4{%
@@ -443,60 +452,37 @@
 \newif\if@notkfam
 \newif\if@notffam
 \newif\if@tempswz
-\newif\if@ltj@use@fd
-\@ltj@use@fdtrue
+\def\@ltj@use@fd{true}
 \DeclareRobustCommand\romanfamily[1]{\edef\f@family{#1}}
 \DeclareRobustCommand\kanjifamily[1]{\edef\k@family{#1}}
 \DeclareRobustCommand\fontfamily[1]{%
   \@notkfamfalse\@notffamfalse
   \edef\tmp@item{'\luatexluaescapestring{#1}'}%
-  \edef\tmp@enc{'\luatexluaescapestring{\k@encoding}'}%
-  \ifcsname \k@encoding+#1\endcsname % if \k@encoding+#1 is already defined
-    \edef\k@family{#1}%
-  \else\if@ltj@use@fd
-     % search font definition file...
-     \directlua{luatexja.jfont.is_kfam(\tmp@enc, \tmp@item)}%
-     \ifin@\edef\k@family{#1}\else%
-       \directlua{luatexja.jfont.is_Nkfam(\tmp@enc, \tmp@item)}%
-       \ifin@\@notkfamtrue\else%
-         % filename of font definition file is always lowercase
-         \edef\@temp{\lowercase{\noexpand\IfFileExists{\k@encoding#1.fd}}}%
-         \message{(I search kanjifont definition file)}%
-         \@temp{\@tempswztrue}{\@tempswzfalse}%
-         \if@tempswz
-           \directlua{luatexja.jfont.add_kfam_list(\tmp@enc, \tmp@item)}%
-	   \edef\k@family{#1}%
-         \else
-           \directlua{luatexja.jfont.add_Nkfam_list(\tmp@enc, \tmp@item)}%
-	   \@notkfamtrue%
-         \fi
-       \fi
-     \fi
-  \else % do not use font definition file
-     \@notkfamtrue%
-  \fi\fi
-  \edef\tmp@enc{'\luatexluaescapestring{\f@encoding}'}%
-  \ifcsname \f@encoding+#1\endcsname
-    \edef\f@family{#1}%
-  \else % search font definition file...
-     \directlua{luatexja.jfont.is_ffam(\tmp@enc, \tmp@item)}%
-     \ifin@\edef\f@family{#1}\else
-       \directlua{luatexja.jfont.is_Nffam(\tmp@enc, \tmp@item)}%
-       \ifin@\@notffamtrue\else
-         % filename of font definition file is always lowercase
-         \edef\@temp{\lowercase{\noexpand\IfFileExists{\f@encoding#1.fd}}}%
-         \message{(I search font definition file)}%
-         \@temp{\@tempswztrue}{\@tempswzfalse}%
-         \if@tempswz
-           \directlua{luatexja.jfont.add_ffam_list(\tmp@enc, \tmp@item)}%
-	   \edef\f@family{#1}%
-         \else
-           \directlua{luatexja.jfont.add_Nffam_list(\tmp@enc, \tmp@item)}%
-           \@notffamtrue%
-         \fi
-       \fi
-     \fi
+  %
+  \directlua{luatexja.jfont.search_kfam(\tmp@item, \@ltj@use@fd)}%
+  \ifin@\edef\k@family{#1}\else\@notkfamtrue\fi
+  %
+  % alphabetic fonts part
+  \directlua{luatexja.jfont.is_ffam(\tmp@item)}%
+  \ifin@\edef\f@family{#1}\else
+    % checking is_stored_ffam is not sufficient,
+    % since LuaTeX-ja doesn't know whats fonts are defined before LuaTeX-ja is loaded.
+    \ifcsname \f@encoding+#1\endcsname % easy case
+      \directlua{luatexja.jfont.add_ffam(\tmp@item)}\edef\f@family{#1}%
+    \else
+      \@tempswafalse
+      \def\cdp@elt##1{\ifcsname ##1+#1\endcsname\@tempswatrue\fi}%
+      \directlua{luatexja.jfont.search_ffam_declared()}%
+      \if@tempswz
+        \directlua{luatexja.jfont.add_ffam(\tmp@item)}\edef\f@family{#1}%
+      \else
+        % now we search Nffam_list and font definition files.
+        \directlua{luatexja.jfont.search_ffam_fd(\tmp@item)}%
+        \ifin@\edef\f@family{#1}\else\@notffamtrue\fi
+      \fi
+    \fi
   \fi
+  %
   \if@notkfam\if@notffam
       {\ifcsname D@\k@encoding\endcsname\@nameuse{D@\k@encoding}\fi
         \xdef\@@temp{\default@family}}\edef\k@family{\@@temp}%

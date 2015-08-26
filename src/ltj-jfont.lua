@@ -381,7 +381,8 @@ end
 ------------------------------------------------------------------------
 do
    -- these function are called from ltj-latex.sty
-   local kyenc_list, ktenc_list = {}, {}
+   local fenc_list, kyenc_list, ktenc_list = {}, {}, {}
+   function add_fenc_list(enc) fenc_list[enc] = 'true ' end
    function add_kyenc_list(enc) kyenc_list[enc] = 'true ' end
    function add_ktenc_list(enc) ktenc_list[enc] = 'true ' end
    function is_kyenc(enc)
@@ -396,36 +397,57 @@ do
    end
 
    local kfam_list, Nkfam_list = {}, {}
-   function add_kfam_list(enc, fam)
-      if not kfam_list[enc] then kfam_list[enc] = {} end
-      kfam_list[enc][fam] = 'true '
+   function add_kfam(fam)
+      kfam_list[fam]=true
    end
-   function add_Nkfam_list(enc, fam)
-      if not Nkfam_list[enc] then Nkfam_list[enc] = {} end
-      Nkfam_list[enc][fam] = 'true '
+   function search_kfam(fam, use_fd)
+      if kfam_list[fam] then 
+	 tex.sprint(cat_lp, '\\let\\ifin@\\iftrue '); return
+      elseif Nkfam_list[fam] then 
+	 tex.sprint(cat_lp, '\\let\\ifin@\\iffalse '); return
+      elseif use_fd then
+	 for i,_ in pairs(kyenc_list) do
+	    if kpse.find_file(string.lower(i)..fam..'.fd') then
+	       tex.sprint(cat_lp, '\\let\\ifin@\\iftrue '); return
+	    end
+	 end
+	 for i,_ in pairs(ktenc_list) do
+	    if kpse.find_file(string.lower(i)..fam..'.fd') then
+	       tex.sprint(cat_lp, '\\let\\ifin@\\iftrue '); return
+	    end
+	 end
+	 Nkfam_list[fam]=true; tex.sprint(cat_lp, '\\let\\ifin@\\iffalse '); return
+      else
+	 tex.sprint(cat_lp, '\\let\\ifin@\\iffalse '); return
+      end
    end
-   function is_kfam(enc, fam)
-      tex.sprint(cat_lp, '\\let\\ifin@\\if'
-		 .. (kfam_list[enc] and kfam_list[enc][fam] or 'false ')) end
-   function is_Nkfam(enc, fam)
-      tex.sprint(cat_lp, '\\let\\ifin@\\if'
-		 .. (Nkfam_list[enc] and Nkfam_list[enc][fam] or 'false ')) end
-
    local ffam_list, Nffam_list = {}, {}
-   function add_ffam_list(enc, fam)
-      if not ffam_list[enc] then ffam_list[enc] = {} end
-      ffam_list[enc][fam] = 'true '
+   function is_ffam(fam)
+      tex.sprint(cat_lp, '\\let\\ifin@\\if' .. (ffam_list[fam] or 'false '))
    end
-   function add_Nffam_list(enc, fam)
-      if not Nffam_list[enc] then Nffam_list[enc] = {} end
-      Nffam_list[enc][fam] = 'true '
+   function add_ffam(fam)
+      ffam_list[fam]='true '
    end
-   function is_ffam(enc, fam)
-      tex.sprint(cat_lp, '\\let\\ifin@\\if'
-		 .. (ffam_list[enc] and ffam_list[enc][fam] or 'false ')) end
-   function is_Nffam(enc, fam)
-      tex.sprint(cat_lp, '\\let\\ifin@\\if'
-		 .. (Nffam_list[enc] and Nffam_list[enc][fam] or 'false ')) end
+   function search_ffam_declared()
+     local s = ''
+     for i,_ in pairs(fenc_list) do
+	s = s .. '\\cdp@elt{' .. i .. '}'
+     end
+     tex.sprint(cat_lp, s)
+   end
+   function search_ffam_fd(fam)
+      if Nffam_list[fam] then 
+	 tex.sprint(cat_lp, '\\let\\ifin@\\iffalse '); return
+      else
+	 for i,_ in pairs(fenc_list) do
+	    if kpse.find_file(string.lower(i)..fam..'.fd') then
+	       tex.sprint(cat_lp, '\\let\\ifin@\\iftrue '); return
+	    end
+	 end
+	 Nffam_list[fam]=true; tex.sprint(cat_lp, '\\let\\ifin@\\iffalse '); return
+      end
+   end
+
 end
 ------------------------------------------------------------------------
 -- ALTERNATE FONTS
