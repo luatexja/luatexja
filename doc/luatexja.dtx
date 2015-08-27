@@ -737,7 +737,7 @@ For changes from \pTeX, see Subsection~\ref{ssec:chgptex}.
 %</ja>
 \begin{itemize}
 %<*en>
-\item The encoding of your source file must be UTF-8. No other
+\item The encoding of your source file must be UTF-8. Other
       encodings, such as EUC-JP or Shift-JIS, are not supported.
 %</en>
 %<*ja>
@@ -1425,17 +1425,17 @@ before \Pkg{luatexja-preset}:
 
 \item[nfssonly]
 %<*en>
-With this option,selecting Japanese fonts won't be performed using  the functionality of
-	     the \Pkg{fontspec} package, but only standard NFSS2.
+With this option, selecting Japanese fonts won't be performed using the functionality of
+	     the \Pkg{fontspec} package, but only standard NFSS2 (hence without
+	     \cs{addjfontfeatures} etc.).
+This option is ignored when \Pkg{luatexja-fontspec} package is loaded.
 
-This option will be disabled when \Pkg{luatexja-fontspec} package is loaded.
 Note that the \Pkg{fontspec} can coexist with the option as the following:
 \begin{lstlisting}
 \usepackage{fontspec}
 \usepackage[hiragino-pron,nfssonly]{luatexja-preset}
 \end{lstlisting}
-Note that the functionality of the \Pkg{luatexja-fontspec} package, such as
-	     \cs{setmainjfont}, cannot be used in the example above.
+In this case, one can use \cs{setmainfont} etc.\ to select \emph{alphabetic} fonts.
 %</en>
 %<*ja>
 \LaTeX 標準のフォント選択機構(NFSS2)を用いて
@@ -1967,6 +1967,7 @@ and the character ``漢'' to the character range~100.
 \begin{lstlisting}
 \ltjdefcharrange{100}{"20000-"2FFFF,`漢}
 \end{lstlisting}
+
 %<*en>
 A character can belong to only one character range.
 For example, whole SIP belong to the range~4 in the default setting of \LuaTeX-ja,
@@ -1980,9 +1981,9 @@ removed from the range~4.
 %</ja>
 
 %<*en>
-The distinction between \textbf{ALchar} and \textbf{JAchar} is done for character ranges.
+The distinction between \textbf{ALchar} and \textbf{JAchar} is performed by character ranges.
 This can be edited by setting the \textsf{jacharrange} parameter.
-For example, this is just the default setting of \LuaTeX-ja, and
+For example, the code below is just the default setting of \LuaTeX-ja, and
 it sets
 \begin{itemize}
  \item a character which belongs character ranges 1,~4, and~5 is \textbf{ALchar},
@@ -2014,12 +2015,35 @@ and positive integer $+n$ means that ``\dots\ is a \textbf{JAchar}''.
 %</ja>
 
 %<*en>
-\paragraph{Default setting}
+\emph{Caution}: this default setting may causes a problem with traditional 8-bit fonts,
+such as \cs{Frowny} in MarVoSym.ttf. Since the codepoint of \cs{Frowny} is 167,
+which belongs to character range~8, this will be typeset \ltjjachar`§ in current
+\emph{Japanese} font.
+To avoid this problem, one can use
+\begin{lstlisting}
+\ltjsetparameter{jacharrange={-1, -8}}
+\end{lstlisting}
+to set all characters whose codepoint is in $[128,255)$ as \textbf{ALchar}.
+%</en>
+%<*ja>
+なお，この標準設定は，伝統的な8ビットのフォントを使うときに問題を起こす可能性がある．
+具体例としてはMarVoSym.ttf中の\cs{Frowny}があり，この符号位置は（文字範囲8内の）167である
+から，\cs{Frowny}はそのままでは\ltjjachar`§を和文フォントで出力してしまうことになる．
+回避するには，
+\begin{lstlisting}
+\ltjsetparameter{jacharrange={-1, -8}}
+\end{lstlisting}
+などとして，符号位置が$[128,255)$の全ての文字を\textbf{ALchar}扱いにさせればよい．
+%</ja>
+
+
+%<*en>
+\paragraph{Default character ranges}
 \LuaTeX-ja predefines eight character ranges for convenience. They are
 determined from the following data:
 %</en>
 %<*ja>
-\paragraph{初期設定}
+\paragraph{文字範囲の初期値}
 \LuaTeX-jaでは8つの文字範囲を予め定義しており，
 これらは以下のデータに基づいて決定している．
 %</ja>
@@ -2037,7 +2061,7 @@ Now we describe these eight ranges. The superscript ``J'' or ``A'' after the
 number shows whether each character in the range is treated as
 \textbf{JAchar}s or not by default. These settings are similar to the
 \texttt{prefercjk} settings defined in \texttt{PXbase} bundle.
-Any characters above \texttt{U+0080} which does not belong to
+Any characters equal to or above \texttt{U+0080} which does not belong to
 these eight ranges belongs to the character range~217.
 %</en>
 %<*ja>
@@ -3010,7 +3034,7 @@ the direction  inside the box and that outside the box differ.
      \put(0,0){\vector(1,0){5}} \put(2.5,-0.2){\makebox(0,0)[t]{$h_{\mathrm{T}}$}}
      \put(0,0){\vector(-1,0){2}}\put(-1,-0.2){\makebox(0,0)[t]{$d_{\mathrm{T}}$}}
      \put(0,0){\vector(0,-1){7}}\put(0.2,-3.5){\makebox(0,0)[l]{$w_{\mathrm{T}}$}}
-   \end{picture}}}
+   \end{picture}}}%
  }
  \def\DTOUeg{%
    \hbox{\smash{\begin{picture}(0,0)(-5,0)
@@ -3021,7 +3045,7 @@ the direction  inside the box and that outside the box differ.
      \put(0,0){\vector(-1,0){5}} \put(-2.5,0.3){\makebox(0,0)[b]{$h_{\mathrm{D}}$}}
      \put(0,0){\vector(1,0){2}}\put(1,0.3){\makebox(0,0)[b]{$d_{\mathrm{D}}$}}
      \put(0,0){\vector(0,1){7}}\put(-0.2,3.5){\makebox(0,0)[r]{$w_{\mathrm{D}}$}}
-   \end{picture}}}
+   \end{picture}}}%
  }
  \def\YOKOeg{%
    \hbox{\smash{\begin{picture}(0,0)
@@ -3032,7 +3056,7 @@ the direction  inside the box and that outside the box differ.
      \put(0,0){\vector(0,1){5}} \put(0.3,2.5){\makebox(0,0)[l]{$h_{\mathrm{Y}}$}}
      \put(0,0){\vector(0,-1){2}}\put(0.3,-1){\makebox(0,0)[l]{$d_{\mathrm{Y}}$}}
      \put(0,0){\vector(1,0){7}}\put(3.5,0.2){\makebox(0,0)[b]{$w_{\mathrm{Y}}$}}
-   \end{picture}}}
+   \end{picture}}}%
  }
 \begin{tabular}{ccc}
 \toprule
@@ -3138,7 +3162,7 @@ the direction  inside the box and that outside the box differ.
    \begin{align*}
    W_{\mathrm{Y}} &= h_{\mathrm{D}}+d_{\mathrm{D}},\\
    H_{\mathrm{Y}} &= w_{\mathrm{D}},\\
-   D_{\mathrm{Y}} &= 0\,pt
+   D_{\mathrm{Y}} &= 0\,\mathrm{pt}
    \end{align*}%
  }&
  \parbox[c]{15\unitlength}{\begin{picture}(15,15)(0,-4)
@@ -5840,144 +5864,13 @@ In \LuaTeX-ja, this \cs{adjustbaseline} does same task, namely setting the
 \item[\cs{fontfamily}\{<family>\}]
 %<*en>
 As in \LaTeXe, this command changes current font family (alphabetic, Japanese,~\emph{or both})
-to <family>.
-
-First, Whether Japanese font family will be changed is determined by following conditions.
-We use an auxiliary list~$N_{\mathrm{J}}$.
+to <family>. See Subsection~\ref{ssec-fontfamilycmd} for detail.
 %</en>
 %<*ja>
 元々の\LaTeXe におけるものと同様に，このコマンドは現在のフォントファミリ（欧文，
-和文，\emph{もしくは両方}）を<family>に変更する．
-まず，和文フォントファミリが変更されるかは以下の順序で決定される．
-補助的に「和文フォントファミリではない」ファミリを格納したリスト$N_{\mathrm{J}}$を用いる．
-%</ja>
-\begin{enumerate}
-%<*en>
-\item If the family~<family> has been defined already by \cs{DeclareKanjiFamily},
-      current Japanese font family will be changed to <family>.
-      Note that <family> need not be defined under \emph{current} Japanese font encoding.
-%</en>
-%<*ja>
-\item ファミリ<family>が既に \cs{DeclareKanjiFamily} によって定義されている場合，
-      和文フォントファミリは<family>に変更される．
-      ここで，<family>は現在の和文フォントエンコーディングで定義されていなくてもよい．
-%</ja>
-%<*en>
-\item If the family~<family> has been listed in a list~$N_{\mathrm{J}}$, this means
-      that <family> is not a Japanese font family, hence current Japanese font family
-      won't be changed.
-%</en>
-%<*ja>
-\item ファミリ<family>がリスト$N_{\mathrm{J}}$に既に含まれていれば，それは
-      <family>が和文フォントファミリではないことを意味するので，和文フォントファミリは変更されない．
-%</ja>
-%<*en>
-\item If the \Pkg{luatexja-fontspec} package is loaded, we stop here, and current Japanese font family
-      won't be changed.
-
-      If the \Pkg{luatexja-fontspec} package is \emph{not} loaded, 
-now \LuaTeX-ja looks whether there exists a Japanese font encoding~<enc> such that
-      a font definition named \texttt{<enc><family>.fd} (the file name is
-      all lowercase) exists. If so, current Japanese font family will be changed to
-      <family>~(the font definition file won't be loaded here). 
-      If not, current Japanese font family won't be changed, and
-      <family> is appended to the list~$N_{\mathrm{J}}$.
-%</en>
-%<*ja>
-\item もし\Pkg{luatexja-fontspec}パッケージが読み込まれていれば，ここで終了であり，
-和文フォントファミリは変更されないことになる．
-
-もし\Pkg{luatexja-fontspec}パッケージが読み込まれていなければ，和文エンコーディング<enc>で
-フォント定義ファイル\texttt{<enc><family>.fd}（ファイル名は全て小文字）が存在するようなも
-      のがあるかどうかを調べる．
-存在すれば，和文フォントファミリは<family>に変更される（フォント定義ファイルは変更されな
-      い）．
-存在しなければ，リスト$N_{\mathrm{J}}$に<family>を追加するだけで，和文フォントファミリは変更されない．
-
-%</ja>
-\end{enumerate}
-
-%<*en>
-Next, whether alphabetic font family will be changed is determined by following conditions.
-We use an auxiliary lists $F_{\mathrm{A}}$~and~$N_{\mathrm{A}}$, and
-patches \cs{DeclareFontEncoding}~and~\cs{DeclareFontFamily} to keep track of alphabetic
-	     font encodings~and~families.
-%</en>
-%<*ja>
-次に，欧文フォントファミリについての判定を述べていく．
-補助的に「欧文フォントファミリと判明した」ファミリのリスト$F_{\textrm{A}}$と，
-「欧文フォントファミリではない」ファミリを格納したリスト$N_{\mathrm{A}}$を用いる．
+和文，\emph{もしくは両方}）を<family>に変更する．詳細は\ref{ssec-fontfamilycmd}節を参照すること．
 %</ja>
 
-\begin{enumerate}
-%<*en>
-\item If the family~<family> has been listed in a list~$F_{\mathrm{A}}$, 
-      current alphabetic font family will be changed to <family>.
-      Note that <family> need not be defined under \emph{current} alphabetic font encoding.
-%</en>
-%<*ja>
-\item ファミリ<family>がリスト$F_{\mathrm{A}}$に既に含まれていれば，
-      欧文フォントファミリは<family>に変更される．
-      ここで，<family>は現在の欧文フォントエンコーディングで定義されていなくてもよい．
-%</ja>
-%<*en>
-\item If the family~<family> has been listed in a list~$N_{\mathrm{A}}$, this means
-      that <family> is not a alphabetic font family, hence current alphabetic font family
-      won't be changed.
-%</en>
-%<*ja>
-\item ファミリ<family>がリスト$N_{\mathrm{A}}$に既に含まれていれば，それは
-      <family>が欧文フォントファミリではないことを意味するので，欧文フォントファミリは変更されない．
-%</ja>
-%<*en>
-\item If there exists an alphabetic font encoding such that the family~<family> has been
-      defined under it, current alphabetic font family will be changed to <family>, and
-      <family> is appended to the list~$F_{\mathrm{A}}$.
-%</en>
-%<*ja>
-\item ある欧文フォントエンコーディング下でファミリ<family>が定義されていれば，
-      リスト$F_{\mathrm{A}}$に<family>を追加し，欧文フォントファミリは<family>に変更される．
-%</ja>
-%<*en>
-\item Now \LuaTeX-ja looks whether there exists an alphabetic font encoding~<enc> such that
-      a font definition named \texttt{<enc><family>.fd} (the file name is
-      all lowercase) exists. If so, current alphabetic font family will be changed to
-      <family>~(the font definition file won't be loaded here). 
-      If not, current alphabetic font family won't be changed, and
-      <family> is appended to the list~$N_{\mathrm{A}}$.
-%</en>
-%<*ja>
-\item 最終段階では，欧文エンコーディング<enc>で
-フォント定義ファイル\texttt{<enc><family>.fd}（ファイル名は全て小文字）が存在するようなも
-      のがあるかどうかを調べる．
-存在すれば，欧文フォントファミリは<family>に変更される（フォント定義ファイルは変更されな
-      い）．
-存在しなければ，リスト$N_{\mathrm{A}}$に<family>を追加するだけで，欧文フォントファミリは変更されない．
-
-%</ja>
-\end{enumerate}
-%<*en>
-Of course, there is a case that ``Japanese font family nor alphabetic font family is changed''.
-In this case, \LuaTeX-ja treats ``the argument <family> is wrong'', so 
-the default family for font substitution is used for alphabetic and Japanese fonts. 
-%%% Note that current font encoding will not
-%%%      be set to <family>, unlike the original implementation in \LaTeX.
-
-Note that the execution of \cs{DeclareFontFamily} \emph{after} loading of \LuaTeX-ja makes
-the second argument (family) is appended to the list~$F_{\mathrm{A}}$.
-%</en>
-%<*ja>
-さて，引数によっては，「和文フォントファミリも欧文フォントファミリも変更されませんでした」
-という時代もあり得る．
-  この場合，引数<family>は不正だった，ということになるので，
-代替フォントに用いられるデフォルトのフォントファミリが欧文フォントと
-  和文フォントに用いられる．
-%%%LaTeX のオリジナルの実装とは異なり，
-%%%  現在のエンコーディングは<family>には設定されないことに注意する．
-
-なお，\cs{DeclareFontFamily}を\LuaTeX-jaの読み込み後に実行した場合は，
-第2引数（ファミリ名）が自動的に$F_{\mathrm{A}}$に追加される．
-%</ja>
 
 \begin{figure}[!tb]
 \begin{LTXexample}[pos=b]
@@ -6052,6 +5945,184 @@ Avant Garde (OT1/pag/m/n) に変わっていることがわかる．
   % \k@family: current Japanese font family
 \userelfont\selectfont あいうabc
 \end{LTXexample}
+
+%<en>\subsection{\cs{fontfamily}}
+%<ja>\subsection{\cs{fontfamily}}
+\label{ssec-fontfamilycmd}
+%<*en>
+In this subsection, we describe when \cs{fontfamily}<family> changes current
+Japanese/alphabetic font family. Basically, current Japanese fotn family is changed to
+<family> if it is recognized as a Japanese font family, and similar with alphabetic font
+family. There is a case that current Japanese/alphabetic font family are both changed to
+<family>, and another case that <family> isn't recognized as a Japanese/alphabetic font
+family either.
+
+\paragraph{Recognition as Japanese font family}
+First, Whether Japanese font family will be changed is determined in following order.
+This order is very similar to \cs{fontfamily} in \pLaTeXe, but we re-implemented in Lua.
+We use an auxiliary list~$N_{\mathrm{J}}$.
+%</en>
+%<*ja>
+本節では，\cs{fontfamily}<family> がいつ和文/欧文フォントファミリを変更するかについて解説
+する．基本的には，<family>が和文フォントファミリだと認識されれば和文側が，欧文フォントファ
+ミリだと認識されれば欧文側が変更される．どちらとも認識されれば和文・欧文の両方が変わるこ
+とになるし，当然どちらとも認識されないこともある．
+
+\paragraph{和文フォントファミリとしての認識}
+まず，<family>が和文フォントファミリとして認識されるかは以下の順序で決定される．
+これは\pLaTeXe の \cs{fontfamily} にとても似ているが，ここではLuaによって実装している．
+補助的に「和文フォントファミリではないと認識された」ファミリを格納したリスト$N_{\mathrm{J}}$を用いる．
+%</ja>
+\begin{enumerate}
+%<*en>
+\item If the family~<family> has been defined already by \cs{DeclareKanjiFamily},
+      <family> is recognized as a  Japanese font family.
+      Note that <family> need not be defined under \emph{current} Japanese font encoding.
+%</en>
+%<*ja>
+\item ファミリ<family>が既に \cs{DeclareKanjiFamily} によって定義されている場合，
+      <family>は和文フォントファミリであると認識される．
+      ここで，<family>は現在の和文フォントエンコーディングで定義されていなくてもよい．
+%</ja>
+%<*en>
+\item If the family~<family> has been listed in a list~$N_{\mathrm{J}}$, this means
+      that <family> is not a Japanese font family.
+%</en>
+%<*ja>
+\item ファミリ<family>がリスト$N_{\mathrm{J}}$に既に含まれていれば，それは
+      <family>が和文フォントファミリではないことを意味する．
+%</ja>
+%<*en>
+\item If the \Pkg{luatexja-fontspec} package is loaded, we stop here, and <family> is not
+      recognized as a Japanese font family.
+
+      If the \Pkg{luatexja-fontspec} package is \emph{not} loaded, 
+now \LuaTeX-ja looks whether there exists a Japanese font encoding~<enc> such that
+      a font definition named \texttt{<enc><family>.fd} (the file name is
+      all lowercase) exists. If so, <family> is recognized as a  Japanese font family (the font definition file won't be loaded here). 
+      If not, <family> is not a Japanese font family, and 
+      <family> is appended to the list~$N_{\mathrm{J}}$.
+%</en>
+%<*ja>
+\item もし\Pkg{luatexja-fontspec}パッケージが読み込まれていれば，ここで終了であり，
+<family>は和文フォントファミリとして認識されないことになる．
+
+もし\Pkg{luatexja-fontspec}パッケージが読み込まれていなければ，和文エンコーディング<enc>で
+フォント定義ファイル\texttt{<enc><family>.fd}（ファイル名は全て小文字）が存在するようなも
+      のがあるかどうかを調べる．
+存在すれば，<family>は和文フォントファミリと認識される（フォント定義ファイルは読み込まれな
+      い）．
+存在しなければ，<family>は和文フォントファミリでないと認識され，リスト$N_{\mathrm{J}}$に<family>を追加することでそれを記憶する．
+
+%</ja>
+\end{enumerate}
+
+%<*en>
+\paragraph{Recognition as alphabetic font family}
+Next, whether alphabetic font family will be changed is determined in following order.
+We use auxiliary lists $F_{\mathrm{A}}$~and~$N_{\mathrm{A}}$, 
+%</en>
+%<*ja>
+\paragraph{欧文フォントファミリとしての認識}
+同様に，<family>が和文フォントファミリとして認識されるかは以下の順序で決定される．
+補助的に「欧文フォントファミリと既に認識された」ファミリのリスト$F_{\textrm{A}}$と，
+「欧文フォントファミリではないと認識された」ファミリを格納したリスト$N_{\mathrm{A}}$を用いる．
+%</ja>
+
+\begin{enumerate}
+%<*en>
+\item If the family~<family> has been listed in a list~$F_{\mathrm{A}}$, 
+      <family> is recognized as an alphabetic font family.
+%</en>
+%<*ja>
+\item ファミリ<family>がリスト$F_{\mathrm{A}}$に既に含まれていれば，
+      <family>は欧文フォントファミリと認識される．
+%</ja>
+%<*en>
+\item If the family~<family> has been listed in a list~$N_{\mathrm{A}}$, this means
+      that <family> is not  an alphabetic font family.
+%</en>
+%<*ja>
+\item ファミリ<family>がリスト$N_{\mathrm{A}}$に既に含まれていれば，それは
+      <family>が欧文フォントファミリではないことを意味する．
+%</ja>
+%<*en>
+\item If there exists an alphabetic font encoding such that the family~<family> has been
+      defined under it, <family> is recognized as an alphabetic font family, and
+      to memorize this, <family> is appended to the list~$F_{\mathrm{A}}$.
+%</en>
+%<*ja>
+\item ある欧文フォントエンコーディング下でファミリ<family>が定義されていれば，
+      <family>は欧文フォントファミリと認識され，リスト$F_{\mathrm{A}}$に<family>を追加することでこのことを記憶する．
+%</ja>
+%<*en>
+\item Now \LuaTeX-ja looks whether there exists an alphabetic font encoding~<enc> such that
+      a font definition named \texttt{<enc><family>.fd} (the file name is
+      all lowercase) exists. If so, current alphabetic font family will be changed to
+      <family>~(the font definition file won't be loaded here). 
+      If not, current alphabetic font family won't be changed, and
+      <family> is appended to the list~$N_{\mathrm{A}}$.
+%</en>
+%<*ja>
+\item 最終段階では，欧文エンコーディング<enc>で
+フォント定義ファイル\texttt{<enc><family>.fd}（ファイル名は全て小文字）が存在するようなも
+      のがあるかどうかを調べる．
+存在すれば，<family>は欧文フォントファミリと認識される（フォント定義ファイルは読み込まれない）．
+存在しなければ，<family>は欧文フォントファミリと認識されないので，リスト$N_{\mathrm{A}}$に
+      <family>を追加してそのことを記憶する．
+%</ja>
+\end{enumerate}
+
+%<*en>
+Also, each call of \cs{DeclareFontFamily} \emph{after} loading of \LuaTeX-ja makes
+the second argument (family) is appended to the list~$F_{\mathrm{A}}$.
+%</en>
+%<*ja>
+また，\cs{DeclareFontFamily}が\LuaTeX-jaの読み込み後に実行された場合は，
+第2引数（ファミリ名）が自動的に$F_{\mathrm{A}}$に追加される．
+%</ja>
+
+%<*en>
+The above order is very similar to \cs{fontfamily} in \pLaTeXe, but more complicated (clause~3.).
+This is because  \pLaTeXe\ is a \emph{format} however \LuaTeX-ja is not, 
+hence \LuaTeX-ja does not know calls of \cs{DeclareFontFamily} \emph{before} itself is
+loaded.
+%</en>
+%<*ja>
+以上の方針は\pLaTeXe における \cs{fontfamily} にやはり類似しているが，3.が加わり若干複雑になっている．
+それは\pLaTeXe がフォーマットであるのに対し\LuaTeX-jaはそうでないため，
+\LuaTeX-jaは自身が読み込まれる前にどういう\cs{DeclareFontFamily}の呼び出しがあったか
+把握できないからである．
+%</ja>
+
+%<en>\paragraph{Remarks}
+%<ja>\paragraph{注意}
+\begin{itemize}
+
+%<*en>
+\item 
+Of course, there is a case that <family> is not recognized as a Japanese font family,  nor
+an alphabetic font family.
+In this case, \LuaTeX-ja treats ``the argument <family> is wrong'', so
+set both current alphabetic and Japanese font family to <family>,
+to use the default family for font substitution.
+%</en>
+%<*ja>
+\item 
+さて，引数によっては，「和文フォントファミリとも欧文フォントファミリも認識されなかった」
+という事態もあり得る．
+  この場合，引数<family>は不正だった，ということになるので，
+和文・欧文の両方のフォントファミリを<family>に設定し，代用フォントが使われるに任せることにする．
+%</ja>
+
+%<*en>
+\item 
+%</en>
+%<*ja>
+\item 
+%</ja>
+\end{itemize}
+
 
 %<*en>
 \section{Addons}
