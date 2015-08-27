@@ -13,6 +13,18 @@
   \tl_set:Nn \l_tmpa_tl { um_cs_set_eq_active_char:Nw }
   \cs_if_exist:cT { __um_cs_set_eq_active_char:Nw } {
     \tl_set:Nn \l_tmpa_tl { __um_cs_set_eq_active_char:Nw }
+    \cs_gset:Npn \use@mathgroup #1 #2
+     {
+      \mode_if_math:T % <- not sure if this is really necessary since we've just checked for mmode and raised an error if not!
+       {
+        \math@bgroup
+          \cs_if_eq:cNF {M@\f@encoding} #1 {#1}
+          \__um_switchto_literal:
+          \ltj@tempcnta=#2 \expandafter\ltj@@mathJapaneseFonts\string#1\relax%
+          \ifin@ \jfam #2 \relax \else \mathgroup #2 \relax \fi
+        \math@egroup
+       }
+     }
   }
   \cs_gset:cpn { \tl_use:N \l_tmpa_tl } #1 = "#2 \q_nil {%"
     \group_begin:
