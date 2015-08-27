@@ -3,14 +3,18 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-unicode-math}[2013/05/14 Patch to unicode-math for LuaTeX-ja]
+\ProvidesPackage{lltjp-unicode-math}[2015/08/28 Patch to unicode-math for LuaTeX-ja]
 
 \RequirePackage{unicode-math,luatexja}
 
 \ExplSyntaxOn
 
 \group_begin:
-  \cs_gset:Npn \um_cs_set_eq_active_char:Nw #1 = "#2 \q_nil {%"
+  \tl_set:Nn \l_tmpa_tl { um_cs_set_eq_active_char:Nw }
+  \cs_if_exist:cT { __um_cs_set_eq_active_char:Nw } {
+    \tl_set:Nn \l_tmpa_tl { __um_cs_set_eq_active_char:Nw }
+  }
+  \cs_gset:cpn { \tl_use:N \l_tmpa_tl } #1 = "#2 \q_nil {%"
     \group_begin:
       %\typeout {um: \string#1, \int_from_hexadecimal:n {#2}, #2}% <- for debug
       \char_set_lccode:nn { `! } { "#2 }%"
