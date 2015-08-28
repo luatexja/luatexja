@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2015/08/27 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2015/08/28 Patch to NFSS2 for LuaTeX-ja]
 
 \let\k@encoding\@empty
 \let\ck@encoding\@empty
@@ -484,10 +484,7 @@
   \fi
   %
   \if@notkfam\if@notffam
-      {\ifcsname D@\k@encoding\endcsname\@nameuse{D@\k@encoding}\fi
-        \xdef\@@temp{\default@family}}\edef\k@family{\@@temp}%
-      {\ifcsname D@\f@encoding\endcsname\@nameuse{D@\f@encoding}\fi
-        \xdef\@@temp{\default@family}}\edef\f@family{\@@temp}%
+    \edef\k@family{#1}\edef\f@family{#1}%
   \fi\fi
 }
 \DeclareRobustCommand\romanseries[1]{\edef\f@series{#1}}

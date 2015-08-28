@@ -158,7 +158,8 @@
   \vskip\belowcaptionskip}
 
 \def\_{\leavevmode \kern .06em\vbox {\hrule \@width .333em}}
-\def\cs#1{\texttt{\upshape\textbackslash\ltjsetparameter{autoxspacing=false}#1}}
+\def\cs#1{\texttt{\upshape\textbackslash
+  \texorpdfstring{\ltjsetparameter{autoxspacing=false}#1}{#1}}}
 
 %%%%%%%%
 \makeatother
@@ -5612,7 +5613,7 @@ With the help of this example, we remark the specification of \cs{inhibitglue}:
 Using \cs{ltjdeclarealtfont}, one can ``compose'' more than one Japanese fonts.
 This \cs{ltjdeclarealtfont} uses in the following form:
 \begin{quote}
-\ttfamily \textbackslash ltjdeclarealtfont<base\_font\_cs><alt\_font\_cs>{<range>}
+\ttfamily \textbackslash ltjdeclarealtfont<base\_font\_cs><alt\_font\_cs>\{<range>\}
 \end{quote}
 where  <base\_font\_cs>~and~<alt\_font\_cs> are defined by \cs{jfont}.
 Its meaning is
@@ -5620,8 +5621,7 @@ Its meaning is
 If the current Japanese font is <base\_font\_cs>, characters which belong to <range>
 is typeset by another Japanese font <alt\_font\_cs>, instead of <base\_font\_cs>.
 \end{quote}
-
-<range> is a comma-separated list of character codes, but also accepts negative integers:
+Here <range> is a comma-separated list of character codes, but also accepts negative integers:
 $-n$~($n≥1$) means that all characters of character classes~$n$, with respect to JFM used
 by <base\_font\_cs>. Note that characters which do not exist in <alt\_font\_cs> are
 ignored.
@@ -5645,7 +5645,7 @@ are typeset by \cs{piyo}.
 
 \cs{ltjdeclarealtfont} は以下の書式で使用する：
 \begin{quote}
-\ttfamily \textbackslash ltjdeclarealtfont<base\_font\_cs><alt\_font\_cs>{<range>}
+\ttfamily \textbackslash ltjdeclarealtfont<base\_font\_cs><alt\_font\_cs>\{<range>\}
 \end{quote}
 これは「現在の和文フォント」が<base\_font\_cs>であるとき，
 <range>に属する文字は<alt\_font\_cs>を用いて組版される，という意味である．
@@ -6097,10 +6097,7 @@ loaded.
 
 %<en>\paragraph{Remarks}
 %<ja>\paragraph{注意}
-\begin{itemize}
-
 %<*en>
-\item 
 Of course, there is a case that <family> is not recognized as a Japanese font family,  nor
 an alphabetic font family.
 In this case, \LuaTeX-ja treats ``the argument <family> is wrong'', so
@@ -6108,20 +6105,11 @@ set both current alphabetic and Japanese font family to <family>,
 to use the default family for font substitution.
 %</en>
 %<*ja>
-\item 
 さて，引数によっては，「和文フォントファミリとも欧文フォントファミリも認識されなかった」
 という事態もあり得る．
   この場合，引数<family>は不正だった，ということになるので，
 和文・欧文の両方のフォントファミリを<family>に設定し，代用フォントが使われるに任せることにする．
 %</ja>
-
-%<*en>
-\item 
-%</en>
-%<*ja>
-\item 
-%</ja>
-\end{itemize}
 
 
 %<*en>
