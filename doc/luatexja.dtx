@@ -158,8 +158,8 @@
   \vskip\belowcaptionskip}
 
 \def\_{\leavevmode \kern .06em\vbox {\hrule \@width .333em}}
-\def\cs#1{\texttt{\upshape\textbackslash
-  \texorpdfstring{\ltjsetparameter{autoxspacing=false}#1}{#1}}}
+\def\cs#1{\texttt{\upshape
+  \texorpdfstring{\textbackslash\ltjsetparameter{autoxspacing=false}#1}{\textbackslash#1}}}
 
 %%%%%%%%
 \makeatother
@@ -746,17 +746,23 @@ For changes from \pTeX, see Subsection~\ref{ssec:chgptex}.
       従来日本語の文字コードとして用いられてきたEUC-JPやShift-JISは使用できない．
 %</ja>
 %<*en>
-\item By default, \LuaTeX-ja uses Japanese fonts to typeset Greek and Cyrillic letters,
-      and some Unicode symbols such as \P~and~\S. To change this behavior, 
-      put \lstinline!\ltjsetparameter{jacharrange={-2,-3,-8}}! in the preamble.
+\item By default, \LuaTeX-ja uses Japanese fonts to typeset Greek and Cyrillic letters.
+      To change this behavior, 
+      put \verb!\ltjsetparameter{jacharrange={-2,-3}}! in the preamble.
       For the detailed description, see Subsection~\ref{ssec-setrange}.
 %</en>
 %<*ja>
 \item 
-標準では，\LuaTeX-jaはギリシャ文字やキリル文字，それに\P や\S などの記号を和文フォントを使っ
+標準では，\LuaTeX-jaはギリシャ文字やキリル文字を和文フォントを使っ
       て組む．ギリシャ語などを本格的に組むなどこの状況が望ましくない場合，
-      プリアンブルに \lstinline!\ltjsetparameter{jacharrange={-2,-3,-8}}! を入れると
+      プリアンブルに
+\begin{lstlisting}
+ \ltjsetparameter{jacharrange={-2,-3}}
+\end{lstlisting}
+      を入れると
       上記種類の文字は欧文フォントを用いて組まれるようになる．
+      なお，\P,~\S といったISO~8859-1の上位領域とJIS~X~0208の共通部分の文字は
+      本バージョンから標準で欧文扱い(\textbf{ALchar})となった．
       詳しい説明は\ref{ssec-setrange}節を参照してほしい．
 %</ja>
 %<*en>
@@ -1587,8 +1593,6 @@ There is not rounded gothic family in Kozuka fonts.
 \end{tabular}
 \end{center}
 
-%<ja>\newpage
-
  \item[hiragino-pro]  Hiragino Pro (Adobe-Japan1-5) fonts.
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[hiragino-pron] Hiragino ProN (Adobe-Japan1-5, JIS04-savvy) fonts.
@@ -1977,8 +1981,8 @@ removed from the range~4.
 %</en>
 %<*ja>
 各文字はただ一つの文字範囲に所属することができる．
-例えば，SIPは全て\LuaTeX-jaのデフォルトでは4番の文字範囲に
-属しているが，上記の指定を行えばSIPは100番に属すようになり，4番からは除かれる．
+例えば，SIP内の文字は全て\LuaTeX-jaのデフォルトでは4番の文字範囲に
+属しているが，上記の指定を行えばSIP内の文字は100番に属すようになり，4番からは除かれる．
 %</ja>
 
 %<*en>
@@ -1987,8 +1991,8 @@ This can be edited by setting the \textsf{jacharrange} parameter.
 For example, the code below is just the default setting of \LuaTeX-ja, and
 it sets
 \begin{itemize}
- \item a character which belongs character ranges 1,~4, and~5 is \textbf{ALchar},
- \item a character which belongs character ranges 2,~3, 6, 7, and~8 is \textbf{JAchar}.
+ \item a character which belongs character ranges 1,~4, 5, and~8 is \textbf{ALchar},
+ \item a character which belongs character ranges 2,~3, 6, and~7 is \textbf{JAchar}.
 \end{itemize}
 %</en>
 %<*ja>
@@ -1996,12 +2000,12 @@ it sets
 これは\textsf{jacharrange}パラメータによって編集できる．
 例えば，以下は\LuaTeX-jaの初期設定であり，次の内容を設定している：
 \begin{itemize}
- \item 1番，4番，5番の文字範囲に属する文字は\textbf{ALchar}．
- \item 2番，3番，6番，7番，8番の文字範囲に属する文字は\textbf{JAchar}．
+ \item 1番，4番，5番，8番の文字範囲に属する文字は\textbf{ALchar}．
+ \item 2番，3番，6番，7番の文字範囲に属する文字は\textbf{JAchar}．
 \end{itemize}
 %</ja>
 \begin{lstlisting}
-\ltjsetparameter{jacharrange={-1, +2, +3, -4, -5, +6, +7, +8}}
+\ltjsetparameter{jacharrange={-1, +2, +3, -4, -5, +6, +7, -8}}
 \end{lstlisting}
 %<*en>
 The argument to \textsf{jacharrange} parameter is a list of non-zero integer.
@@ -2014,29 +2018,6 @@ and positive integer $+n$ means that ``\dots\ is a \textbf{JAchar}''.
 リスト中の負の整数$-n$は「文字範囲$n$に属する文字は\textbf{ALchar}として
 扱う」ことを意味し，正の整数$+n$は「\textbf{JAchar}として扱う」ことを意味する．
 %</ja>
-
-%<*en>
-\emph{Caution}: this default setting may causes a problem with traditional 8-bit fonts,
-such as \cs{Frowny} in MarVoSym.ttf. Since the codepoint of \cs{Frowny} is 167,
-which belongs to character range~8, this will be typeset \ltjjachar`§ in current
-\emph{Japanese} font.
-To avoid this problem, one can use
-\begin{lstlisting}
-\ltjsetparameter{jacharrange={-1, -8}}
-\end{lstlisting}
-to set all characters whose codepoint is in $[128,255)$ as \textbf{ALchar}.
-%</en>
-%<*ja>
-なお，この標準設定は，伝統的な8ビットのフォントを使うときに問題を起こす可能性がある．
-具体例としてはMarVoSym.ttf中の\cs{Frowny}があり，この符号位置は（文字範囲8内の）167である
-から，\cs{Frowny}はそのままでは\ltjjachar`§を和文フォントで出力してしまうことになる．
-回避するには，
-\begin{lstlisting}
-\ltjsetparameter{jacharrange={-1, -8}}
-\end{lstlisting}
-などとして，符号位置が$[128,255)$の全ての文字を\textbf{ALchar}扱いにさせればよい．
-%</ja>
-
 
 %<*en>
 \paragraph{Default character ranges}
@@ -2067,19 +2048,21 @@ these eight ranges belongs to the character range~217.
 %</en>
 %<*ja>
 以下ではこれら8つの文字範囲について記述する．添字のアルファベット「J」「A」
-は，その文字範囲内の文字が\textbf{JAchar}か\textbf{ALchar}かを表している．これらの設定は
-\texttt{PXbase}バンドルで定義されている\texttt{prefercjk}と類似のものである．
+は，その文字範囲内の文字が\textbf{JAchar}か\textbf{ALchar}かを表している．これらの初期設定は
+\texttt{PXbase}バンドルで定義されている\texttt{prefercjk}と類似のものであるが，
+8ビットフォント使用時のトラブルを防ぐために \texttt{U+0080}--\texttt{U+00FF} の文字は全部
+\textbf{ALchar}としている．
 なお，\texttt{U+0080} 以降でこれら8つの文字範囲に属さない文字は，217番の文字範囲に属することになっている．
 %</ja>
 \begin{description}
 %<*en>
 
-\item[Range~8${}^{\kern.1em\text{J}}$] The intersection of the upper half of ISO~8859-1
+\item[Range~8${}^{\text{A}}$] The intersection of the upper half of ISO~8859-1
 	 (Latin-1 Supplement) and JIS~X~0208 (a basic character set for Japanese). This character range
 	 consists of the following characters:
 %</en>
 %<*ja>
-\item[範囲8${}^{\kern.1em\text{J}}$] ISO~8859-1の上位領域（ラテン1補助）と
+\item[範囲8${}^{\text{A}}$] ISO~8859-1の上位領域（ラテン1補助）と
                              JIS~X~0208の共通部分．この文字範囲は
                              以下の文字で構成される：
 %</ja>
@@ -2113,9 +2096,10 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 \item \texttt{U+0180}--\texttt{U+024F}: Latin Extended-B
 \item \texttt{U+0250}--\texttt{U+02AF}: IPA Extensions
 \item \texttt{U+02B0}--\texttt{U+02FF}: Spacing Modifier Letters
-\item \texttt{U+0300}--\texttt{U+036F}: \\\null\hfill Combining Diacritical Marks
-\item \texttt{U+1E00}--\texttt{U+1EFF}: \\\null\hfill Latin Extended Additional
-\par\
+%<en>\par\ 
+\item \texttt{U+0300}--\texttt{U+036F}: \\*\null\hfill Combining Diacritical Marks
+\item \texttt{U+1E00}--\texttt{U+1EFF}: \\*\null\hfill Latin Extended Additional
+%<ja>\par\
 \end{itemize}
 \end{multicols}
 %<*en>
@@ -2124,7 +2108,7 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 %</en>
 %<*ja>
 \item[範囲2${}^{\text{\kern.1emJ}}$] ギリシャ文字とキリル文字．JIS~X~0208（したがってほとんどの
-                             和文フォント）はこれらの文字を持つ．
+                             和文フォント）には，これらの文字の一部が含まれている．
 %</ja>
 \begin{multicols}{2}
 \begin{itemize}
@@ -2248,6 +2232,54 @@ The block list is indicated in Table~\ref{table-rng7}.
 \end{tabular}
 \end{table}
 \end{description}
+
+%<*en>
+\paragraph{Notes on \texttt{U+0080}--\texttt{U+00FF}}
+You should treat characters in \\texttt{U+0080}--\texttt{U+00FF} as \textbf{ALchar}, 
+when you use traditional 8-bit fonts, such as the \Pkg{textcomp} package or the
+\Pkg{marvosym} package.
+
+For example, the codepoint \cs{textparagraph} which is provided by the \Pkg{textcomp}
+package is 182. This codepoint corresponds \P\ (\text{U+00B6}) in Unicode.
+Similarly, \cs{Frowny} which is provided by the \Pkg{marvosym} package has
+the same codepoint as \S\ (\text{U+00A7}).
+Hence, as previous versions of \LuaTeX-ja, if these characters are treated as
+\text{JAchar}s, then \cs{textparagraph} produces ``ltjjachar`¶'' (in a Japanese font), 
+and  \cs{Frowny} produces ``\ltjjachar`§'' (in a Japanese font).
+
+To avoid such situations, the default  setting of \LuaTeX-ja is changed in this release
+so that all characters \texttt{U+0080}--\texttt{U+00FF} are treated as \textbf{ALchar}.
+If you want to output a character as \textbf{ALchar}/\textbf{JAchar} regardless the range
+setting, you can use \cs{ltjalchar}/\cs{ltjjachar} respectively.
+\begin{LTXexample}[width=0.3\textwidth]
+\gtfamily 
+¶，\ltjalchar`¶，\ltjjachar`¶\\   % default: ALchar
+α，\ltjalchar`α，\ltjjachar`α  % default: JAchar
+\end{LTXexample}
+%</en>
+%<*ja>
+\paragraph{\texttt{U+0080}--\texttt{U+00FF}についての注意}
+\LuaTeX-jaで，\Pkg{textcomp}パッケージや\Pkg{marvosym}パッケージ等，Unicodeフォントでなく
+伝統的な8ビットフォントを用いる場合には注意が必要である．
+
+例えば，\Pkg{textcomp}パッケージの提供する \cs{textparagraph} は，
+符号位置が182，つまり \texttt{0xB6} であり，Unicodeではこの符号位置では\P\ (\text{U+00B6}) に対応する．
+また，\Pkg{marvosym}パッケージの提供する \cs{Frowny} も，符号位置は167，つまりUnicodeにおける
+\S\ (\text{U+00A7}) と同じ符号位置にある．
+即ち，以前のバージョンのように，「前節の文字範囲8内の文字は\textbf{JAchar}」という設定で
+あったとすると，上記の \cs{textparagraph} は和文フォントで「\ltjjachar`¶」を出力し，
+また \cs{Frowny} は和文フォントで「\ltjjachar`§」を出力することになる．
+このような事態を避けるために，\emph{本バージョンからは \texttt{U+0080}--\texttt{U+00FF} の範囲の
+文字は全て\textbf{ALchar}となるように初期設定を変更}している．
+
+なお，文字範囲の設定に関わらず文字を\textbf{ALchar}, \textbf{JAchar}で出力したい場合には，
+それぞれ \cs{ltjalchar},~\cs{ltjjachar} に該当文字の文字コードを渡せばよい．
+\begin{LTXexample}[width=0.3\textwidth]
+\gtfamily 
+¶，\ltjalchar`¶，\ltjjachar`¶\\   % default: ALchar
+α，\ltjalchar`α，\ltjjachar`α  % default: JAchar
+\end{LTXexample}
+%</ja>
 
 %<en>\subsection{\Param{kanjiskip} and \Param{xkanjiskip}}
 %<ja>\subsection{\Param{kanjiskip}と\Param{xkanjiskip}}
