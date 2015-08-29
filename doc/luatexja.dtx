@@ -352,7 +352,6 @@ In \pTeX, a line break after Japanese character is ignored (and
 %</ja>
 
 %<*en>
-
 \paragraph{Spaces related to Japanese characters}
 The insertion process of glues/kerns between two Japanese
       characters and between a Japanese character and other characters
@@ -421,17 +420,19 @@ The insertion process of glues/kerns between two Japanese
 
 %<*en>
 \paragraph{Directions}
-From version~20150420.0, \LuaTeX-ja supports vertical writing;
-but this feature must \emph{not} be confused with $\Omega$-style direction support of \LuaTeX\
-itself. ...
+From version~20150420.0, \LuaTeX-ja supports vertical writing.
+We implement this feature by using callbacks of \LuaTeX; so it must \emph{not} be confused
+with $\Omega$-style direction support of \LuaTeX\ itself.
+Due to implementation, the dimension returned by \cs{wd},~\cs{ht}, or~\cs{dp} depends
+on the content of the register \emph{only}. This is major difference with \pTeX.
 %</en>
 %<*ja>
 \paragraph{組方向}
 20150420.0版からは，不安定ながらも\LuaTeX-ja における縦組みをサポートしている．
-なお，\LuaTeX 本体も，$\Omega$流の組方向をサポートしているが，それとは全くの別物であること
+なお，\LuaTeX 本体も$\Omega$流の組方向をサポートしているが，それとは全くの別物であること
 に注意してほしい．
-\LuaTeX のコールバックや実装により，特に異なった組方向のボックスを扱う場合には
-\cs{wd}, \cs{ht}, \cs{dp}等の仕様が異なるので注意．詳細は第\ref{sec-direction}章を参照．
+特に，異なった組方向のボックスを扱う場合には
+\cs{wd}, \cs{ht}, \cs{dp}等の仕様が\pTeX と異なるので注意．詳細は第\ref{sec-direction}章を参照．
 %</ja>
 
 %<*en>
@@ -445,7 +446,35 @@ Japanese characters in discretionary break (\cs{discretionary}) is not supported
       しても使いたい場合は \cs{hbox} で括ること．
 %</ja>
 
+%<*en>
+\paragraph{Greek and Cyrillic letters, and ISO~8859-1 symbols}
+By default, \LuaTeX-ja uses Japanese fonts to typeset Greek and Cyrillic letters,
+      To change this behavior, 
+      put \verb!\ltjsetparameter{jacharrange={-2,-3}}! in the preamble.
+      For the detailed description, see Subsection~\ref{ssec-setrange}.
 
+From this version, characters which belongs both ISO~8859-1 and JIS~X~0208,
+      such as \P~and~\S, are now typeset in alphabetic fonts. This means that
+      without the \cs{fontspec} package, these characters are not typeset correctly.
+%</en>
+%<*ja>
+\paragraph{ギリシャ文字・キリル文字とISO~8859-1の記号}
+標準では，\LuaTeX-jaはギリシャ文字やキリル文字を和文フォントを使っ
+      て組む．ギリシャ語などを本格的に組むなどこの状況が望ましくない場合，
+      プリアンブルに
+\begin{lstlisting}
+ \ltjsetparameter{jacharrange={-2,-3}}
+\end{lstlisting}
+      を入れると
+      上記種類の文字は欧文フォントを用いて組まれるようになる．
+      詳しい説明は\ref{ssec-setrange}節を参照してほしい．
+
+また，\P,~\S といったISO~8859-1の上位領域とJIS~X~0208の共通部分の文字は
+      本バージョンから標準で欧文扱いとなり，\emph{ソース中に直接記述しても
+      \Pkg{fontspec}パッケージ非読み込みの状態では出力されなくなった}．
+      和文扱いで出力するには \verb+\ltjjachar`§+ のように \cs{ltjjachar} 命令
+      を使えばよい．
+%</ja>
 
 %<en>\subsection{Notations}
 %<ja>\subsection{用語と記法}
@@ -744,26 +773,6 @@ For changes from \pTeX, see Subsection~\ref{ssec:chgptex}.
 %<*ja>
 \item 原稿のソースファイルの文字コードはUTF-8固定である．
       従来日本語の文字コードとして用いられてきたEUC-JPやShift-JISは使用できない．
-%</ja>
-%<*en>
-\item By default, \LuaTeX-ja uses Japanese fonts to typeset Greek and Cyrillic letters.
-      To change this behavior, 
-      put \verb!\ltjsetparameter{jacharrange={-2,-3}}! in the preamble.
-      For the detailed description, see Subsection~\ref{ssec-setrange}.
-%</en>
-%<*ja>
-\item 
-標準では，\LuaTeX-jaはギリシャ文字やキリル文字を和文フォントを使っ
-      て組む．ギリシャ語などを本格的に組むなどこの状況が望ましくない場合，
-      プリアンブルに
-\begin{lstlisting}
- \ltjsetparameter{jacharrange={-2,-3}}
-\end{lstlisting}
-      を入れると
-      上記種類の文字は欧文フォントを用いて組まれるようになる．
-      なお，\P,~\S といったISO~8859-1の上位領域とJIS~X~0208の共通部分の文字は
-      本バージョンから標準で欧文扱い(\textbf{ALchar})となった．
-      詳しい説明は\ref{ssec-setrange}節を参照してほしい．
 %</ja>
 %<*en>
 \item \LuaTeX-ja is very slower than \pTeX.
@@ -2247,14 +2256,15 @@ Hence, as previous versions of \LuaTeX-ja, if these characters are treated as
 \text{JAchar}s, then \cs{textparagraph} produces ``ltjjachar`¶'' (in a Japanese font), 
 and  \cs{Frowny} produces ``\ltjjachar`§'' (in a Japanese font).
 
-To avoid such situations, the default  setting of \LuaTeX-ja is changed in this release
+To avoid such situations, the default setting of \LuaTeX-ja is changed in this release
 so that all characters \texttt{U+0080}--\texttt{U+00FF} are treated as \textbf{ALchar}.
-If you want to output a character as \textbf{ALchar}/\textbf{JAchar} regardless the range
-setting, you can use \cs{ltjalchar}/\cs{ltjjachar} respectively.
+
+If you want to output a character as \textbf{ALchar} and \textbf{JAchar} regardless the range
+setting, you can use \cs{ltjalchar} and \cs{ltjjachar} respectively, as the following example.
 \begin{LTXexample}[width=0.3\textwidth]
-\gtfamily 
-¶，\ltjalchar`¶，\ltjjachar`¶\\   % default: ALchar
-α，\ltjalchar`α，\ltjjachar`α  % default: JAchar
+\gtfamily\large % default, ALchar, JAchar
+¶, \ltjalchar`¶, \ltjjachar`¶\\   % default: ALchar
+α, \ltjalchar`α, \ltjjachar`α  % default: JAchar
 \end{LTXexample}
 %</en>
 %<*ja>
@@ -2269,15 +2279,19 @@ setting, you can use \cs{ltjalchar}/\cs{ltjjachar} respectively.
 即ち，以前のバージョンのように，「前節の文字範囲8内の文字は\textbf{JAchar}」という設定で
 あったとすると，上記の \cs{textparagraph} は和文フォントで「\ltjjachar`¶」を出力し，
 また \cs{Frowny} は和文フォントで「\ltjjachar`§」を出力することになる．
-このような事態を避けるために，\emph{本バージョンからは \texttt{U+0080}--\texttt{U+00FF} の範囲の
-文字は全て\textbf{ALchar}となるように初期設定を変更}している．
 
-なお，文字範囲の設定に関わらず文字を\textbf{ALchar}, \textbf{JAchar}で出力したい場合には，
-それぞれ \cs{ltjalchar},~\cs{ltjjachar} に該当文字の文字コードを渡せばよい．
+このような事態を避けるために，本バージョンからは \texttt{U+0080}--\texttt{U+00FF} の範囲の
+文字は全て\textbf{ALchar}となるように初期設定を変更している．
+特に影響を受けるのが，JIS~X~0208の一部分である文字範囲8内の文字であり，
+\emph{\Pkg{fontspec}パッケージを読み込んだりして欧文記号としてこれらの文字の出力環境を整え
+ないと，ソース中に直接記述しても出力されない}ことになる．
+
+なお，文字範囲の設定に関わらず1つの文字を\textbf{ALchar}, \textbf{JAchar}で出力したい場合には，
+以下の例のようにそれぞれ \cs{ltjalchar},~\cs{ltjjachar} に該当文字の文字コードを渡せばよい．
 \begin{LTXexample}[width=0.3\textwidth]
-\gtfamily 
-¶，\ltjalchar`¶，\ltjjachar`¶\\   % default: ALchar
-α，\ltjalchar`α，\ltjjachar`α  % default: JAchar
+\gtfamily\large % default, ALchar, JAchar
+¶, \ltjalchar`¶, \ltjjachar`¶\\   % default: ALchar
+α, \ltjalchar`α, \ltjjachar`α  % default: JAchar
 \end{LTXexample}
 %</ja>
 
@@ -2487,7 +2501,7 @@ Here the horizontal line in the below example is the baseline of a line.
 下の例において引かれている水平線がベースラインである．
 %</ja>
 \begin{LTXexample}
-\vrule width 150pt height 0.4pt depth 0pt \hskip-120pt
+\vrule width 150pt height 0.2pt depth 0.2pt \hskip-120pt
 \ltjsetparameter{yjabaselineshift=0pt, yalbaselineshift=0pt}abcあいう
 \ltjsetparameter{yjabaselineshift=5pt, yalbaselineshift=2pt}abcあいう
 \end{LTXexample}
@@ -2502,13 +2516,15 @@ The following is an example (beware the value is not well tuned):
 異なる文字を中心線に揃えることができる．
 以下は一つの例である（値はあまり調整されていないことに注意）：
 %</ja>
-\begin{LTXexample}
-xyz漢字
+\begin{LTXexample}[width=0.4\textwidth]
+\vrule width 150pt height4.417pt depth-4.217pt%
+\kern-150pt
+\large xyz漢字
 {\scriptsize
-  \ltjsetparameter{yjabaselineshift=-1pt,
-    yalbaselineshift=-1pt}
-  XYZひらがな
-}abcかな
+  \ltjsetparameter{yjabaselineshift=-1.757pt,
+    yalbaselineshift=-1.757pt}
+  漢字xyzあいう
+}あいうabc
 \end{LTXexample}
 
 %<*en>
@@ -2565,20 +2581,20 @@ becuse a \emph{JAchar} is encapsulated by a horizontal box if needed.
 \toprule
 \emph{入力}&\vspace*{\dimexpr-\origbaselineskip-\smallskipamount}
 \begin{lstlisting}
-数式abc: $あa\hbox{い}$, $\int_0^x t\,dt=x^2\!/2$,
+数式abc: $あa\hbox{い}$, $\int_0^x t\,dt=x^2/2$,
 $\Phi\vdash F(x)\ \hbox{for all}\ x\in A$
 \end{lstlisting}\\
 \noalign{\vskip-\origbaselineskip}
 \midrule
 \emph{\pTeX}&
 {\ltjsetparameter{yalbaselineshift=10pt}%
-数式abc: $あa\lower10pt\hbox{い}$, $\int_0^x t\,dt=x^2\!/2$,
+数式abc: $あa\lower10pt\hbox{い}$, $\int_0^x t\,dt=x^2/2$,
 $\Phi\vdash F(x)\ \lower10pt\hbox{for all}\ x\in A$
 \par}\\
 \midrule
 \emph{\LuaTeX-ja}&
 {\ltjsetparameter{yalbaselineshift=10pt}%
-数式abc: $あa\hbox{い}$, $\int_0^x t\,dt=x^2\!/2$,
+数式abc: $あa\hbox{い}$, $\int_0^x t\,dt=x^2/2$,
 $\Phi\vdash F(x)\ \hbox{for all}\ x\in A$
 \par}\\
 \noalign{\vskip-\origbaselineskip}
@@ -2594,8 +2610,9 @@ Among parameters which related to Japanese word-wrapping process (\emph{kinsoku 
  \Param{jaxspmode},~\Param{alxspmode}, \Param{prebreakpenalty},
  \Param{postbreakpenalty}~and~\Param{kcatcode}
 \end{quote}
-are stored by each character codes. ...
+are stored by each character codes.
 
+OpenType font features are ignored in these parameters.
 For example, a fullwidth katakana ``ア'' on line~10 in the below input is replaced to
 its halfwidth variant ``ｱ'', by \verb+hwid+ feature.
 However, the penalty inserted after it is 10 which is the \Param{postbreakpenalty} of
@@ -2612,7 +2629,7 @@ However, the penalty inserted after it is 10 which is the \Param{postbreakpenalt
 
 \Pkg{fontspec}パッケージを使う（\ref{ssec-fontspec}節）場合など，
 各種のOpenType featureを適用することもあると思うが，前段落に述べたパラメータ類は，
-\emph{OpenType featureの適用前の文字コードによって判定される．}
+\emph{OpenType featureの適用前の文字コードによって適用される．}
 例えば，以下の例において10行目の「ア」は，\verb+hwid+ featureの適用により半角カタカナの「ｱ」
 に置き換わる．しかし，その直後に挿入される \Param{postbreakpenalty}は，置換前の「ア」に対する値10である．
 %</ja>
