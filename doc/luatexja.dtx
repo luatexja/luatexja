@@ -331,8 +331,8 @@ Note that \pTeX\ adds new two useful units, namely \texttt{zw}~and~\texttt{zh}.
 As shown above, they are changed by \cs{zw}~and~\cs{zh} respectively, in \LuaTeX-ja.
 %</en>
 %<*ja>
-特に注意してほしいのは，\pTeX で追加された \texttt{zw} と \texttt{zh} という単位を
-\LuaTeX-ja で扱うには，\cs{zw}, \cs{zh} と制御綴の形にしないといけないという点である．
+特に注意してほしいのは，\pTeX で追加された \texttt{zw} と \texttt{zh} という単位は
+\LuaTeX-ja では使用できず，\cs{zw}, \cs{zh} と制御綴の形にしないといけないという点である．
 %</ja>
 
 %<*en>
@@ -2026,6 +2026,15 @@ and positive integer $+n$ means that ``\dots\ is a \textbf{JAchar}''.
 \textsf{jacharrange}パラメータの引数は非零の整数のリストである．
 リスト中の負の整数$-n$は「文字範囲$n$に属する文字は\textbf{ALchar}として
 扱う」ことを意味し，正の整数$+n$は「\textbf{JAchar}として扱う」ことを意味する．
+%</ja>
+
+%<*en>
+Note that characters \texttt{U+0000}--\texttt{U+007F} are always treated as an
+\textbf{ALchar} (this cannot be customized).
+%</en>
+%<*ja>
+なお，\texttt{U+0000}--\texttt{U+007F} は常に\textbf{ALchar}として扱われる（利用者が変更す
+ることは出来ない）．
 %</ja>
 
 %<*en>
@@ -5722,6 +5731,28 @@ are typeset by \cs{piyo}.
 マクロの都合による．
 %</ja>
 
+%<*ja>
+\subsection{\cs{ltjalchar} と \cs{ltjjachar}}
+文字コードが$\text{<chr\_code>}~(\geq 128=\mathtt{0x80})$の文字を
+\ \cs{char} プリミティブを使い \cs{char}<chr\_code> として出力させると，
+その文字の属する文字範囲（\ref{ssec-setrange}節参照）によって
+\textbf{ALchar}か\textbf{JAchar}か，つまり欧文フォントで出力されるか和文フォントで出力され
+るかが決まる．
+
+文字範囲の設定を無視し，文字コードが$\text{<chr\_code>}~(\geq 128=\mathtt{0x80})$の文字を強制的に
+\textbf{ALchar}, \textbf{JAchar}で出力する命令がそれぞれ
+\ \cs{ltjalchar},~\cs{ltjjachar} である．使用方法は \cs{char} と同じく
+\ \cs{ltjalchar}<chr\_code>, \cs{ltjjachar}<chr\_code>とすればよい．
+<chr\_code>が127以下の場合は，\cs{ltjjachar} であっても\textbf{ALchar}として出力されること
+に注意．
+
+以下は\ref{ssec-setrange}節に載せた例に，\cs{char} の動作を追加したものである．
+\begin{LTXexample}[width=0.25\textwidth]
+\gtfamily\large % default, ALchar, JAchar
+¶, \char`¶, \ltjalchar`¶, \ltjjachar`¶\\    % default: ALchar
+α, \char`α, \ltjalchar`α, \ltjjachar`α  % default: JAchar
+\end{LTXexample}
+%</ja>
 
 
 %<en>\section{Commands for \LaTeXe}
