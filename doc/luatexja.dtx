@@ -172,9 +172,9 @@
   width:\hfill\ #2\cr height:\hfill\ #3\cr depth:\hfill\ #4\cr
   }}}}}\,}
 
-\protected\def\Param#1{\hyperlink{fld:#1}{\textsf{#1}}} % parameter name
-\protected\def\DParam#1{\hypertarget{fld:#1}{\textsf{#1}}} % parameter name (definition)
-\protected\def\Pkg#1{\underline{\smash{\texttt{#1}}}} % packages/classes
+\protected\def\Param#1{\hyperlink{fld:#1}{\underline{\smash{\textsf{#1}}}}} % parameter name
+\protected\def\DParam#1{\hypertarget{fld:#1}{\underline{\smash{\textsf{#1}}}}} % parameter name (definition)
+\protected\def\Pkg#1{\textsf{#1}} % packages/classes
 
 
 \begin{document}
@@ -271,7 +271,7 @@ scripts for appropriate callbacks.
 が始まったパッケージである．
 %</ja>
 
-%<en>\subsection{Major Changes from \pTeX}
+%<en>\subsection{Major changes from \pTeX}
 %<ja>\subsection{\pTeX からの主な変更点}
 \label{ssec:chgptex}
 
@@ -518,21 +518,21 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 \textbf{JAchar}の出力に用いられるフォントを\emph{和文フォント}と呼ぶ．
 %</ja>
 %<*en>
-\item A word in a sans-serif font (like \Param{prebreakpenalty})
+\item A word in a sans-serif font with underline (like \Param{prebreakpenalty})
       means an internal parameter for Japanese typesetting, and it
       is used as a key in \cs{ltjsetparameter} command.
 %</en>
 %<*ja>
-\item サンセリフ体で書かれた語（例：\Param{prebreakpenalty}）は日本語組版用の
+\item 下線つきローマン体で書かれた語（例：\Param{prebreakpenalty}）は日本語組版用の
       パラメータを表し，これらは \cs{ltjsetparameter} 命令のキーとして
       用いられる．
 %</ja>
 %<*en>
-\item A word in typewriter font with underline (like \Pkg{fontspec})
+\item A word in a sens-serif font without underline (like \Pkg{fontspec})
       means a package or a class of \LaTeX.
 %</en>
 %<*ja>
-\item 下線付きタイプライタ体の語（例：\Pkg{fontspec}）は\LaTeX の
+\item 下線なしサンセリフ体の語（例：\Pkg{fontspec}）は\LaTeX の
       パッケージやクラスを表す．
 %</ja>
 %<*en>
@@ -544,7 +544,7 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %</ja>
 \end{itemize}
 
-%<en>\subsection{About the Project}
+%<en>\subsection{About the project}
 %<ja>\subsection{プロジェクトについて}
 
 %<en>\paragraph{Project Wiki} Project Wiki is under construction.
@@ -682,13 +682,13 @@ the forefront of development is not the \texttt{master} branch.
 \begin{lstlisting}
 $ git clone git://git.osdn.jp/gitroot/luatex-ja/luatexja.git
 \end{lstlisting}
-\item \texttt{master}ブランチのスナップショット（\texttt{tar.gz}形式）をダウンロードする．
+\item \texttt{master} ブランチのスナップショット（\texttt{tar.gz} 形式）をダウンロードする．
 \begin{flushleft}
 \url{http://git.osdn.jp/view?p=luatex-ja/luatexja.git;a=snapshot;h=HEAD;sf=tgz}.
 \end{flushleft}
 \end{itemize}
-\texttt{master}ブランチ（従って，CTAN内のアーカイブも）はたまにしか更新されないことに注意．
-主な開発は\texttt{master}の外で行われ，比較的まとまってきたらそれを\texttt{master}に
+\texttt{master} ブランチ（従って，CTAN内のアーカイブも）はたまにしか更新されないことに注意．
+主な開発は\texttt{master}の外で行われ，比較的まとまってきたらそれを \texttt{master} に
 反映させることにしている．
 %</ja>
 
@@ -698,8 +698,8 @@ But only the contents in \texttt{src/} are needed to work \LuaTeX-ja.
 %</en>
 %<*ja>
 \item 「Gitリポジトリをクローン」以外の方法でアーカイブを取得したならば，それを展開する．
-      \texttt{src/}をはじめとしたいくつかのディレクトリができるが，
-      動作には\texttt{src/}以下の内容だけで十分．
+      \texttt{src/} をはじめとしたいくつかのディレクトリができるが，
+      動作には \texttt{src/} 以下の内容だけで十分．
 %</ja>
 
 %<*en>
@@ -739,7 +739,7 @@ $ luatex   ltj-kinsoku_make.tex
       instead copying is also good.
 %</en>
 %<*ja>
-\item \texttt{src}の中身を自分の\texttt{TEXMF}ツリーにコピーする．
+\item \texttt{src} の中身を自分の \texttt{TEXMF} ツリーにコピーする．
       場所の例としては，例えば
 \begin{quote}
  \texttt{TEXMF/tex/luatex/luatexja/}
@@ -820,7 +820,7 @@ and finally delete the temporary directory.
 \href{https://osdn.jp/projects/luatex-ja/wiki/FrontPage%28en%29}{%
   プロジェクトWiki英語版トップページ}中に書かれているバッチファイルを
 実行して欲しい．このバッチファイルは，作業用ディレクトリにCMap達を
-コピーし，その中で\LuaTeX-ja の初回起動を行い，作業用ディレクトリを消す作業をしている．
+コピーし，その中で\LuaTeX-jaの初回起動を行い，作業用ディレクトリを消す作業をしている．
 %</ja>
 
 \end{itemize}
@@ -1275,7 +1275,8 @@ this chapter. For the method, please see Subsection~\ref{ssec-math}.
 記述しない．この方法については\ref{ssec-math}節を参照のこと．
 %</ja>
 
-\subsection{\Pkg{luatexja-fontspec}}
+%<en>\subsection{\Pkg{luatexja-fontspec} package}
+%<ja>\subsection{\Pkg{luatexja-fontspec}パッケージ}
 \label{ssec-fontspec}
 %<*en>
 To use the functionality of the \Pkg{fontspec} package to Japanese fonts, 
@@ -1379,8 +1380,8 @@ The default value is calculated automatically (for~example, about~0.924865 when
 	     the \Pkg{ltjsarticle} class is used).
 %</en>
 %<*ja>
-欧文に対する和文の比率は，標準では \Pkg{luatexja-fontspec} 読み込み時の和欧文比率から
-自動計算される（例えば，\Pkg{ltjsarticle} クラス使用時には和文は欧文の約0.924865倍となる）が，
+欧文に対する和文の比率は，標準では \Pkg{luatexja-fontspec}読み込み時の和欧文比率から
+自動計算される（例えば，\Pkg{ltjsarticle}クラス使用時には和文は欧文の約0.924865倍となる）が，
 それを手動で上書きするときに使用する．
 %</ja>
 \end{cslist}
@@ -1426,13 +1427,14 @@ JIS~X~0213:2004→辻\par
 JIS~X~0208:1990→辻
 \end{LTXexample}
 
-%<en>\subsection{Presets}
-%<ja>\subsection{プリセット設定}
+%<en>\subsection{Presets of Japanese fonts}
+%<ja>\subsection{和文フォントのプリセット設定}
 \label{ssec-preset}
 
 %<*en>
-To use standard Japanese font settings easily, one can load the \Pkg{luatexja-preset}
-package with several options. This package provides functions in a part of
+One can load the \Pkg{luatexja-preset}
+package to use several ``presets'' of Japanese fonts. 
+This package provides functions in a part of
 \Pkg{japanese-otf} package and a part of \Pkg{PXchfon} package by Takayuki Yato.
 
 One can specified other options other than listed in this subsection.
@@ -2441,7 +2443,7 @@ JFMは「望ましい\Param{kanjiskip}の値」や
 \cs{ltjgetparameter} によって取得することはできないので注意が必要である．
 %</ja>
 
-%<en>\subsection{Insertion Setting of \Param{xkanjiskip}}
+%<en>\subsection{Insertion setting of \Param{xkanjiskip}}
 %<ja>\subsection{\Param{xkanjiskip} の挿入設定}
 
 %<*en>
@@ -2682,7 +2684,7 @@ However, the penalty inserted after it is 10 which is the \Param{postbreakpenalt
 ``ア'', not 20.
 %</en>
 %<*ja>
-\subsection{禁則処理関連パラメータとfont feature}
+\subsection{禁則処理関連パラメータとOpenTypeのfont feature}
 禁則処理や \Param{kanjiskip}, \Param{xkanjiskip} の挿入に関連したパラメータのうち
 \begin{quote}
  \Param{jaxspmode},~\Param{alxspmode}, \Param{prebreakpenalty},
@@ -2947,7 +2949,7 @@ for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 \end{table}
 
 %<*en>
-\subsection{Non-kanji Characters in a Control Word}
+\subsection{Non-kanji characters in a control word}
 Because the engine differ, so non-kanji JIS~X~0208 characters
 which can be used in a control word differ in \pTeX, in \upTeX,~and~in \LuaTeX-ja.
 Table~\ref{table-kcat-diff} shows the difference.
@@ -4033,7 +4035,7 @@ Please contact the LuaTeX-ja project team.
 ?
 \end{lstlisting}
 
-%<en>\subsection{Structure of a JFM File}
+%<en>\subsection{Structure of a JFM file}
 %<ja>\subsection{JFMファイルの構造}
 \label{ssec-jfm-str}
 %<en>A JFM file is a Lua script which has only one function call:
@@ -4665,7 +4667,7 @@ JFM側で一部の対処ができることにより，\Pkg{jsclasses}のよう�
 %</ja>
 
 
-%<en>\subsection{Math Font Family}
+%<en>\subsection{Math font family}
 %<ja>\subsection{数式フォントファミリ}
 \label{ssec-math}
 
@@ -5609,7 +5611,7 @@ The correct way is using a temporary register.
 
 %<en>\section{Other Commands for plain \TeX\ and \LaTeXe}
 %<ja>\section{plainでも\LaTeX でも利用可能なその他の命令}
-%<en>\subsection{Commands for Compatibility with \pTeX}
+%<en>\subsection{Commands for compatibility with \pTeX}
 %<ja>\subsection{\pTeX 互換用命令}
 
 %<*en>
@@ -6080,8 +6082,8 @@ Avant Garde (OT1/pag/m/n) に変わっていることがわかる．
 \userelfont\selectfont あいうabc
 \end{LTXexample}
 
-%<en>\subsection{\cs{fontfamily}}
-%<ja>\subsection{\cs{fontfamily}}
+%<en>\subsection{Detail of \cs{fontfamily} command}
+%<ja>\subsection{\cs{fontfamily}コマンドの詳細}
 \label{ssec-fontfamilycmd}
 %<*en>
 In this subsection, we describe when \cs{fontfamily}<family> changes current
@@ -6247,14 +6249,14 @@ to use the default family for font substitution.
 
 
 %<*en>
-\section{Addons}
+\section{Addon packages}
 \LuaTeX-ja has several addon packages.
 These addons are written as \LaTeX\ packages, but
 \Pkg{luatexja-otf} and~\Pkg{luatexja-adjust} can be loaded in plain \LuaTeX\
 by \cs{input}.
 %</en>
 %<*ja>
-\section{拡張}
+\section{拡張パッケージ}
 \LuaTeX-jaには（動作には必須ではないが）自由に読み込める拡張が付属している．
 これらは\LaTeX のパッケージとして制作しているが，
 \Pkg{luatexja-otf}と\Pkg{luatexja-adjust}についてはplain \LuaTeX でも\
@@ -6982,7 +6984,7 @@ In this case, <contents> will be aligned \dots
 %<en>\section{Storing Parameters}
 %<ja>\section{パラメータの保持}
 \label{sec-para}
-%<en>\subsection{Used Dimensions, Attributes and Whatsit Nodes}
+%<en>\subsection{Used dimensions, attributes and whatsit nodes}
 %<ja>\subsection{\LuaTeX-jaで用いられるレジスタとwhatsitノード}
 
 %<*en>
@@ -7293,7 +7295,7 @@ These whatsits will be removed during the process of inserting \textbf{JAglue}s.
 これらのwhatsitノードは\textbf{JAglue}の挿入処理の間に取り除かれる．
 %</ja>
 
-%<en>\subsection{Stack System of \LuaTeX-ja}
+%<en>\subsection{Stack system of \LuaTeX-ja}
 %<ja>\subsection{\LuaTeX-jaのスタックシステム}
 \label{ssec-stack}
 
@@ -7473,7 +7475,7 @@ To solve this problem, we use another trick: the assignment
 %</ja>
 
 %<*en>
-\subsection{Lua Functions of the Stack System}
+\subsection{Lua functions of the stack system}
 In this subsection, we will see how a user use \LuaTeX-ja's stack system to
 store some data which obeys the grouping of \TeX.
 %</en>
@@ -7679,7 +7681,7 @@ end
 %<en>\section{Linebreak after a Japanese Character}
 %<ja>\section{和文文字直後の改行}
 \label{sec-lbreak}
-%<en>\subsection{Reference: Behavior in \pTeX}
+%<en>\subsection{Reference: behavior in \pTeX}
 %<ja>\subsection{参考：\pTeX の動作}
 %<*en>
 In~\pTeX, a line break after a Japanese character doesn't emit a space,
@@ -8872,7 +8874,7 @@ With this key, the above input now produces better output.
 \end{lstlisting}
 %</ja>
 
-%<en>\subsection{Class of Characters}
+%<en>\subsection{Class of characters}
 %<ja>\subsection{文字種}
 
 %<en>Roughly speaking, the \Pkg{listings} package processes input as follows:
@@ -9281,7 +9283,7 @@ CMapが必要である．
 縦組時における幅を格納している．構造は以下の通り：
 %</ja>
 %<*en>
-\subsection{Use of Cache}
+\subsection{Use of cache}
 
 \LuaTeX-ja uses the following cache:
 \begin{cslist}
