@@ -1048,6 +1048,11 @@ Okumura), namely, \Pkg{ltjclasses}\footnote{%
 がそれぞれ用意されている．
 %</ja>
 
+%<*en>
+%</en>
+%<*ja>
+%</ja>
+
 %<*ja>
 \paragraph{脚注とボトムフロートの出力順序}
 オリジナルの\LaTeX では脚注がボトムフロートの上に来るようになっており，
@@ -1270,12 +1275,11 @@ this chapter. For the method, please see Subsection~\ref{ssec-math}.
 記述しない．この方法については\ref{ssec-math}節を参照のこと．
 %</ja>
 
-
-\subsection{fontspec}
+\subsection{\Pkg{luatexja-fontspec}}
 \label{ssec-fontspec}
 %<*en>
-To coexist with the \Pkg{fontspec} package, it is needed to load
-the \Pkg{luatexja-fontspec} package in the preamble, as follows:
+To use the functionality of the \Pkg{fontspec} package to Japanese fonts, 
+it is needed to load the \Pkg{luatexja-fontspec} package in the preamble, as follows:
 \begin{quote}
 \ttfamily \textbackslash usepackage[<options>]\{luatexja-fontspec\}
 \end{quote}
@@ -1342,19 +1346,60 @@ alphabetic fonts
 \end{tabular}
 \end{center}
 %</ja>
-%<*en>
-The package option of \Pkg{luatexja-fontspec} are the followings:
+
+%<en> The package option of \Pkg{luatexja-fontspec} are the followings:
+%<ja> \Pkg{luatexja-fontspec} パッケージのオプションは以下の通りである：
 \begin{cslist}
  \item[match]
+%<*en>
 If this option is specified, usual family-changing commands such as
 \cs{rmfamily},~\cs{textrm}, \cs{sffamily},~\dots\ also change Japanese font family.
 
 Note that \emph{\cs{setmonojfont} is defined
 if and only if this \texttt{\textup{match}} option is specified}.
+%</en>
+
+%<*ja>
+このオプションが指定されると，「\pLaTeXe 新ドキュメントクラス」のように\
+\cs{rmfamily}, \verb+\textrm{...}+, \cs{sffamily} 等が
+欧文フォントだけでなく和文フォントも変更するようになる．
+
+\emph{なお，\cs{setmonojfont} はこの \texttt{match} オプションが
+指定された時のみ定義される．}この命令は標準の「タイプライタ体に対応する和文フォント」を指定する．
+%</ja>
 
  \item[pass=<opts>]
-Specify options <opts> which will be passed to the \Pkg{fontspec} package.
+%<en> \emph{(Obsoleted)}\ Specify options <opts> which will be passed to the \Pkg{fontspec} package.
+%<ja> \Pkg{fontspec} パッケージに渡すオプション <opts> を指定する．本オプションは時代遅れである．
+
+\item[scale=<float>]
+%<*en>
+Override the ratio of the font size of Japanese fonts to that of alphabetic fonts.
+The default value is calculated automatically (for~example, about~0.924865 when
+	     the \Pkg{ltjsarticle} class is used).
+%</en>
+%<*ja>
+欧文に対する和文の比率は，標準では \Pkg{luatexja-fontspec} 読み込み時の和欧文比率から
+自動計算される（例えば，\Pkg{ltjsarticle} クラス使用時には和文は欧文の約0.924865倍となる）が，
+それを手動で上書きするときに使用する．
+%</ja>
 \end{cslist}
+
+%<*en>
+All other options listed above are simply passed to the \Pkg{fontspec} package.
+This means that two lines below are equivalent, for example.
+%</en>
+%<*ja>
+上記にないオプションは全て \Pkg{fontspec} パッケージに渡される．
+例えば，下の2行は同じ意味になる：
+%</ja>
+\begin{lstlisting}
+\usepackage[no-math]{fontspec}\usepackage{luatexja-fontspec}
+\usepackage[no-math]{luatexja-fontspec}
+\end{lstlisting}
+
+
+%<*en>
 The reason that \cs{setmonojfont} is not defined by default is that
 it is popular for Japanese fonts that nearly all Japanese glyphs have same
 widths.  Also note that kerning information in a font is not used
@@ -1365,19 +1410,6 @@ This is because of the compatibility with previous versions of \LuaTeX-ja
 Below is an example of \cs{jfontspec}.
 %</en>
 %<*ja>
-\Pkg{luatexja-fontspec} パッケージのオプションは以下の通りである：
-\begin{cslist}
- \item[match]
-このオプションが指定されると，「\pLaTeXe 新ドキュメントクラス」のように\
-\cs{rmfamily}, \verb+\textrm{...}+, \cs{sffamily} 等が
-欧文フォントだけでなく和文フォントも変更するようになる．
-
-\emph{なお，\cs{setmonojfont} はこの \texttt{match} オプションが
-指定された時のみ定義される．}この命令は標準の「タイプライタ体に対応する和文フォント」を指定する．
-
- \item[pass=<opts>]
-\Pkg{fontspec} パッケージに渡すオプション <opts> を指定する．
-\end{cslist}
 標準で \cs{setmonojfont} コマンドが定義されないのは，
 和文フォントではほぼ全ての和文文字のグリフが等幅であるのが伝統的であったことによる．
 また，これらの和文用のコマンドではフォント内のペアカーニング情報は標準では使用されない，
@@ -1402,13 +1434,30 @@ JIS~X~0208:1990→辻
 To use standard Japanese font settings easily, one can load the \Pkg{luatexja-preset}
 package with several options. This package provides functions in a part of
 \Pkg{japanese-otf} package and a part of \Pkg{PXchfon} package by Takayuki Yato.
+
+One can specified other options other than listed in this subsection.
+These are simply passed to the \Pkg{luatexja-fontspec}\footnote{if \texttt{nfssonly} option is
+\emph{not} specified; in this case these options are simply ignored.}.
+For example, the line~5 in below example is eqivalent to lines 1--3.
 %</en>
 %<*ja>
 よく使われている和文フォント設定を一行で指定できるようにしたのが
 \Pkg{luatexja-preset}パッケージである．このパッケージは，
 \Pkg{otf}パッケージの一部機能と八登崇之氏による\Pkg{PXchfon}パッケージの一部機能とを
 合わせたような格好をしている．
+
+オプションとして，本節にないものも指定することができるが，それらは
+\Pkg{luatexja-fontspec}パッケージに渡される\footnote{\texttt{nfssonly} オプションが
+指定されていた場合は，\Pkg{luatexja-fontspec}パッケージは読み込まれないので単純に無視され
+る．}．例えば，下の1--3行目は5行目のように一行にまとめることができる．
 %</ja>
+\begin{lstlisting}
+\usepackage[no-math]{fontspec}
+\usepackage[match]{luatexja-fontspec}
+\usepackage[kozuka-pr6n]{luatexja-preset}
+%%--------
+\usepackage[no-math,match,kozuka-pr6n]{luatexja-preset}
+\end{lstlisting}
 
 %<en>\paragraph{General options}
 %<ja>\paragraph{一般的なオプション}
@@ -1421,7 +1470,7 @@ the \Pkg{luatexja-fontspec} package. This means that the \Pkg{fontspec} package 
 	     automatically loaded by this package.
 \emph{This option is enabled by default.}
 
-If you need to pass some options to \Pkg{fontspec}, load \Pkg{fontspec} manually
+If you need to pass some options to \Pkg{fontspec}, you can load \Pkg{fontspec} manually
 before \Pkg{luatexja-preset}:
 %</en>
 %<*ja>
@@ -1446,7 +1495,9 @@ With this option, selecting Japanese fonts won't be performed using the function
 	     \cs{addjfontfeatures} etc.).
 This option is ignored when \Pkg{luatexja-fontspec} package is loaded.
 
-Note that the \Pkg{fontspec} can coexist with the option as the following:
+When this option is specified, \Pkg{fontspec}~and~\Pkg{luatexja-fontspec} are
+\emph{not} loaded by default. Nevertheless, 
+the package\Pkg{fontspec} can coexist with the option, as the following:
 \begin{lstlisting}
 \usepackage{fontspec}
 \usepackage[hiragino-pron,nfssonly]{luatexja-preset}
@@ -1459,12 +1510,15 @@ In this case, one can use \cs{setmainfont} etc.\ to select \emph{alphabetic} fon
 	     ションが指定された場合には \texttt{ltjpmg}（丸ゴシック）という
 3つの和文フォントファミリを定義し，これらを用いる．
 
-欧文フォントの指定で\Pkg{fontspec}パッケージを読み込んでいる場合でも
+本オプション指定時には\Pkg{fontspec}・\Pkg{luatexja-fontspec}パッケージは
+自動では読み込まれない，しかし，
 \begin{lstlisting}
 \usepackage{fontspec}
 \usepackage[hiragino-pron,nfssonly]{luatexja-preset}
 \end{lstlisting}
-のようにこのオプションを指定することは可能である．一方，
+のようにすれば，このオプションを指定すれば
+欧文フォントを\Pkg{fontspec}パッケージの機能を使って指定することができる．
+一方，
 パッケージ読み込み時に既に\Pkg{luatexja-fontspec}パッケージが読み込まれて
 	     いる場合は \texttt{nfssonly} オプションは無視される．
 %</ja>
@@ -6206,7 +6260,7 @@ by \cs{input}.
 \Pkg{luatexja-otf}と\Pkg{luatexja-adjust}についてはplain \LuaTeX でも\
 \cs{input} で読み込み可能である．
 %</ja>
-\subsection{\texttt{luatexja-fontspec.sty}}
+\subsection{\Pkg{luatexja-fontspec}}
 \label{ssec-fontspec2}
 %<*en>
 As described in Subsection~\ref{ssec-fontspec}, this optional package
@@ -6429,7 +6483,7 @@ BoldFeatures = {
 %</ja>
 
 
-\subsection{\texttt{luatexja-otf.sty}}
+\subsection{\Pkg{luatexja-otf}}
 \label{ssec-ltjotf}
 %<*en>
 This optional package supports typesetting characters in
@@ -6604,7 +6658,7 @@ Lua・\TeX コードが参考になるだろう．
 %</ja>
 
 
-\subsection{\texttt{luatexja-adjust.sty}}
+\subsection{\Pkg{luatexja-adjust}}
 \label{ssec-adj}
 \begin{figure}[t]
 \def\sq{%
@@ -6684,7 +6738,7 @@ for making the difference obvious.
 \end{cslist}
 %</ja>
 
-\subsection{\texttt{luatexja-ruby.sty}}
+\subsection{\Pkg{luatexja-ruby}}
 %<*en>
 This addon package provides functionality of ``ruby'' (\emph{furigana}) annotations
 using callbacks of \LuaTeX-ja.
@@ -6788,7 +6842,7 @@ among the line-head form, the line-middle form, and the line-end form.
 
 
 %<*ja>
-\subsection{\texttt{lltjext.sty}}
+\subsection{\Pkg{lltjext}}
 \pLaTeX では縦組用の拡張として \Pkg{plext} パッケージが用意されていたが，
 それを\LuaTeX-ja用に書きなおしたものが本追加パッケージ \Pkg{lltjext} である．
 
