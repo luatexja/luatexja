@@ -17,7 +17,7 @@
 %%%%%%%%
 \directlua{if jit then jit.on() end}
 
-\usepackage{amsmath,array,tikz,pict2e,multienum,float}
+\usepackage{metalogo,amsmath,array,tikz,pict2e,multienum,float}
 \usepackage{booktabs,multicol,luatexja-ruby}
 \usepackage[all]{xy}
 \usepackage{lltjext,alltt}
@@ -35,6 +35,8 @@
 \setmonojfont{KozGoPr6N-Regular.otf}
 \setmathfont[Scale=MatchLowercase]{xits-math.otf}
 \setsansfont[Scale=MatchLowercase,Ligatures=TeX]{Linux Biolinum O}
+
+\setLaTeXa{\scshape a}
 %<*ja>
 \def\emph#1{\textbf{\textgt{#1}}}
 \def\headfont{\normalfont\bfseries\gtfamily}\normalsize
@@ -455,7 +457,7 @@ By default, \LuaTeX-ja uses Japanese fonts to typeset Greek and Cyrillic letters
 
 From this version, characters which belongs both ISO~8859-1 and JIS~X~0208,
       such as \P~and~\S, are now typeset in alphabetic fonts. This means that
-      without the \cs{fontspec} package, these characters are not typeset correctly.
+      without the \cs{fontspec} (and~\Pkg{luatexja-fontspec}) package, these characters are not typeset correctly.
 %</en>
 %<*ja>
 \paragraph{ギリシャ文字・キリル文字とISO~8859-1の記号}
@@ -471,7 +473,7 @@ From this version, characters which belongs both ISO~8859-1 and JIS~X~0208,
 
 また，\P,~\S といったISO~8859-1の上位領域とJIS~X~0208の共通部分の文字は
       本バージョンから標準で欧文扱いとなり，\emph{ソース中に直接記述しても
-      \Pkg{fontspec}パッケージ非読み込みの状態では出力されなくなった}．
+      \Pkg{fontspec}パッケージ（および\Pkg{luatexja-fontspec}パッケージ）非読み込みの状態では出力されなくなった}．
       和文扱いで出力するには \verb+\ltjjachar`§+ のように \cs{ltjjachar} 命令
       を使えばよい．
 %</ja>
@@ -1037,7 +1039,7 @@ Okumura), namely, \Pkg{ltjclasses}\footnote{%
 しかしながら，上記の設定は日本語の文書にとって十分とは言えない．
 日本語文書を組版するためには，\texttt{article.cls}, \texttt{book.cls}といった
 欧文用のクラスファイルではなく，和文用のクラスファイルを用いた方がよい．
-現時点では，\Pkg{jclasses}（\pLaTeX の標準クラス）と\Pkg{jsclasses}
+現時点では，\Pkg{jclasses}（\pLaTeX の標準クラス）と\Pkg{jsclasses}%
 （奥村晴彦氏による「\pLaTeXe 新ドキュメントクラス」）に対応するものとして，
 \Pkg{ltjclasses}\footnote{%
   横組用は \texttt{ltjarticle.cls},~\texttt{ltjbook.cls}, \texttt{ltjreport.cls} であり，
@@ -1046,11 +1048,6 @@ Okumura), namely, \Pkg{ltjclasses}\footnote{%
 \Pkg{ltjsclasses}\footnote{%
   \texttt{ltjsarticle.cls},~\texttt{ltjsbook.cls},~\texttt{ltjskiyou.cls}.}%
 がそれぞれ用意されている．
-%</ja>
-
-%<*en>
-%</en>
-%<*ja>
 %</ja>
 
 %<*ja>
@@ -1289,13 +1286,18 @@ automatically loads \Pkg{luatexja} and \Pkg{fontspec}
 packages, if needed.
 %</en>
 %<*ja>
-\Pkg{fontspec}パッケージと同様の機能を和文フォントに対しても用いる場合，
-\Pkg{luatexja-fontspec}パッケージを読み込めばよい．
+\Pkg{fontspec}パッケージは，\LuaTeX・\XeTeX において
+TrueType・OpenTypeフォントを容易に扱うためのパッケージであり，このパッケージを読み込んでお
+けばUnicodeによる各種記号の直接入力もできるようになる．
+\LuaTeX-jaでは和文と欧文を区別しているため，\Pkg{fontspec}パッケージの機能は欧文フォントに
+対してのみ有効なものとなっている．
+
+\LuaTeX-ja上において，\Pkg{fontspec}パッケージと同様の機能を和文フォントに対しても用いる場
+合は\Pkg{luatexja-fontspec}パッケージを読み込む：
 \begin{quote}
 \ttfamily \textbackslash usepackage[<options>]\{luatexja-fontspec\}
 \end{quote}
-このパッケージ
-は必要ならば自動で\Pkg{luatexja}パッケージと\Pkg{fontspec}パッケージを読み込む．
+このパッケージは自動で\Pkg{luatexja}パッケージと\Pkg{fontspec}パッケージを読み込む．
 %</ja>
 
 %<*en>

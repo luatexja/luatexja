@@ -10,7 +10,7 @@
 
 \usepackage[textwidth=45\zw, lines=45, footskip=6mm]{geometry}
 \advance\leftmargini-1\zw\advance\leftmarginii-1\zw
-
+\protected\def\Param#1{\underline{\smash{\textsf{\mdseries #1}}}}
 
 \usepackage{luatexja-ruby,showexpl,booktabs}
 \lstset{
@@ -37,7 +37,7 @@
 \DeclareFontShape{JY3}{mc}{mc}{n}{<-> [0.92487] 
   KozMinPr6N-Regular:extend=0.67;jfm=ujisc33}{}
 
-\title{\texttt{luatexja-ruby.sty}}
+\title{\textsf{luatexja-ruby}パッケージ}
 \begin{document}
 \catcode`\<=13
 \def<#1>{{\normalfont\rm\itshape$\langle$#1\/$\rangle$}}
@@ -46,7 +46,7 @@
 \maketitle
 
 \begin{abstract}
-\texttt{luatexja-ruby.sty} は，\LuaTeX-jaの機能を利用してルビの組版処理を行う追加パッケージである．
+\textsf{luatexja-ruby}パッケージは，\LuaTeX-jaの機能を利用してルビの組版処理を行う追加パッケージである．
 \LuaTeX, \LuaTeX-jaの内部処理に割り込むことにより，熟語ルビ中の行分割や，
 行頭形・行中形・行末形の自動検出，また進入許容量の自動設定などを可能とした．
 \end{abstract}
@@ -62,7 +62,7 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 
 \subsection{\ltjruby{用|語}{よう|ご}}
 「進入(intrusion)」「突出(protrusion)」という用語は，
-\href{http://zrbabbler.sp.land.to/pxrubrica.html}{\texttt{pxrubrica}\ パッケージ}%
+\href{http://zrbabbler.sp.land.to/pxrubrica.html}{\textsf{pxrubrica}パッケージ}%
 での用法に準ずる．
 
 \begin{quotation}
@@ -194,7 +194,7 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 このキーの指定では最後に\ \verb+\selectfont+ を加える必要はない．
 
 この \texttt{fontcmd} キーの内容は多くの回数実行される．
-例えば，\texttt{luatexja-fontspec}パッケージを用いてOpenTypeフォントを用いる場合，
+例えば，\textsf{luatexja-fontspec}パッケージを用いてOpenTypeフォントを用いる場合，
 \begin{lstlisting}
  fontcmd=\addjfontfeatures{Style=Ruby}
 \end{lstlisting}
@@ -220,7 +220,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \end{description}
 
 \paragraph{\tt\textbackslash ltjsetruby\{<option>\}}
-<option>の既定値を指定する．\texttt{luatexja-ruby} 読み込み時の値は
+<option>の既定値を指定する．\textsf{luatexja-ruby}読み込み時の値は
 各項目の所で既に説明してあるが，次のようになっている．
 \begin{verbatim}
   pre=-1, post=-1, mode=1, 
@@ -232,19 +232,19 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 
 \paragraph{\texttt{\textbackslash ltjsetparamater} に追加されるキー}
 \begin{description}
-\item[\textsf{\mdseries rubypreintrusion}\tt =\{<chr\_code>, <pre\_int>\}]
+\item[\Param{rubypreintrusion}\tt =\{<chr\_code>, <pre\_int>\}]
 文字<chr\_code> に，その\textbf{直後}のルビによって掛けられるルビ文字列の最大長をルビ全角単位で指定．
-\item[\textsf{\mdseries rubypostintrusion}\tt =\{<chr\_code>, <post\_int>\}]
+\item[\Param{rubypostintrusion}\tt =\{<chr\_code>, <post\_int>\}]
 文字<chr\_code> に，その\textbf{直前}のルビによって掛けられるルビ文字列の最大長をルビ全角単位で指定．
 \end{description}
-既定値は，\textsf{rubypreintrusion},~\textsf{rubypostintrusion}とも
+既定値は，\Param{rubypreintrusion},~\Param{rubypostintrusion}とも
 以下の文字に対しては1，その他の文字については0である：
 \begin{quote}
  平仮名(\texttt{U+3040}--\texttt{U+309F})，カギ括弧「」，読点「，」「、」，中黒「・」
 \end{quote}
 また，ここでは「文字コード$-1$の文字」は，「段落開始の \verb+\parindent+」を表す%
 \footnote{通常の\LuaTeX-jaにおける指定では文中数式境界を表していることに注意．}．
-この「文字」に対する\textsf{rubypreintrusion}の値も1である．
+この「文字」に対する\Param{rubypreintrusion}の値も1である．
 
 \paragraph{\texttt{\textbackslash ltjkenten}}
 圏点を出力する命令で，\verb+\kenten+ という別名を定義している．
@@ -376,7 +376,7 @@ auxファイルに保存する際，各 \verb+\ltjruby+ 命令の呼び出しを
 同様に，段落先頭のルビは行頭形にはならない．
 \texttt{pre}が負（つまり，自動指定）のとき，段落最初の \verb+\parindent+ 部分への
 進入は可能である．\verb+\parindent+ 部分への進入許容量は
-「文字$-1$」に対する\textsf{rubypreintrusion}（既定値は1，ルビ全角単位）と
+「文字$-1$」に対する\Param{rubypreintrusion}（既定値は1，ルビ全角単位）と
 \ \verb+\parindent+ の長さのうち小さい方である．
 \begin{LTXexample}[preset=\Large,width=0.4\textwidth]
 \parindent1\zw\noindent ０１２３４５\par
