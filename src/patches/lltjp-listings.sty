@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-listings}[2015/01/08 Patch to listings for LuaTeX-ja]
+\ProvidesPackage{lltjp-listings}[2015/09/08 Patch to listings for LuaTeX-ja]
 \RequirePackage{listings,luatexbase-cctb}
 
 %%%%%%%%%%%%%%%% Japanese support
@@ -252,22 +252,47 @@
 
 
 % 白線対策
-\def\lst@OutputToken{%
-    \lst@TrackNewLines \lst@OutputLostSpace
-    \lst@ifgobbledws
-        \lst@gobbledwhitespacefalse
-        \lst@@discretionary
+\gdef\lst@frameInit{%
+    \ifx\lst@framelshape\@empty \let\lst@frameL\@empty \fi
+    \ifx\lst@framershape\@empty \let\lst@frameR\@empty \fi
+    \def\lst@framevrule{\vrule\@width\lst@framerulewidth\relax}%
+    \lst@ifframeround
+        \lst@frameCalcDimA\z@ \@getcirc\@tempdima
+        \@tempdimb\@tempdima \divide\@tempdimb\tw@
+        \advance\@tempdimb -\@wholewidth
+        \edef\lst@frametextsep{\the\@tempdimb}%
+        \edef\lst@framerulewidth{\the\@wholewidth}%
+        \lst@frameCalcDimA\@ne \@getcirc\@tempdima
+        \@tempdimb\@tempdima \divide\@tempdimb\tw@
+        \advance\@tempdimb -\tw@\@wholewidth
+        \advance\@tempdimb -\lst@frametextsep
+        \edef\lst@rulesep{\the\@tempdimb}%
     \fi
-    \lst@CheckMerge
-    {\lst@thestyle{\lst@FontAdjust
-     \setbox\@tempboxa\lst@hbox
-        {\lsthk@OutputBox
-         \lst@lefthss
-         \expandafter\lst@FillOutputBox\the\lst@token\@empty
-         \lst@righthss}%
-     \ht\@tempboxa=0pt\dp\@tempboxa=0pt
-     \lst@CalcLostSpaceAndOutput}}%
-    \lst@ResetToken}
+    \lst@frameMakeBoxV\lst@framebox{\ht\strutbox}{\dp\strutbox}%
+    %%%%  ここから
+    \@tempdima\z@
+    \ifdim\ht\strutbox<\cht\@tempdima=\dimexpr\cht-\ht\strutbox\relax\fi
+    \ifdim\dp\strutbox<\cdp\advance\@tempdima=\dimexpr\cdp-\dp\strutbox\relax\fi
+    \edef\lst@framelr{\lineskiplimit-\the\@tempdima\copy\lst@framebox}%
+    %%%% ここまで
+    \ifx\lst@frametshape\@empty\else
+        \lst@frameH T\lst@frametshape
+        \ifvoid\z@\else
+            \par\lst@parshape
+            \@tempdima-\baselineskip \advance\@tempdima\ht\z@
+            \ifdim\prevdepth<\@cclvi\p@\else
+                \advance\@tempdima\prevdepth
+            \fi
+            \ifdim\@tempdima<\z@
+                \vskip\@tempdima\vskip\lineskip
+            \fi
+            \noindent\box\z@\par
+            \lineskiplimit\maxdimen \lineskip\z@
+        \fi
+        \lst@frameSpreadV\lst@framextopmargin
+    \fi}
+
+
 
 %%%%%%%%%%%%%%%% escape to \LaTeX
 \lstloadaspects{escape}
