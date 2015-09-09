@@ -252,7 +252,10 @@
 
 
 % 白線対策
+\newif\ifltj@lst@frame@top
+\newdimen\ltj@lst@frame@lslimit
 \gdef\lst@frameInit{%
+    \ltj@lst@frame@toptrue
     \ifx\lst@framelshape\@empty \let\lst@frameL\@empty \fi
     \ifx\lst@framershape\@empty \let\lst@frameR\@empty \fi
     \def\lst@framevrule{\vrule\@width\lst@framerulewidth\relax}%
@@ -273,7 +276,10 @@
     \@tempdima\z@
     \ifdim\ht\strutbox<\cht\@tempdima=\dimexpr\cht-\ht\strutbox\relax\fi
     \ifdim\dp\strutbox<\cdp\advance\@tempdima=\dimexpr\cdp-\dp\strutbox\relax\fi
-    \edef\lst@framelr{\lineskiplimit-\the\@tempdima\copy\lst@framebox}%
+    \ltj@lst@frame@lslimit=-\@tempdima
+    \def\lst@framelr{%
+      \ifltj@lst@frame@top\ltj@lst@frame@topfalse\else\lineskiplimit\ltj@lst@frame@lslimit\fi
+      \copy\lst@framebox}%
     %%%% ここまで
     \ifx\lst@frametshape\@empty\else
         \lst@frameH T\lst@frametshape
