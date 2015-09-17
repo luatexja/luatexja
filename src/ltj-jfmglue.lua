@@ -682,14 +682,24 @@ local function handle_penalty_suppress(post, pre, g)
 end
 
 -- 和文文字間の JFM glue を node 化
-local function new_jfm_glue(m, bc, ac)
+local function new_jfm_glue(m, bc, ac, ks)
 -- bc, ac: char classes
    local g = m.char_type[bc][ac]
    if g then
       if g[1] then
 	 local f = node_new(id_glue)
 	 set_attr(f, attr_icflag, g[4])
-	 setfield(f, 'spec', node_copy(g[2]))
+	 local fs = node_copy(g[2])
+	 if g.ksp_natural then
+	    setfield(fs, 'width', getfield(fs,'width')+getfield(ks, 'width'))
+	 end
+	 if g.ksp_stretch then
+	    setfield(fs, 'stretch', getfield(fs,'stretch')+getfield(ks, 'stretch'))
+	 end
+	 if g.ksp_shrink then
+	    setfield(fs, 'shrink', getfield(fs,'shrink')+getfield(ks, 'shrink'))
+	 end
+	 setfield(f, 'spec', fs)
 	 return f, g[3]
       else
 	 return node_copy(g[2]), g[3]
@@ -818,19 +828,20 @@ do
    end
 end
 
-local function calc_ja_ja_glue()
+local function calc_ja_ja_glue(ks)
    local qm, pm = Nq.met, Np.met
+   local ks = getfield(kanji_skip,'spec')
    if (qm.char_type==pm.char_type) and (qm.var==pm.var) then
-      return new_jfm_glue(qm, Nq.class, Np.class)
+      return new_jfm_glue(qm, Nq.class, Np.class, ks)
    else
       local npn, nqn = Np.nuc, Nq.nuc
       local gb, db = new_jfm_glue(qm, Nq.class,
 				  slow_find_char_class(Np.char,
-						       qm, getchar(npn)))
+						       qm, getchar(npn)), ks)
       local ga, da = new_jfm_glue(pm,
 				  slow_find_char_class(Nq.char,
 						       pm, getchar(nqn)),
-				  Np.class)
+				  Np.class, ks)
       return calc_ja_ja_aux(gb, ga, db, da);
    end
 end
@@ -876,12 +887,14 @@ end
 local function get_OA_skip()
    local pm = Np.met
    return new_jfm_glue(pm,
-		       fast_find_char_class((Nq.id == id_math and -1 or 'jcharbdd'), pm), Np.class)
+		       fast_find_char_class((Nq.id == id_math and -1 or 'jcharbdd'), pm), 
+		       Np.class, getfield(xkanji_skip,'spec'))
 end
 local function get_OB_skip()
    local qm = Nq.met
    return new_jfm_glue(qm, Nq.class,
-		       fast_find_char_class((Np.id == id_math and -1 or'jcharbdd'), qm))
+		       fast_find_char_class((Np.id == id_math and -1 or'jcharbdd'), qm), 
+		       getfield(xkanji_skip,'spec'))
 end
 
 -- (anything) .. jachar

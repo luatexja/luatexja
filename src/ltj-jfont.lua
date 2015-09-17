@@ -161,7 +161,13 @@ do
 	 if type(i) == 'number' then -- char_type
 	    for k,w in pairs(v.glue) do
 	       local h = node_new(id_glue_spec)
-	       v[k] = {true, h, (w[5] and w[5]/sz or 0), FROM_JFM + (w[4] and w[4]/sz or 0)}
+	       v[k] = {
+		  true, h, (w[5] and w[5]/sz or 0), 
+		  FROM_JFM + (w[4] and w[4]/sz or 0),
+		  ksp_natural = w.ksp_natural,
+		  ksp_stretch = w.ksp_stretch,
+		  ksp_shrink = w.ksp_shrink,
+	       }
 	       setfield(h, 'width', w[1])
 	       setfield(h, 'stretch', w[2])
 	       setfield(h, 'shrink', w[3])
