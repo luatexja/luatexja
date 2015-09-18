@@ -21,7 +21,8 @@
 \def\X@tabular{\@ifnextchar<%>
    {\p@tabular}{\p@tabular<Z>}}
 \def\@stabular<#1>#2{\def\@halignto{to#2}\p@tabular<#1>}
-\def\p@tabular<#1>{\leavevmode \hbox \bgroup $\let\@acol\@tabacol
+\def\p@tabular<#1>{\leavevmode \hbox \bgroup 
+   \count@=\ltjgetparameter{direction}$\let\@acol\@tabacol
    \let\@classz\@tabclassz
    \let\@classiv\@tabclassiv \let\\\@tabularcr\p@tabarray<#1>}
 \def\p@tabarray<#1>{\m@th\@ifnextchar[%]
@@ -45,7 +46,7 @@
     \fi\fi\fi\fi
   \fi
   \ifx\box@dir\relax
-    \ifcase\ltjgetparameter{direction}
+    \ifcase\count@
        \or   \let\box@dir\dtou\@tempcnta=\dstrutbox% dtou
        \or\or\let\box@dir\tate\@tempcnta=\tstrutbox% tate
        \or   \let\box@dir\yoko\@tempcnta=\strutbox% yoko
