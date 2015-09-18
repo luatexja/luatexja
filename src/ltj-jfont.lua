@@ -678,7 +678,10 @@ do
 
    local sort = table.sort
    local function add_fl_table(dest, glyphs, unitable, asc_des, units)
-      local tg, glyphmin, glyphmax = glyphs.glyphs, glyphs.glyphmin or 0, glyphs.glyphmax
+      local tg, glyphmin, glyphmax = glyphs.glyphs, 0, glyphs.glyphmax
+      for _,v in pairs(fields(glyphs)) do
+	 if v=='glyphmin' then glyphmin = glyphs.glyphmin; break end
+      end
       for i = glyphmin, glyphmax-1 do
 	 local gv = tg[i]
 	 if gv then
