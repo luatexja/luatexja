@@ -12,7 +12,6 @@ local err, warn, info, log = luatexbase.errwarinf(_NAME)
 luatexja.load_module('stack');     local ltjs = luatexja.stack
 
 local Dnode = node.direct or node
-
 local nullfunc = function(n) return n end
 local to_node = (Dnode ~= node) and Dnode.tonode or nullfunc
 local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
@@ -146,29 +145,41 @@ end
 -- concatenation of boxes: reusing nodes
 -- ルビ組版が行われている段落/hboxでの設定が使われる．
 -- ルビ文字を格納しているボックスでの設定ではない！
-local function concat(f, b)
-   if f then
-      if b then
-         local h = getlist(f)
-         setfield(node_tail(h), 'next', getlist(b))
-	 setfield(f, 'head', nil); node_free(f)
-         setfield(b, 'head', nil); node_free(b)
-	 return Dnode.hpack(luatexja.jfmglue.main(h,false))
+local concat
+do
+   local node_prev = (Dnode ~= node) and Dnode.getprev or node.prev
+   function concat(f, b)
+      if f then
+	 if b then
+	    local h, nh = getlist(f), getlist(b)
+	    if getid(nh)==id_whatsit and getsubtype(nh)==sid_user then
+	       nh=node_next(nh); node_free(node_prev(nh))
+	    end
+	    setfield(node_tail(h), 'next', nh)
+	    setfield(f, 'head', nil); node_free(f)
+	    setfield(b, 'head', nil); node_free(b)
+	    print('<<<BEFORE>>>')
+	    luatexja.ext_show_node_list(to_node(h), '', print)
+	    print('<<<AFTER>>>')
+	    local g = luatexja.jfmglue.main(h,false)
+	    luatexja.ext_show_node_list(to_node(g), '', print)
+	    return Dnode.hpack(g)
+	 else
+	    return f
+	 end
+      elseif b then
+	 return b
       else
-	 return f
+	 local h = node_new(id_hlist)
+	 setfield(h, 'subtype', 0)
+	 setfield(h, 'width', 0)
+	 setfield(h, 'height', 0)
+	 setfield(h, 'depth', 0)
+	 setfield(h, 'glue_set', 0)
+	 setfield(h, 'glue_order', 0)
+	 setfield(h, 'head', nil)
+	 return h
       end
-   elseif b then
-      return b
-   else
-      local h = node_new(id_hlist)
-      setfield(h, 'subtype', 0)
-      setfield(h, 'width', 0)
-      setfield(h, 'height', 0)
-      setfield(h, 'depth', 0)
-      setfield(h, 'glue_set', 0)
-      setfield(h, 'glue_order', 0)
-      setfield(h, 'head', nil)
-      return h
    end
 end
 
