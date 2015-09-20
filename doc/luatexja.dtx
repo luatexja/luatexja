@@ -139,10 +139,11 @@
 \DeclareRobustCommand\epTeX{\ensuremath{\varepsilon}-\pTeX}
 
 %%%%%%%% other macros
-\newlist{cslist}{description}{1}
+\newlist{cslist}{description}{2}
 \setlist[cslist]{%
     style=nextline,font=\mdseries\ttfamily,
     before*=\def\<{\char`\<}\def\>{\char`\>}\def\{{\char`\{}\def\}{\char`\}},
+    topsep=\medskipamount,
 %<ja> leftmargin=2\zw,
 %<en> leftmargin=2em,
 }
@@ -4418,38 +4419,23 @@ Furthermore, the glyph is shifted according to values of fields
 \label{fig-pos-tate}
 \end{figure}
 
-\item[kern={\{[$j$]=<kern>, [$j'$]=\{<kern>, [<ratio>]\}, ...\}}]
+\item[kern={\{[$j$]=<kern>, [$j'$]=\{<kern>, [ratio=<ratio>]\}, ...\}}]
 
-\item[glue={\{[$j$]=\{<width>, <stretch>, <shrink>, [<priority>], [<ratio>]\}, ...\}}]\
+\item[glue={\{[$j$]=\{<width>, <stretch>, <shrink>, [ratio=<ratio>, ...]\}, ...\}}]\leavevmode
 %<*ja>
 
-文字クラス$i$の文字と$j$の文字の間に挿入されるkernやglueの量を指定する．
+文字クラス$i$の文字と$j$の文字の間に挿入されるカーンやグルーの量を指定する．
 
-             <priority>は \Pkg{luatexja-adjust} による優先順位付き
-	     行長調整（\ref{ssec-adj}節）が有効なときのみ意味を持つ．
-このフィールドは省略可能であり，行調整処理におけるこのglueの優先
-             度を$-2$から$+2$の間の整数で指定する．大きい値ほど「伸びやすく，縮みやすい」
-             ことを意味する．省略時の値
-             は0であり，範囲外の値が指定されたときの動作は未定義である．
-
-<ratio>も省略可能フィールドであり，$-1$から$+1$の実数値をとる．省略時の値は0である．
-\begin{itemize}
-\item $-1$はこのグルーが「前の文字」由来であることを示す．
-\item $+1$はこのグルーが「後の文字」由来であることを示す．
-\item それ以外の値は，「前の文字」由来のグルーと「後の文字」由来の
-グルーが混合されていることを示す．
-\end{itemize}
-なお，このフィールドの値は\Param{differentjfm}の値が
+<ratio>は，グルーの自然長のうちどれだけの割合が「後の文字」由来かを示す量で，
+$0$から$+1$の実数値をとる．省略時の値は$0.5$である．
+このフィールドの値は\Param{differentjfm}の値が
 \texttt{pleft},~\texttt{pright},~\texttt{paverage}の値のときのみ実際に用いられる．
 
 例えば，\cite{x4051}では，句点と中点の間には，
 句点由来の二分空きと中点由来の四分空きが挿入されるが，この場合には
 \begin{itemize}
 \item <width>には$0.5+0.25=0.75$を指定する．
-\item <ratio>には次の値を指定する．
-\[
- -1\cdot \frac{0.5}{0.5+0.25} + 1 \cdot \frac{0.25}{0.5+0.25} = -\frac13
-\]
+\item <ratio>には$0.25/(0.5+0.25)=1/3$を指定する．
 \end{itemize}
 %</ja>
 %<*en>
@@ -4458,22 +4444,45 @@ Furthermore, the glyph is shifted according to values of fields
 Specifies the width of kern or glue which will be inserted
 between characters in character class~$i$ and those in character class~$j$.
 
-<priority> is an integer in $[-2,2]$ (treated as 0 if omitted), and this is
-used only in line adjustment with priority by \Pkg{luatexja-adjust}
-(see Subsection~\ref{ssec-adj}). Higher value means the glue is easy to shretch,
-and is also easy to shrink.
-
-<ratio> is also an optional value between $-1$ and 1. For example,
+<ratio> specifies how much the glue is originated in the ``right'' character.
+It is a real number between 0 and 1, and treated as 0.5 if omitted. For example,
 The width of a glue between an ideographic full stop ``。''
 and a fullwidth middle dot ``・'' is three-fourth of fullwidth,
 namely halfwidth from the ideographic full stop, and
 quarter-width from the fullwidth middle dot.  In this case,
-we specify <ratio> to
-\[
-  -1\cdot \frac{0.5}{0.5+0.25} + 1 \cdot \frac{0.25}{0.5+0.25} = -\frac13.
-\]
+we specify <ratio> to $0.25/(0.5+0.25)=1/3$.
 %</en>
 
+%<*ja>
+グルーの指定においては，上記に加えて各 \texttt{[$j$]} の各サブテーブル内に
+次のキーを指定できる，
+\begin{cslist}[style=standard]
+\item[priority=<priority>]
+             \Pkg{luatexja-adjust} による優先順位付き
+	     行長調整（\ref{ssec-adj}節）の際に使われる値であり，
+行調整処理におけるこのglueの優先
+             度を$-2$から$+2$の間の整数で指定する．大きい値ほど「伸びやすく，縮みやすい」
+             ことを意味する．省略時の値
+             は0であり，範囲外の値が指定されたときの動作は未定義である．
+\item[ksp\_natural=<bool>]
+\item[ksp\_stretch=<bool>]
+\item[ksp\_shrink=<bool>]
+\end{cslist}
+%</ja>
+%<*en>
+In case of glue, one can specify following additional keys in each \texttt{[$j$]}
+	     subtable:
+\begin{cslist}[style=standard]
+\item[priority=<priority>]
+An integer in $[-2,2]$ (treated as 0 if omitted), and this is
+used only in line adjustment with priority by \Pkg{luatexja-adjust}
+(see Subsection~\ref{ssec-adj}). Higher value means the glue is easy to stretch,
+and is also easy to shrink.
+\item[ksp\_natural=<bool>]
+\item[ksp\_stretch=<bool>]
+\item[ksp\_shrink=<bool>]
+\end{cslist}
+%</en>
 
 \item[end\_stretch=<kern>, end\_shrink=<kern>]
 %<*ja>

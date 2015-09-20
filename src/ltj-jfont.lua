@@ -111,14 +111,16 @@ function define_jfm(t)
 	    v.chars = nil
 	 end
 	 v.kern = v.kern or {}; v.glue = v.glue or {}
-	 for j in pairs(v.glue) do
+	 for j,x in pairs(v.glue) do
+	    x.ratio, x[5] = (x.ratio or (x[5] and 0.5*(1+x[5]) or 0.5)), nil
+	    x.priority, x[4] = (x.priority or x[4] or 0), nil
 	    if v.kern[j] then defjfm_res= nil; return end
 	 end
 	 for j,x in pairs(v.kern) do
 	    if type(x)=='number' then
-               v.kern[j] = {x, 0}
+               v.kern[j] = {x, 0.5}
             elseif type(x)=='table' then
-               v.kern[j] = {x[1], x[2] or 0}
+               v.kern[j] = { x[1], ratio=x.ratio or x[2] or 0.5 }
             end
 	 end
 	 t.char_type[i] = v
@@ -162,8 +164,9 @@ do
 	    for k,w in pairs(v.glue) do
 	       local h = node_new(id_glue_spec)
 	       v[k] = {
-		  true, h, (w[5] and w[5]/sz or 0), 
-		  FROM_JFM + (w[4] and w[4]/sz or 0),
+		  true, h, 
+		  ratio=w.ratio/sz, 
+		  priority=FROM_JFM + w.priority/sz,
 		  ksp_natural = w.ksp_natural,
 		  ksp_stretch = w.ksp_stretch,
 		  ksp_shrink = w.ksp_shrink,
@@ -179,7 +182,7 @@ do
 	       setfield(g, 'kern', w[1])
 	       setfield(g, 'subtype', 1)
 	       set_attr(g, attr_icflag, FROM_JFM)
-	       v[k] = {false, g, w[2]/sz}
+	       v[k] = {false, g, ratio=w[2]/sz}
 	    end
 	 end
 	 v.glue, v.kern = nil, nil

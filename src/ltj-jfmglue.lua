@@ -688,21 +688,21 @@ local function new_jfm_glue(m, bc, ac, ks)
    if g then
       if g[1] then
 	 local f = node_new(id_glue)
-	 set_attr(f, attr_icflag, g[4])
+	 set_attr(f, attr_icflag, g.priority)
 	 local fs = node_copy(g[2])
 	 if g.ksp_natural then
 	    setfield(fs, 'width', getfield(fs,'width')+getfield(ks, 'width'))
 	 end
-	 if g.ksp_stretch then
+	 if false and g.ksp_stretch then
 	    setfield(fs, 'stretch', getfield(fs,'stretch')+getfield(ks, 'stretch'))
 	 end
 	 if g.ksp_shrink then
 	    setfield(fs, 'shrink', getfield(fs,'shrink')+getfield(ks, 'shrink'))
 	 end
 	 setfield(f, 'spec', fs)
-	 return f, g[3]
+	 return f, g.ratio
       else
-	 return node_copy(g[2]), g[3]
+	 return node_copy(g[2]), g.ratio
       end
    end
    return nil, 0
@@ -770,8 +770,8 @@ do
    local bk_ak = 2*id_kern - id_kern
 
    calc_ja_ja_aux = function (gb,ga, db, da)
-      local rbb, rab = 0.5*(1-db), 0.5*(1-da) -- 「前の文字」由来のグルーの割合
-      local rba, raa = 0.5*(1+db), 0.5*(1+da) -- 「前の文字」由来のグルーの割合
+      local rbb, rab = 1-db, 1-da -- 「前の文字」由来のグルーの割合
+      local rba, raa = db, da     -- 「後の文字」由来のグルーの割合
       if diffmet_rule ~= math.two_pleft and diffmet_rule ~= math.two_pright
           and diffmet_rule ~= math.two_paverage then
 	 rbb, rab, rba, raa = 1,0,0,1

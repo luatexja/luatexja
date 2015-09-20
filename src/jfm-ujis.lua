@@ -10,22 +10,22 @@
 luatexja.jfont.define_jfm {
    dir = 'yoko',
    zw = 1.0, zh = 1.0,
-   kanjiskip =  {0.0, 0.25, 0},
-   xkanjiskip = {0.25, 0.25, .125},
+   kanjiskip =  { 0.0, 0.25, 0 },
+   xkanjiskip = { 0.25, 0.25, .125 },
    [0] = {
       align = 'left', left = 0.0, down = 0.0,
       width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
       glue = {
 	 -- [index] = { width, stretch, shrink, [priority, [ratio]],
          --             ksp_nat=t/f, ksp_stretch=t/f, ksp_shrink=t/f }
-	 [1] = { 0.5 , 0.0, 0.5,  0, 1, ksp_stretch=true },
-	 [2] = { 0, 0, 0 , ksp_shrink=true },
-	 [3] = { 0.25, 0.0, 0.25, 1, 1 },
-	 [4] = {0, 0, 0},
-	 [6] = {0, 0, 0},
-	 [7] = {0, 0, 0},
-         [8] = {0, 0, 0},
-	 [9] = {0, 0, 0},
+	 [1] = { 0.5 , 0.0, 0.5, rario=1, ksp_stretch=true },
+	 [2] = { 0, 0, 0, ksp_shrink=true },
+	 [3] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+	 [4] = { 0, 0, 0, ksp_shrink=true },
+	 [6] = { 0, 0, 0, ksp_shrink=true },
+	 [7] = { 0, 0, 0, ksp_shrink=true },
+	 [8] = { 0, 0, 0, ksp_shrink=true },
+	 [99] = { 0, 0, 0 },
       }
    },
 
@@ -38,16 +38,16 @@ luatexja.jfont.define_jfm {
       width = 0.5, height = 0.88, depth = 0.12, italic=0.0,
       glue = {
 -- 3 のみ四分，あとは0
-         [0] = {0, 0, 0, ksp_shrink=true },
-         [1] = {0, 0, 0},
-	 [2] = {0, 0, 0},
-	 [3] = { 0.25, 0.0, 0.25, 1 },
-	 [4] = {0, 0, 0},
-	 [5] = {0, 0, 0},
-	 [6] = {0, 0, 0},
-	 [7] = {0, 0, 0},
-         [8] = {0, 0, 0},
-	 [9] = {0, 0, 0},
+         [0] = { 0, 0, 0, ksp_shrink=true },
+         [1] = { 0, 0, 0, ksp_shrink=true },
+	 [2] = { 0, 0, 0, ksp_shrink=true },
+	 [3] = { 0.25, 0.0, 0.25, priority=1 },
+	 [4] = { 0, 0, 0, ksp_shrink=true },
+	 [5] = { 0, 0, 0, ksp_shrink=true },
+	 [6] = { 0, 0, 0, ksp_shrink=true },
+	 [7] = { 0, 0, 0, ksp_shrink=true },
+         [8] = { 0, 0, 0, ksp_shrink=true },
+	 [99] = { 0, 0, 0 },
       }
    },
 
@@ -60,16 +60,16 @@ luatexja.jfont.define_jfm {
       width = 0.5, height = 0.88, depth = 0.12, italic=0.0,
       glue = {
 -- 3 は四分, 2, 4, 9 は0, あとは0.5
-	 [0] = { 0.5 , 0.0, 0.5, 0, -1, ksp_stretch=true },
-	 [1] = { 0.5 , 0.0, 0.5, 0, -1, ksp_stretch=true },
-         [2] = {0, 0, 0},
-	 [3] = { 0.25, 0.0, 0.25, 1, 1 },
-         [4] = {0, 0, 0},
-	 [5] = { 0.5 , 0.0, 0.5, 0, -1, ksp_stretch=true },
-	 [6] = { 0.5 , 0.0, 0.5, 0, -1, ksp_stretch=true },
-	 [7] = { 0.5 , 0.0, 0.5, 0, -1, ksp_stretch=true },
-	 [8] = { 0.5 , 0.0, 0.5, 0, -1, ksp_stretch=true },
-         [9] = {0, 0, 0},
+	 [0] = { 0.5 , 0.0, 0.5, rario=0, ksp_stretch=true },
+	 [1] = { 0.5 , 0.0, 0.5, ratio=0, ksp_stretch=true },
+         [2] = { 0, 0, 0, ksp_shrink=true},
+	 [3] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+         [4] = { 0, 0, 0, ksp_shrink=true },
+	 [5] = { 0.5 , 0.0, 0.5, ratio=0, ksp_stretch=true },
+	 [6] = { 0.5 , 0.0, 0.5, ratio=0, ksp_stretch=true },
+	 [7] = { 0.5 , 0.0, 0.5, ratio=0, ksp_stretch=true },
+	 [8] = { 0.5 , 0.0, 0.5, ratio=0, ksp_stretch=true },
+         [99] = { 0, 0, 0 },
       }
    },
 
@@ -80,16 +80,16 @@ luatexja.jfont.define_jfm {
       --end_stretch = 0.25,
       glue = {
 -- 3 のみ 0.5，あとは0.25
-	 [0] = { 0.25, 0.0, 0.25, 1, 1 },
-	 [1] = { 0.25, 0.0, 0.25, 1, 1 },
-	 [2] = { 0.25, 0.0, 0.25, 1, 1 },
-	 [3] = { 0.5 , 0.0, 0.5 , 1, 0 },
-	 [4] = { 0.25, 0.0, 0.25, 1, 1 },
-	 [5] = { 0.25, 0.0, 0.25, 1, 1 },
-	 [6] = { 0.25, 0.0, 0.25, 1, 1 },
-	 [7] = { 0.25, 0.0, 0.25, 1, 1 },
-	 [8] = { 0.25, 0.0, 0.25, 1, 1 },
-	 [9] = { 0.25, 0.0, 0.25, 1, 1 },
+	 [0] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+	 [1] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+	 [2] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+	 [3] = { 0.5 , 0.0, 0.5 , priority=1 },
+	 [4] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+	 [5] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+	 [6] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+	 [7] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+	 [8] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+	 [99] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
       }
    },
 
@@ -99,14 +99,14 @@ luatexja.jfont.define_jfm {
       width = 0.5, height = 0.88, depth = 0.12, italic=0.0,
       glue = {
 -- 3 は.75, 2, 4 は0, あとは0.5
-	 [0] = { 0.5 , 0.0, 0.5, 0, -1, ksp_stretch=true },
-	 [1] = { 0.5 , 0.0, 0.5, 0, -1, ksp_stretch=true },
-	 [3] = { 0.75, 0.0, 0.25, 1, -1/3 },
-	 [5] = { 0.5 , 0.0, 0.5, 0, -1, ksp_stretch=true },
-	 [6] = { 0.5 , 0.0, 0.5, 0, -1, ksp_stretch=true },
-	 [7] = { 0.5 , 0.0, 0.5, 0, -1, ksp_stretch=true },
-	 [8] = { 0.5 , 0.0, 0.5, 0, -1, ksp_stretch=true },
-         [9] = { 0.5 , 0.0, 0.5, 0, -1, ksp_stretch=true },
+	 [0] = { 0.5 , 0.0, 0.5, ratio=0, ksp_stretch=true },
+	 [1] = { 0.5 , 0.0, 0.5, ratio=0, ksp_stretch=true },
+	 [3] = { 0.75, 0.0, 0.25, priority=1, ratio=1/3, ksp_stretch=true },
+	 [5] = { 0.5 , 0.0, 0.5, ratio=0, ksp_stretch=true },
+	 [6] = { 0.5 , 0.0, 0.5, ratio=0, ksp_stretch=true },
+	 [7] = { 0.5 , 0.0, 0.5, ratio=0, ksp_stretch=true },
+	 [8] = { 0.5 , 0.0, 0.5, ratio=0, ksp_stretch=true },
+         [99] = { 0.5 , 0.0, 0.5, ratio=0, ksp_stretch=true },
       }
    },
 
@@ -115,12 +115,12 @@ luatexja.jfont.define_jfm {
       align = 'left', left = 0.0, down = 0.0,
       width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
       glue = {
-	 [1] = { 0.5 , 0.0, 0.5, 0, 1, ksp_stretch=true },
-	 [2] = {0, 0, 0},
-	 [3] = { 0.25, 0.0, 0.25, 1, 1 },
-	 [4] = {0, 0, 0},
-	 [6] = {0, 0, 0},
-	 [9] = {0, 0, 0},
+	 [1] = { 0.5 , 0.0, 0.5, ratio=1, ksp_stretch=true },
+	 [2] = { 0, 0, 0, ksp_shrink=true },
+	 [3] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+	 [4] = { 0, 0, 0, ksp_shrink=true },
+	 [6] = { 0, 0, 0, ksp_shrink=true },
+	 [99] = { 0, 0, 0 },
       },
       kern = {
 	 [5] = 0.0
@@ -132,15 +132,15 @@ luatexja.jfont.define_jfm {
       align = 'left', left = 0.0, down = 0.0,
       width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
       glue = {
-         [0] = { 0.5 , 0.0, 0.5, 0, 1, ksp_stretch=true },
-	 [1] = { 0.5 , 0.0, 0.5, 0, 1, ksp_stretch=true },
-	 [2] = {0, 0, 0},
-	 [3] = { 0.75, 0.0, 0.25, 1, 1 },
-	 [4] = {0, 0, 0},
-	 [6] = {0, 0, 0},
-	 [7] = { 0.5 , 0.0, 0.5, 0, 1, ksp_stretch=true},
-	 [8] = {0, 0, 0},
-	 [9] = {0, 0, 0},
+         [0] = { 0.5 , 0.0, 0.5, ratio=1, ksp_stretch=true },
+	 [1] = { 0.5 , 0.0, 0.5, ratio=1, ksp_stretch=true },
+	 [2] = { 0, 0, 0, ksp_shrink=true },
+	 [3] = { 0.75, 0.0, 0.25, priority=1, ratio=1 },
+	 [4] = { 0, 0, 0, ksp_shrink=true },
+	 [6] = { 0, 0, 0, ksp_shrink=true },
+	 [7] = { 0.5 , 0.0, 0.5, ratio=1, ksp_stretch=true },
+	 [8] = { 0, 0, 0, ksp_shrink=true },
+	 [99] = { 0, 0, 0 },
       },
       kern = {
 	 [5] = 0.0
@@ -172,14 +172,14 @@ luatexja.jfont.define_jfm {
       align = 'left', left = 0.0, down = 0.0,
       width = 0.5, height = 0.88, depth = 0.12, italic=0.0,
       glue = {
-	 [1] = { 0.5 , 0.0, 0.5, 0, 1, ksp_stretch=true },
-	 [2] = {0, 0, 0},
-	 [3] = { 0.25, 0.0, 0.25, 1, 1 },
-	 [4] = {0, 0, 0},
-	 [6] = {0, 0, 0},
-	 [7] = {0, 0, 0},
-         [8] = {0, 0, 0},
-	 [9] = {0, 0, 0},
+	 [1] = { 0.5 , 0.0, 0.5, ratio=1, ksp_stretch=true },
+	 [2] = { 0, 0, 0, ksp_shrink=true },
+	 [3] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+	 [4] = { 0, 0, 0, ksp_shrink=true },
+	 [6] = { 0, 0, 0, ksp_shrink=true},
+	 [7] = { 0, 0, 0, ksp_shrink=true },
+         [8] = { 0, 0, 0, ksp_shrink=true},
+	 [99] = { 0, 0, 0 },
       }
    },
 
@@ -206,11 +206,11 @@ luatexja.jfont.define_jfm {
       width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
       glue = {
 	 [1] = { 0.5 , 0.0, 0.5, 0, 1, ksp_stretch=true },
-	 [2] = {0, 0, 0},
+	 [2] = { 0, 0, 0, ksp_shrink=true },
 	 [3] = { 0.25, 0.0, 0.25, 1, 1 },
-	 [4] = {0, 0, 0},
-	 [6] = {0, 0, 0},
-	 [9] = {0, 0, 0},
+	 [4] = { 0, 0, 0, ksp_shrink=true },
+	 [6] = { 0, 0, 0, ksp_shrink=true },
+	 [99] = {0, 0, 0},
       },
       kern = {
 	 [8] = 0.0
@@ -221,7 +221,7 @@ luatexja.jfont.define_jfm {
    [99] = { -- box末尾
       chars = {'boxbdd', 'parbdd'},
       glue = {
-	 [3] = { 0.25, 0.0, 0.25, 1 },
+	 [3] = { 0.25, 0.0, 0.25, priority=1 },
       }
    },
 
