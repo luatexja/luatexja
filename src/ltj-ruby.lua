@@ -158,11 +158,7 @@ do
 	    setfield(node_tail(h), 'next', nh)
 	    setfield(f, 'head', nil); node_free(f)
 	    setfield(b, 'head', nil); node_free(b)
-	    print('<<<BEFORE>>>')
-	    luatexja.ext_show_node_list(to_node(h), '', print)
-	    print('<<<AFTER>>>')
 	    local g = luatexja.jfmglue.main(h,false)
-	    luatexja.ext_show_node_list(to_node(g), '', print)
 	    return Dnode.hpack(g)
 	 else
 	    return f
