@@ -682,21 +682,20 @@ local function handle_penalty_suppress(post, pre, g)
 end
 
 -- 和文文字間の JFM glue を node 化
-local function new_jfm_glue(m, bc, ac, ks)
+local function new_jfm_glue(m, bc, ac)
 -- bc, ac: char classes
    local g = m.char_type[bc][ac]
    if g then
       if g[1] then
 	 local f = node_new(id_glue)
 	 set_attr(f, attr_icflag, g.priority)
-	 local fs = node_copy(g[2])
 	 setfield(f, 'spec', node_copy(g[2]))
 	 return f, g.ratio, g.ksp_natural, g.ksp_stretch, g.ksp_shrink
       else
 	 return node_copy(g[2]), g.ratio, false, false, false
       end
    end
-   return nil, 0
+   return false, 0
 end
 
 -- Nq.last (kern w) .... (glue/kern g) Np.first
@@ -709,76 +708,6 @@ end
 
 
 -------------------- 和文文字間空白量の決定
-local function blend_diffmet(b, a, rb, ra)
-   return round(diffmet_rule((1-rb)*b+rb*a, (1-ra)*b+ra*a))
-end
-
-local null_skip_table = {0, 0, 0}
--- get kanjiskip
-local get_kanjiskip
-local get_kanjiskip_normal, get_kanjiskip_jfm
-do
-   local KANJI_SKIP   = luatexja.icflag_table.KANJI_SKIP
-   local KANJI_SKIP_JFM   = luatexja.icflag_table.KANJI_SKIP_JFM
-   get_kanjiskip_normal = function (flag, bn, bp, bh)
-      if Np.auto_kspc or Nq.auto_kspc then
-	 if flag then
-	    return node_copy(kanji_skip)
-	 elseif bn or bp or bh then
-	    local g = node_new(id_glue);
-	    local gx = node_copy(getfield(kanji_skip, 'spec'))
-	    setfield(g, 'spec', gx)
-	    setfield(gx, 'width', bn and getfield(gx, 'width') or 0)
-	    setfield(gx, 'stretch', bp and getfield(gx, 'stretch') or 0)
-	    setfield(gx, 'shrink', bh and getfield(gx, 'shrink') or 0)
-	    if (getfield(gx, 'width')==0) and (getfield(gx, 'stretch')==0)
-	       and (getfield(gx, 'shrink')==0) then
-		  node_free(g)
-	    else
-	       set_attr(g, attr_icflag, KANJI_SKIP)
-	       return g
-	    end
-	 end
-      elseif flag then
-	 local g = node_copy(zero_glue)
-	 set_attr(g, attr_icflag, KANJI_SKIP)
-	 return g
-      end
-   end
-
-   get_kanjiskip_jfm = function (flag, bn, bp, bh, an, ap, ah)
-      if Np.auto_kspc or Nq.auto_kspc then
-	 local g = node_new(id_glue);
-	 local gx = node_new(id_glue_spec);
-	 setfield(gx, 'stretch_order', 0); setfield(gx, 'shrink_order', 0)
-	 local pm, qm = Np.met, Nq.met
-	 local bk = qm.kanjiskip or null_skip_table
-	 if (pm.char_type==qm.char_type) and (qm.var==pm.var) then
-	    setfield(gx, 'width', bn and bk[1] or 0)
-	    setfield(gx, 'stretch', bp and bk[2] or 0)
-	    setfield(gx, 'shrink', bh and bk[3] or 0)
-	 else
-	    local ak = pm.kanjiskip or null_skip_table
-	    setfield(gx, 'width', blend_diffmet(bn and bk[1] or 0, an and ak[1] or 0, 0, 1))
-	    setfield(gx, 'stretch', blend_diffmet(bp and bk[2] or 0, ap and ak[2] or 0, 0, 1))
-	    setfield(gx, 'shrink', -blend_diffmet(bh and -bk[3] or 0, ah and -ak[3]or 0, 0, 1))
-	 end
-	 setfield(g, 'spec', gx)
-	 if (not flag) and (getfield(gx, 'width')==0) and (getfield(gx, 'stretch')==0)
-	 and (getfield(gx, 'shrink')==0) then
-	    node_free(g)
-	 else
-	    set_attr(g, attr_icflag, KANJI_SKIP_JFM)
-	    return g
-	 end
-      elseif flag then
-	 local g =  node_copy(zero_glue)
-	 set_attr(g, attr_icflag, KANJI_SKIP_JFM)
-	 return g
-      end
-   end
-end
-
 local calc_ja_ja_aux
 do
    local bg_ag = 2*id_glue - id_glue
@@ -786,8 +715,10 @@ do
    local bk_ag = 2*id_kern - id_glue
    local bk_ak = 2*id_kern - id_kern
 
-   calc_ja_ja_aux = function (gb, ga, db, da, 
-			     bn, bp, bh, an, ap, ah)
+   local function blend_diffmet(b, a, rb, ra)
+      return round(diffmet_rule((1-rb)*b+rb*a, (1-ra)*b+ra*a))
+   end
+   calc_ja_ja_aux = function (gb, ga, db, da)
       if diffmet_rule ~= math.two_pleft and diffmet_rule ~= math.two_pright
           and diffmet_rule ~= math.two_paverage then
 	 db, da = 0, 1
@@ -844,24 +775,86 @@ do
    end
 end
 
-local function calc_ja_ja_glue()
-   local qm, pm = Nq.met, Np.met
-   if (qm.char_type==pm.char_type) and (qm.var==pm.var) then
-      local g, _, kn, kp, kh = new_jfm_glue(qm, Nq.class, Np.class, ks)
-      local k = get_kanjiskip(false, kn, kp, kh)
-      return g, k
-   else
-      local npn, nqn = Np.nuc, Nq.nuc
-      local gb, db, bn, bp, bh = new_jfm_glue(qm, Nq.class,
-				  slow_find_char_class(Np.char,
-						       qm, getchar(npn)), ks)
-      local ga, da, an, ap, ah = new_jfm_glue(pm,
-				  slow_find_char_class(Nq.char,
-						       pm, getchar(nqn)),
-				  Np.class, ks)
-      local g = calc_ja_ja_aux(gb, ga, db, da, bn, bp, bh, an, ap, ah);
-      local k = get_kanjiskip(false, bn, bp, bh, an, ap, ah)
-      return g, k
+local null_skip_table = {0, 0, 0}
+-- get kanjiskip
+local get_kanjiskip, kanjiskip_jfm_flag
+local calc_ja_ja_glue
+do
+   local KANJI_SKIP   = luatexja.icflag_table.KANJI_SKIP
+   local KANJI_SKIP_JFM   = luatexja.icflag_table.KANJI_SKIP_JFM
+
+   get_kanjiskip_low = function(flag, qm, bn, bp, bh)
+      if flag or bn or bp or bh then
+	 if kanjiskip_jfm_flag then
+	    local g = node_new(id_glue);
+	    local gx = node_new(id_glue_spec);
+	    setfield(gx, 'stretch_order', 0); setfield(gx, 'shrink_order', 0)
+	    local bk = qm.kanjiskip or null_skip_table
+	    setfield(gx, 'width', bn and bk[1] or 0)
+	    setfield(gx, 'stretch', bp and bk[2] or 0)
+	    setfield(gx, 'shrink', bh and bk[3] or 0)
+	    setfield(g, 'spec', gx)
+	    set_attr(g, attr_icflag, KANJI_SKIP_JFM)
+	    return g
+	 elseif flag then
+	    return node_copy(kanji_skip)
+	 else
+	    local g = node_new(id_glue);
+	    local gx = node_new(id_glue_spec);
+	    setfield(gx, 'stretch_order', 0); setfield(gx, 'shrink_order', 0)
+	    local ks = getfield(kanji_skip, 'spec')
+	    setfield(gx, 'width', bn and getfield(ks, 'width') or 0)
+	    setfield(gx, 'stretch', bp and getfield(ks, 'stretch') or 0)
+	    setfield(gx, 'shrink', bh and getfield(ks, 'shrink') or 0)
+	    setfield(g, 'spec', gx)
+	    set_attr(g, attr_icflag, KANJI_SKIP_JFM)
+	    return g
+	 end
+      end
+   end
+   
+   get_kanjiskip = function()
+      if Np.auto_kspc or Nq.auto_kspc then
+	 local pm, qm = Np.met, Nq.met
+	 if (pm.char_type==qm.char_type) and (qm.var==pm.var) then
+	    return get_kanjiskip_low(true, qm, true, true, true)
+	 else
+	    local gb = get_kanjiskip_low(true, qm, true, true, true)
+	    local ga = get_kanjiskip_low(true, pm, true, true, true)
+	    return calc_ja_ja_aux(gb, ga, 0, 1)
+	 end
+      else
+	 local g = node_copy(zero_glue)
+	 set_attr(g, attr_icflag, jfm_flag and KANJI_SKIP_JFM or KANJI_SKIP)
+	 return g
+      end
+   end
+
+   calc_ja_ja_glue = function ()
+      local qm, pm = Nq.met, Np.met
+      if (qm.char_type==pm.char_type) and (qm.var==pm.var) then
+	 local g, _, kn, kp, kh = new_jfm_glue(qm, Nq.class, Np.class)
+	 return g, (Np.auto_kspc or Nq.auto_kspc) and get_kanjiskip_low(false, qm, kn, kp, kh)
+      else
+	 local npn, nqn = Np.nuc, Nq.nuc
+	 local gb, db, bn, bp, bh 
+	    = new_jfm_glue(qm, Nq.class,
+			   slow_find_char_class(Np.char,
+						qm, getchar(npn)))
+	 local ga, da, an, ap, ah 
+	    = new_jfm_glue(pm,
+			   slow_find_char_class(Nq.char,
+						pm, getchar(nqn)),
+						 Np.class)
+	 local g = calc_ja_ja_aux(gb, ga, db, da)
+	 local k
+	 if (pm.char_type==qm.char_type) and (qm.var==pm.var) then
+	    gb = get_kanjiskip_low(false, qm, bn, bp, bh)
+	    ga = get_kanjiskip_low(false, pm, an, ap, ah)
+	    k = calc_ja_ja_aux(gb, ga, db, da)
+	 end
+	 return g, k
+      end
    end
 end
 
@@ -924,11 +917,11 @@ local function handle_np_jachar(mode)
    if qid==id_jglyph or ((qid==id_pbox or qid==id_pbox_w) and Nq.met) then
       local g, k
       if non_ihb_flag then g, k = calc_ja_ja_glue() end -- M->K
-      if not g then g = get_kanjiskip(true, true, true, true) end
+      if not g then g = get_kanjiskip(true) end
       handle_penalty_normal(Nq.post, Np.pre, g); 
       real_insert(g); real_insert(k)
    elseif Nq.met then  -- qid==id_hlist
-      local g = non_ihb_flag and get_OA_skip(get_kanjiskip) or get_kanjiskip(true, true, true, true) -- O_A->K
+      local g = non_ihb_flag and get_OA_skip(get_kanjiskip) or get_kanjiskip(true) -- O_A->K
       handle_penalty_normal(0, Np.pre, g); real_insert(g)
    elseif Nq.pre then
       local g = non_ihb_flag and get_OA_skip(get_kanjiskip) or get_xkanjiskip(Np) -- O_A->X
@@ -966,10 +959,10 @@ end
 local function handle_np_ja_hlist()
    local qid = Nq.id
    if qid==id_jglyph or ((qid==id_pbox or Nq.id == id_pbox_w) and Nq.met) then
-      local g = non_ihb_flag and get_OB_skip() or get_kanjiskip(true, true, true, true) -- O_B->K
+      local g = non_ihb_flag and get_OB_skip() or get_kanjiskip(true) -- O_B->K
       handle_penalty_normal(Nq.post, 0, g); real_insert(g)
    elseif Nq.met then  -- Nq.id==id_hlist
-      local g = get_kanjiskip(true, true, true, true) -- K
+      local g = get_kanjiskip(true) -- K
       handle_penalty_suppress(0, 0, g); real_insert(g)
    elseif Nq.pre then
       local g = get_xkanjiskip(Np) -- X
@@ -1091,8 +1084,7 @@ do
 	 kanji_skip = node_new(id_glue); set_attr(kanji_skip, attr_icflag, KANJI_SKIP)
 	 local s = skip_table_to_spec(KSK)
 	 setfield(kanji_skip, 'spec', s)
-	 get_kanjiskip = (getfield(kanji_skip, 'width') == 1073741823)
-	    and get_kanjiskip_jfm or get_kanjiskip_normal
+	 kanjiskip_jfm_flag = (getfield(s, 'width') == 1073741823)
       end
 
       do

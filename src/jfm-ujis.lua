@@ -25,7 +25,6 @@ luatexja.jfont.define_jfm {
 	 [6] = { 0, 0, 0, ksp_shrink=true },
 	 [7] = { 0, 0, 0, ksp_shrink=true },
 	 [8] = { 0, 0, 0, ksp_shrink=true },
-	 [99] = { 0, 0, 0 },
       }
    },
 
@@ -47,7 +46,6 @@ luatexja.jfont.define_jfm {
 	 [6] = { 0, 0, 0, ksp_shrink=true },
 	 [7] = { 0, 0, 0, ksp_shrink=true },
          [8] = { 0, 0, 0, ksp_shrink=true },
-	 [99] = { 0, 0, 0 },
       }
    },
 
@@ -69,7 +67,6 @@ luatexja.jfont.define_jfm {
 	 [6] = { 0.5 , 0.0, 0.5, ratio=0, ksp_stretch=true },
 	 [7] = { 0.5 , 0.0, 0.5, ratio=0, ksp_stretch=true },
 	 [8] = { 0.5 , 0.0, 0.5, ratio=0, ksp_stretch=true },
-         [99] = { 0, 0, 0 },
       }
    },
 
@@ -89,7 +86,6 @@ luatexja.jfont.define_jfm {
 	 [6] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
 	 [7] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
 	 [8] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
-	 [99] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
       }
    },
 
@@ -106,7 +102,6 @@ luatexja.jfont.define_jfm {
 	 [6] = { 0.5 , 0.0, 0.5, ratio=0, ksp_stretch=true },
 	 [7] = { 0.5 , 0.0, 0.5, ratio=0, ksp_stretch=true },
 	 [8] = { 0.5 , 0.0, 0.5, ratio=0, ksp_stretch=true },
-         [99] = { 0.5 , 0.0, 0.5, ratio=0, ksp_stretch=true },
       }
    },
 
@@ -120,7 +115,6 @@ luatexja.jfont.define_jfm {
 	 [3] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
 	 [4] = { 0, 0, 0, ksp_shrink=true },
 	 [6] = { 0, 0, 0, ksp_shrink=true },
-	 [99] = { 0, 0, 0 },
       },
       kern = {
 	 [5] = 0.0
@@ -140,7 +134,6 @@ luatexja.jfont.define_jfm {
 	 [6] = { 0, 0, 0, ksp_shrink=true },
 	 [7] = { 0.5 , 0.0, 0.5, ratio=1, ksp_stretch=true },
 	 [8] = { 0, 0, 0, ksp_shrink=true },
-	 [99] = { 0, 0, 0 },
       },
       kern = {
 	 [5] = 0.0
@@ -179,7 +172,6 @@ luatexja.jfont.define_jfm {
 	 [6] = { 0, 0, 0, ksp_shrink=true},
 	 [7] = { 0, 0, 0, ksp_shrink=true },
          [8] = { 0, 0, 0, ksp_shrink=true},
-	 [99] = { 0, 0, 0 },
       }
    },
 
@@ -210,7 +202,6 @@ luatexja.jfont.define_jfm {
 	 [3] = { 0.25, 0.0, 0.25, 1, 1 },
 	 [4] = { 0, 0, 0, ksp_shrink=true },
 	 [6] = { 0, 0, 0, ksp_shrink=true },
-	 [99] = {0, 0, 0},
       },
       kern = {
 	 [8] = 0.0
