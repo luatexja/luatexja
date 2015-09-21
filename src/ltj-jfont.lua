@@ -120,7 +120,7 @@ function define_jfm(t)
 	    if type(x)=='number' then
                v.kern[j] = {x, 0.5}
             elseif type(x)=='table' then
-               v.kern[j] = { x[1], ratio=x.ratio or x[2] or 0.5 }
+               v.kern[j] = { x[1], ratio=x.ratio or (x[2] and 0.5*(1+x[2]) or 0.5) }
             end
 	 end
 	 t.char_type[i] = v
@@ -767,7 +767,7 @@ do
       local bx = font_extra_basename[bname].vkerns
       local lookuphash =  id.resources.lookuphash
       local desc = id.shared.rawdata.descriptions
-      if bx then
+      if bx and lookuphash then
 	 for i,v in pairs(bx) do
 	    lookuphash[i] = lookuphash[i] or v
 	    for j,w in pairs(v) do
