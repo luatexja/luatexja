@@ -52,6 +52,17 @@ local jfm_file_name, jfm_var
 local defjfm_res
 local jfm_dir, is_def_jfont, is_vert_enabled
 
+local function norm_val(a)
+   if (not a) or (a==0.) then
+      return nil
+   elseif a==true then
+      return 1
+   else
+      return a
+   end
+end
+
+
 function define_jfm(t)
    local real_char -- Does current character class have the 'real' character?
    if t.dir~=jfm_dir then
@@ -112,9 +123,12 @@ function define_jfm(t)
 	 end
 	 v.kern = v.kern or {}; v.glue = v.glue or {}
 	 for j,x in pairs(v.glue) do
+	    if v.kern[j] then defjfm_res= nil; return end
 	    x.ratio, x[5] = (x.ratio or (x[5] and 0.5*(1+x[5]) or 0.5)), nil
 	    x.priority, x[4] = (x.priority or x[4] or 0), nil
-	    if v.kern[j] then defjfm_res= nil; return end
+	    x.ksp_natural = norm_val(x.ksp_natural)
+	    x.ksp_stretch = norm_val(x.ksp_stretch)
+	    x.ksp_shrink = norm_val(x.ksp_shrink)
 	 end
 	 for j,x in pairs(v.kern) do
 	    if type(x)=='number' then
@@ -149,7 +163,6 @@ do
 	 return new
       else return nil end
    end
-
    update_jfm_cache = function (j,sz)
       if metrics[j].size_cache[sz] then return end
       --local TEMP = node_new(id_kern)
@@ -167,9 +180,9 @@ do
 		  true, h, 
 		  ratio=w.ratio/sz, 
 		  priority=FROM_JFM + w.priority/sz,
-		  ksp_natural = w.ksp_natural,
-		  ksp_stretch = w.ksp_stretch,
-		  ksp_shrink = w.ksp_shrink,
+		  ksp_natural = w.ksp_natural and w.ksp_natural/sz,
+		  ksp_stretch = w.ksp_stretch and w.ksp_stretch/sz,
+		  ksp_shrink =  w.ksp_shrink  and w.ksp_shrink/sz,
 	       }
 	       setfield(h, 'width', w[1])
 	       setfield(h, 'stretch', w[2])

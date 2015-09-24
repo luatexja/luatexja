@@ -790,9 +790,9 @@ do
 	    local gx = node_new(id_glue_spec);
 	    setfield(gx, 'stretch_order', 0); setfield(gx, 'shrink_order', 0)
 	    local bk = qm.kanjiskip or null_skip_table
-	    setfield(gx, 'width', bn and bk[1] or 0)
-	    setfield(gx, 'stretch', bp and bk[2] or 0)
-	    setfield(gx, 'shrink', bh and bk[3] or 0)
+	    setfield(gx, 'width', bn and (bn*bk[1]) or 0)
+	    setfield(gx, 'stretch', bp and (bp*bk[2]) or 0)
+	    setfield(gx, 'shrink', bh and (bh*bk[3]) or 0)
 	    setfield(g, 'spec', gx)
 	    set_attr(g, attr_icflag, KANJI_SKIP_JFM)
 	    return g
@@ -803,9 +803,9 @@ do
 	    local gx = node_new(id_glue_spec);
 	    setfield(gx, 'stretch_order', 0); setfield(gx, 'shrink_order', 0)
 	    local ks = getfield(kanji_skip, 'spec')
-	    setfield(gx, 'width', bn and getfield(ks, 'width') or 0)
-	    setfield(gx, 'stretch', bp and getfield(ks, 'stretch') or 0)
-	    setfield(gx, 'shrink', bh and getfield(ks, 'shrink') or 0)
+	    setfield(gx, 'width', bn and (bn*getfield(ks, 'width')) or 0)
+	    setfield(gx, 'stretch', bp and (bp*getfield(ks, 'stretch')) or 0)
+	    setfield(gx, 'shrink', bh and (bh*getfield(ks, 'shrink')) or 0)
 	    setfield(g, 'spec', gx)
 	    set_attr(g, attr_icflag, KANJI_SKIP_JFM)
 	    return g
@@ -817,10 +817,10 @@ do
       if Np.auto_kspc or Nq.auto_kspc then
 	 local pm, qm = Np.met, Nq.met
 	 if (pm.char_type==qm.char_type) and (qm.var==pm.var) then
-	    return get_kanjiskip_low(true, qm, true, true, true)
+	    return get_kanjiskip_low(true, qm, 1, 1, 1)
 	 else
-	    local gb = get_kanjiskip_low(true, qm, true, true, true)
-	    local ga = get_kanjiskip_low(true, pm, true, true, true)
+	    local gb = get_kanjiskip_low(true, qm, 1, 1, 1)
+	    local ga = get_kanjiskip_low(true, pm, 1, 1, 1)
 	    return calc_ja_ja_aux(gb, ga, 0, 1)
 	 end
       else
@@ -899,7 +899,7 @@ do
    
    get_xkanjiskip = function(Nn)
       if (Nq.xspc>=2) and (Np.xspc%2==1) and (Nq.auto_xspc or Np.auto_xspc) then
-	 return get_xkanjiskip_low(true, Nn.met, true, true, true)
+	 return get_xkanjiskip_low(true, Nn.met, 1, 1, 1)
       else
 	 local g = node_copy(zero_glue)
 	 set_attr(g, attr_icflag, xkanjiskip_jfm_flag and XKANJI_SKIP_JFM or XKANJI_SKIP)
