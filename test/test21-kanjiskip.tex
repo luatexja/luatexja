@@ -1,0 +1,32 @@
+%#!luajittex
+% 例は「プリセットの「文字組アキ量設定」における設定値の齟齬と回避策」
+% （なんでやねんDTP，http://d.hatena.ne.jp/works014/20150926）から引用．
+\input luatexja.sty
+%\input luatexja-adjust.sty
+\def\test#1{\par\vrule\hbox spread\zw{#1}\vrule\par}
+
+\def\testH#1{\vbox{#1%
+\test{あ（…）ああ}
+\test{あ（￥）ああ}
+\test{あ（％）ああ}
+\test{あ（ー）ああ}
+\test{あ（あ）ああ}
+\test{あ（ア）ああ}
+\test{あ（漢）ああ}
+\test{あ（０）ああ}
+\test{…　………}
+\test{￥　￥　％}
+\test{％　％　あ}
+\test{ー　ー　あ}
+\test{あ　あ　ア}
+\test{０　０　ー}
+\test{佐々十郎}
+\test{大村　崑}
+\test{岡　八郎}
+\test{花紀　京}}}
+
+\testH\yoko
+\testH\tate
+
+
+\bye
