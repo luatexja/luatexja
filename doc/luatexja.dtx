@@ -16,7 +16,6 @@
 \makeatletter
 %%%%%%%%
 \directlua{if jit then jit.on() end}
-
 \usepackage{metalogo,amsmath,array,tikz,pict2e,multienum,float}
 \usepackage{booktabs,multicol,luatexja-ruby}
 \usepackage[all]{xy}
@@ -25,6 +24,7 @@
 %%%%%%%% fonts
 \usepackage{luatexja-otf}
 \directlua{luatexja.otf.enable_ivs()}
+\expandafter\let\csname xetex_suppressfontnotfounderror:D\endcsname\suppressfontnotfounderror
 \usepackage[match]{luatexja-fontspec}
 \usepackage[kozuka-pr6n]{luatexja-preset}
 \usepackage{unicode-math}
@@ -4464,23 +4464,23 @@ we specify <ratio> to $0.25/(0.5+0.25)=1/3$.
              度を$-2$から$+2$の間の整数で指定する．大きい値ほど「伸びやすく，縮みやすい」
              ことを意味する．省略時の値
              は0であり，範囲外の値が指定されたときの動作は未定義である．
-\item[ksp\_natural=<num>\textrm{, }%
-  ksp\_stretch=<num>\textrm{, }ksp\_shrink=<num>]\leavevmode
+\item[kanjiskip\_natural=<num>\textrm{, }%
+  kanjiskip\_stretch=<num>\textrm{, }kanjiskip\_shrink=<num>]\leavevmode
 
 JFMによって本来挿入されるグルーの他に
-\Param{kanjiskip}分の空白を自然長(\texttt{ksp\_natural})，伸び量(\texttt{ksp\_stretch})，
-縮み量(\texttt{ksp\_shrink})ごとに挿入する\footnote{本来\Param{xkanjiskip}が挿入される場所においては
+\Param{kanjiskip}分の空白を自然長(\texttt{kanjiskip\_natural})，伸び量(\texttt{kanjiskip\_stretch})，
+縮み量(\texttt{kanjiskip\_shrink})ごとに挿入する\footnote{本来\Param{xkanjiskip}が挿入される場所においては
 	     \Param{xkanjiskip}分の空白を自然長・伸び量・縮み量ごとに．追加できる．}%
 ための指定である．いずれも省略された場合のデフォルト値は0（追加しない）である．
 
 例えば，\LuaTeX-jaの横組標準JFMの \texttt{jfm-ujis.lua} では，
 \begin{itemize}
  \item 通常の文字「あ」と開き括弧類の間に入るグルーは，自然長・縮み量半角，伸び量0のグルー
-となっているが，さらに\Param{kanjiskip}の伸び量に \texttt{ksp\_stretch}（ここでは1）を掛け
+となっているが，さらに\Param{kanjiskip}の伸び量に \texttt{kanjiskip\_stretch}（ここでは1）を掛け
        た分だけ伸びることが許される．
  \item 同様に，閉じ括弧類（全角コンマ「，」も含む）と通常の文字「う」「え」の間にも
 自然長・縮み量半角，伸び量0のグルー
-となっているが，さらに\Param{kanjiskip}の伸び量に \texttt{ksp\_stretch}（ここでは1）を掛け
+となっているが，さらに\Param{kanjiskip}の伸び量に \texttt{kanjiskip\_stretch}（ここでは1）を掛け
        た分だけ伸びることが許される．
 \end{itemize}
 となっている．従って，以下のような組版結果を得る．
@@ -4503,8 +4503,8 @@ An integer in $[-2,2]$ (treated as 0 if omitted), and this is
 used only in line adjustment with priority by \Pkg{luatexja-adjust}
 (see Subsection~\ref{ssec-adj}). Higher value means the glue is easy to stretch,
 and is also easy to shrink.
-\item[ksp\_natural=<num>\textrm{, }%
-  ksp\_stretch=<num>\textrm{, }ksp\_shrink=<num>]\leavevmode
+\item[kanjiskip\_natural=<num>\textrm{, }%
+  kanjiskip\_stretch=<num>\textrm{, }kanjiskip\_shrink=<num>]\leavevmode
 
 These keys specifies whether the natural width of \Param{kanjiskip}
 (the stretch/shrink part, respectively) will be inserted in addition to the original
@@ -4516,12 +4516,12 @@ As an example, in \texttt{jfm-ujis.lua}, the standard JFM in horizontal writing,
 a glue whose natural part and shrink part are both half-width, while its stretch part is
        zero. However, this glue also can be stretched
        as much as the stretch part of \Param{kanjiskip} times the value of
-       \texttt{ksp\_stretch} key (1 in this case).
+       \texttt{kanjiskip\_stretch} key (1 in this case).
  \item Between an ideographic closeing brackets (the ideographic comma ``，''
        is included) and an ordinal letter, we have the same glue. 
        Again, this glue also can be stretched
        as much as the stretch part of \Param{kanjiskip} times the value of
-       \texttt{ksp\_stretch} key (1 in this case).
+       \texttt{kanjiskip\_stretch} key (1 in this case).
 \end{itemize}
 Hence we have the following result:
 

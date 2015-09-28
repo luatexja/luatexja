@@ -126,9 +126,9 @@ function define_jfm(t)
 	    if v.kern[j] then defjfm_res= nil; return end
 	    x.ratio, x[5] = (x.ratio or (x[5] and 0.5*(1+x[5]) or 0.5)), nil
 	    x.priority, x[4] = (x.priority or x[4] or 0), nil
-	    x.ksp_natural = norm_val(x.ksp_natural)
-	    x.ksp_stretch = norm_val(x.ksp_stretch)
-	    x.ksp_shrink = norm_val(x.ksp_shrink)
+	    x.kanjiskip_natural = norm_val(x.kanjiskip_natural)
+	    x.kanjiskip_stretch = norm_val(x.kanjiskip_stretch)
+	    x.kanjiskip_shrink = norm_val(x.kanjiskip_shrink)
 	 end
 	 for j,x in pairs(v.kern) do
 	    if type(x)=='number' then
@@ -180,9 +180,9 @@ do
 		  true, h, 
 		  ratio=w.ratio/sz, 
 		  priority=FROM_JFM + w.priority/sz,
-		  ksp_natural = w.ksp_natural and w.ksp_natural/sz,
-		  ksp_stretch = w.ksp_stretch and w.ksp_stretch/sz,
-		  ksp_shrink =  w.ksp_shrink  and w.ksp_shrink/sz,
+		  kanjiskip_natural = w.kanjiskip_natural and w.kanjiskip_natural/sz,
+		  kanjiskip_stretch = w.kanjiskip_stretch and w.kanjiskip_stretch/sz,
+		  kanjiskip_shrink =  w.kanjiskip_shrink  and w.kanjiskip_shrink/sz,
 	       }
 	       setfield(h, 'width', w[1])
 	       setfield(h, 'stretch', w[2])
@@ -296,7 +296,7 @@ do
       local ad = identifiers[fn].parameters
       local sz = metrics[j].size_cache[f.size]
       local fmtable = { jfm = j, size = f.size, var = jfm_var,
-			ksp = jfm_ksp, 
+			with_kanjiskip = jfm_ksp, 
 			zw = sz.zw, zh = sz.zh,
 			ascent = ad.ascender,
 			descent = ad.descender,

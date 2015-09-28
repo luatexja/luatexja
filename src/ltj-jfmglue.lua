@@ -690,7 +690,7 @@ local function new_jfm_glue(m, bc, ac)
 	 local f = node_new(id_glue)
 	 set_attr(f, attr_icflag, g.priority)
 	 setfield(f, 'spec', node_copy(g[2]))
-	 return f, g.ratio, g.ksp_natural, g.ksp_stretch, g.ksp_shrink
+	 return f, g.ratio, g.kanjiskip_natural, g.kanjiskip_stretch, g.kanjiskip_shrink
       else
 	 return node_copy(g[2]), g.ratio, false, false, false
       end
@@ -784,7 +784,7 @@ do
    local KANJI_SKIP_JFM   = luatexja.icflag_table.KANJI_SKIP_JFM
 
    get_kanjiskip_low = function(flag, qm, bn, bp, bh)
-      if flag or (qm.ksp and (bn or bp or bh)) then
+      if flag or (qm.with_kanjiskip and (bn or bp or bh)) then
 	 if kanjiskip_jfm_flag then
 	    local g = node_new(id_glue);
 	    local gx = node_new(id_glue_spec);
@@ -868,7 +868,7 @@ do
    local XKANJI_SKIP_JFM   = luatexja.icflag_table.XKANJI_SKIP_JFM
 
    get_xkanjiskip_low = function(flag, qm, bn, bp, bh)
-      if flag or (qm.ksp and (bn or bp or bh)) then
+      if flag or (qm.with_kanjiskip and (bn or bp or bh)) then
 	 if xkanjiskip_jfm_flag then
 	    local g = node_new(id_glue);
 	    local gx = node_new(id_glue_spec);
