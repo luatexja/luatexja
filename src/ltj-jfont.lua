@@ -48,7 +48,7 @@ font_metric_table={} -- [font number] -> jfm_name, jfm_var, size
 
 luatexbase.create_callback("luatexja.load_jfm", "data", function (ft, jn) return ft end)
 
-local jfm_file_name, jfm_var
+local jfm_file_name, jfm_var, jfm_ksp
 local defjfm_res
 local jfm_dir, is_def_jfont, is_vert_enabled
 
@@ -296,6 +296,7 @@ do
       local ad = identifiers[fn].parameters
       local sz = metrics[j].size_cache[f.size]
       local fmtable = { jfm = j, size = f.size, var = jfm_var,
+			ksp = jfm_ksp, 
 			zw = sz.zw, zh = sz.zh,
 			ascent = ad.ascender,
 			descent = ad.descender,
@@ -334,7 +335,7 @@ do
    -- extract jfm_file_name and jfm_var
    -- normalize position of 'jfm=' and 'jfmvar=' keys
    local function extract_metric(name)
-      jfm_file_name = ''; jfm_var = ''
+      jfm_file_name = ''; jfm_var = ''; jfm_ksp = true
       local tmp, index = name:sub(1, 5), 1
       if tmp == 'file:' or tmp == 'name:' or tmp == 'psft:' then
 	 index = 6
@@ -372,6 +373,7 @@ do
 	    name = name .. 'jfmvar=' .. jfm_var
 	 end
       end
+      if name:match('-ltjksp') then jfm_ksp = false end
       if jfm_dir == 'tate' then
 	 is_vert_enabled = (not name:match('-vert')) and (not  name:match('-vrt2'))
          if not name:match('vert') and not name:match('vrt2') then

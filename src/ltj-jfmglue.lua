@@ -784,7 +784,7 @@ do
    local KANJI_SKIP_JFM   = luatexja.icflag_table.KANJI_SKIP_JFM
 
    get_kanjiskip_low = function(flag, qm, bn, bp, bh)
-      if flag or bn or bp or bh then
+      if flag or (qm.ksp and (bn or bp or bh)) then
 	 if kanjiskip_jfm_flag then
 	    local g = node_new(id_glue);
 	    local gx = node_new(id_glue_spec);
@@ -868,7 +868,7 @@ do
    local XKANJI_SKIP_JFM   = luatexja.icflag_table.XKANJI_SKIP_JFM
 
    get_xkanjiskip_low = function(flag, qm, bn, bp, bh)
-      if flag or bn or bp or bh then
+      if flag or (qm.ksp and (bn or bp or bh)) then
 	 if xkanjiskip_jfm_flag then
 	    local g = node_new(id_glue);
 	    local gx = node_new(id_glue_spec);
