@@ -3837,8 +3837,8 @@ OpenType font featureと見かけ上同じような形式で指定できるも�
 \paragraph{\texttt{extend} and \texttt{slant}}
 The following setting can be specified as OpenType font features:
 \begin{cslist}[style=standard]
-\item[\cs{extend=}<extend>] expand the font horizontally by <extend>.
-\item[\cs{slant=}<slant>] slant the font.
+\item[\texttt{extend=}<extend>] expand the font horizontally by <extend>.
+\item[\texttt{slant=}<slant>] slant the font.
 \end{cslist}
 Note that \LuaTeX-ja doesn't adjust JFMs by these \texttt{extend} and \texttt{slant}
 settings; you have to write new JFMs on purpose.
@@ -3852,6 +3852,29 @@ letter-spacing and the width of italic correction are not correct:
 \jfont\S=KozMinPr6N-Regular:slant=1;jfm=ujis;-kern
 \S あいう\/ABC
 \end{LTXexample}
+
+%<*ja>
+\paragraph{\texttt{-ltjksp}指定}
+\LuaTeX-ja標準では，\pageref{pg:ksp_nat}ページで説明されている
+\texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\ 
+\texttt{kanjiskip\_shrink}キーの使用によって，
+「JFM由来のグルーの他に，\Param{kanjiskip}の自然長/伸び量/縮み量の一部が
+同じ場所に挿入される」という事態が起こりうる．
+この機能を無効化し，20150922.0版以前と同じような組版を得るための指定が
+\texttt{-ltjksp}指定である．
+
+\begin{LTXexample}[width=16\zw]
+\leavevmode
+\ltjsetparameter{kanjiskip=0pt plus 3\zw}
+\vrule\hbox to 15\zw{あ「い」う，えお}\vrule
+
+\jfont\G=file:KozMinPr6N-Regular.otf%
+  :jfm=ujis;-ltjksp at 9.2487pt
+\G\leavevmode%
+\vrule\hbox to 15\zw{あ「い」う，えお}\vrule
+\end{LTXexample}
+%</ja>
+
 
 %<en>\subsection{\cs{tfont}}
 %<ja>\subsection{\cs{tfont} 命令}
@@ -4466,6 +4489,7 @@ we specify <ratio> to $0.25/(0.5+0.25)=1/3$.
              は0であり，範囲外の値が指定されたときの動作は未定義である．
 \item[kanjiskip\_natural=<num>\textrm{, }%
   kanjiskip\_stretch=<num>\textrm{, }kanjiskip\_shrink=<num>]\leavevmode
+  \label{pg:ksp_nat}
 
 JFMによって本来挿入されるグルーの他に
 \Param{kanjiskip}分の空白を自然長(\texttt{kanjiskip\_natural})，伸び量(\texttt{kanjiskip\_stretch})，
@@ -4506,9 +4530,9 @@ and is also easy to shrink.
 \item[kanjiskip\_natural=<num>\textrm{, }%
   kanjiskip\_stretch=<num>\textrm{, }kanjiskip\_shrink=<num>]\leavevmode
 
-These keys specifies whether the natural width of \Param{kanjiskip}
-(the stretch/shrink part, respectively) will be inserted in addition to the original
-JFM glue. Default values of them are all 0.
+These keys specifies the amount of the natural width of \Param{kanjiskip}
+(the stretch/shrink part, respectively) which will be inserted 
+in addition to the original JFM glue. Default values of them are all 0.
 
 As an example, in \texttt{jfm-ujis.lua}, the standard JFM in horizontal writing, we have
 \begin{itemize}
