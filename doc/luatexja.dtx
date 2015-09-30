@@ -3854,15 +3854,15 @@ letter-spacing and the width of italic correction are not correct:
 \end{LTXexample}
 
 %<*ja>
-\paragraph{\texttt{-ltjksp}指定}
-\LuaTeX-ja標準では，\pageref{pg:ksp_nat}ページで説明されている
-\texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\ 
-\texttt{kanjiskip\_shrink}キーの使用によって，
+\paragraph{\texttt{ltjksp} 指定}
+\label{pg:ltjksp}
+\LuaTeX-ja標準では，
+JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\ 
+\texttt{kanjiskip\_shrink}キー（\pageref{pg:ksp_nat}ページ）の使用によって，
 「JFM由来のグルーの他に，\Param{kanjiskip}の自然長/伸び量/縮み量の一部が
-同じ場所に挿入される」という事態が起こりうる．
-この機能を無効化し，20150922.0版以前と同じような組版を得るための指定が
-\texttt{-ltjksp}指定である．
-
+同じ場所に挿入される」という状況が起こりうる．
+この機能を無効化し，20150922.0版以前と同じような組版を得るためには
+他のOpenType機能と同じように\ \texttt{-ltjksp}\ 指定を行えば良い．
 \begin{LTXexample}[width=16\zw]
 \leavevmode
 \ltjsetparameter{kanjiskip=0pt plus 3\zw}
@@ -3873,6 +3873,13 @@ letter-spacing and the width of italic correction are not correct:
 \G\leavevmode%
 \vrule\hbox to 15\zw{あ「い」う，えお}\vrule
 \end{LTXexample}
+なお，
+\begin{lstlisting}
+ \jfont\G=file:KozMinPr6N-Regular.otf:jfm=ujis;-ltjksp;+ltjksp at 9.2487pt
+\end{lstlisting}
+のように \texttt{+ltjksp} 指定を行った場合は，\texttt{kanjiskip\_natural} など
+3キーは再び有効化される．\texttt{-ltjksp}, \texttt{+ltjksp} を複数回指定した場合は，
+最後に指定したものが有効となる．
 %</ja>
 
 
@@ -6362,8 +6369,8 @@ the commands of Japanese version:
 \ref{ssec-fontspec}節で述べたように，この追加パッケージは\Pkg{fontspec}%
 パッケージで定義されているコマンドに対応する和文フォント用のコマンドを提供する．
 
-\Pkg{fontspec}パッケージで指定可能な各種font featureに加えて，和文版のコマンドには
-以下の``font feature''を指定することができる：
+\Pkg{fontspec}パッケージで指定可能な各種OpenType機能に加えて，和文版のコマンドには
+以下の「フォント機能」を指定することができる：
 %</ja>
 
 
@@ -6419,6 +6426,14 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
 \label{fig:yokotate-fontspec}
 \end{figure}
 
+\item[Kanjiskip=<bool>]
+%<*ja>
+\pageref{pg:ltjksp}ページで説明した \verb+\jfont+ 中での \texttt{ltjksp} 指定と
+同一の効力を持ち，
+JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\ 
+\texttt{kanjiskip\_shrink}キー（\pageref{pg:ksp_nat}ページ）の有効/無効を切り替える．
+標準値は \texttt{true} である．
+%</ja>
 
 \item[TateFeatures=\{<features>\}\textrm{, }TateFont=<font>]
 %<*en>
@@ -6429,7 +6444,7 @@ Similarly, the \texttt{TateFont} key specifies the Japanese font which will be u
 A demonstrarion is shown in Figure~\ref{fig:yokotate-fontspec}.
 %</en>
 %<*ja>
-縦組において使用されるフォントや，縦組においてのみ適用されるfeature達を
+縦組において使用されるフォントや，縦組においてのみ適用されるフォント機能達を
 指定する．使用例は図\ref{fig:yokotate-fontspec}参照．
 %</ja>
 
@@ -6440,7 +6455,7 @@ horizontal writing,.
 A demonstrarion is shown in Figure~\ref{fig:yokotate-fontspec}.
 %</en>
 %<*ja>
-同様に，横組においてのみ適用されるfeature達を
+同様に，横組においてのみ適用されるフォント機能達を
 指定する．使用例は図\ref{fig:yokotate-fontspec}参照．
 %</ja>
 
@@ -6475,7 +6490,7 @@ as the following:
 %<*ja>
 \ref{ssec-altfont}節の \cs{ltjdeclarealtfont} や，
 \ref{ssec-nfsspat}節の \cs{DeclareAlternateKanjiFont} と同様に，
-このキーを用いると一部の文字を異なったフォントやfont featureを使って組むことができる．
+このキーを用いると一部の文字を異なったフォントや機能たちを使って組むことができる．
 \texttt{AltFont} キーに指定する値は，次のように二重のコンマ区切りリストである：
 %</ja>
 \begin{lstlisting}[escapechar=\#]
@@ -6565,8 +6580,9 @@ BoldFeatures = {
 
 また，図\ref{fig:yokotate-fontspec}後半部では6行目の色の指定が効かず，
 2行目で指定した\ \texttt{YokoFeatures},~\texttt{TateFeatures}\ による色の指定が有効になっ
-たままである．これは\emph{\ \texttt{YokoFeatures},~\texttt{TateFeatures}\ によるfeature指定は
-組方向に依存しないfeature指定より後に解釈される}からである．
+たままである．これは\emph{\ \texttt{YokoFeatures},~\texttt{TateFeatures}\ による
+OpenType機能指定は
+組方向に依存しないOpenType機能の指定より後に解釈される}からである．
 
 %</ja>
 
@@ -6644,7 +6660,7 @@ ordinary characters in the following points:
       is not performed to these characters.
 %</en>
 %<*ja>
-\item OpenType feature（例えばグリフ置換やカーニング）をサポートするための
+\item OpenType機能（例えばグリフ置換やカーニング）をサポートするための
   \Pkg{luaotfload}パッケージのコードはこれらの文字には働かない．
 %</ja>
 \end{itemize}
@@ -6721,7 +6737,7 @@ For example, only ``葛'' in ``葛西'' is changed by font features
 \texttt{jp78}~or~\texttt{jp90}, which does not followed by any variation selector.
 %</en>
 %<*ja>
-また，IVSによる字形指定は，font featureによるそれに優先されることとした．
+また，IVSによる字形指定は，OpenType機能によるそれに優先されることとした．
 下の例において，\texttt{jp78}, \texttt{jp90} 指定で字形が変化した文字は
 異体字セレクタが続いていない「葛西」中の「葛」のみである．
 %</ja>
@@ -9267,13 +9283,13 @@ JFM中にある文字クラス$n$の定義の
 が連続した場合に，$p$のフォントに対応したが持つ「異体字情報」に従って出力するグリフを変える．
 
 しかし，単に$p.\textit{char}$を変更するだけでは，後から
-font featureの適用（すぐ下）により置換される可能性がある．そのため，
+OpenType機能の適用（すぐ下）により置換される可能性がある．そのため，
 \cs{CID} や \cs{UTF} と同じように，\textit{glyph\_node}~$p$の代わりに
 \texttt{user\_id} が\textit{char\_by\_cid}であるようなuser-defined whatsitを用いている．
 \item[（\Pkg{luaotfload} によるfont featureの適用）]
 \item[\tt ltj.otf] \texttt{user\_id} が\textit{char\_by\_cid}であるようなuser-defined whatsitを
 きちんと\textit{glyph\_node}に変換する．この処理は，\cs{CID}, \cs{UTF}やIVSによる置換が，
-font featureの適用で上書きされてしまうのを防止するためである．
+OpenType機能の適用で上書きされてしまうのを防止するためである．
 \item[\tt ltj.main\_process] \textbf{JAglue}の挿入処理（\ref{sec-jfmglue}章）と，
 JFMの指定に従って各\textbf{JAchar}の「寸法を補正」することを行う．
 \end{description}

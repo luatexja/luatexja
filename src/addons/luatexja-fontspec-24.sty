@@ -50,7 +50,6 @@
 \cs_new:Nn \ltj_fontspec_define_option:nn {
   \__fontspec_keys_define_code:nnn {fontspec} {#1} {#2}
 }
-
 \cs_new:Nn \ltj_fontspec_define_preparse_external:nn {
   \__fontspec_keys_define_code:nnn {fontspec-preparse-external} {#1} {#2}
 }
@@ -110,6 +109,13 @@
   }
   \ltj_fontspec_define_option:nn {CID} {
     \__fontspec_update_featstr:n {cid=##1}
+  }
+  \ltj_fontspec_define_option:nn {Kanjiskip} {
+    \str_if_eq_x:nnTF {false} { \str_lower_case:n { ##1 } }{
+      \__fontspec_update_featstr:n {-ltjksp}
+    } {
+      \__fontspec_update_featstr:n {+ltjksp}
+    }
   }
   \ltj_fontspec_define_option:nn {JFM} {
     \__fontspec_update_featstr:n {jfm=##1}

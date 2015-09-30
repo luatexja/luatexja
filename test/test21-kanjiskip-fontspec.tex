@@ -1,10 +1,9 @@
-%#!luajittex
-\input luatexja.sty
-\input luatexja-adjust.sty
-%\input lua-visual-debug.sty
-\def\test#1{\vrule\hbox spread\zw{#1}\vrule}
+%#!luajitlatex
+\documentclass{ltjsarticle}
+\usepackage[ipaex]{luatexja-preset}
 
-\baselineskip=1.75\zw
+
+\def\test#1{\vrule\hbox spread\zw{#1}\vrule}
 
 \def\testH#1{\vtop{\hsize=21\zw #1%
 \par\vrule{%
@@ -30,11 +29,13 @@
 \test{岡　八郎}\qquad
 \test{花紀　京}}\par\bigskip}
 
+\begin{document}
 1行目の例は「TeXでDTP―min10.tfmやjis.tfmの問題点」\hfil\break
-（渡邉たけしさん，{\tt http://www.dab.hi-ho.ne.jp/t-wara/tex/min10.html}）から引用．
+（渡邉たけしさん，\texttt{http://www.dab.hi-ho.ne.jp/t-wara/tex/min10.html}）から引用．
 
 1行目以外の例は「プリセットの「文字組アキ量設定」における設定値の齟齬と回避策」\hfil\break
-（なんでやねんDTPさん，{\tt http://d.hatena.ne.jp/works014/20150926}）から引用．
+（なんでやねんDTPさん，\texttt{http://d.hatena.ne.jp/works014/20150926}）から引用．
+
 
 \parindent0pt
 {\gt\bf 標準メトリック}
@@ -42,17 +43,22 @@
 \testH\yoko
 \testH\tate
 
-\vfill\eject
+\newpage
+\addjfontfeatures{Kanjiskip=False}
 
-{\gt\bf 標準メトリックに加えて {\tt -ltjksp} 指定（旧バージョンの組み方）}
+{\gt\bf\verb+\addjfontfeatures{Kanjiskip=False}+ 指定（旧バージョンの組み方）}
 
-\jfont\G=file:ipaexm.ttf:jfm=ujis;-ltjksp at 9.62216pt
-\tfont\H=file:ipaexm.ttf:jfm=ujisv;-ltjksp at 9.62216pt
-\G\H
 \testH\yoko
 \testH\tate
 
-\jfont\G=file:ipaexm.ttf:jfm=ujis;ltjksp;-ltjksp;ltjksp at 9.62216pt
-\G\testH\yoko
 
-\bye
+\newpage
+\addjfontfeatures{Kanjiskip}
+
+{\gt\bf さらに~\verb+\addjfontfeatures{Kanjiskip}+ 指定（現行の組み方）}
+
+\testH\yoko
+\testH\tate
+
+
+\end{document}

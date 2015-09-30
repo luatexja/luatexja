@@ -373,9 +373,11 @@ do
 	    name = name .. 'jfmvar=' .. jfm_var
 	 end
       end
-      if name:match('-ltjksp') then jfm_ksp = false end
+      for x in string.gmatch (name, "[:;]([+%%-]?)ltjks") do
+	 jfm_ksp = not (x=='-')
+      end
       if jfm_dir == 'tate' then
-	 is_vert_enabled = (not name:match('-vert')) and (not  name:match('-vrt2'))
+	 is_vert_enabled = (not name:match('[:;]%-vert')) and (not  name:match('[:;]%-vrt2'))
          if not name:match('vert') and not name:match('vrt2') then
             name = name .. ';vert;vrt2'
          end
