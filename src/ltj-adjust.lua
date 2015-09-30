@@ -107,6 +107,9 @@ local function get_total_stretched(p, line)
    local total = 0
    for q in node_traverse_id(id_glue, getlist(p)) do
       local a, ic = get_stretched(q, go, gs), get_attr_icflag(q)
+      if ic == KANJI_SKIP_JFM  then ic = KANJI_SKIP
+      elseif ic == XKANJI_SKIP_JFM  then ic = XKANJI_SKIP
+      end
       if   type(res[ic]) == 'number' then
 	 -- kanjiskip, xkanjiskip は段落内で spec を共有しているが，
 	 -- それはここでは望ましくないので，各 glue ごとに異なる spec を使う．
@@ -124,8 +127,6 @@ local function get_total_stretched(p, line)
 		  gs_used_line[qs] = line
 	       end
 	    end
-	 elseif ic == KANJI_SKIP_JFM  then ic = KANJI_SKIP
-	 elseif ic == XKANJI_SKIP_JFM  then ic = XKANJI_SKIP
 	 end
 	 res[ic], total = res[ic] + a, total + a
       else
@@ -137,7 +138,9 @@ end
 
 local function clear_stretch(p, ic, name)
    for q in node_traverse_id(id_glue, getlist(p)) do
-      if get_attr_icflag(q) == ic then
+      local f = get_attr_icflag(q)
+      if (f == ic) or ((ic ==KANJI_SKIP) and (f == KANJI_SKIP_JFM))
+	   or ((ic ==XKANJI_SKIP) and (f == XKANJI_SKIP_JFM)) then
          local qs = getfield(q, 'spec')
          if getfield(qs, 'writable') then
             setfield(qs, name..'_order', 0)
