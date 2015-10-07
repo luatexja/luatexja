@@ -69,6 +69,16 @@
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
+\unless\ifdefined\luatexsuppressfontnotfounderror
+  \ifdefined\suppressfontnotfounderror
+    \let\luatexsuppressfontnotfounderror\suppressfontnotfounderror
+    \let\luatexprehyphenchar\prehyphenchar
+    \let\luatexpreexhyphenchar\preexhyphenchar
+    \let\luatexposthyphenchar\posthyphenchar
+    \let\luatexpostexhyphenchar\postexhyphenchar
+  \fi
+\fi
+
 \endlinechar=13 %
 \newif\ifltj@everyhook@avail\ltj@everyhook@availfalse
 %! 外部パッケージは普通の \endlinechar で読まないと危険.
