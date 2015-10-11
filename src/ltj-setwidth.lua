@@ -65,7 +65,7 @@ local ltjw = {} --export
 luatexja.setwidth = ltjw
 
 luatexbase.create_callback("luatexja.set_width", "data",
-			   function (fstable, fmtable, jchar_class)
+			   function (fstable, fmtable, char_data)
 			      return fstable
 			   end)
 local call_callback = luatexbase.call_callback
@@ -75,14 +75,13 @@ local fshift =  { down = 0, left = 0}
 local min, max = math.min, math.max
 
 -- 和文文字の位置補正（横）
-local function capsule_glyph_yoko(p, met, class, head, dir)
-   local char_data = met.char_type[class]
+local function capsule_glyph_yoko(p, met, char_data, head, dir)
    if not char_data then return node_next(p), head, p end
    -- f*: whd specified in JFM
    local fwidth, pwidth = char_data.width, getfield(p, 'width')
    fwidth = (fwidth ~= 'prop') and fwidth or pwidth
    fshift.down = char_data.down; fshift.left = char_data.left
-   fshift = call_callback("luatexja.set_width", fshift, met, class)
+   fshift = call_callback("luatexja.set_width", fshift, met, char_data)
    local fheight, fdepth = char_data.height, char_data.depth
    local kbl = has_attr(p, attr_ykblshift) or 0
    --
@@ -133,8 +132,7 @@ end
 luatexja.setwidth.capsule_glyph_yoko = capsule_glyph_yoko
 
 -- 和文文字の位置補正（縦）
-local function capsule_glyph_tate(p, met, class, head, dir)
-   local char_data = met.char_type[class]
+local function capsule_glyph_tate(p, met, char_data, head, dir)
    if not char_data then return node_next(p), head end
    local ascent, descent = met.ascent, met.descent
    local fwidth, pwidth = char_data.width
@@ -150,7 +148,7 @@ local function capsule_glyph_tate(p, met, class, head, dir)
    end
    fwidth = (fwidth ~= 'prop') and fwidth or pwidth
    fshift.down = char_data.down; fshift.left = char_data.left
-   fshift = call_callback("luatexja.set_width", fshift, met, class)
+   fshift = call_callback("luatexja.set_width", fshift, met, char_data)
    local fheight, fdepth = char_data.height, char_data.depth
 
    local y_shift
@@ -186,16 +184,15 @@ local function capsule_glyph_tate(p, met, class, head, dir)
 end
 luatexja.setwidth.capsule_glyph_tate = capsule_glyph_tate
 
-local function capsule_glyph_math(p, met, class)
-   local char_data = met.char_type[class]
+local function capsule_glyph_math(p, met, char_data)
    if not char_data then return nil end
    local fwidth, pwidth = char_data.width, getfield(p, 'width')
    fwidth = (fwidth ~= 'prop') and fwidth or pwidth
    fshift.down = char_data.down; fshift.left = char_data.left
-   fshift = call_callback("luatexja.set_width", fshift, met, class)
+   fshift = call_callback("luatexja.set_width", fshift, met, char_data)
    local fheight, fdepth = char_data.height, char_data.depth
-   local y_shift, ca
-      = - getfield(p, 'yoffset') + (has_attr(p,attr_ykblshift) or 0), char_data.align
+   local y_shift
+      = - getfield(p, 'yoffset') + (has_attr(p,attr_ykblshift) or 0)
    setfield(p, 'yoffset', -fshift.down)
    setfield(p, 'xoffset', getfield(p, 'xoffset') + char_data.align*(fwidth-pwidth) - fshift.left)
    local box = node_new(id_hlist);

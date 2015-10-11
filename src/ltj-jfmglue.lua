@@ -319,9 +319,9 @@ local function calc_np_aux_glyph_common(lp)
    Np.first= (Np.first or lp)
    if getfield(lp, 'lang') == lang_ja then
       Np.id = id_jglyph
-      local m, cls = set_np_xspc_jachar(Np, lp)
+      local m, mc, cls = set_np_xspc_jachar(Np, lp)
       local npi, npf
-      lp, head, npi, npf = capsule_glyph(lp, m, cls, head, tex_dir, lp)
+      lp, head, npi, npf = capsule_glyph(lp, m, mc[cls], head, tex_dir)
       Np.first = (Np.first~=Np.nuc) and Np.first or npf or npi
       Np.nuc = npi
       return true, check_next_ickern(lp);
@@ -567,6 +567,7 @@ do
       c = c or c_glyph
       local cls = slow_find_char_class(c, m, c_glyph)
       Nx.met, Nx.class, Nx.char = m, cls, c;
+      local mc = m.char_type; Nx.char_type = mc
       if cls~=0 then set_attr(x, attr_jchar_class, cls) end
       if c~=c_glyph then set_attr(x, attr_jchar_code, c) end
       Nx.pre  = table_current_stack[PRE + c]  or 0
@@ -574,12 +575,13 @@ do
       Nx.xspc = table_current_stack[XSP  + c] or 3
       Nx.kcat = table_current_stack[KCAT + c] or 0
       Nx.auto_kspc, Nx.auto_xspc = (has_attr(x, attr_autospc)==1), (has_attr(x, attr_autoxspc)==1)
-      return m, cls
+      return m, mc, cls
    end
    function set_np_xspc_jachar_hbox(Nx, x)
       local m = ltjf_font_metric_table[getfont(x)]
       local c = has_attr(x, attr_jchar_code) or getchar(x)
       Nx.met, Nx.char  = m, c; Nx.class = has_attr(x, attr_jchar_class) or 0;
+      local mc = m.char_type; Nx.char_type = mc
       Nx.pre  = table_current_stack[PRE + c]  or 0
       Nx.post = table_current_stack[POST + c] or 0
       Nx.xspc = table_current_stack[XSP  + c] or 3
@@ -682,9 +684,9 @@ local function handle_penalty_suppress(post, pre, g)
 end
 
 -- 和文文字間の JFM glue を node 化
-local function new_jfm_glue(m, bc, ac)
+local function new_jfm_glue(mc, bc, ac)
 -- bc, ac: char classes
-   local g = m.char_type[bc][ac]
+   local g = mc[bc][ac]
    if g then
       if g[1] then
 	 local f = node_new(id_glue)
@@ -832,23 +834,24 @@ do
 
    calc_ja_ja_glue = function ()
       local qm, pm = Nq.met, Np.met
-      if (qm.char_type==pm.char_type) and (qm.var==pm.var) then
-	 local g, _, kn, kp, kh = new_jfm_glue(qm, Nq.class, Np.class)
+      local qmc, pmc = qm.char_type, pm.char_type
+      if (qmc==pmc) and (qm.var==pm.var) then
+	 local g, _, kn, kp, kh = new_jfm_glue(qmc, Nq.class, Np.class)
 	 return g, (Np.auto_kspc or Nq.auto_kspc) and get_kanjiskip_low(false, qm, kn, kp, kh)
       else
 	 local npn, nqn = Np.nuc, Nq.nuc
 	 local gb, db, bn, bp, bh 
-	    = new_jfm_glue(qm, Nq.class,
+	    = new_jfm_glue(qmc, Nq.class,
 			   slow_find_char_class(Np.char,
 						qm, getchar(npn)))
 	 local ga, da, an, ap, ah 
-	    = new_jfm_glue(pm,
+	    = new_jfm_glue(pmc,
 			   slow_find_char_class(Nq.char,
 						pm, getchar(nqn)),
 						 Np.class)
 	 local g = calc_ja_ja_aux(gb, ga, db, da)
 	 local k
-	 if (pm.char_type==qm.char_type) and (qm.var==pm.var) then
+	 if (pmc==qmc) and (qm.var==pm.var) then
 	    gb = get_kanjiskip_low(false, qm, bn, bp, bh)
 	    ga = get_kanjiskip_low(false, pm, an, ap, ah)
 	    k = calc_ja_ja_aux(gb, ga, db, da)
@@ -913,7 +916,7 @@ end
 local function get_OA_skip(is_kanji)
    local pm = Np.met
    local g, _, kn, kp, kh = new_jfm_glue(
-      pm,
+      pm.char_type,
       fast_find_char_class((Nq.id == id_math and -1 or 'jcharbdd'), pm), 
       Np.class)
    local k
@@ -928,7 +931,7 @@ end
 local function get_OB_skip(is_kanji)
    local qm = Nq.met
    local g, _, kn, kp, kh = new_jfm_glue(
-      qm, Nq.class,
+      qm.char_type, Nq.class,
       fast_find_char_class((Np.id == id_math and -1 or'jcharbdd'), qm))
    local k
    if is_kanji==0 then
@@ -1051,7 +1054,7 @@ local function handle_list_tail(mode)
       -- the current list is the contents of a hbox
       local npi, pm = Np.id, Np.met
       if npi == id_jglyph or (npi==id_pbox and pm) then
-	 local g = new_jfm_glue(pm, Np.class, fast_find_char_class('boxbdd', pm))
+	 local g = new_jfm_glue(pm.char_type, Np.class, fast_find_char_class('boxbdd', pm))
 	 if g then
 	    set_attr(g, attr_icflag, BOXBDD)
 	    head = insert_after(head, Np.last, g)
@@ -1065,7 +1068,7 @@ local function handle_list_head(par_indented)
    local npi, pm = Np.id, Np.met
    if npi ==  id_jglyph or (npi==id_pbox and pm) then
       if non_ihb_flag then
-	 local g = new_jfm_glue(pm, fast_find_char_class(par_indented, pm), Np.class)
+	 local g = new_jfm_glue(pm.char_type, fast_find_char_class(par_indented, pm), Np.class)
 	 if g then
 	    set_attr(g, attr_icflag, BOXBDD)
 	    if getid(g)==id_glue and #Bp==0 then

@@ -24,6 +24,7 @@
 %%%%%%%% fonts
 \usepackage{luatexja-otf}
 \directlua{luatexja.otf.enable_ivs()}
+\expandafter\let\csname xetex_suppressfontnotfounderror:D\endcsname\suppressfontnotfounderror
 \usepackage[match]{luatexja-fontspec}
 \usepackage[kozuka-pr6n]{luatexja-preset}
 \usepackage{unicode-math}
@@ -5051,7 +5052,7 @@ This callback is called when \LuaTeX-ja is trying to encapsule a
 その\textit{glyph\_node}をカプセル化しようとする際に呼び出される．
 %</ja>
 \begin{lstlisting}[numbers=left]
-function (<table> shift_info, <table> jfont_info, <number> char_class)
+function (<table> shift_info, <table> jfont_info, <table> char_type)
   return <table> new_shift_info
 end
 \end{lstlisting}
@@ -5090,7 +5091,7 @@ Then, the position of glyphs is shifted up by
 （和文OpenTypeフォントの標準値）
 \item 実フォント側の数値：$(\hbox{高さ})=28y$, $(\hbox{深さ})=5y$（和文TrueTypeフォントの標準値）
 \end{itemize}
-となっていたとする．すると，実際の文字の出力位置は，以下の量だけ上にぜらされることとなる：
+となっていたとする．すると，実際の文字の出力位置は，以下の量だけ上にずらされることとなる：
 %</ja>
 \[
  \frac{88x}{88x+12x} (28y+5y) - 28y = \frac{26}{25}y= 1.04y.
