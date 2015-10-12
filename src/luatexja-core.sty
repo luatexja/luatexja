@@ -184,8 +184,7 @@
 \def\RequireLuaTeXjaSubmodule#1{%
   \@ifnextchar[{\ltj@requirelua@submod{#1}}{\ltj@requirelua@submod{#1}[]}}
 \def\ltj@requirelua@submod#1[#2]{%
-  \directlua{luatexja.load_module(
-    "\luatexluaescapestring{#1}")}}
+  \directlua{luatexja.load_module("\luatexluaescapestring{#1}")}}
 
 
 %%%%%%%% Load all sub-packages.
@@ -383,8 +382,24 @@
   \fi}
 
 % [x]]kanjiskip = <skip>
-  \define@key[ltj]{japaram}{kanjiskip}{\ltjsetkanjiskip#1}
-  \define@key[ltj]{japaram}{xkanjiskip}{\ltjsetxkanjiskip#1}
+\define@key[ltj]{japaram}{kanjiskip}{\ltjsetkanjiskip#1}
+\define@key[ltj]{japaram}{xkanjiskip}{\ltjsetxkanjiskip#1}
+\ifdefined\newluafunction
+  \newluafunction\ltjsetkanjiskip@inner
+  \newluafunction\ltjsetxkanjiskip@inner
+  \directlua{
+    local t, scan_glue = lua.get_functions_table(), luatexja.token.scan_glue
+    local sss, sti = luatexja.stack.set_stack_skip, luatexja.stack_table_index
+    t[\the\ltjsetkanjiskip@inner] = function()
+      local d = scan_glue(); sss(sti.KSK, d); node.free(d)
+    end
+    t[\the\ltjsetxkanjiskip@inner] = function()
+      local d = scan_glue(); sss(sti.XSK, d); node.free(d)
+    end
+  }
+  \protected\def\ltjsetkanjiskip{\luafunction\ltjsetkanjiskip@inner}
+  \protected\def\ltjsetxkanjiskip{\luafunction\ltjsetxkanjiskip@inner}
+\else
   \protected\def\ltjsetkanjiskip{%                  % SKIP
     \directlua{%
       local d = luatexja.token.scan_glue()
@@ -395,7 +410,7 @@
       local d = luatexja.token.scan_glue()
       luatexja.stack.set_stack_skip(luatexja.stack_table_index.XSK, d); node.free(d)
   }}
-
+\fi
 % jcharwidowpenalty = <count>
 \define@key[ltj]{japaram}{jcharwidowpenalty}{%      %COUNT
   \ltj@@set@stack{JWP}{-10000}{10000}\z@#1 }
@@ -598,7 +613,7 @@
   \ifdefined\newluafunction
     \newluafunction\ltj@@box@dirhook
     \directlua{
-      local t, ltjd = lua.get_functions_table()m luatexja.direction
+      local t, ltjd = lua.get_functions_table(), luatexja.direction
       t[\the\ltj@@box@dirhook] 
         = function() ltjd.set_list_direction_hook() end
     }
