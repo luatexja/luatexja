@@ -62,7 +62,6 @@ local function norm_val(a)
    end
 end
 
-
 function define_jfm(t)
    local real_char -- Does current character class have the 'real' character?
    if t.dir~=jfm_dir then
@@ -75,16 +74,13 @@ function define_jfm(t)
       if type(i) == 'number' then -- char_type
 	 if not v.chars then
 	    if i ~= 0 then defjfm_res= nil; return  end
-	    real_char = true
 	 else
-	    real_char = false
 	    for j,w in pairs(v.chars) do
 	       if type(w) == 'number' and w~=-1 then
-		  real_char = true;
 	       elseif type(w) == 'string' and utf.len(w)==1 then
-		  real_char = true; w = utf.byte(w)
+		  w = utf.byte(w)
 	       elseif type(w) == 'string' and utf.len(w)==2 and utf.sub(w,2) == '*' then
-		  real_char = true; w = utf.byte(utf.sub(w,1,1))
+		  w = utf.byte(utf.sub(w,1,1))
 	       end
 	       if not t.chars[w] then
 		  t.chars[w] = i
@@ -92,34 +88,28 @@ function define_jfm(t)
 		  defjfm_res= nil; return
 	       end
 	    end
-            if type(v.align)~='string' then
-               v.align = 'left' -- left
-            end
-	    if real_char then
-	       if type(v.width)~='number' and v.width~='prop' then
-		  defjfm_res= nil; return
-	       else
-		  if v.width=='prop' and jfm_dir=='tate' then
-		     v.width = 1.0
-		  end
-		  if type(v.height)~='number' then
-		     v.height = 0.0
-		  end
-		  if type(v.depth)~='number' then
-		     v.depth = 0.0
-		  end
-		  if type(v.italic)~='number' then
-		     v.italic = 0.0
-		  end
-		  if type(v.left)~='number' then
-		     v.left = 0.0
-		  end
-		  if type(v.down)~='number' then
-		     v.down = 0.0
-		  end
-	       end
-	    end
 	    v.chars = nil
+	 end
+	 if type(v.align)~='string' then
+	    v.align = 'left' -- left
+	 end
+	 if type(v.width)~='number' then
+	    v.width = (jfm_dir=='tate') and  1.0
+	 end
+	 if type(v.height)~='number' then
+	    v.height = (jfm_dir=='tate') and  0.0
+	 end
+	 if type(v.depth)~='number' then
+	    v.depth =  (jfm_dir=='tate') and  0.0
+	 end
+	 if type(v.italic)~='number' then
+	    v.italic = 0.0
+	 end
+	 if type(v.left)~='number' then
+	    v.left = 0.0
+	 end
+	 if type(v.down)~='number' then
+	    v.down = 0.0
 	 end
 	 v.kern = v.kern or {}; v.glue = v.glue or {}
 	 for j,x in pairs(v.glue) do

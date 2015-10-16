@@ -296,9 +296,13 @@ local function calc_np_pbox(lp, last)
    Np.first = Np.first or lp; Np.id = id_pbox
    set_attr(lp, attr_icflag, get_attr_icflag(lp));
    while lp ~=last and (lpa>=PACKED) and (lpa<BOXBDD) do
-      if getid(lp)==id_hlist or getid(lp)==id_vlist then
+      local lpi = getid(lp)
+      if lpi==id_hlist or lpi==id_vlist then
 	 head, lp, nc = ltjd_make_dir_whatsit(head, lp, list_dir, 'jfm pbox')
 	 Np.first = first and nc or Np.first
+      elseif (lpi==id_rule) and (lpa==PACKED) then
+         lp = node_next(lp)
+	 nc, lp = lp, node_next(lp)
       else
 	 nc, lp = lp, node_next(lp)
       end
