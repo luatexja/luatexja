@@ -24,7 +24,6 @@
 %%%%%%%% fonts
 \usepackage{luatexja-otf}
 \directlua{luatexja.otf.enable_ivs()}
-\expandafter\let\csname xetex_suppressfontnotfounderror:D\endcsname\suppressfontnotfounderror
 \usepackage[match]{luatexja-fontspec}
 \usepackage[kozuka-pr6n]{luatexja-preset}
 \usepackage{unicode-math}
@@ -4212,20 +4211,48 @@ This field is a list of characters which are in this character
 %<ja>（必須）
 
 %<*en>
+\begin{table}[t]
+ \centering
+\begin{tabular}{llr}
+\toprule
+Direction of JFM&\textbf{\texttt{'yoko'} (horizontal)}&\multicolumn{1}{l}{\textbf{\texttt{'tate'} (vertical)}}\\
+\midrule
+\texttt{width} field&the width of the ``real'' glyph&1.0~(full-width)\\
+\texttt{height} field&the height of the ``real'' glyph&0.5~(half-width)\\
+\texttt{depth} field&the depth of the ``real'' glyph&0.5~(half-width)\\
+\midrule
+\texttt{italic} field&\multicolumn{2}{c}{0.0}\\
+\bottomrule
+\end{tabular}
+\caption{Default values of \texttt{width} field and other fields}
+\label{tab-wid}
+\end{table}
 Specify the width of characters in character class~$i$, the height, the depth and
 the amount of italic correction. All characters in character class~$i$ are regarded that its width, height, and depth are
-as values of these fields.
-
-But there is one exception: \texttt{width} field can be \texttt{'prop'}.
-This means that width of a character becomes that of its ``real'' glyph.
+as values of these fields. The default values are shown in Table~\ref{tab-wid}.
 %</en>
 %<*ja>
+\begin{table}[t]
+ \centering
+\begin{tabular}{llr}
+\toprule
+JFM書字方向&\emph{\texttt{'yoko'}（横組）}&\multicolumn{1}{l}{\emph{\texttt{'tate'}（縦組）}}\\
+\midrule
+\texttt{width}&「実際のグリフ」の幅&1.0（全角）\\
+\texttt{height}&「実際のグリフ」の高さ&0.5（二分）\\
+\texttt{depth}&「実際のグリフ」の深さ&0.5（二分）\\
+\midrule
+\texttt{italic}&\multicolumn{2}{c}{0.0}\\
+\bottomrule
+\end{tabular}
+\caption{\texttt{width} フィールド等の標準値}
+\label{tab-wid}
+\end{table}
 文字クラス$i$に属する文字の幅，高さ，深さ，イタリック補正の量を指定する．
 文字クラス$i$に属する全ての文字は，その幅，高さ，深さがこのフィールドで指定した
-値であるものとして扱われる．
-
-例外として，\emph{\texttt{width} フィールドには数値以外に \texttt{'prop'} が指定可能である}．
-この場合，文字の幅はその「実際の」グリフの幅となる．OpenTypeの \texttt{prop} featureと併用
+値であるものとして扱われる．省略時や，数でない値を指定した時には表\nobreak\ref{tab-wid}に
+	     示されている値を用いる．例えば，横組用JFMで \texttt{width} フィールドには数値以外の値を指
+	     定した場合，文字の幅はその「実際の」グリフの幅となる．OpenTypeの \texttt{prop} featureと併用
 	     すれば，これによってプロポーショナル組を行うことができる．
 %</ja>
 
