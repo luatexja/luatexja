@@ -39,7 +39,7 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjreport}
-  [2015/01/01 v1.6-ltj-9
+  [2015/10/18 v1.6-ltj-10
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -174,8 +174,13 @@
   \advance \@tempdima 2in
   \advance \@tempdimb 2in
 \fi
-\setlength{\pdfpagewidth}{\@tempdima}
-\setlength{\pdfpageheight}{\@tempdimb}
+\ifdefined\pdfpagewidth
+  \setlength{\pdfpagewidth}{\@tempdima}
+  \setlength{\pdfpageheight}{\@tempdimb}
+\else
+  \setlength{\pagewidth}{\@tempdima}
+  \setlength{\pageheight}{\@tempdimb}
+\fi
 \setlength\lineskip{1\p@}
 \setlength\normallineskip{1\p@}
 \renewcommand{\baselinestretch}{}

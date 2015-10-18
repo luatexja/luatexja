@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjskiyou}
-  [2015/05/26 ]
+  [2015/10/18 ]
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
@@ -303,8 +303,13 @@
   \advance \@tempdima 2in
   \advance \@tempdimb 2in
 \fi
-\setlength{\pdfpagewidth}{\@tempdima}
-\setlength{\pdfpageheight}{\@tempdimb}
+\ifdefined\pdfpagewidth
+  \setlength{\pdfpagewidth}{\@tempdima}
+  \setlength{\pdfpageheight}{\@tempdimb}
+\else
+  \setlength{\pagewidth}{\@tempdima}
+  \setlength{\pageheight}{\@tempdimb}
+\fi
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
 \ifmingoth
   \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] \ltj@stdmcfont:jfm=min}{}

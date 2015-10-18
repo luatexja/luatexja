@@ -22,7 +22,7 @@
 %  -----------------------------------------
 %
 % \fi
-% \CheckSum{5219}
+% \CheckSum{5229}
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -50,7 +50,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2015/05/26 ]
+  [2015/10/18 ]
 %<*driver>
 \documentclass{ltjsarticle}
 \usepackage{doc}
@@ -714,6 +714,9 @@
 % \begin{macro}{\pdfpageheight}
 % 出力のPDFの用紙サイズをここで設定しておきます。
 % |tombow| が真のときは2インチ足しておきます。
+%
+% [2015-10-18 LTJ] Lua\TeX\ 0.81.0ではプリミティブの名称変更がされたので，
+% それに合わせておきます．
 %    \begin{macrocode}
 \setlength{\@tempdima}{\paperwidth}
 \setlength{\@tempdimb}{\paperheight}
@@ -721,8 +724,13 @@
   \advance \@tempdima 2in
   \advance \@tempdimb 2in
 \fi
-\setlength{\pdfpagewidth}{\@tempdima}
-\setlength{\pdfpageheight}{\@tempdimb}
+\ifdefined\pdfpagewidth
+  \setlength{\pdfpagewidth}{\@tempdima}
+  \setlength{\pdfpageheight}{\@tempdimb}
+\else
+  \setlength{\pagewidth}{\@tempdima}
+  \setlength{\pageheight}{\@tempdimb}
+\fi
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
