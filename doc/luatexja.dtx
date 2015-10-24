@@ -24,7 +24,7 @@
 %%%%%%%% fonts
 \usepackage{luatexja-otf}
 \directlua{luatexja.otf.enable_ivs()}
-\usepackage[match]{luatexja-fontspec}
+\usepackage[match,no-math]{luatexja-fontspec}
 \usepackage[kozuka-pr6n]{luatexja-preset}
 \usepackage{unicode-math}
 \setmainfont[Ligatures=TeX]{Linux Libertine O}
@@ -2749,13 +2749,13 @@ For the detail, see Table~\ref{table-kcat}.
 %<*en>
 \bfseries meaning&
 \bfseries control word&
-\bfseries widow penalty\hbox{}$^*$&
+\bfseries widow penalty&
 \bfseries linebreak\\
 %</en>
 %<*ja>
 \bfseries 意図&
 \bfseries 制御綴中に使用&
-\bfseries 文字ウィドウ処理\hbox{}$^*$&
+\bfseries 文字ウィドウ処理&
 \bfseries 直後での改行\\
 %</ja>
 \midrule
@@ -2770,7 +2770,7 @@ For the detail, see Table~\ref{table-kcat}.
 \medskip
 
 %<*ja>
-文字ウィドウ処理\hbox{}$^*$: 「漢字が一文字だけ次の行に行くのを防ぐ」\
+文字ウィドウ処理：「漢字が一文字だけ次の行に行くのを防ぐ」
 \cs{jcharwidowpenalty} が，
 その文字の直前に挿入されうるか否か，を示す．
 %</ja>
@@ -2842,17 +2842,22 @@ between \XeTeX\ and \LuaTeX, by the following reasons:
 \begin{itemize}
  \item (plain format) \texttt{luatex-unicode-letters.tex} is based on old \texttt{unicode-letters.tex}.
  \item The latter half of \texttt{unicode-letters.tex}~and~\texttt{unicode-letters.def}
-sets\cs{catcode} of Kanji and kana characters to 11, via setting \cs{XeTeXcharclass}.
-
-However, this latter half does not exist (plain case), or not executed (\LaTeX~case) in \LuaTeX, hence
-\cs{catcode} of Kanji and kana characters remains 12 in \LuaTeX.
+sets\cs{catcode} of several characters to 11, via setting \cs{XeTeXcharclass}.
+However, this latter half does not exist (plain case), or not executed (\LaTeX~case) in \LuaTeX.
 \end{itemize}
-In other words, Kanji nor kana characters cannot be used in
-a control word, in the default setting of \LuaTeX.
+In other words, 
+\begin{description}
+\item[plain \LuaTeX]
+Kanji nor kana characters cannot be used in
+a control word, in the default setting of plain \LuaTeX.
+\item[\LuaLaTeX]
+In recent (2015-10-01 or later) \LuaLaTeX, Kanji and kana characters in a control word is supported (these catcode are 11),
+but not fullwidth alphanumerics and several other characters.
+\end{description}
 
 This would be inconvenient for \pTeX~users to shifting to \LuaTeX-ja,
-since several control words containing Kanji, such as \verb+\西暦+,
-are used in \pTeX.
+since several control words containing Kanji or other fullwidth characters, such as
+\verb+\西暦+~or~\verb+\１年目西暦+ are used in \pTeX.
 Hence, \LuaTeX-ja have a counterpart of \texttt{unicode-letters.tex}
 for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 %</en>
@@ -2865,7 +2870,6 @@ for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 \LaTeX では \cs{catcode} の設定はカーネルに \texttt{unicode-letters.def} として統合され．
 このファイルを\XeLaTeX, \LuaLaTeX の両方が用いている．
 
-
 だが，\XeTeX における \cs{catcode} の初期設定と
 \LuaTeX におけるそれは一致していない：
 \begin{itemize}
@@ -2873,16 +2877,20 @@ for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 \texttt{unicode-letters.tex} が古い
  \item \texttt{unicode-letters.tex} 後半部や \texttt{unicode-letters.def} 後半部では
 \cs{XeTeXcharclass} の設定を行なっており，
-それによって漢字や仮名の \cs{catcode} が11に設定されている．
-
+それによって漢字や仮名，および全角英数字の \cs{catcode} が11に設定されている．
 しかし，\texttt{luatex-unicode-letters.tex} ではこの「後半部」が
 まるごと省略されており，また\LuaLaTeX でも \texttt{unicode-letters.def} 後半部は実行されな
-       い．従って漢字や仮名の \cs{catcode} は12のままになっている．
+       い．
 \end{itemize}
-言い換えると，\LuaTeX の初期状態では漢字や仮名を制御綴内に
+言い換えると，
+\begin{description}
+ \item[plain \LuaTeX]  漢字や仮名を制御綴内に
 使用することはできない．
-
-これでは \pTeX で使用できた \verb+\西暦+ などが使えないこととなり，
+ \item[\LuaLaTeX] 最近の（2015-10-01以降の）
+\LuaLaTeX では漢字や仮名を制御綴内に
+使用することが可能になったが，全角英数字は相変わらず使用できない，
+\end{description}
+これでは \pTeX で使用できた \verb+\１年目西暦+\footnote{科研費\LaTeX で使用されているそうです．}などが使えないこととなり，
 \LuaTeX-jaへの移行で手間が生じる．そのため，\LuaTeX-jaでは
 \texttt{unicode-letters.tex} の後半部にあたる内容を自前でパッチし，
 結果として\textbf{\XeTeX における初期設定と同じになるようにしている．}
@@ -9133,7 +9141,7 @@ Letter, Other, Kanji, Open, Closeのどれに属するかは次によって決�
 %</ja>
 \begin{itemize}
 %<en>\item \textbf{ALchar}s above or equal to~\texttt{U+0080} are classified as Letter.
-%<ja>\item （\texttt{U+0080}以降の）\textbf{ALchar}は，すべてLetter扱いである．
+%<ja>\item \<（\texttt{U+0080}以降の）\textbf{ALchar}は，すべてLetter扱いである．
 
 %<en>\item \textbf{JAchar}s are classified in the order as follows:
 %<ja>\item \textbf{JAchar}については，以下の順序に従って文字種を決める：
