@@ -232,7 +232,7 @@
     t[\the\ltj@zh@inner] = function() setdimen('ltj@zh', ltjf.get_zh()) end
   }
   \protected\def\zw{\luafunction\ltj@zw@inner\ltj@zw}
-  \protected\def\zh{\luafuntcion\ltj@zh@inner\ltj@zh}
+  \protected\def\zh{\luafunction\ltj@zh@inner\ltj@zh}
 \else
   \protected\def\zw{\directlua{tex.setdimen('ltj@zw', luatexja.jfont.get_zw())}\ltj@zw}
   \protected\def\zh{\directlua{tex.setdimen('ltj@zh', luatexja.jfont.get_zh())}\ltj@zh}
