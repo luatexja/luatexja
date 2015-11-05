@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-listings}[2015/09/10 Patch to listings for LuaTeX-ja]
+\ProvidesPackage{lltjp-listings}[2015/11/05 Patch to listings for LuaTeX-ja]
 \RequirePackage{listings,luatexbase-cctb}
 
 %%%%%%%%%%%%%%%% Japanese support
@@ -179,26 +179,24 @@
   \SetCatcodeRange{"FE00}{"FE0F}{13}%     Variation Selector
 }
 
-% redefine \lstinline@ and \lst@InlineG
-% because \lstinline!あ...! causes ``Runaway argument?'' Error
-\def\lstinline@#1{%
-    \lst@Init\relax\typeout{N}%
-    \ltj@lst@check@inline{\lst@InlineM#1}{\lst@InlineJ#1}}
-\def\lst@InlineG{%
-    \lst@Init\relax\typeout{G}\tracingall%
-    \ltj@lst@check@inline{\lst@InlineM\}}%
-                         {\let\lst@arg\@empty \lst@InlineGJ}}
+% redefine \lstinline and its inner commands to support Japanese characters
+\renewcommand\lstinline[1][]{%
+    \leavevmode\bgroup % \hbox\bgroup --> \bgroup
+      \def\lst@boxpos{b}%
+      \lsthk@PreSet\lstset{flexiblecolumns,#1}%
+      \lsthk@TextStyle
+      \@ifnextchar\bgroup \ltj@lst@InlineG \ltj@lstinline@}
+\def\ltj@lstinline@#1{%
+  \edef\ltj@lst@temp{\the\catcode`#1}\lst@Init\relax\catcode`#1\ltj@lst@temp
+  \lst@InlineJ#1}
+\def\ltj@lst@InlineG{%
+  \lst@Init\relax\edef\ltj@lst@temp{\the\catcode`\}}\catcode`\}=2 \catcode`\ =12\relax
+  \let\lst@arg\@empty\afterassignment\ltj@lst@InlineG@@\@temptokena}
+\def\ltj@lst@InlineG@@{%
+  \catcode`\}=\ltj@lst@temp
+  \expandafter\expandafter\expandafter\lst@InsideConvert%
+  \expandafter{\the\@temptokena}\lst@arg\lst@DeInit\egroup}
 
-\def\ltj@lst@check@inline#1#2#3{%
-    \typeout{<\meaning#3, \meaning#1>}
-    \begingroup \lccode`\~=`#3\lowercase{\endgroup
-    \ifx~}#3%
-        \def\lst@next{#1}%
-    \else\ifnum`#3>127\relax
-        \def\lst@next{#1}%
-    \else
-        \def\lst@next{#2}%
-    \fi\fi\lst@next #3}
 
 % We redefine \lst@BeginDropInput, since now we have
 % two additional `process macros'.
