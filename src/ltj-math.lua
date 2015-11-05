@@ -152,7 +152,7 @@ function (p, sty)
                set_attr(r, attr_ykblshift, 0)
                -- ltj-setwidth 内で実際の位置補正はおこなうので，補正量を退避
                local met = ltjf_font_metric_table[f]
-               r = capsule_glyph_math(r, met, ltjf_find_char_class(pc, met));
+               r = capsule_glyph_math(r, met, met.char_type[ltjf_find_char_class(pc, met)]);
                setfield(q, 'head', r); node_free(p); p=q;
                set_attr(r, attr_yablshift, k)
             end

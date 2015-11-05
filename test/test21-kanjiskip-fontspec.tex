@@ -1,0 +1,64 @@
+%#!luajitlatex
+\documentclass{ltjsarticle}
+\usepackage[ipaex]{luatexja-preset}
+
+
+\def\test#1{\vrule\hbox spread\zw{#1}\vrule}
+
+\def\testH#1{\vtop{\hsize=21\zw #1%
+\par\vrule{%
+  \ltjsetparameter{kanjiskip=0pt plus 3\zw}%
+  \hbox to 20\zw{あ「い」う，えお}%
+}\vrule\par
+\test{あ（…）ああ}\qquad
+\test{あ（￥）ああ}\par
+\test{あ（％）ああ}\qquad
+\test{あ（ー）ああ}\par
+\test{あ（あ）ああ}\qquad
+\test{あ（ア）ああ}\par
+\test{あ（漢）ああ}\qquad
+\test{あ（０）ああ}\par
+\test{…　………}\qquad
+\test{￥　￥　％}\par
+\test{％　％　あ}\qquad
+\test{ー　ー　あ}\par
+\test{あ　あ　ア}\qquad
+\test{０　０　ー}\par
+\test{佐々十郎}\qquad
+\test{大村　崑}\par
+\test{岡　八郎}\qquad
+\test{花紀　京}}\par\bigskip}
+
+\begin{document}
+1行目の例は「TeXでDTP―min10.tfmやjis.tfmの問題点」\hfil\break
+（渡邉たけしさん，\texttt{http://www.dab.hi-ho.ne.jp/t-wara/tex/min10.html}）から引用．
+
+1行目以外の例は「プリセットの「文字組アキ量設定」における設定値の齟齬と回避策」\hfil\break
+（なんでやねんDTPさん，\texttt{http://d.hatena.ne.jp/works014/20150926}）から引用．
+
+
+\parindent0pt
+{\gt\bf 標準メトリック}
+
+\testH\yoko
+\testH\tate
+
+\newpage
+\addjfontfeatures{Kanjiskip=False}
+
+{\gt\bf\verb+\addjfontfeatures{Kanjiskip=False}+ 指定（旧バージョンの組み方）}
+
+\testH\yoko
+\testH\tate
+
+
+\newpage
+\addjfontfeatures{Kanjiskip}
+
+{\gt\bf さらに~\verb+\addjfontfeatures{Kanjiskip}+ 指定（現行の組み方）}
+
+\testH\yoko
+\testH\tate
+
+
+\end{document}

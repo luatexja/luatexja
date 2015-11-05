@@ -74,12 +74,13 @@ __EOT__
 
 
 print << '__EOT__';
-if tex.getcatcode(0x6F22)==12 then
-  local tex_catcode = tex.setcatcode
-  local function set_letter(b,e)
+local tex_catcode = tex.setcatcode
+local tex_getcc = tex.getcatcode
+local function set_letter(b,e)
+  if tex_getcc(b)~=11 then
     for i=b,e do tex_catcode('global', i, 11) end
   end
-
+end
 __EOT__
 
 open LineBreak, $ARGV[0] or die "can't read $ARGV[0]";
@@ -95,7 +96,7 @@ while (<LineBreak>) {
 		if (exists $lineBreakClass{$lb}) {
 			if ($lineBreakClass{$lb} == 1) {
 				# ideographs: set whole range to class 1
-				print "  set_letter(0x$s,0x$e)\n";
+				print "set_letter(0x$s,0x$e)\n";
 			}
 		}
 	}
@@ -103,7 +104,4 @@ while (<LineBreak>) {
 close LineBreak;
 
 print << '__EOT__';
-
-end
-
 __EOT__

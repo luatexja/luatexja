@@ -87,9 +87,9 @@
   print(...)
   tex.print('\\par ', ...)
 end}}
-\unless\ifdefined\ltjgetwd \def\ltjgetwd#1{\wd#1}\fi
+\unless\ifdefined\ltjgetwd \let\ltjgetwd\wd\fi
 \def\dumplist#1{\par\noindent\leavevmode
-{\dimen0=\ltjgetwd{#1}}%
+{\dimen0=\ltjgetwd#1}%
 \hbox to 0.2\hsize{\copy#1\hss}%
 \vbox{\hsize=0.6\hsize\sixtt\baselineskip=7.2pt\sixgt\let\\=\relax
 \directlua{print('======')

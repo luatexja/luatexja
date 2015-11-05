@@ -65,7 +65,7 @@ local ltjw = {} --export
 luatexja.setwidth = ltjw
 
 luatexbase.create_callback("luatexja.set_width", "data",
-			   function (fstable, fmtable, jchar_class)
+			   function (fstable, fmtable, char_data)
 			      return fstable
 			   end)
 local call_callback = luatexbase.call_callback
@@ -75,22 +75,24 @@ local fshift =  { down = 0, left = 0}
 local min, max = math.min, math.max
 
 -- 和文文字の位置補正（横）
-local function capsule_glyph_yoko(p, met, class, head, dir)
-   local char_data = met.char_type[class]
+local function capsule_glyph_yoko(p, met, char_data, head, dir)
    if not char_data then return node_next(p), head, p end
-   -- f*: whd specified in JFM
-   local fwidth, pwidth = char_data.width, getfield(p, 'width')
-   fwidth = (fwidth ~= 'prop') and fwidth or pwidth
    fshift.down = char_data.down; fshift.left = char_data.left
-   fshift = call_callback("luatexja.set_width", fshift, met, class)
-   local fheight, fdepth = char_data.height, char_data.depth
+   fshift = call_callback("luatexja.set_width", fshift, met, char_data)
    local kbl = has_attr(p, attr_ykblshift) or 0
    --
+   -- f*: whd specified in JFM
+   local fwidth, pwidth = char_data.width, getfield(p, 'width')
+   fwidth = fwidth or pwidth
+   local fheight, pheight = char_data.height, getfield(p, 'height')
+   fheight = fheight or pheight
+   local fdepth, pdepth =  char_data.depth,getfield(p, 'depth')
+   fdepth = fdepth or pdepth
    if pwidth==fwidth then
       -- 補正後glyph node は ht: p.height - kbl - down, dp: p.depth + min(0, kbl+down) を持つ
       -- 設定されるべき寸法: ht: fheight - kbl, dp: fdepth + kbl
-      local ht_diff = fheight + fshift.down - getfield(p, 'height')
-      local dp_diff = fdepth  + kbl - getfield(p, 'depth') - min(kbl + fshift.down, 0)
+      local ht_diff = fheight + fshift.down - pheight
+      local dp_diff = fdepth  + kbl - pdepth - min(kbl + fshift.down, 0)
       if ht_diff == 0 and dp_diff ==0 then -- offset only
 	 set_attr(p, attr_icflag, PROCESSED)
 	 setfield(p, 'xoffset', getfield(p, 'xoffset') - fshift.left)
@@ -104,7 +106,7 @@ local function capsule_glyph_yoko(p, met, class, head, dir)
 	 setfield(box, 'depth', fdepth + kbl)
 	 setfield(box, 'dir', dir)
 	 set_attr(box, attr_icflag, PACKED)
-	 set_attr(p, attr_icflag, PACKED)
+	 --set_attr(p, attr_icflag, PACKED)
 	 head = p and node_insert_before(head, p, box)
 	    or node_insert_after(head, node_tail(head), box)
 	 return node_next(p), head, p, box
@@ -133,8 +135,7 @@ end
 luatexja.setwidth.capsule_glyph_yoko = capsule_glyph_yoko
 
 -- 和文文字の位置補正（縦）
-local function capsule_glyph_tate(p, met, class, head, dir)
-   local char_data = met.char_type[class]
+local function capsule_glyph_tate(p, met, char_data, head, dir)
    if not char_data then return node_next(p), head end
    local ascent, descent = met.ascent, met.descent
    local fwidth, pwidth = char_data.width
@@ -148,11 +149,11 @@ local function capsule_glyph_tate(p, met, class, head, dir)
       pwidth = pwidth + (met.v_advance[pc] or 0)
       ascent = met.v_origin[pc] and ascent - met.v_origin[pc] or ascent
    end
-   fwidth = (fwidth ~= 'prop') and fwidth or pwidth
+   fwidth = fwidth or pwidth
    fshift.down = char_data.down; fshift.left = char_data.left
-   fshift = call_callback("luatexja.set_width", fshift, met, class)
-   local fheight, fdepth = char_data.height, char_data.depth
-
+   fshift = call_callback("luatexja.set_width", fshift, met, char_data)
+   local fheight = char_data.height or 0
+   local fdepth  = char_data.depth or 0
    local y_shift
       = getfield(p, 'xoffset') + (has_attr(p,attr_tkblshift) or 0)
    local q
@@ -186,16 +187,15 @@ local function capsule_glyph_tate(p, met, class, head, dir)
 end
 luatexja.setwidth.capsule_glyph_tate = capsule_glyph_tate
 
-local function capsule_glyph_math(p, met, class)
-   local char_data = met.char_type[class]
+local function capsule_glyph_math(p, met, char_data)
    if not char_data then return nil end
    local fwidth, pwidth = char_data.width, getfield(p, 'width')
    fwidth = (fwidth ~= 'prop') and fwidth or pwidth
    fshift.down = char_data.down; fshift.left = char_data.left
-   fshift = call_callback("luatexja.set_width", fshift, met, class)
+   fshift = call_callback("luatexja.set_width", fshift, met, char_data)
    local fheight, fdepth = char_data.height, char_data.depth
-   local y_shift, ca
-      = - getfield(p, 'yoffset') + (has_attr(p,attr_ykblshift) or 0), char_data.align
+   local y_shift
+      = - getfield(p, 'yoffset') + (has_attr(p,attr_ykblshift) or 0)
    setfield(p, 'yoffset', -fshift.down)
    setfield(p, 'xoffset', getfield(p, 'xoffset') + char_data.align*(fwidth-pwidth) - fshift.left)
    local box = node_new(id_hlist);

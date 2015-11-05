@@ -48,9 +48,19 @@ font_metric_table={} -- [font number] -> jfm_name, jfm_var, size
 
 luatexbase.create_callback("luatexja.load_jfm", "data", function (ft, jn) return ft end)
 
-local jfm_file_name, jfm_var
+local jfm_file_name, jfm_var, jfm_ksp
 local defjfm_res
 local jfm_dir, is_def_jfont, is_vert_enabled
+
+local function norm_val(a)
+   if (not a) or (a==0.) then
+      return nil
+   elseif a==true then
+      return 1
+   else
+      return a
+   end
+end
 
 function define_jfm(t)
    local real_char -- Does current character class have the 'real' character?
@@ -64,16 +74,13 @@ function define_jfm(t)
       if type(i) == 'number' then -- char_type
 	 if not v.chars then
 	    if i ~= 0 then defjfm_res= nil; return  end
-	    real_char = true
 	 else
-	    real_char = false
 	    for j,w in pairs(v.chars) do
 	       if type(w) == 'number' and w~=-1 then
-		  real_char = true;
 	       elseif type(w) == 'string' and utf.len(w)==1 then
-		  real_char = true; w = utf.byte(w)
+		  w = utf.byte(w)
 	       elseif type(w) == 'string' and utf.len(w)==2 and utf.sub(w,2) == '*' then
-		  real_char = true; w = utf.byte(utf.sub(w,1,1))
+		  w = utf.byte(utf.sub(w,1,1))
 	       end
 	       if not t.chars[w] then
 		  t.chars[w] = i
@@ -81,44 +88,43 @@ function define_jfm(t)
 		  defjfm_res= nil; return
 	       end
 	    end
-            if type(v.align)~='string' then
-               v.align = 'left' -- left
-            end
-	    if real_char then
-	       if type(v.width)~='number' and v.width~='prop' then
-		  defjfm_res= nil; return
-	       else
-		  if v.width=='prop' and jfm_dir=='tate' then
-		     v.width = 1.0
-		  end
-		  if type(v.height)~='number' then
-		     v.height = 0.0
-		  end
-		  if type(v.depth)~='number' then
-		     v.depth = 0.0
-		  end
-		  if type(v.italic)~='number' then
-		     v.italic = 0.0
-		  end
-		  if type(v.left)~='number' then
-		     v.left = 0.0
-		  end
-		  if type(v.down)~='number' then
-		     v.down = 0.0
-		  end
-	       end
-	    end
 	    v.chars = nil
 	 end
+	 if type(v.align)~='string' then
+	    v.align = 'left' -- left
+	 end
+	 if type(v.width)~='number' then
+	    v.width = (jfm_dir=='tate') and  1.0
+	 end
+	 if type(v.height)~='number' then
+	    v.height = (jfm_dir=='tate') and  0.0
+	 end
+	 if type(v.depth)~='number' then
+	    v.depth =  (jfm_dir=='tate') and  0.0
+	 end
+	 if type(v.italic)~='number' then
+	    v.italic = 0.0
+	 end
+	 if type(v.left)~='number' then
+	    v.left = 0.0
+	 end
+	 if type(v.down)~='number' then
+	    v.down = 0.0
+	 end
 	 v.kern = v.kern or {}; v.glue = v.glue or {}
-	 for j in pairs(v.glue) do
+	 for j,x in pairs(v.glue) do
 	    if v.kern[j] then defjfm_res= nil; return end
+	    x.ratio, x[5] = (x.ratio or (x[5] and 0.5*(1+x[5]) or 0.5)), nil
+	    x.priority, x[4] = (x.priority or x[4] or 0), nil
+	    x.kanjiskip_natural = norm_val(x.kanjiskip_natural)
+	    x.kanjiskip_stretch = norm_val(x.kanjiskip_stretch)
+	    x.kanjiskip_shrink = norm_val(x.kanjiskip_shrink)
 	 end
 	 for j,x in pairs(v.kern) do
 	    if type(x)=='number' then
-               v.kern[j] = {x, 0}
+               v.kern[j] = {x, 0.5}
             elseif type(x)=='table' then
-               v.kern[j] = {x[1], x[2] or 0}
+               v.kern[j] = { x[1], ratio=x.ratio or (x[2] and 0.5*(1+x[2]) or 0.5) }
             end
 	 end
 	 t.char_type[i] = v
@@ -147,7 +153,6 @@ do
 	 return new
       else return nil end
    end
-
    update_jfm_cache = function (j,sz)
       if metrics[j].size_cache[sz] then return end
       --local TEMP = node_new(id_kern)
@@ -161,7 +166,14 @@ do
 	 if type(i) == 'number' then -- char_type
 	    for k,w in pairs(v.glue) do
 	       local h = node_new(id_glue_spec)
-	       v[k] = {true, h, (w[5] and w[5]/sz or 0), FROM_JFM + (w[4] and w[4]/sz or 0)}
+	       v[k] = {
+		  true, h, 
+		  ratio=w.ratio/sz, 
+		  priority=FROM_JFM + w.priority/sz,
+		  kanjiskip_natural = w.kanjiskip_natural and w.kanjiskip_natural/sz,
+		  kanjiskip_stretch = w.kanjiskip_stretch and w.kanjiskip_stretch/sz,
+		  kanjiskip_shrink =  w.kanjiskip_shrink  and w.kanjiskip_shrink/sz,
+	       }
 	       setfield(h, 'width', w[1])
 	       setfield(h, 'stretch', w[2])
 	       setfield(h, 'shrink', w[3])
@@ -173,7 +185,7 @@ do
 	       setfield(g, 'kern', w[1])
 	       setfield(g, 'subtype', 1)
 	       set_attr(g, attr_icflag, FROM_JFM)
-	       v[k] = {false, g, w[2]/sz}
+	       v[k] = {false, g, ratio=w[2]/sz}
 	    end
 	 end
 	 v.glue, v.kern = nil, nil
@@ -274,6 +286,7 @@ do
       local ad = identifiers[fn].parameters
       local sz = metrics[j].size_cache[f.size]
       local fmtable = { jfm = j, size = f.size, var = jfm_var,
+			with_kanjiskip = jfm_ksp, 
 			zw = sz.zw, zh = sz.zh,
 			ascent = ad.ascender,
 			descent = ad.descender,
@@ -312,7 +325,7 @@ do
    -- extract jfm_file_name and jfm_var
    -- normalize position of 'jfm=' and 'jfmvar=' keys
    local function extract_metric(name)
-      jfm_file_name = ''; jfm_var = ''
+      jfm_file_name = ''; jfm_var = ''; jfm_ksp = true
       local tmp, index = name:sub(1, 5), 1
       if tmp == 'file:' or tmp == 'name:' or tmp == 'psft:' then
 	 index = 6
@@ -350,8 +363,11 @@ do
 	    name = name .. 'jfmvar=' .. jfm_var
 	 end
       end
+      for x in string.gmatch (name, "[:;]([+%%-]?)ltjks") do
+	 jfm_ksp = not (x=='-')
+      end
       if jfm_dir == 'tate' then
-	 is_vert_enabled = (not name:match('-vert')) and (not  name:match('-vrt2'))
+	 is_vert_enabled = (not name:match('[:;]%-vert')) and (not  name:match('[:;]%-vrt2'))
          if not name:match('vert') and not name:match('vrt2') then
             name = name .. ';vert;vrt2'
          end
@@ -758,7 +774,7 @@ do
       local bx = font_extra_basename[bname].vkerns
       local lookuphash =  id.resources.lookuphash
       local desc = id.shared.rawdata.descriptions
-      if bx then
+      if bx and lookuphash then
 	 for i,v in pairs(bx) do
 	    lookuphash[i] = lookuphash[i] or v
 	    for j,w in pairs(v) do

@@ -140,6 +140,7 @@ do
    local node_traverse = node.traverse
    local STCK = luatexja.userid_table.STCK
    local IHB = luatexja.userid_table.IHB
+   local sid_local = node.subtype('local_par')
 
    local function test_list(h, lv)
       if not h then
@@ -149,14 +150,15 @@ do
 	 local w
 	 for p in node_traverse(h) do
 	    if p.id==id_whatsit then
-	       if p.subtype==sid_user then
+	       local ps = p.subtype
+	       if ps==sid_user then
 		  local uid= p.user_id
 		  if uid==DIR then
 		     flag = 1; w = w or p -- found
 		  elseif not(uid==IHB or uid==STCK) then
 		     flag = 0; break -- error
 		  end
-	       else
+	       elseif ps~=sid_local then
 		  flag = 0; break
 	       end
 	    else

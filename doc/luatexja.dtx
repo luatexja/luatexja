@@ -16,7 +16,6 @@
 \makeatletter
 %%%%%%%%
 \directlua{if jit then jit.on() end}
-
 \usepackage{metalogo,amsmath,array,tikz,pict2e,multienum,float}
 \usepackage{booktabs,multicol,luatexja-ruby}
 \usepackage[all]{xy}
@@ -25,7 +24,7 @@
 %%%%%%%% fonts
 \usepackage{luatexja-otf}
 \directlua{luatexja.otf.enable_ivs()}
-\usepackage[match]{luatexja-fontspec}
+\usepackage[match,no-math]{luatexja-fontspec}
 \usepackage[kozuka-pr6n]{luatexja-preset}
 \usepackage{unicode-math}
 \setmainfont[Ligatures=TeX]{Linux Libertine O}
@@ -139,10 +138,11 @@
 \DeclareRobustCommand\epTeX{\ensuremath{\varepsilon}-\pTeX}
 
 %%%%%%%% other macros
-\newlist{cslist}{description}{1}
+\newlist{cslist}{description}{2}
 \setlist[cslist]{%
     style=nextline,font=\mdseries\ttfamily,
     before*=\def\<{\char`\<}\def\>{\char`\>}\def\{{\char`\{}\def\}{\char`\}},
+    topsep=\medskipamount,
 %<ja> leftmargin=2\zw,
 %<en> leftmargin=2em,
 }
@@ -2749,13 +2749,13 @@ For the detail, see Table~\ref{table-kcat}.
 %<*en>
 \bfseries meaning&
 \bfseries control word&
-\bfseries widow penalty\hbox{}$^*$&
+\bfseries widow penalty&
 \bfseries linebreak\\
 %</en>
 %<*ja>
 \bfseries 意図&
 \bfseries 制御綴中に使用&
-\bfseries 文字ウィドウ処理\hbox{}$^*$&
+\bfseries 文字ウィドウ処理&
 \bfseries 直後での改行\\
 %</ja>
 \midrule
@@ -2770,7 +2770,7 @@ For the detail, see Table~\ref{table-kcat}.
 \medskip
 
 %<*ja>
-文字ウィドウ処理\hbox{}$^*$: 「漢字が一文字だけ次の行に行くのを防ぐ」\
+文字ウィドウ処理：「漢字が一文字だけ次の行に行くのを防ぐ」
 \cs{jcharwidowpenalty} が，
 その文字の直前に挿入されうるか否か，を示す．
 %</ja>
@@ -2842,17 +2842,22 @@ between \XeTeX\ and \LuaTeX, by the following reasons:
 \begin{itemize}
  \item (plain format) \texttt{luatex-unicode-letters.tex} is based on old \texttt{unicode-letters.tex}.
  \item The latter half of \texttt{unicode-letters.tex}~and~\texttt{unicode-letters.def}
-sets\cs{catcode} of Kanji and kana characters to 11, via setting \cs{XeTeXcharclass}.
-
-However, this latter half does not exist (plain case), or not executed (\LaTeX~case) in \LuaTeX, hence
-\cs{catcode} of Kanji and kana characters remains 12 in \LuaTeX.
+sets\cs{catcode} of several characters to 11, via setting \cs{XeTeXcharclass}.
+However, this latter half does not exist (plain case), or not executed (\LaTeX~case) in \LuaTeX.
 \end{itemize}
-In other words, Kanji nor kana characters cannot be used in
-a control word, in the default setting of \LuaTeX.
+In other words, 
+\begin{description}
+\item[plain \LuaTeX]
+Kanji nor kana characters cannot be used in
+a control word, in the default setting of plain \LuaTeX.
+\item[\LuaLaTeX]
+In recent (2015-10-01 or later) \LuaLaTeX, Kanji and kana characters in a control word is supported (these catcode are 11),
+but not fullwidth alphanumerics and several other characters.
+\end{description}
 
 This would be inconvenient for \pTeX~users to shifting to \LuaTeX-ja,
-since several control words containing Kanji, such as \verb+\西暦+,
-are used in \pTeX.
+since several control words containing Kanji or other fullwidth characters, such as
+\verb+\西暦+~or~\verb+\１年目西暦+ are used in \pTeX.
 Hence, \LuaTeX-ja have a counterpart of \texttt{unicode-letters.tex}
 for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 %</en>
@@ -2865,7 +2870,6 @@ for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 \LaTeX では \cs{catcode} の設定はカーネルに \texttt{unicode-letters.def} として統合され．
 このファイルを\XeLaTeX, \LuaLaTeX の両方が用いている．
 
-
 だが，\XeTeX における \cs{catcode} の初期設定と
 \LuaTeX におけるそれは一致していない：
 \begin{itemize}
@@ -2873,16 +2877,20 @@ for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 \texttt{unicode-letters.tex} が古い
  \item \texttt{unicode-letters.tex} 後半部や \texttt{unicode-letters.def} 後半部では
 \cs{XeTeXcharclass} の設定を行なっており，
-それによって漢字や仮名の \cs{catcode} が11に設定されている．
-
+それによって漢字や仮名，および全角英数字の \cs{catcode} が11に設定されている．
 しかし，\texttt{luatex-unicode-letters.tex} ではこの「後半部」が
 まるごと省略されており，また\LuaLaTeX でも \texttt{unicode-letters.def} 後半部は実行されな
-       い．従って漢字や仮名の \cs{catcode} は12のままになっている．
+       い．
 \end{itemize}
-言い換えると，\LuaTeX の初期状態では漢字や仮名を制御綴内に
+言い換えると，
+\begin{description}
+ \item[plain \LuaTeX]  漢字や仮名を制御綴内に
 使用することはできない．
-
-これでは \pTeX で使用できた \verb+\西暦+ などが使えないこととなり，
+ \item[\LuaLaTeX] 最近の（2015-10-01以降の）
+\LuaLaTeX では漢字や仮名を制御綴内に
+使用することが可能になったが，全角英数字は相変わらず使用できない，
+\end{description}
+これでは \pTeX で使用できた \verb+\１年目西暦+\footnote{科研費\LaTeX で使用されているそうです．}などが使えないこととなり，
 \LuaTeX-jaへの移行で手間が生じる．そのため，\LuaTeX-jaでは
 \texttt{unicode-letters.tex} の後半部にあたる内容を自前でパッチし，
 結果として\textbf{\XeTeX における初期設定と同じになるようにしている．}
@@ -3836,8 +3844,8 @@ OpenType font featureと見かけ上同じような形式で指定できるも�
 \paragraph{\texttt{extend} and \texttt{slant}}
 The following setting can be specified as OpenType font features:
 \begin{cslist}[style=standard]
-\item[\cs{extend=}<extend>] expand the font horizontally by <extend>.
-\item[\cs{slant=}<slant>] slant the font.
+\item[\texttt{extend=}<extend>] expand the font horizontally by <extend>.
+\item[\texttt{slant=}<slant>] slant the font.
 \end{cslist}
 Note that \LuaTeX-ja doesn't adjust JFMs by these \texttt{extend} and \texttt{slant}
 settings; you have to write new JFMs on purpose.
@@ -3851,6 +3859,36 @@ letter-spacing and the width of italic correction are not correct:
 \jfont\S=KozMinPr6N-Regular:slant=1;jfm=ujis;-kern
 \S あいう\/ABC
 \end{LTXexample}
+
+%<*ja>
+\paragraph{\texttt{ltjksp} 指定}
+\label{pg:ltjksp}
+\LuaTeX-ja標準では，
+JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\ 
+\texttt{kanjiskip\_shrink}キー（\pageref{pg:ksp_nat}ページ）の使用によって，
+「JFM由来のグルーの他に，\Param{kanjiskip}の自然長/伸び量/縮み量の一部が
+同じ場所に挿入される」という状況が起こりうる．
+この機能を無効化し，20150922.0版以前と同じような組版を得るためには
+他のOpenType機能と同じように\ \texttt{-ltjksp}\ 指定を行えば良い．
+\begin{LTXexample}[width=16\zw]
+\leavevmode
+\ltjsetparameter{kanjiskip=0pt plus 3\zw}
+\vrule\hbox to 15\zw{あ「い」う，えお}\vrule
+
+\jfont\G=file:KozMinPr6N-Regular.otf%
+  :jfm=ujis;-ltjksp at 9.2487pt
+\G\leavevmode%
+\vrule\hbox to 15\zw{あ「い」う，えお}\vrule
+\end{LTXexample}
+なお，
+\begin{lstlisting}
+ \jfont\G=file:KozMinPr6N-Regular.otf:jfm=ujis;-ltjksp;+ltjksp at 9.2487pt
+\end{lstlisting}
+のように \texttt{+ltjksp} 指定を行った場合は，\texttt{kanjiskip\_natural} など
+3キーは再び有効化される．\texttt{-ltjksp}, \texttt{+ltjksp} を複数回指定した場合は，
+最後に指定したものが有効となる．
+%</ja>
+
 
 %<en>\subsection{\cs{tfont}}
 %<ja>\subsection{\cs{tfont} 命令}
@@ -4181,20 +4219,48 @@ This field is a list of characters which are in this character
 %<ja>（必須）
 
 %<*en>
+\begin{table}[t]
+ \centering
+\begin{tabular}{llr}
+\toprule
+Direction of JFM&\textbf{\texttt{'yoko'} (horizontal)}&\multicolumn{1}{l}{\textbf{\texttt{'tate'} (vertical)}}\\
+\midrule
+\texttt{width} field&the width of the ``real'' glyph&1.0~(full-width)\\
+\texttt{height} field&the height of the ``real'' glyph&0.5~(half-width)\\
+\texttt{depth} field&the depth of the ``real'' glyph&0.5~(half-width)\\
+\midrule
+\texttt{italic} field&\multicolumn{2}{c}{0.0}\\
+\bottomrule
+\end{tabular}
+\caption{Default values of \texttt{width} field and other fields}
+\label{tab-wid}
+\end{table}
 Specify the width of characters in character class~$i$, the height, the depth and
 the amount of italic correction. All characters in character class~$i$ are regarded that its width, height, and depth are
-as values of these fields.
-
-But there is one exception: \texttt{width} field can be \texttt{'prop'}.
-This means that width of a character becomes that of its ``real'' glyph.
+as values of these fields. The default values are shown in Table~\ref{tab-wid}.
 %</en>
 %<*ja>
+\begin{table}[t]
+ \centering
+\begin{tabular}{llr}
+\toprule
+JFM書字方向&\emph{\texttt{'yoko'}（横組）}&\multicolumn{1}{l}{\emph{\texttt{'tate'}（縦組）}}\\
+\midrule
+\texttt{width}&「実際のグリフ」の幅&1.0（全角）\\
+\texttt{height}&「実際のグリフ」の高さ&0.5（二分）\\
+\texttt{depth}&「実際のグリフ」の深さ&0.5（二分）\\
+\midrule
+\texttt{italic}&\multicolumn{2}{c}{0.0}\\
+\bottomrule
+\end{tabular}
+\caption{\texttt{width} フィールド等の標準値}
+\label{tab-wid}
+\end{table}
 文字クラス$i$に属する文字の幅，高さ，深さ，イタリック補正の量を指定する．
 文字クラス$i$に属する全ての文字は，その幅，高さ，深さがこのフィールドで指定した
-値であるものとして扱われる．
-
-例外として，\emph{\texttt{width} フィールドには数値以外に \texttt{'prop'} が指定可能である}．
-この場合，文字の幅はその「実際の」グリフの幅となる．OpenTypeの \texttt{prop} featureと併用
+値であるものとして扱われる．省略時や，数でない値を指定した時には表\nobreak\ref{tab-wid}に
+	     示されている値を用いる．例えば，横組用JFMで \texttt{width} フィールドには数値以外の値を指
+	     定した場合，文字の幅はその「実際の」グリフの幅となる．OpenTypeの \texttt{prop} featureと併用
 	     すれば，これによってプロポーショナル組を行うことができる．
 %</ja>
 
@@ -4418,62 +4484,122 @@ Furthermore, the glyph is shifted according to values of fields
 \label{fig-pos-tate}
 \end{figure}
 
-\item[kern={\{[$j$]=<kern>, [$j'$]=\{<kern>, [<ratio>]\}, ...\}}]
-
-\item[glue={\{[$j$]=\{<width>, <stretch>, <shrink>, [<priority>], [<ratio>]\}, ...\}}]\
+\item[kern={\{[$j$]=<kern>, [$j'$]=\{<kern>, [ratio=<ratio>]\}, ...\}}]
+\nopagebreak
+\item[glue={\{[$j$]=\{<width>, <stretch>, <shrink>, [ratio=<ratio>, ...]\}, ...\}}]\leavevmode
 %<*ja>
 
-文字クラス$i$の文字と$j$の文字の間に挿入されるkernやglueの量を指定する．
+文字クラス$i$の文字と$j$の文字の間に挿入されるカーンやグルーの量を指定する．
 
-             <priority>は \Pkg{luatexja-adjust} による優先順位付き
-	     行長調整（\ref{ssec-adj}節）が有効なときのみ意味を持つ．
-このフィールドは省略可能であり，行調整処理におけるこのglueの優先
-             度を$-2$から$+2$の間の整数で指定する．大きい値ほど「伸びやすく，縮みやすい」
-             ことを意味する．省略時の値
-             は0であり，範囲外の値が指定されたときの動作は未定義である．
-
-<ratio>も省略可能フィールドであり，$-1$から$+1$の実数値をとる．省略時の値は0である．
-\begin{itemize}
-\item $-1$はこのグルーが「前の文字」由来であることを示す．
-\item $+1$はこのグルーが「後の文字」由来であることを示す．
-\item それ以外の値は，「前の文字」由来のグルーと「後の文字」由来の
-グルーが混合されていることを示す．
-\end{itemize}
-なお，このフィールドの値は\Param{differentjfm}の値が
+<ratio>は，グルーの自然長のうちどれだけの割合が「後の文字」由来かを示す量で，
+$0$から$+1$の実数値をとる．省略時の値は$0.5$である．
+このフィールドの値は\Param{differentjfm}の値が
 \texttt{pleft},~\texttt{pright},~\texttt{paverage}の値のときのみ実際に用いられる．
 
 例えば，\cite{x4051}では，句点と中点の間には，
 句点由来の二分空きと中点由来の四分空きが挿入されるが，この場合には
 \begin{itemize}
 \item <width>には$0.5+0.25=0.75$を指定する．
-\item <ratio>には次の値を指定する．
-\[
- -1\cdot \frac{0.5}{0.5+0.25} + 1 \cdot \frac{0.25}{0.5+0.25} = -\frac13
-\]
+\item <ratio>には$0.25/(0.5+0.25)=1/3$を指定する．
 \end{itemize}
 %</ja>
 %<*en>
 \
 
-Specifies the width of kern or glue which will be inserted
+Specifies the amount of kern or glue which will be inserted
 between characters in character class~$i$ and those in character class~$j$.
 
-<priority> is an integer in $[-2,2]$ (treated as 0 if omitted), and this is
-used only in line adjustment with priority by \Pkg{luatexja-adjust}
-(see Subsection~\ref{ssec-adj}). Higher value means the glue is easy to shretch,
-and is also easy to shrink.
-
-<ratio> is also an optional value between $-1$ and 1. For example,
+<ratio> specifies how much the glue is originated in the ``right'' character.
+It is a real number between 0 and 1, and treated as 0.5 if omitted. For example,
 The width of a glue between an ideographic full stop ``。''
 and a fullwidth middle dot ``・'' is three-fourth of fullwidth,
 namely halfwidth from the ideographic full stop, and
 quarter-width from the fullwidth middle dot.  In this case,
-we specify <ratio> to
-\[
-  -1\cdot \frac{0.5}{0.5+0.25} + 1 \cdot \frac{0.25}{0.5+0.25} = -\frac13.
-\]
+we specify <ratio> to $0.25/(0.5+0.25)=1/3$.
 %</en>
 
+%<*ja>
+グルーの指定においては，上記に加えて各 \texttt{[$j$]} の各サブテーブル内に
+次のキーを指定できる，
+\begin{cslist}[style=standard]
+\item[priority=<priority>]
+             \Pkg{luatexja-adjust} による優先順位付き
+	     行長調整（\ref{ssec-adj}節）の際に使われる値であり，
+行調整処理におけるこのglueの優先
+             度を$-2$から$+2$の間の整数で指定する．大きい値ほど「伸びやすく，縮みやすい」
+             ことを意味する．省略時の値
+             は0であり，範囲外の値が指定されたときの動作は未定義である．
+\item[kanjiskip\_natural=<num>\textrm{, }%
+  kanjiskip\_stretch=<num>\textrm{, }kanjiskip\_shrink=<num>]\leavevmode
+  \label{pg:ksp_nat}
+
+JFMによって本来挿入されるグルーの他に
+\Param{kanjiskip}分の空白を自然長(\texttt{kanjiskip\_natural})，伸び量(\texttt{kanjiskip\_stretch})，
+縮み量(\texttt{kanjiskip\_shrink})ごとに挿入する\footnote{本来\Param{xkanjiskip}が挿入される場所においては
+	     \Param{xkanjiskip}分の空白を自然長・伸び量・縮み量ごとに．追加できる．}%
+ための指定である．いずれも省略された場合のデフォルト値は0（追加しない）である．
+
+例えば，\LuaTeX-jaの横組標準JFMの \texttt{jfm-ujis.lua} では，
+\begin{itemize}
+ \item 通常の文字「あ」と開き括弧類の間に入るグルーは，自然長・縮み量半角，伸び量0のグルー
+となっているが，さらに\Param{kanjiskip}の伸び量に \texttt{kanjiskip\_stretch}（ここでは1）を掛け
+       た分だけ伸びることが許される．
+ \item 同様に，閉じ括弧類（全角コンマ「，」も含む）と通常の文字「う」「え」の間にも
+自然長・縮み量半角，伸び量0のグルー
+となっているが，さらに\Param{kanjiskip}の伸び量に \texttt{kanjiskip\_stretch}（ここでは1）を掛け
+       た分だけ伸びることが許される．
+\end{itemize}
+となっている．従って，以下のような組版結果を得る．
+
+\medskip
+\begin{LTXexample}[width=16\zw]
+\leavevmode
+\ltjsetparameter{kanjiskip=0pt plus 3\zw}
+\vrule\hbox to 15\zw{あ「い」う，えお}\vrule
+\end{LTXexample}
+
+\end{cslist}
+%</ja>
+%<*en>
+In case of glue, one can specify following additional keys in each \texttt{[$j$]}
+	     subtable:
+\begin{cslist}[style=standard]
+\item[priority=<priority>]
+An integer in $[-2,2]$ (treated as 0 if omitted), and this is
+used only in line adjustment with priority by \Pkg{luatexja-adjust}
+(see Subsection~\ref{ssec-adj}). Higher value means the glue is easy to stretch,
+and is also easy to shrink.
+\item[kanjiskip\_natural=<num>\textrm{, }%
+  kanjiskip\_stretch=<num>\textrm{, }kanjiskip\_shrink=<num>]\leavevmode
+
+These keys specifies the amount of the natural width of \Param{kanjiskip}
+(the stretch/shrink part, respectively) which will be inserted 
+in addition to the original JFM glue. Default values of them are all 0.
+
+As an example, in \texttt{jfm-ujis.lua}, the standard JFM in horizontal writing, we have
+\begin{itemize}
+ \item Between an ordinal letter ``あ'' and an ideographic opening bracket, we have
+a glue whose natural part and shrink part are both half-width, while its stretch part is
+       zero. However, this glue also can be stretched
+       as much as the stretch part of \Param{kanjiskip} times the value of
+       \texttt{kanjiskip\_stretch} key (1 in this case).
+ \item Between an ideographic closeing brackets (the ideographic comma ``，''
+       is included) and an ordinal letter, we have the same glue. 
+       Again, this glue also can be stretched
+       as much as the stretch part of \Param{kanjiskip} times the value of
+       \texttt{kanjiskip\_stretch} key (1 in this case).
+\end{itemize}
+Hence we have the following result:
+
+\medskip
+\begin{LTXexample}[width=16\zw]
+\leavevmode
+\ltjsetparameter{kanjiskip=0pt plus 3\zw}
+\vrule\hbox to 15\zw{あ「い」う，えお}\vrule
+\end{LTXexample}
+
+\end{cslist}
+%</en>
 
 \item[end\_stretch=<kern>, end\_shrink=<kern>]
 %<*ja>
@@ -4961,7 +5087,7 @@ This callback is called when \LuaTeX-ja is trying to encapsule a
 その\textit{glyph\_node}をカプセル化しようとする際に呼び出される．
 %</ja>
 \begin{lstlisting}[numbers=left]
-function (<table> shift_info, <table> jfont_info, <number> char_class)
+function (<table> shift_info, <table> jfont_info, <table> char_type)
   return <table> new_shift_info
 end
 \end{lstlisting}
@@ -5000,7 +5126,7 @@ Then, the position of glyphs is shifted up by
 （和文OpenTypeフォントの標準値）
 \item 実フォント側の数値：$(\hbox{高さ})=28y$, $(\hbox{深さ})=5y$（和文TrueTypeフォントの標準値）
 \end{itemize}
-となっていたとする．すると，実際の文字の出力位置は，以下の量だけ上にぜらされることとなる：
+となっていたとする．すると，実際の文字の出力位置は，以下の量だけ上にずらされることとなる：
 %</ja>
 \[
  \frac{88x}{88x+12x} (28y+5y) - 28y = \frac{26}{25}y= 1.04y.
@@ -6278,8 +6404,8 @@ the commands of Japanese version:
 \ref{ssec-fontspec}節で述べたように，この追加パッケージは\Pkg{fontspec}%
 パッケージで定義されているコマンドに対応する和文フォント用のコマンドを提供する．
 
-\Pkg{fontspec}パッケージで指定可能な各種font featureに加えて，和文版のコマンドには
-以下の``font feature''を指定することができる：
+\Pkg{fontspec}パッケージで指定可能な各種OpenType機能に加えて，和文版のコマンドには
+以下の「フォント機能」を指定することができる：
 %</ja>
 
 
@@ -6335,6 +6461,14 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
 \label{fig:yokotate-fontspec}
 \end{figure}
 
+\item[Kanjiskip=<bool>]
+%<*ja>
+\pageref{pg:ltjksp}ページで説明した \verb+\jfont+ 中での \texttt{ltjksp} 指定と
+同一の効力を持ち，
+JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\ 
+\texttt{kanjiskip\_shrink}キー（\pageref{pg:ksp_nat}ページ）の有効/無効を切り替える．
+標準値は \texttt{true} である．
+%</ja>
 
 \item[TateFeatures=\{<features>\}\textrm{, }TateFont=<font>]
 %<*en>
@@ -6345,7 +6479,7 @@ Similarly, the \texttt{TateFont} key specifies the Japanese font which will be u
 A demonstrarion is shown in Figure~\ref{fig:yokotate-fontspec}.
 %</en>
 %<*ja>
-縦組において使用されるフォントや，縦組においてのみ適用されるfeature達を
+縦組において使用されるフォントや，縦組においてのみ適用されるフォント機能達を
 指定する．使用例は図\ref{fig:yokotate-fontspec}参照．
 %</ja>
 
@@ -6356,7 +6490,7 @@ horizontal writing,.
 A demonstrarion is shown in Figure~\ref{fig:yokotate-fontspec}.
 %</en>
 %<*ja>
-同様に，横組においてのみ適用されるfeature達を
+同様に，横組においてのみ適用されるフォント機能達を
 指定する．使用例は図\ref{fig:yokotate-fontspec}参照．
 %</ja>
 
@@ -6391,7 +6525,7 @@ as the following:
 %<*ja>
 \ref{ssec-altfont}節の \cs{ltjdeclarealtfont} や，
 \ref{ssec-nfsspat}節の \cs{DeclareAlternateKanjiFont} と同様に，
-このキーを用いると一部の文字を異なったフォントやfont featureを使って組むことができる．
+このキーを用いると一部の文字を異なったフォントや機能たちを使って組むことができる．
 \texttt{AltFont} キーに指定する値は，次のように二重のコンマ区切りリストである：
 %</ja>
 \begin{lstlisting}[escapechar=\#]
@@ -6481,8 +6615,9 @@ BoldFeatures = {
 
 また，図\ref{fig:yokotate-fontspec}後半部では6行目の色の指定が効かず，
 2行目で指定した\ \texttt{YokoFeatures},~\texttt{TateFeatures}\ による色の指定が有効になっ
-たままである．これは\emph{\ \texttt{YokoFeatures},~\texttt{TateFeatures}\ によるfeature指定は
-組方向に依存しないfeature指定より後に解釈される}からである．
+たままである．これは\emph{\ \texttt{YokoFeatures},~\texttt{TateFeatures}\ による
+OpenType機能指定は
+組方向に依存しないOpenType機能の指定より後に解釈される}からである．
 
 %</ja>
 
@@ -6560,7 +6695,7 @@ ordinary characters in the following points:
       is not performed to these characters.
 %</en>
 %<*ja>
-\item OpenType feature（例えばグリフ置換やカーニング）をサポートするための
+\item OpenType機能（例えばグリフ置換やカーニング）をサポートするための
   \Pkg{luaotfload}パッケージのコードはこれらの文字には働かない．
 %</ja>
 \end{itemize}
@@ -6637,7 +6772,7 @@ For example, only ``葛'' in ``葛西'' is changed by font features
 \texttt{jp78}~or~\texttt{jp90}, which does not followed by any variation selector.
 %</en>
 %<*ja>
-また，IVSによる字形指定は，font featureによるそれに優先されることとした．
+また，IVSによる字形指定は，OpenType機能によるそれに優先されることとした．
 下の例において，\texttt{jp78}, \texttt{jp90} 指定で字形が変化した文字は
 異体字セレクタが続いていない「葛西」中の「葛」のみである．
 %</ja>
@@ -9006,7 +9141,7 @@ Letter, Other, Kanji, Open, Closeのどれに属するかは次によって決�
 %</ja>
 \begin{itemize}
 %<en>\item \textbf{ALchar}s above or equal to~\texttt{U+0080} are classified as Letter.
-%<ja>\item （\texttt{U+0080}以降の）\textbf{ALchar}は，すべてLetter扱いである．
+%<ja>\item \<（\texttt{U+0080}以降の）\textbf{ALchar}は，すべてLetter扱いである．
 
 %<en>\item \textbf{JAchar}s are classified in the order as follows:
 %<ja>\item \textbf{JAchar}については，以下の順序に従って文字種を決める：
@@ -9183,13 +9318,13 @@ JFM中にある文字クラス$n$の定義の
 が連続した場合に，$p$のフォントに対応したが持つ「異体字情報」に従って出力するグリフを変える．
 
 しかし，単に$p.\textit{char}$を変更するだけでは，後から
-font featureの適用（すぐ下）により置換される可能性がある．そのため，
+OpenType機能の適用（すぐ下）により置換される可能性がある．そのため，
 \cs{CID} や \cs{UTF} と同じように，\textit{glyph\_node}~$p$の代わりに
 \texttt{user\_id} が\textit{char\_by\_cid}であるようなuser-defined whatsitを用いている．
 \item[（\Pkg{luaotfload} によるfont featureの適用）]
 \item[\tt ltj.otf] \texttt{user\_id} が\textit{char\_by\_cid}であるようなuser-defined whatsitを
 きちんと\textit{glyph\_node}に変換する．この処理は，\cs{CID}, \cs{UTF}やIVSによる置換が，
-font featureの適用で上書きされてしまうのを防止するためである．
+OpenType機能の適用で上書きされてしまうのを防止するためである．
 \item[\tt ltj.main\_process] \textbf{JAglue}の挿入処理（\ref{sec-jfmglue}章）と，
 JFMの指定に従って各\textbf{JAchar}の「寸法を補正」することを行う．
 \end{description}
