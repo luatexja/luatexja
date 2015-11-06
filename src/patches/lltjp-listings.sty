@@ -188,9 +188,14 @@
       \@ifnextchar\bgroup \ltj@lst@InlineG \ltj@lstinline@}
 \def\ltj@lstinline@#1{%
   \edef\ltj@lst@temp{\the\catcode`#1}\lst@Init\relax\catcode`#1\ltj@lst@temp
+  \lst@Def{13}{\lst@DeInit\egroup \global\let\lst@inlinechars\@empty
+     \PackageError{Listings}{lstinline ended by EOL}\@ehc}%
   \lst@InlineJ#1}
 \def\ltj@lst@InlineG{%
-  \lst@Init\relax\edef\ltj@lst@temp{\the\catcode`\}}\catcode`\}=2 \catcode`\ =12\relax
+  \lst@Init\relax\edef\ltj@lst@temp{\the\catcode`\}}%
+  \catcode`\}=2 \catcode`\ =12\relax
+  \lst@Def{13}{\lst@DeInit\egroup \global\let\lst@inlinechars\@empty
+     \PackageError{Listings}{lstinline ended by EOL}\@ehc}%
   \let\lst@arg\@empty\afterassignment\ltj@lst@InlineG@@\@temptokena}
 \def\ltj@lst@InlineG@@{%
   \catcode`\}=\ltj@lst@temp
