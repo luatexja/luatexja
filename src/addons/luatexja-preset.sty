@@ -324,7 +324,7 @@
   } {}
   \DeclareFontShape{JT3}{#1}{#2}{n}{ <-> s*[\fp_use:N \l_ltjpreset_scale_fp] 
     {\bool_if:NT \l_ltjpreset_noembed_bool {psft:} "#3"
-    : jfm=ujisv ;-kern;\tl_use:N \l_ltjpreset_kanji_shape_tl
+    : jfm=ujisv ;-kern;\tl_use:N \l_ltjpreset_kanji_shape_tl;
     ; script=latn \bool_if:NT \l_ltjpreset_expert_bool { ;+vkna }}
   } {}
   \bool_if:NT \l_ltjpreset_expert_bool { 

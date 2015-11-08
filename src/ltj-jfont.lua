@@ -325,6 +325,8 @@ do
    -- extract jfm_file_name and jfm_var
    -- normalize position of 'jfm=' and 'jfmvar=' keys
    local function extract_metric(name)
+      local is_braced = name:match('^{(.*)}$')
+       name= is_braced or name
       jfm_file_name = ''; jfm_var = ''; jfm_ksp = true
       local tmp, index = name:sub(1, 5), 1
       if tmp == 'file:' or tmp == 'name:' or tmp == 'psft:' then
@@ -371,10 +373,11 @@ do
          if not name:match('vert') and not name:match('vrt2') then
             name = name .. ';vert;vrt2'
          end
+	 print(name)
       else
 	 is_vert_enabled = nil
       end
-      return name
+      return is_braced and ('{' .. name .. '}') or name
    end
 
    -- define_font callback
