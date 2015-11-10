@@ -358,7 +358,11 @@ local function calc_np_aux_glyph_common(lp)
 	       if ls==2 then -- アクセント用の kern
 		  set_attr(lx, attr_icflag, PROCESSED)
 		  lx = node_next(lx) -- lx: アクセント本体
-		  setfield(lx, 'yoffset', getfield(lx, 'yoffset') - (has_attr(lx,attr_ablshift) or 0))
+		  if getid(lx)==id_glyph then
+		     setfield(lx, 'yoffset', getfield(lx, 'yoffset') - (has_attr(lx,attr_ablshift) or 0))
+		  else -- アクセントは上下にシフトされている
+		     setfield(lx, 'shift', getfield(lx, 'shift') + (has_attr(lx,attr_ablshift) or 0))
+		  end
 		  lx = node_next(node_next(lx))
 	       elseif ls==0  then
 		  Np.last = lx
@@ -494,6 +498,11 @@ local calc_np_auxtable = {
       if getsubtype(lp)==2 then
 	 Np.first = Np.first or lp
 	 set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
+	 if getid(lp)==id_glyph then -- アクセント本体
+	    setfield(lp, 'yoffset', getfield(lp, 'yoffset') - (has_attr(lp,attr_ablshift) or 0))
+	 else -- アクセントは上下にシフトされている
+	    setfield(lp, 'shift', getfield(lp, 'shift') + (has_attr(lp,attr_ablshift) or 0))
+	 end
 	 set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
 	 set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
 	 set_attr(lp, attr_icflag, PROCESSED);

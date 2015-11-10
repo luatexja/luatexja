@@ -373,7 +373,6 @@ do
          if not name:match('vert') and not name:match('vrt2') then
             name = name .. ';vert;vrt2'
          end
-	 print(name)
       else
 	 is_vert_enabled = nil
       end
