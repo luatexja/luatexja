@@ -325,6 +325,8 @@ do
    -- extract jfm_file_name and jfm_var
    -- normalize position of 'jfm=' and 'jfmvar=' keys
    local function extract_metric(name)
+      local is_braced = name:match('^{(.*)}$')
+       name= is_braced or name
       jfm_file_name = ''; jfm_var = ''; jfm_ksp = true
       local tmp, index = name:sub(1, 5), 1
       if tmp == 'file:' or tmp == 'name:' or tmp == 'psft:' then
@@ -374,7 +376,7 @@ do
       else
 	 is_vert_enabled = nil
       end
-      return name
+      return is_braced and ('{' .. name .. '}') or name
    end
 
    -- define_font callback
@@ -383,6 +385,7 @@ do
    function luatexja.font_callback(name, size, id)
       local new_name = is_def_jfont and extract_metric(name) or name
       is_def_jfont = false
+      --local res =  otfl_fdr(new_name, size, id)
       local res =  ltjr_font_callback(new_name, size, id, otfl_fdr)
       luatexbase.call_callback('luatexja.define_font', res, new_name, size, id)
       -- this callback processes variation selector, so we execute it always
