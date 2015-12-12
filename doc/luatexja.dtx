@@ -24,16 +24,17 @@
 %%%%%%%% fonts
 \usepackage{luatexja-otf}
 \directlua{luatexja.otf.enable_ivs()}
-\usepackage[match,no-math]{luatexja-fontspec}
-\usepackage[kozuka-pr6n]{luatexja-preset}
-\usepackage{unicode-math}
+\usepackage[no-math]{fontspec}
 \setmainfont[Ligatures=TeX]{Linux Libertine O}
 \setmonofont[Scale=MatchLowercase, ItalicFont=lmmono10-italic.otf,
   BoldFont=lmmonolt10-bold.otf, BoldItalicFont=lmmonolt10-boldoblique.otf
 ]{lmmono10-regular.otf}
+\setsansfont[Scale=MatchLowercase,Ligatures=TeX]{Linux Biolinum O}
+\usepackage[match]{luatexja-fontspec}
+\usepackage[kozuka-pr6n]{luatexja-preset}
+\usepackage{unicode-math}
 \setmonojfont{KozGoPr6N-Regular.otf}
 \setmathfont[Scale=MatchLowercase]{xits-math.otf}
-\setsansfont[Scale=MatchLowercase,Ligatures=TeX]{Linux Biolinum O}
 
 \setLaTeXa{\scshape a}
 %<*ja>
@@ -8857,45 +8858,45 @@ then the patch \Pkg{lltjp-listings} is loaded automatically at \verb+\begin{docu
 
 %<en>\subsection{Notes and additional keys}
 %<ja>\subsection{注意}
-%<*en>
-\paragraph{Escaping to \LaTeX}
-We used the \verb+process_input_buffer+ callback to output \textbf{JAchar}s.
-But it has a drawback; any commands whose name contains a \textbf{JAchar}
-cannot be used in any ``escape to \LaTeX''.
+% %<*en>
+% \paragraph{Escaping to \LaTeX}
+% We used the \verb+process_input_buffer+ callback to output \textbf{JAchar}s.
+% But it has a drawback; any commands whose name contains a \textbf{JAchar}
+% cannot be used in any ``escape to \LaTeX''.
 
-Consider the following input:
-%</en>
-%<*ja>
-\paragraph{\LaTeX へのエスケープ}
-日本語対応を行うために \verb+process_input_buffer+ を使用したことで，
-\texttt{texcl},~\texttt{escapeinside}といった\emph{「\LaTeX へのエスケープ」中では，
-\textbf{JAchar}を名称の一部に含む制御綴は使用不可能}である．
-例えば次のような入力を考えよう：
-%</ja>
-\begin{verbatim*}
-\begin{lstlisting}[escapechar=\#]
-#\ほげ xぴよ#
-\end{lstlisting}
-\end{verbatim*}
-%<en>The line~2 is transformed by the callback to
-%<ja>ここで，2行目は \verb+process_input_buffer+ の作用により，
-\begin{lstlisting}[showspaces, escapechar=\!]
-#\!\IVSA FFFFF!ほ!\IVSA FFFFF!げ x!\IVSA FFFFF!ぴ!\IVSA FFFFF!よ#
-\end{lstlisting}
-%<*en>
-before the line is actually processed.
-In the escape (between the character ``\verb+#+''),
-the category code of \texttt{U+FFFFF} is set to 9~(\emph{ignored}).
-Hence the control symbol ``\cs{}\IVSA FFFFF'' will be executed,
-instead of ``\verb+\ほげ+''.
-%</en>
-%<*ja>
-と変換されてから，実際の処理に回される．
-「\verb+#+」で挟まれた「\LaTeX へのエスケープ」中では\
-\texttt{U+FFFFF} のカテゴリーコードは9~(\textit{ignored})となるので，
-結局「\verb+\ほげ+」の代わりに
-「\cs{}\IVSA FFFFF」というcontrol symbolが実行されることになる．
-%</ja>
+% Consider the following input:
+% %</en>
+% %<*ja>
+% \paragraph{\LaTeX へのエスケープ}
+% 日本語対応を行うために \verb+process_input_buffer+ を使用したことで，
+% \texttt{texcl},~\texttt{escapeinside}といった\emph{「\LaTeX へのエスケープ」中では，
+% \textbf{JAchar}を名称の一部に含む制御綴は使用不可能}である．
+% 例えば次のような入力を考えよう：
+% %</ja>
+% \begin{verbatim*}
+% \begin{lstlisting}[escapechar=\#]
+% #\ほげ xぴよ#
+% \end{lstlisting}
+% \end{verbatim*}
+% %<en>The line~2 is transformed by the callback to
+% %<ja>ここで，2行目は \verb+process_input_buffer+ の作用により，
+% \begin{lstlisting}[showspaces, escapechar=\!]
+% #\!\IVSA FFFFF!ほ!\IVSA FFFFF!げ x!\IVSA FFFFF!ぴ!\IVSA FFFFF!よ#
+% \end{lstlisting}
+% %<*en>
+% before the line is actually processed.
+% In the escape (between the character ``\verb+#+''),
+% the category code of \texttt{U+FFFFF} is set to 9~(\emph{ignored}).
+% Hence the control symbol ``\cs{}\IVSA FFFFF'' will be executed,
+% instead of ``\verb+\ほげ+''.
+% %</en>
+% %<*ja>
+% と変換されてから，実際の処理に回される．
+% 「\verb+#+」で挟まれた「\LaTeX へのエスケープ」中では\
+% \texttt{U+FFFFF} のカテゴリーコードは9~(\textit{ignored})となるので，
+% 結局「\verb+\ほげ+」の代わりに
+% 「\cs{}\IVSA FFFFF」というcontrol symbolが実行されることになる．
+% %</ja>
 
 %<*en>
 \paragraph{Variation selectors}
