@@ -385,6 +385,7 @@ do
    function luatexja.font_callback(name, size, id)
       local new_name = is_def_jfont and extract_metric(name) or name
       is_def_jfont = false
+      --local res =  otfl_fdr(new_name, size, id)
       local res =  ltjr_font_callback(new_name, size, id, otfl_fdr)
       luatexbase.call_callback('luatexja.define_font', res, new_name, size, id)
       -- this callback processes variation selector, so we execute it always

@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-listings}[2015/11/05 Patch to listings for LuaTeX-ja]
+\ProvidesPackage{lltjp-listings}[2015/12/11 Patch to listings for LuaTeX-ja]
 \RequirePackage{listings,luatexbase-cctb}
 
 %%%%%%%%%%%%%%%% Japanese support
@@ -35,8 +35,8 @@
   local cat_lp  = luatexbase.catcodetables['latex-package']
   local ubyte = unicode.utf8.byte
   local spccmd = string.char(0x5C) .. 'ltj@lst@hss@normal'
-  luatexja.lst = {}
-  function luatexja.lst.althss(t)
+  luatexja.listings = {}
+  function luatexja.listings.althss(t)
     t = ubyte(t)
     if not (t>=0xE0100 and t<0xE01F0) then
       tex.sprint(cat_lp, spccmd)
@@ -44,7 +44,7 @@
   end
 }
 \def\ltj@lst@hss@ivs#1{%
-  \directlua{luatexja.lst.althss('\luatexluaescapestring{#1}')}#1%
+  \directlua{luatexja.listings.althss('\luatexluaescapestring{#1}')}#1%
 }
 \def\ltj@lst@hss@double{\lst@hss\lst@hss}
 
@@ -188,20 +188,14 @@
       \@ifnextchar\bgroup \ltj@lst@InlineG \ltj@lstinline@}
 \def\ltj@lstinline@#1{%
   \edef\ltj@lst@temp{\the\catcode`#1}\lst@Init\relax\catcode`#1\ltj@lst@temp
-  \lst@Def{13}{\lst@DeInit\egroup \global\let\lst@inlinechars\@empty
-     \PackageError{Listings}{lstinline ended by EOL}\@ehc}%
   \lst@InlineJ#1}
 \def\ltj@lst@InlineG{%
-  \lst@Init\relax\edef\ltj@lst@temp{\the\catcode`\}}%
-  \catcode`\}=2 \catcode`\ =12\relax
-  \lst@Def{13}{\lst@DeInit\egroup \global\let\lst@inlinechars\@empty
-     \PackageError{Listings}{lstinline ended by EOL}\@ehc}%
+  \lst@Init\relax\edef\ltj@lst@temp{\the\catcode`\}}\catcode`\}=2 \catcode`\ =12\relax
   \let\lst@arg\@empty\afterassignment\ltj@lst@InlineG@@\@temptokena}
 \def\ltj@lst@InlineG@@{%
-  \catcode`\}=\ltj@lst@temp
+  \catcode`\}=\ltj@lst@temp%
   \expandafter\expandafter\expandafter\lst@InsideConvert%
   \expandafter{\the\@temptokena}\lst@arg\lst@DeInit\egroup}
-
 
 % We redefine \lst@BeginDropInput, since now we have
 % two additional `process macros'.
@@ -220,26 +214,38 @@
      \let\ltj@lst@ProcessJALetterHalf\@gobble % added
 }}
 
+\directlua{
+  luatexja.listings.insert_cb = function()
+    if not luatexja.listings.patched then
+      luatexja.listings.patched = 1
+      luatexbase.add_to_callback('process_input_buffer',
+         function(buf)
+           local ret = ''
+           for i = 1, utf.len(buf) do
+              local c = utf.sub(buf, i, i)
+              local cu = utf.byte(c)
+              if cu >= 0x80 and tex.getcatcode(cu) \string~= 13 then
+                ret = ret .. utf.char(1048575) % U+FFFFF
+              end
+              ret = ret .. c
+            end
+            return ret
+          end, 'ltj.listings_unicode', 1)
+    end
+  end
+  luatexja.listings.remove_cb = function()
+    if luatexja.listings.patched then
+      luatexja.listings.patched = nil
+      luatexbase.remove_from_callback('process_input_buffer', 
+        'ltj.listings_unicode')%
+    end
+  end}
 
 % hook!
 \lst@AddToHook{Init}{%
   \luatexcatcodetable\CatcodeTableLTJlistings\ltj@@listing@jpcmd
   \lccode`\~="FFFFF\lowercase{\def~{\ltj@lst@ProcessJALetter}}%"
-  \directlua{%
-    luatexja.patch_listings = 1
-    luatexbase.add_to_callback('process_input_buffer',
-      function(buf)
-        local ret = ''
-        for i = 1, utf.len(buf) do
-          local c = utf.sub(buf, i, i)
-          local cu = utf.byte(c)
-          if cu >= 0x80 and tex.getcatcode(cu) \string~= 13 then
-            ret = ret .. utf.char(1048575) % U+FFFFF
-          end
-          ret = ret .. c
-        end
-        return ret
-      end, 'ltj.listings_unicode', 1)}%
+  \directlua{luatexja.listings.insert_cb()}%
   \if@ltj@lst@double
     \let\ltj@lst@hss@normal=\ltj@lst@hss@double
   \else
@@ -284,13 +290,8 @@
 }\endgroup
 
 \lst@AddToHook{ExitVars}{%
-  \directlua{%
-    if luatexja.patch_listings then
-      luatexja.patch_listings=nil
-      luatexbase.remove_from_callback('process_input_buffer', 
-        'ltj.listings_unicode')%
-    end}}
-
+  \directlua{luatexja.listings.remove_cb()}%
+}
 
 % 白線対策
 \newif\ifltj@lst@frame@top
@@ -343,7 +344,7 @@
 
 %%%%%%%%%%%%%%%% escape to \LaTeX
 \lstloadaspects{escape}
-\gdef\lst@Escape#1#2#3#4{%
+\gdef\lst@Escape#1#2#3#4{
     \lst@CArgX #1\relax\lst@CDefX
         {}%
         {\lst@ifdropinput\else
@@ -361,10 +362,29 @@
                  {\lst@escapeend #4\lst@LeaveAllModes\lst@ReenterModes
                   \lst@newlines\z@ \lst@whitespacefalse}%
                  {}%
-         \fi
-         #3\catcode"FFFFF=9\lst@escapebegin%"
+         \fi%
+         \ltj@lst@escape@setup#2%
+         #3\catcode"FFFFF=9\lst@escapebegin\expandafter\lst@next%"
          \fi}%
         {}}
+\def\ltj@lst@escape@setup#1{%
+  \begingroup\lccode`\~=`#1\lowercase{%
+  \gdef\lst@next##1~{%
+     \let\lst@arg\@empty\ltj@lst@remove@jacmd{##1}%
+     \expandafter\expandafter\expandafter\scantokens\expandafter{\lst@arg}%
+     ~}%
+  }\endgroup
+}
+\begingroup
+  \lccode`\|="FFFFF \lowercase{%"
+  \gdef\ltj@lst@remove@jacmd#1{%
+    \expandafter\ltj@lst@remove@jacmd@\detokenize{#1}|\@nil|}
+  \gdef\ltj@lst@remove@jacmd@#1|{%
+    \ifx#1\@nil\else
+       \lst@lAddTo\lst@arg{#1}%
+       \expandafter\ltj@lst@remove@jacmd@
+    \fi}}
+\endgroup
 
 %%%%%%%%%%%%%%%%
 \lstloadaspects{writefile}
