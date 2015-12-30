@@ -223,14 +223,22 @@
 \bool_new:N \l_ltjpreset_shape_nlck_bool
 %% KozMinPr6N, HiraMinProN-W3 の場合はjp04 feature がないので，nlck にする
 \tl_set:Nn \l_tmpa_tl {, CJKShape=JIS2004 }
-\tl_if_eq:NNT \l_ltjpreset_kanji_shape_tl \l_tmpa_tl {
+\tl_if_eq:NNTF \l_ltjpreset_kanji_shape_tl \l_tmpa_tl {
   \clist_if_in:NnT \l_ltjpreset_font_list { KozMinPr6N-Regular }
    { \bool_set_true:N \l_ltjpreset_shape_nlck_bool }
   \clist_if_in:NnT \l_ltjpreset_font_list { HiraMinProN-W3 }
    { \bool_set_true:N \l_ltjpreset_shape_nlck_bool }
    \clist_if_in:NnT \l_ltjpreset_font_list { Moga90Mincho }
-   { \tl_remove_all:Nn \l_ltjpreset_font_list {90} }%%% これでいいのか？
- 
+   { 
+     \tl_remove_all:Nn \l_ltjpreset_font_list {90} 
+     \tl_clear:N \l_ltjpreset_kanji_shape_tl
+   }
+}{
+  \tl_set:Nn \l_tmpa_tl {, CJKShape=JIS1990 }
+  \tl_if_eq:NNT \l_ltjpreset_kanji_shape_tl \l_tmpa_tl {
+    \clist_if_in:NnT \l_ltjpreset_font_list { Moga90Mincho }
+     { \tl_clear:N \l_ltjpreset_kanji_shape_tl }
+  }
 }
 
 %%%%  リストからの展開
