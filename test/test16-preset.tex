@@ -1,7 +1,6 @@
-%#!luajitlatex test16-preset && pdffonts test16-preset.pdf
-\documentclass{ltjsarticle}
-\usepackage{fontspec}
-\usepackage[hiragino-pron,jis2004,deluxe,expert,nfssonly]{luatexja-preset}
+%#!lualatex test16-preset && pdffonts test16-preset.pdf
+\documentclass{ltjarticle}
+\usepackage[moga-mobo,deluxe,expert, nfssonly, jis2004, match]{luatexja-preset}
 \begin{document}
 \makeatletter
 \def\r#1#2{ \csname #1family \endcsname \csname #2series \endcsname
@@ -35,6 +34,9 @@
 \r{tt}{bf}
 
 $あいう\mathgt{あいう}$
+
+\normalfont
+{あいうえおabc \sf あいうえおabc}
 \end{document}
 
 3.88

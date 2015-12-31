@@ -1,43 +1,58 @@
 % luatexja-preset.sty
 \ProvidesPackage{luatexja-preset}[2015/06/28 Japanese font presets]
 
-\RequirePackage{expl3}
+\RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
 \ExplSyntaxOn
 
-%%%% message
+\fp_new:N \l_ltjpreset_scale_fp
+\group_begin:
+\fontsize{10}{10}\selectfont
+\fp_gset:Nn \l_ltjpreset_scale_fp {\zw / 10}
+\group_end:
+
+\keys_define:nn { luatexja-preset }{  
+  unknown .code:n = \PassOptionsToPackage { \l_keys_key_tl } { luatexja-fontspec },
+  scale .fp_gset:N = \l_ltjpreset_scale_fp
+}
+\cs_new:Nn \ltjpreset_declare_option:nn {
+  \keys_define:nn { luatexja-preset }{
+    #1 .code:n = #2,
+    #1. value_forbidden:n = true
+  }
+}
+
 \bool_new:N \l_ltjpreset_nfssonly_bool % nfssonly
 \bool_set_false:N \l_ltjpreset_nfssonly_bool
-\DeclareOption{nfssonly}  {\bool_set_true:N \l_ltjpreset_nfssonly_bool}
-\DeclareOption{fontspec}  {\bool_set_false:N \l_ltjpreset_nfssonly_bool}
+\ltjpreset_declare_option:nn{nfssonly}  {\bool_set_true:N \l_ltjpreset_nfssonly_bool}
+\ltjpreset_declare_option:nn{fontspec}  {\bool_set_false:N \l_ltjpreset_nfssonly_bool}
 
 \bool_new:N \l_ltjpreset_bold_bool % bold
 \bool_set_false:N \l_ltjpreset_bold_bool
-\DeclareOption{bold}  {\bool_set_true:N \l_ltjpreset_bold_bool}
-\DeclareOption{nobold}{\bool_set_false:N \l_ltjpreset_bold_bool}
+\ltjpreset_declare_option:nn{bold}  {\bool_set_true:N \l_ltjpreset_bold_bool}
+\ltjpreset_declare_option:nn{nobold}{\bool_set_false:N \l_ltjpreset_bold_bool}
 
 \bool_new:N \l_ltjpreset_expert_bool % expert
 \bool_set_false:N \l_ltjpreset_expert_bool
-\DeclareOption{expert}  {\bool_set_true:N \l_ltjpreset_expert_bool}
-\DeclareOption{noexpert}{\bool_set_false:N \l_ltjpreset_expert_bool}
+\ltjpreset_declare_option:nn{expert}  {\bool_set_true:N \l_ltjpreset_expert_bool}
+\ltjpreset_declare_option:nn{noexpert}{\bool_set_false:N \l_ltjpreset_expert_bool}
 
 \int_new:N \l_ltjpreset_deluxe_int % deluxe
 \int_set:Nn \l_ltjpreset_deluxe_int { 0 }
-\DeclareOption{deluxe}{\int_set:Nn \l_ltjpreset_deluxe_int { 2 }}   % 6 fonts
-\DeclareOption{nodeluxe}{\int_set:Nn \l_ltjpreset_deluxe_int { 0 }} % 2 fonts
+\ltjpreset_declare_option:nn{deluxe}{\int_set:Nn \l_ltjpreset_deluxe_int { 2 }}   % 6 fonts
+\ltjpreset_declare_option:nn{nodeluxe}{\int_set:Nn \l_ltjpreset_deluxe_int { 0 }} % 2 fonts
 
-\DeclareOption*{\PassOptionsToPackage{\CurrentOption}{luatexja-fontspec}}
 % JFM
 \cs_set:Npn \ltjpreset_use_jfm: {ujis}  % 使用する JFM
-%%% \DeclareOption{min}{\cs_set:Npn  \ltjpreset_use_jfm: {min}} % min
+%%% \ltjpreset_declare_option:nn{min}{\cs_set:Npn  \ltjpreset_use_jfm: {min}} % min
 %%% ↑jfm-min.lua が横組み・縦組み専用仮名に追いついていないので使用禁止
-\DeclareOption{jis}{\cs_set:Npn  \ltjpreset_use_jfm: {jis}}     % jis
-\DeclareOption{ujis}{\cs_set:Npn  \ltjpreset_use_jfm: {ujis}}   % ujis
+\ltjpreset_declare_option:nn{jis}{\cs_set:Npn  \ltjpreset_use_jfm: {jis}}     % jis
+\ltjpreset_declare_option:nn{ujis}{\cs_set:Npn  \ltjpreset_use_jfm: {ujis}}   % ujis
 
 % 漢字字形
 \tl_new:N \l_ltjpreset_kanji_shape_tl
-\DeclareOption{90jis}{  \tl_set:Nn \l_ltjpreset_kanji_shape_tl { , CJKShape=JIS1990 }} % 90jis
-\DeclareOption{jis2004}{\tl_set:Nn \l_ltjpreset_kanji_shape_tl { , CJKShape=JIS2004 }} % jis2004
+\ltjpreset_declare_option:nn{90jis}{  \tl_set:Nn \l_ltjpreset_kanji_shape_tl { , CJKShape=JIS1990 }} % 90jis
+\ltjpreset_declare_option:nn{jis2004}{\tl_set:Nn \l_ltjpreset_kanji_shape_tl { , CJKShape=JIS2004 }} % jis2004
 
 % font preset
 \bool_new:N \l_ltjpreset_office_bool  % MS Office の HG 系フォントを使っているか
@@ -63,9 +78,11 @@
 }
 
 
+%%%%%%%% プリセット達
+
 % 小塚 (Adobe)
 %% Pro
-\DeclareOption{kozuka-pro}{
+\ltjpreset_declare_option:nn{kozuka-pro}{
   \ltjpreset_set_multi:n {
     KozMinPro-Regular , % mc/m
     KozMinPro-Bold ,    % mc/bx
@@ -77,7 +94,7 @@
   }
 }
 %% Pr6
-\DeclareOption{kozuka-pr6}{
+\ltjpreset_declare_option:nn{kozuka-pr6}{
   \ltjpreset_set_multi:n {
     KozMinProVI-Regular , % mc/m
     KozMinProVI-Bold ,    % mc/bx
@@ -89,7 +106,7 @@
   }
 }
 %% Pr6N
-\DeclareOption{kozuka-pr6n}{
+\ltjpreset_declare_option:nn{kozuka-pr6n}{
   \ltjpreset_set_multi:n {
     KozMinPr6N-Regular , % mc/m
     KozMinPr6N-Bold ,    % mc/bx
@@ -102,7 +119,7 @@
 }
 
 % ヒラギノ (OSX)
-\DeclareOption{hiragino-pro}{
+\ltjpreset_declare_option:nn{hiragino-pro}{
   \ltjpreset_set_multi:n {
     HiraMinPro-W3 , 
     HiraMinPro-W6 , 
@@ -113,7 +130,7 @@
     HiraMaruPro-W4 , 
   }
 }
-\DeclareOption{hiragino-pron}{
+\ltjpreset_declare_option:nn{hiragino-pron}{
   \ltjpreset_set_multi:n {
     HiraMinProN-W3 , 
     HiraMinProN-W6 , 
@@ -126,7 +143,7 @@
 }
 
 % モリサワ
-\DeclareOption{morisawa-pro}{
+\ltjpreset_declare_option:nn{morisawa-pro}{
   \ltjpreset_set_multi:n {
     A-OTF-RyuminPro-Light.otf , A-OTF-FutoMinA101Pro-Bold.otf ,    % mc/m, mc/bx
     A-OTF-GothicBBBPro-Medium.otf , A-OTF-FutoGoB101Pro-Bold.otf , % gt/m, gt/bx (multiweight))
@@ -134,7 +151,7 @@
     A-OTF-Jun101Pro-Light.otf % mg/m
   }
 }
-\DeclareOption{morisawa-pr6n}{
+\ltjpreset_declare_option:nn{morisawa-pr6n}{
   \ltjpreset_set_multi:n {
     A-OTF-RyuminPr6N-Light.otf , A-OTF-FutoMinA101Pr6N-Bold.otf ,    % mc/m, mc/bx
     A-OTF-GothicBBBPr6N-Medium.otf , A-OTF-FutoGoB101Pr6N-Bold.otf , % gt/m, gt/bx (multiweight))
@@ -144,7 +161,7 @@
 }
 
 % 游明朝/游ゴシック (Win8.1)
-\DeclareOption{yu-win}{
+\ltjpreset_declare_option:nn{yu-win}{
   \ltjpreset_set_multi:n {
     YuMincho-Regular , YuMincho-Demibold , % mc/m, mc/bx
     YuGothic-Regular , YuGothic-Bold ,     % gt/m, gt/bx (multiweight))
@@ -155,7 +172,7 @@
 
 % Yu fonts in OSX
 % according to http://support.apple.com/kb/HT5944
-\DeclareOption{yu-osx}{
+\ltjpreset_declare_option:nn{yu-osx}{
   \ltjpreset_set_multi:n {
     YuMincho~Medium , YuMincho~Demibold , % mc/m, mc/bx
     YuGothic~Medium , YuGothic~Bold ,     % gt/m, gt/bx (multiweight))
@@ -165,7 +182,7 @@
 }
 
 % moga-mobo
-\DeclareOption{moga-mobo}{
+\ltjpreset_declare_option:nn{moga-mobo}{
   \ltjpreset_set_multi:n {
     Moga90Mincho, Moga90Mincho~Bold ,       % mc/m, mc/bx
     Moga90Gothic, Moga90Gothic~Bold ,       % gt/m, gt/bx (multiweight))
@@ -176,37 +193,36 @@
 
 
 % ipa, ipaex, ms
-\DeclareOption{ipa}{
+\ltjpreset_declare_option:nn{ipa}{
   \ltjpreset_set_uni:nn { IPAMincho } { IPAGothic }
 }
-\DeclareOption{ipaex}{
+\ltjpreset_declare_option:nn{ipaex}{
   \ltjpreset_set_uni:nn { IPAExMincho } { IPAExGothic }
 }
-\DeclareOption{ms}{
+\ltjpreset_declare_option:nn{ms}{
   \ltjpreset_set_uni:nn { MS-Mincho } { MS-Gothic }
 }
 
 % {ipa,ipaex,ms}-dx % Office 付属フォントを利用
-\DeclareOption{ipaex-hg}{
+\ltjpreset_declare_option:nn{ipaex-hg}{
   \ltjpreset_set_office:nn { IPAExMincho } { IPAExGothic }
 }
-\DeclareOption{ipa-hg}{
+\ltjpreset_declare_option:nn{ipa-hg}{
   \ltjpreset_set_office:nn { IPAMincho } { IPAGothic }
 }
-\DeclareOption{ms-hg}{
+\ltjpreset_declare_option:nn{ms-hg}{
   \ltjpreset_set_office:nn { MS-Mincho } { MS-Gothic }
 }
 
 
 % 非埋込
-\DeclareOption{noembed}{
+\ltjpreset_declare_option:nn{noembed}{
   \ltjpreset_set_uni:nn { Ryumin-Light } { GothicBBB-Medium }
   \bool_set_true:N \l_ltjpreset_noembed_bool
 }
 
-\ExecuteOptions{ipaex}
-
-\ProcessOptions*
+\keys_set:nn { luatexja-preset }{ ipaex }
+\ProcessKeysOptions { luatexja-preset }
 
 %%%%%%%% main routine
 
@@ -313,12 +329,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% nfss only
 \bool_if:NTF \l_ltjpreset_nfssonly_bool {
-
-\fp_new:N \l_ltjpreset_scale_fp
-\group_begin:
-\fontsize{10}{10}\selectfont
-\fp_gset:Nn \l_ltjpreset_scale_fp {\zw / 10}
-\group_end:
 \msg_new:nnn { luatexja-preset }{ scale }{
   Japanese~fonts~will~be~scaled~by~\fp_use:N \l_ltjpreset_scale_fp.
 }
@@ -397,7 +407,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% fontspec
 } {
-
+\PassOptionsToPackage { scale = \fp_use:N \l_ltjpreset_scale_fp } { luatexja-fontspec }
 \RequirePackage{luatexja-fontspec}
 % scale
 \msg_new:nnn { luatexja-preset }{ scale }{

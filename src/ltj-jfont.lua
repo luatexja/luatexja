@@ -699,7 +699,7 @@ do
    local function add_fl_table(dest, glyphs, unitable, asc_des, units)
       local tg, glyphmin, glyphmax = glyphs.glyphs, 0, glyphs.glyphmax
       for _,v in pairs(fields(glyphs)) do
-	 if v=='glyphmin' then glyphmin = glyphs.glyphmin; break end
+	 if v=='glyphmin' then glyphmin, glyphmax = glyphs.glyphmin, glyphmax+1; break end
       end
       for i = glyphmin, glyphmax-1 do
 	 local gv = tg[i]
