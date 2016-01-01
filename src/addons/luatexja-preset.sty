@@ -18,29 +18,25 @@
 \cs_new:Nn \ltjpreset_declare_option:nn {
   \keys_define:nn { luatexja-preset }{
     #1 .code:n = #2,
-    #1. value_forbidden:n = true
+    #1 .value_forbidden:n = true
+  }
+}
+\cs_new:Nn \ltjpreset_declare_bool_option:nn {
+  \bool_new:c { l_ltjpreset_#1_bool }
+  \bool_set_false:c { l_ltjpreset_#1_bool }
+  \keys_define:nn { luatexja-preset }{
+    #1 .bool_set:c =  { l_ltjpreset_#1_bool },
+    #2 .bool_set_inverse:c =  { l_ltjpreset_#1_bool },
+    #1 .default:n =  true,
+    #2 .default:n =  true,
   }
 }
 
-\bool_new:N \l_ltjpreset_nfssonly_bool % nfssonly
-\bool_set_false:N \l_ltjpreset_nfssonly_bool
-\ltjpreset_declare_option:nn{nfssonly}  {\bool_set_true:N \l_ltjpreset_nfssonly_bool}
-\ltjpreset_declare_option:nn{fontspec}  {\bool_set_false:N \l_ltjpreset_nfssonly_bool}
-
-\bool_new:N \l_ltjpreset_bold_bool % bold
-\bool_set_false:N \l_ltjpreset_bold_bool
-\ltjpreset_declare_option:nn{bold}  {\bool_set_true:N \l_ltjpreset_bold_bool}
-\ltjpreset_declare_option:nn{nobold}{\bool_set_false:N \l_ltjpreset_bold_bool}
-
-\bool_new:N \l_ltjpreset_expert_bool % expert
-\bool_set_false:N \l_ltjpreset_expert_bool
-\ltjpreset_declare_option:nn{expert}  {\bool_set_true:N \l_ltjpreset_expert_bool}
-\ltjpreset_declare_option:nn{noexpert}{\bool_set_false:N \l_ltjpreset_expert_bool}
-
-\int_new:N \l_ltjpreset_deluxe_int % deluxe
-\int_set:Nn \l_ltjpreset_deluxe_int { 0 }
-\ltjpreset_declare_option:nn{deluxe}{\int_set:Nn \l_ltjpreset_deluxe_int { 2 }}   % 6 fonts
-\ltjpreset_declare_option:nn{nodeluxe}{\int_set:Nn \l_ltjpreset_deluxe_int { 0 }} % 2 fonts
+%%%%%%%% bool options
+\ltjpreset_declare_bool_option:nn { nfssonly }{ fontspec }
+\ltjpreset_declare_bool_option:nn { bold }{ nobold }
+\ltjpreset_declare_bool_option:nn { expert }{ noexpert }
+\ltjpreset_declare_bool_option:nn { deluxe }{ nodeluxe }
 
 % JFM
 \cs_set:Npn \ltjpreset_use_jfm: {ujis}  % 使用する JFM
@@ -79,6 +75,12 @@
 
 
 %%%%%%%% プリセット達
+
+% カスタム指定
+ \keys_define:nn { luatexja-preset }{
+    custom .code:n = \ltjpreset_set_multi:n { #1 },
+    custom .value_required:n = true
+}
 
 % 小塚 (Adobe)
 %% Pro
@@ -362,7 +364,7 @@
 \DeclareKanjiFamily{JY3}{ltjpm}{}\DeclareKanjiFamily{JT3}{ltjpm}{}
 \DeclareKanjiFamily{JY3}{ltjpg}{}\DeclareKanjiFamily{JT3}{ltjpg}{}
 
-\int_compare:nTF { \l_ltjpreset_deluxe_int ==  2 } {
+\bool_if:NTF \l_ltjpreset_deluxe_bool {
   \bool_if:NT \l_ltjpreset_bold_bool {
     \cs_set_eq:NN \ltjpreset_font_mc_bx: \ltjpreset_font_gt_bx:
   }
@@ -392,7 +394,7 @@
   \DeclareRobustCommand\rubyfamily { \kanjishape{rb}\selectfont }
 }
 
-\int_compare:nTF { \l_ltjpreset_deluxe_int ==  2 } {
+\bool_if:NTF \l_ltjpreset_deluxe_bool {
   \DeclareKanjiFamily{JY3}{ltjpmg}{}\DeclareKanjiFamily{JT3}{ltjpmg}{}
   \ltj_preset_define_family:nnn {ltjpmg} {m}  {\ltjpreset_font_mg:} 
   \ltj_preset_define_family:nnn {ltjpg}  {eb} {\ltjpreset_font_gt_eb:}
@@ -434,7 +436,7 @@
 }
 
 % （丸）ゴシック体の設定: bold option もここで
-\int_compare:nTF { \l_ltjpreset_deluxe_int ==  2 } {
+\bool_if:NTF \l_ltjpreset_deluxe_bool {
 %% mg
  \newjfontfamily \mgfamily [
       BoldFont = \ltjpreset_font_mg:,
