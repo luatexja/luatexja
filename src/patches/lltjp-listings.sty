@@ -270,7 +270,7 @@
     \else\let\lst@next\ltj@lst@MakeActive@
     \ifnum`#1>127 
       \lccode`\^^A=`#1 
-      \lowercase{\lst@lAddTo\lst@temp{$^^A}}%
+      \lowercase{\lst@lAddTo\lst@temp{$^^A}}%$
     \else
       \lccode`\^^@=`#1 
       \lowercase{\lst@lAddTo\lst@temp{^^@}}%
@@ -417,8 +417,12 @@
 \gdef\lst@breakProcessOther#1{\lst@ProcessOther#1}
 % ソースコード目次における文字と番号の空き
 \let \l@lstlisting = \l@figure
+
+%%%% 
 % キャプションとソースコード目次に対する日本語対応
-\def\lstlistingname{ソースコード}
-\def\lstlistlistingname{ソースコード目次}
+%\def\lstlistingname{ソースコード}
+%\def\lstlistlistingname{ソースコード目次}
 %    \end{修正事項}
+%%%%
+
 \endinput
