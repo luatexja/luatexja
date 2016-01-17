@@ -970,8 +970,10 @@ do
 	    if h then
 	       local g = node_new(id_kern)
 	       setfield(g, 'subtype', 1); set_attr(g, attr_icflag, ITALIC)
-	       setfield(g, 'kern', h.characters[getchar(p)].italic)
-	       node_write(g); ensure_tex_attr(attr_icflag, 0)
+	       if h.characters[getchar(p)] and h.characters[getchar(p)].italic then 
+		  setfield(g, 'kern', h.characters[getchar(p)].italic)
+		  node_write(g); ensure_tex_attr(attr_icflag, 0)
+	       end
 	    end
 	 end
       end
