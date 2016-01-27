@@ -1006,6 +1006,25 @@ Note that the bold series in both family are same as the medium series of \emph{
 %<ja>\item 数式モード中の和文文字は明朝体(\texttt{mc})で出力される．
 
 %<*en>
+ \item \cs{jttdefault}%
+  \footnote{%
+	When \Pkg{ltjsclasses} classes are used, or \Pkg{luatexja-fontspec} is loaded with \texttt{match} option,
+	\cs{ttfamily} changes the current Japanese font amily to \cs{jttdefault}.
+  } specifies the Japanese font family in \cs{verb}~or~\texttt{verbatim} environment.
+  The default value of \cs{jttdefault} is \cs{mcdefault}, so \emph{mincho} family is used.
+%</en>
+%<*ja>
+ \item \cs{verb} や \texttt{verbatim} 環境中の和文文字に使われる和文フォントファミリは
+  \ \cs{jttdefault} で指定する%
+  \footnote{%
+	\Pkg{ltjsclasses}を使用したり，あるいは \texttt{match} オプションを指定して\Pkg{luatexja-fontspec}%
+	パッケージを読み込んだときは，単なる \cs{ttfamily} によっても和文フォントが
+	\ \cs{jttfamily} に変更される．
+  }．標準値は \cs{mcdefault}，つまり明朝体として用いるのと
+  同じフォントファミリである．
+%</ja>
+  
+%<*en>
 \item If you use the \Pkg{beamer} class with the default font theme (which uses sans serif
       fonts) and with \LuaTeX-ja, you might want to change default Japanese fonts to
       \emph{gothic} family. The following line  changes  the default Japanese font family
