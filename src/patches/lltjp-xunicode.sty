@@ -5,7 +5,7 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{lltjp-xunicode}[2013/05/14 Patch to xunicode for LuaTeX-ja]
 
-\def\UTFencname{EU2}\def\XeTeXpicfile{}
+\def\XeTeXpicfile{}
 \RequirePackage{xunicode,luatexja}
 {\catcode`\"=12
 \gdef\check@hexcom@digits@#1#2#3#4#5@!@#6#7#8{%
@@ -81,15 +81,17 @@
 \let\hbar\relax
 \let\ltj@tmpb\iftipaonetoken
 \let\iftipaonetoken\relax
-\ReloadXunicode{EU2}
-\makeatletter
+\typeout{UTFencname: \UTFencname}
+\let\ltj@temp=\@temp
+\edef\@tem{\noexpand\ReloadXunicode{\UTFencname}}\@temp
+\let\@temp=\ltj@temp\let\ltj@temp\relax
 \let\hbar\ltj@tmpa
 \let\iftipaonetoken\ltj@tmpb
 \let\ltj@tmpb\relax % no more an if-token
 
 %% ticket 30501
 {\catcode`\!0\catcode`\\11!catcode`!2 11!catcode`!?11!catcode`!-11
- !gdef!EU2\nobreakspace{!?-\nobreakspace}%
+ !expandafter!gdef!csname!UTFencname \nobreakspace!endcsname{!?-\nobreakspace}%
 }
 
 \endinput
