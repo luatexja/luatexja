@@ -317,7 +317,7 @@
     %%%%  ここから
     \@tempdima\z@
     \ifdim\ht\strutbox<\cht\@tempdima=\dimexpr\cht-\ht\strutbox\relax\fi
-    \ifdim\dp\strutbox<\cdp\advance\@tempdima=\dimexpr\cdp-\dp\strutbox\relax\fi
+    \ifdim\dp\strutbox<\cdp\@tempdima=\dimexpr\cdp-\dp\strutbox\relax\fi
     \ltj@lst@frame@lslimit=-\@tempdima
     \def\lst@framelr{%
       \ifltj@lst@frame@top\ltj@lst@frame@topfalse\else\lineskiplimit\ltj@lst@frame@lslimit\fi
