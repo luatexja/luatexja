@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec-24}[2015/06/28 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec-24}[2016/01/30 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e,luatexja}
 \ExplSyntaxOn
 
@@ -180,6 +180,7 @@
   \tl_set_eq:NN \l__fontspec_saved_fontname_tl \l_fontspec_fontname_tl
 
   \tl_set:Nn \g_fontspec_encoding_tl {#5}
+  \tl_set:Nn \l__fontspec_nfss_enc_tl {#5}
   \exp_args:Nx \clist_map_inline:nn {#4}
    {
     \tl_clear:N \l__fontspec_size_tl
@@ -212,6 +213,7 @@
 \cs_set_eq:NN \__ltj_orig_fontspec_set_family:Nnn \fontspec_set_family:Nnn
 \cs_set_eq:NN \__ltj_orig_fontspec_make_font_shapes:Nnnnn \__fontspec_make_font_shapes:Nnnnn
 \cs_set_eq:NN \__ltj_fontspec_orig_DeclareFontShape \DeclareFontShape
+
 \cs_new:Nn \ltj_fontspec_make_font_shapes:Nnnnn {
   \group_begin:
     %% 基底フォント
