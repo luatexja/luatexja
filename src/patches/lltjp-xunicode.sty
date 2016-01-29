@@ -83,7 +83,8 @@
 \let\iftipaonetoken\relax
 \typeout{UTFencname: \UTFencname}
 \let\ltj@temp=\@temp
-\edef\@tem{\noexpand\ReloadXunicode{\UTFencname}}\@temp
+\edef\@temp{\noexpand\ReloadXunicode{\UTFencname}}\@temp
+\makeatletter
 \let\@temp=\ltj@temp\let\ltj@temp\relax
 \let\hbar\ltj@tmpa
 \let\iftipaonetoken\ltj@tmpb
