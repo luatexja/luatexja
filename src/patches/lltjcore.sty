@@ -193,7 +193,11 @@
   \unless\ifnum\ltjgetparameter{direction}=3 \@makefnmark
   \else\hbox to\z@{\hskip-.25\zw\raise.9\zh\@makefnmark\hss}\fi
   \ifhmode\spacefactor\@x@sf\fi\relax}
-\def\@setref#1#2#3{%
+\begingroup
+\@ifpackageloaded{hyperref}
+  {\def\ltj@setrefprefix{real}}
+  {\def\ltj@setrefprefix{}}
+\expandafter\gdef\csname \ltj@setrefprefix @setref\endcsname#1#2#3{%
   \ifx#1\relax
     \protect\G@refundefinedtrue
     \nfss@text{\reset@font\bfseries ??}%
@@ -202,6 +206,7 @@
   \else
     \expandafter#2#1\relax% change \null to \relax
   \fi}
+\endgroup
 \if@compatibility\else
 \def\verb{\relax\ifmmode\hbox\else\leavevmode\fi
   \bgroup
