@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjdefs}[2015/08/29 Default font settings of LuaTeX-ja]
+\ProvidesPackage{lltjdefs}[2016/01/30 Default font settings of LuaTeX-ja]
 
 \def\ltj@stdmcfont{IPAExMincho}
 \def\ltj@stdgtfont{IPAExGothic}
@@ -20,7 +20,6 @@
 
 \newcommand\mcdefault{mc}
 \newcommand\gtdefault{gt}
-\def\verbatim@font{\normalfont\ttfamily\kanjifamily\jttdefault\selectfont}
 \newcommand\jttdefault{\mcdefault}
 \newcommand\kanjiencodingdefault{JY3}
 \newcommand\kanjifamilydefault{\mcdefault}
@@ -54,6 +53,22 @@
 \SetSymbolFont{mincho}{bold}{JY3}{gt}{m}{n}
 \DeclareSymbolFontAlphabet{\mathmc}{mincho}
 \DeclareMathAlphabet{\mathgt}{JY3}{gt}{m}{n}
+
+\newif\if@ltj@match@family
+\@ltj@match@familyfalse
+\def\verbatim@font{\normalfont\ttfamily\kanjifamily\jttdefault\selectfont}
+\DeclareRobustCommand\rmfamily
+        {\not@math@alphabet\rmfamily\mathrm
+                   \romanfamily\rmdefault
+                   \if@ltj@match@family\kanjifamily\mcdefault\fi\selectfont}
+\DeclareRobustCommand\sffamily
+        {\not@math@alphabet\sffamily\mathsf
+                   \romanfamily\sfdefault
+                   \if@ltj@match@family\kanjifamily\gtdefault\fi\selectfont}
+\DeclareRobustCommand\ttfamily
+        {\not@math@alphabet\ttfamily\mathtt
+                   \romanfamily\ttdefault
+                   \if@ltj@match@family\kanjifamily\jttdefault\fi\selectfont}
 
 \ltjdefcharrange{1}{"80-"36F, "1E00-"1EFF}
 \ltjdefcharrange{2}{"370-"4FF, "1F00-"1FFF}

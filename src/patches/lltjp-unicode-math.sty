@@ -38,14 +38,14 @@
   }
   \cs_gset:cpn { \tl_use:N \l_tmpa_tl } #1 = "#2 \q_nil {%"
     \group_begin:
-      %\typeout {um: \string#1, \int_from_hexadecimal:n {#2}, #2}% <- for debug
+      %\typeout {um: \string#1, \int_from_hex:n {#2}, #2}% <- for debug
       \char_set_lccode:nn { `! } { "#2 }%"
       \tex_lowercase:D {
         \tl_set:Nn \l_tmpa_tl {  \relax
           \ifmmode!\else{\directlua{tex.globaldefs = 0}\ltj@allalchar!}\fi}
         \cs_gset_eq:NN #1 \l_tmpa_tl
       }
-      \ltjsetmathletter{ \int_from_hexadecimal:n {#2} }
+      \ltjsetmathletter{ \int_from_hex:n {#2} }
     \group_end:
   }
 }

@@ -371,7 +371,7 @@ do
       if jfm_dir == 'tate' then
 	 is_vert_enabled = (not name:match('[:;]%-vert')) and (not  name:match('[:;]%-vrt2'))
          if not name:match('vert') and not name:match('vrt2') then
-            name = name .. ';vert;vrt2'
+            name = name .. ';+vert;+vrt2'
          end
       else
 	 is_vert_enabled = nil

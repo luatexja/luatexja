@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2015/06/28 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2016/01/30 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -13,7 +13,11 @@
 
 \keys_define:nn { luatexja-preset }{  
   unknown .code:n = \PassOptionsToPackage { \l_keys_key_tl } { luatexja-fontspec },
-  scale .fp_gset:N = \l_ltjpreset_scale_fp
+  scale .fp_gset:N = \l_ltjpreset_scale_fp,
+  match .code: n =
+    \renewcommand\jttdefault{\gtdefault}\@ltj@match@familytrue
+    \PassOptionsToPackage { match } { luatexja-fontspec },
+  match .value_forbidden:n = true
 }
 \cs_new:Nn \ltjpreset_declare_option:nn {
   \keys_define:nn { luatexja-preset }{

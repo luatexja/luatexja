@@ -339,16 +339,7 @@
 %% \DeclareFontShape{JT3}{gt}{m}{sl}{<->ssub*gt/m/n}{}
 %% \DeclareFontShape{JT3}{mc}{bx}{it}{<->ssub*gt/m/n}{}
 %% \DeclareFontShape{JT3}{mc}{bx}{sl}{<->ssub*gt/m/n}{}
-\renewcommand\jttdefault{\gtdefault}
-\DeclareRobustCommand\rmfamily
-        {\not@math@alphabet\rmfamily\mathrm
-         \romanfamily\rmdefault\kanjifamily\mcdefault\selectfont}
-\DeclareRobustCommand\sffamily
-        {\not@math@alphabet\sffamily\mathsf
-         \romanfamily\sfdefault\kanjifamily\gtdefault\selectfont}
-\DeclareRobustCommand\ttfamily
-        {\not@math@alphabet\ttfamily\mathtt
-         \romanfamily\ttdefault\kanjifamily\jttdefault\selectfont}
+\renewcommand\jttdefault{\gtdefault}\@ltj@match@familytrue
 %%
 \AtBeginDocument{%
   \reDeclareMathAlphabet{\mathrm}{\mathrm}{\mathmc}
@@ -411,7 +402,7 @@
   \belowdisplayskip 9\p@ \@plus3\p@ \@minus4\p@
   \belowdisplayshortskip \belowdisplayskip
   \let\@listi\@listI}
-\normalsize
+\mcfamily\selectfont\normalsize
 \setbox0\hbox{\char"3000}% 全角スペース
 \setlength\Cht{\ht0}
 \setlength\Cdp{\dp0}

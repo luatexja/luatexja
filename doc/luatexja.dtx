@@ -1004,12 +1004,14 @@ Note that the bold series in both family are same as the medium series of \emph{
 
 %<en>\item Japanese characters in math mode are typeset by the font family \texttt{mc}.
 %<ja>\item 数式モード中の和文文字は明朝体(\texttt{mc})で出力される．
-
 %<*en>
  \item \cs{jttdefault}%
   \footnote{%
-	When \Pkg{ltjsclasses} classes are used, or \Pkg{luatexja-fontspec} is loaded with \texttt{match} option,
+	When \Pkg{ltjsclasses} classes are used, or
+	\Pkg{luatexja-fontspec} (or \Pkg{luatexja-preset}) is loaded with \texttt{match} option,
 	\cs{ttfamily} changes the current Japanese font amily to \cs{jttdefault}.
+	These classes and packages also redefine \cs{jttdefault} to
+	\cs{gtdefault} (\emph{gothic}~family).
   } specifies the Japanese font family in \cs{verb}~or~\texttt{verbatim} environment.
   The default value of \cs{jttdefault} is \cs{mcdefault}, so \emph{mincho} family is used.
 %</en>
@@ -1018,12 +1020,13 @@ Note that the bold series in both family are same as the medium series of \emph{
   \ \cs{jttdefault} で指定する%
   \footnote{%
 	\Pkg{ltjsclasses}を使用したり，あるいは \texttt{match} オプションを指定して\Pkg{luatexja-fontspec}%
-	パッケージを読み込んだときは，単なる \cs{ttfamily} によっても和文フォントが
-	\ \cs{jttfamily} に変更される．
+	や\Pkg{luatexja-preset}パッケージを読み込んだときは，単なる \cs{ttfamily} によっても和文フォントが
+	\ \cs{jttdefault}\ に変更される．また，これらのクラスファイルやパッケージは
+	\ \cs{jttdefault}\ を \cs{gtdefault}（ゴシック体）に再定義する．
   }．標準値は \cs{mcdefault}，つまり明朝体として用いるのと
   同じフォントファミリである．
 %</ja>
-  
+
 %<*en>
 \item If you use the \Pkg{beamer} class with the default font theme (which uses sans serif
       fonts) and with \LuaTeX-ja, you might want to change default Japanese fonts to
@@ -1486,13 +1489,14 @@ For example, the line~5 in below example is eqivalent to lines 1--3.
 %<en>\paragraph{General options}
 %<ja>\paragraph{一般的なオプション}
 \begin{cslist}[before*=]
-
-\item[fontspec]
+\item[fontspec%
+%<en>\textrm{~(enabled by default)}
+%<ja>\emph{\gtfamily （既定）}
+]
 %<*en>
 With this option, Japanese fonts are selected using functionality of
 the \Pkg{luatexja-fontspec} package. This means that the \Pkg{fontspec} package is
 	     automatically loaded by this package.
-\emph{This option is enabled by default.}
 
 If you need to pass some options to \Pkg{fontspec}, you can load \Pkg{fontspec} manually
 before \Pkg{luatexja-preset}:
@@ -1500,7 +1504,6 @@ before \Pkg{luatexja-preset}:
 %<*ja>
 \Pkg{luatexja-fontspec}パッケージの機能を用いて和文フォントを選択する．
 これは，\Pkg{fontspec}パッケージが自動で読み込まれることを意味する．
-\emph{このオプションは標準で有効になっている．}
 
 もし\Pkg{fontspec}パッケージに何らかのオプションを渡す必要がある
 \footnote{例えば，数式フォントまで置換されてしまい，\cs{mathit}によってギリシャ文字の
@@ -1547,19 +1550,39 @@ In this case, one can use \cs{setmainfont} etc.\ to select \emph{alphabetic} fon
 	     いる場合は \texttt{nfssonly} オプションは無視される．
 %</ja>
 
-\item[nodeluxe]
+\item[match]
 %<*en>
+If this option is specified, usual family-changing commands such as
+\cs{rmfamily},~\cs{textrm}, \cs{sffamily},~\dots\ also change Japanese font family.
+This option is passed to \Pkg{luatexja-fontspec}, if \texttt{fontspec}
+option is specifed.
+%</en>
+
+%<*ja>
+このオプションが指定されると，「\pLaTeXe 新ドキュメントクラス」のように\
+\cs{rmfamily}, \verb+\textrm{...}+, \cs{sffamily} 等が
+欧文フォントだけでなく和文フォントも変更するようになる．
+\ \texttt{fontspec}\ 
+オプションが有効になっている場合は，このオプションは \Pkg{luatexja-fontspec} パッケージへと渡される．
+%</ja>
+
+
+\item[nodeluxe%
+%<en>\textrm{~(enabled by default)}
+%<ja>\emph{\gtfamily （既定）}
+]
+%<*en>
+The nagation of \texttt{deluxe} option.
 Use one-weighted \textit{mincho} and \textit{gothic} font families.
 This means that \verb+\mcfamily\bfseries+, \verb+\gtfamily\bfseries+ and
 \verb+\gtfamily\mdseries+ use the same font.
-\emph{This option is enabled by default.}
 %</en>
 %<*ja>
+\texttt{deluxe}オプションの否定．
 \LaTeXe 環境下の標準設定のように，明朝体・ゴシック体を各1ウェイトで使用する．
 より具体的に言うと，この設定の下では
 \ \verb+\mcfamily\bfseries+, \verb+\gtfamily\bfseries+,
 \verb+\gtfamily\mdseries+はみな同じフォントとなる．
-\emph{このオプションは標準で有効になっている．}
 %</ja>
 \item[deluxe]
 %<*en>
@@ -1596,8 +1619,17 @@ characters designed for ruby.
 }．
 %</ja>
 \item[bold]
-%<en>Substitute bold series of \textit{gothic} for  bold series of \textit{mincho}.
-%<ja>「明朝の太字」をゴシック体の太字によって代替する．
+%<*en>
+Substitute bold series of \textit{gothic} for  bold series of \textit{mincho}.
+If \texttt{nodeluxe} option is enabled, medium series of \textit{gothic} is also changed, 
+since we use same font for both series of \textit{gothic}.
+%</en>
+%<*ja>
+「明朝の太字」をゴシック体の太字によって代替する．
+もし\texttt{nodeluxe}オプションが指定されている場合は，ゴシック体は1ウェイトしか使用されな
+	   いため，
+「ゴシック体の中字」も同時に変更されることになる．
+%</ja>
 \item[90jis]
 %<en>Use 90JIS glyph variants if possible.
 %<ja>出来る限り90JISの字形を使う．
@@ -1613,6 +1645,7 @@ Use the JFM \texttt{jfm-jis.lua}, instead of \texttt{jfm-ujis.lua}, which is the
 用いるJFMを（JISフォントメトリック類似の）\texttt{jfm-jis.lua}にする．このオプションがない時は
 \LuaTeX-ja標準の\texttt{jfm-ujis.lua}が用いられる．
 %</ja>
+
 \end{cslist}
 %<*en>
 Note that \texttt{90jis} and \texttt{jis2004} only affect with \textit{mincho},
@@ -1621,8 +1654,8 @@ We didn't taken account of  when both \texttt{90jis} and \texttt{jis2004} are sp
 %</en>
 %<*ja>
 \texttt{90jis}と\texttt{jis2004}については本パッケージで定義された
-明朝体・ゴシック体（・丸ゴシック体）にのみ有効である．両オプションが
-同時に指定された場合の動作については全く考慮していない．
+明朝体・ゴシック体（・丸ゴシック体）にのみ有効である．
+両オプションが同時に指定された場合の動作については全く考慮していない．
 %</ja>
 
 %<en>\paragraph{Presets for multi weight}
@@ -1721,7 +1754,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{tabular}
 \end{center}
 
-%<ja>\medskip
+%<ja>\newpage
 
  \item[morisawa-pro]  Morisawa Pro (Adobe-Japan1-4) fonts.
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
@@ -1781,7 +1814,8 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{tabular}
 \end{center}
 
- \item[moga-mobo]  MogaMincho, MogaGothic, and MoboGothic.
+%<en>\newpage
+\item[moga-mobo]  MogaMincho, MogaGothic, and MoboGothic.
 %<en>These fonts can be downloaded from\\\hfill \url{http://yozvox.web.fc2.com/}.
 %<ja>これらのフォントは \url{http://yozvox.web.fc2.com/} からダウンロードできる．
 
@@ -1795,9 +1829,9 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<ja>\smash{\raisebox{1.5ex}{\gt 明朝}}%
  &bold&Moga90Mincho Bold&MogaMincho Bold\\
 \midrule
- &&Moga90Gothic&MogaGothic\\
+ &&Moga90Gothic*&MogaGothic*\\
  &\smash{\raisebox{1.5ex}{medium}}
- &Moga90Gothic&MogaGothic\\
+ &Moga90Gothic Bold&MogaGothic Bold\\
 \cmidrule(l){2-4}
 %<en>\textit{gothic}%
 %<ja>\gt ゴシック
@@ -3922,13 +3956,12 @@ JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 \catcode`\<=12\catcode`\>=12
 \ltjsetparameter{jacharrange={+3}}
 \small
-
 \def\r#1#2{%
   \hbox{\tate\Large\vrule
   \parbox{7\zw}{%
     \addjfontfeatures{TateFeatures={Opacity=0.5, Color=#2, JFM=#1}}\noindent
-    ◆◆◆◆◆◆◆
-    ある日モモちゃんがお使いで迷子になって泣きました．
+    ◆◆◆◆◆◆◆\
+    ある日モモちゃんがお使いで迷子になって泣きました。
   }\vrule}}
 \def\s#1#2{%
   \hbox{\tate\Large

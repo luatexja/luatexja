@@ -22,7 +22,7 @@
 %  -----------------------------------------
 %
 % \fi
-% \CheckSum{5229}
+% \CheckSum{5200}
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -56,8 +56,8 @@
 \usepackage{doc}
 \usepackage{fontspec}
 \usepackage[ipaex,nfssonly]{luatexja-preset}
-\usepackage{unicode-math}
-\setmathfont{Latin Modern Math}
+%%%%\usepackage{unicode-math}
+%%%%\setmathfont{Latin Modern Math}
 \usepackage[unicode]{hyperref}
 \addtolength{\textwidth}{-1in}
 \addtolength{\evensidemargin}{1in}
@@ -136,6 +136,9 @@
 % [2014-07-26 LTJ] 縦組用和文フォントの設定を加えました．
 %
 % [2014-12-24 LTJ] |\@setfontsize| 中の和欧文間空白の設定で if 文が抜けていたのを直しました．
+%
+% [2016-01-30 LTJ] |\rmfamily| 他で和文フォントファミリも変更するコードを
+% Lua\TeX-ja カーネル内に移しました．
 %
 % \StopEventually{}
 %
@@ -831,6 +834,9 @@
 %
 % [2004-11-03] |\rmfamily| も和文対応にしました。
 %
+% [2016-01-30 LTJ] |\rmfamily|, |\sffamily|, |\ttfamily| の再定義をLua\TeX-ja
+% カーネルに移動させたので，ここでは和文対応にするフラグ |\@ltj@match@family|\ 
+% を有効にさせるだけでよいです．
 %    \begin{macrocode}
 \DeclareFontShape{JY3}{mc}{bx}{n}{<->ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{gt}{bx}{n}{<->ssub*gt/m/n}{}
@@ -850,16 +856,7 @@
 %% \DeclareFontShape{JT3}{gt}{m}{sl}{<->ssub*gt/m/n}{}
 %% \DeclareFontShape{JT3}{mc}{bx}{it}{<->ssub*gt/m/n}{}
 %% \DeclareFontShape{JT3}{mc}{bx}{sl}{<->ssub*gt/m/n}{}
-\renewcommand\jttdefault{\gtdefault}
-\DeclareRobustCommand\rmfamily
-        {\not@math@alphabet\rmfamily\mathrm
-         \romanfamily\rmdefault\kanjifamily\mcdefault\selectfont}
-\DeclareRobustCommand\sffamily
-        {\not@math@alphabet\sffamily\mathsf
-         \romanfamily\sfdefault\kanjifamily\gtdefault\selectfont}
-\DeclareRobustCommand\ttfamily
-        {\not@math@alphabet\ttfamily\mathtt
-         \romanfamily\ttdefault\kanjifamily\jttdefault\selectfont}
+\renewcommand\jttdefault{\gtdefault}\@ltj@match@familytrue
 %    \end{macrocode}
 %%
 % Lua\TeX-jaでは和文組版に伴うグルーはノードベースで挿入するようになり，また
@@ -1112,7 +1109,7 @@
 % ここで実際に標準フォントサイズで初期化します。
 %
 %    \begin{macrocode}
-\normalsize
+\mcfamily\selectfont\normalsize
 %    \end{macrocode}
 %
 % \end{macro}

@@ -10,15 +10,7 @@
 %%%%%%%% Change Japanese font family by \rmfamily or not
 \cs_new:Npn \ltj_fontspec_match_cmd {
   \renewcommand\jttdefault{\gtdefault}
-  \DeclareRobustCommand\rmfamily
-  {\not@math@alphabet\rmfamily\mathrm
-     \romanfamily\rmdefault\kanjifamily\mcdefault\selectfont}
-  \DeclareRobustCommand\sffamily
-  {\not@math@alphabet\sffamily\mathsf
-     \romanfamily\sfdefault\kanjifamily\gtdefault\selectfont}
-  \DeclareRobustCommand\ttfamily
-  {\not@math@alphabet\ttfamily\mathtt
-     \romanfamily\ttdefault\kanjifamily\jttdefault\selectfont}
+  \@ltj@match@familytrue
   \DeclareDocumentCommand \setmonojfont { O{} m } {
     \ltj_fontspec_set_family:Nnn \jttdefault {##1}{##2}
     \normalfont
