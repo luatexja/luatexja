@@ -159,14 +159,13 @@ local function extract(head)
 end
 
 luatexbase.add_to_callback('hpack_filter', extract,
-			   'ltj.hpack_filter_otf',
+			   'ltj.otf',
    luatexbase.priority_in_callback('pre_linebreak_filter',
-				   'ltj.pre_linebreak_filter'))
+				   'ltj.main'))
 luatexbase.add_to_callback('pre_linebreak_filter', extract,
-			   'ltj.pre_linebreak_filter_otf',
+			   'ltj.otf',
    luatexbase.priority_in_callback('pre_linebreak_filter',
-				   'ltj.pre_linebreak_filter'))
-
+				   'ltj.main'))
 
 -- additional callbacks
 -- 以下は，LuaTeX-ja に用意された callback のサンプルになっている．
@@ -222,10 +221,10 @@ do
       return p
    end
 
-   local function do_ivs_repr(head)
-      head = to_direct(head)
+   local function do_ivs_repr(h)
+      local head = to_direct(h)
       local p, r = head
-      local is_dir_tate = ltjs.list_dir == dir_tate
+      local is_dir_tate = (ltjs.list_dir == dir_tate)
       local attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
       local attr_kblshift = is_dir_tate and attr_tkblshift or attr_ykblshift
       local attr_curfnt =   is_dir_tate and attr_curtfnt or attr_curjfnt
@@ -237,7 +236,7 @@ do
             if q and getid(q)==id_glyph then
                local qc = getchar(q)
                if (qc>=0xFE00 and qc<=0xFE0F) or (qc>=0xE0100 and qc<0xE01F0) then
-                  -- q is a variation selector
+		   -- q is a variation selector
                   if qc>=0xE0100 then qc = qc - 0xE0100 end
                   local pt = ltjf_font_extra_info[pf]
                   pt = pt and pt[getchar(p)];  pt = pt and  pt[qc]
@@ -254,7 +253,7 @@ do
                      head = node_insert_after(head, p, np)
                      head = node_remove(head,p)
 		     node_free(p)
-                  end
+		  end
 		  p = r
 	       else
 		  p = q
@@ -265,8 +264,8 @@ do
 	 else
 	    p = node_next(p)
          end
-      end
-      return to_node(head)
+     end
+     return to_node(head)
    end
 
    enable_ivs = function ()
@@ -275,13 +274,13 @@ do
 			      'luatexja.otf.enable_ivs() was already called, so this call is ignored', '')
       else
 	 luatexbase.add_to_callback('hpack_filter',
-				    do_ivs_repr,'do_ivs', 
+				    do_ivs_repr, 'ltj.do_ivs', 
 				    luatexbase.priority_in_callback('hpack_filter',
-								    'ltj.hpack_filter_pre')+1)
+								    'ltj.set_stack_level')+1)
 	 luatexbase.add_to_callback('pre_linebreak_filter',
-				    do_ivs_repr, 'do_ivs', 
+				    do_ivs_repr, 'ltj.do_ivs', 
 				    luatexbase.priority_in_callback('pre_linebreak_filter',
-								    'ltj.pre_linebreak_filter_pre')+1)
+								    'ltj.set_stack_level')+1)
 	 is_ivs_enabled = true
       end
    end

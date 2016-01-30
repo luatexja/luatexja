@@ -126,6 +126,7 @@ end
 local ltjs_report_stack_level = ltjs.report_stack_level
 local ltjf_vert_form_table    = ltjf.vert_form_table
 local ltjf_font_metric_table  = ltjf.font_metric_table
+local font_getfont = font.getfont
 local function set_box_stack_level(head, mode)
    local box_set, cl = 0, tex.currentgrouplevel + 1
    for _,p  in pairs(wt) do
@@ -144,12 +145,11 @@ local function set_box_stack_level(head, mode)
 	    setfield(p, 'font', nf)
 	    if ltjf_font_metric_table[nf].vert_activated then
 	       pc = ltjf_vert_form_table [getchar(p)]
-	       if font.getfont(nf).characters[pc] then setfield(p, 'char', pc) end
+	       if font_getfont(nf).characters[pc] then setfield(p, 'char', pc) end
 	    end
 	 end
       end
    end
-   --luatexja.ext_show_node_list(head, 'S> ', print)
    return head
 end
 
@@ -157,11 +157,11 @@ end
 luatexbase.add_to_callback('hpack_filter',
    function (head)
      return set_box_stack_level(head, true)
-   end,'ltj.hpack_filter_pre',1)
+   end,'ltj.set_stack_level',1)
 luatexbase.add_to_callback('pre_linebreak_filter',
   function (head)
      return set_box_stack_level(head, false)
-  end,'ltj.pre_linebreak_filter_pre',1)
+  end,'ltj.set_stack_level',1)
 
 luatexja.pretreat = {
    set_box_stack_level = set_box_stack_level,
