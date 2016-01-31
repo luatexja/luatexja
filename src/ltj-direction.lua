@@ -275,7 +275,7 @@ do
       end
    end
 
-   luatexbase.add_to_callback('hpack_filter',
+   ltjb.add_to_callback('hpack_filter',
 			      create_dir_whatsit_hpack, 'ltj.create_dir_whatsit', 10000)
 end
 
@@ -290,7 +290,7 @@ do
       ensure_tex_attr(attr_dir, 0)
       return h
    end
-   luatexbase.add_to_callback('post_linebreak_filter',
+   ltjb.add_to_callback('post_linebreak_filter',
 			      create_dir_whatsit_parbox, 'ltj.create_dir_whatsit', 10000)
 end
 
@@ -987,7 +987,7 @@ do
       stop_time_measure('direction_vpack')
       return to_node(hd)
    end
-   luatexbase.add_to_callback('vpack_filter',
+   ltjb.add_to_callback('vpack_filter',
 			      dir_adjust_vpack,
 			      'ltj.direction', 10000)
 end
@@ -997,7 +997,7 @@ do
    local function dir_adjust_pre_output(h, gc)
       return to_node(create_dir_whatsit_vbox(to_direct(h), gc))
    end
-   luatexbase.add_to_callback('pre_output_filter',
+   ltjb.add_to_callback('pre_output_filter',
 			      dir_adjust_pre_output,
 			      'ltj.direction', 10000)
 
@@ -1026,7 +1026,7 @@ do
 	 end
       end
    end
-   luatexbase.add_to_callback('buildpage_filter',
+   ltjb.add_to_callback('buildpage_filter',
 			      dir_adjust_buildpage,
 			      'ltj.direction', 10000)
 end

@@ -1,0 +1,39 @@
+\RequirePackage{luatex85}
+\documentclass{ltjarticle}
+\usepackage[margin=20mm]{geometry}
+\usepackage{luatexja-otf}
+\usepackage[kozuka-pr6n]{luatexja-preset}
+\normalsize
+\def\test{ある日、モモちゃんが初めて「お使い」に行ったとき，
+  彼女は道に迷って泣きました。医学，芦屋}
+\def\CB{\par{\catcode`_=12\ttfamily PR\directlua{
+  for i,v in pairs(luatexbase.callback_descriptions('hpack_filter')) do
+    tex.sprint(v .. ', ')
+  end
+}}\par{\catcode`_=12\ttfamily HP\directlua{
+  for i,v in pairs(luatexbase.callback_descriptions('pre_linebreak_filter')) do
+    tex.sprint(v .. ', ')
+  end
+}}\par}
+
+\begin{document}
+\CB
+\addjfontfeatures{RawFeature={+trad;+jp04}}\test
+\medskip
+
+\vbox{\tate\Large\hsize=9\zw\test}
+\medskip
+
+\directlua{luatexja.otf.enable_ivs()}
+\CB
+\vbox{\tate\Large\hsize=9\zw\test}
+\medskip
+
+\directlua{luatexja.otf.disable_ivs()}
+\CB
+\vbox{\tate\Large\hsize=9\zw\test}
+\medskip
+
+\test
+\end{document}
+

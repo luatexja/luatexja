@@ -158,15 +158,10 @@ local function extract(head)
    return to_node(head)
 end
 
-luatexbase.add_to_callback('hpack_filter', extract,
-			   'ltj.otf',
-   luatexbase.priority_in_callback('pre_linebreak_filter',
-				   'ltj.main'))
-luatexbase.add_to_callback('pre_linebreak_filter', extract,
-			   'ltj.otf',
-   luatexbase.priority_in_callback('pre_linebreak_filter',
-				   'ltj.main'))
-
+ltjb.add_to_callback('hpack_filter', extract,'ltj.otf',
+  luatexbase.priority_in_callback('hpack_filter', 'ltj.main'))
+ltjb.add_to_callback('pre_linebreak_filter', extract,'ltj.otf',
+  luatexbase.priority_in_callback('pre_linebreak_filter', 'ltj.main'))
 -- additional callbacks
 -- 以下は，LuaTeX-ja に用意された callback のサンプルになっている．
 --   JFM の文字クラスの指定の所で，"AJ1-xxx" 形式での指定を可能とした．
@@ -273,14 +268,10 @@ do
 	 ltjb.package_warning('luatexja-otf',
 			      'luatexja.otf.enable_ivs() was already called, so this call is ignored', '')
       else
-	 luatexbase.add_to_callback('hpack_filter',
-				    do_ivs_repr, 'ltj.do_ivs', 
-				    luatexbase.priority_in_callback('hpack_filter',
-								    'ltj.set_stack_level')+1)
-	 luatexbase.add_to_callback('pre_linebreak_filter',
-				    do_ivs_repr,  'ltj.do_ivs', 
-				    luatexbase.priority_in_callback('pre_linebreak_filter',
-								    'ltj.set_stack_level')+1)
+	 ltjb.add_to_callback('hpack_filter', do_ivs_repr, 'ltj.do_ivs',
+            luatexbase.priority_in_callback('hpack_filter', 'luaotfload.node_processor'))
+	 ltjb.add_to_callback('pre_linebreak_filter', do_ivs_repr, 'ltj.do_ivs',
+            luatexbase.priority_in_callback('pre_linebreak_filter', 'luaotfload.node_processor'))
 	 is_ivs_enabled = true
       end
    end

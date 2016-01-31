@@ -400,6 +400,33 @@ ltjb.generic_info_no_line = generic_info_no_line
 ltjb.ltj_warning_no_line = ltj_warning_no_line
 ltjb.ltj_error = ltj_error
 
+---- deterministic version of luatexbase.add_to_callback
+function ltjb.add_to_callback(name,fun,description,priority)
+    local priority= priority
+    if priority==nil then
+	priority=#luatexbase.callback_descriptions(name)+1
+    end
+    if(luatexbase.callbacktypes[name] == 3 and
+    priority == 1 and
+    #luatexbase.callback_descriptions(name)==1) then
+	luatexbase.module_warning("luatexbase",
+	"resetting exclusive callback: " .. name)
+	luatexbase.reset_callback(name)
+    end
+    local saved_callback={},ff,dd
+    for k,v in ipairs(luatexbase.callback_descriptions(name)) do
+	if k >= priority then
+	    ff,dd= luatexbase.remove_from_callback(name, v)
+	    saved_callback[#saved_callback+1]={ff,dd}
+	end
+    end
+    luatexbase.base_add_to_callback(name,fun,description)
+    for _,v in ipairs(saved_callback) do
+	luatexbase.base_add_to_callback(name,v[1],v[2])
+    end
+    return
+end
+
 -------------------- mock of debug logger
 if not ltjb.out_debug then
    local function no_op() end

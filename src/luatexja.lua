@@ -318,22 +318,20 @@ do
    end
 
    -- callbacks
-   luatexbase.add_to_callback(
+   ltjb.add_to_callback(
       'pre_linebreak_filter',
       function (head,groupcode)
 	 return main_process(head, true, tex.textdir, groupcode)
       end,'ltj.main',
-      luatexbase.priority_in_callback('pre_linebreak_filter',
-				      'luaotfload.node_processor')+1)
-   luatexbase.add_to_callback(
+      luatexbase.priority_in_callback('pre_linebreak_filter', 'luaotfload.node_processor')+1)
+   ltjb.add_to_callback(
       'hpack_filter',
       function (head,groupcode,size,packtype, dir)
 	 return main_process(head, false, dir, groupcode)
       end,'ltj.main',
-      luatexbase.priority_in_callback('hpack_filter',
-				      'luaotfload.node_processor') + 1)
-   luatexbase.add_to_callback('pre_linebreak_filter', adjust_icflag, 'ltj.adjust_icflag', 1)
-   luatexbase.add_to_callback('hpack_filter', adjust_icflag, 'ltj.adjust_icflag', 1)
+      luatexbase.priority_in_callback('hpack_filter', 'luaotfload.node_processor')+1)
+   ltjb.add_to_callback('pre_linebreak_filter', adjust_icflag, 'ltj.adjust_icflag', 1)
+   ltjb.add_to_callback('hpack_filter', adjust_icflag, 'ltj.adjust_icflag', 1)
 
 end
 

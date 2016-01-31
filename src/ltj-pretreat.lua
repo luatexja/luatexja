@@ -116,7 +116,7 @@ do
       return h
    end
 
-   luatexbase.add_to_callback('hyphenate',
+   ltjb.add_to_callback('hyphenate',
 			      function (head,tail)
 				 return suppress_hyphenate_ja(head)
 			      end,'ltj.hyphenate')
@@ -139,9 +139,8 @@ local function set_box_stack_level(head, mode)
    if ltjs.list_dir == dir_tate then
       for p in Dnode.traverse_id(id_glyph,to_direct(head)) do
          if (has_attr(p, attr_icflag) or 0)<=0 and getfield(p, 'lang')==lang_ja then
-            local pfn = has_attr(p, attr_curtfnt) or getfont(p)
             local pc = ltjs_orig_char_table[p]
-	    local nf = ltjf_replace_altfont(pfn, pc)
+	    local nf = ltjf_replace_altfont( has_attr(p, attr_curtfnt) or getfont(p) , pc)
 	    setfield(p, 'font', nf)
 	    if ltjf_font_metric_table[nf].vert_activated then
 	       pc = ltjf_vert_form_table [getchar(p)]
@@ -154,11 +153,11 @@ local function set_box_stack_level(head, mode)
 end
 
 -- CALLBACKS
-luatexbase.add_to_callback('hpack_filter',
+ltjb.add_to_callback('hpack_filter',
    function (head)
      return set_box_stack_level(head, true)
    end,'ltj.set_stack_level',1)
-luatexbase.add_to_callback('pre_linebreak_filter',
+ltjb.add_to_callback('pre_linebreak_filter',
   function (head)
      return set_box_stack_level(head, false)
   end,'ltj.set_stack_level',1)
