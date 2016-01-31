@@ -606,8 +606,9 @@
 
 %%%% \hbox, \vbox, \vtop
 \setbox\z@\hbox{%
+  \primitive\everymath{}
   $\directlua{% This value depends on the version of LuaTeX.
-    luatexja.stack.mmode = -tex.nest[tex.nest.ptr].mode
+     luatexja.stack.mmode = -tex.nest[tex.nest.ptr].mode
   }$%
 }
 \setbox\z@\box\voidb@x

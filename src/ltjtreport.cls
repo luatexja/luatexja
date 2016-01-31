@@ -39,7 +39,7 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjtreport}
-  [2015/10/18 v1.6-ltj-10
+  [2016/01/31 v1.6-ltj-11
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -182,14 +182,18 @@
 \setlength\columnseprule{0\p@}
 \setlength{\@tempdima}{\paperwidth}
 \setlength{\@tempdimb}{\paperheight}
-\iftombow
-  \advance \@tempdima 2in
-  \advance \@tempdimb 2in
-\fi
 \ifdefined\pdfpagewidth
+  \iftombow
+    \advance \@tempdima 2in
+    \advance \@tempdimb 2in
+  \fi
   \setlength{\pdfpagewidth}{\@tempdima}
   \setlength{\pdfpageheight}{\@tempdimb}
 \else
+  \iftombow
+    \advance \@tempdima 2in
+    \advance \@tempdimb 2in
+  \fi
   \setlength{\pagewidth}{\@tempdima}
   \setlength{\pageheight}{\@tempdimb}
 \fi

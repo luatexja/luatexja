@@ -141,6 +141,7 @@ do
    local STCK = luatexja.userid_table.STCK
    local IHB = luatexja.userid_table.IHB
    local sid_local = node.subtype('local_par')
+   local id_local = node.id('local_par')
 
    local function test_list(h, lv)
       if not h then
@@ -161,7 +162,7 @@ do
 	       elseif ps~=sid_local then
 		  flag = 0; break
 	       end
-	    else
+	    elseif p.id~=id_local then
 	       flag = 0; break
 	    end
 	 end
@@ -489,10 +490,12 @@ local function get_box_dir(b, default)
    local bh = getfield(b,'head')
    -- b は insert node となりうるので getlist() は使えない
    local c
-   for bh in traverse_id(id_whatsit, bh) do
-      if getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR then
-	 c = bh
-    	 dir = (dir==0) and has_attr(bh, attr_dir) or dir
+   if bh~=0 then -- bh != nil
+      for bh in traverse_id(id_whatsit, bh) do
+         if getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR then
+            c = bh
+           dir = (dir==0) and has_attr(bh, attr_dir) or dir
+         end
       end
    end
    -- for i=1,2 do

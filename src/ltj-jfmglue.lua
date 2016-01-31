@@ -523,6 +523,9 @@ calc_np_auxtable[13]        = calc_np_auxtable.box_like
 calc_np_auxtable[id_ins]    = calc_np_auxtable.skip
 calc_np_auxtable[id_mark]   = calc_np_auxtable.skip
 calc_np_auxtable[id_adjust] = calc_np_auxtable.skip
+if node.id('local_par') then
+   calc_np_auxtable[node.id('local_par')] = calc_np_auxtable.skip
+end
 
 function calc_np(last, lp)
    local k

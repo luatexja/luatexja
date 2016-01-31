@@ -85,12 +85,6 @@
   #4
 }
 
-%% \ltj@burst-`>TEXT
-%! トリックに使う \romannumeral をエイリアスしておく.
-% Gets the head of TEXT expanded repeatedly until an unexpandable
-% token is seen, and if the token is a space then it is gobbled.
-\let\ltj@burst\romannumeral
-
 %%------------------ LaTeX vs plain
 \ifltj@in@latex            %<*LaTeX>
 
@@ -140,50 +134,19 @@
 %% \ltj@gobble@num <number>
 %! 次に続く整数を(2 回展開で)読み捨てる. 
 \def\ltj@gobble@num{
-  \ltj@burst-`>\ltj@@gobble@num
-}
-\def\ltj@@gobble@num{
-  \expandafter\ltj@@gobble@numA\the\parshapeindent
-}
-\begingroup
-  \lccode`8=`p\lccode`9=`t
-\lowercase{\endgroup
-  \def\ltj@@gobble@numA#189{ }
+  \directlua{luatexja.token.scan_int()}
 }
 
 %% \ltj@gobble@glue <glue>
 %! 次に続くグルー値を(2 回展開で)読み捨てる. 
-\def\ltj@gobble@glue{%
-  \ltj@burst-`>\ltj@@gobble@glue
+\def\ltj@gobble@glue{
+  \directlua{luatexja.token.scan_glue()}
 }
-\def\ltj@@gobble@glue{
-  \expandafter\ltj@@gobble@glueA\the\glueshrinkorder
-}
-\def\ltj@@gobble@glueA#1{ }
 
 %% \ltj@gobble@dimen <dimen>
 %! 次に続く寸法値を(2 回展開で)読み捨てる. 
-\def\ltj@gobble@dimen{%
-  \ltj@burst-`>\ltj@@gobble@dimen
-}
-\def\ltj@@gobble@dimen{
-  \expandafter\ltj@@gobble@dimenA\the\glueshrinkorder
-  0pt minus
-}
-\def\ltj@@gobble@dimenA#1{ }
-
-%% \ltj@@scan@brace
-% This is to be followed by a macro with one argument; if the macro is
-% followed by an open-group token (catcode 1), then it receives as the
-% argument a token \bxnt@escape instead of the group initiated by the
-% open-group, which is left untouched.
-\def\ltj@@scan@brace{
-  \directlua{luatexja.base.scan_brace()}
-}
-
-%% \ltj@@scan@number
-\def\ltj@@scan@number{
-  \directlua{luatexja.base.scan_number()}
+\def\ltj@gobble@dimen{
+  \directlua{luatexja.token.scan_dimen()}
 }
 
 %% \ltj@grab@num <number>
@@ -197,25 +160,7 @@
 %!   (command_name が "assign_int" であるトークン).
 %! (注意: まだ文字表記(`A)に対応していません.)
 \def\ltj@grab@num{
-  \ltj@burst-`>\ltj@@grab@num
-}
-\def\ltj@@grab@num{
-  \ltj@@scan@brace\ltj@@grab@numA
-}
-\def\ltj@@grab@numA#1{
-  \ltj@ifx{#1\ltj@@q@escape}{}{%else
-    \ltj@@scan@number\ltj@@grab@numB#1
-  }
-}
-\def\ltj@@grab@numB#1{
-  \ltj@ifx{#1\ltj@@q@escape}{
-    {0}
-  }{
-    \ltj@@grab@numC
-  }
-}
-\def\ltj@@grab@numC#1\ltj@@q@escapenum{
-  {#1}
+  \directlua{tex.sprint('{' .. luatexja.token.scan_int() .. '}')}
 }
 
 %%------------------ Safe passing

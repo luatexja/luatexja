@@ -302,16 +302,18 @@
 \fi
 \setlength\paperwidth{\inv@mag\paperwidth}%
 \setlength\paperheight{\inv@mag\paperheight}%
-\setlength{\@tempdima}{\paperwidth}
-\setlength{\@tempdimb}{\paperheight}
-\iftombow
-  \advance \@tempdima 2in
-  \advance \@tempdimb 2in
-\fi
 \ifdefined\pdfpagewidth
+  \iftombow
+    \advance \@tempdima 2in
+    \advance \@tempdimb 2in
+  \fi
   \setlength{\pdfpagewidth}{\@tempdima}
   \setlength{\pdfpageheight}{\@tempdimb}
 \else
+  \iftombow
+    \advance \@tempdima 2in
+    \advance \@tempdimb 2in
+  \fi
   \setlength{\pagewidth}{\@tempdima}
   \setlength{\pageheight}{\@tempdimb}
 \fi

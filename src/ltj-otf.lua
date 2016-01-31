@@ -209,7 +209,7 @@ luatexbase.add_to_callback("luatexja.find_char_class",
 			   cid_set_char_class, "ltj.otf.find_char_class", 1)
 
 -------------------- IVS
-local enable_ivs
+local enable_ivs, disable_ivs
 do
    local is_ivs_enabled = false
 -- 組版時
@@ -231,13 +231,13 @@ do
       while p do
 	 local pid = getid(p)
 	 if pid==id_glyph then
-            local pf = getfont(p)
             local q = node_next(p) -- the next node of p
             if q and getid(q)==id_glyph then
                local qc = getchar(q)
                if (qc>=0xFE00 and qc<=0xFE0F) or (qc>=0xE0100 and qc<0xE01F0) then
 		   -- q is a variation selector
                   if qc>=0xE0100 then qc = qc - 0xE0100 end
+                  local pf = getfont(p)
                   local pt = ltjf_font_extra_info[pf]
                   pt = pt and pt[getchar(p)];  pt = pt and  pt[qc]
                   head, r = node_remove(head,q)
@@ -278,10 +278,17 @@ do
 				    luatexbase.priority_in_callback('hpack_filter',
 								    'ltj.set_stack_level')+1)
 	 luatexbase.add_to_callback('pre_linebreak_filter',
-				    do_ivs_repr, 'ltj.do_ivs', 
+				    do_ivs_repr,  'ltj.do_ivs', 
 				    luatexbase.priority_in_callback('pre_linebreak_filter',
 								    'ltj.set_stack_level')+1)
 	 is_ivs_enabled = true
+      end
+   end
+   disable_ivs = function ()
+      if is_ivs_enabled then
+	 luatexbase.remove_from_callback('hpack_filter', 'ltj.do_ivs')
+	 luatexbase.remove_from_callback('pre_linebreak_filter', 'ltj.do_ivs')
+	 is_ivs_enabled = false
       end
    end
 end
@@ -289,6 +296,7 @@ end
 luatexja.otf = {
   append_jglyph = append_jglyph,
   enable_ivs = enable_ivs,  -- 隠し機能: IVS
+  disable_ivs = disable_ivs,  -- 隠し機能: IVS
   cid = cid,
 }
 

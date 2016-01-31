@@ -481,12 +481,12 @@ local function debug_show_node_X(p,print_fn, limit)
             prefix, inner_depth = k, bid
          end
       else
-         s = s .. node.subtype(p.subtype)
+         s = s .. (node.subtype(p.subtype) or '')
 	 if p.subtype==1 then
 	    s = s .. ' stream=' .. p.stream
 	    print_fn(s)
 	    for i=1,#p.data do
-	       print_fn(s .. '  [' .. i .. '] = ' .. tostring(token.command_name(p.data[i])))
+	       print_fn(s .. '  [' .. i .. '] = ' .. tostring(p.data[i].csname))
 	    end
 	 else
 	    print_fn(s)

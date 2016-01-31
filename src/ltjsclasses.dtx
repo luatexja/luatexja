@@ -720,17 +720,21 @@
 %
 % [2015-10-18 LTJ] Lua\TeX\ 0.81.0ではプリミティブの名称変更がされたので，
 % それに合わせておきます．
+%
+% [2016-01-31 LTJ] [2015-10-18]の処理は不完全でした．
 %    \begin{macrocode}
-\setlength{\@tempdima}{\paperwidth}
-\setlength{\@tempdimb}{\paperheight}
-\iftombow
-  \advance \@tempdima 2in
-  \advance \@tempdimb 2in
-\fi
 \ifdefined\pdfpagewidth
+  \iftombow
+    \advance \@tempdima 2in
+    \advance \@tempdimb 2in
+  \fi
   \setlength{\pdfpagewidth}{\@tempdima}
   \setlength{\pdfpageheight}{\@tempdimb}
 \else
+  \iftombow
+    \advance \@tempdima 2in
+    \advance \@tempdimb 2in
+  \fi
   \setlength{\pagewidth}{\@tempdima}
   \setlength{\pageheight}{\@tempdimb}
 \fi
