@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsbook}
-  [2016/01/31 ]
+  [2015/10/18 ]
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
@@ -302,18 +302,16 @@
 \fi
 \setlength\paperwidth{\inv@mag\paperwidth}%
 \setlength\paperheight{\inv@mag\paperheight}%
+\setlength{\@tempdima}{\paperwidth}
+\setlength{\@tempdimb}{\paperheight}
+\iftombow
+  \advance \@tempdima 2in
+  \advance \@tempdimb 2in
+\fi
 \ifdefined\pdfpagewidth
-  \iftombow
-    \advance \@tempdima 2in
-    \advance \@tempdimb 2in
-  \fi
   \setlength{\pdfpagewidth}{\@tempdima}
   \setlength{\pdfpageheight}{\@tempdimb}
 \else
-  \iftombow
-    \advance \@tempdima 2in
-    \advance \@tempdimb 2in
-  \fi
   \setlength{\pagewidth}{\@tempdima}
   \setlength{\pageheight}{\@tempdimb}
 \fi

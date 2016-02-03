@@ -1101,6 +1101,7 @@ end
 -- return value: (the initial cursor lp), (last node)
 local init_var
 do
+   local id_local = node.id('local_par')
    local KANJI_SKIP   = luatexja.icflag_table.KANJI_SKIP
    local XKANJI_SKIP   = luatexja.icflag_table.XKANJI_SKIP
    local KSK  = luatexja.stack_table_index.KSK
@@ -1151,8 +1152,10 @@ do
 	 -- the current list is to be line-breaked:
 	 -- hbox from \parindent is skipped.
 	 local lp, par_indented, lpi, lps  = head, 'boxbdd', getid(head), getsubtype(head)
-	 while lp and ((lpi==id_whatsit and lps~=sid_user)
-		       or ((lpi==id_hlist) and (lps==3))) do
+	 while lp and 
+	    ((lpi==id_whatsit and lps~=sid_user)
+	       or ((lpi==id_hlist) and (lps==3))
+               or (lpi==id_local)) do
 	    if (lpi==id_hlist) and (lps==3) then
                Np.char, par_indented = 'parbdd', 'parbdd'
                Np.width = getfield(lp, 'width')
