@@ -365,9 +365,41 @@
           \vrule\@width\z@
                 \@height.7\baselineskip \@depth.3\baselineskip}%
         \let\size@update\relax}}
-\newbox\adjust@box
-\newbox\adjust@box@aux
-\newdimen\adjust@dimen
+
+\ifdefined\newluafunction
+  \newluafunction\ltj@@adjust@baseline@inner
+  \directlua{%
+    local t = lua.get_functions_table()
+    t[\the\ltj@@adjust@baseline@inner] = function()
+      local ft = luatexja.jfont.font_metric_table[
+        tex.getattribute('ltj@curtfnt')] or {}
+      ft = ft and ft.char_type
+      ft = ft and ft[0]
+      local fm = font.getfont(font.current()).characters[77] or {} %% 'M'
+      print('M', fm.height, fm.depth)
+      print('漢', ft.height, ft.depth)
+      tex.setattribute('ltj@tablshift',
+        0.5*(fm.height - fm.depth - ft.height+ ft.depth))
+      print('tab', tex.getattribute('ltj@tablshift'))
+    end
+  }
+  \def\ltj@@adjust@baseline{\luafunction\ltj@@adjust@baseline@inner}
+\else
+  \newbox\adjust@box@aux
+  \newdimen\adjust@dimen
+  \def\ltj@@adjust@baseline{%
+    \setbox\adjust@box@aux\hbox{\tate\ltj@tkblshift\z@ 漢}%
+    \setbox\adjust@box\hbox{\tate\ltj@tablshift\z@ M}%
+    \adjust@dimen\ht\adjust@box
+    \advance\adjust@dimen\dp\adjust@box
+    \advance\adjust@dimen-\ht\adjust@box@aux
+    \divide\adjust@dimen\tw@
+    \advance\adjust@dimen0.5\dp\adjust@box@aux
+    \advance\adjust@dimen-\dp\adjust@box
+    \ltj@tablshift=\adjust@dimen
+  }
+\fi
+  \newbox\adjust@box
 \def\adjustbaseline{%
     \setbox\adjust@box\hbox{%
       \ltj@ykblshift\z@\ltj@tkblshift\z@ 漢}%
@@ -377,15 +409,8 @@
     \cvs\normalbaselineskip
     \chs\cwd
     \cHT\cht \advance\cHT\cdp
-    \setbox\adjust@box@aux\hbox{\tate\ltj@tkblshift\z@ 漢}%
-    \setbox\adjust@box\hbox{\tate\ltj@tablshift\z@ M}%
-    \adjust@dimen\ht\adjust@box
-    \advance\adjust@dimen\dp\adjust@box
-    \advance\adjust@dimen-\ht\adjust@box@aux
-    \divide\adjust@dimen\tw@
-    \advance\adjust@dimen0.5\dp\adjust@box@aux
-    \advance\adjust@dimen-\dp\adjust@box
-    \ltj@tablshift=\adjust@dimen}
+    \ltj@@adjust@baseline
+}
 \DeclareRobustCommand\romanencoding[1]{%
     \expandafter\ifx\csname T@#1\endcsname\relax
       \@latex@error{Encoding scheme `#1' unknown}\@eha
