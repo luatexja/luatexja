@@ -373,20 +373,16 @@
     t[\the\ltj@@adjust@baseline@inner] = function()
       local ft = luatexja.jfont.font_metric_table[
         tex.getattribute('ltj@curtfnt')] or {}
-      ft = ft and ft.char_type
-      ft = ft and ft[0]
+      ft = ft and ft.char_type or {}
+      ft = ft and ft[0] or {}
       local fm = font.getfont(font.current()).characters[77] or {} %% 'M'
-      print('M', fm.height, fm.depth)
-      print('漢', ft.height, ft.depth)
       tex.setattribute('ltj@tablshift',
-        0.5*(fm.height - fm.depth - ft.height+ ft.depth))
-      print('tab', tex.getattribute('ltj@tablshift'))
+        0.5*((fm.height or 0)- (fm.depth or 0)
+          - (ft.height or 0)+ (ft.depth or 0)))
     end
   }
   \def\ltj@@adjust@baseline{\luafunction\ltj@@adjust@baseline@inner}
 \else
-  \newbox\adjust@box@aux
-  \newdimen\adjust@dimen
   \def\ltj@@adjust@baseline{%
     \setbox\adjust@box@aux\hbox{\tate\ltj@tkblshift\z@ 漢}%
     \setbox\adjust@box\hbox{\tate\ltj@tablshift\z@ M}%
@@ -399,7 +395,9 @@
     \ltj@tablshift=\adjust@dimen
   }
 \fi
-  \newbox\adjust@box
+\newbox\adjust@box
+\newbox\adjust@box@aux
+\newdimen\adjust@dimen
 \def\adjustbaseline{%
     \setbox\adjust@box\hbox{%
       \ltj@ykblshift\z@\ltj@tkblshift\z@ 漢}%
