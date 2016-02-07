@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-listings}[2015/12/11 Patch to listings for LuaTeX-ja]
+\ProvidesPackage{lltjp-listings}[2016/02/07 Patch to listings for LuaTeX-ja]
 \RequirePackage{listings,luatexbase-cctb}
 
 %%%%%%%%%%%%%%%% Japanese support
@@ -286,7 +286,7 @@
     \else
         \lst@lExtend\lst@arg{\lst@temp~}%
         \expandafter\lst@InsideConvert@
-    \fi #2}
+    \fi#2}
 }\endgroup
 
 \lst@AddToHook{ExitVars}{%
@@ -344,7 +344,7 @@
 
 %%%%%%%%%%%%%%%% escape to \LaTeX
 \lstloadaspects{escape}
-\gdef\lst@Escape#1#2#3#4{
+\gdef\lst@Escape#1#2#3#4{%
     \lst@CArgX #1\relax\lst@CDefX
         {}%
         {\lst@ifdropinput\else

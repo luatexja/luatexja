@@ -24,6 +24,7 @@
 
 %%%%%%%% fonts
 \usepackage{luatexja-otf}
+\directlua{luatexja.otf.enable_ivs()}
 \usepackage[no-math]{fontspec}
 \setmainfont[Ligatures=TeX]{Linux Libertine O}
 \setmonofont[Scale=MatchLowercase, ItalicFont=lmmono10-italic.otf,
@@ -5240,11 +5241,11 @@ in \pTeX, and symbols beside each parameter has the following meaning:
 %</ja>
 \begin{itemize}
 %<*en>
-\item ``\ast'' : values at the end of a paragraph or a hbox are
+\item ``$\ast$'' : values at the end of a paragraph or a hbox are
 adopted in the whole paragraph or the whole hbox.
 %</en>
 %<*ja>
-\item ``\ast''：段落やhboxの終端での値がその段落／hbox全体で用いられる．
+\item ``$\ast$''：段落やhboxの終端での値がその段落／hbox全体で用いられる．
 %</ja>
 %<*en>
 \item ``\dagger'': assignments are always global.
@@ -6159,8 +6160,10 @@ to match the vertical center of ``M'' and that of ``あ''  in vertical typesetti
   + d_{\text{あ}} - d_{\text{M}},
 \]
 where $h_{a}$~and~$d_{a}$ denote the height of ``$a$'' and the depth, respectively.
-In \LuaTeX-ja, this \cs{adjustbaseline} does same task, namely setting the
+In \LuaTeX-ja, this \cs{adjustbaseline} does similar task, namely setting the
 	     \Param{talbaselineshift} parameter.
+If the \LaTeX\ is 2015/10/01 release or later, \LuaTeX-ja use a Japanese 
+character whose character class is zero,  instead of `あ'.
 %</en>
 %<*ja>
 \pLaTeXe では，\cs{adjustbaseline} は縦組時に「M」と「あ」の中心線を一致させるために，
@@ -6174,8 +6177,12 @@ In \LuaTeX-ja, this \cs{adjustbaseline} does same task, namely setting the
 \LuaTeX-jaにおいても\cs{adjustbaseline} は同様に\Param{talbaselineshift}パラメータの調整処
 	     理を行っている．
 
-同時に，これも\pLaTeXe の \cs{adjustbaseline} で行われていたが，
-「漢」の寸法を元に，（本節の最初に述べた，小文字で始まる）\cs{cht}, \cs{cwd} といった長さ変数を設定する．
+同時に，これも\pLaTeXe の \cs{adjustbaseline} で同様の処理が行われていたが，
+「漢」の寸法を元に（本節の最初に述べた，小文字で始まる）\cs{cht}, \cs{cwd} 
+といった長さ変数を設定する．
+
+なお，\LaTeX が2015/10/01 版以降の場合は，「あ」「漢」の代わりに
+「文字クラス0の和文文字」を用いる．
 %</ja>
 
 \item[\cs{fontfamily}\{<family>\}]
@@ -6774,16 +6781,13 @@ JFMの\texttt{chars}テーブルのエントリとして \verb+'AJ1-xxx'+ の形
 正しく半角幅で組むために利用されている．
 %</ja>
 
-\directlua{luatexja.otf.enable_ivs()}
 %<*en>
 \paragraph{IVS support}
 Recent fonts support Ideographic Variation Selector (IVS).
 It seems that \Pkg{luaotfload} and \Pkg{fontspec} packages do not support
 IVS, so we implemented IVS support in \Pkg{luatexja-otf}.
 \emph{IVS support by the \Pkg{luatexja-otf} package is experimental.
-If this feature is enabled with current \LuaTeX\ (not with LuaJIT\TeX), 
-we cannot use any OpenType feature, including {\tt vert}~and~{\tt vrt2},
-in vertical writing mode. If you want to enable IVS support nevertheless, load
+If you want to enable IVS support, load
 \Pkg{luatexja-otf} and execute the following:}
 %</en>
 %<*ja>
@@ -6798,14 +6802,10 @@ IVSに対応してはいないようである．これらのパッケージで�
 
 \medskip
 
-\emph{\Pkg{luatexja-otf}によるIVS対応は試験的なものである．現行の\LuaTeX
-でIVS対応を一旦有効にすると，縦組時に句読点などが横組用字形のままで組版されたり，
-\Pkg{luaotfload}によるOpenType
-featureが（\texttt{vert},~\texttt{vrt2}を含め）一切効かないといった
-不具合がある\footnote{なぜかLuaJIT\TeX では大丈夫である．}．}
-そのような不具合を知りながら有効にするには，
+\emph{\Pkg{luatexja-otf}によるIVS対応は試験的なものである．
+有効にするには，
 \Pkg{luatexja-otf}パッケージを読み込んだ上で以下の命令を実行する%
-\footnote{この命令を2回以上実行しても意味がない．}：
+\footnote{この命令を2回以上実行しても意味がない．}：}
 %</ja>
 \begin{lstlisting}
 \directlua{luatexja.otf.enable_ivs()}

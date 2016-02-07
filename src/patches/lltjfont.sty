@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2015/08/28 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2016/02/07 Patch to NFSS2 for LuaTeX-ja]
 
 \let\k@encoding\@empty
 \let\ck@encoding\@empty
@@ -368,22 +368,52 @@
 
 \ifdefined\newluafunction
   \newluafunction\ltj@@adjust@baseline@inner
+  \begingroup\catcode`\~=12
   \directlua{%
+    local nulltable = {}
     local t = lua.get_functions_table()
+    local getfont, dir_tate = font.getfont, luatexja.dir_table.dir_tate
+    local fmt, get_attr = luatexja.jfont.font_metric_table, tex.getattribute
+    local setdimen, set_attr = tex.setdimen, tex.setattribute
+    local dir = luatexja.unary_pars.direction
     t[\the\ltj@@adjust@baseline@inner] = function()
-      local ft = luatexja.jfont.font_metric_table[
-        tex.getattribute('ltj@curtfnt')] or {}
-      ft = ft and ft.char_type or {}
-      ft = ft and ft[0] or {}
-      local fm = font.getfont(font.current()).characters[77] or {} %% 'M'
-      tex.setattribute('ltj@tablshift',
-        0.5*((fm.height or 0)- (fm.depth or 0)
-          - (ft.height or 0)+ (ft.depth or 0)))
+      local ft = fmt[get_attr('ltj@curtfnt')] or nulltable
+      ft = ft and ft.char_type or nulltable
+      local fk = ft and ft[0] or nulltable
+      local ht, dp, wd = fk.height or 0, fk.depth or 0,
+                         fk.width or ft.zw or 0
+      local fm 
+        = ((getfont(font.current()) or nulltable)
+          .characters or nulltable)[77] or nulltable %% 'M'
+      set_attr('ltj@tablshift',
+        0.5*((fm.height or 0)- (fm.depth or 0) - ht+ dp))
+      if dir() ~= dir_tate then
+        ft = fmt[get_attr('ltj@curjfnt')] or nulltable
+        ft = ft and ft.char_type or nulltable
+        fk = ft and ft[0] or nulltable
+        ht, dp, wd = fk.height or 0, fk.depth or 0,
+                     fk.width or ft.zw or 0
+      end
+      setdimen('cht', ht); setdimen('cdp', dp)
+      setdimen('cwd', wd); setdimen('chs', wd)
+      setdimen('cHT', ht+dp)
     end
-  }
-  \def\ltj@@adjust@baseline{\luafunction\ltj@@adjust@baseline@inner}
+  }\endgroup
+  \def\adjustbaseline{\luafunction\ltj@@adjust@baseline@inner
+     \cvs\normalbaselineskip}
 \else
-  \def\ltj@@adjust@baseline{%
+  \newbox\adjust@box
+  \newbox\adjust@box@aux
+  \newdimen\adjust@dimen
+  \def\adjustbaseline{%
+    \setbox\adjust@box\hbox{%
+      \ltj@ykblshift\z@\ltj@tkblshift\z@ 漢}%
+    \cht\ht\adjust@box
+    \cdp\dp\adjust@box
+    \cwd\wd\adjust@box
+    \cvs\normalbaselineskip
+    \chs\cwd
+    \cHT\cht \advance\cHT\cdp
     \setbox\adjust@box@aux\hbox{\tate\ltj@tkblshift\z@ 漢}%
     \setbox\adjust@box\hbox{\tate\ltj@tablshift\z@ M}%
     \adjust@dimen\ht\adjust@box
@@ -395,20 +425,6 @@
     \ltj@tablshift=\adjust@dimen
   }
 \fi
-\newbox\adjust@box
-\newbox\adjust@box@aux
-\newdimen\adjust@dimen
-\def\adjustbaseline{%
-    \setbox\adjust@box\hbox{%
-      \ltj@ykblshift\z@\ltj@tkblshift\z@ 漢}%
-    \cht\ht\adjust@box
-    \cdp\dp\adjust@box
-    \cwd\wd\adjust@box
-    \cvs\normalbaselineskip
-    \chs\cwd
-    \cHT\cht \advance\cHT\cdp
-    \ltj@@adjust@baseline
-}
 \DeclareRobustCommand\romanencoding[1]{%
     \expandafter\ifx\csname T@#1\endcsname\relax
       \@latex@error{Encoding scheme `#1' unknown}\@eha
