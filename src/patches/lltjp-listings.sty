@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-listings}[2016/02/07 Patch to listings for LuaTeX-ja]
+\ProvidesPackage{lltjp-listings}[2016/03/02 Patch to listings for LuaTeX-ja]
 \RequirePackage{listings,luatexbase-cctb}
 
 %%%%%%%%%%%%%%%% Japanese support
@@ -173,7 +173,7 @@
 \newluatexcatcodetable\CatcodeTableLTJlistings
 \setluatexcatcodetable\CatcodeTableLTJlistings{%
   \luatexcatcodetable\CatcodeTableLaTeXAtLetter
-  \catcode"FFFFF=13%"
+  \catcode\ltjlineendcomment=13%"
   \SetCatcodeRange{"FF61}{"FF9F}{13}%     半角カナ
   \SetCatcodeRange{"E0100}{"E01EF}{13}%   漢字用異体字セレクタ
   \SetCatcodeRange{"FE00}{"FE0F}{13}%     Variation Selector
@@ -215,6 +215,7 @@
 }}
 
 \directlua{
+  local utfchar, getcount = unicode.utf8.char, tex.getcount
   luatexja.listings.insert_cb = function()
     if not luatexja.listings.patched then
       luatexja.listings.patched = 1
@@ -225,7 +226,7 @@
               local c = utf.sub(buf, i, i)
               local cu = utf.byte(c)
               if cu >= 0x80 and tex.getcatcode(cu) \string~= 13 then
-                ret = ret .. utf.char(1048575) % U+FFFFF
+                ret = ret .. utfchar(getcount('ltjlineendcomment'))
               end
               ret = ret .. c
             end
@@ -244,7 +245,7 @@
 % hook!
 \lst@AddToHook{Init}{%
   \luatexcatcodetable\CatcodeTableLTJlistings\ltj@@listing@jpcmd
-  \lccode`\~="FFFFF\lowercase{\def~{\ltj@lst@ProcessJALetter}}%"
+  \lccode`\~=\ltjlineendcomment\lowercase{\def~{\ltj@lst@ProcessJALetter}}%"
   \directlua{luatexja.listings.insert_cb()}%
   \if@ltj@lst@double
     \let\ltj@lst@hss@normal=\ltj@lst@hss@double
@@ -263,7 +264,7 @@
 \begingroup
 \catcode`\^^A=12
 \catcode`\^^@=\active
-\lccode`\$="FFFFF \catcode`\$=13 %"
+\lccode`\$=\ltjlineendcomment \catcode`\$=13 %"
 \lowercase{%
 \gdef\ltj@lst@MakeActive@#1{\let\lst@next\relax%
     \ifx#1\relax
@@ -364,7 +365,7 @@
                  {}%
          \fi%
          \ltj@lst@escape@setup#2%
-         #3\catcode"FFFFF=9\lst@escapebegin\expandafter\lst@next%"
+         #3\catcode\ltjlineendcomment=9\lst@escapebegin\expandafter\lst@next%"
          \fi}%
         {}}
 \def\ltj@lst@escape@setup#1{%
@@ -376,7 +377,7 @@
   }\endgroup
 }
 \begingroup
-  \lccode`\|="FFFFF \lowercase{%"
+  \lccode`\|=\ltjlineendcomment \lowercase{%"
   \gdef\ltj@lst@remove@jacmd#1{%
     \expandafter\ltj@lst@remove@jacmd@\detokenize{#1}|\@nil|}
   \gdef\ltj@lst@remove@jacmd@#1|{%

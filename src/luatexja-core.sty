@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2015/12/11 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2016/03/03 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -120,7 +120,9 @@
 %! ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 % LuaTeX-ja core TeX source
 
-\catcode"FFFFF=14 %"
+\newcount\ltjlineendcomment
+\ltjlineendcomment="FFFFF
+\catcode\ltjlineendcomment=14 %"
 
 \def\ltj@loaded{hoge}
 
@@ -771,7 +773,7 @@
 \newcatcodetable\ltj@temp@cctb
 \def\ltj@overwrite@catcodetable#1{%
   \setluatexcatcodetable\ltj@temp@cctb{\luatexcatcodetable#1}%
-  \setluatexcatcodetable#1{\luatexcatcodetable\ltj@temp@cctb\catcode"FFFFF=14}%"
+  \setluatexcatcodetable#1{\luatexcatcodetable\ltj@temp@cctb\catcode\ltjlineendcomment=14}%"
 }
 \ltj@overwrite@catcodetable\CatcodeTableLaTeX
 \ltj@overwrite@catcodetable\CatcodeTableLaTeXAtLetter
