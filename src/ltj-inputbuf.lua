@@ -19,7 +19,7 @@ local ltjc_is_japanese_char_curlist = ltjc.is_japanese_char_curlist
 --- Instead of "%", we use U+FFFFF for suppressing spaces.
 --DEBUG require"socket"
 local time_line = 0
-local start_time_measure, stop_time_measure 
+local start_time_measure, stop_time_measure
    = ltjb.start_time_measure, ltjb.stop_time_measure
 local function add_comment(buffer)
    start_time_measure('inputbuf')
@@ -33,7 +33,7 @@ local function add_comment(buffer)
       if c>=0x80 then
 	 local ct = getcatcode(c)
 	 local te = tex.endlinechar
-	 local ctl = (te ~= -1) and (getcatcode(te)==5) and (getcatcode(getcount('ltjlineendcomment')==14)
+	 local ctl = (te ~= -1) and (getcatcode(te)==5) and (getcatcode(getcount('ltjlineendcomment'))==14)
 	 -- Is the catcode of endline character is 5 (end-of-line)?
 	 -- Is the catcode of \ltjlineendcomment (new comment char) is 14 (comment)?
 	 if ((ct==11) or (ct==12)) and ctl then
