@@ -453,7 +453,7 @@ Japanese characters in discretionary break (\cs{discretionary}) is not supported
 %<*en>
 \paragraph{Greek and Cyrillic letters, and ISO~8859-1 symbols}
 By default, \LuaTeX-ja uses Japanese fonts to typeset Greek and Cyrillic letters,
-      To change this behavior, 
+      To change this behavior,
       put \verb!\ltjsetparameter{jacharrange={-2,-3}}! in the preamble.
       For the detailed description, see Subsection~\ref{ssec-setrange}.
 
@@ -816,7 +816,7 @@ bad argument #1 to 'open' (string expected, got nil)
 If so, please execute a batch file which is written on
 \href{https://osdn.jp/projects/luatex-ja/wiki/FrontPage%28en%29}{ the Project Wiki (English)}.
 This batch file creates a temporary directory, copy CMaps in it,
-run a test file which loads \LuaTeX-ja in this directory, 
+run a test file which loads \LuaTeX-ja in this directory,
 and finally delete the temporary directory.
 %</en>
 %<*ja>
@@ -1213,7 +1213,7 @@ auto select&\cs{fontencoding}&\cs{fontfamily}&---&---&\cs{usefont}\\
 %<*en>
 \item For defining a Japanese font family, use
       \cs{DeclareKanjiFamily} instead of
-      \cs{DeclareFontFamily}. (In previous version of \LuaTeX-ja, 
+      \cs{DeclareFontFamily}. (In previous version of \LuaTeX-ja,
       using \cs{DeclareFontFamily} didn't cause any problem. But this no longer applies
       the current version.)
 \item Defining a Japanese font shape can be done by usual \cs{DeclareFontShape}:
@@ -1300,7 +1300,7 @@ this chapter. For the method, please see Subsection~\ref{ssec-math}.
 %<ja>\subsection{\Pkg{luatexja-fontspec}パッケージ}
 \label{ssec-fontspec}
 %<*en>
-To use the functionality of the \Pkg{fontspec} package to Japanese fonts, 
+To use the functionality of the \Pkg{fontspec} package to Japanese fonts,
 it is needed to load the \Pkg{luatexja-fontspec} package in the preamble, as follows:
 \begin{quote}
 \ttfamily \textbackslash usepackage[<options>]\{luatexja-fontspec\}
@@ -1459,7 +1459,7 @@ JIS~X~0208:1990→辻
 
 %<*en>
 One can load the \Pkg{luatexja-preset}
-package to use several ``presets'' of Japanese fonts. 
+package to use several ``presets'' of Japanese fonts.
 This package provides functions in a part of
 \Pkg{japanese-otf} package and a part of \Pkg{PXchfon} package by Takayuki Yato.
 
@@ -1524,7 +1524,7 @@ With this option, selecting Japanese fonts won't be performed using the function
 This option is ignored when \Pkg{luatexja-fontspec} package is loaded.
 
 When this option is specified, \Pkg{fontspec}~and~\Pkg{luatexja-fontspec} are
-\emph{not} loaded by default. Nevertheless, 
+\emph{not} loaded by default. Nevertheless,
 the package\Pkg{fontspec} can coexist with the option, as the following:
 \begin{lstlisting}
 \usepackage{fontspec}
@@ -1563,7 +1563,7 @@ option is specifed.
 このオプションが指定されると，「\pLaTeXe 新ドキュメントクラス」のように\
 \cs{rmfamily}, \verb+\textrm{...}+, \cs{sffamily} 等が
 欧文フォントだけでなく和文フォントも変更するようになる．
-\ \texttt{fontspec}\ 
+\ \texttt{fontspec}\
 オプションが有効になっている場合は，このオプションは \Pkg{luatexja-fontspec} パッケージへと渡される．
 %</ja>
 
@@ -1622,7 +1622,7 @@ characters designed for ruby.
 \item[bold]
 %<*en>
 Substitute bold series of \textit{gothic} for  bold series of \textit{mincho}.
-If \texttt{nodeluxe} option is enabled, medium series of \textit{gothic} is also changed, 
+If \texttt{nodeluxe} option is enabled, medium series of \textit{gothic} is also changed,
 since we use same font for both series of \textit{gothic}.
 %</en>
 %<*ja>
@@ -2227,7 +2227,7 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 \item \texttt{U+0180}--\texttt{U+024F}: Latin Extended-B
 \item \texttt{U+0250}--\texttt{U+02AF}: IPA Extensions
 \item \texttt{U+02B0}--\texttt{U+02FF}: Spacing Modifier Letters
-%<en>\par\ 
+%<en>\par\
 \item \texttt{U+0300}--\texttt{U+036F}: \\*\null\hfill Combining Diacritical Marks
 \item \texttt{U+1E00}--\texttt{U+1EFF}: \\*\null\hfill Latin Extended Additional
 %<ja>\par\
@@ -2366,7 +2366,7 @@ The block list is indicated in Table~\ref{table-rng7}.
 
 %<*en>
 \paragraph{Notes on \texttt{U+0080}--\texttt{U+00FF}}
-You should treat characters in \\texttt{U+0080}--\texttt{U+00FF} as \textbf{ALchar}, 
+You should treat characters in \\texttt{U+0080}--\texttt{U+00FF} as \textbf{ALchar},
 when you use traditional 8-bit fonts, such as the \Pkg{textcomp} package or the
 \Pkg{marvosym} package.
 
@@ -2375,7 +2375,7 @@ package is 182. This codepoint corresponds \P\ (\text{U+00B6}) in Unicode.
 Similarly, \cs{Frowny} which is provided by the \Pkg{marvosym} package has
 the same codepoint as \S\ (\text{U+00A7}).
 Hence, as previous versions of \LuaTeX-ja, if these characters are treated as
-\text{JAchar}s, then \cs{textparagraph} produces ``ltjjachar`¶'' (in a Japanese font), 
+\text{JAchar}s, then \cs{textparagraph} produces ``ltjjachar`¶'' (in a Japanese font),
 and  \cs{Frowny} produces ``\ltjjachar`§'' (in a Japanese font).
 
 To avoid such situations, the default setting of \LuaTeX-ja is changed in this release
@@ -2900,7 +2900,7 @@ between \XeTeX\ and \LuaTeX, by the following reasons:
 sets\cs{catcode} of several characters to 11, via setting \cs{XeTeXcharclass}.
 However, this latter half does not exist (plain case), or not executed (\LaTeX~case) in \LuaTeX.
 \end{itemize}
-In other words, 
+In other words,
 \begin{description}
 \item[plain \LuaTeX]
 Kanji nor kana characters cannot be used in
@@ -3919,7 +3919,7 @@ letter-spacing and the width of italic correction are not correct:
 \paragraph{\texttt{ltjksp} 指定}
 \label{pg:ltjksp}
 \LuaTeX-ja標準では，
-JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\ 
+JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 \texttt{kanjiskip\_shrink}キー（\pageref{pg:ksp_nat}ページ）の使用によって，
 「JFM由来のグルーの他に，\Param{kanjiskip}の自然長/伸び量/縮み量の一部が
 同じ場所に挿入される」という状況が起こりうる．
@@ -4627,7 +4627,7 @@ and is also easy to shrink.
   kanjiskip\_stretch=<num>\textrm{, }kanjiskip\_shrink=<num>]\leavevmode
 
 These keys specifies the amount of the natural width of \Param{kanjiskip}
-(the stretch/shrink part, respectively) which will be inserted 
+(the stretch/shrink part, respectively) which will be inserted
 in addition to the original JFM glue. Default values of them are all 0.
 
 As an example, in \texttt{jfm-ujis.lua}, the standard JFM in horizontal writing, we have
@@ -4638,7 +4638,7 @@ a glue whose natural part and shrink part are both half-width, while its stretch
        as much as the stretch part of \Param{kanjiskip} times the value of
        \texttt{kanjiskip\_stretch} key (1 in this case).
  \item Between an ideographic closeing brackets (the ideographic comma ``，''
-       is included) and an ordinal letter, we have the same glue. 
+       is included) and an ordinal letter, we have the same glue.
        Again, this glue also can be stretched
        as much as the stretch part of \Param{kanjiskip} times the value of
        \texttt{kanjiskip\_stretch} key (1 in this case).
@@ -6162,7 +6162,7 @@ to match the vertical center of ``M'' and that of ``あ''  in vertical typesetti
 where $h_{a}$~and~$d_{a}$ denote the height of ``$a$'' and the depth, respectively.
 In \LuaTeX-ja, this \cs{adjustbaseline} does similar task, namely setting the
 	     \Param{talbaselineshift} parameter.
-If the \LaTeX\ is 2015/10/01 release or later, \LuaTeX-ja use a Japanese 
+If the \LaTeX\ is 2015/10/01 release or later, \LuaTeX-ja use a Japanese
 character whose character class is zero,  instead of `あ'.
 %</en>
 %<*ja>
@@ -6178,7 +6178,7 @@ character whose character class is zero,  instead of `あ'.
 	     理を行っている．
 
 同時に，これも\pLaTeXe の \cs{adjustbaseline} で同様の処理が行われていたが，
-「漢」の寸法を元に（本節の最初に述べた，小文字で始まる）\cs{cht}, \cs{cwd} 
+「漢」の寸法を元に（本節の最初に述べた，小文字で始まる）\cs{cht}, \cs{cwd}
 といった長さ変数を設定する．
 
 なお，\LaTeX が2015/10/01 版以降の場合は，「あ」「漢」の代わりに
@@ -6320,11 +6320,11 @@ We use an auxiliary list~$N_{\mathrm{J}}$.
 \item If the \Pkg{luatexja-fontspec} package is loaded, we stop here, and <family> is not
       recognized as a Japanese font family.
 
-      If the \Pkg{luatexja-fontspec} package is \emph{not} loaded, 
+      If the \Pkg{luatexja-fontspec} package is \emph{not} loaded,
 now \LuaTeX-ja looks whether there exists a Japanese font encoding~<enc> such that
       a font definition named \texttt{<enc><family>.fd} (the file name is
-      all lowercase) exists. If so, <family> is recognized as a  Japanese font family (the font definition file won't be loaded here). 
-      If not, <family> is not a Japanese font family, and 
+      all lowercase) exists. If so, <family> is recognized as a  Japanese font family (the font definition file won't be loaded here).
+      If not, <family> is not a Japanese font family, and
       <family> is appended to the list~$N_{\mathrm{J}}$.
 %</en>
 %<*ja>
@@ -6344,7 +6344,7 @@ now \LuaTeX-ja looks whether there exists a Japanese font encoding~<enc> such th
 %<*en>
 \paragraph{Recognition as alphabetic font family}
 Next, whether alphabetic font family will be changed is determined in following order.
-We use auxiliary lists $F_{\mathrm{A}}$~and~$N_{\mathrm{A}}$, 
+We use auxiliary lists $F_{\mathrm{A}}$~and~$N_{\mathrm{A}}$,
 %</en>
 %<*ja>
 \paragraph{欧文フォントファミリとしての認識}
@@ -6355,7 +6355,7 @@ We use auxiliary lists $F_{\mathrm{A}}$~and~$N_{\mathrm{A}}$,
 
 \begin{enumerate}
 %<*en>
-\item If the family~<family> has been listed in a list~$F_{\mathrm{A}}$, 
+\item If the family~<family> has been listed in a list~$F_{\mathrm{A}}$,
       <family> is recognized as an alphabetic font family.
 %</en>
 %<*ja>
@@ -6383,7 +6383,7 @@ We use auxiliary lists $F_{\mathrm{A}}$~and~$N_{\mathrm{A}}$,
 \item Now \LuaTeX-ja looks whether there exists an alphabetic font encoding~<enc> such that
       a font definition named \texttt{<enc><family>.fd} (the file name is
       all lowercase) exists. If so, current alphabetic font family will be changed to
-      <family>~(the font definition file won't be loaded here). 
+      <family>~(the font definition file won't be loaded here).
       If not, current alphabetic font family won't be changed, and
       <family> is appended to the list~$N_{\mathrm{A}}$.
 %</en>
@@ -6408,7 +6408,7 @@ the second argument (family) is appended to the list~$F_{\mathrm{A}}$.
 
 %<*en>
 The above order is very similar to \cs{fontfamily} in \pLaTeXe, but more complicated (clause~3.).
-This is because  \pLaTeXe\ is a \emph{format} however \LuaTeX-ja is not, 
+This is because  \pLaTeXe\ is a \emph{format} however \LuaTeX-ja is not,
 hence \LuaTeX-ja does not know calls of \cs{DeclareFontFamily} \emph{before} itself is
 loaded.
 %</en>
@@ -6525,7 +6525,7 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
 %<*ja>
 \pageref{pg:ltjksp}ページで説明した \verb+\jfont+ 中での \texttt{ltjksp} 指定と
 同一の効力を持ち，
-JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\ 
+JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 \texttt{kanjiskip\_shrink}キー（\pageref{pg:ksp_nat}ページ）の有効/無効を切り替える．
 標準値は \texttt{true} である．
 %</ja>
@@ -8023,14 +8023,15 @@ space must be done \emph{just before} an input line is read.
 
 Considering these situations, handling of an end-of-line in \LuaTeX-ja are as follows:
 \begin{quote}
-A character \texttt{U+FFFFF} (its category code is set to 14~(\textit{comment}) by
+A character \cs{ltjlineendcomment} (default: \texttt{\textbackslash ltjlineendcomment="FFFFF},
+i.e. \texttt{U+FFFFF}; its category code is set to 14~(\textit{comment}) by
 \LuaTeX-ja) is appended to an input line, \emph{before \LuaTeX\ actually
 process it}, if and only if the following three conditions are satisfied:
 \begin{enumerate}
 \item The category code of \cs{endlinechar}%
 \footnote{Usually, it is $\langle$\textit{return}$\rangle$
       (whose character code is 13).} is 5~(\textit{end-of-line}).
-\item The category code of \texttt{U+FFFFF} itself is 14~(\textit{comment}).
+\item The category code of \cs{ltjlineendcomment} itself is 14~(\textit{comment}).
 \item The input line matches the following ``regular expression'':
 \[
   (\text{any char})^*(\textbf{JAchar})
@@ -8058,7 +8059,7 @@ there is a space before ``u''. This follows from following reasons:
 \item When line~3 is processed by \texttt{process\_input\_buffer} callback,
 ``あ'' is considered as an \textbf{JAchar}.
 Since  line~3 ends with an \textbf{JAchar},
-the comment character \texttt{U+FFFFF} is appended to this line,
+the comment character \cs{ltjlineendcomment} is appended to this line,
 and hence the linebreak immediately after this line is ignored.
 \item When line~4 is processed by \texttt{process\_input\_buffer} callback,
 ``い'' is considered as an \textbf{ALchar}.
@@ -8083,13 +8084,15 @@ emits a space.
 
 \begin{quote}
 各入力行に対し，\emph{その入力行が読まれる前の内部状態で}
-以下の3条件が満たされている場合，\LuaTeX-jaは\texttt{U+FFFFF}の文字
-\footnote{この文字はコメント文字として扱われるように\LuaTeX-ja内部で設定をしている．}
+以下の3条件が満たされている場合，\LuaTeX-jaは\cs{ltjlineendcomment}の文字
+\footnote{デフォルトでは\texttt{\textbackslash ltjlineendcomment="FFFFF}，
+  つまり\texttt{U+FFFFF}が挿入される．この文字はコメント文字として扱われるように
+  \LuaTeX-ja内部で設定をしている．}
 を末尾に追加する．よって，その場合に改行は空白とは見做されないこととなる．
 \begin{enumerate}
 \item \cs{endlinechar}の文字\footnote{普通は，改行文字（文字コード13番）である．}
 のカテゴリーコードが5~(\textit{end-of-line})である．
-\item \texttt{U+FFFFF}のカテゴリーコードが14~(\textit{comment})である．
+\item \cs{ltjlineendcomment}のカテゴリーコードが14~(\textit{comment})である．
 \item 入力行は次の「正規表現」にマッチしている：
 \[
   (\text{any char})^*(\textbf{JAchar})
@@ -8119,7 +8122,7 @@ u
 \begin{itemize}
 \item 3行目を \texttt{process\_input\_buffer} で処理する時点では，
       「あ」は\textbf{JAchar}（和文扱い）である．よって3行目は\textbf{JAchar}で終わることになり，
-      コメント文字 \texttt{U+FFFFF} が追加される．
+      コメント文字\cs{ltjlineendcomment}が追加される．
       よって，直後の改行文字は無視されることになり，空白は入らない．
 \item 4行目を \texttt{process\_input\_buffer} で処理する時点では，
       「い」は\textbf{ALchar}である．よって4行目は\textbf{ALchar}で終わることになり，
@@ -8892,7 +8895,7 @@ a patch \Pkg{jlisting.sty}~(\cite{jlisting}) resolves the problem forcibly.
 
 %<*en>
 In \LuaTeX-ja, the problem is resolved by using the \verb+process_input_buffer+ callback.
-The callback function inserts the output command (active character \texttt{U+FFFFF})
+The callback function inserts the output command (active character \cs{ltjlineendcomment})
 before each letter above \texttt{U+0080}.
 This method can omits the process to make all Japanese characters active
 (most of the activated characters are not used in many cases).
@@ -8900,7 +8903,7 @@ This method can omits the process to make all Japanese characters active
 %<*ja>
 \LuaTeX-jaでは，\verb+process_input_buffer+ コールバックを利用することで，
 「各行に出現する\texttt{U+0080}以降の文字に対して，それらの出力命令を前置する」
-という方法をとっている．出力命令としては，アクティブ文字化した \texttt{U+FFFFF} を用いている．
+という方法をとっている．出力命令としては，アクティブ文字化した\cs{ltjlineendcomment}を用いている．
 これにより，（入力には使用されていないかもしれない）和文文字をもすべてアクティブ化する手間もなく，
 見通しが良い実装になっている．
 %</ja>
