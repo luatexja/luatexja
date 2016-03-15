@@ -23,5 +23,47 @@
     \@ifstar\__fontspecsverb\@verb
  }
 
+
+\cs_set_eq:NN \ltj_orig_fontspec_setup_maths: \fontspec_setup_maths: 
+\cs_set:Nn \fontspec_setup_maths:
+  {
+    \group_begin:
+      \cs_set:Npn \DeclareMathSymbol##1##2##3##4{%
+        \expandafter\in@\csname sym##3\expandafter\endcsname
+           \expandafter{\group@list}%
+        \ifin@
+          \begingroup
+            \count\z@=##4\relax
+            \count\tw@\count\z@
+            \divide\count\z@\sixt@@n
+            \count@\count\z@
+            \multiply\count@\sixt@@n
+            \advance\count\tw@-\count@
+            \if\relax\noexpand##1% is command?
+              \edef\reserved@a{\noexpand\in@{\string\mathchar}{\meaning##1}}%
+              \reserved@a
+              \ifin@
+                \expandafter\set@mathsymbol
+                   \csname sym##3\endcsname##1##2%
+                   {\hexnumber@{\count\z@}\hexnumber@{\count\tw@}}%
+                \@font@info{Redeclaring math symbol \string##1}%
+              \else
+                \expandafter\set@mathsymbol
+                \csname sym##3\endcsname##1##2%
+                  {\hexnumber@{\count\z@}\hexnumber@{\count\tw@}}%
+              \fi
+            \else
+              \expandafter\set@mathchar
+                \csname sym##3\endcsname##1##2
+                {\hexnumber@{\count\z@}\hexnumber@{\count\tw@}}%
+            \fi
+          \endgroup
+        \else
+          \@latex@error{Symbol font `##3' is not defined}\@eha
+        \fi
+      }
+    \ltj_orig_fontspec_setup_maths:
+    \group_end:
+  }
 \ExplSyntaxOff
 \endinput
