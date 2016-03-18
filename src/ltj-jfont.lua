@@ -950,7 +950,17 @@ do
    local ensure_tex_attr = ltjb.ensure_tex_attr
    local node_write = Dnode.write
    local font = font
-   local ITALIC       = luatexja.icflag_table.ITALIC
+   local new_ic_kern
+   if status.luatex_version>=89 then
+       new_ic_kern = function(g)  return node_new(id_kern,3) end
+   else
+       local ITALIC       = luatexja.icflag_table.ITALIC
+       new_ic_kern = function()
+         local g = node(id_kern)
+         setfield(g, 'subtype', 1); set_attr(g, attr_icflag, ITALIC)
+	 return g
+       end
+   end
    -- EXT: italic correction
    function append_italic()
       local p = to_direct(tex.nest[tex.nest.ptr].tail)
@@ -960,16 +970,14 @@ do
 	    local j = font_metric_table[
 	       has_attr(p, (get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
 	       ]
-	    local g = node_new(id_kern)
-	    setfield(g, 'subtype', 1); set_attr(g, attr_icflag, ITALIC)
+	    local g = new_ic_kern()
 	    setfield(g, 'kern', j.char_type[find_char_class(getchar(p), j)].italic)
 	    node_write(g); ensure_tex_attr(attr_icflag, 0)
 	 else
 	    local f = getfont(p)
 	    local h = font_getfont(f) or font.fonts[f]
 	    if h then
-	       local g = node_new(id_kern)
-	       setfield(g, 'subtype', 1); set_attr(g, attr_icflag, ITALIC)
+	       local g = new_ic_kern()
 	       if h.characters[getchar(p)] and h.characters[getchar(p)].italic then 
 		  setfield(g, 'kern', h.characters[getchar(p)].italic)
 		  node_write(g); ensure_tex_attr(attr_icflag, 0)

@@ -283,8 +283,8 @@ do
 
 local traverse = Dnode.traverse
 local function check_next_ickern(lp)
-   if lp and getid(lp) == id_kern and ITALIC == get_attr_icflag(lp) then
-      set_attr(lp, attr_icflag, IC_PROCESSED)
+  if lp and getid(lp) == id_kern and ( getsubtype(lp)==3 or ITALIC == get_attr_icflag(lp)) then
+      set_attr(lp, attr_icflag, IC_PROCESSED);
       Np.last = lp; return node_next(lp)
    else
       Np.last = Np.nuc; return lp
@@ -366,7 +366,7 @@ local function calc_np_aux_glyph_common(lp)
 		  lx = node_next(node_next(lx))
 	       elseif ls==0  then
 		  Np.last = lx
-	       elseif (ls==1 and lai==ITALIC) then
+	       elseif (ls==3) or (lai==ITALIC) then
 		  Np.last = lx; set_attr(lx, attr_icflag, IC_PROCESSED)
 	       else
 		  lp=lx; break
@@ -519,7 +519,11 @@ local calc_np_auxtable = {
    end,
 }
 calc_np_auxtable[id_rule]   = calc_np_auxtable.box_like
-calc_np_auxtable[13]        = calc_np_auxtable.box_like
+if status.luatex_version>=85 then
+  calc_np_auxtable[15]        = calc_np_auxtable.box_like
+else
+  calc_np_auxtable[13]        = calc_np_auxtable.box_like
+end
 calc_np_auxtable[id_ins]    = calc_np_auxtable.skip
 calc_np_auxtable[id_mark]   = calc_np_auxtable.skip
 calc_np_auxtable[id_adjust] = calc_np_auxtable.skip
@@ -541,7 +545,7 @@ function calc_np(last, lp)
    for k = 1,#Bp do Bp[k] = nil end
    while lp ~= last  do
       local lpa = has_attr(lp, attr_icflag) or 0
-       -- unbox 由来ノードの検出
+      -- unbox 由来ノードの検出
       if lpa>=PACKED then
          if lpa%PROCESSED_BEGIN_FLAG == BOXBDD then
 	    local lq = node_next(lp)
@@ -1196,7 +1200,8 @@ function main(ahead, mode, dir)
    lp = calc_np(last, lp)
    if Np then
       handle_list_head(par_indented)
-      lp = calc_np(last,lp); while Np do
+      lp = calc_np(last,lp); 
+      while Np do
 	 adjust_nq();
 	 local pid, pm = Np.id, Np.met
 	 -- 挿入部
