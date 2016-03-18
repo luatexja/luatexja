@@ -74,6 +74,8 @@ local fshift =  { down = 0, left = 0}
 
 local min, max = math.min, math.max
 
+local rule_subtype = (status.luatex_version>=85) and 3 or 0
+
 -- 和文文字の位置補正（横）
 local function capsule_glyph_yoko(p, met, char_data, head, dir)
    if not char_data then return node_next(p), head, p end
@@ -99,7 +101,7 @@ local function capsule_glyph_yoko(p, met, char_data, head, dir)
 	 setfield(p, 'yoffset', getfield(p, 'yoffset') - kbl - fshift.down)
 	 return node_next(p), head, p
       elseif ht_diff >= 0 and dp_diff >=0 then -- rule
-	 local box = node_new(id_rule)
+	 local box = node_new(id_rule,rule_subtype)
 	 setfield(p, 'yoffset', getfield(p, 'yoffset') - kbl - fshift.down)
 	 setfield(box, 'width', 0)
 	 setfield(box, 'height', fheight - kbl)
@@ -251,7 +253,7 @@ do
 	 setfield(lp, 'yoffset', getfield(lp, 'yoffset') - y_adjust)
       end
       if adj_depth>node_depth then
-	 local r = node_new(id_rule)
+	 local r = node_new(id_rule,rule_subtype)
 	 setfield(r, 'width', 0); setfield(r, 'height', 0)
 	 setfield(r, 'depth', adj_depth); setfield(r, 'dir', tex_dir)
 	 set_attr(r, attr_icflag, PROCESSED)

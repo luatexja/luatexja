@@ -318,6 +318,7 @@ end
 local ltjw_apply_ashift_math = ltjw.apply_ashift_math
 local ltjw_apply_ashift_disc = ltjw.apply_ashift_disc
 local min, max = math.min, math.max
+local rule_subtype = (status.luatex_version>=85) and 3 or 0
 local function calc_np_aux_glyph_common(lp)
    Np.nuc = lp
    Np.first= (Np.first or lp)
@@ -378,7 +379,7 @@ local function calc_np_aux_glyph_common(lp)
       end
       local r
       if adj_depth>node_depth then
-	    r = node_new(id_rule)
+	    r = node_new(id_rule,rule_subtype)
 	    setfield(r, 'width', 0); setfield(r, 'height', 0)
 	    setfield(r, 'depth',adj_depth); setfield(r, 'dir', tex_dir)
 	    set_attr(r, attr_icflag, PROCESSED)
