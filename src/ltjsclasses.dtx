@@ -22,7 +22,7 @@
 %  -----------------------------------------
 %
 % \fi
-% \CheckSum{5202}
+% \CheckSum{5121}
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -50,8 +50,9 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2016/01/30 ]
+  [2016/03/21 ]
 %<*driver>
+\IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass{ltjsarticle}
 \usepackage{doc}
 \usepackage{fontspec}
@@ -100,21 +101,11 @@
 %
 % |ltjclasses| と違うのは以下の点です。
 %
-% \paragraph{サイズオプションの扱いが違う}
-%
-% |ltjclasses| では本文のポイント数を指定するオプションがあり
-% ましたが，ポイント数は10，11，12しかなく，それぞれ別のクラスオプション
-% ファイルを読み込むようになっていました。しかも，標準の10ポイント以外で
-% は多少フォントのバランスが崩れることがあり，あまり便利ではありませんで
-% した。ここでは文字サイズを増すとページを小さくし，\TeX の |\mag| プリ
-% ミティブで全体的に拡大するという手を使って，9ポイントや21，25，30，36，
-% 43ポイント，12Q，14Qの指定を可能にしています。
-%
 % \subsection{\texttt{jsclasses.dtx}からの主な変更点}
 % 全ての変更点を知りたい場合は，|jsclasses.dtx| と |ltjsclasses.dtx| で |diff| を
 % とって下さい。zw, zh は全て |\zw|, |\zh| に置き換えられています。
 % \begin{itemize}
-% \item フォントメトリック関係のオプション |winjis |は単に無視されます。
+% \item フォントメトリック関係のオプション |winjis| は単に無視されます。
 % \item 標準では |jfm-ujis.lua|（Lua\TeX-ja標準のメトリック，OTFパッケージのものがベース）を使用します。
 % \item |uplatex| オプションを削除してあります。
 % \item |disablejfam| オプションが無効になっています。もし
@@ -131,14 +122,17 @@
 %   これがあると |grfext.sty| を読み込んだ際にエラーを引き起こすので削除しました。
 % \end{itemize}
 %
-% [2014-02-07 LTJ] jsclasses 2014-02-07 ベースにしました．
+% [2014-02-07 LTJ] jsclasses 2014-02-07 ベースにしました。
 %
-% [2014-07-26 LTJ] 縦組用和文フォントの設定を加えました．
+% [2014-07-26 LTJ] 縦組用和文フォントの設定を加えました。
 %
-% [2014-12-24 LTJ] |\@setfontsize| 中の和欧文間空白の設定で if 文が抜けていたのを直しました．
+% [2014-12-24 LTJ] |\@setfontsize| 中の和欧文間空白の設定で if 文が抜けていたのを直しました。
 %
 % [2016-01-30 LTJ] |\rmfamily| 他で和文フォントファミリも変更するコードを
-% Lua\TeX-ja カーネル内に移しました．
+% Lua\TeX-ja カーネル内に移しました。
+%
+% [2016-03-21 LTJ] Lua\TeX~beta-0.87.0 ではPDF出力時に|\mag|が使用できなくなったので，
+% ZRさんの|bxjscls|を参考に使わないように書き換えました。
 %
 % \StopEventually{}
 %
@@ -312,27 +306,27 @@
 % [2003-04-18] 12Qオプションを追加しました。
 %
 %    \begin{macrocode}
-\newcommand{\@ptsize}{0}
-\DeclareOption{slide}{\@slidetrue\renewcommand{\@ptsize}{26}\@landscapetrue\@titlepagetrue}
-\DeclareOption{8pt}{\renewcommand{\@ptsize}{-2}}
-\DeclareOption{9pt}{\renewcommand{\@ptsize}{-1}}
-\DeclareOption{10pt}{\renewcommand{\@ptsize}{0}}
-\DeclareOption{11pt}{\renewcommand{\@ptsize}{1}}
-\DeclareOption{12pt}{\renewcommand{\@ptsize}{2}}
-\DeclareOption{14pt}{\renewcommand{\@ptsize}{4}}
-\DeclareOption{17pt}{\renewcommand{\@ptsize}{7}}
-\DeclareOption{20pt}{\renewcommand{\@ptsize}{10}}
-\DeclareOption{21pt}{\renewcommand{\@ptsize}{11}}
-\DeclareOption{25pt}{\renewcommand{\@ptsize}{15}}
-\DeclareOption{30pt}{\renewcommand{\@ptsize}{20}}
-\DeclareOption{36pt}{\renewcommand{\@ptsize}{26}}
-\DeclareOption{43pt}{\renewcommand{\@ptsize}{33}}
-\DeclareOption{12Q}{\renewcommand{\@ptsize}{1200}}
-\DeclareOption{14Q}{\renewcommand{\@ptsize}{1400}}
-\DeclareOption{10ptj}{\renewcommand{\@ptsize}{1001}}
-\DeclareOption{10.5ptj}{\renewcommand{\@ptsize}{1051}}
-\DeclareOption{11ptj}{\renewcommand{\@ptsize}{1101}}
-\DeclareOption{12ptj}{\renewcommand{\@ptsize}{1201}}
+\newdimen\ltjs@mpt \ltjs@mpt=1\p@
+\DeclareOption{slide}{\@slidetrue\ltjs@mpt=3.58318\p@\@landscapetrue\@titlepagetrue}
+\DeclareOption{8pt} {\ltjs@mpt=.83333\p@}% 1.2^(-1)
+\DeclareOption{9pt} {\ltjs@mpt=.91287\p@}% 1.2^(-0.5}
+\DeclareOption{10pt}{\ltjs@mpt=1\p@}
+\DeclareOption{11pt}{\ltjs@mpt=1.0954\p@}% 1.2^0.5
+\DeclareOption{12pt}{\ltjs@mpt=1.2\p@}
+\DeclareOption{14pt}{\ltjs@mpt=1.44\p@}
+\DeclareOption{17pt}{\ltjs@mpt=1.728\p@}
+\DeclareOption{20pt}{\ltjs@mpt=2\p@}
+\DeclareOption{21pt}{\ltjs@mpt=2.0736\p@}
+\DeclareOption{25pt}{\ltjs@mpt=2.48832\p@}
+\DeclareOption{30pt}{\ltjs@mpt=2.98598\p@}
+\DeclareOption{36pt}{\ltjs@mpt=3.58318\p@}
+\DeclareOption{43pt}{\ltjs@mpt=4.29982\p@}
+\DeclareOption{12Q} {\ltjs@mpt=.92308\p@}% 1pt*12Q/13Q
+\DeclareOption{14Q} {\ltjs@mpt=1.07692\p@}% 1pt*14Q/13Q
+\DeclareOption{10ptj}{\ltjs@mpt=1.08547\p@}% 1pt*10bp/13Q
+\DeclareOption{10.5ptj}{\ltjs@mpt=1.13974\p@}
+\DeclareOption{11ptj}{\ltjs@mpt=1.19402\p@}
+\DeclareOption{12ptj}{\ltjs@mpt=1.30256\p@}
 %    \end{macrocode}
 %
 % \paragraph{トンボオプション}
@@ -627,88 +621,22 @@
 % \item |geometry| 側でオプション |mag| は使えません。
 % \end{itemize}
 %
+% [2016-03-21] |\mag| を使わないように全面的に書き換えました。
+% |\ltjs@mpt| に「拡大率だけ大きくしたpt」の値が格納されます。
+% |bxjscls| と同様に，|\@ptsize| は |10pt|,~|11pt|,~|12pt| オプションが指定された時だけ
+% 従来通り0,~1,~2と設定し，それ以外の場合は$-20$とすることにしました。
+% |\inv@mag| はもはや定義していません。
 %    \begin{macrocode}
-\def\inv@mag{1}
-\ifnum\@ptsize=-2
-  \mag 833
-  \def\inv@mag{1.20048}
+\ifdim\ltjs@mpt<.92\p@ % 8pt, 9pt 指定時
   \def\n@baseline{15}%
 \fi
-\ifnum\@ptsize=-1
-  \mag 913 % formerly 900
-  \def\inv@mag{1.09529}
-  \def\n@baseline{15}%
-\fi
-\ifnum\@ptsize=1
-  \mag 1095 % formerly 1100
-  \def\inv@mag{0.913242}
-\fi
-\ifnum\@ptsize=2
-  \mag 1200
-  \def\inv@mag{0.833333}
-\fi
-\ifnum\@ptsize=4
-  \mag 1440
-  \def\inv@mag{0.694444}
-\fi
-\ifnum\@ptsize=7
-  \mag 1728
-  \def\inv@mag{0.578704}
-\fi
-\ifnum\@ptsize=10
-  \mag 2000
-  \def\inv@mag{0.5}
-\fi
-\ifnum\@ptsize=11
-  \mag 2074
-  \def\inv@mag{0.48216}
-\fi
-\ifnum\@ptsize=15
-  \mag 2488
-  \def\inv@mag{0.401929}
-\fi
-\ifnum\@ptsize=20
-  \mag 2986
-  \def\inv@mag{0.334896}
-\fi
-\ifnum\@ptsize=26
-  \mag 3583
-  \def\inv@mag{0.279096}
-\fi
-\ifnum\@ptsize=33
-  \mag 4300
-  \def\inv@mag{0.232558}
-\fi
-\ifnum\@ptsize=1200
-  \mag 923
-  \def\inv@mag{1.0834236}
-\fi
-\ifnum\@ptsize=1400
-  \mag 1077
-  \def\inv@mag{0.928505}
-\fi
-\ifnum\@ptsize=1001
-  \mag 1085
-  \def\inv@mag{0.921659}
-\fi
-\ifnum\@ptsize=1051
-  \mag 1139
-  \def\inv@mag{0.877963}
-\fi
-\ifnum\@ptsize=1101
-  \mag 1194
-  \def\inv@mag{0.837521}
-\fi
-\ifnum\@ptsize=1201
-  \mag 1302
-  \def\inv@mag{0.768049}
-\fi
+\newcommand{\@ptsize}{0}
+\ifdim\ltjs@mpt=1.0954\p@ \renewcommand{\@ptsize}{1}\else
+\ifdim\ltjs@mpt=1.2\p@    \renewcommand{\@ptsize}{2}\else
+\renewcommand{\@ptsize}{-20}\fi\fi
 %<*kiyou>
-\mag 977
-\def\inv@mag{1.02354}
+\ltjs@mpt=0.9769230\p@
 %</kiyou>
-\setlength\paperwidth{\inv@mag\paperwidth}%
-\setlength\paperheight{\inv@mag\paperheight}%
 %    \end{macrocode}
 %
 % \paragraph{PDFの用紙サイズの設定}
@@ -719,7 +647,7 @@
 % |tombow| が真のときは2インチ足しておきます。
 %
 % [2015-10-18 LTJ] Lua\TeX\ 0.81.0ではプリミティブの名称変更がされたので，
-% それに合わせておきます．
+% それに合わせておきます。
 %    \begin{macrocode}
 \setlength{\@tempdima}{\paperwidth}
 \setlength{\@tempdimb}{\paperheight}
@@ -757,7 +685,7 @@
 %
 % この |ltjsclasses| でも，派生元の |jsclasses| と同じように，
 % この公称10ポイントのフォントをここでは13級に縮小して
-% 使うことにします。そのためには，$13\,\textrm{Q}/10\,\textrm{pt}\simeq 0.924872$倍
+% 使うことにします。そのためには，$13\,\textrm{Q}/10\,\textrm{pt}\simeq 0.924715$倍
 % すればいいことになります。
 %
 % |\ltj@stdmcfont|,~|\ltj@stdgtfont| による、デフォルトで使われ明朝・ゴシックのフォントの
@@ -765,29 +693,30 @@
 % 何らかの理由で非埋め込みフォントが正しく利用できない場合にのみ |luatexja.cfg| によって
 % セットされるものです。
 %
-% [2014-07-26 LTJ] なお，現状のところ，縦組用JFMは |jfm-ujisv.lua| しか準備していません．
+% [2014-07-26 LTJ] なお，現状のところ，縦組用JFMは |jfm-ujisv.lua| しか準備していません。
 %
+% [2016-03-21 LTJ] 拡大率の計算で1~ptを$1/72.27$インチでなく0.3514~mmと間違えて扱っていたのを修正．
 %    \begin{macrocode}
 %<*!jspf>
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
 \ifmingoth
-  \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] \ltj@stdmcfont:jfm=min}{}
-  \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] \ltj@stdgtfont:jfm=min}{}
+  \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924715] \ltj@stdmcfont:jfm=min}{}
+  \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924715] \ltj@stdgtfont:jfm=min}{}
 \else
   \ifptexjis
-    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] \ltj@stdmcfont:jfm=jis}{}
-    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] \ltj@stdgtfont:jfm=jis}{}
+    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924715] \ltj@stdmcfont:jfm=jis}{}
+    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924715] \ltj@stdgtfont:jfm=jis}{}
   \else
-    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924872] \ltj@stdmcfont:jfm=ujis}{}
-    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924872] \ltj@stdgtfont:jfm=ujis}{}
+    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924715] \ltj@stdmcfont:jfm=ujis}{}
+    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924715] \ltj@stdgtfont:jfm=ujis}{}
   \fi
 \fi
-\DeclareFontShape{JT3}{mc}{m}{n}{<-> s * [0.924872] \ltj@stdmcfont:jfm=ujisv}{}
-\DeclareFontShape{JT3}{gt}{m}{n}{<-> s * [0.924872] \ltj@stdgtfont:jfm=ujisv}{}
+\DeclareFontShape{JT3}{mc}{m}{n}{<-> s * [0.924715] \ltj@stdmcfont:jfm=ujisv}{}
+\DeclareFontShape{JT3}{gt}{m}{n}{<-> s * [0.924715] \ltj@stdgtfont:jfm=ujisv}{}
 %</!jspf>
 %    \end{macrocode}
 %
-% これにより，公称10ポイントの和文フォントを0.924872倍したことにより，
+% これにより，公称10ポイントの和文フォントを0.924715倍したことにより，
 % 約9.25ポイント，
 % DTPで使う単位（1/72インチ）では9.21ポイントということになり，
 % 公称10ポイントといっても実は9ポイント強になります。
@@ -820,8 +749,8 @@
 % タイプライタ体の代わりにゴシック体を使うことにします。
 %
 % [2014-03-25 LTJ] タイプライタ体に合わせるファミリを |\jttdefault| とし，
-% 通常のゴシック体と別にできるようにしました．|\jttdefault| は，標準で
-% |\gtdefault| と定義しています．
+% 通常のゴシック体と別にできるようにしました。|\jttdefault| は，標準で
+% |\gtdefault| と定義しています。
 %
 % [2003-03-16] イタリック体，斜体について，和文でゴシックを当てていましたが，
 % 数学の定理環境などで多量のイタリック体を使うことがあり，ゴシックに
@@ -836,7 +765,7 @@
 %
 % [2016-01-30 LTJ] |\rmfamily|, |\sffamily|, |\ttfamily| の再定義をLua\TeX-ja
 % カーネルに移動させたので，ここでは和文対応にするフラグ |\@ltj@match@family|\ 
-% を有効にさせるだけでよいです．
+% を有効にさせるだけでよいです。
 %    \begin{macrocode}
 \DeclareFontShape{JY3}{mc}{bx}{n}{<->ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{gt}{bx}{n}{<->ssub*gt/m/n}{}
@@ -974,11 +903,11 @@
 %
 % [2014-05-14 LTJ] |\ltjsetparameter|の実行は時間がかかるので，
 % |\ltjsetkanjiskip| と |\ltjsetxkanjiskip|（両者とも，
-% 実行前には |\ltj@setpar@global| の実行が必要）にしました．
+% 実行前には |\ltj@setpar@global| の実行が必要）にしました。
 %
 % [2014-12-24 LTJ] |jsclasses| では，|\@setfontsize| 中で |xkanjiskip| を
-% 設定するのは現在の和欧文間空白の自然長が正の場合だけでした．
-% |ltjsclasses| では最初からこの判定が抜けてしまっていたので，復活させます．
+% 設定するのは現在の和欧文間空白の自然長が正の場合だけでした。
+% |ltjsclasses| では最初からこの判定が抜けてしまっていたので，復活させます。
 %
 %    \begin{macrocode}
 \def\@setfontsize#1#2#3{%
@@ -1001,9 +930,18 @@
     \if@slide 
       \ltjsetxkanjiskip .1em
     \else
-     \ltjsetxkanjiskip .25em plus .15em minus .06em
+      \ltjsetxkanjiskip .25em plus .15em minus .06em
     \fi
   \fi}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ltjs@setfontsize}
+% クラスファイルの内部では，拡大率も考慮した |ltjs@setfontsize| を
+% |\@setfontsize| の変わりに用いることにします。
+%    \begin{macrocode}
+\def\ltjs@setfontsize#1#2#3{%
+  \@setfontsize#1{#2\ltjs@mpt}{#3\ltjs@mpt}}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1030,7 +968,7 @@
 % TODO: Hasumiさん [qa:54539] のご指摘は考慮中です。
 %
 % [2015-01-07 LTJ] 遅くなりましたが，
-% \url{http://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=1005} にあったZRさんのパッチを取り込みました．
+% \url{http://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=1005} にあったZRさんのパッチを取り込みました。
 %
 %    \begin{macrocode}
 \newif\ifnarrowbaselines
@@ -1079,8 +1017,8 @@
 %    \begin{macrocode}
 \renewcommand{\normalsize}{%
   \ltj@@ifnarrowbaselines
-    {\@setfontsize\normalsize\@xpt\@xiipt}%
-    {\@setfontsize\normalsize\@xpt{\n@baseline}}%
+    {\ltjs@setfontsize\normalsize\@xpt\@xiipt}%
+    {\ltjs@setfontsize\normalsize\@xpt{\n@baseline}}%
 %    \end{macrocode}
 %
 % 数式の上のアキ（|\abovedisplayskip|），
@@ -1093,9 +1031,9 @@
 % いましたが，結局，微調節してみることにしました。
 %
 %    \begin{macrocode}
-  \abovedisplayskip 11\p@ \@plus3\p@ \@minus4\p@
-  \abovedisplayshortskip \z@ \@plus3\p@
-  \belowdisplayskip 9\p@ \@plus3\p@ \@minus4\p@
+  \abovedisplayskip 11\ltjs@mpt \@plus3\ltjs@mpt \@minus4\ltjs@mpt
+  \abovedisplayshortskip \z@ \@plus3\ltjs@mpt
+  \belowdisplayskip 9\ltjs@mpt \@plus3\ltjs@mpt \@minus4\ltjs@mpt
   \belowdisplayshortskip \belowdisplayskip
 %    \end{macrocode}
 %
@@ -1152,12 +1090,12 @@
 %    \begin{macrocode}
 \newcommand{\small}{%
   \ltj@@ifnarrowbaselines
-%<!kiyou>    {\@setfontsize\small\@ixpt{11}}%
-%<kiyou>    {\@setfontsize\small{8.8888}{11}}%
-%<!kiyou>    {\@setfontsize\small\@ixpt{13}}%
-%<kiyou>    {\@setfontsize\small{8.8888}{13.2418}}%
-  \abovedisplayskip 9\p@ \@plus3\p@ \@minus4\p@
-  \abovedisplayshortskip  \z@ \@plus3\p@
+%<!kiyou>    {\ltjs@setfontsize\small\@ixpt{11}}%
+%<kiyou>    {\ltjs@setfontsize\small{8.8888}{11}}%
+%<!kiyou>    {\ltjs@setfontsize\small\@ixpt{13}}%
+%<kiyou>    {\ltjs@setfontsize\small{8.8888}{13.2418}}%
+  \abovedisplayskip 9\ltjs@mpt \@plus3\ltjs@mpt \@minus4\ltjs@mpt
+  \abovedisplayshortskip  \z@ \@plus3\ltjs@mpt
   \belowdisplayskip \abovedisplayskip
   \belowdisplayshortskip \belowdisplayskip
   \def\@listi{\leftmargin\leftmargini
@@ -1176,12 +1114,12 @@
 %    \begin{macrocode}
 \newcommand{\footnotesize}{%
   \ltj@@ifnarrowbaselines
-%<!kiyou>    {\@setfontsize\footnotesize\@viiipt{9.5}}%
-%<kiyou>    {\@setfontsize\footnotesize{8.8888}{11}}%
-%<!kiyou>    {\@setfontsize\footnotesize\@viiipt{11}}%
-%<kiyou>    {\@setfontsize\footnotesize{8.8888}{13.2418}}%
-  \abovedisplayskip 6\p@ \@plus2\p@ \@minus3\p@
-  \abovedisplayshortskip  \z@ \@plus2\p@
+%<!kiyou>    {\ltjs@setfontsize\footnotesize\@viiipt{9.5}}%
+%<kiyou>    {\ltjs@setfontsize\footnotesize{8.8888}{11}}%
+%<!kiyou>    {\ltjs@setfontsize\footnotesize\@viiipt{11}}%
+%<kiyou>    {\ltjs@setfontsize\footnotesize{8.8888}{13.2418}}%
+  \abovedisplayskip 6\ltjs@mpt \@plus2\ltjs@mpt \@minus3\ltjs@mpt
+  \abovedisplayshortskip  \z@ \@plus2\ltjs@mpt
   \belowdisplayskip \abovedisplayskip
   \belowdisplayshortskip \belowdisplayskip
   \def\@listi{\leftmargin\leftmargini
@@ -1210,21 +1148,21 @@
 % [2004-11-03] |\HUGE| を追加。
 %
 %    \begin{macrocode}
-\newcommand{\scriptsize}{\@setfontsize\scriptsize\@viipt\@viiipt}
-\newcommand{\tiny}{\@setfontsize\tiny\@vpt\@vipt}
+\newcommand{\scriptsize}{\ltjs@setfontsize\scriptsize\@viipt\@viiipt}
+\newcommand{\tiny}{\ltjs@setfontsize\tiny\@vpt\@vipt}
 \if@twocolumn
-%<!kiyou>  \newcommand{\large}{\@setfontsize\large\@xiipt{\n@baseline}}
-%<kiyou>  \newcommand{\large}{\@setfontsize\large{11.111}{\n@baseline}}
+%<!kiyou>  \newcommand{\large}{\ltjs@setfontsize\large\@xiipt{\n@baseline}}
+%<kiyou>  \newcommand{\large}{\ltjs@setfontsize\large{11.111}{\n@baseline}}
 \else
-%<!kiyou>  \newcommand{\large}{\@setfontsize\large\@xiipt{17}}
-%<kiyou>  \newcommand{\large}{\@setfontsize\large{11.111}{17}}
+%<!kiyou>  \newcommand{\large}{\ltjs@setfontsize\large\@xiipt{17}}
+%<kiyou>  \newcommand{\large}{\ltjs@setfontsize\large{11.111}{17}}
 \fi
-%<!kiyou>\newcommand{\Large}{\@setfontsize\Large\@xivpt{21}}
-%<kiyou>\newcommand{\Large}{\@setfontsize\Large{12.222}{21}}
-\newcommand{\LARGE}{\@setfontsize\LARGE\@xviipt{25}}
-\newcommand{\huge}{\@setfontsize\huge\@xxpt{28}}
-\newcommand{\Huge}{\@setfontsize\Huge\@xxvpt{33}}
-\newcommand{\HUGE}{\@setfontsize\HUGE{30}{40}}
+%<!kiyou>\newcommand{\Large}{\ltjs@setfontsize\Large\@xivpt{21}}
+%<kiyou>\newcommand{\Large}{\ltjs@setfontsize\Large{12.222}{21}}
+\newcommand{\LARGE}{\ltjs@setfontsize\LARGE\@xviipt{25}}
+\newcommand{\huge}{\ltjs@setfontsize\huge\@xxpt{28}}
+\newcommand{\Huge}{\ltjs@setfontsize\Huge\@xxvpt{33}}
+\newcommand{\HUGE}{\ltjs@setfontsize\HUGE{30}{40}}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1280,7 +1218,7 @@
 %    \begin{macrocode}
 %<!kiyou>\setlength\columnsep{2\zw}
 %<kiyou>\setlength\columnsep{28truebp}
-\setlength\columnseprule{0\p@}
+\setlength\columnseprule{\z@}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1298,10 +1236,10 @@
 % \texttt{normal...} の付いた方は保存用です。
 %
 %    \begin{macrocode}
-\setlength\lineskip{1\p@}
-\setlength\normallineskip{1\p@}
-\setlength\lineskiplimit{1\p@}
-\setlength\normallineskiplimit{1\p@}
+\setlength\lineskip{1\ltjs@mpt}
+\setlength\normallineskip{1\ltjs@mpt}
+\setlength\lineskiplimit{1\ltjs@mpt}
+\setlength\normallineskiplimit{1\ltjs@mpt}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1332,7 +1270,7 @@
 % |\parindent| は段落の先頭の字下げ幅です。
 %
 %    \begin{macrocode}
-\setlength\parskip{0\p@}
+\setlength\parskip{\z@}
 \if@slide
   \setlength\parindent{0\zw}
 \else
@@ -1399,9 +1337,9 @@
 % ことにしました。
 %
 %    \begin{macrocode}
-\setlength\topskip{10\p@}
+\setlength\topskip{10\ltjs@mpt}
 \if@slide
-  \setlength\headheight{0\p@}
+  \setlength\headheight{0\ltjs@mpt}
 \else
   \setlength\headheight{2\topskip}
 \fi
@@ -1421,7 +1359,7 @@
 %    \begin{macrocode}
 %<*article|kiyou>
 \if@slide
-  \setlength\footskip{0pt}
+  \setlength\footskip{\z@}
 \else
   \setlength\footskip{0.03367\paperheight}
   \ifdim\footskip<\baselineskip
@@ -1437,7 +1375,7 @@
     \setlength\footskip{\baselineskip}
   \fi
 \else
-  \setlength\footskip{0pt}
+  \setlength\footskip{\z@}
 \fi
 %</book>
 %    \end{macrocode}
@@ -1453,7 +1391,7 @@
 %    \begin{macrocode}
 %<*article>
 \if@slide
-  \setlength\headsep{0\p@}
+  \setlength\headsep{0\ltjs@mpt}
 \else
   \setlength\headsep{\footskip}
   \addtolength\headsep{-\topskip}
@@ -1472,8 +1410,8 @@
 \addtolength\headsep{-\topskip}
 %</jspf>
 %<*kiyou>
-\setlength\headheight{0\p@}
-\setlength\headsep{0\p@}
+\setlength\headheight{0\ltjs@mpt}
+\setlength\headsep{0\ltjs@mpt}
 %</kiyou>
 %    \end{macrocode}
 % \end{macro}
@@ -1598,7 +1536,7 @@
 %<jspf>\setlength{\textheight}{51\baselineskip}
 %<kiyou>\setlength{\textheight}{47\baselineskip}
 \addtolength{\textheight}{\topskip}
-\addtolength{\textheight}{0.1\p@}
+\addtolength{\textheight}{0.1\ltjs@mpt}
 %<jspf>\setlength{\mathindent}{10mm}
 %    \end{macrocode}
 % \end{macro}
@@ -1711,7 +1649,7 @@
 % 和文の行送りを考えてもうちょっと大きくします。
 %
 %    \begin{macrocode}
-\setlength{\skip\footins}{16\p@ \@plus 5\p@ \@minus 2\p@}
+\setlength{\skip\footins}{16\ltjs@mpt \@plus 5\ltjs@mpt \@minus 2\ltjs@mpt}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1837,9 +1775,9 @@
 % |\intextsep| は本文の途中に出力されるフロートと本文との距離です。
 %
 %    \begin{macrocode}
-\setlength\floatsep    {12\p@ \@plus 2\p@ \@minus 2\p@}
-\setlength\textfloatsep{20\p@ \@plus 2\p@ \@minus 4\p@}
-\setlength\intextsep   {12\p@ \@plus 2\p@ \@minus 2\p@}
+\setlength\floatsep    {12\ltjs@mpt \@plus 2\ltjs@mpt \@minus 2\ltjs@mpt}
+\setlength\textfloatsep{20\ltjs@mpt \@plus 2\ltjs@mpt \@minus 4\ltjs@mpt}
+\setlength\intextsep   {12\ltjs@mpt \@plus 2\ltjs@mpt \@minus 2\ltjs@mpt}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1851,8 +1789,8 @@
 % 二段組のときの段抜きのフロートについての値です。
 %
 %    \begin{macrocode}
-\setlength\dblfloatsep    {12\p@ \@plus 2\p@ \@minus 2\p@}
-\setlength\dbltextfloatsep{20\p@ \@plus 2\p@ \@minus 4\p@}
+\setlength\dblfloatsep    {12\ltjs@mpt \@plus 2\ltjs@mpt \@minus 2\ltjs@mpt}
+\setlength\dbltextfloatsep{20\ltjs@mpt \@plus 2\ltjs@mpt \@minus 4\ltjs@mpt}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1867,9 +1805,9 @@
 % |\@fpsep| はフロート間に入ります。
 %
 %    \begin{macrocode}
-\setlength\@fptop{0\p@ \@plus 1fil}
-\setlength\@fpsep{8\p@ \@plus 2fil}
-\setlength\@fpbot{0\p@ \@plus 1fil}
+\setlength\@fptop{0\ltjs@mpt \@plus 1fil}
+\setlength\@fpsep{8\ltjs@mpt \@plus 2fil}
+\setlength\@fpbot{0\ltjs@mpt \@plus 1fil}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1882,9 +1820,9 @@
 % 段抜きフロートについての値です。
 %
 %    \begin{macrocode}
-\setlength\@dblfptop{0\p@ \@plus 1fil}
-\setlength\@dblfpsep{8\p@ \@plus 2fil}
-\setlength\@dblfpbot{0\p@ \@plus 1fil}
+\setlength\@dblfptop{0\ltjs@mpt \@plus 1fil}
+\setlength\@dblfpsep{8\ltjs@mpt \@plus 2fil}
+\setlength\@dblfpbot{0\ltjs@mpt \@plus 1fil}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -2188,16 +2126,16 @@
         \begin{center}
           \mbox{} \\[1\zw]
           \large
-          {\maybeblue\hrule height0pt depth2pt\relax}\par
+          {\maybeblue\hrule height0\ltjs@mpt depth2\ltjs@mpt\relax}\par
           \smallskip
           \@title
           \smallskip
-          {\maybeblue\hrule height0pt depth2pt\relax}\par
+          {\maybeblue\hrule height0\ltjs@mpt depth2\ltjs@mpt\relax}\par
           \vfill
           {\small \@author}%
         \end{center}
       \else
-      \vskip 60\p@
+      \vskip 60\ltjs@mpt
       \begin{center}%
         {\LARGE \@title \par}%
         \vskip 3em%
@@ -2500,7 +2438,7 @@
     \@afterheading
   \fi
   \if@slide
-    {\vskip-6pt\maybeblue\hrule height0pt depth1pt\vskip7pt\relax}%
+    {\vskip-6\ltjs@mpt\maybeblue\hrule height0\ltjs@mpt depth1\ltjs@mpt\vskip7\ltjs@mpt\relax}%
   \fi
   \par  % 2000-12-18
   \ignorespaces}
@@ -2823,7 +2761,7 @@
     \normalfont
     \ifnum \c@secnumdepth >-2\relax
       \huge\headfont \prepartname\thepart\postpartname
-      \par\vskip20\p@
+      \par\vskip20\ltjs@mpt
     \fi
     \Huge \headfont #2\par}%
   \@endpart}
@@ -2921,8 +2859,8 @@
     \addcontentsline{toc}{chapter}{#1}%
   \fi
   \chaptermark{#1}%
-  \addtocontents{lof}{\protect\addvspace{10\p@}}%
-  \addtocontents{lot}{\protect\addvspace{10\p@}}%
+  \addtocontents{lof}{\protect\addvspace{10\ltjs@mpt}}%
+  \addtocontents{lot}{\protect\addvspace{10\ltjs@mpt}}%
   \if@twocolumn
     \@topnewpage[\@makechapterhead{#2}]%
   \else
@@ -3603,7 +3541,7 @@
 % |array| 環境の列間には |\arraycolsep| の2倍の幅の空きが入ります。
 %
 %    \begin{macrocode}
-\setlength\arraycolsep{5\p@}
+\setlength\arraycolsep{5\ltjs@mpt}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -3612,7 +3550,7 @@
 % |tabular| 環境の列間には |\tabcolsep| の2倍の幅の空きが入ります。
 %
 %    \begin{macrocode}
-\setlength\tabcolsep{6\p@}
+\setlength\tabcolsep{6\ltjs@mpt}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -3621,7 +3559,7 @@
 % |array|，|tabular| 環境内の罫線の幅です。
 %
 %    \begin{macrocode}
-\setlength\arrayrulewidth{.4\p@}
+\setlength\arrayrulewidth{.4\ltjs@mpt}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -3630,7 +3568,7 @@
 % |array|，|tabular| 環境での二重罫線間のアキです。
 %
 %    \begin{macrocode}
-\setlength\doublerulesep{2\p@}
+\setlength\doublerulesep{2\ltjs@mpt}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -3669,8 +3607,8 @@
 % |\fbox|，|\framebox| の罫線の幅です。
 %
 %    \begin{macrocode}
-\setlength\fboxsep{3\p@}
-\setlength\fboxrule{.4\p@}
+\setlength\fboxsep{3\ltjs@mpt}
+\setlength\fboxrule{.4\ltjs@mpt}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -3879,8 +3817,8 @@
 %    \begin{macrocode}
 \newlength\abovecaptionskip
 \newlength\belowcaptionskip
-\setlength\abovecaptionskip{5\p@} % 元: 10\p@
-\setlength\belowcaptionskip{5\p@} % 元: 0\p@
+\setlength\abovecaptionskip{5\ltjs@mpt} % 元: 10\p@
+\setlength\belowcaptionskip{5\ltjs@mpt} % 元: 0\p@
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -3891,7 +3829,7 @@
 %
 % [2003-11-05] ロジックを少し変えてみました。
 %
-% [2015-05-26] |listings| パッケージを使うときに|title| を指定すると次のエラーが出るのを修正．
+% [2015-05-26] |listings| パッケージを使うときに|title| を指定すると次のエラーが出るのを修正。
 % \begin{verbatim}
 % ! Missing number, treated as zero.
 % \end{verbatim}
@@ -4132,7 +4070,7 @@
   \ifnum \c@tocdepth >-2\relax
 %<!book>    \addpenalty\@secpenalty
 %<book>    \addpenalty{-\@highpenalty}%
-    \addvspace{2.25em \@plus\p@}%
+    \addvspace{2.25em \@plus\ltjs@mpt}%
     \begingroup
       \parindent \z@
 %     \@pnumwidth should be \@tocrmarg
@@ -4163,7 +4101,7 @@
 \newcommand*{\l@chapter}[2]{%
   \ifnum \c@tocdepth >\m@ne
     \addpenalty{-\@highpenalty}%
-    \addvspace{1.0em \@plus\p@}
+    \addvspace{1.0em \@plus\ltjs@mpt}
 %   \vskip 1.0em \@plus\p@   % book.clsでは↑がこうなっている
     \begingroup
       \parindent\z@
@@ -4191,7 +4129,7 @@
 \newcommand*{\l@section}[2]{%
   \ifnum \c@tocdepth >\z@
     \addpenalty{\@secpenalty}%
-    \addvspace{1.0em \@plus\p@}%
+    \addvspace{1.0em \@plus\ltjs@mpt}%
     \begingroup
       \parindent\z@
 %     \rightskip\@pnumwidth
@@ -4306,7 +4244,7 @@
 %
 %    \begin{macrocode}
 \def\@dottedtocline#1#2#3#4#5{\ifnum #1>\c@tocdepth \else
-  \vskip \z@ \@plus.2\p@
+  \vskip \z@ \@plus.2\ltjs@mpt
   {\leftskip #2\relax \rightskip \@tocrmarg \parfillskip -\rightskip
     \parindent #2\relax\@afterindenttrue
    \interlinepenalty\@M
@@ -4544,7 +4482,7 @@
 %<!book>    \@mkboth{\indexname}{\indexname}%
     \plainifnotempty % \thispagestyle{plain}
     \parindent\z@
-    \parskip\z@ \@plus .3\p@\relax
+    \parskip\z@ \@plus .3\ltjs@mpt\relax
     \let\item\@idxitem
     \raggedright
     \footnotesize\narrowbaselines
@@ -4579,7 +4517,7 @@
 % 索引で先頭文字ごとのブロックの間に入るスペースです。
 %
 %    \begin{macrocode}
-\newcommand{\indexspace}{\par \vskip 10\p@ \@plus5\p@ \@minus3\p@\relax}
+\newcommand{\indexspace}{\par \vskip 10\ltjs@mpt \@plus5\ltjs@mpt \@minus3\ltjs@mpt\relax}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -4632,7 +4570,7 @@
 %
 % [2013-05-14] plcore.ltx に倣った形に書き直しました（Thanks: 北川さん）。
 %
-% [2014-07-02 LTJ] |\ifydir| を使わない形に書換えました．
+% [2014-07-02 LTJ] |\ifydir| を使わない形に書換えました。
 %
 %    \begin{macrocode}
 \renewcommand\@makefnmark{\hbox{}\hbox{%
@@ -4667,9 +4605,9 @@
 %
 %    \begin{macrocode}
 \renewcommand{\footnoterule}{%
-  \kern-3\p@
-  \hrule width .4\columnwidth
-  \kern 2.6\p@}
+  \kern-3\ltjs@mpt
+  \hrule width .4\columnwidth height \ltjs@mpt
+  \kern 2.6\ltjs@mpt}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -4756,9 +4694,9 @@
 %
 % 段落頭のかぎかっこなどを見かけ1字半下げから全角1字下げに直します。
 %
-% [2012-04-24 LTJ] LuaTeX-jaではJFMに段落開始時の括弧類の字下げ幅をコントロール
+% [2012-04-24 LTJ] Lua\TeX-jaではJFMに段落開始時の括弧類の字下げ幅をコントロール
 % する機能がありますが，|\item| 直後ではラベル用のボックスが段落先頭になる
-% ため，うまく働きませんでした．形を変えて復活させます．
+% ため，うまく働きませんでした。形を変えて復活させます。
 %
 % |\item| 命令の直後です。
 %
