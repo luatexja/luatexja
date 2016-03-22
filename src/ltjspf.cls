@@ -1122,7 +1122,7 @@
 \def\thefootnote{\ifnum\c@footnote>\z@\leavevmode\lower.5ex\hbox{*}\@arabic\c@footnote\fi}
 \renewcommand{\footnoterule}{%
   \kern-3\ltjs@mpt
-  \hrule width .4\columnwidth height \ltjs@mpt
+  \hrule width .4\columnwidth height .4\ltjs@mpt
   \kern 2.6\ltjs@mpt}
 \long\def\@footnotetext{%
   \insert\footins\bgroup
