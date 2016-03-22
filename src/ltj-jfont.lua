@@ -167,8 +167,8 @@ do
 	    for k,w in pairs(v.glue) do
 	       local h = node_new(id_glue_spec)
 	       v[k] = {
-		  true, h, 
-		  ratio=w.ratio/sz, 
+		  true, h,
+		  ratio=w.ratio/sz,
 		  priority=FROM_JFM + w.priority/sz,
 		  kanjiskip_natural = w.kanjiskip_natural and w.kanjiskip_natural/sz,
 		  kanjiskip_stretch = w.kanjiskip_stretch and w.kanjiskip_stretch/sz,
@@ -260,7 +260,7 @@ do
       cstemp = csname:sub( (utf8.byte(csname,1,1) == tex.escapechar) and 2 or 1, -1)
       cstemp = cstemp:sub(1, ((cstemp:sub(-1,-1)==' ') and (cstemp:len()>=2)) and -2 or -1)
       global_flag = g and '\\global' or ''
-      tex.sprint(cat_lp, '\\expandafter\\font\\csname ', 
+      tex.sprint(cat_lp, '\\expandafter\\font\\csname ',
 		 (cstemp==' ') and '\\space' or cstemp, '\\endcsname')
    end
 
@@ -277,7 +277,7 @@ do
 			    "bad JFM `" .. jfm_file_name .. "'",
 			    'The JFM file you specified is not valid JFM file.\n'..
 			       'So defining Japanese font is cancelled.')
-	 tex.sprint(cat_lp, global_flag, '\\expandafter\\let\\csname ', 
+	 tex.sprint(cat_lp, global_flag, '\\expandafter\\let\\csname ',
 		    (cstemp==' ') and '\\space' or cstemp,
 		       '\\endcsname=\\relax')
 	 return
@@ -286,7 +286,7 @@ do
       local ad = identifiers[fn].parameters
       local sz = metrics[j].size_cache[f.size]
       local fmtable = { jfm = j, size = f.size, var = jfm_var,
-			with_kanjiskip = jfm_ksp, 
+			with_kanjiskip = jfm_ksp,
 			zw = sz.zw, zh = sz.zh,
 			ascent = ad.ascender,
 			descent = ad.descender,
@@ -420,9 +420,9 @@ do
       kfam_list[fam]=true
    end
    function search_kfam(fam, use_fd)
-      if kfam_list[fam] then 
+      if kfam_list[fam] then
 	 tex.sprint(cat_lp, '\\let\\ifin@\\iftrue '); return
-      elseif Nkfam_list[fam] then 
+      elseif Nkfam_list[fam] then
 	 tex.sprint(cat_lp, '\\let\\ifin@\\iffalse '); return
       elseif use_fd then
 	 for i,_ in pairs(kyenc_list) do
@@ -455,7 +455,7 @@ do
      tex.sprint(cat_lp, s)
    end
    function search_ffam_fd(fam)
-      if Nffam_list[fam] then 
+      if Nffam_list[fam] then
 	 tex.sprint(cat_lp, '\\let\\ifin@\\iffalse '); return
       else
 	 for i,_ in pairs(fenc_list) do
@@ -765,7 +765,7 @@ do
       end
       if fl.subfonts then
          for _,v in pairs(fl.subfonts) do
-            dest = add_fl_table(dest, v, unicodes, 
+            dest = add_fl_table(dest, v, unicodes,
 				fl.ascent + fl.descent, fl.units_per_em)
          end
       end
@@ -935,7 +935,7 @@ do
 
 	return tfmdata
      end,
-     'ltj.supply_tounicode', 1)  
+     'ltj.supply_tounicode', 1)
 end
 
 
@@ -956,7 +956,7 @@ do
    else
        local ITALIC       = luatexja.icflag_table.ITALIC
        new_ic_kern = function()
-         local g = node(id_kern)
+         local g = node_new(id_kern)
          setfield(g, 'subtype', 1); set_attr(g, attr_icflag, ITALIC)
 	 return g
        end
@@ -978,7 +978,7 @@ do
 	    local h = font_getfont(f) or font.fonts[f]
 	    if h then
 	       local g = new_ic_kern()
-	       if h.characters[getchar(p)] and h.characters[getchar(p)].italic then 
+	       if h.characters[getchar(p)] and h.characters[getchar(p)].italic then
 		  setfield(g, 'kern', h.characters[getchar(p)].italic)
 		  node_write(g); ensure_tex_attr(attr_icflag, 0)
 	       end
@@ -1001,4 +1001,3 @@ vert_form_table = {
    [0xFF3B]=0xFE47, [0xFF3D]=0xFE48, [0xFF3F]=0xFE33,
 }
 setmetatable(vert_form_table, {__index=function(t,k) return k end});
-
