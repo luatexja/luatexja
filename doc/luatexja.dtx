@@ -1058,6 +1058,12 @@ Okumura), namely, \Pkg{ltjclasses}\footnote{%
   The latter \texttt{ltjt*.cls} are for vertically writtened Japanese documents.
 } and \Pkg{ltjsclasses}\footnote{%
   \texttt{ltjsarticle.cls},~\texttt{ltjsbook.cls},~\texttt{ltjskiyou.cls}.}.
+
+Original \Pkg{jsclasses} use \cs{mag}~primitive to set the main document font size.
+However, \LuaTeX\ beta-0.87.0~or~later does not support \cs{mag} in PDF~output,
+so \Pkg{ltjsclasses} use different method%
+\footnote{Similar to \texttt{magstyle=real} in the \Pkg{BXjscls} classes (by Takayuki Yato).}
+to set the main document font size.
 %</en>
 %<*ja>
 しかしながら，上記の設定は日本語の文書にとって十分とは言えない．
@@ -1072,6 +1078,12 @@ Okumura), namely, \Pkg{ltjclasses}\footnote{%
 \Pkg{ltjsclasses}\footnote{%
   \texttt{ltjsarticle.cls},~\texttt{ltjsbook.cls},~\texttt{ltjskiyou.cls}.}%
 がそれぞれ用意されている．
+
+元々の\Pkg{ltjsclasses}ではフォントサイズを指定するのに\cs{mag}プリミティブが使われていたが，
+\LuaTeX~beta-0.87.0以降ではPDF出力時の\cs{mag}のサポートが廃止された．
+そのため，\Pkg{ltjsclasses}では別の方法
+\footnote{八登崇之氏による\Pkg{BXjscls}クラスにおける\texttt{magstyle=real}指定時と類似している．}で
+フォントサイズを指定することにしている．
 %</ja>
 
 %<*ja>
@@ -7403,6 +7415,18 @@ $i$は7より小さい自然数．
 \end{description}
 %<ja> \TeX 側から見える値，つまり \verb+\the\ltj@dir+ の値は常に0である．
 
+\cnt{ltjlineendcomment}
+%<*ja>
+  \LuaTeX-jaは\textbf{JAchar}で入力行が終了した場合，その直後にコメント文字を
+  おくことで余計な空白が挿入されることを防いでいる．
+  \cs{ltjlineendcomment}はその際のコメント文字のUnicodeにおける符号位置を指定する
+  （詳細は\ref{ssec:lineend}節を参照）．
+
+  \LuaTeX-jaにおける既定値は$\texttt{"FFFFF}=1048575$であり，
+  ユーザは内部動作を熟知していない限りこのカウンタの値を変更してはならない．
+  \cs{ltjlineendcomment}の値がUnicodeの範囲外（負や，$\texttt{"10FFFF}=1114111$を超えた場合）
+  にくることは想定されていない．
+%</ja>
 \end{list}
 
 %<*en>
@@ -8009,6 +8033,7 @@ to State~$M$ (middle of line) sometimes.
 
 %<en>\subsection{Behavior in \LuaTeX-ja}
 %<ja>\subsection{\LuaTeX-jaの動作}
+  \label{ssec:lineend}
 %<*en>
 States in the input processor of \LuaTeX\ is the same as that of \TeX,
 and they can't be customized by any callbacks. Hence, we can only use
@@ -8023,9 +8048,10 @@ space must be done \emph{just before} an input line is read.
 
 Considering these situations, handling of an end-of-line in \LuaTeX-ja are as follows:
 \begin{quote}
-A character \cs{ltjlineendcomment} (default: \texttt{\textbackslash ltjlineendcomment="FFFFF},
-i.e. \texttt{U+FFFFF}; its category code is set to 14~(\textit{comment}) by
-\LuaTeX-ja) is appended to an input line, \emph{before \LuaTeX\ actually
+A character whose character code is \cs{ltjlineendcomment}%
+\footnote{Its default value is \texttt{"FFFFF}, so  \texttt{U+FFFFF} is used.
+The category code of \texttt{U+FFFFF} is set to 14~(\textit{comment}) by
+\LuaTeX-ja.} is appended to an input line, \emph{before \LuaTeX\ actually
 process it}, if and only if the following three conditions are satisfied:
 \begin{enumerate}
 \item The category code of \cs{endlinechar}%
@@ -8059,7 +8085,7 @@ there is a space before ``u''. This follows from following reasons:
 \item When line~3 is processed by \texttt{process\_input\_buffer} callback,
 ``あ'' is considered as an \textbf{JAchar}.
 Since  line~3 ends with an \textbf{JAchar},
-the comment character \cs{ltjlineendcomment} is appended to this line,
+the comment character (whose character code is \cs{ltjlineendcomment}) is appended to this line,
 and hence the linebreak immediately after this line is ignored.
 \item When line~4 is processed by \texttt{process\_input\_buffer} callback,
 ``い'' is considered as an \textbf{ALchar}.
@@ -8084,10 +8110,10 @@ emits a space.
 
 \begin{quote}
 各入力行に対し，\emph{その入力行が読まれる前の内部状態で}
-以下の3条件が満たされている場合，\LuaTeX-jaは\cs{ltjlineendcomment}の文字
-\footnote{デフォルトでは\texttt{\textbackslash ltjlineendcomment="FFFFF}，
-  つまり\texttt{U+FFFFF}が挿入される．この文字はコメント文字として扱われるように
-  \LuaTeX-ja内部で設定をしている．}
+以下の3条件が満たされている場合，\LuaTeX-jaは\cs{ltjlineendcomment}番の文字
+\footnote{\cs{ltjlineendcomment}の既定値は\texttt{"FFFFF}であるので，
+  既定では\texttt{U+FFFFF}が使われることになる．この文字はコメント文字として扱われるように
+  \LuaTeX-ja内部で設定をしている．}%
 を末尾に追加する．よって，その場合に改行は空白とは見做されないこととなる．
 \begin{enumerate}
 \item \cs{endlinechar}の文字\footnote{普通は，改行文字（文字コード13番）である．}
@@ -8122,7 +8148,7 @@ u
 \begin{itemize}
 \item 3行目を \texttt{process\_input\_buffer} で処理する時点では，
       「あ」は\textbf{JAchar}（和文扱い）である．よって3行目は\textbf{JAchar}で終わることになり，
-      コメント文字\cs{ltjlineendcomment}が追加される．
+      \cs{ltjlineendcomment}番のコメント文字が追加される．
       よって，直後の改行文字は無視されることになり，空白は入らない．
 \item 4行目を \texttt{process\_input\_buffer} で処理する時点では，
       「い」は\textbf{ALchar}である．よって4行目は\textbf{ALchar}で終わることになり，
