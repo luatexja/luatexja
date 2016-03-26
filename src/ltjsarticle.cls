@@ -96,27 +96,32 @@
 \DeclareOption{landscape}{\@landscapetrue}
 \newif\if@slide
 \@slidefalse
-\newdimen\ltjs@mpt \ltjs@mpt=1\p@
-\DeclareOption{slide}{\@slidetrue\ltjs@mpt=3.58318\p@\@landscapetrue\@titlepagetrue}
-\DeclareOption{8pt} {\ltjs@mpt=.83333\p@}% 1.2^(-1)
-\DeclareOption{9pt} {\ltjs@mpt=.91287\p@}% 1.2^(-0.5}
-\DeclareOption{10pt}{\ltjs@mpt=1\p@}
-\DeclareOption{11pt}{\ltjs@mpt=1.0954\p@}% 1.2^0.5
-\DeclareOption{12pt}{\ltjs@mpt=1.2\p@}
-\DeclareOption{14pt}{\ltjs@mpt=1.44\p@}
-\DeclareOption{17pt}{\ltjs@mpt=1.728\p@}
-\DeclareOption{20pt}{\ltjs@mpt=2\p@}
-\DeclareOption{21pt}{\ltjs@mpt=2.0736\p@}
-\DeclareOption{25pt}{\ltjs@mpt=2.48832\p@}
-\DeclareOption{30pt}{\ltjs@mpt=2.98598\p@}
-\DeclareOption{36pt}{\ltjs@mpt=3.58318\p@}
-\DeclareOption{43pt}{\ltjs@mpt=4.29982\p@}
-\DeclareOption{12Q} {\ltjs@mpt=.92308\p@}% 1pt*12Q/13Q
-\DeclareOption{14Q} {\ltjs@mpt=1.07692\p@}% 1pt*14Q/13Q
-\DeclareOption{10ptj}{\ltjs@mpt=1.08547\p@}% 1pt*10bp/13Q
-\DeclareOption{10.5ptj}{\ltjs@mpt=1.13974\p@}
-\DeclareOption{11ptj}{\ltjs@mpt=1.19402\p@}
-\DeclareOption{12ptj}{\ltjs@mpt=1.30256\p@}
+\def\ltjs@magscale{1}
+\DeclareOption{slide}{\@slidetrue\def\ltjs@magscale{3.58318}\@landscapetrue\@titlepagetrue}
+\DeclareOption{8pt} {\def\ltjs@magscale{.83333}}% 1.2^(-1)
+\DeclareOption{9pt} {\def\ltjs@magscale{.91287}}% 1.2^(-0.5}
+\DeclareOption{10pt}{\def\ltjs@magscale{1}}
+\DeclareOption{11pt}{\def\ltjs@magscale{1.0954}}% 1.2^0.5
+\DeclareOption{12pt}{\def\ltjs@magscale{1.2}}
+\DeclareOption{14pt}{\def\ltjs@magscale{1.44}}
+\DeclareOption{17pt}{\def\ltjs@magscale{1.728}}
+\DeclareOption{20pt}{\def\ltjs@magscale{2}}
+\DeclareOption{21pt}{\def\ltjs@magscale{2.0736}}
+\DeclareOption{25pt}{\def\ltjs@magscale{2.48832}}
+\DeclareOption{30pt}{\def\ltjs@magscale{2.98598}}
+\DeclareOption{36pt}{\def\ltjs@magscale{3.58318}}
+\DeclareOption{43pt}{\def\ltjs@magscale{4.29982}}
+\DeclareOption{12Q} {\def\ltjs@magscale{.92308}}% 1pt*12Q/13Q
+\DeclareOption{14Q} {\def\ltjs@magscale{1.07692}}% 1pt*14Q/13Q
+\DeclareOption{10ptj}{\def\ltjs@magscale{1.08547}}% 1pt*10bp/13Q
+\DeclareOption{10.5ptj}{\def\ltjs@magscale{1.13974}}
+\DeclareOption{11ptj}{\def\ltjs@magscale{1.19402}}
+\DeclareOption{12ptj}{\def\ltjs@magscale{1.30256}}
+\newif\if@ltjs@mag@xreal
+\@ltjs@mag@xrealfalse
+\DeclareOption{xreal}{\@ltjs@mag@xrealtrue}
+\DeclareOption{noxreal}{\@ltjs@mag@xrealfalse}
+\DeclareOption{real}{\@ltjs@mag@xrealfalse}
 \hour\time \divide\hour by 60\relax
 \@tempcnta\hour \multiply\@tempcnta 60\relax
 \minute\time \advance\minute-\@tempcnta
@@ -201,9 +206,6 @@
 \DeclareOption{mingoth}{\mingothtrue}
 \DeclareOption{ptexjis}{\ptexjistrue}
 \DeclareOption{jis}{\jisfonttrue}
-\newif\ifpapersize
-\papersizefalse
-\DeclareOption{papersize}{\papersizetrue}
 \newif\if@english
 \@englishfalse
 \DeclareOption{english}{\@englishtrue}
@@ -218,6 +220,8 @@
   \setlength\paperwidth {\@tempdima}
 \fi
 \if@slide\def\n@baseline{13}\else\def\n@baseline{16}\fi
+\newdimen\ltjs@mpt
+\ltjs@mpt=\ltjs@magscale\p@
 \ifdim\ltjs@mpt<.92\p@ % 8pt, 9pt 指定時
   \def\n@baseline{15}%
 \fi
@@ -225,6 +229,43 @@
 \ifdim\ltjs@mpt=1.0954\p@ \renewcommand{\@ptsize}{1}\else
 \ifdim\ltjs@mpt=1.2\p@    \renewcommand{\@ptsize}{2}\else
 \renewcommand{\@ptsize}{-20}\fi\fi
+\if@ltjs@mag@xreal
+  \RequirePackage{type1cm}
+  \expandafter\let\csname OT1/cmr/m/n/10\endcsname\relax
+  \expandafter\let\csname OMX/cmex/m/n/10\endcsname\relax
+  \begingroup\catcode`\%=12\relax
+  \directlua{
+    function luatexja.round_pt(a)
+      local s = luatexja.print_scaled(math.floor(0.5+a*65536))
+      return (s:match('%.0$')) and s:sub(1,-3) or s
+    end
+  }
+  \endgroup
+  \def\ltjs@magnify@external@font#1 at#2 at#3\@nil{%
+     \def\@tempa{#1}\def\@tempb{#2}%
+     \ifx\@tempb\@empty
+        \edef\@tempb{ scaled\directlua{%
+          tex.sprint(math.floor(0.5+\ltjs@magscale*1000))
+        }}%
+     \else
+        \dimen@\@tempb\relax
+        \edef\@tempb{ at\directlua{%
+          tex.sprint(math.floor(0.5+\ltjs@magscale*tex.getdimen('dimen@')))
+        }sp}%
+     \fi
+     \edef\@tempa{\def\noexpand\external@font{\@tempa\@tempb}}
+  }
+  \let\ltjs@orig@get@external@font=\get@external@font
+  \def\get@external@font{%
+    \edef\f@size{\directlua{%
+      tex.sprint(luatexja.round_pt(\f@size/\ltjs@magscale))}}%
+    \ltjs@orig@get@external@font
+    \begingroup
+      \edef\@tempa{\external@font\space at\space at}%
+      \expandafter\ltjs@magnify@external@font\@tempa\@nil
+    \expandafter\endgroup\@tempa
+  }
+\fi
 \setlength{\@tempdima}{\paperwidth}
 \setlength{\@tempdimb}{\paperheight}
 \iftombow
