@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsbook}
-  [2016/03/21 ]
+  [2016/03/27 ltjsclasses ]
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
@@ -99,26 +99,26 @@
 \newif\if@slide
 \@slidefalse
 \def\ltjs@magscale{1}
-\DeclareOption{slide}{\@slidetrue\def\ltjs@magscale{3.58318}\@landscapetrue\@titlepagetrue}
-\DeclareOption{8pt} {\def\ltjs@magscale{.83333}}% 1.2^(-1)
-\DeclareOption{9pt} {\def\ltjs@magscale{.91287}}% 1.2^(-0.5}
+\DeclareOption{slide}{\@slidetrue\def\ltjs@magscale{3.583}\@landscapetrue\@titlepagetrue}
+\DeclareOption{8pt} {\def\ltjs@magscale{0.83}}% 1.2^(-1)
+\DeclareOption{9pt} {\def\ltjs@magscale{0.913}}% 1.2^(-0.5}
 \DeclareOption{10pt}{\def\ltjs@magscale{1}}
-\DeclareOption{11pt}{\def\ltjs@magscale{1.0954}}% 1.2^0.5
-\DeclareOption{12pt}{\def\ltjs@magscale{1.2}}
-\DeclareOption{14pt}{\def\ltjs@magscale{1.44}}
+\DeclareOption{11pt}{\def\ltjs@magscale{1.095}}% 1.2^0.5
+\DeclareOption{12pt}{\def\ltjs@magscale{1.200}}
+\DeclareOption{14pt}{\def\ltjs@magscale{1.440}}
 \DeclareOption{17pt}{\def\ltjs@magscale{1.728}}
 \DeclareOption{20pt}{\def\ltjs@magscale{2}}
-\DeclareOption{21pt}{\def\ltjs@magscale{2.0736}}
-\DeclareOption{25pt}{\def\ltjs@magscale{2.48832}}
-\DeclareOption{30pt}{\def\ltjs@magscale{2.98598}}
-\DeclareOption{36pt}{\def\ltjs@magscale{3.58318}}
-\DeclareOption{43pt}{\def\ltjs@magscale{4.29982}}
-\DeclareOption{12Q} {\def\ltjs@magscale{.92308}}% 1pt*12Q/13Q
-\DeclareOption{14Q} {\def\ltjs@magscale{1.07692}}% 1pt*14Q/13Q
-\DeclareOption{10ptj}{\def\ltjs@magscale{1.08547}}% 1pt*10bp/13Q
-\DeclareOption{10.5ptj}{\def\ltjs@magscale{1.13974}}
-\DeclareOption{11ptj}{\def\ltjs@magscale{1.19402}}
-\DeclareOption{12ptj}{\def\ltjs@magscale{1.30256}}
+\DeclareOption{21pt}{\def\ltjs@magscale{2.074}}
+\DeclareOption{25pt}{\def\ltjs@magscale{2.488}}
+\DeclareOption{30pt}{\def\ltjs@magscale{2.986}}
+\DeclareOption{36pt}{\def\ltjs@magscale{3.583}}
+\DeclareOption{43pt}{\def\ltjs@magscale{4.300}}
+\DeclareOption{12Q} {\def\ltjs@magscale{0.923}}% 1pt*12Q/13Q
+\DeclareOption{14Q} {\def\ltjs@magscale{1.077}}% 1pt*14Q/13Q
+\DeclareOption{10ptj}{\def\ltjs@magscale{1.085}}% 1pt*10bp/13Q
+\DeclareOption{10.5ptj}{\def\ltjs@magscale{1.139}}
+\DeclareOption{11ptj}{\def\ltjs@magscale{1.194}}
+\DeclareOption{12ptj}{\def\ltjs@magscale{1.302}}
 \newif\if@ltjs@mag@xreal
 \@ltjs@mag@xrealfalse
 \DeclareOption{xreal}{\@ltjs@mag@xrealtrue}
