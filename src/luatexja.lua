@@ -131,6 +131,7 @@ local function print_scaled(s)
    until s<=delta
    return out
 end
+luatexja.print_scaled = print_scaled
 
 local function print_glue(d,order)
    local out=print_scaled(d)
