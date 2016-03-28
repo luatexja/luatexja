@@ -22,7 +22,7 @@
 %  -----------------------------------------
 %
 % \fi
-% \CheckSum{5201}
+% \CheckSum{5209}
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -50,7 +50,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2016/03/27 ltjsclasses ]
+  [2016/03/28 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass{ltjsarticle}
@@ -665,23 +665,36 @@
 \renewcommand{\@ptsize}{-20}\fi\fi
 %    \end{macrocode}
 %
+% \paragraph{オプティカルサイズの補正}
+% \leavevmode\par
 % [2016-03-26 LTJ] |xreal|オプションの指定時には，|bxjscls|の|magstyle=xreal|
 % オプションのように，オプティカルの補正を行うためにNFSSにパッチを当てます。
-% パッチの内容は，一部をmiscさんによる「js*.cls 同様の文字サイズ設定を|\mag|によらずに行う方法：試案」
-% (\texttt{http://oku.edu.mie-u.ac.jp/\textasciitilde okumura/texfaq/qa/28416.html})からとりました。
+% パッチは，概ねmiscさんによる「js*.cls 同様の文字サイズ設定を
+% |\mag|によらずに行う方法：試案」
+% (\texttt{http://oku.edu.mie-u.ac.jp/\textasciitilde okumura/texfaq/qa/28416.html})の
+% 方法に沿っていますが，拡大/縮小するところの計算にはLuaを用いています。
 %
-% パッチを行う際には，計算で数spの誤差が出た時に備え，|type1cm|パッケージを読み込んでおきます。
+% なお，\TeX 内部で長さはsp単位の整数倍で表現されているので，数spの誤差は仕方がないです。
+% そのため，事前に|type1cm|パッケージを読みこんでおきます。
 %
+% [2016-03-28 LTJ] |\luafunction|を使うようにし，また本文のフォントサイズが10ptのときには
+% （不要なので）パッチを当てないことにしました。
 %    \begin{macrocode}
-\if@ltjs@mag@xreal
-  \RequirePackage{type1cm}
+\if@ltjs@mag@xreal\RequirePackage{type1cm}
+\ifdim\ltjs@mpt=\p@\else
   \expandafter\let\csname OT1/cmr/m/n/10\endcsname\relax
   \expandafter\let\csname OMX/cmex/m/n/10\endcsname\relax
+  \newluafunction\ltjs@@magnify@font@calc
   \begingroup\catcode`\%=12\relax
   \directlua{
-    function luatexja.round_pt(a)
-      local s = luatexja.print_scaled(math.floor(0.5+a*65536))
-      return (s:match('%.0$')) and s:sub(1,-3) or s
+    local getdimen, mpt=tex.getdimen, tex.getdimen('ltjs@mpt')/65536
+    local t = lua.get_functions_table()
+    t[\the\ltjs@@magnify@font@calc] = function()
+      tex.sprint(math.floor(0.5+mpt*tex.getdimen('dimen@')))
+    end
+    function luatexja.ltjs_unmagnify_fsize(a)
+      local s = luatexja.print_scaled(math.floor(0.5+a/mpt*65536))
+      tex.sprint( (s:match('%.0$')) and s:sub(1,-3) or s )
     end
   }
   \endgroup
@@ -693,23 +706,20 @@
         }}%
      \else
         \dimen@\@tempb\relax
-        \edef\@tempb{ at\directlua{%
-          tex.sprint(math.floor(0.5+\ltjs@magscale*tex.getdimen('dimen@')))
-        }sp}%
+        \edef\@tempb{ at\luafunction\ltjs@@magnify@font@calc sp}%
      \fi
      \edef\@tempa{\def\noexpand\external@font{\@tempa\@tempb}}
   }
   \let\ltjs@orig@get@external@font=\get@external@font
   \def\get@external@font{%
-    \edef\f@size{\directlua{%
-      tex.sprint(luatexja.round_pt(\f@size/\ltjs@magscale))}}%
+    \edef\f@size{\directlua{luatexja.ltjs_unmagnify_fsize(\f@size)}}%
     \ltjs@orig@get@external@font
     \begingroup
       \edef\@tempa{\external@font\space at\space at}%
       \expandafter\ltjs@magnify@external@font\@tempa\@nil
     \expandafter\endgroup\@tempa
   }
-\fi
+\fi\fi
 %    \end{macrocode}
 %
 %

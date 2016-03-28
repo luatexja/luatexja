@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjspf}
-  [2016/03/27 ltjsclasses ]
+  [2016/03/28 ltjsclasses ]
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
@@ -229,15 +229,21 @@
 \ifdim\ltjs@mpt=1.0954\p@ \renewcommand{\@ptsize}{1}\else
 \ifdim\ltjs@mpt=1.2\p@    \renewcommand{\@ptsize}{2}\else
 \renewcommand{\@ptsize}{-20}\fi\fi
-\if@ltjs@mag@xreal
-  \RequirePackage{type1cm}
+\if@ltjs@mag@xreal\RequirePackage{type1cm}
+\ifdim\ltjs@mpt=\p@\else
   \expandafter\let\csname OT1/cmr/m/n/10\endcsname\relax
   \expandafter\let\csname OMX/cmex/m/n/10\endcsname\relax
+  \newluafunction\ltjs@@magnify@font@calc
   \begingroup\catcode`\%=12\relax
   \directlua{
-    function luatexja.round_pt(a)
-      local s = luatexja.print_scaled(math.floor(0.5+a*65536))
-      return (s:match('%.0$')) and s:sub(1,-3) or s
+    local getdimen, mpt=tex.getdimen, tex.getdimen('ltjs@mpt')/65536
+    local t = lua.get_functions_table()
+    t[\the\ltjs@@magnify@font@calc] = function()
+      tex.sprint(math.floor(0.5+mpt*tex.getdimen('dimen@')))
+    end
+    function luatexja.ltjs_unmagnify_fsize(a)
+      local s = luatexja.print_scaled(math.floor(0.5+a/mpt*65536))
+      tex.sprint( (s:match('%.0$')) and s:sub(1,-3) or s )
     end
   }
   \endgroup
@@ -249,23 +255,20 @@
         }}%
      \else
         \dimen@\@tempb\relax
-        \edef\@tempb{ at\directlua{%
-          tex.sprint(math.floor(0.5+\ltjs@magscale*tex.getdimen('dimen@')))
-        }sp}%
+        \edef\@tempb{ at\luafunction\ltjs@@magnify@font@calc sp}%
      \fi
      \edef\@tempa{\def\noexpand\external@font{\@tempa\@tempb}}
   }
   \let\ltjs@orig@get@external@font=\get@external@font
   \def\get@external@font{%
-    \edef\f@size{\directlua{%
-      tex.sprint(luatexja.round_pt(\f@size/\ltjs@magscale))}}%
+    \edef\f@size{\directlua{luatexja.ltjs_unmagnify_fsize(\f@size)}}%
     \ltjs@orig@get@external@font
     \begingroup
       \edef\@tempa{\external@font\space at\space at}%
       \expandafter\ltjs@magnify@external@font\@tempa\@nil
     \expandafter\endgroup\@tempa
   }
-\fi
+\fi\fi
 \setlength{\@tempdima}{\paperwidth}
 \setlength{\@tempdimb}{\paperheight}
 \iftombow
