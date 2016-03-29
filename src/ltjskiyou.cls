@@ -240,7 +240,7 @@
     local getdimen, mpt=tex.getdimen, tex.getdimen('ltjs@mpt')/65536
     local t = lua.get_functions_table()
     t[\the\ltjs@@magnify@font@calc] = function()
-      tex.sprint(math.floor(0.5+mpt*tex.getdimen('dimen@')))
+      tex.sprint(math.floor(0.5+mpt*getdimen('dimen@')))
     end
     function luatexja.ltjs_unmagnify_fsize(a)
       local s = luatexja.print_scaled(math.floor(0.5+a/mpt*65536))
