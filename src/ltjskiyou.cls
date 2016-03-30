@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjskiyou}
-  [2016/03/28 ltjsclasses ]
+  [2016/03/31 ltjsclasses ]
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
@@ -118,7 +118,7 @@
 \DeclareOption{11ptj}{\def\ltjs@magscale{1.194}}
 \DeclareOption{12ptj}{\def\ltjs@magscale{1.302}}
 \newif\if@ltjs@mag@xreal
-\@ltjs@mag@xrealfalse
+\@ltjs@mag@xrealtrue
 \DeclareOption{xreal}{\@ltjs@mag@xrealtrue}
 \DeclareOption{noxreal}{\@ltjs@mag@xrealfalse}
 \DeclareOption{real}{\@ltjs@mag@xrealfalse}

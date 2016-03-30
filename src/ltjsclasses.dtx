@@ -50,7 +50,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2016/03/28 ltjsclasses ]
+  [2016/03/31 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass{ltjsarticle}
@@ -123,14 +123,14 @@
 % \item 本家|jsclasses.dtx|では|\mag|を用いて「10pt時の組版結果を本文フォントサイズに合わせ拡大縮小」
 %   という方針でしたが，本|ltjsclasses.dtx|ではそのような方法を取っていません。
 %   \begin{itemize}
-%    \item 標準，および|real|オプション指定時には，単にレイアウトに用いる各種長さの値をスケールさせるだけです。
+%    \item |real|オプション指定時には，単にレイアウトに用いる各種長さの値をスケールさせるだけです。
 %      そのため，例えば本文の文字サイズが17ptのときにはcmr10でなくcmr17を用いることになり，組版結果の印象が
 %      異なる恐れがあります。
 %    \item |xreal|オプション指定時には，上記に加えてオプティカルサイズを調整する（本文ではcmr17の代わりに
 %      cmr10を拡大縮小する，など）ため，\LaTeX のフォント選択システムNFSSへパッチを当てます。
 %      こうすることで前項に書いた不具合はなくなりますが，かえって別の不具合が起きる可能性はあります。
 %   \end{itemize}
-%   オプション名は|bxjscls|パッケージの|magstyle|指定に倣いました。
+%   標準では|xreal|オプションが有効になっています。オプション名は|bxjscls|パッケージの|magstyle|指定に倣いました。
 % \end{itemize}
 %
 % [2014-02-07 LTJ] jsclasses 2014-02-07 ベースにしました。
@@ -145,6 +145,7 @@
 % [2016-03-21 LTJ] Lua\TeX~beta-0.87.0 ではPDF出力時に|\mag|が使用できなくなったので，
 % ZRさんの|bxjscls|を参考に使わないように書き換えました。
 %
+% [2016-03-31 LTJ] |xreal|オプションを標準で有効にしました．
 %
 % \StopEventually{}
 %
@@ -347,9 +348,10 @@
 % 現在の|ltjsclasses|ではこのパッチ当ては標準では行いませんが，
 % 将来どうなるかわからないので|real|, |noxreal|で無効化することができるようにしました。
 %
+% [2016-03-31 LTJ] |xreal|オプションを標準にしました．
 %    \begin{macrocode}
 \newif\if@ltjs@mag@xreal
-\@ltjs@mag@xrealfalse
+\@ltjs@mag@xrealtrue
 \DeclareOption{xreal}{\@ltjs@mag@xrealtrue}
 \DeclareOption{noxreal}{\@ltjs@mag@xrealfalse}
 \DeclareOption{real}{\@ltjs@mag@xrealfalse}
