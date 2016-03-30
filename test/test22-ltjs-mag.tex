@@ -1,18 +1,70 @@
-\batchmode
+\batchmode\directlua{
+  luatexbase.module_warning=function()end
+}
 \ifdefined\fsize\else\def\fsize{10pt}\fi
 \edef\head{\noexpand\documentclass[\fsize,xreal]{ltjsarticle}}
 \head\usepackage{type1cm}
 \makeatletter
-\def\R#1{{#1\typeout{\string#1: \fontname\font}}}
-\begin{document}\scrollmode
-\R\tiny
-\R\scriptsize
-\R\footnotesize
-\R\small
-\R\normalsize
-\R\large
-\R\Large
-\R\LARGE
-\R\huge
-\batchmode
+\let\ltj@selectfont@patch\relax
+\newcount\cI\newcount\cF\newdimen\szd
+\gdef\S@#1at#2at#3\@nil{%
+   \def\@tempa{#2}
+   \ifx\@tempa\@empty\else
+      \@tempdima=\dimexpr#2-\@tempdimb\relax
+      \ifdim\@tempdima<\z@ \@tempdima=\@tempdima\fi
+      \ifdim\@tempdima>\szd \global\szd=\@tempdima\fi
+   \fi
+}
+\def\S#1{%
+  \setbox0\hbox{\fontsize{#1\ltjs@mpt}{10}\selectfont
+    \@tempdimb=#1\ltjs@mpt
+    \edef\@tempa{\scantextokens\expandafter{\fontname\font}\space at\space at}%
+    \expandafter\S@\@tempa\@nil
+  }%
+}
+\def\ltjs@setfontsize#1#2#3{%
+  \edef\Fsize{\the\dimexpr\directlua{tex.sprint(#2*\ltjs@magscale)}pt}%
+  \@setfontsize#1{#2\ltjs@mpt}{#3\ltjs@mpt}}
+\def\R#1{{%
+  #1\message{^^J\string#1: \fontname\font\space (ideal: \Fsize)}%
+}}
+
+\def\T@#1#2#3{\global\count@=}
+\def\T#1#2{%
+  \setbox0\hbox{\fontsize{#1\ltjs@mpt}{10}\selectfont
+    \expandafter\T@\romannumeral-`0\fontname\font
+  }%
+  \ifnum\count@=#2\else
+    \typeout{@FAIL: #1\string\ltjs@mpt\space selects cmr\the\count@
+    \space(should be cmr#2)}\szd=1pt%
+  \fi
+}
+\begin{document}\errorstopmode
+\typeout{^^J@part 1: optical size for cmr}
+\szd=0pt
+\T{5.99999}{5}
+\T66
+\T{6.99999}{6}
+\T77
+\T{7.99999}{7}
+\T88
+\T{8.99999}{8}
+\T99
+\T{9.99999}{9}
+\T{10}{10}
+\T{11.99999}{10}
+\T{12}{12}
+\T{16.99999}{12}
+\T{17}{17}
+\ifdim\szd=0pt\typeout{--> @PASSED}\fi
+
+\typeout{^^J@part 2: size difference}
+\cI=1 \loop\ifnum\cI<50 {%
+  \cF=0 \loop\ifnum\cF<10
+    \edef\@tempa{\the\cI.\the\cF}\S{\@tempa}
+    \edef\@tempa{\the\cI.\the\cF5}\S{\@tempa}
+    \advance\cF1
+  \repeat
+}\advance\cI1 \repeat
+\directlua{print('--> @max difference = ' .. tex.getdimen('szd') .. 'sp')}
 \end{document}
