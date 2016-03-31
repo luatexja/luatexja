@@ -34,7 +34,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja}[2015/11/03 Japanese Typesetting with Lua(La))TeX]
+  \ProvidesPackage{luatexja}[2016/03/31 Japanese Typesetting with Lua(La)TeX]
 \fi                             %</LaTeX>
 
 \directlua{require('ltj-unicode-ccfix.lua')}% catcode of ideographs
@@ -42,7 +42,7 @@
 %% Load all sub-packages.
 \ifltj@in@latex                 %<*LaTeX>
   %% \RequirePackage{expl3} needed if the version of l3kernel is v6111
-  \RequirePackage{luatexja-core}  [2015/11/03]
+  \RequirePackage{luatexja-core}  [2016/03/31]
   \RequirePackage{luatexja-compat}[2013/05/14]
 \else                           %<*!LaTeX>
   \input luatexja-core.sty %
