@@ -4,7 +4,7 @@
 % 
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2015/01/01 Patch to LaTeX2e Kernel for LuaTeX-ja]
+\ProvidesPackage{lltjcore}[2016/04/01 Patch to LaTeX2e Kernel for LuaTeX-ja]
 
 \def\cleardoublepage{\clearpage\if@twoside
   \ifodd\c@page
@@ -79,6 +79,7 @@
 \def\@outputtombow{%
   \iftombow
   \vbox to\z@{\kern-13mm\relax
+    \boxmaxdepth\maxdimen
     \moveleft3mm\vbox to\@@paperheight{%
       \hbox to\@@paperwidth{\hskip3mm\relax
          \copy\@TL\hfill\copy\@TC\hfill\copy\@TR\hskip3mm}%
