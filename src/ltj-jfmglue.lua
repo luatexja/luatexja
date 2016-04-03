@@ -122,7 +122,7 @@ end
 local function skip_table_to_glue(n)
    local g, st = node_new(id_glue), ltjs.fast_get_stack_skip(n)
    setglue(g, st.width, st.stretch, st.shrink, st.stretch_order, st.shrink_order)
-   luatexja.ext_show_node(to_node(g), 'sg ',print) 
+   -- luatexja.ext_show_node(to_node(g), 'sg ',print) 
    return g, (st.width==1073741823)
 end
 
