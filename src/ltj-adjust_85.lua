@@ -1,5 +1,5 @@
 --
--- ltj-adjust.lua
+-- luatexja/otf.lua
 --
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 luatexja.load_module('jfmglue');   local ltjj = luatexja.jfmglue
@@ -12,7 +12,10 @@ local to_direct = node.direct.todirect
 local setfield = node.direct.setfield
 local setglue = luatexja.setglue
 local getfield = node.direct.getfield
-local is_zero_glue = node.direct.is_zero_glue
+local is_zero_glue = node.direct.is_zero_glue or
+   function(g)
+      return (getfield(g,'width')==0)and (getfield(g,'stretch')==0)and(getfield(g,'shrink')==0)
+   end
 local getlist = node.direct.getlist
 local getid = node.direct.getid
 local getfont = node.direct.getfont
@@ -84,6 +87,7 @@ local function get_stretched(q, go, gs)
 end
 
 local res = {}
+local gs_used_line = {}
 local function get_total_stretched(p, line)
    local go, gf, gs
       = getfield(p, 'glue_order'), getfield(p, 'glue_set'), getfield(p, 'glue_sign')
@@ -98,6 +102,23 @@ local function get_total_stretched(p, line)
       elseif ic == XKANJI_SKIP_JFM  then ic = XKANJI_SKIP
       end
       if   type(res[ic]) == 'number' then
+	 -- kanjiskip, xkanjiskip は段落内で spec を共有しているが，
+	 -- それはここでは望ましくないので，各 glue ごとに異なる spec を使う．
+	 -- 本当は各行ごとに glue_spec を共有させたかったが，安直にやると
+	 -- ref_count が 0 なので Double-free が発生する．どうする？
+	 -- JFM グルーはそれぞれ異なる glue_spec を用いているので，問題ない．
+	 if (ic == KANJI_SKIP or ic == XKANJI_SKIP) and getsubtype(q)==0 then
+	    local qs = getfield(q, 'spec')
+	    if is_zero_glue(q) then
+	       if (gs_used_line[qs] or 0)<line  then
+		  setfield(q, 'spec', node_copy(qs))
+		  local f = node_new(id_glue); setfield(f, 'spec', qs); node_free(f)
+		  -- decrese qs's reference count
+	       else
+		  gs_used_line[qs] = line
+	       end
+	    end
+	 end
 	 res[ic], total = res[ic] + a, total + a
       else
 	 res[0], total = res[0]  + a, total + a
@@ -111,21 +132,33 @@ local function clear_stretch(p, ic, name)
       local f = get_attr_icflag(q)
       if (f == ic) or ((ic ==KANJI_SKIP) and (f == KANJI_SKIP_JFM))
 	   or ((ic ==XKANJI_SKIP) and (f == XKANJI_SKIP_JFM)) then
-         setfield(q, name..'_order', 0)
-         setfield(q, name, 0)
+         local qs = getfield(q, 'spec')
+         if getfield(qs, 'writable') then
+            setfield(qs, name..'_order', 0)
+            setfield(qs, name, 0)
+         end
       end
    end
 end
 
+local set_stretch_table = {}
 local function set_stretch(p, after, before, ic, name)
    if before > 0 then
       local ratio = after/before
+      for i,_ in pairs(set_stretch_table) do
+         set_stretch_table[i] = nil
+      end
       for q in node_traverse_id(id_glue, getlist(p)) do
 	 local f = get_attr_icflag(q)
          if (f == ic) or ((ic ==KANJI_SKIP) and (f == KANJI_SKIP_JFM))
 	   or ((ic ==XKANJI_SKIP) and (f == XKANJI_SKIP_JFM)) then
-            if getfield(q, name..'_order')==0 then
-               setfield(q, name, getfield(q, name)*ratio)
+            local qs, do_flag = getfield(q, 'spec'), true
+            for i=1,#set_stretch_table do
+               if set_stretch_table[i]==qs then do_flag = false end
+            end
+            if getfield(qs, 'writable') and getfield(qs, name..'_order')==0 and do_flag then
+               setfield(q, name, getfield(qs, name)*ratio)
+               set_stretch_table[#set_stretch_table+1] = qs
             end
          end
       end
@@ -228,6 +261,9 @@ local function adjust_width(head)
 	 total = round(total * res.glue_set)
          aw_step2(p, res, total, aw_step1(p, res, total))
       end
+   end
+   for i,_ in pairs(gs_used_line) do
+      gs_used_line[i]  = nil
    end
    return to_node(head)
 end

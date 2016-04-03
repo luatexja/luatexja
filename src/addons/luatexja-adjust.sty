@@ -64,7 +64,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-adjust}[2014/05/13]
+  \ProvidesPackage{luatexja-adjust}[2016/04/03]
 \fi                             %</LaTeX>
 
 % Load core module if not yet.
@@ -84,7 +84,11 @@
 %%------------------
 
 %! Main part of luatexja-adjust
-\RequireLuaTeXjaSubmodule{adjust}
+\ifnum\luatexversion>90
+  \RequireLuaTeXjaSubmodule{adjust}
+\else
+  \RequireLuaTeXjaSubmodule{adjust_85}
+\fi
 
 % enable/disable ``advanced'' line adjustment
 \protected\def\ltjdisableadjust{\directlua{luatexja.adjust.disable_cb()}}

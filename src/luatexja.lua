@@ -22,7 +22,7 @@ end
 
 local setfield = node.direct.setfield
 luatexja.setglue = node.direct.setglue or
-    function(g,w,st,sh,sto,sho)
+   function(g,w,st,sh,sto,sho)
       setfield(g,'width', w or 0)
       setfield(g,'stretch',st or 0)
       setfield(g,'shrink', sh or 0)

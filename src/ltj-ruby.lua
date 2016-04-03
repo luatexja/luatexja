@@ -11,25 +11,24 @@ local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
 luatexja.load_module('stack');     local ltjs = luatexja.stack
 
-local Dnode = node.direct or node
-local nullfunc = function(n) return n end
-local to_node = (Dnode ~= node) and Dnode.tonode or nullfunc
-local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
+local to_node =  node.direct.tonode
+local to_direct =  node.direct.todirect
 
-local setfield = (Dnode ~= node) and Dnode.setfield or function(n, i, c) n[i] = c end
-local getfield = (Dnode ~= node) and Dnode.getfield or function(n, i) return n[i] end
-local getid = (Dnode ~= node) and Dnode.getid or function(n) return n.id end
-local getfont = (Dnode ~= node) and Dnode.getfont or function(n) return n.font end
-local getlist = (Dnode ~= node) and Dnode.getlist or function(n) return n.head end
-local getchar = (Dnode ~= node) and Dnode.getchar or function(n) return n.char end
-local getsubtype = (Dnode ~= node) and Dnode.getsubtype or function(n) return n.subtype end
+local setfield =  node.direct.setfield
+local setglue = luatexja.setglue
+local getfield =  node.direct.getfield
+local getid =  node.direct.getid
+local getfont =  node.direct.getfont
+local getlist =  node.direct.getlist
+local getchar =  node.direct.getchar
+local getsubtype =  node.direct.getsubtype
 
-local node_new = Dnode.new
-local node_remove = Dnode.remove
-local node_next = (Dnode ~= node) and Dnode.getnext or node.next
-local node_copy, node_free, node_tail = Dnode.copy, Dnode.free, Dnode.tail
-local has_attr, set_attr = Dnode.has_attribute, Dnode.set_attribute
-local insert_before, insert_after = Dnode.insert_before, Dnode.insert_after
+local node_new = node.direct.new
+local node_remove = node.direct.remove
+local node_next =  node.direct.getnext
+local node_copy, node_free, node_tail = node.direct.copy, node.direct.free, node.direct.tail
+local has_attr, set_attr = node.direct.has_attribute, node.direct.set_attribute
+local insert_before, insert_after = node.direct.insert_before, node.direct.insert_after
 
 local id_hlist = node.id('hlist')
 local id_vlist = node.id('vlist')
@@ -38,7 +37,6 @@ local id_whatsit = node.id('whatsit')
 local id_glue = node.id('glue')
 local id_kern = node.id('kern')
 local id_penalty = node.id('penalty')
-local id_glue_spec = node.id('glue_spec')
 local sid_user = node.subtype('user_defined')
 local ltjs_get_stack_table = luatexja.stack.get_stack_table
 local id_pbox_w = 258 -- cluster which consists of a whatsit
@@ -74,12 +72,10 @@ local RUBY_POST = luatexja.userid_table.RUBY_POST
 ----------------------------------------------------------------
 -- TeX interface 0
 ----------------------------------------------------------------
-if Dnode ~= node then
-   function cpbox() return node_copy(Dnode.getbox(0)) end
-else
-   function cpbox() return node.copy(tex.box[0]) end
+do
+   local getbox = node.direct.getbox
+   function cpbox() return node_copy(getbox(0)) end
 end
-
 
 ----------------------------------------------------------------
 -- 補助関数群 1
@@ -147,7 +143,7 @@ end
 -- ルビ文字を格納しているボックスでの設定ではない！
 local concat
 do
-   local node_prev = (Dnode ~= node) and Dnode.getprev or node.prev
+   local node_prev = node.direct.getprev
    function concat(f, b)
       if f then
 	 if b then
@@ -159,7 +155,7 @@ do
 	    setfield(f, 'head', nil); node_free(f)
 	    setfield(b, 'head', nil); node_free(b)
 	    local g = luatexja.jfmglue.main(h,false)
-	    return Dnode.hpack(g)
+	    return node.direct.hpack(g)
 	 else
 	    return f
 	 end
@@ -213,47 +209,29 @@ do
 	    -- この 5 種類の空白をのばす
 	       if getid(hx) == id_kern then
 		  local k = node_new(id_glue)
-		  local ks = node_new(id_glue_spec)
-		  setfield(ks, 'width', getfield(hx, 'kern'))
-		  setfield(ks, 'stretch_order', 2)
-		  setfield(ks, 'stretch', round(middle*65536))
-		  setfield(ks, 'shrink_order', 0); setfield(ks, 'shrink', 0)
-		  setfield(k, 'subtype', 0); setfield(k, 'spec', ks)
+		  setglue(k, getfield(hx, 'kern'), round(middle*65536), 0,
+		             2, 0)
+		  setfield(k, 'subtype', 0);
 		  h = insert_after(h, hx, k);
 		  h = node_remove(h, hx); node_free(hx); hx = k
 	       else -- glue
-		  local old_spec = getfield(hx, 'spec')
-		  local ks = node_copy(old_spec)
-		  setfield(ks, 'stretch_order', 2)
-		  setfield(ks, 'stretch', round(middle*65536))
-		  setfield(ks, 'shrink_order', 0); setfield(ks, 'shrink', 0)
-		  setfield(hx, 'spec', ks)
-		  -- decrease old_spec's reference count
-		  local b = node_new(id_glue)
-		  setfield(b, 'spec', old_spec); node_free(b)
+	          setglue(hx, getfield(hx, 'width'), round(middle*65536), 0,
+	                     2, 0)
 	       end
 	 end
 	 hx = node_next(hx)
       end
       -- 先頭の空白を挿入
       local k = node_new(id_glue);
-      local ks = node_new(id_glue_spec)
-      setfield(ks, 'width', prenw)
-      setfield(ks, 'stretch_order', 2); setfield(ks, 'stretch', round(pre*65536))
-      setfield(ks, 'shrink_order', 0); setfield(ks, 'shrink', 0)
-      setfield(k, 'subtype', 0); setfield(k, 'spec', ks)
+      setglue(k, prenw, round(pre*65536), 0, 2, 0)
       h = insert_before(h, h, k);
       -- 末尾の空白を挿入
       local k = node_new(id_glue);
-      local ks = node_new(id_glue_spec);
-      setfield(ks, 'width', postnw)
-      setfield(ks, 'stretch_order', 2); setfield(ks, 'stretch', round(post*65536))
-      setfield(ks, 'shrink_order', 0); setfield(ks, 'shrink', 0)
-      setfield(k, 'subtype', 0);setfield(k, 'spec', ks)
+      setglue(k, postnw, round(post*65536), 0, 2, 0)
       insert_after(h, node_tail(h), k);
       -- hpack
       setfield(box, 'head', nil); node_free(box)
-      box = Dnode.hpack(h, new_width, 'exactly')
+      box = node.direct.hpack(h, new_width, 'exactly')
       setfield(box, 'height', hh)
       setfield(box, 'depth', hd)
       return box
@@ -287,7 +265,7 @@ local function texiface_low(rst, rtlr, rtlp)
       _, n = insert_after(wv, n, rtlp[i])
    end
    -- w.value: (whatsit) .. r1 .. p1 .. r2 .. p2
-   Dnode.write(w); return w,wv
+   node.direct.write(w); return w,wv
 end
 
 -- rst: table
@@ -356,7 +334,7 @@ local function enlarge_parent(r, p, ppre, pmid, ppost, mapre, mapost, intmode)
    local rwidth = rwidth - pre_intrusion - post_intrusion
    setfield(r, 'width', rwidth)
    setfield(p, 'width', rwidth)
-   local ps = getfield(getlist(p), 'spec')
+   local ps = getlist(p)
    setfield(ps, 'width', getfield(ps, 'width') - pre_intrusion)
    return r, p, post_intrusion
 end
@@ -381,18 +359,18 @@ local function new_ruby_box(r, p, ppre, pmid, ppost,
       local need_repack = false
       -- margin が大きくなりすぎた時の処理
       if round(rpre*getfield(r, 'glue_set')*65536) > max_margin then
-	 local ps = getfield(getlist(r), 'spec'); need_repack = true
+	 local ps = getlist(r); need_repack = true
 	 setfield(ps, 'width', max_margin)
          setfield(ps, 'stretch', 1) -- 全く伸縮しないのも困る
       end
       if round(rpost*getfield(r, 'glue_set')*65536) > max_margin then
-	 local ps = getfield(node_tail(getlist(r)), 'spec'); need_repack = true
+	 local ps = node_tail(getlist(r)); need_repack = true
 	 setfield(ps, 'width', max_margin)
          setfield(ps, 'stretch', 1) -- 全く伸縮しないのも困る
       end
       if need_repack then
 	 local rt = r
-	 r = Dnode.hpack(getlist(r), getfield(r, 'width'), 'exactly')
+	 r = node.direct.hpack(getlist(r), getfield(r, 'width'), 'exactly')
 	 setfield(rt, 'head', nil); node_free(rt);
       end
    end
@@ -401,7 +379,7 @@ local function new_ruby_box(r, p, ppre, pmid, ppost,
    setfield(a, 'depth', 0); setfield(k, 'kern', rgap)
    insert_after(r, r, a); insert_after(r, a, k);
    insert_after(r, k, p); setfield(p, 'next', nil)
-   a = Dnode.vpack(r); setfield(a, 'shift', 0)
+   a = node.direct.vpack(r); setfield(a, 'shift', 0)
    set_attr(a, attr_ruby, post_intrusion)
    if rsmash or getfield(a, 'height')<getfield(p, 'height') then
       local k = node_new(id_kern)
@@ -471,7 +449,7 @@ local function pre_low_cal_box(w, cmp)
 
    -- w.value の node list 更新．
    local nt = wv
-   Dnode.flush_list(node_next(wv))
+   node.direct.flush_list(node_next(wv))
    for i = 1, 2*cmp+1 do setfield(nt, 'next', kf[i]); nt = kf[i]  end
 
    if cmp==1 then     solve_1(coef)
@@ -484,7 +462,7 @@ end
 
 local first_whatsit
 do
-   local traverse_id = Dnode.traverse_id
+   local traverse_id = node.direct.traverse_id
    function first_whatsit(n) -- n 以後で最初の whatsit
       for h in traverse_id(id_whatsit, n) do
          return h
@@ -497,11 +475,8 @@ local next_cluster_array = {}
 -- ノード追加
 local function pre_low_app_node(head, w, cmp, coef, ht, dp)
    -- メインの node list 更新
-   local nt, ntb = node_new(id_glue), node_new(id_glue_spec)
-   setfield(ntb, 'width', coef[1][2*cmp+2])
-   setfield(ntb, 'stretch_order', 0); setfield(ntb, 'stretch', 0)
-   setfield(ntb, 'shrink_order', 0); setfield(ntb, 'shrink', 0)
-   setfield(nt, 'subtype', 0); setfield(nt, 'spec', ntb)
+   local nt = node_new(id_glue)
+   setglue(nt, coef[1][2*cmp+2], 0, 0, 0, 0)
    set_attr(nt, attr_ruby, 1); set_attr(w, attr_ruby, 2)
    head = insert_before(head, w, nt)
    nt = w
@@ -514,16 +489,12 @@ local function pre_low_app_node(head, w, cmp, coef, ht, dp)
       insert_after(head, nt, nta)
       set_attr(nta, attr_ruby, 2*i+1)
       -- glue
-       local ntb = node_new(id_glue_spec);
-      setfield(ntb, 'width', coef[i*2+1][2*cmp+2])
-      setfield(ntb, 'stretch_order', 0); setfield(ntb, 'stretch', 0)
-      setfield(ntb, 'shrink_order', 0); setfield(ntb, 'shrink', 0)
       if i~=cmp or not next_cluster_array[w] then
 	 nt = node_new(id_glue); insert_after(head, nta, nt)
       else
 	 nt = next_cluster_array[w]
       end
-      setfield(nt, 'subtype', 0); setfield(nt, 'spec', ntb)
+      setglue(nt, coef[i*2+1][2*cmp+2], 0, 0, 0, 0)
       set_attr(nt, attr_ruby, 2*i+2)
    end
    tex.setattribute('global', attr_ruby, -0x7FFFFFFF)
@@ -634,7 +605,7 @@ local function post_high_break(head)
    local rs = {}   -- rs: sequence of ruby_nodes,
    local rw = nil  -- rw: main whatsit
    local cmp = -2  -- dummy
-   for h in Dnode.traverse_id(id_hlist, to_direct(head)) do
+   for h in node.direct.traverse_id(id_hlist, to_direct(head)) do
       for i = 1, #rs do rs[i] = nil end
       local ha = getlist(h)
       while ha do

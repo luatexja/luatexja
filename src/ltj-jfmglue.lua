@@ -122,6 +122,7 @@ end
 local function skip_table_to_glue(n)
    local g, st = node_new(id_glue), ltjs.fast_get_stack_skip(n)
    setglue(g, st.width, st.stretch, st.shrink, st.stretch_order, st.shrink_order)
+   luatexja.ext_show_node(to_node(g), 'sg ',print) 
    return g, (st.width==1073741823)
 end
 
@@ -815,7 +816,7 @@ do
       if Np.auto_kspc or Nq.auto_kspc then
 	 local pm, qm = Np.met, Nq.met
 	 if (pm.char_type==qm.char_type) and (qm.var==pm.var) then
-	    return get_kanjiskip_low(true, qm, 1, 1, 1)
+	     return get_kanjiskip_low(true, qm, 1, 1, 1)
 	 else
 	    local gb = get_kanjiskip_low(true, qm, 1, 1, 1)
 	    local ga = get_kanjiskip_low(true, pm, 1, 1, 1)
