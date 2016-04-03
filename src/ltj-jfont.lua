@@ -34,8 +34,6 @@ local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_curtfnt = luatexbase.attributes['ltj@curtfnt']
 local id_glyph = node.id('glyph')
 local id_kern = node.id('kern')
-local id_glue_spec = node.id('glue_spec')
-local id_glue = node.id('glue')
 local cat_lp = luatexbase.catcodetables['latex-package']
 local FROM_JFM     = luatexja.icflag_table.FROM_JFM
 local tokenlib = luatexja.token
@@ -165,27 +163,22 @@ do
 	    ((v.align=='right') and 1 or 0.5)
 	 if type(i) == 'number' then -- char_type
 	    for k,w in pairs(v.glue) do
-	       local h = node_new(id_glue_spec)
 	       v[k] = {
-		  true, h,
+		  nil,
 		  ratio=w.ratio/sz,
 		  priority=FROM_JFM + w.priority/sz,
+		  width = w[1], stretch = w[2], shrink = w[3],
 		  kanjiskip_natural = w.kanjiskip_natural and w.kanjiskip_natural/sz,
 		  kanjiskip_stretch = w.kanjiskip_stretch and w.kanjiskip_stretch/sz,
 		  kanjiskip_shrink =  w.kanjiskip_shrink  and w.kanjiskip_shrink/sz,
 	       }
-	       setfield(h, 'width', w[1])
-	       setfield(h, 'stretch', w[2])
-	       setfield(h, 'shrink', w[3])
-	       setfield(h, 'stretch_order', 0)
-	       setfield(h, 'shrink_order', 0)
 	    end
 	    for k,w in pairs(v.kern) do
 	       local g = node_new(id_kern)
 	       setfield(g, 'kern', w[1])
 	       setfield(g, 'subtype', 1)
 	       set_attr(g, attr_icflag, FROM_JFM)
-	       v[k] = {false, g, ratio=w[2]/sz}
+	       v[k] = {g, ratio=w[2]/sz}
 	    end
 	 end
 	 v.glue, v.kern = nil, nil
@@ -661,14 +654,13 @@ do
 	       for k,w in pairs(v) do
 		  if type(k)=='number' then
 		     --if w[1] then gs = gs + 1 else ke = ke + 1 end
-		     node_free(w[2])
+		     if w[1] then node_free(w[1]) end
 		  end
 	       end
 	    end
 	    n.size_cache[i]=nil
 	 end
       end
-      --print('glue spec: ', gs, 'kern: ', ke)
    end
 end
 

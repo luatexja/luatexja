@@ -16,35 +16,34 @@ luatexja.load_module('direction'); local ltjd = luatexja.direction
 luatexja.load_module('setwidth');      local ltjw = luatexja.setwidth
 local pairs = pairs
 
-local Dnode = node.direct or node
-
 local nullfunc = function(n) return n end
-local to_node = (Dnode ~= node) and Dnode.tonode or nullfunc
-local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
+local to_node = node.direct.tonode
+local to_direct = node.direct.todirect
 
-local setfield = (Dnode ~= node) and Dnode.setfield or function(n, i, c) n[i] = c end
-local getfield = (Dnode ~= node) and Dnode.getfield or function(n, i) return n[i] end
-local getid = (Dnode ~= node) and Dnode.getid or function(n) return n.id end
-local getfont = (Dnode ~= node) and Dnode.getfont or function(n) return n.font end
-local getlist = (Dnode ~= node) and Dnode.getlist or function(n) return n.head end
-local getchar = (Dnode ~= node) and Dnode.getchar or function(n) return n.char end
-local getsubtype = (Dnode ~= node) and Dnode.getsubtype or function(n) return n.subtype end
+local setfield = node.direct.setfield
+local setglue = luatexja.setglue
+local getfield = node.direct.getfield
+local getid = node.direct.getid
+local getfont = node.direct.getfont
+local getlist = node.direct.getlist
+local getchar = node.direct.getchar
+local getsubtype = node.direct.getsubtype
 
-local has_attr = Dnode.has_attribute
-local set_attr = Dnode.set_attribute
-local insert_before = Dnode.insert_before
-local insert_after = Dnode.insert_after
-local node_next = (Dnode ~= node) and Dnode.getnext or node.next
+local has_attr = node.direct.has_attribute
+local set_attr = node.direct.set_attribute
+local insert_before = node.direct.insert_before
+local insert_after = node.direct.insert_after
+local node_next = node.direct.getnext
 local round = tex.round
 local ltjd_make_dir_whatsit = ltjd.make_dir_whatsit
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_find_char_class = ltjf.find_char_class
-local node_new = Dnode.new
-local node_copy = Dnode.copy
-local node_remove = Dnode.remove
-local node_tail = Dnode.tail
-local node_free = Dnode.free
-local node_end_of_math = Dnode.end_of_math
+local node_new = node.direct.new
+local node_copy = node.direct.copy
+local node_remove = node.direct.remove
+local node_tail = node.direct.tail
+local node_free = node.direct.free
+local node_end_of_math = node.direct.end_of_math
 
 local id_glyph = node.id('glyph')
 local id_hlist = node.id('hlist')
@@ -60,7 +59,6 @@ local id_glue = node.id('glue')
 local id_kern = node.id('kern')
 local id_penalty = node.id('penalty')
 
-local id_glue_spec = node.id('glue_spec')
 local id_jglyph    = 512 -- Japanese character
 local id_box_like  = 256 -- vbox, shifted hbox
 local id_pbox      = 257 -- already processed nodes (by \unhbox)
@@ -121,25 +119,10 @@ do
    end
 end
 
-local zero_glue = node_new(id_glue)
-spec_zero_glue = to_node(node_new(id_glue_spec))
-  -- must be public, since mentioned from other sources
-local spec_zero_glue = to_direct(spec_zero_glue)
-setfield(spec_zero_glue, 'width', 0)
-setfield(spec_zero_glue, 'stretch', 0)
-setfield(spec_zero_glue, 'shrink', 0)
-setfield(spec_zero_glue, 'stretch_order', 0)
-setfield(spec_zero_glue, 'shrink_order', 0)
-setfield(zero_glue, 'spec', spec_zero_glue)
-
-local function skip_table_to_spec(n)
-   local g, st = node_new(id_glue_spec), ltjs.fast_get_stack_skip(n)
-   setfield(g, 'width', st.width)
-   setfield(g, 'stretch', st.stretch)
-   setfield(g, 'shrink', st.shrink)
-   setfield(g, 'stretch_order', st.stretch_order)
-   setfield(g, 'shrink_order', st.shrink_order)
-   return g
+local function skip_table_to_glue(n)
+   local g, st = node_new(id_glue), ltjs.fast_get_stack_skip(n)
+   setglue(g, st.width, st.stretch, st.shrink, st.stretch_order, st.shrink_order)
+   return g, (st.width==1073741823)
 end
 
 
@@ -281,7 +264,7 @@ luatexbase.create_callback("luatexja.jfmglue.whatsit_after", "data",
 local calc_np 
 do
 
-local traverse = Dnode.traverse
+local traverse = node.direct.traverse
 local function check_next_ickern(lp)
   if lp and getid(lp) == id_kern and ( getsubtype(lp)==3 or ITALIC == get_attr_icflag(lp)) then
       set_attr(lp, attr_icflag, IC_PROCESSED);
@@ -709,13 +692,13 @@ local function new_jfm_glue(mc, bc, ac)
 -- bc, ac: char classes
    local g = mc[bc][ac]
    if g then
-      if g[1] then
+       if g[1] then
+	   return node_copy(g[1]), g.ratio, false, false, false
+       else
 	 local f = node_new(id_glue)
 	 set_attr(f, attr_icflag, g.priority)
-	 setfield(f, 'spec', node_copy(g[2]))
+	 setglue(f, g.width, g.stretch, g.shrink)
 	 return f, g.ratio, g.kanjiskip_natural, g.kanjiskip_stretch, g.kanjiskip_shrink
-      else
-	 return node_copy(g[2]), g.ratio, false, false, false
       end
    end
    return false, 0
@@ -756,14 +739,13 @@ do
 
       local k = 2*getid(gb) - getid(ga)
       if k == bg_ag then
-	 local bs, as = getfield(gb, 'spec'), getfield(ga, 'spec')
 	 -- 両方とも glue．
-	 setfield(bs, 'width', blend_diffmet(
-		     getfield(bs, 'width'), getfield(as, 'width'), db, da))
-	 setfield(bs, 'stretch', blend_diffmet(
-		     getfield(bs, 'stretch'), getfield(as, 'stretch'), db, da))
-	 setfield(bs, 'shrink', -blend_diffmet(
-		     -getfield(bs, 'shrink'), -getfield(as, 'shrink'), db, da))
+	 setglue(gb, blend_diffmet(
+	                getfield(gb, 'width'), getfield(ga, 'width'), db, da),
+		     blend_diffmet(
+		        getfield(gb, 'stretch'), getfield(ga, 'stretch'), db, da),
+		     -blend_diffmet(
+		     -getfield(gb, 'shrink'), -getfield(ga, 'shrink'), db, da))
 	 node_free(ga)
 	 return gb
       elseif k == bk_ak then
@@ -773,25 +755,23 @@ do
 	 node_free(ga)
 	 return gb
       elseif k == bk_ag then
-	 local as = getfield(ga, 'spec')
 	 -- gb: kern, ga: glue
-	 setfield(as, 'width', blend_diffmet(
-		     getfield(gb, 'kern'), getfield(as, 'width'), db, da))
-	 setfield(as, 'stretch', blend_diffmet(
-		     0, getfield(as, 'stretch'), db, da))
-	 setfield(as, 'shrink', -blend_diffmet(
-		     0, -getfield(as, 'shrink'), db, da))
+	 setglue(ga, blend_diffmet(
+		        getfield(gb, 'kern'), getfield(ga, 'width'), db, da),
+	             blend_diffmet(
+		        0, getfield(ga, 'stretch'), db, da),
+	             -blend_diffmet(
+		        0, -getfield(ga, 'shrink'), db, da))
 	 node_free(gb)
 	 return ga, 0, 0, 0
       else
-	 local bs = getfield(gb, 'spec')
 	 -- gb: glue, ga: kern
-	 setfield(bs, 'width', blend_diffmet(
-		     getfield(bs, 'width'), getfield(ga, 'kern'), db, da))
-	 setfield(bs, 'stretch', blend_diffmet(
-		     getfield(bs, 'stretch'), 0, db, da))
-	 setfield(bs, 'shrink', -blend_diffmet(
-		     -getfield(bs, 'shrink'), 0, db, da))
+	 setglue(gb, blend_diffmet(
+		        getfield(gb, 'width'), getfield(ga, 'kern'), db, da),
+		     blend_diffmet(
+		        getfield(gb, 'stretch'), 0, db, da),
+		     -blend_diffmet(
+		        -getfield(gb, 'shrink'), 0, db, da))
 	 node_free(ga)
 	 return gb
       end
@@ -810,26 +790,21 @@ do
       if flag or (qm.with_kanjiskip and (bn or bp or bh)) then
 	 if kanjiskip_jfm_flag then
 	    local g = node_new(id_glue);
-	    local gx = node_new(id_glue_spec);
-	    setfield(gx, 'stretch_order', 0); setfield(gx, 'shrink_order', 0)
 	    local bk = qm.kanjiskip or null_skip_table
-	    setfield(gx, 'width', bn and (bn*bk[1]) or 0)
-	    setfield(gx, 'stretch', bp and (bp*bk[2]) or 0)
-	    setfield(gx, 'shrink', bh and (bh*bk[3]) or 0)
-	    setfield(g, 'spec', gx)
+	    setglue(g, bn and (bn*bk[1]) or 0, 
+	               bp and (bp*bk[2]) or 0, 
+	               bh and (bh*bk[3]) or 0, 0, 0)
 	    set_attr(g, attr_icflag, KANJI_SKIP_JFM)
 	    return g
 	 elseif flag then
 	    return node_copy(kanji_skip)
 	 else
 	    local g = node_new(id_glue);
-	    local gx = node_new(id_glue_spec);
-	    setfield(gx, 'stretch_order', 0); setfield(gx, 'shrink_order', 0)
-	    local ks = getfield(kanji_skip, 'spec')
-	    setfield(gx, 'width', bn and (bn*getfield(ks, 'width')) or 0)
-	    setfield(gx, 'stretch', bp and (bp*getfield(ks, 'stretch')) or 0)
-	    setfield(gx, 'shrink', bh and (bh*getfield(ks, 'shrink')) or 0)
-	    setfield(g, 'spec', gx)
+	    setglue(g,
+	       bn and (bn*getfield(kanji_skip, 'width')) or 0,
+	       bp and (bp*getfield(kanji_skip, 'stretch')) or 0,
+	       bh and (bh*getfield(kanji_skip, 'shrink')) or 0,
+	       0, 0)
 	    set_attr(g, attr_icflag, KANJI_SKIP_JFM)
 	    return g
 	 end
@@ -847,7 +822,7 @@ do
 	    return calc_ja_ja_aux(gb, ga, 0, 1)
 	 end
       else
-	 local g = node_copy(zero_glue)
+	 local g = node_new(id_glue)
 	 set_attr(g, attr_icflag, kanjiskip_jfm_flag and KANJI_SKIP_JFM or KANJI_SKIP)
 	 return g
       end
@@ -895,26 +870,21 @@ do
       if flag or (qm.with_kanjiskip and (bn or bp or bh)) then
 	 if xkanjiskip_jfm_flag then
 	    local g = node_new(id_glue);
-	    local gx = node_new(id_glue_spec);
-	    setfield(gx, 'stretch_order', 0); setfield(gx, 'shrink_order', 0)
 	    local bk = qm.xkanjiskip or null_skip_table
-	    setfield(gx, 'width', bn and bk[1] or 0)
-	    setfield(gx, 'stretch', bp and bk[2] or 0)
-	    setfield(gx, 'shrink', bh and bk[3] or 0)
-	    setfield(g, 'spec', gx)
+	    setglue(g, bn and bk[1] or 0,
+	               bp and bk[2] or 0,
+		       bh and bk[3] or 0, 0, 0)
 	    set_attr(g, attr_icflag, XKANJI_SKIP_JFM)
 	    return g
 	 elseif flag then
 	    return node_copy(xkanji_skip)
 	 else
 	    local g = node_new(id_glue);
-	    local gx = node_new(id_glue_spec);
-	    setfield(gx, 'stretch_order', 0); setfield(gx, 'shrink_order', 0)
-	    local ks = getfield(xkanji_skip, 'spec')
-	    setfield(gx, 'width', bn and getfield(ks, 'width') or 0)
-	    setfield(gx, 'stretch', bp and getfield(ks, 'stretch') or 0)
-	    setfield(gx, 'shrink', bh and getfield(ks, 'shrink') or 0)
-	    setfield(g, 'spec', gx)
+	    setglue(g,
+	       bn and (bn*getfield(xkanji_skip, 'width')) or 0,
+	       bp and (bp*getfield(xkanji_skip, 'stretch')) or 0,
+	       bh and (bh*getfield(xkanji_skip, 'shrink')) or 0,
+	       0, 0)
 	    set_attr(g, attr_icflag, XKANJI_SKIP_JFM)
 	    return g
 	 end
@@ -925,7 +895,7 @@ do
       if (Nq.xspc>=2) and (Np.xspc%2==1) and (Nq.auto_xspc or Np.auto_xspc) then
 	 return get_xkanjiskip_low(true, Nn.met, 1, 1, 1)
       else
-	 local g = node_copy(zero_glue)
+	 local g = node_new(id_glue)
 	 set_attr(g, attr_icflag, xkanjiskip_jfm_flag and XKANJI_SKIP_JFM or XKANJI_SKIP)
 	 return g
       end
@@ -1140,17 +1110,13 @@ do
       -- ithout this node, set_attr(kanji_skip, ...) somehow creates an "orphaned"  attribute list.
 
       do
-	 kanji_skip = node_new(id_glue); set_attr(kanji_skip, attr_icflag, KANJI_SKIP)
-	 local s = skip_table_to_spec(KSK)
-	 setfield(kanji_skip, 'spec', s)
-	 kanjiskip_jfm_flag = (getfield(s, 'width') == 1073741823)
+	  kanji_skip, kanjiskip_jfm_flag = skip_table_to_glue(KSK)
+	  set_attr(kanji_skip, attr_icflag, KANJI_SKIP)
       end
 
       do
-	 xkanji_skip = node_new(id_glue); set_attr(xkanji_skip, attr_icflag, XKANJI_SKIP)
-	 local s = skip_table_to_spec(XSK)
-	 setfield(xkanji_skip, 'spec', s)
-	 xkanjiskip_jfm_flag = (getfield(s, 'width') == 1073741823)
+	  xkanji_skip, xkanjiskip_jfm_flag = skip_table_to_glue(XSK)
+	  set_attr(xkanji_skip, attr_icflag, XKANJI_SKIP)
       end
 
       if mode then
@@ -1226,8 +1192,8 @@ end
 do
    local IHB  = luatexja.userid_table.IHB
    local BPAR = luatexja.userid_table.BPAR
-   local node_prev = (Dnode ~= node) and Dnode.getprev or node.prev
-   local node_write = Dnode.write
+   local node_prev = node.direct.getprev
+   local node_write = node.direct.write
 
    -- \inhibitglue
    function create_inhibitglue_node()

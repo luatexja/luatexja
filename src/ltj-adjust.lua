@@ -1,55 +1,48 @@
 --
 -- luatexja/otf.lua
 --
-luatexbase.provides_module({
-  name = 'luatexja.adjust',
-  date = '2014/09/30',
-  description = 'Advanced line adjustment for LuaTeX-ja',
-})
-module('luatexja.adjust', package.seeall)
-
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 luatexja.load_module('jfmglue');   local ltjj = luatexja.jfmglue
 luatexja.load_module('stack');     local ltjs = luatexja.stack
 luatexja.load_module('direction'); local ltjd = luatexja.direction
 
-local Dnode = node.direct or node
+local to_node = node.direct.tonode
+local to_direct = node.direct.todirect
 
-local nullfunc = function(n) return n end
-local to_node = (Dnode ~= node) and Dnode.tonode or nullfunc
-local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
+local setfield = node.direct.setfield
+local setglue = luatexja.setglue
+local getfield = node.direct.getfield
+local is_zero_glue = node.direct.is_zero_glue or
+   function(g)
+      return (getfield(g,'width')==0)and (getfield(g,'stretch')==0)and(getfield(g,'shrink')==0)
+   end
+local getlist = node.direct.getlist
+local getid = node.direct.getid
+local getfont = node.direct.getfont
+local getsubtype = node.direct.getsubtype
 
-local setfield = (Dnode ~= node) and Dnode.setfield or function(n, i, c) n[i] = c end
-local getfield = (Dnode ~= node) and Dnode.getfield or function(n, i) return n[i] end
-local getlist = (Dnode ~= node) and Dnode.getlist or function(n) return n.head end
-local getid = (Dnode ~= node) and Dnode.getid or function(n) return n.id end
-local getfont = (Dnode ~= node) and Dnode.getfont or function(n) return n.font end
-local getsubtype = (Dnode ~= node) and Dnode.getsubtype or function(n) return n.subtype end
-
-local node_traverse_id = Dnode.traverse_id
-local node_new = Dnode.new
-local node_copy = Dnode.copy
-local node_hpack = Dnode.hpack
-local node_next = (Dnode ~= node) and Dnode.getnext or node.next
-local node_free = Dnode.free
-local node_prev = (Dnode ~= node) and Dnode.getprev or node.prev
-local node_tail = Dnode.tail
-local has_attr = Dnode.has_attribute
-local set_attr = Dnode.set_attribute
-local insert_after = Dnode.insert_after
+local node_traverse_id = node.direct.traverse_id
+local node_new = node.direct.new
+local node_copy = node.direct.copy
+local node_hpack = node.direct.hpack
+local node_next = node.direct.getnext
+local node_free = node.direct.free
+local node_prev = node.direct.getprev
+local node_tail = node.direct.tail
+local has_attr = node.direct.has_attribute
+local set_attr = node.direct.set_attribute
+local insert_after = node.direct.insert_after
 
 local id_glyph = node.id('glyph')
 local id_kern = node.id('kern')
 local id_hlist = node.id('hlist')
 local id_glue  = node.id('glue')
-local id_glue_spec = node.id('glue_spec')
 local id_whatsit = node.id('whatsit')
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local lang_ja = luatexja.lang_ja
 
 local ltjf_font_metric_table = ltjf.font_metric_table
-local spec_zero_glue = ltjj.spec_zero_glue
 local round, pairs = tex.round, pairs
 
 local PACKED       = luatexja.icflag_table.PACKED
@@ -80,16 +73,14 @@ end
 -- box 内で伸縮された glue の合計値を計算
 
 local function get_stretched(q, go, gs)
-   local qs = getfield(q, 'spec')
-   if not getfield(qs, 'writable') then return 0 end
    if gs == 1 then -- stretching
-      if getfield(qs, 'stretch_order') == go then
-	 return getfield(qs, 'stretch')
+      if getfield(q, 'stretch_order') == go then
+	 return getfield(q, 'stretch')
       else return 0
       end
    else -- shrinking
-      if getfield(qs, 'shrink_order') == go then
-	 return getfield(qs, 'shrink')
+      if getfield(q, 'shrink_order') == go then
+	 return getfield(q, 'shrink')
       else return 0
       end
    end
@@ -118,7 +109,7 @@ local function get_total_stretched(p, line)
 	 -- JFM グルーはそれぞれ異なる glue_spec を用いているので，問題ない．
 	 if (ic == KANJI_SKIP or ic == XKANJI_SKIP) and getsubtype(q)==0 then
 	    local qs = getfield(q, 'spec')
-	    if qs ~= spec_zero_glue then
+	    if is_zero_glue(q) then
 	       if (gs_used_line[qs] or 0)<line  then
 		  setfield(q, 'spec', node_copy(qs))
 		  local f = node_new(id_glue); setfield(f, 'spec', qs); node_free(f)
@@ -166,7 +157,7 @@ local function set_stretch(p, after, before, ic, name)
                if set_stretch_table[i]==qs then do_flag = false end
             end
             if getfield(qs, 'writable') and getfield(qs, name..'_order')==0 and do_flag then
-               setfield(qs, name, getfield(qs, name)*ratio)
+               setfield(q, name, getfield(qs, name)*ratio)
                set_stretch_table[#set_stretch_table+1] = qs
             end
          end
@@ -278,15 +269,16 @@ local function adjust_width(head)
 end
 
 do
+   luatexja.adjust = luatexja.adjust or {}
    local is_reg = false
-   function enable_cb()
+   function luatexja.adjust.enable_cb()
       if not is_reg then
 	 luatexbase.add_to_callback('post_linebreak_filter',
 				    adjust_width, 'Adjust width', 100)
 	 is_reg = true
       end
    end
-   function disable_cb()
+   function luatexja.adjust.disable_cb()
       if is_reg then
 	 luatexbase.remove_from_callback('post_linebreak_filter', 'Adjust width')
 	 is_reg = false

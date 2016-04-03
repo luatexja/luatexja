@@ -99,16 +99,12 @@
 \expandafter\endinput\fi\relax
 
 %% Check LuaTeX version.
-\ifnum\luatexversion<74
+\ifnum\luatexversion<85
   \@PackageError{luatexja-core}
     {This LuaTeX engine is too old for this package;\MessageBreak
-     at least beta-0.74.0 is needed}
+     at least beta-0.85.0 is needed}
     {Package loading is aborted now.\MessageBreak}
 \expandafter\endinput\fi\relax
-
-%! なお、luatexbase-compat の説明に従うと、LuaTeX 拡張プリミティブは
-%! plain/LaTeX の両方で \luatex 付の名前（\directlua はそのまま)
-%! で使えると考えてよい。
 
 %% \LuaTeXjaAvailable
 %! 環境検査にパスした時に定義される.

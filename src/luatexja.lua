@@ -20,6 +20,16 @@ function luatexja.load_lua(fn)
    end
 end
 
+local setfield = node.direct.setfield
+luatexja.setglue = node.direct.setglue or
+    function(g,w,st,sh,sto,sho)
+      setfield(g,'width', w or 0)
+      setfield(g,'stretch',st or 0)
+      setfield(g,'shrink', sh or 0)
+      setfield(g,'stretch_order',sto or 0)
+      setfield(g,'shrink_order', sho or 0)
+    end
+
 -- check token library
 if newtoken then
    luatexja.token = newtoken
@@ -292,10 +302,9 @@ end
 do
    local start_time_measure, stop_time_measure
       = ltjb.start_time_measure, ltjb.stop_time_measure
-   local Dnode = node.direct or node
    local nullfunc = function (n) return n end
-   local to_node = (Dnode ~= node) and Dnode.tonode or nullfunc
-   local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
+   local to_node = node.direct.tonode
+   local to_direct = node.direct.todirect
    local ensure_tex_attr = ltjb.ensure_tex_attr
 
    -- mode = true iff main_process is called from pre_linebreak_filter
@@ -353,7 +362,6 @@ local has_attr = node.has_attribute
 
 local id_penalty = node.id('penalty')
 local id_glyph = node.id('glyph')
-local id_glue_spec = node.id('glue_spec')
 local id_glue = node.id('glue')
 local id_kern = node.id('kern')
 local id_hlist = node.id('hlist')
@@ -423,7 +431,7 @@ local function debug_show_node_X(p,print_fn, limit)
 	 .. ', dir=' .. tostring(node.has_attribute(p, attr_dir))
       print_fn(s)
    elseif pt == 'glue' then
-      s = base .. ' ' ..  print_spec(p.spec)
+      s = base .. ' ' ..  print_spec(p)
       if get_attr_icflag(p)>icflag_table.KINSOKU
          and get_attr_icflag(p)<icflag_table.KANJI_SKIP then
          s = s .. ' (from JFM: priority ' .. get_attr_icflag(p)-icflag_table.FROM_JFM .. ')'

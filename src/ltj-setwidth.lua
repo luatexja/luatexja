@@ -7,26 +7,25 @@ luatexja.load_module('stack');     local ltjs = luatexja.stack
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 luatexja.load_module('direction'); local ltjd = luatexja.direction
 
-local Dnode = node.direct or node
-local setfield = (Dnode ~= node) and Dnode.setfield or function(n, i, c) n[i] = c end
-local getfield = (Dnode ~= node) and Dnode.getfield or function(n, i) return n[i] end
-local getid = (Dnode ~= node) and Dnode.getid or function(n) return n.id end
-local getfont = (Dnode ~= node) and Dnode.getfont or function(n) return n.font end
-local getlist = (Dnode ~= node) and Dnode.getlist or function(n) return n.head end
-local getchar = (Dnode ~= node) and Dnode.getchar or function(n) return n.char end
-local getsubtype = (Dnode ~= node) and Dnode.getsubtype or function(n) return n.subtype end
+local setfield = node.direct.setfield
+local getfield = node.direct.getfield
+local getid = node.direct.getid
+local getfont = node.direct.getfont
+local getlist = node.direct.getlist
+local getchar = node.direct.getchar
+local getsubtype = node.direct.getsubtype
 
-local node_traverse_id = Dnode.traverse_id
-local node_traverse = Dnode.traverse
-local node_new = Dnode.new
-local node_copy = Dnode.copy
-local node_remove = Dnode.remove
-local node_tail = Dnode.tail
-local node_next = (Dnode ~= node) and Dnode.getnext or node.next
-local has_attr = Dnode.has_attribute
-local set_attr = Dnode.set_attribute
-local node_insert_before = Dnode.insert_before
-local node_insert_after = Dnode.insert_after
+local node_traverse_id = node.direct.traverse_id
+local node_traverse = node.direct.traverse
+local node_new = node.direct.new
+local node_copy = node.direct.copy
+local node_remove = node.direct.remove
+local node_tail = node.direct.tail
+local node_next = node.direct.getnext or node.next
+local has_attr = node.direct.has_attribute
+local set_attr = node.direct.set_attribute
+local node_insert_before = node.direct.insert_before
+local node_insert_after = node.direct.insert_after
 local round = tex.round
 
 local id_glyph = node.id('glyph')
