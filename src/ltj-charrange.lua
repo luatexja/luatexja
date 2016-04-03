@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.charrange',
-  date = '2014/05/08',
+  date = '2014/06/03',
   description = 'Handling the range of Japanese characters',
 })
 module('luatexja.charrange', package.seeall)
@@ -11,9 +11,8 @@ local err, warn, info, log = luatexbase.errwarinf(_NAME)
 
 luatexja.load_module('base');      local ltjb = luatexja.base
 
-local Dnode = node.direct or node
-local getchar = (Dnode ~= node) and Dnode.getchar or function(n) return n.char end
-local has_attr = Dnode.has_attribute
+local getchar = node.direct.getchar
+local has_attr = node.direct.has_attribute
 local has_attr_node = node.has_attribute
 local tex_getattr = tex.getattribute
 

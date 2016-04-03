@@ -9,27 +9,24 @@ luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 luatexja.load_module('stack');     local ltjs = luatexja.stack
 luatexja.load_module('setwidth');  local ltjw = luatexja.setwidth
 
-local Dnode = node.direct or node
-
-local setfield = (Dnode ~= node) and Dnode.setfield or function(n, i, c) n[i] = c end
-local getfield = (Dnode ~= node) and Dnode.getfield or function(n, i) return n[i] end
-local getid = (Dnode ~= node) and Dnode.getid or function(n) return n.id end
-local getsubtype = (Dnode ~= node) and Dnode.getsubtype or function(n) return n.subtype end
-local getlist = (Dnode ~= node) and Dnode.getlist or function(n) return n.head end
+local setfield = node.direct.setfield
+local getfield = node.direct.getfield
+local getid = node.direct.getid
+local getsubtype = node.direct.getsubtype
+local getlist = node.direct.getlist
 -- getlist cannot be used for sub_box nodes. Use instead λp. getfield(p, 'head')
-local getchar = (Dnode ~= node) and Dnode.getchar or function(n) return n.char end
+local getchar = node.direct.getchar
 
-local nullfunc = function(n) return n end
-local to_node = (Dnode ~= node) and Dnode.tonode or nullfunc
-local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
+local to_node = node.direct.tonode
+local to_direct = node.direct.todirect
 
-local node_traverse = Dnode.traverse
-local node_new = Dnode.new
-local node_next = (Dnode ~= node) and Dnode.getnext or node.next
-local node_remove = Dnode.remove
-local node_free = Dnode.free
-local has_attr = Dnode.has_attribute
-local set_attr = Dnode.set_attribute
+local node_traverse = node.direct.traverse
+local node_new = node.direct.new
+local node_next = node.direct.getnext
+local node_remove = node.direct.remove
+local node_free = node.direct.free
+local has_attr = node.direct.has_attribute
+local set_attr = node.direct.set_attribute
 local tex_getcount = tex.getcount
 
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
@@ -168,7 +165,6 @@ function (p, sty)
    return p
 end
 
-local node_remove = Dnode.remove
 luatexbase.add_to_callback('mlist_to_hlist',
    function (n, display_type, penalties)
       n = to_direct(n); list_dir = ltjd_get_dir_count()

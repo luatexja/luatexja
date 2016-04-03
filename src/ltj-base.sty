@@ -213,24 +213,6 @@
   }
 }
 
-%% \ltj@safe@glue{<glue>}
-%! グルー値.
-% For a glue. The result is a gluespec object.
-\def\ltj@safe@glue{
-  \ltj@safe@glue@or\ltj@safe@invalid
-}
-\def\ltj@safe@glue@or#1#2{
-  \expandafter\expandafter\expandafter\ltj@@safe@glueA
-   \ltj@gobble@glue#2\ltj@@safe@end{#2}{#1}
-}
-\def\ltj@@safe@glueA#1\ltj@@safe@end#2#3{
-  \ltj@if@blank{#1}{
-    (luatexja.base.to_skip("\the\glueexpr#2\relax"))
-  }{
-    #3
-  }
-}
-
 %% \ltj@safe@real{<real>}
 %! 実数. これは十進表記に限る.
 % For a real number given in decimal notation or a macro that

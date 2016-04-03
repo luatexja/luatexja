@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2016/03/31',
+  date = '2016/04/03',
   description = 'Loader for Japanese fonts',
 })
 module('luatexja.jfont', package.seeall)
@@ -13,19 +13,14 @@ luatexja.load_module('charrange'); local ltjc = luatexja.charrange
 luatexja.load_module('rmlgbm');    local ltjr = luatexja.rmlgbm
 luatexja.load_module('direction'); local ltjd = luatexja.direction
 
+local setfield = node.direct.setfield
+local getid = node.direct.getid
+local to_direct = node.direct.todirect
 
-local Dnode = node.direct or node
-
-local setfield = (Dnode ~= node) and Dnode.setfield or function(n, i, c) n[i] = c end
-local getid = (Dnode ~= node) and Dnode.getid or function(n) return n.id end
-
-local nullfunc = function(n) return n end
-local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
-
-local node_new = Dnode.new
-local node_free = Dnode.free
-local has_attr = Dnode.has_attribute
-local set_attr = Dnode.set_attribute
+local node_new = node.direct.new
+local node_free = node.direct.free
+local has_attr = node.direct.has_attribute
+local set_attr = node.direct.set_attribute
 local round = tex.round
 local font_getfont = font.getfont
 
@@ -935,12 +930,12 @@ end
 -- MISC
 ------------------------------------------------------------------------
 do
-   local getfont = (Dnode ~= node) and Dnode.getfont or function(n) return n.font end
-   local getchar = (Dnode ~= node) and Dnode.getchar or function(n) return n.char end
+   local getfont = node.direct.getfont
+   local getchar = node.direct.getchar
    local get_dir_count = ltjd.get_dir_count
    local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
    local ensure_tex_attr = ltjb.ensure_tex_attr
-   local node_write = Dnode.write
+   local node_write = node.direct.write
    local font = font
    local new_ic_kern
    if status.luatex_version>=89 then

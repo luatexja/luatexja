@@ -156,20 +156,6 @@ ltjb.mprint = mprint
 -------------------- Handling of TeX values
 do
 
-  local glue_spec_id = node.id("glue_spec")
-
-  local function copy_skip(s1, s2)
-    if not s1 then
-      s1 = node.new(glue_spec_id)
-    end
-    s1.width = s2.width or 0
-    s1.stretch = s2.stretch or 0
-    s1.stretch_order = s2.stretch_order or 0
-    s1.shrink = s2.shrink or 0
-    s1.shrink_order = s2.shrink_order or 0
-    return s1
-  end
-
 --! ixbase.to_dimen() と同じ
   local function to_dimen(val)
     if val == nil then
@@ -192,44 +178,7 @@ do
     return tex.sp(val), fil
   end
 
---! ixbase.to_skip() と同じ
-  local function to_skip(val)
-    if type(val) == "userdata" then
-      return val
-    end
-    local res = node.new(glue_spec_id)
-    if val == nil then
-      res.width = 0
-    elseif type(val) == "number" then
-      res.width = val
-    elseif type(val) == "table" then
-      copy_skip(res, val)
-    else
-      local t = tostring(val):lower():explode()
-      local w, p, m = t[1], t[3], t[5]
-      if t[2] == "minus" then
-        p, m = nil, t[3]
-      end
-      res.width = tex.sp(t[1])
-      if p then
-        res.stretch, res.stretch_order = parse_dimen(p)
-      end
-      if m then
-        res.shrink, res.shrink_order = parse_dimen(m)
-      end
-    end
-    return res
-  end
-
-  local function dump_skip(s)
-    print(("%s+%s<%s>-%s<%s>"):format(
-      s.width or 0, s.stretch or 0, s.stretch_order or 0,
-      s.shrink or 0, s.shrink_order or 0))
-  end
-
   ltjb.to_dimen = to_dimen
-  ltjb.dump_skip = dump_skip
-  ltjb.to_skip = to_skip
 end
 
 -------------------- Virtual table for LaTeX counters

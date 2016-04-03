@@ -15,30 +15,26 @@ local id_glyph = node.id('glyph')
 local id_whatsit = node.id('whatsit')
 local sid_user = node.subtype('user_defined')
 
-local Dnode = node.direct or node
+local setfield = node.direct.setfield
+local getfield = node.direct.getfield
+local getid = node.direct.getid
+local getfont = node.direct.getfont
+local getchar = node.direct.getchar
+local getsubtype = node.direct.getsubtype
 
-local setfield = (Dnode ~= node) and Dnode.setfield or function(n, i, c) n[i] = c end
-local getfield = (Dnode ~= node) and Dnode.getfield or function(n, i) return n[i] end
-local getid = (Dnode ~= node) and Dnode.getid or function(n) return n.id end
-local getfont = (Dnode ~= node) and Dnode.getfont or function(n) return n.font end
---local getlist = (Dnode ~= node) and Dnode.getlist or function(n) return n.head end
-local getchar = (Dnode ~= node) and Dnode.getchar or function(n) return n.char end
-local getsubtype = (Dnode ~= node) and Dnode.getsubtype or function(n) return n.subtype end
+local to_node = node.direct.tonode
+local to_direct = node.direct.todirect
 
-local nullfunc = function(n) return n end
-local to_node = (Dnode ~= node) and Dnode.tonode or nullfunc
-local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
-
-local node_new = Dnode.new
-local node_remove = Dnode.remove
-local node_next = (Dnode ~= node) and Dnode.getnext or node.next
-local node_free = Dnode.free
-local has_attr = Dnode.has_attribute
-local set_attr = Dnode.set_attribute
-local unset_attr = Dnode.unset_attribute
-local node_insert_after = Dnode.insert_after
-local node_write = Dnode.write
-local node_traverse_id = Dnode.traverse_id
+local node_new = node.direct.new
+local node_remove = node.direct.remove
+local node_next = node.direct.getnext
+local node_free = node.direct.free
+local has_attr = node.direct.has_attribute
+local set_attr = node.direct.set_attribute
+local unset_attr = node.direct.unset_attribute
+local node_insert_after = node.direct.insert_after
+local node_write = node.direct.write
+local node_traverse_id = node.direct.traverse_id
 
 
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']

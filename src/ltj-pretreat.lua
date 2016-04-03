@@ -8,28 +8,25 @@ luatexja.load_module('stack');     local ltjs = luatexja.stack
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 luatexja.load_module('direction'); local ltjd = luatexja.direction
 
-local Dnode = node.direct or node
+local to_node =  node.direct.tonode
+local to_direct =  node.direct.todirect
 
-local nullfunc = function(n) return n end
-local to_node = (Dnode ~= node) and Dnode.tonode or nullfunc
-local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
-
-local setfield = (Dnode ~= node) and Dnode.setfield or function(n, i, c) n[i] = c end
-local getid = (Dnode ~= node) and Dnode.getid or function(n) return n.id end
-local getfont = (Dnode ~= node) and Dnode.getfont or function(n) return n.font end
-local getchar = (Dnode ~= node) and Dnode.getchar or function(n) return n.char end
-local getfield = (Dnode ~= node) and Dnode.getfield or function(n, i) return n[i] end
-local getsubtype = (Dnode ~= node) and Dnode.getsubtype or function(n) return n.subtype end
+local setfield =  node.direct.setfield
+local getid =  node.direct.getid
+local getfont =  node.direct.getfont
+local getchar =  node.direct.getchar
+local getfield =  node.direct.getfield
+local getsubtype =  node.direct.getsubtype
 
 local pairs = pairs
 local floor = math.floor
-local has_attr = Dnode.has_attribute
-local set_attr = Dnode.set_attribute
-local node_traverse = Dnode.traverse
-local node_remove = Dnode.remove
-local node_next = (Dnode ~= node) and Dnode.getnext or node.next
-local node_free = Dnode.free
-local node_end_of_math = Dnode.end_of_math
+local has_attr = node.direct.has_attribute
+local set_attr = node.direct.set_attribute
+local node_traverse = node.direct.traverse
+local node_remove = node.direct.remove
+local node_next =  node.direct.getnext
+local node_free = node.direct.free
+local node_end_of_math = node.direct.end_of_math
 local tex_getcount = tex.getcount
 
 local id_glyph = node.id('glyph')
@@ -137,7 +134,7 @@ local function set_box_stack_level(head, mode)
       node_free(p)
    end
    if ltjs.list_dir == dir_tate then
-      for p in Dnode.traverse_id(id_glyph,to_direct(head)) do
+      for p in node.direct.traverse_id(id_glyph,to_direct(head)) do
          if (has_attr(p, attr_icflag) or 0)<=0 and getfield(p, 'lang')==lang_ja then
             local pc = ltjs_orig_char_table[p]
 	    local nf = ltjf_replace_altfont( has_attr(p, attr_curtfnt) or getfont(p) , pc)

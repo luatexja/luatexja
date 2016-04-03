@@ -10,26 +10,24 @@ local attr_dir = luatexbase.attributes['ltj@dir']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 
 local cat_lp = luatexbase.catcodetables['latex-package']
-local Dnode = node.direct or node
-local nullfunc = function (n) return n end
-local to_node = (Dnode ~= node) and Dnode.tonode or nullfunc
-local to_direct = (Dnode ~= node) and Dnode.todirect or nullfunc
-local has_attr = Dnode.has_attribute
-local set_attr = Dnode.set_attribute
-local insert_before = Dnode.insert_before
-local insert_after = Dnode.insert_after
-local getid = (Dnode ~= node) and Dnode.getid or function(n) return n.id end
-local getsubtype = (Dnode ~= node) and Dnode.getsubtype or function(n) return n.subtype end
-local getlist = (Dnode ~= node) and Dnode.getlist or function(n) return n.head end
-local setfield = (Dnode ~= node) and Dnode.setfield or function(n, i, c) n[i] = c end
-local getfield = (Dnode ~= node) and Dnode.getfield or function(n, i) return n[i] end
-local node_new = Dnode.new
-local node_tail = Dnode.tail
-local node_free = Dnode.free
-local node_remove = Dnode.remove
-local node_next = (Dnode ~= node) and Dnode.getnext or node.next
-local traverse = Dnode.traverse
-local traverse_id = Dnode.traverse_id
+local to_node = node.direct.tonode
+local to_direct = node.direct.todirect
+local has_attr = node.direct.has_attribute
+local set_attr = node.direct.set_attribute
+local insert_before = node.direct.insert_before
+local insert_after = node.direct.insert_after
+local getid = node.direct.getid
+local getsubtype = node.direct.getsubtype
+local getlist = node.direct.getlist
+local setfield = node.direct.setfield
+local getfield = node.direct.getfield
+local node_new = node.direct.new
+local node_tail = node.direct.tail
+local node_free = node.direct.free
+local node_remove = node.direct.remove
+local node_next = node.direct.getnext
+local traverse = node.direct.traverse
+local traverse_id = node.direct.traverse_id
 local start_time_measure, stop_time_measure
    = ltjb.start_time_measure, ltjb.stop_time_measure
 local abs = math.abs
@@ -65,7 +63,7 @@ local page_direction
 --
 local dir_pool
 do
-   local node_copy = Dnode.copy
+   local node_copy = node.direct.copy
    dir_pool = {}
    for _,i in pairs({dir_tate, dir_yoko, dir_dtou, dir_utod}) do
       local w = node_new(id_whatsit, sid_user)
@@ -581,7 +579,7 @@ local function unwrap_dir_node(b, head, box_dir)
    end
    local shift_old, b_dir, wh = nil, get_box_dir(bh, 0)
    if wh then
-      Dnode.flush_list(getfield(wh, 'value'))
+      node.direct.flush_list(getfield(wh, 'value'))
       setfield(wh, 'value', nil)
    end
    return nh, nb, bh, b_dir
@@ -626,7 +624,7 @@ do
 	    -- dir_node としてカプセル化されている
 	    local _, dnc = get_box_dir(b, 0)
 	    if dnc then -- free all other dir_node
-	       Dnode.flush_list(getfield(dnc, 'value'))
+	       node.direct.flush_list(getfield(dnc, 'value'))
 	       setfield(dnc, 'value', nil)
 	    end
 	    set_attr(b, attr_dir, box_dir%dir_math_mod + dir_node_auto)
@@ -656,7 +654,7 @@ do
 	       db=x; break
 	    end
 	 end
-	 Dnode.flush_list(getfield(dn, 'value'))
+	 node.direct.flush_list(getfield(dn, 'value'))
 	 setfield(dn, 'value', nil)
 	 db = db or create_dir_node(b, box_dir, new_dir, false)
 	 local w = getfield(b, 'width')
@@ -687,7 +685,7 @@ do
    end
 
    -- lastbox
-   local node_prev = (Dnode~=node) and Dnode.getprev or node.prev
+   local node_prev = (node.direct~=node) and node.direct.getprev or node.prev
    local function lastbox_hook()
       start_time_measure('box_primitive_hook')
       local bn = tex_nest[tex_nest.ptr].tail
@@ -705,7 +703,7 @@ do
 	    end
 	    local _, wh =  get_box_dir(b, 0) -- clean dir_node attached to the box
 	    if wh then
-	       Dnode.flush_list(getfield('value', wh))
+	       node.direct.flush_list(getfield('value', wh))
 	       setfield(wh, 'value', nil)
 	    end
 	 end
@@ -866,7 +864,7 @@ do
 end
 
 do
-   local getbox, setbox, copy_list = tex.getbox, tex.setbox, Dnode.copy_list
+   local getbox, setbox, copy_list = tex.getbox, tex.setbox, node.direct.copy_list
    -- raise, lower
    function luatexja.direction.raise_box()
       start_time_measure('box_primitive_hook')
@@ -913,7 +911,7 @@ do
 	       'luatexja',
 	       'Direction Incompatible',
 	       "\\vadjust's argument and outer vlist must have same direction.")
-	    Dnode.last_node()
+	    node.direct.last_node()
 	 end
       end
       stop_time_measure('box_primitive_hook')
@@ -1088,7 +1086,7 @@ do
       end
    end
    local getbox = tex.getbox
-   local setbox, copy = Dnode.setbox, Dnode.copy
+   local setbox, copy = node.direct.setbox, node.direct.copy
    local lua_mem_kb = 0
    function luatexja.direction.finalize()
       local a = to_direct(tex.getbox("AtBeginShipoutBox"))
