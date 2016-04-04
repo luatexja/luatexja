@@ -962,14 +962,6 @@ do
 	       ltjs.list_dir  = has_attr(bh, attr_dir); break
 	    end
 	 end
-	 -- local bh=hd
-	 -- for i=1,2 do
-	 --    if bh and getid(bh)==id_whatsit
-	 --    and getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR then
-	 --       ltjs.list_dir  = has_attr(bh, attr_dir); break
-	 --    end
-	 --    bh = node_next(bh)
-	 -- end
 	 if split_dir_whatsit then
 	    -- adjust direction of 'split_keep'
 	    set_attr(split_dir_whatsit, attr_dir, ltjs.list_dir)
@@ -979,7 +971,9 @@ do
 	 split_dir_whatsit=nil
       else
 	 adjust_badness(hd)
-	 hd = process_dir_node(create_dir_whatsit_vbox(hd, gc), gc)
+	 -- hd = process_dir_node(create_dir_whatsit_vbox(hd, gc), gc)
+	 -- done in append_to_vpack callback
+	 hd = create_dir_whatsit_vbox(hd, gc)
 	 split_dir_whatsit=nil
       end
       stop_time_measure('direction_vpack')
@@ -1010,23 +1004,44 @@ do
    end
 end
 
--- buildpage filter
+-- append_to_vlist filter
 do
-   local function dir_adjust_buildpage(info)
-      if info=='box' then
-	 local head = to_direct(tex.lists.contrib_head)
-	 if head then
-	    head = make_dir_whatsit(head,
-				  node_tail(head),
-				  get_dir_count(),
-				  'buildpage')
-	    tex.lists.contrib_head = to_node(head)
-	 end
+   local id_glue = node.id('glue')
+   local getglue = node.direct.getglue or
+      function(g)
+	 return getfield(g,'width'), getfield(g,'stretch'), getfield(g,'shrink'),
+	 getfield(g,'stretch_order'), getfield(g,'shrink_order')
       end
+local setglue = luatexja.setglue
+   local function copy_glue (new_glue, old_glue, subtype, new_w)
+      setfield(new_glue, 'subtype', subtype)
+      local w,st,sp,sto,spo = getglue(to_direct(old_glue))
+      setglue(new_glue, new_w or w, st, sp, sto, spo)
    end
-   ltjb.add_to_callback('buildpage_filter',
-			      dir_adjust_buildpage,
-			      'ltj.direction', 10000)
+   local node_write = node.direct.write
+   local function dir_adjust_append_vlist(b, loc, prev, mirrored)
+      local old_b = to_direct(b)
+      local new_b = loc=='box' and 
+	 make_dir_whatsit(old_b, old_b, get_dir_count(), 'append_vlist') or old_b
+      
+      if prev > -65536000 then
+	 local d = tex.baselineskip.width - prev 
+	    - getfield(new_b, mirrored and 'depth' or 'height')
+	 local g = node_new(id_glue)
+	 if d < tex.lineskiplimit then
+	    copy_glue(g, tex.lineskip, 1)
+	 else
+	    copy_glue(g, tex.baselineskip, 2, d);
+	 end
+	 node_write(g)
+      end
+      node_write(new_b)
+      tex.prevdepth = getfield(new_b, mirrored and 'height' or 'depth')
+      return nil -- do nothing on tex side
+   end
+   ltjb.add_to_callback('append_to_vlist_filter',
+			dir_adjust_append_vlist,
+			'ltj.direction', 10000)
 end
 
 -- finalize (executed just before \shipout)
