@@ -100,11 +100,11 @@
 \def\ucs{\ltj@code@conv{ucs}}
 
 \def\ltj@code@conv#1{%
-  \directlua{luatexja.compat.from_#1(luatexja.token.scan_int())}%
+  \directlua{luatexja.compat.from_#1(token.scan_int())}%
 }
 
 \def\kansuji{%
-  \directlua{luatexja.compat.to_kansuji(luatexja.token.scan_int())}%
+  \directlua{luatexja.compat.to_kansuji(token.scan_int())}%
 }
 
 \define@key[ltj]{japaram}{kansujichar}{\ltj@@set@stack{KSJ}{0}{0x7FFFFFFF}#1 }

@@ -20,7 +20,7 @@ local sid_user = node.subtype('user_defined')
 local STCK = luatexja.userid_table.STCK
 local fastcopy = table.fastcopy
 local setcount = tex.setcount
-local scan_int, scan_keyword = luatexja.token.scan_int, luatexja.token.scan_keyword
+local scan_int, scan_keyword = token.scan_int, token.scan_keyword
 hmode = 0 -- dummy
 
 charprop_stack_table={};

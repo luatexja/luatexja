@@ -134,19 +134,19 @@
 %% \ltj@gobble@num <number>
 %! 次に続く整数を(2 回展開で)読み捨てる. 
 \def\ltj@gobble@num{
-  \directlua{luatexja.token.scan_int()}
+  \directlua{token.scan_int()}
 }
 
 %% \ltj@gobble@glue <glue>
 %! 次に続くグルー値を(2 回展開で)読み捨てる. 
 \def\ltj@gobble@glue{
-  \directlua{luatexja.token.scan_glue()}
+  \directlua{token.scan_glue()}
 }
 
 %% \ltj@gobble@dimen <dimen>
 %! 次に続く寸法値を(2 回展開で)読み捨てる. 
 \def\ltj@gobble@dimen{
-  \directlua{luatexja.token.scan_dimen()}
+  \directlua{token.scan_dimen()}
 }
 
 %% \ltj@grab@num <number>
@@ -160,7 +160,7 @@
 %!   (command_name が "assign_int" であるトークン).
 %! (注意: まだ文字表記(`A)に対応していません.)
 \def\ltj@grab@num{
-  \directlua{tex.sprint('{' .. luatexja.token.scan_int() .. '}')}
+  \directlua{tex.sprint('{' .. token.scan_int() .. '}')}
 }
 
 %%------------------ Safe passing

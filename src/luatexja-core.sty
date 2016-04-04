@@ -335,16 +335,16 @@
 % yjabaselineshift = <dimen>
 \define@key[ltj]{japaram}{yalbaselineshift}{%
   \directlua{tex.setattribute(luatexja.isglobal,
-    luatexbase.attributes['ltj@yablshift'], luatexja.token.scan_dimen())}#1\relax}
+    luatexbase.attributes['ltj@yablshift'], token.scan_dimen())}#1\relax}
 \define@key[ltj]{japaram}{yjabaselineshift}{%
   \directlua{tex.setattribute(luatexja.isglobal,
-    luatexbase.attributes['ltj@ykblshift'], luatexja.token.scan_dimen())}#1\relax}
+    luatexbase.attributes['ltj@ykblshift'], token.scan_dimen())}#1\relax}
 \define@key[ltj]{japaram}{talbaselineshift}{%
   \directlua{tex.setattribute(luatexja.isglobal,
-    luatexbase.attributes['ltj@tablshift'], luatexja.token.scan_dimen())}#1\relax}
+    luatexbase.attributes['ltj@tablshift'], token.scan_dimen())}#1\relax}
 \define@key[ltj]{japaram}{tjabaselineshift}{%
   \directlua{tex.setattribute(luatexja.isglobal,
-    luatexbase.attributes['ltj@tkblshift'], luatexja.token.scan_dimen())}#1\relax}
+    luatexbase.attributes['ltj@tkblshift'], token.scan_dimen())}#1\relax}
 
 % jaxspmode = {<char_code>, <mode>}
 % mode: inhibit, preonly, postonly, allow
@@ -388,7 +388,7 @@
   \newluafunction\ltjsetkanjiskip@inner
   \newluafunction\ltjsetxkanjiskip@inner
   \directlua{
-    local t, scan_glue = lua.get_functions_table(), luatexja.token.scan_glue
+    local t, scan_glue = lua.get_functions_table(), token.scan_glue
     local sss, sti = luatexja.stack.set_stack_skip, luatexja.stack_table_index
     t[\the\ltjsetkanjiskip@inner] = function()
       local d = scan_glue(); sss(sti.KSK, d); node.free(d)
@@ -402,12 +402,12 @@
 \else
   \protected\def\ltjsetkanjiskip{%                  % SKIP
     \directlua{%
-      local d = luatexja.token.scan_glue()
+      local d = token.scan_glue()
       luatexja.stack.set_stack_skip(luatexja.stack_table_index.KSK, d); node.free(d)
   }}
   \protected\def\ltjsetxkanjiskip{%                  % SKIP
     \directlua{%
-      local d = luatexja.token.scan_glue()
+      local d = token.scan_glue()
       luatexja.stack.set_stack_skip(luatexja.stack_table_index.XSK, d); node.free(d)
   }}
 \fi
@@ -516,10 +516,10 @@
 
 %%%%%%%% \ltjsetmathletter<number>, \ltjunsetmathletter<number>
 \protected\def\ltjsetmathletter#1{%
-  \directlua{luatexja.math.is_math_letters[luatexja.token.scan_int()]=true}#1\relax
+  \directlua{luatexja.math.is_math_letters[token.scan_int()]=true}#1\relax
 }
 \protected\def\ltjunsetmathletter#1{%
-  \directlua{luatexja.math.is_math_letters[luatexja.token.scan_int()]=false}#1\relax
+  \directlua{luatexja.math.is_math_letters[token.scan_int()]=false}#1\relax
 }
 
 %%%%%%%% \ltjdeclarealtfont<base_font_cs><alt_font_cs>{100-200,3000-,5000,...}
@@ -746,11 +746,11 @@
 
 %%%%%%%% \ltjgetwd<box_num> etc.
 \def\ltj@@getwd{%
-  \directlua{luatexja.direction.get_box_dim('width', luatexja.token.scan_int())}}
+  \directlua{luatexja.direction.get_box_dim('width', token.scan_int())}}
 \def\ltj@@getht{%
-  \directlua{luatexja.direction.get_box_dim('height', luatexja.token.scan_int())}}
+  \directlua{luatexja.direction.get_box_dim('height', token.scan_int())}}
 \def\ltj@@getdp{%
-  \directlua{luatexja.direction.get_box_dim('depth', luatexja.token.scan_int())}}
+  \directlua{luatexja.direction.get_box_dim('depth', token.scan_int())}}
 \let\ltjgetwd=\ltj@@getwd\let\ltjgetht=\ltj@@getht\let\ltjgetdp=\ltj@@getdp
 
 %%%%%%%% \ltjsetwd<box_num>=<dimen> etc.

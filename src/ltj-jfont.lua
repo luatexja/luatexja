@@ -31,7 +31,6 @@ local id_glyph = node.id('glyph')
 local id_kern = node.id('kern')
 local cat_lp = luatexbase.catcodetables['latex-package']
 local FROM_JFM     = luatexja.icflag_table.FROM_JFM
-local tokenlib = luatexja.token
 ------------------------------------------------------------------------
 -- LOADING JFM
 ------------------------------------------------------------------------

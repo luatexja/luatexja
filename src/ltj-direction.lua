@@ -764,8 +764,8 @@ do
    luatexja.direction.get_box_dim = get_box_dim
 
    -- return value: (changed dimen of box itself?)
-   local scan_dimen, scan_int = luatexja.token.scan_dimen, luatexja.token.scan_int
-   local scan_keyword = luatexja.token.scan_keyword
+   local scan_dimen, scan_int = token.scan_dimen, token.scan_int
+   local scan_keyword = token.scan_keyword
    local function set_box_dim_common(key, s, l_dir)
       local s_dir, wh = get_box_dir(s, dir_yoko)
       s_dir = s_dir%dir_math_mod
