@@ -20,28 +20,6 @@ function luatexja.load_lua(fn)
    end
 end
 
--- node.direct.setglue is corrupted in r5903
-do
-    local setfield = node.direct.setfield
-    local setglue = node.direct.setglue
-    if setglue then
-	local g = node.direct.new(node.id('glue'))
-	setglue(g, 128,256,512,2,1)
-	local w,st,sh,sto,sho = node.direct.getglue(g)
-	if (w~=128)or(st~=256)or(sh~=512)or(sto~=2)or(sho~=1) then
-	    setglue = nil
-	end
-    end
-    luatexja.setglue = setglue or
-    function(g,w,st,sh,sto,sho)
-	setfield(g,'width', w or 0)
-	setfield(g,'stretch',st or 0)
-	setfield(g,'shrink', sh or 0)
-	setfield(g,'stretch_order',sto or 0)
-	setfield(g,'shrink_order', sho or 0)
-    end
-end
-
 --- 以下は全ファイルで共有される定数
 local icflag_table = {}
 luatexja.icflag_table = icflag_table
