@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjspf}
-  [2016/03/31 ltjsclasses ]
+  [2016/04/04 ltjsclasses ]
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
@@ -257,7 +257,7 @@
         \dimen@\@tempb\relax
         \edef\@tempb{ at\luafunction\ltjs@@magnify@font@calc sp}%
      \fi
-     \edef\@tempa{\def\noexpand\external@font{\@tempa\@tempb}}
+     \edef\@tempa{\def\noexpand\external@font{\@tempa\@tempb}}%
   }
   \let\ltjs@orig@get@external@font=\get@external@font
   \def\get@external@font{%

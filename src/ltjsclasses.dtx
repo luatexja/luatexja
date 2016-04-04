@@ -50,7 +50,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2016/03/31 ltjsclasses ]
+  [2016/04/04 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass{ltjsarticle}
@@ -681,6 +681,8 @@
 %
 % [2016-03-28 LTJ] |\luafunction|を使うようにし，また本文のフォントサイズが10ptのときには
 % （不要なので）パッチを当てないことにしました。
+%
+% [2016-04-04 LTJ] NFSSへのパッチを修正．
 %    \begin{macrocode}
 \if@ltjs@mag@xreal\RequirePackage{type1cm}
 \ifdim\ltjs@mpt=\p@\else
@@ -710,7 +712,7 @@
         \dimen@\@tempb\relax
         \edef\@tempb{ at\luafunction\ltjs@@magnify@font@calc sp}%
      \fi
-     \edef\@tempa{\def\noexpand\external@font{\@tempa\@tempb}}
+     \edef\@tempa{\def\noexpand\external@font{\@tempa\@tempb}}%
   }
   \let\ltjs@orig@get@external@font=\get@external@font
   \def\get@external@font{%
