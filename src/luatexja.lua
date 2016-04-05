@@ -20,6 +20,18 @@ function luatexja.load_lua(fn)
    end
 end
 
+do
+    local setfield = node.direct.setfield
+    luatexja.setglue = node.direct.setglue or
+    function(g,w,st,sh,sto,sho)
+	setfield(g,'width', w or 0)
+	setfield(g,'stretch',st or 0)
+	setfield(g,'shrink', sh or 0)
+	setfield(g,'stretch_order',sto or 0)
+	setfield(g,'shrink_order', sho or 0)
+    end
+end
+
 --- 以下は全ファイルで共有される定数
 local icflag_table = {}
 luatexja.icflag_table = icflag_table
