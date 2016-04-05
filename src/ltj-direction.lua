@@ -138,7 +138,6 @@ do
    local node_traverse = node.traverse
    local STCK = luatexja.userid_table.STCK
    local IHB = luatexja.userid_table.IHB
-   local sid_local = node.subtype('local_par')
    local id_local = node.id('local_par')
 
    local function test_list(h, lv)
@@ -157,8 +156,6 @@ do
 		  elseif not(uid==IHB or uid==STCK) then
 		     flag = 0; break -- error
 		  end
-	       elseif ps~=sid_local then
-		  flag = 0; break
 	       end
 	    elseif p.id~=id_local then
 	       flag = 0; break
