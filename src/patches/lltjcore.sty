@@ -169,26 +169,6 @@
   \unless\ifnum\ltjgetparameter{direction}=3
     \@textsuperscript{\normalfont\@thefnmark}%
   \else\hbox{\yoko \@textsuperscript{\normalfont\@thefnmark}}\fi}}
-\long\def\@footnotetext#1{%
-  \ifcase\ltjgetparameter{direction}%
-    \or   \let\@tempa\dtou
-    \or\or\let\@tempa\tate
-    \or   \let\@tempa\yoko
-    \else \let\@tempa\utod
-  \fi
-  \insert\footins{\@tempa%
-    \reset@font\footnotesize
-    \interlinepenalty\interfootnotelinepenalty
-    \splittopskip\footnotesep
-    \splitmaxdepth \dp\strutbox \floatingpenalty \@MM
-    \hsize\columnwidth \@parboxrestore
-    \protected@edef\@currentlabel{%
-       \csname p@footnote\endcsname\@thefnmark
-    }%
-    \color@begingroup
-      \@makefntext{%
-        \rule\z@\footnotesep\ignorespaces#1\@finalstrut\strutbox}%
-    \color@endgroup}}
 \def\@footnotemark{\leavevmode
   \ifhmode\edef\@x@sf{\the\spacefactor}\nobreak\fi
   \unless\ifnum\ltjgetparameter{direction}=3 \@makefnmark
