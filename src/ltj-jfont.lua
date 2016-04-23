@@ -367,18 +367,18 @@ do
    end
 
    -- define_font callback
-   local otfl_fdr = fonts.definers.read
+   local otfl_fdr
    local ltjr_font_callback = ltjr.font_callback
    function luatexja.font_callback(name, size, id)
       local new_name = is_def_jfont and extract_metric(name) or name
       is_def_jfont = false
-      --local res =  otfl_fdr(new_name, size, id)
       local res =  ltjr_font_callback(new_name, size, id, otfl_fdr)
       luatexbase.call_callback('luatexja.define_font', res, new_name, size, id)
       -- this callback processes variation selector, so we execute it always
       return res
    end
    luatexbase.create_callback('luatexja.define_font', 'simple', function (n) return n end)
+   otfl_fdr= luatexbase.remove_from_callback('define_font', 'luaotfload.define_font')
    luatexbase.add_to_callback('define_font',luatexja.font_callback,"luatexja.font_callback", 1)
 end
 
