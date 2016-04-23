@@ -781,8 +781,8 @@ do
    local checksum = file.checksum
 
    local function prepare_extra_data_base(id)
-      if not id then return end
-      local bname = file.nameonly(id.filename or '')
+      if (not id) or (not id.filename) then return end
+      local bname = file.nameonly(id.filename)
       if not font_extra_basename[bname] then
 	 -- if the cache is present, read it
 	 local newsum = checksum(id.filename) -- MD5 checksum of the fontfile
@@ -809,7 +809,7 @@ do
       end
    end
    local function prepare_extra_data_font(id, res)
-      if type(res)=='table' and res.shared then
+      if type(res)=='table' and res.shared and res.filename then
 	 font_extra_info[id] = font_extra_basename[file.nameonly(res.filename)]
       end
    end
