@@ -22,8 +22,8 @@ Installation
 
 0. Please make sure that your TeX distribution is up-to-date.
    This version of LuaTeX-ja requires
-    - LuaTeX beta-0.80.0 or later
-    - luaotfload v2.5
+    - LuaTeX beta-0.85.0 or later
+    - luaotfload v2.6
     - adobemapping (Adobe CMap files)
     - everysel package
     - IPAex fonts (http://ipafont.ipa.go.jp/)

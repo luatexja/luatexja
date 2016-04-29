@@ -16,6 +16,7 @@
 %%%%%%%%
 \makeatletter
 %%%%%%%%
+\def\pgfsysdriver{pgfsys-pdftex.def}
 \directlua{if jit then jit.on() end}
 \usepackage{metalogo,amsmath,array,tikz,pict2e,multienum,float}
 \usepackage{booktabs,multicol,luatexja-ruby}
@@ -2696,7 +2697,7 @@ becuse a \emph{JAchar} is encapsulated by a horizontal box if needed.
 数式中の挙動は異なっているので注意が必要である．
 例えば，表\ref{tab:math_bsa}のように，数式中に明示的に現れた \cs{hbox} は，
 \begin{itemize}
- \item \pTeX では，ボックス全体が \cs{ybaselineshift} だとシフトされるので，
+ \item 2015年以前の\pTeX では，ボックス全体が \cs{ybaselineshift} だとシフトされるので，
  表\ref{tab:math_bsa}中の``い''のように，ボックス中の和文文字は
  \ \cs{ybaselineshift} だけシフトされ，一方，``for all''のように，
  ボックス内の欧文文字は2重にシフトされることになる．
@@ -2704,6 +2705,10 @@ becuse a \emph{JAchar} is encapsulated by a horizontal box if needed.
  数式中に明示的に現れた \cs{hbox} はシフトしない．そのため，
  表\ref{tab:math_bsa}中の``い''も``for all''も，それぞれ本文中に
  書かれたときと同じ上下位置に組まれる．
+
+ なお，\TeX~Live~2016以降の\pTeX では改修がなされ，\LuaTeX-jaと
+ 近い挙動になるようにしているが，数式中に直に書かれた``あ''のベースラインについては
+ まだ違いが見られる．
 \end{itemize}
 \begin{table}
 \small\centering
@@ -2720,10 +2725,15 @@ $\Phi\vdash F(x)\ \hbox{for all}\ x\in A$
 \end{lstlisting}\\
 \noalign{\vskip-\origbaselineskip}
 \midrule
-\emph{\pTeX}&
+\emph{\pTeX~(--2015)}&
 {\ltjsetparameter{yalbaselineshift=10pt}%
-数式abc: $あa\lower10pt\hbox{い}$, $\int_0^x t\,dt=x^2/2$,
+数式abc: $\lower10pt\hbox{あ}a\lower10pt\hbox{い}$, $\int_0^x t\,dt=x^2/2$,
 $\Phi\vdash F(x)\ \lower10pt\hbox{for all}\ x\in A$
+\par}\\
+\emph{\pTeX~(in \TeX\ Live 2016)}&
+{\ltjsetparameter{yalbaselineshift=10pt}%
+数式abc: $\lower10pt\hbox{あ}a\hbox{い}$, $\int_0^x t\,dt=x^2/2$,
+$\Phi\vdash F(x)\ \hbox{for all}\ x\in A$
 \par}\\
 \midrule
 \emph{\LuaTeX-ja}&
