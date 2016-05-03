@@ -683,11 +683,8 @@ do
 
    local sort = table.sort
    local function add_fl_table(dest, glyphs, unitable, asc_des, units)
-      local tg, glyphmin, glyphmax = glyphs.glyphs, 0, glyphs.glyphmax
-      for _,v in pairs(fields(glyphs)) do
-	 if v=='glyphmin' then glyphmin, glyphmax = glyphs.glyphmin, glyphmax+1; break end
-      end
-      for i = glyphmin, glyphmax-1 do
+      local tg, glyphmin, glyphmax = glyphs.glyphs, glyphs.glyphmin, glyphs.glyphmax
+      for i = glyphmin, glyphmax do
 	 local gv = tg[i]
 	 if gv then
 	    if gv.altuni then
@@ -695,20 +692,22 @@ do
 		  local bu, vsel = at.unicode, at.variant
 		  if vsel then
 		     if vsel>=0xE0100 then vsel = vsel - 0xE0100 end
-		     dest = dest or {}; dest[bu] = dest[bu] or {}
 		     local uniq_flag = true
-		     for i,_ in pairs(dest[bu]) do
-			if i==vs then uniq_flag = false; break end
-		     end
+                     if dest and dest[bu] then
+			for i,_ in pairs(dest[bu]) do
+			   if i==vsel then uniq_flag = false; break end
+		        end
+                     end
 		     if uniq_flag then
-			dest[bu][vsel] = unitable[gv.name]
+			dest = dest or {}; dest[bu] = dest[bu] or {}
+			dest[bu][vsel] = unitable[i]
 		     end
 		  end
 	       end
 	    end
 	    -- vertical metric
 	    local vw, tsb, vk = glyph_vmetric(gv)
-	    local gi = unitable[gv.name]
+	    local gi = unitable[i]
 	    if gi and vw and vw~=asc_des then
 	       -- We do not use tsidebearing, since (1) fontloader does not read VORG table
 	       -- and (2) 'tsidebearing' doea not appear in the returned table by fontloader.fields.
@@ -744,12 +743,26 @@ do
    end
    prepare_fl_data = function (dest, id)
       local fl = fontloader.open(id.filename)
-      local unicodes = id.resources.unicodes
+      local unicodes = {}
+      for i,v in pairs(id.characters) do
+	  unicodes[v.index] = i
+      end
+      
       if fl.glyphs then
+	 local tg, glyphmin, glyphmax = fl.glyphs, fl.glyphmin, fl.glyphmax
+         for i = glyphmin, glyphmax do
+            if tg[i] and tg[i].name then unicodes[tg[i].name] = unicodes[i] end
+         end
 	 dest = add_fl_table(dest, fl, unicodes,
 			     fl.ascent + fl.descent, fl.units_per_em)
       end
       if fl.subfonts then
+         for _,v in pairs(fl.subfonts) do
+	    local tg, glyphmin, glyphmax = v.glyphs, v.glyphmin, v.glyphmax
+            for i = glyphmin, glyphmax do
+               if tg[i] and tg[i].name then unicodes[tg[i].name] = unicodes[i] end
+            end
+         end
          for _,v in pairs(fl.subfonts) do
             dest = add_fl_table(dest, v, unicodes,
 				fl.ascent + fl.descent, fl.units_per_em)
@@ -777,7 +790,7 @@ end
 
 --
 do
-   local cache_ver = 6
+   local cache_ver = 7
    local checksum = file.checksum
 
    local function prepare_extra_data_base(id)
