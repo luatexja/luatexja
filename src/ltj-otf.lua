@@ -96,19 +96,24 @@ do
    local tex_get_attr = tex.getattribute
    cid = function (key)
       if key==0 then return append_jglyph(char) end
-      local curjfnt = identifiers[tex_get_attr((ltjd_get_dir_count()==dir_tate)
-                                                  and attr_curtfnt or attr_curjfnt)]
-      if not curjfnt.cidinfo or
-         curjfnt.cidinfo.ordering ~= "Japan1" and
-         curjfnt.cidinfo.ordering ~= "GB1" and
-         curjfnt.cidinfo.ordering ~= "CNS1" and
-         curjfnt.cidinfo.ordering ~= "Korea1" then
+      local curjfnt_num = tex_get_attr((ltjd_get_dir_count()==dir_tate)
+                                        and attr_curtfnt or attr_curjfnt)
+      local curjfnt = identifiers[curjfnt_num]
+      local cidinfo = curjfnt.resources.cidinfo
+      if not cidinfo or
+         cidinfo.ordering ~= "Japan1" and
+         cidinfo.ordering ~= "GB1" and
+         cidinfo.ordering ~= "CNS1" and
+         cidinfo.ordering ~= "Korea1" then
          --      ltjb.package_warning('luatexja-otf',
          --			   'Current Japanese font (or other CJK font) "'
          --			      ..curjfnt.psname..'" is not a CID-Keyed font (Adobe-Japan1 etc.)')
             return append_jglyph(get_ucs_from_rmlgbm(key))
       end
-      local char = curjfnt.resources.unicodes[curjfnt.cidinfo.ordering..'.'..tostring(key)]
+      local fe, char = ltjf_font_extra_info[curjfnt_num], nil
+      if fe and fe.unicodes then 
+         char = fe.unicodes[cidinfo.ordering..'.'..tostring(key)]
+      end
       if not char then
          ltjb.package_warning('luatexja-otf',
                               'Current Japanese font (or other CJK font) "'
@@ -167,11 +172,12 @@ ltjb.add_to_callback('pre_linebreak_filter', extract,'ltj.otf',
 -- 和文フォント読み込み時に，CID -> unicode 対応をとっておく．
 local function cid_to_char(fmtable, fn)
    local fi = identifiers[fn]
-   if fi.cidinfo and fi.cidinfo.ordering == "Japan1" then
+   local fe = ltjf_font_extra_info[fn]
+   if fi.cidinfo and fi.cidinfo.ordering == "Japan1" and fe then
       for i, v in pairs(fmtable.chars) do
 	 local j = string.match(i, "^AJ1%-([0-9]*)")
 	 if j then
-	    j = tonumber(fi.resources.unicodes['Japan1.'..tostring(j)])
+	    j = tonumber(fe.unicodes['Japan1.'..tostring(j)])
 	    if j then
 	       fmtable.cid_char_type = fmtable.cid_char_type  or {}
 	       fmtable.cid_char_type[j] = v

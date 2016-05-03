@@ -743,15 +743,15 @@ do
    end
    prepare_fl_data = function (dest, id)
       local fl = fontloader.open(id.filename)
-      local unicodes = {}
+      local ind_to_uni, unicodes = {}, {}
       for i,v in pairs(id.characters) do
-	  unicodes[v.index] = i
+	  ind_to_uni[v.index] = i
       end
       
       if fl.glyphs then
 	 local tg, glyphmin, glyphmax = fl.glyphs, fl.glyphmin, fl.glyphmax
          for i = glyphmin, glyphmax do
-            if tg[i] and tg[i].name then unicodes[tg[i].name] = unicodes[i] end
+            if tg[i] and tg[i].name then unicodes[tg[i].name] = ind_to_uni[i] end
          end
 	 dest = add_fl_table(dest, fl, unicodes,
 			     fl.ascent + fl.descent, fl.units_per_em)
@@ -760,16 +760,17 @@ do
          for _,v in pairs(fl.subfonts) do
 	    local tg, glyphmin, glyphmax = v.glyphs, v.glyphmin, v.glyphmax
             for i = glyphmin, glyphmax do
-               if tg[i] and tg[i].name then unicodes[tg[i].name] = unicodes[i] end
+               if tg[i] and tg[i].name then unicodes[tg[i].name] = ind_to_uni[i] end
             end
          end
          for _,v in pairs(fl.subfonts) do
             dest = add_fl_table(dest, v, unicodes,
 				fl.ascent + fl.descent, fl.units_per_em)
          end
-      end
-      fontloader.close(fl); collectgarbage("collect")
-      return dest
+     end
+     if dest then dest.unicodes = unicodes end
+     fontloader.close(fl); collectgarbage("collect")
+     return dest
    end
    -- supply vkern table
    supply_vkern_table = function(id, bname)
@@ -790,7 +791,7 @@ end
 
 --
 do
-   local cache_ver = 7
+   local cache_ver = 9
    local checksum = file.checksum
 
    local function prepare_extra_data_base(id)
