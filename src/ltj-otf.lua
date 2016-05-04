@@ -173,7 +173,8 @@ ltjb.add_to_callback('pre_linebreak_filter', extract,'ltj.otf',
 local function cid_to_char(fmtable, fn)
    local fi = identifiers[fn]
    local fe = ltjf_font_extra_info[fn]
-   if fi.cidinfo and fi.cidinfo.ordering == "Japan1" and fe then
+   if (fi.resources and fi.resources.cidinfo and fi.resources.cidinfo.ordering == "Japan1" )
+      and (fe and fe.unicodes) then
       for i, v in pairs(fmtable.chars) do
 	 local j = string.match(i, "^AJ1%-([0-9]*)")
 	 if j then
@@ -236,7 +237,7 @@ do
                   if qc>=0xE0100 then qc = qc - 0xE0100 end
                   local pf = getfont(p)
                   local pt = ltjf_font_extra_info[pf]
-                  pt = pt and pt[getchar(p)];  pt = pt and  pt[qc]
+		  pt = pt and pt[getchar(p)];  pt = pt and  pt[qc]
                   head, r = node_remove(head,q)
 		  node_free(q)
                   if pt then

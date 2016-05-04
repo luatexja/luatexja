@@ -700,7 +700,7 @@ do
                      end
 		     if uniq_flag then
 			dest = dest or {}; dest[bu] = dest[bu] or {}
-			dest[bu][vsel] = unitable[i]
+			dest[bu][vsel] = unitable[gv.name]
 		     end
 		  end
 	       end
