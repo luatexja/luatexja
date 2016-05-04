@@ -683,7 +683,9 @@ do
 
    local sort = table.sort
    local function add_fl_table(dest, glyphs, unitable, asc_des, units)
-      local tg, glyphmin, glyphmax = glyphs.glyphs, glyphs.glyphmin, glyphs.glyphmax
+      local glyphmin, glyphmax = glyphs.glyphmin, glyphs.glyphmax
+      if glyphmax < 0 then return dest end
+      local tg = glyphs.glyphs
       for i = glyphmin, glyphmax do
 	 local gv = tg[i]
 	 if gv then
@@ -747,22 +749,25 @@ do
       for i,v in pairs(id.characters) do
 	  ind_to_uni[v.index] = i
       end
-      
       if fl.glyphs then
 	 local tg, glyphmin, glyphmax = fl.glyphs, fl.glyphmin, fl.glyphmax
-         for i = glyphmin, glyphmax do
-            if tg[i] and tg[i].name then unicodes[tg[i].name] = ind_to_uni[i] end
-         end
+         if 0 <= glyphmax then
+            for i = glyphmin, glyphmax do
+               if tg[i] and tg[i].name then unicodes[tg[i].name] = ind_to_uni[i] end
+	    end
+	 end
 	 dest = add_fl_table(dest, fl, unicodes,
 			     fl.ascent + fl.descent, fl.units_per_em)
       end
       if fl.subfonts then
          for _,v in pairs(fl.subfonts) do
 	    local tg, glyphmin, glyphmax = v.glyphs, v.glyphmin, v.glyphmax
-            for i = glyphmin, glyphmax do
-               if tg[i] and tg[i].name then unicodes[tg[i].name] = ind_to_uni[i] end
-            end
-         end
+            if 0 <= glyphmax then
+               for i = glyphmin, glyphmax do
+                  if tg[i] and tg[i].name then unicodes[tg[i].name] = ind_to_uni[i] end
+	       end
+	   end
+       end
          for _,v in pairs(fl.subfonts) do
             dest = add_fl_table(dest, v, unicodes,
 				fl.ascent + fl.descent, fl.units_per_em)
