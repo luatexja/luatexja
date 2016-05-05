@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjdefs}[2016/01/30 Default font settings of LuaTeX-ja]
+\ProvidesPackage{lltjdefs}[2016/05/05 Default font settings of LuaTeX-ja]
 
 \def\ltj@stdmcfont{IPAExMincho}
 \def\ltj@stdgtfont{IPAExGothic}
@@ -69,6 +69,11 @@
         {\not@math@alphabet\ttfamily\mathtt
                    \romanfamily\ttdefault
                    \if@ltj@match@family\kanjifamily\jttdefault\fi\selectfont}
+%%% \eminnershape
+\DeclareRobustCommand\em
+        {\@nomath\em \ifdim \fontdimen\@ne\font >\z@
+                       \eminnershape \else \gtfamily \itshape \fi}
+\def\eminnershape{\mcfamily \upshape}
 
 \ltjdefcharrange{1}{"80-"36F, "1E00-"1EFF}
 \ltjdefcharrange{2}{"370-"4FF, "1F00-"1FFF}
