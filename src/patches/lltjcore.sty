@@ -200,11 +200,12 @@
 \gdef\@stopfield{\null\color@endgroup\egroup}
 \newcount\hour
 \newcount\minute
-\def\@tabular{\leavevmode \null\hbox \bgroup $\let\@acol\@tabacol
-   \let\@classz\@tabclassz
-   \let\@classiv\@tabclassiv \let\\\@tabularcr\@tabarray}
-\def\endtabular{\crcr\egroup\egroup $\egroup\null}
-\expandafter \let \csname endtabular*\endcsname = \endtabular
+%%% etoolbox is loaded by everyhook
+\ifltj@everyhook@avail
+  \patchcmd{\@tabular}{\leavevmode}{\leavevmode\null}{}{}
+  \apptocmd{\endtabular}{\null}{}{}
+  \expandafter \let \csname endtabular*\endcsname = \endtabular
+\fi
 \let\@parboxto\@empty
 \long\def\@iiiparbox#1#2[#3]#4#5{%
   \leavevmode
