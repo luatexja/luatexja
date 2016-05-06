@@ -914,7 +914,7 @@ luatexbase.add_to_callback(
       local vorg = {}; fmtable.v_origin = vorg
       local ft = font_getfont(fnum)
       local subtables = {}
-      if false and ft.specification then
+      if ft.specification then
 	 for feat_name,v in pairs(ft.specification.features.normal) do
 	    if v==true then
 	       for _,i in pairs(ft.resources.sequences) do
