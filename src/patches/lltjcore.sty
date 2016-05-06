@@ -171,11 +171,6 @@
   \unless\ifnum\ltjgetparameter{direction}=3
     \hbox{}\hbox{\@textsuperscript{\normalfont\@thefnmark}}\hbox{}%
   \else\hbox{\yoko \@textsuperscript{\normalfont\@thefnmark}}\fi}
-\def\@footnotemark{\leavevmode
-  \ifhmode\edef\@x@sf{\the\spacefactor}\nobreak\fi
-  \unless\ifnum\ltjgetparameter{direction}=3 \@makefnmark
-  \else\hbox to\z@{\hskip-.25\zw\raise.9\zh\@makefnmark\hss}\fi
-  \ifhmode\spacefactor\@x@sf\fi\relax}
 \begingroup
 \@ifpackageloaded{hyperref}
   {\def\ltj@setrefprefix{real}}
@@ -202,6 +197,10 @@
 \newcount\minute
 %%% etoolbox is loaded by everyhook
 \ifltj@everyhook@avail
+  \patchcmd{\@footnotemark}{\@makefnmark}{%
+    \unless\ifnum\ltjgetparameter{direction}=3 \@makefnmark%
+    \else\hbox to\z@{\hskip-.25\zw\raise.9\zh\@makefnmark\hss}\fi%
+  }{}{}
   \patchcmd{\@tabular}{\leavevmode}{\leavevmode\null}{}{}
   \apptocmd{\endtabular}{\null}{}{}
   \expandafter \let \csname endtabular*\endcsname = \endtabular
