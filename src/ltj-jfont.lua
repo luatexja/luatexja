@@ -659,6 +659,18 @@ do
 end
 
 ------------------------------------------------------------------------
+-- VERT VARIANT TABLE
+------------------------------------------------------------------------
+local vert_form_table = {
+   [0x2013]=0xFE32, [0x2014]=0xFE31, [0x2025]=0xFE30,
+   [0xFF08]=0xFE35, [0xFF09]=0xFE36, [0xFF5B]=0xFE37, [0xFF5D]=0xFE38,
+   [0x3014]=0xFE39, [0x3015]=0xFE3A, [0x3010]=0xFE3B, [0x3011]=0xFE3C,
+   [0x300A]=0xFE3D, [0x300B]=0xFE3E, [0x3008]=0xFE3F, [0x3009]=0xFE40,
+   [0x300C]=0xFE41, [0x300D]=0xFE42, [0x300E]=0xFE43, [0x300F]=0xFE44,
+   [0xFF3B]=0xFE47, [0xFF3D]=0xFE48, [0xFF3F]=0xFE33,
+}
+
+------------------------------------------------------------------------
 -- 追加のフォント情報
 ------------------------------------------------------------------------
 font_extra_info = {}
@@ -682,7 +694,7 @@ do
    end
 
    local sort = table.sort
-   local function add_fl_table(dest, glyphs, unitable, asc_des, units)
+   local function add_fl_table(dest, glyphs, unitable, asc_des, units, id)
       local glyphmin, glyphmax = glyphs.glyphmin, glyphs.glyphmax
       if glyphmax < 0 then return dest end
       local tg = glyphs.glyphs
@@ -707,9 +719,20 @@ do
 		  end
 	       end
 	    end
+	    -- vertical form
+	    local gi = unitable[gv.name]
+	    if gi then
+	       if unitable[gv.name .. '.vert'] then
+	          dest = dest or {}; dest[gi] = dest[gi] or {};
+	          dest[gi].vform = unitable[gv.name .. '.vert']
+	       elseif id.characters[gi] and vert_form_table[gi] then
+	          dest = dest or {}; dest[gi] = dest[gi] or {};
+	          dest[gi].vform = vert_form_table[gi]
+	       end
+	    end
 	    -- vertical metric
 	    local vw, tsb, vk = glyph_vmetric(gv)
-	    local gi = unitable[i]
+	    local gi = unitable[gv.name]
 	    if gi and vw and vw~=asc_des then
 	       -- We do not use tsidebearing, since (1) fontloader does not read VORG table
 	       -- and (2) 'tsidebearing' doea not appear in the returned table by fontloader.fields.
@@ -757,7 +780,7 @@ do
 	    end
 	 end
 	 dest = add_fl_table(dest, fl, unicodes,
-			     fl.ascent + fl.descent, fl.units_per_em)
+			     fl.ascent + fl.descent, fl.units_per_em, id)
       end
       if fl.subfonts then
          for _,v in pairs(fl.subfonts) do
@@ -770,7 +793,7 @@ do
        end
          for _,v in pairs(fl.subfonts) do
             dest = add_fl_table(dest, v, unicodes,
-				fl.ascent + fl.descent, fl.units_per_em)
+				fl.ascent + fl.descent, fl.units_per_em, id)
          end
      end
      if dest then dest.unicodes = unicodes end
@@ -796,7 +819,7 @@ end
 
 --
 do
-   local cache_ver = 9
+   local cache_ver = 11
    local checksum = file.checksum
 
    local function prepare_extra_data_base(id)
@@ -891,7 +914,7 @@ luatexbase.add_to_callback(
       local vorg = {}; fmtable.v_origin = vorg
       local ft = font_getfont(fnum)
       local subtables = {}
-      if ft.specification then
+      if false and ft.specification then
 	 for feat_name,v in pairs(ft.specification.features.normal) do
 	    if v==true then
 	       for _,i in pairs(ft.resources.sequences) do
@@ -994,15 +1017,3 @@ do
    end
 end
 
-------------------------------------------------------------------------
--- VERT VARIANT TABLE
-------------------------------------------------------------------------
-vert_form_table = {
-   [0x2013]=0xFE32, [0x2014]=0xFE31, [0x2025]=0xFE30,
-   [0xFF08]=0xFE35, [0xFF09]=0xFE36, [0xFF5B]=0xFE37, [0xFF5D]=0xFE38,
-   [0x3014]=0xFE39, [0x3015]=0xFE3A, [0x3010]=0xFE3B, [0x3011]=0xFE3C,
-   [0x300A]=0xFE3D, [0x300B]=0xFE3E, [0x3008]=0xFE3F, [0x3009]=0xFE40,
-   [0x300C]=0xFE41, [0x300D]=0xFE42, [0x300E]=0xFE43, [0x300F]=0xFE44,
-   [0xFF3B]=0xFE47, [0xFF3D]=0xFE48, [0xFF3F]=0xFE33,
-}
-setmetatable(vert_form_table, {__index=function(t,k) return k end});

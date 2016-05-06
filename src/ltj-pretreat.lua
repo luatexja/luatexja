@@ -42,6 +42,7 @@ local attr_icflag = luatexbase.attributes['ltj@icflag']
 local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
 local ltjs_orig_char_table = ltjs.orig_char_table
 local ltjf_replace_altfont = ltjf.replace_altfont
+local ltjf_font_extra_info = ltjf.font_extra_info
 local attr_orig_char = luatexbase.attributes['ltj@origchar']
 local STCK  = luatexja.userid_table.STCK
 local DIR   = luatexja.userid_table.DIR
@@ -121,7 +122,6 @@ end
 
 -- mode: true iff this function is called from hpack_filter
 local ltjs_report_stack_level = ltjs.report_stack_level
-local ltjf_vert_form_table    = ltjf.vert_form_table
 local ltjf_font_metric_table  = ltjf.font_metric_table
 local font_getfont = font.getfont
 local function set_box_stack_level(head, mode)
@@ -140,8 +140,9 @@ local function set_box_stack_level(head, mode)
 	    local nf = ltjf_replace_altfont( has_attr(p, attr_curtfnt) or getfont(p) , pc)
 	    setfield(p, 'font', nf)
 	    if ltjf_font_metric_table[nf].vert_activated then
-	       pc = ltjf_vert_form_table [getchar(p)]
-	       if font_getfont(nf).characters[pc] then setfield(p, 'char', pc) end
+	       local pc = getchar(p)
+	       pc = (ltjf_font_extra_info[nf] and ltjf_font_extra_info[nf][pc] and ltjf_font_extra_info[nf][pc].vform)
+	       if pc and font_getfont(nf).characters[pc] then setfield(p, 'char', pc) end
 	    end
 	 end
       end
