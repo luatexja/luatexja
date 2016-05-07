@@ -269,6 +269,7 @@ do
 		       '\\endcsname=\\relax')
 	 return
       end
+      if not f then return end
       update_jfm_cache(j, f.size)
       local ad = identifiers[fn].parameters
       local sz = metrics[j].size_cache[f.size]
