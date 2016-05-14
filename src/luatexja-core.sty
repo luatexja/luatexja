@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2016/03/31 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2016/05/15 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -74,7 +74,7 @@
 %! 外部パッケージは普通の \endlinechar で読まないと危険.
 \ifltj@in@latex                 %<*LaTeX>
   \RequirePackage{luatexbase}
-  \RequirePackage{luaotfload} [2013/12/31] % v2.3
+  \RequirePackage{luaotfload}
   \RequirePackage{ltxcmds}    [2011/11/09] % v1.22
   \RequirePackage{pdftexcmds} [2011/11/29] % v0.20
   \RequirePackage{xkeyval}    [2012/10/14] % v2.6b
@@ -112,7 +112,7 @@
 
 %%------------------
 \endlinechar=13
-%! この中に master の luatexja-core.sty の内容を挿入する
+
 %! ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 % LuaTeX-ja core TeX source
 
@@ -189,7 +189,7 @@
 
 %%%%%%%% Load all sub-packages.
 \ifltj@in@latex                 %<*LaTeX>
-  \RequirePackage{ltj-base}   [2013/05/14]
+  \RequirePackage{ltj-base}   [2016/05/15]
 \else                           %<*!LaTeX>
   \input ltj-base.sty %
 \fi                             %</LaTeX>
@@ -761,7 +761,7 @@
 %%------------------ Load module for the format
 
 \ifltj@in@latex                 %<*LaTeX>
-  \RequirePackage{ltj-latex}[2013/05/14]
+  \RequirePackage{ltj-latex}[2016/05/15]
 \else\ifltj@in@plain            %<*plain>
   \input ltj-plain.sty %
 \fi\fi                          %</LaTeX|plain>
