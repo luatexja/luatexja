@@ -110,7 +110,7 @@ local function from_sjis(i)
 	if c1>0x7f then i=0x40 else i=0x3f end
 	c1 = c1 - i
      else
-	c1 = c1 - 0x7e
+	c1 = c1 - 0x9e
      end
      from_kuten(c2*256+c1)
   end
