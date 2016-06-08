@@ -724,29 +724,5 @@
   \directlua{luatexja.jfont.does_alt_set'\luatexluaescapestring{#1}'}}
 
 %%%% patch \@text@composite because of {y,t}albaselineshift
-\def\@text@composite#1#2#3#{%
-  \begingroup
-  \setbox\z@=\hbox\bgroup%
-  \ltj@yablshift\z@\ltj@tablshift\z@
-  \expandafter\@text@composite@x
-  \csname\string#1-\string#2\endcsname}
-\def\@text@composite@x#1#2{%
-  \ifx#1\relax
-    \expandafter\@secondoftwo
-  \else
-    \expandafter\@firstoftwo
-  \fi
-  #1{#2}\egroup
-  \leavevmode
-  \expandafter\lower
-    \ifnum\ltjgetparameter{direction}=3
-      \ltjgetparameter{talbaselineshift}
-    \else\ifmmode
-      \z@
-    \else
-      \ltjgetparameter{yalbaselineshift}
-    \fi\fi
-    \box\z@
-  \endgroup}
 
 \endinput
