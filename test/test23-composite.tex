@@ -1,0 +1,22 @@
+%#!ptex2pdf -l text_composite.tex
+\documentclass{ltjarticle}
+%\DeclareTextComposite{\"}{OT1}{圏}{`点}% invalid
+%\usepackage[utf8x]{inputenc}
+%\usepackage[T1]{fontenc}
+\DeclareTextCompositeCommand{\"}{OT1}{圏}{テン}
+\DeclareTextCompositeCommand{\"}{T1}{圏}{テン}
+\def\test{あ\AA あ\'(あ\'eあ\'圏い\"圏うa\"圏a\AA a（\AA）\'e}
+\makeatletter
+\begin{document}
+\ltjsetparameter{xkanjiskip=15pt, yalbaselineshift=10pt}
+\test
+\setbox2=\hbox{あ\'eい}
+\directlua{luatexja.ext_show_node_list(tex.getbox(2), ' ', print)}
+\par
+\ltjsetparameter{yalbaselineshift=0pt}
+\test
+
+\mathsurround20pt
+\test
+
+\end{document}

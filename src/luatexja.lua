@@ -230,8 +230,8 @@ end
 do
    luatexja.binary_pars = {
       jacharrange = function(c, t)
-	 if type(c)~='number' or c<0 or c>31*ltjc.ATTR_RANGE then
-	    -- 0 はエラーにしない（隠し）
+	 if type(c)~='number' or c<-1 or c>31*ltjc.ATTR_RANGE then
+	    -- 0, -1 はエラーにしない（隠し）
 	    ltjb.package_error('luatexja',
 			       'invalid character range number (' .. tostring(c) .. ')',
 			       'A character range number should be in the range 1..'
@@ -343,6 +343,24 @@ function luatexja.ext_cleanup()
    ltjd.remove_end_whatsit()
 end
 
+
+-- lastnodechar
+do
+   local id_glyph = node.id('glyph')
+   function luatexja.pltx_composite_last_node_char()
+      local n = tex.nest[tex.nest.ptr].tail
+      local r = '-1'
+      if n then
+	 if n.id==id_glyph then
+	    while n.componetns and  n.subtype and n.subtype%4 >= 2 do
+	       n = node.tail(n)
+	    end
+	    r = tostring(n.char)
+	 end
+      end
+      tex.sprint(r)
+   end
+end
 
 -- debug
 

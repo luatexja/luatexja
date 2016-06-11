@@ -122,7 +122,6 @@ end
 local function skip_table_to_glue(n)
    local g, st = node_new(id_glue), ltjs.fast_get_stack_skip(n)
    setglue(g, st.width, st.stretch, st.shrink, st.stretch_order, st.shrink_order)
-   -- luatexja.ext_show_node(to_node(g), 'sg ',print) 
    return g, (st.width==1073741823)
 end
 
@@ -302,7 +301,7 @@ end
 local ltjw_apply_ashift_math = ltjw.apply_ashift_math
 local ltjw_apply_ashift_disc = ltjw.apply_ashift_disc
 local min, max = math.min, math.max
-local function calc_np_aux_glyph_common(lp)
+local function calc_np_aux_glyph_common(lp, acc_flag)
    Np.nuc = lp
    Np.first= (Np.first or lp)
    if getfield(lp, 'lang') == lang_ja then
@@ -380,7 +379,7 @@ local function calc_np_aux_glyph_common(lp)
 	       node_free(r)
 	    elseif (ct.left_protruding or 0) == 0 then
 	       head = insert_before(head, npn, r)
-	       Np.first = (Np.first==npn) and r or npn
+	       Np.first = acc_flag and Np.first or ((Np.first==npn) and r or npn)
 	    elseif (ct.right_protruding or 0) == 0 then
 	       insert_after(head, npn, r); Np.last, lp = r, r
 	    else
@@ -490,7 +489,7 @@ local calc_np_auxtable = {
 	 set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
 	 set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
 	 set_attr(lp, attr_icflag, PROCESSED);
-	 return calc_np_aux_glyph_common(lp)
+	 return calc_np_aux_glyph_common(lp, true)
       else
 	 Np.first = Np.first or lp
 	 Np.id = id_kern; set_attr(lp, attr_icflag, PROCESSED)
