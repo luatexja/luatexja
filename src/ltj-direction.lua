@@ -168,6 +168,8 @@ do
 	 end
       end
    end
+   local node_next_node, node_tail_node = node.next, node.tail
+   local insert_after_node = node.insert_after
    function luatexja.direction.set_list_direction_hook(v)
       local lv = tex_nest.ptr -- must be >= 1
       if not v then
@@ -178,10 +180,12 @@ do
       elseif v=='adj' then
          v = get_adjust_dir_count()
       end
-      local h = to_direct(tex_nest[lv].head)
-      local w = dir_pool[v]()
-      insert_after(h, h, w)
-      tex_nest[lv].tail = to_node(node_tail(w))
+      local h = tex_nest[lv].head
+      local hn = node.next(h)
+      hn = (hn and hn.id==id_local) and hn or h
+      local w = to_node(dir_pool[v]())
+      insert_after_node(h, hn, w)
+      tex_nest[lv].tail = node_tail_node(w)
       ensure_tex_attr(attr_icflag, 0)
       ensure_tex_attr(attr_dir, 0)
    end
@@ -234,7 +238,7 @@ local function create_dir_whatsit(hd, gc, new_dir)
 	    getsubtype(hd)==sid_user and getfield(hd, 'user_id')==DIR then
       set_attr(hd, attr_icflag,
 	       get_attr_icflag(hd) + PROCESSED_BEGIN_FLAG)
-      local n = node_next(hd)
+      local n =node_next(hd)
       if n then
 	 set_attr(n, attr_icflag,
 		  get_attr_icflag(n) + PROCESSED_BEGIN_FLAG)
