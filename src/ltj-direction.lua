@@ -207,7 +207,7 @@ do
 		 "To change direction in an align, \n"
 		    .. "you shold use \\hbox or \\vbox.")
       else
-	 local h = (lv==0) and tex.lists.page_head or tex_nest[lv].head.next
+ 	 local h = (lv==0) and tex.lists.page_head or tex_nest[lv].head.next
 	 local flag,w = test_list(h,lv)
 	 if flag==0 then
 	    if lv==0 and not page_direction then
@@ -222,8 +222,15 @@ do
 	 elseif flag==1 then
 	    node_set_attr(w, attr_dir, v)
 	    if lv==0 then page_direction = v end
-	 else
-	    if lv==0 then page_direction = v end
+	 elseif lv==0 then
+	    page_direction = v
+	 else -- flag == 2: need to create dir whatsit.
+	    local h = tex_nest[lv].head
+	    local hn = node.next(h)
+	    hn = (hn and hn.id==id_local) and hn or h
+	    local w = to_node(dir_pool[v]())
+	    insert_after_node(h,hn,w)
+	    tex_nest[lv].tail = node_tail_node(w)
 	 end
          ensure_tex_attr(attr_icflag, 0)
       end
