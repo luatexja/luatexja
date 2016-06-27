@@ -395,7 +395,10 @@ local function calc_np_aux_glyph_common(lp, acc_flag)
       return true, lp
    end
 end
-local calc_np_auxtable = {
+local calc_np_auxtable
+do
+local dir_tate = luatexja.dir_table.dir_tate
+calc_np_auxtable = {
    [id_glyph] = calc_np_aux_glyph_common,
    [id_hlist] = function(lp)
       local op, flag
@@ -501,6 +504,7 @@ local calc_np_auxtable = {
       return false, node_next(lp)
    end,
 }
+end
 calc_np_auxtable[id_rule]   = calc_np_auxtable.box_like
 calc_np_auxtable[15]        = calc_np_auxtable.box_like
 calc_np_auxtable[id_ins]    = calc_np_auxtable.skip
