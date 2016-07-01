@@ -6805,11 +6805,14 @@ JFMの\texttt{chars}テーブルのエントリとして \verb+'AJ1-xxx'+ の形
 %<*en>
 \paragraph{IVS support}
 Recent fonts support Ideographic Variation Selector (IVS).
-It seems that \Pkg{luaotfload} and \Pkg{fontspec} packages do not support
-IVS, so we implemented IVS support in \Pkg{luatexja-otf}.
-\emph{IVS support by the \Pkg{luatexja-otf} package is experimental.
-If you want to enable IVS support, load
-\Pkg{luatexja-otf} and execute the following:}
+\Pkg{luaotfload} and \Pkg{fontspec} packages used to be not supported IVS,
+so we implemented experimental IVS support in \Pkg{luatexja-otf},
+which is activated by
+\begin{lstlisting}
+\directlua{luatexja.otf.enable_ivs()}
+\end{lstlisting}
+However, recent \Pkg{luaotfload} and \Pkg{fontspec} packages seem to support IVS,
+so we don't execute above command anymore.
 %</en>
 %<*ja>
 \paragraph{IVSサポート}
@@ -6818,67 +6821,14 @@ If you want to enable IVS support, load
 （漢字用異体字セレクタ）を後置することによって
 字形を指定する仕組み(IVS)が含まれている．
 執筆時点の2013年12月では，\Pkg{luaotfload}や\Pkg{fontspec}パッケージ類は
-IVSに対応してはいないようである．これらのパッケージで対応してくれるのが理想的だが，
-それまでのつなぎとして，\Pkg{luatexja-otf}パッケージ内にIVS対応を仕込んでおいた．
-
-\medskip
-
-\emph{\Pkg{luatexja-otf}によるIVS対応は試験的なものである．
-有効にするには，
-\Pkg{luatexja-otf}パッケージを読み込んだ上で以下の命令を実行する%
-\footnote{この命令を2回以上実行しても意味がない．}：}
-%</ja>
+IVSに対応してはいないようであったため，
+\Pkg{luatexja-otf}パッケージ内に試験的なIVS対応を実装した．これは以下の命令の実行で有効になる：
 \begin{lstlisting}
 \directlua{luatexja.otf.enable_ivs()}
 \end{lstlisting}
-%<ja> すると，上の命令を実行した箇所以降では，以下のようにIVSによる字形指定が有効となる．
-%<en> After executing the command above, you can use IVS like the following:
-\begin{LTXexample}
-\Large
-\jfontspec{KozMinPr6N-Regular}
-奈良県葛󠄀城市と，東京都葛󠄁飾区．\\
-こんにちは，渡
-邉󠄀邉󠄁邉󠄂邉󠄃邉󠄄
-邉󠄅邉󠄆邉󠄇邉󠄈邉󠄉
-邉󠄊邉󠄋邉󠄌邉󠄍邉󠄎
-さん．
-\end{LTXexample}
-%<*ja>
-左上側の入力においては，漢字用異体字セレクタを明示するため，
-例えばVariation~Selector~18 (\texttt{U+E0101})を\IVSB{18}のように表記している．
+しかし，現在の\Pkg{luaotfload}や\Pkg{fontspec}パッケージは
+IVSに対応しているようであるので，もはや上の命令を実行する必要はない．
 %</ja>
-\medskip
-
-%<*en>
-Specifying glyph variants by IVS precedes glyph replacement by font features.
-For example, only ``葛'' in ``葛西'' is changed by font features
-\texttt{jp78}~or~\texttt{jp90}, which does not followed by any variation selector.
-%</en>
-%<*ja>
-また，IVSによる字形指定は，OpenType機能によるそれに優先されることとした．
-下の例において，\texttt{jp78}, \texttt{jp90} 指定で字形が変化した文字は
-異体字セレクタが続いていない「葛西」中の「葛」のみである．
-%</ja>
-\begin{LTXexample}
- \def\TEST#1{%
-   {\jfontspec[#1]{KozMinPr6N-Regular}%
-   葛󠄀城市，葛󠄁飾区，葛西}\\}
- 指定なし：\TEST{}
- \texttt{jp78}：\TEST{CJKShape=JIS1978}
- \texttt{jp90}：\TEST{CJKShape=JIS1990}
-\end{LTXexample}
-
-%<*ja>
-現状では，\TeX 側のインターフェースとなる \Pkg{luatexja-otf.sty} は一切変更していない
-ので，ZRさんによる\Pkg{PXipamjm}パッケージ%
-\footnote{\url{https://github.com/zr-tex8r/PXipamjm}. 説明は彼のブログ記事
-「pxipamjm パッケージの説明書のような何か(\url{http://d.hatena.ne.jp/zrbabbler/20131221})」
-にある．}
-にあるような気の利いた命令はまだない．
-異体字の一覧表示を行いたい場合は，gitリポジトリ内の \texttt{test/test19-ivs.tex} 中にある
-Lua・\TeX コードが参考になるだろう．
-%</ja>
-
 
 \subsection{\Pkg{luatexja-adjust}}
 \label{ssec-adj}
