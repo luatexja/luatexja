@@ -25,7 +25,7 @@
 %  -----------------------------------------
 %
 % \fi
-% \CheckSum{5234}
+% \CheckSum{5229}
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -53,7 +53,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2016/07/12 ltjsclasses ]
+  [2016/07/14 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass{ltjsarticle}
@@ -539,9 +539,8 @@
 % \texttt{draft} でoverfull boxの起きた行末に5ptの罫線を引きます。
 %
 %    \begin{macrocode}
-\newif\ifdraft
-\DeclareOption{draft}{\drafttrue \setlength\overfullrule{5pt}}
-\DeclareOption{final}{\draftfalse \setlength\overfullrule{0pt}}
+\DeclareOption{draft}{\setlength\overfullrule{5pt}}
+\DeclareOption{final}{\setlength\overfullrule{0pt}}
 %    \end{macrocode}
 %
 % \paragraph{和文フォントメトリックの選択}
@@ -960,7 +959,7 @@
 % そこで，次のような定義に直し，|I watch TV.\@| と書くことにします。
 %
 %    \begin{macrocode}
-\def\@{\spacefactor3000\space}
+\def\@{\spacefactor3000{}}
 %    \end{macrocode}
 % \end{macro}
 %

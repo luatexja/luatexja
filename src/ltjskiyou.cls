@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjskiyou}
-  [2016/07/12 ltjsclasses ]
+  [2016/07/14 ltjsclasses ]
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
@@ -191,9 +191,8 @@
     }}
 \DeclareOption{disablejfam}{%
   \ClassWarningNoLine{\@currname}{The class option 'disablejfam' is obsolete}}
-\newif\ifdraft
-\DeclareOption{draft}{\drafttrue \setlength\overfullrule{5pt}}
-\DeclareOption{final}{\draftfalse \setlength\overfullrule{0pt}}
+\DeclareOption{draft}{\setlength\overfullrule{5pt}}
+\DeclareOption{final}{\setlength\overfullrule{0pt}}
 \newif\ifmingoth
 \mingothfalse
 \newif\ifjisfont
@@ -328,7 +327,7 @@
 \ltjsetparameter{jaxspmode={`〒,1}}
 \ltjsetparameter{alxspmode={`+,3}}
 \ltjsetparameter{alxspmode={`\%,3}}
-\def\@{\spacefactor3000\space}
+\def\@{\spacefactor3000{}}
 \def\@setfontsize#1#2#3{%
   \ifx\protect\@typeset@protect
     \let\@currsize#1%
