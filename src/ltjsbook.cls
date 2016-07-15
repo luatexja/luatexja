@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsbook}
-  [2016/07/14 ltjsclasses ]
+  [2016/07/15 ltjsclasses ]
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
@@ -98,27 +98,27 @@
 \DeclareOption{landscape}{\@landscapetrue}
 \newif\if@slide
 \@slidefalse
-\def\js@magscale{1}
-\DeclareOption{slide}{\@slidetrue\def\js@magscale{3.583}\@landscapetrue\@titlepagetrue}
-\DeclareOption{8pt} {\def\js@magscale{0.83}}% 1.2^(-1)
-\DeclareOption{9pt} {\def\js@magscale{0.913}}% 1.2^(-0.5}
-\DeclareOption{10pt}{\def\js@magscale{1}}
-\DeclareOption{11pt}{\def\js@magscale{1.095}}% 1.2^0.5
-\DeclareOption{12pt}{\def\js@magscale{1.200}}
-\DeclareOption{14pt}{\def\js@magscale{1.440}}
-\DeclareOption{17pt}{\def\js@magscale{1.728}}
-\DeclareOption{20pt}{\def\js@magscale{2}}
-\DeclareOption{21pt}{\def\js@magscale{2.074}}
-\DeclareOption{25pt}{\def\js@magscale{2.488}}
-\DeclareOption{30pt}{\def\js@magscale{2.986}}
-\DeclareOption{36pt}{\def\js@magscale{3.583}}
-\DeclareOption{43pt}{\def\js@magscale{4.300}}
-\DeclareOption{12Q} {\def\js@magscale{0.923}}% 1pt*12Q/13Q
-\DeclareOption{14Q} {\def\js@magscale{1.077}}% 1pt*14Q/13Q
-\DeclareOption{10ptj}{\def\js@magscale{1.085}}% 1pt*10bp/13Q
-\DeclareOption{10.5ptj}{\def\js@magscale{1.139}}
-\DeclareOption{11ptj}{\def\js@magscale{1.194}}
-\DeclareOption{12ptj}{\def\js@magscale{1.302}}
+\def\jsc@magscale{1}
+\DeclareOption{slide}{\@slidetrue\def\jsc@magscale{3.583}\@landscapetrue\@titlepagetrue}
+\DeclareOption{8pt} {\def\jsc@magscale{0.83}}% 1.2^(-1)
+\DeclareOption{9pt} {\def\jsc@magscale{0.913}}% 1.2^(-0.5}
+\DeclareOption{10pt}{\def\jsc@magscale{1}}
+\DeclareOption{11pt}{\def\jsc@magscale{1.095}}% 1.2^0.5
+\DeclareOption{12pt}{\def\jsc@magscale{1.200}}
+\DeclareOption{14pt}{\def\jsc@magscale{1.440}}
+\DeclareOption{17pt}{\def\jsc@magscale{1.728}}
+\DeclareOption{20pt}{\def\jsc@magscale{2}}
+\DeclareOption{21pt}{\def\jsc@magscale{2.074}}
+\DeclareOption{25pt}{\def\jsc@magscale{2.488}}
+\DeclareOption{30pt}{\def\jsc@magscale{2.986}}
+\DeclareOption{36pt}{\def\jsc@magscale{3.583}}
+\DeclareOption{43pt}{\def\jsc@magscale{4.300}}
+\DeclareOption{12Q} {\def\jsc@magscale{0.923}}% 1pt*12Q/13Q
+\DeclareOption{14Q} {\def\jsc@magscale{1.077}}% 1pt*14Q/13Q
+\DeclareOption{10ptj}{\def\jsc@magscale{1.085}}% 1pt*10bp/13Q
+\DeclareOption{10.5ptj}{\def\jsc@magscale{1.139}}
+\DeclareOption{11ptj}{\def\jsc@magscale{1.194}}
+\DeclareOption{12ptj}{\def\jsc@magscale{1.302}}
 \newif\if@ltjs@mag@xreal
 \@ltjs@mag@xrealtrue
 \DeclareOption{nomag*}{\@ltjs@mag@xrealtrue}
@@ -227,19 +227,19 @@
   \setlength\paperwidth {\@tempdima}
 \fi
 \if@slide\def\n@baseline{13}\else\def\n@baseline{16}\fi
-\newdimen\js@mpt
-\newdimen\js@mmm
-\js@mpt=\js@magscale\p@
-\js@mmm=\js@magscale mm
-\ifdim\js@mpt<.92\p@ % 8pt, 9pt 指定時
+\newdimen\jsc@mpt
+\newdimen\jsc@mmm
+\jsc@mpt=\jsc@magscale\p@
+\jsc@mmm=\jsc@magscale mm
+\ifdim\jsc@mpt<.92\p@ % 8pt, 9pt 指定時
   \def\n@baseline{15}%
 \fi
 \newcommand{\@ptsize}{0}
-\ifdim\js@mpt=1.0954\p@ \renewcommand{\@ptsize}{1}\else
-\ifdim\js@mpt=1.2\p@    \renewcommand{\@ptsize}{2}\else
+\ifdim\jsc@mpt=1.0954\p@ \renewcommand{\@ptsize}{1}\else
+\ifdim\jsc@mpt=1.2\p@    \renewcommand{\@ptsize}{2}\else
 \renewcommand{\@ptsize}{-20}\fi\fi
 \if@ltjs@mag@xreal\RequirePackage{type1cm}
-\ifdim\js@mpt=\p@\else
+\ifdim\jsc@mpt=\p@\else
   \expandafter\let\csname OT1/cmr/m/n/10\endcsname\relax
   \expandafter\let\csname OMX/cmex/m/n/10\endcsname\relax
   \newluafunction\ltjs@@magnify@font@calc
@@ -260,7 +260,7 @@
      \def\@tempa{#1}\def\@tempb{#2}%
      \ifx\@tempb\@empty
         \edef\@tempb{ scaled\directlua{%
-          tex.sprint(math.floor(0.5+\js@magscale*1000))
+          tex.sprint(math.floor(0.5+\jsc@magscale*1000))
         }}%
      \else
         \dimen@\@tempb\relax
@@ -356,8 +356,8 @@
       \ltjsetxkanjiskip .25em plus .15em minus .06em
     \fi
   \fi}
-\def\js@setfontsize#1#2#3{%
-  \@setfontsize#1{#2\js@mpt}{#3\js@mpt}}
+\def\jsc@setfontsize#1#2#3{%
+  \@setfontsize#1{#2\jsc@mpt}{#3\jsc@mpt}}
 \emergencystretch 3\zw
 \newif\ifnarrowbaselines
 \if@english
@@ -382,11 +382,11 @@
 }
 \renewcommand{\normalsize}{%
   \ltj@@ifnarrowbaselines
-    {\js@setfontsize\normalsize\@xpt\@xiipt}%
-    {\js@setfontsize\normalsize\@xpt{\n@baseline}}%
-  \abovedisplayskip 11\js@mpt \@plus3\js@mpt \@minus4\js@mpt
-  \abovedisplayshortskip \z@ \@plus3\js@mpt
-  \belowdisplayskip 9\js@mpt \@plus3\js@mpt \@minus4\js@mpt
+    {\jsc@setfontsize\normalsize\@xpt\@xiipt}%
+    {\jsc@setfontsize\normalsize\@xpt{\n@baseline}}%
+  \abovedisplayskip 11\jsc@mpt \@plus3\jsc@mpt \@minus4\jsc@mpt
+  \abovedisplayshortskip \z@ \@plus3\jsc@mpt
+  \belowdisplayskip 9\jsc@mpt \@plus3\jsc@mpt \@minus4\jsc@mpt
   \belowdisplayshortskip \belowdisplayskip
   \let\@listi\@listI}
 \mcfamily\selectfont\normalsize
@@ -398,10 +398,10 @@
 \setlength\Chs{\wd0}
 \newcommand{\small}{%
   \ltj@@ifnarrowbaselines
-    {\js@setfontsize\small\@ixpt{11}}%
-    {\js@setfontsize\small\@ixpt{13}}%
-  \abovedisplayskip 9\js@mpt \@plus3\js@mpt \@minus4\js@mpt
-  \abovedisplayshortskip  \z@ \@plus3\js@mpt
+    {\jsc@setfontsize\small\@ixpt{11}}%
+    {\jsc@setfontsize\small\@ixpt{13}}%
+  \abovedisplayskip 9\jsc@mpt \@plus3\jsc@mpt \@minus4\jsc@mpt
+  \abovedisplayshortskip  \z@ \@plus3\jsc@mpt
   \belowdisplayskip \abovedisplayskip
   \belowdisplayshortskip \belowdisplayskip
   \def\@listi{\leftmargin\leftmargini
@@ -410,36 +410,36 @@
               \itemsep \parsep}}
 \newcommand{\footnotesize}{%
   \ltj@@ifnarrowbaselines
-    {\js@setfontsize\footnotesize\@viiipt{9.5}}%
-    {\js@setfontsize\footnotesize\@viiipt{11}}%
-  \abovedisplayskip 6\js@mpt \@plus2\js@mpt \@minus3\js@mpt
-  \abovedisplayshortskip  \z@ \@plus2\js@mpt
+    {\jsc@setfontsize\footnotesize\@viiipt{9.5}}%
+    {\jsc@setfontsize\footnotesize\@viiipt{11}}%
+  \abovedisplayskip 6\jsc@mpt \@plus2\jsc@mpt \@minus3\jsc@mpt
+  \abovedisplayshortskip  \z@ \@plus2\jsc@mpt
   \belowdisplayskip \abovedisplayskip
   \belowdisplayshortskip \belowdisplayskip
   \def\@listi{\leftmargin\leftmargini
               \topsep \z@
               \parsep \z@
               \itemsep \parsep}}
-\newcommand{\scriptsize}{\js@setfontsize\scriptsize\@viipt\@viiipt}
-\newcommand{\tiny}{\js@setfontsize\tiny\@vpt\@vipt}
+\newcommand{\scriptsize}{\jsc@setfontsize\scriptsize\@viipt\@viiipt}
+\newcommand{\tiny}{\jsc@setfontsize\tiny\@vpt\@vipt}
 \if@twocolumn
-  \newcommand{\large}{\js@setfontsize\large\@xiipt{\n@baseline}}
+  \newcommand{\large}{\jsc@setfontsize\large\@xiipt{\n@baseline}}
 \else
-  \newcommand{\large}{\js@setfontsize\large\@xiipt{17}}
+  \newcommand{\large}{\jsc@setfontsize\large\@xiipt{17}}
 \fi
-\newcommand{\Large}{\js@setfontsize\Large\@xivpt{21}}
-\newcommand{\LARGE}{\js@setfontsize\LARGE\@xviipt{25}}
-\newcommand{\huge}{\js@setfontsize\huge\@xxpt{28}}
-\newcommand{\Huge}{\js@setfontsize\Huge\@xxvpt{33}}
-\newcommand{\HUGE}{\js@setfontsize\HUGE{30}{40}}
+\newcommand{\Large}{\jsc@setfontsize\Large\@xivpt{21}}
+\newcommand{\LARGE}{\jsc@setfontsize\LARGE\@xviipt{25}}
+\newcommand{\huge}{\jsc@setfontsize\huge\@xxpt{28}}
+\newcommand{\Huge}{\jsc@setfontsize\Huge\@xxvpt{33}}
+\newcommand{\HUGE}{\jsc@setfontsize\HUGE{30}{40}}
 \everydisplay=\expandafter{\the\everydisplay \narrowbaselines}
 \newcommand{\headfont}{\gtfamily\sffamily}
 \setlength\columnsep{2\zw}
 \setlength\columnseprule{\z@}
-\setlength\lineskip{1\js@mpt}
-\setlength\normallineskip{1\js@mpt}
-\setlength\lineskiplimit{1\js@mpt}
-\setlength\normallineskiplimit{1\js@mpt}
+\setlength\lineskip{1\jsc@mpt}
+\setlength\normallineskip{1\jsc@mpt}
+\setlength\lineskiplimit{1\jsc@mpt}
+\setlength\normallineskiplimit{1\jsc@mpt}
 \renewcommand{\baselinestretch}{}
 \setlength\parskip{\z@}
 \if@slide
@@ -450,9 +450,9 @@
 \@lowpenalty   51
 \@medpenalty  151
 \@highpenalty 301
-\setlength\topskip{10\js@mpt}
+\setlength\topskip{10\jsc@mpt}
 \if@slide
-  \setlength\headheight{0\js@mpt}
+  \setlength\headheight{0\jsc@mpt}
 \else
   \setlength\headheight{2\topskip}
 \fi
@@ -468,7 +468,7 @@
   \setlength\headsep{\footskip}
   \addtolength\headsep{-\topskip}
 \else
-  \setlength\headsep{6\js@mmm}
+  \setlength\headsep{6\jsc@mmm}
 \fi
 \setlength\maxdepth{.5\topskip}
 \newdimen\fullwidth
@@ -476,7 +476,7 @@
   \setlength\fullwidth{0.76\paperwidth}
 \else
   \setlength\fullwidth{\paperwidth}
-  \addtolength\fullwidth{-36\js@mmm}
+  \addtolength\fullwidth{-36\jsc@mmm}
 \fi
 \if@twocolumn \@tempdima=2\zw \else \@tempdima=1\zw \fi
 \divide\fullwidth\@tempdima \multiply\fullwidth\@tempdima
@@ -500,7 +500,7 @@
 \divide\textheight\baselineskip
 \multiply\textheight\baselineskip
 \addtolength{\textheight}{\topskip}
-\addtolength{\textheight}{0.1\js@mpt}
+\addtolength{\textheight}{0.1\jsc@mpt}
 \setlength\marginparsep{\columnsep}
 \setlength\marginparpush{\baselineskip}
 \setlength{\oddsidemargin}{\paperwidth}
@@ -516,7 +516,7 @@
 \addtolength\marginparwidth{-\oddsidemargin}
 \addtolength\marginparwidth{-1in}
 \addtolength\marginparwidth{-\textwidth}
-\addtolength\marginparwidth{-10\js@mmm}
+\addtolength\marginparwidth{-10\jsc@mmm}
 \addtolength\marginparwidth{-\marginparsep}
 \@tempdima=1\zw
 \divide\marginparwidth\@tempdima
@@ -534,7 +534,7 @@
 \addtolength\topmargin{-1in}
 {\footnotesize\global\setlength\footnotesep{\baselineskip}}
 \setlength\footnotesep{0.7\footnotesep}
-\setlength{\skip\footins}{16\js@mpt \@plus 5\js@mpt \@minus 2\js@mpt}
+\setlength{\skip\footins}{16\jsc@mpt \@plus 5\jsc@mpt \@minus 2\jsc@mpt}
 \setcounter{topnumber}{9}
 \renewcommand{\topfraction}{.85}
 \setcounter{bottomnumber}{9}
@@ -545,17 +545,17 @@
 \setcounter{dbltopnumber}{9}
 \renewcommand{\dbltopfraction}{.8}
 \renewcommand{\dblfloatpagefraction}{.8}
-\setlength\floatsep    {12\js@mpt \@plus 2\js@mpt \@minus 2\js@mpt}
-\setlength\textfloatsep{20\js@mpt \@plus 2\js@mpt \@minus 4\js@mpt}
-\setlength\intextsep   {12\js@mpt \@plus 2\js@mpt \@minus 2\js@mpt}
-\setlength\dblfloatsep    {12\js@mpt \@plus 2\js@mpt \@minus 2\js@mpt}
-\setlength\dbltextfloatsep{20\js@mpt \@plus 2\js@mpt \@minus 4\js@mpt}
-\setlength\@fptop{0\js@mpt \@plus 1fil}
-\setlength\@fpsep{8\js@mpt \@plus 2fil}
-\setlength\@fpbot{0\js@mpt \@plus 1fil}
-\setlength\@dblfptop{0\js@mpt \@plus 1fil}
-\setlength\@dblfpsep{8\js@mpt \@plus 2fil}
-\setlength\@dblfpbot{0\js@mpt \@plus 1fil}
+\setlength\floatsep    {12\jsc@mpt \@plus 2\jsc@mpt \@minus 2\jsc@mpt}
+\setlength\textfloatsep{20\jsc@mpt \@plus 2\jsc@mpt \@minus 4\jsc@mpt}
+\setlength\intextsep   {12\jsc@mpt \@plus 2\jsc@mpt \@minus 2\jsc@mpt}
+\setlength\dblfloatsep    {12\jsc@mpt \@plus 2\jsc@mpt \@minus 2\jsc@mpt}
+\setlength\dbltextfloatsep{20\jsc@mpt \@plus 2\jsc@mpt \@minus 4\jsc@mpt}
+\setlength\@fptop{0\jsc@mpt \@plus 1fil}
+\setlength\@fpsep{8\jsc@mpt \@plus 2fil}
+\setlength\@fpbot{0\jsc@mpt \@plus 1fil}
+\setlength\@dblfptop{0\jsc@mpt \@plus 1fil}
+\setlength\@dblfpsep{8\jsc@mpt \@plus 2fil}
+\setlength\@dblfpbot{0\jsc@mpt \@plus 1fil}
 \def\ps@plainfoot{%
   \let\@mkboth\@gobbletwo
   \let\@oddhead\@empty
@@ -630,16 +630,16 @@
         \begin{center}
           \mbox{} \\[1\zw]
           \large
-          {\maybeblue\hrule height0\js@mpt depth2\js@mpt\relax}\par
+          {\maybeblue\hrule height0\jsc@mpt depth2\jsc@mpt\relax}\par
           \smallskip
           \@title
           \smallskip
-          {\maybeblue\hrule height0\js@mpt depth2\js@mpt\relax}\par
+          {\maybeblue\hrule height0\jsc@mpt depth2\jsc@mpt\relax}\par
           \vfill
           {\small \@author}%
         \end{center}
       \else
-      \vskip 60\js@mpt
+      \vskip 60\jsc@mpt
       \begin{center}%
         {\LARGE \@title \par}%
         \vskip 3em%
@@ -800,7 +800,7 @@
     \@afterheading
   \fi
   \if@slide
-    {\vskip-6\js@mpt\maybeblue\hrule height0\js@mpt depth1\js@mpt\vskip7\js@mpt\relax}%
+    {\vskip-6\jsc@mpt\maybeblue\hrule height0\jsc@mpt depth1\jsc@mpt\vskip7\jsc@mpt\relax}%
   \fi
   \par  % 2000-12-18
   \ignorespaces}
@@ -885,7 +885,7 @@
     \normalfont
     \ifnum \c@secnumdepth >-2\relax
       \huge\headfont \prepartname\thepart\postpartname
-      \par\vskip20\js@mpt
+      \par\vskip20\jsc@mpt
     \fi
     \Huge \headfont #2\par}%
   \@endpart}
@@ -927,8 +927,8 @@
     \addcontentsline{toc}{chapter}{#1}%
   \fi
   \chaptermark{#1}%
-  \addtocontents{lof}{\protect\addvspace{10\js@mpt}}%
-  \addtocontents{lot}{\protect\addvspace{10\js@mpt}}%
+  \addtocontents{lof}{\protect\addvspace{10\jsc@mpt}}%
+  \addtocontents{lot}{\protect\addvspace{10\jsc@mpt}}%
   \if@twocolumn
     \@topnewpage[\@makechapterhead{#2}]%
   \else
@@ -1131,14 +1131,14 @@
   \gdef\@chapapp{\appendixname}%
   \gdef\@chappos{}%
   \gdef\thechapter{\@Alph\c@chapter}}
-\setlength\arraycolsep{5\js@mpt}
-\setlength\tabcolsep{6\js@mpt}
-\setlength\arrayrulewidth{.4\js@mpt}
-\setlength\doublerulesep{2\js@mpt}
+\setlength\arraycolsep{5\jsc@mpt}
+\setlength\tabcolsep{6\jsc@mpt}
+\setlength\arrayrulewidth{.4\jsc@mpt}
+\setlength\doublerulesep{2\jsc@mpt}
 \setlength\tabbingsep{\labelsep}
 \skip\@mpfootins = \skip\footins
-\setlength\fboxsep{3\js@mpt}
-\setlength\fboxrule{.4\js@mpt}
+\setlength\fboxsep{3\jsc@mpt}
+\setlength\fboxrule{.4\jsc@mpt}
 \@addtoreset{equation}{chapter}
 \renewcommand\theequation
   {\ifnum \c@chapter>\z@ \thechapter.\fi \@arabic\c@equation}
@@ -1170,8 +1170,8 @@
                {\end@dblfloat}
 \newlength\abovecaptionskip
 \newlength\belowcaptionskip
-\setlength\abovecaptionskip{5\js@mpt} % 元: 10\p@
-\setlength\belowcaptionskip{5\js@mpt} % 元: 0\p@
+\setlength\abovecaptionskip{5\jsc@mpt} % 元: 10\p@
+\setlength\belowcaptionskip{5\jsc@mpt} % 元: 0\p@
 \long\def\@makecaption#1#2{{\small
   \advance\leftskip .0628\linewidth
   \advance\rightskip .0628\linewidth
@@ -1195,12 +1195,12 @@
 \newcommand\@tocrmarg{2.55em}
 \newcommand\@dotsep{4.5}
 \setcounter{tocdepth}{1}
-\newdimen\js@tocl@width
+\newdimen\jsc@tocl@width
 \newcommand{\tableofcontents}{%
-  \settowidth\js@tocl@width{\headfont\prechaptername\postchaptername}%
+  \settowidth\jsc@tocl@width{\headfont\prechaptername\postchaptername}%
   \settowidth\@tempdima{\headfont\appendixname}%
-  \ifdim\js@tocl@width<\@tempdima \setlength\js@tocl@width{\@tempdima}\fi
-  \ifdim\js@tocl@width<2\zw \divide\js@tocl@width by 2 \advance\js@tocl@width 1\zw\fi
+  \ifdim\jsc@tocl@width<\@tempdima \setlength\jsc@tocl@width{\@tempdima}\fi
+  \ifdim\jsc@tocl@width<2\zw \divide\jsc@tocl@width by 2 \advance\jsc@tocl@width 1\zw\fi
   \if@twocolumn
     \@restonecoltrue\onecolumn
   \else
@@ -1214,7 +1214,7 @@
 \newcommand*{\l@part}[2]{%
   \ifnum \c@tocdepth >-2\relax
     \addpenalty{-\@highpenalty}%
-    \addvspace{2.25em \@plus\js@mpt}%
+    \addvspace{2.25em \@plus\jsc@mpt}%
     \begingroup
       \parindent \z@
       \rightskip \@tocrmarg
@@ -1231,14 +1231,14 @@
 \newcommand*{\l@chapter}[2]{%
   \ifnum \c@tocdepth >\m@ne
     \addpenalty{-\@highpenalty}%
-    \addvspace{1.0em \@plus\js@mpt}
+    \addvspace{1.0em \@plus\jsc@mpt}
     \begingroup
       \parindent\z@
       \rightskip\@tocrmarg
       \parfillskip-\rightskip
       \leavevmode\headfont
       % \if@english\setlength\@lnumwidth{5.5em}\else\setlength\@lnumwidth{4.683\zw}\fi
-      \setlength\@lnumwidth{\js@tocl@width}\advance\@lnumwidth 2.683\zw
+      \setlength\@lnumwidth{\jsc@tocl@width}\advance\@lnumwidth 2.683\zw
       \advance\leftskip\@lnumwidth \hskip-\leftskip
       #1\nobreak\hfil\nobreak\hbox to\@pnumwidth{\hss#2}\par
       \penalty\@highpenalty
@@ -1246,24 +1246,24 @@
   \fi}
  % \newcommand*{\l@section}{\@dottedtocline{1}{1\zw}{3.683\zw}}
 \newcommand*{\l@section}{%
-          \@tempdima\js@tocl@width \advance\@tempdima -1\zw
+          \@tempdima\jsc@tocl@width \advance\@tempdima -1\zw
           \@dottedtocline{1}{\@tempdima}{3.683\zw}}
 \newcommand*{\l@subsection}{%
-          \@tempdima\js@tocl@width \advance\@tempdima 2.683\zw
+          \@tempdima\jsc@tocl@width \advance\@tempdima 2.683\zw
           \@dottedtocline{2}{\@tempdima}{3.5\zw}}
 \newcommand*{\l@subsubsection}{%
-          \@tempdima\js@tocl@width \advance\@tempdima 6.183\zw
+          \@tempdima\jsc@tocl@width \advance\@tempdima 6.183\zw
           \@dottedtocline{3}{\@tempdima}{4.5\zw}}
 \newcommand*{\l@paragraph}{%
-          \@tempdima\js@tocl@width \advance\@tempdima 10.683\zw
+          \@tempdima\jsc@tocl@width \advance\@tempdima 10.683\zw
           \@dottedtocline{4}{\@tempdima}{5.5\zw}}
 \newcommand*{\l@subparagraph}{%
-          \@tempdima\js@tocl@width \advance\@tempdima 16.183\zw
+          \@tempdima\jsc@tocl@width \advance\@tempdima 16.183\zw
           \@dottedtocline{5}{\@tempdima}{6.5\zw}}
 \newdimen\@lnumwidth
 \def\numberline#1{\hb@xt@\@lnumwidth{#1\hfil}\hspace{0pt}}
 \def\@dottedtocline#1#2#3#4#5{\ifnum #1>\c@tocdepth \else
-  \vskip \z@ \@plus.2\js@mpt
+  \vskip \z@ \@plus.2\jsc@mpt
   {\leftskip #2\relax \rightskip \@tocrmarg \parfillskip -\rightskip
     \parindent #2\relax\@afterindenttrue
    \interlinepenalty\@M
@@ -1342,7 +1342,7 @@
     \@mkboth{\indexname}{}%
     \plainifnotempty % \thispagestyle{plain}
     \parindent\z@
-    \parskip\z@ \@plus .3\js@mpt\relax
+    \parskip\z@ \@plus .3\jsc@mpt\relax
     \let\item\@idxitem
     \raggedright
     \footnotesize\narrowbaselines
@@ -1357,7 +1357,7 @@
 \newcommand{\@idxitem}{\par\hangindent 4\zw} % 元 40pt
 \newcommand{\subitem}{\@idxitem \hspace*{2\zw}} % 元 20pt
 \newcommand{\subsubitem}{\@idxitem \hspace*{3\zw}} % 元 30pt
-\newcommand{\indexspace}{\par \vskip 10\js@mpt \@plus5\js@mpt \@minus3\js@mpt\relax}
+\newcommand{\indexspace}{\par \vskip 10\jsc@mpt \@plus5\jsc@mpt \@minus3\jsc@mpt\relax}
 \newcommand\seename{\if@english see\else →\fi}
 \newcommand\alsoname{\if@english see also\else →\fi}
 \let\footnotes@ve=\footnote
@@ -1370,9 +1370,9 @@
   \else\hbox{\yoko \@textsuperscript{\normalfont\@thefnmark}}\fi}
 \def\thefootnote{\ifnum\c@footnote>\z@\leavevmode\lower.5ex\hbox{*}\@arabic\c@footnote\fi}
 \renewcommand{\footnoterule}{%
-  \kern-3\js@mpt
-  \hrule width 0.4\columnwidth height 0.4\js@mpt
-  \kern 2.6\js@mpt}
+  \kern-3\jsc@mpt
+  \hrule width .4\columnwidth height 0.4\jsc@mpt
+  \kern 2.6\jsc@mpt}
 \@addtoreset{footnote}{chapter}
 \long\def\@footnotetext{%
   \insert\footins\bgroup
