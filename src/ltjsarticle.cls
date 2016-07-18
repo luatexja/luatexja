@@ -238,7 +238,7 @@
   \newluafunction\ltjs@@magnify@font@calc
   \begingroup\catcode`\%=12\relax
   \directlua{
-    local getdimen, mpt=tex.getdimen, tex.getdimen('js@mpt')/65536
+    local getdimen, mpt=tex.getdimen, tex.getdimen('jsc@mpt')/65536
     local t = lua.get_functions_table()
     t[\the\ltjs@@magnify@font@calc] = function()
       tex.sprint(math.floor(0.5+mpt*getdimen('dimen@')))

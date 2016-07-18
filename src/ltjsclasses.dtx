@@ -703,7 +703,7 @@
   \newluafunction\ltjs@@magnify@font@calc
   \begingroup\catcode`\%=12\relax
   \directlua{
-    local getdimen, mpt=tex.getdimen, tex.getdimen('js@mpt')/65536
+    local getdimen, mpt=tex.getdimen, tex.getdimen('jsc@mpt')/65536
     local t = lua.get_functions_table()
     t[\the\ltjs@@magnify@font@calc] = function()
       tex.sprint(math.floor(0.5+mpt*getdimen('dimen@')))
@@ -957,6 +957,9 @@
 % 欧文といえば，\LaTeX の |\def\@{\spacefactor\@m}| という定義（|\@m| は1000）
 % では |I watch TV\@.| と書くと V とピリオドのペアカーニングが効かなくなります。
 % そこで，次のような定義に直し，|I watch TV.\@| と書くことにします。
+%
+% [2016-07-14] 2015-01-01の\LaTeX で，auxiliary filesに書き出されたときに
+% スペースが食われないようにする修正が入りました。これに合わせて |{}| を補いました。
 %
 %    \begin{macrocode}
 \def\@{\spacefactor3000{}}
