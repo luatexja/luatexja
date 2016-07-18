@@ -6,9 +6,9 @@
 %  pLaTeX2ε新ドキュメントクラス
 %
 %  これは LaTeX3 Project の classes.dtx と株式会社アスキーの jclasses.dtx
-%  に基づいて奥村 <okumura@okumuralab.org> が改変したものです。
-%  奥村の改変部分については何の権利も主張しません。
-%  オリジナルの著作権の許す範囲で自由にご利用ください。
+%  に基づいて，もともと奥村晴彦 <okumura@okumuralab.org> により
+%  作成されたものです。
+%  現在は日本語\TeX 開発コミュニティにより管理されています。
 %
 %  [2002-12-19] いろいろなものに収録していただく際にライセンスを明確にする
 %  必要が生じてきました。アスキーのものが最近はmodified BSDライセンスになっ
@@ -17,15 +17,19 @@
 %  [2016-07-11] abenoriさんによる\texttt{nomag}オプションをマージしました。
 %  なお，ソースコードの管理はGitHubで行うことにしました。
 %
+%  [2016-07-13] 日本語\TeX 開発コミュニティによる管理に移行しました。
+%
 %  Copyright 1993 1994 1995 1996 1997 1998 1999
 %  The LaTeX3 Project and any individual authors listed elsewhere
 %  in this file. 
 %
 %  Copyright 1995-1999 ASCII Corporation.
+%  Copyright 1999-2016 Haruhiko Okumura
+%  Copyright 2016 Japanese TeX Development Community
 %  -----------------------------------------
 %
 % \fi
-% \CheckSum{5229}
+% \CheckSum{5291}
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -53,7 +57,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2016/07/15 ltjsclasses ]
+  [2016/07/18 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass{ltjsarticle}
@@ -91,7 +95,8 @@
 %
 % \section{はじめに}
 %
-% これは奥村晴彦先生による |jsclasses.dtx| をLua\LaTeX-ja用に改変したものです。
+% これは，元々奥村晴彦先生により作成され，現在は日本語\TeX 開発コミュニティにより
+% 管理されている |jsclasses.dtx| をLua\LaTeX-ja用に改変したものです。
 % 次のドキュメントクラス（スタイルファイル）を生成します。
 % \begin{quote}
 %   \begin{tabular}{lll}
@@ -101,8 +106,6 @@
 %     $\langle$\textsf{kiyou}$\rangle$   & \texttt{ltjskiyou.cls}      & 某紀要用
 %   \end{tabular}
 % \end{quote}
-%
-% |ltjclasses| と違うのは以下の点です。
 %
 % \subsection{\texttt{jsclasses.dtx}からの主な変更点}
 % 全ての変更点を知りたい場合は，|jsclasses.dtx| と |ltjsclasses.dtx| で |diff| を
@@ -129,11 +132,13 @@
 %    \item |nomag| オプション指定時には，単にレイアウトに用いる各種長さの値をスケールさせるだけです。
 %      そのため，例えば本文の文字サイズが17ptのときにはcmr10でなくcmr17を用いることになり，組版結果の印象が
 %      異なる恐れがあります。
-%    \item |nomag*| オプション指定時には，上記に加えてオプティカルサイズを調整する（本文ではcmr17の代わりに
+%    \item |nomagx| オプション指定時には，上記に加えてオプティカルサイズを調整する（本文ではcmr17の代わりに
 %      cmr10を拡大縮小する，など）ため，\LaTeX のフォント選択システムNFSSへパッチを当てます。
-%      こうすることで前項に書いた不具合はなくなりますが，かえって別の不具合が起きる可能性はあります。
+%      こうすることで前項に書いた不具合はなくなりますが，かえって別の不具合が起きる可能性
+%      はあります。
 %   \end{itemize}
-%   標準では |nomag*| オプションが有効になっています。
+%   標準では |nomagx| オプションが有効になっています。|jsclasses.dtx| で用意されていた
+%   |usemag| オプションを指定すると警告を出します．
 % \end{itemize}
 %
 % [2014-02-07 LTJ] jsclasses 2014-02-07 ベースにしました。
@@ -150,11 +155,26 @@
 %
 % [2016-03-31 LTJ] |xreal|オプションを標準で有効にしました．
 %
-% [2016-07-12 LTJ] jsclasses 開発版に合わせ、|real|, |xreal| オプションの名称を変更するなどの変更を行いました。
+% [2016-07-12 LTJ] |jsclasses.dtx| 開発版に合わせ、|real|, |xreal| オプションの名称を変更するなどの変更を行いました。
+%
+% [2016-07-18 LTJ] |usemag| オプションが指定されると警告を出すようにしました．
 %
 % \StopEventually{}
 %
 % 以下では実際のコードに即して説明します。
+%
+% \begin{macro}{\jsc@clsname}
+%
+% 文書クラスの名前です。エラーメッセージ表示などで使われます。
+%
+%    \begin{macrocode}
+%<article>\def\jsc@clsname{ltjsarticle}
+%<book>\def\jsc@clsname{ltjsbook}
+%<jspf>\def\jsc@clsname{ltjspf}
+%<kiyou>\def\jsc@clsname{ltjskiyou}
+%    \end{macrocode}
+% \end{macro}
+%
 % \section{Lua\TeX-jaの読み込み}
 %
 % まず，|luatexja| を読み込みます。
@@ -323,10 +343,13 @@
 %
 % [2003-04-18] 12Qオプションを追加しました。
 %
+% [2016-07-08] |\mag| を使わずに各種寸法をスケールさせるためのオプション \texttt{nomag} を新設しました。
+% \texttt{usemag} オプションの指定で従来通りの動作となります。デフォルトは \texttt{usemag} です。
+%
 %    \begin{macrocode}
 \def\jsc@magscale{1}
 \DeclareOption{slide}{\@slidetrue\def\jsc@magscale{3.583}\@landscapetrue\@titlepagetrue}
-\DeclareOption{8pt} {\def\jsc@magscale{0.83}}% 1.2^(-1)
+\DeclareOption{8pt} {\def\jsc@magscale{0.833}}% 1.2^(-1)
 \DeclareOption{9pt} {\def\jsc@magscale{0.913}}% 1.2^(-0.5}
 \DeclareOption{10pt}{\def\jsc@magscale{1}}
 \DeclareOption{11pt}{\def\jsc@magscale{1.095}}% 1.2^0.5
@@ -348,19 +371,34 @@
 %    \end{macrocode}
 %
 % \paragraph{オプティカルサイズの補正}
-% |nomag*| オプション指定時には，本文のフォントサイズが10pt以外の場合に
+% |nomagx| オプション指定時には，本文のフォントサイズが10pt以外の場合に
 % オプティカルサイズの補正を行うためにNFSSにパッチを当てます。
 % 現在の |ltjsclasses| ではこのパッチ当ては標準では行いますが，
 % 将来どうなるかわからないので |nomag| で無効化することができるようにしました。
 %
-% |noxreal|, |real| は旧来の互換性として今は残してありますが、将来は削除する予定です。
+% |noxreal|, |real| は旧来の互換性として今は残してありますが、2017年7月に削除する予定です。
 %    \begin{macrocode}
 \newif\if@ltjs@mag@xreal
 \@ltjs@mag@xrealtrue
-\DeclareOption{nomag*}{\@ltjs@mag@xrealtrue}
+\DeclareOption{nomagx}{\@ltjs@mag@xrealtrue}
 \DeclareOption{nomag}{\@ltjs@mag@xrealfalse}
-\DeclareOption{noxreal}{\@ltjs@mag@xrealfalse}
-\DeclareOption{real}{\@ltjs@mag@xrealfalse}
+\DeclareOption{noxreal}{%
+  \ClassWarningNoLine{\jsc@clsname}{%
+    The class option `noxreal' is obsolete. \MessageBreak
+    Please use the `nomag' option instead}%
+  \@ltjs@mag@xrealfalse}
+\DeclareOption{real}{%
+  \ClassWarningNoLine{\jsc@clsname}{%
+    The class option `real' is obsolete. \MessageBreak
+    Please use the `nomag' option instead}%
+  \@ltjs@mag@xrealfalse}
+\DeclareOption{usemag}{%
+  \ClassWarningNoLine{\jsc@clsname}{%
+    This \jsc@clsname\space cls does not support `usemag'\MessageBreak
+	option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
+  \@ltjs@mag@xrealtrue}
+  
+
 %    \end{macrocode}
 %
 %
@@ -523,7 +561,7 @@
 %
 % \paragraph{数式フォントとして和文フォントを登録しないオプション}
 %
-% p\TeX では数式中では16通りのフォントしか使えませんでしたが，Lua\TeX では
+% \pTeX では数式中では16通りのフォントしか使えませんでしたが，Lua\TeX では
 % Omega拡張が取り込まれていて256通りのフォントが使えます。
 % ただし，\LaTeXe カーネルでは未だに数式ファミリの数は16個に制限されているので，
 % 実際に使用可能な数式ファミリの数を増やすためには |lualatex-math| パッケージを
@@ -531,12 +569,14 @@
 %
 %    \begin{macrocode}
 \DeclareOption{disablejfam}{%
-  \ClassWarningNoLine{\@currname}{The class option 'disablejfam' is obsolete}}
+  \ClassWarningNoLine{\jsc@clsname}{The class option 'disablejfam' is obsolete}}
 %    \end{macrocode}
 %
 % \paragraph{ドラフト}
 %
 % \texttt{draft} でoverfull boxの起きた行末に5ptの罫線を引きます。
+%
+% [2016-07-13] |\ifdraft| を定義するのをやめました。
 %
 %    \begin{macrocode}
 \DeclareOption{draft}{\setlength\overfullrule{5pt}}
@@ -548,7 +588,7 @@
 % ここではOTFパッケージのメトリックを元とした，|jfm-ujis.lua| メトリックを標準で使います。
 % 古い\texttt{min10}，\texttt{goth10}互換のメトリックを使いたいときは\texttt{mingoth}
 % というオプションを指定します。
-% p\TeX でよく利用される\texttt{jis}フォントメトリックと互換のメトリックを使いたい場合は，
+% \pTeX でよく利用される\texttt{jis}フォントメトリックと互換のメトリックを使いたい場合は，
 % \texttt{ptexjis}というオプションを指定します。
 % \texttt{winjis}メトリックは用済みのため，\texttt{winjis}オプションは無視されます。
 %
@@ -560,9 +600,9 @@
 \newif\ifptexjis
 \ptexjisfalse
 \DeclareOption{winjis}{%
-  \ClassWarningNoLine{\@currname}{The class option 'winjis' is obsolete}}
+  \ClassWarningNoLine{\jsc@clsname}{The \jsc@clsname\space class does not support `winjis' option}}
 \DeclareOption{uplatex}{%
-  \ClassWarningNoLine{\@currname}{The class option 'uplatex' is obsolete}}
+  \ClassWarningNoLine{\jsc@clsname}{The \jsc@clsname\space class does not support `uplatex' option}}
 \DeclareOption{mingoth}{\mingothtrue}
 \DeclareOption{ptexjis}{\ptexjistrue}
 \DeclareOption{jis}{\jisfonttrue}
@@ -1565,7 +1605,7 @@
 %
 % 書籍以外では本文領域の幅 |\textwidth| は |\fullwidth| と等しくします。
 % |article| ではA4縦置きで49文字となります。
-% 某学会誌スタイルでは|50\zw|（25文字×2段）＋段間8mmとします。
+% 某学会誌スタイルでは |50\zw|（25文字×2段）＋段間8\,mmとします。
 %
 %    \begin{macrocode}
 %<*article>
@@ -1698,7 +1738,7 @@
 % |\marginparwidth| は欄外の書き込みの横幅です。
 % 外側マージンの幅（|\evensidemargin| $+$ 1インチ）から1センチを引き，
 % さらに |\marginparsep|（欄外の書き込みと本文のアキ）を引いた値に
-% しました。最後に|1\zw|の整数倍に切り捨てます。
+% しました。最後に |1\zw| の整数倍に切り捨てます。
 %
 %    \begin{macrocode}
 \setlength\marginparwidth{\paperwidth}
@@ -4000,6 +4040,48 @@
 % これらは互換性のためのもので，
 % できるだけ |\text...| と |\math...| を使ってください。
 %
+% [2016-07-15] KOMA-Script中の |\scr@DeclareOldFontCommand| に倣い、
+% これらの命令を使うときには警告を発することにしました。
+%
+% [2016-07-16] 警告を最初の一回だけ発することにしました。また，
+% 例外的に警告を出さないようにするスイッチも付けます。
+%
+% \begin{macro}{\if@jsc@warnoldfontcmd}
+% \begin{macro}{\if@jsc@warnoldfontcmdexception}
+%    \begin{macrocode}
+\newif\if@jsc@warnoldfontcmd
+\@jsc@warnoldfontcmdtrue
+\newif\if@jsc@warnoldfontcmdexception
+\@jsc@warnoldfontcmdexceptionfalse
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\jsc@DeclareOldFontCommand}
+%    \begin{macrocode}
+\newcommand*{\jsc@DeclareOldFontCommand}[3]{%
+  \DeclareOldFontCommand{#1}{%
+    \jsc@warnoldfontcmd{#1}#2%
+  }{%
+    \jsc@warnoldfontcmd{#1}#3%
+  }%
+}
+\DeclareRobustCommand*{\jsc@warnoldfontcmd}[1]{%
+  \if@jsc@warnoldfontcmdexception\else\if@jsc@warnoldfontcmd
+  \ClassWarning{\jsc@clsname}{%
+    deprecated old font command `\string#1' used.\MessageBreak
+    You should note, that since 1994 LaTeX2e provides a\MessageBreak
+    new font selection scheme called NFSS2 with several\MessageBreak
+    new, combinable font commands. This \jsc@clsname\MessageBreak
+	class has defined the old font commands like\MessageBreak
+	`\string#1' only for compatibility%
+  }%
+  \global\@jsc@warnoldfontcmdfalse
+  \fi\fi
+}
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\mc}
 % \begin{macro}{\gt}
 % \begin{macro}{\rm}
@@ -4009,11 +4091,11 @@
 % フォントファミリを変更します。
 %
 %    \begin{macrocode}
-\DeclareOldFontCommand{\mc}{\normalfont\mcfamily}{\mathmc}
-\DeclareOldFontCommand{\gt}{\normalfont\gtfamily}{\mathgt}
-\DeclareOldFontCommand{\rm}{\normalfont\rmfamily}{\mathrm}
-\DeclareOldFontCommand{\sf}{\normalfont\sffamily}{\mathsf}
-\DeclareOldFontCommand{\tt}{\normalfont\ttfamily}{\mathtt}
+\jsc@DeclareOldFontCommand{\mc}{\normalfont\mcfamily}{\mathmc}
+\jsc@DeclareOldFontCommand{\gt}{\normalfont\gtfamily}{\mathgt}
+\jsc@DeclareOldFontCommand{\rm}{\normalfont\rmfamily}{\mathrm}
+\jsc@DeclareOldFontCommand{\sf}{\normalfont\sffamily}{\mathsf}
+\jsc@DeclareOldFontCommand{\tt}{\normalfont\ttfamily}{\mathtt}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -4027,7 +4109,7 @@
 % コマンドは |\mdseries| です。
 %
 %    \begin{macrocode}
-\DeclareOldFontCommand{\bf}{\normalfont\bfseries}{\mathbf}
+\jsc@DeclareOldFontCommand{\bf}{\normalfont\bfseries}{\mathbf}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -4041,9 +4123,9 @@
 % 通常のアップライト体に戻すコマンドは |\upshape| です。
 %
 %    \begin{macrocode}
-\DeclareOldFontCommand{\it}{\normalfont\itshape}{\mathit}
-\DeclareOldFontCommand{\sl}{\normalfont\slshape}{\@nomath\sl}
-\DeclareOldFontCommand{\sc}{\normalfont\scshape}{\@nomath\sc}
+\jsc@DeclareOldFontCommand{\it}{\normalfont\itshape}{\mathit}
+\jsc@DeclareOldFontCommand{\sl}{\normalfont\slshape}{\@nomath\sl}
+\jsc@DeclareOldFontCommand{\sc}{\normalfont\scshape}{\@nomath\sc}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -4451,8 +4533,13 @@
 %
 % 参考文献リストを出力します。
 %
+% [2016-07-16] \LaTeX~2.09で使われていたフォントコマンドの警告を，
+% 文献スタイル（.bst）ではよく |\bf| がいまだに用いられることが多いため，
+% |thebibliography| 環境内では例外的に出さないようにしました。
+%
 %    \begin{macrocode}
 \newenvironment{thebibliography}[1]{%
+  \global\@jsc@warnoldfontcmdexceptiontrue
   \global\let\presectionname\relax
   \global\let\postsectionname\relax
 %<article|jspf>  \section*{\refname}\@mkboth{\refname}{\refname}%
@@ -4479,7 +4566,8 @@
    \sfcode`\.\@m}
   {\def\@noitemerr
     {\@latex@warning{Empty `thebibliography' environment}}%
-   \endlist}
+   \endlist
+   \global\@jsc@warnoldfontcmdexceptionfalse}
 %    \end{macrocode}
 % \end{environment}
 %

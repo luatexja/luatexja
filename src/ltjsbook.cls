@@ -38,7 +38,8 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsbook}
-  [2016/07/15 ltjsclasses ]
+  [2016/07/18 ltjsclasses ]
+\def\jsc@clsname{ltjsbook}
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
@@ -100,7 +101,7 @@
 \@slidefalse
 \def\jsc@magscale{1}
 \DeclareOption{slide}{\@slidetrue\def\jsc@magscale{3.583}\@landscapetrue\@titlepagetrue}
-\DeclareOption{8pt} {\def\jsc@magscale{0.83}}% 1.2^(-1)
+\DeclareOption{8pt} {\def\jsc@magscale{0.833}}% 1.2^(-1)
 \DeclareOption{9pt} {\def\jsc@magscale{0.913}}% 1.2^(-0.5}
 \DeclareOption{10pt}{\def\jsc@magscale{1}}
 \DeclareOption{11pt}{\def\jsc@magscale{1.095}}% 1.2^0.5
@@ -121,10 +122,24 @@
 \DeclareOption{12ptj}{\def\jsc@magscale{1.302}}
 \newif\if@ltjs@mag@xreal
 \@ltjs@mag@xrealtrue
-\DeclareOption{nomag*}{\@ltjs@mag@xrealtrue}
+\DeclareOption{nomagx}{\@ltjs@mag@xrealtrue}
 \DeclareOption{nomag}{\@ltjs@mag@xrealfalse}
-\DeclareOption{noxreal}{\@ltjs@mag@xrealfalse}
-\DeclareOption{real}{\@ltjs@mag@xrealfalse}
+\DeclareOption{noxreal}{%
+  \ClassWarningNoLine{\jsc@clsname}{%
+    The class option `noxreal' is obsolete. \MessageBreak
+    Please use the `nomag' option instead}%
+  \@ltjs@mag@xrealfalse}
+\DeclareOption{real}{%
+  \ClassWarningNoLine{\jsc@clsname}{%
+    The class option `real' is obsolete. \MessageBreak
+    Please use the `nomag' option instead}%
+  \@ltjs@mag@xrealfalse}
+\DeclareOption{usemag}{%
+  \ClassWarningNoLine{\jsc@clsname}{%
+    This \jsc@clsname\space cls does not support `usemag'\MessageBreak
+option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
+  \@ltjs@mag@xrealtrue}
+
 \hour\time \divide\hour by 60\relax
 \@tempcnta\hour \multiply\@tempcnta 60\relax
 \minute\time \advance\minute-\@tempcnta
@@ -194,7 +209,7 @@
     \tabskip\z@skip\cr
     }}
 \DeclareOption{disablejfam}{%
-  \ClassWarningNoLine{\@currname}{The class option 'disablejfam' is obsolete}}
+  \ClassWarningNoLine{\jsc@clsname}{The class option 'disablejfam' is obsolete}}
 \DeclareOption{draft}{\setlength\overfullrule{5pt}}
 \DeclareOption{final}{\setlength\overfullrule{0pt}}
 \newif\ifmingoth
@@ -204,9 +219,9 @@
 \newif\ifptexjis
 \ptexjisfalse
 \DeclareOption{winjis}{%
-  \ClassWarningNoLine{\@currname}{The class option 'winjis' is obsolete}}
+  \ClassWarningNoLine{\jsc@clsname}{The \jsc@clsname\space class does not support `winjis' option}}
 \DeclareOption{uplatex}{%
-  \ClassWarningNoLine{\@currname}{The class option 'uplatex' is obsolete}}
+  \ClassWarningNoLine{\jsc@clsname}{The \jsc@clsname\space class does not support `uplatex' option}}
 \DeclareOption{mingoth}{\mingothtrue}
 \DeclareOption{ptexjis}{\ptexjistrue}
 \DeclareOption{jis}{\jisfonttrue}
@@ -1180,15 +1195,39 @@
   \ifdim \wd\@tempboxa <\hsize \centering \fi
   #1{\hskip1\zw}#2\par
   \vskip\belowcaptionskip}}
-\DeclareOldFontCommand{\mc}{\normalfont\mcfamily}{\mathmc}
-\DeclareOldFontCommand{\gt}{\normalfont\gtfamily}{\mathgt}
-\DeclareOldFontCommand{\rm}{\normalfont\rmfamily}{\mathrm}
-\DeclareOldFontCommand{\sf}{\normalfont\sffamily}{\mathsf}
-\DeclareOldFontCommand{\tt}{\normalfont\ttfamily}{\mathtt}
-\DeclareOldFontCommand{\bf}{\normalfont\bfseries}{\mathbf}
-\DeclareOldFontCommand{\it}{\normalfont\itshape}{\mathit}
-\DeclareOldFontCommand{\sl}{\normalfont\slshape}{\@nomath\sl}
-\DeclareOldFontCommand{\sc}{\normalfont\scshape}{\@nomath\sc}
+\newif\if@jsc@warnoldfontcmd
+\@jsc@warnoldfontcmdtrue
+\newif\if@jsc@warnoldfontcmdexception
+\@jsc@warnoldfontcmdexceptionfalse
+\newcommand*{\jsc@DeclareOldFontCommand}[3]{%
+  \DeclareOldFontCommand{#1}{%
+    \jsc@warnoldfontcmd{#1}#2%
+  }{%
+    \jsc@warnoldfontcmd{#1}#3%
+  }%
+}
+\DeclareRobustCommand*{\jsc@warnoldfontcmd}[1]{%
+  \if@jsc@warnoldfontcmdexception\else\if@jsc@warnoldfontcmd
+  \ClassWarning{\jsc@clsname}{%
+    deprecated old font command `\string#1' used.\MessageBreak
+    You should note, that since 1994 LaTeX2e provides a\MessageBreak
+    new font selection scheme called NFSS2 with several\MessageBreak
+    new, combinable font commands. This \jsc@clsname\MessageBreak
+class has defined the old font commands like\MessageBreak
+`\string#1' only for compatibility%
+  }%
+  \global\@jsc@warnoldfontcmdfalse
+  \fi\fi
+}
+\jsc@DeclareOldFontCommand{\mc}{\normalfont\mcfamily}{\mathmc}
+\jsc@DeclareOldFontCommand{\gt}{\normalfont\gtfamily}{\mathgt}
+\jsc@DeclareOldFontCommand{\rm}{\normalfont\rmfamily}{\mathrm}
+\jsc@DeclareOldFontCommand{\sf}{\normalfont\sffamily}{\mathsf}
+\jsc@DeclareOldFontCommand{\tt}{\normalfont\ttfamily}{\mathtt}
+\jsc@DeclareOldFontCommand{\bf}{\normalfont\bfseries}{\mathbf}
+\jsc@DeclareOldFontCommand{\it}{\normalfont\itshape}{\mathit}
+\jsc@DeclareOldFontCommand{\sl}{\normalfont\slshape}{\@nomath\sl}
+\jsc@DeclareOldFontCommand{\sc}{\normalfont\scshape}{\@nomath\sc}
 \DeclareRobustCommand*{\cal}{\@fontswitch\relax\mathcal}
 \DeclareRobustCommand*{\mit}{\@fontswitch\relax\mathnormal}
 \newcommand\@pnumwidth{1.55em}
@@ -1295,6 +1334,7 @@
 \newdimen\bibindent
 \setlength\bibindent{2\zw}
 \newenvironment{thebibliography}[1]{%
+  \global\@jsc@warnoldfontcmdexceptiontrue
   \global\let\presectionname\relax
   \global\let\postsectionname\relax
   \chapter*{\bibname}\@mkboth{\bibname}{}%
@@ -1314,7 +1354,8 @@
    \sfcode`\.\@m}
   {\def\@noitemerr
     {\@latex@warning{Empty `thebibliography' environment}}%
-   \endlist}
+   \endlist
+   \global\@jsc@warnoldfontcmdexceptionfalse}
 \newcommand{\newblock}{\hskip .11em\@plus.33em\@minus.07em}
 \let\@openbib@code\@empty
 \newenvironment{theindex}{% 索引を3段組で出力する環境
