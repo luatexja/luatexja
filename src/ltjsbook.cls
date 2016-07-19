@@ -516,6 +516,9 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \multiply\textheight\baselineskip
 \addtolength{\textheight}{\topskip}
 \addtolength{\textheight}{0.1\jsc@mpt}
+\def\flushbottom{%
+   \def\@textbottom{\vskip \z@ \@plus.1\jsc@mpt}%
+   \let\@texttop\relax}
 \setlength\marginparsep{\columnsep}
 \setlength\marginparpush{\baselineskip}
 \setlength{\oddsidemargin}{\paperwidth}

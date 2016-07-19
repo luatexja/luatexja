@@ -39,7 +39,7 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjbook}
-  [2015/10/18 v1.6-ltj-10
+  [2016/07/19 v1.6-ltj-11
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -170,18 +170,20 @@
   \setlength\columnsep{10\p@}
 \fi
 \setlength\columnseprule{0\p@}
-\setlength{\@tempdima}{\paperwidth}
-\setlength{\@tempdimb}{\paperheight}
+\newlength{\stockwidth}
+\newlength{\stockheight}
+\setlength{\stockwidth}{\paperwidth}
+\setlength{\stockheight}{\paperheight}
 \iftombow
-  \advance \@tempdima 2in
-  \advance \@tempdimb 2in
+  \advance \stockwidth 2in
+  \advance \stockheight 2in
 \fi
 \ifdefined\pdfpagewidth
-  \setlength{\pdfpagewidth}{\@tempdima}
-  \setlength{\pdfpageheight}{\@tempdimb}
+  \setlength{\pdfpagewidth}{\stockwidth}
+  \setlength{\pdfpageheight}{\stockheight}
 \else
-  \setlength{\pagewidth}{\@tempdima}
-  \setlength{\pageheight}{\@tempdimb}
+  \setlength{\pagewidth}{\stockwidth}
+  \setlength{\pageheight}{\stockheight}
 \fi
 \setlength\lineskip{1\p@}
 \setlength\normallineskip{1\p@}

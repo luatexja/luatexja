@@ -10,7 +10,7 @@
 %
 % \fi
 %
-% \CheckSum{4509}
+% \CheckSum{4513}
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -85,6 +85,7 @@
 % \changes{v1.6-ltj-8}{2014/11/22}{縦組時のgeometry.styへの対応を別ファイル(lltjp-geometry.sty)に分離．それに伴いv1.6-ltj-3での変更を削除．}
 % \changes{v1.6-ltj-9}{2015/01/01}{縦組クラスの日付出力でエラーになることなどを修正．}
 % \changes{v1.6-ltj-10}{2015/10/18}{Lua\TeX\ 0.81.0に伴うプリミティブ名の変更に対応．}
+% \changes{v1.6-ltj-11}{2016/07/19}{トンボ使用時の用紙サイズの設定方法を変更（aminophenさん，ありがとうございます）．}
 % \fi
 %
 % \iffalse
@@ -114,7 +115,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2015/10/18 v1.6-ltj-10
+  [2016/07/19 v1.6-ltj-11
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -808,33 +809,41 @@
   \setlength\columnsep{10\p@}
 \fi
 \setlength\columnseprule{0\p@}
-\setlength{\@tempdima}{\paperwidth}
-\setlength{\@tempdimb}{\paperheight}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\pdfpagewidth}
-% \begin{macro}{\pdfpageheight}
+% \begin{macro}{\pagewidth}
+% \begin{macro}{\pageheight}
+% \begin{macro}{\stockwidth}
+% \begin{macro}{\stockheight}
 % 出力のPDFの用紙サイズをここで設定しておきます。
 % |tombow|が真のときは2インチ足しておきます。
 %
 % [2015-10-18 LTJ] Lua\TeX\ 0.81.0ではプリミティブの名称変更がされたので，
 % それに合わせておきます．
 %
+% [2016-07-19 LTJ] luatex.defが新しくなったことに対応するaminophenさんのパッチを取り込みました。
+%
 %    \begin{macrocode}
+\newlength{\stockwidth}
+\newlength{\stockheight}
+\setlength{\stockwidth}{\paperwidth}
+\setlength{\stockheight}{\paperheight}
 \iftombow
-  \advance \@tempdima 2in
-  \advance \@tempdimb 2in
+  \advance \stockwidth 2in
+  \advance \stockheight 2in
 \fi
 \ifdefined\pdfpagewidth
-  \setlength{\pdfpagewidth}{\@tempdima}
-  \setlength{\pdfpageheight}{\@tempdimb}
+  \setlength{\pdfpagewidth}{\stockwidth}
+  \setlength{\pdfpageheight}{\stockheight}
 \else
-  \setlength{\pagewidth}{\@tempdima}
-  \setlength{\pageheight}{\@tempdimb}
+  \setlength{\pagewidth}{\stockwidth}
+  \setlength{\pageheight}{\stockheight}
 \fi
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %

@@ -1693,6 +1693,24 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\flushbottom}
+%
+% [2016-07-18] |\textheight| に念のため0.1ポイント余裕を持たせて
+% いるのと同様に，|\flushbottom| にも余裕を持たせます。
+% 元の\LaTeXe での完全な |\flushbottom| の定義は
+%\begin{verbatim}
+%  \def\flushbottom{%
+%    \let\@textbottom\relax \let\@texttop\relax}
+%\end{verbatim}
+% ですが，次のようにします。
+%
+%    \begin{macrocode}
+\def\flushbottom{%
+   \def\@textbottom{\vskip \z@ \@plus.1\jsc@mpt}%
+   \let\@texttop\relax}
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\marginparsep}
 % \begin{macro}{\marginparpush}
 %
