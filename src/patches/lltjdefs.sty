@@ -7,9 +7,11 @@
 
 \def\ltj@stdmcfont{IPAExMincho}
 \def\ltj@stdgtfont{IPAExGothic}
-\InputIfFileExists{luatexja.cfg}{}{%
-  \PackageInfo{lltjdefs}{Cannot find file `luatexja.cfg'\@gobble}%
-}
+\InputIfFileExists{luatexja.cfg}{%
+  \typeout{*************************^^J%
+           * Loading luatexja.cfg.^^J%
+           *************************}%
+}{}
 
 \DeclareKanjiEncodingDefaults{}{}
 \DeclareErrorKanjiFont{JY3}{mc}{m}{n}{10}

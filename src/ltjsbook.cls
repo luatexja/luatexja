@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsbook}
-  [2016/07/18 ltjsclasses ]
+  [2016/07/21 ltjsclasses ]
 \def\jsc@clsname{ltjsbook}
 \RequirePackage{luatexja}
 \newif\if@restonecol
@@ -1512,6 +1512,11 @@ class has defined the old font commands like\MessageBreak
     \unskip \reserved@e {\reserved@f#1}\nobreak \hfil \break \null
     \inhibitglue \ignorespaces
   \fi}
+\IfFileExists{jslogo.sty}{%
+  \RequirePackage{jslogo}
+  \def\小{\jslg@small}
+  \def\上小{\jslg@uppersmall}
+}{%
 \def\小#1{\hbox{$\m@th$%
   \csname S@\f@size\endcsname
   \fontsize\sf@size\z@
@@ -1642,6 +1647,7 @@ class has defined the old font commands like\MessageBreak
   \ifx\f@family\cmr\kern-.08em\else\kern-.15em\fi\TeX}
 \DeclareRobustCommand{\SliTeX}{%
   S\kern-.06emL\kern-.18em\上小{I}\kern -.03em\TeX}
+}
 \newcommand{\prepartname}{\if@english Part~\else 第\fi}
 \newcommand{\postpartname}{\if@english\else 部\fi}
 \newcommand{\prechaptername}{\if@english Chapter~\else 第\fi}

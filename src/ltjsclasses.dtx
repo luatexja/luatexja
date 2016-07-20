@@ -29,7 +29,7 @@
 %  -----------------------------------------
 %
 % \fi
-% \CheckSum{5291}
+% \CheckSum{5310}
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -57,7 +57,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2016/07/18 ltjsclasses ]
+  [2016/07/21 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass{ltjsarticle}
@@ -96,7 +96,7 @@
 % \section{はじめに}
 %
 % これは，元々奥村晴彦先生により作成され，現在は日本語\TeX 開発コミュニティにより
-% 管理されている |jsclasses.dtx| をLua\LaTeX-ja用に改変したものです。
+% 管理されている\texttt{jsclasses.dtx}をLua\LaTeX-ja用に改変したものです。
 % 次のドキュメントクラス（スタイルファイル）を生成します。
 % \begin{quote}
 %   \begin{tabular}{lll}
@@ -108,37 +108,37 @@
 % \end{quote}
 %
 % \subsection{\texttt{jsclasses.dtx}からの主な変更点}
-% 全ての変更点を知りたい場合は，|jsclasses.dtx| と |ltjsclasses.dtx| で |diff| を
+% 全ての変更点を知りたい場合は，\texttt{jsclasses.dtx}と\texttt{ltjsclasses.dtx}でdiffを
 % とって下さい。zw, zh は全て |\zw|, |\zh| に置き換えられています。
 % \begin{itemize}
-% \item フォントメトリック関係のオプション |winjis| は単に無視されます。
-% \item 標準では |jfm-ujis.lua|（Lua\TeX-ja標準のメトリック，OTFパッケージのものがベース）を使用します。
-% \item |uplatex| オプションを削除してあります。
-% \item |disablejfam| オプションが無効になっています。もし
+% \item フォントメトリック関係のオプション\texttt{winjis}は単に無視されます。
+% \item 標準では\texttt{jfm-ujis.lua}（Lua\TeX-ja標準のメトリック，OTFパッケージのものがベース）を使用します。
+% \item \texttt{uplatex}オプションを削除してあります。
+% \item \texttt{disablejfam}オプションが無効になっています。もし
 % \begin{quotation}
 %   |! LaTeX Error: Too many math alphabets used in version ****.|
 % \end{quotation}
-% のエラーが起こった場合は，|lualatex-math| パッケージを読み込んでみて下さい。
-% \item |papersize| オプションの指定に関わらずPDFのページサイズは適切に
+% のエラーが起こった場合は，\texttt{lualatex-math}パッケージを読み込んでみて下さい。
+% \item \texttt{papersize}オプションの指定に関わらずPDFのページサイズは適切に
 %   設定されます。
 % \item Lua\TeX-ja同梱のメトリックを用いる限りは，段落の頭にグルーは挿入されません。
-%   そのため，オリジナルの |jsclasses.dtx| 内にあったhack (|\everyparhook|)は不要になったので，
+%   そのため，オリジナルの\texttt{jsclasses}内にあったhack (|\everyparhook|)は不要になったので，
 %   削除しました。
 % \item 「\texttt{amsmath}との衝突の回避」のコードは，上流で既に対処されているうえ，
-%   これがあると |grfext.sty| を読み込んだ際にエラーを引き起こすので削除しました。
-% \item 本家 |jsclasses.dtx| では |\mag| を用いて「10pt時の組版結果を本文フォントサイズに合わせ拡大縮小」
-%   という方針でしたが，本 |ltjsclasses.dtx| ではそのような方法を取っていません。
+%   これがあると\texttt{grfext.sty}を読み込んだ際にエラーを引き起こすので削除しました。
+% \item 本家\texttt{jsclasses}では |\mag| を用いて「10\,pt時の組版結果を本文フォントサイズに合わせ拡大縮小」
+%   という方針でしたが，本\texttt{ltjsclasses}ではそのような方法を取っていません。
 %   \begin{itemize}
-%    \item |nomag| オプション指定時には，単にレイアウトに用いる各種長さの値をスケールさせるだけです。
-%      そのため，例えば本文の文字サイズが17ptのときにはcmr10でなくcmr17を用いることになり，組版結果の印象が
+%    \item \texttt{nomag}オプション指定時には，単にレイアウトに用いる各種長さの値をスケールさせるだけです。
+%      そのため，例えば本文の文字サイズが17\,ptのときにはcmr10でなくcmr17を用いることになり，組版結果の印象が
 %      異なる恐れがあります。
-%    \item |nomagx| オプション指定時には，上記に加えてオプティカルサイズを調整する（本文ではcmr17の代わりに
+%    \item \texttt{nomagx}オプション指定時には，上記に加えてオプティカルサイズを調整する（本文ではcmr17の代わりに
 %      cmr10を拡大縮小する，など）ため，\LaTeX のフォント選択システムNFSSへパッチを当てます。
 %      こうすることで前項に書いた不具合はなくなりますが，かえって別の不具合が起きる可能性
 %      はあります。
 %   \end{itemize}
-%   標準では |nomagx| オプションが有効になっています。|jsclasses.dtx| で用意されていた
-%   |usemag| オプションを指定すると警告を出します．
+%   標準では\texttt{nomagx}オプションが有効になっています。\texttt{jsclasses}で用意されていた
+%   \texttt{usemag}オプションを指定すると警告を出します．
 % \end{itemize}
 %
 % [2014-02-07 LTJ] jsclasses 2014-02-07 ベースにしました。
@@ -151,13 +151,15 @@
 % Lua\TeX-ja カーネル内に移しました。
 %
 % [2016-03-21 LTJ] Lua\TeX~beta-0.87.0 ではPDF出力時に|\mag|が使用できなくなったので，
-% ZRさんの|bxjscls|を参考に使わないように書き換えました。
+% ZRさんの\texttt{bxjscls}を参考に使わないように書き換えました。
 %
-% [2016-03-31 LTJ] |xreal|オプションを標準で有効にしました．
+% [2016-03-31 LTJ] \texttt{xreal}オプションを標準で有効にしました．
 %
-% [2016-07-12 LTJ] |jsclasses.dtx| 開発版に合わせ、|real|, |xreal| オプションの名称を変更するなどの変更を行いました。
+% [2016-07-12 LTJ] \texttt{jsclasses}開発版に合わせ、\texttt{real},~\texttt{xreal}オプションの名称を変更するなどの変更を行いました。
 %
-% [2016-07-18 LTJ] |usemag| オプションが指定されると警告を出すようにしました．
+% [2016-07-18 LTJ] \texttt{usemag}オプションが指定されると警告を出すようにしました．
+%
+% [2016-07-21 LTJ] \LaTeX 等のロゴの再定義で，\texttt{jslogo}パッケージがあればそちらを読み込むことにしました．
 %
 % \StopEventually{}
 %
@@ -177,7 +179,7 @@
 %
 % \section{Lua\TeX-jaの読み込み}
 %
-% まず，|luatexja| を読み込みます。
+% まず，Lua\TeX-jaを読み込みます。
 %    \begin{macrocode}
 \RequirePackage{luatexja}
 %    \end{macrocode}
@@ -371,12 +373,12 @@
 %    \end{macrocode}
 %
 % \paragraph{オプティカルサイズの補正}
-% |nomagx| オプション指定時には，本文のフォントサイズが10pt以外の場合に
+% \texttt{nomagx}オプション指定時には，本文のフォントサイズが10pt以外の場合に
 % オプティカルサイズの補正を行うためにNFSSにパッチを当てます。
-% 現在の |ltjsclasses| ではこのパッチ当ては標準では行いますが，
-% 将来どうなるかわからないので |nomag| で無効化することができるようにしました。
+% 現在の\texttt{ltjsclasses}ではこのパッチ当ては標準では行いますが，
+% 将来どうなるかわからないので\texttt{nomag}で無効化することができるようにしました。
 %
-% |noxreal|, |real| は旧来の互換性として今は残してありますが、2017年7月に削除する予定です。
+% \texttt{noxreal},~\texttt{real}は旧来の互換性として今は残してありますが、2017年7月に削除する予定です。
 %    \begin{macrocode}
 \newif\if@ltjs@mag@xreal
 \@ltjs@mag@xrealtrue
@@ -405,11 +407,11 @@
 % \paragraph{トンボオプション}
 %
 % トンボ（crop marks）を出力します。
-% 実際の処理は |lltjcore.sty| で行います。
+% 実際の処理は\texttt{lltjcore.sty}で行います。
 % オプション \texttt{tombow} で日付付きのトンボ，
 % オプション \texttt{tombo} で日付なしのトンボを出力します。
 % これらはアスキー版のままです。
-% カウンタ |\hour|，|\minute| は |luatexja-compat.sty| で宣言されています。
+% カウンタ |\hour|，|\minute| は\texttt{luatexja-compat.sty}で宣言されています。
 %
 %    \begin{macrocode}
 \hour\time \divide\hour by 60\relax
@@ -564,7 +566,7 @@
 % \pTeX では数式中では16通りのフォントしか使えませんでしたが，Lua\TeX では
 % Omega拡張が取り込まれていて256通りのフォントが使えます。
 % ただし，\LaTeXe カーネルでは未だに数式ファミリの数は16個に制限されているので，
-% 実際に使用可能な数式ファミリの数を増やすためには |lualatex-math| パッケージを
+% 実際に使用可能な数式ファミリの数を増やすためには\texttt{lualatex-math}パッケージを
 % 読み込む必要があることに注意が必要です。
 %
 %    \begin{macrocode}
@@ -585,7 +587,7 @@
 %
 % \paragraph{和文フォントメトリックの選択}
 %
-% ここではOTFパッケージのメトリックを元とした，|jfm-ujis.lua| メトリックを標準で使います。
+% ここではOTFパッケージのメトリックを元とした，\texttt{jfm-ujis.lua}メトリックを標準で使います。
 % 古い\texttt{min10}，\texttt{goth10}互換のメトリックを使いたいときは\texttt{mingoth}
 % というオプションを指定します。
 % \pTeX でよく利用される\texttt{jis}フォントメトリックと互換のメトリックを使いたい場合は，
@@ -610,7 +612,7 @@
 %
 % \paragraph{papersizeスペシャルの利用}
 %
-% |ltjsclasses| では |papersize| オプションの有無に関わらず，
+% \texttt{ltjsclasses}では\texttt{papersize}オプションの有無に関わらず，
 % PDFのページサイズは適切に設定されるので，削除しました。
 %
 % \paragraph{英語化}
@@ -691,7 +693,7 @@
 %
 % [2016-03-21 LTJ] |\mag| を使わないように全面的に書き換えました。
 % |\ltjs@mpt| に「拡大率だけ大きくしたpt」の値が格納されます。
-% |bxjscls| と同様に，|\@ptsize| は |10pt|,~|11pt|,~|12pt| オプションが指定された時だけ
+% \texttt{bxjscls}と同様に，|\@ptsize| は |10pt|,~|11pt|,~|12pt| オプションが指定された時だけ
 % 従来通り0,~1,~2と設定し，それ以外の場合は$-20$とすることにしました。
 % |\inv@mag| はもはや定義していません。
 %
@@ -701,7 +703,7 @@
 % [2016-07-08] |\jsc@mpt| および |\jsc@mmm| に，それぞれ1ptおよび1mmを拡大させた値を格納します。
 % 以降のレイアウト指定ではこちらを使います。
 %
-% [2016-07-12 LTJ] |\ltjs@...|を本家に合わせて|\jsc@...|に名称変更しました。
+% [2016-07-12 LTJ] |\ltjs@...| を本家に合わせて |\jsc@...| に名称変更しました。
 %    \begin{macrocode}
 %<*kiyou>
 \def\jsc@magscale{0.9769230}
@@ -721,7 +723,7 @@
 %
 % \paragraph{オプティカルサイズの補正}
 % \leavevmode\par
-% [2016-03-26 LTJ] |xreal|オプションの指定時には，|bxjscls|の|magstyle=xreal|
+% [2016-03-26 LTJ] |xreal|オプションの指定時には，\texttt{bxjscls}の|magstyle=xreal|
 % オプションのように，オプティカルの補正を行うためにNFSSにパッチを当てます。
 % パッチは，概ねmiscさんによる「js*.cls 同様の文字サイズ設定を
 % |\mag|によらずに行う方法：試案」
@@ -729,9 +731,9 @@
 % 方法に沿っていますが，拡大/縮小するところの計算にはLuaを用いています。
 %
 % なお，\TeX 内部で長さはsp単位の整数倍で表現されているので，数spの誤差は仕方がないです。
-% そのため，事前に|type1cm|パッケージを読みこんでおきます。
+% そのため，事前に\texttt{type1cm}パッケージを読みこんでおきます。
 %
-% [2016-03-28 LTJ] |\luafunction|を使うようにし，また本文のフォントサイズが10ptのときには
+% [2016-03-28 LTJ] |\luafunction|を使うようにし，また本文のフォントサイズが10\,ptのときには
 % （不要なので）パッチを当てないことにしました。
 %
 % [2016-04-04 LTJ] NFSSへのパッチを修正．
@@ -832,17 +834,17 @@
 % 一方，Lua\TeX-jaの提供するメトリックでは，そのようなことはありません。
 % 公称10ポイントの和文フォントは，10ポイントで出力されます。
 %
-% この |ltjsclasses| でも，派生元の |jsclasses| と同じように，
+% この\texttt{ltjsclasses}でも，派生元の\texttt{jsclasses}と同じように，
 % この公称10ポイントのフォントをここでは13級に縮小して
 % 使うことにします。そのためには，$13\,\textrm{Q}/10\,\textrm{pt}\simeq 0.924715$倍
 % すればいいことになります。
 %
 % |\ltj@stdmcfont|,~|\ltj@stdgtfont| による、デフォルトで使われる明朝・ゴシックのフォントの
 % 設定に対応しました。この2つの命令の値はユーザが日々の利用でその都度指定するものではなく、
-% 何らかの理由で非埋め込みフォントが正しく利用できない場合にのみ |luatexja.cfg| によって
+% 何らかの理由で非埋め込みフォントが正しく利用できない場合にのみ\texttt{luatexja.cfg}によって
 % セットされるものです。
 %
-% [2014-07-26 LTJ] なお，現状のところ，縦組用JFMは |jfm-ujisv.lua| しか準備していません。
+% [2014-07-26 LTJ] なお，現状のところ，縦組用JFMは\texttt{jfm-ujisv.lua}しか準備していません。
 %
 % [2016-03-21 LTJ] 拡大率の計算で1~ptを$1/72.27$インチでなく0.3514~mmと間違えて扱っていたのを修正．
 %    \begin{macrocode}
@@ -940,9 +942,9 @@
 % Lua\TeX-jaでは和文組版に伴うグルーはノードベースで挿入するようになり，また
 % 欧文・和文間のグルーとイタリック補正は干渉しないようになりました。
 % まだ「和文の斜体」についてはLua\LaTeX カーネル側でまともな対応がされていませんが，
-% |jsclasses.dtx| で行われていた |\textmc|, |\textgt| の再定義は不要のように思われます。
+% \texttt{jsclasses}で行われていた |\textmc|, |\textgt| の再定義は不要のように思われます。
 %
-% |jsclasses.dtx| 中で行われていた |\reDeclareMathAlphabet| の再定義は削除。
+% \texttt{jsclasses.dtx}中で行われていた |\reDeclareMathAlphabet| の再定義は削除。
 %
 %    \begin{macrocode}
 \AtBeginDocument{%
@@ -5010,6 +5012,22 @@
 %
 % \LaTeX 関連のロゴを作り直します。
 %
+% [2016-07-14] ロゴの定義は\texttt{jslogo}パッケージに移転しました。
+% 後方互換のため，\texttt{jsclasses}ではデフォルトでこれを読み込みます。
+%
+% [2016-07-21 LTJ] \texttt{jsclasses} とLua\TeX-jaの更新タイミングが一致しない可能性を考慮し，
+% \texttt{jslogo}パッケージが存在しない場合は旧来の定義をそのまま使うことにしました．
+%
+%    \begin{macrocode}
+\IfFileExists{jslogo.sty}{%
+  \RequirePackage{jslogo}
+  \def\小{\jslg@small}
+  \def\上小{\jslg@uppersmall}
+}{%
+%    \end{macrocode}
+%
+% 以下は\texttt{jslogo}パッケージがない場合の定義です．
+%
 % \begin{macro}{\小}
 % \begin{macro}{\上小}
 %
@@ -5211,6 +5229,11 @@
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+%
+% \texttt{jslogo}パッケージがない場合の定義はここで終わりです．
+%    \begin{macrocode}
+}
+%    \end{macrocode}
 %
 % \section{初期設定}
 %
