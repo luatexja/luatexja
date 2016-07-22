@@ -1316,12 +1316,12 @@ class has defined the old font commands like\MessageBreak
   \def\小{\jslg@small}
   \def\上小{\jslg@uppersmall}
 }{%
-\def\小#1{\hbox{$\m@th$%
+\def\小##1{\hbox{$\m@th$%
   \csname S@\f@size\endcsname
   \fontsize\sf@size\z@
   \math@fontsfalse\selectfont
-  #1}}
-\def\上小#1{{\sbox\z@ T\vbox to\ht0{\小{#1}\vss}}}
+  ##1}}
+\def\上小##1{{\sbox\z@ T\vbox to\ht0{\小{##1}\vss}}}
 \def\cmrTeX{%
   \ifdim \fontdimen\@ne\font >\z@
     T\kern-.25em\lower.5ex\hbox{E}\kern-.125emX\@
