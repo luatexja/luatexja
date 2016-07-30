@@ -425,10 +425,6 @@ calc_np_auxtable = {
       Np.id = id_box_like;
       return true, node_next(lp)
    end,
-   skip = function(lp)
-      set_attr(lp, attr_icflag, PROCESSED)
-      return false, node_next(lp)
-   end,
    [id_whatsit] = function(lp)
       local lps = getsubtype(lp)
       if lps==sid_user then
@@ -507,10 +503,11 @@ calc_np_auxtable = {
 end
 calc_np_auxtable[id_rule]   = calc_np_auxtable.box_like
 calc_np_auxtable[15]        = calc_np_auxtable.box_like
-calc_np_auxtable[id_ins]    = calc_np_auxtable.skip
-calc_np_auxtable[id_mark]   = calc_np_auxtable.skip
-calc_np_auxtable[id_adjust] = calc_np_auxtable.skip
-calc_np_auxtable[node.id('local_par')] = calc_np_auxtable.skip
+
+local function calc_np_aux_skip (lp)
+   set_attr(lp, attr_icflag, PROCESSED)
+   return false, node_next(lp)
+end
 
 function calc_np(last, lp)
    local k
@@ -535,7 +532,7 @@ function calc_np(last, lp)
 	    return calc_np_pbox(lp, last)
          end -- id_pbox
       else
-	 k, lp = calc_np_auxtable[getid(lp)](lp)
+	 k, lp = (calc_np_auxtable[getid(lp)] or calc_np_aux_skip)(lp)
 	 if k then return lp end
       end
    end
