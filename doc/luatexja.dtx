@@ -4173,6 +4173,17 @@ floating-point numbers in design-size unit.
 
 \begin{cslist}[style=standard]
 
+\item[version=$1\mathrel{\textrm{or}}2$]
+%<en>(optional, default value is~1)
+%<ja>（任意，既定値は1）
+
+%<*en>
+The version JFM. Currently 1~and~2 are supported
+%</en>
+%<*ja>
+JFMのバージョン．1または2がサポートされる．
+%</ja>
+  
 \item[dir=<direction>]
 %<en>(required)
 %<ja>（必須）
@@ -4678,12 +4689,37 @@ Hence we have the following result:
 
 \item[end\_stretch=<kern>, end\_shrink=<kern>]
 %<*ja>
-（任意）
+（任意，バージョン1のみ）
 
 優先順位付き行長調整が有効であり，かつ現在の文字クラスの文字が行
 	     末に来た時に，行長を詰める調整・伸ばす調整のた
              めにこの文字と行末の間に挿入可能なカーンの大きさを指定する．
 %</ja>
+%<*en>
+(optional, version~1 only)
+%</en>
+
+  \item[end\_adjust=\{<kern>, <kern>, ...\}]
+%<*ja>
+（任意，バージョン2のみ）
+
+優先順位付き行長調整が有効であり，かつ現在の文字クラスの文字が
+  行末に来た時に，この文字と行末の間には指定された値のいずれかの大きさのカーンが
+  挿入される（\autoref{ssec-adj}参照）．
+
+バージョン1における
+\begin{lstlisting}[escapechar=\$]
+    end_stretch = $a$, end_shrink = $b$
+\end{lstlisting}
+という指定は，バージョン2では次の指定と同じになる．
+\begin{lstlisting}[escapechar=\$]
+    end_adjust = {$-b$, 0.0, $a$}
+\end{lstlisting}
+もし真ん中の \texttt{0.0} がない場合は，$a$か$-b$かいずれかのカーンが常に行末に追加される．
+%</ja>
+%<*en>
+(optional, version~2 only)
+%</en>
 
 \end{cslist}
 
@@ -6895,7 +6931,7 @@ for making the difference obvious.
 \end{itemize}
 
 
-\Pkg{luatexja-adjust} は，以下の命令を提供する．これらはすべてグローバルに効力を発揮する．
+\Pkg{luatexja-adjust}は，以下の命令を提供する．これらはすべてグローバルに効力を発揮する．
 
 \begin{cslist}
 \item[\cs{ltjdisableadjust}]
@@ -9228,7 +9264,7 @@ the \texttt{lstlisting} environment or other environments/commands.
 %<*ja>
 \section{和文の行長補正方法}
 \label{sec-adjspec}
-\Pkg{luatexja-adjust} で提供される優先順位付きの行長調整の詳細を述
+\Pkg{luatexja-adjust}で提供される優先順位付きの行長調整の詳細を述
 べる．大まかに述べると，次のようになる．
 \begin{itemize}
 \item 通常の\TeX の行分割方法に従って，段落を行分割する．この段階では，行
@@ -9249,13 +9285,9 @@ the \texttt{lstlisting} environment or other environments/commands.
 \paragraph{準備：合計伸縮量の計算}
 グルーの伸縮度（\texttt{plus} や \texttt{minus} で指定されている値）には，
 有限値の他に，\texttt{fi}，\texttt{fil}，\texttt{fill}，\texttt{filll}と
-いう4つの無限大レベル（後ろの方ほど大きい）があり，行の調整に
-\texttt{fi} などの\emph{無限大レベルの伸縮度が用いられている場合は，そ
-の行に対しての処理を中止}する．
-
-よって，以降，問題にしている行の行長調整は伸縮度が有限長のグルーを用いて
-行われているとして良い．さらに，簡単のため，この行はグルーが広げられている
-（自然長で組むと望ましい行長よりの短い）場合しか扱わない．
+いう4つの無限大レベル（後ろの方ほど大きい）がある．行の調整に
+\texttt{fi} などの\emph{無限大レベルの伸縮度が用いられている行では，
+「行末文字の位置調整」のみ行い，「グルーの調整」は行わない．}
 
 まず，段落中の行中のグルーを
 \begin{itemize}
@@ -9267,42 +9299,53 @@ the \texttt{lstlisting} environment or other environments/commands.
 \item 和欧文間空白(\Param{xkanjiskip})
 \item 和文間空白(\Param{kanjiskip})
 \end{itemize}
-の$1+1+5+1=8$つに類別し，それぞれの種別ごとに
-許容されている伸び量（\texttt{stretch}の値）の合計を計算する．
-また，行長と自然長との差を\textit{total}とおく．
+の$1+1+5+1=8$つに類別する．
+そして許容されている伸び量（\texttt{stretch}の値）の合計を
+無限のレベルごとに
+\begin{align*}
+ T^{+}_{l}&:= \sum_{\text{$\texttt{stretch\_order}(p) = l$}} \texttt{stretch}(p),&
+ l\in \{\text{(finite)}, \texttt{fi}, \texttt{fil}, \texttt{fill}, \texttt{filll}\}
+\end{align*}
+と計算する．さらに，
+\begin{align*}
+T^{+}&:=T^{+}_{L^+},&L^{+} = \max \{l\in
+ \{\text{(finite)}, \texttt{fi}, \texttt{fil}, \texttt{fill}, \texttt{filll}\}:
+ T^{+}_l\neq 0\}
+\end{align*}
+とおく．有限の伸び量については，上記の8種類の類別ごとにも合計を計算する．
+さらに縮み量（\texttt{shrink}の値）についても同様の処理を行い，$T^{-}$を計算する．
 
+また，行長から自然長を引いた値を\textit{total}とおく．
 
 \subsection{行末文字の位置調整}
 行末が文字クラス$n$の\textbf{JAchar}であった場合，
-それを動かすことによって，\textit{total}のうち
-\textbf{JAglue}が負担する分を少なくしようとする．
-この行末文字の左右の移動可能量は，
-JFM中にある文字クラス$n$の定義の
-\texttt{end\_stretch},~\texttt{end\_shrink}フィールドに
-全角単位の値として記述されている．
+\texttt{end\_adjust} の値のいずれかだけこの文字の位置を移動させる．
 
-例えば，行末文字が句点「。」であり，そこで用いられているJFM中に
-\begin{lstlisting}
-  [2] = {
-    chars = { '。', ... }, width = 0.5, ...,
-    end_stretch = 0.5, end_shrink = 0.5,
-  },
-\end{lstlisting}
-という指定があった場合，この行末の句点は
-\begin{itemize}
-\item 通常の\TeX の行分割処理で「半角以上の詰め」が行われていた場合，
-この行中の\textbf{JAglue}の負担を軽減するため，
-行末の句点を半角だけ右に移動する（ぶら下げ組を行う）．
-\item 通常の\TeX の行分割処理で「半角以上の空き」が行われていた場合，
-逆に行末句点を半角左に移動させる（見た目的に全角取りとなる）．
-\item 以上のどちらでもない場合，行末句点の位置調整は行わない．
-\end{itemize}
-となる．
-
-行末文字を移動した場合，その分だけ\textit{total}の値を引いておく．
+\begin{quote}
+  \texttt{end\_adjust = \{$a_{1}$, $a_{2}$, ..., $a_{n}$\}}
+\end{quote}
+であったとする．各$1\leq i\leq n$に対して，
+「行末に$a_{i}$全角だけのカーンを追加した時の，\textit{glue\_set}の値」を
+$b_{i}$とおく．式で書くと，
+\[
+\catcode`\<=12
+b_{i} = \begin{cases}
+  |\textit{total}-a_{i}\cdot \text{\cs{zw}}|/T^{+}
+	  &(\textit{total}-a_{i}\text{\cs{zw}}\geq 0)\\
+  |\textit{total}-a_{i}\cdot \text{\cs{zw}}|/T^{-}
+	  &(\textit{total}-a_{i}\text{\cs{zw}}<0)
+\end{cases}.
+\]
+$b_{i}$達の最小値を与えるような$i$を$j$としたとき\footnote{%
+  そのような$i$が2つ以上あるときは，$|\textit{total}-a_{i}\cdot \text{\cs{zw}}|$,
+  $|a_{i}|$, $a_i$の順で比較して一番小さくなるものが選ばれる．
+}，
+行末に大きさ$a_{j}$のカーンを追加する．
+\textit{total}から$a_{j}$全角の大きさだけ引いておく．
 
 \subsection{グルーの調整}
-\textit{total}の分だけが，行中のグルーの伸び量に応じて負担されることになる．
+$|\textit{total}|$の分だけが，行中のグルーの伸び量に応じて負担されることになる．
+以下，$\textit{total}\geq 0$であると仮定して話を進めるが，負のときも同様である．
 負担するグルーの優先度は以下の順であり，
 できるだけ\Param{kanjiskip}を自然長のままにすることを
 試みている．

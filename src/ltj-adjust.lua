@@ -169,12 +169,19 @@ local function aw_step1(p, total, ntr)
    for i, v in ipairs(eadt) do
       local t = total - v
       if t>0 then
-	 eadt_ratio[i] = {i, t/total_st[65536*total_st.order], t}
+	 eadt_ratio[i] = {i, t/total_st[65536*total_st.order], t, v}
       else
-	 eadt_ratio[i] = {i, t/total_sh[65536*total_sh.order], t}
+	 eadt_ratio[i] = {i, t/total_sh[65536*total_sh.order], t, v}
       end
    end
-   table.sort(eadt_ratio, function (a,b) return abs(a[2])<abs(b[2]) end)
+   table.sort(eadt_ratio, 
+   function (a,b) 
+       for i=2,4 do
+	   local at, bt = abs(a[i]), abs(b[i])
+	   if at~=bt then return at<bt end
+       end
+       return a[4]<b[4]
+   end)
    --print('min', eadt[eadt_ratio[1][1]], eadt_ratio[1][3])
    if eadt[eadt_ratio[1][1]]~=0 then
       local kn = node_new(id_kern)
