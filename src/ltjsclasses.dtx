@@ -64,6 +64,8 @@
 \usepackage{doc}
 \usepackage{fontspec}
 \usepackage[ipaex,nfssonly]{luatexja-preset}
+\ltjsetparameter{alxspmode={`\*,allow}}
+\ltjsetparameter{alxspmode={`\\,allow}}
 %%%%\usepackage{unicode-math}
 %%%%\setmathfont{Latin Modern Math}
 \usepackage[unicode]{hyperref}
@@ -132,13 +134,16 @@
 %    \item \texttt{nomag}オプション指定時には，単にレイアウトに用いる各種長さの値をスケールさせるだけです。
 %      そのため，例えば本文の文字サイズが17\,ptのときにはcmr10でなくcmr17を用いることになり，組版結果の印象が
 %      異なる恐れがあります。
-%    \item \texttt{nomagx}オプション指定時には，上記に加えてオプティカルサイズを調整する（本文ではcmr17の代わりに
+%    \item \texttt{nomag*}オプション指定時には，上記に加えてオプティカルサイズを調整する（本文ではcmr17の代わりに
 %      cmr10を拡大縮小する，など）ため，\LaTeX のフォント選択システムNFSSへパッチを当てます。
 %      こうすることで前項に書いた不具合はなくなりますが，かえって別の不具合が起きる可能性
-%      はあります。
+%      はあります\footnote{%
+%        \texttt{nomag*}は\texttt{jsclasses}でも利用可能ですが，\texttt{ltjsclasses}では\texttt{jsclasses}とは
+%        別の実装をしています。
+%      }。
 %   \end{itemize}
-%   標準では\texttt{nomagx}オプションが有効になっています。\texttt{jsclasses}で用意されていた
-%   \texttt{usemag}オプションを指定すると警告を出します．
+%   標準では\texttt{nomag*}オプションが有効になっています。\texttt{jsclasses}で用意され，かつ既定になっている
+%   \texttt{usemag}オプションを指定すると警告を出します。
 % \end{itemize}
 %
 % [2014-02-07 LTJ] jsclasses 2014-02-07 ベースにしました。
@@ -153,13 +158,13 @@
 % [2016-03-21 LTJ] Lua\TeX~beta-0.87.0 ではPDF出力時に|\mag|が使用できなくなったので，
 % ZRさんの\texttt{bxjscls}を参考に使わないように書き換えました。
 %
-% [2016-03-31 LTJ] \texttt{xreal}オプションを標準で有効にしました．
+% [2016-03-31 LTJ] \texttt{xreal}オプションを標準で有効にしました。
 %
-% [2016-07-12 LTJ] \texttt{jsclasses}開発版に合わせ、\texttt{real},~\texttt{xreal}オプションの名称を変更するなどの変更を行いました。
+% [2016-07-12 LTJ] \texttt{jsclasses}開発版に合わせ，\texttt{real},~\texttt{xreal}オプションの名称を変更するなどの変更を行いました。
 %
-% [2016-07-18 LTJ] \texttt{usemag}オプションが指定されると警告を出すようにしました．
+% [2016-07-18 LTJ] \texttt{usemag}オプションが指定されると警告を出すようにしました。
 %
-% [2016-07-21 LTJ] \LaTeX 等のロゴの再定義で，\texttt{jslogo}パッケージがあればそちらを読み込むことにしました．
+% [2016-07-21 LTJ] \LaTeX 等のロゴの再定義で，\texttt{jslogo}パッケージがあればそちらを読み込むことにしました。
 %
 % \StopEventually{}
 %
@@ -348,6 +353,8 @@
 % [2016-07-08] |\mag| を使わずに各種寸法をスケールさせるためのオプション \texttt{nomag} を新設しました。
 % \texttt{usemag} オプションの指定で従来通りの動作となります。デフォルトは \texttt{usemag} です。
 %
+% [2016-07-24] オプティカルサイズを調整するためにNFSSへパッチを当てるオプション \texttt{nomag*} を新設しました。
+%
 %    \begin{macrocode}
 \def\jsc@magscale{1}
 \DeclareOption{slide}{\@slidetrue\def\jsc@magscale{3.583}\@landscapetrue\@titlepagetrue}
@@ -373,16 +380,16 @@
 %    \end{macrocode}
 %
 % \paragraph{オプティカルサイズの補正}
-% \texttt{nomagx}オプション指定時には，本文のフォントサイズが10pt以外の場合に
+% \texttt{nomag*}オプション指定時には，本文のフォントサイズが10pt以外の場合に
 % オプティカルサイズの補正を行うためにNFSSにパッチを当てます。
 % 現在の\texttt{ltjsclasses}ではこのパッチ当ては標準では行いますが，
 % 将来どうなるかわからないので\texttt{nomag}で無効化することができるようにしました。
 %
-% \texttt{noxreal},~\texttt{real}は旧来の互換性として今は残してありますが、2017年7月に削除する予定です。
+% \texttt{noxreal},~\texttt{real}は旧来の互換性として今は残してありますが，2017年7月に削除する予定です。
 %    \begin{macrocode}
 \newif\if@ltjs@mag@xreal
 \@ltjs@mag@xrealtrue
-\DeclareOption{nomagx}{\@ltjs@mag@xrealtrue}
+\DeclareOption{nomag*}{\@ltjs@mag@xrealtrue}
 \DeclareOption{nomag}{\@ltjs@mag@xrealfalse}
 \DeclareOption{noxreal}{%
   \ClassWarningNoLine{\jsc@clsname}{%
@@ -736,7 +743,7 @@
 % [2016-03-28 LTJ] |\luafunction|を使うようにし，また本文のフォントサイズが10\,ptのときには
 % （不要なので）パッチを当てないことにしました。
 %
-% [2016-04-04 LTJ] NFSSへのパッチを修正．
+% [2016-04-04 LTJ] NFSSへのパッチを修正。
 %    \begin{macrocode}
 \if@ltjs@mag@xreal\RequirePackage{type1cm}
 \ifdim\jsc@mpt=\p@\else
@@ -839,14 +846,14 @@
 % 使うことにします。そのためには，$13\,\textrm{Q}/10\,\textrm{pt}\simeq 0.924715$倍
 % すればいいことになります。
 %
-% |\ltj@stdmcfont|,~|\ltj@stdgtfont| による、デフォルトで使われる明朝・ゴシックのフォントの
-% 設定に対応しました。この2つの命令の値はユーザが日々の利用でその都度指定するものではなく、
+% |\ltj@stdmcfont|,~|\ltj@stdgtfont| による，デフォルトで使われる明朝・ゴシックのフォントの
+% 設定に対応しました。この2つの命令の値はユーザが日々の利用でその都度指定するものではなく，
 % 何らかの理由で非埋め込みフォントが正しく利用できない場合にのみ\texttt{luatexja.cfg}によって
 % セットされるものです。
 %
 % [2014-07-26 LTJ] なお，現状のところ，縦組用JFMは\texttt{jfm-ujisv.lua}しか準備していません。
 %
-% [2016-03-21 LTJ] 拡大率の計算で1~ptを$1/72.27$インチでなく0.3514~mmと間違えて扱っていたのを修正．
+% [2016-03-21 LTJ] 拡大率の計算で1~ptを$1/72.27$インチでなく0.3514~mmと間違えて扱っていたのを修正。
 %    \begin{macrocode}
 %<*!jspf>
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
@@ -4060,7 +4067,7 @@
 % これらは互換性のためのもので，
 % できるだけ |\text...| と |\math...| を使ってください。
 %
-% [2016-07-15] KOMA-Script中の |\scr@DeclareOldFontCommand| に倣い、
+% [2016-07-15] KOMA-Script中の |\scr@DeclareOldFontCommand| に倣い，
 % これらの命令を使うときには警告を発することにしました。
 %
 % [2016-07-16] 警告を最初の一回だけ発することにしました。また，
@@ -5016,7 +5023,7 @@
 % 後方互換のため，\texttt{jsclasses}ではデフォルトでこれを読み込みます。
 %
 % [2016-07-21 LTJ] \texttt{jsclasses} とLua\TeX-jaの更新タイミングが一致しない可能性を考慮し，
-% \texttt{jslogo}パッケージが存在しない場合は旧来の定義をそのまま使うことにしました．
+% \texttt{jslogo}パッケージが存在しない場合は旧来の定義をそのまま使うことにしました。
 %
 %    \begin{macrocode}
 \IfFileExists{jslogo.sty}{%
@@ -5026,7 +5033,7 @@
 }{%
 %    \end{macrocode}
 %
-% 以下は\texttt{jslogo}パッケージがない場合の定義です．
+% 以下は\texttt{jslogo}パッケージがない場合の定義です。
 %
 % \begin{macro}{\小}
 % \begin{macro}{\上小}
@@ -5230,7 +5237,7 @@
 % \end{macro}
 % \end{macro}
 %
-% \texttt{jslogo}パッケージがない場合の定義はここで終わりです．
+% \texttt{jslogo}パッケージがない場合の定義はここで終わりです。
 %    \begin{macrocode}
 }
 %    \end{macrocode}

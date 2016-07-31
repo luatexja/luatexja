@@ -120,7 +120,7 @@
 \DeclareOption{12ptj}{\def\jsc@magscale{1.302}}
 \newif\if@ltjs@mag@xreal
 \@ltjs@mag@xrealtrue
-\DeclareOption{nomagx}{\@ltjs@mag@xrealtrue}
+\DeclareOption{nomag*}{\@ltjs@mag@xrealtrue}
 \DeclareOption{nomag}{\@ltjs@mag@xrealfalse}
 \DeclareOption{noxreal}{%
   \ClassWarningNoLine{\jsc@clsname}{%
