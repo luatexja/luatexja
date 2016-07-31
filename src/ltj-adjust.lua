@@ -69,44 +69,55 @@ end
 
 -- box 内で伸縮された glue の合計値を計算
 
-local function get_stretched(q, go, gs)
-   if gs == 1 then -- stretching
-      if getfield(q, 'stretch_order') == go then
-	 return getfield(q, 'stretch')
-      else return 0
-      end
-   else -- shrinking
-      if getfield(q, 'shrink_order') == go then
-	 return getfield(q, 'shrink')
-      else return 0
-      end
-   end
-end
-
-local res = {}
+local total_stsh = {{},{}}
+local total_st, total_sh = total_stsh[1], total_stsh[2]
 local function get_total_stretched(p, line)
+-- return value: <補正値(sp)>
    local go, gf, gs
-      = getfield(p, 'glue_order'), getfield(p, 'glue_set'), getfield(p, 'glue_sign')
-   if go ~= 0 then return nil end
-   res[0], res.glue_set, res.name = 0, gf, (gs==1) and 'stretch' or 'shrink'
-   for i=1,#priority_table do res[priority_table[i]]=0 end
-   if gs ~= 1 and gs ~= 2 then return res, 0 end
-   local total = 0
-   for q in node_traverse_id(id_glue, getlist(p)) do
-      local a, ic = get_stretched(q, go, gs), get_attr_icflag(q)
-      if ic == KANJI_SKIP_JFM  then ic = KANJI_SKIP
-      elseif ic == XKANJI_SKIP_JFM  then ic = XKANJI_SKIP
-      end
-      if   type(res[ic]) == 'number' then
-	 res[ic], total = res[ic] + a, total + a
-      else
-	 res[0], total = res[0]  + a, total + a
-      end
+     = getfield(p, 'glue_order'), getfield(p, 'glue_set'), getfield(p, 'glue_sign')
+   for i,_ in pairs(total_st) do total_st[i]=nil; total_sh[i]=nil end
+   for i=1,#priority_table do 
+      total_st[priority_table[i]]=0; total_sh[priority_table[i]]=0; 
    end
-   return res, total
+   for i=0,4 do total_st[i*65536]=0; total_sh[i*65536]=0 end
+   total_st[-1]=0; total_sh[-1]=0;
+   for q in node_traverse_id(id_glue, getlist(p)) do
+       local a = getfield(q, 'stretch_order')
+      if a>0 then a=a*65536 else 
+         total_st[0] = total_st[0]+getfield(q, 'stretch')
+         a = get_attr_icflag(q)
+         if a == KANJI_SKIP_JFM  then a = KANJI_SKIP
+	 elseif a == XKANJI_SKIP_JFM  then a = XKANJI_SKIP
+	 elseif type(total_st[a])~='number' then a = -1 end
+      end
+      total_st[a] = total_st[a]+getfield(q, 'stretch')
+      local a = getfield(q, 'shrink_order')
+      if a>0 then a=a*65536 else 
+         total_sh[0] = total_sh[0]+getfield(q, 'shrink')
+         a = get_attr_icflag(q)
+         if a == KANJI_SKIP_JFM  then a = KANJI_SKIP
+         elseif a == XKANJI_SKIP_JFM  then a = XKANJI_SKIP
+	 elseif type(total_sh[a])~='number' then a = -1 end
+      end
+      total_sh[a] = total_sh[a]+getfield(q, 'shrink')
+   end
+   for i=4,0,-1 do if total_st[i*65536]~=0 then total_st.order=i; break end; end
+   for i=4,0,-1 do if total_sh[i*65536]~=0 then total_sh.order=i; break end; end
+   print('gf', (gs==0) and ' ' or (gs==1 and '+' or '-') .. gf )
+   print('**STRETCH')
+   for i,v in pairs(total_st) do print(i, v); end
+   print('**shrink')
+   for i,v in pairs(total_sh) do print(i, v); end
+   print('****** END ******')
+   if gs==0 then
+      return 0, gf
+   else 
+      return round((3-2*gs)*total_stsh[gs][go*65536]*gf), gf
+   end
 end
 
 local function clear_stretch(p, ic, name)
+   print('clear', ic)
    for q in node_traverse_id(id_glue, getlist(p)) do
       local f = get_attr_icflag(q)
       if (f == ic) or ((ic ==KANJI_SKIP) and (f == KANJI_SKIP_JFM))
@@ -134,22 +145,17 @@ end
 
 -- step 1: 行末に kern を挿入（句読点，中点用）
 local ltjd_glyph_from_packed = ltjd.glyph_from_packed
-local function aw_step1(p, res, total)
+local function aw_step1(p, total, ntr)
    local head = getlist(p)
-   local x = node_tail(head); if not x then return false end
+   local x = node_tail(head); if not x then return total, false end
    -- x: \rightskip
-   x = node_prev(x); if not x then return false end
+   x = node_prev(x); if not x then return total, false end
    local xi, xc = getid(x)
    if xi == id_glue and getsubtype(x) == 15 then
       -- 段落最終行のときは，\penalty10000 \parfillskip が入るので，
       -- その前の node が本来の末尾文字となる
       x = node_prev(node_prev(x)); xi = getid(x)
    end
-   -- local xi = getid(x)
-   -- while (get_attr_icflag(x) == PACKED)
-   --    and  ((xi == id_penalty) or (xi == id_kern) or (xi == id_kern)) do
-   --       x = node_prev(x); xi = getid(x)
-   -- end
    if xi == id_glyph and getfield(x, 'lang')==lang_ja then
       -- 和文文字
       xc = x
@@ -158,25 +164,55 @@ local function aw_step1(p, res, total)
       xc = ltjd_glyph_from_packed(x)
       while getid(xc) == id_whatsit do xc = node_next(xc) end -- これはなんのために？
    else
-     return false-- それ以外は対象外．
+     return total, false-- それ以外は対象外．
    end
-   local xk = ltjf_font_metric_table[getfont(xc)]
-     .char_type[has_attr(xc, attr_jchar_class) or 0]['end_' .. res.name] or 0
+   local xkst = ltjf_font_metric_table[getfont(xc)]
+     .char_type[has_attr(xc, attr_jchar_class) or 0]['end_stretch'] or 0
+   local xksh = ltjf_font_metric_table[getfont(xc)]
+     .char_type[has_attr(xc, attr_jchar_class) or 0]['end_shrink'] or 0
+   local xkni = ltjf_font_metric_table[getfont(xc)]
+     .char_type[has_attr(xc, attr_jchar_class) or 0]['end_natural_inhibit']
 
-   if xk>0 and total>=xk then
-      total = total - xk
+   print(total, xkst, xksh, ntr)
+   if total>=xkst and xkst>0 then
       local kn = node_new(id_kern)
-      setfield(kn, 'kern', (res.name=='shrink' and -1 or 1) * xk)
-      set_attr(kn, attr_icflag, FROM_JFM)
+      setfield(kn, 'kern', xkst); set_attr(kn, attr_icflag, FROM_JFM)
       insert_after(head, x, kn)
-      return true
-   else return false
+      return total - xkst, true
+   elseif total<=-xksh and xksh<0 then
+      local kn = node_new(id_kern)
+      setfield(kn, 'kern', -xksh); set_attr(kn, attr_icflag, FROM_JFM)
+      insert_after(head, x, kn)
+      return total + xksh, true
+   else --    
+      local str = -(total-xkst)/total_sh[65536*total_sh.order] -- end_stretch を入れたときの glue_set (shrink)
+      local shr = (xksh+total)/total_st[65536*total_st.order] -- end_shrink を入れたときの glue_set (stretch)
+      print(xkni, str, ntr, shr)
+      if xkni then
+ 	 if str<shr then 
+            local kn = node_new(id_kern)
+            setfield(kn, 'kern', xkst); set_attr(kn, attr_icflag, FROM_JFM)
+            insert_after(head, x, kn)
+	    return total- xkst, true
+	 else
+            local kn = node_new(id_kern)
+            setfield(kn, 'kern', -xksh); set_attr(kn, attr_icflag, FROM_JFM)
+            insert_after(head, x, kn)
+            return total + xksh, true  
+	 end
+      else
+	 return total, false   
+      end
    end
 end
 
 -- step 2: 行中の glue を変える
-local function aw_step2(p, res, total, added_flag)
-   if total == 0 then -- もともと伸縮の必要なし
+local function aw_step2(p, total, added_flag)
+   local name = (total>0) and 'stretch' or 'shrink'
+   local res = total_stsh[(total>0) and 1 or 2]
+   print('STEP2', total)
+   if (total == 0) or res.order>0 then 
+      -- もともと伸縮の必要なしか，残りの伸縮量は無限大
       if added_flag then -- 行末に kern 追加したので，それによる補正
 	 local f = node_hpack(getlist(p), getfield(p, 'width'), 'exactly')
 	 setfield(f, 'head', nil)
@@ -186,8 +222,10 @@ local function aw_step2(p, res, total, added_flag)
 	 node_free(f)
 	 return
       end
-   elseif total <= res[0] then -- 和文処理グルー以外で足りる
-      for _,v in pairs(priority_table) do clear_stretch(p, v, res.name) end
+   end
+   total = math.abs(total)
+   if total <= res[-1] then -- 和文処理グルー以外で足りる
+      for _,v in pairs(priority_table) do clear_stretch(p, v, name) end
       local f = node_hpack(getlist(p), getfield(p, 'width'), 'exactly')
       setfield(f, 'head', nil)
       setfield(p, 'glue_set', getfield(f, 'glue_set'))
@@ -195,14 +233,15 @@ local function aw_step2(p, res, total, added_flag)
       setfield(p, 'glue_sign', getfield(f, 'glue_sign'))
       node_free(f)
    else
-      total = total - res[0]
+      total = total - res[-1]; print('のこり', total)
       for i = 1, #priority_table do
-         local v = priority_table[i]
+	 local v = priority_table[i]
+	 print('total vs v', total, res[v], v)
          if total <= res[v] then
             for j = i+1,#priority_table do
-               clear_stretch(p, priority_table[j], res.name)
+               clear_stretch(p, priority_table[j], name)
             end
-            set_stretch(p, total, res[v], v, res.name); break
+            set_stretch(p, total, res[v], v, name); break
          end
          total = total - res[v]
       end
@@ -222,12 +261,7 @@ local function adjust_width(head)
    local line = 1
    for p in node_traverse_id(id_hlist, to_direct(head)) do
       line = line + 1
-      local res, total = get_total_stretched(p, line)
-        -- this is the same table as the table which is def'd in l. 92
-      if res and res.glue_set<1 then
-	 total = round(total * res.glue_set)
-         aw_step2(p, res, total, aw_step1(p, res, total))
-      end
+      aw_step2(p, aw_step1(p, get_total_stretched(p, line)))
    end
    return to_node(head)
 end
