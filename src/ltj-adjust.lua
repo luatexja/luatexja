@@ -103,12 +103,6 @@ local function get_total_stretched(p, line)
    end
    for i=4,0,-1 do if total_st[i*65536]~=0 then total_st.order=i; break end; end
    for i=4,0,-1 do if total_sh[i*65536]~=0 then total_sh.order=i; break end; end
-   print('gf', (gs==0) and ' ' or (gs==1 and '+' or '-') .. gf )
-   print('**STRETCH')
-   for i,v in pairs(total_st) do print(i, v); end
-   print('**shrink')
-   for i,v in pairs(total_sh) do print(i, v); end
-   print('****** END ******')
    if gs==0 then
       return 0, gf
    else 
@@ -117,7 +111,6 @@ local function get_total_stretched(p, line)
 end
 
 local function clear_stretch(p, ic, name)
-   print('clear', ic)
    for q in node_traverse_id(id_glue, getlist(p)) do
       local f = get_attr_icflag(q)
       if (f == ic) or ((ic ==KANJI_SKIP) and (f == KANJI_SKIP_JFM))
@@ -144,6 +137,7 @@ local function set_stretch(p, after, before, ic, name)
 end
 
 -- step 1: 行末に kern を挿入（句読点，中点用）
+local abs = math.abs
 local ltjd_glyph_from_packed = ltjd.glyph_from_packed
 local function aw_step1(p, total, ntr)
    local head = getlist(p)
@@ -164,45 +158,31 @@ local function aw_step1(p, total, ntr)
       xc = ltjd_glyph_from_packed(x)
       while getid(xc) == id_whatsit do xc = node_next(xc) end -- これはなんのために？
    else
-     return total, false-- それ以外は対象外．
+      return total, false-- それ以外は対象外．
    end
-   local xkst = ltjf_font_metric_table[getfont(xc)]
-     .char_type[has_attr(xc, attr_jchar_class) or 0]['end_stretch'] or 0
-   local xksh = ltjf_font_metric_table[getfont(xc)]
-     .char_type[has_attr(xc, attr_jchar_class) or 0]['end_shrink'] or 0
-   local xkni = ltjf_font_metric_table[getfont(xc)]
-     .char_type[has_attr(xc, attr_jchar_class) or 0]['end_natural_inhibit']
-
-   print(total, xkst, xksh, ntr)
-   if total>=xkst and xkst>0 then
-      local kn = node_new(id_kern)
-      setfield(kn, 'kern', xkst); set_attr(kn, attr_icflag, FROM_JFM)
-      insert_after(head, x, kn)
-      return total - xkst, true
-   elseif total<=-xksh and xksh<0 then
-      local kn = node_new(id_kern)
-      setfield(kn, 'kern', -xksh); set_attr(kn, attr_icflag, FROM_JFM)
-      insert_after(head, x, kn)
-      return total + xksh, true
-   else --    
-      local str = -(total-xkst)/total_sh[65536*total_sh.order] -- end_stretch を入れたときの glue_set (shrink)
-      local shr = (xksh+total)/total_st[65536*total_st.order] -- end_shrink を入れたときの glue_set (stretch)
-      print(xkni, str, ntr, shr)
-      if xkni then
- 	 if str<shr then 
-            local kn = node_new(id_kern)
-            setfield(kn, 'kern', xkst); set_attr(kn, attr_icflag, FROM_JFM)
-            insert_after(head, x, kn)
-	    return total- xkst, true
-	 else
-            local kn = node_new(id_kern)
-            setfield(kn, 'kern', -xksh); set_attr(kn, attr_icflag, FROM_JFM)
-            insert_after(head, x, kn)
-            return total + xksh, true  
-	 end
+   local eadt = ltjf_font_metric_table[getfont(xc)]
+      .char_type[has_attr(xc, attr_jchar_class) or 0].end_adjust
+   if not eadt then 
+      return total, false
+   end
+   local eadt_ratio = {}
+   for i, v in ipairs(eadt) do
+      local t = total - v
+      if t>0 then
+	 eadt_ratio[i] = {i, t/total_st[65536*total_st.order], t}
       else
-	 return total, false   
+	 eadt_ratio[i] = {i, t/total_sh[65536*total_sh.order], t}
       end
+   end
+   table.sort(eadt_ratio, function (a,b) return abs(a[2])<abs(b[2]) end)
+   --print('min', eadt[eadt_ratio[1][1]], eadt_ratio[1][3])
+   if eadt[eadt_ratio[1][1]]~=0 then
+      local kn = node_new(id_kern)
+      setfield(kn, 'kern', eadt[eadt_ratio[1][1]]); set_attr(kn, attr_icflag, FROM_JFM)
+      insert_after(head, x, kn)
+      return eadt_ratio[1][3], true
+   else
+      return total, false
    end
 end
 
@@ -210,8 +190,7 @@ end
 local function aw_step2(p, total, added_flag)
    local name = (total>0) and 'stretch' or 'shrink'
    local res = total_stsh[(total>0) and 1 or 2]
-   print('STEP2', total)
-   if (total == 0) or res.order>0 then 
+   if total==0 or res.order > 0 then 
       -- もともと伸縮の必要なしか，残りの伸縮量は無限大
       if added_flag then -- 行末に kern 追加したので，それによる補正
 	 local f = node_hpack(getlist(p), getfield(p, 'width'), 'exactly')
@@ -233,10 +212,9 @@ local function aw_step2(p, total, added_flag)
       setfield(p, 'glue_sign', getfield(f, 'glue_sign'))
       node_free(f)
    else
-      total = total - res[-1]; print('のこり', total)
+      total = total - res[-1];
       for i = 1, #priority_table do
 	 local v = priority_table[i]
-	 print('total vs v', total, res[v], v)
          if total <= res[v] then
             for j = i+1,#priority_table do
                clear_stretch(p, priority_table[j], name)

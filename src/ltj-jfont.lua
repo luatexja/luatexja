@@ -61,6 +61,7 @@ function define_jfm(t)
    elseif type(t.zw)~='number' or type(t.zh)~='number' then
       defjfm_res= nil; return
    end
+   t.version = (type(t.version)=='number') and t.version or 1
    t.char_type = {}; t.chars = {}
    for i,v in pairs(t) do
       if type(i) == 'number' then -- char_type
@@ -102,6 +103,28 @@ function define_jfm(t)
 	 end
 	 if type(v.down)~='number' then
 	    v.down = 0.0
+	 end
+	 if t.version>=2 then
+	    if v.end_stretch then defjfm_res= nil; return end
+	    if v.end_shrink  then defjfm_res= nil; return end
+	    if v.end_adjust then
+	       if type(v.end_adjust)~='table' then
+	          v.end_adjust = nil
+	       else
+	          table.sort(v.end_adjust)
+	       end
+	    end
+	 else
+	    v.end_adjust = nil
+	    if v.end_stretch and v.end_stretch~=0.0 then 
+	       v.end_adjust = (v.end_adjust or {}) 
+	       v.end_adjust[#(v.end_adjust)+1] = v.end_stretch
+	    end
+	    if v.end_shrink and v.end_ahrink~=0.0 then 
+	       v.end_adjust = (v.end_adjust or {}) 
+	       v.end_adjust[#(v.end_adjust)+1] = -v.end_shrink
+	    end
+	    if v.end_adjust then v.end_adjust[#(v.end_adjust)+1] = 0.0 end
 	 end
 	 v.kern = v.kern or {}; v.glue = v.glue or {}
 	 for j,x in pairs(v.glue) do

@@ -17,16 +17,17 @@
   \textcolor{cyan!50!white}{\copy\gridbox}\hskip-20\zw\copy0\vrule\par
 }
 
-
+\ltjdisableadjust
 \long\def\testbox#1{%
-  \textcolor{red!80!black}{\ltjenableadjust\setbox0=\vbox{\hsize=20\zw\parfillskip0pt#1}\outbox{ON}}\par
+  \textcolor{red!80!black}{\ltjenableadjust
+    \setbox0=\vbox{\hsize=20\zw\parfillskip0pt#1}\ltjdisableadjust\outbox{ON}}\par
   \textcolor{black!90!white}{%
     \ltjdisableadjust\setbox0=\vbox{\hsize=20\zw\parfillskip0pt#1}\outbox{OFF}}\par\medskip
 }
 
 \parindent0pt
 \begin{document}
-\jfontspec[JFM=hang]{ipam.ttf}
+\jfontspec[YokoFeatures={JFM=hang}]{ipam.ttf}
 
 \ltjsetparameter{kanjiskip=.0\zw plus .4pt minus .4pt}
 {\tt kanjiskip: \ltjgetparameter{kanjiskip}
@@ -87,16 +88,46 @@ xkanjiskip: \ltjgetparameter{xkanjiskip}}
 日本では\pTeX，p\LaTeX が使われている。
 }
 \testbox{%
+あいうえおかきくけこさしすせそたちつて・
+}
+
+\newpage
+行末の句点
+\typeout{行末の句点}
+
+\testbox{%
 あいうえおかきくけこさしすせそたちつて．
+}
+\testbox{%
+あいうえおかきくけこさしすせそたちつ\vrule width .25\zw て．
 }
 \testbox{%
 あいうえおかきくけこさしすせそたちつ\vrule width .5\zw て．
 }
 \testbox{%
-あいうえおかきくけこさしすせそたちつ\vrule width 1\zw て．
+あいうえおかきくけこさしすせそたちつ\vrule width .75\zw て．
 }
 \testbox{%
-あいうえおかきくけこさしすせそたちつて・
+あいうえおかきくけこさしすせそたちつ\vrule width 1\zw て．
+}
+
+行末の読点
+\typeout{行末の読点}
+
+\testbox{%
+あいうえおかきくけこさしすせそたちつて，
+}
+\testbox{%
+あいうえおかきくけこさしすせそたちつ\vrule width .25\zw て，
+}
+\testbox{%
+あいうえおかきくけこさしすせそたちつ\vrule width .5\zw て，
+}
+\testbox{%
+あいうえおかきくけこさしすせそたちつ\vrule width .75\zw て，
+}
+\testbox{%
+あいうえおかきくけこさしすせそたちつ\vrule width 1\zw て，
 }
 
 \newpage

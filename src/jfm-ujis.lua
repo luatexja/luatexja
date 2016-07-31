@@ -92,7 +92,7 @@ luatexja.jfont.define_jfm {
       align = 'left', left = 0.0, down = 0.0,
       width = 0.5, height = 0.88, depth = 0.12, italic=0.0,
       glue = {
--- 3 は.75, 2, 4 は0, あとは0.5
+         -- 3 は.75, 2, 4 は0, あとは0.5
 	 [0] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
 	 [1] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
 	 [3] = { 0.75, 0.0, 0.25, priority=1, ratio=1./3, kanjiskip_stretch=1 },
