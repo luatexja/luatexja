@@ -68,6 +68,7 @@
 \fi                             %</LaTeX>
 
 % Load core module if not yet.
+% xkeyval.sty is already required in luatexja.sty.
 \ifx\luatexjacoreLoaded\@undefined
   \ifltj@in@latex                 %<*LaTeX>
     \RequirePackage{luatexja}[2016/05/15]
@@ -91,12 +92,38 @@
 \fi
 
 % enable/disable ``advanced'' line adjustment
-\protected\def\ltjdisableadjust{\directlua{luatexja.adjust.disable_cb()}}
-\protected\def\ltjenableadjust{\directlua{luatexja.adjust.enable_cb()}}
+% 1: lineend  (aw_step1)
+% 2: priority (aw_step2)
+% 3: all
+
+\newcount\ltjadj@status
+\define@key[ltj]{adjust}{all}[]{\ltjadj@status=3 }
+\define@boolkey[ltj]{adjust}{lineend}[true]{%
+  \ifltj@adjust@lineend
+    \ifodd\ltjadj@status\else\advance\ltjadj@status\@ne\fi
+  \else
+    \ifodd\ltjadj@status\advance\ltjadj@status\m@ne\fi
+  \fi\relax}
+\define@boolkey[ltj]{adjust}{priority}[true]{%
+  \ifltj@adjust@priority
+    \ifnum\ltjadj@status>1\else\advance\ltjadj@status2\fi
+  \else
+    \ifnum\ltjadj@status>1\advance\ltjadj@status-2\fi
+  \fi\relax}
+\protected\def\@@ltjenableadjust[#1]{%
+   \setkeys[ltj]{adjust}{#1}%
+   \directlua{luatexja.adjust.enable_cb(\the\ltjadj@status)}\ignorespaces
+}
+\protected\def\ltjdisableadjust{\ltjenableadjust*[]}
+\protected\def\ltjenableadjust{%
+   \ltx@ifnextchar*{\ltjadj@status\z@\ltx@firstoftwo{\@ltjenableadjust}}{\@ltjenableadjust}}
+\protected\def\@ltjenableadjust{%
+   \ltx@ifnextchar[{\@@ltjenableadjust}{\@@ltjenableadjust[all]}}%]
+
 \ltjenableadjust
 % there is also a key for \ltjsetparameter, for same effect
 \define@boolkey[ltj]{japaram}{adjust}[true]{%
-  \ifltj@japaram@adjust\ltjenableadjust\else\ltjdisableadjust\fi
+  \ifltj@japaram@adjust\ltjenableadjust\else\ltjdisableadjust\fi\relax
 }
 
 

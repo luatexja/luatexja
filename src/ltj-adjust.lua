@@ -194,6 +194,17 @@ local function aw_step1(p, total, ntr)
 end
 
 -- step 2: 行中の glue を変える
+local function aw_step2_dummy(p, _, added_flag)
+   if added_flag then -- 行末に kern 追加したので，それによる補正
+      local f = node_hpack(getlist(p), getfield(p, 'width'), 'exactly')
+      setfield(f, 'head', nil)
+      setfield(p, 'glue_set', getfield(f, 'glue_set'))
+      setfield(p, 'glue_order', getfield(f, 'glue_order'))
+      setfield(p, 'glue_sign', getfield(f, 'glue_sign'))
+      node_free(f)
+      return
+   end
+end
 local function aw_step2(p, total, added_flag)
    local name = (total>0) and 'stretch' or 'shrink'
    local res = total_stsh[(total>0) and 1 or 2]
@@ -240,33 +251,36 @@ local function aw_step2(p, total, added_flag)
 end
 
 
-local ltjs_fast_get_stack_skip = ltjs.fast_get_stack_skip
-local function adjust_width(head)
-   if not head then return head end
-   local line = 1
-   for p in node_traverse_id(id_hlist, to_direct(head)) do
-      line = line + 1
-      aw_step2(p, aw_step1(p, get_total_stretched(p, line)))
-   end
-   return to_node(head)
-end
-
 do
-   luatexja.adjust = luatexja.adjust or {}
+   local myaw_atep1, myaw_step2
+   local dummy =  function(p,t,n) return t, false end
+   local ltjs_fast_get_stack_skip = ltjs.fast_get_stack_skip
+   local function adjust_width(head)
+      if not head then return head end
+      local line = 1
+      for p in node_traverse_id(id_hlist, to_direct(head)) do
+         line = line + 1
+         myaw_step2(p, myaw_step1(p, get_total_stretched(p, line)))
+      end
+      return to_node(head)
+   end
    local is_reg = false
-   function luatexja.adjust.enable_cb()
-      if not is_reg then
+   function enable_cb(status)
+      if status>0 and (not is_reg) then
 	 luatexbase.add_to_callback('post_linebreak_filter',
 				    adjust_width, 'Adjust width', 100)
 	 is_reg = true
-      end
-   end
-   function luatexja.adjust.disable_cb()
-      if is_reg then
+      elseif is_reg and status==0 then
 	 luatexbase.remove_from_callback('post_linebreak_filter', 'Adjust width')
 	 is_reg = false
       end
+      myaw_step1 = (status%2>0) and aw_step1 or dummy
+      myaw_step2 = (status>=2) and aw_step2 or aw_step2_dummy
    end
+   function disable_cb() -- only for compatibility
+       enable_cs(0)
+   end
+   luatexja.adjust = luatexja.adjust or {enable_cb=enable_cb, disable_cb=disable_cb}  
 end
 
 luatexja.unary_pars.adjust = function(t)
