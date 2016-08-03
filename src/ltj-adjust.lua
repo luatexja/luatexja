@@ -101,8 +101,14 @@ local function get_total_stretched(p, line)
       end
       total_sh[a] = total_sh[a]+getfield(q, 'shrink')
    end
-   for i=4,0,-1 do if total_st[i*65536]~=0 then total_st.order=i; break end; end
-   for i=4,0,-1 do if total_sh[i*65536]~=0 then total_sh.order=i; break end; end
+   for i=4,1,-1 do if total_st[i*65536]~=0 then total_st.order=i; break end; end
+   if not total_st.order then
+       total_st.order, total_st[-65536] = -1,0.1 -- dummy
+   end
+   for i=4,1,-1 do if total_sh[i*65536]~=0 then total_sh.order=i; break end; end
+   if not total_sh.order then
+       total_sh.order, total_sh[-65536] = -1,0.1 -- dummy
+   end
    if gs==0 then
       return 0, gf
    else 
