@@ -91,32 +91,24 @@
   \RequireLuaTeXjaSubmodule{adjust_85}
 \fi
 
-% enable/disable ``advanced'' line adjustment
-% 1: lineend  (aw_step1)
-% 2: priority (aw_step2)
-% 3: all
 
-\newcount\ltjadj@status
-\define@key[ltj]{adjust}{all}[]{\ltjadj@status=3 }
-\define@boolkey[ltj]{adjust}{lineend}[true]{%
-  \ifltj@adjust@lineend
-    \ifodd\ltjadj@status\else\advance\ltjadj@status\@ne\fi
-  \else
-    \ifodd\ltjadj@status\advance\ltjadj@status\m@ne\fi
-  \fi\relax}
+\newcount\ltjadj@status@le
+\newcount\ltjadj@status@pr
+\let\ltj@adjust@temp=\relax
+\define@key[ltj]{adjust}{all}[]{\ltjadj@status@le=1 \ltjadj@status@pr=1 }
+\define@choicekey[ltj]{adjust}{lineend}[\@@temp\ltj@adjust@temp]%
+{false,true,extended}[true]{%
+  \ifnum\ltj@adjust@temp=-1 \else\ltjadj@status@le=\ltj@adjust@temp\fi\relax}
 \define@boolkey[ltj]{adjust}{priority}[true]{%
-  \ifltj@adjust@priority
-    \ifnum\ltjadj@status>1\else\advance\ltjadj@status2\fi
-  \else
-    \ifnum\ltjadj@status>1\advance\ltjadj@status-2\fi
-  \fi\relax}
+  \ltjadj@status@pr=\ifltj@adjust@priority1\else0\fi\relax}
 \protected\def\@@ltjenableadjust[#1]{%
    \setkeys[ltj]{adjust}{#1}%
-   \directlua{luatexja.adjust.enable_cb(\the\ltjadj@status)}\ignorespaces
+   \directlua{luatexja.adjust.enable_cb(\the\ltjadj@status@le, \the\ltjadj@status@pr)}\ignorespaces
 }
 \protected\def\ltjdisableadjust{\ltjenableadjust*[]}
 \protected\def\ltjenableadjust{%
-   \ltx@ifnextchar*{\ltjadj@status\z@\ltx@firstoftwo{\@ltjenableadjust}}{\@ltjenableadjust}}
+   \ltx@ifnextchar*{\ltjadj@status@pr\z@\ltjadj@status@le\z@
+     \ltx@firstoftwo{\@ltjenableadjust}}{\@ltjenableadjust}}
 \protected\def\@ltjenableadjust{%
    \ltx@ifnextchar[{\@@ltjenableadjust}{\@@ltjenableadjust[all]}}%]
 

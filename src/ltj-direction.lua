@@ -287,7 +287,7 @@ end
 
 do
    local function create_dir_whatsit_parbox(h, gc)
-      stop_time_measure('tex_linebreak')
+      stop_time_measure('tex_linebreak');
       -- start 側は ltj-debug.lua に
       local new_dir = ltjs.list_dir
       for line in traverse_id(id_hlist, to_direct(h)) do
@@ -1070,7 +1070,7 @@ do
 			[get_box_dir(b, dir_yoko)%dir_math_mod][new_dir][getid(b)]) do
          local cmd, arg, nn = v[1], v[2]
          if cmd=='kern' then
-            nn = node_new(id_kern)
+            nn = node_new(id_kern, 1)
             setfield(nn, 'kern', arg(w, h, d, dn_w, dn_h, dn_d))
          elseif cmd=='whatsit' then
             nn = node_new(id_whatsit, arg)

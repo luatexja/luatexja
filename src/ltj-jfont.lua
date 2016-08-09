@@ -110,7 +110,9 @@ function define_jfm(t)
 	    if v.end_adjust then
 	       if type(v.end_adjust)~='table' then
 	          v.end_adjust = nil
-	       else
+	       elseif #(v.end_adjust)==0 then
+		  v.end_adjust = nil
+	       else 
 	          table.sort(v.end_adjust)
 	       end
 	    end
@@ -170,7 +172,6 @@ do
    end
    update_jfm_cache = function (j,sz)
       if metrics[j].size_cache[sz] then return end
-      --local TEMP = node_new(id_kern)
       local t = {}
       metrics[j].size_cache[sz] = t
       t.chars = metrics[j].chars
@@ -191,9 +192,8 @@ do
 	       }
 	    end
 	    for k,w in pairs(v.kern) do
-	       local g = node_new(id_kern)
+	       local g = node_new(id_kern, 1)
 	       setfield(g, 'kern', w[1])
-	       setfield(g, 'subtype', 1)
 	       set_attr(g, attr_icflag, FROM_JFM)
 	       v[k] = {g, ratio=w[2]/sz}
 	    end
@@ -205,7 +205,6 @@ do
       t.zw = round(metrics[j].zw*sz)
       t.zh = round(metrics[j].zh*sz)
       t.size = sz
-      --node_free(TEMP)
    end
 end
 
@@ -1008,8 +1007,8 @@ do
    else
        local ITALIC       = luatexja.icflag_table.ITALIC
        new_ic_kern = function()
-         local g = node_new(id_kern)
-         setfield(g, 'subtype', 1); set_attr(g, attr_icflag, ITALIC)
+         local g = node_new(id_kern, 1)
+         set_attr(g, attr_icflag, ITALIC)
 	 return g
        end
    end

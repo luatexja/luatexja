@@ -19,10 +19,14 @@
 
 \ltjdisableadjust
 \long\def\testbox#1{%
-  \textcolor{red!80!black}{\ltjenableadjust
-    \setbox0=\vbox{\hsize=20\zw\parfillskip0pt#1}\ltjdisableadjust\outbox{ON}}\par
+  \textcolor{red!80!black}{\ltjenableadjust[all, lineend=extended]
+    \setbox0=\vbox{%
+      \hsize=20\zw#1%
+	}\ltjdisableadjust\outbox{ON}}\par
   \textcolor{black!90!white}{%
-    \ltjdisableadjust\setbox0=\vbox{\hsize=20\zw\parfillskip0pt#1}\outbox{OFF}}\par\medskip
+    \ltjdisableadjust\setbox0=\vbox{%
+	  \hsize=20\zw#1%
+    }\outbox{OFF}}\par\medskip
 }
 
 \parindent0pt
@@ -38,16 +42,27 @@ xkanjiskip: \ltjgetparameter{xkanjiskip}}
 このテストでは，行末の句読点・中点類の位置調整を有効にした
 \texttt{jfm-hang.lua}を用いている．
 \begin{itemize}
-\item 句読点は，調整量に合わせて，ぶら下げ，二分取り，全角取りの3種類から選択される．
+\item 句点は，調整量に合わせて，ぶら下げ，全角取りの2種類から選択される．
+\item 読点は，調整量に合わせて，ぶら下げ，二分取り，全角取りの3種類から選択される．
 \item 中点類は，行末に四分空きを追加することのみ対応．
 詰める際の「直前の四分空きも取る」は未実装，
-\item 行末文字の位置調整は，glueによる調整の負担量が少なくなるように行われる．
-なお，この位置調整で調整の方向が変わることはない．
 
-例えば，「三分伸ばす」調整が必要な，句点で終わる行があった場合，句点を全
-      角取りにするとglueの負担合計は「六分詰める」となり，調整量の絶対値
-      は減るが，方向が「伸ばす」から「詰める」こととなる．よってこのよう
-      な場合，句点は二分取りのままである．
+\item \texttt{lineend=true}のときは，\TeX による行分割後に行末文字の位置調整が行われる．
+行われる条件は，
+\begin{description}
+\item[最終行以外] 無限大の伸長度を持つグルーが関わっていない
+\item[最終行] 無限大の伸長度を持つグルーは\verb+\parfillskip+のみで，かつ
+\[
+ (\hbox{許される最小の行末文字と行末の間})\leq
+ (\hbox{\verb+\parfillskip+のこの行における実際の長さ})\leq
+ (\hbox{許される最大の行末文字と行末の間})
+\]
+となっている
+\end{description}
+
+\item \texttt{lineend=extended}のときは，\TeX による行分割の時点で行末位置の文字調整を考慮
+      する．但し，段落の最後の文字については例外的に行わず，代わりに
+上の「\texttt{lineend=true}の場合」の最終行のときと同じ補正を行う．
 \end{itemize}
 
 \testbox{%
@@ -60,7 +75,7 @@ xkanjiskip: \ltjgetparameter{xkanjiskip}}
 }
 
 \testbox{%
-あいうえおかきA M M Dこさ\texttt{DO i=1,10}『
+あうえおかきAI M M Dこさ\texttt{DO i=1,10}『
 }
 
 \testbox{%
@@ -71,12 +86,16 @@ xkanjiskip: \ltjgetparameter{xkanjiskip}}
 あいうえおきくけこ「」さ123456そたちつて
 }
 
+\typeout{あいうえお}
+
+
 \def\pTeX{p\kern-.2em\TeX}
 \testbox{%
 日本で\pTeX，p\LaTeX がよく使われている。
 }
 
 中点類の空き詰めは括弧類より優先
+\typeout{中点類の空き詰め}
 
 \testbox{%
 あいうえおかきくけ・こさしすせそたち「「あ

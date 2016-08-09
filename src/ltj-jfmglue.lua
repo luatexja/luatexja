@@ -637,8 +637,11 @@ end
 
 -------------------- 最下層の処理
 
+luatexbase.create_callback('luatexja.adjust_jfmglue', 'simple', nullfunc)
+
 -- change penalties (or create a new penalty, if needed)
 local function handle_penalty_normal(post, pre, g)
+   luatexbase.call_callback('luatexja.adjust_jfmglue', head, Nq, Np, Bp)
    local a = (pre or 0) + (post or 0)
    if #Bp == 0 then
       if (a~=0 and not(g and getid(g)==id_kern)) then
@@ -654,6 +657,7 @@ local function handle_penalty_normal(post, pre, g)
 end
 
 local function handle_penalty_always(post, pre, g)
+   luatexbase.call_callback('luatexja.adjust_jfmglue', head, Nq, Np, Bp)
    local a = (pre or 0) + (post or 0)
    if #Bp == 0 then
       if not (g and getid(g)==id_glue) or a~=0 then
@@ -669,7 +673,7 @@ local function handle_penalty_always(post, pre, g)
 end
 
 local function handle_penalty_suppress(post, pre, g)
-   local a = (pre or 0) + (post or 0)
+   luatexbase.call_callback('luatexja.adjust_jfmglue', head, Nq, Np, Bp)
    if #Bp == 0 then
       if g and getid(g)==id_glue then
 	 local p = node_new(id_penalty)
@@ -678,6 +682,21 @@ local function handle_penalty_suppress(post, pre, g)
          set_attr(p, attr_icflag, KINSOKU)
       end
    else for _, v in pairs(Bp) do add_penalty(v,a) end
+   end
+end
+
+local function handle_penalty_jwp()
+   local a = table_current_stack[luatexja.stack_table_index.JWP]
+   if #widow_Bp == 0 then
+      if a~=0 then
+	 local p = node_new(id_penalty)
+	 if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
+	 setfield(p, 'penalty', a)
+	 head = insert_before(head, widow_Np.first, p)
+	 widow_Bp[1]=p;
+	 set_attr(p, attr_icflag, KINSOKU)
+      end
+   else for _, v in pairs(widow_Bp) do add_penalty(v,a) end
    end
 end
 
@@ -725,10 +744,10 @@ do
       end
       if not gb then
 	 if ga then
-	    gb = node_new(id_kern); setfield(gb, 'kern', 0)
+	    gb = node_new(id_kern, 1); setfield(gb, 'kern', 0)
 	 else return nil end
       elseif not ga then
-	 ga = node_new(id_kern); setfield(ga, 'kern', 0)
+	 ga = node_new(id_kern, 1); setfield(ga, 'kern', 0)
       end
 
       local k = 2*getid(gb) - getid(ga)
@@ -1023,19 +1042,16 @@ end
 
 -------------------- 開始・終了時の処理
 do
-
+local node_prev = node.direct.getprev
 -- リスト末尾の処理
-local JWP  = luatexja.stack_table_index.JWP
-local function handle_list_tail(mode)
-   adjust_nq(); Np = Nq
+local function handle_list_tail(mode, last)
+   adjust_nq()
    if mode then
       -- the current list is to be line-breaked.
       -- Insert \jcharwidowpenalty
-      Bp = widow_Bp; Np = widow_Np
-      if Np.first then
-	 handle_penalty_normal(0, table_current_stack[JWP] or 0)
-      end
+      if widow_Np.first then handle_penalty_jwp() end
    else
+      Np=Nq	  
       -- the current list is the contents of a hbox
       local npi, pm = Np.id, Np.met
       if npi == id_jglyph or (npi==id_pbox and pm) then
@@ -1177,7 +1193,7 @@ function main(ahead, mode, dir)
 	 end
 	 lp = calc_np(last,lp)
       end
-      handle_list_tail(mode)
+      handle_list_tail(mode, last)
    end
    return cleanup(mode, TEMP)
 end

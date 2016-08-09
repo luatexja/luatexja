@@ -30,6 +30,15 @@ do
 	setfield(g,'stretch_order',sto or 0)
 	setfield(g,'shrink_order', sho or 0)
     end
+    local getfield = node.direct.getfield
+    luatexja.getglue = node.direct.getglue or
+    function(g)
+	return getfield(g,'width'),
+	       getfield(g,'stretch'),
+	       getfield(g,'shrink'),
+	       getfield(g,'stretch_order'),
+	       getfield(g,'shrink_order')
+    end
 end
 
 --- 以下は全ファイルで共有される定数
@@ -45,9 +54,10 @@ icflag_table.KANJI_SKIP      = 9
 icflag_table.KANJI_SKIP_JFM  = 10
 icflag_table.XKANJI_SKIP     = 11
 icflag_table.XKANJI_SKIP_JFM = 12
-icflag_table.PROCESSED       = 13
-icflag_table.IC_PROCESSED    = 14
-icflag_table.BOXBDD          = 15
+icflag_table.LINEEND         = 13
+icflag_table.PROCESSED       = 14
+icflag_table.IC_PROCESSED    = 15
+icflag_table.BOXBDD          = 16
 icflag_table.PROCESSED_BEGIN_FLAG = 128
 
 local stack_table_index = {}
@@ -462,6 +472,8 @@ local function debug_show_node_X(p,print_fn, limit)
 	 s = s .. ' (for accent)'
       elseif get_attr_icflag(p)==icflag_table.IC_PROCESSED then
 	 s = s .. ' (italic correction)'
+      elseif get_attr_icflag(p)==icflag_table.LINEEND then
+	 s = s .. ' (end-of-line)'
          -- elseif get_attr_icflag(p)==ITALIC then
          --    s = s .. ' (italic correction)'
       elseif get_attr_icflag(p)>icflag_table.KINSOKU
