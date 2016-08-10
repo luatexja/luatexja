@@ -56,7 +56,7 @@ xkanjiskip: \ltjgetparameter{xkanjiskip}}
 \begin{align*}
  \min\{(\hbox{許される最小の行末文字と行末の間}),0\}
   &\leq(\hbox{\texttt{\textbackslash parfillskip}のこの行における実際の長さ})\\
-  &\leq(\hbox{許される最大の行末文字と行末の間})
+  &\leq\max\{(\hbox{許される最大の行末文字と行末の間}),0\}
 \end{align*}
 となっている
 \end{description}
