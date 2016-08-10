@@ -36,6 +36,7 @@ local id_kern = node.id('kern')
 local id_hlist = node.id('hlist')
 local id_glue  = node.id('glue')
 local id_whatsit = node.id('whatsit')
+local id_penalty = node.id('penalty')
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local lang_ja = luatexja.lang_ja
@@ -73,18 +74,20 @@ end
 
 local total_stsh = {{},{}}
 local total_st, total_sh = total_stsh[1], total_stsh[2]
-local function get_total_stretched(p)
+local get_total_stretched
+do
+local dimensions = node.direct.dimensions
+function get_total_stretched(p)
 -- return value: <補正値(sp)>
-   local go, gf, gs
-     = getfield(p, 'glue_order'), getfield(p, 'glue_set'), getfield(p, 'glue_sign')
+   local ph = getlist(p)
+   if not ph then return 0 end
    for i,_ in pairs(total_st) do total_st[i]=nil; total_sh[i]=nil end
    for i=1,#priority_table do 
       total_st[priority_table[i]]=0; total_sh[priority_table[i]]=0; 
    end
    for i=0,4 do total_st[i*65536]=0; total_sh[i*65536]=0 end
-   total_st[-1]=0; total_sh[-1]=0;
-   local pf, pfw
-   for q in node_traverse_id(id_glue, getlist(p)) do
+   total_st[-1]=0; total_sh[-1]=0;   
+   for q in node_traverse_id(id_glue, ph) do
       local a = getfield(q, 'stretch_order')
       if a>0 then a=a*65536 else 
          total_st[0] = total_st[0]+getfield(q, 'stretch')
@@ -112,11 +115,8 @@ local function get_total_stretched(p)
    if not total_sh.order then
        total_sh.order, total_sh[-65536] = -1,0.1 -- dummy
    end
-   if gs==0 then
-      return 0
-   else 
-      return round((3-2*gs)*total_stsh[gs][go*65536]*gf)
-   end
+   return getfield(p,'width') - dimensions(ph)
+end
 end
 
 local function clear_stretch(p, ic, name)
@@ -154,6 +154,11 @@ local function aw_step1(p, total)
    -- x: \rightskip
    x = node_prev(x); if not x then return total, false end
    local xi, xc = getid(x)
+   -- x may be penalty
+   while xi==id_penalty do
+      x = node_prev(x); if not x then return total, false end
+      xi = getid(x)
+   end
    if (total>0 and total_st.order>0) or (total<0 and total_sh.order>0) then
        -- 無限大のグルーで処理が行われているときは処理中止．
        return total, false
@@ -200,7 +205,7 @@ local function aw_step1(p, total)
    end
 end
 
--- step 1 行末用
+-- step 1 最終行用
 local min, max = math.min, math.max
 local function aw_step1_last(p, total)
    local head = getlist(p)
@@ -346,7 +351,6 @@ end
 -- step 1': lineend=extended の場合（行分割時に考慮））
 local insert_lineend_kern
 do
-   local id_penalty = node.id('penalty')
    local insert_before = node.direct.insert_before
    local KINSOKU      = luatexja.icflag_table.KINSOKU
    function insert_lineend_kern(head, nq, np, Bp)
