@@ -200,7 +200,8 @@ local function aw_step1(p, total)
    end
 end
 
--- 行末用
+-- step 1 行末用
+local min = math.min
 local function aw_step1_last(p, total)
    local head = getlist(p)
    local x = node_tail(head); if not x then return total, false end
@@ -242,7 +243,7 @@ local function aw_step1_last(p, total)
    -- 続行条件2: eadt[1]<= \parfillskip <= eadt[#eadt]
    local pfw = getfield(pf, 'width') 
      + (total>0 and getfield(pf, 'stretch') or -getfield(pf, 'shrink')) *getfield(p, 'glue_set') 
-   if pfw<eadt[1] or eadt[#eadt]<pfw then return total, false end
+   if pfw<min(0,eadt[1]) or eadt[#eadt]<pfw then return total, false end
    -- \parfillskip を 0 にする
    total = total + getfield(pf, 'width') 
    total_st.order, total_sh.order = 0, 0
@@ -312,7 +313,7 @@ local function aw_step2(p, total, added_flag)
 	 return
       end
    end
-   total = math.abs(total)
+   total = abs(total)
    if total <= res[-1] then -- 和文処理グルー以外で足りる
       for _,v in pairs(priority_table) do clear_stretch(p, v, name) end
       local f = node_hpack(getlist(p), getfield(p, 'width'), 'exactly')
@@ -342,7 +343,7 @@ local function aw_step2(p, total, added_flag)
    end
 end
 
-
+-- step 1': lineend=extended の場合（行分割時に考慮））
 local insert_lineend_kern
 do
    local id_penalty = node.id('penalty')
@@ -409,7 +410,6 @@ do
 	 luatexbase.remove_from_callback('post_linebreak_filter', 'Adjust width')
 	 is_reg = false
       end
-      myaw_step1 = dummy --(status%2>0) and aw_step1 or dummy
       if status_le==2 then
 	 if not luatexbase.in_callback('luatexja.adjust_jfmglue', 'luatexja.adjust') then
 	    luatexbase.add_to_callback('luatexja.adjust_jfmglue', insert_lineend_kern, 'luatexja.adjust')

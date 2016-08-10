@@ -1,7 +1,7 @@
 %#!lualatex
 
 \documentclass{ltjsarticle}
-\usepackage{luatexja-fontspec,luatexja-adjust, luacode,xcolor}
+\usepackage{luatexja-fontspec,luatexja-adjust,xcolor,amsmath,amssymb}
 
 \def\sq{%
   \hbox to 1\zw{\hss\fboxsep=-.5\fboxrule\fbox{%
@@ -29,11 +29,12 @@
     }\outbox{OFF}}\par\medskip
 }
 
+\usepackage[textwidth=52\zw,lines=47,centering]{geometry}
 \parindent0pt
 \begin{document}
 \jfontspec[YokoFeatures={JFM=hang}]{ipam.ttf}
 
-\ltjsetparameter{kanjiskip=.0\zw plus .4pt minus .4pt}
+\ltjsetparameter{kanjiskip=.0\zw plus .4pt minus .5pt}
 {\tt kanjiskip: \ltjgetparameter{kanjiskip}
 
 \ltjsetparameter{xkanjiskip=.25\zw plus .25\zw minus .125\zw}
@@ -52,11 +53,11 @@ xkanjiskip: \ltjgetparameter{xkanjiskip}}
 \begin{description}
 \item[最終行以外] 無限大の伸長度を持つグルーが関わっていない
 \item[最終行] 無限大の伸長度を持つグルーは\verb+\parfillskip+のみで，かつ
-\[
- (\hbox{許される最小の行末文字と行末の間})\leq
- (\hbox{\verb+\parfillskip+のこの行における実際の長さ})\leq
- (\hbox{許される最大の行末文字と行末の間})
-\]
+\begin{align*}
+ \min\{(\hbox{許される最小の行末文字と行末の間}),0\}
+  &\leq(\hbox{\texttt{\textbackslash parfillskip}のこの行における実際の長さ})\\
+  &\leq(\hbox{許される最大の行末文字と行末の間})
+\end{align*}
 となっている
 \end{description}
 
@@ -101,16 +102,15 @@ xkanjiskip: \ltjgetparameter{xkanjiskip}}
 あいうえおかきくけ・こさしすせそたち「「あ
 }
 
-句読点類・中点類の後ろ空き
+中点類の後ろ空き（\verb+\parfillskip+を0にしている）
 
 \testbox{%
-日本では\pTeX，p\LaTeX が使われている。
+\parfillskip0pt日本では\pTeX，p\LaTeX が使われている。
 }
 \testbox{%
-あいうえおかきくけこさしすせそたちつて・
+\parfillskip0ptあいうえおかきくけこさしすせそたちつて・
 }
 
-\newpage
 行末の句点
 \typeout{行末の句点}
 
@@ -150,5 +150,62 @@ xkanjiskip: \ltjgetparameter{xkanjiskip}}
 }
 
 \newpage
+
+\def\USTCON{\hbox{USTCON}}
+\def\sample#1{\small\hsize=17\zw\jfontspec[YokoFeatures={JFM=hang}]{ipam.ttf}
+{\centering\scriptsize\textbf{\ttfamily #1}\par}\parindent1\zw%
+\ltjsetparameter{kanjiskip=.0\zw plus .4pt minus .5pt}
+1913年、ニールス・ボーアはラザフォードらによって得られた原子構造と、それ以前から報告されて
+いた原子のスペクトル線に関する結果から、原子に束縛された電子はある定常状態にあって、定常状
+態の電子は電磁波を放出せず、原子のスペクトル線の周波数は電子が異なる定常状態へ遷移する際に
+生じるエネルギー準位の差によって決定される、という仮定を導き出した。このモデルは今日、
+ボーアの原子模型と呼ばれる。ボーアは定常状態に関する仮定から、水素原子の問題に関する量子条
+件を得た。この量子条件はボーアの量子条件（英: Bohr's quantum condition）と呼ばれる。ボーア
+の量子条件によって、原子の定常状態が実現し得るためには水素原子核の周りを運動する束縛電子の
+角運動量が換算プランク定数の整数倍になっていなければならないが、その物理的な意味は明らかで
+はなかったが、後にド・ブロイの物質波を導入することで電子波が軌道上で定常波を成す条件として
+理解されるようになった。1915年から1916年にかけてアルノルト・ゾンマーフェルトによってボーア
+の方法が拡張された。ゾンマーフェルトによる量子条件はボーア＝ゾンマーフェルトの量子化条件と
+して知られる。ゾンマーフェルトはボーアの理論をニュートン力学の形式から解析力学の正準形式に
+置き換え、これにより1つのエネルギー準位に対して、ボーアの円軌道の他に楕円軌道をとる束縛電
+子が存在することが示された。これにより磁場中の原子のスペクトルが分裂するという正常ゼーマン
+効果は、同じエネルギー準位を持つ異なる電子軌道が、磁場によって別々のエネルギー準位を持つこ
+ととして理解できるようになった。ボーアのモデルについて、電子が定常状態から別の定常状態へ遷
+移する機構は知られていなかったが、アルベルト・アインシュタインは1917\nobreak 年に、原子核崩壊からの
+類推によって、電子・原子核系すなわち原子の状態遷移が確率的に起こるというモデルを導入した。
+アインシュタインは、自身のモデルと古典的な統計力学を組み合わせることにより、原子集団の熱放
+射のエネルギー分布としてプランクの公式が得られることを示した。
+}
+
+
+\ltjenableadjust[lineend=extended, priority=true]
+\setbox40000=\vtop{\sample{lineend=extended, priority=true}}
+\ltjdisableadjust
+\ltjenableadjust[lineend=true, priority=false, priority=true]
+\setbox40002=\vtop{\sample{linened=true,priority=true}}
+\ltjdisableadjust
+\ltjenableadjust[lineend=false, priority=false, priority=true]
+\setbox40004=\vtop{\sample{lineend=false,priority=true}}
+\ltjdisableadjust
+\ltjenableadjust[lineend=extended, priority=false]
+\setbox40010=\vtop{\sample{lineend=extended, priority=false}}
+\ltjdisableadjust
+\ltjenableadjust[lineend=true, priority=false, priority=false]
+\setbox40012=\vtop{\sample{linened=true,priority=false}}
+\ltjdisableadjust
+\ltjenableadjust[lineend=false, priority=false, priority=false]
+\setbox40014=\vtop{\sample{lineend=false,priority=false}}
+\ltjdisableadjust
+
+\noindent
+\vrule\copy40000\vrule\hfill\vrule\copy40002\vrule\hfill\vrule\copy40014\vrule
+
+\begin{flushright}
+ 出典：Wikipedia日本語版「量子力学」の記事（一部，改段落削除），2016/08/10閲覧\\
+\catcode`\%=11\texttt{https://ja.wikipedia.org/wiki/%E9%87%8F%E5%AD%90%E5%8A%9B%E5%AD%A6}
+\end{flushright}
+\newpage
+\noindent
+\vrule\copy40000\vrule\hfill\vrule\copy40002\vrule\hfill\vrule\copy40004\vrule
 
 \end{document}
