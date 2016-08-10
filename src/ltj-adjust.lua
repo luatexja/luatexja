@@ -201,7 +201,7 @@ local function aw_step1(p, total)
 end
 
 -- step 1 行末用
-local min = math.min
+local min, max = math.min, math.max
 local function aw_step1_last(p, total)
    local head = getlist(p)
    local x = node_tail(head); if not x then return total, false end
@@ -240,10 +240,10 @@ local function aw_step1_last(p, total)
    if not eadt then 
       return total, false
    end
-   -- 続行条件2: eadt[1]<= \parfillskip <= eadt[#eadt]
+   -- 続行条件2: min(eadt[1], 0)<= \parfillskip <= max(eadt[#eadt], 0)
    local pfw = getfield(pf, 'width') 
      + (total>0 and getfield(pf, 'stretch') or -getfield(pf, 'shrink')) *getfield(p, 'glue_set') 
-   if pfw<min(0,eadt[1]) or eadt[#eadt]<pfw then return total, false end
+   if pfw<min(0,eadt[1]) or max(0,eadt[#eadt])<pfw then return total, false end
    -- \parfillskip を 0 にする
    total = total + getfield(pf, 'width') 
    total_st.order, total_sh.order = 0, 0
@@ -358,7 +358,8 @@ do
 	    setfield(x, 'kern', eadt[1]); set_attr(x, attr_icflag, LINEEND)
 	    insert_before(head, np.first, x)
 	 end
-	 for i=2,#eadt do
+	 local eadt_num = #eadt
+	 for i=2,eadt_num do
 	    local x = node_new(id_penalty)
 	    setfield(x, 'penalty', 0); set_attr(x, attr_icflag, KINSOKU)
 	    insert_before(head, np.first, x); Bp[#Bp+1] = x
@@ -366,12 +367,12 @@ do
 	    setfield(x, 'kern', eadt[i]-eadt[i-1]); set_attr(x, attr_icflag, LINEEND)
 	    insert_before(head, np.first, x)
 	 end
-         if #eadt>1 or eadt[1]~=0 then
+         if eadt_num>1 or eadt[1]~=0 then
 	    local x = node_new(id_penalty)
 	    setfield(x, 'penalty', 0); set_attr(x, attr_icflag, KINSOKU)
 	    insert_before(head, np.first, x); Bp[#Bp+1] = x
 	    local x = node_new(id_kern, 1)
-	    setfield(x, 'kern', -eadt[#eadt]); set_attr(x, attr_icflag, LINEEND)
+	    setfield(x, 'kern', -eadt[eadt_num]); set_attr(x, attr_icflag, LINEEND)
 	    insert_before(head, np.first, x)
 	    local x = node_new(id_penalty)
 	    setfield(x, 'penalty', 10000); set_attr(x, attr_icflag, KINSOKU)
