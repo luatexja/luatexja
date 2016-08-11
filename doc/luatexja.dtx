@@ -165,7 +165,7 @@
 \def\_{\leavevmode \kern .06em\vbox {\hrule \@width .333em}}
 \def\cs#1{\texttt{\upshape
   \texorpdfstring{\textbackslash\ltjsetparameter{autoxspacing=false}#1}{\textbackslash#1}}}
-
+\ltjsetparameter{alxspmode={`\\,allow}}
 %%%%%%%%
 \makeatother
 %%%%%%%%
@@ -177,8 +177,8 @@
   width:\hfill\ #2\cr height:\hfill\ #3\cr depth:\hfill\ #4\cr
   }}}}}\,}
 
-\protected\def\Param#1{\hyperlink{fld:#1}{\underline{\smash{\textsf{#1}}}}} % parameter name
-\protected\def\DParam#1{\hypertarget{fld:#1}{\underline{\smash{\textsf{#1}}}}} % parameter name (definition)
+\protected\def\Param#1{\textcompwordmark\hyperlink{fld:#1}{\underline{\smash{\textsf{#1}}}}\textcompwordmark} % parameter name
+\protected\def\DParam#1{\textcompwordmark\hypertarget{fld:#1}{\underline{\smash{\textsf{#1}}}}\textcompwordmark} % parameter name (definition)
 \protected\def\Pkg#1{\textsf{#1}} % packages/classes
 
 
@@ -8288,11 +8288,11 @@ with the \textit{id} of it:
 \Node{glyph}{accent}\\\noalign{\medskip}
 \Node{hbox}{accent (shifted vert.)}
 \end{array}\right\}\longrightarrow
-\Node{kern}{$\mathit{subtype}=2$}}^{\text{(a)}}
+\Node{kern}{$\mathit{subtype}=2$}}^{\text{(b)}}
 \longrightarrow
 \Node{glyph}{$p$}\longrightarrow
 \overbrace{%
-\Node{kern}{italic corr.}}^{\text{(b)}}
+\Node{kern}{italic corr.}}^{\text{(a)}}
 \]
 
 %<*en>
@@ -9397,13 +9397,42 @@ $b_{i}$達の最小値を与えるような$i$を$j$としたとき\footnote{%
 \textit{total}から$a_{j}$全角の大きさだけ引いておく．
 
 \subsection{行末文字の位置調整（行分割での考慮）}
-未完．最終行！
+\texttt{lineend=extended}が指定されている場合，\TeX による行分割が行われる前に
+各\textbf{JAchar}の直後に，その文字が行末に来たときの位置補正用のノードを挿入していく．
+
+\ref{sec-jfmglue}章の用語を使って述べる．
+前側のクラスタ\textit{Nq}が「和文A」「和文B」であり，
+JFMによって\texttt{end\_adjust}の値が
+\begin{quote}
+  \texttt{end\_adjust = \{$a_{1}$, $a_{2}$, ..., $a_{n}$\}}
+\end{quote}
+であったとする．このとき，次のクラスタ\textit{Np}の直前に以下のノード列を挿入する．
+\textbf{JAglue}の挿入過程で禁則処理のために「\textit{Nq}と\textit{Np}の間のペナルティ値を増やす」ことが
+行われることがあるが，以下で述べられている$(n+1)$個のペナルティはみなその処理対象になっている．
+\begin{align*}
+  \Node{kern}{$a_{1}\text{\cs{zw}}$}
+  &\longrightarrow \Node{penalty}{$0$} \longrightarrow\Node{kern}{$(a_{2}-a_{1})\text{\cs{zw}}$}
+  \longrightarrow \Node{penalty}{$0$} \longrightarrow\Node{kern}{$(a_{3}-a_{2})\text{\cs{zw}}$}\\
+  &\longrightarrow
+  \cdots \longrightarrow\Node{penalty}{$0$} \longrightarrow
+  \Node{kern}{$(a_{n}-a_{n-1})\text{\cs{zw}}$}
+  \longrightarrow \Node{penalty}{$0$} \longrightarrow
+  \Node{kern}{$-a_{n}\text{\cs{zw}}$} \longrightarrow \Node{penalty}{$10000$}
+\end{align*}
+$n$個あるペナルティの箇所が改行可能箇所である．いずれかで改行された場合は，
+その前にあるカーン（$n$箇所のうちどこで改行しても，合計の長さは$a_{i}$の形）は行末に残るが，
+後ろのペナルティ・カーンは除去される．なお，$a_1=0$のときは最初の幅が$a_{1}\text{\cs{zw}}$のカーンは不要なので挿入されず，
+さらにかつ$n=1$であった場合は後ろのペナルティも挿入されない．
+
+なお，段落の末尾には\cs{penalty10000}と\cs{parfillskip}由来のグルーが自動的に入るが，
+これらとの兼ね合いのため\emph{最後のクラスタについては上記のノード挿入処理は行われない}．
+段落最終行の行末文字の位置調整は，すでに述べた「行分割後の場合」における最終行の処理をそのまま用いている．
 
 \subsection{グルーの調整}
 $|\textit{total}|$の分だけが，行中のグルーの伸び量に応じて負担されることになる．
 以下，$\textit{total}\geq 0$であると仮定して話を進めるが，負のときも同様である．
 負担するグルーの優先度は以下の順であり，
-できるだけ\Param{kanjiskip}を自然長のままにすることを
+できるだけ \Param{kanjiskip} を自然長のままにすることを
 試みている．
 \begin{enumerate}\def\labelenumi{(\Alph{enumi})}
  \item \textbf{JAglue}以外のグルー
