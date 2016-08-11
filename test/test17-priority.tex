@@ -19,7 +19,7 @@
 
 \ltjdisableadjust
 \long\def\testbox#1{%
-  \textcolor{red!80!black}{\ltjenableadjust[all, lineend=extended]
+  \textcolor{red!80!black}{\ltjenableadjust[priority=true, lineend=extended]
     \setbox0=\vbox{%
       \hsize=20\zw#1%
 	}\ltjdisableadjust\outbox{ON}}\par
@@ -149,32 +149,19 @@ xkanjiskip: \ltjgetparameter{xkanjiskip}}
 あいうえおかきくけこさしすせそたちつ\vrule width 1\zw て，
 }
 
-\newpage
 
+次ページ以降の出典：
+  Wikisource日本語版「竹取物語」（一部），2016/08/11閲覧\\
+{\catcode`\%=11\texttt{https://ja.wikisource.org/wiki/%E7%AB%B9%E5%8F%96%E7%89%A9%E8%AA%9E}}
+
+\twocolumn
 \def\USTCON{\hbox{USTCON}}
-\def\sample#1{\small\hsize=17\zw\jfontspec[YokoFeatures={JFM=hang}]{ipam.ttf}
+\small\newdimen\R \R=25\zw
+\def\sample#1{\small\hsize=\R\jfontspec[YokoFeatures={JFM=hang}]{ipam.ttf}
 {\centering\scriptsize\textbf{\ttfamily #1}\par}\parindent1\zw%
 \ltjsetparameter{kanjiskip=.0\zw plus .4pt minus .5pt}
-1913年、ニールス・ボーアはラザフォードらによって得られた原子構造と、それ以前から報告されて
-いた原子のスペクトル線に関する結果から、原子に束縛された電子はある定常状態にあって、定常状
-態の電子は電磁波を放出せず、原子のスペクトル線の周波数は電子が異なる定常状態へ遷移する際に
-生じるエネルギー準位の差によって決定される、という仮定を導き出した。このモデルは今日、
-ボーアの原子模型と呼ばれる。ボーアは定常状態に関する仮定から、水素原子の問題に関する量子条
-件を得た。この量子条件はボーアの量子条件（英: Bohr's quantum condition）と呼ばれる。ボーア
-の量子条件によって、原子の定常状態が実現し得るためには水素原子核の周りを運動する束縛電子の
-角運動量が換算プランク定数の整数倍になっていなければならないが、その物理的な意味は明らかで
-はなかったが、後にド・ブロイの物質波を導入することで電子波が軌道上で定常波を成す条件として
-理解されるようになった。1915年から1916年にかけてアルノルト・ゾンマーフェルトによってボーア
-の方法が拡張された。ゾンマーフェルトによる量子条件はボーア＝ゾンマーフェルトの量子化条件と
-して知られる。ゾンマーフェルトはボーアの理論をニュートン力学の形式から解析力学の正準形式に
-置き換え、これにより1つのエネルギー準位に対して、ボーアの円軌道の他に楕円軌道をとる束縛電
-子が存在することが示された。これにより磁場中の原子のスペクトルが分裂するという正常ゼーマン
-効果は、同じエネルギー準位を持つ異なる電子軌道が、磁場によって別々のエネルギー準位を持つこ
-ととして理解できるようになった。ボーアのモデルについて、電子が定常状態から別の定常状態へ遷
-移する機構は知られていなかったが、アルベルト・アインシュタインは1917\nobreak 年に、原子核崩壊からの
-類推によって、電子・原子核系すなわち原子の状態遷移が確率的に起こるというモデルを導入した。
-アインシュタインは、自身のモデルと古典的な統計力学を組み合わせることにより、原子集団の熱放
-射のエネルギー分布としてプランクの公式が得られることを示した。
+かやうにて、御心を互に慰め給ふほどに、三年ばかりありて、春の初より、かぐや姫月のおもしろう出でたるを見て、常よりも物思ひたるさまなり。ある人の「月の顔見るは忌むこと。」ゝ制しけれども、ともすればひとまには月を見ていみじく泣き給ふ。七月のもちの月にいで居て、切に物思へるけしきなり。近く使はるゝ人々、竹取の翁に告げていはく、「かぐや姫例も月をあはれがり給ひけれども、この頃となりてはたゞ事にも侍らざンめり。いみじく思し歎くことあるべし。よく〳〵見奉らせ給へ。」といふを聞きて、かぐや姫にいふやう、「なでふ心ちすれば、かく物を思ひたるさまにて月を見給ふぞ。うましき世に。」といふ。かぐや姫、「月を見れば世の中こゝろぼそくあはれに侍り。なでふ物をか歎き侍るべき。」といふ。かぐや姫のある所に至りて見れば、なほ物思へるけしきなり。これを見て、「あが佛何事を思ひ給ふぞ。思すらんこと何事ぞ。」といへば、「思ふこともなし。物なん心細く覺ゆる。」といへば、翁、「月な見給ひそ。これを見給へば物思すけしきはあるぞ。」といへば、「いかでか月を見ずにはあらん。」とて、なほ月出づれば、いで居つゝ歎き思へり。夕暗には物思はぬ氣色なり。月の程になりぬれば、猶時々はうち歎きなきなどす。是をつかふものども、「猶物思すことあるべし。」とさゝやけど、親を始めて何事とも知らず。八月十五日ばかりの月にいで居て、かぐや姫いといたく泣き給ふ。人めも今はつゝみ給はず泣き給ふ。これを見て、親どもゝ「何事ぞ。」と問ひさわぐ。かぐや姫なく〳〵いふ、「さき〳〵も申さんと思ひしかども、『かならず心惑はし給はんものぞ。』と思ひて、今まで過し侍りつるなり。『さのみやは。』とてうち出で侍りぬるぞ。おのが身はこの國の人にもあらず、月の都の人なり。それを昔の契なりけるによりてなん、この世界にはまうで來りける。今は歸るべきになりにければ、この月の十五日に、かのもとの國より迎に人々まうでこんず。さらずまかりぬべければ、思し歎かんが悲しきことを、この春より思ひ歎き侍るなり。」といひて、いみじく泣く。翁「こはなでふことをの給ふぞ。竹の中より見つけきこえたりしかど、菜種の大さおはせしを、我丈たち並ぶまで養ひ奉りたる我子を、何人か迎へ聞えん。まさに許さんや。」といひて、「我こそ死なめ。」とて、泣きのゝしることいと堪へがたげなり。かぐや姫のいはく、「月の都の人にて父母あり。片時の間とてかの國よりまうでこしかども、かくこの國には數多の年を經ぬるになんありける。かの國の父母の事もおぼえず。こゝにはかく久しく遊び聞えてならひ奉れり。いみじからん心地もせず、悲しくのみなんある。されど己が心ならず罷りなんとする。」といひて、諸共にいみじう泣く。つかはるゝ人々も年頃ならひて、立ち別れなんことを、心ばへなどあてやかに美しかりつることを見ならひて、戀しからんことの堪へがたく、湯水も飮まれず、同じ心に歎しがりけり。この事を帝きこしめして、竹取が家に御使つかはさせ給ふ。御使に竹取いで逢ひて、泣くこと限なし。この事を歎くに、髪も白く腰も屈り目もたゞれにけり。翁今年は五十許なりけれども、「物思には片時になん老になりにける。」と見ゆ。御使仰事とて翁にいはく、「いと心苦しく物思ふなるは、誠にか。」と仰せ給ふ。
+
 }
 
 
@@ -197,15 +184,72 @@ xkanjiskip: \ltjgetparameter{xkanjiskip}}
 \setbox40014=\vtop{\sample{lineend=false,priority=false}}
 \ltjdisableadjust
 
-\noindent
-\vrule\copy40000\vrule\hfill\vrule\copy40002\vrule\hfill\vrule\copy40014\vrule
+{\catcode`\#=12
+\directlua{%
+  function gb(a)
+     local t = tex.getbox(a)
+     local x = {}
+     for n in node.traverse_id(node.id('hlist'), t.head) do
+        local b = n.glue_order>0 and 0 or 100*math.pow(n.glue_set, 3);
+        if b<=12 then x[#x+1]={2,b}    % decent
+        elseif n.glue_sign==1 and b>=100 then x[#x+1]={0,b} %very loose
+        elseif n.glue_sign==1 then x[#x+1]={1,b} % loose
+        else   x[#x+1]={3,b} end %tight
+     end
+     x[0]={2, 0}
+     local d = 0
+     for i=1,#x do
+       d = d + math.pow(tex.linepenalty + x[i][2], 2)
+       if math.abs(x[i][1]-x[i-1][1])>=1 then d = d + tex.adjdemerits end
+     end
+     tex.sprint(-2,tostring(d) )
+  end
+}}
+\protected\def\getbadness#1{\par\medskip\textcolor{blue}{\small demerits: \directlua{gb(#1)}}}
 
-\begin{flushright}
- 出典：Wikipedia日本語版「量子力学」の記事（一部，改段落削除），2016/08/10閲覧\\
-\catcode`\%=11\texttt{https://ja.wikipedia.org/wiki/%E9%87%8F%E5%AD%90%E5%8A%9B%E5%AD%A6}
-\end{flushright}
+\noindent
+\vrule\copy40010\vrule\relax\getbadness{40010}
+
+\medskip
+\noindent
+\vrule\copy40012\vrule\relax\getbadness{40012}
+
 \newpage
 \noindent
-\vrule\copy40000\vrule\hfill\vrule\copy40002\vrule\hfill\vrule\copy40004\vrule
+\vrule\copy40014\vrule\relax\getbadness{40014}
+
+\clearpage
+\R28\zw
+\ltjenableadjust[lineend=extended, priority=true]
+\setbox40000=\vtop{\sample{lineend=extended, priority=true}}
+\ltjdisableadjust
+\ltjenableadjust[lineend=true, priority=false, priority=true]
+\setbox40002=\vtop{\sample{linened=true,priority=true}}
+\ltjdisableadjust
+\ltjenableadjust[lineend=false, priority=false, priority=true]
+\setbox40004=\vtop{\sample{lineend=false,priority=true}}
+\ltjdisableadjust
+\ltjenableadjust[lineend=extended, priority=false]
+\setbox40010=\vtop{\sample{lineend=extended, priority=false}}
+\ltjdisableadjust
+\ltjenableadjust[lineend=true, priority=false, priority=false]
+\setbox40012=\vtop{\sample{linened=true,priority=false}}
+\ltjdisableadjust
+\ltjenableadjust[lineend=false, priority=false, priority=false]
+\setbox40014=\vtop{\sample{lineend=false,priority=false}}
+\ltjdisableadjust
+
+\noindent
+\vrule\copy40010\vrule\relax\getbadness{40010}
+
+\newpage
+\noindent
+\vrule\copy40012\vrule\relax\getbadness{40012}
+\newpage
+\noindent
+\vrule\copy40014\vrule\relax\getbadness{40014}
+
+
+
 
 \end{document}
