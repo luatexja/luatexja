@@ -6912,37 +6912,79 @@ for making the difference obvious.
 (see Japanese version of this manual)
 %</en>
 %<*ja>
+この追加パッケージは以下の機能を提供する．詳細な仕様については\ref{sec-adjspec}章を参照してほしい．
+\begin{description}
+\item[行末文字の位置調整]
+  \pTeX では，（是非はともかく）「行末の読点はぶら下げか二分取りか全角取りのいずれかに」のように
+  行末文字と実際の行末の位置関係を2通り以上にすることは面倒であった．
+  和文フォントメトリックだけでは「常に行末の読点はぶら下げ」といったことしかできず，
+  前の文に書いたことを実現するには
+\begin{lstlisting}
+\def\。{%
+  \penalty10000 % 禁則ペナルティ
+  \hbox to0pt{。\hss}\penalty0 % ぶら下げの場合
+  \kern.5\zw\penalty0 % 二分取りの場合
+  \kern.5\zw\penalty0 % 全角取りの場合
+}
+\end{lstlisting}
+  のような命令を定義し，文中の全ての句点を \lstinline+\。+ で書くことが必要だった．
+
+\Pkg{luatexja-adjust}パッケージは，上で述べた行末文字と実際の行末との位置関係を
+2通り以上から自動的に選択する機能を提供する．
+\pdfTeX と同じように，「\TeX による行分割の後で行末文字の位置を補正する」方法と
+  「行分割の過程で行末文字の位置を考慮に入れる」方法を選べるようにした（
+\Pkg{luatexja-adjust}パッケージの既定では前者）．
+  
+\item[優先順位付きの行長調整]
 \pTeX では，行長調整において優先度の概念が存在しなかったため，図
 \ref{fig-adj}上段における半角分の半端は，図\ref{fig-adj}中段のように，鍵
 括弧周辺の空白と和文間空白(\Param{kanjiskip})の両方によって負担される．し
 かし，「日本語組版処理の要件」\cite{jlreq}やJIS~X~4051~\cite{x4051}におい
 ては，このような状況では半端は鍵括弧周辺の空白のみで負担し，その他の和文
-文字はベタ組で組まれる（図\ref{fig-adj}下段）ことになっている．この追加
-パッケージは\cite{jlreq}や\cite{x4051}における規定のような，優先順位付き
-の行長調整を提供する．詳細な仕様については\ref{sec-adjspec}章を参照してほしい．
+文字はベタ組で組まれる（図\ref{fig-adj}下段）ことになっている．
+\Pkg{luatexja-adjust}パッケージの提供する第2の機能は，
+\cite{jlreq}や\cite{x4051}における規定のような，優先順位付き
+の行長調整である．
 \begin{itemize}
  \item 優先度付き行長調整は，段落を行分割した後に個々の行について行われるものである．
 そのため，行分割の位置は変化することはない．
 
-また，\verb+\hbox to ... {...}+ のような「幅が指定されたhbox」では無効である．
+\verb+\hbox{...}+ といった「途中で改行できない水平ボックス」では（たとえ幅が指定されていても）無効である．
  \item 優先度付き行長調整を行うと，和文処理グルーの自然長は変化しないが，伸び量や縮み量は
 一般に変化する．そのため，既に組まれた段落を \cs{unhbox} などを利用して組み直す処理を
 行う場合には注意が必要である．
 \end{itemize}
+\end{description}
 
-
-\Pkg{luatexja-adjust}は，以下の命令を提供する．これらはすべてグローバルに効力を発揮する．
+\Pkg{luatexja-adjust}パッケージは，上記で述べた2機能を有効化/無効化するための
+以下の命令を提供する．これらはすべてグローバルに効力を発揮する．
 
 \begin{cslist}
+\item[\cs{ltjenableadjust[...]}]
+\verb+...+ に指定したkey-valueリストに従い，「行末文字の位置調整」「優先順位付きの行長調整」を有効化/無効化する．
+指定できるキーは以下の通り．
+\begin{description}
+  \item[\texttt{lineend=[false,true,extended]}]
+  行末文字の位置調整の機能を無効化(\texttt{false})，「行分割後に調整」の形で有効化(\texttt{true})，
+  「行分割の仮定で考慮」(\texttt{extended})する．
+  \item[\texttt{priority=[false,true]}]
+  優先順位付きの行長調整を無効化(\texttt{false})，または有効化(\texttt{true})する．
+\end{description}
+両キーともキー名のみを指定した場合は値として\texttt{true}が指定されたものと扱われる．
+
+互換性の為，オプション無しでただ\cs{ltjenableadjust}が呼び出された場合は，
+\begin{lstlisting}
+\ltjenableadjust[lineend=true,priority=true]
+\end{lstlisting}
+と扱われる．
+  
 \item[\cs{ltjdisableadjust}]
-優先順位付きの行長調整を無効化する．
+\Pkg{luatexja-adjust}パッケージの機能を無効化する．
+\begin{lstlisting}
+\ltjenableadjust[lineend=false,priority=false]
+\end{lstlisting}
+と同義．
 
-\item[\cs{ltjenableadjust}]
-優先順位付きの行長調整を有効化する．
-
-\item[\textsf{adjust}\,=<bool>] \cs{ltjsetparameter} で指定可能な追加パラメータであり，
-<bool>が\textit{true}なら \cs{ltjenableadjust} を，
-そうでなければ \cs{ltjdisableadjust} を実行する．
 \end{cslist}
 %</ja>
 
@@ -9264,23 +9306,22 @@ the \texttt{lstlisting} environment or other environments/commands.
 %<*ja>
 \section{和文の行長補正方法}
 \label{sec-adjspec}
-\Pkg{luatexja-adjust}で提供される優先順位付きの行長調整の詳細を述
-べる．大まかに述べると，次のようになる．
+\Pkg{luatexja-adjust}で提供される優先順位付きの行長調整の詳細を大まかに述べると，次のようになる．
 \begin{itemize}
+\item （\texttt{lineend=extended}の場合）\textbf{JAglue}の挿入処理のところで，
+  ……
 \item 通常の\TeX の行分割方法に従って，段落を行分割する．この段階では，行
       長に半端が出た場合，その半端分は\textbf{JAglue}（\Param{xkanjiskip}，
       \Param{kanjiskip}，JFMグルー）と
       それ以外のグルーの全てで（優先順位なく）負担される．
 \item その後，\texttt{post\_linebreak\_filter} callbackを使い，\emph{段
-      落中の各行ごとに}，行末文字の位置を調整したり，優先度付きの行長調整
+      落中の各行ごとに}，行末文字の位置を調整（\texttt{lineend=true}の場合）したり，優先度付きの行長調整
       を実現するためにグルーの伸縮度を調整する．
       その処理においては，グルーの自然長と\textbf{JAglue}以外の
       グルーの伸び量・縮み量は変更せず，必要に応じて\textbf{JAglue}の伸び量・縮み量のみを
       変更する設計とした．
-
-\Pkg{luatexja-adjust} の作用は，この処理を行うcallbackを追加するだけであり，
-      この章の残りではcallbackでの処理について解説する．
 \end{itemize}
+この章の残りでは各処理について解説する．
 
 \paragraph{準備：合計伸縮量の計算}
 グルーの伸縮度（\texttt{plus} や \texttt{minus} で指定されている値）には，
@@ -9317,22 +9358,34 @@ T^{+}&:=T^{+}_{L^+},&L^{+} = \max \{l\in
 
 また，行長から自然長を引いた値を\textit{total}とおく．
 
-\subsection{行末文字の位置調整}
-行末が文字クラス$n$の\textbf{JAchar}であった場合，
-\texttt{end\_adjust} の値のいずれかだけこの文字の位置を移動させる．
-
+\subsection{行末文字の位置調整（行分割後の場合）}
+行末が\textbf{JAchar}であり，この文字の属する文字クラスでは
 \begin{quote}
   \texttt{end\_adjust = \{$a_{1}$, $a_{2}$, ..., $a_{n}$\}}
 \end{quote}
-であったとする．各$1\leq i\leq n$に対して，
+であったとする．
+このとき，以下の条件を満たした場合，
+この文字クラスに対する\texttt{end\_adjust}の値のいずれかだけこの文字の位置を移動させる．
+\begin{description}
+  \item[最終行以外] 行長調整に無限大の伸縮度が用いられていない．
+  すなわち，$\textit{total}>0$ならば$L^{+}=(\text{finite})$であり，
+  $\textit{total}>0$ならば$L^{-}=(\text{finite})$である．
+  \item[最終行] 行長調整に無限大に伸び縮みするグルーが用いられたなら，それは\cs{parfillskip}のみであり，
+    かつ，次の不等式が成立する：
+  \[
+   \min\{0,a_{1}\}\text{\cs{zw}}\leq (\text{\cs{parfillskip}の実際の長さ}) \leq \max\{0,a_{n}\}\text{\cs{zw}}
+  \]
+\end{description}
+
+各$1\leq i\leq n$に対して，
 「行末に$a_{i}$全角だけのカーンを追加した時の，\textit{glue\_set}の値」を
 $b_{i}$とおく．式で書くと，
 \[
 \catcode`\<=12
 b_{i} = \begin{cases}
-  |\textit{total}-a_{i}\cdot \text{\cs{zw}}|/T^{+}
+  |\textit{total}-a_{i}\text{\cs{zw}}|/T^{+}
 	  &(\textit{total}-a_{i}\text{\cs{zw}}\geq 0)\\
-  |\textit{total}-a_{i}\cdot \text{\cs{zw}}|/T^{-}
+  |\textit{total}-a_{i}\text{\cs{zw}}|/T^{-}
 	  &(\textit{total}-a_{i}\text{\cs{zw}}<0)
 \end{cases}.
 \]
@@ -9342,6 +9395,9 @@ $b_{i}$達の最小値を与えるような$i$を$j$としたとき\footnote{%
 }，
 行末に大きさ$a_{j}$のカーンを追加する．
 \textit{total}から$a_{j}$全角の大きさだけ引いておく．
+
+\subsection{行末文字の位置調整（行分割での考慮）}
+未完．最終行！
 
 \subsection{グルーの調整}
 $|\textit{total}|$の分だけが，行中のグルーの伸び量に応じて負担されることになる．

@@ -95,7 +95,6 @@
 \newcount\ltjadj@status@le
 \newcount\ltjadj@status@pr
 \let\ltj@adjust@temp=\relax
-\define@key[ltj]{adjust}{all}[]{\ltjadj@status@le=1 \ltjadj@status@pr=1 }
 \define@choicekey[ltj]{adjust}{lineend}[\@@temp\ltj@adjust@temp]%
 {false,true,extended}[true]{%
   \ifnum\ltj@adjust@temp=-1 \else\ltjadj@status@le=\ltj@adjust@temp\fi\relax}
@@ -105,12 +104,9 @@
    \setkeys[ltj]{adjust}{#1}%
    \directlua{luatexja.adjust.enable_cb(\the\ltjadj@status@le, \the\ltjadj@status@pr)}\ignorespaces
 }
-\protected\def\ltjdisableadjust{\ltjenableadjust*[]}
+\protected\def\ltjdisableadjust{\ltjenableadjust[lineend=false,priority=false]}
 \protected\def\ltjenableadjust{%
-   \ltx@ifnextchar*{\ltjadj@status@pr\z@\ltjadj@status@le\z@
-     \ltx@firstoftwo{\@ltjenableadjust}}{\@ltjenableadjust}}
-\protected\def\@ltjenableadjust{%
-   \ltx@ifnextchar[{\@@ltjenableadjust}{\@@ltjenableadjust[all]}}%]
+   \ltx@ifnextchar[{\@@ltjenableadjust}{\@@ltjenableadjust[lineend,priority]}}%]
 
 \ltjenableadjust
 % there is also a key for \ltjsetparameter, for same effect
