@@ -956,7 +956,25 @@ end
 
 -- vsplit
 do
-   local split_dir_whatsit
+   local split_dir_whatsit, split_dir_head
+   local cat_lp = luatexbase.catcodetables['latex-package']
+   local sprint, scan_int, tex_getbox = tex.sprint, token.scan_int, tex.getbox
+   function luatexja.direction.vsplit()
+      local n = scan_int();
+      local p = to_direct(tex_getbox(n))
+      split_dir_head = nil
+      if p then
+	 local bh = getlist(p)
+	 if getid(bh)==id_whatsit and getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR 
+	    and node_next(bh) then
+	    ltjs.list_dir = has_attr(bh, attr_dir)
+	    local q = node_next(p)
+	    setfield(p, 'head', node_remove(bh,bh,bh))
+	    split_dir_head = bh
+	 end
+      end
+      sprint(cat_lp, '\\ltj@@orig@vsplit' .. tostring(n))
+   end	
    local function dir_adjust_vpack(h, gc)
       start_time_measure('direction_vpack')
       local hd = to_direct(h)
@@ -965,10 +983,9 @@ do
 	 hd = create_dir_whatsit_vbox(hd, gc)
 	 split_dir_whatsit = hd
       elseif gc=='split_off'  then
-	 for  bh in traverse_id(id_whatsit, hd) do
-	    if getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR then
-	       ltjs.list_dir  = has_attr(bh, attr_dir); break
-	    end
+	 if split_dir_head then
+	    list_dir = has_attr(split_dir_head, attr_dir)
+	    hd = insert_before(hd, hd, split_dir_head)
 	 end
 	 if split_dir_whatsit then
 	    -- adjust direction of 'split_keep'
