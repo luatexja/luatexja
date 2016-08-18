@@ -224,6 +224,9 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \newif\if@english
 \@englishfalse
 \DeclareOption{english}{\@englishtrue}
+\newif\if@jslogo \@jslogotrue
+\DeclareOption{jslogo}{\@jslogotrue}
+\DeclareOption{nojslogo}{\@jslogofalse}
 \ExecuteOptions{a4paper,oneside,onecolumn,notitlepage,final}
 \ProcessOptions
 \if@slide
@@ -809,7 +812,9 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
     \@afterheading
   \fi
   \if@slide
-    {\vskip-6\jsc@mpt\maybeblue\hrule height0\jsc@mpt depth1\jsc@mpt\vskip7\jsc@mpt\relax}%
+    {\vskip\if@twocolumn-5\jsc@mpt\else-6\jsc@mpt\fi
+     \maybeblue\hrule height0\jsc@mpt depth1\jsc@mpt
+     \vskip\if@twocolumn 4\jsc@mpt\else 7\jsc@mpt\fi\relax}
   \fi
   \par  % 2000-12-18
   \ignorespaces}
@@ -894,7 +899,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \fi
 \if@twocolumn
   \newcommand{\subsection}{\@startsection{subsection}{2}{\z@}%
-    {\z@}{\z@}%
+    {\z@}{\if@slide .4\Cvs \else \z@ \fi}%
     {\normalfont\normalsize\headfont}}
 \else
   \newcommand{\subsection}{\@startsection{subsection}{2}{\z@}%
@@ -904,27 +909,33 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \fi
 \if@twocolumn
   \newcommand{\subsubsection}{\@startsection{subsubsection}{3}{\z@}%
-    {\z@}{\z@}%
+    {\z@}{\if@slide .4\Cvs \else \z@ \fi}%
     {\normalfont\normalsize\headfont}}
 \else
   \newcommand{\subsubsection}{\@startsection{subsubsection}{3}{\z@}%
     {\Cvs \@plus.5\Cdp \@minus.2\Cdp}%
-    {\z@}%
+    {\if@slide .5\Cvs \@plus.3\Cdp \else \z@ \fi}%
     {\normalfont\normalsize\headfont}}
 \fi
 \if@twocolumn
   \newcommand{\paragraph}{\@startsection{paragraph}{4}{\z@}%
-    {\z@}{-1\zw}% 改行せず 1\zw のアキ
+    {\z@}{\if@slide .4\Cvs \else -1\zw\fi}% 改行せず 1\zw のアキ
     {\normalfont\normalsize\headfont ■}}
 \else
   \newcommand{\paragraph}{\@startsection{paragraph}{4}{\z@}%
     {0.5\Cvs \@plus.5\Cdp \@minus.2\Cdp}%
-    {-1\zw}% 改行せず 1\zw のアキ
+    {\if@slide .5\Cvs \@plus.3\Cdp \else -1\zw\fi}% 改行せず 1\zw のアキ
     {\normalfont\normalsize\headfont ■}}
 \fi
-\newcommand{\subparagraph}{\@startsection{subparagraph}{5}{\z@}%
-   {\z@}{-1\zw}%
-   {\normalfont\normalsize\headfont}}
+\if@twocolumn
+  \newcommand{\subparagraph}{\@startsection{subparagraph}{5}{\z@}%
+    {\z@}{\if@slide .4\Cvs \@plus.3\Cdp \else -1\zw\fi}%
+    {\normalfont\normalsize\headfont}}
+\else
+  \newcommand{\subparagraph}{\@startsection{subparagraph}{5}{\z@}%
+    {\z@}{\if@slide .5\Cvs \@plus.3\Cdp \else -1\zw\fi}%
+    {\normalfont\normalsize\headfont}}
+\fi
 \if@slide
   \setlength\leftmargini{1\zw}
 \else
@@ -1428,11 +1439,12 @@ class has defined the old font commands like\MessageBreak
     \unskip \reserved@e {\reserved@f#1}\nobreak \hfil \break \null
     \inhibitglue \ignorespaces
   \fi}
-\IfFileExists{jslogo.sty}{%
+\IfFileExists{jslogo.sty}{}{\@jslogofalse}%
+\if@jslogo
   \RequirePackage{jslogo}
   \def\小{\jslg@small}
   \def\上小{\jslg@uppersmall}
-}{%
+\else
 \def\小##1{\hbox{$\m@th$%
   \csname S@\f@size\endcsname
   \fontsize\sf@size\z@
@@ -1563,7 +1575,7 @@ class has defined the old font commands like\MessageBreak
   \ifx\f@family\cmr\kern-.08em\else\kern-.15em\fi\TeX}
 \DeclareRobustCommand{\SliTeX}{%
   S\kern-.06emL\kern-.18em\上小{I}\kern -.03em\TeX}
-}
+\fi
 \newcommand{\prepartname}{\if@english Part~\else 第\fi}
 \newcommand{\postpartname}{\if@english\else 部\fi}
 \newcommand{\presectionname}{}%  第
