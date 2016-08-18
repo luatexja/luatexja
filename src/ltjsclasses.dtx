@@ -5071,12 +5071,12 @@
 % 文字を小さめに出したり上寄りに小さめに出したりする命令です。
 %
 %    \begin{macrocode}
-\def\小##1{\hbox{$\m@th$%
+\def\小#1{\hbox{$\m@th$%
   \csname S@\f@size\endcsname
   \fontsize\sf@size\z@
   \math@fontsfalse\selectfont
-  ##1}}
-\def\上小##1{{\sbox\z@ T\vbox to\ht0{\小{##1}\vss}}}
+  #1}}
+\def\上小#1{{\sbox\z@ T\vbox to\ht0{\小{#1}\vss}}}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
