@@ -5,15 +5,14 @@ luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 luatexja.load_module('jfmglue');   local ltjj = luatexja.jfmglue
 luatexja.load_module('stack');     local ltjs = luatexja.stack
 luatexja.load_module('direction'); local ltjd = luatexja.direction
+luatexja.adjust = luatexja.adjust or {}
 
 local to_node = node.direct.tonode
 local to_direct = node.direct.todirect
 
 local setfield = node.direct.setfield
 local setglue = luatexja.setglue
-local getglue = luatexja.getglue
 local getfield = node.direct.getfield
-local is_zero_glue = node.direct.is_zero_glue
 local getlist = node.direct.getlist
 local getid = node.direct.getid
 local getfont = node.direct.getfont
@@ -21,8 +20,6 @@ local getsubtype = node.direct.getsubtype
 
 local node_traverse_id = node.direct.traverse_id
 local node_new = node.direct.new
-local node_copy = node.direct.copy
-local node_hpack = node.direct.hpack
 local node_next = node.direct.getnext
 local node_free = node.direct.free
 local node_prev = node.direct.getprev
@@ -42,7 +39,7 @@ local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local lang_ja = luatexja.lang_ja
 
 local ltjf_font_metric_table = ltjf.font_metric_table
-local round, pairs = tex.round, pairs
+local ipairs, pairs = ipairs, pairs
 
 local PACKED       = luatexja.icflag_table.PACKED
 local LINEEND      = luatexja.icflag_table.LINEEND
@@ -52,16 +49,6 @@ local KANJI_SKIP_JFM = luatexja.icflag_table.KANJI_SKIP_JFM
 local XKANJI_SKIP  = luatexja.icflag_table.XKANJI_SKIP
 local XKANJI_SKIP_JFM  = luatexja.icflag_table.XKANJI_SKIP_JFM
 
-local priority_table = {
-   FROM_JFM + 2,
-   FROM_JFM + 1,
-   FROM_JFM,
-   FROM_JFM - 1,
-   FROM_JFM - 2,
-   XKANJI_SKIP,
-   KANJI_SKIP
-}
-
 local get_attr_icflag
 do
    local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
@@ -70,9 +57,37 @@ do
    end
 end
 
+local priority_num = { 0, 0 }
+local at2pr = { {}, {} }
+do
+   local tmp = {}
+   local function cmp(a,b) return a[1]>b[1] end -- 大きいほうが先！
+   local function make_priority_table(glue_sign, xsk, ksk, others)
+      for i,_ in pairs(tmp) do tmp[i]=nil end
+      for i=-2,2 do tmp[#tmp+1] = { i, FROM_JFM+i } end
+      tmp[#tmp+1] = { xsk, XKANJI_SKIP }
+      tmp[#tmp+1] = { xsk, XKANJI_SKIP_JFM }
+      tmp[#tmp+1] = { ksk, KANJI_SKIP }
+      tmp[#tmp+1] = { ksk, KANJI_SKIP_JFM }
+      tmp[#tmp+1] = { others, -1 }
+      table.sort(tmp, cmp)
+      local a, m, n = at2pr[glue_sign], 10000000, 0
+      for i=1,#tmp do
+	 if tmp[i][1]<m then n,m = n+1,tmp[i][1] end
+	 a[tmp[i][2]] = n
+      end
+      priority_num[glue_sign] = n
+      setmetatable(a, {__index = function () return others end })
+   end
+   make_priority_table(1, -3, -4, 5)
+   make_priority_table(2, -3, -4, 5)
+   luatexja.adjust.make_priority_table = make_priority_table
+end
+
 -- box 内で伸縮された glue の合計値を計算
 
 local total_stsh = {{},{}}
+local at2pr_st, at2pr_sh = at2pr[1], at2pr[2]
 local total_st, total_sh = total_stsh[1], total_stsh[2]
 local get_total_stretched
 do
@@ -82,30 +97,22 @@ function get_total_stretched(p)
    local ph = getlist(p)
    if not ph then return 0 end
    for i,_ in pairs(total_st) do total_st[i]=nil; total_sh[i]=nil end
-   for i=1,#priority_table do 
-      total_st[priority_table[i]]=0; total_sh[priority_table[i]]=0; 
-   end
+   for i=1,priority_num[1] do total_st[i]=0 end
+   for i=1,priority_num[2] do total_sh[i]=0 end
    for i=0,4 do total_st[i*65536]=0; total_sh[i*65536]=0 end
-   total_st[-1]=0; total_sh[-1]=0;   
    for q in node_traverse_id(id_glue, ph) do
       local a = getfield(q, 'stretch_order')
-      if a>0 then a=a*65536 else 
-         total_st[0] = total_st[0]+getfield(q, 'stretch')
-         a = get_attr_icflag(q)
-         if a == KANJI_SKIP_JFM  then a = KANJI_SKIP
-	 elseif a == XKANJI_SKIP_JFM  then a = XKANJI_SKIP
-	 elseif type(total_st[a])~='number' then a = -1 end
+      if a==0 then
+	 local b = at2pr_st[get_attr_icflag(q)]; 
+	 total_st[b] = total_st[b]+getfield(q, 'stretch')
       end
-      total_st[a] = total_st[a]+getfield(q, 'stretch')
+      total_st[a*65536] = total_st[a]+getfield(q, 'stretch')
       local a = getfield(q, 'shrink_order')
-      if a>0 then a=a*65536 else 
-         total_sh[0] = total_sh[0]+getfield(q, 'shrink')
-         a = get_attr_icflag(q)
-         if a == KANJI_SKIP_JFM  then a = KANJI_SKIP
-         elseif a == XKANJI_SKIP_JFM  then a = XKANJI_SKIP
-	 elseif type(total_sh[a])~='number' then a = -1 end
+      if a==0 then
+	 local b = at2pr_sh[get_attr_icflag(q)]; 
+	 total_sh[b] = total_sh[b]+getfield(q, 'shrink')
       end
-      total_sh[a] = total_sh[a]+getfield(q, 'shrink')
+      total_sh[a*65536] = total_sh[a]+getfield(q, 'shrink')
    end
    for i=4,1,-1 do if total_st[i*65536]~=0 then total_st.order=i; break end; end
    if not total_st.order then
@@ -117,32 +124,6 @@ function get_total_stretched(p)
    end
    return getfield(p,'width') - dimensions(ph)
 end
-end
-
-local function clear_stretch(p, ic, name)
-   for q in node_traverse_id(id_glue, getlist(p)) do
-      local f = get_attr_icflag(q)
-      if (f == ic) or ((ic ==KANJI_SKIP) and (f == KANJI_SKIP_JFM))
-	   or ((ic ==XKANJI_SKIP) and (f == XKANJI_SKIP_JFM)) then
-         setfield(q, name..'_order', 0)
-         setfield(q, name, 0)
-      end
-   end
-end
-
-local function set_stretch(p, after, before, ic, name)
-   if before > 0 then
-      local ratio = after/before
-      for q in node_traverse_id(id_glue, getlist(p)) do
-	 local f = get_attr_icflag(q)
-         if (f == ic) or ((ic ==KANJI_SKIP) and (f == KANJI_SKIP_JFM))
-	   or ((ic ==XKANJI_SKIP) and (f == XKANJI_SKIP_JFM)) then
-	    if getfield(q, name..'_order')==0 then
-               setfield(q, name, getfield(q, name)*ratio)
-            end
-         end
-      end
-   end
 end
 
 -- step 1: 行末に kern を挿入（句読点，中点用）
@@ -253,13 +234,15 @@ local function aw_step1_last(p, total)
    total = total + getfield(pf, 'width') 
    total_st.order, total_sh.order = 0, 0
    if getfield(pf, 'stretch_order')==0 then 
+      local i = at2pr_st[-1] 
       total_st[0] = total_st[0] - getfield(pf, 'stretch') 
-      total_st[-1] = total_st[-1] - getfield(pf, 'stretch') 
+      total_st[i] = total_st[i] - getfield(pf, 'stretch') 
       total_st.order = (total_st[0]==0) and -1 or 0
    end
    if getfield(pf, 'shrink_order')==0 then 
+      local i = at2pr_sh[-1] 
       total_sh[0] = total_sh[0] - getfield(pf, 'shrink') 
-      total_sh[-1] = total_sh[-1] - getfield(pf, 'shrink') 
+      total_sh[i] = total_sh[i] - getfield(pf, 'shrink') 
       total_sh.order = (total_sh[0]==0) and -1 or 0
    end
    setfield(pf, 'subtype', 1); setglue(pf)
@@ -292,60 +275,66 @@ end
 
 
 -- step 2: 行中の glue を変える
-local function aw_step2_dummy(p, _, added_flag)
-   if added_flag then -- 行末に kern 追加したので，それによる補正
-      local f = node_hpack(getlist(p), getfield(p, 'width'), 'exactly')
-      setfield(f, 'head', nil)
-      setfield(p, 'glue_set', getfield(f, 'glue_set'))
-      setfield(p, 'glue_order', getfield(f, 'glue_order'))
-      setfield(p, 'glue_sign', getfield(f, 'glue_sign'))
-      node_free(f)
-      return
+local aw_step2, aw_step2_dummy
+do
+local node_hpack = node.direct.hpack
+local function repack(p)
+   local f = node_hpack(getlist(p), getfield(p, 'width'), 'exactly')
+   setfield(f, 'head', nil)
+   setfield(p, 'glue_set', getfield(f, 'glue_set'))
+   setfield(p, 'glue_order', getfield(f, 'glue_order'))
+   setfield(p, 'glue_sign', getfield(f, 'glue_sign'))
+   node_free(f)
+   return
+end
+function aw_step2_dummy(p, _, added_flag)
+   if added_flag then return repack(p) end
+end
+
+local function clear_stretch(p, ind, ap, name)
+   for q in node_traverse_id(id_glue, getlist(p)) do
+      local f = ap[get_attr_icflag(q)]
+      if f == ind then
+         setfield(q, name..'_order', 0)
+         setfield(q, name, 0)
+      end
    end
 end
-local function aw_step2(p, total, added_flag)
+
+local function set_stretch(p, after, before, ind, ap, name)
+   if before > 0 then
+      local ratio = after/before
+      for q in node_traverse_id(id_glue, getlist(p)) do
+	 local f = ap[get_attr_icflag(q)]
+         if (f==ind) and getfield(q, name..'_order')==0 then
+            setfield(q, name, getfield(q, name)*ratio)
+         end
+      end
+   end
+end
+
+function aw_step2(p, total, added_flag)
    local name = (total>0) and 'stretch' or 'shrink'
-   local res = total_stsh[(total>0) and 1 or 2]
+   local id =  (total>0) and 1 or 2
+   local res = total_stsh[id]
+   local pnum = priority_num[id]
    if total==0 or res.order > 0 then 
       -- もともと伸縮の必要なしか，残りの伸縮量は無限大
-      if added_flag then -- 行末に kern 追加したので，それによる補正
-	 local f = node_hpack(getlist(p), getfield(p, 'width'), 'exactly')
-	 setfield(f, 'head', nil)
-	 setfield(p, 'glue_set', getfield(f, 'glue_set'))
-	 setfield(p, 'glue_order', getfield(f, 'glue_order'))
-	 setfield(p, 'glue_sign', getfield(f, 'glue_sign'))
-	 node_free(f)
-	 return
-      end
+      if added_flag then return repack(p) end
    end
    total = abs(total)
-   if total <= res[-1] then -- 和文処理グルー以外で足りる
-      for _,v in pairs(priority_table) do clear_stretch(p, v, name) end
-      local f = node_hpack(getlist(p), getfield(p, 'width'), 'exactly')
-      setfield(f, 'head', nil)
-      setfield(p, 'glue_set', getfield(f, 'glue_set'))
-      setfield(p, 'glue_order', getfield(f, 'glue_order'))
-      setfield(p, 'glue_sign', getfield(f, 'glue_sign'))
-      node_free(f)
-   else
-      total = total - res[-1]; 
-      for i = 1, #priority_table do
-	 local v = priority_table[i]
-         if total <= res[v] then
-            for j = i+1,#priority_table do
-               clear_stretch(p, priority_table[j], name)
-            end
-            set_stretch(p, total, res[v], v, name); break
+   for i = 1, pnum do
+      if total <= res[i] then
+	 local a = at2pr[id]  
+         for j = i+1,pnum do
+            clear_stretch(p, j, a, name)
          end
-         total = total - res[v]
+         set_stretch(p, total, res[i], i, a, name); break
       end
-      local f = node_hpack(getlist(p), getfield(p, 'width'), 'exactly')
-      setfield(f, 'head', nil)
-      setfield(p, 'glue_set', getfield(f, 'glue_set'))
-      setfield(p, 'glue_order', getfield(f, 'glue_order'))
-      setfield(p, 'glue_sign', getfield(f, 'glue_sign'))
-      node_free(f)
+      total = total - res[i]
    end
+   return repack(p)
+end
 end
 
 -- step 1': lineend=extended の場合（行分割時に考慮））
@@ -386,7 +375,7 @@ do
    end
 end
 
-local adust_width
+local adjust_width
 do
    local myaw_atep1, myaw_step2, myaw_step1_last
    local dummy =  function(p,t,n) return t, false end
@@ -435,7 +424,8 @@ do
    function disable_cb() -- only for compatibility
        enable_cs(0)
    end
-   luatexja.adjust = luatexja.adjust or {enable_cb=enable_cb, disable_cb=disable_cb}  
+   luatexja.adjust.enable_cb=enable_cb
+   luatexja.adjust.disable_cb=disable_cb
 end
 
 luatexja.unary_pars.adjust = function(t)
