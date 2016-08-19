@@ -177,10 +177,11 @@
   width:\hfill\ #2\cr height:\hfill\ #3\cr depth:\hfill\ #4\cr
   }}}}}\,}
 
-\protected\def\Param#1{\textcompwordmark\hyperlink{fld:#1}{\underline{\smash{\textsf{#1}}}}\textcompwordmark} % parameter name
-\protected\def\DParam#1{\textcompwordmark\hypertarget{fld:#1}{\underline{\smash{\textsf{#1}}}}\textcompwordmark} % parameter name (definition)
+\def\myghost{\ifmmode\else\ltjalchar"200C \fi}
+\protected\def\Param#1{\myghost\hyperlink{fld:#1}{\underline{\smash{\textsf{#1}}}}\myghost} % parameter name
+\protected\def\DParam#1{\myghost\hypertarget{fld:#1}{\underline{\smash{\textsf{#1}}}}\myghost} % parameter name (definition)
 \protected\def\Pkg#1{\textsf{#1}} % packages/classes
-
+\ltjsetparameter{alxspmode={"200C,allow}}
 
 \begin{document}
 \lstset{
@@ -6984,8 +6985,34 @@ for making the difference obvious.
 \ltjenableadjust[lineend=false,priority=false]
 \end{lstlisting}
 と同義．
-
 \end{cslist}
+
+また，優先順位付きの行長調整のために，次の2パラメータが\cs{ltjsetparameter}内で
+追加される．両パラメータともグローバルに効力を発揮する．
+\begin{cslist}[style=standard]
+\item[\DParam{stretch\_priority}\,=\{<list>\}]
+\Param{kanjiskip}, \Param{xkanjiskip}，および「\textbf{JAglue}以外のグルー」を，
+「行を自然長より伸ばす」場合の調整に用いる優先度を指定する．
+
+指定方法は，<list>の中にkey-value listの形で
+\begin{lstlisting}
+stretch_priority={kanjiskip=-40,xkanjiskip=-30,others=50}
+\end{lstlisting}
+のようにして行う．キー名\texttt{kanjiskip},~\texttt{xkanjiskip}については
+そのままの意味であり，
+\texttt{others}キーが「\textbf{JAglue}以外のグルー」を表す．
+各キーの値は，JFMグルーにおける「優先度$i$」を$10i$に対応させた整数値であり，
+  大きい方が先に伸ばされることを意味している．
+
+\item[\DParam{shrink\_priority}\,=\{<list>\}]
+同様に，「行を自然長より縮める」場合の調整に用いる優先度を指定する．
+それ以外は\Param{stretch\_priority}と指定の形式は変わらない．
+\end{cslist}
+初期値は\Param{stretch\_priority}, \Param{shrink\_priority}とも
+\begin{lstlisting}
+{kanjiskip=-40,xkanjiskip=-30,others=50}
+\end{lstlisting}
+である．
 %</ja>
 
 \subsection{\Pkg{luatexja-ruby}}
