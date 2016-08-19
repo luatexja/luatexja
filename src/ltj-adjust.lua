@@ -61,24 +61,28 @@ local priority_num = { 0, 0 }
 local at2pr = { {}, {} }
 local at2pr_st, at2pr_sh = at2pr[1], at2pr[2]
 do
+   local priority_table = {{},{}}
+   luatexja.adjust.priority_table = priority_table
    local tmp = {}
    local function cmp(a,b) return a[1]>b[1] end -- 大きいほうが先！
-   local function make_priority_table(glue_sign, xsk, ksk, others)
+   local function make_priority_table(glue_sign)
       for i,_ in pairs(tmp) do tmp[i]=nil end
       for i=-2,2 do tmp[#tmp+1] = { i, FROM_JFM+i } end
-      tmp[#tmp+1] = { xsk, XKANJI_SKIP }
-      tmp[#tmp+1] = { xsk, XKANJI_SKIP_JFM }
-      tmp[#tmp+1] = { ksk, KANJI_SKIP }
-      tmp[#tmp+1] = { ksk, KANJI_SKIP_JFM }
-      tmp[#tmp+1] = { others, -1 }
+      local pt = priority_table[glue_sign]
+      tmp[#tmp+1] = { pt[2]/10, XKANJI_SKIP }
+      tmp[#tmp+1] = { pt[2]/10, XKANJI_SKIP_JFM }
+      tmp[#tmp+1] = { pt[1]/10, KANJI_SKIP }
+      tmp[#tmp+1] = { pt[1]/10, KANJI_SKIP_JFM }
+      tmp[#tmp+1] = { pt[3]/10, -1 }
       table.sort(tmp, cmp)
       local a, m, n = at2pr[glue_sign], 10000000, 0
       for i=1,#tmp do
 	 if tmp[i][1]<m then n,m = n+1,tmp[i][1] end
 	 a[tmp[i][2]] = n
       end
+      local o = a[-1]
       priority_num[glue_sign] = n
-      setmetatable(a, {__index = function () return others end })
+      setmetatable(a, {__index = function () return o end })
    end
    luatexja.adjust.make_priority_table = make_priority_table
 end

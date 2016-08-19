@@ -111,14 +111,22 @@
 \ltjenableadjust
 
 %%% 優先順位の設定
-%%% stretch_priority = {<xkanjiskip>, <kanjiskip>, <others>}
+\define@key[ltj]{adjpri}{kanjiskip}{%
+  \directlua{luatexja.adjust.priority_table[\the\count@][1] = token.scan_int()}#1\relax}
+\define@key[ltj]{adjpri}{xkanjiskip}{%
+  \directlua{luatexja.adjust.priority_table[\the\count@][2] = token.scan_int()}#1\relax}
+\define@key[ltj]{adjpri}{others}{%
+  \directlua{luatexja.adjust.priority_table[\the\count@][3] = token.scan_int()}#1\relax}
 \define@key[ltj]{japaram}{stretch_priority}{%
-  \directlua{luatexja.adjust.make_priority_table(1,#1)}\relax
-}
+  \begingroup\count@=1 \setkeys[ltj]{adjpri}{#1}\relax
+  \directlua{luatexja.adjust.make_priority_table(1)}\endgroup}
 \define@key[ltj]{japaram}{shrink_priority}{%
-  \directlua{luatexja.adjust.make_priority_table(2,#1)}\relax
+  \begingroup\count@=2 \setkeys[ltj]{adjpri}{#1}\relax
+  \directlua{luatexja.adjust.make_priority_table(2)}\endgroup}
+\ltjsetparameter{%
+  stretch_priority={kanjiskip=-40, xkanjiskip=-30, others=50},
+   shrink_priority={kanjiskip=-40, xkanjiskip=-30, others=50},
 }
-\ltjsetparameter{stretch_priority={-3,-4,5}, shrink_priority={-3,-4,5}}
 
 
 %%------------------ all done
