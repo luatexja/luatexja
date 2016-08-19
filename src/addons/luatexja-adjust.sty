@@ -109,10 +109,16 @@
    \ltx@ifnextchar[{\@@ltjenableadjust}{\@@ltjenableadjust[lineend,priority]}}%]
 
 \ltjenableadjust
-% there is also a key for \ltjsetparameter, for same effect
-\define@boolkey[ltj]{japaram}{adjust}[true]{%
-  \ifltj@japaram@adjust\ltjenableadjust\else\ltjdisableadjust\fi\relax
+
+%%% 優先順位の設定
+%%% stretch_priority = {<xkanjiskip>, <kanjiskip>, <others>}
+\define@key[ltj]{japaram}{stretch_priority}{%
+  \directlua{luatexja.adjust.make_priority_table(1,#1)}\relax
 }
+\define@key[ltj]{japaram}{shrink_priority}{%
+  \directlua{luatexja.adjust.make_priority_table(2,#1)}\relax
+}
+\ltjsetparameter{stretch_priority={-3,-4,5}, shrink_priority={-3,-4,5}}
 
 
 %%------------------ all done

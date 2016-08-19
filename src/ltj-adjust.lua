@@ -59,6 +59,7 @@ end
 
 local priority_num = { 0, 0 }
 local at2pr = { {}, {} }
+local at2pr_st, at2pr_sh = at2pr[1], at2pr[2]
 do
    local tmp = {}
    local function cmp(a,b) return a[1]>b[1] end -- 大きいほうが先！
@@ -79,15 +80,12 @@ do
       priority_num[glue_sign] = n
       setmetatable(a, {__index = function () return others end })
    end
-   make_priority_table(1, -3, -4, 5)
-   make_priority_table(2, -3, -4, 5)
    luatexja.adjust.make_priority_table = make_priority_table
 end
 
 -- box 内で伸縮された glue の合計値を計算
 
 local total_stsh = {{},{}}
-local at2pr_st, at2pr_sh = at2pr[1], at2pr[2]
 local total_st, total_sh = total_stsh[1], total_stsh[2]
 local get_total_stretched
 do
