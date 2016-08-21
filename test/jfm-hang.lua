@@ -22,6 +22,21 @@ luatexja.jfont.define_jfm {
 	 [8] = { 0, 0, 0, kanjiskip_shrink=1 },
       }
    },
+   [100] = { -- 伸び/縮みで異なる優先度の例，
+      chars = { 'ぱ', 'ぴ', 'ぷ', 'ぺ', 'ぽ' },
+      align = 'left', left = 0.0, down = 0.0,
+      width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
+      glue = {
+	 [1] = { 0.5 , .5, .5, priority={0, -4}, ratio=1 },
+	 [2] = { 0, 0, 0, kanjiskip_shrink=1 },
+	 [102] = { 0, 0, 0, kanjiskip_shrink=1 },
+	 [3] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+	 [4] = { 0, 0, 0, kanjiskip_shrink=1 },
+	 [6] = { 0, 0, 0, kanjiskip_shrink=1 },
+	 [7] = { 0, 0, 0, kanjiskip_shrink=1 },
+	 [8] = { 0, 0, 0, kanjiskip_shrink=1 },
+      }
+   },
 
    [1] = { -- 開き括弧類
       chars = {
@@ -33,6 +48,7 @@ luatexja.jfont.define_jfm {
       glue = {
 -- 3 のみ四分，あとは0
          [0] = { 0, 0, 0, kanjiskip_shrink=1 },
+         [100] = { 0, 0, 0, kanjiskip_shrink=1 },
          [1] = { 0, 0, 0, kanjiskip_shrink=1 },
 	 [2] = { 0, 0, 0, kanjiskip_shrink=1, kanjiskip_stretch=1 },
 	 [102] = { 0, 0, 0, kanjiskip_shrink=1, kanjiskip_stretch=1 },
@@ -56,6 +72,7 @@ luatexja.jfont.define_jfm {
       glue = {
      -- 3 は四分, 2, 4, 9 は0, あとは0.5
 	 [0] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
+	 [100] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
 	 [1] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
          [2] = { 0, 0, 0, kanjiskip_shrink=1},
          [102] = { 0, 0, 0, kanjiskip_shrink=1},
@@ -78,6 +95,7 @@ luatexja.jfont.define_jfm {
       glue = {
      -- 3 は四分, 2, 4, 9 は0, あとは0.5
 	 [0] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
+	 [100] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
 	 [1] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
          [2] = { 0, 0, 0, kanjiskip_shrink=1},
          [102] = { 0, 0, 0, kanjiskip_shrink=1},
@@ -98,6 +116,7 @@ luatexja.jfont.define_jfm {
       glue = {
 -- 3 のみ 0.5，あとは0.25
 	 [0] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+	 [100] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
 	 [1] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
 	 [2] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
 	 [102] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
@@ -118,13 +137,14 @@ luatexja.jfont.define_jfm {
       -- （luatexja-adjust 下では半角取りを認めない）
       glue = {
          -- 3 は.75, 2, 4 は0, あとは0.5
-	 [0] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
-	 [1] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
+	 [0] = { 0.5 , 0.0, 0.0, ratio=0, kanjiskip_stretch=1 },
+	 [100] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+	 [1] = { 0.5 , 0.0, 0.0, ratio=0, kanjiskip_stretch=1 },
 	 [3] = { 0.75, 0.0, 0.25, priority=1, ratio=1./3, kanjiskip_stretch=1 },
-	 [5] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
-	 [6] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
-	 [7] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
-	 [8] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
+	 [5] = { 0.5 , 0.0, 0.0, ratio=0, kanjiskip_stretch=1 },
+	 [6] = { 0.5 , 0.0, 0.0, ratio=0, kanjiskip_stretch=1 },
+	 [7] = { 0.5 , 0.0, 0.0, ratio=0, kanjiskip_stretch=1 },
+	 [8] = { 0.5 , 0.0, 0.0, ratio=0, kanjiskip_stretch=1 },
       }
    },
 
@@ -150,14 +170,15 @@ luatexja.jfont.define_jfm {
       align = 'left', left = 0.0, down = 0.0,
       width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
       glue = {
-         [0] = { 0.5 , 0.0, 0.5, ratio=1, kanjiskip_stretch=1 },
-	 [1] = { 0.5 , 0.0, 0.5, ratio=1, kanjiskip_stretch=1 },
+         [0] = { 1.0 , 0.0, 0.5, ratio=1, kanjiskip_stretch=1 },
+         [100] = { 1.0 , 0.0, 0.5, ratio=1, kanjiskip_stretch=1 },
+	 [1] = { 1.0 , 0.0, 0.5, ratio=1, kanjiskip_stretch=1 },
 	 [2] = { 0, 0, 0, kanjiskip_shrink=1 },
 	 [102] = { 0, 0, 0, kanjiskip_shrink=1 },
 	 [3] = { 0.75, 0.0, 0.25, priority=1, ratio=1 },
 	 [4] = { 0, 0, 0, kanjiskip_shrink=1 },
 	 [6] = { 0, 0, 0, kanjiskip_shrink=1 },
-	 [7] = { 0.5 , 0.0, 0.5, ratio=1, kanjiskip_stretch=1 },
+	 [7] = { 1.0 , 0.0, 0.5, ratio=1, kanjiskip_stretch=1 },
 	 [8] = { 0, 0, 0, kanjiskip_shrink=1 },
       },
       kern = {
