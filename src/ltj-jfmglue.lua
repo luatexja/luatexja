@@ -681,7 +681,9 @@ local function handle_penalty_suppress(post, pre, g)
 	 Bp[1]=p
          set_attr(p, attr_icflag, KINSOKU)
       end
-   else for _, v in pairs(Bp) do add_penalty(v,a) end
+   else 
+      local a = (pre or 0) + (post or 0)
+      for _, v in pairs(Bp) do add_penalty(v,a) end
    end
 end
 
