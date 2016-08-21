@@ -67,7 +67,11 @@ do
    local function cmp(a,b) return a[1]>b[1] end -- 大きいほうが先！
    local function make_priority_table(glue_sign)
       for i,_ in pairs(tmp) do tmp[i]=nil end
-      for i=-2,2 do tmp[#tmp+1] = { i, FROM_JFM+i } end
+      if glue_sign==2 then -- shrink
+	 for i=0,63 do tmp[#tmp+1] = { (i%8)-4, FROM_JFM+i } end
+      else -- stretch
+	 for i=0,63 do tmp[#tmp+1] = { math.floor(i/8)-4, FROM_JFM+i } end
+      end    
       local pt = priority_table[glue_sign]
       tmp[#tmp+1] = { pt[2]/10, XKANJI_SKIP }
       tmp[#tmp+1] = { pt[2]/10, XKANJI_SKIP_JFM }

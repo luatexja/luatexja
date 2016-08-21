@@ -2,6 +2,7 @@
 
 \documentclass{ltjsarticle}
 \usepackage{luatexja-fontspec,luatexja-adjust,xcolor,amsmath,amssymb}
+
 \def\sq{%
   \hbox to 1\zw{\hss\fboxsep=-.5\fboxrule\fbox{%
   　\hskip\dimexpr-.5\zw-.2pt\vrule width.4pt height.08\zw depth.12\zw%
@@ -34,14 +35,15 @@
 \jfontspec[YokoFeatures={JFM=hang}]{ipam.ttf}
 
 \ltjsetparameter{kanjiskip=.0\zw plus .4pt minus .5pt}
-{\tt kanjiskip: \ltjgetparameter{kanjiskip}
+
+\twocolumn[{\tt kanjiskip: \ltjgetparameter{kanjiskip}
 
 \ltjsetparameter{xkanjiskip=.25\zw plus .25\zw minus .125\zw}
 xkanjiskip: \ltjgetparameter{xkanjiskip}}
 
 このテストでは，行末の句読点・中点類の位置調整を有効にした
 \texttt{jfm-hang.lua}を用いている．
-\begin{itemize}
+{\begin{itemize}
 \item 句点は，調整量に合わせて，ぶら下げ，全角取りの2種類から選択される．
 \item 読点は，調整量に合わせて，ぶら下げ，二分取り，全角取りの3種類から選択される．
 \item 中点類は，行末に四分空きを追加することのみ対応．
@@ -51,7 +53,7 @@ xkanjiskip: \ltjgetparameter{xkanjiskip}}
 行われる条件は，
 \begin{description}
 \item[最終行以外] 無限大の伸長度を持つグルーが関わっていない
-\item[最終行] 無限大の伸長度を持つグルーは\verb+\parfillskip+のみで，かつ
+\item[最終行] 無限大の伸長度を持つグルーは\texttt{\textbackslash parfillskip}のみで，かつ
 \begin{align*}
  \min\{(\hbox{許される最小の行末文字と行末の間}),0\}
   &\leq(\hbox{\texttt{\textbackslash parfillskip}のこの行における実際の長さ})\\
@@ -63,7 +65,7 @@ xkanjiskip: \ltjgetparameter{xkanjiskip}}
 \item \texttt{lineend=extended}のときは，\TeX による行分割の時点で行末位置の文字調整を考慮
       する．但し，段落の最後の文字については例外的に行わず，代わりに
 上の「\texttt{lineend=true}の場合」の最終行のときと同じ補正を行う．
-\end{itemize}
+\end{itemize}}]
 
 \testbox{%
 ◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
@@ -101,10 +103,10 @@ xkanjiskip: \ltjgetparameter{xkanjiskip}}
 あいうえおかきくけ・こさしすせそたち「「あ
 }
 
-中点類の後ろ空き（\verb+\parfillskip+を0にしている）
+次の例では\verb+\parfillskip+を0にしている
 
 \testbox{%
-\parfillskip0pt日本では\pTeX，p\LaTeX が使われている。
+あいうえおかきくけこさしすせそたちつて・
 }
 \testbox{%
 \parfillskip0ptあいうえおかきくけこさしすせそたちつて・
@@ -149,6 +151,21 @@ xkanjiskip: \ltjgetparameter{xkanjiskip}}
 }
 
 
+伸び縮みで異なる優先度．
+
+以下の例では，「ぱ」と鍵括弧の間は自然長・伸び・縮み全部半角．
+\texttt{kanjiskip}より伸びる時の優先度は高く，
+縮むときの優先度は低い．
+
+{\ltjsetparameter{kanjiskip=0pt plus 1.5pt minus 1.5pt}
+\testbox{%
+  \parfillskip0ptあいうえおかきくけこ\<\vrule width7.5\zw\<ぱ「
+}
+\testbox{%
+  \parfillskip0ptあいうえおかきくけこ\<\vrule width9\zw\<ぱ「
+}
+}
+
 次ページ以降の出典：
   Wikisource日本語版「竹取物語」（一部），2016/08/11閲覧\\
 {\catcode`\%=11\texttt{https://ja.wikisource.org/wiki/%E7%AB%B9%E5%8F%96%E7%89%A9%E8%AA%9E}}
@@ -189,7 +206,7 @@ xkanjiskip: \ltjgetparameter{xkanjiskip}}
      local t = tex.getbox(a)
      local x = {}
      for n in node.traverse_id(node.id('hlist'), t.head) do
-        local b = n.glue_order>0 and 0 or 100*math.pow(n.glue_set, 3);
+        local b = n.glue_order>0 and 0 or math.floor(100*math.pow(n.glue_set, 3)+0.5);
         if b<=12 then x[#x+1]={2,b}    % decent
         elseif n.glue_sign==1 and b>=100 then x[#x+1]={0,b} %very loose
         elseif n.glue_sign==1 then x[#x+1]={1,b} % loose
@@ -198,7 +215,7 @@ xkanjiskip: \ltjgetparameter{xkanjiskip}}
      x[0]={2, 0}
      local d = 0
      for i=1,#x do
-       d = d + math.pow(tex.linepenalty + x[i][2], 2)
+       d = d + math.floor(math.pow(tex.linepenalty + x[i][2], 2)+0.5)
        if math.abs(x[i][1]-x[i-1][1])>=1 then d = d + tex.adjdemerits end
      end
      tex.sprint(-2,tostring(d) )

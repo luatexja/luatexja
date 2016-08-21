@@ -47,18 +47,18 @@ luatexja.icflag_table = icflag_table
 icflag_table.ITALIC          = 1
 icflag_table.PACKED          = 2
 icflag_table.KINSOKU         = 3
-icflag_table.FROM_JFM        = 6
+icflag_table.FROM_JFM        = 4
 -- FROM_JFM: 4, 5, 6, 7, 8 →優先度高（伸びやすく，縮みやすい）
 -- 6 が標準
-icflag_table.KANJI_SKIP      = 9
-icflag_table.KANJI_SKIP_JFM  = 10
-icflag_table.XKANJI_SKIP     = 11
-icflag_table.XKANJI_SKIP_JFM = 12
-icflag_table.LINEEND         = 13
-icflag_table.PROCESSED       = 14
-icflag_table.IC_PROCESSED    = 15
-icflag_table.BOXBDD          = 16
-icflag_table.PROCESSED_BEGIN_FLAG = 128
+icflag_table.KANJI_SKIP      = 68 -- = 4+64
+icflag_table.KANJI_SKIP_JFM  = 69
+icflag_table.XKANJI_SKIP     = 70
+icflag_table.XKANJI_SKIP_JFM = 71
+icflag_table.LINEEND         = 72
+icflag_table.PROCESSED       = 73
+icflag_table.IC_PROCESSED    = 74
+icflag_table.BOXBDD          = 75
+icflag_table.PROCESSED_BEGIN_FLAG = 4096 -- sufficiently large power of 2
 
 local stack_table_index = {}
 luatexja.stack_table_index = stack_table_index

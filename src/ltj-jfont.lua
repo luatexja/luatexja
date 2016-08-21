@@ -132,7 +132,21 @@ function define_jfm(t)
 	 for j,x in pairs(v.glue) do
 	    if v.kern[j] then defjfm_res= nil; return end
 	    x.ratio, x[5] = (x.ratio or (x[5] and 0.5*(1+x[5]) or 0.5)), nil
-	    x.priority, x[4] = (x.priority or x[4] or 0), nil
+	    do
+	       local xp
+	       xp, x[4] = (x.priority or x[4]), nil
+	       if type(xp)=='table' and t.version>=2 then
+		  if type(xp[1])~='number' or xp[1]<-4 or xp[1]>3 then defjfm_res=nil end  -- stretch
+		  if type(xp[2])~='number' or xp[2]<-4 or xp[2]>3 then defjfm_res=nil end  -- shrink
+		  xp = (xp[1]+4)*8+(xp[2]+4)
+	       elseif xp and type(xp)~='number' then
+		  defjfm_res = nil
+	       else
+		  xp = (xp or 0)*9+36	
+		  if xp<0 or xp>=64 then defjfm_res=nil end 
+	       end
+	       x.priority = xp
+	    end
 	    x.kanjiskip_natural = norm_val(x.kanjiskip_natural)
 	    x.kanjiskip_stretch = norm_val(x.kanjiskip_stretch)
 	    x.kanjiskip_shrink = norm_val(x.kanjiskip_shrink)
