@@ -1509,12 +1509,19 @@
 % 計算では |\headheight| ではなく |\topskip| を使う
 % ことにしました。
 %
+%
+% [2016-08-17] 圏点やルビが一行目に来た場合に下がるのを防ぐた
+% め，|\topskip| を10ptから1.38zwに増やしました。
+% |\headheight| は従来と同じ20ptのままとします。
+%
+% [2016-08-17 LTJ] 1.38zwの代わりに1.38|\zh|にしています。
+%
 %    \begin{macrocode}
-\setlength\topskip{10\jsc@mpt}
+\setlength\topskip{1.38\zh}%% 2016-08-17
 \if@slide
   \setlength\headheight{0\jsc@mpt}
 \else
-  \setlength\headheight{2\topskip}
+  \setlength\headheight{20\jsc@mpt}%% 2016-08-17
 \fi
 %    \end{macrocode}
 % \end{macro}
@@ -1809,7 +1816,7 @@
 \if@slide
   \addtolength\topmargin{-\headheight}
 \else
-  \addtolength\topmargin{-\topskip}
+  \addtolength\topmargin{-0.5\headheight}%% 2016-08-17
 \fi
 \addtolength\topmargin{-\headsep}
 \addtolength\topmargin{-\footskip}
