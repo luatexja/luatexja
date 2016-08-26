@@ -29,7 +29,7 @@
 %  -----------------------------------------
 %
 % \fi
-% \CheckSum{5377}
+% \CheckSum{5366}
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -57,25 +57,25 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2016/08/03 ltjsclasses ]
+  [2016/08/27 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass{ltjsarticle}
-\usepackage{doc}
+\usepackage{hypdoc}
+\hypersetup{unicode=true}
 \usepackage{fontspec}
 \usepackage[ipaex,nfssonly]{luatexja-preset}
 \ltjsetparameter{alxspmode={`\*,allow}}
 \ltjsetparameter{alxspmode={`\\,allow}}
 %%%%\usepackage{unicode-math}
 %%%%\setmathfont{Latin Modern Math}
-\usepackage[unicode]{hyperref}
 \addtolength{\textwidth}{-1in}
 \addtolength{\evensidemargin}{1in}
 \addtolength{\oddsidemargin}{1in}
 \addtolength{\marginparwidth}{1in}
 \setlength\marginparpush{0pt}
 % \OnlyDescription
-\DisableCrossrefs
+\EnableCrossrefs
 \setcounter{StandardModuleDepth}{1}
 \GetFileInfo{ltjsclasses.dtx}
 \CodelineNumbered
@@ -1517,11 +1517,11 @@
 % [2016-08-17 LTJ] 1.38zwの代わりに1.38|\zh|にしています。
 %
 %    \begin{macrocode}
-\setlength\topskip{1.38\zh}%% 2016-08-17
+\setlength\topskip{1.38\zh}%% from 10\jsc@mpt (2016-08-17)
 \if@slide
   \setlength\headheight{0\jsc@mpt}
 \else
-  \setlength\headheight{20\jsc@mpt}%% 2016-08-17
+  \setlength\headheight{20\jsc@mpt}%% from 2\topskip (2016-08-17); from \topskip (2003-06-26)
 \fi
 %    \end{macrocode}
 % \end{macro}
@@ -1699,6 +1699,9 @@
 % [2003-06-26] |\headheight| を |\topskip| に直しました。
 % 以前はこの二つは値が同じであったので，変化はないはずです。
 %
+% [2016-08-26] |\topskip| を10ptから1.38zwに増やしましたので，
+% その分 |\textheight| を増やします（2016-08-17での修正漏れ）。
+%
 %    \begin{macrocode}
 %<*article|book>
 \if@slide
@@ -1706,7 +1709,7 @@
 \else
   \setlength{\textheight}{0.83\paperheight}
 \fi
-\addtolength{\textheight}{-\topskip}
+\addtolength{\textheight}{-0.5\headheight}%% from -\topskip (2016-08-26); from -\headheight (2003-06-26)
 \addtolength{\textheight}{-\headsep}
 \addtolength{\textheight}{-\footskip}
 \addtolength{\textheight}{-\topskip}
@@ -1810,13 +1813,17 @@
 % [2011-10-03 LTJ] ここも |\oddsidemargin| のときと同様に |-\inv@mag in| ではなく
 % |-1in| にします。
 %
+% [2016-08-17] |\topskip| を10ptから1.38zwに直しましたが，
+% |\topmargin| は従来の値から変わらないように調節しました。
+% …のつもりでしたが，|\textheight| を増やし忘れていたので
+% 変わってしまっていました（2016-08-26修正済み）。
 %    \begin{macrocode}
 \setlength\topmargin{\paperheight}
 \addtolength\topmargin{-\textheight}
 \if@slide
   \addtolength\topmargin{-\headheight}
 \else
-  \addtolength\topmargin{-0.5\headheight}%% 2016-08-17
+  \addtolength\topmargin{-0.5\headheight}%% from -\topskip (2016-08-17); from -\headheight (2003-06-26)
 \fi
 \addtolength\topmargin{-\headsep}
 \addtolength\topmargin{-\footskip}
@@ -4835,12 +4842,8 @@
 %
 % [2016-07-11] コミュニティ版p\LaTeX の変更に追随しました（Thanks: 角藤さん）。
 %
-%    \begin{macrocode}
-\renewcommand\@makefnmark{%
-  \unless\ifnum\ltjgetparameter{direction}=3
-    \hbox{}\hbox{\@textsuperscript{\normalfont\@thefnmark}}\hbox{}%
-  \else\hbox{\yoko \@textsuperscript{\normalfont\@thefnmark}}\fi}
-%    \end{macrocode}
+% [2016-08-27 LTJ] 結果的に |\@makefnmark| の定義が
+% Lua\TeX-ja本体(lltjcore.sty)中のものと全く同じになっていたので，削除します，
 % \end{macro}
 %
 % \begin{macro}{\thefootnote}
