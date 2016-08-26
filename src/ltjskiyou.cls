@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjskiyou}
-  [2016/08/03 ltjsclasses ]
+  [2016/08/27 ltjsclasses ]
 \def\jsc@clsname{ltjskiyou}
 \RequirePackage{luatexja}
 \newif\if@restonecol
@@ -462,11 +462,11 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \@lowpenalty   51
 \@medpenalty  151
 \@highpenalty 301
-\setlength\topskip{1.38\zh}%% 2016-08-17
+\setlength\topskip{1.38\zh}%% from 10\jsc@mpt (2016-08-17)
 \if@slide
   \setlength\headheight{0\jsc@mpt}
 \else
-  \setlength\headheight{20\jsc@mpt}%% 2016-08-17
+  \setlength\headheight{20\jsc@mpt}%% from 2\topskip (2016-08-17); from \topskip (2003-06-26)
 \fi
 \if@slide
   \setlength\footskip{\z@}
@@ -514,7 +514,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \if@slide
   \addtolength\topmargin{-\headheight}
 \else
-  \addtolength\topmargin{-0.5\headheight}%% 2016-08-17
+  \addtolength\topmargin{-0.5\headheight}%% from -\topskip (2016-08-17); from -\headheight (2003-06-26)
 \fi
 \addtolength\topmargin{-\headsep}
 \addtolength\topmargin{-\footskip}
@@ -1322,10 +1322,6 @@ class has defined the old font commands like\MessageBreak
 \def\footnote{\inhibitglue\footnotes@ve}
 \let\footnotemarks@ve=\footnotemark
 \def\footnotemark{\inhibitglue\footnotemarks@ve}
-\renewcommand\@makefnmark{%
-  \unless\ifnum\ltjgetparameter{direction}=3
-    \hbox{}\hbox{\@textsuperscript{\normalfont\@thefnmark}}\hbox{}%
-  \else\hbox{\yoko \@textsuperscript{\normalfont\@thefnmark}}\fi}
 \def\thefootnote{\ifnum\c@footnote>\z@\leavevmode\lower.5ex\hbox{*}\@arabic\c@footnote\fi}
 \renewcommand{\footnoterule}{%
   \kern-3\jsc@mpt
