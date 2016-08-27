@@ -168,9 +168,8 @@ do
 	       }
 	    end
 	    for k,w in pairs(v.kern) do
-	       local g = node_new(id_kern)
+	       local g = node_new(id_kern, 1)
 	       setfield(g, 'kern', w[1])
-	       setfield(g, 'subtype', 1)
 	       set_attr(g, attr_icflag, FROM_JFM)
 	       v[k] = {g, ratio=w[2]/sz}
 	    end
@@ -985,8 +984,8 @@ do
    else
        local ITALIC       = luatexja.icflag_table.ITALIC
        new_ic_kern = function()
-         local g = node_new(id_kern)
-         setfield(g, 'subtype', 1); set_attr(g, attr_icflag, ITALIC)
+         local g = node_new(id_kern, 1)
+         set_attr(g, attr_icflag, ITALIC)
 	 return g
        end
    end

@@ -374,7 +374,7 @@ local function new_ruby_box(r, p, ppre, pmid, ppost,
 	 setfield(rt, 'head', nil); node_free(rt);
       end
    end
-   local a, k = node_new(id_rule), node_new(id_kern)
+   local a, k = node_new(id_rule), node_new(id_kern, 1)
    setfield(a, 'width', 0); setfield(a, 'height', 0)
    setfield(a, 'depth', 0); setfield(k, 'kern', rgap)
    insert_after(r, r, a); insert_after(r, a, k);
@@ -382,7 +382,7 @@ local function new_ruby_box(r, p, ppre, pmid, ppost,
    a = node.direct.vpack(r); setfield(a, 'shift', 0)
    set_attr(a, attr_ruby, post_intrusion)
    if rsmash or getfield(a, 'height')<getfield(p, 'height') then
-      local k = node_new(id_kern)
+      local k = node_new(id_kern, 1)
       setfield(k, 'kern', -getfield(a, 'height')+getfield(p, 'height'))
       setfield(a, 'head', k); insert_before(r, r, k)
       setfield(a, 'height', getfield(p, 'height'))

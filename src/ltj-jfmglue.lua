@@ -725,10 +725,10 @@ do
       end
       if not gb then
 	 if ga then
-	    gb = node_new(id_kern); setfield(gb, 'kern', 0)
+	    gb = node_new(id_kern, 1); setfield(gb, 'kern', 0)
 	 else return nil end
       elseif not ga then
-	 ga = node_new(id_kern); setfield(ga, 'kern', 0)
+	 ga = node_new(id_kern, 1); setfield(ga, 'kern', 0)
       end
 
       local k = 2*getid(gb) - getid(ga)
