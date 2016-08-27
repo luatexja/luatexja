@@ -177,9 +177,11 @@
   width:\hfill\ #2\cr height:\hfill\ #3\cr depth:\hfill\ #4\cr
   }}}}}\,}
 
-\protected\def\Param#1{\hyperlink{fld:#1}{\underline{\smash{\textsf{#1}}}}} % parameter name
-\protected\def\DParam#1{\hypertarget{fld:#1}{\underline{\smash{\textsf{#1}}}}} % parameter name (definition)
+\def\myghost{\ifmmode\else\ltjalchar"200C \fi}
+\protected\def\Param#1{\myghost\hyperlink{fld:#1}{\underline{\smash{\textsf{#1}}}}\myghost} % parameter name
+\protected\def\DParam#1{\myghost\hypertarget{fld:#1}{\underline{\smash{\textsf{#1}}}}\myghost} % parameter name (definition)
 \protected\def\Pkg#1{\textsf{#1}} % packages/classes
+\ltjsetparameter{alxspmode={"200C,allow}}
 
 
 \begin{document}
@@ -8210,11 +8212,11 @@ with the \textit{id} of it:
 \Node{glyph}{accent}\\\noalign{\medskip}
 \Node{hbox}{accent (shifted vert.)}
 \end{array}\right\}\longrightarrow
-\Node{kern}{$\mathit{subtype}=2$}}^{\text{(a)}}
+\Node{kern}{$\mathit{subtype}=2$}}^{\text{(b)}}
 \longrightarrow
 \Node{glyph}{$p$}\longrightarrow
 \overbrace{%
-\Node{kern}{italic corr.}}^{\text{(b)}}
+\Node{kern}{italic corr.}}^{\text{(a)}}
 \]
 
 %<*en>
