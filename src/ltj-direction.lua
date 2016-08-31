@@ -694,6 +694,7 @@ do
 
    -- lastbox
    local node_prev = (node.direct~=node) and node.direct.getprev or node.prev
+   local id_glue = node.id('glue')
    local function lastbox_hook()
       start_time_measure('box_primitive_hook')
       local bn = tex_nest[tex_nest.ptr].tail
@@ -701,6 +702,14 @@ do
 	 local b, head = to_direct(bn), to_direct(tex_nest[tex_nest.ptr].head)
 	 local bid = getid(b)
 	 if bid==id_hlist or bid==id_vlist then
+            local p = getlist(b)
+	    -- alignment 由来
+            if p and getid(p)==id_glue and getsubtype(p)==12 then -- tabskip
+	       local np = node_next(p); local npid = getid(np)
+	       if npid==id_hlist or npid==id_vlist then
+		  setfield(b, 'head', create_dir_whatsit(p, 'align', get_box_dir(np, 0)))
+	       end
+            end
 	    local box_dir =  get_box_dir(b, 0)
 	    if box_dir>= dir_node_auto then -- unwrap dir_node
 	       local p = node_prev(b)
