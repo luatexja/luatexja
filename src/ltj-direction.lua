@@ -266,15 +266,22 @@ end
 
 -- hpack_filter, vpack_filter, post_line_break_filter
 -- の結果を組方向を明示するため，先頭に dir_node を設置
+local get_box_dir
 do
    local function create_dir_whatsit_hpack(h, gc)
       local hd = to_direct(h)
-      if gc=='fin_row' or gc == 'preamble'  then
+      if gc=='fin_row' then
 	 if hd  then
+	    for p in traverse_id(15, hd) do -- unset
+	       if get_box_dir(p, 0)==0 then
+                  setfield(p, 'head', create_dir_whatsit(getlist(p), 'fin_row', ltjs.list_dir))
+               end
+	    end
 	    set_attr(hd, attr_icflag, PROCESSED_BEGIN_FLAG)
 	    ensure_tex_attr(attr_icflag, 0)
 	 end
 	 return h
+      elseif gc == 'preamble'  then
       else
 	 adjust_badness(hd)
 	 return to_node(create_dir_whatsit(hd, gc, ltjs.list_dir))
@@ -490,7 +497,7 @@ end
 
 -- 1st ret val: b の組方向
 -- 2nd ret val はその DIR whatsit
-local function get_box_dir(b, default)
+function get_box_dir(b, default)
    start_time_measure('get_box_dir')
    local dir = has_attr(b, attr_dir) or 0
    local bh = getfield(b,'head')
@@ -703,7 +710,7 @@ do
 	 local bid = getid(b)
 	 if bid==id_hlist or bid==id_vlist then
             local p = getlist(b)
-	    -- alignment 由来
+	    -- alignment の各行の中身が入ったボックス
             if p and getid(p)==id_glue and getsubtype(p)==12 then -- tabskip
 	       local np = node_next(p); local npid = getid(np)
 	       if npid==id_hlist or npid==id_vlist then

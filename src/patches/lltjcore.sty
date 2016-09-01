@@ -264,7 +264,7 @@
        \@texttop
        \dimen@ \dp\@outputbox
        \unvbox \@outputbox
-       \ifnum\ltjgetparameter{direction}=4\else\hskip\z@\fi %%% LuaTeX-ja
+       \ifnum\ltjgetparameter{direction}=4\else\vbox{\hskip\z@}\fi %%% LuaTeX-ja
        \vskip -\dimen@
        \@textbottom
        }%
