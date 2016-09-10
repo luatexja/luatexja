@@ -408,7 +408,8 @@ local function debug_show_node_X(p,print_fn, limit)
          .. tostring(p.font)
          .. ' (' .. print_scaled(p.height) .. '+'
          .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
-         .. ' xoff: ' .. print_scaled(p.xoffset)
+         .. ' off: (' .. print_scaled(p.xoffset)
+         .. ',' .. print_scaled(p.yoffset) .. ')'
       print_fn(s)
    elseif pt=='hlist' or pt=='vlist' or pt=='unset'or pt=='ins' then
       if pt=='ins' then

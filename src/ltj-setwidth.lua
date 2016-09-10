@@ -107,7 +107,7 @@ local function capsule_glyph_yoko(p, met, char_data, head, dir)
 	 setfield(box, 'depth', fdepth + kbl)
 	 setfield(box, 'dir', dir)
 	 set_attr(box, attr_icflag, PACKED)
-	 --set_attr(p, attr_icflag, PACKED)
+	 set_attr(p, attr_icflag, PROCESSED)
 	 head = p and node_insert_before(head, p, box)
 	    or node_insert_after(head, node_tail(head), box)
 	 return node_next(p), head, p, box
@@ -219,7 +219,7 @@ function luatexja.setwidth.apply_ashift_math(head, last, attr_ablshift)
 	 return
       elseif (has_attr(p, attr_icflag) or 0) ~= PROCESSED then
 	 if pid==id_hlist or pid==id_vlist then
-	    setfield(p, 'shift', getfield(p, 'shift') +  (has_attr(p,attr_ablshift) or 0))
+	    setfield(p, 'shift', getfield(p, 'shift') +  (has_attr(p,attr_ablshift) or 0)) 
 	 elseif pid==id_rule then
 	    local v = has_attr(p,attr_ablshift) or 0
 	    setfield(p, 'height', getfield(p, 'height')-v)
@@ -231,6 +231,7 @@ function luatexja.setwidth.apply_ashift_math(head, last, attr_ablshift)
 	    setfield(p, 'yoffset',
 		     getfield(p, 'yoffset') - (has_attr(p,attr_ablshift) or 0))
 	 end
+         set_attr(p, attr_icflag, PROCESSED)
       end
    end
 end
