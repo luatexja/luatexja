@@ -6,6 +6,9 @@
 \ProvidesPackage{lltjext}[2015/09/18 v1.2-ltj-4 Macros for vertical writing]
 \RequirePackage{luatexja}
 
+{\catcode`\*=11
+\global\let\ltj@lltjext@orig@tabularS=\tabular*
+}%
 \let\ltj@lltjext@orig@tabular=\tabular
 \let\ltj@lltjext@orig@array=\array
 
@@ -747,10 +750,12 @@
 }
 
 \@ifpackageloaded{array}{%
+  \expandafter\let\csname tabular*\endcsname=\ltj@lltjext@orig@tabularS
   \let\tabular=\ltj@lltjext@orig@tabular
   \let\array=\ltj@lltjext@orig@array
   \ltj@lltjext@patch@array
 }{%
+  \let\ltj@lltjext@orig@tabularS\relax
   \let\ltj@lltjext@orig@tabular\relax
   \let\ltj@lltjext@orig@array\relax
   \RequirePackage{filehook}
