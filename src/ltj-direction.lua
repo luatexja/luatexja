@@ -1002,6 +1002,7 @@ do
 	 if split_dir_head then
 	    list_dir = has_attr(split_dir_head, attr_dir)
 	    hd = insert_before(hd, hd, split_dir_head)
+	    split_dir_head=nil
 	 end
 	 if split_dir_whatsit then
 	    -- adjust direction of 'split_keep'
