@@ -268,7 +268,7 @@
 	\fi
 	\ifnum#2>\z@ \shift@CID{#2}{10185}%
 	\fi}
-\gdef\ajnenrei#1#2{\hskip\kanjiskip\hbox{\tate\ifnum#2<10
+\gdef\ajnenrei#1#2{\hskip\ltjgetparameter{kanjiskip}\hbox{\tate\ifnum#2<10
 	\shift@CID{#2}{10207}\CID{\ifcase#1\or10230\or10232\or10231\or10229\fi}%
 	\else\ifnum#2=10\CID{\ifodd#1 10208\else10217\fi}%
 		\CID{\ifcase#1\or10218\or10232\or10218\or10229\fi}%
