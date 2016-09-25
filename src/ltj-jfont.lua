@@ -87,7 +87,7 @@ function define_jfm(t)
 	    v.align = 'left' -- left
 	 end
 	 if type(v.width)~='number' then
-	    v.width = (jfm_dir=='tate') and  1.0
+	    v.width = nil
 	 end
 	 if type(v.height)~='number' then
 	    v.height = (jfm_dir=='tate') and  0.0

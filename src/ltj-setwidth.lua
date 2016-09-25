@@ -191,7 +191,7 @@ luatexja.setwidth.capsule_glyph_tate = capsule_glyph_tate
 local function capsule_glyph_math(p, met, char_data)
    if not char_data then return nil end
    local fwidth, pwidth = char_data.width, getfield(p, 'width')
-   fwidth = (fwidth ~= 'prop') and fwidth or pwidth
+   fwidth = fwidth or pwidth
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = call_callback("luatexja.set_width", fshift, met, char_data)
    local fheight, fdepth = char_data.height, char_data.depth
