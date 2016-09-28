@@ -953,9 +953,9 @@ luatexbase.add_to_callback(
       local subtables = {}
       if ft.specification then
 	 for feat_name,v in pairs(ft.specification.features.normal) do
-	    if v==true then
+	    if v==true and ft.resources then
 	       for _,i in pairs(ft.resources.sequences) do
-		  if i.order[1]== feat_name and i.type == 'gpos_single' then
+		  if i.order[1]== feat_name and i.type == 'gpos_single' and type(i.subtables)=='table' then
 		     for _,st in pairs(i.subtables) do
 			subtables[st] = true
 		     end
