@@ -986,7 +986,7 @@ do
      'luaotfload.patch_font',
      function (tfmdata)
 	local cidinfo = tfmdata.cidinfo or tfmdata.resources.cidinfo
-	if cidinfo then
+	if cidinfo and cidinfo.registry and cidinfo.ordering then
 	   local rd = ltjr_prepare_cid_font(cidinfo.registry, cidinfo.ordering)
 	   if rd then
 	      local ru, rc = rd.resources.unicodes, rd.characters
