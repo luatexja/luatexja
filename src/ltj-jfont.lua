@@ -985,8 +985,9 @@ do
   luatexbase.add_to_callback(
      'luaotfload.patch_font',
      function (tfmdata)
-	if tfmdata.cidinfo then
-	   local rd = ltjr_prepare_cid_font(tfmdata.cidinfo.registry, tfmdata.cidinfo.ordering)
+	local cidinfo = tfmdata.cidinfo or tfmdata.resources.cidinfo
+	if cidinfo then
+	   local rd = ltjr_prepare_cid_font(cidinfo.registry, cidinfo.ordering)
 	   if rd then
 	      local ru, rc = rd.resources.unicodes, rd.characters
 	      for i,v in pairs(tfmdata.characters) do
