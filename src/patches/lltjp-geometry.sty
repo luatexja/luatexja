@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-geometry}[2015/01/04 Patch to geometry for LuaTeX-ja with vertical writing mode]
+\ProvidesPackage{lltjp-geometry}[2016/10/06 Patch to geometry for LuaTeX-ja with vertical writing mode]
 \RequirePackage{ifluatex}
 
 \ifdefined\if@ltj@@geometry@tate\expandafter\endinput\fi
@@ -18,6 +18,7 @@
 \fi
 
 \RequirePackage{filehook}
+\RequirePackage{etoolbox}
 \newif\ifGm@ltj@layoutswitch
 \let\orig@PackageWarningNoLine=\PackageWarningNoLine
 % define ifGm@swap@papersize if it is undefined
@@ -74,6 +75,14 @@
 \define@key{Gm}{noheadfoot}[true]{\Gm@doifelse{noheadfoot}{#1}%
   {\Gm@setlength\headheight\z@\Gm@defbylen{ltj@headsep}\z@
   \Gm@defbylen{ltj@footskip}\z@}{}}%
+\define@key{Gm}{layoutwidth}{\Gm@layouttrue\Gm@setlength\Gm@layoutheight{#1}}%
+\define@key{Gm}{layoutheight}{\Gm@layouttrue\Gm@setlength\Gm@layoutwidth{#1}}%
+\define@key{Gm}{layoutsize}{\Gm@branch{#1}{layoutwidth}{layoutheight}}%
+\define@key{Gm}{layout}{\Gm@layouttrue\@nameuse{Gm@#1}{Gm@layout}%
+  \Gm@setlength\@tempdima{\Gm@layoutheight}%
+  \Gm@setlength\Gm@layoutheight{\Gm@layoutwidth}%
+  \Gm@setlength\Gm@layoutwidth{\@tempdima}%
+}%
 
 % \@mparswitch は傍注の出力位置を左右ページで変えるスイッチだが，
 % geometry.sty はこれを左右ページのレイアウトを変えるか否かの判定にも使っている．
@@ -141,11 +150,11 @@
    \ifGm@showcrop
     \vb@xt@\z@{\vskip-1\Gm@truedimen in\vskip\Gm@layoutvoffset%
      \hb@xt@\z@{\hskip-1\Gm@truedimen in\hskip\Gm@layouthoffset%
-      \vb@xt@\Gm@layoutheight{%
+      \vb@xt@\Gm@layoutwidth{%
        \let\protect\relax
-       \hb@xt@\Gm@layoutwidth{\Gm@cropmark(-1,1,-3,3)\hfil\Gm@cropmark(1,1,3,3)}%
+       \hb@xt@\Gm@layoutheight{\Gm@cropmark(-1,1,-3,3)\hfil\Gm@cropmark(1,1,3,3)}%
        \vfil
-       \hb@xt@\Gm@layoutwidth{\Gm@cropmark(-1,-1,-3,-3)\hfil\Gm@cropmark(1,-1,3,-3)}}%
+       \hb@xt@\Gm@layoutheight{\Gm@cropmark(-1,-1,-3,-3)\hfil\Gm@cropmark(1,-1,3,-3)}}%
      \hss}%
     \vss}%
    \fi%
@@ -412,9 +421,9 @@
     \addtolength\@tempdimb{\topskip}%
     \textheight\@tempdimb
   \fi
-  \advance\oddsidemargin\Gm@layoutvoffset%
-  \advance\evensidemargin\Gm@layoutvoffset%
-  \advance\topmargin\Gm@layouthoffset%
+  \advance\oddsidemargin\Gm@layouthoffset%
+  \advance\evensidemargin\Gm@layouthoffset%
+  \advance\topmargin\Gm@layoutvoffset%
   \addtolength\Gm@layoutheight{\Gm@bindingoffset}%
 }% end of \Gm@@process
 % log
