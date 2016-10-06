@@ -84,6 +84,17 @@
 \end{itemize}
 と変更している．
 
+\subsection{widthとheight}
+\cs{textwidth}が字送り方向の長さ（縦）を表すのと同様に，
+\texttt{width}, \texttt{totalwidth}, \texttt{textwidth}キーの値も字送り方向を，また
+\texttt{height}, \texttt{totalheight}, \texttt{textheight}キーの値も行送り方向（横）を表すようになっている．
+
+しかし，\emph{用紙サイズについては例外}であり，物理的な意味での幅・高さを表す．
+\texttt{paperwidth}, \texttt{layoutwidth}はそれぞれ紙の横幅，レイアウトの横幅を，
+\texttt{paperheight}, \texttt{layoutheight}はそれぞれ紙の高さ，レイアウトの高さを表している．
+
+
+
 \subsection{傍注}
 縦組の場合，傍注は本文の上下に配置される\footnote{%
   二段組の場合は上下共に，一段組の場合は標準では下側だが，
