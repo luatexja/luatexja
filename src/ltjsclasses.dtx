@@ -57,7 +57,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2016/08/27 ltjsclasses ]
+  [2016/10/13 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass{ltjsarticle}
@@ -165,6 +165,8 @@
 % [2016-07-18 LTJ] \texttt{usemag}オプションが指定されると警告を出すようにしました。
 %
 % [2016-07-21 LTJ] \LaTeX 等のロゴの再定義で，\texttt{jslogo}パッケージがあればそちらを読み込むことにしました。
+%
+% [2016-10-13 LTJ] \texttt{slide}オプションの使用時にエラーが出るのを修正．
 %
 % \StopEventually{}
 %
@@ -5414,7 +5416,7 @@
   \renewcommand\familydefault{\sfdefault}
   \raggedright
   \ltj@setpar@global
-  \ltjsetxkanjiskip{0.1em}\relax
+  \ltjsetxkanjiskip0.1em\relax
 \fi
 %    \end{macrocode}
 %

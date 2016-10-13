@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsarticle}
-  [2016/08/27 ltjsclasses ]
+  [2016/10/13 ltjsclasses ]
 \def\jsc@clsname{ltjsarticle}
 \RequirePackage{luatexja}
 \newif\if@restonecol
@@ -1623,7 +1623,7 @@ class has defined the old font commands like\MessageBreak
   \renewcommand\familydefault{\sfdefault}
   \raggedright
   \ltj@setpar@global
-  \ltjsetxkanjiskip{0.1em}\relax
+  \ltjsetxkanjiskip0.1em\relax
 \fi
 \endinput
 %%
