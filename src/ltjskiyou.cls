@@ -216,7 +216,9 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \DeclareOption{winjis}{%
   \ClassWarningNoLine{\jsc@clsname}{The \jsc@clsname\space class does not support `winjis' option}}
 \DeclareOption{uplatex}{%
-  \ClassWarningNoLine{\jsc@clsname}{The \jsc@clsname\space class does not support `uplatex' option}}
+  \ClassErrorNoLine{\jsc@clsname}{The \jsc@clsname\space class does not support `uplatex' option}}
+\DeclareOption{autodetect-engine}{%
+  \ClassWarningNoLine{\jsc@clsname}{The \jsc@clsname\space class does not support `autodetect-engine' option}}
 \DeclareOption{mingoth}{\mingothtrue}
 \DeclareOption{ptexjis}{\ptexjistrue}
 \DeclareOption{jis}{\jisfonttrue}
@@ -289,6 +291,9 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
     \expandafter\endgroup\@tempa
   }
 \fi\fi
+\def\jsc@smallskip{\vspace\jsc@smallskipamount}
+\newskip\jsc@smallskipamount
+\jsc@smallskipamount=3\jsc@mpt plus 1\jsc@mpt minus 1\jsc@mpt
 \newlength{\stockwidth}
 \newlength{\stockheight}
 \setlength{\stockwidth}{\paperwidth}
@@ -626,9 +631,9 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
           \mbox{} \\[1\zw]
           \large
           {\maybeblue\hrule height0\jsc@mpt depth2\jsc@mpt\relax}\par
-          \smallskip
+          \jsc@smallskip
           \@title
-          \smallskip
+          \jsc@smallskip
           {\maybeblue\hrule height0\jsc@mpt depth2\jsc@mpt\relax}\par
           \vfill
           {\small \@author}%
@@ -901,15 +906,16 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
     {\if@slide .5\Cvs \@plus.3\Cdp \else \z@ \fi}%
     {\normalfont\normalsize\headfont}}
 \fi
+\newcommand{\jsParagraphMark}{■}
 \if@twocolumn
   \newcommand{\paragraph}{\@startsection{paragraph}{4}{\z@}%
     {\z@}{\if@slide .4\Cvs \else -1\zw\fi}% 改行せず 1\zw のアキ
-    {\normalfont\normalsize\headfont ■}}
+    {\normalfont\normalsize\headfont\jsParagraphMark}}
 \else
   \newcommand{\paragraph}{\@startsection{paragraph}{4}{\z@}%
     {0.5\Cvs \@plus.5\Cdp \@minus.2\Cdp}%
     {\if@slide .5\Cvs \@plus.3\Cdp \else -1\zw\fi}% 改行せず 1\zw のアキ
-    {\normalfont\normalsize\headfont ■}}
+    {\normalfont\normalsize\headfont\jsParagraphMark}}
 \fi
 \if@twocolumn
   \newcommand{\subparagraph}{\@startsection{subparagraph}{5}{\z@}%

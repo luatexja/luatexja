@@ -216,7 +216,9 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \DeclareOption{winjis}{%
   \ClassWarningNoLine{\jsc@clsname}{The \jsc@clsname\space class does not support `winjis' option}}
 \DeclareOption{uplatex}{%
-  \ClassWarningNoLine{\jsc@clsname}{The \jsc@clsname\space class does not support `uplatex' option}}
+  \ClassErrorNoLine{\jsc@clsname}{The \jsc@clsname\space class does not support `uplatex' option}}
+\DeclareOption{autodetect-engine}{%
+  \ClassWarningNoLine{\jsc@clsname}{The \jsc@clsname\space class does not support `autodetect-engine' option}}
 \DeclareOption{mingoth}{\mingothtrue}
 \DeclareOption{ptexjis}{\ptexjistrue}
 \DeclareOption{jis}{\jisfonttrue}
@@ -288,6 +290,9 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
     \expandafter\endgroup\@tempa
   }
 \fi\fi
+\def\jsc@smallskip{\vspace\jsc@smallskipamount}
+\newskip\jsc@smallskipamount
+\jsc@smallskipamount=3\jsc@mpt plus 1\jsc@mpt minus 1\jsc@mpt
 \newlength{\stockwidth}
 \newlength{\stockheight}
 \setlength{\stockwidth}{\paperwidth}

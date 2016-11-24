@@ -56,7 +56,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2016/10/13 ltjsclasses ]
+  [2016/11/24 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass{ltjsarticle}
@@ -114,7 +114,8 @@
 % \begin{itemize}
 % \item フォントメトリック関係のオプション\texttt{winjis}は単に無視されます。
 % \item 標準では\texttt{jfm-ujis.lua}（Lua\TeX-ja標準のメトリック，OTFパッケージのものがベース）を使用します。
-% \item \texttt{uplatex}オプションを削除してあります。
+% \item \texttt{uplatex}オプション，\texttt{autodetect-engine}オプションを
+% 削除してあります（前者ではエラーを出すようにしています）。
 % \item \texttt{disablejfam}オプションが無効になっています。もし
 % \begin{quotation}
 %   |! LaTeX Error: Too many math alphabets used in version ****.|
@@ -335,6 +336,9 @@
 %
 % オプション \texttt{slide} を新設しました。
 %
+% [2016-10-08] \texttt{slide} オプションは article 以外では使い物にならなかったので，
+% 簡単のため article のみで使えるオプションとしました。
+%
 %    \begin{macrocode}
 \newif\if@slide
 \@slidefalse
@@ -355,9 +359,6 @@
 % \texttt{usemag} オプションの指定で従来通りの動作となります。デフォルトは \texttt{usemag} です。
 %
 % [2016-07-24] オプティカルサイズを調整するためにNFSSへパッチを当てるオプション \texttt{nomag*} を新設しました。
-%
-% [2016-10-08] \texttt{slide} オプションは article 以外では使い物にならなかったので，
-% 簡単のため article のみで使えるオプションとしました。
 %
 %    \begin{macrocode}
 \def\jsc@magscale{1}
@@ -607,6 +608,10 @@
 % \texttt{ptexjis}というオプションを指定します。
 % \texttt{winjis}メトリックは用済みのため，\texttt{winjis}オプションは無視されます。
 %
+% [2016-11-09] pLaTeX / upLaTeX を自動判別するオプション \texttt{autodetect-engine} を新設しました。
+%
+% [2016-11-24 LTJ] \texttt{autodetect-engine} はLua\TeX-jaでは意味がないので警告を表示させます．
+%
 %    \begin{macrocode}
 \newif\ifmingoth
 \mingothfalse
@@ -617,7 +622,9 @@
 \DeclareOption{winjis}{%
   \ClassWarningNoLine{\jsc@clsname}{The \jsc@clsname\space class does not support `winjis' option}}
 \DeclareOption{uplatex}{%
-  \ClassWarningNoLine{\jsc@clsname}{The \jsc@clsname\space class does not support `uplatex' option}}
+  \ClassErrorNoLine{\jsc@clsname}{The \jsc@clsname\space class does not support `uplatex' option}}
+\DeclareOption{autodetect-engine}{%
+  \ClassWarningNoLine{\jsc@clsname}{The \jsc@clsname\space class does not support `autodetect-engine' option}}
 \DeclareOption{mingoth}{\mingothtrue}
 \DeclareOption{ptexjis}{\ptexjistrue}
 \DeclareOption{jis}{\jisfonttrue}
@@ -804,6 +811,38 @@
   }
 \fi\fi
 %    \end{macrocode}
+%
+% [2016-11-16] latex.ltx (ltspace.dtx)で定義されている |\smallskip| の，
+% 単位 |pt| を |\jsc@mpt| に置き換えた |\jsc@smallskip| を定義します。
+% これは |\maketitle| で用いられます。
+% |\jsc@medskip| と |\jsc@bigskip| は必要ないのでコメントアウトしています。
+%
+% \begin{macro}{\jsc@smallskip}
+% \begin{macro}{\jsc@medskip}
+% \begin{macro}{\jsc@bigskip}
+%    \begin{macrocode}
+\def\jsc@smallskip{\vspace\jsc@smallskipamount}
+%\def\jsc@medskip{\vspace\jsc@medskipamount}
+%\def\jsc@bigskip{\vspace\jsc@bigskipamount}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\jsc@smallskipamount}
+% \begin{macro}{\jsc@medskipamount}
+% \begin{macro}{\jsc@bigskipamount}
+%    \begin{macrocode}
+\newskip\jsc@smallskipamount
+\jsc@smallskipamount=3\jsc@mpt plus 1\jsc@mpt minus 1\jsc@mpt
+%\newskip\jsc@medskipamount
+%\jsc@medskipamount =6\jsc@mpt plus 2\jsc@mpt minus 2\jsc@mpt
+%\newskip\jsc@bigskipamount
+%\jsc@bigskipamoun =12\jsc@mpt plus 4\jsc@mpt minus 4\jsc@mpt
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 %
 %
 % \paragraph{PDFの用紙サイズの設定}
@@ -2351,9 +2390,9 @@
           \mbox{} \\[1\zw]
           \large
           {\maybeblue\hrule height0\jsc@mpt depth2\jsc@mpt\relax}\par
-          \smallskip
+          \jsc@smallskip
           \@title
-          \smallskip
+          \jsc@smallskip
           {\maybeblue\hrule height0\jsc@mpt depth2\jsc@mpt\relax}\par
           \vfill
           {\small \@author}%
@@ -3227,18 +3266,28 @@
 %
 %    見出しの後ろで改行されません。
 %
+% [2016-11-16] 従来は |\paragraph| の最初に出るマークを「■」に固定して
+% いましたが，このマークを変更可能にするため |\jsParagraphMark| というマクロ
+% に切り出しました。これで，たとえば
+%\begin{verbatim}
+%  \renewcommand{\jsParagraphMark}{★}
+%\end{verbatim}
+% とすれば「★」に変更できますし，マークを空にすることも容易です。
+% なお，某学会クラスでは従来どおりマークは付きません。
+%
 %    \begin{macrocode}
+%<!jspf>\newcommand{\jsParagraphMark}{■}
 \if@twocolumn
   \newcommand{\paragraph}{\@startsection{paragraph}{4}{\z@}%
     {\z@}{\if@slide .4\Cvs \else -1\zw\fi}% 改行せず 1\zw のアキ
 %<jspf>    {\normalfont\normalsize\headfont}}
-%<!jspf>    {\normalfont\normalsize\headfont ■}}
+%<!jspf>    {\normalfont\normalsize\headfont\jsParagraphMark}}
 \else
   \newcommand{\paragraph}{\@startsection{paragraph}{4}{\z@}%
     {0.5\Cvs \@plus.5\Cdp \@minus.2\Cdp}%
     {\if@slide .5\Cvs \@plus.3\Cdp \else -1\zw\fi}% 改行せず 1\zw のアキ
 %<jspf>    {\normalfont\normalsize\headfont}}
-%<!jspf>    {\normalfont\normalsize\headfont ■}}
+%<!jspf>    {\normalfont\normalsize\headfont\jsParagraphMark}}
 \fi
 %    \end{macrocode}
 % \end{macro}
@@ -4872,6 +4921,11 @@
 %
 % [2003-08-15] |\textasteriskcentered| ではフォントによって
 % 下がりすぎるので変更しました。
+%
+% [2016-10-08] TODO: 脚注番号が |newtxtext| や |newpxtext| の使用時に
+% おかしくなってしまいます。これらのパッケージは内部で |\thefootnote| を
+% 再定義していますので，気になる場合はパッケージを読み込むときに
+% \texttt{defaultsups} オプションを付けてください(qa:57284, qa:57287)。
 %
 %    \begin{macrocode}
 \def\thefootnote{\ifnum\c@footnote>\z@\leavevmode\lower.5ex\hbox{*}\@arabic\c@footnote\fi}
