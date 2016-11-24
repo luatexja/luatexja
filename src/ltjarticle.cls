@@ -21,25 +21,9 @@
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
 %% File: ltjclasses.dtx
-%% \CharacterTable
-%%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
-%%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
-%%   Digits        \0\1\2\3\4\5\6\7\8\9
-%%   Exclamation   \!     Double quote  \"     Hash (number) \#
-%%   Dollar        \$     Percent       \%     Ampersand     \&
-%%   Acute accent  \'     Left paren    \(     Right paren   \)
-%%   Asterisk      \*     Plus          \+     Comma         \,
-%%   Minus         \-     Point         \.     Solidus       \/
-%%   Colon         \:     Semicolon     \;     Less than     \<
-%%   Equals        \=     Greater than  \>     Question mark \?
-%%   Commercial at \@     Left bracket  \[     Backslash     \\
-%%   Right bracket \]     Circumflex    \^     Underscore    \_
-%%   Grave accent  \`     Left brace    \{     Vertical bar  \|
-%%   Right brace   \}     Tilde         \~}
-%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjarticle}
-  [2016/07/19 v1.6-ltj-11
+  [2016/11/24 v1.7b-ltj-11
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -337,7 +321,7 @@
     \def\@makefnmark{\hbox{\unless\ifnum\ltjgetparameter{direction}=3 $\m@th^{\@thefnmark}$
       \else\hbox{\yoko$\m@th^{\@thefnmark}$}\fi}}%
      \long\def\@makefntext##1{\parindent 1em\noindent
-       \hbox to1.8em{\hss$\m@th^{\@thefnmark}$}##1}%
+       \hb@xt@1.8em{\hss$\m@th^{\@thefnmark}$}##1}%
     \if@twocolumn
       \ifnum \col@number=\@ne \@maketitle
       \else \twocolumn[\@maketitle]%
@@ -352,6 +336,7 @@
   \setcounter{footnote}{0}%
   \global\let\thanks\relax
   \global\let\maketitle\relax
+  \global\let\@maketitle\relax
   \global\let\p@thanks\relax
   \global\let\@thanks\@empty
   \global\let\@author\@empty
@@ -417,7 +402,9 @@
    \thesubsubsection.\@arabic\c@paragraph}
 \renewcommand{\thesubparagraph}{%
    \theparagraph.\@arabic\c@subparagraph}
-\newcommand{\part}{\par\addvspace{4ex}%
+\newcommand{\part}{%
+  \if@noskipsec \leavevmode \fi
+  \par\addvspace{4ex}%
   \@afterindenttrue
   \secdef\@part\@spart}
 \def\@part[#1]#2{%
@@ -430,7 +417,7 @@
   \fi
   \markboth{}{}%
   {\parindent\z@\raggedright
-   \interlinepenalty\@M\reset@font
+   \interlinepenalty\@M\normalfont
    \ifnum \c@secnumdepth >\m@ne
      \Large\bfseries\prepartname\thepart\postpartname
      \par\nobreak
@@ -439,29 +426,29 @@
   \nobreak\vskip3ex\@afterheading}
 \def\@spart#1{{%
   \parindent\z@\raggedright
-  \interlinepenalty\@M\reset@font
+  \interlinepenalty\@M\normalfont
   \huge\bfseries#1\par}%
   \nobreak\vskip3ex\@afterheading}
 \newcommand{\section}{\@startsection{section}{1}{\z@}%
    {1.5\Cvs \@plus.5\Cvs \@minus.2\Cvs}%
    {.5\Cvs \@plus.3\Cvs}%
-   {\reset@font\Large\bfseries}}
+   {\normalfont\Large\bfseries}}
 \newcommand{\subsection}{\@startsection{subsection}{2}{\z@}%
    {1.5\Cvs \@plus.5\Cvs \@minus.2\Cvs}%
    {.5\Cvs \@plus.3\Cvs}%
-   {\reset@font\large\bfseries}}
+   {\normalfont\large\bfseries}}
 \newcommand{\subsubsection}{\@startsection{subsubsection}{3}{\z@}%
    {1.5\Cvs \@plus.5\Cvs \@minus.2\Cvs}%
    {.5\Cvs \@plus.3\Cvs}%
-   {\reset@font\normalsize\bfseries}}
+   {\normalfont\normalsize\bfseries}}
 \newcommand{\paragraph}{\@startsection{paragraph}{4}{\z@}%
    {3.25ex \@plus 1ex \@minus .2ex}%
    {-1em}%
-   {\reset@font\normalsize\bfseries}}
+   {\normalfont\normalsize\bfseries}}
 \newcommand{\subparagraph}{\@startsection{subparagraph}{5}{\z@}%
    {3.25ex \@plus 1ex \@minus .2ex}%
    {-1em}%
-   {\reset@font\normalsize\bfseries}}
+   {\normalfont\normalsize\bfseries}}
 \newcommand{\appendix}{\par
   \setcounter{section}{0}%
   \setcounter{subsection}{0}%
@@ -502,7 +489,7 @@
   {\ifnum \@enumdepth >\thr@@\@toodeep\else
    \advance\@enumdepth\@ne
    \edef\@enumctr{enum\romannumeral\the\@enumdepth}%
-   \list{\csname label\@enumctr\endcsname}{%
+   \expandafter \list \csname label\@enumctr\endcsname{%
       \ifnum\ltjgetparameter{direction}=3
          \ifnum \@listdepth=\@ne \topsep.5\normalbaselineskip
            \else\topsep\z@\fi
@@ -529,8 +516,7 @@
   {\ifnum \@itemdepth >\thr@@\@toodeep\else
    \advance\@itemdepth\@ne
    \edef\@itemitem{labelitem\romannumeral\the\@itemdepth}%
-   \expandafter
-   \list{\csname \@itemitem\endcsname}{%
+   \expandafter \list \csname \@itemitem\endcsname{%
       \ifnum\ltjgetparameter{direction}=3
          \ifnum \@listdepth=\@ne \topsep.5\normalbaselineskip
            \else\topsep\z@\fi
@@ -606,7 +592,7 @@
       \else #1: #2\relax\par\fi
   \else
     \global \@minipagefalse
-    \hbox to\hsize{\hfil\box\@tempboxa\hfil}%
+    \hb@xt@\hsize{\hfil\box\@tempboxa\hfil}%
   \fi
   \vskip\belowcaptionskip}
 \setlength\arraycolsep{5\p@}
@@ -649,7 +635,7 @@
 \newdimen\toclineskip
 \setlength\toclineskip{\z@}
 \newdimen\@lnumwidth
-\def\numberline#1{\hbox to\@lnumwidth{#1\hfil}}
+\def\numberline#1{\hb@xt@\@lnumwidth{#1\hfil}}
 \def\@dottedtocline#1#2#3#4#5{%
   \ifnum #1>\c@tocdepth \else
     \vskip\toclineskip \@plus.2\p@
@@ -658,7 +644,7 @@
      \interlinepenalty\@M
      \leavevmode
      \@lnumwidth #3\relax
-     \advance\leftskip \@lnumwidth \hbox{}\hskip -\leftskip
+     \advance\leftskip \@lnumwidth \null\nobreak\hskip -\leftskip
      {#4}\nobreak
      \leaders\hbox{$\m@th \mkern \@dotsep mu.\mkern \@dotsep mu$}%
      \hfill\nobreak
@@ -687,7 +673,7 @@
     {\leavevmode\large\bfseries
      \setlength\@lnumwidth{4\zw}%
      #1\hfil\nobreak
-     \hbox to\@pnumwidth{\hss#2}}\par
+     \hb@xt@\@pnumwidth{\hss#2}}\par
     \nobreak
     \if@compatibility
     \global\@nobreaktrue
@@ -704,7 +690,7 @@
       \leavevmode\bfseries
       \setlength\@lnumwidth{1.5em}%
       \advance\leftskip\@lnumwidth \hskip-\leftskip
-      #1\nobreak\hfil\nobreak\hbox to\@pnumwidth{\hss#2}\par
+      #1\nobreak\hfil\nobreak\hb@xt@\@pnumwidth{\hss#2}\par
     \endgroup
   \fi}
 \newcommand*{\l@subsection}   {\@dottedtocline{2}{1.5em}{2.3em}}
@@ -712,14 +698,14 @@
 \newcommand*{\l@paragraph}    {\@dottedtocline{4}{7.0em}{4.1em}}
 \newcommand*{\l@subparagraph} {\@dottedtocline{5}{10em}{5em}}
 \newcommand{\listoffigures}{%
-    \section*{\listfigurename
-  \@mkboth{\listfigurename}{\listfigurename}}%
+    \section*{\listfigurename}%
+  \@mkboth{\listfigurename}{\listfigurename}%
   \@starttoc{lof}%
 }
 \newcommand*{\l@figure}{\@dottedtocline{1}{1.5em}{2.3em}}
 \newcommand{\listoftables}{%
-    \section*{\listtablename
-  \@mkboth{\listtablename}{\listtablename}}%
+    \section*{\listtablename}%
+  \@mkboth{\listtablename}{\listtablename}%
   \@starttoc{lot}%
 }
 \let\l@table\l@figure
@@ -727,7 +713,7 @@
 \setlength\bibindent{1.5em}
 \newcommand{\newblock}{\hskip .11em\@plus.33em\@minus.07em}
 \newenvironment{thebibliography}[1]
-{\section*{\refname\@mkboth{\refname}{\refname}}%
+{\section*{\refname}\@mkboth{\refname}{\refname}%
    \list{\@biblabel{\@arabic\c@enumiv}}%
         {\settowidth\labelwidth{\@biblabel{#1}}%
          \leftmargin\labelwidth
@@ -747,11 +733,11 @@
 \let\@openbib@code\@empty
 \newenvironment{theindex}
   {\if@twocolumn\@restonecolfalse\else\@restonecoltrue\fi
-   \columnseprule\z@ \columnsep 35\p@
    \twocolumn[\section*{\indexname}]%
    \@mkboth{\indexname}{\indexname}%
    \thispagestyle{jpl@in}\parindent\z@
    \parskip\z@ \@plus .3\p@\relax
+   \columnseprule\z@ \columnsep 35\p@
    \let\item\@idxitem}
   {\if@restonecol\onecolumn\else\clearpage\fi}
 \newcommand{\@idxitem}{\par\hangindent 40\p@}
@@ -760,10 +746,10 @@
 \newcommand{\indexspace}{\par \vskip 10\p@ \@plus5\p@ \@minus3\p@\relax}
 \renewcommand{\footnoterule}{%
   \kern-3\p@
-  \hrule width .4\columnwidth
-  \kern 2.6\p@}
+  \hrule\@width.4\columnwidth
+  \kern2.6\p@}
 \newcommand\@makefntext[1]{\parindent 1em
-  \noindent\hbox to 1.8em{\hss\@makefnmark}#1}
+  \noindent\hb@xt@ 1.8em{\hss\@makefnmark}#1}
 \newif\if西暦 \西暦false
 \def\西暦{\西暦true}
 \def\和暦{\西暦false}

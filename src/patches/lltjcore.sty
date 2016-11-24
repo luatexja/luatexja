@@ -236,10 +236,6 @@
     \@nolnerr
   \else
     \unskip \reserved@e {\reserved@f#1}\nobreak \hfil \break \null
-    % pLaTeX のように \break \break としても，行頭禁則由来のペナルティは
-    % 2つのペナリティとも増加されるだけである．
-    % LuaTeX でのハイフネーション方法は TeX82 と異なるので，
-    % \null のままにしても不都合は生じない．
     \ignorespaces
   \fi}
 
