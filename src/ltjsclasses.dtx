@@ -56,7 +56,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2016/11/24 ltjsclasses ]
+  [2016/12/05 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass{ltjsarticle}
@@ -4750,17 +4750,17 @@
 % で囲んでください。
 %
 %    \begin{macrocode}
-% \def\@citex[#1]#2{%
+% \def\@citex[#1]#2{\leavevmode
 %   \let\@citea\@empty
 %   \@cite{\@for\@citeb:=#2\do
 %     {\@citea\def\@citea{，\inhibitglue\penalty\@m\ }%
-%      \edef\@citeb{\expandafter\@firstofone\@citeb}%
+%      \edef\@citeb{\expandafter\@firstofone\@citeb\@empty}%
 %      \if@filesw\immediate\write\@auxout{\string\citation{\@citeb}}\fi
 %      \@ifundefined{b@\@citeb}{\mbox{\normalfont\bfseries ?}%
 %        \G@refundefinedtrue
 %        \@latex@warning
 %          {Citation `\@citeb' on page \thepage \space undefined}}%
-%        {\hbox{\csname b@\@citeb\endcsname}}}}{#1}}
+%        {\@cite@ofmt{\csname b@\@citeb\endcsname}}}}{#1}}
 % \def\@cite#1#2{\inhibitglue［{#1\if@tempswa ，#2\fi}］\inhibitglue}
 %    \end{macrocode}
 %
@@ -5115,12 +5115,15 @@
 %
 % しかし単に戻すだけでも駄目みたいなので，ここでも最後にグルーを消しておきます。
 %
+% [2016-12-05 LTJ] 本家[2016-11-29]，lltjcore.styでの変更に追従させます．
+%
 %    \begin{macrocode}
 \def\@gnewline #1{%
   \ifvmode
     \@nolnerr
   \else
-    \unskip \reserved@e {\reserved@f#1}\nobreak \hfil \break \null
+%<article|book>    \unskip \reserved@e {\reserved@f#1}\nobreak \hfil \break \hskip\z@
+%<jspf|kiyou>    \unskip \reserved@e {\reserved@f#1}\nobreak \hfil \break \null
     \inhibitglue \ignorespaces
   \fi}
 %    \end{macrocode}
