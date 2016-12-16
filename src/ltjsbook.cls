@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsbook}
-  [2016/12/05 ltjsclasses ]
+  [2016/12/16 ltjsclasses ]
 \def\jsc@clsname{ltjsbook}
 \RequirePackage{luatexja}
 \newif\if@restonecol
@@ -926,9 +926,11 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \@endpart}
 \def\@endpart{\vfil\newpage
   \if@twoside
+   \if@openright %% added (2016/12/13)
     \null
     \thispagestyle{empty}%
     \newpage
+   \fi %% added (2016/12/13)
   \fi
   \if@restonecol
     \twocolumn
