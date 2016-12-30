@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjtbook}
-  [2016/11/24 v1.7b-ltj-11
+  [2016/12/30 v1.7c-ltj-11
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -464,7 +464,11 @@
   \Huge\bfseries#1\par}%
   \@endpart}
 \def\@endpart{\vfil\newpage
-   \if@twoside\null\thispagestyle{empty}\newpage\fi
+   \if@twoside
+    \if@openright %% added (2016/12/18)
+     \null\thispagestyle{empty}\newpage
+    \fi %% added (2016/12/18)
+   \fi
    \if@tempswa\twocolumn\fi}
 \newcommand{\chapter}{%
   \if@openright\cleardoublepage\else\clearpage\fi
