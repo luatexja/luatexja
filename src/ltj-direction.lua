@@ -106,14 +106,14 @@ do
       end
    end
    function get_dir_count()
-      for i=tex_nest.ptr, 1, -1 do
-	 local h = tex_nest[i].head.next
-	 if h then
-	    local t = get_dir_count_inner(h)
-	    if t~=0 then return t end
-	 end
-      end
-      return page_direction
+       for i=tex_nest.ptr, 1, -1 do
+	   local h = tex_nest[i].head.next
+	   if h then
+	       local t = get_dir_count_inner(h)
+	       if t~=0 then return t end
+	   end
+       end
+       return page_direction
    end
    function get_adjust_dir_count()
       for i=tex_nest.ptr, 1, -1 do
@@ -951,6 +951,9 @@ do
       local list_dir = get_dir_count()
       local a = tex_nest[tex_nest.ptr].tail
       local ad = to_direct(a)
+      if (not a) or getid(ad)~=id_ins then
+	  a = node.tail(tex.lists.page_head); ad = to_direct(a)
+      end
       if a and getid(ad)==id_ins then
 	 local h = getfield(ad, 'head')
 	 if getid(h)==id_whatsit and
