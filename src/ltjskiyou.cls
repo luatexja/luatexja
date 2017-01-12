@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjskiyou}
-  [2016/12/16 ltjsclasses ]
+  [2017/01/12 ltjsclasses ]
 \def\jsc@clsname{ltjskiyou}
 \RequirePackage{luatexja}
 \newif\if@restonecol
@@ -294,20 +294,28 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \def\jsc@smallskip{\vspace\jsc@smallskipamount}
 \newskip\jsc@smallskipamount
 \jsc@smallskipamount=3\jsc@mpt plus 1\jsc@mpt minus 1\jsc@mpt
-\newlength{\stockwidth}
-\newlength{\stockheight}
-\setlength{\stockwidth}{\paperwidth}
-\setlength{\stockheight}{\paperheight}
 \iftombow
+  \newlength{\stockwidth}
+  \newlength{\stockheight}
+  \setlength{\stockwidth}{\paperwidth}
+  \setlength{\stockheight}{\paperheight}
   \advance \stockwidth 2in
   \advance \stockheight 2in
-\fi
-\ifdefined\pdfpagewidth
-  \setlength{\pdfpagewidth}{\stockwidth}
-  \setlength{\pdfpageheight}{\stockheight}
+  \ifdefined\pdfpagewidth
+    \setlength{\pdfpagewidth}{\stockwidth}
+    \setlength{\pdfpageheight}{\stockheight}
+  \else
+    \setlength{\pagewidth}{\stockwidth}
+    \setlength{\pageheight}{\stockheight}
+  \fi
 \else
-  \setlength{\pagewidth}{\stockwidth}
-  \setlength{\pageheight}{\stockheight}
+  \ifdefined\pdfpagewidth
+    \setlength{\pdfpagewidth}{\paperwidth}
+    \setlength{\pdfpageheight}{\paperheight}
+  \else
+    \setlength{\pagewidth}{\paperwidth}
+    \setlength{\pageheight}{\paperheight}
+  \fi
 \fi
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
 \ifmingoth
