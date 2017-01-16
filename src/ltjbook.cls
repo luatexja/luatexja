@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjbook}
-  [2016/12/30 v1.7c-ltj-11
+  [2017/01/17 v1.7c-ltj-12
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -154,20 +154,28 @@
   \setlength\columnsep{10\p@}
 \fi
 \setlength\columnseprule{0\p@}
-\newlength{\stockwidth}
-\newlength{\stockheight}
-\setlength{\stockwidth}{\paperwidth}
-\setlength{\stockheight}{\paperheight}
 \iftombow
+  \newlength{\stockwidth}
+  \newlength{\stockheight}
+  \setlength{\stockwidth}{\paperwidth}
+  \setlength{\stockheight}{\paperheight}
   \advance \stockwidth 2in
   \advance \stockheight 2in
-\fi
-\ifdefined\pdfpagewidth
-  \setlength{\pdfpagewidth}{\stockwidth}
-  \setlength{\pdfpageheight}{\stockheight}
+  \ifdefined\pdfpagewidth
+    \setlength{\pdfpagewidth}{\stockwidth}
+    \setlength{\pdfpageheight}{\stockheight}
+  \else
+    \setlength{\pagewidth}{\stockwidth}
+    \setlength{\pageheight}{\stockheight}
+  \fi
 \else
-  \setlength{\pagewidth}{\stockwidth}
-  \setlength{\pageheight}{\stockheight}
+  \ifdefined\pdfpagewidth
+    \setlength{\pdfpagewidth}{\paperwidth}
+    \setlength{\pdfpageheight}{\paperheight}
+  \else
+    \setlength{\pagewidth}{\paperwidth}
+    \setlength{\pageheight}{\paperheight}
+  \fi
 \fi
 \setlength\lineskip{1\p@}
 \setlength\normallineskip{1\p@}
