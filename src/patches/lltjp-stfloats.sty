@@ -3,45 +3,16 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-stfloats}[2014/11/23 Patch to stfloats for LuaTeX-ja]
+\ProvidesPackage{lltjp-stfloats}[2017/01/19 Patch to stfloats for LuaTeX-ja]
 
 \RequirePackage{stfloats,luatexja}
+\RequirePackage{etoolbox}
 
 \let\ltj@fn@makecol=\fn@makecol
 
-\gdef\fn@makecol{%
-   \setbox\@outputbox \box\@cclv
-   \let\@elt\relax
-   \xdef\@freelist{\@freelist\@midlist}%
-   \global \let \@midlist \@empty
-   \@combinefloats
-   \ifvoid\footins
-   \else
-     \setbox\@outputbox \vbox {%
-       \boxmaxdepth \@maxdepth
-       \unvbox \@outputbox
-       \vskip \skip\footins
-       \color@begingroup
-         \normalcolor
-         \footnoterule
-         \unvbox \footins
-       \color@endgroup
-       }%
-   \fi
-   \ifvbox\@kludgeins
-     \@makespecialcolbox
-   \else
-     \setbox\@outputbox \vbox to\@colht {%
-       \@texttop
-       \dimen@ \ltjgetdp\@outputbox
-       \unvbox \@outputbox
-       \ifnum\ltjgetparameter{direction}=3 \hskip\z@\fi %%% LuaTeX-ja
-       \vskip -\dimen@
-       \@textbottom
-       }%
-   \fi
-   \global \maxdepth \@maxdepth
-  }
+\patchcmd\fn@makecol{\vskip -\dimen@}%
+  {\ifnum\ltjgetparameter{direction}=4\else\vbox{\hskip\z@}\fi %%% LuaTeX-ja
+   \vskip -\dimen@}{}{}
 
 \ifx\@makecol\ltj@fn@makecol
   \global\let\@makecol\fn@makecol
