@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-footmisc}[2014/11/23 Patch to footmisc for LuaTeX-ja]
+\ProvidesPackage{lltjp-footmisc}[2017/01/19 Patch to footmisc for LuaTeX-ja]
 \RequirePackage{footmisc}
 
 \let  \if@tempswa  \ifFN@bottom
@@ -47,7 +47,7 @@
       \setbox\@outputbox \vbox to\@colht{%
         \@texttop \dimen@\dp\@outputbox
         \unvbox\@outputbox
-        \ifnum\ltjgetparameter{direction}=3 \hskip\z@\fi %%% LuaTeX-ja
+        \ifnum\ltjgetparameter{direction}=3 \vbox{\hskip\z@}\fi %%% LuaTeX-ja
         \vskip -\dimen@\@textbottom
       }%
     \fi
