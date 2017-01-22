@@ -22,6 +22,16 @@
 \usepackage{booktabs,multicol,luatexja-ruby}
 \usepackage[all]{xy}
 \usepackage{lltjext,alltt}
+\patchcmd\@outputpage{\stepcounter{page}}{%
+  \directlua{%
+    local k = collectgarbage("count")
+    if k>900000 then 
+      collectgarbage("collect")
+      texio.write_nl("term and log", "GC: ", math.floor(k), math.floor(collectgarbage("count")))
+    end
+  }%
+  \stepcounter{page}%
+}{}{}
 
 %%%%%%%% fonts
 \usepackage{luatexja-otf}
@@ -459,7 +469,7 @@ By default, \LuaTeX-ja uses Japanese fonts to typeset Greek and Cyrillic letters
       put \verb!\ltjsetparameter{jacharrange={-2,-3}}! in the preamble.
       For the detailed description, see Subsection~\ref{ssec-setrange}.
 
-From this version, characters which belongs both ISO~8859-1 and JIS~X~0208,
+From version~20150906.0, characters which belongs both ISO~8859-1 and JIS~X~0208,
       such as \P~and~\S, are now typeset in alphabetic fonts. This means that
       without the \cs{fontspec} (and~\Pkg{luatexja-fontspec}) package, these characters are not typeset correctly.
 %</en>
@@ -476,7 +486,7 @@ From this version, characters which belongs both ISO~8859-1 and JIS~X~0208,
       詳しい説明は\ref{ssec-setrange}節を参照してほしい．
 
 また，\P,~\S といったISO~8859-1の上位領域とJIS~X~0208の共通部分の文字は
-      本バージョンから標準で欧文扱いとなり，\emph{ソース中に直接記述しても
+      20150906.0版から標準で欧文扱いとなり，\emph{ソース中に直接記述しても
       \Pkg{fontspec}パッケージ（および\Pkg{luatexja-fontspec}パッケージ）非読み込みの状態では出力されなくなった}．
       和文扱いで出力するには \verb+\ltjjachar`§+ のように \cs{ltjjachar} 命令
       を使えばよい．
@@ -608,13 +618,14 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 \item \Pkg{luaotfload} v2.6 (or later)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
 \item \Pkg{everysel} (if you want to use \LuaTeX-ja with \LaTeXe)
+\item \Pkg{ltxcmds}, \Pkg{pdftexcmds}, \Pkg{atbegshi}
 \item \Pkg{fontspec} v2.4
 %<en>\item \emph{IPAex fonts} (\url{http://ipafont.ipa.go.jp/})
 %<ja>\item \emph{IPAexフォント(\url{http://ipafont.ipa.go.jp/})}
 \end{itemize}
-%<en>In summary, this version of \LuaTeX-ja no longer supports \TeX~Live~2015 (or older version).
+%<en>In summary, \LuaTeX-ja version 20160404.0 (or~later) no longer supports \TeX~Live~2015.
 %<*ja>
-要約すると，本バージョンの\LuaTeX-jaは\TeX~Live~2015以前では動作しない\footnote{%
+要約すると，20160404.0版以降の\LuaTeX-jaは\TeX~Live~2015以前では動作しない\footnote{%
   もっとも，自分で\LuaTeX のバイナリをSubversionリポジトリからビルドしていれば話は別である．
 }．
 %</ja>
@@ -850,7 +861,7 @@ and finally delete the temporary directory.
 \begin{tabular}{cccccc}
 \toprule
 \textbf{direction}&
-\textbf{classification}&\textbf{font name}&\bf ``10\,pt''&\bf``7\,pt''&\bf``5\,pt''\\\midrule
+\textbf{classification}&\textbf{font name}&\bfseries ``10\,pt''&\bfseries ``7\,pt''&\bfseries ``5\,pt''\\\midrule
 \smash{\raisebox{-1ex}{\emph{yoko} (horizontal)}}&
 \emph{mincho}&IPAex Mincho&\cs{tenmin}&\cs{sevenmin}&\cs{fivemin}\\
 &\emph{gothic}&IPAex Gothic&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
@@ -867,7 +878,7 @@ and finally delete the temporary directory.
 \begin{center}\small
 \begin{tabular}{cccccc}
 \toprule
-\emph{組方向}&\emph{字体}&\emph{フォント名}&\bf ``10\,pt''&\bf``7\,pt''&\bf``5\,pt''\\\midrule
+\emph{組方向}&\emph{字体}&\emph{フォント名}&\bfseries``10\,pt''&\bfseries``7\,pt''&\bfseries``5\,pt''\\\midrule
 \smash{\raisebox{-1ex}{横組}}&
 明朝体&IPAex明朝&\cs{tenmin}&\cs{sevenmin}&\cs{fivemin}\\
 &ゴシック体&IPAexゴシック&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
@@ -1705,7 +1716,7 @@ There is not rounded gothic family in Kozuka fonts.
 \begin{center}\small
 \begin{tabular}{cllll}
 \toprule
-\bf family&\bf series&\tt kozuka-pro&\tt kozuka-pr6&\tt kozuka-pr6n\\
+\bfseries family&\bfseries series&\ttfamily kozuka-pro&\ttfamily kozuka-pr6&\ttfamily kozuka-pr6n\\
 \midrule
  &medium&KozMinPro-Regular&KozMinProVI-Regular&KozMinPr6N-Regular\\
 %<en>\smash{\raisebox{1.5ex}{\textit{mincho}}}%
