@@ -22,6 +22,8 @@
 \usepackage{booktabs,multicol,luatexja-ruby}
 \usepackage[all]{xy}
 \usepackage{lltjext,alltt}
+
+%%%%%%%% Lua GC
 \patchcmd\@outputpage{\stepcounter{page}}{%
   \directlua{%
     local k = collectgarbage("count")
@@ -619,7 +621,7 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
 \item \Pkg{everysel} (if you want to use \LuaTeX-ja with \LaTeXe)
 \item \Pkg{ltxcmds}, \Pkg{pdftexcmds}, \Pkg{atbegshi}
-\item \Pkg{fontspec} v2.4
+\item \Pkg{fontspec} v2.4 (or later)
 %<en>\item \emph{IPAex fonts} (\url{http://ipafont.ipa.go.jp/})
 %<ja>\item \emph{IPAexフォント(\url{http://ipafont.ipa.go.jp/})}
 \end{itemize}
@@ -793,14 +795,25 @@ For changes from \pTeX, see Subsection~\ref{ssec:chgptex}.
 %</ja>
 %<*en>
 \item \LuaTeX-ja is very slower than \pTeX.
-Generally speaking, LuaJIT\TeX\ processes \LuaTeX-ja
-about 30\% faster than \LuaTeX, but not always.
+  Generally speaking, LuaJIT\TeX\ processes \LuaTeX-ja
+  about 30\% faster than \LuaTeX, but not always%
+  \footnote{%
+    LuaJIT has the 1\,GB~(or~2\,GB) memory limitation. So typesetting a large source by LuaJIT\TeX\ 
+    may cause an ``out of memory'' error.
+  }.
 %</en>
 %<*ja>
 \item \LuaTeX-jaは動作が\pTeX に比べて非常に遅い．
 コードを調整して徐々に速くしているが，まだ満足できる速度ではない．
 LuaJIT\TeX を用いると\LuaTeX のだいたい1.3倍の速度で動くようであるが，
-IPA mj明朝などの大きいフォントを用いた場合には\LuaTeX よりも遅くなることもある．
+IPA mj明朝などの大きいフォントを用いた場合には\LuaTeX よりも遅くなることもある
+  \footnote{%
+    LuaJITは1\,GB（あるいは2\,GB）のメモリ制限があることが知られている．そのため，
+    大きいソースファイルをLuaJIT\TeX でタイプセットするとLuaの側で``out of memory''エラーが発生してしまう．
+    本ドキュメントのように，「各ページごとにLuaで使っているメモリ容量をチェックし，
+    必要なら\texttt{collectgarbage("collect")}でガベージコレクタを実行」すると
+    状況が多少改善されるかもしれない．
+  }．
 %</ja>
 
 \item%
