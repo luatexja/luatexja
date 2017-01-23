@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2017/01/23 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2017/01/24 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -170,8 +170,8 @@
 \ltjpreset_declare_option:nn{yu-win}{
   \ltjpreset_set_multi:n {
     YuMincho-Regular , YuMincho-Demibold , % mc/m, mc/bx
-    YuGothic-Regular , YuGothic-Regular ,  % gt/m, gt/bx (multiweight))
-    YuGothic-Bold    , YuGothic-Bold ,     % gt/m (uni), gt/eb
+    YuGothic-Regular , YuGothic-Bold ,  % gt/m, gt/bx (multiweight))
+    YuGothic-Regular , YuGothic-Bold ,     % gt/m (uni), gt/eb
     YuGothic-Bold                          % mg/m
   }
 }
@@ -179,8 +179,8 @@
 \ltjpreset_declare_option:nn{yu-win10}{
   \ltjpreset_set_multi:n {
     YuMincho-Regular , YuMincho-Demibold , % mc/m, mc/bx
-    YuGothic-Medium , YuGothic-Regular ,  % gt/m, gt/bx (multiweight))
-    YuGothic-Bold    , YuGothic-Bold ,     % gt/m (uni), gt/eb
+    YuGothic-Regular , YuGothic-Bold     ,  % gt/m, gt/bx (multiweight))
+    YuGothic-Medium  , YuGothic-Bold ,     % gt/m (uni), gt/eb
     YuGothic-Bold                          % mg/m
   }
 }
@@ -190,8 +190,8 @@
 \ltjpreset_declare_option:nn{yu-osx}{
   \ltjpreset_set_multi:n {
     YuMincho~Medium , YuMincho~Demibold , % mc/m, mc/bx
-    YuGothic~Medium , YuGothic~Medium ,     % gt/m, gt/bx (multiweight))
-    YuGothic~Bold   , YuGothic~Bold ,     % gt/m (uni), gt/eb
+    YuGothic~Medium , YuGothic~Bold ,     % gt/m, gt/bx (multiweight))
+    YuGothic~Medium   , YuGothic~Bold ,     % gt/m (uni), gt/eb
     YuGothic~Bold                         % mg/m
   }
 }
@@ -200,17 +200,27 @@
 \ltjpreset_declare_option:nn{moga-mobo}{
   \ltjpreset_set_multi:n {
     Moga90Mincho, Moga90Mincho~Bold ,       % mc/m, mc/bx
-    Moga90Gothic, Moga90Gothic,       % gt/m, gt/bx (multiweight))
-    Moga90Gothic~Bold, Moga90Gothic~Bold,   % gt/m (uni), gt/eb
+    Moga90Gothic, Moga90Gothic~Bold,       % gt/m, gt/bx (multiweight))
+    Moga90Gothic, Moga90Gothic~Bold,   % gt/m (uni), gt/eb
     Mobo90Gothic                            % mg/m
   }
 }
 \ltjpreset_declare_option:nn{moga-mobo-ex}{
   \ltjpreset_set_multi:n {
     MogaEx90Mincho, MogaEx90Mincho~Bold ,       % mc/m, mc/bx
-    MogaEx90Gothic, MogaEx90Gothic,       % gt/m, gt/bx (multiweight))
-    MogaEx90Gothic~Bold, MogaEx90Gothic~Bold,   % gt/m (uni), gt/eb
+    MogaEx90Gothic, MogaEx90Gothic~Bold,       % gt/m, gt/bx (multiweight))
+    MogaEx90Gothic, MogaEx90Gothic~Bold,   % gt/m (uni), gt/eb
     MoboEx90Gothic                            % mg/m
+  }
+}
+
+% Ume fones
+\ltjpreset_declare_option:nn{ume}{
+  \ltjpreset_set_multi:n {
+    Ume~Mincho, Ume~Mincho,
+    Ume~Gothic, Ume~Gothic~O5,
+    Ume~Gothic~O5, Ume~Gothic~O5,
+    Ume~Gothic~O4
   }
 }
 

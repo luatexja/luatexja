@@ -1756,6 +1756,7 @@ There is not rounded gothic family in Kozuka fonts.
 \end{tabular}
 \end{center}
 
+%<ja>\newpage
  \item[hiragino-pro]  Hiragino Pro (Adobe-Japan1-5) fonts.
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[hiragino-pron] Hiragino ProN (Adobe-Japan1-5, JIS04-savvy) fonts.
@@ -1800,7 +1801,6 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
  \item[morisawa-pro]  Morisawa Pro (Adobe-Japan1-4) fonts.
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[morisawa-pr6n]  Morisawa Pr6N (Adobe-Japan1-6, JIS04-savvy) fonts.
-
 \begin{center}\small
 \begin{tabular}{cl>{\tt}l>{\tt}l}
 \toprule
@@ -1825,12 +1825,12 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{tabular}
 \end{center}
 
+%<en>\newpage
  \item[yu-win]  Yu fonts bundled with Windows~8.1.
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[yu-win10]  Yu fonts bundled with Windows~10.
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[yu-osx]  Yu fonts bundled with OSX~Mavericks.
-
 \begin{center}\small
 \begin{tabular}{cllll}
 \toprule
@@ -1857,7 +1857,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{tabular}
 \end{center}
 
-%<en>\newpage
+%<ja>\newpage
 \item[moga-mobo]  MogaMincho, MogaGothic, and MoboGothic.
 \item[moga-mobo-ex]  MogaExMincho, MogaExGothic, and MoboExGothic.
 %<en>These fonts can be downloaded from\\\hfill \url{http://yozvox.web.fc2.com/}.
@@ -1886,6 +1886,35 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{center}
 %<en>When \texttt{moga-mobo-ex} is specified, the font ``MogaEx90Mincho'' etc.\ are used.
 %<ja>\texttt{moga-mobo-ex}オプション指定時にはMogaEx90MinchoなどのExが名前についたフォントが使われる．
+
+\item[ume]  Ume Mincho and Ume Gothic.
+%<en>These fonts can be downloaded from\\\hfill \url{https://ja.osdn.net/projects/ume-font/wiki/FrontPage}.
+%<ja>これらのフォントは \url{https://ja.osdn.net/projects/ume-font/wiki/FrontPage} からダウンロードできる．
+\begin{center}\small
+\begin{tabular}{cll}
+\toprule
+\bf family&\bf series&\bf default\\
+\midrule
+ &medium&Ume Mincho\\
+%<en>\smash{\raisebox{1.5ex}{\textit{mincho}}}%
+%<ja>\smash{\raisebox{1.5ex}{\gt 明朝}}%
+ &bold&Ume Mincho\\
+\midrule
+ &&Ume Gothic*\\
+ &\smash{\raisebox{1.5ex}{medium}}&Ume Gothic O5\\
+\cmidrule(l){2-3}
+%<en>\textit{gothic}%
+%<ja>\gt ゴシック
+ &bold&Ume Gothic O5\\
+ &heavy&Ume Gothic O5\\
+\midrule
+%<en>\textit{rounded gothic}
+%<ja>\gt 丸ゴシック
+&&Ume Gothic O5\\
+\bottomrule
+\end{tabular}
+\end{center}
+
 \end{cslist}
 %<en>\paragraph{Presets for single weight}
 %<ja>\paragraph{単ウェイト用プリセット一覧}
