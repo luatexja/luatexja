@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec}[2015/08/26 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec}[2017/01/23 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e,luatexja}
 \ExplSyntaxOn
 
@@ -11,8 +11,8 @@
 %% Default scale value for jfont.
 \fp_new:N \g_ltj_fontspec_scale_fp
 \group_begin:
-\fontsize{10}{10}\selectfont
-\fp_gset:Nn \g_ltj_fontspec_scale_fp {\zw / 10}
+\fontsize{16}{16}\selectfont
+\fp_gset:Nn \g_ltj_fontspec_scale_fp {\zw / 16}
 \group_end:
 
 \bool_new:N \ltj_fontspec_match
@@ -27,7 +27,9 @@
   }
 \ProcessKeysOptions{ luatexja-fontspec }
 \RequirePackage{fontspec}[2014/06/01]% v2.4
-\RequirePackage{luatexja-fontspec-24}
+\@ifpackagelater{fontspec}{2017/01/01}%
+  {\RequirePackage{luatexja-fontspec-25c}}% v2.5c
+  {\RequirePackage{luatexja-fontspec-24}}% --v2.5a
 
 \ExplSyntaxOff
 %%%%%%%% Now we completely ignore kanjifont definition file.
