@@ -472,8 +472,9 @@ By default, \LuaTeX-ja uses Japanese fonts to typeset Greek and Cyrillic letters
       For the detailed description, see Subsection~\ref{ssec-setrange}.
 
 From version~20150906.0, characters which belongs both ISO~8859-1 and JIS~X~0208,
-      such as \P~and~\S, are now typeset in alphabetic fonts. This means that
-      without the \cs{fontspec} (and~\Pkg{luatexja-fontspec}) package, these characters are not typeset correctly.
+such as \P~and~\S, are now typeset in alphabetic fonts.
+If you are using \LaTeXe\ prior to 2017/01/01, these characters are not typeset correctly
+without the \cs{fontspec} (and~\Pkg{luatexja-fontspec}) package.
 %</en>
 %<*ja>
 \paragraph{ギリシャ文字・キリル文字とISO~8859-1の記号}
@@ -488,10 +489,13 @@ From version~20150906.0, characters which belongs both ISO~8859-1 and JIS~X~0208
       詳しい説明は\ref{ssec-setrange}節を参照してほしい．
 
 また，\P,~\S といったISO~8859-1の上位領域とJIS~X~0208の共通部分の文字は
-      20150906.0版から標準で欧文扱いとなり，\emph{ソース中に直接記述しても
-      \Pkg{fontspec}パッケージ（および\Pkg{luatexja-fontspec}パッケージ）非読み込みの状態では出力されなくなった}．
-      和文扱いで出力するには \verb+\ltjjachar`§+ のように \cs{ltjjachar} 命令
-      を使えばよい．
+      20150906.0版から標準で欧文扱いとなった．\LaTeXe\ 2017/01/01以降では
+標準でTUエンコーディングのLatin Modernフォントが使われるので，
+特に何もせずソース中にそのまま記述してもこれらの文字が出力される
+\footnote{\LaTeXe\ 2017/01/01より前では，ソース中に直接記述しても
+  \Pkg{fontspec}パッケージ（および\Pkg{luatexja-fontspec}パッケージ）非読み込みの状態では出力されない．}．
+和文扱いで出力するには \verb+\ltjjachar`§+ のように \cs{ltjjachar} 命令
+を使えばよい．
 %</ja>
 
 %<en>\subsection{Notations}
@@ -1793,8 +1797,6 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{tabular}
 \end{center}
 
-%<ja>\newpage
-
  \item[morisawa-pro]  Morisawa Pro (Adobe-Japan1-4) fonts.
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[morisawa-pr6n]  Morisawa Pr6N (Adobe-Japan1-6, JIS04-savvy) fonts.
@@ -1825,39 +1827,41 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 
  \item[yu-win]  Yu fonts bundled with Windows~8.1.
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
+ \item[yu-win10]  Yu fonts bundled with Windows~10.
+%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[yu-osx]  Yu fonts bundled with OSX~Mavericks.
 
 \begin{center}\small
-\begin{tabular}{clll}
+\begin{tabular}{cllll}
 \toprule
-\bf family&\bf series&\tt yu-win&\tt yu-osx\\
+\bf family&\bf series&\texttt{yu-win}&\texttt{yu-win10}&\texttt{yu-osx}\\
 \midrule
- &medium&YuMincho-Regular&YuMincho~Medium\\
+ &medium&YuMincho-Regular&YuMincho-Regular&YuMincho~Medium\\
 %<en>\smash{\raisebox{1.5ex}{\textit{mincho}}}%
 %<ja>\smash{\raisebox{1.5ex}{\gt 明朝}}%
- &bold&YuMincho-Demibold&YuMincho~Demibold\\
+ &bold&YuMincho-Demibold&YuMincho-Demibold&YuMincho~Demibold\\
 \midrule
- &&YuGothic-Regular*&YuGothic~Medium*\\
- &\smash{\raisebox{1.5ex}{medium}}
- &YuGothic-Bold&YuGothic~Bold\\
-\cmidrule(l){2-4}
+ &&YuGothic-Regular*&YuGothic-Regular*&YuGothic~Medium*\\
+ &\smash{\raisebox{1.5ex}{medium}}%
+        &YuGothic-Regular&YuGothic-Medium&YuGothic~Medium\\
+\cmidrule(l){2-5}
 %<en>\textit{gothic}%
 %<ja>\gt ゴシック
- &bold&YuGothic-Bold&YuGothic~Bold\\
- &heavy&YuGothic-Bold&YuGothic~Bold\\
+ &bold&YuGothic-Bold&YuGothic-Bold&YuGothic~Bold\\
+ &heavy&YuGothic-Bold&YuGothic-Bold&YuGothic~Bold\\
 \midrule
 %<en>\textit{rounded gothic}
 %<ja>\gt 丸ゴシック
-&&YuGothic-Bold&YuGothic~Bold\\
+&&YuGothic-Bold&YuGothic-Bold&YuGothic~Bold\\
 \bottomrule
 \end{tabular}
 \end{center}
 
 %<en>\newpage
 \item[moga-mobo]  MogaMincho, MogaGothic, and MoboGothic.
+\item[moga-mobo-ex]  MogaExMincho, MogaExGothic, and MoboExGothic.
 %<en>These fonts can be downloaded from\\\hfill \url{http://yozvox.web.fc2.com/}.
 %<ja>これらのフォントは \url{http://yozvox.web.fc2.com/} からダウンロードできる．
-
 \begin{center}\small
 \begin{tabular}{clll}
 \toprule
@@ -1868,10 +1872,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<ja>\smash{\raisebox{1.5ex}{\gt 明朝}}%
  &bold&Moga90Mincho Bold&MogaMincho Bold\\
 \midrule
- &&Moga90Gothic*&MogaGothic*\\
- &\smash{\raisebox{1.5ex}{medium}}
- &Moga90Gothic Bold&MogaGothic Bold\\
-\cmidrule(l){2-4}
+ &medium&Moga90Gothic&MogaGothic\\
 %<en>\textit{gothic}%
 %<ja>\gt ゴシック
  &bold&Moga90Gothic Bold&MogaGothic Bold\\
@@ -1883,8 +1884,8 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \bottomrule
 \end{tabular}
 \end{center}
-
-
+%<en>When \texttt{moga-mobo-ex} is specified, the font ``MogaEx90Mincho'' etc.\ are used.
+%<ja>\texttt{moga-mobo-ex}オプション指定時にはMogaEx90MinchoなどのExが名前についたフォントが使われる．
 \end{cslist}
 %<en>\paragraph{Presets for single weight}
 %<ja>\paragraph{単ウェイト用プリセット一覧}

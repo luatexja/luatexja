@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2016/01/30 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2017/01/23 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -170,7 +170,16 @@
 \ltjpreset_declare_option:nn{yu-win}{
   \ltjpreset_set_multi:n {
     YuMincho-Regular , YuMincho-Demibold , % mc/m, mc/bx
-    YuGothic-Regular , YuGothic-Bold ,     % gt/m, gt/bx (multiweight))
+    YuGothic-Regular , YuGothic-Regular ,  % gt/m, gt/bx (multiweight))
+    YuGothic-Bold    , YuGothic-Bold ,     % gt/m (uni), gt/eb
+    YuGothic-Bold                          % mg/m
+  }
+}
+% Win10
+\ltjpreset_declare_option:nn{yu-win10}{
+  \ltjpreset_set_multi:n {
+    YuMincho-Regular , YuMincho-Demibold , % mc/m, mc/bx
+    YuGothic-Medium , YuGothic-Regular ,  % gt/m, gt/bx (multiweight))
     YuGothic-Bold    , YuGothic-Bold ,     % gt/m (uni), gt/eb
     YuGothic-Bold                          % mg/m
   }
@@ -181,7 +190,7 @@
 \ltjpreset_declare_option:nn{yu-osx}{
   \ltjpreset_set_multi:n {
     YuMincho~Medium , YuMincho~Demibold , % mc/m, mc/bx
-    YuGothic~Medium , YuGothic~Bold ,     % gt/m, gt/bx (multiweight))
+    YuGothic~Medium , YuGothic~Medium ,     % gt/m, gt/bx (multiweight))
     YuGothic~Bold   , YuGothic~Bold ,     % gt/m (uni), gt/eb
     YuGothic~Bold                         % mg/m
   }
@@ -191,9 +200,17 @@
 \ltjpreset_declare_option:nn{moga-mobo}{
   \ltjpreset_set_multi:n {
     Moga90Mincho, Moga90Mincho~Bold ,       % mc/m, mc/bx
-    Moga90Gothic, Moga90Gothic~Bold ,       % gt/m, gt/bx (multiweight))
+    Moga90Gothic, Moga90Gothic,       % gt/m, gt/bx (multiweight))
     Moga90Gothic~Bold, Moga90Gothic~Bold,   % gt/m (uni), gt/eb
     Mobo90Gothic                            % mg/m
+  }
+}
+\ltjpreset_declare_option:nn{moga-mobo-ex}{
+  \ltjpreset_set_multi:n {
+    MogaEx90Mincho, MogaEx90Mincho~Bold ,       % mc/m, mc/bx
+    MogaEx90Gothic, MogaEx90Gothic,       % gt/m, gt/bx (multiweight))
+    MogaEx90Gothic~Bold, MogaEx90Gothic~Bold,   % gt/m (uni), gt/eb
+    MoboEx90Gothic                            % mg/m
   }
 }
 
@@ -251,6 +268,11 @@
   \clist_if_in:NnT \l_ltjpreset_font_list { HiraMinProN-W3 }
    { \bool_set_true:N \l_ltjpreset_shape_nlck_bool }
    \clist_if_in:NnT \l_ltjpreset_font_list { Moga90Mincho }
+   { 
+     \tl_remove_all:Nn \l_ltjpreset_font_list {90} 
+     \tl_clear:N \l_ltjpreset_kanji_shape_tl
+   }
+   \clist_if_in:NnT \l_ltjpreset_font_list { MogaEx90Mincho }
    { 
      \tl_remove_all:Nn \l_ltjpreset_font_list {90} 
      \tl_clear:N \l_ltjpreset_kanji_shape_tl
