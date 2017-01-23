@@ -8,12 +8,21 @@
 \RequirePackage{fontspec,luatexja}
 \ExplSyntaxOn
 
-\cs_set:Nn \fontspec_visible_space:
- {
-  \font_glyph_if_exist:NnTF \font {"2423}
-   { \ltjalchar"2423\scan_stop: }
-   { \fontspec_visible_space_fallback: }
- }
+\@ifpackagelater{fontspec}{2017/01/01}{
+  \cs_set:Nn \fontspec_visible_space:
+   {
+   \__fontspec_primitive_font_glyph_if_exist:NnTF \font {"2423}
+     { \ltjalchar"2423\scan_stop: }
+     { \fontspec_visible_space_fallback: }
+   }
+}{
+  \cs_set:Nn \fontspec_visible_space:
+   {
+   \font_glyph_if_exist:NnTF \font {"2423}
+     { \ltjalchar"2423\scan_stop: }
+     { \fontspec_visible_space_fallback: }
+   }
+}
 \def\verb
  {
   \relax\ifmmode\hbox\else\leavevmode\fi % same as lltjcore

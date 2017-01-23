@@ -56,7 +56,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2017/01/12 ltjsclasses ]
+  [2017/01/23 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass{ltjsarticle}
@@ -769,10 +769,14 @@
 % （不要なので）パッチを当てないことにしました。
 %
 % [2016-04-04 LTJ] NFSSへのパッチを修正。
+%
+% [2017-01-23] \LaTeXe\ 2017-01-01以降ではTUエンコーディングが標準なので，
+% \texttt{type1cm}パッケージは読み込まないようにしました．
 %    \begin{macrocode}
-\if@ltjs@mag@xreal\RequirePackage{type1cm}
+\if@ltjs@mag@xreal
 \ifdim\jsc@mpt=\p@\else
   \expandafter\let\csname OT1/cmr/m/n/10\endcsname\relax
+  \expandafter\let\csname TU/lmr/m/n/10\endcsname\relax
   \expandafter\let\csname OMX/cmex/m/n/10\endcsname\relax
   \newluafunction\ltjs@@magnify@font@calc
   \begingroup\catcode`\%=12\relax

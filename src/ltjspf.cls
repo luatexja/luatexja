@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjspf}
-  [2017/01/12 ltjsclasses ]
+  [2017/01/23 ltjsclasses ]
 \def\jsc@clsname{ltjspf}
 \RequirePackage{luatexja}
 \newif\if@restonecol
@@ -250,9 +250,10 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \ifdim\jsc@mpt=1.0954\p@ \renewcommand{\@ptsize}{1}\else
 \ifdim\jsc@mpt=1.2\p@    \renewcommand{\@ptsize}{2}\else
 \renewcommand{\@ptsize}{-20}\fi\fi
-\if@ltjs@mag@xreal\RequirePackage{type1cm}
+\if@ltjs@mag@xreal
 \ifdim\jsc@mpt=\p@\else
   \expandafter\let\csname OT1/cmr/m/n/10\endcsname\relax
+  \expandafter\let\csname TU/lmr/m/n/10\endcsname\relax
   \expandafter\let\csname OMX/cmex/m/n/10\endcsname\relax
   \newluafunction\ltjs@@magnify@font@calc
   \begingroup\catcode`\%=12\relax
