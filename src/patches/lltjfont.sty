@@ -5,6 +5,24 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{lltjfont}[2016/04/01 Patch to NFSS2 for LuaTeX-ja]
 
+\def\ltj@chardef@text@cmd#1{%
+  \edef\ltj@chardef@text@cmd@name{\expandafter\@gobble\string#1}%
+  \afterassignment\ltj@chardef@text@cmd@\ltj@tempcnta
+}
+\def\ltj@chardef@text@cmd@{%
+  \expandafter\edef\csname \ltj@chardef@text@cmd@name\endcsname{%
+    \noexpand\ltjalchar\the\ltj@tempcnta\space
+  }%
+}
+\def\DeclareTextSymbol#1#2#3{%
+  \@dec@text@cmd\ltj@chardef@text@cmd#1{#2}#3\relax
+}
+
+\ifdefined\UnicodeEncodingName
+  \input{tuenc.def}
+\fi
+
+
 \let\k@encoding\@empty
 \let\ck@encoding\@empty
 % LuaTeX-ja uses JY3 and JT3 encodings.
