@@ -26,11 +26,13 @@
 %%%%%%%% Lua GC
 \patchcmd\@outputpage{\stepcounter{page}}{%
   \directlua{%
-    local k = collectgarbage("count")
-    if k>900000 then 
-      collectgarbage("collect")
-      texio.write_nl("term and log", "GC: ", math.floor(k), math.floor(collectgarbage("count")))
-    end
+	if jit then
+      local k = collectgarbage("count")
+      if k>900000 then 
+        collectgarbage("collect")
+        texio.write_nl("term and log", "GC: ", math.floor(k), math.floor(collectgarbage("count")))
+      end
+	end
   }%
   \stepcounter{page}%
 }{}{}
@@ -56,7 +58,7 @@
 \def\headfont{\normalfont\bfseries\gtfamily}\normalsize
 %</ja>
 %<*en>
-\frenchspacing
+\frenchspacing\sloppy
 \usepackage[margin=25mm,lmargin=30mm,rmargin=30mm,footskip=6mm]{geometry}
 \usepackage{luatexja-adjust}\ltjdisableadjust
 \parskip=\smallskipamount
@@ -176,7 +178,7 @@
 
 \def\_{\leavevmode \kern .06em\vbox {\hrule \@width .333em}}
 \def\cs#1{\texttt{\upshape
-  \texorpdfstring{\textbackslash\ltjsetparameter{autoxspacing=false}#1}{\textbackslash#1}}}
+  \texorpdfstring{\textbackslash\hbox{\ltjsetparameter{autoxspacing=false}#1}}{\textbackslash#1}}}
 \ltjsetparameter{alxspmode={`\\,allow}}
 %%%%%%%%
 \makeatother
@@ -2435,16 +2437,12 @@ The block list is indicated in Table~\ref{table-rng7}.
 %<*en>
 \paragraph{Notes on \texttt{U+0080}--\texttt{U+00FF}}
 You should treat characters in \\texttt{U+0080}--\texttt{U+00FF} as \textbf{ALchar},
-when you use traditional 8-bit fonts, such as the \Pkg{textcomp} package or the
-\Pkg{marvosym} package.
+when you use traditional 8-bit fonts, such as the \Pkg{marvosym} package.
 
-For example, the codepoint \cs{textparagraph} which is provided by the \Pkg{textcomp}
-package is 182. This codepoint corresponds \P\ (\text{U+00B6}) in Unicode.
-Similarly, \cs{Frowny} which is provided by the \Pkg{marvosym} package has
+For example, \cs{Frowny} which is provided by the \Pkg{marvosym} package has
 the same codepoint as \S\ (\text{U+00A7}).
 Hence, as previous versions of \LuaTeX-ja, if these characters are treated as
-\text{JAchar}s, then \cs{textparagraph} produces ``ltjjachar`¶'' (in a Japanese font),
-and  \cs{Frowny} produces ``\ltjjachar`§'' (in a Japanese font).
+\text{JAchar}s, then \cs{Frowny} produces ``\ltjjachar`§'' (in a Japanese font).
 
 To avoid such situations, the default setting of \LuaTeX-ja is changed in this release
 so that all characters \texttt{U+0080}--\texttt{U+00FF} are treated as \textbf{ALchar}.
@@ -2459,22 +2457,16 @@ setting, you can use \cs{ltjalchar} and \cs{ltjjachar} respectively, as the foll
 %</en>
 %<*ja>
 \paragraph{\texttt{U+0080}--\texttt{U+00FF}についての注意}
-\LuaTeX-jaで，\Pkg{textcomp}パッケージや\Pkg{marvosym}パッケージ等，Unicodeフォントでなく
+\LuaTeX-jaで，\Pkg{marvosym}パッケージ等，Unicodeフォントでなく
 伝統的な8ビットフォントを用いる場合には注意が必要である．
 
-例えば，\Pkg{textcomp}パッケージの提供する \cs{textparagraph} は，
-符号位置が182，つまり \texttt{0xB6} であり，Unicodeではこの符号位置では\P\ (\text{U+00B6}) に対応する．
-また，\Pkg{marvosym}パッケージの提供する \cs{Frowny} も，符号位置は167，つまりUnicodeにおける
+例えば，\Pkg{marvosym}パッケージの提供する \cs{Frowny} も，符号位置は167，つまりUnicodeにおける
 \S\ (\text{U+00A7}) と同じ符号位置にある．
 即ち，以前のバージョンのように，「前節の文字範囲8内の文字は\textbf{JAchar}」という設定で
-あったとすると，上記の \cs{textparagraph} は和文フォントで「\ltjjachar`¶」を出力し，
-また \cs{Frowny} は和文フォントで「\ltjjachar`§」を出力することになる．
+あったとすると，上記の \cs{Frowny} は和文フォントで「\ltjjachar`§」を出力することになる．
 
 このような事態を避けるために，本バージョンからは \texttt{U+0080}--\texttt{U+00FF} の範囲の
 文字は全て\textbf{ALchar}となるように初期設定を変更している．
-特に影響を受けるのが，JIS~X~0208の一部分である文字範囲8内の文字であり，
-\emph{\Pkg{fontspec}パッケージを読み込んだりして欧文記号としてこれらの文字の出力環境を整え
-ないと，ソース中に直接記述しても出力されない}ことになる．
 
 なお，文字範囲の設定に関わらず1つの文字を\textbf{ALchar}, \textbf{JAchar}で出力したい場合には，
 以下の例のようにそれぞれ \cs{ltjalchar},~\cs{ltjjachar} に該当文字の文字コードを渡せばよい．
@@ -2484,6 +2476,7 @@ setting, you can use \cs{ltjalchar} and \cs{ltjjachar} respectively, as the foll
 α, \ltjalchar`α, \ltjjachar`α  % default: JAchar
 \end{LTXexample}
 %</ja>
+
 
 %<en>\subsection{\Param{kanjiskip} and \Param{xkanjiskip}}
 %<ja>\subsection{\Param{kanjiskip}と\Param{xkanjiskip}}
@@ -6110,7 +6103,6 @@ are typeset by \cs{piyo}.
 \end{LTXexample}
 %</ja>
 
-
 %<en>\section{Commands for \LaTeXe}
 %<ja>\section{\LaTeXe 用の命令}
 
@@ -6553,6 +6545,30 @@ to use the default family for font substitution.
 和文・欧文の両方のフォントファミリを<family>に設定し，代用フォントが使われるに任せることにする．
 %</ja>
 
+%<*en>
+\subsection{Notes on \cs{DeclareTextSymbol}}
+From \LaTeX~2017/01/01, the standard encoding of \LuaLaTeX\ is changed to the \texttt{TU}
+encoding. This menas that symbols defined by \texttt{T1}~and~\texttt{TS1} encodings can be used
+without loading any package. To produces these symbols in alphabetic fonts in \LuaTeX-ja,
+\LuaTeX-ja patches \cs{DeclareTextSymbol}, and reloads \texttt{tuenc.def}.
+
+Under original definition of \cs{DeclareTextSymbol},
+internal commands which is defined by \cs{DeclareTextSymbol} (such as \cs{T1\cs{textquotedblleft}})
+are \textit{chardef} tokens. However, this no longer holds in \LuaTeX-ja;
+for example, the meaning of \cs{TU\cs{textquotedblleft}} is \cs{ltjalchar8220\ltjalchar"2423 }.
+%</en>
+%<*ja>
+\subsection{\cs{DeclareTextSymbol}使用時の注意}
+\LaTeX~(2017/01/01)以降では，\texttt{TU}エンコーディングが標準となり，特に何もしなくても
+\texttt{T1},~\texttt{TS1}エンコーディングで定義されていた記号類が
+使えるようになった．\LuaTeX-jaではこれらの命令によって記号が欧文フォントで出力されるようにするため，
+\cs{DeclareTextSymbol}命令を改変し，そして\texttt{TU}エンコーディングの定義である
+\texttt{tuenc.def}を再読込している．
+
+従来は \cs{DeclareTextSymbol} で内部的に定義された\cs{T1\cs{textquotedblleft}}といった命令は
+\textit{chardef}トークンであった．しかし前段落で述べた改変によりもはやそうではなくなっており，例えば
+\cs{TU\cs{textquotedblleft}}は \cs{ltjalchar8220\ltjalchar"2423 } という定義になっている．%"
+%</ja>
 
 %<*en>
 \section{Addon packages}
