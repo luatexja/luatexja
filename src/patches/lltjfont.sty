@@ -10,9 +10,13 @@
   \afterassignment\ltj@chardef@text@cmd@\ltj@tempcnta
 }
 \def\ltj@chardef@text@cmd@{%
-  \expandafter\edef\csname \ltj@chardef@text@cmd@name\endcsname{%
-    \noexpand\ltjalchar\the\ltj@tempcnta\space
-  }%
+  \ifnum\ltj@tempcnta>"7F
+    \expandafter\edef\csname \ltj@chardef@text@cmd@name\endcsname{%
+      \noexpand\ltjalchar\the\ltj@tempcnta\space
+    }%
+  \else
+    \expandafter\chardef\csname \ltj@chardef@text@cmd@name\endcsname\ltj@tempcnta
+  \fi
 }
 \def\DeclareTextSymbol#1#2#3{%
   \@dec@text@cmd\ltj@chardef@text@cmd#1{#2}#3\relax
