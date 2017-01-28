@@ -74,7 +74,8 @@
 \RequirePackage{lltjp-geometry}
 \RequirePackage{filehook}
 \AtEndOfPackageFile*{fontspec}{%
-  \RequirePackage{lltjp-fontspec-immediate}
+  \input{lltjp-fontspec-immediate.sty}
+  % \RequirePackage だと fontspec にオプション指定したときにエラー出る
 }
 
 
