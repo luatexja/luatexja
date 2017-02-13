@@ -656,7 +656,7 @@
 
 %%% kanji
 \def\Kanji#1{\expandafter\@Kanji\csname c@#1\endcsname}
-\def\@Kanji#1{\expandafter\kansuji\number #1\relax}
+\def\@Kanji#1{\kansuji #1}
 \def\kanji{\ifnum\ltjgetparameter{direction}=3 \expandafter\kansuji\fi}
 
 %%% bou
