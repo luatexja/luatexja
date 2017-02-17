@@ -772,7 +772,7 @@
 %	\def\check@UTF##1##2##3{\ifx\UTF##1\0x##2\else##3\fi}}{}}
 \gdef\ajRedefine@ajCommands{\@ifpackageloaded{hyperref}{%
 	\let\hyperref@ajLabel\ajLabel
-	\def\ajLabel##1##{\ifHy@pdfstring\Hy@ReturnAfterElseFi\hyperref@ajLabel\@arabic\else\Hy@ReturnAfterFi\hyperref@ajLabel##1\fi}%
+	\def\ajLabel##1##{\ifHy@pdfstring\Hy@ReturnAfterElseFi\hyperref@ajLabel\@arabic\else\ltx@ReturnAfterFi\hyperref@ajLabel##1\fi}%
 	\ajRedefine@ajCommand\△{Lig△}\▽{Lig▽}\！{Lig小}\ajLig{Lig}\ajPICT{PICT}\※{PICT}\ajVar{Var}\@nil\@nil
 	\aj@Redefine@ajCommand○{Maru}●{KuroMaru}□{Kaku}■{KuroKaku}◇{MaruKaku}◆{KuroMaruKaku}\@nil\@nil
 	\def\（##1）{\ifHy@pdfstring(##1)\else\expandafter\ifx\csname ajLig(##1)\endcsname\relax\@ajnumber{##1}{Kakko}%
