@@ -25,7 +25,7 @@
 %
 %  Copyright 1995-1999 ASCII Corporation.
 %  Copyright 1999-2016 Haruhiko Okumura
-%  Copyright 2016 Japanese TeX Development Community
+%  Copyright 2016-2017 Japanese TeX Development Community
 %  -----------------------------------------
 %
 % \fi
@@ -57,7 +57,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2017/02/17 ltjsclasses ]
+  [2017/02/18 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass{ltjsarticle}
@@ -99,12 +99,18 @@
 % これは，元々奥村晴彦先生により作成され，現在は日本語\TeX 開発コミュニティにより
 % 管理されている\texttt{jsclasses.dtx}をLua\LaTeX-ja用に改変したものです。
 % 次のドキュメントクラス（スタイルファイル）を生成します。
+%
+% [2017-02-13] forum:2121の議論を機に，ltjsreportクラスを新設しました。
+% 従来のltjsbookの |report| オプションと比べると，|abstract| 環境の使い方
+% および挙動がアスキーのjreportに近づきました。
+%
 % \begin{quote}
 %   \begin{tabular}{lll}
 %     $\langle$\textsf{article}$\rangle$ & \texttt{ltjsarticle.cls}  & 論文・レポート用 \\
 %     $\langle$\textsf{book}$\rangle$    & \texttt{ltjsbook.cls}     & 書籍用 \\
+%     $\langle$\textsf{report}$\rangle$  & \texttt{ltjsreport.cls}   & レポート用 \\
 %     $\langle$\textsf{jspf}$\rangle$    & \texttt{ltjspf.cls}       & 某学会誌用 \\
-%     $\langle$\textsf{kiyou}$\rangle$   & \texttt{ltjskiyou.cls}      & 某紀要用
+%     $\langle$\textsf{kiyou}$\rangle$   & \texttt{ltjskiyou.cls}    & 某紀要用
 %   \end{tabular}
 % \end{quote}
 %
@@ -646,9 +652,12 @@
 \DeclareOption{english}{\@englishtrue}
 %    \end{macrocode}
 %
-% \paragraph{ltjsreport相当}
+% \paragraph{ltjsbookをltjsreportもどきに}
 %
 % オプション \texttt{report} を新設しました。
+%
+% [2017-02-13] 従来は「ltjsreport相当」をltjsbookの \texttt{report} オプションで提供して
+% いましたが，新しくltjsreportクラスも作りました。どちらでもお好きな方を使ってください。
 %
 %    \begin{macrocode}
 %<*book>
@@ -1751,7 +1760,7 @@
 %</book>
 %<*report>
 \setlength\fullwidth{0.76\paperwidth}
-\if@twocolumn \@tempdima=2zw \else \@tempdima=1zw \fi
+\if@twocolumn \@tempdima=2\zw \else \@tempdima=1\zw \fi
 \divide\fullwidth\@tempdima \multiply\fullwidth\@tempdima
 \setlength\textwidth{\fullwidth}
 %</report>
@@ -5160,14 +5169,14 @@
 %
 % [2016-12-05 LTJ] 本家[2016-11-29]，lltjcore.styでの変更に追従させます．
 %
+% [2017-02-18 LTJ] lltjcore.sty側で戻したのを忘れていました．
 %    \begin{macrocode}
 \def\@gnewline #1{%
   \ifvmode
     \@nolnerr
   \else
-%<article|book>    \unskip \reserved@e {\reserved@f#1}\nobreak \hfil \break \hskip\z@
-%<jspf|kiyou>    \unskip \reserved@e {\reserved@f#1}\nobreak \hfil \break \null
-    \inhibitglue \ignorespaces
+    \unskip \reserved@e {\reserved@f#1}\nobreak \hfil \break \null
+    \inhibitglue\ignorespaces
   \fi}
 %    \end{macrocode}
 %

@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsreport}
-  [2017/02/17 ltjsclasses ]
+  [2017/02/18 ltjsclasses ]
 \def\jsc@clsname{ltjsreport}
 \RequirePackage{luatexja}
 \newif\if@restonecol
@@ -492,7 +492,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \setlength\maxdepth{.5\topskip}
 \newdimen\fullwidth
 \setlength\fullwidth{0.76\paperwidth}
-\if@twocolumn \@tempdima=2zw \else \@tempdima=1zw \fi
+\if@twocolumn \@tempdima=2\zw \else \@tempdima=1\zw \fi
 \divide\fullwidth\@tempdima \multiply\fullwidth\@tempdima
 \setlength\textwidth{\fullwidth}
 \if@slide
@@ -1525,7 +1525,8 @@ class has defined the old font commands like\MessageBreak
   \ifvmode
     \@nolnerr
   \else
-    \inhibitglue \ignorespaces
+    \unskip \reserved@e {\reserved@f#1}\nobreak \hfil \break \null
+    \inhibitglue\ignorespaces
   \fi}
 \IfFileExists{jslogo.sty}{}{\@jslogofalse}%
 \if@jslogo

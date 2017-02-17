@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjspf}
-  [2017/02/17 ltjsclasses ]
+  [2017/02/18 ltjsclasses ]
 \def\jsc@clsname{ltjspf}
 \RequirePackage{luatexja}
 \newif\if@restonecol
@@ -1329,7 +1329,7 @@ class has defined the old font commands like\MessageBreak
     \@nolnerr
   \else
     \unskip \reserved@e {\reserved@f#1}\nobreak \hfil \break \null
-    \inhibitglue \ignorespaces
+    \inhibitglue\ignorespaces
   \fi}
 \IfFileExists{jslogo.sty}{}{\@jslogofalse}%
 \if@jslogo
