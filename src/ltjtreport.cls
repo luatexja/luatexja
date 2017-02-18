@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjtreport}
-  [2017/01/17 v1.7c-ltj-12
+  [2017/02/15 v1.7d-ltj-12
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -33,6 +33,7 @@
 \newif\if@titlepage
 \@titlepagetrue
 \newif\if@openright
+\newif\if@openleft
 \hour\time \divide\hour by 60\relax
 \@tempcnta\hour \multiply\@tempcnta 60\relax
 \minute\time \advance\minute-\@tempcnta
@@ -122,8 +123,9 @@
 \DeclareOption{notitlepage}{\@titlepagefalse}
 \if@compatibility
 \else
-\DeclareOption{openright}{\@openrighttrue}
-\DeclareOption{openany}{\@openrightfalse}
+\DeclareOption{openright}{\@openrighttrue\@openleftfalse}
+\DeclareOption{openleft}{\@openlefttrue\@openrightfalse}
+\DeclareOption{openany}{\@openrightfalse\@openleftfalse}
 \fi
 \DeclareOption{leqno}{\input{leqno.clo}}
 \DeclareOption{fleqn}{\input{fleqn.clo}}
@@ -205,6 +207,45 @@
 \renewcommand{\floatpagefraction}{.5}
 \renewcommand{\dbltopfraction}{.7}
 \renewcommand{\dblfloatpagefraction}{.5}
+\def\pltx@cleartorightpage{\clearpage\if@twoside
+  \ifodd\c@page
+    \iftdir
+      \hbox{}\thispagestyle{empty}\newpage
+      \if@twocolumn\hbox{}\newpage\fi
+    \fi
+  \else
+    \ifydir
+      \hbox{}\thispagestyle{empty}\newpage
+      \if@twocolumn\hbox{}\newpage\fi
+    \fi
+  \fi\fi}
+\def\pltx@cleartoleftpage{\clearpage\if@twoside
+  \ifodd\c@page
+    \ifydir
+      \hbox{}\thispagestyle{empty}\newpage
+      \if@twocolumn\hbox{}\newpage\fi
+    \fi
+  \else
+    \iftdir
+      \hbox{}\thispagestyle{empty}\newpage
+      \if@twocolumn\hbox{}\newpage\fi
+    \fi
+  \fi\fi}
+\def\pltx@cleartooddpage{\clearpage\if@twoside
+  \ifodd\c@page\else
+    \hbox{}\thispagestyle{empty}\newpage
+    \if@twocolumn\hbox{}\newpage\fi
+  \fi\fi}
+\def\pltx@cleartoevenpage{\clearpage\if@twoside
+  \ifodd\c@page
+    \hbox{}\thispagestyle{empty}\newpage
+    \if@twocolumn\hbox{}\newpage\fi
+  \fi\fi}
+\if@openleft
+  \let\cleardoublepage\pltx@cleartoleftpage
+\else\if@openright
+  \let\cleardoublepage\pltx@cleartorightpage
+\fi\fi
 \def\ps@plain{\let\@mkboth\@gobbletwo
    \let\ps@jpl@in\ps@plain
    \let\@oddhead\@empty
@@ -295,6 +336,7 @@
     }%
     {\if@restonecol\twocolumn\else\newpage\fi
     }
++% \changes{v1.7d}{2017/02/15}{bookクラスでtitlepageを必ず奇数ページ
 \else
 \newenvironment{titlepage}
     {%
@@ -304,7 +346,7 @@
         \@restonecolfalse\newpage
       \fi
       \thispagestyle{empty}%
-      \setcounter{page}\@ne
+      \ifodd\c@page\setcounter{page}\@ne\else\setcounter{page}\z@\fi %% 2017/02/15
     }%
     {\if@restonecol\twocolumn \else \newpage \fi
      \if@twoside\else
@@ -314,7 +356,7 @@
 \fi
 \def\p@thanks#1{\footnotemark
   \protected@xdef\@thanks{\@thanks
-    \protect{\noindent$\m@th^\thefootnote$~#1\protect\par}}}
+    \protect{\noindent\hbox{\yoko$\m@th^\thefootnote$}#1\protect\par}}}
 \if@titlepage
   \newcommand{\maketitle}{\begin{titlepage}%
   \let\footnotesize\small
@@ -445,7 +487,8 @@
 \newcommand{\@chapapp}{\prechaptername}
 \newcommand{\@chappos}{\postchaptername}
 \newcommand{\part}{%
-  \if@openright \cleardoublepage \else \clearpage \fi
+  \if@openleft \cleardoublepage \else
+  \if@openright \cleardoublepage \else \clearpage \fi \fi
   \thispagestyle{empty}%
   \if@twocolumn\onecolumn\@tempswatrue\else\@tempswafalse\fi
   \null\vfil
@@ -474,13 +517,16 @@
   \@endpart}
 \def\@endpart{\vfil\newpage
    \if@twoside
-    \if@openright %% added (2016/12/18)
+    \if@openleft %% \if@openleft added (2017/02/15)
      \null\thispagestyle{empty}\newpage
-    \fi %% added (2016/12/18)
+    \else\if@openright %% \if@openright added (2016/12/18)
+     \null\thispagestyle{empty}\newpage
+    \fi\fi %% added (2016/12/18, 2017/02/15)
    \fi
    \if@tempswa\twocolumn\fi}
 \newcommand{\chapter}{%
-  \if@openright\cleardoublepage\else\clearpage\fi
+  \if@openleft \cleardoublepage \else
+  \if@openright \cleardoublepage \else \clearpage \fi \fi
   \thispagestyle{jpl@in}%
   \global\@topnum\z@
   \@afterindenttrue
@@ -513,6 +559,7 @@
    \else
      #1\relax
    \fi}\nobreak\vskip3\Cvs}
+ タイトルより高い位置に右カラムの始点が来るという挙動を維持してあります。
 \def\@schapter#1{%
   \@makeschapterhead{#1}\@afterheading
 }
