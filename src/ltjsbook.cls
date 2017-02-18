@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsbook}
-  [2017/01/23 ltjsclasses ]
+  [2017/02/18 ltjsclasses ]
 \def\jsc@clsname{ltjsbook}
 \RequirePackage{luatexja}
 \newif\if@restonecol
@@ -268,11 +268,11 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
     local getdimen, mpt=tex.getdimen, tex.getdimen('jsc@mpt')/65536
     local t = lua.get_functions_table()
     t[\the\ltjs@@magnify@font@calc] = function()
-      tex.sprint(math.floor(0.5+mpt*getdimen('dimen@')))
+      tex.sprint(-2,math.floor(0.5+mpt*getdimen('dimen@')))
     end
     function luatexja.ltjs_unmagnify_fsize(a)
       local s = luatexja.print_scaled(math.floor(0.5+a/mpt*65536))
-      tex.sprint( (s:match('%.0$')) and s:sub(1,-3) or s )
+      tex.sprint(-2, (s:match('%.0$')) and s:sub(1,-3) or s )
     end
   }
   \endgroup
@@ -280,7 +280,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
      \def\@tempa{#1}\def\@tempb{#2}%
      \ifx\@tempb\@empty
         \edef\@tempb{ scaled\directlua{%
-          tex.sprint(math.floor(0.5+\jsc@magscale*1000))
+          tex.sprint(-2,math.floor(0.5+\jsc@magscale*1000))
         }}%
      \else
         \dimen@\@tempb\relax
@@ -1534,8 +1534,8 @@ class has defined the old font commands like\MessageBreak
   \ifvmode
     \@nolnerr
   \else
-    \unskip \reserved@e {\reserved@f#1}\nobreak \hfil \break \hskip\z@
-    \inhibitglue \ignorespaces
+    \unskip \reserved@e {\reserved@f#1}\nobreak \hfil \break \null
+    \inhibitglue\ignorespaces
   \fi}
 \IfFileExists{jslogo.sty}{}{\@jslogofalse}%
 \if@jslogo

@@ -12,7 +12,7 @@
 \def\luatexjalatexLoaded{\endinput}
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{ltj-latex}[2016/08/21 LaTeX support of LuaTeX-ja]
+\ProvidesPackage{ltj-latex}[2017/01/28 LaTeX support of LuaTeX-ja]
 
 % cleanup at end of the document
 %\let\ltj@@orig@end=\@@end
@@ -72,6 +72,11 @@
 }{}}% ascmac
 
 \RequirePackage{lltjp-geometry}
+\RequirePackage{filehook}
+\AtEndOfPackageFile*{fontspec}{%
+  \input{lltjp-fontspec-immediate.sty}
+  % \RequirePackage だと fontspec にオプション指定したときにエラー出る
+}
 
 
 %%------------------ all done

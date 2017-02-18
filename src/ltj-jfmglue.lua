@@ -1153,6 +1153,7 @@ end
 
 local ensure_tex_attr = ltjb.ensure_tex_attr
 local function cleanup(mode, TEMP)
+   -- luatexja.ext_show_node_list(to_node(head), '> ', print)
    -- adjust attr_icflag for avoiding error
    if tex.getattribute(attr_icflag)~=0 then ensure_tex_attr(attr_icflag, 0) end
    node_free(kanji_skip); 

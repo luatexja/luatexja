@@ -1,17 +1,17 @@
 %%
-%% This is file `ltjskiyou.cls',
+%% This is file `ltjsreport.cls',
 %% generated with the docstrip utility.
 %%
 %% The original source files were:
 %%
-%% ltjsclasses.dtx  (with options: `kiyou')
+%% ltjsclasses.dtx  (with options: `report')
 %% 
 %% IMPORTANT NOTICE:
 %% 
 %% For the copyright see the source file.
 %% 
 %% Any modified versions of this file must be renamed
-%% with new filenames distinct from ltjskiyou.cls.
+%% with new filenames distinct from ltjsreport.cls.
 %% 
 %% For distribution of the original source see the terms
 %% for copying and modification in the file ltjsclasses.dtx.
@@ -37,12 +37,13 @@
 %%   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{ltjskiyou}
+\ProvidesClass{ltjsreport}
   [2017/02/18 ltjsclasses ]
-\def\jsc@clsname{ltjskiyou}
+\def\jsc@clsname{ltjsreport}
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
+\newif\if@openright
 \newif\if@enablejfam \@enablejfamtrue
 \DeclareOption{a3paper}{%
   \setlength\paperheight {420mm}%
@@ -162,6 +163,8 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \DeclareOption{twocolumn}{\@twocolumntrue}
 \DeclareOption{titlepage}{\@titlepagetrue}
 \DeclareOption{notitlepage}{\@titlepagefalse}
+\DeclareOption{openright}{\@openrighttrue}
+\DeclareOption{openany}{\@openrightfalse}
 \def\eqnarray{%
    \stepcounter{equation}%
    \def\@currentlabel{\p@equation\theequation}%
@@ -228,7 +231,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \newif\if@jslogo \@jslogotrue
 \DeclareOption{jslogo}{\@jslogotrue}
 \DeclareOption{nojslogo}{\@jslogofalse}
-\ExecuteOptions{a4paper,twoside,twocolumn,notitlepage,final}
+\ExecuteOptions{a4paper,oneside,onecolumn,titlepage,openany,final}
 \ProcessOptions
 \if@slide
   \def\maybeblue{\@ifundefined{ver@color.sty}{}{\color{blue}}}
@@ -238,8 +241,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \setlength\paperheight{\paperwidth}
   \setlength\paperwidth {\@tempdima}
 \fi
-\def\n@baseline{14.897}
-\def\jsc@magscale{0.9769230}
+\if@slide\def\n@baseline{13}\else\def\n@baseline{16}\fi
 \newdimen\jsc@mpt
 \newdimen\jsc@mmm
 \jsc@mpt=\jsc@magscale\p@
@@ -423,8 +425,8 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \setlength\Chs{\wd0}
 \newcommand{\small}{%
   \ltj@@ifnarrowbaselines
-    {\jsc@setfontsize\small{8.8888}{11}}%
-    {\jsc@setfontsize\small{8.8888}{13.2418}}%
+    {\jsc@setfontsize\small\@ixpt{11}}%
+    {\jsc@setfontsize\small\@ixpt{13}}%
   \abovedisplayskip 9\jsc@mpt \@plus3\jsc@mpt \@minus4\jsc@mpt
   \abovedisplayshortskip  \z@ \@plus3\jsc@mpt
   \belowdisplayskip \abovedisplayskip
@@ -435,8 +437,8 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
               \itemsep \parsep}}
 \newcommand{\footnotesize}{%
   \ltj@@ifnarrowbaselines
-    {\jsc@setfontsize\footnotesize{8.8888}{11}}%
-    {\jsc@setfontsize\footnotesize{8.8888}{13.2418}}%
+    {\jsc@setfontsize\footnotesize\@viiipt{9.5}}%
+    {\jsc@setfontsize\footnotesize\@viiipt{11}}%
   \abovedisplayskip 6\jsc@mpt \@plus2\jsc@mpt \@minus3\jsc@mpt
   \abovedisplayshortskip  \z@ \@plus2\jsc@mpt
   \belowdisplayskip \abovedisplayskip
@@ -448,18 +450,18 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \newcommand{\scriptsize}{\jsc@setfontsize\scriptsize\@viipt\@viiipt}
 \newcommand{\tiny}{\jsc@setfontsize\tiny\@vpt\@vipt}
 \if@twocolumn
-  \newcommand{\large}{\jsc@setfontsize\large{11.111}{\n@baseline}}
+  \newcommand{\large}{\jsc@setfontsize\large\@xiipt{\n@baseline}}
 \else
-  \newcommand{\large}{\jsc@setfontsize\large{11.111}{17}}
+  \newcommand{\large}{\jsc@setfontsize\large\@xiipt{17}}
 \fi
-\newcommand{\Large}{\jsc@setfontsize\Large{12.222}{21}}
+\newcommand{\Large}{\jsc@setfontsize\Large\@xivpt{21}}
 \newcommand{\LARGE}{\jsc@setfontsize\LARGE\@xviipt{25}}
 \newcommand{\huge}{\jsc@setfontsize\huge\@xxpt{28}}
 \newcommand{\Huge}{\jsc@setfontsize\Huge\@xxvpt{33}}
 \newcommand{\HUGE}{\jsc@setfontsize\HUGE{30}{40}}
 \everydisplay=\expandafter{\the\everydisplay \narrowbaselines}
 \newcommand{\headfont}{\gtfamily\sffamily}
-\setlength\columnsep{28truebp}
+\setlength\columnsep{2\zw}
 \setlength\columnseprule{\z@}
 \setlength\lineskip{1\jsc@mpt}
 \setlength\normallineskip{1\jsc@mpt}
@@ -481,24 +483,29 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \else
   \setlength\headheight{20\jsc@mpt}%% from 2\topskip (2016-08-17); from \topskip (2003-06-26)
 \fi
-\if@slide
-  \setlength\footskip{\z@}
-\else
-  \setlength\footskip{0.03367\paperheight}
-  \ifdim\footskip<\baselineskip
-    \setlength\footskip{\baselineskip}
-  \fi
+\setlength\footskip{0.03367\paperheight}
+\ifdim\footskip<\baselineskip
+  \setlength\footskip{\baselineskip}
 \fi
-\setlength\headheight{0\jsc@mpt}
-\setlength\headsep{0\jsc@mpt}
-\addtolength\headsep{-\topskip}%% added (2016-10-08)
-\addtolength\headsep{10\jsc@mpt}%% added (2016-10-08)
+\setlength\headsep{\footskip}
+\addtolength\headsep{-\topskip}
 \setlength\maxdepth{.5\topskip}
 \newdimen\fullwidth
-\setlength\fullwidth{48\zw}
-\addtolength\fullwidth{\columnsep}
+\setlength\fullwidth{0.76\paperwidth}
+\if@twocolumn \@tempdima=2\zw \else \@tempdima=1\zw \fi
+\divide\fullwidth\@tempdima \multiply\fullwidth\@tempdima
 \setlength\textwidth{\fullwidth}
-\setlength{\textheight}{47\baselineskip}
+\if@slide
+  \setlength{\textheight}{0.95\paperheight}
+\else
+  \setlength{\textheight}{0.83\paperheight}
+\fi
+\addtolength{\textheight}{-10\jsc@mpt}%% from -\topskip (2016-10-08); from -\headheight (2003-06-26)
+\addtolength{\textheight}{-\headsep}
+\addtolength{\textheight}{-\footskip}
+\addtolength{\textheight}{-\topskip}
+\divide\textheight\baselineskip
+\multiply\textheight\baselineskip
 \addtolength{\textheight}{\topskip}
 \addtolength{\textheight}{0.1\jsc@mpt}
 \def\flushbottom{%
@@ -534,7 +541,6 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \addtolength\topmargin{-\headsep}
 \addtolength\topmargin{-\footskip}
 \setlength\topmargin{0.5\topmargin}
-\setlength\topmargin{81truebp}
 \addtolength\topmargin{-1in}
 {\footnotesize\global\setlength\footnotesep{\baselineskip}}
 \setlength\footnotesep{0.7\footnotesep}
@@ -577,35 +583,28 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \def\@oddhead{%
     \hbox to \fullwidth{\hfil\textbf{\thepage}}\hss}}
 \let\ps@plain\ps@plainfoot
-\if@twoside
-  \def\ps@headings{%
-    \let\@oddfoot\@empty
-    \let\@evenfoot\@empty
-    \def\@evenhead{\if@mparswitch \hss \fi
-      \underline{\hbox to \fullwidth{\textbf{\thepage}\hfil\leftmark}}%
-      \if@mparswitch\else \hss \fi}%
-    \def\@oddhead{%
-      \underline{%
-        \hbox to \fullwidth{{\rightmark}\hfil\textbf{\thepage}}}\hss}%
-    \let\@mkboth\markboth
-    \def\sectionmark##1{\markboth{%
-       \ifnum \c@secnumdepth >\z@ \thesection \hskip1\zw\fi
-       ##1}{}}%
-    \def\subsectionmark##1{\markright{%
-       \ifnum \c@secnumdepth >\@ne \thesubsection \hskip1\zw\fi
-       ##1}}%
-  }
-\else % if not twoside
-  \def\ps@headings{%
-    \let\@oddfoot\@empty
-    \def\@oddhead{%
-      \underline{%
-        \hbox to \fullwidth{{\rightmark}\hfil\textbf{\thepage}}}\hss}%
-    \let\@mkboth\markboth
-    \def\sectionmark##1{\markright{%
-        \ifnum \c@secnumdepth >\z@ \thesection \hskip1\zw\fi
-        ##1}}}
-\fi
+\newif\if@omit@number
+\def\ps@headings{%
+  \let\@oddfoot\@empty
+  \let\@evenfoot\@empty
+  \def\@evenhead{%
+    \if@mparswitch \hss \fi
+    \underline{\hbox to \fullwidth{\ltjsetparameter{autoxspacing={true}}
+        \textbf{\thepage}\hfil\leftmark}}%
+    \if@mparswitch\else \hss \fi}%
+  \def\@oddhead{\underline{\hbox to \fullwidth{\ltjsetparameter{autoxspacing={true}}
+        {\if@twoside\rightmark\else\leftmark\fi}\hfil\textbf{\thepage}}}\hss}%
+  \let\@mkboth\markboth
+  \def\chaptermark##1{\markboth{%
+    \ifnum \c@secnumdepth >\m@ne
+        \if@omit@number\else
+          \@chapapp\thechapter\@chappos\hskip1\zw
+        \fi
+    \fi
+    ##1}{}}%
+  \def\sectionmark##1{\markright{%
+    \ifnum \c@secnumdepth >\z@ \thesection \hskip1\zw\fi
+    ##1}}}%
 \def\ps@myheadings{%
   \let\@oddfoot\@empty\let\@evenfoot\@empty
   \def\@evenhead{%
@@ -615,8 +614,8 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \def\@oddhead{%
     \hbox to \fullwidth{\rightmark\hfil\thepage}\hss}%
   \let\@mkboth\@gobbletwo
+  \let\chaptermark\@gobble
   \let\sectionmark\@gobble
-  \let\subsectionmark\@gobble
 }
 \def\plainifnotempty{%
   \ifx \@oddhead \@empty
@@ -829,31 +828,43 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \fi
   \@xsect{#3}}
 \newcommand*\chaptermark[1]{}
-\setcounter{secnumdepth}{3}
+\setcounter{secnumdepth}{2}
 \newcounter{part}
-\newcounter{section}
+\newcounter{chapter}
+\newcounter{section}[chapter]
 \newcounter{subsection}[section]
 \newcounter{subsubsection}[subsection]
 \newcounter{paragraph}[subsubsection]
 \newcounter{subparagraph}[paragraph]
 \renewcommand{\thepart}{\@Roman\c@part}
-% \renewcommand{\thesection}{\@arabic\c@section}
-\renewcommand{\thesection}{\presectionname\@arabic\c@section\postsectionname}
-\renewcommand{\thesubsection}{\@arabic\c@section.\@arabic\c@subsection}
+\renewcommand{\thechapter}{\@arabic\c@chapter}
+\renewcommand{\thesection}{\thechapter.\@arabic\c@section}
+\renewcommand{\thesubsection}{\thesection.\@arabic\c@subsection}
 \renewcommand{\thesubsubsection}{%
    \thesubsection.\@arabic\c@subsubsection}
 \renewcommand{\theparagraph}{%
    \thesubsubsection.\@arabic\c@paragraph}
 \renewcommand{\thesubparagraph}{%
    \theparagraph.\@arabic\c@subparagraph}
+\newcommand{\@chapapp}{\prechaptername}
+\newcommand{\@chappos}{\postchaptername}
 \newcommand\part{%
-  \if@noskipsec \leavevmode \fi
-  \par
-  \addvspace{4ex}%
-  \if@english \@afterindentfalse \else \@afterindenttrue \fi
+  \if@openright
+    \cleardoublepage
+  \else
+    \clearpage
+  \fi
+  \thispagestyle{empty}% 欧文用標準スタイルでは plain
+  \if@twocolumn
+    \onecolumn
+    \@restonecoltrue
+  \else
+    \@restonecolfalse
+  \fi
+  \null\vfil
   \secdef\@part\@spart}
 \def\@part[#1]#2{%
-  \ifnum \c@secnumdepth >\m@ne
+  \ifnum \c@secnumdepth >-2\relax
     \refstepcounter{part}%
     \addcontentsline{toc}{part}{%
       \prepartname\thepart\postpartname\hspace{1\zw}#1}%
@@ -861,31 +872,90 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
     \addcontentsline{toc}{part}{#1}%
   \fi
   \markboth{}{}%
-  {\parindent\z@
-    \raggedright
+  {\centering
     \interlinepenalty \@M
     \normalfont
-    \ifnum \c@secnumdepth >\m@ne
-      \Large\headfont\prepartname\thepart\postpartname
-      \par\nobreak
+    \ifnum \c@secnumdepth >-2\relax
+      \huge\headfont \prepartname\thepart\postpartname
+      \par\vskip20\jsc@mpt
     \fi
-    \huge \headfont #2%
-    \markboth{}{}\par}%
-  \nobreak
-  \vskip 3ex
-  \@afterheading}
+    \Huge \headfont #2\par}%
+  \@endpart}
 \def\@spart#1{{%
-    \parindent \z@ \raggedright
+    \centering
     \interlinepenalty \@M
     \normalfont
-    \huge \headfont #1\par}%
-  \nobreak
-  \vskip 3ex
-  \@afterheading}
+    \Huge \headfont #1\par}%
+  \@endpart}
+\def\@endpart{\vfil\newpage
+  \if@twoside
+   \if@openright %% added (2016/12/13)
+    \null
+    \thispagestyle{empty}%
+    \newpage
+   \fi %% added (2016/12/13)
+  \fi
+  \if@restonecol
+    \twocolumn
+  \fi}
+\newcommand{\chapter}{%
+  \if@openright\cleardoublepage\else\clearpage\fi
+  \plainifnotempty % 元: \thispagestyle{plain}
+  \global\@topnum\z@
+  \if@english \@afterindentfalse \else \@afterindenttrue \fi
+  \secdef
+    {\@omit@numberfalse\@chapter}%
+    {\@omit@numbertrue\@schapter}}
+\def\@chapter[#1]#2{%
+  \ifnum \c@secnumdepth >\m@ne
+      \refstepcounter{chapter}%
+      \typeout{\@chapapp\thechapter\@chappos}%
+      \addcontentsline{toc}{chapter}%
+        {\protect\numberline
+        % {\if@english\thechapter\else\@chapapp\thechapter\@chappos\fi}%
+        {\@chapapp\thechapter\@chappos}%
+        #1}%
+  \else
+    \addcontentsline{toc}{chapter}{#1}%
+  \fi
+  \chaptermark{#1}%
+  \addtocontents{lof}{\protect\addvspace{10\jsc@mpt}}%
+  \addtocontents{lot}{\protect\addvspace{10\jsc@mpt}}%
+  \if@twocolumn
+    \@topnewpage[\@makechapterhead{#2}]%
+  \else
+    \@makechapterhead{#2}%
+    \@afterheading
+  \fi}
+\def\@makechapterhead#1{%
+  \vspace*{2\Cvs}% 欧文は50pt
+  {\parindent \z@ \raggedright \normalfont
+    \ifnum \c@secnumdepth >\m@ne
+        \huge\headfont \@chapapp\thechapter\@chappos
+        \par\nobreak
+        \vskip \Cvs % 欧文は20pt
+    \fi
+    \interlinepenalty\@M
+    \Huge \headfont #1\par\nobreak
+    \vskip 3\Cvs}} % 欧文は40pt
+\def\@schapter#1{%
+  \chaptermark{#1}%
+  \if@twocolumn
+    \@topnewpage[\@makeschapterhead{#1}]%
+  \else
+    \@makeschapterhead{#1}\@afterheading
+  \fi}
+\def\@makeschapterhead#1{%
+  \vspace*{2\Cvs}% 欧文は50pt
+  {\parindent \z@ \raggedright
+    \normalfont
+    \interlinepenalty\@M
+    \Huge \headfont #1\par\nobreak
+    \vskip 3\Cvs}} % 欧文は40pt
 \if@twocolumn
   \newcommand{\section}{%
     \@startsection{section}{1}{\z@}%
-    {\Cvs}{0.5\Cvs}%
+    {0.6\Cvs}{0.4\Cvs}%
     {\normalfont\large\headfont\raggedright}}
 \else
   \newcommand{\section}{%
@@ -1094,12 +1164,11 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
       \setcounter{page}\@ne
     \fi}
 \newcommand{\appendix}{\par
+  \setcounter{chapter}{0}%
   \setcounter{section}{0}%
-  \setcounter{subsection}{0}%
-  \gdef\presectionname{\appendixname}%
-  \gdef\postsectionname{}%
-  \gdef\thesection{\presectionname\@Alph\c@section\postsectionname}%
-  \gdef\thesubsection{\@Alph\c@section.\@arabic\c@subsection}}
+  \gdef\@chapapp{\appendixname}%
+  \gdef\@chappos{}%
+  \gdef\thechapter{\@Alph\c@chapter}}
 \setlength\arraycolsep{5\jsc@mpt}
 \setlength\tabcolsep{6\jsc@mpt}
 \setlength\arrayrulewidth{.4\jsc@mpt}
@@ -1108,9 +1177,12 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \skip\@mpfootins = \skip\footins
 \setlength\fboxsep{3\jsc@mpt}
 \setlength\fboxrule{.4\jsc@mpt}
-\renewcommand \theequation {\@arabic\c@equation}
-\newcounter{figure}
-\renewcommand \thefigure {\@arabic\c@figure}
+\@addtoreset{equation}{chapter}
+\renewcommand\theequation
+  {\ifnum \c@chapter>\z@ \thechapter.\fi \@arabic\c@equation}
+\newcounter{figure}[chapter]
+\renewcommand \thefigure
+     {\ifnum \c@chapter>\z@ \thechapter.\fi \@arabic\c@figure}
 \def\fps@figure{tbp}
 \def\ftype@figure{1}
 \def\ext@figure{lof}
@@ -1121,8 +1193,9 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \newenvironment{figure*}%
                {\@dblfloat{figure}}%
                {\end@dblfloat}
-\newcounter{table}
-\renewcommand\thetable{\@arabic\c@table}
+\newcounter{table}[chapter]
+\renewcommand \thetable
+     {\ifnum \c@chapter>\z@ \thechapter.\fi \@arabic\c@table}
 \def\fps@table{tbp}
 \def\ftype@table{2}
 \def\ext@table{lot}
@@ -1183,20 +1256,26 @@ class has defined the old font commands like\MessageBreak
 \newcommand\@pnumwidth{1.55em}
 \newcommand\@tocrmarg{2.55em}
 \newcommand\@dotsep{4.5}
-\setcounter{tocdepth}{2}
+\setcounter{tocdepth}{1}
 \newdimen\jsc@tocl@width
 \newcommand{\tableofcontents}{%
-  \settowidth\jsc@tocl@width{\headfont\presectionname\postsectionname}%
+  \settowidth\jsc@tocl@width{\headfont\prechaptername\postchaptername}%
   \settowidth\@tempdima{\headfont\appendixname}%
-  \ifdim\jsc@tocl@width<\@tempdima\relax\setlength\jsc@tocl@width{\@tempdima}\fi
+  \ifdim\jsc@tocl@width<\@tempdima \setlength\jsc@tocl@width{\@tempdima}\fi
   \ifdim\jsc@tocl@width<2\zw \divide\jsc@tocl@width by 2 \advance\jsc@tocl@width 1\zw\fi
-  \section*{\contentsname}%
-  \@mkboth{\contentsname}{\contentsname}%
+  \if@twocolumn
+    \@restonecoltrue\onecolumn
+  \else
+    \@restonecolfalse
+  \fi
+  \chapter*{\contentsname}%
+  \@mkboth{\contentsname}{}%
   \@starttoc{toc}%
+  \if@restonecol\twocolumn\fi
 }
 \newcommand*{\l@part}[2]{%
   \ifnum \c@tocdepth >-2\relax
-    \addpenalty\@secpenalty
+    \addpenalty{-\@highpenalty}%
     \addvspace{2.25em \@plus\jsc@mpt}%
     \begingroup
       \parindent \z@
@@ -1207,35 +1286,42 @@ class has defined the old font commands like\MessageBreak
         \setlength\@lnumwidth{4\zw}%
         #1\hfil \hb@xt@\@pnumwidth{\hss #2}}\par
       \nobreak
+    \global\@nobreaktrue
+    \everypar{\global\@nobreakfalse\everypar{}}%
     \endgroup
   \fi}
-\newcommand*{\l@section}[2]{%
-  \ifnum \c@tocdepth >\z@
-    \addpenalty{\@secpenalty}%
-    \addvspace{1.0em \@plus\jsc@mpt}%
+\newcommand*{\l@chapter}[2]{%
+  \ifnum \c@tocdepth >\m@ne
+    \addpenalty{-\@highpenalty}%
+    \addvspace{1.0em \@plus\jsc@mpt}
     \begingroup
       \parindent\z@
       \rightskip\@tocrmarg
       \parfillskip-\rightskip
       \leavevmode\headfont
-      %\setlength\@lnumwidth{4\zw}% 元1.5em [2003-03-02]
-      \setlength\@lnumwidth{\jsc@tocl@width}\advance\@lnumwidth 2\zw
+      % \if@english\setlength\@lnumwidth{5.5em}\else\setlength\@lnumwidth{4.683\zw}\fi
+      \setlength\@lnumwidth{\jsc@tocl@width}\advance\@lnumwidth 2.683\zw
       \advance\leftskip\@lnumwidth \hskip-\leftskip
       #1\nobreak\hfil\nobreak\hbox to\@pnumwidth{\hss#2}\par
+      \penalty\@highpenalty
     \endgroup
   \fi}
-\newcommand*{\l@subsection}{%
+ % \newcommand*{\l@section}{\@dottedtocline{1}{1\zw}{3.683\zw}}
+\newcommand*{\l@section}{%
           \@tempdima\jsc@tocl@width \advance\@tempdima -1\zw
-          \@dottedtocline{2}{\@tempdima}{3\zw}}
+          \@dottedtocline{1}{\@tempdima}{3.683\zw}}
+\newcommand*{\l@subsection}{%
+          \@tempdima\jsc@tocl@width \advance\@tempdima 2.683\zw
+          \@dottedtocline{2}{\@tempdima}{3.5\zw}}
 \newcommand*{\l@subsubsection}{%
-          \@tempdima\jsc@tocl@width \advance\@tempdima 0\zw
-          \@dottedtocline{3}{\@tempdima}{4\zw}}
+          \@tempdima\jsc@tocl@width \advance\@tempdima 6.183\zw
+          \@dottedtocline{3}{\@tempdima}{4.5\zw}}
 \newcommand*{\l@paragraph}{%
-          \@tempdima\jsc@tocl@width \advance\@tempdima 1\zw
-          \@dottedtocline{4}{\@tempdima}{5\zw}}
+          \@tempdima\jsc@tocl@width \advance\@tempdima 10.683\zw
+          \@dottedtocline{4}{\@tempdima}{5.5\zw}}
 \newcommand*{\l@subparagraph}{%
-          \@tempdima\jsc@tocl@width \advance\@tempdima 2\zw
-          \@dottedtocline{5}{\@tempdima}{6\zw}}
+          \@tempdima\jsc@tocl@width \advance\@tempdima 16.183\zw
+          \@dottedtocline{5}{\@tempdima}{6.5\zw}}
 \newdimen\@lnumwidth
 \def\numberline#1{\hb@xt@\@lnumwidth{#1\hfil}\hspace{0pt}}
 \def\@dottedtocline#1#2#3#4#5{\ifnum #1>\c@tocdepth \else
@@ -1251,15 +1337,21 @@ class has defined the old font commands like\MessageBreak
        mu$}\hfill \nobreak\hb@xt@\@pnumwidth{%
          \hfil\normalfont \normalcolor #5}\par}\fi}
 \newcommand{\listoffigures}{%
-  \section*{\listfigurename}%
-  \@mkboth{\listfigurename}{\listfigurename}%
+  \if@twocolumn\@restonecoltrue\onecolumn
+  \else\@restonecolfalse\fi
+  \chapter*{\listfigurename}%
+  \@mkboth{\listfigurename}{}%
   \@starttoc{lof}%
+  \if@restonecol\twocolumn\fi
 }
 \newcommand*{\l@figure}{\@dottedtocline{1}{1\zw}{3.683\zw}}
 \newcommand{\listoftables}{%
-  \section*{\listtablename}%
-  \@mkboth{\listtablename}{\listtablename}%
+  \if@twocolumn\@restonecoltrue\onecolumn
+  \else\@restonecolfalse\fi
+  \chapter*{\listtablename}%
+  \@mkboth{\listtablename}{}%
   \@starttoc{lot}%
+  \if@restonecol\twocolumn\fi
 }
 \let\l@table\l@figure
 \newdimen\bibindent
@@ -1268,9 +1360,8 @@ class has defined the old font commands like\MessageBreak
   \global\@jsc@warnoldfontcmdexceptiontrue
   \global\let\presectionname\relax
   \global\let\postsectionname\relax
-  \vspace{1.5\baselineskip}
-  \subsubsection*{\refname}\@mkboth{\refname}{\refname}%
-  \vspace{0.5\baselineskip}
+  \chapter*{\bibname}\@mkboth{\bibname}{}%
+  \addcontentsline{toc}{chapter}{\bibname}%
    \list{\@biblabel{\@arabic\c@enumiv}}%
         {\settowidth\labelwidth{\@biblabel{#1}}%
          \leftmargin\labelwidth
@@ -1279,7 +1370,6 @@ class has defined the old font commands like\MessageBreak
          \usecounter{enumiv}%
          \let\p@enumiv\@empty
          \renewcommand\theenumiv{\@arabic\c@enumiv}}%
-   \small
    \sloppy
    \clubpenalty4000
    \@clubpenalty\clubpenalty
@@ -1299,21 +1389,21 @@ class has defined the old font commands like\MessageBreak
     \fi
     \columnseprule.4pt \columnsep 2\zw
     \ifx\multicols\@undefined
-      \def\presectionname{}\def\postsectionname{}%
-      \twocolumn[\section*{\indexname}]%
+      \twocolumn[\@makeschapterhead{\indexname}%
+      \addcontentsline{toc}{chapter}{\indexname}]%
     \else
       \ifdim\textwidth<\fullwidth
         \setlength{\evensidemargin}{\oddsidemargin}
         \setlength{\textwidth}{\fullwidth}
         \setlength{\linewidth}{\fullwidth}
-        \def\presectionname{}\def\postsectionname{}%
-        \begin{multicols}{3}[\section*{\indexname}]%
+        \begin{multicols}{3}[\chapter*{\indexname}%
+        \addcontentsline{toc}{chapter}{\indexname}]%
       \else
-        \def\presectionname{}\def\postsectionname{}%
-        \begin{multicols}{2}[\section*{\indexname}]%
+        \begin{multicols}{2}[\chapter*{\indexname}%
+        \addcontentsline{toc}{chapter}{\indexname}]%
       \fi
     \fi
-    \@mkboth{\indexname}{\indexname}%
+    \@mkboth{\indexname}{}%
     \plainifnotempty % \thispagestyle{plain}
     \parindent\z@
     \parskip\z@ \@plus .3\jsc@mpt\relax
@@ -1343,6 +1433,7 @@ class has defined the old font commands like\MessageBreak
   \kern-3\jsc@mpt
   \hrule width .4\columnwidth height 0.4\jsc@mpt
   \kern 2.6\jsc@mpt}
+\@addtoreset{footnote}{chapter}
 \long\def\@footnotetext{%
   \insert\footins\bgroup
     \normalfont\footnotesize
@@ -1576,6 +1667,8 @@ class has defined the old font commands like\MessageBreak
 \fi
 \newcommand{\prepartname}{\if@english Part~\else 第\fi}
 \newcommand{\postpartname}{\if@english\else 部\fi}
+\newcommand{\prechaptername}{\if@english Chapter~\else 第\fi}
+\newcommand{\postchaptername}{\if@english\else 章\fi}
 \newcommand{\presectionname}{}%  第
 \newcommand{\postsectionname}{}% 節
 \newcommand{\contentsname}{\if@english Contents\else 目次\fi}
@@ -1629,4 +1722,4 @@ class has defined the old font commands like\MessageBreak
 \fi
 \endinput
 %%
-%% End of file `ltjskiyou.cls'.
+%% End of file `ltjsreport.cls'.
