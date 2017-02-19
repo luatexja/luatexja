@@ -267,7 +267,7 @@
    \else
      \setbox\@outputbox \vbox to\@colht {%
        \@texttop
-       \dimen@ \dp\@outputbox\typeout{\the\dimen@,\meaning\@textbottom}
+       \dimen@ \dp\@outputbox
        \unvbox \@outputbox
        \ifnum\ltjgetparameter{direction}=4\else\vbox{\hskip\z@}\fi %%% LuaTeX-ja
        \vskip -\dimen@
@@ -276,6 +276,7 @@
    \fi
    \global \maxdepth \@maxdepth
 }
+\let\ltj@orig@makecol=\@makecol
 
 \patchcmd\@makespecialcolbox{\@textbottom}{\ifltj@ftn@unvboxed\iffnfixbottom\else\@textbottom\fi\else\@textbottom\fi}{}{}
 

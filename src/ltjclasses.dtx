@@ -4517,10 +4517,12 @@
 % \end{macro}
 % \end{macro}
 %
+% |stfloats|パッケージがシステムにインストールされている場合は、このパッケージを使って
+% p\LaTeX の標準時と同じようにボトムフロートの下に脚注が組まれるようにします。
 % \changes{v1.0d}{1996/02/29}{articleとreportのデフォルトを
 %                              \pstyle{plain}に修正}
 % \changes{v1.4}{2002/04/09}{縦組スタイルで\cs{flushbottom}しないようにした}
-% \changes{v1.7d-ltj-13}{2017/02/19}{\pLaTeX と\LuaTex-ja の|\@makecol|が違うことを
+% \changes{v1.7d-ltj-13}{2017/02/19}{p\LaTeX とLua\TeX-jaの|\@makecol|が違うことを
 %   考慮していなかった}
 %    \begin{macrocode}
 %<book>\pagestyle{headings}
@@ -4528,6 +4530,7 @@
 \pagenumbering{arabic}
 \raggedbottom
 \fnfixbottomtrue % 2017-02-19
+\IfFileExists{stfloats.sty}{\RequirePackage{stfloats}\fnbelowfloat}{}
 \if@twocolumn
   \twocolumn
   \sloppy
@@ -4561,7 +4564,7 @@
 % \section{各種パッケージへの対応}
 % もともと縦組での利用を想定されていないいくつかのパッケージについて、
 % 補正するためのコードを記述しておきます。
-% この節のコードは|filehook|パッケージ（\LuaTeX-ja読み込み時に自動でロードされます）
+% この節のコードは|filehook|パッケージ（Lua\TeX-ja読み込み時に自動でロードされます）
 % の機能を用いています。
 %
 % \subsection{\texttt{ftnright}パッケージ}
@@ -4569,10 +4572,8 @@
 % パッケージ読み込み前に予め退避しておき、読み込み後に復帰させます。
 % \changes{v1.7d}{2017/02/19}{コード追加}
 %    \begin{macrocode}
-%<*tate>
 \AtBeginOfPackageFile*{ftnright}{\let\ltjt@orig@@makefntext=\@makefntext}
 \AtEndOfPackageFile*{ftnright}{\let\@makefntext=\ltjt@orig@@makefntext}
-%</tate>
 %    \end{macrocode}
 %
 %

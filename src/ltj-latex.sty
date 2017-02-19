@@ -62,7 +62,6 @@
 \ltj@pkgpatch{unicode-math}
 \ltj@pkgpatch{xunicode}
 \ltj@pkgpatch{fontspec}
-\ltj@pkgpatch{stfloats}
 \ltj@pkgpatch{footmisc}
 \ltj@pkgpatch{tascmac}
 \ltj@AtBeginDocument{\@ifpackageloaded{ascmac}{%
@@ -70,6 +69,7 @@
   \makeatletter\input{lltjp-tascmac.sty}%
   \ltj@asc@temp\let\ltj@asc@temp=\relax
 }{}}% ascmac
+\ltj@pkgpatch{stfloats}
 
 \RequirePackage{lltjp-geometry}
 \RequirePackage{filehook}

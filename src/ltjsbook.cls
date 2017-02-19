@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsbook}
-  [2017/02/18 ltjsclasses ]
+  [2017/02/19 ltjsclasses ]
 \def\jsc@clsname{ltjsbook}
 \RequirePackage{luatexja}
 \newif\if@restonecol
@@ -1713,6 +1713,8 @@ class has defined the old font commands like\MessageBreak
 \hyphenation{ado-be post-script ghost-script phe-nom-e-no-log-i-cal man-u-script}
 \if@report \pagestyle{plain} \else \pagestyle{headings} \fi
 \pagenumbering{arabic}
+\fnfixbottomtrue % 2017-02-19
+\IfFileExists{stfloats.sty}{\RequirePackage{stfloats}\fnbelowfloat}{}
 \if@twocolumn
   \twocolumn
   \sloppy

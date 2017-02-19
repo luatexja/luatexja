@@ -8,7 +8,11 @@
 \RequirePackage{stfloats,luatexja}
 \RequirePackage{etoolbox}
 
+\newif\ifltj@stfloats@fnbelowfloat
 \let\ltj@fn@makecol=\fn@makecol
+\ifx\@makecol\ltj@fn@makecol\ltj@stfloats@fnbelowfloattrue\fi % \fnbelowfloat 発行済
+\let\ltj@fn@makecol=\relax
+\global\let\org@makecol\ltj@orig@makecol
 
 \patchcmd\fn@makecol{\vskip -\dimen@\@textbottom}%
   {\ifnum\ltjgetparameter{direction}=4\else\vbox{\hskip\z@}\fi %%% LuaTeX-ja
@@ -18,7 +22,7 @@
 \patchcmd\fn@makecol{\ifvoid\footins}{\ifvoid\footins\ltj@ftn@unvboxedfalse}{}{}
 \patchcmd\fn@makecol{\setbox\@outputbox \vbox}{\ltj@ftn@unvboxedtrue\setbox\@outputbox \vbox}{}{}
 
-\ifx\@makecol\ltj@fn@makecol
+\ifltj@stfloats@fnbelowfloat
   \global\let\@makecol\fn@makecol
 \fi
 \endinput

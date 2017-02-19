@@ -57,7 +57,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2017/02/18 ltjsclasses ]
+  [2017/02/19 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass{ltjsarticle}
@@ -5523,13 +5523,19 @@
 % \paragraph{ページ設定}
 %
 % ページ設定の初期化です。
+% |stfloats|パッケージがシステムにインストールされている場合は、このパッケージを使って
+% \pLaTeX の標準時と同じようにボトムフロートの下に脚注が組まれるようにします。
 %
+% [2017-02-19] \pLaTeX とLua\TeX-jaの|\@makecol|が違うことを
+%   考慮していませんでした。
 %    \begin{macrocode}
 %<article>\if@slide \pagestyle{empty} \else \pagestyle{plain} \fi
 %<book>\if@report \pagestyle{plain} \else \pagestyle{headings} \fi
 %<report|kiyou>\pagestyle{plain}
 %<jspf>\pagestyle{headings}
 \pagenumbering{arabic}
+\fnfixbottomtrue % 2017-02-19
+\IfFileExists{stfloats.sty}{\RequirePackage{stfloats}\fnbelowfloat}{}
 \if@twocolumn
   \twocolumn
   \sloppy

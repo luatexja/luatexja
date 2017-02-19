@@ -299,6 +299,8 @@
 \def\@listvi {\leftmargin\leftmarginvi
               \labelwidth\leftmarginvi
               \advance\labelwidth-\labelsep}
+\AtBeginOfPackageFile*{ftnright}{\let\ltjt@orig@@makefntext=\@makefntext}
+\AtEndOfPackageFile*{ftnright}{\let\@makefntext=\ltjt@orig@@makefntext}
 \endinput
 %%
 %% End of file `ltjsize11.clo'.

@@ -941,6 +941,7 @@
 \pagenumbering{arabic}
 \raggedbottom
 \fnfixbottomtrue % 2017-02-19
+\IfFileExists{stfloats.sty}{\RequirePackage{stfloats}\fnbelowfloat}{}
 \if@twocolumn
   \twocolumn
   \sloppy
@@ -952,6 +953,8 @@
 \else
   \@mparswitchfalse
 \fi
+\AtBeginOfPackageFile*{ftnright}{\let\ltjt@orig@@makefntext=\@makefntext}
+\AtEndOfPackageFile*{ftnright}{\let\@makefntext=\ltjt@orig@@makefntext}
 \endinput
 %%
 %% End of file `ltjbook.cls'.

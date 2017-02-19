@@ -951,6 +951,7 @@
 \pagenumbering{arabic}
 \raggedbottom
 \fnfixbottomtrue % 2017-02-19
+\IfFileExists{stfloats.sty}{\RequirePackage{stfloats}\fnbelowfloat}{}
 \if@twocolumn
   \twocolumn
   \sloppy
