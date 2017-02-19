@@ -324,7 +324,7 @@ For more detailed information, see Part~\ref{part-imp} or other sections of this
 
 %<*en>
 \paragraph{Command names} \pTeX\ addes several primitives, such as \cs{kanjiskip},
-\cs{prebreakpenalty},~and,~\cs{ifydir}. They can be used as follows:
+\cs{prebreakpenalty},~and \cs{ifydir}. They can be used as follows:
 %</en>
 %<*ja>
 \paragraph{命令の名称} 例えば\pTeX で追加された次のようなプリミティブ
@@ -1120,17 +1120,41 @@ to set the main document font size.
 
 %<*ja>
 \paragraph{脚注とボトムフロートの出力順序}
-オリジナルの\LaTeX では脚注がボトムフロートの上に来るようになっており，
-\pLaTeX では脚注がボトムフロートの下に来るように変更されている．
+オリジナルの\LaTeX では脚注はボトムフロートの上に出力され，また\cs{raggedbottom}命令でページの高さが不揃いであることを許した場合には
+脚注の下端の垂直位置もページに応じて変わるようになっている．
+一方，日本語の組版では脚注はボトムフロートの下に来るのが一般的であるので，
+\pLaTeX ではそのように変更されており，
+さらに\cs{raggedbottom}命令を実行した後でも脚注は常にページの下端に固定されるようになっている．
 
 \LuaTeX-jaでは「欧文クラスの中にちょっとだけ日本語を入れる」という利用も考慮し，
-脚注とボトムフロートの順序は\LaTeX 通りとした．もし\pLaTeX の出力順序が好みならば，
-\Pkg{stfloats}パッケージを利用して
-\begin{lstlisting}
- \usepackage{stfloats}\fnbelowfloat
-\end{lstlisting}
-のようにすればよい．\Pkg{footmisc}パッケージを \texttt{bottom}\ オプションを指定して
-読み込むという方法もあるが，それだとボトムフロートと脚注の間が開いてしまう．
+脚注とボトムフロートの順序，及び\cs{raggedbottom}時の脚注の垂直位置は\LaTeX 通りとした．
+これらを制御するには以下の手段がある：
+\begin{itemize}
+ \item \pLaTeX のように，脚注をボトムフロートの下に組む場合には
+  \Pkg{stfloats}パッケージを利用して
+  \begin{lstlisting}
+    \usepackage{stfloats}\fnbelowfloat
+  \end{lstlisting}
+  とする．この状況から「脚注をボトムフロートの上に組む」という\LaTeX の標準の挙動に戻したければ，
+  \Pkg{stfloats}パッケージの\cs{fnunderfloat}命令を使用する．
+  \item \cs{raggedbottom}時の脚注の垂直位置は，\cs{iffnfixbottom}という真偽値で制御する．
+  \begin{description}
+    \item[偽(\cs{fnfixbottomfalse})の場合] \LaTeX 標準と同じく，本文と脚注の間の空白は\cs{skip}\cs{footins}のみ．
+    従って脚注の垂直位置はページにより変動する．
+    \item[真(\cs{fnfixbottomtrue})の場合] \pLaTeX や\Pkg{footmisc}パッケージを\texttt{bottom}オプションで
+    読み込んだ場合のように，脚注は常にページの下端に固定される．
+  \end{description}
+\item ただし，\LuaTeX-jaが提供する「互換クラス」(\Pkg{ltjclasses}, \Pkg{ltjsclasses})では，
+  \pLaTeX と合わせるために以下のようにしている：
+  \begin{itemize}
+    \item \cs{fnfixbottomtrue}が自動的に実行される
+    \item \Pkg{stfloats}パッケージが\LuaTeX から参照できる場所にあった場合は
+    自動的に読み込み，\cs{fnbelowfloat}を実行する．
+  \end{itemize}
+\end{itemize}
+なお，\Pkg{stfloats}パッケージを使う代わりに，
+\Pkg{footmisc}パッケージを \texttt{bottom}オプションを指定して読み込む
+という「解決法」もある．
 %</ja>
 %%% ↑は英訳しない
 
@@ -1758,7 +1782,6 @@ There is not rounded gothic family in Kozuka fonts.
 \end{tabular}
 \end{center}
 
-%<ja>\newpage
  \item[hiragino-pro]  Hiragino Pro (Adobe-Japan1-5) fonts.
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[hiragino-pron] Hiragino ProN (Adobe-Japan1-5, JIS04-savvy) fonts.
