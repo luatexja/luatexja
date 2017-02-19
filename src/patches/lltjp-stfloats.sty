@@ -3,16 +3,20 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-stfloats}[2017/01/19 Patch to stfloats for LuaTeX-ja]
+\ProvidesPackage{lltjp-stfloats}[2017/02/19 Patch to stfloats for LuaTeX-ja]
 
 \RequirePackage{stfloats,luatexja}
 \RequirePackage{etoolbox}
 
 \let\ltj@fn@makecol=\fn@makecol
 
-\patchcmd\fn@makecol{\vskip -\dimen@}%
+\patchcmd\fn@makecol{\vskip -\dimen@\@textbottom}%
   {\ifnum\ltjgetparameter{direction}=4\else\vbox{\hskip\z@}\fi %%% LuaTeX-ja
-   \vskip -\dimen@}{}{}
+   \vskip -\dimen@
+   \ifltj@ftn@unvboxed\iffnfixbottom\else\@textbottom\fi\else\@textbottom\fi}{}{}
+\patchcmd\fn@makecol{\vskip\skip\footins}{\iffnfixbottom\vskip\z@\@plus.0001fil\fi\vskip\skip\footins}{}{}
+\patchcmd\fn@makecol{\ifvoid\footins}{\ifvoid\footins\ltj@ftn@unvboxedfalse}{}{}
+\patchcmd\fn@makecol{\setbox\@outputbox \vbox}{\ltj@ftn@unvboxedtrue\setbox\@outputbox \vbox}{}{}
 
 \ifx\@makecol\ltj@fn@makecol
   \global\let\@makecol\fn@makecol

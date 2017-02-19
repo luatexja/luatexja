@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjreport}
-  [2017/02/15 v1.7d-ltj-12
+  [2017/02/19 v1.7d-ltj-13
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -935,6 +935,7 @@
 \pagestyle{plain}
 \pagenumbering{arabic}
 \raggedbottom
+\fnfixbottomtrue % 2017-02-19
 \if@twocolumn
   \twocolumn
   \sloppy

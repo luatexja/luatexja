@@ -4,7 +4,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2016/05/05 Patch to LaTeX2e Kernel for LuaTeX-ja]
+\ProvidesPackage{lltjcore}[2017/02/19 Patch to LaTeX2e Kernel for LuaTeX-ja]
 
 \def\cleardoublepage{\clearpage\if@twoside
   \ifodd\c@page
@@ -237,14 +237,19 @@
     \vbox{\yoko\unvbox \@begindvibox #1}%
 }
 
+\newif\iffnfixbottom
+\newif\ifltj@ftn@unvboxed
 %%% @makecol
 \gdef \@makecol {%
    \ifvoid\footins
+     \ltj@ftn@unvboxedfalse
      \setbox\@outputbox \box\@cclv
    \else
+     \ltj@ftn@unvboxedtrue
      \setbox\@outputbox \vbox {%
        \boxmaxdepth \@maxdepth
        \unvbox \@cclv
+       \iffnfixbottom\vskip\z@ \@plus.0001fil\fi
        \vskip \skip\footins
        \color@begingroup
          \normalcolor
@@ -262,15 +267,19 @@
    \else
      \setbox\@outputbox \vbox to\@colht {%
        \@texttop
-       \dimen@ \dp\@outputbox
+       \dimen@ \dp\@outputbox\typeout{\the\dimen@,\meaning\@textbottom}
        \unvbox \@outputbox
        \ifnum\ltjgetparameter{direction}=4\else\vbox{\hskip\z@}\fi %%% LuaTeX-ja
        \vskip -\dimen@
-       \@textbottom
+       \ifltj@ftn@unvboxed\iffnfixbottom\else\@textbottom\fi\else\@textbottom\fi
        }%
+    {\scrollmode\showboxdepth1\showboxbreadth10000
+     \tracingonline1\showbox\@outputbox\errorstopmode}
    \fi
    \global \maxdepth \@maxdepth
 }
+
+\patchcmd\@makespecialcolbox{\@textbottom}{\ifltj@ftn@unvboxed\iffnfixbottom\else\@textbottom\fi\else\@textbottom\fi}{}{}
 
 \def\@gnewline #1{%
   \ifvmode

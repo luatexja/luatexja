@@ -103,6 +103,8 @@
 % \changes{v1.7d}{2017/02/15}{titlepageのページ番号を奇数ならば1に、
 %   偶数ならば0にリセットするように変更}
 % \changes{v1.7d}{2017/02/15}{縦組クラスの所属表示の番号を直立にした}
+% \changes{v1.7d-ltj-13}{2017/02/19}{縦組時クラスで|ftnright|パッケージを使うと
+%   脚注番号が上書きされ横に寝てしまう問題を修正（aminophenさん，ありがとうございます）．}
 % \fi
 %
 % \iffalse
@@ -132,7 +134,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2017/02/15 v1.7d-ltj-12
+  [2017/02/19 v1.7d-ltj-13
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -4518,11 +4520,14 @@
 % \changes{v1.0d}{1996/02/29}{articleとreportのデフォルトを
 %                              \pstyle{plain}に修正}
 % \changes{v1.4}{2002/04/09}{縦組スタイルで\cs{flushbottom}しないようにした}
+% \changes{v1.7d-ltj-13}{2017/02/19}{\pLaTeX と\LuaTex-ja の|\@makecol|が違うことを
+%   考慮していなかった}
 %    \begin{macrocode}
 %<book>\pagestyle{headings}
 %<!book>\pagestyle{plain}
 \pagenumbering{arabic}
 \raggedbottom
+\fnfixbottomtrue % 2017-02-19
 \if@twocolumn
   \twocolumn
   \sloppy
@@ -4553,6 +4558,22 @@
 %</article|report|book>
 %    \end{macrocode}
 %
+% \section{各種パッケージへの対応}
+% もともと縦組での利用を想定されていないいくつかのパッケージについて、
+% 補正するためのコードを記述しておきます。
+% この節のコードは|filehook|パッケージ（\LuaTeX-ja読み込み時に自動でロードされます）
+% の機能を用いています。
+%
+% \subsection{\texttt{ftnright}パッケージ}
+% 脚注番号の書式が|ftnright|パッケージによって勝手に書き換えられるので、
+% パッケージ読み込み前に予め退避しておき、読み込み後に復帰させます。
+% \changes{v1.7d}{2017/02/19}{コード追加}
+%    \begin{macrocode}
+%<*tate>
+\AtBeginOfPackageFile*{ftnright}{\let\ltjt@orig@@makefntext=\@makefntext}
+\AtEndOfPackageFile*{ftnright}{\let\@makefntext=\ltjt@orig@@makefntext}
+%</tate>
+%    \end{macrocode}
 %
 %
 % \Finale
