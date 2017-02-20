@@ -105,6 +105,8 @@
 % \changes{v1.7d}{2017/02/15}{縦組クラスの所属表示の番号を直立にした}
 % \changes{v1.7d-ltj-13}{2017/02/19}{縦組時クラスで|ftnright|パッケージを使うと
 %   脚注番号が上書きされ横に寝てしまう問題を修正（aminophenさん，ありがとうございます）．}
+% \changes{v1.7d-ltj-14}{2017/02/20}{openleftオプションの処理で\cs{iftdir}, \cs{ifydir}を
+%   誤って使っている問題を修正（aminophenさん，ありがとうございます）．}
 % \fi
 %
 % \iffalse
@@ -134,7 +136,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2017/02/19 v1.7d-ltj-13
+  [2017/02/20 v1.7d-ltj-14
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -1788,30 +1790,17 @@
 %   \item|\pltx@cleartoevenpage|：偶数ページになるまでページを繰る命令
 % \end{enumerate}
 % \changes{v1.7d}{2017/02/15}{\cs{cleardoublepage}の代用となる命令群を追加}
+% \changes{v1.7d-ltj-14}{2017/02/20}{\cs{iftdir}, \cs{ifydir}を使わないように修正}
 %    \begin{macrocode}
 \def\pltx@cleartorightpage{\clearpage\if@twoside
-  \ifodd\c@page
-    \iftdir
-      \hbox{}\thispagestyle{empty}\newpage
-      \if@twocolumn\hbox{}\newpage\fi
-    \fi
-  \else
-    \ifydir
-      \hbox{}\thispagestyle{empty}\newpage
-      \if@twocolumn\hbox{}\newpage\fi
-    \fi
+  \unless\ifodd\dimexpr\c@page+\ltjgetparameter{direction}\relax
+    \hbox{}\thispagestyle{empty}\newpage
+    \if@twocolumn\hbox{}\newpage\fi
   \fi\fi}
 \def\pltx@cleartoleftpage{\clearpage\if@twoside
-  \ifodd\c@page
-    \ifydir
-      \hbox{}\thispagestyle{empty}\newpage
-      \if@twocolumn\hbox{}\newpage\fi
-    \fi
-  \else
-    \iftdir
-      \hbox{}\thispagestyle{empty}\newpage
-      \if@twocolumn\hbox{}\newpage\fi
-    \fi
+  \ifodd\dimexpr\c@page+\ltjgetparameter{direction}\relax
+    \hbox{}\thispagestyle{empty}\newpage
+    \if@twocolumn\hbox{}\newpage\fi
   \fi\fi}
 %    \end{macrocode}
 %
@@ -2285,7 +2274,7 @@
 %    \end{macrocode}
 %
 % そして、\LaTeX{}ネイティブのための定義です。
-+% \changes{v1.7d}{2017/02/15}{bookクラスでtitlepageを必ず奇数ページ
+% \changes{v1.7d}{2017/02/15}{bookクラスでtitlepageを必ず奇数ページ
 %   に送るように変更}
 % \changes{v1.7d}{2017/02/15}{titlepageのページ番号を奇数ならば1に、
 %   偶数ならば0にリセットするように変更}
@@ -2985,7 +2974,7 @@
 % このマクロは、章見出しに番号を付けないときに呼び出されます。
 %
 % \emph{日本語\TeX{}開発コミュニティによる補足}：やはり二段組でチャプター
- タイトルより高い位置に右カラムの始点が来るという挙動を維持してあります。
+% タイトルより高い位置に右カラムの始点が来るという挙動を維持してあります。
 % \changes{v1.7c}{2016/12/18}{奇妙なarticleガードとコードを削除して
 %    ドキュメントを追加}
 %    \begin{macrocode}
@@ -4572,8 +4561,10 @@
 % パッケージ読み込み前に予め退避しておき、読み込み後に復帰させます。
 % \changes{v1.7d}{2017/02/19}{コード追加}
 %    \begin{macrocode}
+%<*article|report|book>
 \AtBeginOfPackageFile*{ftnright}{\let\ltjt@orig@@makefntext=\@makefntext}
 \AtEndOfPackageFile*{ftnright}{\let\@makefntext=\ltjt@orig@@makefntext}
+%</article|report|book>
 %    \end{macrocode}
 %
 %

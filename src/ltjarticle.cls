@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjarticle}
-  [2017/02/19 v1.7d-ltj-13
+  [2017/02/20 v1.7d-ltj-14
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -188,28 +188,14 @@
 \renewcommand{\dbltopfraction}{.7}
 \renewcommand{\dblfloatpagefraction}{.5}
 \def\pltx@cleartorightpage{\clearpage\if@twoside
-  \ifodd\c@page
-    \iftdir
-      \hbox{}\thispagestyle{empty}\newpage
-      \if@twocolumn\hbox{}\newpage\fi
-    \fi
-  \else
-    \ifydir
-      \hbox{}\thispagestyle{empty}\newpage
-      \if@twocolumn\hbox{}\newpage\fi
-    \fi
+  \unless\ifodd\dimexpr\c@page+\ltjgetparameter{direction}\relax
+    \hbox{}\thispagestyle{empty}\newpage
+    \if@twocolumn\hbox{}\newpage\fi
   \fi\fi}
 \def\pltx@cleartoleftpage{\clearpage\if@twoside
-  \ifodd\c@page
-    \ifydir
-      \hbox{}\thispagestyle{empty}\newpage
-      \if@twocolumn\hbox{}\newpage\fi
-    \fi
-  \else
-    \iftdir
-      \hbox{}\thispagestyle{empty}\newpage
-      \if@twocolumn\hbox{}\newpage\fi
-    \fi
+  \ifodd\dimexpr\c@page+\ltjgetparameter{direction}\relax
+    \hbox{}\thispagestyle{empty}\newpage
+    \if@twocolumn\hbox{}\newpage\fi
   \fi\fi}
 \def\pltx@cleartooddpage{\clearpage\if@twoside
   \ifodd\c@page\else
@@ -303,7 +289,6 @@
     }%
     {\if@restonecol\twocolumn\else\newpage\fi
     }
-+% \changes{v1.7d}{2017/02/15}{bookクラスでtitlepageを必ず奇数ページ
 \else
 \newenvironment{titlepage}
     {%
