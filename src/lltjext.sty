@@ -36,7 +36,7 @@
 \def\p@array<#1>[#2]#3{%
   \let\box@dir\relax
   \if #1z\relax
-    \ifnum\ltjgetparameter{direction}=3\relax
+    \ifnum\count@=3\relax
       \let\box@dir\utod\@tempcnta=\zstrutbox
     \fi
   \else
