@@ -688,7 +688,7 @@
 
 %%% references
 \def\@eqnnum{{\reset@font\rmfamily \normalcolor
-  \ifnum\ltjgetparameter{direction}=3 \raise.25\zh\hbox{\yoko(\theequation)}%
+  \ifnum\ltjgetparameter{direction}=11\raise.25\zh\hbox{\yoko(\theequation)}%
   \else (\theequation)\fi}}
 \def\@thecounter#1{\noexpand\rensuji{\noexpand\arabic{#1}}}
 \def\@thmcounter#1{\noexpand\rensuji{\noexpand\arabic{#1}}}
@@ -709,7 +709,7 @@
   \def\p@array<##1>[##2]##3{%
     \let\box@dir\relax
     \if ##1z\relax
-      \ifnum\ltjgetparameter{direction}=3\relax
+      \ifnum\count@=3\relax
         \let\box@dir\utod\@tempcnta=\zstrutbox
       \fi
     \else
