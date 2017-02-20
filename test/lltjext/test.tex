@@ -1,0 +1,208 @@
+\ifdefined\BASEDIR
+  \documentclass[11pt]{ltjtarticle}
+  \let\BASEDIR=\tate
+\else
+  \documentclass[11pt]{ltjarticle}
+  \let\BASEDIR=\yoko
+\fi
+\usepackage[OT1]{fontenc}
+\DeclareFontFamily{OT1}{mycmr}{}
+\DeclareFontShape{OT1}{mycmr}{m}{n}{<-> s*[0.5] cmr10}{}
+\DeclareFontShape{OT1}{mycmr}{bx}{n}{<-> s*[0.5] cmbx10}{}
+\def\rmdefault{mycmr}\rmfamily
+\usepackage[kozuka-pron,nfssonly]{luatexja-preset}
+
+\newif\ifMATH
+%\usepackage{plext}
+\usepackage{xcolor}
+\usepackage[papersize={182mm,182mm},textwidth=42\zw,lines=30,centering]{geometry}
+
+\makeatletter
+\def\set@fontsize#1#2#3{%
+    \@defaultunits\@tempdimb#2pt\relax\@nnil
+    \edef\f@size{\strip@pt\@tempdimb}%
+    \@defaultunits\@tempskipa#3pt\relax\@nnil
+    \edef\f@baselineskip{\the\@tempskipa}%
+    \edef\f@linespread{#1}%
+    \let\baselinestretch\f@linespread
+    \def\size@update{%
+      \baselineskip\f@baselineskip\relax
+      \baselineskip\f@linespread\baselineskip
+      \normalbaselineskip\baselineskip
+      \adjustbaseline
+      \setbox\strutbox\hbox{\yoko
+          \vrule\@width\z@
+                \@height\dimexpr \cht\@depth\dimexpr \cdp}%
+      \setbox\dstrutbox\hbox{\dtou
+          \vrule\@width\z@
+                \@height\dimexpr \cht\@depth\dimexpr \cdp}%
+      \setbox\tstrutbox\hbox{\tate
+          \vrule\@width\z@
+                \@height\dimexpr \cht\@depth\dimexpr \cdp}%
+      \setbox\zstrutbox\hbox{\tate
+          \vrule\@width\z@
+                \@height\dimexpr \cht\@depth\dimexpr \cdp}%
+     \let\size@update\relax}}
+
+
+
+\def\G{\expandafter\dimen@\ifnum\ltjgetparameter{direction}=3 \ltjgetparameter{talbaselineshift}\else\ltjgetparameter{yalbaselineshift}\fi\raise-\dimen@}
+\newbox\adjust@box\newdimen\adjust@dimen
+\let\orig@adjustbaseline=\adjustbaseline
+\def\adjustbaseline{\orig@adjustbaseline
+  \setbox\adjust@box\hbox{\char\euc"A1A1}%
+  \cht\ht\adjust@box
+  \cdp\dp\adjust@box
+  \cwd\wd\adjust@box
+  \cvs\normalbaselineskip
+  \chs\cwd
+  \cHT\cht \advance\cHT\cdp
+  \ifnum\ltjgetparameter{direction}=3\relax
+    \setbox\adjust@box\hbox{\ltjsetparameter{talbaselineshift=\z@}M}%
+    \adjust@dimen\ht\adjust@box
+    \advance\adjust@dimen\dp\adjust@box
+    \advance\adjust@dimen-\cHT
+    \divide\adjust@dimen\tw@
+    \advance\adjust@dimen\cdp
+    \advance\adjust@dimen-\dp\adjust@box
+    \ltjsetparameter{talbaselineshift=\adjust@dimen}
+  \else
+    \setbox\adjust@box\hbox{\ltjsetparameter{yalbaselineshift=\z@}M}%
+    \adjust@dimen\ht\adjust@box
+    \advance\adjust@dimen\dp\adjust@box
+    \advance\adjust@dimen-\cHT
+    \divide\adjust@dimen\tw@
+    \advance\adjust@dimen\cdp
+    \advance\adjust@dimen-\dp\adjust@box
+    \ltjsetparameter{yalbaselineshift=\adjust@dimen}
+  \fi}
+\def\At#1#2{%
+\setbox0=\hbox{\ifMATH$\fi\tabcolsep\z@%
+  \ifx\BASEDIR\tate\setbox\strutbox=\copy\tstrutbox\fi
+  \setbox0=\hbox{\smash{$\vcenter{\hbox{\vrule height2ptdepth0pt\vrule depth2ptheight0pt}}$}%
+    \begin{tabular}#2[#1]{l}
+      \hline ◆a◆a◆\\ \hline
+    \end{tabular}}%
+  \leavevmode%
+  \textcolor{green!70!black}{%
+    \G\hbox{\vrule width \dimexpr 40pt+\wd0 height.1mm depth 0pt}}%
+  \kern-\dimexpr 40pt+\wd0
+  \textcolor{cyan}{\vrule width \dimexpr 40pt+\wd0 height.1mm depth 0pt}%
+  \kern-\dimexpr 40pt+\wd0 \hbox to20pt{\hss あ%
+  \hbox to 0pt{\textcolor{magenta!50!white}{${\kern\wd0\over\kern20pt}$}}abc}\box0\kern4em%
+  \kern3em%
+  \setbox0=\hbox{%
+    \begin{tabular}#2[#1]{c}
+      ◆\smash{abcde}あいう◆\\◆あいう◆あいう◆\\
+      ◆\smash{abcde}あいう◆
+    \end{tabular}}%
+  \textcolor{green!70!black}{%
+    \G\hbox{\vrule width \dimexpr 20pt+\wd0 height.1mm depth 0pt}}%
+  \kern-\dimexpr 20pt+\wd0
+  \hbox to 0pt{\textcolor{magenta!50!white}{${\kern\dimexpr20pt+\wd0\over\kern20pt}$}}%
+  \textcolor{cyan}{\vrule width \dimexpr 20pt+\wd0 height.1mm depth 0pt}%
+  \kern-\dimexpr 10pt+\wd0\box0\kern10pt%
+\ifMATH$\fi}\ht0=50pt\dp0=50pt\leavevmode\box0 }
+
+\def\Ap#1#2{%
+\setbox0=\hbox{あ\tabcolsep\z@%
+  \ifx\BASEDIR\tate\setbox\strutbox=\copy\tstrutbox\fi
+  \setbox0=\hbox{\parbox#2[#1]{7\zw}{%
+	 ◆あいお\hfil xyz ab-cde\hfil あ◇う\break◆◆◆◇◆◆◆\break あいうえおかきえPhy◆}}
+  \leavevmode
+  \textcolor{green!70!black}{%
+    \G\hbox{\vrule width \dimexpr 20pt+\wd0 height.1mm depth 0pt}}%
+  \kern-\dimexpr 20pt+\wd0
+  \textcolor{cyan}{\vrule width \dimexpr 20pt+\wd0 height.1mm depth 0pt}%
+  \kern-\dimexpr 10pt+\wd0 \vrule width.1mmheight30ptdepth30pt
+  \kern-.1mm\box0\kern4em
+  }\ht0=50pt\dp0=50pt\leavevmode\box0 }
+
+
+\everypar{}
+\def\LTORIG#1{%
+  \expandafter\newbox\csname lt#1\endcsname
+  \global\expandafter\setbox\csname lt#1\endcsname
+  \vtop{\BASEDIR\normalsize\adjustbaseline\noindent
+ 	\textbf{\kern5\zw 未読込}
+	  \begin{description}
+		\def\makelabel##1{\hbox to 4em{##1\hss}}
+	   \item[Top] \typeout{TTTT}\A{t}{}\typeout{AAAA}
+	   \item[Center] \leavevmode\kern4\zw\A{c}{}
+	   \item[Bottom] \A{b}{}
+	  \end{description}
+  }}
+\let\A=\At\LTORIG o
+\let\A=\Ap\LTORIG p
+
+\def\PLT#1#2{%
+  \expandafter\newbox\csname pl#1#2\endcsname
+  \global\expandafter\setbox\csname pl#1#2\endcsname
+  \vtop{\BASEDIR\normalsize\adjustbaseline\noindent
+  \textbf{開発版
+    \smash{\hbox to1\zw{#2\hss}}\ifMATH 数式\fi}
+  \begin{description}
+  \def\makelabel##1{\hbox to 4em{##1\hss}}
+     \item[Top] \A{t}{<#2>}
+     \item[Center] \leavevmode\kern4\zw\A{c}{<#2>}
+     \item[Bottom] \A{b}{<#2>}
+  \end{description}}}
+
+\usepackage{lltjext}
+\let\A=\At
+\MATHfalse\PLT bn\PLT by\PLT bt \PLT bz
+\MATHtrue \PLT dn\PLT dy\PLT dt \PLT dz
+\MATHfalse
+\let\A=\Ap
+\PLT cn\PLT cy\PLT ct \PLT cz
+
+\makeatletter
+\def\@out#1#2{%
+  \edef\boxname{#1#2}\expandafter\copy\csname \boxname\endcsname}
+
+\def\OUT#1#2{%
+\newpage\noindent
+\rlap{\textcolor{red}{\@out{pl#1}n}}%
+\rlap{\textcolor{black}{\@out{lt#1}{}}}%
+\newpage
+\noindent
+\rlap{\textcolor{blue}{\@out{pl#2}n}}%
+\rlap{\textcolor{black}{\@out{lt#1}{}}}%
+\newpage
+\noindent
+\rlap{\textcolor{red}{\@out{pl#1}n}}%
+\rlap{\textcolor{blue}{\@out{pl#2}n}}%
+\newpage
+\noindent
+\rlap{\textcolor{red}{\@out{pl#1}y}}%
+\rlap{\textcolor{blue}{\@out{pl#2}y}}%
+\newpage
+\noindent
+\rlap{\textcolor{red}{\@out{pl#1}t}}%
+\rlap{\textcolor{blue}{\@out{pl#2}t}}%
+\newpage
+\noindent
+\rlap{\textcolor{red}{\@out{pl#1}z}}%
+\rlap{\textcolor{blue}{\@out{pl#2}z}}%
+\newpage}
+\def\OUTNEW#1#2{%
+\noindent
+\rlap{\textcolor{#2}{\@out{pl#1}y}}%
+\newpage
+\noindent
+\rlap{\textcolor{#2}{\@out{pl#1}t}}%
+\newpage
+\noindent
+\rlap{\textcolor{#2}{\@out{pl#1}z}}%
+\newpage
+}
+\begin{document}
+\parindent0pt
+
+\hbox{\BASEDIR\LARGE\adjustbaseline tabular, array環境}
+\OUTNEW{b}{blue}
+\OUTNEW{d}{blue!50!black}
+%\hbox{\BASEDIR\LARGE\adjustbaseline \texttt{\textbackslash parbox}命令}
+%\OUT pc
+\end{document}
+
