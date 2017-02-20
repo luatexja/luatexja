@@ -696,6 +696,8 @@
 %% Compatibility with array package
 
 \def\ltj@lltjext@patch@array{%
+  \patchcmd{\@tabular}{\hbox\bgroup}{%
+	\hbox\bgroup\count@=\ltjgetparameter{direction}}{}{}
   \def\@startpbox##1{\bgroup
    \box@dir\adjustbaseline%%% これを追加
    \hsize=##1\@arrayparboxrestore
@@ -722,7 +724,7 @@
       \fi\fi\fi\fi
     \fi
     \ifx\box@dir\relax
-      \ifcase\ltjgetparameter{direction}
+      \ifcase\count@
          \or   \let\box@dir\dtou\@tempcnta=\tabskip \z@\tabskip \z@\dstrutbox% dtou
          \or\or\let\box@dir\tate\@tempcnta=\tstrutbox% tate
          \or   \let\box@dir\yoko\@tempcnta=\strutbox% yoko
@@ -741,7 +743,7 @@
                     \bgroup \tabskip \z@skip \@arstrut \@preamble
                             \tabskip \z@ \cr}%
     \endgroup
-    \@arrayleft
+    \@arrayleft\typeout{\meaning\@begin@alignbox, \meaning\box@dir}
     \@begin@alignbox\bgroup\box@dir\adjustbaseline
       \let\par\@empty
       \let\@sharp####\let\protect\relax
@@ -759,7 +761,7 @@
   \let\ltj@lltjext@orig@tabularS\relax
   \let\ltj@lltjext@orig@tabular\relax
   \let\ltj@lltjext@orig@array\relax
-  \RequirePackage{filehook}
+  \RequirePackage{filehook,etoolbox}
   \AtEndOfPackageFile{array}{\ltj@lltjext@patch@array}
 }
 
