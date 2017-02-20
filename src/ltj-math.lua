@@ -64,6 +64,7 @@ local ltjd_make_dir_whatsit = ltjd.make_dir_whatsit
 local is_math_letters = {}
 local list_dir
 
+-- vcenter noad は軸に揃えるため，欧文ベースライン補正がかかる
 local function conv_vcenter(sb)
    local h = getfield(sb, 'head');local hd = getlist(h)
    if getid(hd)==id_whatsit and 
@@ -71,10 +72,9 @@ local function conv_vcenter(sb)
       local d = node_next(hd)
       if getid(d)==id_vlist and has_attr(d, attr_dir)>=dir_node_auto then
 	 node_free(hd); setfield(h, 'head', nil); node_free(h)
-	 setfield(sb, 'head', d); h = d
+	 setfield(sb, 'head', d);  set_attr(d, attr_icflag, 0)
       end
    end
-   set_attr(h, attr_icflag, PROCESSED)
    return sb
 end
 
