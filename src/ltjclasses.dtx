@@ -1793,12 +1793,12 @@
 % \changes{v1.7d-ltj-14}{2017/02/20}{\cs{iftdir}, \cs{ifydir}を使わないように修正}
 %    \begin{macrocode}
 \def\pltx@cleartorightpage{\clearpage\if@twoside
-  \unless\ifodd\dimexpr\c@page+\ltjgetparameter{direction}\relax
+  \unless\ifodd\numexpr\c@page+\ltjgetparameter{direction}\relax
     \hbox{}\thispagestyle{empty}\newpage
     \if@twocolumn\hbox{}\newpage\fi
   \fi\fi}
 \def\pltx@cleartoleftpage{\clearpage\if@twoside
-  \ifodd\dimexpr\c@page+\ltjgetparameter{direction}\relax
+  \ifodd\numexpr\c@page+\ltjgetparameter{direction}\relax
     \hbox{}\thispagestyle{empty}\newpage
     \if@twocolumn\hbox{}\newpage\fi
   \fi\fi}

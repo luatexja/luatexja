@@ -208,12 +208,12 @@
 \renewcommand{\dbltopfraction}{.7}
 \renewcommand{\dblfloatpagefraction}{.5}
 \def\pltx@cleartorightpage{\clearpage\if@twoside
-  \unless\ifodd\dimexpr\c@page+\ltjgetparameter{direction}\relax
+  \unless\ifodd\numexpr\c@page+\ltjgetparameter{direction}\relax
     \hbox{}\thispagestyle{empty}\newpage
     \if@twocolumn\hbox{}\newpage\fi
   \fi\fi}
 \def\pltx@cleartoleftpage{\clearpage\if@twoside
-  \ifodd\dimexpr\c@page+\ltjgetparameter{direction}\relax
+  \ifodd\numexpr\c@page+\ltjgetparameter{direction}\relax
     \hbox{}\thispagestyle{empty}\newpage
     \if@twocolumn\hbox{}\newpage\fi
   \fi\fi}
