@@ -50,21 +50,28 @@
 \ifdefined\cHT\else\newdimen\cHT\fi
 %\let\afont\font
 
+\let\ystrutbox\strutbox
 \newbox\dstrutbox
 \newbox\tstrutbox
 \newbox\zstrutbox
+\def\strutbox{\iftdir\tstrutbox\else\ystrutbox\fi}
 \def\strut{\relax
   \ifnum\ltjgetparameter{direction}=1 % dtou
     \ifmmode\copy\dstrutbox\else\unhcopy\dstrutbox\fi
   \else\ifnum\ltjgetparameter{direction}=4 % yoko
-    \ifmmode\copy\strutbox\else\unhcopy\strutbox\fi
+    \ifmmode\copy\ystrutbox\else\unhcopy\ystrutbox\fi
   \else % tate and utod
     \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi
   \fi\fi
 }
+
+\def\ystrut{\relax\hbox{\yoko
+   \ifmmode\copy\ystrutbox\else\unhcopy\ystrutbox\fi}}
 \def\tstrut{\relax\hbox{\tate
    \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi}}
-\def\zstrut{\relax\hbox{\tate
+\def\dstrut{\relax\hbox{\dtou
+   \ifmmode\copy\dstrutbox\else\unhcopy\dstrutbox\fi}}
+\def\zstrut{\relax\hbox{\utod
    \ifmmode\copy\zstrutbox\else\unhcopy\zstrutbox\fi}}
 
 {%
@@ -374,7 +381,7 @@
       \baselineskip\f@linespread\baselineskip
       \normalbaselineskip\baselineskip
       \adjustbaseline
-      \setbox\strutbox\hbox{\yoko
+      \setbox\ystrutbox\hbox{\yoko
           \vrule\@width\z@
                 \@height.7\baselineskip \@depth.3\baselineskip}%
       \setbox\dstrutbox\hbox{\dtou
