@@ -54,7 +54,8 @@
 \newbox\dstrutbox
 \newbox\tstrutbox
 \newbox\zstrutbox
-\def\strutbox{\iftdir\tstrutbox\else\ystrutbox\fi}
+%\def\strutbox{%
+%}
 \def\strut{\relax
   \ifnum\ltjgetparameter{direction}=1 % dtou
     \ifmmode\copy\dstrutbox\else\unhcopy\dstrutbox\fi
