@@ -358,7 +358,7 @@
   \color@endgroup
   \egroup
   \expandafter\@iiiparbox\@mpargs{\unvbox\@tempboxa}\egroup}
-\def\parbox{\@ifnextchar<%>
+\DeclareRobustCommand\parbox{\@ifnextchar<%>
    {\X@parbox}{\X@parbox<Z>}}
 \def\X@parbox<#1>{\@ifnextchar[%]
    {\@iparbox<#1>}{\@iiiparbox<#1>{c}\relax[s]}}
@@ -367,19 +367,19 @@
 \def\@iiparbox<#1>#2[#3]{\@ifnextchar[%]%
    {\@iiiparbox<#1>{#2}{#3}}{\@iiiparbox<#1>{#2}{#3}[#2]}}
 \long\def\@iiiparbox<#1>#2#3[#4]#5#6{%
-  \leavevmode\bgroup
+  \leavevmode
   \setlength\@tempdima{#5}%
   \fork@parbox@option<#1>[#2]%
   \@begin@tempboxa\vbox{\box@dir
     \hsize\@tempdima\@parboxrestore\adjustbaseline#6\@@par}%
-    \ifx\relax#3\relax\else
+    \ifx\relax#3\else
       \setlength\@tempdimb{#3}%
       \edef\@parboxto{to\the\@tempdimb}%
     \fi
     \@begin@parbox\@parboxto{\box@dir\adjustbaseline
        \let\hss\vss\let\unhbox\unvbox
        \csname bm@#4\endcsname}\@end@parbox
-  \@end@tempboxa\egroup}
+  \@end@tempboxa}
 \def\fork@parbox@option<#1>[#2]{%
   \let\box@dir\relax
   \if #1z\relax
@@ -411,8 +411,12 @@
        \let\@begin@parbox\vbox
        \let\@end@parbox\relax
     \else
-      \def\@begin@parbox{$\vcenter}%
-      \def\@end@parbox{\m@th$}%
+      \ifmmode
+        \let\@begin@parbox\vcenter\let\@end@parbox\relax
+      \else
+        \def\@begin@parbox{\null$\vcenter}%
+        \def\@end@parbox{\m@th$\null}%
+      \fi
     \fi\fi
   \else
     \if #2t\relax
@@ -422,8 +426,12 @@
        \let\@begin@parbox\vbox
        \let\@end@parbox\relax
     \else
-      \def\@begin@parbox{$\vcenter}%
-      \def\@end@parbox{\m@th$}%
+      \ifmmode
+        \let\@begin@parbox\vcenter\let\@end@parbox\relax
+      \else
+        \def\@begin@parbox{\null$\vcenter}%
+        \def\@end@parbox{\m@th$\null}%
+      \fi
     \fi\fi
   \fi
 \else\ifnum\ltjgetparameter{direction}=1 % dtou
@@ -435,8 +443,12 @@
        \let\@begin@parbox\vbox
        \let\@end@parbox\relax
     \else
-      \def\@begin@parbox{$\vcenter}%
-      \def\@end@parbox{\m@th$}%
+      \ifmmode
+        \let\@begin@parbox\vcenter\let\@end@parbox\relax
+      \else
+        \def\@begin@parbox{\null$\vcenter}%
+        \def\@end@parbox{\m@th$\null}%
+      \fi
     \fi\fi
   \else\ifx\box@dir\dtou
     \if #2t\relax
@@ -446,8 +458,12 @@
        \let\@begin@parbox\vbox
        \let\@end@parbox\relax
     \else
-      \def\@begin@parbox{$\vcenter}%
-      \def\@end@parbox{\m@th$}%
+      \ifmmode
+        \let\@begin@parbox\vcenter\let\@end@parbox\relax
+      \else
+        \def\@begin@parbox{\null$\vcenter}%
+        \def\@end@parbox{\m@th$\null}%
+      \fi
     \fi\fi
   \else % 180 度回転→vtop, vbox を入れ替える
     \if #2t\relax
@@ -457,8 +473,12 @@
        \let\@begin@parbox\vtop %%% !!!
        \let\@end@parbox\relax
     \else
-      \def\@begin@parbox{$\vcenter}%
-      \def\@end@parbox{\m@th$}%
+      \ifmmode
+        \let\@begin@parbox\vcenter\let\@end@parbox\relax
+      \else
+        \def\@begin@parbox{\null$\vcenter}%
+        \def\@end@parbox{\m@th$\null}%
+      \fi
     \fi\fi
   \fi\fi
 \else % tate, utod
@@ -470,8 +490,12 @@
       \def\@begin@parbox{\vbox\bgroup\vbox}%
       \def\@end@parbox{\kern\z@\egroup}%
     \else
-      \def\@begin@parbox{$\vcenter}%
-      \def\@end@parbox{\m@th$}%
+      \ifmmode
+        \let\@begin@parbox\vcenter\let\@end@parbox\relax
+      \else
+        \def\@begin@parbox{\null$\vcenter}%
+        \def\@end@parbox{\m@th$\null}%
+      \fi
     \fi\fi
   \else\ifx\box@dir\dtou % 180 度回転→vtop, vbox を入れ替える
     \if #2t\relax
@@ -481,8 +505,12 @@
       \let\@begin@parbox\vtop %%% !!!
       \let\@end@parbox\relax
     \else
-      \def\@begin@parbox{$\vcenter}%
-      \def\@end@parbox{\m@th$}%
+      \ifmmode
+        \let\@begin@parbox\vcenter\let\@end@parbox\relax
+      \else
+        \def\@begin@parbox{\null$\vcenter}%
+        \def\@end@parbox{\m@th$\null}%
+      \fi
     \fi\fi
   \else
     \if #2t\relax
@@ -492,8 +520,12 @@
        \let\@begin@parbox\vbox
        \let\@end@parbox\relax
     \else
-      \def\@begin@parbox{$\vcenter}%
-      \def\@end@parbox{\m@th$}%
+      \ifmmode
+        \let\@begin@parbox\vcenter\let\@end@parbox\relax
+      \else
+        \def\@begin@parbox{\null$\vcenter}%
+        \def\@end@parbox{\m@th$\null}%
+      \fi
     \fi\fi
   \fi\fi
 \fi\fi%
