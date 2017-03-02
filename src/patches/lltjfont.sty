@@ -3,9 +3,10 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2016/04/01 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2017/02/23 Patch to NFSS2 for LuaTeX-ja]
 
 \def\ltj@chardef@text@cmd#1{%
+  \let\@ifdefinable\@@ifdefinable%
   \edef\ltj@chardef@text@cmd@name{\expandafter\@gobble\string#1}%
   \afterassignment\ltj@chardef@text@cmd@\ltj@tempcnta
 }
@@ -23,7 +24,10 @@
 }
 
 \ifdefined\UnicodeEncodingName
+  \let\ltj@temp@DeclareTextComposite=\DeclareTextComposite
+  \def\DeclareTextComposite#1#2#3#4{}%
   \input{tuenc.def}
+  \let\DeclareTextComposite=\ltj@temp@DeclareTextComposite
 \fi
 
 
