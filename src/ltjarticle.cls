@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjarticle}
-  [2017/02/20 v1.7d-ltj-14
+  [2017/03/06 v1.7e-ltj-14
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -88,8 +88,8 @@
   \tombowtrue \tombowdatetrue
   \setlength{\@tombowwidth}{.1\p@}%
   \@bannertoken{%
-     \jobname\space:\space\number\year/\number\month/\number\day
-      (\number\hour:\number\minute)}
+     \jobname\space(\number\year-\two@digits\month-\two@digits\day
+     \space\two@digits\hour:\two@digits\minute)}%
   \maketombowbox}
 \DeclareOption{tombo}{%
   \tombowtrue \tombowdatefalse
