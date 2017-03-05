@@ -38,12 +38,13 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsreport}
-  [2017/02/19 ltjsclasses ]
+  [2017/03/06 ltjsclasses ]
 \def\jsc@clsname{ltjsreport}
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
 \newif\if@openright
+\newif\if@openleft
 \newif\if@enablejfam \@enablejfamtrue
 \DeclareOption{a3paper}{%
   \setlength\paperheight {420mm}%
@@ -163,8 +164,9 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \DeclareOption{twocolumn}{\@twocolumntrue}
 \DeclareOption{titlepage}{\@titlepagetrue}
 \DeclareOption{notitlepage}{\@titlepagefalse}
-\DeclareOption{openright}{\@openrighttrue}
-\DeclareOption{openany}{\@openrightfalse}
+\DeclareOption{openright}{\@openrighttrue\@openleftfalse}
+\DeclareOption{openleft}{\@openlefttrue\@openrightfalse}
+\DeclareOption{openany}{\@openrightfalse\@openleftfalse}
 \def\eqnarray{%
    \stepcounter{equation}%
    \def\@currentlabel{\p@equation\theequation}%
@@ -566,6 +568,31 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \setlength\@dblfptop{0\jsc@mpt \@plus 1fil}
 \setlength\@dblfpsep{8\jsc@mpt \@plus 2fil}
 \setlength\@dblfpbot{0\jsc@mpt \@plus 1fil}
+\def\pltx@cleartorightpage{\clearpage\if@twoside
+  \unless\ifodd\numexpr\c@page+\ltjgetparameter{direction}\relax
+    \hbox{}\thispagestyle{empty}\newpage
+    \if@twocolumn\hbox{}\newpage\fi
+  \fi\fi}
+\def\pltx@cleartoleftpage{\clearpage\if@twoside
+  \ifodd\numexpr\c@page+\ltjgetparameter{direction}\relax
+    \hbox{}\thispagestyle{empty}\newpage
+    \if@twocolumn\hbox{}\newpage\fi
+  \fi\fi}
+\def\pltx@cleartooddpage{\clearpage\if@twoside
+  \ifodd\c@page\else
+    \hbox{}\thispagestyle{empty}\newpage
+    \if@twocolumn\hbox{}\newpage\fi
+  \fi\fi}
+\def\pltx@cleartoevenpage{\clearpage\if@twoside
+  \ifodd\c@page
+    \hbox{}\thispagestyle{empty}\newpage
+    \if@twocolumn\hbox{}\newpage\fi
+  \fi\fi}
+\if@openleft
+  \let\cleardoublepage\pltx@cleartoleftpage
+\else\if@openright
+  \let\cleardoublepage\pltx@cleartorightpage
+\fi\fi
 \def\ps@plainfoot{%
   \let\@mkboth\@gobbletwo
   \let\@oddhead\@empty
@@ -849,11 +876,13 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \newcommand{\@chapapp}{\prechaptername}
 \newcommand{\@chappos}{\postchaptername}
 \newcommand\part{%
-  \if@openright
+  \if@openleft
+\cleardoublepage
+  \else\if@openright
     \cleardoublepage
   \else
     \clearpage
-  \fi
+  \fi\fi
   \thispagestyle{empty}% 欧文用標準スタイルでは plain
   \if@twocolumn
     \onecolumn
@@ -889,17 +918,18 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \@endpart}
 \def\@endpart{\vfil\newpage
   \if@twoside
-   \if@openright %% added (2016/12/13)
-    \null
-    \thispagestyle{empty}%
-    \newpage
-   \fi %% added (2016/12/13)
+   \if@openleft %% added (????/??/??)
+    \null\thispagestyle{empty}\newpage
+   \else\if@openright %% added (2016/12/13)
+    \null\thispagestyle{empty}\newpage
+   \fi\fi %% added (2016/12/13, ????/??/??)
   \fi
   \if@restonecol
     \twocolumn
   \fi}
 \newcommand{\chapter}{%
-  \if@openright\cleardoublepage\else\clearpage\fi
+  \if@openleft\cleardoublepage\else
+  \if@openright\cleardoublepage\else\clearpage\fi\fi
   \plainifnotempty % 元: \thispagestyle{plain}
   \global\@topnum\z@
   \if@english \@afterindentfalse \else \@afterindenttrue \fi
@@ -1157,7 +1187,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
       \@restonecolfalse\newpage
     \fi
     \thispagestyle{empty}%
-    \setcounter{page}\@ne
+    \ifodd\c@page\setcounter{page}\@ne\else\setcounter{page}\z@\fi
   }%
   {\if@restonecol\twocolumn \else \newpage \fi
     \if@twoside\else

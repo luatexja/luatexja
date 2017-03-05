@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsarticle}
-  [2017/02/19 ltjsclasses ]
+  [2017/03/06 ltjsclasses ]
 \def\jsc@clsname{ltjsarticle}
 \RequirePackage{luatexja}
 \newif\if@restonecol
@@ -578,6 +578,26 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \setlength\@dblfptop{0\jsc@mpt \@plus 1fil}
 \setlength\@dblfpsep{8\jsc@mpt \@plus 2fil}
 \setlength\@dblfpbot{0\jsc@mpt \@plus 1fil}
+\def\pltx@cleartorightpage{\clearpage\if@twoside
+  \unless\ifodd\numexpr\c@page+\ltjgetparameter{direction}\relax
+    \hbox{}\thispagestyle{empty}\newpage
+    \if@twocolumn\hbox{}\newpage\fi
+  \fi\fi}
+\def\pltx@cleartoleftpage{\clearpage\if@twoside
+  \ifodd\numexpr\c@page+\ltjgetparameter{direction}\relax
+    \hbox{}\thispagestyle{empty}\newpage
+    \if@twocolumn\hbox{}\newpage\fi
+  \fi\fi}
+\def\pltx@cleartooddpage{\clearpage\if@twoside
+  \ifodd\c@page\else
+    \hbox{}\thispagestyle{empty}\newpage
+    \if@twocolumn\hbox{}\newpage\fi
+  \fi\fi}
+\def\pltx@cleartoevenpage{\clearpage\if@twoside
+  \ifodd\c@page
+    \hbox{}\thispagestyle{empty}\newpage
+    \if@twocolumn\hbox{}\newpage\fi
+  \fi\fi}
 \def\ps@plainfoot{%
   \let\@mkboth\@gobbletwo
   \let\@oddhead\@empty
@@ -1105,7 +1125,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
       \@restonecolfalse\newpage
     \fi
     \thispagestyle{empty}%
-    \setcounter{page}\@ne
+    \ifodd\c@page\setcounter{page}\@ne\else\setcounter{page}\z@\fi
   }%
   {\if@restonecol\twocolumn \else \newpage \fi
     \if@twoside\else
