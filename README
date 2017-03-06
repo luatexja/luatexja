@@ -26,10 +26,14 @@ Installation
     - luaotfload v2.6
     - adobemapping (Adobe CMap files)
     - everysel package
+    - etoolbox package
+    - ltxcmds package
+    - pdftexcmds package
+    - atbegshi package
     - IPAex fonts (http://ipafont.ipa.go.jp/)
-   Hence this version does not work in TeX Live 2014 (or earlier).
+   Hence this version does not work in TeX Live 2015 (or earlier).
 
-1. If you are using TeX Live 2015 or later, you can install LuaTeX-ja via tlmgr.
+1. If you are using TeX Live 2016 or later, you can install LuaTeX-ja via tlmgr.
 
 2. If you must/want to install manually:
 
@@ -63,7 +67,7 @@ LuaTeX-ja supports both the plain format and LaTeX2e.
 Simply loading luatexja.sty by \input or \usepackage does the minimal setting.
 
 - If you want to create Japanese-based documents, you can consider the use of
-  ltj{article,book,report}.cls or ltjs{article,book}.cls.
+  ltj{article,book,report}.cls or ltjs{article,book,report}.cls.
 - If you want to use functionality of the fontspec package with Japanese fonts,
   load luatexja-fontspec.sty. It defines control sequences such as \setmainjfont,
   \setsansjfont and  \jfontspec, which can be used for specifying Japanese fonts.

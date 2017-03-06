@@ -625,7 +625,7 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 \item \LuaTeX\ beta-0.85.0 (or later)
 \item \Pkg{luaotfload} v2.6 (or later)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
-\item \Pkg{everysel} (if you want to use \LuaTeX-ja with \LaTeXe)
+\item \Pkg{etoolbox}, \Pkg{everysel} (if you want to use \LuaTeX-ja with \LaTeXe)
 \item \Pkg{ltxcmds}, \Pkg{pdftexcmds}, \Pkg{atbegshi}
 \item \Pkg{fontspec} v2.4 (or later)
 %<en>\item \emph{IPAex fonts} (\url{http://ipafont.ipa.go.jp/})
@@ -1087,9 +1087,9 @@ classes in \pLaTeX) and \Pkg{jsclasses} (classes by Haruhiko
 Okumura), namely, \Pkg{ltjclasses}\footnote{%
   \texttt{ltjarticle.cls},~\texttt{ltjbook.cls}, \texttt{ltjreport.cls},
   \texttt{ltjtarticle.cls}, \texttt{ltjtbook.cls}, \texttt{ltjtreport.cls}.
-  The latter \texttt{ltjt*.cls} are for vertically writtened Japanese documents.
+  The latter \texttt{ltjt*.cls} are for vertically written Japanese documents.
 } and \Pkg{ltjsclasses}\footnote{%
-  \texttt{ltjsarticle.cls},~\texttt{ltjsbook.cls},~\texttt{ltjskiyou.cls}.}.
+  \texttt{ltjsarticle.cls},~\texttt{ltjsbook.cls}, \texttt{ltjsreport.cls},~\texttt{ltjskiyou.cls}.}.
 
 Original \Pkg{jsclasses} use \cs{mag}~primitive to set the main document font size.
 However, \LuaTeX\ beta-0.87.0~or~later does not support \cs{mag} in PDF~output,
@@ -1108,7 +1108,7 @@ to set the main document font size.
   縦組用は \texttt{ltjtarticle.cls}, \texttt{ltjtbook.cls}, \texttt{ltjtreport.cls} である．
 }，
 \Pkg{ltjsclasses}\footnote{%
-  \texttt{ltjsarticle.cls},~\texttt{ltjsbook.cls},~\texttt{ltjskiyou.cls}.}%
+  \texttt{ltjsarticle.cls},~\texttt{ltjsbook.cls}, \texttt{ltjsreport.cls},~\texttt{ltjskiyou.cls}.}%
 がそれぞれ用意されている．
 
 元々の\Pkg{ltjsclasses}ではフォントサイズを指定するのに\cs{mag}プリミティブが使われていたが，
