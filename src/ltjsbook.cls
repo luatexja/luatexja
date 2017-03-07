@@ -962,11 +962,11 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \@endpart}
 \def\@endpart{\vfil\newpage
   \if@twoside
-   \if@openleft %% added (????/??/??)
+   \if@openleft %% added (2017/02/24)
     \null\thispagestyle{empty}\newpage
    \else\if@openright %% added (2016/12/13)
     \null\thispagestyle{empty}\newpage
-   \fi\fi %% added (2016/12/13, ????/??/??)
+   \fi\fi %% added (2016/12/13, 2017/02/24)
   \fi
   \if@restonecol
     \twocolumn
