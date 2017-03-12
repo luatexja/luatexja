@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2017/02/23 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2017/03/12 Patch to NFSS2 for LuaTeX-ja]
 
 \def\ltj@chardef@text@cmd#1{%
   \let\@ifdefinable\@@ifdefinable%
@@ -612,9 +612,6 @@
 }
 \@onlypreamble\romanprocess@table
 \@onlypreamble\kanjiprocess@table
-\DeclareTextCommandDefault{\textunderscore}{%
-  \leavevmode\kern.06em
-  \vbox{\hrule\@width.3em}}
 
 %%%%%% LuaTeX-ja specific
 
