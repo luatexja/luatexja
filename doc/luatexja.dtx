@@ -1705,15 +1705,26 @@ since we use same font for both series of \textit{gothic}.
 \item[jis2004]
 %<en>Use JIS2004 glyph variants if possible.
 %<ja>出来る限りJIS2004の字形を使う．
-\item[jis]
+\item[jfm\_yoko=<jfm>]
 %<*en>
-Use the JFM \texttt{jfm-jis.lua}, instead of \texttt{jfm-ujis.lua}, which is the default JFM of
-\LuaTeX-ja.
+Use the JFM \texttt{jfm-<jfm>.lua} for horizontal direction, instead of \texttt{jfm-ujis.lua}~(default JFM).
 %</en>
 %<*ja>
-用いるJFMを（JISフォントメトリック類似の）\texttt{jfm-jis.lua}にする．このオプションがない時は
-\LuaTeX-ja標準の\texttt{jfm-ujis.lua}が用いられる．
+横組用和文フォントで用いるJFMを\texttt{jfm-<jfm>.lua}にする．このオプションがない時は
+\LuaTeX\nobreakdash -ja標準の\texttt{jfm-ujis.lua}が用いられる．
 %</ja>
+\item[jfm\_tate=<jfm>]
+%<*en>
+Use the JFM \texttt{jfm-<jfm>.lua} for vertical direction, instead of \texttt{jfm-ujisv.lua}~(default JFM).
+%</en>
+%<*ja>
+縦用和文フォントで用いるJFMを\texttt{jfm-<jfm>.lua}にする．このオプションがない時は
+\LuaTeX-ja標準の\texttt{jfm-ujisv.lua}が用いられる．
+%</ja>
+
+\item[jis]
+%<en>Same as \texttt{jfm\_yoko=jis}.
+%<ja>\texttt{jfm\_yoko=jis}と同じ．ここで用いるJFM\texttt{jfm-jis.lua}はJISフォントメトリックを元にしたものである．
 
 \end{cslist}
 %<*en>
@@ -1850,7 +1861,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{tabular}
 \end{center}
 
-%<en>\newpage
+\newpage
  \item[yu-win]  Yu fonts bundled with Windows~8.1.
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[yu-win10]  Yu fonts bundled with Windows~10.
@@ -1882,7 +1893,6 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{tabular}
 \end{center}
 
-%<ja>\newpage
 \item[moga-mobo]  MogaMincho, MogaGothic, and MoboGothic.
 \item[moga-mobo-ex]  MogaExMincho, MogaExGothic, and MoboExGothic.
 %<en>These fonts can be downloaded from\\\hfill \url{http://yozvox.web.fc2.com/}.
