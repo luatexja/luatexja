@@ -41,7 +41,7 @@
     \fi
   \else
     \if #1y\relax
-       \let\box@dir\yoko\@tempcnta=\strutbox
+       \let\box@dir\yoko\@tempcnta=\ystrutbox
     \else\if #1t\relax
        \let\box@dir\tate\@tempcnta=\tstrutbox
     \else\if #1d\relax
@@ -54,7 +54,7 @@
     \ifcase\count@
        \or   \let\box@dir\dtou\@tempcnta=\dstrutbox% dtou
        \or\or\let\box@dir\tate\@tempcnta=\tstrutbox% tate
-       \or   \let\box@dir\yoko\@tempcnta=\strutbox% yoko
+       \or   \let\box@dir\yoko\@tempcnta=\ystrutbox% yoko
        \else \let\box@dir\utod\@tempcnta=\zstrutbox% utod
     \fi
   \fi
@@ -746,7 +746,7 @@
       \fi
     \else
       \if ##1y\relax
-        \let\box@dir\yoko\@tempcnta=\strutbox
+        \let\box@dir\yoko\@tempcnta=\ystrutbox
       \else\if ##1t\relax
         \let\box@dir\tate\@tempcnta=\tstrutbox
       \else\if ##1d\relax
@@ -759,7 +759,7 @@
       \ifcase\count@
          \or   \let\box@dir\dtou\@tempcnta=\tabskip \z@\tabskip \z@\dstrutbox% dtou
          \or\or\let\box@dir\tate\@tempcnta=\tstrutbox% tate
-         \or   \let\box@dir\yoko\@tempcnta=\strutbox% yoko
+         \or   \let\box@dir\yoko\@tempcnta=\ystrutbox% yoko
          \else \let\box@dir\utod\@tempcnta=\zstrutbox% utod
       \fi
     \fi
