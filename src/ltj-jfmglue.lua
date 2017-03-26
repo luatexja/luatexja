@@ -28,7 +28,15 @@ local getfont = node.direct.getfont
 local getlist = node.direct.getlist
 local getchar = node.direct.getchar
 local getsubtype = node.direct.getsubtype
-
+local if_lang_ja
+do
+    local lang_ja = luatexja.lang_ja
+    local getlang = node.direct.getlang
+    if_lang_ja = getlang 
+      and function (n) return getlang(n)==lang_ja end
+      or  function (n) return getfield(n,'lang')==lang_ja end
+end
+  
 local has_attr = node.direct.has_attribute
 local set_attr = node.direct.set_attribute
 local insert_before = node.direct.insert_before
@@ -64,7 +72,6 @@ local id_box_like  = 256 -- vbox, shifted hbox
 local id_pbox      = 257 -- already processed nodes (by \unhbox)
 local id_pbox_w    = 258 -- cluster which consists of a whatsit
 local sid_user = node.subtype('user_defined')
-local lang_ja = luatexja.lang_ja
 
 local sid_start_link = node.subtype('pdf_start_link')
 local sid_start_thread = node.subtype('pdf_start_thread')
@@ -235,7 +242,7 @@ function check_box_high(Nx, box_ptr, box_end)
       local first_char = first_char
       if first_char then
          if getid(first_char)==id_glyph then
-	    if getfield(first_char, 'lang') == lang_ja then
+	    if if_lang_ja(first_char) then
 	       set_np_xspc_jachar_hbox(Nx, first_char)
 	    else
 	       set_np_xspc_alchar(Nx, getchar(first_char),first_char, 1)
@@ -304,7 +311,7 @@ local min, max = math.min, math.max
 local function calc_np_aux_glyph_common(lp, acc_flag)
    Np.nuc = lp
    Np.first= (Np.first or lp)
-   if getfield(lp, 'lang') == lang_ja then
+   if if_lang_ja(lp) then
       Np.id = id_jglyph
       local m, mc, cls = set_np_xspc_jachar(Np, lp)
       local npi, npf
@@ -329,7 +336,7 @@ local function calc_np_aux_glyph_common(lp, acc_flag)
 	    lp=lx; break
 	 else
 	    local lid = getid(lx)
-	    if lid==id_glyph and getfield(lx, 'lang') ~= lang_ja then
+	    if lid==id_glyph and not if_lang_ja(lx) then
 	       -- 欧文文字
 	       last_glyph = lx; set_attr(lx, attr_icflag, PROCESSED); Np.last = lx
 	       y_adjust = has_attr(lx,attr_ablshift) or 0
@@ -615,7 +622,7 @@ do
       local s = Nx.last_char
       if s then
 	 if getid(s)==id_glyph then
-	    if getfield(s, 'lang') == lang_ja then
+	    if if_lang_ja(s) then
 	       set_np_xspc_jachar_hbox(Nx, s)
 	    else
 	       set_np_xspc_alchar(Nx, getchar(s), s, 2)

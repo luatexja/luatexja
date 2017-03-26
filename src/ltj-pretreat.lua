@@ -17,6 +17,7 @@ local getfont =  node.direct.getfont
 local getchar =  node.direct.getchar
 local getfield =  node.direct.getfield
 local getsubtype =  node.direct.getsubtype
+local getlang = node.direct.getlang or function (n) return getfield(n,'lang') end
 
 local pairs = pairs
 local floor = math.floor
@@ -50,6 +51,10 @@ local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 
 local dir_tate = luatexja.dir_table.dir_tate
 local lang_ja = luatexja.lang_ja
+
+local setlang = node.direct.setlang or function(n,l) setfield(n,'lang',l) end 
+local setfont = node.direct.setfont or function(n,l) setfield(n,'font',l) end 
+local setchar = node.direct.setchar or function(n,l) setfield(n,'char',l) end 
 
 ------------------------------------------------------------------------
 -- MAIN PROCESS STEP 1: replace fonts
@@ -98,9 +103,8 @@ do
 	    while pid==id_glyph do
 	       local pc = getchar(p)
 	       if (has_attr(p, attr_icflag) or 0)<=0 and is_ucs_in_japanese_char(p, pc) then
-		  setfield(p, 'font', 
-			   ltjf_replace_altfont(has_attr(p, attr_curjfnt) or getfont(p), pc))
-		  setfield(p, 'lang', lang_ja)
+		  setfont(p, ltjf_replace_altfont(has_attr(p, attr_curjfnt) or getfont(p), pc))
+		  setlang(p, lang_ja)
 		  ltjs_orig_char_table[p] = pc
 	       end
 	       p = node_next(p); pid = getid(p)
@@ -135,14 +139,14 @@ local function set_box_stack_level(head, mode)
    end
    if ltjs.list_dir == dir_tate then
       for p in node.direct.traverse_id(id_glyph,to_direct(head)) do
-         if (has_attr(p, attr_icflag) or 0)<=0 and getfield(p, 'lang')==lang_ja then
+         if (has_attr(p, attr_icflag) or 0)<=0 and getlang(p)==lang_ja then
             local pc = ltjs_orig_char_table[p]
 	    local nf = ltjf_replace_altfont( has_attr(p, attr_curtfnt) or getfont(p) , pc)
-	    setfield(p, 'font', nf)
+	    setfont(p, nf)
 	    if ltjf_font_metric_table[nf].vert_activated then
 	       local pc = getchar(p)
 	       pc = (ltjf_font_extra_info[nf] and ltjf_font_extra_info[nf][pc] and ltjf_font_extra_info[nf][pc].vform)
-	       if pc and font_getfont(nf).characters[pc] then setfield(p, 'char', pc) end
+	       if pc and font_getfont(nf).characters[pc] then setchar(p,  pc) end
 	    end
 	 end
       end

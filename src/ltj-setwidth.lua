@@ -14,6 +14,15 @@ local getfont = node.direct.getfont
 local getlist = node.direct.getlist
 local getchar = node.direct.getchar
 local getsubtype = node.direct.getsubtype
+local getwhd = node.direct.getwhd or function(n)
+  return getfield(n,'width'), getfield(n,'height'),getfield(n,'depth') end
+local setwhd = node.direct.setwhd or function(n,w,h,d)
+  setfield(n,'width',w); setfield(n,'height',h); setfield(n,'depth',d) end
+local setchar = node.direct.setchar or function(n,c) setfield(n,'char',c) end
+local setoffsets = node.direct.setoffsets or function(n,x,y)
+  setfield(n,'xoffset',x); setfield(n,'yoffset',y)  end
+local getoffsets = node.direct.getoffsets or function(n)
+  return getfield(n,'xoffset'), getfield(n,'yoffset')  end
 
 local node_traverse_id = node.direct.traverse_id
 local node_traverse = node.direct.traverse
@@ -83,28 +92,25 @@ local function capsule_glyph_yoko(p, met, char_data, head, dir)
    local kbl = has_attr(p, attr_ykblshift) or 0
    --
    -- f*: whd specified in JFM
-   local fwidth, pwidth = char_data.width, getfield(p, 'width')
-   fwidth = fwidth or pwidth
-   local fheight, pheight = char_data.height, getfield(p, 'height')
-   fheight = fheight or pheight
-   local fdepth, pdepth =  char_data.depth,getfield(p, 'depth')
-   fdepth = fdepth or pdepth
+   local pwidth, pheight,pdepth = getwhd(p)
+   local fwidth = char_data.width or pwidth
+   local fheight= char_data.height or pheight
+   local fdepth = char_data.depth or pdepth
    if pwidth==fwidth then
       -- 補正後glyph node は ht: p.height - kbl - down, dp: p.depth + min(0, kbl+down) を持つ
       -- 設定されるべき寸法: ht: fheight - kbl, dp: fdepth + kbl
       local ht_diff = fheight + fshift.down - pheight
       local dp_diff = fdepth  + kbl - pdepth - min(kbl + fshift.down, 0)
       if ht_diff == 0 and dp_diff ==0 then -- offset only
-	 set_attr(p, attr_icflag, PROCESSED)
-	 setfield(p, 'xoffset', getfield(p, 'xoffset') - fshift.left)
-	 setfield(p, 'yoffset', getfield(p, 'yoffset') - kbl - fshift.down)
+         set_attr(p, attr_icflag, PROCESSED)
+         local xo, yo = getoffsets(p)
+	 setoffsets(p, xo - fshift.left, yo - kbl - fshift.down)
 	 return node_next(p), head, p
       elseif ht_diff >= 0 and dp_diff >=0 then -- rule
 	 local box = node_new(id_rule,rule_subtype)
-	 setfield(p, 'yoffset', getfield(p, 'yoffset') - kbl - fshift.down)
-	 setfield(box, 'width', 0)
-	 setfield(box, 'height', fheight - kbl)
-	 setfield(box, 'depth', fdepth + kbl)
+         local xo, yo = getoffsets(p)
+	 setoffsets(p, xo, yo - kbl - fshift.down)
+	 setwhd(box, 0, fheight - kbl, fdepth + kbl)
 	 setfield(box, 'dir', dir)
 	 set_attr(box, attr_icflag, PACKED)
 	 set_attr(p, attr_icflag, PROCESSED)
@@ -121,9 +127,7 @@ local function capsule_glyph_yoko(p, met, char_data, head, dir)
    setfield(p, 'xoffset', getfield(p, 'xoffset')
 	       + char_data.align*(fwidth-pwidth) - fshift.left)
    local box = node_new(id_hlist)
-   setfield(box, 'width', fwidth)
-   setfield(box, 'height', fheight)
-   setfield(box, 'depth', fdepth)
+   setwhd(box, fwidth, fheight, fdepth)
    setfield(box, 'head', p)
    setfield(box, 'shift', kbl)
    setfield(box, 'dir', dir)
@@ -143,7 +147,7 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
    do
       local pf = getfont(p)
       local pc = getchar(p)
-      setfield(p, 'char', pc)
+      setchar(p, pc)
       pwidth = ltjf_font_extra_info[pf] and  ltjf_font_extra_info[pf][pc]
 	 and ltjf_font_extra_info[pf][pc].vwidth
 	 and ltjf_font_extra_info[pf][pc].vwidth * met.size or (ascent+descent)
@@ -160,9 +164,7 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
    local q
    head, q = node_remove(head, p)
    local box = node_new(id_hlist)
-   setfield(box, 'width', fwidth)
-   setfield(box, 'height', fheight)
-   setfield(box, 'depth', fdepth)
+   setwhd(box, fwidth, fheight, fdepth)
    setfield(box, 'shift', y_shift)
    setfield(box, 'dir', dir)
 
@@ -200,9 +202,7 @@ local function capsule_glyph_math(p, met, char_data)
    setfield(p, 'yoffset', -fshift.down)
    setfield(p, 'xoffset', getfield(p, 'xoffset') + char_data.align*(fwidth-pwidth) - fshift.left)
    local box = node_new(id_hlist);
-   setfield(box, 'width', fwidth)
-   setfield(box, 'height', fheight)
-   setfield(box, 'depth', fdepth)
+   setfield(box, fwidth, fheight, fdepth)
    setfield(box, 'head', p)
    setfield(box, 'shift', y_shift)
    setfield(box, 'dir', tex.mathdir)
