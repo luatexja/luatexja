@@ -42,16 +42,14 @@ local set_attr = node.direct.set_attribute
 local insert_before = node.direct.insert_before
 local insert_after = node.direct.insert_after
 local node_next = node.direct.getnext
-local round = tex.round
 local ltjd_make_dir_whatsit = ltjd.make_dir_whatsit
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_find_char_class = ltjf.find_char_class
 local node_new = node.direct.new
 local node_copy = node.direct.copy
-local node_remove = node.direct.remove
 local node_tail = node.direct.tail
 local node_free = node.direct.free
-local node_end_of_math = node.direct.end_of_math
+local node_remove = node.direct.remove
 
 local id_glyph = node.id('glyph')
 local id_hlist = node.id('hlist')
@@ -72,11 +70,6 @@ local id_box_like  = 256 -- vbox, shifted hbox
 local id_pbox      = 257 -- already processed nodes (by \unhbox)
 local id_pbox_w    = 258 -- cluster which consists of a whatsit
 local sid_user = node.subtype('user_defined')
-
-local sid_start_link = node.subtype('pdf_start_link')
-local sid_start_thread = node.subtype('pdf_start_thread')
-local sid_end_link = node.subtype('pdf_end_link')
-local sid_end_thread = node.subtype('pdf_end_thread')
 
 local ITALIC       = luatexja.icflag_table.ITALIC
 local PACKED       = luatexja.icflag_table.PACKED
@@ -404,7 +397,12 @@ local function calc_np_aux_glyph_common(lp, acc_flag)
 end
 local calc_np_auxtable
 do
+local node_end_of_math = node.direct.end_of_math
 local dir_tate = luatexja.dir_table.dir_tate
+local sid_start_link = node.subtype('pdf_start_link')
+local sid_start_thread = node.subtype('pdf_start_thread')
+local sid_end_link = node.subtype('pdf_end_link')
+local sid_end_thread = node.subtype('pdf_end_thread')
 calc_np_auxtable = {
    [id_glyph] = calc_np_aux_glyph_common,
    [id_hlist] = function(lp)
@@ -606,12 +604,11 @@ do
 	 c = getchar(x)
 	 Nx.pre  = table_current_stack[PRE + c]  or 0
 	 Nx.post = table_current_stack[POST + c] or 0
-	 Nx.xspc = table_current_stack[XSP  + c] or 3
       else
 	 Nx.pre, Nx.post = 0, 0
-         Nx.xspc = table_current_stack[XSP - 1] or 3
       end
       Nx.met = nil
+      Nx.xspc = table_current_stack[XSP  + c] or 3
       Nx.auto_xspc = (has_attr(x, attr_autoxspc)==1)
    end
    local set_np_xspc_alchar = set_np_xspc_alchar
@@ -738,6 +735,7 @@ end
 -------------------- 和文文字間空白量の決定
 local calc_ja_ja_aux
 do
+   local round = tex.round
    local bg_ag = 2*id_glue - id_glue
    local bg_ak = 2*id_glue - id_kern
    local bk_ag = 2*id_kern - id_glue
