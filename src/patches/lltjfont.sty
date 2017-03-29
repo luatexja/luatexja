@@ -500,7 +500,7 @@
   \csname D@\k@encoding\endcsname
   \let\kenc@update\relax
   \let\ck@encoding\k@encoding
-  \edef\tmp@enc{'\luatexluaescapestring{\k@encoding}'}
+  \edef\tmp@enc{'\luatexluaescapestring{\k@encoding}'}%
   \directlua{luatexja.jfont.is_kyenc(\tmp@enc)}\ifin@%
     \let\cy@encoding\k@encoding
   \else
