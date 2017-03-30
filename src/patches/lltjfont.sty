@@ -62,7 +62,7 @@
 \def\strutbox{%
   \ifnum\ltjgetparameter{direction}=1 \dstrutbox       % dtou
   \else\ifnum\ltjgetparameter{direction}=3 \tstrutbox  % tate
-  \else\ifnum\ltjgetparameter{direction}=11 \tstrutbox % utod (tstrutbox)
+  \else\ifnum\ltjgetparameter{direction}=11 \zstrutbox % utod
   \else\ystrutbox % yoko
   \fi\fi\fi
 }
@@ -71,9 +71,11 @@
     \ifmmode\copy\dstrutbox\else\unhcopy\dstrutbox\fi
   \else\ifnum\ltjgetparameter{direction}=4 % yoko
     \ifmmode\copy\ystrutbox\else\unhcopy\ystrutbox\fi
-  \else % tate and utod
+  \else\ifnum\ltjgetparameter{direction}=3 % tate
     \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi
-  \fi\fi
+  \else % utod
+    \ifmmode\copy\zstrutbox\else\unhcopy\zstrutbox\fi
+  \fi\fi\fi
 }
 
 \def\ystrut{\relax\hbox{\yoko
@@ -401,7 +403,7 @@
       \setbox\tstrutbox\hbox{\tate
           \vrule\@width\z@
                 \@height.5\baselineskip \@depth.5\baselineskip}%
-      \setbox\zstrutbox\hbox{\tate
+      \setbox\zstrutbox\hbox{\utod
           \vrule\@width\z@
                 \@height.7\baselineskip \@depth.3\baselineskip}%
      \let\size@update\relax}}
@@ -498,7 +500,7 @@
   \csname D@\k@encoding\endcsname
   \let\kenc@update\relax
   \let\ck@encoding\k@encoding
-  \edef\tmp@enc{'\luatexluaescapestring{\k@encoding}'}
+  \edef\tmp@enc{'\luatexluaescapestring{\k@encoding}'}%
   \directlua{luatexja.jfont.is_kyenc(\tmp@enc)}\ifin@%
     \let\cy@encoding\k@encoding
   \else
