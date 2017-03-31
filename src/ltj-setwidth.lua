@@ -205,7 +205,7 @@ local function capsule_glyph_math(p, met, char_data)
    setfield(p, 'yoffset', -fshift.down)
    setfield(p, 'xoffset', getfield(p, 'xoffset') + char_data.align*(fwidth-pwidth) - fshift.left)
    local box = node_new(id_hlist);
-   setfield(box, fwidth, fheight, fdepth)
+   setwhd(box, fwidth, fheight, fdepth)
    setfield(box, 'head', p)
    setfield(box, 'shift', y_shift)
    setdir(box, tex.mathdir)
@@ -258,7 +258,7 @@ do
       end
       if adj_depth>node_depth then
 	 local r = node_new(id_rule,rule_subtype)
-	 setwhd(0, 0, adj_depth); setdir(r, tex_dir)
+	 setwhd(r, 0, 0, adj_depth); setdir(r, tex_dir)
 	 set_attr(r, attr_icflag, PROCESSED)
 	 if field=='post' then
 	    node_insert_after(head, head, r)

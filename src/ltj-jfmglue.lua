@@ -1006,7 +1006,7 @@ end
 -- (anything) .. (和文文字で始まる hlist)
 local function handle_np_ja_hlist()
    local qid = Nq.id
-   if qid==id_jglyph or ((qid==id_pbox or Nq.id == id_pbox_w) and Nq.met) then
+   if qid==id_jglyph or ((qid==id_pbox or qid == id_pbox_w) and Nq.met) then
       local g = non_ihb_flag and get_OB_skip(0) or get_kanjiskip() -- O_B->K
       handle_penalty_normal(Nq.post, 0, g); real_insert(g)
    elseif Nq.met then  -- Nq.id==id_hlist

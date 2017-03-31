@@ -102,7 +102,7 @@ do
 	    local pid = getid(p)
 	    while pid==id_glyph do
 	       local pc = getchar(p)
-	       if (has_attr(p, attr_icflag) or 0)<=0 and is_ucs_in_japanese_char(p, pc) then
+	       if has_attr(p, attr_icflag, 0) and is_ucs_in_japanese_char(p, pc) then
 		  setfont(p, ltjf_replace_altfont(has_attr(p, attr_curjfnt) or getfont(p), pc))
 		  setlang(p, lang_ja)
 		  ltjs_orig_char_table[p] = pc
@@ -130,8 +130,12 @@ local ltjf_font_metric_table  = ltjf.font_metric_table
 local font_getfont = font.getfont
 local function set_box_stack_level(head, mode)
    local box_set, cl = 0, tex.currentgrouplevel + 1
-   for _,p  in pairs(wt) do
-      if mode and getfield(p, 'value')==cl then box_set = 1 end; node_free(p)
+   if mode then
+      for _,p  in pairs(wt) do
+         if getfield(p, 'value')==cl then box_set = 1 end; node_free(p)
+      end
+   else
+      for _,p  in pairs(wt) do node_free(p) end
    end
    ltjs_report_stack_level(tex_getcount('ltj@@stack') + box_set)
    for _,p  in pairs(wtd) do
@@ -139,9 +143,8 @@ local function set_box_stack_level(head, mode)
    end
    if ltjs.list_dir == dir_tate then
       for p in node.direct.traverse_id(id_glyph,to_direct(head)) do
-         if (has_attr(p, attr_icflag) or 0)<=0 and getlang(p)==lang_ja then
-            local pc = ltjs_orig_char_table[p]
-	    local nf = ltjf_replace_altfont( has_attr(p, attr_curtfnt) or getfont(p) , pc)
+         if has_attr(p, attr_icflag, 0) and getlang(p)==lang_ja then
+	    local nf = ltjf_replace_altfont( has_attr(p, attr_curtfnt) or getfont(p) , ltjs_orig_char_table[p])
 	    setfont(p, nf)
 	    if ltjf_font_metric_table[nf].vert_activated then
 	       local pc = getchar(p)
