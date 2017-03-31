@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2017/03/20 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2017/04/01 Patch to NFSS2 for LuaTeX-ja]
 
 \def\ltj@chardef@text@cmd#1{%
   \let\@ifdefinable\@@ifdefinable%
@@ -61,21 +61,18 @@
 \newbox\zstrutbox
 \def\strutbox{%
   \ifnum\ltjgetparameter{direction}=1 \dstrutbox       % dtou
-  \else\ifnum\ltjgetparameter{direction}=3 \tstrutbox  % tate
-  \else\ifnum\ltjgetparameter{direction}=11 \zstrutbox % utod
-  \else\ystrutbox % yoko
-  \fi\fi\fi
+  \else\ifnum\ltjgetparameter{direction}=4 \ystrutbox  % yoko
+  \else\tstrutbox  % tate and utod
+  \fi\fi
 }
 \def\strut{\relax
   \ifnum\ltjgetparameter{direction}=1 % dtou
     \ifmmode\copy\dstrutbox\else\unhcopy\dstrutbox\fi
   \else\ifnum\ltjgetparameter{direction}=4 % yoko
     \ifmmode\copy\ystrutbox\else\unhcopy\ystrutbox\fi
-  \else\ifnum\ltjgetparameter{direction}=3 % tate
+  \else % tate and utod
     \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi
-  \else % utod
-    \ifmmode\copy\zstrutbox\else\unhcopy\zstrutbox\fi
-  \fi\fi\fi
+  \fi\fi
 }
 
 \def\ystrut{\relax\hbox{\yoko

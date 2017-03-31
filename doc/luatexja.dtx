@@ -136,6 +136,16 @@
 	pdftitle={LuaTeX-jaパッケージ}
 %</ja>
 }
+%<*ja>
+\def\HyRef@autoref#1#2{%
+  \begingroup
+    \Hy@safe@activestrue
+    \expandafter\HyRef@autosetref\csname r@#2\endcsname{#2}{#1}%
+  \endgroup\ltjalchar"200C %" 欧文ゴースト
+}
+\def\figureautorefname{図}
+\def\tableautorefname{表}
+%</ja>
 
 %%%%%%%% definition env.
 \usepackage{amsthm}
@@ -626,7 +636,7 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 \item \Pkg{luaotfload} v2.6 (or later)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
 \item \Pkg{etoolbox}, \Pkg{everysel} (if you want to use \LuaTeX-ja with \LaTeXe)
-\item \Pkg{ltxcmds}, \Pkg{pdftexcmds}, \Pkg{atbegshi}
+\item \Pkg{ltxcmds}, \Pkg{pdftexcmds}, \Pkg{filehook}, \Pkg{atbegshi}
 \item \Pkg{fontspec} v2.4 (or later)
 %<en>\item \emph{IPAex fonts} (\url{http://ipafont.ipa.go.jp/})
 %<ja>\item \emph{IPAexフォント(\url{http://ipafont.ipa.go.jp/})}
@@ -2354,16 +2364,16 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 \end{multicols}
 %<*en>
 \item[Range~3${}^{\text{\kern.1emJ}}$] Punctuations and Miscellaneous symbols. The block list is
-	   indicated in Table~\ref{table-rng3}.
+	   indicated in \autoref{tab:rng3}.
 %</en>
 %<*ja>
-\item[範囲3${}^{\text{\kern.1emJ}}$] 句読点と記号類．ブロックのリストは表\ref{table-rng3}%
+\item[範囲3${}^{\text{\kern.1emJ}}$] 句読点と記号類．ブロックのリストは\autoref{tab:rng3}%
                              に示してある．
 %</ja>
 \begin{table}[!tb]
 %<en>\caption{Unicode blocks in predefined character range~3.}\medskip
 %<ja>\caption{文字範囲3に指定されているUnicodeブロック．}
-\label{table-rng3}
+\label{tab:rng3}
 \catcode`\"=13\def"#1#2#3#4{\texttt{U+#1#2#3#4}}%"
 \centering\small
 \begin{tabular}{llll}
@@ -2407,12 +2417,12 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 \end{lstlisting}
 %<en>\item[Range~5${}^{\text{A}}$] Surrogates and Supplementary Private Use Areas.
 %<ja>\item[範囲5${}^{\text{A}}$] 代用符号と補助私用領域．
-%<en>\item[Range~6${}^{\text{\kern.1emJ}}$] Characters used in Japanese. The block list is indicated in Table~\ref{table-rng6}.
-%<ja>\item[範囲6${}^{\text{\kern.1emJ}}$] 日本語で用いられる文字．ブロックのリストは表\ref{table-rng6}に示す．
+%<en>\item[Range~6${}^{\text{\kern.1emJ}}$] Characters used in Japanese. The block list is indicated in \autoref{tab:rng6}.
+%<ja>\item[範囲6${}^{\text{\kern.1emJ}}$] 日本語で用いられる文字．ブロックのリストは\autoref{tab:rng6}に示す．
 \begin{table}[!tb]
 %<en>\caption{Unicode blocks in predefined character range~6.}\medskip
 %<ja>\caption{文字範囲6に指定されているUnicodeブロック．}
-\label{table-rng6}
+\label{tab:rng6}
 \catcode`\"=13\def"#1#2#3#4{\texttt{U+#1#2#3#4}}%"
 \centering\small
 \begin{tabular}{llll}
@@ -2437,17 +2447,17 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 \end{table}
 %<*en>
 \item[Range~7${}^{\text{\kern.1emJ}}$] Characters used in CJK languages, but not included in  Adobe-Japan1-6.
-The block list is indicated in Table~\ref{table-rng7}.
+The block list is indicated in \autoref{tab:rng7}.
 %</en>
 %<*ja>
 \item[範囲7${}^{\text{\kern.1emJ}}$] CJK言語で用いられる文字のうち，Adobe-Japan1-6に
                             含まれていないもの．
-                            ブロックのリストは表\ref{table-rng7}に示す．
+                            ブロックのリストは\autoref{tab:rng7}に示す．
 %</ja>
 \begin{table}[!tb]
 %<en>\caption{Unicode blocks in predefined character range~7.}\medskip
 %<ja>\caption{文字範囲7に指定されているUnicodeブロック．}
-\label{table-rng7}
+\label{tab:rng7}
 \catcode`\"=13\def"#1#2#3#4{\texttt{U+#1#2#3#4}}%"
 \centering\small
 \begin{tabular}{llll}
@@ -2773,24 +2783,29 @@ becuse a \emph{JAchar} is encapsulated by a horizontal box if needed.
 
 %<*ja>
 \paragraph{数式における挙動：\pTeX との違い}
-\textbf{ALchar}のベースラインを補正する \Param{yalbaselineshift} パラメータは
-ほぼ\pTeX における \cs{ybaselineshift} に対応しているものであるが，
+\textbf{ALchar}のベースラインを補正する\Param{yalbaselineshift}, \Param{talbaselineshift}パラメータは
+ほぼ\pTeX における \cs{ybaselineshift}, \cs{tbaselineshift} に対応しているものであるが，
 数式中の挙動は異なっているので注意が必要である．
-例えば，表\ref{tab:math_bsa}のように，数式中に明示的に現れた \cs{hbox} は，
+例えば，\autoref{tab:math_bsa}のように，数式中に明示的に現れた \cs{hbox},~\cs{vbox} は，横組において
 \begin{itemize}
  \item 2015年以前の\pTeX では，ボックス全体が \cs{ybaselineshift} だとシフトされるので，
- 表\ref{tab:math_bsa}中の``い''のように，ボックス中の和文文字は
+ \autoref{tab:math_bsa}中の``い''のように，ボックス中の和文文字は
  \ \cs{ybaselineshift} だけシフトされ，一方，``for all''のように，
  ボックス内の欧文文字は2重にシフトされることになる．
  \item 一方，\LuaTeX-jaではそのようなことはおこらず，
- 数式中に明示的に現れた \cs{hbox} はシフトしない．そのため，
- 表\ref{tab:math_bsa}中の``い''も``for all''も，それぞれ本文中に
+ 数式中に明示的に現れた \cs{hbox},~\cs{vbox} はシフトしない．そのため，
+ \autoref{tab:math_bsa}中の``い''も``for all''も，それぞれ本文中に
  書かれたときと同じ上下位置に組まれる．
 
  なお，\TeX~Live~2016以降の\pTeX では改修がなされ，\LuaTeX-jaと
  近い挙動になるようにしているが，数式中に直に書かれた``あ''のベースラインについては
  まだ違いが見られる．
 \end{itemize}
+
+なお，20170401.0版以降の\LuaTeX-jaでは，\cs{vcenter} によるボックスには
+全体が\Param{yalbaselineshift}, \Param{talbaselineshift} パラメータが反映されるようにしている．
+その方が結果が自然であることによる変更なのだが，結果的に\cs{vcenter} については\pTeX と同じ挙動となった．
+
 \begin{table}
 \small\centering
 \caption{数式関係のベースライン補正($\Param{yalbaselineshift}=10\,\textrm{pt}$)}
@@ -2882,7 +2897,7 @@ However, the penalty inserted after it is 10 which is the \Param{postbreakpenalt
 \subsection{予備知識：\pTeX と\upTeX における \cs{kcatcode}}
 \pTeX，\upTeX においては，和文文字が制御綴内で利用できるかどうか
 は \cs{kcatcode} の値によって決定されるのであった．
-詳細は表\ref{table-kcat}を参照されたい．
+詳細は\autoref{tab:kcat}を参照されたい．
 %</ja>
 %<*en>
 \section{\cs{catcode} in \LuaTeX-ja}
@@ -2890,13 +2905,13 @@ However, the penalty inserted after it is 10 which is the \Param{postbreakpenalt
 \subsection{Preliminaries: \cs{kcatcode} in \pTeX\ and \upTeX}
 In \pTeX~and~\upTeX, the value of \cs{kcatcode} determines
 whether a Japanese character can be used in a control word.
-For the detail, see Table~\ref{table-kcat}.
+For the detail, see \autoref{tab:kcat}.
 %</en>
 
 \begin{table}[t]
 \small
 \caption{\cs{kcatcode} in \upTeX}
-\label{table-kcat}
+\label{tab:kcat}
 %<en>\medskip
 
 \noindent\hfill
@@ -3058,7 +3073,7 @@ for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 %<en>\caption{Difference of the set of non-kanji JIS~X~0208 characters which can be used in a control word}
 %<ja>\caption{制御綴中に使用出来るJIS~X~0208非漢字の違い}
 %<en>\medskip
-\label{table-kcat-diff}
+\label{tab:kcat-diff}
 \def\D#1#2#3#4{%
   {\fboxsep0pt\fcolorbox{cyan}{white}%
   {\large\char"#1#2#3#4}}\ (\texttt{U+#1#2#3#4})} %"
@@ -3119,7 +3134,7 @@ for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 \subsection{Non-kanji characters in a control word}
 Because the engine differ, so non-kanji JIS~X~0208 characters
 which can be used in a control word differ in \pTeX, in \upTeX,~and~in \LuaTeX-ja.
-Table~\ref{table-kcat-diff} shows the difference.
+\autoref{tab:kcat-diff} shows the difference.
 Except for four characters ``・'',~``゛'', ``゜'',~``゠'',
 \LuaTeX-ja admits more characters in a control word than \upTeX.
 
@@ -3132,7 +3147,7 @@ For the detail, see \url{https://github.com/h-kitagawa/kct}.
 
 エンジンが異なるので，\pTeX, \upTeX, \LuaTeX-ja
 において制御綴中に使用可能なJIS~X~0208の文字は異なる．
-異なっているところだけを載せると，表\ref{table-kcat-diff}のようになる．
+異なっているところだけを載せると，\autoref{tab:kcat-diff}のようになる．
 「・」「゛」「゜」「゠」を除けば，\LuaTeX-jaでは\upTeX より多くの文字が
 制御綴に使用可能になっている．
 
@@ -3236,7 +3251,7 @@ Example&\obox{\yoko}&\obox{\tate}&\obox{\dtou}&\obox{\utod}\\
 \end{table}
 
 %<*en>
-\LuaTeX-ja supports four directions, as shown in Table~\ref{tab-dir}.
+\LuaTeX-ja supports four directions, as shown in \autoref{tab-dir}.
 The second column (\emph{yoko} direction) is just horizontal writing,
 and the third column (\emph{tate} direction) is vertical writing.
 The fourth column (\emph{dtou} direction) is actually a hidden feature of \pTeX.
@@ -3249,7 +3264,7 @@ only when the current list is null. Also, the direction of a math formula is cha
 %</en>
 
 %<*ja>
-\LuaTeX-jaがサポートする組方向は表\ref{tab-dir}に示す4つである．
+\LuaTeX-jaがサポートする組方向は\autoref{tab-dir}に示す4つである．
 4列目の \cs{dtou} は聞き慣れない命令だと思うが，
 実は\pTeX に同名の命令が（ドキュメントには書かれていないが）存在する．
 Down-TO-Upの意味なのだろう．\cs{dtou} を使用する機会はないだろうが，
@@ -3277,7 +3292,7 @@ The below is an example.
 また横組に戻る% yoko
 \end{LTXexample}
 
-Table~\ref{tab-diffdir} shows how a box is arranged when
+\autoref{tab-diffdir} shows how a box is arranged when
 the direction  inside the box and that outside the box differ.
 %</en>
 %<*ja>
@@ -3298,7 +3313,7 @@ the direction  inside the box and that outside the box differ.
 \end{LTXexample}
 
 異なる組方向のボックスを配置した場合にどう組まれるかの仕様も，\pTeX を
-踏襲している．表\ref{tab-diffdir}に示す．
+踏襲している．\autoref{tab-diffdir}に示す．
 %</ja>
 
 \begin{table}[t]
@@ -3611,7 +3626,7 @@ These commands set the dimension of \cs{box<num>}. One does not need
 \ltjsetwd42 20pt,  \ltjsetwd42=20pt,  \ltjsetwd=42 20pt,  \ltjsetwd=42=20pt
 \end{lstlisting}
 
-設定値は「横組」「縦組及び \cs{utod} 方向」「\cs{dtou} 方向」
+設定値は「横組」「縦組及びutod方向」「dtou方向」
 の3種ごとに独立して記録される．参考として，Gitリポジトリ内の
 	      \verb+test/test55-boxdim_diffdir.{tex,pdf}+ を挙げておく．
 
@@ -3885,10 +3900,10 @@ The following JFMs are shipped with \LuaTeX-ja:
 %</ja>
 \end{description}
 %<*en>
-The difference among these three~JFMs is  shown in Table~\ref{tab-difjfm}.
+The difference among these three~JFMs is  shown in \autoref{tab-difjfm}.
 %</en>
 %<*ja>
-これら3つのJFMの違いは表\ref{tab-difjfm}に示した．表中の文例の一部には，
+これら3つのJFMの違いは\autoref{tab-difjfm}に示した．表中の文例の一部には，
 \cite{min10}の図3,~4のものを用いた．
 %</ja>
 
@@ -3918,11 +3933,11 @@ Sometimes there is a need that \ldots.
 \item[jfmvar=<string>]
 標準では，JFMとサイズが同じで，
   実フォントだけが異なる2つの和文フォントは「区別されない」．例えば
-図\ref{fig:jfmvar}において，最初の「）」と「【」の実フォントは異なるが，
+\autoref{fig:jfmvar}において，最初の「）」と「【」の実フォントは異なるが，
 JFMもサイズも同じなので，普通に「）【」と入力した時と同じように半角空きとなる．
 
 しかし，JFMとサイズが同じであっても，\texttt{jfmvar} キーの異なる
-2つの和文フォント，例えば図\ref{fig:jfmvar}で言う \cs{F} と \cs{H}，
+2つの和文フォント，例えば\autoref{fig:jfmvar}で言う \cs{F} と \cs{H}，
 は「区別される」．異なる和文フォントに異なる \texttt{jfmvar} キーを割り当て，
 かつ\Param{differentjfm}パラメータを \texttt{both} に設定すれば，
 \pTeX と似た状況で組版されることになる．
@@ -3955,7 +3970,7 @@ JFMもサイズも同じなので，普通に「）【」と入力した時と�
 Some fonts have information for inter-glyph spacing.
 This version of \LuaTeX-ja treats kerning spaces like an italic correction;
 any glue and/or kern from the JFM and a kerning space can coexist.
-See Figure~\ref{fig:kern-jfm} for detail.
+See \autoref{fig:kern-jfm} for detail.
 
 Note that in \cs{setmainjfont} etc.\ which are provided by \Pkg{luatexja-fontspec}
 package, kerning option is set \emph{off} (\texttt{Kerning=Off}) by default,
@@ -3966,7 +3981,7 @@ because of the compatibility with previous versions of \LuaTeX-ja.
 このカーニング情報は以前の\LuaTeX-ja とはあまり相性が良くなかったが，
 本バージョンではカーニングによる空白はイタリック補正と同様に扱うことになっている．
 つまり，カーニング由来の空白とJFM由来のグルー・カーンは同時に入りうる．
-図\ref{fig:kern-jfm}を参照．
+\autoref{fig:kern-jfm}を参照．
 \begin{itemize}
  \item \emph{\cs{jfont} や，
 NFSS2用の命令（\ref{ssec-chgfnt}節，\ref{ssec-nfsspat}節）における指定では
@@ -4113,7 +4128,7 @@ JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 \end{lstlisting}
  \item \ref{ssec-math}節で述べる，数式中の和文フォントには縦組用和文フォントは指定できない．
  \item \texttt{jfm=<name>}\ の部分には縦組用JFMを指定する．
-以下の縦組用JFMが\LuaTeX-jaには同梱されており，違いを表\ref{tab-difjfm-tate}に示した．
+以下の縦組用JFMが\LuaTeX-jaには同梱されており，違いを\autoref{tab-difjfm-tate}に示した．
 \begin{description}
 \item[\tt jfm-ujisv.lua] \LuaTeX-jaの標準縦組用JFMである．このJFMは\upTeX で
   用いられるUTF/OTFパッケージ用の和文用TFMである \verb+upnmlminr-v.tfm+ を
@@ -4404,7 +4419,7 @@ Direction of JFM&\textbf{\texttt{'yoko'} (horizontal)}&\multicolumn{1}{l}{\textb
 \end{table}
 Specify the width of characters in character class~$i$, the height, the depth and
 the amount of italic correction. All characters in character class~$i$ are regarded that its width, height, and depth are
-as values of these fields. The default values are shown in Table~\ref{tab-wid}.
+as values of these fields. The default values are shown in \autoref{tab-wid}.
 %</en>
 %<*ja>
 \begin{table}[t]
@@ -4441,7 +4456,7 @@ These fields are for adjusting the position of the ``real'' glyph. Legal
 	     treated as~0, and \texttt{align} field is treated as
 	     \texttt{'left'}.
 The effects of these 3~fields are indicated in
-Figures \ref{fig-pos}~and~\ref{fig-pos-tate}.
+\autoref{fig:pos}~and~\autoref{fig:pos-tate}.
 %</en>
 %<*ja>
 これらのフィールドは実際のグリフの位置を調整するためにある．
@@ -4449,8 +4464,8 @@ Figures \ref{fig-pos}~and~\ref{fig-pos-tate}.
 \texttt{'right'} のいずれかである．もしこれら3つのフィールドのうちの1つが省かれた
 場合，\texttt{left} と \texttt{down} は0，\texttt{align} フィールドは
 \ \texttt{'left'} であるものとして扱われる．
-これら3つのフィールドの意味については図\ref{fig-pos}（横組用和文フォント），
-図\ref{fig-pos-tate}（縦組用和文フォント）で説明する．
+これら3つのフィールドの意味については\autoref{fig:pos}（横組用和文フォント），
+\autoref{fig:pos-tate}（縦組用和文フォント）で説明する．
 %</ja>
 
 %<*en>
@@ -4567,7 +4582,7 @@ Furthermore, the glyph is shifted according to values of fields
 %<en>The position of the real glyph (horizontal Japanese fonts)
 %<ja>横組和文フォントにおける「実際の」グリフの位置
 }
-\label{fig-pos}
+\label{fig:pos}
 \end{figure}
 \begin{figure}[!tb]
 \begin{minipage}{0.4\textwidth}%
@@ -4648,7 +4663,7 @@ Furthermore, the glyph is shifted according to values of fields
 %<en>The position of the real glyph (vertical Japanese fonts)
 %<ja>縦組和文フォントにおける「実際の」グリフの位置
 }
-\label{fig-pos-tate}
+\label{fig:pos-tate}
 \end{figure}
 
 \item[kern={\{[$j$]=<kern>, [$j'$]=\{<kern>, [ratio=<ratio>]\}, ...\}}]
@@ -5014,7 +5029,7 @@ an external package is needed to support this in plain \TeX\ and
 
 %<*en>
 \LuaTeX-ja's handling of Japanese fonts in math formulas is similar;
-Table~\ref{tab-math} shows counterparts to \TeX's primitives for math
+\autoref{tab-math} shows counterparts to \TeX's primitives for math
 font families. There is no relation between the value of
 \cs{fam} and that of \cs{jfam}; with appropriate settings,
 you can set both \cs{fam} and \cs{jfam} to the same value.
@@ -5024,7 +5039,7 @@ a \emph{horizontal} Japanese font.
 %</en>
 %<*ja>
 \LuaTeX-jaの数式中での和文フォントの扱いも同様である．
-表\ref{tab-math}は数式フォントファミリに対する \TeX のプリミティブと対応する
+\autoref{tab-math}は数式フォントファミリに対する \TeX のプリミティブと対応する
 ものを示している．\cs{fam} と \cs{jfam} の値の間には関係はなく，
 適切な設定の下では \cs{fam} と \cs{jfam} の両方に同じ値を設定することができる．
 \Param{jatextfont} 他の第2引数<jfont\_cs>は，\cs{jfont} で定義された
@@ -6383,7 +6398,7 @@ characters in <range> of the Japanese font (we say the \emph{base font})
 which specified by first 4 arguments are typeset
 by the Japanese font which specified by fifth to eighth arguments
 (we say the \emph{alternate font}).
-An example is shown in Figure~\ref{fig:altkanji}.
+An example is shown in \autoref{fig:altkanji}.
 
 \begin{itemize}
  \item
@@ -6603,6 +6618,40 @@ for example, the meaning of \cs{TU\cs{textquotedblleft}} is \cs{ltjalchar8220\lt
 \cs{TU\cs{textquotedblleft}}は \cs{ltjalchar8220\ltjalchar"2423 } という定義になっている．%"
 %</ja>
 
+\begin{table}[t]
+  \centering\small
+  \caption{strut}\label{tab:strutbox}
+  \begin{tabular}{llcccl}
+    \toprule
+    \textbf{box}&\textbf{direction}&\textbf{width}&\textbf{height}&\textbf{depth}
+    &\textbf{user command}\\
+    \midrule
+  \cs{ystrutbox}&yoko&0&0.7\cs{baselineskip}&0.3\cs{baselineskip}&\cs{ystrut}\\\midrule
+  \cs{tstrutbox}&tate, utod&0&0.5\cs{baselineskip}&0.5\cs{baselineskip}&\cs{tstrut}\\\midrule
+  \cs{dstrutbox}&dtou&0&0.7\cs{baselineskip}&0.3\cs{baselineskip}&\cs{dstrut}\\\midrule
+  \cs{zstrutbox}&---&0&0.7\cs{baselineskip}&0.3\cs{baselineskip}&\cs{zstrut}\\\bottomrule
+  \end{tabular}
+\end{table}
+%<*en>
+\subsection{\cs{strutbox}}
+As \pLaTeX~(2017/04/08 or later), \cs{strutbox} is \emph{a macro} which is expanded to one of
+\cs{ystrutbox},~\cs{tstrutbox},~and~\cs{dstrutbox}
+(all of them are shown in \autoref{tab:strutbox}), according to the current direction.
+Similarly, \cs{strut} now uses one of these boxes.
+%</en>
+%<*ja>
+\subsection{\cs{strutbox}}
+\pLaTeX~2017/04/08以降と同じように，
+\cs{strutbox}は現在の組方向によって\cs{ystrutbox}, \cs{tstrutbox}, \cs{dstrutbox}の
+いずれかに展開される\emph{マクロ}となっている（これらについては\autoref{tab:strutbox}参照）．
+同様に\cs{strut}もこの3\nobreak ボックスのいずれかを組方向によって使い分けるようになっている．
+
+\cs{zstrutbox}はutod方向（\pTeX でいう縦数式ディレクション）で使われる支柱ボックスであるが，
+実際に使われるのは\cs{zstrut}が明示的に発行された時，そして
+\Pkg{lltjext}パッケージで追加される組方向指定で \texttt{<u>} を指定した時，および
+周囲が縦組の状況で \texttt{<z>} を指定した時に限られている．
+%</ja>
+
 %<*en>
 \section{Addon packages}
 \LuaTeX-ja has several addon packages.
@@ -6703,22 +6752,22 @@ The \texttt{TateFeatures} key specifies font features which are only turned~on i
 vertical writing, such as \texttt{Style=VerticalKana}~(\texttt{vkna} feature).
 Similarly, the \texttt{TateFont} key specifies the Japanese font which will be used only
 	     in vertical writing.
-A demonstrarion is shown in Figure~\ref{fig:yokotate-fontspec}.
+A demonstrarion is shown in \autoref{fig:yokotate-fontspec}.
 %</en>
 %<*ja>
 縦組において使用されるフォントや，縦組においてのみ適用されるフォント機能達を
-指定する．使用例は図\ref{fig:yokotate-fontspec}参照．
+指定する．使用例は\autoref{fig:yokotate-fontspec}参照．
 %</ja>
 
 \item[YokoFeatures=\{<features>\}]
 %<*en>
 The \texttt{YokoFeatures} key specifies font features which are only turned~on in
 horizontal writing,.
-A demonstrarion is shown in Figure~\ref{fig:yokotate-fontspec}.
+A demonstrarion is shown in \autoref{fig:yokotate-fontspec}.
 %</en>
 %<*ja>
 同様に，横組においてのみ適用されるフォント機能達を
-指定する．使用例は図\ref{fig:yokotate-fontspec}参照．
+指定する．使用例は\autoref{fig:yokotate-fontspec}参照．
 %</ja>
 
 
@@ -6767,11 +6816,11 @@ AltFont = {
 %<*en>
 Each sublist should have the \texttt{Range} key
 (sublist which does not contain \texttt{Range} key is simply ignored).
-A demonstrarion is shown in Figure~\ref{fig:altkanji-fontspec}.
+A demonstrarion is shown in \autoref{fig:altkanji-fontspec}.
 %</en>
 %<*ja>
 各部分リストには \texttt{Range} キーが必須である（含まれない部分リストは
-単純に無視される）．指定例は図\ref{fig:altkanji-fontspec}に示した．
+単純に無視される）．指定例は\autoref{fig:altkanji-fontspec}に示した．
 %</ja>
 \end{cslist}
 
@@ -6808,7 +6857,7 @@ one can specify \texttt{AltFont} inside \texttt{YokoFeatures},~\texttt{TateFeatu
 
 Note that features which are specified in \texttt{YokoFeatures}~and~\texttt{TateFeatures}
 are always interpreted \emph{after} other ``direction-independent'' features.
-This explains why \cs{addjfontfeatures} at~line~6 in~Figure~\ref{fig:yokotate-fontspec}
+This explains why \cs{addjfontfeatures} at~line~6 in~\autoref{fig:yokotate-fontspec}
 has no effect, because a color specification is already done in
 \texttt{YokoFeatures}~and~\texttt{TateFeatures} keys.
 %</en>
@@ -6840,7 +6889,7 @@ BoldFeatures = {
 指定することは可能であり．また\ \texttt{YokoFeatures},~\texttt{TateFeatures} キーの
 中身に \texttt{AltFont} を指定することができる．
 
-また，図\ref{fig:yokotate-fontspec}後半部では6行目の色の指定が効かず，
+また，\autoref{fig:yokotate-fontspec}後半部では6行目の色の指定が効かず，
 2行目で指定した\ \texttt{YokoFeatures},~\texttt{TateFeatures}\ による色の指定が有効になっ
 たままである．これは\emph{\ \texttt{YokoFeatures},~\texttt{TateFeatures}\ による
 OpenType機能指定は
@@ -7013,8 +7062,8 @@ with priority&%
 Note: the value of
 \Param{kanjiskip} is 0\,pt${}^{+1/5\,\mathrm{em}}_{-1/5\,\mathrm{em}}$ in this figure,
 for making the difference obvious.
-%<ja>\caption{行長調整}\label{fig-adj}
-%<en>\caption{Line adjustment}\label{fig-adj}
+%<ja>\caption{行長調整}\label{fig:adj}
+%<en>\caption{Line adjustment}\label{fig:adj}
 \end{figure}
 
 
@@ -7047,11 +7096,11 @@ for making the difference obvious.
   
 \item[優先順位付きの行長調整]
 \pTeX では，行長調整において優先度の概念が存在しなかったため，図
-\ref{fig-adj}上段における半角分の半端は，図\ref{fig-adj}中段のように，鍵
+\ref{fig:adj}上段における半角分の半端は，\autoref{fig:adj}中段のように，鍵
 括弧周辺の空白と和文間空白(\Param{kanjiskip})の両方によって負担される．し
 かし，「日本語組版処理の要件」\cite{jlreq}やJIS~X~4051~\cite{x4051}におい
 ては，このような状況では半端は鍵括弧周辺の空白のみで負担し，その他の和文
-文字はベタ組で組まれる（図\ref{fig-adj}下段）ことになっている．
+文字はベタ組で組まれる（\autoref{fig:adj}下段）ことになっている．
 \Pkg{luatexja-adjust}パッケージの提供する第2の機能は，
 \cite{jlreq}や\cite{x4051}における規定のような，優先順位付き
 の行長調整である．
@@ -7959,7 +8008,7 @@ as in \Pkg{luatexja-adjust}.
 
 %<*en>
 \paragraph{Setting parameters}
-Figure~\ref{fig:setpar-def} shows the \emph{most outer} definition of
+\autoref{fig:setpar-def} shows the \emph{most outer} definition of
 two commands,
 \cs{ltjsetparameter} and \cs{ltjglobalsetparameter}.
 Most important part is the last \cs{setkeys},
@@ -7986,7 +8035,7 @@ but also by the value of \cs{globaldefs}.
 %</en>
 %<*ja>
 \paragraph{パラメータの設定}
-\cs{ltjsetparameter} と，\cs{ltjglobalsetparameter} の定義は図\ref{fig:setpar-def}の
+\cs{ltjsetparameter} と，\cs{ltjglobalsetparameter} の定義は\autoref{fig:setpar-def}の
 のようになっている．
 本質的なのは最後の \cs{setkeys} で，これは\Pkg{xkeyval}パッケージの提供する命令である．
 
@@ -8099,7 +8148,7 @@ internal states are as follows:
 The first three states---$N$,~$S$, and~$M$---are as same as \TeX's input
 processor.  State~$K$ is similar to state~$M$, and is entered after
 Japanese characters.  The diagram of state transitions are indicated in
-Figure~\ref{fig-ptexipro}.  Note that \pTeX\ doesn't leave state~$K$
+\autoref{fig:ptexipro}.  Note that \pTeX\ doesn't leave state~$K$
 after ``beginning/ending of a group'' characters.
 %</en>
 
@@ -8118,7 +8167,7 @@ after ``beginning/ending of a group'' characters.
 \item State~$M$: 行中．
 \item State~$K$: 行中（和文文字の後）．
 \end{itemize}
-また，状態遷移は，図\ref{fig-ptexipro}のようになっており，図中の数字は
+また，状態遷移は，\autoref{fig:ptexipro}のようになっており，図中の数字は
 カテゴリーコードを表している．最初の3状態は\TeX の入力処理部と同じであり，
 図中から状態$K$と「$j$」と書かれた矢印を取り除けば，\TeX の入力処理部と同
 じものになる．
@@ -8200,7 +8249,7 @@ to State~$M$ (middle of line) sometimes.
 \end{itemize}
 %<en>\caption{State transitions of \pTeX's input processor}
 %<ja>\caption{\pTeX の入力処理部の状態遷移}
-\label{fig-ptexipro}
+\label{fig:ptexipro}
 \end{figure}
 
 
@@ -8836,7 +8885,7 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 \end{table}
 
 \subsection{その他の場合}
-本節の内容は表\ref{tab-jfmglue}にまとめてある．
+本節の内容は\autoref{tab-jfmglue}にまとめてある．
 
 \paragraph{和文Aと欧文の間}
 \textit{Nq}が\textsf{和文A}で，\textit{Np}が\textsf{欧文}の場合，JFMグルー挿入処理は次のようにして行われる．
@@ -9026,7 +9075,7 @@ $d = \max(\texttt{depth} - \texttt{yoffset}, 0)$,
 $h = \max(\texttt{height} + \texttt{yoffset}, 0)$, $d=\texttt{depth}$.
 \end{description}
 という仕様になっている．つまり，\texttt{yoffset} が負（グリフを下ける）の場合に深さは増加しな
-い（表\ref{tab:yoffset_and_im}参照）．
+い（\autoref{tab:yoffset_and_im}参照）．
 
 \begin{table}[t]
 \caption{\texttt{yoffset} and imaginary body}
@@ -9732,7 +9781,7 @@ CMapが必要である．
 
 \pageref{para-cid}ページで述べたように，\texttt{cid}キーを使って
 非埋め込みの中国語・韓国語フォントを定義する場合，同様のキャッシュが生成される．
-キャッシュの名称，必要となるCMapについては表\ref{tab:cid-cache}を参照して欲しい．
+キャッシュの名称，必要となるCMapについては\autoref{tab:cid-cache}を参照して欲しい．
 
 \item[extra\_***.lua]
 フォント``\texttt{***}''における異体字セレクタの情報，縦組用字形への変換テーブル，そして
@@ -9750,7 +9799,7 @@ It is created from three CMaps, \texttt{UniJIS2004-UTF32-\{H,V\}} and
 	     \texttt{Adobe-Japan1-UCS2},
 and this is why these two CMaps are needed in the first run of \LuaTeX-ja.
 
-Similar caches are created as Table~\ref{tab:cid-cache},
+Similar caches are created as \autoref{tab:cid-cache},
 if you specified \texttt{cid} key in \cs{jfont}
 to use other CID-keyed non-embedded fonts for Chinese or Korean,
 as in Page~\pageref{para-cid}.
