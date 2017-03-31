@@ -30,6 +30,8 @@ Installation
     - ltxcmds package
     - pdftexcmds package
     - atbegshi package
+    - filehook package
+    - stfloats package
     - IPAex fonts (http://ipafont.ipa.go.jp/)
    Hence this version does not work in TeX Live 2015 (or earlier).
 
