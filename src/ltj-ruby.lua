@@ -673,9 +673,9 @@ luatexbase.add_to_callback('hpack_filter', post_high_hbox, 'ltj.ruby.post_hbox',
 ----------------------------------------------------------------
 do
    local RIPRE  = luatexja.stack_table_index.RIPRE
-   local function whatsit_callback(Np, lp, Nq, bsl)
+   local function whatsit_callback(Np, lp, Nq)
       if Np.nuc then return Np
-      elseif getfield(lp, 'user_id') == RUBY_PRE then
+      elseif  getfield(lp, 'user_id') == RUBY_PRE then
          Np.first, Np.nuc, Np.last = lp, lp, lp
          local lpv = getfield(lp, 'value')
          local x = node_next(node_next(lpv))
@@ -711,6 +711,8 @@ do
             set_attr(lpv, attr_ruby_maxprep, 0)
          end
          return Np
+      else
+        return Np
       end
    end
    luatexbase.add_to_callback("luatexja.jfmglue.whatsit_getinfo", whatsit_callback,

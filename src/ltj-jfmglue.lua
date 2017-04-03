@@ -1237,6 +1237,8 @@ do
       elseif Np and getfield(lp, 'user_id') == BPAR then
          Np.first = lp; Np.nuc = lp; Np.last = lp
          return Np
+      else
+	 return Np
       end
    end
 
