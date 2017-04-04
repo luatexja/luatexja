@@ -14,7 +14,7 @@ local getfont = node.direct.getfont
 local getlist = node.direct.getlist
 local getchar = node.direct.getchar
 local getsubtype = node.direct.getsubtype
-local getdepth = node.direct.getdepth or function(n) getfield(n,'depth') end
+local getdepth = node.direct.getdepth or function(n) return getfield(n,'depth') end
 local getwhd = node.direct.getwhd or function(n)
   return getfield(n,'width'), getfield(n,'height'),getfield(n,'depth') end
 
