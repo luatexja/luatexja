@@ -198,23 +198,24 @@
 \def\asluastring#1{'\luatexluaescapestring{\detokenize{#1}}'}
 
 %%%%%%%% Redefine \/
-\protected\def\/{\relax\directlua{luatexja.jfont.append_italic()}}
+\newluafunction\ltj@@italic@inner
+\directlua{
+  local t = lua.get_functions_table()
+  t[\the\ltj@@italic@inner] = luatexja.jfont.append_italic
+}
+\protected\def\/{\relax\luafunction\ltj@@italic@inner}
 
 %%%%%%%% \jfont\CS={...:...;jfm=metric;...}, \globaljfont
 \protected\def\jfont#1{%
   \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false, 'yoko','\luatexluaescapestring{\noexpand#1}')}}
 \protected\def\globaljfont#1{%
   \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true,  'yoko','\luatexluaescapestring{\noexpand#1}')}}
-\ifdefined\newluafunction
-  \newluafunction\ltj@@jfont@inner
-  \directlua{
-    local t = lua.get_functions_table()
-    t[\the\ltj@@jfont@inner] = luatexja.jfont.jfontdefY
-  }
-  \def\ltj@@jfont{\luafunction\ltj@@jfont@inner}
-\else
-  \def\ltj@@jfont{\directlua{luatexja.jfont.jfontdefY()}}
-\fi
+\newluafunction\ltj@@jfont@inner
+\directlua{
+  local t = lua.get_functions_table()
+  t[\the\ltj@@jfont@inner] = luatexja.jfont.jfontdefY
+}
+\def\ltj@@jfont{\luafunction\ltj@@jfont@inner}
 
 %%%%%%%% \tfont\CS={...:...;jfm=metric;...}, \globaltfont
 \protected\def\tfont#1{%
@@ -223,44 +224,35 @@
   \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true,  'tate','\luatexluaescapestring{\noexpand#1}')}}
 
 %%%%%%%% \zw, \zh
-\ifdefined\newluafunction
-  \newluafunction\ltj@zw@inner
-  \newluafunction\ltj@zh@inner
-  \directlua{
-    local t, setdimen, ltjf = lua.get_functions_table(), tex.setdimen, luatexja.jfont
-    t[\the\ltj@zw@inner] = function() setdimen('ltj@zw', ltjf.get_zw()) end
-    t[\the\ltj@zh@inner] = function() setdimen('ltj@zh', ltjf.get_zh()) end
-  }
-  \protected\def\zw{\luafunction\ltj@zw@inner\ltj@zw}
-  \protected\def\zh{\luafunction\ltj@zh@inner\ltj@zh}
-\else
-  \protected\def\zw{\directlua{tex.setdimen('ltj@zw', luatexja.jfont.get_zw())}\ltj@zw}
-  \protected\def\zh{\directlua{tex.setdimen('ltj@zh', luatexja.jfont.get_zh())}\ltj@zh}
-\fi
+\newluafunction\ltj@zw@inner
+\newluafunction\ltj@zh@inner
+\directlua{
+  local t, setdimen, ltjf = lua.get_functions_table(), tex.setdimen, luatexja.jfont
+  t[\the\ltj@zw@inner] = function() setdimen('ltj@zw', ltjf.get_zw()) end
+  t[\the\ltj@zh@inner] = function() setdimen('ltj@zh', ltjf.get_zh()) end
+}
+\protected\def\zw{\luafunction\ltj@zw@inner\ltj@zw}
+\protected\def\zh{\luafunction\ltj@zh@inner\ltj@zh}
 
 %%%%%%%% \inhibitglue
-\ifdefined\newluafunction
-  \newluafunction\ltj@reset@globaldefs@inner
-  \newluafunction\ltj@restore@globaldefs@inner
-  \newluafunction\ltj@@ihb@inner
-  \directlua{
-    local t = lua.get_functions_table()
-    t[\the\ltj@reset@globaldefs@inner] 
-       = function() luatexja.global_temp = tex.globaldefs; tex.globaldefs = 0 end
-    t[\the\ltj@restore@globaldefs@inner] 
-       = function() tex.globaldefs = luatexja.global_temp end
-    t[\the\ltj@@ihb@inner] = luatexja.jfmglue.create_inhibitglue_node
-  }
-  \protected\def\ltj@reset@globaldefs{\luafunction\ltj@reset@globaldefs@inner}
-  \protected\def\ltj@restore@globaldefs{\luafunction\ltj@restore@globaldefs@inner}
-  \protected\def\inhibitglue{\ifhmode\relax\luafunction\ltj@@ihb@inner\fi}
-\else
-  \protected\def\ltj@reset@globaldefs{%
-    \directlua{luatexja.global_temp = tex.globaldefs; tex.globaldefs = 0}}
-  \protected\def\ltj@restore@globaldefs{\directlua{tex.globaldefs = luatexja.global_temp}\relax}
-  \protected\def\inhibitglue{\ifhmode\ltj@@ihb\fi}
-  \def\ltj@@ihb{\relax\directlua{luatexja.jfmglue.create_inhibitglue_node()}}
-\fi
+\newluafunction\ltj@reset@globaldefs@inner
+\newluafunction\ltj@restore@globaldefs@inner
+\newluafunction\ltj@@ihb@inner
+\newluafunction\ltj@@fakeparbegin@inner
+\directlua{
+  local t = lua.get_functions_table()
+  t[\the\ltj@reset@globaldefs@inner] 
+     = function() luatexja.global_temp = tex.globaldefs; tex.globaldefs = 0 end
+  t[\the\ltj@restore@globaldefs@inner] 
+     = function() tex.globaldefs = luatexja.global_temp end
+  t[\the\ltj@@ihb@inner] = luatexja.jfmglue.create_inhibitglue_node
+  t[\the\ltj@@fakeparbegin@inner] = luatexja.jfmglue.create_beginpar_node
+}
+\protected\def\ltj@reset@globaldefs{\luafunction\ltj@reset@globaldefs@inner}
+\protected\def\ltj@restore@globaldefs{\luafunction\ltj@restore@globaldefs@inner}
+\protected\def\inhibitglue{\ifhmode\relax\luafunction\ltj@@ihb@inner\fi}
+\protected\def\ltjfakeparbegin{\ifhmode\relax\luafunction\ltj@@fakeparbegin@inner\fi}
+
 
 %%%%%%%% \ltjdefcharrange<name>{100-200,3000-,5000,...}
 \protected\def\ltjdefcharrange#1#2{%
@@ -384,33 +376,21 @@
 % [x]]kanjiskip = <skip>
 \define@key[ltj]{japaram}{kanjiskip}{\ltjsetkanjiskip#1}
 \define@key[ltj]{japaram}{xkanjiskip}{\ltjsetxkanjiskip#1}
-\ifdefined\newluafunction
-  \newluafunction\ltjsetkanjiskip@inner
-  \newluafunction\ltjsetxkanjiskip@inner
-  \directlua{
-    local t, scan_glue = lua.get_functions_table(), token.scan_glue
-    local sss, sti = luatexja.stack.set_stack_skip, luatexja.stack_table_index
-    t[\the\ltjsetkanjiskip@inner] = function()
-      local d = scan_glue(); sss(sti.KSK, d); node.free(d)
-    end
-    t[\the\ltjsetxkanjiskip@inner] = function()
-      local d = scan_glue(); sss(sti.XSK, d); node.free(d)
-    end
-  }
-  \protected\def\ltjsetkanjiskip{\luafunction\ltjsetkanjiskip@inner}
-  \protected\def\ltjsetxkanjiskip{\luafunction\ltjsetxkanjiskip@inner}
-\else
-  \protected\def\ltjsetkanjiskip{%                  % SKIP
-    \directlua{%
-      local d = token.scan_glue()
-      luatexja.stack.set_stack_skip(luatexja.stack_table_index.KSK, d); node.free(d)
-  }}
-  \protected\def\ltjsetxkanjiskip{%                  % SKIP
-    \directlua{%
-      local d = token.scan_glue()
-      luatexja.stack.set_stack_skip(luatexja.stack_table_index.XSK, d); node.free(d)
-  }}
-\fi
+\newluafunction\ltjsetkanjiskip@inner
+\newluafunction\ltjsetxkanjiskip@inner
+\directlua{
+  local t, scan_glue = lua.get_functions_table(), token.scan_glue
+  local sss, sti = luatexja.stack.set_stack_skip, luatexja.stack_table_index
+  t[\the\ltjsetkanjiskip@inner] = function()
+    local d = scan_glue(); sss(sti.KSK, d); node.free(d)
+  end
+  t[\the\ltjsetxkanjiskip@inner] = function()
+    local d = scan_glue(); sss(sti.XSK, d); node.free(d)
+  end
+}
+\protected\def\ltjsetkanjiskip{\luafunction\ltjsetkanjiskip@inner}
+\protected\def\ltjsetxkanjiskip{\luafunction\ltjsetxkanjiskip@inner}
+
 % jcharwidowpenalty = <count>
 \define@key[ltj]{japaram}{jcharwidowpenalty}{%      %COUNT
   \ltj@@set@stack{JWP}{-10000}{10000}\z@#1 }
@@ -611,75 +591,41 @@
 }
 \setbox\z@\box\voidb@x
 \ifltj@everyhook@avail% using everyhook package
-  \ifdefined\newluafunction
-    \newluafunction\ltj@@box@dirhook
-    \directlua{
-      local t, ltjd = lua.get_functions_table(), luatexja.direction
-      t[\the\ltj@@box@dirhook] 
-        = function() ltjd.set_list_direction_hook() end
-    }
+  \newluafunction\ltj@@box@dirhook
+  \directlua{
+    local t, ltjd = lua.get_functions_table(), luatexja.direction
+    t[\the\ltj@@box@dirhook] 
+      = function() ltjd.set_list_direction_hook() end
+  }
   \PushPreHook{hbox}{\luafunction\ltj@@box@dirhook\aftergroup\ltj@@reset@badness}
   \PushPreHook{vbox}{\luafunction\ltj@@box@dirhook\aftergroup\ltj@@reset@badness}
-  \else
-    \PushPreHook{hbox}{%
-      \directlua{luatexja.direction.set_list_direction_hook()}%
-      \aftergroup\ltj@@reset@badness
-    }
-    \PushPreHook{vbox}{%
-      \directlua{luatexja.direction.set_list_direction_hook()}%
-      \aftergroup\ltj@@reset@badness
-    }
-  \fi
 \else
   \let\ltj@@everyhbox=\everyhbox\let\ltj@@everyvbox=\everyvbox
   \newtoks\ltj@@i@everyhbox\newtoks\ltj@@i@everyvbox
   \let\everyhbox=\ltj@@i@everyhbox\let\everyvbox=\ltj@@i@everyvbox
-  \ifdefined\newluafunction
-    \newluafunction\ltj@@box@dirhook
-    \directlua{
-      local t, ltjd = lua.get_functions_table(), luatexja.direction
-      t[\the\ltj@@box@dirhook] 
-        = function() ltjd.set_list_direction_hook() end
-    }
-    \ltj@@everyhbox{\luafunction\ltj@@box@dirhook
-      \aftergroup\ltj@@reset@badness\the\ltj@@i@everyhbox}
-    \ltj@@everyvbox{\luafunction\ltj@@box@dirhook
-      \aftergroup\ltj@@reset@badness\the\ltj@@i@everyvbox}
-  \else
-    \ltj@@everyhbox{%
-      \directlua{luatexja.direction.set_list_direction_hook()}%
-      \aftergroup\ltj@@reset@badness
-      \the\ltj@@i@everyhbox}
-    \ltj@@everyvbox{%
-      \directlua{luatexja.direction.set_list_direction_hook()}%
-      \aftergroup\ltj@@reset@badness
-      \the\ltj@@i@everyvbox}
-  \fi
+  \newluafunction\ltj@@box@dirhook
+  \directlua{
+    local t, ltjd = lua.get_functions_table(), luatexja.direction
+    t[\the\ltj@@box@dirhook] 
+      = function() ltjd.set_list_direction_hook() end
+  }
+  \ltj@@everyhbox{\luafunction\ltj@@box@dirhook
+    \aftergroup\ltj@@reset@badness\the\ltj@@i@everyhbox}
+  \ltj@@everyvbox{\luafunction\ltj@@box@dirhook
+    \aftergroup\ltj@@reset@badness\the\ltj@@i@everyvbox}
 \fi
 
-\ifdefined\newluafunction
-  \newluafunction\ltj@@reset@badness@inner
-  \directlua{
-    local t = lua.get_functions_table()
-    t[\the\ltj@@reset@badness@inner] = function() 
-      if luatexja.global_temp then
-        tex.hbadness= tex.hbadness or luatexja.hbadness_temp
-        tex.vbadness= tex.vbadness or luatexja.vbadness_temp
-        tex.globaldefs= luatexja.global_temp or tex.globaldefs
-      end
-    end}
-  \protected\def\ltj@@reset@badness{\luafunction\ltj@@reset@badness@inner}
-\else
-  \protected\def\ltj@@reset@badness{%
-    \directlua{%
-      if luatexja.global_temp then
-        tex.hbadness= tex.hbadness or luatexja.hbadness_temp
-        tex.vbadness= tex.vbadness or luatexja.vbadness_temp
-        tex.globaldefs= luatexja.global_temp or tex.globaldefs
-      end
-    }%
-  }
-\fi
+\newluafunction\ltj@@reset@badness@inner
+\directlua{
+  local t = lua.get_functions_table()
+  t[\the\ltj@@reset@badness@inner] = function() 
+    if luatexja.global_temp then
+      tex.hbadness= tex.hbadness or luatexja.hbadness_temp
+      tex.vbadness= tex.vbadness or luatexja.vbadness_temp
+      tex.globaldefs= luatexja.global_temp or tex.globaldefs
+    end
+  end}
+\protected\def\ltj@@reset@badness{\luafunction\ltj@@reset@badness@inner}
 
 \AtBeginShipout{\directlua{luatexja.direction.finalize()}}
 

@@ -2814,7 +2814,7 @@
         \begingroup \@svsechd \endgroup
         \unskip
         \@tempskipa #1\relax
-        \hskip -\@tempskipa\@inhibitglue
+        \hskip -\@tempskipa\ltjfakeparbegin
       \else
         \clubpenalty \@clubpenalty
         \everypar{}%
@@ -5180,10 +5180,13 @@
 % する機能がありますが，|\item| 直後ではラベル用のボックスが段落先頭になる
 % ため，うまく働きませんでした。形を変えて復活させます。
 %
+% [2017-04-03 LTJ] 従来クラフファイルで定義していた |\@inhibitglue| は，
+% Lua\TeX-jaのコアに |\ltjfakeparbegin| として正式に追加されたのでリネームします．
+%
 % |\item| 命令の直後です。
 %
 %    \begin{macrocode}
-\protected\def\@inhibitglue{\directlua{luatexja.jfmglue.create_beginpar_node()}}
+\let\@inhibitglue=\ltjfakeparbegin
 \def\@item[#1]{%
   \if@noparitem
     \@donoparitem
@@ -5226,7 +5229,7 @@
     \else
       \clubpenalty \@clubpenalty
       \everypar{}%
-    \fi\@inhibitglue}%
+    \fi\ltjfakeparbegin}%
   \if@noitemarg
     \@noitemargfalse
     \if@nmbrlist
