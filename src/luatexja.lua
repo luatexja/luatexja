@@ -82,6 +82,7 @@ userid_table.IHB  = luatexbase.newuserwhatsitid('inhibitglue',  'luatexja') -- \
 userid_table.STCK = luatexbase.newuserwhatsitid('stack_marker', 'luatexja') -- スタック管理
 userid_table.BPAR = luatexbase.newuserwhatsitid('begin_par',    'luatexja') -- 「段落始め」
 userid_table.DIR  = luatexbase.newuserwhatsitid('direction',    'luatexja') -- 組方向
+userid_table.BOXB = luatexbase.newuserwhatsitid('box_boundary', 'luatexja') -- 「ボックス始め・終わり」
 
 local dir_table = {}
 luatexja.dir_table = dir_table

@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2017/03/21 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2017/04/19 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -227,6 +227,19 @@
   }
 }
 
+% Source Han {Serif,Sans}
+\ltjpreset_declare_option:nn{sourcehan}{
+  \ltjpreset_set_multi:n {
+    Source~Han~Serif~Regular, % mc/m
+    Source~Han~Serif~Bold,    % mc/bx
+    Source~Han~Sans~Normal,   % gt/m  (multi)
+    Source~Han~Sans~Bold,     % gt/bx
+    Source~Han~Sans~Medium,   % gt/m  (uni)
+    Source~Han~Sans~Heavy,    % gt/eb
+    Source~Han~Sans~Heavy     % mg/m
+  }
+}
+
 
 % ipa, ipaex, ms
 \ltjpreset_declare_option:nn{ipa}{
@@ -379,23 +392,23 @@
   \DeclareFontShape{JY3}{#1}{#2}{n}{ <-> s*[\fp_use:N \l_ltjpreset_scale_fp]
     {\bool_if:NT \l_ltjpreset_noembed_bool {psft:} "#3"
     : jfm=\tl_use:N \ltjpreset_use_jfm_yoko_tl ;-kern;\tl_use:N \l_ltjpreset_kanji_shape_tl
-    ; script=latn \bool_if:NT \l_ltjpreset_expert_bool { ;+hkna }}
+    ; script=cjk \bool_if:NT \l_ltjpreset_expert_bool { ;+hkna }}
   } {}
   \DeclareFontShape{JT3}{#1}{#2}{n}{ <-> s*[\fp_use:N \l_ltjpreset_scale_fp]
     {\bool_if:NT \l_ltjpreset_noembed_bool {psft:} "#3"
     : jfm=\tl_use:N \ltjpreset_use_jfm_tate_tl ;-kern;\tl_use:N \l_ltjpreset_kanji_shape_tl;
-    ; script=latn \bool_if:NT \l_ltjpreset_expert_bool { ;+vkna }}
+    ; script=cjk \bool_if:NT \l_ltjpreset_expert_bool { ;+vkna }}
   } {}
   \bool_if:NT \l_ltjpreset_expert_bool {
     \DeclareFontShape{JY3}{#1}{#2}{rb}{ <-> s*[\fp_use:N \l_ltjpreset_scale_fp]
       {\bool_if:NT \l_ltjpreset_noembed_bool {psft:} "#3"
       : jfm=\tl_use:N \ltjpreset_use_jfm_yoko_tl ;-kern;\tl_use:N \l_ltjpreset_kanji_shape_tl ;+ruby
-      ; script=kana}
+      ; script=kana }
     } {}
     \DeclareFontShape{JT3}{#1}{#2}{rb}{ <-> s*[\fp_use:N \l_ltjpreset_scale_fp]
       {\bool_if:NT \l_ltjpreset_noembed_bool {psft:} "#3"
       : jfm=\tl_use:N \ltjpreset_use_jfm_tate_tl ;-kern;\tl_use:N \l_ltjpreset_kanji_shape_tl ;+ruby
-      ; script=kana}
+      ; script=kana }
     } {}
   }
 }
@@ -463,6 +476,7 @@
   \tl_use:N \l_ltjpreset_kanji_shape_tl,
   YokoFeatures = { JFM = \tl_use:N \ltjpreset_use_jfm_yoko_tl },
   TateFeatures = { JFM = \tl_use:N \ltjpreset_use_jfm_tate_tl },
+  Script=CJK,
 }
 
 \bool_if:NT \l_ltjpreset_expert_bool {

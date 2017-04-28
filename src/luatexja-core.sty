@@ -239,6 +239,7 @@
 \newluafunction\ltj@restore@globaldefs@inner
 \newluafunction\ltj@@ihb@inner
 \newluafunction\ltj@@fakeparbegin@inner
+\newluafunction\ltj@@fakeboxbdd@inner
 \directlua{
   local t = lua.get_functions_table()
   t[\the\ltj@reset@globaldefs@inner] 
@@ -247,11 +248,13 @@
      = function() tex.globaldefs = luatexja.global_temp end
   t[\the\ltj@@ihb@inner] = luatexja.jfmglue.create_inhibitglue_node
   t[\the\ltj@@fakeparbegin@inner] = luatexja.jfmglue.create_beginpar_node
+  t[\the\ltj@@fakeboxbdd@inner] = luatexja.jfmglue.create_boxbdd_node
 }
 \protected\def\ltj@reset@globaldefs{\luafunction\ltj@reset@globaldefs@inner}
 \protected\def\ltj@restore@globaldefs{\luafunction\ltj@restore@globaldefs@inner}
 \protected\def\inhibitglue{\ifhmode\relax\luafunction\ltj@@ihb@inner\fi}
 \protected\def\ltjfakeparbegin{\ifhmode\relax\luafunction\ltj@@fakeparbegin@inner\fi}
+\protected\def\ltjfakeboxbdd{\ifhmode\relax\luafunction\ltj@@fakeboxbdd@inner\fi}
 
 
 %%%%%%%% \ltjdefcharrange<name>{100-200,3000-,5000,...}

@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec-24}[2016/01/30 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec-24}[2017/04/19 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e,luatexja}
 \ExplSyntaxOn
 
@@ -138,7 +138,7 @@
   }
   \clist_set:Nx \g__fontspec_default_fontopts_clist {
     YokoFeatures = { JFM=ujis }, TateFeatures = { JFM=ujisv },
-    Scale=\fp_use:N \g_ltj_fontspec_scale_fp, Kerning=Off,
+    Scale=\fp_use:N \g_ltj_fontspec_scale_fp, Kerning=Off, Script=CJK, 
     \g__ltj_fontspec_default_fontopts_clist
   }
   \prop_set_eq:NN \g__fontspec_fontopts_prop \g__ltj_fontspec_fontopts_prop

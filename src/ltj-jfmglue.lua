@@ -1210,6 +1210,7 @@ end
 do
    local IHB  = luatexja.userid_table.IHB
    local BPAR = luatexja.userid_table.BPAR
+   local BOXB = luatexja.userid_table.BOXB
    local node_prev = node.direct.getprev
    local node_write = node.direct.write
 
@@ -1232,10 +1233,29 @@ do
       node_write(tn)
    end
 
+   -- Node for indicating a head/end of a box
+   function create_boxbdd_node()
+      local tn = node_new(id_whatsit, sid_user)
+      setfield(tn, 'user_id', BOXB)
+      setfield(tn, 'type', 100)
+      setfield(tn, 'value', 1)
+      node_write(tn)
+   end
+
    local function whatsit_callback(Np, lp, Nq)
       if Np and Np.nuc then return Np
       elseif Np and getfield(lp, 'user_id') == BPAR then
          Np.first = lp; Np.nuc = lp; Np.last = lp
+         return Np
+      elseif Np and getfield(lp, 'user_id') == BOXB then
+	 Np.first = lp; Np.nuc = lp; Np.last = lp
+	 if Nq then
+	    if Nq.met then
+	       Np.class = fast_find_char_class('parbdd', Nq.met)
+            end
+            Np.met = Nq.met; Np.pre = 0; Np.post = 0; Np.xspc = 0
+            Np.auto_xspc = false
+         end	 
          return Np
       else
 	 return Np
@@ -1249,6 +1269,18 @@ do
          if Np then
             if Np.met then
                Nq.class = fast_find_char_class('parbdd', Np.met)
+            end
+            Nq.met = Np.met; Nq.pre = 0; Nq.post = 0; Nq.xspc = 0
+            Nq.auto_xspc = false
+         end
+         head = node_remove(head, y)
+         node_free(y)
+       elseif not s and getfield(Nq.nuc, 'user_id') == BOXB then
+         local x, y = node_prev(Nq.nuc), Nq.nuc
+         Nq.first, Nq.nuc, Nq.last = x, x, x
+         if Np then
+            if Np.met then
+               Nq.class = fast_find_char_class('boxbdd', Np.met)
             end
             Nq.met = Np.met; Nq.pre = 0; Nq.post = 0; Nq.xspc = 0
             Nq.auto_xspc = false
