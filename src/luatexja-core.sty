@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2016/05/15 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2017/05/05 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -189,7 +189,7 @@
 
 %%%%%%%% Load all sub-packages.
 \ifltj@in@latex                 %<*LaTeX>
-  \RequirePackage{ltj-base}   [2016/05/15]
+  \RequirePackage{ltj-base}
 \else                           %<*!LaTeX>
   \input ltj-base.sty %
 \fi                             %</LaTeX>
@@ -714,7 +714,7 @@
 %%------------------ Load module for the format
 
 \ifltj@in@latex                 %<*LaTeX>
-  \RequirePackage{ltj-latex}[2016/05/15]
+  \RequirePackage{ltj-latex}
 \else\ifltj@in@plain            %<*plain>
   \input ltj-plain.sty %
 \fi\fi                          %</LaTeX|plain>

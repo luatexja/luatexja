@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.ruby',
-  date = '2015/09/18',
+  date = '2017/05/05',
   description = 'Ruby annotation',
 })
 module('luatexja.ruby', package.seeall)

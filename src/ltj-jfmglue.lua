@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2016/04/03',
+  date = '2017/05/05',
   description = 'Insertion process of JFM glues and kanjiskip',
 })
 module('luatexja.jfmglue', package.seeall)
