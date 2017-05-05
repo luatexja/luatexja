@@ -825,7 +825,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
         \begingroup \@svsechd \endgroup
         \unskip
         \@tempskipa #1\relax
-        \hskip -\@tempskipa\@inhibitglue
+        \hskip -\@tempskipa\ltjfakeparbegin
       \else
         \clubpenalty \@clubpenalty
         \everypar{}%
@@ -1488,7 +1488,7 @@ class has defined the old font commands like\MessageBreak
   \parindent 1\zw
   \noindent
   \llap{\@makefnmark\hskip0.3\zw}#1}
-\protected\def\@inhibitglue{\directlua{luatexja.jfmglue.create_beginpar_node()}}
+\let\@inhibitglue=\ltjfakeparbegin
 \def\@item[#1]{%
   \if@noparitem
     \@donoparitem
@@ -1531,7 +1531,7 @@ class has defined the old font commands like\MessageBreak
     \else
       \clubpenalty \@clubpenalty
       \everypar{}%
-    \fi\@inhibitglue}%
+    \fi\ltjfakeparbegin}%
   \if@noitemarg
     \@noitemargfalse
     \if@nmbrlist
