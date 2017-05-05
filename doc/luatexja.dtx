@@ -6062,6 +6062,49 @@ With the help of this example, we remark the specification of \cs{inhibitglue}:
 \end{itemize}
 
 
+\subsection{\cs{ltjfakeboxbdd}, \cs{ltjfakeparbegin}}
+%<*ja>
+リスト環境内での\cs{item}で始まる各項目などでは，
+「段落最初の鍵括弧が余計に半角字下げされる」など，
+JFMにある\texttt{'parbdd'}, \texttt{'boxbdd'}の指定が見かけ上破綻していることがある．
+
+これは\TeX が\cs{everypar}を用いて段落開始時に記号類や空白などを挿入してしまっているため，
+段落最初の鍵括弧が実際には段落最初のノードではないことに起因する．以下に例を示した．
+%</ja>
+\begin{LTXexample}[width=0.3\textwidth]
+\parindent1\zw
+\noindent ああああああああ\par % for comparison
+「ああああああ \par            % normal paragraph
+
+\everypar{\null}
+「ああああああ \par            % ???
+\end{LTXexample}
+%<*ja>
+\cs{ltjfakeboxbdd}, \cs{ltjfakeparbegin}はこの状況を改善する命令である．
+実際には\cs{everypar}の末尾にこれらを追加するという使い方がほとんどになるだろう．
+\begin{itemize}
+  \item \cs{ltjfakeparbegin}は，実行された箇所が「インデントあり段落の開始」であると\LuaTeX-jaの
+  和文処理グルー挿入処理に認識させる．この命令の直前に\textbf{JAchar}があった場合，
+  この文字の後ろに入るグルー等の処理については未定義である
+  \footnote{%
+    この命令と同等の内容は，\cs{dirrctlua}の形で\Pkg{ltjsclasses}内で以前から使われていた．
+    一般ユーザでも利用しやすくするため，20170505.0版では新たに命令として定義した．
+  }．
+  \item \cs{ltjfakeboxbdd}は，実行された箇所が「ボックスの先頭と末尾」であると\LuaTeX-jaの
+  和文処理グルー挿入処理に認識させる．
+\end{itemize}
+例えば，先ほどの例に対して適用すると，次のようになる．
+%</ja>
+\begin{LTXexample}[width=0.3\textwidth]
+\parindent1\zw
+\noindent ああああああああ\par % for comparison
+「ああああああ \par            % normal paragraph
+
+\everypar{\null\ltjfakeparbegin}
+「ああああああ \par
+\end{LTXexample}
+
+
 \subsection{\cs{ltjdeclarealtfont}}
 \label{ssec-altfont}
 %<*en>
