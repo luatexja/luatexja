@@ -6063,6 +6063,12 @@ With the help of this example, we remark the specification of \cs{inhibitglue}:
 
 
 \subsection{\cs{ltjfakeboxbdd}, \cs{ltjfakeparbegin}}
+%<*en>
+Sometimes \texttt{'parbdd'}~and~\texttt{'boxbdd'} specifications~look like ``fail'',
+especially in paragraphs inside list environments.
+This is because \cs{everypar} inserts some nodes such as boxes and kerns, so
+the ``first letter'' in a paragraph is in fact not the first letter.
+%</en>
 %<*ja>
 リスト環境内での\cs{item}で始まる各項目などでは，
 「段落最初の鍵括弧が余計に半角字下げされる」など，
@@ -6079,6 +6085,16 @@ JFMにある\texttt{'parbdd'}, \texttt{'boxbdd'}の指定が見かけ上破綻�
 \everypar{\null}
 「ああああああ \par            % ???
 \end{LTXexample}
+%<*en>
+\cs{ltjfakeboxbdd}~and~\cs{ltjfakeparbegin} primitives resolve this situation.
+\begin{itemize}
+  \item \cs{ltjfakeparbegin} creates a node which indicates
+  ``beginning of an indented paragraph'' to the insertion process of \textbf{JAglue}.
+ \item \cs{ltjfakeboxbdd} creates a node which indicates
+  ``beginning/ending of a box'' to the insertion process of \textbf{JAglue}.
+\end{itemize}
+As an example, the example above can be improved as follows:
+%</en>
 %<*ja>
 \cs{ltjfakeboxbdd}, \cs{ltjfakeparbegin}はこの状況を改善する命令である．
 実際には\cs{everypar}の末尾にこれらを追加するという使い方がほとんどになるだろう．
