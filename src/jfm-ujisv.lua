@@ -260,9 +260,6 @@ local t = {
 
    [99] = { -- box末尾
       chars = {'boxbdd', 'parbdd'},
-      glue = {
-	 [3] = { 0.25, 0.0, 0.25, priority=1 },
-      }
    },
 
 }
