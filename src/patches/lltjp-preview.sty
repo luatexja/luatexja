@@ -1,0 +1,16 @@
+%
+% lltjp-preview.sty
+%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{lltjp-preview}[2017/05/08 Patch to preview for LuaTeX-ja]
+
+\RequirePackage{etoolbox,preview,luatexja}
+
+\patchcmd\pr@endbox{%
+   \pr@ship@end
+}{%
+   \setbox\pr@box\hbox{\yoko\box\pr@box}\pr@ship@end
+}{}{}
+
+\endinput

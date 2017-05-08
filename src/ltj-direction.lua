@@ -530,7 +530,7 @@ do
       start_time_measure('box_primitive_hook')
       local list_dir = get_dir_count()%dir_math_mod
       local b = getbox(tex_getcount('ltj@tempcnta'))
-      if b then
+      if b and getlist(to_direct(b)) then
 	 local box_dir = get_box_dir(to_direct(b), dir_yoko)
 	 if box_dir%dir_math_mod ~= list_dir then
 	    ltjb.package_error(
@@ -1159,7 +1159,6 @@ do
       finalize_inner(shipout_temp)
       setbox('global', "AtBeginShipoutBox", copy(getlist(shipout_temp)))
       setfield(shipout_temp, 'head',nil)
-
       -- garbage collect
       --local m = collectgarbage('count')
       --if m>lua_mem_kb+20480 then
