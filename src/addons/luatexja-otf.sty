@@ -64,7 +64,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-otf}[2017/05/05]
+  \ProvidesPackage{luatexja-otf}[2017/05/20]
 \fi                             %</LaTeX>
 
 % Load core module if not yet.
@@ -97,8 +97,107 @@
   \RequirePackage{luatexja-ajmacros}
 \else                           %<*!LaTeX>
   \input luatexja-ajmacros.sty %
+  % \bou is defined in lltjext, \mbox is defined in LaTeX kernel
+  \def\boutenchar{\char\euc"A1A2}%"
+  \def\bou#1{\ifvmode\leavevmode\fi\@bou#1\end}
+  \def\@bou#1{%
+    \ifx#1\end \let\next=\relax
+    \else
+      \ifnum\ltjgetparameter{direction}=3\relax
+        \hbox to\z@{\vbox to\z@{\boxmaxdepth\maxdimen
+          \vss\moveleft0.2\zw\hbox{\yoko\boutenchar}\nointerlineskip
+          \hbox{\char\euc"A1A1}}\hss}\nobreak#1\relax
+      \else
+        \hbox to\z@{\vbox to\z@{\boxmaxdepth\maxdimen
+          \vss\moveleft-0.2\zw\hbox{\boutenchar}\nointerlineskip
+          \hbox{\char\euc"A1A1}}\hss}\nobreak#1\relax
+      \fi
+      \let\next=\@bou
+    \fi\next}
+  \long\def\mbox#1{\leavevmode\hbox{#1}}
 \fi                             %</LaTeX>
 
+% macros from otf.sty
+%for literature
+\protected\def\ajKunoji{%
+  \ifnum\ltjgetparameter{direction}=3 \mbox{\UTF{3033}\UTF{3035}}\else
+		\@PackageError{luatexja-otf}{A TATE character in YOKO mode!}{Change a direction to TATE.}%2003/03/12
+		\fi}
+\protected\def\ajKunojiwithBou{%
+  \ifnum\ltjgetparameter{direction}=3 \mbox{\bou{\mbox{\UTF{3033}}}\bou{\mbox{\UTF{3035}}}}\else
+		\@PackageError{luatexja-otf}{A TATE character in YOKO mode!}{Change a direction to TATE.}%2003/03/12
+		\fi}
+\protected\def\ajDKunoji{%
+  \ifnum\ltjgetparameter{direction}=3 \mbox{\UTF{3034}\UTF{3035}}\else
+		\@PackageError{luatexja-otf}{A TATE character in YOKO mode!}{Change a direction to TATE.}%2003/03/12
+		\fi}
+\protected\def\ajDKunojiwithBou{%
+  \ifnum\ltjgetparameter{direction}=3 \mbox{\bou{\mbox{\UTF{3034}}}\bou{\mbox{\UTF{3035}}}}\else
+		\@PackageError{luatexja-otf}{A TATE character in YOKO mode!}{Change a direction to TATE.}%2003/03/12
+		\fi}
+\protected\def\ajNinoji{\CID{12106}}
+\protected\def\ajvarNinoji{%
+  \ifnum\ltjgetparameter{direction}=3 \CID{12107}\else
+		\@PackageError{luatexja-otf}{A TATE character in YOKO mode!}{Change a direction to TATE.}%2003/03/12
+		\fi}
+\protected\def\ajYusuriten{%
+  \ifnum\ltjgetparameter{direction}=3 \CID{16193}\else
+		\@PackageError{luatexja-otf}{A TATE character in YOKO mode!}{Change a direction to TATE.}%2003/03/12
+		\fi}
+\protected\def\ajMasu{\UTF{303c}}
+\protected\def\ajYori{\UTF{309f}}
+\protected\def\ajKoto{\UTF{30ff}}
+\protected\def\ajUta{\UTF{303d}}
+%dingbats
+\protected\def\ajCommandKey{\UTF{2318}}
+\protected\def\ajReturnKey{\UTF{23ce}}
+\protected\def\ajCheckmark{\UTF{2713}}
+\protected\def\ajVisibleSpace{\UTF{2423}}
+\protected\def\ajSenteMark{\UTF{2617}}
+\protected\def\ajGoteMark{\UTF{2616}}
+\protected\def\ajClub{\UTF{2663}}
+\protected\def\ajHeart{\UTF{2661}}
+\protected\def\ajSpade{\UTF{2660}}
+\protected\def\ajDiamond{\UTF{2662}}
+\protected\def\ajvarClub{\UTF{2667}}
+\protected\def\ajvarHeart{\UTF{2665}}
+\protected\def\ajvarSpade{\UTF{2664}}
+\protected\def\ajvarDiamond{\UTF{2666}}
+\protected\def\ajPhone{\UTF{260e}}
+\protected\def\ajPostal{\UTF{3020}}
+\protected\def\ajvarPostal{\UTF{3036}}
+\protected\def\ajSun{\UTF{2600}}
+\protected\def\ajCloud{\UTF{2601}}
+\protected\def\ajUmbrella{\UTF{2602}}
+\protected\def\ajSnowman{\UTF{2603}}
+\protected\def\ajJIS{\UTF{3004}}
+\protected\def\ajJAS{\CID{12088}}
+\protected\def\ajBall{\CID{12097}}
+\protected\def\ajHotSpring{\UTF{2668}}
+\protected\def\ajWhiteSesame{\UTF{fe46}}
+\protected\def\ajBlackSesame{\UTF{fe45}}
+\protected\def\ajWhiteFlorette{\UTF{2740}}
+\protected\def\ajBlackFlorette{\UTF{273f}}
+\protected\def\ajRightBArrow{\CID{8206}}
+\protected\def\ajLeftBArrow{\CID{8207}}
+\protected\def\ajUpBArrow{\CID{8208}}
+\protected\def\ajDownBArrow{\CID{8209}}
+\protected\def\ajRightHand{\CID{8219}}
+\protected\def\ajLeftHand{\CID{8220}}
+\protected\def\ajUpHand{\CID{8221}}
+\protected\def\ajDownHand{\CID{8222}}
+\protected\def\ajRightScissors{\CID{12176}}
+\protected\def\ajLeftScissors{\CID{12175}}
+\protected\def\ajUpScissors{\CID{12177}}
+\protected\def\ajDownScissors{\CID{12178}}
+\protected\def\ajRightWArrow{\CID{12197}}
+\protected\def\ajLeftWArrow{\CID{12196}}
+\protected\def\ajUpWArrow{\CID{12198}}
+\protected\def\ajDownWArrow{\CID{12199}}
+\protected\def\ajRightDownArrow{\CID{12202}}
+\protected\def\ajLeftDownArrow{\CID{12203}}
+\protected\def\ajLeftUpArrow{\CID{12204}}
+\protected\def\ajRightUpArrow{\CID{12205}}
 
 %%------------------ all done
 \ltj@otf@AtEnd
