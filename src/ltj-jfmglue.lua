@@ -832,7 +832,9 @@ do
    end
    
    get_kanjiskip = function()
-      if Np.auto_kspc or Nq.auto_kspc then
+      if Np.auto_kspc==0 or Nq.auto_kspc==0 then
+        return nil 
+      elseif Np.auto_kspc or Nq.auto_kspc then
 	 local pm, qm = Np.met, Nq.met
 	 if (pm.char_type==qm.char_type) and (qm.var==pm.var) then
 	     return get_kanjiskip_low(true, qm, 1, 1, 1)
@@ -841,7 +843,7 @@ do
 	    local ga = get_kanjiskip_low(true, pm, 1, 1, 1)
 	    return calc_ja_ja_aux(gb, ga, 0, 1)
 	 end
-      else
+      else   
 	 local g = node_new(id_glue)
 	 set_attr(g, attr_icflag, kanjiskip_jfm_flag and KANJI_SKIP_JFM or KANJI_SKIP)
 	 return g
@@ -912,7 +914,9 @@ do
    end
    
    get_xkanjiskip = function(Nn)
-      if (Nq.xspc>=2) and (Np.xspc%2==1) and (Nq.auto_xspc or Np.auto_xspc) then
+      if Np.auto_xspc==0 or Nq.auto_xspc==0 then
+        return nil 
+      elseif (Nq.xspc>=2) and (Np.xspc%2==1) and (Nq.auto_xspc or Np.auto_xspc) then
 	 return get_xkanjiskip_low(true, Nn.met, 1, 1, 1)
       else
 	 local g = node_new(id_glue)
@@ -924,6 +928,10 @@ end
 
 -------------------- 隣接した「塊」間の処理
 
+local function combine_spc(name)
+   return (Np[name] or Nq[name]) and ((Np[name]~=0) and (Nq[name]~=0))
+end
+
 local function get_OA_skip(is_kanji)
    local pm = Np.met
    local g, _, kn, kp, kh = new_jfm_glue(
@@ -932,9 +940,9 @@ local function get_OA_skip(is_kanji)
       Np.class)
    local k
    if is_kanji==0 then
-      k = (Np.auto_kspc or Nq.auto_kspc) and get_kanjiskip_low(false, pm, kn, kp, kh)
+      k = combine_spc('auto_kspc') and get_kanjiskip_low(false, pm, kn, kp, kh)
    elseif is_kanji==1 then
-      k = ((Nq.xspc>=2) and (Np.xspc%2==1) and (Nq.auto_xspc or Np.auto_xspc))
+      k = ((Nq.xspc>=2) and (Np.xspc%2==1) and combine_spc('auto_xspc'))
 	 and get_xkanjiskip_low(false, pm, kn, kp, kh)
    end
    return g, k
@@ -946,9 +954,9 @@ local function get_OB_skip(is_kanji)
       fast_find_char_class((Np.id == id_math and -1 or'jcharbdd'), qm))
    local k
    if is_kanji==0 then
-      k = (Np.auto_kspc or Nq.auto_kspc) and get_kanjiskip_low(false, qm, kn, kp, kh)
+      k = combine_spc('auto_kspc') and get_kanjiskip_low(false, qm, kn, kp, kh)
    elseif is_kanji==1 then
-      k = ((Nq.xspc>=2) and (Np.xspc%2==1) and (Nq.auto_xspc or Np.auto_xspc))
+      k = ((Nq.xspc>=2) and (Np.xspc%2==1) and combine_spc('auto_xspc'))
 	 and get_xkanjiskip_low(false, qm, kn, kp, kh)
    end
    return g, k
@@ -1180,6 +1188,8 @@ end
 -- main interface
 function main(ahead, mode, dir)
    if not ahead then return ahead end
+   --luatexja.ext_show_node_list(to_node(ahead ), '>B ', print)
+   --print()
    head = ahead;
    local lp, last, par_indented, TEMP = init_var(mode,dir)
    lp = calc_np(last, lp)
@@ -1203,6 +1213,8 @@ function main(ahead, mode, dir)
       end
       handle_list_tail(mode, last)
    end
+   --luatexja.ext_show_node_list(to_node(ahead ), '>A ', print)
+   --print()
    return cleanup(mode, TEMP)
 end
 end
@@ -1251,10 +1263,10 @@ do
 	 Np.first = lp; Np.nuc = lp; Np.last = lp
 	 if Nq then
 	    if Nq.met then
-	       Np.class = fast_find_char_class('parbdd', Nq.met)
+	       Np.class = fast_find_char_class('boxbdd', Nq.met)
             end
             Np.met = Nq.met; Np.pre = 0; Np.post = 0; Np.xspc = 0
-            Np.auto_xspc = false
+            Np.auto_xspc, Np.auto_kspc = 0, 0
          end	 
          return Np
       else
@@ -1271,7 +1283,7 @@ do
                Nq.class = fast_find_char_class('parbdd', Np.met)
             end
             Nq.met = Np.met; Nq.pre = 0; Nq.post = 0; Nq.xspc = 0
-            Nq.auto_xspc = false
+            Nq.auto_xspc, Nq.auto_kspc = 0, 0
          end
          head = node_remove(head, y)
          node_free(y)
@@ -1283,7 +1295,7 @@ do
                Nq.class = fast_find_char_class('boxbdd', Np.met)
             end
             Nq.met = Np.met; Nq.pre = 0; Nq.post = 0; Nq.xspc = 0
-            Nq.auto_xspc = false
+            Nq.auto_xspc, Nq.auto_kspc = 0, 0
          end
          head = node_remove(head, y)
 	 node_free(y)

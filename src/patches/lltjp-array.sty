@@ -1,0 +1,16 @@
+%
+% lltjp-array.sty
+%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{lltjp-array}[2017/06/18 Patch to preview for LuaTeX-ja]
+
+\RequirePackage{etoolbox,array,luatexja}
+
+\patchcmd\insert@column{%
+   \@sharp\unskip
+}{%
+   \ltj@sharp
+}{}{}
+
+\endinput

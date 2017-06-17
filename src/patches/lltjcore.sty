@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2017/05/05 Patch to LaTeX2e Kernel for LuaTeX-ja]
+\ProvidesPackage{lltjcore}[2017/06/18 Patch to LaTeX2e Kernel for LuaTeX-ja]
 
 \def\cleardoublepage{\clearpage\if@twoside
   \ifodd\c@page
@@ -303,5 +303,32 @@
       \ignorespaces
     \fi
   \fi}
+
+%%%%%% \@tabclassz
+\def\ltj@sharp{\ltjfakeboxbdd\@sharp\unskip\ltjfakeboxbdd}
+\def\@tabclassz{%
+  \ifcase\@lastchclass
+    \@acolampacol
+  \or
+    \@ampacol
+  \or
+  \or
+  \or
+    \@addamp
+  \or
+    \@acolampacol
+  \or
+    \@firstampfalse\@acol
+  \fi
+  \edef\@preamble{%
+    \@preamble{%
+      \ifcase\@chnum
+        \hfil\ignorespaces\ltj@sharp\hfil
+      \or
+        \hskip1sp\ignorespaces\ltj@sharp\hfil
+      \or
+        \hfil\hskip1sp\ignorespaces\ltj@sharp
+      \fi}}}
+
 
 \endinput

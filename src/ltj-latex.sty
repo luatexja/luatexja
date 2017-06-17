@@ -12,9 +12,10 @@
 \def\luatexjalatexLoaded{\endinput}
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{ltj-latex}[2017/05/05 LaTeX support of LuaTeX-ja]
+\ProvidesPackage{ltj-latex}[2017/06/18 LaTeX support of LuaTeX-ja]
 
 % LaTeX2e 2017/05/01 で行われる対策
+% 本 sty からは 2018/05/01 削除予定
 \ifx\document@default@language \@undefined
   \let\document@default@language\m@ne
 \fi
@@ -79,6 +80,7 @@
 }{}}% ascmac
 \ltj@pkgpatch{stfloats}
 \ltj@pkgpatch{preview}
+\ltj@pkgpatch{array}
 
 \RequirePackage{lltjp-geometry}
 \RequirePackage{filehook}
