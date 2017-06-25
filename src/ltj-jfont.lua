@@ -856,16 +856,16 @@ end
 
 --
 do
-   local cache_ver = 11
+   local cache_ver = 12
    local checksum = file.checksum
 
    local function prepare_extra_data_base(id)
       if (not id) or (not id.filename) then return end
-      local bname = file.nameonly(id.filename)
+      local bname = id.psname or file.nameonly(id.filename)
       if not font_extra_basename[bname] then
 	 -- if the cache is present, read it
 	 local newsum = checksum(id.filename) -- MD5 checksum of the fontfile
-	 local v = "extra_" .. string.lower(file.nameonly(id.filename))
+	 local v = "extra_" .. string.lower(bname)
 	 local dat = ltjb.load_cache(
 	    v,
 	    function (t) return (t.version~=cache_ver) or (t.chksum~=newsum) end
