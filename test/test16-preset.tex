@@ -1,20 +1,26 @@
 %#!lualatex test16-preset && pdffonts test16-preset.pdf
-\documentclass{ltjarticle}
-\usepackage[moga-mobo,deluxe,expert, nfssonly, jis2004, match]{luatexja-preset}
+\documentclass{ltjtarticle}
+\makeatletter
+\let\ltj@orig@DeclareFontShape@=\DeclareFontShape@
+\def\DeclareFontShape@#1#2#3#4#5#6{%
+      \immediate\typeout{DFS |#1|#2|#3|#4|#5|#6|}%
+      \ltj@orig@DeclareFontShape@{#1}{#2}{#3}{#4}{#5}{#6}%
+      }
+\makeatother
+\usepackage[noto-otf,deluxe,expert,nfssonly,jis2004, match]{luatexja-preset}
 \begin{document}
 \makeatletter
 \def\r#1#2{ \csname #1family \endcsname \csname #2series \endcsname
   %\addjfontfeature {CJKShape=JIS1983}
   {\romanfamily{\ttdefault}\selectfont<\k@family><\k@series><\k@shape>}\\
-  {\tt#1, #2\ \ \ \ \ }: あいうえおabc漢字，あ！い，辻\\
-  {\tt#1, #2 (rb)}: {\rubyfamily あいうえおabc漢字，あ！い，辻}
+  {\tt#1, #2\ \ \ \ \ }: あーいうえおabc漢字，あ！い，辻ぁが\\
+  {\tt#1, #2 (rb)}: {\rubyfamily あいうえおabc漢字，あ！い，辻ぁが}
 }
 \@namedef{..series}{\relax}
 
 \r{mc}{md}
 
 \r{mc}{bf}
-
 
 
 \r{gt}{md}
@@ -26,7 +32,7 @@
 \fi
 
 \ifdefined\gtebfamily
-\r{gteb}{..}
+\r{gt}{eb}
 \fi
 
 \r{tt}{md}
@@ -37,6 +43,5 @@ $あいう\mathgt{あいう}$
 
 \normalfont
 {あいうえおabc \sf あいうえおabc}
-\end{document}
 
-3.88
+\end{document}

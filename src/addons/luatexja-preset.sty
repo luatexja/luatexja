@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2017/05/05 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2017/06/25 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -473,7 +473,7 @@
   \ltj_preset_define_family:nnn {ltjpmg} {m}  {\ltjpreset_font_mg:}
   \ltj_preset_define_family:nnn {ltjpg}  {eb} {\ltjpreset_font_gt_eb:}
   \def\ebdefault{eb}
-  \DeclareRobustCommand\ebseries { \not@math@alphabet\ebseries\relaxfontseries\ebdefault\selectfont }
+  \DeclareRobustCommand\ebseries { \not@math@alphabet\ebseries\relax\fontseries\ebdefault\selectfont }
   \DeclareRobustCommand\gtebfamily { \kanjifamily{ltjpg}\fontseries{\ebdefault}\selectfont }
   \DeclareTextFontCommand{\textgteb}{\gtebfamily}
   \DeclareRobustCommand\mgfamily { \not@math@alphabet\mgfamily\relax\kanjifamily{ltjpmg}\selectfont }
