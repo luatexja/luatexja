@@ -232,11 +232,33 @@
   \ltjpreset_set_multi:n {
     Source~Han~Serif~Regular, % mc/m
     Source~Han~Serif~Bold,    % mc/bx
-    Source~Han~Sans~Normal,   % gt/m  (multi)
+    Source~Han~Sans~Regular,  % gt/m  (multi)
     Source~Han~Sans~Bold,     % gt/bx
     Source~Han~Sans~Medium,   % gt/m  (uni)
     Source~Han~Sans~Heavy,    % gt/eb
     Source~Han~Sans~Heavy     % mg/m
+  }
+}
+\ltjpreset_declare_option:nn{noto-otc}{
+  \ltjpreset_set_multi:n {
+    Noto~Serif~CJK~Regular, % mc/m
+    Noto~Serif~CJK~Bold,    % mc/bx
+    Noto~Sans~CJK~Regular,  % gt/m  (multi)
+    Noto~Sans~CJK~Bold,     % gt/bx
+    Noto~Sans~CJK~Medium,   % gt/m  (uni)
+    Noto~Sans~CJK~Black,    % gt/eb
+    Noto~Sans~CJK~Black,    % mg/m
+  }
+}
+\ltjpreset_declare_option:nn{noto-otf}{
+  \ltjpreset_set_multi:n {
+    Noto~Serif~CJK~JP~Regular, % mc/m
+    Noto~Serif~CJK~JP~Bold,    % mc/bx
+    Noto~Sans~CJK~JP~Regular,  % gt/m  (multi)
+    Noto~Sans~CJK~JP~Bold,     % gt/bx
+    Noto~Sans~CJK~JP~Medium,   % gt/m  (uni)
+    Noto~Sans~CJK~JP~Black,    % gt/eb
+    Noto~Sans~CJK~JP~Black,    % mg/m
   }
 }
 
@@ -452,7 +474,7 @@
   \ltj_preset_define_family:nnn {ltjpg}  {eb} {\ltjpreset_font_gt_eb:}
   \def\ebdefault{eb}
   \DeclareRobustCommand\ebseries { \not@math@alphabet\ebseries\relaxfontseries\ebdefault\selectfont }
-  \DeclareRobustCommand\gtebfamily { \kanjifamily{ltjpg}\fontseries{eb}\selectfont }
+  \DeclareRobustCommand\gtebfamily { \kanjifamily{ltjpg}\fontseries{\ebdefault}\selectfont }
   \DeclareTextFontCommand{\textgteb}{\gtebfamily}
   \DeclareRobustCommand\mgfamily { \not@math@alphabet\mgfamily\relax\kanjifamily{ltjpmg}\selectfont }
   \DeclareTextFontCommand{\textmg}{\mgfamily}
@@ -499,13 +521,9 @@
     ] { \ltjpreset_font_mg: }
     \DeclareTextFontCommand{\textmg}{\mgfamily}
 %% gt/eb
-%% 注意: ファミリは 'gteb'．シリーズは \mdseries のまま．
-%%       \bfseries を追加したほうが良い？
-  \newjfontfamily \gtebfamily [
-      BoldFont = \ltjpreset_font_gt_eb:,
-      \bool_if:NT \l_ltjpreset_noembed_bool { NoEmbed,  }
-      \tl_use:N \l_ltjpreset_add_features_tl
-    ] { \ltjpreset_font_gt_eb: }
+  \def\ebdefault{eb}
+  \DeclareRobustCommand\ebseries { \not@math@alphabet\ebseries\relax\fontseries\ebdefault\selectfont }
+  \DeclareRobustCommand\gtebfamily { \kanjifamily{\gtdefault}\fontseries{\ebdefault}\selectfont }
   \DeclareTextFontCommand{\textgteb}{\gtebfamily}
   \bool_if:NT \l_ltjpreset_bold_bool {
     \cs_set_eq:NN \ltjpreset_font_mc_bx: \ltjpreset_font_gt_bx:
@@ -531,6 +549,9 @@
   \tl_use:N \l_ltjpreset_add_features_tl
 ] { \ltjpreset_font_mc_m: }
 \setsansjfont [
+  \bool_if:NT \l_ltjpreset_deluxe_bool {
+    FontFace={eb}{n}{\ltjpreset_font_gt_eb:},
+  }
   BoldFont = \ltjpreset_font_gt_bx:
   \bool_if:NT \l_ltjpreset_noembed_bool { , NoEmbed },
   \tl_use:N \l_ltjpreset_add_features_tl

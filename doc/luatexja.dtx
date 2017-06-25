@@ -1906,8 +1906,9 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{center}
 
 \item[moga-mobo]  MogaMincho, MogaGothic, and MoboGothic.
+%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
 \item[moga-mobo-ex]  MogaExMincho, MogaExGothic, and MoboExGothic.
-%<en>These fonts can be downloaded from\\\hfill \url{http://yozvox.web.fc2.com/}.
+%<en>\par These fonts can be downloaded from \url{http://yozvox.web.fc2.com/}.
 %<ja>これらのフォントは \url{http://yozvox.web.fc2.com/} からダウンロードできる．
 \begin{center}\small
 \begin{tabular}{clll}
@@ -1935,7 +1936,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<ja>\texttt{moga-mobo-ex}オプション指定時にはMogaEx90MinchoなどのExが名前についたフォントが使われる．
 
 \item[ume]  Ume Mincho and Ume Gothic.
-%<en>These fonts can be downloaded from\\\hfill \url{https://ja.osdn.net/projects/ume-font/wiki/FrontPage}.
+%<en>\par These fonts can be downloaded from\\\hfill \url{https://ja.osdn.net/projects/ume-font/wiki/FrontPage}.
 %<ja>これらのフォントは \url{https://ja.osdn.net/projects/ume-font/wiki/FrontPage} からダウンロードできる．
 \begin{center}\small
 \begin{tabular}{cll}
@@ -1961,6 +1962,41 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \bottomrule
 \end{tabular}
 \end{center}
+
+%<ja>\newpage
+ \item[sourcehan]  Source Han Serif and Source Han Sans fonts (Language-specific OTF \textit{or} OTC)
+%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
+ \item[noto-otc]  Noto Serif CJK and Noto Sans CJK fonts (OTC)
+%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
+ \item[noto-otf]  Noto Serif CJK and Noto Sans CJK fonts (Language-specific OTF)
+\begin{center}\small
+\def\AD#1#2{Noto #1 CJK #2&Noto #1 CJK JP #2}%
+\begin{tabular}{cllll}
+\toprule
+\bf family&\bf series&\texttt{sourcehan}&\texttt{noto-otc}&\texttt{noto-otf}\\
+\midrule
+ &medium&Source Han Serif Regular&\AD{Serif}{Regular}\\
+%<en>\smash{\raisebox{1.5ex}{\textit{mincho}}}%
+%<ja>\smash{\raisebox{1.5ex}{\gt 明朝}}%
+ &bold&Source Han Serif Bold&\AD{Serif}{Bold}\\
+\midrule
+ &&Source Han Sans Regular*&\AD{Sans}{Regular*}\\
+ &\smash{\raisebox{1.5ex}{medium}}
+ &Source Han Sans Medium&\AD{Sans}{Medium}\\
+\cmidrule(l){2-4}
+%<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
+%<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
+ &bold&Source Han Sans Bold&\AD{Sans}{Bold}\\
+ &heavy&Source Han Sans Heavy&\AD{Sans}{Black}\\
+\midrule
+%<en>\textit{rounded gothic}
+%<ja>\gt 丸ゴシック
+&&Source Han Sans Heavy&\AD{Sans}{Black}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+
 
 \end{cslist}
 %<en>\paragraph{Presets for single weight}
