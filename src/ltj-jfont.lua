@@ -804,7 +804,13 @@ do
       return dest
    end
    prepare_fl_data = function (dest, id)
-      local fl = fontloader.open(id.filename)
+      local t = fontloader.info(id.filename)
+      local fl
+      if t.filename then
+        fl = fontloader.open(id.filename)
+      else
+        fl = fontloader.open(id.filename, id.fullname)
+      end
       local ind_to_uni, unicodes = {}, {}
       for i,v in pairs(id.characters) do
 	  ind_to_uni[v.index] = i
