@@ -8,7 +8,7 @@
 \RequirePackage{etoolbox,array,luatexja}
 
 \patchcmd\insert@column{%
-   \@sharp\unskip
+   \ignorespaces\@sharp\unskip
 }{%
    \ltj@sharp
 }{}{}

@@ -305,7 +305,7 @@
   \fi}
 
 %%%%%% \@tabclassz
-\def\ltj@sharp{\ltjfakeboxbdd\@sharp\unskip\ltjfakeboxbdd}
+\def\ltj@sharp{\ltjfakeboxbdd\ignorespaces\@sharp\unskip\ltjfakeboxbdd}
 \def\@tabclassz{%
   \ifcase\@lastchclass
     \@acolampacol
@@ -323,12 +323,17 @@
   \edef\@preamble{%
     \@preamble{%
       \ifcase\@chnum
-        \hfil\ignorespaces\ltj@sharp\hfil
+        \hfil\ltj@sharp\hfil
       \or
-        \hskip1sp\ignorespaces\ltj@sharp\hfil
+        \hskip1sp\ltj@sharp\hfil
       \or
-        \hfil\hskip1sp\ignorespaces\ltj@sharp
+        \hfil\hskip1sp\ltj@sharp
       \fi}}}
+\patchcmd\@classv{%
+   \ignorespaces\@sharp
+}{%
+   \ltjfakeparbegin\ignorespaces\@sharp\unskip\ltjfakeboxbdd
+}{}{}
 
 
 \endinput
