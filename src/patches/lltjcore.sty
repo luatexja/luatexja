@@ -332,7 +332,7 @@
 \patchcmd\@classv{%
    \ignorespaces\@sharp
 }{%
-   \ltjfakeparbegin\ignorespaces\@sharp\unskip\ltjfakeboxbdd
+   \everypar\expandafter{\the\everypar\ltjfakeboxbdd}\ignorespaces\@sharp\unskip
 }{}{}
 
 
