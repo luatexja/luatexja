@@ -66,7 +66,8 @@
   \fork@array@option<#1>[#2]%
   \@mkpream{#3}\edef\@preamble{\ialign \noexpand\@halignto
   \bgroup\@arstrut \@preamble \tabskip\z@skip \cr}%
-   \let\tabularnewline\\%
+  \let\@startpbox\@@startpbox \let\@endpbox\@@endpbox
+  \let\tabularnewline\\%
   \@begin@alignbox\bgroup\box@dir\adjustbaseline
     \let\par\@empty
     \let\@sharp##\let\protect\relax
@@ -804,7 +805,7 @@
 	{\ltj@ext@dir=\ltjgetparameter{direction}\relax}{}{}
   \def\@startpbox##1{\bgroup
    \box@dir\adjustbaseline%%% これを追加
-   \hsize=##1\@arrayparboxrestore
+   \setlength\hsize{##1}\@arrayparboxrestore
      \everypar{%
         \vrule \@height \ltjgetht\@arstrutbox \@width \z@
         \everypar{}}%
