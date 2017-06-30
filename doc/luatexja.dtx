@@ -1966,6 +1966,35 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<ja>\newpage
  \item[sourcehan]  Source Han Serif and Source Han Sans fonts (Language-specific OTF \textit{or} OTC)
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
+ \item[sourcehan-jp]  Source Han Serif JP and Source Han Sans JP fonts (Region-specific Subset OTF)
+\begin{center}\small
+\def\AD#1#2{Source Han #1 #2&Source Han #1 JP #2}%
+\begin{tabular}{cllll}
+\toprule
+\bf family&\bf series&\texttt{sourcehan}&\texttt{sourcehan-jp}\\
+\midrule
+ &medium&\AD{Serif}{Regular}\\
+%<en>\smash{\raisebox{1.5ex}{\textit{mincho}}}%
+%<ja>\smash{\raisebox{1.5ex}{\gt 明朝}}%
+ &bold&\AD{Serif}{Bold}\\
+\midrule
+ &&\AD{Sans}{Regular*}\\
+ &\smash{\raisebox{1.5ex}{medium}}
+ &\AD{Sans}{Medium}\\
+\cmidrule(l){2-4}
+%<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
+%<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
+ &bold&\AD{Sans}{Bold}\\
+ &heavy&\AD{Sans}{Heavy}\\
+\midrule
+%<en>\textit{rounded gothic}
+%<ja>\gt 丸ゴシック
+&&\AD{Sans}{Heavy}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+
  \item[noto-otc]  Noto Serif CJK and Noto Sans CJK fonts (OTC)
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[noto-otf]  Noto Serif CJK and Noto Sans CJK fonts (Language-specific OTF)
@@ -1973,25 +2002,25 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \def\AD#1#2{Noto #1 CJK #2&Noto #1 CJK JP #2}%
 \begin{tabular}{cllll}
 \toprule
-\bf family&\bf series&\texttt{sourcehan}&\texttt{noto-otc}&\texttt{noto-otf}\\
+\bf family&\bf series&\texttt{noto-otc}&\texttt{noto-otf}\\
 \midrule
- &medium&Source Han Serif Regular&\AD{Serif}{Regular}\\
+ &medium&\AD{Serif}{Regular}\\
 %<en>\smash{\raisebox{1.5ex}{\textit{mincho}}}%
 %<ja>\smash{\raisebox{1.5ex}{\gt 明朝}}%
- &bold&Source Han Serif Bold&\AD{Serif}{Bold}\\
+ &bold&\AD{Serif}{Bold}\\
 \midrule
- &&Source Han Sans Regular*&\AD{Sans}{Regular*}\\
+ &&\AD{Sans}{Regular*}\\
  &\smash{\raisebox{1.5ex}{medium}}
- &Source Han Sans Medium&\AD{Sans}{Medium}\\
+ &\AD{Sans}{Medium}\\
 \cmidrule(l){2-4}
 %<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
 %<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
- &bold&Source Han Sans Bold&\AD{Sans}{Bold}\\
- &heavy&Source Han Sans Heavy&\AD{Sans}{Black}\\
+ &bold&\AD{Sans}{Bold}\\
+ &heavy&\AD{Sans}{Black}\\
 \midrule
 %<en>\textit{rounded gothic}
 %<ja>\gt 丸ゴシック
-&&Source Han Sans Heavy&\AD{Sans}{Black}\\
+&&\AD{Sans}{Black}\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -2896,6 +2925,7 @@ However, the penalty inserted after it is 10 which is the \Param{postbreakpenalt
 ``ア'', not 20.
 %</en>
 %<*ja>
+\newpage
 \subsection{禁則処理関連パラメータとOpenTypeのfont feature}
 禁則処理や \Param{kanjiskip}, \Param{xkanjiskip} の挿入に関連したパラメータのうち
 \begin{quote}
@@ -4104,12 +4134,12 @@ JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 %<ja>\subsection{\cs{tfont} 命令}
 
 
+{\catcode`\<=12\catcode`\>=12
 \begin{table}[t]
 %<en>\caption{Differences between vertical JFMs shipped with \LuaTeX-ja}
 %<ja>\caption{\LuaTeX-ja に同梱されている縦組用 JFM の違い}
 %<en>\medskip
 \label{tab-difjfm-tate}
-\catcode`\<=12\catcode`\>=12
 \ltjsetparameter{jacharrange={+3}}
 \small
 \def\r#1#2{%
@@ -4146,6 +4176,7 @@ JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 \end{minipage}
 \ltjsetparameter{jacharrange={-3}}
 \end{table}
+}
 
 %<*en>
 ...

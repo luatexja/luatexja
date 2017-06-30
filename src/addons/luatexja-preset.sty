@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2017/06/25 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2017/06/30 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -237,6 +237,17 @@
     Source~Han~Sans~Medium,   % gt/m  (uni)
     Source~Han~Sans~Heavy,    % gt/eb
     Source~Han~Sans~Heavy     % mg/m
+  }
+}
+\ltjpreset_declare_option:nn{sourcehan-jp}{
+  \ltjpreset_set_multi:n {
+    Source~Han~Serif~JP~Regular, % mc/m
+    Source~Han~Serif~JP~Bold,    % mc/bx
+    Source~Han~Sans~JP~Regular,  % gt/m  (multi)
+    Source~Han~Sans~JP~Bold,     % gt/bx
+    Source~Han~Sans~JP~Medium,   % gt/m  (uni)
+    Source~Han~Sans~JP~Heavy,    % gt/eb
+    Source~Han~Sans~JP~Heavy     % mg/m
   }
 }
 \ltjpreset_declare_option:nn{noto-otc}{
