@@ -7029,24 +7029,31 @@ OpenType機能指定は
 \subsection{\Pkg{luatexja-otf}}
 \label{ssec-ltjotf}
 %<*en>
-This optional package supports typesetting characters in
-Adobe-Japan1 character collection
-(or other CID character collection, if the font is supported).
+This optional package supports typesetting glyphs
+by specifying a CID number.
 The package \Pkg{luatexja-otf} offers the following 2~low-level
 commands:
 %</en>
 %<*ja>
-この追加パッケージはAdobe-Japan1（フォント自身が持っていれば，
-別のCID文字セットでも可）の文字の出力をサポートする．
+この追加パッケージはCID番号による文字の出力をサポートする．
 \Pkg{luatexja-otf}は以下の2つの低レベルコマンドを提供する：
 %</ja>
 \begin{cslist}
 \item[\cs{CID}\{<number>\}]
 %<*en>
-Typeset a character whose CID number is <number>.
+Typeset a glyph whose CID number is <number>.
+If the Japanese font is neither Adobe-Japan1,~Adobe-GB1, Adobe-CNS1,~nor~Adobe-Korea1 CID-keyed font,
+\LuaTeX-ja treats that <number> is a CID number of Adobe-Japan1 character collection,
+and tries to typeset a ``most suitable glyph''.
 %</en>
 %<*ja>
 CID番号が<number>の文字を出力する．
+もし現在の和文フォントがAdobe-Japan1,~Adobe-GB1, Adobe-CNS1,~Adobe-Korea1の
+  いずれのCID-keyed fontでもない場合，<number>はAdobe-Japan1のCID番号であると解釈し
+  「適切なグリフ」\footnote{%
+  例えばフォントにIVDコレクションAdobe-Japan1が含まれていれば，その情報を用いて
+  グリフを選択する．
+}を出力する．
 %</ja>
 
 \item[\cs{UTF}\{<hex\_number>\}]
@@ -7123,34 +7130,6 @@ JFMの\texttt{chars}テーブルのエントリとして \verb+'AJ1-xxx'+ の形
 
 この拡張記法は，標準JFM~\texttt{jfm-ujis.lua}で，半角ひらがなのグリフ（CID~516--598）を
 正しく半角幅で組むために利用されている．
-%</ja>
-
-%<*en>
-\paragraph{IVS support}
-Recent fonts support Ideographic Variation Selector (IVS).
-\Pkg{luaotfload} and \Pkg{fontspec} packages used to be not supported IVS,
-so we implemented experimental IVS support in \Pkg{luatexja-otf},
-which is activated by
-\begin{lstlisting}
-\directlua{luatexja.otf.enable_ivs()}
-\end{lstlisting}
-However, recent \Pkg{luaotfload} and \Pkg{fontspec} packages seem to support IVS,
-so we don't execute above command anymore.
-%</en>
-%<*ja>
-\paragraph{IVSサポート}
-最近のOpenTypeフォントやTrueTypeフォントには，
-\texttt{U+E0100}--\texttt{U+E01EF}の範囲の「文字」
-（漢字用異体字セレクタ）を後置することによって
-字形を指定する仕組み(IVS)が含まれている．
-執筆時点の2013年12月では，\Pkg{luaotfload}や\Pkg{fontspec}パッケージ類は
-IVSに対応してはいないようであったため，
-\Pkg{luatexja-otf}パッケージ内に試験的なIVS対応を実装した．これは以下の命令の実行で有効になる：
-\begin{lstlisting}
-\directlua{luatexja.otf.enable_ivs()}
-\end{lstlisting}
-しかし，現在の\Pkg{luaotfload}や\Pkg{fontspec}パッケージは
-IVSに対応しているようであるので，もはや上の命令を実行する必要はない．
 %</ja>
 
 \subsection{\Pkg{luatexja-adjust}}
