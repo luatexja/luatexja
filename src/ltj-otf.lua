@@ -55,16 +55,23 @@ local ltjd_get_dir_count = ltjd.get_dir_count
 local dir_tate = luatexja.dir_table.dir_tate
 
 luatexja.userid_table.OTF = luatexbase.newuserwhatsitid('char_by_cid',  'luatexja')
-luatexja.userid_table.VSR = luatexbase.newuserwhatsitid('replace_vs',  'luatexja')
-local OTF, VSR = luatexja.userid_table.OTF, luatexja.userid_table.VSR
+local OTF = luatexja.userid_table.OTF
+local tex_get_attr = tex.getattribute
 
 local function get_ucs_from_rmlgbm(c)
-   local v = ltjr_cidfont_data["Adobe-Japan1"].resources.unicodes["Japan1." .. tostring(c)]
-   if not v then -- AJ1 範囲外
-      return 0
+   local v = (luatexja.otf.ivd_aj1 and luatexja.otf.ivd_aj1[c]
+     or ltjr_cidfont_data["Adobe-Japan1"].resources.unicodes["Japan1." .. tostring(c)])
+     or 0
+   if type(v)~='number' then -- table
+      local curjfnt_num = tex_get_attr((ltjd_get_dir_count()==dir_tate)
+                                        and attr_curtfnt or attr_curjfnt)
+      local curjfnt = identifiers[curjfnt_num].resources
+      curjfnt = curjfnt and curjfnt.variants
+      curjfnt = curjfnt and curjfnt[v[2]]
+      return curjfnt and curjfnt[v[1]] or v[1]
    elseif v<0xF0000 then -- 素直に Unicode にマップ可能
       return v
-   else
+   else -- privete use area
       local w = ltjr_cidfont_data["Adobe-Japan1"].characters[v]. tounicode
       -- must be non-nil!
       local i = string.len(w)
@@ -93,7 +100,6 @@ end
 
 local cid
 do
-   local tex_get_attr = tex.getattribute
    cid = function (key)
       if key==0 then return append_jglyph(char) end
       local curjfnt_num = tex_get_attr((ltjd_get_dir_count()==dir_tate)
@@ -137,17 +143,18 @@ local function extract(head)
       if getid(p)==id_whatsit then
          if getsubtype(p)==sid_user then
             local puid = getfield(p, 'user_id')
-            if puid==OTF or puid==VSR then
+            if puid==OTF then
+            --if puid==OTF or puid==VSR then
                local g = node_new(id_glyph)
                setfield(g, 'subtype', 0)
 	       setfield(g, 'char', getfield(p, 'value'))
                local v = has_attr(p, attr_curfnt); setfield(g, 'font',v)
-               if puid==OTF then
+               --if puid==OTF then
                   setfield(g, 'lang', lang_ja)
                   set_attr(g, attr_kblshift, has_attr(p, attr_kblshift))
-               else
-                  set_attr(g, attr_ablshift, has_attr(p, attr_ablshift))
-               end
+               --else
+               --   set_attr(g, attr_ablshift, has_attr(p, attr_ablshift))
+               --end
                head = node_insert_after(head, p, g)
                head = node_remove(head, p)
                node_free(p); p = g
@@ -206,86 +213,12 @@ end
 luatexbase.add_to_callback("luatexja.find_char_class",
 			   cid_set_char_class, "ltj.otf.find_char_class", 1)
 
--------------------- IVS
-local enable_ivs, disable_ivs
-do
-   local is_ivs_enabled = false
--- 組版時
-   local function ivs_jglyph(char, bp, pf, uid)
-      local p = node_new(id_whatsit,sid_user)
-      setfield(p, 'user_id', uid)
-      setfield(p, 'type', 100)
-      setfield(p, 'value', char)
-      return p
-   end
-
-   local function do_ivs_repr(h)
-      local head = to_direct(h)
-      local p, r = head
-      local is_dir_tate = (ltjs.list_dir == dir_tate)
-      local attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
-      local attr_kblshift = is_dir_tate and attr_tkblshift or attr_ykblshift
-      local attr_curfnt =   is_dir_tate and attr_curtfnt or attr_curjfnt
-      while p do
-	 local pid = getid(p)
-	 if pid==id_glyph then
-            local q = node_next(p) -- the next node of p
-            if q and getid(q)==id_glyph then
-               local qc = getchar(q)
-               if (qc>=0xFE00 and qc<=0xFE0F) or (qc>=0xE0100 and qc<0xE01F0) then
-		   -- q is a variation selector
-                  if qc>=0xE0100 then qc = qc - 0xE0100 end
-                  local pf = getfont(p)
-                  local pt = ltjf_font_extra_info[pf]
-		  pt = pt and pt[getchar(p)];  pt = pt and  pt[qc]
-                  head, r = node_remove(head,q)
-		  node_free(q)
-                  if pt then
-		     local is_jachar = (getfield(p, 'lang')==lang_ja)
-                     local np = ivs_jglyph(pt, p, pf,
-                                           is_jachar and OTF or VSR)
-		     if is_jachar then
-			set_attr(np, attr_curfnt, pf)
-			set_attr(np, attr_kblshift, has_attr(p, attr_kblshift))
-		     end
-                     head = node_insert_after(head, p, np)
-                     head = node_remove(head,p)
-		     node_free(p)
-		  end
-		  p = r
-	       else
-		  p = q
-               end
-	    else
-	       p = node_next(p)
-            end
-	 else
-	    p = node_next(p)
-         end
-     end
-     return to_node(head)
-   end
-
-   enable_ivs = function ()
-      if is_ivs_enabled then
-	 ltjb.package_warning('luatexja-otf',
-			      'luatexja.otf.enable_ivs() was already called, so this call is ignored', '')
-      else
-	 ltjb.add_to_callback('hpack_filter', do_ivs_repr, 'ltj.do_ivs',
-            luatexbase.priority_in_callback('hpack_filter', 'luaotfload.node_processor'))
-	 ltjb.add_to_callback('pre_linebreak_filter', do_ivs_repr, 'ltj.do_ivs',
-            luatexbase.priority_in_callback('pre_linebreak_filter', 'luaotfload.node_processor'))
-	 is_ivs_enabled = true
-      end
-   end
-   disable_ivs = function ()
-      if is_ivs_enabled then
-	 luatexbase.remove_from_callback('hpack_filter', 'ltj.do_ivs')
-	 luatexbase.remove_from_callback('pre_linebreak_filter', 'ltj.do_ivs')
-	 is_ivs_enabled = false
-      end
-   end
+--IVS
+local function enable_ivs()
+  ltjb.package_warning('luatexja-otf',
+    'luatexja.otf.enable_ivs() has now no effect.')
 end
+local disable_ivs = enable_ivs
 
 luatexja.otf = {
   append_jglyph = append_jglyph,
@@ -293,5 +226,8 @@ luatexja.otf = {
   disable_ivs = disable_ivs,  -- 隠し機能: IVS
   cid = cid,
 }
+
+luatexja.load_module('ivd_aj1')
+
 
 -- EOF
