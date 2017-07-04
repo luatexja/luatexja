@@ -58,17 +58,27 @@ luatexja.userid_table.OTF = luatexbase.newuserwhatsitid('char_by_cid',  'luatexj
 local OTF = luatexja.userid_table.OTF
 local tex_get_attr = tex.getattribute
 
+local cache_var = 2
+local cache_outdate_fn = function (t) return t.version~=cache_ver end
+local ivd_aj1 = ltjb.load_cache('ltj-ivd_aj1',cache_outdate_fn)
+if not ivd_aj1 then -- make cache
+   ivd_aj1 = require('ltj-ivd_aj1.lua')
+   ltjb.save_cache_luc('ltj-ivd_aj1', ivd_aj1)
+end
+
+
 local function get_ucs_from_rmlgbm(c)
-   local v = (luatexja.otf.ivd_aj1 and luatexja.otf.ivd_aj1[c]
+   local v = (ivd_aj1 and ivd_aj1.table_ivd_aj1[c]
      or ltjr_cidfont_data["Adobe-Japan1"].resources.unicodes["Japan1." .. tostring(c)])
      or 0
-   if type(v)~='number' then -- table
+   if v>=0x200000 then -- table
       local curjfnt_num = tex_get_attr((ltjd_get_dir_count()==dir_tate)
                                         and attr_curtfnt or attr_curjfnt)
       local curjfnt = identifiers[curjfnt_num].resources
+      local base, ivs = v % 0x200000, 0xE00FF + math.floor(v/0x200000)
       curjfnt = curjfnt and curjfnt.variants
-      curjfnt = curjfnt and curjfnt[v[2]]
-      return curjfnt and curjfnt[v[1]] or v[1]
+      curjfnt = curjfnt and curjfnt[ivs]
+      return curjfnt and curjfnt[base] or base
    elseif v<0xF0000 then -- 素直に Unicode にマップ可能
       return v
    else -- privete use area
@@ -226,8 +236,6 @@ luatexja.otf = {
   disable_ivs = disable_ivs,  -- 隠し機能: IVS
   cid = cid,
 }
-
-luatexja.load_module('ivd_aj1')
 
 
 -- EOF
