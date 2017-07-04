@@ -7,6 +7,7 @@
 
 % \IVS[?] 用
 \begin{luacode}
+   local identifiers = fonts.hashes.identifiers
    local fallback_color = 'red'  -- IVS がないときは，この色で既定文字を出力
    local list_color = 'blue!50!black'     -- リスト表示の色
 
@@ -16,15 +17,19 @@
    local sort = table.sort
    function list_ivs(s)
       local c = ubyte(s)
-      local pt = luatexja.otf.font_ivs_table[tex.attribute[attr_curjfnt]][c]
+      local pt = identifiers[tex.getattribute(attr_curjfnt)].resources
+      pt = pt and pt.variants
       if pt then
          local t = {}
-         for i,_ in pairs(pt) do t[1+#t]=i end
-         sort(t); tex.sprint('\\textcolor{' .. list_color .. '}{')
-         for _,i in ipairs(t) do 
-            if i<0xF0 then -- only IVS
-               tex.sprint('\\oalign{' .. s .. uchar(i+0xE0100)
-                          .. '\\crcr\\hss\\tiny' .. tostring(i) .. '\\hss\\crcr}') 
+         for i,v in pairs(pt) do
+           if v[c] then t[#t+1]={i,v[c]} end
+         end
+         sort(t, function(a,b) return a[1]<b[1] end)
+         tex.sprint('\\textcolor{' .. list_color .. '}{')
+         for _,i in ipairs(t) do
+            if i[1]>=0xE0100 then -- only IVS
+               tex.sprint('\\oalign{' .. s .. uchar(i[1])
+                          .. '\\crcr\\hss\\tiny' .. tostring(i[1]-0xE0100) .. '\\hss\\crcr}')
             end
          end
          tex.sprint('}')
@@ -54,15 +59,12 @@
 例文はZRさんのブログ記事「ipamjmパッケージでアレしてみた」\footnote{%
 \verb+http://d.hatena.ne.jp/zrbabbler/20131214/1387029624+}より引用．
 
-\paragraph{標準状態では……} 見事に異体字セレクタの部分が全角空きになっている．
 \begin{quote}
 \LARGE
 渡邉󠄏さんとか%    { } の中は U+9089 U+E010F
 渡𫟪󠄂さんとか。% { } の中は U+2B7EA U+E0102
 \end{quote}
 
-%\paragraph{IVS処理コードをここで有効化した．}\ 
-%\directlua{luatexja.otf.enable_ivs()}
 
 \begin{quote}
 \LARGE
@@ -74,9 +76,8 @@
 \textcolor{blue}{\MJI0{𫟪}}\textcolor{blue}{\MJI1{𫟪}}〓\MJI21{邉}
 \end{quote}
 MJ番号を直接指定していたところは，このソース中では無視して下駄「〓」にした．
-なぜか青色で示した「𫟪」(U+2B7EA)のIVSが機能していないようだが，フォント側にその記述がない，ということ？
+青色は「𫟪」(U+2B7EA)のIVS．
 
-\directlua{luatexja.otf.enable_ivs()}
 \begin{quote}
 \LARGE
 渡邉󠄏さんとか%    { } の中は U+9089 U+E010F
@@ -108,6 +109,7 @@ MJ番号を直接指定していたところは，このソース中では無視
       \toprule
       文字&Unicode&異体字\\
       \midrule
+      今&U+4ECA&\IVS?{今}\\
       邉&U+9089&\IVS?{邉}\\
       邊&U+908A&\IVS?{邊}\\
       𫟪&U+2B7EA&\IVS?{𫟪}\\
@@ -117,28 +119,13 @@ MJ番号を直接指定していたところは，このソース中では無視
    \end{center}
 }
 
-%\TABLE{IPAmj明朝}{ipamjm}
-%\TABLE{小塚明朝 Pr6N R}{kozminpr6n-regular}
-%\TABLE{花園明朝A}{hanamina}
-%\TABLE{花園明朝 OpenType}{hanaminotpr6n-regular}
+\TABLE{IPAmj明朝}{ipamjm}
+\TABLE{小塚明朝 Pr6N R}{kozminpr6n-regular}
+\TABLE{Source Han Serif Regular}{Source\space Han\space Serif\space Regular}
 
 \begin{lstlisting}[basicstyle=\tt, columns=fixed, basewidth=.5em]
 奈良県葛󠄀城市と東京都葛󠄁飾区．%
 江戸川区葛西はどっち？
 \end{lstlisting}
-
-
-\def\test{あいうえお
-  {\ltjsetparameter{yjabaselineshift=-2pt,tjabaselineshift=2pt}%
-  \vrule 葛葛󠄀城市と葛󠄁飾区\CID{200}}あ}
-\catcode`\@=11
-\ltjsetparameter{kanjiskip=4pt}
-
-\hbox{\jfont\F=KozMinPr6N-Regular:jfm=ujis at 12pt \F\CID{200}\test}
-
-\hrule
-
-\hbox{\tate\tfont\F=KozMinPr6N-Regular:jfm=ujisv at 12pt \F\CID{200}\test}
-
 
 \end{document}
