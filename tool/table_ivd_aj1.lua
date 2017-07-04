@@ -23,7 +23,7 @@ end
 f:close()
 
 for i=1,maxcid do
-    print(' ' .. tostring(t[i]) .. ', ')
+    print(' ' .. tostring(t[i] or false) .. ',')
 end
 
 
