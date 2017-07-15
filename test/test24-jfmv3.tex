@@ -1,23 +1,26 @@
 \input luatexja.sty
 
+\def\TEST#1{%
+\setbox0=\vbox {\hsize=6\zw\parindent=0pt
+#1
 \tentt
 
 あ！あ
 
 あ！a
 
-あ！)
+い！)
 
 あ！(
 
 あ！）全角
 
-あ！\kern0ptあ
+い！\kern0ptあ
 
 
 あ（あ
 
-あ\kern0pt（あ
+い\kern0pt（あ
 
 あ・あ
 
@@ -26,4 +29,16 @@
 あ・)
 
 あ・a
+
+}\copy0}
+
+\TEST\yoko
+
+\medskip
+\TEST\tate
+\tracingonline1
+\showboxdepth10000
+\showboxbreadth10000
+\setbox0=\hbox{\tate い！\kern0ptあ}
+\showbox0
 \end
