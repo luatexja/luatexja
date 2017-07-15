@@ -933,18 +933,40 @@ local function combine_spc(name)
    return (Np[name] or Nq[name]) and ((Np[name]~=0) and (Nq[name]~=0))
 end
 
+-- OAX, OBX: alchar or math
+local function get_OAX_skip()
+   local pm = Np.met
+   local g, _, kn, kp, kh = new_jfm_glue(
+      pm.char_type,
+      fast_find_char_class(
+        (Nq.id == id_math and -1 or (Nq.xspc>=2 and 'alchar' or 'nox_alchar')), pm), 
+      Np.class)
+   local k = ((Nq.xspc>=2) and (Np.xspc%2==1) and combine_spc('auto_xspc'))
+       and get_xkanjiskip_low(false, pm, kn, kp, kh)
+   return g, k
+end
+local function get_OBX_skip()
+   local qm = Nq.met
+   local g, _, kn, kp, kh = new_jfm_glue(
+      qm.char_type, Nq.class,
+      fast_find_char_class(
+        (Np.id == id_math and -1 or (Np.xspc%2==1 and 'alchar' or 'nox_alchar')), qm)
+    )
+   local k = ((Nq.xspc>=2) and (Np.xspc%2==1) and combine_spc('auto_xspc'))
+	 and get_xkanjiskip_low(false, qm, kn, kp, kh)
+   return g, k
+end
+
 local function get_OA_skip(is_kanji)
    local pm = Np.met
    local g, _, kn, kp, kh = new_jfm_glue(
       pm.char_type,
-      fast_find_char_class((Nq.id == id_math and -1 or 'jcharbdd'), pm), 
+      fast_find_char_class(
+        (((Nq.id==id_glue)or(Nq.id==id_kern)) and 'glue' or 'jcharbdd'), pm), 
       Np.class)
    local k
    if is_kanji==0 then
       k = combine_spc('auto_kspc') and get_kanjiskip_low(false, pm, kn, kp, kh)
-   elseif is_kanji==1 then
-      k = ((Nq.xspc>=2) and (Np.xspc%2==1) and combine_spc('auto_xspc'))
-	 and get_xkanjiskip_low(false, pm, kn, kp, kh)
    end
    return g, k
 end
@@ -952,13 +974,11 @@ local function get_OB_skip(is_kanji)
    local qm = Nq.met
    local g, _, kn, kp, kh = new_jfm_glue(
       qm.char_type, Nq.class,
-      fast_find_char_class((Np.id == id_math and -1 or'jcharbdd'), qm))
+      fast_find_char_class(
+        (((Np.id==id_glue)or(Np.id==id_kern)) and 'glue' or 'jcharbdd'), qm))
    local k
    if is_kanji==0 then
       k = combine_spc('auto_kspc') and get_kanjiskip_low(false, qm, kn, kp, kh)
-   elseif is_kanji==1 then
-      k = ((Nq.xspc>=2) and (Np.xspc%2==1) and combine_spc('auto_xspc'))
-	 and get_xkanjiskip_low(false, qm, kn, kp, kh)
    end
    return g, k
 end
@@ -979,7 +999,7 @@ local function handle_np_jachar(mode)
       handle_penalty_normal(0, Np.pre, g); real_insert(g); real_insert(k)
    elseif Nq.pre then
       local g, k
-      if non_ihb_flag then g, k = get_OA_skip(1) end -- O_A->X
+      if non_ihb_flag then g, k = get_OAX_skip() end -- O_A->X
       if not g then g = get_xkanjiskip(Np) end
       handle_penalty_normal((qid==id_hlist and 0 or Nq.post), Np.pre, g); 
       real_insert(g); real_insert(k)
@@ -1000,7 +1020,7 @@ end
 -- jachar .. (anything)
 local function handle_nq_jachar()
     if Np.pre then
-      local g = non_ihb_flag and get_OB_skip(1) or get_xkanjiskip(Nq) -- O_B->X
+      local g = non_ihb_flag and get_OBX_skip() or get_xkanjiskip(Nq) -- O_B->X
       handle_penalty_normal(Nq.post, (Np.id==id_hlist and 0 or Np.pre), g); real_insert(g)
    else
       local g =non_ihb_flag and  (get_OB_skip()) -- O_B

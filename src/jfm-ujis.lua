@@ -8,6 +8,7 @@
 
 
 local t = {
+   version = 3,
    dir = 'yoko',
    zw = 1.0, zh = 1.0,
    kanjiskip =  { 0.0, 0.25, 0 },
@@ -260,7 +261,7 @@ local t = {
 
 
    [99] = { -- box末尾
-      chars = {'boxbdd', 'parbdd'},
+      chars = {'boxbdd', 'parbdd', 'glue'},
    },
 
 }
@@ -273,5 +274,14 @@ local ht = t[107].chars
 for i=9758,9778 do ht[#ht+1] = 'AJ1-' .. tostring(i) end
 local ht = t[207].chars
 for i=9738,9757 do ht[#ht+1] = 'AJ1-' .. tostring(i) end
+
+t[100]=table.fastcopy(t[0])
+t[100].chars={'nox_alchar'}
+for i,v in pairs(t) do
+  if i~=6 and type(i)=='number' and type(v)=='table' then -- 感嘆符以外
+    if v.glue and v.glue[0] then v.glue[100] = v.glue[0] end
+    if v.kern and v.kern[0] then v.kern[100] = v.kern[0] end
+  end
+end
 
 luatexja.jfont.define_jfm(t)
