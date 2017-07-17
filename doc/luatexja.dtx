@@ -21,7 +21,7 @@
 \usepackage{metalogo,amsmath,array,tikz,pict2e,multienum,float}
 \usepackage{booktabs,multicol,luatexja-ruby}
 \usepackage[all]{xy}
-\usepackage{lltjext,alltt}
+\usepackage{lltjext,alltt,comment}
 
 %%%%%%%% Lua GC
 \patchcmd\@outputpage{\stepcounter{page}}{%
@@ -39,7 +39,6 @@
 
 %%%%%%%% fonts
 \usepackage{luatexja-otf}
-\directlua{luatexja.otf.enable_ivs()}
 \usepackage[no-math]{fontspec}
 \setmainfont[Ligatures=TeX]{Linux Libertine O}
 \setmonofont[Scale=MatchLowercase, ItalicFont=lmmono10-italic.otf,
@@ -3925,7 +3924,7 @@ Specify the name of (horizontal) JFM.
 If specified JFM has not been loaded, \LuaTeX-ja search and load
 a file named \texttt{jfm-<name>.lua}.
 
-The following JFMs are shipped with \LuaTeX-ja:
+The following horizontal JFMs are shipped with \LuaTeX-ja:
 %</en>
 %<*ja>
 用いる（横組用）JFMの名前を指定する．もし以前に指定されたJFMが読み込まれていなければ，
@@ -3933,7 +3932,7 @@ The following JFMs are shipped with \LuaTeX-ja:
 %</ja>
 \begin{description}
 %<*en>
-\item[\tt jfm-ujis.lua] A standard JFM in \LuaTeX-ja. This JFM is
+\item[\tt jfm-ujis.lua] A standard horizontal JFM in \LuaTeX-ja. This JFM is
   based on \verb+upnmlminr-h.tfm+, a metric for UTF/OTF package that
   is used in \upTeX. When you use the \Pkg{luatexja-otf} package, you should use this JFM.
 %</en>
@@ -4134,7 +4133,8 @@ JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 %<ja>\subsection{\cs{tfont} 命令}
 
 
-{\catcode`\<=12\catcode`\>=12
+\begin{comment}
+  {\catcode`\<=12\catcode`\>=12
 \begin{table}[t]
 %<en>\caption{Differences between vertical JFMs shipped with \LuaTeX-ja}
 %<ja>\caption{\LuaTeX-ja に同梱されている縦組用 JFM の違い}
@@ -4177,9 +4177,31 @@ JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 \ltjsetparameter{jacharrange={-3}}
 \end{table}
 }
+\end{comment}
 
 %<*en>
-...
+\cs{tfont} loads a font as a Japanese font for vertical direction.
+This command admits the same syntax used in \cs{font}~and~\cs{jfont}.
+A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont}:
+\begin{itemize}
+ \item Both \texttt{vert}~and~\texttt{vrt2} Opentype features are activated,
+  unless they are explicitly activated or deactivated (as the third line in the example below).
+\begin{lstlisting}
+\tfont\S=file:KozMinPr6N-Regular.otf:jfm=ujisv
+    % vert and vrt2 are automatically activated
+\tfont\T=file:KozMinPr6N-Regular.otf:jfm=ujisv;-vert % vert and vrt2 are not activated
+\end{lstlisting}
+ \item ...
+ \item One have to specify the name of vertical JFM in  \texttt{jfm=<name>}.
+\LuaTeX-ja ships following vertical JFMs:
+\begin{description}
+\item[\tt jfm-ujisv.lua] A standard vertical JFM in \LuaTeX-ja. This JFM is
+  based on \verb+upnmlminr-v.tfm+, a metric for UTF/OTF package that
+  is used in \upTeX.
+\item[\tt jfm-tmin.lua] A counterpart for \verb+tmin10.tfm+, which is one
+  of the default Japanese font metric shipped with \pTeX.
+\end{description}
+\end{itemize}
 %</en>
 %<*ja>
 \cs{tfont} はフォントを縦組用の和文フォントとして読み込む命令であり，
@@ -4197,7 +4219,7 @@ JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 \end{lstlisting}
  \item \ref{ssec-math}節で述べる，数式中の和文フォントには縦組用和文フォントは指定できない．
  \item \texttt{jfm=<name>}\ の部分には縦組用JFMを指定する．
-以下の縦組用JFMが\LuaTeX-jaには同梱されており，違いを\autoref{tab-difjfm-tate}に示した．
+以下の縦組用JFMが\LuaTeX-jaには同梱されている．%おり，違いを\autoref{tab-difjfm-tate}に示した．
 \begin{description}
 \item[\tt jfm-ujisv.lua] \LuaTeX-jaの標準縦組用JFMである．このJFMは\upTeX で
   用いられるUTF/OTFパッケージ用の和文用TFMである \verb+upnmlminr-v.tfm+ を
@@ -4338,15 +4360,15 @@ floating-point numbers in design-size unit.
 
 \begin{cslist}[style=standard]
 
-\item[version=$1\mathrel{\textrm{or}}2$]
+\item[version=<version>]
 %<en>(optional, default value is~1)
 %<ja>（任意，既定値は1）
 
 %<*en>
-The version JFM. Currently 1~and~2 are supported
+The version JFM. Currently 1,~2,~and,~3 are supported
 %</en>
 %<*ja>
-JFMのバージョン．1または2がサポートされる．
+JFMのバージョン．1,~2,~3がサポートされる．
 %</ja>
   
 \item[dir=<direction>]
@@ -4777,8 +4799,8 @@ we specify <ratio> to $0.25/(0.5+0.25)=1/3$.
              \Pkg{luatexja-adjust}による優先順位付き
 	     行長調整（\ref{ssec-adj}節）において，このグルーの優先度を指定する．許される値は以下の通り：
   \begin{description}
-    \item[バージョン1のとき] $-4$から$+3$の間の整数
-    \item[バージョン2のとき] $-4$から$+3$の間の整数の2つ組\texttt{\{<stretch>, <shrink>\}}か，
+    \item[バージョン1] $-4$から$+3$の間の整数
+    \item[バージョン2以降] $-4$から$+3$の間の整数の2つ組\texttt{\{<stretch>, <shrink>\}}か，
     または$-4$から$+3$の間の整数．<stretch>, <shrink>はそれぞれこのグルーが伸びるときの優先度，縮むときの
     優先度であり，単に整数$i$が指定された場合は\texttt{\{$i$, $i$\}}であると解釈される．
   \end{description}
@@ -4821,7 +4843,7 @@ In case of glue, one can specify following additional keys in each \texttt{[$j$]
 \begin{cslist}[style=standard]
 \item[priority=<priority>]
 An integer in $[-4,3]$ (treated as 0 if omitted), or
-a pair of these integers \texttt{\{<stretch>, <shrink>\}} (version~2 only).
+a pair of these integers \texttt{\{<stretch>, <shrink>\}} (version 2~or~later).
 This is
 used only in line adjustment with priority by \Pkg{luatexja-adjust}
 (see Subsection~\ref{ssec-adj}). Higher value means the glue is easy to stretch,
@@ -5010,8 +5032,31 @@ The following is the list of imaginary characters:
 %<ja>通常の（\cs{noindent} で開始されていない）段落の先頭．
 
 \item['jcharbdd']
-%<en>A boundary between \textbf{JAchar} and anything else (such as \textbf{ALchar}, kern, glue,\,\ldots).
-%<ja>\textbf{JAchar}と「その他のもの」（欧文文字，glue，kern等）との境界．
+%<en>A boundary between \textbf{JAchar} and anything else.
+%<*ja>
+\textbf{JAchar}と「その他のもの」との境界．
+
+バージョン2以前では\textbf{ALchar}，箱，罫線(rule)，glue,~kernなどいろいろなものと\textbf{JAchar}の境界に対して
+本特殊文字が用いられていたが，
+バージョン3以降では\ \texttt{'jcharbdd'}, \texttt{'alchar'}, \texttt{'nox\_alchar'},
+\texttt{'glue'} と細分化され，
+\texttt{'jcharbdd'} は主に\textbf{JAchar}とボックスや罫線(rule)との境界に使われるようになった．
+%</ja>
+  
+\item['alchar', 'nox\_alchar']
+%<*en>
+(version 3~or~later) A boundary between \textbf{JAchar} and \textbf{ALchar}.
+%</en>
+%<*ja>
+（バージョン3以降）\textbf{JAchar}と\textbf{ALchar}との境界．
+\textbf{JAchar}と\textbf{ALchar}の間に\Param{xkanjiskip}が入ることが可能な場合は
+\ \texttt{'alchar'}\ が，そうでない場合は\ \texttt{'nox\_alchar'}\ が用いられる
+（この区別は\textbf{ALchar}側の\Param{alxspmode}の値によってのみ行われる）．
+%</ja>
+
+\item['glue']
+%<en>(version 3~or~later) A boundary between \textbf{JAchar}, and, a glue or kern.
+%<ja>（バージョン3以降））\textbf{JAchar}とglue，kernとの境界．
 
 \item[$-1$]
 %<en>The left/right boundary of an inline math formula.
