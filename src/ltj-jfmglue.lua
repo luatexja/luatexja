@@ -933,8 +933,8 @@ local function combine_spc(name)
    return (Np[name] or Nq[name]) and ((Np[name]~=0) and (Nq[name]~=0))
 end
 
--- OAX, OBX: alchar or math
-local function get_OAX_skip()
+-- NA, NB: alchar or math
+local function get_NA_skip()
    local pm = Np.met
    local g, _, kn, kp, kh = new_jfm_glue(
       pm.char_type,
@@ -945,7 +945,7 @@ local function get_OAX_skip()
        and get_xkanjiskip_low(false, pm, kn, kp, kh)
    return g, k
 end
-local function get_OBX_skip()
+local function get_NB_skip()
    local qm = Nq.met
    local g, _, kn, kp, kh = new_jfm_glue(
       qm.char_type, Nq.class,
@@ -999,7 +999,7 @@ local function handle_np_jachar(mode)
       handle_penalty_normal(0, Np.pre, g); real_insert(g); real_insert(k)
    elseif Nq.pre then
       local g, k
-      if non_ihb_flag then g, k = get_OAX_skip() end -- O_A->X
+      if non_ihb_flag then g, k = get_NA_skip() end -- N_A->X
       if not g then g = get_xkanjiskip(Np) end
       handle_penalty_normal((qid==id_hlist and 0 or Nq.post), Np.pre, g); 
       real_insert(g); real_insert(k)
@@ -1020,7 +1020,7 @@ end
 -- jachar .. (anything)
 local function handle_nq_jachar()
     if Np.pre then
-      local g = non_ihb_flag and get_OBX_skip() or get_xkanjiskip(Nq) -- O_B->X
+      local g = non_ihb_flag and get_NB_skip() or get_xkanjiskip(Nq) -- N_B->X
       handle_penalty_normal(Nq.post, (Np.id==id_hlist and 0 or Np.pre), g); real_insert(g)
    else
       local g =non_ihb_flag and  (get_OB_skip()) -- O_B
