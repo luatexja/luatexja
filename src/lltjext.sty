@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjext}[2017/05/05 v1.2g-ltj-5 Macros for vertical writing]
+\ProvidesPackage{lltjext}[2017/07/17 v1.2g-ltj-6 Macros for vertical writing]
 \RequirePackage{luatexja}
 \newcount\ltj@ext@dir
 {\catcode`\*=11
@@ -801,7 +801,7 @@
 \def\ltj@lltjext@patch@array{%
   \patchcmd{\@tabular}{\hbox\bgroup}{%
 	\hbox\bgroup\ltj@ext@dir=\ltjgetparameter{direction}}{}{}
-  \pretocmd{\@array}%
+  \pretocmd{\array}%
 	{\ltj@ext@dir=\ltjgetparameter{direction}\relax}{}{}
   \def\@startpbox##1{\bgroup
    \box@dir\adjustbaseline%%% これを追加

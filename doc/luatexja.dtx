@@ -5234,16 +5234,9 @@ For $i\in\omega$, \texttt{char\_type[$i$]} is information of characters whose cl
   0&\text{\texttt{'left'} (default)}\\0.5&\text{\tt 'middle'}\\1&\text{\tt 'right'}
  \end{cases}
 \]
-\item For $j\in \omega$, \texttt{[$j$]} stores a kern or a glue which will be inserted
-between character class~$i$ and class~$j$.
-
-If a kern will be inserted, the value of this field is \texttt{[$j$]=\{false, <kern\_node>, <ratio>\}},
-where <kern\_node> is a node\footnote{%
- This version of \LuaTeX-ja uses ``direct access
-      model'' for accessing nodes, if possible. }.
-If a glue will be inserted, we have \texttt{[$j$]=\{false, <spec\_node>, <ratio>, <icflag>\}},
-where <spec\_node> is also a node, and $\text{<icflag>}=\textit{from\_jfm}+\text{<priority>}$.
 \end{itemize}
+For $i$,~$j\in \omega$, \texttt{char\_type[$i$][$j$]} stores a kern or a glue which will be inserted
+between character class~$i$ and class~$j$.
 \end{description}
 %</en>
 %<*ja>
@@ -5276,23 +5269,34 @@ JFMで指定されているそれぞれの値をスケーリングしたもの�
  \end{cases}
 \]
 のいずれかの値をとる．
-\item $j\in \omega$に対して，\texttt{[$j$]} は文字クラス$i$の文字と$j$の文字の間に挿入されるkern
-      やglueを格納している．
-間に入るものがkernであれば，このフィールドの値は\
-\texttt{[$j$]=\{false, <kern\_node>, <ratio>\}} である．
-<kern\_node>はkernを表すノードそのものである\footnote{%
+\end{itemize}
+$i$,~$j\in \omega$に対して，\texttt{char\_type[$i$][$j$]} は
+文字クラス$i$の文字と$j$の文字の間に挿入されるグルーやカーンを格納している．
+\begin{itemize}
+  \item 間に入るものがカーンであれば，この値は\
+\texttt{[$j$]=\{[1]=<kern\_node>, ratio=<ratio>\}} であり，
+<kern\_node>はカーンを表すノードそのものである\footnote{%
 本バージョンではノードのアクセス手法にdirect access
       modelを用いている．そのため，例えば\LuaTeX\ beta-0.78.2では，単なる自然数のようにし
       か見えないことに注意．
 }．
-glueであれば，\texttt{[$j$]=\{false, <spec\_node>, <ratio>, <icflag>\}} である．
-<spec\_node>はglueの長さを表すノードそのものであり，
-      $\text{<icflag>}=\textit{from\_jfm}+\text{<priority>}$である．
+  \item グルーであれば，この値は以下のキーを持つテーブルである．
+  \begin{description}
+    \item[\texttt{width}, \texttt{stretch}, \texttt{shrink}]
+    グルーのそれぞれ自然長，伸び量，縮み量をsp単位で表したもの．
+    \item[\texttt{priority}] （バージョン2以降の）JFMでの指定 \texttt{\{<stretch>,<shrink>\}} を
+    \[
+      (\text{<stretch>}+4)\cdot 8+\text{<shrink>}+4
+    \]
+    として0--63の整数にパックしたもの．
+    \item[\texttt{ratio}, \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch}, \texttt{kanjiskip\_shrink}]
+    JFM中の同名のフィールドの値がそのまま使われている．
+  \end{description}
 \end{itemize}
 \item[ascent\textrm{, }descent]
 ……
 \item[chars\_cbcache]
-……
+文字クラス決定の処理で．キャッシュとして使われる．
 \end{cslist}
 %</ja>
 
