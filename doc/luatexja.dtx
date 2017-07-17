@@ -8566,6 +8566,8 @@ u
 
 \def\OA{$\text{\sf O}_{\text{\sf A}}$}
 \def\OB{$\text{\sf O}_{\text{\sf B}}$}
+\def\NA{$\text{\sf N}_{\text{\sf A}}$}
+\def\NB{$\text{\sf N}_{\text{\sf B}}$}
 \begin{defn}
 %<*en>
 A \emph{cluster} is consecutive nodes in one of the following forms,
@@ -8760,7 +8762,7 @@ JFMグルーの挿入が行われない（\Param{xkanjiskip},~\Param{kanjiskip}�
 \item[欧文] リスト中に直接／hboxの中身として出現している「\textbf{JAchar}以外の文字」．次の3つの場合が該当：
 \begin{itemize}
 \item \textit{id}が\textit{id\_glyph}である．
-\item \textit{id}が\textit{id\_math}である．
+\item \textit{id}が\textit{id\_math}である（つまりこのクラスタは1つの文中数式をなす）．
 \item \textit{id}が\textit{id\_pbox}か\textit{id\_hlist}か\textit{id\_disc}であって，$\mathit{Np}.\mathit{head}$が\textbf{ALchar}．
 \end{itemize}
 \item[箱] box，またはそれに類似するもの．次の2つが該当：
@@ -8982,7 +8984,7 @@ $a$は禁則処理用に\textit{Nq}と\textit{Np}の間に加えられるべき�
 \sf 和文A&
 \gkf{E}{M→K}{PN}&
 \gkf{---}{\OA →K}{PN}&
-\gkf{---}{\OA →X}{PN}&
+\gkf{---}{\NA →X}{PN}&
 \gkf{---}{\OA}{PA}&
 \gkf{---}{\OA}{PN}&
 \gkf{---}{\OA}{PS}\\
@@ -8991,7 +8993,7 @@ $a$は禁則処理用に\textit{Nq}と\textit{Np}の間に加えられるべき�
 \gkf{---}{K}{PS}&
 \gkf{---}{X}{PS}\\
 \sf 欧文&
-\gkf{E}{\OB →X}{PA}&
+\gkf{E}{\NB →X}{PA}&
 \gkf{---}{X}{PS}\cr
 \sf 箱&\gkf{E}{\OB}{PA}\\
 \sf glue&\gkf{E}{\OB}{PN}\\
@@ -9042,21 +9044,29 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 \paragraph{和文Aと欧文の間}
 \textit{Nq}が\textsf{和文A}で，\textit{Np}が\textsf{欧文}の場合，JFMグルー挿入処理は次のようにして行われる．
 \begin{itemize}
-\item 「右空白」については，まず以下に述べる\textsf{Boundary-B~[\OB]}により空白を決定しようと試みる．
+\item 「右空白」については，まず以下に述べる\textsf{欧文境界B~[\NB]}により空白を決定しようと試みる．
 それが失敗した場合は，\textsf{\Param{xkanjiskip}~[X]}によって定める．
 %\item 「左空白」については，既に述べた\textsf{line-end~[E]}をそのまま採用する．それに伴う「右空白」の補正も%同じ．
 \item 禁則用ペナルティも，以前述べた\textsf{P-normal~[PN]}と同じである．
 \end{itemize}
 \begin{description}
-\item[Boundary-B~{[\OB]}] \textbf{JAchar}と「\textbf{JAchar}でないもの」との間に入る空白を以下によって求め，
-未定義でなければそれを「右空白」として採用する．
-\textsf{JFM-origin~[M]}の変種と考えて良い．
-これによって定まる空白の典型例は，和文の閉じ括弧と欧文文字の間に入る半角アキである．
+\item[欧文境界B~{[\NB]}] 以下で求めた量を「右空白」として採用する．
+この処理は\textsf{JFM-origin~[M]}の変種と考えて良く，
+典型例は「和文の閉じ括弧と欧文文字の間に入る半角アキ」である．
 \begin{enumerate}
 \item もし両クラスタの間で \cs{inhibitglue} が実行されていた場合%
-（証としてwhatsitノードが自動挿入される），「右空白」は未定義．
+（証としてwhatsitノードが自動挿入される），未定義．
 \item そうでなければ，
-\textit{Nq}と「文字コードが {\tt'jcharbdd'} の文字」との間に入るグルー／カーンとして定まる．
+\textit{Nq}と「文字コードが$x$の文字」との間に入るグルー／カーンとする．
+この$x$は次の場合分けによる：
+  \begin{itemize}
+    \item $\mathit{Np}.\mathit{id}$が\textit{id\_math}のとき（つまりクラスタ\textit{Np}が文中数式を表す）
+    ときは，$x=-1$．
+    \item \textit{Np}の中身の中身の文字コードについて，「直前への\Param{xkanjiskip}の挿入」が禁止されている
+（つまり，\Param{jaxspmode}~(or \Param{alxspmode})パラメタが偶数）ときは，
+    $x=\text{\texttt{'nox\_alchar'}}$．
+    \item 以上のいずれでもないときは，$x=\text{\texttt{'alchar'}}$．
+  \end{itemize}
 \end{enumerate}
 \item[\Param{xkanjiskip}~{[X]}]
 この段階では，\textsf{\Param{kanjiskip}~[K]}のときと同じように，
@@ -9080,22 +9090,29 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 
 \paragraph{欧文と和文Aの間}
 \textit{Nq}が\textsf{欧文}で，\textit{Np}が\textsf{和文A}の場合，JFMグルー挿入処理は上の場合とほぼ同じである．
-\textsf{和文A}のクラスタが逆になるので，\textsf{Boundary-A~[\OA]}の部分が変わるだけ．
+\textsf{和文A}のクラスタが逆になるので，\textsf{欧文境界B~[\NB]}の部分が変わるだけである．
 \begin{itemize}
-\item 「右空白」については，まず以下に述べる\textsf{Boundary-A~[\OA]}により空白を決定しようと試みる．
+\item 「右空白」については，まず以下に述べる\textsf{欧文境界A~[\OA]}により空白を決定しようと試みる．
 それが失敗した場合は，\textsf{\Param{xkanjiskip}~[X]}によって定める．
 %\item \textit{Nq}が和文でないので，「左空白」は算出されない．
 \item 禁則用ペナルティは，以前述べた\textsf{P-normal~[PN]}と同じである．
 \end{itemize}
 \begin{description}
-\item[Boundary-A~{[\OA]}] 「\textbf{JAchar}でないもの」と\textbf{JAchar}との間に入る空白を以下によって求め，
-未定義でなければそれを「右空白」として採用する．
-\textsf{JFM-origin~[M]}の変種と考えて良い．
-これによって定まる空白の典型例は，欧文文字と和文の開き括弧との間に入る半角アキである．
+\item[欧文境界A~{[\NA]}] これは\textsf{欧文境界B~[\NB]}で\textit{Np}と\textit{Nq}の役割が
+  交換されたものと思えば良い．
+  この処理で定まる空白の典型例は，欧文文字と和文の開き括弧との間に入る半角アキである．
 \begin{enumerate}
-\item もし両クラスタの間で \cs{inhibitglue} が実行されていた場合（証としてwhatsitノードが自動挿入される），次へ．
+\item もし両クラスタの間で \cs{inhibitglue} が実行されていた場合（証としてwhatsitノードが自動挿入される），
+  未定義．
 \item そうでなければ，
-「文字コードが {\tt'jcharbdd'} の文字」と\textit{Np}との間に入るグルー／カーンとして定まる．
+「文字コードが$x$の文字」と\textit{Np}との間に入るグルー／カーンと定める．
+$x$は\textit{Nq}から\textsf{欧文境界B~[\NB]}におけるそれと同じ方法で定めるが，
+\texttt{'nox\_alchar'}か\texttt{'alchar'}は
+\begin{quote}
+  \textit{Nq}の中身の文字コードについて，「直後への\Param{xkanjiskip}の挿入」が禁止されている
+（つまり，\Param{jaxspmode}~(or \Param{alxspmode})パラメタが2以上）．
+\end{quote}
+  か否かで判断する．
 \end{enumerate}
 \end{description}
 
@@ -9103,9 +9120,8 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 \textit{Nq}が\textsf{和文A}で，\textit{Np}が\textsf{箱}・グルー・カーンのいずれかであった場合，
 両者の間に挿入されるJFMグルーについては同じ処理である．しかし，そこでの行分割に対する仕様が異なるので，
 ペナルティの挿入処理は若干異なったものとなっている．
-
 \begin{itemize}
-\item 「右空白」については，既に述べた\textsf{Boundary-B~[\OB]}により空白を決定しようと試みる．
+\item 「右空白」については，以下に述べる\textsf{Boundary-B~[\OB]}により空白を決定しようと試みる．
 それが失敗した場合は，「右空白」は挿入されない．
 %\item 「左空白」については，既に述べた\textsf{line-end~[E]}の算出方法をそのまま採用する．それに伴う「右空白」の補正も同じ．
 \item 禁則用ペナルティの処理は，後ろのクラスタ\textit{Np}の種類によって異なる．
@@ -9128,6 +9144,12 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 \end{itemize}
 
 \begin{description}
+\item[Boundary-B~{[\OB]}] この処理は\textsf{欧文境界B~[\NB]}と同様であり，
+  $x$が次によって決まることのみが異なる：
+  \begin{itemize}
+    \item \textit{Np}がグルーやカーンのときは，$x=\text{\texttt{'glue'}}$．
+    \item そうでない（\textit{Np}が\textsf{箱}）ときは，$x=\text{\texttt{'jcharbdd'}}$．
+  \end{itemize}
 \item[P-allow~{[PA]}]
 \textit{Nq}と\textit{Np}の間の(a)部分にペナルティがあれば，\textsf{P-normal~[PN]}と同様に，
 それらの各ノードにおいてペナルティ値を$a$だけ増加させる．
@@ -9156,7 +9178,7 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 すぐ上の（\textit{Nq}と\textit{Np}の順序が逆になっている）場合と同じである．
 %が，「左空白」がなくなることにのみ注意．
 \begin{itemize}
-\item 「右空白」については，既に述べた\textsf{Boundary-A~[\OA]}により空白を決定しようと試みる．
+\item 「右空白」については，以下に述べる\textsf{Boundary-A~[\OA]}により空白を決定しようと試みる．
 それが失敗した場合は，「右空白」は挿入されない．
 %\item \textit{Nq}が和文でないので，「左空白」は算出されない．
 \item 禁則用ペナルティの処理は，\textit{Nq}の種類によって異なる．
@@ -9171,12 +9193,21 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 \end{description}
 \end{itemize}
 
+\begin{description}
+\item[Boundary-A~{[\OA]}] この処理は\textsf{欧文境界A~[\NA]}と同様であり，
+  $x$が次によって決まることのみが異なる：
+  \begin{itemize}
+    \item \textit{Nq}がグルーやカーンのときは，$x=\text{\texttt{'glue'}}$．
+    \item そうでない（\textit{Nq}が\textsf{箱}）ときは，$x=\text{\texttt{'jcharbdd'}}$．
+  \end{itemize}
+\end{description}
+
 \paragraph{和文Aと和文Bの違い}
 先に述べたように，\textsf{和文B}はhboxの中身の先頭（or 末尾）として出現している
 \textbf{JAchar}である．リスト内に直接ノードとして現れている\textbf{JAchar}（\textsf{和文A}）との違いは，
 \begin{itemize}
 \item \textsf{和文B}に対しては，JFMの文字クラス指定から定まる空白
-\textsf{JFM-origin~[M]}，\textsf{Boundary-A~[\OA]}，\textsf{Boundary-B~[\OB]}）の挿入は行われない．
+（\textsf{JFM由来[M]}，\textsf{Boundary-A~[\OA]}など）の挿入は行われない．
 %「左空白」の算出も行われない．
 例えば，
 \begin{itemize}
@@ -9199,12 +9230,12 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 あ．A
 \end{LTXexample}
 \begin{itemize}
-\item 1行目の\cs{inhibitglue}は\textsf{Boundary-B~[\OB]}の処理のみを抑止するので，ピリオドと「A」の間には
+\item 1行目の\cs{inhibitglue}は\textsf{欧文境界B~[\NB]}の処理のみを抑止するので，ピリオドと「A」の間には
 \Param{xkanjiskip}（四分アキ）が入ることに注意．
 \item 2行目のピリオドと「A」の間においては，前者が\textsf{和文B}となる（hboxの中身の末尾として登場しているから）ので，
-そもそも\textsf{Boundary-B~[\OB]}の処理は行われない．よって，\Param{xkanjiskip}が入ることとなる．
+そもそも\textsf{欧文境界B~[\NB]}の処理は行われない．よって，\Param{xkanjiskip}が入ることとなる．
 \item 3行目では，ピリオドの属するクラスタは\textsf{和文A}である．これによって，
-ピリオドと「A」の間には\textsf{Boundary-B~[\OB]}由来の半角アキが入ることになる．
+ピリオドと「A」の間には\textsf{欧文境界B~[\NB]}由来の半角アキが入ることになる．
 \end{itemize}
 %</ja>
 
