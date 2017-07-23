@@ -404,7 +404,9 @@
 }
 
 % mc/l
-\clist_pop:NN \l_ltjpreset_font_list \l_tmpa_tl
+\clist_if_empty:NTF \l_ltjpreset_font_list
+  { \tl_set:Nn \l_tmpa_tl {~} }{ \clist_pop:NN \l_ltjpreset_font_list \l_tmpa_tl }
+\tl_if_empty:NT \l_tmpa_tl {\tl_set\colon Nn \l_tmpa_tl {~}}
 \cs_set:Nx \ltjpreset_font_mc_l: {
    \tl_if_blank:nTF \l_tmpa_tl { \ltjpreset_font_mc_m: } {\tl_use:N \l_tmpa_tl }
 }
