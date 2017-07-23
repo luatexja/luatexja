@@ -459,7 +459,7 @@ on the content of the register \emph{only}. This is major difference with \pTeX.
 %</en>
 %<*ja>
 \paragraph{組方向}
-20150420.0版からは，不安定ながらも\LuaTeX-ja における縦組みをサポートしている．
+バージョン20150420.0からは，不安定ながらも\LuaTeX-ja における縦組みをサポートしている．
 なお，\LuaTeX 本体も$\Omega$流の組方向をサポートしているが，それとは全くの別物であること
 に注意してほしい．
 特に，異なった組方向のボックスを扱う場合には
@@ -502,7 +502,7 @@ without the \cs{fontspec} (and~\Pkg{luatexja-fontspec}) package.
       詳しい説明は\ref{ssec-setrange}節を参照してほしい．
 
 また，\P,~\S といったISO~8859-1の上位領域とJIS~X~0208の共通部分の文字は
-      20150906.0版から標準で欧文扱いとなった．\LaTeXe\ 2017/01/01以降では
+      バージョン20150906.0から標準で欧文扱いとなった．\LaTeXe\ 2017/01/01以降では
 標準でTUエンコーディングのLatin Modernフォントが使われるので，
 特に何もせずソース中にそのまま記述してもこれらの文字が出力される
 \footnote{\LaTeXe\ 2017/01/01より前では，ソース中に直接記述しても
@@ -644,7 +644,7 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 \end{itemize}
 %<en>In summary, \LuaTeX-ja version 20160404.0 (or~later) no longer supports \TeX~Live~2015.
 %<*ja>
-要約すると，20160404.0版以降の\LuaTeX-jaは\TeX~Live~2015以前では動作しない\footnote{%
+要約すると，バージョン20160404.0以降の\LuaTeX-jaは\TeX~Live~2015以前では動作しない\footnote{%
   もっとも，自分で\LuaTeX のバイナリをSubversionリポジトリからビルドしていれば話は別である．
 }．
 %</ja>
@@ -2575,7 +2575,7 @@ the same codepoint as \S\ (\text{U+00A7}).
 Hence, as previous versions of \LuaTeX-ja, if these characters are treated as
 \text{JAchar}s, then \cs{Frowny} produces ``\ltjjachar`§'' (in a Japanese font).
 
-To avoid such situations, the default setting of \LuaTeX-ja is changed in this release
+To avoid such situations, the default setting of \LuaTeX-ja is changed in version~20150906.0
 so that all characters \texttt{U+0080}--\texttt{U+00FF} are treated as \textbf{ALchar}.
 
 If you want to output a character as \textbf{ALchar} and \textbf{JAchar} regardless the range
@@ -2596,7 +2596,7 @@ setting, you can use \cs{ltjalchar} and \cs{ltjjachar} respectively, as the foll
 即ち，以前のバージョンのように，「前節の文字範囲8内の文字は\textbf{JAchar}」という設定で
 あったとすると，上記の \cs{Frowny} は和文フォントで「\ltjjachar`§」を出力することになる．
 
-このような事態を避けるために，本バージョンからは \texttt{U+0080}--\texttt{U+00FF} の範囲の
+このような事態を避けるために，バージョン20150906.0からは \texttt{U+0080}--\texttt{U+00FF} の範囲の
 文字は全て\textbf{ALchar}となるように初期設定を変更している．
 
 なお，文字範囲の設定に関わらず1つの文字を\textbf{ALchar}, \textbf{JAchar}で出力したい場合には，
@@ -2890,7 +2890,7 @@ becuse a \emph{JAchar} is encapsulated by a horizontal box if needed.
  まだ違いが見られる．
 \end{itemize}
 
-なお，20170401.0版以降の\LuaTeX-jaでは，\cs{vcenter} によるボックスには
+なお，バージョン20170401.0以降の\LuaTeX-jaでは，\cs{vcenter} によるボックスには
 全体が\Param{yalbaselineshift}, \Param{talbaselineshift} パラメータが反映されるようにしている．
 その方が結果が自然であることによる変更なのだが，結果的に\cs{vcenter} については\pTeX と同じ挙動となった．
 
@@ -4057,7 +4057,7 @@ JFMもサイズも同じなので，普通に「）【」と入力した時と�
 \label{para-kern}
 %<*en>
 Some fonts have information for inter-glyph spacing.
-This version of \LuaTeX-ja treats kerning spaces like an italic correction;
+\LuaTeX-ja 20140324.0 or later treats kerning spaces like an italic correction;
 any glue and/or kern from the JFM and a kerning space can coexist.
 See \autoref{fig:kern-jfm} for detail.
 
@@ -4068,7 +4068,7 @@ because of the compatibility with previous versions of \LuaTeX-ja.
 %<*ja>
 いくつかのフォントはグリフ間のスペースについての情報を持っている．
 このカーニング情報は以前の\LuaTeX-ja とはあまり相性が良くなかったが，
-本バージョンではカーニングによる空白はイタリック補正と同様に扱うことになっている．
+バージョン20140324.0以降ではカーニングによる空白はイタリック補正と同様に扱うことになっている．
 つまり，カーニング由来の空白とJFM由来のグルー・カーンは同時に入りうる．
 \autoref{fig:kern-jfm}を参照．
 \begin{itemize}
@@ -4129,7 +4129,7 @@ JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 \texttt{kanjiskip\_shrink}キー（\pageref{pg:ksp_nat}ページ）の使用によって，
 「JFM由来のグルーの他に，\Param{kanjiskip}の自然長/伸び量/縮み量の一部が
 同じ場所に挿入される」という状況が起こりうる．
-この機能を無効化し，20150922.0版以前と同じような組版を得るためには
+この機能を無効化し，バージョン20150922.0以前と同じような組版を得るためには
 他のOpenType機能と同じように\ \texttt{-ltjksp}\ 指定を行えば良い．
 \begin{LTXexample}[width=16\zw]
 \leavevmode
@@ -5343,7 +5343,7 @@ $i$,~$j\in \omega$に対して，\texttt{char\_type[$i$][$j$]} は
   \item 間に入るものがカーンであれば，この値は\
 \texttt{[$j$]=\{[1]=<kern\_node>, ratio=<ratio>\}} であり，
 <kern\_node>はカーンを表すノードそのものである\footnote{%
-本バージョンではノードのアクセス手法にdirect access
+バージョン20150420.0以降ではノードのアクセス手法にdirect access
       modelを用いている．そのため，例えば\LuaTeX\ beta-0.78.2では，単なる自然数のようにし
       か見えないことに注意．
 }．
@@ -5351,7 +5351,7 @@ $i$,~$j\in \omega$に対して，\texttt{char\_type[$i$][$j$]} は
   \begin{description}
     \item[\texttt{width}, \texttt{stretch}, \texttt{shrink}]
     グルーのそれぞれ自然長，伸び量，縮み量をsp単位で表したもの．
-    \item[\texttt{priority}] （バージョン2以降の）JFMでの指定 \texttt{\{<stretch>,<shrink>\}} を
+    \item[\texttt{priority}] バ（ージョン2以降の）JFMでの指定 \texttt{\{<stretch>,<shrink>\}} を
     \[
       (\text{<stretch>}+4)\cdot 8+\text{<shrink>}+4
     \]
@@ -5572,13 +5572,13 @@ Penalty value for suppressing orphans. This penalty is inserted just
 
 %<*en>
 An additional attributes which each character whose character code is <chr\_code> has.
-At the present version, the lowermost bit of <natural number> indicates
+At version~20120506.0 or later, the lowermost bit of <natural number> indicates
 	     whether the character is considered as a punctuation mark
 	     (see the description of \Param{jcharwidowpenalty} above).
 %</en>
 %<*ja>
 文字コードが<chr\_code>の文字が持つ付加的な属性値．
-現在のバージョンでは，<natural number>の最下位ビットが，その文字が句読点と
+バージョン20120506.0以降では，<natural number>の最下位ビットが，その文字が句読点と
 みなされるかどうかを表している（上の\Param{jcharwidowpenalty}の記述を参照）．
 %</ja>
 
@@ -6244,7 +6244,7 @@ As an example, the example above can be improved as follows:
   この文字の後ろに入るグルー等の処理については未定義である
   \footnote{%
     この命令と同等の内容は，\cs{dirrctlua}の形で\Pkg{ltjsclasses}内で以前から使われていた．
-    一般ユーザでも利用しやすくするため，20170505.0版では新たに命令として定義した．
+    一般ユーザでも利用しやすくするため，バージョン20170505.0で新たに命令として定義した．
   }．
   \item \cs{ltjfakeboxbdd}は，実行された箇所が「ボックスの先頭と末尾」であると\LuaTeX-jaの
   和文処理グルー挿入処理に認識させる．
@@ -6538,7 +6538,7 @@ character whose character class is zero,  instead of `あ'.
 「漢」の寸法を元に（本節の最初に述べた，小文字で始まる）\cs{cht}, \cs{cwd}
 といった長さ変数を設定する．
 
-なお，\LaTeX が2015/10/01 版以降の場合は，「あ」「漢」の代わりに
+なお，\LaTeX が2015/10/01版以降の場合は，「あ」「漢」の代わりに
 「文字クラス0の和文文字」を用いる．
 %</ja>
 
