@@ -21,7 +21,7 @@
 \usepackage{metalogo,amsmath,array,tikz,pict2e,multienum,float}
 \usepackage{booktabs,multicol,luatexja-ruby}
 \usepackage[all]{xy}
-\usepackage{lltjext,alltt}
+\usepackage{lltjext,alltt,comment}
 
 %%%%%%%% Lua GC
 \patchcmd\@outputpage{\stepcounter{page}}{%
@@ -39,7 +39,6 @@
 
 %%%%%%%% fonts
 \usepackage{luatexja-otf}
-\directlua{luatexja.otf.enable_ivs()}
 \usepackage[no-math]{fontspec}
 \setmainfont[Ligatures=TeX]{Linux Libertine O}
 \setmonofont[Scale=MatchLowercase, ItalicFont=lmmono10-italic.otf,
@@ -3947,7 +3946,7 @@ Specify the name of (horizontal) JFM.
 If specified JFM has not been loaded, \LuaTeX-ja search and load
 a file named \texttt{jfm-<name>.lua}.
 
-The following JFMs are shipped with \LuaTeX-ja:
+The following horizontal JFMs are shipped with \LuaTeX-ja:
 %</en>
 %<*ja>
 用いる（横組用）JFMの名前を指定する．もし以前に指定されたJFMが読み込まれていなければ，
@@ -3955,7 +3954,7 @@ The following JFMs are shipped with \LuaTeX-ja:
 %</ja>
 \begin{description}
 %<*en>
-\item[\tt jfm-ujis.lua] A standard JFM in \LuaTeX-ja. This JFM is
+\item[\tt jfm-ujis.lua] A standard horizontal JFM in \LuaTeX-ja. This JFM is
   based on \verb+upnmlminr-h.tfm+, a metric for UTF/OTF package that
   is used in \upTeX. When you use the \Pkg{luatexja-otf} package, you should use this JFM.
 %</en>
@@ -4156,7 +4155,8 @@ JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 %<ja>\subsection{\cs{tfont} 命令}
 
 
-{\catcode`\<=12\catcode`\>=12
+\begin{comment}
+  {\catcode`\<=12\catcode`\>=12
 \begin{table}[t]
 %<en>\caption{Differences between vertical JFMs shipped with \LuaTeX-ja}
 %<ja>\caption{\LuaTeX-ja に同梱されている縦組用 JFM の違い}
@@ -4199,9 +4199,31 @@ JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 \ltjsetparameter{jacharrange={-3}}
 \end{table}
 }
+\end{comment}
 
 %<*en>
-...
+\cs{tfont} loads a font as a Japanese font for vertical direction.
+This command admits the same syntax used in \cs{font}~and~\cs{jfont}.
+A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont}:
+\begin{itemize}
+ \item Both \texttt{vert}~and~\texttt{vrt2} Opentype features are activated,
+  unless they are explicitly activated or deactivated (as the third line in the example below).
+\begin{lstlisting}
+\tfont\S=file:KozMinPr6N-Regular.otf:jfm=ujisv
+    % vert and vrt2 are automatically activated
+\tfont\T=file:KozMinPr6N-Regular.otf:jfm=ujisv;-vert % vert and vrt2 are not activated
+\end{lstlisting}
+ \item ...
+ \item One have to specify the name of vertical JFM in  \texttt{jfm=<name>}.
+\LuaTeX-ja ships following vertical JFMs:
+\begin{description}
+\item[\tt jfm-ujisv.lua] A standard vertical JFM in \LuaTeX-ja. This JFM is
+  based on \verb+upnmlminr-v.tfm+, a metric for UTF/OTF package that
+  is used in \upTeX.
+\item[\tt jfm-tmin.lua] A counterpart for \verb+tmin10.tfm+, which is one
+  of the default Japanese font metric shipped with \pTeX.
+\end{description}
+\end{itemize}
 %</en>
 %<*ja>
 \cs{tfont} はフォントを縦組用の和文フォントとして読み込む命令であり，
@@ -4219,7 +4241,7 @@ JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 \end{lstlisting}
  \item \ref{ssec-math}節で述べる，数式中の和文フォントには縦組用和文フォントは指定できない．
  \item \texttt{jfm=<name>}\ の部分には縦組用JFMを指定する．
-以下の縦組用JFMが\LuaTeX-jaには同梱されており，違いを\autoref{tab-difjfm-tate}に示した．
+以下の縦組用JFMが\LuaTeX-jaには同梱されている．%おり，違いを\autoref{tab-difjfm-tate}に示した．
 \begin{description}
 \item[\tt jfm-ujisv.lua] \LuaTeX-jaの標準縦組用JFMである．このJFMは\upTeX で
   用いられるUTF/OTFパッケージ用の和文用TFMである \verb+upnmlminr-v.tfm+ を
@@ -4360,15 +4382,15 @@ floating-point numbers in design-size unit.
 
 \begin{cslist}[style=standard]
 
-\item[version=$1\mathrel{\textrm{or}}2$]
+\item[version=<version>]
 %<en>(optional, default value is~1)
 %<ja>（任意，既定値は1）
 
 %<*en>
-The version JFM. Currently 1~and~2 are supported
+The version JFM. Currently 1,~2,~and,~3 are supported
 %</en>
 %<*ja>
-JFMのバージョン．1または2がサポートされる．
+JFMのバージョン．1,~2,~3がサポートされる．
 %</ja>
   
 \item[dir=<direction>]
@@ -4799,8 +4821,8 @@ we specify <ratio> to $0.25/(0.5+0.25)=1/3$.
              \Pkg{luatexja-adjust}による優先順位付き
 	     行長調整（\ref{ssec-adj}節）において，このグルーの優先度を指定する．許される値は以下の通り：
   \begin{description}
-    \item[バージョン1のとき] $-4$から$+3$の間の整数
-    \item[バージョン2のとき] $-4$から$+3$の間の整数の2つ組\texttt{\{<stretch>, <shrink>\}}か，
+    \item[バージョン1] $-4$から$+3$の間の整数
+    \item[バージョン2以降] $-4$から$+3$の間の整数の2つ組\texttt{\{<stretch>, <shrink>\}}か，
     または$-4$から$+3$の間の整数．<stretch>, <shrink>はそれぞれこのグルーが伸びるときの優先度，縮むときの
     優先度であり，単に整数$i$が指定された場合は\texttt{\{$i$, $i$\}}であると解釈される．
   \end{description}
@@ -4843,7 +4865,7 @@ In case of glue, one can specify following additional keys in each \texttt{[$j$]
 \begin{cslist}[style=standard]
 \item[priority=<priority>]
 An integer in $[-4,3]$ (treated as 0 if omitted), or
-a pair of these integers \texttt{\{<stretch>, <shrink>\}} (version~2 only).
+a pair of these integers \texttt{\{<stretch>, <shrink>\}} (version 2~or~later).
 This is
 used only in line adjustment with priority by \Pkg{luatexja-adjust}
 (see Subsection~\ref{ssec-adj}). Higher value means the glue is easy to stretch,
@@ -5032,8 +5054,31 @@ The following is the list of imaginary characters:
 %<ja>通常の（\cs{noindent} で開始されていない）段落の先頭．
 
 \item['jcharbdd']
-%<en>A boundary between \textbf{JAchar} and anything else (such as \textbf{ALchar}, kern, glue,\,\ldots).
-%<ja>\textbf{JAchar}と「その他のもの」（欧文文字，glue，kern等）との境界．
+%<en>A boundary between \textbf{JAchar} and anything else.
+%<*ja>
+\textbf{JAchar}と「その他のもの」との境界．
+
+バージョン2以前では\textbf{ALchar}，箱，罫線(rule)，glue,~kernなどいろいろなものと\textbf{JAchar}の境界に対して
+本特殊文字が用いられていたが，
+バージョン3以降では\ \texttt{'jcharbdd'}, \texttt{'alchar'}, \texttt{'nox\_alchar'},
+\texttt{'glue'} と細分化され，
+\texttt{'jcharbdd'} は主に\textbf{JAchar}とボックスや罫線(rule)との境界に使われるようになった．
+%</ja>
+  
+\item['alchar', 'nox\_alchar']
+%<*en>
+(version 3~or~later) A boundary between \textbf{JAchar} and \textbf{ALchar}.
+%</en>
+%<*ja>
+（バージョン3以降）\textbf{JAchar}と\textbf{ALchar}との境界．
+\textbf{JAchar}と\textbf{ALchar}の間に\Param{xkanjiskip}が入ることが可能な場合は
+\ \texttt{'alchar'}\ が，そうでない場合は\ \texttt{'nox\_alchar'}\ が用いられる
+（この区別は\textbf{ALchar}側の\Param{alxspmode}の値によってのみ行われる）．
+%</ja>
+
+\item['glue']
+%<en>(version 3~or~later) A boundary between \textbf{JAchar}, and, a glue or kern.
+%<ja>（バージョン3以降））\textbf{JAchar}とglue，kernとの境界．
 
 \item[$-1$]
 %<en>The left/right boundary of an inline math formula.
@@ -8547,6 +8592,8 @@ u
 
 \def\OA{$\text{\sf O}_{\text{\sf A}}$}
 \def\OB{$\text{\sf O}_{\text{\sf B}}$}
+\def\NA{$\text{\sf N}_{\text{\sf A}}$}
+\def\NB{$\text{\sf N}_{\text{\sf B}}$}
 \begin{defn}
 %<*en>
 A \emph{cluster} is consecutive nodes in one of the following forms,
@@ -8741,7 +8788,7 @@ JFMグルーの挿入が行われない（\Param{xkanjiskip},~\Param{kanjiskip}�
 \item[欧文] リスト中に直接／hboxの中身として出現している「\textbf{JAchar}以外の文字」．次の3つの場合が該当：
 \begin{itemize}
 \item \textit{id}が\textit{id\_glyph}である．
-\item \textit{id}が\textit{id\_math}である．
+\item \textit{id}が\textit{id\_math}である（つまりこのクラスタは1つの文中数式をなす）．
 \item \textit{id}が\textit{id\_pbox}か\textit{id\_hlist}か\textit{id\_disc}であって，$\mathit{Np}.\mathit{head}$が\textbf{ALchar}．
 \end{itemize}
 \item[箱] box，またはそれに類似するもの．次の2つが該当：
@@ -8963,7 +9010,7 @@ $a$は禁則処理用に\textit{Nq}と\textit{Np}の間に加えられるべき�
 \sf 和文A&
 \gkf{E}{M→K}{PN}&
 \gkf{---}{\OA →K}{PN}&
-\gkf{---}{\OA →X}{PN}&
+\gkf{---}{\NA →X}{PN}&
 \gkf{---}{\OA}{PA}&
 \gkf{---}{\OA}{PN}&
 \gkf{---}{\OA}{PS}\\
@@ -8972,7 +9019,7 @@ $a$は禁則処理用に\textit{Nq}と\textit{Np}の間に加えられるべき�
 \gkf{---}{K}{PS}&
 \gkf{---}{X}{PS}\\
 \sf 欧文&
-\gkf{E}{\OB →X}{PA}&
+\gkf{E}{\NB →X}{PA}&
 \gkf{---}{X}{PS}\cr
 \sf 箱&\gkf{E}{\OB}{PA}\\
 \sf glue&\gkf{E}{\OB}{PN}\\
@@ -9023,21 +9070,29 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 \paragraph{和文Aと欧文の間}
 \textit{Nq}が\textsf{和文A}で，\textit{Np}が\textsf{欧文}の場合，JFMグルー挿入処理は次のようにして行われる．
 \begin{itemize}
-\item 「右空白」については，まず以下に述べる\textsf{Boundary-B~[\OB]}により空白を決定しようと試みる．
+\item 「右空白」については，まず以下に述べる\textsf{欧文境界B~[\NB]}により空白を決定しようと試みる．
 それが失敗した場合は，\textsf{\Param{xkanjiskip}~[X]}によって定める．
 %\item 「左空白」については，既に述べた\textsf{line-end~[E]}をそのまま採用する．それに伴う「右空白」の補正も%同じ．
 \item 禁則用ペナルティも，以前述べた\textsf{P-normal~[PN]}と同じである．
 \end{itemize}
 \begin{description}
-\item[Boundary-B~{[\OB]}] \textbf{JAchar}と「\textbf{JAchar}でないもの」との間に入る空白を以下によって求め，
-未定義でなければそれを「右空白」として採用する．
-\textsf{JFM-origin~[M]}の変種と考えて良い．
-これによって定まる空白の典型例は，和文の閉じ括弧と欧文文字の間に入る半角アキである．
+\item[欧文境界B~{[\NB]}] 以下で求めた量を「右空白」として採用する．
+この処理は\textsf{JFM-origin~[M]}の変種と考えて良く，
+典型例は「和文の閉じ括弧と欧文文字の間に入る半角アキ」である．
 \begin{enumerate}
 \item もし両クラスタの間で \cs{inhibitglue} が実行されていた場合%
-（証としてwhatsitノードが自動挿入される），「右空白」は未定義．
+（証としてwhatsitノードが自動挿入される），未定義．
 \item そうでなければ，
-\textit{Nq}と「文字コードが {\tt'jcharbdd'} の文字」との間に入るグルー／カーンとして定まる．
+\textit{Nq}と「文字コードが$x$の文字」との間に入るグルー／カーンとする．
+この$x$は次の場合分けによる：
+  \begin{itemize}
+    \item $\mathit{Np}.\mathit{id}$が\textit{id\_math}のとき（つまりクラスタ\textit{Np}が文中数式を表す）
+    ときは，$x=-1$．
+    \item \textit{Np}の中身の中身の文字コードについて，「直前への\Param{xkanjiskip}の挿入」が禁止されている
+（つまり，\Param{jaxspmode}~(or \Param{alxspmode})パラメタが偶数）ときは，
+    $x=\text{\texttt{'nox\_alchar'}}$．
+    \item 以上のいずれでもないときは，$x=\text{\texttt{'alchar'}}$．
+  \end{itemize}
 \end{enumerate}
 \item[\Param{xkanjiskip}~{[X]}]
 この段階では，\textsf{\Param{kanjiskip}~[K]}のときと同じように，
@@ -9061,22 +9116,29 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 
 \paragraph{欧文と和文Aの間}
 \textit{Nq}が\textsf{欧文}で，\textit{Np}が\textsf{和文A}の場合，JFMグルー挿入処理は上の場合とほぼ同じである．
-\textsf{和文A}のクラスタが逆になるので，\textsf{Boundary-A~[\OA]}の部分が変わるだけ．
+\textsf{和文A}のクラスタが逆になるので，\textsf{欧文境界B~[\NB]}の部分が変わるだけである．
 \begin{itemize}
-\item 「右空白」については，まず以下に述べる\textsf{Boundary-A~[\OA]}により空白を決定しようと試みる．
+\item 「右空白」については，まず以下に述べる\textsf{欧文境界A~[\OA]}により空白を決定しようと試みる．
 それが失敗した場合は，\textsf{\Param{xkanjiskip}~[X]}によって定める．
 %\item \textit{Nq}が和文でないので，「左空白」は算出されない．
 \item 禁則用ペナルティは，以前述べた\textsf{P-normal~[PN]}と同じである．
 \end{itemize}
 \begin{description}
-\item[Boundary-A~{[\OA]}] 「\textbf{JAchar}でないもの」と\textbf{JAchar}との間に入る空白を以下によって求め，
-未定義でなければそれを「右空白」として採用する．
-\textsf{JFM-origin~[M]}の変種と考えて良い．
-これによって定まる空白の典型例は，欧文文字と和文の開き括弧との間に入る半角アキである．
+\item[欧文境界A~{[\NA]}] これは\textsf{欧文境界B~[\NB]}で\textit{Np}と\textit{Nq}の役割が
+  交換されたものと思えば良い．
+  この処理で定まる空白の典型例は，欧文文字と和文の開き括弧との間に入る半角アキである．
 \begin{enumerate}
-\item もし両クラスタの間で \cs{inhibitglue} が実行されていた場合（証としてwhatsitノードが自動挿入される），次へ．
+\item もし両クラスタの間で \cs{inhibitglue} が実行されていた場合（証としてwhatsitノードが自動挿入される），
+  未定義．
 \item そうでなければ，
-「文字コードが {\tt'jcharbdd'} の文字」と\textit{Np}との間に入るグルー／カーンとして定まる．
+「文字コードが$x$の文字」と\textit{Np}との間に入るグルー／カーンと定める．
+$x$は\textit{Nq}から\textsf{欧文境界B~[\NB]}におけるそれと同じ方法で定めるが，
+\texttt{'nox\_alchar'}か\texttt{'alchar'}は
+\begin{quote}
+  \textit{Nq}の中身の文字コードについて，「直後への\Param{xkanjiskip}の挿入」が禁止されている
+（つまり，\Param{jaxspmode}~(or \Param{alxspmode})パラメタが2以上）．
+\end{quote}
+  か否かで判断する．
 \end{enumerate}
 \end{description}
 
@@ -9084,9 +9146,8 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 \textit{Nq}が\textsf{和文A}で，\textit{Np}が\textsf{箱}・グルー・カーンのいずれかであった場合，
 両者の間に挿入されるJFMグルーについては同じ処理である．しかし，そこでの行分割に対する仕様が異なるので，
 ペナルティの挿入処理は若干異なったものとなっている．
-
 \begin{itemize}
-\item 「右空白」については，既に述べた\textsf{Boundary-B~[\OB]}により空白を決定しようと試みる．
+\item 「右空白」については，以下に述べる\textsf{Boundary-B~[\OB]}により空白を決定しようと試みる．
 それが失敗した場合は，「右空白」は挿入されない．
 %\item 「左空白」については，既に述べた\textsf{line-end~[E]}の算出方法をそのまま採用する．それに伴う「右空白」の補正も同じ．
 \item 禁則用ペナルティの処理は，後ろのクラスタ\textit{Np}の種類によって異なる．
@@ -9109,6 +9170,12 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 \end{itemize}
 
 \begin{description}
+\item[Boundary-B~{[\OB]}] この処理は\textsf{欧文境界B~[\NB]}と同様であり，
+  $x$が次によって決まることのみが異なる：
+  \begin{itemize}
+    \item \textit{Np}がグルーやカーンのときは，$x=\text{\texttt{'glue'}}$．
+    \item そうでない（\textit{Np}が\textsf{箱}）ときは，$x=\text{\texttt{'jcharbdd'}}$．
+  \end{itemize}
 \item[P-allow~{[PA]}]
 \textit{Nq}と\textit{Np}の間の(a)部分にペナルティがあれば，\textsf{P-normal~[PN]}と同様に，
 それらの各ノードにおいてペナルティ値を$a$だけ増加させる．
@@ -9137,7 +9204,7 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 すぐ上の（\textit{Nq}と\textit{Np}の順序が逆になっている）場合と同じである．
 %が，「左空白」がなくなることにのみ注意．
 \begin{itemize}
-\item 「右空白」については，既に述べた\textsf{Boundary-A~[\OA]}により空白を決定しようと試みる．
+\item 「右空白」については，以下に述べる\textsf{Boundary-A~[\OA]}により空白を決定しようと試みる．
 それが失敗した場合は，「右空白」は挿入されない．
 %\item \textit{Nq}が和文でないので，「左空白」は算出されない．
 \item 禁則用ペナルティの処理は，\textit{Nq}の種類によって異なる．
@@ -9152,12 +9219,21 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 \end{description}
 \end{itemize}
 
+\begin{description}
+\item[Boundary-A~{[\OA]}] この処理は\textsf{欧文境界A~[\NA]}と同様であり，
+  $x$が次によって決まることのみが異なる：
+  \begin{itemize}
+    \item \textit{Nq}がグルーやカーンのときは，$x=\text{\texttt{'glue'}}$．
+    \item そうでない（\textit{Nq}が\textsf{箱}）ときは，$x=\text{\texttt{'jcharbdd'}}$．
+  \end{itemize}
+\end{description}
+
 \paragraph{和文Aと和文Bの違い}
 先に述べたように，\textsf{和文B}はhboxの中身の先頭（or 末尾）として出現している
 \textbf{JAchar}である．リスト内に直接ノードとして現れている\textbf{JAchar}（\textsf{和文A}）との違いは，
 \begin{itemize}
 \item \textsf{和文B}に対しては，JFMの文字クラス指定から定まる空白
-\textsf{JFM-origin~[M]}，\textsf{Boundary-A~[\OA]}，\textsf{Boundary-B~[\OB]}）の挿入は行われない．
+（\textsf{JFM由来[M]}，\textsf{Boundary-A~[\OA]}など）の挿入は行われない．
 %「左空白」の算出も行われない．
 例えば，
 \begin{itemize}
@@ -9180,12 +9256,12 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 あ．A
 \end{LTXexample}
 \begin{itemize}
-\item 1行目の\cs{inhibitglue}は\textsf{Boundary-B~[\OB]}の処理のみを抑止するので，ピリオドと「A」の間には
+\item 1行目の\cs{inhibitglue}は\textsf{欧文境界B~[\NB]}の処理のみを抑止するので，ピリオドと「A」の間には
 \Param{xkanjiskip}（四分アキ）が入ることに注意．
 \item 2行目のピリオドと「A」の間においては，前者が\textsf{和文B}となる（hboxの中身の末尾として登場しているから）ので，
-そもそも\textsf{Boundary-B~[\OB]}の処理は行われない．よって，\Param{xkanjiskip}が入ることとなる．
+そもそも\textsf{欧文境界B~[\NB]}の処理は行われない．よって，\Param{xkanjiskip}が入ることとなる．
 \item 3行目では，ピリオドの属するクラスタは\textsf{和文A}である．これによって，
-ピリオドと「A」の間には\textsf{Boundary-B~[\OB]}由来の半角アキが入ることになる．
+ピリオドと「A」の間には\textsf{欧文境界B~[\NB]}由来の半角アキが入ることになる．
 \end{itemize}
 %</ja>
 

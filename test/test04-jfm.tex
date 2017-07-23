@@ -97,6 +97,7 @@ end}}
   print('======')}\hrule}%
 }
 
+\catcode`_=12
 %\tracingonline=1\tracingoutput=1\showboxdepth=3\showboxbreadth=100
 
 \head{JA--JA (penなし)}
@@ -117,6 +118,10 @@ end}}
 
 \setbox0=\hbox{\rmlh あa}\dumplist0
 
+\setbox0=\hbox{\rmlh あ(}\dumplist0
+
+\setbox0=\hbox{\rmlh あ)}\dumplist0
+
 \setbox0=\hbox{\rmlh いa}\dumplist0
 
 \setbox0=\hbox{\rmlh うa}\dumplist0
@@ -128,6 +133,10 @@ end}}
 \head{EN--JA (penなし)}
 
 \setbox0=\hbox{\rmlh aあ}\dumplist0
+
+\setbox0=\hbox{\rmlh (あ}\dumplist0
+
+\setbox0=\hbox{\rmlh )あ}\dumplist0
 
 \setbox0=\hbox{\rmlh aい}\dumplist0
 

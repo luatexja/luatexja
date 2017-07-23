@@ -162,6 +162,15 @@ function define_jfm(t)
 	 t[i] = nil
       end
    end
+   if t.version<3 then
+      -- In version 3, 'jcharbdd' is divided into 
+      -- 'alchar': ALchar (or math boundary) 
+      -- 'nox_alchar': ALchar (or math boundary), where xkanjiskip won't inserted
+      -- 'glue': glue/kern, 'jcharbdd': other cases (和文B, rule, ...)
+      t.chars.alchar = t.chars.jcharbdd
+      t.chars.nox_alchar = t.chars.jcharbdd
+      t.chars.glue = t.chars.jcharbdd
+   end
    t = luatexbase.call_callback("luatexja.load_jfm", t, jfm_file_name)
    t.size_cache = {}
    defjfm_res = t
