@@ -7,16 +7,20 @@
       \ltj@orig@DeclareFontShape@{#1}{#2}{#3}{#4}{#5}{#6}%
       }
 \makeatother
-\usepackage[noto-otf,deluxe,expert,nfssonly,jis2004, match]{luatexja-preset}
+\usepackage[hiragino-pron,deluxe,expert,jis2004, match,nfssonly]{luatexja-preset}
 \begin{document}
 \makeatletter
 \def\r#1#2{ \csname #1family \endcsname \csname #2series \endcsname
   %\addjfontfeature {CJKShape=JIS1983}
   {\romanfamily{\ttdefault}\selectfont<\k@family><\k@series><\k@shape>}\\
   {\tt#1, #2\ \ \ \ \ }: あーいうえおabc漢字，あ！い，辻ぁが\\
-  {\tt#1, #2 (rb)}: {\rubyfamily あいうえおabc漢字，あ！い，辻ぁが}
+  {\tt#1, #2 (rb)}: {\rubyfamily あーいうえおabc漢字，あ！い，辻ぁが}
 }
 \@namedef{..series}{\relax}
+
+\ifdefined\ltseries
+\r{mc}{lt}
+\fi
 
 \r{mc}{md}
 
@@ -31,7 +35,7 @@
 \r{mg}{md}
 \fi
 
-\ifdefined\gtebfamily
+\ifdefined\ebseries
 \r{gt}{eb}
 \fi
 

@@ -1667,26 +1667,39 @@ This means that \verb+\mcfamily\bfseries+, \verb+\gtfamily\bfseries+ and
 %</ja>
 \item[deluxe]
 %<*en>
-Use \textit{mincho} with two weights (medium~and~bold),
-\textit{gothic} with three weights (medium, bold~and~heavy), and \textit{rounded gothic}%
+Use \textit{mincho} with three weights (light, medium, and~bold),
+\textit{gothic} with three weights (medium, bold, and~heavy), and \textit{rounded gothic}%
 \footnote{Provided by \cs{mgfamily} and \cs{textmg},
-because \textit{rounded gothic} is called \textit{maru gothic} (丸ゴシック) in Japanese.}.
-The heavy weight of \textit{gothic} can be used by ``changing the family'' \cs{gtebfamily},
-or \verb+\textgteb{...}+.
-This is because the \Pkg{fontspec} package can handle only medium (\cs{mdseries}) and
-bold (\cs{bfseries}).
+because ``rounded gothic'' is called \textit{maru gothic} (丸ゴシック) in Japanese.}.
+The light weight of mincho and the heavy weight of gothic can be used by
+\cs{mcfamily}\cs{ltseries}~and~\cs{gtfamily}\cs{ebseries}, respectively.
+
+\begin{itemize}
+ \item Some presets do not have the light weight of mincho.
+  In this case, we substitute the medium weight for the light weight.
+ \item \Pkg{luatexja-preset} does not produce an error (only produces a warning), even if
+  (one of) fonts for \cs{mcfamily}\cs{ltseries}, \cs{gtfamily}\cs{ebseries}, \cs{mgfamily}
+  do not exist.
+\end{itemize}
 %</en>
 %<*ja>
-明朝体2ウェイト・ゴシック体3ウェイトと，
-丸ゴシック体 (\cs{mgfamily}, \verb+\textmg{...}+) を使用可能とする．
-ゴシック体は中字・太字・極太の3ウェイトがあるが，
-極太ゴシック体を使う場合，
+明朝体3ウェイト・ゴシック体3ウェイトと，
+丸ゴシック体 (\cs{mgfamily}, \verb+\textmg{...}+) を利用可能にする．
+明朝体は細字・中字・太字の3ウェイトがあり，
+明朝体の細字は \cs{mcfamily}\cs{ltseries} で利用できる．
+また，ゴシック体は中字・太字・極太の3ウェイトがあり，
+ゴシック体の極太は \cs{gtfamily}\cs{ebseries} で利用できる%
+\footnote{過去との互換性のため，\cs{gtebfamily}, \cs{textgteb\{...\}} も
+ 依然として利用可能である．}．
+
 \begin{itemize}
- \item \cs{gtebfamily}, \verb+\textgteb{...}+
- \item \cs{ebseries} （周囲がゴシック体のとき，\texttt{nfssonly} オプション指定時のみ）
+  \item プリセット設定によっては明朝体細字が用意されていないものもある．その場合は
+  明朝体中字が代用される．
+  \item 明朝体細字，ゴシック体極太，丸ゴシック体の3フォントについては
+  実際にフォントをロードする前に存在するかチェックを行う．
+  存在しなかったものについては警告を発し，
+  それぞれ明朝体中字．ゴシック体太字，ゴシック体太字で代用する．
 \end{itemize}
-のいずれかを用いる．標準で \cs{ebseries} が準備されていないのは，バージョンが古い
-\Pkg{fontspec}では中字(\cs{mdseries})と太字(\cs{bfseries})しか扱えなかった名残である．
 %</ja>
 \item[expert]
 %<*en>
@@ -1784,9 +1797,10 @@ There is not rounded gothic family in Kozuka fonts.
 \toprule
 \bfseries family&\bfseries series&\ttfamily kozuka-pro&\ttfamily kozuka-pr6&\ttfamily kozuka-pr6n\\
 \midrule
+ &light&KozMinPro-Light&KozMinProVI-Light&KozMinPr6N-Light\\
+%<en>\textit{mincho}%
+%<ja>\textgt{明朝}%
  &medium&KozMinPro-Regular&KozMinProVI-Regular&KozMinPr6N-Regular\\
-%<en>\smash{\raisebox{1.5ex}{\textit{mincho}}}%
-%<ja>\smash{\raisebox{1.5ex}{\gt 明朝}}%
  &bold&KozMinPro-Bold&KozMinProVI-Bold&KozMinPr6N-Bold\\
 \midrule
  &&KozGoPro-Regular*&KozGoProVI-Regular*&KozGoPr6N-Regular*\\
@@ -1810,24 +1824,29 @@ There is not rounded gothic family in Kozuka fonts.
  \item[hiragino-pron] Hiragino ProN (Adobe-Japan1-5, JIS04-savvy) fonts.
 
 %<*en>
-Hiragino fonts are bundled with Mac OS~X 10.5 or later.
+Hiragino fonts (except Hiragino~Mincho~W2) are bundled with Mac OS~X 10.5 or later.
 Some editions of a Japanese word-processor ``一太郎2012'' includes Hiragino ProN fonts.
-Note that the heavy weight of \textit{gothic} family only supports
-Adobe-Japan1-3 character collection (Std/StdN).
+Note that the heavy weight of gothic family only supports
+Adobe-Japan1-3 character collection (Std/StdN), while others supports
+Adobe-Japan1-5 character collection.
 %</en>
 %<*ja>
 ヒラギノフォントは，Mac OS~X以外にも，一太郎2012の上位エディションにもバンドルされている．
-極太ゴシックとして用いるヒラギノ角ゴW8は，Adobe-Japan1-3の範囲しかカバーしていない
+極太ゴシック体として用いるヒラギノ角ゴW8は，Adobe-Japan1-3の範囲しかカバーしていない
 Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
+
+なお，明朝体細字として用いるヒラギノ明朝体W2はOS~Xや一太郎にはバンドルされておらず，
+別途購入する必要がある．
 %</ja>
 \begin{center}\small
 \begin{tabular}{clll}
 \toprule
 \bf family&\bf series&\tt hiragino-pro&\tt hiragino-pron\\
 \midrule
+ &light&Hiragino~Mincho~Pro~W2&Hiragino~Mincho~ProN~W2\\
+%<en>\textit{mincho}%
+%<ja>\textgt{明朝}%
  &medium&Hiragino~Mincho~Pro~W3&Hiragino~Mincho~ProN~W3\\
-%<en>\smash{\raisebox{1.5ex}{\textit{mincho}}}%
-%<ja>\smash{\raisebox{1.5ex}{\gt 明朝}}%
  &bold&Hiragino~Mincho~Pro~W6&Hiragino~Mincho~ProN~W6\\
 \midrule
  &&Hiragino~Kaku~Gothic~Pro~W3*&Hiragino~Kaku~Gothic~ProN~W3*\\
@@ -1884,9 +1903,10 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \toprule
 \bf family&\bf series&\texttt{yu-win}&\texttt{yu-win10}&\texttt{yu-osx}\\
 \midrule
+ &light&YuMincho-Light&YuMincho-Light&(YuMincho~Medium)\\
+%<en>\textit{mincho}%
+%<ja>\textgt{明朝}%
  &medium&YuMincho-Regular&YuMincho-Regular&YuMincho~Medium\\
-%<en>\smash{\raisebox{1.5ex}{\textit{mincho}}}%
-%<ja>\smash{\raisebox{1.5ex}{\gt 明朝}}%
  &bold&YuMincho-Demibold&YuMincho-Demibold&YuMincho~Demibold\\
 \midrule
  &&YuGothic-Regular*&YuGothic-Regular*&YuGothic~Medium*\\
@@ -1973,9 +1993,10 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \toprule
 \bf family&\bf series&\texttt{sourcehan}&\texttt{sourcehan-jp}\\
 \midrule
+ &light&\AD{Serif}{Light}\\
+%<en>\textit{mincho}%
+%<ja>\textgt{明朝}%
  &medium&\AD{Serif}{Regular}\\
-%<en>\smash{\raisebox{1.5ex}{\textit{mincho}}}%
-%<ja>\smash{\raisebox{1.5ex}{\gt 明朝}}%
  &bold&\AD{Serif}{Bold}\\
 \midrule
  &&\AD{Sans}{Regular*}\\
@@ -2004,9 +2025,10 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \toprule
 \bf family&\bf series&\texttt{noto-otc}&\texttt{noto-otf}\\
 \midrule
+ &light&\AD{Serif}{Light}\\
+%<en>\textit{mincho}%
+%<ja>\textgt{明朝}%
  &medium&\AD{Serif}{Regular}\\
-%<en>\smash{\raisebox{1.5ex}{\textit{mincho}}}%
-%<ja>\smash{\raisebox{1.5ex}{\gt 明朝}}%
  &bold&\AD{Serif}{Bold}\\
 \midrule
  &&\AD{Sans}{Regular*}\\
