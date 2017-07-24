@@ -1,14 +1,14 @@
-\input luatexja-core.sty
+\documentclass{article}
+\usepackage{luatexja,ltj-warichu,ltj-warichufnt}
 \showboxbreadth=999
 \showboxdepth=999
 \jfont\Song={name:HanaMinA:jfm=ujis} at 16pt
 \jfont\smallSong={name:HanaMinA:jfm=ujis} at 7pt
-\input ltj-warichu.sty
-\input ltj-warichufnt.sty
+\makeatletter
 \zmh@depth=8pt
 \guji@everytwolinemode={\smallSong\baselineskip=8pt\zmh@depth=4pt}
 \guji@twolineraise=0pt
-
+\begin{document}
 \Song
 
 \guji
@@ -16,4 +16,5 @@
 
 陳仲舉言爲士則，行爲世範，登車攬轡，有澄清天下之志。|{汝南先賢傳曰：「陳蕃字仲舉，汝南平輿人。有室，荒蕪不埽除，曰：『大丈夫當爲國家埽天下。』值漢桓之末，閹豎用事，外戚豪橫。及拜太傅，與大將軍竇武謀誅宦官，反爲所害。」}爲豫章太守，|{海內先賢傳曰：「蕃爲尚書，以忠正忤貴戚，不得在臺，遷豫章太守。」}至，便問徐孺子所在，欲先看之。|{謝承後漢書曰：「徐穉字孺子，豫章南昌人。清妙高跱，超世絕俗。前後爲諸公所辟，雖不就，及其死，萬里赴弔。常豫炙雞一隻，以綿漬酒中，㬥乾以裹雞，徑到所赴冢隧外，以水漬綿，斗米飯，白茅爲藉，以雞置前。酹酒畢，留謁即去，不見喪主。」}主簿白：「羣情欲府君先入廨。」陳曰：「武王式商容之閭，席不暇煗。|{許叔重曰：「商容，殷之賢人，老子師也。」車上跽曰式。}吾之禮賢，有何不可！」|{袁宏漢紀曰：「蕃在豫章，爲穉獨設⼀榻，去則懸之，見禮如此。」}
 \endguji
-\bye
+\end{document}
+

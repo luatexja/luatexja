@@ -156,6 +156,7 @@
 \guji@everycommand={\parindent=2em\indent}
 \def\guji{%
   \begingroup
+  \ifdefined\eh@everypar\let\everypar\eh@everypar\fi% temporary disable everyhook package
   \everypar{\guji@iterate}%
   \everyvbox{\everypar{}}%
   \guji@hsize=\hsize
@@ -558,7 +559,7 @@
               \unhbox\guji@tmpbox
             \else
               \advance\guji@hoffset by \wd\guji@tmpbox
-              \unhbox\guji@tmpbox
+              \unhbox\guji@tmpbox\relax
             \fi
           \fi
         \fi
