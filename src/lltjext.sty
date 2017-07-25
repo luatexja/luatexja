@@ -191,7 +191,7 @@
       \let\@begin@alignbox\vcenter
       \let\@end@alignbox\relax
     \fi\fi
-  \else
+  \else\ifx\box@dir\tate
     \if #2t\relax
        \let\@begin@alignbox\vtop
        \let\@end@alignbox\relax
@@ -202,7 +202,20 @@
        \let\@begin@alignbox\vcenter
        \let\@end@alignbox\relax
     \fi\fi
-  \fi\fi
+  \else % utod
+    \if #2t\relax
+       \def\@begin@alignbox{\lower\dimexpr
+	 \ltjgetparameter{talbaselineshift}-\ltjgetparameter{yalbaselineshift}\vtop}
+       \let\@end@alignbox\relax
+    \else\if #2b\relax
+       \def\@begin@alignbox{\lower\dimexpr
+	 \ltjgetparameter{talbaselineshift}-\ltjgetparameter{yalbaselineshift}\vbox}
+       \let\@end@alignbox\relax
+    \else
+       \let\@begin@alignbox\vcenter
+       \let\@end@alignbox\relax
+    \fi\fi
+  \fi\fi\fi
 \fi\fi%
 }
 
@@ -566,6 +579,21 @@
         \def\@end@parbox{\m@th$\null}%
       \fi
     \fi\fi
+  \else\ifx\box@dir\tate
+    \if #2t\relax
+       \let\@begin@parbox\vtop
+       \let\@end@parbox\relax
+    \else\if #2b\relax
+       \let\@begin@parbox\vbox
+       \let\@end@parbox\relax
+    \else
+      \ifmmode
+        \let\@begin@parbox\vcenter\let\@end@parbox\relax
+      \else
+        \def\@begin@parbox{\null$\vcenter}%
+        \def\@end@parbox{\m@th$\null}%
+      \fi
+    \fi\fi
   \else\ifx\box@dir\dtou % 180 度回転→vtop, vbox を入れ替える
     \if #2t\relax
       \let\@begin@parbox\vbox %%% !!!
@@ -581,13 +609,13 @@
         \def\@end@parbox{\m@th$\null}%
       \fi
     \fi\fi
-  \else
+  \else % \utod
     \if #2t\relax
-       \let\@begin@parbox\vtop
-       \let\@end@parbox\relax
+      \def\@begin@parbox{\raise\cht\vtop\bgroup\kern\z@\vtop}%
+      \let\@end@parbox\egroup
     \else\if #2b\relax
-       \let\@begin@parbox\vbox
-       \let\@end@parbox\relax
+      \def\@begin@parbox{\lower\cdp\vbox\bgroup\kern\z@\vbox}%
+      \let\@end@parbox\egroup
     \else
       \ifmmode
         \let\@begin@parbox\vcenter\let\@end@parbox\relax
@@ -596,7 +624,7 @@
         \def\@end@parbox{\m@th$\null}%
       \fi
     \fi\fi
-  \fi\fi
+  \fi\fi\fi
 \fi\fi%
 }
 
