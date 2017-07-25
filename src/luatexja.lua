@@ -177,18 +177,23 @@ end
 
 -- EXT: print parameters that don't need arguments
 do
+   local tex_getattr = tex.getattribute
+   local function getattr(a)
+      local r = tex.getattribute(a)
+      return (r==-0x7FFFFFFF) and 0 or r
+   end 
    luatexja.unary_pars = {
       yalbaselineshift = function(t)
-	 return print_scaled(tex.getattribute('ltj@yablshift'))..'pt'
+	 return print_scaled(getattr('ltj@yablshift'))..'pt'
       end,
       yjabaselineshift = function(t)
-	 return print_scaled(tex.getattribute('ltj@ykblshift'))..'pt'
+	 return print_scaled(getattr('ltj@ykblshift'))..'pt'
       end,
       talbaselineshift = function(t)
-	 return print_scaled(tex.getattribute('ltj@tablshift'))..'pt'
+	 return print_scaled(getattr('ltj@tablshift'))..'pt'
       end,
       tjabaselineshift = function(t)
-	 return print_scaled(tex.getattribute('ltj@tkblshift'))..'pt'
+	 return print_scaled(getattr('ltj@tkblshift'))..'pt'
       end,
       kanjiskip = function(t)
 	 return print_spec(ltjs.get_stack_skip(stack_table_index.KSK, t))
@@ -200,10 +205,10 @@ do
 	 return ltjs.get_stack_table(stack_table_index.JWP, 0, t)
       end,
       autospacing = function(t)
-	 return tex.getattribute('ltj@autospc')
+	 return getattr('ltj@autospc')
       end,
       autoxspacing = function(t)
-	 return tex.getattribute('ltj@autoxspc')
+	 return getattr('ltj@autoxspc')
       end,
       differentjfm = function(t)
 	 local f, r = luatexja.jfmglue.diffmet_rule, '???'

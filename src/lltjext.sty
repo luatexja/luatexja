@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjext}[2017/07/17 v1.2g-ltj-6 Macros for vertical writing]
+\ProvidesPackage{lltjext}[2017/07/26 v1.2g-ltj-7 Macros for vertical writing]
 \RequirePackage{luatexja}
 \newcount\ltj@ext@dir
 {\catcode`\*=11
@@ -389,12 +389,15 @@
       \def\@end@parbox{\m@th$\null}%
     \fi
   \fi\fi}
+\def\lltjext@getjablshift{%
+  \ifnum\ltj@ext@dir=3 \ltjgetparameter{tjabaselineshift}\else
+  \ltjgetparameter{yjabaselineshift}\fi}
 \def\fork@parbox@option@@B#1{%
   \if #1t\relax
-    \def\@begin@parbox{\raise\cht\vtop\bgroup\kern\z@\vbox}%
+    \def\@begin@parbox{\raise\dimexpr\cht-\lltjext@getjablshift\vtop\bgroup\kern\z@\vbox}%
     \let\@end@parbox\egroup
   \else\if #1b\relax
-    \def\@begin@parbox{\lower\cdp\vbox\bgroup\vbox}%
+    \def\@begin@parbox{\lower\dimexpr\cdp+\lltjext@getjablshift\vbox\bgroup\vbox}%
     \def\@end@parbox{\kern\z@\egroup}%
   \else
     \ifmmode
@@ -720,7 +723,7 @@
 
 %%%%%%%%%%%%%%%% LuaTeX-ja original
 
-\define@key[ltj]{japaram}{autouprightnum}{%      %COUNT
-  \ltj@@set@stack{AURN}{0}{10000}\z@#1 }
+%%\define@key[ltj]{japaram}{autouprightnum}{%      %COUNT
+%%  \ltj@@set@stack{AURN}{0}{10000}\z@#1 }
 
 \endinput
