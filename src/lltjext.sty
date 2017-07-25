@@ -75,149 +75,86 @@
 \def\endarray{\crcr\egroup\egroup\@end@alignbox}
 \def\endtabular{\endarray$\egroup}
 \expandafter \let \csname endtabular*\endcsname = \endtabular
-% コミュニティ版では、アスキー版で不自然だった表組（array環境およびtabular環境）と
-% 周囲の本文との揃え位置を修正し、以下のように設計しました。
-% \begin{itemize}
-% \item 周囲の組方向が横組かつ組方向が|<y>|, |<z>|指定の場合
-% \begin{itemize}
-%   \item |[t]|指定のとき\\一行目のベースラインが周囲のそれと一致（罫線の場合は和文ベースラインの位置）
-%   \item |[c]|指定のとき\\表組の中心が周囲の数式軸を通る（欧文ベースラインシフトの影響下）
-%   \item |[b]|指定のとき\\最終行のベースラインが周囲のそれと一致（罫線の場合は和文ベースラインの位置）
-% \end{itemize}
-% \item 周囲の組方向が横組かつ組方向が|<t>|指定の場合
-% \begin{itemize}
-%   \item |[t]|指定のとき\\表組の上端が周囲の和文ベースラインと一致
-%   \item |[c]|指定のとき\\表組の中心が周囲の数式軸を通る（欧文ベースラインシフトの影響下）
-%   \item |[b]|指定のとき\\表組の下端が周囲の和文ベースラインと一致
-% \end{itemize}
-% \item 周囲の組方向が縦組かつ組方向が|<y>|指定の場合
-% \begin{itemize}
-%   \item |[t]|指定のとき\\表組の上端が周囲の和文ベースラインと一致
-%   \item |[c]|指定のとき\\表組の中心が周囲の数式軸を通る（欧文ベースラインシフトの影響下）
-%   \item |[b]|指定のとき\\表組の下端が周囲の和文ベースラインと一致
-% \end{itemize}
-% \item 周囲の組方向が縦組かつ組方向が|<t>|指定の場合
-% \begin{itemize}
-%   \item |[t]|指定のとき\\一行目のベースラインが周囲のそれと一致（罫線の場合は和文ベースラインの位置）
-%   \item |[c]|指定のとき\\表組の中心が周囲の数式軸を通る（欧文ベースラインシフトの影響下）
-%   \item |[b]|指定のとき\\最終行のベースラインが周囲のそれと一致（罫線の場合は和文ベースラインの位置）
-% \end{itemize}
-% \item 周囲の組方向が縦組かつ組方向が|<z>|指定の場合
-% \begin{itemize}
-%   \item |[t]|指定のとき\\一行目の欧文ベースラインが周囲のそれと一致
-%   \item |[c]|指定のとき\\表組の中心が周囲の数式軸を通る（欧文ベースラインシフトの影響下）
-%   \item |[b]|指定のとき\\最終行の欧文ベースラインが周囲のそれと一致
-% \end{itemize}
+% ↓中身＼周囲→　yoko  tate  utod  dtou
+% yoko          A*    B*    B     B
+% tate          B*    A*    D     C
+% utod          B     D*    A     C
+% dtou          B     C     C     A
+% A: 周囲と中身の組方向が一致．そのまま \vtop/\vcenter/\vbox
+% B: 周囲と中身が90度ずれ．上端/下端がベースラインに揃うように
+% C: 周囲と中身が180度ずれ．\vtop, \vbox 入れ替え
+% D: 欧文ベースライン同士を揃えるようにする
+
+\def\fork@array@option@@A#1{%
+  \let\@end@alignbox\relax
+  \if #1t\relax     \let\@begin@alignbox\vtop
+  \else\if #1b\relax\let\@begin@alignbox\vbox
+  \else             \let\@begin@alignbox\vcenter
+  \fi\fi}
+\def\fork@array@option@@B#1{%
+  \if #1t\relax
+    \def\@begin@alignbox{\vtop\bgroup\kern\z@\vbox}%
+    \let\@end@alignbox\egroup
+  \else\if #1b\relax
+    \def\@begin@alignbox{\vbox\bgroup\vbox}%
+    \def\@end@alignbox{\kern\z@\egroup}%
+  \else
+    \let\@begin@alignbox\vcenter
+    \let\@end@alignbox\relax
+  \fi\fi}
+\def\fork@array@option@@C#1{%
+  \let\@end@alignbox\relax
+  \if #1t\relax     \let\@begin@alignbox\vbox
+  \else\if #1b\relax\let\@begin@alignbox\vtop
+  \else             \let\@begin@alignbox\vcenter
+  \fi\fi}
 \def\fork@array@option<#1>[#2]{%
-\ifnum\ltjgetparameter{direction}=4 % yoko
-  \ifx\box@dir\yoko
-    \if #2t\relax
-       \let\@begin@alignbox\vtop
-       \let\@end@alignbox\relax
-    \else\if #2b\relax
-       \let\@begin@alignbox\vbox
-       \let\@end@alignbox\relax
-    \else
-       \let\@begin@alignbox\vcenter
-       \let\@end@alignbox\relax
-    \fi\fi
+\ifnum\ltj@ext@dir=4 % yoko
+  \ifx\box@dir\yoko      \fork@array@option@@A{#2}%
+  \else                  \fork@array@option@@B{#2}%
+  \fi
+\else\ifnum\ltj@ext@dir=1 % dtou
+  \ifx\box@dir\yoko      \fork@array@option@@B{#2}%
+  \else\ifx\box@dir\dtou \fork@array@option@@A{#2}%
+  \else                  \fork@array@option@@C{#2}%
+  \fi\fi
+\else\ifnum\ltj@ext@dir=3 % tate
+  \ifx\box@dir\yoko      \fork@array@option@@B{#2}%
+  \else\ifx\box@dir\tate \fork@array@option@@A{#2}%
+  \else\ifx\box@dir\dtou \fork@array@option@@C{#2}%
   \else
     \if #2t\relax
-       \def\@begin@alignbox{\vtop\bgroup\kern\z@\vbox}%
-       \let\@end@alignbox\egroup
-    \else\if #2b\relax
-       \def\@begin@alignbox{\vbox\bgroup\vbox}%
-       \def\@end@alignbox{\kern\z@\egroup}%
-    \else
-       \let\@begin@alignbox\vcenter
-       \let\@end@alignbox\relax
-    \fi\fi
-  \fi
-\else\ifnum\ltjgetparameter{direction}=1 % dtou
-  \ifx\box@dir\yoko
-    \if #2t\relax
-       \def\@begin@alignbox{\vtop\bgroup\kern\z@\vbox}%
-       \let\@end@alignbox\egroup
-    \else\if #2b\relax
-       \def\@begin@alignbox{\vbox\bgroup\vbox}%
-       \def\@end@alignbox{\kern\z@\egroup}%
-    \else
-      \let\@begin@alignbox\vcenter
-        \let\@end@alignbox\relax
-    \fi\fi
-  \else\ifx\box@dir\dtou
-    \if #2t\relax
-       \let\@begin@alignbox\vtop
-       \let\@end@alignbox\relax
-    \else\if #2b\relax
-       \let\@begin@alignbox\vbox
-       \let\@end@alignbox\relax
-    \else
-       \let\@begin@alignbox\vcenter
-       \let\@end@alignbox\relax
-    \fi\fi
-  \else % 180 度回転→vtop, vbox を入れ替える
-    \if #2t\relax
-       \let\@begin@alignbox\vbox %%% !!!
-       \let\@end@alignbox\relax
-    \else\if #2b\relax
-       \let\@begin@alignbox\vtop %%% !!!
-       \let\@end@alignbox\relax
-    \else
-       \let\@begin@alignbox\vcenter
-       \let\@end@alignbox\relax
-    \fi\fi
-  \fi\fi
-\else % tate, utod
-  \ifx\box@dir\yoko
-    \if #2t\relax
-      \def\@begin@alignbox{\vtop\bgroup\kern\z@\vbox}%
-      \let\@end@alignbox\egroup
-    \else\if #2b\relax
-      \def\@begin@alignbox{\vbox\bgroup\vbox}%
-      \def\@end@alignbox{\kern\z@\egroup}%
-    \else
-      \let\@begin@alignbox\vcenter
-      \let\@end@alignbox\relax
-    \fi\fi
-  \else\ifx\box@dir\dtou % 180 度回転→vtop, vbox を入れ替える
-    \if #2t\relax
-      \let\@begin@alignbox\vbox %%% !!!
+      \def\@begin@alignbox{\lower\dimexpr
+         \ltjgetparameter{talbaselineshift}-\ltjgetparameter{yalbaselineshift}\vtop}
       \let\@end@alignbox\relax
     \else\if #2b\relax
-      \let\@begin@alignbox\vtop %%% !!!
+      \def\@begin@alignbox{\lower\dimexpr
+         \ltjgetparameter{talbaselineshift}-\ltjgetparameter{yalbaselineshift}\vbox}
       \let\@end@alignbox\relax
     \else
       \let\@begin@alignbox\vcenter
       \let\@end@alignbox\relax
-    \fi\fi
-  \else\ifx\box@dir\tate
-    \if #2t\relax
-       \let\@begin@alignbox\vtop
-       \let\@end@alignbox\relax
-    \else\if #2b\relax
-       \let\@begin@alignbox\vbox
-       \let\@end@alignbox\relax
-    \else
-       \let\@begin@alignbox\vcenter
-       \let\@end@alignbox\relax
-    \fi\fi
-  \else % utod
-    \if #2t\relax
-       \def\@begin@alignbox{\lower\dimexpr
-	 \ltjgetparameter{talbaselineshift}-\ltjgetparameter{yalbaselineshift}\vtop}
-       \let\@end@alignbox\relax
-    \else\if #2b\relax
-       \def\@begin@alignbox{\lower\dimexpr
-	 \ltjgetparameter{talbaselineshift}-\ltjgetparameter{yalbaselineshift}\vbox}
-       \let\@end@alignbox\relax
-    \else
-       \let\@begin@alignbox\vcenter
-       \let\@end@alignbox\relax
     \fi\fi
   \fi\fi\fi
-\fi\fi%
-}
+\else % utod
+  \ifx\box@dir\yoko      \fork@array@option@@B{#2}%
+  \else\ifx\box@dir\utod \fork@array@option@@A{#2}%
+  \else\ifx\box@dir\dtou \fork@array@option@@C{#2}%
+  \else
+    \if #2t\relax
+      \def\@begin@alignbox{\lower\dimexpr
+         \ltjgetparameter{yalbaselineshift}-\ltjgetparameter{talbaselineshift}\vtop}
+      \let\@end@alignbox\relax
+    \else\if #2b\relax
+      \def\@begin@alignbox{\lower\dimexpr
+         \ltjgetparameter{yalbaselineshift}-\ltjgetparameter{talbaselineshift}\vbox}
+      \let\@end@alignbox\relax
+    \else
+      \let\@begin@alignbox\vcenter
+      \let\@end@alignbox\relax
+    \fi\fi
+  \fi\fi\fi
+\fi\fi\fi}
 
 %%% caption
 \newbox\@floatbox
@@ -428,45 +365,50 @@
        \let\hss\vss\let\unhbox\unvbox
        \csname bm@#4\endcsname}\@end@parbox
   \@end@tempboxa}
-% コミュニティ版では、アスキー版で不自然だった|\parbox|の箱と
-% 周囲の本文との揃え位置を修正し、以下のように設計しました。
-% \begin{itemize}
-% \item 周囲の組方向が横組かつ組方向が|<y>|, |<z>|指定の場合
-% \begin{itemize}
-%   \item |[t]|指定のとき\\一行目のベースラインが周囲のそれと一致
-%   \item |[c]|指定のとき\\箱の中心が周囲の数式軸を通る（欧文ベースラインシフトの影響下）
-%   \item |[b]|指定のとき\\最終行のベースラインが周囲のそれと一致
-% \end{itemize}
-% \item 周囲の組方向が横組かつ組方向が|<t>|指定の場合
-% \begin{itemize}
-%   \item |[t]|指定のとき\\箱の上端が周囲の和文文字の高さと一致
-%   \item |[c]|指定のとき\\箱の中心が周囲の数式軸を通る（欧文ベースラインシフトの影響下）
-%   \item |[b]|指定のとき\\箱の下端が周囲の和文文字の深さと一致
-% \end{itemize}
-% \item 周囲の組方向が縦組かつ組方向が|<y>|指定の場合
-% \begin{itemize}
-%   \item |[t]|指定のとき\\箱の上端が周囲の和文文字の高さと一致
-%   \item |[c]|指定のとき\\箱の中心が周囲の数式軸を通る（欧文ベースラインシフトの影響下）
-%   \item |[b]|指定のとき\\箱の下端が周囲の和文文字の深さと一致
-% \end{itemize}
-% \item 周囲の組方向が縦組かつ組方向が|<t>|指定の場合
-% \begin{itemize}
-%   \item |[t]|指定のとき\\一行目のベースラインが周囲のそれと一致
-%   \item |[c]|指定のとき\\箱の中心が周囲の数式軸を通る（欧文ベースラインシフトの影響下）
-%   \item |[b]|指定のとき\\最終行のベースラインが周囲のそれと一致
-% \end{itemize}
-% \item 周囲の組方向が縦組かつ組方向が|<z>|指定の場合
-%  [TODO] 未定！
-%^^A \begin{itemize}
-%^^A   \item |[t]|指定のとき\\箱の上端が周囲の和文ベースラインと一致
-%^^A   \item |[c]|指定のとき\\箱の中心が周囲の数式軸を通る（欧文ベースラインシフトの影響下）
-%^^A   \item |[b]|指定のとき\\箱の下端が周囲の和文ベースラインと一致
-%^^A \end{itemize}
-% \end{itemize}
+
+
+% ↓中身＼周囲→　yoko  tate  utod  dtou
+% yoko          A*    B*    B     B
+% tate          B*    A*    D     C
+% utod          B     D*    A     C
+% dtou          B     C     C     A
+% A: 周囲と中身の組方向が一致．そのまま \vtop/\vcenter/\vbox
+% B: 周囲と中身が90度ずれ．上端が和文の高さ or 下端が和文の深さに揃うように
+% C: 周囲と中身が180度ずれ．（コードは B のものを流用）
+% D: 上端が和文の高さ or 下端が和文の深さに揃うように（コードは B のものを流用）
+
+\def\fork@parbox@option@@A#1{%
+  \let\@end@parbox\relax
+  \if #1t\relax     \let\@begin@parbox\vtop
+  \else\if #1b\relax\let\@begin@parbox\vbox
+  \else
+    \ifmmode
+      \let\@begin@parbox\vcenter\let\@end@parbox\relax
+    \else
+      \def\@begin@parbox{\null$\vcenter}%
+      \def\@end@parbox{\m@th$\null}%
+    \fi
+  \fi\fi}
+\def\fork@parbox@option@@B#1{%
+  \if #1t\relax
+    \def\@begin@parbox{\raise\cht\vtop\bgroup\kern\z@\vbox}%
+    \let\@end@parbox\egroup
+  \else\if #1b\relax
+    \def\@begin@parbox{\lower\cdp\vbox\bgroup\vbox}%
+    \def\@end@parbox{\kern\z@\egroup}%
+  \else
+    \ifmmode
+      \let\@begin@parbox\vcenter\let\@end@parbox\relax
+    \else
+      \def\@begin@parbox{\null$\vcenter}%
+      \def\@end@parbox{\m@th$\null}%
+    \fi
+  \fi\fi}
+\let\fork@parbox@option@@C=\fork@parbox@option@@B
 \def\fork@parbox@option<#1>[#2]{%
-  \let\box@dir\relax
+  \let\box@dir\relax \ltj@ext@dir=\ltjgetparameter{direction}\relax
   \if #1z\relax
-    \ifnum\ltjgetparameter{direction}=3\relax
+    \ifnum\ltj@ext@dir=3\relax
       \let\box@dir\utod
     \fi
   \else
@@ -477,156 +419,35 @@
     \fi\fi\fi\fi
   \fi
   \ifx\box@dir\relax
-    \ifcase\ltjgetparameter{direction}\relax
+    \ifcase\ltj@ext@dir
        \or   \let\box@dir\dtou
        \or\or\let\box@dir\tate
        \or   \let\box@dir\yoko
        \else \let\box@dir\utod
     \fi
   \fi
-\ifnum\ltjgetparameter{direction}=4 % yoko
-  \ifx\box@dir\yoko
-    \if #2t\relax
-       \let\@begin@parbox\vtop
-       \let\@end@parbox\relax
-    \else\if #2b\relax
-       \let\@begin@parbox\vbox
-       \let\@end@parbox\relax
-    \else
-      \ifmmode
-        \let\@begin@parbox\vcenter\let\@end@parbox\relax
-      \else
-        \def\@begin@parbox{\null$\vcenter}%
-        \def\@end@parbox{\m@th$\null}%
-      \fi
-    \fi\fi
-  \else
-    \if #2t\relax
-       \def\@begin@parbox{\raise\cht\vtop\bgroup\kern\z@\vbox}%
-       \let\@end@parbox\egroup
-    \else\if #2b\relax
-       \def\@begin@parbox{\lower\cdp\vbox\bgroup\vbox}%
-       \def\@end@parbox{\kern\z@\egroup}%
-    \else
-      \ifmmode
-        \let\@begin@parbox\vcenter\let\@end@parbox\relax
-      \else
-        \def\@begin@parbox{\null$\vcenter}%
-        \def\@end@parbox{\m@th$\null}%
-      \fi
-    \fi\fi
+\ifnum\ltj@ext@dir=4 % yoko
+  \ifx\box@dir\yoko      \fork@parbox@option@@A{#2}%
+  \else                  \fork@parbox@option@@B{#2}%
   \fi
-\else\ifnum\ltjgetparameter{direction}=1 % dtou
-  \ifx\box@dir\yoko
-    \if #2t\relax
-       \def\@begin@parbox{\raise\cht\vtop\bgroup\kern\z@\vbox}%
-       \let\@end@parbox\egroup
-    \else\if #2b\relax
-       \def\@begin@parbox{\lower\cdp\vbox\bgroup\vbox}%
-       \def\@end@parbox{\kern\z@\egroup}%
-    \else
-      \ifmmode
-        \let\@begin@parbox\vcenter\let\@end@parbox\relax
-      \else
-        \def\@begin@parbox{\null$\vcenter}%
-        \def\@end@parbox{\m@th$\null}%
-      \fi
-    \fi\fi
-  \else\ifx\box@dir\dtou
-    \if #2t\relax
-       \let\@begin@parbox\vtop
-       \let\@end@parbox\relax
-    \else\if #2b\relax
-       \let\@begin@parbox\vbox
-       \let\@end@parbox\relax
-    \else
-      \ifmmode
-        \let\@begin@parbox\vcenter\let\@end@parbox\relax
-      \else
-        \def\@begin@parbox{\null$\vcenter}%
-        \def\@end@parbox{\m@th$\null}%
-      \fi
-    \fi\fi
-  \else % 180 度回転→vtop, vbox を入れ替える
-    \if #2t\relax
-       \let\@begin@parbox\vbox %%% !!!
-       \let\@end@parbox\relax
-    \else\if #2b\relax
-       \let\@begin@parbox\vtop %%% !!!
-       \let\@end@parbox\relax
-    \else
-      \ifmmode
-        \let\@begin@parbox\vcenter\let\@end@parbox\relax
-      \else
-        \def\@begin@parbox{\null$\vcenter}%
-        \def\@end@parbox{\m@th$\null}%
-      \fi
-    \fi\fi
+\else\ifnum\ltj@ext@dir=1 % dtou
+  \ifx\box@dir\yoko      \fork@parbox@option@@B{#2}%
+  \else\ifx\box@dir\dtou \fork@parbox@option@@A{#2}%
+  \else                  \fork@parbox@option@@C{#2}%
   \fi\fi
-\else % tate, utod
-  \ifx\box@dir\yoko
-    \if #2t\relax
-      \def\@begin@parbox{\raise\cht\vtop\bgroup\kern\z@\vbox}%
-      \let\@end@parbox\egroup
-    \else\if #2b\relax
-      \def\@begin@parbox{\lower\cdp\vbox\bgroup\vbox}%
-      \def\@end@parbox{\kern\z@\egroup}%
-    \else
-      \ifmmode
-        \let\@begin@parbox\vcenter\let\@end@parbox\relax
-      \else
-        \def\@begin@parbox{\null$\vcenter}%
-        \def\@end@parbox{\m@th$\null}%
-      \fi
-    \fi\fi
-  \else\ifx\box@dir\tate
-    \if #2t\relax
-       \let\@begin@parbox\vtop
-       \let\@end@parbox\relax
-    \else\if #2b\relax
-       \let\@begin@parbox\vbox
-       \let\@end@parbox\relax
-    \else
-      \ifmmode
-        \let\@begin@parbox\vcenter\let\@end@parbox\relax
-      \else
-        \def\@begin@parbox{\null$\vcenter}%
-        \def\@end@parbox{\m@th$\null}%
-      \fi
-    \fi\fi
-  \else\ifx\box@dir\dtou % 180 度回転→vtop, vbox を入れ替える
-    \if #2t\relax
-      \let\@begin@parbox\vbox %%% !!!
-      \let\@end@parbox\relax
-    \else\if #2b\relax
-      \let\@begin@parbox\vtop %%% !!!
-      \let\@end@parbox\relax
-    \else
-      \ifmmode
-        \let\@begin@parbox\vcenter\let\@end@parbox\relax
-      \else
-        \def\@begin@parbox{\null$\vcenter}%
-        \def\@end@parbox{\m@th$\null}%
-      \fi
-    \fi\fi
-  \else % \utod
-    \if #2t\relax
-      \def\@begin@parbox{\raise\cht\vtop\bgroup\kern\z@\vtop}%
-      \let\@end@parbox\egroup
-    \else\if #2b\relax
-      \def\@begin@parbox{\lower\cdp\vbox\bgroup\kern\z@\vbox}%
-      \let\@end@parbox\egroup
-    \else
-      \ifmmode
-        \let\@begin@parbox\vcenter\let\@end@parbox\relax
-      \else
-        \def\@begin@parbox{\null$\vcenter}%
-        \def\@end@parbox{\m@th$\null}%
-      \fi
-    \fi\fi
+\else\ifnum\ltj@ext@dir=3 % tate
+  \ifx\box@dir\yoko      \fork@parbox@option@@B{#2}%
+  \else\ifx\box@dir\tate \fork@parbox@option@@A{#2}%
+  \else\ifx\box@dir\dtou \fork@parbox@option@@C{#2}%
+  \else                  \fork@parbox@option@@B{#2}% D
   \fi\fi\fi
-\fi\fi%
-}
+\else % utod
+  \ifx\box@dir\yoko      \fork@parbox@option@@B{#2}%
+  \else\ifx\box@dir\utod \fork@parbox@option@@A{#2}%
+  \else\ifx\box@dir\dtou \fork@parbox@option@@C{#2}%
+  \else                  \fork@parbox@option@@B{#2}% D
+  \fi\fi\fi
+\fi\fi\fi}
 
 %%% pbox
 \DeclareRobustCommand\pbox{\leavevmode\@ifnextchar<{\X@makePbox}{\X@makePbox<Z>}}
