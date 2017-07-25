@@ -7466,27 +7466,15 @@ among the line-head form, the line-middle form, and the line-end form.
 \texttt{<z>}\ の他に\ \texttt{<d>}（dtou方向），\texttt{<u>}（utod方向）を追加した．
 \texttt{<z>} と \texttt{<u>} の違いは，\texttt{<z>} が（\Pkg{plext} パッケージと同様に）
 周囲の組方向が縦組のときにしか意味を持たない
-       のに対し，\texttt{<u>} にはそのような制限がないことである．
-
- \item \Pkg{plext} パッケージでは，表組（\texttt{tabular} 環境，\texttt{align} 環境等）や
-\texttt{minipage} 環境，\cs{parbox} 命令において，
-垂直位置指定 \texttt{[t]},~\texttt{[b]} の挙動が非読み込み時と微妙に変わることがあった．
-
-\Pkg{lltjext} パッケージでは，垂直位置指定が\LaTeXe と同様の挙動（以下に示す）に
-なるように修正した．
-\begin{itemize}
- \item \texttt{[t]} オプション指定時は，ボックスのベースラインが中身の1行目のベースライン
-       （1行目の上に罫線などが来た時は，ボックスの上端）に一致するように配置する．
- \item \texttt{[b]} オプション指定時は，ボックスのベースラインが中身の最終行のベースライン
-       （中身の最後が罫線などの時は，ボックスの下端）に一致するように配置する．
- \item それ以外のときは，ボックスの中央が「数式の軸」に一致するように配置する．
-\end{itemize}
-
+  \footnote{%
+    周囲の組方向が縦組以外のときは，\texttt{<z>} を指定しても中身の組方向は周囲の組方向と変わらない．
+  }%
+のに対し，\texttt{<u>} にはそのような制限がないことである．
  \item 連数字用命令 \cs{rensuji} における位置合わせオプション \texttt{[l]}, \texttt{[c]},
        \texttt{[r]} の挙動を若干変更した．
-
 \end{itemize}
 }
+
 %</ja>
 %<*en>
 \subsection{\texttt{lltjext.sty}}
@@ -7524,7 +7512,7 @@ counterpart of the \Pkg{plext} package.
 その際，中身は<pos>の値に従い，左寄せ(\texttt{l})，右揃え(\texttt{r})，
 中央揃え（それ以外）される．
 \item[picture環境]
-図表作成に用いる \texttt{picture} 環境も，
+図表作成に用いる\texttt{picture}環境も，
 \begin{lstlisting}
 \begin{picture}<dir>(x_size, y_size)(x_offset,y_offset)
   ...
@@ -7567,14 +7555,21 @@ the direction inside the environment is same as that outside the enviromnent.
  \item[u] \emph{utod} direction
 \end{description}
 \item[\cs{parbox}\<<dir>\>{[<pos>]}\{<width>\}\{<contents>\}]
-\cs{parbox} command is also extended by \texttt{\<dir\>}.
+\cs{parbox} command is also extended by \texttt{\<<dir>\>}.
 
 \item[\cs{pbox}\<<dir>\>{[<width>][<pos>]}\{<contents>\}]
 This commands typeset <contents> in LR-mode, in <dir> direction.
 If <width> is positive, the width of the box becomes this <width>.
-In this case, <contents> will be aligned \dots
-
+In this case, <contents> will be aligned to left (when <pos> is \texttt{l}),
+center (\texttt{c}), or~right (\texttt{r}).
+  
 \item[picture\textrm{\ environment}]
+\texttt{picture} environment also extended by \texttt{\<<dir>\>}, as follows:
+\begin{lstlisting}
+\begin{picture}<dir>(x_size, y_size)(x_offset,y_offset)
+  ...
+\end{picture}
+\end{lstlisting}
 
 \item[\cs{rensuji}{[<pos>]}\{<contents>\}\textrm{, }\cs{rensujiskip}]
 
@@ -7587,8 +7582,80 @@ In this case, <contents> will be aligned \dots
 \end{cslist}
 %</en>
 
+%<*ja>
+\paragraph{表組他の揃え位置}
+表組（\texttt{array}, \texttt{tabular}環境），\cs{parbox}命令，\cs{minipage}環境の
+揃え位置については\autoref{tab:lltjext_dir}を参照．\pLaTeX~2017-07-29と
+できるだけ同じ挙動になるようにしている．\autoref{tab:lltjext_dir}中のA--Dの意味は次の通り．
 
+\begin{table}
+  \caption{\Pkg{lltjext}パッケージにおける表組・\cs{parbox}命令他の揃え位置}
+  \label{tab:lltjext_dir}
+  {\centering
+    \begin{tabular}{lcccc}
+      \toprule
+      ↓中身＼周囲→&\cs{yoko}&\cs{tate}&\cs{utod}&\cs{dtou}\\
+      \midrule
+      \cs{yoko}&A&B&B&B\\
+      \cs{tate}&B&A&D&C\\
+      \cs{utod}&B&D&A&C\\
+      \cs{dtou}&B&C&C&A\\
+      \bottomrule
+    \end{tabular}\par}
+\end{table}
 
+\begin{description}
+ \item[A] 周囲の組方向と中身の組方向が同じ場合．
+  \begin{itemize}
+   \item \texttt{[t]}指定のとき：
+    中身の先頭行のベースラインが周囲のベースラインと一致する．
+    表組で先頭行の上に罫線があった場合は，それがベースラインの位置
+    \footnote{\LuaTeX-jaでは和文側のベースラインの位置も上下移動できることに注意．
+      そのため「和文ベースライン」の位置に来るとは限らない．}となる．
+   \item \texttt{[c]}指定のとき：
+    中身の上下の中心が周囲の数式の軸を通る．
+   \item \texttt{[b]}指定のとき：
+    中身の最終行のベースラインが周囲のベースラインと一致する．
+    表組で最終行の下に罫線があった場合は，それがベースラインの位置となる．
+  \end{itemize}
+ \item[B] 周囲の組方向と中身の組方向が90度ずれている場合．
+  \begin{itemize}
+   \item \texttt{[t]}指定のとき：
+    表組においては，上端が周囲のベースラインと一致する．
+    \cs{parbox}や\cs{minipage}環境においては，上端が周囲の和文文字の上端と一致する．
+   \item \texttt{[c]}指定のとき：
+    中身の上下の中心が周囲の数式の軸を通る．
+   \item \texttt{[b]}指定のとき：
+    表組においては，下端が周囲のベースラインと一致する．
+    \cs{parbox}や\cs{minipage}環境においては，下端が周囲の和文文字の下端と一致する．
+  \end{itemize}
+ \item[C] 周囲の組方向と中身の組方向が180度ずれている場合．
+  \cs{parbox}や\cs{minipage}環境においては，上のBの場合と同じ挙動である．表組においては，
+  Aで\texttt{[t]}と\texttt{[b]}を入れ替えた
+  \begin{itemize}
+   \item \texttt{[t]}指定のとき：
+    中身の最終行のベースラインが周囲のベースラインと一致する．
+    最終行の下に罫線があった場合は，それがベースラインの位置となる．
+   \item \texttt{[c]}指定のとき：
+    中身の上下の中心が周囲の数式の軸を通る．
+   \item \texttt{[b]}指定のとき：
+    中身の先頭行のベースラインが周囲のベースラインと一致する．
+    表組で先頭行の上に罫線があった場合は，それがベースラインの位置となる．
+  \end{itemize}
+ \item[D] 通常の縦組(\cs{tate})と「縦数式ディレクション」に相当する\cs{utod}方向が絡んだ場合．
+  \cs{parbox}や\cs{minipage}環境においては，上のBの場合と同じ挙動である．表組においては，
+  \begin{itemize}
+   \item \texttt{[t]}指定のとき：
+    中身の先頭行の欧文ベースラインが周囲の欧文ベースラインと一致する．
+   \item \texttt{[c]}指定のとき：
+    中身の上下の中心が周囲の数式の軸を通る．
+   \item \texttt{[b]}指定のとき：
+    中身の最終行の欧文ベースラインが周囲の欧文ベースラインと一致する．
+  \end{itemize}
+\end{description}
+%</ja>
+
+\clearpage
 %<en>\part{Implementations}
 %<ja>\part{実装}
 \label{part-imp}
@@ -7904,7 +7971,7 @@ for its label before the actual contents. So \dots
 %</en>
 %<*ja>
 「段落の開始」を意味するノード．
-list環境，itemize環境などにおいて，\cs{item} で始まる各項目は……
+\texttt{list}環境，\texttt{itemize}環境などにおいて，\cs{item} で始まる各項目は……
 %</ja>
 
 \item[\textit{direction}]
