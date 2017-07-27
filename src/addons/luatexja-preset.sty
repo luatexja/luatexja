@@ -58,22 +58,40 @@
 % font preset
 \bool_new:N \l_ltjpreset_office_bool  % MS Office の HG 系フォントを使っているか
 \bool_new:N \l_ltjpreset_noembed_bool % 非埋込か
-\clist_new:N \l_ltjpreset_font_list
+
+\prop_new:N \l_ltjpreset_font_prop_list
+\keys_define:nn { ltjpreset_set_font_list } {
+  mc .code:n =
+     \prop_put\colon Nnn \l_ltjpreset_font_prop_list { mc-l } {#1}
+     \prop_put\colon Nnn \l_ltjpreset_font_prop_list { mc-m } {#1}
+     \prop_put\colon Nnn \l_ltjpreset_font_prop_list { mc-bx } {#1},
+  gt .code:n =
+     \prop_put\colon Nnn \l_ltjpreset_font_prop_list { gt-u } {#1}
+     \prop_put\colon Nnn \l_ltjpreset_font_prop_list { mc-m } {#1}
+     \prop_put\colon Nnn \l_ltjpreset_font_prop_list { mc-bx } {#1}
+     \prop_put\colon Nnn \l_ltjpreset_font_prop_list { mc-eb } {#1},
+  unknown .code:n =
+   \prop_put:Nnn \l_ltjpreset_font_prop_list { \l_keys_key_tl } {#1}
+}
+
+
 
 \cs_new:Npn \ltjpreset_set_uni:nn #1#2 {
-  \ltjpreset_set_multi:n { #1, #2, #2, #2, #2, #2, #2 }
+  \keys_set:nn { ltjpreset_set_font_list } {
+    mc = #1, gt = #2, mc-bx = #2,
+  }
 }
 \cs_new:Npn \ltjpreset_set_multi:n #1 {
-  \clist_set:Nn \l_ltjpreset_font_list { #1 }
+  \keys_set:nn { ltjpreset_set_font_list } { #1 }
   \bool_set_false:N \l_ltjpreset_office_bool
   \bool_set_false:N \l_ltjpreset_noembed_bool
 }
 \cs_new:Npn \ltjpreset_set_office:nn #1 #2{
   \ltjpreset_set_multi:n {
-    #1, HGMinchoE ,           % mc/m, mc/bx
-    HGGothicM , HGGothicE ,   % gt/m, gt/bx (multiweight))
-    #2 , HGSoeiKakugothicUB , % gt/m (uni), gt/eb
-    HGMaruGothicMPRO          % mg/m
+    mc-m = #1,         mc-bx = HGMinchoE ,
+    gt-m = HGGothicM , gt-bx = HGGothicE ,
+    gt-u = #2 ,        gt-eb = HGSoeiKakugothicUB ,
+    mg-m = HGMaruGothicMPRO
   }
   \bool_set_true:N \l_ltjpreset_office_bool
 }
@@ -93,103 +111,83 @@
 %% Pro
 \ltjpreset_declare_option:nn{kozuka-pro}{
   \ltjpreset_set_multi:n {
-    KozMinPro-Regular, % mc/m
-    KozMinPro-Bold,    % mc/bx
-    KozGoPro-Regular,  % gt/m  (multi)
-    KozGoPro-Bold,     % gt/bx
-    KozGoPro-Medium,   % gt/m  (uni)
-    KozGoPro-Heavy,    % gt/eb
-    KozGoPro-Heavy,    % mg/m
-    KozMinPro-Light,   % mc/l
+    mc-m =  KozMinPro-Regular, mc-bx = KozMinPro-Bold,
+    gt-m =  KozGoPro-Regular,  gt-bx = KozGoPro-Bold,
+    gt-u =  KozGoPro-Medium,   gt-eb = KozGoPro-Heavy,
+    mg-m =  KozGoPro-Heavy,    mc-l =  KozMinPro-Light,
   }
 }
 %% Pr6
 \ltjpreset_declare_option:nn{kozuka-pr6}{
   \ltjpreset_set_multi:n {
-    KozMinProVI-Regular, % mc/m
-    KozMinProVI-Bold,    % mc/bx
-    KozGoProVI-Regular,  % gt/m  (multi)
-    KozGoProVI-Bold,     % gt/bx
-    KozGoProVI-Medium,   % gt/m  (uni)
-    KozGoProVI-Heavy,    % gt/eb
-    KozGoProVI-Heavy,    % mg/m
-    KozMinProVI-Light,   % mc/l
+    mc-m =  KozMinProVI-Regular, mc-bx = KozMinProVI-Bold,
+    gt-m =  KozGoProVI-Regular,  gt-bx = KozGoProVI-Bold,
+    gt-u =  KozGoProVI-Medium,   gt-eb = KozGoProVI-Heavy,
+    mg-m =  KozGoProVI-Heavy,    mc-l =  KozMinProVI-Light,
   }
 }
 %% Pr6N
 \ltjpreset_declare_option:nn{kozuka-pr6n}{
   \ltjpreset_set_multi:n {
-    KozMinPr6N-Regular, % mc/m
-    KozMinPr6N-Bold,    % mc/bx
-    KozGoPr6N-Regular,  % gt/m  (multi)
-    KozGoPr6N-Bold,     % gt/bx
-    KozGoPr6N-Medium,   % gt/m  (uni)
-    KozGoPr6N-Heavy,    % gt/eb
-    KozGoPr6N-Heavy,    % mg/m
-    KozMinPr6N-Light,   % mc/l
+    mc-m =  KozMinPr6N-Regular, mc-bx = KozMinPr6N-Bold,
+    gt-m =  KozGoPr6N-Regular,  gt-bx = KozGoPr6N-Bold,
+    gt-u =  KozGoPr6N-Medium,   gt-eb = KozGoPr6N-Heavy,
+    mg-m =  KozGoPr6N-Heavy,    mc-l =  KozMinPr6N-Light,
   }
 }
 
 % ヒラギノ (OSX)
 \ltjpreset_declare_option:nn{hiragino-pro}{
   \ltjpreset_set_multi:n {
-    HiraMinPro-W3 ,
-    HiraMinPro-W6 ,
-    HiraKakuPro-W3 , % gt/m (multi)
-    HiraKakuPro-W6 ,
-    HiraKakuPro-W6 , % gt/m (uni)
-    HiraKakuStd-W8 ,
-    HiraMaruPro-W4 ,
-    HiraMinPro-W2,
+    mc-m = HiraMinPro-W3,  mc-bx = HiraMinPro-W6,
+    gt-m = HiraKakuPro-W3, gt-bx = HiraKakuPro-W6,
+    gt-u = HiraKakuPro-W6, gt-eb = HiraKakuStd-W8,
+    mg-m = HiraMaruPro-W4, mc-l =  HiraMinPro-W2,
   }
 }
 \ltjpreset_declare_option:nn{hiragino-pron}{
   \ltjpreset_set_multi:n {
-    HiraMinProN-W3 ,
-    HiraMinProN-W6 ,
-    HiraKakuProN-W3 , % gt/m (multi)
-    HiraKakuProN-W6 ,
-    HiraKakuProN-W6 , % gt/m (uni)
-    HiraKakuStdN-W8 ,
-    HiraMaruProN-W4 ,
-    HiraMinProN-W2 ,
+    mc-m = HiraMinProN-W3,  mc-bx = HiraMinProN-W6,
+    gt-m = HiraKakuProN-W3, gt-bx = HiraKakuProN-W6,
+    gt-u = HiraKakuProN-W6, gt-eb = HiraKakuStdN-W8,
+    mg-m = HiraMaruProN-W4, mc-l =  HiraMinProN-W2,
   }
 }
 
 % モリサワ
 \ltjpreset_declare_option:nn{morisawa-pro}{
   \ltjpreset_set_multi:n {
-    A-OTF-RyuminPro-Light.otf , A-OTF-FutoMinA101Pro-Bold.otf ,    % mc/m, mc/bx
-    A-OTF-GothicBBBPro-Medium.otf , A-OTF-FutoGoB101Pro-Bold.otf , % gt/m, gt/bx (multiweight))
-    A-OTF-GothicBBBPro-Medium.otf , A-OTF-MidashiGoPro-MB31.otf ,  % gt/m (uni), gt/eb
-    A-OTF-Jun101Pro-Light.otf % mg/m
+    mc-m = A-OTF-RyuminPro-Light.otf,      mc-bx = A-OTF-FutoMinA101Pro-Bold.otf,
+    gt-m = A-OTF-GothicBBBPro-Medium.otf , gt-bx = A-OTF-FutoGoB101Pro-Bold.otf,
+    gt-u = A-OTF-GothicBBBPro-Medium.otf , gt-eb = A-OTF-MidashiGoPro-MB31.otf,
+    mg-m = A-OTF-Jun101Pro-Light.otf,
   }
 }
 \ltjpreset_declare_option:nn{morisawa-pr6n}{
   \ltjpreset_set_multi:n {
-    A-OTF-RyuminPr6N-Light.otf , A-OTF-FutoMinA101Pr6N-Bold.otf ,    % mc/m, mc/bx
-    A-OTF-GothicBBBPr6N-Medium.otf , A-OTF-FutoGoB101Pr6N-Bold.otf , % gt/m, gt/bx (multiweight))
-    A-OTF-GothicBBBPr6N-Medium.otf , A-OTF-MidashiGoPr6N-MB31.otf ,  % gt/m (uni), gt/eb
-    A-OTF-ShinMGoPr6N-Light.otf                                      % mg/m
+    mc-m = A-OTF-RyuminPr6N-Light.otf,      mc-bx = A-OTF-FutoMinA101Pr6N-Bold.otf,
+    gt-m = A-OTF-GothicBBBPr6N-Medium.otf , gt-bx = A-OTF-FutoGoB101Pr6N-Bold.otf,
+    gt-u = A-OTF-GothicBBBPr6N-Medium.otf , gt-eb = A-OTF-MidashiGoPr6N-MB31.otf,
+    mg-m = A-OTF-Jun101Pr6N-Light.otf,
   }
 }
 
 % 游明朝/游ゴシック (Win8.1)
 \ltjpreset_declare_option:nn{yu-win}{
   \ltjpreset_set_multi:n {
-    YuMincho-Regular , YuMincho-Demibold , % mc/m, mc/bx
-    YuGothic-Regular , YuGothic-Bold ,     % gt/m, gt/bx (multiweight))
-    YuGothic-Regular , YuGothic-Bold ,     % gt/m (uni), gt/eb
-    YuGothic-Bold,     YuMincho-Light      % mg/m, mc/l
+    mc-m = YuMincho-Regular, mc-bx = YuMincho-Demibold,
+    gt-m = YuGothic-Regular, gt-bx = YuGothic-Bold,
+    gt-u = YuGothic-Regular, gt-eb = YuGothic-Bold,
+    mg-m = YuGothic-Bold,    mc-l =  YuMincho-Light
   }
 }
 % Win10
 \ltjpreset_declare_option:nn{yu-win10}{
   \ltjpreset_set_multi:n {
-    YuMincho-Regular , YuMincho-Demibold , % mc/m, mc/bx
-    YuGothic-Regular , YuGothic-Bold     , % gt/m, gt/bx (multiweight))
-    YuGothic-Medium  , YuGothic-Bold ,     % gt/m (uni), gt/eb
-    YuGothic-Bold,     YuMincho-Light      % mg/m, mc/l
+    mc-m = YuMincho-Regular, mc-bx = YuMincho-Demibold,
+    gt-m = YuGothic-Regular, gt-bx = YuGothic-Bold,
+    gt-u = YuGothic-Medium,  gt-eb = YuGothic-Bold,
+    mg-m = YuGothic-Bold,    mc-l =  YuMincho-Light
   }
 }
 
@@ -197,10 +195,10 @@
 % according to http://support.apple.com/kb/HT5944
 \ltjpreset_declare_option:nn{yu-osx}{
   \ltjpreset_set_multi:n {
-    YuMincho~Medium , YuMincho~Demibold , % mc/m, mc/bx
-    YuGothic~Medium , YuGothic~Bold ,     % gt/m, gt/bx (multiweight))
-    YuGothic~Medium   , YuGothic~Bold ,   % gt/m (uni), gt/eb
-    YuGothic~Bold                         % mg/m
+    mc-m =  YuMincho~Medium, mc-bx = YuMincho~Demibold,
+    gt-m =  YuGothic~Medium, gt-u =  YuGothic~Medium,
+    gt-bx = YuGothic~Bold,   gt-eb = YuGothic~Bold,
+    mg-m =  YuGothic~Bold
   }
 }
 
