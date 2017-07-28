@@ -572,10 +572,10 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %</ja>
 %<*en>
 \item In this document, natural numbers start from~zero.
-  $\omega$ denotes the set of all natural numbers.
+  $\omega$ denotes the set of all natural numbers which can be used in \TeX.
 %</en>
 %<*ja>
-\item 本ドキュメントでは，自然数は0から始まる．自然数全体の集合は$\omega$と表記する．
+\item 本ドキュメントでは，自然数は0から始まる．（\TeX で扱える）自然数全体の集合は$\omega$と表記する．
 %</ja>
 \end{itemize}
 
@@ -1432,22 +1432,19 @@ alphabetic fonts
 %</en>
 %<*ja>
 \begin{center}\small
-\begin{tabular}{cccc}
+\begin{tabular}{ccccc}
 \toprule
 和文
-&\cs{jfontspec}&\cs{setmainjfont}&\cs{setsansjfont}\\
+&\cs{jfontspec}&\cs{setmainjfont}&\cs{setsansjfont}&\cs{setmonojfont}$^*$\\
 欧文
-&\cs{fontspec}&\cs{setmainfont}&\cs{setsansfont}\\
+&\cs{fontspec}&\cs{setmainfont}&\cs{setsansfont}&\cs{setmonofont}\\
 \midrule
 和文
-&\cs{newjfontfamily}&\cs{newjfontface}&\cs{defaultjfontfeatures}\\
+&\cs{newjfontfamily}&\cs{newjfontface}
+&\cs{defaultjfontfeatures}&\cs{addjfontfeatures}\\
 欧文
-&\cs{newfontfamily}&\cs{newfontface}&\cs{defaultfontfeatures}\\
-\midrule
-和文
-&\cs{addjfontfeatures}\\
-欧文
-&\cs{addfontfeatures}\\
+&\cs{newfontfamily}&\cs{newfontface}
+&\cs{defaultfontfeatures}&\cs{addfontfeatures}\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1564,6 +1561,47 @@ The following presets are defined:
 \end{lstlisting}
 %<ja>として読み込み，小塚書体(Pr6N)を使うことを指定している．
 %<en> which means that Kozuka~Pr6N fonts will be used in this document.
+
+%<*ja>
+上記のプリセット以外の和文フォント設定を使いたい場合，本来は
+\Pkg{luatexja-fontspec}パッケージの提供する
+\cs{setmainjfont}, \cs{setsansjfont}を使って自分で指定するべきである．
+\texttt{custom}オプションを使うことで，\Pkg{luatexja-preset}パッケージの内部に直接アクセスして
+\begin{lstlisting}
+\usepackage[kozuka-pr6n,          % kozuka-pr6n プリセットを基礎にして，
+  custom={
+    mc=SourceHanSerif-Regular,    % 明朝体（細字・中字・太字）
+    mc-l=SourceHanSerif-Bold,     % 明朝体細字
+    mc-m=KozMinPr6N-Regular,      % 明朝体中字
+    mg-m=HG Maru Gothic PRO,      % 丸ゴシック体
+  },
+  deluxe,expert,jis2004,match,nfssonly
+]{luatexja-preset}
+\end{lstlisting}
+のようにすることもできるが，\texttt{custom}オプションの書式は予告なく変更されることがある
+上，\texttt{90jis}や\texttt{JIS2004}オプションとの相性があまり良くないので推奨はしない．
+%</ja>
+%<*en>
+To use a Japanese font setting which does not match with any presets,
+the legitimate method is to use \cs{setmainjfont}~and~\cs{setsansjfont}
+which are provided by the \Pkg{luatexja-fontspec} package.
+
+One can use the \texttt{custom} option, such as
+\begin{lstlisting}
+\usepackage[kozuka-pr6n,          % based on the kozuka-pr6n preset (Kozuka Pr6N),
+  custom={
+    mc=SourceHanSerif-Regular,    % mincho family (three weight)
+    mc-l=SourceHanSerif-Bold,     % mincho light
+    mc-m=KozMinPr6N-Regular,      % mincho medium
+    mg-m=HG Maru Gothic PRO,      % rounded gothic
+  },
+  deluxe,expert,jis2004,match,nfssonly
+]{luatexja-preset}
+\end{lstlisting}
+However, we do not recommend this \cs{custom} option;
+the format might change, and this \cs{custom} option is not well-compatible with
+\texttt{90jis}~nor~\cs{jis2004} options.
+%</en>
 
 %<*en>
 \subsection{\cs{CID}, \cs{UTF}, and macros in \Pkg{japanese-otf} package}
@@ -1705,7 +1743,7 @@ and the character ``漢'' to the character range~100.
 %<*en>
 A character can belong to only one character range.
 For example, whole SIP belong to the range~4 in the default setting of \LuaTeX-ja,
-and if you execute the above line, then SIP will belong to the range~100 and be
+and if one executes the above line, then SIP will belong to the range~100 and be
 removed from the range~4.
 %</en>
 %<*ja>
@@ -7684,7 +7722,6 @@ are internally specified by:
 \end{description}
 として指定を行っているので注意すること．
 %</ja>
-
 
 \clearpage
 %<en>\part{Implementations}
