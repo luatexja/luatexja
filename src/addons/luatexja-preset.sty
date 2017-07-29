@@ -427,31 +427,26 @@
 
 
 %%%%%%%% 存在判定
+\cs_new:Nn \ltjpreset_substitute:nnnn {
+  \group_begin:
+    \suppressfontnotfounderror=1
+    \font \l_ltjpreset_font_test: = "\cs:w ltjpreset_font_#1_#2: \cs_end:"\relax
+    \ifx \l_ltjpreset_font_test: \nullfont
+      \msg_warning:nnxxxx { luatexja-preset }{ no-font }
+        { \cs:w ltjpreset_font_#1_#2: \cs_end: }{ #1/#2 }
+        { \cs:w ltjpreset_font_#3_#4: \cs_end: }{ #3/#4 }
+      \cs_gset_eq:cc { ltjpreset_font_#1_#2: } { ltjpreset_font_#3_#4: }
+    \fi
+  \group_end:
+}
+
 \msg_new:nnn { luatexja-preset }{ no-font }{
   Font~ for~ #1~ (#2)~ is~ not~found.~ Hence~ I~ substitute~ #3~ (#4)~ for~ it.
 }
 \bool_if:NT \l_ltjpreset_deluxe_bool {
-  \group_begin:
-    \suppressfontnotfounderror=1
-    \font \l_ltjpreset_font_test: = "\ltjpreset_font_gt_eb:"\relax
-    \ifx \l_ltjpreset_font_test: \nullfont
-      \msg_warning:nnxxxx { luatexja-preset }{ no-font }
-        { \ltjpreset_font_gt_eb: }{ gt/eb }{ \ltjpreset_font_gt_bx: }{ gt/bx }
-      \cs_gset_eq:NN \ltjpreset_font_gt_eb: \ltjpreset_font_gt_bx:
-    \fi
-    \font \l_ltjpreset_font_test: = "\ltjpreset_font_mc_l:"\relax
-    \ifx \l_ltjpreset_font_test: \nullfont
-      \msg_warning:nnxxxx { luatexja-preset }{ no-font }
-        { \ltjpreset_font_mc_l: }{ mc/l }{ \ltjpreset_font_mc_m: }{ mc/m }
-      \cs_gset_eq:NN \ltjpreset_font_mc_l: \ltjpreset_font_mc_m:
-    \fi
-    \font \l_ltjpreset_font_test: = "\ltjpreset_font_mg_m:"\relax
-    \ifx \l_ltjpreset_font_test: \nullfont
-      \msg_warning:nnxxxx { luatexja-preset }{ no-font }
-        { \ltjpreset_font_mg_m: }{ mg/m }{ \ltjpreset_font_gt_bx: }{ gt/bx }
-      \cs_gset_eq:NN \ltjpreset_font_mg_m: \ltjpreset_font_gt_bx:
-    \fi
-  \group_end:
+  \ltjpreset_substitute:nnnn { gt } { eb } { gt } { bx }
+  \ltjpreset_substitute:nnnn { mg } { m  } { gt } { bx }
+  \ltjpreset_substitute:nnnn { mc } { l  } { mc } { m  }
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
