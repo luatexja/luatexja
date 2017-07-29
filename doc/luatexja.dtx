@@ -1570,9 +1570,14 @@ The following presets are defined:
 \begin{lstlisting}
 \usepackage[kozuka-pr6n,          % kozuka-pr6n プリセットを基礎にして，
   custom={
-    mc=SourceHanSerif-Regular,    % 明朝体（細字・中字・太字）
+    mc=SourceHanSerif-Regular,    % 明朝体（全ウェイト）
     mc-l=SourceHanSerif-Bold,     % 明朝体細字
     mc-m=KozMinPr6N-Regular,      % 明朝体中字
+  % mc-bx=KozMinPr6N-Bold,        % 明朝体太字
+  % gt=HirakakuProN-W3,           % ゴシック体（全ウェイト）
+  % gt-m=SourceHanSans-Regular,   % ゴシック体中字（deluxe オプション指定時）
+  % gt-bx=HiraKakuProN-W6,ular,   % ゴシック体太字
+  % gt-eb=HiraKakuProN-W6,ular,   % ゴシック体極太
     mg-m=HG Maru Gothic PRO,      % 丸ゴシック体
   },
   deluxe,expert,jis2004,match,nfssonly
@@ -1590,9 +1595,14 @@ One can use the \texttt{custom} option, such as
 \begin{lstlisting}
 \usepackage[kozuka-pr6n,          % based on the kozuka-pr6n preset (Kozuka Pr6N),
   custom={
-    mc=SourceHanSerif-Regular,    % mincho family (three weight)
+    mc=SourceHanSerif-Regular,    % mincho family (all weights)
     mc-l=SourceHanSerif-Bold,     % mincho light
     mc-m=KozMinPr6N-Regular,      % mincho medium
+  % mc-bx=KozMinPr6N-Bold,        % mincho bold
+  % gt=HirakakuProN-W3,           % gothic family (all weights)
+  % gt-m=SourceHanSans-Regular,   % gothic medium (with deluxe option)
+  % gt-bx=HiraKakuProN-W6,ular,   % gothic bold
+  % gt-eb=HiraKakuProN-W6,ular,   % gothic extrabold
     mg-m=HG Maru Gothic PRO,      % rounded gothic
   },
   deluxe,expert,jis2004,match,nfssonly
@@ -7232,10 +7242,10 @@ This means that \verb+\mcfamily\bfseries+, \verb+\gtfamily\bfseries+ and
 \item[deluxe]
 %<*en>
 Use the mincho family with three weights (light, medium, and~bold),
-the gothic family with three weights (medium, bold, and~heavy), and \textit{rounded gothic}%
+the gothic family with three weights (medium, bold, and~extrabold), and \textit{rounded gothic}%
 \footnote{Provided by \cs{mgfamily} and \cs{textmg},
 because ``rounded gothic'' is called \textit{maru gothic} (丸ゴシック) in Japanese.}.
-The light weight of mincho and the heavy weight of gothic can be used by
+The light weight of mincho and the extrabold weight of gothic can be used by
 \cs{mcfamily}\cs{ltseries}~and~\cs{gtfamily}\cs{ebseries}, respectively.
 
 \begin{itemize}
@@ -7374,7 +7384,7 @@ There is not rounded gothic family in Kozuka fonts.
 %<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
 %<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
  &bold&KozGoPro-Bold&KozGoProVI-Bold&KozGoPr6N-Bold\\
- &heavy&KozGoPro-Heavy&KozGoProVI-Heavy&KozGoPr6N-Heavy\\
+ &extrabold&KozGoPro-Heavy&KozGoProVI-Heavy&KozGoPr6N-Heavy\\
 \midrule
 %<en>\textit{rounded gothic}
 %<ja>\gt 丸ゴシック
@@ -7391,7 +7401,7 @@ There is not rounded gothic family in Kozuka fonts.
 %<*en>
 Hiragino fonts (except Hiragino~Mincho~W2) are bundled with Mac OS~X 10.5 or later.
 Some editions of a Japanese word-processor ``一太郎2012'' includes Hiragino ProN fonts.
-Note that the heavy weight of gothic family only supports
+Note that the extrabold weight of gothic family only supports
 Adobe-Japan1-3 character collection (Std/StdN), while others supports
 Adobe-Japan1-5 character collection.
 %</en>
@@ -7421,7 +7431,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
 %<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
  &bold&Hiragino~Kaku~Gothic~Pro~W6&Hiragino~Kaku~Gothic~ProN~W6\\
- &heavy&Hiragino~Kaku~Gothic~Std~W8&Hiragino~Kaku~Gothic~StdN~W8\\
+ &extrabold&Hiragino~Kaku~Gothic~Std~W8&Hiragino~Kaku~Gothic~StdN~W8\\
 \midrule
 %<en>\textit{rounded gothic}
 %<ja>\gt 丸ゴシック
@@ -7448,7 +7458,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<en>\textit{gothic}%
 %<ja>\gt ゴシック
  &bold&A-OTF-FutoGoB101Pro-Bold.otf&A-OTF-FutoGoB101Pr6N-Bold.otf\\
- &heavy&A-OTF-MidashiGoPro-MB31.otf&A-OTF-MidashiGoPr6N-MB31.otf\\
+ &extrabold&A-OTF-MidashiGoPro-MB31.otf&A-OTF-MidashiGoPr6N-MB31.otf\\
 \midrule
 %<en>\textit{rounded gothic}
 %<ja>\gt 丸ゴシック
@@ -7481,7 +7491,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<en>\textit{gothic}%
 %<ja>\gt ゴシック
  &bold&YuGothic-Bold&YuGothic-Bold&YuGothic~Bold\\
- &heavy&YuGothic-Bold&YuGothic-Bold&YuGothic~Bold\\
+ &extrabold&YuGothic-Bold&YuGothic-Bold&YuGothic~Bold\\
 \midrule
 %<en>\textit{rounded gothic}
 %<ja>\gt 丸ゴシック
@@ -7509,7 +7519,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<en>\textit{gothic}%
 %<ja>\gt ゴシック
  &bold&Moga90Gothic Bold&MogaGothic Bold\\
- &heavy&Moga90Gothic Bold&MogaGothic Bold\\
+ &extrabold&Moga90Gothic Bold&MogaGothic Bold\\
 \midrule
 %<en>\textit{rounded gothic}
 %<ja>\gt 丸ゴシック
@@ -7539,7 +7549,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<en>\textit{gothic}%
 %<ja>\gt ゴシック
  &bold&Ume Gothic O5\\
- &heavy&Ume Gothic O5\\
+ &extrabold&Ume Gothic O5\\
 \midrule
 %<en>\textit{rounded gothic}
 %<ja>\gt 丸ゴシック
@@ -7570,7 +7580,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
 %<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
  &bold&\AD{Sans}{Bold}\\
- &heavy&\AD{Sans}{Heavy}\\
+ &extrabold&\AD{Sans}{Heavy}\\
 \midrule
 %<en>\textit{rounded gothic}
 %<ja>\gt 丸ゴシック
@@ -7602,7 +7612,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
 %<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
  &bold&\AD{Sans}{Bold}\\
- &heavy&\AD{Sans}{Black}\\
+ &extrabold&\AD{Sans}{Black}\\
 \midrule
 %<en>\textit{rounded gothic}
 %<ja>\gt 丸ゴシック
@@ -7674,7 +7684,7 @@ We can use HG~fonts bundled with Microsoft~Office for realizing multiple weights
 \multicolumn{3}{c}{HG Gothic M}\\\midrule
 \bf gothic bold&
 \multicolumn{3}{c}{HG Gothic E}\\\midrule
-\bf gothic heavy&
+\bf gothic extrabold&
 \multicolumn{3}{c}{HG Soei Kaku Gothic UB}\\\midrule
 \bf rounded gothic&
 \multicolumn{3}{c}{HG Maru Gothic PRO}\\
