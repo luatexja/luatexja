@@ -903,8 +903,8 @@ do
       end
    end
    local function prepare_extra_data_font(id, res)
-      if type(res)=='table' and res.shared and res.filename then
-	 font_extra_info[id] = font_extra_basename[file.nameonly(res.filename)]
+      if type(res)=='table' and res.shared and (res.psname or res.filename) then
+	 font_extra_info[id] = font_extra_basename[res.psname or file.nameonly(res.filename)]
       end
    end
     luatexbase.add_to_callback(
