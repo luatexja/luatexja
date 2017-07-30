@@ -1602,7 +1602,7 @@ One can use the \texttt{custom} option, such as
   % gt=HirakakuProN-W3,           % gothic family (all weights)
   % gt-m=SourceHanSans-Regular,   % gothic medium (with deluxe option)
   % gt-bx=HiraKakuProN-W6,ular,   % gothic bold
-  % gt-eb=HiraKakuProN-W6,ular,   % gothic extrabold
+  % gt-eb=HiraKakuProN-W6,ular,   % gothic extra bold
     mg-m=HG Maru Gothic PRO,      % rounded gothic
   },
   deluxe,expert,jis2004,match,nfssonly
@@ -6485,6 +6485,7 @@ A demonstrarion is shown in \autoref{fig:altkanji-fontspec}.
 
 %<*en>
 \paragraph{Remark on \texttt{AltFont}, \texttt{YokoFeatures}, \texttt{TateFeatures} keys}
+\leavevmode\par
 In \texttt{AltFont},~\texttt{YokoFeatures},~\texttt{TateFeatures} keys,
 one cannot specify per-shape settings such as \texttt{BoldFeatures}.
 For example,
@@ -7242,10 +7243,10 @@ This means that \verb+\mcfamily\bfseries+, \verb+\gtfamily\bfseries+ and
 \item[deluxe]
 %<*en>
 Use the mincho family with three weights (light, medium, and~bold),
-the gothic family with three weights (medium, bold, and~extrabold), and \textit{rounded gothic}%
+the gothic family with three weights (medium, bold, and extra~bold), and \textit{rounded gothic}%
 \footnote{Provided by \cs{mgfamily} and \cs{textmg},
 because ``rounded gothic'' is called \textit{maru gothic} (丸ゴシック) in Japanese.}.
-The light weight of mincho and the extrabold weight of gothic can be used by
+Mincho light and gothic extra~bold can be by
 \cs{mcfamily}\cs{ltseries}~and~\cs{gtfamily}\cs{ebseries}, respectively.
 
 \begin{itemize}
@@ -7367,7 +7368,7 @@ There is not rounded gothic family in Kozuka fonts.
 「小塚丸ゴシック」は存在しないので，便宜的に小塚ゴシックHによって代用している．
 %</ja>
 \begin{center}\small
-\begin{tabular}{cllll}
+\begin{tabular}{lllll}
 \toprule
 \bfseries family&\bfseries series&\ttfamily kozuka-pro&\ttfamily kozuka-pr6&\ttfamily kozuka-pr6n\\
 \midrule
@@ -7384,7 +7385,7 @@ There is not rounded gothic family in Kozuka fonts.
 %<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
 %<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
  &bold&KozGoPro-Bold&KozGoProVI-Bold&KozGoPr6N-Bold\\
- &extrabold&KozGoPro-Heavy&KozGoProVI-Heavy&KozGoPr6N-Heavy\\
+ &extra bold&KozGoPro-Heavy&KozGoProVI-Heavy&KozGoPr6N-Heavy\\
 \midrule
 %<en>\textit{rounded gothic}
 %<ja>\gt 丸ゴシック
@@ -7401,8 +7402,8 @@ There is not rounded gothic family in Kozuka fonts.
 %<*en>
 Hiragino fonts (except Hiragino~Mincho~W2) are bundled with Mac OS~X 10.5 or later.
 Some editions of a Japanese word-processor ``一太郎2012'' includes Hiragino ProN fonts.
-Note that the extrabold weight of gothic family only supports
-Adobe-Japan1-3 character collection (Std/StdN), while others supports
+Note that fonts for gothic extra~bold (HiraKakuStd[N]-W8) only contains characters in
+Adobe-Japan1-3 character collection, while others contains those in
 Adobe-Japan1-5 character collection.
 %</en>
 %<*ja>
@@ -7414,7 +7415,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 別途購入する必要がある．
 %</ja>
 \begin{center}\small
-\begin{tabular}{clll}
+\begin{tabular}{llll}
 \toprule
 \bf family&\bf series&\tt hiragino-pro&\tt hiragino-pron\\
 \midrule
@@ -7431,7 +7432,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
 %<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
  &bold&Hiragino~Kaku~Gothic~Pro~W6&Hiragino~Kaku~Gothic~ProN~W6\\
- &extrabold&Hiragino~Kaku~Gothic~Std~W8&Hiragino~Kaku~Gothic~StdN~W8\\
+ &extra bold&Hiragino~Kaku~Gothic~Std~W8&Hiragino~Kaku~Gothic~StdN~W8\\
 \midrule
 %<en>\textit{rounded gothic}
 %<ja>\gt 丸ゴシック
@@ -7444,7 +7445,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[morisawa-pr6n]  Morisawa Pr6N (Adobe-Japan1-6, JIS04-savvy) fonts.
 \begin{center}\small
-\begin{tabular}{cl>{\tt}l>{\tt}l}
+\begin{tabular}{ll>{\tt}l>{\tt}l}
 \toprule
 \bf family&\bf series&morisawa-pro&morisawa-pr6n\\
 \midrule
@@ -7458,7 +7459,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<en>\textit{gothic}%
 %<ja>\gt ゴシック
  &bold&A-OTF-FutoGoB101Pro-Bold.otf&A-OTF-FutoGoB101Pr6N-Bold.otf\\
- &extrabold&A-OTF-MidashiGoPro-MB31.otf&A-OTF-MidashiGoPr6N-MB31.otf\\
+ &extra bold&A-OTF-MidashiGoPro-MB31.otf&A-OTF-MidashiGoPr6N-MB31.otf\\
 \midrule
 %<en>\textit{rounded gothic}
 %<ja>\gt 丸ゴシック
@@ -7474,7 +7475,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[yu-osx]  Yu fonts bundled with OSX~Mavericks.
 \begin{center}\small
-\begin{tabular}{cllll}
+\begin{tabular}{lllll}
 \toprule
 \bf family&\bf series&\texttt{yu-win}&\texttt{yu-win10}&\texttt{yu-osx}\\
 \midrule
@@ -7491,7 +7492,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<en>\textit{gothic}%
 %<ja>\gt ゴシック
  &bold&YuGothic-Bold&YuGothic-Bold&YuGothic~Bold\\
- &extrabold&YuGothic-Bold&YuGothic-Bold&YuGothic~Bold\\
+ &extra bold&YuGothic-Bold&YuGothic-Bold&YuGothic~Bold\\
 \midrule
 %<en>\textit{rounded gothic}
 %<ja>\gt 丸ゴシック
@@ -7506,7 +7507,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<en>\par These fonts can be downloaded from \url{http://yozvox.web.fc2.com/}.
 %<ja>これらのフォントは \url{http://yozvox.web.fc2.com/} からダウンロードできる．
 \begin{center}\small
-\begin{tabular}{clll}
+\begin{tabular}{llll}
 \toprule
 \bf family&\bf series&\bf default, \texttt{90jis}~option&\bf \texttt{jis2004} option\\
 \midrule
@@ -7519,7 +7520,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<en>\textit{gothic}%
 %<ja>\gt ゴシック
  &bold&Moga90Gothic Bold&MogaGothic Bold\\
- &extrabold&Moga90Gothic Bold&MogaGothic Bold\\
+ &extra bold&Moga90Gothic Bold&MogaGothic Bold\\
 \midrule
 %<en>\textit{rounded gothic}
 %<ja>\gt 丸ゴシック
@@ -7534,7 +7535,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<en>\par These fonts can be downloaded from\\\hfill \url{https://ja.osdn.net/projects/ume-font/wiki/FrontPage}.
 %<ja>これらのフォントは \url{https://ja.osdn.net/projects/ume-font/wiki/FrontPage} からダウンロードできる．
 \begin{center}\small
-\begin{tabular}{cll}
+\begin{tabular}{lll}
 \toprule
 \bf family&\bf series&\bf default\\
 \midrule
@@ -7549,7 +7550,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<en>\textit{gothic}%
 %<ja>\gt ゴシック
  &bold&Ume Gothic O5\\
- &extrabold&Ume Gothic O5\\
+ &extra bold&Ume Gothic O5\\
 \midrule
 %<en>\textit{rounded gothic}
 %<ja>\gt 丸ゴシック
@@ -7563,7 +7564,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
  \item[sourcehan-jp]  Source Han Serif JP and Source Han Sans JP fonts (Region-specific Subset OTF)
 \begin{center}\small
 \def\AD#1#2{Source Han #1 #2&Source Han #1 JP #2}%
-\begin{tabular}{cllll}
+\begin{tabular}{lllll}
 \toprule
 \bf family&\bf series&\texttt{sourcehan}&\texttt{sourcehan-jp}\\
 \midrule
@@ -7580,7 +7581,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
 %<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
  &bold&\AD{Sans}{Bold}\\
- &extrabold&\AD{Sans}{Heavy}\\
+ &extra bold&\AD{Sans}{Heavy}\\
 \midrule
 %<en>\textit{rounded gothic}
 %<ja>\gt 丸ゴシック
@@ -7595,7 +7596,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
  \item[noto-otf]  Noto Serif CJK and Noto Sans CJK fonts (Language-specific OTF)
 \begin{center}\small
 \def\AD#1#2{Noto #1 CJK #2&Noto #1 CJK JP #2}%
-\begin{tabular}{cllll}
+\begin{tabular}{lllll}
 \toprule
 \bf family&\bf series&\texttt{noto-otc}&\texttt{noto-otf}\\
 \midrule
@@ -7612,7 +7613,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
 %<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
  &bold&\AD{Sans}{Bold}\\
- &extrabold&\AD{Sans}{Black}\\
+ &extra bold&\AD{Sans}{Black}\\
 \midrule
 %<en>\textit{rounded gothic}
 %<ja>\gt 丸ゴシック
@@ -7658,56 +7659,43 @@ Next, we describe settings for using only single weight.
 %<ja>\paragraph{HGフォントの利用}
 %<*en>
 We can use HG~fonts bundled with Microsoft~Office for realizing multiple weights.
+In the table below, starred fonts (e.g., IPA~Gothic*) are used
+only if \texttt{jis2004} or \texttt{nodeluxe} option is spefified.
 %</en>
 %<*ja>
 すぐ前に書いた単ウェイト用設定を，Microsoft Office等に付属するHGフォントを使って
-多ウェイト化した設定もある．
+多ウェイト化した設定もある．以下の表では，*~付きのフォント（例：IPAゴシック*）は
+\texttt{jis2004}と\texttt{nodeluxe}のいずれかのオプションが有効になっているときに使われる．
 %</ja>
 \par\nobreak\medskip
 {\centering\small
-\begin{tabular}{llll}
+\begin{tabular}{lllll}
 \toprule
-&\tt ipa-hg&\tt ipaex-hg&\tt ms-hg\\
+\textbf{family}&\textbf{series}&\tt ipa-hg&\tt ipaex-hg&\tt ms-hg\\
 \midrule
 %<*en>
-\bf mincho medium
-&IPA Mincho&IPAex Mincho&MS Mincho\\\midrule
-\bf mincho bold&
-\multicolumn{3}{c}{HG Mincho E}\\\midrule
-\bf Gothic medium\\
-~~without \texttt{deluxe}
-&IPA Gothic&IPAex Gothic&MS Gothic\\
-~~with {\tt jis2004}
-&IPA Gothic&IPAex Gothic&MS Gothic\\
-\cmidrule(lr){1-4}
-~~otherwise&
-\multicolumn{3}{c}{HG Gothic M}\\\midrule
-\bf gothic bold&
-\multicolumn{3}{c}{HG Gothic E}\\\midrule
-\bf gothic extrabold&
-\multicolumn{3}{c}{HG Soei Kaku Gothic UB}\\\midrule
-\bf rounded gothic&
-\multicolumn{3}{c}{HG Maru Gothic PRO}\\
+&medium&IPA Mincho&IPAex Mincho&MS Mincho\\
+\smash{\raisebox{1.5ex}{\textit{mincho}}}%
+&bold&HG Mincho E&HG Mincho E&HG Mincho E\\\midrule
+&&IPA Gothic*&IPAex Gothic*&MS Gothic*\\
+&\smash{\raisebox{1.5ex}{medium}}%
+&HG Gothic M&HG Gothic M&HG Gothic M\\\cmidrule{2-5}
+\textit{gothic}&bold&HG Gothic E&HG Gothic E&HG Gothic E\\\cmidrule{2-5}
+&extra bold&HG Soei Kaku Gothic UB&HG Soei Kaku Gothic UB&HG Soei Kaku Gothic UB\\\midrule
+\textit{rounded gothic}&&
+HG Maru Gothic PRO&HG Maru Gothic PRO&HG Maru Gothic PRO\\
 %</en>
 %<*ja>
-\gtfamily 明朝体中字
-&IPA明朝&IPAex明朝&MS明朝\\\midrule
-\gtfamily 明朝体太字&
-\multicolumn{3}{c}{HG明朝E}\\\midrule
-\gtfamily ゴシック体中字\\
-　単ウェイト時
-&IPAゴシック&IPAexゴシック&MSゴシック\\
-　{\tt jis2004}指定時
-&IPAゴシック&IPAexゴシック&MSゴシック\\
-\cmidrule(lr){1-4}
-　それ以外の時&
-\multicolumn{3}{c}{HGゴシックM}\\\midrule
-\gtfamily ゴシック体太字&
-\multicolumn{3}{c}{HGゴシックE}\\\midrule
-\gtfamily ゴシック体極太&
-\multicolumn{3}{c}{HG創英角ゴシックUB}\\\midrule
-\gtfamily 丸ゴシック体&
-\multicolumn{3}{c}{HG丸ゴシック体PRO}\\
+&medium&IPA明朝&IPAex明朝&MS明朝\\
+\smash{\raisebox{1.5ex}{\textgt{明朝体}}}%
+&bold&HG明朝E&HG明朝E&HG明朝E\\\midrule
+&&IPAゴシック*&IPAexゴシック*&MSゴシック*\\
+&\smash{\raisebox{1.5ex}{medium}}%
+&HGゴシックM&HGゴシックM&HGゴシックM\\\cmidrule{2-5}
+\textgt{ゴシック体}&bold&HGゴシックE&HGゴシックE&HGゴシックE\\\cmidrule{2-5}
+&extra bold&HG創英角ゴシックUB&HG創英角ゴシックUB&HG創英角ゴシックUB\\\midrule
+\textgt{丸ゴシック体}&&
+HG丸ゴシック体PRO&HG丸ゴシック体PRO&HG丸ゴシック体PRO\\
 %</ja>
 \bottomrule
 \end{tabular}\par\medskip}
