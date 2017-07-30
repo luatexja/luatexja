@@ -572,10 +572,10 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %</ja>
 %<*en>
 \item In this document, natural numbers start from~zero.
-  $\omega$ denotes the set of all natural numbers.
+  $\omega$ denotes the set of all natural numbers which can be used in \TeX.
 %</en>
 %<*ja>
-\item 本ドキュメントでは，自然数は0から始まる．自然数全体の集合は$\omega$と表記する．
+\item 本ドキュメントでは，自然数は0から始まる．（\TeX で扱える）自然数全体の集合は$\omega$と表記する．
 %</ja>
 \end{itemize}
 
@@ -984,7 +984,7 @@ plfonts.dtx} and \texttt{pldefs.ltx}):
 
 \begin{itemize}
 %<*en>
-\item Font encodings for Japanese fonts is \texttt{JY3}~(for horizontal direction) and
+\item Font encodings for Japanese fonts are \texttt{JY3}~(for horizontal direction) and
 \texttt{JT3}~(for vertical direction).
 %</en>
 %<*ja>
@@ -993,20 +993,20 @@ plfonts.dtx} and \texttt{pldefs.ltx}):
 %</ja>
 
 %<*en>
-\item Traditionally, Japanese documents use two typeface categories: \emph{mincho}~(明朝体) and
+\item Traditionally, Japanese documents use only two families: \emph{mincho}~(明朝体) and
  \emph{gothic}~(\textgt{ゴシック体}). \emph{mincho} is used in the main text, while \emph{gothic}
       is used in the headings or for emphasis.
 \begin{center}\small
 \begin{tabular}{lllc}
 \toprule
-\textbf{classification}&&&\textbf{family name}\\\midrule
+\textbf{classification}&&&\textbf{commands}\\\midrule
 \emph{mincho} (明朝体)&\verb+\textmc{...}+&\verb+{\mcfamily ...}+&\cs{mcdefault}\\
 \emph{gothic} (\textgt{ゴシック体})&\verb+\textgt{...}+&\verb+{\gtfamily ...}+&\cs{gtdefault}\\
 \bottomrule
 \end{tabular}
 \end{center}
 \item
-By default, the following fonts are used for \emph{mincho} and \emph{gothic}:
+By default, the following fonts are used for these two families.
 \begin{center}\small
 \begin{tabular}{ccccc}
 \toprule
@@ -1016,7 +1016,7 @@ By default, the following fonts are used for \emph{mincho} and \emph{gothic}:
 \bottomrule
 \end{tabular}
 \end{center}
-Note that the bold series in both family are same as the medium series of \emph{gothic}
+Note that the bold series in both family are same as the medium series of gothic
      family. There is no italic nor slanted shape for
       these \texttt{mc}~and~\texttt{gt}.
 %</en>
@@ -1031,7 +1031,7 @@ Note that the bold series in both family are same as the medium series of \emph{
 \bottomrule
 \end{tabular}
 \end{center}
-\item 標準では，次のフォントファミリが用いられる：
+\item 標準では，次のフォントが用いられる：
 \begin{center}\small
 \begin{tabular}{ccccc}
 \toprule
@@ -1041,8 +1041,8 @@ Note that the bold series in both family are same as the medium series of \emph{
 \bottomrule
 \end{tabular}
 \end{center}
-どちらのファミリにおいても，そのboldシリーズで使われるフォントは
-ゴシック体のmediumシリーズで使われるフォントと同じであることに注意．
+どちらのファミリにおいても，太字(\cs{bfseries})のフォントは
+ゴシック体中字(\cs{gtfamily}\cs{mdseries})で使われるフォントと同じであることに注意．
 また，どちらのファミリでもイタリック体・スラント体は定義されない．
 %</ja>
 
@@ -1057,7 +1057,7 @@ Note that the bold series in both family are same as the medium series of \emph{
 	These classes and packages also redefine \cs{jttdefault} to
 	\cs{gtdefault} (\emph{gothic}~family).
   } specifies the Japanese font family in \cs{verb}~or~\texttt{verbatim} environment.
-  The default value of \cs{jttdefault} is \cs{mcdefault}, so \emph{mincho} family is used.
+  The default value of \cs{jttdefault} is \cs{mcdefault}, so the mincho family is used.
 %</en>
 %<*ja>
  \item \cs{verb} や \texttt{verbatim} 環境中の和文文字に使われる和文フォントファミリは
@@ -1074,8 +1074,8 @@ Note that the bold series in both family are same as the medium series of \emph{
 %<*en>
 \item If you use the \Pkg{beamer} class with the default font theme (which uses sans serif
       fonts) and with \LuaTeX-ja, you might want to change default Japanese fonts to
-      \emph{gothic} family. The following line  changes  the default Japanese font family
-      to \emph{gothic}:
+      the gothic family. The following line  changes  the default Japanese font family
+      to it:
 %</en>
 %<*ja>
 \item \Pkg{beamer}クラスを既定のフォント設定で使う場合，既定欧文フォントがサンセリフなの
@@ -1432,22 +1432,19 @@ alphabetic fonts
 %</en>
 %<*ja>
 \begin{center}\small
-\begin{tabular}{cccc}
+\begin{tabular}{ccccc}
 \toprule
 和文
-&\cs{jfontspec}&\cs{setmainjfont}&\cs{setsansjfont}\\
+&\cs{jfontspec}&\cs{setmainjfont}&\cs{setsansjfont}&\cs{setmonojfont}$^*$\\
 欧文
-&\cs{fontspec}&\cs{setmainfont}&\cs{setsansfont}\\
+&\cs{fontspec}&\cs{setmainfont}&\cs{setsansfont}&\cs{setmonofont}\\
 \midrule
 和文
-&\cs{newjfontfamily}&\cs{newjfontface}&\cs{defaultjfontfeatures}\\
+&\cs{newjfontfamily}&\cs{newjfontface}
+&\cs{defaultjfontfeatures}&\cs{addjfontfeatures}\\
 欧文
-&\cs{newfontfamily}&\cs{newfontface}&\cs{defaultfontfeatures}\\
-\midrule
-和文
-&\cs{addjfontfeatures}\\
-欧文
-&\cs{addfontfeatures}\\
+&\cs{newfontfamily}&\cs{newfontface}
+&\cs{defaultfontfeatures}&\cs{addfontfeatures}\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1534,630 +1531,87 @@ JIS~X~0208:1990→辻
 
 %<en>\subsection{Presets of Japanese fonts}
 %<ja>\subsection{和文フォントのプリセット設定}
-\label{ssec-preset}
+\label{ssec:preset-abst}
 
 %<*en>
-One can load the \Pkg{luatexja-preset}
-package to use several ``presets'' of Japanese fonts.
-This package provides functions in a part of
-\Pkg{japanese-otf} package and a part of \Pkg{PXchfon} package by Takayuki Yato.
-
-One can specified other options other than listed in this subsection.
-These are simply passed to the \Pkg{luatexja-fontspec}\footnote{if \texttt{nfssonly} option is
-\emph{not} specified; in this case these options are simply ignored.}.
-For example, the line~5 in below example is eqivalent to lines 1--3.
+With \Pkg{luatexja-preset} package, 
+one use one of ``preset'' to simplify Japanese font setting.
+For details of package options, and those of each presets, please see Subsecion~\ref{ssec:preset}.
+The following presets are defined:
 %</en>
 %<*ja>
 よく使われている和文フォント設定を一行で指定できるようにしたのが
-\Pkg{luatexja-preset}パッケージである．このパッケージは，
-\Pkg{otf}パッケージの一部機能と八登崇之氏による\Pkg{PXchfon}パッケージの一部機能とを
-合わせたような格好をしている．
-
-オプションとして，本節にないものも指定することができるが，それらは
-\Pkg{luatexja-fontspec}パッケージに渡される\footnote{\texttt{nfssonly} オプションが
-指定されていた場合は，\Pkg{luatexja-fontspec}パッケージは読み込まれないので単純に無視され
-る．}．例えば，下の1--3行目は5行目のように一行にまとめることができる．
+\Pkg{luatexja-preset}パッケージである．オプションや各プリセットの詳細については
+\ref{ssec:preset}節を参照して欲しい．
+現時点では以下のプリセットが定義されている：
 %</ja>
+\begin{quote}
+  \ttfamily
+  \hyphenchar\font=-1 \exhyphenchar=-1
+  hiragino-pro, hiragino-pron, ipa, ipa-hg, ipaex, ipaex-hg,
+  kozuka-pr6, kozuka-pr6n, kozuka-pro, moga-mobo, moga-mobo-ex,
+  morisawa-pr6n, morisawa-pro, ms, ms-hg, noembed, noto-otc, noto-otf,
+  sourcehan, sourcehan-jp, ume, yu-osx, yu-win, yu-win10
+\end{quote}
+
+%<ja> 例えば，本ドキュメントでは\Pkg{luatexja-preset}パッケージを
+%<en> For example, this document loads \Pkg{luatexja-preset} package by
 \begin{lstlisting}
-\usepackage[no-math]{fontspec}
-\usepackage[match]{luatexja-fontspec}
 \usepackage[kozuka-pr6n]{luatexja-preset}
-%%--------
-\usepackage[no-math,match,kozuka-pr6n]{luatexja-preset}
 \end{lstlisting}
+%<ja>として読み込み，小塚書体(Pr6N)を使うことを指定している．
+%<en> which means that Kozuka~Pr6N fonts will be used in this document.
 
-%<en>\paragraph{General options}
-%<ja>\paragraph{一般的なオプション}
-\begin{cslist}[before*=]
-\item[fontspec%
-%<en>\textrm{~(enabled by default)}
-%<ja>\emph{\gtfamily （既定）}
-]
-%<*en>
-With this option, Japanese fonts are selected using functionality of
-the \Pkg{luatexja-fontspec} package. This means that the \Pkg{fontspec} package is
-	     automatically loaded by this package.
-
-If you need to pass some options to \Pkg{fontspec}, you can load \Pkg{fontspec} manually
-before \Pkg{luatexja-preset}:
-%</en>
 %<*ja>
-\Pkg{luatexja-fontspec}パッケージの機能を用いて和文フォントを選択する．
-これは，\Pkg{fontspec}パッケージが自動で読み込まれることを意味する．
-
-もし\Pkg{fontspec}パッケージに何らかのオプションを渡す必要がある
-\footnote{例えば，数式フォントまで置換されてしまい，\cs{mathit}によってギリシャ文字の
-斜体大文字が出なくなる，など．}場合は，
-次のように\Pkg{luatexja-preset}の前に\Pkg{fontspec}を手動で読みこめば良い：
-%</ja>
+上記のプリセット以外の和文フォント設定を使いたい場合，本来は
+\Pkg{luatexja-fontspec}パッケージの提供する
+\cs{setmainjfont}, \cs{setsansjfont}を使って自分で指定するべきである．
+\texttt{custom}オプションを使うことで，\Pkg{luatexja-preset}パッケージの内部に直接アクセスして
 \begin{lstlisting}
-\usepackage[no-math]{fontspec}
-\usepackage[...]{luatexja-preset}
+\usepackage[kozuka-pr6n,          % kozuka-pr6n プリセットを基礎にして，
+  custom={
+    mc=SourceHanSerif-Regular,    % 明朝体（全ウェイト）
+    mc-l=SourceHanSerif-Bold,     % 明朝体細字
+    mc-m=KozMinPr6N-Regular,      % 明朝体中字
+  % mc-bx=KozMinPr6N-Bold,        % 明朝体太字
+  % gt=HirakakuProN-W3,           % ゴシック体（全ウェイト）
+  % gt-m=SourceHanSans-Regular,   % ゴシック体中字（deluxe オプション指定時）
+  % gt-bx=HiraKakuProN-W6,ular,   % ゴシック体太字
+  % gt-eb=HiraKakuProN-W6,ular,   % ゴシック体極太
+    mg-m=HG Maru Gothic PRO,      % 丸ゴシック体
+  },
+  deluxe,expert,jis2004,match,nfssonly
+]{luatexja-preset}
 \end{lstlisting}
-
-\item[nfssonly]
+のようにすることもできるが，\texttt{custom}オプションの書式は予告なく変更されることがある
+上，\texttt{90jis}や\texttt{JIS2004}オプションとの相性があまり良くないので推奨はしない．
+%</ja>
 %<*en>
-With this option, selecting Japanese fonts won't be performed using the functionality of
-	     the \Pkg{fontspec} package, but only standard NFSS2 (hence without
-	     \cs{addjfontfeatures} etc.).
-This option is ignored when \Pkg{luatexja-fontspec} package is loaded.
+To use a Japanese font setting which does not match with any presets,
+the legitimate method is to use \cs{setmainjfont}~and~\cs{setsansjfont}
+which are provided by the \Pkg{luatexja-fontspec} package.
 
-When this option is specified, \Pkg{fontspec}~and~\Pkg{luatexja-fontspec} are
-\emph{not} loaded by default. Nevertheless,
-the package\Pkg{fontspec} can coexist with the option, as the following:
+One can use the \texttt{custom} option, such as
 \begin{lstlisting}
-\usepackage{fontspec}
-\usepackage[hiragino-pron,nfssonly]{luatexja-preset}
+\usepackage[kozuka-pr6n,          % based on the kozuka-pr6n preset (Kozuka Pr6N),
+  custom={
+    mc=SourceHanSerif-Regular,    % mincho family (all weights)
+    mc-l=SourceHanSerif-Bold,     % mincho light
+    mc-m=KozMinPr6N-Regular,      % mincho medium
+  % mc-bx=KozMinPr6N-Bold,        % mincho bold
+  % gt=HirakakuProN-W3,           % gothic family (all weights)
+  % gt-m=SourceHanSans-Regular,   % gothic medium (with deluxe option)
+  % gt-bx=HiraKakuProN-W6,ular,   % gothic bold
+  % gt-eb=HiraKakuProN-W6,ular,   % gothic extra bold
+    mg-m=HG Maru Gothic PRO,      % rounded gothic
+  },
+  deluxe,expert,jis2004,match,nfssonly
+]{luatexja-preset}
 \end{lstlisting}
-In this case, one can use \cs{setmainfont} etc.\ to select \emph{alphabetic} fonts.
+However, we do not recommend this \cs{custom} option;
+the format might change, and this \cs{custom} option is not well-compatible with
+\texttt{90jis}~nor~\cs{jis2004} options.
 %</en>
-%<*ja>
-\LaTeX 標準のフォント選択機構(NFSS2)を用いて
-\texttt{ltjpm}（明朝），\texttt{ltjpg}（ゴシック），それに後に述べる \texttt{deluxe} オプ
-	     ションが指定された場合には \texttt{ltjpmg}（丸ゴシック）という
-3つの和文フォントファミリを定義し，これらを用いる．
-
-本オプション指定時には\Pkg{fontspec}・\Pkg{luatexja-fontspec}パッケージは
-自動では読み込まれない，しかし，
-\begin{lstlisting}
-\usepackage{fontspec}
-\usepackage[hiragino-pron,nfssonly]{luatexja-preset}
-\end{lstlisting}
-のようにすれば，このオプションを指定すれば
-欧文フォントを\Pkg{fontspec}パッケージの機能を使って指定することができる．
-一方，
-パッケージ読み込み時に既に\Pkg{luatexja-fontspec}パッケージが読み込まれて
-	     いる場合は \texttt{nfssonly} オプションは無視される．
-%</ja>
-
-\item[match]
-%<*en>
-If this option is specified, usual family-changing commands such as
-\cs{rmfamily},~\cs{textrm}, \cs{sffamily},~\dots\ also change Japanese font family.
-This option is passed to \Pkg{luatexja-fontspec}, if \texttt{fontspec}
-option is specifed.
-%</en>
-
-%<*ja>
-このオプションが指定されると，「\pLaTeXe 新ドキュメントクラス」のように\
-\cs{rmfamily}, \verb+\textrm{...}+, \cs{sffamily} 等が
-欧文フォントだけでなく和文フォントも変更するようになる．
-\ \texttt{fontspec}\
-オプションが有効になっている場合は，このオプションは \Pkg{luatexja-fontspec} パッケージへと渡される．
-%</ja>
-
-
-\item[nodeluxe%
-%<en>\textrm{~(enabled by default)}
-%<ja>\emph{\gtfamily （既定）}
-]
-%<*en>
-The nagation of \texttt{deluxe} option.
-Use one-weighted \textit{mincho} and \textit{gothic} font families.
-This means that \verb+\mcfamily\bfseries+, \verb+\gtfamily\bfseries+ and
-\verb+\gtfamily\mdseries+ use the same font.
-%</en>
-%<*ja>
-\texttt{deluxe}オプションの否定．
-\LaTeXe 環境下の標準設定のように，明朝体・ゴシック体を各1ウェイトで使用する．
-より具体的に言うと，この設定の下では
-\ \verb+\mcfamily\bfseries+, \verb+\gtfamily\bfseries+,
-\verb+\gtfamily\mdseries+はみな同じフォントとなる．
-%</ja>
-\item[deluxe]
-%<*en>
-Use \textit{mincho} with three weights (light, medium, and~bold),
-\textit{gothic} with three weights (medium, bold, and~heavy), and \textit{rounded gothic}%
-\footnote{Provided by \cs{mgfamily} and \cs{textmg},
-because ``rounded gothic'' is called \textit{maru gothic} (丸ゴシック) in Japanese.}.
-The light weight of mincho and the heavy weight of gothic can be used by
-\cs{mcfamily}\cs{ltseries}~and~\cs{gtfamily}\cs{ebseries}, respectively.
-
-\begin{itemize}
- \item Some presets do not have the light weight of mincho.
-  In this case, we substitute the medium weight for the light weight.
- \item \Pkg{luatexja-preset} does not produce an error (only produces a warning), even if
-  (one of) fonts for \cs{mcfamily}\cs{ltseries}, \cs{gtfamily}\cs{ebseries}, \cs{mgfamily}
-  do not exist.
-\end{itemize}
-%</en>
-%<*ja>
-明朝体3ウェイト・ゴシック体3ウェイトと，
-丸ゴシック体 (\cs{mgfamily}, \verb+\textmg{...}+) を利用可能にする．
-明朝体は細字・中字・太字の3ウェイトがあり，
-明朝体の細字は \cs{mcfamily}\cs{ltseries} で利用できる．
-また，ゴシック体は中字・太字・極太の3ウェイトがあり，
-ゴシック体の極太は \cs{gtfamily}\cs{ebseries} で利用できる%
-\footnote{過去との互換性のため，\cs{gtebfamily}, \cs{textgteb\{...\}} も
- 依然として利用可能である．}．
-
-\begin{itemize}
-  \item プリセット設定によっては明朝体細字が用意されていないものもある．その場合は
-  明朝体中字が代用される．
-  \item 明朝体細字，ゴシック体極太，丸ゴシック体の3フォントについては
-  実際にフォントをロードする前に存在するかチェックを行う．
-  存在しなかったものについては警告を発し，
-  それぞれ明朝体中字．ゴシック体太字，ゴシック体太字で代用する．
-\end{itemize}
-%</ja>
-\item[expert]
-%<*en>
-Use horizontal/vertical kana alternates, and define a command \cs{rubyfamily} to use kana
-characters designed for ruby.
-%</en>
-%<*ja>
-横組・縦組専用仮名を用いる．また，\cs{rubyfamily} でルビ用仮名が使用可能となる\footnote{%
-  \cs{rubyfamily}とはいいつつ，実際にはフォントファミリを切り替えるのではない（通常では
-  font featureの追加，\texttt{nfssonly} 指定時にはシェイプを \texttt{rb} に切り替え）．
-}．
-%</ja>
-\item[bold]
-%<*en>
-Substitute bold series of \textit{gothic} for  bold series of \textit{mincho}.
-If \texttt{nodeluxe} option is enabled, medium series of \textit{gothic} is also changed,
-since we use same font for both series of \textit{gothic}.
-%</en>
-%<*ja>
-「明朝の太字」をゴシック体の太字によって代替する．
-もし\texttt{nodeluxe}オプションが指定されている場合は，ゴシック体は1ウェイトしか使用されな
-	   いため，
-「ゴシック体の中字」も同時に変更されることになる．
-%</ja>
-\item[90jis]
-%<en>Use 90JIS glyph variants if possible.
-%<ja>出来る限り90JISの字形を使う．
-\item[jis2004]
-%<en>Use JIS2004 glyph variants if possible.
-%<ja>出来る限りJIS2004の字形を使う．
-\item[jfm\_yoko=<jfm>]
-%<*en>
-Use the JFM \texttt{jfm-<jfm>.lua} for horizontal direction, instead of \texttt{jfm-ujis.lua}~(default JFM).
-%</en>
-%<*ja>
-横組用和文フォントで用いるJFMを\texttt{jfm-<jfm>.lua}にする．このオプションがない時は
-\LuaTeX\nobreakdash -ja標準の\texttt{jfm-ujis.lua}が用いられる．
-%</ja>
-\item[jfm\_tate=<jfm>]
-%<*en>
-Use the JFM \texttt{jfm-<jfm>.lua} for vertical direction, instead of \texttt{jfm-ujisv.lua}~(default JFM).
-%</en>
-%<*ja>
-縦用和文フォントで用いるJFMを\texttt{jfm-<jfm>.lua}にする．このオプションがない時は
-\LuaTeX-ja標準の\texttt{jfm-ujisv.lua}が用いられる．
-%</ja>
-
-\item[jis]
-%<en>Same as \texttt{jfm\_yoko=jis}.
-%<ja>\texttt{jfm\_yoko=jis}と同じ．ここで用いるJFM\texttt{jfm-jis.lua}はJISフォントメトリックを元にしたものである．
-
-\end{cslist}
-%<*en>
-Note that \texttt{90jis} and \texttt{jis2004} only affect with \textit{mincho},
-\textit{gothic} (and possibly \textit{rounded gothic}) defined by this package.
-We didn't taken account of  when both \texttt{90jis} and \texttt{jis2004} are specified.
-%</en>
-%<*ja>
-\texttt{90jis}と\texttt{jis2004}については本パッケージで定義された
-明朝体・ゴシック体（・丸ゴシック体）にのみ有効である．
-両オプションが同時に指定された場合の動作については全く考慮していない．
-%</ja>
-
-%<en>\paragraph{Presets for multi weight}
-%<ja>\paragraph{多ウェイト用プリセットの一覧}
-%<*en>
-Besides \texttt{morisawa-pro}~and~\texttt{morisawa-pr6n} presets,
-fonts are specified by font name, not by file name.
-In following tables, starred fonts (e.g.~KozGo\dots-Regular) are used for medium series of \textit{gothic},
-\emph{if and only if \texttt{deluxe} option is specified}.
-%</en>
-%<*ja>
-\texttt{morisawa-pro}, \texttt{morisawa-pr6n}以外はフォントの指定は
-（ファイル名でなく）フォント名で行われる．
-以下の表において，*\,つきのフォント(e,g,~KozGo\dots-Regular)は，\emph{\texttt{deluxe}オプション指定時に}
-ゴシック体中字として用いられるものを示している．
-%</ja>
-\begin{cslist}[style=standard]
- \item[kozuka-pro] Kozuka Pro (Adobe-Japan1-4) fonts.
-%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
- \item[kozuka-pr6] Kozuka Pr6 (Adobe-Japan1-6)  fonts.
-%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
- \item[kozuka-pr6n] Kozuka Pr6N (Adobe-Japan1-6, JIS04-savvy) fonts.
-
-%<*en>
-Kozuka Pro/Pr6N fonts are bundled with Adobe's software, such as Adobe~InDesign.
-There is not rounded gothic family in Kozuka fonts.
-%</en>
-%<*ja>
-小塚Pro書体・Pr6N書体はAdobe InDesign等のAdobe製品にバンドルされている．
-「小塚丸ゴシック」は存在しないので，便宜的に小塚ゴシックHによって代用している．
-%</ja>
-\begin{center}\small
-\begin{tabular}{cllll}
-\toprule
-\bfseries family&\bfseries series&\ttfamily kozuka-pro&\ttfamily kozuka-pr6&\ttfamily kozuka-pr6n\\
-\midrule
- &light&KozMinPro-Light&KozMinProVI-Light&KozMinPr6N-Light\\
-%<en>\textit{mincho}%
-%<ja>\textgt{明朝}%
- &medium&KozMinPro-Regular&KozMinProVI-Regular&KozMinPr6N-Regular\\
- &bold&KozMinPro-Bold&KozMinProVI-Bold&KozMinPr6N-Bold\\
-\midrule
- &&KozGoPro-Regular*&KozGoProVI-Regular*&KozGoPr6N-Regular*\\
- &\smash{\raisebox{1.5ex}{medium}}
- &KozGoPro-Medium&KozGoProVI-Medium&KozGoPr6N-Medium\\
-\cmidrule(l){2-5}
-%<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
-%<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
- &bold&KozGoPro-Bold&KozGoProVI-Bold&KozGoPr6N-Bold\\
- &heavy&KozGoPro-Heavy&KozGoProVI-Heavy&KozGoPr6N-Heavy\\
-\midrule
-%<en>\textit{rounded gothic}
-%<ja>\gt 丸ゴシック
-&&KozGoPro-Heavy&KozGoProVI-Heavy&KozGoPr6N-Heavy\\
-\bottomrule
-\end{tabular}
-\end{center}
-
- \item[hiragino-pro]  Hiragino Pro (Adobe-Japan1-5) fonts.
-%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
- \item[hiragino-pron] Hiragino ProN (Adobe-Japan1-5, JIS04-savvy) fonts.
-
-%<*en>
-Hiragino fonts (except Hiragino~Mincho~W2) are bundled with Mac OS~X 10.5 or later.
-Some editions of a Japanese word-processor ``一太郎2012'' includes Hiragino ProN fonts.
-Note that the heavy weight of gothic family only supports
-Adobe-Japan1-3 character collection (Std/StdN), while others supports
-Adobe-Japan1-5 character collection.
-%</en>
-%<*ja>
-ヒラギノフォントは，Mac OS~X以外にも，一太郎2012の上位エディションにもバンドルされている．
-極太ゴシック体として用いるヒラギノ角ゴW8は，Adobe-Japan1-3の範囲しかカバーしていない
-Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
-
-なお，明朝体細字として用いるヒラギノ明朝体W2はOS~Xや一太郎にはバンドルされておらず，
-別途購入する必要がある．
-%</ja>
-\begin{center}\small
-\begin{tabular}{clll}
-\toprule
-\bf family&\bf series&\tt hiragino-pro&\tt hiragino-pron\\
-\midrule
- &light&Hiragino~Mincho~Pro~W2&Hiragino~Mincho~ProN~W2\\
-%<en>\textit{mincho}%
-%<ja>\textgt{明朝}%
- &medium&Hiragino~Mincho~Pro~W3&Hiragino~Mincho~ProN~W3\\
- &bold&Hiragino~Mincho~Pro~W6&Hiragino~Mincho~ProN~W6\\
-\midrule
- &&Hiragino~Kaku~Gothic~Pro~W3*&Hiragino~Kaku~Gothic~ProN~W3*\\
- &\smash{\raisebox{1.5ex}{medium}}
- &Hiragino~Kaku~Gothic~Pro~W6&Hiragino~Kaku~Gothic~ProN~W6\\
-\cmidrule(l){2-4}
-%<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
-%<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
- &bold&Hiragino~Kaku~Gothic~Pro~W6&Hiragino~Kaku~Gothic~ProN~W6\\
- &heavy&Hiragino~Kaku~Gothic~Std~W8&Hiragino~Kaku~Gothic~StdN~W8\\
-\midrule
-%<en>\textit{rounded gothic}
-%<ja>\gt 丸ゴシック
-&&Hiragino~Maru~Gothic~Pro~W4&Hiragino~Maru~Gothic~ProN~W4\\
-\bottomrule
-\end{tabular}
-\end{center}
-
- \item[morisawa-pro]  Morisawa Pro (Adobe-Japan1-4) fonts.
-%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
- \item[morisawa-pr6n]  Morisawa Pr6N (Adobe-Japan1-6, JIS04-savvy) fonts.
-\begin{center}\small
-\begin{tabular}{cl>{\tt}l>{\tt}l}
-\toprule
-\bf family&\bf series&morisawa-pro&morisawa-pr6n\\
-\midrule
- &medium&A-OTF-RyuminPro-Light.otf&A-OTF-RyuminPr6N-Light.otf\\
-%<en>\smash{\raisebox{1.5ex}{\textit{mincho}}}%
-%<ja>\smash{\raisebox{1.5ex}{\gt 明朝}}%
- &bold&A-OTF-FutoMinA101Pro-Bold.otf&A-OTF-FutoMinA101Pr6N-Bold.otf\\
-\midrule
- &medium
- &A-OTF-GothicBBBPro-Medium.otf&A-OTF-GothicBBBPr6N-Medium.otf\\
-%<en>\textit{gothic}%
-%<ja>\gt ゴシック
- &bold&A-OTF-FutoGoB101Pro-Bold.otf&A-OTF-FutoGoB101Pr6N-Bold.otf\\
- &heavy&A-OTF-MidashiGoPro-MB31.otf&A-OTF-MidashiGoPr6N-MB31.otf\\
-\midrule
-%<en>\textit{rounded gothic}
-%<ja>\gt 丸ゴシック
-&&A-OTF-Jun101Pro-Light.otf&A-OTF-ShinMGoPr6N-Light.otf\\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\newpage
- \item[yu-win]  Yu fonts bundled with Windows~8.1.
-%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
- \item[yu-win10]  Yu fonts bundled with Windows~10.
-%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
- \item[yu-osx]  Yu fonts bundled with OSX~Mavericks.
-\begin{center}\small
-\begin{tabular}{cllll}
-\toprule
-\bf family&\bf series&\texttt{yu-win}&\texttt{yu-win10}&\texttt{yu-osx}\\
-\midrule
- &light&YuMincho-Light&YuMincho-Light&(YuMincho~Medium)\\
-%<en>\textit{mincho}%
-%<ja>\textgt{明朝}%
- &medium&YuMincho-Regular&YuMincho-Regular&YuMincho~Medium\\
- &bold&YuMincho-Demibold&YuMincho-Demibold&YuMincho~Demibold\\
-\midrule
- &&YuGothic-Regular*&YuGothic-Regular*&YuGothic~Medium*\\
- &\smash{\raisebox{1.5ex}{medium}}%
-        &YuGothic-Regular&YuGothic-Medium&YuGothic~Medium\\
-\cmidrule(l){2-5}
-%<en>\textit{gothic}%
-%<ja>\gt ゴシック
- &bold&YuGothic-Bold&YuGothic-Bold&YuGothic~Bold\\
- &heavy&YuGothic-Bold&YuGothic-Bold&YuGothic~Bold\\
-\midrule
-%<en>\textit{rounded gothic}
-%<ja>\gt 丸ゴシック
-&&YuGothic-Bold&YuGothic-Bold&YuGothic~Bold\\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\item[moga-mobo]  MogaMincho, MogaGothic, and MoboGothic.
-%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
-\item[moga-mobo-ex]  MogaExMincho, MogaExGothic, and MoboExGothic.
-%<en>\par These fonts can be downloaded from \url{http://yozvox.web.fc2.com/}.
-%<ja>これらのフォントは \url{http://yozvox.web.fc2.com/} からダウンロードできる．
-\begin{center}\small
-\begin{tabular}{clll}
-\toprule
-\bf family&\bf series&\bf default, \texttt{90jis}~option&\bf \texttt{jis2004} option\\
-\midrule
- &medium&Moga90Mincho&MogaMincho\\
-%<en>\smash{\raisebox{1.5ex}{\textit{mincho}}}%
-%<ja>\smash{\raisebox{1.5ex}{\gt 明朝}}%
- &bold&Moga90Mincho Bold&MogaMincho Bold\\
-\midrule
- &medium&Moga90Gothic&MogaGothic\\
-%<en>\textit{gothic}%
-%<ja>\gt ゴシック
- &bold&Moga90Gothic Bold&MogaGothic Bold\\
- &heavy&Moga90Gothic Bold&MogaGothic Bold\\
-\midrule
-%<en>\textit{rounded gothic}
-%<ja>\gt 丸ゴシック
-&&Mobo90Gothic&MoboGothic\\
-\bottomrule
-\end{tabular}
-\end{center}
-%<en>When \texttt{moga-mobo-ex} is specified, the font ``MogaEx90Mincho'' etc.\ are used.
-%<ja>\texttt{moga-mobo-ex}オプション指定時にはMogaEx90MinchoなどのExが名前についたフォントが使われる．
-
-\item[ume]  Ume Mincho and Ume Gothic.
-%<en>\par These fonts can be downloaded from\\\hfill \url{https://ja.osdn.net/projects/ume-font/wiki/FrontPage}.
-%<ja>これらのフォントは \url{https://ja.osdn.net/projects/ume-font/wiki/FrontPage} からダウンロードできる．
-\begin{center}\small
-\begin{tabular}{cll}
-\toprule
-\bf family&\bf series&\bf default\\
-\midrule
- &medium&Ume Mincho\\
-%<en>\smash{\raisebox{1.5ex}{\textit{mincho}}}%
-%<ja>\smash{\raisebox{1.5ex}{\gt 明朝}}%
- &bold&Ume Mincho\\
-\midrule
- &&Ume Gothic*\\
- &\smash{\raisebox{1.5ex}{medium}}&Ume Gothic O5\\
-\cmidrule(l){2-3}
-%<en>\textit{gothic}%
-%<ja>\gt ゴシック
- &bold&Ume Gothic O5\\
- &heavy&Ume Gothic O5\\
-\midrule
-%<en>\textit{rounded gothic}
-%<ja>\gt 丸ゴシック
-&&Ume Gothic O5\\
-\bottomrule
-\end{tabular}
-\end{center}
-
-%<ja>\newpage
- \item[sourcehan]  Source Han Serif and Source Han Sans fonts (Language-specific OTF \textit{or} OTC)
-%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
- \item[sourcehan-jp]  Source Han Serif JP and Source Han Sans JP fonts (Region-specific Subset OTF)
-\begin{center}\small
-\def\AD#1#2{Source Han #1 #2&Source Han #1 JP #2}%
-\begin{tabular}{cllll}
-\toprule
-\bf family&\bf series&\texttt{sourcehan}&\texttt{sourcehan-jp}\\
-\midrule
- &light&\AD{Serif}{Light}\\
-%<en>\textit{mincho}%
-%<ja>\textgt{明朝}%
- &medium&\AD{Serif}{Regular}\\
- &bold&\AD{Serif}{Bold}\\
-\midrule
- &&\AD{Sans}{Regular*}\\
- &\smash{\raisebox{1.5ex}{medium}}
- &\AD{Sans}{Medium}\\
-\cmidrule(l){2-4}
-%<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
-%<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
- &bold&\AD{Sans}{Bold}\\
- &heavy&\AD{Sans}{Heavy}\\
-\midrule
-%<en>\textit{rounded gothic}
-%<ja>\gt 丸ゴシック
-&&\AD{Sans}{Heavy}\\
-\bottomrule
-\end{tabular}
-\end{center}
-
-
- \item[noto-otc]  Noto Serif CJK and Noto Sans CJK fonts (OTC)
-%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
- \item[noto-otf]  Noto Serif CJK and Noto Sans CJK fonts (Language-specific OTF)
-\begin{center}\small
-\def\AD#1#2{Noto #1 CJK #2&Noto #1 CJK JP #2}%
-\begin{tabular}{cllll}
-\toprule
-\bf family&\bf series&\texttt{noto-otc}&\texttt{noto-otf}\\
-\midrule
- &light&\AD{Serif}{Light}\\
-%<en>\textit{mincho}%
-%<ja>\textgt{明朝}%
- &medium&\AD{Serif}{Regular}\\
- &bold&\AD{Serif}{Bold}\\
-\midrule
- &&\AD{Sans}{Regular*}\\
- &\smash{\raisebox{1.5ex}{medium}}
- &\AD{Sans}{Medium}\\
-\cmidrule(l){2-4}
-%<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
-%<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
- &bold&\AD{Sans}{Bold}\\
- &heavy&\AD{Sans}{Black}\\
-\midrule
-%<en>\textit{rounded gothic}
-%<ja>\gt 丸ゴシック
-&&\AD{Sans}{Black}\\
-\bottomrule
-\end{tabular}
-\end{center}
-
-
-
-\end{cslist}
-%<en>\paragraph{Presets for single weight}
-%<ja>\paragraph{単ウェイト用プリセット一覧}
-%<*en>
-Next, we describe settings for using only single weight.
-%</en>
-%<*ja>
-次に，単ウェイト用の設定を述べる．この4設定では
-明朝体太字・丸ゴシック体はゴシック体と同じフォントが用いられる．
-%</ja>
-\par\nobreak\medskip
-{\centering\small
-\begin{tabular}{lllll}
-\toprule
-&\tt noembed&\tt ipa&\tt ipaex&\tt ms\\
-\midrule
-%<*en>
-\it mincho&Ryumin-Light (non-embedded)
-&IPA Mincho&IPAex Mincho&MS Mincho\\
-\it gothic&GothicBBB-Medium (non-embedded)
-&IPA Gothic&IPAex Gothic&MS Gothic\\
-%</en>
-%<*ja>
-\gtfamily 明朝体&Ryumin-Light（非埋込）
-&IPA明朝&IPAex明朝&MS明朝\\
-\gtfamily ゴシック体&GothicBBB-Medium（非埋込）
-&IPAゴシック&IPAexゴシック&MSゴシック\\
-%</ja>
-\bottomrule
-\end{tabular}\par\medskip}
-
-%<en>\paragraph{Using HG fonts}
-%<ja>\paragraph{HGフォントの利用}
-%<*en>
-We can use HG~fonts bundled with Microsoft~Office for realizing multiple weights.
-%</en>
-%<*ja>
-すぐ前に書いた単ウェイト用設定を，Microsoft Office等に付属するHGフォントを使って
-多ウェイト化した設定もある．
-%</ja>
-\par\nobreak\medskip
-{\centering\small
-\begin{tabular}{llll}
-\toprule
-&\tt ipa-hg&\tt ipaex-hg&\tt ms-hg\\
-\midrule
-%<*en>
-\bf mincho medium
-&IPA Mincho&IPAex Mincho&MS Mincho\\\midrule
-\bf mincho bold&
-\multicolumn{3}{c}{HG Mincho E}\\\midrule
-\bf Gothic medium\\
-~~without \texttt{deluxe}
-&IPA Gothic&IPAex Gothic&MS Gothic\\
-~~with {\tt jis2004}
-&IPA Gothic&IPAex Gothic&MS Gothic\\
-\cmidrule(lr){1-4}
-~~otherwise&
-\multicolumn{3}{c}{HG Gothic M}\\\midrule
-\bf gothic bold&
-\multicolumn{3}{c}{HG Gothic E}\\\midrule
-\bf gothic heavy&
-\multicolumn{3}{c}{HG Soei Kaku Gothic UB}\\\midrule
-\bf rounded gothic&
-\multicolumn{3}{c}{HG Maru Gothic PRO}\\
-%</en>
-%<*ja>
-\gtfamily 明朝体中字
-&IPA明朝&IPAex明朝&MS明朝\\\midrule
-\gtfamily 明朝体太字&
-\multicolumn{3}{c}{HG明朝E}\\\midrule
-\gtfamily ゴシック体中字\\
-　単ウェイト時
-&IPAゴシック&IPAexゴシック&MSゴシック\\
-　{\tt jis2004}指定時
-&IPAゴシック&IPAexゴシック&MSゴシック\\
-\cmidrule(lr){1-4}
-　それ以外の時&
-\multicolumn{3}{c}{HGゴシックM}\\\midrule
-\gtfamily ゴシック体太字&
-\multicolumn{3}{c}{HGゴシックE}\\\midrule
-\gtfamily ゴシック体極太&
-\multicolumn{3}{c}{HG創英角ゴシックUB}\\\midrule
-\gtfamily 丸ゴシック体&
-\multicolumn{3}{c}{HG丸ゴシック体PRO}\\
-%</ja>
-\bottomrule
-\end{tabular}\par\medskip}
-
-%<*en>
-Note that HG~Mincho~E, HG~Gothic~E, HG Soei Kaku Gothic UB, and HG Maru Gothic PRO
-are internally specified by:
-\begin{description}
-\item[default] by font name (\texttt{HGMinchoE}, etc.).
-\item[{\tt 90jis}] by file name (\texttt{hgrme.ttc}, \texttt{hgrge.ttc}, \texttt{hgrsgu.ttc}, \texttt{hgrsmp.ttf}).
-\item[{\tt jis2004}] by file name (\texttt{hgrme04.ttc}, \texttt{hgrge04.ttc}, \texttt{hgrsgu04.ttc}, \texttt{hgrsmp04.ttf}).
-\end{description}
-%</en>
-%<*ja>
-なお，HG明朝E・HGゴシックE・HG創英角ゴシックUB・HG丸ゴシック体PROの4つについては，内部で
-\begin{description}
-\item[標準] フォント名（\texttt{HGMinchoE} など）
-\item[{\tt 90jis}指定時] ファイル名 (%
-\texttt{hgrme.ttc}, \texttt{hgrge.ttc}, \texttt{hgrsgu.ttc}, \texttt{hgrsmp.ttf})
-\item[{\tt jis2004}指定時] ファイル名 (%
-\texttt{hgrme04.ttc}, \texttt{hgrge04.ttc}, \texttt{hgrsgu04.ttc}, \texttt{hgrsmp04.ttf})
-\end{description}
-として指定を行っているので注意すること．
-%</ja>
-
 
 %<*en>
 \subsection{\cs{CID}, \cs{UTF}, and macros in \Pkg{japanese-otf} package}
@@ -2299,7 +1753,7 @@ and the character ``漢'' to the character range~100.
 %<*en>
 A character can belong to only one character range.
 For example, whole SIP belong to the range~4 in the default setting of \LuaTeX-ja,
-and if you execute the above line, then SIP will belong to the range~100 and be
+and if one executes the above line, then SIP will belong to the range~100 and be
 removed from the range~4.
 %</en>
 %<*ja>
@@ -7031,6 +6485,7 @@ A demonstrarion is shown in \autoref{fig:altkanji-fontspec}.
 
 %<*en>
 \paragraph{Remark on \texttt{AltFont}, \texttt{YokoFeatures}, \texttt{TateFeatures} keys}
+\leavevmode\par
 In \texttt{AltFont},~\texttt{YokoFeatures},~\texttt{TateFeatures} keys,
 one cannot specify per-shape settings such as \texttt{BoldFeatures}.
 For example,
@@ -7655,6 +7110,617 @@ center (\texttt{c}), or~right (\texttt{r}).
 \end{description}
 %</ja>
 
+\subsection{\Pkg{luatexja-preset}}
+\label{ssec:preset}
+
+%<*en>
+As described in Subsection~\ref{ssec:preset-abst},
+One can load the \Pkg{luatexja-preset}
+package to use several ``presets'' of Japanese fonts.
+This package provides functions in a part of \Pkg{japanese-otf} package (changing fonts)
+and a part of \Pkg{PXchfon} package (presets) by Takayuki Yato.
+
+One can specified other options other than listed below.
+These are simply passed to the \Pkg{luatexja-fontspec}\footnote{if \texttt{nfssonly} option is
+\emph{not} specified; in this case these options are simply ignored.}.
+For example, the line~5 in below example is equivalent to lines 1--3.
+%</en>
+%<*ja>
+\ref{ssec:preset-abst}節で述べたように，よく使われている和文フォント設定を一行で指定できるようにしたのが
+\Pkg{luatexja-preset}パッケージである．このパッケージは，
+\Pkg{otf}パッケージの一部（多書体化）と八登崇之氏による\Pkg{PXchfon}パッケージの一部（プリセット指定）
+とを合わせたような格好をしている．
+
+オプションとして，以下のリストにないものも指定することができるが，それらは
+\Pkg{luatexja-fontspec}パッケージに渡される\footnote{\texttt{nfssonly} オプションが
+指定されていた場合は，\Pkg{luatexja-fontspec}パッケージは読み込まれないので単純に無視され
+る．}．例えば，下の1--3行目は5行目のように一行にまとめることができる．
+%</ja>
+\begin{lstlisting}
+\usepackage[no-math]{fontspec}
+\usepackage[match]{luatexja-fontspec}
+\usepackage[kozuka-pr6n]{luatexja-preset}
+%%--------
+\usepackage[no-math,match,kozuka-pr6n]{luatexja-preset}
+\end{lstlisting}
+
+\begin{cslist}[before*=]
+\item[fontspec%
+%<en>\textrm{~(enabled by default)}
+%<ja>\emph{\gtfamily （既定）}
+]
+%<*en>
+With this option, Japanese fonts are selected using functionality of
+the \Pkg{luatexja-fontspec} package. This means that the \Pkg{fontspec} package is
+	     automatically loaded by this package.
+
+If you need to pass some options to \Pkg{fontspec}, you can load \Pkg{fontspec} manually
+before \Pkg{luatexja-preset}:
+%</en>
+%<*ja>
+\Pkg{luatexja-fontspec}パッケージの機能を用いて和文フォントを選択する．
+これは，\Pkg{fontspec}パッケージが自動で読み込まれることを意味する．
+
+もし\Pkg{fontspec}パッケージに何らかのオプションを渡す必要がある
+\footnote{例えば，数式フォントまで置換されてしまい，\cs{mathit}によってギリシャ文字の
+斜体大文字が出なくなる，など．}場合は，
+次のように\Pkg{luatexja-preset}の前に\Pkg{fontspec}を手動で読みこめば良い：
+%</ja>
+\begin{lstlisting}
+\usepackage[no-math]{fontspec}
+\usepackage[...]{luatexja-preset}
+\end{lstlisting}
+
+\item[nfssonly]
+%<*en>
+With this option, selecting Japanese fonts won't be performed using the functionality of
+	     the \Pkg{fontspec} package, but only standard NFSS2 (hence without
+	     \cs{addjfontfeatures} etc.).
+This option is ignored when \Pkg{luatexja-fontspec} package is loaded.
+
+When this option is specified, \Pkg{fontspec}~and~\Pkg{luatexja-fontspec} are
+\emph{not} loaded by default. Nevertheless,
+the package\Pkg{fontspec} can coexist with the option, as the following:
+\begin{lstlisting}
+\usepackage{fontspec}
+\usepackage[hiragino-pron,nfssonly]{luatexja-preset}
+\end{lstlisting}
+In this case, one can use \cs{setmainfont} etc.\ to select \emph{alphabetic} fonts.
+%</en>
+%<*ja>
+\LaTeX 標準のフォント選択機構(NFSS2)を用いて
+\texttt{ltjpm}（明朝），\texttt{ltjpg}（ゴシック），それに後に述べる \texttt{deluxe} オプ
+	     ションが指定された場合には \texttt{ltjpmg}（丸ゴシック）という
+3つの和文フォントファミリを定義し，これらを用いる．
+
+本オプション指定時には\Pkg{fontspec}・\Pkg{luatexja-fontspec}パッケージは
+自動では読み込まれない，しかし，
+\begin{lstlisting}
+\usepackage{fontspec}
+\usepackage[hiragino-pron,nfssonly]{luatexja-preset}
+\end{lstlisting}
+のようにすれば，このオプションを指定すれば
+欧文フォントを\Pkg{fontspec}パッケージの機能を使って指定することができる．
+一方，
+パッケージ読み込み時に既に\Pkg{luatexja-fontspec}パッケージが読み込まれて
+	     いる場合は \texttt{nfssonly} オプションは無視される．
+%</ja>
+
+\item[match]
+%<*en>
+If this option is specified, usual family-changing commands such as
+\cs{rmfamily},~\cs{textrm}, \cs{sffamily},~\dots\ also change Japanese font family.
+This option is passed to \Pkg{luatexja-fontspec}, if \texttt{fontspec}
+option is specifed.
+%</en>
+
+%<*ja>
+このオプションが指定されると，「\pLaTeXe 新ドキュメントクラス」のように\
+\cs{rmfamily}, \verb+\textrm{...}+, \cs{sffamily} 等が
+欧文フォントだけでなく和文フォントも変更するようになる．
+\ \texttt{fontspec}\
+オプションが有効になっている場合は，このオプションは \Pkg{luatexja-fontspec} パッケージへと渡される．
+%</ja>
+
+
+\item[nodeluxe%
+%<en>\textrm{~(enabled by default)}
+%<ja>\emph{\gtfamily （既定）}
+]
+%<*en>
+The nagation of \texttt{deluxe} option.
+Use one-weighted \textit{mincho} and \textit{gothic} font families.
+This means that \verb+\mcfamily\bfseries+, \verb+\gtfamily\bfseries+ and
+\verb+\gtfamily\mdseries+ use the same font.
+%</en>
+%<*ja>
+\texttt{deluxe}オプションの否定．
+\LaTeXe 環境下の標準設定のように，明朝体・ゴシック体を各1ウェイトで使用する．
+より具体的に言うと，この設定の下では
+\ \verb+\mcfamily\bfseries+, \verb+\gtfamily\bfseries+,
+\verb+\gtfamily\mdseries+はみな同じフォントとなる．
+%</ja>
+\item[deluxe]
+%<*en>
+Use the mincho family with three weights (light, medium, and~bold),
+the gothic family with three weights (medium, bold, and extra~bold), and \textit{rounded gothic}%
+\footnote{Provided by \cs{mgfamily} and \cs{textmg},
+because ``rounded gothic'' is called \textit{maru gothic} (丸ゴシック) in Japanese.}.
+Mincho light and gothic extra~bold can be by
+\cs{mcfamily}\cs{ltseries}~and~\cs{gtfamily}\cs{ebseries}, respectively.
+
+\begin{itemize}
+ \item Some presets do not have the light weight of mincho.
+  In this case, we substitute the medium weight for the light weight.
+ \item \Pkg{luatexja-preset} does not produce an error (only produces a warning), even if
+  (one of) fonts for \cs{mcfamily}\cs{ltseries}, \cs{gtfamily}\cs{ebseries}, \cs{mgfamily}
+  do not exist.
+\end{itemize}
+%</en>
+%<*ja>
+明朝体・ゴシック体各3ウェイトと，
+丸ゴシック体 (\cs{mgfamily}, \verb+\textmg{...}+) を利用可能にする．
+明朝体は細字・中字・太字の3ウェイトがあり，
+明朝体の細字は \cs{mcfamily}\cs{ltseries} で利用できる．
+また，ゴシック体は中字・太字・極太の3ウェイトがあり，
+ゴシック体の極太は \cs{gtfamily}\cs{ebseries} で利用できる%
+\footnote{過去との互換性のため，\cs{gtebfamily}, \cs{textgteb\{...\}} も
+ 依然として利用可能である．}．
+
+\begin{itemize}
+  \item プリセット設定によっては明朝体細字が用意されていないものもある．その場合は
+  明朝体中字が代用される．
+  \item 明朝体細字，ゴシック体極太，丸ゴシック体の3フォントについては
+  実際にフォントをロードする前に存在するかチェックを行う．
+  存在しなかったものについては警告を発し，
+  それぞれ明朝体中字．ゴシック体太字，ゴシック体太字で代用する．
+\end{itemize}
+%</ja>
+\item[expert]
+%<*en>
+Use horizontal/vertical kana alternates, and define a command \cs{rubyfamily} to use kana
+characters designed for ruby.
+%</en>
+%<*ja>
+横組・縦組専用仮名を用いる．また，\cs{rubyfamily} でルビ用仮名が使用可能となる\footnote{%
+  \cs{rubyfamily}とはいいつつ，実際にはフォントファミリを切り替えるのではない（通常では
+  font featureの追加，\texttt{nfssonly} 指定時にはシェイプを \texttt{rb} に切り替え）．
+}．
+%</ja>
+\item[bold]
+%<*en>
+Substitute bold series of gothic for  bold series of mincho.
+If \texttt{nodeluxe} option is enabled, medium series of gothic is also changed,
+since we use same font for both series of gothic.
+%</en>
+%<*ja>
+「明朝の太字」をゴシック体の太字によって代替する．
+もし\texttt{nodeluxe}オプションが指定されている場合は，ゴシック体は1ウェイトしか使用されな
+	   いため，
+「ゴシック体の中字」も同時に変更されることになる．
+%</ja>
+\item[90jis]
+%<en>Use 90JIS glyph variants if possible.
+%<ja>出来る限り90JISの字形を使う．
+\item[jis2004]
+%<en>Use JIS2004 glyph variants if possible.
+%<ja>出来る限りJIS2004の字形を使う．
+\item[jfm\_yoko=<jfm>]
+%<*en>
+Use the JFM \texttt{jfm-<jfm>.lua} for horizontal direction, instead of \texttt{jfm-ujis.lua}~(default JFM).
+%</en>
+%<*ja>
+横組用和文フォントで用いるJFMを\texttt{jfm-<jfm>.lua}にする．このオプションがない時は
+\LuaTeX\nobreakdash -ja標準の\texttt{jfm-ujis.lua}が用いられる．
+%</ja>
+\item[jfm\_tate=<jfm>]
+%<*en>
+Use the JFM \texttt{jfm-<jfm>.lua} for vertical direction, instead of \texttt{jfm-ujisv.lua}~(default JFM).
+%</en>
+%<*ja>
+縦用和文フォントで用いるJFMを\texttt{jfm-<jfm>.lua}にする．このオプションがない時は
+\LuaTeX-ja標準の\texttt{jfm-ujisv.lua}が用いられる．
+%</ja>
+
+\item[jis]
+%<en>Same as \texttt{jfm\_yoko=jis}.
+%<ja>\texttt{jfm\_yoko=jis}と同じ．ここで用いるJFM\texttt{jfm-jis.lua}はJISフォントメトリックを元にしたものである．
+
+\end{cslist}
+%<*en>
+Note that \texttt{90jis} and \texttt{jis2004} only affect with mincho,
+gothic (and, possibly rounded gothic) families defined by this package.
+We didn't taken account of  when both \texttt{90jis} and \texttt{jis2004} are specified.
+%</en>
+%<*ja>
+\texttt{90jis}と\texttt{jis2004}については本パッケージで定義された
+明朝体・ゴシック体（・丸ゴシック体）にのみ有効である．
+両オプションが同時に指定された場合の動作については全く考慮していない．
+%</ja>
+
+%<en>\paragraph{Presets for multi weight}
+%<ja>\paragraph{多ウェイト用プリセットの一覧}
+%<*en>
+Besides \texttt{morisawa-pro}~and~\texttt{morisawa-pr6n} presets,
+fonts are specified by font name, not by file name.
+In following tables, starred fonts (e.g.~KozGo\dots-Regular) are used for medium series of \textit{gothic},
+\emph{if and only if \texttt{deluxe} option is specified}.
+%</en>
+%<*ja>
+\texttt{morisawa-pro}, \texttt{morisawa-pr6n}以外はフォントの指定は
+（ファイル名でなく）フォント名で行われる．
+以下の表において，*\,つきのフォント(e.g.,~KozGo\dots-Regular)は，\emph{\texttt{deluxe}オプション指定時に}
+ゴシック体中字として用いられるものを示している．
+%</ja>
+\begin{cslist}[style=standard]
+ \item[kozuka-pro] Kozuka Pro (Adobe-Japan1-4) fonts.
+%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
+ \item[kozuka-pr6] Kozuka Pr6 (Adobe-Japan1-6)  fonts.
+%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
+ \item[kozuka-pr6n] Kozuka Pr6N (Adobe-Japan1-6, JIS04-savvy) fonts.
+
+%<*en>
+Kozuka Pro/Pr6N fonts are bundled with Adobe's software, such as Adobe~InDesign.
+There is not rounded gothic family in Kozuka fonts.
+%</en>
+%<*ja>
+小塚Pro書体・Pr6N書体はAdobe InDesign等のAdobe製品にバンドルされている．
+「小塚丸ゴシック」は存在しないので，便宜的に小塚ゴシックHによって代用している．
+%</ja>
+\begin{center}\small
+\begin{tabular}{lllll}
+\toprule
+\bfseries family&\bfseries series&\ttfamily kozuka-pro&\ttfamily kozuka-pr6&\ttfamily kozuka-pr6n\\
+\midrule
+ &light&KozMinPro-Light&KozMinProVI-Light&KozMinPr6N-Light\\
+%<en>\textit{mincho}%
+%<ja>\textgt{明朝}%
+ &medium&KozMinPro-Regular&KozMinProVI-Regular&KozMinPr6N-Regular\\
+ &bold&KozMinPro-Bold&KozMinProVI-Bold&KozMinPr6N-Bold\\
+\midrule
+ &&KozGoPro-Regular*&KozGoProVI-Regular*&KozGoPr6N-Regular*\\
+ &\smash{\raisebox{1.5ex}{medium}}
+ &KozGoPro-Medium&KozGoProVI-Medium&KozGoPr6N-Medium\\
+\cmidrule(l){2-5}
+%<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
+%<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
+ &bold&KozGoPro-Bold&KozGoProVI-Bold&KozGoPr6N-Bold\\
+ &extra bold&KozGoPro-Heavy&KozGoProVI-Heavy&KozGoPr6N-Heavy\\
+\midrule
+%<en>\textit{rounded gothic}
+%<ja>\gt 丸ゴシック
+&&KozGoPro-Heavy&KozGoProVI-Heavy&KozGoPr6N-Heavy\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+%<en>\newpage
+ \item[hiragino-pro]  Hiragino Pro (Adobe-Japan1-5) fonts.
+%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
+ \item[hiragino-pron] Hiragino ProN (Adobe-Japan1-5, JIS04-savvy) fonts.
+
+%<*en>
+Hiragino fonts (except Hiragino~Mincho~W2) are bundled with Mac OS~X 10.5 or later.
+Some editions of a Japanese word-processor ``一太郎2012'' includes Hiragino ProN fonts.
+Note that fonts for gothic extra~bold (HiraKakuStd[N]-W8) only contains characters in
+Adobe-Japan1-3 character collection, while others contains those in
+Adobe-Japan1-5 character collection.
+%</en>
+%<*ja>
+ヒラギノフォントは，Mac OS~X以外にも，一太郎2012の上位エディションにもバンドルされている．
+極太ゴシック体として用いるヒラギノ角ゴW8は，Adobe-Japan1-3の範囲しかカバーしていない
+Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
+
+なお，明朝体細字として用いるヒラギノ明朝体W2はOS~Xや一太郎にはバンドルされておらず，
+別途購入する必要がある．
+%</ja>
+\begin{center}\small
+\begin{tabular}{llll}
+\toprule
+\bf family&\bf series&\tt hiragino-pro&\tt hiragino-pron\\
+\midrule
+ &light&Hiragino~Mincho~Pro~W2&Hiragino~Mincho~ProN~W2\\
+%<en>\textit{mincho}%
+%<ja>\textgt{明朝}%
+ &medium&Hiragino~Mincho~Pro~W3&Hiragino~Mincho~ProN~W3\\
+ &bold&Hiragino~Mincho~Pro~W6&Hiragino~Mincho~ProN~W6\\
+\midrule
+ &&Hiragino~Kaku~Gothic~Pro~W3*&Hiragino~Kaku~Gothic~ProN~W3*\\
+ &\smash{\raisebox{1.5ex}{medium}}
+ &Hiragino~Kaku~Gothic~Pro~W6&Hiragino~Kaku~Gothic~ProN~W6\\
+\cmidrule(l){2-4}
+%<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
+%<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
+ &bold&Hiragino~Kaku~Gothic~Pro~W6&Hiragino~Kaku~Gothic~ProN~W6\\
+ &extra bold&Hiragino~Kaku~Gothic~Std~W8&Hiragino~Kaku~Gothic~StdN~W8\\
+\midrule
+%<en>\textit{rounded gothic}
+%<ja>\gt 丸ゴシック
+&&Hiragino~Maru~Gothic~Pro~W4&Hiragino~Maru~Gothic~ProN~W4\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+ \item[morisawa-pro]  Morisawa Pro (Adobe-Japan1-4) fonts.
+%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
+ \item[morisawa-pr6n]  Morisawa Pr6N (Adobe-Japan1-6, JIS04-savvy) fonts.
+\begin{center}\small
+\begin{tabular}{ll>{\tt}l>{\tt}l}
+\toprule
+\bf family&\bf series&morisawa-pro&morisawa-pr6n\\
+\midrule
+ &medium&A-OTF-RyuminPro-Light.otf&A-OTF-RyuminPr6N-Light.otf\\
+%<en>\smash{\raisebox{1.5ex}{\textit{mincho}}}%
+%<ja>\smash{\raisebox{1.5ex}{\gt 明朝}}%
+ &bold&A-OTF-FutoMinA101Pro-Bold.otf&A-OTF-FutoMinA101Pr6N-Bold.otf\\
+\midrule
+ &medium
+ &A-OTF-GothicBBBPro-Medium.otf&A-OTF-GothicBBBPr6N-Medium.otf\\
+%<en>\textit{gothic}%
+%<ja>\gt ゴシック
+ &bold&A-OTF-FutoGoB101Pro-Bold.otf&A-OTF-FutoGoB101Pr6N-Bold.otf\\
+ &extra bold&A-OTF-MidashiGoPro-MB31.otf&A-OTF-MidashiGoPr6N-MB31.otf\\
+\midrule
+%<en>\textit{rounded gothic}
+%<ja>\gt 丸ゴシック
+&&A-OTF-Jun101Pro-Light.otf&A-OTF-ShinMGoPr6N-Light.otf\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+
+ \item[yu-win]  Yu fonts bundled with Windows~8.1.
+%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
+ \item[yu-win10]  Yu fonts bundled with Windows~10.
+%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
+ \item[yu-osx]  Yu fonts bundled with OSX~Mavericks.
+\begin{center}\small
+\begin{tabular}{lllll}
+\toprule
+\bf family&\bf series&\texttt{yu-win}&\texttt{yu-win10}&\texttt{yu-osx}\\
+\midrule
+ &light&YuMincho-Light&YuMincho-Light&(YuMincho~Medium)\\
+%<en>\textit{mincho}%
+%<ja>\textgt{明朝}%
+ &medium&YuMincho-Regular&YuMincho-Regular&YuMincho~Medium\\
+ &bold&YuMincho-Demibold&YuMincho-Demibold&YuMincho~Demibold\\
+\midrule
+ &&YuGothic-Regular*&YuGothic-Regular*&YuGothic~Medium*\\
+ &\smash{\raisebox{1.5ex}{medium}}%
+        &YuGothic-Regular&YuGothic-Medium&YuGothic~Medium\\
+\cmidrule(l){2-5}
+%<en>\textit{gothic}%
+%<ja>\gt ゴシック
+ &bold&YuGothic-Bold&YuGothic-Bold&YuGothic~Bold\\
+ &extra bold&YuGothic-Bold&YuGothic-Bold&YuGothic~Bold\\
+\midrule
+%<en>\textit{rounded gothic}
+%<ja>\gt 丸ゴシック
+&&YuGothic-Bold&YuGothic-Bold&YuGothic~Bold\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\item[moga-mobo]  MogaMincho, MogaGothic, and MoboGothic.
+%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
+\item[moga-mobo-ex]  MogaExMincho, MogaExGothic, and MoboExGothic.
+%<en>\par These fonts can be downloaded from \url{http://yozvox.web.fc2.com/}.
+%<ja>これらのフォントは \url{http://yozvox.web.fc2.com/} からダウンロードできる．
+\begin{center}\small
+\begin{tabular}{llll}
+\toprule
+\bf family&\bf series&\bf default, \texttt{90jis}~option&\bf \texttt{jis2004} option\\
+\midrule
+ &medium&Moga90Mincho&MogaMincho\\
+%<en>\smash{\raisebox{1.5ex}{\textit{mincho}}}%
+%<ja>\smash{\raisebox{1.5ex}{\gt 明朝}}%
+ &bold&Moga90Mincho Bold&MogaMincho Bold\\
+\midrule
+ &medium&Moga90Gothic&MogaGothic\\
+%<en>\textit{gothic}%
+%<ja>\gt ゴシック
+ &bold&Moga90Gothic Bold&MogaGothic Bold\\
+ &extra bold&Moga90Gothic Bold&MogaGothic Bold\\
+\midrule
+%<en>\textit{rounded gothic}
+%<ja>\gt 丸ゴシック
+&&Mobo90Gothic&MoboGothic\\
+\bottomrule
+\end{tabular}
+\end{center}
+%<en>When \texttt{moga-mobo-ex} is specified, the font ``MogaEx90Mincho'' etc.\ are used.
+%<ja>\texttt{moga-mobo-ex}オプション指定時にはMogaEx90MinchoなどのExが名前についたフォントが使われる．
+
+\item[ume]  Ume Mincho and Ume Gothic.
+%<en>\par These fonts can be downloaded from\\\hfill \url{https://ja.osdn.net/projects/ume-font/wiki/FrontPage}.
+%<ja>これらのフォントは \url{https://ja.osdn.net/projects/ume-font/wiki/FrontPage} からダウンロードできる．
+\begin{center}\small
+\begin{tabular}{lll}
+\toprule
+\bf family&\bf series&\bf default\\
+\midrule
+ &medium&Ume Mincho\\
+%<en>\smash{\raisebox{1.5ex}{\textit{mincho}}}%
+%<ja>\smash{\raisebox{1.5ex}{\gt 明朝}}%
+ &bold&Ume Mincho\\
+\midrule
+ &&Ume Gothic*\\
+ &\smash{\raisebox{1.5ex}{medium}}&Ume Gothic O5\\
+\cmidrule(l){2-3}
+%<en>\textit{gothic}%
+%<ja>\gt ゴシック
+ &bold&Ume Gothic O5\\
+ &extra bold&Ume Gothic O5\\
+\midrule
+%<en>\textit{rounded gothic}
+%<ja>\gt 丸ゴシック
+&&Ume Gothic O5\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+ \item[sourcehan]  Source Han Serif and Source Han Sans fonts (Language-specific OTF \textit{or} OTC)
+%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
+ \item[sourcehan-jp]  Source Han Serif JP and Source Han Sans JP fonts (Region-specific Subset OTF)
+\begin{center}\small
+\def\AD#1#2{Source Han #1 #2&Source Han #1 JP #2}%
+\begin{tabular}{lllll}
+\toprule
+\bf family&\bf series&\texttt{sourcehan}&\texttt{sourcehan-jp}\\
+\midrule
+ &light&\AD{Serif}{Light}\\
+%<en>\textit{mincho}%
+%<ja>\textgt{明朝}%
+ &medium&\AD{Serif}{Regular}\\
+ &bold&\AD{Serif}{Bold}\\
+\midrule
+ &&\AD{Sans}{Regular*}\\
+ &\smash{\raisebox{1.5ex}{medium}}
+ &\AD{Sans}{Medium}\\
+\cmidrule(l){2-4}
+%<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
+%<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
+ &bold&\AD{Sans}{Bold}\\
+ &extra bold&\AD{Sans}{Heavy}\\
+\midrule
+%<en>\textit{rounded gothic}
+%<ja>\gt 丸ゴシック
+&&\AD{Sans}{Heavy}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+
+ \item[noto-otc]  Noto Serif CJK and Noto Sans CJK fonts (OTC)
+%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
+ \item[noto-otf]  Noto Serif CJK and Noto Sans CJK fonts (Language-specific OTF)
+\begin{center}\small
+\def\AD#1#2{Noto #1 CJK #2&Noto #1 CJK JP #2}%
+\begin{tabular}{lllll}
+\toprule
+\bf family&\bf series&\texttt{noto-otc}&\texttt{noto-otf}\\
+\midrule
+ &light&\AD{Serif}{Light}\\
+%<en>\textit{mincho}%
+%<ja>\textgt{明朝}%
+ &medium&\AD{Serif}{Regular}\\
+ &bold&\AD{Serif}{Bold}\\
+\midrule
+ &&\AD{Sans}{Regular*}\\
+ &\smash{\raisebox{1.5ex}{medium}}
+ &\AD{Sans}{Medium}\\
+\cmidrule(l){2-4}
+%<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
+%<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
+ &bold&\AD{Sans}{Bold}\\
+ &extra bold&\AD{Sans}{Black}\\
+\midrule
+%<en>\textit{rounded gothic}
+%<ja>\gt 丸ゴシック
+&&\AD{Sans}{Black}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+
+
+\end{cslist}
+%<en>\paragraph{Presets for single weight}
+%<ja>\paragraph{単ウェイト用プリセット一覧}
+%<*en>
+Next, we describe settings for using only single weight.
+%</en>
+%<*ja>
+次に，単ウェイト用の設定を述べる．この4設定では
+明朝体太字・丸ゴシック体はゴシック体と同じフォントが用いられる．
+%</ja>
+\par\nobreak\medskip
+{\centering\small
+\begin{tabular}{lllll}
+\toprule
+&\tt noembed&\tt ipa&\tt ipaex&\tt ms\\
+\midrule
+%<*en>
+\it mincho&Ryumin-Light (non-embedded)
+&IPA Mincho&IPAex Mincho&MS Mincho\\
+\it gothic&GothicBBB-Medium (non-embedded)
+&IPA Gothic&IPAex Gothic&MS Gothic\\
+%</en>
+%<*ja>
+\gtfamily 明朝体&Ryumin-Light（非埋込）
+&IPA明朝&IPAex明朝&MS明朝\\
+\gtfamily ゴシック体&GothicBBB-Medium（非埋込）
+&IPAゴシック&IPAexゴシック&MSゴシック\\
+%</ja>
+\bottomrule
+\end{tabular}\par\medskip}
+
+%<en>\paragraph{Using HG fonts}
+%<ja>\paragraph{HGフォントの利用}
+%<*en>
+We can use HG~fonts bundled with Microsoft~Office for realizing multiple weights.
+In the table below, starred fonts (e.g., IPA~Gothic*) are used
+only if \texttt{jis2004} or \texttt{nodeluxe} option is spefified.
+%</en>
+%<*ja>
+すぐ前に書いた単ウェイト用設定を，Microsoft Office等に付属するHGフォントを使って
+多ウェイト化した設定もある．以下の表では，*~付きのフォント（例：IPAゴシック*）は
+\texttt{jis2004}と\texttt{nodeluxe}のいずれかのオプションが有効になっているときに使われる．
+%</ja>
+\par\nobreak\medskip
+{\centering\small
+\begin{tabular}{lllll}
+\toprule
+\textbf{family}&\textbf{series}&\tt ipa-hg&\tt ipaex-hg&\tt ms-hg\\
+\midrule
+%<*en>
+&medium&IPA Mincho&IPAex Mincho&MS Mincho\\
+\smash{\raisebox{1.5ex}{\textit{mincho}}}%
+&bold&HG Mincho E&HG Mincho E&HG Mincho E\\\midrule
+&&IPA Gothic*&IPAex Gothic*&MS Gothic*\\
+&\smash{\raisebox{1.5ex}{medium}}%
+&HG Gothic M&HG Gothic M&HG Gothic M\\\cmidrule{2-5}
+\textit{gothic}&bold&HG Gothic E&HG Gothic E&HG Gothic E\\\cmidrule{2-5}
+&extra bold&HG Soei Kaku Gothic UB&HG Soei Kaku Gothic UB&HG Soei Kaku Gothic UB\\\midrule
+\textit{rounded gothic}&&
+HG Maru Gothic PRO&HG Maru Gothic PRO&HG Maru Gothic PRO\\
+%</en>
+%<*ja>
+&medium&IPA明朝&IPAex明朝&MS明朝\\
+\smash{\raisebox{1.5ex}{\textgt{明朝体}}}%
+&bold&HG明朝E&HG明朝E&HG明朝E\\\midrule
+&&IPAゴシック*&IPAexゴシック*&MSゴシック*\\
+&\smash{\raisebox{1.5ex}{medium}}%
+&HGゴシックM&HGゴシックM&HGゴシックM\\\cmidrule{2-5}
+\textgt{ゴシック体}&bold&HGゴシックE&HGゴシックE&HGゴシックE\\\cmidrule{2-5}
+&extra bold&HG創英角ゴシックUB&HG創英角ゴシックUB&HG創英角ゴシックUB\\\midrule
+\textgt{丸ゴシック体}&&
+HG丸ゴシック体PRO&HG丸ゴシック体PRO&HG丸ゴシック体PRO\\
+%</ja>
+\bottomrule
+\end{tabular}\par\medskip}
+
+%<*en>
+Note that HG~Mincho~E, HG~Gothic~E, HG Soei Kaku Gothic UB, and HG Maru Gothic PRO
+are internally specified by:
+\begin{description}
+\item[default] by font name (\texttt{HGMinchoE}, etc.).
+\item[{\tt 90jis}] by file name (\texttt{hgrme.ttc}, \texttt{hgrge.ttc}, \texttt{hgrsgu.ttc}, \texttt{hgrsmp.ttf}).
+\item[{\tt jis2004}] by file name (\texttt{hgrme04.ttc}, \texttt{hgrge04.ttc}, \texttt{hgrsgu04.ttc}, \texttt{hgrsmp04.ttf}).
+\end{description}
+%</en>
+%<*ja>
+なお，HG明朝E・HGゴシックE・HG創英角ゴシックUB・HG丸ゴシック体PROの4つについては，内部で
+\begin{description}
+\item[標準] フォント名（\texttt{HGMinchoE} など）
+\item[{\tt 90jis}指定時] ファイル名 (%
+\texttt{hgrme.ttc}, \texttt{hgrge.ttc}, \texttt{hgrsgu.ttc}, \texttt{hgrsmp.ttf})
+\item[{\tt jis2004}指定時] ファイル名 (%
+\texttt{hgrme04.ttc}, \texttt{hgrge04.ttc}, \texttt{hgrsgu04.ttc}, \texttt{hgrsmp04.ttf})
+\end{description}
+として指定を行っているので注意すること．
+%</ja>
+
 \clearpage
 %<en>\part{Implementations}
 %<ja>\part{実装}
@@ -7987,7 +8053,7 @@ These whatsits will be removed during the process of inserting \textbf{JAglue}s.
 
 %<en>\subsection{Stack system of \LuaTeX-ja}
 %<ja>\subsection{\LuaTeX-jaのスタックシステム}
-\label{ssec-stack}
+\label{ssec:stack}
 
 %<en>\paragraph{Background}
 %<ja>\paragraph{背景}
@@ -8011,7 +8077,7 @@ source:
 \end{LTXexample}
 
 %<*en>
-As described in Subsection~\ref{ssec-param}, the only effective value of
+As described in Subsection~\ref{ssec:param}, the only effective value of
 \Param{kanjiskip} in an hbox is the latest value, so the value of
 \Param{kanjiskip} which applied in the entire hbox should be 5\,pt.
 However, by the implementation method of \LuaTeX, this ``5\,pt'' cannot be
@@ -8019,7 +8085,7 @@ known from any callbacks.  In the \texttt{tex/packaging.w}, which is a
 file in the source of \LuaTeX, there are the following codes:
 %</en>
 %<*ja>
-\ref{ssec-param}節で述べたように，あるhboxの中で効力を持つ
+\ref{ssec:param}節で述べたように，あるhboxの中で効力を持つ
 \Param{kanjiskip}の値は最後に現れた値のみであり，したがってボックス全体に適用される
 \Param{kanjiskip}は5\,ptであるべきである．しかし，\LuaTeX の実
 装を観察すると，この5\,ptという長さはどのコールバックからも知ることはできないことがわかる．
@@ -8316,7 +8382,7 @@ function luatexja.unary_pars.hoge (t)
 end
 \end{lstlisting}
 Here the argument of \verb+luatexja.unary_pars.hoge+ is
-the stack level of \LuaTeX-ja's stack system (see Subsection~\ref{ssec-stack}).
+the stack level of \LuaTeX-ja's stack system (see Subsection~\ref{ssec:stack}).
 
 On the other hand, for parameters that need an additional argument
 (this must be an integer), one have to define a function in
@@ -8347,7 +8413,7 @@ function luatexja.unary_pars.hoge (t)
 end
 \end{lstlisting}
 を実行すると，\verb+\ltjgetparameter{hoge}+ は \texttt{42} という\emph{文字列}を返す．
-関数 \verb+luatexja.unary_pars.hoge+ の引数$t$は，\ref{ssec-stack}節で述べた
+関数 \verb+luatexja.unary_pars.hoge+ の引数$t$は，\ref{ssec:stack}節で述べた
 \LuaTeX-jaのスタックシステムにおけるスタックレベルである．
 戻り値はいかなる値であっても，最終的には文字列として出力されることに注意．
 
@@ -8911,7 +8977,7 @@ $g$は「文字コード \texttt{'boxbdd'} の文字」と\textit{Np}の間に�
 \Param{kcatcode}の最下位ビットはこの\Param{jcharwidowpenalty}用にのみ利用される．}．
 
 \subsection{概観と典型例：2つの「和文A」の場合}
-\label{ssec-cluster-wa}
+\label{ssec:cluster-wa}
 先に述べたように，2つの隣り合ったクラスタ，\textit{Nq}と\textit{Np}の間には，
 ペナルティ，\cs{vadjust}，whatsitなど，行組版には関係しないものがある．模式的に表すと，
 \[
@@ -9510,7 +9576,7 @@ variation selectors are ``combined'' with the previous character.
 \texttt{vsraw}は，ブール値の値をとるキーであり，標準ではfalseである．
 \begin{itemize}
  \item trueの場合は，異体字セレクタは「直前の文字に続けて」出力される．
-もしもIVSサポート（\ref{ssec-ltjotf}節）が有効になっていた場合は，
+もしもIVSサポート（\ref{ssec:ltjotf}節）が有効になっていた場合は，
 以下の例（左側は入力，右側はその出力）のようになる．
 %</ja>
 \begin{LTXexample}
@@ -9795,7 +9861,7 @@ the \texttt{lstlisting} environment or other environments/commands.
 \begin{itemize}
 \item \textbf{JAglue}ではないグルー
 \item JFMグルー（優先度\footnote{%
-  \ref{ssec-jfm-str}節にあるように，
+  \ref{ssec:jfm-str}節にあるように，
   各JFMグルーには$-4$から3までの優先度がついている．場合によっては
   伸びと縮みで異なる優先度が付いているかもしれない．}%
 別にまとめられる）

@@ -7,7 +7,7 @@
       \ltj@orig@DeclareFontShape@{#1}{#2}{#3}{#4}{#5}{#6}%
       }
 \makeatother
-\usepackage[hiragino-pron,deluxe,expert,jis2004, match,nfssonly]{luatexja-preset}
+\usepackage[sourcehan, 90jis,deluxe,expert, match,nfssonly]{luatexja-preset}
 \begin{document}
 \makeatletter
 \def\r#1#2{ \csname #1family \endcsname \csname #2series \endcsname
@@ -31,12 +31,12 @@
 
 \r{gt}{bf}
 
-\ifdefined\mgfamily
-\r{mg}{md}
-\fi
-
 \ifdefined\ebseries
 \r{gt}{eb}
+\fi
+
+\ifdefined\mgfamily
+\r{mg}{md}
 \fi
 
 \r{tt}{md}
