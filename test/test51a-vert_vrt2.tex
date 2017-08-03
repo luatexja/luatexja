@@ -1,0 +1,26 @@
+\input luatexja.sty
+\def\FN{KozMinPr6N-Regular}
+
+\leavevmode
+\tfont\VN=\FN:-vert;jfm=ujisv
+\tfont\VT=\FN:+vert;jfm=ujisv
+\tfont\VU=\FN:+vrt2;jfm=ujisv
+\tfont\VB=\FN:+vert;+vrt2;jfm=ujisv
+\tfont\VD=\FN:jfm=ujisv
+\tentt
+\ltjsetparameter{jacharrange={+8}}
+\def\TEST{\tate 上⇦⇧⇩⇨⬅⬆⬇➡下¶\ltjjachar"253B\ltjjachar"0165，}
+\hbox{\TEST}
+\hbox{\VD\TEST ~~~~~default}
+\hbox{\VB\TEST +vert +vrt2}
+\hbox{\VN\TEST -vert -vrt2}
+\hbox{\VT\TEST +vert -vrt2}
+\hbox{\VU\TEST -vert +vrt2}
+
+\par
+
+\catcode`\@=11
+\expandafter\@gobble\TEST
+
+\bye
+

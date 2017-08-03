@@ -42,7 +42,7 @@ luatexbase.create_callback("luatexja.load_jfm", "data", function (ft, jn) return
 
 local jfm_file_name, jfm_var, jfm_ksp
 local defjfm_res
-local jfm_dir, is_def_jfont, is_vert_enabled
+local jfm_dir, is_def_jfont, is_vert_enabled, auto_enable_vrt2
 
 local function norm_val(a)
    if (not a) or (a==0.) then
@@ -300,6 +300,7 @@ do
 
 -- EXT
    local identifiers = fonts.hashes.identifiers
+   local provides_feature = luaotfload.aux.provides_feature
    function jfontdefY()
       local j = load_jfont_metric(jfm_dir)
       local fn = font.id(cstemp)
@@ -328,6 +329,14 @@ do
                         chars_cbcache = {},
 			vert_activated = is_vert_enabled,
       }
+      if auto_enable_vrt2 then
+         local t = identifiers[fn]
+         local lang, scr = t.properties.language, t.properties.script
+         local vrt2_exist = provides_feature(
+           fn, t.properties.script, t.properties.language, 'vrt2'
+         )
+         t.shared.features[vrt2_exist and 'vrt2' or 'vert'] = true
+      end
 
       fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
       font_metric_table[fn]=fmtable
@@ -359,7 +368,7 @@ do
    -- normalize position of 'jfm=' and 'jfmvar=' keys
    local function extract_metric(name)
       local is_braced = name:match('^{(.*)}$')
-       name= is_braced or name
+      name= is_braced or name
       jfm_file_name = ''; jfm_var = ''; jfm_ksp = true
       local tmp, index = name:sub(1, 5), 1
       if tmp == 'file:' or tmp == 'name:' or tmp == 'psft:' then
@@ -403,11 +412,9 @@ do
       end
       if jfm_dir == 'tate' then
 	 is_vert_enabled = (not name:match('[:;]%-vert')) and (not  name:match('[:;]%-vrt2'))
-         if not name:match('vert') and not name:match('vrt2') then
-            name = name .. ';+vert;+vrt2'
-         end
+         auto_enable_vrt2 = (not name:match('vert') and not name:match('vrt2'))
       else
-	 is_vert_enabled = nil
+	 is_vert_enabled, auto_enable_vrt2 = nil, nil
       end
       return is_braced and ('{' .. name .. '}') or name
    end
