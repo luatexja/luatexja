@@ -1,7 +1,10 @@
 \input luatexja.sty
 \def\FN{KozMinPr6N-Regular}
+\hoffset-10mm
+\voffset-10mm
+\hsize180mm
+\vsize260mm
 
-\leavevmode
 \tfont\VN=\FN:-vert;jfm=ujisv
 \tfont\VT=\FN:+vert;jfm=ujisv
 \tfont\VU=\FN:+vrt2;jfm=ujisv
@@ -9,18 +12,29 @@
 \tfont\VD=\FN:jfm=ujisv
 \tentt
 \ltjsetparameter{jacharrange={+8}}
-\def\TEST{\tate 上⇦⇧⇩⇨⬅⬆⬇➡下¶\ltjjachar"253B\ltjjachar"0165，}
-\hbox{\TEST}
-\hbox{\VD\TEST ~~~~~default}
-\hbox{\VB\TEST +vert +vrt2}
-\hbox{\VN\TEST -vert -vrt2}
-\hbox{\VT\TEST +vert -vrt2}
-\hbox{\VU\TEST -vert +vrt2}
-
-\par
-
 \catcode`\@=11
-\expandafter\@gobble\TEST
+\parindent0pt
+
+\def\TESTA{\leavevmode
+\vbox{\hsize=21\zw\TEST}
+\ \vrule\ 
+\vbox{\hsize=210pt\VD\TEST \hfill\break\null\hfill~~~~default}
+\ \vrule\ 
+\vbox{\hsize=210pt\VB\TEST \hfill\break\null\hfill+vert +vrt2}
+\ \vrule\ 
+\vbox{\hsize=210pt\VN\TEST \hfill\break\null\hfill-vert -vrt2}
+\ \vrule\ 
+\vbox{\hsize=210pt\VT\TEST \hfill\break\null\hfill+vert -vrt2}
+\ \vrule\ 
+\vbox{\hsize=210pt\VU\TEST \hfill\break\null\hfill-vert +vrt2}
+\par
+\expandafter\@gobble\TEST\par}
+
+\def\TEST{\tate
+  左←↑↓→☜☝☟☞⇦⇧⇩⇨⬅⬆⬇➡右¶\ltjjachar"253B\ltjjachar"0165\relax
+  あ：いーう，え、お．か。き；け“こ”さ‘し’す
+  ‥…〜ー＝―‐゠㍉㌔㌢㍍㌘㌧㌃㌶㍑㍗㌍㌦㌣㌫㍊㌻㍾㍽㍼㍻＝≒≠≡}
+\TESTA
 
 \bye
 
