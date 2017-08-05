@@ -67,13 +67,13 @@ local t = {
          [2] = { 0, 0, 0, kanjiskip_shrink=1 },
 	 [3] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
          [4] = { 0, 0, 0, kanjiskip_shrink=1 },
-	 [5] = { 0.5 , 0.0, 0.5, rario=0, kanjiskip_stretch=1 },
-	 [105] = { 0.5 , 0.0, 0.5, rario=0, kanjiskip_stretch=1 },
-	 [6] = { 0.5 , 0.0, 0.5, rario=0, kanjiskip_stretch=1 },
-	 [7] = { 0.5 , 0.0, 0.5, rario=0, kanjiskip_stretch=1 },
-	 [107] = { 0.5 , 0.0, 0.5, rario=0, kanjiskip_stretch=1 },
-	 [207] = { 0.5 , 0.0, 0.5, rario=0, kanjiskip_stretch=1 },
-	 [8] = { 0.5 , 0.0, 0.5, rario=0, kanjiskip_stretch=1 },
+	 [5] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
+	 [105] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
+	 [6] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
+	 [7] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
+	 [107] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
+	 [207] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
+	 [8] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
       }
    },
 
@@ -137,7 +137,7 @@ local t = {
 
    [5] = { -- -- 二分（二重）ダッシュ
       chars = { '゠', '–' },
-      align = 'center', left = 0.0, down = 0.0,
+      align = 'middle', left = 0.0, down = 0.0,
       width = 0.50, height = 0.50, depth = 0.50, italic=0.0,
       glue = {
 	 [1] = { 0.5 , 0.0, 0.5, ratio=1, kanjiskip_stretch=1 },
