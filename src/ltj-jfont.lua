@@ -712,18 +712,6 @@ do
 end
 
 ------------------------------------------------------------------------
--- VERT VARIANT TABLE
-------------------------------------------------------------------------
-local vert_form_table = {
-   [0x2013]=0xFE32, [0x2014]=0xFE31, [0x2025]=0xFE30,
-   [0xFF08]=0xFE35, [0xFF09]=0xFE36, [0xFF5B]=0xFE37, [0xFF5D]=0xFE38,
-   [0x3014]=0xFE39, [0x3015]=0xFE3A, [0x3010]=0xFE3B, [0x3011]=0xFE3C,
-   [0x300A]=0xFE3D, [0x300B]=0xFE3E, [0x3008]=0xFE3F, [0x3009]=0xFE40,
-   [0x300C]=0xFE41, [0x300D]=0xFE42, [0x300E]=0xFE43, [0x300F]=0xFE44,
-   [0xFF3B]=0xFE47, [0xFF3D]=0xFE48, [0xFF3F]=0xFE33,
-}
-
-------------------------------------------------------------------------
 -- 追加のフォント情報
 ------------------------------------------------------------------------
 font_extra_info = {}
@@ -770,17 +758,6 @@ do
 			dest[bu][vsel] = unitable[gv.name]
 		     end
 		  end
-	       end
-	    end
-	    -- vertical form
-	    local gi = unitable[gv.name]
-	    if gi then
-	       if unitable[gv.name .. '.vert'] then
-	          dest = dest or {}; dest[gi] = dest[gi] or {};
-	          dest[gi].vform = unitable[gv.name .. '.vert']
-	       elseif id.characters[gi] and vert_form_table[gi] then
-	          dest = dest or {}; dest[gi] = dest[gi] or {};
-	          dest[gi].vform = vert_form_table[gi]
 	       end
 	    end
 	    -- vertical metric
@@ -878,7 +855,7 @@ end
 
 --
 do
-   local cache_ver = 12
+   local cache_ver = 13
    local checksum = file.checksum
 
    local function prepare_extra_data_base(id)
@@ -995,7 +972,52 @@ luatexbase.add_to_callback(
 	 end
       end
       return fmtable
-   end, 1, 'ltj.v_advance'
+   end, 'ltj.v_advance', 1
+)
+end
+
+------------------------------------------------------------------------
+-- make table of vertical glyphs which does not covered by vert feature
+------------------------------------------------------------------------
+do
+------------------------------------------------------------------------
+-- VERT VARIANT TABLE
+------------------------------------------------------------------------
+  local vert_form_table = {
+     [0x2013]=0xFE32, [0x2014]=0xFE31, [0x2025]=0xFE30, [0x2026]=0xFE19,
+     [0xFF08]=0xFE35, [0xFF09]=0xFE36, [0xFF5B]=0xFE37, [0xFF5D]=0xFE38,
+     [0x3014]=0xFE39, [0x3015]=0xFE3A, [0x3010]=0xFE3B, [0x3011]=0xFE3C,
+     [0x300A]=0xFE3D, [0x300B]=0xFE3E, [0x3008]=0xFE3F, [0x3009]=0xFE40,
+     [0x300C]=0xFE41, [0x300D]=0xFE42, [0x300E]=0xFE43, [0x300F]=0xFE44,
+     [0xFF3B]=0xFE47, [0xFF3D]=0xFE48, [0xFF3F]=0xFE33,
+     [0x2190]=0x2191, [0x2191]=0x2192, [0x2192]=0x2193, [0x2193]=0x2190,
+     [0x21E6]=0x21E7, [0x21E7]=0x21E8, [0x21E8]=0x21E9, [0x21E9]=0x21E6,
+  }
+  local function add_vform(coverage, vform, ft)
+     if type(coverage)~='table' then return end
+     for i,v in pairs(vert_form_table) do
+	 if (not coverage[i]) and ft.characters[v] then
+	     vform[i] = v
+	 end
+     end
+  end
+
+luatexbase.add_to_callback(
+   "luatexja.define_jfont",
+   function (fmtable, fnum)
+      local vform = {}; fmtable.vform = vform
+      local ft = font_getfont(fnum)
+      if ft.specification and ft.resources then
+	  for _,i in pairs(ft.resources.sequences) do
+	      if i.order[1]== 'vert' and i.type == 'gsub_single' and i.steps then
+		  for _,j in pairs(i.steps) do
+		     if type(j)=='table' then add_vform(j.coverage,vform, ft) end
+		  end
+	      end
+	  end
+      end
+      return fmtable
+   end, 'ltj.get_vert_form', 1
 )
 end
 
