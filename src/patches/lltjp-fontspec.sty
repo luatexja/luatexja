@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-fontspec}[2017/05/05 Patch to fontspec for LuaTeX-ja]
+\ProvidesPackage{lltjp-fontspec}[2017/08/07 Patch to fontspec for LuaTeX-ja]
 
 \RequirePackage{fontspec,luatexja}
 \ExplSyntaxOn
@@ -38,4 +38,5 @@
 \cs_set:Npn \eminnershape { \mcfamily \upshape }
 
 \ExplSyntaxOff
+\expandafter\patchcmd\csname TU\string\textasteriskcentered\endcsname{\char}{\ltjalchar}{}{}
 \endinput
