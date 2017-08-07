@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-%%% \ProvidesPackage{lltjp-fontspec-immediate}[2017/01/28 Patch to fontspec for LuaTeX-ja]
+%%% \ProvidesPackage{lltjp-fontspec-immediate}[2017/08/07 Patch to fontspec for LuaTeX-ja]
 
 \RequirePackage{fontspec,luatexja}
 \ExplSyntaxOn
@@ -63,5 +63,6 @@
  }
 }
 \ExplSyntaxOff
+\expandafter\patchcmd\csname TU\string\textasteriskcentered\endcsname{\char}{\ltjalchar}{}{}
 \endinput
 
