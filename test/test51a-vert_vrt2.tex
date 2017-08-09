@@ -1,7 +1,7 @@
 \documentclass{ltjarticle}
 \usepackage[margin=15mm,centering]{geometry}
 \usepackage{lltjext,cancel,luacode}
-
+%\usepackage{lua-visual-debug}
 \begin{luacode}
 local provides_feature = luaotfload.aux.provides_feature
 local function myfeat_sub(fn,t,a)
@@ -52,7 +52,7 @@ end
 \def\TEST{
   左←↑↓→☜☝☟☞⇦⇧⇩⇨⬅⬆⬇➡右¶\ltjjachar"253B\ltjjachar"0165\relax
   あ：いーう，え、お．か。き；け\ltjjachar"201Cこ\ltjjachar"301D%
-  さ\ltjjachar"301Fし\ltjjachar"201Dす
+  さ\ltjjachar"301Fし\ltjjachar"201Dす\ltjjachar"2015せ\ltjjachar"2014そ
   ‥…〜ー＝―‐゠㍉㌔㌢㍍㌘㌧㌃㌶㍑㍗㌍㌦㌣㌫㍊㌻㍾㍽㍼㍻＝≒≠≡}
 
 

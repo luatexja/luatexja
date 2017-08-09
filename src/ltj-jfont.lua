@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2017/05/05',
+  date = '2017/08/09',
   description = 'Loader for Japanese fonts',
 })
 module('luatexja.jfont', package.seeall)
@@ -718,7 +718,165 @@ font_extra_info = {}
 local font_extra_info = font_extra_info -- key: fontnumber
 local font_extra_basename = {} -- key: basename
 
--- IVS and vertical metrics
+local list_rotate_glyphs
+do
+  -- output of function_utr50.lua
+  local function rotate_in_utr50(i)
+  -- UTR#50 revision 17; 2016-10-20
+    if (0x0000<=i)and(i<0x00A7) then return true end
+    if (0x00A8<=i)and(i<0x00A9) then return true end
+    if (0x00AA<=i)and(i<0x00AE) then return true end
+    if (0x00AF<=i)and(i<0x00B1) then return true end
+    if (0x00B2<=i)and(i<0x00BC) then return true end
+    if (0x00BF<=i)and(i<0x00D7) then return true end
+    if (0x00D8<=i)and(i<0x00F7) then return true end
+    if (0x00F8<=i)and(i<0x02EA) then return true end
+    if (0x02EC<=i)and(i<0x0860) then return true end
+    if (0x08A0<=i)and(i<0x1100) then return true end
+    if (0x1200<=i)and(i<0x1401) then return true end
+    if (0x1680<=i)and(i<0x18B0) then return true end
+    if (0x1900<=i)and(i<0x1C90) then return true end
+    if (0x1CC0<=i)and(i<0x2016) then return true end
+    if (0x2017<=i)and(i<0x2020) then return true end
+    if (0x2022<=i)and(i<0x2030) then return true end
+    if (0x2032<=i)and(i<0x203B) then return true end
+    if (0x203D<=i)and(i<0x2042) then return true end
+    if (0x2043<=i)and(i<0x2047) then return true end
+    if (0x204A<=i)and(i<0x2051) then return true end
+    if (0x2052<=i)and(i<0x2065) then return true end
+    if (0x2066<=i)and(i<0x20DD) then return true end
+    if (0x20E1<=i)and(i<0x20E2) then return true end
+    if (0x20E5<=i)and(i<0x2100) then return true end
+    if (0x2102<=i)and(i<0x2103) then return true end
+    if (0x210A<=i)and(i<0x210F) then return true end
+    if (0x2110<=i)and(i<0x2113) then return true end
+    if (0x2115<=i)and(i<0x2116) then return true end
+    if (0x2118<=i)and(i<0x211E) then return true end
+    if (0x2124<=i)and(i<0x2125) then return true end
+    if (0x2126<=i)and(i<0x2127) then return true end
+    if (0x2128<=i)and(i<0x2129) then return true end
+    if (0x212A<=i)and(i<0x212E) then return true end
+    if (0x212F<=i)and(i<0x2135) then return true end
+    if (0x2140<=i)and(i<0x2145) then return true end
+    if (0x214B<=i)and(i<0x214C) then return true end
+    if (0x214E<=i)and(i<0x214F) then return true end
+    if (0x218A<=i)and(i<0x218C) then return true end
+    if (0x2190<=i)and(i<0x221E) then return true end
+    if (0x221F<=i)and(i<0x2234) then return true end
+    if (0x2236<=i)and(i<0x2300) then return true end
+    if (0x2308<=i)and(i<0x230C) then return true end
+    if (0x2320<=i)and(i<0x2324) then return true end
+    if (0x2329<=i)and(i<0x232B) then return true end
+    if (0x232C<=i)and(i<0x237D) then return true end
+    if (0x239B<=i)and(i<0x23BE) then return true end
+    if (0x23CE<=i)and(i<0x23CF) then return true end
+    if (0x23D0<=i)and(i<0x23D1) then return true end
+    if (0x23DC<=i)and(i<0x23E2) then return true end
+    if (0x2423<=i)and(i<0x2424) then return true end
+    if (0x2500<=i)and(i<0x25A0) then return true end
+    if (0x261A<=i)and(i<0x2620) then return true end
+    if (0x2768<=i)and(i<0x2776) then return true end
+    if (0x2794<=i)and(i<0x2B12) then return true end
+    if (0x2B30<=i)and(i<0x2B50) then return true end
+    if (0x2B5A<=i)and(i<0x2BB8) then return true end
+    if (0x2BEC<=i)and(i<0x2BF0) then return true end
+    if (0x2C00<=i)and(i<0x2E80) then return true end
+    if (0x3008<=i)and(i<0x3012) then return true end
+    if (0x3014<=i)and(i<0x3020) then return true end
+    if (0x3030<=i)and(i<0x3031) then return true end
+    if (0x30A0<=i)and(i<0x30A1) then return true end
+    if (0x30FC<=i)and(i<0x30FD) then return true end
+    if (0xA4D0<=i)and(i<0xA960) then return true end
+    if (0xA980<=i)and(i<0xAC00) then return true end
+    if (0xD800<=i)and(i<0xE000) then return true end
+    if (0xFB00<=i)and(i<0xFE10) then return true end
+    if (0xFE20<=i)and(i<0xFE30) then return true end
+    if (0xFE49<=i)and(i<0xFE50) then return true end
+    if (0xFE58<=i)and(i<0xFE5F) then return true end
+    if (0xFE63<=i)and(i<0xFE67) then return true end
+    if (0xFE70<=i)and(i<0xFF01) then return true end
+    if (0xFF08<=i)and(i<0xFF0A) then return true end
+    if (0xFF0D<=i)and(i<0xFF0E) then return true end
+    if (0xFF1A<=i)and(i<0xFF1F) then return true end
+    if (0xFF3B<=i)and(i<0xFF3C) then return true end
+    if (0xFF3D<=i)and(i<0xFF3E) then return true end
+    if (0xFF3F<=i)and(i<0xFF40) then return true end
+    if (0xFF5B<=i)and(i<0xFFE0) then return true end
+    if (0xFFE3<=i)and(i<0xFFE4) then return true end
+    if (0xFFE8<=i)and(i<0xFFF0) then return true end
+    if (0xFFF9<=i)and(i<0xFFFC) then return true end
+    if (0xFFFE<=i)and(i<0x10200) then return true end
+    if (0x10280<=i)and(i<0x103E0) then return true end
+    if (0x10400<=i)and(i<0x10570) then return true end
+    if (0x10600<=i)and(i<0x10780) then return true end
+    if (0x10800<=i)and(i<0x108B0) then return true end
+    if (0x108E0<=i)and(i<0x10940) then return true end
+    if (0x109A0<=i)and(i<0x10AA0) then return true end
+    if (0x10AC0<=i)and(i<0x10BB0) then return true end
+    if (0x10C00<=i)and(i<0x10C50) then return true end
+    if (0x10C80<=i)and(i<0x10D00) then return true end
+    if (0x10E60<=i)and(i<0x10E80) then return true end
+    if (0x11000<=i)and(i<0x11250) then return true end
+    if (0x11280<=i)and(i<0x11380) then return true end
+    if (0x11400<=i)and(i<0x114E0) then return true end
+    if (0x11600<=i)and(i<0x116D0) then return true end
+    if (0x11700<=i)and(i<0x11740) then return true end
+    if (0x118A0<=i)and(i<0x11900) then return true end
+    if (0x11AC0<=i)and(i<0x11B00) then return true end
+    if (0x11C00<=i)and(i<0x11CC0) then return true end
+    if (0x12000<=i)and(i<0x12550) then return true end
+    if (0x16800<=i)and(i<0x16A70) then return true end
+    if (0x16AD0<=i)and(i<0x16B90) then return true end
+    if (0x16F00<=i)and(i<0x16FA0) then return true end
+    if (0x1BC00<=i)and(i<0x1BCB0) then return true end
+    if (0x1D200<=i)and(i<0x1D250) then return true end
+    if (0x1D400<=i)and(i<0x1D800) then return true end
+    if (0x1E000<=i)and(i<0x1E030) then return true end
+    if (0x1E800<=i)and(i<0x1E8E0) then return true end
+    if (0x1E900<=i)and(i<0x1E960) then return true end
+    if (0x1EE00<=i)and(i<0x1EF00) then return true end
+    if (0x1F800<=i)and(i<0x1F900) then return true end
+    if (0xE0000<=i)and(i<0xE0080) then return true end
+    if (0xE0100<=i)and(i<0xE01F0) then return true end
+  end
+   list_rotate_glyphs = function (dest, id)
+      if id.specification and id.resources then
+         local rot = {}
+         for i,_ in pairs(id.characters) do
+	    if rotate_in_utr50(i) then rot[i] = true end
+         end
+         if id.resources.sequences then
+	 for _,i in pairs(id.resources.sequences) do
+	    if i.order[1]== 'vert' and i.type == 'gsub_single' and i.steps then
+	       for _,j in pairs(i.steps) do
+	          if type(j)=='table' then 
+		     if type(j,coverage)=='table' then
+			for i,_ in pairs(j.coverage) do rot[i]=nil end
+		     end
+		  end
+	       end
+	    end
+	 end; end
+	 -- コードポイントが共有されているグリフについて
+         if id.resources.duplicates then
+	 for i,v in pairs(id.resources.duplicates) do
+	    local f = rot[i]
+            for j,_ in pairs(v) do f = f and rot[j] end
+            rot[i]=f
+            for j,_ in pairs(v) do rot[j] = f end
+         end; end
+	 
+	 for i,_ in pairs(rot) do
+	    dest = dest or {}
+	    dest[i] = dest[i] or {}
+	    dest[i].rotation = true
+         end
+      end
+      return dest
+   end
+end
+
+-- vertical metrics
 local prepare_fl_data
 local supply_vkern_table
 do
@@ -855,7 +1013,7 @@ end
 
 --
 do
-   local cache_ver = 13
+   local cache_ver = 14
    local checksum = file.checksum
 
    local function prepare_extra_data_base(id)
@@ -875,6 +1033,7 @@ do
 	 else
 	    local dat = nil
 	    dat = prepare_fl_data(dat, id)
+	    dat = list_rotate_glyphs(dat, id)
 	    font_extra_basename[bname] = dat or {}
 	    ltjb.save_cache( v,
 			     {
@@ -978,20 +1137,21 @@ end
 
 ------------------------------------------------------------------------
 -- make table of vertical glyphs which does not covered by vert feature
+-- nor UTR#50
 ------------------------------------------------------------------------
 do
 ------------------------------------------------------------------------
 -- VERT VARIANT TABLE
 ------------------------------------------------------------------------
   local vert_form_table = {
-     [0x2013]=0xFE32, [0x2014]=0xFE31, [0x2025]=0xFE30, [0x2026]=0xFE19,
+     [0x3001]=0xFE11, [0x3002]=0xFE12, [0x3016]=0xFE17, [0x3017]=0xFE18,
+     [0x2026]=0xFE19,
+     [0x2025]=0xFE30, [0x2014]=0xFE31, [0x2013]=0xFE32, [0xFF3F]=0xFE33,
      [0xFF08]=0xFE35, [0xFF09]=0xFE36, [0xFF5B]=0xFE37, [0xFF5D]=0xFE38,
      [0x3014]=0xFE39, [0x3015]=0xFE3A, [0x3010]=0xFE3B, [0x3011]=0xFE3C,
      [0x300A]=0xFE3D, [0x300B]=0xFE3E, [0x3008]=0xFE3F, [0x3009]=0xFE40,
      [0x300C]=0xFE41, [0x300D]=0xFE42, [0x300E]=0xFE43, [0x300F]=0xFE44,
-     [0xFF3B]=0xFE47, [0xFF3D]=0xFE48, [0xFF3F]=0xFE33,
-     [0x2190]=0x2191, [0x2191]=0x2192, [0x2192]=0x2193, [0x2193]=0x2190,
-     [0x21E6]=0x21E7, [0x21E7]=0x21E8, [0x21E8]=0x21E9, [0x21E9]=0x21E6,
+     [0xFF3B]=0xFE47, [0xFF3D]=0xFE48, 
   }
   local function add_vform(coverage, vform, ft)
      if type(coverage)~='table' then return end

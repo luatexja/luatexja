@@ -57,7 +57,6 @@ local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 local attr_tkblshift = luatexbase.attributes['ltj@tkblshift']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 
-local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_font_extra_info = ltjf.font_extra_info
 
 local PACKED       = luatexja.icflag_table.PACKED
@@ -144,6 +143,33 @@ end
 luatexja.setwidth.capsule_glyph_yoko = capsule_glyph_yoko
 
 -- 和文文字の位置補正（縦）
+-- UTR#50 で R もしくは Tr と指定されているが，縦組用グリフがないもの
+local function capsule_glyph_tate_rot(p, met, char_data, head, dir, asc)
+   fshift.down = char_data.down; fshift.left = char_data.left
+   fshift = call_callback("luatexja.set_width", fshift, met, char_data)
+   local kbl = has_attr(p, attr_tkblshift) or 0
+   -- f*: whd specified in JFM
+   local pwidth, pheight,pdepth = getwhd(p)
+   local fwidth = char_data.width or pwidth
+   local fheight= char_data.height or pheight
+   local fdepth = char_data.depth or pdepth
+   local q
+   head, q = node_remove(head, p)
+   local xo, yo = getoffsets(p)
+   setoffsets(p, xo + char_data.align*(fwidth-pwidth) - fshift.left,
+              yo - fshift.down - asc);
+   setnext(p, nil)
+   local box = node_new(id_hlist)
+   setwhd(box, fwidth, fheight, fdepth)
+   setfield(box, 'head', p)
+   setfield(box, 'shift', kbl)
+   setdir(box, dir)
+   set_attr(box, attr_icflag, PACKED)
+   head = q and node_insert_before(head, q, box)
+      or node_insert_after(head, node_tail(head), box)
+   return q, head, box
+end
+
 local function capsule_glyph_tate(p, met, char_data, head, dir)
    if not char_data then return node_next(p), head end
    local ascent, descent = met.ascent, met.descent
@@ -151,10 +177,13 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
    do
       local pf = getfont(p)
       local pc = getchar(p)
-      setchar(p, pc)
-      pwidth = ltjf_font_extra_info[pf] and  ltjf_font_extra_info[pf][pc]
-	 and ltjf_font_extra_info[pf][pc].vwidth
-	 and ltjf_font_extra_info[pf][pc].vwidth * met.size or (ascent+descent)
+      local cei = ltjf_font_extra_info[pf] and  ltjf_font_extra_info[pf][pc]
+      if cei and met.vert_activated then
+	 if cei.rotation then
+	    return capsule_glyph_tate_rot(p, met, char_data, head, dir, 0.5*(ascent-descent))
+	 end
+      end
+      pwidth = (cei and cei.vwidth) and cei.vwidth * met.size or (ascent+descent)
       pwidth = pwidth + (met.v_advance[pc] or 0)
       ascent = met.v_origin[pc] and ascent - met.v_origin[pc] or ascent
    end

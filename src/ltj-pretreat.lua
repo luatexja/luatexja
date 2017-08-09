@@ -149,7 +149,6 @@ local function set_box_stack_level(head, mode)
 	    if ltjf_font_metric_table[nf].vert_activated then
 	       local pc = getchar(p)
 	       pc = ltjf_font_metric_table[nf].vform[pc]
-	       if pc then setchar(p,  pc) end
 	    end
 	 end
       end
