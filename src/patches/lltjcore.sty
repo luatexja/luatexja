@@ -187,7 +187,7 @@
   \fi}
 \endgroup
 \if@compatibility\else
-\def\verb{\relax\ifmmode\hbox\else\leavevmode\fi
+\def\verb{\relax\ifmmode\hbox\else\leavevmode\vadjust{}\fi
   \bgroup
     \verb@eol@error \let\do\@makeother \dospecials
     \verbatim@font\@noligs
