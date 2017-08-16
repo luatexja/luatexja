@@ -1039,6 +1039,7 @@ do
 ------------------------------------------------------------------------
 -- VERT VARIANT TABLE
 ------------------------------------------------------------------------
+  local provides_feature = luaotfload.aux.provides_feature
   local vert_form_table = {
      [0x3001]=0xFE11, [0x3002]=0xFE12, [0x3016]=0xFE17, [0x3017]=0xFE18,
      [0x2026]=0xFE19,
@@ -1049,12 +1050,15 @@ do
      [0x300C]=0xFE41, [0x300D]=0xFE42, [0x300E]=0xFE43, [0x300F]=0xFE44,
      [0xFF3B]=0xFE47, [0xFF3D]=0xFE48, 
   }
-  local function add_vform(coverage, vform, ft)
+  local function add_vform(coverage, vform, ft, add_vert)
      if type(coverage)~='table' then return end
      for i,v in pairs(vert_form_table) do
-	 if (not coverage[i]) and ft.characters[v] then
+	 if not coverage[i] and ft.characters[v] then
 	     vform[i] = v
 	 end
+     end
+     if add_vert then -- vert feature が有効にならない場合
+	for i,v in pairs(coverage) do vform[i] = vform[i] or v end
      end
   end
 
@@ -1062,14 +1066,18 @@ luatexbase.add_to_callback(
    "luatexja.define_jfont",
    function (fmtable, fnum)
       local vform = {}; fmtable.vform = vform
-      local ft = font_getfont(fnum)
-      if ft.specification and ft.resources then
-	  for _,i in pairs(ft.resources.sequences) do
-	      if i.order[1]== 'vert' and i.type == 'gsub_single' and i.steps then
-		  for _,j in pairs(i.steps) do
-		     if type(j)=='table' then add_vform(j.coverage,vform, ft) end
-		  end
-	      end
+      local t = font_getfont(fnum)
+      if t.specification and t.resources then
+	 local add_vert  
+	   = not (provides_feature(fnum, t.properties.script, t.properties.language, 'vert'))
+	     and not (provides_feature(fnum, t.properties.script, t.properties.language, 'vrt2'))
+         -- 現在の language, script で vert もvrt2 も有効にできない場合，強制的に vert 適用
+	 for _,i in pairs(t.resources.sequences) do
+	    if i.order[1]== 'vert' and i.type == 'gsub_single' and i.steps then
+	       for _,j in pairs(i.steps) do
+	          if type(j)=='table' then add_vform(j.coverage,vform, t, add_vert) end
+	       end
+	    end
 	  end
       end
       return fmtable
