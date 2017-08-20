@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2017/08/17 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2017/08/20 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -213,7 +213,7 @@
     mc-m = YuMincho-Regular, mc-bx = YuMincho-Demibold,
     gt-m = YuGothic-Regular, gt-bx = YuGothic-Bold,
     gt-u = YuGothic-Regular, gt-eb = YuGothic-Bold,
-    mg-m = YuGothic-Bold,    mc-l =  YuMincho-Light
+    mg-m = YuGothic-Bold,    mc-l =  YuMincho-Light,
     __custom = false, __office = false, __noembed = false,
 }
 % Win10
@@ -221,7 +221,7 @@
     mc-m = YuMincho-Regular, mc-bx = YuMincho-Demibold,
     gt-m = YuGothic-Regular, gt-bx = YuGothic-Bold,
     gt-u = YuGothic-Medium,  gt-eb = YuGothic-Bold,
-    mg-m = YuGothic-Bold,    mc-l =  YuMincho-Light
+    mg-m = YuGothic-Bold,    mc-l =  YuMincho-Light,
     __custom = false, __office = false, __noembed = false,
 }
 
@@ -231,7 +231,7 @@
     mc =  YuMincho~Medium, mc-bx = YuMincho~Demibold,
     gt-m =  YuGothic~Medium, gt-u =  YuGothic~Medium,
     gt-bx = YuGothic~Bold,   gt-eb = YuGothic~Bold,
-    mg-m =  YuGothic~Bold
+    mg-m =  YuGothic~Bold,
     __custom = false, __office = false, __noembed = false,
 }
 
@@ -240,14 +240,14 @@
     mc =   Moga90Mincho, mc-bx = Moga90Mincho~Bold,
     gt-m = Moga90Gothic, gt-bx = Moga90Gothic~Bold,
     gt-u = Moga90Gothic, gt-eb = Moga90Gothic~Bold,
-    mg-m = Mobo90Gothic
+    mg-m = Mobo90Gothic,
     __custom = false, __office = false, __noembed = false,
 }
 \ltjpreset_declare_preset:nx{moga-mobo-ex}{
     mc =   MogaEx90Mincho, mc-bx = MogaEx90Mincho~Bold,
     gt-m = MogaEx90Gothic, gt-bx = MogaEx90Gothic~Bold,
     gt-u = MogaEx90Gothic, gt-eb = MogaEx90Gothic~Bold,
-    mg-m = MoboEx90Gothic
+    mg-m = MoboEx90Gothic,
     __custom = false, __office = false, __noembed = false,
 }
 
@@ -256,7 +256,7 @@
     mc = Ume~Mincho,
     gt-m = Ume~Gothic,    gt-bx = Ume~Gothic~O5,
     gt-u = Ume~Gothic~O5, gt-eb = Ume~Gothic~O5,
-    mg-m = Ume~Gothic~O4
+    mg-m = Ume~Gothic~O4,
     __custom = false, __office = false, __noembed = false,
 }
 
@@ -463,6 +463,7 @@
     \DeclareFontShape{#1}{#2}{#3}{#4}{ <-> s*[\fp_use:N \g_ltjpreset_scale_fp]
       { \bool_if:NT \g_ltjpreset_noembed_bool {psft:} #5
 	;-kern \tl_use:N \l_ltjpreset_kanji_shape_tl; #6 } } {}
+    \typeout{\fp_use:N \g_ltjpreset_scale_fp }
   }
   \cs_new:Nn \ltj_preset_define_family:nnn {
     \ltj_preset_declare_font_shape:nnnnnn { JY3 } { #1 } { #2 } { n }
