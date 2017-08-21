@@ -463,7 +463,6 @@
     \DeclareFontShape{#1}{#2}{#3}{#4}{ <-> s*[\fp_use:N \g_ltjpreset_scale_fp]
       { \bool_if:NT \g_ltjpreset_noembed_bool {psft:} #5
 	;-kern \tl_use:N \l_ltjpreset_kanji_shape_tl; #6 } } {}
-    \typeout{\fp_use:N \g_ltjpreset_scale_fp }
   }
   \cs_new:Nn \ltj_preset_define_family:nnn {
     \ltj_preset_declare_font_shape:nnnnnn { JY3 } { #1 } { #2 } { n }
@@ -601,9 +600,11 @@
   \ltjpreset_extract_fonts:
   \ltjpreset_check_deluxe_existence:
   \ltjpreset_do_fontset:
+  \normalfont
 }
 
 \ltjapplypreset {}
 
 \ExplSyntaxOff
+
 \endinput
