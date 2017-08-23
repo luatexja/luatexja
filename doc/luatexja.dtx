@@ -1562,56 +1562,6 @@ The following presets are defined:
 %<ja>として読み込み，小塚書体(Pr6N)を使うことを指定している．
 %<en> which means that Kozuka~Pr6N fonts will be used in this document.
 
-%<*ja>
-上記のプリセット以外の和文フォント設定を使いたい場合，本来は
-\Pkg{luatexja-fontspec}パッケージの提供する
-\cs{setmainjfont}, \cs{setsansjfont}を使って自分で指定するべきである．
-\texttt{custom}オプションを使うことで，\Pkg{luatexja-preset}パッケージの内部に直接アクセスして
-\begin{lstlisting}
-\usepackage[kozuka-pr6n,          % kozuka-pr6n プリセットを基礎にして，
-  custom={
-    mc=SourceHanSerif-Regular,    % 明朝体（全ウェイト）
-    mc-l=SourceHanSerif-Bold,     % 明朝体細字
-    mc-m=KozMinPr6N-Regular,      % 明朝体中字
-  % mc-bx=KozMinPr6N-Bold,        % 明朝体太字
-  % gt=HirakakuProN-W3,           % ゴシック体（全ウェイト）
-  % gt-m=SourceHanSans-Regular,   % ゴシック体中字（deluxe オプション指定時）
-  % gt-bx=HiraKakuProN-W6,ular,   % ゴシック体太字
-  % gt-eb=HiraKakuProN-W6,ular,   % ゴシック体極太
-    mg-m=HG Maru Gothic PRO,      % 丸ゴシック体
-  },
-  deluxe,expert,jis2004,match,nfssonly
-]{luatexja-preset}
-\end{lstlisting}
-のようにすることもできるが，\texttt{custom}オプションの書式は予告なく変更されることがある
-上，\texttt{90jis}や\texttt{JIS2004}オプションとの相性があまり良くないので推奨はしない．
-%</ja>
-%<*en>
-To use a Japanese font setting which does not match with any presets,
-the legitimate method is to use \cs{setmainjfont}~and~\cs{setsansjfont}
-which are provided by the \Pkg{luatexja-fontspec} package.
-
-One can use the \texttt{custom} option, such as
-\begin{lstlisting}
-\usepackage[kozuka-pr6n,          % based on the kozuka-pr6n preset (Kozuka Pr6N),
-  custom={
-    mc=SourceHanSerif-Regular,    % mincho family (all weights)
-    mc-l=SourceHanSerif-Bold,     % mincho light
-    mc-m=KozMinPr6N-Regular,      % mincho medium
-  % mc-bx=KozMinPr6N-Bold,        % mincho bold
-  % gt=HirakakuProN-W3,           % gothic family (all weights)
-  % gt-m=SourceHanSans-Regular,   % gothic medium (with deluxe option)
-  % gt-bx=HiraKakuProN-W6,ular,   % gothic bold
-  % gt-eb=HiraKakuProN-W6,ular,   % gothic extra bold
-    mg-m=HGMaruGothicMPRO,        % rounded gothic
-  },
-  deluxe,expert,jis2004,match,nfssonly
-]{luatexja-preset}
-\end{lstlisting}
-However, we do not recommend this \cs{custom} option;
-the format might change, and this \cs{custom} option is not well-compatible with
-\texttt{90jis}~nor~\cs{jis2004} options.
-%</en>
 
 %<*en>
 \subsection{\cs{CID}, \cs{UTF}, and macros in \Pkg{japanese-otf} package}
@@ -7120,8 +7070,8 @@ package to use several ``presets'' of Japanese fonts.
 This package provides functions in a part of \Pkg{japanese-otf} package (changing fonts)
 and a part of \Pkg{PXchfon} package (presets) by Takayuki Yato.
 
-One can specified other options other than listed below.
-These are simply passed to the \Pkg{luatexja-fontspec}\footnote{if \texttt{nfssonly} option is
+Options which are given in \cs{usepackage} but not described in this~chapter
+are simply passed to the \Pkg{luatexja-fontspec}\footnote{if \texttt{nfssonly} option is
 \emph{not} specified; in this case these options are simply ignored.}.
 For example, the line~5 in below example is equivalent to lines 1--3.
 %</en>
@@ -7131,7 +7081,9 @@ For example, the line~5 in below example is equivalent to lines 1--3.
 \Pkg{otf}パッケージの一部（多書体化）と八登崇之氏による\Pkg{PXchfon}パッケージの一部（プリセット指定）
 とを合わせたような格好をしている．
 
-オプションとして，以下のリストにないものも指定することができるが，それらは
+パッケージ読み込み時に渡されたオプションのうち，
+本章（\ref{ssec:ltjpreset-general}節から\ref{ssec:ltjpreset-hg}節）にない
+を指定した場合，それらはそのまま
 \Pkg{luatexja-fontspec}パッケージに渡される\footnote{\texttt{nfssonly} オプションが
 指定されていた場合は，\Pkg{luatexja-fontspec}パッケージは読み込まれないので単純に無視され
 る．}．例えば，下の1--3行目は5行目のように一行にまとめることができる．
@@ -7143,6 +7095,10 @@ For example, the line~5 in below example is equivalent to lines 1--3.
 %%--------
 \usepackage[no-math,match,kozuka-pr6n]{luatexja-preset}
 \end{lstlisting}
+
+%<en>\subsection{General Options}
+%<ja>\subsection{一般的なオプション}
+\label{ssec:ltjpreset-general}
 
 \begin{cslist}[before*=]
 \item[fontspec%
@@ -7338,8 +7294,10 @@ We didn't taken account of  when both \texttt{90jis} and \texttt{jis2004} are sp
 両オプションが同時に指定された場合の動作については全く考慮していない．
 %</ja>
 
-%<en>\paragraph{Presets for multi weight}
-%<ja>\paragraph{多ウェイト用プリセットの一覧}
+%<en>\subsection{Presets which support multi weights}
+%<ja>\subsection{多ウェイト用プリセットの一覧}
+\label{ssec:ltjpreset-multi}
+
 %<*en>
 Besides \texttt{morisawa-pro}~and~\texttt{morisawa-pr6n} presets,
 fonts are specified by font name, not by file name.
@@ -7444,7 +7402,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
  \item[morisawa-pro]  Morisawa Pro (Adobe-Japan1-4) fonts.
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[morisawa-pr6n]  Morisawa Pr6N (Adobe-Japan1-6, JIS04-savvy) fonts.
-\begin{center}\small
+\begin{center}\footnotesize
 \begin{tabular}{ll>{\tt}l>{\tt}l}
 \toprule
 \bf family&\bf series&morisawa-pro&morisawa-pr6n\\
@@ -7622,11 +7580,11 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{tabular}
 \end{center}
 
-
-
 \end{cslist}
-%<en>\paragraph{Presets for single weight}
-%<ja>\paragraph{単ウェイト用プリセット一覧}
+%<en>\subsection{Presets which do not support multi weights}
+%<ja>\subsection{単ウェイト用プリセット一覧}
+\label{ssec:ltjpreset-single}
+
 %<*en>
 Next, we describe settings for using only single weight.
 %</en>
@@ -7647,16 +7605,17 @@ Next, we describe settings for using only single weight.
 &IPA Gothic&IPAex Gothic&MS Gothic\\
 %</en>
 %<*ja>
-\gtfamily 明朝体&Ryumin-Light（非埋込）
+\gtfamily 明朝&Ryumin-Light（非埋込）
 &IPA明朝&IPAex明朝&MS明朝\\
-\gtfamily ゴシック体&GothicBBB-Medium（非埋込）
+\gtfamily ゴシック&GothicBBB-Medium（非埋込）
 &IPAゴシック&IPAexゴシック&MSゴシック\\
 %</ja>
 \bottomrule
 \end{tabular}\par\medskip}
 
-%<en>\paragraph{Using HG fonts}
-%<ja>\paragraph{HGフォントの利用}
+%<en>\subsection{Presets which use HG fonts}
+%<ja>\subsection{HGフォントを使うプリセット}
+\label{ssec:ltjpreset-hg}
 %<*en>
 We can use HG~fonts bundled with Microsoft~Office for realizing multiple weights.
 In the table below, starred fonts (e.g., IPA~Gothic*) are used
@@ -7687,14 +7646,14 @@ HG MaruGothic M PRO&HG MaruGothic M PRO&HG MaruGothic M PRO\\
 %</en>
 %<*ja>
 &medium&IPA明朝&IPAex明朝&MS明朝\\
-\smash{\raisebox{1.5ex}{\textgt{明朝体}}}%
+\smash{\raisebox{1.5ex}{\textgt{明朝}}}%
 &bold&HG明朝E&HG明朝E&HG明朝E\\\midrule
 &&IPAゴシック*&IPAexゴシック*&MSゴシック*\\
 &\smash{\raisebox{1.5ex}{medium}}%
 &HGゴシックM&HGゴシックM&HGゴシックM\\\cmidrule{2-5}
-\textgt{ゴシック体}&bold&HGゴシックE&HGゴシックE&HGゴシックE\\\cmidrule{2-5}
+\textgt{ゴシック}&bold&HGゴシックE&HGゴシックE&HGゴシックE\\\cmidrule{2-5}
 &extra bold&HG創英角ゴシックUB&HG創英角ゴシックUB&HG創英角ゴシックUB\\\midrule
-\textgt{丸ゴシック体}&&
+\textgt{丸ゴシック}&&
 HG丸ゴシックM-PRO&HG丸ゴシックM-PRO&HG丸ゴシックM-PRO\\
 %</ja>
 \bottomrule
@@ -7720,6 +7679,138 @@ are internally specified by:
 \end{description}
 として指定を行っているので注意すること．
 %</ja>
+
+%<en>\subsection{Define/Use Custom Presets}
+%<ja>\subsection{新たなプリセットの定義}
+
+%<*ja>
+バージョン********.0以降では，自分で新たなプリセットを定義することが出来るようになった．
+以下に説明する2命令はプリアンブルでしか実行できない．
+%</ja>
+%<*en>
+From version~********.0, one can define new presets using \cs{ltjnewpreset},
+and use them by \cs{ltjapplypreset}. These two commands can only be used in the preamble.
+%</en>
+\begin{cslist}
+ \item[\cs{ltjnewpreset}\{<name>\}\{<specification>\}]
+%<*ja>
+  新たに<name>という名称のプリセットを定義する．この名称は，
+  すでに定義されているプリセット名や，
+  \ref{ssec:ltjpreset-general}で定義されているオプション，さらに
+  次の9つと重複してはならない．
+  \begin{quote}
+	\ttfamily
+	mc mc-l mc-m mc-bx gt gt-m gt-bx gt-eb mg-m
+  \end{quote}
+
+  <specification>は，プリセット名や以下のキー達のコンマ区切りリストを指定する：
+  \begin{description}
+   \item[\ttfamily mc-l=<font>] 明朝体細字(\cs{mcfamily}\cs{ltseries})
+   \item[\ttfamily mc-m=<font>] 明朝体中字(\cs{mcfamily}\cs{mdseries})
+   \item[\ttfamily mc-bx=<font>] 明朝体太字(\cs{mcfamily}\cs{bfseries})
+   \item[\ttfamily gt-m=<font>] ゴシック体中字(\cs{gtfamily}\cs{mdseries})
+   \item[\ttfamily gt-bx=<font>] ゴシック体太字(\cs{gtfamily}\cs{bfseries})
+   \item[\ttfamily gt-eb=<font>] ゴシック体太字(\cs{gtfamily}\cs{ebseries})
+   \item[\ttfamily mg-m=<font>] 丸ゴシック体(\cs{mgfamily})
+   \item[\ttfamily mc=<font>] 明朝体の細字・中字・太字全部を設定．
+	以下を指定したことと同じである：
+	\begin{quote}
+	  \ttfamily mc-l=<font>, mc-m=<font>, mc-bx=<font>
+	\end{quote}
+   \item[\ttfamily gt=<font>] ゴシック体の中字・太字・極太全部を設定．
+	以下を指定したことと同じである：
+	\begin{quote}
+	  \ttfamily gt-m=<font>, gt-bx=<font>, gt-eb=<font>
+	\end{quote}
+  \end{description}
+  なお，パッケージ読み込み時に \texttt{deluxe} が有効でない場合は，
+  上記9キーのうち\texttt{mc}, \texttt{gt}しか実質的に意味を持たない．  
+%</ja>
+%<*en>
+  Define new preset~<name>. This <name> cannot be same as other presets,
+  options described in Subsection~\ref{ssec:ltjpreset-general}, nor
+  following nine strings:
+  \begin{quote}
+	\ttfamily
+	mc mc-l mc-m mc-bx gt gt-m gt-bx gt-eb mg-m
+  \end{quote}
+
+  <specification> is a comma-separated list which consists of
+  other presets and/or the following keys:
+  \begin{description}
+   \item[\ttfamily mc-l=<font>] mincho light
+   \item[\ttfamily mc-m=<font>] mincho medium
+   \item[\ttfamily mc-bx=<font>] mincho bold
+   \item[\ttfamily gt-m=<font>] gothic medium
+   \item[\ttfamily gt-bx=<font>] gothic bold
+   \item[\ttfamily gt-eb=<font>] gothic extra~bold
+   \item[\ttfamily mg-m=<font>] rounded gothic
+   \item[\ttfamily mc=<font>] Same as
+	\begin{quote}
+	  \ttfamily mc-l=<font>, mc-m=<font>, mc-bx=<font>
+	\end{quote}
+   \item[\ttfamily gt=<font>] Same as
+	\begin{quote}
+	  \ttfamily gt-m=<font>, gt-bx=<font>, gt-eb=<font>
+	\end{quote}
+  \end{description}
+  If \texttt{deluxe} is not specified at loading the package,
+  only \texttt{mc}~and~\texttt{gt} keys (among above 9~keys) have a meaning.
+%</en>
+ \item[\cs{ltjnewpreset}*\{<name>\}\{<specification>\}]
+%<*ja>
+  \cs{ltjnewpreset}とほぼ同じであるが，こちらはすでに定義されているプリセット名
+  を<name>に指定した場合にはエラーを出さずに定義を置き換える．
+%</ja>
+%<*en>
+  Almost same as \cs{ltjnewpreset}. However, if <name> matches a preset which already defined,
+  this command simply overwrite it.
+%</en>
+ \item[\cs{ltjapplypreset}\{<name>\}]
+%<ja> <name>で指定されたプリセットを使って和文フォントを設定する．
+%<en> Set Japanese font families using preset~<name>.
+\end{cslist}
+
+%<*ja>
+なお，\cs{ltjnewpreset}の第二引数<specification>に含まれる
+プリセット名は\cs{ltjnewpreset}の時点で定義されている必要はなく，
+\cs{ltjapplypreset}で実際に使うときに定義されていれば良い．
+そのため，次のような記述も可能である：
+\begin{lstlisting}
+  \ltjnewpreset{hoge}{piyo,mc-bx=HiraMinProN-W6}
+  \ltjnewpreset{piyo}{mg-m=HiraMaruProN-W4}
+  \ltjapplypreset{hoge}
+\end{lstlisting}
+
+\paragraph{注意}
+\cs{ltjnewpreset}で定義したプリセットには以下の制限がある．
+\begin{itemize}
+  \item 非埋め込みのフォントを指定することはできない．
+  \item \texttt{ipa-hg}などのいくつかのプリセットでは
+  「\texttt{90jis}, \texttt{jis2004}が指定されているか否かでフォントの指定を変える」処理が
+  行われていたが，\cs{ltjnewpreset}で定義したプリセットではこの処理は働かない．
+  HGフォントやモガ明朝などを使うプリセットを定義する場合には注意すること．
+\end{itemize}
+%</ja>
+%<*en>
+Note that \cs{ltjnewpreset} does not ``expand'' the definition to define a preset.
+This means that one can write as the following:
+\begin{lstlisting}
+  \ltjnewpreset{hoge}{piyo,mc-bx=HiraMinProN-W6}
+  \ltjnewpreset{piyo}{mg-m=HiraMaruProN-W4}
+  \ltjapplypreset{hoge}
+\end{lstlisting}
+
+\paragraph{Restrictions}
+Presets which are defined by \cs{ltjnewpreset} have following restrictions:
+\begin{itemize}
+  \item One cannot specify non-embedded fonts (such as Ryumin-Light).
+  \item Some presets, such as \texttt{ipa-hg}, have a feature that
+  fonts are changed according to whether \texttt{90jis}~or~\texttt{jis2004} is speified.
+  This feature is not usable in presets which are defined by \cs{ltjnewpreset}.
+\end{itemize}
+%</en>
+
 
 \clearpage
 %<en>\part{Implementations}
