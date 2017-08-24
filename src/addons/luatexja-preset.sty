@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2017/08/20 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2017/08/23 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -589,7 +589,7 @@
   } {
     \keys_define:nn { luatexja-preset } {
       #2 .meta:n = { #3, __custom = true, __noembed = false, __office = false, },
-      #3 .value_forbidden:n = true, #1 .groups:n = { preset },
+      #2 .value_forbidden:n = true, #2 .groups:n = { preset },
     }
     \seq_put_right:Nn \g_ltjpreset_presets_seq { #2 }
   }
@@ -604,6 +604,9 @@
 }
 
 \ltjapplypreset {}
+
+\@onlypreamble\ltjnewpreset
+\@onlypreamble\ltjapplypreset
 
 \ExplSyntaxOff
 
