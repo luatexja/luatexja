@@ -3660,14 +3660,27 @@ JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 This command admits the same syntax used in \cs{font}~and~\cs{jfont}.
 A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont}:
 \begin{itemize}
- \item Both \texttt{vert}~and~\texttt{vrt2} Opentype features are activated,
-  unless they are explicitly activated or deactivated (as the third line in the example below).
+ \item OpenType Feature~\texttt{vrt2}%
+  \footnote{If the font does not define \texttt{vrt2} feature,
+	use \texttt{vert} instead.} is automatically activated,
+  unless \texttt{vert}~and//or~\texttt{vrt2} are explicitly activated
+  or deactivated (as the second line in the example below).
 \begin{lstlisting}
-\tfont\S=file:KozMinPr6N-Regular.otf:jfm=ujisv
-    % vert and vrt2 are automatically activated
+\tfont\S=file:KozMinPr6N-Regular.otf:jfm=ujisv % vrt2 is automatically activated
 \tfont\T=file:KozMinPr6N-Regular.otf:jfm=ujisv;-vert % vert and vrt2 are not activated
+\tfont\U=file:ipaexm.ttf:jfm=ujisv
+    % vert is automatically activated, since this font does not have vrt2
 \end{lstlisting}
- \item ...
+ \item Sometimes \texttt{vert} and/or \texttt{vrt2} are not activated
+ while one specified activation of these feature.
+ This is because the font does not define these features in current combination of
+ script~tag and language~system~identifier.
+
+ In this situation, \LuaTeX-ja performs all replacements which is defined in~\texttt{vert}
+ feature for \emph{some} scripts for \emph{some} languages.
+ \item Furthermore, a glyph is automatically rotated 90~degrees,
+  if it is not replaced by \texttt{vert} feature for \emph{any} script
+  for \emph{any} language, and if it is marked as `r''~or~``Tr'' in UAX~\#50.
  \item One have to specify the name of vertical JFM in  \texttt{jfm=<name>}.
 \LuaTeX-ja ships following vertical JFMs:
 \begin{description}
@@ -3685,14 +3698,32 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
 \cs{tfont} で定義された縦組用和文フォントは，
 以下の点が \cs{jfont} による横組用和文フォントとは異なる：
 \begin{itemize}
- \item 自動的に \texttt{vert}, \texttt{vrt2} の両OpenType featureが有効化される．
-但し，以下の例の3行目に示すように，明示的に \texttt{vert}, \texttt{vrt2}（のいずれか）の
-有効・無効を指定した場合は別である．
+ \item 明示的に \texttt{vert}, \texttt{vrt2}（のいずれか）の
+  有効・無効を指定した場合を除き，自動的に OpenType feature~\texttt{vrt2} の有効化が
+  指定されたものとみなされる
+ \footnote{もしフォントが\texttt{vrt2}を定義していなかった場合，代わりに
+ \texttt{vert}を用いる．}．
 \begin{lstlisting}
-\tfont\S=file:KozMinPr6N-Regular.otf:jfm=ujisv
-    % vert and vrt2 are automatically activated
+\tfont\S=file:KozMinPr6N-Regular.otf:jfm=ujisv % vrt2 is automatically activated
 \tfont\T=file:KozMinPr6N-Regular.otf:jfm=ujisv;-vert % vert and vrt2 are not activated
+\tfont\U=file:ipaexm.ttf:jfm=ujisv
+    % vert is automatically activated, since this font does not have vrt2
 \end{lstlisting}
+ \item \texttt{vert}, \texttt{vrt2} の少なくとも一つの有効を指定した場合にも関わらず，
+  script tagとlanguage system identifierの値の組み合わせによって
+  実際には有効にならなかった場合，\LuaTeX-jaは
+ \begin{quote}
+   どれかのscript,~languageで定義されている\texttt{vert}による
+   （単一グリフから単一グリフへの）置換を全部適用する
+ \end{quote}
+  という挙動を取る\footnote{%
+  例えば，Windows~7に付属しているSimHeiでは，\texttt{vert}はScriptが\texttt{hani}，
+  Languageが\texttt{CHN}という状況でのみ定義されている．しかし，\Pkg{luaotfload}では
+  このscript,~languageの組み合わせを指定することはできないので，
+  \Pkg{luaotfload}そのままでは\texttt{vert}を適用させることはできない．
+ }．
+ \item さらに，「いかなるscript,~languageでも\texttt{vert}により置換されない」グリフ
+  のうち，UAX~\#50で``r''もしくは``Tr''と指定されているものは90度自動回転させる．
  \item \ref{ssec-math}節で述べる，数式中の和文フォントには縦組用和文フォントは指定できない．
  \item \texttt{jfm=<name>}\ の部分には縦組用JFMを指定する．
 以下の縦組用JFMが\LuaTeX-jaには同梱されている．%おり，違いを\autoref{tab-difjfm-tate}に示した．
