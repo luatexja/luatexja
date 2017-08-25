@@ -365,11 +365,19 @@ do
 end
 
 do
+   local gmatch = string.gmatch
    -- extract jfm_file_name and jfm_var
    -- normalize position of 'jfm=' and 'jfmvar=' keys
    local function extract_metric(name)
-      local is_braced = name:match('^{(.*)}$')
-      name= is_braced or name
+      do
+         local nametemp
+	 nametemp = name:match('^{(.*)}$')
+	 if nametemp then name = nametemp
+         else
+  	    nametemp = name:match('^"(.*)"$')
+	    name = nametemp or name
+         end
+      end
       jfm_file_name = ''; jfm_var = ''; jfm_ksp = true
       local tmp, index = name:sub(1, 5), 1
       if tmp == 'file:' or tmp == 'name:' or tmp == 'psft:' then
@@ -378,7 +386,7 @@ do
       local p = name:find(":", index); index = p and (p+1) or index
       while index do
 	 local l = name:len()+1
-	 local q = name:find(";", index+1) or l
+	 local q = name:find(";", index) or l
 	 if name:sub(index, index+3)=='jfm=' and q>index+4 then
 	    jfm_file_name = name:sub(index+4, q-1)
 	    if l~=q then
@@ -408,16 +416,17 @@ do
 	    name = name .. 'jfmvar=' .. jfm_var
 	 end
       end
-      for x in string.gmatch (name, "[:;]([+%%-]?)ltjks") do
+      for x in gmatch (name, "[:;]([+%%-]?)ltjks") do
 	 jfm_ksp = not (x=='-')
       end
       if jfm_dir == 'tate' then
 	 is_vert_enabled = (not name:match('[:;]%-vert')) and (not  name:match('[:;]%-vrt2'))
-         auto_enable_vrt2 = (not name:match('vert') and not name:match('vrt2'))
+	 auto_enable_vrt2 
+	   = (not name:match('[:;][+%-]?vert')) and (not name:match('[:;][+%-]?vrt2'))
       else
 	 is_vert_enabled, auto_enable_vrt2 = nil, nil
       end
-      return is_braced and ('{' .. name .. '}') or name
+      return name
    end
 
    -- define_font callback
@@ -744,7 +753,7 @@ do
 	    if i.order[1]== 'vert' and i.type == 'gsub_single' and i.steps then
 	       for _,j in pairs(i.steps) do
 	          if type(j)=='table' then 
-		     if type(j,coverage)=='table' then
+		     if type(j.coverage)=='table' then
 			for i,_ in pairs(j.coverage) do rot[i]=nil end
 		     end
 		  end
