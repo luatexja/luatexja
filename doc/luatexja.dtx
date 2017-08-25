@@ -7070,7 +7070,7 @@ package to use several ``presets'' of Japanese fonts.
 This package provides functions in a part of \Pkg{japanese-otf} package (changing fonts)
 and a part of \Pkg{PXchfon} package (presets) by Takayuki Yato.
 
-Options which are given in \cs{usepackage} but not described in this~chapter
+Options which are given in \cs{usepackage} but not described in this~subsection
 are simply passed to the \Pkg{luatexja-fontspec}\footnote{if \texttt{nfssonly} option is
 \emph{not} specified; in this case these options are simply ignored.}.
 For example, the line~5 in below example is equivalent to lines 1--3.
@@ -7082,8 +7082,7 @@ For example, the line~5 in below example is equivalent to lines 1--3.
 とを合わせたような格好をしている．
 
 パッケージ読み込み時に渡されたオプションのうち，
-本章（\ref{ssec:ltjpreset-general}節から\ref{ssec:ltjpreset-hg}節）にない
-を指定した場合，それらはそのまま
+本節にないものを指定した場合，それらはそのまま
 \Pkg{luatexja-fontspec}パッケージに渡される\footnote{\texttt{nfssonly} オプションが
 指定されていた場合は，\Pkg{luatexja-fontspec}パッケージは読み込まれないので単純に無視され
 る．}．例えば，下の1--3行目は5行目のように一行にまとめることができる．
@@ -7096,9 +7095,9 @@ For example, the line~5 in below example is equivalent to lines 1--3.
 \usepackage[no-math,match,kozuka-pr6n]{luatexja-preset}
 \end{lstlisting}
 
-%<en>\subsection{General Options}
-%<ja>\subsection{一般的なオプション}
-\label{ssec:ltjpreset-general}
+%<en>\subsubsection{General Options}
+%<ja>\subsubsection{一般的なオプション}
+\label{sssec:ltjpreset-general}
 
 \begin{cslist}[before*=]
 \item[fontspec%
@@ -7294,9 +7293,9 @@ We didn't taken account of  when both \texttt{90jis} and \texttt{jis2004} are sp
 両オプションが同時に指定された場合の動作については全く考慮していない．
 %</ja>
 
-%<en>\subsection{Presets which support multi weights}
-%<ja>\subsection{多ウェイト用プリセットの一覧}
-\label{ssec:ltjpreset-multi}
+%<en>\subsubsection{Presets which support multi weights}
+%<ja>\subsubsection{多ウェイト用プリセットの一覧}
+\label{sssec:ltjpreset-multi}
 
 %<*en>
 Besides \texttt{morisawa-pro}~and~\texttt{morisawa-pr6n} presets,
@@ -7581,9 +7580,9 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{center}
 
 \end{cslist}
-%<en>\subsection{Presets which do not support multi weights}
-%<ja>\subsection{単ウェイト用プリセット一覧}
-\label{ssec:ltjpreset-single}
+%<en>\subsubsection{Presets which do not support multi weights}
+%<ja>\subsubsection{単ウェイト用プリセット一覧}
+\label{sssec:ltjpreset-single}
 
 %<*en>
 Next, we describe settings for using only single weight.
@@ -7613,9 +7612,9 @@ Next, we describe settings for using only single weight.
 \bottomrule
 \end{tabular}\par\medskip}
 
-%<en>\subsection{Presets which use HG fonts}
-%<ja>\subsection{HGフォントを使うプリセット}
-\label{ssec:ltjpreset-hg}
+%<en>\subsubsection{Presets which use HG fonts}
+%<ja>\subsubsection{HGフォントを使うプリセット}
+\label{sssec:ltjpreset-hg}
 %<*en>
 We can use HG~fonts bundled with Microsoft~Office for realizing multiple weights.
 In the table below, starred fonts (e.g., IPA~Gothic*) are used
@@ -7680,8 +7679,8 @@ are internally specified by:
 として指定を行っているので注意すること．
 %</ja>
 
-%<en>\subsection{Define/Use Custom Presets}
-%<ja>\subsection{新たなプリセットの定義}
+%<en>\subsubsection{Define/Use Custom Presets}
+%<ja>\subsubsection{新たなプリセットの定義}
 
 %<*ja>
 バージョン********.0以降では，自分で新たなプリセットを定義することが出来るようになった．
@@ -7696,7 +7695,7 @@ and use them by \cs{ltjapplypreset}. These two commands can only be used in the 
 %<*ja>
   新たに<name>という名称のプリセットを定義する．この名称は，
   すでに定義されているプリセット名や，
-  \ref{ssec:ltjpreset-general}で定義されているオプション，さらに
+  \ref{sssec:ltjpreset-general}で定義されているオプション，さらに
   次の9つと重複してはならない．
   \begin{quote}
 	\ttfamily
@@ -7728,7 +7727,7 @@ and use them by \cs{ltjapplypreset}. These two commands can only be used in the 
 %</ja>
 %<*en>
   Define new preset~<name>. This <name> cannot be same as other presets,
-  options described in Subsection~\ref{ssec:ltjpreset-general}, nor
+  options described in Subsubsection~\ref{sssec:ltjpreset-general}, nor
   following nine strings:
   \begin{quote}
 	\ttfamily
