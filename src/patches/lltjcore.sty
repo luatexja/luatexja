@@ -289,7 +289,7 @@
 \fi}
 
 
-%%%%%% \@tabclassz
+%%%%%% tabular (platex/#43) \@tabclassz
 \def\ltj@sharp{\ltjfakeboxbdd\ignorespaces\@sharp\unskip\ltjfakeboxbdd}
 \def\@tabclassz{%
   \ifcase\@lastchclass
@@ -320,5 +320,10 @@
    \everypar\expandafter{\the\everypar\ltjfakeboxbdd}\ignorespaces\@sharp\unskip
 }{}{}
 
-
+%%%%%% tabbing (platex/#53)
+\patchcmd\@startline{\strut}{\strut\inhibitglue}{}{}
+\def\ltj@unhbox@curfield{\ltjfakeboxbdd\unhbox\@curfield\ltjfakeboxbdd}
+%\patchcmd\@contfield{\unhbox\@curfield}{\ltj@unhbox@curfield}{}{}
+\patchcmd\@addfield{\unhbox\@curfield}{\ltj@unhbox@curfield}{}{}
+\pretocmd\@stopfield{\inhibitglue\null}{}{}
 \endinput
