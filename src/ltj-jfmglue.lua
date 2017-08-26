@@ -127,18 +127,23 @@ end
 
 
 -- penalty 値の計算
-local function add_penalty(p,e)
-   local pp = getfield(p, 'penalty')
-   if pp>=10000 then
-      if e<=-10000 then setfield(p, 'penalty', 0) end
-   elseif pp<=-10000 then
-      if e>=10000 then  setfield(p, 'penalty', 0) end
-   else
-      pp = pp + e
-      if pp>=10000 then      setfield(p, 'penalty', 10000)
-      elseif pp<=-10000 then setfield(p, 'penalty', -10000)
-      else                   setfield(p, 'penalty', pp) end
+local add_penalty
+do
+local setpenalty = node.direct.setpenalty or function(n, a) setfield(n,'penalty',a) end
+local getpenalty = node.direct.getpenalty or function(n) return getfield(n,'penalty') end
+function add_penalty(p,e)
+   local pp = getpenalty(p)
+   if (pp>-10000) and (pp<10000) then
+      if e>=10000 then       setpenalty(p, 10000)
+      elseif e<=-10000 then  setpenalty(p, -10000)
+      else
+         pp = pp + e
+         if pp>=10000 then      setpenalty(p, 10000)
+         elseif pp<=-10000 then setpenalty(p, -10000)
+	 else                   setpenalty(p, pp) end
+      end
    end
+end
 end
 
 -- 「異なる JFM」の間の調整方法
