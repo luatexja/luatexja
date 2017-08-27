@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjext}[2017/07/26 v1.2g-ltj-7 Macros for vertical writing]
+\ProvidesPackage{lltjext}[2017/08/27 v1.2g-ltj-8 Macros for vertical writing]
 \RequirePackage{luatexja}
 \newcount\ltj@ext@dir
 {\catcode`\*=11
@@ -19,11 +19,11 @@
  \ltj@ext@dir=\ltjgetparameter{direction}\relax\X@tabarray}
 \def\tabular{\let\@halignto\@empty\X@tabular}
 \@namedef{tabular*}{\@ifnextchar<%>
-   {\@stabular}{\@stabular<z>}}
+   {\@stabular}{\@stabular<Z>}}
 \def\X@tabarray{\@ifnextchar<%>
-   {\p@tabarray}{\p@tabarray<z>}}
+   {\p@tabarray}{\p@tabarray<Z>}}
 \def\X@tabular{\@ifnextchar<%>
-   {\p@tabular}{\p@tabular<z>}}
+   {\p@tabular}{\p@tabular<Z>}}
 \def\@stabular<#1>#2{%
    \setlength\dimen@{#2}%
    \edef\@halignto{to\the\dimen@}\p@tabular<#1>}
