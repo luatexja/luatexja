@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2017/08/07 Patch to LaTeX2e Kernel for LuaTeX-ja]
+\ProvidesPackage{lltjcore}[2017/08/27 Patch to LaTeX2e Kernel for LuaTeX-ja]
 \RequirePackage{etoolbox}
 
 \def\cleardoublepage{\clearpage\if@twoside
@@ -288,21 +288,8 @@
   \ignorespaces
 \fi}
 
-\def\@no@lnbk #1[#2]{%
-  \ifvmode
-    \@nolnerr
-  \else
-    \@tempskipa\lastskip
-    \unskip
-    \penalty #1\@getpen{#2}%
-    \hskip\z@\relax %% added (2017/05/03)
-    \ifdim\@tempskipa>\z@
-      \hskip\@tempskipa
-      \ignorespaces
-    \fi
-  \fi}
 
-%%%%%% \@tabclassz
+%%%%%% tabular (platex/#43) \@tabclassz
 \def\ltj@sharp{\ltjfakeboxbdd\ignorespaces\@sharp\unskip\ltjfakeboxbdd}
 \def\@tabclassz{%
   \ifcase\@lastchclass
@@ -333,5 +320,10 @@
    \everypar\expandafter{\the\everypar\ltjfakeboxbdd}\ignorespaces\@sharp\unskip
 }{}{}
 
-
+%%%%%% tabbing (platex/#53)
+\patchcmd\@startline{\strut}{\strut\inhibitglue}{}{}
+\def\ltj@unhbox@curfield{\ltjfakeboxbdd\unhbox\@curfield\ltjfakeboxbdd}
+%\patchcmd\@contfield{\unhbox\@curfield}{\ltj@unhbox@curfield}{}{}
+\patchcmd\@addfield{\unhbox\@curfield}{\ltj@unhbox@curfield}{}{}
+\pretocmd\@stopfield{\inhibitglue}{}{}
 \endinput
