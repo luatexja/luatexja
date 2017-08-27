@@ -325,5 +325,5 @@
 \def\ltj@unhbox@curfield{\ltjfakeboxbdd\unhbox\@curfield\ltjfakeboxbdd}
 %\patchcmd\@contfield{\unhbox\@curfield}{\ltj@unhbox@curfield}{}{}
 \patchcmd\@addfield{\unhbox\@curfield}{\ltj@unhbox@curfield}{}{}
-\pretocmd\@stopfield{\inhibitglue\null}{}{}
+\pretocmd\@stopfield{\inhibitglue}{}{}
 \endinput
