@@ -174,7 +174,7 @@ do
       local lv = tex_nest.ptr -- must be >= 1
       if not v then
          v = get_dir_count()
-	 if abs(tex_nest[lv-1].mode) == ltjs.mmode and v == dir_tate then
+	 if abs(tex_nest[lv].mode) == ltjs.mmode and v == dir_tate then
 	    v = dir_utod
 	 end
       elseif v=='adj' then
@@ -194,7 +194,7 @@ do
       local lv = tex_nest.ptr
       if not v then
          v,name  = get_dir_count(), nil
-	 if lv>=1 and abs(tex_nest[lv-1].mode) == ltjs.mmode and v == dir_tate then
+	 if abs(tex_nest[lv].mode) == ltjs.mmode and v == dir_tate then
 	    v = dir_utod
 	 end
       elseif v=='adj' then
