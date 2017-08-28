@@ -535,13 +535,13 @@ local function debug_show_node_X(p,print_fn, limit)
    elseif pt=='noad' then
       s = base ; print_fn(s)
       if p.nucleus then
-         prefix = k .. 'N'; debug_show_node_X(p.nucleus, print_fn);
+         prefix = k .. 'N'; debug_show_node_X(p.nucleus, print_fn, limit);
       end
       if p.sup then
-         prefix = k .. '^'; debug_show_node_X(p.sup, print_fn);
+         prefix = k .. '^'; debug_show_node_X(p.sup, print_fn, limit);
       end
       if p.sub then
-         prefix = k .. '_'; debug_show_node_X(p.sub, print_fn);
+         prefix = k .. '_'; debug_show_node_X(p.sub, print_fn, limit);
       end
       prefix = k;
    elseif pt=='math_char' then

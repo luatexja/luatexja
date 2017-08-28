@@ -169,9 +169,9 @@ luatexbase.add_to_callback('mlist_to_hlist',
    function (n, display_type, penalties)
       n = to_direct(n); list_dir = ltjd_get_dir_count()
       if getid(n)==id_whatsit and getsubtype(n)==sid_user and
-      getfield(n, 'user_id') == DIR then
+        getfield(n, 'user_id') == DIR then
 	 local old_n = n; n = node_remove(n, n)
-	 node_free(old_n)
+	 node_free(old_n); if not n then return nil end
       end
       return node.mlist_to_hlist(
 	 to_node(conv_jchar_to_hbox(n, 0)),
