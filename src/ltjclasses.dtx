@@ -110,6 +110,8 @@
 % \changes{v1.7e}{2017/03/05}{トンボに表示するジョブ情報の書式を変更}
 % \changes{v1.7e}{2017/03/05}{\cs{frontmatter}と\cs{mainmatter}を
 %   奇数ページに送るように変更}
+% \changes{v1.7e-ltj-15}{2017/08/28}{本ドキュメントのタイプセットで，小塚フォントが存在するときには
+%   それを用いるように変更（PDFサイズ削減のため）．クラスファイル本体の変更はなし，}
 % \fi
 %
 % \iffalse
@@ -139,14 +141,22 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2017/03/06 v1.7e-ltj-14
+  [2017/08/28 v1.7e-ltj-15
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
 ]
 \documentclass{ltjltxdoc}
 \GetFileInfo{ltjclasses.dtx}
-\usepackage[ipaex,nfssonly]{luatexja-preset}
+\begingroup
+ \suppressfontnotfounderror=1
+ \global\font\testfont=file:KozMinPr6N-Regular.otf
+\endgroup
+\ifx\testfont\nullfont
+  \usepackage[ipaex,nfssonly]{luatexja-preset}
+\else
+  \usepackage[kozuka-pr6n,nfssonly]{luatexja-preset}
+\fi
 \usepackage[unicode]{hyperref}
 \title{Lua\LaTeX-ja用\texttt{jclasses}互換クラス}
 \author{Lua\TeX-jaプロジェクト}

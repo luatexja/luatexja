@@ -57,13 +57,21 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2017/03/06 ltjsclasses ]
+  [2017/08/28 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass{ltjsarticle}
 \usepackage{hypdoc}
 \hypersetup{unicode=true}
-\usepackage[ipaex,nfssonly]{luatexja-preset}
+\begingroup
+ \suppressfontnotfounderror=1
+ \global\font\testfont=file:KozMinPr6N-Regular.otf
+\endgroup
+\ifx\testfont\nullfont
+  \usepackage[ipaex,nfssonly]{luatexja-preset}
+\else
+  \usepackage[kozuka-pr6n,nfssonly]{luatexja-preset}
+\fi  
 \ltjsetparameter{alxspmode={`\*,allow}}
 \ltjsetparameter{alxspmode={`\\,allow}}
 %%%%\usepackage{unicode-math}
