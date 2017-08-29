@@ -604,8 +604,6 @@
   }
   \PushPreHook{hbox}{\luafunction\ltj@@box@dirhook\aftergroup\ltj@@reset@badness}
   \PushPreHook{vbox}{\luafunction\ltj@@box@dirhook\aftergroup\ltj@@reset@badness}
-  \PushPreHook{math}{\luafunction\ltj@@box@dirhook}
-  \PushPreHook{display}{\luafunction\ltj@@box@dirhook}
 \else
   \let\ltj@@everyhbox=\everyhbox\let\ltj@@everyvbox=\everyvbox
   \newtoks\ltj@@i@everyhbox\newtoks\ltj@@i@everyvbox
@@ -620,20 +618,6 @@
     \aftergroup\ltj@@reset@badness\the\ltj@@i@everyhbox}
   \ltj@@everyvbox{\luafunction\ltj@@box@dirhook
     \aftergroup\ltj@@reset@badness\the\ltj@@i@everyvbox}
-  %% math
-  \ifltj@in@latex
-    \frozen@everymath{\luafunction\ltj@@box@dirhook\check@mathfonts\the\everymath}
-  \else
-    \let\ltj@@everymath=\everymath\newtoks\ltj@@i@everymath\let\everymath=\ltj@@i@everymath
-    \ltj@@everymath{\luafunction\ltj@@box@dirhook\the\ltj@@i@everymath}
-  \fi
-  %% display
-  \ifltj@in@latex
-    \frozen@everydisplay{\luafunction\ltj@@box@dirhook\check@mathfonts\the\everydisplay}
-  \else
-    \let\ltj@@everydisplay=\everydisplay\newtoks\ltj@@i@everydisplay\let\everydisplay=\ltj@@i@everydisplay
-    \ltj@@everydisplay{\luafunction\ltj@@box@dirhook\the\ltj@@i@everydisplay}
-  \fi
 \fi
 
 \newluafunction\ltj@@reset@badness@inner
