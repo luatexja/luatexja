@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsreport}
-  [2017/03/06 ltjsclasses ]
+  [2017/08/28 ltjsclasses ]
 \def\jsc@clsname{ltjsreport}
 \RequirePackage{luatexja}
 \newif\if@restonecol

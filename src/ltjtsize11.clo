@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesFile{ltjtsize11.clo}
-  [2017/03/06 v1.7e-ltj-14
+  [2017/08/28 v1.7e-ltj-15
   Standard LuaLaTeX-ja file (size option)]
 \renewcommand{\normalsize}{%
     \@setfontsize\normalsize\@xipt{17}%
@@ -35,7 +35,7 @@
 \def\kanjiencodingdefault{JT3}%
 \kanjiencoding{\kanjiencodingdefault}%
 \normalsize
-\setbox0\hbox{\char"3000}% 全角スペース
+\setbox0\hbox{漢}
 \setlength\Cht{\ht0}
 \setlength\Cdp{\dp0}
 \setlength\Cwd{\wd0}
