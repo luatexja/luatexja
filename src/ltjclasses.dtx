@@ -110,8 +110,9 @@
 % \changes{v1.7e}{2017/03/05}{トンボに表示するジョブ情報の書式を変更}
 % \changes{v1.7e}{2017/03/05}{\cs{frontmatter}と\cs{mainmatter}を
 %   奇数ページに送るように変更}
-% \changes{v1.7e-ltj-15}{2017/08/28}{本ドキュメントのタイプセットで，小塚フォントが存在するときには
-%   それを用いるように変更（PDFサイズ削減のため）．クラスファイル本体の変更はなし，}
+% \changes{v1.7e-ltj-15}{2017/08/31}{本ドキュメントのタイプセットで，小塚フォントが存在するときには
+%   それを用いるように変更（PDFサイズ削減のため）．}
+% \changes{v1.7e-ltj-15}{2017/08/31}{\cs{Cht}他の設定に用いる和文文字を「漢」に変更．}
 % \fi
 %
 % \iffalse
@@ -141,7 +142,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2017/08/28 v1.7e-ltj-15
+  [2017/08/31 v1.7e-ltj-15
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -705,8 +706,9 @@
 % \begin{macro}{\Chs}
 % 基準となる長さの設定をします。これらのパラメータは\file{lltjfont.sty}で定義
 % されています。
+% \changes{v1.7e-ltj-15}{2017/08/31}{\cs{Cht}他の設定に用いる和文文字を「漢」に変更．}
 %    \begin{macrocode}
-\setbox0\hbox{\char"3000}% 全角スペース
+\setbox0\hbox{漢}
 \setlength\Cht{\ht0}
 \setlength\Cdp{\dp0}
 \setlength\Cwd{\wd0}
