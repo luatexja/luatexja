@@ -200,14 +200,21 @@ do
       elseif v=='adj' then
          v,name = get_adjust_dir_count(), nil
       end
+      local current_nest = tex_nest[lv]
       if tex.currentgrouptype==6 then
 	 ltjb.package_error(
                  'luatexja',
                  "You can't use `\\" .. name .. "' in an align",
-		 "To change direction in an align, \n"
-		    .. "you shold use \\hbox or \\vbox.")
+		 "To change the direction in an align, \n"
+		 .. "you shold use \\hbox or \\vbox.")
+      elseif current_nest.mode == ltjs.hmode or abs(current_nest.mode) == ltjs.mmode then
+	 ltjb.package_error(
+                 'luatexja',
+		 "Improper `\\" .. name .. "'",
+		 'You cannot change the direction in unrestricted horizontal mode \n'
+		 .. 'nor math modes.')
       else
- 	 local h = (lv==0) and tex.lists.page_head or tex_nest[lv].head.next
+	 local h = (lv==0) and tex.lists.page_head or current_nest.head.next
 	 local flag,w = test_list(h,lv)
 	 if flag==0 then
 	    if lv==0 and not page_direction then
@@ -225,12 +232,12 @@ do
 	 elseif lv==0 then
 	    page_direction = v
 	 else -- flag == 2: need to create dir whatsit.
-	    local h = tex_nest[lv].head
+	    local h = current_nest.head
 	    local hn = node.next(h)
 	    hn = (hn and hn.id==id_local) and hn or h
 	    local w = to_node(dir_pool[v]())
 	    insert_after_node(h,hn,w)
-	    tex_nest[lv].tail = node_tail_node(w)
+	    current_nest.tail = node_tail_node(w)
 	 end
          ensure_tex_attr(attr_icflag, 0)
       end
