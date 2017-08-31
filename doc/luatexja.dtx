@@ -2350,7 +2350,6 @@ However, the penalty inserted after it is 10 which is the \Param{postbreakpenalt
 ``ア'', not 20.
 %</en>
 %<*ja>
-\newpage
 \subsection{禁則処理関連パラメータとOpenTypeのfont feature}
 禁則処理や \Param{kanjiskip}, \Param{xkanjiskip} の挿入に関連したパラメータのうち
 \begin{quote}
@@ -2752,7 +2751,9 @@ We implemented this for debugging purpose.
 The fifth column (\emph{utod} direction) corresponds the ``\texttt{tate (math) direction}'' of \pTeX.
 
 Directions can be changed by \cs{yoko},~\cs{tate}, \cs{dtou},~\cs{utod},
-only when the current list is null. Also, the direction of a math formula is changed to
+only when the current list is null.
+These commands cannot be executed in unrestricted horizontal modes, nor math modes.
+The direction of a math formula is changed to
 \emph{utod}, when the direction outside the math formula is \emph{tate} (vertical writing).
 %</en>
 
@@ -2766,6 +2767,8 @@ Down-TO-Upの意味なのだろう．\cs{dtou} を使用する機会はないだ
 
 組方向は，\cs{yoko},~\cs{tate}, \cs{dtou},~\cs{utod} をそれぞれ使用することで，
 現在作成中のリストやボックスが空の時にのみ変更可能である．
+ただし，現在のモードが非制限水平モードや（文中，別行立て問わず）数式モードであるときには
+組方向を変更することは出来ない．
 また，縦組中の数式内のボックスは\pTeX と同じように組方向が \cs{utod} となる．
 %</ja>
 
