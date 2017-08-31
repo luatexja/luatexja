@@ -112,7 +112,7 @@
 %   奇数ページに送るように変更}
 % \changes{v1.7e-ltj-15}{2017/08/31}{本ドキュメントのタイプセットで，小塚フォントが存在するときには
 %   それを用いるように変更（PDFサイズ削減のため）．}
-% \changes{v1.7e-ltj-15}{2017/08/31}{\cs{Cht}他の設定に用いる和文文字を「漢」に変更．}
+% \changes{v1.7f}{2017/08/31}{和文書体の基準を全角空白から「漢」に変更}
 % \fi
 %
 % \iffalse
@@ -142,7 +142,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2017/08/31 v1.7e-ltj-15
+  [2017/08/31 v1.7f-ltj-15
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -705,8 +705,9 @@
 % \begin{macro}{\Cvs}
 % \begin{macro}{\Chs}
 % 基準となる長さの設定をします。これらのパラメータは\file{lltjfont.sty}で定義
-% されています。
-% \changes{v1.7e-ltj-15}{2017/08/31}{\cs{Cht}他の設定に用いる和文文字を「漢」に変更．}
+% されています。基準とする文字を「全角空白」（EUCコード\texttt{0xA1A1}）から
+% 「漢」（JISコード\texttt{0x3441}）へ変更しました。
+% \changes{v1.7f}{2017/08/31}{和文書体の基準を全角空白から「漢」に変更}
 %    \begin{macrocode}
 \setbox0\hbox{漢}
 \setlength\Cht{\ht0}
