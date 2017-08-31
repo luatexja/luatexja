@@ -1,0 +1,64 @@
+\documentclass{ltjarticle}
+\usepackage[margin=15mm,centering]{geometry}
+\usepackage{lltjext,cancel,luacode}
+%\usepackage{lua-visual-debug}
+\begin{luacode}
+local provides_feature = luaotfload.aux.provides_feature
+local function myfeat_sub(fn,t,a)
+  if provides_feature(
+    fn, t.properties.script, t.properties.language, a
+  ) then
+    tex.sprint('~\\fbox{\\footnotesize\\ttfamily ' .. a .. '}')
+  else
+    tex.sprint('~\\ensuremath{\\xcancel{\\fbox{\\footnotesize\\ttfamily '
+      .. a .. '}}}')
+  end
+end
+function myfeat()
+  local fn = tex.getattribute('ltj@curtfnt')
+  local t = fonts.hashes.identifiers[fn]
+  tex.sprint('~script(lang): \\texttt{' ..
+    t.properties.script .. '}(\\texttt{' .. t.properties.language .. '})')
+  myfeat_sub(fn,t,'vert')
+  myfeat_sub(fn,t,'vrt2')
+end
+\end{luacode}
+
+\begin{document}
+\ltjsetparameter{jacharrange={+8}}
+\parindent0pt
+\def\ISFEAT#1{}
+
+\def\TESTA#1{\leavevmode\bgroup
+  \def\FN{#1}%
+  \jfont\HN=\FN:jfm=ujis;script=hani
+  \tfont\VN=\FN:-vert;script=hani;jfm=ujisv
+  \tfont\VT=\FN:+vert;script=hani;jfm=ujisv
+  \tfont\VU=\FN:+vrt2;script=hani;jfm=ujisv
+  \tfont\VB=\FN:+vert;script=hani;+vrt2;jfm=ujisv
+  \tfont\VD=\FN:jfm=ujisv;script=hani
+  \HN\VD font: \texttt{\FN}\directlua{myfeat()}
+  \par\nobreak\medskip\ttfamily
+  \parbox<t>{210pt}{\VD ■default\\\TEST}\ \vrule\ 
+  \parbox<t>{210pt}{\VB ■+vert~+vrt2\\\TEST}\ \vrule\ 
+  \parbox<t>{210pt}{\VN ■-vert~-vrt2\\\TEST}\ \vrule\ 
+  \parbox<t>{210pt}{\VT ■+vert~-vrt2\\\TEST}\ \vrule\ 
+  \parbox<t>{210pt}{\VU ■-vert~+vrt2\\\TEST}
+  \par\smallskip\hrule\smallskip
+  \parbox<y>{210pt}{\HN ■よこぐみ\\\TEST}
+  \par\egroup\bigskip
+}
+
+\def\TEST{
+  左←↑↓→☜☝☟☞⇦⇧⇩⇨⬅⬆⬇➡右¶\ltjjachar"253B\ltjjachar"0165\relax
+  あ：いーう，え、お．か。き；け\ltjjachar"201Cこ\ltjjachar"301D%
+  さ\ltjjachar"301Fし\ltjjachar"201Dす\ltjjachar"2015せ\ltjjachar"2014そ
+  ‥…〜ー＝―‐゠㍉㌔㌢㍍㌘㌧㌃㌶㍑㍗㌍㌦㌣㌫㍊㌻㍾㍽㍼㍻＝≒≠≡}
+
+
+\TESTA{MogaMincho}
+\TESTA{IPAexMincho}
+\TESTA{KozMinPr6N-Regular}
+
+\end{document}
+

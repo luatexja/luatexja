@@ -5,7 +5,7 @@ luatexja.load_module('base');      local ltjb = luatexja.base
 
 local cidfont_data = {}
 local cache_chars = {}
-local cache_ver = 5
+local cache_ver = 6
 local identifiers = fonts.hashes.identifiers
 
 local cid_reg, cid_order, cid_supp, cid_name
@@ -118,6 +118,7 @@ do
 	 },
 	 embedding = "no", cache = "yes", factor = 0, hfactor = 0, vfactor = 0,
 	 tounicode = 1,
+	 properties = { language = "dflt", script = "dflt" },
       }
       cidfont_data[cid_name] = k
 
@@ -200,7 +201,7 @@ do
    cidf_vert_processor = {
       function (head, fnum)
          local fontdata = identifiers[fnum]
-         if fontdata.is_ltj_vert then
+         if luatexja.jfont.font_metric_table[fnum].vert_activated then
             local vt = fontdata.shared.ltj_vert_table
             for n in traverse_id(id_glyph, head) do
                if n.font==fnum then
@@ -316,9 +317,6 @@ local function mk_rml(name, size, id)
       e = e * 1000
       var, fontdata.extend  = var .. 'x' .. tostring(e), e
    end
-   if string.match(specification.detail, '(%+?vert)') then
-      cachedata.is_ltj_vert = true
-   end
    fontdata.name = specification.name .. size .. var; cachedata.name = fontdata.name
    fontdata.fullname = specification.name .. var; cachedata.fullname = fontdata.fullname
    fontdata.psname = specification.name; cachedata.psname = fontdata.psname
@@ -328,7 +326,8 @@ local function mk_rml(name, size, id)
 end
 
 local function font_callback(name, size, id, fallback)
-   local p = name:find(":") or name:len()+1
+   if name:sub(1,1)=="{" and name:sub(-1)=="}" then name = name:sub(2,-2) end
+   local p = name:find(":") or 0
    if name:sub(1, p-1) == 'psft' then
       local s = "Adobe-Japan1-6"
       local basename = name:sub(p+1)
