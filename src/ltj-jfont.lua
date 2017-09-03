@@ -860,11 +860,19 @@ do
    prepare_fl_data = function (dest, id)
       local t = fontloader.info(id.filename)
       local fl
-      if t.filename then
+      if t.fontname then
         fl = fontloader.open(id.filename)
       else
-        fl = fontloader.open(id.filename, id.fullname)
+	local index
+	for i,v in ipairs(t) do
+          if v.fontname == id.fontname then index=i; break end
+        end  
+	fl = fontloader.open(id.filename, index)
+	if not fl then
+	    fl = fontloader.open(id.filename, index) -- マニュアルにはこっちで書いてあるが？
+        end
       end
+      if not fl then fontloader.close(fl); return dest end
       local ind_to_uni, unicodes = {}, {}
       for i,v in pairs(id.characters) do
 	  ind_to_uni[v.index] = i
