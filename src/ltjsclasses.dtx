@@ -57,7 +57,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2017/08/28 ltjsclasses ]
+  [2017/09/04 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass{ltjsarticle}
@@ -1063,6 +1063,7 @@
 % \texttt{jsclasses}で行われていた |\textmc|, |\textgt| の再定義は不要のように思われます。
 %
 % \texttt{jsclasses.dtx}中で行われていた |\reDeclareMathAlphabet| の再定義は削除。
+% また，Yue ZHANGさん作の\texttt{fixjfm}パッケージ対応のコードもLua\TeX-jaでは削除しています．
 %
 %    \begin{macrocode}
 \AtBeginDocument{%

@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2017/08/09',
+  date = '2017/09/04',
   description = 'Loader for Japanese fonts',
 })
 module('luatexja.jfont', package.seeall)
@@ -863,13 +863,13 @@ do
       if t.fontname then
         fl = fontloader.open(id.filename)
       else
-	local index
-	for i,v in ipairs(t) do
-          if v.fontname == id.fontname then index=i; break end
-        end  
-	fl = fontloader.open(id.filename, index)
+        fl = fontloader.open(id.filename, id.fontname) -- マニュアルにはこっちで書いてあるが？
 	if not fl then
-	    fl = fontloader.open(id.filename, index) -- マニュアルにはこっちで書いてあるが？
+          local index
+	  for i,v in ipairs(t) do
+            if v.fontname == id.fontname then index=i; break end
+          end  
+	  fl = fontloader.open(id.filename, index)
         end
       end
       if not fl then fontloader.close(fl); return dest end
