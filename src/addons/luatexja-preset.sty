@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2017/08/24 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2017/09/04 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -78,7 +78,6 @@
 }
 
 %%%%%%%% bool options
-\bool_new:N \l_ltjpreset_shape_nlck_bool
 \ltjpreset_declare_bool_option:nn { nfssonly }{ fontspec }
 \ltjpreset_declare_bool_option:nn { bold }{ nobold }
 \ltjpreset_declare_bool_option:nn { expert }{ noexpert }
@@ -347,16 +346,11 @@
 %%%%%%%% main routine
 
 \cs_new:Nn \ltjpreset_extract_fonts: {
-  %% KozMinPr6N, HiraMinProN-W3 の場合はjp04 feature がないので，nlck にする
   %% MogaMincho の場合は 90 をつける/はずす
   \bool_if:NF \g_ltjpreset_custom_bool {
     \tl_set:Nn \l_tmpa_tl {, CJKShape=JIS2004 }
     \tl_if_eq:NNT \l_ltjpreset_kanji_shape_tl \l_tmpa_tl {
       \tl_set:Nx \l_tmpb_tl { \prop_item:Nn \g_ltjpreset_font_prop { mc-m } }
-      \tl_if_in:NnT  \l_tmpb_tl { KozMinPr6N-Regular }
-        { \bool_set_true:N \l_ltjpreset_shape_nlck_bool }
-      \tl_if_in:NnT  \l_tmpb_tl { HiraMinProN-W3 }
-        { \bool_set_true:N \l_ltjpreset_shape_nlck_bool }
       \tl_if_in:NnT  \l_tmpb_tl { Moga90Mincho } {
         \prop_clear:N \l_tmpa_prop
         \prop_map_inline:Nn \g_ltjpreset_font_prop {
@@ -504,9 +498,7 @@
     }
     \tl_set:Nn \l_tmpa_tl {, CJKShape=JIS2004 }
     \tl_if_eq:NNT \l_ltjpreset_kanji_shape_tl \l_tmpa_tl {
-      \tl_set:Nx \l_ltjpreset_kanji_shape_tl {
-	\bool_if:NTF \l_ltjpreset_shape_nlck_bool { ;+nlck } { ;+jp04 }
-      }
+      \tl_set:Nx \l_ltjpreset_kanji_shape_tl { ;+jp04 }
     }
     \ltj_preset_define_family:nnn {ltjpm} {m}  {\ltjpreset_font_mc_m:}
     \ltj_preset_define_family:nnn {ltjpm} {bx} {\ltjpreset_font_mc_bx:}
@@ -537,11 +529,6 @@
   \addjfontfeature{ Kerning=Off }
   % 実際の fontspec の呼びだし
   \cs_new:Nn \ltjpreset_do_fontset: { \group_begin:
-      \tl_set:Nn \l_tmpa_tl {, CJKShape=JIS2004 }
-      \tl_if_eq:NNT \l_ltjpreset_kanji_shape_tl \l_tmpa_tl {
-        \bool_if:NT \l_ltjpreset_shape_nlck_bool
-          { \tl_set:Nn \l_ltjpreset_kanji_shape_tl { , CJKShape=NLC } }
-      }
       \tl_gset:Nx \l_ltjpreset_add_features_tl {
         \tl_use:N \l_ltjpreset_kanji_shape_tl,
         YokoFeatures = { JFM = \tl_use:N \ltjpreset_use_jfm_yoko_tl },
