@@ -6,11 +6,12 @@
 \usepackage{luatexja,luacode}
 \begin{luacode}
 local id_hlist = node.id('hlist')
+local id_penalty = node.id('penalty')
 local id_glue  = node.id('glue')
 local id_glue_spec = node.id('glue_spec')
 local attr_icflag = luatexbase.attributes['ltj@icflag']
-local PACKED = 2
-local PROCESSED_BEGIN_FLAG = 32
+local PACKED = luatexja.icflag_table.PACKED
+local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 
 local function get_attr_icflag(p)
    return (node.has_attribute(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
@@ -22,7 +23,7 @@ local function compute_total_stretched(p)
   if gs ~= 1 and gs ~= 2 then return 0 end
   local a = 0
   for q in node.traverse_id(id_glue, p.head) do
-    local qs = q.spec
+    local qs = q
     if gs == 1 then -- stretching
       if qs.stretch_order == go then a = a + qs.stretch end
     else -- shrinking
@@ -34,12 +35,16 @@ end
 
 function adjust_width_toten(head) 
   if not head then return head end
-  for p in node.traverse_id(id_hlist, head) do
+  for p in node.traverse_id(id_hlist, head) do repeat
     local t = node.tail(p.head) -- \rightskip glue
     local x = node.prev(t)      -- 本当の行末の node を格納
+    if not x then break end
     if x.id == id_glue and x.subtype == 15 then
       -- 段落最終行のときの補正
       x = node.prev(node.prev(x))
+    end
+    while x do
+      if x.id == id_penalty then x = node.prev(x) else break end
     end
     if x.id == id_hlist and get_attr_icflag(x) == PACKED then
        local xc = x.head
@@ -49,9 +54,8 @@ function adjust_width_toten(head)
        local cts = compute_total_stretched(p)
        if (xcc == '，'  or xcc == '、' or xcc == '．'  or xcc == '。') and cts>=0 then
          local ag  = node.new(id_glue) -- additional glue
-         local ags = node.new(id_glue_spec)
-         ag.spec, ags.width = ags, math.min(xcs, cts)
-         ags.shrink, ags.stretch, ags.shrink_order, ags.stretch_order = 0, 0, 0, 0
+         ag.width = math.min(xcs, cts)
+         ag.shrink, ag.stretch, ag.shrink_order, ag.stretch_order = 0, 0, 0, 0
          node.insert_after(p.head, x, ag)
          local f = node.hpack(p.head, p.width, 'exactly')
          f.head, p.glue_set, p.glue_sign, p.glue_order 
@@ -59,7 +63,7 @@ function adjust_width_toten(head)
          node.free(f)
        end
     end
-  end
+  until true end
   return head
 end
 
@@ -71,15 +75,14 @@ luatexbase.add_to_callback('post_linebreak_filter',
 \parindent0pt
 \leavevmode
 \vrule\setbox0=\vbox{\hsize=20\zw 
-０１２３４５６７８９あいうえおかきくけ，%
-０１２３４５６７８９あいうえおかきくけ．%
-０１２３４５６７８９あいうえおかきく\hskip .25\zw こ．%
-０１２３４５６７８９あいうえおかきく\hskip .5 \zw け，%
-０１２３４５６７８\hskip0\zw ９あいうえおかきくけ，%
+０１２３４５６７８\hskip-0.25\zw ９あいうえおかきくけ，\break
+０１２３４５６７８\hskip0\zw ９あいうえおかきくけ，\break
+０１２３４５６７８\hskip0.25\zw ９あいうえおかきくけ，\break
+０１２３４５６７８\hskip0.5\zw ９あいうえおかきくけ，\break
+０１２３４５６７８\hskip0.75\zw ９あいうえおかきくけ，\break
+０１２３４５６７８\hskip1\zw ９あいうえおかきくけ，\break
 
 ０１２３４５６７８９あいうえおかきくけこ%
 }\copy0\vrule
-
-\directlua{luatexja.ext_show_node_list(tex.box[0], '  ', print)}
 
 \end{document}

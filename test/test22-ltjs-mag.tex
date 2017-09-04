@@ -3,7 +3,8 @@
 }
 \ifdefined\fsize\else\def\fsize{10pt}\fi
 \edef\head{\noexpand\documentclass[\fsize,xreal]{ltjsarticle}}
-\head\usepackage{type1cm}
+\head\usepackage[OT1]{fontenc}\def\rmdefault{cmr}
+\usepackage{type1cm}\normalfont\noralsize
 \makeatletter
 \let\ltj@selectfont@patch\relax
 \newcount\cI\newcount\cF\newdimen\szd
@@ -16,26 +17,26 @@
    \fi
 }
 \def\S#1{%
-  \setbox0\hbox{\fontsize{#1\js@mpt}{10}\selectfont
-    \@tempdimb=#1\js@mpt
+  \setbox0\hbox{\fontsize{#1\jsc@mpt}{10}\selectfont
+    \@tempdimb=#1\jsc@mpt
     \edef\@tempa{\scantextokens\expandafter{\fontname\font}\space at\space at}%
     \expandafter\S@\@tempa\@nil
   }%
 }
 \def\js@setfontsize#1#2#3{%
   \edef\Fsize{\the\dimexpr\directlua{tex.sprint(#2*\js@magscale)}pt}%
-  \@setfontsize#1{#2\js@mpt}{#3\js@mpt}}
+  \@setfontsize#1{#2\jsc@mpt}{#3\jsc@mpt}}
 \def\R#1{{%
   #1\message{^^J\string#1: \fontname\font\space (ideal: \Fsize)}%
 }}
 
 \def\T@#1#2#3{\global\count@=}
 \def\T#1#2{%
-  \setbox0\hbox{\fontsize{#1\js@mpt}{10}\selectfont
+  \setbox0\hbox{\fontsize{#1\jsc@mpt}{10}\selectfont
     \expandafter\T@\romannumeral-`0\fontname\font
   }%
   \ifnum\count@=#2\else
-    \typeout{@FAIL: #1\string\js@mpt\space selects cmr\the\count@
+    \typeout{@FAIL: #1\string\jsc@mpt\space selects cmr\the\count@
     \space(should be cmr#2)}\szd=1pt%
   \fi
 }
