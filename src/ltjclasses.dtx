@@ -113,6 +113,7 @@
 % \changes{v1.7e-ltj-15}{2017/08/31}{本ドキュメントのタイプセットで，小塚フォントが存在するときには
 %   それを用いるように変更（PDFサイズ削減のため）．}
 % \changes{v1.7f}{2017/08/31}{和文書体の基準を全角空白から「漢」に変更}
+% \changes{v1.7g}{2017/09/19}{内部処理で使ったボックス0を空にした}
 % \fi
 %
 % \iffalse
@@ -142,7 +143,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2017/08/31 v1.7f-ltj-15
+  [2017/09/19 v1.7g-ltj-15
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -708,6 +709,7 @@
 % されています。基準とする文字を「全角空白」（EUCコード\texttt{0xA1A1}）から
 % 「漢」（JISコード\texttt{0x3441}）へ変更しました。
 % \changes{v1.7f}{2017/08/31}{和文書体の基準を全角空白から「漢」に変更}
+% \changes{v1.7g}{2017/09/19}{内部処理で使ったボックス0を空にした}
 %    \begin{macrocode}
 \setbox0\hbox{漢}
 \setlength\Cht{\ht0}
@@ -715,6 +717,7 @@
 \setlength\Cwd{\wd0}
 \setlength\Cvs{\baselineskip}
 \setlength\Chs{\wd0}
+\setbox0=\box\voidb@x
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1954,7 +1957,7 @@
 %
 % \pstyle{jpl@in}スタイルは、クラスファイル内部で使用するものです。
 % \LaTeX{}では、bookクラスを\pstyle{headings}としています。
-% しかし、\cs{tableofcontnts}コマンドの内部では\pstyle{plain}として
+% しかし、\cs{tableofcontents}コマンドの内部では\pstyle{plain}として
 % 設定されるため、一つの文書でのページ番号の位置が上下に出力される
 % ことになります。
 %
@@ -2520,8 +2523,8 @@
 %\newcommand*{\sectionmark}[1]{}
 %\newcommand*{\subsectionmark}[1]{}
 %\newcommand*{\subsubsectionmark}[1]{}
-%\newcommand*{\paragraph}[1]{}
-%\newcommand*{\subparagraph}[1]{}
+%\newcommand*{\paragraphmark}[1]{}
+%\newcommand*{\subparagraphmark}[1]{}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -2589,10 +2592,10 @@
 % |\alph{|\Lcount{COUNTER}|}|は、\Lcount{COUNTER}の値を
 % $1=$~a, $2=$~b のようにして出力します。
 %
-% |\Roman{|\Lcount{COUNTER}|}|は、\Lcount{COUNTER}の値を
+% |\Alph{|\Lcount{COUNTER}|}|は、\Lcount{COUNTER}の値を
 % $1=$~A, $2=$~B のようにして出力します。
 %
-% |\kansuji{|\Lcount{COUNTER}|}|は、\Lcount{COUNTER}の値を
+% |\Kanji{|\Lcount{COUNTER}|}|は、\Lcount{COUNTER}の値を
 % 漢数字で出力します。
 %
 % |\rensuji{|\meta{obj}|}|は、\meta{obj}を横に並べて出力します。
@@ -4000,10 +4003,12 @@
 % |\@tempdima|にしていますが、この変数はいろいろな箇所で使われますので、
 % 期待した値が入らない場合があります。
 %
-% たとえば、|lltjfont.sty|での|\selectfont|は、和欧文のベースラインを調整する
-% ために|\@tempdima|変数を用いています。そのため、|\l@...|マクロの中で
-% フォントを切替えると、|\numberline|マクロのボックス
-% の幅が、ベースラインを調整するときに計算した値になってしまいます。
+% ^^A たとえば、|lltjfont.sty|での|\selectfont|は、和欧文のベースラインを調整する
+% ^^A ために|\@tempdima|変数を用いています。そのため、|\l@...|マクロの中で
+% ^^A フォントを切替えると、|\numberline|マクロのボックス
+% ^^A の幅が、ベースラインを調整するときに計算した値になってしまいます。
+% ^^A →修正(texjporg)：最近の|\adjustbaseline|では|\adjust@dimen|が使われて
+% ^^A いるため、記述をコメントアウトしました。
 %
 % フォント選択コマンドの後、あるいは|\numberline|マクロの中でフォントを
 % 切替えてもよいのですが、一時変数を意識したくないので、
@@ -4042,9 +4047,9 @@
 % \end{macro}
 %
 % \begin{macro}{\addcontentsline}
-% ページ番号を|\rensuji|で囲むように変更します。
-% 横組のときにも`|\rensuji|'コマンドが出力されますが、
-% このコマンドによる影響はありません。
+% 縦組の場合にページ番号を|\rensuji|で囲むように変更します。
+% ^^A 横組のときにも`|\rensuji|'コマンドが出力されますが、
+% ^^A このコマンドによる影響はありません。
 %
 % このマクロは\file{ltsect.dtx}で定義されています。
 %    \begin{macrocode}

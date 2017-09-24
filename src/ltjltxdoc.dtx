@@ -37,12 +37,14 @@
 % \changes{v1.0b}{1997/07/29}{\cs{}と\texttt{"}の\cs{xspcode}を変更}
 % \changes{v1.0b-ltj}{2011/09/27}{Lua\LaTeX-ja 用に修正}
 % \changes{v1.0b-ltj-2}{2014/07/03}{orを意味する縦棒の出力が異常だったので修正}
+% \changes{v1.0c}{2016/07/25}{docパッケージが上書きする\cs{verb}を再々定義}
+% \changes{v1.0d}{2017/09/24}{\cs{vadjust\{\}}を追加}
 % \fi
 %
 % \iffalse
 %<class>
 %<class>\NeedsTeXFormat{LaTeX2e}
-%<class>\ProvidesClass{ltjltxdoc}[2011/10/03 v1.0b-ltj Standard LuaLaTeX-ja file]
+%<class>\ProvidesClass{ltjltxdoc}[2017/09/24 v1.0d-ltj-2 Standard LuaLaTeX-ja file]
 %<*driver>
 \documentclass{ltjltxdoc}
 \GetFileInfo{ltjltxdoc.cls}
@@ -177,6 +179,28 @@
   \hss\vrule width.1pt\egroup}
 %    \end{macrocode}
 % \end{environment}
+%
+% \begin{macro}{\verb}
+% p\LaTeX{}では、|\verb|コマンドを修正して直前に|\xkanjiskip|が入るように
+% しています。しかし、\file{ltxdoc.cls}が読み込む\file{doc.sty}が上書き
+% してしまいますので、これを再々定義します。\file{doc.sty}での定義は
+%\begin{verbatim}
+%   \def\verb{\relax\ifmmode\hbox\else\leavevmode\null\fi
+%     \bgroup \let\do\do@noligs \verbatim@nolig@list
+%       \ttfamily \verb@eol@error \let\do\@makeother \dospecials
+%       \@ifstar{\@sverb}{\@vobeyspaces \frenchspacing \@sverb}}
+%\end{verbatim}
+% となっていますので、\file{plcore.dtx}と同様に|\null|を外して|\vadjust{}|を
+% 入れます。
+% \changes{v1.0c}{2016/07/25}{docパッケージが上書きする\cs{verb}を再々定義}
+% \changes{v1.0d}{2017/09/24}{\cs{vadjust\{\}}を追加}
+%    \begin{macrocode}
+\def\verb{\relax\ifmmode\hbox\else\leavevmode\vadjust{}\fi
+  \bgroup \let\do\do@noligs \verbatim@nolig@list
+    \ttfamily \verb@eol@error \let\do\@makeother \dospecials
+    \@ifstar{\@sverb}{\@vobeyspaces \frenchspacing \@sverb}}
+%    \end{macrocode}
+% \end{macro}
 %
 % \begin{macro}{alxspmode}
 % コマンド名の|\|と16進数を示すための|"|の前にもスペースが入るよう、

@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsbook}
-  [2017/09/04 ltjsclasses ]
+  [2017/09/19 ltjsclasses ]
 \def\jsc@clsname{ltjsbook}
 \RequirePackage{luatexja}
 \newif\if@restonecol
@@ -423,12 +423,13 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \belowdisplayshortskip \belowdisplayskip
   \let\@listi\@listI}
 \mcfamily\selectfont\normalsize
-\setbox0\hbox{\char"3000}% 全角スペース
+\setbox0\hbox{漢}
 \setlength\Cht{\ht0}
 \setlength\Cdp{\dp0}
 \setlength\Cwd{\wd0}
 \setlength\Cvs{\baselineskip}
 \setlength\Chs{\wd0}
+\setbox0=\box\voidb@x
 \newcommand{\small}{%
   \ltj@@ifnarrowbaselines
     {\jsc@setfontsize\small\@ixpt{11}}%

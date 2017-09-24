@@ -281,4 +281,16 @@ for i,v in pairs(t) do
   end
 end
 
+-- [[
+t[200]=table.fastcopy(t[0])
+t[200].chars={'〱', '〲'}
+t[200].width = 2
+for i,v in pairs(t) do
+  if i~=6 and type(i)=='number' and type(v)=='table' then -- 感嘆符以外
+    if v.glue and v.glue[0] then v.glue[200] = v.glue[0] end
+    if v.kern and v.kern[0] then v.kern[200] = v.kern[0] end
+  end
+end
+-- ]]
+
 luatexja.jfont.define_jfm(t)
