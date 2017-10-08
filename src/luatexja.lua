@@ -410,9 +410,9 @@ local function debug_show_node_X(p,print_fn, limit)
    local base = prefix .. string.format('%X', get_attr_icflag(p))
    .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
    if pt == 'glyph' then
-      s = base .. ' ' .. utf.char(p.char) .. ' '
-         .. tostring(p.font)
-         .. ' (' .. print_scaled(p.height) .. '+'
+      s = base .. ' ' .. 
+         (p.char>=0xF0000 and string.format('(U+%X)', p.char) or utf.char(p.char)) .. ' '
+         .. tostring(p.font) .. ' (' .. print_scaled(p.height) .. '+'
          .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
       if p.xoffset~=0 or p.yoffset~=0 then
          s = s .. ' off: (' .. print_scaled(p.xoffset)

@@ -569,16 +569,17 @@ do
    local attr_jchar_code = luatexbase.attributes['ltj@charcode']
    local attr_autospc = luatexbase.attributes['ltj@autospc']
    local attr_autoxspc = luatexbase.attributes['ltj@autoxspc']
+   local getcomponents = node.direct.getcomponents
    --local ltjf_get_vert_glyph = ltjf.get_vert_glyph
    function set_np_xspc_jachar(Nx, x)
       local m = ltjf_font_metric_table[getfont(x)]
-      local c, c_glyph = ltjs_orig_char_table[x], getchar(x)
+      local c, c_glyph = (not getcomponents(x) and ltjs_orig_char_table[x]), getchar(x)
+      if c and c~=c_glyph then set_attr(x, attr_jchar_code, c) end
       c = c or c_glyph
       local cls = slow_find_char_class(c, m, c_glyph)
       Nx.met, Nx.class, Nx.char = m, cls, c;
       local mc = m.char_type; Nx.char_type = mc
       if cls~=0 then set_attr(x, attr_jchar_class, cls) end
-      if c~=c_glyph then set_attr(x, attr_jchar_code, c) end
       Nx.pre  = table_current_stack[PRE + c]  or 0
       Nx.post = table_current_stack[POST + c] or 0
       Nx.xspc = table_current_stack[XSP  + c] or 3
@@ -603,9 +604,9 @@ do
    function set_np_xspc_alchar(Nx, c,x, lig)
       if c~=-1 then
 	 local f = (lig ==1) and nullfunc or node_tail
-         local xc, xs = getfield(x, 'components'), getsubtype(x)
+         local xc, xs = getcomponents(x), getsubtype(x)
 	 while xc and xs and xs%4>=2 do
-	    x = f(xc); xc, xs = getfield(x, 'components'), getsubtype(x)
+	    x = f(xc); xc, xs = getcomponents(x), getsubtype(x)
 	 end
 	 c = getchar(x)
 	 Nx.pre  = table_current_stack[PRE + c]  or 0
