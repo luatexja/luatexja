@@ -272,12 +272,12 @@ do
 
 local traverse = node.direct.traverse
 local function check_next_ickern(lp)
-  if lp and getid(lp) == id_kern and ( getsubtype(lp)==3 or ITALIC == get_attr_icflag(lp)) then
-      set_attr(lp, attr_icflag, IC_PROCESSED);
-      Np.last = lp; return node_next(lp)
-   else
-      Np.last = Np.nuc; return lp
+   local lx = Np.nuc
+   while lp and getid(lp) == id_kern and ( getsubtype(lp)==3 or ITALIC == get_attr_icflag(lp)) do
+     set_attr(lp, attr_icflag, IC_PROCESSED);
+     lx, lp = lp, node_next(lp)
    end
+   Np.last = lx; return lp
 end
 
 local function calc_np_pbox(lp, last)
