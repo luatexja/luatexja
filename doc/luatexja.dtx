@@ -1086,6 +1086,15 @@ Note that the bold series in both family are same as the medium series of gothic
  \renewcommand{\kanjifamilydefault}{\gtdefault}
 \end{lstlisting}
 
+%<*ja>
+\item \pLaTeX と同様に，\texttt{mc},~\texttt{gt}両ファミリには「従属欧文」書体が定義されている．
+  これらは\cs{userelfont}を\cs{selectfont}（や，その他の「実際に」
+  フォントを変更する命令）の前で実行することにより使うことができる．
+
+  \pLaTeX では標準の欧文フォントはOT1エンコーディングのComputer Modern Roman (\texttt{cmr})%
+  であったが，2017年以降の\LuaLaTeX ではTUエンコーディングのlatin Modern Roman (\texttt{lmr})%
+  に変更されている．そのため，前段落で述べた「従属欧文」も，Latin Modern Romanに設定している．
+%</ja>
 
 \end{itemize}
 
@@ -5932,17 +5941,16 @@ assignment, where \cs{DeclareRelationFont} does a global assignment.
 
 \item[\cs{userelfont}]
 %<*en>
-Change current alphabetic font encoding/family/\dots\ to the `accompanied' alphabetic
-	     font family with respect to current Japanese font family,
-	     which was set by
-	     \cs{DeclareRelationFont} or \cs{SetRelationFont}.
-Like \cs{fontfamily}, \cs{selectfont} is required to take an effect.
+(Only)~at the next call of \cs{selectfont},
+  change current alphabetic font encoding/family/\dots\ to the `accompanied' alphabetic
+  font family with respect to current Japanese font family,
+  which was set by
+  \cs{DeclareRelationFont} or \cs{SetRelationFont}.
 %</en>
 %<*ja>
-現在の欧文フォントのエンコーディング／ファミリ／…… を，
+次回（のみ）の\cs{selectfont}の実行時に，現在の欧文フォントのエンコーディング／ファミリ／…… を，
 \cs{DeclareRelationFont} か \cs{SetRelationFont} で指定された
 現在の和文フォントに対応する「従属欧文」フォントに変更する．
-\cs{fontfamily} のように，有効にするためには \cs{selectfont} が必要である．
 %</ja>
 
 \item[\cs{adjustbaseline}]
