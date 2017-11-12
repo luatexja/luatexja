@@ -1110,8 +1110,9 @@ do
       local dn_h = getfield(db, 'height')
       local dn_d = getfield(db, 'depth')
       local db_head, db_tail
-      for _,v in ipairs(dir_node_aux
-			[get_box_dir(b, dir_yoko)%dir_math_mod][new_dir][getid(b)]) do
+      local t = dir_node_aux[get_box_dir(b, dir_yoko)%dir_math_mod][new_dir]
+      t = t and t[getid(b)]; if not t then return end
+      for _,v in ipairs(t) do
          local cmd, arg, nn = v[1], v[2]
          if cmd=='kern' then
             nn = node_new(id_kern, 1)
