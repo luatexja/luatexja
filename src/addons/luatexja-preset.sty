@@ -1,15 +1,9 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2017/09/04 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2017/12/15 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
 \ExplSyntaxOn
-
-\fp_new:N \g_ltjpreset_scale_fp
-\group_begin:
-\fontsize{10}{10}\selectfont
-\fp_gset:Nn \g_ltjpreset_scale_fp {\zw / 10}
-\group_end:
 
 %% messages
 \msg_new:nnn { luatexja-preset }{ ltj-fontspec }{
@@ -44,7 +38,7 @@
     \tl_if_empty:NT \l_tmpa_tl {
       \PassOptionsToPackage { \l_tmpa_tl } { luatexja-fontspec }
     },
-  scale .fp_gset:N = \g_ltjpreset_scale_fp,
+  scale .code:n  = \gdef\Cjascale{#1},
   match .code: n =
     \renewcommand\jttdefault{\gtdefault}\@ltj@match@familytrue
     \PassOptionsToPackage { match } { luatexja-fontspec },
@@ -450,11 +444,11 @@
 \bool_if:NTF \g_ltjpreset_nfssonly_bool {
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% nfss only
-  \msg_warning:nnx { luatexja-preset }{ scale }{ \fp_use:N \g_ltjpreset_scale_fp }
+  \msg_warning:nnx { luatexja-preset }{ scale }{ \Cjascale }
 
   \cs_new:Nn \ltj_preset_declare_font_shape:nnnnnn {
     \cs_if_exist:cT { #1/#2/#3/#4/10 } { \cs_undefine:c { #1/#2/#3/#4/10 } }
-    \DeclareFontShape{#1}{#2}{#3}{#4}{ <-> s*[\fp_use:N \g_ltjpreset_scale_fp]
+    \DeclareFontShape{#1}{#2}{#3}{#4}{ <-> s*[\Cjascale]
       { \bool_if:NT \g_ltjpreset_noembed_bool {psft:} #5
 	;-kern \tl_use:N \l_ltjpreset_kanji_shape_tl; #6 } } {}
   }
@@ -515,10 +509,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% fontspec
 } {
-  \PassOptionsToPackage { scale = \fp_use:N \g_ltjpreset_scale_fp } { luatexja-fontspec }
   \RequirePackage{luatexja-fontspec}
   % scale
-  \msg_warning:nnx { luatexja-preset }{ scale }{ \fp_use:N \g_ltj_fontspec_scale_fp }
+  \msg_warning:nnx { luatexja-preset }{ scale }{ \Cjascale }
   \tl_new:N \l_ltjpreset_add_features_tl
 
   \bool_if:NT \g_ltjpreset_expert_bool {

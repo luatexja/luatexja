@@ -3,17 +3,9 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec}[2017/06/25 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec}[2017/12/15 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e,luatexja}
 \ExplSyntaxOn
-
-%%%%%%%% \g_ltj_fontspec_scale_fp
-%% Default scale value for jfont.
-\fp_new:N \g_ltj_fontspec_scale_fp
-\group_begin:
-\fontsize{16}{16}\selectfont
-\fp_gset:Nn \g_ltj_fontspec_scale_fp {\zw / 16}
-\group_end:
 
 \bool_new:N \ltj_fontspec_match_bool
 \keys_define:nn { luatexja-fontspec }
@@ -22,10 +14,11 @@
     match .default:n  = true,
     pass .code:n = \PassOptionsToPackage{#1} {fontspec},
       % 互換性のために残したオプション
-    scale .fp_gset:N = \g_ltj_fontspec_scale_fp,
+    scale .code:n = \gdef\Cjascale{#1},
     unknown .code:n = \PassOptionsToPackage { \l_keys_key_tl } {fontspec},
   }
 \ProcessKeysOptions{ luatexja-fontspec }
+
 \RequirePackage{fontspec}[2017/01/01]% v2.5c
 \RequirePackage{luatexja-fontspec-25c}
 %\@ifpackagelater{fontspec}{2017/01/01}%
