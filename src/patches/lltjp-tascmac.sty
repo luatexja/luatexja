@@ -7,12 +7,27 @@
 % \dimen...=\ybaselineshift ==> \dimen...=\ltj@yablshift sp
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-tascmac}[2017/05/05 Patch to (t)ascmac for LuaTeX-ja]
+\ProvidesPackage{lltjp-tascmac}[2017/12/23 Patch to (t)ascmac for LuaTeX-ja]
 
 \RequirePackage{tascmac,luatexja}
 
 %% use Type1 font for ascgrp
 \pdfextension mapline{+ascgrp <ascgrp.pfb}
+
+%% oval command
+\def\ascmac@parse@ovarg#1{%
+  \ifnum\ltjgetparameter{direction}=3\relax
+    \def\ascmac@ovarg{}%
+    \@tfor\reserved@a:=#1\do{%
+      \if l\reserved@a \edef\ascmac@ovarg{\ascmac@ovarg t}%
+      \else\if t\reserved@a \edef\ascmac@ovarg{\ascmac@ovarg r}%
+      \else\if r\reserved@a \edef\ascmac@ovarg{\ascmac@ovarg b}%
+      \else\if b\reserved@a \edef\ascmac@ovarg{\ascmac@ovarg l}%
+      \fi\fi\fi\fi}%
+  \else
+    \def\ascmac@ovarg{#1}%
+  \fi
+}
 
 %% boxnote environment
 \def\boxnote{\par\vspace{.3\baselineskip}%
