@@ -10,24 +10,6 @@
 %
 % \fi
 %
-% \CheckSum{151}
-%% \CharacterTable
-%%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
-%%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
-%%   Digits        \0\1\2\3\4\5\6\7\8\9
-%%   Exclamation   \!     Double quote  \"     Hash (number) \#
-%%   Dollar        \$     Percent       \%     Ampersand     \&
-%%   Acute accent  \'     Left paren    \(     Right paren   \)
-%%   Asterisk      \*     Plus          \+     Comma         \,
-%%   Minus         \-     Point         \.     Solidus       \/
-%%   Colon         \:     Semicolon     \;     Less than     \<
-%%   Equals        \=     Greater than  \>     Question mark \?
-%%   Commercial at \@     Left bracket  \[     Backslash     \\
-%%   Right bracket \]     Circumflex    \^     Underscore    \_
-%%   Grave accent  \`     Left brace    \{     Vertical bar  \|
-%%   Right brace   \}     Tilde         \~}
-%%
-%
 % \setcounter{StandardModuleDepth}{1}
 % \StopEventually{}
 %
@@ -39,12 +21,13 @@
 % \changes{v1.0b-ltj-2}{2014/07/03}{orを意味する縦棒の出力が異常だったので修正}
 % \changes{v1.0c}{2016/07/25}{docパッケージが上書きする\cs{verb}を再々定義}
 % \changes{v1.0d}{2017/09/24}{\cs{vadjust\{\}}を追加}
+% \changes{v1.0d-ltj-3}{2018/01/01}{\cs{Cjascale}を追加}
 % \fi
 %
 % \iffalse
 %<class>
 %<class>\NeedsTeXFormat{LaTeX2e}
-%<class>\ProvidesClass{ltjltxdoc}[2017/09/24 v1.0d-ltj-2 Standard LuaLaTeX-ja file]
+%<class>\ProvidesClass{ltjltxdoc}[2018/01/01 v1.0d-ltj-3 Standard LuaLaTeX-ja file]
 %<*driver>
 \documentclass{ltjltxdoc}
 \GetFileInfo{ltjltxdoc.cls}
@@ -70,8 +53,14 @@
 \LoadClass{ltxdoc}
 %    \end{macrocode}
 % \file{ltxdoc}の読み込み後に\file{luatexja}を読み込みます。
+%
+% \changes{v1.60d-ltj-3}{2018/01/01}{\cs{Cjascale}を追加しました。
+% これは、コミュニティ版p\kern-.05em\LaTeX で導入された、
+% 和文スケール（$1\,\cs{zw} \div \hbox{要求サイズ}$）を表す実数値マクロです。}
+%
 %    \begin{macrocode}
 \RequirePackage{luatexja}
+\def\Cjascale{0.962216}
 %    \end{macrocode}
 %
 % \begin{macro}{\normalsize}

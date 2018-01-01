@@ -482,7 +482,7 @@ Japanese characters in discretionary break (\cs{discretionary}) is not supported
 By default, \LuaTeX-ja uses Japanese fonts to typeset Greek and Cyrillic letters,
       To change this behavior,
       put \verb!\ltjsetparameter{jacharrange={-2,-3}}! in the preamble.
-      For the detailed description, see Subsection~\ref{ssec-setrange}.
+      For the detailed description, see Subsection~\ref{ssec:setrange}.
 
 From version~20150906.0, characters which belongs both ISO~8859-1 and JIS~X~0208,
 such as \P~and~\S, are now typeset in alphabetic fonts.
@@ -499,7 +499,7 @@ without the \cs{fontspec} (and~\Pkg{luatexja-fontspec}) package.
 \end{lstlisting}
       を入れると
       上記種類の文字は欧文フォントを用いて組まれるようになる．
-      詳しい説明は\ref{ssec-setrange}節を参照してほしい．
+      詳しい説明は\ref{ssec:setrange}節を参照してほしい．
 
 また，\P,~\S といったISO~8859-1の上位領域とJIS~X~0208の共通部分の文字は
       バージョン20150906.0から標準で欧文扱いとなった．\LaTeXe\ 2017/01/01以降では
@@ -524,11 +524,11 @@ In this document, the following terms and notations are used:
 %<*en>
 \item Characters are classified into following two types.
       Note that the classification can be customized by a user
-      (see Subsection~\ref{ssec-setrange}).
+      (see Subsection~\ref{ssec:setrange}).
 %</en>
 %<*ja>
 \item 文字は次の2種類に分けられる．この類別は固定されているものではなく，ユーザが後から変更可能である
-      （\ref{ssec-setrange}節を参照）．
+      （\ref{ssec:setrange}節を参照）．
 %</ja>
 \begin{itemize}
 %<*en>
@@ -874,7 +874,7 @@ and finally delete the temporary directory.
 
 %<en>\subsection{Using in plain \TeX}
 %<ja>\subsection{plain \TeX で使う}
-\label{ssec-plain}
+\label{ssec:plain}
 
 %<en>To use \LuaTeX-ja in plain \TeX, simply put the following at the beginning of the document:
 %<ja>\LuaTeX-jaを plain \TeX で使うためには，単に次の行をソースファイルの冒頭に追加すればよい：
@@ -923,11 +923,11 @@ and finally delete the temporary directory.
 \begin{itemize}
 %<*en>
 \item With \texttt{luatexja.cfg}, one can use other fonts
-as ``default'' Japanese fonts (Subsection~\ref{ssec-cfg}).
+as ``default'' Japanese fonts (Subsection~\ref{ssec:cfg}).
 %</en>
 %<*ja>
 \item \texttt{luatexja.cfg} を用いることによって，標準和文フォントを
-IPAexフォントから別のフォントに置き換えることができる．\ref{ssec-cfg}節を参照．
+IPAexフォントから別のフォントに置き換えることができる．\ref{ssec:cfg}節を参照．
 %</ja>
 
 %<*en>
@@ -960,7 +960,7 @@ IPAexフォントから別のフォントに置き換えることができる．
 
 %<en>\subsection{Using in \LaTeX}
 %<ja>\subsection{\LaTeX で使う}
-\label{ssec-ltx}
+\label{ssec:ltx}
 
 %<*en>
 Using in \LaTeXe\ is basically same. To set up the minimal environment
@@ -1213,17 +1213,17 @@ This patch \Pkg{lltjp-geometry} also can be used in \pLaTeX; for the detail, ple
 %<ja>\section{フォントの変更}
 
 \subsection{plain \TeX~and~\LaTeXe}
-\label{ssec-chgfnt}
+\label{ssec:chgfnt}
 
 \paragraph{plain \TeX}
 %<*en>
 To change Japanese fonts in plain \TeX, you must use the command
-\cs{jfont}~and~\cs{tfont}. So please see Subsection~\ref{ssec-jfont}.
+\cs{jfont}~and~\cs{tfont}. So please see Subsection~\ref{ssec:jfont}.
 %</en>
 %<*ja>
 plain \TeX で和文フォントを変更するためには，
 \pTeX のように \cs{jfont} 命令や \cs{tfont} 命令を直接用いる．
-\ref{ssec-jfont}節を参照．
+\ref{ssec:jfont}節を参照．
 %</ja>
 
 \paragraph{\LaTeXe\ (NFSS2)}
@@ -1286,7 +1286,7 @@ auto select&\cs{fontencoding}&\cs{fontfamily}&---&---&\cs{usefont}\\
       alphabetic fonts to \texttt{T1}.
       \cs{fontfamily} also changes the current Japanese font family,
       the current alphabetic font family, \emph{or both}.
-      For the detail, see Subsection~\ref{ssec-nfsspat}.
+      For the detail, see Subsection~\ref{ssec:nfsspat}.
 %</en>
 %<*ja>
       ここで，\verb+\fontencoding{+<encoding>\verb+}+ は，引数により和文側か欧文
@@ -1295,7 +1295,7 @@ auto select&\cs{fontencoding}&\cs{fontfamily}&---&---&\cs{usefont}\\
       \texttt{JY3}に変更し，\verb+\fontencoding{T1}+ は欧文フォント側を
       \texttt{T1}へと変更する．\cs{fontfamily} も引数により和文側，欧文
       側，\emph{あるいは両方}のフォントファミリを変更する．詳細は
-      \ref{ssec-nfsspat}節を参照すること．
+      \ref{ssec:nfsspat}節を参照すること．
 %</ja>
 
 %<*en>
@@ -1319,8 +1319,8 @@ auto select&\cs{fontencoding}&\cs{fontfamily}&---&---&\cs{usefont}\\
 \end{lstlisting}
 %<*ja>
 仮名書体を使う場合など，複数の和文フォントを組み合わせて使いたい場合は
-\ref{ssec-altfont}節の \cs{ltjdeclarealtfont} と，その\LaTeX 版の\
-\cs{DeclareAlternateKanjiFont}（\ref{ssec-nfsspat}節）を参照せよ．
+\ref{ssec:altfont}節の \cs{ltjdeclarealtfont} と，その\LaTeX 版の\
+\cs{DeclareAlternateKanjiFont}（\ref{ssec:nfsspat}節）を参照せよ．
 %</ja>
 
 \end{itemize}
@@ -1376,17 +1376,17 @@ $5\in 素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
 %<*en>
 We also believe that using Japanese characters as identifiers is rare,
 hence we don't describe how to change Japanese fonts in math mode in
-this chapter. For the method, please see Subsection~\ref{ssec-math}.
+this chapter. For the method, please see Subsection~\ref{ssec:math}.
 %</en>
 %<*ja>
 また\LuaTeX-jaプロジェクトでは，和文文字が識別子として用いられることはほとんどない
 と考えており，したがってこの節では数式モード中の和文フォントを変更する方法については
-記述しない．この方法については\ref{ssec-math}節を参照のこと．
+記述しない．この方法については\ref{ssec:math}節を参照のこと．
 %</ja>
 
 %<en>\subsection{\Pkg{luatexja-fontspec} package}
 %<ja>\subsection{\Pkg{luatexja-fontspec}パッケージ}
-\label{ssec-fontspec}
+\label{ssec:fontspec}
 %<*en>
 To use the functionality of the \Pkg{fontspec} package to Japanese fonts,
 it is needed to load the \Pkg{luatexja-fontspec} package in the preamble, as follows:
@@ -1487,13 +1487,23 @@ if and only if this \texttt{\textup{match}} option is specified}.
 \item[scale=<float>]
 %<*en>
 Override the ratio of the font size of Japanese fonts to that of alphabetic fonts.
-The default value is calculated automatically (for~example, about~0.924865 when
-	     the \Pkg{ltjsarticle} class is used).
+The default value is determined as follows:
+  \begin{itemize}
+    \item The value of \cs{Cjascale} is used, if this control sequence is already defined.
+    \item It is calculated automatically from the current Japanese font at the loading of the
+    package, if \cs{Cjascale} is not defined.
+  \end{itemize}
+\cs{Cjascale} is defined in \Pkg{ltjclasses} and \Pkg{ltjsclasses}.
 %</en>
 %<*ja>
-欧文に対する和文の比率は，標準では \Pkg{luatexja-fontspec}読み込み時の和欧文比率から
-自動計算される（例えば，\Pkg{ltjsarticle}クラス使用時には和文は欧文の約0.924865倍となる）が，
-それを手動で上書きするときに使用する．
+欧文に対する和文の比率を手動で上書きするときに使用する．
+標準では
+\begin{itemize}
+  \item \cs{Cjascale}が定義されている場合
+  \footnote{\LuaTeX-ja が用意しているクラスファイル(\Pkg{ltjclasses},~\Pkg{ltjsclasses})を
+  使う場合はこちらに当てはまる．}は，それを用いる．
+  \item \cs{Cjascale}が未定義の場合は，\Pkg{luatexja-fontspec}読み込み時の和文フォントから自動計算される．
+\end{itemize}
 %</ja>
 \end{cslist}
 
@@ -1613,13 +1623,13 @@ as an external package \Pkg{luatexja-otf}.
 
 これら3オプションについては，
 \Pkg{luatexja-preset} パッケージにプリセットを使う時に一緒に指定するか，
-あるいは対応する内容を\ref{ssec-chgfnt}節，\ref{ssec-nfsspat}節 (NFSS2) や
-\ref{ssec-fontspec}節 (\Pkg{fontspec}) の方法で手動で指定する必要がある．
+あるいは対応する内容を\ref{ssec:chgfnt}節，\ref{ssec:nfsspat}節 (NFSS2) や
+\ref{ssec:fontspec}節 (\Pkg{fontspec}) の方法で手動で指定する必要がある．
 %</ja>
 
 %<en>\subsection{Changing default Japanese fonts}
 %<ja>\subsection{標準和文フォントの変更}
-\label{ssec-cfg}
+\label{ssec:cfg}
 %<*en>
 If \texttt{luatexja.cfg} can be seen from \LuaTeX, \LuaTeX-ja automatically reads it.
 The main use of \texttt{luatexja.cfg} is for changing default Japanese fonts,
@@ -1690,7 +1700,7 @@ parameters, you have to use commands \cs{ltjsetparameter} and
 
 %<en>\subsection{Range of \textbf{JAchar}s}
 %<ja>\subsection{\textbf{JAchar}の範囲}
-\label{ssec-setrange}
+\label{ssec:setrange}
 
 %<*en>
 \LuaTeX-ja divides the Unicode codespace \texttt{U+0080}--\texttt{U+10FFFF}
@@ -2156,10 +2166,10 @@ as follows:
 \ltjsetparameter{alxspmode={`あ,preonly}, jaxspmode={`\!,postonly}}
 \end{lstlisting}
 %<*en>
-One can use also numbers to specify these two parameters (see Subsection~\ref{ssec-param}).
+One can use also numbers to specify these two parameters (see Subsection~\ref{ssec:param}).
 %</en>
 %<*ja>
-また，これら2パラメータには数値で値を指定することもできる（\ref{ssec-param}節を参照）．
+また，これら2パラメータには数値で値を指定することもできる（\ref{ssec:param}節を参照）．
 %</ja>
 
 %<*en>
@@ -2367,7 +2377,7 @@ However, the penalty inserted after it is 10 which is the \Param{postbreakpenalt
 \end{quote}
 は，文字コードごとに設定する量である．
 
-\Pkg{fontspec}パッケージを使う（\ref{ssec-fontspec}節）場合など，
+\Pkg{fontspec}パッケージを使う（\ref{ssec:fontspec}節）場合など，
 各種のOpenType featureを適用することもあると思うが，前段落に述べたパラメータ類は，
 \emph{OpenType featureの適用前の文字コードによって適用される．}
 例えば，以下の例において10行目の「ア」は，\verb+hwid+ featureの適用により半角カタカナの「ｱ」
@@ -2476,7 +2486,7 @@ and \LuaTeX-ja can control these four kinds separately:
 \begin{itemize}
  \item
 \emph{Distinction between \textbf{JAchar} or \textbf{ALchar}}
-is controlled by the character range, see Subsection~\ref{ssec-setrange}.
+is controlled by the character range, see Subsection~\ref{ssec:setrange}.
  \item
 \emph{Whether the character can be used in a control word}
 is controlled by setting \cs{catcode} to 11~(enabled) or 12~(disabled), as usual.
@@ -2493,7 +2503,7 @@ is controlled by the lowermost bit of the \Param{kcatcode} parameter.
 分割している：
 \begin{description}
  \item[欧文/和文の区別 (\upTeX)]
-\cs{ltjdefcharrange} と\textsf{jacharrange}パラメータ（\ref{ssec-setrange}節）
+\cs{ltjdefcharrange} と\textsf{jacharrange}パラメータ（\ref{ssec:setrange}節）
  \item[制御綴中に使用可か]
 \LuaTeX 自身の \cs{catcode} でよい
  \item[\Param{jcharwidowpenalty}が挿入可か]
@@ -3252,7 +3262,7 @@ overridden by \LuaTeX-ja, using~\verb+\protected\def+.
 %<ja>\section{フォントメトリックと和文フォント}
 %<en>\subsection{\cs{jfont}}
 %<ja>\subsection{\cs{jfont} 命令}
-\label{ssec-jfont}
+\label{ssec:jfont}
 
 %<*en>
 To load a font as a Japanese font (for horizontal direction), you must use the
@@ -3489,7 +3499,7 @@ because of the compatibility with previous versions of \LuaTeX-ja.
 \autoref{fig:kern-jfm}を参照．
 \begin{itemize}
  \item \emph{\cs{jfont} や，
-NFSS2用の命令（\ref{ssec-chgfnt}節，\ref{ssec-nfsspat}節）における指定では
+NFSS2用の命令（\ref{ssec:chgfnt}節，\ref{ssec:nfsspat}節）における指定では
 カーニング情報は標準で使用する}ことになっているようである．
 言い換えれば，カーニング情報を使用しない設定にするには，面倒でも
 \begin{lstlisting}
@@ -3686,7 +3696,7 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
  }．
  \item さらに，「いかなるscript,~languageでも\texttt{vert}により置換されない」グリフ
   のうち，UAX~\#50で``r''もしくは``Tr''と指定されているものは90度自動回転させる．
- \item \ref{ssec-math}節で述べる，数式中の和文フォントには縦組用和文フォントは指定できない．
+ \item \ref{ssec:math}節で述べる，数式中の和文フォントには縦組用和文フォントは指定できない．
  \item \texttt{jfm=<name>}\ の部分には縦組用JFMを指定する．
 以下の縦組用JFMが\LuaTeX-jaには同梱されている．%おり，違いを\autoref{tab-difjfm-tate}に示した．
 \begin{description}
@@ -3705,7 +3715,7 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
 
 %<en>\subsection{Prefix \texttt{psft}}
 %<ja>\subsection{\texttt{psft}プリフィックス}
-\label{ssec-psft}
+\label{ssec:psft}
 %<*en>
 Besides ``\texttt{file:}''\ and ``\texttt{name:}''\ prefixes which
 are introduced in the \Pkg{luaotfload} package,
@@ -3808,7 +3818,7 @@ Please contact the LuaTeX-ja project team.
 
 %<en>\subsection{Structure of a JFM file}
 %<ja>\subsection{JFMファイルの構造}
-\label{ssec-jfm-str}
+\label{ssec:jfm-str}
 %<en>A JFM file is a Lua script which has only one function call:
 %<ja>JFMファイルはただ一つの関数呼び出しを含むLuaスクリプトである：
 \begin{lstlisting}
@@ -4266,7 +4276,7 @@ we specify <ratio> to $0.25/(0.5+0.25)=1/3$.
 \begin{cslist}[style=standard]
 \item[priority=<priority>]
              \Pkg{luatexja-adjust}による優先順位付き
-	     行長調整（\ref{ssec-adj}節）において，このグルーの優先度を指定する．許される値は以下の通り：
+	     行長調整（\ref{ssec:adj}節）において，このグルーの優先度を指定する．許される値は以下の通り：
   \begin{description}
     \item[バージョン1] $-4$から$+3$の間の整数
     \item[バージョン2以降] $-4$から$+3$の間の整数の2つ組\texttt{\{<stretch>, <shrink>\}}か，
@@ -4315,7 +4325,7 @@ An integer in $[-4,3]$ (treated as 0 if omitted), or
 a pair of these integers \texttt{\{<stretch>, <shrink>\}} (version 2~or~later).
 This is
 used only in line adjustment with priority by \Pkg{luatexja-adjust}
-(see Subsection~\ref{ssec-adj}). Higher value means the glue is easy to stretch,
+(see Subsection~\ref{ssec:adj}). Higher value means the glue is easy to stretch,
 and is also easy to shrink. 
 \item[kanjiskip\_natural=<num>\textrm{, }%
   kanjiskip\_stretch=<num>\textrm{, }kanjiskip\_shrink=<num>]\leavevmode
@@ -4367,7 +4377,7 @@ Hence we have the following result:
 
 優先順位付き行長調整が有効であり，かつ現在の文字クラスの文字が
   行末に来た時に，この文字と行末の間には指定された値のいずれかの大きさのカーンが
-  挿入される（\autoref{ssec-adj}参照）．
+  挿入される（\autoref{ssec:adj}参照）．
 
 バージョン1における
 \begin{lstlisting}[escapechar=\$]
@@ -4593,7 +4603,7 @@ JFM側で一部の対処ができることにより，\Pkg{jsclasses}のよう�
 
 %<en>\subsection{Math font family}
 %<ja>\subsection{数式フォントファミリ}
-\label{ssec-math}
+\label{ssec:math}
 
 %<*en>
 \TeX\ handles fonts in math formulas by 16~font families\footnote{Omega,
@@ -4938,7 +4948,7 @@ Then, the position of glyphs is shifted up by
 %<en>\section{Parameters}
 %<ja>\section{パラメータ}
 \subsection{\cs{ltjsetparameter}}
-\label{ssec-param}
+\label{ssec:param}
 
 %<*en>
 As described before, \cs{ltjsetparameter} and \cs{ltjgetparameter} are
@@ -5168,7 +5178,7 @@ The default glue which inserted between two \textbf{JAchar}s.
 Changing current Japanese font does not alter this parameter, as \pTeX.
 
 If the natural width of this parameter is \cs{maxdimen}, \LuaTeX-ja uses
-the value which is specified in the JFM for current Japanese font (See Subsection~\ref{ssec-jfm-str}).
+the value which is specified in the JFM for current Japanese font (See Subsection~\ref{ssec:jfm-str}).
 %</en>
 
 \item[\DParam{xkanjiskip}\,=<skip>$^\ast$] [\cs{xkanjiskip}]\
@@ -5184,7 +5194,7 @@ The default glue which inserted between a \textbf{JAchar} and an
 Changing current font does not alter this parameter, as \pTeX.
 
 As \Param{kanjiskip}, if the natural width of this parameter is \cs{maxdimen}, \LuaTeX-ja uses
-the value which is specified in the JFM for current Japanese font (See Subsection~\ref{ssec-jfm-str}).
+the value which is specified in the JFM for current Japanese font (See Subsection~\ref{ssec:jfm-str}).
 %</en>
 
 
@@ -5213,7 +5223,7 @@ The default value is \texttt{paverage}. \dots
 %</en>
 %<*ja>
 デフォルト値は \texttt{paverage} である．
-各々の値による差異の詳細は\ref{ssec-cluster-wa}節の「『右空白』の算出」を参照してほしい．
+各々の値による差異の詳細は\ref{ssec:cluster-wa}節の「『右空白』の算出」を参照してほしい．
 %</ja>
 
 \item[\DParam{jacharrange}\,=<ranges>]
@@ -5239,7 +5249,7 @@ the behavior of this assignment is undefined.
 
 
 \subsection{\cs{ltjgetparameter}}
-\label{ssec-getpar}
+\label{ssec:getpar}
 %<*en>
 \cs{ltjgetparameter} is a control sequence for acquiring parameters. It
 always takes a parameter name as first argument.
@@ -5709,7 +5719,7 @@ As an example, the example above can be improved as follows:
 
 
 \subsection{\cs{ltjdeclarealtfont}}
-\label{ssec-altfont}
+\label{ssec:altfont}
 %<*en>
 Using \cs{ltjdeclarealtfont}, one can ``compose'' more than one Japanese fonts.
 This \cs{ltjdeclarealtfont} uses in the following form:
@@ -5778,7 +5788,7 @@ are typeset by \cs{piyo}.
 \subsection{\cs{ltjalchar} と \cs{ltjjachar}}
 文字コードが$\text{<chr\_code>}~(\geq 128=\mathtt{0x80})$の文字を
 \ \cs{char} プリミティブを使い \cs{char}<chr\_code> として出力させると，
-その文字の属する文字範囲（\ref{ssec-setrange}節参照）によって
+その文字の属する文字範囲（\ref{ssec:setrange}節参照）によって
 \textbf{ALchar}か\textbf{JAchar}か，つまり欧文フォントで出力されるか和文フォントで出力され
 るかが決まる．
 
@@ -5789,7 +5799,7 @@ are typeset by \cs{piyo}.
 <chr\_code>が127以下の場合は，\cs{ltjjachar} であっても\textbf{ALchar}として出力されること
 に注意．
 
-以下は\ref{ssec-setrange}節に載せた例に，\cs{char} の動作を追加したものである．
+以下は\ref{ssec:setrange}節に載せた例に，\cs{char} の動作を追加したものである．
 \begin{LTXexample}[width=0.25\textwidth]
 \gtfamily\large % default, ALchar, JAchar
 ¶, \char`¶, \ltjalchar`¶, \ltjjachar`¶\\    % default: ALchar
@@ -5802,19 +5812,19 @@ are typeset by \cs{piyo}.
 
 %<en>\subsection{Patch for NFSS2}
 %<ja>\subsection{NFSS2へのパッチ}
-\label{ssec-nfsspat}
+\label{ssec:nfsspat}
 
 %<*en>
 Japanese patch for NFSS2 in \LuaTeX-ja
 is based on \texttt{plfonts.dtx} which plays the same role in \pLaTeXe.
 We will describe
-commands which are not described in Subsection~\ref{ssec-chgfnt}.
+commands which are not described in Subsection~\ref{ssec:chgfnt}.
 %</en>
 %<*ja>
 \LuaTeX-jaのNFSS2への日本語パッチは
 \pLaTeXe で同様の役割を果たす \texttt{plfonts.dtx} をベースに，
 和文エンコーディングの管理等をLuaで書きなおしたものである．
-ここでは\ref{ssec-chgfnt}節で述べていなかった命令について
+ここでは\ref{ssec:chgfnt}節で述べていなかった命令について
 記述しておく．
 %</ja>
 
@@ -5991,11 +6001,11 @@ character whose character class is zero,  instead of `あ'.
 \item[\cs{fontfamily}\{<family>\}]
 %<*en>
 As in \LaTeXe, this command changes current font family (alphabetic, Japanese,~\emph{or both})
-to <family>. See Subsection~\ref{ssec-fontfamilycmd} for detail.
+to <family>. See Subsection~\ref{ssec:fontfamilycmd} for detail.
 %</en>
 %<*ja>
 元々の\LaTeXe におけるものと同様に，このコマンドは現在のフォントファミリ（欧文，
-和文，\emph{もしくは両方}）を<family>に変更する．詳細は\ref{ssec-fontfamilycmd}節を参照すること．
+和文，\emph{もしくは両方}）を<family>に変更する．詳細は\ref{ssec:fontfamilycmd}節を参照すること．
 %</ja>
 
 
@@ -6018,7 +6028,7 @@ to <family>. See Subsection~\ref{ssec-fontfamilycmd} for detail.
 \item[\cs{DeclareAlternateKanjiFont}\{<base-encoding>\}\{<base-family>\}\{<base-series>\}\{<base-shape>\}\\
   \null\hfill\{<alt-encoding>\}\{<alt-family>\}\{<alt-series>\}\{<alt-shape>\}\{<range>\}]
 %<*ja>
-\ref{ssec-altfont}節の\
+\ref{ssec:altfont}節の\
 \cs{ltjdeclarealtfont} と同様に，前半の4引数の
 和文フォント（基底フォント）のうち<range>中の文字を
 第5から第8引数の和文フォントを使って組むように指示する．
@@ -6038,7 +6048,7 @@ to <family>. See Subsection~\ref{ssec-fontfamilycmd} for detail.
 \end{itemize}%
 %</ja>
 %<*en>
-As \cs{ltjdeclarealtfont}~(Subsection~\ref{ssec-altfont}),
+As \cs{ltjdeclarealtfont}~(Subsection~\ref{ssec:altfont}),
 characters in <range> of the Japanese font (we say the \emph{base font})
 which specified by first 4 arguments are typeset
 by the Japanese font which specified by fifth to eighth arguments
@@ -6075,7 +6085,7 @@ Avant Garde (OT1/pag/m/n) に変わっていることがわかる．
 
 %<en>\subsection{Detail of \cs{fontfamily} command}
 %<ja>\subsection{\cs{fontfamily}コマンドの詳細}
-\label{ssec-fontfamilycmd}
+\label{ssec:fontfamilycmd}
 %<*en>
 In this subsection, we describe when \cs{fontfamily}<family> changes current
 Japanese/alphabetic font family. Basically, current Japanese fotn family is changed to
@@ -6312,9 +6322,9 @@ by \cs{input}.
 \cs{input} で読み込み可能である．
 %</ja>
 \subsection{\Pkg{luatexja-fontspec}}
-\label{ssec-fontspec2}
+\label{ssec:fontspec2}
 %<*en>
-As described in Subsection~\ref{ssec-fontspec}, this optional package
+As described in Subsection~\ref{ssec:fontspec}, this optional package
 provides the counterparts for several commands defined in the
 \Pkg{fontspec} package (requires \Pkg{fontspec}~v2.4).
 In addition to OpenType font features in the original \Pkg{fontspec},
@@ -6322,7 +6332,7 @@ the following ``font features'' specifications are allowed for
 the commands of Japanese version:
 %</en>
 %<*ja>
-\ref{ssec-fontspec}節で述べたように，この追加パッケージは\Pkg{fontspec}%
+\ref{ssec:fontspec}節で述べたように，この追加パッケージは\Pkg{fontspec}%
 パッケージで定義されているコマンドに対応する和文フォント用のコマンドを提供する．
 
 \Pkg{fontspec}パッケージで指定可能な各種OpenType機能に加えて，和文版のコマンドには
@@ -6336,7 +6346,7 @@ the commands of Japanese version:
 %<*en>
 These 3 keys correspond to \texttt{cid}, \texttt{jfm} and
 \texttt{jfmvar} keys for \cs{jfont}~and~\cs{tfont} respectively.
-See Subsections~\ref{ssec-jfont} and \ref{ssec-psft} for details
+See Subsections~\ref{ssec:jfont} and \ref{ssec:psft} for details
  of \texttt{cid}, \texttt{jfm} and
 \texttt{jfmvar} keys.
 
@@ -6348,8 +6358,8 @@ will be actually used in \texttt{YokoFeatures}~and~\texttt{TateFeatures} keys.
 %<*ja>
 これら3つのキーはそれぞれ \cs{jfont},~\cs{tfont}に対する
 \texttt{cid}, \texttt{jfm}, \texttt{jfmvar}キーとそれぞれ対応する．
-\texttt{cid}, \texttt{jfm}, \texttt{jfmvar}キーの詳細は\ref{ssec-jfont}節
-	     と\ref{ssec-psft}節を参照．
+\texttt{cid}, \texttt{jfm}, \texttt{jfmvar}キーの詳細は\ref{ssec:jfont}節
+	     と\ref{ssec:psft}節を参照．
 
 \texttt{CID} キーは下の \texttt{NoEmbed} と合わせて用いられたときのみ有効である．
 また，横組用JFMと縦組用JFMは共用できないため，実際に \texttt{JFM} キーを用いる際は
@@ -6360,11 +6370,11 @@ will be actually used in \texttt{YokoFeatures}~and~\texttt{TateFeatures} keys.
 \item[NoEmbed]
 %<*en>
 By specifying this key, one can use ``name-only'' Japanese font which
-will not be embedded in the output PDF file. See Subsection~\ref{ssec-psft}.
+will not be embedded in the output PDF file. See Subsection~\ref{ssec:psft}.
 %</en>
 %<*ja>
 これを指定することで，PDFに埋め込まれない「名前だけ」のフォントを指定することが
-できる．\ref{ssec-psft}節を参照．
+できる．\ref{ssec:psft}節を参照．
 %</ja>
 
 \begin{figure}[!tb]
@@ -6436,16 +6446,16 @@ A demonstrarion is shown in \autoref{fig:yokotate-fontspec}.
 \item[AltFont]
 
 %<*en>
-As \cs{ltjdeclarealtfont}~(Subsection~\ref{ssec-altfont}) and
-\cs{DeclareAlternateKanjiFont}~(Subsection~\ref{ssec-nfsspat}),
+As \cs{ltjdeclarealtfont}~(Subsection~\ref{ssec:altfont}) and
+\cs{DeclareAlternateKanjiFont}~(Subsection~\ref{ssec:nfsspat}),
 with this key, one can typeset some Japanese characters
 by a different font and/or using different features.
 The \texttt{AltFont} feature takes a comma-separated list of comma-separated lists,
 as the following:
 %</en>
 %<*ja>
-\ref{ssec-altfont}節の \cs{ltjdeclarealtfont} や，
-\ref{ssec-nfsspat}節の \cs{DeclareAlternateKanjiFont} と同様に，
+\ref{ssec:altfont}節の \cs{ltjdeclarealtfont} や，
+\ref{ssec:nfsspat}節の \cs{DeclareAlternateKanjiFont} と同様に，
 このキーを用いると一部の文字を異なったフォントや機能たちを使って組むことができる．
 \texttt{AltFont} キーに指定する値は，次のように二重のコンマ区切りリストである：
 %</ja>
@@ -6545,7 +6555,7 @@ OpenType機能指定は
 
 
 \subsection{\Pkg{luatexja-otf}}
-\label{ssec-ltjotf}
+\label{ssec:ltjotf}
 %<*en>
 This optional package supports typesetting glyphs
 by specifying a CID number.
@@ -6651,7 +6661,7 @@ JFMの\texttt{chars}テーブルのエントリとして \verb+'AJ1-xxx'+ の形
 %</ja>
 
 \subsection{\Pkg{luatexja-adjust}}
-\label{ssec-adj}
+\label{ssec:adj}
 \begin{figure}[t]
 \def\sq{%
   \hbox to 1\zw{\hss\fboxsep=-.5\fboxrule\fbox{%

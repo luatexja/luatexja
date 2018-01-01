@@ -39,11 +39,12 @@
 %%
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{ltjltxdoc}[2011/10/03 v1.0b-ltj Standard LuaLaTeX-ja file]
+\ProvidesClass{ltjltxdoc}[2018/01/01 v1.0d-ltj-3 Standard LuaLaTeX-ja file]
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{ltxdoc}}
 \ProcessOptions
 \LoadClass{ltxdoc}
 \RequirePackage{luatexja}
+\def\Cjascale{0.962216}
 \renewcommand{\normalsize}{%
     \@setfontsize\normalsize\@xpt{15}%
   \abovedisplayskip 10\p@ \@plus2\p@ \@minus5\p@
@@ -82,6 +83,10 @@
       \vskip.5\baselineskip
     \hrule height.1pt\egroup
   \hss\vrule width.1pt\egroup}
+\def\verb{\relax\ifmmode\hbox\else\leavevmode\vadjust{}\fi
+  \bgroup \let\do\do@noligs \verbatim@nolig@list
+    \ttfamily \verb@eol@error \let\do\@makeother \dospecials
+    \@ifstar{\@sverb}{\@vobeyspaces \frenchspacing \@sverb}}
 \ltjsetparameter{alxspmode={"5C,3}} %% \
 \ltjsetparameter{alxspmode={"22,3}} %% "
 \def\mod@math@codes{\mathcode`\|="207C \mathcode`\&="2026
