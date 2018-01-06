@@ -859,6 +859,7 @@ do
    end
    prepare_fl_data = function (dest, id)
       local t = fontloader.info(id.filename)
+      if not t then return dest end
       local fl
       if t.fontname then
         fl = fontloader.open(id.filename)
@@ -948,7 +949,7 @@ do
 	    font_extra_basename[bname] = dat or {}
 	    ltjb.save_cache( v,
 			     {
-				chksum = checksum(id.filename),
+				chksum = newsum,
 				version = cache_ver,
 				dat,
 			     })
