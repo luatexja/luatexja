@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-unicode-math}[2017/11/12 Patch to unicode-math for LuaTeX-ja]
+\ProvidesPackage{lltjp-unicode-math}[2018/01/12 Patch to unicode-math for LuaTeX-ja]
 
 \RequirePackage{unicode-math,luatexja}
 
@@ -12,8 +12,6 @@
 \group_begin:
   \bool_new:N \lltjp_um_patch_mathgroup_bool
   \bool_set_true:N \lltjp_um_patch_mathgroup_bool
-%% Recent unicode-math (2017-10-02, v0.8g) does not have \ProvidesPackage,
-%% So we can't use the date option of \@ifpackageloaded.
   \cs_gset:Nn \__um_define_math_chars: {
     \group_begin:
       \cs_set:Npn \__um_sym:nnn ##1##2##3
@@ -22,7 +20,7 @@
          { \mathord \mathalpha \mathbin \mathrel \mathpunct \mathop \mathfence }
          {##3}
         {
-          \exp_last_unbraced:NNx \cs_gset_eq:NN ##2 { \Ucharcat ##1 ~ 12 ~ }
+          \exp_last_unbraced:NNx \cs_gset_eq:NN ##2 { \char_generate:nn {##1} {12} }
           \ltjsetmathletter{ ##1 }
         }
        }
@@ -46,7 +44,6 @@
    }
 }
 \group_end:
-
 \ExplSyntaxOff
 
 \endinput
