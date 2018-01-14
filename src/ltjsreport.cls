@@ -322,21 +322,22 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
     \setlength{\pageheight}{\paperheight}
   \fi
 \fi
+ \def\Cjascale{0.924715}
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
 \ifmingoth
-  \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924715] \ltj@stdmcfont:jfm=min}{}
-  \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924715] \ltj@stdgtfont:jfm=min}{}
+  \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:jfm=min}{}
+  \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:jfm=min}{}
 \else
   \ifptexjis
-    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924715] \ltj@stdmcfont:jfm=jis}{}
-    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924715] \ltj@stdgtfont:jfm=jis}{}
+    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:jfm=jis}{}
+    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:jfm=jis}{}
   \else
-    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924715] \ltj@stdmcfont:jfm=ujis}{}
-    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924715] \ltj@stdgtfont:jfm=ujis}{}
+    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:jfm=ujis}{}
+    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:jfm=ujis}{}
   \fi
 \fi
-\DeclareFontShape{JT3}{mc}{m}{n}{<-> s * [0.924715] \ltj@stdmcfont:jfm=ujisv}{}
-\DeclareFontShape{JT3}{gt}{m}{n}{<-> s * [0.924715] \ltj@stdgtfont:jfm=ujisv}{}
+\DeclareFontShape{JT3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:jfm=ujisv}{}
+\DeclareFontShape{JT3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:jfm=ujisv}{}
 \DeclareFontShape{JY3}{mc}{bx}{n}{<->ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{gt}{bx}{n}{<->ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{mc}{m}{it}{<->ssub*mc/m/n}{}

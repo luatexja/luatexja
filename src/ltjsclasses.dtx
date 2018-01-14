@@ -966,23 +966,7 @@
 %
 % [2016-03-21 LTJ] 拡大率の計算で1~ptを$1/72.27$インチでなく0.3514~mmと間違えて扱っていたのを修正。
 %    \begin{macrocode}
-%<*!jspf>
-\expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
-\ifmingoth
-  \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924715] \ltj@stdmcfont:jfm=min}{}
-  \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924715] \ltj@stdgtfont:jfm=min}{}
-\else
-  \ifptexjis
-    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924715] \ltj@stdmcfont:jfm=jis}{}
-    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924715] \ltj@stdgtfont:jfm=jis}{}
-  \else
-    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.924715] \ltj@stdmcfont:jfm=ujis}{}
-    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.924715] \ltj@stdgtfont:jfm=ujis}{}
-  \fi
-\fi
-\DeclareFontShape{JT3}{mc}{m}{n}{<-> s * [0.924715] \ltj@stdmcfont:jfm=ujisv}{}
-\DeclareFontShape{JT3}{gt}{m}{n}{<-> s * [0.924715] \ltj@stdgtfont:jfm=ujisv}{}
-%</!jspf>
+%<!jspf> \def\Cjascale{0.924715}
 %    \end{macrocode}
 %
 % これにより，公称10ポイントの和文フォントを0.924715倍したことにより，
@@ -995,23 +979,27 @@
 % $0.9*72.27/72 \simeq 0.903375$ 倍します。
 %
 %    \begin{macrocode}
-%<*jspf>
+%<jspf> \def\Cjascale{0.903375}
+%    \end{macrocode}
+%
+% 実際にフォントの再定義を行う部分です．
+%
+%    \begin{macrocode}
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
 \ifmingoth
-  \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.903375] \ltj@stdmcfont:jfm=min}{}
-  \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.903375] \ltj@stdgtfont:jfm=min}{}
+  \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:jfm=min}{}
+  \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:jfm=min}{}
 \else
   \ifptexjis
-    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.903375] \ltj@stdmcfont:jfm=jis}{}
-    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.903375] \ltj@stdgtfont:jfm=jis}{}
+    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:jfm=jis}{}
+    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:jfm=jis}{}
   \else
-    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.903375] \ltj@stdmcfont:jfm=ujis}{}
-    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.903375] \ltj@stdgtfont:jfm=ujis}{}
+    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:jfm=ujis}{}
+    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:jfm=ujis}{}
   \fi
 \fi
-\DeclareFontShape{JT3}{mc}{m}{n}{<-> s * [0.903375] \ltj@stdmcfont:jfm=ujisv}{}
-\DeclareFontShape{JT3}{gt}{m}{n}{<-> s * [0.903375] \ltj@stdgtfont:jfm=ujisv}{}
-%</jspf>
+\DeclareFontShape{JT3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:jfm=ujisv}{}
+\DeclareFontShape{JT3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:jfm=ujisv}{}
 %    \end{macrocode}
 %
 % 和文でイタリック体，斜体，サンセリフ体，
