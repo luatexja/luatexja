@@ -1,0 +1,22 @@
+\documentclass[14pt,ja=standard,nomag*,lualatex]{bxjsarticle}
+\usepackage{ifptex,iftex}
+\usepackage{amsmath}
+\ifptex
+\usepackage{lmodern}
+\else
+\usepackage{unicode-math}
+\fi
+\title{テスト}
+\author{テスト 太郎}
+\begin{document}
+\maketitle
+\section{オイラーの公式}
+オイラーの公式を式\ref{eq:eular}に示す。
+\begin{equation}\label{eq:eular}
+  e^{i\theta} = \cos\theta + i\sin\theta
+\end{equation}
+これに$\theta = \pi$を代入すると式\ref{eq:eular2}を得る。
+\begin{equation}\label{eq:eular2}
+  e^{-i\pi} = -1
+\end{equation}
+\end{document}

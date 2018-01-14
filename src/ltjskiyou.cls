@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjskiyou}
-  [2017/09/19 ltjsclasses ]
+  [2018/01/14 ltjsclasses ]
 \def\jsc@clsname{ltjskiyou}
 \RequirePackage{luatexja}
 \newif\if@restonecol
@@ -117,25 +117,15 @@
 \DeclareOption{10.5ptj}{\def\jsc@magscale{1.139}}
 \DeclareOption{11ptj}{\def\jsc@magscale{1.194}}
 \DeclareOption{12ptj}{\def\jsc@magscale{1.302}}
-\newif\if@ltjs@mag@xreal
-\@ltjs@mag@xrealtrue
-\DeclareOption{nomag*}{\@ltjs@mag@xrealtrue}
-\DeclareOption{nomag}{\@ltjs@mag@xrealfalse}
-\DeclareOption{noxreal}{%
-  \ClassWarningNoLine{\jsc@clsname}{%
-    The class option `noxreal' is obsolete. \MessageBreak
-    Please use the `nomag' option instead}%
-  \@ltjs@mag@xrealfalse}
-\DeclareOption{real}{%
-  \ClassWarningNoLine{\jsc@clsname}{%
-    The class option `real' is obsolete. \MessageBreak
-    Please use the `nomag' option instead}%
-  \@ltjs@mag@xrealfalse}
+\newif\ifjsc@mag@xreal
+\jsc@mag@xrealtrue
+\DeclareOption{nomag*}{\jsc@mag@xrealtrue}
+\DeclareOption{nomag}{\jsc@mag@xrealfalse}
 \DeclareOption{usemag}{%
   \ClassWarningNoLine{\jsc@clsname}{%
     This \jsc@clsname\space cls does not support `usemag'\MessageBreak
 option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
-  \@ltjs@mag@xrealtrue}
+  \jsc@mag@xrealtrue}
 
 \hour\time \divide\hour by 60\relax
 \@tempcnta\hour \multiply\@tempcnta 60\relax
@@ -251,7 +241,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \ifdim\jsc@mpt=1.0954\p@ \renewcommand{\@ptsize}{1}\else
 \ifdim\jsc@mpt=1.2\p@    \renewcommand{\@ptsize}{2}\else
 \renewcommand{\@ptsize}{-20}\fi\fi
-\if@ltjs@mag@xreal
+\ifjsc@mag@xreal
 \ifdim\jsc@mpt=\p@\else
   \expandafter\let\csname OT1/cmr/m/n/10\endcsname\relax
   \expandafter\let\csname TU/lmr/m/n/10\endcsname\relax

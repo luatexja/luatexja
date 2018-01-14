@@ -3,15 +3,15 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-unicode-math}[2018/01/12 Patch to unicode-math for LuaTeX-ja]
+\ProvidesPackage{lltjp-unicode-math}[2018/01/14 Patch to unicode-math for LuaTeX-ja]
 
-\RequirePackage{unicode-math,luatexja}
+\RequirePackage{unicode-math,luatexja,etoolbox}
 
 \ExplSyntaxOn
 
 \group_begin:
-  \bool_new:N \lltjp_um_patch_mathgroup_bool
-  \bool_set_true:N \lltjp_um_patch_mathgroup_bool
+  \bool_new:N \__lltjp_um_patch_mathgroup_bool
+  \bool_set_true:N \__lltjp_um_patch_mathgroup_bool
   \cs_gset:Nn \__um_define_math_chars: {
     \group_begin:
       \cs_set:Npn \__um_sym:nnn ##1##2##3
@@ -28,7 +28,7 @@
     \group_end:
   }
 
-\bool_if:NT \lltjp_um_patch_mathgroup_bool {
+\bool_if:NT \__lltjp_um_patch_mathgroup_bool {
   \cs_gset:Npn \use@mathgroup #1 #2
    {
     %\typeout{UM <#1><#2>}
@@ -44,6 +44,50 @@
    }
 }
 \group_end:
+
+\ifcsname jsc@mag@xrealtrue \endcsname \else
+    \expandafter\expandafter\expandafter \ExplSyntaxOff \expandafter \endinput
+\fi
+\ifjsc@mag@xreal
+    \cs_if_exist:cTF { ltjs@orig@get@external@font } {
+	  % ltjsclasses: use lua
+	  \cs_new:Nn \lltjp_um_unmag_fsize:
+	    {
+		  \cs_gset:Nx \lltjp_um_f@size: {\directlua{luatexja.ltjs_unmagnify_fsize(\f@size)}}
+		  \cs_gset:Nx \lltjp_um_sf@size: {\directlua{luatexja.ltjs_unmagnify_fsize(\sf@size)}}
+		  \cs_gset:Nx \lltjp_um_ssf@size: {\directlua{luatexja.ltjs_unmagnify_fsize(\ssf@size)}}
+		}
+	}{
+	  % bxjscls: use \jsc@preadjust@extract@font
+	  \cs_new:Nn \lltjp_um_unmag_fsize:
+	    {
+		  \group_begin:
+		    \jsc@preadjust@extract@font
+		    \cs_gset_eq:NN \lltjp_um_f@size: \f@size
+		  \group_end:
+		  \group_begin:
+		    \cs_set_eq:NN \f@size \sf@size \jsc@preadjust@extract@font
+		    \cs_gset_eq:NN \lltjp_um_sf@size: \f@size
+		  \group_end:
+		  \group_begin:
+		    \cs_set_eq:NN \f@size \ssf@size \jsc@preadjust@extract@font
+		    \cs_gset_eq:NN \lltjp_um_ssf@size: \f@size
+		  \group_end:
+		}
+	}
+    \pretocmd { \__um_fontspec_select_font: } {
+	  \cs_set_eq:NN \lltjp_um_orig_fsize: \f@size
+	  \lltjp_um_unmag_fsize:
+	  \cs_set_eq:NN \f@size \lltjp_um_f@size:
+	  \cs_set_eq:NN \tf@size \lltjp_um_f@size:
+	  \cs_set_eq:NN \sf@size \lltjp_um_sf@size:
+	  \cs_set_eq:NN \ssf@size \lltjp_um_ssf@size:
+	} {} {}
+    \apptocmd { \__um_fontspec_select_font: } {
+	  \cs_set_eq:NN \f@size \lltjp_um_orig_fsize:
+	} {} {}
+\fi
+
 \ExplSyntaxOff
 
 \endinput

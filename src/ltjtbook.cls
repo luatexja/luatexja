@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjtbook}
-  [2017/12/31 v1.7g-ltj-16
+  [2018/01/13 v1.7h-ltj-15
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -154,7 +154,6 @@
   'ltj.jclasses_load_jfm', 1)}
 {\jfont\g=\ltj@stdmcfont:jfm=min } % loading jfm-min.lua
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
-\def\Cjascale{0.962216}
 \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.962216] \ltj@stdmcfont:jfm=min}{}
 \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.962216] \ltj@stdgtfont:jfm=min;jfmvar=goth}{}
 \ltjglobalsetparameter{differentjfm=both}
@@ -163,6 +162,7 @@
 \ProcessOptions\relax
 \input{ltjtbk1\@ptsize.clo}
 \RequirePackage{lltjext}
+\def\Cjascale{0.962216}
 \if@stysize
   \setlength\columnsep{3\Cwd}
 \else

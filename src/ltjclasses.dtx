@@ -114,7 +114,7 @@
 %   それを用いるように変更（PDFサイズ削減のため）．}
 % \changes{v1.7f}{2017/08/31}{和文書体の基準を全角空白から「漢」に変更}
 % \changes{v1.7g}{2017/09/19}{内部処理で使ったボックス0を空にした}
-% \changes{v1.7g-ltj-16}{2017/12/31}{\cs{Cjascale}追加}
+% \changes{v1.7h}{2018/01/13}{和文スケール値\cs{Cjascale}を定義}
 % \fi
 %
 % \iffalse
@@ -144,7 +144,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2017/12/31 v1.7g-ltj-16
+  [2018/01/13 v1.7h-ltj-15
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -583,11 +583,7 @@
 %
 % \changes{v1.6-ltj-9}{2015/01/01}{サイズクラスのロード前にメトリックの変更を行わないと，
 % \cs{Cht}等の値が反映されないのでこの場所に移動させました．}
-% 
-% \changes{v1.6g-ltj-16}{2017/12/31}{\cs{Cjascale}を追加しました。
-% これは、コミュニティ版p\kern-.05em\LaTeX で導入された、
-% 和文スケール（$1\,\cs{zw} \div \hbox{要求サイズ}$）を表す実数値マクロです。}
-% 
+%
 %    \begin{macrocode}
 %<*article|report|book>
 \directlua{luatexbase.add_to_callback('luatexja.load_jfm',
@@ -595,7 +591,6 @@
   'ltj.jclasses_load_jfm', 1)}
 {\jfont\g=\ltj@stdmcfont:jfm=min } % loading jfm-min.lua
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
-\def\Cjascale{0.962216}
 \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.962216] \ltj@stdmcfont:jfm=min}{}
 \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.962216] \ltj@stdgtfont:jfm=min;jfmvar=goth}{}
 \ltjglobalsetparameter{differentjfm=both}
@@ -854,7 +849,22 @@
 % \end{macro}
 % \end{macro}
 %
-%
+% \begin{macro}{\Cjascale}
+% 和文スケール値（$1\,\mathrm{zw} \div \hbox{要求サイズ}$）を
+% 表す実数値マクロ|\Cjascale|を定義します。
+% ^^A p\LaTeXe{}の標準クラスでは、フォーマット作成時に読み込まれた
+% ^^A フォント定義ファイル（\file{jy1mc.fd} / \file{jy1gt.fd} /
+% ^^A \file{jt1mc.fd} / \file{jt1gt.fd}）での和文スケール値がそのまま
+% ^^A 有効ですので、これは1です。
+% この\texttt{jclasses}互換クラスでは、Lua\TeX-ja読み込み時の和文スケール値がそのまま
+% 使用され、その値は0.962216です。
+% \changes{v1.7h}{2018/01/13}{和文スケール値\cs{Cjascale}を定義}
+%    \begin{macrocode}
+%<*article|report|book>
+\def\Cjascale{0.962216}
+%</article|report|book>
+%    \end{macrocode}
+% \end{macro}
 %
 % \section{レイアウト}
 %

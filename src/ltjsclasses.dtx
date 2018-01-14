@@ -57,7 +57,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2017/09/19 ltjsclasses ]
+  [2018/01/14 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass{ltjsarticle}
@@ -417,26 +417,20 @@
 % 将来どうなるかわからないので\texttt{nomag}で無効化することができるようにしました。
 %
 % \texttt{noxreal},~\texttt{real}は旧来の互換性として今は残してありますが，2017年7月に削除する予定です。
+%
+% [2018-01-14] \texttt{noxreal},~\texttt{real} を削除しました．また，内部命令の名称を
+% \texttt{jsclasses}に合わせました．
+%
 %    \begin{macrocode}
-\newif\if@ltjs@mag@xreal
-\@ltjs@mag@xrealtrue
-\DeclareOption{nomag*}{\@ltjs@mag@xrealtrue}
-\DeclareOption{nomag}{\@ltjs@mag@xrealfalse}
-\DeclareOption{noxreal}{%
-  \ClassWarningNoLine{\jsc@clsname}{%
-    The class option `noxreal' is obsolete. \MessageBreak
-    Please use the `nomag' option instead}%
-  \@ltjs@mag@xrealfalse}
-\DeclareOption{real}{%
-  \ClassWarningNoLine{\jsc@clsname}{%
-    The class option `real' is obsolete. \MessageBreak
-    Please use the `nomag' option instead}%
-  \@ltjs@mag@xrealfalse}
+\newif\ifjsc@mag@xreal
+\jsc@mag@xrealtrue
+\DeclareOption{nomag*}{\jsc@mag@xrealtrue}
+\DeclareOption{nomag}{\jsc@mag@xrealfalse}
 \DeclareOption{usemag}{%
   \ClassWarningNoLine{\jsc@clsname}{%
     This \jsc@clsname\space cls does not support `usemag'\MessageBreak
 	option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
-  \@ltjs@mag@xrealtrue}
+  \jsc@mag@xrealtrue}
 
 
 %    \end{macrocode}
@@ -812,7 +806,7 @@
 % [2017-02-17 LTJ] |\directlua|中で出力される数字のカテゴリーコードが12になるようにしました．
 % この保証をしないと例えば\texttt{listings}パッケージで無限ループになります．
 %    \begin{macrocode}
-\if@ltjs@mag@xreal
+\ifjsc@mag@xreal
 \ifdim\jsc@mpt=\p@\else
   \expandafter\let\csname OT1/cmr/m/n/10\endcsname\relax
   \expandafter\let\csname TU/lmr/m/n/10\endcsname\relax
@@ -964,7 +958,11 @@
 %
 % [2014-07-26 LTJ] なお，現状のところ，縦組用JFMは\texttt{jfm-ujisv.lua}しか準備していません。
 %
-% [2016-03-21 LTJ] 拡大率の計算で1~ptを$1/72.27$インチでなく0.3514~mmと間違えて扱っていたのを修正。
+% [2016-03-21 LTJ] 拡大率の計算で1~ptを$1/72.27$インチでなく0.3514\,mmと間違えて扱っていたのを修正。
+%
+% [2017-12-31] 和文スケール（$1\,\mathrm{zw} \div \hbox{要求サイズ}$）を
+% 表す実数値マクロ |\Cjascale| を定義しました。
+%
 %    \begin{macrocode}
 %<!jspf> \def\Cjascale{0.924715}
 %    \end{macrocode}
