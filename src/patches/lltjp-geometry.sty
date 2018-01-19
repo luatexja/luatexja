@@ -3,14 +3,25 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-geometry}[2017/05/05 Patch to geometry for LuaTeX-ja with vertical writing mode]
-\RequirePackage{ifluatex}
-
+\ProvidesPackage{lltjp-geometry}[2018/01/19 Patch to geometry for LuaTeX-ja with vertical writing mode]
 \ifdefined\if@ltj@@geometry@tate\expandafter\endinput\fi
 \newif\if@ltj@@geometry@tate
+\newif\if@ltj@@geometry@forceoff
 \@ltj@@geometry@tatefalse
-\ifluatex\else % pTeX
-  \@ltj@@geometry@tatetrue
+\@ltj@@geometry@forceofffalse
+\DeclareOption{force}{\@ltj@@geometry@tatetrue}
+\DeclareOption{disable}{\@ltj@@geometry@forceofftrue}
+
+\ProcessOptions\relax
+
+\RequirePackage{ifluatex}
+\ifluatex
+  \ifdefined\luatexjaLoaded\else
+    \PackageError{lltjp-geometry}{%
+	  lltjp-geometry does not work without luatexja.
+	}{}
+\fi
+\else % pTeX
 \def \AtBeginDvi #1{%
   \global \setbox \@begindvibox
     \vbox{\yoko\unvbox \@begindvibox #1}%
@@ -30,9 +41,16 @@
   \edef\Gm@ltj@footskip{\the\footskip}
 \ifluatex
   \ifnum\ltjgetparameter{direction}=3 \@ltj@@geometry@tatetrue\fi
+\else
+  \@gobble\iftrue\csname iftdir\endcsname\@ltj@@geometry@tatetrue\fi
 \fi
+\patchcmd\@begindocumenthook{\tate}{\tate}{\@ltj@@geometry@tatetrue}{}%
 \if@ltj@@geometry@tate
-  \let\PackageWarningNoLine\@gobbletwo% 警告抑止
+  \if@ltj@@geometry@forceoff
+    \@ltj@@geometry@tatefalse
+  \else
+    \let\PackageWarningNoLine\@gobbletwo% 警告抑止
+  \fi
 \fi
 }
 \AtEndOfPackageFile{geometry}{%

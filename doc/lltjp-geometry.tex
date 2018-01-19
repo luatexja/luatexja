@@ -12,7 +12,8 @@
 \def\headfont{\normalfont\bfseries\gtfamily}
 \def\pTeX{p\kern-.05em\TeX}
 \def\cs#1{\text{\texttt{\char`\\#1}}}
-
+\protected\def\Pkg#1{\textsf{#1}}
+\protected\def\>{\hskip\ltjgetparameter{xkanjiskip}}
 \lstset{
   basicstyle=\ttfamily, basewidth=0.5em,
 }
@@ -31,56 +32,79 @@
 \def\LuaTeX{Lua\TeX}
 \definecolor{blue}{rgb}{0, 0.25, 1}
 
-\title{\textsf{lltjp-geometry}パッケージ}
-\author{\LuaTeX-jaプロジェクト%
+\title{\Pkg{lltjp-geometry}パッケージ}
+\author{\LuaTeX-jaプロジェクト\null%
   \thanks{\url{http://osdn.jp/projects/luatex-ja/wiki/FrontPage}}}
 \begin{document}
 \maketitle
 
 ページレイアウトの設定として，\href{http://www.ctan.org/pkg/geometry}%
-{\textsf{geometry}パッケージ}が有名であるが，
+{\Pkg{geometry}パッケージ}が有名であるが，
 これはp\LaTeX・\LuaTeX-jaの縦組クラスでは利用が不可能という問題があった．
-本文書で解説する\textsf{lltjp-geometry}パッケージは，\textsf{geometry}パッケージを
+本文書で解説する\Pkg{lltjp-geometry}パッケージは，\Pkg{geometry}パッケージを
 縦組クラスに対応させるパッチである．
 
 
 \section{利用方法}
-\textsf{lltjp-geometry}パッケージは，\LuaTeX-jaに標準で含まれている．
-本パッケージの動作には\href{http://www.ctan.org/pkg/ifluatex}{\textsf{ifluatex}},
-\href{http://www.ctan.org/pkg/filehook}{\textsf{filehook}}パッケージが必要である．
+\Pkg{lltjp-geometry}パッケージは，\LuaTeX-jaに標準で含まれている．
+本パッケージの動作には\href{http://www.ctan.org/pkg/ifluatex}{\Pkg{ifluatex}},
+\href{http://www.ctan.org/pkg/filehook}{\Pkg{filehook}}パッケージが必要である．
 
-\subsection{\LuaTeX-ja}
-\LuaTeX-jaでは，\textsf{geometry}パッケージ読み込み時に
-自動的に\textsf{lltjp-geometry}パッケージが読み込まれ，ユーザは何もしなくても良い．
-\LuaTeX-jaで横組クラスを利用する時でも，
-\textsf{lltjp-geometry}パッケージは自動的に動作を停止するので，横組時の挙動が
-変わってしまうことはない．
-
-\subsection{\pTeX 系列}
-\pTeX 系列では，\textsf{tarticle}, \textsf{tbook}, \textsf{treport}といった
-\emph{縦組クラスを使う場合}にのみ，
+\LuaTeX-jaでは，\Pkg{geometry}パッケージ読み込み時に
+自動的に\Pkg{lltjp-geometry}パッケージが読み込まれる．
+縦組クラスか否かの自動判定（\ref{ssec:auto}節）を上書きしたい場合は，
 \begin{lstlisting}
-\usepackage{lltjp-geometry}
+% \PassOptionsToPackage{force}{lltjp-geometry} % 強制的に有効
+\PassOptionsToPackage{disable}{lltjp-geometry} % 強制的に無効
+\documentclass{...}
 \usepackage[...]{geometry}
 \end{lstlisting}
-のように\emph{\textsf{geometry}パッケージの前}に読み込む．
-\pTeX 系列では使用クラスが横組か縦組かの自動判定を行えない\footnote{%
-  標準縦組クラスでは，\cs{begin\{document\}} の内部で組方向を縦組に変更するので，
-  プリアンブル中で判定できない．
-}ので，\emph{横組クラスで読み込んではならない}．
+のように\emph{\Pkg{luatexja}の読み込み前}に\cs{PassOptionsToPackage}で
+本パッケージに渡すオプションを指定する（\cs{usepackage\{lltjp-geometry\}}\>は使えない）．
 
-パッケージオプションは存在しない．
+\pTeX 系列では，\Pkg{tarticle}, \Pkg{tbook}, \Pkg{treport}といった
+\emph{縦組クラスを使う場合}に，
+\begin{lstlisting}
+\usepackage[...]{lltjp-geometry}
+\usepackage[...]{geometry}
+\end{lstlisting}
+と，\Pkg{geometry}パッケージの前に読み込む．
 
-\section{\textsf{lltjp-geometry}使用時の注意事項}
+\subsection{縦組クラスか否かの判定}
+\label{ssec:auto}
+本パッケージは，以下のいずれかが該当する場合に「現在のクラスは縦組クラス」と自動判定し，
+\Pkg{geometry}パッケージ読み込み直後にパッチを当てる：
+\begin{enumerate}
+  \item \Pkg{geometry}パッケージを読み込む際に，現在の組方向が縦組になっている．
+  \item \cs{AtBeginDocument}により指定される，\cs{begin\{document\}}\>時に実行される内容に
+  \cs{tate}（というトークン）が含まれている．
+  \item 本パッケージを読み込む際に\texttt{force}オプションが指定されている．
+\end{enumerate}
+\LuaTeX-jaで縦組クラスを利用する場合は主に1.の，
+\pTeX 系列で縦組クラスを利用する場合は主に2.の状況となる
+\footnote{%
+  標準縦組クラスでは，\cs{begin\{document\}}\>の内部で組方向を縦組に変更する．
+}．
+
+上記の自動判定がうまく行かなかったときに備え，
+本パッケージには\texttt{force}オプションと\texttt{disable}オプションを用意した．
+\begin{itemize}
+  \item \texttt{force}オプションが指定されている場合は，自動判定の結果に関わらず
+  \Pkg{geometry}パッケージ読み込み直後にパッチを当てる．
+  \item \texttt{disable}オプションが指定されている場合は，自動判定の結果に関わらず
+  何もしない．
+\end{itemize}
+
+\section{\Pkg{lltjp-geometry}使用時の注意事項}
 
 \subsection{\texttt{twoside}指定時}
 縦組の本は通常右綴じである．これを反映し，
-\texttt{twoside} オプション指定時には
+\texttt{twoside}オプション指定時には
 \begin{itemize}
-\item \texttt{left}, \texttt{lmargin} は小口側の余白，
-\texttt{right}, \texttt{rmargin} はノド側の余白を指す．
-\item 左右余白比 \texttt{hmarginratio} の標準値は$3:2$に変更．
-\item \texttt{bindingoffset} は\emph{右側}に余白を確保する．
+\item \texttt{left}, \texttt{lmargin}は小口側の余白，
+\texttt{right}, \texttt{rmargin}はノド側の余白を指す．
+\item 左右余白比 \texttt{hmarginratio}の標準値は$3:2$に変更．
+\item \texttt{bindingoffset}は\emph{右側}に余白を確保する．
 \end{itemize}
 と変更している．
 
@@ -98,22 +122,22 @@
 \subsection{傍注}
 縦組の場合，傍注は本文の上下に配置される\footnote{%
   二段組の場合は上下共に，一段組の場合は標準では下側だが，
-  \texttt{reversemp} が指定されたときには上側に配置される．
+  \texttt{reversemp}が指定されたときには上側に配置される．
 }．これにより，\emph{\texttt{includemp}（や \texttt{includeall}）が
 未指定の場合，傍注はヘッダやフッタに重なる}．
-\texttt{includemp} 指定時は，\cs{footskip}, \cs{headsep} のいずれか
+\texttt{includemp}指定時は，\cs{footskip}, \cs{headsep}のいずれか
 （二段組の場合は両方）を$\cs{marginparwidth} + \cs{marginparsep}$だけ
 増加させる．
 
 \section{\texttt{lines}オプションに関する注意事項}
-本節の内容は，\textsf{lltjp-geometry}パッケージを読み込まない場合，
-つまり，横組クラスで\textsf{geometry}パッケージを普通に使用した場合にも
+本節の内容は，\Pkg{lltjp-geometry}パッケージを読み込まない場合，
+つまり，横組クラスで\Pkg{geometry}パッケージを普通に使用した場合にも
 当てはまる注意事項である．
 
-\subsection{\textsf{fontspec}パッケージとの干渉}
-\pTeX 系列では，次のように\textsf{fontenc}パッケージ読み込み直後に
-\textsf{geometry}パッケージを用いてレイアウトを設定すると，
-\texttt{lines} による指定が正しく働かないという症状が生じる：
+\subsection{\Pkg{fontspec}パッケージとの干渉}
+\Pkg{fontspec}パッケージの，読み込み直後に
+\Pkg{geometry}パッケージを用いてレイアウトを設定すると，
+\texttt{lines}による指定が正しく働かないという症状が生じる：
 \begin{lstlisting}
 \documentclass{article}
 \usepackage{geometry}
@@ -123,16 +147,16 @@
 hoge\typeout{\the\topskip, \the\baselineskip, \the\textheight}
 \end{document}
 \end{lstlisting}
-\cs{typeout} で \cs{topskip}, \cs{baselineskip}, \cs{textheight} の値を調べると
+\cs{typeout}で\cs{topskip}, \cs{baselineskip}, \cs{textheight}の値を調べると
 \[
  \frac{\cs{textheight} - \cs{topskip}}{\cs{baselineskip}} = 15.8\dot 3
 \]
 となることがわかるから，1ページには16行分入らないことがわかる．
 
-これは，\textsf{fontspec} の読み込みによって \cs{baselineskip} がなぜか
-10\,ptに変えられてしまい，\cs{geometry} 命令はその値に従って本文領域の高さを計算するためで
+これは，\Pkg{fontspec}の読み込みによって\cs{baselineskip}がなぜか
+10\,ptに変えられてしまい，\cs{geometry}命令はその値に従って本文領域の高さを計算するためで
 ある．とりあえずの対策は，
-\cs{normalsize} によって \cs{baselineskip} を正しい値に再設定し，その後
+\cs{normalsize}によって\cs{baselineskip}を正しい値に再設定し，その後
 レイアウトを設定すれば良い：
 \begin{lstlisting}
 \usepackage{geometry}
@@ -140,28 +164,25 @@ hoge\typeout{\the\topskip, \the\baselineskip, \the\textheight}
 \normalsize\geometry{lines=20}
 \end{lstlisting}
 
-なお，同様の症状は\textsf{newtxtext}パッケージなどでも発生するようなので，
-\pTeX 系列といえども無縁ではない．
 
-
-\subsection{\cs{maxdepth} の調整}
+\subsection{\cs{maxdepth}の調整}
 \LaTeX では，
 最後の行の深さ\rensuji{$d$}と
 本文領域の上端から最後の行のベースラインまでの距離\rensuji{$f$}に対し，
 \[
- \cs{textheight} = f+\max(0, d-\cs{maxdepth})
+ \cs{textheight}= f+\max(0, d-\cs{maxdepth})
 \]
 が成り立つ．
 
-\pTeX 系列の標準縦組クラス\textsf{[u]tarticle}等，
-及びそれを\LuaTeX-ja用に移植した\textsf{ltjtarticle}等では，
- \cs{topskip} は\emph{横組時における}全角空白の高さ7.77588\,pt\footnote{%
+\pTeX 系列の標準縦組クラス\Pkg{[u]tarticle}等，
+及びそれを\LuaTeX-ja用に移植した\Pkg{ltjtarticle}等では，
+ \cs{topskip}は\emph{横組時における}全角空白の高さ7.77588\,pt\footnote{%
   標準の\texttt{10pt}オプション指定時．以下同じ．
   ところで，この量は公称フォントサイズの10\,ptか，もしくは
   全角空白の高さと深さを合わせた値の9.16446\,ptの間違いではないか，と筆者は考えている．
   なお，奥村晴彦氏の\href{https://oku.edu.mie-u.ac.jp/~okumura/jsclasses/}%
   {p\LaTeXe 新ドキュメントクラス}では公称ポイントサイズ10\,ptに設定されている．
-}であり，\cs{maxdepth} はその半分の値（従って3.88794\,pt）である．
+}であり，\cs{maxdepth}はその半分の値（従って3.88794\,pt）である．
 
 いくつかのフォントについて，その中の文字の深さの最大値を見てみると
 表\ref{tab:baseline}のようになっている．
@@ -185,51 +206,51 @@ hoge\typeout{\the\topskip, \the\baselineskip, \the\textheight}
     \label{tab:baseline}}
 \end{table}
 欧文フォントのベースラインは，そのままでは和文との組み合わせが悪いので，
-さらに$\textsf{tbaselineshift}=3.41666\,\textrm{pt}$だけ下がることを考えると，
-最後の行に和文文字が来た場合はほぼ確実に深さが \cs{maxdepth} を超えてしまうことになる．
+さらに$\Pkg{tbaselineshift}=3.41666\,\textrm{pt}$だけ下がることを考えると，
+最後の行に和文文字が来た場合はほぼ確実に深さが\cs{maxdepth}を超えてしまうことになる．
 従って，本文領域を「\rensuji{$n$}行分」として指定するときによく使われる
 \begin{equation}
    \cs{textheight} = \cs{topskip} + (n-1)\cs{baselineskip}
  \label{eq:nline}
 \end{equation}
-は\textsf{tarticle}クラスのデフォルトでは通用しない．
+は\Pkg{tarticle}クラスのデフォルトでは通用しない．
 
 通常の地の文のみの文章においてほぼ確実に\eqref{eq:nline}が成り立つようにするため，
-\textsf{lltjp-geometry}では\emph{\texttt{lines}オプション指定時のみ} \cs{maxdepth} の値が
+\Pkg{lltjp-geometry}では\emph{\texttt{lines}オプション指定時のみ}\cs{maxdepth}の値が
 最低でも
 \begin{quote}
 公称ポイントサイズの半分に，欧文ベースラインのシフト量を加えた値%
-\footnote{\textsf{tarticle}の場合だと，
+\footnote{\Pkg{tarticle}の場合だと，
 $5\,\textrm{pt} + 3.41666\,\textrm{pt}=8.41666\,\textrm{pt}$である．}
 \end{quote}
-になるようにしている．\texttt{lines} オプション非指定時にはこのような調整は
+になるようにしている．\texttt{lines}オプション非指定時にはこのような調整は
 行われない．
 
 
 \subsection{見かけ上の基本版面の位置}
 \LaTeX では，
 本文の一行目のベースラインは，本文領域の「上端」から
- \ \cs{topskip}\ だけ「下がった」ところに来ることになっている．
-あまり \cs{topskip} が小さいと，ユーザが大きい文字サイズを指定した時に1行目のベースライン
+ \cs{topskip}\ だけ「下がった」ところに来ることになっている．
+あまり\cs{topskip}が小さいと，ユーザが大きい文字サイズを指定した時に1行目のベースライン
 位置が狂う危険があるため，
-\textsf{geometry}パッケージでは
+\Pkg{geometry}パッケージでは
 \begin{quote}
- \texttt{lines} オプション指定時，\cs{topskip} の値を最低でも
- \cs{strutbox} の高さ($0.7\cs{baselineskip}$)まで引き上げる
+ \texttt{lines}オプション指定時，\cs{topskip}の値を最低でも
+ \cs{strutbox}の高さ($0.7\cs{baselineskip}$)まで引き上げる
 \end{quote}
 という仕様になっている．
 
-縦組の場合は，\cs{strutbox} に対応するボックスは \cs{tstrutbox} であるため，
-\textsf{lltjp-geometry}では
+縦組の場合は，\cs{strutbox}に対応するボックスは\cs{tstrutbox}であるため，
+\Pkg{lltjp-geometry}では
 \begin{quote}
- \texttt{lines} オプション指定時，\cs{topskip} の値を最低でも
- \emph{\cs{tstrutbox} の高さ($\cs{baselineskip}/2$)}まで引き上げる
+ \texttt{lines}オプション指定時，\cs{topskip}の値を最低でも
+ \emph{\cs{tstrutbox}の高さ($\cs{baselineskip}/2$)}まで引き上げる
 \end{quote}
-という挙動にした．見かけ上は \cs{topskip} の値制限が緩くなったが，前節で述べたように
+という挙動にした．見かけ上は\cs{topskip}の値制限が緩くなったが，前節で述べたように
 欧文フォントのベースラインは和文に合うように下にずらされるので，
 実用上は問題は起きないだろう．
 
-前節の \cs{maxdepth} の調整も考え合わせると，\emph{\LaTeX が認識する本文領域と，
+前節の\cs{maxdepth}の調整も考え合わせると，\emph{\LaTeX が認識する本文領域と，
 実際の見た目の基本版面の位置とは異なる}ことに注意してほしい．
 
 \medskip
@@ -243,10 +264,10 @@ $5\,\textrm{pt} + 3.41666\,\textrm{pt}=8.41666\,\textrm{pt}$である．}
 \end{lstlisting}
 と指定すると，実際には以下のように設定される．
 \begin{itemize}
- \item \cs{topskip} は \cs{tstrutbox} の高さ8.5\,ptに設定される．
- \item 本文領域の「高さ」 \cs{textheight} は
+ \item\cs{topskip}は\cs{tstrutbox}の高さ8.5\,ptに設定される．
+ \item 本文領域の「高さ」\cs{textheight}は
 \[
- \cs{topskip} + (30-1)\cs{baselineskip} = 530.5\,\textrm{pt}.
+ \cs{topskip}+ (30-1)\cs{baselineskip}= 530.5\,\textrm{pt}.
 \]
  \item 従って，左余白と右余白は
 \[
@@ -254,12 +275,12 @@ $5\,\textrm{pt} + 3.41666\,\textrm{pt}=8.41666\,\textrm{pt}$である．}
 \]
 \end{itemize}
 しかし，実際にはページの最初の行のベースラインは，本文領域の右端から
-\ \cs{topskip} だけ左にずれたところにあり，
+\cs{topskip}だけ左にずれたところにあり，
 一方ページの最終行のベースラインは本文領域の左端にある．
 縦組和文フォントのベースラインは文字の左右中央を通ることから，
-従って，\emph{見た目で言えば，右余白の方が$\cs{topskip} =8.5\,\textrm{pt}$だけ
+従って，\emph{見た目で言えば，右余白の方が$\cs{topskip}=8.5\,\textrm{pt}$だけ
 大きい}ということになってしまう\footnote{%
-  同様に，横組で \texttt{vcentering} を指定すると，見かけでは
+  同様に，横組で \texttt{vcentering}を指定すると，見かけでは
   $\cs{topskip}-\cs{Cht}+\cs{Cdp}$だけ上余白が大きいように見える．
 }．
 
