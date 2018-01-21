@@ -815,8 +815,9 @@ For changes from \pTeX, see Subsection~\ref{ssec:chgptex}.
   Generally speaking, LuaJIT\TeX\ processes \LuaTeX-ja
   about 30\% faster than \LuaTeX, but not always%
   \footnote{%
-    LuaJIT has the 1\,GB~(or~2\,GB) memory limitation. So typesetting a large source by LuaJIT\TeX\ 
-    may cause an ``out of memory'' error.
+    LuaJIT has several limitations such as 1\,GB~(or~2\,GB) memory limitation.
+	So typesetting a large source by LuaJIT\TeX may cause an ``out of memory'' error,
+	or failure of loading/saving font cache of \Pkg{luaotfload}.
   }.
 %</en>
 %<*ja>
@@ -825,11 +826,13 @@ For changes from \pTeX, see Subsection~\ref{ssec:chgptex}.
 LuaJIT\TeX を用いると\LuaTeX のだいたい1.3倍の速度で動くようであるが，
 IPA mj明朝などの大きいフォントを用いた場合には\LuaTeX よりも遅くなることもある
   \footnote{%
-    LuaJITは1\,GB（あるいは2\,GB）のメモリ制限があることが知られている．そのため，
+    LuaJITは1\,GB（あるいは2\,GB）のメモリ制限など，いくつかの制限事項があることが知られている．そのため，
     大きいソースファイルをLuaJIT\TeX でタイプセットするとLuaの側で``out of memory''エラーが発生してしまう．
     本ドキュメントのように，「各ページごとにLuaで使っているメモリ容量をチェックし，
     必要なら\texttt{collectgarbage("collect")}でガベージコレクタを実行」すると
     状況が多少改善されるかもしれない．
+	また，LuaJIT\TeX でIPA mj明朝などの「大きい」フォントを利用した場合はフォントキャッシュの保存に失敗し，
+	毎回フォントを読み込まなければならず結果的に時間がかかることがある．
   }．
 %</ja>
 
@@ -1113,9 +1116,11 @@ Okumura), namely, \Pkg{ltjclasses}\footnote{%
 
 Original \Pkg{jsclasses} use \cs{mag}~primitive to set the main document font size.
 However, \LuaTeX\ beta-0.87.0~or~later does not support \cs{mag} in PDF~output,
-so \Pkg{ltjsclasses} use different method%
-\footnote{Similar to \texttt{magstyle=xreal} in the \Pkg{BXjscls} classes (by Takayuki Yato).}
-to set the main document font size.
+so \Pkg{ltjsclasses} uses the \texttt{nomag*} option\footnote{Same effect as 
+  the \Pkg{BXjscls} classes (by Takayuki Yato) and \Pkg{jsclasses}.
+  However, these classes uses only \TeX\ code, but \Pkg{ltjsclasses} uses Lua code.}
+ by default to set the main font size. If this causes some unexpected behavior, specify
+\texttt{nomag} option in \cs{documentclass}.
 %</en>
 %<*ja>
 しかしながら，上記の設定は日本語の文書にとって十分とは言えない．
@@ -1131,11 +1136,15 @@ to set the main document font size.
   \texttt{ltjsarticle.cls},~\texttt{ltjsbook.cls}, \texttt{ltjsreport.cls},~\texttt{ltjskiyou.cls}.}%
 がそれぞれ用意されている．
 
-元々の\Pkg{ltjsclasses}ではフォントサイズを指定するのに\cs{mag}プリミティブが使われていたが，
+元々の\Pkg{jsclasses}では本文のフォントサイズを設定するのに\cs{mag}プリミティブが使われていたが，
 \LuaTeX~beta-0.87.0以降ではPDF出力時の\cs{mag}のサポートが廃止された．
-そのため，\Pkg{ltjsclasses}では別の方法
-\footnote{八登崇之氏による\Pkg{BXjscls}クラスにおける\texttt{magstyle=xreal}指定時と類似している．}で
-フォントサイズを指定することにしている．
+そのため，\Pkg{ltjsclasses}では\texttt{nomag*}オプション
+\footnote{\Pkg{jsclasses}や，八登崇之氏による\Pkg{BXjscls}クラスにおける同名のオプションと
+  同じ．上記クラスは\TeX コードのみで実装しているが，\Pkg{ltjsclasses}ではLuaコードも用いている．}が標準で
+有効になっており，これを使って本文フォントサイズの設定を行っている．
+しかし，この\texttt{nomag*}オプションでは（20180121.0版より前の版において\Pkg{unicode-math}パッケージ使用時に
+起きたように）予想外の意図しない現象に遭遇する危険がある．そのような場合は
+\cs{documentclass}において\texttt{nomag}オプションを指定してほしい．
 %</ja>
 
 %<*ja>
