@@ -5457,6 +5457,56 @@ The correct way is using a temporary register.
 
 \end{itemize}
 
+
+%<*en>
+\subsection{Alternative Commands to \cs{ltjsetparameter}}
+The basic method to set parameters of \LuaTeX-ja is to use
+\cs{ltjsetparameter}~or~\cs{ltjglobalsetparameter}.
+However, these commands are slow, because they parse a key-value list,
+so several alternative commands are used in \LuaTeX-ja.
+\emph{This subsection is not for general \LuaTeX-ja users.}
+
+\paragraph{Setting \Param{kanjiskip}~or~\Param{xkanjiskip}}
+In \Pkg{ltjsclasses}, every size-changing command such as \cs{Large}
+changes \cs{kanjiskip}~and~\cs{xkanjiskip}.
+But a simple implementation, as the code below, is slow since
+two key-value lists are parsed by \cs{ltjsetparameter}:
+\begin{lstlisting}
+  \ltjsetparameter{kanjiskip=0\zw plus .1\zw minus .01\zw}
+  \@tempskipa=\ltjgetparameter{xkanjiskip}
+  \ifdim\@tempskipa>\z@
+    \if@slide
+      \ltjsetparameter{xkanjiskip=0.1em}
+    \else
+      \ltjsetparameter{xkanjiskip=0.25em plus 0.15em minus 0.06em}
+    \fi
+  \fi
+\end{lstlisting}
+
+Hence, \LuaTeX-ja defines more primitive commands, namely \cs{ltj@setpar@global},
+\cs{ltjsetkanjiskip}, and~\cs{ltjsetxkanjiskip}. Here
+\begin{quote}
+  \lstinline+\ltj@setpar@global\ltjsetkanjiskip 10pt+
+\end{quote}
+and \lstinline+\ltjsetparameter{kanjiskip=10pt}+ has the same effect.
+The actual code of \Pkg{ltjsclasses} is shown below:
+\begin{lstlisting}
+  \ltj@setpar@global
+  \ltjsetkanjiskip{\z@ plus .1\zw minus .01\zw}
+  \@tempskipa=\ltjgetparameter{xkanjiskip}
+  \ifdim\@tempskipa>\z@
+    \if@slide
+      \ltjsetxkanjiskip.1em
+    \else
+      \ltjsetxkanjiskip.25em plus .15em minus .06em
+    \fi
+  \fi
+\end{lstlisting}
+
+Note that using \cs{ltjsetkanjiskip}~or~\cs{ltjsetxkanjiskip} alone,
+that is, without executing \cs{ltj@setpar@global} in advance, is \emph{not} supported.
+%</en>
+
 %<*ja>
 \subsection{\cs{ltjsetparameter} の代替}
 原則として各種内部パラメータの設定には \cs{ltjsetparameter} もしくは
@@ -5465,7 +5515,7 @@ The correct way is using a temporary register.
 \LuaTeX-ja の内部ではより高速に実行できる別の形式を用いている．
 \emph{本節は一般利用者むけの内容ではない．}
 
-\paragraph{\Param{kanjiskip}, \Param{xkanjiskip} の設定}
+\paragraph{\Param{kanjiskip}, \Param{xkanjiskip}の設定}
 \pLaTeXe 新ドキュメントクラスでは，
 \begin{lstlisting}
 \def\@setfontsize#1#2#3{%
