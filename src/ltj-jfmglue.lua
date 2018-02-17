@@ -3,11 +3,10 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2017/05/05',
-  description = 'Insertion process of JFM glues and kanjiskip',
+  date = '2018/02/18',
+  description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
-module('luatexja.jfmglue', package.seeall)
-local err, warn, info, log = luatexbase .errwarinf(_NAME)
+luatexja.jfmglue = luatexja.jfmglue or {}
 
 luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('stack');     local ltjs = luatexja.stack
@@ -16,9 +15,8 @@ luatexja.load_module('direction'); local ltjd = luatexja.direction
 luatexja.load_module('setwidth');      local ltjw = luatexja.setwidth
 local pairs = pairs
 
-local nullfunc = function(n) return n end
-local to_node = node.direct.tonode
-local to_direct = node.direct.todirect
+--local to_node = node.direct.tonode
+--local to_direct = node.direct.todirect
 
 local setfield = node.direct.setfield
 local setglue = luatexja.setglue
@@ -88,7 +86,7 @@ local list_dir
 local capsule_glyph
 local tex_dir
 local attr_ablshift
-local set_np_xspc_jachar
+local set_np_xspc_jachar, set_np_xspc_alchar
 local set_np_xspc_jachar_hbox
 
 local ltjs_orig_char_table = ltjs.orig_char_table
@@ -147,7 +145,7 @@ end
 end
 
 -- 「異なる JFM」の間の調整方法
-diffmet_rule = math.two_paverage
+luatexja.jfmglue.diffmet_rule = math.two_paverage
 function math.two_add(a,b) return a+b end
 function math.two_average(a,b) return (a+b)*0.5 end
 function math.two_paverage(a,b) return (a+b)/2 end
@@ -165,6 +163,7 @@ local non_ihb_flag -- JFM グルー挿入抑止用 flag
 -------------------- hlist 内の文字の検索
 
 local first_char, last_char, find_first_char
+local check_box_high
 do
 local ltjd_glyph_from_packed = ltjd.glyph_from_packed
 local function check_box(box_ptr, box_end)
@@ -235,7 +234,7 @@ local function check_box(box_ptr, box_end)
    return found_visible_node
 end
 
-function check_box_high(Nx, box_ptr, box_end)
+check_box_high = function (Nx, box_ptr, box_end)
    first_char = nil;  last_char = nil;  find_first_char = true
    if check_box(box_ptr, box_end) then
       local first_char = first_char
@@ -555,7 +554,7 @@ end
 -- We think that "Np is a Japanese character" if Np.met~=nil,
 --            "Np is an alphabetic character" if Np.pre~=nil,
 --            "Np is not a character" otherwise.
-after_hlist = nil -- global
+local after_hlist = nil -- global
 local after_alchar, extract_np
 do
   local PRE  = luatexja.stack_table_index.PRE
@@ -601,6 +600,7 @@ do
 
 -- 欧文文字のデータを取得
    local floor = math.floor
+   local nullfunc = function(n) return n end
    function set_np_xspc_alchar(Nx, c,x, lig)
       if c~=-1 then
 	 local f = (lig ==1) and nullfunc or node_tail
@@ -648,7 +648,7 @@ end
 
 -------------------- 最下層の処理
 
-luatexbase.create_callback('luatexja.adjust_jfmglue', 'simple', nullfunc)
+luatexbase.create_callback('luatexja.adjust_jfmglue', 'simple', function(n) return n end)
 
 -- change penalties (or create a new penalty, if needed)
 local function handle_penalty_normal(post, pre, g)
@@ -749,11 +749,11 @@ do
    local bk_ak = 2*id_kern - id_kern
 
    local function blend_diffmet(b, a, rb, ra)
-      return round(diffmet_rule((1-rb)*b+rb*a, (1-ra)*b+ra*a))
+      return round(luatexja.jfmglue.diffmet_rule((1-rb)*b+rb*a, (1-ra)*b+ra*a))
    end
    calc_ja_ja_aux = function (gb, ga, db, da)
-      if diffmet_rule ~= math.two_pleft and diffmet_rule ~= math.two_pright
-          and diffmet_rule ~= math.two_paverage then
+      if luatexja.jfmglue.diffmet_rule ~= math.two_pleft and diffmet_rule ~= math.two_pright
+          and luatexja.jfmglue.diffmet_rule ~= math.two_paverage then
 	 db, da = 0, 1
       end
       if not gb then
@@ -808,6 +808,7 @@ end
 local null_skip_table = {0, 0, 0}
 -- get kanjiskip
 local get_kanjiskip, kanjiskip_jfm_flag
+local get_kanjiskip_low
 local calc_ja_ja_glue
 do
    local KANJI_SKIP   = luatexja.icflag_table.KANJI_SKIP
@@ -891,6 +892,7 @@ end
 -- get xkanjiskip
 local get_xkanjiskip, xkanjiskip_jfm_flag
 local get_xkanjiskip_normal, get_xkanjiskip_jfm
+local get_xkanjiskip_low
 do
    local XKANJI_SKIP   = luatexja.icflag_table.XKANJI_SKIP
    local XKANJI_SKIP_JFM   = luatexja.icflag_table.XKANJI_SKIP_JFM
@@ -1063,6 +1065,7 @@ end
 
 
 -- Nq が前側のクラスタとなることによる修正
+local adjust_nq
 do
    local adjust_nq_aux = {
       [id_glyph] = function() after_alchar(Nq) end, -- after_alchar(Nq)
@@ -1075,7 +1078,7 @@ do
 		     end,
    }
 
-   function adjust_nq()
+   adjust_nq=function()
       local x = adjust_nq_aux[Nq.id]
       if x then x()  end
    end
@@ -1213,7 +1216,7 @@ end
 -------------------- 外部から呼ばれる関数
 
 -- main interface
-function main(ahead, mode, dir)
+function luatexja.jfmglue.main(ahead, mode, dir)
    if not ahead then return ahead end
    --luatexja.ext_show_node_list(to_node(ahead ), '>B ', print)
    --print()
@@ -1254,7 +1257,7 @@ do
    local node_write = node.direct.write
 
    -- \inhibitglue
-   function create_inhibitglue_node()
+   function luatexja.jfmglue.create_inhibitglue_node()
       local tn = node_new(id_whatsit, sid_user)
       setfield(tn, 'user_id', IHB)
       setfield(tn, 'type', 100)
@@ -1264,7 +1267,7 @@ do
 
    -- Node for indicating beginning of a paragraph
    -- (for ltjsclasses)
-   function create_beginpar_node()
+   function luatexja.jfmglue.create_beginpar_node()
       local tn = node_new(id_whatsit, sid_user)
       setfield(tn, 'user_id', BPAR)
       setfield(tn, 'type', 100)
@@ -1273,7 +1276,7 @@ do
    end
 
    -- Node for indicating a head/end of a box
-   function create_boxbdd_node()
+   function luatexja.jfmglue.create_boxbdd_node()
       local tn = node_new(id_whatsit, sid_user)
       setfield(tn, 'user_id', BOXB)
       setfield(tn, 'type', 100)
@@ -1336,3 +1339,6 @@ do
                               "luatexja.beginpar.np_info_after", 1)
 
 end
+
+luatexja.jfmglue.after_hlist = after_hlist
+luatexja.jfmglue.check_box_high = check_box_high

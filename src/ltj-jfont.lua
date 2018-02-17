@@ -3,10 +3,9 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2017/09/04',
+  date = '2018/02/18',
   description = 'Loader for Japanese fonts',
 })
-module('luatexja.jfont', package.seeall)
 
 luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('charrange'); local ltjc = luatexja.charrange
@@ -31,12 +30,14 @@ local id_glyph = node.id('glyph')
 local id_kern = node.id('kern')
 local cat_lp = luatexbase.catcodetables['latex-package']
 local FROM_JFM     = luatexja.icflag_table.FROM_JFM
+
+luatexja.jfont = luatexja.jfont or {}
 ------------------------------------------------------------------------
 -- LOADING JFM
 ------------------------------------------------------------------------
 
-metrics={} -- this table stores all metric informations
-font_metric_table={} -- [font number] -> jfm_name, jfm_var, size
+local metrics={} -- this table stores all metric informations
+local font_metric_table={} -- [font number] -> jfm_name, jfm_var, size
 
 luatexbase.create_callback("luatexja.load_jfm", "data", function (ft, jn) return ft end)
 
@@ -54,7 +55,7 @@ local function norm_val(a)
    end
 end
 
-function define_jfm(t)
+function luatexja.jfont.define_jfm(t)
    local real_char -- Does current character class have the 'real' character?
    if t.dir~=jfm_dir then
       defjfm_res= nil; return
@@ -234,7 +235,8 @@ end
 luatexbase.create_callback("luatexja.find_char_class", "data",
 			   function (arg, fmtable, char)
 			      return 0
-			   end)
+			  end)
+local find_char_class
 do
    local start_time_measure = ltjb.start_time_measure
    local stop_time_measure = ltjb.stop_time_measure
@@ -287,7 +289,7 @@ do
 
 -- EXT
    local utf8 = unicode.utf8
-   function jfontdefX(g, dir, csname)
+   function luatexja.jfont.jfontdefX(g, dir, csname)
       jfm_dir, is_def_jfont = dir, true
       cstemp = csname:sub( (utf8.byte(csname,1,1) == tex.escapechar) and 2 or 1, -1)
       cstemp = cstemp:sub(1, ((cstemp:sub(-1,-1)==' ') and (cstemp:len()>=2)) and -2 or -1)
@@ -301,7 +303,7 @@ do
 -- EXT
    local identifiers = fonts.hashes.identifiers
    local provides_feature = luaotfload.aux.provides_feature
-   function jfontdefY()
+   function luatexja.jfont.jfontdefY()
       local j = load_jfont_metric(jfm_dir)
       local fn = font.id(cstemp)
       local f = font_getfont(fn)
@@ -352,12 +354,12 @@ do
    local dir_tate = luatexja.dir_table.dir_tate
    local tex_get_attr = tex.getattribute
    -- PUBLIC function
-   function get_zw()
+   function luatexja.jfont.get_zw()
       local a = font_metric_table[
 	 tex_get_attr((get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)]
       return a and a.zw or 0
    end
-   function get_zh()
+   function luatexja.jfont.get_zh()
       local a = font_metric_table[
 	 tex_get_attr((get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)]
       return a and a.zw or 0
@@ -451,25 +453,25 @@ end
 do
    -- these function are called from ltj-latex.sty
    local fenc_list, kyenc_list, ktenc_list = {}, {}, {}
-   function add_fenc_list(enc) fenc_list[enc] = 'true ' end
-   function add_kyenc_list(enc) kyenc_list[enc] = 'true ' end
-   function add_ktenc_list(enc) ktenc_list[enc] = 'true ' end
-   function is_kyenc(enc)
+   function luatexja.jfont.add_fenc_list(enc) fenc_list[enc] = 'true ' end
+   function luatexja.jfont.add_kyenc_list(enc) kyenc_list[enc] = 'true ' end
+   function luatexja.jfont.add_ktenc_list(enc) ktenc_list[enc] = 'true ' end
+   function luatexja.jfont.is_kyenc(enc)
       tex.sprint(cat_lp, '\\let\\ifin@\\if' .. (kyenc_list[enc] or 'false '))
    end
-   function is_ktenc(enc)
+   function luatexja.jfont.is_ktenc(enc)
       tex.sprint(cat_lp, '\\let\\ifin@\\if' .. (ktenc_list[enc] or 'false '))
    end
-   function is_kenc(enc)
+   function luatexja.jfont.is_kenc(enc)
       tex.sprint(cat_lp, '\\let\\ifin@\\if'
 		 .. (kyenc_list[enc] or ktenc_list[enc] or 'false '))
    end
 
    local kfam_list, Nkfam_list = {}, {}
-   function add_kfam(fam)
+   function luatexja.jfont.add_kfam(fam)
       kfam_list[fam]=true
    end
-   function search_kfam(fam, use_fd)
+   function luatexja.jfont.search_kfam(fam, use_fd)
       if kfam_list[fam] then
 	 tex.sprint(cat_lp, '\\let\\ifin@\\iftrue '); return
       elseif Nkfam_list[fam] then
@@ -491,20 +493,20 @@ do
       end
    end
    local ffam_list, Nffam_list = {}, {}
-   function is_ffam(fam)
+   function luatexja.jfont.is_ffam(fam)
       tex.sprint(cat_lp, '\\let\\ifin@\\if' .. (ffam_list[fam] or 'false '))
    end
-   function add_ffam(fam)
+   function luatexja.jfont.add_ffam(fam)
       ffam_list[fam]='true '
    end
-   function search_ffam_declared()
+   function luatexja.jfont.search_ffam_declared()
      local s = ''
      for i,_ in pairs(fenc_list) do
 	s = s .. '\\cdp@elt{' .. i .. '}'
      end
      tex.sprint(cat_lp, s)
    end
-   function search_ffam_fd(fam)
+   function luatexja.jfont.search_ffam_fd(fam)
       if Nffam_list[fam] then
 	 tex.sprint(cat_lp, '\\let\\ifin@\\iffalse '); return
       else
@@ -521,14 +523,13 @@ end
 ------------------------------------------------------------------------
 -- ALTERNATE FONTS
 ------------------------------------------------------------------------
-alt_font_table = {}
-local alt_font_table = alt_font_table
+local alt_font_table = {}
 local attr_curaltfnt = {}
 local ucs_out = 0x110000
 
 ------ for TeX interface
 -- EXT
-function set_alt_font(b,e,ind,bfnt)
+function luatexja.jfont.set_alt_font(b,e,ind,bfnt)
    -- ind: 新フォント, bfnt: 基底フォント
    if b>e then b, e = e, b end
    if b*e<=0 then
@@ -562,7 +563,7 @@ function set_alt_font(b,e,ind,bfnt)
 end
 
 -- EXT
-function clear_alt_font(bfnt)
+function luatexja.jfont.clear_alt_font(bfnt)
    if alt_font_table[bfnt] then
       local t = alt_font_table[bfnt]
       for i,_ in pairs(t) do t[i]=nil; end
@@ -570,7 +571,7 @@ function clear_alt_font(bfnt)
 end
 
 ------ used in ltjp.suppress_hyphenate_ja callback
-function replace_altfont(pf, pc)
+function luatexja.jfont.replace_altfont(pf, pc)
    local a = alt_font_table[pf]
    return a and a[pc] or pf
 end
@@ -580,7 +581,7 @@ end
 local alt_font_table_latex = {}
 
 -- EXT
-function clear_alt_font_latex(bbase)
+function luatexja.jfont.clear_alt_font_latex(bbase)
    local t = alt_font_table_latex[bbase]
    if t then
       for j,v in pairs(t) do t[j] = nil end
@@ -588,7 +589,7 @@ function clear_alt_font_latex(bbase)
 end
 
 -- EXT
-function set_alt_font_latex(b,e,ind,bbase)
+function luatexja.jfont.set_alt_font_latex(b,e,ind,bbase)
    -- ind: Alt font の enc/fam/ser/shape, bbase: 基底フォントの enc/fam/ser/shape
    if b>e then b, e = e, b end
    if b*e<=0 then
@@ -630,17 +631,17 @@ do
    local alt_font_base, alt_font_base_num
    local aftl_base
    -- EXT
-   function does_alt_set(bbase)
+   function luatexja.jfont.does_alt_set(bbase)
       aftl_base = alt_font_table_latex[bbase]
       tex.sprint(cat_lp, '\\if' .. (aftl_base and 'true' or 'false'))
    end
    -- EXT
-   function print_aftl_address()
+   function luatexja.jfont.print_aftl_address()
       tex.sprint(cat_lp, ';ltjaltfont' .. tostring(aftl_base):sub(8))
    end
 
 -- EXT
-   function output_alt_font_cmd(dir, bbase)
+   function luatexja.jfont.output_alt_font_cmd(dir, bbase)
       alt_font_base = bbase
       if dir == 't' then
 	 alt_font_base_num = tex.getattribute(attr_curtfnt)
@@ -660,7 +661,7 @@ do
    end
 
 -- EXT
-   function pickup_alt_font_a(size_str)
+   function luatexja.jfont.pickup_alt_font_a(size_str)
       local t = alt_font_table_latex[alt_font_base]
       if t then
          for i,v in pairs(t) do
@@ -679,7 +680,7 @@ do
    end
 
 -- EXT
-   function pickup_alt_font_b(afnt_num, afnt_base)
+   function luatexja.jfont.pickup_alt_font_b(afnt_num, afnt_base)
       local t = alt_font_table[alt_font_base_num]
       local ac = font_getfont(afnt_num).characters
       if not t then t = {}; alt_font_table[alt_font_base_num] = t end
@@ -703,7 +704,7 @@ end
 -- 終了時に各種ノードを破棄
 ------------------------------------------------------------------------
 do
-   function cleanup_size_cache()
+   function luatexja.jfont.cleanup_size_cache()
       --local gs, ke = 0, 0
       for _,n in pairs(metrics) do
 	 for i,t in pairs(n.size_cache) do
@@ -724,8 +725,8 @@ end
 ------------------------------------------------------------------------
 -- 追加のフォント情報
 ------------------------------------------------------------------------
-font_extra_info = {}
-local font_extra_info = font_extra_info -- key: fontnumber
+local font_extra_info = {}
+luatexja.jfont.font_extra_info= font_extra_info -- key: fontnumber
 local font_extra_basename = {} -- key: basename
 
 local list_rotate_glyphs
@@ -1154,7 +1155,7 @@ do
        end
    end
    -- EXT: italic correction
-   function append_italic()
+   function luatexja.jfont.append_italic()
       local p = to_direct(tex.nest[tex.nest.ptr].tail)
       local TEMP = node_new(id_kern)
       if p and getid(p)==id_glyph then
@@ -1180,4 +1181,8 @@ do
       node_free(TEMP)
    end
 end
+
+luatexja.jfont.metrics = metrics
+luatexja.jfont.font_metric_table = font_metric_table
+luatexja.jfont.find_char_class = find_char_class
 

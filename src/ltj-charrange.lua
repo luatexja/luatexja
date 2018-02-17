@@ -3,12 +3,10 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.charrange',
-  date = '2017/05/05',
+  date = '2018/02/18',
   description = 'Handling the range of Japanese characters',
 })
-module('luatexja.charrange', package.seeall)
-local err, warn, info, log = luatexbase.errwarinf(_NAME)
-
+luatexja.charrange = {}
 luatexja.load_module('base');      local ltjb = luatexja.base
 
 local getchar = node.direct.getchar
@@ -16,7 +14,8 @@ local has_attr = node.direct.has_attribute
 local has_attr_node = node.has_attribute
 local tex_getattr = tex.getattribute
 
-ATTR_RANGE = 7
+local ATTR_RANGE = 7
+luatexja.charrange.ATTR_RANGE = ATTR_RANGE
 local jcr_cjk, jcr_noncjk = 0, 1
 local floor = math.floor
 local pow = math.pow
@@ -40,8 +39,7 @@ pow_table[31*ATTR_RANGE] = pow(2, 31)
 --         external 217, 1  2       216, 217 and (out of range): 'other'
 
 -- initialize
-jcr_table_main = {}
-local jcr_table_main = jcr_table_main
+local jcr_table_main = {}
 local ucs_out = 0x110000
 
 for i=0x0 ,0x7F       do jcr_table_main[i]=-1 end
@@ -49,7 +47,7 @@ for i=0x80 ,0xFF      do jcr_table_main[i]=1 end
 for i=0x100,ucs_out-1 do jcr_table_main[i]=0 end
 
 -- EXT: add characters to a range
-function add_char_range(b,e,ind) -- ind: external range number
+function luatexja.charrange.add_char_range(b,e,ind) -- ind: external range number
    if not ind or ind<0 or ind>31*ATTR_RANGE then -- 0 はエラーにしない（隠し）
       ltjb.package_error('luatexja',
 			 "invalid character range number (" .. ind .. ")",
@@ -70,32 +68,30 @@ function add_char_range(b,e,ind) -- ind: external range number
    end
 end
 
-function char_to_range(c) -- return the external range number
+function luatexja.charrange.char_to_range(c) -- return the external range number
    local r = jcr_table_main[ltjb.in_unicode(c, false)] or 217
    return (r~=0) and r or 217
 end
 
-function get_range_setting(i) -- i: internal range number
+local function get_range_setting(i) -- i: internal range number
    return floor(tex_getattr(kcat_attr_table[i])/pow_table[i])%2
 end
 
 --  glyph_node p は和文文字か？
-function is_ucs_in_japanese_char_node(p)
+function luatexja.charrange.is_ucs_in_japanese_char(p)
    return nfn_table[jcr_table_main[c or p.char]](p)
 end
-is_ucs_in_japanese_char = is_ucs_in_japanese_char_node
--- only ltj-otf.lua uses this version
 
-function is_ucs_in_japanese_char_direct(p ,c)
+function luatexja.charrange.is_ucs_in_japanese_char_direct(p ,c)
    return fn_table[jcr_table_main[c or getchar(p)]](p)
 end
 
-function is_japanese_char_curlist(c) -- assume that c>=0x80
+function luatexja.charrange.is_japanese_char_curlist(c) -- assume that c>=0x80
    return get_range_setting(jcr_table_main[c])~= jcr_noncjk
 end
 
 -- EXT
-function toggle_char_range(g, i) -- i: external range number
+function luatexja.charrange.toggle_char_range(g, i) -- i: external range number
    if type(i)~='number' then
 	      ltjb.package_error('luatexja',
 				 "invalid character range number (" .. tostring(i).. ")",
@@ -111,5 +107,7 @@ function toggle_char_range(g, i) -- i: external range number
 		       (floor(a/pow_table[i+1])*2+kc)*pow_table[i]+a%pow_table[i])
    end
 end
+
+luatexja.charrange.get_range_setting=get_range_setting
 
 -- EOF

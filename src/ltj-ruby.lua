@@ -3,13 +3,12 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.ruby',
-  date = '2017/05/05',
+  date = '2018/02/18',
   description = 'Ruby annotation',
 })
-module('luatexja.ruby', package.seeall)
-local err, warn, info, log = luatexbase.errwarinf(_NAME)
-
+luatexja.ruby = {}
 luatexja.load_module('stack');     local ltjs = luatexja.stack
+luatexja.load_module('base');      local ltjb = luatexja.base
 
 local to_node =  node.direct.tonode
 local to_direct =  node.direct.todirect
@@ -74,7 +73,7 @@ local RUBY_POST = luatexja.userid_table.RUBY_POST
 ----------------------------------------------------------------
 do
    local getbox = node.direct.getbox
-   function cpbox() return node_copy(getbox(0)) end
+   function luatexja.ruby.cpbox() return node_copy(getbox(0)) end
 end
 
 ----------------------------------------------------------------
@@ -119,9 +118,9 @@ end
 
 
 -- 実行回数 + ルビ中身 から uniq_id を作る関数
-old_break_info = {} -- public, 前 run 時の分割情報
+local old_break_info = {} -- public, 前 run 時の分割情報
 local cache_handle
-function read_old_break_info()
+function luatexja.ruby.read_old_break_info()
    if  tex.jobname then
       local fname = tex.jobname .. '.ltjruby'
       local real_file = kpse.find_file(fname)
@@ -269,11 +268,11 @@ local function texiface_low(rst, rtlr, rtlp)
 end
 
 -- rst: table
-function texiface(rst, rtlr, rtlp)
+function luatexja.ruby.texiface(rst, rtlr, rtlp)
    if #rtlr ~= #rtlp then
       for i=1, #rtlr do node_free(rtlr[i]) end
       for i=1, #rtlp do node_free(rtlp[i]) end
-      luatexja.base.package_error('luatexja-ruby',
+      ltjb.package_error('luatexja-ruby',
 				  'Group count mismatch between the ruby and\n' ..
 				     'the body (' .. #rtlr .. ' != ' .. #rtlp .. ').',
 				  '')
