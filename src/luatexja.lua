@@ -3,14 +3,7 @@ require('lualibs')
 tableunpack = table.unpack
 
 ------------------------------------------------------------------------
--- naming:
---    ext_... : called from \directlua{}
---    int_... : called from other Lua codes, but not from \directlua{}
---    (other)     : only called from this file
-function luatexja.load_module(name)
-   require('ltj-' .. name.. '.lua')
-end
-function luatexja.load_lua(fn)
+local function load_lua(fn)
    local found = kpse.find_file(fn, 'tex')
    if not found then
       tex.error("LuaTeX-ja error: File `" .. fn .. "' not found")
@@ -18,6 +11,10 @@ function luatexja.load_lua(fn)
       texio.write_nl('(' .. found .. ')')
       dofile(found)
    end
+end
+luatexja.load_lua = load_lua
+function luatexja.load_module(name)
+   require('ltj-' .. name.. '.lua')
 end
 
 do
@@ -111,7 +108,7 @@ load_module('pretreat');  local ltjp = luatexja.pretreat
 load_module('setwidth');  local ltjw = luatexja.setwidth
 load_module('jfmglue');   local ltjj = luatexja.jfmglue -- +1 glue +1 gs +1 attr_list
 load_module('math');      local ltjm = luatexja.math
-load_module('tangle');    local ltjb = luatexja.base
+load_module('base');    local ltjb = luatexja.base
 
 
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']

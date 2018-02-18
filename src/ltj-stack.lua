@@ -3,12 +3,11 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.stack',
-  date = '2017/05/05',
+  date = '2018/02/18',
   description = 'LuaTeX-ja stack system',
 })
-module('luatexja.stack', package.seeall)
-local err, warn, info, log = luatexbase.errwarinf(_NAME)
-
+luatexja.stack = {}
+local ltjs=luatexja.stack
 luatexja.load_module('base');      local ltjb = luatexja.base
 
 --------------------------------------------------------------------------------
@@ -21,14 +20,14 @@ local STCK = luatexja.userid_table.STCK
 local fastcopy = table.fastcopy
 local setcount = tex.setcount
 local scan_int, scan_keyword = token.scan_int, token.scan_keyword
-hmode = 0 -- dummy
+ltjs.hmode = 0 -- dummy
 
-charprop_stack_table={};
-local charprop_stack_table = charprop_stack_table
+local charprop_stack_table={};
+ltjs.charprop_stack_table = charprop_stack_table
 charprop_stack_table[0]={}
 
 
-function get_stack_level()
+local function get_stack_level()
    local i = tex.getcount('ltj@@stack')
    local j = tex.currentgrouplevel
    if j > tex.getcount('ltj@@group@level') then
@@ -43,15 +42,16 @@ function get_stack_level()
       charprop_stack_table[i] = fastcopy(charprop_stack_table[i-1])
       setcount('ltj@@stack', i)
       if gd~=0 then tex.globaldefs = gd end
-      if  tex.nest[tex.nest.ptr].mode == -hmode then -- rest. hmode のみ
+      if  tex.nest[tex.nest.ptr].mode == -ltjs.hmode then -- rest. hmode のみ
 	 local g = node_new(id_whatsit, sid_user)
 	 g.user_id=STCK; g.type=100; g.value=j; node.write(g)
       end
    end
    return i
 end
+ltjs.get_stack_level = get_stack_level
 
-function set_stack_table(m, p)
+local function set_stack_table(m, p)
    local i = get_stack_level()
    charprop_stack_table[i][m] = p
    if luatexja.isglobal=='global' then
@@ -60,10 +60,10 @@ function set_stack_table(m, p)
       end
    end
 end
-local set_stack_table = set_stack_table
+ltjs.set_stack_table = set_stack_table
 
 -- EXT
-function set_stack_perchar(m,lb,ub, getter)
+function ltjs.set_stack_perchar(m,lb,ub, getter)
    local c = scan_int()
    scan_keyword(',')
    local p = tonumber((getter or scan_int)())
@@ -79,7 +79,7 @@ function set_stack_perchar(m,lb,ub, getter)
 end
 
 -- EXT
-function set_stack_font(m,c,p)
+function ltjs.set_stack_font(m,c,p)
    if type(c)~='number' or c<0 or c>255 then
       ltjb.package_error('luatexja',
 			 "invalid family number (".. tostring(c) .. ")",
@@ -91,7 +91,7 @@ function set_stack_font(m,c,p)
 end
 
 -- EXT: sp: glue_spec
-function set_stack_skip(m,sp)
+function ltjs.set_stack_skip(m,sp)
   local i = get_stack_level()
   if not sp then return end
   if not charprop_stack_table[i][m] then
@@ -116,24 +116,25 @@ end
 
 -- These three functions are used in ltj-jfmglue.lua.
 -- list_dir and orig_char_table are used in other lua files.
-orig_char_table = {}
-list_dir = nil -- dummy
-table_current_stack = nil -- dummy
-function report_stack_level(bsl)
-   table_current_stack = charprop_stack_table[bsl]
+local orig_char_table = {}
+ltjs.orig_char_table = orig_char_table
+ltjs.list_dir = nil -- dummy
+ltjs.table_current_stack = nil -- dummy
+function ltjs.report_stack_level(bsl)
+   ltjs.table_current_stack = charprop_stack_table[bsl]
    return bsl
 end
-function fast_get_stack_skip(m)
-   return table_current_stack[m]
+function ltjs.fast_get_stack_skip(m)
+   return ltjs.table_current_stack[m]
       or { width = 0, stretch = 0, shrink = 0, stretch_order = 0, shrink_order = 0 }
 end
 
 -- For other situations, use the following instead:
-function get_stack_skip(m, idx)
+function ltjs.get_stack_skip(m, idx)
    return charprop_stack_table[idx][m]
       or { width = 0, stretch = 0, shrink = 0, stretch_order = 0, shrink_order = 0 }
 end
-function get_stack_table(mc, d, idx)
+function ltjs.get_stack_table(mc, d, idx)
    local i = charprop_stack_table[idx][mc]
    return i or d
 end
