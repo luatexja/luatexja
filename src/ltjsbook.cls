@@ -1476,10 +1476,10 @@ class has defined the old font commands like\MessageBreak
     \color@begingroup
       \@makefntext{%
         \rule\z@\footnotesep\ignorespaces}%
-      \futurelet\next\fo@t}
-\def\fo@t{\ifcat\bgroup\noexpand\next \let\next\f@@t
-                                \else \let\next\f@t\fi \next}
-\def\f@@t{\bgroup\aftergroup\@foot\let\next}
+      \futurelet\ltj@@next\fo@t}
+\def\fo@t{\ifcat\bgroup\noexpand\ltj@@next \let\ltj@@next\f@@t
+                                \else \let\ltj@@next\f@t\fi \ltj@@next}
+\def\f@@t{\bgroup\aftergroup\@foot\let\ltj@@next}
 \def\f@t#1{#1\@foot}
 \def\@foot{\@finalstrut\strutbox\color@endgroup\egroup}
 \newcommand\@makefntext[1]{%

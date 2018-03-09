@@ -447,16 +447,16 @@ luatexja.base._error_show(true)% and many spaces trail!
 \protected\def\ltj@afterbox#1{%
   \def\ltj@afb@xarg{#1}%
   \afterassignment\ltj@afb@x
-  \chardef\next`.}
-\def\ltj@afb@x{\futurelet\next\ltj@afb@xtest}
+  \chardef\ltj@@next`.}
+\def\ltj@afb@x{\futurelet\ltj@@next\ltj@afb@xtest}
 \def\ltj@afb@xtest{%
-  \ifcase\ifx\next\hbox\tw@\fi
-         \ifx\next\vbox\tw@\fi
-         \ifx\next\vtop\tw@\fi
-         \ifx\next\box\@ne\fi
-         \ifx\next\copy\@ne\fi
-         \ifx\next\vsplit\@ne\fi
-         \ifx\next\lastbox\@ne\fi
+  \ifcase\ifx\ltj@@next\hbox\tw@\fi
+         \ifx\ltj@@next\vbox\tw@\fi
+         \ifx\ltj@@next\vtop\tw@\fi
+         \ifx\ltj@@next\box\@ne\fi
+         \ifx\ltj@@next\copy\@ne\fi
+         \ifx\ltj@@next\vsplit\@ne\fi
+         \ifx\ltj@@next\lastbox\@ne\fi
          0% ``A <box> was ...'' error will be causes by \setbox later anyway.
   \or\afterassignment\ltj@afb@xarg
   \or\afterassignment\ltj@afb@xagarg

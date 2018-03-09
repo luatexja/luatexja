@@ -422,10 +422,10 @@
 \define@key[ltj]{japaram}{jacharrange}{\expandafter\ltj@@scrange#1,,}
 \def\ltj@@scrange#1,{%
   \edef\ltj@temp{#1}%
-  \ifx\ltj@temp\empty\let\next=\relax\else\let\next=\ltj@@scrange
+  \ifx\ltj@temp\empty\let\ltj@@next=\relax\else\let\ltj@@next=\ltj@@scrange
     \directlua{luatexja.charrange.toggle_char_range(%
       luatexja.is_global,\ltj@safe@num@or{nil}{#1})}%
-  \fi\next
+  \fi\ltj@@next
 }
 
 \protected\def\ltj@setpar@global{%
@@ -574,7 +574,7 @@
 \let\orig@insert=\insert
 \protected\def\insert{\begingroup\afterassignment\ltj@@insert@A\ltj@tempcnta}
 \protected\def\ltj@@insert@A{\orig@insert\ltj@tempcnta\bgroup
-  \aftergroup\ltj@@insert@B\let\next}
+  \aftergroup\ltj@@insert@B\let\ltj@@next}
 \protected\def\ltj@@insert@B{\directlua{luatexja.direction.populate_insertion_dir_whatsit()}\endgroup}
 
 %%%% vadjust
@@ -582,7 +582,7 @@
 \protected\def\vadjust{%
   \ltj@@orig@vadjust\bgroup
   \directlua{luatexja.direction.set_list_direction_hook('adj')}%
-  \aftergroup\ltj@@vadjust@check@dir\let\next}
+  \aftergroup\ltj@@vadjust@check@dir\let\ltj@@next}
 \protected\def\ltj@@vadjust@check@dir{%
   \directlua{luatexja.direction.check_adjust_direction()}%
 }

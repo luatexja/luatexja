@@ -101,7 +101,7 @@
   \def\boutenchar{\char\euc"A1A2}%"
   \def\bou#1{\ifvmode\leavevmode\fi\@bou#1\end}
   \def\@bou#1{%
-    \ifx#1\end \let\next=\relax
+    \ifx#1\end \let\ltj@@next=\relax
     \else
       \ifnum\ltjgetparameter{direction}=3\relax
         \hbox to\z@{\vbox to\z@{\boxmaxdepth\maxdimen
@@ -112,8 +112,8 @@
           \vss\moveleft-0.2\zw\hbox{\boutenchar}\nointerlineskip
           \hbox{\char\euc"A1A1}}\hss}\nobreak#1\relax
       \fi
-      \let\next=\@bou
-    \fi\next}
+      \let\ltj@@next=\@bou
+    \fi\ltj@@next}
   \long\def\mbox#1{\leavevmode\hbox{#1}}
 \fi                             %</LaTeX>
 
