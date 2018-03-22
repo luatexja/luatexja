@@ -122,10 +122,19 @@
 \ltj@@decl@array@param{kansujichar}
 
 \ifltj@in@latex
+% \pltx@next@inhibitglue (pLaTeX 2018-03-09)
+\protected\def\pltx@next@inhibitglue{%
+  \ifhmode\inhibitglue\else
+  \edef\@tempa{\everypar{%
+    \everypar{\unexpanded\expandafter{\the\everypar}}%
+    \unexpanded\expandafter{\the\everypar}\inhibitglue}}%
+\@tempa\fi}
   \newcommand\printglossary{\@input@{\jobname.gls}}
+% \hour, \minute: define only
+  \newcount\hour
+  \newcount\minute
 \fi
-\newcount\hour
-\newcount\minute
+
 
 %%------------------ all done
 \ltj@compat@AtEnd
