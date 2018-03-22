@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsreport}
-  [2018/01/14 ltjsclasses ]
+  [2018/03/22 ltjsclasses ]
 \def\jsc@clsname{ltjsreport}
 \RequirePackage{luatexja}
 \newif\if@restonecol
@@ -1469,12 +1469,12 @@ class has defined the old font commands like\MessageBreak
     \color@begingroup
       \@makefntext{%
         \rule\z@\footnotesep\ignorespaces}%
-      \futurelet\ltj@@next\fo@t}
-\def\fo@t{\ifcat\bgroup\noexpand\ltj@@next \let\ltj@@next\f@@t
-                                \else \let\ltj@@next\f@t\fi \ltj@@next}
-\def\f@@t{\bgroup\aftergroup\@foot\let\ltj@@next}
-\def\f@t#1{#1\@foot}
-\def\@foot{\@finalstrut\strutbox\color@endgroup\egroup}
+      \futurelet\jsc@next\jsc@fo@t}
+\def\jsc@fo@t{\ifcat\bgroup\noexpand\jsc@next \let\jsc@next\jsc@f@@t
+                                \else \let\jsc@next\jsc@f@t\fi \jsc@next}
+\def\jsc@f@@t{\bgroup\aftergroup\jsc@@foot\let\jsc@next}
+\def\jsc@f@t#1{#1\jsc@@foot}
+\def\jsc@@foot{\@finalstrut\strutbox\color@endgroup\egroup}
 \newcommand\@makefntext[1]{%
   \advance\leftskip 3\zw
   \parindent 1\zw
