@@ -5,10 +5,10 @@
 %
 %  Copyright 1995-2001 ASCII Corporation.
 %  Copyright (c) 2010 ASCII MEDIA WORKS
-%  Copyright (c) 2016-2017 Japanese TeX Development Community
+%  Copyright (c) 2016-2018 Japanese TeX Development Community
 %
-%  This file is part of the pLaTeX2e system.
-%  -----------------------------------------
+%  This file is part of the pLaTeX2e system (community edition).
+%  -------------------------------------------------------------
 %
 % \fi
 %
@@ -114,7 +114,7 @@
 %   それを用いるように変更（PDFサイズ削減のため）．}
 % \changes{v1.7f}{2017/08/31}{和文書体の基準を全角空白から「漢」に変更}
 % \changes{v1.7g}{2017/09/19}{内部処理で使ったボックス0を空にした}
-% \changes{v1.7h}{2018/01/13}{和文スケール値\cs{Cjascale}を定義}
+% \changes{v1.7h}{2018/02/04}{和文スケール値\cs{Cjascale}を定義}
 % \fi
 %
 % \iffalse
@@ -144,7 +144,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2018/01/13 v1.7h-ltj-15
+  [2018/02/04 v1.7h-ltj-15
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -174,7 +174,7 @@
 %
 % \section{はじめに}
 % このファイルは、Lua\LaTeX-ja用の|jclasses|互換クラスファイルです。
-% v1.6をベースに作成しています。
+% コミュニティ版をベースに作成しています。
 % \dst{}プログラムによって、横組用のクラスファイルと縦組用のクラスファイル
 % を作成することができます。
 %
@@ -850,21 +850,20 @@
 % \end{macro}
 %
 % \begin{macro}{\Cjascale}
-% 和文スケール値（$1\,\mathrm{zw} \div \hbox{要求サイズ}$）を
+% このクラスファイルが意図する和文スケール値
+% （$1\,\mathrm{zw} \div \textmc{要求サイズ}$）を
 % 表す実数値マクロ|\Cjascale|を定義します。
-% ^^A p\LaTeXe{}の標準クラスでは、フォーマット作成時に読み込まれた
-% ^^A フォント定義ファイル（\file{jy1mc.fd} / \file{jy1gt.fd} /
-% ^^A \file{jt1mc.fd} / \file{jt1gt.fd}）での和文スケール値がそのまま
-% ^^A 有効ですので、これは1です。
 % この\texttt{jclasses}互換クラスでは、Lua\TeX-ja読み込み時の和文スケール値がそのまま
 % 使用され、その値は0.962216です。
-% \changes{v1.7h}{2018/01/13}{和文スケール値\cs{Cjascale}を定義}
+% \changes{v1.7h}{2018/02/04}{和文スケール値\cs{Cjascale}を定義}
 %    \begin{macrocode}
 %<*article|report|book>
 \def\Cjascale{0.962216}
 %</article|report|book>
 %    \end{macrocode}
 % \end{macro}
+%
+%
 %
 % \section{レイアウト}
 %
@@ -1542,7 +1541,7 @@
 % |\marginparwidth|を計算します。
 % ここで、|\@tempdima|の値は、\linebreak
 % |\paperwidth| $-$ |\textwidth|です。
-% \changes{v1.1d}{1995/11/24}{typo: \cs{marginmarwidth} to \cs{marginparwidth}}
+% \changes{v1.1d}{1995/11/24}{\break typo: \cs{marginmarwidth} to \cs{marginparwidth}}
 %    \begin{macrocode}
 %<*yoko>
   \if@twoside
@@ -2048,9 +2047,9 @@
 %<*report|book>
   \def\chaptermark##1{\markboth{%
      \ifnum \c@secnumdepth >\m@ne
-%<book>         \if@mainmatter
+%<book>       \if@mainmatter
          \@chapapp\thechapter\@chappos\hskip1\zw
-%<book>         \fi
+%<book>       \fi
      \fi
      ##1}{}}%
   \def\sectionmark##1{\markright{%
@@ -2077,9 +2076,9 @@
 %<*report|book>
 \def\chaptermark##1{\markright{%
    \ifnum \c@secnumdepth >\m@ne
-%<book>         \if@mainmatter
+%<book>     \if@mainmatter
        \@chapapp\thechapter\@chappos\hskip1\zw
-%<book>         \fi
+%<book>     \fi
    \fi
    ##1}}%
 %</report|book>
@@ -2124,9 +2123,9 @@
 %<*report|book>
 \def\chaptermark##1{\markboth{%
      \ifnum \c@secnumdepth >\m@ne
-%<book>         \if@mainmatter
+%<book>       \if@mainmatter
          \@chapapp\thechapter\@chappos\hskip1\zw
-%<book>         \fi
+%<book>       \fi
      \fi
      ##1}{}}%
   \def\sectionmark##1{\markright{%
@@ -2155,9 +2154,9 @@
 %<*report|book>
   \def\chaptermark##1{\markright{%
      \ifnum \c@secnumdepth >\m@ne
-%<book>         \if@mainmatter
+%<book>       \if@mainmatter
          \@chapapp\thechapter\@chappos\hskip1\zw
-%<book>         \fi
+%<book>       \fi
      \fi
      ##1}}%
 %</report|book>
@@ -2302,7 +2301,7 @@
 \if@compatibility
 \newenvironment{titlepage}
     {%
-%<book>      \cleardoublepage
+%<book>     \cleardoublepage
      \if@twocolumn\@restonecoltrue\onecolumn
      \else\@restonecolfalse\newpage\fi
      \thispagestyle{empty}%
@@ -2774,11 +2773,11 @@
 % \end{description}
 %
 % |\secdef|は次のようにして使うことができます。
-% \begin{verbatim}
+%\begin{verbatim}
 %    \def\chapter {... \secdef \CMDA \CMDB }
 %    \def\CMDA    [#1]#2{....} % \chapter[...]{...} の定義
 %    \def\CMDB    #1{....}     % \chapter*{...} の定義
-% \end{verbatim}
+%\end{verbatim}
 %
 %
 % \subsubsection{partレベル}
@@ -4311,7 +4310,7 @@
          \renewcommand\theenumiv{\@arabic\c@enumiv}}%
    \sloppy
 %    \end{macrocode}
-% \changes{v1.1a}{1997/01/23}{\LaTeX\ \texttt{!<1996/12/01!>}に合わせて修正}
+% \changes{v1.1a}{1997/01/23}{\break\LaTeX\ \texttt{!<1996/12/01!>}に合わせて修正}
 %    \begin{macrocode}
    \clubpenalty4000
    \@clubpenalty\clubpenalty

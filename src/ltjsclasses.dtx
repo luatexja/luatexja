@@ -69,10 +69,10 @@
 \addtolength{\marginparwidth}{1in}
 \setlength\marginparpush{0pt}
 % \OnlyDescription
+\CodelineNumbered
 \EnableCrossrefs
 \setcounter{StandardModuleDepth}{1}
 \GetFileInfo{ltjsclasses.dtx}
-\CodelineNumbered
 \begin{document}
 \DocInput{ltjsclasses.dtx}
 \end{document}
@@ -418,8 +418,6 @@
     This \jsc@clsname\space cls does not support `usemag'\MessageBreak
 	option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \jsc@mag@xrealtrue}
-
-
 %    \end{macrocode}
 %
 %
@@ -787,7 +785,7 @@
 %
 % [2016-04-04 LTJ] NFSSへのパッチを修正。
 %
-% [2017-01-23] \LaTeXe\ 2017-01-01以降ではTUエンコーディングが標準なので，
+% [2017-01-23 LTJ] \LaTeXe\ 2017-01-01以降ではTUエンコーディングが標準なので，
 % \texttt{type1cm}パッケージは読み込まないようにしました．
 %
 % [2017-02-17 LTJ] |\directlua|中で出力される数字のカテゴリーコードが12になるようにしました．
@@ -1332,10 +1330,10 @@
 %
 % |\small| も |\normalsize| と同様に設定します。
 % 行送りは，|\normalsize| が16ポイントなら，
-% 割合からすれば $16 \times 0.9 = 14.4$ ポイントになりますが，
+% 割合からすれば$16 \times 0.9 = 14.4$ポイントになりますが，
 % |\small| の使われ方を考えて，ここでは和文13ポイント，
 % 欧文11ポイントとします。
-% また，|\topsep| と |\parsep| は，元はそれぞれ $4 \pm 2$，$2 \pm 1$
+% また，|\topsep| と |\parsep| は，元はそれぞれ$4 \pm 2$，$2 \pm 1$
 % ポイントでしたが，ここではゼロ（|\z@|）にしました。
 %
 %    \begin{macrocode}
@@ -1586,7 +1584,6 @@
 % ので，2倍に増やしました。代わりに，版面の上下揃えの
 % 計算では |\headheight| ではなく |\topskip| を使う
 % ことにしました。
-%
 %
 % [2016-08-17] 圏点やルビが一行目に来た場合に下がるのを防ぐた
 % め，|\topskip| を10ptから1.38zwに増やしました。
@@ -1844,8 +1841,8 @@
 %
 %    \begin{macrocode}
 \def\flushbottom{%
-   \def\@textbottom{\vskip \z@ \@plus.1\jsc@mpt}%
-   \let\@texttop\relax}
+  \def\@textbottom{\vskip \z@ \@plus.1\jsc@mpt}%
+  \let\@texttop\relax}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1924,6 +1921,7 @@
 % |\topmargin| は従来の値から変わらないように調節しました。
 % …のつもりでしたが，|\textheight| を増やし忘れていたので
 % 変わってしまっていました（2016-08-26修正済み）。
+%
 %    \begin{macrocode}
 \setlength\topmargin{\paperheight}
 \addtolength\topmargin{-\textheight}
@@ -1969,8 +1967,8 @@
 %
 % フロート（図，表）関連のパラメータは\LaTeXe 本体で定義されていますが，
 % ここで設定変更します。本文ページ（本文とフロートが共存するページ）
-% ちなみに，カウンタは内部では |\c@| を名前に冠したマクロになっています。
 % とフロートだけのページで設定が異なります。
+% ちなみに，カウンタは内部では |\c@| を名前に冠したマクロになっています。
 %
 % \begin{macro}{\c@topnumber}
 %
@@ -2483,6 +2481,10 @@
 % 和文のものでは |\Large| になっていましたが，ここでは |\large|
 % にしました。
 %
+% [2016-11-16] スペーシングを元の |jsclasses| に合わせるため，|\smallskip| を
+% |\jsc@smallskip| に置き換えました。|\smallskip| のままでは
+% \texttt{nomag(*)} の場合にスケールしなくなり，レイアウトが変わってしまいます。
+%
 %    \begin{macrocode}
 %<*article|book|report|kiyou>
 \if@titlepage
@@ -2814,7 +2816,7 @@
   \if@slide
     {\vskip\if@twocolumn-5\jsc@mpt\else-6\jsc@mpt\fi
      \maybeblue\hrule height0\jsc@mpt depth1\jsc@mpt
-     \vskip\if@twocolumn 4\jsc@mpt\else 7\jsc@mpt\fi\relax}
+     \vskip\if@twocolumn 4\jsc@mpt\else 7\jsc@mpt\fi\relax}%
   \fi
   \par  % 2000-12-18
   \ignorespaces}
@@ -2977,6 +2979,15 @@
 %
 % ページ番号をローマ数字にし，章番号を付けないようにします。
 %
+% [2017-03-05] |\frontmatter| と |\mainmatter| の2つの命令は，
+% 改丁または改ページした後で |\pagenumbering{...}| でノンブルを1に
+% リセットします。長い間 |\frontmatter| は \texttt{openany} のときに
+% 単なる改ページとしていましたが，これではノンブルをリセットする際に
+% 偶奇逆転が起こる場合がありました。\texttt{openany} かどうかに依らず
+% 奇数ページまで繰るように修正することで，問題を解消しました。
+% 実は，\LaTeX の標準クラスでは1998年に修正されていた問題です
+% （コミュニティ版\pLaTeX の標準クラス2017/03/05も参照）。
+%
 %    \begin{macrocode}
 %<*book>
 \newcommand\frontmatter{%
@@ -2989,15 +3000,6 @@
 % \begin{macro}{\mainmatter}
 %
 % ページ番号を算用数字にし，章番号を付けるようにします。
-%
-% [2017-03-05] |\frontmatter| と |\mainmatter| の2つの命令は，
-% 改丁または改ページした後で |\pagenumbering{...}| でノンブルを1に
-% リセットします。長い間 |\frontmatter| は \texttt{openany} のときに
-% 単なる改ページとしていましたが，これではノンブルをリセットする際に
-% 偶奇逆転が起こる場合がありました。\texttt{openany} かどうかに依らず
-% 奇数ページまで繰るように修正することで，問題を解消しました。
-% 実は，\LaTeX の標準クラスでは1998年に修正されていた問題です
-% （コミュニティ版\pLaTeX の標準クラス2017/03/05も参照）。
 %
 %    \begin{macrocode}
 \newcommand\mainmatter{%
@@ -3014,7 +3016,7 @@
 %    \begin{macrocode}
 \newcommand\backmatter{%
   \if@openleft
-	\cleardoublepage
+    \cleardoublepage
   \else\if@openright
     \cleardoublepage
   \else
@@ -3070,7 +3072,7 @@
 %<*book|report>
 \newcommand\part{%
   \if@openleft
-	\cleardoublepage
+    \cleardoublepage
   \else\if@openright
     \cleardoublepage
   \else
@@ -5063,7 +5065,7 @@
 % 「注1」の形式にするには次のようにしてください。
 %
 %    \begin{macrocode}
-% \def\thefootnote{\ifnum\c@footnote>\z@注\kern0.1\zw\@arabic\c@footnote\fi}
+% \def\thefootnote{\ifnum\c@footnote>\z@ 注\kern0.1\zw\@arabic\c@footnote\fi}
 %    \end{macrocode}
 %
 % \end{macro}
@@ -5084,6 +5086,8 @@
 %
 % 脚注番号は章ごとにリセットされます。
 %
+% [2018-03-11] |\next|などいくつかの内部命令を |\jsc@...| 付きの
+% ユニークな名前にしました。
 %    \begin{macrocode}
 %<book|report>\@addtoreset{footnote}{chapter}
 %    \end{macrocode}
@@ -5169,7 +5173,7 @@
 % する機能がありますが，|\item| 直後ではラベル用のボックスが段落先頭になる
 % ため，うまく働きませんでした。形を変えて復活させます。
 %
-% [2017-04-03 LTJ] 従来クラフファイルで定義していた |\@inhibitglue| は，
+% [2017-04-03 LTJ] 従来クラスファイルで定義していた |\@inhibitglue| は，
 % Lua\TeX-jaのコアに |\ltjfakeparbegin| として正式に追加されたのでリネームします．
 %
 % |\item| 命令の直後です。
@@ -5258,7 +5262,7 @@
     \@nolnerr
   \else
     \unskip \reserved@e {\reserved@f#1}\nobreak \hfil \break \null
-    \inhibitglue\ignorespaces
+    \inhibitglue \ignorespaces
   \fi}
 %    \end{macrocode}
 %
@@ -5268,7 +5272,6 @@
 %
 % [2016-07-14] ロゴの定義は\texttt{jslogo}パッケージに移転しました。
 % 後方互換のため，\texttt{jsclasses}ではデフォルトでこれを読み込みます。
-%
 % \texttt{nojslogo}オプションが指定されている場合は読み込みません。
 %
 % [2016-07-21 LTJ] \texttt{jsclasses} とLua\TeX-jaの更新タイミングが一致しない可能性を考慮し，

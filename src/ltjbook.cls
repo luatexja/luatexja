@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjbook}
-  [2018/01/13 v1.7h-ltj-15
+  [2018/02/04 v1.7h-ltj-15
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -248,9 +248,9 @@
     \let\@mkboth\markboth
   \def\chaptermark##1{\markboth{%
      \ifnum \c@secnumdepth >\m@ne
-         \if@mainmatter
+       \if@mainmatter
          \@chapapp\thechapter\@chappos\hskip1\zw
-         \fi
+       \fi
      \fi
      ##1}{}}%
   \def\sectionmark##1{\markright{%
@@ -264,9 +264,9 @@
     \let\@mkboth\markboth
 \def\chaptermark##1{\markright{%
    \ifnum \c@secnumdepth >\m@ne
-         \if@mainmatter
+     \if@mainmatter
        \@chapapp\thechapter\@chappos\hskip1\zw
-         \fi
+     \fi
    \fi
    ##1}}%
   }
@@ -280,9 +280,9 @@
   \let\@mkboth\markboth
 \def\chaptermark##1{\markboth{%
      \ifnum \c@secnumdepth >\m@ne
-         \if@mainmatter
+       \if@mainmatter
          \@chapapp\thechapter\@chappos\hskip1\zw
-         \fi
+       \fi
      \fi
      ##1}{}}%
   \def\sectionmark##1{\markright{%
@@ -296,9 +296,9 @@
     \let\@mkboth\markboth
   \def\chaptermark##1{\markright{%
      \ifnum \c@secnumdepth >\m@ne
-         \if@mainmatter
+       \if@mainmatter
          \@chapapp\thechapter\@chappos\hskip1\zw
-         \fi
+       \fi
      \fi
      ##1}}%
   }
@@ -314,7 +314,7 @@
 \if@compatibility
 \newenvironment{titlepage}
     {%
-      \cleardoublepage
+     \cleardoublepage
      \if@twocolumn\@restonecoltrue\onecolumn
      \else\@restonecolfalse\newpage\fi
      \thispagestyle{empty}%

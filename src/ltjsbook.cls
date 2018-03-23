@@ -129,7 +129,6 @@
     This \jsc@clsname\space cls does not support `usemag'\MessageBreak
 option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \jsc@mag@xrealtrue}
-
 \hour\time \divide\hour by 60\relax
 \@tempcnta\hour \multiply\@tempcnta 60\relax
 \minute\time \advance\minute-\@tempcnta
@@ -529,8 +528,8 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \addtolength{\textheight}{\topskip}
 \addtolength{\textheight}{0.1\jsc@mpt}
 \def\flushbottom{%
-   \def\@textbottom{\vskip \z@ \@plus.1\jsc@mpt}%
-   \let\@texttop\relax}
+  \def\@textbottom{\vskip \z@ \@plus.1\jsc@mpt}%
+  \let\@texttop\relax}
 \setlength\marginparsep{\columnsep}
 \setlength\marginparpush{\baselineskip}
 \setlength{\oddsidemargin}{\paperwidth}
@@ -857,7 +856,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \if@slide
     {\vskip\if@twocolumn-5\jsc@mpt\else-6\jsc@mpt\fi
      \maybeblue\hrule height0\jsc@mpt depth1\jsc@mpt
-     \vskip\if@twocolumn 4\jsc@mpt\else 7\jsc@mpt\fi\relax}
+     \vskip\if@twocolumn 4\jsc@mpt\else 7\jsc@mpt\fi\relax}%
   \fi
   \par  % 2000-12-18
   \ignorespaces}
@@ -904,7 +903,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \pagenumbering{arabic}}
 \newcommand\backmatter{%
   \if@openleft
-\cleardoublepage
+    \cleardoublepage
   \else\if@openright
     \cleardoublepage
   \else
@@ -913,7 +912,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \@mainmatterfalse}
 \newcommand\part{%
   \if@openleft
-\cleardoublepage
+    \cleardoublepage
   \else\if@openright
     \cleardoublepage
   \else
@@ -1555,7 +1554,7 @@ class has defined the old font commands like\MessageBreak
     \@nolnerr
   \else
     \unskip \reserved@e {\reserved@f#1}\nobreak \hfil \break \null
-    \inhibitglue\ignorespaces
+    \inhibitglue \ignorespaces
   \fi}
 \IfFileExists{jslogo.sty}{}{\@jslogofalse}%
 \if@jslogo
