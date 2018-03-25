@@ -195,7 +195,9 @@
     \language\l@nohyphenation
     \@ifstar\@sverb\@verb}
 \fi
-\gdef\@stopfield{\null\color@endgroup\egroup}
+\gdef\@stopfield{%
+  \inhibitglue\@tempskipa\lastskip\unskip
+  \hskip\@tempskipa\color@endgroup\egroup}
 \pretocmd{\footnote}{\inhibitglue}{}{}
 \pretocmd{\footnotemark}{\inhibitglue}{}{}
 \patchcmd{\@footnotemark}{\@makefnmark}{%
@@ -324,5 +326,4 @@
 \def\ltj@unhbox@curfield{\ltjfakeboxbdd\unhbox\@curfield\ltjfakeboxbdd}
 %\patchcmd\@contfield{\unhbox\@curfield}{\ltj@unhbox@curfield}{}{}
 \patchcmd\@addfield{\unhbox\@curfield}{\ltj@unhbox@curfield}{}{}
-\pretocmd\@stopfield{\inhibitglue}{}{}
 \endinput
