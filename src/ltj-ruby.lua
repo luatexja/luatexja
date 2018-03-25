@@ -119,7 +119,7 @@ end
 
 -- 実行回数 + ルビ中身 から uniq_id を作る関数
 luatexja.ruby.old_break_info = {} -- public, 前 run 時の分割情報
-local old_break_info = old_break_info
+local old_break_info = luatexja.ruby.old_break_info
 local cache_handle
 function luatexja.ruby.read_old_break_info()
    if  tex.jobname then
