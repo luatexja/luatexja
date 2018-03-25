@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-array}[2017/06/18 Patch to array for LuaTeX-ja]
+\ProvidesPackage{lltjp-array}[2018/03/25 Patch to array for LuaTeX-ja]
 
 \RequirePackage{etoolbox,array,luatexja}
 
@@ -12,5 +12,14 @@
 }{%
    \ltj@sharp
 }{}{}
+
+%% remove extra \xkanjiskip (pLaTeX2e 2016/04/17)
+\def\@tabular{%
+	    \leavevmode \null
+	    \hbox \bgroup $\col@sep\tabcolsep \let\d@llarbegin\begingroup
+	                                      \let\d@llarend\endgroup
+	    \@tabarray}
+\def\endtabular{\endarray $\egroup\null}
+\expandafter \let \csname endtabular*\endcsname = \endtabular
 
 \endinput

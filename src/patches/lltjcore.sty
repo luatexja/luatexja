@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2017/11/12 Patch to LaTeX2e Kernel for LuaTeX-ja]
+\ProvidesPackage{lltjcore}[2018/03/25 Patch to LaTeX2e Kernel for LuaTeX-ja]
 \RequirePackage{etoolbox}
 
 \def\cleardoublepage{\clearpage\if@twoside
@@ -202,9 +202,6 @@
   \unless\ifnum\ltjgetparameter{direction}=3 \@makefnmark%
   \else\hbox to\z@{\hskip-.25\zw\raise.9\zh\@makefnmark\hss}\fi%
 }{}{}
-\patchcmd{\@tabular}{\leavevmode}{\leavevmode\null}{}{}
-\apptocmd{\endtabular}{\null}{}{}
-\expandafter \let \csname endtabular*\endcsname = \endtabular
 \let\@parboxto\@empty
 \long\def\@iiiparbox#1#2[#3]#4#5{%
   \leavevmode
@@ -289,7 +286,7 @@
 
 
 %%%%%% tabular (platex/#43) \@tabclassz
-\def\ltj@sharp{\ltjfakeboxbdd\ignorespaces\@sharp\unskip\ltjfakeboxbdd}
+\def\ltj@sharp{\relax\pltx@next@inhibitglue\ltjfakeboxbdd\ignorespaces\@sharp\unskip\ltjfakeboxbdd}
 \def\@tabclassz{%
   \ifcase\@lastchclass
     \@acolampacol
@@ -318,6 +315,9 @@
 }{%
    \everypar\expandafter{\the\everypar\ltjfakeboxbdd}\ignorespaces\@sharp\unskip
 }{}{}
+\patchcmd{\@tabular}{\leavevmode}{\leavevmode\null}{}{}
+\apptocmd{\endtabular}{\null}{}{}
+\expandafter \let \csname endtabular*\endcsname = \endtabular
 
 %%%%%% tabbing (platex/#53)
 \patchcmd\@startline{\strut}{\strut\inhibitglue}{}{}
