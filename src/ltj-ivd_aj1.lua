@@ -5,6 +5,11 @@ table_ivd_aj1 = {
 -- #
 -- # History:
 -- #
+-- # 2017-12-12 Registration of additional sequences in the Adobe-Japan1
+-- #            collection. Combined registration of the KRName collection
+-- #            and of sequences in that collection. Registration of
+-- #            additional sequences in the Moji_Joho collection.
+-- #
 -- # 2016-08-15 Combined registration of the MSARG collection and of
 -- #            sequences in that collection.
 -- #
@@ -27,7 +32,7 @@ table_ivd_aj1 = {
 -- # For more details on the IVD, see UTS #37:
 -- # http://www.unicode.org/reports/tr37/
 -- #
--- # Copyright 2006-2016 Unicode, Inc.
+-- # Copyright 2006-2017 Unicode, Inc.
 -- # For terms of use, see: http://www.unicode.org/terms_of_use.html
 -- #
 -- # EOF
@@ -13864,7 +13869,7 @@ table_ivd_aj1 = {
  4217781,
  2120710,
  4217871,
- 6315023,
+ 2282820,
  2120729,
  4222344,
  4225117,
@@ -13893,7 +13898,7 @@ table_ivd_aj1 = {
  4229642,
  6326794,
  4231109,
- 4229232,
+ 2286953,
  6328386,
  2110751,
  2275153,
@@ -14217,7 +14222,7 @@ table_ivd_aj1 = {
  6323765,
  4226627,
  4226700,
- 4226896,
+ 2286200,
  2229567,
  2253418,
  4350576,
@@ -14256,7 +14261,7 @@ table_ivd_aj1 = {
  4230553,
  2115558,
  4230708,
- 4230730,
+ 2287338,
  4231151,
  4231303,
  4231162,
