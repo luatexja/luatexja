@@ -2555,23 +2555,23 @@ for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 %</en>
 %<*ja>
 ネイティブにUnicode全部の文字を扱える\XeTeX や\LuaTeX では，
-文字が制御綴内で使用できるかは通常の欧文文字と同じく \cs{catcode}
-で指定することとなる．plain \XeTeX における \cs{catcode} の初期設定は\
-\texttt{unicode-letters.tex} 中に記述されており，plain \LuaTeX ではそれを
-元にした \texttt{luatex-unicode-letters.tex} を用いている．
-\LaTeX では \cs{catcode} の設定はカーネルに \texttt{unicode-letters.def} として統合され．
+文字が制御綴内で使用できるかは通常の欧文文字と同じく\cs{catcode}%
+で指定することとなる．plain \XeTeX における\cs{catcode}の初期設定は%
+\texttt{unicode-letters.tex}中に記述されており，plain \LuaTeX ではそれを
+元にした\texttt{luatex-unicode-letters.tex}を用いている．
+\LaTeX では\cs{catcode}の設定はカーネルに\texttt{unicode-letters.def}として統合され．
 このファイルを\XeLaTeX, \LuaLaTeX の両方が用いている．
 
-だが，\XeTeX における \cs{catcode} の初期設定と
+だが，\XeTeX における\cs{catcode}の初期設定と
 \LuaTeX におけるそれは一致していない：
 \begin{itemize}
- \item \texttt{luatex-unicode-letters.tex} の元になった\
-\texttt{unicode-letters.tex} が古い
- \item \texttt{unicode-letters.tex} 後半部や \texttt{unicode-letters.def} 後半部では
-\cs{XeTeXcharclass} の設定を行なっており，
-それによって漢字や仮名，および全角英数字の \cs{catcode} が11に設定されている．
-しかし，\texttt{luatex-unicode-letters.tex} ではこの「後半部」が
-まるごと省略されており，また\LuaLaTeX でも \texttt{unicode-letters.def} 後半部は実行されな
+ \item \texttt{luatex-unicode-letters.tex} の元になった
+  \texttt{unicode-letters.tex}が古い
+ \item \texttt{unicode-letters.tex} 後半部や\texttt{unicode-letters.def}後半部では
+\cs{XeTeXcharclass}の設定を行なっており，
+それによって漢字や仮名，および全角英数字の\cs{catcode}が11に設定されている．
+しかし，\texttt{luatex-unicode-letters.tex}ではこの「後半部」が
+まるごと省略されており，また\LuaLaTeX でも\texttt{unicode-letters.def}後半部は実行されな
        い．
 \end{itemize}
 言い換えると，
@@ -2582,10 +2582,10 @@ for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 \LuaLaTeX では漢字や仮名を制御綴内に
 使用することが可能になったが，全角英数字は相変わらず使用できない，
 \end{description}
-これでは \pTeX で使用できた \verb+\１年目西暦+\footnote{科研費\LaTeX で使用されているそうです．}などが使えないこととなり，
+これでは\pTeX で使用できた\verb+\１年目西暦+\footnote{科研費\LaTeX で使用されているそうです．}などが使えないこととなり，
 \LuaTeX-jaへの移行で手間が生じる．そのため，\LuaTeX-jaでは
-\texttt{unicode-letters.tex} の後半部にあたる内容を自前でパッチし，
-結果として\textbf{\XeTeX における初期設定と同じになるようにしている．}
+\texttt{unicode-letters.tex}の後半部にあたる内容を自前でパッチし，
+結果として\emph{\XeTeX における初期設定と同じになるようにしている．}
 %</ja>
 
 \begin{table}
@@ -4313,6 +4313,9 @@ JFMによって本来挿入されるグルーの他に
 自然長・縮み量半角，伸び量0のグルー
 となっているが，さらに\Param{kanjiskip}の伸び量に \texttt{kanjiskip\_stretch}（ここでは1）を掛け
        た分だけ伸びることが許される．
+ \item 一方，開き括弧類と通常の文字の間，また通常の文字と閉じ括弧類の間は
+  自然長・縮み量・伸び量0のグルーだが，\Param{kanjiskip}の縮み量に
+  \texttt{kanjiskip\_shrink}（ここでは1）を掛けた分だけ縮むことが許される．
 \end{itemize}
 となっている．従って，以下のような組版結果を得る．
 
@@ -4321,6 +4324,10 @@ JFMによって本来挿入されるグルーの他に
 \leavevmode
 \ltjsetparameter{kanjiskip=0pt plus 3\zw}
 \vrule\hbox to 15\zw{あ「い」う，えお}\vrule
+
+\vrule\hbox{あ「い」う，えお}\vrule\par
+\ltjsetparameter{kanjiskip=0pt minus \zw}
+\vrule\hbox to 6.5\zw{あ「い」う，えお}\vrule
 \end{LTXexample}
 
 \end{cslist}
@@ -4355,6 +4362,10 @@ a glue whose natural part and shrink part are both half-width, while its stretch
        Again, this glue also can be stretched
        as much as the stretch part of \Param{kanjiskip} times the value of
        \texttt{kanjiskip\_stretch} key (1 in this case).
+ \item Between an ideographic opening bracket and an ordinal letter
+  and between an ordinal letter and an ideographic closing bracket,
+  we have a glue whose natural part and stretch part are both zero, while its shrink part as much as
+  the shrink part of \Param{kanjiskip}.
 \end{itemize}
 Hence we have the following result:
 
@@ -4363,6 +4374,10 @@ Hence we have the following result:
 \leavevmode
 \ltjsetparameter{kanjiskip=0pt plus 3\zw}
 \vrule\hbox to 15\zw{あ「い」う，えお}\vrule
+
+\vrule\hbox{あ「い」う，えお}\vrule\par
+\ltjsetparameter{kanjiskip=0pt minus \zw}
+\vrule\hbox to 6.5\zw{あ「い」う，えお}\vrule
 \end{LTXexample}
 
 \end{cslist}
@@ -4382,7 +4397,7 @@ Hence we have the following result:
 
   \item[end\_adjust=\{<kern>, <kern>, ...\}]
 %<*ja>
-（任意，バージョン2のみ）
+（任意，バージョン2以降）
 
 優先順位付き行長調整が有効であり，かつ現在の文字クラスの文字が
   行末に来た時に，この文字と行末の間には指定された値のいずれかの大きさのカーンが
@@ -4392,14 +4407,14 @@ Hence we have the following result:
 \begin{lstlisting}[escapechar=\$]
     end_stretch = $a$, end_shrink = $b$
 \end{lstlisting}
-という指定は，バージョン2では次の指定と同じになる．
+という指定は，バージョン2以降では次の指定と同じになる．
 \begin{lstlisting}[escapechar=\$]
     end_adjust = {$-b$, 0.0, $a$}
 \end{lstlisting}
 もし真ん中の \texttt{0.0} がない場合は，$a$か$-b$かいずれかのカーンが常に行末に追加される．
 %</ja>
 %<*en>
-(optional, version~2 only)
+(optional, version~2 or~later)
 %</en>
 
 \end{cslist}
@@ -4544,7 +4559,7 @@ The following is the list of imaginary characters:
 
 \item['glue']
 %<en>(version 3~or~later) A boundary between \textbf{JAchar}, and, a glue or kern.
-%<ja>（バージョン3以降））\textbf{JAchar}とglue，kernとの境界．
+%<ja>（バージョン3以降）\textbf{JAchar}とglue，kernとの境界．
 
 \item[$-1$]
 %<en>The left/right boundary of an inline math formula.

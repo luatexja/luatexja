@@ -78,7 +78,7 @@ local t = {
    },
 
    [3] = { -- 中点類
-      chars = {'・', '：', '；'},
+      chars = {'・', '：', '；', '·'},
       align = 'middle', left = 0.0, down = 0.0,
       width = 0.5, height = 0.88, depth = 0.12, italic=0.0,
       --end_stretch = 0.25,
