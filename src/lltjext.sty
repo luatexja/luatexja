@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjext}[2017/08/27 v1.2g-ltj-8 Macros for vertical writing]
+\ProvidesPackage{lltjext}[2018/03/29 v1.2g-ltj-9 Macros for vertical writing]
 \RequirePackage{luatexja}
 \newcount\ltj@ext@dir
 {\catcode`\*=11
@@ -28,7 +28,8 @@
    \setlength\dimen@{#2}%
    \edef\@halignto{to\the\dimen@}\p@tabular<#1>}
 \def\p@tabular<#1>{\leavevmode \hbox \bgroup 
-   \ltj@ext@dir=\ltjgetparameter{direction}$\let\@acol\@tabacol
+   \ltj@ext@dir=\ltjgetparameter{direction}
+   $\let\@acol\@tabacol
    \let\@classz\@tabclassz
    \let\@classiv\@tabclassiv \let\\\@tabularcr\p@tabarray<#1>}
 \def\p@tabarray<#1>{\m@th\@ifnextchar[%]
@@ -651,7 +652,7 @@
 
 \def\ltj@lltjext@patch@array{%
   \patchcmd{\@tabular}{\hbox\bgroup}{%
-	\hbox\bgroup\ltj@ext@dir=\ltjgetparameter{direction}}{}{}
+	\hbox\bgroup\ltj@ext@dir=\ltjgetparameter{direction}}{\typeout{SUCC}}{}
   \pretocmd{\array}%
 	{\ltj@ext@dir=\ltjgetparameter{direction}\relax}{}{}
   \def\@startpbox##1{\bgroup

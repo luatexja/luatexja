@@ -3584,6 +3584,28 @@ JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 3キーは再び有効化される．\texttt{-ltjksp}, \texttt{+ltjksp} を複数回指定した場合は，
 最後に指定したものが有効となる．
 %</ja>
+%<*en>
+\paragraph{\texttt{ltjksp}}
+\label{pg:ltjksp}
+\texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
+\texttt{kanjiskip\_shrink} keys (Page~\pageref{pg:ksp_nat}) makes tha
+\LuaTeX-ja inserts not only a glue which is specified by a JFM, and also
+the natural width/stretch part/shrink part of \Param{kanjiskip}.
+
+This functionality is disabled by \texttt{-ltjksp} specification.
+\begin{LTXexample}[width=16\zw]
+\leavevmode
+\ltjsetparameter{kanjiskip=0pt plus 3\zw}
+\vrule\hbox to 15\zw{あ「い」う，えお}\vrule
+
+\jfont\G=file:KozMinPr6N-Regular.otf%
+  :jfm=ujis;-ltjksp at 9.2487pt
+\G\leavevmode%
+\vrule\hbox to 15\zw{あ「い」う，えお}\vrule
+\end{LTXexample}
+%</en>
+
+
 
 
 %<en>\subsection{\cs{tfont}}
@@ -4382,7 +4404,7 @@ Hence we have the following result:
 
 \end{cslist}
 %</en>
-
+  
 \item[end\_stretch=<kern>, end\_shrink=<kern>]
 %<*ja>
 （任意，バージョン1のみ）
