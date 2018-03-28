@@ -130,11 +130,9 @@
     \unexpanded\expandafter{\the\everypar}\inhibitglue}}%
 \@tempa\fi}
   \newcommand\printglossary{\@input@{\jobname.gls}}
-% \hour, \minute: define only
-  \newcount\hour
-  \newcount\minute
+\csname newcount\endcsname\hour
+\csname newcount\endcsname\minute
 \fi
-
 
 %%------------------ all done
 \ltj@compat@AtEnd
