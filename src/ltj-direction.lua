@@ -640,7 +640,10 @@ do
       local bh = getlist(b)
       local box_dir, dn =  get_box_dir(b, ltjs.list_dir)
       -- 既に b の中身にあるwhatsit
-
+      if not dn then
+	bh = create_dir_whatsit(bh, 'make_dir_whatsit', dir_yoko)
+	dn = bh; setfield(b, 'head', bh)
+      end
       if box_dir%dir_math_mod==new_dir then
 	 if box_dir>=dir_node_auto then
 	    -- dir_node としてカプセル化されている
