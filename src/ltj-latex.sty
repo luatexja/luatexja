@@ -89,6 +89,12 @@
   % \RequirePackage だと fontspec にオプション指定したときにエラー出る
 }
 
+\@ifpackageloaded{siunitx}{%
+  \chardef\ltj@patch@siunitx@execute\z@\input{lltjp-siunitx.sty}%
+}{%
+  \AtBeginOfPackageFile*{siunitx}{\input{lltjp-siunitx.sty}}%
+}
+\AtEndOfPackageFile*{siunitx}{\csname __ltj_siunitx_patch:\endcsname}
 
 %%------------------ all done
 \ltj@latex@AtEnd

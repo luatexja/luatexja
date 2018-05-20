@@ -1,0 +1,19 @@
+\documentclass{scrbook}
+  %\usepackage{luatexja}
+  \usepackage{fontspec}
+  \usepackage{luatexja-fontspec}
+  \usepackage[
+    mode=text,
+    detect-all,
+]{siunitx}
+  %\usepackage{luatexja-fontspec}
+\makeatletter
+\typeout{\meaning\@begindocumenthook}
+\begin{document}
+  \ifdefined\gtfamily\gtfamily\fi Ω
+  {\ExplSyntaxOn\makeatletter
+   \ttfamily\meaning\@begindocumenthook}
+  
+  \SI{-2.5e-10}{mol.L^{-1}}\SI{1}{\micro\metre\angstrom\arcminute\arcsecond\ohm}
+  \vrule\SI{}{\ohm}\vrule
+  \end{document}
