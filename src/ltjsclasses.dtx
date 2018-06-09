@@ -44,7 +44,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2018/03/22 ltjsclasses ]
+  [2018/06/09 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass{ltjsarticle}
@@ -1006,9 +1006,14 @@
 % [2016-01-30 LTJ] |\rmfamily|, |\sffamily|, |\ttfamily| の再定義をLua\TeX-ja
 % カーネルに移動させたので，ここでは和文対応にするフラグ |\@ltj@match@family|\
 % を有効にさせるだけでよいです。
+%
+% [2018-06-09 LTJ] シリーズ|b|は同じ書体の|bx|と等価になるように宣言します。
+%
 %    \begin{macrocode}
 \DeclareFontShape{JY3}{mc}{bx}{n}{<->ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{gt}{bx}{n}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JY3}{mc}{b}{n}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JY3}{mc}{b}{n}{<->ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{mc}{m}{it}{<->ssub*mc/m/n}{}
 \DeclareFontShape{JY3}{mc}{m}{sl}{<->ssub*mc/m/n}{}
 \DeclareFontShape{JY3}{mc}{m}{sc}{<->ssub*mc/m/n}{}
@@ -1016,15 +1021,21 @@
 \DeclareFontShape{JY3}{gt}{m}{sl}{<->ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{mc}{bx}{it}{<->ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{mc}{bx}{sl}{<->ssub*gt/m/n}{}
-% \DeclareFontShape{JT3}{mc}{bx}{n}{<->ssub*gt/m/n}{}
-% \DeclareFontShape{JT3}{gt}{bx}{n}{<->ssub*gt/m/n}{}
-%% \DeclareFontShape{JT3}{mc}{m}{it}{<->ssub*mc/m/n}{}
-%% \DeclareFontShape{JT3}{mc}{m}{sl}{<->ssub*mc/m/n}{}
-%% \DeclareFontShape{JT3}{mc}{m}{sc}{<->ssub*mc/m/n}{}
-%% \DeclareFontShape{JT3}{gt}{m}{it}{<->ssub*gt/m/n}{}
-%% \DeclareFontShape{JT3}{gt}{m}{sl}{<->ssub*gt/m/n}{}
-%% \DeclareFontShape{JT3}{mc}{bx}{it}{<->ssub*gt/m/n}{}
-%% \DeclareFontShape{JT3}{mc}{bx}{sl}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JY3}{mc}{b}{it}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JY3}{mc}{b}{sl}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{mc}{bx}{n}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{gt}{bx}{n}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{mc}{b}{n}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{mc}{b}{n}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{mc}{m}{it}{<->ssub*mc/m/n}{}
+\DeclareFontShape{JT3}{mc}{m}{sl}{<->ssub*mc/m/n}{}
+\DeclareFontShape{JT3}{mc}{m}{sc}{<->ssub*mc/m/n}{}
+\DeclareFontShape{JT3}{gt}{m}{it}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{gt}{m}{sl}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{mc}{bx}{it}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{mc}{bx}{sl}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{mc}{b}{it}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{mc}{b}{sl}{<->ssub*gt/m/n}{}
 \renewcommand\jttdefault{\gtdefault}\@ltj@match@familytrue
 %    \end{macrocode}
 %%

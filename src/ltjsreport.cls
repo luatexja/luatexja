@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsreport}
-  [2018/03/22 ltjsclasses ]
+  [2018/06/09 ltjsclasses ]
 \def\jsc@clsname{ltjsreport}
 \RequirePackage{luatexja}
 \newif\if@restonecol
@@ -329,6 +329,8 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \DeclareFontShape{JT3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:jfm=ujisv}{}
 \DeclareFontShape{JY3}{mc}{bx}{n}{<->ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{gt}{bx}{n}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JY3}{mc}{b}{n}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JY3}{mc}{b}{n}{<->ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{mc}{m}{it}{<->ssub*mc/m/n}{}
 \DeclareFontShape{JY3}{mc}{m}{sl}{<->ssub*mc/m/n}{}
 \DeclareFontShape{JY3}{mc}{m}{sc}{<->ssub*mc/m/n}{}
@@ -336,13 +338,21 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \DeclareFontShape{JY3}{gt}{m}{sl}{<->ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{mc}{bx}{it}{<->ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{mc}{bx}{sl}{<->ssub*gt/m/n}{}
-%% \DeclareFontShape{JT3}{mc}{m}{it}{<->ssub*mc/m/n}{}
-%% \DeclareFontShape{JT3}{mc}{m}{sl}{<->ssub*mc/m/n}{}
-%% \DeclareFontShape{JT3}{mc}{m}{sc}{<->ssub*mc/m/n}{}
-%% \DeclareFontShape{JT3}{gt}{m}{it}{<->ssub*gt/m/n}{}
-%% \DeclareFontShape{JT3}{gt}{m}{sl}{<->ssub*gt/m/n}{}
-%% \DeclareFontShape{JT3}{mc}{bx}{it}{<->ssub*gt/m/n}{}
-%% \DeclareFontShape{JT3}{mc}{bx}{sl}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JY3}{mc}{b}{it}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JY3}{mc}{b}{sl}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{mc}{bx}{n}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{gt}{bx}{n}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{mc}{b}{n}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{mc}{b}{n}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{mc}{m}{it}{<->ssub*mc/m/n}{}
+\DeclareFontShape{JT3}{mc}{m}{sl}{<->ssub*mc/m/n}{}
+\DeclareFontShape{JT3}{mc}{m}{sc}{<->ssub*mc/m/n}{}
+\DeclareFontShape{JT3}{gt}{m}{it}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{gt}{m}{sl}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{mc}{bx}{it}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{mc}{bx}{sl}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{mc}{b}{it}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{mc}{b}{sl}{<->ssub*gt/m/n}{}
 \renewcommand\jttdefault{\gtdefault}\@ltj@match@familytrue
 %%
 \AtBeginDocument{%
