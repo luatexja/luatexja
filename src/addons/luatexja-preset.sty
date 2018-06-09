@@ -428,9 +428,9 @@
 %%%%%%%% deluxe (\mgfamily はあとで定義）
 \bool_if:NTF \g_ltjpreset_deluxe_bool {
   \cs_new:Nn \ltjpreset_check_deluxe_existence: {
-    \ltjpreset_substitute:nnnn { gt } { eb } { gt } { bx }
-    \ltjpreset_substitute:nnnn { mg } { m  } { gt } { bx }
-    \ltjpreset_substitute:nnnn { mc } { l  } { mc } { m  }
+    \ltjpreset_substitute:nnnn { gt } { eb } { gt } { \bfdefault }
+    \ltjpreset_substitute:nnnn { mg } { \mddefault  } { gt } { \bfdefault }
+    \ltjpreset_substitute:nnnn { mc } { l  } { mc } { \mddefault  }
   }
   \def\ltdefault{l}
   \DeclareRobustCommand\ltseries { \not@math@alphabet\ltseries\relax\fontseries\ltdefault\selectfont }
@@ -470,9 +470,9 @@
   \DeclareKanjiFamily{JY3}{ltjpm}{}\DeclareKanjiFamily{JT3}{ltjpm}{}
   \DeclareKanjiFamily{JY3}{ltjpg}{}\DeclareKanjiFamily{JT3}{ltjpg}{}
   \def\mcdefault{ltjpm}\def\gtdefault{ltjpg}
-  \SetSymbolFont{mincho}{normal}{JY3}{ltjpm}{m}{n}
-  \SetSymbolFont{mincho}{bold}{JY3}{ltjpm}{bx}{n}
-  \DeclareMathAlphabet{\mathgt}{JY3}{ltjpg}{m}{n}
+  \SetSymbolFont{mincho}{normal}{JY3}{ltjpm}{\mddefault}{n}
+  \SetSymbolFont{mincho}{bold}{JY3}{ltjpm}{\bfdefault}{n}
+  \DeclareMathAlphabet{\mathgt}{JY3}{ltjpg}{\mddefault}{n}
   \bool_if:NT \g_ltjpreset_expert_bool {
     \DeclareRobustCommand\rubyfamily { \kanjishape{rb}\selectfont }
   }
@@ -494,10 +494,10 @@
     \tl_if_eq:NNT \l_ltjpreset_kanji_shape_tl \l_tmpa_tl {
       \tl_set:Nx \l_ltjpreset_kanji_shape_tl { ;+jp04 }
     }
-    \ltj_preset_define_family:nnn {ltjpm} {m}  {\ltjpreset_font_mc_m:}
-    \ltj_preset_define_family:nnn {ltjpm} {bx} {\ltjpreset_font_mc_bx:}
-    \ltj_preset_define_family:nnn {ltjpg} {m}  {\ltjpreset_font_gt_m:}
-    \ltj_preset_define_family:nnn {ltjpg} {bx} {\ltjpreset_font_gt_bx:}
+    \ltj_preset_define_family:nnn {ltjpm} {\mddefault}  {\ltjpreset_font_mc_m:}
+    \ltj_preset_define_family:nnn {ltjpm} {\bfdefault} {\ltjpreset_font_mc_bx:}
+    \ltj_preset_define_family:nnn {ltjpg} {\mddefault}  {\ltjpreset_font_gt_m:}
+    \ltj_preset_define_family:nnn {ltjpg} {\bfdefault} {\ltjpreset_font_gt_bx:}
     \normalfont
     \bool_if:NT \g_ltjpreset_deluxe_bool {
       \ltj_preset_define_family:nnn {ltjpm}  {l} {\ltjpreset_font_mc_l:}
