@@ -179,6 +179,8 @@ end
 
 local update_jfm_cache
 do
+   local floor = math.floor
+   local function myround(a) return floor(a+0.5) end
    local function mult_table(old,scale) -- modified from table.fastcopy
       if old then
 	 local new = { }
@@ -186,7 +188,7 @@ do
 	    if type(v) == "table" then
 	       new[k] = mult_table(v,scale)
 	    elseif type(v) == "number" then
-	       new[k] = round(v*scale)
+	       new[k] = myround(v*scale)
 	    else
 	       new[k] = v
 	    end
