@@ -202,10 +202,12 @@
   width:\hfill\ #2\cr height:\hfill\ #3\cr depth:\hfill\ #4\cr
   }}}}}\,}
 
+\makeatletter
 \def\myghost{\ifmmode\else\ltjalchar"200C \fi}
-\protected\def\Param#1{\myghost\hyperlink{fld:#1}{\underline{\smash{\textsf{#1}}}}\myghost} % parameter name
+\def\Param#1{\texorpdfstring{\@Param{#1}}{#1}} % parameter name
+\protected\def\@Param#1{\myghost\hyperlink{fld:#1}{\underline{\smash{\textsf{#1}}}}\myghost}
 \protected\def\DParam#1{\myghost\hypertarget{fld:#1}{\underline{\smash{\textsf{#1}}}}\myghost} % parameter name (definition)
-\protected\def\Pkg#1{\textsf{#1}} % packages/classes
+\def\Pkg#1{\texorpdfstring{\textsf{#1}}{#1}} % packages/classes
 \ltjsetparameter{alxspmode={"200C,allow}}
 
 \begin{document}
@@ -1019,9 +1021,9 @@ By default, the following fonts are used for these two families.
 \bottomrule
 \end{tabular}
 \end{center}
-Note that the bold series in both family are same as the medium series of gothic
-     family. There is no italic nor slanted shape for
-      these \texttt{mc}~and~\texttt{gt}.
+Note that the bold series (series \texttt{bx}~or~\texttt{b}) in both family
+     are same as the medium series of gothic family.
+     There is no italic nor slanted shape for these \texttt{mc}~and~\texttt{gt}.
 %</en>
 %<*ja>
 \item \pLaTeX と同様に，標準では「明朝体」「ゴシック体」の2種類を用いる：
@@ -1047,6 +1049,11 @@ Note that the bold series in both family are same as the medium series of gothic
 どちらのファミリにおいても，太字(\cs{bfseries})のフォントは
 ゴシック体中字(\cs{gtfamily}\cs{mdseries})で使われるフォントと同じであることに注意．
 また，どちらのファミリでもイタリック体・スラント体は定義されない．
+
+  和文の太字を表すシリーズ名は，（元々のComputer Modernが
+  太字に\texttt{bx}を用いていたことから）伝統的に\texttt{bx}~(Bold Extended)が使われてきた．
+  しかし，太字にシリーズ\texttt{b}を使うフォントも増えてきたため，
+  バージョン20180616.0以降では和文の太字として\texttt{bx},~\texttt{b}の両方を扱えるようにした．
 %</ja>
 
 %<en>\item Japanese characters in math mode are typeset by the font family \texttt{mc}.
@@ -6170,11 +6177,11 @@ As closing this subsection, we shall introduce an example of
 %<*ja>
 この節の終わりに，\cs{SetRelationFont} と \cs{userelfont} の例を
 紹介しておこう．\cs{userelfont} の使用によって，「abc」の部分のフォントが
-Avant Garde (OT1/pag/m/n) に変わっていることがわかる．
+Latin Modern Sans Serif (TU/lmss/m/n) に変わっていることがわかる．
 %</ja>
 \begin{LTXexample}[width=0.3\textwidth]
 \makeatletter
-\SetRelationFont{JY3}{\k@family}{m}{n}{OT1}{pag}{m}{n}
+\SetRelationFont{JY3}{\k@family}{m}{n}{TU}{lmss}{m}{n}
   % \k@family: current Japanese font family
 \userelfont\selectfont あいうabc
 \end{LTXexample}
