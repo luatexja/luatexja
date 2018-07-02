@@ -44,7 +44,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2018/06/09 ltjsclasses ]
+  [2018/07/02 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass{ltjsarticle}
@@ -790,9 +790,13 @@
 %
 % [2017-02-17 LTJ] |\directlua|中で出力される数字のカテゴリーコードが12になるようにしました．
 % この保証をしないと例えば\texttt{listings}パッケージで無限ループになります．
+%
+% [2018-07-02 LTJ] 10ptオプションが指定されており，
+% 実際にはオプティカルサイズの補正が不要なときは「|xreal|オプションは指定されなかった」という
+% 扱いにしておきます．
 %    \begin{macrocode}
 \ifjsc@mag@xreal
-\ifdim\jsc@mpt=\p@\else
+\ifdim\jsc@mpt=\p@\jsc@mag@xrealfalse\else
   \expandafter\let\csname OT1/cmr/m/n/10\endcsname\relax
   \expandafter\let\csname TU/lmr/m/n/10\endcsname\relax
   \expandafter\let\csname OMX/cmex/m/n/10\endcsname\relax
