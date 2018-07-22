@@ -51,13 +51,12 @@ do
         if d>dmax then dmax=d end
         if h>hmax then hmax=h end
         if (bls-h-d)<lmin then lmin=bls-h-d end
-        --print(v[1], d, h, bls-h-d)
       end
+      if lmin==1/0 then lmin = 0 end
       return lmin, bls - lmin - (before.depth+after.height)
     end
   end
   function lineskip.p_dummy(before, after)
-    local bls = tex.baselineskip.width
     return nil, 0
   end
 end
@@ -75,6 +74,7 @@ do
   end
   function lineskip.l_fixed(dist, g, adj, normal)
     local ng = tex.baselineskip; local f = ng.width*lineskip.fixed_factor
+    if f==0 then return lineskip.l_dummy(dist, g, adj, normal) end
     g.subtype=2
     setglue(g,
       normal - f * floor((dist-lineskip.fixed_mindist)/f),
@@ -88,6 +88,7 @@ end
     l_skip = lineskip['l_'..tostring(skip_method)] or lineskip.l_dummy
   end
   
+do
   luatexbase.add_to_callback('post_linebreak_filter',
     function(h)
       for x in node.traverse_id(12, h) do
@@ -99,7 +100,6 @@ end
               local normal = tex.baselineskip.width - p.depth - n.height
               local lmin, adj; lmin, adj = l_profiler(p,n)
               l_skip(lmin or normal,x,adj, normal)
-              print(p.depth, x.width, n.height, p.depth+x.width+n.height)
             end
           end
         end
@@ -107,6 +107,37 @@ end
       return true
     end, 'test', 10000
   )
+end
+
+do
+  local to_direct, to_node = node.direct.todirect, node.direct.tonode
+  local make_dir_whatsit = luatexja.direction.make_dir_whatsit
+  local get_dir_count = luatexja.direction.get_dir_count
+  local function lineskip_append_vlist(b, loc, prev, mirrored)
+     local new_b = to_node(loc=='box' and 
+	   make_dir_whatsit(to_direct(b), to_direct(b), get_dir_count(), 'append_vlist')) or b
+     local tail = tex.nest[tex.nest.ptr].tail
+     if tail and tail.id==12 and tail.subtype==3 then
+        tail = tail.prev
+     end
+     if tail and (prev > -65536000) then
+        local normal = tex.baselineskip.width - prev - new_b.height
+        local lmin, adj = nil, 0;
+        if tail.id==0 and new_b.id==0 then
+          if tail.depth==prev then lmin, adj = l_profiler(tail,new_b) end
+        end
+        local g = node.new(12); l_skip(lmin or normal, g, adj, normal)
+        node.write(g)
+      end
+      node.write(new_b)
+      tex.prevdepth = new_b.depth
+      return nil -- do nothing on tex side
+   end
+   luatexbase.remove_from_callback('append_to_vlist_filter','ltj.direction')
+   luatexja.base.add_to_callback('append_to_vlist_filter',
+			lineskip_append_vlist,
+			'line profile', 10000)
+end  
 \end{luacode}
 \begin{document}
 \directlua{%
@@ -134,10 +165,14 @@ end
 ああああああああああああああああああ\\
 ……であるから$b=\dfrac1{X_2}$となる．\\
 一方$\dfrac{A^A}{B_B}=21$なので……\\
-……であるから$b=\dfrac1{X_2}$となる．\vadjust{あああああ$\dfrac34$}\\
+……であるから$b=\dfrac1{X_2}$となる．\\%\vadjust{あああああ$\dfrac34$}\\
 一方$\dfrac{A^A}{B_B}=21$なので……
 
-……であるから$b=\dfrac1{X_2}$となる．\\
+あいであるから$b=\dfrac1{X_2}$となる．新段落！\\
+一方$\dfrac{A^A}{B_B}=21$なので……
+
+\prevdepth0pt
+うえであるから$b=\dfrac1{X_2}$prevdepth設定のため無効\\
 一方$\dfrac{A^A}{B_B}=21$なので……
 }}\par}
 
