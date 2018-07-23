@@ -62,23 +62,27 @@ do
 end
 do
   local setglue = node.setglue
-  local floor, min = math.floor, math.min
+  local floor, max = math.floor, math.max
   function lineskip.l_dummy(dist, g, adj, normal)
     if dist < tex.lineskiplimit then
-      local ng = tex.lineskip; g.subtype=2
+      local ng = tex.lineskip; g.subtype=1
       setglue(g, ng.width + adj, ng.stretch, ng.shrink, ng.stretch_order, ng.shrink_order)
     else
       local ng = tex.baselineskip; g.subtype=2
       setglue(g, normal, ng.stretch, ng.shrink, ng.stretch_order, ng.shrink_order)
     end
   end
-  function lineskip.l_fixed(dist, g, adj, normal)
-    local ng = tex.baselineskip; local f = ng.width*lineskip.fixed_factor
-    if f==0 then return lineskip.l_dummy(dist, g, adj, normal) end
-    g.subtype=2
-    setglue(g,
-      normal - f * floor((dist-lineskip.fixed_mindist)/f),
-      ng.stretch, ng.shrink, ng.stretch_order, ng.shrink_order)
+  function lineskip.l_step(dist, g, adj, normal)
+    if dist < tex.lineskiplimit then
+      local ng = tex.baselineskip; g.subtype=1
+      local f = max(1,ng.width*lineskip.step_factor)
+      setglue(g,
+        normal - f * floor((dist-tex.lineskip.width)/f),
+        ng.stretch, ng.shrink, ng.stretch_order, ng.shrink_order)
+    else
+      local ng = tex.baselineskip; g.subtype=2
+      setglue(g, normal, ng.stretch, ng.shrink, ng.stretch_order, ng.shrink_order)
+    end
   end
 end
 
@@ -141,11 +145,14 @@ end
 \end{luacode}
 \begin{document}
 \directlua{%
-  lineskip.fixed_mindist = tex.lineskip.width
-  lineskip.fixed_factor = 0.5
+  lineskip.step_factor = 0.5
 }
 
-
+% #1: null（TeX 既定） or profile（行の中身を考慮した行間測定）
+% #2: null（TeX 既定）
+%   or step（行送りが \baselineskip で十分でなかった場合，
+%            lineskip.step_factor * \baselineskip の倍数だけ広げて
+%            行間が \lineskip 以上になるようにする）
 \def\R#1#2{\directlua{lineskip.setting('#1','#2')}%
 \noindent\fbox{\parbox{25\zw}{%
 \baselineskip14pt\noindent
@@ -157,9 +164,20 @@ end
  □□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■
  □□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■
  □□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■
+ □□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■
+ □□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■
+ □□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■
+ □□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■
+ □□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■
+ □□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■
+ □□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■
+ □□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■
+ □□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■
  □□□□■□□□□■□□□□■□□□□■
 }}\dp2=0pt\rlap{\copy2}\par\vspace*{-\baselineskip}
 \textbf{#1, #2}\\
+\vrule height 2pt depth 0pt width 10\zw\\
+\vrule height 2pt depth 0pt width 10\zw\\
 \the\baselineskip あああああああああああああああ\\
 あああああああああ$X_{X_{X_X}}$ああああああ\\
 ああああああああああああああああああ\\
@@ -171,15 +189,23 @@ end
 あいであるから$b=\dfrac1{X_2}$となる．新段落！\\
 一方$\dfrac{A^A}{B_B}=21$なので……
 
+\hbox{感じ感じ$\displaystyle\int$}
+ほげであるから$b=\dfrac1{X_2}$となる．新段落！\\
+一方$\dfrac{A^A}{B_B}=21$なので……
+
+\hrule
+かきであるから$b=\dfrac1{X_2}$となる．hrule無効\\
+一方$\dfrac{A^A}{B_B}=21$なので……
+
 \prevdepth0pt
 うえであるから$b=\dfrac1{X_2}$prevdepth設定のため無効\\
 一方$\dfrac{A^A}{B_B}=21$なので……
-}}\par}
+}}\newpage}
 
 
 \R{null}{null}
 \R{profile}{null}
-\R{null}{fixed}
-\R{profile}{fixed}
+\R{null}{step}
+\R{profile}{step}
 
 \end{document}
