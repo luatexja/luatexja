@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjarticle}
-  [2018/02/04 v1.7h-ltj-15
+  [2018/07/24 v1.8-ltj-15
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -779,7 +779,7 @@
   \kern2.6\p@}
 \newcommand\@makefntext[1]{\parindent 1em
   \noindent\hb@xt@ 1.8em{\hss\@makefnmark}#1}
-\newif\if西暦 \西暦false
+\newif\if西暦 \西暦true
 \def\西暦{\西暦true}
 \def\和暦{\西暦false}
 \newcount\heisei \heisei\year \advance\heisei-1988\relax
