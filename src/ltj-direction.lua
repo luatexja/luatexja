@@ -1059,45 +1059,7 @@ do
    end
 end
 
--- append_to_vlist filter
-do
-   local id_glue = node.id('glue')
-   local getglue = node.direct.getglue or
-      function(g)
-	 return getfield(g,'width'), getfield(g,'stretch'), getfield(g,'shrink'),
-	 getfield(g,'stretch_order'), getfield(g,'shrink_order')
-      end
-local setglue = luatexja.setglue
-   local function copy_glue (new_glue, old_glue, subtype, new_w)
-      setfield(new_glue, 'subtype', subtype)
-      local w,st,sp,sto,spo = getglue(to_direct(old_glue))
-      setglue(new_glue, new_w or w, st, sp, sto, spo)
-   end
-   local node_write = node.direct.write
-   local function dir_adjust_append_vlist(b, loc, prev, mirrored)
-      local old_b = to_direct(b)
-      local new_b = loc=='box' and 
-	 make_dir_whatsit(old_b, old_b, get_dir_count(), 'append_vlist') or old_b
-      
-      if prev > -65536000 then
-	 local d = tex.baselineskip.width - prev 
-	    - getfield(new_b, mirrored and 'depth' or 'height')
-	 local g = node_new(id_glue)
-	 if d < tex.lineskiplimit then
-	    copy_glue(g, tex.lineskip, 1)
-	 else
-	    copy_glue(g, tex.baselineskip, 2, d);
-	 end
-	 node_write(g)
-      end
-      node_write(new_b)
-      tex.prevdepth = getfield(new_b, mirrored and 'height' or 'depth')
-      return nil -- do nothing on tex side
-   end
-   ltjb.add_to_callback('append_to_vlist_filter',
-			dir_adjust_append_vlist,
-			'ltj.direction', 10000)
-end
+-- append_to_vlist filter: done in ltj-lineskip.lua
 
 -- finalize (executed just before \shipout)
 -- we supply correct pdfsavematrix nodes etc. inside dir_node

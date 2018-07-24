@@ -102,13 +102,14 @@ if luatexja_debug then load_module('debug') end
 load_module('charrange'); local ltjc = luatexja.charrange
 load_module('stack');     local ltjs = luatexja.stack
 load_module('direction'); local ltjd = luatexja.direction -- +1 hlist +1 attr_list
+load_module('lineskip');  local ltjl = luatexja.lineskip -- +1 hlist +1 attr_list
 load_module('jfont');     local ltjf = luatexja.jfont
 load_module('inputbuf');  local ltji = luatexja.inputbuf
 load_module('pretreat');  local ltjp = luatexja.pretreat
 load_module('setwidth');  local ltjw = luatexja.setwidth
 load_module('jfmglue');   local ltjj = luatexja.jfmglue -- +1 glue +1 gs +1 attr_list
 load_module('math');      local ltjm = luatexja.math
-load_module('base');    local ltjb = luatexja.base
+load_module('base');      local ltjb = luatexja.base
 
 
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']

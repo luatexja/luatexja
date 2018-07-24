@@ -5,6 +5,7 @@ luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 luatexja.load_module('jfmglue');   local ltjj = luatexja.jfmglue
 luatexja.load_module('stack');     local ltjs = luatexja.stack
 luatexja.load_module('direction'); local ltjd = luatexja.direction
+luatexja.load_module('lineskip');  local ltjl = luatexja.lineskip
 luatexja.adjust = luatexja.adjust or {}
 
 local to_node = node.direct.tonode
@@ -437,3 +438,77 @@ end
 luatexja.unary_pars.adjust = function(t)
    return is_reg and 1 or 0
 end
+
+-- -----------------------------------
+ltjl.step_factor = 0.5
+do
+  local insert = table.insert
+  local rangedimensions, max = node.direct.rangedimensions, math.max
+  function ltjl.p_profile(before, after, mirrored, bw)
+    local t = {}
+    do
+      local w_acc, d_before = 0, 0
+      local x = getlist(before); local xn = node_next(x)
+      while x do
+        local w, d
+        if xn then w, _, d= rangedimensions(before,x,xn)
+        else w, _, d= rangedimensions(before,x) end
+        if d~=d_before then
+          d_before = d; t[w_acc] = t[w_acc] or {}
+          if t[w_acc][1] then t[w_acc][1]=max(t[w_acc][1],d)
+          else t[w_acc][1]=d end
+        end
+        w_acc = w_acc + w
+        x = xn; if x then xn = node_next(x) end
+      end
+    end
+    do
+      local w_acc, h_before = 0, 0
+      local x = getlist(after); local xn = node_next(x)
+      while x do
+        local w, h, d
+        if xn then w, h, d = rangedimensions(after,x,xn)
+	else w, h,d = rangedimensions(after,x) end
+	if mirrored then h=d end
+        if h~=h_before then
+          h_before = h; t[w_acc] = t[w_acc] or {}
+          if t[w_acc][2] then t[w_acc][2]=max(t[w_acc][2],h)
+          else t[w_acc][2]=h end
+        end
+        w_acc = w_acc + w
+        x = xn; if x then xn = node_next(x) end
+      end
+    end
+    local t2 = {}
+    for i,v in pairs(t) do insert(t2, { i, v[1], v[2] } ) end
+    table.sort(t2, function(a,b) return a[1]<b[1] end)
+    do
+      local dmax, d, hmax, h, lmin = 0, 0, 0, 0, 1/0
+      for i,v in ipairs(t2) do
+        d, h = (v[2] or d), (v[3] or h)
+        if d>dmax then dmax=d end
+        if h>hmax then hmax=h end
+        if (bw-h-d)<lmin then lmin=bw-h-d end
+      end
+      if lmin==1/0 then lmin = 0 end
+      return lmin, 
+         bw - lmin - getfield(before, 'depth')
+             - getfield(after, mirrored and 'depth' or 'height')
+    end
+  end
+end
+
+do
+  local copy_glue = ltjl.copy_glue
+  local floor, max = math.floor, math.max
+  function ltjl.l_step(dist, g, adj, normal, bw)
+    if dist < tex.lineskiplimit then
+       local f = max(1, bw*ltjl.step_factor)
+       copy_glue(g, tex.baselineskip, 1, normal - f * floor((dist-tex.lineskip.width)/f))
+    else
+       copy_glue(g, tex.baselineskip, 2, normal)
+    end
+  end
+end
+
+
