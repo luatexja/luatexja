@@ -5,7 +5,7 @@ luatexja.load_module('base'); local ltjb = luatexja.base
 luatexja.load_module('direction'); local ltjd = luatexja.direction
 luatexja.lineskip = luatexja.lineskip or {}
 
-local to_direct, to_node = node.direct.todirect, node.direct.tonode
+local to_direct = node.direct.todirect
 local ltjl = luatexja.lineskip
 local id_glue = node.id('glue')
 local id_hlist = node.id('hlist')

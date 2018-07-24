@@ -64,7 +64,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-adjust}[2017/05/05]
+  \ProvidesPackage{luatexja-adjust}[2018/07/24]
 \fi                             %</LaTeX>
 
 % Load core module if not yet.
@@ -85,21 +85,25 @@
 %%------------------
 
 %! Main part of luatexja-adjust
-\ifnum\luatexversion>90
-  \RequireLuaTeXjaSubmodule{adjust}
-\else
-  \RequireLuaTeXjaSubmodule{adjust_85}
-\fi
-
+\RequireLuaTeXjaSubmodule{adjust}
 
 \newcount\ltjadj@status@le
 \newcount\ltjadj@status@pr
+\let\ltjadj@method@profile\@empty
+\let\ltjadj@method@lineskip\@empty
 \let\ltj@adjust@temp=\relax
 \define@choicekey[ltj]{adjust}{lineend}[\@@temp\ltj@adjust@temp]%
 {false,true,extended}[true]{%
   \ifnum\ltj@adjust@temp=-1 \else\ltjadj@status@le=\ltj@adjust@temp\fi\relax}
 \define@boolkey[ltj]{adjust}{priority}[true]{%
   \ltjadj@status@pr=\ifltj@adjust@priority1\else0\fi\relax}
+\define@key[ltj]{adjust}{profile}[]{%
+  \def\ltjadj@method@profile{#1}\ltjadj@set@lineskip\relax}
+\define@key[ltj]{adjust}{lineskip}[]{%
+  \def\ltjadj@method@lineskip{#1}\ltjadj@set@lineskip\relax}
+\protected\def\ltjadj@set@lineskip{%
+  \directlua{luatexja.lineskip.setting('\ltjadj@method@profile','\ltjadj@method@lineskip')}\relax
+}
 \protected\def\@@ltjenableadjust[#1]{%
    \setkeys[ltj]{adjust}{#1}%
    \directlua{luatexja.adjust.enable_cb(\the\ltjadj@status@le, \the\ltjadj@status@pr)}\ignorespaces
