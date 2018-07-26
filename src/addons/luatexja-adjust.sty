@@ -88,27 +88,28 @@
 \RequireLuaTeXjaSubmodule{adjust}
 
 \newcount\ltjadj@status@le
+\newcount\ltjadj@status@lp
 \newcount\ltjadj@status@pr
-\let\ltjadj@method@profile\@empty
-\let\ltjadj@method@lineskip\@empty
+\newcount\ltjadj@status@ls
 \let\ltj@adjust@temp=\relax
 \define@choicekey[ltj]{adjust}{lineend}[\@@temp\ltj@adjust@temp]%
 {false,true,extended}[true]{%
   \ifnum\ltj@adjust@temp=-1 \else\ltjadj@status@le=\ltj@adjust@temp\fi\relax}
 \define@boolkey[ltj]{adjust}{priority}[true]{%
   \ltjadj@status@pr=\ifltj@adjust@priority1\else0\fi\relax}
-\define@key[ltj]{adjust}{profile}[]{%
-  \def\ltjadj@method@profile{#1}\ltjadj@set@lineskip\relax}
-\define@key[ltj]{adjust}{lineskip}[]{%
-  \def\ltjadj@method@lineskip{#1}\ltjadj@set@lineskip\relax}
-\protected\def\ltjadj@set@lineskip{%
-  \directlua{luatexja.lineskip.setting('\ltjadj@method@profile','\ltjadj@method@lineskip')}\relax
-}
+\define@boolkey[ltj]{adjust}{profile}[true]{%
+  \ltjadj@status@lp=\ifltj@adjust@profile1\else0\fi\relax}
+\define@boolkey[ltj]{adjust}{linestep}[true]{%
+  \ltjadj@status@ls=\ifltj@adjust@linestep1\else0\fi\relax}
+
 \protected\def\@@ltjenableadjust[#1]{%
    \setkeys[ltj]{adjust}{#1}%
-   \directlua{luatexja.adjust.enable_cb(\the\ltjadj@status@le, \the\ltjadj@status@pr)}\ignorespaces
+   \directlua{luatexja.adjust.enable_cb(
+    \the\ltjadj@status@le, \the\ltjadj@status@pr,
+    \the\ltjadj@status@lp, \the\ltjadj@status@ls)}\ignorespaces
 }
-\protected\def\ltjdisableadjust{\ltjenableadjust[lineend=false,priority=false]}
+\protected\def\ltjdisableadjust{%
+  \ltjenableadjust[lineend=false,priority=false,profile=false,linestep=false]}
 \protected\def\ltjenableadjust{%
    \ltx@ifnextchar[{\@@ltjenableadjust}{\@@ltjenableadjust[lineend,priority]}}%]
 
@@ -131,6 +132,8 @@
   stretch_priority={kanjiskip=-35, xkanjiskip=-25, others=50},
    shrink_priority={kanjiskip=-35, xkanjiskip=-25, others=50},
 }
+\define@key[ltj]{japaram}{linestep_factor}{%
+  \directlua{luatexja.adjust.step_factor=#1}\relax}
 
 
 %%------------------ all done

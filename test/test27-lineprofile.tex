@@ -2,12 +2,7 @@
 \usepackage[width=40\zw, lines=40,centering]{geometry}
 \usepackage{amsmath,luacode,xcolor,luatexja-adjust}
 \begin{document}
-% #1: null（TeX 既定） or profile（行の中身を考慮した行間測定）
-% #2: null（TeX 既定）
-%   or step（行送りが \baselineskip で十分でなかった場合，
-%            lineskip.step_factor * \baselineskip の倍数だけ広げて
-%            行間が \lineskip 以上になるようにする）
-\def\R#1#2{\directlua{luatexja.lineskip.setting('#1','#2')}%
+\def\R#1#2{\ltjenableadjust[profile=#1,linestep=#2]%
 \noindent\fbox{\parbox{25\zw}{%
 \baselineskip14pt\noindent
 \setbox2=\vtop{\noindent\hsize20\zw\textcolor{cyan!30!white}{%
@@ -57,9 +52,9 @@
 }}\newpage}
 
 
-\R{null}{null}
-\R{profile}{null}
-\R{null}{step}
-\R{profile}{step}
+\R{false}{false}
+\R{true}{false}
+\R{false}{true}
+\R{true}{true}
 
 \end{document}

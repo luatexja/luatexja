@@ -635,7 +635,7 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %<en>The following packages are needed for the \LuaTeX-ja\ package.
 %<ja>\LuaTeX-jaパッケージの動作には次のパッケージ類が必要である．
 \begin{itemize}
-\item \LuaTeX\ beta-0.85.0 (or later)
+\item \LuaTeX\ 1.0.0 (or later)
 \item \Pkg{luaotfload} v2.6 (or later)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
 \item \Pkg{etoolbox}, \Pkg{everysel} (if you want to use \LuaTeX-ja with \LaTeXe)
@@ -644,9 +644,9 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %<en>\item \emph{IPAex fonts} (\url{http://ipafont.ipa.go.jp/})
 %<ja>\item \emph{IPAexフォント(\url{http://ipafont.ipa.go.jp/})}
 \end{itemize}
-%<en>In summary, \LuaTeX-ja version 20160404.0 (or~later) no longer supports \TeX~Live~2015.
+%<en>In summary, \LuaTeX-ja version 2018****.0 (or~later) no longer supports \TeX~Live~2016.
 %<*ja>
-要約すると，バージョン20160404.0以降の\LuaTeX-jaは\TeX~Live~2015以前では動作しない\footnote{%
+要約すると，バージョン2018****.0以降の\LuaTeX-jaは\TeX~Live~2016以前では動作しない\footnote{%
   もっとも，自分で\LuaTeX のバイナリをSubversionリポジトリからビルドしていれば話は別である．
 }．
 %</ja>
@@ -673,21 +673,6 @@ IPAex fonts are also available in these distributions.
 これらのディストリビューションはIPAexフォントも収録している．
 W32\TeX においてはIPAexフォントは \texttt{luatexja.tar.xz} 内にある．
 %</ja>
-
-% %<*ja>
-% 例えば\TeX~Live~2015を利用しているなら，\LuaTeX-jaは\TeX~Live manager (\texttt{tlmgr})を
-% 使ってインストールすることができる．
-% \begin{lstlisting}
-% $ tlmgr install luatexja
-% \end{lstlisting}
-% %</ja>
-% %<*en>
-% If you are using \TeX~Live~2015, you can install \LuaTeX-ja
-% from \TeX~Live manager (\texttt{tlmgr}):
-% \begin{lstlisting}
-% $ tlmgr install luatexja
-% \end{lstlisting}
-% %</en>
 
 %<en>\paragraph{Manual installation}
 %<ja>\paragraph{手動インストール方法}
@@ -6811,12 +6796,12 @@ for making the difference obvious.
 %<*ja>
 この追加パッケージは以下の機能を提供する．詳細な仕様については\ref{sec-adjspec}章を参照してほしい．
 \begin{description}
-\item[行末文字の位置調整]
+ \item[行末文字の位置調整]
   \pTeX では，（是非はともかく）「行末の読点はぶら下げか二分取りか全角取りのいずれかに」のように
   行末文字と実際の行末の位置関係を2通り以上にすることは面倒であった．
   和文フォントメトリックだけでは「常に行末の読点はぶら下げ」といったことしかできず，
   前の文に書いたことを実現するには
-\begin{lstlisting}
+  \begin{lstlisting}
 \def\。{%
   \penalty10000 % 禁則ペナルティ
   \hbox to0pt{。\hss}\penalty0 % ぶら下げの場合
@@ -6826,34 +6811,145 @@ for making the difference obvious.
 \end{lstlisting}
   のような命令を定義し，文中の全ての句点を \lstinline+\。+ で書くことが必要だった．
 
-\Pkg{luatexja-adjust}パッケージは，上で述べた行末文字と実際の行末との位置関係を
-2通り以上から自動的に選択する機能を提供する．
-\pdfTeX と同じように，「\TeX による行分割の後で行末文字の位置を補正する」方法と
-  「行分割の過程で行末文字の位置を考慮に入れる」方法を選べるようにした（
-\Pkg{luatexja-adjust}パッケージの既定では前者）．
+  \Pkg{luatexja-adjust}パッケージは，上で述べた行末文字と実際の行末との位置関係を
+  2通り以上から自動的に選択する機能を提供する．
+  \pdfTeX と同じように，「\TeX による行分割の後で行末文字の位置を補正する」方法と
+  「行分割の過程で行末文字の位置を考慮に入れる」方法を選べるようにした
+  （\Pkg{luatexja-adjust}パッケージの既定では前者）．
   
-\item[優先順位付きの行長調整]
-\pTeX では，行長調整において優先度の概念が存在しなかったため，図
-\ref{fig:adj}上段における半角分の半端は，\autoref{fig:adj}中段のように，鍵
-括弧周辺の空白と和文間空白(\Param{kanjiskip})の両方によって負担される．し
-かし，「日本語組版処理の要件」\cite{jlreq}やJIS~X~4051~\cite{x4051}におい
-ては，このような状況では半端は鍵括弧周辺の空白のみで負担し，その他の和文
-文字はベタ組で組まれる（\autoref{fig:adj}下段）ことになっている．
-\Pkg{luatexja-adjust}パッケージの提供する第2の機能は，
-\cite{jlreq}や\cite{x4051}における規定のような，優先順位付き
-の行長調整である．
-\begin{itemize}
- \item 優先度付き行長調整は，段落を行分割した後に個々の行について行われるものである．
-そのため，行分割の位置は変化することはない．
+ \item[優先順位付きの行長調整]
+  \pTeX では，行長調整において優先度の概念が存在しなかったため，図
+  \ref{fig:adj}上段における半角分の半端は，\autoref{fig:adj}中段のように，鍵
+  括弧周辺の空白と和文間空白(\Param{kanjiskip})の両方によって負担される．し
+  かし，「日本語組版処理の要件」\cite{jlreq}やJIS~X~4051~\cite{x4051}におい
+  ては，このような状況では半端は鍵括弧周辺の空白のみで負担し，その他の和文
+  文字はベタ組で組まれる（\autoref{fig:adj}下段）ことになっている．
+  \Pkg{luatexja-adjust}パッケージの提供する第2の機能は，
+  \cite{jlreq}や\cite{x4051}における規定のような，優先順位付き
+  の行長調整である．
+  \begin{itemize}
+   \item 優先度付き行長調整は，段落を行分割した後に個々の行について行われるものである．
+	そのため，行分割の位置は変化することはない．
+	
+	\verb+\hbox{...}+ といった「途中で改行できない水平ボックス」では（たとえ幅が指定されていても）無効である．
+   \item 優先度付き行長調整を行うと，和文処理グルーの自然長は変化しないが，伸び量や縮み量は
+	一般に変化する．そのため，既に組まれた段落を \cs{unhbox} などを利用して組み直す処理を
+	行う場合には注意が必要である．
+  \end{itemize}
+  
+ \item[「中身までみた」行送り計算]
+  複数行に渡る文章を組版するときには行間に空きが入ることが普通である．
+  \TeX では各行が一つずつの水平ボックスをなしていることを思い出すと，隣り合った
+  2つの行（つまり水平ボックス）の間の空きは次のようにして決まるのだった：
+  \begin{enumerate}
+   \item 「通常に組んだときの行間」$d$を，\cs{baselineskip}から
+	「前の行」の深さと「次の行」の高さを加えたものを引いた値とする．
+   \item $d\ge\cs{lineskiplimit}$の場合，
+	標準の行送り\cs{baselineskip}で組んでも十分な間隔があると判断され，
+	2行の間には長さ$d$の空白が挿入される．つまり行送りは\cs{baselineskip}．
+   \item {\catcode`\<=12$d<\cs{lineskiplimit}$}の場合，
+	2行の間には長さ\cs{lineskip}の空白が挿入される．
+	そのため（設定値によるが，多くの場合）行送りは\cs{baselineskip}より広がる．
+  \end{enumerate}
 
-\verb+\hbox{...}+ といった「途中で改行できない水平ボックス」では（たとえ幅が指定されていても）無効である．
- \item 優先度付き行長調整を行うと，和文処理グルーの自然長は変化しないが，伸び量や縮み量は
-一般に変化する．そのため，既に組まれた段落を \cs{unhbox} などを利用して組み直す処理を
-行う場合には注意が必要である．
-\end{itemize}
+  \begin{figure}[t]
+	\noindent\centering
+	\begin{minipage}[b]{18\zw}
+	  \ltjenableadjust[profile=false, linestep=false]
+	  ……だから，①より$\dfrac{a^2}{b} = \dfrac{1+\sqrt{5}}2$．\\
+	  よって$b=\dfrac{1-\sqrt{5}}2$である．\\
+	  これを②式に代入すると……
+	  \par\vskip\abovecaptionskip
+	  \ltjenableadjust[profile=false, linestep=false]
+	  \par\centering\leavevmode{\small (a)}
+	\end{minipage}%
+	\kern2\zw
+	\begin{minipage}[b]{18\zw}
+	  \ltjenableadjust[profile]
+	  ……だから，①より$\dfrac{a^2}{b} = \dfrac{1+\sqrt{5}}2$．\\
+	  よって$b=\dfrac{1-\sqrt{5}}2$である．\\
+	  これを②式に代入すると……
+	  \par\vskip\abovecaptionskip
+	  \ltjenableadjust[profile=false, linestep=false]
+	  \par\centering\leavevmode{\small (b)}
+	\end{minipage}\par
+	  \caption{高い行が連続したときの状況}\label{fig:linegap1}
+  \end{figure}
+
+  以上で述べたことから，\TeX 標準では行送りの決定で「高さ・深さを取っているものが
+  行のどの水平位置にあるか」は一切考慮しない．そのため，
+  \autoref{fig:linegap1}~(a)のように「必要以上に行間が空いて見える」状況が起こる．
+
+  \Pkg{luatexja-adjust}パッケージでは，「通常に組んだときの行間」$d$を
+  各行の中身の文字・グルー・ボックスの寸法を勘案して計算するという方法を
+  利用できるようにした．この機能を使うと，\autoref{fig:linegap1}~(b)のように
+  行間の空きが必要以上に大きくなることを避けることができる．
+  \begin{itemize}
+	\item 段落中の隣り合った二行だけでなく，行間の空きは
+	新たに水平ボックス$h$を（内部・外部問わず）垂直モードで追加した時にも自動で挿入される．
+	その場合には，前段落で述べた「中身までみる」処理は
+	\begin{itemize}
+	 \item 現在のリストにおける最後のノード
+	  \footnote{最後のノードが\cs{parskip}によるグルーであった場合のみ
+		さらに一つ前のノードを参照する}が水平ボックス$h'$であり，かつ
+	  \item \cs{prevdepth}の値とその$h'$の深さの値が一致している
+	\end{itemize}
+	場合にのみ発動するようにしている．
+	\item 行の中身に水平ボックス$h''$が入ってくることもあるが，その場合は$h''$の中身までは参照しない．
+	参照するようにしてしまうと，\cs{smash}など手動で行った高さ・深さ調整の意味がなくなってしまうからである．
+  \end{itemize}
+  
+  \begin{figure}[t]
+	\noindent\centering
+	\begin{minipage}[b]{16\zw}
+	  \ltjenableadjust[profile]
+	  ……だから，①より$\dfrac{a^2}{b}= \dfrac{1+\sqrt{5}}2$．\\
+	  よって$b=\dfrac{1-\sqrt{5}}2$である．\\
+	  これを②式に代入すると……
+	  \par\vskip\abovecaptionskip
+	  \ltjenableadjust[profile=false, linestep=false]
+	  \par\centering\leavevmode{\small (a): 無効}
+	\end{minipage}%
+	\kern2\zw
+	\begin{minipage}[b]{16\zw}
+	  \ltjsetparameter{linestep_factor=0.25}
+	  \ltjenableadjust[profile, linestep]
+	  ……だから，①より$\dfrac{a^2}{b} = \dfrac{1+\sqrt{5}}2$．\\
+	  よって$b=\dfrac{1-\sqrt{5}}2$である．\\
+	  これを②式に代入すると……
+	  \par\vskip\abovecaptionskip
+	  \ltjenableadjust[profile=false, linestep=false]
+	  \par\centering\leavevmode{\small (b): $0.25$\cs{baselineskip}刻み}
+	\end{minipage}\par\medskip
+	\begin{minipage}[b]{16\zw}
+	  \ltjsetparameter{linestep_factor=0.5}
+	  \ltjenableadjust[profile, linestep]
+	  ……だから，①より$\dfrac{a^2}{b} = \dfrac{1+\sqrt{5}}2$．\\
+	  よって$b=\dfrac{1-\sqrt{5}}2$である．\\
+	  これを②式に代入すると……
+	  \par\vskip\abovecaptionskip
+	  \ltjenableadjust[profile=false, linestep=false]
+	  \par\centering\leavevmode{\small (c): 0.5\cs{baselineskip}刻み}
+	\end{minipage}%
+	\kern2\zw
+	\begin{minipage}[b]{16\zw}
+	  \ltjsetparameter{linestep_factor=1}
+	  \ltjenableadjust[profile, linestep]
+	  ……だから，①より$\dfrac{a^2}{b} = \dfrac{1+\sqrt{5}}2$．\\
+	  よって$b=\dfrac{1-\sqrt{5}}2$である．\\
+	  これを②式に代入すると……
+	  \par\vskip\abovecaptionskip
+	  \ltjenableadjust[profile=false, linestep=false]
+	  \par\centering\leavevmode{\small (d): \cs{baselineskip}刻み}
+	\end{minipage}\par
+	  \caption{段階的な行送り増加}\label{fig:linegap2}
+  \end{figure}
+
+ \item[段階的な行送り増加]
+  ...
 \end{description}
 
-\Pkg{luatexja-adjust}パッケージは，上記で述べた2機能を有効化/無効化するための
+\Pkg{luatexja-adjust}パッケージは，上記で述べた4機能を有効化/無効化するための
 以下の命令を提供する．これらはすべてグローバルに効力を発揮する．
 
 \begin{cslist}
@@ -6863,9 +6959,13 @@ for making the difference obvious.
 \begin{description}
   \item[\texttt{lineend=[false,true,extended]}]
   行末文字の位置調整の機能を無効化(\texttt{false})，「行分割後に調整」の形で有効化(\texttt{true})，
-  「行分割の仮定で考慮」(\texttt{extended})する．
+  「行分割の仮定で考慮」の形で有効化(\texttt{extended})する．
   \item[\texttt{priority=[false,true]}]
-  優先順位付きの行長調整を無効化(\texttt{false})，または有効化(\texttt{true})する．
+  優先順位付きの行長調整を無効化(\texttt{false})，または有効化(\texttt{true})．
+  \item[\texttt{profile=[false,true]}]
+  「中身までみた」行送り計算を無効化(\texttt{false})，または有効化(\texttt{true})．
+  \item[\texttt{linestep=[false,true]}]
+  ...
 \end{description}
 両キーともキー名のみを指定した場合は値として\texttt{true}が指定されたものと扱われる．
 
@@ -6878,13 +6978,13 @@ for making the difference obvious.
 \item[\cs{ltjdisableadjust}]
 \Pkg{luatexja-adjust}パッケージの機能を無効化する．
 \begin{lstlisting}
-\ltjenableadjust[lineend=false,priority=false]
+\ltjenableadjust[lineend=false,priority=false,profile=false,linestep=false]
 \end{lstlisting}
 と同義．
 \end{cslist}
 
-また，優先順位付きの行長調整のために，次の2パラメータが\cs{ltjsetparameter}内で
-追加される．両パラメータともグローバルに効力を発揮する．
+また，優先順位付きの行長調整のために，次の3パラメータが\cs{ltjsetparameter}内で
+追加される．いずれもグローバルに効力を発揮する．
 \begin{cslist}[style=standard]
 \item[\DParam{stretch\_priority}\,=\{<list>\}]
 \Param{kanjiskip}, \Param{xkanjiskip}，および「\textbf{JAglue}以外のグルー」を，
@@ -6903,12 +7003,16 @@ stretch_priority={kanjiskip=-35,xkanjiskip=-25,others=50}
 \item[\DParam{shrink\_priority}\,=\{<list>\}]
 同様に，「行を自然長より縮める」場合の調整に用いる優先度を指定する．
 それ以外は\Param{stretch\_priority}と指定の形式は変わらない．
+
+ \item[\DParam{linestep\_factor}\,=<float>]
+
 \end{cslist}
 初期値は\Param{stretch\_priority}, \Param{shrink\_priority}とも
 \begin{lstlisting}
 {kanjiskip=-35,xkanjiskip=-25,others=50}
 \end{lstlisting}
 であり，「優先度$-4$」と指定されているJFMグルーが最も伸び（縮み）にくいようになっている．
+また\Param{linestep\_factor}の初期値は0.5（つまり半行分）である．
 %</ja>
 
 \subsection{\Pkg{luatexja-ruby}}

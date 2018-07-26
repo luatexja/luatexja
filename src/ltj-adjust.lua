@@ -402,7 +402,7 @@ do
       return to_node(head)
    end
    local is_reg = false
-   function enable_cb(status_le, status_pr)
+   function enable_cb(status_le, status_pr, status_lp, status_ls)
       if (status_le>0 or status_pr>0) and (not is_reg) then
 	 luatexbase.add_to_callback('post_linebreak_filter',
 				    adjust_width, 'Adjust width', 100)
@@ -427,9 +427,13 @@ do
          end
       end
       myaw_step2 = (status_pr>0) and aw_step2 or aw_step2_dummy
+      luatexja.lineskip.setting(
+         status_lp>0 and 'profile' or 'dummy',
+	 status_ls>0 and 'step' or 'dummy'
+      )      
    end
    function disable_cb() -- only for compatibility
-       enable_cs(0)
+       enable_cs(0,0,0,0)
    end
    luatexja.adjust.enable_cb=enable_cb
    luatexja.adjust.disable_cb=disable_cb
@@ -440,7 +444,7 @@ luatexja.unary_pars.adjust = function(t)
 end
 
 -- -----------------------------------
-ltjl.step_factor = 0.5
+luatexja.adjust.step_factor = 0.5
 do
   local insert = table.insert
   local rangedimensions, max = node.direct.rangedimensions, math.max
@@ -499,11 +503,12 @@ do
 end
 
 do
+  local ltja = luatexja.adjust
   local copy_glue = ltjl.copy_glue
   local floor, max = math.floor, math.max
   function ltjl.l_step(dist, g, adj, normal, bw)
     if dist < tex.lineskiplimit then
-       local f = max(1, bw*ltjl.step_factor)
+       local f = max(1, bw*ltja.step_factor)
        copy_glue(g, tex.baselineskip, 1, normal - f * floor((dist-tex.lineskip.width)/f))
     else
        copy_glue(g, tex.baselineskip, 2, normal)
