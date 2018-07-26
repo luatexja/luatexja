@@ -6841,7 +6841,7 @@ for making the difference obvious.
   複数行に渡る文章を組版するときには行間に空きが入ることが普通である．
   \TeX では各行が一つずつの水平ボックスをなしていることを思い出すと，隣り合った
   2つの行（つまり水平ボックス）の間の空きは次のようにして決まるのだった：
-  \begin{enumerate}
+  \begin{itemize}
    \item 「通常に組んだときの行間」$d$を，\cs{baselineskip}から
 	「前の行」の深さと「次の行」の高さを加えたものを引いた値とする．
    \item $d\ge\cs{lineskiplimit}$の場合，
@@ -6850,7 +6850,7 @@ for making the difference obvious.
    \item {\catcode`\<=12$d<\cs{lineskiplimit}$}の場合，
 	2行の間には長さ\cs{lineskip}の空白が挿入される．
 	そのため（設定値によるが，多くの場合）行送りは\cs{baselineskip}より広がる．
-  \end{enumerate}
+  \end{itemize}
 
   \begin{figure}[t]
 	\noindent\centering
@@ -6876,9 +6876,9 @@ for making the difference obvious.
 	  \caption{高い行が連続したときの状況}\label{fig:linegap1}
   \end{figure}
 
-  以上で述べたことから，\TeX 標準では行送りの決定で「高さ・深さを取っているものが
-  行のどの水平位置にあるか」は一切考慮しない．そのため，
-  \autoref{fig:linegap1}~(a)のように「必要以上に行間が空いて見える」状況が起こる．
+  ここで，\TeX は行送りの決定で「高さ・深さを取っているものが
+  行のどの水平位置にあるか」は一切考慮しないことに注意してほしい．そのため，
+  \autoref{fig:linegap1}~(a)のように「必要以上に行間が空いて見える」状況が起こることがある．
 
   \Pkg{luatexja-adjust}パッケージでは，「通常に組んだときの行間」$d$を
   各行の中身の文字・グルー・ボックスの寸法を勘案して計算するという方法を
@@ -6945,8 +6945,23 @@ for making the difference obvious.
 	  \caption{段階的な行送り増加}\label{fig:linegap2}
   \end{figure}
 
- \item[段階的な行送り増加]
-  ...
+ \item[段階的な行送り調整]
+  既に述べたように，
+  「通常に組んだときの行間」$d$が\cs{lineskiplimit}より小さい場合，\TeX 標準では
+  行間は\cs{lineskip}となるのだった．
+  このとき行送りは「前の行の深さ」，「次の行の高さ」，\cs{lineskip}の3つの和になるわけだが，
+  場合によっては行送りを「\cs{baselineskip}の整数倍」などと切りのいい値に揃えたいという状況が
+  考えられなくもない．
+  
+  \Pkg{luatexja-adjust}パッケージでは，{\catcode`\<=12$d<\cs{lineskiplimit}$}のときに
+  行送りを\cs{baselineskip}の\Param{linestep\_factor}倍ずつ増減させて
+  \begin{quote}
+	行間が\cs{lineskip}以上となるような，
+	最小の$(1+k\cdot \Param{linestep\_factor})\cs{baselineskip}$（$k$は整数）の値
+  \end{quote}
+  とする機能を利用できるようにした．
+  \autoref{fig:linegap2}の(a)がこの機能を無効にした状況で，(b),~(c),~(d)が
+  それぞれ\Param{linestep\_factor}を0.25,~0.5,~1とした状況である．
 \end{description}
 
 \Pkg{luatexja-adjust}パッケージは，上記で述べた4機能を有効化/無効化するための
@@ -6954,7 +6969,8 @@ for making the difference obvious.
 
 \begin{cslist}
 \item[\cs{ltjenableadjust[...]}]
-\verb+...+ に指定したkey-valueリストに従い，「行末文字の位置調整」「優先順位付きの行長調整」を有効化/無効化する．
+\verb+...+ に指定したkey-valueリストに従い，「行末文字の位置調整」「優先順位付きの行長調整」
+  「『中身までみた』行送り計算」「段階的な行送り調整」を有効化/無効化する．
 指定できるキーは以下の通り．
 \begin{description}
   \item[\texttt{lineend=[false,true,extended]}]
@@ -6965,9 +6981,9 @@ for making the difference obvious.
   \item[\texttt{profile=[false,true]}]
   「中身までみた」行送り計算を無効化(\texttt{false})，または有効化(\texttt{true})．
   \item[\texttt{linestep=[false,true]}]
-  ...
+  段階的な行送り調整を無効化(\texttt{false})，または有効化(\texttt{true})．
 \end{description}
-両キーともキー名のみを指定した場合は値として\texttt{true}が指定されたものと扱われる．
+どのキーともキー名のみを指定した場合は値として\texttt{true}が指定されたものと扱われる．
 
 互換性の為，オプション無しでただ\cs{ltjenableadjust}が呼び出された場合は，
 \begin{lstlisting}
@@ -7005,14 +7021,16 @@ stretch_priority={kanjiskip=-35,xkanjiskip=-25,others=50}
 それ以外は\Param{stretch\_priority}と指定の形式は変わらない．
 
  \item[\DParam{linestep\_factor}\,=<float>]
-
+  段階的な行送り調整の際，\cs{baselineskip}の何倍単位で行送りを変えるかを指定する．
+  0を指定すると無効になるのと変わらない．また負数を指定すると，
+  その絶対値が指定されたかのように扱われる．
+  初期値は0.5（つまり半行単位）である．
 \end{cslist}
-初期値は\Param{stretch\_priority}, \Param{shrink\_priority}とも
+\Param{stretch\_priority}, \Param{shrink\_priority}の初期値はどちらも
 \begin{lstlisting}
 {kanjiskip=-35,xkanjiskip=-25,others=50}
 \end{lstlisting}
 であり，「優先度$-4$」と指定されているJFMグルーが最も伸び（縮み）にくいようになっている．
-また\Param{linestep\_factor}の初期値は0.5（つまり半行分）である．
 %</ja>
 
 \subsection{\Pkg{luatexja-ruby}}

@@ -133,7 +133,7 @@
    shrink_priority={kanjiskip=-35, xkanjiskip=-25, others=50},
 }
 \define@key[ltj]{japaram}{linestep_factor}{%
-  \directlua{luatexja.adjust.step_factor=#1}\relax}
+  \directlua{local d = #1; luatexja.adjust.step_factor=math.abs(d)}\relax}
 
 
 %%------------------ all done
