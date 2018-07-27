@@ -211,37 +211,6 @@
 \vfill\eject
 
 \vbox{\tate\hsize100mm
-\tfont\f=KozMinPr6N-Regular.otf:-vert;jfm=ujisv \f
-
-\ltjsetparameter{yalbaselineshift=.25em}\baselineskip15pt\parindent\zw
-\LaTeX の特徴として、テキストファイルであるソースコードを入力として処理することでDVIや
-PDFなどの表示形式を出力として得ることが挙げられる。
-
-\LaTeX の最大の長所は、\TeX に由来する高品質で自由度の高い組版処理能力である。組版処理能力
-は一般向けの出版物の作成にも充分に耐えられるものであり、実際の出版例もある。
-中でも数式組版の品質が高い。さらに、数式専用の命令文（コマンド）が用意されているので、
-単純なソースコードで高品質な数式表示を得られる。そのため、数式を多く含む自然科学系や工学系
-の出版物などでは、\LaTeX 形式での投稿が標準的なフォーマットとされていることも多い。
-
-くわえて、ソースコードに詳細な設定を記述することで、文書のスタイル（表示形式、見栄え、たと
-えばレイアウトやフォントなど）を自在に調節できる。また、ソースコード上で文書内容・文書構造
-（章・節・段落や強調箇所など）と文書スタイルの設定との分離が可能である。そのため、同一文書
-内で終始一貫したスタイをル保つことができる。また、同じ文書内容でレイアウトやフォントだけを
-変えることができるなど、文書内容データの再利用性が高い。一度スタイル設定を決めてしまえば、
-あとは文書内容の記述に専念することができるという利点もある。論文などの投稿では、学術雑
-誌のスタイルを記述したファイル（パッケージファイル）を Web からダウンロードして利用するこ
-とで、統一されたスタイルで論文を投稿することができ、論文の投稿者と雑誌の編集者とのやり取り
-を簡略化できる。Kile、TeXShop、TeXworks、EasyTeX、WinShell などの \TeX 用エ
-ディタや、野鳥（やてふ、YaTeX）、TeXlipse、KaTeX（花鳥、かてふ）、祝鳥
-（のりてふ）、M's TeX Helper 2など の\TeX 用テキストエディタマクロを兼用することに
-よって、より効率的な文章作成が可能ともなる。またMapleやMathematicaなどでドキュメントを
-作成し、\TeX 形式で出力することも可能である。
-
-\null\hfill
-（Wikipediaの「\LaTeX」の記事より．8/13現在）
-}
-
-\vbox{\tate\hsize100mm
 \tfont\f=KozMinPr6N-Regular.otf:jfm=ujisv \f
 
 \ltjsetparameter{yalbaselineshift=.25em}\baselineskip15pt\parindent\zw
@@ -270,6 +239,8 @@ PDFなどの表示形式を出力として得ることが挙げられる。
 
 \null\hfill
 （Wikipediaの「\LaTeX」の記事より．8/13現在）
+
+左⇦⇧⇩⇨⬅⬆⬇➡右
 }
 
 \message{^^Jget/set box dimension^^J}
@@ -461,10 +432,45 @@ $$
 \setbox0\hbox{}%
 \setbox1=\lastbox\the\wd1
 
-\leavevmode
-\hbox{\tate\tentmin ―(U+2015)と—(U+2014)，「」あ}
-\hbox{\tate\tfont\g=IPAexMincho:-vert;jfm=ujisv\g%
-  ―(U+2015)と—(U+2014)，「」あ}
 
+\vfill\eject
 
+\def\TEST#1{%
+  \tfont\A={#1;jfm=ujisv}
+  \noindent\vbox{\tate\hsize=200mm\A\parindent0pt
+    {\tentt #1}\par
+    あ，いーう．え「お」”か”左←↑→↓下
+  }\
+}
+
+\TEST{IPAexMincho:}
+\TEST{hgrkk.ttc:}
+\TEST{hgrkk.ttc:script=kana}
+\TEST{hgrkk.ttc:script=kana;language=jan}
+\TEST{hgrkk.ttc:script=hani}
+\TEST{KozMinPr6N-Regular.otf:}
+\TEST{KozMinPr6N-Regular.otf:script=kana}
+\TEST{KozMinPr6N-Regular.otf:script=kana;language=jan}
+\TEST{KozMinPr6N-Regular.otf:script=hani}
+
+\def\X#1#2#3{%
+漢字\hbox{#1◆あい#2えお◆}漢字
+\raise10pt\hbox{#1◆あい#2えお◆}漢字
+\lower10pt\hbox{#1◆あい#2えお◆}漢字#3
+漢字\hbox{\hbox{#1◆あい#2えお◆}}漢字
+\raise10pt\hbox{\hbox{#1◆あい#2えお◆}}漢字
+\lower10pt\hbox{\hbox{#1◆あい#2えお◆}}漢字#3
+漢字\vbox{\hsize80pt#1\vrule◆あい#2えお◆\hfil\vrule}漢字
+\raise10pt\vbox{\hsize80pt#1\noindent\vrule◆あい#2えお◆\hfil\vrule}漢字
+\lower10pt\vbox{\hsize80pt#1\vrule◆あい#2えお◆\hfil\vrule}漢字
+}
+
+\vfil\eject
+\vbox{\yoko
+\X\yoko Y{\hfil\break}\par\X\tate T{}\par\X\dtou D{}\par
+\X\utod U{}}
+
+\vbox{\tate
+\X\yoko Y{}\par\X\tate T{\hfil\break}\par\X\dtou D{\hfil\break}\par
+\X\utod U{\hfil\break}}
 \end
