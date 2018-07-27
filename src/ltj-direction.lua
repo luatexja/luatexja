@@ -1067,6 +1067,11 @@ do
    local finalize_inner
    local function finalize_dir_node(db,new_dir)
       local b = getlist(db)
+      if getid(b)==id_whatsit and getsubtype(b)==sid_user
+         and getfield(b, 'user_id')==DIR then
+         local ob = b; b = node_remove(b,b); setfield(db, 'head', b);
+	 node_free(ob)
+      end
       finalize_inner(b)
       local w = getfield(b, 'width')
       local h = getfield(b, 'height')
