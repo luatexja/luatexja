@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsarticle}
-  [2018/07/24 ltjsclasses ]
+  [2018/07/30 ltjsclasses ]
 \def\jsc@clsname{ltjsarticle}
 \RequirePackage{luatexja}
 \newif\if@restonecol
@@ -204,11 +204,11 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \newif\ifptexjis
 \ptexjisfalse
 \DeclareOption{winjis}{%
-  \ClassWarningNoLine{\jsc@clsname}{The \jsc@clsname\space class does not support `winjis' option}}
+  \ClassWarningNoLine{\jsc@clsname}{this class does not support `winjis' option}}
 \DeclareOption{uplatex}{%
-  \ClassErrorNoLine{\jsc@clsname}{The \jsc@clsname\space class does not support `uplatex' option}}
+  \ClassError{\jsc@clsname}{this class does not support `uplatex' option}}
 \DeclareOption{autodetect-engine}{%
-  \ClassWarningNoLine{\jsc@clsname}{The \jsc@clsname\space class does not support `autodetect-engine' option}}
+  \ClassWarningNoLine{\jsc@clsname}{this class does not support `autodetect-engine' option}}
 \DeclareOption{mingoth}{\mingothtrue}
 \DeclareOption{ptexjis}{\ptexjistrue}
 \DeclareOption{jis}{\jisfonttrue}
