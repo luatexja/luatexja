@@ -8,6 +8,11 @@
 \RequirePackage{fontspec,luatexja}
 \ExplSyntaxOn
 
+% <= v2.6g uses \l__fontspec_nfss_enc_tl instead of \g__fontspec_nfss_enc_tl
+\ifdefined \g__fontspec_nfss_enc_tl \else
+  \def \g__fontspec_nfss_enc_tl { \l__fontspec_nfss_enc_tl }
+\fi
+
 \@ifpackagelater{fontspec}{2017/01/01}{
 %%%%%%%% fontspec v2.5c overwrites \rmfamily etc. in \setmainfont
 \DeclareDocumentCommand \setmainfont { O{} m O{} }
@@ -16,14 +21,14 @@
   \tl_set_eq:NN \rmdefault \g__fontspec_rmfamily_family
   \use:x { \exp_not:n { \DeclareRobustCommand \rmfamily }
    {
-    \exp_not:N \fontencoding { \l__fontspec_nfss_enc_tl }
+    \exp_not:N \fontencoding { \g__fontspec_nfss_enc_tl }
     \exp_not:N \fontfamily { \g__fontspec_rmfamily_family }
     \exp_not:N\if@ltj@match@family\exp_not:N\kanjifamily\exp_not:N\mcdefault\exp_not:N\fi%%%
     \exp_not:N \selectfont
    }
   }
   \str_if_eq_x:nnT {\familydefault} {\rmdefault}
-    { \tl_set_eq:NN \encodingdefault \l__fontspec_nfss_enc_tl }
+    { \tl_set_eq:NN \encodingdefault \g__fontspec_nfss_enc_tl }
   \normalfont
   \ignorespaces
  }
@@ -33,14 +38,14 @@
   \tl_set_eq:NN \sfdefault \g__fontspec_sffamily_family
   \use:x { \exp_not:n { \DeclareRobustCommand \sffamily }
    {
-    \exp_not:N \fontencoding { \l__fontspec_nfss_enc_tl }
+    \exp_not:N \fontencoding { \g__fontspec_nfss_enc_tl }
     \exp_not:N \fontfamily { \g__fontspec_sffamily_family }
     \exp_not:N\if@ltj@match@family\exp_not:N\kanjifamily\exp_not:N\gtdefault\exp_not:N\fi%%%
     \exp_not:N \selectfont
    }
   }
   \str_if_eq_x:nnT {\familydefault} {\sfdefault}
-    { \tl_set_eq:NN \encodingdefault \l__fontspec_nfss_enc_tl }
+    { \tl_set_eq:NN \encodingdefault \g__fontspec_nfss_enc_tl }
   \normalfont
   \ignorespaces
  }
@@ -50,14 +55,14 @@
   \tl_set_eq:NN \ttdefault \g__fontspec_ttfamily_family
   \use:x { \exp_not:n { \DeclareRobustCommand \ttfamily }
    {
-    \exp_not:N \fontencoding { \l__fontspec_nfss_enc_tl }
+    \exp_not:N \fontencoding { \g__fontspec_nfss_enc_tl }
     \exp_not:N \fontfamily { \g__fontspec_ttfamily_family }
     \exp_not:N\if@ltj@match@family\exp_not:N\kanjifamily\exp_not:N\jttdefault\exp_not:N\fi%%%
     \exp_not:N \selectfont
    }
   }
   \str_if_eq_x:nnT {\familydefault} {\ttdefault}
-    { \tl_set_eq:NN \encodingdefault \l__fontspec_nfss_enc_tl }
+    { \tl_set_eq:NN \encodingdefault \g__fontspec_nfss_enc_tl }
   \normalfont
   \ignorespaces
  }
