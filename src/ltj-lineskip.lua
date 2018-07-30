@@ -66,7 +66,7 @@ do
       end
       return true
    end
-   luatexbase.add_to_callback('post_linebreak_filter', 
+   ltjb.add_to_callback('post_linebreak_filter', 
       adjust_glue, 'ltj.lineskip', 10000)
 end
 

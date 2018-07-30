@@ -1,6 +1,7 @@
 --
 -- ltj-adjust.lua
 --
+luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 luatexja.load_module('jfmglue');   local ltjj = luatexja.jfmglue
 luatexja.load_module('stack');     local ltjs = luatexja.stack
@@ -404,8 +405,9 @@ do
    local is_reg = false
    function enable_cb(status_le, status_pr, status_lp, status_ls)
       if (status_le>0 or status_pr>0) and (not is_reg) then
-	 luatexbase.add_to_callback('post_linebreak_filter',
-				    adjust_width, 'Adjust width', 100)
+	 ltjb.add_to_callback('post_linebreak_filter',
+            adjust_width, 'Adjust width', 
+	    luatexbase.priority_in_callback('post_linebreak_filter', 'ltj.lineskip')-1)
 	 is_reg = true
       elseif is_reg and (status_le==0 and status_pr==0) then
 	 luatexbase.remove_from_callback('post_linebreak_filter', 'Adjust width')
@@ -413,7 +415,7 @@ do
       end
       if status_le==2 then
 	 if not luatexbase.in_callback('luatexja.adjust_jfmglue', 'luatexja.adjust') then
-	    luatexbase.add_to_callback('luatexja.adjust_jfmglue', insert_lineend_kern, 'luatexja.adjust')
+	    ltjb.add_to_callback('luatexja.adjust_jfmglue', insert_lineend_kern, 'luatexja.adjust')
 	 end
          myaw_step1, myaw_step1_last = dummy, aw_step1_last
       else

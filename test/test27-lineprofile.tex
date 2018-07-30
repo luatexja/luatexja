@@ -24,7 +24,7 @@
  □□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■□□□□■
  □□□□■□□□□■□□□□■□□□□■
 }}\dp2=0pt\rlap{\copy2}\par\vspace*{-\baselineskip}
-\textbf{#1, #2}\\
+\textbf{profile: #1, linestep: #2}\par
 \vrule height 2pt depth 0pt width 10\zw\\
 \vrule height 2pt depth 0pt width 10\zw\\
 \the\baselineskip あああああああああああああああ\\
@@ -56,5 +56,20 @@
 \R{true}{false}
 \R{false}{true}
 \R{true}{true}
+
+\ltjdisableadjust
+\def\R#1#2{\ltjenableadjust[profile=#1,priority=#2]%
+\noindent\fbox{\parbox[t]{20\zw}{%
+\baselineskip14pt\noindent
+\textbf{profile: #1, priority: #2}\par
+  \ltjsetparameter{xkanjiskip=.25\zw plus 20pt minus 20pt}
+  ああxあaaaあxあx\vrule height 30pt depth 30pt width 9.7\zw「\break
+  \vrule height 30pt depth 30pt width9.7\zw xあxあxあaaaああ「\break
+}}}
+
+\R{false}{false}%
+\R{true}{false}\\
+\R{false}{true}%
+\R{true}{true}%
 
 \end{document}
