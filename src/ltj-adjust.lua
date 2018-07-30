@@ -496,7 +496,7 @@ do
         if h>hmax then hmax=h end
         if (bw-h-d)<lmin then lmin=bw-h-d end
       end
-      if lmin==1/0 then lmin = 0 end
+      if lmin==1/0 then lmin = bw end
       return lmin, 
          bw - lmin - getfield(before, 'depth')
              - getfield(after, mirrored and 'depth' or 'height')
