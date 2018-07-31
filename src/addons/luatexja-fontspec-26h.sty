@@ -148,6 +148,11 @@
   \cs_set_eq:NN \DeclareFontFamily \ltj_fontspec_DeclareFontFamily
   \tl_set:Nn \g_fontspec_encoding_tl {JY3}
   \__ltj_orig_fontspec_select_font_family:nn{#1}{#2}
+
+  \cs_gset:Npx \__ltj_fontspec_aftergroup {
+    \exp_not:N \tl_set:Nn \exp_not:N \l_fontspec_family_tl { \l_fontspec_family_tl }
+  }
+  \aftergroup \__ltj_fontspec_aftergroup
   \group_end:
 }
 
