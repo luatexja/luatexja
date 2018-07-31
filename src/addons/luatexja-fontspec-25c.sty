@@ -1,9 +1,9 @@
 %
-% luatexja-fontspec-26h.sty
+% luatexja-fontspec-25c.sty
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec-26h}[2018/07/31 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec-25c}[2018/06/15 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e,luatexja}
 \ExplSyntaxOn
 
@@ -93,9 +93,6 @@
   \DeclareKanjiFamily {JT3} {#2} {#3}
 }
 
-\tl_new:N \g__ltj_fontspec_kanji_nfss_family_tl
-\tl_new:N \g__ltj_fontspec_orig_nfss_family_tl
-
 \cs_set_eq:NN \__ltj_orig_fontspec_select_font_family:nn \__fontspec_select_font_family:nn
 \cs_new_protected:Nn \ltj_fontspec_select_font_family:nn {
   \group_begin:
@@ -151,11 +148,6 @@
   \cs_set_eq:NN \DeclareFontFamily \ltj_fontspec_DeclareFontFamily
   \tl_set:Nn \g_fontspec_encoding_tl {JY3}
   \__ltj_orig_fontspec_select_font_family:nn{#1}{#2}
-
-  \cs_gset:Npx \__ltj_fontspec_aftergroup {
-    \exp_not:N \tl_set:Nn \exp_not:N \l_fontspec_family_tl { \l_fontspec_family_tl }
-  }
-  \aftergroup \__ltj_fontspec_aftergroup
   \group_end:
 }
 
@@ -182,7 +174,7 @@
   \tl_set_eq:NN \l__fontspec_saved_fontname_tl \l_fontspec_fontname_tl
 
   \tl_set:Nn \g_fontspec_encoding_tl {#5}
-  \tl_set:Nn \g__fontspec_nfss_enc_tl {#5}
+  \tl_set:Nn \l__fontspec_nfss_enc_tl {#5}
   \exp_args:Nx \clist_map_inline:nn {#4}
    {
     \tl_clear:N \l__fontspec_size_tl
@@ -208,15 +200,9 @@
  }
 
 \cs_new:Nn \ltj_fontspec_set_family:Nnn {
-  %\typeout{A>>[\g__fontspec_nfss_family_tl][\g__ltj_fontspec_kanji_nfss_family_tl]}
-  \tl_gset_eq:NN \g__ltj_fontspec_orig_nfss_family_tl \g__fontspec_nfss_family_tl
-  \tl_gset_eq:NN \g__fontspec_nfss_family_tl \g__ltj_fontspec_kanji_nfss_family_tl
   \cs_set_eq:NN \__fontspec_select_font_family:nn \ltj_fontspec_select_font_family:nn
   \__ltj_orig_fontspec_set_family:Nnn #1 {#2} {#3}
   \cs_set_eq:NN \__fontspec_select_font_family:nn \__ltj_orig_fontspec_select_font_family:nn
-  \tl_gset_eq:NN \g__ltj_fontspec_kanji_nfss_family_tl \g__fontspec_nfss_family_tl
-  \tl_gset_eq:NN \g__fontspec_nfss_family_tl \g__ltj_fontspec_orig_nfss_family_tl
-  %\typeout{B>>[\g__fontspec_nfss_family_tl][\g__ltj_fontspec_kanji_nfss_family_tl]}
 }
 \cs_set_eq:NN \__ltj_orig_fontspec_set_family:Nnn \fontspec_set_family:Nnn
 \cs_set_eq:NN \__ltj_orig_fontspec_make_font_shapes:Nnnnn \__fontspec_make_font_shapes:Nnnnn
@@ -345,18 +331,12 @@
 \DeclareDocumentCommand \addjfontfeatures {m} {
   \ltj_fontspec_if_fontspec_font:TF
    {
-    %\typeout{C>>[\g__fontspec_nfss_family_tl][\g__ltj_fontspec_kanji_nfss_family_tl]}
-    \tl_gset_eq:NN \g__ltj_fontspec_orig_nfss_family_tl \g__fontspec_nfss_family_tl
-    \tl_gset_eq:NN \g__fontspec_nfss_family_tl \g__ltj_fontspec_kanji_nfss_family_tl
     \group_begin:
       \tl_set_eq:NN \f@family \k@family
       \cs_set_eq:NN \__fontspec_select_font_family:nn \ltj_fontspec_select_font_family:nn
       \addfontfeatures {#1}
     \group_end:
-    \kanjifamily\g__fontspec_nfss_family_tl\selectfont
-    \tl_gset_eq:NN \g__ltj_fontspec_kanji_nfss_family_tl \g__fontspec_nfss_family_tl
-    \tl_gset_eq:NN \g__fontspec_nfss_family_tl \g__ltj_fontspec_orig_nfss_family_tl
-    %\typeout{D>>[\g__fontspec_nfss_family_tl][\g__ltj_fontspec_kanji_nfss_family_tl]}
+    \fontfamily\l_fontspec_family_tl\selectfont
    }{
     \msg_warning:nn  {luatexja-fontspec} {addjfontfeatures-ignored}
    }
@@ -367,7 +347,7 @@
 
 \prg_new_conditional:Nnn \ltj_fontspec_if_fontspec_font: {TF,T,F}
 {
-  \cs_if_exist:cTF {g__fontspec_fontinfo_ \k@family _prop} \prg_return_true: \prg_return_false:
+  \cs_if_exist:cTF {g__fontspec_ \k@family _prop} \prg_return_true: \prg_return_false:
 }
 
 \endinput
