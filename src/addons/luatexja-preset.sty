@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2018/06/15 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2018/08/01 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -562,6 +562,10 @@
     \seq_if_in:NnTF \g_ltjpreset_presets_seq { #2 } {
       \bool_if:cTF { c_ #1 _bool } {
         \msg_warning:nnn { luatexja-preset }{ exist-preset-overwrite } { #2 }
+        \keys_define:nn { luatexja-preset } {
+        #2 .meta:n = { #3, __custom = true, __noembed = false, __office = false, },
+        #2 .value_forbidden:n = true, #2 .groups:n = { preset },
+        }
       } {
         \msg_error:nnn { luatexja-preset }{ exist-preset-nooverwrite } { #2 }
       }
@@ -579,6 +583,7 @@
 
 \cs_set:Npn \ltjapplypreset #1 {
   \keys_set_groups:nnn { luatexja-preset } { preset } { #1 }
+  % \prop_map_inline:Nn \g_ltjpreset_font_prop {\typeout{ [##1] = "##2" } }
   \ltjpreset_extract_fonts:
   \ltjpreset_check_deluxe_existence:
   \ltjpreset_do_fontset:
