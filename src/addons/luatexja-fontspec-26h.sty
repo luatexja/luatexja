@@ -235,6 +235,7 @@
   \__ltj_set_global_variable_for_kanji:
   \cs_set_eq:NN \__fontspec_select_font_family:nn \ltj_fontspec_select_font_family:nn
   \__ltj_orig_fontspec_set_family:Nnn #1 {#2} {#3}
+  \cs_set_eq:NN \__fontspec_select_font_family:nn \__ltj_orig_fontspec_select_font_family:nn
   \__ltj_restore_global_variable:
 }
 \cs_set_eq:NN \__ltj_orig_fontspec_set_family:Nnn \fontspec_set_family:Nnn
@@ -314,20 +315,30 @@
 
 \DeclareDocumentCommand \setmainjfont { O{} m O{} } {
   \ltj_fontspec_set_family:Nnn \mcdefault {#1,#3}{#2}
-  \DeclareSymbolFont{mincho}{JY3}{\l_fontspec_family_tl}{\mddefault}{n}
-  \SetSymbolFont{mincho}{bold}{JY3}{\l_fontspec_family_tl}{\bfdefault}{n}
+  \DeclareSymbolFont{mincho}{JY3}{\mcdefault}{\mddefault}{n}
+  \SetSymbolFont{mincho}{bold}{JY3}{\mcdefault}{\bfdefault}{n}
   \normalfont
 }
 
 \DeclareDocumentCommand \setsansjfont { O{} m O{} } {
   \ltj_fontspec_set_family:Nnn \gtdefault {#1,#3}{#2}
-  \DeclareMathAlphabet{\mathgt}{JY3}{\l_fontspec_family_tl}{\mddefault}{n}
+  \DeclareMathAlphabet{\mathgt}{JY3}{\gtdefault}{\mddefault}{n}
   \normalfont
 }
 
 \DeclareDocumentCommand \newjfontfamily { m O{} m O{} } {
   \cs_set_eq:NN \fontspec_set_family:Nnn \ltj_fontspec_set_family:Nnn
   \newfontfamily #1 [#2,#4] {#3}
+  \cs_set_eq:NN \fontspec_set_family:Nnn \__ltj_orig_fontspec_set_family:Nnn
+}
+\DeclareDocumentCommand \renewjfontfamily { m O{} m O{} } {
+  \cs_set_eq:NN \fontspec_set_family:Nnn \ltj_fontspec_set_family:Nnn
+  \renewfontfamily #1 [#2,#4] {#3}
+  \cs_set_eq:NN \fontspec_set_family:Nnn \__ltj_orig_fontspec_set_family:Nnn
+}
+\DeclareDocumentCommand \setjfontfamily { m O{} m O{} } {
+  \cs_set_eq:NN \fontspec_set_family:Nnn \ltj_fontspec_set_family:Nnn
+  \setfontfamily #1 [#2,#4] {#3}
   \cs_set_eq:NN \fontspec_set_family:Nnn \__ltj_orig_fontspec_set_family:Nnn
 }
 
