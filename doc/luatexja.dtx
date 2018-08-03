@@ -72,7 +72,12 @@
 \usepackage{luatexja-adjust}%\ltjdisableadjust
 \advance\leftmargini-1\zw\advance\leftmarginii-1\zw
 %</ja>
-
+%<en>\long\def\fakefn#1#2{\par\noindent{\footnotesize\hbox to1.8em{\hss#1}#2\par}}
+%<*ja>
+\long\def\fakefn#1#2{%
+  \par{\footnotesize\advance\leftskip 3\zw\parindent1\zw\noindent
+  \llap{#1\hskip.3\zw}#2\par}}
+%</ja>
 %%%%%%%% listings
 
 %%%%%%%% IVS
@@ -1429,16 +1434,21 @@ TrueType・OpenTypeフォントを容易に扱うためのパッケージであ�
 %</ja>
 
 %<*en>
-In the \Pkg{luatexja-fontspec} package, the following seven~commands are defined as
-counterparts of original commands in the \Pkg{fontspec} package:
+In the \Pkg{luatexja-fontspec} package, several commands are defined as
+counterparts of original commands in the \Pkg{fontspec} package
+(see \autoref{tab:ltj_fntspc}):
 %</en>
 %<*ja>
-\Pkg{luatexja-fontspec}パッケージでは，以下の7つのコマンドを\Pkg{fontspec}
-パッケージの元のコマンドに対応するものとして定義している：
+\Pkg{luatexja-fontspec}パッケージでは，\autoref{tab:ltj_fntspc}の
+「和文」行に示した命令を\Pkg{fontspec}パッケージの元のコマンド（「欧文」行）
+に対応するものとして定義している：
 %</ja>
 %<*en>
-\begin{center}\small
-\begin{tabular}{ccccc}
+\begin{table}
+\caption{Commands of \Pkg{luatexja-fontspec}}\label{tab:ltj_fntspc}
+\medskip
+{\centering\small
+\begin{tabular}{cllll}
 \toprule
 Japanese fonts
 &\cs{jfontspec}&\cs{setmainjfont}&\cs{setsansjfont}&\cs{setmonojfont}$^*$\\
@@ -1446,18 +1456,33 @@ alphabetic fonts
 &\cs{fontspec}&\cs{setmainfont}&\cs{setsansfont}&\cs{setmonofont}\\
 \midrule
 Japanese fonts
-&\cs{newjfontfamily}&\cs{newjfontface}
-&\cs{defaultjfontfeatures}&\cs{addjfontfeatures}\\
+&\cs{newjfontfamily}&\cs{renewjfontfamily}$^{**}$&\cs{setjfontfamily}$^{**}$\\
 alphabetic fonts
-&\cs{newfontfamily}&\cs{newfontface}
-&\cs{defaultfontfeatures}&\cs{addfontfeatures}\\
+&\cs{newfontfamily}&\cs{renewfontfamily}$^{**}$&\cs{setfontfamily}$^{**}$\\
+\midrule
+Japanese fonts
+&\cs{newjfontface}&\cs{defaultjfontfeatures}&\cs{addjfontfeatures}\\
+alphabetic fonts
+&\cs{newfontface}&\cs{defaultfontfeatures}&\cs{addfontfeatures}\\
 \bottomrule
-\end{tabular}
-\end{center}
+\end{tabular}\par}
+\medskip
+\fakefn{$^*$}{%
+  \cs{setmonojfont} is defined if and only if \texttt{match} option is specified.}
+\fakefn{$^{**}$}{%
+  \cs{renewfontfamily}~and~\cs{setfontfamily} are new commands
+  in \Pkg{fontspec}~v2.6h (2018/7/30).
+  Hence, \Pkg{luatexja-fontspec} define \cs{renewjfontfamily}~and~\cs{setjfontfamily}
+  only when \Pkg{fontspec}~v2.6h (or later) is used.
+}
+\end{table}
 %</en>
 %<*ja>
-\begin{center}\small
-\begin{tabular}{ccccc}
+\begin{table}
+\caption{\Pkg{luatexja-fontspec}で定義される命令}\label{tab:ltj_fntspc}
+\medskip
+{\centering\small
+\begin{tabular}{cllll}
 \toprule
 和文
 &\cs{jfontspec}&\cs{setmainjfont}&\cs{setsansjfont}&\cs{setmonojfont}$^*$\\
@@ -1465,14 +1490,28 @@ alphabetic fonts
 &\cs{fontspec}&\cs{setmainfont}&\cs{setsansfont}&\cs{setmonofont}\\
 \midrule
 和文
-&\cs{newjfontfamily}&\cs{newjfontface}
-&\cs{defaultjfontfeatures}&\cs{addjfontfeatures}\\
+&\cs{newjfontfamily}&\cs{renewjfontfamily}$^{**}$&\cs{setjfontfamily}$^{**}$\\
 欧文
-&\cs{newfontfamily}&\cs{newfontface}
-&\cs{defaultfontfeatures}&\cs{addfontfeatures}\\
+&\cs{newfontfamily}&\cs{renewfontfamily}$^{**}$&\cs{setfontfamily}$^{**}$\\
+\midrule
+和文
+&\cs{newjfontface}&\cs{defaultjfontfeatures}&\cs{addjfontfeatures}\\
+欧文
+&\cs{newfontface}&\cs{defaultfontfeatures}&\cs{addfontfeatures}\\
 \bottomrule
-\end{tabular}
-\end{center}
+\end{tabular}\par}
+
+\medskip
+\fakefn{$^*$}{\cs{setmonojfont} は \texttt{match} オプションが
+指定された時のみ定義される．}
+\fakefn{$^{**}$}{%
+  \cs{renewfontfamily} と \cs{setfontfamily} は
+  \Pkg{fontspec}~v2.6h (2018/7/30)で新たに追加された命令である．
+  そのため，\Pkg{luatexja-fontspec}が \cs{renewjfontfamily} と \cs{setjfontfamily} を
+  定義するのはv2.6h以降の\Pkg{fontspec}を使用した時のみになっている．
+}
+
+\end{table}
 %</ja>
 
 %<en> The package option of \Pkg{luatexja-fontspec} are the followings:
@@ -6378,7 +6417,7 @@ for example, the meaning of \cs{TU\cs{textquotedblleft}} is \cs{ltjalchar8220\lt
 
 \begin{table}[t]
   \centering\small
-  \caption{strut}\label{tab:strutbox}
+  \caption{strut}\label{tab:strutbox}\medskip
   \begin{tabular}{llcccl}
     \toprule
     \textbf{box}&\textbf{direction}&\textbf{width}&\textbf{height}&\textbf{depth}
@@ -6795,11 +6834,11 @@ with priority&%
 \\
 \bottomrule
 \end{tabular}\par}
-\smallskip
+\medskip
 
-Note: the value of
+\fakefn{}{The value of
 \Param{kanjiskip} is 0\,pt${}^{+1/5\,\mathrm{em}}_{-1/5\,\mathrm{em}}$ in this figure,
-for making the difference obvious.
+for making the difference obvious.}
 %<ja>\caption{行長調整}\label{fig:adj}
 %<en>\caption{Line adjustment}\label{fig:adj}
 \end{figure}
