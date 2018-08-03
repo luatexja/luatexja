@@ -4,7 +4,7 @@
 
 \makeatletter
 \let\ltj@orig@DeclareFontShape@=\DeclareFontShape@
-\def\DeclareFontShape@#1#2#3#4#5#6{%
+\def\@@@DeclareFontShape@#1#2#3#4#5#6{%
 \immediate\typeout{DFS |#1|#2|#3|#4|#5|#6|}%
 \ltj@orig@DeclareFontShape@{#1}{#2}{#3}{#4}{#5}{#6}%
 }
@@ -60,6 +60,7 @@
 \medskip\piyo\test
 
 \newpage
+%\typeout{!!!! 5gou kana}
 \section{5号かな}
 {%
 \jfontspec[
@@ -76,6 +77,7 @@
 （\ltjjachar"21B5）%"
 }
 
+\newpage
 \section{addfontfeatures}
 \piyo\test
 \addjfontfeatures{
@@ -125,11 +127,11 @@
 
 どっちかではうまくいくようにしたいが……
 
-
+\typeout{!!! BOLD}
 \paragraph{BoldFeaturesとAltFontその1}
 \jfontspec
 [
-  AltFont = { { Color=0000FF,  Range="6000-"9FFF } },
+  AltFont={{Color=0000FF, Range="6000-"9FFF}},
   BoldFont=KozMinPr6N-Bold,
   UprightFeatures = {
     AltFont = {
