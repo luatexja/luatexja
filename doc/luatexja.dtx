@@ -7570,12 +7570,12 @@ since we use same font for both series of gothic.
 	   いため，
 「ゴシック体の中字」も同時に変更されることになる．
 %</ja>
-\item[90jis]
-%<en>Use 90JIS glyph variants if possible.
-%<ja>出来る限り90JISの字形を使う．
-\item[jis2004]
-%<en>Use JIS2004 glyph variants if possible.
-%<ja>出来る限りJIS2004の字形を使う．
+\item[jis90\textrm{,~}90jis]
+%<en>Use JIS~X~0208:1990 glyph variants if possible.
+%<ja>出来る限りJIS~X~0208:1990の字形を使う．
+\item[jis2004\textrm{,~}2004jis]
+%<en>Use JIS~X~0213:2004 glyph variants if possible.
+%<ja>出来る限りJIS~X~0213:2004の字形を使う．
 \item[jfm\_yoko=<jfm>]
 %<*en>
 Use the JFM \texttt{jfm-<jfm>.lua} for horizontal direction, instead of \texttt{jfm-ujis.lua}~(default JFM).
@@ -7599,14 +7599,14 @@ Use the JFM \texttt{jfm-<jfm>.lua} for vertical direction, instead of \texttt{jf
 
 \end{cslist}
 %<*en>
-Note that \texttt{90jis} and \texttt{jis2004} only affect with mincho,
+Note that \texttt{jis90},~\texttt{90jis}, \texttt{jis2004}~and~\texttt{2004jis} only affect with mincho,
 gothic (and, possibly rounded gothic) families defined by this package.
-We didn't taken account of  when both \texttt{90jis} and \texttt{jis2004} are specified.
+We didn't taken account of when more than one options among them are specified.
 %</en>
 %<*ja>
-\texttt{90jis}と\texttt{jis2004}については本パッケージで定義された
+\texttt{jis90},~\texttt{90jis}, \texttt{jis2004},~\texttt{2004jis}については本パッケージで定義された
 明朝体・ゴシック体（・丸ゴシック体）にのみ有効である．
-両オプションが同時に指定された場合の動作については全く考慮していない．
+これら4オプションのうち複数が同時に指定された場合の動作については全く考慮していない．
 %</ja>
 
 %<en>\subsubsection{Presets which support multi weights}
@@ -7979,17 +7979,17 @@ Note that HG~Mincho~E, HG~Gothic~E, HG Soei Kaku Gothic UB, and HG Maru Gothic P
 are internally specified by:
 \begin{description}
 \item[default] by font name (\texttt{HGMinchoE}, etc.).
-\item[{\tt 90jis}] by file name (\texttt{hgrme.ttc}, \texttt{hgrge.ttc}, \texttt{hgrsgu.ttc}, \texttt{hgrsmp.ttf}).
-\item[{\tt jis2004}] by file name (\texttt{hgrme04.ttc}, \texttt{hgrge04.ttc}, \texttt{hgrsgu04.ttc}, \texttt{hgrsmp04.ttf}).
+\item[\texttt{jis90}, \texttt{90jis}] by file name (\texttt{hgrme.ttc}, \texttt{hgrge.ttc}, \texttt{hgrsgu.ttc}, \texttt{hgrsmp.ttf}).
+\item[\texttt{jis2004}, \texttt{2004jis}] by file name (\texttt{hgrme04.ttc}, \texttt{hgrge04.ttc}, \texttt{hgrsgu04.ttc}, \texttt{hgrsmp04.ttf}).
 \end{description}
 %</en>
 %<*ja>
 なお，HG明朝E・HGゴシックE・HG創英角ゴシックUB・HG丸ゴシック体PROの4つについては，内部で
 \begin{description}
 \item[標準] フォント名（\texttt{HGMinchoE} など）
-\item[{\tt 90jis}指定時] ファイル名 (%
+\item[\texttt{jis90}, \texttt{90jis}指定時] ファイル名 (%
 \texttt{hgrme.ttc}, \texttt{hgrge.ttc}, \texttt{hgrsgu.ttc}, \texttt{hgrsmp.ttf})
-\item[{\tt jis2004}指定時] ファイル名 (%
+\item[\texttt{jis2004}, \texttt{2004jis}指定時] ファイル名 (%
 \texttt{hgrme04.ttc}, \texttt{hgrge04.ttc}, \texttt{hgrsgu04.ttc}, \texttt{hgrsmp04.ttf})
 \end{description}
 として指定を行っているので注意すること．
