@@ -508,9 +508,12 @@ do
   local ltja = luatexja.adjust
   local copy_glue = ltjl.copy_glue
   local floor, max = math.floor, math.max
-  function ltjl.l_step(dist, g, adj, normal, bw)
+  function ltjl.l_step(dist, g, adj, normal, bw, loc)
+    if loc=='alignment' then
+      return ltjl.l_dummy(dist, g, adj, normal, bw, loc)
+    end
     if dist < tex.lineskiplimit then
-       local f = max(1, bw*ltja.step_factor)
+	local f = max(1, bw*ltja.step_factor)
        copy_glue(g, tex.baselineskip, 1, normal - f * floor((dist-tex.lineskip.width)/f))
     else
        copy_glue(g, tex.baselineskip, 2, normal)

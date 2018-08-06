@@ -30,7 +30,7 @@ ltjl.copy_glue = copy_glue
 function ltjl.p_dummy(before, after)
    return nil, 0
 end
-function ltjl.l_dummy(dist, g, adj, normal, bw)
+function ltjl.l_dummy(dist, g, adj, normal, bw, loc)
    if dist < tex.lineskiplimit then
       copy_glue(g, tex.lineskip, 1, tex.lineskip.width + adj)
    else
@@ -96,7 +96,7 @@ do
 	    end
 	 end
 	 local g = node_new(id_glue)
-         ltj_skip(lmin or normal, g, adj, normal, bw)
+         ltj_skip(lmin or normal, g, adj, normal, bw, loc)
 	 node_write(g)
       end
       node_write(new_b)
