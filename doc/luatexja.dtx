@@ -7001,6 +7001,11 @@ for making the difference obvious.}
   とする機能を利用できるようにした．
   \autoref{fig:linegap2}の(a)がこの機能を無効にした状況で，(b),~(c),~(d)が
   それぞれ\Param{linestep\_factor}を0.25,~0.5,~1とした状況である．
+
+  なお，この機能は表組時(\cs{halign},~\cs{valign})には無効である．
+  \LaTeX における表組環境（tabular, arrayなど）では，\cs{baselineskip},~\cs{lineskip}はどちらも0に設定されているので
+  （代わりに各行に\cs{@arstrut}という支柱が入る）ために意味がないことと，
+  数式を内部で表組を使って組むalign環境などではかえって行間が不揃いになってしまうからである．
 \end{description}
 
 \Pkg{luatexja-adjust}パッケージは，上記で述べた4機能を有効化/無効化するための
