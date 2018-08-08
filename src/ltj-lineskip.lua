@@ -8,6 +8,7 @@ luatexja.lineskip = luatexja.lineskip or {}
 local to_direct = node.direct.todirect
 local ltjl = luatexja.lineskip
 local id_glue = node.id('glue')
+local id_penalty = node.id('penalty')
 local id_hlist = node.id('hlist')
 local setfield = node.direct.setfield
 local getfield = node.direct.getfield
@@ -55,7 +56,9 @@ do
            local p, n = node_prev(x), node_next(x)
            if p then
               local pid = getid(p)
-	      while (12<=pid) and (pid<=14) and node_prev(p) do p = node_prev(p); pid = getid(p) end
+	      while (id_glue<=pid) and (pid<=id_penalty) and node_prev(p) do 
+	        p = node_prev(p); pid = getid(p)
+	      end
 	      if pid==id_hlist and getid(n)==id_hlist then
                 local normal = bw - getfield(p, 'depth') - getfield(n, 'height')
                 local lmin, adj = ltj_profiler(p, n, false, bw)
@@ -85,7 +88,7 @@ do
 	    - getfield(new_b, mirrored and 'depth' or 'height')
          local lmin, adj = nil, 0
          local tail = to_direct(tex.nest[tex.nest.ptr].tail)
-         if tail and getid(tail)==id_glue and getsubtype(tail)==3 then
+         while tail and (id_glue<=getid(tail)) and (getid(tail)<=id_penalty) do
             tail = node_prev(tail)
          end
 	 if tail then
