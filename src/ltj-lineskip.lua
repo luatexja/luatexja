@@ -74,6 +74,7 @@ do
 end
 
 do
+   local p_dummy = ltjl.p_dummy
    local make_dir_whatsit = luatexja.direction.make_dir_whatsit
    local get_dir_count = luatexja.direction.get_dir_count
    local node_write = node.direct.write
@@ -88,8 +89,10 @@ do
 	    - getfield(new_b, mirrored and 'depth' or 'height')
          local lmin, adj = nil, 0
          local tail = to_direct(tex.nest[tex.nest.ptr].tail)
-         while tail and (id_glue<=getid(tail)) and (getid(tail)<=id_penalty) do
-            tail = node_prev(tail)
+         if p_dummy~=ltj_profiler then
+            while tail and (id_glue<=getid(tail)) and (getid(tail)<=id_penalty) do
+               tail = node_prev(tail)
+            end
          end
 	 if tail then
 	    if getid(tail)==id_hlist and getid(new_b)==id_hlist then
