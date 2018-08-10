@@ -252,6 +252,7 @@ local function texiface_low(rst, rtlr, rtlp)
    setfield(w, 'value', to_node(wv))
    setfield(wv, 'type', 100)
    setfield(wv, 'value', floor(#rtlr))
+   setfield(wv, 'user_id', RUBY_PRE) -- dummy
    set_attr(wv, attr_ruby, rst.rubyzw)
    set_attr(wv, attr_ruby_maxmargin, rst.maxmargin)
    set_attr(wv, attr_ruby_maxprep, rst.pre)
