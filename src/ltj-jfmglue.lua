@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2018/02/18',
+  date = '2018/08/11',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}
@@ -280,7 +280,8 @@ local function check_next_ickern(lp)
 end
 
 local function calc_np_pbox(lp, last)
-   local first, lpa, nc = (not Np.first), get_attr_icflag(lp), nil
+   local first, nc = (not Np.first), nil
+   local lpa = get_attr_icflag(lp)==PACKED and PACKED or KINSOKU -- KINSOKU: dummy
    Np.first = Np.first or lp; Np.id = id_pbox
    set_attr(lp, attr_icflag, get_attr_icflag(lp));
    while lp ~=last and (lpa>=PACKED) and (lpa<BOXBDD) do
