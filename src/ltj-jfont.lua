@@ -1188,3 +1188,4 @@ luatexja.jfont.metrics = metrics
 luatexja.jfont.font_metric_table = font_metric_table
 luatexja.jfont.find_char_class = find_char_class
 
+luatexja.jfont.update_jfm_cache = update_jfm_cache
