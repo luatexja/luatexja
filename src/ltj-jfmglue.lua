@@ -281,7 +281,8 @@ end
 
 local function calc_np_pbox(lp, last)
    local first, nc = (not Np.first), nil
-   local lpa = get_attr_icflag(lp)==PACKED and PACKED or KINSOKU -- KINSOKU: dummy
+   --local lpa = get_attr_icflag(lp)==PACKED and PACKED or KINSOKU -- KINSOKU: dummy
+   local lpa = get_attr_icflag(lp)
    Np.first = Np.first or lp; Np.id = id_pbox
    set_attr(lp, attr_icflag, get_attr_icflag(lp));
    while lp ~=last and (lpa>=PACKED) and (lpa<BOXBDD) do
@@ -723,7 +724,7 @@ local function new_jfm_glue(mc, bc, ac)
 	   return node_copy(g[1]), g.ratio, false, false, false
        else
 	 local f = node_new(id_glue)
-	 set_attr(f, attr_icflag, g.priority)
+         set_attr(f, attr_icflag, g.priority)
 	 setglue(f, g.width, g.stretch, g.shrink)
 	 return f, g.ratio, g.kanjiskip_natural, g.kanjiskip_stretch, g.kanjiskip_shrink
       end

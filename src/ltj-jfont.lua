@@ -55,7 +55,9 @@ local function norm_val(a)
    end
 end
 
-function luatexja.jfont.define_jfm(t)
+local fastcopy=table.fastcopy
+function luatexja.jfont.define_jfm(to)
+   local t = fastcopy(to)
    local real_char -- Does current character class have the 'real' character?
    if t.dir~=jfm_dir then
       defjfm_res= nil; return
