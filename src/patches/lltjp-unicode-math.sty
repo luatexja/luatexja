@@ -14,23 +14,23 @@
   \bool_set_true:N \__lltjp_um_patch_mathgroup_bool
   \cs_gset:Nn \__um_set_delcode:nnn
     {
-      \ltjsetmathletter{ #3 }
       \Udelcode#2 = \csname sym#1\endcsname #3 \scan_stop:
+      \ltjsetmathletter{ #3 }
     }
   \cs_gset:Nn \__um_radical:nn
     {
-      \ltjsetmathletter{ #2 }
       \Uradical \csname sym#1\endcsname #2 \scan_stop:
+      \ltjsetmathletter{ #2 }
     }
   \cs_gset:Nn \__um_delimiter:Nnn
     {
-      \ltjsetmathletter{ #3 }
       \Udelimiter \mathchar@type#1 \csname sym#2\endcsname #3 \scan_stop:
+      \ltjsetmathletter{ #3 }
     }
   \cs_gset:Nn \__um_accent:nnn
     {
-      \ltjsetmathletter{ #3 }
       \Umathaccent #1~ \mathchar@type\mathaccent \use:c { sym #2 } #3 \scan_stop:
+      \ltjsetmathletter{ #3 }
     }
   \cs_gset:Nn \__um_define_math_chars: {
     \group_begin:
