@@ -18,17 +18,13 @@
    \__ltj_siunix_patch_inner:n { l__siunitx_#1_math }
    \__ltj_siunix_patch_inner:n { l__siunitx_#1_text }
 }
-\cs_new:Nn \__ltj_siunitx_patch: {
-  \AtBeginDocument {
-    \__ltj_siunix_patch_inner:n { c__siunitx_minus }
-    \__ltj_siunix_patch_inner:n { c__siunitx_mu }
-    \__ltj_siunix_patch_inner_math:n { angstrom }
-    \__ltj_siunix_patch_inner_math:n { arcminute }
-    \__ltj_siunix_patch_inner_math:n { arcsecond }
-    \__ltj_siunix_patch_inner_math:n { ohm }
-  }
+\AtBeginDocument {
+  \__ltj_siunix_patch_inner:n { c__siunitx_minus }
+  \__ltj_siunix_patch_inner:n { c__siunitx_mu }
+  \__ltj_siunix_patch_inner_math:n { angstrom }
+  \__ltj_siunix_patch_inner_math:n { arcminute }
+  \__ltj_siunix_patch_inner_math:n { arcsecond }
+  \__ltj_siunix_patch_inner_math:n { ohm }
 }
-\ifdefined\ltj@patch@siunitx@executed\__ltj_siunitx_patch:\fi
-
 \ExplSyntaxOff
 \endinput

@@ -31,16 +31,17 @@
 
 \def\ltj@pkgpatch#1{\ltj@AtBeginDocument{\@ifpackageloaded{#1}{\usepackage{lltjp-#1}}{}}}
 
-% similar to \ltj@pkgpatch, but this is used .sty which
-% can be reloaded inside the document by \input.
-\def\ltj@pkgpatchA#1{\ltj@AtBeginDocument{\@ifpackageloaded{#1}{\input{lltjp-#1.sty}}{}}}
-
 \endlinechar=13
 
 %%% patch for LaTeX
 \usepackage{lltjfont}
 \usepackage{lltjdefs}
 \usepackage{lltjcore}
+
+\RequirePackage{filehook}
+\def\ltj@pkgpatch@im#1{%
+ \@ifnextchar[{\ltj@pkgpatch@im@{#1}}{\ltj@pkgpatch@im@{#1}[lltjp-#1]}}%]
+\def\ltj@pkgpatch@im@#1[#2]{\AtEndOfPackageFile*{#1}{\input{#2.sty}}}
 
 %%% default parameters
 \directlua{
@@ -58,36 +59,25 @@
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
 
 %%% patch for packages
-\ltj@pkgpatch{listings}
-\ltj@pkgpatch{xunicode}
-\ltj@pkgpatch{fontspec}
-\ltj@pkgpatch{footmisc}
+\ltj@pkgpatch@im{listings}
+\ltj@pkgpatch{xunicode}  %% at \begin{document}
+\ltj@pkgpatch{fontspec}  %% at \begin{document}
+\ltj@pkgpatch@im{fontspec}[lltjp-fontspec-immediate]
+\ltj@pkgpatch{footmisc}  %% at \begin{document}
 \ltj@pkgpatch{tascmac}
 \ltj@AtBeginDocument{\@ifpackageloaded{ascmac}{%
   \edef\ltj@asc@temp{\noexpand\catcode`\noexpand\@=\the\catcode`\@}%
   \makeatletter\input{lltjp-tascmac.sty}%
   \ltj@asc@temp\let\ltj@asc@temp=\relax
 }{}}% ascmac
-\ltj@pkgpatch{stfloats}
-\ltj@pkgpatch{preview}
-\ltj@pkgpatch{array}
+\ltj@pkgpatch@im{stfloats}
+\ltj@pkgpatch{preview}  %% at \begin{document}
+  % (preview package has delayed option)
+\ltj@pkgpatch{array}    %% at \begin{document}
+\ltj@pkgpatch@im{unicode-math}
+\ltj@pkgpatch@im{siunitx}
 
 \RequirePackage{lltjp-geometry}
-\RequirePackage{filehook}
-\AtEndOfPackageFile*{fontspec}{%
-  \input{lltjp-fontspec-immediate.sty}
-  % \RequirePackage だと fontspec にオプション指定したときにエラー出る
-}
-\AtEndOfPackageFile*{unicode-math}{%
-  \input{lltjp-unicode-math-immediate.sty}
-}
-
-\@ifpackageloaded{siunitx}{%
-  \chardef\ltj@patch@siunitx@execute\z@\input{lltjp-siunitx.sty}%
-}{%
-  \AtBeginOfPackageFile*{siunitx}{\input{lltjp-siunitx.sty}}%
-}
-\AtEndOfPackageFile*{siunitx}{\csname __ltj_siunitx_patch:\endcsname}
 
 %%------------------ all done
 \ltj@latex@AtEnd

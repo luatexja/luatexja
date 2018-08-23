@@ -1,23 +1,23 @@
 %#!lualatex
-\documentclass{ltjsarticle}
+\documentclass{article}
 \usepackage[a4paper]{geometry}
-\makeatletter\ltj@alljachar %←全部の（>=U+0080な）文字を和文文字扱いに！
+\makeatletter
 
-\usepackage{luatexja-fontspec}
 \usepackage{unicode-math}
 
-
-\setmathfont{XITSMath}
+\usepackage{luatexja-fontspec}
 \setmainjfont{IPAGothic}
+\setmathfont{XITSMath}
 
-\makeatletter
+\ltj@alljachar %←全部の（>=U+0080な）文字を和文文字扱いに！
+\setmainfont{TexGyreTermes}
+
 \reDeclareMathAlphabet{\mathtestA}{\mathrm}{\mathmc}
 \reDeclareMathAlphabet{\mathtestB}{\mathrm}{\mathtestb}
 \reDeclareMathAlphabet{\mathtestC}{\mathtesta}{\mathmc}
 \reDeclareMathAlphabet{\mathtestD}{\mathtesta}{\mathtestb}
 \reDeclareMathAlphabet{\mathtestE}{\mathtestE}{\mathmc}
 \begin{document}\makeatletter
-
 \[
  \frac1{1^2}+\frac1{2^2}+\cdots=
 \sum_{n=1}^\infty \frac1{n^s}=\zeta(2)=\frac{\pi^2}{6}
@@ -48,4 +48,9 @@ mathgt: $\mathgt{\alpha あいうえおabcde}$
 \tt\meaning\mathtestD
 
 \tt\meaning\mathtestE
+
+\meaning\lfloor
+\[
+\lceil x\rceil + \lfloor x\rfloor +\hat a-\sqrt{a} - [\hbar]
+\]
 \end{document}

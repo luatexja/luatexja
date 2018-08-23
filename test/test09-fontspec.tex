@@ -11,7 +11,8 @@
 
 
 \usepackage{luatexja}
-\usepackage{luatexja-fontspec,booktabs,array,lltjext}
+\usepackage{luatexja-fontspec}
+\usepackage{booktabs,array,lltjext}
 
 \defaultfontfeatures{Numbers=OldStyle}
 \setmainfont{TeXGyreTermes}
@@ -21,7 +22,7 @@
 \setmainjfont[BoldFont=IPAexGothic]{IPAexMincho} % default: JFM=ujis
 \setsansjfont{IPAexGothic}
 
-\newjfontfamily\ipajisninety[CJKShape=JIS1990]{IPAexMincho}
+\setjfontfamily\ipajisninety[CJKShape=JIS1990]{IPAexMincho}
 
 \normalsize
 \usepackage[margin=25mm,a4paper]{geometry}
@@ -65,12 +66,11 @@
 \vbox{\hsize=7\zw\tate\parindent1\zw\R}}
 
 \subsection{Kerning}
-{\jfontspec[NoEmbed]{Ryumin-Light}
-
+{\jfontspec{KozMinPr6N-Regular}
 アノ ← Kerning=Off
 
 \noindent{\addjfontfeatures{Kerning=On} アノ ← Kerning=On}
-}
+\par}
 
 \subsection{unicode}
 
@@ -96,7 +96,7 @@
 
 \newpage
 \section{fontspecによる非埋め込みフォント}
-\newjfontfamily\test[BoldFont=GothicBBB-Medium, NoEmbed]{Ryumin-Light}
+\setjfontfamily\test[BoldFont=GothicBBB-Medium, NoEmbed]{Ryumin-Light}
 
 %{\test
 %\begin{tabular}<y>{ll>{\itshape}l>{\slshape}l}
@@ -109,7 +109,7 @@
 %\end{tabular}}
 
 \section{JFMの違い}
-\newjfontfamily\test[ TateFont=KozGoPr6N-Light ]{KozMinPr6N-Bold}
+\setjfontfamily\test[ TateFont=KozGoPr6N-Light ]{KozMinPr6N-Bold}
 
 \def\yttest{\leavevmode%
 \parbox<y>{20\zw}{%
@@ -129,5 +129,10 @@
 \addjfontfeatures{Color=0000FF, YokoFeatures={ Color=0080FF, JFM=min}, TateFeatures={JFM=tmin}}
 \yttest
 
+
+\section{match}
+
+\normalfont
+\sffamily aiuあいう\rmfamily aiuあいう \ttfamily aiuあいう
 
 \end{document}
