@@ -12,16 +12,7 @@
 \def\luatexjalatexLoaded{\endinput}
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{ltj-latex}[2018/06/15 LaTeX support of LuaTeX-ja]
-
-% LaTeX2e 2017/05/01 で行われる対策
-% 本 sty からは 2018/05/01 削除予定
-\ifx\document@default@language \@undefined
-  \let\document@default@language\m@ne
-\fi
-\ifx\l@nohyphenation \@undefined
-  \newlanguage\l@nohyphenation
-\fi
+\ProvidesPackage{ltj-latex}[2018/08/23 LaTeX support of LuaTeX-ja]
 
 % cleanup at end of the document
 %\let\ltj@@orig@end=\@@end
@@ -68,7 +59,6 @@
 
 %%% patch for packages
 \ltj@pkgpatch{listings}
-\ltj@pkgpatch{unicode-math}
 \ltj@pkgpatch{xunicode}
 \ltj@pkgpatch{fontspec}
 \ltj@pkgpatch{footmisc}
@@ -87,6 +77,9 @@
 \AtEndOfPackageFile*{fontspec}{%
   \input{lltjp-fontspec-immediate.sty}
   % \RequirePackage だと fontspec にオプション指定したときにエラー出る
+}
+\AtEndOfPackageFile*{unicode-math}{%
+  \input{lltjp-unicode-math-immediate.sty}
 }
 
 \@ifpackageloaded{siunitx}{%
