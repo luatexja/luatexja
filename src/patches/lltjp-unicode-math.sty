@@ -1,69 +1,41 @@
 %
-% lltjp-unicode-math.sty
+% lltjp-unicode-math.sty 2018-08-24
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-unicode-math-immediate}[2018/08/23 Patch to unicode-math for LuaTeX-ja]
 
 \RequirePackage{unicode-math,luatexja,etoolbox}
 
 \ExplSyntaxOn
 
-\group_begin:
-  \bool_new:N \__lltjp_um_patch_mathgroup_bool
-  \bool_set_true:N \__lltjp_um_patch_mathgroup_bool
-  \cs_gset:Nn \__um_set_delcode:nnn
-    {
-      \Udelcode#2 = \csname sym#1\endcsname #3 \scan_stop:
-      \ltjsetmathletter{ #3 }
-    }
-  \cs_gset:Nn \__um_radical:nn
-    {
-      \Uradical \csname sym#1\endcsname #2 \scan_stop:
-      \ltjsetmathletter{ #2 }
-    }
-  \cs_gset:Nn \__um_delimiter:Nnn
-    {
-      \Udelimiter \mathchar@type#1 \csname sym#2\endcsname #3 \scan_stop:
-      \ltjsetmathletter{ #3 }
-    }
-  \cs_gset:Nn \__um_accent:nnn
-    {
-      \Umathaccent #1~ \mathchar@type\mathaccent \use:c { sym #2 } #3 \scan_stop:
-      \ltjsetmathletter{ #3 }
-    }
-  \cs_gset:Nn \__um_define_math_chars: {
-    \group_begin:
-      \cs_set:Npn \__um_sym:nnn ##1##2##3
-       {
-        \tl_if_in:nnT
-         { \mathord \mathalpha \mathbin \mathrel \mathpunct \mathop \mathfence }
-         {##3}
-        {
-          \exp_last_unbraced:NNx \cs_gset_eq:NN ##2 { \char_generate:nn {##1} {12} }
-          \ltjsetmathletter{ ##1 }
-        }
-       }
-      \__um_input_math_symbol_table:
-    \group_end:
-  }
-
-\bool_if:NT \__lltjp_um_patch_mathgroup_bool {
-  \cs_gset:Npn \use@mathgroup #1 #2
-   {
-    %\typeout{UM <#1><#2>}
-    \mode_if_math:T % <- not sure if this is really necessary since we've just checked for mmode and raised an error if not!
+\cs_set:Nn \__um_define_math_chars: {
+  \group_begin:
+    \cs_set:Npn \__um_sym:nnn ##1##2##3
      {
-      \math@bgroup
-        \cs_if_eq:cNF {M@\f@encoding} #1 {#1}
-        \__um_switchto_literal:
-        \ltj@tempcnta=#2 \expandafter\ltj@@mathJapaneseFonts\string#1\relax%
-        \ifin@ \jfam #2 \relax \else \mathgroup #2 \relax \fi
-      \math@egroup
+      \ltjsetmathletter{ ##1 }
+      \tl_if_in:nnT
+       { \mathord \mathalpha \mathbin \mathrel \mathpunct \mathop \mathfence }
+       {##3}
+      {
+        \exp_last_unbraced:NNx \cs_gset_eq:NN ##2 { \char_generate:nn {##1} {12} }
+      }
      }
+    \__um_input_math_symbol_table:
+  \group_end:
+}
+\cs_set:Npn \use@mathgroup #1 #2
+{
+  %\typeout{UM <#1><#2>}
+  \mode_if_math:T % <- not sure
+   {
+    \math@bgroup
+      \cs_if_eq:cNF {M@\f@encoding} #1 {#1}
+      \__um_switchto_literal:
+      \ltj@tempcnta=#2 \expandafter\ltj@@mathJapaneseFonts\string#1\relax%
+      \ifin@ \jfam #2 \relax \else \mathgroup #2 \relax \fi
+    \math@egroup
    }
 }
-\group_end:
 
 \ifcsname jsc@mag@xrealtrue \endcsname \else
     \expandafter\expandafter\expandafter \ExplSyntaxOff \expandafter \endinput
