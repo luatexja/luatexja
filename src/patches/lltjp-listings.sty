@@ -1,5 +1,5 @@
 %
-% lltjp-listings.sty 2017-05-05
+% lltjp-listings.sty 2018-08-25
 %
 
 \NeedsTeXFormat{LaTeX2e}
@@ -385,6 +385,13 @@
        \expandafter\ltj@lst@remove@jacmd@
     \fi}}
 \endgroup
+
+%%%%%%%%%%%%%%%% texcl
+\lst@AddToHook{AfterBeginComment}
+   {\ifnum\lst@mode=\lst@TeXLmode
+      \catcode`\^^M=13\relax
+      \catcode\ltjlineendcomment=9\relax
+    \fi}
 
 %%%%%%%%%%%%%%%%
 \lstloadaspects{writefile}
