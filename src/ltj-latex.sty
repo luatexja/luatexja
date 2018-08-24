@@ -33,7 +33,13 @@
  \@ifnextchar[{\ltj@pkgpatch@im@{#1}}{\ltj@pkgpatch@im@{#1}[lltjp-#1]}}%]
 \def\ltj@pkgpatch@im@#1[#2]{%
   \AtEndOfPackageFile*{#1}{%
-    \@ifpackageloaded{#2}{}{\RequirePackage{#2}}%
+    \@ifpackageloaded{#2}{}{%
+	  \@namedef{ver@#2.\@pkgextension}{0000/00/00}%dummy
+	  \if\catcode`@=11\let\ltj@temp\relax\else
+	    \edef\ltj@temp{\noexpand\catcode`@=\the\catcode`@\relax}\makeatletter
+	  \fi
+	  \@@input{#2.\@pkgextension}\ltj@temp
+	}%
   }%
 }
 
