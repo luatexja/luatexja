@@ -19,17 +19,11 @@
 %\protected\def\@@end{%
 %  \directlua{luatexja.ext_cleanup()}\ltj@@orig@end}
 
-% Globally add to the head of a macro (cf. LaTeX2e's \g@addto@macro)
-\long\def\ltj@g@addto@macro#1#2{%
-  \begingroup
-    \def\ltj@tmpa{#2}
-    \toks@\expandafter\expandafter\expandafter{\expandafter\ltj@tmpa#1}
-    \xdef#1{\the\toks@}
-  \endgroup}
+\def\ltj@AtBeginDocument{\gpreto\@begindocumenthook}
 
-\def\ltj@AtBeginDocument{\ltj@g@addto@macro\@begindocumenthook}
-
-\def\ltj@pkgpatch#1{\ltj@AtBeginDocument{\@ifpackageloaded{#1}{\usepackage{lltjp-#1}}{}}}
+\def\ltj@pkgpatch#1{%
+  \@ifnextchar[{\ltj@pkgpatch@@{#1}}{\ltj@pkgpatch@@{#1}[lltjp-#1]}}%]
+\def\ltj@pkgpatch@@#1[#2]{\ltj@AtBeginDocument{\@ifpackageloaded{#1}{\RequirePackage{#2}}{}}}
 
 \endlinechar=13
 
@@ -41,7 +35,7 @@
 \RequirePackage{filehook}
 \def\ltj@pkgpatch@im#1{%
  \@ifnextchar[{\ltj@pkgpatch@im@{#1}}{\ltj@pkgpatch@im@{#1}[lltjp-#1]}}%]
-\def\ltj@pkgpatch@im@#1[#2]{\AtEndOfPackageFile*{#1}{\input{#2.sty}}}
+\def\ltj@pkgpatch@im@#1[#2]{\AtEndOfPackageFile*{#1}{\RequirePackage{#2}}}
 
 %%% default parameters
 \directlua{
@@ -64,11 +58,7 @@
 \ltj@pkgpatch@im{fontspec}
 \ltj@pkgpatch{footmisc}  %% at \begin{document}
 \ltj@pkgpatch{tascmac}
-\ltj@AtBeginDocument{\@ifpackageloaded{ascmac}{%
-  \edef\ltj@asc@temp{\noexpand\catcode`\noexpand\@=\the\catcode`\@}%
-  \makeatletter\input{lltjp-tascmac.sty}%
-  \ltj@asc@temp\let\ltj@asc@temp=\relax
-}{}}% ascmac
+\ltj@pkgpatch{ascmac}[lltjp-tascmac]
 \ltj@pkgpatch@im{stfloats}
 \ltj@pkgpatch{preview}  %% at \begin{document}
   % (preview package has delayed option)
