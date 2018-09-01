@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2018/08/01 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2018/09/01 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -446,6 +446,13 @@
 \bool_if:NTF \g_ltjpreset_nfssonly_bool {
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% nfss only
+  \cs_if_exist:NF \Cjascale {
+    \group_begin:
+    \fontsize{16}{16}\selectfont
+    \cs_gset:Npx \Cjascale { \fp_to_decimal:n {\zw / 16} }
+    \group_end:
+  }
+
   \msg_warning:nnx { luatexja-preset }{ scale }{ \Cjascale }
 
   \cs_new:Nn \ltj_preset_declare_font_shape:nnnnnn {

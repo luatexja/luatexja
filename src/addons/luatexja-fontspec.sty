@@ -3,14 +3,12 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec}[2018/07/31 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec}[2018/09/01 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e,luatexja}
 \ExplSyntaxOn
 
 \cs_if_exist:NF \Cjascale {
-  %%%%%%%% \g_ltj_fontspec_scale_fp
   %% Default scale value for jfont.
-  \fp_new:N \g_ltj_fontspec_scale_fp
   \group_begin:
   \fontsize{16}{16}\selectfont
   \cs_gset:Npx \Cjascale { \fp_to_decimal:n {\zw / 16} }
