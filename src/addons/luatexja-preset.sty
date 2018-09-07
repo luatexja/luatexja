@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2018/09/01 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2018/09/07 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -488,6 +488,7 @@
 
   \bool_if:NT \g_ltjpreset_deluxe_bool {
     \DeclareKanjiFamily{JY3}{ltjpmg}{}\DeclareKanjiFamily{JT3}{ltjpmg}{}
+    \let\mgfamily\undefined
     \DeclareRobustCommand\mgfamily {
       \not@math@alphabet\mgfamily\relax\kanjifamily{ltjpmg}\selectfont
     }
@@ -555,9 +556,15 @@
     ] { \ltjpreset_font_gt_m: }
     \bool_if:NT \g_ltjpreset_deluxe_bool {
       %% mg
-      \newjfontfamily \mgfamily [
-        BoldFont = \ltjpreset_font_mg_m: \tl_use:N \l_ltjpreset_add_features_tl
-      ] { \ltjpreset_font_mg_m: }
+	  \bool_if_exist:NTF \setfontfamily {
+        \setjfontfamily \mgfamily [
+          BoldFont = \ltjpreset_font_mg_m: \tl_use:N \l_ltjpreset_add_features_tl
+        ] { \ltjpreset_font_mg_m: }
+	  } {
+        \newjfontfamily \mgfamily [
+          BoldFont = \ltjpreset_font_mg_m: \tl_use:N \l_ltjpreset_add_features_tl
+        ] { \ltjpreset_font_mg_m: }
+      }
       \DeclareTextFontCommand{\textmg}{\mgfamily}
     }
   }

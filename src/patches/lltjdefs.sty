@@ -3,10 +3,10 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjdefs}[2018/06/15 Default font settings of LuaTeX-ja]
+\ProvidesPackage{lltjdefs}[2018/09/05 Default font settings of LuaTeX-ja]
 
-\def\ltj@stdmcfont{IPAExMincho}
-\def\ltj@stdgtfont{IPAExGothic}
+\ifdefined\ltj@stdmcfont\else\def\ltj@stdmcfont{IPAExMincho}\fi
+\ifdefined\ltj@stdgtfont\else\def\ltj@stdgtfont{IPAExGothic}\fi
 \InputIfFileExists{luatexja.cfg}{%
   \typeout{*************************^^J%
            * Loading luatexja.cfg.^^J%
