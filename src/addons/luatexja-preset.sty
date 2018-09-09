@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2018/09/07 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2018/09/09 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -102,9 +102,13 @@
   mc .groups:n = { preset }, mc .value_required:n = true,
   gt .code:n =
      \prop_put:Nnn \g_ltjpreset_font_prop { gt-u } {#1}
-     \prop_put:Nnn \g_ltjpreset_font_prop { gt-m } {#1}
+     \prop_put:Nnn \g_ltjpreset_font_prop { gt-d } {#1}
      \prop_put:Nnn \g_ltjpreset_font_prop { gt-bx } {#1}
      \prop_put:Nnn \g_ltjpreset_font_prop { gt-eb } {#1},
+  gt-m .code:n = % gtfamily , medium series
+     \prop_put:Nnn \g_ltjpreset_font_prop { gt-u } {#1}
+     \prop_put:Nnn \g_ltjpreset_font_prop { gt-d } {#1},
+  % gt-d, gt-u は隠し
   gt .groups:n = { preset }, gt .value_required:n = true,
 }
 \cs_set:Nn \g_ltjpreset_tmp_cs:n {
@@ -117,7 +121,7 @@
 \g_ltjpreset_tmp_cs:n { mc-m }
 \g_ltjpreset_tmp_cs:n { mc-bx }
 \g_ltjpreset_tmp_cs:n { gt-u }
-\g_ltjpreset_tmp_cs:n { gt-m }
+\g_ltjpreset_tmp_cs:n { gt-d }
 \g_ltjpreset_tmp_cs:n { gt-bx }
 \g_ltjpreset_tmp_cs:n { gt-eb}
 \g_ltjpreset_tmp_cs:n { mg-m }
@@ -129,7 +133,7 @@
 }
 \cs_new:Npn \ltjpreset_set_office:nn #1 #2{
   mc   = #1,         mc-bx = HGMinchoE ,
-  gt-m = HGGothicM , gt-bx = HGGothicE ,
+  gt-d = HGGothicM , gt-bx = HGGothicE ,
   gt-u = #2 ,        gt-eb = HGSoeiKakugothicUB ,
   mg-m = HGMaruGothicMPRO,
   __custom = false, __office = true, __noembed = false,
@@ -149,7 +153,7 @@
 %% Pro
 \ltjpreset_declare_preset:nx{kozuka-pro}{
     mc-m =  KozMinPro-Regular, mc-bx = KozMinPro-Bold,
-    gt-m =  KozGoPro-Regular,  gt-bx = KozGoPro-Bold,
+    gt-d =  KozGoPro-Regular,  gt-bx = KozGoPro-Bold,
     gt-u =  KozGoPro-Medium,   gt-eb = KozGoPro-Heavy,
     mg-m =  KozGoPro-Heavy,    mc-l =  KozMinPro-Light,
     __custom = false, __office = false, __noembed = false,
@@ -157,7 +161,7 @@
 %% Pr6
 \ltjpreset_declare_preset:nx{kozuka-pr6}{
     mc-m =  KozMinProVI-Regular, mc-bx = KozMinProVI-Bold,
-    gt-m =  KozGoProVI-Regular,  gt-bx = KozGoProVI-Bold,
+    gt-d =  KozGoProVI-Regular,  gt-bx = KozGoProVI-Bold,
     gt-u =  KozGoProVI-Medium,   gt-eb = KozGoProVI-Heavy,
     mg-m =  KozGoProVI-Heavy,    mc-l =  KozMinProVI-Light,
     __custom = false, __office = false, __noembed = false,
@@ -165,7 +169,7 @@
 %% Pr6N
 \ltjpreset_declare_preset:nx{kozuka-pr6n}{
     mc-m =  KozMinPr6N-Regular, mc-bx = KozMinPr6N-Bold,
-    gt-m =  KozGoPr6N-Regular,  gt-bx = KozGoPr6N-Bold,
+    gt-d =  KozGoPr6N-Regular,  gt-bx = KozGoPr6N-Bold,
     gt-u =  KozGoPr6N-Medium,   gt-eb = KozGoPr6N-Heavy,
     mg-m =  KozGoPr6N-Heavy,    mc-l =  KozMinPr6N-Light,
     __custom = false, __office = false, __noembed = false,
@@ -174,14 +178,14 @@
 % ヒラギノ (OSX)
 \ltjpreset_declare_preset:nx{hiragino-pro}{
     mc-m = HiraMinPro-W3,  mc-bx = HiraMinPro-W6,
-    gt-m = HiraKakuPro-W3, gt-bx = HiraKakuPro-W6,
+    gt-d = HiraKakuPro-W3, gt-bx = HiraKakuPro-W6,
     gt-u = HiraKakuPro-W6, gt-eb = HiraKakuStd-W8,
     mg-m = HiraMaruPro-W4, mc-l =  HiraMinPro-W2,
     __custom = false, __office = false, __noembed = false,
 }
 \ltjpreset_declare_preset:nx{hiragino-pron}{
     mc-m = HiraMinProN-W3,  mc-bx = HiraMinProN-W6,
-    gt-m = HiraKakuProN-W3, gt-bx = HiraKakuProN-W6,
+    gt-d = HiraKakuProN-W3, gt-bx = HiraKakuProN-W6,
     gt-u = HiraKakuProN-W6, gt-eb = HiraKakuStdN-W8,
     mg-m = HiraMaruProN-W4, mc-l =  HiraMinProN-W2,
     __custom = false, __office = false, __noembed = false,
@@ -190,14 +194,14 @@
 % モリサワ
 \ltjpreset_declare_preset:nx{morisawa-pro}{
     mc =   A-OTF-RyuminPro-Light.otf,      mc-bx = A-OTF-FutoMinA101Pro-Bold.otf,
-    gt-m = A-OTF-GothicBBBPro-Medium.otf , gt-bx = A-OTF-FutoGoB101Pro-Bold.otf,
+    gt-d = A-OTF-GothicBBBPro-Medium.otf , gt-bx = A-OTF-FutoGoB101Pro-Bold.otf,
     gt-u = A-OTF-GothicBBBPro-Medium.otf , gt-eb = A-OTF-MidashiGoPro-MB31.otf,
     mg-m = A-OTF-Jun101Pro-Light.otf,
     __custom = false, __office = false, __noembed = false,
 }
 \ltjpreset_declare_preset:nx{morisawa-pr6n}{
     mc =   A-OTF-RyuminPr6N-Light.otf,      mc-bx = A-OTF-FutoMinA101Pr6N-Bold.otf,
-    gt-m = A-OTF-GothicBBBPr6N-Medium.otf , gt-bx = A-OTF-FutoGoB101Pr6N-Bold.otf,
+    gt-d = A-OTF-GothicBBBPr6N-Medium.otf , gt-bx = A-OTF-FutoGoB101Pr6N-Bold.otf,
     gt-u = A-OTF-GothicBBBPr6N-Medium.otf , gt-eb = A-OTF-MidashiGoPr6N-MB31.otf,
     mg-m = A-OTF-Jun101Pr6N-Light.otf,
     __custom = false, __office = false, __noembed = false,
@@ -206,7 +210,7 @@
 % 游明朝/游ゴシック (Win8.1)
 \ltjpreset_declare_preset:nx{yu-win}{
     mc-m = YuMincho-Regular, mc-bx = YuMincho-Demibold,
-    gt-m = YuGothic-Regular, gt-bx = YuGothic-Bold,
+    gt-d = YuGothic-Regular, gt-bx = YuGothic-Bold,
     gt-u = YuGothic-Regular, gt-eb = YuGothic-Bold,
     mg-m = YuGothic-Bold,    mc-l =  YuMincho-Light,
     __custom = false, __office = false, __noembed = false,
@@ -214,7 +218,7 @@
 % Win10
 \ltjpreset_declare_preset:nx{yu-win10}{
     mc-m = YuMincho-Regular, mc-bx = YuMincho-Demibold,
-    gt-m = YuGothic-Regular, gt-bx = YuGothic-Bold,
+    gt-d = YuGothic-Regular, gt-bx = YuGothic-Bold,
     gt-u = YuGothic-Medium,  gt-eb = YuGothic-Bold,
     mg-m = YuGothic-Bold,    mc-l =  YuMincho-Light,
     __custom = false, __office = false, __noembed = false,
@@ -224,7 +228,7 @@
 % according to http://support.apple.com/kb/HT5944
 \ltjpreset_declare_preset:nx{yu-osx}{
     mc =  YuMincho~Medium, mc-bx = YuMincho~Demibold,
-    gt-m =  YuGothic~Medium, gt-u =  YuGothic~Medium,
+    gt-d =  YuGothic~Medium, gt-u =  YuGothic~Medium,
     gt-bx = YuGothic~Bold,   gt-eb = YuGothic~Bold,
     mg-m =  YuGothic~Bold,
     __custom = false, __office = false, __noembed = false,
@@ -233,14 +237,14 @@
 % moga-mobo
 \ltjpreset_declare_preset:nx{moga-mobo}{
     mc =   Moga90Mincho, mc-bx = Moga90Mincho~Bold,
-    gt-m = Moga90Gothic, gt-bx = Moga90Gothic~Bold,
+    gt-d = Moga90Gothic, gt-bx = Moga90Gothic~Bold,
     gt-u = Moga90Gothic, gt-eb = Moga90Gothic~Bold,
     mg-m = Mobo90Gothic,
     __custom = false, __office = false, __noembed = false,
 }
 \ltjpreset_declare_preset:nx{moga-mobo-ex}{
     mc =   MogaEx90Mincho, mc-bx = MogaEx90Mincho~Bold,
-    gt-m = MogaEx90Gothic, gt-bx = MogaEx90Gothic~Bold,
+    gt-d = MogaEx90Gothic, gt-bx = MogaEx90Gothic~Bold,
     gt-u = MogaEx90Gothic, gt-eb = MogaEx90Gothic~Bold,
     mg-m = MoboEx90Gothic,
     __custom = false, __office = false, __noembed = false,
@@ -249,7 +253,7 @@
 % Ume fones
 \ltjpreset_declare_preset:nx{ume}{
     mc = Ume~Mincho,
-    gt-m = Ume~Gothic,    gt-bx = Ume~Gothic~O5,
+    gt-d = Ume~Gothic,    gt-bx = Ume~Gothic~O5,
     gt-u = Ume~Gothic~O5, gt-eb = Ume~Gothic~O5,
     mg-m = Ume~Gothic~O4,
     __custom = false, __office = false, __noembed = false,
@@ -259,7 +263,7 @@
 \ltjpreset_declare_preset:nx{sourcehan}{
     mc-m =  Source~Han~Serif~Regular,
     mc-bx = Source~Han~Serif~Bold,
-    gt-m =  Source~Han~Sans~Regular,
+    gt-d =  Source~Han~Sans~Regular,
     gt-bx = Source~Han~Sans~Bold,
     gt-u =  Source~Han~Sans~Medium,
     gt-eb = Source~Han~Sans~Heavy,
@@ -270,7 +274,7 @@
 \ltjpreset_declare_preset:nx{sourcehan-jp}{
     mc-m =  Source~Han~Serif~JP~Regular,
     mc-bx = Source~Han~Serif~JP~Bold,
-    gt-m =  Source~Han~Sans~JP~Regular,
+    gt-d =  Source~Han~Sans~JP~Regular,
     gt-bx = Source~Han~Sans~JP~Bold,
     gt-u =  Source~Han~Sans~JP~Medium,
     gt-eb = Source~Han~Sans~JP~Heavy,
@@ -281,7 +285,7 @@
 \ltjpreset_declare_preset:nx{noto-otc}{
     mc-m =  Noto~Serif~CJK~Regular,
     mc-bx = Noto~Serif~CJK~Bold,
-    gt-m =  Noto~Sans~CJK~Regular,
+    gt-d =  Noto~Sans~CJK~Regular,
     gt-bx = Noto~Sans~CJK~Bold,
     gt-u =  Noto~Sans~CJK~Medium,
     gt-eb = Noto~Sans~CJK~Black,
@@ -292,7 +296,7 @@
 \ltjpreset_declare_preset:nx{noto-otf}{
     mc-m =  Noto~Serif~CJK~JP~Regular,
     mc-bx = Noto~Serif~CJK~JP~Bold,
-    gt-m =  Noto~Sans~CJK~JP~Regular,
+    gt-d =  Noto~Sans~CJK~JP~Regular,
     gt-bx = Noto~Sans~CJK~JP~Bold,
     gt-u =  Noto~Sans~CJK~JP~Medium,
     gt-eb = Noto~Sans~CJK~JP~Black,
@@ -369,7 +373,7 @@
   \cs_set:Nx \ltjpreset_font_mc_l:  { \prop_item:Nn \g_ltjpreset_font_prop { mc-l } }
   \cs_set:Nx \ltjpreset_font_mc_m:  { \prop_item:Nn \g_ltjpreset_font_prop { mc-m } }
   \cs_set:Nx \ltjpreset_font_mc_bx: { \prop_item:Nn \g_ltjpreset_font_prop { mc-bx } }
-  \cs_set:Nx \ltjpreset_font_gt_m:  { \prop_item:Nn \g_ltjpreset_font_prop { gt-m } }
+  \cs_set:Nx \ltjpreset_font_gt_m:  { \prop_item:Nn \g_ltjpreset_font_prop { gt-d } }
   \cs_set:Nx \ltjpreset_font_gt_u:  { \prop_item:Nn \g_ltjpreset_font_prop { gt-u } }
   \cs_set:Nx \ltjpreset_font_gt_bx: { \prop_item:Nn \g_ltjpreset_font_prop { gt-bx } }
   \cs_set:Nx \ltjpreset_font_gt_eb: { \prop_item:Nn \g_ltjpreset_font_prop { gt-eb } }
