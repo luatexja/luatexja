@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjext}[2018/03/29 v1.2g-ltj-9 Macros for vertical writing]
+\ProvidesPackage{lltjext}[2018/09/10 v1.2i-ltj-9 Macros for vertical writing]
 \RequirePackage{luatexja}
 \newcount\ltj@ext@dir
 {\catcode`\*=11
@@ -36,6 +36,7 @@
    {\p@array<#1>}{\p@array<#1>[c]}}
 
 \def\p@array<#1>[#2]#3{%
+  \fork@array@option<#1>[#2]\@begin@alignbox
   \let\box@dir\relax
   \if #1z\relax
     \ifnum\ltj@ext@dir=3\relax
@@ -60,19 +61,21 @@
        \else \let\box@dir\utod\@tempcnta=\zstrutbox% utod
     \fi
   \fi
+  \bgroup\box@dir\adjustbaseline
   \setbox\@arstrutbox\hbox{%
     \box@dir
     \vrule\@height\arraystretch\ltjgetht\@tempcnta
           \@depth\arraystretch\ltjgetdp\@tempcnta \@width\z@}%
-  \fork@array@option<#1>[#2]%
   \@mkpream{#3}\edef\@preamble{\ialign \noexpand\@halignto
   \bgroup\@arstrut \@preamble \tabskip\z@skip \cr}%
   \let\@startpbox\@@startpbox \let\@endpbox\@@endpbox
   \let\tabularnewline\\%
-  \@begin@alignbox\bgroup\box@dir\adjustbaseline
     \let\par\@empty
-    \let\@sharp##\let\protect\relax
-    \lineskip\z@skip\baselineskip\z@skip\@preamble}
+    \let\@sharp##%
+	\set@typeset@protect
+    \lineskip\z@skip\baselineskip\z@skip
+    \ifhmode \@preamerr\z@ \@@par\fi
+	\@preamble}
 \def\endarray{\crcr\egroup\egroup\@end@alignbox}
 \def\endtabular{\endarray$\egroup}
 \expandafter \let \csname endtabular*\endcsname = \endtabular
@@ -217,12 +220,21 @@
   \@ifnextchar[{\@iilayoutcaption}{\relax}}
 \def\@iilayoutcaption[#1#2]{%
   \def\caption@posa{#1}\def\caption@posb{#2}}
-\def\pcaption{\refstepcounter\@captype \@dblarg{\@pcaption\@captype}}
+\def\pcaption{%
+  \ifx\@captype\@undefined
+    \@latex@error{\noexpand\pcaption outside float}\@ehd
+    \expandafter\@gobble
+  \else
+    \refstepcounter\@captype
+    \expandafter\@firstofone
+  \fi
+  {\@dblarg{\@pcaption\@captype}}%
+}
 \long\def\@pcaption#1[#2]#3{%
   \addcontentsline{\csname ext@#1\endcsname}{#1}{%
     \protect\numberline{\csname the#1\endcsname}{\ignorespaces#2}}%
   \ifvoid\@floatbox
-     \latex@error{Use with `\protect\layoutfloat'.}\@eha
+     \@latex@error{Use \noexpand\pcaption with `\protect\layoutfloat'}\@eha
   \fi
   \make@pcaptionbox{#3}%
   \@pboxswfalse
