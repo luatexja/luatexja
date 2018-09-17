@@ -145,7 +145,7 @@ the first line of the listing is not rendered.
 IVS対応1: \texttt{vsraw=false} (default)
 
 \begin{LTXexample}[escapechar=\%, basicstyle=\tt]
-1234567890
+123456789012345678
 1葛󠄀城，葛󠄁飾
 󠄀a
 \end{LTXexample}
@@ -153,7 +153,7 @@ IVS対応1: \texttt{vsraw=false} (default)
 IVS対応2: \texttt{vsraw=true}
 
 \begin{LTXexample}[escapechar=\%,vsraw, basicstyle=\tt]
-1234567890
+123456789012345678
 1葛󠄀城，葛󠄁飾ｱｲｳ
 \end{LTXexample}
 
@@ -209,4 +209,12 @@ foo \lstinline[basicstyle=\tt\gtfamily]!あexit 0; #shbar! baz あ
 aiu
 \end{lstlisting}
 あいうえお
+
+\bigskip
+\textbf{Escape character}
+\begin{lstlisting}[escapechar=\#,basicstyle=\ttfamily]
+1234567890123457890
+aiu#\textcolor{red}{e} #o#\textcolor{red}{ka}#ki
+\end{lstlisting}
+
 \end{document}

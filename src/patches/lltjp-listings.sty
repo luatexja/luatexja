@@ -1,5 +1,5 @@
 %
-% lltjp-listings.sty 2018-08-25
+% lltjp-listings.sty 2018-09-17
 %
 
 \NeedsTeXFormat{LaTeX2e}
@@ -371,7 +371,7 @@
   \begingroup\lccode`\~=`#1\lowercase{%
   \gdef\lst@next##1~{%
      \let\lst@arg\@empty\ltj@lst@remove@jacmd{##1}%
-     \expandafter\expandafter\expandafter\scantokens\expandafter{\lst@arg}%
+     \expandafter\expandafter\expandafter\scantokens\expandafter{\lst@arg\relax}%
      ~}%
   }\endgroup
 }
