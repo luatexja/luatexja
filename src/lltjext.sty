@@ -19,12 +19,12 @@
  \ltj@ext@dir=\ltjgetparameter{direction}\relax\X@tabarray}
 \def\tabular{\let\@halignto\@empty\X@tabular}
 \@namedef{tabular*}{\@ifnextchar<%>
-   {\@stabular}{\@stabular<Z>}}
+   {\p@stabular}{\p@stabular<Z>}}
 \def\X@tabarray{\@ifnextchar<%>
    {\p@tabarray}{\p@tabarray<Z>}}
 \def\X@tabular{\@ifnextchar<%>
    {\p@tabular}{\p@tabular<Z>}}
-\def\@stabular<#1>#2{%
+\def\p@stabular<#1>#2{%
    \setlength\dimen@{#2}%
    \edef\@halignto{to\the\dimen@}\p@tabular<#1>}
 \def\p@tabular<#1>{\leavevmode \hbox \bgroup 
