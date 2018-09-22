@@ -3,12 +3,9 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjext}[2018/09/21 v1.2j-ltj-9 Macros for vertical writing]
+\ProvidesPackage{lltjext}[2018/09/22 v1.2j-ltj-9 Macros for vertical writing]
 \RequirePackage{luatexja}
 \newcount\ltj@ext@dir
-{\catcode`\*=11
-\global\let\ltj@lltjext@orig@tabularS=\tabular*
-}%
 \let\ltj@lltjext@orig@tabular=\tabular
 \let\ltj@lltjext@orig@array=\array
 
@@ -20,6 +17,9 @@
 \def\tabular{\let\@halignto\@empty\X@tabular}
 \@namedef{tabular*}{\@ifnextchar<%>
    {\p@stabular}{\p@stabular<Z>}}
+{\catcode`\*=11
+\global\let\ltj@lltjext@orig@tabularS=\tabular*
+}%
 \def\X@tabarray{\@ifnextchar<%>
    {\p@tabarray}{\p@tabarray<Z>}}
 \def\X@tabular{\@ifnextchar<%>
@@ -36,7 +36,6 @@
    {\p@array<#1>}{\p@array<#1>[c]}}
 
 \def\p@array<#1>[#2]#3{%
-  \fork@array@option<#1>[#2]\@begin@alignbox
   \let\box@dir\relax
   \if #1z\relax
     \ifnum\ltj@ext@dir=3\relax
@@ -61,6 +60,7 @@
        \else \let\box@dir\utod\@tempcnta=\zstrutbox% utod
     \fi
   \fi
+  \fork@array@option<#1>[#2]\@begin@alignbox
   \bgroup\box@dir\adjustbaseline
   \setbox\@arstrutbox\hbox{%
     \box@dir
@@ -196,11 +196,11 @@
     }\hrule width\floatwidth height\floatruletick depth\z@}}
 \def\DeclareLayoutCaption#1<#2>(#3)[#4#5]{%
   \expandafter
-  \ifx\csname #1@layoutcaption\endcsname\relax \else
+  \ifx\csname #1@layoutc@ption\endcsname\relax \else
     \@latex@info{Redeclaring capiton layout setting of '#1'}%
   \fi
   \expandafter
-  \gdef\csname #1@layoutcaption\endcsname{%
+  \gdef\csname #1@layoutc@ption\endcsname{%
      \if Z\caption@dir\def\caption@dir{#2}\fi
      \ifdim\captionwidth=\z@ \captionwidth=#3\relax\fi
      \if Z\caption@posa\def\caption@posa{#4}\fi
@@ -242,22 +242,23 @@
     \if l\caption@posb\box\@captionbox\kern\captionfloatsep\fi
     \if t\caption@posa\vtop
     \else\if b\caption@posa\vbox
-    \else\ifmmode\vcenter \else\@pboxswtrue $\vcenter \fi\fi\fi
+    \else\@pboxswtrue $\vcenter \fi\fi
     {\if u\caption@posb\box\@captionbox\kern\captionfloatsep\fi
      \unvbox\@floatbox
      \if d\caption@posb\kern\captionfloatsep\box\@captionbox\fi}%
+    \if@pboxsw \m@th$\fi
     \if r\caption@posb\kern\captionfloatsep\box\@captionbox\fi
-    \if@pboxsw \m@th$\fi \if r\float@pos\else\hss\fi}}%
+    \if r\float@pos\else\hss\fi}}%
   \par\vskip.25\baselineskip
   \box\@tempboxa}
 \def\make@pcaptionbox#1{%
   \expandafter
-  \ifx\csname\@captype @layoutcaption\endcsname\relax
+  \ifx\csname\@captype @layoutc@ption\endcsname\relax
      \@latex@warning{Default caption layout of `\@captype' unknown.}%
        \def\caption@dir{Z}\captionwidth\z@
        \def\caption@posa{Z}\def\caption@posb{Z}%
   \else
-     \csname \@captype @layoutcaption\endcsname
+     \csname \@captype @layoutc@ption\endcsname
   \fi
   \@tempswafalse
   % \@tempswa: 基本組の組方向とキャプションの組方向が直交するか？
@@ -667,6 +668,8 @@
 	\hbox\bgroup\ltj@ext@dir=\ltjgetparameter{direction}}{}{}
   \pretocmd{\array}%
 	{\ltj@ext@dir=\ltjgetparameter{direction}\relax}{}{}
+  \expandafter\let\csname tabular*\endcsname=\ltj@lltjext@orig@tabularS
+  \patchcmd{\p@stabular}{\p@tabular}{\@tabular}{}{}
   \def\@startpbox##1{\bgroup
    \box@dir\adjustbaseline%%% これを追加
    \setlength\hsize{##1}\@arrayparboxrestore
@@ -719,19 +722,13 @@
       \let\\\@arraycr\let\tabularnewline\\\let\par\@empty
      \lineskip\z@skip\baselineskip\z@skip\@preamble}
   \def\endarray{\crcr\egroup\egroup\@end@alignbox\@arrayright}
-  \@namedef{tabular*}{\@ifnextchar<{\p@stabular}{\p@stabular<Z>}}%>
-  \def\p@stabular<##1>##2{%
-    \setlength\dimen@{##2}%
-    \edef\@halignto{to\the\dimen@}\@tabular<##1>}
 }
 
 \@ifpackageloaded{array}{%
-  \expandafter\let\csname tabular*\endcsname=\ltj@lltjext@orig@tabularS
   \let\tabular=\ltj@lltjext@orig@tabular
   \let\array=\ltj@lltjext@orig@array
   \ltj@lltjext@patch@array
 }{%
-  \let\ltj@lltjext@orig@tabularS\relax
   \let\ltj@lltjext@orig@tabular\relax
   \let\ltj@lltjext@orig@array\relax
   \RequirePackage{filehook,etoolbox}
