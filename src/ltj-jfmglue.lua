@@ -272,7 +272,8 @@ do
 local traverse = node.direct.traverse
 local function check_next_ickern(lp)
    local lx = Np.nuc
-   while lp and getid(lp) == id_kern and ( getsubtype(lp)==3 or ITALIC == get_attr_icflag(lp)) do
+   while lp and getid(lp) == id_kern and ( getsubtype(lp)==0 or 
+     getsubtype(lp)==3 or ITALIC == get_attr_icflag(lp)) do
      set_attr(lp, attr_icflag, IC_PROCESSED);
      lx, lp = lp, node_next(lp)
    end
