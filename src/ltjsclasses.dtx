@@ -44,7 +44,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2018/07/30 ltjsclasses ]
+  [2018/09/23 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass{ltjsarticle}
@@ -188,8 +188,10 @@
 %
 % \section{Lua\TeX-jaの読み込み}
 %
-% まず，Lua\TeX-jaを読み込みます。
+% 和文スケール値を設定した後に，Lua\TeX-jaを読み込みます。
 %    \begin{macrocode}
+%<!jspf>\def\Cjascale{0.924715}
+%<jspf>\def\Cjascale{0.903375}
 \RequirePackage{luatexja}
 %    \end{macrocode}
 %
@@ -954,9 +956,6 @@
 % [2017-12-31] 和文スケール（$1\,\mathrm{zw} \div \hbox{要求サイズ}$）を
 % 表す実数値マクロ |\Cjascale| を定義しました。
 %
-%    \begin{macrocode}
-%<!jspf> \def\Cjascale{0.924715}
-%    \end{macrocode}
 %
 % これにより，公称10ポイントの和文フォントを0.924715倍したことにより，
 % 約9.25ポイント，
@@ -967,11 +966,15 @@
 % 和文フォントをPostScriptの9ポイントにするために，
 % $0.9*72.27/72 \simeq 0.903375$ 倍します。
 %
-%    \begin{macrocode}
-%<jspf> \def\Cjascale{0.903375}
-%    \end{macrocode}
+% [2018-09-23 LTJ] 実際の|\Cjascale|の定義はLua\TeX-jaの読み込み前に移動しました．
+% こうすることによって「0.962216倍された和文フォント」という実際には使われない和文フォントを
+% 読み込む必要がなくなります．
+%
 %
 % 実際にフォントの再定義を行う部分です．
+%
+% [2018-09-23 LTJ] |\Cjascale|の設定を前倒ししたことに伴い，実際の再定義は
+% \texttt{mingoth}, \texttt{ptexjis}のときしか必要なくなりました．
 %
 %    \begin{macrocode}
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
@@ -982,13 +985,8 @@
   \ifptexjis
     \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:jfm=jis}{}
     \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:jfm=jis}{}
-  \else
-    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:jfm=ujis}{}
-    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:jfm=ujis}{}
   \fi
 \fi
-\DeclareFontShape{JT3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:jfm=ujisv}{}
-\DeclareFontShape{JT3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:jfm=ujisv}{}
 %    \end{macrocode}
 %
 % 和文でイタリック体，斜体，サンセリフ体，

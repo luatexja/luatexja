@@ -38,8 +38,9 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjspf}
-  [2018/07/30 ltjsclasses ]
+  [2018/09/23 ltjsclasses ]
 \def\jsc@clsname{ltjspf}
+\def\Cjascale{0.903375}
 \RequirePackage{luatexja}
 \newif\if@restonecol
 \newif\if@titlepage
@@ -306,7 +307,6 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
     \setlength{\pageheight}{\paperheight}
   \fi
 \fi
- \def\Cjascale{0.903375}
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
 \ifmingoth
   \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:jfm=min}{}
@@ -315,13 +315,8 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \ifptexjis
     \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:jfm=jis}{}
     \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:jfm=jis}{}
-  \else
-    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:jfm=ujis}{}
-    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:jfm=ujis}{}
   \fi
 \fi
-\DeclareFontShape{JT3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:jfm=ujisv}{}
-\DeclareFontShape{JT3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:jfm=ujisv}{}
 \DeclareFontShape{JY3}{mc}{bx}{n}{<->ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{gt}{bx}{n}{<->ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{mc}{b}{n}{<->ssub*gt/m/n}{}
