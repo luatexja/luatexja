@@ -453,7 +453,7 @@ do
   function ltjl.p_profile(before, after, mirrored, bw)
     local t = {}
     do
-      local w_acc, d_before = 0, 0
+      local w_acc, d_before = getfield(before,'shift'), 0
       local x = getlist(before); local xn = node_next(x)
       while x do
         local w, d
@@ -469,7 +469,7 @@ do
       end
     end
     do
-      local w_acc, h_before = 0, 0
+      local w_acc, h_before = getfield(after,'shift'), 0
       local x = getlist(after); local xn = node_next(x)
       while x do
         local w, h, d
