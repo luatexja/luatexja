@@ -109,7 +109,8 @@
      \prop_put:Nnn \g_ltjpreset_font_prop { gt-u } {#1}
      \prop_put:Nnn \g_ltjpreset_font_prop { gt-d } {#1},
   % gt-d, gt-u は隠し
-  gt .groups:n = { preset }, gt .value_required:n = true,
+  gt .groups:n = { preset },   gt .value_required:n = true,
+  gt-m .groups:n = { preset }, gt-m .value_required:n = true,
 }
 \cs_set:Nn \g_ltjpreset_tmp_cs:n {
   \keys_define:nn { luatexja-preset } {
