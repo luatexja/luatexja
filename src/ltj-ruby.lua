@@ -67,6 +67,7 @@ luatexja.userid_table.RUBY_PRE = luatexbase.newuserwhatsitid('ruby_pre',  'luate
 luatexja.userid_table.RUBY_POST = luatexbase.newuserwhatsitid('ruby_post',  'luatexja')
 local RUBY_PRE  = luatexja.userid_table.RUBY_PRE
 local RUBY_POST = luatexja.userid_table.RUBY_POST
+local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 
 ----------------------------------------------------------------
 -- TeX interface 0
@@ -144,6 +145,9 @@ end
 local concat
 do
    local node_prev = node.direct.getprev
+   local function get_attr_icflag(p)
+      return (has_attr(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
+   end
    function concat(f, b)
       if f then
 	 if b then
@@ -151,6 +155,8 @@ do
 	    if getid(nh)==id_whatsit and getsubtype(nh)==sid_user then
 	       nh=node_next(nh); node_free(node_prev(nh))
 	    end
+            set_attr(nh, attr_icflag,
+	      get_attr_icflag(nh) + PROCESSED_BEGIN_FLAG)
 	    setfield(node_tail(h), 'next', nh)
 	    setfield(f, 'head', nil); node_free(f)
 	    setfield(b, 'head', nil); node_free(b)
