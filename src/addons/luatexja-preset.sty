@@ -448,6 +448,8 @@
   \cs_set_eq:NN \ltjpreset_check_deluxe_existence: \prg_do_nothing:
 }
 
+\int_new:N \g_ltjpreset_applycount_int
+
 \bool_if:NTF \g_ltjpreset_nfssonly_bool {
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% nfss only
@@ -466,41 +468,53 @@
       { \bool_if:NT \g_ltjpreset_noembed_bool {psft:} #5
 	;-kern \tl_use:N \l_ltjpreset_kanji_shape_tl; #6 } } {}
   }
+  \cs_generate_variant:Nn \ltj_preset_declare_font_shape:nnnnnn { xnnnnn }
   \cs_new:Nn \ltj_preset_define_family:nnn {
-    \ltj_preset_declare_font_shape:nnnnnn { JY3 } { #1 } { #2 } { n }
+    \ltj_preset_declare_font_shape:xnnnnn { JY3 }
+      { #1 \int_to_arabic:n { \g_ltjpreset_applycount_int }} { #2 } { n }
       { "#3" : jfm=\tl_use:N \ltjpreset_use_jfm_yoko_tl }
       { script=hani \bool_if:NT \g_ltjpreset_expert_bool { ;+hkna } }
-    \ltj_preset_declare_font_shape:nnnnnn { JT3 } { #1 } { #2 } { n }
+    \ltj_preset_declare_font_shape:xnnnnn { JT3 }
+      { #1 \int_to_arabic:n { \g_ltjpreset_applycount_int }} { #2 } { n }
       { "#3" : jfm=\tl_use:N \ltjpreset_use_jfm_tate_tl }
       { script=hani \bool_if:NT \g_ltjpreset_expert_bool { ;+vkna } }
     \bool_if:NT \g_ltjpreset_expert_bool {
-      \ltj_preset_declare_font_shape:nnnnnn { JY3 } { #1 } { #2 } { rb }
+      \ltj_preset_declare_font_shape:xnnnnn { JY3 }
+        { #1 \int_to_arabic:n { \g_ltjpreset_applycount_int }} { #2 } { rb }
         { "#3" : jfm=\tl_use:N \ltjpreset_use_jfm_yoko_tl } { script=kana; +ruby }
-      \ltj_preset_declare_font_shape:nnnnnn { JT3 } { #1 } { #2 } { rb }
+      \ltj_preset_declare_font_shape:xnnnnn { JT3 }
+        { #1 \int_to_arabic:n { \g_ltjpreset_applycount_int }} { #2 } { rb }
         { "#3" : jfm=\tl_use:N \ltjpreset_use_jfm_tate_tl } { script=kana; +ruby }
     }
   }
-
-  \DeclareKanjiFamily{JY3}{ltjpm}{}\DeclareKanjiFamily{JT3}{ltjpm}{}
-  \DeclareKanjiFamily{JY3}{ltjpg}{}\DeclareKanjiFamily{JT3}{ltjpg}{}
-  \def\mcdefault{ltjpm}\def\gtdefault{ltjpg}
-  \SetSymbolFont{mincho}{normal}{JY3}{ltjpm}{m}{n}
-  \SetSymbolFont{mincho}{bold}{JY3}{ltjpm}{bx}{n}
-  \DeclareMathAlphabet{\mathgt}{JY3}{ltjpg}{m}{n}
-  \bool_if:NT \g_ltjpreset_expert_bool {
-    \DeclareRobustCommand\rubyfamily { \kanjishape{rb}\selectfont }
-  }
-
   \bool_if:NT \g_ltjpreset_deluxe_bool {
-    \DeclareKanjiFamily{JY3}{ltjpmg}{}\DeclareKanjiFamily{JT3}{ltjpmg}{}
     \let\mgfamily\undefined
     \DeclareRobustCommand\mgfamily {
-      \not@math@alphabet\mgfamily\relax\kanjifamily{ltjpmg}\selectfont
+      \not@math@alphabet\mgfamily\relax
+      \kanjifamily{ltjpmg \int_to_arabic:n { \g_ltjpreset_applycount_int }}\selectfont
     }
     \DeclareTextFontCommand{\textmg}{\mgfamily}
   }
+  \bool_if:NT \g_ltjpreset_expert_bool {
+    \DeclareRobustCommand\rubyfamily { \kanjishape{rb}\selectfont }
+  }
   %
   \cs_new:Nn \ltjpreset_do_fontset: { \group_begin:
+    % ======
+    \xdef\mcdefault{ltjpm \int_to_arabic:n { \g_ltjpreset_applycount_int }}
+    \xdef\gtdefault{ltjpg \int_to_arabic:n { \g_ltjpreset_applycount_int }}
+    \DeclareKanjiFamily{JY3}{\mcdefault}{}
+    \DeclareKanjiFamily{JT3}{\mcdefault}{}
+    \DeclareKanjiFamily{JY3}{\gtdefault}{}
+    \DeclareKanjiFamily{JT3}{\gtdefault}{}
+    \SetSymbolFont{mincho}{normal}{JY3}{\mcdefault}{m}{n}
+    \SetSymbolFont{mincho}{bold}{JY3}{\mcdefault}{bx}{n}
+    \DeclareMathAlphabet{\mathgt}{JY3}{\gtdefault}{m}{n}
+    \bool_if:NT \g_ltjpreset_deluxe_bool {
+      \DeclareKanjiFamily{JY3}{ltjpmg \int_to_arabic:n { \g_ltjpreset_applycount_int }}{}
+      \DeclareKanjiFamily{JT3}{ltjpmg \int_to_arabic:n { \g_ltjpreset_applycount_int }}{}
+    }
+    % ======
     \tl_set:Nn \l_tmpa_tl {, CJKShape=JIS1990 }
     \tl_if_eq:NNT \l_ltjpreset_kanji_shape_tl \l_tmpa_tl {
       \tl_set:Nn \l_ltjpreset_kanji_shape_tl { ;+jp90 }
@@ -602,7 +616,9 @@
   }
 }
 
+
 \cs_set:Npn \ltjapplypreset #1 {
+  \int_gincr:N \g_ltjpreset_applycount_int
   \keys_set_groups:nnn { luatexja-preset } { preset } { #1 }
   % \prop_map_inline:Nn \g_ltjpreset_font_prop {\typeout{ [##1] = "##2" } }
   \ltjpreset_extract_fonts:
