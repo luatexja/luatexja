@@ -7465,9 +7465,14 @@ In this case, one can use \cs{setmainfont} etc.\ to select \emph{alphabetic} fon
 %</en>
 %<*ja>
 \LaTeX 標準のフォント選択機構(NFSS2)を用いて
-\texttt{ltjpm}（明朝），\texttt{ltjpg}（ゴシック），それに後に述べる \texttt{deluxe} オプ
-	     ションが指定された場合には \texttt{ltjpmg}（丸ゴシック）という
-3つの和文フォントファミリを定義し，これらを用いる．
+\texttt{ltjpm}$n$（明朝），\texttt{ltjpg}$n$（ゴシック），
+それに後に述べる\texttt{deluxe}オプションが指定された場合には
+\texttt{ltjpmg}$n$（丸ゴシック）という
+和文フォントファミリを定義%
+\footnote{%
+  $n$は自然数であり，\cs{ltjapplypreset}の実行（この命令は\Pkg{luatexja-preset}パッケージ
+  読み込み時に自動的に実行される）ごとに増加していく．
+}し，これらを用いる．
 
 本オプション指定時には\Pkg{fontspec}・\Pkg{luatexja-fontspec}パッケージは
 自動では読み込まれない，しかし，
@@ -7477,9 +7482,10 @@ In this case, one can use \cs{setmainfont} etc.\ to select \emph{alphabetic} fon
 \end{lstlisting}
 のようにすれば，このオプションを指定すれば
 欧文フォントを\Pkg{fontspec}パッケージの機能を使って指定することができる．
-一方，
-パッケージ読み込み時に既に\Pkg{luatexja-fontspec}パッケージが読み込まれて
-	     いる場合は \texttt{nfssonly} オプションは無視される．
+
+一方，\Pkg{luatexja-preset}パッケージ読み込み時に
+既に\Pkg{luatexja-fontspec}パッケージが読み込まれている場合は
+\texttt{nfssonly}オプションは無視される．
 %</ja>
 
 \item[match]
