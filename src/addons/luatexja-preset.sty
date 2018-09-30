@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2018/09/09 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2018/09/30 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -463,26 +463,24 @@
   \msg_warning:nnx { luatexja-preset }{ scale }{ \Cjascale }
 
   \cs_new:Nn \ltj_preset_declare_font_shape:nnnnnn {
-    \cs_if_exist:cT { #1/#2/#3/#4/10 } { \cs_undefine:c { #1/#2/#3/#4/10 } }
     \DeclareFontShape{#1}{#2}{#3}{#4}{ <-> s*[\Cjascale]
       { \bool_if:NT \g_ltjpreset_noembed_bool {psft:} #5
 	;-kern \tl_use:N \l_ltjpreset_kanji_shape_tl; #6 } } {}
   }
-  \cs_generate_variant:Nn \ltj_preset_declare_font_shape:nnnnnn { xnnnnn }
   \cs_new:Nn \ltj_preset_define_family:nnn {
-    \ltj_preset_declare_font_shape:xnnnnn { JY3 }
+    \ltj_preset_declare_font_shape:nnnnnn { JY3 }
       { #1 \int_to_arabic:n { \g_ltjpreset_applycount_int }} { #2 } { n }
       { "#3" : jfm=\tl_use:N \ltjpreset_use_jfm_yoko_tl }
       { script=hani \bool_if:NT \g_ltjpreset_expert_bool { ;+hkna } }
-    \ltj_preset_declare_font_shape:xnnnnn { JT3 }
+    \ltj_preset_declare_font_shape:nnnnnn { JT3 }
       { #1 \int_to_arabic:n { \g_ltjpreset_applycount_int }} { #2 } { n }
       { "#3" : jfm=\tl_use:N \ltjpreset_use_jfm_tate_tl }
       { script=hani \bool_if:NT \g_ltjpreset_expert_bool { ;+vkna } }
     \bool_if:NT \g_ltjpreset_expert_bool {
-      \ltj_preset_declare_font_shape:xnnnnn { JY3 }
+      \ltj_preset_declare_font_shape:nnnnnn { JY3 }
         { #1 \int_to_arabic:n { \g_ltjpreset_applycount_int }} { #2 } { rb }
         { "#3" : jfm=\tl_use:N \ltjpreset_use_jfm_yoko_tl } { script=kana; +ruby }
-      \ltj_preset_declare_font_shape:xnnnnn { JT3 }
+      \ltj_preset_declare_font_shape:nnnnnn { JT3 }
         { #1 \int_to_arabic:n { \g_ltjpreset_applycount_int }} { #2 } { rb }
         { "#3" : jfm=\tl_use:N \ltjpreset_use_jfm_tate_tl } { script=kana; +ruby }
     }
