@@ -347,8 +347,11 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \renewcommand\jttdefault{\gtdefault}\@ltj@match@familytrue
 %%
 \AtBeginDocument{%
-  \reDeclareMathAlphabet{\mathrm}{\mathrm}{\mathmc}
-  \reDeclareMathAlphabet{\mathbf}{\mathbf}{\mathgt}}%
+  \unless\ifltj@disablejfam
+    \reDeclareMathAlphabet{\mathrm}{\mathrm}{\mathmc}
+    \reDeclareMathAlphabet{\mathbf}{\mathbf}{\mathgt}
+  \fi
+}%
 \ltjsetparameter{jaxspmode={`！,2}}
 \ltjsetparameter{jaxspmode={`〒,1}}
 \ltjsetparameter{alxspmode={`+,3}}

@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec-25c}[2018/06/15 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec-25c}[2018/10/08 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e,luatexja}
 \ExplSyntaxOn
 
@@ -281,14 +281,18 @@
 
 \DeclareDocumentCommand \setmainjfont { O{} m O{} } {
   \ltj_fontspec_set_family:Nnn \mcdefault {#1,#3}{#2}
-  \DeclareSymbolFont{mincho}{JY3}{\l_fontspec_family_tl}{\mddefault}{n}
-  \SetSymbolFont{mincho}{bold}{JY3}{\l_fontspec_family_tl}{\bfdefault}{n}
+  \unless\ifltj@disablejfam
+    \DeclareSymbolFont{mincho}{JY3}{\l_fontspec_family_tl}{\mddefault}{n}
+    \SetSymbolFont{mincho}{bold}{JY3}{\l_fontspec_family_tl}{\bfdefault}{n}
+  \fi
   \normalfont
 }
 
 \DeclareDocumentCommand \setsansjfont { O{} m O{} } {
   \ltj_fontspec_set_family:Nnn \gtdefault {#1,#3}{#2}
-  \DeclareMathAlphabet{\mathgt}{JY3}{\l_fontspec_family_tl}{\mddefault}{n}
+  \unless\ifltj@disablejfam
+    \DeclareMathAlphabet{\mathgt}{JY3}{\l_fontspec_family_tl}{\mddefault}{n}
+  \fi
   \normalfont
 }
 

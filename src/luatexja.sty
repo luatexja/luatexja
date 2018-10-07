@@ -24,6 +24,7 @@
 \edef\ltj@AtEnd{\x
   \noexpand\let\noexpand\ltj@AtEnd\relax}
 \def\luatexjaLoaded{\endinput}
+\newif\ifltj@disablejfam
 
 %% Check if LaTeX is used.
 \begingroup\expandafter\expandafter\expandafter\endgroup
@@ -35,6 +36,9 @@
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
   \ProvidesPackage{luatexja}[2018/09/30 Japanese Typesetting with Lua(La)TeX]
+  \DeclareOption{disablejfam}{\ltj@disablejfamtrue}
+  \DeclareOption*{}
+  \ProcessOptions\relax
 \fi                             %</LaTeX>
 %%%% VERSION
 \def\LuaTeXjaversion{20180930.0}

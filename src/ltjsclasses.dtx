@@ -1053,8 +1053,11 @@
 %
 %    \begin{macrocode}
 \AtBeginDocument{%
-  \reDeclareMathAlphabet{\mathrm}{\mathrm}{\mathmc}
-  \reDeclareMathAlphabet{\mathbf}{\mathbf}{\mathgt}}%
+  \unless\ifltj@disablejfam
+    \reDeclareMathAlphabet{\mathrm}{\mathrm}{\mathmc}
+    \reDeclareMathAlphabet{\mathbf}{\mathbf}{\mathgt}
+  \fi
+}%
 %    \end{macrocode}
 %
 % \begin{macro}{\textsterling}

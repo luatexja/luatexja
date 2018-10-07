@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2018/01/12 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2018/10/08 Patch to NFSS2 for LuaTeX-ja]
 
 \def\ltj@chardef@text@cmd#1{%
   \let\@ifdefinable\@@ifdefinable%
@@ -318,10 +318,29 @@
   \expandafter\let\csname selectfont\space \endcsname \ltj@@orig@selectfont
   \ltj@@EverySelectfont@Init
 }
+\def\ltj@selectfont@tate{%
+  \let\k@encoding\ct@encoding
+  \xdef\font@name{\csname\curr@kfontshape/\f@size\endcsname}%
+  \pickup@tfont\font@name
+  \ltj@@does@alt@set{\curr@kfontshape}%
+    % alt fonts の定義
+    \directlua{luatexja.jfont.output_alt_font_cmd('t', '\luatexluaescapestring{\curr@kfontshape}')}%
+    % 定義した alt fonts のデータを \ltjdeclarealtfont に渡すのと同等の処理をする
+    \directlua{luatexja.jfont.pickup_alt_font_a('\f@size')}%
+  \fi}
+\def\ltj@selectfont@yoko{%
+  \let\k@encoding\cy@encoding
+  \xdef\font@name{\csname\curr@kfontshape/\f@size\endcsname}%
+  \pickup@jfont\font@name
+  \ltj@@does@alt@set{\curr@kfontshape}%
+    % alt fonts の定義
+    \directlua{luatexja.jfont.output_alt_font_cmd('y', '\luatexluaescapestring{\curr@kfontshape}')}%
+    % 定義した alt fonts のデータを \ltjdeclarealtfont に渡すのと同等の処理をする
+    \directlua{luatexja.jfont.pickup_alt_font_a('\f@size')}%
+  \fi}
 \def\ltj@selectfont@patch{%
- \directlua{luatexja.base.start_time_measure('selectfont')}%
- \global\let\ltj@afont@name=\font@name
- \let\tmp@error@fontshape\error@fontshape
+  \directlua{luatexja.base.start_time_measure('selectfont')}%
+  \let\tmp@error@fontshape\error@fontshape
   \let\error@fontshape\error@kfontshape
   \directlua{luatexja.jfont.is_kyenc('\luatexluaescapestring{\k@encoding}')}\ifin@%
     \let\cy@encoding\k@encoding
@@ -334,33 +353,15 @@
       \@latex@error{KANJI Encoding scheme `\k@encoding' unknown}\@eha
     \fi
   \fi
-%
-  \let\k@encoding\ct@encoding
-  \xdef\font@name{\csname\curr@kfontshape/\f@size\endcsname}%
-  \pickup@tfont
-  \font@name
-  \ltj@@does@alt@set{\curr@kfontshape}%
-    % alt fonts の定義
-    \directlua{luatexja.jfont.output_alt_font_cmd('t', '\luatexluaescapestring{\curr@kfontshape}')}%
-    % 定義した alt fonts のデータを \ltjdeclarealtfont に渡すのと同等の処理をする
-    \directlua{luatexja.jfont.pickup_alt_font_a('\f@size')}%
-  \fi
-%
-  \let\k@encoding\cy@encoding
-  \xdef\font@name{\csname\curr@kfontshape/\f@size\endcsname}%
-  \pickup@jfont
-  \font@name
-  \ltj@@does@alt@set{\curr@kfontshape}%
-    % alt fonts の定義
-    \directlua{luatexja.jfont.output_alt_font_cmd('y', '\luatexluaescapestring{\curr@kfontshape}')}%
-    % 定義した alt fonts のデータを \ltjdeclarealtfont に渡すのと同等の処理をする
-    \directlua{luatexja.jfont.pickup_alt_font_a('\f@size')}%
-  \fi
+  \global\let\ltj@afont@name=\font@name
+  %\ifnum3=\ltjgetparameter{direction}\relax \ltj@selectfont@tate
+  %\else \ltj@selectfont@yoko\fi
+  \ltj@selectfont@tate\ltj@selectfont@yoko
 %
   \edef\tmp@item{{\k@encoding}}\expandafter\def\expandafter\k@encoding\tmp@item
   \kenc@update
+  \global\let\font@name=\ltj@afont@name
   \let\error@fontshape\tmp@error@fontshape
-%
   \if@knjcmd \@knjcmdfalse
     \expandafter\ifx
     \csname rel@\k@encoding/\k@family/\k@series/\k@shape\endcsname\relax
@@ -570,12 +571,12 @@
     \romanshape{\shapedefault}%
     \selectfont\ignorespaces}
 \let\reset@font\normalfont
-\DeclareRobustCommand\mcfamily
-        {\not@math@alphabet\mcfamily\mathmc
-         \kanjifamily\mcdefault\selectfont}
-\DeclareRobustCommand\gtfamily
-        {\not@math@alphabet\gtfamily\mathgt
-         \kanjifamily\gtdefault\selectfont}
+\DeclareRobustCommand\mcfamily{%
+  \unless\ifltj@disablejfam\not@math@alphabet\mcfamily\mathmc\fi
+  \kanjifamily\mcdefault\selectfont}
+\DeclareRobustCommand\gtfamily{%
+  \unless\ifltj@disablejfam\not@math@alphabet\gtfamily\mathgt\fi
+  \kanjifamily\gtdefault\selectfont}
 \let\romanprocess@table\process@table
 \def\kanjiprocess@table{%
   \kanjiencoding{\kanjiencodingdefault}%
@@ -656,6 +657,7 @@
 \let\@@italiccorr=\/
 
 %%%%%% Japanese font for math mode
+\unless\ifltj@disablejfam
 
 % \M@<enc> から その <enc> が和文用か調べる
 {\catcode`M=12%
@@ -688,6 +690,8 @@
     #1\fi\ltj@tempcnta=#2 \expandafter\ltj@@mathJapaneseFonts\string#1\relax%
     \ifin@\jfam#2\relax\else\mathgroup#2\relax\fi
   \expandafter\math@egroup\fi}%
+
+\fi
 
 %%%%%% Alternate Japanese Fonts
 %%%% \DeclareAlternateKanjiFont<Benc><Bfam><Bser><Bshape><Aenc><Afam><Aser><Ashape><range>

@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2018/09/30 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2018/10/08 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -465,7 +465,7 @@
   \cs_new:Nn \ltj_preset_declare_font_shape:nnnnnn {
     \DeclareFontShape{#1}{#2}{#3}{#4}{ <-> s*[\Cjascale]
       { \bool_if:NT \g_ltjpreset_noembed_bool {psft:} #5
-	;-kern \tl_use:N \l_ltjpreset_kanji_shape_tl; #6 } } {}
+    ;-kern \tl_use:N \l_ltjpreset_kanji_shape_tl; #6 } } {}
   }
   \cs_new:Nn \ltj_preset_define_family:nnn {
     \ltj_preset_declare_font_shape:nnnnnn { JY3 }
@@ -505,9 +505,11 @@
     \DeclareKanjiFamily{JT3}{\mcdefault}{}
     \DeclareKanjiFamily{JY3}{\gtdefault}{}
     \DeclareKanjiFamily{JT3}{\gtdefault}{}
-    \SetSymbolFont{mincho}{normal}{JY3}{\mcdefault}{m}{n}
-    \SetSymbolFont{mincho}{bold}{JY3}{\mcdefault}{bx}{n}
-    \DeclareMathAlphabet{\mathgt}{JY3}{\gtdefault}{m}{n}
+    \unless\ifltj@disablejfam
+      \SetSymbolFont{mincho}{normal}{JY3}{\mcdefault}{m}{n}
+      \SetSymbolFont{mincho}{bold}{JY3}{\mcdefault}{bx}{n}
+      \DeclareMathAlphabet{\mathgt}{JY3}{\gtdefault}{m}{n}
+    \fi
     \bool_if:NT \g_ltjpreset_deluxe_bool {
       \DeclareKanjiFamily{JY3}{ltjpmg \int_to_arabic:n { \g_ltjpreset_applycount_int }}{}
       \DeclareKanjiFamily{JT3}{ltjpmg \int_to_arabic:n { \g_ltjpreset_applycount_int }}{}
@@ -573,11 +575,11 @@
     ] { \ltjpreset_font_gt_m: }
     \bool_if:NT \g_ltjpreset_deluxe_bool {
       %% mg
-	  \bool_if_exist:NTF \setfontfamily {
+      \bool_if_exist:NTF \setfontfamily {
         \setjfontfamily \mgfamily [
           BoldFont = \ltjpreset_font_mg_m: \tl_use:N \l_ltjpreset_add_features_tl
         ] { \ltjpreset_font_mg_m: }
-	  } {
+      } {
         \newjfontfamily \mgfamily [
           BoldFont = \ltjpreset_font_mg_m: \tl_use:N \l_ltjpreset_add_features_tl
         ] { \ltjpreset_font_mg_m: }
