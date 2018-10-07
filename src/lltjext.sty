@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjext}[2018/09/29 v1.2j-ltj-10 Macros for vertical writing]
+\ProvidesPackage{lltjext}[2018/10/07 v1.2k-ltj-10 Macros for vertical writing]
 \RequirePackage{luatexja}
 \newcount\ltj@ext@dir
 \let\ltj@lltjext@orig@tabular=\tabular
@@ -206,8 +206,8 @@
      \if Z\caption@posa\def\caption@posa{#4}\fi
      \if Z\caption@posb\def\caption@posb{#5}\fi}}
 \@onlypreamble\DeclareLayoutCaption
-\DeclareLayoutCaption{figure}<y>(.8\linewidth)[cd]
-\DeclareLayoutCaption{table}<y>(.8\linewidth)[cu]
+\DeclareLayoutCaption{figure}<n>(.8\linewidth)[cd]
+\DeclareLayoutCaption{table}<n>(.8\linewidth)[cu]
 \def\layoutcaption{\def\caption@dir{Z}\captionwidth\z@
   \def\caption@posa{Z}\def\caption@posb{Z}%
   \@ifnextchar<\X@layoutcaption{%
@@ -276,7 +276,8 @@
   \setbox0\hbox{\hbox{\captiondir
      \captionfontsetup\parindent\z@\inhibitglue
      \csname fnum@\@captype\endcsname 　#1}}%"
-  \if@tempswa\@tempdima\ltjgetht0\relax\else\@tempdima\ltjgetwd0\relax\fi
+  \if@tempswa\@tempdima\ltjgetht0 \advance\@tempdima\ltjgetdp0
+  \else\@tempdima\ltjgetwd0 \fi
   \ifdim\@tempdima>\captionwidth \@tempdima\captionwidth \fi
   \@pboxswfalse
   \setbox0\hbox{%
