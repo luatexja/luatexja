@@ -116,6 +116,7 @@
 % \changes{v1.7g}{2017/09/19}{内部処理で使ったボックス0を空にした}
 % \changes{v1.7h}{2018/02/04}{和文スケール値\cs{Cjascale}を定義}
 % \changes{v1.8}{2018/07/03}{\cs{today}のデフォルトを和暦から西暦に変更}
+% \changes{v1.8-ltj-16}{2018/10/08}{Lua\TeX-jaが|disablejfam|オプションをサポートしたことによる変更}
 % \fi
 %
 % \iffalse
@@ -145,7 +146,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2018/07/24 v1.8-ltj-15
+  [2018/10/08 v1.8-ltj-16
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -202,7 +203,7 @@
 % 全ての変更点を知りたい場合は、|jclasses.dtx|と|ltjclasses.dtx|で|diff|を
 % とって下さい。
 % \begin{itemize}
-% \item |disablejfam|オプションを無効化。もし
+% \item もし
 % \begin{quotation}
 %   |! LaTeX Error: Too many math alphabets used in version ****.|
 % \end{quotation}
@@ -543,12 +544,12 @@
 % |mathrmmc|オプションは、
 % |\mathrm|と|\mathbf|を和欧文両対応にするためのクラスオプションです。
 % \changes{v1.1d}{1992/02/04}{disablejfamの判断を間違えてたのを修正}
+% \changes{v1.8-ltj-16}{2018/10/08}{Lua\TeX-ja本体が，主にメモリ消費を抑える目的で
+%   |disablejfam|オプションをサポートしました。そのため以前出していた警告は削除します。}
 %    \begin{macrocode}
 \if@compatibility
   \@mathrmmctrue
 \else
-  \DeclareOption{disablejfam}{%
-    \ClassWarningNoLine{\@currname}{The class option 'disablejfam' is obsolete}}
   \DeclareOption{mathrmmc}{\@mathrmmctrue}
 \fi
 %    \end{macrocode}
@@ -3852,7 +3853,12 @@
 %    \LaTeX{} 2.09
 %    compatibility mode では和文数式フォントfamが2重定義されていた
 %    ので、その部分を変更しました。
+%
+% \changes{v1.8-ltj-14}{2018/10/08}{Lua\TeX-ja本体が|disablejfam|オプションをサポートしました。
+%    クラス読み込み時に|disablejfam|オプションを指定した場合は、それがLua\TeX-jaに渡されて
+%	 数式中に日本語を記述することができなくなります（|\mathmc|, |\mathgt|も定義されません）。}
 %    \begin{macrocode}
+\unless\ifltj@disablejfam
 \if@compatibility\else
   \DeclareSymbolFont{mincho}{JY3}{mc}{m}{n}
   \DeclareSymbolFontAlphabet{\mathmc}{mincho}
@@ -3865,6 +3871,7 @@
   \reDeclareMathAlphabet{\mathrm}{\mathrm}{\mathmc}
   \reDeclareMathAlphabet{\mathbf}{\mathbf}{\mathgt}
 }%
+\fi
 \fi
 %    \end{macrocode}
 %

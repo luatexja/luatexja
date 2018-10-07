@@ -44,10 +44,10 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2018/09/23 ltjsclasses ]
+  [2018/10/08 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
-\documentclass{ltjsarticle}
+\documentclass[disablejfam]{ltjsarticle}
 \usepackage{hypdoc}
 \hypersetup{unicode=true}
 \begingroup
@@ -117,7 +117,8 @@
 % \item 標準では\texttt{jfm-ujis.lua}（Lua\TeX-ja標準のメトリック，OTFパッケージのものがベース）を使用します。
 % \item \texttt{uplatex}オプション，\texttt{autodetect-engine}オプションを
 % 削除してあります（前者ではエラーを出すようにしています）。
-% \item \texttt{disablejfam}オプションが無効になっています。もし
+% \item \texttt{disablejfam}オプションはクラス側では何もしません（ただLua\TeX-ja本体に
+% 渡されるだけです）．もし
 % \begin{quotation}
 %   |! LaTeX Error: Too many math alphabets used in version ****.|
 % \end{quotation}
@@ -596,10 +597,8 @@
 % 実際に使用可能な数式ファミリの数を増やすためには\texttt{lualatex-math}パッケージを
 % 読み込む必要があることに注意が必要です。
 %
-%    \begin{macrocode}
-\DeclareOption{disablejfam}{%
-  \ClassWarningNoLine{\jsc@clsname}{The class option 'disablejfam' is obsolete}}
-%    \end{macrocode}
+% [2018-10-08 LTJ] Lua\TeX-ja本体が\texttt{disablejfam}オプションをサポートしたので，
+% クラスファイルからは削除します．
 %
 % \paragraph{ドラフト}
 %

@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsarticle}
-  [2018/09/23 ltjsclasses ]
+  [2018/10/08 ltjsclasses ]
 \def\jsc@clsname{ltjsarticle}
 \def\Cjascale{0.924715}
 \RequirePackage{luatexja}
@@ -194,8 +194,6 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
       &\global\@eqcnt\thr@@ \hb@xt@\z@\bgroup\hss##\egroup
     \tabskip\z@skip\cr
     }}
-\DeclareOption{disablejfam}{%
-  \ClassWarningNoLine{\jsc@clsname}{The class option 'disablejfam' is obsolete}}
 \DeclareOption{draft}{\setlength\overfullrule{5pt}}
 \DeclareOption{final}{\setlength\overfullrule{0pt}}
 \newif\ifmingoth

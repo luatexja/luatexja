@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjbook}
-  [2018/07/24 v1.8-ltj-15
+  [2018/10/08 v1.8-ltj-16
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -132,8 +132,6 @@
 \if@compatibility
   \@mathrmmctrue
 \else
-  \DeclareOption{disablejfam}{%
-    \ClassWarningNoLine{\@currname}{The class option 'disablejfam' is obsolete}}
   \DeclareOption{mathrmmc}{\@mathrmmctrue}
 \fi
 \DeclareOption{draft}{\setlength\overfullrule{5pt}}
@@ -726,6 +724,7 @@
 \@addtoreset{equation}{chapter}
 \renewcommand{\theequation}{%
   \ifnum\c@chapter>\z@\thechapter.\fi \@arabic\c@equation}
+\unless\ifltj@disablejfam
 \if@compatibility\else
   \DeclareSymbolFont{mincho}{JY3}{mc}{m}{n}
   \DeclareSymbolFontAlphabet{\mathmc}{mincho}
@@ -738,6 +737,7 @@
   \reDeclareMathAlphabet{\mathrm}{\mathrm}{\mathmc}
   \reDeclareMathAlphabet{\mathbf}{\mathbf}{\mathgt}
 }%
+\fi
 \fi
 \DeclareOldFontCommand{\mc}{\normalfont\mcfamily}{\mathmc}
 \DeclareOldFontCommand{\gt}{\normalfont\gtfamily}{\mathgt}
