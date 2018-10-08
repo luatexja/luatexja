@@ -427,7 +427,7 @@
       = ((getfont(font.current()) or nulltable)
         .characters or nulltable)[77] or nulltable %% 'M'
     set_attr('ltj@tablshift',
-      0.5*((fm.height or 0)- (fm.depth or 0) - ht+ dp))
+      tex.round(0.5*((fm.height or 0)- (fm.depth or 0) - ht+ dp)))
     if dir() ~= dir_tate then
       ft = fmt[get_attr('ltj@curjfnt')] or nulltable
       ft = ft and ft.char_type or nulltable
