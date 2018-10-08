@@ -344,6 +344,9 @@ do
          t.shared.features[vrt2_exist and 'vrt2' or 'vert'] = true
       end
 
+      texio.write_nl('term and log', 
+        'JFNT\t' .. identifiers[fn].name .. '\t' .. identifiers[fn].size .. '\t' .. fn, '')
+
       fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
       font_metric_table[fn]=fmtable
       tex.sprint(cat_lp, global_flag, '\\protected\\expandafter\\def\\csname ',
@@ -419,7 +422,7 @@ do
 	    .. ((l==':' or l==';') and '' or ';')
 	    .. 'jfm=' .. jfm_file_name
 	 if jfm_var~='' then
-	    name = name .. 'jfmvar=' .. jfm_var
+	    name = name .. ';jfmvar=' .. jfm_var
 	 end
       end
       for x in gmatch (name, "[:;]([+%%-]?)ltjks") do

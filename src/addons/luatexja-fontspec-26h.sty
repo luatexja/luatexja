@@ -315,14 +315,18 @@
 
 \DeclareDocumentCommand \setmainjfont { O{} m O{} } {
   \ltj_fontspec_set_family:Nnn \mcdefault {#1,#3}{#2}
-  \DeclareSymbolFont{mincho}{JY3}{\mcdefault}{\mddefault}{n}
-  \SetSymbolFont{mincho}{bold}{JY3}{\mcdefault}{\bfdefault}{n}
+  \unless\ifltj@disablejfam
+    \DeclareSymbolFont{mincho}{JY3}{\mcdefault}{\mddefault}{n}
+    \SetSymbolFont{mincho}{bold}{JY3}{\mcdefault}{\bfdefault}{n}
+  \fi
   \normalfont
 }
 
 \DeclareDocumentCommand \setsansjfont { O{} m O{} } {
   \ltj_fontspec_set_family:Nnn \gtdefault {#1,#3}{#2}
-  \DeclareMathAlphabet{\mathgt}{JY3}{\gtdefault}{\mddefault}{n}
+  \unless\ifltj@disablejfam
+    \DeclareMathAlphabet{\mathgt}{JY3}{\gtdefault}{\mddefault}{n}
+  \fi
   \normalfont
 }
 
