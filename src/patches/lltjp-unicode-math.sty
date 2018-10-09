@@ -1,5 +1,5 @@
 %
-% lltjp-unicode-math.sty 2018-08-24
+% lltjp-unicode-math.sty 2018-10-09
 %
 
 \NeedsTeXFormat{LaTeX2e}
@@ -23,6 +23,7 @@
     \__um_input_math_symbol_table:
   \group_end:
 }
+\unless\ifltj@disablejfam
 \cs_set:Npn \use@mathgroup #1 #2
 {
   %\typeout{UM <#1><#2>}
@@ -36,6 +37,7 @@
     \math@egroup
    }
 }
+\fi
 
 \ifcsname jsc@mag@xrealtrue \endcsname \else
     \expandafter\expandafter\expandafter \ExplSyntaxOff \expandafter \endinput
