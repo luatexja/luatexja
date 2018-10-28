@@ -11,7 +11,7 @@
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 
 %<en>\documentclass[a4paper,titlepage]{article}
-%<ja>\documentclass[a4paper,titlepage]{ltjsarticle}
+%<ja>\documentclass[a4paper,10ptj,titlepage]{ltjsarticle}
 
 %%%%%%%%
 \makeatletter
@@ -49,7 +49,7 @@
 \usepackage[kozuka-pr6n]{luatexja-preset}
 \usepackage{unicode-math}
 \setmonojfont{KozGoPr6N-Regular.otf}
-\setmathfont[Scale=MatchLowercase]{xits-math.otf}
+\setmathfont[Scale=MatchLowercase]{XITSMath}
 
 \setLaTeXa{\scshape a}
 %<*ja>
@@ -68,7 +68,7 @@
     {\normalfont\normalsize\bfseries\raisebox{.2ex}{$\mdlgblksquare\mkern1mu$}}}
 %</en>
 %<*ja>
-\usepackage[textwidth=45\zw, lines=45, footskip=6mm]{geometry}
+\usepackage[textwidth=44\zw, lines=41, footskip=6mm]{geometry}
 \usepackage{luatexja-adjust}%\ltjdisableadjust
 \advance\leftmargini-1\zw\advance\leftmarginii-1\zw
 %</ja>
@@ -610,7 +610,7 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %<ja>本プロジェクトはOSDNのサービスを用いて運営されている．
 
 %<en>\paragraph{Members}\
-%<ja>\paragraph{開発メンバー}\
+%<ja>\clearpage\paragraph{開発メンバー}\
 
 %<*en>
 \begin{multienumerate}
@@ -631,7 +631,7 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 
 % \paragraph{Acknowledgments} -- 挿入するならここ
 
-\clearpage
+%<en>\clearpage
 %<en>\section{Getting Started}
 %<ja>\section{使い方}
 %<en>\subsection{Installation}
@@ -970,11 +970,11 @@ for Japanese, you only have to load \texttt{luatexja.sty}:
 \end{lstlisting}
 %<*en>
 It also does minimal settings (counterparts in \pLaTeX\ are \texttt{%
-plfonts.dtx} and \texttt{pldefs.ltx}):
+plfonts.dtx} and \texttt{pldefs.ltx}).
 %</en>
 %<*ja>
 これで\pLaTeX の\texttt{plfonts.dtx}と\texttt{pldefs.ltx}に相当する最低限の設定が
-なされる：
+なされる．
 %</ja>
 
 \begin{itemize}
@@ -1011,7 +1011,7 @@ By default, the following fonts are used for these two families.
 \bottomrule
 \end{tabular}
 \end{center}
-Note that the bold series (series \texttt{bx}~or~\texttt{b}) in both family
+\item Note that the bold series (series \texttt{bx}~or~\texttt{b}) in both family
      are same as the medium series of gothic family.
      There is no italic nor slanted shape for these \texttt{mc}~and~\texttt{gt}.
 %</en>
@@ -1026,6 +1026,7 @@ Note that the bold series (series \texttt{bx}~or~\texttt{b}) in both family
 \bottomrule
 \end{tabular}
 \end{center}
+  \newpage
 \item 標準では，次のフォントが用いられる：
 \begin{center}\small
 \begin{tabular}{ccccc}
@@ -1036,18 +1037,35 @@ Note that the bold series (series \texttt{bx}~or~\texttt{b}) in both family
 \bottomrule
 \end{tabular}
 \end{center}
-どちらのファミリにおいても，太字(\cs{bfseries})のフォントは
+
+明朝・ゴシックどちらのファミリにおいても，太字(\cs{bfseries})のフォントは
 ゴシック体中字(\cs{gtfamily}\cs{mdseries})で使われるフォントと同じであることに注意．
 また，どちらのファミリでもイタリック体・スラント体は定義されない．
 
-  和文の太字を表すシリーズ名は，（元々のComputer Modernが
+ \item 和文の太字を表すシリーズ名は，（元々のComputer Modernが
   太字に\texttt{bx}を用いていたことから）伝統的に\texttt{bx}~(Bold Extended)が使われてきた．
   しかし，太字にシリーズ\texttt{b}を使うフォントも増えてきたため，
   バージョン20180616.0以降では和文の太字として\texttt{bx},~\texttt{b}の両方を扱えるようにした．
 %</ja>
 
-%<en>\item Japanese characters in math mode are typeset by the font family \texttt{mc}.
-%<ja>\item 数式モード中の和文文字は明朝体(\texttt{mc})で出力される．
+%<*en>
+ \item From version~20181102.0, one can specifies \texttt{disablejfam} option at
+  loading \LuaTeX-ja. This option prevents loading a patch for \LaTeX, which are
+  needed to support Japanese characters in math mode.
+
+  Without \texttt{disablejfam} option, one can typeset Japanese characters in
+  math mode as~\verb+$あ$+ (see Page~\pageref{para:jachar_in_math}) as before.
+  Japanese characters in math mode are typeset by the font family \texttt{mc}.
+%</en>
+%<*ja>
+ \item バージョン20181102.0以降では，\texttt{disablejfam}オプションを\LuaTeX-ja読み込み時に
+  指定できるようになった．このオプションは，数式モード中に直に和文文字を書けるようにするための
+  \LaTeX へのパッチを読み込まない．
+
+  \texttt{disablejfam}のない状況では，以前と同様に和文文字を数式モード中に
+  直に書くことができる（但し\autoref{para:jachar_in_math}ページの記述も参照）．
+  その際には明朝体(\texttt{mc})で出力される．
+%</ja>
 %<*en>
  \item \cs{jttdefault}%
   \footnote{%
@@ -1332,12 +1350,16 @@ auto select&\cs{fontencoding}&\cs{fontfamily}&---&---&\cs{usefont}\\
 \end{itemize}
 
 %<*en>
-\paragraph{Remark: Japanese characters in math mode}
+\paragraph{Japanese characters in math mode}
+\label{para:jachar_in_math}
+
 Since \pTeX\ supports Japanese characters in math mode, there are
 sources like the following:
 %</en>
 %<*ja>
-\paragraph{注意：数式モード中の和文文字}
+\paragraph{数式モード中の和文文字}
+\label{para:jachar_in_math}
+  
 \pTeX では，特に何もしないでも数式中に和文文字を記述することができた．そのため，
 以下のようなソースが見られた：
 %</ja>
@@ -1376,19 +1398,33 @@ In this point of view,
 $f_{\text{高温}}$~%
 ($f_{\text{high temperature}}$).
 \[ y=(x-1)^2+2\quad
-  \mathrel{\text{よって}}\quad y>0 \]
+  \mathrel{\mbox{よって}}\quad y>0 \]
 $5\in 素:=\{\,p\in\mathbb N:\text{$p$ is a prime}\,\}$.
 \end{LTXexample}
+
 %<*en>
 We also believe that using Japanese characters as identifiers is rare,
 hence we don't describe how to change Japanese fonts in math mode in
 this chapter. For the method, please see Subsection~\ref{ssec:math}.
+
+{\emshape When \LuaTeX-ja is loaded with \texttt{disablejfam}~option,
+  one cannot write Japanese characters in math mode as~\verb+$素$+.
+  At that case, one have to use \cs{mbox} (or~\cs{text} in the \Pkg{amsmath} package).
+}
 %</en>
 %<*ja>
-また\LuaTeX-jaプロジェクトでは，和文文字が識別子として用いられることはほとんどない
+なお\LuaTeX-jaプロジェクトでは，和文文字が識別子として用いられることはほとんどない
 と考えており，したがってこの節では数式モード中の和文フォントを変更する方法については
 記述しない．この方法については\ref{ssec:math}節を参照のこと．
+
+{\gtfamily\bfseries
+  既に記述した通り，\texttt{disablejfam}オプションを指定して\LuaTeX-jaを読み込んだ場合は，
+  \verb+$素$+ のように直接和文文字を数式モード中に記述することはできなくなる．
+  \cs{mbox}，あるいは\Pkg{amsmath}パッケージの提供する\cs{text}命令などを使うことになる．
+}
 %</ja>
+
+
 
 %<en>\subsection{\Pkg{luatexja-fontspec} package}
 %<ja>\subsection{\Pkg{luatexja-fontspec}パッケージ}
