@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2018/06/15',
+  date = '2018/11/01',
   description = 'Loader for Japanese fonts',
 })
 
@@ -68,101 +68,101 @@ function luatexja.jfont.define_jfm(to)
    t.char_type = {}; t.chars = {}
    for i,v in pairs(t) do
       if type(i) == 'number' then -- char_type
-	 if not v.chars then
-	    if i ~= 0 then defjfm_res= nil; return  end
-	 else
-	    for j,w in pairs(v.chars) do
-	       if type(w) == 'number' and w~=-1 then
-	       elseif type(w) == 'string' and utf.len(w)==1 then
-		  w = utf.byte(w)
-	       elseif type(w) == 'string' and utf.len(w)==2 and utf.sub(w,2) == '*' then
-		  w = utf.byte(utf.sub(w,1,1))
-	       end
-	       if not t.chars[w] then
-		  t.chars[w] = i
-	       else
-		  defjfm_res= nil; return
-	       end
-	    end
-	    v.chars = nil
-	 end
-	 if type(v.align)~='string' then
-	    v.align = 'left' -- left
-	 end
-	 if type(v.width)~='number' then
-	    v.width = nil
-	 end
-	 if type(v.height)~='number' then
-	    v.height = (jfm_dir=='tate') and  0.0
-	 end
-	 if type(v.depth)~='number' then
-	    v.depth =  (jfm_dir=='tate') and  0.0
-	 end
-	 if type(v.italic)~='number' then
-	    v.italic = 0.0
-	 end
-	 if type(v.left)~='number' then
-	    v.left = 0.0
-	 end
-	 if type(v.down)~='number' then
-	    v.down = 0.0
-	 end
-	 if t.version>=2 then
-	    if v.end_stretch then defjfm_res= nil; return end
-	    if v.end_shrink  then defjfm_res= nil; return end
-	    if v.end_adjust then
-	       if type(v.end_adjust)~='table' then
-	          v.end_adjust = nil
-	       elseif #(v.end_adjust)==0 then
-		  v.end_adjust = nil
-	       else 
-	          table.sort(v.end_adjust)
-	       end
-	    end
-	 else
-	    v.end_adjust = nil
-	    if v.end_stretch and v.end_stretch~=0.0 then 
-	       v.end_adjust = (v.end_adjust or {}) 
-	       v.end_adjust[#(v.end_adjust)+1] = v.end_stretch
-	    end
-	    if v.end_shrink and v.end_ahrink~=0.0 then 
-	       v.end_adjust = (v.end_adjust or {}) 
-	       v.end_adjust[#(v.end_adjust)+1] = -v.end_shrink
-	    end
-	    if v.end_adjust then v.end_adjust[#(v.end_adjust)+1] = 0.0 end
-	 end
-	 v.kern = v.kern or {}; v.glue = v.glue or {}
-	 for j,x in pairs(v.glue) do
-	    if v.kern[j] then defjfm_res= nil; return end
-	    x.ratio, x[5] = (x.ratio or (x[5] and 0.5*(1+x[5]) or 0.5)), nil
-	    do
-	       local xp
-	       xp, x[4] = (x.priority or x[4]), nil
-	       if type(xp)=='table' and t.version>=2 then
-		  if type(xp[1])~='number' or xp[1]<-4 or xp[1]>3 then defjfm_res=nil end  -- stretch
-		  if type(xp[2])~='number' or xp[2]<-4 or xp[2]>3 then defjfm_res=nil end  -- shrink
-		  xp = (xp[1]+4)*8+(xp[2]+4)
-	       elseif xp and type(xp)~='number' then
-		  defjfm_res = nil
-	       else
-		  xp = (xp or 0)*9+36	
-		  if xp<0 or xp>=64 then defjfm_res=nil end 
-	       end
-	       x.priority = xp
-	    end
-	    x.kanjiskip_natural = norm_val(x.kanjiskip_natural)
-	    x.kanjiskip_stretch = norm_val(x.kanjiskip_stretch)
-	    x.kanjiskip_shrink = norm_val(x.kanjiskip_shrink)
-	 end
-	 for j,x in pairs(v.kern) do
-	    if type(x)=='number' then
+         if not v.chars then
+            if i ~= 0 then defjfm_res= nil; return  end
+         else
+            for j,w in pairs(v.chars) do
+               if type(w) == 'number' and w~=-1 then
+               elseif type(w) == 'string' and utf.len(w)==1 then
+                  w = utf.byte(w)
+               elseif type(w) == 'string' and utf.len(w)==2 and utf.sub(w,2) == '*' then
+                  w = utf.byte(utf.sub(w,1,1))
+               end
+               if not t.chars[w] then
+                  t.chars[w] = i
+               else
+                  defjfm_res= nil; return
+               end
+            end
+            v.chars = nil
+         end
+         if type(v.align)~='string' then
+            v.align = 'left' -- left
+         end
+         if type(v.width)~='number' then
+            v.width = nil
+         end
+         if type(v.height)~='number' then
+            v.height = (jfm_dir=='tate') and  0.0
+         end
+         if type(v.depth)~='number' then
+            v.depth =  (jfm_dir=='tate') and  0.0
+         end
+         if type(v.italic)~='number' then
+            v.italic = 0.0
+         end
+         if type(v.left)~='number' then
+            v.left = 0.0
+         end
+         if type(v.down)~='number' then
+            v.down = 0.0
+         end
+         if t.version>=2 then
+            if v.end_stretch then defjfm_res= nil; return end
+            if v.end_shrink  then defjfm_res= nil; return end
+            if v.end_adjust then
+               if type(v.end_adjust)~='table' then
+                  v.end_adjust = nil
+               elseif #(v.end_adjust)==0 then
+                  v.end_adjust = nil
+               else 
+                  table.sort(v.end_adjust)
+               end
+            end
+         else
+            v.end_adjust = nil
+            if v.end_stretch and v.end_stretch~=0.0 then 
+               v.end_adjust = (v.end_adjust or {}) 
+               v.end_adjust[#(v.end_adjust)+1] = v.end_stretch
+            end
+            if v.end_shrink and v.end_ahrink~=0.0 then 
+               v.end_adjust = (v.end_adjust or {}) 
+               v.end_adjust[#(v.end_adjust)+1] = -v.end_shrink
+            end
+            if v.end_adjust then v.end_adjust[#(v.end_adjust)+1] = 0.0 end
+         end
+         v.kern = v.kern or {}; v.glue = v.glue or {}
+         for j,x in pairs(v.glue) do
+            if v.kern[j] then defjfm_res= nil; return end
+            x.ratio, x[5] = (x.ratio or (x[5] and 0.5*(1+x[5]) or 0.5)), nil
+            do
+               local xp
+               xp, x[4] = (x.priority or x[4]), nil
+               if type(xp)=='table' and t.version>=2 then
+                  if type(xp[1])~='number' or xp[1]<-4 or xp[1]>3 then defjfm_res=nil end  -- stretch
+                  if type(xp[2])~='number' or xp[2]<-4 or xp[2]>3 then defjfm_res=nil end  -- shrink
+                  xp = (xp[1]+4)*8+(xp[2]+4)
+               elseif xp and type(xp)~='number' then
+                  defjfm_res = nil
+               else
+                  xp = (xp or 0)*9+36        
+                  if xp<0 or xp>=64 then defjfm_res=nil end 
+               end
+               x.priority = xp
+            end
+            x.kanjiskip_natural = norm_val(x.kanjiskip_natural)
+            x.kanjiskip_stretch = norm_val(x.kanjiskip_stretch)
+            x.kanjiskip_shrink = norm_val(x.kanjiskip_shrink)
+         end
+         for j,x in pairs(v.kern) do
+            if type(x)=='number' then
                v.kern[j] = {x, 0.5}
             elseif type(x)=='table' then
                v.kern[j] = { x[1], (x.ratio or (x[2] and 0.5*(1+x[2]) or 0.5)) }
             end
-	 end
-	 t.char_type[i] = v
-	 t[i] = nil
+         end
+         t.char_type[i] = v
+         t[i] = nil
       end
    end
    if t.version<3 then
@@ -185,17 +185,17 @@ do
    local function myround(a) return floor(a+0.5) end
    local function mult_table(old,scale) -- modified from table.fastcopy
       if old then
-	 local new = { }
-	 for k,v in next, old do
-	    if type(v) == "table" then
-	       new[k] = mult_table(v,scale)
-	    elseif type(v) == "number" then
-	       new[k] = myround(v*scale)
-	    else
-	       new[k] = v
-	    end
-	 end
-	 return new
+         local new = { }
+         for k,v in next, old do
+            if type(v) == "table" then
+               new[k] = mult_table(v,scale)
+            elseif type(v) == "number" then
+               new[k] = myround(v*scale)
+            else
+               new[k] = v
+            end
+         end
+         return new
       else return nil end
    end
    update_jfm_cache = function (j,sz)
@@ -205,28 +205,28 @@ do
       t.chars = metrics[j].chars
       t.char_type = mult_table(metrics[j].char_type, sz)
       for i,v in pairs(t.char_type) do
-	 v.align = (v.align=='left') and 0 or
-	    ((v.align=='right') and 1 or 0.5)
-	 if type(i) == 'number' then -- char_type
-	    for k,w in pairs(v.glue) do
-	       v[k] = {
-		  nil,
-		  ratio=w.ratio/sz,
-		  priority=FROM_JFM + w.priority/sz,
-		  width = w[1], stretch = w[2], shrink = w[3],
-		  kanjiskip_natural = w.kanjiskip_natural and w.kanjiskip_natural/sz,
-		  kanjiskip_stretch = w.kanjiskip_stretch and w.kanjiskip_stretch/sz,
-		  kanjiskip_shrink =  w.kanjiskip_shrink  and w.kanjiskip_shrink/sz,
-	       }
-	    end
-	    for k,w in pairs(v.kern) do
-	       local g = node_new(id_kern, 1)
-	       setfield(g, 'kern', w[1])
-	       set_attr(g, attr_icflag, FROM_JFM)
-	       v[k] = {g, ratio=w[2]/sz}
-	    end
-	 end
-	 v.glue, v.kern = nil, nil
+         v.align = (v.align=='left') and 0 or
+            ((v.align=='right') and 1 or 0.5)
+         if type(i) == 'number' then -- char_type
+            for k,w in pairs(v.glue) do
+               v[k] = {
+                  nil,
+                  ratio=w.ratio/sz,
+                  priority=FROM_JFM + w.priority/sz,
+                  width = w[1], stretch = w[2], shrink = w[3],
+                  kanjiskip_natural = w.kanjiskip_natural and w.kanjiskip_natural/sz,
+                  kanjiskip_stretch = w.kanjiskip_stretch and w.kanjiskip_stretch/sz,
+                  kanjiskip_shrink =  w.kanjiskip_shrink  and w.kanjiskip_shrink/sz,
+               }
+            end
+            for k,w in pairs(v.kern) do
+               local g = node_new(id_kern, 1)
+               setfield(g, 'kern', w[1])
+               set_attr(g, attr_icflag, FROM_JFM)
+               v[k] = {g, ratio=w[2]/sz}
+            end
+         end
+         v.glue, v.kern = nil, nil
       end
       t.kanjiskip = mult_table(metrics[j].kanjiskip, sz)
       t.xkanjiskip = mult_table(metrics[j].xkanjiskip,sz)
@@ -237,9 +237,9 @@ do
 end
 
 luatexbase.create_callback("luatexja.find_char_class", "data",
-			   function (arg, fmtable, char)
-			      return 0
-			  end)
+                           function (arg, fmtable, char)
+                              return 0
+                          end)
 local find_char_class
 do
    local start_time_measure = ltjb.start_time_measure
@@ -272,22 +272,22 @@ do
    local global_flag -- true if \globaljfont, false if \jfont
    local function load_jfont_metric()
       if jfm_file_name=='' then
-	 ltjb.package_error('luatexja',
-			    'no JFM specified',
-			    'To load and define a Japanese font, a JFM must be specified.'..
-			    "The JFM 'ujis' will be  used for now.")
-	 jfm_file_name='ujis'
+         ltjb.package_error('luatexja',
+                            'no JFM specified',
+                            'To load and define a Japanese font, a JFM must be specified.'..
+                            "The JFM 'ujis' will be  used for now.")
+         jfm_file_name='ujis'
       end
       for j,v in ipairs(metrics) do
-	 if v.name==jfm_file_name then return j end
+         if v.name==jfm_file_name then return j end
       end
       luatexja.load_lua('jfm-' .. jfm_file_name .. '.lua')
       if defjfm_res then
-	 defjfm_res.name = jfm_file_name
-	 table.insert(metrics, defjfm_res)
-	 return #metrics
+         defjfm_res.name = jfm_file_name
+         table.insert(metrics, defjfm_res)
+         return #metrics
       else
-	 return nil
+         return nil
       end
    end
 
@@ -299,7 +299,7 @@ do
       cstemp = cstemp:sub(1, ((cstemp:sub(-1,-1)==' ') and (cstemp:len()>=2)) and -2 or -1)
       global_flag = g and '\\global' or ''
       tex.sprint(cat_lp, '\\expandafter\\font\\csname ',
-		 (cstemp==' ') and '\\space' or cstemp, '\\endcsname')
+                 (cstemp==' ') and '\\space' or cstemp, '\\endcsname')
    end
 
    luatexbase.create_callback("luatexja.define_jfont", "data", function (ft, fn) return ft end)
@@ -312,28 +312,28 @@ do
       local fn = font.id(cstemp)
       local f = font_getfont(fn)
       if not j then
-	 ltjb.package_error('luatexja',
-			    "bad JFM `" .. jfm_file_name .. "'",
-			    'The JFM file you specified is not valid JFM file.\n'..
-			       'So defining Japanese font is cancelled.')
-	 tex.sprint(cat_lp, global_flag, '\\expandafter\\let\\csname ',
-		    (cstemp==' ') and '\\space' or cstemp,
-		       '\\endcsname=\\relax')
-	 return
+         ltjb.package_error('luatexja',
+                            "bad JFM `" .. jfm_file_name .. "'",
+                            'The JFM file you specified is not valid JFM file.\n'..
+                               'So defining Japanese font is cancelled.')
+         tex.sprint(cat_lp, global_flag, '\\expandafter\\let\\csname ',
+                    (cstemp==' ') and '\\space' or cstemp,
+                       '\\endcsname=\\relax')
+         return
       end
       if not f then return end
       update_jfm_cache(j, f.size)
       local ad = identifiers[fn].parameters
       local sz = metrics[j].size_cache[f.size]
       local fmtable = { jfm = j, size = f.size, var = jfm_var,
-			with_kanjiskip = jfm_ksp,
-			zw = sz.zw, zh = sz.zh,
-			ascent = ad.ascender,
-			descent = ad.descender,
-			chars = sz.chars, char_type = sz.char_type,
-			kanjiskip = sz.kanjiskip, xkanjiskip = sz.xkanjiskip,
+                        with_kanjiskip = jfm_ksp,
+                        zw = sz.zw, zh = sz.zh,
+                        ascent = ad.ascender,
+                        descent = ad.descender,
+                        chars = sz.chars, char_type = sz.char_type,
+                        kanjiskip = sz.kanjiskip, xkanjiskip = sz.xkanjiskip,
                         chars_cbcache = {},
-			vert_activated = is_vert_enabled,
+                        vert_activated = is_vert_enabled,
       }
       if auto_enable_vrt2 then
          local t = identifiers[fn]
@@ -344,14 +344,14 @@ do
          t.shared.features[vrt2_exist and 'vrt2' or 'vert'] = true
       end
 
-      texio.write_nl('term and log', 
-        'JFNT\t' .. identifiers[fn].name .. '\t' .. identifiers[fn].size .. '\t' .. fn, '')
+      --texio.write_nl('term and log', 
+      --'JFNT\t' .. identifiers[fn].name .. '\t' .. identifiers[fn].size .. '\t' .. fn, '')
 
       fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
       font_metric_table[fn]=fmtable
       tex.sprint(cat_lp, global_flag, '\\protected\\expandafter\\def\\csname ',
-		    (cstemp==' ') and '\\space' or cstemp, '\\endcsname{\\ltj@cur'..
-		    (jfm_dir == 'yoko' and 'j' or 't') .. 'fnt', fn, '\\relax}')
+                    (cstemp==' ') and '\\space' or cstemp, '\\endcsname{\\ltj@cur'..
+                    (jfm_dir == 'yoko' and 'j' or 't') .. 'fnt', fn, '\\relax}')
       jfm_file_name = nil
    end
 end
@@ -363,12 +363,12 @@ do
    -- PUBLIC function
    function luatexja.jfont.get_zw()
       local a = font_metric_table[
-	 tex_get_attr((get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)]
+         tex_get_attr((get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)]
       return a and a.zw or 0
    end
    function luatexja.jfont.get_zh()
       local a = font_metric_table[
-	 tex_get_attr((get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)]
+         tex_get_attr((get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)]
       return a and a.zw or 0
    end
 end
@@ -380,60 +380,60 @@ do
    local function extract_metric(name)
       do
          local nametemp
-	 nametemp = name:match('^{(.*)}$')
-	 if nametemp then name = nametemp
+         nametemp = name:match('^{(.*)}$')
+         if nametemp then name = nametemp
          else
-  	    nametemp = name:match('^"(.*)"$')
-	    name = nametemp or name
+              nametemp = name:match('^"(.*)"$')
+            name = nametemp or name
          end
       end
       jfm_file_name = ''; jfm_var = ''; jfm_ksp = true
       local tmp, index = name:sub(1, 5), 1
       if tmp == 'file:' or tmp == 'name:' or tmp == 'psft:' then
-	 index = 6
+         index = 6
       end
       local p = name:find(":", index); index = p and (p+1) or index
       while index do
-	 local l = name:len()+1
-	 local q = name:find(";", index) or l
-	 if name:sub(index, index+3)=='jfm=' and q>index+4 then
-	    jfm_file_name = name:sub(index+4, q-1)
-	    if l~=q then
-	       name = name:sub(1,index-1) .. name:sub(q+1)
-	    else
-	       name = name:sub(1,index-1)
-	       index = nil
-	    end
-	 elseif name:sub(index, index+6)=='jfmvar=' and q>index+6 then
-	    jfm_var = name:sub(index+7, q-1)
-	    if l~=q then
-	       name = name:sub(1,index-1) .. name:sub(q+1)
-	    else
-	       name = name:sub(1,index-1)
-	       index = nil
-	    end
-	 else
-	    index = (l~=q) and (q+1) or nil
-	 end
+         local l = name:len()+1
+         local q = name:find(";", index) or l
+         if name:sub(index, index+3)=='jfm=' and q>index+4 then
+            jfm_file_name = name:sub(index+4, q-1)
+            if l~=q then
+               name = name:sub(1,index-1) .. name:sub(q+1)
+            else
+               name = name:sub(1,index-1)
+               index = nil
+            end
+         elseif name:sub(index, index+6)=='jfmvar=' and q>index+6 then
+            jfm_var = name:sub(index+7, q-1)
+            if l~=q then
+               name = name:sub(1,index-1) .. name:sub(q+1)
+            else
+               name = name:sub(1,index-1)
+               index = nil
+            end
+         else
+            index = (l~=q) and (q+1) or nil
+         end
       end
       if jfm_file_name~='' then
-	 local l = name:sub(-1)
-	 name = name
-	    .. ((l==':' or l==';') and '' or ';')
-	    .. 'jfm=' .. jfm_file_name
-	 if jfm_var~='' then
-	    name = name .. ';jfmvar=' .. jfm_var
-	 end
+         local l = name:sub(-1)
+         name = name
+            .. ((l==':' or l==';') and '' or ';')
+            .. 'jfm=' .. jfm_file_name
+         if jfm_var~='' then
+            name = name .. ';jfmvar=' .. jfm_var
+         end
       end
       for x in gmatch (name, "[:;]([+%%-]?)ltjks") do
-	 jfm_ksp = not (x=='-')
+         jfm_ksp = not (x=='-')
       end
       if jfm_dir == 'tate' then
-	 is_vert_enabled = (not name:match('[:;]%-vert')) and (not  name:match('[:;]%-vrt2'))
-	 auto_enable_vrt2 
-	   = (not name:match('[:;][+%-]?vert')) and (not name:match('[:;][+%-]?vrt2'))
+         is_vert_enabled = (not name:match('[:;]%-vert')) and (not  name:match('[:;]%-vrt2'))
+         auto_enable_vrt2 
+           = (not name:match('[:;][+%-]?vert')) and (not name:match('[:;][+%-]?vrt2'))
       else
-	 is_vert_enabled, auto_enable_vrt2 = nil, nil
+         is_vert_enabled, auto_enable_vrt2 = nil, nil
       end
       return name
    end
@@ -471,7 +471,7 @@ do
    end
    function luatexja.jfont.is_kenc(enc)
       tex.sprint(cat_lp, '\\let\\ifin@\\if'
-		 .. (kyenc_list[enc] or ktenc_list[enc] or 'false '))
+                 .. (kyenc_list[enc] or ktenc_list[enc] or 'false '))
    end
 
    local kfam_list, Nkfam_list = {}, {}
@@ -480,23 +480,23 @@ do
    end
    function luatexja.jfont.search_kfam(fam, use_fd)
       if kfam_list[fam] then
-	 tex.sprint(cat_lp, '\\let\\ifin@\\iftrue '); return
+         tex.sprint(cat_lp, '\\let\\ifin@\\iftrue '); return
       elseif Nkfam_list[fam] then
-	 tex.sprint(cat_lp, '\\let\\ifin@\\iffalse '); return
+         tex.sprint(cat_lp, '\\let\\ifin@\\iffalse '); return
       elseif use_fd then
-	 for i,_ in pairs(kyenc_list) do
-	    if kpse.find_file(string.lower(i)..fam..'.fd') then
-	       tex.sprint(cat_lp, '\\let\\ifin@\\iftrue '); return
-	    end
-	 end
-	 for i,_ in pairs(ktenc_list) do
-	    if kpse.find_file(string.lower(i)..fam..'.fd') then
-	       tex.sprint(cat_lp, '\\let\\ifin@\\iftrue '); return
-	    end
-	 end
-	 Nkfam_list[fam]=true; tex.sprint(cat_lp, '\\let\\ifin@\\iffalse '); return
+         for i,_ in pairs(kyenc_list) do
+            if kpse.find_file(string.lower(i)..fam..'.fd') then
+               tex.sprint(cat_lp, '\\let\\ifin@\\iftrue '); return
+            end
+         end
+         for i,_ in pairs(ktenc_list) do
+            if kpse.find_file(string.lower(i)..fam..'.fd') then
+               tex.sprint(cat_lp, '\\let\\ifin@\\iftrue '); return
+            end
+         end
+         Nkfam_list[fam]=true; tex.sprint(cat_lp, '\\let\\ifin@\\iffalse '); return
       else
-	 tex.sprint(cat_lp, '\\let\\ifin@\\iffalse '); return
+         tex.sprint(cat_lp, '\\let\\ifin@\\iffalse '); return
       end
    end
    local ffam_list, Nffam_list = {}, {}
@@ -509,20 +509,20 @@ do
    function luatexja.jfont.search_ffam_declared()
      local s = ''
      for i,_ in pairs(fenc_list) do
-	s = s .. '\\cdp@elt{' .. i .. '}'
+        s = s .. '\\cdp@elt{' .. i .. '}'
      end
      tex.sprint(cat_lp, s)
    end
    function luatexja.jfont.search_ffam_fd(fam)
       if Nffam_list[fam] then
-	 tex.sprint(cat_lp, '\\let\\ifin@\\iffalse '); return
+         tex.sprint(cat_lp, '\\let\\ifin@\\iffalse '); return
       else
-	 for i,_ in pairs(fenc_list) do
-	    if kpse.find_file(string.lower(i)..fam..'.fd') then
-	       tex.sprint(cat_lp, '\\let\\ifin@\\iftrue '); return
-	    end
-	 end
-	 Nffam_list[fam]=true; tex.sprint(cat_lp, '\\let\\ifin@\\iffalse '); return
+         for i,_ in pairs(fenc_list) do
+            if kpse.find_file(string.lower(i)..fam..'.fd') then
+               tex.sprint(cat_lp, '\\let\\ifin@\\iftrue '); return
+            end
+         end
+         Nffam_list[fam]=true; tex.sprint(cat_lp, '\\let\\ifin@\\iffalse '); return
       end
    end
 
@@ -541,15 +541,15 @@ function luatexja.jfont.set_alt_font(b,e,ind,bfnt)
    if b>e then b, e = e, b end
    if b*e<=0 then
       ltjb.package_error('luatexja',
-			'bad character range ([' .. b .. ',' .. e .. ']). ' ..
-			   'I take the intersection with [0x80, 0x10ffff].')
+                        'bad character range ([' .. b .. ',' .. e .. ']). ' ..
+                           'I take the intersection with [0x80, 0x10ffff].')
       b, e = math.max(0x80,b),math.min(ucs_out-1,e)
    elseif e<0 then -- b<e<0
       -- do nothing
    elseif b<0x80 or e>=ucs_out then
       ltjb.package_warning('luatexja',
-			   'bad character range ([' .. b .. ',' .. e .. ']). ' ..
-			      'I take the intersection with [0x80, 0x10ffff].')
+                           'bad character range ([' .. b .. ',' .. e .. ']). ' ..
+                              'I take the intersection with [0x80, 0x10ffff].')
       b, e = math.max(0x80,b), math.min(ucs_out-1,e)
    end
    if not alt_font_table[bfnt] then alt_font_table[bfnt]={} end
@@ -558,13 +558,13 @@ function luatexja.jfont.set_alt_font(b,e,ind,bfnt)
    if bfnt==ind then ind = nil end -- ind == bfnt の場合はテーブルから削除
    if e>=0 then -- character range
       for i=b, e do
-	 if ac[i]then  t[i]=ind end
+         if ac[i]then  t[i]=ind end
       end
    else
       b, e = -e, -b
       local tx = font_metric_table[bfnt].chars
       for i,v in pairs(tx) do
-	 if b<=v and v<=e and ac[i] then t[i]=ind end
+         if b<=v and v<=e and ac[i] then t[i]=ind end
       end
    end
 end
@@ -601,15 +601,15 @@ function luatexja.jfont.set_alt_font_latex(b,e,ind,bbase)
    if b>e then b, e = e, b end
    if b*e<=0 then
       ltjb.package_error('luatexja',
-			'bad character range ([' .. b .. ',' .. e .. ']). ' ..
-			   'I take the intersection with [0x80, 0x10ffff].')
+                        'bad character range ([' .. b .. ',' .. e .. ']). ' ..
+                           'I take the intersection with [0x80, 0x10ffff].')
       b, e = math.max(0x80,b),math.min(ucs_out-1,e)
    elseif e<0 then -- b<e<0
       -- do nothing
    elseif b<0x80 or e>=ucs_out then
       ltjb.package_warning('luatexja',
-			   'bad character range ([' .. b .. ',' .. e .. ']). ' ..
-			      'I take the intersection with [0x80, 0x10ffff].')
+                           'bad character range ([' .. b .. ',' .. e .. ']). ' ..
+                              'I take the intersection with [0x80, 0x10ffff].')
       b, e = math.max(0x80,b), math.min(ucs_out-1,e)
    end
 
@@ -651,9 +651,9 @@ do
    function luatexja.jfont.output_alt_font_cmd(dir, bbase)
       alt_font_base = bbase
       if dir == 't' then
-	 alt_font_base_num = tex.getattribute(attr_curtfnt)
+         alt_font_base_num = tex.getattribute(attr_curtfnt)
       else
-	 alt_font_base_num = tex.getattribute(attr_curjfnt)
+         alt_font_base_num = tex.getattribute(attr_curjfnt)
       end
       local t = alt_font_table[alt_font_base_num]
       if t then
@@ -714,17 +714,17 @@ do
    function luatexja.jfont.cleanup_size_cache()
       --local gs, ke = 0, 0
       for _,n in pairs(metrics) do
-	 for i,t in pairs(n.size_cache) do
-	    for _,v in pairs(t.char_type) do
-	       for k,w in pairs(v) do
-		  if type(k)=='number' then
-		     --if w[1] then gs = gs + 1 else ke = ke + 1 end
-		     if w[1] then node_free(w[1]) end
-		  end
-	       end
-	    end
-	    n.size_cache[i]=nil
-	 end
+         for i,t in pairs(n.size_cache) do
+            for _,v in pairs(t.char_type) do
+               for k,w in pairs(v) do
+                  if type(k)=='number' then
+                     --if w[1] then gs = gs + 1 else ke = ke + 1 end
+                     if w[1] then node_free(w[1]) end
+                  end
+               end
+            end
+            n.size_cache[i]=nil
+         end
       end
    end
 end
@@ -754,33 +754,33 @@ do
       if id.specification and id.resources then
          local rot = {}
          for i,_ in pairs(id.characters) do
-	    if rotate_in_uax50(i) then rot[i] = true end
+            if rotate_in_uax50(i) then rot[i] = true end
          end
          if id.resources.sequences then
-	 for _,i in pairs(id.resources.sequences) do
-	    if i.order[1]== 'vert' and i.type == 'gsub_single' and i.steps then
-	       for _,j in pairs(i.steps) do
-	          if type(j)=='table' then 
-		     if type(j.coverage)=='table' then
-			for i,_ in pairs(j.coverage) do rot[i]=nil end
-		     end
-		  end
-	       end
-	    end
-	 end; end
-	 -- コードポイントが共有されているグリフについて
+         for _,i in pairs(id.resources.sequences) do
+            if i.order[1]== 'vert' and i.type == 'gsub_single' and i.steps then
+               for _,j in pairs(i.steps) do
+                  if type(j)=='table' then 
+                     if type(j.coverage)=='table' then
+                        for i,_ in pairs(j.coverage) do rot[i]=nil end
+                     end
+                  end
+               end
+            end
+         end; end
+         -- コードポイントが共有されているグリフについて
          if id.resources.duplicates then
-	 for i,v in pairs(id.resources.duplicates) do
-	    local f = rot[i]
+         for i,v in pairs(id.resources.duplicates) do
+            local f = rot[i]
             for j,_ in pairs(v) do f = f and rot[j] end
             rot[i]=f
             for j,_ in pairs(v) do rot[j] = f end
          end; end
-	 
-	 for i,_ in pairs(rot) do
-	    dest = dest or {}
-	    dest[i] = dest[i] or {}
-	    dest[i].rotation = true
+         
+         for i,_ in pairs(rot) do
+            dest = dest or {}
+            dest[i] = dest[i] or {}
+            dest[i].rotation = true
          end
       end
       return dest
@@ -796,9 +796,9 @@ do
       local flds = fields(glyph)
       local vw, tsb, vk = nil, nil, nil
       for _,i in ipairs(flds) do
-	 if i=='vwidth' then vw = glyph.vwidth end
-	 if i=='tsidebearing' then tsb = glyph.tsidebearing end
-	 if i=='vkerns' then vk = glyph.vkerns end
+         if i=='vwidth' then vw = glyph.vwidth end
+         if i=='tsidebearing' then tsb = glyph.tsidebearing end
+         if i=='vkerns' then vk = glyph.vkerns end
       end
       return vw, tsb, vk
    end
@@ -809,59 +809,59 @@ do
       if glyphmax < 0 then return dest end
       local tg = glyphs.glyphs
       for i = glyphmin, glyphmax do
-	 local gv = tg[i]
-	 if gv then
-	    if gv.altuni then
-	       for _,at in pairs(gv.altuni) do
-		  local bu, vsel = at.unicode, at.variant
-		  if vsel then
-		     if vsel>=0xE0100 then vsel = vsel - 0xE0100 end
-		     local uniq_flag = true
+         local gv = tg[i]
+         if gv then
+            if gv.altuni then
+               for _,at in pairs(gv.altuni) do
+                  local bu, vsel = at.unicode, at.variant
+                  if vsel then
+                     if vsel>=0xE0100 then vsel = vsel - 0xE0100 end
+                     local uniq_flag = true
                      if dest and dest[bu] then
-			for i,_ in pairs(dest[bu]) do
-			   if i==vsel then uniq_flag = false; break end
-		        end
+                        for i,_ in pairs(dest[bu]) do
+                           if i==vsel then uniq_flag = false; break end
+                        end
                      end
-		     if uniq_flag then
-			dest = dest or {}; dest[bu] = dest[bu] or {}
-			dest[bu][vsel] = unitable[gv.name]
-		     end
-		  end
-	       end
-	    end
-	    -- vertical metric
-	    local vw, tsb, vk = glyph_vmetric(gv)
-	    local gi = unitable[gv.name]
-	    if gi and vw and vw~=asc_des then
-	       -- We do not use tsidebearing, since (1) fontloader does not read VORG table
-	       -- and (2) 'tsidebearing' doea not appear in the returned table by fontloader.fields.
-	       -- Hence, we assume that vertical origin == ascender
-	       -- (see capsule_glyph_tate in ltj-setwidth.lua)
-	       dest = dest or {}; dest[gi] = dest[gi] or {}
-	       dest[gi].vwidth = vw/units
-	    end
-	    -- vertical kern
-	    if gi and vk then
-	       dest = dest or {};
-	       local dest_vk = dest.vkerns or {}; dest.vkerns = dest_vk
-	       for _,v in pairs(vk) do
-		  if unitable[v.char] then
-		     local vl = v.lookup
-		     if type(vl)=='table' then
-			for _,vlt in pairs(vl) do
-			   dest_vk[vlt] = dest_vk[vlt] or {}
-			   dest_vk[vlt][gi] = dest_vk[vlt][gi] or {}
-			   dest_vk[vlt][gi][unitable[v.char]] = v.off
-			end
-		     else
-			dest_vk[vl] = dest_vk[vl] or {}
-			dest_vk[vl][gi] = dest_vk[vl][gi] or {}
-			dest_vk[vl][gi][unitable[v.char]] = v.off
-		     end
-		  end
-	       end
-	    end
-	 end
+                     if uniq_flag then
+                        dest = dest or {}; dest[bu] = dest[bu] or {}
+                        dest[bu][vsel] = unitable[gv.name]
+                     end
+                  end
+               end
+            end
+            -- vertical metric
+            local vw, tsb, vk = glyph_vmetric(gv)
+            local gi = unitable[gv.name]
+            if gi and vw and vw~=asc_des then
+               -- We do not use tsidebearing, since (1) fontloader does not read VORG table
+               -- and (2) 'tsidebearing' doea not appear in the returned table by fontloader.fields.
+               -- Hence, we assume that vertical origin == ascender
+               -- (see capsule_glyph_tate in ltj-setwidth.lua)
+               dest = dest or {}; dest[gi] = dest[gi] or {}
+               dest[gi].vwidth = vw/units
+            end
+            -- vertical kern
+            if gi and vk then
+               dest = dest or {};
+               local dest_vk = dest.vkerns or {}; dest.vkerns = dest_vk
+               for _,v in pairs(vk) do
+                  if unitable[v.char] then
+                     local vl = v.lookup
+                     if type(vl)=='table' then
+                        for _,vlt in pairs(vl) do
+                           dest_vk[vlt] = dest_vk[vlt] or {}
+                           dest_vk[vlt][gi] = dest_vk[vlt][gi] or {}
+                           dest_vk[vlt][gi][unitable[v.char]] = v.off
+                        end
+                     else
+                        dest_vk[vl] = dest_vk[vl] or {}
+                        dest_vk[vl][gi] = dest_vk[vl][gi] or {}
+                        dest_vk[vl][gi][unitable[v.char]] = v.off
+                     end
+                  end
+               end
+            end
+         end
       end
       return dest
    end
@@ -873,41 +873,41 @@ do
         fl = fontloader.open(id.filename)
       else
         fl = fontloader.open(id.filename, id.fontname) -- マニュアルにはこっちで書いてあるが？
-	if not fl then
+        if not fl then
           local index
-	  for i,v in ipairs(t) do
+          for i,v in ipairs(t) do
             if v.fontname == id.fontname then index=i; break end
           end  
-	  fl = fontloader.open(id.filename, index)
+          fl = fontloader.open(id.filename, index)
         end
       end
       if not fl then fontloader.close(fl); return dest end
       local ind_to_uni, unicodes = {}, {}
       for i,v in pairs(id.characters) do
-	  ind_to_uni[v.index] = i
+          ind_to_uni[v.index] = i
       end
       if fl.glyphs then
-	 local tg, glyphmin, glyphmax = fl.glyphs, fl.glyphmin, fl.glyphmax
+         local tg, glyphmin, glyphmax = fl.glyphs, fl.glyphmin, fl.glyphmax
          if 0 <= glyphmax then
             for i = glyphmin, glyphmax do
                if tg[i] and tg[i].name then unicodes[tg[i].name] = ind_to_uni[i] end
-	    end
-	 end
-	 dest = add_fl_table(dest, fl, unicodes,
-			     fl.ascent + fl.descent, fl.units_per_em, id)
+            end
+         end
+         dest = add_fl_table(dest, fl, unicodes,
+                             fl.ascent + fl.descent, fl.units_per_em, id)
       end
       if fl.subfonts then
          for _,v in pairs(fl.subfonts) do
-	    local tg, glyphmin, glyphmax = v.glyphs, v.glyphmin, v.glyphmax
+            local tg, glyphmin, glyphmax = v.glyphs, v.glyphmin, v.glyphmax
             if 0 <= glyphmax then
                for i = glyphmin, glyphmax do
                   if tg[i] and tg[i].name then unicodes[tg[i].name] = ind_to_uni[i] end
-	       end
-	   end
+               end
+           end
        end
          for _,v in pairs(fl.subfonts) do
             dest = add_fl_table(dest, v, unicodes,
-				fl.ascent + fl.descent, fl.units_per_em, id)
+                                fl.ascent + fl.descent, fl.units_per_em, id)
          end
      end
      if dest then dest.unicodes = unicodes end
@@ -920,13 +920,13 @@ do
       local lookuphash =  id.resources.lookuphash
       local desc = id.shared.rawdata.descriptions
       if bx and lookuphash then
-	 for i,v in pairs(bx) do
-	    lookuphash[i] = lookuphash[i] or v
-	    for j,w in pairs(v) do
-	       desc[j].kerns = desc[j].kerns or {}
-	       desc[j].kerns[i] = w
-	    end
-	 end
+         for i,v in pairs(bx) do
+            lookuphash[i] = lookuphash[i] or v
+            for j,w in pairs(v) do
+               desc[j].kerns = desc[j].kerns or {}
+               desc[j].kerns[i] = w
+            end
+         end
       end
    end
 end
@@ -939,52 +939,52 @@ do
       if (not id) or (not id.filename) then return end
       local bname = id.psname or file.nameonly(id.filename)
       if not font_extra_basename[bname] then
-	 -- if the cache is present, read it
-	 if not lfs then lfs=require"lfs"  end
-	 local newtime = lfs.attributes(id.filename,"modification")
-	 local v = "extra_" .. string.lower(bname)
-	 local dat = ltjb.load_cache(
-	    v,
-	    function (t) return (t.version~=cache_ver) or (t.modtime~=newtime) end
-	 )
-	 -- if the cache is not found or outdated, save the cache
-	 if dat then
-	    font_extra_basename[bname] = dat[1] or {}
-	 else
-	    local dat = nil
-	    dat = prepare_fl_data(dat, id)
-	    dat = list_rotate_glyphs(dat, id)
-	    font_extra_basename[bname] = dat or {}
-	    ltjb.save_cache( v,
-			     {
-				modtime = newtime,
-				version = cache_ver,
-				dat,
-			     })
-	 end
-	 return bname
+         -- if the cache is present, read it
+         if not lfs then lfs=require"lfs"  end
+         local newtime = lfs.attributes(id.filename,"modification")
+         local v = "extra_" .. string.lower(bname)
+         local dat = ltjb.load_cache(
+            v,
+            function (t) return (t.version~=cache_ver) or (t.modtime~=newtime) end
+         )
+         -- if the cache is not found or outdated, save the cache
+         if dat then
+            font_extra_basename[bname] = dat[1] or {}
+         else
+            local dat = nil
+            dat = prepare_fl_data(dat, id)
+            dat = list_rotate_glyphs(dat, id)
+            font_extra_basename[bname] = dat or {}
+            ltjb.save_cache( v,
+                             {
+                                modtime = newtime,
+                                version = cache_ver,
+                                dat,
+                             })
+         end
+         return bname
       end
    end
    local function prepare_extra_data_font(id, res)
       if type(res)=='table' and res.shared and (res.psname or res.filename) then
-	 font_extra_info[id] = font_extra_basename[res.psname or file.nameonly(res.filename)]
+         font_extra_info[id] = font_extra_basename[res.psname or file.nameonly(res.filename)]
       end
    end
     luatexbase.add_to_callback(
        'luaotfload.patch_font',
        function (tfmdata)
-	  -- these function is executed one time per one fontfile
+          -- these function is executed one time per one fontfile
           if jfm_file_name then
             local bname = prepare_extra_data_base(tfmdata)
             if bname then supply_vkern_table(tfmdata, bname) end
           end
-	  return tfmdata
+          return tfmdata
        end,
        'ltj.prepare_extra_data', 1)
    luatexbase.add_to_callback(
       'luatexja.define_font',
       function (res, name, size, id)
-	 prepare_extra_data_font(id, res)
+         prepare_extra_data_font(id, res)
       end,
       'ltj.prepare_extra_data', 1)
 
@@ -994,8 +994,8 @@ do
    local identifiers = fonts.hashes.identifiers
    for i=1,font.nextid()-1 do
       if identifiers[i] then
-	 prepare_extra_data_base(identifiers[i])
-	 prepare_extra_data_font(i,identifiers[i])
+         prepare_extra_data_base(identifiers[i])
+         prepare_extra_data_font(i,identifiers[i])
       end
    end
 end
@@ -1007,20 +1007,20 @@ end
 do
    local function acc_feature(table_vadv, table_vorg, subtables, ft,  already_vert)
       for char_num,v in pairs(ft.shared.rawdata.descriptions) do
-	 if v.slookups then
-	    for sn, sv in pairs(v.slookups) do
-	       if subtables[sn] and type(sv)=='table' then
-		  if sv[4]~=0 then
-		     table_vadv[char_num]
-			= (table_vadv[char_num] or 0) + sv[4]
-		  end
-		  if sv[2]~=0 and not already_vert then
-		     table_vorg[char_num]
-			= (table_vorg[char_num] or 0) + sv[2]
-		  end
-	       end
-	    end
-	 end
+         if v.slookups then
+            for sn, sv in pairs(v.slookups) do
+               if subtables[sn] and type(sv)=='table' then
+                  if sv[4]~=0 then
+                     table_vadv[char_num]
+                        = (table_vadv[char_num] or 0) + sv[4]
+                  end
+                  if sv[2]~=0 and not already_vert then
+                     table_vorg[char_num]
+                        = (table_vorg[char_num] or 0) + sv[2]
+                  end
+               end
+            end
+         end
       end
    end
 
@@ -1032,25 +1032,25 @@ luatexbase.add_to_callback(
       local ft = font_getfont(fnum)
       local subtables = {}
       if ft.specification then
-	 for feat_name,v in pairs(ft.specification.features.normal) do
-	    if v==true and ft.resources then
-	       for _,i in pairs(ft.resources.sequences) do
-		  if i.order[1]== feat_name and i.type == 'gpos_single' and type(i.subtables)=='table' then
-		     for _,st in pairs(i.subtables) do
-			subtables[st] = true
-		     end
-		  end
-	       end
-	    end
-	 end
-	 acc_feature(vadv, vorg, subtables, ft,
-		     ft.specification.features.normal.vrt2 or ft.specification.features.normal.vert)
-	 for i,v in pairs(vadv) do
-	    vadv[i]=vadv[i]/ft.units_per_em*fmtable.size
-	 end
-	 for i,v in pairs(vorg) do
-	    vorg[i]=vorg[i]/ft.units_per_em*fmtable.size
-	 end
+         for feat_name,v in pairs(ft.specification.features.normal) do
+            if v==true and ft.resources then
+               for _,i in pairs(ft.resources.sequences) do
+                  if i.order[1]== feat_name and i.type == 'gpos_single' and type(i.subtables)=='table' then
+                     for _,st in pairs(i.subtables) do
+                        subtables[st] = true
+                     end
+                  end
+               end
+            end
+         end
+         acc_feature(vadv, vorg, subtables, ft,
+                     ft.specification.features.normal.vrt2 or ft.specification.features.normal.vert)
+         for i,v in pairs(vadv) do
+            vadv[i]=vadv[i]/ft.units_per_em*fmtable.size
+         end
+         for i,v in pairs(vorg) do
+            vorg[i]=vorg[i]/ft.units_per_em*fmtable.size
+         end
       end
       return fmtable
    end, 'ltj.v_advance', 1
@@ -1079,12 +1079,12 @@ do
   local function add_vform(coverage, vform, ft, add_vert)
      if type(coverage)~='table' then return end
      for i,v in pairs(vert_form_table) do
-	 if not coverage[i] and ft.characters[v] then
-	     vform[i] = v
-	 end
+         if not coverage[i] and ft.characters[v] then
+             vform[i] = v
+         end
      end
      if add_vert then -- vert feature が有効にならない場合
-	for i,v in pairs(coverage) do vform[i] = vform[i] or v end
+        for i,v in pairs(coverage) do vform[i] = vform[i] or v end
      end
   end
 
@@ -1094,17 +1094,17 @@ luatexbase.add_to_callback(
       local vform = {}; fmtable.vform = vform
       local t = font_getfont(fnum)
       if t.specification and t.resources then
-	 local add_vert  
-	   = not (provides_feature(fnum, t.properties.script, t.properties.language, 'vert'))
-	     and not (provides_feature(fnum, t.properties.script, t.properties.language, 'vrt2'))
+         local add_vert  
+           = not (provides_feature(fnum, t.properties.script, t.properties.language, 'vert'))
+             and not (provides_feature(fnum, t.properties.script, t.properties.language, 'vrt2'))
          -- 現在の language, script で vert もvrt2 も有効にできない場合，強制的に vert 適用
-	 for _,i in pairs(t.resources.sequences) do
-	    if i.order[1]== 'vert' and i.type == 'gsub_single' and i.steps then
-	       for _,j in pairs(i.steps) do
-	          if type(j)=='table' then add_vform(j.coverage,vform, t, add_vert) end
-	       end
-	    end
-	  end
+         for _,i in pairs(t.resources.sequences) do
+            if i.order[1]== 'vert' and i.type == 'gsub_single' and i.steps then
+               for _,j in pairs(i.steps) do
+                  if type(j)=='table' then add_vform(j.coverage,vform, t, add_vert) end
+               end
+            end
+          end
       end
       return fmtable
    end, 'ltj.get_vert_form', 1
@@ -1119,21 +1119,21 @@ do
   luatexbase.add_to_callback(
      'luaotfload.patch_font',
      function (tfmdata)
-	local cidinfo = tfmdata.cidinfo or tfmdata.resources.cidinfo
-	if cidinfo and cidinfo.registry and cidinfo.ordering then
-	   local rd = ltjr_prepare_cid_font(cidinfo.registry, cidinfo.ordering)
-	   if rd then
-	      local ru, rc = rd.resources.unicodes, rd.characters
-	      for i,v in pairs(tfmdata.characters) do
-		 local w = ru["Japan1." .. tostring(v.index)]
-		 if w then
-		    v.tounicode = v.tounicode or rc[w]. tounicode
-		 end
-	      end
-	   end
-	end
+        local cidinfo = tfmdata.cidinfo or tfmdata.resources.cidinfo
+        if cidinfo and cidinfo.registry and cidinfo.ordering then
+           local rd = ltjr_prepare_cid_font(cidinfo.registry, cidinfo.ordering)
+           if rd then
+              local ru, rc = rd.resources.unicodes, rd.characters
+              for i,v in pairs(tfmdata.characters) do
+                 local w = ru["Japan1." .. tostring(v.index)]
+                 if w then
+                    v.tounicode = v.tounicode or rc[w]. tounicode
+                 end
+              end
+           end
+        end
 
-	return tfmdata
+        return tfmdata
      end,
      'ltj.supply_tounicode', 1)
 end
@@ -1158,7 +1158,7 @@ do
        new_ic_kern = function()
          local g = node_new(id_kern, 1)
          set_attr(g, attr_icflag, ITALIC)
-	 return g
+         return g
        end
    end
    -- EXT: italic correction
@@ -1166,24 +1166,24 @@ do
       local p = to_direct(tex.nest[tex.nest.ptr].tail)
       local TEMP = node_new(id_kern)
       if p and getid(p)==id_glyph then
-	 if is_ucs_in_japanese_char(p) then
-	    local j = font_metric_table[
-	       has_attr(p, (get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
-	       ]
-	    local g = new_ic_kern()
-	    setfield(g, 'kern', j.char_type[find_char_class(getchar(p), j)].italic)
-	    node_write(g); ensure_tex_attr(attr_icflag, 0)
-	 else
-	    local f = getfont(p)
-	    local h = font_getfont(f) or font.fonts[f]
-	    if h then
-	       local g = new_ic_kern()
-	       if h.characters[getchar(p)] and h.characters[getchar(p)].italic then
-		  setfield(g, 'kern', h.characters[getchar(p)].italic)
-		  node_write(g); ensure_tex_attr(attr_icflag, 0)
-	       end
-	    end
-	 end
+         if is_ucs_in_japanese_char(p) then
+            local j = font_metric_table[
+               has_attr(p, (get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
+               ]
+            local g = new_ic_kern()
+            setfield(g, 'kern', j.char_type[find_char_class(getchar(p), j)].italic)
+            node_write(g); ensure_tex_attr(attr_icflag, 0)
+         else
+            local f = getfont(p)
+            local h = font_getfont(f) or font.fonts[f]
+            if h then
+               local g = new_ic_kern()
+               if h.characters[getchar(p)] and h.characters[getchar(p)].italic then
+                  setfield(g, 'kern', h.characters[getchar(p)].italic)
+                  node_write(g); ensure_tex_attr(attr_icflag, 0)
+               end
+            end
+         end
       end
       node_free(TEMP)
    end

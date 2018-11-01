@@ -6119,12 +6119,24 @@ assignment, where \cs{DeclareRelationFont} does a global assignment.
   font family with respect to current Japanese font family,
   which was set by
   \cs{DeclareRelationFont} or \cs{SetRelationFont}.
+
+  The following is an example of \cs{SetRelationFont} and \cs{userelfont}:
 %</en>
 %<*ja>
 次回（のみ）の\cs{selectfont}の実行時に，現在の欧文フォントのエンコーディング／ファミリ／…… を，
 \cs{DeclareRelationFont} か \cs{SetRelationFont} で指定された
 現在の和文フォントに対応する「従属欧文」フォントに変更する．
+
+  以下に \cs{SetRelationFont} と \cs{userelfont} の例を
+紹介しておこう．\cs{userelfont} の使用によって，「abc」の部分のフォントが
+Latin Modern Sans Serif (TU/lmss/m/n) に変わっていることがわかる．
 %</ja>
+\begin{LTXexample}[width=0.3\textwidth]
+\makeatletter
+\SetRelationFont{JY3}{\k@family}{m}{n}{TU}{lmss}{m}{n}
+  % \k@family: current Japanese font family
+\userelfont\selectfont あいうabc
+\end{LTXexample}
 
 \item[\cs{adjustbaseline}]
 %<*en>
@@ -6230,21 +6242,35 @@ current Japanese font is changed, or only after \cs{selectfont} is executed.
 %</en>
 \end{cslist}
 
+
 %<*en>
-As closing this subsection, we shall introduce an example of
-\cs{SetRelationFont} and \cs{userelfont}:
+Furthermore, \LuaTeX-ja applies patches which enables NFSS2 commands,
+such~as \cs{DeclareSymbolFont}~and~\cs{SetSymbolFont}, to specify
+Japanee fonts as math fonts.
+
+Specifying \texttt{disablejfam} option in \cs{usepackage} prevents
+applying these patches.
+Hence one cannot write Japanese Characters in math mode directly
+if \texttt{disablejfam} option is specified.
+The code below does not work either:
+\begin{lstlisting}
+\DeclareSymbolFont{mincho}{JY3}{mc}{m}{n}
+\DeclareSymbolFontAlphabet{\mathmc}{mincho}
+\end{lstlisting}
 %</en>
 %<*ja>
-この節の終わりに，\cs{SetRelationFont} と \cs{userelfont} の例を
-紹介しておこう．\cs{userelfont} の使用によって，「abc」の部分のフォントが
-Latin Modern Sans Serif (TU/lmss/m/n) に変わっていることがわかる．
+この他にも，標準では
+\cs{DeclareSymbolFont}, \cs{SetSymbolFont} などの命令で
+（NFSS2の枠組みで）数式フォントとして日本語フォントを使えるようにするためのパッチを当てている．
+
+一方，\texttt{disablejfam}オプション指定時には，これらのパッチを当てないので
+\begin{lstlisting}
+\DeclareSymbolFont{mincho}{JY3}{mc}{m}{n}
+\DeclareSymbolFontAlphabet{\mathmc}{mincho}
+\end{lstlisting}
+のように設定しても，数式モード中に直に日本語を記述することはできない．
+\verb|$\mathmc{あ}$| のように \cs{mathmc} で囲んでもできない．
 %</ja>
-\begin{LTXexample}[width=0.3\textwidth]
-\makeatletter
-\SetRelationFont{JY3}{\k@family}{m}{n}{TU}{lmss}{m}{n}
-  % \k@family: current Japanese font family
-\userelfont\selectfont あいうabc
-\end{LTXexample}
 
 %<en>\subsection{Detail of \cs{fontfamily} command}
 %<ja>\subsection{\cs{fontfamily}コマンドの詳細}
