@@ -8,7 +8,7 @@
 ]{siunitx}
   %\usepackage{luatexja-fontspec}
 \makeatletter
-\typeout{\meaning\@begindocumenthook}
+%\typeout{\meaning\@begindocumenthook}
 \begin{document}
   \ifdefined\gtfamily\gtfamily\fi Ω
   {\ExplSyntaxOn\makeatletter
@@ -16,4 +16,27 @@
   
   \SI{-2.5e-10}{mol.L^{-1}}\SI{1}{\micro\metre\angstrom\arcminute\arcsecond\ohm}
   \vrule\SI{}{\ohm}\vrule
-  \end{document}
+
+ $\begin{array}{lSs}
+%   \typeout{\meaning\@preamble}
+   a&-.123 & J.mol^{-1} \\
+   a&1.23e-3 & Hartree \\
+  \end{array}$
+
+\begin{tabular}{lSs}
+%  \typeout{\meaning\@preamble}
+  a&-.123 & J.mol^{-1} \\
+  a&1.23e-3 & Hartree \\
+\end{tabular}
+
+\end{document}
+
+
+LTJ
+\d@llarbegin \__siunitx_table_collect_begin:Nn S{}\relax
+\pltx@next@inhibitglue \ltjfakeboxbdd \ignorespaces
+\@sharp \unskip \ltjfakeboxbdd \__siunitx_table_print:\relax \d@llarend
+
+non-LTJ
+\d@llarbegin \__siunitx_table_collect_begin:Nn S{}
+\ignorespaces \@sharp \unskip \__siunitx_table_print:\relax \d@llarend

@@ -1,10 +1,11 @@
 %
-% lltjp-siunitx.sty 2018-08-24
+% lltjp-siunitx.sty 2018-11-02
 %
 
 \NeedsTeXFormat{LaTeX2e}
 
 \RequirePackage{luatexja}
+\makeatletter
 \ExplSyntaxOn
 \cs_generate_variant:Nn \tl_if_in:NnT { coT }
 \cs_new:Nn \__ltj_siunix_patch_inner:n {
@@ -26,5 +27,48 @@
   \__ltj_siunix_patch_inner_math:n { arcsecond }
   \__ltj_siunix_patch_inner_math:n { ohm }
 }
+
+%%%% new table column: S and s
+\cs_set_protected:Npn \__siunitx_table_collect_not_braced:N #1
+  {
+    \token_if_eq_meaning:NNF #1 \relax {
+    \token_if_eq_meaning:NNF #1 \ltjfakeboxbdd {
+    \token_if_eq_meaning:NNF #1 \pltx@next@inhibitglue {
+    \token_if_eq_meaning:NNF #1 \tex_ignorespaces:D
+      {
+        \token_if_eq_meaning:NNF #1 \tex_unskip:D
+          { \__siunitx_table_collect_not_braced_aux_i:N #1 }
+      }
+	}}}
+    \__siunitx_table_collect_next:
+  }
+
+\AtBeginDocument
+  {
+    \@ifpackageloaded { mdwtab }
+      {
+        \cs_set_protected:Npn \__siunitx_table_collect_not_braced:N #1
+          {
+            \token_if_eq_meaning:NNF #1 \relax {
+            \token_if_eq_meaning:NNF #1 \ltjfakeboxbdd {
+            \token_if_eq_meaning:NNF #1 \pltx@next@inhibitglue {
+            \token_if_eq_meaning:NNF #1 \tex_ignorespaces:D
+              {
+                \token_if_eq_meaning:NNF #1 \tex_unskip:D
+                  {
+                    \token_if_eq_meaning:NNF #1 \tab@setcr
+                      {
+                        \token_if_eq_meaning:NNF #1 \@maybe@unskip
+                          { \__siunitx_table_collect_not_braced_aux_i:N #1 }
+                      }
+                  }
+              }
+            }}}
+            \__siunitx_table_collect_next:
+          }
+      }
+      { }
+  }
+
 \ExplSyntaxOff
 \endinput
