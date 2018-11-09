@@ -322,23 +322,25 @@
   \let\k@encoding\ct@encoding
   \xdef\font@name{\csname\curr@kfontshape/\f@size\endcsname}%
   \pickup@tfont
-  \ifnum\ltjgetparameter{direction}=3 \font@name\fi
-  \ltj@@does@alt@set{\curr@kfontshape}%
-    % alt fonts の定義
-    \directlua{luatexja.jfont.output_alt_font_cmd('t', '\luatexluaescapestring{\curr@kfontshape}')}%
-    % 定義した alt fonts のデータを \ltjdeclarealtfont に渡すのと同等の処理をする
-    \directlua{luatexja.jfont.pickup_alt_font_a('\f@size')}%
+  \ifnum\ltjgetparameter{direction}=3 \font@name
+    \ltj@@does@alt@set{\curr@kfontshape}{%
+      % alt fonts の定義
+      \directlua{luatexja.jfont.output_alt_font_cmd('t', '\luatexluaescapestring{\curr@kfontshape}')}%
+      % 定義した alt fonts のデータを \ltjdeclarealtfont に渡すのと同等の処理をする
+      \directlua{luatexja.jfont.pickup_alt_font_a('\f@size')}%
+    }%
   \fi}
 \def\ltj@selectfont@yoko{%
   \let\k@encoding\cy@encoding
   \xdef\font@name{\csname\curr@kfontshape/\f@size\endcsname}%
   \pickup@jfont
-  \unless\ifnum\ltjgetparameter{direction}=3 \font@name\fi
-  \ltj@@does@alt@set{\curr@kfontshape}%
-    % alt fonts の定義
-    \directlua{luatexja.jfont.output_alt_font_cmd('y', '\luatexluaescapestring{\curr@kfontshape}')}%
-    % 定義した alt fonts のデータを \ltjdeclarealtfont に渡すのと同等の処理をする
-    \directlua{luatexja.jfont.pickup_alt_font_a('\f@size')}%
+  \unless\ifnum\ltjgetparameter{direction}=3 \font@name
+	 \ltj@@does@alt@set{\curr@kfontshape}{%
+      % alt fonts の定義
+      \directlua{luatexja.jfont.output_alt_font_cmd('y', '\luatexluaescapestring{\curr@kfontshape}')}%
+      % 定義した alt fonts のデータを \ltjdeclarealtfont に渡すのと同等の処理をする
+      \directlua{luatexja.jfont.pickup_alt_font_a('\f@size')}%
+    }%
   \fi}
 \def\ltj@selectfont@patch{%
   \directlua{luatexja.base.start_time_measure('selectfont')}%
@@ -638,21 +640,21 @@
   #1\directlua{luatexja.jfont.print_aftl_address()}\space at%
 }
 \def\extract@jfont{%
-   \get@external@font
-    \ltj@@does@alt@set{\f@encoding/\f@family/\f@series/\f@shape}%
-      \edef\external@font{\expandafter\ltj@@patch@external@font\external@font}%
-    \fi
+    \get@external@font
 	\unless\ifnum\ltjgetparameter{direction}=3\relax
+      \ltj@@does@alt@set{\f@encoding/\f@family/\f@series/\f@shape}{%
+        \edef\external@font{\expandafter\ltj@@patch@external@font\external@font}%
+      }%
       \expandafter\globaljfont\font@name\external@font\relax\font@name% ここで時間がかかる
 	\fi
     \csname \f@encoding+\f@family\endcsname
     \csname\curr@fontshape\endcsname}
 \def\extract@tfont{%
    \get@external@font
-    \ltj@@does@alt@set{\f@encoding/\f@family/\f@series/\f@shape}%
-      \edef\external@font{\expandafter\ltj@@patch@external@font\external@font}%
-    \fi
 	\ifnum\ltjgetparameter{direction}=3\relax
+      \ltj@@does@alt@set{\f@encoding/\f@family/\f@series/\f@shape}{%
+        \edef\external@font{\expandafter\ltj@@patch@external@font\external@font}%
+      }%
       \expandafter\globaltfont\font@name\external@font\relax\font@name
 	\else
 	  \directlua{%
@@ -760,8 +762,8 @@
   \directlua{luatexja.jfont.pickup_alt_font_b(\the\ltj@tempcntc,'\luatexluaescapestring{#2}')}%
 }
 
-\def\ltj@@does@alt@set#1{%
-  \directlua{luatexja.jfont.does_alt_set'\luatexluaescapestring{#1}'}}
+\def\ltj@@does@alt@set#1#2{%
+  \directlua{luatexja.jfont.does_alt_set'\luatexluaescapestring{#1}'}{#2}}
 
 %%%% patch \@text@composite because of {y,t}albaselineshift
 

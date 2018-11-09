@@ -651,7 +651,7 @@ do
    -- EXT
    function luatexja.jfont.does_alt_set(bbase)
       aftl_base = alt_font_table_latex[bbase]
-      tex.sprint(cat_lp, '\\if' .. (aftl_base and 'true' or 'false'))
+      tex.sprint(cat_lp, aftl_base and '\\@firstofone' or '\\@gobble')
    end
    -- EXT
    function luatexja.jfont.print_aftl_address()
