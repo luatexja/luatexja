@@ -267,10 +267,11 @@ end
 -- LOADING JAPANESE FONTS
 ------------------------------------------------------------------------
 
+local load_jfont_metric
 do
    local cstemp
    local global_flag -- true if \globaljfont, false if \jfont
-   local function load_jfont_metric()
+   load_jfont_metric = function()
       if jfm_file_name=='' then
          ltjb.package_error('luatexja',
                             'no JFM specified',
@@ -452,6 +453,16 @@ do
    luatexbase.create_callback('luatexja.define_font', 'simple', function (n) return n end)
    otfl_fdr= luatexbase.remove_from_callback('define_font', 'luaotfload.define_font')
    luatexbase.add_to_callback('define_font',luatexja.font_callback,"luatexja.font_callback", 1)
+
+   local match, sp = string.match, tex.sp
+   local function load_tfont_jfmonly(spec)
+      local spec, size = match(spec,'(.+)%s+at%s*([%.%w]*)')
+      size = sp(size); extract_metric(spec)
+      jfm_dir = 'tate'
+      local i = load_jfont_metric(); update_jfm_cache(i, size)
+      luatexja.jfont.tfont_jfmonly_result = metrics[i].size_cache[size]
+   end
+   luatexja.jfont.load_tfont_jfmonly = load_tfont_jfmonly
 end
 
 ------------------------------------------------------------------------

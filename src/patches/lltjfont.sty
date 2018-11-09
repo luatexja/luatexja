@@ -75,13 +75,13 @@
   \fi\fi
 }
 
-\def\ystrut{\relax\hbox{\yoko
+\def\ystrut{\relax\hbox{\ltj@@orig@yoko
    \ifmmode\copy\ystrutbox\else\unhcopy\ystrutbox\fi}}
-\def\tstrut{\relax\hbox{\tate
+\def\tstrut{\relax\hbox{\ltj@@orig@tate
    \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi}}
-\def\dstrut{\relax\hbox{\dtou
+\def\dstrut{\relax\hbox{\ltj@@orig@dtou
    \ifmmode\copy\dstrutbox\else\unhcopy\dstrutbox\fi}}
-\def\zstrut{\relax\hbox{\utod
+\def\zstrut{\relax\hbox{\ltj@@orig@utod
    \ifmmode\copy\zstrutbox\else\unhcopy\zstrutbox\fi}}
 
 {%
@@ -321,7 +321,8 @@
 \def\ltj@selectfont@tate{%
   \let\k@encoding\ct@encoding
   \xdef\font@name{\csname\curr@kfontshape/\f@size\endcsname}%
-  \pickup@tfont\font@name
+  \pickup@tfont
+  \ifnum\ltjgetparameter{direction}=3 \font@name\fi
   \ltj@@does@alt@set{\curr@kfontshape}%
     % alt fonts の定義
     \directlua{luatexja.jfont.output_alt_font_cmd('t', '\luatexluaescapestring{\curr@kfontshape}')}%
@@ -331,7 +332,8 @@
 \def\ltj@selectfont@yoko{%
   \let\k@encoding\cy@encoding
   \xdef\font@name{\csname\curr@kfontshape/\f@size\endcsname}%
-  \pickup@jfont\font@name
+  \pickup@jfont
+  \unless\ifnum\ltjgetparameter{direction}=3 \font@name\fi
   \ltj@@does@alt@set{\curr@kfontshape}%
     % alt fonts の定義
     \directlua{luatexja.jfont.output_alt_font_cmd('y', '\luatexluaescapestring{\curr@kfontshape}')}%
@@ -354,8 +356,6 @@
     \fi
   \fi
   \global\let\ltj@afont@name=\font@name
-  %\ifnum3=\ltjgetparameter{direction}\relax \ltj@selectfont@tate
-  %\else \ltj@selectfont@yoko\fi
   \ltj@selectfont@tate\ltj@selectfont@yoko
 %
   \edef\tmp@item{{\k@encoding}}\expandafter\def\expandafter\k@encoding\tmp@item
@@ -381,6 +381,20 @@
 }
 \EverySelectfont{\ltj@selectfont@patch}
 
+\bgroup
+  \def\ltj@@dir@patch#1#2{%
+    \global\csletcs{ltj@@orig@#1}{#1}%
+	\protected\expandafter\xdef\csname #1\endcsname{%
+	  \csname ltj@@orig@#1\endcsname
+      \unexpanded{\global\let\ltj@afont@name=\font@name}%
+	  \expandonce{\csname ltj@selectfont@#2\endcsname}%
+      \unexpanded{\global\let\font@name=\ltj@afont@name}%
+	}%
+  }
+  \ltj@@dir@patch{yoko}{yoko}\ltj@@dir@patch{tate}{tate}
+  \ltj@@dir@patch{utod}{yoko}\ltj@@dir@patch{dtou}{yoko}
+\egroup
+
 \def\KanjiEncodingPair#1#2{\@namedef{t@enc@#1}{#2}\@namedef{y@enc@#2}{#1}}
 \def\set@fontsize#1#2#3{%
     \@defaultunits\@tempdimb#2pt\relax\@nnil
@@ -394,16 +408,16 @@
       \baselineskip\f@linespread\baselineskip
       \normalbaselineskip\baselineskip
       \adjustbaseline
-      \setbox\ystrutbox\hbox{\yoko
+      \setbox\ystrutbox\hbox{\ltj@@orig@yoko
           \vrule\@width\z@
                 \@height.7\baselineskip \@depth.3\baselineskip}%
-      \setbox\dstrutbox\hbox{\dtou
+      \setbox\dstrutbox\hbox{\ltj@@orig@dtou
           \vrule\@width\z@
                 \@height.7\baselineskip \@depth.3\baselineskip}%
-      \setbox\tstrutbox\hbox{\tate
+      \setbox\tstrutbox\hbox{\ltj@@orig@tate
           \vrule\@width\z@
                 \@height.5\baselineskip \@depth.5\baselineskip}%
-      \setbox\zstrutbox\hbox{\utod
+      \setbox\zstrutbox\hbox{\ltj@@orig@utod
           \vrule\@width\z@
                 \@height.7\baselineskip \@depth.3\baselineskip}%
      \let\size@update\relax}}
@@ -418,7 +432,10 @@
   local setdimen, set_attr = tex.setdimen, tex.setattribute
   local dir = luatexja.unary_pars.direction
   t[\the\ltj@@adjust@baseline@inner] = function()
-    local ft = fmt[get_attr('ltj@curtfnt')] or nulltable
+    local dir = dir()
+    local ft = (dir==dir_tate
+      and fmt[get_attr('ltj@curtfnt')] or luatexja.jfont.tfont_jfmonly_result)
+      or nulltable
     ft = ft and ft.char_type or nulltable
     local fk = ft and ft[0] or nulltable
     local ht, dp, wd = fk.height or 0, fk.depth or 0,
@@ -428,7 +445,7 @@
         .characters or nulltable)[77] or nulltable %% 'M'
     set_attr('ltj@tablshift',
       tex.round(0.5*((fm.height or 0)- (fm.depth or 0) - ht+ dp)))
-    if dir() ~= dir_tate then
+    if dir ~= dir_tate then
       ft = fmt[get_attr('ltj@curjfnt')] or nulltable
       ft = ft and ft.char_type or nulltable
       fk = ft and ft[0] or nulltable
@@ -625,8 +642,9 @@
     \ltj@@does@alt@set{\f@encoding/\f@family/\f@series/\f@shape}%
       \edef\external@font{\expandafter\ltj@@patch@external@font\external@font}%
     \fi
-    \expandafter\globaljfont\font@name\external@font\relax% ここで時間がかかる
-    \font@name%\global\zw=\zw\global\zh=\zh
+	\unless\ifnum\ltjgetparameter{direction}=3\relax
+      \expandafter\globaljfont\font@name\external@font\relax\font@name% ここで時間がかかる
+	\fi
     \csname \f@encoding+\f@family\endcsname
     \csname\curr@fontshape\endcsname}
 \def\extract@tfont{%
@@ -634,8 +652,13 @@
     \ltj@@does@alt@set{\f@encoding/\f@family/\f@series/\f@shape}%
       \edef\external@font{\expandafter\ltj@@patch@external@font\external@font}%
     \fi
-    \expandafter\globaltfont\font@name\external@font\relax
-    \font@name%\global\zw=\zw\global\zh=\zh
+	\ifnum\ltjgetparameter{direction}=3\relax
+      \expandafter\globaltfont\font@name\external@font\relax\font@name
+	\else
+	  \directlua{%
+		luatexja.jfont.load_tfont_jfmonly('\luatexluaescapestring{\external@font}')
+	  }%
+	\fi
     \csname \f@encoding+\f@family\endcsname
     \csname\curr@fontshape\endcsname}
 
