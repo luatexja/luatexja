@@ -388,9 +388,11 @@
     \global\csletcs{ltj@@orig@#1}{#1}%
 	\protected\expandafter\xdef\csname #1\endcsname{%
 	  \csname ltj@@orig@#1\endcsname
+      \unexpanded{\let\ltj@@protect\protect\set@typeset@protect}%
       \unexpanded{\global\let\ltj@afont@name=\font@name}%
 	  \expandonce{\csname ltj@selectfont@#2\endcsname}%
       \unexpanded{\global\let\font@name=\ltj@afont@name}%
+      \unexpanded{\let\protect\ltj@@protect}%
 	}%
   }
   \ltj@@dir@patch{yoko}{yoko}\ltj@@dir@patch{tate}{tate}
@@ -438,6 +440,7 @@
     local ft = (dir==dir_tate
       and fmt[get_attr('ltj@curtfnt')] or luatexja.jfont.tfont_jfmonly_result)
       or nulltable
+    %local ft = fmt[get_attr('ltj@curtfnt')] or nulltable
     ft = ft and ft.char_type or nulltable
     local fk = ft and ft[0] or nulltable
     local ht, dp, wd = fk.height or 0, fk.depth or 0,
