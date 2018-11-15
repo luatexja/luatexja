@@ -445,56 +445,75 @@ luatexja.unary_pars.adjust = function(t)
    return is_reg and 1 or 0
 end
 
+-- ----------------------------------
+do
+  local max, ins, sort = math.max, table.insert, table.sort
+  local function insert(package, ind, d, b, e)
+    local bound = package[2]
+    bound[b], bound[e]=true, true
+    ins(package[1], {b,e,[ind]=d})
+  end
+  local function flatten(package)
+    local bd={} for i,_ in pairs(package[2]) do ins(bd,{i}) end
+    sort(bd, function (a,b) return a[1]<b[1] end)
+    local bdc=#bd; local t = package[1]
+    sort(t, function (a,b) return a[1]<b[1] end)
+    local bdi =1
+    for i=1,#t do
+      while bd[bdi][1]<t[i][1] do bdi=bdi+1 end
+      local j = bdi
+      while j<bdc and bd[j+1][1]<=t[i][2] do
+        for k,w in pairs(t[i]) do
+          if k>=3 then
+            bd[j][k]=bd[j][k] and max(bd[j][k],w) or w
+          end
+        end
+        j=j+1
+      end
+    end
+    package[2]=nil; package[1]=nil; package.flatten, package.insert=nil, nil
+    bd[#bd]=nil
+    return bd
+  end
+  function init_range()
+    return {{},{}, insert=insert, flatten=flatten}
+  end
+end
+
 -- -----------------------------------
 luatexja.adjust.step_factor = 0.5
 do
   local insert = table.insert
   local rangedimensions, max = node.direct.rangedimensions, math.max
+  local function profile_inner(box, range, ind, vmirrored, adj)
+    local w_acc, d_before = getfield(box,'shift'), 0
+    local x = getlist(box); local xn = node_next(x)
+    while x do
+      local w, h, d
+      if xn then w, h, d= rangedimensions(box,x,xn)
+      else w, h, d= rangedimensions(box,x) end
+      if vmirrored then h=d end
+      local w_new = w_acc + w
+      if w>=0 then
+        range:insert(ind, h, w_acc-adj, w_new)
+      else
+        range:insert(ind, h, w_new-adj, w_acc)
+      end
+      w_acc = w_new; x = xn; if x then xn = node_next(x) end
+    end
+  end  
   function ltjl.p_profile(before, after, mirrored, bw)
-    local t = {}
-    do
-      local w_acc, d_before = getfield(before,'shift'), 0
-      local x = getlist(before); local xn = node_next(x)
-      while x do
-        local w, d
-        if xn then w, _, d= rangedimensions(before,x,xn)
-        else w, _, d= rangedimensions(before,x) end
-        if d~=d_before then
-          d_before = d; t[w_acc] = t[w_acc] or {}
-          if t[w_acc][1] then t[w_acc][1]=max(t[w_acc][1],d)
-          else t[w_acc][1]=d end
-        end
-        w_acc = w_acc + w
-        x = xn; if x then xn = node_next(x) end
-      end
-    end
-    do
-      local w_acc, h_before = getfield(after,'shift'), 0
-      local x = getlist(after); local xn = node_next(x)
-      while x do
-        local w, h, d
-        if xn then w, h, d = rangedimensions(after,x,xn)
-	else w, h,d = rangedimensions(after,x) end
-	if mirrored then h=d end
-        if h~=h_before then
-          h_before = h; t[w_acc] = t[w_acc] or {}
-          if t[w_acc][2] then t[w_acc][2]=max(t[w_acc][2],h)
-          else t[w_acc][2]=h end
-        end
-        w_acc = w_acc + w
-        x = xn; if x then xn = node_next(x) end
-      end
-    end
-    local t2 = {}
-    for i,v in pairs(t) do insert(t2, { i, v[1], v[2] } ) end
-    table.sort(t2, function(a,b) return a[1]<b[1] end)
+    local range, tls = init_range(), tex.lineskip.width
+    profile_inner(before, range, 3, true,     tls)
+    profile_inner(after,  range, 4, mirrored, tls)
+    range = range:flatten()
     do
       local dmax, d, hmax, h, lmin = 0, 0, 0, 0, 1/0
-      for i,v in ipairs(t2) do
-        d, h = (v[2] or d), (v[3] or h)
+      for i,v in ipairs(range) do
+        d, h = (v[3] or 0), (v[4] or 0)
         if d>dmax then dmax=d end
         if h>hmax then hmax=h end
-        if (bw-h-d)<lmin then lmin=bw-h-d end
+        if bw-h-d<lmin then lmin=bw-h-d end
       end
       if lmin==1/0 then lmin = bw end
       return lmin, 
@@ -513,7 +532,7 @@ do
       return ltjl.l_dummy(dist, g, adj, normal, bw, loc)
     end
     if dist < tex.lineskiplimit then
-	local f = max(1, bw*ltja.step_factor)
+    local f = max(1, bw*ltja.step_factor)
        copy_glue(g, tex.baselineskip, 1, normal - f * floor((dist-tex.lineskip.width)/f))
     else
        copy_glue(g, tex.baselineskip, 2, normal)
