@@ -314,6 +314,8 @@
 \expandafter\expandafter\expandafter\let
 \expandafter\expandafter\csname ltj@@orig@selectfont\endcsname\csname selectfont\space\endcsname
 \@EverySelectfont@Init
+\let\ltj@@font@info\@font@info
+\let\ltj@@font@warning\@font@warning
 \def\@EverySelectfont@Init{%
   \expandafter\let\csname selectfont\space \endcsname \ltj@@orig@selectfont
   \ltj@@EverySelectfont@Init
@@ -321,6 +323,9 @@
 \def\ltj@selectfont@tate{%
   \let\k@encoding\ct@encoding
   \xdef\font@name{\csname\curr@kfontshape/\f@size\endcsname}%
+  \unless\ifnum\ltjgetparameter{direction}=3\relax
+	\let\@font@info\@gobble\let\@font@warning\@gobble
+  \fi
   \pickup@tfont
   \ifnum\ltjgetparameter{direction}=3 \font@name
     \ltj@@does@alt@set{\curr@kfontshape}{%
@@ -329,10 +334,15 @@
       % 定義した alt fonts のデータを \ltjdeclarealtfont に渡すのと同等の処理をする
       \directlua{luatexja.jfont.pickup_alt_font_a('\f@size')}%
     }%
+  \else
+	\let\@font@info\ltj@@font@info\let\@font@warning\ltj@@font@warning
   \fi}
 \def\ltj@selectfont@yoko{%
   \let\k@encoding\cy@encoding
   \xdef\font@name{\csname\curr@kfontshape/\f@size\endcsname}%
+  \ifnum\ltjgetparameter{direction}=3\relax
+	\let\@font@info\@gobble\let\@font@warning\@gobble
+  \fi
   \pickup@jfont
   \unless\ifnum\ltjgetparameter{direction}=3 \font@name
 	 \ltj@@does@alt@set{\curr@kfontshape}{%
@@ -341,6 +351,8 @@
       % 定義した alt fonts のデータを \ltjdeclarealtfont に渡すのと同等の処理をする
       \directlua{luatexja.jfont.pickup_alt_font_a('\f@size')}%
     }%
+  \else
+	\let\@font@info\ltj@@font@info\let\@font@warning\ltj@@font@warning
   \fi}
 \def\ltj@selectfont@patch{%
   \directlua{luatexja.base.start_time_measure('selectfont')}%
