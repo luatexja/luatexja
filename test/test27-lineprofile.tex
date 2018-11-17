@@ -72,4 +72,23 @@
 \R{false}{true}%
 \R{true}{true}%
 
+\ltjdisableadjust
+\ltjenableadjust[profile]
+
+\def\R#1{%
+  \fbox{\parbox[t]{130pt}{\lineskip1pt\textbf{#1pt (\texttt{lineskip}: \the\lineskip)}\\%
+    \noindent\vrule height 5pt depth 50pt width 45pt\kern30pt%
+    \vrule height 5pt depth 50pt width 30pt\\
+    \textcolor{red}{\kern\dimexpr45pt+#1pt\vrule height 50pt depth 5pt width20pt}%
+    \textcolor{blue}{\kern-40pt\vrule height 5pt depth 5pt width 60pt}%
+  }}\hskip0pt\ignorespaces
+}
+
+\noindent
+\R{0}
+\R{0.5}
+\R{1}
+\R{9}
+\R{10}
+
 \end{document}
