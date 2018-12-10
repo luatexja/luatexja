@@ -314,8 +314,8 @@
 \expandafter\expandafter\expandafter\let
 \expandafter\expandafter\csname ltj@@orig@selectfont\endcsname\csname selectfont\space\endcsname
 \@EverySelectfont@Init
-\let\ltj@@font@info\@font@info
-\let\ltj@@font@warning\@font@warning
+%\let\ltj@@font@info\@font@info
+%\let\ltj@@font@warning\@font@warning
 \def\@EverySelectfont@Init{%
   \expandafter\let\csname selectfont\space \endcsname \ltj@@orig@selectfont
   \ltj@@EverySelectfont@Init
@@ -323,9 +323,6 @@
 \def\ltj@selectfont@tate{%
   \let\k@encoding\ct@encoding
   \xdef\font@name{\csname\curr@kfontshape/\f@size\endcsname}%
-  \unless\ifnum\ltjgetparameter{direction}=3\relax
-	\let\@font@info\@gobble\let\@font@warning\@gobble
-  \fi
   \pickup@tfont
   \ifnum\ltjgetparameter{direction}=3 \font@name
     \ltj@@does@alt@set{\curr@kfontshape}{%
@@ -334,15 +331,10 @@
       % 定義した alt fonts のデータを \ltjdeclarealtfont に渡すのと同等の処理をする
       \directlua{luatexja.jfont.pickup_alt_font_a('\f@size')}%
     }%
-  \else
-	\let\@font@info\ltj@@font@info\let\@font@warning\ltj@@font@warning
   \fi}
 \def\ltj@selectfont@yoko{%
   \let\k@encoding\cy@encoding
   \xdef\font@name{\csname\curr@kfontshape/\f@size\endcsname}%
-  \ifnum\ltjgetparameter{direction}=3\relax
-	\let\@font@info\@gobble\let\@font@warning\@gobble
-  \fi
   \pickup@jfont
   \unless\ifnum\ltjgetparameter{direction}=3 \font@name
 	 \ltj@@does@alt@set{\curr@kfontshape}{%
@@ -351,8 +343,6 @@
       % 定義した alt fonts のデータを \ltjdeclarealtfont に渡すのと同等の処理をする
       \directlua{luatexja.jfont.pickup_alt_font_a('\f@size')}%
     }%
-  \else
-	\let\@font@info\ltj@@font@info\let\@font@warning\ltj@@font@warning
   \fi}
 \def\ltj@selectfont@patch{%
   \directlua{luatexja.base.start_time_measure('selectfont')}%
@@ -445,6 +435,7 @@
   local t = lua.get_functions_table()
   local getfont, dir_tate = font.getfont, luatexja.dir_table.dir_tate
   local fmt, get_attr = luatexja.jfont.font_metric_table, tex.getattribute
+  local getcount=tex.getcount
   local setdimen, set_attr = tex.setdimen, tex.setattribute
   local dir = luatexja.unary_pars.direction
   t[\the\ltj@@adjust@baseline@inner] = function()
@@ -635,19 +626,31 @@
 
 \let\extract@afont\extract@font
 \def\pickup@jfont{%
-    \expandafter \ifx \font@name \relax
+  \unless\ifnum\ltjgetparameter{direction}=3\relax
+     \expandafter \ifx \font@name \relax
        \let\extract@font\extract@jfont
        \define@newfont
        \let\extract@font\extract@afont
-    \fi
-    \let\getjfont\font@name}
+     \fi
+  \fi
+  \let\getjfont\font@name}
 \def\pickup@tfont{%
+  \ifnum\ltjgetparameter{direction}=3\relax
     \expandafter \ifx \font@name \relax
        \let\extract@font\extract@tfont
        \define@newfont
        \let\extract@font\extract@afont
     \fi
-    \let\gettfont\font@name}
+  \else
+	\begingroup\escapechar\m@ne
+	\ifcsname ltj@@tfontjfm/\expandafter\string\font@name\endcsname\else
+       \let\extract@font\extract@tfont@onlyjfm
+       \define@newfont
+       \let\extract@font\extract@afont
+	\fi\endgroup
+	\csname ltj@@tfontjfm/\string\font@name\endcsname
+  \fi
+  \let\gettfont\font@name}
 
 % 異なる和文 enc/fam/ser/shape からは異なるフォント番号が振られるように
 % わざと「ゴミをつける」
@@ -655,29 +658,29 @@
   #1\directlua{luatexja.jfont.print_aftl_address()}\space at%
 }
 \def\extract@jfont{%
-    \get@external@font
-	\unless\ifnum\ltjgetparameter{direction}=3\relax
-      \ltj@@does@alt@set{\f@encoding/\f@family/\f@series/\f@shape}{%
-        \edef\external@font{\expandafter\ltj@@patch@external@font\external@font}%
-      }%
-      \expandafter\globaljfont\font@name\external@font\relax\font@name% ここで時間がかかる
-	\fi
+	\get@external@font
+    \ltj@@does@alt@set{\f@encoding/\f@family/\f@series/\f@shape}{%
+      \edef\external@font{\expandafter\ltj@@patch@external@font\external@font}%
+    }%
+    \expandafter\globaljfont\font@name\external@font\relax\font@name% ここで時間がかかる
     \csname \f@encoding+\f@family\endcsname
     \csname\curr@fontshape\endcsname}
 \def\extract@tfont{%
-   \get@external@font
-	\ifnum\ltjgetparameter{direction}=3\relax
-      \ltj@@does@alt@set{\f@encoding/\f@family/\f@series/\f@shape}{%
-        \edef\external@font{\expandafter\ltj@@patch@external@font\external@font}%
-      }%
-      \expandafter\globaltfont\font@name\external@font\relax\font@name
-	\else
+	\get@external@font
+    \ltj@@does@alt@set{\f@encoding/\f@family/\f@series/\f@shape}{%
+      \edef\external@font{\expandafter\ltj@@patch@external@font\external@font}%
+    }%
+    \expandafter\globaltfont\font@name\external@font\relax\font@name
+    \csname \f@encoding+\f@family\endcsname
+    \csname\curr@fontshape\endcsname}
+\def\extract@tfont@onlyjfm{%
+	\get@external@font
+	\csxdef{ltj@@tfontjfm/\expandafter\string\font@name}{%
 	  \directlua{%
 		luatexja.jfont.load_tfont_jfmonly('\luatexluaescapestring{\external@font}')
 	  }%
-	\fi
-    \csname \f@encoding+\f@family\endcsname
-    \csname\curr@fontshape\endcsname}
+	}%
+}
 
 \let\ltj@@al@do@subst@correction=\do@subst@correction
 \def\ltj@@ja@do@subst@correction{%

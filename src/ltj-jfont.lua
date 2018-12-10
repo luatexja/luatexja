@@ -460,7 +460,12 @@ do
       size = sp(size); extract_metric(spec)
       jfm_dir = 'tate'
       local i = load_jfont_metric(); update_jfm_cache(i, size)
-      luatexja.jfont.tfont_jfmonly_result = metrics[i].size_cache[size]
+      tex.sprint(cat_lp, 
+        '\\noexpand\\directlua{luatexja.jfont.set_tfont_jfmonly_result('
+         .. tostring(i) .. ',' .. tostring(size) .. ')}')
+   end
+   function luatexja.jfont.set_tfont_jfmonly_result(i,s)
+      luatexja.jfont.tfont_jfmonly_result=metrics[i].size_cache[s]
    end
    luatexja.jfont.load_tfont_jfmonly = load_tfont_jfmonly
 end
