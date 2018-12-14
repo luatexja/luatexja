@@ -440,10 +440,10 @@
   local dir = luatexja.unary_pars.direction
   t[\the\ltj@@adjust@baseline@inner] = function()
     local dir = dir()
-    local ft = (dir==dir_tate
-      and fmt[get_attr('ltj@curtfnt')] or luatexja.jfont.tfont_jfmonly_result)
-      or nulltable
-    %local ft = fmt[get_attr('ltj@curtfnt')] or nulltable
+    %local ft = (dir==dir_tate
+    %  and fmt[get_attr('ltj@curtfnt')] or luatexja.jfont.tfont_jfmonly_result)
+    %  or nulltable
+    local ft = fmt[get_attr('ltj@curtfnt')] or nulltable
     ft = ft and ft.char_type or nulltable
     local fk = ft and ft[0] or nulltable
     local ht, dp, wd = fk.height or 0, fk.depth or 0,

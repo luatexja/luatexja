@@ -198,8 +198,9 @@ do
          return new
       else return nil end
    end
+   local size_cache_num = 1
    update_jfm_cache = function (j,sz)
-      if metrics[j].size_cache[sz] then return end
+      if metrics[j].size_cache[sz] then return metrics[j].size_cache[sz].index end
       local t = {}
       metrics[j].size_cache[sz] = t
       t.chars = metrics[j].chars
@@ -233,6 +234,9 @@ do
       t.zw = round(metrics[j].zw*sz)
       t.zh = round(metrics[j].zh*sz)
       t.size = sz
+      size_cache_num = size_cache_num + 1
+      t.index = size_cache_num
+      return size_cache_num
    end
 end
 
@@ -459,13 +463,11 @@ do
       local spec, size = match(spec,'(.+)%s+at%s*([%.%w]*)')
       size = sp(size); extract_metric(spec)
       jfm_dir = 'tate'
-      local i = load_jfont_metric(); update_jfm_cache(i, size)
+      local i = load_jfont_metric()
+      local j = -update_jfm_cache(i, size)
+      font_metric_table[j]=metrics[i].size_cache[s]      
       tex.sprint(cat_lp, 
-        '\\noexpand\\directlua{luatexja.jfont.set_tfont_jfmonly_result('
-         .. tostring(i) .. ',' .. tostring(size) .. ')}')
-   end
-   function luatexja.jfont.set_tfont_jfmonly_result(i,s)
-      luatexja.jfont.tfont_jfmonly_result=metrics[i].size_cache[s]
+        '\\noexpand\\ltj@curtfnt' .. tostring(-j) .. '\\relax')
    end
    luatexja.jfont.load_tfont_jfmonly = load_tfont_jfmonly
 end
