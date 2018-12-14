@@ -651,12 +651,18 @@
     \let\gettfont\font@name
   \else
 	\begingroup\escapechar\m@ne
+	\typeout{"ltj@@tfontjfm/\expandafter\string\font@name"
+	  \ifcsname ltj@@tfontjfm/\expandafter\string\font@name\endcsname
+	  \expandafter\meaning\csname ltj@@tfontjfm/\expandafter\string\font@name\endcsname
+	  \else F\fi}%
 	\ifcsname ltj@@tfontjfm/\expandafter\string\font@name\endcsname\else
        \let\extract@font\extract@tfont@onlyjfm
        \define@newfont
        \let\extract@font\extract@afont
-	\fi\endgroup
-	\csname ltj@@tfontjfm/\string\font@name\endcsname
+	\fi
+	\endgroup
+	\typeout{"ltj@@tfontjfm/\expandafter\expandafter\expandafter\@gobble\expandafter\string\font@name"}%
+	\csname ltj@@tfontjfm/\expandafter\expandafter\expandafter\@gobble\expandafter\string\font@name\endcsname
   \fi
 }
 
@@ -683,6 +689,7 @@
     \csname\curr@fontshape\endcsname}
 \def\extract@tfont@onlyjfm{%
 	\get@external@font
+	\typeout{ltj@@tfontjfm/\expandafter\string\font@name}%
 	\csxdef{ltj@@tfontjfm/\expandafter\string\font@name}{%
 	  \directlua{%
 		luatexja.jfont.load_tfont_jfmonly('\luatexluaescapestring{\external@font}')

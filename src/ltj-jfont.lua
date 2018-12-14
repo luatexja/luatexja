@@ -467,7 +467,7 @@ do
       local j = -update_jfm_cache(i, size)
       font_metric_table[j]=metrics[i].size_cache[s]      
       tex.sprint(cat_lp, 
-        '\\noexpand\\ltj@curtfnt' .. tostring(-j) .. '\\relax')
+        '\\ltj@curtfnt' .. tostring(j) .. '\\relax')
    end
    luatexja.jfont.load_tfont_jfmonly = load_tfont_jfmonly
 end

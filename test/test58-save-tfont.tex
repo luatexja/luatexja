@@ -1,0 +1,21 @@
+\documentclass{ltjarticle}
+
+\makeatletter
+\DeclareFixedFont\HOGE{JT3}{gt}{m}{n}{14}
+\DeclareFixedFont\PIYO{JY3}{gt}{m}{n}{20}
+
+\makeatletter
+\begin{document}
+\leavevmode
+\def\T{[\the\ltj@curjfnt,\the\ltj@curtfnt]}
+あいう\T えお\PIYO あい\T う\scriptsize あ\T\ltjsetparameter{talbaselineshift=-10pt}
+\HOGE あいう\T\normalsize あ\T
+\hbox{\tate あい\T うえおa12\HOGE あいう\T えおa12}
+\typeout{\expandafter\meaning\csname JT3/gt/m/n/10\endcsname}
+\typeout{\expandafter\meaning\csname ltj@@tfontjfm/\string\JT3/gt/m/n/10\endcsname}
+
+あい\T う\tiny あい\T う
+\hbox{\tate あいうえ\T お12\Large あ\T12}
+
+
+\end{document}
