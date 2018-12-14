@@ -392,19 +392,21 @@
 \EverySelectfont{\ltj@selectfont@patch}
 
 \bgroup
-  \def\ltj@@dir@patch#1#2{%
+  \def\ltj@@dir@patch#1#2#3{%
     \global\csletcs{ltj@@orig@#1}{#1}%
 	\protected\expandafter\xdef\csname #1\endcsname{%
 	  \csname ltj@@orig@#1\endcsname
-      \unexpanded{\let\ltj@@protect\protect\set@typeset@protect}%
+      \unexpanded{\ifnum#3<\z@\let\ltj@@protect\protect\set@typeset@protect}%
       \unexpanded{\global\let\ltj@afont@name=\font@name}%
 	  \expandonce{\csname ltj@selectfont@#2\endcsname}%
       \unexpanded{\global\let\font@name=\ltj@afont@name}%
-      \unexpanded{\let\protect\ltj@@protect}%
+      \unexpanded{\let\protect\ltj@@protect\fi}%
 	}%
   }
-  \ltj@@dir@patch{yoko}{yoko}\ltj@@dir@patch{tate}{tate}
-  \ltj@@dir@patch{utod}{yoko}\ltj@@dir@patch{dtou}{yoko}
+  \ltj@@dir@patch{yoko}{yoko}{\ltj@curjfnt}
+  \ltj@@dir@patch{tate}{tate}{\ltj@curtfnt}
+  \ltj@@dir@patch{utod}{yoko}{\ltj@curjfnt}
+  \ltj@@dir@patch{dtou}{yoko}{\ltj@curjfnt}
 \egroup
 
 \def\KanjiEncodingPair#1#2{\@namedef{t@enc@#1}{#2}\@namedef{y@enc@#2}{#1}}
