@@ -243,18 +243,24 @@
    \gdef\f@baselineskip{#5pt}}
 \@onlypreamble\DeclareKanjiSubstitution
 \@onlypreamble\DeclareErrorKanjiFont
+
+\newif\ifltjselectfont@force@define
 \def\DeclareFixedFont#1#2#3#4#5#6{%
    \begingroup
       \math@fontsfalse
       \every@math@size{}%
       \fontsize{#6}\z@
       \directlua{luatexja.jfont.is_kyenc('\luatexluaescapestring{#2}')}\ifin@%
+	    \ltjselectfont@force@definetrue
         \usekanji{#2}{#3}{#4}{#5}%
         \global\let#1\getjfont
+	    \ltjselectfont@force@definefalse
       \else
         \directlua{luatexja.jfont.is_ktenc('\luatexluaescapestring{#2}')}\ifin@%
+  	      \ltjselectfont@force@definetrue
           \usekanji{#2}{#3}{#4}{#5}%
           \global\let#1\gettfont
+	      \ltjselectfont@force@definefalse
         \else
           \useroman{#2}{#3}{#4}{#5}%
           \global\expandafter\let\expandafter#1\the\font
@@ -439,13 +445,9 @@
   local setdimen, set_attr = tex.setdimen, tex.setattribute
   local dir = luatexja.unary_pars.direction
   t[\the\ltj@@adjust@baseline@inner] = function()
-    local dir = dir()
-    %local ft = (dir==dir_tate
-    %  and fmt[get_attr('ltj@curtfnt')] or luatexja.jfont.tfont_jfmonly_result)
-    %  or nulltable
     local ft = fmt[get_attr('ltj@curtfnt')] or nulltable
-    ft = ft and ft.char_type or nulltable
-    local fk = ft and ft[0] or nulltable
+    ft = ft.char_type or nulltable
+    local fk = ft[0] or nulltable
     local ht, dp, wd = fk.height or 0, fk.depth or 0,
                        fk.width or ft.zw or 0
     local fm 
@@ -453,10 +455,10 @@
         .characters or nulltable)[77] or nulltable %% 'M'
     set_attr('ltj@tablshift',
       tex.round(0.5*((fm.height or 0)- (fm.depth or 0) - ht+ dp)))
-    if dir ~= dir_tate then
+    if dir() ~= dir_tate then
       ft = fmt[get_attr('ltj@curjfnt')] or nulltable
-      ft = ft and ft.char_type or nulltable
-      fk = ft and ft[0] or nulltable
+      ft = ft.char_type or nulltable
+      fk = ft[0] or nulltable
       ht, dp, wd = fk.height or 0, fk.depth or 0,
                    fk.width or ft.zw or 0
     end
@@ -626,21 +628,27 @@
 
 \let\extract@afont\extract@font
 \def\pickup@jfont{%
-  \unless\ifnum\ltjgetparameter{direction}=3\relax
-     \expandafter \ifx \font@name \relax
+  \ifnum
+	\unless\ifnum\ltjgetparameter{direction}=3 1\else
+	    \ifltjselectfont@force@define 1\else 0\fi\fi =1 %
+    \expandafter \ifx \font@name \relax
        \let\extract@font\extract@jfont
        \define@newfont
        \let\extract@font\extract@afont
-     \fi
+    \fi
+    \let\getjfont\font@name
   \fi
-  \let\getjfont\font@name}
+}
 \def\pickup@tfont{%
-  \ifnum\ltjgetparameter{direction}=3\relax
+  \ifnum
+	\ifnum\ltjgetparameter{direction}=3 1\else
+	    \ifltjselectfont@force@define 1\else 0\fi\fi =1 %
     \expandafter \ifx \font@name \relax
        \let\extract@font\extract@tfont
        \define@newfont
        \let\extract@font\extract@afont
     \fi
+    \let\gettfont\font@name
   \else
 	\begingroup\escapechar\m@ne
 	\ifcsname ltj@@tfontjfm/\expandafter\string\font@name\endcsname\else
@@ -650,7 +658,7 @@
 	\fi\endgroup
 	\csname ltj@@tfontjfm/\string\font@name\endcsname
   \fi
-  \let\gettfont\font@name}
+}
 
 % 異なる和文 enc/fam/ser/shape からは異なるフォント番号が振られるように
 % わざと「ゴミをつける」
