@@ -7,7 +7,7 @@
 \makeatletter
 \begin{document}
 \leavevmode
-\def\T{{\ttfamily [\the\ltj@curjfnt,\the\ltj@curtfnt]}}
+\def\T{[\the\ltj@curjfnt,\the\ltj@curtfnt]}
 あいう\T えお\PIYO あい\T う\scriptsize あ\T\ltjsetparameter{talbaselineshift=-10pt}
 \HOGE あいう\T
 \vbox{\hsize=100pt\tate
@@ -16,9 +16,9 @@
   \normalsize あい\T う12\\
   \HOGE あいう\T えおa12\\
   \global\PIYO あい\T 12}\\
-あい\T うえお12\small あい\T
+あい\T うえお12\small あい\T\\
 う\tiny あい\T う\footnotesize あい\T う12
-\hbox{\tate あいうえ\T お12\Large あ\T12}
-
+\hbox{\tate あ\T い\normalsize うえ\T お12\Large\global\PIYO あ\T12}%
+あい\T かき
 
 \end{document}

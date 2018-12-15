@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2018/11/01',
+  date = '2018/12/15',
   description = 'Loader for Japanese fonts',
 })
 
@@ -459,16 +459,16 @@ do
    luatexbase.add_to_callback('define_font',luatexja.font_callback,"luatexja.font_callback", 1)
 
    local match, sp = string.match, tex.sp
-   local function load_tfont_jfmonly(spec)
+   local function load_jfmonly(spec, dir)
       local spec, size = match(spec,'(.+)%s+at%s*([%.%w]*)')
       size = sp(size); extract_metric(spec)
-      jfm_dir = 'tate'
+      jfm_dir = dir
       local i = load_jfont_metric()
       local j = -update_jfm_cache(i, size)
       font_metric_table[j]=metrics[i].size_cache[s]      
-      tex.sprint(cat_lp, '\\ltj@curtfnt' .. tostring(j) .. '\\relax')
+      tex.sprint(cat_lp, '\\ltj@cur' .. (dir=='yoko' and 'j' or 't') .. 'fnt' .. tostring(j) .. '\\relax')
    end
-   luatexja.jfont.load_tfont_jfmonly = load_tfont_jfmonly
+   luatexja.jfont.load_jfmonly = load_jfmonly
 end
 
 ------------------------------------------------------------------------

@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2018/10/08 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2018/12/15 Patch to NFSS2 for LuaTeX-ja]
 
 \def\ltj@chardef@text@cmd#1{%
   \let\@ifdefinable\@@ifdefinable%
@@ -639,6 +639,15 @@
        \let\extract@font\extract@afont
     \fi
     \let\getjfont\font@name
+  \else
+	\begingroup\escapechar\m@ne
+	\ifcsname ltj@@fontjfm/\expandafter\string\font@name\endcsname\else
+       \let\extract@font\extract@jfont@onlyjfm
+       \define@newfont
+       \let\extract@font\extract@afont
+	\fi
+	\endgroup
+	\csname ltj@@fontjfm/\expandafter\expandafter\expandafter\@gobble\expandafter\string\font@name\endcsname
   \fi
 }
 \def\pickup@tfont{%
@@ -653,13 +662,13 @@
     \let\gettfont\font@name
   \else
 	\begingroup\escapechar\m@ne
-	\ifcsname ltj@@tfontjfm/\expandafter\string\font@name\endcsname\else
+	\ifcsname ltj@@fontjfm/\expandafter\string\font@name\endcsname\else
        \let\extract@font\extract@tfont@onlyjfm
        \define@newfont
        \let\extract@font\extract@afont
 	\fi
 	\endgroup
-	\csname ltj@@tfontjfm/\expandafter\expandafter\expandafter\@gobble\expandafter\string\font@name\endcsname
+	\csname ltj@@fontjfm/\expandafter\expandafter\expandafter\@gobble\expandafter\string\font@name\endcsname
   \fi
 }
 
@@ -684,14 +693,20 @@
     \expandafter\globaltfont\font@name\external@font\relax\font@name
     \csname \f@encoding+\f@family\endcsname
     \csname\curr@fontshape\endcsname}
+\def\extract@jfont@onlyjfm{%
+	\get@external@font
+	\csxdef{ltj@@fontjfm/\expandafter\string\font@name}{%
+	  \directlua{%
+		luatexja.jfont.load_jfmonly('\luatexluaescapestring{\external@font}', 'yoko')
+	  }%
+	}}
 \def\extract@tfont@onlyjfm{%
 	\get@external@font
-	\csxdef{ltj@@tfontjfm/\expandafter\string\font@name}{%
+	\csxdef{ltj@@fontjfm/\expandafter\string\font@name}{%
 	  \directlua{%
-		luatexja.jfont.load_tfont_jfmonly('\luatexluaescapestring{\external@font}')
+		luatexja.jfont.load_jfmonly('\luatexluaescapestring{\external@font}', 'tate')
 	  }%
-	}%
-}
+	}}
 
 \let\ltj@@al@do@subst@correction=\do@subst@correction
 \def\ltj@@ja@do@subst@correction{%

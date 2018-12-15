@@ -103,7 +103,9 @@ do
 	    while pid==id_glyph do
 	       local pc = getchar(p)
 	       if has_attr(p, attr_icflag, 0) and is_ucs_in_japanese_char(p, pc) then
-		  setfont(p, ltjf_replace_altfont(has_attr(p, attr_curjfnt) or getfont(p), pc))
+                  local pf = has_attr(p, attr_curjfnt)
+                  pf = (pf and pf>0 and pf) or getfont(p)
+		  setfont(p, ltjf_replace_altfont(pf, pc))
 		  setlang(p, lang_ja)
 		  ltjs_orig_char_table[p] = pc
 	       end
