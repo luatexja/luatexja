@@ -1120,7 +1120,7 @@ By default, the following fonts are used for these two families.
 However, above settings are not sufficient for Japanese-based
 documents. To typeset Japanese-based documents, you are better to use
 class files other than \texttt{article.cls}, \texttt{book.cls}, and so on.  At
-the present, we have the counterparts of \Pkg{jclasses} (standard
+the present, \LuaTeX-ja has the counterparts of \Pkg{jclasses} (standard
 classes in \pLaTeX) and \Pkg{jsclasses} (classes by Haruhiko
 Okumura), namely, \Pkg{ltjclasses}\footnote{%
   \texttt{ltjarticle.cls},~\texttt{ltjbook.cls}, \texttt{ltjreport.cls},
@@ -1149,7 +1149,7 @@ so \Pkg{ltjsclasses} uses the \texttt{nomag*} option\footnote{Same effect as
 }，
 \Pkg{ltjsclasses}\footnote{%
   \texttt{ltjsarticle.cls},~\texttt{ltjsbook.cls}, \texttt{ltjsreport.cls},~\texttt{ltjskiyou.cls}.}%
-がそれぞれ用意されている．
+がそれぞれ\LuaTeX-ja標準で用意されている．
 
 元々の\Pkg{jsclasses}では本文のフォントサイズを設定するのに\cs{mag}プリミティブが使われていたが，
 \LuaTeX~beta-0.87.0以降ではPDF出力時の\cs{mag}のサポートが廃止された．
@@ -5976,6 +5976,42 @@ are typeset by \cs{piyo}.
 
 %<en>\section{Commands for \LaTeXe}
 %<ja>\section{\LaTeXe 用の命令}
+
+%<*en>
+\subsection{Loading Japanese fonts in \LaTeXe}
+\label{ssec:ltx-jfm}
+From versoin~20190107, 
+\emph{\LuaTeX-ja does not load Japanese fonts for horizontal direction and
+  that for vertical direction at same time},
+to reduce the number of loaded fonts.
+This will save time for typesetting and memory consumption of Lua side (\cite{tc18ltja})．
+
+\begin{itemize}
+  \item \cs{selectfont} loads (and chooses) only the Japanese font for current direction,
+  and does not load the Japanese font for other direction
+  (\LuaTeX-ja only detects its size and JFM, to calculate the amount of shifting the baseline).
+
+  \item Direction changing commands (\cs{yoko},~\cs{tate}, \cs{dtou},~\cs{utod}) are patched to
+  include the following process:
+  \begin{quote}
+	If the Japanese font for new direction is not loaded,
+	\LuaTeX-ja loads it automatically.
+  \end{quote}
+  Original commands are saved as \cs{ltj@@orig@yoko} etc.
+  
+  \item Specifying Japanese font command which is
+  defined by \cs{jfont},~\cs{tfont}, or~\cs{DeclareFixedFont} directly
+  actually loads (and selects) the Japanese font.
+  For example, \textbf{JAchar}s in \cs{box0} will be typeset in \cs{HOGE},
+  in the following code:
+\begin{lstlisting}
+  % in horizontal direction (\yoko)
+  \DeclareFixedFont\HOGE{JT3}{gt}{m}{n}{12} % JT3: for vertical direction
+  \HOGE
+  \setbox0=\hbox{\tate あいう}
+\end{lstlisting}
+  \end{itemize}
+%</en>
 
 %<*ja>
 \subsection{\LaTeXe 下での和文フォントの読み込み}
