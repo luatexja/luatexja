@@ -208,7 +208,7 @@ do
       local hh, hd = getfield(box, 'height'), getfield(box, 'depth')
       local hx = h
       while hx do
-         local hic = has_attr(hx, attr_icflag) or 0
+	 local hic = has_attr(hx, attr_icflag) or 0
 	 if (hic == KANJI_SKIP) or (hic == KANJI_SKIP_JFM)
             or (hic == XKANJI_SKIP) or (hic == XKANJI_SKIP_JFM)
             or ((hic<=FROM_JFM+63) and (hic>=FROM_JFM)) then

@@ -134,6 +134,8 @@
 }
 \define@key[ltj]{japaram}{linestep_factor}{%
   \directlua{local d = #1; luatexja.adjust.step_factor=math.abs(d)}\relax}
+\define@key[ltj]{japaram}{profile_hgap_factor}{%
+  \directlua{luatexja.adjust.profile_hgap_factor = math.abs(#1)}\relax}
 
 
 %%------------------ all done

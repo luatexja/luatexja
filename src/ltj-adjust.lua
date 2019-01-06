@@ -482,6 +482,7 @@ end
 
 -- -----------------------------------
 luatexja.adjust.step_factor = 0.5
+luatexja.adjust.profile_hgap_factor = 1
 do
   local insert = table.insert
   local rangedimensions, max = node.direct.rangedimensions, math.max
@@ -503,7 +504,8 @@ do
     end
   end  
   function ltjl.p_profile(before, after, mirrored, bw)
-    local range, tls = init_range(), tex.lineskip.width
+    local range, tls 
+      = init_range(), luatexja.adjust.profile_hgap_factor*tex.lineskip.width
     profile_inner(before, range, 3, true,     tls)
     profile_inner(after,  range, 4, mirrored, tls)
     range = range:flatten()

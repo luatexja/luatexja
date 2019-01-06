@@ -2865,6 +2865,10 @@ Down-TO-Upの意味なのだろう．\cs{dtou} を使用する機会はないだ
 ただし，現在のモードが非制限水平モードや（文中，別行立て問わず）数式モードであるときには
 組方向を変更することは出来ない．
 また，縦組中の数式内のボックスは\pTeX と同じように組方向が \cs{utod} となる．
+
+なお，\LaTeX の下で\LuaTeX-jaを使用する場合，組方向変更命令には
+「新たな組方向下での和文フォントを必要なら読み込み（・選択する）」という
+処理が付け加えられている（\ref{ssec:ltx-jfm}節参照）．
 %</ja>
 
 %<*en>
@@ -5973,6 +5977,41 @@ are typeset by \cs{piyo}.
 %<en>\section{Commands for \LaTeXe}
 %<ja>\section{\LaTeXe 用の命令}
 
+%<*ja>
+\subsection{\LaTeXe 下での和文フォントの読み込み}
+\label{ssec:ltx-jfm}
+バージョン20190107以降では，\LaTeXe の下で\LuaTeX-jaを使用した際に，
+\emph{横組用和文フォントと縦組み用和文フォントを両方一度に読み込み・選択せずに，
+  実際にそれぞれを使う組方向になったときに行う}という方針にした．
+これは実際に読み込むフォント数を削減することで，
+タイプセットにかかる時間と（主にLuaの）メモリ消費を削減するためである(\cite{tc18ltja})．
+
+\begin{itemize}
+  \item \cs{selectfont}は横組用・縦組用和文フォントのうち，現在の組方向で使う方を
+  実際に読み込み（・選択し），そうでない方は「フォントサイズとJFMのみ\LuaTeX-jaが把握している状態」
+  （以下，\emph{JFM把握状態}）とする．
+
+  \item 組方向変更命令\cs{yoko},~\cs{tate}, \cs{dtou},~\cs{utod}には
+  \begin{quote}
+	新たな組方向での和文フォントが読み込まれていない（JFM把握状態）ならば，
+	現在のエンコーディング・ファミリ・シリーズ・シェイプから改めて読み込む（または選択する）
+  \end{quote}
+  処理が付け加えられている．
+  もとの「組方向を変更するだけ」の命令は\cs{ltj@@orig@yoko}のように\texttt{ltj@@orig@}が前についた
+  命令に保存されている．
+  
+  \item \cs{jfont},~\cs{tfont},~\cs{DeclareFixedFont}で定義された和文フォントは
+  その時点で実際にフォントが読み込まれる．すなわち，以下のコードにおいて，
+  \cs{box0}中の\textbf{JAchar}は\cs{HOGE}でタイプセットされる．
+\begin{lstlisting}
+  % in horizontal direction (\yoko)
+  \DeclareFixedFont\HOGE{JT3}{gt}{m}{n}{12} % JT3: for vertical direction
+  \HOGE
+  \setbox0=\hbox{\tate あいう}
+\end{lstlisting}
+  \end{itemize}
+%</ja>
+
 %<en>\subsection{Patch for NFSS2}
 %<ja>\subsection{NFSS2へのパッチ}
 \label{ssec:nfsspat}
@@ -7105,7 +7144,7 @@ for making the difference obvious.}
 と同義．
 \end{cslist}
 
-また，優先順位付きの行長調整のために，次の3パラメータが\cs{ltjsetparameter}内で
+また，次のパラメータが\cs{ltjsetparameter}内で
 追加される．いずれもグローバルに効力を発揮する．
 \begin{cslist}[style=standard]
 \item[\DParam{stretch\_priority}\,=\{<list>\}]
@@ -7121,22 +7160,30 @@ stretch_priority={kanjiskip=-35,xkanjiskip=-25,others=50}
 \texttt{others}キーが「\textbf{JAglue}以外のグルー」を表す．
 各キーの値は，JFMグルーにおける「優先度$i$」を$10i$に対応させた整数値であり，
   大きい方が先に伸ばされることを意味している．
-
-\item[\DParam{shrink\_priority}\,=\{<list>\}]
-同様に，「行を自然長より縮める」場合の調整に用いる優先度を指定する．
-それ以外は\Param{stretch\_priority}と指定の形式は変わらない．
-
- \item[\DParam{linestep\_factor}\,=<float>]
-  段階的な行送り調整の際，\cs{baselineskip}の何倍単位で行送りを変えるかを指定する．
-  0を指定すると無効になるのと変わらない．また負数を指定すると，
-  その絶対値が指定されたかのように扱われる．
-  初期値は0.5（つまり半行単位）である．
-\end{cslist}
-\Param{stretch\_priority}, \Param{shrink\_priority}の初期値はどちらも
+  初期値は
 \begin{lstlisting}
 {kanjiskip=-35,xkanjiskip=-25,others=50}
 \end{lstlisting}
-であり，「優先度$-4$」と指定されているJFMグルーが最も伸び（縮み）にくいようになっている．
+であり，「優先度$-4$」と指定されているJFMグルーが最も伸びにくいようになっている．
+
+\item[\DParam{shrink\_priority}\,=\{<list>\}]
+同様に，「行を自然長より縮める」場合の調整に用いる優先度を指定する．
+それ以外は\Param{stretch\_priority}と指定の形式は変わらない（初期値も変わらない）．
+
+ \item[\DParam{linestep\_factor}\,=<float>]
+  段階的な行送り調整の際，\cs{baselineskip}の自然長の何倍単位で行送りを変えるかを指定する．
+  0を指定すると無効になるのと変わらない．また負数を指定すると，
+  その絶対値が指定されたかのように扱われる．
+  初期値は0.5（つまり半行単位）である．
+
+  \item[\DParam{profile\_hgap\_factor}\,=<float>]
+  「中身まで見た」行送り計算の際，
+  前の行にある深さが大きいものと次の行にある高さが大きいものが
+  水平方向にどれだけ離れていないといけないかを
+  「\cs{lineskip}の自然長の何倍か」で指定する．
+  負数を指定すると，その絶対値が指定されたかのように扱われる．
+  初期値は1（つまり\cs{lineskip}（の自然長））である．
+\end{cslist}
 %</ja>
 
 \subsection{\Pkg{luatexja-ruby}}
@@ -8282,18 +8329,23 @@ Current number of Japanese font family for math formulas.
 
 \attr{ltj@curjfnt}
 %<*en>
-The font index of current Japanese font for horizontal direction.
+If this attribute is a positive number, it stores the font number of current Japanese font for horizontal direction.
+If this attribute is negative, it means that the Japanese font for horizontal direction is
+not loaded---\LuaTeX-ja only knows its size and JFM.
 %</en>
 %<*ja>
-現在の横組用和文フォントのフォント番号．
+基本的には現在の横組用和文フォントのフォント番号を格納しているが，
+\LaTeX 下で使用する場合は（$-2$以下の）負数となることがある．
+  負数の場合は「横組用和文フォントは実際には読み込まれておらず，そのフォントサイズとJFMだけが
+  \LuaTeX-jaが把握している」状態を表す．
 %</ja>
 
 \attr{ltj@curtfnt}
 %<*en>
-The font index of current Japanese font for vertical direction.
+Similar to \cs{ltj@curjfnt}, but with current Japanese font for vertical direction.
 %</en>
 %<*ja>
-現在の縦組用和文フォントのフォント番号．
+縦組用和文フォントに関する\cs{ltj@curjfnt}と同様の値．
 %</ja>
 
 \attr{ltj@charclass}
@@ -10994,11 +11046,11 @@ TUG 2013, October 2013.
 Requirements for Japanese Text Layout (W3C Working Group Note), 2011, 2012. \newblock
 \url{http://www.w3.org/TR/jlreq/}%
 %<ja> \\日本語訳の書籍版：W3C日本語組版タスクフォース（編），『W3C技術ノート 日本語組版処理の要件』，東京電機大学出版局，2012．
-\bibitem{min10} 乙部厳己．min10フォントについて．\\\null\hfill
+\bibitem{min10} 乙部厳己．「min10フォントについて」\\\null\hfill
 \url{http://argent.shinshu-u.ac.jp/~otobe/tex/files/min10.pdf}
-\bibitem{x4051} 日本工業規格(Japanese Industrial Standard). JIS~X~4051,
-日本語文書の組版方法(Formatting rules for Japanese documents), 1993, 1995, 2004.
-\bibitem{ptexdoc} 濱野尚人，田村明史，倉沢良一．\TeX の出版への応用—縦組み機能の組み込み—．
+\bibitem{x4051} 日本工業規格(Japanese Industrial Standard). 「JIS~X~4051,
+日本語文書の組版方法(Formatting rules for Japanese documents)」, 1993, 1995, 2004.
+\bibitem{ptexdoc} 濱野尚人，田村明史，倉沢良一．「\TeX の出版への応用—縦組み機能の組み込み—」．
 \\\null\hfill\texttt{.../texmf-dist/doc/ptex/base/ptexdoc.pdf}
 \bibitem{ptextug} Hisato Hamano. \newblock
 \textit{Vertical Typesetting with \TeX}, TUGBoat~\textbf{11}(3), 346--352, 1990.
@@ -11007,6 +11059,8 @@ ISO 32000-1:2008, \textit{Document management -- Portable document format -- Par
       1.7}, 2008. \newblock
 \\\null\hfill
 \url{http://www.iso.org/iso/iso\_catalogue/catalogue_tc/catalogue\_detail.htm?csnumber=51502}
+\bibitem{tc18ltja} 北川弘典．「\LuaTeX-jaの近況」，\TeX Conf~2018．\\
+  \url{https://osdn.net/projects/luatex-ja/wiki/Documentation/attach/tc18ltja.pdf}
 \end{thebibliography}
 
 \end{document}
