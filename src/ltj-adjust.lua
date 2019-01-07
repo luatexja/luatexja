@@ -482,7 +482,13 @@ end
 
 -- -----------------------------------
 luatexja.adjust.step_factor = 0.5
+luatexja.unary_pars.linestep_factor = function(t)
+   return luatexja.adjust.step_factor
+end
 luatexja.adjust.profile_hgap_factor = 1
+luatexja.unary_pars.profile_hgap_factor = function(t)
+   return luatexja.adjust.profile_hgap_factor
+end
 do
   local insert = table.insert
   local rangedimensions, max = node.direct.rangedimensions, math.max
