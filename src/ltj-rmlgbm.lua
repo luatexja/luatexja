@@ -5,7 +5,7 @@ luatexja.load_module('base');      local ltjb = luatexja.base
 
 local cidfont_data = {}
 local cache_chars = {}
-local cache_ver = 6
+local cache_ver = 7
 local identifiers = fonts.hashes.identifiers
 
 local cid_reg, cid_order, cid_supp, cid_name
@@ -148,8 +148,11 @@ do
          },
          dynamics = {}, features = {}, processes = {},
          --rawdata = { descriptions = {} },
-     }
-      k.resources = { unicodes = ttu, }
+      }
+      k.resources = { 
+         unicodes = ttu, 
+	 features = { dummy={dummy={dflt=true}} }
+      }
       k.descriptions = {}
       cache_chars[cid_name]  = { [655360] = k.characters }
 
