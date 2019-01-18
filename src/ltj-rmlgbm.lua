@@ -351,6 +351,9 @@ local function font_callback(name, size, id, fallback)
 	    if xname:len()+1==q then p = nil else p = q + 1 end
 	 end
       end
+      p = basename:find(":")
+      if p then basename=basename:sub(1,p-1) end
+      if basename:sub(1,1)=="{" and basename:sub(-1)=="}" then basename = basename:sub(2,-2) end
       cid_reg, cid_order = string.match(s, "^(.-)%-(.-)%-(%d-)$")
       if not cid_reg then
          cid_reg, cid_order = string.match(s, "^(.-)%-(.-)$")
