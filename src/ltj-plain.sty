@@ -23,8 +23,10 @@
 %! ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 % LuaTeX-ja macros against plain TeX
 
-\def\ltj@stdmcfont{IPAExMincho}
-\def\ltj@stdgtfont{IPAExGothic}
+\ifdefined\ltj@stdmcfont\else\def\ltj@stdmcfont{IPAExMincho}\fi
+\ifdefined\ltj@stdgtfont\else\def\ltj@stdgtfont{IPAExGothic}\fi
+\ifdefined\ltj@stdyokojfm\else\def\ltj@stdyokojfm{ujis}\fi
+\ifdefined\ltj@stdtatejfm\else\def\ltj@stdtatejfm{ujisv}\fi
 \newread\ltj@@cfgread
 \openin\ltj@@cfgread{luatexja.cfg}%
 \ifeof\ltj@@cfgread
@@ -35,19 +37,19 @@
 \fi
 \let\ltj@@cfgread\relax\advance\count16\m@ne\relax
 
-\jfont\tenmin=\ltj@stdmcfont:jfm=ujis at 9.62216pt
-\jfont\sevenmin=\ltj@stdmcfont:jfm=ujis at 6.73551pt
-\jfont\fivemin=\ltj@stdmcfont:jfm=ujis at 4.81108pt
-\jfont\tengt=\ltj@stdgtfont:jfm=ujis at 9.62216pt
-\jfont\sevengt=\ltj@stdgtfont:jfm=ujis at 6.73551pt
-\jfont\fivegt=\ltj@stdgtfont:jfm=ujis at 4.81108pt
+\jfont\tenmin=\ltj@stdmcfont:jfm=\ltj@stdyokojfm at 9.62216pt
+\jfont\sevenmin=\ltj@stdmcfont:jfm=\ltj@stdyokojfm at 6.73551pt
+\jfont\fivemin=\ltj@stdmcfont:jfm=\ltj@stdyokojfm at 4.81108pt
+\jfont\tengt=\ltj@stdgtfont:jfm=\ltj@stdyokojfm at 9.62216pt
+\jfont\sevengt=\ltj@stdgtfont:jfm=\ltj@stdyokojfm at 6.73551pt
+\jfont\fivegt=\ltj@stdgtfont:jfm=\ltj@stdyokojfm at 4.81108pt
 
-\tfont\tentmin=\ltj@stdmcfont:jfm=ujisv at 9.62216pt
-\tfont\seventmin=\ltj@stdmcfont:jfm=ujisv at 6.73551pt
-\tfont\fivetmin=\ltj@stdmcfont:jfm=ujisv at 4.81108pt
-\tfont\tentgt=\ltj@stdgtfont:jfm=ujisv at 9.62216pt
-\tfont\seventgt=\ltj@stdgtfont:jfm=ujisv at 6.73551pt
-\tfont\fivetgt=\ltj@stdgtfont:jfm=ujisv at 4.81108pt
+\tfont\tentmin=\ltj@stdmcfont:jfm=\ltj@stdtatejfm at 9.62216pt
+\tfont\seventmin=\ltj@stdmcfont:jfm=\ltj@stdtatejfm at 6.73551pt
+\tfont\fivetmin=\ltj@stdmcfont:jfm=\ltj@stdtatejfm at 4.81108pt
+\tfont\tentgt=\ltj@stdgtfont:jfm=\ltj@stdtatejfm at 9.62216pt
+\tfont\seventgt=\ltj@stdgtfont:jfm=\ltj@stdtatejfm at 6.73551pt
+\tfont\fivetgt=\ltj@stdgtfont:jfm=\ltj@stdtatejfm at 4.81108pt
 
 \def\mc{\tenmin\tentmin}
 \def\gt{\tengt\tentgt}
