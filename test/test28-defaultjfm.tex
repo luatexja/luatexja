@@ -1,0 +1,16 @@
+\makeatletter
+\directlua{jlreq={burasage=true}}
+\def\ltj@stdyokojfm{jlreq}
+\def\ltj@stdtatejfm{jlreqv}
+\documentclass{ltjtarticle}
+\usepackage{luatexja-adjust}
+\ltjenableadjust[lineend=extended]
+\usepackage{luatexja-fontspec}
+\setmainjfont{ipaexg.ttf}
+\usepackage{bxjalipsum}% "吾輩は猫である"したい
+\begin{document}
+
+\smash{\parbox{30\zw}{\jalipsum[4-5]{wagahai}}}
+
+\end{document}
+
