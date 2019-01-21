@@ -609,9 +609,11 @@ do
 	 local f = (lig ==1) and nullfunc or node_tail
          local xc, xs = getcomponents(x), getsubtype(x)
 	 while xc and xs and xs%4>=2 do
-	    x = f(xc); xc, xs = getcomponents(x), getsubtype(x)
+	    x = f(xc); 
+	    if getid(x)==id_disc then x, xc, xs = nil, getfield(x,'replace'), 2
+	    else xc, xs = getcomponents(x), getsubtype(x) end
 	 end
-	 c = getchar(x)
+	 c = x and getchar(x) or c
 	 Nx.pre  = table_current_stack[PRE + c]  or 0
 	 Nx.post = table_current_stack[POST + c] or 0
       else
