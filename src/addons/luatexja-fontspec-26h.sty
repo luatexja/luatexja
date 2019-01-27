@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec-26h}[2018/10/08 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec-26h}[2019/01/27 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e,luatexja}
 \ExplSyntaxOn
 
@@ -216,14 +216,26 @@
       \l__fontspec_sizing_leftover_clist
     \tl_if_empty:NT \l__fontspec_size_tl { \__fontspec_error:n {no-size-info} }
 
-    \str_if_eq:nnTF { #5 } { JY3 } {
-      % "normal"
-      \__fontspec_load_fontname:n {\l__fontspec_sizedfont_tl}
-    } {
-      \tl_if_empty:NTF \l_ltj_fontspec_fontname_tate_tl
-        { \__fontspec_load_fontname:n {\l__fontspec_sizedfont_tl} }
-        { \__fontspec_load_fontname:n {\l_ltj_fontspec_fontname_tate_tl} }
-    }
+    \cs_if_exist:NTF \__fontspec_load_fontname:Nn
+	{ %% >= v2.7
+	  \str_if_eq:nnTF { #5 } { JY3 } {
+        % "normal"
+        \__fontspec_load_fontname:Nn \l_fontspec_fontname_tl {\l__fontspec_sizedfont_tl}
+      } {
+        \tl_if_empty:NTF \l_ltj_fontspec_fontname_tate_tl
+          { \__fontspec_load_fontname:Nn \l_fontspec_fontname_tl  {\l__fontspec_sizedfont_tl} }
+          { \__fontspec_load_fontname:Nn \l_fontspec_fontname_tl  {\l_ltj_fontspec_fontname_tate_tl} }
+      }
+	} { %% < v2.7
+	  \str_if_eq:nnTF { #5 } { JY3 } {
+        % "normal"
+        \__fontspec_load_fontname:n {\l__fontspec_sizedfont_tl}
+      } {
+        \tl_if_empty:NTF \l_ltj_fontspec_fontname_tate_tl
+          { \__fontspec_load_fontname:n {\l__fontspec_sizedfont_tl} }
+          { \__fontspec_load_fontname:n {\l_ltj_fontspec_fontname_tate_tl} }
+      }
+	}
     \__fontspec_setup_nfss:Nnnn \l__fontspec_nfss_tl {#3} {#6} {}
    }
   \bool_set_true:N \l__fontspec_nosc_bool
