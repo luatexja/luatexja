@@ -475,7 +475,7 @@ local function debug_show_node_X(p,print_fn, limit)
 	    debug_show_node_X(q, print_fn, limit)
 	 end
       end
-      prefix=k       
+      prefix=k
    elseif pt == 'glue' then
       s = base .. ' ' ..  print_spec(p)
       if get_attr_icflag(p)>icflag_table.KINSOKU

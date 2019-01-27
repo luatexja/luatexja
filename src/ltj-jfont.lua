@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2018/12/15',
+  date = '2019/01/28',
   description = 'Loader for Japanese fonts',
 })
 
@@ -340,8 +340,8 @@ do
                         chars_cbcache = {},
                         vert_activated = is_vert_enabled,
       }
+      local t = identifiers[fn]
       if auto_enable_vrt2 then
-         local t = identifiers[fn]
          local lang, scr = t.properties.language, t.properties.script
          local vrt2_exist = provides_feature(
            fn, t.properties.script, t.properties.language, 'vrt2'
@@ -1168,6 +1168,7 @@ do
    local node_write = node.direct.write
    local font = font
    local new_ic_kern
+   local dir_tate = luatexja.dir_table.dir_tate
    if status.luatex_version>=89 then
        new_ic_kern = function(g)  return node_new(id_kern,3) end
    else

@@ -106,6 +106,13 @@ do
    local function entry(a)
       return {index = a}
    end
+   local feat_dummy_vert = { gsub={vert={dflt={dflt=true}}} }
+   local seq_dummy_vert={{
+     features={vert={dflt={dflt=true}}},
+     --flags={false,false,false,false},
+     --index=1, name="s_s_0", skiphash=false, steps={coverage={},index=1},
+     ["type"]="gsub_single", order='vert',
+   }}
    make_cid_font = function ()
       local kx = cid_replace[cid_name]
       if not kx then return end
@@ -146,14 +153,17 @@ do
             cidinfo= k.cidinfo, verbose = false,
             shared = { featuredata = {}, },
          },
-         dynamics = {}, features = {}, processes = {},
-         --rawdata = { descriptions = {} },
+         dynamics = {}, processes = {},
+         rawdata = {}, features={},
       }
-      k.resources = { 
-         unicodes = ttu, 
-	 features = { dummy={dummy={dflt=true}} }
+      k.resources = {
+         unicodes = ttu,
+	 features = feat_dummy_vert,
+	 sequences = seq_dummy_vert,
       }
       k.descriptions = {}
+      k.shared.rawdata.resources=k.resources
+      k.shared.rawdata.descriptions=k.descriptions
       cache_chars[cid_name]  = { [655360] = k.characters }
 
       -- 縦書用字形
@@ -199,16 +209,21 @@ end
 --
 local cidf_vert_processor
 do
-   local traverse_id = node.traverse_id
+   local traverse_id, is_node = node.direct.traverse_id, node.is_node
+   local to_direct = node.direct.todirect
    local id_glyph = node.id('glyph')
+   local getfont = node.direct.getfont
+   local getchar = node.direct.getchar
+   local setchar = node.direct.setchar
    cidf_vert_processor = {
       function (head, fnum)
          local fontdata = identifiers[fnum]
-         if luatexja.jfont.font_metric_table[fnum].vert_activated then
-            local vt = fontdata.shared.ltj_vert_table
+         if head and luatexja.jfont.font_metric_table[fnum].vert_activated then
+	    local vt = fontdata.shared.ltj_vert_table
+	    local nh = is_node(head) and to_direct(head) or head 
             for n in traverse_id(id_glyph, head) do
-               if n.font==fnum then
-                  n.char = vt[n.char] or n.char
+               if getfont(n)==fnum then
+		 local c = getchar(n); setchar(n, vt[c] or c)
                end
             end
             return head, false
@@ -252,7 +267,12 @@ local function mk_rml(name, size, id)
    local specification = definers.analyze(name,size)
    --specification = definers.resolve(specification) (not needed)
    specification.detail = specification.detail or ''
-
+   do
+      local n = specification.name
+      if n:sub(1,1)=="{" then n=n:sub(2) end
+      if n:sub(-1)=="}" then  n=n:sub(1,-2) end
+      specification.name=n
+   end
    local fontdata = {}
    local cachedata = {}
    local s = cidfont_data[cid_name]
@@ -351,9 +371,6 @@ local function font_callback(name, size, id, fallback)
 	    if xname:len()+1==q then p = nil else p = q + 1 end
 	 end
       end
-      p = basename:find(":")
-      if p then basename=basename:sub(1,p-1) end
-      if basename:sub(1,1)=="{" and basename:sub(-1)=="}" then basename = basename:sub(2,-2) end
       cid_reg, cid_order = string.match(s, "^(.-)%-(.-)%-(%d-)$")
       if not cid_reg then
          cid_reg, cid_order = string.match(s, "^(.-)%-(.-)$")

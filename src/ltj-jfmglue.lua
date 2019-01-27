@@ -609,7 +609,7 @@ do
 	 local f = (lig ==1) and nullfunc or node_tail
          local xc, xs = getcomponents(x), getsubtype(x)
 	 while xc and xs and xs%4>=2 do
-	    x = f(xc); 
+	    x = f(xc);
 	    if getid(x)==id_disc then x, xc, xs = nil, getfield(x,'replace'), 2
 	    else xc, xs = getcomponents(x), getsubtype(x) end
 	 end
