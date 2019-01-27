@@ -1,0 +1,142 @@
+%#! luatex
+\input luatexja.sty
+
+\let\tengoth=\tengt
+\jfont\jisse={psft:Ryumin-Light:script=latn;+jp78;jfm=ujis}
+\jfont\jisexpt={psft:Ryumin-Light:script=latn;+expt;jfm=ujis}
+\jfont\jishwid={psft:Ryumin-Light:script=latn;+hwid;jfm=ujis}
+\jfont\jispalt={psft:Ryumin-Light:script=latn;+palt;jfm=ujis}
+%\font\tmihwid={psft:Ryumin-Light:script=latn;+hwid}
+\jfont\jisnalt={psft:Ryumin-Light:script=latn;+nalt;jfm=ujis}
+\jfont\jistrad={psft:Ryumin-Light:script=latn;+trad;jfm=ujis}
+\jfont\jissups={psft:Ryumin-Light:script=latn;+sups;jfm=ujis}
+\jfont\jisliga={psft:Ryumin-Light:script=latn;+liga;jfm=ujis}
+%\font\tmiliga={psft:Ryumin-Light:script=latn;+liga}
+\jfont\jisvert={psft:Ryumin-Light:script=latn;+vert;jfm=ujis}
+\parskip=\smallskipamount\parindent=1\zw
+
+{\noindent\bf\tengoth jfm-ujis.luaを使用}
+
+\bigskip
+
+{\noindent\bf\tengoth luaotf\/loadによるfeatureとの共存状況（非埋め込み版）}
+
+{\noindent\bf\tengoth 注: 表示はビューワによって実際に用いられるフォントに依存します．}
+
+{\tentt expt} feature: 剥→{\jisexpt 剥}
+
+{\tentt jp78} feature: 辻→{\jisse 辻}
+
+{\tentt hwid} feature: アイｳｴ→{\jishwid アイｳｴ}
+
+{\tentt palt} feature: トップクォーク→{\jispalt トップクォーク}\hfil\break
+
+{\tentt nalt} feature: 男→{\jisnalt 男}
+
+{\tentt trad} feature: 医学→{\jistrad 医学}
+
+{\tentt sups} feature: 注１注1→{\jissups 注１注1}\hfil\break
+↑まだ上付き文字用の文字クラスを作ってない．
+
+{\tentt liga} feature: か゚き゚く゚け゚こ゚→{\jisliga か゚き゚く゚け゚こ゚}\hfil\break
+↑合字用の半濁点（{\tentt U+309A}）を用いれば成功する．単体用（{\tentt U+309C}）では失敗する．%比較：{\tmiliga か゜き゜く゜け゜こ゜}
+%{\tentt liga} feature: か゜き゜く゜け゜こ゜→{\jisliga か゜き゜く゜け゜こ゜}\hfil\break
+%↑なぜかうまくいかない．%比較：{\tmiliga か゜き゜く゜け゜こ゜}
+
+{\tentt vert} feature: あ（㌢㍍），い→{\jisvert あ（㌢㍍），い}\hfil\break
+↑縦組み時に気にすればいいか．
+
+\bigskip
+
+\noindent あいうえお
+
+「あいうえお←全角下がりが正しい（{\tt'boxbdd'}のテスト1）
+
+{\tt'boxbdd'}のテスト2: \vrule\hbox{「」}\vrule ←正しい実装ならば2本の罫線の間は全角幅
+
+
+\bigskip
+{\noindent\bf\tengt ■{\tt differentjfm}による挙動の違い}
+
+\jfont\tenMa={psft:Ryumin-Light:jfm=ujis}
+\jfont\tenMb={psft:Ryumin-Light:jfm=jis;jfmvar=a}
+\jfont\tenGa={psft:GothicBBB-Medium:jfm=ujis} at 15pt
+\jfont\tenGb={psft:GothicBBB-Medium:jfm=jis;jfmvar=a} at 15pt\relax
+
+\def\djtest{%
+{\tt Ma-Ma}: \setbox0=\hbox{{\tenMa ）}{\tenMa  ・}}\hbox to 90pt{\copy0\hss(\the\wd0)},
+{\tt Ma-Mb}: \setbox0=\hbox{{\tenMa ）}{\tenMb ・}}\hbox to 90pt{\copy0\hss(\the\wd0)},
+{\tt Mb-Mb}: \setbox0=\hbox{{\tenMb ）}{\tenMb ・}}\hbox to 90pt{\copy0\hss(\the\wd0)},
+
+{\tt Ma-Ga}: \setbox0=\hbox{{\tenMa ）}{\tenGa ・}}\hbox to 90pt{\copy0\hss(\the\wd0)},
+{\tt Ma-Gb}: \setbox0=\hbox{{\tenMa ）}{\tenGb ・}}\hbox to 90pt{\copy0\hss(\the\wd0)},
+{\tt Mb-Gb}: \setbox0=\hbox{{\tenMb ）}{\tenGb ・}}\hbox to 90pt{\copy0\hss(\the\wd0)}%
+}
+
+{\noindent\bf\tengt {\tt differentjfm=small}（小さい方）}
+
+\ltjsetparameter{differentjfm=small}\djtest
+
+{\noindent\bf\tengt {\tt differentjfm=large}（大きい方）}
+
+\ltjsetparameter{differentjfm=LARGE}\djtest
+
+
+{\noindent\bf\tengt {\tt differentjfm=average}（平均）}
+
+\ltjsetparameter{differentjfm=AVERAGE}\djtest
+
+{\noindent\bf\tengt {\tt differentjfm=both}（合計）}
+
+\ltjsetparameter{differentjfm=Both}\djtest
+
+{\noindent\bf\tengt {\tt differentjfm=pleft}（左側の指定で比例配分）}
+
+\ltjsetparameter{differentjfm=pleft}\djtest
+
+{\noindent\bf\tengt {\tt differentjfm=pright}（右側の指定で比例配分）}
+
+\ltjsetparameter{differentjfm=pright}\djtest
+
+{\noindent\bf\tengt {\tt differentjfm=paverage}（default, 左・右それぞれの指定で比例配分した値の平均）}
+
+\ltjsetparameter{differentjfm=paverage}\djtest
+
+
+\bigskip
+{\noindent\bf\tengt ■ujis, jis, min}
+
+\def\test#1{\jfont\mx={psft:Ryumin-Light:jfm=#1}
+\par\noindent\hbox to 30pt{#1}%
+\hbox to 250pt{\mx ちょっとチェックしちゃった！が，まあいいです。\hss}%
+\hbox{\mx「大」、「小」，‘国’“国”――……}}
+
+\test{ujis}
+\test{jis}
+\test{min}
+
+\par\vfill\eject
+{\noindent\bf\tengt ■dash}
+
+左から順に，U+2500（罫線），U+2015 (HORIZONTAL~BAR)，U+2014 (EM~DASH)
+
+\def\test#1{\jfont\mx={psft:Ryumin-Light:jfm=#1}
+\par\noindent\hbox to 30pt{#1}%
+\hbox to 250pt{\mx  a──b――c——d}}
+
+\test{ujis}
+\test{jis}
+\test{min}
+
+{\catcode`\@=11 罫線のalxspmodeを3にしてみる（以前の設定値）
+\ltj@tempcnta="2500%" 罫線
+\loop\ifnum\ltj@tempcnta<"2580%"
+  \ltjsetparameter{alxspmode={\ltj@tempcnta,3}}%
+  \advance\ltj@tempcnta by1
+\repeat
+\test{ujis}
+\test{jis}
+\test{min}
+}
+
+\end
