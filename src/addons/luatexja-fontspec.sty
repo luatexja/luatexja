@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec}[2018/09/01 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec}[2019/01/28 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e,luatexja}
 \ExplSyntaxOn
 
@@ -15,10 +15,10 @@
   \group_end:
 }
 
-\bool_new:N \ltj_fontspec_match_bool
+\bool_new:N \__ltj_fontspec_match_bool
 \keys_define:nn { luatexja-fontspec }
   {
-    match .bool_set:N = \ltj_fontspec_match_bool,
+    match .bool_set:N = \__ltj_fontspec_match_bool,
     match .default:n  = true,
     pass .code:n = \PassOptionsToPackage{#1} {fontspec},
       % 互換性のために残したオプション

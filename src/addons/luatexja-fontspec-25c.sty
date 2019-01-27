@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec-25c}[2018/10/08 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec-25c}[2019/01/28 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e,luatexja}
 \ExplSyntaxOn
 
@@ -16,7 +16,7 @@
     \normalfont
   }
 }
-\bool_if:NT  \ltj_fontspec_match_bool \ltj_fontspec_match_cmd
+\bool_if:NT  \__ltj_fontspec_match_bool \ltj_fontspec_match_cmd
 
 %%%%%%%% Messages
 \msg_new:nnn {luatexja-fontspec} {addjfontfeatures-ignored}

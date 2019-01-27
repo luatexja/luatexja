@@ -458,6 +458,24 @@ local function debug_show_node_X(p,print_fn, limit)
          .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
 	 .. ', dir=' .. tostring(node.has_attribute(p, attr_dir))
       print_fn(s)
+   elseif pt=='disc' then
+      print_fn(s)
+      local bid = inner_depth
+      if inner_depth < limit then
+         prefix, inner_depth = k.. 'p.', inner_depth + 1
+	 for q in node.traverse(p.pre) do
+	    debug_show_node_X(q, print_fn, limit)
+	 end
+         prefix = k.. 'P.'
+	 for q in node.traverse(p.post) do
+	    debug_show_node_X(q, print_fn, limit)
+	 end
+         prefix = k.. 'R.'
+	 for q in node.traverse(p.replace) do
+	    debug_show_node_X(q, print_fn, limit)
+	 end
+      end
+      prefix=k       
    elseif pt == 'glue' then
       s = base .. ' ' ..  print_spec(p)
       if get_attr_icflag(p)>icflag_table.KINSOKU

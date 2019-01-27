@@ -196,6 +196,15 @@
 \def\cs#1{\texttt{\upshape
   \texorpdfstring{\textbackslash\hbox{\ltjsetparameter{autoxspacing=false}#1}}{\textbackslash#1}}}
 \ltjsetparameter{alxspmode={`\\,allow}}
+\def\text@#1{%
+  \ifnum\mathstyle<\scriptstyle
+	\mbox{#1}
+  \else\ifnum\mathstyle<\scriptscriptstyle
+	\mbox{\let\f@size\sf@size\selectfont#1}
+  \else
+	\mbox{\let\f@size\ssf@size\selectfont#1}
+  \fi\fi
+}
 %%%%%%%%
 \makeatother
 %%%%%%%%
@@ -917,12 +926,14 @@ and finally delete the temporary directory.
 %</ja>
 \begin{itemize}
 %<*en>
-\item With \texttt{luatexja.cfg}, one can use other fonts
-as ``default'' Japanese fonts (Subsection~\ref{ssec:cfg}).
+\item The ``default'' Japanese fonts (and~JFMs for them) can be 
+  modified by defining \cs{ltj@stdmcfont} etc.\ \emph{before}
+  one inputs \texttt{luatexja.sty} (Subsection~\ref{ssec:cfg}).
 %</en>
 %<*ja>
-\item \texttt{luatexja.cfg} を用いることによって，標準和文フォントを
-IPAexフォントから別のフォントに置き換えることができる．\ref{ssec:cfg}節を参照．
+\item 標準和文フォントやJFMをIPAexフォントから別のものに置き換えるには，
+  \cs{ltj@stdmcfont}等を\texttt{luatexja.sty}読み込み\emph{前}に定義すればよい．
+  \ref{ssec:cfg}節を参照．
 %</ja>
 
 %<*en>
@@ -1702,60 +1713,6 @@ as an external package \Pkg{luatexja-otf}.
 あるいは対応する内容を\ref{ssec:chgfnt}節，\ref{ssec:nfsspat}節 (NFSS2) や
 \ref{ssec:fontspec}節 (\Pkg{fontspec}) の方法で手動で指定する必要がある．
 %</ja>
-
-%<en>\subsection{Changing default Japanese fonts}
-%<ja>\subsection{標準和文フォントの変更}
-\label{ssec:cfg}
-%<*en>
-If \texttt{luatexja.cfg} can be seen from \LuaTeX, \LuaTeX-ja automatically reads it.
-The main use of \texttt{luatexja.cfg} is for changing default Japanese fonts,
-when IPAex fonts cannot be installed in \TeX~system.
-One should not overuse this \texttt{luatexja.cfg}; fonts which will be used in
-a document should be specified in its source.
-
-For example,
-\begin{lstlisting}
-\def\ltj@stdmcfont{IPAMincho}
-\def\ltj@stdgtfont{IPAGothic}
-\end{lstlisting}
-makes that IPA~Mincho and IPA~Gothic will be used as default Japanese fonts, instead of
-IPAex~Mincho and IPAex~Gothic.
-
-For another example, the following two lines makes that
-non-embedded fonts Ryumin-Light~and~GothicBBB-Medium as default Japanese fonts
-(as the earlier version of \LuaTeX-ja):
-\begin{lstlisting}
-\def\ltj@stdmcfont{psft:Ryumin-Light}
-\def\ltj@stdgtfont{psft:GothicBBB-Medium}
-\end{lstlisting}
-%</en>
-%<*ja>
-\LuaTeX から見える位置に \texttt{luatexja.cfg} があれば，\LuaTeX-jaはそれを読み込む．
-このファイルを用いるとplain~\TeX, \LaTeXe における標準和文フォントを
-IPAex明朝・IPAexゴシックから変更することができる．
-しかし，基本的には\emph{文章中で用いるフォントは（例えば \Pkg{luatexja-preset} などで）
-文書ソース内で指定するべき}であり，この \texttt{luatexja.cfg} は，
-「IPAexフォントがインストールできない」など，IPAexフォントが使用できない場合にのみ
-応急処置的に用いるべきである．
-
-例えば
-\begin{lstlisting}
-\def\ltj@stdmcfont{IPAMincho}
-\def\ltj@stdgtfont{IPAGothic}
-\end{lstlisting}
-と記述しておけば，標準和文フォントがIPA明朝・IPAゴシックへと変
-更される．
-
-
-なお，20140906.0以前のバージョンのように，
-Ryumin-Light, GothicBBB-Mediumという名前の非埋込フォントを用いる場合は
-\begin{lstlisting}
-\def\ltj@stdmcfont{psft:Ryumin-Light}
-\def\ltj@stdgtfont{psft:GothicBBB-Medium}
-\end{lstlisting}
-と記述すればよい．
-%</ja>
-
 
 %<en>\section{Changing Internal Parameters}
 %<ja>\section{パラメータの変更}
@@ -3815,6 +3772,77 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
 ト・縦組用和文フォントの定義が可能であったが，\LuaTeX-jaではそうでないので注意．
 %</ja>
 
+%<en>\subsection{Default Japanese fonts and JFMs}
+%<ja>\subsection{標準和文フォント・JFMの変更}
+\label{ssec:cfg}
+%<*en>
+If following commands are defined at loading \LuaTeX-ja package, these change
+default Japanese fonts and JFMs for them:
+%</en>
+%<*ja>
+\LuaTeX-jaが読み込まれる前に以下の命令が定義されていた場合は，
+それらが標準和文フォントやそれらに用いるJFMとして使われる．
+%</ja>
+
+\begin{cslist}[style=standard]
+  \item[\cs{ltj@stdmcfont}] 
+%<en>The default Japanese font for the mincho family.
+%<ja>明朝体として用いるフォント．
+  \item[\cs{ltj@stdgtfont}]
+%<en>The default Japanese font for the gothic family.
+%<ja>ゴシック体として用いるフォント．
+  \item[\cs{ltj@stdyokojfm}]
+%<en>The default JFM for horizontal direction.
+%<ja>標準で用いる横組用JFM．
+  \item[\cs{ltj@stdyokojfm}]
+%<en>The default JFM for vertical direction.
+%<ja>標準で用いる縦組用JFM．
+\end{cslist}
+
+%<*en>
+For example,
+\begin{lstlisting}
+\def\ltj@stdmcfont{IPAMincho}
+\def\ltj@stdgtfont{IPAGothic}
+\end{lstlisting}
+makes that IPA~Mincho and IPA~Gothic will be used as default Japanese fonts, instead of
+IPAex~Mincho and IPAex~Gothic.
+
+This feature is intended for classes which use special JFMs
+\footnote{This is because commands has \texttt{@} in their names.}.
+It is recommended to use \cs{luatexja-preset}~or~\cs{luatexja-fontspec} package
+to select standard fonts in ordinary \LaTeX\ sources.
+%</en>
+%<*ja>
+例えば
+\begin{lstlisting}
+\def\ltj@stdmcfont{IPAMincho}
+\def\ltj@stdgtfont{IPAGothic}
+\end{lstlisting}
+と記述しておけば，標準和文フォントがIPA明朝・IPAゴシックへと変
+更される．
+
+この機能は，特別のJFMを用いるクラス
+\footnote{例えば阿部紀行氏によるjlreqがそれにあたる．}%
+などでの使用を意図しており，命令名に\texttt{@}が含まれることから
+通常の\TeX/\LaTeX 文書での使用は意図していない．
+通常の\LaTeX 文書では\Pkg{luatexja-preset}や\Pkg{luatexja-fontspec}などで
+使用フォントを選択することを推奨する．
+%</ja>
+
+%<*en>
+For compatibility with earlier versions,
+\LuaTeX-ja reads  \texttt{luatexja.cfg} automatically if it is found by \LuaTeX.
+One should not overuse this \texttt{luatexja.cfg}; it will overwrite
+the definition of \cs{ltj@stdmcfont} and others.
+%</en>
+%<*ja>
+旧バージョンとの互換性のため，
+\LuaTeX から見える位置に\texttt{luatexja.cfg}があれば，\LuaTeX-jaはそれを読み込む．
+しかし，\texttt{luatexja.cfg}内で\cs{ltj@stdmcfont}等が定義されていた場合はそちらが
+優先されるので，もはや\texttt{luatexja.cfg}は使わないほうが良いだろう．
+%</ja>
+
 %<en>\subsection{Prefix \texttt{psft}}
 %<ja>\subsection{\texttt{psft}プリフィックス}
 \label{ssec:psft}
@@ -5059,8 +5087,6 @@ Then, the position of glyphs is shifted up by
  \frac{88x}{88x+12x} (28y+5y) - 28y = \frac{26}{25}y= 1.04y.
 \]
 \end{description}
-
-
 
 %<en>\section{Parameters}
 %<ja>\section{パラメータ}
