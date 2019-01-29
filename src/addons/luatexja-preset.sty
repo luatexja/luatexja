@@ -464,29 +464,35 @@
 
   \msg_warning:nnx { luatexja-preset }{ scale }{ \Cjascale }
 
-  \cs_new:Nn \ltj_preset_declare_font_shape:nnnnnn {
-    \DeclareFontShape{#1}{#2}{#3}{#4}{ <-> s*[\Cjascale]
+  % {1: encoding}{2: family}{3: series}{4: shape}{5: fontname}{6: feature}{7: scale}
+  \cs_new:Nn \__ltjpreset_declare_font_shape:nnnnnnn {
+    \DeclareFontShape{#1}{#2}{#3}{#4}{ <-> s*[#7]
       { \bool_if:NT \g__ltjpreset_noembed_bool {psft:} #5
     ;-kern \tl_use:N \l__ltjpreset_kanji_shape_tl; #6 } } {}
   }
-  \cs_new:Nn \ltj_preset_define_family:nnn {
-    \ltj_preset_declare_font_shape:nnnnnn { JY3 }
+  \cs_new:Nn \__ltjpreset_define_family:nnn {
+    \__ltjpreset_declare_font_shape:nnnnnnn { JY3 }
       { ltjp #1 \int_to_arabic:n { \g__ltjpreset_applycount_int }} { #2 } { n }
       { "#3" : jfm=\tl_use:N \__ltjpreset_use_jfm_yoko_tl }
       { script=hani \bool_if:NT \g__ltjpreset_expert_bool { ;+hkna } }
-    \ltj_preset_declare_font_shape:nnnnnn { JT3 }
+	  { \Cjascale }
+    \__ltjpreset_declare_font_shape:nnnnnnn { JT3 }
       { ltjp #1 \int_to_arabic:n { \g__ltjpreset_applycount_int }} { #2 } { n }
       { "#3" : jfm=\tl_use:N \__ltjpreset_use_jfm_tate_tl }
       { script=hani \bool_if:NT \g__ltjpreset_expert_bool { ;+vkna } }
+	  { \Cjascale }
     \bool_if:NT \g__ltjpreset_expert_bool {
-      \ltj_preset_declare_font_shape:nnnnnn { JY3 }
+      \__ltjpreset_declare_font_shape:nnnnnnn { JY3 }
         { ltjp #1 \int_to_arabic:n { \g__ltjpreset_applycount_int }} { #2 } { rb }
         { "#3" : jfm=\tl_use:N \__ltjpreset_use_jfm_yoko_tl } { script=kana; +ruby }
-      \ltj_preset_declare_font_shape:nnnnnn { JT3 }
+	    { \Cjascale }
+      \__ltjpreset_declare_font_shape:nnnnnnn { JT3 }
         { ltjp #1 \int_to_arabic:n { \g__ltjpreset_applycount_int }} { #2 } { rb }
         { "#3" : jfm=\tl_use:N \__ltjpreset_use_jfm_tate_tl } { script=kana; +ruby }
+	    { \Cjascale }
     }
-    \cs_if_exist_use:N \ltj_preset_define_family_hook:nnn { #1 } { #2 } { #3 }
+    \cs_if_exist:NT \ltjpreset_define_family_hook_nfssonly:nnn
+      { \ltjpreset_define_family_hook_nfssonly:nnn { #1 } { #2 } { #3 } }
   }
   \bool_if:NT \g__ltjpreset_deluxe_bool {
     \let\mgfamily\undefined
@@ -526,17 +532,17 @@
     \tl_if_eq:NNT \l__ltjpreset_kanji_shape_tl \l_tmpa_tl {
       \tl_set:Nx \l__ltjpreset_kanji_shape_tl { ;+jp04 }
     }
-    \ltj_preset_define_family:nnn {mc} {m}  {\__ltjpreset_font_mc_m:}
-    \ltj_preset_define_family:nnn {mc} {bx} {\__ltjpreset_font_mc_bx:}
-    \ltj_preset_define_family:nnn {mc} {b}  {\__ltjpreset_font_mc_bx:}
-    \ltj_preset_define_family:nnn {gt} {m}  {\__ltjpreset_font_gt_m:}
-    \ltj_preset_define_family:nnn {gt} {bx} {\__ltjpreset_font_gt_bx:}
-    \ltj_preset_define_family:nnn {gt} {b}  {\__ltjpreset_font_gt_bx:}
+    \__ltjpreset_define_family:nnn {mc} {m}  {\__ltjpreset_font_mc_m:}
+    \__ltjpreset_define_family:nnn {mc} {bx} {\__ltjpreset_font_mc_bx:}
+    \__ltjpreset_define_family:nnn {mc} {b}  {\__ltjpreset_font_mc_bx:}
+    \__ltjpreset_define_family:nnn {gt} {m}  {\__ltjpreset_font_gt_m:}
+    \__ltjpreset_define_family:nnn {gt} {bx} {\__ltjpreset_font_gt_bx:}
+    \__ltjpreset_define_family:nnn {gt} {b}  {\__ltjpreset_font_gt_bx:}
     \normalfont
     \bool_if:NT \g__ltjpreset_deluxe_bool {
-      \ltj_preset_define_family:nnn {mc}  {l} {\__ltjpreset_font_mc_l:}
-      \ltj_preset_define_family:nnn {gt}  {eb} {\__ltjpreset_font_gt_eb:}
-      \ltj_preset_define_family:nnn {mg} {m}  {\__ltjpreset_font_mg_m:}
+      \__ltjpreset_define_family:nnn {mc}  {l} {\__ltjpreset_font_mc_l:}
+      \__ltjpreset_define_family:nnn {gt}  {eb} {\__ltjpreset_font_gt_eb:}
+      \__ltjpreset_define_family:nnn {mg} {m}  {\__ltjpreset_font_mg_m:}
     }
     \group_end:
   }
@@ -568,23 +574,74 @@
         , YokoFeatures = {Style = HorizontalKana}, TateFeatures = {Style = VerticalKana}
       }
     }
+\typeout{
+      \bool_if:NT \g__ltjpreset_deluxe_bool {
+	    FontFace={l}{n}{ Font = \__ltjpreset_font_mc_l:,
+          \cs_if_exist:NT \ltjpreset_define_family_hook_fontspec:nnn {
+            \ltjpreset_define_family_hook_fontspec:nnn
+			  { mc } { l } { \__ltjpreset_font_mc_l: }
+	      }
+		},
+	  }
+      BoldFont = \__ltjpreset_font_mc_bx: \tl_use:N \l__ltjpreset_add_features_tl,
+      \cs_if_exist:NT \ltjpreset_define_family_hook_fontspec:nnn {
+		UprightFeatures = { \ltjpreset_define_family_hook_fontspec:nnn
+		  { mc } { m } { \__ltjpreset_font_mc_m: } },
+		BoldFeatures = { \ltjpreset_define_family_hook_fontspec:nnn
+		  { mc } { bx } { \__ltjpreset_font_mc_bx: } },
+	  }
+}
     \setmainjfont [
-      \bool_if:NT \g__ltjpreset_deluxe_bool { FontFace={l}{n}{\__ltjpreset_font_mc_l:}, }
-      BoldFont = \__ltjpreset_font_mc_bx: \tl_use:N \l__ltjpreset_add_features_tl
+      \bool_if:NT \g__ltjpreset_deluxe_bool {
+	    FontFace={l}{n}{ Font = \__ltjpreset_font_mc_l:,
+          \cs_if_exist:NT \ltjpreset_define_family_hook_fontspec:nnn {
+            \ltjpreset_define_family_hook_fontspec:nnn
+			  { mc } { l } { \__ltjpreset_font_mc_l: }
+	      }
+		},
+	  }
+      BoldFont = \__ltjpreset_font_mc_bx: \tl_use:N \l__ltjpreset_add_features_tl,
+      \cs_if_exist:NT \ltjpreset_define_family_hook_fontspec:nnn {
+		UprightFeatures = { \ltjpreset_define_family_hook_fontspec:nnn
+		  { mc } { m } { \__ltjpreset_font_mc_m: } },
+		BoldFeatures = { \ltjpreset_define_family_hook_fontspec:nnn
+		  { mc } { bx } { \__ltjpreset_font_mc_bx: } },
+	  }
     ] { \__ltjpreset_font_mc_m: }
     \setsansjfont [
-      \bool_if:NT \g__ltjpreset_deluxe_bool { FontFace={eb}{n}{\__ltjpreset_font_gt_eb:}, }
-      BoldFont = \__ltjpreset_font_gt_bx: \tl_use:N \l__ltjpreset_add_features_tl
+      \bool_if:NT \g__ltjpreset_deluxe_bool {
+		FontFace={eb}{n}{ Font = \__ltjpreset_font_gt_eb:,
+          \cs_if_exist:NT \ltjpreset_define_family_hook_fontspec:nnn {
+            \ltjpreset_define_family_hook_fontspec:nnn
+			  { gt } { eb } { \__ltjpreset_font_gt_eb: }
+	      }
+	    },
+	  }
+      BoldFont = \__ltjpreset_font_gt_bx: \tl_use:N \l__ltjpreset_add_features_tl,
+      \cs_if_exist:NT \ltjpreset_define_family_hook_fontspec:nnn {
+		UprightFeatures = { \ltjpreset_define_family_hook_fontspec:nnn
+		  { gt } { m } { \__ltjpreset_font_gt_m: } },
+		BoldFeatures = { \ltjpreset_define_family_hook_fontspec:nnn
+		  { gt } { bx } { \__ltjpreset_font_gt_bx: } },
+	  }
     ] { \__ltjpreset_font_gt_m: }
     \bool_if:NT \g__ltjpreset_deluxe_bool {
       %% mg
       \bool_if_exist:NTF \setfontfamily {
         \setjfontfamily \mgfamily [
-          BoldFont = \__ltjpreset_font_mg_m: \tl_use:N \l__ltjpreset_add_features_tl
+          BoldFont = \__ltjpreset_font_mg_m: \tl_use:N \l__ltjpreset_add_features_tl,
+          \cs_if_exist:NT \ltjpreset_define_family_hook_fontspec:nnn {
+		    \ltjpreset_define_family_hook_fontspec:nnn
+		      { mg } { m } { \__ltjpreset_font_mg_m: },
+          }
         ] { \__ltjpreset_font_mg_m: }
       } {
         \newjfontfamily \mgfamily [
-          BoldFont = \__ltjpreset_font_mg_m: \tl_use:N \l__ltjpreset_add_features_tl
+          BoldFont = \__ltjpreset_font_mg_m: \tl_use:N \l__ltjpreset_add_features_tl,
+          \cs_if_exist:NT \ltjpreset_define_family_hook_fontspec:nnn {
+		    \ltjpreset_define_family_hook_fontspec:nnn
+		      { mg } { m } { \__ltjpreset_font_mg_m: },
+          }
         ] { \__ltjpreset_font_mg_m: }
       }
       \DeclareTextFontCommand{\textmg}{\mgfamily}
