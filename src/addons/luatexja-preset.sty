@@ -112,21 +112,20 @@
   gt .groups:n = { preset },   gt .value_required:n = true,
   gt-m .groups:n = { preset }, gt-m .value_required:n = true,
 }
-\cs_set:Nn \g__ltjpreset_tmp_cs:n {
+\cs_set:Nn \ltjpreset_define_preset_prop:n {
   \keys_define:nn { luatexja-preset } {
     #1 .code:n = \prop_put:Non \g__ltjpreset_font_prop { #1 } { ##1 },
     #1 .groups:n = { preset }, #1 .value_required:n = true,
   }
 }
-\g__ltjpreset_tmp_cs:n { mc-l }
-\g__ltjpreset_tmp_cs:n { mc-m }
-\g__ltjpreset_tmp_cs:n { mc-bx }
-\g__ltjpreset_tmp_cs:n { gt-u }
-\g__ltjpreset_tmp_cs:n { gt-d }
-\g__ltjpreset_tmp_cs:n { gt-bx }
-\g__ltjpreset_tmp_cs:n { gt-eb}
-\g__ltjpreset_tmp_cs:n { mg-m }
-\cs_undefine:N \g__ltjpreset_tmp_cs:n
+\ltjpreset_define_preset_prop:n { mc-l }
+\ltjpreset_define_preset_prop:n { mc-m }
+\ltjpreset_define_preset_prop:n { mc-bx }
+\ltjpreset_define_preset_prop:n { gt-u }
+\ltjpreset_define_preset_prop:n { gt-d }
+\ltjpreset_define_preset_prop:n { gt-bx }
+\ltjpreset_define_preset_prop:n { gt-eb}
+\ltjpreset_define_preset_prop:n { mg-m }
 
 \cs_new:Nn \__ltjpreset_set_uni:nn {
   mc = #1, gt = #2, mc-bx = #2, mg-m = #2,
@@ -467,8 +466,8 @@
   % {1: encoding}{2: family}{3: series}{4: shape}{5: fontname}{6: feature}{7: scale}
   \cs_new:Nn \__ltjpreset_declare_font_shape:nnnnnnn {
     \DeclareFontShape{#1}{#2}{#3}{#4}{ <-> s*[#7]
-      { \bool_if:NT \g__ltjpreset_noembed_bool {psft:} #5
-    ;-kern \tl_use:N \l__ltjpreset_kanji_shape_tl; #6 } } {}
+      \bool_if:NT \g__ltjpreset_noembed_bool {psft:} #5
+      ;-kern \tl_use:N \l__ltjpreset_kanji_shape_tl; #6 } {}
   }
   \cs_new:Nn \__ltjpreset_define_family:nnn {
     \__ltjpreset_declare_font_shape:nnnnnnn { JY3 }
