@@ -675,12 +675,21 @@
 % 異なる和文 enc/fam/ser/shape からは異なるフォント番号が振られるように
 % わざと「ゴミをつける」
 \def\ltj@@patch@external@font#1 at{%
-  #1\directlua{luatexja.jfont.print_aftl_address()}\space at%
+  \directlua{
+	local s = '\luatexluaescapestring{#1}'
+	local is_braced, is_quoted
+	if s:sub(1,1)=='{' and s:sub(-1)=='}' then is_braced=true; s=s:sub(2,-2) end
+	if s:sub(1,1)=='"' and s:sub(-1)=='"' then is_quoted=true; s=s:sub(2,-2) end
+	s=s..luatexja.jfont.print_aftl_address()
+	if is_braced then s='{'..s..'}' elseif is_quoted then s='"'..s..'"' end
+	%print(s, is_quoted, is_braced)
+    tex.sprint(-2, s)}%
+  \space at%
 }
 \def\extract@jfont{%
 	\get@external@font
     \ltj@@does@alt@set{\f@encoding/\f@family/\f@series/\f@shape}{%
-      \edef\external@font{\expandafter\ltj@@patch@external@font\external@font}%
+      \edef\external@font{\expandafter\ltj@@patch@external@font\romannumeral-`0\external@font}%
     }%
     \expandafter\globaljfont\font@name\external@font\relax\font@name% ここで時間がかかる
     \csname \f@encoding+\f@family\endcsname

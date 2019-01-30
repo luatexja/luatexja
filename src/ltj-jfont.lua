@@ -661,7 +661,7 @@ do
    end
    -- EXT
    function luatexja.jfont.print_aftl_address()
-      tex.sprint(cat_lp, ';ltjaltfont' .. tostring(aftl_base):sub(8))
+      return ';ltjaltfont' .. tostring(aftl_base):sub(8)
    end
 
 -- EXT
