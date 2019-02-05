@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjdefs}[2018/10/08 Default font settings of LuaTeX-ja]
+\ProvidesPackage{lltjdefs}[2019/02/05 Default font settings of LuaTeX-ja]
 
 \ifdefined\ltj@stdmcfont\else\def\ltj@stdmcfont{IPAExMincho}\fi
 \ifdefined\ltj@stdgtfont\else\def\ltj@stdgtfont{IPAExGothic}\fi
@@ -105,7 +105,8 @@
 \ltjdefcharrange{5}{"D800-"DFFF, "E0000-"E00FF, "E01F0-"10FFFF}
 \ltjdefcharrange{6}{%
   "2460-"24FF, "2E80-"2EFF, "3000-"30FF, "3190-"319F, "31F0-"4DBF,
-  "4E00-"9FFF, "F900-"FAFF, "FE10-"FE6F, "20000-"2FFFF, "E0100-"E01EF}
+  "4E00-"9FFF, "F900-"FAFF, "FE10-"FE6F, "1B000-"1B0FF,
+  "20000-"2FFFF,"E0100-"E01EF}
 \ltjdefcharrange{7}{
   "1100-"11FF, "2F00-"2FFF, "3100-"31EF, "A000-"A4CF, "A830-"A83F,
   "AC00-"D7FF}
@@ -171,7 +172,8 @@ POSITIVE
 % Japanese
 \ltjdefcharrange{6}{%
   "2460-"24FF, "2E80-"2EFF, "3000-"30FF, "3190-"319F, "31F0-"4DBF,
-  "4E00-"9FFF, "F900-"FAFF, "FE10-"FE6F, "20000-"2FFFF, "E0100-"E01EF}
+  "4E00-"9FFF, "F900-"FAFF, "FE10-"FE6F, "20000-"2FFFF, "E0100-"E01EF
+  "1B000-"1B0FF}
 %   77  "2460-"24FF num = 150/160 name = Enclosed Alphanumerics
 %   98  "2E80-"2EFF num = 21 name = CJK Radicals Supplement
 %  101  "3000-"303F num = 144 name = CJK Symbols and Punctuation
@@ -187,6 +189,7 @@ POSITIVE
 %  147  "FE10-"FE1F num = 0/16 name = Vertical Forms
 %  149  "FE30-"FE4F num = 8/32 name = CJK Compatibility Forms
 %  150  "FE50-"FE6F num = 0/32 name = Small Form Variants
+%       "1B000-"1B0FF          name = Kana Supplement
 %  SIP
 %  "E0000-"E01EF Variation Selectors Supplement
 
