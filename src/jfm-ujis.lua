@@ -26,7 +26,8 @@ local t = {
 	 [107] = { 0, 0, 0, kanjiskip_shrink=1 },
 	 [207] = { 0, 0, 0, kanjiskip_shrink=1 },
 	 [8] = { 0, 0, 0, kanjiskip_shrink=1 },
-      }
+      },
+      kern = { [307] = 0 },	 
    },
 
    [1] = { -- 開き括弧類
@@ -193,7 +194,8 @@ local t = {
 	 [4] = { 0, 0, 0, kanjiskip_shrink=1 },
 	 [6] = { 0, 0, 0, kanjiskip_shrink=1 },
          [8] = { 0, 0, 0, kanjiskip_shrink=1 },
-      }
+      },
+      kern = { [307] = 0 },	 
    },
 
    [107] = { -- 1/3 角
@@ -215,6 +217,21 @@ local t = {
       chars = {},
       align = 'left', left = 0.0, down = 0.0,
       width = 0.25, height = 0.88, depth = 0.12, italic=0.0,
+      glue = {
+	 [1] = { 0.5 , 0.0, 0.5, ratio=1, kanjiskip_stretch=1 },
+	 [2] = { 0, 0, 0, kanjiskip_shrink=1 },
+	 [3] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+	 [4] = { 0, 0, 0, kanjiskip_shrink=1 },
+	 [6] = { 0, 0, 0, kanjiskip_shrink=1 },
+	 [207] = { 0, 0, 0, kanjiskip_shrink=1 },
+         [8] = { 0, 0, 0, kanjiskip_shrink=1 },
+      }
+   },
+
+   [307] = { -- 1/4 角
+      chars = { 0x3099, 0x309A },
+      align = 'right', left = 0.0, down = 0.0,
+      width = 0, height = 0.88, depth = 0.12, italic=0.0,
       glue = {
 	 [1] = { 0.5 , 0.0, 0.5, ratio=1, kanjiskip_stretch=1 },
 	 [2] = { 0, 0, 0, kanjiskip_shrink=1 },
