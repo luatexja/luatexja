@@ -14,7 +14,7 @@
 \ifltj@in@latex                 %<*LaTeX>
   \NeedsTeXFormat{LaTeX2e}
   \PackageWarning{ltj-plain}{Don't load this package directly; load luatexja.sty instead.}
-  \ProvidesPackage{ltj-plain}[2019/02/05]
+  \ProvidesPackage{ltj-plain}[2019/02/11]
 \fi                             %</LaTeX>
 
 %%------------------
@@ -78,17 +78,21 @@
   "2000-"243F, "2500-"27BF, "2900-"29FF, "2B00-"2BFF}
 \ltjdefcharrange{4}{%
    "500-"10FF, "1200-"1DFF, "2440-"245F, "27C0-"28FF, "2A00-"2AFF,
-  "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A82F, "A840-"ABFF, "FB00-"FE0F,
-  "FE20-"FE2F, "FE70-"FEFF, "10000-"1FFFF, "E000-"F8FF} % non-Japanese
+  "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A95F, "A980-"ABFF, "E000-"F8FF,
+  "FB00-"FE0F, "FE20-"FE2F, "FE70-"FEFF, "10000-"1AFFF, "1B170-"1F0FF,
+  "1F300-"1FFFF
+} % non-Japanese
 \ltjdefcharrange{5}{"D800-"DFFF, "E0000-"E00FF, "E01F0-"10FFFF}
 \ltjdefcharrange{6}{%
   "2460-"24FF, "2E80-"2EFF, "3000-"30FF, "3190-"319F, "31F0-"4DBF,
-  "4E00-"9FFF, "F900-"FAFF, "FE10-"FE6F, "1B000-"1B12F,
-  "20000-"2FFFF,"E0100-"E01EF}
-\ltjdefcharrange{7}{
-  "1100-"11FF, "2F00-"2FFF, "3100-"31EF, "A000-"A4CF, "A830-"A83F,
-  "AC00-"D7FF}
-\ltjdefcharrange{8}{"B4, "A8, "B1, "D7, "F7, "B0, "A7, "B6}
+  "4E00-"9FFF, "F900-"FAFF, "FE10-"FE1F, "FE30-"FE6F, "FF00-"FFEF,
+  "1B000-"1B16F, "1F100-"1F2FF, "20000-"2FFFF, "E0100-"E01EF
+}
+\ltjdefcharrange{7}{%
+  "1100-"11FF, "2F00-"2FFF, "3100-"318F, "31A0-"31EF, "A000-"A4CF,
+  "A960-"A97F, "AC00-"D7FF
+}
+\ltjdefcharrange{8}{"A7, "A8, "B0, "B1, "B4, "B6, "D7, "F7}
 \ltjsetparameter{jacharrange={-1, +2, +3, -4, -5, +6, +7, -8}}
 
 \directlua{for x=128,255 do luatexja.math.is_math_letters[x] = true end}
