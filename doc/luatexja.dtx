@@ -892,7 +892,7 @@ and finally delete the temporary directory.
 %<*en>
 \item The following 12~Japanese fonts are preloaded:
 \begin{center}\small
-\begin{tabular}{cccccc}
+\begin{tabular}{llllll}
 \toprule
 \textbf{direction}&
 \textbf{classification}&\textbf{font name}&\bfseries ``10\,pt''&\bfseries ``7\,pt''&\bfseries ``5\,pt''\\\midrule
@@ -910,16 +910,16 @@ and finally delete the temporary directory.
 %<*ja>
 \item 以下の12個の和文フォントが定義される：
 \begin{center}\small
-\begin{tabular}{cccccc}
+\begin{tabular}{llllll}
 \toprule
 \emph{組方向}&\emph{字体}&\emph{フォント名}&\bfseries``10\,pt''&\bfseries``7\,pt''&\bfseries``5\,pt''\\\midrule
-\smash{\raisebox{-1ex}{横組}}&
+\smash{\raisebox{-0.7\zh}{横組}}&
 明朝体&IPAex明朝&\cs{tenmin}&\cs{sevenmin}&\cs{fivemin}\\
-&ゴシック体&IPAexゴシック&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
+&\textgt{ゴシック体}&IPAexゴシック&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
 \midrule
-\smash{\raisebox{-1ex}{縦組}}&
+\smash{\raisebox{-0.7\zh}{縦組}}&
 明朝体&IPAex明朝&\cs{tentmin}&\cs{seventmin}&\cs{fivetmin}\\
-&ゴシック体&IPAexゴシック&\cs{tentgt} &\cs{seventgt} &\cs{fivetgt}\\
+&\textgt{ゴシック体}&IPAexゴシック&\cs{tentgt} &\cs{seventgt} &\cs{fivetgt}\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1014,7 +1014,7 @@ plfonts.dtx} and \texttt{pldefs.ltx}).
 \item
 By default, the following fonts are used for these two families.
 \begin{center}\small
-\begin{tabular}{ccccc}
+\begin{tabular}{lllll}
 \toprule
 \textbf{classification}&\textbf{family}&\cs{mdseries}&\cs{bfseries}&\textbf{scale}\\\midrule
 \emph{mincho} (明朝体)&\tt mc&IPAex Mincho&IPAex Gothic&0.962216\\
@@ -1029,7 +1029,7 @@ By default, the following fonts are used for these two families.
 %<*ja>
 \item \pLaTeX と同様に，標準では「明朝体」「ゴシック体」の2種類を用いる：
 \begin{center}\small
-\begin{tabular}{cllc}
+\begin{tabular}{llll}
 \toprule
 \emph{字体}&&&\emph{ファミリ名}\\\midrule
 明朝体&\verb+\textmc{...}+&\verb+{\mcfamily ...}+&\cs{mcdefault}\\
@@ -1040,11 +1040,11 @@ By default, the following fonts are used for these two families.
   \newpage
 \item 標準では，次のフォントが用いられる：
 \begin{center}\small
-\begin{tabular}{ccccc}
+\begin{tabular}{lllll}
 \toprule
 \emph{字体}&\emph{ファミリ}&\cs{mdseries}&\cs{bfseries}&\emph{スケール}\\\midrule
 明朝体&\tt mc&IPAex明朝&IPAexゴシック&0.962216\\
-ゴシック体&\tt gt&IPAexゴシック&IPAexゴシック&0.962216\\
+\textgt{ゴシック体}&\tt gt&IPAexゴシック&IPAexゴシック&0.962216\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1280,7 +1280,7 @@ For \LaTeXe, \LuaTeX-ja adopted most of the font selection system of \pLaTeXe\ (
 
 %<*en>
 \begin{center}\small
-\begin{tabular}{cccccc}
+\begin{tabular}{llllll}
 \toprule
 &\textbf{encoding}&\textbf{family}&\textbf{series}&\textbf{shape}&\textbf{selection}\\\midrule
 alphabetic fonts
@@ -1297,17 +1297,17 @@ auto select&\cs{fontencoding}&\cs{fontfamily}&---&---&\cs{usefont}\\
 %</en>
 %<*ja>
 \begin{center}\small
-\begin{tabular}{cccccc}
+\begin{tabular}{llllll}
 \toprule
 &\emph{エンコーディング}&\emph{ファミリ}&\emph{シリーズ}&\emph{シェープ}&\emph{選択}\\\midrule
-欧文
+\emph{欧文}
 &\cs{romanencoding}&\cs{romanfamily}&\cs{romanseries}&\cs{romanshape}
 &\cs{useroman}\\
-和文
+\emph{和文}
 &\cs{kanjiencoding}&\cs{kanjifamily}&\cs{kanjiseries}&\cs{kanjishape}
 &\cs{usekanji}\\
-両方&---&--&\cs{fontseries}&\cs{fontshape}&---\\
-自動選択&\cs{fontencoding}&\cs{fontfamily}&---&---&\cs{usefont}\\
+\emph{両方}&---&--&\cs{fontseries}&\cs{fontshape}&---\\
+\emph{自動選択}&\cs{fontencoding}&\cs{fontfamily}&---&---&\cs{usefont}\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1514,21 +1514,21 @@ alphabetic fonts
 \caption{\Pkg{luatexja-fontspec}で定義される命令}\label{tab:ltj_fntspc}
 \medskip
 {\centering\small
-\begin{tabular}{cllll}
+\begin{tabular}{lllll}
 \toprule
-和文
+\emph{和文}
 &\cs{jfontspec}&\cs{setmainjfont}&\cs{setsansjfont}&\cs{setmonojfont}$^*$\\
-欧文
+\emph{欧文}
 &\cs{fontspec}&\cs{setmainfont}&\cs{setsansfont}&\cs{setmonofont}\\
 \midrule
-和文
+\emph{和文}
 &\cs{newjfontfamily}&\cs{renewjfontfamily}$^{**}$&\cs{setjfontfamily}$^{**}$\\
-欧文
+\emph{欧文}
 &\cs{newfontfamily}&\cs{renewfontfamily}$^{**}$&\cs{setfontfamily}$^{**}$\\
 \midrule
-和文
+\emph{和文}
 &\cs{newjfontface}&\cs{defaultjfontfeatures}&\cs{addjfontfeatures}\\
-欧文
+\emph{欧文}
 &\cs{newfontface}&\cs{defaultfontfeatures}&\cs{addfontfeatures}\\
 \bottomrule
 \end{tabular}\par}
@@ -1818,8 +1818,8 @@ determined from the following data:
 これらは以下のデータに基づいて決定している．
 %</ja>
 \begin{itemize}
-%<en>\item Blocks in Unicode~6.0.
-%<ja>\item Unicode~6.0のブロック．
+%<en>\item Blocks in Unicode~11.0.
+%<ja>\item Unicode~11.0のブロック．
 %<en>\item The \texttt{Adobe-Japan1-UCS2} mapping between a CID Adobe-Japan1-6 and Unicode.
 %<ja>\item Adobe-Japan1-6のCIDとUnicodeの間の対応表\texttt{Adobe-Japan1-UCS2}．
 %<en>\item The \Pkg{PXbase} bundle for \upTeX\ by Takayuki Yato.
@@ -1919,7 +1919,7 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 %<ja>\caption{文字範囲3に指定されているUnicodeブロック．}
 \label{tab:rng3}
 \catcode`\"=13\def"#1#2#3#4{\texttt{U+#1#2#3#4}}%"
-\centering\small
+\centering\footnotesize
 \begin{tabular}{llll}
 "2000--"206F&General Punctuation&
 "2070--"209F&Superscripts and Subscripts\\
@@ -1937,8 +1937,8 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 "2600--"26FF&Miscellaneous Symbols\\
 "2700--"27BF&Dingbats&
 "2900--"297F&Supplemental Arrows-B\\
-"2980--"29FF&Misc.\ Mathematical Symbols-B&
-"2B00--"2BFF&Miscellaneous Symbols and Arrows
+"2980--"29FF&Misc.\ Math Symbols-B&
+"2B00--"2BFF&Misc.\ Symbols and Arrows
 \end{tabular}
 \end{table}
 %<*en>
@@ -1956,8 +1956,10 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 \begin{lstlisting}
 \ltjdefcharrange{4}{%
    "500-"10FF, "1200-"1DFF, "2440-"245F, "27C0-"28FF, "2A00-"2AFF,
-  "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A82F, "A840-"ABFF, "FB00-"FE0F,
-  "FE20-"FE2F, "FE70-"FEFF, "10000-"1FFFF, "E000-"F8FF} % non-Japanese
+  "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A95F, "A980-"ABFF, "E000-"F8FF,
+  "FB00-"FE0F, "FE20-"FE2F, "FE70-"FEFF, "10000-"1AFFF, "1B170-"1F0FF,
+  "1F300-"1FFFF
+} % non-Japanese
 \end{lstlisting}
 %<en>\item[Range~5${}^{\text{A}}$] Surrogates and Supplementary Private Use Areas.
 %<ja>\item[範囲5${}^{\text{A}}$] 代用符号と補助私用領域．
@@ -1968,7 +1970,7 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 %<ja>\caption{文字範囲6に指定されているUnicodeブロック．}
 \label{tab:rng6}
 \catcode`\"=13\def"#1#2#3#4{\texttt{U+#1#2#3#4}}%"
-\centering\small
+\centering\footnotesize
 \begin{tabular}{llll}
 "2460--"24FF&Enclosed Alphanumerics&
 "2E80--"2EFF&CJK Radicals Supplement\\
@@ -1979,14 +1981,20 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 "31F0--"31FF&Katakana Phonetic Extensions&
 "3200--"32FF&Enclosed CJK Letters and Months\\
 "3300--"33FF&CJK Compatibility&
-"3400--"4DBF&CJK Unified Ideographs Extension A\\
+"3400--"4DBF&CJK Unified Ideographs Ext-A\\
 "4E00--"9FFF&CJK Unified Ideographs&
 "F900--"FAFF&CJK Compatibility Ideographs\\
 "FE10--"FE1F&Vertical Forms&
 "FE30--"FE4F&CJK Compatibility Forms\\
 "FE50--"FE6F&Small Form Variants&
-"{20}000--"{2F}FFF&(Supplementary Ideographic Plane)\\
-"{E0}100--"{E0}1EF&Variation Selectors Supplement
+"FF00--"FFEF&Halfwidth and Fullwidth Forms\\
+"{1B}000--"{1B}0FF&Kana Supplement&
+"{1B}100--"{1B}12F&Kana Extended-A\\
+%"{1B}130--"{1B}16F&Small Kana Extension
+"{1F}100--"{1F}1FF&Enclosed Alphanumeric Supp.&
+"{1F}200--"{1F}2FF&Enclosed Ideographic Supp.\\
+"{20}000--"{2F}FFF&(Supp. Ideographic Plane)&
+"{E0}100--"{E0}1EF&Variation Selectors Supp.
 \end{tabular}
 \end{table}
 %<*en>
@@ -2014,7 +2022,7 @@ The block list is indicated in \autoref{tab:rng7}.
 "31C0--"31EF&CJK Strokes&
 "A000--"A48F&Yi Syllables\\
 "A490--"A4CF&Yi Radicals&
-"A830--"A83F&Common Indic Number Forms\\
+"A960--"A97F&Hangul Jamo Extended-A\\
 "AC00--"D7AF&Hangul Syllables&
 "D7B0--"D7FF&Hangul Jamo Extended-B
 \end{tabular}
@@ -2459,7 +2467,7 @@ For the detail, see \autoref{tab:kcat}.
 %<en>\medskip
 
 \noindent\hfill
-\begin{tabular}{ccccc}
+\begin{tabular}{llccc}
 \toprule
 \bfseries \cs{kcatcode}&
 %<*en>
@@ -2623,8 +2631,8 @@ for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
   {\large\char"#1#2#3#4}}\ (\texttt{U+#1#2#3#4})} %"
 \leavevmode\hbox to 0pt{\hss\begin{tabular}{cccccc}
 \toprule
-%<en>&\bf row&\bf col.&\bf \pTeX&\bf \upTeX&\bf\LuaTeX-ja\\
-%<ja>&\bf 区&\bf 点&\bf \pTeX&\bf \upTeX&\fontseries{b}\selectfont\LuaTeX-ja\\
+%<en>&\textbf{row}&\textbf{col.}&\textbf{\pTeX}&\textbf{\upTeX}&\textbf{\LuaTeX-ja}\\
+%<ja>&\emph{区}&\emph{点}&\emph{\pTeX}&\emph{\upTeX}&\emph{\LuaTeX-ja}\\
 \midrule
 %\D 3000&1&1&N&N&Y\\
 \D 30FB&1&6&N&Y&N\\
@@ -2650,8 +2658,8 @@ for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 \end{tabular}\qquad
 \begin{tabular}{cccccc}
 \toprule
-%<en>&\bf row&\bf col.&\bf \pTeX&\bf \upTeX&\bf\LuaTeX-ja\\
-%<ja>&\bf 区&\bf 点&\bf \pTeX&\bf \upTeX&\fontseries{b}\selectfont\LuaTeX-ja\\
+%<en>&\textbf{row}&\textbf{col.}&\textbf{\pTeX}&\textbf{\upTeX}&\textbf{\LuaTeX-ja}\\
+%<ja>&\emph{区}&\emph{点}&\emph{\pTeX}&\emph{\upTeX}&\emph{\LuaTeX-ja}\\
 \midrule
 \D FF5C&1&35&N&N&Y\\
 \D FF0B&1&60&N&N&Y\\
@@ -10300,19 +10308,37 @@ For illustration, we introduce following classes of characters:
 直前が和文文字であるかを示すフラグ \verb+\lst@ifkanji+ を新たに導入した．
 以降，説明のために以下のように文字を分類する：
 %</ja>
+%<*ja>
 \begin{center}
 \small
-\begin{tabular}{lccccc}
+\begin{tabular}{llllll}
 \toprule
-&Letter&Other&Kanji&Open&Close\\\midrule
+&\emph{Letter}&\emph{Other}&\emph{Kanji}&\emph{Open}&\emph{Close}\\\midrule
 \verb+\lst@ifletter+&T&F&T&F&T\\
 \verb+\lst@ifkanji+&F&F&T&T&F\\
-%<en>Meaning&char in an identifier&other alphabet&%
-%<en>most of Japanese char&opening brackets&closing brackets\\
-%<ja>意図&識別子中の文字&その他欧文文字&殆どの和文文字&開き括弧類&閉じ括弧類\\
+\emph{意図}&識別子中の文字&その他欧文文字&殆どの和文文字&開き括弧類&閉じ括弧類\\
 \bottomrule
 \end{tabular}
 \end{center}
+%</ja>
+%<*en>
+\begin{center}
+\small
+\begin{tabular}{llll}
+\toprule
+&\textbf{Letter}&\textbf{Other}&\\\midrule
+\verb+\lst@ifletter+&T&F&\\
+\verb+\lst@ifkanji+&F&F&\\
+\textbf{Meaning}&char in an identifier&other alphabet&\\
+  \midrule
+&\textbf{Kanji}&\textbf{Open}&\textbf{Close}\\\midrule
+\verb+\lst@ifletter+&T&F&T\\
+\verb+\lst@ifkanji+&T&T&F\\
+\textbf{Meaning}&most of Japanese char&opening brackets&closing brackets\\
+\bottomrule
+\end{tabular}
+\end{center}
+%</en>
 %<*en>
 Note that \textit{digits} in the \Pkg{listings} package can be Letter or
 Other according to circumstances.
@@ -10344,27 +10370,27 @@ The following table summarizes $5\times 5=25$ cases:
 %</ja>
 \begin{center}
 \small
-\begin{tabular}{llccccc}
+\begin{tabular}{lllllll}
 \toprule
 %<*en>
-&&\multicolumn{4}{c}{Next}\\\cmidrule(lr){3-7}
-&&\hbox to 4em{\hss Letter\hss}&\hbox to 4em{\hss Other\hss}
-&\hbox to 4em{\hss Kanji\hss}&\hbox to 4em{\hss Open\hss}&Close\\\midrule
+&&\multicolumn{4}{c}{\textbf{Next}}\\\cmidrule(lr){3-7}
+&&\hbox to 4em{Letter\hss}&\hbox to 4em{Other\hss}
+&\hbox to 4em{Kanji\hss}&\hbox to 4em{Open\hss}&Close\\\midrule
 &Letter&collects&\multicolumn{3}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
 &Other&outputs&collects&\multicolumn{2}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
-Prev&Kanji&\multicolumn{4}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
+\textbf{Prev}&Kanji&\multicolumn{4}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
 &Open&\multicolumn{5}{c}{\hrulefill \ collects\ \hrulefill}\\
 &Close&\multicolumn{4}{c}{\hrulefill \ outputs\ \hrulefill}&collects\\
 %</en>
 %<*ja>
-&&\multicolumn{4}{c}{後ろ側の文字}\\\cmidrule(lr){3-7}
-&&\hbox to 4em{\hss Letter\hss}&\hbox to 4em{\hss Other\hss}
-&\hbox to 4em{\hss Kanji\hss}&\hbox to 4em{\hss Open\hss}&Close\\\midrule
-直&Letter&収集&\multicolumn{3}{c}{\hrulefill \ 出力\ \hrulefill}&収集\\
-前&Other&出力&収集&\multicolumn{2}{c}{\hrulefill \ 出力\ \hrulefill}&収集\\
-文&Kanji&\multicolumn{4}{c}{\hrulefill \ 出力\ \hrulefill}&収集\\
-字&Open&\multicolumn{5}{c}{\hrulefill \ 収集\ \hrulefill}\\
-種&Close&\multicolumn{4}{c}{\hrulefill \ 出力\ \hrulefill}&収集\\
+&&\multicolumn{4}{c}{\textbf{後側文字種}}\\\cmidrule(lr){3-7}
+&&\hbox to 4em{Letter\hss}&\hbox to 4em{Other\hss}
+&\hbox to 4em{Kanji\hss}&\hbox to 4em{Open\hss}&Close\\\midrule
+\emph{直}&Letter&収集&\multicolumn{3}{c}{\hrulefill \ 出力\ \hrulefill}&収集\\
+\emph{前}&Other&出力&収集&\multicolumn{2}{c}{\hrulefill \ 出力\ \hrulefill}&収集\\
+\emph{文}&Kanji&\multicolumn{4}{c}{\hrulefill \ 出力\ \hrulefill}&収集\\
+\emph{字}&Open&\multicolumn{5}{c}{\hrulefill \ 収集\ \hrulefill}\\
+\emph{種}&Close&\multicolumn{4}{c}{\hrulefill \ 出力\ \hrulefill}&収集\\
 %</ja>
 \bottomrule
 \end{tabular}
