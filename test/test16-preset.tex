@@ -1,13 +1,43 @@
 %#!lualatex test16-preset && pdffonts test16-preset.pdf
 \documentclass{ltjtarticle}
 \makeatletter
-\let\ltj@orig@DeclareFontShape@=\DeclareFontShape@
-\def\DeclareFontShape@#1#2#3#4#5#6{%
-      \immediate\typeout{DFS |#1|#2|#3|#4|#5|#6|}%
-      \ltj@orig@DeclareFontShape@{#1}{#2}{#3}{#4}{#5}{#6}%
-      }
-\makeatother
-\usepackage[deluxe,expert,jis2004, match,nfssonly]{luatexja-preset}
+%\let\ltj@orig@DeclareFontShape@=\DeclareFontShape@
+%\def\DeclareFontShape@#1#2#3#4#5#6{%
+%      \immediate\typeout{DFS |#1|#2|#3|#4|#5|#6|}%
+%      \ltj@orig@DeclareFontShape@{#1}{#2}{#3}{#4}{#5}{#6}%
+%      }
+\usepackage[deluxe,expert,jis2004, match]{luatexja-preset}
+
+\ExplSyntaxOn
+\cs_new:Nn \__my_ltjpreset_kana_color: {FF00FF}
+\cs_new:Nn \__my_ltjpreset_kana_range: {"30A0-"30AF}
+\cs_new:Nn \ltjpreset_define_family_hook_nfssonly:nnn
+{
+    \__ltjpreset_declare_font_shape:nnnnnnn { JY3 }
+      { ltjp #1 \int_to_arabic:n { \g__ltjpreset_applycount_int }} { #2 } { nk }
+      { "#3" : jfm=\tl_use:N \__ltjpreset_use_jfm_yoko_tl }
+      { script=hani \bool_if:NT \g__ltjpreset_expert_bool { ;+hkna }
+		; color=\__my_ltjpreset_kana_color: }
+      { \Cjascale }
+    \DeclareAlternateKanjiFont
+      { JY3 } { ltjp #1 \int_to_arabic:n { \g__ltjpreset_applycount_int }} { #2 } { n }
+      { JY3 } { ltjp #1 \int_to_arabic:n { \g__ltjpreset_applycount_int }} { #2 } { nk }
+      { \__my_ltjpreset_kana_range: }
+    \__ltjpreset_declare_font_shape:nnnnnnn { JT3 }
+      { ltjp #1 \int_to_arabic:n { \g__ltjpreset_applycount_int }} { #2 } { nk }
+      { "#3" : jfm=\tl_use:N \__ltjpreset_use_jfm_tate_tl }
+      { script=hani \bool_if:NT \g__ltjpreset_expert_bool { ;+vkna }
+		; color=\__my_ltjpreset_kana_color: }
+      { \Cjascale }
+    \DeclareAlternateKanjiFont
+      { JT3 } { ltjp #1 \int_to_arabic:n { \g__ltjpreset_applycount_int }} { #2 } { n }
+      { JT3 } { ltjp #1 \int_to_arabic:n { \g__ltjpreset_applycount_int }} { #2 } { nk }
+      { \__my_ltjpreset_kana_range: }
+}
+\cs_new:Nn \ltjpreset_define_family_hook_fontspec:nnn {
+    AltFont={ { Range=\__my_ltjpreset_kana_range:, Color=\__my_ltjpreset_kana_color: } }
+}
+\ExplSyntaxOff
 \ltjnewpreset{mc}{} % error
 \ltjnewpreset{kozuka-pro}{} % error
 
@@ -18,8 +48,10 @@
   mc=SourceHanSerif-Regular,
   mc-l=SourceHanSerif-Bold,
   mc-m=KozMinPr6N-Regular,
-  mg-m=HGSeikaishotaiPRO,
+  mg-m=KozMinPr6N-Light,
 }
+
+\makeatother
 
 \ltjapplypreset{hoge}
 \begin{document}
@@ -27,8 +59,8 @@
 \def\r#1#2{ \csname #1family \endcsname \csname #2series \endcsname
   %\addjfontfeature {CJKShape=JIS1983}
   {\romanfamily{\ttdefault}\selectfont<\k@family><\k@series><\k@shape>}\\
-  {\tt#1, #2\ \ \ \ \ }: あーいうえおabc漢字，あ！い，辻ぁが\\
-  {\tt#1, #2 (rb)}: {\rubyfamily あーいうえおabc漢字，あ！い，辻ぁが}
+  {\tt#1, #2\ \ \ \ \ }: あーいうえおabcアイ漢字，あ！い，辻ぁが\\
+  {\tt#1, #2 (rb)}: {\rubyfamily あーいうえおabcアイ漢字，あ！い，辻ぁが}
 }
 \@namedef{..series}{\relax}
 
@@ -61,5 +93,12 @@ $あいう\mathgt{あいう}$
 
 \normalfont
 {あいうえおabc \sf あいうえおabc}
+
+\newpage
+あーいうえおabc漢字，あ！い，辻ぁが\\
+{\fontseries{bx}\selectfont あーいうえおabc漢字，あ！い，辻ぁが}\\
+{\fontseries{b}\selectfont あーいうえおabc漢字，あ！い，辻ぁが}
+
+\bfdefault
 
 \end{document}
