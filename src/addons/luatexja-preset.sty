@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2019/01/29 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2019/02/25 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -573,23 +573,6 @@
         , YokoFeatures = {Style = HorizontalKana}, TateFeatures = {Style = VerticalKana}
       }
     }
-\typeout{
-      \bool_if:NT \g__ltjpreset_deluxe_bool {
-	    FontFace={l}{n}{ Font = \__ltjpreset_font_mc_l:,
-          \cs_if_exist:NT \ltjpreset_define_family_hook_fontspec:nnn {
-            \ltjpreset_define_family_hook_fontspec:nnn
-			  { mc } { l } { \__ltjpreset_font_mc_l: }
-	      }
-		},
-	  }
-      BoldFont = \__ltjpreset_font_mc_bx: \tl_use:N \l__ltjpreset_add_features_tl,
-      \cs_if_exist:NT \ltjpreset_define_family_hook_fontspec:nnn {
-		UprightFeatures = { \ltjpreset_define_family_hook_fontspec:nnn
-		  { mc } { m } { \__ltjpreset_font_mc_m: } },
-		BoldFeatures = { \ltjpreset_define_family_hook_fontspec:nnn
-		  { mc } { bx } { \__ltjpreset_font_mc_bx: } },
-	  }
-}
     \setmainjfont [
       \bool_if:NT \g__ltjpreset_deluxe_bool {
 	    FontFace={l}{n}{ Font = \__ltjpreset_font_mc_l:,
