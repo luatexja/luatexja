@@ -743,12 +743,15 @@
 
 \let\ltj@@al@getanddefine@fonts=\getanddefine@fonts
 \def\ltj@@ja@getanddefine@fonts#1#2{%
+  \let\if@ltj@tempif\ifltjselectfont@force@define
+  \ltjselectfont@force@definetrue
   \xdef\font@name{\csname \string#2/\tf@size\endcsname}%
   \pickup@jfont\let\textfont@name\font@name
   \xdef\font@name{\csname \string#2/\sf@size\endcsname}%
   \pickup@jfont\let\scriptfont@name\font@name
   \xdef\font@name{\csname \string#2/\ssf@size\endcsname}%
   \pickup@jfont
+  \let\ifltjselectfont@force@define\if@ltj@tempif
   \edef\math@fonts{\math@fonts\ltj@setpar@global%
     \ltj@@set@stackfont#1,\textfont@name:{MJT}%
     \ltj@@set@stackfont#1,\scriptfont@name:{MJS}%
