@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec}[2019/01/28 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec}[2019/03/20 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e,luatexja}
 \ExplSyntaxOn
 
@@ -29,8 +29,10 @@
 
 \RequirePackage{fontspec}[2017/01/01]% v2.5c
 \@ifpackagelater{fontspec}{2018/07/29}%
-  {\RequirePackage{luatexja-fontspec-26h}}% v2.6h
-  {\RequirePackage{luatexja-fontspec-25c}}% v2.5c
+  {\@ifpackagelater{fontspec}{2019/03/15}%
+    {\RequirePackage{luatexja-fontspec-27c}} % v2.7c
+    {\RequirePackage{luatexja-fontspec-26h}}}% v2.6h
+  {\RequirePackage{luatexja-fontspec-25c}}   % v2.5c
 
 \ExplSyntaxOff
 %%%%%%%% Now we completely ignore kanjifont definition file.

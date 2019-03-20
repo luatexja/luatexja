@@ -689,7 +689,7 @@
 \def\extract@jfont{%
 	\get@external@font
     \ltj@@does@alt@set{\f@encoding/\f@family/\f@series/\f@shape}{%
-      \edef\external@font{\expandafter\ltj@@patch@external@font\romannumeral-`0\external@font}%
+      \edef\external@font{\expandafter\ltj@@patch@external@font\external@font}%
     }%
     \expandafter\globaljfont\font@name\external@font\relax\font@name% ここで時間がかかる
     \csname \f@encoding+\f@family\endcsname
