@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2019/02/25 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2019/03/26 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -192,6 +192,13 @@
 }
 
 % モリサワ
+\ltjpreset_declare_preset:nx{bizud}{
+    mc =   BIZ-UDMinchoM.ttc,
+    gt-d = BIZ-UDGothicR.ttc, gt-bx = BIZ-UDGothicB.ttc,
+    gt-u = BIZ-UDGothicR.ttc, gt-eb = BIZ-UDGothicB.ttc,
+    mg-m = BIZ-UDGothicB.ttc,
+    __custom = false, __office = false, __noembed = false,
+}
 \ltjpreset_declare_preset:nx{morisawa-pro}{
     mc =   A-OTF-RyuminPro-Light.otf,      mc-bx = A-OTF-FutoMinA101Pro-Bold.otf,
     gt-d = A-OTF-GothicBBBPro-Medium.otf , gt-bx = A-OTF-FutoGoB101Pro-Bold.otf,
