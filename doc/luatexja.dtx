@@ -1656,7 +1656,7 @@ The following presets are defined:
   \hyphenchar\font=-1 \exhyphenchar=-1
   hiragino-pro, hiragino-pron, ipa, ipa-hg, ipaex, ipaex-hg,
   kozuka-pr6, kozuka-pr6n, kozuka-pro, moga-mobo, moga-mobo-ex,
-  morisawa-pr6n, morisawa-pro, ms, ms-hg, noembed, noto-otc, noto-otf,
+  bizud, morisawa-pr6n, morisawa-pro, ms, ms-hg, noembed, noto-otc, noto-otf,
   sourcehan, sourcehan-jp, ume, yu-osx, yu-win, yu-win10
 \end{quote}
 
@@ -7804,13 +7804,13 @@ We didn't taken account of when more than one options among them are specified.
 \label{sssec:ltjpreset-multi}
 
 %<*en>
-Besides \texttt{morisawa-pro}~and~\texttt{morisawa-pr6n} presets,
+Besides \texttt{bizud}, \texttt{morisawa-pro},~and~\texttt{morisawa-pr6n} presets,
 fonts are specified by font name, not by file name.
 In following tables, starred fonts (e.g.~KozGo\dots-Regular) are used for medium series of \textit{gothic},
 \emph{if and only if \texttt{deluxe} option is specified}.
 %</en>
 %<*ja>
-\texttt{morisawa-pro}, \texttt{morisawa-pr6n}以外はフォントの指定は
+\texttt{bizud}, \texttt{morisawa-pro}, \texttt{morisawa-pr6n}以外はフォントの指定は
 （ファイル名でなく）フォント名で行われる．
 以下の表において，*\,つきのフォント(e.g.,~KozGo\dots-Regular)は，\emph{\texttt{deluxe}オプション指定時に}
 ゴシック体中字として用いられるものを示している．
@@ -7857,7 +7857,6 @@ There is not rounded gothic family in Kozuka fonts.
 \end{tabular}
 \end{center}
 
-%<en>\newpage
  \item[hiragino-pro]  Hiragino Pro (Adobe-Japan1-5) fonts.
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[hiragino-pron] Hiragino ProN (Adobe-Japan1-5, JIS04-savvy) fonts.
@@ -7903,6 +7902,34 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \bottomrule
 \end{tabular}
 \end{center}
+
+%<ja>\newpage
+\item[bizud] BIZ UD fonts (by Morisawa Inc.) bundled with
+  Windows~10 October 2018 Update.
+\begin{center}\small
+\begin{tabular}{ll>{\ttfamily}l}
+\toprule
+\textbf{family}&\textbf{series}\\
+\midrule
+%<en>\textit{mincho}
+%<ja>\textgt{明朝}%
+ &&BIZ-UDMinchoM.ttc\\
+\midrule
+ &medium&BIZ-UDGothicR.ttc\\
+\cmidrule(l){2-3}
+%<en>\textit{gothic}%
+%<ja>\gt ゴシック
+ &bold&BIZ-UDGothicB.ttc\\
+ &extra bold&BIZ-UDGothicB.ttc\\
+\midrule
+%<en>\textit{rounded gothic}
+%<ja>\gt 丸ゴシック
+&&BIZ-UDGothicB.ttc\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+%<en>\newpage
 
  \item[morisawa-pro]  Morisawa Pro (Adobe-Japan1-4) fonts.
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
@@ -8022,6 +8049,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{tabular}
 \end{center}
 
+%<en>\newpage
  \item[sourcehan]  Source Han Serif and Source Han Sans fonts (Language-specific OTF \textit{or} OTC)
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[sourcehan-jp]  Source Han Serif JP and Source Han Sans JP fonts (Region-specific Subset OTF)
