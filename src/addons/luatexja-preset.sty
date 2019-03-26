@@ -424,12 +424,31 @@
   }
 }
 
+%%%%%%%% フォント名を \l__ltjpreset_font_name: に格納
+\clist_new:N \l__ltjpreset_extensions_clist
+\clist_set:Nn \l__ltjpreset_extensions_clist {.otf,.ttf,.OTF,.TTF,.ttc,.TTC}
+\prg_new_conditional:Nnn \__ltjpreset_if_detect_external:n {TF} {
+  \clist_map_inline:Nn \l__ltjpreset_extensions_clist {
+    \bool_set_false:N \l_tmpa_bool
+    \tl_if_in:nnT {#1 <= end_of_string} {##1 <= end_of_string}
+      { \bool_set_true:N \l_tmpa_bool \clist_map_break: }
+  }
+  \bool_if:NTF \l_tmpa_bool \prg_return_true: \prg_return_false:
+}
+\cs_new:Nn \__ltjpreset_wrap_fontname:n {
+  \__ltjpreset_if_detect_external:nTF { #1 }
+    { \cs_set:Nn \l__ltjpreset_font_name: { [#1] } }
+    { \cs_set:Nn \l__ltjpreset_font_name: { "#1" } }
+}
+\cs_generate_variant:Nn \__ltjpreset_wrap_fontname:n { e }
+
 %%%%%%%% 存在判定
 \cs_new:Nn \__ltjpreset_substitute:nnnn {
   \group_begin:
     \suppressfontnotfounderror=1
     \cs_if_exist:cT {ltjpreset_font_#1_#2:} {
-      \font \g__ltjpreset_font_test: = "\cs:w ltjpreset_font_#1_#2: \cs_end:"\relax
+	  \__ltjpreset_wrap_fontname:e { \cs:w ltjpreset_font_#1_#2: \cs_end: }
+      \font \g__ltjpreset_font_test: = \l__preset_font_name:\relax
       \ifx \g__ltjpreset_font_test: \nullfont
         \msg_warning:nnxxxx { luatexja-preset }{ no-font }
           { \cs:w ltjpreset_font_#1_#2: \cs_end: }{ #1/#2 }
@@ -477,24 +496,25 @@
       ;-kern \tl_use:N \l__ltjpreset_kanji_shape_tl; #6 } {}
   }
   \cs_new:Nn \__ltjpreset_define_family:nnn {
+	\__ltjpreset_wrap_fontname:e { #3 }
     \__ltjpreset_declare_font_shape:nnnnnnn { JY3 }
       { ltjp #1 \int_to_arabic:n { \g__ltjpreset_applycount_int }} { #2 } { n }
-      { "#3" : jfm=\tl_use:N \__ltjpreset_use_jfm_yoko_tl }
+      { \l__ltjpreset_font_name: : jfm=\tl_use:N \__ltjpreset_use_jfm_yoko_tl }
       { script=hani \bool_if:NT \g__ltjpreset_expert_bool { ;+hkna } }
 	  { \Cjascale }
     \__ltjpreset_declare_font_shape:nnnnnnn { JT3 }
       { ltjp #1 \int_to_arabic:n { \g__ltjpreset_applycount_int }} { #2 } { n }
-      { "#3" : jfm=\tl_use:N \__ltjpreset_use_jfm_tate_tl }
+      { \l__ltjpreset_font_name:  : jfm=\tl_use:N \__ltjpreset_use_jfm_tate_tl }
       { script=hani \bool_if:NT \g__ltjpreset_expert_bool { ;+vkna } }
 	  { \Cjascale }
     \bool_if:NT \g__ltjpreset_expert_bool {
       \__ltjpreset_declare_font_shape:nnnnnnn { JY3 }
         { ltjp #1 \int_to_arabic:n { \g__ltjpreset_applycount_int }} { #2 } { rb }
-        { "#3" : jfm=\tl_use:N \__ltjpreset_use_jfm_yoko_tl } { script=kana; +ruby }
+        { \l__ltjpreset_font_name:  : jfm=\tl_use:N \__ltjpreset_use_jfm_yoko_tl } { script=kana; +ruby }
 	    { \Cjascale }
       \__ltjpreset_declare_font_shape:nnnnnnn { JT3 }
         { ltjp #1 \int_to_arabic:n { \g__ltjpreset_applycount_int }} { #2 } { rb }
-        { "#3" : jfm=\tl_use:N \__ltjpreset_use_jfm_tate_tl } { script=kana; +ruby }
+        { \l__ltjpreset_font_name:  : jfm=\tl_use:N \__ltjpreset_use_jfm_tate_tl } { script=kana; +ruby }
 	    { \Cjascale }
     }
     \cs_if_exist:NT \ltjpreset_define_family_hook_nfssonly:nnn
