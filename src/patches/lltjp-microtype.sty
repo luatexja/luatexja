@@ -1,0 +1,19 @@
+%
+% lltjp-microtype.sty 2019-03-28
+%
+% (Work in Progress)
+% 
+\NeedsTeXFormat{LaTeX2e}
+
+\RequirePackage{etoolbox}
+\RequirePackage{luatexja}
+\makeatletter
+
+\def\MT@register@font{%
+  \xdef\MT@font@list{\expandonce{\MT@font@list}\MT@font,}%
+}
+\def\MT@register@subst@font{\MT@exp@one@n\MT@in@clist\font@name\MT@font@list
+  \ifMT@inlist@\else
+	\xdef\MT@font@list{\expandonce{\MT@font@list}\font@name,}%
+  \fi}
+\endinput
