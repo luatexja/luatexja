@@ -1,5 +1,5 @@
 %
-% lltjp-microtype.sty 2019-03-28
+% lltjp-microtype.sty 2019-03-29
 %
 % (Work in Progress)
 % 
@@ -16,4 +16,39 @@
   \ifMT@inlist@\else
 	\xdef\MT@font@list{\expandonce{\MT@font@list}\font@name,}%
   \fi}
+
+%\endinput
+\begingroup
+  \catcode`\/=\z@
+  /MT@map@tlist@n{/\LτJCHAREX}/@makeother /lccode`/τ=`/t
+  /lowercase{%
+    /def/x{/endgroup
+      /def/MT@is@char##1\CHAR"##2##3##4/relax{%
+		%/message{MIC <##1><##2><##3><##4>}%
+        /ifx/relax##4/relax
+            /expandafter/MT@is@char@ltja/MT@strip@prefix##1/relax\LτJALCHAR\LτJALCHAR/relax
+        /else
+          /ifx/relax##1/relax
+            /if##3\/relax
+              /edef/MT@char@{/number"##2}%
+              /MT@ifstreq/MT@charstring{##3##4}/relax/MT@norestfalse
+            /else
+              /edef/MT@char@{/number"##2##3}%
+              /MT@ifstreq/MT@charstring{##4}/relax
+                {/MT@is@xchar##2##3|##4\CHAR"/relax}%
+            /fi
+          /fi
+        /fi
+      }%
+      /def/MT@is@char@ltja##1\LτJALCHAR##2\LτJALCHAR##3/relax{%
+        /ifx/relax##1/relax
+          /ifx/relax##2/relax/else
+            /edef/MT@char@{/number##2}%
+          /fi
+        /fi
+      }%
+    }%
+  }
+/x
+
 \endinput

@@ -1,0 +1,30 @@
+\documentclass{article}
+\usepackage{luatexja}
+\usepackage[factor=2000]{microtype}
+\usepackage{etoolbox}
+\makeatletter
+\SetProtrusion{ encoding=TU, font = */*/*/*/normalsize}{
+  %\char"DF={0,0},
+  \'A={800,200}, \ss={1000,100}
+}
+\textwidth10mm
+%\tracingnone
+\begin{document}
+\parindent0pt
+
+\leavevmode
+\smash{\vrule  depth 1000pt width .125mm}
+\hfill
+\smash{\vrule  depth 1000pt width .125mm}
+
+A
+
+\'A\hfill \'A
+
+Á\hfill Á
+
+\ss\hfill \ss
+
+ß\hfill ß
+
+\end{document}
