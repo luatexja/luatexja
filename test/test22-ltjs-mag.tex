@@ -1,10 +1,13 @@
-\batchmode\directlua{
+\batchmode
+%\loggingall
+\directlua{
   luatexbase.module_warning=function()end
 }
 \ifdefined\fsize\else\def\fsize{10pt}\fi
-\edef\head{\noexpand\documentclass[\fsize,xreal]{ltjsarticle}}
-\head\usepackage[OT1]{fontenc}\def\rmdefault{cmr}
-\usepackage{type1cm}\normalfont\noralsize
+\edef\head{\noexpand\documentclass[\fsize,nomag*]{ltjsarticle}}
+\head%\listfiles
+\usepackage{type1cm}\usepackage[OT1]{fontenc}
+\def\rmdefault{cmr}
 \makeatletter
 \let\ltj@selectfont@patch\relax
 \newcount\cI\newcount\cF\newdimen\szd
@@ -23,8 +26,8 @@
     \expandafter\S@\@tempa\@nil
   }%
 }
-\def\js@setfontsize#1#2#3{%
-  \edef\Fsize{\the\dimexpr\directlua{tex.sprint(#2*\js@magscale)}pt}%
+\def\ltjs@setfontsize#1#2#3{%
+  \edef\Fsize{\the\dimexpr\directlua{tex.sprint(#2*\jsc@magscale)}pt}%
   \@setfontsize#1{#2\jsc@mpt}{#3\jsc@mpt}}
 \def\R#1{{%
   #1\message{^^J\string#1: \fontname\font\space (ideal: \Fsize)}%
@@ -36,7 +39,7 @@
     \expandafter\T@\romannumeral-`0\fontname\font
   }%
   \ifnum\count@=#2\else
-    \typeout{@FAIL: #1\string\jsc@mpt\space selects cmr\the\count@
+    \typeout{@FAIL: #1\string\ljsc@mpt\space selects cmr\the\count@
     \space(should be cmr#2)}\szd=1pt%
   \fi
 }
