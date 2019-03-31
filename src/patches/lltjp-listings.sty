@@ -196,6 +196,9 @@
   \expandafter\expandafter\expandafter\lst@InsideConvert%
   \expandafter{\the\@temptokena}\lst@arg\lst@DeInit\egroup}
 
+%%%%%%%%%%%%%%%% \lstMakeShortInline
+\patchcmd\lstMakeShortInline@{\lst@shortinlinedef#1}{\lst@shortinlinedef~}{}{}
+
 % We redefine \lst@BeginDropInput, since now we have
 % two additional `process macros'.
 \def\lst@BeginDropInput#1{%
