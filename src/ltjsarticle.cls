@@ -1621,27 +1621,43 @@ class has defined the old font commands like\MessageBreak
 \newcommand{\tablename}{\if@english Table~\else 表\fi}
 \newcommand{\appendixname}{\if@english \else 付録\fi}
 \newcommand{\abstractname}{\if@english Abstract\else 概要\fi}
+%% |ltjarticle| などと違って，標準を西暦にし，余分な空白が入らないように改良しました。
 \newif\if西暦 \西暦true
 \def\西暦{\西暦true}
 \def\和暦{\西暦false}
-\newcount\heisei \heisei\year \advance\heisei-1988\relax
+\def\pltx@today@year@#1{%
+  \ifnum\numexpr\year-#1=1 元\else
+\ifnum\ltjgetparameter{direction}=3 \kansuji\numexpr\year-#1\relax
+\else \number\numexpr\year-#1\relax\nobreak\fi
+  \fi 年
+}
+\def\pltx@today@year{%
+  \ifnum\numexpr\year*10000+\month*100+\day<19890108
+昭和\pltx@today@year@{1925}%
+  \else\ifnum\numexpr\year*10000+\month*100+\day<20190501
+平成\pltx@today@year@{1988}%
+  \else
+令和\pltx@today@year@{2018}%
+  \fi\fi}
 \def\today{%
   \if@english
     \ifcase\month\or
       January\or February\or March\or April\or May\or June\or
       July\or August\or September\or October\or November\or December\fi
       \space\number\day, \number\year
+  \else\if西暦
+    \ifnum\ltjgetparameter{direction}=3 \kansuji\year
+\else\number\year\nobreak\fi 年
   \else
-    \if西暦
-      \number\year 年
-      \number\month 月
-      \number\day 日
-    \else
-      平成\number\heisei 年
-      \number\month 月
-      \number\day 日
-    \fi
-  \fi}
+\pltx@today@year
+  \fi
+  \ifnum\ltjgetparameter{direction}=3
+\kansuji\month 月
+    \kansuji\day 日
+  \else
+    \number\month\nobreak 月
+    \number\day\nobreak 日
+  \fi\fi}
 \hyphenation{ado-be post-script ghost-script phe-nom-e-no-log-i-cal man-u-script}
 \if@slide \pagestyle{empty} \else \pagestyle{plain} \fi
 \pagenumbering{arabic}

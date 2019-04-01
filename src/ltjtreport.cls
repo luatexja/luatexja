@@ -910,7 +910,7 @@
   \else\ifnum\numexpr\year*10000+\month*100+\day<20190501
 平成\pltx@today@year@{1988}%
   \else
-〓〓\pltx@today@year@{2018}%
+令和\pltx@today@year@{2018}%
   \fi\fi}
 \def\today{{%
   \if西暦
