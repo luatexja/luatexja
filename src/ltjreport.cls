@@ -886,7 +886,7 @@
 \def\pltx@today@year@#1{%
   \ifnum\numexpr\year-#1=1 元\else
 \ifnum\ltjgetparameter{direction}=3 \kansuji\numexpr\year-#1\relax
-\else \number\numexpr\year-#1\relax\fi
+\else \number\numexpr\year-#1\relax\nobreak\fi
   \fi 年
 }
 \def\pltx@today@year{%
@@ -899,7 +899,8 @@
   \fi\fi}
 \def\today{{%
   \if西暦
-    \ifnum\ltjgetparameter{direction}=3 \kansuji\year\else\number\year\fi 年
+    \ifnum\ltjgetparameter{direction}=3 \kansuji\year
+\else\number\year\nobreak\fi 年
   \else
 \pltx@today@year
   \fi
@@ -907,8 +908,8 @@
 \kansuji\month 月
     \kansuji\day 日
   \else
-    \number\month~月
-    \number\day~日
+    \number\month\nobreak 月
+    \number\day\nobreak 日
   \fi}}
 \newcommand{\prepartname}{第}
 \newcommand{\postpartname}{部}
