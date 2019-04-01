@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.charrange',
-  date = '2018/02/18',
+  date = '2019/04/01',
   description = 'Handling the range of Japanese characters',
 })
 luatexja.charrange = {}
@@ -18,21 +18,20 @@ local ATTR_RANGE = 7
 luatexja.charrange.ATTR_RANGE = ATTR_RANGE
 local jcr_cjk, jcr_noncjk = 0, 1
 local floor = math.floor
-local pow = math.pow
 local kcat_attr_table = {}
 local pow_table = {}
 local fn_table = {} -- used in is_ucs_in_japanese_char_direct
 local nfn_table = {} -- used in is_ucs_in_japanese_char_node
 for i = 0, 31*ATTR_RANGE-1 do
-   local ka, pw = luatexbase.attributes['ltj@kcat'..floor(i/31)], 1/pow(2, i%31)
+   local ka, pw = luatexbase.attributes['ltj@kcat'..floor(i/31)], 1/(2^(i%31))
    local jcr_noncjk = jcr_noncjk
-   kcat_attr_table[i], pow_table[i] = ka, pow(2, i%31)
+   kcat_attr_table[i], pow_table[i] = ka, 2^(i%31)
    fn_table[i] = function(p) return floor(has_attr(p, ka)*pw)%2 ~= jcr_noncjk end
    nfn_table[i] = function(p) return floor(has_attr_node(p, ka)*pw)%2 ~= jcr_noncjk end
 end
 fn_table[-1] = function() return false end -- for char --U+007F
 nfn_table[-1] = function() return false end -- for char --U+007F
-pow_table[31*ATTR_RANGE] = pow(2, 31)
+pow_table[31*ATTR_RANGE] = 2^31
 
 -- jcr_table_main[chr_code] = index
 -- index : internal 0,   1, 2, ..., 216               0: 'other'
