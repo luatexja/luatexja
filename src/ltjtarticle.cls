@@ -799,28 +799,32 @@
 \newif\if西暦 \西暦true
 \def\西暦{\西暦true}
 \def\和暦{\西暦false}
-\newcount\heisei \heisei\year \advance\heisei-1988\relax
-\def\today{{%
-  \ifnum\ltjgetparameter{direction}=3
-    \if西暦
-      \kansuji\year 年
-      \kansuji\month 月
-      \kansuji\day 日
-    \else
-      平成\ifnum\heisei=1 元年\else\kansuji\heisei 年\fi
-      \kansuji\month 月
-      \kansuji\day 日
-    \fi
+\def\pltx@today@year@#1{%
+  \ifnum\numexpr\year-#1=1 元\else
+\ifnum\ltjgetparameter{direction}=3 \kansuji\numexpr\year-#1\relax
+\else \number\numexpr\year-#1\relax\fi
+  \fi 年
+}
+\def\pltx@today@year{%
+  \ifnum\numexpr\year*10000+\month*100+\day<19890108
+昭和\pltx@today@year@{1925}%
+  \else\ifnum\numexpr\year*10000+\month*100+\day<20190501
+平成\pltx@today@year@{1988}%
   \else
-    \if西暦
-      \number\year~年
-      \number\month~月
-      \number\day~日
-    \else
-      平成\ifnum\heisei=1 元年\else\number\heisei~年\fi
-      \number\month~月
-      \number\day~日
-    \fi
+〓〓\pltx@today@year@{2018}%
+  \fi\fi}
+\def\today{{%
+  \if西暦
+    \ifnum\ltjgetparameter{direction}=3 \kansuji\year\else\number\year\fi 年
+  \else
+\pltx@today@year
+  \fi
+  \ifnum\ltjgetparameter{direction}=3
+\kansuji\month 月
+    \kansuji\day 日
+  \else
+    \number\month~月
+    \number\day~日
   \fi}}
 \newcommand{\prepartname}{第}
 \newcommand{\postpartname}{部}

@@ -117,6 +117,7 @@
 % \changes{v1.7h}{2018/02/04}{和文スケール値\cs{Cjascale}を定義}
 % \changes{v1.8}{2018/07/03}{\cs{today}のデフォルトを和暦から西暦に変更}
 % \changes{v1.8-ltj-16}{2018/10/08}{Lua\TeX-jaが|disablejfam|オプションをサポートしたことによる変更}
+% \changes{v1.8-ltj-17}{2019/04/01}{新元号の処理}
 % \fi
 %
 % \iffalse
@@ -4471,43 +4472,39 @@
 % \end{macro}
 % \EnableCrossrefs
 %
-% \begin{macro}{\heisei}
-% \changes{v1.1m}{1998/04/07}{\cs{today}の計算手順を変更}
-% |\today|コマンドを|\rightmark|で指定したとき、|\rightmark|を出力する部分
-% で和暦のための計算ができないので、クラスファイルを読み込む時点で計算して
-% おきます。
-%    \begin{macrocode}
-\newcount\heisei \heisei\year \advance\heisei-1988\relax
-%    \end{macrocode}
-% \end{macro}
-%
+% \changes{v1.8-ltj-17} |\heisei|は削除．
 % \begin{macro}{\today}
 % 縦組の場合は、漢数字で出力します。
 %
 % \changes{v1.6-ltj-9}{2015/01/01}{縦組では，この漢数字による日付出力でエラーになりました．
 % Lua\TeX-ja では，\cs{kansuji}の後に\cs{number}を続けることは出来ないので\cs{number}を削除しました．}
 %    \begin{macrocode}
+\def\pltx@today@year@#1{%
+  \ifnum\numexpr\year-#1=1 元\else
+	\ifnum\ltjgetparameter{direction}=3 \kansuji\numexpr\year-#1\relax
+	\else \number\numexpr\year-#1\relax\fi
+  \fi 年
+}
+\def\pltx@today@year{%
+  \ifnum\numexpr\year*10000+\month*100+\day<19890108
+	昭和\pltx@today@year@{1925}%
+  \else\ifnum\numexpr\year*10000+\month*100+\day<20190501
+	平成\pltx@today@year@{1988}%
+  \else 
+	〓〓\pltx@today@year@{2018}%
+  \fi\fi}
 \def\today{{%
-  \ifnum\ltjgetparameter{direction}=3
-    \if西暦
-      \kansuji\year 年
-      \kansuji\month 月
-      \kansuji\day 日
-    \else
-      平成\ifnum\heisei=1 元年\else\kansuji\heisei 年\fi
-      \kansuji\month 月
-      \kansuji\day 日
-    \fi
+  \if西暦
+    \ifnum\ltjgetparameter{direction}=3 \kansuji\year\else\number\year\fi 年
   \else
-    \if西暦
-      \number\year~年
-      \number\month~月
-      \number\day~日
-    \else
-      平成\ifnum\heisei=1 元年\else\number\heisei~年\fi
-      \number\month~月
-      \number\day~日
-    \fi
+	\pltx@today@year
+  \fi
+  \ifnum\ltjgetparameter{direction}=3
+	\kansuji\month 月
+    \kansuji\day 日
+  \else
+    \number\month~月
+    \number\day~日
   \fi}}
 %    \end{macrocode}
 % \end{macro}
