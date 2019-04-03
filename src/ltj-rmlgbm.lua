@@ -5,12 +5,12 @@ luatexja.load_module('base');      local ltjb = luatexja.base
 
 local cidfont_data = {}
 local cache_chars = {}
-local cache_ver = 7
+local cache_ver = 8
 local identifiers = fonts.hashes.identifiers
 
 local cid_reg, cid_order, cid_supp, cid_name
 local cid_replace = {
-   ["Adobe-Japan1"] = {"UniJIS2004-UTF32", 23057, 6,
+   ["Adobe-Japan1"] = {"UniJIS2004-UTF32", 23059, 7,
 		       function (i)
 			  if (231<=i and i<=632) or (8718<=i and i<=8719)
 		             or (12063<=i and i<=12087) then
@@ -35,11 +35,15 @@ local cid_replace = {
 			     return 327680 -- 655360/2
 			  end
 		       end},
-   ["Adobe-CNS1"]   = {"UniCNS-UTF32", 19155, 6,
+   ["Adobe-CNS1"]   = {"UniCNS-UTF32", 19178, 7,
 		       function (i)
 			  if (13648<=i and i<=13742) or (i==17603) then
 			     return 327680 -- 655360/2
 			  end
+		       end},
+   ["Adobe-KR"] = {"UniAKR-UTF32", 22896, 9,
+		       function (i)
+                         -- ??
 		       end},
 }
 
