@@ -43,7 +43,13 @@ local cid_replace = {
 		       end},
    ["Adobe-KR"] = {"UniAKR-UTF32", 22896, 9,
 		       function (i)
-                         -- ??
+			  if i==3057 then
+			     return 655360*2
+			  elseif i==3058 then
+			     return 655360*3
+			  elseif i==12235 or i==12236 then
+			     return 163840 -- 655360/4
+			  end
 		       end},
 }
 
