@@ -120,7 +120,8 @@ do
          cidinfo.ordering ~= "Japan1" and
          cidinfo.ordering ~= "GB1" and
          cidinfo.ordering ~= "CNS1" and
-         cidinfo.ordering ~= "Korea1" then
+         cidinfo.ordering ~= "Korea1" and
+         cidinfo.ordering ~= "KR" then
          --      ltjb.package_warning('luatexja-otf',
          --			   'Current Japanese font (or other CJK font) "'
          --			      ..curjfnt.psname..'" is not a CID-Keyed font (Adobe-Japan1 etc.)')

@@ -98,18 +98,21 @@ do
    end
 
    local function open_cmap_file(name, inc, cid_dec, mke)
-      fh = io.open(kpse.find_file(name, 'cmap files'), "r")
-      line = fh:read("*l")
-      while line do
-         if string.find(line, "%x+%s+begin...?char") then
-            load_cid_char(cid_dec, mke)
-         elseif string.find(line, "%x+%s+begin...?range") then
-            load_cid_range(inc, cid_dec, mke)
-         else
-            line = fh:read("*l")
+      local fn = kpse.find_file(name, 'cmap files')
+      if fn then
+         local fh = io.open(fn, "r")
+         line = fh:read("*l")
+         while line do
+            if string.find(line, "%x+%s+begin...?char") then
+               load_cid_char(cid_dec, mke)
+            elseif string.find(line, "%x+%s+begin...?range") then
+               load_cid_range(inc, cid_dec, mke)
+            else
+               line = fh:read("*l")
+            end
          end
+         fh:close();
       end
-      fh:close();
    end
 
    local function increment(a) return a+1 end
@@ -362,7 +365,7 @@ local function font_callback(name, size, id, fallback)
    if name:sub(1,1)=="{" and name:sub(-1)=="}" then name = name:sub(2,-2) end
    local p = name:find(":") or 0
    if name:sub(1, p-1) == 'psft' then
-      local s = "Adobe-Japan1-6"
+      local s = "Adobe-Japan1-7"
       local basename = name:sub(p+1)
       local p = basename:find(":")
       local q = basename:find("/[BI][BI]?")
