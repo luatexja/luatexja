@@ -21,9 +21,10 @@
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
 %% File: ltjclasses.dtx
+
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjtreport}
-  [2018/10/08 v1.8-ltj-16
+  [2019/04/06 v1.8b-ltj-16
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -788,7 +789,7 @@
 \def\addcontentsline#1#2#3{%
   \protected@write\@auxout
     {\let\label\@gobble \let\index\@gobble \let\glossary\@gobble
-\@temptokena{\rensuji{\thepage}}}%
+     \@temptokena{\rensuji{\thepage}}}%
     {\string\@writefile{#1}%
        {\protect\contentsline{#2}{#3}{\the\@temptokena}%
 \protected@file@percent}}%
@@ -898,29 +899,33 @@
 \newif\if西暦 \西暦true
 \def\西暦{\西暦true}
 \def\和暦{\西暦false}
+\newcount\heisei \heisei\year \advance\heisei-1988\relax
 \def\pltx@today@year@#1{%
   \ifnum\numexpr\year-#1=1 元\else
-\ifnum\ltjgetparameter{direction}=3 \kansuji\numexpr\year-#1\relax
-\else \number\numexpr\year-#1\relax\nobreak\fi
+    \ifnum\ltjgetparameter{direction}=3
+      \kansuji\numexpr\year-#1\relax
+    \else
+      \number\numexpr\year-#1\relax\nobreak
+    \fi
   \fi 年
 }
 \def\pltx@today@year{%
   \ifnum\numexpr\year*10000+\month*100+\day<19890108
-昭和\pltx@today@year@{1925}%
+    昭和\pltx@today@year@{1925}%
   \else\ifnum\numexpr\year*10000+\month*100+\day<20190501
-平成\pltx@today@year@{1988}%
+    平成\pltx@today@year@{1988}%
   \else
-令和\pltx@today@year@{2018}%
+    令和\pltx@today@year@{2018}%
   \fi\fi}
 \def\today{{%
   \if西暦
     \ifnum\ltjgetparameter{direction}=3 \kansuji\year
-\else\number\year\nobreak\fi 年
+    \else\number\year\nobreak\fi 年
   \else
-\pltx@today@year
+    \pltx@today@year
   \fi
   \ifnum\ltjgetparameter{direction}=3
-\kansuji\month 月
+    \kansuji\month 月
     \kansuji\day 日
   \else
     \number\month\nobreak 月

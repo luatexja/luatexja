@@ -117,7 +117,10 @@
 % \changes{v1.7h}{2018/02/04}{和文スケール値\cs{Cjascale}を定義}
 % \changes{v1.8}{2018/07/03}{\cs{today}のデフォルトを和暦から西暦に変更}
 % \changes{v1.8-ltj-16}{2018/10/08}{Lua\TeX-jaが|disablejfam|オプションをサポートしたことによる変更}
-% \changes{v1.8-ltj-17}{2019/04/01}{新元号の処理}
+% \changes{v1.8a}{2018/10/25}{ファイル書き出し時の行末文字対策
+%    (sync with ltsect.dtx 2018/09/26 v1.1c)}
+% \changes{v1.8b}{2019/04/02}{新元号対応}
+
 % \fi
 %
 % \iffalse
@@ -147,7 +150,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2018/10/08 v1.8-ltj-16
+  [2019/04/06 v1.8b-ltj-16
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -163,6 +166,7 @@
 \else
   \usepackage[kozuka-pr6n,nfssonly]{luatexja-preset}
 \fi
+\def\pLaTeX{p\kern-.05em\LaTeX}
 \usepackage[unicode]{hyperref}
 \title{Lua\LaTeX-ja用\texttt{jclasses}互換クラス}
 \author{Lua\TeX-jaプロジェクト}
@@ -4076,13 +4080,15 @@
 % ^^A このコマンドによる影響はありません。
 %
 % このマクロは\file{ltsect.dtx}で定義されています。
+% \changes{v1.8a}{2018/10/25}{ファイル書き出し時の行末文字対策
+%    (sync with ltsect.dtx 2018/09/26 v1.1c)}
 %    \begin{macrocode}
 \providecommand*\protected@file@percent{}
 \def\addcontentsline#1#2#3{%
   \protected@write\@auxout
     {\let\label\@gobble \let\index\@gobble \let\glossary\@gobble
-%<tate>\@temptokena{\rensuji{\thepage}}}%
-%<yoko>\@temptokena{\thepage}}%
+%<tate>     \@temptokena{\rensuji{\thepage}}}%
+%<yoko>     \@temptokena{\thepage}}%
     {\string\@writefile{#1}%
        {\protect\contentsline{#2}{#3}{\the\@temptokena}%
 		\protected@file@percent}}%
@@ -4472,42 +4478,60 @@
 % \end{macro}
 % \EnableCrossrefs
 %
-% \changes{v1.8-ltj-17} |\heisei|は削除．
+% \begin{macro}{\heisei}
+% \changes{v1.1m}{1998/04/07}{\cs{today}の計算手順を変更}
+% \changes{v1.8b}{2019/04/02}{\cs{heisei}の値は$\mbox{西暦}-1988$で固定}
+% |\today|コマンドを|\rightmark|で指定したとき、|\rightmark|を出力する部分
+% で和暦のための計算ができないので、クラスファイルを読み込む時点で計算して
+% おきます。
+%    \begin{macrocode}
+\newcount\heisei \heisei\year \advance\heisei-1988\relax
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\today}
+% \begin{macro}{\pltx@today@year}
 % 縦組の場合は、漢数字で出力します。
+% \pLaTeX\ 2018-12-01以前では縦数式ディレクション時でも漢数字で出力していましたが、
+% \pLaTeX\ 2019-04-06以降からはそうしなくなりました。
 %
 % \changes{v1.6-ltj-9}{2015/01/01}{縦組では，この漢数字による日付出力でエラーになりました．
 % Lua\TeX-ja では，\cs{kansuji}の後に\cs{number}を続けることは出来ないので\cs{number}を削除しました．}
+% \changes{v1.8b}{2019/04/02}{\cs{today}の計算・出力方法を変更。}
 %    \begin{macrocode}
 \def\pltx@today@year@#1{%
   \ifnum\numexpr\year-#1=1 元\else
-	\ifnum\ltjgetparameter{direction}=3 \kansuji\numexpr\year-#1\relax
-	\else \number\numexpr\year-#1\relax\nobreak\fi
+    \ifnum\ltjgetparameter{direction}=3
+      \kansuji\numexpr\year-#1\relax
+    \else
+      \number\numexpr\year-#1\relax\nobreak
+    \fi
   \fi 年
 }
 \def\pltx@today@year{%
   \ifnum\numexpr\year*10000+\month*100+\day<19890108
-	昭和\pltx@today@year@{1925}%
+    昭和\pltx@today@year@{1925}%
   \else\ifnum\numexpr\year*10000+\month*100+\day<20190501
-	平成\pltx@today@year@{1988}%
+    平成\pltx@today@year@{1988}%
   \else 
-	令和\pltx@today@year@{2018}%
+    令和\pltx@today@year@{2018}%
   \fi\fi}
 \def\today{{%
   \if西暦
     \ifnum\ltjgetparameter{direction}=3 \kansuji\year
-	\else\number\year\nobreak\fi 年
+    \else\number\year\nobreak\fi 年
   \else
-	\pltx@today@year
+    \pltx@today@year
   \fi
   \ifnum\ltjgetparameter{direction}=3
-	\kansuji\month 月
+    \kansuji\month 月
     \kansuji\day 日
   \else
     \number\month\nobreak 月
     \number\day\nobreak 日
   \fi}}
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 %

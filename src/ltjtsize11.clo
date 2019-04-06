@@ -21,9 +21,10 @@
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
 %% File: ltjclasses.dtx
+
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesFile{ltjtsize11.clo}
-  [2018/10/08 v1.8-ltj-16
+  [2019/04/06 v1.8b-ltj-16
   Standard LuaLaTeX-ja file (size option)]
 \renewcommand{\normalsize}{%
     \@setfontsize\normalsize\@xipt{17}%
