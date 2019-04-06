@@ -3894,22 +3894,22 @@ Identity-Hとなり，PDFの標準規格ISO32000-1:2008~(\cite{pdfstd})に非準
 
 %<*en>
 The default font defined by using \texttt{psft:} prefix is for Japanese typesetting;
-it is Adobe-Japan1-6 CID-keyed font.
+it is Adobe-Japan1-7 CID-keyed font.
 One can specify \texttt{cid} key to use other CID-keyed non-embedded fonts
 for Chinese or Korean typesetting.
 %</en>
 %<*ja>
 標準で\texttt{psft:}プリフィックスで定義されるフォントは日本語用のもので
-あり，Adobe-Japan1-6のCIDに対応したものとなる．しかし，\LuaTeX-jaは中国語
+あり，Adobe-Japan1-7のCIDに対応したものとなる．しかし，\LuaTeX-jaは中国語
 の組版にも威力を発揮することが分かり，日本語フォントでない非埋込フォント
 の対応も必要となった．そのために追加されたのが\texttt{cid}キーである．
 
 \texttt{cid}キーに値を指定すると，そのCIDを持った非埋込フォントを定義することができる：
 %</ja>
 \begin{lstlisting}[numbers=left]
-\jfont\testJ={psft:Ryumin-Light:cid=Adobe-Japan1-6;jfm=jis}     % Japanese
-\jfont\testD={psft:Ryumin-Light:jfm=jis}                        % default value is Adobe-Japan1-6
-\jfont\testC={psft:AdobeMingStd-Light:cid=Adobe-CNS1-6;jfm=jis} % Traditional Chinese
+\jfont\testJ={psft:Ryumin-Light:cid=Adobe-Japan1-7;jfm=jis}     % Japanese
+\jfont\testD={psft:Ryumin-Light:jfm=jis}                        % default value is Adobe-Japan1-7
+\jfont\testC={psft:AdobeMingStd-Light:cid=Adobe-CNS1-7;jfm=jis} % Traditional Chinese
 \jfont\testG={psft:SimSun:cid=Adobe-GB1-5;jfm=jis}              % Simplified Chinese
 \jfont\testK={psft:Batang:cid=Adobe-Korea1-2;jfm=jis}           % Korean
 \end{lstlisting}
@@ -6868,13 +6868,14 @@ commands:
 \item[\cs{CID}\{<number>\}]
 %<*en>
 Typeset a glyph whose CID number is <number>.
-If the Japanese font is neither Adobe-Japan1,~Adobe-GB1, Adobe-CNS1,~nor~Adobe-Korea1 CID-keyed font,
+If the Japanese font is neither Adobe-Japan1,~Adobe-GB1, Adobe-CNS1,
+Adobe-Korea1,~nor~Adobe-KR CID-keyed font,
 \LuaTeX-ja treats that <number> is a CID number of Adobe-Japan1 character collection,
 and tries to typeset a ``most suitable glyph''.
 %</en>
 %<*ja>
 CID番号が<number>の文字を出力する．
-もし現在の和文フォントがAdobe-Japan1,~Adobe-GB1, Adobe-CNS1,~Adobe-Korea1の
+もし現在の和文フォントがAdobe-Japan1,~Adobe-GB1, Adobe-CNS1, Adobe-Korea1,~Adobe-KRの
   いずれのCID-keyed fontでもない場合，<number>はAdobe-Japan1のCID番号であると解釈し
   「適切なグリフ」\footnote{%
   例えばフォントにIVDコレクションAdobe-Japan1が含まれていれば，その情報を用いて
@@ -10816,6 +10817,7 @@ The following is the structure of the that table.
 \midrule
 Adobe-Japan1-*&ltj-cid-auto-adobe-japan1.lua&UniJIS2004-UTF32-*&Adobe-Japan1-UCS2\\
 Adobe-Korea1-*&ltj-cid-auto-adobe-korea1.lua&UniKS-UTF32-*&Adobe-Korea1-UCS2\\
+Adobe-KR-*&ltj-cid-auto-adobe-kr.lua&UniAKR-UTF32-*&Adobe-KR-UCS2\\
 Adobe-GB1-*&ltj-cid-auto-adobe-gb1.lua&UniGB-UTF32-*&Adobe-GB1-UCS2\\
 Adobe-CNS1-*&ltj-cid-auto-adobe-cns1.lua&UniCNS-UTF32-*&Adobe-CNS1-UCS2\\
 \bottomrule
