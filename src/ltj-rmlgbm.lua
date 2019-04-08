@@ -100,7 +100,7 @@ do
    local function open_cmap_file(name, inc, cid_dec, mke)
       local fn = kpse.find_file(name, 'cmap files')
       if fn then
-         local fh = io.open(fn, "r")
+         fh = io.open(fn, "r")
          line = fh:read("*l")
          while line do
             if string.find(line, "%x+%s+begin...?char") then
