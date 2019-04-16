@@ -132,15 +132,19 @@
    { \fontspec_visible_space_fallback: }
  }
 
-\def\verb
- {
-  \relax\ifmmode\hbox\else\leavevmode\fi % same as lltjcore
-  \bgroup
-    \verb@eol@error \let\do\@makeother \dospecials
-    \verbatim@font\@noligs
-    \@ifstar\__fontspecsverb\@verb
- }
-
+\AtBeginDocument{
+  \cs_if_exist:NF \verbvisiblespace {
+    % >= LaTeX2e <2018-12-01> does not need the following patch
+    \def\verb
+    {
+      \relax\ifmmode\hbox\else\leavevmode\fi % same as lltjcore
+      \bgroup
+        \verb@eol@error \let\do\@makeother \dospecials
+        \verbatim@font\@noligs
+        \@ifstar\__fontspecsverb\@verb
+    }
+  }
+}
 \cs_set:Npn \emshape { \gtfamily \itshape }
 \cs_set:Npn \eminnershape { \mcfamily \upshape }
 
