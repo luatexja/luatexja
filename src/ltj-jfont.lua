@@ -1092,23 +1092,24 @@ do
      [0x300A]=0xFE3D, [0x300B]=0xFE3E, [0x3008]=0xFE3F, [0x3009]=0xFE40,
      [0x300C]=0xFE41, [0x300D]=0xFE42, [0x300E]=0xFE43, [0x300F]=0xFE44,
      [0xFF3B]=0xFE47, [0xFF3D]=0xFE48, 
-     [-0xFF0C]=0xFE11, [-0xFF0E]=0xFE12,
-     [-0x201C]=0x301D, [-0x201D]=0x301F,
   }
-  local abs = math.abs
+  local vert_jpotf_table = {
+     [0xFF0C]=0xFE11, [0xFF0E]=0xFE12,
+     [0x201C]=0x301D, [0x201D]=0x301F,
+  }
   local function add_vform(coverage, vform, ft, add_vert, jpotf_vert)
-     if type(coverage)~='table' then return end
-     for i,v in pairs(vert_form_table) do
-         if i>=0 and not coverage[i] and ft.characters[v] then
-	     vform[i] = v
-         end
-         if jpotf_vert and i<0 and ft.characters[v]then
-             vform[abs(i)] = coverage[v] or v
-         end
-     end
-     if add_vert then -- vert feature が有効にならない場合
-        for i,v in pairs(coverage) do vform[i] = vform[i] or v end
-     end
+    if type(coverage)~='table' then return end
+    for i,v in pairs(vert_form_table) do
+       if not coverage[i] and ft.characters[v] then vform[i] = v end
+    end
+    if jpotf_vert then
+      for i,v in pairs(vert_jpotf_table) do
+	if ft.characters[v] then  vform[i] = coverage[v] or v end
+      end
+    end
+    if add_vert then -- vert feature が有効にならない場合
+      for i,v in pairs(coverage) do vform[i] = vform[i] or v end
+    end
   end
 
 luatexbase.add_to_callback(
