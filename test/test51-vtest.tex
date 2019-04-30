@@ -211,7 +211,7 @@
 \vfill\eject
 
 \vbox{\tate\hsize100mm
-\tfont\f=KozMinPr6N-Regular.otf:jfm=ujisv \f
+\tfont\f=[KozMinPr6N-Regular.otf]:jfm=ujisv \f
 
 \ltjsetparameter{yalbaselineshift=.25em}\baselineskip15pt\parindent\zw
 \LaTeX の特徴として、テキストファイルであるソースコードを入力として処理することでDVIや
@@ -444,14 +444,14 @@ $$
 }
 
 \TEST{IPAexMincho:}
-\TEST{hgrkk.ttc:}
-\TEST{hgrkk.ttc:script=kana}
-\TEST{hgrkk.ttc:script=kana;language=jan}
-\TEST{hgrkk.ttc:script=hani}
-\TEST{KozMinPr6N-Regular.otf:}
-\TEST{KozMinPr6N-Regular.otf:script=kana}
-\TEST{KozMinPr6N-Regular.otf:script=kana;language=jan}
-\TEST{KozMinPr6N-Regular.otf:script=hani}
+\TEST{[hgrkk.ttc]:}
+\TEST{[hgrkk.ttc]:script=kana}
+\TEST{[hgrkk.ttc]:script=kana;language=jan}
+\TEST{[hgrkk.ttc]:script=hani}
+\TEST{[KozMinPr6N-Regular.otf]:}
+\TEST{[KozMinPr6N-Regular.otf]:script=kana}
+\TEST{[KozMinPr6N-Regular.otf]:script=kana;language=jan}
+\TEST{[KozMinPr6N-Regular.otf]:script=hani}
 
 \def\X#1#2#3{%
 漢字\hbox{#1◆あい#2えお◆}漢字
@@ -473,4 +473,25 @@ $$
 \vbox{\tate
 \X\yoko Y{}\par\X\tate T{\hfil\break}\par\X\dtou D{\hfil\break}\par
 \X\utod U{\hfil\break}}
+
+
+\vfill\eject
+\def\T{KozMinPr6N-Regular.otf}
+%\def\T{ipaexm.ttf}
+%\def\T{HiraMinProN-W3.otf}
+\jfont\X=[\T]:jfm=ujis;language=latn;script=latn
+\tfont\V=[\T]:jfm=ujisv;+vert;jpotf;language=latn;script=latn
+\tfont\VM=[\T]:jfm=ujisv;+vert;language=latn;script=latn
+
+\noindent
+\vbox{\yoko\X\hsize=20\zw
+  \char"301Dあ「」ああ\char"301F---“あああ，あああ．”
+}\\
+\vbox{\tate\V\hsize=20\zw
+  \char"301Dあ「」ああ\char"301F---“あああ，あああ．”
+}
+\vbox{\tate\VM\hsize=20\zw
+  \char"301Dあ「」ああ\char"301F---“あああ，あああ．”
+}
+
 \end

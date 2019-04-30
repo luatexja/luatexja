@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2019/02/11',
+  date = '2019/04/30',
   description = 'Loader for Japanese fonts',
 })
 
@@ -1092,12 +1092,18 @@ do
      [0x300A]=0xFE3D, [0x300B]=0xFE3E, [0x3008]=0xFE3F, [0x3009]=0xFE40,
      [0x300C]=0xFE41, [0x300D]=0xFE42, [0x300E]=0xFE43, [0x300F]=0xFE44,
      [0xFF3B]=0xFE47, [0xFF3D]=0xFE48, 
+     [-0xFF0C]=0xFE11, [-0xFF0E]=0xFE12,
+     [-0x201C]=0x301D, [-0x201D]=0x301F,
   }
-  local function add_vform(coverage, vform, ft, add_vert)
+  local abs = math.abs
+  local function add_vform(coverage, vform, ft, add_vert, jpotf_vert)
      if type(coverage)~='table' then return end
      for i,v in pairs(vert_form_table) do
-         if not coverage[i] and ft.characters[v] then
-             vform[i] = v
+         if i>=0 and not coverage[i] and ft.characters[v] then
+	     vform[i] = v
+         end
+         if jpotf_vert and i<0 and ft.characters[v]then
+             vform[abs(i)] = coverage[v] or v
          end
      end
      if add_vert then -- vert feature が有効にならない場合
@@ -1114,11 +1120,14 @@ luatexbase.add_to_callback(
          local add_vert  
            = not (provides_feature(fnum, t.properties.script, t.properties.language, 'vert'))
              and not (provides_feature(fnum, t.properties.script, t.properties.language, 'vrt2'))
+         local jpotf_vert = t.shared.features.jpotf
          -- 現在の language, script で vert もvrt2 も有効にできない場合，強制的に vert 適用
          for _,i in pairs(t.resources.sequences) do
             if i.order[1]== 'vert' and i.type == 'gsub_single' and i.steps then
                for _,j in pairs(i.steps) do
-                  if type(j)=='table' then add_vform(j.coverage,vform, t, add_vert) end
+                  if type(j)=='table' then
+		      add_vform(j.coverage,vform, t, add_vert, jpotf_vert)
+		  end
                end
             end
           end
