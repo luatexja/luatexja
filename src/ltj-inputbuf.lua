@@ -6,9 +6,9 @@ luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('charrange'); local ltjc = luatexja.charrange
 
 require("unicode")
-local utflen = unicode.utf8.len
-local utfbyte = unicode.utf8.byte
-local utfchar = unicode.utf8.char
+local utflen = utf.len
+local utfbyte = utf.byte
+local utfchar = utf.char
 local node_new = node.new
 local node_free = node.free
 local id_glyph = node.id('glyph')

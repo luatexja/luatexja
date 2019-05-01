@@ -18,6 +18,7 @@ end
 
 
 -- \kuten, \jis, \euc, \sjis, \ucs, \kansuji
+local utfchar=utf.char
 local function to_kansuji(num)
    if not num then num=0; return
    elseif num<0 then
@@ -25,7 +26,7 @@ local function to_kansuji(num)
    end
    local s = ""
    while num~=0 do
-      s = utf.char(
+      s = utfchar(
 	 ltjs.get_stack_table(luatexja.stack_table_index.KSJ + num%10,
 				'', tex.getcount('ltj@@stack'))) .. s
       num=math.floor(num/10)

@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjdefs}[2019/02/11 Default font settings of LuaTeX-ja]
+\ProvidesPackage{lltjdefs}[2019/05/01 Default font settings of LuaTeX-ja]
 
 \ifdefined\ltj@stdmcfont\else\def\ltj@stdmcfont{IPAExMincho}\fi
 \ifdefined\ltj@stdgtfont\else\def\ltj@stdgtfont{IPAExGothic}\fi
@@ -119,6 +119,10 @@
 
 \directlua{for x=128,255 do luatexja.math.is_math_letters[x] = true end}
 \protected\def\<{\ifvmode\leavevmode\fi\inhibitglue}
+
+\directlua{luatexja.jfont.register_vert_replace{
+  ['，']='、', ['．']='。', ['“']=0x301D, ['”']=0x301F,
+}}
 
 % END OF FILE
 \endinput

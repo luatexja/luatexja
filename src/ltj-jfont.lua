@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2019/04/30',
+  date = '2019/05/01',
   description = 'Loader for Japanese fonts',
 })
 
@@ -297,10 +297,10 @@ do
    end
 
 -- EXT
-   local utf8 = unicode.utf8
+   local utfbyte = utf.byte
    function luatexja.jfont.jfontdefX(g, dir, csname)
       jfm_dir, is_def_jfont = dir, true
-      cstemp = csname:sub( (utf8.byte(csname,1,1) == tex.escapechar) and 2 or 1, -1)
+      cstemp = csname:sub( (utfbyte(csname,1,1) == tex.escapechar) and 2 or 1, -1)
       cstemp = cstemp:sub(1, ((cstemp:sub(-1,-1)==' ') and (cstemp:len()>=2)) and -2 or -1)
       global_flag = g and '\\global' or ''
       tex.sprint(cat_lp, '\\expandafter\\font\\csname ',
@@ -1093,10 +1093,7 @@ do
      [0x300C]=0xFE41, [0x300D]=0xFE42, [0x300E]=0xFE43, [0x300F]=0xFE44,
      [0xFF3B]=0xFE47, [0xFF3D]=0xFE48, 
   }
-  local vert_jpotf_table = {
-     [0xFF0C]=0xFE11, [0xFF0E]=0xFE12,
-     [0x201C]=0x301D, [0x201D]=0x301F,
-  }
+  local vert_jpotf_table = {}
   local function add_vform(coverage, vform, ft, add_vert, jpotf_vert)
     if type(coverage)~='table' then return end
     for i,v in pairs(vert_form_table) do
@@ -1104,12 +1101,24 @@ do
     end
     if jpotf_vert then
       for i,v in pairs(vert_jpotf_table) do
-	if ft.characters[v] then  vform[i] = coverage[v] or v end
+	if ft.characters[v] then  vform[i] = coverage[v] or vform[v] or v end
       end
     end
     if add_vert then -- vert feature が有効にならない場合
       for i,v in pairs(coverage) do vform[i] = vform[i] or v end
     end
+  end
+
+  local utfbyte, utfsub = utf.byte, utf.sub
+  luatexja.jfont.register_vert_replace = function(t)
+    for i,v in pairs(t) do
+      local ic = (type(i)=='number') and i or 
+        ((type(i)=='string') and utfbyte(utfsub(i,1,1)) or nil)
+      if ic then
+        vert_jpotf_table[ic] = (type(v)=='number') and v or 
+          ((type(v)=='string') and utfbyte(utfsub(v,1,1)) or nil)
+      end
+    end  
   end
 
 luatexbase.add_to_callback(

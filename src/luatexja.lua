@@ -400,7 +400,7 @@ local function get_attr_icflag(p)
 end
 
 local prefix, inner_depth
-
+local utfchar = utf.char
 local function debug_show_node_X(p,print_fn, limit)
    local k = prefix
    local s
@@ -409,7 +409,7 @@ local function debug_show_node_X(p,print_fn, limit)
    .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
    if pt == 'glyph' then
       s = base .. ' ' .. 
-         (p.char>=0xF0000 and string.format('(U+%X)', p.char) or utf.char(p.char)) .. ' '
+         (p.char>=0xF0000 and string.format('(U+%X)', p.char) or utfchar(p.char)) .. ' '
          .. tostring(p.font) .. ' (' .. print_scaled(p.height) .. '+'
          .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
       if p.xoffset~=0 or p.yoffset~=0 then
@@ -561,7 +561,7 @@ local function debug_show_node_X(p,print_fn, limit)
       end
       prefix = k;
    elseif pt=='math_char' then
-      s = base .. ' fam: ' .. p.fam .. ' , char = ' .. utf.char(p.char)
+      s = base .. ' fam: ' .. p.fam .. ' , char = ' .. utfchar(p.char)
       print_fn(s)
    elseif pt=='sub_box' or pt=='sub_mlist' then
       print_fn(base)
