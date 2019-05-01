@@ -185,7 +185,7 @@ do
       for i = 0,kx[2] do cidm[i] = -1 end
       open_cmap_file(kx[1] .. "-V", increment, tonumber, entry)
       for i,v in pairs(tt) do
-         ttv[i] =  cidmo[v.index]
+	 ttv[i] =  cidmo[v.index] -- "unicode" of vertical variant
       end
 
       -- tounicode エントリ

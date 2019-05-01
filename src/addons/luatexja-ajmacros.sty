@@ -347,7 +347,8 @@
 	\@ajligdef{#1}{\number\@tempcnta}\advance\@tempcnta\@ne
 	\expandafter\@ajligaturedef\fi}
 \def\@aj@ligdef#1#2#3{\expandafter\xdef\csname ajLig\@ajmojifam#1\endcsname
-	{\noexpand\CID{\noexpand\unless\noexpand\ifnum\noexpand\ltjgetparameter\noexpand{direction\noexpand}=3 #2\noexpand\else#3\noexpand\fi}}}
+	{\unexpanded{\unless\ifnum\ltjgetparameter{direction}=3 }%
+	 \noexpand\CID{#2}\noexpand\else\noexpand\CID{#3}\noexpand\fi}}
 \def\@aj@ligaturedef#1{\ifx\@nil#1\else
 	\@aj@ligdef{#1}{\number\@tempcnta}{\number\@tempcntb}%
 	\advance\@tempcnta\@ne\advance\@tempcntb\@ne

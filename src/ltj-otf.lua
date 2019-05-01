@@ -85,16 +85,40 @@ local function get_ucs_from_rmlgbm(c)
       local w = ltjr_cidfont_data["Adobe-Japan1"].characters[v]. tounicode
       -- must be non-nil!
       local i = string.len(w)
+      local r
       if i==4 then -- UCS2
-         return tonumber(w,16)
+         r = tonumber(w,16)
       elseif i==8 then
          i,w = tonumber(string.sub(w,1,4),16), tonumber(string.sub(w,-4),16)
          if (w>=0xD800) and (w<=0xDB7F) and (i>=0xDC00) and (i<=0xDFFF) then -- Surrogate pair
-            return (w-0xD800)*0x400 + (i-0xDC00)
+            r = (w-0xD800)*0x400 + (i-0xDC00)
          else
-            return 0
+            r = 0
          end
       end
+      if ltjr_cidfont_data["Adobe-Japan1"].shared.ltj_vert_table[r] then
+         -- CID が縦組用字形だった場合
+         local curjfnt_num = tex_get_attr((ltjd_get_dir_count()==dir_tate)
+                                        and attr_curtfnt or attr_curjfnt)
+         local t = identifiers[curjfnt_num]
+         if t.resources.sequences then
+            for _,i in pairs(t.resources.sequences) do
+               if (i.order[1]=='vert' or i.order[1]=='vrt2')
+                  and i.type == 'gsub_single' and i.steps then
+                  for _,j in pairs(i.steps) do
+                     if type(j)=='table' then 
+                        if type(j.coverage)=='table' then
+                           for i,k in pairs(j.coverage) do
+                              if i==r then return k end
+                           end
+                        end
+                     end
+                  end
+               end
+            end
+         end
+      end
+      return r
    end
 end
 

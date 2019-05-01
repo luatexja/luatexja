@@ -2,10 +2,10 @@
 \documentclass{ltjsarticle}
 \usepackage{luacode}
 \usepackage{luatexja-otf}
+\usepackage[sourcehan,nfssonly]{luatexja-preset}
 \begin{document}
 
-※このファイルはフォントを埋め込んでいないため，代替されるフォントによっては正しく
-表示されないでしょう．
+※このファイルは源ノ明朝・源ノ角ゴシックを埋め込んでいます．
 
 森\UTF{9DD7}外と内田百\UTF{9592}とが\UTF{9AD9}島屋に行くところを想像した。
 
@@ -39,6 +39,15 @@
 
 {\bf（速報）}世界陸上\CID{20660}，\ajLig{ボルト}がフライングで失格．
 
+
+\ajLig{明治}\ajLig{大正}\ajLig{昭和}\ajLig{平成}\ajLig{令和}%
+\textgt{\ajLig{明治}\ajLig{大正}\ajLig{昭和}\ajLig{平成}\ajLig{令和}}
+
+\hbox{\tate
+  \ajLig{明治}\ajLig{大正}\ajLig{昭和}\ajLig{平成}\ajLig{令和}%
+  \textgt{\ajLig{明治}\ajLig{大正}\ajLig{昭和}\ajLig{平成}\ajLig{令和}}}
+
+
 \aj半角{半角カタカナひらがな} %←JFM の問題か，半角ひらがなが全角幅で出てしまう．
 ←luatexja-otf.sty内で，JFMの文法拡張を行いました．
 
@@ -51,13 +60,13 @@ luatexja-otf.styの下でも，TrueTypeフォントは正常に読めるよね�
 
 \newpage
 
-\section*{Adobe-Japan1-6 全グリフ}
+\section*{Adobe-Japan1-7 全グリフ}
 
 {\footnotesize
 % 表の作成は Lua でサボってしまう．
 % \CID{0} (.notdef) は luaotfload がマッピングしてくれないみたい．
 \begin{luacode*}
-for i = 0, 23057 do
+for i = 0, 23059 do
    if i % 50 == 0 then
       tex.print(string.format("\\noindent%05d", i))
    end
