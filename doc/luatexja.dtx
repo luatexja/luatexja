@@ -1141,7 +1141,7 @@ Okumura), namely, \Pkg{ltjclasses}\footnote{%
   \texttt{ltjsarticle.cls},~\texttt{ltjsbook.cls}, \texttt{ltjsreport.cls},~\texttt{ltjskiyou.cls}.}.
 
 Original \Pkg{jsclasses} use \cs{mag}~primitive to set the main document font size.
-However, \LuaTeX\ beta-0.87.0~or~later does not support \cs{mag} in PDF~output,
+However, \LuaTeX\ does not support \cs{mag} in PDF~output,
 so \Pkg{ltjsclasses} uses the \texttt{nomag*} option\footnote{Same effect as 
   the \Pkg{BXjscls} classes (by Takayuki Yato) and \Pkg{jsclasses}.
   However, these classes uses only \TeX\ code, but \Pkg{ltjsclasses} uses Lua code.}
@@ -1163,7 +1163,7 @@ so \Pkg{ltjsclasses} uses the \texttt{nomag*} option\footnote{Same effect as
 がそれぞれ\LuaTeX-ja標準で用意されている．
 
 元々の\Pkg{jsclasses}では本文のフォントサイズを設定するのに\cs{mag}プリミティブが使われていたが，
-\LuaTeX~beta-0.87.0以降ではPDF出力時の\cs{mag}のサポートが廃止された．
+\LuaTeX ではPDF出力時の\cs{mag}のサポートが廃止された．
 そのため，\Pkg{ltjsclasses}では\texttt{nomag*}オプション
 \footnote{\Pkg{jsclasses}や，八登崇之氏による\Pkg{BXjscls}クラスにおける同名のオプションと
   同じ．上記クラスは\TeX コードのみで実装しているが，\Pkg{ltjsclasses}ではLuaコードも用いている．}が標準で
@@ -3774,6 +3774,43 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
   である \verb+tmin10.tfm+ に相当し，\texttt{min10.tfm} と同様に
   「っ」など一部の文字幅が狭められている．
 \end{description}
+
+\begin{figure}[!tb]
+\begin{LTXexample}[pos=b]
+\jfont\X=[KozMinPr6N-Regular.otf]:jfm=ujis
+\tfont\U=[KozMinPr6N-Regular.otf]:jfm=ujisv
+\tfont\V=[KozMinPr6N-Regular.otf]:jfm=ujisv;jpotf
+\def\TEST#1#2{\leavevmode\hbox{#1#2\string#2 “引用，と句読点．”}}
+\ttfamily\centering\TEST\yoko\X \quad \TEST\tate\U \quad \TEST\tate\V
+\end{LTXexample}
+\caption{\texttt{jpotf} ``feature''}
+\label{fig:jpotf}
+\end{figure}
+  
+ \item \texttt{vert}, \texttt{vrt2}の少なくとも片方が（明示的・自動的を問わず）
+  有効になっていた場合，さらに\texttt{jpotf}を指定することで
+  「通常では行わない縦組用字形への変換」を行うことができる．
+
+  標準では，この「変換」は全角のコンマ・ピリオドを句読点に，
+  また全角の二重引用符をダブルミニュートへ置き換える
+  \footnote{%
+	\texttt{jpotf}という名前にしたのは，
+	OTFパッケージの縦組用和文TFMでほぼ同じの処理（そちらではさらに一重引用符を
+	「シングルミニュート」に置換する機能もあった）を行っていたことに由来する．
+  }．\autoref{fig:jpotf}を参照．
+
+  ユーザ側で「変換」をカスタマイズしたい場合，
+  \verb+luatexja.jfont.register_vert_replace+ 関数に変更内容を記したテーブルを渡す．
+  例えば縦組中では「あ」を「い」に置換し，また「，」は（「、」に置換せず）「，」のままに
+  したい場合は次のようにすれば良い．
+\begin{lstlisting}
+\directlua{luatexja.jfont.register_vert_replace{
+  ['あ']='い', ['，']=nil,
+}}
+\end{lstlisting}
+  \verb+luatexja.jfont.register_vert_replace+ による変更はこの関数の\emph{実行後}に定義される
+  フォントについてのみ有効である．
+  
 \end{itemize}
 
 なお，\pTeX では，\cs{font},~\cs{jfont},~\cs{tfont}のどれでも欧文フォント・横組用和文フォン
@@ -3907,12 +3944,12 @@ for Chinese or Korean typesetting.
 \texttt{cid}キーに値を指定すると，そのCIDを持った非埋込フォントを定義することができる：
 %</ja>
 \begin{lstlisting}[numbers=left]
-\jfont\testJ={psft:Ryumin-Light:cid=Adobe-Japan1-7;jfm=jis}     % Japanese
-\jfont\testD={psft:Ryumin-Light:jfm=jis}                        % default value is Adobe-Japan1-7
-\jfont\testC={psft:AdobeMingStd-Light:cid=Adobe-CNS1-7;jfm=jis} % Traditional Chinese
-\jfont\testG={psft:SimSun:cid=Adobe-GB1-5;jfm=jis}              % Simplified Chinese
-\jfont\testK={psft:Batang:cid=Adobe-Korea1-2;jfm=jis}           % Korean
-\jfont\testKR={psft:SourceHanSerifAKR9:cid=Adobe-KR-9;jfm=jis}  % Korean
+\jfont\testJ={psft:Ryumin-Light:cid=Adobe-Japan1-7;jfm=jis}    % Japanese
+\jfont\testD={psft:Ryumin-Light:jfm=jis}                       % default: Adobe-Japan1-7
+\jfont\testC={psft:AdobeMingStd-Light:cid=Adobe-CNS1-7;jfm=jis}% Traditional Chinese
+\jfont\testG={psft:SimSun:cid=Adobe-GB1-5;jfm=jis}             % Simplified Chinese
+\jfont\testK={psft:Batang:cid=Adobe-Korea1-2;jfm=jis}          % Korean
+\jfont\testKR={psft:SourceHanSerifAKR9:cid=Adobe-KR-9;jfm=jis} % Korean
 \end{lstlisting}
 %<*en>
 Note that the code above specifies \texttt{jfm-jis.lua}, which is for Japanese fonts,
@@ -4627,7 +4664,7 @@ as follows:
 %<*ja>
 ここで，句点「。」(\texttt{U+3002})の文字クラスは，以下のようにして決まる．
 \begin{enumerate}
-\item \Pkg{luaotfload} によって縦組用句点のグリフに置き換わる．
+\item \Pkg{luaotfload}によって縦組用句点のグリフに置き換わる．
 \item 置換後のグリフは \texttt{U+FE12} であり，JFMに従えば文字クラスは\emph{0}と判定される．
 \item この場合，置換前の横組用句点のグリフによって文字クラスを判定する．
 \item 結果として，上の出力例中の句点の文字クラスは2000となる．
@@ -4953,10 +4990,10 @@ $i$,~$j\in \omega$に対して，\texttt{char\_type[$i$][$j$]} は
 \begin{itemize}
   \item 間に入るものがカーンであれば，この値は\
 \texttt{[$j$]=\{[1]=<kern\_node>, ratio=<ratio>\}} であり，
-<kern\_node>はカーンを表すノードそのものである\footnote{%
-バージョン20150420.0以降ではノードのアクセス手法にdirect access
-      modelを用いている．そのため，例えば\LuaTeX\ beta-0.78.2では，単なる自然数のようにし
-      か見えないことに注意．
+<kern\_node>はカーンを表すノードである\footnote{%
+      バージョン20150420.0以降ではノードのアクセス手法にdirect access
+      modelを用いているため，ノードそのものを表すユーザーデータではなく，
+      内部で参照のために使われる添字（整数）である．
 }．
   \item グルーであれば，この値は以下のキーを持つテーブルである．
   \begin{description}
@@ -4972,7 +5009,9 @@ $i$,~$j\in \omega$に対して，\texttt{char\_type[$i$][$j$]} は
   \end{description}
 \end{itemize}
 \item[ascent\textrm{, }descent]
-……
+  縦組時に個々のグリフを90度回転させる場合，そのグリフは（実際の高さ・深さにかかわらず）
+  便宜的に高さ\texttt{ascent}，深さ\texttt{descent}を持つものだと想定して回転させる．
+  この仕様は\Pkg{luaotfload}がOpenTypeフォントのVORGテーブルを読まないための暫定的なものである．
 \item[chars\_cbcache]
 文字クラス決定の処理で．キャッシュとして使われる．
 \end{cslist}
