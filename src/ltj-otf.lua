@@ -82,21 +82,27 @@ local function get_ucs_from_rmlgbm(c)
    elseif v<0xF0000 then -- 素直に Unicode にマップ可能
       return v
    else -- privete use area
-      local w = ltjr_cidfont_data["Adobe-Japan1"].characters[v]. tounicode
-      -- must be non-nil!
-      local i = string.len(w)
-      local r
-      if i==4 then -- UCS2
-         r = tonumber(w,16)
-      elseif i==8 then
-         i,w = tonumber(string.sub(w,1,4),16), tonumber(string.sub(w,-4),16)
-         if (w>=0xD800) and (w<=0xDB7F) and (i>=0xDC00) and (i<=0xDFFF) then -- Surrogate pair
-            r = (w-0xD800)*0x400 + (i-0xDC00)
-         else
-            r = 0
+      local r, aj = nil, ltjr_cidfont_data["Adobe-Japan1"] 
+      -- 先に ltj_vert_table を見る
+      for i,w in pairs(aj.shared.ltj_vert_table) do
+         if w==v then r=i; break end
+      end
+      if not r then
+         -- なければ ToUnicode から引く
+         local w = aj.characters[v].tounicode -- must be non-nil!
+         local i = string.len(w)
+         if i==4 then -- UCS2
+            r = tonumber(w,16)
+         elseif i==8 then
+            i,w = tonumber(string.sub(w,1,4),16), tonumber(string.sub(w,-4),16)
+            if (w>=0xD800) and (w<=0xDB7F) and (i>=0xDC00) and (i<=0xDFFF) then -- Surrogate pair
+               r = (w-0xD800)*0x400 + (i-0xDC00)
+            else
+               r = 0
+            end
          end
       end
-      if ltjr_cidfont_data["Adobe-Japan1"].shared.ltj_vert_table[r] then
+      if aj.shared.ltj_vert_table[r] then
          -- CID が縦組用字形だった場合
          local curjfnt_num = tex_get_attr((ltjd_get_dir_count()==dir_tate)
                                         and attr_curtfnt or attr_curjfnt)
