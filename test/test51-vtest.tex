@@ -476,22 +476,22 @@ $$
 
 
 \vfill\eject
-\def\T{KozMinPr6N-Regular.otf}
-%\def\T{ipaexm.ttf}
-%\def\T{HiraMinProN-W3.otf}
-\jfont\X=[\T]:jfm=ujis;language=latn;script=latn
-\tfont\V=[\T]:jfm=ujisv;+vert;jpotf;language=latn;script=latn
-\tfont\VM=[\T]:jfm=ujisv;+vert;language=latn;script=latn
+\directlua{luatexja.jfont.register_vert_replace{
+  ['あ']='い', %['，']=false, ['．']='ゐ',
+}}
+%\def\T{[KozMinPr6N-Regular.otf]}
+\def\T{SourceHanSerif-Regular}
+%\def\T{[ipaexm.ttf]}
+%\def\T{[HiraMinProN-W3.otf]}
+\jfont\X=\T:jfm=ujis;language=latn;script=latn
+\tfont\V=\T:jfm=ujisv;+vert;jpotf;language=latn;script=latn
+\tfont\VM=\T:jfm=ujisv;+vert;language=latn;script=latn
 
 \noindent
-\vbox{\yoko\X\hsize=20\zw
-  \char"301Dあ「」ああ\char"301F---“あああ，あああ．”
-}\\
-\vbox{\tate\V\hsize=20\zw
-  \char"301Dあ「」ああ\char"301F---“あああ，あああ．”
-}
-\vbox{\tate\VM\hsize=20\zw
-  \char"301Dあ「」ああ\char"301F---“あああ，あああ．”
-}
+\def\ts{\char"301Dあ\char"301Dあ「」あ\char"301Eあ\char"301F%
+  ---“あああ，あああ．”}
+\vbox{\yoko\X\hsize=20\zw\ts}\vadjust{\vskip.5\baselineskip}\\
+\vbox{\tate\V\hsize=20\zw\ts}\quad
+\vbox{\tate\VM\hsize=20\zw\ts}
 
 \end

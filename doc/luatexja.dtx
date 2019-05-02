@@ -3729,6 +3729,23 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
 \item[\tt jfm-tmin.lua] A counterpart for \verb+tmin10.tfm+, which is one
   of the default Japanese font metric shipped with \pTeX.
 \end{description}
+\begin{figure}[!tb]
+\begin{LTXexample}[pos=b]
+\jfont\X=[KozMinPr6N-Regular.otf]:jfm=ujis
+\tfont\U=[KozMinPr6N-Regular.otf]:jfm=ujisv
+\tfont\V=[KozMinPr6N-Regular.otf]:jfm=ujisv;jpotf
+\def\TEST#1#2{\leavevmode\hbox{#1#2\string#2 “引用，と句読点．”}}
+\ttfamily\centering\TEST\yoko\X \quad \TEST\tate\U \quad \TEST\tate\V
+\end{LTXexample}
+\caption{\texttt{jpotf} ``feature''}
+\label{fig:jpotf}
+\end{figure}
+  
+ \item If \texttt{vert}~and/or~\texttt{vrt2} features are activated,
+  one can specify \texttt{jpotf} to additional substitutions.
+  By default, it substitutes ideographic comma/period for fullwidth comma/period,
+  and double prime quotation marks for double quotation marks
+  (See~\autoref{fig:jpotf}).
 \end{itemize}
 %</en>
 %<*ja>
@@ -3805,7 +3822,7 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
   したい場合は次のようにすれば良い．
 \begin{lstlisting}
 \directlua{luatexja.jfont.register_vert_replace{
-  ['あ']='い', ['，']=nil,
+  ['あ']='い', ['，']=false,
 }}
 \end{lstlisting}
   \verb+luatexja.jfont.register_vert_replace+ による変更はこの関数の\emph{実行後}に定義される
