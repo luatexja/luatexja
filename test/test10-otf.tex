@@ -1,8 +1,8 @@
 %#! lualatex
 \documentclass{ltjsarticle}
 \usepackage{luacode}
-\usepackage{luatexja-otf}
-\usepackage[sourcehan,nfssonly]{luatexja-preset}
+\usepackage{luatexja-otf,lltjext}
+\usepackage[sourcehan]{luatexja-preset}
 \begin{document}
 
 ※このファイルは源ノ明朝・源ノ角ゴシックを埋め込んでいます．
@@ -52,13 +52,26 @@
 ←luatexja-otf.sty内で，JFMの文法拡張を行いました．
 
 
-{\DeclareKanjiFamily{JY3}{hoge}{}
-\DeclareFontShape{JY3}{hoge}{m}{n}{<-> file:ipaexg.ttf:jfm=ujis}{}
-\fontfamily{hoge}\selectfont
-luatexja-otf.styの下でも，TrueTypeフォントは正常に読めるよね？
-\verb+\CID+は正常に働かないと思うけど．}
 
 \newpage
+
+\newcommand\SAMPLE{%
+ \mbox{1\CID{0}☃ゃーん}\pbox<t>{2☃ゃーん}%
+ \mbox{3\UTF{2603}\UTF{3083}\UTF{30FC}ん}%
+ \pbox<t>{4\UTF{2603}\UTF{3083}\UTF{30FC}ん}%
+ \mbox{5\CID{8218}\CID{908}\CID{660}ん}%
+ \pbox<t>{6\CID{8218}\CID{908}\CID{660}ん}%
+ \mbox{7\CID{8218}\CID{7924}\CID{7891}ん}%
+ \pbox<t>{8\CID{8218}\CID{7924}\CID{7891}ん}}
+
+\SAMPLE\par\smallskip
+\jfontspec{ipaexg.ttf}\SAMPLE\par
+\jfontspec{HaranoAjiGothic-Regular.otf}\SAMPLE\par
+% 原ノ味フォント https://github.com/trueroad/HaranoAjiFonts
+
+
+
+
 
 \section*{Adobe-Japan1-7 全グリフ}
 
