@@ -43,7 +43,7 @@ luatexbase.create_callback("luatexja.load_jfm", "data", function (ft, jn) return
 
 local jfm_file_name, jfm_var, jfm_ksp
 local defjfm_res
-local jfm_dir, is_def_jfont, is_vert_enabled, auto_enable_vrt2
+local jfm_dir, is_def_jfont, vert_activated, auto_enable_vrt2
 
 local function norm_val(a)
    if (not a) or (a==0.) then
@@ -338,7 +338,7 @@ do
                         chars = sz.chars, char_type = sz.char_type,
                         kanjiskip = sz.kanjiskip, xkanjiskip = sz.xkanjiskip,
                         chars_cbcache = {},
-                        vert_activated = is_vert_enabled,
+                        vert_activated = vert_activated,
       }
       local t = identifiers[fn]
       if auto_enable_vrt2 then
@@ -434,11 +434,11 @@ do
          jfm_ksp = not (x=='-')
       end
       if jfm_dir == 'tate' then
-         is_vert_enabled = (not name:match('[:;]%-vert')) and (not  name:match('[:;]%-vrt2'))
+         vert_activated = (not name:match('[:;]%-vert')) and (not  name:match('[:;]%-vrt2'))
          auto_enable_vrt2 
            = (not name:match('[:;][+%-]?vert')) and (not name:match('[:;][+%-]?vrt2'))
       else
-         is_vert_enabled, auto_enable_vrt2 = nil, nil
+         vert_activated, auto_enable_vrt2 = nil, nil
       end
       return name
    end

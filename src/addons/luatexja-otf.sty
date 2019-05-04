@@ -90,7 +90,7 @@
 \protected\def\CID#1{\ifvmode\leavevmode\fi\ltj@tempcnta#1\relax\directlua{luatexja.otf.cid(\the\ltj@tempcnta)}\relax}
 
 %% \UTF compatible with the OTF package for pLaTeX
-\protected\def\UTF#1{\ifvmode\leavevmode\fi\directlua{luatexja.otf.append_jglyph(0x#1)}}
+\protected\def\UTF#1{\ifvmode\leavevmode\fi\directlua{luatexja.otf.utf(0x#1)}}
 
 %% Load ajmacros
 \ifltj@in@latex                 %<*LaTeX>

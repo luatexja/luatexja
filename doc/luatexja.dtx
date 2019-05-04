@@ -2410,7 +2410,7 @@ However, the penalty inserted after it is 10 which is the \Param{postbreakpenalt
 ``ア'', not 20.
 %</en>
 %<*ja>
-\subsection{禁則処理関連パラメータとOpenTypeのfont feature}
+\subsection{禁則処理関連パラメータとOpenType機能}
 禁則処理や \Param{kanjiskip}, \Param{xkanjiskip} の挿入に関連したパラメータのうち
 \begin{quote}
  \Param{jaxspmode},~\Param{alxspmode}, \Param{prebreakpenalty},
@@ -2419,8 +2419,8 @@ However, the penalty inserted after it is 10 which is the \Param{postbreakpenalt
 は，文字コードごとに設定する量である．
 
 \Pkg{fontspec}パッケージを使う（\ref{ssec:fontspec}節）場合など，
-各種のOpenType featureを適用することもあると思うが，前段落に述べたパラメータ類は，
-\emph{OpenType featureの適用前の文字コードによって適用される．}
+各種のOpenType機能を適用することもあると思うが，前段落に述べたパラメータ類は，
+\emph{OpenType機能の適用前の文字コードによって適用される．}
 例えば，以下の例において10行目の「ア」は，\verb+hwid+ featureの適用により半角カタカナの「ｱ」
 に置き換わる．しかし，その直後に挿入される \Param{postbreakpenalty}は，置換前の「ア」に対する値10である．
 %</ja>
@@ -3561,7 +3561,7 @@ NFSS2用の命令（\ref{ssec:chgfnt}節，\ref{ssec:nfsspat}節）における�
 
 %<*ja>
 \paragraph{\texttt{extend}と\texttt{slant}}
-OpenType font featureと見かけ上同じような形式で指定できるものに，
+OpenType機能と見かけ上同じような形式で指定できるものに，
 \begin{description}
 \item[\texttt{extend=}<extend>] 横方向に<extend>倍拡大する．
 \item[\texttt{slant=}<slant>] <slant>に指定された割合だけ傾ける．
@@ -3646,7 +3646,7 @@ This functionality is disabled by \texttt{-ltjksp} specification.
 
 %<en>\subsection{\cs{tfont}}
 %<ja>\subsection{\cs{tfont} 命令}
-
+\label{ssec:tfont}
 
 \begin{comment}
   {\catcode`\<=12\catcode`\>=12
@@ -3755,7 +3755,7 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
 以下の点が \cs{jfont} による横組用和文フォントとは異なる：
 \begin{itemize}
  \item 明示的に \texttt{vert}, \texttt{vrt2}（のいずれか）の
-  有効・無効を指定した場合を除き，自動的に OpenType feature~\texttt{vrt2} の有効化が
+  有効・無効を指定した場合を除き，自動的に OpenType機能 \texttt{vrt2} の有効化が
   指定されたものとみなされる
  \footnote{もしフォントが\texttt{vrt2}を定義していなかった場合，代わりに
  \texttt{vert}を用いる．}．
@@ -3935,7 +3935,7 @@ Identity-Hとなり，PDFの標準規格ISO32000-1:2008~(\cite{pdfstd})に非準
 ので注意してほしい．
 
 \emph{\texttt{psft} プリフィックスの下では
-\texttt{+jp90} などのOpenType font featureの効力はない．
+\texttt{+jp90} などのOpenType機能の効力はない．
 非埋込フォントをPDFに使用すると，実際にどのようなフォントが
 表示に用いられるか予測できないからである．}\
 \texttt{extend} と \texttt{slant} 指定は単なる変形のため
@@ -4650,7 +4650,7 @@ applying font features by \Pkg{luaotfload}}.
 \item JFMによれば，この「ﾋ」のグリフの文字クラスは2000である．
 \item 以上により文字クラス2000とみなされるため，結果として「ﾋ」の幅は半角だと認識される．
 \end{enumerate}
-この例は，\emph{文字クラスの決定はfont featureの適用によるグリフ置換の結果に基づく}ことを
+この例は，\emph{文字クラスの決定はOpenType機能の適用によるグリフ置換の結果に基づく}ことを
 示している．
 %</ja>
 
@@ -6935,7 +6935,9 @@ CID番号が<number>の文字を出力する．
 もし現在の和文フォントがAdobe-Japan1,~Adobe-GB1, Adobe-CNS1, Adobe-Korea1,~Adobe-KRの
   いずれのCID-keyed fontでもない場合，<number>はAdobe-Japan1のCID番号であると解釈し
   「適切なグリフ」\footnote{%
-  例えばフォントにIVDコレクションAdobe-Japan1が含まれていれば，その情報を用いて
+  特に縦組用グリフのCID番号を指定した場合は（LuaTeX-ja 20190504.0以降では若干改良されているが）
+  意図しない結果になる可能性が高い．
+  また，フォントにIVDコレクションAdobe-Japan1が含まれていれば，その情報を用いて
   グリフを選択する．
 }を出力する．
 %</ja>
@@ -6985,12 +6987,20 @@ ordinary characters in the following points:
 \item 常に\textbf{JAchar}として扱われる．
 %</ja>
 %<*en>
-\item Processing codes for supporting OpenType features (\textit{e.g.},
+\item In vertical direction, \texttt{vert}/\texttt{vrt2} feature are automatically applied to
+      characters by \cs{UTF}, regardless these feature are not activated in current Japanese font.
+%</en>
+%<*ja>
+\item 縦組時には，現在の縦組用和文フォントで \texttt{vert}/\texttt{vrt2} 機能が
+  有効か無効かを問わず，\cs{UTF} で出力される文字にはこれらのOpenType機能が働いた字形になる．
+%</ja>
+%<*en>
+\item Processing codes for supporting other OpenType features (for example,
       glyph replacement and kerning) by the \Pkg{luaotfload} package
       is not performed to these characters.
 %</en>
 %<*ja>
-\item OpenType機能（例えばグリフ置換やカーニング）をサポートするための
+\item その他のOpenType機能（例えばグリフ置換やカーニング）をサポートするための
   \Pkg{luaotfload}パッケージのコードはこれらの文字には働かない．
 %</ja>
 \end{itemize}
@@ -7163,7 +7173,8 @@ for making the difference obvious.}
 	  \item \cs{prevdepth}の値とその$h'$の深さの値が一致している
 	\end{itemize}
 	場合にのみ発動するようにしている．
-	\item 行の中身に水平ボックス$h''$が入ってくることもあるが，その場合は$h''$の中身までは参照しない．
+	\item 行の中身に水平ボックス$h''$が入ってくることもあるが，その場合は$h''$の中身の高さ・深さまでは
+	参照せず，あくまでも$h''$自身の高さ・深さのみを参照する．
 	参照するようにしてしまうと，\cs{smash}など手動で行った高さ・深さ調整の意味がなくなってしまうからである．
   \end{itemize}
   
@@ -7803,7 +7814,7 @@ characters designed for ruby.
 %<*ja>
 横組・縦組専用仮名を用いる．また，\cs{rubyfamily} でルビ用仮名が使用可能となる\footnote{%
   \cs{rubyfamily}とはいいつつ，実際にはフォントファミリを切り替えるのではない（通常では
-  font featureの追加，\texttt{nfssonly} 指定時にはシェイプを \texttt{rb} に切り替え）．
+  OpenType機能の有効化であり，\texttt{nfssonly} 指定時にはシェイプを \texttt{rb} に切り替える）．
 }．
 %</ja>
 \item[bold]
@@ -10724,53 +10735,6 @@ $|\textit{total}|$の分だけが，行中のグルーの伸び量，あるい�
 %</ja>
 
 %<*ja>
-\section{IVS対応}
-\verb+luatexja.otf.enable_ivs()+ を実行し，IVS対応を有効にした状態では，
-\verb+pre_linebreak_filter+ や \verb+hpack_filter+ コールバックには
-次の4つが順に実行される状態となっている：
-\begin{description}
-\item[\tt ltj.do\_ivs] \textit{glyph\_node}~$p$の直後に，異体字セレクタ（を表す\textit{glyph\_node}）
-が連続した場合に，$p$のフォントに対応したが持つ「異体字情報」に従って出力するグリフを変える．
-
-しかし，単に$p.\textit{char}$を変更するだけでは，後から
-OpenType機能の適用（すぐ下）により置換される可能性がある．そのため，
-\cs{CID} や \cs{UTF} と同じように，\textit{glyph\_node}~$p$の代わりに
-\texttt{user\_id} が\textit{char\_by\_cid}であるようなuser-defined whatsitを用いている．
-\item[（\Pkg{luaotfload} によるfont featureの適用）]
-\item[\tt ltj.otf] \texttt{user\_id} が\textit{char\_by\_cid}であるようなuser-defined whatsitを
-きちんと\textit{glyph\_node}に変換する．この処理は，\cs{CID}, \cs{UTF}やIVSによる置換が，
-OpenType機能の適用で上書きされてしまうのを防止するためである．
-\item[\tt ltj.main\_process] \textbf{JAglue}の挿入処理（\ref{sec-jfmglue}章）と，
-JFMの指定に従って各\textbf{JAchar}の「寸法を補正」することを行う．
-\end{description}
-
-問題は各フォントの持っているIVS情報をどのように取得するか，である．
-\Pkg{luaotfload} はフォント番号<font\_number>の情報を\
-\texttt{fonts.hashes.identifiers[<font\_number>]} 以下に格納している．
-しかし，OpenTypeフォントのIVS情報は格納されていないようである%
-\footnote{TrueTypeフォントに関しては，
-\begin{center}
-\texttt{fonts.hashes.idenfiers[<font\_number>]%
-  .resources.variants[<selector>][<base\_char>]}
-\end{center}
-に，<base\_char>番の文字の後に異体字セレクタ<selector>が続いた場合に
-出力すべきグリフが書かれてある．}．
-%例えば，小塚明朝Pr6N~Rでは，
-
-一方，\LuaTeX 内部の \texttt{fontloader} の返すテーブルには
-OpenTypeフォントでもTrueTypeフォントでもIVS情報が格納されている．
-具体的には……
-
-そのため，\LuaTeX-jaのIVS対応においては，\LuaTeX 内部の\
-\texttt{fontloader} を直接用いることで，フォントのIVS情報を取得している．
-20140114.0以降でキャッシュを用いるようにした要因はここにあり，
-\texttt{fontloader} の呼び出しでかなり時間を消費することから，
-%%% to_table を使わなくしたことで，メモリ使用量は減った
-IVS情報をキャッシュに保存することで2回目以降の実行時間を節約している．
-%</ja>
-
-
-%<*ja>
 \section{複数フォントの「合成」（未完）}
 \section{\LuaTeX-jaにおけるキャッシュ}
 \Pkg{luaotfload}パッケージが，各TrueType・OpenTypeフォントの情報を
@@ -11199,6 +11163,51 @@ direction~whatsit内部のノードリストに，\textit{dir\_box}として格�
  }
 \]
 のようになる．
+
+\subsection{縦組用字形の取得}
+縦組時には，「\hbox to \zw{、}」(\texttt{U+3001})から「\ltjjachar"FE11」(\texttt{U+FE11})%"
+のように縦組用字形への置き換えに関係する処理は，以下のようになっている．
+  \begin{itemize}
+	\item 各縦組用和文フォントは読み込み時に以下の属性が設定される：
+	\begin{description}
+	  \item[\textit{vert\_activated}] 真となるのは，
+	  明示的に \texttt{-vert} も \texttt{-vrt2} のいずれも指定されていないちょうどその時．
+	  \item[\textit{auto\_enable\_vrt2}] 真となるのは，
+	  \texttt{vert}, \texttt{vrt2}のいずれについても有効・無効が指定されていないちょうどその時．
+	\end{description}
+	\textit{vert\_activated}については\texttt{luatexja.define\_jfont}コールバックで渡される引数
+	\texttt{jfont\_info}から取得可能である．
+
+	\item \textit{auto\_enable\_vrt2}が真の場合は，現在のscript tagとlanguage system identifierの値で
+	\texttt{vrt2}機能が利用可能か調べる．利用可能ならば\texttt{vrt2}を，そうでなければ
+	\texttt{vert}を有効化する．
+	\item また，各和文フォント読み込み時には，
+	「OpenType機能による置換以前に行う縦組形への置換」を格納したテーブル\textit{vform}も作成する．
+	\begin{enumerate}
+	  \item \LuaTeX-jaには，「\hbox to \zw{、}」(\texttt{U+3001})→「\ltjjachar"FE11」(\texttt{U+FE11})といった
+	  いくつかの置換がハードコードされている．そのような各置換$i\longmapsto v$に対して，
+	  \begin{quote}
+		置換元$i$が（あるscript, languageにおける）\texttt{vert}では置換対象でなく，
+		かつ置換先$v$がフォント内に存在する文字コードである
+	  \end{quote}
+	  ならば，$i\longmapsto v$を\textit{vform}に登録する．
+	  \item \ref{ssec:tfont}節にある\texttt{jpotf}が指定された場合，
+	  ……
+	  \item もし\texttt{vert}も\texttt{vrt2}も現在のscript, languageでは有効にできない場合，
+	  どこかのscript, languageにおける\texttt{vert}で定義されている
+	  置換$i\longmapsto v$をすべて\textit{vform}に登録する．
+	\end{enumerate}
+	
+	あとで説明するように，\textit{vform}は\textit{vert\_activated}が真であるような縦組用和文フォントでしか
+	利用されない．
+	
+	\item 「現在の水平リスト」内の\textbf{JAchar}を（欧文フォントから）和文フォントへ置き換える処理において，
+    その時点での組方向が縦組であり，かつ処理対象の各ノードの縦組用フォントで
+	\textit{vert\_activated}が真である場合，\textit{vform}に従いグリフが置き換えられる．
+
+	\Pkg{luaotfload}が行う，OpenType機能に沿ったグリフ置換はこの後の処理となる．G
+  \end{itemize}
+
 %</ja>
 
 \newpage

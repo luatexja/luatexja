@@ -138,10 +138,39 @@ local function append_jglyph(char)
    node_write(p)
 end
 
+local utf
+do
+   utf = function (ucs)
+      local char = ucs
+      if ltjd_get_dir_count()==dir_tate then
+         local curjfnt_num = tex_get_attr((ltjd_get_dir_count()==dir_tate)
+                                        and attr_curtfnt or attr_curjfnt)
+         local t = identifiers[curjfnt_num]
+         if t.resources.sequences then
+            for _,i in pairs(t.resources.sequences) do
+               if (i.order[1]=='vert' or i.order[1]=='vrt2')
+                  and i.type == 'gsub_single' and i.steps then
+                  for _,j in pairs(i.steps) do
+                     if type(j)=='table' then 
+                        if type(j.coverage)=='table' then
+                           for i,k in pairs(j.coverage) do
+                              if i==char then return append_jglyph(k) end
+                           end
+                        end
+                     end
+                  end
+               end
+            end
+         end
+      end
+      return append_jglyph(char)
+   end
+end
+
 local cid
 do
    cid = function (key)
-      if key==0 then return append_jglyph(char) end
+      if key==0 then return append_jglyph(0) end
       local curjfnt_num = tex_get_attr((ltjd_get_dir_count()==dir_tate)
                                         and attr_curtfnt or attr_curjfnt)
       local curjfnt = identifiers[curjfnt_num]
@@ -265,7 +294,7 @@ luatexja.otf = {
   append_jglyph = append_jglyph,
   enable_ivs = enable_ivs,  -- 隠し機能: IVS
   disable_ivs = disable_ivs,  -- 隠し機能: IVS
-  cid = cid,
+  cid = cid, utf = utf,
 }
 
 
