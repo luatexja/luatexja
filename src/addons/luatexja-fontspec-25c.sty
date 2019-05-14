@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec-25c}[2019/01/28 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec-25c}[2019/05/14 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e,luatexja}
 \ExplSyntaxOn
 
@@ -11,8 +11,8 @@
 \cs_new:Npn \ltj_fontspec_match_cmd {
   \renewcommand\jttdefault{\gtdefault}
   \@ltj@match@familytrue
-  \DeclareDocumentCommand \setmonojfont { O{} m } {
-    \ltj_fontspec_set_family:Nnn \jttdefault {##1}{##2}
+  \DeclareDocumentCommand \setmonojfont { O{} m O{} } {
+    \ltj_fontspec_set_family:Nnn \jttdefault {##1,##3}{##2}
     \normalfont
   }
 }
