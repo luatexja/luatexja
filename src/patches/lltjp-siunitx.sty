@@ -1,5 +1,5 @@
 %
-% lltjp-siunitx.sty 2018-11-02
+% lltjp-siunitx.sty 2019-06-06
 %
 
 \NeedsTeXFormat{LaTeX2e}
@@ -29,9 +29,25 @@
 }
 
 %%%% new table column: S and s
+\bool_new:N \l__ltj_siunitx_table_collect_relax_bool
+\cs_set_protected:Npn \__siunitx_table_collect_begin_s: {
+  \bool_set_false:N \l__ltj_siunitx_table_collect_relax_bool
+  \cs_set_eq:NN \__siunitx_table_collect_token:N
+    \__siunitx_table_collect_token_s:N
+  \cs_set_eq:NN \__siunitx_table_print: \__siunitx_table_print_s:
+  \__siunitx_table_collect_init_s:
+  \__siunitx_table_collect_get:
+}
+
 \cs_set_protected:Npn \__siunitx_table_collect_not_braced:N #1
   {
-    \token_if_eq_meaning:NNF #1 \relax {
+	\token_if_eq_meaning:NNTF #1 \tex_relax:D {
+      \bool_if:NTF \l__ltj_siunitx_table_collect_relax_bool {
+		\__siunitx_table_collect_not_braced_aux_i:N #1
+	  } {
+	    \bool_set_true:N \l__ltj_siunitx_table_collect_relax_bool
+	  }
+	} {
     \token_if_eq_meaning:NNF #1 \ltjfakeboxbdd {
     \token_if_eq_meaning:NNF #1 \pltx@next@inhibitglue {
     \token_if_eq_meaning:NNF #1 \tex_ignorespaces:D
@@ -48,8 +64,14 @@
     \@ifpackageloaded { mdwtab }
       {
         \cs_set_protected:Npn \__siunitx_table_collect_not_braced:N #1
-          {
-            \token_if_eq_meaning:NNF #1 \relax {
+          { 
+	        \token_if_eq_meaning:NNTF #1 \tex_relax:D {
+              \bool_if:NTF \l__ltj_siunitx_table_collect_relax_bool {
+		        \__siunitx_table_collect_not_braced_aux_i:N #1
+	          } {
+	            \bool_set_true:N \l__ltj_siunitx_table_collect_relax_bool
+	          }
+	        } {
             \token_if_eq_meaning:NNF #1 \ltjfakeboxbdd {
             \token_if_eq_meaning:NNF #1 \pltx@next@inhibitglue {
             \token_if_eq_meaning:NNF #1 \tex_ignorespaces:D
