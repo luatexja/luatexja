@@ -813,8 +813,6 @@ do
       local flds = fields(glyph)
       local vw, tsb, vk = nil, nil, nil
       for _,i in ipairs(flds) do
-         if i=='vwidth' then vw = glyph.vwidth end
-         if i=='tsidebearing' then tsb = glyph.tsidebearing end
          if i=='vkerns' then vk = glyph.vkerns end
       end
       return vw, tsb, vk
@@ -849,14 +847,6 @@ do
             -- vertical metric
             local vw, tsb, vk = glyph_vmetric(gv)
             local gi = unitable[gv.name]
-            if gi and vw and vw~=asc_des then
-               -- We do not use tsidebearing, since (1) fontloader does not read VORG table
-               -- and (2) 'tsidebearing' doea not appear in the returned table by fontloader.fields.
-               -- Hence, we assume that vertical origin == ascender
-               -- (see capsule_glyph_tate in ltj-setwidth.lua)
-               dest = dest or {}; dest[gi] = dest[gi] or {}
-               dest[gi].vwidth = vw/units
-            end
             -- vertical kern
             if gi and vk then
                dest = dest or {};
