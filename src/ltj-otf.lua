@@ -47,7 +47,6 @@ local lang_ja = luatexja.lang_ja
 local identifiers = fonts.hashes.identifiers
 
 local ltjf_font_metric_table = ltjf.font_metric_table
-local ltjf_font_extra_info = ltjf.font_extra_info
 local ltjf_find_char_class = ltjf.find_char_class
 local ltjr_cidfont_data = ltjr.cidfont_data
 local ltjc_is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char
@@ -190,15 +189,11 @@ do
          --			      ..curjfnt.psname..'" is not a CID-Keyed font (Adobe-Japan1 etc.)')
             return append_jglyph(get_ucs_from_rmlgbm(key))
       else
-	 local char = nil
-	 for i,v in pairs(curjfnt.shared.rawdata.descriptions) do
-	    if v.index==key then char = i; break end
-	 end
+	 local char = ltjf_font_metric_table[curjfnt_num].cid_to_uni[key]
 	 if not char then
 	    ltjb.package_warning('luatexja-otf',
-               'Current Japanese font (or other CJK font) "'
-		  ..curjfnt.psname..'" does not have the specified CID character ('
-		  ..tostring(key)..')',
+               '"' ..curjfnt.psname..'" does not have CID character '
+		  ..tostring(key),
 	       'Use a font including the specified CID character.')
          char = 0
 	 end
@@ -252,15 +247,16 @@ ltjb.add_to_callback('pre_linebreak_filter', extract,'ltj.otf',
 --   CID <-> グリフ 対応状況による変換テーブルが用意される．
 
 -- 和文フォント読み込み時に，CID -> unicode 対応をとっておく．
-local function cid_to_char(fmtable, fn)
+local function cid_to_uni(fmtable, fn)
    local fi = identifiers[fn]
-   local fe = ltjf_font_extra_info[fn]
-   if (fi.resources and fi.resources.cidinfo and fi.resources.cidinfo.ordering == "Japan1" )
-      and (fe and fe.unicodes) then
+   local t = {}; fmtable.cid_to_uni = t
+   for i,v in pairs(fi.shared.rawdata.descriptions) do t[v.index] = i end
+   if fi.resources and fi.resources.cidinfo 
+      and fi.resources.cidinfo.ordering == "Japan1" then
       for i, v in pairs(fmtable.chars) do
 	 local j = string.match(i, "^AJ1%-([0-9]*)")
 	 if j then
-	    j = tonumber(fe.unicodes['Japan1.'..tostring(j)])
+	    j = t[i]
 	    if j then
 	       fmtable.cid_char_type = fmtable.cid_char_type  or {}
 	       fmtable.cid_char_type[j] = v
@@ -271,10 +267,10 @@ local function cid_to_char(fmtable, fn)
    return fmtable
 end
 luatexbase.add_to_callback("luatexja.define_jfont",
-			   cid_to_char, "ltj.otf.define_jfont", 1)
+			   cid_to_uni, "ltj.otf.define_jfont", 1)
 --  既に読み込まれているフォントに対しても，同じことをやらないといけない
 for fn, v in pairs(ltjf_font_metric_table) do
-   ltjf_font_metric_table[fn] = cid_to_char(v, fn)
+   ltjf_font_metric_table[fn] = cid_to_uni(v, fn)
 end
 
 

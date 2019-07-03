@@ -43,7 +43,6 @@ local attr_icflag = luatexbase.attributes['ltj@icflag']
 local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
 local ltjs_orig_char_table = ltjs.orig_char_table
 local ltjf_replace_altfont = ltjf.replace_altfont
---local ltjf_font_extra_info = ltjf.font_extra_info
 local attr_orig_char = luatexbase.attributes['ltj@origchar']
 local STCK  = luatexja.userid_table.STCK
 local DIR   = luatexja.userid_table.DIR
