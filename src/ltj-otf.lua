@@ -68,9 +68,13 @@ end
 
 
 local function get_ucs_from_rmlgbm(c)
-   local v = (ivd_aj1 and ivd_aj1.table_ivd_aj1[c]
-     or ltjr_cidfont_data["Adobe-Japan1"].resources.unicodes["Japan1." .. tostring(c)])
-     or 0
+   local v = (ivd_aj1 and ivd_aj1.table_ivd_aj1[c])
+   if v==true then
+     for i,w in pairs(ltjr_cidfont_data["Adobe-Japan1"].descriptions) do
+	if w.index==v then v = i; break end
+     end
+   end
+   v = v or 0
    if v>=0x200000 then -- table
       local curjfnt_num = tex_get_attr((ltjd_get_dir_count()==dir_tate)
                                         and attr_curtfnt or attr_curjfnt)
@@ -185,20 +189,21 @@ do
          --			   'Current Japanese font (or other CJK font) "'
          --			      ..curjfnt.psname..'" is not a CID-Keyed font (Adobe-Japan1 etc.)')
             return append_jglyph(get_ucs_from_rmlgbm(key))
-      end
-      local fe, char = ltjf_font_extra_info[curjfnt_num], nil
-      if fe and fe.unicodes then 
-         char = fe.unicodes[cidinfo.ordering..'.'..tostring(key)]
-      end
-      if not char then
-         ltjb.package_warning('luatexja-otf',
-                              'Current Japanese font (or other CJK font) "'
-                                 ..curjfnt.psname..'" does not have the specified CID character ('
-                                 ..tostring(key)..')',
-                              'Use a font including the specified CID character.')
+      else
+	 local char = nil
+	 for i,v in pairs(curjfnt.shared.rawdata.descriptions) do
+	    if v.index==key then char = i; break end
+	 end
+	 if not char then
+	    ltjb.package_warning('luatexja-otf',
+               'Current Japanese font (or other CJK font) "'
+		  ..curjfnt.psname..'" does not have the specified CID character ('
+		  ..tostring(key)..')',
+	       'Use a font including the specified CID character.')
          char = 0
+	 end
+	 return append_jglyph(char)
       end
-      return append_jglyph(char)
    end
 end
 

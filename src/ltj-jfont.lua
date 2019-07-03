@@ -950,7 +950,7 @@ end
 
 --
 do
-   local cache_ver = 16
+   local cache_ver = 17
 
    local function prepare_extra_data_base(id)
       if (not id) or (not id.filename) then return end
