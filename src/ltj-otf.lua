@@ -47,6 +47,7 @@ local lang_ja = luatexja.lang_ja
 local identifiers = fonts.hashes.identifiers
 
 local ltjf_font_metric_table = ltjf.font_metric_table
+local ltjf_font_extra_info = ltjf.font_extra_info
 local ltjf_find_char_class = ltjf.find_char_class
 local ltjr_cidfont_data = ltjr.cidfont_data
 local ltjc_is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char
@@ -67,13 +68,9 @@ end
 
 
 local function get_ucs_from_rmlgbm(c)
-   local v = (ivd_aj1 and ivd_aj1.table_ivd_aj1[c])
-   if v==true then
-     for i,w in pairs(ltjr_cidfont_data["Adobe-Japan1"].descriptions) do
-	if w.index==v then v = i; break end
-     end
-   end
-   v = v or 0
+   local v = (ivd_aj1 and ivd_aj1.table_ivd_aj1[c]
+      or ltjr_cidfont_data["Adobe-Japan1"].resources.unicodes["Japan1." .. tostring(c)])
+      or 0
    if v>=0x200000 then -- table
       local curjfnt_num = tex_get_attr((ltjd_get_dir_count()==dir_tate)
                                         and attr_curtfnt or attr_curjfnt)
@@ -189,12 +186,12 @@ do
          --			      ..curjfnt.psname..'" is not a CID-Keyed font (Adobe-Japan1 etc.)')
             return append_jglyph(get_ucs_from_rmlgbm(key))
       else
-	 local char = ltjf_font_metric_table[curjfnt_num].cid_to_uni[key]
+	 local char = ltjf_font_extra_info[curjfnt_num].ind_to_uni[key]
 	 if not char then
-	    ltjb.package_warning('luatexja-otf',
-               '"' ..curjfnt.psname..'" does not have CID character '
-		  ..tostring(key),
-	       'Use a font including the specified CID character.')
+--	    ltjb.package_warning('luatexja-otf',
+--               '"' ..curjfnt.psname..'" does not have CID character '
+--		  ..tostring(key),
+--	       'Use a font including the specified CID character.')
          char = 0
 	 end
 	 return append_jglyph(char)
@@ -243,15 +240,12 @@ ltjb.add_to_callback('pre_linebreak_filter', extract,'ltj.otf',
 -- additional callbacks
 -- 以下は，LuaTeX-ja に用意された callback のサンプルになっている．
 --   JFM の文字クラスの指定の所で，"AJ1-xxx" 形式での指定を可能とした．
---   これらの文字指定は，和文フォント定義ごとに，それぞれのフォントの
---   CID <-> グリフ 対応状況による変換テーブルが用意される．
 
--- 和文フォント読み込み時に，CID -> unicode 対応をとっておく．
-local function cid_to_uni(fmtable, fn)
+-- 和文フォント読み込み時に，ind -> unicode 対応をとっておく．
+local function ind_to_uni(fmtable, fn)
    local fi = identifiers[fn]
-   local t = {}; fmtable.cid_to_uni = t
-   for i,v in pairs(fi.shared.rawdata.descriptions) do t[v.index] = i end
-   if fi.resources and fi.resources.cidinfo 
+   local t = ltjf_font_extra_info[fn].ind_to_uni
+   if t and fi.resources and fi.resources.cidinfo 
       and fi.resources.cidinfo.ordering == "Japan1" then
       for i, v in pairs(fmtable.chars) do
 	 local j = string.match(i, "^AJ1%-([0-9]*)")
@@ -267,10 +261,10 @@ local function cid_to_uni(fmtable, fn)
    return fmtable
 end
 luatexbase.add_to_callback("luatexja.define_jfont",
-			   cid_to_uni, "ltj.otf.define_jfont", 1)
+			   ind_to_uni, "ltj.otf.define_jfont", 1)
 --  既に読み込まれているフォントに対しても，同じことをやらないといけない
 for fn, v in pairs(ltjf_font_metric_table) do
-   ltjf_font_metric_table[fn] = cid_to_uni(v, fn)
+   ltjf_font_metric_table[fn] = ind_to_uni(v, fn)
 end
 
 

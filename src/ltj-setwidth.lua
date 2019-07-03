@@ -177,20 +177,20 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
    do
       local pf = getfont(p)
       local pc = getchar(p)
-      local cei = ltjf_font_extra_info[pf] and  ltjf_font_extra_info[pf][pc]
-      if cei and met.vert_activated then
-	 if cei.rotation then
+      local feir = ltjf_font_extra_info[pf]
+      if feir and feir.rotation and met.vert_activated then
+	 if feir.rotation[pc] then
 	    return capsule_glyph_tate_rot(p, met, char_data, head, dir, 0.5*(ascent-descent))
 	 end
       end
       local ident = fonts.hashes.identifiers[pf]
       pwidth = (ident.descriptions and ident.descriptions[pc] 
-         and (ident.descriptions[pc].vheight / ident.units * met.size))
+         and ident.descriptions[pc].vheight
+         and ident.descriptions[pc].vheight / ident.units * met.size)
          or (ascent+descent)
       pwidth = pwidth + (met.v_advance[pc] or 0)
       ascent = met.v_origin[pc] and ascent - met.v_origin[pc] or ascent
    end
-   print(fwidth, pwidth)
    fwidth = fwidth or pwidth
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = call_callback("luatexja.set_width", fshift, met, char_data)

@@ -796,8 +796,8 @@ do
          
          for i,_ in pairs(rot) do
             dest = dest or {}
-            dest[i] = dest[i] or {}
-            dest[i].rotation = true
+            dest.rotation = dest.rotation or {}
+            dest.rotation[i] = true
          end
       end
       return dest
@@ -806,141 +806,21 @@ end
 
 -- vertical metrics
 local prepare_fl_data
-local supply_vkern_table
 do
-   local fields = fontloader.fields
-   local function glyph_vmetric(glyph)
-      local flds = fields(glyph)
-      local vw, tsb, vk = nil, nil, nil
-      for _,i in ipairs(flds) do
-         if i=='vkerns' then vk = glyph.vkerns end
-      end
-      return vw, tsb, vk
-   end
-
    local sort = table.sort
-   local function add_fl_table(dest, glyphs, unitable, asc_des, units, id)
-      local glyphmin, glyphmax = glyphs.glyphmin, glyphs.glyphmax
-      if glyphmax < 0 then return dest end
-      local tg = glyphs.glyphs
-      for i = glyphmin, glyphmax do
-         local gv = tg[i]
-         if gv then
-            if gv.altuni then
-               for _,at in pairs(gv.altuni) do
-                  local bu, vsel = at.unicode, at.variant
-                  if vsel then
-                     if vsel>=0xE0100 then vsel = vsel - 0xE0100 end
-                     local uniq_flag = true
-                     if dest and dest[bu] then
-                        for i,_ in pairs(dest[bu]) do
-                           if i==vsel then uniq_flag = false; break end
-                        end
-                     end
-                     if uniq_flag then
-                        dest = dest or {}; dest[bu] = dest[bu] or {}
-                        dest[bu][vsel] = unitable[gv.name]
-                     end
-                  end
-               end
-            end
-            -- vertical metric
-            local vw, tsb, vk = glyph_vmetric(gv)
-            local gi = unitable[gv.name]
-            -- vertical kern
-            if gi and vk then
-               dest = dest or {};
-               local dest_vk = dest.vkerns or {}; dest.vkerns = dest_vk
-               for _,v in pairs(vk) do
-                  if unitable[v.char] then
-                     local vl = v.lookup
-                     if type(vl)=='table' then
-                        for _,vlt in pairs(vl) do
-                           dest_vk[vlt] = dest_vk[vlt] or {}
-                           dest_vk[vlt][gi] = dest_vk[vlt][gi] or {}
-                           dest_vk[vlt][gi][unitable[v.char]] = v.off
-                        end
-                     else
-                        dest_vk[vl] = dest_vk[vl] or {}
-                        dest_vk[vl][gi] = dest_vk[vl][gi] or {}
-                        dest_vk[vl][gi][unitable[v.char]] = v.off
-                     end
-                  end
-               end
-            end
-         end
-      end
-      return dest
-   end
    prepare_fl_data = function (dest, id)
-      local t = fontloader.info(id.filename)
-      if not t then return dest end
-      local fl
-      if t.fontname then
-        fl = fontloader.open(id.filename)
-      else
-        fl = fontloader.open(id.filename, id.fontname) -- マニュアルにはこっちで書いてあるが？
-        if not fl then
-          local index
-          for i,v in ipairs(t) do
-            if v.fontname == id.fontname then index=i; break end
-          end  
-          fl = fontloader.open(id.filename, index)
-        end
-      end
-      if not fl then fontloader.close(fl); return dest end
-      local ind_to_uni, unicodes = {}, {}
-      for i,v in pairs(id.characters) do
-          ind_to_uni[v.index] = i
-      end
-      if fl.glyphs then
-         local tg, glyphmin, glyphmax = fl.glyphs, fl.glyphmin, fl.glyphmax
-         if 0 <= glyphmax then
-            for i = glyphmin, glyphmax do
-               if tg[i] and tg[i].name then unicodes[tg[i].name] = ind_to_uni[i] end
-            end
-         end
-         dest = add_fl_table(dest, fl, unicodes,
-                             fl.ascent + fl.descent, fl.units_per_em, id)
-      end
-      if fl.subfonts then
-         for _,v in pairs(fl.subfonts) do
-            local tg, glyphmin, glyphmax = v.glyphs, v.glyphmin, v.glyphmax
-            if 0 <= glyphmax then
-               for i = glyphmin, glyphmax do
-                  if tg[i] and tg[i].name then unicodes[tg[i].name] = ind_to_uni[i] end
-               end
-           end
-       end
-         for _,v in pairs(fl.subfonts) do
-            dest = add_fl_table(dest, v, unicodes,
-                                fl.ascent + fl.descent, fl.units_per_em, id)
-         end
+     local t = {}
+     for i,v in pairs(id.shared.rawdata.descriptions) do
+        t[v.index] = i
      end
-     if dest then dest.unicodes = unicodes end
-     fontloader.close(fl); collectgarbage("collect")
+     dest = dest or {}; dest.ind_to_uni = t
      return dest
-   end
-   -- supply vkern table
-   supply_vkern_table = function(id, bname)
-      local bx = font_extra_basename[bname].vkerns
-      local lookuphash =  id.resources.lookuphash
-      local desc = id.shared.rawdata.descriptions
-      if bx and lookuphash then
-         for i,v in pairs(bx) do
-            lookuphash[i] = lookuphash[i] or v
-            for j,w in pairs(v) do
-               desc[j].kerns = desc[j].kerns or {}
-               desc[j].kerns[i] = w
-            end
-         end
-      end
    end
 end
 
 --
 do
-   local cache_ver = 17
+   local cache_ver = 18
 
    local function prepare_extra_data_base(id)
       if (not id) or (not id.filename) then return end
@@ -983,7 +863,6 @@ do
           -- these function is executed one time per one fontfile
           if jfm_file_name then
             local bname = prepare_extra_data_base(tfmdata)
-            if bname then supply_vkern_table(tfmdata, bname) end
           end
           return tfmdata
        end,
