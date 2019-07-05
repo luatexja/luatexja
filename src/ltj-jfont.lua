@@ -860,11 +860,8 @@ do
     luatexbase.add_to_callback(
        'luaotfload.patch_font',
        function (tfmdata)
-          -- these function is executed one time per one fontfile
-          if jfm_file_name then
-            local bname = prepare_extra_data_base(tfmdata)
-          end
-          return tfmdata
+	  -- these function is executed one time per one fontfile
+	  prepare_extra_data_base(tfmdata); return tfmdata
        end,
        'ltj.prepare_extra_data', 1)
    luatexbase.add_to_callback(
