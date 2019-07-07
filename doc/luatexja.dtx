@@ -1818,7 +1818,7 @@ determined from the following data:
 これらは以下のデータに基づいて決定している．
 %</ja>
 \begin{itemize}
-%<en>\item Blocks in Unicode~11.0.
+%<en>\item Blocks in Unicode~12.0.0.
 %<ja>\item Unicode~11.0のブロック．
 %<en>\item The \texttt{Adobe-Japan1-UCS2} mapping between a CID Adobe-Japan1-6 and Unicode.
 %<ja>\item Adobe-Japan1-6のCIDとUnicodeの間の対応表\texttt{Adobe-Japan1-UCS2}．
@@ -6937,6 +6937,7 @@ CID番号が<number>の文字を出力する．
   「適切なグリフ」\footnote{%
   特に縦組用グリフのCID番号を指定した場合は（LuaTeX-ja 20190504.0以降では若干改良されているが）
   意図しない結果になる可能性が高い．
+  なお，バージョン20190708.0以降では，CIDからグリフへの選択にグリフ名の情報を使用していない．
   また，フォントにIVDコレクションAdobe-Japan1が含まれていれば，その情報を用いて
   グリフを選択する．
 }を出力する．
