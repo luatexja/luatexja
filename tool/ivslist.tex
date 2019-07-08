@@ -29,52 +29,29 @@
 \baselineskip18pt
 
 \begin{luacode}
-local fl = fontloader.open(ident.filename)
-local ft = fontloader.to_table(fl)
-
+local t = ident.shared.rawdata
+t = t and t.resources
+t = t and t.variants
 local ivs, ivsi = {}, {}
-local uniq_flag
-local function add_ivs_table(tg)
-   for gu, gv in pairs(tg) do
-      local ga = gv.altuni
-      if ga then
-	 for _,at in pairs(ga) do
-	    local bu, vs = at.unicode, (at.variant or 0)-0xE0100
-	    if vs>=0 and vs<0xF0 then
-	       if not ivs[bu] then ivs[bu] = {}; ivsi[1+#ivsi]=bu end
-	       uniq_flag = true
-               for _,v in pairs(ivs[bu]) do
-                  if v[1]==vs then uniq_flag = false; break end
-               end
-	       if uniq_flag then ivs[bu][1+#(ivs[bu])] = { vs, gv.name } end
-	    end
-	 end
-      end
-   end
+for i,v in pairs(t) do
+  if i>=0xE0100 then
+    for j,w in pairs(v) do
+       if not ivs[j] then table.insert(ivsi,j); ivs[j]=ivs[j] or {}; end
+       table.insert(ivs[j],{i-0xE0100,w})
+    end
+  end
 end
-
-add_ivs_table(ft.glyphs)
-if ft.subfonts then
-   for _,v in pairs(ft.subfonts) do
-      add_ivs_table(v.glyphs)
-   end
-end
-fontloader.close(fl)
-
-local unicodes = ident.resources.unicodes
 local sort = table.sort
 local sortfn = function (a,b) return a[1]<b[1] end
 sort(ivsi)
-for _,v in pairs(ivsi) do 
-   sort(ivs[v], sortfn) 
+for _,v in pairs(ivsi) do
+   sort(ivs[v], sortfn)
    tex.sprint('\\OUT{' .. string.format('%X', v) .. '}\\ ')
    for _, cn in pairs(ivs[v]) do
-     tex.sprint('\\FMT{' .. tostring(unicodes[cn[2]]) .. '}{' .. cn[1] .. '}' )
+     tex.sprint('\\FMT{' .. tostring(cn[2]) .. '}{' .. cn[1] .. '}' )
    end
    tex.sprint('\\par')
 end
-
-
 \end{luacode}
 
 
