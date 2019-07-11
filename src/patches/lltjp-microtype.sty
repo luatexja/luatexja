@@ -1,5 +1,5 @@
 %
-% lltjp-microtype.sty 2019-03-29
+% lltjp-microtype.sty 2019-07-12
 %
 % (Work in Progress)
 % 
@@ -23,10 +23,11 @@
   /MT@map@tlist@n{/\LτJCHAREX}/@makeother /lccode`/τ=`/t
   /lowercase{%
     /def/x{/endgroup
+      /def/MT@charstring{\CHAR"}%
       /def/MT@is@char##1\CHAR"##2##3##4/relax{%
 		%/message{MIC <##1><##2><##3><##4>}%
         /ifx/relax##4/relax
-            /expandafter/MT@is@char@ltja/MT@strip@prefix##1/relax\LτJALCHAR\LτJALCHAR/relax
+            /expandafter/MT@is@char@ltja/MT@strip@prefix##1>/relax\LτJALCHAR\LτJALCHAR/relax
         /else
           /ifx/relax##1/relax
             /if##3\/relax
@@ -50,5 +51,4 @@
     }%
   }
 /x
-
 \endinput
