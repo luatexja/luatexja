@@ -41,10 +41,12 @@
           /fi
         /fi
       }%
+      /def/MT@ltjs@drop@##1>##2/relax{##1}%
       /def/MT@is@char@ltja##1\LτJALCHAR##2\LτJALCHAR##3/relax{%
+        %/typeout{MICLTJA <##1><##2><##3>}%
         /ifx/relax##1/relax
           /ifx/relax##2/relax/else
-            /edef/MT@char@{/number##2}%
+            /edef/MT@char@{/expandafter/number/MT@ltjs@drop@##2>/relax}%
           /fi
         /fi
       }%
