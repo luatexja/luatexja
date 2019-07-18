@@ -48,8 +48,7 @@
 %% Load all sub-packages.
 \ifltj@in@latex                 %<*LaTeX>
   %% \RequirePackage{expl3} needed if the version of l3kernel is v6111
-  \RequirePackage{luatexja-core}
-  \RequirePackage{luatexja-compat}
+  \RequirePackage{luatexja-core,luatexja-compat}
 \else                           %<*!LaTeX>
   \input luatexja-core.sty %
   \input luatexja-compat.sty %
