@@ -257,7 +257,7 @@ do
       if lfs.isdir(testpath) then savepath = testpath; break end
    end
 
-   save_cache_luc = function (filename, t, serialized)
+   local function save_cache_luc(filename, t, serialized)
       local fullpath = savepath .. '/' ..  filename .. luc_suffix
       local s = serialized or serialize(t, 'return', false)
       if s then
@@ -271,7 +271,7 @@ do
       end
    end
 
-   save_cache = function (filename, t)
+   local function save_cache(filename, t)
       local fullpath = savepath .. '/' ..  filename .. '.lua'
       local s = serialize(t, 'return', false)
       if s then
@@ -285,7 +285,7 @@ do
       end
    end
 
-   local function load_cache_a (filename, outdate)
+   local function load_cache_a(filename, outdate)
       local result
       for _,v in pairs(path) do
 	 local fn = join(v, cache_dir, filename)
@@ -302,7 +302,7 @@ do
       end
    end
    
-   load_cache = function (filename, outdate)
+   local function load_cache(filename, outdate)
       local r = load_cache_a(filename ..  luc_suffix, outdate)
       if r then 
 	 return r
@@ -313,6 +313,17 @@ do
       end
    end
 
+   local function remove_file_if_exist(name)
+     if os.rename(name,name) then os.remove(name) end
+   end
+   local function remove_cache (filename)
+      local fullpath_wo_ext = savepath .. '/' ..  filename .. '.lu'
+      remove_file_if_exist(fullpath_wo_ext .. 'a')
+      remove_file_if_exist(fullpath_wo_ext .. 'b')
+      remove_file_if_exist(fullpath_wo_ext .. 'c')
+   end
+
+   ltjb.remove_cache = remove_cache
    ltjb.load_cache = load_cache
    ltjb.save_cache_luc = save_cache_luc
    ltjb.save_cache = save_cache
