@@ -177,8 +177,7 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
    local ascent, descent = met.ascent, met.descent
    local fwidth, pwidth = char_data.width
    do
-      local pf = getfont(p)
-      local pc = getchar(p)
+      local pf, pc = getfont(p), getchar(p)
       local feir = ltjf_font_extra_info[pf]
       if feir and feir.rotation and met.vert_activated then
 	 if feir.rotation[pc] then
@@ -186,10 +185,10 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
 	 end
       end
       local ident = fonts.hashes.identifiers[pf]
-      pwidth = (ident.descriptions and ident.descriptions[pc] 
+      pwidth = (ident.descriptions and ident.descriptions[pc]
          and ident.descriptions[pc].vheight
          and ident.descriptions[pc].vheight / ident.units * met.size)
-	 or (ident.metadata and ident.metadate.defaultvheight) or (ascent+descent)
+         or (ident.metadata and ident.metadata.defaultvheight) or (ascent+descent)
       ascent = feir.vorigin[pc] and (feir.vorigin[pc] / ident.units * met.size) or ascent
    end
    fwidth = fwidth or pwidth

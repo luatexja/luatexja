@@ -812,11 +812,11 @@ do
      local ascent = id.shared.rawdata.metadata.ascender
      local t_vorigin, t_ind_to_uni = {}, {}
      for i,v in pairs(id.shared.rawdata.descriptions) do
-        t_ind_to_uni[v.index] = i
-        if v.tsb then
-          local j = v.boundingbox[4] + v.tsb
-          if j~=ascent then print(i,j);t_vorigin[i]=j end
-        end
+       t_ind_to_uni[v.index] = i
+       if v.tsb then
+         local j = v.boundingbox[4] + v.tsb
+         if j~=ascent then t_vorigin[i]=j end
+       end
      end
      dest = dest or {}
      dest.ind_to_uni = t_ind_to_uni
@@ -888,63 +888,6 @@ do
          prepare_extra_data_font(i,identifiers[i])
       end
    end
-end
-
-
-------------------------------------------------------------------------
--- calculate vadvance
-------------------------------------------------------------------------
-do
-   local function acc_feature(table_vadv, table_vorg, subtables, ft,  already_vert)
-      for char_num,v in pairs(ft.shared.rawdata.descriptions) do
-         if v.slookups then
-            for sn, sv in pairs(v.slookups) do
-               if subtables[sn] and type(sv)=='table' then
-                  if sv[4]~=0 then
-                     table_vadv[char_num]
-                        = (table_vadv[char_num] or 0) + sv[4]
-                  end
-                  if sv[2]~=0 and not already_vert then
-                     table_vorg[char_num]
-                        = (table_vorg[char_num] or 0) + sv[2]
-                  end
-               end
-            end
-         end
-      end
-   end
-
-luatexbase.add_to_callback(
-   "luatexja.define_jfont",
-   function (fmtable, fnum)
-      local vadv = {}; fmtable.v_advance = vadv
-      local vorg = {}; fmtable.v_origin = vorg
-      local ft = font_getfont(fnum)
-      local subtables = {}
-      if ft.specification then
-         for feat_name,v in pairs(ft.specification.features.normal) do
-            if v==true and ft.resources then
-               for _,i in pairs(ft.resources.sequences) do
-                  if i.order[1]== feat_name and i.type == 'gpos_single' and type(i.subtables)=='table' then
-                     for _,st in pairs(i.subtables) do
-                        subtables[st] = true
-                     end
-                  end
-               end
-            end
-         end
-         acc_feature(vadv, vorg, subtables, ft,
-                     ft.specification.features.normal.vrt2 or ft.specification.features.normal.vert)
-         for i,v in pairs(vadv) do
-            vadv[i]=vadv[i]/ft.units_per_em*fmtable.size
-         end
-         for i,v in pairs(vorg) do
-            vorg[i]=vorg[i]/ft.units_per_em*fmtable.size
-         end
-      end
-      return fmtable
-   end, 'ltj.v_advance', 1
-)
 end
 
 ------------------------------------------------------------------------

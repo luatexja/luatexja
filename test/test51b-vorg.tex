@@ -1,0 +1,56 @@
+\documentclass{ltjarticle}
+\usepackage[margin=15mm,centering]{geometry}
+\usepackage{lltjext,xcolor}
+%\usepackage{lua-visual-debug}
+\begin{document}
+\def\V#1{%
+  \setbox0=\hbox to0pt{\yoko\hss\smash{#1}　\kern-\zw\hss}%
+  \box0\relax
+}
+\def\YL{\rlap{\textcolor{magenta}{\vrule height 0.0625mm depth 0.0625mm width 500pt}}}
+\def\TEST#1{\smash{\hbox to 0pt{\tate%
+  \kern120pt\YL%
+  \tfont\A=#1:jfm=ujisv at 10pt\A
+  \jfont\B=#1:jfm=ujis at 10pt\B
+  国\V Ｔ\V ｙ\V ｐ\V ｏ\V ｇ\V ｒ\V ａ\V ｐ\V ｈ\V ｙ国\V Ｑ国
+  \V Ｊ国\V{\ltjjachar`Å}国
+  \hss}}%
+  \smash{\hbox to 0pt{\tate%
+  \hbox to 120pt{\ttfamily #1\hss}\YL%
+  \tfont\A=#1:jfm=ujisv at 10pt\A
+  国Ｔｙｐｏｇｒａｐｈｙ国Ｑ国Ｊ国\ltjjachar`Å国\ltjjachar"3031国
+  \hss}}\quad}
+
+\def\TL{\smash{\rlap{\hbox to 0pt{\tate%
+  \kern120pt\color{cyan}\kern-0.0625mm%
+  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
+  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
+  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
+  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
+  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
+  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
+  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
+  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
+  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
+  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
+  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
+  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
+  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
+  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
+  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
+  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
+  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
+  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
+  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
+}}}}
+
+\leavevmode
+\TL
+\TEST{IPAExMincho}
+\TEST{HiraMinProN-W3}
+\TEST{KozMinPr6N-Regular}
+\TEST{YuMincho}
+\TEST{SourceHanSerif-Regular}
+
+\end{document}
+
