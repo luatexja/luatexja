@@ -14,6 +14,7 @@ local getfont = node.direct.getfont
 local getlist = node.direct.getlist
 local getchar = node.direct.getchar
 local getsubtype = node.direct.getsubtype
+local getwidth = node.direct.getwidth or function(n) return getfield(n,'width') end
 local getdepth = node.direct.getdepth or function(n) return getfield(n,'depth') end
 local getwhd = node.direct.getwhd or function(n)
   return getfield(n,'width'), getfield(n,'height'),getfield(n,'depth') end
@@ -23,6 +24,7 @@ local setwhd = node.direct.setwhd or function(n,w,h,d)
 local setchar = node.direct.setchar or function(n,c) setfield(n,'char',c) end
 local setnext = node.direct.setnext or function(n,c) setfield(n,'next',c) end
 local setdir = node.direct.setdir or function(n,c) setfield(n,'dir',c) end
+local setkern = node.direct.setkern or function(n,c) setfield(n,'kern',c) end
 local setoffsets = node.direct.setoffsets or function(n,x,y)
   setfield(n,'xoffset',x); setfield(n,'yoffset',y)  end
 local getoffsets = node.direct.getoffsets or function(n)
@@ -81,7 +83,7 @@ luatexbase.create_callback("luatexja.set_width", "data",
 			   end)
 local call_callback = luatexbase.call_callback
 
-local fshift =  { down = 0, left = 0}
+local fshift =  { down = 0, left = 0 }
 
 local min, max = math.min, math.max
 
@@ -187,9 +189,8 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
       pwidth = (ident.descriptions and ident.descriptions[pc] 
          and ident.descriptions[pc].vheight
          and ident.descriptions[pc].vheight / ident.units * met.size)
-         or (ascent+descent)
-      pwidth = pwidth + (met.v_advance[pc] or 0)
-      ascent = met.v_origin[pc] and ascent - met.v_origin[pc] or ascent
+	 or (ident.metadata and ident.metadate.defaultvheight) or (ascent+descent)
+      ascent = feir.vorigin[pc] and (feir.vorigin[pc] / ident.units * met.size) or ascent
    end
    fwidth = fwidth or pwidth
    fshift.down = char_data.down; fshift.left = char_data.left
@@ -210,9 +211,9 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
    local ws = node_new(id_whatsit, sid_save)
    local wm = node_new(id_whatsit, sid_matrix)
    setfield(wm, 'data', '0 1 -1 0')
-   local pwnh = -round(0.5*getfield(p, 'width'))
-   local k2 = node_new(id_kern, 1); setfield(k2, 'kern', pwnh)
-   local k3 = node_new(id_kern, 1); setfield(k3, 'kern', -getfield(p, 'width')-pwnh)
+   local pwnh = -round(0.5*getwidth(p))
+   local k2 = node_new(id_kern, 1); setkern(k2, pwnh)
+   local k3 = node_new(id_kern, 1); setkern(k3, -getwidth(p)-pwnh)
    local wr = node_new(id_whatsit, sid_restore)
    setfield(box, 'head', ws)
    setnext(ws, wm);  setnext(wm, k2);
@@ -228,7 +229,7 @@ luatexja.setwidth.capsule_glyph_tate = capsule_glyph_tate
 
 local function capsule_glyph_math(p, met, char_data)
    if not char_data then return nil end
-   local fwidth, pwidth = char_data.width, getfield(p, 'width')
+   local fwidth, pwidth = char_data.width, getwidth(p)
    fwidth = fwidth or pwidth
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = call_callback("luatexja.set_width", fshift, met, char_data)

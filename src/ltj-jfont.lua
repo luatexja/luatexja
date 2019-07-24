@@ -809,18 +809,25 @@ local prepare_fl_data
 do
    local sort = table.sort
    prepare_fl_data = function (dest, id)
-     local t = {}
+     local ascent = id.shared.rawdata.metadata.ascender
+     local t_vorigin, t_ind_to_uni = {}, {}
      for i,v in pairs(id.shared.rawdata.descriptions) do
-        t[v.index] = i
+        t_ind_to_uni[v.index] = i
+        if v.tsb then
+          local j = v.boundingbox[4] + v.tsb
+          if j~=ascent then print(i,j);t_vorigin[i]=j end
+        end
      end
-     dest = dest or {}; dest.ind_to_uni = t
+     dest = dest or {}
+     dest.ind_to_uni = t_ind_to_uni
+     dest.vorigin = t_vorigin
      return dest
    end
 end
 
 --
 do
-   local cache_ver = 18
+   local cache_ver = 19
 
    local function prepare_extra_data_base(id)
       if (not id) or (not id.filename) then return end

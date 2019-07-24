@@ -297,7 +297,6 @@ end
 t[200]=table.fastcopy(t[0])
 t[200].chars={'〱', '〲'}
 t[200].width = 2.0
-t[200].left=-0.5
 for i,v in pairs(t) do
   if type(v)=='table' then
     if v.glue and v.glue[0] then v.glue[200] = v.glue[0] end
