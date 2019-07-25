@@ -315,7 +315,7 @@ do -- 002 ---------------------------------------
    local identifiers = fonts.hashes.identifiers
    local function calc_np_notdef(lp)
       local ident = identifiers[getfont(lp)]
-      if not ident.characters[getchar(p)] then
+      if not ident.descriptions[getchar(lp)] then
 	 local ln = node_next(lp)
 	 if (ident.shared and ident.shared.features and ident.shared.features.notdef)
 	    and ln and getid(ln)==id_glyph then 
