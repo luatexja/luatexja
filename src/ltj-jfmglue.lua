@@ -318,7 +318,7 @@ do -- 002 ---------------------------------------
       if not ident.characters[getchar(p)] then
 	 local ln = node_next(lp)
 	 if (ident.shared and ident.shared.features and ident.shared.features.notdef)
-	    and ln and getid(ln)==id_char then 
+	    and ln and getid(ln)==id_glyph then 
 	    set_attr(lp, attr_icflag, PROCESSED)
 	    set_attr(ln, attr_jchar_code, has_attr(lp, attr_jchar_code) or getchar(lp))
 	    set_attr(ln, attr_jchar_class, has_attr(lp, attr_jchar_class) or 0)
