@@ -58,6 +58,7 @@ local dir_tate = luatexja.dir_table.dir_tate
 local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 local attr_tkblshift = luatexbase.attributes['ltj@tkblshift']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
+local attr_vert_ori = luatexbase.attributes['ltj@vert@ori']
 
 local ltjf_font_extra_info = ltjf.font_extra_info
 
@@ -180,7 +181,7 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
       local pf, pc = getfont(p), getchar(p)
       local feir = ltjf_font_extra_info[pf]
       if feir and feir.rotation and met.vert_activated then
-	 if feir.rotation[pc] then
+	 if feir.rotation[pc] and (has_attr(p, attr_vert_ori) or 0)<=0 then
 	    return capsule_glyph_tate_rot(p, met, char_data, head, dir, 0.5*(ascent-descent))
 	 end
       end

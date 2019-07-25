@@ -2,46 +2,40 @@
 \usepackage[margin=15mm,centering]{geometry}
 \usepackage{lltjext,xcolor}
 %\usepackage{lua-visual-debug}
+\makeatletter
+\protected\def\ltjuprightchar{\afterassignment\ltj@@uprightcharchar\ltj@tempcnta}
+\def\ltj@@uprightchar{{\directlua{tex.globaldefs=0}\ltj@alljachar
+  \ltj@vert@ori\@ne\ltj@@origchar\ltj@tempcnta}}
+\def\ltjvertupright{\ltj@vert@ori\@ne}
 \begin{document}
+\sffamily
 \def\V#1{%
   \setbox0=\hbox to0pt{\yoko\hss\smash{#1}　\kern-\zw\hss}%
   \box0\relax
 }
-\def\YL{\rlap{\textcolor{magenta}{\vrule height 0.0625mm depth 0.0625mm width 500pt}}}
+\def\YL{\rlap{\textcolor{cyan!50!white}{\vrule height 0.05mm depth 0.05mm width 500pt}}}
 \def\TEST#1{\smash{\hbox to 0pt{\tate%
   \kern120pt\YL%
   \tfont\A=#1:jfm=ujisv at 10pt\A
   \jfont\B=#1:jfm=ujis at 10pt\B
-  国\V Ｔ\V ｙ\V ｐ\V ｏ\V ｇ\V ｒ\V ａ\V ｐ\V ｈ\V ｙ国\V Ｑ国
-  \V Ｊ国\V{\ltjjachar`Å}国
+  国\V Ｔ\V ｙ\V ｐ\V ｏ\V ｇ\V ｒ\V ａ\V ｐ\V ｈ\V Ｙ国\V Ｑ国
+  \V Ｊ国\V{\ltjjachar`Å}国\V{\ltjjachar`β}国
   \hss}}%
-  \smash{\hbox to 0pt{\tate%
+  \smash{\hbox to 0pt{\tate\ltjvertupright%
   \hbox to 120pt{\ttfamily #1\hss}\YL%
-  \tfont\A=#1:jfm=ujisv at 10pt\A
-  国Ｔｙｐｏｇｒａｐｈｙ国Ｑ国Ｊ国\ltjjachar`Å国\ltjjachar"3031国
+  \tfont\A=#1:jfm=ujisv;notdef=false at 10pt\A
+  国ＴｙｐｏｇｒａｐｈＹ国Ｑ国Ｊ国\ltjjachar`Å国\ltjjachar`β国\ltjjachar"3031国
+  \ltjjachar"41国
   \hss}}\quad}
 
+% AJ1-6 には Å の pre-rotated glyph あり→こいつは回転してはいけない
+% TODO: notdef があると乱れる
+
 \def\TL{\smash{\rlap{\hbox to 0pt{\tate%
-  \kern120pt\color{cyan}\kern-0.0625mm%
-  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
-  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
-  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
-  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
-  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
-  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
-  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
-  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
-  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
-  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
-  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
-  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
-  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
-  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
-  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
-  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
-  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
-  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
-  \vrule height 400pt depth 0pt width 0.125mm\kern\dimexpr10pt-0.125mm%
+  \kern120pt\color{cyan}\kern-0.05mm%
+  \count2=0 \loop\ifnum\count2<50
+  \vrule height 400pt depth 0pt width 0.1mm\kern\dimexpr10pt-0.1mm%
+  \advance\count2 by 1\relax\repeat
 }}}}
 
 \leavevmode
