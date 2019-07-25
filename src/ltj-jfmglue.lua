@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2018/08/11',
+  date = '2019/07/26',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}
@@ -267,7 +267,7 @@ luatexbase.create_callback("luatexja.jfmglue.whatsit_after", "data",
 
 -- calc next Np
 local calc_np 
-do
+do -- 001 -----------------------------------------------
 
 local traverse = node.direct.traverse
 local function check_next_ickern(lp)
@@ -306,21 +306,40 @@ local function calc_np_pbox(lp, last)
    return lp
 end
 
-local ltjw_apply_ashift_math = ltjw.apply_ashift_math
-local ltjw_apply_ashift_disc = ltjw.apply_ashift_disc
-local min, max = math.min, math.max
-local function calc_np_aux_glyph_common(lp, acc_flag)
-   Np.nuc = lp
-   Np.first= (Np.first or lp)
-   if if_lang_ja(lp) then
+local calc_np_aux_glyph_common
+do -- 002 ---------------------------------------
+   local min, max = math.min, math.max
+   local getwhd = node.direct.getwhd
+   local attr_jchar_class = luatexbase.attributes['ltj@charclass']
+   local attr_jchar_code = luatexbase.attributes['ltj@charcode']
+   local identifiers = fonts.hashes.identifiers
+   local function calc_np_notdef(lp)
+      local ident = identifiers[getfont(lp)]
+      if not ident.characters[getchar(p)] then
+	 local ln = node_next(lp)
+	 if (ident.shared and ident.shared.features and ident.shared.features.notdef)
+	    and ln and getid(ln)==id_char then 
+	    set_attr(lp, attr_icflag, PROCESSED)
+	    set_attr(ln, attr_jchar_code, has_attr(lp, attr_jchar_code) or getchar(lp))
+	    set_attr(ln, attr_jchar_class, has_attr(lp, attr_jchar_class) or 0)
+	    Np.nuc, lp = ln, ln
+	 end
+      end
+      return lp
+   end 
+function calc_np_aux_glyph_common(lp, acc_flag)
+   Np.nuc, Np.first = lp, (Np.first or lp)
+   if if_lang_ja(lp) then -- JAchar
       Np.id = id_jglyph
       local m, mc, cls = set_np_xspc_jachar(Np, lp)
       local npi, npf
+      local w, h, d = getwhd(lp)
+      if w==0 and h==0 and d==0 then lp = calc_np_notdef(lp) end
       lp, head, npi, npf = capsule_glyph(lp, m, mc[cls], head, tex_dir)
       Np.first = (Np.first~=Np.nuc) and Np.first or npf or npi
       Np.nuc = npi
       return true, check_next_ickern(lp);
-   else
+   else --ALchar
       Np.id = id_glyph
       set_np_xspc_alchar(Np, getchar(lp), lp, 1)
       -- loop
@@ -403,8 +422,11 @@ local function calc_np_aux_glyph_common(lp, acc_flag)
       return true, lp
    end
 end
+end -- 002 ---------------------------------------
 local calc_np_auxtable
-do
+do  -- 002 ---------------------------------------
+local ltjw_apply_ashift_math = ltjw.apply_ashift_math
+local ltjw_apply_ashift_disc = ltjw.apply_ashift_disc
 local node_end_of_math = node.direct.end_of_math
 local dir_tate = luatexja.dir_table.dir_tate
 local sid_start_link = node.subtype('pdf_start_link')
@@ -513,7 +535,7 @@ calc_np_auxtable = {
       return false, node_next(lp)
    end,
 }
-end
+end -- 002 ---------------------------------------
 calc_np_auxtable[id_rule]   = calc_np_auxtable.box_like
 calc_np_auxtable[15]        = calc_np_auxtable.box_like
 
@@ -551,7 +573,7 @@ function calc_np(last, lp)
    end
    Np=nil
 end
-end
+end -- 001 -----------------------------------------------
 
 -- extract informations from Np
 -- We think that "Np is a Japanese character" if Np.met~=nil,
