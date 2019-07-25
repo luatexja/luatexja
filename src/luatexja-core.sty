@@ -477,14 +477,20 @@
 
 %%%%%%%% \ltjalchar<number>, \ltjjachar<number>
 \let\ltj@@origchar=\char
-\protected\def\ltj@alljachar{\relax
-    \csname ltj@kcat0\endcsname\z@
-    \csname ltj@kcat1\endcsname\z@
-    \csname ltj@kcat2\endcsname\z@
-    \csname ltj@kcat3\endcsname\z@
-    \csname ltj@kcat4\endcsname\z@
-    \csname ltj@kcat5\endcsname\z@
-    \csname ltj@kcat6\endcsname\z@}
+\newluafunction\ltj@alljachar@inner
+\directlua{
+  local t, set_attr = lua.get_functions_table(), tex.setattribute
+  local get_attr, floor = tex.getattribute, math.floor
+  local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
+  local lang_ja = luatexja.lang_ja
+  t[\the\ltj@alljachar@inner] = function()
+    font.current(get_attr(attr_curjfnt)); tex.language=lang_ja;
+    for i=0,6 do
+      set_attr(luatexbase.attributes['ltj@kcat' .. floor(i)],0)
+    end
+  end
+}
+\protected\def\ltj@alljachar{\luafunction\ltj@alljachar@inner}
 \protected\def\ltj@allalchar{\relax
     \csname ltj@kcat0\endcsname="7FFFFFFF %"
     \csname ltj@kcat1\endcsname="7FFFFFFF %"
