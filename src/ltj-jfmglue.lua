@@ -191,7 +191,8 @@ local function check_box(box_ptr, box_end)
       end
       if pid==id_kern then
 	 local pa = get_attr_icflag(p)
-	 if pa==IC_PROCESSED then
+	 if (pa==IC_PROCESSED)or(pa==BOXBDD) then
+	 --if (pa==IC_PROCESSED)or(pa==BOXBDD)or(getsubtype(p)==0) then
 	    -- do nothing
 	 elseif getsubtype(p)==2 then
 	    p = node_next(node_next(p));
@@ -221,7 +222,8 @@ local function check_box(box_ptr, box_end)
 	    first_char = p; find_first_char = false
 	 end
 	 last_char = p; found_visible_node = true
-      elseif pid==id_rule and get_attr_icflag(p)==PACKED then
+      elseif (pid==id_rule and get_attr_icflag(p)==PACKED)
+         or (pid==id_glue and get_attr_icflag(p)==BOXBDD) then
 	 -- do nothing
       elseif not (pid==id_ins   or pid==id_mark
 		  or pid==id_adjust or pid==id_whatsit
