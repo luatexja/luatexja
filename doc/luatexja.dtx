@@ -40,11 +40,12 @@
 %%%%%%%% fonts
 \usepackage{luatexja-otf}
 \usepackage[no-math]{fontspec}
-\setmainfont[Ligatures=TeX]{Linux Libertine O}
+\setmainfont[Ligatures=TeX,RawFeature=-notdef]{Linux Libertine O}
 \setmonofont[Scale=MatchLowercase, ItalicFont=lmmono10-italic.otf,
-  BoldFont=lmmonolt10-bold.otf, BoldItalicFont=lmmonolt10-boldoblique.otf
+  BoldFont=lmmonolt10-bold.otf, BoldItalicFont=lmmonolt10-boldoblique.otf,
+  RawFeature=-notdef
 ]{lmmono10-regular.otf}
-\setsansfont[Scale=MatchLowercase,Ligatures=TeX]{Linux Biolinum O}
+\setsansfont[Scale=MatchLowercase,Ligatures=TeX,RawFeature=-notdef]{Linux Biolinum O}
 \usepackage[match]{luatexja-fontspec}
 \usepackage[kozuka-pr6n]{luatexja-preset}
 \usepackage{unicode-math}
