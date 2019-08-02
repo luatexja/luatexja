@@ -80,6 +80,7 @@ userid_table.STCK = luatexbase.newuserwhatsitid('stack_marker', 'luatexja') -- �
 userid_table.BPAR = luatexbase.newuserwhatsitid('begin_par',    'luatexja') -- 「段落始め」
 userid_table.DIR  = luatexbase.newuserwhatsitid('direction',    'luatexja') -- 組方向
 userid_table.BOXB = luatexbase.newuserwhatsitid('box_boundary', 'luatexja') -- 「ボックス始め・終わり」
+userid_table.JA_AL_BDD = luatexbase.newuserwhatsitid('ja_al_boundary', 'luatexja')
 
 local dir_table = {}
 luatexja.dir_table = dir_table

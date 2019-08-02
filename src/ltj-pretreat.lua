@@ -45,6 +45,7 @@ local ltjs_orig_char_table = ltjs.orig_char_table
 local ltjf_replace_altfont = ltjf.replace_altfont
 local STCK  = luatexja.userid_table.STCK
 local DIR   = luatexja.userid_table.DIR
+local JA_AL_BDD = luatexja.userid_table.JA_AL_BDD
 local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 
 local dir_tate = luatexja.dir_table.dir_tate
@@ -85,6 +86,9 @@ do
 		{
 		   __index = function() return node_next end,
 		})
+   local id_boundary = node.id('boundary')
+   local node_new, insert_before = node.direct.new, node.direct.insert_before
+   local setsubtype = node.direct.setsubtype or function(n,l) setfield(n,'subtype',l) end 
    local function suppress_hyphenate_ja (h)
       start_time_measure('ltj_hyphenate')
       head = to_direct(h)
@@ -97,15 +101,26 @@ do
       do
 	 local p = head
 	 while p do
-	    local pid = getid(p)
+	    local pid, prev_chartype = getid(p), 0
+	    -- prev_chartype: 0: not char 1: ALchar 2: JAchar
 	    while pid==id_glyph do
 	       local pc = getchar(p)
 	       if has_attr(p, attr_icflag, 0) and is_ucs_in_japanese_char(p, pc) then
+		  if prev_chartype==1 then
+                     local b = node_new(id_whatsit,sid_user);
+		     setfield(b, 'type', 100); setfield(b, 'user_id', JA_AL_BDD);
+		     insert_before(head, p, b)
+		  end
                   local pf = has_attr(p, attr_curjfnt)
                   pf = (pf and pf>0 and pf) or getfont(p)
 		  setfont(p, ltjf_replace_altfont(pf, pc))
 		  setlang(p, lang_ja)
-		  ltjs_orig_char_table[p] = pc
+		  ltjs_orig_char_table[p], prev_chartype = pc, 2
+               elseif prev_chartype==2 then
+		  local b = node_new(id_whatsit,sid_user);
+		  setfield(b, 'type', 100); setfield(b, 'user_id', JA_AL_BDD);
+		  insert_before(head, p, b); prev_chartype = 1
+               else prev_chartype = 1
 	       end
 	       p = node_next(p); pid = getid(p)
 	    end

@@ -469,6 +469,10 @@ calc_np_auxtable = {
 	    local lq = node_next(lp);
 	    head = node_remove(head, lp); node_free(lp); non_ihb_flag = false
 	    return false, lq;
+	 elseif getfield(lp, 'user_id')==luatexja.userid_table.JA_AL_BDD then
+	    local lq = node_next(lp);
+	    head = node_remove(head, lp); node_free(lp)
+	    return false, lq;
 	 else
 	    set_attr(lp, attr_icflag, PROCESSED)
 	    luatexbase.call_callback("luatexja.jfmglue.whatsit_getinfo",
@@ -1279,7 +1283,7 @@ end
 end
 
 do
-   local IHB  = luatexja.userid_table.IHB
+   local IHB  = luatexja.userid_table.IHB 
    local BPAR = luatexja.userid_table.BPAR
    local BOXB = luatexja.userid_table.BOXB
    local node_prev = node.direct.getprev
