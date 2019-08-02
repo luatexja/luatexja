@@ -4693,7 +4693,7 @@ as follows:
 %<ja>\paragraph{仮想的な文字}
 %<en>\paragraph{Imaginary characters}
 %<*en>
-As described before, you can specify several \emph{imaginary characters} in
+As described before, you can specify several ``imaginary characters'' in
 \texttt{chars} field. The most of these characters are regarded as the
 characters of class 0 in \pTeX.
 As a result, \LuaTeX-ja can control typesetting finer than \pTeX.
@@ -4712,8 +4712,17 @@ The following is the list of imaginary characters:
 %%<ja>JFMやサイズが異なる2つの\textbf{JAchar}の間の境界として用いられる．
 
 \item['boxbdd']
-%<en>The beginning/ending of a hbox, and the beginning of a noindented (i.e., began by \cs{noindent}) paragraph.
-%<ja>hboxの先頭と末尾，及びインデントされていない（\cs{noindent} で開始された）段落の先頭を表す．
+%<*en>
+The beginning/ending of a hbox, and the beginning of a noindented (i.e., began by \cs{noindent}) paragraph.
+If a hbox~$b$ begins (resp.~ends) a glue or kern between this ``charater'' and a \textbf{JAchar},
+\textbf{JAglue} won't be inserted before(resp.~after) the hbox~$b$.
+\Param{kanjiskip}~and~\Param{xkanjiskip} around a hbox.
+%</en>
+%<*ja>
+hboxの先頭と末尾，及びインデントされていない（\cs{noindent} で開始された）段落の先頭を表す．
+この「文字」との間に設定したグルー・カーンがボックス$b$の先頭（もしくは末尾）に来た場合，
+  そのボックス$b$の直前（もしくは直後）には和文処理グルーは入らない．
+%</ja>
 
 \item['parbdd']
 %<en>The beginning of an (indented) paragraph.
