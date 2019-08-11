@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsbook}
-  [2019/04/06 ltjsclasses ]
+  [2019/08/12 ltjsclasses ]
 \def\jsc@clsname{ltjsbook}
 \def\Cjascale{0.924715}
 \RequirePackage{luatexja}
@@ -199,6 +199,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
       &\global\@eqcnt\thr@@ \hb@xt@\z@\bgroup\hss##\egroup
     \tabskip\z@skip\cr
     }}
+\DeclareOption{disablejfam}{}
 \DeclareOption{draft}{\setlength\overfullrule{5pt}}
 \DeclareOption{final}{\setlength\overfullrule{0pt}}
 \newif\ifmingoth

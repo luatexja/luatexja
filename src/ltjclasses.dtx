@@ -120,6 +120,7 @@
 % \changes{v1.8a}{2018/10/25}{ファイル書き出し時の行末文字対策
 %    (sync with ltsect.dtx 2018/09/26 v1.1c)}
 % \changes{v1.8b}{2019/04/02}{新元号対応}
+% \changes{v1.8b-ltj-17}{2019/08/12}{disablejfamの``Unused global option(s)''警告を出さないようにした}
 
 % \fi
 %
@@ -602,6 +603,18 @@
 \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.962216] \ltj@stdgtfont:jfm=min;jfmvar=goth}{}
 \ltjglobalsetparameter{differentjfm=both}
 \directlua{luatexbase.remove_from_callback('luatexja.load_jfm', 'ltj.jclasses_load_jfm')}
+%</article|report|book>
+%    \end{macrocode}
+%
+% \subsection{disablejfamオプション}
+% \changes{v1.8b-ltj-17}{2019/08/12}{disablejfamの``Unused global option(s)''警告を出さないようにした}
+% disablejfamオプションは\LuaTeX-ja本体で処理しますが，
+% もう\LuaTeX-jaは読み込んでいるため，このままでは``Unused global option(s): [disablejfam]''警告が
+% 出てしまいます．そのため，「何もしない」disablejfamオプションをクラス内で定義しておきます．
+%
+%    \begin{macrocode}
+%<*article|report|book>
+\DeclareOption{disablejfam}{}
 %</article|report|book>
 %    \end{macrocode}
 %

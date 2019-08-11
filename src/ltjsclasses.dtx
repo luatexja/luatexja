@@ -44,7 +44,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2019/04/06 ltjsclasses ]
+  [2019/08/12 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass[disablejfam]{ltjsarticle}
@@ -599,6 +599,14 @@
 %
 % [2018-10-08 LTJ] Lua\TeX-ja本体が\texttt{disablejfam}オプションをサポートしたので，
 % クラスファイルからは削除します．
+%
+% [2019-08-12 LTJ] ……と思いましたが，``Unused global option(s): [disablejfam]''警告が
+% 出てしまいますので，「何もしない」クラスオプションとして形だけ定義します．
+%    \begin{macrocode}
+%<*article|report|book>
+\DeclareOption{disablejfam}{}
+%</article|report|book>
+%    \end{macrocode}
 %
 % \paragraph{ドラフト}
 %

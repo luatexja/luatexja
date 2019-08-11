@@ -157,6 +157,7 @@
 \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.962216] \ltj@stdgtfont:jfm=min;jfmvar=goth}{}
 \ltjglobalsetparameter{differentjfm=both}
 \directlua{luatexbase.remove_from_callback('luatexja.load_jfm', 'ltj.jclasses_load_jfm')}
+\DeclareOption{disablejfam}{}
 \ExecuteOptions{a4paper,10pt,twoside,onecolumn,final,openright,tate}
 \ProcessOptions\relax
 \input{ltjtbk1\@ptsize.clo}
