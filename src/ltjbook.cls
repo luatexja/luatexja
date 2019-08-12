@@ -24,7 +24,7 @@
 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjbook}
-  [2019/04/06 v1.8b-ltj-16
+  [2019/08/12 v1.8b-ltj-17
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}

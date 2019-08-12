@@ -1,5 +1,5 @@
 %
-% lltjp-microtype.sty 2019-07-12
+% lltjp-microtype.sty 2019-08-12
 %
 % (Work in Progress)
 % 
@@ -9,12 +9,24 @@
 \makeatletter
 
 \def\MT@register@font{%
-  \xdef\MT@font@list{\expandonce{\MT@font@list}\MT@font,}%
+  \xdef\MT@font@list{\expandonce{\MT@font@list\MT@font},}% !!!
 }
 \def\MT@register@subst@font{\MT@exp@one@n\MT@in@clist\font@name\MT@font@list
   \ifMT@inlist@\else
-	\xdef\MT@font@list{\expandonce{\MT@font@list}\font@name,}%
+	\xdef\MT@font@list{\expandonce{\MT@font@list\font@name},}% !!!
   \fi}
+\let\ltj@MT@tracking@\MT@tracking@
+\def\MT@tracking@{%
+  \MT@exp@one@n\MT@in@clist\MT@font\MT@tr@font@list
+  \ifMT@inlist@\else
+    \MT@maybe@do{tr}%
+    \ifMT@do\else
+      \xdef\MT@tr@font@list{\expandonce{\MT@tr@font@list\MT@font,}}% !!!
+    \fi
+  \fi
+}
+\ifx\MT@tracking\ltj@MT@tracking@\let\MT@tracking\MT@tracking@\fi
+
 
 %\endinput
 \begingroup
