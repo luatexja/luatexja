@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjdefs}[2019/05/01 Default font settings of LuaTeX-ja]
+\ProvidesPackage{lltjdefs}[2019/08/21 Default font settings of LuaTeX-ja]
 
 \ifdefined\ltj@stdmcfont\else\def\ltj@stdmcfont{IPAExMincho}\fi
 \ifdefined\ltj@stdgtfont\else\def\ltj@stdgtfont{IPAExGothic}\fi
@@ -17,6 +17,10 @@
 
 \DeclareKanjiEncodingDefaults{}{}
 \DeclareErrorKanjiFont{JY3}{mc}{m}{n}{10}
+\kanjifamily{mc}
+\kanjiseries{m}
+\kanjishape{n}
+\fontsize{10}{10}
 \DeclareYokoKanjiEncoding{JY3}{}{}
 \DeclareKanjiSubstitution{JY3}{mc}{m}{n}
 \DeclareTateKanjiEncoding{JT3}{}{}

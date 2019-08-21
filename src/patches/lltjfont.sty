@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2019/01/29 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2019/08/21 Patch to NFSS2 for LuaTeX-ja]
 
 \def\ltj@chardef@text@cmd#1{%
   \let\@ifdefinable\@@ifdefinable%
@@ -228,6 +228,7 @@
                            \def\default@series{#3}%
                            \def\default@shape{#4}}%
   \fi}
+\@onlypreamble\DeclareKanjiSubstitution
 \def\DeclareErrorKanjiFont#1#2#3#4#5{%
    \xdef\error@kfontshape{%
       \noexpand\expandafter\noexpand\split@name\noexpand\string
@@ -236,12 +237,7 @@
    \gdef\default@k@family{#2}%
    \gdef\default@k@series{#3}%
    \gdef\default@k@shape{#4}%
-   \global\let\k@family\default@k@family
-   \global\let\k@series\default@k@series
-   \global\let\k@shape\default@k@shape
-   \gdef\f@size{#5}%
-   \gdef\f@baselineskip{#5pt}}
-\@onlypreamble\DeclareKanjiSubstitution
+   }
 \@onlypreamble\DeclareErrorKanjiFont
 
 \newif\ifltjselectfont@force@define
