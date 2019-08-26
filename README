@@ -23,7 +23,7 @@ Installation
 0. Please make sure that your TeX distribution is up-to-date.
    This version of LuaTeX-ja requires
     - LuaTeX 1.0.0 or later
-    - luaotfload v2.6
+    - luaotfload (v2.98 or later recommended)
     - adobemapping (Adobe CMap files)
     - everysel package
     - etoolbox package
@@ -35,7 +35,7 @@ Installation
     - IPAex fonts (http://ipafont.ipa.go.jp/)
    Hence this version does not work in TeX Live 2016 (or earlier).
 
-1. If you are using TeX Live 2018 or later, you can install LuaTeX-ja via tlmgr.
+1. If you are using TeX Live 2019 or later, you can install LuaTeX-ja via tlmgr.
 
 2. If you must/want to install manually:
 
