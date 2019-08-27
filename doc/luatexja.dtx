@@ -1845,7 +1845,6 @@ these eight ranges belongs to the character range~217.
 %</ja>
 \begin{description}
 %<*en>
-
 \item[Range~8${}^{\text{A}}$] The intersection of the upper half of ISO~8859-1
 	 (Latin-1 Supplement) and JIS~X~0208 (a basic character set for Japanese). This character range
 	 consists of the following characters:
@@ -1870,11 +1869,11 @@ these eight ranges belongs to the character range~217.
 \end{multicols}
 
 %<*en>
-\item[Range~1${}^{\text{A}}$] Latin characters that some of them are included in Adobe-Japan1-6.
+\item[Range~1${}^{\text{A}}$] Latin characters that some of them are included in Adobe-Japan1-7.
 This range consists of the following Unicode ranges, \emph{except characters in the range~8 above}:
 %</en>
 %<*ja>
-\item[範囲1${}^{\text{A}}$] ラテン文字のうち，Adobe-Japan1-6との共通部分があるもの．
+\item[範囲1${}^{\text{A}}$] ラテン文字のうち，Adobe-Japan1-7との共通部分があるもの．
                              この範囲は以下のUnicodeのブロックのうち
                              \emph{範囲8を除いた}部分で構成されている：
 %</ja>
@@ -1908,11 +1907,11 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 \end{itemize}
 \end{multicols}
 %<*en>
-\item[Range~3${}^{\text{\kern.1emJ}}$] Punctuations and Miscellaneous symbols. The block list is
+\item[Range~3${}^{\text{\kern.1emJ}}$] Miscellaneous symbols. The block list is
 	   indicated in \autoref{tab:rng3}.
 %</en>
 %<*ja>
-\item[範囲3${}^{\text{\kern.1emJ}}$] 句読点と記号類．ブロックのリストは\autoref{tab:rng3}%
+\item[範囲3${}^{\text{\kern.1emJ}}$] 記号類．ブロックのリストは\autoref{tab:rng3}%
                              に示してある．
 %</ja>
 \begin{table}[!tb]
@@ -1922,7 +1921,6 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 \catcode`\"=13\def"#1#2#3#4{\texttt{U+#1#2#3#4}}%"
 \centering\footnotesize
 \begin{tabular}{llll}
-"2000--"206F&General Punctuation&
 "2070--"209F&Superscripts and Subscripts\\
 "20A0--"20CF&Currency Symbols&
 "20D0--"20FF&Comb.\ Diacritical Marks for Symbols\\
@@ -1943,23 +1941,72 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 \end{tabular}
 \end{table}
 %<*en>
+\item[Range~9${}^{\text{J}}$] The intersection of the ``General Punctuation'' block
+  (\texttt{U+2000}--\texttt{U+206F})
+  and Adobe-Japan1-7 character collection. This character range
+  consists of the following characters:
+%</en>
+%<*ja>
+\item[範囲9${}^{\text{J}}$] Unicodeの「一般句読点」ブロック(\texttt{U+2000}--\texttt{U+206F})と
+  Adobe-Japan1-7の共通部分．この文字範囲は
+  以下の文字で構成される：
+%</ja>
+\begin{multicols}{2}\small
+\begin{itemize}
+  \def\ch#1#2{\item \ltjjachar"20#1\ (\texttt{U+20#1}, #2)}%"
+  \ch{02}{En space}
+  \ch{10}{Hyphen}
+  \ch{11}{Non-breaking hyphen}
+  \ch{13}{En dash}
+  \ch{14}{Em dash}
+  \ch{15}{Horizontal bar}
+  \ch{16}{Double vertical line}
+  \ch{18}{Left single quotation mark}
+  \ch{19}{Right single quotation mark}
+  \ch{1A}{Single low-9 quotation mark}
+  \ch{1C}{Left double quotation mark}
+  \ch{1D}{Right double quotation mark}
+  \ch{1E}{Double low-9 quotation mark}
+  \ch{20}{Dagger}
+  \ch{21}{Double dagger}
+  \ch{22}{Bullet}
+  \ch{25}{Two dot leader}
+  \ch{26}{Horizontal ellipsis}
+  \ch{30}{Per mille sign}
+  \ch{32}{Prime}
+  \ch{33}{Double prime}
+  \ch{39}{Single left-pointing angle quot.}
+  \ch{3A}{Single right-pointing angle quot.}
+  \ch{3B}{Reference mark}
+  \ch{3C}{Double exclamation mark}
+  \ch{3E}{Overline}
+  \ch{3F}{Undertie}
+  \ch{42}{Asterism}
+  \ch{44}{Fraction slash}
+  \ch{47}{Double question mark}
+  \ch{48}{Question exclamation mark}
+  \ch{49}{Exclamation question mark}
+  \ch{51}{Two asterisks aligned vertically}
+\end{itemize}
+\end{multicols}
+%<*en>
 \item[Range~4${}^{\text{A}}$] Characters usually not in Japanese fonts. This range consists
 	   of almost all Unicode blocks which are not in other
 	   predefined ranges. Hence, instead of showing the block list,
-	   we put the definition of this range itself:
+	   we put the definition of this range itself.
 %</en>
 %<*ja>
 \item[範囲4${}^{\text{A}}$] 通常和文フォントには含まれていない文字．
                              この範囲は他の範囲にないほとんど全てのUnicodeブロック
                              で構成されている．したがって，ブロックのリストを示す
-                             代わりに，範囲の定義そのものを示す：
+                             代わりに，範囲の定義そのものを示す．
 %</ja>
 \begin{lstlisting}
 \ltjdefcharrange{4}{%
    "500-"10FF, "1200-"1DFF, "2440-"245F, "27C0-"28FF, "2A00-"2AFF,
   "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A95F, "A980-"ABFF, "E000-"F8FF,
   "FB00-"FE0F, "FE20-"FE2F, "FE70-"FEFF, "10000-"1AFFF, "1B170-"1F0FF,
-  "1F300-"1FFFF
+  "1F300-"1FFFF, ... (characters in "2000-"206F which are not in range 9)
 } % non-Japanese
 \end{lstlisting}
 %<en>\item[Range~5${}^{\text{A}}$] Surrogates and Supplementary Private Use Areas.
@@ -1999,11 +2046,11 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 \end{tabular}
 \end{table}
 %<*en>
-\item[Range~7${}^{\text{\kern.1emJ}}$] Characters used in CJK languages, but not included in  Adobe-Japan1-6.
+\item[Range~7${}^{\text{\kern.1emJ}}$] Characters used in CJK languages, but not included in  Adobe-Japan1-7.
 The block list is indicated in \autoref{tab:rng7}.
 %</en>
 %<*ja>
-\item[範囲7${}^{\text{\kern.1emJ}}$] CJK言語で用いられる文字のうち，Adobe-Japan1-6に
+\item[範囲7${}^{\text{\kern.1emJ}}$] CJK言語で用いられる文字のうち，Adobe-Japan1-7に
                             含まれていないもの．
                             ブロックのリストは\autoref{tab:rng7}に示す．
 %</ja>

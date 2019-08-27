@@ -75,12 +75,12 @@
 \ltjdefcharrange{1}{"80-"36F, "1E00-"1EFF}
 \ltjdefcharrange{2}{"370-"4FF, "1F00-"1FFF}
 \ltjdefcharrange{3}{%
-  "2000-"243F, "2500-"27BF, "2900-"29FF, "2B00-"2BFF}
+  "2070-"243F, "2500-"27BF, "2900-"29FF, "2B00-"2BFF}
 \ltjdefcharrange{4}{%
    "500-"10FF, "1200-"1DFF, "2440-"245F, "27C0-"28FF, "2A00-"2AFF,
   "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A95F, "A980-"ABFF, "E000-"F8FF,
   "FB00-"FE0F, "FE20-"FE2F, "FE70-"FEFF, "10000-"1AFFF, "1B170-"1F0FF,
-  "1F300-"1FFFF, "200D
+  "1F300-"1FFFF, "2000-"206F
 } % non-Japanese
 \ltjdefcharrange{5}{"D800-"DFFF, "E0000-"E00FF, "E01F0-"10FFFF}
 \ltjdefcharrange{6}{%
@@ -93,7 +93,13 @@
   "A960-"A97F, "AC00-"D7FF
 }
 \ltjdefcharrange{8}{"A7, "A8, "B0, "B1, "B4, "B6, "D7, "F7}
-\ltjsetparameter{jacharrange={-1, +2, +3, -4, -5, +6, +7, -8}}
+\ltjdefcharrange{9}{
+  "2002, "2010, "2011, "2013, "2014, "2015, "2016, "2018, "2019,
+  "201A, "201C, "201D, "201E, "2020, "2021, "2022, "2025, "2026,
+  "2030, "2032, "2033, "2039, "203A, "203B, "203C, "203E, "203F,
+  "2042, "2044, "2047, "2048, "2049, "2051
+}
+\ltjsetparameter{jacharrange={-1, +2, +3, -4, -5, +6, +7, -8, +9}}
 
 \directlua{for x=128,255 do luatexja.math.is_math_letters[x] = true end}
 \let\ltj@@orig@end=\@@end
