@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2019/07/08',
+  date = '2019/08/27',
   description = 'Loader for Japanese fonts',
 })
 
@@ -93,10 +93,10 @@ function luatexja.jfont.define_jfm(to)
             v.width = nil
          end
          if type(v.height)~='number' then
-            v.height = (jfm_dir=='tate') and  0.0
+            v.height = (jfm_dir=='tate') and  0.0 or nil
          end
          if type(v.depth)~='number' then
-            v.depth =  (jfm_dir=='tate') and  0.0
+            v.depth =  (jfm_dir=='tate') and  0.0 or nil
          end
          if type(v.italic)~='number' then
             v.italic = 0.0
