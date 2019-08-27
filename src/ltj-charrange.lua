@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.charrange',
-  date = '2019/04/01',
+  date = '2019/08/28',
   description = 'Handling the range of Japanese characters',
 })
 luatexja.charrange = {}
@@ -99,7 +99,7 @@ function luatexja.charrange.toggle_char_range(g, i) -- i: external range number
    else
       local kc
       if i>0 then kc=0 else kc=1; i=-i end
-      if i>=7*ATTR_RANGE then i=0 end
+      if i>=31*ATTR_RANGE then i=0 end
       local attr = kcat_attr_table[i]
       local a = tex_getattr(attr)
       tex.setattribute(g, attr,
