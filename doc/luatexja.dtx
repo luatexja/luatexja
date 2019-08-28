@@ -1772,7 +1772,7 @@ For example, the code below is just the default setting of \LuaTeX-ja, and
 it sets
 \begin{itemize}
  \item a character which belongs character ranges 1,~4, 5, and~8 is \textbf{ALchar},
- \item a character which belongs character ranges 2,~3, 6, and~7 is \textbf{JAchar}.
+ \item a character which belongs character ranges 2,~3, 6, 7,~and~9 is \textbf{JAchar}.
 \end{itemize}
 %</en>
 %<*ja>
@@ -1781,11 +1781,11 @@ it sets
 例えば，以下は\LuaTeX-jaの初期設定であり，次の内容を設定している：
 \begin{itemize}
  \item 1番，4番，5番，8番の文字範囲に属する文字は\textbf{ALchar}．
- \item 2番，3番，6番，7番の文字範囲に属する文字は\textbf{JAchar}．
+ \item 2番，3番，6番，7番，9番の文字範囲に属する文字は\textbf{JAchar}．
 \end{itemize}
 %</ja>
 \begin{lstlisting}
-\ltjsetparameter{jacharrange={-1, +2, +3, -4, -5, +6, +7, -8}}
+\ltjsetparameter{jacharrange={-1, +2, +3, -4, -5, +6, +7, -8, +9}}
 \end{lstlisting}
 %<*en>
 The argument to \textsf{jacharrange} parameter is a list of non-zero integer.
@@ -1846,50 +1846,56 @@ these eight ranges belongs to the character range~217.
 \begin{description}
 %<*en>
 \item[Range~8${}^{\text{A}}$] The intersection of the upper half of ISO~8859-1
-	 (Latin-1 Supplement) and JIS~X~0208 (a basic character set for Japanese). This character range
-	 consists of the following characters:
+	 (Latin-1 Supplement) and JIS~X~0208 (a basic character set for Japanese).
+  The character list is indicated in \autoref{tab:rng8}.
 %</en>
 %<*ja>
 \item[範囲8${}^{\text{A}}$] ISO~8859-1の上位領域（ラテン1補助）と
-                             JIS~X~0208の共通部分．この文字範囲は
-                             以下の文字で構成される：
+  JIS~X~0208の共通部分．文字のリストは\autoref{tab:rng8}を参照．
 %</ja>
-\begin{multicols}{2}
-\begin{itemize}
-\def\ch#1#2{\item \char"#1\ (\texttt{U+00#1}, #2)}%"
-\ch{A7}{Section Sign}
-\ch{A8}{Diaeresis}
-\ch{B0}{Degree sign}
-\ch{B1}{Plus-minus sign}
-\ch{B4}{Spacing acute}
-\ch{B6}{Paragraph sign}
-\ch{D7}{Multiplication sign}
-\ch{F7}{Division Sign}
-\end{itemize}
-\end{multicols}
+\begin{table}[!tb]
+%<en>\caption{Characters in predefined character range~8.}\medskip
+%<ja>\caption{文字範囲8に指定されている文字．}
+\label{tab:rng8}
+\centering\footnotesize
+\def\ch#1{\char"#1~(\texttt{U+00#1})}%"
+\begin{tabular}{llll}
+\ch{A7}&{Section Sign}&
+\ch{A8}&{Diaeresis}\\
+\ch{B0}&{Degree sign}&
+\ch{B1}&{Plus-minus sign}\\
+\ch{B4}&{Spacing acute}&
+\ch{B6}&{Paragraph sign}\\
+\ch{D7}&{Multiplication sign}&
+\ch{F7}&{Division Sign}
+\end{tabular}
+\end{table}
 
 %<*en>
 \item[Range~1${}^{\text{A}}$] Latin characters that some of them are included in Adobe-Japan1-7.
-This range consists of the following Unicode ranges, \emph{except characters in the range~8 above}:
+  This range consists of the Unicode ranges indicated in \autoref{tab:rng1},
+  \emph{except characters in the range~8 above}.
 %</en>
 %<*ja>
 \item[範囲1${}^{\text{A}}$] ラテン文字のうち，Adobe-Japan1-7との共通部分があるもの．
-                             この範囲は以下のUnicodeのブロックのうち
-                             \emph{範囲8を除いた}部分で構成されている：
+                             この範囲は\autoref{tab:rng1}で示したUnicodeのブロックのうち
+                             \emph{範囲8を除いた}部分で構成されている．
 %</ja>
-\begin{multicols}{2}
-\begin{itemize}
-\item \texttt{U+0080}--\texttt{U+00FF}: Latin-1 Supplement
-\item \texttt{U+0100}--\texttt{U+017F}: Latin Extended-A
-\item \texttt{U+0180}--\texttt{U+024F}: Latin Extended-B
-\item \texttt{U+0250}--\texttt{U+02AF}: IPA Extensions
-\item \texttt{U+02B0}--\texttt{U+02FF}: Spacing Modifier Letters
-%<en>\par\
-\item \texttt{U+0300}--\texttt{U+036F}: \\*\null\hfill Combining Diacritical Marks
-\item \texttt{U+1E00}--\texttt{U+1EFF}: \\*\null\hfill Latin Extended Additional
-%<ja>\par\
-\end{itemize}
-\end{multicols}
+\begin{table}[!tb]
+%<en>\caption{Unicode blocks in predefined character range~1.}\medskip
+%<ja>\caption{文字範囲1に指定されているUnicodeブロック．}
+\label{tab:rng1}
+\centering\footnotesize
+\begin{tabular}{llll}
+ \texttt{U+0080}--\texttt{U+00FF}&Latin-1 Supplement&
+ \texttt{U+0100}--\texttt{U+017F}&Latin Extended-A\\
+ \texttt{U+0180}--\texttt{U+024F}& Latin Extended-B&
+ \texttt{U+0250}--\texttt{U+02AF}& IPA Extensions\\
+ \texttt{U+02B0}--\texttt{U+02FF}& Spacing Modifier Letters&
+ \texttt{U+0300}--\texttt{U+036F}& Combining Diacritical Marks\\
+ \texttt{U+1E00}--\texttt{U+1EFF}&Latin Extended Additional
+\end{tabular}
+\end{table}
 %<*en>
 \item[Range~2${}^{\text{\kern.1emJ}}$] Greek and Cyrillic letters. JIS~X~0208 (hence most of Japanese
 	   fonts) has some of these characters.
@@ -1943,52 +1949,57 @@ This range consists of the following Unicode ranges, \emph{except characters in 
 %<*en>
 \item[Range~9${}^{\text{J}}$] The intersection of the ``General Punctuation'' block
   (\texttt{U+2000}--\texttt{U+206F})
-  and Adobe-Japan1-7 character collection. This character range
-  consists of the following characters:
+  and Adobe-Japan1-7 character collection.
+  This character range characters in \sutoref{tab:rng9}.
 %</en>
 %<*ja>
 \item[範囲9${}^{\text{J}}$] Unicodeの「一般句読点」ブロック(\texttt{U+2000}--\texttt{U+206F})と
-  Adobe-Japan1-7の共通部分．この文字範囲は
-  以下の文字で構成される：
+  Adobe-Japan1-7の共通部分．
+  この文字範囲は\autoref{tab:rng9}に示した文字で構成される．
 %</ja>
-\begin{multicols}{2}\small
-\begin{itemize}
-  \def\ch#1#2{\item \ltjjachar"20#1\ (\texttt{U+20#1}, #2)}%"
-  \ch{02}{En space}
-  \ch{10}{Hyphen}
-  \ch{11}{Non-breaking hyphen}
-  \ch{13}{En dash}
-  \ch{14}{Em dash}
-  \ch{15}{Horizontal bar}
-  \ch{16}{Double vertical line}
-  \ch{18}{Left single quotation mark}
-  \ch{19}{Right single quotation mark}
-  \ch{1A}{Single low-9 quotation mark}
-  \ch{1C}{Left double quotation mark}
-  \ch{1D}{Right double quotation mark}
-  \ch{1E}{Double low-9 quotation mark}
-  \ch{20}{Dagger}
-  \ch{21}{Double dagger}
-  \ch{22}{Bullet}
-  \ch{25}{Two dot leader}
-  \ch{26}{Horizontal ellipsis}
-  \ch{30}{Per mille sign}
-  \ch{32}{Prime}
-  \ch{33}{Double prime}
-  \ch{39}{Single left-pointing angle quot.}
-  \ch{3A}{Single right-pointing angle quot.}
-  \ch{3B}{Reference mark}
-  \ch{3C}{Double exclamation mark}
-  \ch{3E}{Overline}
-  \ch{3F}{Undertie}
-  \ch{42}{Asterism}
-  \ch{44}{Fraction slash}
-  \ch{47}{Double question mark}
-  \ch{48}{Question exclamation mark}
-  \ch{49}{Exclamation question mark}
-  \ch{51}{Two asterisks aligned vertically}
-\end{itemize}
-\end{multicols}
+\begin{table}[!tb]
+%<en>\caption{Characters in predefined character range~9.}\medskip
+%<ja>\caption{文字範囲9に指定されている文字．}
+\label{tab:rng9}
+\centering\footnotesize
+\def\ch#1{\char"20#1~(\texttt{U+20#1})}%"
+% 13: JIS X0213, AJ, Adobe-Japan-1 only
+\begin{tabular}{llllll}
+  \ch{02}&{En space}&AJ&
+  \ch{10}&{Hyphen}&\\
+  \ch{11}&{Non-breaking hyphen}&AJ&
+  \ch{13}&{En dash}&13\\
+  \ch{14}&{Em dash}&&
+  \ch{15}&{Horizontal bar}&\\
+  \ch{16}&{Double vertical line}&&
+  \ch{18}&{Left single quotation mark}&\\
+  \ch{19}&{Right single quotation mark}&&
+  \ch{1A}&{Single low-9 quotation mark}&AJ\\
+  \ch{1C}&{Left double quotation mark}&&
+  \ch{1D}&{Right double quotation mark}&\\
+  \ch{1E}&{Double low-9 quotation mark}&AJ&
+  \ch{20}&{Dagger}&\\
+  \ch{21}&{Double dagger}&&
+  \ch{22}&{Bullet}&13\\
+  \ch{25}&{Two dot leader}&&
+  \ch{26}&{Horizontal ellipsis}&\\
+  \ch{30}&{Per mille sign}&&
+  \ch{32}&{Prime}&\\
+  \ch{33}&{Double prime}&&
+  \ch{39}&{Single left-pointing angle quot.}&AJ\\
+  \ch{3A}&{Single right-pointing angle quot.}&AJ&
+  \ch{3B}&{Reference mark}&\\
+  \ch{3C}&{Double exclamation mark}&13&
+  \ch{3E}&{Overline}&\\
+  \ch{3F}&{Undertie}&13&
+  \ch{42}&{Asterism}&13\\
+  \ch{44}&{Fraction slash}&AJ&
+  \ch{47}&{Double question mark}&13\\
+  \ch{48}&{Question exclamation mark}&13&
+  \ch{49}&{Exclamation question mark}&13\\
+  \ch{51}&{Two asterisks aligned vertically}&13
+\end{tabular}
+\end{table}
 %<*en>
 \item[Range~4${}^{\text{A}}$] Characters usually not in Japanese fonts. This range consists
 	   of almost all Unicode blocks which are not in other
