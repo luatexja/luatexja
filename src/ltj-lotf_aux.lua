@@ -48,6 +48,29 @@ function aux.get_vheight(id, c) -- scaled points
   end
 end
 
+function aux.replace_vert_variant(id, c)
+  local t = getfont(id)
+  if t and t.resources and t.resources.sequences then
+    for _,i in pairs(t.resources.sequences) do
+      if (i.order[1]=='vert' or i.order[1]=='vrt2')
+          and i.type == 'gsub_single' and i.steps then
+        for _,j in pairs(i.steps) do
+          if type(j)=='table' then 
+            if type(j.coverage)=='table' then
+              for i,k in pairs(j.coverage) do
+                if i==c then return k end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  return c
+end
+
+
+
 local search
 search = function (t, key, prefix)
   if type(t)=="table" then

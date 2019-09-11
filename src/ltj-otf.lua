@@ -10,6 +10,7 @@ luatexja.load_module('rmlgbm');    local ltjr = luatexja.rmlgbm
 luatexja.load_module('charrange'); local ltjc = luatexja.charrange
 luatexja.load_module('direction'); local ltjd = luatexja.direction
 luatexja.load_module('stack');     local ltjs = luatexja.stack
+luatexja.load_module('lotf_aux');  local ltju = luatexja.lotf_aux
 
 local id_glyph = node.id('glyph')
 local id_whatsit = node.id('whatsit')
@@ -104,25 +105,9 @@ local function get_ucs_from_rmlgbm(c)
       end
       if aj.shared.ltj_vert_table[r] then
          -- CID が縦組用字形だった場合
-         local curjfnt_num = tex_get_attr((ltjd_get_dir_count()==dir_tate)
-                                        and attr_curtfnt or attr_curjfnt)
-         local t = font_getfont(curjfnt_num)
-         if t.resources.sequences then
-            for _,i in pairs(t.resources.sequences) do
-               if (i.order[1]=='vert' or i.order[1]=='vrt2')
-                  and i.type == 'gsub_single' and i.steps then
-                  for _,j in pairs(i.steps) do
-                     if type(j)=='table' then 
-                        if type(j.coverage)=='table' then
-                           for i,k in pairs(j.coverage) do
-                              if i==r then return k end
-                           end
-                        end
-                     end
-                  end
-               end
-            end
-         end
+         return ltju.replace_vert_variant(
+            tex_get_attr((ltjd_get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt),
+	    r)
       end
       return r
    end
@@ -141,29 +126,12 @@ end
 local utf
 do
    utf = function (ucs)
-      local char = ucs
       if ltjd_get_dir_count()==dir_tate then
-         local curjfnt_num = tex_get_attr((ltjd_get_dir_count()==dir_tate)
-                                        and attr_curtfnt or attr_curjfnt)
-         local t = font_getfont(curjfnt_num)
-         if t.resources.sequences then
-            for _,i in pairs(t.resources.sequences) do
-               if (i.order[1]=='vert' or i.order[1]=='vrt2')
-                  and i.type == 'gsub_single' and i.steps then
-                  for _,j in pairs(i.steps) do
-                     if type(j)=='table' then 
-                        if type(j.coverage)=='table' then
-                           for i,k in pairs(j.coverage) do
-                              if i==char then return append_jglyph(k) end
-                           end
-                        end
-                     end
-                  end
-               end
-            end
-         end
+         ucs = ltju.replace_vert_variant(
+            tex_get_attr((ltjd_get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt),
+	    ucs)
       end
-      return append_jglyph(char)
+      return append_jglyph(ucs)
    end
 end
 
