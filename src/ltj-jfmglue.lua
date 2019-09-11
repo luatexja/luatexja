@@ -12,7 +12,8 @@ luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('stack');     local ltjs = luatexja.stack
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 luatexja.load_module('direction'); local ltjd = luatexja.direction
-luatexja.load_module('setwidth');      local ltjw = luatexja.setwidth
+luatexja.load_module('setwidth');  local ltjw = luatexja.setwidth
+luatexja.load_module('lotf_aux');  local ltju = luatexja.lotf_aux
 local pairs = pairs
 
 --local to_node = node.direct.tonode
@@ -312,13 +313,11 @@ do -- 002 ---------------------------------------
    local getwhd = node.direct.getwhd
    local attr_jchar_class = luatexbase.attributes['ltj@charclass']
    local attr_jchar_code = luatexbase.attributes['ltj@charcode']
-   local identifiers = fonts.hashes.identifiers
+   local font_getfont = font.getfont
    local function calc_np_notdef(lp)
-      local ident = identifiers[getfont(lp)]
-      if not ident.descriptions[getchar(lp)] then
+      if not font_getfont(getfont(lp)).characters[getchar(lp)] then
 	 local ln = node_next(lp)
-	 if (ident.shared and ident.shared.features and ident.shared.features.notdef)
-	    and ln and getid(ln)==id_glyph then 
+	 if ltju.specified_feature(getfont(lp), 'notdef') and ln and getid(ln)==id_glyph then 
 	    set_attr(lp, attr_icflag, PROCESSED)
 	    set_attr(ln, attr_jchar_code, has_attr(lp, attr_jchar_code) or getchar(lp))
 	    set_attr(ln, attr_jchar_class, has_attr(lp, attr_jchar_class) or 0)

@@ -11,6 +11,7 @@ luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('charrange'); local ltjc = luatexja.charrange
 luatexja.load_module('rmlgbm');    local ltjr = luatexja.rmlgbm
 luatexja.load_module('direction'); local ltjd = luatexja.direction
+luatexja.load_module('lotf_aux');  local ltju = luatexja.lotf_aux
 
 local setfield = node.direct.setfield
 local getid = node.direct.getid
@@ -310,8 +311,6 @@ do
    luatexbase.create_callback("luatexja.define_jfont", "data", function (ft, fn) return ft end)
 
 -- EXT
-   local identifiers = fonts.hashes.identifiers
-   local provides_feature = luaotfload.aux.provides_feature
    function luatexja.jfont.jfontdefY()
       local j = load_jfont_metric(jfm_dir)
       local fn = font.id(cstemp)
@@ -328,25 +327,17 @@ do
       end
       if not f then return end
       update_jfm_cache(j, f.size)
-      local ad = identifiers[fn].parameters
       local sz = metrics[j].size_cache[f.size]
       local fmtable = { jfm = j, size = f.size, var = jfm_var,
                         with_kanjiskip = jfm_ksp,
                         zw = sz.zw, zh = sz.zh,
-                        ascent = ad.ascender,
-                        descent = ad.descender,
                         chars = sz.chars, char_type = sz.char_type,
                         kanjiskip = sz.kanjiskip, xkanjiskip = sz.xkanjiskip,
                         chars_cbcache = {},
                         vert_activated = vert_activated,
       }
-      local t = identifiers[fn]
       if auto_enable_vrt2 then
-         local lang, scr = t.properties.language, t.properties.script
-         local vrt2_exist = provides_feature(
-           fn, t.properties.script, t.properties.language, 'vrt2'
-         )
-         t.shared.features[vrt2_exist and 'vrt2' or 'vert'] = true
+         ltju.enable_feature(fn, ltju.exist_feature(fn, 'vrt2') and 'vrt2' or 'vert')
       end
 
       --texio.write_nl('term and log', 
@@ -809,18 +800,20 @@ local prepare_fl_data
 do
    local sort = table.sort
    prepare_fl_data = function (dest, id)
-     local ascent = id.shared.rawdata.metadata.ascender
+     local rawdata = id.shared.rawdata
+     local ascender = rawdata.metadata.ascender
+     local units = id.units
      local t_vorigin, t_ind_to_uni = {}, {}
-     for i,v in pairs(id.shared.rawdata.descriptions) do
+     for i,v in pairs(rawdata.descriptions) do
        t_ind_to_uni[v.index] = i
        if v.tsb then
          local j = v.boundingbox[4] + v.tsb
-         if j~=ascent then t_vorigin[i]=j end
+         if j~=ascender then t_vorigin[i]=j / units end
        end
      end
      dest = dest or {}
      dest.ind_to_uni = t_ind_to_uni
-     dest.vorigin = t_vorigin
+     dest.vorigin = t_vorigin -- designed size = 1.0
      return dest
    end
 end
@@ -860,11 +853,11 @@ do
    local nulltable = {} -- dummy
    ltjr.vert_addfunc = function (n) font_extra_info[n] = nulltable end
 
-   local identifiers = fonts.hashes.identifiers
    for i=1,font.nextid()-1 do
-      if identifiers[i] then
-         prepare_extra_data_base(identifiers[i])
-         prepare_extra_data_font(i,identifiers[i])
+      local t = font.getfont(i)
+      if t then
+         prepare_extra_data_base(t)
+         prepare_extra_data_font(i,t)
       end
    end
 end
@@ -922,9 +915,7 @@ luatexbase.add_to_callback(
       local vform = {}; fmtable.vform = vform
       local t = font_getfont(fnum)
       if t.specification and t.resources then
-         local add_vert  
-           = not (provides_feature(fnum, t.properties.script, t.properties.language, 'vert'))
-             and not (provides_feature(fnum, t.properties.script, t.properties.language, 'vrt2'))
+         local add_vert = not ltju.exist_feature(fnum, 'vert') and not ltju.exist_feature(fnum, 'vrt2')
          local jpotf_vert = t.shared.features.jpotf
          -- 現在の language, script で vert もvrt2 も有効にできない場合，強制的に vert 適用
          for _,i in pairs(t.resources.sequences) do

@@ -6,6 +6,7 @@ luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('stack');     local ltjs = luatexja.stack
 luatexja.load_module('jfont');     local ltjf = luatexja.jfont
 luatexja.load_module('direction'); local ltjd = luatexja.direction
+luatexja.load_module('lotf_aux');  local ltju = luatexja.lotf_aux
 
 local setfield = node.direct.setfield
 local getfield = node.direct.getfield
@@ -173,24 +174,22 @@ local function capsule_glyph_tate_rot(p, met, char_data, head, dir, asc)
    return q, head, box
 end
 
+local font_getfont = font.getfont
+local get_ascender, get_descender = ltju.get_ascender, ltju.get_descender
 local function capsule_glyph_tate(p, met, char_data, head, dir)
    if not char_data then return node_next(p), head end
-   local ascent, descent = met.ascent, met.descent
-   local fwidth, pwidth = char_data.width
+   local fwidth, pwidth, ascender = char_data.width
    do
       local pf, pc = getfont(p), getchar(p)
       local feir = ltjf_font_extra_info[pf]
       if feir and feir.rotation and met.vert_activated then
 	 if feir.rotation[pc] and (has_attr(p, attr_vert_ori) or 0)<=0 then
-	    return capsule_glyph_tate_rot(p, met, char_data, head, dir, 0.5*(ascent-descent))
+	    return capsule_glyph_tate_rot(p, met, char_data, head, dir, 
+              0.5*(get_ascender(pf)-get_descender(pf)))
 	 end
       end
-      local ident = fonts.hashes.identifiers[pf]
-      pwidth = (ident.descriptions and ident.descriptions[pc]
-         and ident.descriptions[pc].vheight
-         and ident.descriptions[pc].vheight / ident.units * met.size)
-         or (ident.metadata and ident.metadata.defaultvheight) or (ascent+descent)
-      ascent = feir.vorigin[pc] and (feir.vorigin[pc] / ident.units * met.size) or ascent
+      pwidth = ltju.get_vheight(pf, pc, met.size)
+      ascender = feir.vorigin[pc] and (feir.vorigin[pc] * met.size) or get_ascender(pf)
    end
    fwidth = fwidth or pwidth
    fshift.down = char_data.down; fshift.left = char_data.left
@@ -207,7 +206,7 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
    setdir(box, dir)
 
    setoffsets(p, -fshift.down,
-              yo -(ascent + char_data.align*(fwidth-pwidth) - fshift.left) )
+              yo -(ascender + char_data.align*(fwidth-pwidth) - fshift.left) )
    local ws = node_new(id_whatsit, sid_save)
    local wm = node_new(id_whatsit, sid_matrix)
    setfield(wm, 'data', '0 1 -1 0')

@@ -228,9 +228,10 @@ do
    local getfont = node.direct.getfont
    local getchar = node.direct.getchar
    local setchar = node.direct.setchar
+   local font_getfont = font.getfont
    cidf_vert_processor = {
       function (head, fnum)
-         local fontdata = identifiers[fnum]
+         local fontdata = font_getfont(fnum)
          if head and luatexja.jfont.font_metric_table[fnum].vert_activated then
 	    local vt = fontdata.shared.ltj_vert_table
 	    local nh = is_node(head) and to_direct(head) or head 

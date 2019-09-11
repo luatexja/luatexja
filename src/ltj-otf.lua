@@ -44,7 +44,7 @@ local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 local attr_tablshift = luatexbase.attributes['ltj@tablshift']
 local attr_tkblshift = luatexbase.attributes['ltj@tkblshift']
 local lang_ja = luatexja.lang_ja
-local identifiers = fonts.hashes.identifiers
+local font_getfont = font.getfont
 
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_font_extra_info = ltjf.font_extra_info
@@ -74,7 +74,7 @@ local function get_ucs_from_rmlgbm(c)
    if v>=0x200000 then -- table
       local curjfnt_num = tex_get_attr((ltjd_get_dir_count()==dir_tate)
                                         and attr_curtfnt or attr_curjfnt)
-      local curjfnt = identifiers[curjfnt_num].resources
+      local curjfnt = font_getfont(curjfnt_num).resources
       local base, ivs = v % 0x200000, 0xE00FF + math.floor(v/0x200000)
       curjfnt = curjfnt and curjfnt.variants
       curjfnt = curjfnt and curjfnt[ivs]
@@ -106,7 +106,7 @@ local function get_ucs_from_rmlgbm(c)
          -- CID が縦組用字形だった場合
          local curjfnt_num = tex_get_attr((ltjd_get_dir_count()==dir_tate)
                                         and attr_curtfnt or attr_curjfnt)
-         local t = identifiers[curjfnt_num]
+         local t = font_getfont(curjfnt_num)
          if t.resources.sequences then
             for _,i in pairs(t.resources.sequences) do
                if (i.order[1]=='vert' or i.order[1]=='vrt2')
@@ -145,7 +145,7 @@ do
       if ltjd_get_dir_count()==dir_tate then
          local curjfnt_num = tex_get_attr((ltjd_get_dir_count()==dir_tate)
                                         and attr_curtfnt or attr_curjfnt)
-         local t = identifiers[curjfnt_num]
+         local t = font_getfont(curjfnt_num)
          if t.resources.sequences then
             for _,i in pairs(t.resources.sequences) do
                if (i.order[1]=='vert' or i.order[1]=='vrt2')
@@ -173,7 +173,7 @@ do
       if key==0 then return append_jglyph(0) end
       local curjfnt_num = tex_get_attr((ltjd_get_dir_count()==dir_tate)
                                         and attr_curtfnt or attr_curjfnt)
-      local curjfnt = identifiers[curjfnt_num]
+      local curjfnt = font_getfont(curjfnt_num)
       local cidinfo = curjfnt.resources.cidinfo
       if not cidinfo or
          cidinfo.ordering ~= "Japan1" and
@@ -243,7 +243,7 @@ ltjb.add_to_callback('pre_linebreak_filter', extract,'ltj.otf',
 
 -- 和文フォント読み込み時に，ind -> unicode 対応をとっておく．
 local function ind_to_uni(fmtable, fn)
-   local fi = identifiers[fn]
+   local fi = font_getfont(fn)
    local t = ltjf_font_extra_info[fn].ind_to_uni
    if t and fi.resources and fi.resources.cidinfo 
       and fi.resources.cidinfo.ordering == "Japan1" then
