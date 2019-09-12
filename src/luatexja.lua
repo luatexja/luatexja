@@ -100,6 +100,7 @@ load_module('rmlgbm');    local ltjr = luatexja.rmlgbm -- must be 1st
 
 if luatexja_debug then load_module('debug') end
 
+load_module('lotf_aux');  local ltju = luatexja.lotf_aux
 load_module('charrange'); local ltjc = luatexja.charrange
 load_module('stack');     local ltjs = luatexja.stack
 load_module('direction'); local ltjd = luatexja.direction -- +1 hlist +1 attr_list
