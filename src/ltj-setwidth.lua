@@ -188,8 +188,7 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
               0.5*(get_ascender(pf)-get_descender(pf)))
 	 end
       end
-      pwidth = ltju.get_vheight(pf, pc, met.size)
-      ascender = feir.vorigin[pc] and (feir.vorigin[pc] * met.size) or get_ascender(pf)
+      pwidth, ascender = feir.vheight[pc]*met.size, feir.vorigin[pc]*met.size
    end
    fwidth = fwidth or pwidth
    fshift.down = char_data.down; fshift.left = char_data.left

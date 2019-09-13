@@ -5093,10 +5093,6 @@ $i$,~$j\in \omega$に対して，\texttt{char\_type[$i$][$j$]} は
     JFM中の同名のフィールドの値がそのまま使われている．
   \end{description}
 \end{itemize}
-\item[ascent\textrm{, }descent]
-  縦組時に個々のグリフを90度回転させる場合，そのグリフは（実際の高さ・深さにかかわらず）
-  便宜的に高さ\texttt{ascent}，深さ\texttt{descent}を持つものだと想定して回転させる．
-  この仕様は\Pkg{luaotfload}がOpenTypeフォントのVORGテーブルを読まないための暫定的なものである．
 \item[chars\_cbcache]
 文字クラス決定の処理で．キャッシュとして使われる．
 \end{cslist}
@@ -10862,10 +10858,6 @@ CMapが必要である．
 \pageref{para-cid}ページで述べたように，\texttt{cid}キーを使って
 非埋め込みの中国語・韓国語フォントを定義する場合，同様のキャッシュが生成される．
 キャッシュの名称，必要となるCMapについては\autoref{tab:cid-cache}を参照して欲しい．
-
-\item[extra\_***.lua]
-フォント``\texttt{***}''における異体字セレクタの情報，縦組用字形への変換テーブル，そして
-縦組時における幅を格納している．構造は以下の通り：
 %</ja>
 %<*en>
 \subsection{Use of cache}
@@ -10883,16 +10875,6 @@ Similar caches are created as \autoref{tab:cid-cache},
 if you specified \texttt{cid} key in \cs{jfont}
 to use other CID-keyed non-embedded fonts for Chinese or Korean,
 as in Page~\pageref{para-cid}.
-
-\item[extra\_***.lua]
-This file stores the table which stores the following.
-\begin{itemize}
- \item unicode variants in a font ``\texttt{***}''
- \item vertical width of glyphs, if it is not equal to the sum of
-the height of ascender and the depth of descender
- \item vertical variants
-\end{itemize}
-The following is the structure of the that table.
 %</en>
 
 \begin{table}[!tb]
@@ -10914,29 +10896,6 @@ Adobe-CNS1-*&ltj-cid-auto-adobe-cns1.lua&UniCNS-UTF32-*&Adobe-CNS1-UCS2\\
 \end{tabular}
 \end{table}
 
-\begin{lstlisting}
-return {
- {
-  [10955]={    -- U+2ACB "Subset Of Above Not Equal To"
-   [65024]=983879, -- <2ACB FE00>
-   ["vwidth"]=0.98, -- vertical width
-  },
-  [37001]={    -- U+9089 "邉"
-   [0]=37001,  --   <9089 E0100>
-   991049,     --   <9089 E0101>
-   ...
-   ["vform"]=995025, -- vertical variant
-  },
-  ...
-  ["unicodes"]={
-    ["aj102.pe.vert"]=984163, -- glyph name to unicode
-    ...
-  }
- },
- ["chksum"]="FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", -- checksum of the fontfile
- ["version"]=11, -- version of the cache
-}
-\end{lstlisting}
 %<*ja>
 \item[ltj-jisx0208.\{luc|lub\}]
 \LuaTeX-ja配布中の\texttt{ltj-jisx0208.lua}をバイナリ化したものである．

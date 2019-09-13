@@ -5,13 +5,10 @@
 -- functions which access to fonts.* will be gathered in this file.
 local aux = {}
 luatexja.lotf_aux = aux
+local font_metric_table = {}
+aux.font_metric_table = font_metric_table
 
-local getfont
-do
-  local font_getfont = font.getfont
-  getfont = function (id) return (type(id)=="table") and id or font_getfont(id) end
-end
-  -- accept font number or table
+local getfont = font.getfont
 local provides_feature = luaotfload.aux.provides_feature
 function aux.exist_feature(id, name)
   local t = getfont(id)
@@ -33,30 +30,63 @@ function aux.specified_feature(id, name)
 end
 
 local function get_ascender(id) -- scaled points
+  if font_metric_table[id].ascender then return font_metric_table[id].ascender end
   local t = getfont(id)
-  return (t and t.parameters and t.parameters.ascender) or 0
+  local a = t and t.parameters and t.parameters.ascender or 0
+  font_metric_table[id].ascender = a; return a
 end
 local function get_descender(id) -- scaled points
+  if font_metric_table[id].descender then return font_metric_table[id].descender end
   local t = getfont(id)
-  return (t and t.parameters and t.parameters.descender) or 0
+  local a = t and t.parameters and t.parameters.descender or 0
+  font_metric_table[id].descender = a; return a
 end
 aux.get_ascender, aux.get_descender = get_ascender, get_descender
 
-function aux.get_vheight(id, c) -- scaled points
-  local t = getfont(id)
-  if t and t.descriptions and t.descriptions[c] and t.descriptions[c].vheight then
-    return t.descriptions[c].vheight / t.units * t.size
-  elseif t and t.shared and t.shared.rawdata and t.shared.rawdata.metadata then
-    return t.shared.rawdata.metadata.defaultvheight / t.units * t.size
-  else
-    return get_ascender(id) + get_descender(id)
+local function get_vmet_table(tfmdata, dest)
+   if tfmata and tfmdata.shared then return dest end
+   local rawdata = tfmdata.shared.rawdata
+   local ascender = rawdata.metadata.ascender or 0
+   local default_vheight 
+     = rawdata.metadata.defaultvheight
+       or (rawdata.metadata.descender and (ascender+rawdata.metadata.descender) or units)
+   local units = tfmdata.units
+   local t_vorigin, t_vheight, t_ind_to_uni = {}, {}, {}
+   for i,v in pairs(rawdata.descriptions) do
+     t_ind_to_uni[v.index] = i
+     if v.tsb then
+       local j = v.boundingbox[4] + v.tsb
+       if j~=ascender then t_vorigin[i]= j / units end
+     end
+     if v.vheight then
+       if v.vheight~=default_vheight then t_vheight[i] = v.vheight / units end
+     end
+   end
+   setmetatable(t_vheight, {__index = function () return default_vheight / units end } )
+   setmetatable(t_vorigin, {__index = function () return ascender / units end } )
+   dest = dest or {}
+   dest.ind_to_uni = t_ind_to_uni
+   dest.vorigin = t_vorigin -- designed size = 1.0
+   dest.vheight = t_vheight -- designed size = 1.0
+   return dest
+end
+aux.get_vmet_table = get_vmet_table
+
+local function loop_over_duplicates(id, func)
+-- func: return non-nil iff abort this fn
+  local t = (type(id)=="table") and id or getfont(id)
+  if t and t.resources and t.resources.duplicates then
+    for i,v in pairs(t.resources.duplicates) do
+      func(i,v)
+    end
   end
 end
+aux.loop_over_duplicates = loop_over_duplicates
 
 local function loop_over_feat(id, feature_name, func)
 -- feature_name: like { vert=true, vrt2 = true, ...}
 -- func: return non-nil iff abort this fn
-  local t = getfont(id)
+  local t = (type(id)=="table") and id or getfont(id)
   if t and t.resources and t.resources.sequences then
     for _,i in pairs(t.resources.sequences) do
       if i.order[1] and feature_name[i.order[1]] then
@@ -91,6 +121,7 @@ end
 local search
 search = function (t, key, prefix)
   if type(t)=="table" then
+    prefix = prefix or ''
     for i,v in pairs(t) do 
       if i==key then print(prefix..'.'..i, v) 
       else  search(v,key,prefix..'.'..tostring(i)) end

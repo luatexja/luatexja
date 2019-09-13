@@ -7,11 +7,11 @@ luatexbase.provides_module({
   description = 'Loader for Japanese fonts',
 })
 
+luatexja.load_module('lotf_aux');  local ltju = luatexja.lotf_aux
 luatexja.load_module('base');      local ltjb = luatexja.base
 luatexja.load_module('charrange'); local ltjc = luatexja.charrange
 luatexja.load_module('rmlgbm');    local ltjr = luatexja.rmlgbm
 luatexja.load_module('direction'); local ltjd = luatexja.direction
-luatexja.load_module('lotf_aux');  local ltju = luatexja.lotf_aux
 
 local setfield = node.direct.setfield
 local getid = node.direct.getid
@@ -37,8 +37,8 @@ luatexja.jfont = luatexja.jfont or {}
 -- LOADING JFM
 ------------------------------------------------------------------------
 
-local metrics={} -- this table stores all metric informations
-local font_metric_table={} -- [font number] -> jfm_name, jfm_var, size
+local metrics = {} -- this table stores all metric informations
+local font_metric_table = ltju.font_metric_table -- [font number] -> jfm_name, jfm_var, size
 
 luatexbase.create_callback("luatexja.load_jfm", "data", function (ft, jn) return ft end)
 
@@ -760,21 +760,29 @@ do
     return lo%2==1
   end
   local vert_vrt2 = { vert=true, vrt2 = true }
-  list_rotate_glyphs = function (dest, id)
+  local function list_rorate_dup (i, v, dest)
+    local f = dest[i]
+    if not f then
+      for j,_ in pairs(v) do if dest[j] then f=true; break end end
+    end
+    dest[i]=f; for j,_ in pairs(v) do dest[j]=f end
+  end
+  list_rotate_glyphs = function (tfmdata, dest)
     local rot = {}
-    for i,_ in pairs(id.characters) do
+    for i,_ in pairs(tfmdata.characters) do
       if rotate_in_uax50(i) then rot[i] = true end
     end
-    ltju.loop_over_feat(id, vert_vrt2, function (i,k) rot[i] = nil end)
-    -- コードポイントが共有されているグリフについて
-    if id.resources and id.resources.duplicates then
-      for i,v in pairs(id.resources.duplicates) do
-        local f = rot[i]
-        for j,_ in pairs(v) do f = f and rot[j] end
-        rot[i]=f
-        for j,_ in pairs(v) do rot[j] = f end
-      end
-    end
+    ltju.loop_over_feat(tfmdata, vert_vrt2, function (i,k) rot[i] = nil end)
+    -- 同じグリフが複数の Unicode ポイントを持っている場合．
+    -- いずれかの Unicode ポイントで rot = true ならば全体で rotate
+    ltju.loop_over_duplicates(tfmdata,
+       function (i, v)
+         local f = rot[i]
+         if not f then
+            for j,_ in pairs(v) do if rot[j] then f=true; break end end
+         end
+         rot[i]=f; for j,_ in pairs(v) do rot[j]=f end
+       end)
     for i,_ in pairs(rot) do
        dest = dest or {}; dest.rotation = dest.rotation or {}
        dest.rotation[i] = true
@@ -783,45 +791,22 @@ do
   end
 end
 
--- vertical metrics
-local prepare_fl_data
 do
-   local sort = table.sort
-   prepare_fl_data = function (dest, id)
-     local rawdata = id.shared.rawdata
-     local ascender = rawdata.metadata.ascender
-     local units = id.units
-     local t_vorigin, t_ind_to_uni = {}, {}
-     for i,v in pairs(rawdata.descriptions) do
-       t_ind_to_uni[v.index] = i
-       if v.tsb then
-         local j = v.boundingbox[4] + v.tsb
-         if j~=ascender then t_vorigin[i]=j / units end
-       end
-     end
-     dest = dest or {}
-     dest.ind_to_uni = t_ind_to_uni
-     dest.vorigin = t_vorigin -- designed size = 1.0
-     return dest
-   end
-end
-
---
-do
-   local function prepare_extra_data_base(id)
-      if (not id) or (not id.filename) then return end
-      local bname = id.psname or file.nameonly(id.filename)
+   local nameonly, lower = file.nameonly, string.lower
+   local function prepare_extra_data_base(tfmdata)
+      if (not tfmdata) or (not tfmdata.filename) then return end
+      local bname = tfmdata.psname or nameonly(tfmdata.filename)
       if not font_extra_basename[bname] then
-         ltjb.remove_cache("extra_" .. string.lower(bname)) -- remove cache
-         local dat = prepare_fl_data(dat, id)
-         dat = list_rotate_glyphs(dat, id)
-         font_extra_basename[bname] = dat or {}
+         ltjb.remove_cache("extra_" .. lower(bname)) -- remove cache
+         local dest = ltju.get_vmet_table(tfmdata, dest)
+         dest = list_rotate_glyphs(tfmdata, dest)
+         font_extra_basename[bname] = dest or {}
          return bname
       end
    end
    local function prepare_extra_data_font(id, res)
-      if type(res)=='table' and res.shared and (res.psname or res.filename) then
-         font_extra_info[id] = font_extra_basename[res.psname or file.nameonly(res.filename)]
+      if type(res)=='table' and (res.psname or res.filename) then
+         font_extra_info[id] = font_extra_basename[res.psname or nameonly(res.filename)]
       end
    end
     luatexbase.add_to_callback(
