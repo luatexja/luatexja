@@ -83,16 +83,17 @@ local function loop_over_duplicates(id, func)
 end
 aux.loop_over_duplicates = loop_over_duplicates
 
-local function loop_over_feat(id, feature_name, func)
+local function loop_over_feat(id, feature_name, func, universal)
 -- feature_name: like { vert=true, vrt2 = true, ...}
 -- func: return non-nil iff abort this fn
+-- universal: true iff look up all (script, lang) pair
   local t = (type(id)=="table") and id or getfont(id)
   if t and t.resources and t.resources.sequences then
     for _,i in pairs(t.resources.sequences) do
       if i.order[1] and feature_name[i.order[1]] then
         local f = i.features and i.features[i.order[1]]
         if i.type == 'gsub_single' and i.steps 
-          and f and f[t.properties.script] and f[t.properties.script][t.properties.language] then
+          and f and (universal or (f[t.properties.script] and f[t.properties.script][t.properties.language])) then
           for _,j in pairs(i.steps) do
             if type(j)=='table' then 
               if type(j.coverage)=='table' then

@@ -854,22 +854,7 @@ do
      [0x300C]=0xFE41, [0x300D]=0xFE42, [0x300E]=0xFE43, [0x300F]=0xFE44,
      [0xFF3B]=0xFE47, [0xFF3D]=0xFE48, 
   }
-  local vert_jpotf_table = {}
-  local function add_vform(i, k, vform, ft, add_vert, jpotf_vert)
-    if type(coverage)~='table' then return end
-    for i,v in pairs(vert_form_table) do
-       if not coverage[i] and ft.characters[v] then vform[i] = v end
-    end
-    if jpotf_vert then
-      for i,v in pairs(vert_jpotf_table) do
-	if ft.characters[v] then  vform[i] = coverage[v] or vform[v] or v end
-      end
-    end
-    if add_vert then -- vert feature が有効にならない場合
-      for i,v in pairs(coverage) do vform[i] = vform[i] or v end
-    end
-  end
-
+  local vert_jpotf_table, vert_feat = {}, {vert=true}
   local utfbyte, utfsub = utf.byte, utf.sub
   luatexja.jfont.register_vert_replace = function(t)
     for i,v in pairs(t) do
@@ -887,20 +872,25 @@ luatexbase.add_to_callback(
    function (fmtable, fnum)
       local vform = {}; fmtable.vform = vform
       local t = font_getfont(fnum)
-      if t.specification and t.resources then
-         local add_vert = not ltju.exist_feature(fnum, 'vert') and not ltju.exist_feature(fnum, 'vrt2')
-         local jpotf_vert = ltju.specified_feature(fnum, 'jpotf')
-         -- 現在の language, script で vert もvrt2 も有効にできない場合，強制的に vert 適用
-         for _,i in pairs(t.resources.sequences) do
-            if i.order[1]== 'vert' and i.type == 'gsub_single' and i.steps then
-               for _,j in pairs(i.steps) do
-                  if type(j)=='table' then
-		      add_vform(j.coverage,vform, t, add_vert, jpotf_vert)
-		  end
-               end
-            end
-          end
+      if not t then return fmtable end
+      for i,v in pairs(vert_form_table) do
+	if t.characters[v] then vform[i] = v end
       end
+      if ltju.specified_feature(fnum, 'jpotf') then
+        for i,v in pairs(vert_jpotf_table) do
+          if t.characters[v] then vform[i] = vform[v] or v end
+        end
+      end
+      if not ltju.exist_feature(fnum, 'vert') and not ltju.exist_feature(fnum, 'vrt2') then
+        -- 現在の (script, lang) で vert もvrt2 も有効にできない場合，
+	-- 全 (script,lang) の vert を強制的に適用
+        ltju.loop_over_feat(t, vert_feat, function (i,k) vform[i] = vform[i] or k end, true)
+      end
+      -- vform の中身を vert 適用結果に変える
+      ltju.loop_over_feat(t, vert_feat,
+        function (i,k)
+          for j,w in pairs(vform) do if w==k then vform[j]=nil elseif w==i then vform[j] = k end end
+        end)
       return fmtable
    end, 'ltj.get_vert_form', 1
 )
