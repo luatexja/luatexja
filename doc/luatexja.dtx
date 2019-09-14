@@ -41,10 +41,12 @@
 \usepackage{luatexja-otf}
 \usepackage[no-math]{fontspec}
 \setmainfont[Ligatures=TeX,RawFeature=-notdef]{Linux Libertine O}
-\setmonofont[Scale=MatchLowercase, ItalicFont=lmmono10-italic.otf,
-  BoldFont=lmmonolt10-bold.otf, BoldItalicFont=lmmonolt10-boldoblique.otf,
-  RawFeature=-notdef
-]{lmmono10-regular.otf}
+\setmonofont[RawFeature=-notdef, Ligatures=CommonOff, CharacterVariant={31,45,61,36},
+%<en>  Scale=0.8132073118633364, FakeStretch=1.183236,
+%<ja>  Scale=MatchLowercase, FakeStretch=1.137121,
+  ItalicFont=iosevka-slab-lightoblique,
+  BoldFont=iosevka-medium, BoldItalicFont=iosevka-slab-mediumitalic,
+]{iosevka-slab-light}
 \setsansfont[Scale=MatchLowercase,Ligatures=TeX,RawFeature=-notdef]{Linux Biolinum O}
 \usepackage[match]{luatexja-fontspec}
 \usepackage[kozuka-pr6n]{luatexja-preset}
@@ -174,7 +176,7 @@
 %%%%%%%% other macros
 \newlist{cslist}{description}{2}
 \setlist[cslist]{%
-    style=nextline,font=\mdseries\ttfamily,
+    style=nextline,font=\bfseries\ttfamily,
     before*=\def\<{\char`\<}\def\>{\char`\>}\def\{{\char`\{}\def\}{\char`\}},
     topsep=\medskipamount,
 %<ja> leftmargin=2\zw,
@@ -3484,17 +3486,17 @@ The following horizontal JFMs are shipped with \LuaTeX-ja:
 %</ja>
 \begin{description}
 %<*en>
-\item[\tt jfm-ujis.lua] A standard horizontal JFM in \LuaTeX-ja. This JFM is
+\item[\texttt{jfm-ujis.lua}] A standard horizontal JFM in \LuaTeX-ja. This JFM is
   based on \verb+upnmlminr-h.tfm+, a metric for UTF/OTF package that
   is used in \upTeX. When you use the \Pkg{luatexja-otf} package, you should use this JFM.
 %</en>
 %<*ja>
-\item[\tt jfm-ujis.lua] \LuaTeX-jaの標準JFMである．このJFMは\upTeX で
+\item[\texttt{jfm-ujis.lua}] \LuaTeX-jaの標準JFMである．このJFMは\upTeX で
   用いられるUTF/OTFパッケージ用の和文用TFMである \verb+upnmlminr-h.tfm+ を
   元にしている．\Pkg{luatexja-otf}パッケージを使うときはこのJFMを指定するべきである．
 %</ja>
 %<*en>
-\item[\tt jfm-jis.lua] A counterpart for \verb+jis.tfm+, ``JIS font
+\item[\texttt{jfm-jis.lua}] A counterpart for \verb+jis.tfm+, ``JIS font
   metric'' which is widely used in \pTeX. A major difference between
   \texttt{jfm-ujis.lua} and this \texttt{jfm-jis.lua} is that
   most characters under \texttt{jfm-ujis.lua} are square-shaped,
@@ -3502,18 +3504,18 @@ The following horizontal JFMs are shipped with \LuaTeX-ja:
   rectangles.
 %</en>
 %<*ja>
-\item[\tt jfm-jis.lua] \pTeX で広く用いられている「JISフォントメトリック」
+\item[\texttt{jfm-jis.lua}] \pTeX で広く用いられている「JISフォントメトリック」
   \verb+jis.tfm+ に相当するJFMである．\texttt{jfm-ujis.lua} とこの
   \texttt{jfm-jis.lua} の主な違いは，\texttt{jfm-ujis.lua} ではほとんどの文字が
   正方形状であるのに対し，\texttt{jfm-jis.lua} では横長の長方形状であることと，
   \texttt{jfm-ujis.lua} では「？」「！」の直後に半角空白が挿入されることである．
 %</ja>
 %<*en>
-\item[\tt jfm-min.lua] A counterpart for \verb+min10.tfm+, which is one
+\item[\texttt{jfm-min.lua}] A counterpart for \verb+min10.tfm+, which is one
   of the default Japanese font metric shipped with \pTeX.
 %</en>
 %<*ja>
-\item[\tt jfm-min.lua] \pTeX に同梱されているデフォルトの和文用TFM
+\item[\texttt{jfm-min.lua}] \pTeX に同梱されているデフォルトの和文用TFM
 (\verb+min10.tfm+)に相当し，行末で文字が揃うようにするために「っ」など一部の文字幅が変わっ
 	   ている．\verb+min10.tfm+ については\cite{min10}が詳しい．
 %</ja>
@@ -3782,10 +3784,10 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
  \item One have to specify the name of vertical JFM in  \texttt{jfm=<name>}.
 \LuaTeX-ja ships following vertical JFMs:
 \begin{description}
-\item[\tt jfm-ujisv.lua] A standard vertical JFM in \LuaTeX-ja. This JFM is
+\item[\texttt{jfm-ujisv.lua}] A standard vertical JFM in \LuaTeX-ja. This JFM is
   based on \verb+upnmlminr-v.tfm+, a metric for UTF/OTF package that
   is used in \upTeX.
-\item[\tt jfm-tmin.lua] A counterpart for \verb+tmin10.tfm+, which is one
+\item[\texttt{jfm-tmin.lua}] A counterpart for \verb+tmin10.tfm+, which is one
   of the default Japanese font metric shipped with \pTeX.
 \end{description}
 \begin{figure}[!tb]
@@ -3843,10 +3845,10 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
  \item \texttt{jfm=<name>}\ の部分には縦組用JFMを指定する．
 以下の縦組用JFMが\LuaTeX-jaには同梱されている．%おり，違いを\autoref{tab-difjfm-tate}に示した．
 \begin{description}
-\item[\tt jfm-ujisv.lua] \LuaTeX-jaの標準縦組用JFMである．このJFMは\upTeX で
+\item[\texttt{jfm-ujisv.lua}] \LuaTeX-jaの標準縦組用JFMである．このJFMは\upTeX で
   用いられるUTF/OTFパッケージ用の和文用TFMである \verb+upnmlminr-v.tfm+ を
   元にしている．
-\item[\tt jfm-tmin.lua] \pTeX に同梱されているデフォルトの和文用縦組TFM
+\item[\texttt{jfm-tmin.lua}] \pTeX に同梱されているデフォルトの和文用縦組TFM
   である \verb+tmin10.tfm+ に相当し，\texttt{min10.tfm} と同様に
   「っ」など一部の文字幅が狭められている．
 \end{description}
@@ -3976,8 +3978,8 @@ will not be embedded to PDF.
 Note that these non-embedded fonts under current \LuaTeX\ has Identity-H encoding,
 and this violates the standard ISO32000-1:2008~(\cite{pdfstd}).
 
-\emph{OpenType font features, such as ``{\tt +jp90}'',
-have no meaning in name-only fonts using ``{\tt psft:}''\ prefix,
+\emph{OpenType font features, such as ``\texttt{+jp90}'',
+have no meaning in name-only fonts using ``\texttt{psft:}''\ prefix,
 because we can't expect what fonts are actually used by the PDF reader.}
 Note that \texttt{extend}~and~\texttt{slant} settings (see~above) are supported
 with \texttt{psft} prefix, because they are only simple linear transformations.
@@ -5031,7 +5033,7 @@ For $i\in\omega$, \texttt{char\_type[$i$]} is information of characters whose cl
  \item \texttt{align} is a number which is determined from \texttt{align}~field in the JFM:
 \[
  \begin{cases}
-  0&\text{\texttt{'left'} (default)}\\0.5&\text{\tt 'middle'}\\1&\text{\tt 'right'}
+  0&\text{\texttt{'left'} (default)}\\0.5&\text{\ttfamily 'middle'}\\1&\text{\ttfamily 'right'}
  \end{cases}
 \]
 \end{itemize}
@@ -5065,7 +5067,7 @@ JFMで指定されているそれぞれの値をスケーリングしたもの�
  \item \texttt{align} はJFMで指定されている値によって，
 \[
  \begin{cases}
-  0&\text{\texttt{'left'}や省略時}\\0.5&\text{\tt 'middle'}\\1&\text{\tt 'right'}
+  0&\text{\texttt{'left'}や省略時}\\0.5&\text{\ttfamily 'middle'}\\1&\text{\ttfamily 'right'}
  \end{cases}
 \]
 のいずれかの値をとる．
