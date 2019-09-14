@@ -1,9 +1,8 @@
-%#! euptex
-% cat jisx0208table.log | tr -s '\n' > ../src/luatexja/jisx0208.lua
-% の後，少々修正
+%#! euptex -shell-escape
 \catcode`\!=1
 \catcode`\?=2
-
+\immediate\openout1=jisx0208_1.lua
+\def\OUT{\immediate\write1}
 \catcode`@11
 \def\@firstoftwo#1#2{#1}
 \def\@secondoftwo#1#2{#2}
@@ -81,10 +80,9 @@
 \font\tt=cmtt10 at 10pt\tt\baselineskip=12pt\parindent=0pt\parskip=0pt
 
 \catcode`\_=12
-\message!^^Jluatexbase.provides_module({?
-\message!^^J  name = 'luatexja.jisx0208'})?
-\message!^^Jmodule('luatexja.jisx0208', package.seeall)?
-\message!^^Jtable_jisx0208_uptex = {?
+\OUT!return {?
+\OUT!version = 3,?
+\OUT!table_jisx0208_uptex = {?
 
 \ku=1
 \loop 
@@ -93,13 +91,10 @@
     \loop
     \advance\tmp1 
     \tmpa=\jis\tmp \tmpb=\tmp\advance\tmpb-"2020%"
-    \ifnum\tmpa=0\else
-      \ifnum\tmpa>256
-        \kansujichar1=\tmpa
-        \message!^^J  [0x\hex\tmpb] = 0x\hex\tmpa, --(\kansuji1)?
-      \else
-        \message!^^J  [0x\hex\tmpb] = 0x\hex\tmpa, ?
-      \fi
+    \ifnum\tmpa>0
+       \OUT!  0x\hex\tmpa,?
+    \else	
+       \OUT!  false, -- 0x\hex\tmpb?
     \fi
     \advance\ten 1
     \ifnum\ten<95\relax\repeat
@@ -107,6 +102,22 @@
   \advance\ku 1
 \ifnum\ku<95\relax\repeat
 
-\message!^^J}?
+\OUT!}}?
+\immediate\closeout1
+\catcode`\#=12
+\immediate\openout1=jisx0208_2.tmp
+\OUT!kpse.set_program_name("luatex")?
+\OUT!require('lualibs')?
+\OUT!local t=require('jisx0208_1.lua')?
+\OUT!local s=t.table_jisx0208_uptex?
+\OUT!for i=#s,1,-1 do if type(s[i])=='number' then a=i;break end end?
+\OUT!for i=a+1,#s do s[i]=nil end?
+\OUT!local f = io.open('ltj-jisx0208.lua', 'w')?
+\OUT!f:write(table.serialize(t, 'return'))?
+\OUT!f:close()?
+\immediate\closeout1
+\immediate\write18!texlua jisx0208_2.tmp?
+\immediate\write18!rm jisx0208_2.tmp?
+\immediate\write18!rm jisx0208_1.lua?
 
 \end

@@ -7,7 +7,7 @@ luatexja.load_module('stack');  local ltjs = luatexja.stack
 local stack_table_index = luatexja.stack_table_index
 
 -- load jisx0208 table
-local cache_ver = 2
+local cache_ver = 3
 
 local cache_outdate_fn = function (t) return t.version~=cache_ver end
 local jisx0208 = ltjb.load_cache('ltj-jisx0208',cache_outdate_fn)
@@ -53,7 +53,11 @@ local function from_kuten(i)
 			 "I'm going to use 0 instead of that illegal character code.")
       i=0
    end
-   tex.write(tostring(jisx0208.table_jisx0208_uptex[i] or 0))
+   if (i%256==0)or(i%256>94) then
+     tex.write('0')
+   else 
+     tex.write(tostring(jisx0208.table_jisx0208_uptex[math.floor(i/256)*94+(i%256)-94] or 0))
+   end
 end
 
 -- \euc: EUC-JP による符号位置 => Unicode 符号位置
