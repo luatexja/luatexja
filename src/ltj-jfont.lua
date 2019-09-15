@@ -889,7 +889,9 @@ luatexbase.add_to_callback(
       -- vform の中身を vert 適用結果に変える
       ltju.loop_over_feat(t, vert_feat,
         function (i,k)
-          for j,w in pairs(vform) do if w==k then vform[j]=nil elseif w==i then vform[j] = k end end
+          for j,w in pairs(vform) do
+            if (i==j)and(w==k) then vform[j]=nil elseif w==i then vform[j] = k end
+	  end
         end)
       return fmtable
    end, 'ltj.get_vert_form', 1

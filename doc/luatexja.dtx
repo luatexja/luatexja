@@ -87,7 +87,7 @@
 
 \def\IVS#1{\char\numexpr "E0100+#1\relax}%"
 \def\IVSA#1#2#3#4#5{%
-  \textcolor{blue}{\raisebox{3.5pt}{\tt%
+  \textcolor{blue}{\raisebox{3.5pt}{\normalfont\ttfamily%
     \fboxsep=0.5pt\fbox{\tiny \oalign{0#1#2\crcr#3#4#5\crcr}}}}%
 }
 {\catcode`\%=11
@@ -359,23 +359,23 @@ For more detailed information, see Part~\ref{part-imp} or other sections of this
 %<*ja>
 \paragraph{命令の名称} 例えば\pTeX で追加された次のようなプリミティブ
 %</ja>
-\begin{verbatim}
+\begin{lstlisting}
 \kanjiskip=10pt  \dimen0=kanjiskip
 \tbaselineshift=0.1zw
 \dimen0=\tbaselineshift
 \prebreakpenalty`ぁ=100
 \ifydir ... \fi
-\end{verbatim}
+\end{lstlisting}
 %<en> However, we cannot use them under \LuaTeX-ja.
 %<en> Instead of them, we have to write as the following.
 %<ja> は\LuaTeX-jaには存在しない．\LuaTeX-jaでは以下のように記述することになる．
-\begin{verbatim}
+\begin{lstlisting}
 \ltjsetparameter{kanjiskip=10pt}  \dimen0=\ltjgetparameter{kanjiskip}
 \ltjsetparameter{talbaselineshift=0.1\zw}
 \dimen0=\ltjgetparameter{talbaselineshift}
 \ltjsetparameter{prebreakpenalty={`ぁ,100}}
 \ifnum\ltjgetparemeter{direction}=4 ... \fi
-\end{verbatim}
+\end{lstlisting}
 %<*en>
 Note that \pTeX\ adds new two useful units, namely \texttt{zw}~and~\texttt{zh}.
 As shown above, they are changed by \cs{zw}~and~\cs{zh} respectively, in \LuaTeX-ja.
@@ -1019,9 +1019,9 @@ By default, the following fonts are used for these two families.
 \begin{center}\small
 \begin{tabular}{lllll}
 \toprule
-\textbf{classification}&\textbf{family}&\cs{mdseries}&\cs{bfseries}&\textbf{scale}\\\midrule
-\emph{mincho} (明朝体)&\tt mc&IPAex Mincho&IPAex Gothic&0.962216\\
-\emph{gothic} (\textgt{ゴシック体})&\tt gt&IPAex Gothic&IPAex Gothic&0.962216\\
+\textbf{classification}&\textbf{family}&\textbf{\cs{mdseries}}&\textbf{\cs{bfseries}}&\textbf{scale}\\\midrule
+\emph{mincho} (明朝体)&\texttt{mc}&IPAexMincho&IPAexGothic&0.962216\\
+\emph{gothic} (\textgt{ゴシック体})&\texttt{gt}&IPAexGothic&IPAexGothic&0.962216\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1045,9 +1045,9 @@ By default, the following fonts are used for these two families.
 \begin{center}\small
 \begin{tabular}{lllll}
 \toprule
-\emph{字体}&\emph{ファミリ}&\cs{mdseries}&\cs{bfseries}&\emph{スケール}\\\midrule
-明朝体&\tt mc&IPAex明朝&IPAexゴシック&0.962216\\
-\textgt{ゴシック体}&\tt gt&IPAexゴシック&IPAexゴシック&0.962216\\
+\emph{字体}&\emph{ファミリ}&\textbf{\cs{mdseries}}&\textbf{\cs{bfseries}}&\emph{スケール}\\\midrule
+明朝体&\texttt{mc}&IPAex明朝&IPAexゴシック&0.962216\\
+\textgt{ゴシック体}&\texttt{gt}&IPAexゴシック&IPAexゴシック&0.962216\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1812,25 +1812,25 @@ Note that characters \texttt{U+0000}--\texttt{U+007F} are always treated as an
 
 %<*en>
 \paragraph{Default character ranges}
-\LuaTeX-ja predefines eight character ranges for convenience. They are
+\LuaTeX-ja predefines nine character ranges for convenience. They are
 determined from the following data:
 %</en>
 %<*ja>
 \paragraph{文字範囲の初期値}
-\LuaTeX-jaでは8つの文字範囲を予め定義しており，
+\LuaTeX-jaでは9つの文字範囲を予め定義しており，
 これらは以下のデータに基づいて決定している．
 %</ja>
 \begin{itemize}
 %<en>\item Blocks in Unicode~12.0.0.
-%<ja>\item Unicode~11.0のブロック．
-%<en>\item The \texttt{Adobe-Japan1-UCS2} mapping between a CID Adobe-Japan1-6 and Unicode.
-%<ja>\item Adobe-Japan1-6のCIDとUnicodeの間の対応表\texttt{Adobe-Japan1-UCS2}．
+%<ja>\item Unicode~12.0のブロック．
+%<en>\item The \texttt{Adobe-Japan1-UCS2} mapping between a CID Adobe-Japan1- and Unicode.
+%<ja>\item Adobe-Japan1-7のCIDとUnicodeの間の対応表\texttt{Adobe-Japan1-UCS2}7．
 %<en>\item The \Pkg{PXbase} bundle for \upTeX\ by Takayuki Yato.
 %<ja>\item 八登崇之氏による\upTeX 用の\Pkg{PXbase}バンドル．
 \end{itemize}
 
 %<*en>
-Now we describe these eight ranges. The superscript ``J'' or ``A'' after the
+Now we describe these nine ranges. The superscript ``J'' or ``A'' after the
 number shows whether each character in the range is treated as
 \textbf{JAchar}s or not by default. These settings are similar to the
 \texttt{prefercjk} settings defined in \texttt{PXbase} bundle.
@@ -1838,12 +1838,12 @@ Any characters equal to or above \texttt{U+0080} which does not belong to
 these eight ranges belongs to the character range~217.
 %</en>
 %<*ja>
-以下ではこれら8つの文字範囲について記述する．添字のアルファベット「J」「A」
+以下ではこれら9つの文字範囲について記述する．添字のアルファベット「J」「A」
 は，その文字範囲内の文字が\textbf{JAchar}か\textbf{ALchar}かを表している．これらの初期設定は
 \texttt{PXbase}バンドルで定義されている\texttt{prefercjk}と類似のものであるが，
 8ビットフォント使用時のトラブルを防ぐために \texttt{U+0080}--\texttt{U+00FF} の文字は全部
 \textbf{ALchar}としている．
-なお，\texttt{U+0080} 以降でこれら8つの文字範囲に属さない文字は，217番の文字範囲に属することになっている．
+なお，\texttt{U+0080} 以降でこれら9つの文字範囲に属さない文字は，217番の文字範囲に属することになっている．
 %</ja>
 \begin{description}
 %<*en>
@@ -1964,9 +1964,11 @@ these eight ranges belongs to the character range~217.
 %<ja>\caption{文字範囲9に指定されている文字．}
 \label{tab:rng9}
 \centering\footnotesize
-\def\ch#1{\char"20#1~(\texttt{U+20#1})}%"
+\def\ch#1{%
+  {\fboxsep0pt\fcolorbox{cyan}{white}%
+  {\normalsize\char"20#1}}\ (\texttt{U+20#1})} %"
 % 13: JIS X0213, AJ, Adobe-Japan-1 only
-\begin{tabular}{llllll}
+\begin{tabular}{ll>{\color{white}}lll>{\color{white}}l}
   \ch{02}&{En space}&AJ&
   \ch{10}&{Hyphen}&\\
   \ch{11}&{Non-breaking hyphen}&AJ&
@@ -4931,9 +4933,9 @@ a \emph{horizontal} Japanese font.
 %<ja>\bf 和文フォント&\bf 欧文フォント\\
 \midrule
 \cs{jfam}${}\in [0,256)$&\cs{fam}\\
-\tt\Param{jatextfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\cs{textfont}<fam>=<font\_cs>\\
-\tt\Param{jascriptfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\cs{scriptfont}<fam>=<font\_cs>\\
-\tt\Param{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}&\tt\cs{scriptscriptfont}<fam>=<font\_cs>\\
+\ttfamily\Param{jatextfont}\,=\{<jfam>,<jfont\_cs>\}&\ttfamily\cs{textfont}<fam>=<font\_cs>\\
+\ttfamily\Param{jascriptfont}\,=\{<jfam>,<jfont\_cs>\}&\ttfamily\cs{scriptfont}<fam>=<font\_cs>\\
+\ttfamily\Param{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}&\ttfamily\cs{scriptscriptfont}<fam>=<font\_cs>\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -6310,9 +6312,9 @@ The above 3~commands are just the counterparts for \cs{DeclareFontEncodingDefaul
 	     更させるようにするのが一般的と思われる．
 
 本命令は
-\begin{center}\tt
-<unified-cmd>\{<arg>\}\quad$\longrightarrow$\quad
-(<al-cmd>の1段展開結果)\{<ja-cmd>の1段展開結果)\{<arg>\}\}
+\begin{center}
+<unified-cmd>\texttt{\{}<arg>\texttt{\}}\quad$\longrightarrow$\quad
+(<al-cmd>の1段展開結果)\texttt{\{}<ja-cmd>の1段展開結果)\texttt{\{<arg>\}\}}
 \end{center}
 と定義を行うので，使用には注意が必要である：
 %<en>\vspace{-\medskipamount}
@@ -10292,11 +10294,11 @@ then the patch \Pkg{lltjp-listings} is loaded automatically at \verb+\begin{docu
 % \textbf{JAchar}を名称の一部に含む制御綴は使用不可能}である．
 % 例えば次のような入力を考えよう：
 % %</ja>
-% \begin{verbatim*}
-% \begin{lstlisting}[escapechar=\#]
+% \begin{lstlisting}[showspaces][escapechar=\!]
+% !\cs{begin}!{lstlisting}[escapechar=\#]
 % #\ほげ xぴよ#
+% !\cs{end}!{lstlisting}
 % \end{lstlisting}
-% \end{verbatim*}
 % %<en>The line~2 is transformed by the callback to
 % %<ja>ここで，2行目は \verb+process_input_buffer+ の作用により，
 % \begin{lstlisting}[showspaces, escapechar=\!]
