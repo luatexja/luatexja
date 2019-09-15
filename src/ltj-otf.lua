@@ -73,19 +73,22 @@ local function get_ucs_from_rmlgbm(c)
       or ltjr_cidfont_data["Adobe-Japan1"].resources.unicodes["Japan1." .. tostring(c)])
       or 0
    if v>=0x200000 then -- table
-      local curjfnt_num = tex_get_attr((ltjd_get_dir_count()==dir_tate)
+      local curjfnt = tex_get_attr((ltjd_get_dir_count()==dir_tate)
                                         and attr_curtfnt or attr_curjfnt)
-      local curjfnt = font_getfont(curjfnt_num).resources
-      local base, ivs = v % 0x200000, 0xE00FF + math.floor(v/0x200000)
-      curjfnt = curjfnt and curjfnt.variants
-      curjfnt = curjfnt and curjfnt[ivs]
-      return curjfnt and curjfnt[base] or base
+      local tfmdata = font_getfont(curjfnt)
+      if tfmdata and tfmdata.resources then
+        local base, ivs = v % 0x200000, 0xE00FF + math.floor(v/0x200000)
+        curjfnt = tfmdata and tfmdata.variants
+        curjfnt = curjfnt and curjfnt[ivs]
+        return curjfnt and curjfnt[base] or base
+      else return base
+      end
    elseif v<0xF0000 then -- 素直に Unicode にマップ可能
       return v
    else -- privete use area
       local r, aj = nil, ltjr_cidfont_data["Adobe-Japan1"] 
       -- 先に ltj_vert_table を見る
-      for i,w in pairs(aj.shared.ltj_vert_table) do
+      for i,w in pairs(aj.ltj_vert_table) do
          if w==v then r=i; break end
       end
       if not r then
@@ -103,7 +106,7 @@ local function get_ucs_from_rmlgbm(c)
             end
          end
       end
-      if aj.shared.ltj_vert_table[r] then
+      if aj.ltj_vert_table[r] then
          -- CID が縦組用字形だった場合
          return ltju.replace_vert_variant(
             tex_get_attr((ltjd_get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt),
@@ -139,29 +142,18 @@ local cid
 do
    cid = function (key)
       if key==0 then return append_jglyph(0) end
-      local curjfnt_num = tex_get_attr((ltjd_get_dir_count()==dir_tate)
+      local curjfnt = tex_get_attr((ltjd_get_dir_count()==dir_tate)
                                         and attr_curtfnt or attr_curjfnt)
-      local curjfnt = font_getfont(curjfnt_num)
-      local cidinfo = curjfnt.resources.cidinfo
-      if not cidinfo or
+      local cidinfo = ltju.get_cidinfo(cudjfnt)
+      if type(cidinfo)~="table" or
          cidinfo.ordering ~= "Japan1" and
          cidinfo.ordering ~= "GB1" and
          cidinfo.ordering ~= "CNS1" and
          cidinfo.ordering ~= "Korea1" and
          cidinfo.ordering ~= "KR" then
-         --      ltjb.package_warning('luatexja-otf',
-         --			   'Current Japanese font (or other CJK font) "'
-         --			      ..curjfnt.psname..'" is not a CID-Keyed font (Adobe-Japan1 etc.)')
             return append_jglyph(get_ucs_from_rmlgbm(key))
       else
-	 local char = ltjf_font_extra_info[curjfnt_num].ind_to_uni[key]
-	 if not char then
---	    ltjb.package_warning('luatexja-otf',
---               '"' ..curjfnt.psname..'" does not have CID character '
---		  ..tostring(key),
---	       'Use a font including the specified CID character.')
-         char = 0
-	 end
+	 local char = ltjf_font_extra_info[curjfnt].ind_to_uni[key] or 0
 	 return append_jglyph(char)
       end
    end
@@ -211,10 +203,9 @@ ltjb.add_to_callback('pre_linebreak_filter', extract,'ltj.otf',
 
 -- 和文フォント読み込み時に，ind -> unicode 対応をとっておく．
 local function ind_to_uni(fmtable, fn)
-   local fi = font_getfont(fn)
+   local cid = ltju.get_cidinfo(fn)
    local t = ltjf_font_extra_info[fn].ind_to_uni
-   if t and fi.resources and fi.resources.cidinfo 
-      and fi.resources.cidinfo.ordering == "Japan1" then
+   if t and cid.ordering == "Japan1" then
       for i, v in pairs(fmtable.chars) do
 	 local j = string.match(i, "^AJ1%-([0-9]*)")
 	 if j then

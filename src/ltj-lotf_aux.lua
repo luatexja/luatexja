@@ -29,12 +29,24 @@ function aux.specified_feature(id, name)
   return (t and t.shared and t.shared.features and t.shared.features[name])
 end
 
+
+do
+local nulltable = {}
+local function get_cidinfo(id) -- table
+  local t = getfont(id)
+  local a = t and (t.cidinfo or (t.resources and t.resources and t.resources.cidinfo)) or nulltable
+  return a
+end
+aux.get_cidinfo = get_cidinfo
+end
+
 local function get_ascender(id) -- scaled points
   if font_metric_table[id].ascender then return font_metric_table[id].ascender end
   local t = getfont(id)
   local a = t and t.parameters and t.parameters.ascender or 0
   font_metric_table[id].ascender = a; return a
 end
+
 local function get_descender(id) -- scaled points
   if font_metric_table[id].descender then return font_metric_table[id].descender end
   local t = getfont(id)

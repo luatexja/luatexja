@@ -904,13 +904,14 @@ do
   luatexbase.add_to_callback(
      'luaotfload.patch_font',
      function (tfmdata)
-        local cidinfo = tfmdata.cidinfo or tfmdata.resources.cidinfo
+        local cidinfo = tfmdata.cidinfo or (tfmdata.resource and tfmdata.resources.cidinfo)
         if cidinfo and cidinfo.registry and cidinfo.ordering then
            local rd = ltjr_prepare_cid_font(cidinfo.registry, cidinfo.ordering)
            if rd then
-              local ru, rc = rd.resources.unicodes, rd.characters
+	      local ru = rd.resources.unicodes -- defined by LuaTeX-ja
+	      local rc = rd.characters
               for i,v in pairs(tfmdata.characters) do
-                 local w = ru["Japan1." .. tostring(v.index)]
+                 local w = ru[cidinfo.ordering .. "." .. tostring(v.index)]
                  if w then
                     v.tounicode = v.tounicode or rc[w]. tounicode
                  end

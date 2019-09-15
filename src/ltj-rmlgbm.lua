@@ -5,7 +5,7 @@ luatexja.load_module('base');      local ltjb = luatexja.base
 
 local cidfont_data = {}
 local cache_chars = {}
-local cache_ver = 8
+local cache_ver = 9
 local identifiers = fonts.hashes.identifiers
 
 local cid_reg, cid_order, cid_supp, cid_name
@@ -181,7 +181,7 @@ do
 
       -- 縦書用字形
       tt, cidm = {}, {}
-      local ttv = {}; k.shared.ltj_vert_table = ttv
+      local ttv = {}; k.ltj_vert_table = ttv
       for i = 0,kx[2] do cidm[i] = -1 end
       open_cmap_file(kx[1] .. "-V", increment, tonumber, entry)
       for i,v in pairs(tt) do
@@ -233,7 +233,7 @@ do
       function (head, fnum)
          local fontdata = font_getfont(fnum)
          if head and luatexja.jfont.font_metric_table[fnum].vert_activated then
-	    local vt = fontdata.shared.ltj_vert_table
+	    local vt = fontdata.ltj_vert_table
 	    local nh = is_node(head) and to_direct(head) or head 
             for n in traverse_id(id_glyph, head) do
                if getfont(n)==fnum then
@@ -400,7 +400,7 @@ local function font_callback(name, size, id, fallback)
       return mk_rml(basename, size, id)
    else
       local tfmdata=fallback(name, size, id)
-      if type (tfmdata) == "table" and tfmdata.shared then
+      if type (tfmdata) == "table" and tfmdata.encodingbytes == 2 then
         luatexbase.call_callback("luaotfload.patch_font", tfmdata, name)
       end
       return tfmdata
