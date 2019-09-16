@@ -1013,7 +1013,7 @@ do
 	 split_dir_whatsit = hd
       elseif gc=='split_off'  then
 	 if split_dir_head then
-	    list_dir = has_attr(split_dir_head, attr_dir)
+	    ltjs.list_dir = has_attr(split_dir_head, attr_dir)
 	    hd = insert_before(hd, hd, split_dir_head)
 	    split_dir_head=nil
 	 end

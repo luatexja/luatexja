@@ -152,7 +152,8 @@
 }
 \def\ltj@@ruby[#1]#2#3{{% #1: option #2: 親文字群，#3: ルビ文字列群，共に| 区切り
   \setkeys[ltj]{ruby}{#1}%
-  \directlua{ruby_tmplist_r = \string{\string}; ruby_tmplist_p = \string{\string}}%
+  \directlua{luatexja.ruby.ruby_tmplist_r = \string{\string};
+	luatexja.ruby.ruby_tmplist_p = \string{\string}}%
   \leavevmode\dimen0=\f@size pt\dimen1=\ltj@@rubyip@size\dimen0%
   % 引数展開，テーブルにセット
   \pxrr@decompbar{#2}{\let\ltj@@ruby@mark\ltj@@ruby@sp\pxrr@res}%
@@ -160,16 +161,16 @@
   {\fontsize{\ltj@@rubyip@size\dimen0}\z@\selectfont\ltj@@rubyip@fontcmd\global\dimen1=\zw}%
   \directlua{%
     luatexja.ruby.texiface(\ltj@@ruby@create@table{\dimen1},
-    ruby_tmplist_r, ruby_tmplist_p)}%
+    luatexja.ruby.ruby_tmplist_r, luatexja.ruby.ruby_tmplist_p)}%
 }}
 
 \def\ltj@@ruby@sr#1{%
   \setbox0=\hbox{\fontsize{\dimen1}\z@\ltj@@rubyip@fontcmd\selectfont#1}%
-  \directlua{table.insert(ruby_tmplist_r, luatexja.ruby.cpbox())}%
+  \directlua{table.insert(luatexja.ruby.ruby_tmplist_r, luatexja.ruby.cpbox())}%
 }
 \def\ltj@@ruby@sp#1{%
   \setbox0=\hbox{\selectfont#1}%
-  \directlua{table.insert(ruby_tmplist_p, luatexja.ruby.cpbox())}%
+  \directlua{table.insert(luatexja.ruby.ruby_tmplist_p, luatexja.ruby.cpbox())}%
 }
 
 \protected\def\ltjkenten{\@ifnextchar[\ltj@@kenten{\ltj@@kenten[]}}%]

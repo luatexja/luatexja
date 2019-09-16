@@ -200,9 +200,9 @@ local function aw_step1_last(p, total)
    local head = getlist(p)
    local x = node_tail(head); if not x then return total, false end
    -- x: \rightskip
-   pf = node_prev(x); if not x then return total, false end
+   local pf = node_prev(x); if not x then return total, false end
    if getid(pf) ~= id_glue or getsubtype(pf) ~= 15 then return total, false end
-   x = node_prev(node_prev(pf)); xi = getid(x)
+   x = node_prev(node_prev(pf))
    local xi, xc = getid(x)
    if xi == id_glyph and getfield(x, 'lang')==lang_ja then
       -- 和文文字
@@ -350,7 +350,7 @@ local insert_lineend_kern
 do
    local insert_before = node.direct.insert_before
    local KINSOKU      = luatexja.icflag_table.KINSOKU
-   function insert_lineend_kern(head, nq, np, Bp)
+   insert_lineend_kern = function (head, nq, np, Bp)
       if nq.met then 
          local eadt = nq.met.char_type[nq.class].end_adjust
 	 if not eadt then return end
@@ -385,7 +385,7 @@ end
 
 local adjust_width
 do
-   local myaw_atep1, myaw_step2, myaw_step1_last
+   local myaw_step1, myaw_step2, myaw_step1_last
    local dummy =  function(p,t,n) return t, false end
    local ltjs_fast_get_stack_skip = ltjs.fast_get_stack_skip
    function adjust_width(head)
@@ -403,7 +403,7 @@ do
       return to_node(head)
    end
    local is_reg = false
-   function enable_cb(status_le, status_pr, status_lp, status_ls)
+   local function enable_cb(status_le, status_pr, status_lp, status_ls)
       if (status_le>0 or status_pr>0) and (not is_reg) then
 	 ltjb.add_to_callback('post_linebreak_filter',
             adjust_width, 'Adjust width', 
@@ -434,7 +434,7 @@ do
 	 status_ls>0 and 'step' or 'dummy'
       )      
    end
-   function disable_cb() -- only for compatibility
+   local function disable_cb() -- only for compatibility
        enable_cs(0,0,0,0)
    end
    luatexja.adjust.enable_cb=enable_cb
@@ -446,6 +446,7 @@ luatexja.unary_pars.adjust = function(t)
 end
 
 -- ----------------------------------
+local init_range
 do
   local max, ins, sort = math.max, table.insert, table.sort
   local function insert(package, ind, d, b, e)
@@ -475,7 +476,7 @@ do
     bd[#bd]=nil
     return bd
   end
-  function init_range()
+  init_range = function ()
     return {{},{}, insert=insert, flatten=flatten}
   end
 end

@@ -203,7 +203,8 @@ ltjb.add_to_callback('pre_linebreak_filter', extract,'ltj.otf',
 
 -- 和文フォント読み込み時に，ind -> unicode 対応をとっておく．
 local function ind_to_uni(fmtable, fn)
-   local cid = ltju.get_cidinfo(fn)
+   if fn<0 then return end
+   local cid = ltju.get_cidinfo(fn);
    local t = ltjf_font_extra_info[fn].ind_to_uni
    if t and cid.ordering == "Japan1" then
       for i, v in pairs(fmtable.chars) do

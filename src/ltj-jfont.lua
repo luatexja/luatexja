@@ -808,8 +808,8 @@ do
       if type(res)=='table' and (res.psname or res.filename) then
          local bname = res.psname or nameonly(res.filename)
          local t = font_extra_basename[bname]
-         if not t then prepare_extra_data_base(res) end
-         font_extra_info[id] = t or font_extra_basename[bname]
+         if not t then bname = prepare_extra_data_base(res) end
+	 font_extra_info[id] = t or font_extra_basename[bname]
       end
    end
     luatexbase.add_to_callback(

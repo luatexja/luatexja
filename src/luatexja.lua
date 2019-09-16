@@ -1,6 +1,5 @@
 
 require('lualibs')
-tableunpack = table.unpack
 
 ------------------------------------------------------------------------
 local function load_lua(fn)
