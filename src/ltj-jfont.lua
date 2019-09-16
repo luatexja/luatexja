@@ -456,7 +456,7 @@ do
       jfm_dir = dir
       local i = load_jfont_metric()
       local j = -update_jfm_cache(i, size)
-      font_metric_table[j]=metrics[i].size_cache[s]      
+      font_metric_table[j]=metrics[i].size_cache[size]
       tex.sprint(cat_lp, '\\ltj@cur' .. (dir=='yoko' and 'j' or 't') .. 'fnt' .. tostring(j) .. '\\relax')
    end
    luatexja.jfont.load_jfmonly = load_jfmonly
@@ -806,7 +806,10 @@ do
    end
    local function prepare_extra_data_font(id, res)
       if type(res)=='table' and (res.psname or res.filename) then
-         font_extra_info[id] = font_extra_basename[res.psname or nameonly(res.filename)]
+         local bname = res.psname or nameonly(res.filename)
+         local t = font_extra_basename[bname]
+         if not t then prepare_extra_data_base(res) end
+         font_extra_info[id] = t or font_extra_basename[bname]
       end
    end
     luatexbase.add_to_callback(

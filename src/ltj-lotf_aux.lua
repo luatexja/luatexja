@@ -56,7 +56,7 @@ end
 aux.get_ascender, aux.get_descender = get_ascender, get_descender
 
 local function get_vmet_table(tfmdata, dest)
-   if tfmata and tfmdata.shared then return dest end
+   if (not tfmdata) or (not tfmdata.shared) then return dest end
    local rawdata = tfmdata.shared.rawdata
    local ascender = rawdata.metadata.ascender or 0
    local default_vheight 
@@ -130,6 +130,14 @@ function aux.replace_vert_variant(id, c)
 end
 
 
+--for name, func in pairs(aux) do
+--  if type(func)=="function" then 
+--    aux[name] = function(...)
+--      print('LOTF_AUX', name, ...);
+--      local a = func(...); print('RESULT', a); return a
+--    end
+--  end
+--end
 
 local search
 search = function (t, key, prefix)
@@ -142,5 +150,7 @@ search = function (t, key, prefix)
   end
 end
 aux.t_search = search
+
+
 
 -- EOF
