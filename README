@@ -23,6 +23,7 @@ Installation
 0. Please make sure that your TeX distribution is up-to-date.
    This version of LuaTeX-ja requires
     - LuaTeX 1.0.0 or later
+      LuaHBTeX and HarfTeX are not currently supported
     - luaotfload (v2.98 or later recommended)
     - adobemapping (Adobe CMap files)
     - everysel package

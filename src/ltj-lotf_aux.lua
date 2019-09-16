@@ -2,9 +2,11 @@
 -- ltj-lotf_aux.lua
 --
 
--- functions which access to fonts.* will be gathered in this file.
+-- functions which access to caches by luaotfload gathered in this file.
+-- lines with marked by "-- HARFLOAD" are codes for harfload
 local aux = {}
 luatexja.lotf_aux = aux
+
 local font_metric_table = {}
 aux.font_metric_table = font_metric_table
 
@@ -22,11 +24,15 @@ function aux.enable_feature(id, name)
   local t = getfont(id)
   if t and t.shared and t.shared.features then
     t.shared.features[name] = true
+  elseif t and t.hb then -- HARFLOAD
+    local hb, tf = require("harf-base"), t.hb.spec.features
+    tf[#tf+1] = hb.Feature.new(name)
   end
 end
 function aux.specified_feature(id, name)
   local t = getfont(id)
-  return (t and t.shared and t.shared.features and t.shared.features[name])
+  return t and (t.shared and t.shared.features and t.shared.features[name])
+         or (t.hb and t.hb.spec and t.hb.spec.options and t.hb.spec.options[name]) -- HARFLOAD
 end
 
 
@@ -43,20 +49,28 @@ end
 local function get_ascender(id) -- scaled points
   if font_metric_table[id].ascender then return font_metric_table[id].ascender end
   local t = getfont(id)
-  local a = t and t.parameters and t.parameters.ascender or 0
-  font_metric_table[id].ascender = a; return a
+  local a = t and t.parameters and t.parameters.ascender or t.size*0.88
+  font_metric_table[id].descender = a; return a
 end
 
 local function get_descender(id) -- scaled points
   if font_metric_table[id].descender then return font_metric_table[id].descender end
   local t = getfont(id)
-  local a = t and t.parameters and t.parameters.descender or 0
+  local a = t and t.parameters and t.parameters.descender or t.size*0.12
   font_metric_table[id].descender = a; return a
 end
 aux.get_ascender, aux.get_descender = get_ascender, get_descender
 
+do
+local dummy_vht, dummy_vorg = {}, {}
+setmetatable(dummy_vht, {__index = function () return 1 end } )
+setmetatable(dummy_vorg, {__index = function () return 0.88 end } )
 local function get_vmet_table(tfmdata, dest)
-   if (not tfmdata) or (not tfmdata.shared) then return dest end
+   if (not tfmdata) or (not tfmdata.shared) then
+     dest = dest or {}
+     dest.vorigin, dest.vheight = dummy_vorg, dummy_vht
+     return dest
+   end
    local rawdata = tfmdata.shared.rawdata
    local ascender = rawdata.metadata.ascender or 0
    local default_vheight 
@@ -83,7 +97,7 @@ local function get_vmet_table(tfmdata, dest)
    return dest
 end
 aux.get_vmet_table = get_vmet_table
-
+end
 local function loop_over_duplicates(id, func)
 -- func: return non-nil iff abort this fn
   local t = (type(id)=="table") and id or getfont(id)
