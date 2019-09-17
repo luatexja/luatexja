@@ -10,6 +10,10 @@ luatexja.lotf_aux = aux
 local font_metric_table = {}
 aux.font_metric_table = font_metric_table
 
+local function is_harf(t)
+  return luaharfbuzz and package.loaded['harf'] and require("harf-base")
+end
+
 local getfont = font.getfont
 local provides_feature = luaotfload.aux.provides_feature
 function aux.exist_feature(id, name)
@@ -24,7 +28,7 @@ function aux.enable_feature(id, name)
   local t = getfont(id)
   if t and t.shared and t.shared.features then
     t.shared.features[name] = true
-  elseif t and t.hb then -- HARFLOAD
+  elseif t and is_harf(t) then -- HARFLOAD
     local hb, tf = require("harf-base"), t.hb.spec.features
     tf[#tf+1] = hb.Feature.new(name)
   end
@@ -46,18 +50,28 @@ end
 aux.get_cidinfo = get_cidinfo
 end
 
+local function get_asc_des(id)
+  local t, v = getfont(id), font_metric_table[id]
+  local a, d
+  if t and t.shared then
+    local u = t.units
+    local t2 = t.shared.rawdata.metadata
+    if t2 then
+      a, d = t2.ascender and t2.ascender/u, t2.descender and -t2.descender/u
+    end
+  -- HARFLOAD h_extents() returns "too large" value...?
+  -- rawdata.metadata.horizontalmetrics is same
+  end
+  v.ascender, v.descender =  (a or 0.88)*t.size, (d or 0.12)*t.size
+end
 local function get_ascender(id) -- scaled points
-  if font_metric_table[id].ascender then return font_metric_table[id].ascender end
-  local t = getfont(id)
-  local a = t and t.parameters and t.parameters.ascender or t.size*0.88
-  font_metric_table[id].descender = a; return a
+  if not font_metric_table[id].ascender then get_asc_des(id) end
+  return font_metric_table[id].ascender
 end
 
 local function get_descender(id) -- scaled points
-  if font_metric_table[id].descender then return font_metric_table[id].descender end
-  local t = getfont(id)
-  local a = t and t.parameters and t.parameters.descender or t.size*0.12
-  font_metric_table[id].descender = a; return a
+  if not font_metric_table[id].descender then get_asc_des(id) end
+  return font_metric_table[id].descender
 end
 aux.get_ascender, aux.get_descender = get_ascender, get_descender
 
