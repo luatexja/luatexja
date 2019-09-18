@@ -399,11 +399,13 @@ local function font_callback(name, size, id, fallback)
       end
       return mk_rml(basename, size, id)
    else
-      local tfmdata=fallback(name, size, id)
-      if type (tfmdata) == "table" and tfmdata.encodingbytes == 2 then
-        luatexbase.call_callback("luaotfload.patch_font", tfmdata, name)
+      local fontdata=fallback(name, size, id)
+      if type (fontdata) == "table" and fontdata.encodingbytes == 2 then
+        luatexbase.call_callback ("luaotfload.patch_font", fontdata, name, id)
+      else
+        luatexbase.call_callback ("luaotfload.patch_font_unsafe", fontdata, name, id)
       end
-      return tfmdata
+      return fontdata
    end
 end
 
