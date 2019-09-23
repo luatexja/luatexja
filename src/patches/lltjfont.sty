@@ -773,7 +773,7 @@
 %%%%%% Alternate Japanese Fonts
 %%%% \DeclareAlternateKanjiFont<Benc><Bfam><Bser><Bshape><Aenc><Afam><Aser><Ashape><range>
 % いつも global
-\DeclareRobustComman\DeclareAlternateKanjiFont[9]{%
+\DeclareRobustCommand\DeclareAlternateKanjiFont[9]{%
   \edef\@temp{#9}%
   \ifx\@temp\@empty\else
     {\def\ltj@temp@bfont{#1/#2/#3/#4}\def\ltj@temp@afont{#5/#6/#7/#8}%
