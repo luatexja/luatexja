@@ -1,9 +1,9 @@
 --
--- luatexja/charrange.lua
+-- ltj-charrange.lua
 --
 luatexbase.provides_module({
   name = 'luatexja.charrange',
-  date = '2019/08/28',
+  date = '2019/09/26',
   description = 'Handling the range of Japanese characters',
 })
 luatexja.charrange = {}

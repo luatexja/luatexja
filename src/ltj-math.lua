@@ -1,5 +1,5 @@
 --
--- luatexja/ltj-math.lua
+-- ltj-math.lua
 --
 
 luatexja.load_module('base');      local ltjb = luatexja.base

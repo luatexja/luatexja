@@ -1,9 +1,9 @@
 --
--- luatexja/jfont.lua
+-- ltj-jfont.lua
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2019/08/27',
+  date = '2019/09/26',
   description = 'Loader for Japanese fonts',
 })
 

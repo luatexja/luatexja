@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2018/06/15 Patch to LaTeX2e Kernel for LuaTeX-ja]
+\ProvidesPackage{lltjcore}[2019/09/26 Patch to LaTeX2e Kernel for LuaTeX-ja]
 \RequirePackage{etoolbox}
 
 \def\cleardoublepage{\clearpage\if@twoside
@@ -233,13 +233,13 @@
        \csname bm@#3\endcsname}%
     \if@pboxsw \m@th$\null\fi% !!!
   \@end@tempboxa}
-\def\underline#1{%
+\DeclareRobustCommand\underline[1]{%
   \relax
   \ifmmode\@@underline{#1}%
   \else \leavevmode\null$\@@underline{\hbox{#1}}\m@th$\null\relax\fi}
 
 %%% AtBeginDvi
-\def \AtBeginDvi #1{%
+\DeclareRobustCommand \AtBeginDvi [1]{%
   \global \setbox \@begindvibox
     \vbox{\yoko\unvbox \@begindvibox #1}%
 }

@@ -1,9 +1,9 @@
 --
--- luatexja/stack.lua
+-- ltj-stack.lua
 --
 luatexbase.provides_module({
   name = 'luatexja.stack',
-  date = '2018/02/18',
+  date = '2019/09/26',
   description = 'LuaTeX-ja stack system',
 })
 luatexja.stack = {}
@@ -18,7 +18,7 @@ local id_whatsit = node.id('whatsit')
 local sid_user = node.subtype('user_defined')
 local STCK = luatexja.userid_table.STCK
 local fastcopy = table.fastcopy
-local setcount = tex.setcount
+local setcount, getcount = tex.setcount, tex.getcount
 local scan_int, scan_keyword = token.scan_int, token.scan_keyword
 ltjs.hmode = 0 -- dummy
 
@@ -26,11 +26,10 @@ local charprop_stack_table={};
 ltjs.charprop_stack_table = charprop_stack_table
 charprop_stack_table[0]={}
 
-
 local function get_stack_level()
-   local i = tex.getcount('ltj@@stack')
+   local i = getcount('ltj@@stack')
    local j = tex.currentgrouplevel
-   if j > tex.getcount('ltj@@group@level') then
+   if j > getcount('ltj@@group@level') then
       i = i+1 -- new stack level
       local gd = tex.globaldefs
       if gd~=0 then tex.globaldefs = 0 end

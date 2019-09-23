@@ -64,7 +64,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-otf}[2017/05/20]
+  \ProvidesPackage{luatexja-otf}[2019/09/26]
 \fi                             %</LaTeX>
 
 % Load core module if not yet.
@@ -114,7 +114,7 @@
       \fi
       \let\ltj@@next=\@bou
     \fi\ltj@@next}
-  \long\def\mbox#1{\leavevmode\hbox{#1}}
+  \protected\long\def\mbox#1{\leavevmode\hbox{#1}}
 \fi                             %</LaTeX>
 
 % macros from otf.sty

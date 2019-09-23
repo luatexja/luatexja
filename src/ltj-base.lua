@@ -1,5 +1,5 @@
 --
--- luatexja/ltj-base.lua
+-- ltj-base.lua
 --
 local ltb = luatexbase
 local tostring = tostring

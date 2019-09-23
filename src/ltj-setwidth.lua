@@ -1,5 +1,5 @@
 --
--- src/ltj-setwidth.lua
+-- ltj-setwidth.lua
 --
 
 luatexja.load_module('base');      local ltjb = luatexja.base

@@ -1,5 +1,5 @@
 --
--- luatexja/debug.lua
+-- ltj-debug.lua
 --
 local ltjdbg = {}
 luatexja.debug = ltjdbg

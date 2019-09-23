@@ -1,5 +1,5 @@
 --
--- luatexja/ltj-otf.lua
+-- ltj-otf.lua
 --
 require('unicode')
 require('lualibs')

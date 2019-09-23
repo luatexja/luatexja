@@ -1,9 +1,9 @@
 --
--- luatexja/ltj-jfmglue.lua
+-- ltj-jfmglue.lua
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2019/07/26',
+  date = '2019/09/26',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}

@@ -1,5 +1,5 @@
 --
--- luatexja/ltj-rmlgbm.lua
+-- ltj-rmlgbm.lua
 --
 luatexja.load_module('base');      local ltjb = luatexja.base
 

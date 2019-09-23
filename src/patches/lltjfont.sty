@@ -65,7 +65,7 @@
   \else\tstrutbox  % tate and utod
   \fi\fi
 }
-\def\strut{\relax
+\DeclareRobustCommand\strut{\relax
   \ifnum\ltjgetparameter{direction}=1 % dtou
     \ifmmode\copy\dstrutbox\else\unhcopy\dstrutbox\fi
   \else\ifnum\ltjgetparameter{direction}=4 % yoko
@@ -75,13 +75,13 @@
   \fi\fi
 }
 
-\def\ystrut{\relax\hbox{\ltj@@orig@yoko
+\DeclareRobustCommand\ystrut{\relax\hbox{\ltj@@orig@yoko
    \ifmmode\copy\ystrutbox\else\unhcopy\ystrutbox\fi}}
-\def\tstrut{\relax\hbox{\ltj@@orig@tate
+\DeclareRobustCommand\tstrut{\relax\hbox{\ltj@@orig@tate
    \ifmmode\copy\tstrutbox\else\unhcopy\tstrutbox\fi}}
-\def\dstrut{\relax\hbox{\ltj@@orig@dtou
+\DeclareRobustCommand\dstrut{\relax\hbox{\ltj@@orig@dtou
    \ifmmode\copy\dstrutbox\else\unhcopy\dstrutbox\fi}}
-\def\zstrut{\relax\hbox{\ltj@@orig@utod
+\DeclareRobustCommand\zstrut{\relax\hbox{\ltj@@orig@utod
    \ifmmode\copy\zstrutbox\else\unhcopy\zstrutbox\fi}}
 
 {%
@@ -574,10 +574,10 @@
 \DeclareRobustCommand\romanshape[1]{\edef\f@shape{#1}}
 \DeclareRobustCommand\kanjishape[1]{\edef\k@shape{#1}}
 \DeclareRobustCommand\fontshape[1]{\kanjishape{#1}\romanshape{#1}}
-\def\usekanji#1#2#3#4{%
+\DeclareRobustCommand\usekanji[4]{%
     \kanjiencoding{#1}\kanjifamily{#2}\kanjiseries{#3}\kanjishape{#4}%
     \selectfont\ignorespaces}
-\def\useroman#1#2#3#4{%
+\DeclareRobustCommand\useroman[4]{%
     \romanencoding{#1}\romanfamily{#2}\romanseries{#3}\romanshape{#4}%
     \selectfont\ignorespaces}
 \protected\def\usefont#1#2#3#4{%
@@ -773,7 +773,7 @@
 %%%%%% Alternate Japanese Fonts
 %%%% \DeclareAlternateKanjiFont<Benc><Bfam><Bser><Bshape><Aenc><Afam><Aser><Ashape><range>
 % いつも global
-\def\DeclareAlternateKanjiFont#1#2#3#4#5#6#7#8#9{%
+\DeclareRobustComman\DeclareAlternateKanjiFont[9]{%
   \edef\@temp{#9}%
   \ifx\@temp\@empty\else
     {\def\ltj@temp@bfont{#1/#2/#3/#4}\def\ltj@temp@afont{#5/#6/#7/#8}%

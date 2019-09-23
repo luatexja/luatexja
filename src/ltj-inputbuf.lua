@@ -1,5 +1,5 @@
 --
--- luatexja/ltj-inputbuf.lua
+-- ltj-inputbuf.lua
 --
 
 luatexja.load_module('base');      local ltjb = luatexja.base

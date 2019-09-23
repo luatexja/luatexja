@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec}[2019/03/20 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec}[2019/09/26 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e,luatexja}
 \ExplSyntaxOn
 
@@ -44,7 +44,7 @@
    \ifx\csname \f@encoding+\f@family\endcsname\relax
        \directlua{luatexja.jfont.is_kenc('\luatexluaescapestring{\f@encoding}')}%
 \ifin@\else % Alphabetic font
-    \@font@info{Try loading font information for \f@encoding+\f@family}%
+    \@font@info{Trying loading font information for \f@encoding+\f@family}%
     \global\expandafter\let
        \csname\f@encoding+\f@family\endcsname\@empty
      \nfss@catcodes
