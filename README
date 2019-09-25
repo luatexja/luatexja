@@ -23,7 +23,6 @@ Installation
 0. Please make sure that your TeX distribution is up-to-date.
    This version of LuaTeX-ja requires
     - LuaTeX 1.0.0 or later
-      LuaHBTeX and HarfTeX are not currently supported
     - luaotfload (v2.98 or later recommended)
     - adobemapping (Adobe CMap files)
     - everysel package
@@ -34,7 +33,10 @@ Installation
     - filehook package
     - stfloats package
     - IPAex fonts (http://ipafont.ipa.go.jp/)
-   Hence this version does not work in TeX Live 2016 (or earlier).
+
+   LuaHBTeX and HarfTeX are not supported for now. With these engines,
+   one might be able to typeset documents without an error, but with
+   some unwanted results.
 
 1. If you are using TeX Live 2019 or later, you can install LuaTeX-ja via tlmgr.
 

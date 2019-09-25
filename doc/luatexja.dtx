@@ -768,7 +768,7 @@ $ lualatex ltjltxdoc.ins
 $ luatex   ltj-kinsoku_make.tex
 \end{lstlisting}
 %<*en>
-\emph{Do not forget The last line (processing \texttt{ltj-kinsoku\_make.tex})}.
+\emph{Do not forget processing \texttt{ltj-kinsoku\_make.tex}}.
 \texttt{*.\{dtx,ins\}} and \texttt{ltj-kinsoku\_make.tex} used here are not needed in regular use.
 %</en>
 %<*ja>
@@ -822,29 +822,12 @@ For changes from \pTeX, see Subsection~\ref{ssec:chgptex}.
       従来日本語の文字コードとして用いられてきたEUC-JPやShift-JISは使用できない．
 %</ja>
 %<*en>
-\item \LuaTeX-ja is very slower than \pTeX.
-  % Generally speaking, LuaJIT\TeX\ processes \LuaTeX-ja
-  % about 30\% faster than \LuaTeX, but not always%
-  % \footnote{%
-  %   LuaJIT has several limitations such as 1\,GB~(or~2\,GB) memory limitation.
-  % 	So typesetting a large source by LuaJIT\TeX may cause an ``out of memory'' error,
-  % 	or failure of loading/saving font cache of \Pkg{luaotfload}.
-  % }.
+\item \LuaTeX-ja is very slower than \pTeX, and uses a lot of memory.
 %</en>
 %<*ja>
 \item \LuaTeX-jaは動作が\pTeX に比べて非常に遅い．
-コードを調整して徐々に速くしているが，まだ満足できる速度ではない．
-% LuaJIT\TeX を用いると\LuaTeX のだいたい1.3倍の速度で動くようであるが，
-% IPA mj明朝などの大きいフォントを用いた場合には\LuaTeX よりも遅くなることもある
-%   \footnote{%
-%     LuaJITは1\,GB（あるいは2\,GB）のメモリ制限など，いくつかの制限事項があることが知られている．そのため，
-%     大きいソースファイルをLuaJIT\TeX でタイプセットするとLuaの側で``out of memory''エラーが発生してしまう．
-%     本ドキュメントのように，「各ページごとにLuaで使っているメモリ容量をチェックし，
-%     必要なら\texttt{collectgarbage("collect")}でガベージコレクタを実行」すると
-%     状況が多少改善されるかもしれない．
-% 	また，LuaJIT\TeX でIPA mj明朝などの「大きい」フォントを利用した場合はフォントキャッシュの保存に失敗し，
-% 	毎回フォントを読み込まなければならず結果的に時間がかかることがある．
-%   }．
+  コードを調整して徐々に速くしているが，まだ満足できる速度ではない．
+  また，和文フォントを読み込むために多量のメモリを消費することにも注意が必要である．
 %</ja>
 
 \item%
@@ -6280,13 +6263,14 @@ for information of current Japanese font:
 %<*ja>
 を定義している．なお，\cs{cwd} と \cs{zw}，また
 \cs{cHT} と \cs{zh} は一致しない可能性がある．なぜなら，
-\cs{cwd},~\cs{cHT} は「あ」の寸法から決定されるのに対し，
+\cs{cwd},~\cs{cHT} は文字クラス0の和文文字の寸法から決定されるのに対し，
 \cs{zw} と \cs{zh} はJFMに指定された値に過ぎないからである．
 %</ja>
 %<*en>
 Note that \cs{cwd}~and~\cs{cHT} may  differ from \cs{zw}~and~\cs{zh}
 respectively.
-On the one hand the former dimensions are determined from the character ``あ'',
+On the one hand the former dimensions are determined from
+a character whose character class is zero,
 but on the other hand \cs{zw}~and~\cs{zh} are specified by JFM.
 %</en>
 
@@ -6412,7 +6396,7 @@ to match the vertical center of ``M'' and that of ``漢''  in vertical typesetti
 where $h_{a}$~and~$d_{a}$ denote the height of ``$a$'' and the depth, respectively.
 In \LuaTeX-ja, this \cs{adjustbaseline} does similar task, namely setting the
 	     \Param{talbaselineshift} parameter
-(a Japanese character whose character class is zero, instead of `漢' is used).
+(a Japanese character whose character class is zero is used, instead of `漢' ).
 %</en>
 %<*ja>
 \pLaTeXe では，\cs{adjustbaseline} は縦組時に「M」と「漢」の中心線を一致させるために，
@@ -10838,9 +10822,6 @@ $|\textit{total}|$の分だけが，行中のグルーの伸び量，あるい�
  \item 「通常の」テキスト形式のキャッシュ（拡張子は \texttt{.lua}）以外にも，
 それをバイナリ形式（バイトコード）に変換したものもサポートしている．
 \begin{itemize}
- \item \LuaTeX とLuaJIT\TeX ではバイトコードの形式が異なるため，バイナリ形式の
-キャッシュは共有できない．\LuaTeX 用のバイナリキャッシュは \texttt{.luc}，
-LuaJIT\TeX 用のは \texttt{.lub} と拡張子を変えることで対応している．
  \item キャッシュを読み込む時，同名のバイナリキャッシュがあれば，
 テキスト形式のものよりそちらを優先して読み込む．
  \item テキスト形式のキャッシュが更新/作成される際は，そのバイナリ版も
@@ -10860,9 +10841,6 @@ in a similar way to the \Pkg{luaotfload} package:
  \item In addition to caches of the text form (the extension is ``\texttt{.lua}''),
 caches of the \emph{binary}, precompiled form are supported.
 \begin{itemize}
- \item We cannot share same binary cache for \LuaTeX\ and LuaJIT\TeX.
-Hence we distinguish them by their extension, ``\texttt{.luc}'' for \LuaTeX\
-and ``\texttt{.lub}'' for LuaJIT\TeX.
  \item In loading a cache, the binary cache precedes
 the text form.
  \item When \LuaTeX-ja updates a cache \texttt{hoge.lua},
@@ -10924,14 +10902,14 @@ Adobe-CNS1-*&ltj-cid-auto-adobe-cns1.lua&UniCNS-UTF32-*&Adobe-CNS1-UCS2\\
 \end{table}
 
 %<*ja>
-\item[ltj-jisx0208.\{luc|lub\}]
-\LuaTeX-ja配布中の\texttt{ltj-jisx0208.lua}をバイナリ化したものである．
+\item[ltj-jisx0208.luc]
+\LuaTeX-ja配布中の\texttt{ltj-jisx0208.lua}をバイトコード化したものである．
 これはJIS~X~0208とUnicodeとの変換テーブルであり，
 \pTeX との互換目的の文字コード変換命令で用いられる．
 %</ja>
 %<*en>
 \item[ltj-jisx0208.\{luc|lub\}]
-The binary version of \texttt{ltj-jisx0208.lua}.
+The bytecode version of \texttt{ltj-jisx0208.lua}.
 This is the conversion table between JIS~X~0208 and Unicode
 which is used in Kanji-code conversion commands for compatibility with \pTeX.
 %</en>
