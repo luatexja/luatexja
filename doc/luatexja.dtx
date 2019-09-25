@@ -3863,12 +3863,15 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
 \end{description}
 
 \begin{figure}[!tb]
-\begin{LTXexample}[pos=b]
+\begin{LTXexample}[pos=r,width=.4\textwidth]
 \jfont\X=[KozMinPr6N-Regular.otf]:jfm=ujis
 \tfont\U=[KozMinPr6N-Regular.otf]:jfm=ujisv
 \tfont\V=[KozMinPr6N-Regular.otf]:jfm=ujisv;jpotf
-\def\TEST#1#2{\leavevmode\hbox{#1#2\string#2 “引用，と句読点．”}}
-\ttfamily\centering\TEST\yoko\X \quad \TEST\tate\U \quad \TEST\tate\V
+\def\TEST#1#2{\leavevmode
+  \hbox{#1#2\string#2 “引用，と句読点．”}}
+\ttfamily\centering
+\TEST\yoko\X\quad \TEST\tate\U\quad
+\TEST\tate\V
 \end{LTXexample}
 \caption{\texttt{jpotf} ``feature''}
 \label{fig:jpotf}
@@ -3897,7 +3900,7 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
 	\texttt{jpotf}という名前にしたのは，
 	OTFパッケージの縦組用和文TFMでほぼ同じの処理（そちらではさらに一重引用符を
 	「シングルミニュート」に置換する機能もあった）を行っていたことに由来する．
-  }．\autoref{fig:jpotf}を参照．
+  }．実行例は\autoref{fig:jpotf}を参照．
 
   ユーザ側で「置換」をカスタマイズしたい場合，
   \verb+luatexja.jfont.register_vert_replace+関数に変更内容を記したテーブルを渡す．
@@ -3990,25 +3993,25 @@ the definition of \cs{ltj@stdmcfont} and others.
 %<ja>\subsection{\texttt{psft}プリフィックス}
 \label{ssec:psft}
 %<*en>
-Besides ``\texttt{file:}''\ and ``\texttt{name:}''\ prefixes which
+Besides ``\texttt{file}''\ and ``\texttt{name}''\ prefixes which
 are introduced in the \Pkg{luaotfload} package,
-\LuaTeX-ja adds ``\texttt{psft:}''\ prefix in \cs{jfont} (and~\cs{font}),
+\LuaTeX-ja adds ``\texttt{psft}''\ prefix in \cs{jfont} (and~\cs{font}),
 to specify a ``name-only'' Japanese font which
 will not be embedded to PDF.
 Note that these non-embedded fonts under current \LuaTeX\ has Identity-H encoding,
 and this violates the standard ISO32000-1:2008~(\cite{pdfstd}).
 
 \emph{OpenType font features, such as ``\texttt{+jp90}'',
-have no meaning in name-only fonts using ``\texttt{psft:}''\ prefix,
+have no meaning in name-only fonts using ``\texttt{psft}''\ prefix,
 because we can't expect what fonts are actually used by the PDF reader.}
 Note that \texttt{extend}~and~\texttt{slant} settings (see~above) are supported
 with \texttt{psft} prefix, because they are only simple linear transformations.
 %</en>
 %<*ja>
 \Pkg{luaotfload}で使用可能になった
-\texttt{file:}\ と \texttt{name:}\ のプリフィックスに加えて，
+\texttt{file}\ と \texttt{name}\ のプリフィックスに加えて，
 \cs{jfont}（と \cs{font} プリミティブ）では
-\texttt{psft:}プリフィックスを用いることができる．
+\texttt{psft}\ プリフィックスを用いることができる．
 このプリフィックスを用いることで，PDFには埋め込まれない「名前だけの」
 和文フォントを指定することができる．
 なお，現行の\LuaTeX で非埋め込みフォントを作成するとPDF内でのエンコーディングが
@@ -4028,13 +4031,13 @@ Identity-Hとなり，PDFの標準規格ISO32000-1:2008~(\cite{pdfstd})に非準
 \label{para-cid}
 
 %<*en>
-The default font defined by using \texttt{psft:} prefix is for Japanese typesetting;
+The default font defined by using \texttt{psft} prefix is for Japanese typesetting;
 it is Adobe-Japan1-7 CID-keyed font.
 One can specify \texttt{cid} key to use other CID-keyed non-embedded fonts
 for Chinese or Korean typesetting.
 %</en>
 %<*ja>
-標準で\texttt{psft:}プリフィックスで定義されるフォントは日本語用のもので
+標準で\texttt{psft}\ プリフィックスで定義されるフォントは日本語用のもので
 あり，Adobe-Japan1-7のCIDに対応したものとなる．しかし，\LuaTeX-jaは中国語
 の組版にも威力を発揮することが分かり，日本語フォントでない非埋込フォント
 の対応も必要となった．そのために追加されたのが\texttt{cid}キーである．
@@ -4107,7 +4110,7 @@ floating-point numbers in design-size unit.
 %<*ja>
 実際のデータは上で \verb+{ ... }+ で示されたテーブルの中に格納されている．
 以下ではこのテーブルの構造について記す．
-なお，JFMファイル中の長さは全てdesign-sizeを単位とする浮動小数点数であることに
+なお，JFMファイル中の長さは全てdesign sizeを単位とする浮動小数点数であることに
 注意する．
 %</ja>
 
@@ -4173,7 +4176,7 @@ This field specifies the ``ideal'' amount of \Param{kanjiskip}. As noted
 %<*ja>
 理想的な\Param{kanjiskip}の量を指定する．\ref{subs-kskip}節で述べたように，
 もし\Param{kanjiskip}が \cs{maxdimen} の値ならば，このフィールドで指定された
-値が実際には用いられる（指定なしは0\,ptとして扱われる）．<stretch>と<shrink>のフィールドもdesign-size
+値が実際には用いられる（指定なしは0\,ptとして扱われる）．<stretch>と<shrink>のフィールドもdesign size
 が単位であることに注意せよ．
 %</ja>
 
@@ -5266,18 +5269,17 @@ of \LuaTeX, see Section~\ref{sec-para}.
 
 %<*en>
 \cs{ltjsetparameter} and \cs{ltjglobalsetparameter} are commands
-for assigning parameters. These take one argument which is a
-\texttt{<key>=<value>} list.
+for assigning parameters. These take one argument which is a key-value list.
 The difference between these two commands is the
 scope of assignment;
 \cs{ltjsetparameter} does a local assignment and
-\cs{ltjglobalsetparameter} does a global one.
+\cs{ltjglobalsetparameter} does a global one by default.
 They also obey the value of \cs{globaldefs}, like other assignments.
 %</en>
 %<*ja>
 \cs{ltjsetparameter} と \cs{ltjglobalsetparameter} はパラメータを
-指定するための命令で，\texttt{<key>=<value>}のリストを
-引数としてとる．両者の違いはスコープであり，
+指定するための命令で，key-valueリストを
+引数としてとる．両者の違いはスコープであり，標準では
 \cs{ltjsetparameter} はローカルな設定を行うのに対し，
 \cs{ltjglobalsetparameter} はグローバルな設定を行う．
 また，他のパラメータ指定と同様に \cs{globaldefs} の値にも従う．
@@ -6143,20 +6145,21 @@ because simple ``\texttt{-1}'' is treated as the range between 0~and~1.
 \textbf{ALchar}か\textbf{JAchar}か，つまり欧文フォントで出力されるか和文フォントで出力され
 るかが決まる．
 
-文字範囲の設定を無視し，文字コードが$\text{<chr\_code>}~(\geq 128=\mathtt{0x80})$の文字を強制的に
+文字範囲の設定を無視し，文字コードが<chr\_code>の文字を強制的に
 \textbf{ALchar}, \textbf{JAchar}で出力する命令がそれぞれ
 \ \cs{ltjalchar},~\cs{ltjjachar} である．使用方法は \cs{char} と同じく
 \ \cs{ltjalchar}<chr\_code>, \cs{ltjjachar}<chr\_code>とすればよい．
-<chr\_code>が127以下の場合は，\cs{ltjjachar} であっても\textbf{ALchar}として出力されること
-に注意．
+\LuaTeX-ja~20190926.0から，<chr\_code>が127以下の場合でも\cs{ltjjachar}<chr\_code>が
+\textbf{JAchar}として出力されるようになっている．
 
-以下は\ref{ssec:setrange}節に載せた例に，\cs{char} の動作を追加したものである．
-\begin{LTXexample}[width=0.25\textwidth]
-\gtfamily\large % default, ALchar, JAchar
-¶, \char`¶, \ltjalchar`¶, \ltjjachar`¶\\    % default: ALchar
-α, \char`α, \ltjalchar`α, \ltjjachar`α  % default: JAchar
-\end{LTXexample}
+以下は\ref{ssec:setrange}節に載せた例に，\cs{char} の動作などを追加したものである．
 %</ja>
+\begin{LTXexample}[width=0.25\textwidth]
+\gtfamily\large
+¶,\char`¶,\ltjalchar`¶,\ltjjachar`¶\\     % default: ALchar
+α,\char`α,\ltjalchar`α,\ltjjachar`α\\ % default: JAchar
+g,\char`g,\ltjalchar`g,\ltjjachar`g       % ALchar unless \ltjjachar
+\end{LTXexample}
 
 %<en>\section{Commands for \LaTeXe}
 %<ja>\section{\LaTeXe 用の命令}
