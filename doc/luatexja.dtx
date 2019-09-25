@@ -18,7 +18,7 @@
 %%%%%%%%
 \def\pgfsysdriver{pgfsys-pdftex.def}
 \directlua{if jit then jit.on() end}
-\usepackage{metalogo,amsmath,array,tikz,pict2e,multienum,float}
+\usepackage{metalogo,amsmath,array,tikz,pict2e,multienum,float,mathtools}
 \usepackage{booktabs,multicol,luatexja-ruby}
 \usepackage[all]{xy}
 \usepackage{lltjext,alltt,comment}
@@ -44,9 +44,9 @@
 \setmonofont[RawFeature=-notdef, Ligatures=CommonOff, CharacterVariant={31,45,61,36},
 %<en>  Scale=0.8132073118633364, FakeStretch=1.183236,
 %<ja>  Scale=MatchLowercase, FakeStretch=1.137121,
-  ItalicFont=iosevka-slab-lightoblique,
-  BoldFont=iosevka-medium, BoldItalicFont=iosevka-slab-mediumitalic,
-]{iosevka-slab-light}
+  ItalicFont=iosevka-slab-oblique,
+  BoldFont=iosevka-slab-bold, BoldItalicFont=iosevka-slab-bolditalic,
+]{iosevka-slab-regular}
 \setsansfont[Scale=MatchLowercase,Ligatures=TeX,RawFeature=-notdef]{Linux Biolinum O}
 \usepackage[match]{luatexja-fontspec}
 \usepackage[kozuka-pr6n]{luatexja-preset}
@@ -73,7 +73,7 @@
 %<*ja>
 \usepackage[textwidth=44\zw, lines=41, footskip=6mm]{geometry}
 \usepackage{luatexja-adjust}%\ltjdisableadjust
-\advance\leftmargini-1\zw\advance\leftmarginii-1\zw
+\advance\leftmargini-1\zw
 %</ja>
 %<en>\long\def\fakefn#1#2{\par\noindent{\footnotesize\hbox to1.8em{\hss#1}#2\par}}
 %<*ja>
@@ -100,7 +100,8 @@
 \lstset{
   basicstyle=\ttfamily\small, pos=r, breaklines=true,
   numbers=none, rframe={}, basewidth=0.5em, numberstyle=\tiny, numbersep=0.5em,
-  explpreset={numberstyle=\tiny, numbers=left, numbersep=1em, columns=fixed}
+  explpreset={numberstyle=\tiny, numbers=left, numbersep=1em, columns=fixed},
+  morecomment=[l]{\%}, commentstyle=\color{green},
 }
 % Suppress output from showexpl to stdout.
 \makeatletter
@@ -145,12 +146,13 @@
 	pdftitle={LuaTeX-jaパッケージ}
 %</ja>
 }
+\usepackage{bxghost}
 %<*ja>
 \def\HyRef@autoref#1#2{%
   \begingroup
     \Hy@safe@activestrue
     \expandafter\HyRef@autosetref\csname r@#2\endcsname{#2}{#1}%
-  \endgroup\ltjalchar"200C %" 欧文ゴースト
+  \endgroup\eghostguarded{}%" 欧文ゴースト
 }
 \def\figureautorefname{図}
 \def\tableautorefname{表}
@@ -197,7 +199,7 @@
 
 \def\_{\leavevmode \kern .06em\vbox {\hrule \@width .333em}}
 \def\cs#1{\texttt{\upshape
-  \texorpdfstring{\textbackslash\hbox{\ltjsetparameter{autoxspacing=false}#1}}{\textbackslash#1}}}
+  \texorpdfstring{\hbox{\ltjsetparameter{autoxspacing=false}\textbackslash#1}}{\textbackslash#1}}}
 \ltjsetparameter{alxspmode={`\\,allow}}
 \def\text@#1{%
   \ifnum\mathstyle<\scriptstyle
@@ -220,12 +222,10 @@
   }}}}}\,}
 
 \makeatletter
-\def\myghost{\ifmmode\else\ltjalchar"200C \fi}
 \def\Param#1{\texorpdfstring{\@Param{#1}}{#1}} % parameter name
-\protected\def\@Param#1{\myghost\hyperlink{fld:#1}{\underline{\smash{\textsf{#1}}}}\myghost}
-\protected\def\DParam#1{\myghost\hypertarget{fld:#1}{\underline{\smash{\textsf{#1}}}}\myghost} % parameter name (definition)
+\protected\def\@Param#1{\eghostguarded{\hyperlink{fld:#1}{\underline{\smash{\textsf{#1}}}}}}
+\protected\def\DParam#1{\eghostguarded{\hypertarget{fld:#1}{\underline{\smash{\textsf{#1}}}}}} % parameter name (definition)
 \def\Pkg#1{\texorpdfstring{\textsf{#1}}{#1}} % packages/classes
-\ltjsetparameter{alxspmode={"200C,allow}}
 
 \begin{document}
 \lstset{
@@ -299,7 +299,7 @@ extent, but gaps still exist.
 外部UTF-8入力が利用可能となり，さらにUnicode化を推進し，\pTeX の内部処理
 までUnicode化した\upTeX も開発されている．また，\pTeX に\eTeX 拡張をマー
 ジした\epTeX も登場し，\TeX\ Live\ 2011では\pLaTeX が\epTeX の上で動作す
-るようになった．だが，\pdfTeX 拡張（PDF直接出力やmicro-typesetting）を
+るようになった．だが，\pdfTeX 拡張の主要部分（PDF直接出力やmicro-typesetting）を
 \pTeX に対応させようという動きはなく，海外とのgapは未だにあるのが現状であ
 る．
 %</ja>
@@ -652,8 +652,8 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %<en>The following packages are needed for the \LuaTeX-ja\ package.
 %<ja>\LuaTeX-jaパッケージの動作には次のパッケージ類が必要である．
 \begin{itemize}
-\item \LuaTeX\ 1.0.0 (or later)
-\item recent \Pkg{luaotfload} (v2.98 or later recommended)
+\item \href{http://www.luatex.org/}{\LuaTeX}\ 1.0.0 (or later)
+\item recent \href{https://github.com/latex3/luaotfload}{\Pkg{luaotfload}} (v2.98 or later recommended)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
 \item \Pkg{etoolbox}, \Pkg{everysel} (if you want to use \LuaTeX-ja with \LaTeXe)
 \item \Pkg{ltxcmds}, \Pkg{pdftexcmds}, \Pkg{filehook}, \Pkg{atbegshi}
@@ -661,11 +661,18 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %<en>\item \emph{IPAex fonts} (\url{http://ipafont.ipa.go.jp/})
 %<ja>\item \emph{IPAexフォント(\url{http://ipafont.ipa.go.jp/})}
 \end{itemize}
-%<en>In summary, \LuaTeX-ja version 20180825.0 (or~later) no longer supports \TeX~Live~2016.
+
+%<*en>
+LuaHB\TeX~and~\href{https://github.com/khaledhosny/harftex}{Harf\TeX},
+which are \LuaTeX-variants integrated with Harfbuzz, are not supported for now.
+Maybe documents can typeset without an error,
+but with unwanted results (especially, vertical typesetting and \cs{CID}).
+%</en>
 %<*ja>
-要約すると，バージョン20180825.0以降の\LuaTeX-jaは\TeX~Live~2016以前では動作しない\footnote{%
-  もっとも，自分で\LuaTeX のバイナリをSubversionリポジトリからビルドしていれば話は別である．
-}．
+現時点では，LuaHB\TeX や\href{https://github.com/khaledhosny/harftex}{Harf\TeX}といった
+Harfbuzzを利用したエンジンでの動作は未保証である．
+エラーが発生せずにタイプセットできるかもしれないが，特に縦組時や
+\cs{CID}などで意図しない結果となりうる可能性が大きい．
 %</ja>
 
 %<*en>
@@ -1283,10 +1290,10 @@ For \LaTeXe, \LuaTeX-ja adopted most of the font selection system of \pLaTeXe\ (
 
 %<*en>
 \begin{center}\small
-\begin{tabular}{llllll}
+\begin{tabular}{>{\bfseries}llllll}
 \toprule
 &\textbf{encoding}&\textbf{family}&\textbf{series}&\textbf{shape}&\textbf{selection}\\\midrule
-alphabetic fonts
+Alphabetic fonts
 &\cs{romanencoding}&\cs{romanfamily}&\cs{romanseries}&\cs{romanshape}
 &\cs{useroman}\\
 Japanese fonts
@@ -1483,21 +1490,21 @@ counterparts of original commands in the \Pkg{fontspec} package
 \caption{Commands of \Pkg{luatexja-fontspec}}\label{tab:ltj_fntspc}
 \medskip
 {\centering\small
-\begin{tabular}{cllll}
+\begin{tabular}{>{\bfseries}lllll}
 \toprule
 Japanese fonts
 &\cs{jfontspec}&\cs{setmainjfont}&\cs{setsansjfont}&\cs{setmonojfont}$^*$\\
-alphabetic fonts
+Alphabetic fonts
 &\cs{fontspec}&\cs{setmainfont}&\cs{setsansfont}&\cs{setmonofont}\\
 \midrule
 Japanese fonts
 &\cs{newjfontfamily}&\cs{renewjfontfamily}$^{**}$&\cs{setjfontfamily}$^{**}$\\
-alphabetic fonts
+Alphabetic fonts
 &\cs{newfontfamily}&\cs{renewfontfamily}$^{**}$&\cs{setfontfamily}$^{**}$\\
 \midrule
 Japanese fonts
 &\cs{newjfontface}&\cs{defaultjfontfeatures}&\cs{addjfontfeatures}\\
-alphabetic fonts
+Alphabetic fonts
 &\cs{newfontface}&\cs{defaultfontfeatures}&\cs{addfontfeatures}\\
 \bottomrule
 \end{tabular}\par}
@@ -2644,7 +2651,7 @@ but not fullwidth alphanumerics and several other characters.
 
 This would be inconvenient for \pTeX~users to shifting to \LuaTeX-ja,
 since several control words containing Kanji or other fullwidth characters, such as
-\verb+\西暦+~or~\verb+\１年目西暦+ are used in \pTeX.
+\cs{西暦}~or~\cs{１年目西暦} are used in \pTeX.
 Hence, \LuaTeX-ja have a counterpart of \texttt{unicode-letters.tex}
 for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 %</en>
@@ -2677,7 +2684,7 @@ for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 \LuaLaTeX では漢字や仮名を制御綴内に
 使用することが可能になったが，全角英数字は相変わらず使用できない，
 \end{description}
-これでは\pTeX で使用できた\verb+\１年目西暦+\footnote{科研費\LaTeX で使用されているそうです．}などが使えないこととなり，
+これでは\pTeX で使用できた\cs{１年目西暦}\footnote{科研費\LaTeX で使用されているそうです．}などが使えないこととなり，
 \LuaTeX-jaへの移行で手間が生じる．そのため，\LuaTeX-jaでは
 \texttt{unicode-letters.tex}の後半部にあたる内容を自前でパッチし，
 結果として\emph{\XeTeX における初期設定と同じになるようにしている．}
@@ -3866,29 +3873,40 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
 \caption{\texttt{jpotf} ``feature''}
 \label{fig:jpotf}
 \end{figure}
-  
+\begin{table}[t]
+  \def\D#1#2#3#4{%
+	{\fboxsep0pt\fcolorbox{cyan}{white}%
+    {\large\lower-\cdp\hbox{\tate\ltjjachar"#1#2#3#4}}}\ (\texttt{U+#1#2#3#4})%"
+  }
+  \caption{\texttt{jpotf}が指定された際に行われる追加の縦組形への置換}
+  \label{tab:vert_replace_jpotf}\small\centering
+  \begin{tabular}{*{2}{l@{}>{${}\longmapsto{}$}c@{}l}}
+	\toprule
+	\D FF0C&&\D 3001&\D FF0E&&\D 3002\\
+	\D 201C&&\D 301D&\D 201D&&\D 301F\\
+	\bottomrule
+  \end{tabular}
+\end{table}
+
  \item \texttt{vert}, \texttt{vrt2}の少なくとも片方が（明示的・自動的を問わず）
   有効になっていた場合，さらに\texttt{jpotf}を指定することで
-  「通常では行わない縦組用字形への変換」を行うことができる．
-
-  標準では，この「変換」は全角のコンマ・ピリオドを句読点に，
-  また全角の二重引用符をダブルミニュートへ置き換える
+  「通常では行わない縦組用字形への置換」を行うことができる．
+  
+  標準では，\autoref{tab:vert_replace_jpotf}に示した置換が登録されている
   \footnote{%
 	\texttt{jpotf}という名前にしたのは，
 	OTFパッケージの縦組用和文TFMでほぼ同じの処理（そちらではさらに一重引用符を
 	「シングルミニュート」に置換する機能もあった）を行っていたことに由来する．
   }．\autoref{fig:jpotf}を参照．
 
-  ユーザ側で「変換」をカスタマイズしたい場合，
-  \verb+luatexja.jfont.register_vert_replace+ 関数に変更内容を記したテーブルを渡す．
-  例えば縦組中では「あ」を「い」に置換し，また「，」は（「、」に置換せず）「，」のままに
-  したい場合は次のようにすれば良い．
-\begin{lstlisting}
-\directlua{luatexja.jfont.register_vert_replace{
-  ['あ']='い', ['，']=false,
-}}
-\end{lstlisting}
-  \verb+luatexja.jfont.register_vert_replace+ による変更はこの関数の\emph{実行後}に定義される
+  ユーザ側で「置換」をカスタマイズしたい場合，
+  \verb+luatexja.jfont.register_vert_replace+関数に変更内容を記したテーブルを渡す．
+  例えば置換$i_1\longmapsto v_1$, $i_2\longmapsto v_2$,~$\dots$を登録する場合は
+	\begin{lstlisting}[escapechar=\!]
+\directlua{luatexja.jfont.register_vert_replace{[!$i_1$!]=!$v_1$!, [!$i_2$!]=!$v_2$!, ...}}
+	\end{lstlisting}
+  を実行する．
+  \verb+luatexja.jfont.register_vert_replace+による変更はこの関数の\emph{実行後}に定義される
   フォントについてのみ有効である．
   
 \end{itemize}
@@ -5034,9 +5052,11 @@ For $i\in\omega$, \texttt{char\_type[$i$]} is information of characters whose cl
        scaled value of those specified by the JFM, by the font size.
  \item \texttt{align} is a number which is determined from \texttt{align}~field in the JFM:
 \[
- \begin{cases}
-  0&\text{\texttt{'left'} (default)}\\0.5&\text{\ttfamily 'middle'}\\1&\text{\ttfamily 'right'}
- \end{cases}
+ \begin{cases*}
+  1&(\texttt{'right'} in JFM),\\
+  0.5&(\texttt{'middle'} in JFM),\\
+  0&(otherwise).
+ \end{cases*}
 \]
 \end{itemize}
 For $i$,~$j\in \omega$, \texttt{char\_type[$i$][$j$]} stores a kern or a glue which will be inserted
@@ -5068,9 +5088,11 @@ $i\in\omega$に対して，\texttt{char\_type[$i$]} は文字クラス$i$の文�
 JFMで指定されているそれぞれの値をスケーリングしたものである．
  \item \texttt{align} はJFMで指定されている値によって，
 \[
- \begin{cases}
-  0&\text{\texttt{'left'}や省略時}\\0.5&\text{\ttfamily 'middle'}\\1&\text{\ttfamily 'right'}
- \end{cases}
+ \begin{cases*}
+  1&(\texttt{'right'} in JFM),\\
+  0.5&(\texttt{'middle'} in JFM),\\
+  0&(otherwise).
+ \end{cases*}
 \]
 のいずれかの値をとる．
 \end{itemize}
@@ -6074,6 +6096,9 @@ If the current Japanese font is \cs{hoge}, \texttt{U+3000}--\texttt{U+30FF}
 and characters in class~1 (ideographic opening brackets)
 are typeset by \cs{piyo}.
 \end{quote}
+
+Note that specifying negative numbers needs specification like \verb+{-1}-{-1}+,
+because simple ``\texttt{-1}'' is treated as the range between 0~and~1.
 %</en>
 %<*ja>
 \cs{jfont} の書式を見ればわかるように，基本的には\LuaTeX-jaにおける1つの和文フォントに
@@ -6375,36 +6400,31 @@ Latin Modern Sans Serif (TU/lmss/m/n) に変わっていることがわかる．
 \item[\cs{adjustbaseline}]
 %<*en>
 In \pLaTeXe, \cs{adjustbaseline} sets \cs{tbaselineshift}
-to match the vertical center of ``M'' and that of ``あ''  in vertical typesetting:
+to match the vertical center of ``M'' and that of ``漢''  in vertical typesetting:
 \[
 \text{\cs{tbaselineshift}} \leftarrow
-\frac{(h_{\text{M}}+d_{\text{M}}) - (h_{\text{あ}}+d_{\text{あ}})}2
-  + d_{\text{あ}} - d_{\text{M}},
+\frac{(h_{\text{M}}+d_{\text{M}}) - (h_{\text{漢}}+d_{\text{漢}})}2
+  + d_{\text{漢}} - d_{\text{M}},
 \]
 where $h_{a}$~and~$d_{a}$ denote the height of ``$a$'' and the depth, respectively.
 In \LuaTeX-ja, this \cs{adjustbaseline} does similar task, namely setting the
-	     \Param{talbaselineshift} parameter.
-If the \LaTeX\ is 2015/10/01 release or later, \LuaTeX-ja use a Japanese
-character whose character class is zero,  instead of `あ'.
+	     \Param{talbaselineshift} parameter
+(a Japanese character whose character class is zero, instead of `漢' is used).
 %</en>
 %<*ja>
-\pLaTeXe では，\cs{adjustbaseline} は縦組時に「M」と「あ」の中心線を一致させるために，
-\cs{tbaselineshift} を設定する役割を持っていた：
+\pLaTeXe では，\cs{adjustbaseline} は縦組時に「M」と「漢」の中心線を一致させるために，
+\cs{tbaselineshift} を設定する役割を持っている：
 \[
 \text{\cs{tbaselineshift}} \leftarrow
-\frac{(h_{\text{M}}+d_{\text{M}}) - (h_{\text{あ}}+d_{\text{あ}})}2
-  + d_{\text{あ}} - d_{\text{M}},
+\frac{(h_{\text{M}}+d_{\text{M}}) - (h_{\text{漢}}+d_{\text{漢}})}2
+  + d_{\text{漢}} - d_{\text{M}},
 \]
 ここで，$h_{a}$,~$d_{a}$はそれぞれ「$a$」の高さ・深さを表す．
-\LuaTeX-jaにおいても\cs{adjustbaseline} は同様に\Param{talbaselineshift}パラメータの調整処
-	     理を行っている．
+\LuaTeX-jaにおいても，同じように\cs{adjustbaseline}は\Param{talbaselineshift}パラメータの調整処
+	     理を行っている（但し「漢」でなく「文字クラス0の和文文字」を用いる）．
 
-同時に，これも\pLaTeXe の \cs{adjustbaseline} で同様の処理が行われていたが，
-「漢」の寸法を元に（本節の最初に述べた，小文字で始まる）\cs{cht}, \cs{cwd}
-といった長さ変数を設定する．
-
-なお，\LaTeX が2015/10/01版以降の場合は，「あ」「漢」の代わりに
-「文字クラス0の和文文字」を用いる．
+\pLaTeXe では，\cs{adjustbaseline}で（本節の最初に述べた，小文字で始まる）\cs{cht}, \cs{cwd}%の
+  設定処理も行っていたが，\LuaTeX-jaでも全く同様である．
 %</ja>
 
 \item[\cs{fontfamily}\{<family>\}]
@@ -6446,7 +6466,7 @@ to <family>. See Subsection~\ref{ssec:fontfamilycmd} for detail.
 \begin{itemize}
  \item
 \cs{ltjdeclarealtfont} では基底フォント・置き換え先和文フォントはあらかじめ定義されてい
-	     ないといけない（その代わり即時発効）であったが，
+	     ないといけない（その代わり即時発効）たが，
 \cs{DeclareAlternateKanjiFont} の設定が
 実際に効力が発揮するのは，書体変更やサイズ変更を行った時，
 あるいは（これらを含むが）\cs{selectfont} が実行された時である．
@@ -8657,31 +8677,31 @@ unlike explicit \cs{kern}.
 Penalties inserted for the word-wrapping process (\emph{kinsoku shori}) of Japanese characters.
 %</en>
 %<ja>禁則処理のために挿入されたペナルティ．
-\item[\mathversion{bold}$(\textit{from\_jfm}-2)$--$(\textit{from\_jfm}+2)$~(4--8)]
+\item[\mathversion{bold}$\textit{from\_jfm}$--$(\textit{from\_jfm}+63)$~(4--67)]
 %<en>Glues/kerns from JFM.
 %<ja>JFM由来のグルー／カーン．
-\item[\textit{kanji\_skip}~(9), \textit{kanji\_skip\_jfm}~(10)]
+\item[\textit{kanji\_skip}~(68), \textit{kanji\_skip\_jfm}~(69)]
 %<en>Glues from \Param{kanjiskip}.
 %<ja>和文間空白\Param{kanjiskip}を表すグルー．
-\item[\textit{xkanji\_skip}~(11), \textit{xkanji\_skip\_jfm}~(12)]
+\item[\textit{xkanji\_skip}~(70), \textit{xkanji\_skip\_jfm}~(71)]
 %<en>Glues from \Param{xkanjiskip}.
 %<ja>和欧文間空白\Param{xkanjiskip}を表すグルー．
-\item[\textit{processed} (13)]
+\item[\textit{processed} (73)]
 %<en>Nodes which is already processed by \ldots.
 %<ja>\LuaTeX-ja の内部処理によって既に処理されたノード．
-\item[\textit{ic\_processed} (14)]
+\item[\textit{ic\_processed} (74)]
 %<*en>
 Glues from an italic correction, but already processed in the insertion process of \textbf{JAglue}s.
 %</en>
 %<ja>イタリック補正に由来するグルーであって，既に \textbf{JAglue} 挿入処理にかかったもの．
-\item[\textit{boxbdd} (15)]
+\item[\textit{boxbdd} (75)]
 %<en>Glues/kerns that inserted just the beginning or the ending of an hbox or a paragraph.
 %<ja>hboxか段落の最初か最後に挿入されたグルー／カーン．
 \end{description}
 
 %<*ja>
 また，挿入処理の結果であるリストの最初のノードでは，\verb+\ltj@icflag+ の値に
-\textit{processed\_begin\_flag}~(128)が追加される．これによって，\cs{unhbox} が
+\textit{processed\_begin\_flag}~(4096)が追加される．これによって，\cs{unhbox} が
 連続した場合でも「ボックスの境界」が識別できるようになっている．
 %</ja>
 
@@ -9102,10 +9122,10 @@ whose prefix is \texttt{ltj} and whose family is \texttt{japaram}, as the follow
 \texttt{luatexja.isglobal}. Its meaning is the following.
 \begin{align}
  \texttt{luatexja.isglobal} =
-\begin{cases}
- \texttt{'global'}&\text{global}\\
- \texttt{''}&\text{local}
-\end{cases}
+\begin{cases*}
+ \texttt{'global'}&(global assignment),\\
+ \texttt{''}&(local assignment).
+\end{cases*}
 \end{align}
 This is determined not only by command name
 (\cs{ltjsetparameter}~or~\cs{ltjglobalsetparameter}),
@@ -9126,10 +9146,10 @@ but also by the value of \cs{globaldefs}.
 なお，パラメータ指定がグローバルかローカルかどうかを示す \texttt{luatexja.isglobal} が，
 \begin{align}
  \texttt{luatexja.isglobal} =
-\begin{cases}
- \texttt{'global'}&\text{パラメータ設定はグローバル}\\
- \texttt{''}&\text{パラメータ設定はローカル}
-\end{cases}
+\begin{cases*}
+ \texttt{'global'}&（パラメータ設定はグローバル），\\
+ \texttt{''}&（パラメータ設定はローカル）．
+\end{cases*}
 \end{align}
 として自動的にセットされる\footnote{命令が \cs{ltjglobalsetparameter} かどうかだけでは
 なく，実行時の \cs{globaldefs} の値にも依存して定まる．}．
@@ -9806,11 +9826,11 @@ JFM由来のグルー／カーンは以下の値となる：
 \]
 ここで．$f(x,y)$は
 \[
- f(x,y)=\begin{cases}
-x&\text{if\ }\Param{diffrentjfm}=\texttt{pleft};\\
-y&\text{if\ }\Param{diffrentjfm}=\texttt{pright};\\
-(x+y)/2&\text{if\ }\Param{diffrentjfm}=\texttt{paverage};
-\end{cases}.
+ f(x,y)=\begin{dcases*}
+x&($\Param{diffrentjfm}=\texttt{pleft}$),\\
+y&($\Param{diffrentjfm}=\texttt{pright}$),\\
+\frac{x+y}2&($\Param{diffrentjfm}=\texttt{paverage}$).
+\end{dcases*}
 \]
 \item
 \Param{differentjfm}がそれ以外の値の時は，<ratio>の値は無視され，JFM由来のグルー／カーンは以下の値となる：
@@ -9819,12 +9839,12 @@ y&\text{if\ }\Param{diffrentjfm}=\texttt{pright};\\
 \]
 ここで．$f(x,y)$は
 \[
- f(x,y)=\begin{cases}
-\min(x,y)&\text{if\ }\Param{diffrentjfm}=\texttt{small};\\
-\max(x,y)&\text{if\ }\Param{diffrentjfm}=\texttt{large};\\
-(x+y)/2&\text{if\ }\Param{diffrentjfm}=\texttt{average};\\
-x+y&\text{if\ }\Param{diffrentjfm}=\texttt{both};
-\end{cases}.
+ f(x,y)=\begin{dcases*}
+\min(x,y)&($\Param{diffrentjfm}=\texttt{small}$),\\
+\max(x,y)&($\Param{diffrentjfm}=\texttt{large}$),\\
+\frac{x+y}2&($\Param{diffrentjfm}=\texttt{average}$),\\
+x+y&($\Param{diffrentjfm}=\texttt{both}$).
+\end{dcases*}
 \]
 \end{itemize}
 \end{enumerate}
@@ -10695,12 +10715,12 @@ T^{+}&:=T^{+}_{L^+},&L^{+} = \max \{l\in
 $b_{i}$とおく．式で書くと，
 \[
 \catcode`\<=12
-b_{i} = \begin{cases}
-  |\textit{total}-a_{i}\text{\cs{zw}}|/T^{+}
-	  &(\textit{total}-a_{i}\text{\cs{zw}}\geq 0)\\
-  |\textit{total}-a_{i}\text{\cs{zw}}|/T^{-}
-	  &(\textit{total}-a_{i}\text{\cs{zw}}<0)
-\end{cases}.
+b_{i} = \begin{dcases*}
+  \frac{\lvert\textit{total}-a_{i}\text{\cs{zw}}\rvert}{T^{+}}
+	  &($\textit{total}-a_{i}\text{\cs{zw}}\geq 0$),\\
+  \frac{\lvert\textit{total}-a_{i}\text{\cs{zw}}\rvert}{T^{-}}
+	  &($\textit{total}-a_{i}\text{\cs{zw}}<0$).
+\end{dcases*}
 \]
 $b_{i}$達の最小値を与えるような$i$を$j$としたとき\footnote{%
   そのような$i$が2つ以上あるときは，$|\textit{total}-a_{i}\cdot \text{\cs{zw}}|$,
@@ -10856,7 +10876,7 @@ its binary version is also updated.
 \item[ltj-cid-auto-adobe-japan1.lua]
 Ryumin-Lightのような非埋め込みフォントの情報を格納しており，
 （それらが\LuaTeX-jaの標準和文フォントなので）\LuaTeX-jaの読み込み時に自動で読まれる．
-生成には\texttt{UniJIS2004-UTF32-\{H, V\}}, \texttt{Adobe-Japan1-UCS2}という3つの
+生成には\texttt{UniJIS2004-UTF32-\{H,V\}}, \texttt{Adobe-Japan1-UCS2}という3つの
 CMapが必要である．
 
 \pageref{para-cid}ページで述べたように，\texttt{cid}キーを使って
@@ -11199,7 +11219,29 @@ direction~whatsit内部のノードリストに，\textit{dir\_box}として格�
 \subsection{縦組用字形の取得}
 縦組時には，「\hbox to \zw{、}」(\texttt{U+3001})から「\ltjjachar"FE11」(\texttt{U+FE11})%"
 のように縦組用字形への置き換えに関係する処理は，以下のようになっている．
-  \begin{itemize}
+
+\begin{table}[t]
+  \def\D#1#2#3#4{%
+	{\fboxsep0pt\fcolorbox{cyan}{white}%
+    {\large\char"#1#2#3#4}}\ (\texttt{U+#1#2#3#4})%"
+  }
+  \caption{\LuaTeX-ja標準で行われる縦組形への置換}
+  \label{tab:vert_replace}\small\centering
+  \begin{tabular}{*{3}{l@{}>{${}\longmapsto{}$}c@{}l}}
+	\toprule
+	\D 3001&&\D FE11&\D 3002&&\D FE12&\D 3016&&\D FE17\\
+	\D 3017&&\D FE18&\D 2026&&\D FE19&\D 2025&&\D FE30\\
+	\D 2014&&\D FE31&\D 2013&&\D FE32&\D FF3F&&\D FE33\\
+	\D FF08&&\D FE35&\D FF09&&\D FE36&\D FF5B&&\D FE37\\
+	\D FF5D&&\D FE38&\D 3014&&\D FE39&\D 3015&&\D FE3A\\
+	\D 3010&&\D FE3B&\D 3011&&\D FE3C&\D 300A&&\D FE3D\\
+	\D 300B&&\D FE3E&\D 3008&&\D FE3F&\D 3009&&\D FE40\\
+	\D 300C&&\D FE41&\D 300D&&\D FE42&\D 300E&&\D FE43\\
+	\D 300F&&\D FE44&\D FF3B&&\D FE47&\D FF3D&&\D FE48\\
+	\bottomrule
+  \end{tabular}
+\end{table}
+\begin{itemize}
 	\item 各縦組用和文フォントは読み込み時に以下の属性が設定される：
 	\begin{description}
 	  \item[\textit{vert\_activated}] 真となるのは，
@@ -11216,20 +11258,16 @@ direction~whatsit内部のノードリストに，\textit{dir\_box}として格�
 	\item また，各和文フォント読み込み時には，
 	「OpenType機能による置換以前に行う縦組形への置換」を格納したテーブル\textit{vform}も作成する．
 	\begin{enumerate}
-	  \item \LuaTeX-jaには，「\hbox to \zw{、}」(\texttt{U+3001})→「\ltjjachar"FE11」(\texttt{U+FE11})といった
-	  いくつかの置換がハードコードされている．そのような各置換$i\longmapsto v$に対して，
-	  \begin{quote}
-		置換元$i$が（あるscript, languageにおける）\texttt{vert}では置換対象でなく，
-		かつ置換先$v$がフォント内に存在する文字コードである
-	  \end{quote}
-	  ならば，$i\longmapsto v$を\textit{vform}に登録する．
+	  \item \autoref{tab:vert_replace}に示した各置換$i\longmapsto v$に対し，
+	  置換先$v$がフォント内に存在する文字コードであるならば，$i\longmapsto v$を\textit{vform}に登録する．
 	  \item \ref{ssec:tfont}節にある\texttt{jpotf}が指定された場合，
-	  ……
+	  \LuaTeX-ja内部の別のテーブル\textit{vert\_jpotf\_table}に登録されている各置換$i\longmapsto v$に対して
+	  置換先$v$がフォント内に存在する文字コードであるならば，$i\longmapsto v$を\textit{vform}に登録する．
 	  \item もし\texttt{vert}も\texttt{vrt2}も現在のscript, languageでは有効にできない場合，
 	  どこかのscript, languageにおける\texttt{vert}で定義されている
 	  置換$i\longmapsto v$をすべて\textit{vform}に登録する．
 	\end{enumerate}
-	
+
 	あとで説明するように，\textit{vform}は\textit{vert\_activated}が真であるような縦組用和文フォントでしか
 	利用されない．
 	
@@ -11237,9 +11275,8 @@ direction~whatsit内部のノードリストに，\textit{dir\_box}として格�
     その時点での組方向が縦組であり，かつ処理対象の各ノードの縦組用フォントで
 	\textit{vert\_activated}が真である場合，\textit{vform}に従いグリフが置き換えられる．
 
-	\Pkg{luaotfload}が行う，OpenType機能に沿ったグリフ置換はこの後の処理となる．G
+	\Pkg{luaotfload}が行う，OpenType機能に沿ったグリフ置換はこの後の処理となる．
   \end{itemize}
-
 %</ja>
 
 \newpage
@@ -11250,32 +11287,27 @@ Victor Eijkhout. \newblock \textit{\TeX\ by Topic, A \TeX nician's Reference}, A
 \bibitem{listings} C.\ Heinz, B.\ Moses. \newblock The \textsf{Listings} Package.
 \bibitem{uptex} Takuji Tanaka. \newblock
 upTeX---Unicode version of pTeX with CJK extensions,
-TUG 2013, October 2013.
-%<ja>\newblock
-%<en>\\\null\hfill
+TUG 2013, October 2013.\newblock
 \url{http://tug.org/tug2013/slides/TUG2013_upTeX.pdf}
-\bibitem{jlisting} Thor Watanabe. \newblock Listings\ -\ MyTeXpert.
-%<en>\newblock
-%<ja>\\\null\hfill
+\bibitem{jlisting} Thor Watanabe. \newblock Listings\ -\ MyTeXpert.\newblock
 \url{http://mytexpert.osdn.jp/index.php?Listings}
 \bibitem{jlreq}  W3C Japanese Layout Task Force~(ed). \newblock
 Requirements for Japanese Text Layout (W3C Working Group Note), 2011, 2012. \newblock
 \url{http://www.w3.org/TR/jlreq/}%
 %<ja> \\日本語訳の書籍版：W3C日本語組版タスクフォース（編），『W3C技術ノート 日本語組版処理の要件』，東京電機大学出版局，2012．
-\bibitem{min10} 乙部厳己．「min10フォントについて」\\\null\hfill
+\bibitem{min10} 乙部厳己．「min10フォントについて」\newblock
 \url{http://argent.shinshu-u.ac.jp/~otobe/tex/files/min10.pdf}
 \bibitem{x4051} 日本工業規格(Japanese Industrial Standard). 「JIS~X~4051,
 日本語文書の組版方法(Formatting rules for Japanese documents)」, 1993, 1995, 2004.
 \bibitem{ptexdoc} 濱野尚人，田村明史，倉沢良一．「\TeX の出版への応用—縦組み機能の組み込み—」．
-\\\null\hfill\texttt{.../texmf-dist/doc/ptex/base/ptexdoc.pdf}
+\newblock\texttt{.../texmf-dist/doc/ptex/base/ptexdoc.pdf}
 \bibitem{ptextug} Hisato Hamano. \newblock
 \textit{Vertical Typesetting with \TeX}, TUGBoat~\textbf{11}(3), 346--352, 1990.
 \bibitem{pdfstd} International Organization for Standardization. \newblock
 ISO 32000-1:2008, \textit{Document management -- Portable document format -- Part 1: PDF
       1.7}, 2008. \newblock
-\\\null\hfill
 \url{http://www.iso.org/iso/iso\_catalogue/catalogue_tc/catalogue\_detail.htm?csnumber=51502}
-\bibitem{tc18ltja} 北川弘典．「\LuaTeX-jaの近況」，\TeX Conf~2018．\\
+\bibitem{tc18ltja} 北川弘典．「\LuaTeX-jaの近況」，\TeX Conf~2018．
   \url{https://osdn.net/projects/luatex-ja/wiki/Documentation/attach/tc18ltja.pdf}
 \end{thebibliography}
 
