@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2019/08/21 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2019/09/25 Patch to NFSS2 for LuaTeX-ja]
 
 \def\ltj@chardef@text@cmd#1{%
   \let\@ifdefinable\@@ifdefinable%
@@ -308,7 +308,7 @@
   \fi
 }
 \newif\if@knjcmd
-\def\userelfont{\@knjcmdtrue}
+\DeclareRobustCommand\userelfont{\@knjcmdtrue}
 
 
 \RequirePackage{everysel}
@@ -465,7 +465,7 @@
     setdimen('cHT', ht+dp)
   end
 }\endgroup
-\def\adjustbaseline{\luafunction\ltj@@adjust@baseline@inner
+\DeclareRobustCommand\adjustbaseline{\luafunction\ltj@@adjust@baseline@inner
    \cvs\normalbaselineskip}
 \DeclareRobustCommand\romanencoding[1]{%
     \expandafter\ifx\csname T@#1\endcsname\relax
@@ -773,7 +773,7 @@
 %%%%%% Alternate Japanese Fonts
 %%%% \DeclareAlternateKanjiFont<Benc><Bfam><Bser><Bshape><Aenc><Afam><Aser><Ashape><range>
 % いつも global
-\DeclareRobustCommand\DeclareAlternateKanjiFont[9]{%
+\def\DeclareAlternateKanjiFont#1#2#3#4#5#6#7#8#9{%
   \edef\@temp{#9}%
   \ifx\@temp\@empty\else
     {\def\ltj@temp@bfont{#1/#2/#3/#4}\def\ltj@temp@afont{#5/#6/#7/#8}%

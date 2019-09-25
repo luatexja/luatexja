@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjext}[2018/10/07 v1.2k-ltj-10 Macros for vertical writing]
+\ProvidesPackage{lltjext}[2019/09/25 v1.2k-ltj-11 Macros for vertical writing]
 \RequirePackage{luatexja}
 \newcount\ltj@ext@dir
 \let\ltj@lltjext@orig@tabular=\tabular
@@ -631,7 +631,7 @@
 %%% bou
 %%%
 \def\boutenchar{\char\euc"A1A2}%"
-\def\bou#1{\ifvmode\leavevmode\fi\@bou#1\end}
+\DeclareRobustCommand\bou[1]{\ifvmode\leavevmode\fi\@bou#1\end}
 \def\@bou#1{%
   \ifx#1\end \let\ltj@@next=\relax
   \else
@@ -648,7 +648,7 @@
   \fi\ltj@@next}
 
 %%% kasen
-\def\kasen#1{%
+\DeclareRobustCommand\kasen[1]{%
   \ifnum\ltjgetparameter{direction}=3\relax
     \setbox\z@\hbox{#1}\leavevmode\raise.7\zw
     \hbox to\z@{\vrule\@width\wd\z@ \@depth\z@ \@height.4\p@\hss}%
