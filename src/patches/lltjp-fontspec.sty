@@ -28,7 +28,7 @@
             \exp_not:N \selectfont
           }
       }
-    \str_if_eq_x:nnT {\familydefault} {\rmdefault}
+    \str_if_eq:eeT {\familydefault} {\rmdefault}
       { \tl_set_eq:NN \encodingdefault \g__fontspec_nfss_enc_tl }
     \__fontspec_setmainfont_hook:nn {#1} {#2}
     \normalfont
@@ -47,7 +47,7 @@
             \exp_not:N \selectfont
           }
       }
-    \str_if_eq_x:nnT {\familydefault} {\sfdefault}
+    \str_if_eq:eeT {\familydefault} {\sfdefault}
       { \tl_set_eq:NN \encodingdefault \g__fontspec_nfss_enc_tl }
     \__fontspec_setsansfont_hook:nn {#1} {#2}
     \normalfont
@@ -66,7 +66,7 @@
             \exp_not:N \selectfont
           }
       }
-    \str_if_eq_x:nnT {\familydefault} {\ttdefault}
+    \str_if_eq:eeT {\familydefault} {\ttdefault}
       { \tl_set_eq:NN \encodingdefault \g__fontspec_nfss_enc_tl }
     \__fontspec_setmonofont_hook:nn {#1} {#2}
     \normalfont
@@ -84,7 +84,7 @@
     \exp_not:N \selectfont
    }
   }
-  \str_if_eq_x:nnT {\familydefault} {\rmdefault}
+  \str_if_eq:eeT {\familydefault} {\rmdefault}
     { \tl_set_eq:NN \encodingdefault \g__fontspec_nfss_enc_tl }
   \normalfont
   \ignorespaces
@@ -101,7 +101,7 @@
     \exp_not:N \selectfont
    }
   }
-  \str_if_eq_x:nnT {\familydefault} {\sfdefault}
+  \str_if_eq:eeT {\familydefault} {\sfdefault}
     { \tl_set_eq:NN \encodingdefault \g__fontspec_nfss_enc_tl }
   \normalfont
   \ignorespaces
@@ -118,7 +118,7 @@
     \exp_not:N \selectfont
    }
   }
-  \str_if_eq_x:nnT {\familydefault} {\ttdefault}
+  \str_if_eq:eeT {\familydefault} {\ttdefault}
     { \tl_set_eq:NN \encodingdefault \g__fontspec_nfss_enc_tl }
   \normalfont
   \ignorespaces
