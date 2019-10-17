@@ -21,10 +21,9 @@
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
 %% File: ltjclasses.dtx
-
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjarticle}
-  [2019/08/12 v1.8b-ltj-17
+  [2019/10/17 v1.8c-ltj-17
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
