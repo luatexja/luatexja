@@ -1647,7 +1647,7 @@ The following presets are defined:
 \begin{quote}
   \ttfamily
   \hyphenchar\font=-1 \exhyphenchar=-1
-  hiragino-pro, hiragino-pron, ipa, ipa-hg, ipaex, ipaex-hg,
+  haranoaji, hiragino-pro, hiragino-pron, ipa, ipa-hg, ipaex, ipaex-hg,
   kozuka-pr6, kozuka-pr6n, kozuka-pro, moga-mobo, moga-mobo-ex,
   bizud, morisawa-pr6n, morisawa-pro, ms, ms-hg, noembed, noto-otc, noto-otf,
   sourcehan, sourcehan-jp, ume, yu-osx, yu-win, yu-win10
@@ -7949,13 +7949,13 @@ We didn't taken account of when more than one options among them are specified.
 \label{sssec:ltjpreset-multi}
 
 %<*en>
-Besides \texttt{bizud}, \texttt{morisawa-pro},~and~\texttt{morisawa-pr6n} presets,
+Besides \texttt{bizud}, \texttt{haranoaji}, \texttt{morisawa-pro},~and~\texttt{morisawa-pr6n} presets,
 fonts are specified by font name, not by file name.
 In following tables, starred fonts (e.g.~KozGo\dots-Regular) are used for medium series of \textit{gothic},
 \emph{if and only if \texttt{deluxe} option is specified}.
 %</en>
 %<*ja>
-\texttt{bizud}, \texttt{morisawa-pro}, \texttt{morisawa-pr6n}以外はフォントの指定は
+\texttt{bizud}, \texttt{haranoaji}, \texttt{morisawa-pro}, \texttt{morisawa-pr6n}以外はフォントの指定は
 （ファイル名でなく）フォント名で行われる．
 以下の表において，*\,つきのフォント(e.g.,~KozGo\dots-Regular)は，\emph{\texttt{deluxe}オプション指定時に}
 ゴシック体中字として用いられるものを示している．
@@ -8254,6 +8254,43 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<en>\textit{rounded gothic}
 %<ja>\gt 丸ゴシック
 &&\AD{Sans}{Black}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+ \item[haranoaji]  Harano Aji Fonts.
+%<en>\par These fonts can be downloaded from\\\hfill \url{https://github.com/trueroad/HaranoAjiFonts}.
+%<ja>これらのフォントは \url{https://github.com/trueroad/HaranoAjiFonts} からダウンロードできる．
+%<*en>
+There is not rounded gothic family in Harano Aji Fonts.
+%</en>
+%<*ja>
+「原ノ味丸ゴシック」は存在しないので，
+便宜的に原ノ味角ゴシックHeavyによって代用している．
+%</ja>
+\begin{center}\small
+\begin{tabular}{lll}
+\toprule
+\bf family&\bf series&\texttt{haranoaji}\\
+\midrule
+ &light&HaranoAjiMincho-Light.otf\\
+%<en>\textit{mincho}%
+%<ja>\textgt{明朝}%
+ &medium&HaranoAjiMincho-Regular.otf\\
+ &bold&HaranoAjiMincho-Bold.otf\\
+\midrule
+ &&HaranoAjiGothic-Regular.otf*\\
+ &\smash{\raisebox{1.5ex}{medium}}
+ &HaranoAjiGothic-Medium.otf\\
+\cmidrule(l){2-3}
+%<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
+%<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
+ &bold&HaranoAjiGothic-Bold.otf\\
+ &extra bold&HaranoAjiGothic-Heavy.otf\\
+\midrule
+%<en>\textit{rounded gothic}
+%<ja>\gt 丸ゴシック
+&&HaranoAjiGothic-Heavy.otf\\
 \bottomrule
 \end{tabular}
 \end{center}
