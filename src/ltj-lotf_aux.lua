@@ -49,14 +49,18 @@ end
 local function get_asc_des(id)
   local t, v = getfont(id), font_metric_table[id]
   local a, d
-  if t and t.shared then
+  if t and t.shared and t.shared.rawdata then
     local u = t.units
     local t2 = t.shared.rawdata.metadata
     if t2 then
       a, d = t2.ascender and t2.ascender/u, t2.descender and -t2.descender/u
     end
-  -- HARF h_extents() returns "too large" value...?
-  -- rawdata.metadata.horizontalmetrics is same
+  elseif t.hb then -- HARF
+    local hbfont, u = t.hb.shared.font, t.hb.shared.upem
+    local h = hbfont:get_h_extents()
+    if h and u then 
+       a, d = h.ascender and h.ascender/u, h.descender and -h.descender/u
+    end
   end
   v.ascender, v.descender =  (a or 0.88)*t.size, (d or 0.12)*t.size
 end

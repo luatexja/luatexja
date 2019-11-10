@@ -1,5 +1,5 @@
 %
-% lltjp-fontspec.sty 2018-08-24
+% lltjp-fontspec.sty 2019-10-21
 %
 
 \NeedsTeXFormat{LaTeX2e}
@@ -13,7 +13,65 @@
 \fi
 
 %%%%%%%% fontspec v2.5c overwrites \rmfamily etc. in \setmainfont
-\@ifpackagelater{fontspec}{2018/07/29}{ %% 2.6h or later
+\@ifpackagelater{fontspec}{2019/10/19}{ %% 2.7d or later
+\cs_set:Nn \__fontspec_main_setmainfont:nn
+  {
+    \fontspec_set_family:Nnn \l__fontspec_rmfamily_family_tl {#1} {#2}
+    \tl_set_eq:NN \rmdefault \l__fontspec_rmfamily_family_tl
+    \use:x
+      {
+        \exp_not:n { \DeclareRobustCommand \rmfamily }
+          {
+            \exp_not:N \fontencoding { \g__fontspec_nfss_enc_tl }
+            \exp_not:N \fontfamily { \exp_not:N \rmdefault }
+    \exp_not:N\if@ltj@match@family\exp_not:N\kanjifamily\exp_not:N\mcdefault\exp_not:N\fi%%%
+            \exp_not:N \selectfont
+          }
+      }
+    \str_if_eq:eeT {\familydefault} {\rmdefault}
+      { \tl_set_eq:NN \encodingdefault \g__fontspec_nfss_enc_tl }
+    \__fontspec_setmainfont_hook:nn {#1} {#2}
+    \normalfont
+  }
+\cs_set:Nn \__fontspec_main_setsansfont:nn
+  {
+    \fontspec_set_family:Nnn \l__fontspec_sffamily_family_tl {#1} {#2}
+    \tl_set_eq:NN \sfdefault \l__fontspec_sffamily_family_tl
+    \use:x
+      {
+        \exp_not:n { \DeclareRobustCommand \sffamily }
+          {
+            \exp_not:N \fontencoding { \g__fontspec_nfss_enc_tl }
+            \exp_not:N \fontfamily { \exp_not:N \sfdefault  }
+    \exp_not:N\if@ltj@match@family\exp_not:N\kanjifamily\exp_not:N\gtdefault\exp_not:N\fi%%%
+            \exp_not:N \selectfont
+          }
+      }
+    \str_if_eq:eeT {\familydefault} {\sfdefault}
+      { \tl_set_eq:NN \encodingdefault \g__fontspec_nfss_enc_tl }
+    \__fontspec_setsansfont_hook:nn {#1} {#2}
+    \normalfont
+  }
+\cs_set:Nn \__fontspec_main_setmonofont:nn
+  {
+    \fontspec_set_family:Nnn \l__fontspec_ttfamily_family_tl {#1} {#2}
+    \tl_set_eq:NN \ttdefault \l__fontspec_ttfamily_family_tl
+    \use:x
+      {
+        \exp_not:n { \DeclareRobustCommand \ttfamily }
+          {
+            \exp_not:N \fontencoding { \g__fontspec_nfss_enc_tl }
+            \exp_not:N \fontfamily {  \exp_not:N \ttdefault }
+    \exp_not:N\if@ltj@match@family\exp_not:N\kanjifamily\exp_not:N\jttdefault\exp_not:N\fi%%%
+            \exp_not:N \selectfont
+          }
+      }
+    \str_if_eq:eeT {\familydefault} {\ttdefault}
+      { \tl_set_eq:NN \encodingdefault \g__fontspec_nfss_enc_tl }
+    \__fontspec_setmonofont_hook:nn {#1} {#2}
+    \normalfont
+  }
+}{\@ifpackagelater{fontspec}{2018/07/29}{ %% 2.6h <= and <= 2.7c
 \cs_set:Nn \__fontspec_main_setmainfont:nn
   {
     \fontspec_set_family:Nnn \l__fontspec_rmfamily_family_tl {#1} {#2}
@@ -123,7 +181,7 @@
   \normalfont
   \ignorespaces
  }
-}
+}}
 
 \cs_set:Nn \fontspec_visible_space:
  {

@@ -185,7 +185,7 @@ end
 -- not used in current LuaTeX-ja
 do
 --! ixbase.counter と同じ
-  counter = {}
+  local counter = {}
   local mt_counter = {}
   setmetatable(counter, mt_counter)
 
@@ -373,10 +373,10 @@ function ltjb.add_to_callback(name,fun,description,priority)
 	"resetting exclusive callback: " .. name)
 	luatexbase.reset_callback(name)
     end
-    local saved_callback={},ff,dd
+    local saved_callback={}
     for k,v in ipairs(luatexbase.callback_descriptions(name)) do
 	if k >= priority then
-	    ff,dd= luatexbase.remove_from_callback(name, v)
+	    local ff,dd = luatexbase.remove_from_callback(name, v)
 	    saved_callback[#saved_callback+1]={ff,dd}
 	end
     end
