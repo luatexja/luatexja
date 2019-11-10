@@ -10,10 +10,6 @@ luatexja.lotf_aux = aux
 local font_metric_table = {}
 aux.font_metric_table = font_metric_table
 
-local function is_harf(t)
-  return luaharfbuzz and package.loaded['harf'] and require("harf-base")
-end
-
 local getfont = font.getfont
 local provides_feature = luaotfload.aux.provides_feature
 function aux.exist_feature(id, name)
@@ -28,15 +24,15 @@ function aux.enable_feature(id, name)
   local t = getfont(id)
   if t and t.shared and t.shared.features then
     t.shared.features[name] = true
-  elseif t and is_harf(t) then -- HARFLOAD
-    local hb, tf = require("harf-base"), t.hb.spec.features
+  elseif t and t.hb then -- HARF
+    local hb, tf = luaotfload.harfbuzz, t.hb.spec.hb_features
     tf[#tf+1] = hb.Feature.new(name)
   end
 end
 function aux.specified_feature(id, name)
   local t = getfont(id)
   return t and (t.shared and t.shared.features and t.shared.features[name])
-         or (t.hb and t.hb.spec and t.hb.spec.options and t.hb.spec.options[name]) -- HARFLOAD
+         or (t.hb and t.hb.spec and t.hb.spec.features.raw and t.hb.spec.features.raw[name]) -- HARF
 end
 
 
@@ -59,7 +55,7 @@ local function get_asc_des(id)
     if t2 then
       a, d = t2.ascender and t2.ascender/u, t2.descender and -t2.descender/u
     end
-  -- HARFLOAD h_extents() returns "too large" value...?
+  -- HARF h_extents() returns "too large" value...?
   -- rawdata.metadata.horizontalmetrics is same
   end
   v.ascender, v.descender =  (a or 0.88)*t.size, (d or 0.12)*t.size
@@ -115,7 +111,7 @@ end
 local function loop_over_duplicates(id, func)
 -- func: return non-nil iff abort this fn
   local t = (type(id)=="table") and id or getfont(id)
-  if t and t.resources and t.resources.duplicates then
+  if t and t.resources and t.resources.duplicates then -- HARF: not executed
     for i,v in pairs(t.resources.duplicates) do
       func(i,v)
     end
@@ -128,7 +124,7 @@ local function loop_over_feat(id, feature_name, func, universal)
 -- func: return non-nil iff abort this fn
 -- universal: true iff look up all (script, lang) pair
   local t = (type(id)=="table") and id or getfont(id)
-  if t and t.resources and t.resources.sequences then
+  if t and t.resources and t.resources.sequences then -- HARF: not executed
     for _,i in pairs(t.resources.sequences) do
       if i.order[1] and feature_name[i.order[1]] then
         local f = i.features and i.features[i.order[1]]
