@@ -210,7 +210,9 @@ do
       end
 
       -- Save
-      k.characters[46].width = math.floor(655360/14);
+      if k and k.characters and k.characters[46] then
+        k.characters[46].width = math.floor(655360/14);
+      end
       ltjb.save_cache( "ltj-cid-auto-" .. string.lower(cid_name),
 		       {
 			  version = cache_ver,
