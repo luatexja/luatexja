@@ -83,6 +83,7 @@ local function get_vmet_table(tfmdata, dest)
    if (not tfmdata) or (not tfmdata.shared) or (not tfmdata.shared.rawdata) then
      dest = dest or {}
      dest.vorigin, dest.vheight = dummy_vorg, dummy_vht
+     dest.ind_to_uni = {}
      return dest
    end
    local rawdata = tfmdata.shared.rawdata
