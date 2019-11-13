@@ -80,7 +80,7 @@ local dummy_vht, dummy_vorg = {}, {}
 setmetatable(dummy_vht, {__index = function () return 1 end } )
 setmetatable(dummy_vorg, {__index = function () return 0.88 end } )
 local function get_vmet_table(tfmdata, dest)
-   if (not tfmdata) or (not tfmdata.shared) then
+   if (not tfmdata) or (not tfmdata.shared) or (not tfmdata.shared.rawdata) then
      dest = dest or {}
      dest.vorigin, dest.vheight = dummy_vorg, dummy_vht
      return dest
