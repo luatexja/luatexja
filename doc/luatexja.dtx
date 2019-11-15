@@ -46,7 +46,8 @@
 %<ja>  Scale=MatchLowercase, FakeStretch=1.137121,
   ItalicFont=iosevka-slab-oblique,
   BoldFont=iosevka-slab-bold, BoldItalicFont=iosevka-slab-bolditalic,
-]{iosevka-slab-regular}
+%<en> ]{iosevka-slab-regular}
+%<ja> ]{iosevka-slab-light}
 \setsansfont[Scale=MatchLowercase,Ligatures=TeX,RawFeature=-notdef]{Linux Biolinum O}
 \usepackage[match]{luatexja-fontspec}
 \usepackage[kozuka-pr6n]{luatexja-preset}
@@ -653,27 +654,16 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %<ja>\LuaTeX-jaパッケージの動作には次のパッケージ類が必要である．
 \begin{itemize}
 \item \href{http://www.luatex.org/}{\LuaTeX}\ 1.0.0 (or later)
-\item recent \href{https://github.com/latex3/luaotfload}{\Pkg{luaotfload}} (v2.98 or later recommended)
+\item recent \href{https://github.com/latex3/luaotfload}{\Pkg{luaotfload}} (v3.1 or later recommended)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
-\item \Pkg{etoolbox}, \Pkg{everysel} (if you want to use \LuaTeX-ja with \LaTeXe)
+\item \href{https://github.com/josephwright/etoolbox/}{\Pkg{etoolbox}},
+  \Pkg{everysel} (if you want to use \LuaTeX-ja with \LaTeXe)
 \item \Pkg{ltxcmds}, \Pkg{pdftexcmds}, \Pkg{filehook}, \Pkg{atbegshi}
-\item \Pkg{fontspec} v2.7c (or later)
+\item \href{https://github.com/wspr/fontspec/}{\Pkg{fontspec}} v2.7c (or later)
 %<en>\item \emph{IPAex fonts} (\url{http://ipafont.ipa.go.jp/})
 %<ja>\item \emph{IPAexフォント(\url{http://ipafont.ipa.go.jp/})}
 \end{itemize}
 
-%<*en>
-LuaHB\TeX~and~\href{https://github.com/khaledhosny/harftex}{Harf\TeX},
-which are \LuaTeX-variants integrated with Harfbuzz, are not supported for now.
-Maybe documents can typeset without an error,
-but with unwanted results (especially, vertical typesetting and \cs{CID}).
-%</en>
-%<*ja>
-現時点では，LuaHB\TeX や\href{https://github.com/khaledhosny/harftex}{Harf\TeX}といった
-Harfbuzzを利用したエンジンでの動作は未保証である．
-エラーが発生せずにタイプセットできるかもしれないが，特に縦組時や
-\cs{CID}などで意図しない結果となりうる可能性が大きい．
-%</ja>
 
 %<*en>
 Now \LuaTeX-ja is available from
@@ -681,8 +671,8 @@ CTAN (in the \texttt{macros/luatex/generic/luatexja} directory), and
 the following distributions:
   \begin{itemize}
   \item MiK\TeX\ (in \texttt{luatexja.tar.lzma}); see the next subsection
-  \item \TeX\ Live (in \texttt{texmf-dist/tex/luatex/luatexja})
-  \item W32\TeX\ (in \texttt{luatexja.tar.xz})
+  \item \href{https://www.tug.org/texlive/}{\TeX\ Live} (in \texttt{texmf-dist/tex/luatex/luatexja})
+  \item \href{http://w32tex.org/}{W32\TeX}\ (in \texttt{luatexja.tar.xz})
   \end{itemize}
 IPAex fonts are also available in these distributions.
 %</en>
@@ -698,6 +688,27 @@ IPAex fonts are also available in these distributions.
 W32\TeX においてはIPAexフォントは \texttt{luatexja.tar.xz} 内にある．
 %</ja>
 
+%<*en>
+\paragraph{Using \LuaTeX-ja with LuaHB\TeX}
+Using \LuaTeX-ja with LuaHB\TeX (\LuaTeX\ integrated with
+\href{https://github.com/harfbuzz/harfbuzz}{HarfBuzz}) is not well tested.
+Maybe documents can typeset without an error,
+but with unwanted results (especially, vertical typesetting and \cs{CID}).
+
+Especially,
+\emph{We don't recommend defining a Japanese font with Harfbuzz},
+by specifying \texttt{Renderer=Harfbuzz}~etc.\ (\Pkg{fontspec}) or~{mode=harf} (otherwise).
+%</en>
+%<*ja>
+\paragraph{LuaHB\TeX 下での\LuaTeX-jaの使用}
+現時点では，LuaHB\TeX 下での\LuaTeX-jaの使用は十分にテストされていない．
+エラーが発生せずにタイプセットできるかもしれないが，特に縦組時や
+\cs{CID}などで意図しない結果となりうる可能性が大きい．
+
+特に，\texttt{Renderer=Harfbuzz}等（\Pkg{fontspec}）や\texttt{mode=harf}指定（それ以外）を用いて
+\emph{和文フォントに対してHarfBuzzを用いることは推奨しない}．
+%</ja>
+
 %<en>\paragraph{Manual installation}
 %<ja>\paragraph{手動インストール方法}
 
@@ -707,7 +718,7 @@ W32\TeX においてはIPAexフォントは \texttt{luatexja.tar.xz} 内にあ�
       At the present, \LuaTeX-ja has no \emph{stable} release.
 
 \begin{itemize}
-\item Clone the Git repository:
+\item Clone the Git repository by
 \begin{lstlisting}
 $ git clone git://git.osdn.jp/gitroot/luatex-ja/luatexja.git
 \end{lstlisting}
@@ -725,11 +736,11 @@ the forefront of development is not the \texttt{master} branch.
       開発版であって，安定版でないことに注意．
 
 \begin{itemize}
-\item Gitリポジトリをクローンする：
+\item Gitリポジトリを次のコマンドでクローンする：
 \begin{lstlisting}
 $ git clone git://git.osdn.jp/gitroot/luatex-ja/luatexja.git
 \end{lstlisting}
-\item \texttt{master} ブランチのスナップショット（\texttt{tar.gz} 形式）をダウンロードする．
+\item \texttt{master} ブランチのスナップショット（\texttt{tar.gz} 形式）をダウンロードする：
 \begin{flushleft}
 \url{http://git.osdn.jp/view?p=luatex-ja/luatexja.git;a=snapshot;h=HEAD;sf=tgz}.
 \end{flushleft}
@@ -3424,14 +3435,16 @@ JFMは文字と和文組版で自動的に挿入される
 \def\r#1#2{%
   \hbox{\Large\vrule
   \parbox[b]{7\zw}{%
-    \addjfontfeatures{YokoFeatures={Opacity=0.5, Color=#2, JFM=#1}}\noindent
+    \addjfontfeatures{YokoFeatures={JFM=#1}}\noindent
+	\color{#2}\transparent{0.5}
     ◆◆◆◆◆◆◆
     ある日モモちゃんがお使いで迷子になって泣きました．
   }\vrule}}
 \def\s#1#2{%
   \Large
   \parbox[b]{7\zw}{%
-    \addjfontfeatures{YokoFeatures={Opacity=0.5, Color=#2, JFM=#1}}\noindent
+    \addjfontfeatures{YokoFeatures={JFM=#1}}\noindent
+	\color{#2}\transparent{0.5}
     ちょっと！何
   }}
 \def\t#1#2#3{\hbox to 0pt{\hss%
@@ -3713,14 +3726,16 @@ This functionality is disabled by \texttt{-ltjksp} specification.
 \def\r#1#2{%
   \hbox{\tate\Large\vrule
   \parbox{7\zw}{%
-    \addjfontfeatures{TateFeatures={Opacity=0.5, Color=#2, JFM=#1}}\noindent
+    \addjfontfeatures{TateFeatures={JFM=#1}}\noindent
+	\color{#2}\transparent{0.5}
     ◆◆◆◆◆◆◆
     ある日モモちゃんが「お使い」で迷子になって泣きました。
   }\vrule}}
 \def\s#1#2{%
   \hbox{\tate\Large
   \parbox{7\zw}{%
-    \addjfontfeatures{TateFeatures={Opacity=0.5, Color=#2, JFM=#1}}\noindent
+    \addjfontfeatures{TateFeatures={JFM=#1}}\noindent
+	\color{#2}\transparent{0.5}
     ちょっと！何
   }}}
 \def\t#1#2#3{\hbox to 0pt{\hss%
@@ -6428,11 +6443,11 @@ to <family>. See Subsection~\ref{ssec:fontfamilycmd} for detail.
 \begin{figure}[!tb]
 \begin{LTXexample}[pos=b]
 \DeclareKanjiFamily{JY3}{edm}{}
-\DeclareFontShape{JY3}{edm}{m}{n}    {<-> s*KozMinPr6N-Regular:jfm=ujis;}{}
-\DeclareFontShape{JY3}{edm}{m}{green}{<-> s*KozMinPr6N-Regular:jfm=ujis;color=007F00}{}
-\DeclareFontShape{JY3}{edm}{m}{blue} {<-> s*KozMinPr6N-Regular:jfm=ujis;color=0000FF}{}
-\DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{green}{"4E00-"67FF,{-2}-{-2}}
-\DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{blue}{ "6800-"9FFF}
+\DeclareFontShape{JY3}{edm}{m}{n}   {<-> s*KozMinPr6N-Regular:jfm=ujis;}{}
+\DeclareFontShape{JY3}{edm}{m}{fb}  {<-> s*KozMinPr6N-Regular:jfm=ujis;embolden=1}{}
+\DeclareFontShape{JY3}{edm}{m}{fb2} {<-> s*KozMinPr6N-Regular:jfm=ujis;embolden=1.5}{}
+\DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{fb}{ "4E00-"67FF,{-2}-{-2}}
+\DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{fb2}{"6800-"9FFF}
 {\kanjifamily{edm}\selectfont
 日本国民は、正当に選挙された国会における代表者を通じて行動し、……}
 \end{LTXexample}
@@ -6810,11 +6825,11 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec:psft}.
 \begin{figure}[!tb]
 \begin{LTXexample}[width=0.25\textwidth]
 \jfontspec[
-  YokoFeatures={Color=007F00}, TateFeatures={Color=00007F},
+  YokoFeatures={FakeBold=3}, TateFeatures={FakeBold=6},
   TateFont=KozGoPr6N-Regular
 ]{KozMinPr6N-Regular}
 \hbox{\yoko 横組のテスト}\hbox{\tate 縦組のテスト}
-\addjfontfeatures{Color=FF0000}
+\addjfontfeatures{FakeBold=0}
 \hbox{\yoko 横組}\hbox{\tate 縦組}
 \end{LTXexample}
 %<ja>\caption{\texttt{TateFeatures} 等の使用例}
@@ -6860,8 +6875,8 @@ A demonstrarion is shown in \autoref{fig:yokotate-fontspec}.
 \begin{LTXexample}[pos=b]
 \jfontspec[
   AltFont={
-    {Range="4E00-"67FF, Color=007F00},
-    {Range="6800-"9EFF, Color=0000FF},
+    {Range="4E00-"67FF, FakeBold=4},
+    {Range="6800-"9EFF, FakeBold=8},
     {Range="3040-"306F, Font=KozGoPr6N-Regular},
   }
 ]{KozMinPr6N-Regular}
@@ -6924,7 +6939,7 @@ For example,
 \begin{lstlisting}
 AltFont = {
   { Font=HogeraMin-Light, BoldFont=HogeraMin-Bold,
-    Range="3000-"30FF, BoldFeatures={Color=007F00} }
+    Range="3000-"30FF, BoldFeatures={FakeBold=1} }
 }
 \end{lstlisting}
 does \emph{not} work. Instead, one have to write
@@ -6933,7 +6948,7 @@ UprightFeatures = {
   AltFont = { { Font=HogeraMin-Light, Range="3000-"30FF, } },
 },
 BoldFeatures = {
-  AltFont =  { { Font=HogeraMin-Bold, Range="3000-"30FF, Color=007F00 } },
+  AltFont =  { { Font=HogeraMin-Bold, Range="3000-"30FF, FakeBold=1 } },
 }
 \end{lstlisting}
 
@@ -6956,7 +6971,7 @@ has no effect, because a color specification is already done in
 \begin{lstlisting}
 AltFont = {
   { Font=HogeraMin-Light, BoldFont=HogeraMin-Bold,
-    Range="3000-"30FF, BoldFeatures={Color=007F00} }
+    Range="3000-"30FF, BoldFeatures={FakeBold=1} }
 }
 \end{lstlisting}
 のように指定することは出来ず，
@@ -6965,7 +6980,7 @@ UprightFeatures = {
   AltFont = { { Font=HogeraMin-Light, Range="3000-"30FF, } },
 },
 BoldFeatures = {
-  AltFont =  { { Font=HogeraMin-Bold, Range="3000-"30FF, Color=007F00 } },
+  AltFont =  { { Font=HogeraMin-Bold, Range="3000-"30FF, FakeBold=1 } },
 }
 \end{lstlisting}
 のように指定しなければならない．
@@ -6975,8 +6990,8 @@ BoldFeatures = {
 指定することは可能であり．また\ \texttt{YokoFeatures},~\texttt{TateFeatures} キーの
 中身に \texttt{AltFont} を指定することができる．
 
-また，\autoref{fig:yokotate-fontspec}後半部では6行目の色の指定が効かず，
-2行目で指定した\ \texttt{YokoFeatures},~\texttt{TateFeatures}\ による色の指定が有効になっ
+また，\autoref{fig:yokotate-fontspec}後半部では6行目の疑似太字無効化の指定が効かず，
+2行目で指定した\ \texttt{YokoFeatures},~\texttt{TateFeatures}\ による疑似太字の指定が有効になっ
 たままである．これは\emph{\ \texttt{YokoFeatures},~\texttt{TateFeatures}\ による
 OpenType機能指定は
 組方向に依存しないOpenType機能の指定より後に解釈される}からである．
@@ -7991,12 +8006,12 @@ There is not rounded gothic family in Kozuka fonts.
  &KozGoPro-Medium&KozGoProVI-Medium&KozGoPr6N-Medium\\
 \cmidrule(l){2-5}
 %<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
-%<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
+%<ja>\smash{\raisebox{2ex}{\textgt{ゴシック}}}%
  &bold&KozGoPro-Bold&KozGoProVI-Bold&KozGoPr6N-Bold\\
  &extra bold&KozGoPro-Heavy&KozGoProVI-Heavy&KozGoPr6N-Heavy\\
 \midrule
 %<en>\textit{rounded gothic}
-%<ja>\gt 丸ゴシック
+%<ja>\textgt{丸ゴシック}
 &&KozGoPro-Heavy&KozGoProVI-Heavy&KozGoPr6N-Heavy\\
 \bottomrule
 \end{tabular}
@@ -8037,18 +8052,17 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
  &Hiragino~Kaku~Gothic~Pro~W6&Hiragino~Kaku~Gothic~ProN~W6\\
 \cmidrule(l){2-4}
 %<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
-%<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
+%<ja>\smash{\raisebox{2ex}{\textgt{ゴシック}}}%
  &bold&Hiragino~Kaku~Gothic~Pro~W6&Hiragino~Kaku~Gothic~ProN~W6\\
  &extra bold&Hiragino~Kaku~Gothic~Std~W8&Hiragino~Kaku~Gothic~StdN~W8\\
 \midrule
 %<en>\textit{rounded gothic}
-%<ja>\gt 丸ゴシック
+%<ja>\textgt{丸ゴシック}
 &&Hiragino~Maru~Gothic~Pro~W4&Hiragino~Maru~Gothic~ProN~W4\\
 \bottomrule
 \end{tabular}
 \end{center}
 
-%<ja>\newpage
 \item[bizud] BIZ UD fonts (by Morisawa Inc.) bundled with
   Windows~10 October 2018 Update.
 \begin{center}\small
@@ -8063,12 +8077,12 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
  &medium&BIZ-UDGothicR.ttc\\
 \cmidrule(l){2-3}
 %<en>\textit{gothic}%
-%<ja>\gt ゴシック
+%<ja>\textgt{ゴシック}
  &bold&BIZ-UDGothicB.ttc\\
  &extra bold&BIZ-UDGothicB.ttc\\
 \midrule
 %<en>\textit{rounded gothic}
-%<ja>\gt 丸ゴシック
+%<ja>\textgt{丸ゴシック}
 &&BIZ-UDGothicB.ttc\\
 \bottomrule
 \end{tabular}
@@ -8086,18 +8100,18 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \midrule
  &medium&A-OTF-RyuminPro-Light.otf&A-OTF-RyuminPr6N-Light.otf\\
 %<en>\smash{\raisebox{1.5ex}{\textit{mincho}}}%
-%<ja>\smash{\raisebox{1.5ex}{\gt 明朝}}%
+%<ja>\smash{\raisebox{1.5ex}{\textgt{明朝}}}%
  &bold&A-OTF-FutoMinA101Pro-Bold.otf&A-OTF-FutoMinA101Pr6N-Bold.otf\\
 \midrule
  &medium
  &A-OTF-GothicBBBPro-Medium.otf&A-OTF-GothicBBBPr6N-Medium.otf\\
 %<en>\textit{gothic}%
-%<ja>\gt ゴシック
+%<ja>\textgt{ゴシック}
  &bold&A-OTF-FutoGoB101Pro-Bold.otf&A-OTF-FutoGoB101Pr6N-Bold.otf\\
  &extra bold&A-OTF-MidashiGoPro-MB31.otf&A-OTF-MidashiGoPr6N-MB31.otf\\
 \midrule
 %<en>\textit{rounded gothic}
-%<ja>\gt 丸ゴシック
+%<ja>\textgt{丸ゴシック}
 &&A-OTF-Jun101Pro-Light.otf&A-OTF-ShinMGoPr6N-Light.otf\\
 \bottomrule
 \end{tabular}
@@ -8125,12 +8139,12 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
         &YuGothic-Regular&YuGothic-Medium&YuGothic~Medium\\
 \cmidrule(l){2-5}
 %<en>\textit{gothic}%
-%<ja>\gt ゴシック
+%<ja>\textgt{ゴシック}
  &bold&YuGothic-Bold&YuGothic-Bold&YuGothic~Bold\\
  &extra bold&YuGothic-Bold&YuGothic-Bold&YuGothic~Bold\\
 \midrule
 %<en>\textit{rounded gothic}
-%<ja>\gt 丸ゴシック
+%<ja>\textgt{丸ゴシック}
 &&YuGothic-Bold&YuGothic-Bold&YuGothic~Bold\\
 \bottomrule
 \end{tabular}
@@ -8148,17 +8162,17 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \midrule
  &medium&Moga90Mincho&MogaMincho\\
 %<en>\smash{\raisebox{1.5ex}{\textit{mincho}}}%
-%<ja>\smash{\raisebox{1.5ex}{\gt 明朝}}%
+%<ja>\smash{\raisebox{1.5ex}{\textgt{明朝}}}%
  &bold&Moga90Mincho Bold&MogaMincho Bold\\
 \midrule
  &medium&Moga90Gothic&MogaGothic\\
 %<en>\textit{gothic}%
-%<ja>\gt ゴシック
+%<ja>\textgt{ゴシック}
  &bold&Moga90Gothic Bold&MogaGothic Bold\\
  &extra bold&Moga90Gothic Bold&MogaGothic Bold\\
 \midrule
 %<en>\textit{rounded gothic}
-%<ja>\gt 丸ゴシック
+%<ja>\textgt{丸ゴシック}
 &&Mobo90Gothic&MoboGothic\\
 \bottomrule
 \end{tabular}
@@ -8176,19 +8190,19 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \midrule
  &medium&Ume Mincho\\
 %<en>\smash{\raisebox{1.5ex}{\textit{mincho}}}%
-%<ja>\smash{\raisebox{1.5ex}{\gt 明朝}}%
+%<ja>\smash{\raisebox{1.5ex}{\textgt{明朝}}}%
  &bold&Ume Mincho\\
 \midrule
  &&Ume Gothic*\\
  &\smash{\raisebox{1.5ex}{medium}}&Ume Gothic O5\\
 \cmidrule(l){2-3}
 %<en>\textit{gothic}%
-%<ja>\gt ゴシック
+%<ja>\textgt{ゴシック}
  &bold&Ume Gothic O5\\
  &extra bold&Ume Gothic O5\\
 \midrule
 %<en>\textit{rounded gothic}
-%<ja>\gt 丸ゴシック
+%<ja>\textgt{丸ゴシック}
 &&Ume Gothic O5\\
 \bottomrule
 \end{tabular}
@@ -8215,12 +8229,12 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
  &\AD{Sans}{Medium}\\
 \cmidrule(l){2-4}
 %<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
-%<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
+%<ja>\smash{\raisebox{2ex}{\textgt{ゴシック}}}%
  &bold&\AD{Sans}{Bold}\\
  &extra bold&\AD{Sans}{Heavy}\\
 \midrule
 %<en>\textit{rounded gothic}
-%<ja>\gt 丸ゴシック
+%<ja>\textgt{丸ゴシック}
 &&\AD{Sans}{Heavy}\\
 \bottomrule
 \end{tabular}
@@ -8247,26 +8261,25 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
  &\AD{Sans}{Medium}\\
 \cmidrule(l){2-4}
 %<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
-%<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
+%<ja>\smash{\raisebox{2ex}{\textgt{ゴシック}}}%
  &bold&\AD{Sans}{Bold}\\
  &extra bold&\AD{Sans}{Black}\\
 \midrule
 %<en>\textit{rounded gothic}
-%<ja>\gt 丸ゴシック
+%<ja>\textgt{丸ゴシック}
 &&\AD{Sans}{Black}\\
 \bottomrule
 \end{tabular}
 \end{center}
 
- \item[haranoaji]  Harano Aji Fonts.
+\item[haranoaji]  Harano Aji Fonts.
 %<en>\par These fonts can be downloaded from\\\hfill \url{https://github.com/trueroad/HaranoAjiFonts}.
 %<ja>これらのフォントは \url{https://github.com/trueroad/HaranoAjiFonts} からダウンロードできる．
 %<*en>
 There is not rounded gothic family in Harano Aji Fonts.
 %</en>
 %<*ja>
-「原ノ味丸ゴシック」は存在しないので，
-便宜的に原ノ味角ゴシックHeavyによって代用している．
+「原ノ味丸ゴシック」は存在しないので，便宜的に原ノ味角ゴシックHeavyによって代用している．
 %</ja>
 \begin{center}\small
 \begin{tabular}{lll}
@@ -8284,18 +8297,18 @@ There is not rounded gothic family in Harano Aji Fonts.
  &HaranoAjiGothic-Medium.otf\\
 \cmidrule(l){2-3}
 %<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
-%<ja>\smash{\raisebox{2ex}{\gt ゴシック}}%
+%<ja>\smash{\raisebox{2ex}{\textgt{ゴシック}}}%
  &bold&HaranoAjiGothic-Bold.otf\\
  &extra bold&HaranoAjiGothic-Heavy.otf\\
 \midrule
 %<en>\textit{rounded gothic}
-%<ja>\gt 丸ゴシック
+%<ja>\textgt{丸ゴシック}
 &&HaranoAjiGothic-Heavy.otf\\
 \bottomrule
 \end{tabular}
 \end{center}
-
 \end{cslist}
+
 %<en>\subsubsection{Presets which do not support multi weights}
 %<ja>\subsubsection{単ウェイト用プリセット一覧}
 \label{sssec:ltjpreset-single}

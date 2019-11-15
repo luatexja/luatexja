@@ -27,12 +27,8 @@
   }
 \ProcessKeysOptions{ luatexja-fontspec }
 
-\RequirePackage{fontspec}[2017/01/01]% v2.5c
-\@ifpackagelater{fontspec}{2018/07/29}%
-  {\@ifpackagelater{fontspec}{2019/03/15}%
-    {\RequirePackage{luatexja-fontspec-27c}} % v2.7c
-    {\RequirePackage{luatexja-fontspec-26h}}}% v2.6h
-  {\RequirePackage{luatexja-fontspec-25c}}   % v2.5c
+\RequirePackage{fontspec}[2019/03/15]% v2.7c
+\RequirePackage{luatexja-fontspec-27c} % v2.7c
 
 \ExplSyntaxOff
 %%%%%%%% Now we completely ignore kanjifont definition file.

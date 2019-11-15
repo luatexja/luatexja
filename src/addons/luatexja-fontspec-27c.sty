@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec-27c}[2019/05/14 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec-27c}[2019/11/15 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e}
 \ExplSyntaxOn
 
@@ -226,7 +226,7 @@
       \l__fontspec_sizing_leftover_clist
     \tl_if_empty:NT \l__fontspec_size_tl { \__fontspec_error:n {no-size-info} }
 
-	\str_if_eq:nnTF { \g__fontspec_nfss_enc_tl } { JY3 } {
+	\str_if_eq:eeTF { \g__fontspec_nfss_enc_tl } { JY3 } {
       % "normal"
       \__fontspec_load_fontname:Nn \l_fontspec_fontname_tl {\l__fontspec_sizedfont_tl}
     } {
@@ -266,7 +266,7 @@
 %%% Altfont 内部処理部
 \cs_new:Nn \__ltj_fontspec_make_font_shapes_alt:Nnnnnn {
   \group_begin:
-    \str_if_eq:nnTF { #6 } { JY3 } {
+    \str_if_eq:eeTF { #6 } { JY3 } {
       \cs_set_eq:NN \__fontspec_declare_shape:nnxx \__ltj_fontspec_declare_shape_yoko:nnxx
     }{
       \cs_set_eq:NN \__fontspec_declare_shape:nnxx \__ltj_fontspec_declare_shape_tate:nnxx
