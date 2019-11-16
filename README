@@ -23,7 +23,7 @@ Installation
 0. Please make sure that your TeX distribution is up-to-date.
    This version of LuaTeX-ja requires
     - LuaTeX 1.0.0 or later
-    - luaotfload (v2.98 or later recommended)
+    - luaotfload (v3.1 or later recommended)
     - adobemapping (Adobe CMap files)
     - everysel package
     - etoolbox package
@@ -34,8 +34,8 @@ Installation
     - stfloats package
     - IPAex fonts (http://ipafont.ipa.go.jp/)
 
-   LuaHBTeX and HarfTeX are not supported for now. With these engines,
-   one might be able to typeset documents without an error, but with
+   Using LuaTeX-ja with LuaHBTeX is not well tested.
+   One might be able to typeset documents without an error, but with
    some unwanted results.
 
 1. If you are using TeX Live 2019 or later, you can install LuaTeX-ja via tlmgr.
@@ -79,6 +79,9 @@ Simply loading luatexja.sty by \input or \usepackage does the minimal setting.
 
 Notes
 -----
+* We don't recommend defining a Japanese font with HarfBuzz, by specifying
+  "Renderer=..." (fontspec) or "mode=harf" (otherwise).
+
 * This archive contains four .{dtx,ins} pairs:
     src/ltjclasses.{ins,dtx},  src/ltjltxdoc.{ins,dtx}
     src/ltjsclasses.{ins,dtx}, doc/luatexja.{ins,dtx}

@@ -17,25 +17,10 @@
 \makeatletter
 %%%%%%%%
 \def\pgfsysdriver{pgfsys-pdftex.def}
-\directlua{if jit then jit.on() end}
 \usepackage{metalogo,amsmath,array,tikz,pict2e,multienum,float,mathtools}
 \usepackage{booktabs,multicol,luatexja-ruby}
 \usepackage[all]{xy}
 \usepackage{lltjext,alltt,comment}
-
-%%%%%%%% Lua GC
-\patchcmd\@outputpage{\stepcounter{page}}{%
-  \directlua{%
-	if jit then
-      local k = collectgarbage("count")
-      if k>900000 then 
-        collectgarbage("collect")
-        texio.write_nl("term and log", "GC: ", math.floor(k), math.floor(collectgarbage("count")))
-      end
-	end
-  }%
-  \stepcounter{page}%
-}{}{}
 
 %%%%%%%% fonts
 \usepackage{luatexja-otf}
@@ -88,14 +73,22 @@
 
 \def\IVS#1{\char\numexpr "E0100+#1\relax}%"
 \def\IVSA#1#2#3#4#5{%
-  \textcolor{blue}{\raisebox{3.5pt}{\normalfont\ttfamily%
-    \fboxsep=0.5pt\fbox{\tiny \oalign{0#1#2\crcr#3#4#5\crcr}}}}%
+  \hbox to1em{\hss\textcolor{blue}{\raisebox{3.5pt}{\normalfont\ttfamily%
+    \fboxsep=0.5pt\fbox{\hbox to0.75em{\hss\tiny \oalign{0#1#2\crcr#3#4#5\crcr}\hss}}}}\hss}%
 }
 {\catcode`\%=11
   \gdef\IVSB#1{\expandafter\IVSA\directlua{
     local cat_str = luatexbase.catcodetables['string']
     tex.sprint(cat_str, string.format('%X', 0xE00EF+#1))
 }}}
+\def\UCSA#1#2#3#4{%
+  \hbox to1em{\hss\textcolor{blue}{\raisebox{3.5pt}{\normalfont\ttfamily%
+    \fboxsep=0.5pt\fbox{\hbox to0.75em{\hss\tiny \oalign{#1#2\crcr#3#4\crcr}\hss}}}}\hss}%
+}
+\def\UCSB#1#2{%
+  \hbox to1em{\hss\textcolor{red}{\raisebox{3.5pt}{\normalfont\ttfamily%
+    \fboxsep=0.5pt\fbox{\hbox to0.75em{\hss\tiny \oalign{\hss#1\hss\crcr\hss#2\hss\crcr}\hss}}}}\hss}%
+}
 
 \usepackage{listings,showexpl,enumitem}
 \lstset{
@@ -649,7 +642,7 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %<ja>\section{使い方}
 %<en>\subsection{Installation}
 %<ja>\subsection{インストール}
-
+\label{ssec:install}
 %<en>The following packages are needed for the \LuaTeX-ja\ package.
 %<ja>\LuaTeX-jaパッケージの動作には次のパッケージ類が必要である．
 \begin{itemize}
@@ -696,7 +689,7 @@ Maybe documents can typeset without an error,
 but with unwanted results (especially, vertical typesetting and \cs{CID}).
 
 Especially,
-\emph{We don't recommend defining a Japanese font with Harfbuzz},
+\emph{We don't recommend defining a Japanese font with HarfBuzz},
 by specifying \texttt{Renderer=Harfbuzz}~etc.\ (\Pkg{fontspec}) or~{mode=harf} (otherwise).
 %</en>
 %<*ja>
@@ -1172,8 +1165,7 @@ so \Pkg{ltjsclasses} uses the \texttt{nomag*} option\footnote{Same effect as
 \footnote{\Pkg{jsclasses}や，八登崇之氏による\Pkg{BXjscls}クラスにおける同名のオプションと
   同じ．上記クラスは\TeX コードのみで実装しているが，\Pkg{ltjsclasses}ではLuaコードも用いている．}が標準で
 有効になっており，これを使って本文フォントサイズの設定を行っている．
-しかし，この\texttt{nomag*}オプションでは（20180121.0版より前の版において\Pkg{unicode-math}パッケージ使用時に
-起きたように）予想外の意図しない現象に遭遇する危険がある．そのような場合は
+しかし，この\texttt{nomag*}オプションでは（バージョン20180121.0より前で\Pkg{unicode-math}パッケージ使用時に起きたように）予想外の意図しない現象に遭遇する危険がある．そのような場合は
 \cs{documentclass}において\texttt{nomag}オプションを指定してほしい．
 %</ja>
 
@@ -2134,6 +2126,52 @@ setting, you can use \cs{ltjalchar} and \cs{ltjjachar} respectively, as the foll
 ¶, \ltjalchar`¶, \ltjjachar`¶\\   % default: ALchar
 α, \ltjalchar`α, \ltjjachar`α  % default: JAchar
 \end{LTXexample}
+%</ja>
+
+%<*ja>
+\paragraph{絵文字など，複数コードポイントの列で表現される字形をを利用する場合の注意}
+（\Pkg{luaotfload}による）OpenType機能や合字等の処理は，\LuaTeX-jaが
+段落・水平ボックスの中身全体に対して「この文字は\textbf{JAchar}だから和文フォントで組む」と
+フォントを置き換えた後に適用される．
+そのため，異体字セレクタや絵文字といった複数のコードポイントの列で表現される文字を
+組む場合には，列全体で\textbf{JAchar}の範囲か\textbf{ALchar}の範囲かが
+統一されていないといけない．
+
+例えば，CJK統合漢字（とその拡張達）と
+IVS用の異体字セレクタ(\texttt{U+E0100}--\texttt{U+E01EF})は標準では
+どちらも同じ文字範囲6であるため，（フォントがサポートしていれば）IVSは正しく機能する．
+しかし，下の例のように異体字セレクタを\textbf{ALchar}の文字範囲(4)に移動させると，
+IVSは機能しなくなる：
+\ltjdefcharrange{4}{"E0100-"E01EF}
+\begin{LTXexample}
+\ltjdefcharrange{4}{"E0100-"E01EF}
+葛󠄀城市，葛󠄁飾区，葛西
+\end{LTXexample}
+\ltjdefcharrange{6}{"E0100-"E01EF}
+
+また，標準では絵文字として使われる可能性が大きい一部の文字が\textbf{JAchar}となっている
+\footnote{同じUnicodeブロック内にAdobe-Japan1-6の文字があったため．}．
+絵文字を用いる場合にはこの点に留意する必要がある．
+
+\begin{center}
+  \begin{minipage}{.5\textwidth}\small\ttfamily
+\verb!\ltjsetparameter{jacharrange={+3}}!\\
+\verb!\font\nce=NotoColorEmoji.ttf:mode=harf\nce!\\
+\IVSA 1F469\UCSB{ZW}{J}\UCSA 2764\UCSB{VS}{16}\UCSB{ZW}J\IVSA 1F48B\UCSB{ZW}J\IVSA 1F468\ 
+  \textcolor{green}{\% U+2764: JAchar}\\
+\verb!\ltjsetparameter{jacharrange={-3}}!\\
+\IVSA 1F469\UCSB{ZW}{J}\UCSA 2764\UCSB{VS}{16}\UCSB{ZW}J\IVSA 1F48B\UCSB{ZW}J\IVSA 1F468\ 
+  \textcolor{green}{\% U+2764: ALchar}
+  \end{minipage}%
+  \begin{minipage}{.5\textwidth}
+\ltjsetparameter{jacharrange={+3}}
+\font\nce=NotoColorEmoji.ttf:mode=harf\nce
+👩‍❤️‍💋‍👨
+\ltjsetparameter{jacharrange={-3}}
+👩‍❤️‍💋‍👨
+  \end{minipage}
+\end{center}
+\ltjsetparameter{jacharrange={+3}}
 %</ja>
 
 
@@ -6444,8 +6482,8 @@ to <family>. See Subsection~\ref{ssec:fontfamilycmd} for detail.
 \begin{LTXexample}[pos=b]
 \DeclareKanjiFamily{JY3}{edm}{}
 \DeclareFontShape{JY3}{edm}{m}{n}   {<-> s*KozMinPr6N-Regular:jfm=ujis;}{}
-\DeclareFontShape{JY3}{edm}{m}{fb}  {<-> s*KozMinPr6N-Regular:jfm=ujis;embolden=1}{}
-\DeclareFontShape{JY3}{edm}{m}{fb2} {<-> s*KozMinPr6N-Regular:jfm=ujis;embolden=1.5}{}
+\DeclareFontShape{JY3}{edm}{m}{fb}  {<-> s*KozGoPr6N-Regular:jfm=ujis}{}
+\DeclareFontShape{JY3}{edm}{m}{fb2} {<-> s*KozGoPr6N-Medium:jfm=ujis}{}
 \DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{fb}{ "4E00-"67FF,{-2}-{-2}}
 \DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{fb2}{"6800-"9FFF}
 {\kanjifamily{edm}\selectfont
@@ -6875,8 +6913,8 @@ A demonstrarion is shown in \autoref{fig:yokotate-fontspec}.
 \begin{LTXexample}[pos=b]
 \jfontspec[
   AltFont={
-    {Range="4E00-"67FF, FakeBold=4},
-    {Range="6800-"9EFF, FakeBold=8},
+    {Range="4E00-"67FF, Font=KozGoPr6N-Medium},
+    {Range="6800-"9EFF, FakeBold=4},
     {Range="3040-"306F, Font=KozGoPr6N-Regular},
   }
 ]{KozMinPr6N-Regular}
@@ -7086,13 +7124,13 @@ ordinary characters in the following points:
   有効か無効かを問わず，\cs{UTF} で出力される文字にはこれらのOpenType機能が働いた字形になる．
 %</ja>
 %<*en>
-\item Processing codes for supporting other OpenType features (for example,
+\item Processes for supporting other OpenType features (for example,
       glyph replacement and kerning) by the \Pkg{luaotfload} package
       is not performed to these characters.
 %</en>
 %<*ja>
 \item その他のOpenType機能（例えばグリフ置換やカーニング）をサポートするための
-  \Pkg{luaotfload}パッケージのコードはこれらの文字には働かない．
+  \Pkg{luaotfload}パッケージによる処理はこれらの文字には働かない．
 %</ja>
 \end{itemize}
 
@@ -8826,19 +8864,19 @@ Nodes for \LuaTeX-ja's stack system (see the next
 
 \item[\textit{char\_by\_cid}]
 %<*en>
-Nodes for \textbf{JAchar} which the callback process of
-	   \Pkg{luaotfload} won't be applied, and the character code is
+Nodes for \textbf{JAchar} which processes by \Pkg{luaotfload} won't be applied,
+       and the character code is
 	   stored in the \texttt{value} field. Each node of this type are
            converted to a \textit{glyph\_node} \emph{after}
-	   the callback process of luaotfload.
-Nodes of this type is used in \cs{CID}, \cs{UTF} and IVS support.
+	   processes by luaotfload.
+Nodes of this type is used in \cs{CID}~and~\cs{UTF}.
 %</en>
 %<*ja>
-\Pkg{luaotfload}のコールバックによる処理が適用されない\textbf{JAchar}のためのノードで，
+\Pkg{luaotfload}による処理が適用されない\textbf{JAchar}のためのノードで，
 \texttt{value} フィールドに文字コードが格納されている．
 この種類のノードはそれぞれが\Pkg{luaotfload}のコールバックの処理の
 \emph{後で}\textit{glyph\_node}に変換される．
-\cs{CID}, \cs{UTF}やIVS対応処理でこの種類のノードが利用されている．
+\cs{CID}, \cs{UTF}でこの種類のノードが利用されている．
 %</ja>
 
 \item[\textit{replace\_vs}]
@@ -10399,9 +10437,8 @@ variation selectors are ``combined'' with the previous character.
 
 \texttt{vsraw}は，ブール値の値をとるキーであり，標準ではfalseである．
 \begin{itemize}
- \item trueの場合は，異体字セレクタは「直前の文字に続けて」出力される．
-もしもIVSサポート（\ref{ssec:ltjotf}節）が有効になっていた場合は，
-以下の例（左側は入力，右側はその出力）のようになる．
+ \item trueの場合は，異体字セレクタは「直前の文字に続けて」出力されるため，
+例えば以下の例（左側は入力，右側はその出力）のようになる．
 %</ja>
 \begin{LTXexample}
 \begin{lstlisting}[vsraw=true]
@@ -10429,8 +10466,8 @@ The default setting of the \texttt{vscmd} key produces the following.
 %<en> For example, the following code is the setting of the \texttt{vscmd} key in this document.
 \begin{lstlisting}[numbers=left]
 \def\IVSA#1#2#3#4#5{%
-  \textcolor{blue}{\raisebox{3.5pt}{\tt%
-    \fboxsep=0.5pt\fbox{\tiny \oalign{0#1#2\crcr#3#4#5\crcr}}}}%
+  \hbox to1em{\hss\textcolor{blue}{\raisebox{3.5pt}{\normalfont\ttfamily%
+    \fboxsep=0.5pt\fbox{\hbox to0.75em{\hss\tiny \oalign{0#1#2\crcr#3#4#5\crcr}\hss}}}}\hss}%
 }
 {\catcode`\%=11
   \gdef\IVSB#1{\expandafter\IVSA\directlua{
