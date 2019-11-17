@@ -773,16 +773,18 @@ do
       if rotate_in_uax50(i) then rot[i] = true end
     end
     ltju.loop_over_feat(tfmdata, vert_vrt2, function (i,k) rot[i] = nil end)
-    -- 同じグリフが複数の Unicode ポイントを持っている場合．
-    -- いずれかの Unicode ポイントで rot = true ならば全体で rotate
-    ltju.loop_over_duplicates(tfmdata,
-       function (i, v)
-         local f = rot[i]
-         if not f then
-            for j,_ in pairs(v) do if rot[j] then f=true; break end end
-         end
-         rot[i]=f; for j,_ in pairs(v) do rot[j]=f end
-       end)
+    -- ↓「TeX Live 2019のLuaLaTeXで縦書きの三点リーダーが横書きになる」
+    -- (https://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=2722) により無効化
+    -- -- 同じグリフが複数の Unicode ポイントを持っている場合．
+    -- -- いずれかの Unicode ポイントで rot = true ならば全体で rotate
+    --ltju.loop_over_duplicates(tfmdata,
+    --   function (i, v)
+    --     local f = rot[i]
+    --     if not f then
+    --        for j,_ in pairs(v) do if rot[j] then f=true; break end end
+    --     end
+    --     rot[i]=f; for j,_ in pairs(v) do rot[j]=f end
+    --   end)
     for i,_ in pairs(rot) do
        dest = dest or {}; dest.rotation = dest.rotation or {}
        dest.rotation[i] = true
