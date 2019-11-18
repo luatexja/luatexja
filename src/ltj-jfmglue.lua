@@ -31,9 +31,10 @@ local if_lang_ja
 do
     local lang_ja = luatexja.lang_ja
     local getlang = node.direct.getlang
+    -- glyph with font number 0 (\nullfont) is always considered an ALchar node
     if_lang_ja = getlang 
-      and function (n) return getlang(n)==lang_ja end
-      or  function (n) return getfield(n,'lang')==lang_ja end
+      and function (n) return (getlang(n)==lang_ja)and(getfont(n)~=0) end
+      or  function (n) return (getfield(n,'lang')==lang_ja)and(getfont(n)~=0) end
 end
   
 local has_attr = node.direct.has_attribute
