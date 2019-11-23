@@ -44,7 +44,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2019/08/12 ltjsclasses ]
+  [2019/11/23 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass[disablejfam]{ltjsarticle}
@@ -53,12 +53,18 @@
 \begingroup
  \suppressfontnotfounderror=1
  \global\font\testfont=file:KozMinPr6N-Regular.otf
+ \global\font\testfonta=file:HaranoAjiMincho-Regular.otf
 \endgroup
-\ifx\testfont\nullfont
+\ifx\testfonta\nullfont\ifx\testfont\nullfont
   \usepackage[ipaex,nfssonly]{luatexja-preset}
 \else
   \usepackage[kozuka-pr6n,nfssonly]{luatexja-preset}
-\fi  
+\fi\else
+  \usepackage[haranoaji,nfssonly]{luatexja-preset}
+\fi
+\let\testfont\undefined\let\testfonta\undefined
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
 \ltjsetparameter{alxspmode={`\*,allow}}
 \ltjsetparameter{alxspmode={`\\,allow}}
 %%%%\usepackage{unicode-math}

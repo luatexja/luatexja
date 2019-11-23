@@ -4,8 +4,11 @@
 %  Original: jltxdoc.dtx
 %
 %  Copyright 1995,1996,1997  ASCII Corporation.
+%  Copyright (c) 2010 ASCII MEDIA WORKS
+%  Copyright (c) 2016 Japanese TeX Development Community
+%  Copyright (c) 2016-2017 Japanese TeX Development Community
 %
-%  This file is part of pLaTeX2e system.
+%  This file is part of the pLaTeX2e system (community edition).
 %  -------------------------------------
 %
 % \fi
@@ -31,7 +34,19 @@
 %<*driver>
 \documentclass{ltjltxdoc}
 \GetFileInfo{ltjltxdoc.cls}
-\usepackage[kozuka-pr6n]{luatexja-preset}
+\begingroup
+ \suppressfontnotfounderror=1
+ \global\font\testfont=file:KozMinPr6N-Regular.otf
+ \global\font\testfonta=file:HaranoAjiMincho-Regular.otf
+\endgroup
+\ifx\testfonta\nullfont\ifx\testfont\nullfont
+  \usepackage[ipaex,nfssonly]{luatexja-preset}
+\else
+  \usepackage[kozuka-pr6n,nfssonly]{luatexja-preset}
+\fi\else
+  \usepackage[haranoaji,nfssonly]{luatexja-preset}
+\fi
+\let\testfont\undefined\let\testfonta\undefined
 \usepackage{unicode-math}
 \setmathfont{Latin Modern Math}
 \title{Lua\LaTeX-jaドキュメント記述用クラス}

@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesFile{ltjsize12.clo}
-  [2019/10/17 v1.8c-ltj-17
+  [2019/11/23 v1.8d-ltj-17
   Standard LuaLaTeX-ja file (size option)]
 \renewcommand{\normalsize}{%
     \@setfontsize\normalsize\@xiipt{16.5}%
@@ -33,7 +33,9 @@
    \belowdisplayskip \abovedisplayskip
    \let\@listi\@listI}
 \normalsize
-\MakeRobust\normalsize
+\ifx\MakeRobust\@undefined \else
+  \MakeRobust\normalsize
+\fi
 \setbox0\hbox{漢}
 \setlength\Cht{\ht0}
 \setlength\Cdp{\dp0}
