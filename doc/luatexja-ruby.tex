@@ -1,16 +1,20 @@
-%#! luajitlatex
+%#! lualatex
 %%% a test of ruby.
 \documentclass[a4paper,10pt]{ltjsarticle}
-\usepackage{luatexja-otf,amsmath}
+\usepackage{luatexja-otf,amsmath,bxghost}
+\usepackage[no-math]{fontspec}
 \usepackage[match]{luatexja-fontspec}
-\usepackage[kozuka-pr6n]{luatexja-preset}\normalsize
+\usepackage[haranoaji]{luatexja-preset}\normalsize
+\setmonojfont{HaranoAjiGothic-Regular.otf}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+
 \def\emph#1{\textbf{\textgt{#1}}}
 \def\headfont{\normalfont\bfseries\gtfamily}
-\setmonojfont{KozGoPr6N-Regular.otf}
-
-\usepackage[textwidth=45\zw, lines=45, footskip=6mm]{geometry}
+\def\cs#1{\eghostguarded{\texttt{\textbackslash#1}}}
+\usepackage[textwidth=45\zw, lines=45, footskip=2\zh]{geometry}
 \advance\leftmargini-1\zw\advance\leftmarginii-1\zw
-\protected\def\Param#1{\underline{\smash{\textsf{\mdseries #1}}}}
+\protected\def\Param#1{\eghostguarded{\underline{\smash{\textsf{\mdseries #1}}}}}
 
 \usepackage{luatexja-ruby,showexpl,booktabs}
 \lstset{
@@ -30,17 +34,17 @@
 }
 
 \def\Node#1#2{\,\vcenter{\hbox{\fboxsep=1pt\fbox{\vbox{\small\halign{\hfil##\hfil\cr
-  #1\mathstrut\cr\noalign{\hrule height.4pt}\strut#2\cr}}}}\,}}
+  #1\mathstrut\cr\noalign{\smallskip\hrule height.4pt\smallskip}\strut\<#2\cr}}}}}\,}
 \def\LuaTeX{Lua\TeX}
 
 % 三分ルビ用
 \DeclareFontShape{JY3}{mc}{mc}{n}{<-> [0.92487] 
-  KozMinPr6N-Regular:extend=0.67;jfm=ujisc33}{}
+  HaranoAjiMincho-Regular:extend=0.67;jfm=ujisc33}{}
 
 \title{\textsf{luatexja-ruby}パッケージ}
 \begin{document}
 \catcode`\<=13
-\def<#1>{{\normalfont\rm\itshape$\langle$#1\/$\rangle$}}
+\def<#1>{{\rmfamily\mdseries\itshape$\langle$#1\/$\rangle$}}
 %\fontsize{13.19873}{15}\selectfont%
 
 \maketitle
@@ -76,17 +80,17 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 \end{quotation}
 
 \subsection{\ruby{命|令}{めい|れい}}
-\paragraph{\tt\textbackslash ltjruby}
+\paragraph{\cs{ltjruby}}
 ルビ出力用命令の本体．\verb+\ruby+ という別名を定義している．
 \begin{quote}
-\tt \textbackslash ltjruby[<option>]\{親|文|字\}\{おや|も|じ\}
+\ttfamily \textbackslash ltjruby[<option>]\{親|文|字\}\{おや|も|じ\}
 \end{quote}
 のように使用する．
 第2・第3引数内の「\verb+|+」はグループの区切りを表す．詳細は\ref{ssec:grp}\nobreak 小節を参照．
 
 <option>には以下の内容をkey-valueリストで指定可能である：
 \begin{description}
-\def\makelabel#1{\tt#1}
+\def\makelabel#1{\ttfamily\bfseries #1}
 \item[pre=<real>] 前進入許容量をルビ全角単位で指定．
 負の長さを指定した場合は，ルビの状況や直前の文字に応じた自動指定を意味する．
 既定値は負（つまり，自動指定）．
@@ -102,13 +106,13 @@ plain \LuaTeX でのロードはまだサポートしておらず，
  \item[bit 2--3] ルビ文字の突出量$x$から実際の前進入量$b$，後進入量$a$の計算方法を指定する．
 親文字の文字数が$k+1$，親文字の前に入る空白量・間の空白量・後ろの空白量の比が$p:q:r$のとき，
 \begin{description}
- \item[00] $b=\min\{B, xp/[p+kq+r]\}$, \ $a=\min\{A, xr/[p+kq+r]\}$
- \item[01] $b=\min(B, x)$, \ $a=\min[A, \max(x-b,0)]$
- \item[10] $a=\min(A, x)$, \ $b=\min[B, \max(x-a,0)]$
+ \item[00] $b=\min(B, xp/(p+kq+r))$, \ $a=\min(A, xr/(p+kq+r))$
+ \item[01] $b=\min(B, x)$, \ $a=\min(A, \max(x-b,0))$
+ \item[10] $a=\min(A, x)$, \ $b=\min(B, \max(x-a,0))$
  \item[11] $M=\min(B,A)$とおく．もし$x\le 2M$ならば$b=a=x/2$．そうでなければ
 \[
- b=\min\left(B, M + \frac{(x-2M)p}{p+kp+r}\right),\qquad 
- a=\min\left(A, M + \frac{(x-2M)r}{p+kp+r}\right)
+ b=\min\left(B, M + \frac{(x-2M)p}{p+kq+r}\right),\qquad 
+ a=\min\left(A, M + \frac{(x-2M)r}{p+kq+r}\right)
 \]
 \end{description}
 
@@ -208,7 +212,7 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 普通はこの2つのうちいずれかを設定するだけで足りるだろう．
 
 \begin{description}
-\def\makelabel#1{\tt#1}
+\def\makelabel#1{\ttfamily\bfseries #1}
 \item[naka] 以下のオプションを同時に設定する．主に中付きルビを組むときに用いる．
 \begin{verbatim}
 mode=1, stretch={1}{2}{1}, stretchruby={1}{2}{1}
@@ -219,7 +223,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \end{verbatim}
 \end{description}
 
-\paragraph{\tt\textbackslash ltjsetruby\{<option>\}}
+\paragraph{\cs{ltjsetruby}\{<option>\}}
 <option>の既定値を指定する．\textsf{luatexja-ruby}読み込み時の値は
 各項目の所で既に説明してあるが，次のようになっている．
 \begin{verbatim}
@@ -232,9 +236,9 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 
 \paragraph{\texttt{\textbackslash ltjsetparamater} に追加されるキー}
 \begin{description}
-\item[\Param{rubypreintrusion}\tt =\{<chr\_code>, <pre\_int>\}]
+\item[\Param{rubypreintrusion}\ttfamily =\{<chr\_code>, <pre\_int>\}]
 文字<chr\_code> に，その\textbf{直後}のルビによって掛けられるルビ文字列の最大長をルビ全角単位で指定．
-\item[\Param{rubypostintrusion}\tt =\{<chr\_code>, <post\_int>\}]
+\item[\Param{rubypostintrusion}\ttfamily =\{<chr\_code>, <post\_int>\}]
 文字<chr\_code> に，その\textbf{直前}のルビによって掛けられるルビ文字列の最大長をルビ全角単位で指定．
 \end{description}
 既定値は，\Param{rubypreintrusion},~\Param{rubypostintrusion}とも
@@ -249,7 +253,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \paragraph{\texttt{\textbackslash ltjkenten}}
 圏点を出力する命令で，\verb+\kenten+ という別名を定義している．
 \begin{quote}
- \tt \textbackslash ltjkenten[<option>]\{親文字\}
+ \ttfamily\cs{ltjkenten}[<option>]\{親文字\}
 \end{quote}
 のように使用する．複数文字に圏点をつける場合でも，\verb+\ltjruby+ のように「\texttt{|}」を使って
 文字を区切る\textbf{必要はない}ことに注意してほしい．
@@ -260,7 +264,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \subsection{グループの\ruby{指|定}{し|てい}}
 \label{ssec:grp}
 \begin{quote}
-\tt \textbackslash ltjruby[<option>]\{親|文|字\}\{おや|も|じ\}
+\ttfamily\cs{ltjruby}[<option>]\{親|文|字\}\{おや|も|じ\}
 \end{quote}
 のように，\verb+\ltjruby+\ の第2・第3引数内の「\verb+|+」はグループの区切りを表す．
 グループの数は両者で一致しなければならず，
@@ -279,7 +283,6 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \ltjruby{普}{ふ}\ltjruby{通}{つう}\ltjruby{車}{しや}
 \end{verbatim}
 
-\newpage
 複数グループかつ上記の条件を満たさない場合は，
 所謂「可動グループルビ」であり，ルビの前後や各グループの切れ目で行分割が可能となる．
 例えば

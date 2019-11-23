@@ -1,17 +1,17 @@
-%#! luajitlatex
+%#! lualatex
 \documentclass[a4paper,10pt]{ltjsarticle}
 \usepackage[textwidth=45\zw, lines=45, footskip=2\zh, verbose]{geometry}
-\usepackage{listings,amsmath,booktabs,lltjext}
-\usepackage[match]{luatexja-fontspec}
+\usepackage{listings,amsmath,booktabs,lltjext,bxghost}
 \usepackage{unicode-math}
-\setmathfont{XITS Math}
-\setmainfont{TeX Gyre Termes}
-\setsansfont[Scale=0.95]{TeX Gyre Heros}
-\usepackage[kozuka-pr6n]{luatexja-preset}\normalsize
+\setmathfont{Latin Modern Math}
+\usepackage[match]{luatexja-fontspec}
+\usepackage[haranoaji]{luatexja-preset}
+\setmonojfont{HaranoAjiGothic-Regular}
+\normalsize
 \def\emph#1{\textbf{\textgt{\mathversion{bold}#1}}}
 \def\headfont{\normalfont\bfseries\gtfamily}
 \def\pTeX{p\kern-.05em\TeX}
-\def\cs#1{\text{\texttt{\char`\\#1}}}
+\def\cs#1{\text{\eghostguarded{\texttt{\char`\\#1}}}}
 \protected\def\Pkg#1{\textsf{#1}}
 \protected\def\>{\hskip\ltjgetparameter{xkanjiskip}}
 \lstset{
@@ -244,7 +244,7 @@ $5\,\textrm{pt} + 3.41666\,\textrm{pt}=8.41666\,\textrm{pt}$である．}
 \Pkg{lltjp-geometry}では
 \begin{quote}
  \texttt{lines}オプション指定時，\cs{topskip}の値を最低でも
- \emph{\cs{tstrutbox}の高さ($\cs{baselineskip}/2$)}まで引き上げる
+ \emph{\cs{tstrutbox}の高さ}($\cs{baselineskip}/2$)まで引き上げる
 \end{quote}
 という挙動にした．見かけ上は\cs{topskip}の値制限が緩くなったが，前節で述べたように
 欧文フォントのベースラインは和文に合うように下にずらされるので，
@@ -278,8 +278,8 @@ $5\,\textrm{pt} + 3.41666\,\textrm{pt}=8.41666\,\textrm{pt}$である．}
 \cs{topskip}だけ左にずれたところにあり，
 一方ページの最終行のベースラインは本文領域の左端にある．
 縦組和文フォントのベースラインは文字の左右中央を通ることから，
-従って，\emph{見た目で言えば，右余白の方が$\cs{topskip}=8.5\,\textrm{pt}$だけ
-大きい}ということになってしまう\footnote{%
+従って，\emph{見た目で言えば，右余白の方が\cs{topskip}}~($=8.5\,\textrm{pt}$)%
+\emph{だけ大きい}ということになってしまう\footnote{%
   同様に，横組で \texttt{vcentering}を指定すると，見かけでは
   $\cs{topskip}-\cs{Cht}+\cs{Cdp}$だけ上余白が大きいように見える．
 }．
