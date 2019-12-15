@@ -205,6 +205,7 @@
     \language\l@nohyphenation
     \@ifstar\@sverb\@verb}
 \fi
+\patchcmd{\do@noligs}{\kern\z@}{\vadjust{}}{}{} % reported by p_typo
 \gdef\@stopfield{%
   \inhibitglue\@tempskipa\lastskip\unskip
   \hskip\@tempskipa\color@endgroup\egroup}
