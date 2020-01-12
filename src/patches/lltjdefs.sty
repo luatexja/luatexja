@@ -77,9 +77,19 @@
   \DeclareMathAlphabet{\mathgt}{JY3}{gt}{m}{n}
 \fi
 
+\ifdefined\fontseriesforce
+\def\bfseries@mc{bx}
+\def\bfseries@gt{bx}
+\def\bfseries@jtt{\bfseries@gt}
+\def\mdseries@mc{m}
+\def\mdseries@gt{m}
+\def\mdseries@jtt{\mdseries@jtt}
+\fi
+
 \newif\if@ltj@match@family
 \@ltj@match@familyfalse
 \def\verbatim@font{\normalfont\ttfamily\kanjifamily\jttdefault\selectfont}
+
 \def\@ltj@hook@family#1#2{ % #1: csname #2: contents
   \ifcsname @#1hook\endcsname % LaTeX 2020-02-02
 	\csappto{@#1hook}{#2}%
@@ -93,9 +103,21 @@
 	\fi
   \fi
 }
-\@ltj@hook@family{rmfamily}{\if@ltj@match@family\kanjifamily\mcdefault\fi}
-\@ltj@hook@family{sffamily}{\if@ltj@match@family\kanjifamily\gtdefault\fi}
-\@ltj@hook@family{ttfamily}{\if@ltj@match@family\kanjifamily\jttdefault\fi}
+\@ltj@hook@family{rmfamily}{%
+  \if@ltj@match@family
+    \prepare@family@series@update@kanji{mc}\mcdefault
+  \fi
+}
+\@ltj@hook@family{sffamily}{%
+  \if@ltj@match@family
+    \prepare@family@series@update@kanji{gt}\gtdefault
+  \fi
+}
+\@ltj@hook@family{ttfamily}{%
+  \if@ltj@match@family
+    \prepare@family@series@update@kanji{jtt}\jttdefault
+  \fi
+}
 
 %%% \eminnershape
 \expandafter\patchcmd\csname em \endcsname{\itshape}{\gtfamily\itshape}{}{}
