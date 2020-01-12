@@ -1,0 +1,19 @@
+\documentclass{ltjarticle}
+\makeatletter
+\def\TEST{%
+ \par
+  A: \f@encoding/\f@family/\f@series/\f@shape.
+  K: \k@encoding/\k@family/\k@series/\k@shape.
+  あいうABC
+}
+\begin{document}
+
+\bfdefault
+\TEST
+\emph{\TEST}
+\textsf{\TEST}
+\textbf{\TEST}
+{\fontseries{b}\selectfont \TEST}
+{\fontseries{bx}\selectfont \TEST}
+\textsc{\textit{\TEST}}
+\end{document}

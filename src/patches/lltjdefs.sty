@@ -40,8 +40,8 @@
 \DeclareFontShape{JY3}{gt}{m}{n}{<-> s*[\ifdefined\Cjascale\Cjascale\else 0.962216\fi] \ltj@stdgtfont:jfm=\ltj@stdyokojfm}{}
 \DeclareFontShape{JY3}{mc}{bx}{n}{<-> ssub*gt/m/n}{}
 \DeclareFontShape{JY3}{gt}{bx}{n}{<-> ssub*gt/m/n}{}
-\DeclareFontShape{JY3}{mc}{b}{n}{<-> ssub*mc/bx/n}{}
-\DeclareFontShape{JY3}{gt}{b}{n}{<-> ssub*gt/bx/n}{}
+\DeclareFontShape{JY3}{mc}{b}{n}{<-> ssub*gt/m/n}{}
+\DeclareFontShape{JY3}{gt}{b}{n}{<-> ssub*gt/m/n}{}
 
 \DeclareKanjiFamily{JT3}{mc}{}
 \DeclareFontShape{JT3}{mc}{m}{n}{<-> s*[\ifdefined\Cjascale\Cjascale\else 0.962216\fi] \ltj@stdmcfont:jfm=\ltj@stdtatejfm}{}
@@ -49,8 +49,8 @@
 \DeclareFontShape{JT3}{gt}{m}{n}{<-> s*[\ifdefined\Cjascale\Cjascale\else 0.962216\fi] \ltj@stdgtfont:jfm=\ltj@stdtatejfm}{}
 \DeclareFontShape{JT3}{mc}{bx}{n}{<-> ssub*gt/m/n}{}
 \DeclareFontShape{JT3}{gt}{bx}{n}{<-> ssub*gt/m/n}{}
-\DeclareFontShape{JT3}{mc}{b}{n}{<-> ssub*mc/bx/n}{}
-\DeclareFontShape{JT3}{gt}{b}{n}{<-> ssub*gt/bx/n}{}
+\DeclareFontShape{JT3}{mc}{b}{n}{<-> ssub*gt/m/n}{}
+\DeclareFontShape{JT3}{gt}{b}{n}{<-> ssub*gt/m/n}{}
 \KanjiEncodingPair{JY3}{JT3}
 
 \DeclareRelationFont{JY3}{gt}{m}{}{TU}{lmr}{bx}{}
@@ -80,22 +80,25 @@
 \newif\if@ltj@match@family
 \@ltj@match@familyfalse
 \def\verbatim@font{\normalfont\ttfamily\kanjifamily\jttdefault\selectfont}
-\DeclareRobustCommand\rmfamily
-        {\not@math@alphabet\rmfamily\mathrm
-                   \romanfamily\rmdefault
-                   \if@ltj@match@family\kanjifamily\mcdefault\fi\selectfont}
-\DeclareRobustCommand\sffamily
-        {\not@math@alphabet\sffamily\mathsf
-                   \romanfamily\sfdefault
-                   \if@ltj@match@family\kanjifamily\gtdefault\fi\selectfont}
-\DeclareRobustCommand\ttfamily
-        {\not@math@alphabet\ttfamily\mathtt
-                   \romanfamily\ttdefault
-                   \if@ltj@match@family\kanjifamily\jttdefault\fi\selectfont}
+\def\@ltj@hook@family#1#2{ % #1: csname #2: contents
+  \ifcsname @#1hook\endcsname % LaTeX 2020-02-02
+	\csappto{@#1hook}{#2}%
+  \else
+	\ifcsname #1 \endcsname
+	  \expandafter\patchcmd\csname #1 \endcsname{\selectfont}{#2\selectfont}{}{}%
+	\else
+	  \PackageWarningNoLine{luatexja}{%
+		Patching to \expandafter\string\csname #1\endcsname\space failed
+	  }%
+	\fi
+  \fi
+}
+\@ltj@hook@family{rmfamily}{\if@ltj@match@family\kanjifamily\mcdefault\fi}
+\@ltj@hook@family{sffamily}{\if@ltj@match@family\kanjifamily\gtdefault\fi}
+\@ltj@hook@family{ttfamily}{\if@ltj@match@family\kanjifamily\jttdefault\fi}
+
 %%% \eminnershape
-\DeclareRobustCommand\em
-        {\@nomath\em \ifdim \fontdimen\@ne\font >\z@
-                       \eminnershape \else \gtfamily \itshape \fi}
+\expandafter\patchcmd\csname em \endcsname{\itshape}{\gtfamily\itshape}{}{}
 \def\eminnershape{\mcfamily \upshape}
 
 \ltjdefcharrange{1}{"80-"36F, "1E00-"1EFF}
