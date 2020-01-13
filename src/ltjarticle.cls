@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjarticle}
-  [2019/11/23 v1.8d-ltj-17
+  [2020/01/13 v1.8e-ltj-17
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -530,16 +530,17 @@
          \usecounter{\@enumctr}%
          \def\makelabel##1{\hss\llap{##1}}}%
    \fi}{\endlist}
-\newcommand{\labelitemi}{\textbullet}
+\newcommand{\labelitemi}{\labelitemfont \textbullet}
 \newcommand{\labelitemii}{%
   \ifnum\ltjgetparameter{direction}=3
-     {\textcircled{~}}
+     {\labelitemfont \textcircled{~}}
   \else
-     {\normalfont\bfseries\textendash}
+     {\labelitemfont \bfseries\textendash}
   \fi
 }
-\newcommand{\labelitemiii}{\textasteriskcentered}
-\newcommand{\labelitemiv}{\textperiodcentered}
+\newcommand{\labelitemiii}{\labelitemfont \textasteriskcentered}
+\newcommand{\labelitemiv}{\labelitemfont \textperiodcentered}
+\newcommand\labelitemfont{\normalfont}
 \renewenvironment{itemize}
   {\ifnum \@itemdepth >\thr@@\@toodeep\else
    \advance\@itemdepth\@ne
