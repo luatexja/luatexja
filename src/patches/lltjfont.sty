@@ -732,7 +732,8 @@
   \else\ifx\kanjidef@ult\jttdef@ult \jttfamily
   \fi\fi\fi
 }
-\else
+\fi
+\ifdefined\prepare@family@series@update@kanji\else
 %%%% LaTeX 2019-10-01
 \def\prepare@family@series@update@kanji#1{\kanjifamily}
 \fi

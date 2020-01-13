@@ -166,7 +166,6 @@ function (p, sty)
 end
 
 do
-  local mlist_to_hlist = node.mlist_to_hlist
   local function mlist_callback_ltja(n)
     local n = to_direct(n); list_dir = ltjd_get_dir_count()
     if getid(n)==id_whatsit and getsubtype(n)==sid_user and
@@ -176,11 +175,12 @@ do
     end
     return to_node(conv_jchar_to_hbox(n, 0))
   end
-  -- LaTeX 2020-02-02 seems to have pre_mlist_to_hlist callback
-  if luatexbase.callbacktypes['pre_mlist_to_hlist'] then
-    luatexbase.add_to_callback('pre_mlist_to_hlist',
-      mlist_callback_ltja(n), 'ltj.mlist_to_hlist_pre', 1)
+  -- LaTeX 2020-02-02 seems to have pre_mlist_to_hlist_filter callback
+  if luatexbase.callbacktypes['pre_mlist_to_hlist_filter'] then
+    luatexbase.add_to_callback('pre_mlist_to_hlist_filter',
+      mlist_callback_ltja, 'ltj.mlist_to_hlist_pre', 1)
   else
+    local mlist_to_hlist = node.mlist_to_hlist
     luatexbase.add_to_callback('mlist_to_hlist',
       function (n, display_type, penalties)
         return mlist_to_hlist(mlist_callback_ltja(n),display_type, penalties)

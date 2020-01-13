@@ -1,18 +1,9 @@
 %#! lualatex
 \documentclass{article}
-
-\makeatletter
-\let\ltj@orig@DeclareFontShape@=\DeclareFontShape@
-\def\DeclareFontShape@#1#2#3#4#5#6{%
-\immediate\typeout{DFS |#1|#2|#3|#4|#5|#6|}%
-\ltj@orig@DeclareFontShape@{#1}{#2}{#3}{#4}{#5}{#6}%
-}
-\makeatother
-
+\usepackage[margin=15mm]{geometry}
 
 \usepackage{luatexja}
 \usepackage{luatexja-fontspec}
-\usepackage{booktabs,array,lltjext}
 
 \defaultfontfeatures{Numbers=OldStyle}
 \setmainfont{TeXGyreTermes}
@@ -22,10 +13,7 @@
 \setmainjfont[BoldFont=IPAexGothic]{IPAexMincho} % default: JFM=ujis
 \setsansjfont{IPAexGothic}
 
-\setjfontfamily\ipajisninety[CJKShape=JIS1990]{IPAexMincho}
-
-\normalsize
-\usepackage[margin=25mm,a4paper]{geometry}
+\newjfontfamily\ipajisninety[CJKShape=JIS1990]{IPAexMincho}
 
 \begin{document}
 
@@ -35,12 +23,21 @@
 
 \noindent 通常：「あいうえお」、（かきくけこ）。{\bf 太字}と{\gt ゴシック}。
 
-%{\addjfontfeatures{JFM=mono}
-%\noindent 等幅：「あいうえお」、（かきくけこ）。{\bf 太字}と{\gt ゴシック}。
-%}
+{\addjfontfeatures{JFM=mono}
+\noindent 等幅：「あいうえお」、（かきくけこ）。{\bf 太字}と{\gt ゴシック}。
+}
 
+\subsection{JIS2004}
+逢芦飴溢茨鰯淫迂厩噂餌襖迦牙廻恢晦蟹葛鞄釜翰翫徽
+祇汲灸笈卿饗僅喰櫛屑粂祁隙倦捲牽鍵諺巷梗膏鵠甑叉
+榊薩鯖錆鮫餐杓灼酋楯薯藷哨鞘杖蝕訊逗摺撰煎煽穿箭
+詮噌遡揃遜腿蛸辿樽歎註瀦捗槌鎚辻挺鄭擢溺兎堵屠賭
+瀞遁謎灘楢禰牌這秤駁箸叛挽誹樋稗逼謬豹廟瀕斧蔽瞥
+蔑篇娩鞭庖蓬鱒迄儲餅籾爺鑓愈猷漣煉簾榔屢冤叟咬嘲
+囀徘扁棘橙狡甕甦疼祟竈筵篝腱艘芒虔蜃蠅訝靄靱騙鴉
 
-\def\R{%
+\subsection{JIS1990}
+{\ipajisninety
 逢芦飴溢茨鰯淫迂厩噂餌襖迦牙廻恢晦蟹葛鞄釜翰翫徽
 祇汲灸笈卿饗僅喰櫛屑粂祁隙倦捲牽鍵諺巷梗膏鵠甑叉
 榊薩鯖錆鮫餐杓灼酋楯薯藷哨鞘杖蝕訊逗摺撰煎煽穿箭
@@ -50,27 +47,15 @@
 囀徘扁棘橙狡甕甦疼祟竈筵篝腱艘芒虔蜃蠅訝靄靱騙鴉
 }
 
-\subsection{JIS2004}
-\R
-
-\medskip\hrule\medskip
-\vbox{\hsize=7\zw\tate\parindent1\zw\R}
-
-
-
-\subsection{JIS1990}
-{\ipajisninety
-\R
-
-\medskip\hrule\medskip
-\vbox{\hsize=7\zw\tate\parindent1\zw\R}}
+\vspace{1\zw}
 
 \subsection{Kerning}
-{\jfontspec{KozMinPr6N-Regular}
+{\jfontspec[NoEmbed]{Ryumin-Light}
+
 アノ ← Kerning=Off
 
 \noindent{\addjfontfeatures{Kerning=On} アノ ← Kerning=On}
-\par}
+}
 
 \subsection{unicode}
 
@@ -78,7 +63,7 @@
 常に和文：「\ltjjachar"201C」「\ltjjachar"010F」%"
 常に欧文：「\ltjalchar"201C」「\ltjalchar"010F」%"
 
-{\let\char=\ltjalchar\textquotedblleft}あ\textquotedblleft あ%
+{\tracingall\let\char=\ltjalchar\textquotedblleft}あ\textquotedblleft あ%
 {\let\char=\ltjjachar\textquotedblleft}あ“あ
 
 \begin{itemize}
@@ -94,45 +79,11 @@
 \end{itemize}
 \end{itemize}
 
-\newpage
-\section{fontspecによる非埋め込みフォント}
-\setjfontfamily\test[BoldFont=GothicBBB-Medium, NoEmbed]{Ryumin-Light}
-
-%{\test
-%\begin{tabular}<y>{ll>{\itshape}l>{\slshape}l}
-%\toprule
-%&Upright&Italic&Slanted\\
-%\midrule
-%Regular&あいうえお&あいうえお&あいうえお\
-%Bold   &\textbf{あいうえお}&\textbf{あいうえお}&\textbf{あいうえお}\\
-%\bottomrule
-%\end{tabular}}
-
-\section{JFMの違い}
-\setjfontfamily\test[ TateFont=KozGoPr6N-Light ]{KozMinPr6N-Bold}
-
-\def\yttest{\leavevmode%
-\parbox<y>{20\zw}{%
-「ちょっと」，“チェック”しちゃった！あいう
-}%
-\parbox<t>{20\zw}{%
-「ちょっと」，“チェック”しちゃった！あいう}%
-}
-
-\test
-\addjfontfeatures{CJKShape=JIS1990,Color=FF0000}
-\yttest
-\noindent
-
-%\vskip-\dimexpr20\zw+\lineskip\relax
-\noindent
-\addjfontfeatures{Color=0000FF, YokoFeatures={ Color=0080FF, JFM=min}, TateFeatures={JFM=tmin}}
-\yttest
-
-
-\section{match}
-
-\normalfont
-\sffamily aiuあいう\rmfamily aiuあいう \ttfamily aiuあいう
+\addfontfeatures{Color=BD6D8F}
+\addjfontfeatures{Color=28AFCB,CJKShape=JIS1990}
+あいうえお芦漢字ABC
+\[
+あいうえお芦\int_0^∞ e^{-x^2}\,dx\mathrm{ABC}\textrm{ABC}\textsf{ABC}
+\]
 
 \end{document}
