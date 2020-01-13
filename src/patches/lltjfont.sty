@@ -602,10 +602,10 @@
     \else
        \ifcsname \k@encoding /\k@family /#2/\k@shape \endcsname
          \set@target@kanji@series{#2}%
-         \@font@shape@subst@warning
+         {\let\curr@fontshape\curr@kfontshape\@font@shape@subst@warning}%
        \else
          \set@target@kanji@series{#3}%
-         \@font@shape@subst@warning
+         {\let\curr@fontshape\curr@kfontshape\@font@shape@subst@warning}%
        \fi
     \fi
   \fi
@@ -629,10 +629,10 @@
     \else
        \ifcsname \k@encoding /\k@family /\k@series/#2\endcsname
          \edef\k@shape{#2}%
-         \@font@shape@subst@warning
+         {\let\curr@fontshape\curr@kfontshape\@font@shape@subst@warning}%
        \else
          \edef\k@shape{#3}%
-         \@font@shape@subst@warning
+         {\let\curr@fontshape\curr@kfontshape\@font@shape@subst@warning}%
        \fi
     \fi
   \fi

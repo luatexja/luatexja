@@ -84,11 +84,11 @@
 \fi
 
 \ifdefined\fontseriesforce
-\def\bfseries@mc{bx}
-\def\bfseries@gt{bx}
+\edef\bfseries@mc{\bfdefault}
+\edef\bfseries@gt{\bfdefault}
 \def\bfseries@jtt{\bfseries@gt}
-\def\mdseries@mc{m}
-\def\mdseries@gt{m}
+\edef\mdseries@mc{\mddefault}
+\edef\mdseries@gt{\mddefault}
 \def\mdseries@jtt{\mdseries@gt}
 \fi
 
