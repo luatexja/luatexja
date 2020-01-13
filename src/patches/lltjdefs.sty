@@ -32,7 +32,13 @@
 \newcommand\kanjiencodingdefault{JY3}
 \newcommand\kanjifamilydefault{\mcdefault}
 \newcommand\kanjiseriesdefault{\mddefault}
-\newcommand\kanjishapedefault{\updefault}
+\ifdefined\shapedefault
+  %% LaTeX 2020-02-02
+  \newcommand\kanjishapedefault{\shapedefault}
+\else
+  %% LaTeX 2019-10-01
+  \newcommand\kanjishapedefault{\updefault}
+\fi
 
 \DeclareKanjiFamily{JY3}{mc}{}
 \DeclareFontShape{JY3}{mc}{m}{n}{<-> s*[\ifdefined\Cjascale\Cjascale\else 0.962216\fi] \ltj@stdmcfont:jfm=\ltj@stdyokojfm}{}
@@ -93,7 +99,7 @@
 \def\@ltj@hook@family#1#2{ % #1: csname #2: contents
   \ifcsname @#1hook\endcsname % LaTeX 2020-02-02
 	\csappto{@#1hook}{#2}%
-  \else
+  \else % LaTeX 2019-10-01
 	\ifcsname #1 \endcsname
 	  \expandafter\patchcmd\csname #1 \endcsname{\selectfont}{#2\selectfont}{}{}%
 	\else
