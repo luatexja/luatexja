@@ -165,17 +165,27 @@ function (p, sty)
    return p
 end
 
-luatexbase.add_to_callback('mlist_to_hlist',
-   function (n, display_type, penalties)
-      n = to_direct(n); list_dir = ltjd_get_dir_count()
-      if getid(n)==id_whatsit and getsubtype(n)==sid_user and
+do
+  local mlist_to_hlist = node.mlist_to_hlist
+  local function mlist_callback_ltja(n)
+    local n = to_direct(n); list_dir = ltjd_get_dir_count()
+    if getid(n)==id_whatsit and getsubtype(n)==sid_user and
         getfield(n, 'user_id') == DIR then
-	 local old_n = n; n = node_remove(n, n)
-	 node_free(old_n); if not n then return nil end
-      end
-      return node.mlist_to_hlist(
-	 to_node(conv_jchar_to_hbox(n, 0)),
-	 display_type, penalties)
-   end,'ltj.mlist_to_hlist', 1)
+      local old_n = n; n = node_remove(n, n)
+      node_free(old_n); if not n then return nil end
+    end
+    return to_node(conv_jchar_to_hbox(n, 0))
+  end
+  -- LaTeX 2020-02-02 seems to have pre_mlist_to_hlist callback
+  if luatexbase.callbacktypes['pre_mlist_to_hlist'] then
+    luatexbase.add_to_callback('pre_mlist_to_hlist',
+      mlist_callback_ltja(n), 'ltj.mlist_to_hlist_pre', 1)
+  else
+    luatexbase.add_to_callback('mlist_to_hlist',
+      function (n, display_type, penalties)
+        return mlist_to_hlist(mlist_callback_ltja(n),display_type, penalties)
+      end,'ltj.mlist_to_hlist', 1)
+  end
+end
 
 luatexja.math = { is_math_letters = is_math_letters }
