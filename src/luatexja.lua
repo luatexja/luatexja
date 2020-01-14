@@ -402,7 +402,7 @@ end
 
 local prefix, inner_depth
 local utfchar = utf.char
-local function debug_show_node_X(p,print_fn, limit)
+local function debug_show_node_X(p,print_fn, limit, inner_depth)
    local k = prefix
    local s
    local pt=node_type(p.id)
@@ -451,7 +451,7 @@ local function debug_show_node_X(p,print_fn, limit)
       prefix, inner_depth = prefix.. '.', inner_depth + 1
       if inner_depth < limit then
 	 for q in node.traverse(p.head) do
-	    debug_show_node_X(q, print_fn, limit)
+	    debug_show_node_X(q, print_fn, limit, inner_depth)
 	 end
       end
       prefix=k
@@ -466,15 +466,15 @@ local function debug_show_node_X(p,print_fn, limit)
       if inner_depth < limit then
          prefix, inner_depth = k.. 'p.', inner_depth + 1
 	 for q in node.traverse(p.pre) do
-	    debug_show_node_X(q, print_fn, limit)
+	    debug_show_node_X(q, print_fn, limit, inner_depth)
 	 end
          prefix = k.. 'P.'
 	 for q in node.traverse(p.post) do
-	    debug_show_node_X(q, print_fn, limit)
+	    debug_show_node_X(q, print_fn, limit, inner_depth)
 	 end
          prefix = k.. 'R.'
 	 for q in node.traverse(p.replace) do
-	    debug_show_node_X(q, print_fn, limit)
+	    debug_show_node_X(q, print_fn, limit, inner_depth)
 	 end
       end
       prefix=k
@@ -532,7 +532,7 @@ local function debug_show_node_X(p,print_fn, limit)
             prefix, inner_depth =prefix.. '.', inner_depth + 1
             if inner_depth < limit then
 	       for q in node.traverse(p.value) do
-		  debug_show_node_X(q, print_fn, limit)
+		  debug_show_node_X(q, print_fn, limit, inner_depth)
 	       end
 	    end
             prefix, inner_depth = k, bid
@@ -553,13 +553,13 @@ local function debug_show_node_X(p,print_fn, limit)
    elseif pt=='noad' then
       s = base ; print_fn(s)
       if p.nucleus then
-         prefix = k .. 'N'; debug_show_node_X(p.nucleus, print_fn, limit);
+         prefix = k .. 'N'; debug_show_node_X(p.nucleus, print_fn, limit, inner_depth);
       end
       if p.sup then
-         prefix = k .. '^'; debug_show_node_X(p.sup, print_fn, limit);
+         prefix = k .. '^'; debug_show_node_X(p.sup, print_fn, limit, inner_depth);
       end
       if p.sub then
-         prefix = k .. '_'; debug_show_node_X(p.sub, print_fn, limit);
+         prefix = k .. '_'; debug_show_node_X(p.sub, print_fn, limit, inner_depth);
       end
       prefix = k;
    elseif pt=='math_char' then
@@ -570,7 +570,7 @@ local function debug_show_node_X(p,print_fn, limit)
       if p.head then
          prefix = k .. '.';
 	 for q in node.traverse(p.head) do
-	    debug_show_node_X(q, print_fn)
+	    debug_show_node_X(q, print_fn, limit, inner_depth)
 	 end
       end
    else
@@ -583,7 +583,7 @@ function luatexja.ext_show_node_list(head,depth,print_fn, lim)
    inner_depth = 0
    if head then
       while head do
-         debug_show_node_X(head, print_fn, lim or 1/0); head = node_next(head)
+         debug_show_node_X(head, print_fn, lim or 1/0, inner_depth); head = node_next(head)
       end
    else
       print_fn(prefix .. ' (null list)')
@@ -593,7 +593,7 @@ function luatexja.ext_show_node(head,depth,print_fn, lim)
    prefix = depth
    inner_depth = 0
    if head then
-      debug_show_node_X(head, print_fn, lim or 1/0)
+      debug_show_node_X(head, print_fn, lim or 1/0, inner_depth)
    else
       print_fn(prefix .. ' (null list)')
    end

@@ -681,7 +681,9 @@
 \patchcmd\prepare@family@series@update@kanji{\maybe@load@fontshape}
   {\begingroup\let\f@encoding\k@encoding\let\f@family\k@family
     \maybe@load@fontshape\endgroup}{}{}
-\appto\@meta@family@list{\@elt{mc}\@elt{gt}\@elt{jtt}}
+\patchcmd\prepare@family@series@update@kanji{\@meta@family@list}{\@meta@family@kanji@list}{}{}
+\def\@meta@family@kanji@list{\@elt{mc}\@elt{gt}\@elt{jtt}}
+%%\appto\@meta@family@list{\@elt{mc}\@elt{gt}\@elt{jtt}}
 \DeclareRobustCommand\bfseries{%
   \not@math@alphabet\bfseries\mathbf
   \expand@font@defaults
