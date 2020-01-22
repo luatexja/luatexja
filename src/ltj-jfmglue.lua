@@ -803,7 +803,9 @@ do
 		     blend_diffmet(
 		        getfield(gb, 'stretch'), getfield(ga, 'stretch'), db, da),
 		     -blend_diffmet(
-		     -getfield(gb, 'shrink'), -getfield(ga, 'shrink'), db, da))
+		     -getfield(gb, 'shrink'), -getfield(ga, 'shrink'), db, da),
+		     getfield(gb, 'stretch_order'), getfield(gb, 'shrink_order'))
+		     -- {stretch, shrink}_order: [x]kanjiskip のとき
 	 node_free(ga)
 	 return gb
       elseif k == bk_ak then
@@ -863,7 +865,8 @@ do
 	       bn and (bn*getfield(kanji_skip, 'width')) or 0,
 	       bp and (bp*getfield(kanji_skip, 'stretch')) or 0,
 	       bh and (bh*getfield(kanji_skip, 'shrink')) or 0,
-	       0, 0)
+	       bp and getfield(kanji_skip, 'stretch_order') or 0,
+	       bh and getfield(kanji_skip, 'shrink_order') or 0)
 	    set_attr(g, attr_icflag, KANJI_SKIP_JFM)
 	    return g
 	 end
@@ -908,11 +911,11 @@ do
 						 Np.class)
 	 local g = calc_ja_ja_aux(gb, ga, db, da)
 	 local k
-	 if (pmc==qmc) and (qm.var==pm.var) then
-	    gb = get_kanjiskip_low(false, qm, bn, bp, bh)
-	    ga = get_kanjiskip_low(false, pm, an, ap, ah)
-	    k = calc_ja_ja_aux(gb, ga, db, da)
-	 end
+	 --if (pmc==qmc) and (qm.var==pm.var) then
+         gb = get_kanjiskip_low(false, qm, bn, bp, bh)
+	 ga = get_kanjiskip_low(false, pm, an, ap, ah)
+	 k = calc_ja_ja_aux(gb, ga, db, da)
+	 --end
 	 return g, k
       end
    end
@@ -946,7 +949,8 @@ do
 	       bn and (bn*getfield(xkanji_skip, 'width')) or 0,
 	       bp and (bp*getfield(xkanji_skip, 'stretch')) or 0,
 	       bh and (bh*getfield(xkanji_skip, 'shrink')) or 0,
-	       0, 0)
+	       bp and getfield(xkanji_skip, 'stretch_order') or 0,
+	       bh and getfield(xkanji_skip, 'shrink_order') or 0)
 	    set_attr(g, attr_icflag, XKANJI_SKIP_JFM)
 	    return g
 	 end
