@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2019/09/26',
+  date = '2020/01/23',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}
@@ -557,6 +557,8 @@ function calc_np(last, lp)
    Np.post, Np.pre, Np.xspc = nil, nil, nil
    Np.first, Np.id, Np.last, Np.met, Np.class= nil, nil, nil, nil
    Np.auto_kspc, Np.auto_xspc, Np.char, Np.nuc = nil, nil, nil, nil
+   -- auto_kspc, auto_xspc: normally true/false, 
+   -- but the number 0 when Np is ''the beginning of the box/paragraph''.
    for k in pairs(Np) do Np[k] = nil end
 
    for k = 1,#Bp do Bp[k] = nil end
@@ -782,58 +784,50 @@ do
    local function blend_diffmet(b, a, rb, ra)
       return round(luatexja.jfmglue.diffmet_rule((1-rb)*b+rb*a, (1-ra)*b+ra*a))
    end
+   local blend_diffmet_inf
+   do
+      local abs, log, log264, floor = math.abs, math.log, math.log(2)*64, math.floor
+      blend_diffmet_inf = function (b, a, bo, ao, rb, ra)
+         local nb, na = (bo and b*2.0^(64*bo) or 0), (ao and a*2.0^(64*ao) or 0)
+         local r = luatexja.jfmglue.diffmet_rule((1-rb)*b+rb*a, (1-ra)*b+ra*a)
+         local ro = (r~=0) and floor(log(abs(r))/log264+0.0625) or 0
+         return round(r/2.^(64*ro)), ro
+      end
+   end
+   local getglue = luatexja.getglue
    calc_ja_ja_aux = function (gb, ga, db, da)
       if luatexja.jfmglue.diffmet_rule ~= math.two_pleft and diffmet_rule ~= math.two_pright
           and luatexja.jfmglue.diffmet_rule ~= math.two_paverage then
 	 db, da = 0, 1
       end
       if not gb then
-	 if ga then
-	    gb = node_new(id_kern, 1); setfield(gb, 'kern', 0)
+	 if ga then gb = node_new(id_kern, 1); setfield(gb, 'kern', 0)
 	 else return nil end
       elseif not ga then
 	 ga = node_new(id_kern, 1); setfield(ga, 'kern', 0)
       end
-
-      local k = 2*getid(gb) - getid(ga)
-      if k == bg_ag then
-	 -- 両方とも glue．
-	 setglue(gb, blend_diffmet(
-	                getfield(gb, 'width'), getfield(ga, 'width'), db, da),
-		     blend_diffmet(
-		        getfield(gb, 'stretch'), getfield(ga, 'stretch'), db, da),
-		     -blend_diffmet(
-		     -getfield(gb, 'shrink'), -getfield(ga, 'shrink'), db, da),
-		     getfield(gb, 'stretch_order'), getfield(gb, 'shrink_order'))
-		     -- {stretch, shrink}_order: [x]kanjiskip のとき
-	 node_free(ga)
-	 return gb
-      elseif k == bk_ak then
-	 -- 両方とも kern．
-	 setfield(gb, 'kern', blend_diffmet(
-		     getfield(gb, 'kern'), getfield(ga, 'kern'), db, da))
-	 node_free(ga)
-	 return gb
-      elseif k == bk_ag then
-	 -- gb: kern, ga: glue
-	 setglue(ga, blend_diffmet(
-		        getfield(gb, 'kern'), getfield(ga, 'width'), db, da),
-	             blend_diffmet(
-		        0, getfield(ga, 'stretch'), db, da),
-	             -blend_diffmet(
-		        0, -getfield(ga, 'shrink'), db, da))
-	 node_free(gb)
-	 return ga, 0, 0, 0
+      local gbw, gaw, gbst, gast, gbsto, gasto, gbsh, gash, gbsho, gasho
+      if getid(gb)==id_glue then
+         gbw, gbst, gbsh, gbsto, gbsho = getglue(gb)
       else
-	 -- gb: glue, ga: kern
-	 setglue(gb, blend_diffmet(
-		        getfield(gb, 'width'), getfield(ga, 'kern'), db, da),
-		     blend_diffmet(
-		        getfield(gb, 'stretch'), 0, db, da),
-		     -blend_diffmet(
-		        -getfield(gb, 'shrink'), 0, db, da))
-	 node_free(ga)
-	 return gb
+	 gbw = getfield(gb, 'kern')
+      end
+      if getid(ga)==id_glue then
+         gaw, gast, gash, gasto, gasho = getglue(ga)
+      else
+	 gaw = getfield(ga, 'kern')
+      end
+      if not (gbst or gast) then -- 両方とも kern
+	 setfield(gb, 'kern', blend_diffmet(gbw, gaw, db, da))
+	 node_free(ga); return gb
+      else
+         local gr = gb
+         if not gbst then gr = ga; node_free(gb) else node_free(ga) end
+         gbw = blend_diffmet(gbw or 0, gaw or 0, db, da) -- 結果の自然長
+         gbst, gbsto = blend_diffmet_inf(gbst, gast, gbsto, gasto, db, da) -- 伸び
+	 gbsh, gbsho = blend_diffmet_inf(-(gbsh or 0), -(gash or 0), gbsto, gasto, db, da) -- -(縮み)
+	 setglue(gr, gbw, gbst, -gbsh, gbsto, gbsho)
+	 return gr
       end
    end
 end
@@ -848,7 +842,10 @@ do
    local KANJI_SKIP_JFM   = luatexja.icflag_table.KANJI_SKIP_JFM
 
    get_kanjiskip_low = function(flag, qm, bn, bp, bh)
-      if flag or (qm.with_kanjiskip and (bn or bp or bh)) then
+   -- flag = false: kanjiskip そのもの（パラメータ or JFM）
+   --               ノード kanji_skip のコピーで良い場合は nil が帰る
+   -- flag = true: JFM グルーに付随する kanjiskip 自然長/伸び/縮み分
+      if qm.with_kanjiskip and (bn or bp or bh) then
 	 if kanjiskip_jfm_flag then
 	    local g = node_new(id_glue);
 	    local bk = qm.kanjiskip or null_skip_table
@@ -858,15 +855,13 @@ do
 	    set_attr(g, attr_icflag, KANJI_SKIP_JFM)
 	    return g
 	 elseif flag then
-	    return node_copy(kanji_skip)
-	 else
 	    local g = node_new(id_glue);
 	    setglue(g,
 	       bn and (bn*getfield(kanji_skip, 'width')) or 0,
 	       bp and (bp*getfield(kanji_skip, 'stretch')) or 0,
 	       bh and (bh*getfield(kanji_skip, 'shrink')) or 0,
-	       bp and getfield(kanji_skip, 'stretch_order') or 0,
-	       bh and getfield(kanji_skip, 'shrink_order') or 0)
+	       bp and bp~=0 and getfield(kanji_skip, 'stretch_order') or 0,
+	       bh and bh~=0 and getfield(kanji_skip, 'shrink_order') or 0)
 	    set_attr(g, attr_icflag, KANJI_SKIP_JFM)
 	    return g
 	 end
@@ -879,11 +874,17 @@ do
       elseif Np.auto_kspc or Nq.auto_kspc then
 	 local pm, qm = Np.met, Nq.met
 	 if (pm.char_type==qm.char_type) and (qm.var==pm.var) then
-	     return get_kanjiskip_low(true, qm, 1, 1, 1)
+	     return get_kanjiskip_low(false, qm, 1, 1, 1) or node_copy(kanji_skip)
 	 else
-	    local gb = get_kanjiskip_low(true, qm, 1, 1, 1)
-	    local ga = get_kanjiskip_low(true, pm, 1, 1, 1)
-	    return calc_ja_ja_aux(gb, ga, 0, 1)
+	    local gb = get_kanjiskip_low(false, qm, 1, 1, 1)
+	    if gb then
+	        return calc_ja_ja_aux(gb, 
+		  get_kanjiskip_low(false, pm, 1, 1, 1) or node_copy(kanji_skip), 0, 1) 
+	    else
+	        local ga = get_kanjiskip_low(false, pm, 1, 1, 1)
+	        return (ga and calc_ja_ja_aux(node_copy(kanji_skip), ga, 0, 1))
+                       or node_copy(kanji_skip)
+	    end
 	 end
       else   
 	 local g = node_new(id_glue)
@@ -897,7 +898,7 @@ do
       local qmc, pmc = qm.char_type, pm.char_type
       if (qmc==pmc) and (qm.var==pm.var) then
 	 local g, _, kn, kp, kh = new_jfm_glue(qmc, Nq.class, Np.class)
-	 return g, (Np.auto_kspc or Nq.auto_kspc) and get_kanjiskip_low(false, qm, kn, kp, kh)
+	 return g, (Np.auto_kspc or Nq.auto_kspc) and get_kanjiskip_low(true, qm, kn, kp, kh)
       else
 	 local npn, nqn = Np.nuc, Nq.nuc
 	 local gb, db, bn, bp, bh 
@@ -912,8 +913,8 @@ do
 	 local g = calc_ja_ja_aux(gb, ga, db, da)
 	 local k
 	 --if (pmc==qmc) and (qm.var==pm.var) then
-         gb = get_kanjiskip_low(false, qm, bn, bp, bh)
-	 ga = get_kanjiskip_low(false, pm, an, ap, ah)
+         gb = get_kanjiskip_low(true, qm, bn, bp, bh)
+	 ga = get_kanjiskip_low(true, pm, an, ap, ah)
 	 k = calc_ja_ja_aux(gb, ga, db, da)
 	 --end
 	 return g, k
@@ -1009,7 +1010,7 @@ local function get_OA_skip(is_kanji)
       Np.class)
    local k
    if is_kanji==0 then
-      k = combine_spc('auto_kspc') and get_kanjiskip_low(false, pm, kn, kp, kh)
+      k = combine_spc('auto_kspc') and get_kanjiskip_low(true, pm, kn, kp, kh)
    end
    return g, k
 end
@@ -1021,7 +1022,7 @@ local function get_OB_skip(is_kanji)
         (((Np.id==id_glue)or(Np.id==id_kern)) and 'glue' or 'jcharbdd'), qm))
    local k
    if is_kanji==0 then
-      k = combine_spc('auto_kspc') and get_kanjiskip_low(false, qm, kn, kp, kh)
+      k = combine_spc('auto_kspc') and get_kanjiskip_low(true, qm, kn, kp, kh)
    end
    return g, k
 end
