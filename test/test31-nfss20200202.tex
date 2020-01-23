@@ -1,0 +1,35 @@
+\documentclass{ltjarticle}
+\makeatletter
+\def\mdseries@mc{el}
+\def\bfseries@mc{sb}
+\def\mdseries@gt{l}
+\def\bfseries@gt{k}
+\DeclareFontShape{JY3}{gt}{k}{n}{<-> KozGoPr6N-Heavy.otf:jfm=ujis}{}
+\DeclareFontShape{JT3}{gt}{k}{n}{<-> KozGoPr6N-Heavy.otf:jfm=ujisv}{}
+\DeclareFontShape{JY3}{gt}{l}{n}{<-> KozGoPr6N-ExtraLight.otf:jfm=ujis}{}
+\DeclareFontShape{JT3}{gt}{l}{n}{<-> KozGoPr6N-ExtraLight.otf:jfm=ujisv}{}
+\DeclareFontShape{JY3}{mc}{el}{n}{<-> KozMinPr6N-ExtraLight.otf:jfm=ujis}{}
+\DeclareFontShape{JT3}{mc}{el}{n}{<-> KozMinPr6N-ExtraLight.otf:jfm=ujisv}{}
+\DeclareFontShape{JY3}{mc}{sb}{n}{<-> KozMinPr6N-Bold.otf:jfm=ujis}{}
+\DeclareFontShape{JT3}{mc}{sb}{n}{<-> KozMinPr6N-Bold.otf:jfm=ujisv}{}
+\def\TEST{%
+ \par
+  A: \f@encoding/\f@family/\f@series/\f@shape.
+  K: \k@encoding/\k@family/\k@series/\k@shape.
+  あいうABC
+}
+\begin{document}
+\TEST NORMAL
+\emph{\TEST} EMPH
+\textsf{\TEST} SF
+\textbf{\TEST} BF
+\textgt{\TEST} GT
+\textbf{\textgt{\TEST}} BF+GT
+\textbf{\textgt{\textmd{\TEST}}} BF+GT+MD
+
+\textsc{\textit{\TEST}} SC+IT
+
+{\fontseries{b}\selectfont \TEST} B
+{\fontseries{bx}\selectfont \TEST} BX
+
+\end{document}

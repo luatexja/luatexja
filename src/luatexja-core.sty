@@ -232,8 +232,10 @@
   t[\the\ltj@zw@inner] = function() setdimen('ltj@zw', ltjf.get_zw()) end
   t[\the\ltj@zh@inner] = function() setdimen('ltj@zh', ltjf.get_zh()) end
 }
-\protected\def\zw{\luafunction\ltj@zw@inner\ltj@zw}
-\protected\def\zh{\luafunction\ltj@zh@inner\ltj@zh}
+\protected\def\ltj@zw{\luafunction\ltj@zw@inner\ltj@zw}
+\protected\def\ltj@zh{\luafunction\ltj@zh@inner\ltj@zh}
+\let\zw=\ltj@zw
+\let\zh=\ltj@zh
 
 %%%%%%%% \inhibitglue
 \newluafunction\ltj@reset@globaldefs@inner
