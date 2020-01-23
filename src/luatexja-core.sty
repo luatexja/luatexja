@@ -124,10 +124,10 @@
 
 \def\ltj@loaded{hoge}
 
-\newdimen\ltj@zw
-\newdimen\ltj@zh
-\newdimen\jQ \jQ=0.25mm
-\let\jH=\jQ
+\newdimen\ltj@dimen@zw
+\newdimen\ltj@dimen@zh
+\newdimen\ltj@dimen@jQ \ltj@dimen@jQ=0.25mm
+\let\jQ=\ltj@dimen@jQ \let\jH=\jQ
 
 %%%%%%%% error message
 \def\ltj@defnum{0}
@@ -229,11 +229,11 @@
 \newluafunction\ltj@zh@inner
 \directlua{
   local t, setdimen, ltjf = lua.get_functions_table(), tex.setdimen, luatexja.jfont
-  t[\the\ltj@zw@inner] = function() setdimen('ltj@zw', ltjf.get_zw()) end
-  t[\the\ltj@zh@inner] = function() setdimen('ltj@zh', ltjf.get_zh()) end
+  t[\the\ltj@zw@inner] = function() setdimen('ltj@dimen@zw', ltjf.get_zw()) end
+  t[\the\ltj@zh@inner] = function() setdimen('ltj@dimen@zh', ltjf.get_zh()) end
 }
-\protected\def\ltj@zw{\luafunction\ltj@zw@inner\ltj@zw}
-\protected\def\ltj@zh{\luafunction\ltj@zh@inner\ltj@zh}
+\protected\def\ltj@zw{\luafunction\ltj@zw@inner\ltj@dimen@zw}
+\protected\def\ltj@zh{\luafunction\ltj@zh@inner\ltj@dimen@zh}
 \let\zw=\ltj@zw
 \let\zh=\ltj@zh
 

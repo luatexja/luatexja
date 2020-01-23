@@ -653,27 +653,10 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
   \Pkg{everysel} (if you want to use \LuaTeX-ja with \LaTeXe)
 \item \Pkg{ltxcmds}, \Pkg{pdftexcmds}, \Pkg{filehook}, \Pkg{atbegshi}
 \item \href{https://github.com/wspr/fontspec/}{\Pkg{fontspec}} v2.7c (or later)
-%<en>\item IPAex fonts (\url{http://ipafont.ipa.go.jp/})
-%<ja>\item IPAexフォント(\url{http://ipafont.ipa.go.jp/})
+%<en>\item \emph{IPAex fonts} (\url{http://ipafont.ipa.go.jp/})
+%<ja>\item \emph{IPAexフォント(\url{http://ipafont.ipa.go.jp/})}
 \end{itemize}
-%<*en>
-Note that color specification in font~definitions, such as
-\begin{lstlisting}
-\font\test=file:lmromandunh10-regular.otf:color=FF0000BB % \font primitive
-\addfontfeatures{Color=00FF00} % fontspec
-\end{lstlisting}
-are not compatible with \LuaTeX-ja in plain \LuaTeX\ and \LaTeX~2019-10-01~(or prior).
-So we recommend to use \LaTeX~2020-02-02.
-%</en>
-%<*ja>
-なお，フォント定義の際の色指定，例えば
-\begin{lstlisting}
-\font\test=file:lmromandunh10-regular.otf:color=FF0000BB % \font primitive
-\addfontfeatures{Color=00FF00} % fontspec
-\end{lstlisting}
-は，plain \LuaTeX や\LaTeX~2019-10-01以前において\LuaTeX-jaとは\emph{共存しない}．
-そのため，\LaTeX~2020-02-02以降を用いることを勧める．
-%</ja>
+
 
 %<*en>
 Now \LuaTeX-ja is available from
@@ -1441,7 +1424,7 @@ this chapter. For the method, please see Subsection~\ref{ssec:math}.
 と考えており，したがってこの節では数式モード中の和文フォントを変更する方法については
 記述しない．この方法については\ref{ssec:math}節を参照のこと．
 
-{\bfseries
+{\gtfamily\bfseries
   既に記述した通り，\texttt{disablejfam}オプションを指定して\LuaTeX-jaを読み込んだ場合は，
   \verb+$素$+ のように直接和文文字を数式モード中に記述することはできなくなる．
   \cs{mbox}，あるいは\Pkg{amsmath}パッケージの提供する\cs{text}命令などを使うことになる．
@@ -5013,17 +4996,6 @@ a \emph{horizontal} Japanese font.
 \bottomrule
 \end{tabular}
 \end{table}
-
-%<*en>
-Note that any OpenType features are not applied to Japanese characters in math mode.
-Other features, such as \texttt{color}~and~\texttt{embolden} may be applied to these
-characters, but one should not expect this.
-%</en>
-%<*ja>
-なお，数式中に直に記述した和文文字に対してはOpenType機能は適用されない．
-\texttt{color}や\texttt{embolden}など他の「機能」は適用される可能性があるが，
-ユーザは期待すべきではない．
-%</ja>
 
 %<en>\subsection{Callbacks}
 %<ja>\subsection{コールバック}
@@ -8654,7 +8626,7 @@ This \cs{jH} is the same \cs{dimen} register as \cs{jQ}.
 等しい．この \cs{jH} は \cs{jQ} と同じ寸法レジスタを指す．
 %</ja>
 
-\dim{ltj@zw}
+\dim{ltj@dimen@zw}
 %<*en>
 A temporal register for the ``full-width'' of current Japanese font.
 The command \cs{zw} sets this register to the correct value, and
@@ -8666,7 +8638,7 @@ The command \cs{zw} sets this register to the correct value, and
 「このレジスタ自体を返す」．
 %</ja>
 
-\dim{ltj@zh}
+\dim{ltj@dimen@zh}
 %<*en>
 A temporal register for the ``full-height'' (usually the sum of height of imaginary body and its depth) of current Japanese font.
 The command \cs{zh} sets this register to the correct value, and
