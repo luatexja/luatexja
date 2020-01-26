@@ -31,8 +31,7 @@
 %<ja>  Scale=MatchLowercase, FakeStretch=1.137121,
   ItalicFont=iosevka-slab-oblique,
   BoldFont=iosevka-slab-bold, BoldItalicFont=iosevka-slab-bolditalic,
-%<en> ]{iosevka-slab-regular}
-%<ja> ]{iosevka-slab-light}
+]{iosevka-slab-regular}
 \setsansfont[Scale=MatchLowercase,Ligatures=TeX,RawFeature=-notdef]{Linux Biolinum O}
 \usepackage[match]{luatexja-fontspec}
 \usepackage[kozuka-pr6n]{luatexja-preset}
@@ -372,11 +371,18 @@ For more detailed information, see Part~\ref{part-imp} or other sections of this
 \end{lstlisting}
 %<*en>
 Note that \pTeX\ adds new two useful units, namely \texttt{zw}~and~\texttt{zh}.
-As shown above, they are changed by \cs{zw}~and~\cs{zh} respectively, in \LuaTeX-ja.
+As shown above, \emph{they are changed to \cs{zw}~and~\cs{zh} respectively} in \LuaTeX-ja.%
+\footnote{\LuaTeX-ja 20200127.0 introduces \cs{ltj@zw}~and~\cs{ltj@zh}, which are copy of
+  \cs{zw}~and~\cs{zh}.}
 %</en>
 %<*ja>
-特に注意してほしいのは，\pTeX で追加された \texttt{zw} と \texttt{zh} という単位は
-\LuaTeX-ja では使用できず，\cs{zw}, \cs{zh} と制御綴の形にしないといけないという点である．
+特に注意してほしいのは，\pTeX で追加された\texttt{zw}と\texttt{zh}という単位は
+\LuaTeX-ja では使用できず，\emph{\cs{zw}, \cs{zh} と制御綴の形にしないといけない}という点である
+\footnote{%
+  別のパッケージやユーザが\cs{zw},~\cs{zh}を書き換えてしまうことに対応するため，
+  \LuaTeX-ja 20200127.0以降では，\cs{ltj@zw},~\cs{ltj@zh}がそれぞれ\cs{zw},~\cs{zh}の
+  コピーとして定義されている．
+}．
 %</ja>
 
 %<*en>
@@ -646,7 +652,7 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %<en>The following packages are needed for the \LuaTeX-ja\ package.
 %<ja>\LuaTeX-jaパッケージの動作には次のパッケージ類が必要である．
 \begin{itemize}
-\item \href{http://www.luatex.org/}{\LuaTeX}\ 1.0.0 (or later)
+\item \href{http://www.luatex.org/}{\LuaTeX}\ 1.07.0 (or later)
 \item recent \href{https://github.com/latex3/luaotfload}{\Pkg{luaotfload}} (v3.1 or later recommended)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
 \item \href{https://github.com/josephwright/etoolbox/}{\Pkg{etoolbox}},
@@ -1002,12 +1008,24 @@ plfonts.dtx} and \texttt{pldefs.ltx}).
 \begin{center}\small
 \begin{tabular}{lllc}
 \toprule
-\textbf{classification}&&&\textbf{commands}\\\midrule
+\textbf{classification}&\textbf{commands}&&\textbf{family}\\\midrule
 \emph{mincho} (明朝体)&\verb+\textmc{...}+&\verb+{\mcfamily ...}+&\cs{mcdefault}\\
 \emph{gothic} (\textgt{ゴシック体})&\verb+\textgt{...}+&\verb+{\gtfamily ...}+&\cs{gtdefault}\\
+(Japanese counterpart for typewriter font)&---&---&\cs{jttdefault}\\
 \bottomrule
 \end{tabular}
 \end{center}
+  Here \cs{jttdefault} specifies the Japanese font family in \cs{verb}~or~\texttt{verbatim}
+  environment, and its default value is \cs{mcdefault} (mincho family).%
+  \footnote{%
+	When \Pkg{ltjsclasses} classes are used, or
+	\Pkg{luatexja-fontspec} (or \Pkg{luatexja-preset}) is loaded with \texttt{match} option,
+	\cs{ttfamily} changes the current Japanese font amily to \cs{jttdefault}.
+	These classes and packages also redefine \cs{jttdefault} to
+	\cs{gtdefault} (\emph{gothic}~family).
+  } \LuaTeX-ja does not define commands to only switch current Japanese font family to
+  \cs{jttdefault}.
+
 \item
 By default, the following fonts are used for these two families.
 \begin{center}\small
@@ -1024,17 +1042,26 @@ By default, the following fonts are used for these two families.
      There is no italic nor slanted shape for these \texttt{mc}~and~\texttt{gt}.
 %</en>
 %<*ja>
-\item \pLaTeX と同様に，標準では「明朝体」「ゴシック体」の2種類を用いる：
+\item \pLaTeX と同様に，標準では「明朝体」「ゴシック体」の2種類を用いる．
 \begin{center}\small
 \begin{tabular}{llll}
 \toprule
-\emph{字体}&&&\emph{ファミリ名}\\\midrule
+\emph{字体}&\emph{命令}&&\emph{ファミリ名}\\\midrule
 明朝体&\verb+\textmc{...}+&\verb+{\mcfamily ...}+&\cs{mcdefault}\\
 \textgt{ゴシック体}&\verb+\textgt{...}+&\verb+{\gtfamily ...}+&\cs{gtdefault}\\
+（タイプライタ体と合わせる和文）&---&&\cs{jttdefault}\\
 \bottomrule
 \end{tabular}
 \end{center}
-  \newpage
+  \cs{jttdefault}は\cs{verb}や\texttt{verbatim}環境中の和文文字に使われる和文フォントファミリであり，
+  標準値は\cs{mcdefault}，つまり明朝体である
+  \footnote{%
+	\Pkg{ltjsclasses}を使用したり，また\Pkg{luatexja-fontspec}や\Pkg{luatexja-preset}パッケージを
+	\texttt{match}オプションを指定して読み込んだときは，単なる\cs{ttfamily}によっても和文フォントが
+	\cs{jttdefault}に変更される．また，これらのクラスファイルやパッケージは
+	\cs{jttdefault}を \cs{gtdefault}（ゴシック体）に再定義する．
+  }．和文フォントファミリ（のみ）を\cs{jttdefault}に切り替える命令は準備していない．
+
 \item 標準では，次のフォントが用いられる：
 \begin{center}\small
 \begin{tabular}{lllll}
@@ -1073,28 +1100,6 @@ By default, the following fonts are used for these two families.
   \texttt{disablejfam}のない状況では，以前と同様に和文文字を数式モード中に
   直に書くことができる（但し\autoref{para:jachar_in_math}ページの記述も参照）．
   その際には明朝体(\texttt{mc})で出力される．
-%</ja>
-%<*en>
- \item \cs{jttdefault}%
-  \footnote{%
-	When \Pkg{ltjsclasses} classes are used, or
-	\Pkg{luatexja-fontspec} (or \Pkg{luatexja-preset}) is loaded with \texttt{match} option,
-	\cs{ttfamily} changes the current Japanese font amily to \cs{jttdefault}.
-	These classes and packages also redefine \cs{jttdefault} to
-	\cs{gtdefault} (\emph{gothic}~family).
-  } specifies the Japanese font family in \cs{verb}~or~\texttt{verbatim} environment.
-  The default value of \cs{jttdefault} is \cs{mcdefault}, so the mincho family is used.
-%</en>
-%<*ja>
- \item \cs{verb} や \texttt{verbatim} 環境中の和文文字に使われる和文フォントファミリは
-  \ \cs{jttdefault} で指定する%
-  \footnote{%
-	\Pkg{ltjsclasses}を使用したり，あるいは \texttt{match} オプションを指定して\Pkg{luatexja-fontspec}%
-	や\Pkg{luatexja-preset}パッケージを読み込んだときは，単なる \cs{ttfamily} によっても和文フォントが
-	\ \cs{jttdefault}\ に変更される．また，これらのクラスファイルやパッケージは
-	\ \cs{jttdefault}\ を \cs{gtdefault}（ゴシック体）に再定義する．
-  }．標準値は \cs{mcdefault}，つまり明朝体として用いるのと
-  同じフォントファミリである．
 %</ja>
 
 %<*en>
@@ -1345,7 +1350,7 @@ auto select&\cs{fontencoding}&\cs{fontfamily}&---&---&\cs{usefont}\\
 \item 和文フォントのシェイプを定義するには，通常の \cs{DeclareFontShape} を使えば良い：
 %</ja>
 \begin{lstlisting}
-\DeclareFontShape{JY3}{mc}{bx}{n}{<-> s*KozMinPr6N-Bold:jfm=ujis;-kern}{}
+\DeclareFontShape{JY3}{mc}{b}{n}{<-> s*KozMinPr6N-Bold:jfm=ujis;-kern}{}
     % Kozuka Mincho Pr6N Bold
 \end{lstlisting}
 %<*ja>
@@ -1479,14 +1484,14 @@ counterparts of original commands in the \Pkg{fontspec} package
 \begin{tabular}{>{\bfseries}lllll}
 \toprule
 Japanese fonts
-&\cs{jfontspec}&\cs{setmainjfont}&\cs{setsansjfont}&\cs{setmonojfont}$^*$\\
+&\cs{jfontspec}&\cs{setmainjfont}&\cs{setsansjfont}&\cs{setmonojfont}\\
 Alphabetic fonts
 &\cs{fontspec}&\cs{setmainfont}&\cs{setsansfont}&\cs{setmonofont}\\
 \midrule
 Japanese fonts
-&\cs{newjfontfamily}&\cs{renewjfontfamily}$^{**}$&\cs{setjfontfamily}$^{**}$\\
+&\cs{newjfontfamily}&\cs{renewjfontfamily}&\cs{setjfontfamily}\\
 Alphabetic fonts
-&\cs{newfontfamily}&\cs{renewfontfamily}$^{**}$&\cs{setfontfamily}$^{**}$\\
+&\cs{newfontfamily}&\cs{renewfontfamily}&\cs{setfontfamily}\\
 \midrule
 Japanese fonts
 &\cs{newjfontface}&\cs{defaultjfontfeatures}&\cs{addjfontfeatures}\\
@@ -1494,15 +1499,6 @@ Alphabetic fonts
 &\cs{newfontface}&\cs{defaultfontfeatures}&\cs{addfontfeatures}\\
 \bottomrule
 \end{tabular}\par}
-\medskip
-\fakefn{$^*$}{%
-  \cs{setmonojfont} is defined if and only if \texttt{match} option is specified.}
-\fakefn{$^{**}$}{%
-  \cs{renewfontfamily}~and~\cs{setfontfamily} are new commands
-  in \Pkg{fontspec}~v2.6h (2018/7/30).
-  Hence, \Pkg{luatexja-fontspec} define \cs{renewjfontfamily}~and~\cs{setjfontfamily}
-  only when \Pkg{fontspec}~v2.6h (or later) is used.
-}
 \end{table}
 %</en>
 %<*ja>
@@ -1513,14 +1509,14 @@ Alphabetic fonts
 \begin{tabular}{lllll}
 \toprule
 \emph{和文}
-&\cs{jfontspec}&\cs{setmainjfont}&\cs{setsansjfont}&\cs{setmonojfont}$^*$\\
+&\cs{jfontspec}&\cs{setmainjfont}&\cs{setsansjfont}&\cs{setmonojfont}\\
 \emph{欧文}
 &\cs{fontspec}&\cs{setmainfont}&\cs{setsansfont}&\cs{setmonofont}\\
 \midrule
 \emph{和文}
-&\cs{newjfontfamily}&\cs{renewjfontfamily}$^{**}$&\cs{setjfontfamily}$^{**}$\\
+&\cs{newjfontfamily}&\cs{renewjfontfamily}&\cs{setjfontfamily}\\
 \emph{欧文}
-&\cs{newfontfamily}&\cs{renewfontfamily}$^{**}$&\cs{setfontfamily}$^{**}$\\
+&\cs{newfontfamily}&\cs{renewfontfamily}&\cs{setfontfamily}\\
 \midrule
 \emph{和文}
 &\cs{newjfontface}&\cs{defaultjfontfeatures}&\cs{addjfontfeatures}\\
@@ -1528,17 +1524,6 @@ Alphabetic fonts
 &\cs{newfontface}&\cs{defaultfontfeatures}&\cs{addfontfeatures}\\
 \bottomrule
 \end{tabular}\par}
-
-\medskip
-\fakefn{$^*$}{\cs{setmonojfont} は \texttt{match} オプションが
-指定された時のみ定義される．}
-\fakefn{$^{**}$}{%
-  \cs{renewfontfamily} と \cs{setfontfamily} は
-  \Pkg{fontspec}~v2.6h (2018/7/30)で新たに追加された命令である．
-  そのため，\Pkg{luatexja-fontspec}が \cs{renewjfontfamily} と \cs{setjfontfamily} を
-  定義するのはv2.6h以降の\Pkg{fontspec}を使用した時のみになっている．
-}
-
 \end{table}
 %</ja>
 
@@ -1549,18 +1534,12 @@ Alphabetic fonts
 %<*en>
 If this option is specified, usual family-changing commands such as
 \cs{rmfamily},~\cs{textrm}, \cs{sffamily},~\dots\ also change Japanese font family.
-
-Note that \emph{\cs{setmonojfont} is defined
-if and only if this \texttt{\textup{match}} option is specified}.
 %</en>
 
 %<*ja>
 このオプションが指定されると，「\pLaTeXe 新ドキュメントクラス」のように\
 \cs{rmfamily}, \verb+\textrm{...}+, \cs{sffamily} 等が
 欧文フォントだけでなく和文フォントも変更するようになる．
-
-\emph{なお，\cs{setmonojfont} はこの \texttt{match} オプションが
-指定された時のみ定義される．}この命令は標準の「タイプライタ体に対応する和文フォント」を指定する．
 %</ja>
 
  \item[pass=<opts>]
@@ -1602,12 +1581,8 @@ This means that two lines below are equivalent, for example.
 \usepackage[no-math]{fontspec}\usepackage{luatexja-fontspec}
 \usepackage[no-math]{luatexja-fontspec}
 \end{lstlisting}
-
-
 %<*en>
-The reason that \cs{setmonojfont} is not defined by default is that
-it is popular for Japanese fonts that nearly all Japanese glyphs have same
-widths.  Also note that kerning information in a font is not used
+Note that kerning information in a font is not used
 (that is, \texttt{kern} feature is set off) by default in these seven (or~eight) commands.
 This is because of the compatibility with previous versions of \LuaTeX-ja
 (see \ref{para-kern}).
@@ -1615,9 +1590,7 @@ This is because of the compatibility with previous versions of \LuaTeX-ja
 Below is an example of \cs{jfontspec}.
 %</en>
 %<*ja>
-標準で \cs{setmonojfont} コマンドが定義されないのは，
-和文フォントではほぼ全ての和文文字のグリフが等幅であるのが伝統的であったことによる．
-また，これらの和文用のコマンドではフォント内のペアカーニング情報は標準では使用されない，
+これらの和文用のコマンドではフォント内のペアカーニング情報は標準では使用されない，
 言い換えれば \texttt{kern} featureは標準では無効化となっている．
 これは以前のバージョンの\LuaTeX-jaとの互換性のためである（\ref{para-kern}節を参照）．
 
@@ -8463,42 +8436,44 @@ and use them by \cs{ltjapplypreset}. These two commands can only be used in the 
   新たに<name>という名称のプリセットを定義する．この名称は，
   すでに定義されているプリセット名や，
   \ref{sssec:ltjpreset-general}で定義されているオプション，さらに
-  次の9つと重複してはならない．
+  次の11個と重複してはならない．
   \begin{quote}
 	\ttfamily
-	mc mc-l mc-m mc-bx gt gt-m gt-bx gt-eb mg-m
+	mc mc-l mc-m mc-b mc-bx gt gt-m gt-b gt-bx gt-eb mg-m
   \end{quote}
 
   <specification>は，プリセット名や以下のキー達のコンマ区切りリストを指定する：
   \begin{description}
    \item[\ttfamily mc-l=<font>] 明朝体細字(\cs{mcfamily}\cs{ltseries})
    \item[\ttfamily mc-m=<font>] 明朝体中字(\cs{mcfamily}\cs{mdseries})
-   \item[\ttfamily mc-bx=<font>] 明朝体太字(\cs{mcfamily}\cs{bfseries})
+   \item[\ttfamily mc-b=<font>] 明朝体太字(\cs{mcfamily}\cs{bfseries})
+   \item[\ttfamily mc-bx=<font>] \texttt{mc-b=<font>}と同義．
    \item[\ttfamily gt-m=<font>] ゴシック体中字(\cs{gtfamily}\cs{mdseries})
-   \item[\ttfamily gt-bx=<font>] ゴシック体太字(\cs{gtfamily}\cs{bfseries})
+   \item[\ttfamily gt-b=<font>] ゴシック体太字(\cs{gtfamily}\cs{bfseries})
+   \item[\ttfamily gt-bx=<font>] \texttt{gt-b=<font>}と同義．
    \item[\ttfamily gt-eb=<font>] ゴシック体太字(\cs{gtfamily}\cs{ebseries})
    \item[\ttfamily mg-m=<font>] 丸ゴシック体(\cs{mgfamily})
    \item[\ttfamily mc=<font>] 明朝体の細字・中字・太字全部を設定．
 	以下を指定したことと同じである：
 	\begin{quote}
-	  \ttfamily mc-l=<font>, mc-m=<font>, mc-bx=<font>
+	  \ttfamily mc-l=<font>, mc-m=<font>, mc-b=<font>
 	\end{quote}
    \item[\ttfamily gt=<font>] ゴシック体の中字・太字・極太全部を設定．
 	以下を指定したことと同じである：
 	\begin{quote}
-	  \ttfamily gt-m=<font>, gt-bx=<font>, gt-eb=<font>
+	  \ttfamily gt-m=<font>, gt-b=<font>, gt-eb=<font>
 	\end{quote}
   \end{description}
   なお，パッケージ読み込み時に \texttt{deluxe} が有効でない場合は，
-  上記9キーのうち\texttt{mc}, \texttt{gt}しか実質的に意味を持たない．  
+  上記11キーのうち\texttt{mc}, \texttt{gt}しか実質的に意味を持たない．
 %</ja>
 %<*en>
   Define new preset~<name>. This <name> cannot be same as other presets,
   options described in Subsubsection~\ref{sssec:ltjpreset-general}, nor
-  following nine strings:
+  following 11~strings:
   \begin{quote}
-	\ttfamily
-	mc mc-l mc-m mc-bx gt gt-m gt-bx gt-eb mg-m
+	\ttfamily	
+	mc mc-l mc-m mc-b mc-bx gt gt-m gt-b gt-bx gt-eb mg-m
   \end{quote}
 
   <specification> is a comma-separated list which consists of
@@ -8506,22 +8481,24 @@ and use them by \cs{ltjapplypreset}. These two commands can only be used in the 
   \begin{description}
    \item[\ttfamily mc-l=<font>] mincho light
    \item[\ttfamily mc-m=<font>] mincho medium
-   \item[\ttfamily mc-bx=<font>] mincho bold
+   \item[\ttfamily mc-b=<font>] mincho bold
+   \item[\ttfamily mc-bx=<font>] synonym for \texttt{mc-b=<font>}
    \item[\ttfamily gt-m=<font>] gothic medium
-   \item[\ttfamily gt-bx=<font>] gothic bold
+   \item[\ttfamily gt-b=<font>] gothic bold
+   \item[\ttfamily gt-bx=<font>] synonym for \texttt{gt-b=<font>}
    \item[\ttfamily gt-eb=<font>] gothic extra~bold
    \item[\ttfamily mg-m=<font>] rounded gothic
    \item[\ttfamily mc=<font>] Same as
 	\begin{quote}
-	  \ttfamily mc-l=<font>, mc-m=<font>, mc-bx=<font>
+	  \ttfamily mc-l=<font>, mc-m=<font>, mc-b=<font>
 	\end{quote}
    \item[\ttfamily gt=<font>] Same as
 	\begin{quote}
-	  \ttfamily gt-m=<font>, gt-bx=<font>, gt-eb=<font>
+	  \ttfamily gt-m=<font>, gt-b=<font>, gt-eb=<font>
 	\end{quote}
   \end{description}
   If \texttt{deluxe} is not specified at loading the package,
-  only \texttt{mc}~and~\texttt{gt} keys (among above 9~keys) have a meaning.
+  only \texttt{mc}~and~\texttt{gt} keys (among above 11~keys) have a meaning.
 %</en>
  \item[\cs{ltjnewpreset}*\{<name>\}\{<specification>\}]
 %<*ja>
@@ -8543,7 +8520,7 @@ and use them by \cs{ltjapplypreset}. These two commands can only be used in the 
 \cs{ltjapplypreset}で実際に使うときに定義されていれば良い．
 そのため，次のような記述も可能である：
 \begin{lstlisting}
-  \ltjnewpreset{hoge}{piyo,mc-bx=HiraMinProN-W6}
+  \ltjnewpreset{hoge}{piyo,mc-b=HiraMinProN-W6}
   \ltjnewpreset{piyo}{mg-m=HiraMaruProN-W4}
   \ltjapplypreset{hoge}
 \end{lstlisting}
@@ -8562,7 +8539,7 @@ and use them by \cs{ltjapplypreset}. These two commands can only be used in the 
 Note that \cs{ltjnewpreset} does not ``expand'' the definition to define a preset.
 This means that one can write as the following:
 \begin{lstlisting}
-  \ltjnewpreset{hoge}{piyo,mc-bx=HiraMinProN-W6}
+  \ltjnewpreset{hoge}{piyo,mc-b=HiraMinProN-W6}
   \ltjnewpreset{piyo}{mg-m=HiraMaruProN-W4}
   \ltjapplypreset{hoge}
 \end{lstlisting}
