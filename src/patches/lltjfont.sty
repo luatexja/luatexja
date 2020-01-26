@@ -3,9 +3,9 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2020/01/12 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2020/01/26 Patch to NFSS2 for LuaTeX-ja]
 
-%% pathing \DeclareTextComposite
+%% patching \DeclareTextComposite
 \def\ltj@chardef@text@cmd#1{%
   \let\@ifdefinable\@@ifdefinable%
   \edef\ltj@chardef@text@cmd@name{\expandafter\@gobble\string#1}%
@@ -682,7 +682,6 @@
     \maybe@load@fontshape\endgroup}{}{}
 \patchcmd\prepare@family@series@update@kanji{\@meta@family@list}{\@meta@family@kanji@list}{}{}
 \def\@meta@family@kanji@list{\@elt{mc}\@elt{gt}\@elt{jtt}}
-%%\appto\@meta@family@list{\@elt{mc}\@elt{gt}\@elt{jtt}}
 \DeclareRobustCommand\bfseries{%
   \not@math@alphabet\bfseries\mathbf
   \expand@font@defaults
