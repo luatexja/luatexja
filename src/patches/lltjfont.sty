@@ -568,7 +568,7 @@
   \fi\fi
 }
 
-\ifdefined\fontseriesforce
+\ifdefined\@rmfamilyhook
 %%%% LaTeX 2020-02-02
 \DeclareRobustCommand\romanseriesforce[1]{\edef\f@series{#1}}
 \DeclareRobustCommand\kanjiseriesforce[1]{\edef\k@series{#1}}
@@ -671,7 +671,7 @@
     \ignorespaces}
 \let\reset@font\normalfont
 
-\ifdefined\fontseriesforce
+\ifdefined\@rmfamilyhook
 %%%% LaTeX 2020-02-02
 \let\prepare@family@series@update@kanji=\prepare@family@series@update
 \patchcmd\prepare@family@series@update{\fontfamily}{\romanfamily}{}{}

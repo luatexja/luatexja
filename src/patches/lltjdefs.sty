@@ -83,14 +83,14 @@
   \DeclareMathAlphabet{\mathgt}{JY3}{gt}{m}{n}
 \fi
 
-\ifdefined\fontseriesforce
+\ifdefined\@rmfamilyhook
 %%%% LaTeX 2020-02-02
 \edef\bfseries@mc{\bfdefault}
 \edef\bfseries@gt{\bfdefault}
-\def\bfseries@jtt{\bfseries@gt}
+\def\bfseries@jtt{\bfseries@mc}
 \edef\mdseries@mc{\mddefault}
 \edef\mdseries@gt{\mddefault}
-\def\mdseries@jtt{\mdseries@gt}
+\def\mdseries@jtt{\mdseries@mc}
 \fi
 
 \newif\if@ltj@match@family

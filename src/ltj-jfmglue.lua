@@ -789,7 +789,7 @@ do
       local abs, log, log264, floor = math.abs, math.log, math.log(2)*64, math.floor
       blend_diffmet_inf = function (b, a, bo, ao, rb, ra)
          local nb, na = (bo and b*2.0^(64*bo) or 0), (ao and a*2.0^(64*ao) or 0)
-         local r = luatexja.jfmglue.diffmet_rule((1-rb)*b+rb*a, (1-ra)*b+ra*a)
+         local r = luatexja.jfmglue.diffmet_rule((1-rb)*nb+rb*na, (1-ra)*nb+ra*na)
          local ro = (r~=0) and floor(log(abs(r))/log264+0.0625) or 0
          return round(r/2.^(64*ro)), ro
       end

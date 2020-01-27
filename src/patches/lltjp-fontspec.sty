@@ -12,7 +12,6 @@
   \tl_replace_all:cnn { rmfamily~ } { \fontfamily }{ \romanfamily }
   \tl_replace_all:cnn { sffamily~ } { \fontfamily }{ \romanfamily }
   \tl_replace_all:cnn { ttfamily~ } { \fontfamily }{ \romanfamily }
-  \typeout{LATEX~ 2019-10-01!}
   \cs_if_exist:NF \@rmfamilyhook {
     \tl_replace_all:cnn { rmfamily~ } { \selectfont } {
       \if@ltj@match@family
