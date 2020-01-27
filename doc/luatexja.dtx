@@ -663,7 +663,6 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %<ja>\item \emph{IPAexフォント(\url{http://ipafont.ipa.go.jp/})}
 \end{itemize}
 
-
 %<*en>
 Now \LuaTeX-ja is available from
 CTAN (in the \texttt{macros/luatex/generic/luatexja} directory), and
@@ -877,6 +876,31 @@ and finally delete the temporary directory.
 コピーし，その中で\LuaTeX-jaの初回起動を行い，作業用ディレクトリを消す作業をしている．
 %</ja>
 
+\item
+%<*en>
+Note that when \LuaTeX-ja is loaded in plain \LuaTeX~nor \LaTeX~2019-10-01,
+we cannot use color specification on font loading, such as
+\begin{lstlisting}
+  \font\hoge=lmroman10-regular.otf:color=FF0000 % \font primitive
+  \DeclareFontShape{TU}{...}{...}{...}{<-> lmsans10-boldoblique:color=005599}{} % NFSS
+  \setmainfont{texgyretermes}[Color=220022]     % fontspec
+\end{lstlisting}
+This is because codes for shifting baseline in math mode (\LuaTeX-ja) collide with and prevents loading
+codes for font color (\Pkg{luaotfload}) in these environments.
+\emph{We recommend to use \LaTeX\ 2020-02-02}, since we can avoid this collision in \LaTeX\ 2020-02-02.
+%</en>
+%<*ja>
+なお，\LuaTeX-jaをplain~\LuaTeX や\LaTeX\ 2019-10-01以前の環境下で用いる場合，
+以下のような\emph{フォント読み込み時の色指定}（\cs{textcolor}命令ではなく！）\emph{は利用できない}．
+\begin{lstlisting}
+  \font\hoge=lmroman10-regular.otf:color=FF0000 % \font primitive
+  \DeclareFontShape{TU}{...}{...}{...}{<-> lmsans10-boldoblique:color=005599}{} % NFSS
+  \setmainfont{texgyretermes}[Color=220022]     % fontspec
+\end{lstlisting}
+これは，\LuaTeX-jaによる数式内のベースライン補正（\ref{ssec:baseline}節）のコードが
+\Pkg{luaotfload}パッケージのフォント色処理のコードと衝突するためである．
+\LaTeX\ 2020-02-02以降では衝突回避のための仕組みが備わっているので．\emph{\LaTeX\ 2020-02-02以降での使用を勧める}．
+%</ja>
 \end{itemize}
 
 %<en>\subsection{Using in plain \TeX}
@@ -2301,6 +2325,7 @@ parameters to \texttt{true}/\texttt{false}, respectively.
 
 %<en>\subsection{Shifting the baseline}
 %<ja>\subsection{ベースラインの移動}
+\label{ssec:baseline}
 %<*en>
 To make a match between a Japanese font and an alphabetic font, sometimes
 shifting of the baseline of one of the pair is needed. In \pTeX, this is achieved

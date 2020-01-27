@@ -825,7 +825,7 @@ do
          if not gbst then gr = ga; node_free(gb) else node_free(ga) end
          gbw = blend_diffmet(gbw or 0, gaw or 0, db, da) -- 結果の自然長
          gbst, gbsto = blend_diffmet_inf(gbst, gast, gbsto, gasto, db, da) -- 伸び
-	 gbsh, gbsho = blend_diffmet_inf(-(gbsh or 0), -(gash or 0), gbsto, gasto, db, da) -- -(縮み)
+         gbsh, gbsho = blend_diffmet_inf(-(gbsh or 0), -(gash or 0), gbsho, gasho, db, da) -- -(縮み)
 	 setglue(gr, gbw, gbst, -gbsh, gbsto, gbsho)
 	 return gr
       end
@@ -855,13 +855,14 @@ do
 	    set_attr(g, attr_icflag, KANJI_SKIP_JFM)
 	    return g
 	 elseif flag then
-	    local g = node_new(id_glue);
+	    local g = node_new(id_glue)
+            local st = bp and (bp*getfield(kanji_skip, 'stretch')) or 0
+            local sh = bh and (bh*getfield(kanji_skip, 'shrink')) or 0
 	    setglue(g,
 	       bn and (bn*getfield(kanji_skip, 'width')) or 0,
-	       bp and (bp*getfield(kanji_skip, 'stretch')) or 0,
-	       bh and (bh*getfield(kanji_skip, 'shrink')) or 0,
-	       bp and bp~=0 and getfield(kanji_skip, 'stretch_order') or 0,
-	       bh and bh~=0 and getfield(kanji_skip, 'shrink_order') or 0)
+	       st, sh, 
+	       (st==0) and 0 or getfield(kanji_skip, 'stretch_order'),
+	       (sh==0) and 0 or getfield(kanji_skip, 'shrink_order'))
 	    set_attr(g, attr_icflag, KANJI_SKIP_JFM)
 	    return g
 	 end

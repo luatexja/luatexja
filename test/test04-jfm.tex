@@ -400,4 +400,12 @@ end}}
 \setbox0=\hbox{\kmd 」カ゚．}
 \dumplist0
 
+\head{その他: kanjiskip with inf stretch}
+\jfont\knx=KozMinPr6N-Regular.otf:jfm=test2;-kern
+
+\ltjsetparameter{kanjiskip=1pt plus 1.25fil minus 2.75fill}
+\ltjsetparameter{differentjfm=average}
+\setbox0=\hbox{感感」\knx 感}
+\dumplist0
+
 \end
