@@ -572,10 +572,10 @@
 %%%% LaTeX 2020-02-02
 \DeclareRobustCommand\romanseriesforce[1]{\edef\f@series{#1}}
 \DeclareRobustCommand\kanjiseriesforce[1]{\edef\k@series{#1}}
-\DeclareRobustCommand\fontseriesforce[1]{\kanjiseries{#1}\romanseries{#1}}
+\DeclareRobustCommand\fontseriesforce[1]{\kanjiseriesforce{#1}\romanseriesforce{#1}}
 \DeclareRobustCommand\romanshapeforce[1]{\edef\f@shape{#1}}
 \DeclareRobustCommand\kanjishapeforce[1]{\edef\k@shape{#1}}
-\DeclareRobustCommand\fontshapeforce[1]{\kanjishape{#1}\romanshape{#1}}
+\DeclareRobustCommand\fontshapeforce[1]{\kanjishapeforce{#1}\romanshapeforce{#1}}
 
 \def\merge@font@kanji@series#1{%
   \expandafter\expandafter\expandafter
