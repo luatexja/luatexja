@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2020/01/26 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2020/01/31 Patch to NFSS2 for LuaTeX-ja]
 
 %% patching \DeclareTextComposite
 \def\ltj@chardef@text@cmd#1{%
@@ -577,46 +577,46 @@
 \DeclareRobustCommand\kanjishapeforce[1]{\edef\k@shape{#1}}
 \DeclareRobustCommand\fontshapeforce[1]{\kanjishapeforce{#1}\romanshapeforce{#1}}
 
-\def\merge@font@kanji@series#1{%
+\def\merge@kanji@series#1{%
   \expandafter\expandafter\expandafter
-  \merge@font@kanji@series@
+  \merge@kanji@series@
     \csname series@\k@series @#1\endcsname
     {#1}%
     \@nil
 }
-\def\set@target@kanji@series#1{%
+\def\set@target@series@kanji#1{%
     \edef\k@series{#1}%
     \edef\k@series{\expandafter\series@drop@one@m\k@series mm\series@drop@one@m}%
 }
-\def\merge@font@kanji@series@#1#2#3\@nil{%
+\def\merge@kanji@series@#1#2#3\@nil{%
   \def\@reserveda{#3}%
   \ifx\@reserveda\@empty
-    \set@target@kanji@series{#2}%
+    \set@target@series@kanji{#2}%
   \else
     \begingroup\let\f@encoding\k@encoding\let\f@family\k@family
 	   \maybe@load@fontshape\endgroup
     \edef\@reserveda{\k@encoding /\k@family /#1/\k@shape}%
      \ifcsname \@reserveda \endcsname
-       \set@target@kanji@series{#1}%
+       \set@target@series@kanji{#1}%
     \else
        \ifcsname \k@encoding /\k@family /#2/\k@shape \endcsname
-         \set@target@kanji@series{#2}%
+         \set@target@series@kanji{#2}%
          {\let\curr@fontshape\curr@kfontshape\@font@shape@subst@warning}%
        \else
-         \set@target@kanji@series{#3}%
+         \set@target@series@kanji{#3}%
          {\let\curr@fontshape\curr@kfontshape\@font@shape@subst@warning}%
        \fi
     \fi
   \fi
 }
-\def\merge@font@kanji@shape#1{%
+\def\merge@kanji@shape#1{%
   \expandafter\expandafter\expandafter
-  \merge@font@kanji@shape@
+  \merge@kanji@shape@
     \csname shape@\k@shape @#1\endcsname
     {#1}%
     \@nil
 }
-\def\merge@font@kanji@shape@#1#2#3\@nil{%
+\def\merge@kanji@shape@#1#2#3\@nil{%
   \def\@reserveda{#3}%
   \ifx\@reserveda\@empty
     \edef\k@shape{#2}%
@@ -637,13 +637,19 @@
   \fi
 }
 \DeclareRobustCommand\romanseries[1]{\merge@font@series{#1}}
-\DeclareRobustCommand\kanjiseries[1]{\merge@font@kanji@series{#1}}
+\DeclareRobustCommand\kanjiseries[1]{\merge@kanji@series{#1}}
 \DeclareRobustCommand\fontseries[1]{%
-   \merge@font@series{#1}\merge@font@kanji@series{#1}}
+   \merge@font@series{#1}\merge@kanji@series{#1}}
 \DeclareRobustCommand\romanshape[1]{\merge@font@shape{#1}}
-\DeclareRobustCommand\kanjishape[1]{\merge@font@kanji@shape{#1}}
+\DeclareRobustCommand\kanjishape[1]{\merge@kanji@shape{#1}}
 \DeclareRobustCommand\fontshape[1]{%
-   \merge@font@shape{#1}\merge@font@kanji@shape{#1}}
+   \merge@font@shape{#1}\merge@kanji@shape{#1}}
+\DeclareRobustCommand\usekanji[4]{%
+    \kanjiencoding{#1}\edef\k@family{#2}\edef\k@series{#3}\edef\k@shape{#4}%
+    \selectfont\ignorespaces}
+\DeclareRobustCommand\useroman[4]{%
+    \romanencoding{#1}\edef\f@family{#2}\edef\f@series{#3}\edef\f@shape{#4}%
+    \selectfont\ignorespaces}
 \else
 %%%% LaTeX 2019-10-01
 \DeclareRobustCommand\romanseries[1]{\edef\f@series{#1}}
@@ -652,14 +658,14 @@
 \DeclareRobustCommand\romanshape[1]{\edef\f@shape{#1}}
 \DeclareRobustCommand\kanjishape[1]{\edef\k@shape{#1}}
 \DeclareRobustCommand\fontshape[1]{\kanjishape{#1}\romanshape{#1}}
-\fi
-%%%%
 \DeclareRobustCommand\usekanji[4]{%
     \kanjiencoding{#1}\kanjifamily{#2}\kanjiseries{#3}\kanjishape{#4}%
     \selectfont\ignorespaces}
 \DeclareRobustCommand\useroman[4]{%
     \romanencoding{#1}\romanfamily{#2}\romanseries{#3}\romanshape{#4}%
     \selectfont\ignorespaces}
+\fi
+%%%%
 \protected\def\usefont#1#2#3#4{%
   \directlua{luatexja.jfont.is_kenc('\luatexluaescapestring{#1}')}\ifin@%
   \usekanji{#1}{#2}{#3}{#4}%
@@ -675,13 +681,18 @@
 %%%% LaTeX 2020-02-02
 \let\prepare@family@series@update@kanji=\prepare@family@series@update
 \patchcmd\prepare@family@series@update{\fontfamily}{\romanfamily}{}{}
+\patchcmd\prepare@family@series@update@kanji{\update@series@target@value}{\update@series@target@value@kanji}{}{}
+\patchcmd\prepare@family@series@update@kanji{\@meta@family@list}{\@meta@family@list@kanji}{}{}
 \patchcmd\prepare@family@series@update@kanji{\fontfamily}{\kanjifamily}{}{}
-\patchcmd\prepare@family@series@update@kanji{\f@series}{\k@series}{}{}
 \patchcmd\prepare@family@series@update@kanji{\maybe@load@fontshape}
   {\begingroup\let\f@encoding\k@encoding\let\f@family\k@family
     \maybe@load@fontshape\endgroup}{}{}
-\patchcmd\prepare@family@series@update@kanji{\@meta@family@list}{\@meta@family@kanji@list}{}{}
-\def\@meta@family@kanji@list{\@elt{mc}\@elt{gt}\@elt{jtt}}
+\patchcmd\prepare@family@series@update@kanji{\f@series}{\k@series}{}{}
+\let\update@series@target@value@kanji=\update@series@target@value
+\patchcmd\update@series@target@value@kanji{\f@family}{\k@family}{}{}
+\patchcmd\update@series@target@value@kanji{\f@series}{\k@series}{}{}
+
+\def\@meta@family@list@kanji{\@elt{mc}\@elt{gt}\@elt{jtt}}
 \DeclareRobustCommand\bfseries{%
   \not@math@alphabet\bfseries\mathbf
   \expand@font@defaults

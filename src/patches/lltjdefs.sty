@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjdefs}[2019/09/26 Default font settings of LuaTeX-ja]
+\ProvidesPackage{lltjdefs}[2020/01/31 Default font settings of LuaTeX-ja]
 
 \ifdefined\ltj@stdmcfont\else\def\ltj@stdmcfont{IPAExMincho}\fi
 \ifdefined\ltj@stdgtfont\else\def\ltj@stdgtfont{IPAExGothic}\fi
@@ -105,7 +105,7 @@
 	  \expandafter\patchcmd\csname #1 \endcsname{\selectfont}{#2\selectfont}{}{}%
 	\else
 	  \PackageWarningNoLine{luatexja}{%
-		Patching to \expandafter\string\csname #1\endcsname\space failed
+		Patching to \expandafter\string\csname #1\endcsname\space failed%
 	  }%
 	\fi
   \fi
