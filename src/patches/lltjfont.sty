@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2020/01/31 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2020/02/04 Patch to NFSS2 for LuaTeX-ja]
 
 %% patching \DeclareTextComposite
 \def\ltj@chardef@text@cmd#1{%
@@ -621,7 +621,8 @@
   \ifx\@reserveda\@empty
     \edef\k@shape{#2}%
   \else
-    \maybe@load@fontshape
+    \begingroup\let\f@encoding\k@encoding\let\f@family\k@family
+	   \maybe@load@fontshape\endgroup
     \edef\@reserveda{\k@encoding /\k@family /\k@series/#1}%
      \ifcsname \@reserveda\endcsname
        \edef\k@shape{#1}%
