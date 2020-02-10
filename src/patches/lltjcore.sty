@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2020/02/11 Patch to LaTeX2e Kernel for LuaTeX-ja]
+\ProvidesPackage{lltjcore}[2019/09/26 Patch to LaTeX2e Kernel for LuaTeX-ja]
 \RequirePackage{etoolbox}
 
 \def\cleardoublepage{\clearpage\if@twoside
@@ -292,7 +292,7 @@
   \ifvmode
     \@nolnerr
   \else
-    \unskip \reserved@e {\reserved@f#1}\nobreak \hfil \break \null\ltjfakeboxbdd
+    \unskip \reserved@e {\reserved@f#1}\nobreak \hfil \break \null
     % \null は \break の効果が行頭禁則文字で打ち消されないために必要
   \ignorespaces
 \fi}
