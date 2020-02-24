@@ -3,7 +3,8 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-geometry}[2018/01/19 Patch to geometry for LuaTeX-ja with vertical writing mode]
+\ProvidesPackage{lltjp-geometry}[2020/02/25 Patch to geometry for LuaTeX-ja with vertical writing mode]
+\RequirePackage{expl3}
 \ifdefined\if@ltj@@geometry@tate\expandafter\endinput\fi
 \newif\if@ltj@@geometry@tate
 \newif\if@ltj@@geometry@forceoff
@@ -35,6 +36,7 @@
 % define ifGm@swap@papersize if it is undefined
 \expandafter\newif\csname ifGm@swap@papersize\endcsname
 
+\ExplSyntaxOn
 \AtBeginOfPackageFile{geometry}{%
   \edef\Gm@ltj@topskip{\the\topskip}
   \edef\Gm@ltj@headsep{\the\headsep}
@@ -44,7 +46,7 @@
 \else
   \@gobble\iftrue\csname iftdir\endcsname\@ltj@@geometry@tatetrue\fi
 \fi
-\patchcmd\@begindocumenthook{\tate}{\tate}{\@ltj@@geometry@tatetrue}{}%
+\tl_if_in:NnT \@begindocumenthook { \tate } { \@ltj@@geometry@tatetrue }
 \if@ltj@@geometry@tate
   \if@ltj@@geometry@forceoff
     \@ltj@@geometry@tatefalse
@@ -53,6 +55,8 @@
   \fi
 \fi
 }
+\ExplSyntaxOff
+
 \AtEndOfPackageFile{geometry}{%
 \let\PackageWarningNoLine=\orig@PackageWarningNoLine
 \if@ltj@@geometry@tate
