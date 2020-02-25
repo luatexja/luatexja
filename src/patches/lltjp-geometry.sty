@@ -36,7 +36,6 @@
 % define ifGm@swap@papersize if it is undefined
 \expandafter\newif\csname ifGm@swap@papersize\endcsname
 
-\ExplSyntaxOn
 \AtBeginOfPackageFile{geometry}{%
   \edef\Gm@ltj@topskip{\the\topskip}
   \edef\Gm@ltj@headsep{\the\headsep}
@@ -46,7 +45,7 @@
 \else
   \@gobble\iftrue\csname iftdir\endcsname\@ltj@@geometry@tatetrue\fi
 \fi
-\tl_if_in:NnT \@begindocumenthook { \tate } { \@ltj@@geometry@tatetrue }
+\csname tl_if_in:NnT\endcsname\@begindocumenthook{\tate}{\@ltj@@geometry@tatetrue}
 \if@ltj@@geometry@tate
   \if@ltj@@geometry@forceoff
     \@ltj@@geometry@tatefalse
@@ -55,7 +54,6 @@
   \fi
 \fi
 }
-\ExplSyntaxOff
 
 \AtEndOfPackageFile{geometry}{%
 \let\PackageWarningNoLine=\orig@PackageWarningNoLine
