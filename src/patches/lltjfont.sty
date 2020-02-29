@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2020/02/07 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2020/02/29 Patch to NFSS2 for LuaTeX-ja]
 
 %% patching \DeclareTextComposite
 \def\ltj@chardef@text@cmd#1{%
@@ -570,12 +570,17 @@
 
 \ifdefined\@rmfamilyhook
 %%%% LaTeX 2020-02-02
-\DeclareRobustCommand\romanseriesforce[1]{\edef\f@series{#1}}
-\DeclareRobustCommand\kanjiseriesforce[1]{\edef\k@series{#1}}
-\DeclareRobustCommand\fontseriesforce[1]{\kanjiseriesforce{#1}\romanseriesforce{#1}}
-\DeclareRobustCommand\romanshapeforce[1]{\edef\f@shape{#1}}
-\DeclareRobustCommand\kanjishapeforce[1]{\edef\k@shape{#1}}
-\DeclareRobustCommand\fontshapeforce[1]{\kanjishapeforce{#1}\romanshapeforce{#1}}
+\newif\ifltj@@latex@plv@develop
+\ifx\series@maybe@drop@one@m\@undefined     % patch level 0--4
+  \@latex@error
+   {Please update LaTeX2e!^^J\space\space
+     At least LaTeX2e 2020-02-02 patch level 5 is required}
+   {LaTeX2e 2020-02-02 patch level 2 and 4 has a bug.}
+\else
+  \unless\ifx\series@maybe@drop@one@m@x\@undefined % patch level 5
+    \ltj@@latex@plv@developtrue
+  \fi
+\fi
 
 \def\merge@kanji@series#1{%
   \expandafter\expandafter\expandafter
@@ -584,10 +589,19 @@
     {#1}%
     \@nil
 }
-\def\set@target@series@kanji#1{%
-    \edef\k@series{#1}%
-    \edef\k@series{\expandafter\series@drop@one@m\k@series mm\series@drop@one@m}%
-}
+
+\ifltj@@latex@plv@develop % 2020-02-02 pl5 + develop
+  \def\set@target@series@kanji#1{%
+      \edef\k@series{#1}%
+      \series@maybe@drop@one@m\k@series\k@series
+  }
+\else
+  \def\set@target@series@kanji#1{%
+      \edef\k@series{#1}%
+      \expandafter\series@maybe@drop@one@m\expandafter{\k@series}\k@series
+  }
+\fi
+
 \def\merge@kanji@series@#1#2#3\@nil{%
   \def\reserved@a{#3}%
   \ifx\reserved@a\@empty
@@ -637,14 +651,21 @@
     \fi
   \fi
 }
-\DeclareRobustCommand\romanseries[1]{\merge@font@series{#1}}
-\DeclareRobustCommand\kanjiseries[1]{\merge@kanji@series{#1}}
+\DeclareRobustCommand\romanseries[1]{\@forced@seriesfalse\merge@font@series{#1}}
+\DeclareRobustCommand\kanjiseries[1]{\@forced@seriesfalse\merge@kanji@series{#1}}
 \DeclareRobustCommand\fontseries[1]{%
-   \merge@font@series{#1}\merge@kanji@series{#1}}
+   \@forced@seriesfalse\merge@font@series{#1}\merge@kanji@series{#1}}
+\DeclareRobustCommand\romanseriesforce[1]{\@forced@seriestrue\merge@font@series{#1}}
+\DeclareRobustCommand\kanjiseriesforce[1]{\@forced@seriestrue\merge@kanji@series{#1}}
+\DeclareRobustCommand\fontseriesforce[1]{%
+   \@forced@seriestrue\merge@font@series{#1}\merge@kanji@series{#1}}
 \DeclareRobustCommand\romanshape[1]{\merge@font@shape{#1}}
 \DeclareRobustCommand\kanjishape[1]{\merge@kanji@shape{#1}}
 \DeclareRobustCommand\fontshape[1]{%
    \merge@font@shape{#1}\merge@kanji@shape{#1}}
+\DeclareRobustCommand\romanshapeforce[1]{\edef\f@shape{#1}}
+\DeclareRobustCommand\kanjishapeforce[1]{\edef\k@shape{#1}}
+\DeclareRobustCommand\fontshapeforce[1]{\kanjishapeforce{#1}\romanshapeforce{#1}}
 \DeclareRobustCommand\usekanji[4]{%
     \kanjiencoding{#1}\edef\k@family{#2}\edef\k@series{#3}\edef\k@shape{#4}%
     \selectfont\ignorespaces}
@@ -683,53 +704,49 @@
 \let\prepare@family@series@update@kanji=\prepare@family@series@update
 \patchcmd\prepare@family@series@update{\fontfamily}{\romanfamily}{}{}
 \patchcmd\prepare@family@series@update@kanji{\update@series@target@value}{\update@series@target@value@kanji}{}{}
+\patchcmd\prepare@family@series@update@kanji{\f@family}{\k@family}{}{}
 \patchcmd\prepare@family@series@update@kanji{\@meta@family@list}{\@meta@family@list@kanji}{}{}
 \patchcmd\prepare@family@series@update@kanji{\fontfamily}{\kanjifamily}{}{}
 \patchcmd\prepare@family@series@update@kanji{\maybe@load@fontshape}
   {\begingroup\let\f@encoding\k@encoding\let\f@family\k@family
     \maybe@load@fontshape\endgroup}{}{}
 \patchcmd\prepare@family@series@update@kanji{\f@series}{\k@series}{}{}
+\patchcmd\prepare@family@series@update@kanji{\f@series}{\k@series}{}{}
 \let\update@series@target@value@kanji=\update@series@target@value
 \patchcmd\update@series@target@value@kanji{\f@family}{\k@family}{}{}
 \patchcmd\update@series@target@value@kanji{\f@series}{\k@series}{}{}
-
+\patchcmd\update@series@target@value@kanji{\f@series}{\k@series}{}{}
+\patchcmd\update@series@target@value@kanji{\f@series}{\k@series}{}{}
+\patchcmd\update@series@target@value@kanji{\f@series}{\k@series}{}{}
 \def\@meta@family@list@kanji{\@elt{mc}\@elt{gt}\@elt{jtt}}
 \DeclareRobustCommand\bfseries{%
   \not@math@alphabet\bfseries\mathbf
   \expand@font@defaults
-  \romanseries{%
-    \ifx\f@family\rmdef@ult      \bfseries@rm
-    \else\ifx\f@family\sfdef@ult \bfseries@sf
-    \else\ifx\f@family\ttdef@ult \bfseries@tt
-    \else                        \bfdefault
-    \fi\fi\fi
-  }%
-  \kanjiseries{%
-    \ifx\k@family\mcdef@ult      \bfseries@mc
-    \else\ifx\k@family\gtdef@ult \bfseries@gt
-    \else\ifx\k@family\jttdef@ult\bfseries@jtt
-    \else                        \bfdefault
-    \fi\fi\fi
-  }%
+  \ifx\f@family\rmdef@ult      \romanseries\bfseries@rm
+  \else\ifx\f@family\sfdef@ult \romanseries\bfseries@sf
+  \else\ifx\f@family\ttdef@ult \romanseries\bfseries@tt
+  \else                        \romanseries\bfdefault
+  \fi\fi\fi
+  \ifx\k@family\mcdef@ult      \kanjiseries\bfseries@mc
+  \else\ifx\k@family\gtdef@ult \kanjiseries\bfseries@gt
+  \else\ifx\k@family\jttdef@ult\kanjiseries\bfseries@jtt
+  \else                        \kanjiseries\bfdefault
+  \fi\fi\fi
  \selectfont
 }
 \DeclareRobustCommand\mdseries{%
   \not@math@alphabet\mdseries\relax
   \expand@font@defaults
-  \romanseries{%
-    \ifx\f@family\rmdef@ult      \mdseries@rm
-    \else\ifx\f@family\sfdef@ult \mdseries@sf
-    \else\ifx\f@family\ttdef@ult \mdseries@tt
-    \else                        \mddefault
-    \fi\fi\fi
-  }%
-  \kanjiseries{%
-    \ifx\k@family\mcdef@ult      \mdseries@mc
-    \else\ifx\k@family\gtdef@ult \mdseries@gt
-    \else\ifx\k@family\jttdef@ult\mdseries@jtt
-    \else                        \mddefault
-    \fi\fi\fi
-  }%
+  \ifx\f@family\rmdef@ult      \romanseries\mdseries@rm
+  \else\ifx\f@family\sfdef@ult \romanseries\mdseries@sf
+  \else\ifx\f@family\ttdef@ult \romanseries\mdseries@tt
+  \else                        \romanseries\mddefault
+  \fi\fi\fi
+  \ifx\k@family\mcdef@ult      \kanjiseries\mdseries@mc
+  \else\ifx\k@family\gtdef@ult \kanjiseries\mdseries@gt
+  \else\ifx\k@family\jttdef@ult\kanjiseries\mdseries@jtt
+  \else                        \kanjiseries\mddefault
+  \fi\fi\fi
   \selectfont
 }
 \appto\expand@font@defaults{%
