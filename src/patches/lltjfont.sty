@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2020/02/29 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2020/03/01 Patch to NFSS2 for LuaTeX-ja]
 
 %% patching \DeclareTextComposite
 \def\ltj@chardef@text@cmd#1{%
@@ -568,17 +568,22 @@
   \fi\fi
 }
 
+\newcount\ltj@@latex@plv \ltj@@latex@plv=-1
 \ifdefined\@rmfamilyhook
 %%%% LaTeX 2020-02-02
-\newif\ifltj@@latex@plv@develop
-\ifx\series@maybe@drop@one@m\@undefined     % patch level 0--4
+\ifx\@forced@seriestrue\@undefined % 2020-02-02 pl0--2
   \@latex@error
    {Please update LaTeX2e!^^J\space\space
-     At least LaTeX2e 2020-02-02 patch level 5 is required}
-   {LaTeX2e 2020-02-02 patch level 2 and 4 has a bug.}
+     At least LaTeX2e 2020-02-02 patch level 3 is required}
+   {LaTeX2e 2020-02-02 patch level 2 (and 4) has a bug.}
 \else
-  \unless\ifx\series@maybe@drop@one@m@x\@undefined % patch level 5
-    \ltj@@latex@plv@developtrue
+  \ltj@@latex@plv=300
+  \unless\ifx\series@maybe@drop@one@m@x\@undefined % pl5 + develop
+    \ltj@@latex@plv=501
+  \else
+    \unless\ifx\series@maybe@drop@one@m\@undefined % patch level 5
+      \ltj@@latex@plv=500
+    \fi
   \fi
 \fi
 
@@ -590,17 +595,22 @@
     \@nil
 }
 
-\ifltj@@latex@plv@develop % 2020-02-02 pl5 + develop
+\ifnum\ltj@@latex@plv>500 % pl5 + develop
   \def\set@target@series@kanji#1{%
       \edef\k@series{#1}%
       \series@maybe@drop@one@m\k@series\k@series
   }
-\else
+\else\ifnum\ltj@@latex@plv>300 % pl5
   \def\set@target@series@kanji#1{%
       \edef\k@series{#1}%
       \expandafter\series@maybe@drop@one@m\expandafter{\k@series}\k@series
   }
-\fi
+\else % pl 3, 4
+  \def\set@target@series@kanji#1{%
+      \edef\k@series{#1}%
+	  \edef\k@series{\expandafter\series@drop@one@m\k@series mm\series@drop@one@m}%
+  }
+\fi\fi
 
 \def\merge@kanji@series@#1#2#3\@nil{%
   \def\reserved@a{#3}%
@@ -651,14 +661,25 @@
     \fi
   \fi
 }
-\DeclareRobustCommand\romanseries[1]{\@forced@seriesfalse\merge@font@series{#1}}
-\DeclareRobustCommand\kanjiseries[1]{\@forced@seriesfalse\merge@kanji@series{#1}}
-\DeclareRobustCommand\fontseries[1]{%
-   \@forced@seriesfalse\merge@font@series{#1}\merge@kanji@series{#1}}
-\DeclareRobustCommand\romanseriesforce[1]{\@forced@seriestrue\merge@font@series{#1}}
-\DeclareRobustCommand\kanjiseriesforce[1]{\@forced@seriestrue\merge@kanji@series{#1}}
-\DeclareRobustCommand\fontseriesforce[1]{%
-   \@forced@seriestrue\merge@font@series{#1}\merge@kanji@series{#1}}
+\ifnum\ltj@@latex@plv=300 % pl3, 4
+  \DeclareRobustCommand\romanseries[1]{\merge@font@series{#1}}
+  \DeclareRobustCommand\kanjiseries[1]{\merge@kanji@series{#1}}
+  \DeclareRobustCommand\fontseries[1]{%
+     \merge@font@series{#1}\merge@kanji@series{#1}}
+  \DeclareRobustCommand\romanseriesforce[1]{\edef\f@series{#1}}
+  \DeclareRobustCommand\kanjiseriesforce[1]{\edef\k@series{#1}}
+  \DeclareRobustCommand\fontseriesforce[1]{%
+     \edef\f@series{#1}\edef\k@series{#1}}
+\else % pl 5
+  \DeclareRobustCommand\romanseries[1]{\@forced@seriesfalse\merge@font@series{#1}}
+  \DeclareRobustCommand\kanjiseries[1]{\@forced@seriesfalse\merge@kanji@series{#1}}
+  \DeclareRobustCommand\fontseries[1]{%
+    \@forced@seriesfalse\merge@font@series{#1}\merge@kanji@series{#1}}
+  \DeclareRobustCommand\romanseriesforce[1]{\@forced@seriestrue\merge@font@series{#1}}
+  \DeclareRobustCommand\kanjiseriesforce[1]{\@forced@seriestrue\merge@kanji@series{#1}}
+  \DeclareRobustCommand\fontseriesforce[1]{%
+     \@forced@seriestrue\merge@font@series{#1}\merge@kanji@series{#1}}
+\fi
 \DeclareRobustCommand\romanshape[1]{\merge@font@shape{#1}}
 \DeclareRobustCommand\kanjishape[1]{\merge@kanji@shape{#1}}
 \DeclareRobustCommand\fontshape[1]{%
@@ -672,6 +693,7 @@
 \DeclareRobustCommand\useroman[4]{%
     \romanencoding{#1}\edef\f@family{#2}\edef\f@series{#3}\edef\f@shape{#4}%
     \selectfont\ignorespaces}
+%%%% LaTeX 2020-02-02 END
 \else
 %%%% LaTeX 2019-10-01
 \DeclareRobustCommand\romanseries[1]{\edef\f@series{#1}}
@@ -686,6 +708,7 @@
 \DeclareRobustCommand\useroman[4]{%
     \romanencoding{#1}\romanfamily{#2}\romanseries{#3}\romanshape{#4}%
     \selectfont\ignorespaces}
+%%%% LaTeX 2019-10-01 END
 \fi
 %%%%
 \protected\def\usefont#1#2#3#4{%
@@ -703,6 +726,7 @@
 %%%% LaTeX 2020-02-02
 \let\prepare@family@series@update@kanji=\prepare@family@series@update
 \patchcmd\prepare@family@series@update{\fontfamily}{\romanfamily}{}{}
+\patchcmd\prepare@family@series@update@kanji{\fontfamily}{\kanjifamily}{}{}
 \patchcmd\prepare@family@series@update@kanji{\update@series@target@value}{\update@series@target@value@kanji}{}{}
 \patchcmd\prepare@family@series@update@kanji{\f@family}{\k@family}{}{}
 \patchcmd\prepare@family@series@update@kanji{\@meta@family@list}{\@meta@family@list@kanji}{}{}
@@ -898,6 +922,7 @@
     \aftergroup\subst@correction
 }
 \def\do@subst@correction{%
+   \directlua{luatexja.jfont.is_kenc('\luatexluaescapestring{\f@encoding}')}%
    \ltj@@IsFontJapanese{\curr@fontshape}\ifin@%
      \ltj@@ja@do@subst@correction
    \else
