@@ -922,8 +922,7 @@
     \aftergroup\subst@correction
 }
 \def\do@subst@correction{%
-   \directlua{luatexja.jfont.is_kenc('\luatexluaescapestring{\f@encoding}')}%
-   \ltj@@IsFontJapanese{\curr@fontshape}\ifin@%
+   \directlua{luatexja.jfont.is_kenc('\luatexluaescapestring{\f@encoding}')}\ifin@%
      \ltj@@ja@do@subst@correction
    \else
      \ltj@@al@do@subst@correction
