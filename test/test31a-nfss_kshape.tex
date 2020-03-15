@@ -1,0 +1,55 @@
+\ifdefined\directlua
+  \documentclass{ltjarticle}
+\else\ifdefined\ucs
+  \documentclass{ujarticle}
+\else
+  \documentclass{jarticle}
+\fi\fi
+\makeatletter
+\newcount\REPCNT
+\def\REP{%
+  <\the\REPCNT: \f@shape/\k@shape>%
+  \typeout{<\the\REPCNT: \f@shape/\k@shape>}%
+  \global\advance\REPCNT by1\relax}
+
+\makeatother
+
+\begin{document}
+
+{\itshape a\REP}
+% 内部で \fontshape が欧文と和文の両方を変えようとする
+% => 和文の変更に失敗しても警告は出したくない
+
+{\fontshape{ait}
+ \selectfont\REP}
+% \fontshape は欧文と和文の両方を変えようとする
+% => 和文の変更に失敗しても警告は出したくない
+
+{\fontshapeforce{asl}
+ \selectfont\REP}
+% \fontshapeforce は欧文と和文の両方を変えようとする
+% => 和文の変更に失敗しても警告は出したくない
+
+{\kanjishape{kit}
+ \selectfont\REP}
+% \kanjishape は和文だけを変更 => 警告すべき
+
+{\kanjishapeforce{ksl}
+ \selectfont\REP}
+% \kanjishapeforce は和文だけを変更 => 警告すべき
+
+{\usefont{\csname k@encoding\endcsname}{mc}{m}{ksc}\REP}
+% \usefont は encoding に応じて \useroman と \usekanji の一方だけを実行
+% この例は和文横組フォントだけを変えることを意図 => 警告すべき
+
+{\fontshape{asc}
+ \selectfont\REP}
+% \fontshape は欧文と和文の両方を変えようとする
+% => 和文の変更に失敗しても警告は出したくない
+
+{\fontshapeforce{asw}
+ \selectfont\REP}
+% \fontshapeforce は欧文と和文の両方を変えようとする
+% => 和文の変更に失敗しても警告は出したくない
+
+\end{document}
