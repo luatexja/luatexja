@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2020/03/01 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2020/03/15 Patch to NFSS2 for LuaTeX-ja]
 
 %% patching \DeclareTextComposite
 \def\ltj@chardef@text@cmd#1{%
@@ -571,6 +571,8 @@
 \newcount\ltj@@latex@plv \ltj@@latex@plv=-1
 \ifdefined\@rmfamilyhook
 %%%% LaTeX 2020-02-02
+\newif\if@shape@roman@kanji
+%%%%%% 2020-02-02 patchlevel detection
 \ifx\@forced@seriestrue\@undefined % 2020-02-02 pl0--2
   \@latex@error
    {Please update LaTeX2e!^^J\space\space
@@ -586,6 +588,7 @@
     \fi
   \fi
 \fi
+%%%%%%
 
 \def\merge@kanji@series#1{%
   \expandafter\expandafter\expandafter
@@ -595,17 +598,17 @@
     \@nil
 }
 
-\ifnum\ltj@@latex@plv>500 % pl5 + develop
+\ifnum\ltj@@latex@plv>500 % !!! pl5 + develop
   \def\set@target@series@kanji#1{%
       \edef\k@series{#1}%
       \series@maybe@drop@one@m\k@series\k@series
   }
-\else\ifnum\ltj@@latex@plv>300 % pl5
+\else\ifnum\ltj@@latex@plv>300 % !!! pl5
   \def\set@target@series@kanji#1{%
       \edef\k@series{#1}%
       \expandafter\series@maybe@drop@one@m\expandafter{\k@series}\k@series
   }
-\else % pl 3, 4
+\else % !!! pl 3, 4
   \def\set@target@series@kanji#1{%
       \edef\k@series{#1}%
 	  \edef\k@series{\expandafter\series@drop@one@m\k@series mm\series@drop@one@m}%
@@ -643,7 +646,11 @@
 \def\merge@kanji@shape@#1#2#3\@nil{%
   \def\reserved@a{#3}%
   \ifx\reserved@a\@empty
-    \edef\k@shape{#2}%
+    \if@shape@roman@kanji
+      \set@safe@kanji@shape{#2}{}%
+    \else
+      \edef\k@shape{#2}%
+    \fi
   \else
     \begingroup\let\f@encoding\k@encoding\let\f@family\k@family
 	   \maybe@load@fontshape\endgroup
@@ -655,13 +662,28 @@
          \edef\k@shape{#2}%
          {\let\curr@fontshape\curr@kfontshape\@font@shape@subst@warning}%
        \else
-         \edef\k@shape{#3}%
-         {\let\curr@fontshape\curr@kfontshape\@font@shape@subst@warning}%
+         \if@shape@roman@kanji
+           \set@safe@kanji@shape{#3}%
+           {{\let\curr@fontshape\curr@kfontshape\@font@shape@subst@warning}}%
+         \else
+           \edef\k@shape{#3}%
+           {\let\curr@fontshape\curr@kfontshape\@font@shape@subst@warning}%
+         \fi
        \fi
     \fi
   \fi
 }
-\ifnum\ltj@@latex@plv=300 % pl3, 4
+\def\set@safe@kanji@shape#1#2{%
+  \edef\reserved@b{\k@encoding /\k@family /\k@series/#1}%
+  \ifcsname \reserved@b\endcsname
+    \edef\k@shape{#1}%
+    #2%
+  \else
+    \@font@info{Kanji font shape \reserved@b' undefined\MessageBreak
+                No change}%
+  \fi
+}
+\ifnum\ltj@@latex@plv=300 % !!! pl3, 4
   \DeclareRobustCommand\romanseries[1]{\merge@font@series{#1}}
   \DeclareRobustCommand\kanjiseries[1]{\merge@kanji@series{#1}}
   \DeclareRobustCommand\fontseries[1]{%
@@ -670,7 +692,7 @@
   \DeclareRobustCommand\kanjiseriesforce[1]{\edef\k@series{#1}}
   \DeclareRobustCommand\fontseriesforce[1]{%
      \edef\f@series{#1}\edef\k@series{#1}}
-\else % pl 5
+\else % !!! pl 5
   \DeclareRobustCommand\romanseries[1]{\@forced@seriesfalse\merge@font@series{#1}}
   \DeclareRobustCommand\kanjiseries[1]{\@forced@seriesfalse\merge@kanji@series{#1}}
   \DeclareRobustCommand\fontseries[1]{%
@@ -683,10 +705,13 @@
 \DeclareRobustCommand\romanshape[1]{\merge@font@shape{#1}}
 \DeclareRobustCommand\kanjishape[1]{\merge@kanji@shape{#1}}
 \DeclareRobustCommand\fontshape[1]{%
-   \merge@font@shape{#1}\merge@kanji@shape{#1}}
+   \@shape@roman@kanjitrue
+   \merge@font@shape{#1}\merge@kanji@shape{#1}%
+   \@shape@roman@kanjifalse
+}
 \DeclareRobustCommand\romanshapeforce[1]{\edef\f@shape{#1}}
 \DeclareRobustCommand\kanjishapeforce[1]{\edef\k@shape{#1}}
-\DeclareRobustCommand\fontshapeforce[1]{\kanjishapeforce{#1}\romanshapeforce{#1}}
+\DeclareRobustCommand\fontshapeforce[1]{\set@safe@kanji@shape{#1}{}\romanshapeforce{#1}}
 \DeclareRobustCommand\usekanji[4]{%
     \kanjiencoding{#1}\edef\k@family{#2}\edef\k@series{#3}\edef\k@shape{#4}%
     \selectfont\ignorespaces}
