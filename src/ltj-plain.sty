@@ -23,8 +23,10 @@
 %! ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 % LuaTeX-ja macros against plain TeX
 
-\ifdefined\ltj@stdmcfont\else\def\ltj@stdmcfont{IPAExMincho}\fi
-\ifdefined\ltj@stdgtfont\else\def\ltj@stdgtfont{IPAExGothic}\fi
+\ifdefined\ltj@stdmcfont\else\def\ltj@stdmcfont{file:HaranoAjiMincho-Regular.otf}\fi
+\ifdefined\ltj@stdgtfont\else\def\ltj@stdgtfont{file:HaranoAjiGothic-Medium.otf}\fi
+%\ifdefined\ltj@stdmcfont\else\def\ltj@stdmcfont{IPAExMincho}\fi
+%\ifdefined\ltj@stdgtfont\else\def\ltj@stdgtfont{IPAExGothic}\fi
 \ifdefined\ltj@stdyokojfm\else\def\ltj@stdyokojfm{ujis}\fi
 \ifdefined\ltj@stdtatejfm\else\def\ltj@stdtatejfm{ujisv}\fi
 \newread\ltj@@cfgread

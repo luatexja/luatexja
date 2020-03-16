@@ -659,8 +659,10 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
   \Pkg{everysel} (if you want to use \LuaTeX-ja with \LaTeXe)
 \item \Pkg{ltxcmds}, \Pkg{pdftexcmds}, \Pkg{filehook}, \Pkg{atbegshi}
 \item \href{https://github.com/wspr/fontspec/}{\Pkg{fontspec}} v2.7c (or later)
-%<en>\item \emph{IPAex fonts} (\url{http://ipafont.ipa.go.jp/})
-%<ja>\item \emph{IPAexフォント(\url{http://ipafont.ipa.go.jp/})}
+%%% %<en>\item \emph{IPAex fonts} (\url{http://ipafont.ipa.go.jp/})
+%%% %<ja>\item \emph{IPAexフォント(\url{http://ipafont.ipa.go.jp/})}
+%<en>\item \emph{Haranoaji fonts} (\url{https://github.com/trueroad/HaranoAjiFonts})
+%<ja>\item \emph{原ノ味フォント(\url{https://github.com/trueroad/HaranoAjiFonts})}
 \end{itemize}
 
 %<*en>
@@ -668,11 +670,11 @@ Now \LuaTeX-ja is available from
 CTAN (in the \texttt{macros/luatex/generic/luatexja} directory), and
 the following distributions:
   \begin{itemize}
-  \item MiK\TeX\ (in \texttt{luatexja.tar.lzma}); see the next subsection
   \item \href{https://www.tug.org/texlive/}{\TeX\ Live} (in \texttt{texmf-dist/tex/luatex/luatexja})
   \item \href{http://w32tex.org/}{W32\TeX}\ (in \texttt{luatexja.tar.xz})
+  \item MiK\TeX\ (in \texttt{luatexja.tar.lzma}); see the next subsection
   \end{itemize}
-IPAex fonts are also available in these distributions.
+Haranoaji fonts are available in \TeX~Live and MiK\TeX.
 %</en>
 %<*ja>
 現在，\LuaTeX-jaはCTAN (\texttt{macros/luatex/generic/luatexja})に収録されている他，
@@ -682,8 +684,7 @@ IPAex fonts are also available in these distributions.
   \item \TeX\ Live (\texttt{texmf-dist/tex/luatex/luatexja})
   \item W32\TeX\ (\texttt{luatexja.tar.xz})
   \end{itemize}
-これらのディストリビューションはIPAexフォントも収録している．
-W32\TeX においてはIPAexフォントは \texttt{luatexja.tar.xz} 内にある．
+\TeX Live, MiK\TeX は原ノ味フォントも収録している．
 %</ja>
 
 %<*en>
@@ -924,12 +925,12 @@ codes for font color (\Pkg{luaotfload}) in these environments.
 \textbf{direction}&
 \textbf{classification}&\textbf{font name}&\bfseries ``10\,pt''&\bfseries ``7\,pt''&\bfseries ``5\,pt''\\\midrule
 \smash{\raisebox{-1ex}{\emph{yoko} (horizontal)}}&
-\emph{mincho}&IPAex Mincho&\cs{tenmin}&\cs{sevenmin}&\cs{fivemin}\\
-&\emph{gothic}&IPAex Gothic&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
+\emph{mincho}&HaranoAjiMincho-Regular&\cs{tenmin}&\cs{sevenmin}&\cs{fivemin}\\
+&\emph{gothic}&HaranoAjiGothic-Medium&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
 \midrule
 \smash{\raisebox{-1ex}{\emph{tate} (vertical)}}&
-\emph{mincho}&IPAex Mincho&\cs{tentmin}&\cs{seventmin}&\cs{fivetmin}\\
-&\emph{gothic}&IPAex Gothic&\cs{tentgt} &\cs{seventgt} &\cs{fivetgt}\\
+\emph{mincho}&HaranoAjiMincho-Regular&\cs{tentmin}&\cs{seventmin}&\cs{fivetmin}\\
+&\emph{gothic}&HaranoAjiGothic-Medium&\cs{tentgt} &\cs{seventgt} &\cs{fivetgt}\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -941,12 +942,12 @@ codes for font color (\Pkg{luaotfload}) in these environments.
 \toprule
 \emph{組方向}&\emph{字体}&\emph{フォント名}&\bfseries``10\,pt''&\bfseries``7\,pt''&\bfseries``5\,pt''\\\midrule
 \smash{\raisebox{-0.7\zh}{横組}}&
-明朝体&IPAex明朝&\cs{tenmin}&\cs{sevenmin}&\cs{fivemin}\\
-&\textgt{ゴシック体}&IPAexゴシック&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
+明朝体&原ノ味明朝Regular&\cs{tenmin}&\cs{sevenmin}&\cs{fivemin}\\
+&\textgt{ゴシック体}&原ノ味ゴシックMedium&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
 \midrule
 \smash{\raisebox{-0.7\zh}{縦組}}&
-明朝体&IPAex明朝&\cs{tentmin}&\cs{seventmin}&\cs{fivetmin}\\
-&\textgt{ゴシック体}&IPAexゴシック&\cs{tentgt} &\cs{seventgt} &\cs{fivetgt}\\
+明朝体&原ノ味明朝Regular&\cs{tentmin}&\cs{seventmin}&\cs{fivetmin}\\
+&\textgt{ゴシック体}&原ノ味ゴシックMedium&\cs{tentgt} &\cs{seventgt} &\cs{fivetgt}\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -958,7 +959,7 @@ codes for font color (\Pkg{luaotfload}) in these environments.
   one inputs \texttt{luatexja.sty} (Subsection~\ref{ssec:cfg}).
 %</en>
 %<*ja>
-\item 標準和文フォントやJFMをIPAexフォントから別のものに置き換えるには，
+\item 標準和文フォントやJFMを原ノ味フォントから別のものに置き換えるには，
   \cs{ltj@stdmcfont}等を\texttt{luatexja.sty}読み込み\emph{前}に定義すればよい．
   \ref{ssec:cfg}節を参照．
 %</ja>
@@ -1056,8 +1057,8 @@ By default, the following fonts are used for these two families.
 \begin{tabular}{lllll}
 \toprule
 \textbf{classification}&\textbf{family}&\textbf{\cs{mdseries}}&\textbf{\cs{bfseries}}&\textbf{scale}\\\midrule
-\emph{mincho} (明朝体)&\texttt{mc}&IPAexMincho&IPAexGothic&0.962216\\
-\emph{gothic} (\textgt{ゴシック体})&\texttt{gt}&IPAexGothic&IPAexGothic&0.962216\\
+\emph{mincho} (明朝体)&\texttt{mc}&HaranoAjiMincho-Regular&HaranoAjiGothic-Medium&0.962216\\
+\emph{gothic} (\textgt{ゴシック体})&\texttt{gt}&HaranoAjiGothic-Medium&HaranoAjiGothic-Medium&0.962216\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1091,8 +1092,8 @@ By default, the following fonts are used for these two families.
 \begin{tabular}{lllll}
 \toprule
 \emph{字体}&\emph{ファミリ}&\textbf{\cs{mdseries}}&\textbf{\cs{bfseries}}&\emph{スケール}\\\midrule
-明朝体&\texttt{mc}&IPAex明朝&IPAexゴシック&0.962216\\
-\textgt{ゴシック体}&\texttt{gt}&IPAexゴシック&IPAexゴシック&0.962216\\
+明朝体&\texttt{mc}&原ノ味明朝Regular&原ノ味ゴシックMedium&0.962216\\
+\textgt{ゴシック体}&\texttt{gt}&原ノ味ゴシックMedium&原ノ味ゴシックMedium&0.962216\\
 \bottomrule
 \end{tabular}
 \end{center}
