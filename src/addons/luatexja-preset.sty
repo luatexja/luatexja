@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2020/01/26 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2020/03/19 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -359,7 +359,7 @@
   __custom = false, __office = false, __noembed = true,
 }
 
-\keys_set:nn {luatexja-preset} { ipaex }
+\keys_set:nn {luatexja-preset} { haranoaji } %% old: ipaex
 \ProcessKeysOptions { luatexja-preset }
 \@ifpackageloaded{luatexja-fontspec}{
   \bool_if:NT \g__ltjpreset_nfssonly_bool

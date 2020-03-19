@@ -661,7 +661,7 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 \item \href{https://github.com/wspr/fontspec/}{\Pkg{fontspec}} v2.7c (or later)
 %%% %<en>\item \emph{IPAex fonts} (\url{http://ipafont.ipa.go.jp/})
 %%% %<ja>\item \emph{IPAexフォント(\url{http://ipafont.ipa.go.jp/})}
-%<en>\item \emph{Haranoaji fonts} (\url{https://github.com/trueroad/HaranoAjiFonts})
+%<en>\item \emph{Harano Aji fonts} (\url{https://github.com/trueroad/HaranoAjiFonts})
 %<ja>\item \emph{原ノ味フォント(\url{https://github.com/trueroad/HaranoAjiFonts})}
 \end{itemize}
 
@@ -674,7 +674,7 @@ the following distributions:
   \item \href{http://w32tex.org/}{W32\TeX}\ (in \texttt{luatexja.tar.xz})
   \item MiK\TeX\ (in \texttt{luatexja.tar.lzma}); see the next subsection
   \end{itemize}
-Haranoaji fonts are available in \TeX~Live and MiK\TeX.
+Harano Aji fonts are available in \TeX~Live and MiK\TeX.
 %</en>
 %<*ja>
 現在，\LuaTeX-jaはCTAN (\texttt{macros/luatex/generic/luatexja})に収録されている他，
@@ -3988,7 +3988,8 @@ For example,
 \def\ltj@stdgtfont{IPAGothic}
 \end{lstlisting}
 makes that IPA~Mincho and IPA~Gothic will be used as default Japanese fonts, instead of
-IPAex~Mincho and IPAex~Gothic.
+Harano Aji fonts.
+%IPAex~Mincho and IPAex~Gothic.
 
 This feature is intended for classes which use special JFMs
 \footnote{This is because commands has \texttt{@} in their names.}.
@@ -8061,17 +8062,15 @@ There is not rounded gothic family in Kozuka fonts.
 
 %<*en>
 Hiragino fonts (except Hiragino~Mincho~W2) are bundled with Mac OS~X 10.5 or later.
-Some editions of a Japanese word-processor ``一太郎2012'' includes Hiragino ProN fonts.
 Note that fonts for gothic extra~bold (HiraKakuStd[N]-W8) only contains characters in
 Adobe-Japan1-3 character collection, while others contains those in
 Adobe-Japan1-5 character collection.
 %</en>
 %<*ja>
-ヒラギノフォントは，Mac OS~X以外にも，一太郎2012の上位エディションにもバンドルされている．
 極太ゴシック体として用いるヒラギノ角ゴW8は，Adobe-Japan1-3の範囲しかカバーしていない
 Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 
-なお，明朝体細字として用いるヒラギノ明朝体W2はOS~Xや一太郎にはバンドルされておらず，
+なお，明朝体細字として用いるヒラギノ明朝体W2はOS~Xにはバンドルされておらず，
 別途購入する必要がある．
 %</ja>
 \begin{center}\small
