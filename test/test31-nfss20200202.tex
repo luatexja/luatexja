@@ -1,35 +1,49 @@
 \documentclass{ltjarticle}
 \makeatletter
+%\DeclareFontSeriesDefault[sf]{md}{b}
 \def\mdseries@mc{el}
 \def\bfseries@mc{sb}
 \def\mdseries@gt{l}
 \def\bfseries@gt{k}
-\DeclareFontShape{JY3}{gt}{k}{n}{<-> KozGoPr6N-Heavy.otf:jfm=ujis}{}
-\DeclareFontShape{JT3}{gt}{k}{n}{<-> KozGoPr6N-Heavy.otf:jfm=ujisv}{}
-\DeclareFontShape{JY3}{gt}{l}{n}{<-> KozGoPr6N-ExtraLight.otf:jfm=ujis}{}
-\DeclareFontShape{JT3}{gt}{l}{n}{<-> KozGoPr6N-ExtraLight.otf:jfm=ujisv}{}
-\DeclareFontShape{JY3}{mc}{el}{n}{<-> KozMinPr6N-ExtraLight.otf:jfm=ujis}{}
-\DeclareFontShape{JT3}{mc}{el}{n}{<-> KozMinPr6N-ExtraLight.otf:jfm=ujisv}{}
-\DeclareFontShape{JY3}{mc}{sb}{n}{<-> KozMinPr6N-Bold.otf:jfm=ujis}{}
-\DeclareFontShape{JT3}{mc}{sb}{n}{<-> KozMinPr6N-Bold.otf:jfm=ujisv}{}
+\DeclareFontShape{JY3}{gt}{k}{n}{<-> HaranoAjiGothic-Heavy.otf:jfm=ujis}{}
+\DeclareFontShape{JT3}{gt}{k}{n}{<-> HaranoAjiGothic-Heavy.otf:jfm=ujisv}{}
+\DeclareFontShape{JY3}{gt}{l}{n}{<-> HaranoAjiGothic-ExtraLight.otf:jfm=ujis}{}
+\DeclareFontShape{JT3}{gt}{l}{n}{<-> HaranoAjiGothic-ExtraLight.otf:jfm=ujisv}{}
+\DeclareFontShape{JY3}{mc}{el}{n}{<-> HaranoAjiMincho-ExtraLight.otf:jfm=ujis}{}
+\DeclareFontShape{JT3}{mc}{el}{n}{<-> HaranoAjiMincho-ExtraLight.otf:jfm=ujisv}{}
+\DeclareFontShape{JY3}{mc}{sb}{n}{<-> HaranoAjiMincho-Bold.otf:jfm=ujis}{}
+\DeclareFontShape{JT3}{mc}{sb}{n}{<-> HaranoAjiMincho-Bold.otf:jfm=ujisv}{}
 \def\TEST{%
  \par
   A: \f@encoding/\f@family/\f@series/\f@shape.
   K: \k@encoding/\k@family/\k@series/\k@shape.
   あいうABC
 }
+\def\TESTA{%
+  \TEST NORMAL
+  \emph{\TEST} EMPH
+  \textsf{\TEST} SF
+  \textbf{\TEST} BF
+  \textgt{\TEST} GT
+  \textbf{\textgt{\TEST}} BF+GT
+  \textbf{\textgt{\textmd{\TEST}}} BF+GT+MD
+  \par 
+  \textsc{\textit{\TEST}} SC+IT
+  \par
+  {\fontseries{b}\selectfont \TEST} B
+  {\fontseries{bx}\selectfont \TEST} BX
+}
 \begin{document}
-\TEST NORMAL
-\emph{\TEST} EMPH
-\textsf{\TEST} SF
-\textbf{\TEST} BF
-\textgt{\TEST} GT
-\textbf{\textgt{\TEST}} BF+GT
-\textbf{\textgt{\textmd{\TEST}}} BF+GT+MD
+%{\ttfamily\expandafter\meaning\csname bfdefault\endcsname::%
+%  \expandafter\meaning\csname bfdefault@previous\endcsname}\par
 
-\textsc{\textit{\TEST}} SC+IT
+{\ttfamily ======DEFAULT======\par}
+\TESTA
+\def\bfdefault{b}\newpage
+{\ttfamily ======\detokenize{\def\bfdefault{bx}}======\par}
 
-{\fontseries{b}\selectfont \TEST} B
-{\fontseries{bx}\selectfont \TEST} BX
+\TESTA
 
+%\ttfamily
+%\expandafter\meaning\csname bfseries \endcsname
 \end{document}
