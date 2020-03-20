@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2020/03/15 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2020/03/20 Patch to NFSS2 for LuaTeX-ja]
 
 %% patching \DeclareTextComposite
 \def\ltj@chardef@text@cmd#1{%
@@ -580,13 +580,13 @@
    {LaTeX2e 2020-02-02 patch level 2 (and 4) has a bug.}
 \else
   \ltj@@latex@plv=300
-  \unless\ifx\series@maybe@drop@one@m@x\@undefined % pl5 + develop
+  \unless\ifx\bfseries@previous\@undefined % 2020-03-19 (+gh306)
+    \ltj@@latex@plv=550
+  \else\unless\ifx\series@maybe@drop@one@m@x\@undefined % pl5 + develop
     \ltj@@latex@plv=501
-  \else
-    \unless\ifx\series@maybe@drop@one@m\@undefined % patch level 5
-      \ltj@@latex@plv=500
-    \fi
-  \fi
+  \else\unless\ifx\series@maybe@drop@one@m\@undefined % patch level 5
+    \ltj@@latex@plv=500
+  \fi\fi\fi
 \fi
 %%%%%%
 
@@ -767,36 +767,55 @@
 \patchcmd\update@series@target@value@kanji{\f@series}{\k@series}{}{}
 \patchcmd\update@series@target@value@kanji{\f@series}{\k@series}{}{}
 \def\@meta@family@list@kanji{\@elt{mc}\@elt{gt}\@elt{jtt}}
-\DeclareRobustCommand\bfseries{%
-  \not@math@alphabet\bfseries\mathbf
-  \expand@font@defaults
-  \ifx\f@family\rmdef@ult      \romanseries\bfseries@rm
-  \else\ifx\f@family\sfdef@ult \romanseries\bfseries@sf
-  \else\ifx\f@family\ttdef@ult \romanseries\bfseries@tt
-  \else                        \romanseries\bfdefault
-  \fi\fi\fi
+
+\ifnum\ltj@@latex@plv>549 % !!! pl5 + gh306
+\ifnum\expandafter\patchcmd\csname bfseries \endcsname{%
+  \let\bfseries@previous\bfdefault
+  \let\bfseries@rm\bfdef@ult
+  \let\bfseries@sf\bfdef@ult
+  \let\bfseries@tt\bfdef@ult
+}{%
+  \let\bfseries@previous\bfdefault
+  \let\bfseries@rm\bfdef@ult
+  \let\bfseries@sf\bfdef@ult
+  \let\bfseries@tt\bfdef@ult
+  \let\bfseries@mc\bfdef@ult
+  \let\bfseries@gt\bfdef@ult
+  \let\bfseries@jtt\bfdef@ult
+}{}{}
+\expandafter\patchcmd\csname mdseries \endcsname{%
+  \let\mdseries@previous\mddefault
+  \let\mdseries@rm\mddef@ult
+  \let\mdseries@sf\mddef@ult
+  \let\mdseries@tt\mddef@ult
+}{%
+  \let\mdseries@previous\mddefault
+  \let\mdseries@rm\mddef@ult
+  \let\mdseries@sf\mddef@ult
+  \let\mdseries@tt\mddef@ult
+  \let\mdseries@mc\mddef@ult
+  \let\mdseries@gt\mddef@ult
+  \let\mdseries@jtt\mddef@ult
+}{}{}
+\fi
+\expandafter\patchcmd\csname bfseries \endcsname{\selectfont}%
+{%
   \ifx\k@family\mcdef@ult      \kanjiseries\bfseries@mc
   \else\ifx\k@family\gtdef@ult \kanjiseries\bfseries@gt
   \else\ifx\k@family\jttdef@ult\kanjiseries\bfseries@jtt
   \else                        \kanjiseries\bfdefault
   \fi\fi\fi
- \selectfont
-}
-\DeclareRobustCommand\mdseries{%
-  \not@math@alphabet\mdseries\relax
-  \expand@font@defaults
-  \ifx\f@family\rmdef@ult      \romanseries\mdseries@rm
-  \else\ifx\f@family\sfdef@ult \romanseries\mdseries@sf
-  \else\ifx\f@family\ttdef@ult \romanseries\mdseries@tt
-  \else                        \romanseries\mddefault
-  \fi\fi\fi
+  \selectfont
+}{}{}
+\expandafter\patchcmd\csname mdseries \endcsname{\selectfont}%
+{%
   \ifx\k@family\mcdef@ult      \kanjiseries\mdseries@mc
   \else\ifx\k@family\gtdef@ult \kanjiseries\mdseries@gt
   \else\ifx\k@family\jttdef@ult\kanjiseries\mdseries@jtt
   \else                        \kanjiseries\mddefault
   \fi\fi\fi
   \selectfont
-}
+}{}{}
 \appto\expand@font@defaults{%
   \edef\mcdef@ult{\mcdefault}%
   \edef\gtdef@ult{\gtdefault}%
