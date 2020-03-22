@@ -505,8 +505,6 @@ By default, \LuaTeX-ja uses Japanese fonts to typeset Greek and Cyrillic letters
 
 From version~20150906.0, characters which belongs both ISO~8859-1 and JIS~X~0208,
 such as \P~and~\S, are now typeset in alphabetic fonts.
-If you are using \LaTeXe\ prior to 2017/01/01, these characters are not typeset correctly
-without the \cs{fontspec} (and~\Pkg{luatexja-fontspec}) package.
 %</en>
 %<*ja>
 \paragraph{ギリシャ文字・キリル文字とISO~8859-1の記号}
@@ -523,9 +521,7 @@ without the \cs{fontspec} (and~\Pkg{luatexja-fontspec}) package.
 また，\P,~\S といったISO~8859-1の上位領域とJIS~X~0208の共通部分の文字は
       バージョン20150906.0から標準で欧文扱いとなった．\LaTeXe\ 2017/01/01以降では
 標準でTUエンコーディングのLatin Modernフォントが使われるので，
-特に何もせずソース中にそのまま記述してもこれらの文字が出力される
-\footnote{\LaTeXe\ 2017/01/01より前では，ソース中に直接記述しても
-  \Pkg{fontspec}パッケージ（および\Pkg{luatexja-fontspec}パッケージ）非読み込みの状態では出力されない．}．
+特に何もせずソース中にそのまま記述してもこれらの文字が出力される．
 和文扱いで出力するには \verb+\ltjjachar`§+ のように \cs{ltjjachar} 命令
 を使えばよい．
 %</ja>
@@ -655,6 +651,7 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 \item \href{http://www.luatex.org/}{\LuaTeX}\ 1.07.0 (or later)
 \item recent \href{https://github.com/latex3/luaotfload}{\Pkg{luaotfload}} (v3.1 or later recommended)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
+\item \LaTeX\ 2020-02-02 patch level 5 or later (if you want to use \LuaTeX-ja with \LaTeXe)
 \item \href{https://github.com/josephwright/etoolbox/}{\Pkg{etoolbox}},
   \Pkg{everysel} (if you want to use \LuaTeX-ja with \LaTeXe)
 \item \Pkg{ltxcmds}, \Pkg{pdftexcmds}, \Pkg{filehook}, \Pkg{atbegshi}
@@ -879,7 +876,7 @@ and finally delete the temporary directory.
 
 \item
 %<*en>
-Note that when \LuaTeX-ja is loaded in plain \LuaTeX~nor \LaTeX~2019-10-01,
+Note that when \LuaTeX-ja is loaded in plain \LuaTeX,
 we cannot use color specification on font loading, such as
 \begin{lstlisting}
   \font\hoge=lmroman10-regular.otf:color=FF0000 % \font primitive
@@ -888,10 +885,10 @@ we cannot use color specification on font loading, such as
 \end{lstlisting}
 This is because codes for shifting baseline in math mode (\LuaTeX-ja) collide with and prevents loading
 codes for font color (\Pkg{luaotfload}) in these environments.
-\emph{We recommend to use \LaTeX\ 2020-02-02}, since we can avoid this collision in \LaTeX\ 2020-02-02.
+\emph{We recommend to use \LaTeX\ 2020-02-02 (or later)}, since we can avoid this collision in there.
 %</en>
 %<*ja>
-なお，\LuaTeX-jaをplain~\LuaTeX や\LaTeX\ 2019-10-01以前の環境下で用いる場合，
+なお，\LuaTeX-jaをplain~\LuaTeX で用いる場合，
 以下のような\emph{フォント読み込み時の色指定}（\cs{textcolor}命令ではなく！）\emph{は利用できない}．
 \begin{lstlisting}
   \font\hoge=lmroman10-regular.otf:color=FF0000 % \font primitive
@@ -1296,12 +1293,24 @@ For \LaTeXe, \LuaTeX-ja adopted most of the font selection system of \pLaTeXe\ (
 %</ja>
 \begin{itemize}
 %<*en>
-\item Commands \cs{fontfamily}, \cs{fontseries}, and \cs{fontshape} can be used to change
-      attributes of Japanese fonts.
+\item \cs{fontfamily}, \cs{fontseries}, and~\cs{fontshape} try to change
+      attributes of Japanese fonts, as well as those of alphabetic fonts.
+      Of course, \cs{selectfont} is needed to select current text fonts.
+
+      \textbf{Remark in \LaTeX~2020-02-02 or later}:
+      \cs{fontshape} always changes current alphabetic font shape,
+      but it does \emph{not} change current Japanese font shape if
+      the target shape is unavailable for current Japanese encoding/family/series.
+      For the detail, see Subsection~\ref{ssec:nfsspat}.
 %</en>
 %<*ja>
-\item 和文フォントの属性を変更するには，\cs{fontfamily}, \cs{fontseries}, \cs{fontshape} を使用する．
+\item \cs{fontfamily}, \cs{fontseries}, \cs{fontshape} は欧文・和文フォント両方の属性を変更しようとする．
       もちろん，それらを実際に反映させるには手動で \cs{selectfont} を実行する必要がある．
+
+      \emph{\LaTeX\ 2020-02-02以降での注意}：
+      \cs{fontshape\{<shape>\}}は常に欧文フォントのシェイプを設定するが，
+      もしも現在の和文フォントファミリ・シリーズで要求されたシェイプが利用不能だった場合には，和文フォントのシェイプは変更しない．
+      詳細は\ref{ssec:nfsspat}節を参照すること．
 %</ja>
 
 %<*en>
@@ -1350,7 +1359,7 @@ auto select&\cs{fontencoding}&\cs{fontfamily}&---&---&\cs{usefont}\\
       For the detail, see Subsection~\ref{ssec:nfsspat}.
 %</en>
 %<*ja>
-      ここで，\verb+\fontencoding{+<encoding>\verb+}+ は，引数により和文側か欧文
+      ここで，\cs{fontencoding\{<encoding>\}}は，引数により和文側か欧文
       側かのどちらかのエンコーディングを変更する．例えば，
       \verb+\fontencoding{JY3}+ は和文フォントのエンコーディングを
       \texttt{JY3}に変更し，\verb+\fontencoding{T1}+ は欧文フォント側を
@@ -6476,6 +6485,68 @@ to <family>. See Subsection~\ref{ssec:fontfamilycmd} for detail.
 %<*ja>
 元々の\LaTeXe におけるものと同様に，このコマンドは現在のフォントファミリ（欧文，
 和文，\emph{もしくは両方}）を<family>に変更する．詳細は\ref{ssec:fontfamilycmd}節を参照すること．
+%</ja>
+
+\item[\cs{fontshape}\{<shape>\}\textrm{, }\cs{fontshapeforce}\{<shape>\}]
+%<*en>
+As in \LaTeXe, this command changes current alphabetic font shape
+according to shape change rules.
+
+Traditionally, \cs{fontshape} changes also current Japanese font shape always.
+However, this leads a lot of \LaTeX\ font warning like
+\begin{verbatim}
+    Font shape `JY3/mc/m/it' undefined
+    using `JY3/mc/m/n' instead on ....
+\end{verbatim}
+when \cs{itshape} is called,
+because almost all Japanese fonts only have shape ``\texttt{n}'', and \cs{itshape} calls \cs{fontshape}.
+
+\LuaTeX-ja~********.0 (with \LaTeX\ 2020-02-02 or~later) change the behavior. Namely,
+\cs{fontshape\{<shape>\}}, \cs{fontshapeforce\{<shape>\}} change current Japanese font shape, only if
+the required shape (according to shape changing rules) or <shape> is avaliable in current Japanese font family/series.
+When this is not the case, an info such as
+\begin{verbatim}
+    Kanji font shape JY3/mc/m/it' undefined
+    No change on ...
+\end{verbatim}
+is issued instead of a warning.
+%</en>
+%<*ja>
+元々の\LaTeXe におけるものと同様に，このコマンドは現在の欧文フォントシェイプを
+\cs{DeclareFontShapeChangeRule}によるシェイプ更新規則によって変更する．
+
+伝統的には，\cs{fontshape}は無条件に和文フォントシェイプも変更した．しかし，例えば多くの和文フォントは
+シェイプが``\texttt{n}''しか持たないことと\cs{itshape}が\cs{fontshape}を呼び出すことから，
+\begin{verbatim}
+    Font shape `JY3/mc/m/it' undefined
+    using `JY3/mc/m/n' instead on ....
+\end{verbatim}
+といった警告をもたらしてしまっていた．
+
+一方，\LuaTeX-ja ********.0以降では，
+\cs{fontshape\{<shape>\}}, \cs{fontshapeforce\{<shape>\}}が和文フォントシェイプを更新するのは，
+シェイプ更新規則に基づいた値や<shape>の少なくとも一つが現在の和文フォントファミリ・シリーズで利用可能なときに限られる．
+どちらでもなく，和文フォントシェイプが変更されなかった場合には
+\begin{verbatim}
+    Kanji font shape JY3/mc/m/it' undefined
+    No change on ...
+\end{verbatim}
+というinfo（警告でなく）を出力する．
+%</ja>
+
+\item[\cs{kanjishape}\{<shape>\}\textrm{, }\cs{kanjishapeforce}\{<shape>\}]
+%<*en>
+\cs{kanjishape\{<shape>\}} changes current Japanese font shape according to shape change rules, and
+\cs{kanjishape\{<shape>\}} changes current Japanese font shape to <shape>, regardless of the rules.
+Hence \cs{kanjishape\{it\}} produces a warning
+\begin{verbatim}
+    Font shape `JY3/mc/m/it' undefined
+    using `JY3/mc/m/n' instead on ....
+\end{verbatim}
+which is not produced by \cs{fontshape\{it\}}.
+%</en>
+%<*ja>
+  ...
 %</ja>
 
 
