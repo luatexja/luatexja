@@ -648,7 +648,7 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %<en>The following packages are needed for the \LuaTeX-ja\ package.
 %<ja>\LuaTeX-jaパッケージの動作には次のパッケージ類が必要である．
 \begin{itemize}
-\item \href{http://www.luatex.org/}{\LuaTeX}\ 1.07.0 (or later)
+\item \href{http://www.luatex.org/}{\LuaTeX}\ 1.10.0 (or later)
 \item recent \href{https://github.com/latex3/luaotfload}{\Pkg{luaotfload}} (v3.1 or later recommended)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
 \item \LaTeX\ 2020-02-02 patch level 5 or later (if you want to use \LuaTeX-ja with \LaTeXe)
@@ -1291,27 +1291,6 @@ For \LaTeXe, \LuaTeX-ja adopted most of the font selection system of \pLaTeXe\ (
 %<*ja>
 \LaTeX で用いる際には，\pLaTeXe\ (\texttt{plfonts.dtx})用のフォント選択機構の大部分を流用している．
 %</ja>
-\begin{itemize}
-%<*en>
-\item \cs{fontfamily}, \cs{fontseries}, and~\cs{fontshape} try to change
-      attributes of Japanese fonts, as well as those of alphabetic fonts.
-      Of course, \cs{selectfont} is needed to select current text fonts.
-
-      \textbf{Remark in \LaTeX~2020-02-02 or later}:
-      \cs{fontshape} always changes current alphabetic font shape,
-      but it does \emph{not} change current Japanese font shape if
-      the target shape is unavailable for current Japanese encoding/family/series.
-      For the detail, see Subsection~\ref{ssec:nfsspat}.
-%</en>
-%<*ja>
-\item \cs{fontfamily}, \cs{fontseries}, \cs{fontshape} は欧文・和文フォント両方の属性を変更しようとする．
-      もちろん，それらを実際に反映させるには手動で \cs{selectfont} を実行する必要がある．
-
-      \emph{\LaTeX\ 2020-02-02以降での注意}：
-      \cs{fontshape\{<shape>\}}は常に欧文フォントのシェイプを設定するが，
-      もしも現在の和文フォントファミリ・シリーズで要求されたシェイプが利用不能だった場合には，和文フォントのシェイプは変更しない．
-      詳細は\ref{ssec:nfsspat}節を参照すること．
-%</ja>
 
 %<*en>
 \begin{center}\small
@@ -1324,7 +1303,7 @@ Alphabetic fonts
 Japanese fonts
 &\cs{kanjiencoding}&\cs{kanjifamily}&\cs{kanjiseries}&\cs{kanjishape}
 &\cs{usekanji}\\
-both&---&--&\cs{fontseries}&\cs{fontshape}&---\\
+both&---&--&\cs{fontseries}&\cs{fontshape}$^*$&---\\
 auto select&\cs{fontencoding}&\cs{fontfamily}&---&---&\cs{usefont}\\
 \bottomrule
 \end{tabular}
@@ -1341,15 +1320,35 @@ auto select&\cs{fontencoding}&\cs{fontfamily}&---&---&\cs{usefont}\\
 \emph{和文}
 &\cs{kanjiencoding}&\cs{kanjifamily}&\cs{kanjiseries}&\cs{kanjishape}
 &\cs{usekanji}\\
-\emph{両方}&---&--&\cs{fontseries}&\cs{fontshape}&---\\
+\emph{両方}&---&--&\cs{fontseries}&\cs{fontshape}$^*$&---\\
 \emph{自動選択}&\cs{fontencoding}&\cs{fontfamily}&---&---&\cs{usefont}\\
 \bottomrule
 \end{tabular}
 \end{center}
 %</ja>
 
+\begin{itemize}
 %<*en>
-      \verb+\fontencoding{+<encoding>\verb+}+ changes the encoding of alphabetic fonts
+\item \cs{fontfamily}, \cs{fontseries}, and~\cs{fontshape} try to change
+      attributes of Japanese fonts, as well as those of alphabetic fonts.
+      Of course, \cs{selectfont} is needed to select current text fonts.
+
+      Note that \cs{fontshape} always changes current alphabetic font shape,
+      but it does \emph{not} change current Japanese font shape if
+      the target shape is unavailable for current Japanese encoding/family/series.
+      For the detail, see Subsection~\ref{ssec:nfsspat}.
+%</en>
+%<*ja>
+\item \cs{fontfamily}, \cs{fontseries}, \cs{fontshape} は欧文・和文フォント両方の属性を変更しようとする．
+      もちろん，それらを実際に反映させるには手動で \cs{selectfont} を実行する必要がある．
+
+      なお，\cs{fontshape\{<shape>\}}は常に欧文フォントのシェイプを設定するが，
+      もしも現在の和文フォントファミリ・シリーズで要求されたシェイプが利用不能だった場合には，和文フォントのシェイプは変更しない．
+      詳細は\ref{ssec:nfsspat}節を参照すること．
+%</ja>
+
+%<*en>
+\item \verb+\fontencoding{+<encoding>\verb+}+ changes the encoding of alphabetic fonts
       or Japanese fonts depending on the argument. For example,
       \verb+\fontencoding{JY3}+ changes the encoding of Japanese fonts to
       \texttt{JY3}, and \verb+\fontencoding{T1}+ changes the encoding of
@@ -1359,7 +1358,7 @@ auto select&\cs{fontencoding}&\cs{fontfamily}&---&---&\cs{usefont}\\
       For the detail, see Subsection~\ref{ssec:nfsspat}.
 %</en>
 %<*ja>
-      ここで，\cs{fontencoding\{<encoding>\}}は，引数により和文側か欧文
+\item  ここで，\cs{fontencoding\{<encoding>\}}は，引数により和文側か欧文
       側かのどちらかのエンコーディングを変更する．例えば，
       \verb+\fontencoding{JY3}+ は和文フォントのエンコーディングを
       \texttt{JY3}に変更し，\verb+\fontencoding{T1}+ は欧文フォント側を
@@ -6501,8 +6500,8 @@ However, this leads a lot of \LaTeX\ font warning like
 when \cs{itshape} is called,
 because almost all Japanese fonts only have shape ``\texttt{n}'', and \cs{itshape} calls \cs{fontshape}.
 
-\LuaTeX-ja~********.0 (with \LaTeX\ 2020-02-02 or~later) change the behavior. Namely,
-\cs{fontshape\{<shape>\}}, \cs{fontshapeforce\{<shape>\}} change current Japanese font shape, only if
+\LuaTeX-ja~********.0 change the behavior. Namely,
+\cs{fontshape\{<shape>\}}~and~\cs{fontshapeforce\{<shape>\}} change current Japanese font shape, only if
 the required shape (according to shape changing rules) or <shape> is avaliable in current Japanese font family/series.
 When this is not the case, an info such as
 \begin{verbatim}
@@ -6537,7 +6536,7 @@ is issued instead of a warning.
 \item[\cs{kanjishape}\{<shape>\}\textrm{, }\cs{kanjishapeforce}\{<shape>\}]
 %<*en>
 \cs{kanjishape\{<shape>\}} changes current Japanese font shape according to shape change rules, and
-\cs{kanjishape\{<shape>\}} changes current Japanese font shape to <shape>, regardless of the rules.
+\cs{kanjishapeforce\{<shape>\}} changes current Japanese font shape to <shape>, regardless of the rules.
 Hence \cs{kanjishape\{it\}} produces a warning
 \begin{verbatim}
     Font shape `JY3/mc/m/it' undefined
@@ -6553,9 +6552,9 @@ which is not produced by \cs{fontshape\{it\}}.
 \begin{figure}[!tb]
 \begin{LTXexample}[pos=b]
 \DeclareKanjiFamily{JY3}{edm}{}
-\DeclareFontShape{JY3}{edm}{m}{n}   {<-> s*KozMinPr6N-Regular:jfm=ujis;}{}
-\DeclareFontShape{JY3}{edm}{m}{fb}  {<-> s*KozGoPr6N-Regular:jfm=ujis}{}
-\DeclareFontShape{JY3}{edm}{m}{fb2} {<-> s*KozGoPr6N-Medium:jfm=ujis}{}
+\DeclareFontShape{JY3}{edm}{m}{n}   {<-> s*KozMinPr6N-Regular:jfm=ujis}{}
+\DeclareFontShape{JY3}{edm}{m}{fb}  {<-> s*KozGoPr6N-Regular:jfm=ujis;color=003FFF}{}
+\DeclareFontShape{JY3}{edm}{m}{fb2} {<-> s*KozGoPr6N-Regular:jfm=ujis;color=FF1900}{}
 \DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{fb}{ "4E00-"67FF,{-2}-{-2}}
 \DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{fb2}{"6800-"9FFF}
 {\kanjifamily{edm}\selectfont
@@ -6935,11 +6934,11 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec:psft}.
 \begin{figure}[!tb]
 \begin{LTXexample}[width=0.25\textwidth]
 \jfontspec[
-  YokoFeatures={FakeBold=3}, TateFeatures={FakeBold=6},
+  YokoFeatures={Color=FF1900}, TateFeatures={Color=003FFF},
   TateFont=KozGoPr6N-Regular
 ]{KozMinPr6N-Regular}
 \hbox{\yoko 横組のテスト}\hbox{\tate 縦組のテスト}
-\addjfontfeatures{FakeBold=0}
+\addjfontfeatures{Color=00AF00}
 \hbox{\yoko 横組}\hbox{\tate 縦組}
 \end{LTXexample}
 %<ja>\caption{\texttt{TateFeatures} 等の使用例}
@@ -6985,9 +6984,9 @@ A demonstrarion is shown in \autoref{fig:yokotate-fontspec}.
 \begin{LTXexample}[pos=b]
 \jfontspec[
   AltFont={
-    {Range="4E00-"67FF, Font=KozGoPr6N-Medium},
-    {Range="6800-"9EFF, FakeBold=4},
-    {Range="3040-"306F, Font=KozGoPr6N-Regular},
+    {Range="4E00-"67FF, Font=KozGoPr6N-Regular, Color=003FFF},
+    {Range="6800-"9EFF, Color=FF1900},
+    {Range="3040-"306F, Font=KozGoPr6N-Regular, Color=35A16B},
   }
 ]{KozMinPr6N-Regular}
 日本国民は、正当に選挙された国会における代表者を通じて行動し、われらとわれらの子孫のために、
@@ -7049,7 +7048,7 @@ For example,
 \begin{lstlisting}
 AltFont = {
   { Font=HogeraMin-Light, BoldFont=HogeraMin-Bold,
-    Range="3000-"30FF, BoldFeatures={FakeBold=1} }
+    Range="3000-"30FF, BoldFeatures={Color=FF1900} }
 }
 \end{lstlisting}
 does \emph{not} work. Instead, one have to write
@@ -7058,7 +7057,7 @@ UprightFeatures = {
   AltFont = { { Font=HogeraMin-Light, Range="3000-"30FF, } },
 },
 BoldFeatures = {
-  AltFont =  { { Font=HogeraMin-Bold, Range="3000-"30FF, FakeBold=1 } },
+  AltFont =  { { Font=HogeraMin-Bold, Range="3000-"30FF, Color=FF1900 } },
 }
 \end{lstlisting}
 
@@ -7081,7 +7080,7 @@ has no effect, because a color specification is already done in
 \begin{lstlisting}
 AltFont = {
   { Font=HogeraMin-Light, BoldFont=HogeraMin-Bold,
-    Range="3000-"30FF, BoldFeatures={FakeBold=1} }
+    Range="3000-"30FF, BoldFeatures={Color=FF1900} }
 }
 \end{lstlisting}
 のように指定することは出来ず，
@@ -7090,7 +7089,7 @@ UprightFeatures = {
   AltFont = { { Font=HogeraMin-Light, Range="3000-"30FF, } },
 },
 BoldFeatures = {
-  AltFont =  { { Font=HogeraMin-Bold, Range="3000-"30FF, FakeBold=1 } },
+  AltFont =  { { Font=HogeraMin-Bold, Range="3000-"30FF, Color=FF1900 } },
 }
 \end{lstlisting}
 のように指定しなければならない．
