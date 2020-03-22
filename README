@@ -33,7 +33,7 @@ Installation
     - atbegshi package
     - filehook package
     - stfloats package
-    - IPAex fonts (http://ipafont.ipa.go.jp/)
+    - Harano Aji fonts (https://github.com/trueroad/HaranoAjiFonts)
 
    Using LuaTeX-ja with LuaHBTeX is not well tested.
    One might be able to typeset documents without an error, but with
