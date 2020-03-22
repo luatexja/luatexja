@@ -34,6 +34,7 @@ Installation
     - filehook package
     - stfloats package
     - Harano Aji fonts (https://github.com/trueroad/HaranoAjiFonts)
+	  more specifically, HaranoAjiMincho-Regular and HaranoAjiGothic-Medium
 
    Using LuaTeX-ja with LuaHBTeX is not well tested.
    One might be able to typeset documents without an error, but with

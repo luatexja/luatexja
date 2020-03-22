@@ -651,15 +651,26 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 \item \href{http://www.luatex.org/}{\LuaTeX}\ 1.10.0 (or later)
 \item recent \href{https://github.com/latex3/luaotfload}{\Pkg{luaotfload}} (v3.1 or later recommended)
 \item \Pkg{adobemapping} (Adobe cmap and pdfmapping files)
-\item \LaTeX\ 2020-02-02 patch level 5 or later (if you want to use \LuaTeX-ja with \LaTeXe)
+\item \LaTeX\ 2020-02-02 patch level 5 or later
+%<en>  (if you want to use \LuaTeX-ja with \LaTeXe)
+%<ja>  （\LaTeX 下で\LuaTeX-jaを使う場合）
 \item \href{https://github.com/josephwright/etoolbox/}{\Pkg{etoolbox}},
-  \Pkg{everysel} (if you want to use \LuaTeX-ja with \LaTeXe)
+  \Pkg{everysel}
+%<en>  (if you want to use \LuaTeX-ja with \LaTeXe)
+%<ja>  （\LaTeX 下で\LuaTeX-jaを使う場合）
 \item \Pkg{ltxcmds}, \Pkg{pdftexcmds}, \Pkg{filehook}, \Pkg{atbegshi}
 \item \href{https://github.com/wspr/fontspec/}{\Pkg{fontspec}} v2.7c (or later)
 %%% %<en>\item \emph{IPAex fonts} (\url{http://ipafont.ipa.go.jp/})
 %%% %<ja>\item \emph{IPAexフォント(\url{http://ipafont.ipa.go.jp/})}
-%<en>\item \emph{Harano Aji fonts} (\url{https://github.com/trueroad/HaranoAjiFonts})
-%<ja>\item \emph{原ノ味フォント(\url{https://github.com/trueroad/HaranoAjiFonts})}
+%<*en>
+\item \emph{Harano Aji fonts} (\url{https://github.com/trueroad/HaranoAjiFonts})\\
+  More specifically, HaranoAjiMincho-Regular~and~HaranoAjiGothic-Medium.
+%</en>
+%<*ja>
+\item \emph{原ノ味フォント(\url{https://github.com/trueroad/HaranoAjiFonts})}\\
+\LuaTeX-jaの最低限の動作には原ノ味明朝Regular~(HaranoAjiMincho-Regular)と
+原ノ味角ゴシックMedium~(HaranoAjiGothic-Medium)があれば十分である．
+%</ja>
 \end{itemize}
 
 %<*en>
@@ -685,7 +696,7 @@ Harano Aji fonts are available in \TeX~Live and MiK\TeX.
 %</ja>
 
 %<*en>
-\paragraph{Using \LuaTeX-ja with LuaHB\TeX}
+\paragraph{HarfBuzz~and~\LuaTeX-ja}
 Using \LuaTeX-ja with LuaHB\TeX (\LuaTeX\ integrated with
 \href{https://github.com/harfbuzz/harfbuzz}{HarfBuzz}) is not well tested.
 Maybe documents can typeset without an error,
@@ -696,13 +707,12 @@ Especially,
 by specifying \texttt{Renderer=Harfbuzz}~etc.\ (\Pkg{fontspec}) or~{mode=harf} (otherwise).
 %</en>
 %<*ja>
-\paragraph{LuaHB\TeX 下での\LuaTeX-jaの使用}
-現時点では，LuaHB\TeX 下での\LuaTeX-jaの使用は十分にテストされていない．
+\paragraph{HarfBuzzと\LuaTeX-ja}
+現時点では，HarfBuzzの機能を用いたときの\LuaTeX-jaの使用は十分にテストされていない．
 エラーが発生せずにタイプセットできるかもしれないが，特に縦組時や
 \cs{CID}などで意図しない結果となりうる可能性が大きい．
-
-特に，\texttt{Renderer=Harfbuzz}等（\Pkg{fontspec}）や\texttt{mode=harf}指定（それ以外）を用いて
-\emph{和文フォントに対してHarfBuzzを用いることは推奨しない}．
+特に，\emph{\texttt{Renderer=Harfbuzz}等（\Pkg{fontspec}）や\texttt{mode=harf}指定（それ以外）を通じて
+  和文フォントに対してHarfBuzzを用いることは推奨しない}．
 %</ja>
 
 %<en>\paragraph{Manual installation}
@@ -880,8 +890,6 @@ Note that when \LuaTeX-ja is loaded in plain \LuaTeX,
 we cannot use color specification on font loading, such as
 \begin{lstlisting}
   \font\hoge=lmroman10-regular.otf:color=FF0000 % \font primitive
-  \DeclareFontShape{TU}{...}{...}{...}{<-> lmsans10-boldoblique:color=005599}{} % NFSS
-  \setmainfont{texgyretermes}[Color=220022]     % fontspec
 \end{lstlisting}
 This is because codes for shifting baseline in math mode (\LuaTeX-ja) collide with and prevents loading
 codes for font color (\Pkg{luaotfload}) in these environments.
@@ -892,8 +900,6 @@ codes for font color (\Pkg{luaotfload}) in these environments.
 以下のような\emph{フォント読み込み時の色指定}（\cs{textcolor}命令ではなく！）\emph{は利用できない}．
 \begin{lstlisting}
   \font\hoge=lmroman10-regular.otf:color=FF0000 % \font primitive
-  \DeclareFontShape{TU}{...}{...}{...}{<-> lmsans10-boldoblique:color=005599}{} % NFSS
-  \setmainfont{texgyretermes}[Color=220022]     % fontspec
 \end{lstlisting}
 これは，\LuaTeX-jaによる数式内のベースライン補正（\ref{ssec:baseline}節）のコードが
 \Pkg{luaotfload}パッケージのフォント色処理のコードと衝突するためである．
@@ -940,11 +946,11 @@ codes for font color (\Pkg{luaotfload}) in these environments.
 \emph{組方向}&\emph{字体}&\emph{フォント名}&\bfseries``10\,pt''&\bfseries``7\,pt''&\bfseries``5\,pt''\\\midrule
 \smash{\raisebox{-0.7\zh}{横組}}&
 明朝体&原ノ味明朝Regular&\cs{tenmin}&\cs{sevenmin}&\cs{fivemin}\\
-&\textgt{ゴシック体}&原ノ味ゴシックMedium&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
+&\textgt{ゴシック体}&原ノ味角ゴシックMedium&\cs{tengt} &\cs{sevengt} &\cs{fivegt}\\
 \midrule
 \smash{\raisebox{-0.7\zh}{縦組}}&
 明朝体&原ノ味明朝Regular&\cs{tentmin}&\cs{seventmin}&\cs{fivetmin}\\
-&\textgt{ゴシック体}&原ノ味ゴシックMedium&\cs{tentgt} &\cs{seventgt} &\cs{fivetgt}\\
+&\textgt{ゴシック体}&原ノ味角ゴシックMedium&\cs{tentgt} &\cs{seventgt} &\cs{fivetgt}\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1089,8 +1095,8 @@ By default, the following fonts are used for these two families.
 \begin{tabular}{lllll}
 \toprule
 \emph{字体}&\emph{ファミリ}&\textbf{\cs{mdseries}}&\textbf{\cs{bfseries}}&\emph{スケール}\\\midrule
-明朝体&\texttt{mc}&原ノ味明朝Regular&原ノ味ゴシックMedium&0.962216\\
-\textgt{ゴシック体}&\texttt{gt}&原ノ味ゴシックMedium&原ノ味ゴシックMedium&0.962216\\
+明朝体&\texttt{mc}&原ノ味明朝Regular&原ノ味角ゴシックMedium&0.962216\\
+\textgt{ゴシック体}&\texttt{gt}&原ノ味角ゴシックMedium&原ノ味角ゴシックMedium&0.962216\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -6500,7 +6506,7 @@ However, this leads a lot of \LaTeX\ font warning like
 when \cs{itshape} is called,
 because almost all Japanese fonts only have shape ``\texttt{n}'', and \cs{itshape} calls \cs{fontshape}.
 
-\LuaTeX-ja~********.0 change the behavior. Namely,
+\LuaTeX-ja~20200323.0 change the behavior. Namely,
 \cs{fontshape\{<shape>\}}~and~\cs{fontshapeforce\{<shape>\}} change current Japanese font shape, only if
 the required shape (according to shape changing rules) or <shape> is avaliable in current Japanese font family/series.
 When this is not the case, an info such as
@@ -6522,7 +6528,7 @@ is issued instead of a warning.
 \end{verbatim}
 といった警告をもたらしてしまっていた．
 
-一方，\LuaTeX-ja ********.0以降では，
+一方，\LuaTeX-ja 20200323.0以降では，
 \cs{fontshape\{<shape>\}}, \cs{fontshapeforce\{<shape>\}}が和文フォントシェイプを更新するのは，
 シェイプ更新規則に基づいた値や<shape>の少なくとも一つが現在の和文フォントファミリ・シリーズで利用可能なときに限られる．
 どちらでもなく，和文フォントシェイプが変更されなかった場合には
