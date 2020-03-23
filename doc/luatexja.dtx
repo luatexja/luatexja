@@ -3,8 +3,6 @@
 
 % To typeset this manual, you need following two fonts:
 %  - KozMinPr6N-Regular.otf
-%  - KozGoPr6N-Medium.otf
-%  - KozGoPr6N-Regular.otf
 
 %%%%% section ==> 章
 %%%%% subsection => 節
@@ -34,9 +32,9 @@
 ]{iosevka-slab-regular}
 \setsansfont[Scale=MatchLowercase,Ligatures=TeX,RawFeature=-notdef]{Linux Biolinum O}
 \usepackage[match]{luatexja-fontspec}
-\usepackage[kozuka-pr6n]{luatexja-preset}
+\usepackage[haranoaji]{luatexja-preset}
 \usepackage{unicode-math}
-\setmonojfont{KozGoPr6N-Regular.otf}
+\setmonojfont{HaranoAjiGothic-Regular.otf}
 \setmathfont[Scale=MatchLowercase]{XITSMath}
 
 \setLaTeXa{\scshape a}
@@ -1389,8 +1387,8 @@ auto select&\cs{fontencoding}&\cs{fontfamily}&---&---&\cs{usefont}\\
 \item 和文フォントのシェイプを定義するには，通常の \cs{DeclareFontShape} を使えば良い：
 %</ja>
 \begin{lstlisting}
-\DeclareFontShape{JY3}{mc}{b}{n}{<-> s*KozMinPr6N-Bold:jfm=ujis;-kern}{}
-    % Kozuka Mincho Pr6N Bold
+\DeclareFontShape{JY3}{mc}{b}{n}{<-> s*HaranoAjiMincho--Bold:jfm=ujis;-kern}{}
+    % Harano Aji Mincho Bold
 \end{lstlisting}
 %<*ja>
 仮名書体を使う場合など，複数の和文フォントを組み合わせて使いたい場合は
@@ -1637,10 +1635,12 @@ Below is an example of \cs{jfontspec}.
 %</ja>
 
 \begin{LTXexample}[width=0.4\textwidth]
-\jfontspec[CJKShape=NLC]{KozMinPr6N-Regular}
-JIS~X~0213:2004→辻\par
-\jfontspec[CJKShape=JIS1990]{KozMinPr6N-Regular}
-JIS~X~0208:1990→辻
+\jfontspec[CJKShape=NLC]{HaranoAjiMincho-Regular}
+JIS~X~0213:2004→辻鯵\par
+\jfontspec[CJKShape=JIS1990]{HaranoAjiMincho-Regular}
+JIS~X~0208-1990→辻鯵\par
+\jfontspec[CJKShape=JIS1978]{HaranoAjiMincho-Regular}
+JIS~C~6226-1978→辻鯵
 \end{LTXexample}
 
 %<en>\subsection{Presets of Japanese fonts}
@@ -1671,10 +1671,10 @@ The following presets are defined:
 %<ja> 例えば，本ドキュメントでは\Pkg{luatexja-preset}パッケージを
 %<en> For example, this document loads \Pkg{luatexja-preset} package by
 \begin{lstlisting}
-\usepackage[kozuka-pr6n]{luatexja-preset}
+\usepackage[haranoaji]{luatexja-preset}
 \end{lstlisting}
-%<ja>として読み込み，小塚書体(Pr6N)を使うことを指定している．
-%<en> which means that Kozuka~Pr6N fonts will be used in this document.
+%<ja>として読み込み，原ノ味フォントを使うことを指定している．
+%<en> which means that Harano Aji fonts will be used in this document.
 
 
 %<*en>
@@ -1693,14 +1693,13 @@ as an external package \Pkg{luatexja-otf}.
 一部を（\Pkg{luatexja-otf}という別のパッケージとして）実装した．
 %</ja>
 
-\begin{LTXexample}
+%!!! BROKEN
+\begin{LTXexample}[width=0.4\textwidth]
 \jfontspec{KozMinPr6N-Regular.otf}
-森\UTF{9DD7}外と内田百\UTF{9592}とが\UTF{9AD9}島屋に行く。
-
+森\UTF{9DD7}外と内田百\UTF{9592}とが\UTF{9AD9}島屋に\\
 \CID{7652}飾区の\CID{13706}野家，
-\CID{1481}城市，葛西駅，
-高崎と\CID{8705}\UTF{FA11}
-
+\CID{1481}城市，葛西駅，\\
+高崎と\CID{8705}\UTF{FA11}，
 \aj半角{はんかくカタカナ}
 \end{LTXexample}
 
@@ -3441,22 +3440,22 @@ TrueType/OpenTypeフォントにfeatureを指定したものを和文フォン�
 ことができる：
 %</ja>
 \begin{LTXexample}[width=0.3\textwidth]
-\jfont\tradgt={file:KozMinPr6N-Regular.otf:script=latn;%
+\jfont\tradmc={IPAexMincho:script=latn;%
   +trad;-kern;jfm=ujis} at 14pt
-\tradgt 当／体／医／区
+\tradmc 当／体／医／区
 \end{LTXexample}
 
 %<*en>
 Note that the defined control sequence
-(\cs{tradgt} in the example above) using \cs{jfont} is not a
+(\cs{tradmc} in the example above) using \cs{jfont} is not a
 \textit{font\_def} token,  but a macro.
-Hence the input like \verb+\fontname\tradgt+
+Hence the input like \verb+\fontname\tradmc+
 causes a error.  We denote control sequences which are defined in
 \cs{jfont} by <jfont\_cs>.
 %</en>
 %<*ja>
-なお，\cs{jfont} で定義された制御綴（上の例だと \cs{tradgt}）
-は\textit{font\_def}トークンではなくマクロである．従って，\verb+\fontname\tradgt+ のような
+なお，\cs{jfont} で定義された制御綴（上の例だと \cs{tradmc}）
+は\textit{font\_def}トークンではなくマクロである．従って，\verb+\fontname\tradmc+のような
 入力はエラーとなる．以下では \cs{jfont} で定義された
 制御綴を<jfont\_cs>で表す．
 %</ja>
@@ -3588,9 +3587,9 @@ The difference among these three~JFMs is  shown in \autoref{tab-difjfm}.
 \begin{figure}
 \begin{LTXexample}[width=0.3\textwidth]
 \ltjsetparameter{differentjfm=both}
-\jfont\F=file:KozMinPr6N-Regular.otf:jfm=ujis
-\jfont\G=file:KozGoPr6N-Medium.otf:jfm=ujis
-\jfont\H=file:KozGoPr6N-Medium.otf:jfm=ujis;jfmvar=hoge
+\jfont\F=HaranoAjiMincho-Regular:jfm=ujis
+\jfont\G=HaranoAjiGothic-Medium:jfm=ujis
+\jfont\H=HaranoAjiGothic-Medium:jfm=ujis;jfmvar=hoge
 \F ）{\G 【】}（ % halfwidth space
    ）{\H 『』}（ % fullwidth space
 
@@ -3625,10 +3624,10 @@ JFMもサイズも同じなので，普通に「）【」と入力した時と�
 \begin{figure}
 \begin{LTXexample}[pos=t]
 \newcommand\test{\vrule ダイナミックダイクマ\vrule\\}
-\jfont\KMFW = KozMinPr6N-Regular:jfm=prop;-kern at 17pt
-\jfont\KMFK = KozMinPr6N-Regular:jfm=prop at 17pt % kern is activated
-\jfont\KMPW = KozMinPr6N-Regular:jfm=prop;script=dflt;+pwid;-kern at 17pt
-\jfont\KMPK = KozMinPr6N-Regular:jfm=prop;script=dflt;+pwid;+kern at 17pt
+\jfont\KMFW = HaranoAjiMincho-Regular:jfm=prop;-kern at 17.28pt
+\jfont\KMFK = HaranoAjiMincho-Regular:jfm=prop at 17.28pt % kern is activated
+\jfont\KMPW = HaranoAjiMincho-Regular:jfm=prop;script=dflt;+palt;-kern at 17.28pt
+\jfont\KMPK = HaranoAjiMincho-Regular:jfm=prop;script=dflt;+palt;+kern at 17.28pt
 \begin{multicols}{2}
 \ltjsetparameter{kanjiskip=0pt}
 {\KMFW\test \KMFK\test \KMPW\test \KMPK\test}
@@ -3666,8 +3665,8 @@ NFSS2用の命令（\ref{ssec:chgfnt}節，\ref{ssec:nfsspat}節）における�
 カーニング情報は標準で使用する}ことになっているようである．
 言い換えれば，カーニング情報を使用しない設定にするには，面倒でも
 \begin{lstlisting}
-\jfont\hoge=KozMinPr6N-Regular:jfm=ujis;-kern at 3.5mm
-\DeclareFontShape{JY3}{fuga}{m}{n} {<-> s*KozMinPr6N-Regular:jfm=ujis;-kern}{}
+\jfont\hoge=HaranoAjiMincho-Regular:jfm=ujis;-kern at 3.5mm
+\DeclareFontShape{JY3}{fuga}{m}{n} {<-> s*HaranoAjiMincho-Regular:jfm=ujis;-kern}{}
 \end{lstlisting}
 のように，\texttt{-kern} という指定を自分で追加しなければいけない．
  \item
@@ -3703,11 +3702,9 @@ For example, the following example uses the standard JFM \texttt{jfm-ujis.lua}, 
 letter-spacing and the width of italic correction are not correct:
 %</en>
 \begin{LTXexample}[width=0.3\textwidth]
-\jfont\E=KozMinPr6N-Regular:extend=1.5;jfm=ujis;-kern
-\E あいうえお
-
-\jfont\S=KozMinPr6N-Regular:slant=1;jfm=ujis;-kern
-\S あいう\/ABC
+\jfont\E=HaranoAjiMincho-Regular:extend=1.5;jfm=ujis;-kern
+\jfont\S=HaranoAjiMincho-Regular:slant=1;jfm=ujis;-kern
+\E あいうえお \S あいう\/ABC
 \end{LTXexample}
 
 %<*ja>
@@ -3723,16 +3720,15 @@ JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 \begin{LTXexample}[width=16\zw]
 \leavevmode
 \ltjsetparameter{kanjiskip=0pt plus 3\zw}
-\vrule\hbox to 15\zw{あ「い」う，えお}\vrule
-
-\jfont\G=file:KozMinPr6N-Regular.otf%
-  :jfm=ujis;-ltjksp at 9.2487pt
+\vrule\hbox to 15\zw{あ「い」う，えお}\vrule\\
+\jfont\G=HaranoAjiMincho-Regular%
+  :jfm=ujis;-ltjksp at \zw
 \G\leavevmode%
 \vrule\hbox to 15\zw{あ「い」う，えお}\vrule
 \end{LTXexample}
 なお，
 \begin{lstlisting}
- \jfont\G=file:KozMinPr6N-Regular.otf:jfm=ujis;-ltjksp;+ltjksp at 9.2487pt
+ \jfont\G=HaranoAjiMincho-Regular:jfm=ujis;-ltjksp;+ltjksp at \zw
 \end{lstlisting}
 のように \texttt{+ltjksp} 指定を行った場合は，\texttt{kanjiskip\_natural} など
 3キーは再び有効化される．\texttt{-ltjksp}, \texttt{+ltjksp} を複数回指定した場合は，
@@ -3750,10 +3746,9 @@ This functionality is disabled by \texttt{-ltjksp} specification.
 \begin{LTXexample}[width=16\zw]
 \leavevmode
 \ltjsetparameter{kanjiskip=0pt plus 3\zw}
-\vrule\hbox to 15\zw{あ「い」う，えお}\vrule
-
-\jfont\G=file:KozMinPr6N-Regular.otf%
-  :jfm=ujis;-ltjksp at 9.2487pt
+\vrule\hbox to 15\zw{あ「い」う，えお}\vrule\\
+\jfont\G=HaranoAjiMincho-Regular%
+  :jfm=ujis;-ltjksp at \zw
 \G\leavevmode%
 \vrule\hbox to 15\zw{あ「い」う，えお}\vrule
 \end{LTXexample}
@@ -3825,8 +3820,8 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
   unless \texttt{vert}~and//or~\texttt{vrt2} are explicitly activated
   or deactivated (as the second line in the example below).
 \begin{lstlisting}
-\tfont\S=file:KozMinPr6N-Regular.otf:jfm=ujisv % vrt2 is automatically activated
-\tfont\T=file:KozMinPr6N-Regular.otf:jfm=ujisv;-vert % vert and vrt2 are not activated
+\tfont\S=HaranoAjiMincho-Regular:jfm=ujisv % vrt2 is automatically activated
+\tfont\T=HaranoAjiMincho-Regular:jfm=ujisv;-vert % vert and vrt2 are not activated
 \tfont\U=file:ipaexm.ttf:jfm=ujisv
     % vert is automatically activated, since this font does not have vrt2
 \end{lstlisting}
@@ -3851,9 +3846,9 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
 \end{description}
 \begin{figure}[!tb]
 \begin{LTXexample}[pos=b]
-\jfont\X=[KozMinPr6N-Regular.otf]:jfm=ujis
-\tfont\U=[KozMinPr6N-Regular.otf]:jfm=ujisv
-\tfont\V=[KozMinPr6N-Regular.otf]:jfm=ujisv;jpotf
+\jfont\X=[HaranoAjiMincho-Regular.otf]:jfm=ujis
+\tfont\U=[HaranoAjiMincho-Regular.otf]:jfm=ujisv
+\tfont\V=[HaranoAjiMincho-Regular.otf]:jfm=ujisv;jpotf
 \def\TEST#1#2{\leavevmode\hbox{#1#2\string#2 “引用，と句読点．”}}
 \ttfamily\centering\TEST\yoko\X \quad \TEST\tate\U \quad \TEST\tate\V
 \end{LTXexample}
@@ -3880,8 +3875,8 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
  \footnote{もしフォントが\texttt{vrt2}を定義していなかった場合，代わりに
  \texttt{vert}を用いる．}．
 \begin{lstlisting}
-\tfont\S=file:KozMinPr6N-Regular.otf:jfm=ujisv % vrt2 is automatically activated
-\tfont\T=file:KozMinPr6N-Regular.otf:jfm=ujisv;-vert % vert and vrt2 are not activated
+\tfont\S=HaranoAjiMincho-Regular:jfm=ujisv % vrt2 is automatically activated
+\tfont\T=HaranoAjiMincho-Regular:jfm=ujisv;-vert % vert and vrt2 are not activated
 \tfont\U=file:ipaexm.ttf:jfm=ujisv
     % vert is automatically activated, since this font does not have vrt2
 \end{lstlisting}
@@ -3914,9 +3909,9 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
 
 \begin{figure}[!tb]
 \begin{LTXexample}[pos=r,width=.4\textwidth]
-\jfont\X=[KozMinPr6N-Regular.otf]:jfm=ujis
-\tfont\U=[KozMinPr6N-Regular.otf]:jfm=ujisv
-\tfont\V=[KozMinPr6N-Regular.otf]:jfm=ujisv;jpotf
+\jfont\X=[HaranoAjiMincho-Regular.otf]:jfm=ujis
+\tfont\U=[HaranoAjiMincho-Regular.otf]:jfm=ujisv
+\tfont\V=[HaranoAjiMincho-Regular.otf]:jfm=ujisv;jpotf
 \def\TEST#1#2{\leavevmode
   \hbox{#1#2\string#2 “引用，と句読点．”}}
 \ttfamily\centering
@@ -4763,9 +4758,8 @@ using  \texttt{jfm-test.lua} which contains the following:
 %<ja>ここで，次のような入力とその実行結果を考える：
 %<en>Now consider the following input/output:
 \begin{LTXexample}[width=0.3\textwidth]
-\jfont\a=file:KozMinPr6N-Regular.otf:jfm=test;+hwid
-\setbox0\hbox{\a ヒ漢}
-\the\wd0
+\jfont\a=IPAexMincho:jfm=test;+hwid
+\setbox0\hbox{\a ヒ漢}\the\wd0
 \end{LTXexample}
 %<*en>
 Now we look why the above source outputs 15\,pt.
@@ -4798,7 +4792,7 @@ The following input is an example.
 但し，JFMによって決まる置換後のグリフの文字クラスが0である場合は，置換前の文字クラスを採用する．
 %</ja>
 \begin{LTXexample}[width=0.3\textwidth]
-\jfont\a=file:KozMinPr6N-Regular.otf:jfm=test;+vert
+\jfont\a=HaranoAjiMincho-Regular:jfm=test;+vert
 \a 漢。\inhibitglue 漢
 \end{LTXexample}
 %<*en>
@@ -4937,7 +4931,7 @@ See Japanese version of this manual.
 \texttt{'parbdd'}を入れれば全角下がりとなる．
 
 \begin{LTXexample}[width=0.4\textwidth]
-\jfont\g=KozMinPr6N-Regular:jfm=test \g
+\jfont\g=HaranoAjiMincho-Regular:jfm=test \g
 \parindent1\zw\noindent{}◆◆◆◆◆
 \par 「◆◆←二分下がり
 \par 【◆◆←全角下がり
@@ -6003,7 +5997,7 @@ the beginning of a box and ``あ'', and also between ``あ''~and~``ウ''.
 %</ja>
 
 \begin{LTXexample}[width=0.4\textwidth]
-\jfont\g=file:KozMinPr6N-Regular.otf:jfm=test \g
+\jfont\g=HaranoAjiMincho-Regular:jfm=test \g
 \fbox{\hbox{あウあ\inhibitglue ウ}}
 \inhibitglue\par\noindent あ1
 \par\inhibitglue\noindent あ2
@@ -6558,9 +6552,9 @@ which is not produced by \cs{fontshape\{it\}}.
 \begin{figure}[!tb]
 \begin{LTXexample}[pos=b]
 \DeclareKanjiFamily{JY3}{edm}{}
-\DeclareFontShape{JY3}{edm}{m}{n}   {<-> s*KozMinPr6N-Regular:jfm=ujis}{}
-\DeclareFontShape{JY3}{edm}{m}{fb}  {<-> s*KozGoPr6N-Regular:jfm=ujis;color=003FFF}{}
-\DeclareFontShape{JY3}{edm}{m}{fb2} {<-> s*KozGoPr6N-Regular:jfm=ujis;color=FF1900}{}
+\DeclareFontShape{JY3}{edm}{m}{n}   {<-> s*HaranoAjiMincho-Regular:jfm=ujis}{}
+\DeclareFontShape{JY3}{edm}{m}{fb}  {<-> s*HaranoAjiGothic-Regular:jfm=ujis;color=003FFF}{}
+\DeclareFontShape{JY3}{edm}{m}{fb2} {<-> s*HaranoAjiGothic-Regular:jfm=ujis;color=FF1900}{}
 \DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{fb}{ "4E00-"67FF,{-2}-{-2}}
 \DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{fb2}{"6800-"9FFF}
 {\kanjifamily{edm}\selectfont
@@ -6941,8 +6935,8 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec:psft}.
 \begin{LTXexample}[width=0.25\textwidth]
 \jfontspec[
   YokoFeatures={Color=FF1900}, TateFeatures={Color=003FFF},
-  TateFont=KozGoPr6N-Regular
-]{KozMinPr6N-Regular}
+  TateFont=HaranoAjiGothic-Regular
+]{HaranoAjiMincho-Regular}
 \hbox{\yoko 横組のテスト}\hbox{\tate 縦組のテスト}
 \addjfontfeatures{Color=00AF00}
 \hbox{\yoko 横組}\hbox{\tate 縦組}
@@ -6990,11 +6984,11 @@ A demonstrarion is shown in \autoref{fig:yokotate-fontspec}.
 \begin{LTXexample}[pos=b]
 \jfontspec[
   AltFont={
-    {Range="4E00-"67FF, Font=KozGoPr6N-Regular, Color=003FFF},
+    {Range="4E00-"67FF, Font=HaranoAjiGothic-Regular, Color=003FFF},
     {Range="6800-"9EFF, Color=FF1900},
-    {Range="3040-"306F, Font=KozGoPr6N-Regular, Color=35A16B},
+    {Range="3040-"306F, Font=HaranoAjiGothic-Regular, Color=35A16B},
   }
-]{KozMinPr6N-Regular}
+]{HaranoAjiMincho-Regular}
 日本国民は、正当に選挙された国会における代表者を通じて行動し、われらとわれらの子孫のために、
 諸国民との協和による成果と、わが国全土にわたつて自由のもたらす恵沢を確保し、……
 \end{LTXexample}
