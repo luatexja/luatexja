@@ -40,8 +40,7 @@ do
 local nulltable = {}
 local function get_cidinfo(id) -- table
   local t = getfont(id)
-  local a = t and (t.cidinfo or (t.resources and t.resources and t.resources.cidinfo)) or nulltable
-  return a
+  return t and (t.resources and t.resources.cidinfo or t.cidinfo) or nulltable
 end
 aux.get_cidinfo = get_cidinfo
 end

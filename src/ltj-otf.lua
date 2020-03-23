@@ -78,7 +78,7 @@ local function get_ucs_from_rmlgbm(c)
       local tfmdata = font_getfont(curjfnt)
       if tfmdata and tfmdata.resources then
         local base, ivs = v % 0x200000, 0xE00FF + math.floor(v/0x200000)
-        curjfnt = tfmdata and tfmdata.variants
+        curjfnt = tfmdata.resources.variants
         curjfnt = curjfnt and curjfnt[ivs]
         return curjfnt and curjfnt[base] or base
       else return base
@@ -144,7 +144,7 @@ do
       if key==0 then return append_jglyph(0) end
       local curjfnt = tex_get_attr((ltjd_get_dir_count()==dir_tate)
                                         and attr_curtfnt or attr_curjfnt)
-      local cidinfo = ltju.get_cidinfo(cudjfnt)
+      local cidinfo = ltju.get_cidinfo(curjfnt)
       if type(cidinfo)~="table" or
          cidinfo.ordering ~= "Japan1" and
          cidinfo.ordering ~= "GB1" and
