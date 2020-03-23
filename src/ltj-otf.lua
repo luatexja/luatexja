@@ -205,7 +205,7 @@ ltjb.add_to_callback('pre_linebreak_filter', extract,'ltj.otf',
 local function ind_to_uni(fmtable, fn)
    if fn<0 then return end
    local cid = ltju.get_cidinfo(fn);
-   local t = ltjf_font_extra_info[fn].ind_to_uni
+   local t = ltjf_font_extra_info[fn]; t = t and t.ind_to_uni
    if t and cid.ordering == "Japan1" then
       for i, v in pairs(fmtable.chars) do
 	 local j = string.match(i, "^AJ1%-([0-9]*)")
