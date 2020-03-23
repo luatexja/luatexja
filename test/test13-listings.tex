@@ -33,7 +33,7 @@
 	\fi
 }{}
 \DeclareKanjiFamily{JY3}{koz}{}
-\DeclareFontShape{JY3}{koz}{m}{n}{<-> s * [1.2] KozMinPr6N-Regular:jfm=ujis}{}
+\DeclareFontShape{JY3}{koz}{m}{n}{<-> s * [1.2] HaranoAjiMincho-Regular:jfm=ujis}{}
 \DeclareFontShape{JY3}{koz}{m}{sl}{<-> s * [1.2] psft:Ryumin-Light:jfm=ujis;slant=0.167}{}
 \DeclareFontShape{JY3}{koz}{m}{it}{<-> ssub* koz/m/sl}{}
 \def\mcdefault{koz}
@@ -217,4 +217,25 @@ aiu
 aiu# \textcolor{red}{e} #o#\textcolor{red}{ka}#ki
 \end{lstlisting}
 
+
+\newpage
+\lstset{basewidth=0.75\zw,basicstyle=\ttfamily,doubleletterspace,backgroundcolor=}
+\noindent
+\def\A{\leavevmode\smash{\hbox to 0.75\zw{\kern-.0625mm\vrule height 0pt depth 200pt width 0.125mm\hss}}}%
+\textcolor{cyan}{\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A}%
+
+\begin{lstlisting}
+1234567890123456789012345
+123（あいう（ｶﾝｼﾞabc
+1234567890123456789012345
+123あいう）（ｶﾝｼﾞabc
+1234567890123456789012345
+123あい：う（ｶﾝｼﾞabc
+1234567890123456789012345
+:H:
+1234567890123456789012345
+:HHHH:
+1234567890123456789012345
+1234567890123456789012345
+\end{lstlisting}
 \end{document}

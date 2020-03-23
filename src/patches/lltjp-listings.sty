@@ -1,5 +1,5 @@
 %
-% lltjp-listings.sty 2018-09-17
+% lltjp-listings.sty 2020-03-23
 %
 
 \NeedsTeXFormat{LaTeX2e}
@@ -26,8 +26,10 @@
 % override \lst@FillFixed@
 % \ltj@hst@hss is \ltj@lst@hss@ivs or \ltj@lst@hss@normal,
 % according to vsraw = true or not.
+\def\lst@FillFixed#1{{\null#1\null}\lst@FillFixed@}
 \def\lst@FillFixed@#1{%
-  \ifx\@empty#1\else\ltj@lst@hss#1\expandafter\lst@FillFixed@\fi}
+  \ifx\@empty#1\else\ltj@lst@hss{\null#1\null}\expandafter\lst@FillFixed@\fi}
+\let\lst@FillOutputBox\lst@FillFixed
 
 \directlua{
   local cat_str = luatexbase.catcodetables['string']
@@ -97,7 +99,8 @@
   \else
     \ltj@lst@setletterflag
   \fi
-  \lst@Append#1}
+  \lst@Append#1%
+}
 
 % 半角カナ処理命令
 \def\ltj@lst@ProcessJALetterHalf#1{%
@@ -422,7 +425,6 @@
         \@gobbletwo\fi\fi
     \fi}
 \endgroup
-
 
 %    \begin{修正事項}{1.3} from jlisting.sty
 % ちょっとした修正
