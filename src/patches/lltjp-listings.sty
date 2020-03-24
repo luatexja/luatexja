@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\RequirePackage{listings,luatexbase-cctb}
+\RequirePackage{etoolbox,listings,luatexbase-cctb}
 
 %%%%%%%%%%%%%%%% Japanese support
 %% whether letter-space in a fixed mode box is doubled or not
@@ -30,6 +30,15 @@
 \def\lst@FillFixed@#1{%
   \ifx\@empty#1\else\ltj@lst@hss{\null#1\null}\expandafter\lst@FillFixed@\fi}
 \let\lst@FillOutputBox\lst@FillFixed
+% [space/full]flexiblemode (not much useful...)
+\def\ltj@lst@FillFlex#1\@empty{\null#1\null}
+\patchcmd\lst@column@flexible
+  {\let\lst@FillOutputBox\@empty}{\let\lst@FillOutputBox\ltj@lst@FillFlex}{}{}
+\patchcmd\lst@column@fullflexible
+  {\let\lst@FillOutputBox\@empty}{\let\lst@FillOutputBox\ltj@lst@FillFlex}{}{}
+\patchcmd\lst@column@spaceflexible
+  {\let\lst@FillOutputBox\@empty}{\let\lst@FillOutputBox\ltj@lst@FillFlex}{}{}
+
 
 \directlua{
   local cat_str = luatexbase.catcodetables['string']
