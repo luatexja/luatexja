@@ -7124,6 +7124,9 @@ If the Japanese font is neither Adobe-Japan1,~Adobe-GB1, Adobe-CNS1,
 Adobe-Korea1,~nor~Adobe-KR CID-keyed font,
 \LuaTeX-ja treats that <number> is a CID number of Adobe-Japan1 character collection,
 and tries to typeset a ``most suitable glyph''.
+
+Note that if the Japanese font is loaded using the HarfBuzz library, this \cs{CID}
+command does not work.
 %</en>
 %<*ja>
 CID番号が<number>の文字を出力する．
@@ -7136,6 +7139,8 @@ CID番号が<number>の文字を出力する．
   また，フォントにIVDコレクションAdobe-Japan1が含まれていれば，その情報を用いて
   グリフを選択する．
 }を出力する．
+
+なお，現在の和文フォントがHarfBuzzを用いて読み込まれた場合には，\cs{CID}は正しく動作しない．
 %</ja>
 
 \item[\cs{UTF}\{<hex\_number>\}]
