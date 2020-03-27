@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2020/03/19 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2020/03/27 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -488,6 +488,8 @@
   \def\ebdefault{eb}
   \DeclareRobustCommand\ebseries { \not@math@alphabet\ebseries\relax\fontseries\ebdefault\selectfont }
   \DeclareRobustCommand\gtebfamily { \gtfamily\fontseries{\ebdefault}\selectfont }
+  \DeclareTextFontCommand{\textlt}{\ltseries}
+  \DeclareTextFontCommand{\texteb}{\ebseries}
 } {
   \cs_set_eq:NN \__ltjpreset_check_deluxe_existence: \prg_do_nothing:
 }
