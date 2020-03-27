@@ -1,0 +1,17 @@
+\documentclass{ltjarticle}
+\usepackage[OT1]{fontenc}
+\DeclareSymbolFont{hogemath}{OT1}{hoge}{m}{n}
+\SetSymbolFont{hogemath}{bold}{OT1}{hoge}{bx}{n}
+\DeclareSymbolFont{piyomath}{JY3}{piyo}{m}{n}
+\SetSymbolFont{piyomath}{bold}{JY3}{piyo}{bx}{n}
+%
+\DeclareFontFamily{OT1}{guha}{}
+\DeclareFontShape{OT1}{guha}{m}{n}{<-> cmfi10}{}
+\DeclareFontShape{JY3}{gt}{l}{it}{<-> file:HaranoAjiMincho-Heavy.otf:jfm=ujis}{}
+\DeclareFontSubstitution{OT1}{guha}{m}{n}
+\DeclareKanjiSubstitution{JY3}{gt}{l}{it}
+%
+\begin{document}
+\romanfamily{fuga}\kanjifamily{fuga}\selectfont abcあいうえお
+\setbox0=\hbox{$\empty$}%
+\end{document}

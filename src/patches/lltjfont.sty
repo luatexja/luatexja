@@ -227,10 +227,18 @@
                            \def\default@k@series{#3}%
                            \def\default@k@shape{#4}}%
   \fi}
-\let\wrong@kfontshape\wrong@fontshape
-\patchcmd\wrong@kfontshape{\default@shape}{\default@k@shape}{}{}
-\patchcmd\wrong@kfontshape{\default@series}{\default@k@series}{}{}
-\patchcmd\wrong@kfontshape{\default@family}{\default@k@family}{}{}
+\let\wrong@ja@fontshape\wrong@fontshape
+\let\wrong@al@fontshape\wrong@fontshape
+\patchcmd\wrong@ja@fontshape{\default@shape}{\default@k@shape}{}{}
+\patchcmd\wrong@ja@fontshape{\default@series}{\default@k@series}{}{}
+\patchcmd\wrong@ja@fontshape{\default@family}{\default@k@family}{}{}
+\def\wrong@fontshape{%
+  \directlua{luatexja.jfont.is_kenc('\luatexluaescapestring{\f@encoding}')}\ifin@%
+    \wrong@ja@fontshape
+  \else
+    \wrong@al@fontshape
+  \fi
+}
 \@onlypreamble\DeclareKanjiSubstitution
 \def\DeclareErrorKanjiFont#1#2#3#4#5{%
    \xdef\error@kfontshape{%
@@ -353,8 +361,6 @@
   \directlua{luatexja.base.start_time_measure('selectfont')}%
   \let\tmp@error@fontshape\error@fontshape
   \let\error@fontshape\error@kfontshape
-  \let\tmp@wrong@fontshape\wrong@fontshape
-  \let\wrong@fontshape\wrong@kfontshape
   \directlua{luatexja.jfont.is_kyenc('\luatexluaescapestring{\k@encoding}')}\ifin@%
     \let\cy@encoding\k@encoding
     \ensure@KanjiEncodingPair{t}%
@@ -375,7 +381,6 @@
   \kenc@update
   \global\let\font@name=\ltj@afont@name
   \let\error@fontshape\tmp@error@fontshape
-  \let\wrong@fontshape\tmp@wrong@fontshape
   \if@knjcmd \@knjcmdfalse
     \expandafter\ifx
     \csname rel@\k@encoding/\k@family/\k@series/\k@shape\endcsname\relax
