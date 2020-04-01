@@ -232,7 +232,9 @@ do
    }
 
    local unary_pars = luatexja.unary_pars
-   function luatexja.ext_get_parameter_unary(k)
+   local scan_arg = token.scan_argument
+   function luatexja.ext_get_parameter_unary()
+      local k= scan_arg()
       if unary_pars[k] then
 	 tex.write(tostring(unary_pars[k](tex.getcount('ltj@@stack'))))
       end
@@ -289,9 +291,9 @@ do
       end,
    }
    local binary_pars = luatexja.binary_pars
-
+   local scan_arg, scan_int = token.scan_argument, token.scan_int
    binary_pars.alxspmode = binary_pars.jaxspmode
-   function luatexja.ext_get_parameter_binary(k,c)
+   function luatexja.ext_get_parameter_binary(k, c)
       if binary_pars[k] then
 	 tex.write(tostring(binary_pars[k](c,tex.getcount('ltj@@stack'))))
       end

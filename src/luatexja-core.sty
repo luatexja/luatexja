@@ -469,9 +469,12 @@
   {\ltj@@getparam@two{#1}}%
   {\ltj@@getparam@one{#1}}%
 }
-\def\ltj@@getparam@one#1{%
-  \directlua{luatexja.ext_get_parameter_unary('#1')}%
-}%
+\newluafunction\ltj@@getparam@one@inner
+\directlua{
+  local t = lua.get_functions_table()
+  t[\the\ltj@@getparam@one@inner] = luatexja.ext_get_parameter_unary
+}
+\luadef\ltj@@getparam@one\ltj@@getparam@one@inner
 \def\ltj@@getparam@two#1#2{%
   \directlua{luatexja.ext_get_parameter_binary('#1', \ltj@safe@num@or{nil}{#2})}%
 }
@@ -491,7 +494,7 @@
     end
   end
 }
-\protected\def\ltj@alljachar{\luafunction\ltj@alljachar@inner}
+\protected\luadef\ltj@alljachar\ltj@alljachar@inner
 \protected\def\ltj@allalchar{\relax
     \csname ltj@kcat0\endcsname="7FFFFFFF %"
     \csname ltj@kcat1\endcsname="7FFFFFFF %"
@@ -579,10 +582,17 @@
 
 %%%% insert
 \let\orig@insert=\insert
+\newluafunction\ltj@@lua@populate@insertwhatsit@inner
+\directlua{
+  local t = lua.get_functions_table()
+  t[\the\ltj@@lua@populate@insertwhatsit@inner]
+    = luatexja.direction.populate_insertion_dir_whatsit
+}
+\luadef\ltj@@lua@populate@insertwhatsit\ltj@@lua@populate@insertwhatsit@inner
 \protected\def\insert{\begingroup\afterassignment\ltj@@insert@A\ltj@tempcnta}
 \protected\def\ltj@@insert@A{\orig@insert\ltj@tempcnta\bgroup
   \aftergroup\ltj@@insert@B\let\ltj@@next}
-\protected\def\ltj@@insert@B{\directlua{luatexja.direction.populate_insertion_dir_whatsit()}\endgroup}
+\protected\def\ltj@@insert@B{\ltj@@lua@populate@insertwhatsit\endgroup}
 
 %%%% vadjust
 \let\ltj@@orig@vadjust=\vadjust
@@ -606,7 +616,7 @@
   \newluafunction\ltj@@box@dirhook
   \directlua{
     local t, ltjd = lua.get_functions_table(), luatexja.direction
-    t[\the\ltj@@box@dirhook] 
+    t[\the\ltj@@box@dirhook]
       = function() ltjd.set_list_direction_hook() end
   }
   \PushPreHook{hbox}{\luafunction\ltj@@box@dirhook\aftergroup\ltj@@reset@badness}
@@ -642,6 +652,12 @@
 \AtBeginShipout{\directlua{luatexja.direction.finalize()}}
 
 %%%% \raise, \lower, \moveleft, \moveright
+\newluafunction\ltj@@lua@raisebox@inner
+\directlua{
+  local t = lua.get_functions_table()
+  t[\the\ltj@@lua@raisebox@inner]=luatexja.direction.raise_box
+}
+\protected\luadef\ltj@@lua@raisebox\ltj@@lua@raisebox@inner
 \let\ltj@@orig@raise=\raise
 \let\ltj@@orig@lower=\lower
 \protected\def\raise{\ltj@reset@globaldefs\afterassignment\ltj@@raise\ltj@tempdima}
@@ -649,8 +665,7 @@
 \protected\def\ltj@@raise{%
   \ltj@restore@globaldefs
   \edef\ltj@@raise@a{%
-    \noexpand\directlua{luatexja.direction.raise_box()}%
-    \ltj@@orig@raise\the\ltj@tempdima\noexpand\box\ltj@afbox
+    \ltj@@lua@raisebox\ltj@@orig@raise\the\ltj@tempdima\noexpand\box\ltj@afbox
   }\ltj@afterbox\ltj@@raise@a}
 \let\ltj@@orig@moveleft=\moveleft
 \let\ltj@@orig@moveright=\moveright
@@ -659,8 +674,7 @@
 \protected\def\ltj@@moveleft{%
   \ltj@restore@globaldefs
   \edef\ltj@@moveleft@a{%
-    \noexpand\directlua{luatexja.direction.raise_box()}%
-    \ltj@@orig@moveleft\the\ltj@tempdima\noexpand\box\ltj@afbox
+    \ltj@@lua@raisebox\ltj@@orig@moveleft\the\ltj@tempdima\noexpand\box\ltj@afbox
   }\ltj@afterbox\ltj@@moveleft@a}
 
 %%%%\vsplit
@@ -670,22 +684,25 @@
 \let\ltj@@orig@vcenter=\vcenter
 \protected\def\vcenter{\ltj@afterbox\ltj@@vcenter\vbox}
 \protected\def\ltj@@vcenter{%
-  \directlua{luatexja.direction.raise_box()}%
-  \ltj@@orig@vcenter{\box\ltj@afbox}%
+  \ltj@@lua@raisebox\ltj@@orig@vcenter{\box\ltj@afbox}%
 }
 
 %%%% \unhbox and \unvbox
+\newluafunction\ltj@@lua@unboxcheckdir@inner
+\directlua{
+  local t = lua.get_functions_table()
+  t[\the\ltj@@lua@unboxcheckdir@inner]=luatexja.direction.unbox_check_dir
+}
+\luadef\ltj@@lua@unboxcheckdir\ltj@@lua@unboxcheckdir@inner
 \long\def \@gobbletwo #1#2{}
 \let\ltj@@orig@unhbox=\unhbox
 \let\ltj@@orig@unvbox=\unvbox
 \protected\def\unhbox{\ltj@reset@globaldefs\afterassignment\ltj@@unhbox\ltj@tempcnta}
 \protected\def\unvbox{\ltj@reset@globaldefs\afterassignment\ltj@@unvbox\ltj@tempcnta}
 \protected\def\ltj@@unhbox{%
-  \directlua{luatexja.direction.unbox_check_dir()}%
-  \ltj@@orig@unhbox\ltj@tempcnta}
+  \ltj@@lua@unboxcheckdir\ltj@@orig@unhbox\ltj@tempcnta}
 \protected\def\ltj@@unvbox{%
-  \directlua{luatexja.direction.unbox_check_dir()}%
-  \ltj@@orig@unvbox\ltj@tempcnta}
+  \ltj@@lua@unboxcheckdir\ltj@@orig@unvbox\ltj@tempcnta}
 \let\ltj@@orig@unhcopy=\unhcopy
 \let\ltj@@orig@unvcopy=\unvcopy
 \protected\def\unhcopy{\ltj@reset@globaldefs\afterassignment\ltj@@unhcopy\ltj@tempcnta}

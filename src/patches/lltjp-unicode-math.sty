@@ -26,13 +26,12 @@
 \unless\ifltj@disablejfam
 \cs_set:Npn \use@mathgroup #1 #2
 {
-  %\typeout{UM <#1><#2>}
   \mode_if_math:T % <- not sure
    {
     \math@bgroup
       \cs_if_eq:cNF {M@\f@encoding} #1 {#1}
       \__um_switchto_literal:
-      \ltj@tempcnta=#2 \expandafter\ltj@@mathJapaneseFonts\string#1\relax%
+      \ltj@tempcnta=#2 \expandafter\ltj@@mathJapaneseFonts\string#1/\relax%
       \ifin@ \jfam #2 \relax \else \mathgroup #2 \relax \fi
     \math@egroup
    }

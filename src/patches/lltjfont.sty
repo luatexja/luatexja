@@ -1039,7 +1039,8 @@
 \def\use@mathgroup#1#2{\relax\ifmmode
   \math@bgroup
     \expandafter\ifx\csname M@\f@encoding\endcsname#1\else
-    #1\fi\ltj@tempcnta=#2 \expandafter\ltj@@mathJapaneseFonts\string#1\relax%
+    #1\fi\ltj@tempcnta=#2
+	\expandafter\ltj@@mathJapaneseFonts\string#1/\relax%
     \ifin@\jfam#2\relax\else\mathgroup#2\relax\fi
   \expandafter\math@egroup\fi}%
 
