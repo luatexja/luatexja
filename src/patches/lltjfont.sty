@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2020/03/27 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2020-04-01 Patch to NFSS2 for LuaTeX-ja]
 
 %% patching \DeclareTextComposite
 \def\ltj@chardef@text@cmd#1{%
@@ -83,11 +83,31 @@
 \DeclareRobustCommand\zstrut{\relax\hbox{\ltj@@orig@utod
    \ifmmode\copy\zstrutbox\else\unhcopy\zstrutbox\fi}}
 
-{%
-  \def\cdp@elt#1#2#3#4{%
-    \directlua{luatexja.jfont.add_fenc_list('\luatexluaescapestring{#1}')}}%
-  \cdp@list%
+
+
+\newluafunction\ltj@@add@fenc@@inner
+\newluafunction\ltj@@add@kyenc@@inner
+\newluafunction\ltj@@add@ktenc@@inner
+\newluafunction\ltj@@is@kyenc@@inner
+\newluafunction\ltj@@is@ktenc@@inner
+\newluafunction\ltj@@is@kenc@@inner
+\directlua{%
+  local lf = lua.get_functions_table()
+  lf[\the\ltj@@add@fenc@@inner]  = luatexja.jfont.add_fenc_list
+  lf[\the\ltj@@add@kyenc@@inner] = luatexja.jfont.add_kyenc_list
+  lf[\the\ltj@@add@ktenc@@inner] = luatexja.jfont.add_ktenc_list
+  lf[\the\ltj@@is@kyenc@@inner]  = luatexja.jfont.is_kyenc
+  lf[\the\ltj@@is@ktenc@@inner]  = luatexja.jfont.is_ktenc
+  lf[\the\ltj@@is@kenc@@inner]   = luatexja.jfont.is_kenc
 }
+\luadef\ltj@@add@fenc \ltj@@add@fenc@@inner
+\luadef\ltj@@add@kyenc\ltj@@add@kyenc@@inner
+\luadef\ltj@@add@ktenc\ltj@@add@ktenc@@inner
+\luadef\ltj@@is@kyenc \ltj@@is@kyenc@@inner
+\luadef\ltj@@is@ktenc \ltj@@is@ktenc@@inner
+\luadef\ltj@@is@kenc  \ltj@@is@kenc@@inner
+
+{\def\cdp@elt#1#2#3#4{\ltj@@add@fenc{#1}}\cdp@list}
 
 \def\DeclareFontEncoding{%
   \begingroup
@@ -102,7 +122,7 @@
                     {\default@family}{\default@series}%
                     {\default@shape}}%
      \expandafter\let\csname#1-cmd\endcsname\@changed@cmd
-     \directlua{luatexja.jfont.add_fenc_list('\luatexluaescapestring{#1}')}%
+     \ltj@@add@fenc{#1}%
   \else
      \@font@info{Redeclaring font encoding #1}%
   \fi
@@ -133,7 +153,7 @@
                     {\default@k@family}{\default@k@series}%
                     {\default@k@shape}}%
     \expandafter\let\csname#1-cmd\endcsname\@changed@kcmd
-    \directlua{luatexja.jfont.add_kyenc_list('\luatexluaescapestring{#1}')}%
+    \ltj@@add@kyenc{#1}%
   \else
     \@font@info{Redeclaring KANJI (yoko) font encoding #1}%
   \fi
@@ -152,7 +172,7 @@
                     {\default@k@family}{\default@k@series}%
                     {\default@k@shape}}%
     \expandafter\let\csname#1-cmd\endcsname\@changed@kcmd
-    \directlua{luatexja.jfont.add_ktenc_list('\luatexluaescapestring{#1}')}%
+    \ltj@@add@ktenc{#1}%
   \else
     \@font@info{Redeclaring KANJI (tate) font encoding #1}%
   \fi
@@ -233,7 +253,7 @@
 \patchcmd\wrong@ja@fontshape{\default@series}{\default@k@series}{}{}
 \patchcmd\wrong@ja@fontshape{\default@family}{\default@k@family}{}{}
 \def\wrong@fontshape{%
-  \directlua{luatexja.jfont.is_kenc('\luatexluaescapestring{\f@encoding}')}\ifin@%
+  \ltj@@is@kenc{\f@encoding}\ifin@%
     \wrong@ja@fontshape
   \else
     \wrong@al@fontshape
@@ -257,13 +277,13 @@
       \math@fontsfalse
       \every@math@size{}%
       \fontsize{#6}\z@
-      \directlua{luatexja.jfont.is_kyenc('\luatexluaescapestring{#2}')}\ifin@%
+      \ltj@@is@kyenc{#2}\ifin@%
 	    \ltjselectfont@force@definetrue
         \usekanji{#2}{#3}{#4}{#5}%
         \global\let#1\getjfont
 	    \ltjselectfont@force@definefalse
       \else
-        \directlua{luatexja.jfont.is_ktenc('\luatexluaescapestring{#2}')}\ifin@%
+        \ltj@@is@ktenc{#2}\ifin@%
   	      \ltjselectfont@force@definetrue
           \usekanji{#2}{#3}{#4}{#5}%
           \global\let#1\gettfont
@@ -361,12 +381,12 @@
   \directlua{luatexja.base.start_time_measure('selectfont')}%
   \let\tmp@error@fontshape\error@fontshape
   \let\error@fontshape\error@kfontshape
-  \directlua{luatexja.jfont.is_kyenc('\luatexluaescapestring{\k@encoding}')}\ifin@%
+  \ltj@@is@kyenc{\k@encoding}\ifin@%
     \let\cy@encoding\k@encoding
     \ensure@KanjiEncodingPair{t}%
     \edef\ct@encoding{\csname t@enc@\k@encoding\endcsname}%
   \else
-    \directlua{luatexja.jfont.is_ktenc('\luatexluaescapestring{\k@encoding}')}\ifin@%
+    \ltj@@is@ktenc{\k@encoding}\ifin@%
       \let\ct@encoding\k@encoding
       \ensure@KanjiEncodingPair{y}%
       \edef\cy@encoding{\csname y@enc@\k@encoding\endcsname}%
@@ -514,19 +534,17 @@
     \fi
 }
 \DeclareRobustCommand\fontencoding[1]{%
-  \directlua{luatexja.jfont.is_kyenc('\luatexluaescapestring{#1}')}\ifin@%
-  \kanjiencoding{#1}\else\romanencoding{#1}\fi}
+  \ltj@@is@kyenc{#1}\ifin@\kanjiencoding{#1}\else\romanencoding{#1}\fi}
 \def\@@kenc@update{%
   \default@KT
   \csname T@\k@encoding\endcsname
   \csname D@\k@encoding\endcsname
   \let\kenc@update\relax
   \let\ck@encoding\k@encoding
-  \edef\tmp@enc{'\luatexluaescapestring{\k@encoding}'}%
-  \directlua{luatexja.jfont.is_kyenc(\tmp@enc)}\ifin@%
+  \ltj@@is@kyenc{\k@encoding}\ifin@
     \let\cy@encoding\k@encoding
   \else
-    \directlua{luatexja.jfont.is_ktenc(\tmp@enc)}\ifin@%
+    \ltj@@is@ktenc{\k@encoding}\ifin@
       \let\ct@encoding\k@encoding
     \else
       \@latex@error{KANJI Encoding scheme `\k@encoding' unknown}\@eha
@@ -761,8 +779,7 @@
 \fi
 %%%%
 \protected\def\usefont#1#2#3#4{%
-  \directlua{luatexja.jfont.is_kenc('\luatexluaescapestring{#1}')}\ifin@%
-  \usekanji{#1}{#2}{#3}{#4}%
+  \ltj@@is@kenc{#1}\ifin@\usekanji{#1}{#2}{#3}{#4}%
   \else\useroman{#1}{#2}{#3}{#4}%
   \fi}
 \DeclareRobustCommand\normalfont{%
@@ -879,11 +896,8 @@
 
 %%%%%% LuaTeX-ja specific
 
-% #1 の展開結果から encoding 部分をとりだし，それが和文用かどうかの結果を \ifin@ に代入
-\def\ltj@@IsFontJapanese#1{%
-  \directlua{luatexja.jfont.is_kenc(string.match(
-      '\luatexluaescapestring{#1}', '[^/]+'))}}
-
+% #1/#2 の展開結果から encoding 部分 (#1) をとりだし，それが和文用かどうかの結果を \ifin@ に代入
+\def\ltj@@IsFontJapanese#1/#2\relax{\ltj@@is@kenc{#1}}
 
 \let\extract@afont\extract@font
 \def\pickup@jfont{%
@@ -983,7 +997,7 @@
     \aftergroup\subst@correction
 }
 \def\do@subst@correction{%
-   \directlua{luatexja.jfont.is_kenc('\luatexluaescapestring{\f@encoding}')}\ifin@%
+   \ltj@@is@kenc{\f@encoding}\ifin@%
      \ltj@@ja@do@subst@correction
    \else
      \ltj@@al@do@subst@correction
@@ -996,7 +1010,7 @@
 
 % \M@<enc> から その <enc> が和文用か調べる
 {\catcode`M=12%
-\gdef\ltj@@mathJapaneseFonts#1M#2#3\relax{\ltj@@IsFontJapanese{#3}}}
+\gdef\ltj@@mathJapaneseFonts#1M#2#3/#4\relax{\ltj@@is@kenc{#3}}}
 
 \let\ltj@@al@getanddefine@fonts=\getanddefine@fonts
 \def\ltj@@ja@getanddefine@fonts#1#2{%
@@ -1017,7 +1031,7 @@
 }
 
 \def\getanddefine@fonts#1#2{%
-  \ltj@tempcnta=#1\ltj@@IsFontJapanese{\string#2}%
+  \ltj@tempcnta=#1\expandafter\ltj@@IsFontJapanese\string#2/\relax%
   \ifin@\let\ltj@temp=\ltj@@ja@getanddefine@fonts%
   \else \let\ltj@temp=\ltj@@al@getanddefine@fonts\fi
   \ltj@temp{#1}{#2}%

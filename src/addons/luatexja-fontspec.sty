@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec}[2019/09/26 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec}[2020-04-01 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e,luatexja}
 \ExplSyntaxOn
 
@@ -36,10 +36,9 @@
 
 % We must redefine \try@load@fontshape to ignore kanjifont definitions at all.
 \def\try@load@fontshape{%
-   \expandafter
-   \ifx\csname \f@encoding+\f@family\endcsname\relax
-       \directlua{luatexja.jfont.is_kenc('\luatexluaescapestring{\f@encoding}')}%
-\ifin@\else % Alphabetic font
+  \expandafter
+  \ifx\csname \f@encoding+\f@family\endcsname\relax
+  \ltj@@is@kenc{\f@encoding}\ifin@\else % Alphabetic font
     \@font@info{Trying loading font information for \f@encoding+\f@family}%
     \global\expandafter\let
        \csname\f@encoding+\f@family\endcsname\@empty
@@ -50,7 +49,7 @@
          \noexpand\InputIfFileExists{\f@encoding\f@family.fd}}}%
      \reserved@a\relax
           {\@input@{\f@encoding\f@family.fd}}%
-\fi
-   \fi}
+  \fi
+  \fi}
 
 \endinput

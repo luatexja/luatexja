@@ -12,22 +12,19 @@
    (lltjp-microtype.sty, 2019-11-08) may not work}
 \patchcmd\MT@register@font
   {\xdef\MT@font@list{\MT@font@list\MT@font,}}%
-  {\directlua{luatexja.jfont.is_kenc('\luatexluaescapestring{\f@encoding}')}%
-   \unless\ifin@
+  {\ltj@@is@kenc{\f@encoding}\unless\ifin@
      \xdef\MT@font@list{\MT@font@list\MT@font,}%
    \fi
    }{}{}
 \patchcmd\MT@register@subst@font
   {\xdef\MT@font@list{\MT@font@list\font@name,}}%
-  {\directlua{luatexja.jfont.is_kenc('\luatexluaescapestring{\f@encoding}')}%
-   \unless\ifin@
+  {\ltj@@is@kenc{\f@encoding}\unless\ifin@
      \xdef\MT@font@list{\MT@font@list\font@name,}%
    \fi}{}{}
 \let\ltj@MT@tracking@\MT@tracking@
 \patchcmd\MT@tracking@
   {\xdef\MT@tr@font@list{\MT@tr@font@list\MT@font,}}%
-  {\directlua{luatexja.jfont.is_kenc('\luatexluaescapestring{\f@encoding}')}%
-   \unless\ifin@
+  {\ltj@@is@kenc{\f@encoding}\unless\ifin@
      \xdef\MT@tr@font@list{\MT@tr@font@list\MT@font,}%
    \fi}{}{}
 \ifx\MT@tracking\ltj@MT@tracking@\let\MT@tracking\MT@tracking@\fi

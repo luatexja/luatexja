@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2019/09/26',
+  date = '2020-04-01',
   description = 'Loader for Japanese fonts',
 })
 
@@ -466,18 +466,20 @@ end
 -- LATEX INTERFACE
 ------------------------------------------------------------------------
 do
+   local scan_arg = token.scan_argument
    -- these function are called from ltj-latex.sty
    local fenc_list, kyenc_list, ktenc_list = {}, {}, {}
-   function luatexja.jfont.add_fenc_list(enc) fenc_list[enc] = 'true ' end
-   function luatexja.jfont.add_kyenc_list(enc) kyenc_list[enc] = 'true ' end
-   function luatexja.jfont.add_ktenc_list(enc) ktenc_list[enc] = 'true ' end
-   function luatexja.jfont.is_kyenc(enc)
-      tex.sprint(cat_lp, '\\let\\ifin@\\if' .. (kyenc_list[enc] or 'false '))
+   function luatexja.jfont.add_fenc_list() fenc_list[scan_arg()] = 'true ' end
+   function luatexja.jfont.add_kyenc_list() kyenc_list[scan_arg()] = 'true ' end
+   function luatexja.jfont.add_ktenc_list() ktenc_list[scan_arg()] = 'true ' end
+   function luatexja.jfont.is_kyenc()
+      tex.sprint(cat_lp, '\\let\\ifin@\\if' .. (kyenc_list[scan_arg()] or 'false '))
    end
-   function luatexja.jfont.is_ktenc(enc)
-      tex.sprint(cat_lp, '\\let\\ifin@\\if' .. (ktenc_list[enc] or 'false '))
+   function luatexja.jfont.is_ktenc()
+      tex.sprint(cat_lp, '\\let\\ifin@\\if' .. (ktenc_list[scan_arg()] or 'false '))
    end
-   function luatexja.jfont.is_kenc(enc)
+   function luatexja.jfont.is_kenc()
+      local enc = scan_arg()
       tex.sprint(cat_lp, '\\let\\ifin@\\if'
                  .. (kyenc_list[enc] or ktenc_list[enc] or 'false '))
    end
