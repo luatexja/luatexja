@@ -200,11 +200,24 @@
 
 %%%%%%%% Redefine \/
 \newluafunction\ltj@@italic@inner
+\newluafunction\ltj@@start@time@measure@inner
+\newluafunction\ltj@@stop@time@measure@inner
 \directlua{
   local t = lua.get_functions_table()
+  local start_time_measure = luatexja.base.start_time_measure
+  local stop_time_measure = luatexja.base.stop_time_measure
+  local scan_arg = token.scan_argument
   t[\the\ltj@@italic@inner] = luatexja.jfont.append_italic
+  t[\the\ltj@@start@time@measure@inner] = function()
+    start_time_measure(scan_arg())
+  end
+  t[\the\ltj@@stop@time@measure@inner] = function()
+    stop_time_measure(scan_arg())
+  end
 }
 \protected\def\/{\relax\luafunction\ltj@@italic@inner}
+\luadef\ltj@@start@time@measure\ltj@@start@time@measure@inner
+\luadef\ltj@@stop@time@measure\ltj@@stop@time@measure@inner
 
 %%%%%%%% \jfont\CS={...:...;jfm=metric;...}, \globaljfont
 \protected\def\jfont#1{%
@@ -253,8 +266,8 @@
   t[\the\ltj@@fakeparbegin@inner] = luatexja.jfmglue.create_beginpar_node
   t[\the\ltj@@fakeboxbdd@inner] = luatexja.jfmglue.create_boxbdd_node
 }
-\protected\def\ltj@reset@globaldefs{\luafunction\ltj@reset@globaldefs@inner}
-\protected\def\ltj@restore@globaldefs{\luafunction\ltj@restore@globaldefs@inner}
+\protected\luadef\ltj@reset@globaldefs  \ltj@reset@globaldefs@inner
+\protected\luadef\ltj@restore@globaldefs\ltj@restore@globaldefs@inner
 \protected\def\inhibitglue{\ifhmode\relax\luafunction\ltj@@ihb@inner\fi}
 \protected\def\ltjfakeparbegin{\ifhmode\relax\luafunction\ltj@@fakeparbegin@inner\fi}
 \protected\def\ltjfakeboxbdd{\ifhmode\relax\luafunction\ltj@@fakeboxbdd@inner\fi}
@@ -394,8 +407,8 @@
     local d = scan_glue(); sss(sti.XSK, d); node.free(d)
   end
 }
-\protected\def\ltjsetkanjiskip{\luafunction\ltjsetkanjiskip@inner}
-\protected\def\ltjsetxkanjiskip{\luafunction\ltjsetxkanjiskip@inner}
+\protected\luadef\ltjsetkanjiskip \ltjsetkanjiskip@inner
+\protected\luadef\ltjsetxkanjiskip\ltjsetxkanjiskip@inner
 
 % jcharwidowpenalty = <count>
 \define@key[ltj]{japaram}{jcharwidowpenalty}{%      %COUNT
@@ -434,16 +447,16 @@
     \else\directlua{luatexja.isglobal=''}\fi
 }
 \protected\def\ltjsetparameter#1{%
-  \directlua{luatexja.base.start_time_measure('set_par')}%
+  \ltj@@start@time@measure{set_par}%
   \ltj@setpar@global\setkeys[ltj]{japaram}{#1}%
-  \directlua{luatexja.base.stop_time_measure('set_par')}%
+  \ltj@@stop@time@measure{set_par}%
   \ignorespaces}
 \protected\def\ltjglobalsetparameter#1{%
   \relax\ifnum\globaldefs<0\directlua{luatexja.isglobal=''}%
     \else\directlua{luatexja.isglobal='global'}\fi%
-  \directlua{luatexja.base.start_time_measure('set_par')}%
+  \ltj@@start@time@measure{set_par}%
   \setkeys[ltj]{japaram}{#1}%
-  \directlua{luatexja.base.stop_time_measure('set_par')}%
+  \ltj@@stop@time@measure{set_par}%
   \ignorespaces}
 
 %%%%%%%% \ltjgetparameter
@@ -459,7 +472,7 @@
 \ltj@@decl@array@param{chartorange}
 \ltj@@decl@array@param{boxdir}
 \def\ltjgetparameter#1{%
-  \directlua{luatexja.base.start_time_measure('get_par')}%
+  \ltj@@start@time@measure{get_par}%
   % stop call is moved in luatexja.lua
   \ifcsname ltj@@array@param/#1\endcsname
     \expandafter\ltx@firstoftwo
@@ -612,41 +625,34 @@
   }$%
 }
 \setbox\z@\box\voidb@x
-\ifltj@everyhook@avail% using everyhook package
-  \newluafunction\ltj@@box@dirhook
-  \directlua{
-    local t, ltjd = lua.get_functions_table(), luatexja.direction
-    t[\the\ltj@@box@dirhook]
-      = function() ltjd.set_list_direction_hook() end
-  }
-  \PushPreHook{hbox}{\luafunction\ltj@@box@dirhook\aftergroup\ltj@@reset@badness}
-  \PushPreHook{vbox}{\luafunction\ltj@@box@dirhook\aftergroup\ltj@@reset@badness}
-\else
-  \let\ltj@@everyhbox=\everyhbox\let\ltj@@everyvbox=\everyvbox
-  \newtoks\ltj@@i@everyhbox\newtoks\ltj@@i@everyvbox
-  \let\everyhbox=\ltj@@i@everyhbox\let\everyvbox=\ltj@@i@everyvbox
-  \newluafunction\ltj@@box@dirhook
-  \directlua{
-    local t, ltjd = lua.get_functions_table(), luatexja.direction
-    t[\the\ltj@@box@dirhook] 
-      = function() ltjd.set_list_direction_hook() end
-  }
-  \ltj@@everyhbox{\luafunction\ltj@@box@dirhook
-    \aftergroup\ltj@@reset@badness\the\ltj@@i@everyhbox}
-  \ltj@@everyvbox{\luafunction\ltj@@box@dirhook
-    \aftergroup\ltj@@reset@badness\the\ltj@@i@everyvbox}
-\fi
-
+\newluafunction\ltj@@box@dirhook@inner
 \newluafunction\ltj@@reset@badness@inner
 \directlua{
-  local t = lua.get_functions_table()
-  t[\the\ltj@@reset@badness@inner] = function() 
+  local t, ltjd = lua.get_functions_table(), luatexja.direction
+  t[\the\ltj@@box@dirhook@inner]
+    = function() ltjd.set_list_direction_hook() end
+  t[\the\ltj@@reset@badness@inner] = function()
     if luatexja.global_temp then
       tex.hbadness= tex.hbadness or luatexja.hbadness_temp
       tex.vbadness= tex.vbadness or luatexja.vbadness_temp
       tex.globaldefs= luatexja.global_temp or tex.globaldefs
     end
-  end}
+  end
+}
+\luadef\ltj@@box@dirhook\ltj@@box@dirhook@inner
+\ifltj@everyhook@avail% using everyhook package
+  \PushPreHook{hbox}{\ltj@@box@dirhook\aftergroup\ltj@@reset@badness}
+  \PushPreHook{vbox}{\ltj@@box@dirhook\aftergroup\ltj@@reset@badness}
+\else
+  \let\ltj@@everyhbox=\everyhbox\let\ltj@@everyvbox=\everyvbox
+  \newtoks\ltj@@i@everyhbox\newtoks\ltj@@i@everyvbox
+  \let\everyhbox=\ltj@@i@everyhbox\let\everyvbox=\ltj@@i@everyvbox
+  \ltj@@everyhbox{\ltj@@box@dirhook
+    \aftergroup\ltj@@reset@badness\the\ltj@@i@everyhbox}
+  \ltj@@everyvbox{\ltj@@box@dirhook
+    \aftergroup\ltj@@reset@badness\the\ltj@@i@everyvbox}
+\fi
+
 \protected\def\ltj@@reset@badness{\luafunction\ltj@@reset@badness@inner}
 
 \AtBeginShipout{\directlua{luatexja.direction.finalize()}}

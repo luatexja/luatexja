@@ -378,7 +378,7 @@
     }%
   \fi}
 \def\ltj@selectfont@patch{%
-  \directlua{luatexja.base.start_time_measure('selectfont')}%
+  \ltj@@start@time@measure{selectfont}%
   \let\tmp@error@fontshape\error@fontshape
   \let\error@fontshape\error@kfontshape
   \ltj@@is@kyenc{\k@encoding}\ifin@%
@@ -416,7 +416,7 @@
     \fi
   \fi
   \global\let\font@name=\ltj@afont@name
-  \directlua{luatexja.base.stop_time_measure('selectfont')}%
+  \ltj@@stop@time@measure{selectfont}%
 }
 \EverySelectfont{\ltj@selectfont@patch}
 
