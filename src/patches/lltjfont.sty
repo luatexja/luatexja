@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2020-04-04 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2020-04-07 Patch to NFSS2 for LuaTeX-ja]
 
 %% patching \DeclareTextComposite
 \def\ltj@chardef@text@cmd#1{%
@@ -809,30 +809,43 @@
 \patchcmd\update@series@target@value@kanji{\f@series}{\k@series}{}{}
 \def\@meta@family@list@kanji{\@elt{mc}\@elt{gt}\@elt{jtt}}
 
-\expandafter\patchcmd\csname bfseries \endcsname{%
-  \let\bfseries@rm\bfdef@ult
-  \let\bfseries@sf\bfdef@ult
-  \let\bfseries@tt\bfdef@ult
-}{%
-  \let\bfseries@rm\bfdef@ult
-  \let\bfseries@sf\bfdef@ult
-  \let\bfseries@tt\bfdef@ult
-  \let\bfseries@mc\bfdef@ult
-  \let\bfseries@gt\bfdef@ult
-  \let\bfseries@jtt\bfdef@ult
-}{}{}
-\expandafter\patchcmd\csname mdseries \endcsname{%
-  \let\mdseries@rm\mddef@ult
-  \let\mdseries@sf\mddef@ult
-  \let\mdseries@tt\mddef@ult
-}{%
-  \let\mdseries@rm\mddef@ult
-  \let\mdseries@sf\mddef@ult
-  \let\mdseries@tt\mddef@ult
-  \let\mdseries@mc\mddef@ult
-  \let\mdseries@gt\mddef@ult
-  \let\mdseries@jtt\mddef@ult
-}{}{}
+\ifdefined\@setbfseriesdefaultshook % after 2020-04-07
+  \g@addto@macro\@setbfseriesdefaultshook{%
+    \let\bfseries@mc\bfdef@ult
+    \let\bfseries@gt\bfdef@ult
+    \let\bfseries@jtt\bfdef@ult
+ }
+\else % 2020-02-02
+  \expandafter\patchcmd\csname bfseries \endcsname{%
+    \let\bfseries@rm\bfdef@ult
+    \let\bfseries@sf\bfdef@ult
+    \let\bfseries@tt\bfdef@ult
+  }{%
+    \let\bfseries@rm\bfdef@ult
+    \let\bfseries@sf\bfdef@ult
+    \let\bfseries@tt\bfdef@ult
+  }{}{}
+\fi
+\ifdefined\@setmdseriesdefaultshook % after 2020-04-07
+  \g@addto@macro\@setmdseriesdefaultshook{%
+    \let\mdseries@mc\mddef@ult
+    \let\mdseries@gt\mddef@ult
+    \let\mdseries@jtt\mddef@ult
+  }
+\else % 2020-02-02
+  \expandafter\patchcmd\csname mdseries \endcsname{%
+    \let\mdseries@rm\mddef@ult
+    \let\mdseries@sf\mddef@ult
+    \let\mdseries@tt\mddef@ult
+  }{%
+    \let\mdseries@rm\mddef@ult
+    \let\mdseries@sf\mddef@ult
+    \let\mdseries@tt\mddef@ult
+    \let\mdseries@mc\mddef@ult
+    \let\mdseries@gt\mddef@ult
+    \let\mdseries@jtt\mddef@ult
+  }{}{}
+\fi
 \expandafter\patchcmd\csname bfseries \endcsname{%
   \ifx\f@family\rmdef@ult      \fontseries\bfseries@rm
   \else\ifx\f@family\sfdef@ult \fontseries\bfseries@sf
@@ -877,12 +890,21 @@
   \fi\fi\fi
   \selectfont
 }{}{}
-\appto\expand@font@defaults{%
-  \edef\mcdef@ult{\mcdefault}%
-  \edef\gtdef@ult{\gtdefault}%
-  \edef\jttdef@ult{\jttdefault}%
-  \edef\kanjidef@ult{\kanjifamilydefault}%
-}
+\ifdefined\@expandfontdefaultshook % 2020-04-07
+  \g@addto@macro\@expandfontdefaultshook{
+    \edef\mcdef@ult{\mcdefault}%
+    \edef\gtdef@ult{\gtdefault}%
+    \edef\jttdef@ult{\jttdefault}%
+    \edef\kanjidef@ult{\kanjifamilydefault}%
+  }
+\else % 2020-02-02
+  \appto\expand@font@defaults{%
+    \edef\mcdef@ult{\mcdefault}%
+    \edef\gtdef@ult{\gtdefault}%
+    \edef\jttdef@ult{\jttdefault}%
+    \edef\kanjidef@ult{\kanjifamilydefault}%
+  }
+\fi
 \appto\init@series@setup{%
   \ifx\kanjidef@ult\mcdef@ult      \mcfamily
   \else\ifx\kanjidef@ult\gtdef@ult \gtfamily
