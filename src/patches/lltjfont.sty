@@ -712,19 +712,6 @@
     \fi
   \fi
 }
-\def\set@safe@kanji@shape#1#2{%
-  \edef\reserved@b{\k@encoding /\k@family /\k@series/#1}%
-  \ifcsname \reserved@b\endcsname
-    \edef\k@shape{#1}%
-    #2%
-  \else
-    \@kanji@shape@nochange@info{\reserved@b}%
-  \fi
-}
-\def\@kanji@shape@nochange@info#1{%
-    \@font@info{Kanji font shape `#1' undefined\MessageBreak
-                No change}%
-}
 \ifnum\ltj@@latex@plv=300 % !!! pl3, 4
   \DeclareRobustCommand\romanseries[1]{\merge@font@series{#1}}
   \DeclareRobustCommand\kanjiseries[1]{\merge@kanji@series{#1}}
@@ -768,7 +755,7 @@
 \DeclareRobustCommand\fontseries[1]{\kanjiseries{#1}\romanseries{#1}}
 \DeclareRobustCommand\romanshape[1]{\edef\f@shape{#1}}
 \DeclareRobustCommand\kanjishape[1]{\edef\k@shape{#1}}
-\DeclareRobustCommand\fontshape[1]{\kanjishape{#1}\romanshape{#1}}
+\DeclareRobustCommand\fontshape[1]{\set@safe@kanji@shape{#1}{}\romanshape{#1}}
 \DeclareRobustCommand\usekanji[4]{%
     \kanjiencoding{#1}\kanjifamily{#2}\kanjiseries{#3}\kanjishape{#4}%
     \selectfont\ignorespaces}
@@ -778,6 +765,21 @@
 %%%% LaTeX 2019-10-01 END
 \fi
 %%%%
+
+\def\set@safe@kanji@shape#1#2{%
+  \edef\reserved@b{\k@encoding /\k@family /\k@series/#1}%
+  \ifcsname \reserved@b\endcsname
+    \edef\k@shape{#1}%
+    #2%
+  \else
+    \@kanji@shape@nochange@info{\reserved@b}%
+  \fi
+}
+\def\@kanji@shape@nochange@info#1{%
+    \@font@info{Kanji font shape `#1' undefined\MessageBreak
+                No change}%
+}
+
 \protected\def\usefont#1#2#3#4{%
   \ltj@@is@kenc{#1}\ifin@\usekanji{#1}{#2}{#3}{#4}%
   \else\useroman{#1}{#2}{#3}{#4}%
