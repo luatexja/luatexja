@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2020-04-07 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2020-04-12 Patch to NFSS2 for LuaTeX-ja]
 
 %% patching \DeclareTextComposite
 \def\ltj@chardef@text@cmd#1{%
@@ -826,6 +826,9 @@
     \let\bfseries@rm\bfdef@ult
     \let\bfseries@sf\bfdef@ult
     \let\bfseries@tt\bfdef@ult
+    \let\bfseries@mc\bfdef@ult
+    \let\bfseries@gt\bfdef@ult
+    \let\bfseries@jtt\bfdef@ult
   }{}{}
 \fi
 \ifdefined\@setmdseriesdefaultshook % after 2020-04-07

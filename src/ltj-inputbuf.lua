@@ -32,16 +32,16 @@ local function add_comment(buffer)
       local c = utfbyte(buffer, i)
       if c>=0x80 then
 	 local te = tex.endlinechar
-	 local ctl = (te ~= -1) and (getcatcode(te)==5) and (getcatcode(getcount('ltjlineendcomment'))==14)
-	 -- Is the catcode of \ltjlineendcomment (new comment char) is 14 (comment)?
 	 -- Is the catcode of endline character is 5 (end-of-line)?
-	 if ctl then
+	 if (te ~= -1) and (getcatcode(te)==5) then
 	    local ct = getcatcode(c)
 	    if (ct==11) or (ct==12) then
-	       if ltjc_is_japanese_char_curlist(c) then
+	       local lec = getcount('ltjlineendcomment')
+               -- Is the catcode of \ltjlineendcomment (new comment char) is 14 (comment)?
+	       if ltjc_is_japanese_char_curlist(c) and (getcatcode(lec)==14) then
                   stop_time_measure('inputbuf')
-	          return buffer .. utfchar(getcount('ltjlineendcomment'))
-	       end
+                  return buffer .. utfchar(lec)
+               end
 	    end
          end
       end
