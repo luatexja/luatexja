@@ -91,6 +91,9 @@
 \newluafunction\ltj@@is@kyenc@@inner
 \newluafunction\ltj@@is@ktenc@@inner
 \newluafunction\ltj@@is@kenc@@inner
+\newluafunction\ltj@@is@ffam@@inner
+\newluafunction\ltj@@add@ffam@@inner
+\newluafunction\ltj@@add@kfam@@inner
 \directlua{%
   local lf = lua.get_functions_table()
   lf[\the\ltj@@add@fenc@@inner]  = luatexja.jfont.add_fenc_list
@@ -99,6 +102,9 @@
   lf[\the\ltj@@is@kyenc@@inner]  = luatexja.jfont.is_kyenc
   lf[\the\ltj@@is@ktenc@@inner]  = luatexja.jfont.is_ktenc
   lf[\the\ltj@@is@kenc@@inner]   = luatexja.jfont.is_kenc
+  lf[\the\ltj@@is@ffam@@inner]   = luatexja.jfont.is_ffam
+  lf[\the\ltj@@add@ffam@@inner]  = luatexja.jfont.add_ffam
+  lf[\the\ltj@@add@kfam@@inner]  = luatexja.jfont.add_kfam
 }
 \luadef\ltj@@add@fenc \ltj@@add@fenc@@inner
 \luadef\ltj@@add@kyenc\ltj@@add@kyenc@@inner
@@ -106,6 +112,9 @@
 \luadef\ltj@@is@kyenc \ltj@@is@kyenc@@inner
 \luadef\ltj@@is@ktenc \ltj@@is@ktenc@@inner
 \luadef\ltj@@is@kenc  \ltj@@is@kenc@@inner
+\luadef\ltj@@is@ffam  \ltj@@is@ffam@@inner
+\luadef\ltj@@add@ffam \ltj@@add@ffam@@inner
+\luadef\ltj@@add@kfam \ltj@@add@kfam@@inner
 
 {\def\cdp@elt#1#2#3#4{\ltj@@add@fenc{#1}}\cdp@list}
 
@@ -210,7 +219,7 @@
               \@empty
             \else \reserved@a
             \fi
-     \directlua{luatexja.jfont.add_ffam('\luatexluaescapestring{#2}')}%
+     \ltj@@add@ffam{#2}%
     }%
 }
 \def\DeclareKanjiFamily#1#2#3{%
@@ -223,7 +232,7 @@
               \@empty
             \else \reserved@a
             \fi
-     \directlua{luatexja.jfont.add_kfam('\luatexluaescapestring{#2}')}%
+     \ltj@@add@kfam{#2}%
      }%
 }
 \def\DeclareKanjiSubstitution#1#2#3#4{%
@@ -578,27 +587,28 @@
 \DeclareRobustCommand\kanjifamily[1]{\edef\k@family{#1}}
 \DeclareRobustCommand\fontfamily[1]{%
   \@notkfamfalse\@notffamfalse
-  \edef\tmp@item{'\luatexluaescapestring{#1}'}%
   %
-  \directlua{luatexja.jfont.search_kfam(\tmp@item, \@ltj@use@fd)}%
+  \directlua{luatexja.jfont.search_kfam()}{#1}{\@ltj@use@fd}%
   \ifin@\edef\k@family{#1}\else\@notkfamtrue\fi
   %
   % alphabetic fonts part
-  \directlua{luatexja.jfont.is_ffam(\tmp@item)}%
+  \ltj@@is@ffam{#1}%
   \ifin@\edef\f@family{#1}\else
     % checking is_stored_ffam is not sufficient,
     % since LuaTeX-ja doesn't know whats fonts are defined before LuaTeX-ja is loaded.
     \ifcsname \f@encoding+#1\endcsname % easy case
-      \directlua{luatexja.jfont.add_ffam(\tmp@item)}\edef\f@family{#1}%
+      \ltj@@add@ffam{#1}\edef\f@family{#1}%
     \else
       \@tempswafalse
-      \def\cdp@elt##1{\ifcsname ##1+#1\endcsname\@tempswatrue\fi}%
-      \directlua{luatexja.jfont.search_ffam_declared()}%
+      \def\cdp@elt##1{\ifcsname ##1+#1\endcsname%
+	\@tempswatrue\def\cdp@elt####1\relax{}%
+      \fi}%
+      \directlua{luatexja.jfont.search_ffam_declared()}\relax%
       \if@tempswz
-        \directlua{luatexja.jfont.add_ffam(\tmp@item)}\edef\f@family{#1}%
+        \ltj@@add@ffam{#1}\edef\f@family{#1}%
       \else
         % now we search Nffam_list and font definition files.
-        \directlua{luatexja.jfont.search_ffam_fd(\tmp@item)}%
+        \directlua{luatexja.jfont.search_ffam_fd()}{#1}%
         \ifin@\edef\f@family{#1}\else\@notffamtrue\fi
       \fi
     \fi
@@ -1026,19 +1036,22 @@
     \expandafter\globaltfont\font@name\external@font\relax\font@name
     \csname \f@encoding+\f@family\endcsname
     \csname\curr@fontshape\endcsname}
+
+\newluafunction\ltj@@jfont@@jfmonly@@inner
+\directlua{%
+  local lf = lua.get_functions_table()
+  lf[\the\ltj@@jfont@@jfmonly@@inner]  = luatexja.jfont.load_jfmonly
+}
+\luadef\ltj@@jfont@@jfmonly  \ltj@@jfont@@jfmonly@@inner
 \def\extract@jfont@onlyjfm{%
 	\get@external@font
 	\csxdef{ltj@@fontjfm/\expandafter\string\font@name}{%
-	  \directlua{%
-		luatexja.jfont.load_jfmonly('\luatexluaescapestring{\external@font}', 'yoko')
-	  }%
+          \ltj@@jfont@@jfmonly{\external@font}{yoko}%
 	}}
 \def\extract@tfont@onlyjfm{%
 	\get@external@font
 	\csxdef{ltj@@fontjfm/\expandafter\string\font@name}{%
-	  \directlua{%
-		luatexja.jfont.load_jfmonly('\luatexluaescapestring{\external@font}', 'tate')
-	  }%
+          \ltj@@jfont@@jfmonly{\external@font}{tate}%
 	}}
 
 \let\ltj@@al@do@subst@correction=\do@subst@correction
@@ -1129,6 +1142,12 @@
 
 %%%% \ClearAlternateKanjiFont<Benc><Bfam><Bser><Bshape>
 % いつも global
+\newluafunction\ltj@@does@alt@set@@inner
+\directlua{%
+  local lf = lua.get_functions_table()
+  lf[\the\ltj@@does@alt@set@@inner]  = luatexja.jfont.does_alt_set
+}
+\def\ltj@@does@alt@set#1#2{\luafunction\ltj@@does@alt@set@@inner{#1}{#2}}
 \def\ClearAlternateKanjiFont#1#2#3#4{%
    \directlua{luatexja.jfont.clear_alt_font_latex('\luatexluaescapestring{#1/#2/#3/#4}')}}
 
@@ -1142,9 +1161,6 @@
   \ltj@@getjfontnumber#1%
   \directlua{luatexja.jfont.pickup_alt_font_b(\the\ltj@tempcntc,'\luatexluaescapestring{#2}')}%
 }
-
-\def\ltj@@does@alt@set#1#2{%
-  \directlua{luatexja.jfont.does_alt_set'\luatexluaescapestring{#1}'}{#2}}
 
 %%%% patch \@text@composite because of {y,t}albaselineshift
 

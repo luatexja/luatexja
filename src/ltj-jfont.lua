@@ -449,9 +449,10 @@ do
    otfl_fdr= luatexbase.remove_from_callback('define_font', 'luaotfload.define_font')
    luatexbase.add_to_callback('define_font',luatexja.font_callback,"luatexja.font_callback", 1)
 
-   local match, sp = string.match, tex.sp
-   local function load_jfmonly(spec, dir)
-      local spec, size = match(spec,'(.+)%s+at%s*([%.%w]*)')
+   local match, sp, scan_arg = string.match, tex.sp, token.scan_argument
+   local function load_jfmonly()
+      local spec, size = match(scan_arg(), '(.+)%s+at%s*([%.%w]*)')
+      local dir = scan_arg()
       size = sp(size); extract_metric(spec)
       jfm_dir = dir
       local i = load_jfont_metric()
@@ -485,10 +486,12 @@ do
    end
 
    local kfam_list, Nkfam_list = {}, {}
-   function luatexja.jfont.add_kfam(fam)
-      kfam_list[fam]=true
+   function luatexja.jfont.add_kfam()
+      kfam_list[scan_arg()]=true
    end
-   function luatexja.jfont.search_kfam(fam, use_fd)
+   function luatexja.jfont.search_kfam()
+      local fam = scan_arg()
+      local use_fd = (scan_arg() =='true')
       if kfam_list[fam] then
          tex.sprint(cat_lp, '\\let\\ifin@\\iftrue '); return
       elseif Nkfam_list[fam] then
@@ -510,11 +513,11 @@ do
       end
    end
    local ffam_list, Nffam_list = {}, {}
-   function luatexja.jfont.is_ffam(fam)
-      tex.sprint(cat_lp, '\\let\\ifin@\\if' .. (ffam_list[fam] or 'false '))
+   function luatexja.jfont.is_ffam()
+      tex.sprint(cat_lp, '\\let\\ifin@\\if' .. (ffam_list[scan_arg()] or 'false '))
    end
-   function luatexja.jfont.add_ffam(fam)
-      ffam_list[fam]='true '
+   function luatexja.jfont.add_ffam()
+      ffam_list[scan_arg()]='true '
    end
    function luatexja.jfont.search_ffam_declared()
      local s = ''
@@ -523,7 +526,8 @@ do
      end
      tex.sprint(cat_lp, s)
    end
-   function luatexja.jfont.search_ffam_fd(fam)
+   function luatexja.jfont.search_ffam_fd()
+      local fam = scan_arg()
       if Nffam_list[fam] then
          tex.sprint(cat_lp, '\\let\\ifin@\\iffalse '); return
       else
@@ -645,11 +649,12 @@ end
 
 -- ここから先は 新 \selectfont の内部でしか実行されない
 do
+   local scan_arg = token.scan_argument
    local alt_font_base, alt_font_base_num
    local aftl_base
    -- EXT
-   function luatexja.jfont.does_alt_set(bbase)
-      aftl_base = alt_font_table_latex[bbase]
+   function luatexja.jfont.does_alt_set()
+      aftl_base = alt_font_table_latex[scan_arg()]
       tex.sprint(cat_lp, aftl_base and '\\@firstofone' or '\\@gobble')
    end
    -- EXT
