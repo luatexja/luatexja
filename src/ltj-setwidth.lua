@@ -87,7 +87,7 @@ local call_callback = luatexbase.call_callback
 
 local fshift =  { down = 0, left = 0 }
 
-local min, max = math.min, math.max
+local min, max, floor, abs = math.min, math.max, math.floor, math.abs
 
 local rule_subtype = (status.luatex_version>=85) and 3 or 0
 
@@ -129,6 +129,11 @@ local function capsule_glyph_yoko(p, met, char_data, head, dir)
 
    local q
    head, q = node_remove(head, p)
+   if char_data.round_threshold then
+      local frac = abs(pwidth / fwidth); 
+      local quot = floor(frac)
+      if frac-quot <char_data.round_threshold then fwidth = fwidth * quot end
+   end
    local xo, yo = getoffsets(p)
    setoffsets(p, xo + char_data.align*(fwidth-pwidth) - fshift.left,
               yo - fshift.down);

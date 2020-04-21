@@ -28,6 +28,7 @@ local t = {
 	 [8] = { 0, 0, 0, kanjiskip_shrink=1 },
       },
       kern = { [307] = 0 },	 
+      round_threshold = 0.01,
    },
 
    [1] = { -- 開き括弧類

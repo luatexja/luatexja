@@ -108,6 +108,8 @@ function luatexja.jfont.define_jfm(to)
          if type(v.down)~='number' then
             v.down = 0.0
          end
+         v.round_threshold = ((t.version>=3)and(i==0)and(type(v.round_threshold)=='number'))
+            and v.round_threshold or nil
          if t.version>=2 then
             if v.end_stretch then defjfm_res= nil; return end
             if v.end_shrink  then defjfm_res= nil; return end
@@ -218,7 +220,8 @@ do
                   width = w[1], stretch = w[2], shrink = w[3],
                   kanjiskip_natural = w.kanjiskip_natural and w.kanjiskip_natural/sz,
                   kanjiskip_stretch = w.kanjiskip_stretch and w.kanjiskip_stretch/sz,
-                  kanjiskip_shrink =  w.kanjiskip_shrink  and w.kanjiskip_shrink/sz,
+		  kanjiskip_shrink =  w.kanjiskip_shrink  and w.kanjiskip_shrink/sz,
+		  round_threshold = w.round_threshold and w.round_threshold/zw,
                }
             end
             for k,w in pairs(v.kern) do
@@ -331,7 +334,7 @@ do
       local fmtable = { jfm = j, size = f.size, var = jfm_var,
                         with_kanjiskip = jfm_ksp,
                         zw = sz.zw, zh = sz.zh,
-                        chars = sz.chars, char_type = sz.char_type,
+			chars = sz.chars, char_type = sz.char_type,
                         kanjiskip = sz.kanjiskip, xkanjiskip = sz.xkanjiskip,
                         chars_cbcache = {},
                         vert_activated = vert_activated,
