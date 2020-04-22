@@ -1,0 +1,21 @@
+\documentclass{ltjsarticle}
+\usepackage[sourcehan-jp,nfssonly]{luatexja-preset}
+\begin{document}
+\lineskip0pt
+
+\setbox0=\hbox{\tate あ〳〵あ〱あ――あ}\leavevmode\vrule\copy0\vrule
+{\ttfamily\tiny\directlua{%
+  luatexja.ext_show_node(tex.getbox(0), '\string\\par> ', tex.print)
+}\par}
+
+\newpage
+\setbox0=\hbox{\yoko あ〳〵あ〱あ――あ}\par
+\hrule
+\copy0
+\hrule
+{\ttfamily\tiny\directlua{%
+  luatexja.ext_show_node(tex.getbox(0), '\string\\par> ', tex.print)
+}\par}
+
+\end{document}
+\bye

@@ -196,6 +196,11 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
       pwidth, ascender = feir.vheight[pc]*met.size, feir.vorigin[pc]*met.size
    end
    fwidth = fwidth or pwidth
+   if fwidth~=pwidth and char_data.round_threshold then
+      local frac = abs(pwidth / fwidth); 
+      local quot = floor(frac)
+      if frac-quot <char_data.round_threshold then fwidth = fwidth * quot end
+   end
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = call_callback("luatexja.set_width", fshift, met, char_data)
    local fheight = char_data.height or 0
