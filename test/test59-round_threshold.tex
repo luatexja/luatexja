@@ -1,21 +1,31 @@
 \documentclass{ltjsarticle}
+\def\Cjascale{1}
 \usepackage[sourcehan-jp,nfssonly]{luatexja-preset}
+\usepackage{luatexja-ruby}
 \begin{document}
 \lineskip0pt
 
-\setbox0=\hbox{\tate あ〳〵あ〱あ――あ}\leavevmode\vrule\copy0\vrule
+\setbox0=\hbox{\tate あ〳〵あ〱あ――あ——明}\leavevmode\vrule\copy0\vrule
 {\ttfamily\tiny\directlua{%
   luatexja.ext_show_node(tex.getbox(0), '\string\\par> ', tex.print)
 }\par}
 
 \newpage
-\setbox0=\hbox{\yoko あ〳〵あ〱あ――あ}\par
+\setbox0=\hbox{\yoko あ〳〵あ〱あ――あ——明}\par
 \hrule
 \copy0
 \hrule
 {\ttfamily\tiny\directlua{%
   luatexja.ext_show_node(tex.getbox(0), '\string\\par> ', tex.print)
 }\par}
+
+\def\TEST#1{%
+\setbox2=\hbox{明日\Uchar`#1\Uchar`#1明日}
+\leavevmode #1~(\texttt{\the\numexpr`#1}): \vrule\copy2\vrule\par}
+
+\TEST{―}\TEST{—}
+
+%\ruby{明日}{あした}
 
 \end{document}
 \bye

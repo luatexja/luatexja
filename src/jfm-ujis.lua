@@ -229,7 +229,7 @@ local t = {
       }
    },
 
-   [307] = { -- 1/4 角
+   [307] = { -- 合成用（半）濁点
       chars = { 0x3099, 0x309A },
       align = 'right', left = 0.0, down = 0.0,
       width = 0, height = 0.88, depth = 0.12, italic=0.0,
