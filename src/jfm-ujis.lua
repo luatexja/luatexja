@@ -47,6 +47,9 @@ local t = {
 	 [4] = { 0, 0, 0, kanjiskip_shrink=1 },
 	 [5] = { 0, 0, 0, kanjiskip_shrink=1 },
 	 [105] = { 0, 0, 0, kanjiskip_shrink=1 },
+	 [205] = { 0, 0, 0, kanjiskip_shrink=1 },
+	 [305] = { 0, 0, 0, kanjiskip_shrink=1 },
+	 [405] = { 0, 0, 0, kanjiskip_shrink=1 },
 	 [6] = { 0, 0, 0, kanjiskip_shrink=1 },
 	 [007] = { 0, 0, 0, kanjiskip_shrink=1 },
 	 [107] = { 0, 0, 0, kanjiskip_shrink=1 },
@@ -71,6 +74,9 @@ local t = {
          [4] = { 0, 0, 0, kanjiskip_shrink=1 },
 	 [5] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
 	 [105] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
+	 [205] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
+	 [305] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
+	 [405] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
 	 [6] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
 	 [007] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
 	 [107] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
@@ -93,6 +99,9 @@ local t = {
 	 [4] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
 	 [5] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
 	 [105] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+	 [205] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+	 [305] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+	 [405] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
 	 [6] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
 	 [007] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
 	 [107] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
@@ -112,6 +121,9 @@ local t = {
 	 [3] = { 0.75, 0.0, 0.25, priority=1, ratio=1./3, kanjiskip_stretch=1 },
 	 [5] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
 	 [105] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
+	 [205] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
+	 [305] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
+	 [405] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
 	 [6] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
 	 [007] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
 	 [107] = { 0.5 , 0.0, 0.5, ratio=0, kanjiskip_stretch=1 },
@@ -121,7 +133,7 @@ local t = {
    },
 
    [5] = { -- 分離禁止文字
-      chars = { '—', '―', '‥', '…', '〳', '〴', '〵', },
+      chars = { '―', '‥', '…', '〳', '〴', '〵', },
       align = 'left', left = 0.0, down = 0.0,
       width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
       glue = {
@@ -132,8 +144,7 @@ local t = {
 	 [6] = { 0, 0, 0, kanjiskip_shrink=1 },
       },
       kern = {
-	 [5] = 0.0,
-	 [105] = 0.0
+	 [5] = 0.0, [105] = 0.0, [205] = 0.0, [305] = 0.0, [405] = 0.0,
       }
    },
 
@@ -149,8 +160,53 @@ local t = {
 	 [6] = { 0, 0, 0, kanjiskip_shrink=1 },
       },
       kern = {
-	 [5] = 0.0,
-	 [105] = 0.0
+	 [5] = 0.0, [105] = 0.0, [205] = 0.0, [305] = 0.0, [405] = 0.0,
+      }
+   },
+
+   [205] = { -- em-dash
+      chars = { 0x2014 },
+      align = 'middle', left = 0.0, down = 0.0,
+      width = 1, height = 0.88, depth = 0.12, italic=0.0,
+      glue = {
+	 [1] = { 0.5 , 0.0, 0.5, ratio=1, kanjiskip_stretch=1 },
+	 [2] = { 0, 0, 0, kanjiskip_shrink=1 },
+	 [3] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+	 [4] = { 0, 0, 0, kanjiskip_shrink=1 },
+	 [6] = { 0, 0, 0, kanjiskip_shrink=1 },
+      },
+      kern = {
+	 [5] = 0.0, [105] = 0.0, [205] = 0.0, [305] = 0.0, [405] = 0.0,
+      }
+   },
+   [305] = { -- two-em dash
+      chars = { 0x2E3A },
+      align = 'middle', left = 0.0, down = 0.0,
+      width = 2, height = 0.88, depth = 0.12, italic=0.0,
+      glue = {
+	 [1] = { 0.5 , 0.0, 0.5, ratio=1, kanjiskip_stretch=1 },
+	 [2] = { 0, 0, 0, kanjiskip_shrink=1 },
+	 [3] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+	 [4] = { 0, 0, 0, kanjiskip_shrink=1 },
+	 [6] = { 0, 0, 0, kanjiskip_shrink=1 },
+      },
+      kern = {
+	 [5] = 0.0, [105] = 0.0, [205] = 0.0, [305] = 0.0, [405] = 0.0,
+      }
+   },
+   [405] = { -- two-em dash
+      chars = { 0x2E3B },
+      align = 'middle', left = 0.0, down = 0.0,
+      width = 3, height = 0.88, depth = 0.12, italic=0.0,
+      glue = {
+	 [1] = { 0.5 , 0.0, 0.5, ratio=1, kanjiskip_stretch=1 },
+	 [2] = { 0, 0, 0, kanjiskip_shrink=1 },
+	 [3] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+	 [4] = { 0, 0, 0, kanjiskip_shrink=1 },
+	 [6] = { 0, 0, 0, kanjiskip_shrink=1 },
+      },
+      kern = {
+	 [5] = 0.0, [105] = 0.0, [205] = 0.0, [305] = 0.0, [405] = 0.0,
       }
    },
 
@@ -171,8 +227,7 @@ local t = {
 	 [8] = { 0, 0, 0, kanjiskip_shrink=1 },
       },
       kern = {
-	 [5] = 0.0,
-	 [105] = 0.0
+	 [5] = 0.0, [105] = 0.0, [205] = 0.0, [305] = 0.0, [405] = 0.0,
       }
    },
 
