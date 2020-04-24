@@ -194,7 +194,7 @@ local t = {
 	 [5] = 0.0, [105] = 0.0, [205] = 0.0, [305] = 0.0, [405] = 0.0,
       }
    },
-   [405] = { -- two-em dash
+   [405] = { -- three-em dash
       chars = { 0x2E3B },
       align = 'middle', left = 0.0, down = 0.0,
       width = 3, height = 0.88, depth = 0.12, italic=0.0,
