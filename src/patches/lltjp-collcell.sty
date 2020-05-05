@@ -1,0 +1,37 @@
+%
+% lltjp-collcell.sty
+%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{lltjp-array}[2020/05/06 Patch to collcell for LuaTeX-ja]
+
+\RequirePackage{etoolbox,array}
+
+\def\collcell@beforeuser{\ltjfakeboxbdd\ignorespaces}
+\def\collcell@afteruser{\unskip\ltjfakeboxbdd}
+
+\def\collectcell#1#2\relax\pltx@next@inhibitglue\ltjfakeboxbdd\ignorespaces{%
+  \begingroup
+  \collect@cell@count\z@
+  \collect@cell@toks{}%
+  \let\collect@cell@spaces\empty
+  \def\collect@cell@end{%
+    \expandafter\endgroup
+    \expandafter\collcell@beforeuser
+    \expandafter\ccell@swap\expandafter{\the\collect@cell@toks}{#1}%
+    \collcell@afteruser
+  }%
+  \collect@cell@look#2%
+}
+\patchcmd\collect@cell@arg{%
+    \cci{%
+      \collect@cell@look
+    }%
+}{
+    \cci{%
+      \collect@cell@look
+    }%
+	\ltjfakeboxbdd{\collect@cell@look}
+}{}{}
+
+\endinput
