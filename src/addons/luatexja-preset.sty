@@ -463,9 +463,9 @@
 \cs_new:Nn \__ltjpreset_substitute:nnnn {
   \group_begin:
     \suppressfontnotfounderror=1
-    \cs_if_exist:cT {ltjpreset_font_#1_#2:} {
+    \cs_if_exist:cTF { __ltjpreset_font_#1_#2: } {
       \__ltjpreset_wrap_fontname:e { \cs:w __ltjpreset_font_#1_#2: \cs_end: }
-      \font \g__ltjpreset_font_test: = \l__preset_font_name:\relax
+      \font \g__ltjpreset_font_test: = \l__ltjpreset_font_name:\relax
       \ifx \g__ltjpreset_font_test: \nullfont
         \msg_warning:nnxxxx { luatexja-preset }{ no-font }
           { \cs:w __ltjpreset_font_#1_#2: \cs_end: }{ #1/#2 }
