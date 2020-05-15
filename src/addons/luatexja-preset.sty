@@ -464,15 +464,15 @@
   \group_begin:
     \suppressfontnotfounderror=1
     \cs_if_exist:cT {ltjpreset_font_#1_#2:} {
-	  \__ltjpreset_wrap_fontname:e { \cs:w ltjpreset_font_#1_#2: \cs_end: }
+      \__ltjpreset_wrap_fontname:e { \cs:w __ltjpreset_font_#1_#2: \cs_end: }
       \font \g__ltjpreset_font_test: = \l__preset_font_name:\relax
       \ifx \g__ltjpreset_font_test: \nullfont
         \msg_warning:nnxxxx { luatexja-preset }{ no-font }
-          { \cs:w ltjpreset_font_#1_#2: \cs_end: }{ #1/#2 }
-          { \cs:w ltjpreset_font_#3_#4: \cs_end: }{ #3/#4 }
-        \cs_gset_eq:cc { ltjpreset_font_#1_#2: } { ltjpreset_font_#3_#4: }
+          { \cs:w __ltjpreset_font_#1_#2: \cs_end: }{ #1/#2 }
+          { \cs:w __ltjpreset_font_#3_#4: \cs_end: }{ #3/#4 }
+        \cs_gset_eq:cc { __ltjpreset_font_#1_#2: } { __ltjpreset_font_#3_#4: }
       \fi
-    } { \cs_gset_eq:cc { ltjpreset_font_#1_#2: } { ltjpreset_font_#3_#4: } }
+    } { \cs_gset_eq:cc { __ltjpreset_font_#1_#2: } { __ltjpreset_font_#3_#4: } }
   \group_end:
 }
 
