@@ -130,9 +130,9 @@ local function capsule_glyph_yoko(p, met, char_data, head, dir)
    local q
    head, q = node_remove(head, p)
    if char_data.round_threshold then
-      local frac = abs(pwidth / fwidth); 
-      local quot = floor(frac)
-      if frac-quot <char_data.round_threshold then fwidth = fwidth * quot end
+      local frac = pwidth / fwidth
+      local quot = floor(frac+0.5)
+      if abs(frac-quot) <char_data.round_threshold then fwidth = fwidth * quot end
    end
    local xo, yo = getoffsets(p)
    setoffsets(p, xo + char_data.align*(fwidth-pwidth) - fshift.left,
@@ -197,9 +197,9 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
    end
    fwidth = fwidth or pwidth
    if fwidth~=pwidth and char_data.round_threshold then
-      local frac = abs(pwidth / fwidth); 
-      local quot = floor(frac)
-      if frac-quot <char_data.round_threshold then fwidth = fwidth * quot end
+      local frac = pwidth / fwidth
+      local quot = floor(frac+0.5)
+      if abs(frac-quot) <char_data.round_threshold then fwidth = fwidth * quot end
    end
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = call_callback("luatexja.set_width", fshift, met, char_data)

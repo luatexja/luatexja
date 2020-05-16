@@ -1,5 +1,6 @@
 %<*!showexpl>
 %#! lualatex -shell-escape
+%% KozMinPr6N-Regular.otf is needed to typeset this document.
 
 %%%%% section ==> 章
 %%%%% subsection => 節
@@ -33,6 +34,7 @@
 \usepackage{unicode-math}
 \setmonojfont{HaranoAjiGothic-Regular.otf}
 \setmathfont[Scale=MatchLowercase]{XITSMath}
+\newjfontface\KOZM{KozMinPr6N-Regular.otf}
 
 \setLaTeXa{\scshape a}
 %<*ja>
@@ -1966,7 +1968,7 @@ these eight ranges belongs to the character range~217.
 \centering\footnotesize
 \def\ch#1{%
   {\fboxsep0pt\fcolorbox{cyan}{white}%
-  {\normalsize\char"20#1}}\ (\texttt{U+20#1})} %"
+  {\normalsize\KOZM\UTF{20#1}}}\ (\texttt{U+20#1})} %"
 % 13: JIS X0213, AJ, Adobe-Japan-1 only
 \begin{tabular}{ll>{\color{white}}lll>{\color{white}}l}
   \ch{02}&{En space}&AJ&
@@ -3465,7 +3467,7 @@ subsection. At the calling of \cs{jfont}, you must specify
 which JFM will be used for this font by the following keys:
 %</en>
 %<*ja>
-JFMは文字と和文組版で自動的に挿入される
+JFMは文字の寸法情報と和文組版で自動的に挿入される
 グルー／カーンの寸法情報を持っている．JFMの構造は次の節で述べる．
 \cs{jfont} 命令の呼び出しの際には，どのJFMを用いるのかを以下のキーで
 指定する必要がある：
@@ -3597,6 +3599,20 @@ The difference among these three~JFMs is  shown in \autoref{tab-difjfm}.
 \caption{Example of \texttt{jfmvar} key}
 \label{fig:jfmvar}
 \end{figure}
+
+%<*ja>
+また，プロポーショナル組用に\texttt{jfm-prop.lua}と\texttt{jfm-propw.lua}も用意されている．
+どちらのJFMも文字幅の情報と自動挿入されるグルー・カーンの情報は持たない（つまりグリフの文字幅をそのまま採用する）．
+\texttt{jfm-prop.lua}と\texttt{jfm-propw.lua}の差は，前者が
+文字の高さ・深さ情報も持たないのに対し，後者は持っている点である
+\footnote{プロポーショナル組の状況でルビをつけたい，などという状況では\texttt{jfm-propw.lua}が有用かもしれない．}．
+%</ja>
+%<*en>
+Furthermore, \LuaTeX-ja also ship two JFMs, namely \texttt{jfm-prop.lua}~and~\emph{\texttt{jfm-propw.lua}},
+  for ``proportional typesetting''.
+Both JFMs don't have any character width information, nor glues/kerns information.
+\texttt{jfm-prop.lua} also also not have character height and depth information, while \texttt{jfm-propw.lua} has them.
+%</en>
 
 %<*en>
 \item[jfmvar=<string>]
@@ -4726,6 +4742,25 @@ Hence we have the following result:
 %<*en>
 (optional, version~2 or~later)
 %</en>
+
+  \item[round\_threshold=<float>]
+%<*ja>
+（任意，バージョン3以降，文字クラス0のみ）
+
+「実際のグリフの幅に合わせて文字幅を整数倍する」際のしきい値を指定する．
+より正確に述べると，次のようになる．このフィールドに正の数$r$が指定されていたとし，
+文字クラス0で指定されている文字幅が$w$，文字クラス0に属する文字のグリフの幅が$w'$であったとする．
+$n$を$w/w'$に「もっとも近い整数」($\lfloor w/w'+0.5\rfloor$)としたとき，
+もし$|w/w'-n|\char`<r$であれば，JFMで文字幅$nw$が指定されたものとして扱う．
+
+この機能は，ほとんど源ノ明朝・源ノ角ゴシックにおける2倍角・3倍角ダッシュの合字のために実装されたと
+言ってもよい．これらのグリフは\LuaTeX 内部ではUnicodeの私用領域に割り当てられるので，
+JFM側で番号を指定することができない．
+%</ja>
+%<*en>
+(optional, version~3 or~later, only available in character class~0)
+%</en>
+
 
 \end{cslist}
 
@@ -11366,10 +11401,11 @@ direction~whatsit内部のノードリストに，\textit{dir\_box}として格�
 縦組時には，「\hbox to \zw{、}」(\texttt{U+3001})から「\ltjjachar"FE11」(\texttt{U+FE11})%"
 のように縦組用字形への置き換えに関係する処理は，以下のようになっている．
 
+
 \begin{table}[t]
   \def\D#1#2#3#4{%
 	{\fboxsep0pt\fcolorbox{cyan}{white}%
-    {\large\char"#1#2#3#4}}\ (\texttt{U+#1#2#3#4})%"
+    {\large\KOZM\ltjjachar"#1#2#3#4}}\ (\texttt{U+#1#2#3#4})%"
   }
   \caption{\LuaTeX-ja標準で行われる縦組形への置換}
   \label{tab:vert_replace}\small\centering

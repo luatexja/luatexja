@@ -186,13 +186,17 @@ local update_jfm_cache
 do
    local floor = math.floor
    local function myround(a) return floor(a+0.5) end
+   local mult_ignore_key = {
+     round_threshold=true, kanjiskip_natural=true, kanjiskip_stretch=true, kanjiskip_shrink=true,
+     raio=true, priority=true
+   }
    local function mult_table(old,scale) -- modified from table.fastcopy
       if old then
          local new = { }
          for k,v in next, old do
             if type(v) == "table" then
                new[k] = mult_table(v,scale)
-            elseif type(v) == "number" then
+            elseif type(v) == "number" and not mult_ignore_key[k] then
                new[k] = myround(v*scale)
             else
                new[k] = v
@@ -215,13 +219,13 @@ do
             for k,w in pairs(v.glue) do
                v[k] = {
                   nil,
-                  ratio=w.ratio/sz,
-                  priority=FROM_JFM + w.priority/sz,
+                  ratio=w.ratio,
+                  priority=FROM_JFM + w.priority,
                   width = w[1], stretch = w[2], shrink = w[3],
-                  kanjiskip_natural = w.kanjiskip_natural and w.kanjiskip_natural/sz,
-                  kanjiskip_stretch = w.kanjiskip_stretch and w.kanjiskip_stretch/sz,
-		  kanjiskip_shrink =  w.kanjiskip_shrink  and w.kanjiskip_shrink/sz,
-		  round_threshold = w.round_threshold and w.round_threshold/zw,
+                  kanjiskip_natural = w.kanjiskip_natural,
+                  kanjiskip_stretch = w.kanjiskip_stretch,
+                  kanjiskip_shrink =  w.kanjiskip_shrink,
+                  round_threshold = w.round_threshold,
                }
             end
             for k,w in pairs(v.kern) do
