@@ -139,6 +139,7 @@ do
    local STCK = luatexja.userid_table.STCK
    local IHB = luatexja.userid_table.IHB
    local id_local = node.id('local_par')
+   local id_dir = node.id('dir')
 
    local function test_list(h, lv)
       if not h then
@@ -157,7 +158,7 @@ do
 		     flag = 0; break -- error
 		  end
 	       end
-	    elseif p.id~=id_local then
+	    elseif p.id~=id_local and p.id~=id_dir then
 	       flag = 0; break
 	    end
 	 end
@@ -220,6 +221,9 @@ do
 	    if lv==0 and not page_direction then
 	       page_direction = v -- for first call of \yoko (in luatexja-core.sty)
 	    else
+              if luatexja.debug then
+                luatexja.ext_show_node_list(node.direct.tonode(h),'>> ', texio.write_nl)
+              end
               ltjb.package_error(
                  'luatexja',
                  "Use `\\" .. tostring(name) .. "' at top of list",

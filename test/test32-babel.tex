@@ -1,0 +1,16 @@
+\ifdefined\directlua
+  \directlua{luatexja_debug=1}
+  \documentclass{ltjarticle}
+  \usepackage{luatexja}
+\else
+  \documentclass{jarticle}
+\fi
+%\usepackage[bidi=basic-r]{babel}
+%\babelprovide[import=ar, main]{arabic}
+%\babelfont{rm}{Amiri}
+\usepackage[english]{babel}
+\begin{document}
+あasdfghjklいうえお
+\footnote{\ifdefined\directlua\else\yoko\fi かqwertyuioき}%
+さ/.,mnbvcxzし
+\end{document}

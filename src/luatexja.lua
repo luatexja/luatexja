@@ -516,6 +516,9 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
 	 s = s .. ' (for kinsoku)'
       end
       print_fn(s)
+   elseif pt == 'dir' then
+      s = base .. ' ' .. tostring(p.dir) .. ' (level ' .. tostring(p.level) .. ')'
+      print_fn(s)
    elseif pt == 'whatsit' then
       s = base
       if p.subtype==sid_user then
