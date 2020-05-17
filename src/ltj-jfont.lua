@@ -188,7 +188,7 @@ do
    local function myround(a) return floor(a+0.5) end
    local mult_ignore_key = {
      round_threshold=true, kanjiskip_natural=true, kanjiskip_stretch=true, kanjiskip_shrink=true,
-     raio=true, priority=true
+     ratio=true, priority=true
    }
    local function mult_table(old,scale) -- modified from table.fastcopy
       if old then
@@ -226,7 +226,7 @@ do
                   kanjiskip_stretch = w.kanjiskip_stretch,
                   kanjiskip_shrink =  w.kanjiskip_shrink,
                   round_threshold = w.round_threshold,
-               }
+		  }
             end
             for k,w in pairs(v.kern) do
                local g = node_new(id_kern, 1)
