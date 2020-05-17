@@ -153,6 +153,7 @@
 \theoremstyle{definition}
 %<en>\newtheorem{defn}{Definition}
 %<ja>\newtheorem{defn}{定義}
+\DeclareMathOperator\nint{nint}
 
 %%%%%%%% logo
 \usepackage{metalogo}
@@ -3542,7 +3543,7 @@ The following horizontal JFMs are shipped with \LuaTeX-ja:
 %<*en>
 \item[\texttt{jfm-ujis.lua}] A standard horizontal JFM in \LuaTeX-ja. This JFM is
   based on \verb+upnmlminr-h.tfm+, a metric for UTF/OTF package that
-  is used in \upTeX. When you use the \Pkg{luatexja-otf} package, you should use this JFM.
+  is used in \upTeX. When you are going to use the \Pkg{luatexja-otf} package, you should use this JFM.
 %</en>
 %<*ja>
 \item[\texttt{jfm-ujis.lua}] \LuaTeX-jaの標準JFMである．このJFMは\upTeX で
@@ -3608,7 +3609,7 @@ The difference among these three~JFMs is  shown in \autoref{tab-difjfm}.
 \footnote{プロポーショナル組の状況でルビをつけたい，などという状況では\texttt{jfm-propw.lua}が有用かもしれない．}．
 %</ja>
 %<*en>
-Furthermore, \LuaTeX-ja also ship two JFMs, namely \texttt{jfm-prop.lua}~and~\emph{\texttt{jfm-propw.lua}},
+Furthermore, \LuaTeX-ja also ship two JFMs, namely \texttt{jfm-prop.lua}~and~\texttt{jfm-propw.lua},
   for ``proportional typesetting''.
 Both JFMs don't have any character width information, nor glues/kerns information.
 \texttt{jfm-prop.lua} also also not have character height and depth information, while \texttt{jfm-propw.lua} has them.
@@ -3689,6 +3690,7 @@ NFSS2用の命令（\ref{ssec:chgfnt}節，\ref{ssec:nfsspat}節）における�
 %</ja>
 
 %<*ja>
+\newpage
 \paragraph{\texttt{extend}と\texttt{slant}}
 OpenType機能と見かけ上同じような形式で指定できるものに，
 \begin{description}
@@ -3709,7 +3711,7 @@ The following setting can be specified as OpenType font features:
 \item[\texttt{slant=}<slant>] slant the font.
 \end{cslist}
 Note that \LuaTeX-ja doesn't adjust JFMs by these \texttt{extend} and \texttt{slant}
-settings; you have to write new JFMs on purpose.
+settings; one have to write new JFMs on purpose.
 For example, the following example uses the standard JFM \texttt{jfm-ujis.lua}, hence
 letter-spacing and the width of italic correction are not correct:
 %</en>
@@ -3720,30 +3722,21 @@ letter-spacing and the width of italic correction are not correct:
 \end{LTXexample}
 
 %<*ja>
-\paragraph{\texttt{ltjksp} 指定}
+\paragraph{\texttt{ltjksp}指定}
 \label{pg:ltjksp}
 \LuaTeX-ja標準では，
-JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
+JFM中における\texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 \texttt{kanjiskip\_shrink}キー（\pageref{pg:ksp_nat}ページ）の使用によって，
 「JFM由来のグルーの他に，\Param{kanjiskip}の自然長/伸び量/縮み量の一部が
 同じ場所に挿入される」という状況が起こりうる．
 この機能を無効化し，バージョン20150922.0以前と同じような組版を得るためには
-他のOpenType機能と同じように\ \texttt{-ltjksp}\ 指定を行えば良い．
-\begin{LTXexample}[width=16\zw]
-\leavevmode
-\ltjsetparameter{kanjiskip=0pt plus 3\zw}
-\vrule\hbox to 15\zw{あ「い」う，えお}\vrule\\
-\jfont\G=HaranoAjiMincho-Regular%
-  :jfm=ujis;-ltjksp at \zw
-\G\leavevmode%
-\vrule\hbox to 15\zw{あ「い」う，えお}\vrule
-\end{LTXexample}
+他のOpenType機能と同じように\texttt{-ltjksp}指定を行えば良い（\autoref{fig:ltjksp}参照）．
 なお，
 \begin{lstlisting}
  \jfont\G=HaranoAjiMincho-Regular:jfm=ujis;-ltjksp;+ltjksp at \zw
 \end{lstlisting}
-のように \texttt{+ltjksp} 指定を行った場合は，\texttt{kanjiskip\_natural} など
-3キーは再び有効化される．\texttt{-ltjksp}, \texttt{+ltjksp} を複数回指定した場合は，
+のように\texttt{+ltjksp}指定を行った場合は，\texttt{kanjiskip\_natural}など
+3キーは再び有効化される．\texttt{-ltjksp}, \texttt{+ltjksp}を複数回指定した場合は，
 最後に指定したものが有効となる．
 %</ja>
 %<*en>
@@ -3753,8 +3746,10 @@ JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 \texttt{kanjiskip\_shrink} keys (Page~\pageref{pg:ksp_nat}) makes tha
 \LuaTeX-ja inserts not only a glue which is specified by a JFM, and also
 the natural width/stretch part/shrink part of \Param{kanjiskip}.
-
-This functionality is disabled by \texttt{-ltjksp} specification.
+This functionality is disabled by \texttt{-ltjksp} specification,
+as shown in~\autoref{fig:ltjksp}.
+%</en>
+\begin{figure}
 \begin{LTXexample}[width=16\zw]
 \leavevmode
 \ltjsetparameter{kanjiskip=0pt plus 3\zw}
@@ -3764,7 +3759,9 @@ This functionality is disabled by \texttt{-ltjksp} specification.
 \G\leavevmode%
 \vrule\hbox to 15\zw{あ「い」う，えお}\vrule
 \end{LTXexample}
-%</en>
+\caption{\texttt{ltjksp}}
+\label{fig:ltjksp}
+\end{figure}
 
 
 
@@ -3828,7 +3825,7 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
 \begin{itemize}
  \item OpenType Feature~\texttt{vrt2}%
   \footnote{If the font does not define \texttt{vrt2} feature,
-	use \texttt{vert} instead.} is automatically activated,
+	\texttt{vert} is used instead.} is automatically activated,
   unless \texttt{vert}~and//or~\texttt{vrt2} are explicitly activated
   or deactivated (as the second line in the example below).
 \begin{lstlisting}
@@ -3873,6 +3870,8 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
   By default, it substitutes ideographic comma/period for fullwidth comma/period,
   and double prime quotation marks for double quotation marks
   (See~\autoref{fig:jpotf}).
+  One can customize substitutions by lua~function \verb+luatexja.jfont.register_vert_replace+\ %
+  (see Japanese version of this manual).
 \end{itemize}
 %</en>
 %<*ja>
@@ -4750,8 +4749,9 @@ Hence we have the following result:
 「実際のグリフの幅に合わせて文字幅を整数倍する」際のしきい値を指定する．
 より正確に述べると，次のようになる．このフィールドに正の数$r$が指定されていたとし，
 文字クラス0で指定されている文字幅が$w$，文字クラス0に属する文字のグリフの幅が$w'$であったとする．
-$n$を$w/w'$に「もっとも近い整数」($\lfloor w/w'+0.5\rfloor$)としたとき，
-もし$|w/w'-n|\char`<r$であれば，JFMで文字幅$nw$が指定されたものとして扱う．
+$n=\nint(w/w')$とした
+\footnote{ここで，$\nint(a)=\lfloor a+0.5\rfloor$は$a$に「もっとも近い整数」を表す．}
+とき，もし$w'>w$かつ$|w/w'-n|\char`<r$であれば，JFMで文字幅$nw$が指定されたものとして扱う．
 
 この機能は，ほとんど源ノ明朝・源ノ角ゴシックにおける2倍角・3倍角ダッシュの合字のために実装されたと
 言ってもよい．これらのグリフは\LuaTeX 内部ではUnicodeの私用領域に割り当てられるので，
@@ -4852,7 +4852,7 @@ as follows:
 %<ja>\paragraph{仮想的な文字}
 %<en>\paragraph{Imaginary characters}
 %<*en>
-As described before, you can specify several ``imaginary characters'' in
+As described before, one can specify several ``imaginary characters'' in
 \texttt{chars} field. The most of these characters are regarded as the
 characters of class 0 in \pTeX.
 As a result, \LuaTeX-ja can control typesetting finer than \pTeX.
@@ -5002,7 +5002,7 @@ an external package is needed to support this in plain \TeX\ and
 \autoref{tab-math} shows counterparts to \TeX's primitives for math
 font families. There is no relation between the value of
 \cs{fam} and that of \cs{jfam}; with appropriate settings,
-you can set both \cs{fam} and \cs{jfam} to the same value.
+one can set both \cs{fam} and \cs{jfam} to the same value.
 Here <jfont\_cs> in the argument of \Param{jatextfont} etc.\ is
 a control sequence which is defined by \cs{jfont}, i.e.,
 a \emph{horizontal} Japanese font.
@@ -5053,7 +5053,7 @@ be accessed via \verb+luatexbase.add_to_callback+ function and so on, as other c
 %<en>\item[\texttt{luatexja.load\_jfm} callback]
 %<ja>\item[\texttt{luatexja.load\_jfm}コールバック]
 %<*en>
-With this callback you can overwrite JFMs.
+With this callback, one can overwrite JFMs.
 This callback is called when a new JFM is loaded.
 %</en>
 %<*ja>

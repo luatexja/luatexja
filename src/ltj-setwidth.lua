@@ -129,10 +129,12 @@ local function capsule_glyph_yoko(p, met, char_data, head, dir)
 
    local q
    head, q = node_remove(head, p)
-   if char_data.round_threshold then
-      local frac = pwidth / fwidth
-      local quot = floor(frac+0.5)
-      if abs(frac-quot) <char_data.round_threshold then fwidth = fwidth * quot end
+   if pwidth > fwidth then
+      if char_data.round_threshold then
+         local frac = pwidth / fwidth
+         local quot = floor(frac+0.5)
+	 if abs(frac-quot) <char_data.round_threshold then fwidth = fwidth * quot end
+      end
    end
    local xo, yo = getoffsets(p)
    setoffsets(p, xo + char_data.align*(fwidth-pwidth) - fshift.left,
@@ -196,7 +198,7 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
       pwidth, ascender = feir.vheight[pc]*met.size, feir.vorigin[pc]*met.size
    end
    fwidth = fwidth or pwidth
-   if fwidth~=pwidth and char_data.round_threshold then
+   if pwidth>fwidth and char_data.round_threshold then
       local frac = pwidth / fwidth
       local quot = floor(frac+0.5)
       if abs(frac-quot) <char_data.round_threshold then fwidth = fwidth * quot end
