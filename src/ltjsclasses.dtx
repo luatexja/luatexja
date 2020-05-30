@@ -44,25 +44,12 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2019/11/23 ltjsclasses ]
+  [2020/05/30 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass[disablejfam]{ltjsarticle}
 \usepackage{hypdoc}
 \hypersetup{unicode=true}
-\begingroup
- \suppressfontnotfounderror=1
- \global\font\testfont=file:KozMinPr6N-Regular.otf
- \global\font\testfonta=file:HaranoAjiMincho-Regular.otf
-\endgroup
-\ifx\testfonta\nullfont\ifx\testfont\nullfont
-  \usepackage[ipaex,nfssonly]{luatexja-preset}
-\else
-  \usepackage[kozuka-pr6n,nfssonly]{luatexja-preset}
-\fi\else
-  \usepackage[haranoaji,nfssonly]{luatexja-preset}
-\fi
-\let\testfont\undefined\let\testfonta\undefined
 \usepackage{unicode-math}
 \setmathfont{Latin Modern Math}
 \ltjsetparameter{alxspmode={`\*,allow}}
@@ -124,7 +111,7 @@
 % \item \texttt{uplatex}オプション，\texttt{autodetect-engine}オプションを
 % 削除してあります（前者ではエラーを出すようにしています）。
 % \item \texttt{disablejfam}オプションはクラス側では何もしません（ただLua\TeX-ja本体に
-% 渡されるだけです）．もし
+% 渡されるだけです）。もし
 % \begin{quotation}
 %   |! LaTeX Error: Too many math alphabets used in version ****.|
 % \end{quotation}
@@ -174,7 +161,7 @@
 %
 % [2016-07-21 LTJ] \LaTeX 等のロゴの再定義で，\texttt{jslogo}パッケージがあればそちらを読み込むことにしました。
 %
-% [2016-10-13 LTJ] \texttt{slide}オプションの使用時にエラーが出るのを修正．
+% [2016-10-13 LTJ] \texttt{slide}オプションの使用時にエラーが出るのを修正。
 %
 % \StopEventually{}
 %
@@ -414,8 +401,8 @@
 %
 % \texttt{noxreal},~\texttt{real}は旧来の互換性として今は残してありますが，2017年7月に削除する予定です。
 %
-% [2018-01-14] \texttt{noxreal},~\texttt{real} を削除しました．また，内部命令の名称を
-% \texttt{jsclasses}に合わせました．
+% [2018-01-14] \texttt{noxreal},~\texttt{real} を削除しました。また，内部命令の名称を
+% \texttt{jsclasses}に合わせました。
 %
 %    \begin{macrocode}
 \newif\ifjsc@mag@xreal
@@ -604,10 +591,10 @@
 % 読み込む必要があることに注意が必要です。
 %
 % [2018-10-08 LTJ] Lua\TeX-ja本体が\texttt{disablejfam}オプションをサポートしたので，
-% クラスファイルからは削除します．
+% クラスファイルからは削除します。
 %
 % [2019-08-12 LTJ] ……と思いましたが，``Unused global option(s): [disablejfam]''警告が
-% 出てしまいますので，「何もしない」クラスオプションとして形だけ定義します．
+% 出てしまいますので，「何もしない」クラスオプションとして形だけ定義します。
 %    \begin{macrocode}
 %<*article|report|book>
 \DeclareOption{disablejfam}{}
@@ -636,9 +623,9 @@
 %
 % [2016-11-09] pLaTeX / upLaTeX を自動判別するオプション \texttt{autodetect-engine} を新設しました。
 %
-% [2016-11-24 LTJ] \texttt{autodetect-engine} はLua\TeX-jaでは意味がないので警告を表示させます．
+% [2016-11-24 LTJ] \texttt{autodetect-engine} はLua\TeX-jaでは意味がないので警告を表示させます。
 %
-% [2018-07-30 LTJ] \texttt{uplatex} 指定時のエラーが正しく表示されなかったので修正しました．
+% [2018-07-30 LTJ] \texttt{uplatex} 指定時のエラーが正しく表示されなかったので修正しました。
 %
 %    \begin{macrocode}
 \newif\ifmingoth
@@ -803,14 +790,14 @@
 % [2016-04-04 LTJ] NFSSへのパッチを修正。
 %
 % [2017-01-23 LTJ] \LaTeXe\ 2017-01-01以降ではTUエンコーディングが標準なので，
-% \texttt{type1cm}パッケージは読み込まないようにしました．
+% \texttt{type1cm}パッケージは読み込まないようにしました。
 %
-% [2017-02-17 LTJ] |\directlua|中で出力される数字のカテゴリーコードが12になるようにしました．
-% この保証をしないと例えば\texttt{listings}パッケージで無限ループになります．
+% [2017-02-17 LTJ] |\directlua|中で出力される数字のカテゴリーコードが12になるようにしました。
+% この保証をしないと例えば\texttt{listings}パッケージで無限ループになります。
 %
 % [2018-07-02 LTJ] 10ptオプションが指定されており，
 % 実際にはオプティカルサイズの補正が不要なときは「|xreal|オプションは指定されなかった」という
-% 扱いにしておきます．
+% 扱いにしておきます。
 %    \begin{macrocode}
 \ifjsc@mag@xreal
 \ifdim\jsc@mpt=\p@\jsc@mag@xrealfalse\else
@@ -958,9 +945,7 @@
 % すればいいことになります。
 %
 % |\ltj@stdmcfont|,~|\ltj@stdgtfont| による，デフォルトで使われる明朝・ゴシックのフォントの
-% 設定に対応しました。この2つの命令の値はユーザが日々の利用でその都度指定するものではなく，
-% 何らかの理由で非埋め込みフォントが正しく利用できない場合にのみ\texttt{luatexja.cfg}によって
-% セットされるものです。
+% 設定に対応しました。この2つの命令の値はユーザが日々の利用でその都度指定するものではありません。
 %
 % [2014-07-26 LTJ] なお，現状のところ，縦組用JFMは\texttt{jfm-ujisv.lua}しか準備していません。
 %
@@ -969,6 +954,7 @@
 % [2017-12-31] 和文スケール（$1\,\mathrm{zw} \div \hbox{要求サイズ}$）を
 % 表す実数値マクロ |\Cjascale| を定義しました。
 %
+% [2020-05-30] |\ltj@stdmcfont|の説明に古い記述があったので修正。
 %
 % これにより，公称10ポイントの和文フォントを0.924715倍したことにより，
 % 約9.25ポイント，
@@ -979,15 +965,15 @@
 % 和文フォントをPostScriptの9ポイントにするために，
 % $0.9*72.27/72 \simeq 0.903375$ 倍します。
 %
-% [2018-09-23 LTJ] 実際の|\Cjascale|の定義はLua\TeX-jaの読み込み前に移動しました．
+% [2018-09-23 LTJ] 実際の|\Cjascale|の定義はLua\TeX-jaの読み込み前に移動しました。
 % こうすることによって「0.962216倍された和文フォント」という実際には使われない和文フォントを
-% 読み込む必要がなくなります．
+% 読み込む必要がなくなります。
 %
 %
-% 実際にフォントの再定義を行う部分です．
+% 実際にフォントの再定義を行う部分です。
 %
 % [2018-09-23 LTJ] |\Cjascale|の設定を前倒ししたことに伴い，実際の再定義は
-% \texttt{mingoth}, \texttt{ptexjis}のときしか必要なくなりました．
+% \texttt{mingoth}, \texttt{ptexjis}のときしか必要なくなりました。
 %
 %    \begin{macrocode}
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
@@ -1062,7 +1048,7 @@
 % \texttt{jsclasses}で行われていた |\textmc|, |\textgt| の再定義は不要のように思われます。
 %
 % \texttt{jsclasses.dtx}中で行われていた |\reDeclareMathAlphabet| の再定義は削除。
-% また，Yue ZHANGさん作の\texttt{fixjfm}パッケージ対応のコードもLua\TeX-jaでは削除しています．
+% また，Yue ZHANGさん作の\texttt{fixjfm}パッケージ対応のコードもLua\TeX-jaでは削除しています。
 %
 %    \begin{macrocode}
 \AtBeginDocument{%
@@ -5220,7 +5206,7 @@
 % ため，うまく働きませんでした。形を変えて復活させます。
 %
 % [2017-04-03 LTJ] 従来クラスファイルで定義していた |\@inhibitglue| は，
-% Lua\TeX-jaのコアに |\ltjfakeparbegin| として正式に追加されたのでリネームします．
+% Lua\TeX-jaのコアに |\ltjfakeparbegin| として正式に追加されたのでリネームします。
 %
 % |\item| 命令の直後です。
 %
@@ -5299,9 +5285,9 @@
 %
 % しかし単に戻すだけでも駄目みたいなので，ここでも最後にグルーを消しておきます。
 %
-% [2016-12-05 LTJ] 本家[2016-11-29]，lltjcore.styでの変更に追従させます．
+% [2016-12-05 LTJ] 本家[2016-11-29]，lltjcore.styでの変更に追従させます。
 %
-% [2017-02-18 LTJ] lltjcore.sty側で戻したのを忘れていました．
+% [2017-02-18 LTJ] lltjcore.sty側で戻したのを忘れていました。
 %    \begin{macrocode}
 \def\@gnewline #1{%
   \ifvmode
@@ -5678,7 +5664,7 @@
 % \paragraph{ページ設定}
 %
 % ページ設定の初期化です。
-% |stfloats|パッケージがシステムにインストールされている場合は、このパッケージを使って
+% |stfloats|パッケージがシステムにインストールされている場合は，このパッケージを使って
 % \pLaTeX の標準時と同じようにボトムフロートの下に脚注が組まれるようにします。
 %
 % [2017-02-19] \pLaTeX とLua\TeX-jaの|\@makecol|が違うことを

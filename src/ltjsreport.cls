@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsreport}
-  [2019/11/23 ltjsclasses ]
+  [2020/05/30 ltjsclasses ]
 \def\jsc@clsname{ltjsreport}
 \def\Cjascale{0.924715}
 \RequirePackage{luatexja}
