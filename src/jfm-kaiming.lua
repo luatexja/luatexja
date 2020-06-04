@@ -6,8 +6,8 @@ luatexja.jfont.define_jfm {
     align = 'left', left = 0.0, down = 0.0,
     width = 1.0, height = 0.88, depth = 0.12, italic=0.0,
     glue = {
-      --[1] = { 0.5 , 0.0, 0.5  },
-      [3] = { 0.125, 0.0, 0.125 }
+      [1] = { 0, 0.5, 0 },
+      [3] = { 0, 0.25, 0 }
     }
   },
 
