@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2020-05-15 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2020-06-14 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -76,6 +76,7 @@
 \__ltjpreset_declare_bool_option:nn { bold }{ nobold }
 \__ltjpreset_declare_bool_option:nn { expert }{ noexpert }
 \__ltjpreset_declare_bool_option:nn { deluxe }{ nodeluxe }
+\__ltjpreset_declare_bool_option:nn { nocheck }{ check }
 
 % JFM
 \tl_new:N \__ltjpreset_use_jfm_yoko_tl % 使用する JFM（横）
@@ -464,14 +465,16 @@
   \group_begin:
     \suppressfontnotfounderror=1
     \cs_if_exist:cTF { __ltjpreset_font_#1_#2: } {
-      \__ltjpreset_wrap_fontname:e { \cs:w __ltjpreset_font_#1_#2: \cs_end: }
-      \font \g__ltjpreset_font_test: = \l__ltjpreset_font_name:\relax
-      \ifx \g__ltjpreset_font_test: \nullfont
-        \msg_warning:nnxxxx { luatexja-preset }{ no-font }
-          { \cs:w __ltjpreset_font_#1_#2: \cs_end: }{ #1/#2 }
-          { \cs:w __ltjpreset_font_#3_#4: \cs_end: }{ #3/#4 }
-        \cs_gset_eq:cc { __ltjpreset_font_#1_#2: } { __ltjpreset_font_#3_#4: }
-      \fi
+      \bool_if:NF \g__ltjpreset_nocheck_bool {
+        \__ltjpreset_wrap_fontname:e { \cs:w __ltjpreset_font_#1_#2: \cs_end: }
+        \font \g__ltjpreset_font_test: = \l__ltjpreset_font_name:\relax
+        \ifx \g__ltjpreset_font_test: \nullfont
+          \msg_warning:nnxxxx { luatexja-preset }{ no-font }
+            { \cs:w __ltjpreset_font_#1_#2: \cs_end: }{ #1/#2 }
+            { \cs:w __ltjpreset_font_#3_#4: \cs_end: }{ #3/#4 }
+          \cs_gset_eq:cc { __ltjpreset_font_#1_#2: } { __ltjpreset_font_#3_#4: }
+        \fi
+      }
     } { \cs_gset_eq:cc { __ltjpreset_font_#1_#2: } { __ltjpreset_font_#3_#4: } }
   \group_end:
 }
