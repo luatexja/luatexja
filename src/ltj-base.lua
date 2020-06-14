@@ -248,6 +248,7 @@ do
    local join, isreadable = file.join, file.isreadable
    local tofile, serialize = table.tofile, table.serialize
    local luc_suffix = jit and '.lub' or '.luc'
+   local dump = string.dump
 
    -- determine save path
    local savepath = ''
@@ -256,31 +257,31 @@ do
       if not lfs.isdir(testpath) then dir.mkdirs(testpath) end
       if lfs.isdir(testpath) then savepath = testpath; break end
    end
-
+   local serial_spec = {functions=false, noquotes=true}
    local function save_cache_luc(filename, t, serialized)
       local fullpath = savepath .. '/' ..  filename .. luc_suffix
-      local s = serialized or serialize(t, 'return', false)
+      local s = serialized or serialize(t, 'return', false, serial_spec)
       if s then
 	 local sa = load(s)
 	 local f = io.open(fullpath, 'wb')
 	 if f and sa then 
-	    f:write(string.dump(sa, true)) 
+	    f:write(dump(sa, true)) 
 	    texio.write('(save cache: ' .. fullpath .. ')')
+            f:close()
 	 end
-	 f:close()
       end
    end
 
    local function save_cache(filename, t)
       local fullpath = savepath .. '/' ..  filename .. '.lua'
-      local s = serialize(t, 'return', false)
+      local s = serialize(t, 'return', false, serial_spec)
       if s then
-	 local f = io.open(fullpath, 'w')
+	 local f = io.open(fullpath, 'wb')
 	 if f then 
-	    f:write(s) 
+	    f:write(s)
 	    texio.write('(save cache: ' .. fullpath .. ')')
+	    f:close()
 	 end
-	 f:close()
 	 save_cache_luc(filename, t, s)
       end
    end
@@ -289,10 +290,11 @@ do
       local result
       for _,v in pairs(path) do
 	 local fn = join(v, cache_dir, filename)
-	 if isreadable(fn) then 
+	 if isreadable(fn) then
 	    texio.write('(load cache: ' .. fn .. ')')
 	    result = loadfile(fn)
-	    result = result and result(); break
+	    result = result and result()
+	    break
 	 end
       end
       if (not result) or outdate(result) then 

@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2020-05-17',
+  date = '2020-06-14',
   description = 'Loader for Japanese fonts',
 })
 
@@ -808,15 +808,37 @@ do
 end
 
 do
+   local cache_ver = 20
    local nameonly, lower = file.nameonly, string.lower
+   local lfs = require"lfs"
+   local file_attributes = lfs.attributes
+   local load_cache, save_cache = ltjb.load_cache, ltjb.save_cache
    local function prepare_extra_data_base(tfmdata)
       if (not tfmdata) or (not tfmdata.filename) then return end
       local bname = tfmdata.psname or nameonly(tfmdata.filename)
       if not font_extra_basename[bname] then
-         ltjb.remove_cache("extra_" .. lower(bname)) -- remove cache
-         local dest = ltju.get_vmet_table(tfmdata, dest)
-         dest = list_rotate_glyphs(tfmdata, dest)
-         font_extra_basename[bname] = dest or {}
+	 -- if the cache is present, read it
+	 -- 
+         local newtime = file_attributes(tfmdata.filename,"modification")
+         local v = "extra_" .. string.lower(bname)
+         local dest = load_cache(
+            v,
+            function (t) return (t.version~=cache_ver) or (t.modtime~=newtime) end
+         )
+         -- if the cache is not found or outdated, save the cache
+         if dest then
+            font_extra_basename[bname] = dest[1] or {}
+         else
+            local dest = ltju.get_vmet_table(tfmdata, nil)
+            dest = list_rotate_glyphs(tfmdata, dest)
+            font_extra_basename[bname] = dest or {}
+            save_cache( v,
+                             {
+                                modtime = newtime,
+                                version = cache_ver,
+                                dest,
+                             })
+         end
          return bname
       end
    end
