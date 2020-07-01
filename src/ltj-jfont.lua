@@ -808,7 +808,7 @@ do
 end
 
 do
-   local cache_ver = 21
+   local cache_ver = 22
    local nameonly, lower = file.nameonly, string.lower
    local lfs = require"lfs"
    local file_attributes = lfs.attributes
@@ -830,7 +830,11 @@ do
          )
          -- if the cache is not found or outdated, save the cache
          if dest then
-            font_extra_basename[bname] = dest[1] or {}
+	    font_extra_basename[bname] = dest[1] or {}
+	    local vheight, vorigin = dest[1].vheight, dest[1].vorigin
+	    local vhd, vod = vheight.default, vorigin.default
+            setmetatable(vheight, {__index = function () return vhd end } )
+            setmetatable(vorigin, {__index = function () return vod end } )
          else
             local dest = ltju.get_vmet_table(tfmdata, nil)
             dest = list_rotate_glyphs(tfmdata, dest)

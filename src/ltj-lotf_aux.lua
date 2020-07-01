@@ -102,8 +102,11 @@ local function get_vmet_table(tfmdata, dest)
        if v.vheight~=default_vheight then t_vheight[i] = v.vheight / units end
      end
    end
-   setmetatable(t_vheight, {__index = function () return default_vheight / units end } )
-   setmetatable(t_vorigin, {__index = function () return ascender / units end } )
+   local vhd, vod = default_vheight / units, ascender/units
+   t_vheight.default = vhd
+   t_vorigin.default = vod
+   setmetatable(t_vheight, {__index = function () return vhd end } )
+   setmetatable(t_vorigin, {__index = function () return vdd end } )
    dest = dest or {}
    dest.ind_to_uni = t_ind_to_uni
    dest.vorigin = t_vorigin -- designed size = 1.0

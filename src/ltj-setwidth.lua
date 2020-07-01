@@ -194,8 +194,8 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
 	    return capsule_glyph_tate_rot(p, met, char_data, head, dir, 
               0.5*(get_ascender(pf)-get_descender(pf)))
 	 end
-      end
-      pwidth, ascender = feir.vheight[pc]*met.size, feir.vorigin[pc]*met.size
+     end
+     pwidth, ascender = feir.vheight[pc]*met.size, feir.vorigin[pc]*met.size
    end
    fwidth = fwidth or pwidth
    if pwidth>fwidth and char_data.round_threshold then
