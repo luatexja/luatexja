@@ -808,7 +808,7 @@ do
 end
 
 do
-   local cache_ver = 20
+   local cache_ver = 21
    local nameonly, lower = file.nameonly, string.lower
    local lfs = require"lfs"
    local file_attributes = lfs.attributes
@@ -823,7 +823,10 @@ do
          local v = "extra_" .. string.lower(bname)
          local dest = load_cache(
             v,
-            function (t) return (t.version~=cache_ver) or (t.modtime~=newtime) end
+	    function (t) 
+		return (t.lotf_version~=luaotfload.version)
+		       or (t.version~=cache_ver) or (t.modtime~=newtime) 
+	    end
          )
          -- if the cache is not found or outdated, save the cache
          if dest then
@@ -836,6 +839,7 @@ do
                              {
                                 modtime = newtime,
                                 version = cache_ver,
+                                lotf_version = luaotfload.version,
                                 dest,
                              })
          end
