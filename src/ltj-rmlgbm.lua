@@ -5,7 +5,7 @@ luatexja.load_module('base');      local ltjb = luatexja.base
 
 local cidfont_data = {}
 local cache_chars = {}
-local cache_ver = 9
+local cache_ver = 10
 local identifiers = fonts.hashes.identifiers
 
 local cid_reg, cid_order, cid_supp, cid_name
@@ -175,8 +175,6 @@ do
 	 sequences = seq_dummy_vert,
       }
       k.descriptions = {}
-      k.shared.rawdata.resources=k.resources
-      k.shared.rawdata.descriptions=k.descriptions
       cache_chars[cid_name]  = { [655360] = k.characters }
 
       -- 縦書用字形
@@ -218,6 +216,8 @@ do
 			  version = cache_ver,
 			  k,
 		       })
+      k.shared.rawdata.resources=k.resources
+      k.shared.rawdata.descriptions=k.descriptions
    end
 end
 
@@ -253,6 +253,8 @@ local function read_cid_font()
    local dat = ltjb.load_cache("ltj-cid-auto-" .. string.lower(cid_name),
 			       cid_cache_outdated )
    if dat then
+      dat[1].shared.rawdata.resources=dat[1].resources
+      dat[1].shared.rawdata.descriptions=dat[1].descriptions
       cidfont_data[cid_name] = dat[1]
       cache_chars[cid_name]  = { [655360] = cidfont_data[cid_name].characters }
    else

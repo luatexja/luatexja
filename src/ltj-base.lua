@@ -231,6 +231,7 @@ end
 
 require('lualibs-lpeg') -- string.split
 require('lualibs-os')   -- os.type
+require('lualibs-gzip') -- gzip.*
 
 do
    local kpse_var_value = kpse.var_value
@@ -273,26 +274,26 @@ do
    end
 
    local function save_cache(filename, t)
-      local fullpath = savepath .. '/' ..  filename .. '.lua'
+      local fullpath = savepath .. '/' ..  filename .. '.lua.gz'
       local s = serialize(t, 'return', false, serial_spec)
       if s then
-	 local f = io.open(fullpath, 'wb')
-	 if f then 
-	    f:write(s)
-	    texio.write('(save cache: ' .. fullpath .. ')')
-	    f:close()
-	 end
-	 save_cache_luc(filename, t, s)
+         gzip.save(fullpath, s, 1)
+         texio.write('(save cache: ' .. fullpath .. ')')
+         save_cache_luc(filename, t, s)
       end
    end
 
-   local function load_cache_a(filename, outdate)
+   local function load_cache_a(filename, outdate, compressed)
       local result
       for _,v in pairs(path) do
 	 local fn = join(v, cache_dir, filename)
 	 if isreadable(fn) then
 	    texio.write('(load cache: ' .. fn .. ')')
-	    result = loadfile(fn)
+	    if compressed then
+	      result = loadstring(gzip.load(fn))
+	    else
+	      result = loadfile(fn)
+	    end
 	    result = result and result()
 	    break
 	 end
@@ -305,11 +306,11 @@ do
    end
    
    local function load_cache(filename, outdate)
-      local r = load_cache_a(filename ..  luc_suffix, outdate)
+      local r = load_cache_a(filename ..  luc_suffix, outdate, false)
       if r then 
 	 return r
       else
-         local r = load_cache_a(filename .. '.lua', outdate)
+         local r = load_cache_a(filename .. '.lua.gz', outdate, true)
 	 if r then save_cache_luc(filename, r) end -- update the precompiled cache
 	 return r
       end
@@ -321,6 +322,7 @@ do
    local function remove_cache (filename)
       local fullpath_wo_ext = savepath .. '/' ..  filename .. '.lu'
       remove_file_if_exist(fullpath_wo_ext .. 'a')
+      remove_file_if_exist(fullpath_wo_ext .. 'a.gz')
       remove_file_if_exist(fullpath_wo_ext .. 'b')
       remove_file_if_exist(fullpath_wo_ext .. 'c')
    end
