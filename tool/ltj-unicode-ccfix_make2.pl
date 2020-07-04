@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# create ltj-unicode-ccfix.tex by processing Unicode data file
+# create ltj-unicode-ccfix.lua by processing Unicode data file
 #	LineBreak.txt
 
 # modified from unicode-char-prep.pl (part of the XeTeX typesetting system).
@@ -38,7 +38,7 @@
 # authorization from the copyright holders.
 # \****************************************************************************/
 
-die "usage: perl $0 LineBreak.txt > unicode-letters.tex\n"
+die "usage: perl $0 LineBreak.txt > ltj-unicode-ccfix.lua\n"
 	unless $#ARGV == 0;
 
 sub parse_unidata {
