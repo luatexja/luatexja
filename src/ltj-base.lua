@@ -259,6 +259,18 @@ do
       if lfs.isdir(testpath) then savepath = testpath; break end
    end
    local serial_spec = {functions=false, noquotes=true}
+
+   local function remove_file_if_exist(name)
+     if os.rename(name,name) then os.remove(name) end
+   end
+   local function remove_cache (filename)
+      local fullpath_wo_ext = savepath .. '/' ..  filename .. '.lu'
+      remove_file_if_exist(fullpath_wo_ext .. 'a')
+      remove_file_if_exist(fullpath_wo_ext .. 'a.gz')
+      remove_file_if_exist(fullpath_wo_ext .. 'b')
+      remove_file_if_exist(fullpath_wo_ext .. 'c')
+   end
+
    local function save_cache_luc(filename, t, serialized)
       local fullpath = savepath .. '/' ..  filename .. luc_suffix
       local s = serialized or serialize(t, 'return', false, serial_spec)
@@ -306,6 +318,7 @@ do
    end
    
    local function load_cache(filename, outdate)
+      remove_file_if_exist(savepath .. '/' ..  filename .. '.lua')
       local r = load_cache_a(filename ..  luc_suffix, outdate, false)
       if r then 
 	 return r
@@ -314,17 +327,6 @@ do
 	 if r then save_cache_luc(filename, r) end -- update the precompiled cache
 	 return r
       end
-   end
-
-   local function remove_file_if_exist(name)
-     if os.rename(name,name) then os.remove(name) end
-   end
-   local function remove_cache (filename)
-      local fullpath_wo_ext = savepath .. '/' ..  filename .. '.lu'
-      remove_file_if_exist(fullpath_wo_ext .. 'a')
-      remove_file_if_exist(fullpath_wo_ext .. 'a.gz')
-      remove_file_if_exist(fullpath_wo_ext .. 'b')
-      remove_file_if_exist(fullpath_wo_ext .. 'c')
    end
 
    ltjb.remove_cache = remove_cache
