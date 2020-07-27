@@ -132,6 +132,7 @@
 %    v1.8-ltj-16の変更を削除。「\pTeX と互換性を持たせる」メトリックの変更などは
 %    新設の|ptexmin|オプション指定時にのみ行うようにした。
 %    句読点を「、」「。」に統一。}
+% \changes{v1.8e-ltj-19}{2020/07/27}{|everyshi|パッケージへのパッチを別パッケージへ分離。}
 % \fi
 %
 % \iffalse
@@ -161,7 +162,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2020/05/30 v1.8e-ltj-18
+  [2020/07/27 v1.8e-ltj-19
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -460,7 +461,7 @@
 % 縦組クラスと|everyshi|パッケージの相性が悪い問題に対処します。
 % この処理は、ZRさんの|pxeveryshi|パッケージと実質的に同じ内容です。
 %
-% [2020/07/27] lltjp-everyshi.sty に写しました．
+% [2020/07/27 LTJ] |lltjp-everyshi.sty|に移しました。
 %    \begin{macrocode}
 %<*tate>
 %\AtEndOfPackageFile{everyshi}{%
