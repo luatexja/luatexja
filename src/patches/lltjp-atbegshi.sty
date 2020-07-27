@@ -1,0 +1,80 @@
+%
+% lltjp-atbegshi.sty
+%
+
+\ifdefined\NeedsTeXFormat
+  \NeedsTeXFormat{LaTeX2e}
+  \ProvidesPackage{lltjp-atbegshi}[2020-07-27 Patch to atbegshi for LuaTeX-ja]
+  \RequirePackage{atbegshi}
+\else
+  \input atbegshi.sty
+\fi
+
+%--------------------------------------
+% following codes are almost copied from
+%   pxatbegshi.sty 2019/09/07 v0.5 (in platex-tools bundle, by H. Yamashita).
+
+%% internal macros are locally effective
+\begingroup
+
+%--------------------------------------- helpers
+
+%% unique tokens
+\def\pxabgs@mark{\pxabgs@mark@}
+\def\pxabgs@fin{\pxabgs@fin@}
+
+%% \pxabgs@patch@cmd\CMD{<orig>}{<new>}
+\@onlypreamble\pxabgs@patch@cmd
+\def\pxabgs@patch@cmd#1#2#3{%
+  \ifx#1\relax\else
+  \def\pxabgs@next##1#2##2\pxabgs@mark##3\pxabgs@fin{%
+    \ifx\pxabgs@mark##3\pxabgs@mark
+      \let#1\relax
+    \else
+      \def\pxabgs@fragment{##2}%
+      \def#1{##1#3##2}%
+    \fi}%
+  \expandafter\pxabgs@next#1\pxabgs@mark#2\pxabgs@mark\pxabgs@fin
+  \fi
+}
+
+%---------------------------------------
+
+% concept: execute all hooks inside yoko direction \vbox
+
+% prepare
+\let\pxabgs@AtBegShi@Output\AtBegShi@Output
+% try first patch
+\pxabgs@patch@cmd\pxabgs@AtBegShi@Output
+  {\let\AtBegShi@OrgProtect\protect}%
+  {\setbox8\vbox\bgroup\yoko\let\AtBegShi@OrgProtect\protect}
+\pxabgs@patch@cmd\pxabgs@AtBegShi@Output
+    {\AtBeginShipoutOriginalShipout\box\AtBeginShipoutBox}%
+    {\AtBeginShipoutOriginalShipout\box\AtBeginShipoutBox\egroup}
+\pxabgs@patch@cmd\pxabgs@AtBegShi@Output
+  {%
+    \begingroup
+      \setbox\AtBeginShipoutBox\box\AtBeginShipoutBox
+    \endgroup
+    \let\protect\AtBegShi@OrgProtect
+  }{%
+    \begingroup
+      \setbox\AtBeginShipoutBox\box\AtBeginShipoutBox
+    \endgroup
+    \let\protect\AtBegShi@OrgProtect
+    \egroup
+  }
+% commit the change only when successful
+\ifx\pxabgs@AtBegShi@Output\relax
+  \@PackageWarningNoLine{lltjp-atbegshi}{%
+    Failed in patching \string\AtBegShi@Output.\MessageBreak
+    This may cause error in tate direction%
+  }
+\else
+  \global\let\AtBegShi@Output\pxabgs@AtBegShi@Output
+\fi
+
+\endgroup
+%% internal macros are no longer effective
+
+\endinput

@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2017/11/12 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2020-07-27 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -78,8 +78,8 @@
   \RequirePackage{ltxcmds}    [2011/11/09] % v1.22
   \RequirePackage{pdftexcmds} [2011/11/29] % v0.20
   \RequirePackage{xkeyval}    [2012/10/14] % v2.6b
-  \RequirePackage{atbegshi}
   \RequirePackage{etoolbox}
+  \RequirePackage{lltjp-atbegshi}
   \AtBeginShipoutInit
   \IfFileExists{everyhook.sty}{\RequirePackage{everyhook}\ltj@everyhook@availtrue}{}
 \else                           %<*!LaTeX>
@@ -88,7 +88,7 @@
   \input ltxcmds.sty
   \input pdftexcmds.sty
   \input xkeyval
-  \input atbegshi.sty
+  \input lltjp-atbegshi.sty
   \AtBeginShipoutInit
 \fi                             %</LaTeX>
 \endlinechar=-1 %
@@ -426,7 +426,7 @@
     \directlua{luatexja.jfmglue.diffmet_rule = math.two_paverage}\or
     \directlua{luatexja.jfmglue.diffmet_rule = math.two_add}
   \fi
-}{\ltj@PackageError{luatexja}{invalid argument `#1' for `differentjfm'}{%
+}{\@PackageError{luatexja}{invalid argument `#1' for `differentjfm'}{%
   Argument for `differentjfm' must be one of `large', `small', `average',^^J%
   `pleft', `pright', 'paverage' or `both'. }}
   % large, small, average, pleft, pright, paverage, both
