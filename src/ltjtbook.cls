@@ -105,17 +105,6 @@
 \DeclareOption{tate}{%
   \tate\AtBeginDocument{\message{《縦組モード》}\adjustbaseline}%
 }
-\AtEndOfPackageFile{everyshi}{%
-  \def\@EveryShipout@Output{%
-    \setbox8\vbox{%
-      \yoko
-      \@EveryShipout@Hook
-      \@EveryShipout@AtNextHook
-      \global\setbox\luatexoutputbox=\box\luatexoutputbox
-    }%
-    \gdef\@EveryShipout@AtNextHook{}%
-    \@EveryShipout@Org@Shipout\box\luatexoutputbox
-  }}
 \DeclareOption{oneside}{\@twosidefalse}
 \DeclareOption{twoside}{\@twosidetrue}
 \DeclareOption{onecolumn}{\@twocolumnfalse}

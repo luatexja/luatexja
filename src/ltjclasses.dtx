@@ -459,19 +459,21 @@
 %
 % 縦組クラスと|everyshi|パッケージの相性が悪い問題に対処します。
 % この処理は、ZRさんの|pxeveryshi|パッケージと実質的に同じ内容です。
+%
+% [2020/07/27] lltjp-everyshi.sty に写しました．
 %    \begin{macrocode}
 %<*tate>
-\AtEndOfPackageFile{everyshi}{%
-  \def\@EveryShipout@Output{%
-    \setbox8\vbox{%
-      \yoko
-      \@EveryShipout@Hook
-      \@EveryShipout@AtNextHook
-      \global\setbox\luatexoutputbox=\box\luatexoutputbox
-    }%
-    \gdef\@EveryShipout@AtNextHook{}%
-    \@EveryShipout@Org@Shipout\box\luatexoutputbox
-  }}
+%\AtEndOfPackageFile{everyshi}{%
+%  \def\@EveryShipout@Output{%
+%    \setbox8\vbox{%
+%      \yoko
+%      \@EveryShipout@Hook
+%      \@EveryShipout@AtNextHook
+%      \global\setbox\luatexoutputbox=\box\luatexoutputbox
+%    }%
+%    \gdef\@EveryShipout@AtNextHook{}%
+%    \@EveryShipout@Org@Shipout\box\luatexoutputbox
+%  }}
 %</tate>
 %    \end{macrocode}
 %
