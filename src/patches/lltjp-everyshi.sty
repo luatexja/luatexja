@@ -1,0 +1,22 @@
+%
+% lltjp-everyshi.sty
+% almost the same as pxeveryshi package by ZR
+%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{lltjp-everyshi}[2020/07/27 Patch to everyshi for LuaTeX-ja]
+\RequirePackageWithOptions{everyshi}
+
+\def\@EveryShipout@Output{%
+  \setbox8\vbox{%
+    \yoko
+    \@EveryShipout@Hook
+    \@EveryShipout@AtNextHook
+    \global\setbox\luatexoutputbox=\box\luatexoutputbox
+  }%
+  \gdef\@EveryShipout@AtNextHook{}%
+  \@EveryShipout@Org@Shipout\box\luatexoutputbox
+}
+
+
+\endinput
