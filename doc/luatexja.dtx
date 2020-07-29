@@ -10553,7 +10553,8 @@ variation selectors are ``combined'' with the previous character.
  \item trueの場合は，異体字セレクタは「直前の文字に続けて」出力されるため，
 例えば以下の例（左側は入力，右側はその出力）のようになる．
 %</ja>
-\begin{LTXexample}
+%%%% [preset=...]: workaround for lstlisting inside LTXexample
+\begin{LTXexample}[preset=\expandafter\def\csname @captype\endcsname{lstlisting}]
 \begin{lstlisting}[vsraw=true]
 葛󠄀城市，葛󠄁飾区，葛西
 \end{lstlisting}
@@ -10569,7 +10570,7 @@ The default setting of the \texttt{vscmd} key produces the following.
 どのような形で出力されるかを規定するのが \texttt{vscmd} キーであり，
 \Pkg{lltjp-listings} の標準設定では以下の例の右側のように出力される．
 %</ja>
-\begin{LTXexample}
+\begin{LTXexample}[preset=\expandafter\def\csname @captype\endcsname{lstlisting}]
 \begin{lstlisting}[vsraw=false,
    vscmd=\ltjlistingsvsstdcmd]
 葛󠄀城市，葛󠄁飾区，葛西
@@ -11019,7 +11020,7 @@ $|\textit{total}|$の分だけが，行中のグルーの伸び量，あるい�
 \begin{itemize}
  \item 通常，キャッシュは\texttt{\$TEXMFVAR/luatexja/}以下に保存され，
 そこから読み込みが行われる．
- \item 「通常の」テキスト形式のキャッシュ（拡張子は \texttt{.lua}）以外にも，
+ \item 「通常の」テキスト形式のキャッシュ（拡張子は \texttt{.lua.gz}，gzip圧縮されているため）以外にも，
 それをバイナリ形式（バイトコード）に変換したものもサポートしている．
 \begin{itemize}
  \item キャッシュを読み込む時，同名のバイナリキャッシュがあれば，
@@ -11028,6 +11029,7 @@ $|\textit{total}|$の分だけが，行中のグルーの伸び量，あるい�
 同時に更新される．
 また，（バイナリ版が見つからず）テキスト形式のキャッシュ側が読み込まれたときは，
 \LuaTeX-jaはバイナリキャッシュを作成する．
+未圧縮のテキスト形式のキャッシュ(\texttt{hoge.lua})は20200802.0以降では利用しない．
 \end{itemize}
 \end{itemize}
 %</ja>
@@ -11038,12 +11040,13 @@ in a similar way to the \Pkg{luaotfload} package:
 \begin{itemize}
  \item Cache files are usually stored in (and loaded from)
 \texttt{\$TEXMFVAR/luatexja/}.
- \item In addition to caches of the text form (the extension is ``\texttt{.lua}''),
-caches of the \emph{binary}, precompiled form are supported.
+ \item In addition to caches of the text form (the extension is ``\texttt{.lua.gz}'',
+because they are compressed by gzip),
+caches of the \emph{binary}~(bytecode) form are supported.
 \begin{itemize}
  \item In loading a cache, the binary cache precedes
 the text form.
- \item When \LuaTeX-ja updates a cache \texttt{hoge.lua},
+ \item When \LuaTeX-ja updates a compressed text cache \texttt{hoge.lua.gz},
 its binary version is also updated.
 \end{itemize}
 \end{itemize}
@@ -11108,7 +11111,7 @@ Adobe-CNS1-*&ltj-cid-auto-adobe-cns1.lua&UniCNS-UTF32-*&Adobe-CNS1-UCS2\\
 \pTeX との互換目的の文字コード変換命令で用いられる．
 %</ja>
 %<*en>
-\item[ltj-jisx0208.\{luc|lub\}]
+\item[ltj-jisx0208.luc]
 The bytecode version of \texttt{ltj-jisx0208.lua}.
 This is the conversion table between JIS~X~0208 and Unicode
 which is used in Kanji-code conversion commands for compatibility with \pTeX.
@@ -11124,7 +11127,7 @@ where <filename> stands for the file name \emph{without suffix}:
 \begin{cslist}
 \item[save\_cache(<filename>, <data>)]
 Save a non-nil table <data> into a cache <filename>.
-Both the text form <filename>\texttt{.lua} and its binary version
+Both the compressed text form <filename>\texttt{.lua.gz} and its binary version
 are created or updated.
 
 \item[save\_cache\_luc(<filename>, <data>{[, <serialized\_data>]})]
@@ -11139,11 +11142,11 @@ Load the cache <filename>.
 and its return value is whether the cache is outdated.
 
 \texttt{load\_cache} first tries to
-read the binary cache <filename>\texttt{.\{luc|lub\}}.
+read the binary cache <filename>\texttt{.luc}.
 If its contents is up-to-date, \texttt{load\_cache} returns the contents.
 If the binary cache is not found or
 its contents is outdated, \texttt{load\_cache} tries to
-read the text form <filename>\texttt{.lua}.
+read the compressed text form <filename>\texttt{.lua.gz}.
 Hence, the return value of \texttt{load\_cache} is non-nil,
 if and only if the updated cache is found.
 \end{cslist}
@@ -11156,7 +11159,7 @@ if and only if the updated cache is found.
 \begin{cslist}
 \item[save\_cache(<filename>, <data>)]
 nilでない<data>をキャッシュ<filename>に保存する．
-テキスト形式の<filename>\texttt{.lua}のみならず，
+テキスト形式の<filename>\texttt{.lua.gz}\footnote{拡張子からわかる通り，実際にはgzip圧縮される．}のみならず，
 そのバイナリ版も作成/更新される．
 
 \item[save\_cache\_luc(<filename>, <data>{[, <serialized\_data>]})]
@@ -11171,11 +11174,11 @@ nilでない<data>をキャッシュ<filename>に保存する．
 <outdate>は1引数（キャッシュの中身）をとる関数であり，
 その戻り値は「キャッシュの更新が必要」かどうかを示すブール値でないといけない．
 
-\texttt{load\_cache}は，まずバイナリキャッシュ<filename>\texttt{.\{luc|lub\}}を
+\texttt{load\_cache}は，まずバイナリキャッシュ<filename>\texttt{.luc}を
 読みこむ．もしその内容が「新しい」，つまり<outdate>の評価結果が \texttt{false} なら
 \texttt{load\_cache}はこのバイナリキャッシュの中身を返す．
-もしバイナリキャッシュが見つからなかったか，「古すぎる」ならばテキスト版
-	     <filename>\texttt{.lua}を読み込み，その値を返す．
+もしバイナリキャッシュが見つからなかったか，「古すぎる」ならば（gzip圧縮された）テキスト形式の
+	     <filename>\texttt{.lua.gz}を読み込み，その値を返す．
 
 以上より，\texttt{load\_cache}自体がnilでない値を返すのは，ちょうど「新しい」キャッシュが
 見つかった場合である．
