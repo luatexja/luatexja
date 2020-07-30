@@ -4,7 +4,7 @@
 
 \ifdefined\NeedsTeXFormat
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{lltjp-atbegshi}[2020-07-27 Patch to atbegshi for LuaTeX-ja]
+  \ProvidesPackage{lltjp-atbegshi}[2020-07-30 Patch to atbegshi for LuaTeX-ja]
   \RequirePackage{atbegshi}
 \else
   \input atbegshi.sty
@@ -24,7 +24,6 @@
 \def\pxabgs@fin{\pxabgs@fin@}
 
 %% \pxabgs@patch@cmd\CMD{<orig>}{<new>}
-\@onlypreamble\pxabgs@patch@cmd
 \def\pxabgs@patch@cmd#1#2#3{%
   \ifx#1\relax\else
   \def\pxabgs@next##1#2##2\pxabgs@mark##3\pxabgs@fin{%
