@@ -279,7 +279,7 @@ do
 	 local f = io.open(fullpath, 'wb')
 	 if f and sa then 
 	    f:write(dump(sa, true)) 
-	    texio.write('(save cache: ' .. fullpath .. ')')
+	    texio.write('log', '(save cache: ' .. fullpath .. ')')
             f:close()
 	 end
       end
@@ -290,7 +290,7 @@ do
       local s = serialize(t, 'return', false, serial_spec)
       if s then
          gzip.save(fullpath, s, 1)
-         texio.write('(save cache: ' .. fullpath .. ')')
+         texio.write('log', '(save cache: ' .. fullpath .. ')')
          save_cache_luc(filename, t, s)
       end
    end
@@ -300,7 +300,7 @@ do
       for _,v in pairs(path) do
 	 local fn = join(v, cache_dir, filename)
 	 if isreadable(fn) then
-	    texio.write('(load cache: ' .. fn .. ')')
+	    texio.write('log','(load cache: ' .. filename .. ')')
 	    if compressed then
 	      result = loadstring(gzip.load(fn))
 	    else
