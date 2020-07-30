@@ -1,6 +1,7 @@
 print([[
+local f = false
 return {
-version = 2,
+version = 3,
 table_ivd_aj1 = {]])
 
 local f = io.open('IVD_Sequences.txt')
@@ -22,10 +23,12 @@ while s do
 end
 f:close()
 
+local s={}
 for i=1,maxcid do
-    print(' ' .. tostring(t[i] or false) .. ',')
+    s[#s+1] = t[i] and string.format('0x%x', t[i]) or 'f'
+    if #s==10 then print(" " .. table.concat(s, ",") .. ','); s={} end
 end
-
+print(" " .. table.concat(s, ","))
 
 -- ( echo 'luatexja.otf.ivd_aj1 = {' ; grep 'Adobe-Japan1' IVD_Sequences.txt|sed 's/\([0-9A-F][0-9A-F]*\) \([0-9A-F][0-9A-F]*\)\;.*CID.\([0-9][0-9]*\)$/[\3]=\{0x\1,0x\2\},/' ; echo '}' )
 print([[}}]])

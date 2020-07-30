@@ -59,9 +59,9 @@ luatexja.userid_table.OTF = luatexbase.newuserwhatsitid('char_by_cid',  'luatexj
 local OTF = luatexja.userid_table.OTF
 local tex_get_attr = tex.getattribute
 
-local cache_var = 2
-local cache_outdate_fn = function (t) return t.version~=cache_ver end
-local ivd_aj1 = ltjb.load_cache('ltj-ivd_aj1',cache_outdate_fn)
+local cache_ver = 3
+local ivd_aj1 = ltjb.load_cache('ltj-ivd_aj1',
+   function (t) return t.version~=cache_ver end)
 if not ivd_aj1 then -- make cache
    ivd_aj1 = require('ltj-ivd_aj1.lua')
    ltjb.save_cache_luc('ltj-ivd_aj1', ivd_aj1)
@@ -74,7 +74,7 @@ local function get_ucs_from_rmlgbm(c)
       or 0
    if v>=0x200000 then -- table
       local curjfnt = tex_get_attr((ltjd_get_dir_count()==dir_tate)
-                                        and attr_curtfnt or attr_curjfnt)
+                                   and attr_curtfnt or attr_curjfnt)
       local tfmdata = font_getfont(curjfnt)
       if tfmdata and tfmdata.resources then
         local base, ivs = v % 0x200000, 0xE00FF + math.floor(v/0x200000)
@@ -120,10 +120,8 @@ end
 -- This whatsit node will be extracted to a glyph_node
 local function append_jglyph(char)
    local p = node_new(id_whatsit,sid_user)
-   setfield(p, 'user_id', OTF)
-   setfield(p, 'type', 100)
-   setfield(p, 'value', char)
-   node_write(p)
+   setfield(p, 'user_id', OTF); setfield(p, 'type', 100)
+   setfield(p, 'value', char);  node_write(p)
 end
 
 local utf
@@ -247,8 +245,7 @@ local disable_ivs = enable_ivs
 
 luatexja.otf = {
   append_jglyph = append_jglyph,
-  enable_ivs = enable_ivs,  -- 隠し機能: IVS
-  disable_ivs = disable_ivs,  -- 隠し機能: IVS
+  enable_ivs = enable_ivs, disable_ivs = disable_ivs,
   cid = cid, utf = utf,
 }
 
