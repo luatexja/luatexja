@@ -44,7 +44,6 @@ icflag_table.IC_PROCESSED    = 74
 icflag_table.BOXBDD          = 75
 icflag_table.PROCESSED_BEGIN_FLAG = 4096 -- sufficiently large power of 2
 
-do
 local stack_ind = {}
 luatexja.stack_table_index = stack_ind
 stack_ind.PRE  = 0x200000 -- characterごと
@@ -60,9 +59,7 @@ stack_ind.MJT  = 0x100 -- 0--255
 stack_ind.MJS  = 0x200 -- 0--255
 stack_ind.MJSS = 0x300 -- 0--255
 stack_ind.KSJ  = 0x400 -- 0--9
-end
 
-do
 local uid_table = {}
 luatexja.userid_table = uid_table
 uid_table.IHB  = luatexbase.newuserwhatsitid('inhibitglue',  'luatexja') -- \inhibitglue
@@ -71,9 +68,7 @@ uid_table.BPAR = luatexbase.newuserwhatsitid('begin_par',    'luatexja') -- 「�
 uid_table.DIR  = luatexbase.newuserwhatsitid('direction',    'luatexja') -- 組方向
 uid_table.BOXB = luatexbase.newuserwhatsitid('box_boundary', 'luatexja') -- 「ボックス始め・終わり」
 uid_table.JA_AL_BDD = luatexbase.newuserwhatsitid('ja_al_boundary', 'luatexja')
-end
 
-do
 local dir_table = {}
 luatexja.dir_table = dir_table
 dir_table.dir_dtou = 1
@@ -84,7 +79,6 @@ dir_table.dir_node_auto   = 128 -- 組方向を合わせるために自動で作
 dir_table.dir_node_manual = 256 -- 寸法代入によって作られたもの
 dir_table.dir_utod = dir_table.dir_tate + dir_table.dir_math_mod
   -- 「縦数式ディレクション」 in pTeX
-end
 --- 定義終わり
 
 local load_module = luatexja.load_module

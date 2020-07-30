@@ -1,20 +1,20 @@
 --
 -- ltj-otf.lua
 --
-require('unicode')
-require('lualibs')
+require 'unicode'
+require 'lualibs'
 
-luatexja.load_module('base');      local ltjb = luatexja.base
-luatexja.load_module('jfont');     local ltjf = luatexja.jfont
-luatexja.load_module('rmlgbm');    local ltjr = luatexja.rmlgbm
-luatexja.load_module('charrange'); local ltjc = luatexja.charrange
-luatexja.load_module('direction'); local ltjd = luatexja.direction
-luatexja.load_module('stack');     local ltjs = luatexja.stack
-luatexja.load_module('lotf_aux');  local ltju = luatexja.lotf_aux
+luatexja.load_module 'base';      local ltjb = luatexja.base
+luatexja.load_module 'jfont';     local ltjf = luatexja.jfont
+luatexja.load_module 'rmlgbm';    local ltjr = luatexja.rmlgbm
+luatexja.load_module 'charrange'; local ltjc = luatexja.charrange
+luatexja.load_module 'direction'; local ltjd = luatexja.direction
+luatexja.load_module 'stack';     local ltjs = luatexja.stack
+luatexja.load_module 'lotf_aux';  local ltju = luatexja.lotf_aux
 
-local id_glyph = node.id('glyph')
-local id_whatsit = node.id('whatsit')
-local sid_user = node.subtype('user_defined')
+local id_glyph = node.id 'glyph'
+local id_whatsit = node.id 'whatsit'
+local sid_user = node.subtype 'user_defined'
 
 local setfield = node.direct.setfield
 local getfield = node.direct.getfield
@@ -22,10 +22,8 @@ local getid = node.direct.getid
 local getfont = node.direct.getfont
 local getchar = node.direct.getchar
 local getsubtype = node.direct.getsubtype
-
 local to_node = node.direct.tonode
 local to_direct = node.direct.todirect
-
 local node_new = node.direct.new
 local node_remove = node.direct.remove
 local node_next = node.direct.getnext
@@ -36,7 +34,6 @@ local unset_attr = node.direct.unset_attribute
 local node_insert_after = node.direct.insert_after
 local node_write = node.direct.write
 local node_traverse_id = node.direct.traverse_id
-
 
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_curtfnt = luatexbase.attributes['ltj@curtfnt']
@@ -73,13 +70,12 @@ local function get_ucs_from_rmlgbm(c)
       or ltjr_cidfont_data["Adobe-Japan1"].resources.unicodes["Japan1." .. tostring(c)])
       or 0
    if v>=0x200000 then -- table
-      local curjfnt = tex_get_attr((ltjd_get_dir_count()==dir_tate)
-                                   and attr_curtfnt or attr_curjfnt)
+      local curjfnt = tex_get_attr(
+        (ltjd_get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
       local tfmdata = font_getfont(curjfnt)
       if tfmdata and tfmdata.resources then
         local base, ivs = v % 0x200000, 0xE00FF + math.floor(v/0x200000)
-        curjfnt = tfmdata.resources.variants
-        curjfnt = curjfnt and curjfnt[ivs]
+        curjfnt = tfmdata.resources.variants; curjfnt = curjfnt and curjfnt[ivs]
         return curjfnt and curjfnt[base] or base
       else return base
       end
@@ -110,7 +106,7 @@ local function get_ucs_from_rmlgbm(c)
          -- CID が縦組用字形だった場合
          return ltju.replace_vert_variant(
             tex_get_attr((ltjd_get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt),
-	    r)
+            r)
       end
       return r
    end
@@ -130,7 +126,7 @@ do
       if ltjd_get_dir_count()==dir_tate then
          ucs = ltju.replace_vert_variant(
             tex_get_attr((ltjd_get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt),
-	    ucs)
+            ucs)
       end
       return append_jglyph(ucs)
    end
@@ -138,21 +134,19 @@ end
 
 local cid
 do
+   local ord = {
+      ['Japan1']=true, ['GB1']=true, ['CNS1']=true, ['Korea1']=true, ['KR']=true
+   }
    cid = function (key)
       if key==0 then return append_jglyph(0) end
-      local curjfnt = tex_get_attr((ltjd_get_dir_count()==dir_tate)
-                                        and attr_curtfnt or attr_curjfnt)
+      local curjfnt = tex_get_attr(
+         (ltjd_get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
       local cidinfo = ltju.get_cidinfo(curjfnt)
-      if type(cidinfo)~="table" or
-         cidinfo.ordering ~= "Japan1" and
-         cidinfo.ordering ~= "GB1" and
-         cidinfo.ordering ~= "CNS1" and
-         cidinfo.ordering ~= "Korea1" and
-         cidinfo.ordering ~= "KR" then
+      if type(cidinfo)~="table" or not ord[cidinfo.ordering] then
             return append_jglyph(get_ucs_from_rmlgbm(key))
       else
-	 local char = ltjf_font_extra_info[curjfnt].ind_to_uni[key] or 0
-	 return append_jglyph(char)
+         local char = ltjf_font_extra_info[curjfnt].ind_to_uni[key] or 0
+         return append_jglyph(char)
       end
    end
 end
@@ -169,17 +163,12 @@ local function extract(head)
          if getsubtype(p)==sid_user then
             local puid = getfield(p, 'user_id')
             if puid==OTF then
-            --if puid==OTF or puid==VSR then
                local g = node_new(id_glyph)
                setfield(g, 'subtype', 0)
-	       setfield(g, 'char', getfield(p, 'value'))
-               local v = has_attr(p, attr_curfnt); setfield(g, 'font',v)
-               --if puid==OTF then
-                  setfield(g, 'lang', lang_ja)
-                  set_attr(g, attr_kblshift, has_attr(p, attr_kblshift))
-               --else
-               --   set_attr(g, attr_ablshift, has_attr(p, attr_ablshift))
-               --end
+               setfield(g, 'char', getfield(p, 'value'))
+               local v = has_attr(p, attr_curfnt); setfield(g, 'font', v)
+               setfield(g, 'lang', lang_ja)
+               set_attr(g, attr_kblshift, has_attr(p, attr_kblshift))
                head = node_insert_after(head, p, g)
                head = node_remove(head, p)
                node_free(p); p = g
@@ -206,20 +195,20 @@ local function ind_to_uni(fmtable, fn)
    local t = ltjf_font_extra_info[fn]; t = t and t.ind_to_uni
    if t and cid.ordering == "Japan1" then
       for i, v in pairs(fmtable.chars) do
-	 local j = string.match(i, "^AJ1%-([0-9]*)")
-	 if j then
-	    j = t[i]
-	    if j then
-	       fmtable.cid_char_type = fmtable.cid_char_type  or {}
-	       fmtable.cid_char_type[j] = v
-	    end
-	 end
+         local j = string.match(i, "^AJ1%-([0-9]*)")
+         if j then
+            j = t[i]
+            if j then
+               fmtable.cid_char_type = fmtable.cid_char_type  or {}
+               fmtable.cid_char_type[j] = v
+            end
+         end
       end
    end
    return fmtable
 end
 luatexbase.add_to_callback("luatexja.define_jfont",
-			   ind_to_uni, "ltj.otf.define_jfont", 1)
+                           ind_to_uni, "ltj.otf.define_jfont", 1)
 --  既に読み込まれているフォントに対しても，同じことをやらないといけない
 for fn, v in pairs(ltjf_font_metric_table) do
    ltjf_font_metric_table[fn] = ind_to_uni(v, fn)
@@ -234,12 +223,12 @@ local function cid_set_char_class(arg, fmtable, char)
    end
 end
 luatexbase.add_to_callback("luatexja.find_char_class",
-			   cid_set_char_class, "ltj.otf.find_char_class", 1)
+                           cid_set_char_class, "ltj.otf.find_char_class", 1)
 
 --IVS
 local function enable_ivs()
   ltjb.package_warning('luatexja-otf',
-    'luatexja.otf.enable_ivs() has now no effect.')
+     'luatexja.otf.enable_ivs() has now no effect.')
 end
 local disable_ivs = enable_ivs
 
