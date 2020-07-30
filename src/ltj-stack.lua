@@ -3,19 +3,19 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.stack',
-  date = '2019/09/26',
+  date = '2020-07-30',
   description = 'LuaTeX-ja stack system',
 })
 luatexja.stack = {}
 local ltjs=luatexja.stack
-luatexja.load_module('base');      local ltjb = luatexja.base
+luatexja.load_module 'base';      local ltjb = luatexja.base
 
 --------------------------------------------------------------------------------
 -- stack table (obeys TeX's grouping)
 --------------------------------------------------------------------------------
 local node_new = node.new
-local id_whatsit = node.id('whatsit')
-local sid_user = node.subtype('user_defined')
+local id_whatsit = node.id 'whatsit'
+local sid_user = node.subtype 'user_defined'
 local STCK = luatexja.userid_table.STCK
 local fastcopy = table.fastcopy
 local setcount, getcount = tex.setcount, tex.getcount
@@ -27,23 +27,23 @@ ltjs.charprop_stack_table = charprop_stack_table
 charprop_stack_table[0]={}
 
 local function get_stack_level()
-   local i = getcount('ltj@@stack')
+   local i = getcount 'ltj@@stack'
    local j = tex.currentgrouplevel
-   if j > getcount('ltj@@group@level') then
+   if j > getcount 'ltj@@group@level' then
       i = i+1 -- new stack level
       local gd = tex.globaldefs
       if gd~=0 then tex.globaldefs = 0 end
       --  'tex.globaldefs = 0' is local even if \globaldefs > 0.
       setcount('ltj@@group@level', j)
       for k,v in pairs(charprop_stack_table) do -- clear the stack above i
-	 if k>=i then charprop_stack_table[k]=nil end
+         if k>=i then charprop_stack_table[k]=nil end
       end
       charprop_stack_table[i] = fastcopy(charprop_stack_table[i-1])
       setcount('ltj@@stack', i)
       if gd~=0 then tex.globaldefs = gd end
       if  tex.nest[tex.nest.ptr].mode == -ltjs.hmode then -- rest. hmode のみ
-	 local g = node_new(id_whatsit, sid_user)
-	 g.user_id=STCK; g.type=100; g.value=j; node.write(g)
+         local g = node_new(id_whatsit, sid_user)
+         g.user_id=STCK; g.type=100; g.value=j; node.write(g)
       end
    end
    return i
@@ -68,10 +68,10 @@ function ltjs.set_stack_perchar(m,lb,ub, getter)
    local p = tonumber((getter or scan_int)())
    if p<lb or p>ub then
       ltjb.package_error('luatexja',
-			 "invalid code (".. tostring(p) .. ")",
-			 "The code should in the range "..tostring(lb) .. '..' ..
-			 tostring(ub) .. ".\n" ..
-		      "I'm going to use 0 instead of that illegal code value.")
+                         "invalid code (".. tostring(p) .. ")",
+                         "The code should in the range "..tostring(lb) .. '..' ..
+                         tostring(ub) .. ".\n" ..
+                        "I'm going to use 0 instead of that illegal code value.")
       p=0
    end
    set_stack_table(m+ltjb.in_unicode(c, true), p)
@@ -81,9 +81,9 @@ end
 function ltjs.set_stack_font(m,c,p)
    if type(c)~='number' or c<0 or c>255 then
       ltjb.package_error('luatexja',
-			 "invalid family number (".. tostring(c) .. ")",
-			 "The family number should in the range 0 .. 255.\n" ..
-			  "I'm going to use 0 instead of that illegal family number.")
+                         "invalid family number (".. tostring(c) .. ")",
+                         "The family number should in the range 0 .. 255.\n" ..
+                          "I'm going to use 0 instead of that illegal family number.")
       c=0
    end
    set_stack_table(m+c, p)
@@ -103,12 +103,12 @@ function ltjs.set_stack_skip(m,sp)
   charprop_stack_table[i][m].shrink_order  = sp.shrink_order
   if luatexja.isglobal=='global' then
      for j,v in pairs(charprop_stack_table) do
-	if not charprop_stack_table[j][m] then charprop_stack_table[j][m] = {} end
-	charprop_stack_table[j][m].width   = sp.width
-	charprop_stack_table[j][m].stretch = sp.stretch
-	charprop_stack_table[j][m].shrink  = sp.shrink
-	charprop_stack_table[j][m].stretch_order = sp.stretch_order
-	charprop_stack_table[j][m].shrink_order  = sp.shrink_order
+        if not charprop_stack_table[j][m] then charprop_stack_table[j][m] = {} end
+        charprop_stack_table[j][m].width   = sp.width
+        charprop_stack_table[j][m].stretch = sp.stretch
+        charprop_stack_table[j][m].shrink  = sp.shrink
+        charprop_stack_table[j][m].stretch_order = sp.stretch_order
+        charprop_stack_table[j][m].shrink_order  = sp.shrink_order
      end
   end
 end

@@ -1,12 +1,12 @@
 --
 -- ltj-adjust.lua
 --
-luatexja.load_module('base');      local ltjb = luatexja.base
-luatexja.load_module('jfont');     local ltjf = luatexja.jfont
-luatexja.load_module('jfmglue');   local ltjj = luatexja.jfmglue
-luatexja.load_module('stack');     local ltjs = luatexja.stack
-luatexja.load_module('direction'); local ltjd = luatexja.direction
-luatexja.load_module('lineskip');  local ltjl = luatexja.lineskip
+luatexja.load_module 'base';      local ltjb = luatexja.base
+luatexja.load_module 'jfont';     local ltjf = luatexja.jfont
+luatexja.load_module 'jfmglue';   local ltjj = luatexja.jfmglue
+luatexja.load_module 'stack';     local ltjs = luatexja.stack
+luatexja.load_module 'direction'; local ltjd = luatexja.direction
+luatexja.load_module 'lineskip';  local ltjl = luatexja.lineskip
 luatexja.adjust = luatexja.adjust or {}
 
 local to_node = node.direct.tonode
@@ -30,12 +30,12 @@ local has_attr = node.direct.has_attribute
 local set_attr = node.direct.set_attribute
 local insert_after = node.direct.insert_after
 
-local id_glyph = node.id('glyph')
-local id_kern = node.id('kern')
-local id_hlist = node.id('hlist')
-local id_glue  = node.id('glue')
-local id_whatsit = node.id('whatsit')
-local id_penalty = node.id('penalty')
+local id_glyph   = node.id 'glyph'
+local id_kern    = node.id 'kern'
+local id_hlist   = node.id 'hlist'
+local id_glue    = node.id 'glue'
+local id_whatsit = node.id 'whatsit'
+local id_penalty = node.id 'penalty'
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local lang_ja = luatexja.lang_ja
@@ -70,9 +70,9 @@ do
    local function make_priority_table(glue_sign)
       for i,_ in pairs(tmp) do tmp[i]=nil end
       if glue_sign==2 then -- shrink
-	 for i=0,63 do tmp[#tmp+1] = { (i%8)-4, FROM_JFM+i } end
+         for i=0,63 do tmp[#tmp+1] = { (i%8)-4, FROM_JFM+i } end
       else -- stretch
-	 for i=0,63 do tmp[#tmp+1] = { math.floor(i/8)-4, FROM_JFM+i } end
+         for i=0,63 do tmp[#tmp+1] = { math.floor(i/8)-4, FROM_JFM+i } end
       end    
       local pt = priority_table[glue_sign]
       tmp[#tmp+1] = { pt[2]/10, XKANJI_SKIP }
@@ -83,8 +83,8 @@ do
       table.sort(tmp, cmp)
       local a, m, n = at2pr[glue_sign], 10000000, 0
       for i=1,#tmp do
-	 if tmp[i][1]<m then n,m = n+1,tmp[i][1] end
-	 a[tmp[i][2]] = n
+         if tmp[i][1]<m then n,m = n+1,tmp[i][1] end
+         a[tmp[i][2]] = n
       end
       local o = a[-1]
       priority_num[glue_sign] = n
@@ -111,14 +111,14 @@ function get_total_stretched(p)
    for q in node_traverse_id(id_glue, ph) do
       local a = getfield(q, 'stretch_order')
       if a==0 then
-	 local b = at2pr_st[get_attr_icflag(q)]; 
-	 total_st[b] = total_st[b]+getfield(q, 'stretch')
+         local b = at2pr_st[get_attr_icflag(q)]; 
+         total_st[b] = total_st[b]+getfield(q, 'stretch')
       end
       total_st[a*65536] = total_st[a]+getfield(q, 'stretch')
       local a = getfield(q, 'shrink_order')
       if a==0 then
-	 local b = at2pr_sh[get_attr_icflag(q)]; 
-	 total_sh[b] = total_sh[b]+getfield(q, 'shrink')
+         local b = at2pr_sh[get_attr_icflag(q)]; 
+         total_sh[b] = total_sh[b]+getfield(q, 'shrink')
       end
       total_sh[a*65536] = total_sh[a]+getfield(q, 'shrink')
    end
@@ -171,16 +171,16 @@ local function aw_step1(p, total)
    for i, v in ipairs(eadt) do
       local t = total - v
       if t>0 then
-	 eadt_ratio[i] = {i, t/total_st[65536*total_st.order], t, v}
+         eadt_ratio[i] = {i, t/total_st[65536*total_st.order], t, v}
       else
-	 eadt_ratio[i] = {i, t/total_sh[65536*total_sh.order], t, v}
+         eadt_ratio[i] = {i, t/total_sh[65536*total_sh.order], t, v}
       end
    end
    table.sort(eadt_ratio, 
    function (a,b) 
        for i=2,4 do
-	   local at, bt = abs(a[i]), abs(b[i])
-	   if at~=bt then return at<bt end
+           local at, bt = abs(a[i]), abs(b[i])
+           if at~=bt then return at<bt end
        end
        return a[4]<b[4]
    end)
@@ -219,14 +219,14 @@ local function aw_step1_last(p, total)
       if total_st.order ~= getfield(pf, 'stretch_order') then return total, false end
       if total_st[total_st.order*65536] ~= getfield(pf, 'stretch') then return total, false end
       for i=total_st.order-1, 1, -1 do
-	 if total_st[i*65536] ~= 0 then return total, false end
+         if total_st[i*65536] ~= 0 then return total, false end
       end
    end
    if total<0 and total_sh.order>0 then
       if total_sh.order ~= getfield(pf, 'shrink_order') then return total, false end
       if total_sh[total_sh.order*65536] ~= getfield(pf, 'shrink') then return total, false end
       for i=total_sh.order-1, 1, -1 do
-	 if total_sh[i*65536] ~= 0 then return total, false end
+         if total_sh[i*65536] ~= 0 then return total, false end
       end
    end
    local eadt = ltjf_font_metric_table[getfont(xc)]
@@ -258,16 +258,16 @@ local function aw_step1_last(p, total)
    for i, v in ipairs(eadt) do
       local t = total - v
       if t>0 then
-	 eadt_ratio[i] = {i, t/total_st[65536*total_st.order], t, v}
+         eadt_ratio[i] = {i, t/total_st[65536*total_st.order], t, v}
       else
-	 eadt_ratio[i] = {i, t/total_sh[65536*total_sh.order], t, v}
+         eadt_ratio[i] = {i, t/total_sh[65536*total_sh.order], t, v}
       end
    end
    table.sort(eadt_ratio, 
    function (a,b) 
        for i=2,4 do
-	   local at, bt = abs(a[i]), abs(b[i])
-	   if at~=bt then return at<bt end
+           local at, bt = abs(a[i]), abs(b[i])
+           if at~=bt then return at<bt end
        end
        return a[4]<b[4]
    end)
@@ -303,8 +303,7 @@ local function clear_stretch(p, ind, ap, name)
    for q in node_traverse_id(id_glue, getlist(p)) do
       local f = ap[get_attr_icflag(q)]
       if f == ind then
-         setfield(q, name..'_order', 0)
-         setfield(q, name, 0)
+         setfield(q, name..'_order', 0); setfield(q, name, 0)
       end
    end
 end
@@ -313,7 +312,7 @@ local function set_stretch(p, after, before, ind, ap, name)
    if before > 0 then
       local ratio = after/before
       for q in node_traverse_id(id_glue, getlist(p)) do
-	 local f = ap[get_attr_icflag(q)]
+         local f = ap[get_attr_icflag(q)]
          if (f==ind) and getfield(q, name..'_order')==0 then
             setfield(q, name, getfield(q, name)*ratio)
          end
@@ -333,7 +332,7 @@ function aw_step2(p, total, added_flag)
    total = abs(total)
    for i = 1, pnum do
       if total <= res[i] then
-	 local a = at2pr[id]  
+         local a = at2pr[id]  
          for j = i+1,pnum do
             clear_stretch(p, j, a, name)
          end
@@ -353,32 +352,32 @@ do
    insert_lineend_kern = function (head, nq, np, Bp)
       if nq.met then 
          local eadt = nq.met.char_type[nq.class].end_adjust
-	 if not eadt then return end
-	 if eadt[1]~=0 then
-	    local x = node_new(id_kern, 1)
-	    setfield(x, 'kern', eadt[1]); set_attr(x, attr_icflag, LINEEND)
-	    insert_before(head, np.first, x)
-	 end
-	 local eadt_num = #eadt
-	 for i=2,eadt_num do
-	    local x = node_new(id_penalty)
-	    setfield(x, 'penalty', 0); set_attr(x, attr_icflag, KINSOKU)
-	    insert_before(head, np.first, x); Bp[#Bp+1] = x
-	    local x = node_new(id_kern, 1)
-	    setfield(x, 'kern', eadt[i]-eadt[i-1]); set_attr(x, attr_icflag, LINEEND)
-	    insert_before(head, np.first, x)
-	 end
+         if not eadt then return end
+         if eadt[1]~=0 then
+            local x = node_new(id_kern, 1)
+            setfield(x, 'kern', eadt[1]); set_attr(x, attr_icflag, LINEEND)
+            insert_before(head, np.first, x)
+         end
+         local eadt_num = #eadt
+         for i=2,eadt_num do
+            local x = node_new(id_penalty)
+            setfield(x, 'penalty', 0); set_attr(x, attr_icflag, KINSOKU)
+            insert_before(head, np.first, x); Bp[#Bp+1] = x
+            local x = node_new(id_kern, 1)
+            setfield(x, 'kern', eadt[i]-eadt[i-1]); set_attr(x, attr_icflag, LINEEND)
+            insert_before(head, np.first, x)
+         end
          if eadt_num>1 or eadt[1]~=0 then
-	    local x = node_new(id_penalty)
-	    setfield(x, 'penalty', 0); set_attr(x, attr_icflag, KINSOKU)
-	    insert_before(head, np.first, x); Bp[#Bp+1] = x
-	    local x = node_new(id_kern, 1)
-	    setfield(x, 'kern', -eadt[eadt_num]); set_attr(x, attr_icflag, LINEEND)
-	    insert_before(head, np.first, x)
-	    local x = node_new(id_penalty)
-	    setfield(x, 'penalty', 10000); set_attr(x, attr_icflag, KINSOKU)
-	    insert_before(head, np.first, x); Bp[#Bp+1] = x
-	 end
+            local x = node_new(id_penalty)
+            setfield(x, 'penalty', 0); set_attr(x, attr_icflag, KINSOKU)
+            insert_before(head, np.first, x); Bp[#Bp+1] = x
+            local x = node_new(id_kern, 1)
+            setfield(x, 'kern', -eadt[eadt_num]); set_attr(x, attr_icflag, LINEEND)
+            insert_before(head, np.first, x)
+            local x = node_new(id_penalty)
+            setfield(x, 'penalty', 10000); set_attr(x, attr_icflag, KINSOKU)
+            insert_before(head, np.first, x); Bp[#Bp+1] = x
+         end
       end
    end
 end
@@ -392,9 +391,9 @@ do
       if not head then return head end
       local last_p
       for p in node_traverse_id(id_hlist, to_direct(head)) do
-	 if last_p then
-	    myaw_step2(last_p, myaw_step1(last_p, get_total_stretched(last_p)))
-	 end
+         if last_p then
+            myaw_step2(last_p, myaw_step1(last_p, get_total_stretched(last_p)))
+         end
          last_p = p
       end
       if last_p then
@@ -405,18 +404,18 @@ do
    local is_reg = false
    local function enable_cb(status_le, status_pr, status_lp, status_ls)
       if (status_le>0 or status_pr>0) and (not is_reg) then
-	 ltjb.add_to_callback('post_linebreak_filter',
+         ltjb.add_to_callback('post_linebreak_filter',
             adjust_width, 'Adjust width', 
-	    luatexbase.priority_in_callback('post_linebreak_filter', 'ltj.lineskip')-1)
-	 is_reg = true
+            luatexbase.priority_in_callback('post_linebreak_filter', 'ltj.lineskip')-1)
+         is_reg = true
       elseif is_reg and (status_le==0 and status_pr==0) then
-	 luatexbase.remove_from_callback('post_linebreak_filter', 'Adjust width')
-	 is_reg = false
+         luatexbase.remove_from_callback('post_linebreak_filter', 'Adjust width')
+         is_reg = false
       end
       if status_le==2 then
-	 if not luatexbase.in_callback('luatexja.adjust_jfmglue', 'luatexja.adjust') then
-	    ltjb.add_to_callback('luatexja.adjust_jfmglue', insert_lineend_kern, 'luatexja.adjust')
-	 end
+         if not luatexbase.in_callback('luatexja.adjust_jfmglue', 'luatexja.adjust') then
+            ltjb.add_to_callback('luatexja.adjust_jfmglue', insert_lineend_kern, 'luatexja.adjust')
+         end
          myaw_step1, myaw_step1_last = dummy, aw_step1_last
       else
          if status_le==0 then
@@ -425,13 +424,13 @@ do
             myaw_step1, myaw_step1_last = aw_step1, aw_step1_last
          end
          if luatexbase.in_callback('luatexja.adjust_jfmglue', 'luatexja.adjust') then
-   	    luatexbase.remove_from_callback('luatexja.adjust_jfmglue', 'luatexja.adjust')
+               luatexbase.remove_from_callback('luatexja.adjust_jfmglue', 'luatexja.adjust')
          end
       end
       myaw_step2 = (status_pr>0) and aw_step2 or aw_step2_dummy
       luatexja.lineskip.setting(
          status_lp>0 and 'profile' or 'dummy',
-	 status_ls>0 and 'step' or 'dummy'
+         status_ls>0 and 'step' or 'dummy'
       )      
    end
    local function disable_cb() -- only for compatibility
@@ -455,7 +454,7 @@ do
     ins(package[1], {b,e,[ind]=d})
   end
   local function flatten(package)
-    local bd={} for i,_ in pairs(package[2]) do ins(bd,{i}) end
+    local bd = {} for i,_ in pairs(package[2]) do ins(bd,{i}) end
     sort(bd, function (a,b) return a[1]<b[1] end)
     local bdc=#bd; local t = package[1]
     sort(t, function (a,b) return a[1]<b[1] end)
@@ -469,7 +468,7 @@ do
             bd[j][k]=bd[j][k] and max(bd[j][k],w) or w
           end
         end
-        j=j+1
+        j = j + 1
       end
     end
     package[2]=nil; package[1]=nil; package.flatten, package.insert=nil, nil
@@ -527,7 +526,7 @@ do
       if lmin==1/0 then lmin = bw end
       return lmin, 
          bw - lmin - getfield(before, 'depth')
-             - getfield(after, mirrored and 'depth' or 'height')
+            - getfield(after, mirrored and 'depth' or 'height')
     end
   end
 end

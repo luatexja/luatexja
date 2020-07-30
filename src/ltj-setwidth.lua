@@ -2,11 +2,11 @@
 -- ltj-setwidth.lua
 --
 
-luatexja.load_module('base');      local ltjb = luatexja.base
-luatexja.load_module('stack');     local ltjs = luatexja.stack
-luatexja.load_module('jfont');     local ltjf = luatexja.jfont
-luatexja.load_module('direction'); local ltjd = luatexja.direction
-luatexja.load_module('lotf_aux');  local ltju = luatexja.lotf_aux
+luatexja.load_module 'base';      local ltjb = luatexja.base
+luatexja.load_module 'stack';     local ltjs = luatexja.stack
+luatexja.load_module 'jfont';     local ltjf = luatexja.jfont
+luatexja.load_module 'direction'; local ltjd = luatexja.direction
+luatexja.load_module 'lotf_aux';  local ltju = luatexja.lotf_aux
 
 local setfield = node.direct.setfield
 local getfield = node.direct.getfield
@@ -44,16 +44,16 @@ local node_insert_before = node.direct.insert_before
 local node_insert_after = node.direct.insert_after
 local round = tex.round
 
-local id_glyph = node.id('glyph')
-local id_kern = node.id('kern')
-local id_hlist = node.id('hlist')
-local id_vlist = node.id('vlist')
-local id_rule = node.id('rule')
-local id_math = node.id('math')
-local id_whatsit = node.id('whatsit')
-local sid_save = node.subtype('pdf_save')
-local sid_restore = node.subtype('pdf_restore')
-local sid_matrix = node.subtype('pdf_setmatrix')
+local id_glyph  = node.id 'glyph'
+local id_kern   = node.id 'kern'
+local id_hlist  = node.id 'hlist'
+local id_vlist  = node.id 'vlist'
+local id_rule   = node.id 'rule'
+local id_math   = node.id 'math'
+local id_whatsit= node.id 'whatsit'
+local sid_save   = node.subtype 'pdf_save'
+local sid_restore = node.subtype 'pdf_restore'
+local sid_matrix  = node.subtype 'pdf_setmatrix'
 local dir_tate = luatexja.dir_table.dir_tate
 
 local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
@@ -80,9 +80,9 @@ local ltjw = {} --export
 luatexja.setwidth = ltjw
 
 luatexbase.create_callback("luatexja.set_width", "data",
-			   function (fstable, fmtable, char_data)
-			      return fstable
-			   end)
+                           function (fstable, fmtable, char_data)
+                              return fstable
+                           end)
 local call_callback = luatexbase.call_callback
 
 local fshift =  { down = 0, left = 0 }
@@ -111,19 +111,19 @@ local function capsule_glyph_yoko(p, met, char_data, head, dir)
       if ht_diff == 0 and dp_diff ==0 then -- offset only
          set_attr(p, attr_icflag, PROCESSED)
          local xo, yo = getoffsets(p)
-	 setoffsets(p, xo - fshift.left, yo - kbl - fshift.down)
-	 return node_next(p), head, p
+         setoffsets(p, xo - fshift.left, yo - kbl - fshift.down)
+         return node_next(p), head, p
       elseif ht_diff >= 0 and dp_diff >=0 then -- rule
-	 local box = node_new(id_rule,rule_subtype)
+         local box = node_new(id_rule,rule_subtype)
          local xo, yo = getoffsets(p)
-	 setoffsets(p, xo, yo - kbl - fshift.down)
-	 setwhd(box, 0, fheight - kbl, fdepth + kbl)
-	 setdir(box, dir)
-	 set_attr(box, attr_icflag, PACKED)
-	 set_attr(p, attr_icflag, PROCESSED)
-	 head = p and node_insert_before(head, p, box)
-	    or node_insert_after(head, node_tail(head), box)
-	 return node_next(p), head, p, box
+         setoffsets(p, xo, yo - kbl - fshift.down)
+         setwhd(box, 0, fheight - kbl, fdepth + kbl)
+         setdir(box, dir)
+         set_attr(box, attr_icflag, PACKED)
+         set_attr(p, attr_icflag, PROCESSED)
+         head = p and node_insert_before(head, p, box)
+            or node_insert_after(head, node_tail(head), box)
+         return node_next(p), head, p, box
       end
    end
 
@@ -133,7 +133,7 @@ local function capsule_glyph_yoko(p, met, char_data, head, dir)
       if char_data.round_threshold then
          local frac = pwidth / fwidth
          local quot = floor(frac+0.5)
-	 if abs(frac-quot) <char_data.round_threshold then fwidth = fwidth * quot end
+         if abs(frac-quot) <char_data.round_threshold then fwidth = fwidth * quot end
       end
    end
    local xo, yo = getoffsets(p)
@@ -190,10 +190,10 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
       local pf, pc = getfont(p), getchar(p)
       local feir = ltjf_font_extra_info[pf]
       if feir and feir.rotation and met.vert_activated then
-	 if feir.rotation[pc] and (has_attr(p, attr_vert_ori) or 0)<=0 then
-	    return capsule_glyph_tate_rot(p, met, char_data, head, dir, 
+         if feir.rotation[pc] and (has_attr(p, attr_vert_ori) or 0)<=0 then
+            return capsule_glyph_tate_rot(p, met, char_data, head, dir, 
               0.5*(get_ascender(pf)-get_descender(pf)))
-	 end
+         end
      end
      pwidth, ascender = feir.vheight[pc]*met.size, feir.vorigin[pc]*met.size
    end
@@ -263,21 +263,21 @@ function luatexja.setwidth.apply_ashift_math(head, last, attr_ablshift)
    for p in node_traverse(head) do
       local pid = getid(p)
       if p==last then
-	 return
+         return
       elseif (has_attr(p, attr_icflag) or 0) ~= PROCESSED then
-	 if pid==id_hlist or pid==id_vlist then
-	    setfield(p, 'shift', getfield(p, 'shift') +  (has_attr(p,attr_ablshift) or 0)) 
-	 elseif pid==id_rule then
-	    local v = has_attr(p,attr_ablshift) or 0
-	    setfield(p, 'height', getfield(p, 'height')-v)
-	    setfield(p, 'depth', getdepth(p)+v)
-	    set_attr(p, attr_icflag, PROCESSED)
-	 elseif pid==id_glyph then
-	    -- 欧文文字; 和文文字は pid == id_hlist の場合で処理される
-	    -- (see conv_jchar_to_hbox_A in ltj-math.lua)
-	    setfield(p, 'yoffset',
-		     getfield(p, 'yoffset') - (has_attr(p,attr_ablshift) or 0))
-	 end
+         if pid==id_hlist or pid==id_vlist then
+            setfield(p, 'shift', getfield(p, 'shift') +  (has_attr(p,attr_ablshift) or 0)) 
+         elseif pid==id_rule then
+            local v = has_attr(p,attr_ablshift) or 0
+            setfield(p, 'height', getfield(p, 'height')-v)
+            setfield(p, 'depth', getdepth(p)+v)
+            set_attr(p, attr_icflag, PROCESSED)
+         elseif pid==id_glyph then
+            -- 欧文文字; 和文文字は pid == id_hlist の場合で処理される
+            -- (see conv_jchar_to_hbox_A in ltj-math.lua)
+            setfield(p, 'yoffset',
+                     getfield(p, 'yoffset') - (has_attr(p,attr_ablshift) or 0))
+         end
          set_attr(p, attr_icflag, PROCESSED)
       end
    end
@@ -294,28 +294,28 @@ do
       if not head then return end
       local y_adjust, node_depth, adj_depth = 0, 0, 0
       for lp in node_traverse_id(id_glyph, head) do
-	 y_adjust = has_attr(lp,attr_ablshift) or 0
-	 local ld = getdepth(lp)
-	 node_depth = max(ld + min(y_adjust, 0), node_depth)
-	 adj_depth = (y_adjust>0) and max(ld + y_adjust, adj_depth) or adj_depth
-	 setfield(lp, 'yoffset', getfield(lp, 'yoffset') - y_adjust)
+         y_adjust = has_attr(lp,attr_ablshift) or 0
+         local ld = getdepth(lp)
+         node_depth = max(ld + min(y_adjust, 0), node_depth)
+         adj_depth = (y_adjust>0) and max(ld + y_adjust, adj_depth) or adj_depth
+         setfield(lp, 'yoffset', getfield(lp, 'yoffset') - y_adjust)
       end
       if adj_depth>node_depth then
-	 local r = node_new(id_rule,rule_subtype)
-	 setwhd(r, 0, 0, adj_depth); setdir(r, tex_dir)
-	 set_attr(r, attr_icflag, PROCESSED)
-	 if field=='post' then
-	    node_insert_after(head, head, r)
-	 else
-	    setfield(disc, field, (node_insert_before(head, head, r)))
-	 end
+         local r = node_new(id_rule,rule_subtype)
+         setwhd(r, 0, 0, adj_depth); setdir(r, tex_dir)
+         set_attr(r, attr_icflag, PROCESSED)
+         if field=='post' then
+            node_insert_after(head, head, r)
+         else
+            setfield(disc, field, (node_insert_before(head, head, r)))
+         end
       end
    end
    function luatexja.setwidth.apply_ashift_disc(d, is_dir_tate, dir)
       attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
       disc, tex_dir = d, dir
-      ashift_disc_inner('pre')
-      ashift_disc_inner('post')
-      ashift_disc_inner('replace')
+      ashift_disc_inner 'pre'
+      ashift_disc_inner 'post'
+      ashift_disc_inner 'replace'
    end
 end

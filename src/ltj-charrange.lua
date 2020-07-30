@@ -3,11 +3,11 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.charrange',
-  date = '2019/09/26',
+  date = '2020-07-30',
   description = 'Handling the range of Japanese characters',
 })
 luatexja.charrange = {}
-luatexja.load_module('base');      local ltjb = luatexja.base
+luatexja.load_module 'base';      local ltjb = luatexja.base
 
 local getchar = node.direct.getchar
 local has_attr = node.direct.has_attribute
@@ -49,18 +49,16 @@ for i=0x100,ucs_out-1 do jcr_table_main[i]=0 end
 function luatexja.charrange.add_char_range(b,e,ind) -- ind: external range number
    if not ind or ind<0 or ind>31*ATTR_RANGE then -- 0 はエラーにしない（隠し）
       ltjb.package_error('luatexja',
-			 "invalid character range number (" .. ind .. ")",
-			 "A character range number should be in the range 1.."
+                         "invalid character range number (" .. ind .. ")",
+                         "A character range number should be in the range 1.."
                           .. 31*ATTR_RANGE .. ",\n" ..
-			  "ignored.")
+                         "ignored.")
       return
    elseif b<0x80 or e>=ucs_out then
       ltjb.package_warning('luatexja',
-			 'bad character range ([' .. b .. ',' .. e .. ']). ' ..
-			   'I take the intersection with [0x80, 0x10ffff].')
-   elseif b>e then
-      local j=b; e=b; b=j
-   end
+                           'bad character range ([' .. b .. ',' .. e .. ']). ' ..
+                           'I take the intersection with [0x80, 0x10ffff].')
+   elseif b>e then b, e = e, b end
    if ind == 31*ATTR_RANGE then ind=0 end
    for i=math.max(0x80,b),math.min(ucs_out-1,e) do
       jcr_table_main[i]=ind
@@ -92,9 +90,9 @@ end
 -- EXT
 function luatexja.charrange.toggle_char_range(g, i) -- i: external range number
    if type(i)~='number' then
-	      ltjb.package_error('luatexja',
-				 "invalid character range number (" .. tostring(i).. ")",
-				 "A character range number must be a number, ignored.")
+      ltjb.package_error('luatexja',
+                         "invalid character range number (" .. tostring(i).. ")",
+                         "A character range number must be a number, ignored.")
    elseif i==0 then return
    else
       local kc
@@ -103,7 +101,7 @@ function luatexja.charrange.toggle_char_range(g, i) -- i: external range number
       local attr = kcat_attr_table[i]
       local a = tex_getattr(attr)
       tex.setattribute(g, attr,
-		       (floor(a/pow_table[i+1])*2+kc)*pow_table[i]+a%pow_table[i])
+         (floor(a/pow_table[i+1])*2+kc)*pow_table[i]+a%pow_table[i])
    end
 end
 

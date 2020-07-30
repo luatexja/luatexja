@@ -287,16 +287,16 @@
       \every@math@size{}%
       \fontsize{#6}\z@
       \ltj@@is@kyenc{#2}\ifin@%
-	    \ltjselectfont@force@definetrue
+            \ltjselectfont@force@definetrue
         \usekanji{#2}{#3}{#4}{#5}%
         \global\let#1\getjfont
-	    \ltjselectfont@force@definefalse
+            \ltjselectfont@force@definefalse
       \else
         \ltj@@is@ktenc{#2}\ifin@%
-  	      \ltjselectfont@force@definetrue
+              \ltjselectfont@force@definetrue
           \usekanji{#2}{#3}{#4}{#5}%
           \global\let#1\gettfont
-	      \ltjselectfont@force@definefalse
+              \ltjselectfont@force@definefalse
         \else
           \useroman{#2}{#3}{#4}{#5}%
           \global\expandafter\let\expandafter#1\the\font
@@ -379,7 +379,7 @@
   \xdef\font@name{\csname\curr@kfontshape/\f@size\endcsname}%
   \pickup@jfont
   \unless\ifnum\ltjgetparameter{direction}=3 \font@name
-	 \ltj@@does@alt@set{\curr@kfontshape}{%
+         \ltj@@does@alt@set{\curr@kfontshape}{%
       % alt fonts の定義
       \directlua{luatexja.jfont.output_alt_font_cmd('y', '\luatexluaescapestring{\curr@kfontshape}')}%
       % 定義した alt fonts のデータを \ltjdeclarealtfont に渡すのと同等の処理をする
@@ -432,14 +432,14 @@
 \bgroup
   \def\ltj@@dir@patch#1#2#3{%
     \global\csletcs{ltj@@orig@#1}{#1}%
-	\protected\expandafter\xdef\csname #1\endcsname{%
-	  \csname ltj@@orig@#1\endcsname
+        \protected\expandafter\xdef\csname #1\endcsname{%
+          \csname ltj@@orig@#1\endcsname
       \unexpanded{\ifnum#3<\z@\let\ltj@@protect\protect\set@typeset@protect}%
       \unexpanded{\global\let\ltj@afont@name=\font@name}%
-	  \expandonce{\csname ltj@selectfont@#2\endcsname}%
+          \expandonce{\csname ltj@selectfont@#2\endcsname}%
       \unexpanded{\global\let\font@name=\ltj@afont@name}%
       \unexpanded{\let\protect\ltj@@protect\fi}%
-	}%
+        }%
   }
   \ltj@@dir@patch{yoko}{yoko}{\ltj@curjfnt}
   \ltj@@dir@patch{tate}{tate}{\ltj@curtfnt}
@@ -601,7 +601,7 @@
     \else
       \@tempswafalse
       \def\cdp@elt##1{\ifcsname ##1+#1\endcsname%
-	\@tempswatrue\def\cdp@elt####1\relax{}%
+        \@tempswatrue\def\cdp@elt####1\relax{}%
       \fi}%
       \directlua{luatexja.jfont.search_ffam_declared()}\relax%
       \if@tempswz
@@ -659,8 +659,8 @@
   }
 \else % !!! pl 3, 4
   \def\set@target@series@kanji#1{%
-      \edef\k@series{#1}%
-	  \edef\k@series{\expandafter\series@drop@one@m\k@series mm\series@drop@one@m}%
+    \edef\k@series{#1}%
+    \edef\k@series{\expandafter\series@drop@one@m\k@series mm\series@drop@one@m}%
   }
 \fi\fi
 
@@ -670,7 +670,7 @@
     \set@target@series@kanji{#2}%
   \else
     \begingroup\let\f@encoding\k@encoding\let\f@family\k@family
-	   \maybe@load@fontshape\endgroup
+    \maybe@load@fontshape\endgroup
     \edef\reserved@a{\k@encoding /\k@family /#1/\k@shape}%
      \ifcsname \reserved@a \endcsname
        \set@target@series@kanji{#1}%
@@ -702,7 +702,7 @@
     \fi
   \else
     \begingroup\let\f@encoding\k@encoding\let\f@family\k@family
-	   \maybe@load@fontshape\endgroup
+           \maybe@load@fontshape\endgroup
     \edef\reserved@a{\k@encoding /\k@family /\k@series/#1}%
      \ifcsname \reserved@a\endcsname
        \edef\k@shape{#1}%
@@ -965,8 +965,8 @@
 \let\extract@afont\extract@font
 \def\pickup@jfont{%
   \ifnum
-	\unless\ifnum\ltjgetparameter{direction}=3 1\else
-	    \ifltjselectfont@force@define 1\else 0\fi\fi =1 %
+    \unless\ifnum\ltjgetparameter{direction}=3 1\else
+    \ifltjselectfont@force@define 1\else 0\fi\fi =1 %
     \expandafter \ifx \font@name \relax
        \let\extract@font\extract@jfont
        \define@newfont
@@ -974,20 +974,20 @@
     \fi
     \let\getjfont\font@name
   \else
-	\begingroup\escapechar\m@ne
-	\ifcsname ltj@@fontjfm/\expandafter\string\font@name\endcsname\else
-       \let\extract@font\extract@jfont@onlyjfm
-       \define@newfont
-       \let\extract@font\extract@afont
-	\fi
-	\endgroup
-	\csname ltj@@fontjfm/\expandafter\expandafter\expandafter\@gobble\expandafter\string\font@name\endcsname
+    \begingroup\escapechar\m@ne
+      \ifcsname ltj@@fontjfm/\expandafter\string\font@name\endcsname\else
+        \let\extract@font\extract@jfont@onlyjfm
+        \define@newfont
+        \let\extract@font\extract@afont
+      \fi
+    \endgroup
+    \csname ltj@@fontjfm/\expandafter\expandafter\expandafter\@gobble\expandafter\string\font@name\endcsname
   \fi
 }
 \def\pickup@tfont{%
   \ifnum
-	\ifnum\ltjgetparameter{direction}=3 1\else
-	    \ifltjselectfont@force@define 1\else 0\fi\fi =1 %
+    \ifnum\ltjgetparameter{direction}=3 1\else
+    \ifltjselectfont@force@define 1\else 0\fi\fi =1 %
     \expandafter \ifx \font@name \relax
        \let\extract@font\extract@tfont
        \define@newfont
@@ -995,14 +995,14 @@
     \fi
     \let\gettfont\font@name
   \else
-	\begingroup\escapechar\m@ne
-	\ifcsname ltj@@fontjfm/\expandafter\string\font@name\endcsname\else
-       \let\extract@font\extract@tfont@onlyjfm
-       \define@newfont
-       \let\extract@font\extract@afont
-	\fi
-	\endgroup
-	\csname ltj@@fontjfm/\expandafter\expandafter\expandafter\@gobble\expandafter\string\font@name\endcsname
+    \begingroup\escapechar\m@ne
+      \ifcsname ltj@@fontjfm/\expandafter\string\font@name\endcsname\else
+        \let\extract@font\extract@tfont@onlyjfm
+        \define@newfont
+        \let\extract@font\extract@afont
+      \fi
+    \endgroup
+    \csname ltj@@fontjfm/\expandafter\expandafter\expandafter\@gobble\expandafter\string\font@name\endcsname
   \fi
 }
 
@@ -1010,18 +1010,18 @@
 % わざと「ゴミをつける」
 \def\ltj@@patch@external@font#1 at{%
   \directlua{
-	local s = '\luatexluaescapestring{#1}'
-	local is_braced, is_quoted
-	if s:sub(1,1)=='{' and s:sub(-1)=='}' then is_braced=true; s=s:sub(2,-2) end
-	if s:sub(1,1)=='"' and s:sub(-1)=='"' then is_quoted=true; s=s:sub(2,-2) end
-	s=s..luatexja.jfont.print_aftl_address()
-	if is_braced then s='{'..s..'}' elseif is_quoted then s='"'..s..'"' end
-	%print(s, is_quoted, is_braced)
+        local s = '\luatexluaescapestring{#1}'
+        local is_braced, is_quoted
+        if s:sub(1,1)=='{' and s:sub(-1)=='}' then is_braced=true; s=s:sub(2,-2) end
+        if s:sub(1,1)=='"' and s:sub(-1)=='"' then is_quoted=true; s=s:sub(2,-2) end
+        s=s..luatexja.jfont.print_aftl_address()
+        if is_braced then s='{'..s..'}' elseif is_quoted then s='"'..s..'"' end
+        %print(s, is_quoted, is_braced)
     tex.sprint(-2, s)}%
   \space at%
 }
 \def\extract@jfont{%
-	\get@external@font
+    \get@external@font
     \ltj@@does@alt@set{\f@encoding/\f@family/\f@series/\f@shape}{%
       \edef\external@font{\expandafter\ltj@@patch@external@font\external@font}%
     }%
@@ -1029,7 +1029,7 @@
     \csname \f@encoding+\f@family\endcsname
     \csname\curr@fontshape\endcsname}
 \def\extract@tfont{%
-	\get@external@font
+    \get@external@font
     \ltj@@does@alt@set{\f@encoding/\f@family/\f@series/\f@shape}{%
       \edef\external@font{\expandafter\ltj@@patch@external@font\external@font}%
     }%
@@ -1044,15 +1044,15 @@
 }
 \luadef\ltj@@jfont@@jfmonly  \ltj@@jfont@@jfmonly@@inner
 \def\extract@jfont@onlyjfm{%
-	\get@external@font
-	\csxdef{ltj@@fontjfm/\expandafter\string\font@name}{%
-          \ltj@@jfont@@jfmonly{\external@font}{yoko}%
-	}}
+  \get@external@font
+  \csxdef{ltj@@fontjfm/\expandafter\string\font@name}{%
+    \ltj@@jfont@@jfmonly{\external@font}{yoko}%
+}}
 \def\extract@tfont@onlyjfm{%
-	\get@external@font
-	\csxdef{ltj@@fontjfm/\expandafter\string\font@name}{%
-          \ltj@@jfont@@jfmonly{\external@font}{tate}%
-	}}
+  \get@external@font
+  \csxdef{ltj@@fontjfm/\expandafter\string\font@name}{%
+    \ltj@@jfont@@jfmonly{\external@font}{tate}%
+}}
 
 \let\ltj@@al@do@subst@correction=\do@subst@correction
 \def\ltj@@ja@do@subst@correction{%
@@ -1106,7 +1106,7 @@
   \math@bgroup
     \expandafter\ifx\csname M@\f@encoding\endcsname#1\else
     #1\fi\ltj@tempcnta=#2
-	\expandafter\ltj@@mathJapaneseFonts\string#1/\relax%
+      \expandafter\ltj@@mathJapaneseFonts\string#1/\relax%
     \ifin@\jfam#2\relax\else\mathgroup#2\relax\fi
   \expandafter\math@egroup\fi}%
 
@@ -1138,7 +1138,7 @@
     \the\ltj@tempcnta,\the\ltj@tempcntb,
     '\luatexluaescapestring{\ltj@temp@afont}',
     '\luatexluaescapestring{\ltj@temp@bfont}')}%
-  }
+}
 
 %%%% \ClearAlternateKanjiFont<Benc><Bfam><Bser><Bshape>
 % いつも global
@@ -1161,59 +1161,4 @@
   \ltj@@getjfontnumber#1%
   \directlua{luatexja.jfont.pickup_alt_font_b(\the\ltj@tempcntc,'\luatexluaescapestring{#2}')}%
 }
-
-%%%% patch \@text@composite because of {y,t}albaselineshift
-
-% %% \pltx@isletter from plfonts.dtx
-% \def\pltx@mark{\pltx@mark@}
-% \let\pltx@scanstop\relax
-% \long\def\pltx@cond#1\fi{%
-%   #1\expandafter\@firstoftwo\else\expandafter\@secondoftwo\fi}
-% \long\def\pltx@isletter#1{%
-%   \expandafter\pltx@isletter@i#1\pltx@scanstop}
-% \long\def\pltx@isletter@i#1\pltx@scanstop{%
-%   \pltx@cond\ifx\pltx@mark#1\pltx@mark\fi{\@firstoftwo}%
-%     {\pltx@isletter@ii\pltx@scanstop#1\pltx@scanstop{}#1\pltx@mark}}
-% \long\def\pltx@isletter@ii#1\pltx@scanstop#{%
-%   \pltx@cond\ifx\pltx@mark#1\pltx@mark\fi%
-%     {\pltx@isletter@iii}{\pltx@isletter@iv}}
-% \long\def\pltx@isletter@iii#1\pltx@mark{\@secondoftwo}
-% \long\def\pltx@isletter@iv#1#2#3\pltx@mark{%
-%   \pltx@cond\ifx\pltx@mark#3\pltx@mark\fi{%
-%     \pltx@cond{\ifnum0\ifcat A\noexpand#21\fi\ifcat=\noexpand#21\fi>\z@}\fi
-%       {\@firstoftwo}{\@secondoftwo}%
-%   }{\@secondoftwo}}
-%
-% \def\@text@composite@x#1#2{%
-%   \ifx#1\relax
-%     #2%
-%   \else\pltx@isletter{#1}{#1}{%
-%     \begingroup
-%     \setbox\z@\hbox\bgroup%
-%       \ltj@yablshift\z@ \ltj@tablshift\z@
-%       #1%
-%       \@tempcntb\directlua{luatexja.pltx_composite_last_node_char()}%)
-%       \xdef\pltx@composite@temp{\noexpand\@tempcntb=\the\@tempcntb\relax}%
-%       \aftergroup\pltx@composite@temp
-%     \egroup
-%     \ifnum\ltjgetparameter{direction}=3 %
-%       \@tempdima=\ltj@tablshift sp\else\@tempdima=\ltj@yablshift sp\fi
-%     \ifnum\@tempcntb<\z@\@tempcnta\z@\else
-%       \@tempcnta=\ltjgetparameter{jacharrange}{\ltjgetparameter{chartorange}{\@tempcntb}}\relax
-%       \ifnum\@tempcnta=\z@\@tempdima\z@\fi
-%     \fi
-%     \ifnum\@tempcnta>\z@
-%       \ifodd\ltjgetparameter{alxspmode}{\@tempcntb}\else\leavevmode\hbox{}\fi
-%       \begingroup\mathsurround\z@$%
-%         \hbox{\lower\@tempdima\box\z@}
-%       $\endgroup%
-%       \ifnum\ltjgetparameter{alxspmode}{\@tempcntb}<2\hbox{}\fi
-%     \else
-%       \ifdim\@tempdima=\z@{\ltj@yablshift\z@ \ltj@tablshift\z@#1}%
-%       \else\lower\@tempdima\box\z@\fi
-%     \fi
-%     \endgroup}%
-%   \fi
-% }
-
 \endinput

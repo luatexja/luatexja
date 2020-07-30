@@ -101,15 +101,15 @@
 
 \def\@ltj@hook@family#1#2{ % #1: csname #2: contents
   \ifcsname @#1hook\endcsname % LaTeX 2020-02-02
-	\csappto{@#1hook}{#2}%
+    \csappto{@#1hook}{#2}%
   \else % LaTeX 2019-10-01
-	\ifcsname #1 \endcsname
-	  \expandafter\patchcmd\csname #1 \endcsname{\selectfont}{#2\selectfont}{}{}%
-	\else
-	  \PackageWarningNoLine{luatexja}{%
-		Patching to \expandafter\string\csname #1\endcsname\space failed%
-	  }%
-	\fi
+    \ifcsname #1 \endcsname
+      \expandafter\patchcmd\csname #1 \endcsname{\selectfont}{#2\selectfont}{}{}%
+    \else
+      \PackageWarningNoLine{luatexja}{%
+        Patching to \expandafter\string\csname #1\endcsname\space failed%
+      }%
+    \fi
   \fi
 }
 \@ltj@hook@family{rmfamily}{%

@@ -2,11 +2,11 @@
 -- ltj-pretreat.lua
 --
 
-luatexja.load_module('base');      local ltjb = luatexja.base
-luatexja.load_module('charrange'); local ltjc = luatexja.charrange
-luatexja.load_module('stack');     local ltjs = luatexja.stack
-luatexja.load_module('jfont');     local ltjf = luatexja.jfont
-luatexja.load_module('direction'); local ltjd = luatexja.direction
+luatexja.load_module 'base';      local ltjb = luatexja.base
+luatexja.load_module 'charrange'; local ltjc = luatexja.charrange
+luatexja.load_module 'stack';     local ltjs = luatexja.stack
+luatexja.load_module 'jfont';     local ltjf = luatexja.jfont
+luatexja.load_module 'direction'; local ltjd = luatexja.direction
 
 local to_node =  node.direct.tonode
 local to_direct =  node.direct.todirect
@@ -67,25 +67,23 @@ do
    local suppress_hyphenate_ja_aux = {
       [id_math] = function(p) return node_next(node_end_of_math(node_next(p))) end,
       [id_whatsit] = function(p)
-	 if getsubtype(p)==sid_user then
-	    local uid = getfield(p, 'user_id')
-	    if uid==STCK then
-	       wt[#wt+1] = p; node_remove(head, p)
-	    elseif uid==DIR then
-	       if has_attr(p, attr_icflag)<PROCESSED_BEGIN_FLAG  then
-		  ltjs.list_dir = has_attr(p, attr_dir)
-	       else -- こっちのケースは通常使用では起こらない
-		  wtd[#wtd+1] = p; node_remove(head, p)
-	       end
-	    end
-	 end
-	 return node_next(p)
+         if getsubtype(p)==sid_user then
+            local uid = getfield(p, 'user_id')
+            if uid==STCK then
+               wt[#wt+1] = p; node_remove(head, p)
+            elseif uid==DIR then
+               if has_attr(p, attr_icflag)<PROCESSED_BEGIN_FLAG  then
+                  ltjs.list_dir = has_attr(p, attr_dir)
+               else -- こっちのケースは通常使用では起こらない
+                  wtd[#wtd+1] = p; node_remove(head, p)
+               end
+            end
+         end
+         return node_next(p)
       end,
    }
    setmetatable(suppress_hyphenate_ja_aux, 
-		{
-		   __index = function() return node_next end,
-		})
+                { __index = function() return node_next end, })
    local id_boundary = node.id('boundary')
    local node_new, insert_before = node.direct.new, node.direct.insert_before
    local setsubtype = node.direct.setsubtype or function(n,l) setfield(n,'subtype',l) end 
@@ -95,37 +93,37 @@ do
       for i = 1,#wt do wt[i]=nil end
       for i = 1,#wtd do wtd[i]=nil end
       for i,_ in pairs(ltjs_orig_char_table) do
-	 ltjs_orig_char_table[i] = nil
+         ltjs_orig_char_table[i] = nil
       end
       ltjs.list_dir=ltjd_get_dir_count()
       do
-	 local p = head
-	 while p do
-	    local pid, prev_chartype = getid(p), 0
-	    -- prev_chartype: 0: not char 1: ALchar 2: JAchar
-	    while pid==id_glyph do
-	       local pc = getchar(p)
-	       if has_attr(p, attr_icflag, 0) and is_ucs_in_japanese_char(p, pc) then
-		  if prev_chartype==1 then
+         local p = head
+         while p do
+            local pid, prev_chartype = getid(p), 0
+            -- prev_chartype: 0: not char 1: ALchar 2: JAchar
+            while pid==id_glyph do
+               local pc = getchar(p)
+               if has_attr(p, attr_icflag, 0) and is_ucs_in_japanese_char(p, pc) then
+                  if prev_chartype==1 then
                      local b = node_new(id_whatsit,sid_user);
-		     setfield(b, 'type', 100); setfield(b, 'user_id', JA_AL_BDD);
-		     insert_before(head, p, b)
-		  end
+                     setfield(b, 'type', 100); setfield(b, 'user_id', JA_AL_BDD);
+                     insert_before(head, p, b)
+                  end
                   local pf = has_attr(p, attr_curjfnt)
                   pf = (pf and pf>0 and pf) or getfont(p)
-		  setfont(p, ltjf_replace_altfont(pf, pc))
-		  setlang(p, lang_ja)
-		  ltjs_orig_char_table[p], prev_chartype = pc, 2
+                  setfont(p, ltjf_replace_altfont(pf, pc))
+                  setlang(p, lang_ja)
+                  ltjs_orig_char_table[p], prev_chartype = pc, 2
                elseif prev_chartype==2 then
-		  local b = node_new(id_whatsit,sid_user);
-		  setfield(b, 'type', 100); setfield(b, 'user_id', JA_AL_BDD);
-		  insert_before(head, p, b); prev_chartype = 1
+                  local b = node_new(id_whatsit,sid_user);
+                  setfield(b, 'type', 100); setfield(b, 'user_id', JA_AL_BDD);
+                  insert_before(head, p, b); prev_chartype = 1
                else prev_chartype = 1
-	       end
-	       p = node_next(p); pid = getid(p)
-	    end
-	    p = (suppress_hyphenate_ja_aux[pid])(p)
-	 end
+               end
+               p = node_next(p); pid = getid(p)
+            end
+            p = (suppress_hyphenate_ja_aux[pid])(p)
+         end
       end
       stop_time_measure('ltj_hyphenate'); start_time_measure('tex_hyphenate')
       lang.hyphenate(h, nil)
@@ -133,10 +131,7 @@ do
       return h
    end
 
-   ltjb.add_to_callback('hyphenate',
-			      function (head,tail)
-				 return suppress_hyphenate_ja(head)
-			      end,'ltj.hyphenate')
+   ltjb.add_to_callback('hyphenate', suppress_hyphenate_ja, 'ltj.hyphenate')
 end
 
 -- mode: true iff this function is called from hpack_filter
@@ -153,20 +148,17 @@ local function set_box_stack_level(head, mode)
       for _,p  in pairs(wt) do node_free(p) end
    end
    ltjs_report_stack_level(tex_getcount('ltj@@stack') + box_set)
-   for _,p  in pairs(wtd) do
-      node_free(p)
-   end
+   for _,p  in pairs(wtd) do node_free(p) end
    if ltjs.list_dir == dir_tate then
       for p in node.direct.traverse_id(id_glyph,to_direct(head)) do
          if has_attr(p, attr_icflag, 0) and getlang(p)==lang_ja then
-	    local nf = ltjf_replace_altfont( has_attr(p, attr_curtfnt) or getfont(p) , ltjs_orig_char_table[p])
-	    setfont(p, nf)
-	    if ltjf_font_metric_table[nf].vert_activated then
-	       local pc = getchar(p)
-	       pc = ltjf_font_metric_table[nf].vform[pc]
+            local nf = ltjf_replace_altfont( has_attr(p, attr_curtfnt) or getfont(p) , ltjs_orig_char_table[p])
+            setfont(p, nf)
+            if ltjf_font_metric_table[nf].vert_activated then
+               local pc = getchar(p); pc = ltjf_font_metric_table[nf].vform[pc]
                if pc then setchar(p,  pc) end
-	    end
-	 end
+            end
+         end
       end
    end
    return head
@@ -176,11 +168,11 @@ end
 ltjb.add_to_callback('hpack_filter',
    function (head)
      return set_box_stack_level(head, true)
-   end,'ltj.set_stack_level',1)
+   end, 'ltj.set_stack_level', 1)
 ltjb.add_to_callback('pre_linebreak_filter',
-  function (head)
-     return set_box_stack_level(head, false)
-  end,'ltj.set_stack_level',1)
+   function (head)
+      return set_box_stack_level(head, false)
+   end, 'ltj.set_stack_level', 1)
 
 luatexja.pretreat = {
    set_box_stack_level = set_box_stack_level,

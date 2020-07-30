@@ -3,17 +3,17 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2020/01/23',
+  date = '2020-07-30',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}
 
-luatexja.load_module('base');      local ltjb = luatexja.base
-luatexja.load_module('stack');     local ltjs = luatexja.stack
-luatexja.load_module('jfont');     local ltjf = luatexja.jfont
-luatexja.load_module('direction'); local ltjd = luatexja.direction
-luatexja.load_module('setwidth');  local ltjw = luatexja.setwidth
-luatexja.load_module('lotf_aux');  local ltju = luatexja.lotf_aux
+luatexja.load_module 'base';      local ltjb = luatexja.base
+luatexja.load_module 'stack';     local ltjs = luatexja.stack
+luatexja.load_module 'jfont';     local ltjf = luatexja.jfont
+luatexja.load_module 'direction'; local ltjd = luatexja.direction
+luatexja.load_module 'setwidth';  local ltjw = luatexja.setwidth
+luatexja.load_module 'lotf_aux';  local ltju = luatexja.lotf_aux
 local pairs = pairs
 
 --local to_node = node.direct.tonode
@@ -51,25 +51,25 @@ local node_tail = node.direct.tail
 local node_free = node.direct.free
 local node_remove = node.direct.remove
 
-local id_glyph = node.id('glyph')
-local id_hlist = node.id('hlist')
-local id_vlist = node.id('vlist')
-local id_rule = node.id('rule')
-local id_ins = node.id('ins')
-local id_mark = node.id('mark')
-local id_adjust = node.id('adjust')
-local id_disc = node.id('disc')
-local id_whatsit = node.id('whatsit')
-local id_math = node.id('math')
-local id_glue = node.id('glue')
-local id_kern = node.id('kern')
-local id_penalty = node.id('penalty')
+local id_glyph = node.id 'glyph'
+local id_hlist = node.id 'hlist'
+local id_vlist = node.id 'vlist'
+local id_rule  = node.id 'rule'
+local id_ins   = node.id 'ins'
+local id_mark  = node.id 'mark'
+local id_adjust = node.id 'adjust'
+local id_disc  = node.id 'disc'
+local id_whatsit = node.id 'whatsit'
+local id_math  = node.id 'math'
+local id_glue  = node.id 'glue'
+local id_kern  = node.id 'kern'
+local id_penalty = node.id 'penalty'
 
 local id_jglyph    = 512 -- Japanese character
 local id_box_like  = 256 -- vbox, shifted hbox
 local id_pbox      = 257 -- already processed nodes (by \unhbox)
 local id_pbox_w    = 258 -- cluster which consists of a whatsit
-local sid_user = node.subtype('user_defined')
+local sid_user = node.subtype 'user_defined'
 
 local ITALIC       = luatexja.icflag_table.ITALIC
 local PACKED       = luatexja.icflag_table.PACKED
@@ -112,9 +112,9 @@ do
    slow_find_char_class = function (c, m, oc)
       local cls = ltjf_find_char_class(oc, m)
       if oc~=c and c and cls==0 then
-	 return ltjf_find_char_class(c, m)
+         return ltjf_find_char_class(c, m)
       else
-	 return cls
+         return cls
       end
    end
 end
@@ -140,7 +140,7 @@ function add_penalty(p,e)
          pp = pp + e
          if pp>=10000 then      setpenalty(p, 10000)
          elseif pp<=-10000 then setpenalty(p, -10000)
-	 else                   setpenalty(p, pp) end
+         else                   setpenalty(p, pp) end
       end
    end
 end
@@ -177,59 +177,51 @@ local function check_box(box_ptr, box_end)
    while p and p~=box_end do
       local pid = getid(p)
       if pid==id_kern and getsubtype(p)==2 then
-	 p = node_next(node_next(node_next(p))); pid = getid(p) -- p must be glyph_node
+         p = node_next(node_next(node_next(p))); pid = getid(p) -- p must be glyph_node
        end
       if pid==id_glyph then
-	 repeat
-	    if find_first_char then
-	       first_char = p; find_first_char = false
-	    end
-	    last_char = p; found_visible_node = true; p=node_next(p)
-	    if (not p) or p==box_end then
-               return found_visible_node
-            end
-	 until getid(p)~=id_glyph
-	 pid = getid(p) -- p must be non-nil
+         repeat
+            if find_first_char then first_char = p; find_first_char = false end
+            last_char = p; found_visible_node = true; p=node_next(p)
+            if (not p) or p==box_end then return found_visible_node end
+         until getid(p)~=id_glyph
+         pid = getid(p) -- p must be non-nil
       end
       if pid==id_kern then
-	 local pa = get_attr_icflag(p)
-	 if pa==IC_PROCESSED then
-	    -- do nothing
-	 elseif getsubtype(p)==2 then
-	    p = node_next(node_next(p));
-	    -- Note that another node_next will be executed outside this if-statement.
-	 else
-	    found_visible_node = true
-	    find_first_char = false; last_char = nil
-	 end
+         local pa = get_attr_icflag(p)
+         if pa==IC_PROCESSED then
+            -- do nothing
+         elseif getsubtype(p)==2 then
+            p = node_next(node_next(p));
+            -- Note that another node_next will be executed outside this if-statement.
+         else
+            found_visible_node = true
+            find_first_char = false; last_char = nil
+         end
       elseif pid==id_hlist then
-	 if PACKED == get_attr_icflag(p) then
-	    local s = ltjd_glyph_from_packed(p)
-	    if find_first_char then
-	       first_char = s; find_first_char = false
-	    end
-	    last_char = s; found_visible_node = true
-	 else
-	    if getfield(p, 'shift')==0 then
-	       last_char = nil
-	       if check_box(getlist(p), nil) then found_visible_node = true end
-	       find_first_char = false
-	    else
-	       find_first_char = false; last_char = nil
-	    end
-	 end
+         if PACKED == get_attr_icflag(p) then
+            local s = ltjd_glyph_from_packed(p)
+            if find_first_char then first_char = s; find_first_char = false end
+            last_char = s; found_visible_node = true
+         else
+            if getfield(p, 'shift')==0 then
+               last_char = nil
+               if check_box(getlist(p), nil) then found_visible_node = true end
+               find_first_char = false
+            else
+               find_first_char = false; last_char = nil
+            end
+         end
       elseif pid==id_math then
-	 if find_first_char then
-	    first_char = p; find_first_char = false
-	 end
-	 last_char = p; found_visible_node = true
+         if find_first_char then first_char = p; find_first_char = false end
+         last_char = p; found_visible_node = true
       elseif pid==id_rule and get_attr_icflag(p)==PACKED then
-	 -- do nothing
+         -- do nothing
       elseif not (pid==id_ins   or pid==id_mark
-		  or pid==id_adjust or pid==id_whatsit
-		  or pid==id_penalty) then
-	 found_visible_node = true
-	 find_first_char = false; last_char = nil
+                  or pid==id_adjust or pid==id_whatsit
+                  or pid==id_penalty) then
+         found_visible_node = true
+         find_first_char = false; last_char = nil
       end
       p = node_next(p)
    end
@@ -242,13 +234,13 @@ check_box_high = function (Nx, box_ptr, box_end)
       local first_char = first_char
       if first_char then
          if getid(first_char)==id_glyph then
-	    if if_lang_ja(first_char) then
-	       set_np_xspc_jachar_hbox(Nx, first_char)
-	    else
-	       set_np_xspc_alchar(Nx, getchar(first_char),first_char, 1)
-	    end
-	 else -- math_node
-	    set_np_xspc_alchar(Nx, -1,first_char)
+            if if_lang_ja(first_char) then
+               set_np_xspc_jachar_hbox(Nx, first_char)
+            else
+               set_np_xspc_alchar(Nx, getchar(first_char),first_char, 1)
+            end
+         else -- math_node
+            set_np_xspc_alchar(Nx, -1,first_char)
          end
       end
    end
@@ -258,14 +250,14 @@ end
 -------------------- Np の計算と情報取得
 
 luatexbase.create_callback("luatexja.jfmglue.whatsit_getinfo", "data",
-			   function (Np, lp, Nq)
-			      if Np.nuc then return Np
-			      else
-				 return Np  -- your code
-			      end
-			   end)
+                           function (Np, lp, Nq)
+                              if Np.nuc then return Np
+                              else
+                                 return Np  -- your code
+                              end
+                           end)
 luatexbase.create_callback("luatexja.jfmglue.whatsit_after", "data",
-			   function (stat, Nq, Np) return false end)
+                           function (stat, Nq, Np) return false end)
 
 -- calc next Np
 local calc_np 
@@ -292,12 +284,12 @@ local function calc_np_pbox(lp, last)
       local lpi = getid(lp)
       if lpa==PACKED then
          if lpi==id_rule then lp = node_next(lp) end
-	 nc, lp = lp, node_next(lp)
+         nc, lp = lp, node_next(lp)
       elseif lpi==id_hlist or lpi==id_vlist then
-	 head, lp, nc = ltjd_make_dir_whatsit(head, lp, list_dir, 'jfm pbox')
-	 Np.first = first and nc or Np.first
+         head, lp, nc = ltjd_make_dir_whatsit(head, lp, list_dir, 'jfm pbox')
+         Np.first = first and nc or Np.first
       else
-	 nc, lp = lp, node_next(lp)
+         nc, lp = lp, node_next(lp)
       end
       first, lpa = false, (lp and has_attr(lp, attr_icflag) or 0)
      -- get_attr_icflag() ではいけない！
@@ -317,13 +309,13 @@ do -- 002 ---------------------------------------
    local font_getfont = font.getfont
    local function calc_np_notdef(lp)
       if not font_getfont(getfont(lp)).characters[getchar(lp)] then
-	 local ln = node_next(lp)
-	 if ltju.specified_feature(getfont(lp), 'notdef') and ln and getid(ln)==id_glyph then 
-	    set_attr(lp, attr_icflag, PROCESSED)
-	    set_attr(ln, attr_jchar_code, has_attr(lp, attr_jchar_code) or getchar(lp))
-	    set_attr(ln, attr_jchar_class, has_attr(lp, attr_jchar_class) or 0)
-	    Np.nuc, lp = ln, ln
-	 end
+         local ln = node_next(lp)
+         if ltju.specified_feature(getfont(lp), 'notdef') and ln and getid(ln)==id_glyph then 
+            set_attr(lp, attr_icflag, PROCESSED)
+            set_attr(ln, attr_jchar_code, has_attr(lp, attr_jchar_code) or getchar(lp))
+            set_attr(ln, attr_jchar_class, has_attr(lp, attr_jchar_class) or 0)
+            Np.nuc, lp = ln, ln
+         end
       end
       return lp
    end 
@@ -351,73 +343,73 @@ function calc_np_aux_glyph_common(lp, acc_flag)
       setfield(lp, 'yoffset', getfield(lp, 'yoffset') - y_adjust)
       lp = node_next(lp)
       for lx in traverse(lp) do
-	 local lai = get_attr_icflag(lx)
-	 if lx==last or  lai>=PACKED then
-	    lp=lx; break
-	 else
-	    local lid = getid(lx)
-	    if lid==id_glyph and not if_lang_ja(lx) then
-	       -- 欧文文字
-	       last_glyph = lx; set_attr(lx, attr_icflag, PROCESSED); Np.last = lx
-	       y_adjust = has_attr(lx,attr_ablshift) or 0
-	       node_depth = max(getfield(lx, 'depth') + min(y_adjust, 0), node_depth)
-	       adj_depth = (y_adjust>0) and max(getfield(lx, 'depth') + y_adjust, adj_depth) or adj_depth
-	       setfield(lx, 'yoffset', getfield(lx, 'yoffset') - y_adjust)
-	    elseif lid==id_kern then
-	       local ls = getsubtype(lx)
-	       if ls==2 then -- アクセント用の kern
-		  set_attr(lx, attr_icflag, PROCESSED)
-		  lx = node_next(lx) -- lx: アクセント本体
-		  if getid(lx)==id_glyph then
-		     setfield(lx, 'yoffset', getfield(lx, 'yoffset') - (has_attr(lx,attr_ablshift) or 0))
-		  else -- アクセントは上下にシフトされている
-		     setfield(lx, 'shift', getfield(lx, 'shift') + (has_attr(lx,attr_ablshift) or 0))
-		  end
-		  lx = node_next(node_next(lx))
-	       elseif ls==0  then
-		  Np.last = lx
-	       elseif (ls==3) or (lai==ITALIC) then
-		  Np.last = lx; set_attr(lx, attr_icflag, IC_PROCESSED)
-	       else
-		  lp=lx; break
-	       end
-	    else
-	       lp=lx; break
-	    end
-	 end
+         local lai = get_attr_icflag(lx)
+         if lx==last or  lai>=PACKED then
+            lp=lx; break
+         else
+            local lid = getid(lx)
+            if lid==id_glyph and not if_lang_ja(lx) then
+               -- 欧文文字
+               last_glyph = lx; set_attr(lx, attr_icflag, PROCESSED); Np.last = lx
+               y_adjust = has_attr(lx,attr_ablshift) or 0
+               node_depth = max(getfield(lx, 'depth') + min(y_adjust, 0), node_depth)
+               adj_depth = (y_adjust>0) and max(getfield(lx, 'depth') + y_adjust, adj_depth) or adj_depth
+               setfield(lx, 'yoffset', getfield(lx, 'yoffset') - y_adjust)
+            elseif lid==id_kern then
+               local ls = getsubtype(lx)
+               if ls==2 then -- アクセント用の kern
+                  set_attr(lx, attr_icflag, PROCESSED)
+                  lx = node_next(lx) -- lx: アクセント本体
+                  if getid(lx)==id_glyph then
+                     setfield(lx, 'yoffset', getfield(lx, 'yoffset') - (has_attr(lx,attr_ablshift) or 0))
+                  else -- アクセントは上下にシフトされている
+                     setfield(lx, 'shift', getfield(lx, 'shift') + (has_attr(lx,attr_ablshift) or 0))
+                  end
+                  lx = node_next(node_next(lx))
+               elseif ls==0  then
+                  Np.last = lx
+               elseif (ls==3) or (lai==ITALIC) then
+                  Np.last = lx; set_attr(lx, attr_icflag, IC_PROCESSED)
+               else
+                  lp=lx; break
+               end
+            else
+               lp=lx; break
+            end
+         end
       end
       local r
       if adj_depth>node_depth then
-	    r = node_new(id_rule,3)
-	    setfield(r, 'width', 0); setfield(r, 'height', 0)
-	    setfield(r, 'depth',adj_depth); setfield(r, 'dir', tex_dir)
-	    set_attr(r, attr_icflag, PROCESSED)
+            r = node_new(id_rule,3)
+            setfield(r, 'width', 0); setfield(r, 'height', 0)
+            setfield(r, 'depth',adj_depth); setfield(r, 'dir', tex_dir)
+            set_attr(r, attr_icflag, PROCESSED)
       end
       if last_glyph then
-	 Np.last_char = last_glyph
-	 if r then insert_after(head, first_glyph, r) end
+         Np.last_char = last_glyph
+         if r then insert_after(head, first_glyph, r) end
       else
-	 local npn = Np.nuc
-	 Np.last_char = npn
-	 if r then
-	    local nf, nc = getfont(npn), getchar(npn)
-	    local ct = (font.getfont(nf) or font.fonts[nf] ).characters[nc]
-	    if not ct then -- variation selector
-	       node_free(r)
-	    elseif (ct.left_protruding or 0) == 0 then
-	       head = insert_before(head, npn, r)
-	       Np.first = acc_flag and Np.first or ((Np.first==npn) and r or npn)
-	    elseif (ct.right_protruding or 0) == 0 then
-	       insert_after(head, npn, r); Np.last, lp = r, r
-	    else
-	       ltjb.package_warning_no_line(
-		  'luatexja',
-		  'Check depth of glyph node ' .. tostring(npn) .. '(font=' .. nf
-		     .. ', char=' .. nc .. '),    because its \\lpcode is ' .. tostring(ct.left_protruding)
-		     .. ' and its \\rpcode is ' .. tostring(ct.right_protruding)
-	       ); node_free(r)
-	    end
-	 end
+         local npn = Np.nuc
+         Np.last_char = npn
+         if r then
+            local nf, nc = getfont(npn), getchar(npn)
+            local ct = (font.getfont(nf) or font.fonts[nf] ).characters[nc]
+            if not ct then -- variation selector
+               node_free(r)
+            elseif (ct.left_protruding or 0) == 0 then
+               head = insert_before(head, npn, r)
+               Np.first = acc_flag and Np.first or ((Np.first==npn) and r or npn)
+            elseif (ct.right_protruding or 0) == 0 then
+               insert_after(head, npn, r); Np.last, lp = r, r
+            else
+               ltjb.package_warning_no_line(
+                  'luatexja',
+                  'Check depth of glyph node ' .. tostring(npn) .. '(font=' .. nf
+                     .. ', char=' .. nc .. '),    because its \\lpcode is ' .. tostring(ct.left_protruding)
+                     .. ' and its \\rpcode is ' .. tostring(ct.right_protruding)
+               ); node_free(r)
+            end
+         end
       end
       return true, lp
    end
@@ -429,10 +421,10 @@ local ltjw_apply_ashift_math = ltjw.apply_ashift_math
 local ltjw_apply_ashift_disc = ltjw.apply_ashift_disc
 local node_end_of_math = node.direct.end_of_math
 local dir_tate = luatexja.dir_table.dir_tate
-local sid_start_link = node.subtype('pdf_start_link')
-local sid_start_thread = node.subtype('pdf_start_thread')
-local sid_end_link = node.subtype('pdf_end_link')
-local sid_end_thread = node.subtype('pdf_end_thread')
+local sid_start_link   = node.subtype 'pdf_start_link'
+local sid_start_thread = node.subtype 'pdf_start_thread'
+local sid_end_link     = node.subtype 'pdf_end_link'
+local sid_end_thread   = node.subtype 'pdf_end_thread'
 calc_np_auxtable = {
    [id_glyph] = calc_np_aux_glyph_common,
    [id_hlist] = function(lp)
@@ -441,10 +433,10 @@ calc_np_auxtable = {
       set_attr(op, attr_icflag, PROCESSED)
       Np.first = Np.first or op; Np.last = op; Np.nuc = op;
       if (flag or getfield(op, 'shift')~=0) then
-	 Np.id = id_box_like
+         Np.id = id_box_like
       else
-	 Np.id = id_hlist
-	 Np.last_char = check_box_high(Np, getlist(op), nil)
+         Np.id = id_hlist
+         Np.last_char = check_box_high(Np, getlist(op), nil)
       end
       return true, lp
    end,
@@ -463,34 +455,34 @@ calc_np_auxtable = {
    [id_whatsit] = function(lp)
       local lps = getsubtype(lp)
       if lps==sid_user then
-	 if getfield(lp, 'user_id')==luatexja.userid_table.IHB then
-	    local lq = node_next(lp);
-	    head = node_remove(head, lp); node_free(lp); non_ihb_flag = false
-	    return false, lq;
-	 elseif getfield(lp, 'user_id')==luatexja.userid_table.JA_AL_BDD then
-	    local lq = node_next(lp);
-	    head = node_remove(head, lp); node_free(lp)
-	    return false, lq;
-	 else
-	    set_attr(lp, attr_icflag, PROCESSED)
-	    luatexbase.call_callback("luatexja.jfmglue.whatsit_getinfo",
-				     Np, lp, Nq)
-	    if Np.nuc then
-	       Np.id = id_pbox_w; Np.first = Np.nuc; Np.last = Np.nuc;
-	       return true, node_next(lp)
-	    else
-	       return false, node_next(lp)
-	    end
-	 end
+         if getfield(lp, 'user_id')==luatexja.userid_table.IHB then
+            local lq = node_next(lp);
+            head = node_remove(head, lp); node_free(lp); non_ihb_flag = false
+            return false, lq;
+         elseif getfield(lp, 'user_id')==luatexja.userid_table.JA_AL_BDD then
+            local lq = node_next(lp);
+            head = node_remove(head, lp); node_free(lp)
+            return false, lq;
+         else
+            set_attr(lp, attr_icflag, PROCESSED)
+            luatexbase.call_callback("luatexja.jfmglue.whatsit_getinfo",
+                                     Np, lp, Nq)
+            if Np.nuc then
+               Np.id = id_pbox_w; Np.first = Np.nuc; Np.last = Np.nuc;
+               return true, node_next(lp)
+            else
+               return false, node_next(lp)
+            end
+         end
       else
-	 -- we do special treatment for these whatsit nodes.
-	 if lps == sid_start_link or lps == sid_start_thread then
-	    Np.first = lp
-	 elseif lps == sid_end_link or lps == sid_end_thread then
-	    Np.first, Nq.last = nil, lp;
-	 end
-	 set_attr(lp, attr_icflag, PROCESSED)
-	 return false, node_next(lp)
+         -- we do special treatment for these whatsit nodes.
+         if lps == sid_start_link or lps == sid_start_thread then
+            Np.first = lp
+         elseif lps == sid_end_link or lps == sid_end_thread then
+            Np.first, Nq.last = nil, lp;
+         end
+         set_attr(lp, attr_icflag, PROCESSED)
+         return false, node_next(lp)
       end
    end,
    [id_math] = function(lp)
@@ -517,21 +509,21 @@ calc_np_auxtable = {
    end,
    [id_kern] = function(lp)
       if getsubtype(lp)==2 then
-	 Np.first = Np.first or lp
-	 set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
-	 if getid(lp)==id_glyph then -- アクセント本体
-	    setfield(lp, 'yoffset', getfield(lp, 'yoffset') - (has_attr(lp,attr_ablshift) or 0))
-	 else -- アクセントは上下にシフトされている
-	    setfield(lp, 'shift', getfield(lp, 'shift') + (has_attr(lp,attr_ablshift) or 0))
-	 end
-	 set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
-	 set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
-	 set_attr(lp, attr_icflag, PROCESSED);
-	 return calc_np_aux_glyph_common(lp, true)
+         Np.first = Np.first or lp
+         set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
+         if getid(lp)==id_glyph then -- アクセント本体
+            setfield(lp, 'yoffset', getfield(lp, 'yoffset') - (has_attr(lp,attr_ablshift) or 0))
+         else -- アクセントは上下にシフトされている
+            setfield(lp, 'shift', getfield(lp, 'shift') + (has_attr(lp,attr_ablshift) or 0))
+         end
+         set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
+         set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
+         set_attr(lp, attr_icflag, PROCESSED);
+         return calc_np_aux_glyph_common(lp, true)
       else
-	 Np.first = Np.first or lp
-	 Np.id = id_kern; set_attr(lp, attr_icflag, PROCESSED)
-	 Np.last = lp; return true, node_next(lp)
+         Np.first = Np.first or lp
+         Np.id = id_kern; set_attr(lp, attr_icflag, PROCESSED)
+         Np.last = lp; return true, node_next(lp)
       end
    end,
    [id_penalty] = function(lp)
@@ -567,14 +559,14 @@ function calc_np(last, lp)
       -- unbox 由来ノードの検出
       if lpa>=PACKED then
          if lpa%PROCESSED_BEGIN_FLAG == BOXBDD then
-	    local lq = node_next(lp)
+            local lq = node_next(lp)
             head = node_remove(head, lp); node_free(lp); lp = lq
          else
-	    return calc_np_pbox(lp, last)
+            return calc_np_pbox(lp, last)
          end -- id_pbox
       else
-	 k, lp = (calc_np_auxtable[getid(lp)] or calc_np_aux_skip)(lp)
-	 if k then return lp end
+         k, lp = (calc_np_auxtable[getid(lp)] or calc_np_aux_skip)(lp)
+         if k then return lp end
       end
    end
    Np=nil
@@ -634,44 +626,42 @@ do
    local nullfunc = function(n) return n end
    function set_np_xspc_alchar(Nx, c,x, lig)
       if c~=-1 then
-	 local f = (lig ==1) and nullfunc or node_tail
+         local f = (lig ==1) and nullfunc or node_tail
          local xc, xs = getcomponents(x), getsubtype(x)
-	 while xc and xs and xs%4>=2 do
-	    x = f(xc);
-	    if getid(x)==id_disc then x, xc, xs = nil, getfield(x,'replace'), 2
-	    else xc, xs = getcomponents(x), getsubtype(x) end
-	 end
-	 c = x and getchar(x) or c
-	 Nx.pre  = table_current_stack[PRE + c]  or 0
-	 Nx.post = table_current_stack[POST + c] or 0
+         while xc and xs and xs%4>=2 do
+            x = f(xc);
+            if getid(x)==id_disc then x, xc, xs = nil, getfield(x,'replace'), 2
+            else xc, xs = getcomponents(x), getsubtype(x) end
+         end
+         c = x and getchar(x) or c
+         Nx.pre  = table_current_stack[PRE + c]  or 0
+         Nx.post = table_current_stack[POST + c] or 0
       else
-	 Nx.pre, Nx.post = 0, 0
+         Nx.pre, Nx.post = 0, 0
       end
       Nx.met = nil
       Nx.xspc = table_current_stack[XSP  + c] or 3
       Nx.auto_xspc = (has_attr(x, attr_autoxspc)==1)
    end
    local set_np_xspc_alchar = set_np_xspc_alchar
-
    -- change the information for the next loop
    -- (will be done if Nx is an alphabetic character or a hlist)
    after_hlist = function (Nx)
       local s = Nx.last_char
       if s then
-	 if getid(s)==id_glyph then
-	    if if_lang_ja(s) then
-	       set_np_xspc_jachar_hbox(Nx, s)
-	    else
-	       set_np_xspc_alchar(Nx, getchar(s), s, 2)
-	    end
-	 else
-	    set_np_xspc_alchar(Nx, -1, s)
-	 end
+         if getid(s)==id_glyph then
+            if if_lang_ja(s) then
+               set_np_xspc_jachar_hbox(Nx, s)
+            else
+               set_np_xspc_alchar(Nx, getchar(s), s, 2)
+            end
+         else
+            set_np_xspc_alchar(Nx, -1, s)
+         end
       else
-	 Nx.pre, Nx.met = nil, nil
+         Nx.pre, Nx.met = nil, nil
       end
    end
-
    after_alchar = function (Nx)
       local x = Nx.last_char
       return set_np_xspc_alchar(Nx, getchar(x), x, 2)
@@ -689,12 +679,10 @@ local function handle_penalty_normal(post, pre, g)
    local a = (pre or 0) + (post or 0)
    if #Bp == 0 then
       if (a~=0 and not(g and getid(g)==id_kern)) then
-	 local p = node_new(id_penalty)
-	 if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
-	 setfield(p, 'penalty', a)
-	 head = insert_before(head, Np.first, p)
-	 Bp[1]=p;
-	 set_attr(p, attr_icflag, KINSOKU)
+         local p = node_new(id_penalty)
+         if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
+         setfield(p, 'penalty', a); head = insert_before(head, Np.first, p)
+         Bp[1]=p; set_attr(p, attr_icflag, KINSOKU)
       end
    else for _, v in pairs(Bp) do add_penalty(v,a) end
    end
@@ -705,12 +693,10 @@ local function handle_penalty_always(post, pre, g)
    local a = (pre or 0) + (post or 0)
    if #Bp == 0 then
       if not (g and getid(g)==id_glue) or a~=0 then
-	 local p = node_new(id_penalty)
-	 if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
-	 setfield(p, 'penalty', a)
-	 head = insert_before(head, Np.first, p)
-	 Bp[1]=p
-         set_attr(p, attr_icflag, KINSOKU)
+         local p = node_new(id_penalty)
+         if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
+         setfield(p, 'penalty', a); head = insert_before(head, Np.first, p)
+         Bp[1]=p; set_attr(p, attr_icflag, KINSOKU)
       end
    else for _, v in pairs(Bp) do add_penalty(v,a) end
    end
@@ -720,10 +706,9 @@ local function handle_penalty_suppress(post, pre, g)
    luatexbase.call_callback('luatexja.adjust_jfmglue', head, Nq, Np, Bp)
    if #Bp == 0 then
       if g and getid(g)==id_glue then
-	 local p = node_new(id_penalty)
-	 setfield(p, 'penalty', 10000); head = insert_before(head, Np.first, p)
-	 Bp[1]=p
-         set_attr(p, attr_icflag, KINSOKU)
+         local p = node_new(id_penalty)
+         setfield(p, 'penalty', 10000); head = insert_before(head, Np.first, p)
+         Bp[1]=p; set_attr(p, attr_icflag, KINSOKU)
       end
    else 
       local a = (pre or 0) + (post or 0)
@@ -735,12 +720,10 @@ local function handle_penalty_jwp()
    local a = table_current_stack[luatexja.stack_table_index.JWP]
    if #widow_Bp == 0 then
       if a~=0 then
-	 local p = node_new(id_penalty)
-	 if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
-	 setfield(p, 'penalty', a)
-	 head = insert_before(head, widow_Np.first, p)
-	 widow_Bp[1]=p;
-	 set_attr(p, attr_icflag, KINSOKU)
+         local p = node_new(id_penalty)
+         if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
+         setfield(p, 'penalty', a); head = insert_before(head, widow_Np.first, p)
+         widow_Bp[1]=p; set_attr(p, attr_icflag, KINSOKU)
       end
    else for _, v in pairs(widow_Bp) do add_penalty(v,a) end
    end
@@ -752,12 +735,12 @@ local function new_jfm_glue(mc, bc, ac)
    local g = mc[bc][ac]
    if g then
        if g[1] then
-	   return node_copy(g[1]), g.ratio, false, false, false
+           return node_copy(g[1]), g.ratio, false, false, false
        else
-	 local f = node_new(id_glue)
+         local f = node_new(id_glue)
          set_attr(f, attr_icflag, g.priority)
-	 setglue(f, g.width, g.stretch, g.shrink)
-	 return f, g.ratio, g.kanjiskip_natural, g.kanjiskip_stretch, g.kanjiskip_shrink
+         setglue(f, g.width, g.stretch, g.shrink)
+         return f, g.ratio, g.kanjiskip_natural, g.kanjiskip_stretch, g.kanjiskip_shrink
       end
    end
    return false, 0
@@ -798,36 +781,36 @@ do
    calc_ja_ja_aux = function (gb, ga, db, da)
       if luatexja.jfmglue.diffmet_rule ~= math.two_pleft and diffmet_rule ~= math.two_pright
           and luatexja.jfmglue.diffmet_rule ~= math.two_paverage then
-	 db, da = 0, 1
+         db, da = 0, 1
       end
       if not gb then
-	 if ga then gb = node_new(id_kern, 1); setfield(gb, 'kern', 0)
-	 else return nil end
+         if ga then gb = node_new(id_kern, 1); setfield(gb, 'kern', 0)
+         else return nil end
       elseif not ga then
-	 ga = node_new(id_kern, 1); setfield(ga, 'kern', 0)
+         ga = node_new(id_kern, 1); setfield(ga, 'kern', 0)
       end
       local gbw, gaw, gbst, gast, gbsto, gasto, gbsh, gash, gbsho, gasho
       if getid(gb)==id_glue then
          gbw, gbst, gbsh, gbsto, gbsho = getglue(gb)
       else
-	 gbw = getfield(gb, 'kern')
+         gbw = getfield(gb, 'kern')
       end
       if getid(ga)==id_glue then
          gaw, gast, gash, gasto, gasho = getglue(ga)
       else
-	 gaw = getfield(ga, 'kern')
+         gaw = getfield(ga, 'kern')
       end
       if not (gbst or gast) then -- 両方とも kern
-	 setfield(gb, 'kern', blend_diffmet(gbw, gaw, db, da))
-	 node_free(ga); return gb
+         setfield(gb, 'kern', blend_diffmet(gbw, gaw, db, da))
+         node_free(ga); return gb
       else
          local gr = gb
          if not gbst then gr = ga; node_free(gb) else node_free(ga) end
          gbw = blend_diffmet(gbw or 0, gaw or 0, db, da) -- 結果の自然長
          gbst, gbsto = blend_diffmet_inf(gbst, gast, gbsto, gasto, db, da) -- 伸び
          gbsh, gbsho = blend_diffmet_inf(-(gbsh or 0), -(gash or 0), gbsho, gasho, db, da) -- -(縮み)
-	 setglue(gr, gbw, gbst, -gbsh, gbsto, gbsho)
-	 return gr
+         setglue(gr, gbw, gbst, -gbsh, gbsto, gbsho)
+         return gr
       end
    end
 end
@@ -846,51 +829,50 @@ do
    --               ノード kanji_skip のコピーで良い場合は nil が帰る
    -- flag = true: JFM グルーに付随する kanjiskip 自然長/伸び/縮み分
       if qm.with_kanjiskip and (bn or bp or bh) then
-	 if kanjiskip_jfm_flag then
-	    local g = node_new(id_glue);
-	    local bk = qm.kanjiskip or null_skip_table
-	    setglue(g, bn and (bn*bk[1]) or 0, 
-	               bp and (bp*bk[2]) or 0, 
-	               bh and (bh*bk[3]) or 0, 0, 0)
-	    set_attr(g, attr_icflag, KANJI_SKIP_JFM)
-	    return g
-	 elseif flag then
-	    local g = node_new(id_glue)
+         if kanjiskip_jfm_flag then
+            local g = node_new(id_glue);
+            local bk = qm.kanjiskip or null_skip_table
+            setglue(g, bn and (bn*bk[1]) or 0, 
+                       bp and (bp*bk[2]) or 0, 
+                       bh and (bh*bk[3]) or 0, 0, 0)
+            set_attr(g, attr_icflag, KANJI_SKIP_JFM)
+            return g
+         elseif flag then
+            local g = node_new(id_glue)
             local st = bp and (bp*getfield(kanji_skip, 'stretch')) or 0
             local sh = bh and (bh*getfield(kanji_skip, 'shrink')) or 0
-	    setglue(g,
-	       bn and (bn*getfield(kanji_skip, 'width')) or 0,
-	       st, sh, 
-	       (st==0) and 0 or getfield(kanji_skip, 'stretch_order'),
-	       (sh==0) and 0 or getfield(kanji_skip, 'shrink_order'))
-	    set_attr(g, attr_icflag, KANJI_SKIP_JFM)
-	    return g
-	 end
+            setglue(g,
+               bn and (bn*getfield(kanji_skip, 'width')) or 0,
+               st, sh, 
+               (st==0) and 0 or getfield(kanji_skip, 'stretch_order'),
+               (sh==0) and 0 or getfield(kanji_skip, 'shrink_order'))
+            set_attr(g, attr_icflag, KANJI_SKIP_JFM)
+            return g
+         end
       end
    end
    
    get_kanjiskip = function()
-      if Np.auto_kspc==0 or Nq.auto_kspc==0 then
-        return nil 
+      if Np.auto_kspc==0 or Nq.auto_kspc==0 then return nil 
       elseif Np.auto_kspc or Nq.auto_kspc then
-	 local pm, qm = Np.met, Nq.met
-	 if (pm.char_type==qm.char_type) and (qm.var==pm.var) then
-	     return get_kanjiskip_low(false, qm, 1, 1, 1) or node_copy(kanji_skip)
-	 else
-	    local gb = get_kanjiskip_low(false, qm, 1, 1, 1)
-	    if gb then
-	        return calc_ja_ja_aux(gb, 
-		  get_kanjiskip_low(false, pm, 1, 1, 1) or node_copy(kanji_skip), 0, 1) 
-	    else
-	        local ga = get_kanjiskip_low(false, pm, 1, 1, 1)
-	        return (ga and calc_ja_ja_aux(node_copy(kanji_skip), ga, 0, 1))
-                       or node_copy(kanji_skip)
-	    end
-	 end
+         local pm, qm = Np.met, Nq.met
+         if (pm.char_type==qm.char_type) and (qm.var==pm.var) then
+             return get_kanjiskip_low(false, qm, 1, 1, 1) or node_copy(kanji_skip)
+         else
+            local gb = get_kanjiskip_low(false, qm, 1, 1, 1)
+            if gb then
+               return calc_ja_ja_aux(gb, 
+                 get_kanjiskip_low(false, pm, 1, 1, 1) or node_copy(kanji_skip), 0, 1) 
+            else
+               local ga = get_kanjiskip_low(false, pm, 1, 1, 1)
+               return (ga and calc_ja_ja_aux(node_copy(kanji_skip), ga, 0, 1))
+                 or node_copy(kanji_skip)
+            end
+         end
       else   
-	 local g = node_new(id_glue)
-	 set_attr(g, attr_icflag, kanjiskip_jfm_flag and KANJI_SKIP_JFM or KANJI_SKIP)
-	 return g
+         local g = node_new(id_glue)
+         set_attr(g, attr_icflag, kanjiskip_jfm_flag and KANJI_SKIP_JFM or KANJI_SKIP)
+         return g
       end
    end
 
@@ -898,27 +880,25 @@ do
       local qm, pm = Nq.met, Np.met
       local qmc, pmc = qm.char_type, pm.char_type
       if (qmc==pmc) and (qm.var==pm.var) then
-	 local g, _, kn, kp, kh = new_jfm_glue(qmc, Nq.class, Np.class)
-	 return g, (Np.auto_kspc or Nq.auto_kspc) and get_kanjiskip_low(true, qm, kn, kp, kh)
+         local g, _, kn, kp, kh = new_jfm_glue(qmc, Nq.class, Np.class)
+         return g, (Np.auto_kspc or Nq.auto_kspc) and get_kanjiskip_low(true, qm, kn, kp, kh)
       else
-	 local npn, nqn = Np.nuc, Nq.nuc
-	 local gb, db, bn, bp, bh 
-	    = new_jfm_glue(qmc, Nq.class,
-			   slow_find_char_class(Np.char,
-						qm, getchar(npn)))
-	 local ga, da, an, ap, ah 
-	    = new_jfm_glue(pmc,
-			   slow_find_char_class(Nq.char,
-						pm, getchar(nqn)),
-						 Np.class)
-	 local g = calc_ja_ja_aux(gb, ga, db, da)
-	 local k
-	 --if (pmc==qmc) and (qm.var==pm.var) then
+         local npn, nqn = Np.nuc, Nq.nuc
+         local gb, db, bn, bp, bh 
+            = new_jfm_glue(qmc, Nq.class,
+                           slow_find_char_class(Np.char,
+                                                qm, getchar(npn)))
+         local ga, da, an, ap, ah 
+            = new_jfm_glue(pmc,
+                           slow_find_char_class(Nq.char,
+                                                pm, getchar(nqn)),
+                           Np.class)
+         local g = calc_ja_ja_aux(gb, ga, db, da)
+         local k
          gb = get_kanjiskip_low(true, qm, bn, bp, bh)
-	 ga = get_kanjiskip_low(true, pm, an, ap, ah)
-	 k = calc_ja_ja_aux(gb, ga, db, da)
-	 --end
-	 return g, k
+         ga = get_kanjiskip_low(true, pm, an, ap, ah)
+         k = calc_ja_ja_aux(gb, ga, db, da)
+         return g, k
       end
    end
 end
@@ -935,27 +915,27 @@ do
 
    get_xkanjiskip_low = function(flag, qm, bn, bp, bh)
       if flag or (qm.with_kanjiskip and (bn or bp or bh)) then
-	 if xkanjiskip_jfm_flag then
-	    local g = node_new(id_glue);
-	    local bk = qm.xkanjiskip or null_skip_table
-	    setglue(g, bn and bk[1] or 0,
-	               bp and bk[2] or 0,
-		       bh and bk[3] or 0, 0, 0)
-	    set_attr(g, attr_icflag, XKANJI_SKIP_JFM)
-	    return g
-	 elseif flag then
-	    return node_copy(xkanji_skip)
-	 else
-	    local g = node_new(id_glue);
-	    setglue(g,
-	       bn and (bn*getfield(xkanji_skip, 'width')) or 0,
-	       bp and (bp*getfield(xkanji_skip, 'stretch')) or 0,
-	       bh and (bh*getfield(xkanji_skip, 'shrink')) or 0,
-	       bp and getfield(xkanji_skip, 'stretch_order') or 0,
-	       bh and getfield(xkanji_skip, 'shrink_order') or 0)
-	    set_attr(g, attr_icflag, XKANJI_SKIP_JFM)
-	    return g
-	 end
+         if xkanjiskip_jfm_flag then
+            local g = node_new(id_glue);
+            local bk = qm.xkanjiskip or null_skip_table
+            setglue(g, bn and bk[1] or 0,
+                       bp and bk[2] or 0,
+                       bh and bk[3] or 0, 0, 0)
+            set_attr(g, attr_icflag, XKANJI_SKIP_JFM)
+            return g
+         elseif flag then
+            return node_copy(xkanji_skip)
+         else
+            local g = node_new(id_glue);
+            setglue(g,
+               bn and (bn*getfield(xkanji_skip, 'width')) or 0,
+               bp and (bp*getfield(xkanji_skip, 'stretch')) or 0,
+               bh and (bh*getfield(xkanji_skip, 'shrink')) or 0,
+               bp and getfield(xkanji_skip, 'stretch_order') or 0,
+               bh and getfield(xkanji_skip, 'shrink_order') or 0)
+            set_attr(g, attr_icflag, XKANJI_SKIP_JFM)
+            return g
+         end
       end
    end
    
@@ -963,11 +943,11 @@ do
       if Np.auto_xspc==0 or Nq.auto_xspc==0 then
         return nil 
       elseif (Nq.xspc>=2) and (Np.xspc%2==1) and (Nq.auto_xspc or Np.auto_xspc) then
-	 return get_xkanjiskip_low(true, Nn.met, 1, 1, 1)
+         return get_xkanjiskip_low(true, Nn.met, 1, 1, 1)
       else
-	 local g = node_new(id_glue)
-	 set_attr(g, attr_icflag, xkanjiskip_jfm_flag and XKANJI_SKIP_JFM or XKANJI_SKIP)
-	 return g
+         local g = node_new(id_glue)
+         set_attr(g, attr_icflag, xkanjiskip_jfm_flag and XKANJI_SKIP_JFM or XKANJI_SKIP)
+         return g
       end
    end
 end
@@ -986,7 +966,7 @@ local function get_NA_skip()
       fast_find_char_class(
         (Nq.id == id_math and -1 or (Nq.xspc>=2 and 'alchar' or 'nox_alchar')), pm), 
       Np.class)
-   local k = ((Nq.xspc>=2) and (Np.xspc%2==1) and combine_spc('auto_xspc'))
+   local k = ((Nq.xspc>=2) and (Np.xspc%2==1) and combine_spc 'auto_xspc')
        and get_xkanjiskip_low(false, pm, kn, kp, kh)
    return g, k
 end
@@ -997,12 +977,12 @@ local function get_NB_skip()
       fast_find_char_class(
         (Np.id == id_math and -1 or (Np.xspc%2==1 and 'alchar' or 'nox_alchar')), qm)
     )
-   local k = ((Nq.xspc>=2) and (Np.xspc%2==1) and combine_spc('auto_xspc'))
-	 and get_xkanjiskip_low(false, qm, kn, kp, kh)
+   local k = ((Nq.xspc>=2) and (Np.xspc%2==1) and combine_spc 'auto_xspc')
+         and get_xkanjiskip_low(false, qm, kn, kp, kh)
    return g, k
 end
 
-local function get_OA_skip(is_kanji)
+local function get_OA_skip(insert_ksp)
    local pm = Np.met
    local g, _, kn, kp, kh = new_jfm_glue(
       pm.char_type,
@@ -1010,20 +990,20 @@ local function get_OA_skip(is_kanji)
         (((Nq.id==id_glue)or(Nq.id==id_kern)) and 'glue' or 'jcharbdd'), pm), 
       Np.class)
    local k
-   if is_kanji==0 then
-      k = combine_spc('auto_kspc') and get_kanjiskip_low(true, pm, kn, kp, kh)
+   if insert_ksp then
+      k = (combine_spc 'auto_kspc') and get_kanjiskip_low(true, pm, kn, kp, kh)
    end
    return g, k
 end
-local function get_OB_skip(is_kanji)
+local function get_OB_skip(insert_ksp)
    local qm = Nq.met
    local g, _, kn, kp, kh = new_jfm_glue(
       qm.char_type, Nq.class,
       fast_find_char_class(
         (((Np.id==id_glue)or(Np.id==id_kern)) and 'glue' or 'jcharbdd'), qm))
    local k
-   if is_kanji==0 then
-      k = combine_spc('auto_kspc') and get_kanjiskip_low(true, qm, kn, kp, kh)
+   if insert_ksp then
+      k = (combine_spc 'auto_kspc') and get_kanjiskip_low(true, qm, kn, kp, kh)
    end
    return g, k
 end
@@ -1039,7 +1019,7 @@ local function handle_np_jachar(mode)
       real_insert(g); real_insert(k)
    elseif Nq.met then  -- qid==id_hlist
       local g, k
-      if non_ihb_flag then g, k = get_OA_skip(0) end -- O_A->K
+      if non_ihb_flag then g, k = get_OA_skip(true) end -- O_A->K
       if not g then g = get_kanjiskip() end
       handle_penalty_normal(0, Np.pre, g); real_insert(g); real_insert(k)
    elseif Nq.pre then
@@ -1081,7 +1061,7 @@ end
 local function handle_np_ja_hlist()
    local qid = Nq.id
    if qid==id_jglyph or ((qid==id_pbox or qid == id_pbox_w) and Nq.met) then
-      local g = non_ihb_flag and get_OB_skip(0) or get_kanjiskip() -- O_B->K
+      local g = non_ihb_flag and get_OB_skip(true) or get_kanjiskip() -- O_B->K
       handle_penalty_normal(Nq.post, 0, g); real_insert(g)
    elseif Nq.met then  -- Nq.id==id_hlist
       local g = get_kanjiskip() -- K
@@ -1110,12 +1090,12 @@ do
       [id_pbox]  = function() after_hlist(Nq) end,
       [id_disc]  = function() after_hlist(Nq) end,
       [id_pbox_w]  = function()
-			luatexbase.call_callback("luatexja.jfmglue.whatsit_after",
-						 false, Nq, Np)
-		     end,
+                        luatexbase.call_callback("luatexja.jfmglue.whatsit_after",
+                                                 false, Nq, Np)
+                     end,
    }
 
-   adjust_nq=function()
+   adjust_nq = function()
       local x = adjust_nq_aux[Nq.id]
       if x then x()  end
    end
@@ -1133,15 +1113,15 @@ local function handle_list_tail(mode, last)
       -- Insert \jcharwidowpenalty
       if widow_Np.first then handle_penalty_jwp() end
    else
-      Np=Nq	  
+      Np = Nq          
       -- the current list is the contents of a hbox
       local npi, pm = Np.id, Np.met
       if npi == id_jglyph or (npi==id_pbox and pm) then
-	 local g = new_jfm_glue(pm.char_type, Np.class, fast_find_char_class('boxbdd', pm))
-	 if g then
-	    set_attr(g, attr_icflag, BOXBDD)
-	    head = insert_after(head, Np.last, g)
-	 end
+         local g = new_jfm_glue(pm.char_type, Np.class, fast_find_char_class('boxbdd', pm))
+         if g then
+            set_attr(g, attr_icflag, BOXBDD)
+            head = insert_after(head, Np.last, g)
+         end
       end
    end
 end
@@ -1149,17 +1129,17 @@ end
 -- リスト先頭の処理
 local function handle_list_head(par_indented)
    local npi, pm = Np.id, Np.met
-   if npi ==  id_jglyph or (npi==id_pbox and pm) then
+   if npi == id_jglyph or (npi==id_pbox and pm) then
       if non_ihb_flag then
-	 local g = new_jfm_glue(pm.char_type, fast_find_char_class(par_indented, pm), Np.class)
-	 if g then
-	    set_attr(g, attr_icflag, BOXBDD)
-	    if getid(g)==id_glue and #Bp==0 then
-	       local h = node_new(id_penalty)
-	       setfield(h, 'penalty', 10000); set_attr(h, attr_icflag, BOXBDD)
-	    end
-	    head = insert_before(head, Np.first, g)
-	 end
+         local g = new_jfm_glue(pm.char_type, fast_find_char_class(par_indented, pm), Np.class)
+         if g then
+            set_attr(g, attr_icflag, BOXBDD)
+            if getid(g)==id_glue and #Bp==0 then
+               local h = node_new(id_penalty)
+               setfield(h, 'penalty', 10000); set_attr(h, attr_icflag, BOXBDD)
+            end
+            head = insert_before(head, Np.first, g)
+         end
       end
    end
 end
@@ -1168,7 +1148,7 @@ end
 -- return value: (the initial cursor lp), (last node)
 local init_var
 do
-   local id_local = node.id('local_par')
+   local id_local = node.id 'local_par'
    local KANJI_SKIP   = luatexja.icflag_table.KANJI_SKIP
    local XKANJI_SKIP   = luatexja.icflag_table.XKANJI_SKIP
    local KSK  = luatexja.stack_table_index.KSK
@@ -1180,16 +1160,16 @@ do
    local table_pool = {
       {}, {}, {first=nil},
       { auto_kspc=nil, auto_xspc=nil, char=nil, class=nil,
-	first=nil, id=nil, last=nil, met=nil, nuc=nil,
-	post=nil, pre=nil, xspc=nil, }, 
+        first=nil, id=nil, last=nil, met=nil, nuc=nil,
+        post=nil, pre=nil, xspc=nil, }, 
       { auto_kspc=nil, auto_xspc=nil, char=nil, class=nil,
-	first=nil, id=nil, last=nil, met=nil, nuc=nil,
-	post=nil, pre=nil, xspc=nil, },
+        first=nil, id=nil, last=nil, met=nil, nuc=nil,
+        post=nil, pre=nil, xspc=nil, },
    }
    init_var = function (mode,dir)
       -- 1073741823: max_dimen
       Bp, widow_Bp, widow_Np, Np, Nq
-	 = table_pool[1], table_pool[2], table_pool[3], table_pool[4], table_pool[5]
+         = table_pool[1], table_pool[2], table_pool[3], table_pool[4], table_pool[5]
       for i=1,5 do for j,_ in pairs(table_pool[i]) do table_pool[i][j]=nil end end
       table_current_stack = ltjs.table_current_stack
 
@@ -1202,31 +1182,31 @@ do
       -- ithout this node, set_attr(kanji_skip, ...) somehow creates an "orphaned"  attribute list.
 
       do
-	  kanji_skip, kanjiskip_jfm_flag = skip_table_to_glue(KSK)
-	  set_attr(kanji_skip, attr_icflag, KANJI_SKIP)
+          kanji_skip, kanjiskip_jfm_flag = skip_table_to_glue(KSK)
+          set_attr(kanji_skip, attr_icflag, KANJI_SKIP)
       end
 
       do
-	  xkanji_skip, xkanjiskip_jfm_flag = skip_table_to_glue(XSK)
-	  set_attr(xkanji_skip, attr_icflag, XKANJI_SKIP)
+          xkanji_skip, xkanjiskip_jfm_flag = skip_table_to_glue(XSK)
+          set_attr(xkanji_skip, attr_icflag, XKANJI_SKIP)
       end
 
       if mode then
-	 -- the current list is to be line-breaked:
-	 -- hbox from \parindent is skipped.
-	 local lp, par_indented, lpi, lps  = head, 'boxbdd', getid(head), getsubtype(head)
-	 while lp and 
-	    ((lpi==id_whatsit and lps~=sid_user)
-	       or ((lpi==id_hlist) and (lps==3))
+         -- the current list is to be line-breaked:
+         -- hbox from \parindent is skipped.
+         local lp, par_indented, lpi, lps  = head, 'boxbdd', getid(head), getsubtype(head)
+         while lp and 
+            ((lpi==id_whatsit and lps~=sid_user)
+               or ((lpi==id_hlist) and (lps==3))
                or (lpi==id_local)) do
-	    if (lpi==id_hlist) and (lps==3) then
+            if (lpi==id_hlist) and (lps==3) then
                Np.char, par_indented = 'parbdd', 'parbdd'
                Np.width = getfield(lp, 'width')
             end
-	    lp=node_next(lp); lpi, lps = getid(lp), getsubtype(lp) end
-	 return lp, node_tail(head), par_indented, TEMP
+            lp=node_next(lp); lpi, lps = getid(lp), getsubtype(lp) end
+         return lp, node_tail(head), par_indented, TEMP
       else
-	 return head, nil, 'boxbdd', TEMP
+         return head, nil, 'boxbdd', TEMP
       end
    end
 end
@@ -1242,10 +1222,10 @@ local function cleanup(mode, TEMP)
    if mode then
       local h = node_next(head)
       if getid(h) == id_penalty and getfield(h, 'penalty') == 10000 then
-	 h = node_next(h)
-	 if getid(h) == id_glue and getsubtype(h) == 15 and not node_next(h) then
-	    return false
-	 end
+         h = node_next(h)
+         if getid(h) == id_glue and getsubtype(h) == 15 and not node_next(h) then
+            return false
+         end
       end
    end
    return head
@@ -1264,19 +1244,19 @@ function luatexja.jfmglue.main(ahead, mode, dir)
       handle_list_head(par_indented)
       lp = calc_np(last,lp); 
       while Np do
-	 adjust_nq();
-	 local pid, pm = Np.id, Np.met
-	 -- 挿入部
-	 if pid == id_jglyph then
-	    handle_np_jachar(mode)
-	 elseif pm then
-	    if pid==id_hlist then handle_np_ja_hlist()
-	    else handle_np_jachar() end
-	 elseif Nq.met then
-	    if Nq.id==id_hlist then handle_nq_ja_hlist()
-	    else handle_nq_jachar() end
-	 end
-	 lp = calc_np(last,lp)
+         adjust_nq();
+         local pid, pm = Np.id, Np.met
+         -- 挿入部
+         if pid == id_jglyph then
+            handle_np_jachar(mode)
+         elseif pm then
+            if pid==id_hlist then handle_np_ja_hlist()
+            else handle_np_jachar() end
+         elseif Nq.met then
+            if Nq.id==id_hlist then handle_nq_ja_hlist()
+            else handle_nq_jachar() end
+         end
+         lp = calc_np(last,lp)
       end
       handle_list_tail(mode, last)
    end
@@ -1327,17 +1307,17 @@ do
          Np.first = lp; Np.nuc = lp; Np.last = lp
          return Np
       elseif Np and getfield(lp, 'user_id') == BOXB then
-	 Np.first = lp; Np.nuc = lp; Np.last = lp
-	 if Nq then
-	    if Nq.met then
-	       Np.class = fast_find_char_class('boxbdd', Nq.met)
+         Np.first = lp; Np.nuc = lp; Np.last = lp
+         if Nq then
+            if Nq.met then
+               Np.class = fast_find_char_class('boxbdd', Nq.met)
             end
             Np.met = Nq.met; Np.pre = 0; Np.post = 0; Np.xspc = 0
             Np.auto_xspc, Np.auto_kspc = 0, 0
-         end	 
+         end         
          return Np
       else
-	 return Np
+         return Np
       end
    end
 
@@ -1365,7 +1345,7 @@ do
             Nq.auto_xspc, Nq.auto_kspc = 0, 0
          end
          head = node_remove(head, y)
-	 node_free(y)
+         node_free(y)
       end
       return s
    end

@@ -3,15 +3,15 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2020-06-14',
+  date = '2020-07-30',
   description = 'Loader for Japanese fonts',
 })
 
-luatexja.load_module('lotf_aux');  local ltju = luatexja.lotf_aux
-luatexja.load_module('base');      local ltjb = luatexja.base
-luatexja.load_module('charrange'); local ltjc = luatexja.charrange
-luatexja.load_module('rmlgbm');    local ltjr = luatexja.rmlgbm
-luatexja.load_module('direction'); local ltjd = luatexja.direction
+luatexja.load_module 'lotf_aux';  local ltju = luatexja.lotf_aux
+luatexja.load_module 'base';      local ltjb = luatexja.base
+luatexja.load_module 'charrange'; local ltjc = luatexja.charrange
+luatexja.load_module 'rmlgbm';    local ltjr = luatexja.rmlgbm
+luatexja.load_module 'direction'; local ltjd = luatexja.direction
 
 local setfield = node.direct.setfield
 local getid = node.direct.getid
@@ -226,7 +226,7 @@ do
                   kanjiskip_stretch = w.kanjiskip_stretch,
                   kanjiskip_shrink =  w.kanjiskip_shrink,
                   round_threshold = w.round_threshold,
-		  }
+                  }
             end
             for k,w in pairs(v.kern) do
                local g = node_new(id_kern, 1)
@@ -289,7 +289,7 @@ do
                             'no JFM specified',
                             'To load and define a Japanese font, a JFM must be specified.'..
                             "The JFM 'ujis' will be  used for now.")
-         jfm_file_name='ujis'
+         jfm_file_name = 'ujis'
       end
       for j,v in ipairs(metrics) do
          if v.name==jfm_file_name then return j end
@@ -338,7 +338,7 @@ do
       local fmtable = { jfm = j, size = f.size, var = jfm_var,
                         with_kanjiskip = jfm_ksp,
                         zw = sz.zw, zh = sz.zh,
-			chars = sz.chars, char_type = sz.char_type,
+                        chars = sz.chars, char_type = sz.char_type,
                         kanjiskip = sz.kanjiskip, xkanjiskip = sz.xkanjiskip,
                         chars_cbcache = {},
                         vert_activated = vert_activated,
@@ -346,9 +346,6 @@ do
       if auto_enable_vrt2 then
          ltju.enable_feature(fn, ltju.exist_feature(fn, 'vrt2') and 'vrt2' or 'vert')
       end
-
-      --texio.write_nl('term and log', 
-      --'JFNT\t' .. identifiers[fn].name .. '\t' .. identifiers[fn].size .. '\t' .. fn, '')
 
       fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
       font_metric_table[fn]=fmtable
@@ -381,15 +378,7 @@ do
    -- extract jfm_file_name and jfm_var
    -- normalize position of 'jfm=' and 'jfmvar=' keys
    local function extract_metric(name)
-      do
-         local nametemp
-         nametemp = name:match('^{(.*)}$')
-         if nametemp then name = nametemp
-         else
-              nametemp = name:match('^"(.*)"$')
-            name = nametemp or name
-         end
-      end
+      name = (name:match '^{(.*)}$') or (name:match '^"(.*)"$') or name
       jfm_file_name = ''; jfm_var = ''; jfm_ksp = true
       local tmp, index = name:sub(1, 5), 1
       if tmp == 'file:' or tmp == 'name:' or tmp == 'psft:' then
@@ -404,16 +393,14 @@ do
             if l~=q then
                name = name:sub(1,index-1) .. name:sub(q+1)
             else
-               name = name:sub(1,index-1)
-               index = nil
+               name = name:sub(1,index-1); index = nil
             end
          elseif name:sub(index, index+6)=='jfmvar=' and q>index+6 then
             jfm_var = name:sub(index+7, q-1)
             if l~=q then
                name = name:sub(1,index-1) .. name:sub(q+1)
             else
-               name = name:sub(1,index-1)
-               index = nil
+               name = name:sub(1,index-1); index = nil
             end
          else
             index = (l~=q) and (q+1) or nil
@@ -432,9 +419,9 @@ do
          jfm_ksp = not (x=='-')
       end
       if jfm_dir == 'tate' then
-         vert_activated = (not name:match('[:;]%-vert')) and (not  name:match('[:;]%-vrt2'))
+         vert_activated = (not name:match '[:;]%-vert') and (not name:match '[:;]%-vrt2')
          auto_enable_vrt2 
-           = (not name:match('[:;][+%-]?vert')) and (not name:match('[:;][+%-]?vrt2'))
+           = (not name:match '[:;][+%-]?vert') and (not name:match '[:;][+%-]?vrt2')
       else
          vert_activated, auto_enable_vrt2 = nil, nil
       end
@@ -672,18 +659,14 @@ do
 -- EXT
    function luatexja.jfont.output_alt_font_cmd(dir, bbase)
       alt_font_base = bbase
-      if dir == 't' then
-         alt_font_base_num = tex.getattribute(attr_curtfnt)
-      else
-         alt_font_base_num = tex.getattribute(attr_curjfnt)
-      end
+      alt_font_base_num = tex.getattribute((dir == 't') and attr_curtfnt or attr_curjfnt)
       local t = alt_font_table[alt_font_base_num]
       if t then
          for i,_ in pairs(t) do t[i]=nil end
       end
       t = alt_font_table_latex[bbase]
       if t then
-       for i,_ in pairs(t) do
+         for i,_ in pairs(t) do
             tex.sprint(cat_lp, '\\ltj@pickup@altfont@aux' .. dir .. '{' .. i .. '}')
          end
       end
@@ -817,35 +800,34 @@ do
       if (not tfmdata) or (not tfmdata.filename) then return end
       local bname = tfmdata.psname or nameonly(tfmdata.filename)
       if not font_extra_basename[bname] then
-	 -- if the cache is present, read it
-	 -- 
+         -- if the cache is present, read it
+         -- 
          local newtime = file_attributes(tfmdata.filename,"modification")
          local v = "extra_" .. string.lower(bname)
          local dest = load_cache(
             v,
-	    function (t) 
-		return (t.lotf_version~=luaotfload.version)
-		       or (t.version~=cache_ver) or (t.modtime~=newtime) 
-	    end
+            function (t) 
+                return (t.lotf_version~=luaotfload.version)
+                       or (t.version~=cache_ver) or (t.modtime~=newtime) 
+            end
          )
          -- if the cache is not found or outdated, save the cache
          if dest then
-	    font_extra_basename[bname] = dest[1] or {}
-	    local vheight, vorigin = dest[1].vheight, dest[1].vorigin
-	    local vhd, vod = vheight.default, vorigin.default
+            font_extra_basename[bname] = dest[1] or {}
+            local vheight, vorigin = dest[1].vheight, dest[1].vorigin
+            local vhd, vod = vheight.default, vorigin.default
             setmetatable(vheight, {__index = function () return vhd end } )
             setmetatable(vorigin, {__index = function () return vod end } )
          else
             local dest = ltju.get_vmet_table(tfmdata, nil)
             dest = list_rotate_glyphs(tfmdata, dest)
             font_extra_basename[bname] = dest or {}
-            save_cache( v,
-                             {
-                                modtime = newtime,
-                                version = cache_ver,
-                                lotf_version = luaotfload.version,
-                                dest,
-                             })
+            save_cache(v,
+                       { modtime = newtime,
+                         version = cache_ver,
+                         lotf_version = luaotfload.version,
+                         dest,
+                       })
          end
          return bname
       end
@@ -855,14 +837,14 @@ do
          local bname = res.psname or nameonly(res.filename)
          local t = font_extra_basename[bname]
          if not t then bname = prepare_extra_data_base(res) end
-	 font_extra_info[id] = t or font_extra_basename[bname]
+         font_extra_info[id] = t or font_extra_basename[bname]
       end
    end
     luatexbase.add_to_callback(
        'luaotfload.patch_font',
        function (tfmdata)
-	  -- these function is executed one time per one fontfile
-	  prepare_extra_data_base(tfmdata); return tfmdata
+          -- these function is executed one time per one fontfile
+          prepare_extra_data_base(tfmdata); return tfmdata
        end,
        'ltj.prepare_extra_data', 1)
    luatexbase.add_to_callback(
@@ -923,7 +905,7 @@ luatexbase.add_to_callback(
       local t = font_getfont(fnum)
       if not t then return fmtable end
       for i,v in pairs(vert_form_table) do
-	if t.characters[v] then vform[i] = v end
+        if t.characters[v] then vform[i] = v end
       end
       if ltju.specified_feature(fnum, 'jpotf') then
         for i,v in pairs(vert_jpotf_table) do
@@ -932,7 +914,7 @@ luatexbase.add_to_callback(
       end
       if not ltju.exist_feature(fnum, 'vert') and not ltju.exist_feature(fnum, 'vrt2') then
         -- 現在の (script, lang) で vert もvrt2 も有効にできない場合，
-	-- 全 (script,lang) の vert を強制的に適用
+        -- 全 (script,lang) の vert を強制的に適用
         ltju.loop_over_feat(t, vert_feat, function (i,k) vform[i] = vform[i] or k end, true)
       end
       -- vform の中身を vert 適用結果に変える
@@ -940,7 +922,7 @@ luatexbase.add_to_callback(
         function (i,k)
           for j,w in pairs(vform) do
             if (i==j)and(w==k) then vform[j]=nil elseif w==i then vform[j] = k end
-	  end
+          end
         end)
       return fmtable
    end, 'ltj.get_vert_form', 1
@@ -959,8 +941,8 @@ do
         if cidinfo and cidinfo.registry and cidinfo.ordering then
            local rd = ltjr_prepare_cid_font(cidinfo.registry, cidinfo.ordering)
            if rd then
-	      local ru = rd.resources.unicodes -- defined by LuaTeX-ja
-	      local rc = rd.characters
+              local ru = rd.resources.unicodes -- defined by LuaTeX-ja
+              local rc = rd.characters
               for i,v in pairs(tfmdata.characters) do
                  local w = ru[cidinfo.ordering .. "." .. tostring(v.index)]
                  if w then
