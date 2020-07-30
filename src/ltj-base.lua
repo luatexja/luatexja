@@ -30,25 +30,22 @@ do
 --! LaTeX 形式のエラーメッセージ(\PackageError 等)を
 --! Lua 関数の呼び出しで行う.
 
-  local LF = "\n"
-  local err_break = ""
+  local LF, BEL = "\n", "\a"
   local err_main = ""
   local err_help = ""
 
   local function message_cont(str, c)
-    return str:gsub(err_break, LF .. c)
+    return str:gsub(LF, LF .. c)
   end
   local function into_lines(str)
-    return str:gsub(err_break, LF):explode(LF)
-  end
-
-  _error_set_break = function (str)
-    err_break = str
+    return str:explode(LF)
   end
 
   _error_set_message = function (msgcont, main, help)
-    err_main = message_cont(main, msgcont)
-    err_help = into_lines(help)
+    err_main = message_cont(main, msgcont):gsub(BEL, LF)
+    err_help = (help and help~="") and into_lines(help)
+       or {"Sorry, I don't know how to help in this situation.", 
+           "Maybe you should try asking a human?" }
   end
 
   _error_show = function (escchar)
@@ -67,7 +64,7 @@ do
   local message_a = "Type  H <return>  for immediate help"
 
   generic_error = function (msgcont, main, ref, help)
-    local mainref = main..".\n\n"..ref.."\n"..message_a
+    local mainref = main..".\a\a"..ref..BEL..message_a
     _error_set_message(msgcont, mainref, help)
     _error_show(true)
   end
@@ -79,7 +76,7 @@ do
     local on_line = line and (" on input line "..tex.inputlineno) or ""
     local newlinechar = tex.newlinechar
     tex.newlinechar = -1
-    texio.write_nl(out, br..main..on_line.."."..br)
+    texio.write_nl(out, br..mainc..on_line.."."..br)
     tex.newlinechar = newlinechar
   end
 
@@ -97,25 +94,25 @@ do
   end
 
   package_error = function (pkgname, main, help)
-    generic_error("("..pkgname.."                ",
+    generic_error("("..pkgname..")                ",
       "Package "..pkgname.." Error: "..main,
       "See the "..pkgname.." package documentation for explanation.",
       help)
   end
   package_warning = function (pkgname, main)
-    generic_warning("("..pkgname.."                ",
+    generic_warning("("..pkgname..")                ",
       "Package "..pkgname.." Warning: "..main)
   end
   package_warning_no_line = function (pkgname, main)
-    generic_warning_no_line("("..pkgname.."                ",
+    generic_warning_no_line("("..pkgname..")                ",
       "Package "..pkgname.." Warning: "..main)
   end
   package_info = function (pkgname, main)
-    generic_info("("..pkgname.."             ",
+    generic_info("("..pkgname..")             ",
       "Package "..pkgname.." Info: "..main)
   end
   package_info_no_line = function (pkgname, main)
-    generic_info_no_line("("..pkgname.."             ",
+    generic_info_no_line("("..pkgname..")             ",
       "Package "..pkgname.." Info: "..main)
   end
 
@@ -346,7 +343,6 @@ do
 end
 ----
 
-ltjb._error_set_break = _error_set_break
 ltjb._error_set_message = _error_set_message
 ltjb._error_show = _error_show
 ltjb._generic_warn_info = _generic_warn_info
