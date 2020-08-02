@@ -27,20 +27,32 @@
 \usepackage{lltjcore}
 
 %%% patching commands
-\RequirePackage{filehook}
-
+\newif\ifltj@ltfilehook@avail
+\@ifl@t@r\fmtversion{2020-10-01}{%
+  \ifnum\patch@level<0\relax \ifnum\patch@level<-6 \ltj@ltfilehook@availtrue\fi
+  \else\ltj@ltfilehookavailtrue\fi
+}{}
+\ifltj@ltfilehook@avail
+  \def\ltj@ExecuteAfterPackage#1{\AddToHook{package/after/#1}}
+  \def\ltj@ExecuteBeforePackage#1{\AddToHook{package/before/#1}}
+\else
+  \RequirePackage{filehook}
+  \let\ltj@ExecuteAfterPackage=\AtEndOfPackageFile
+  \let\ltj@ExecuteBeforePackage=\AtBeginOfPackageFile
+\fi
 \def\ltj@pkgpatch@im#1{%
  \@ifnextchar[{\ltj@pkgpatch@im@{#1}}{\ltj@pkgpatch@im@{#1}[lltjp-#1]}}%]
-\def\ltj@pkgpatch@im@#1[#2]{%
-  \AtEndOfPackageFile*{#1}{%
-    \@ifpackageloaded{#2}{}{%
-	  \@namedef{ver@#2.\@pkgextension}{0000/00/00}%dummy
-	  \if\catcode`@=11\let\ltj@temp\relax\else
-	    \edef\ltj@temp{\noexpand\catcode`@=\the\catcode`@\relax}\makeatletter
-	  \fi
-	  \@@input{#2.\@pkgextension}\ltj@temp
-	}%
+\def\ltj@pkgpatch@im@@#1{%
+  \@ifpackageloaded{#1}{}{%
+    \if\catcode`@=11\let\ltj@temp\relax\else
+      \edef\ltj@temp{\noexpand\catcode`@=\the\catcode`@\relax}\makeatletter
+    \fi
+    \@@input{#1.\@pkgextension}\ltj@temp
   }%
+}
+\def\ltj@pkgpatch@im@#1[#2]{%
+  \@ifpackageloaded{#1}{\ltj@pkgpatch@im@@{#2}}%
+  {\ltj@ExecuteAfterPackage{#1}{\ltj@pkgpatch@im@@{#2}}}%
 }
 
 \def\ltj@pkgpatch#1{%

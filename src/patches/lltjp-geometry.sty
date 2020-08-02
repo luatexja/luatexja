@@ -29,14 +29,31 @@
 }
 \fi
 
-\RequirePackage{filehook}
+%============================================
+\unless\ifdefined\ltj@ExecuteAfterPackage
+\newif\ifltj@ltfilehook@avail
+\@ifl@t@r\fmtversion{2020-10-01}{%
+  \ifnum\patch@level<0\relax \ifnum\patch@level<-6 \ltj@ltfilehook@availtrue\fi
+  \else\ltj@ltfilehookavailtrue\fi
+}{}
+\ifltj@ltfilehook@avail
+  \def\ltj@ExecuteAfterPackage#1{\AddToHook{package/after/#1}}
+  \def\ltj@ExecuteBeforePackage#1{\AddToHook{package/before/#1}}
+\else
+  \RequirePackage{filehook}
+  \let\ltj@ExecuteAfterPackage=\AtEndOfPackageFile
+  \let\ltj@ExecuteBeforePackage=\AtBeginOfPackageFile
+\fi
+\fi
+%============================================
+
 \RequirePackage{etoolbox}
 \newif\ifGm@ltj@layoutswitch
 \let\orig@PackageWarningNoLine=\PackageWarningNoLine
 % define ifGm@swap@papersize if it is undefined
 \expandafter\newif\csname ifGm@swap@papersize\endcsname
 
-\AtBeginOfPackageFile{geometry}{%
+\ltj@ExecuteBeforePackage{geometry}{%
   \edef\Gm@ltj@topskip{\the\topskip}
   \edef\Gm@ltj@headsep{\the\headsep}
   \edef\Gm@ltj@footskip{\the\footskip}
@@ -54,8 +71,7 @@
   \fi
 \fi
 }
-
-\AtEndOfPackageFile{geometry}{%
+\ltj@ExecuteAfterPackage{geometry}{%
 \let\PackageWarningNoLine=\orig@PackageWarningNoLine
 \if@ltj@@geometry@tate
   \let\PackageWarningNoLine=\orig@PackageWarningNoLine

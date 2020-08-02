@@ -738,7 +738,6 @@
      \lineskip\z@skip\baselineskip\z@skip\@preamble}
   \def\endarray{\crcr\egroup\egroup\@end@alignbox\@arrayright}
 }
-
 \@ifpackageloaded{array}{%
   \let\tabular=\ltj@lltjext@orig@tabular
   \let\array=\ltj@lltjext@orig@array
@@ -746,8 +745,7 @@
 }{%
   \let\ltj@lltjext@orig@tabular\relax
   \let\ltj@lltjext@orig@array\relax
-  \RequirePackage{filehook,etoolbox}
-  \AtEndOfPackageFile{array}{\ltj@lltjext@patch@array}
+  \ltj@ExecuteAfterPackage{array}{\ltj@lltjext@patch@array}
 }
 
 %%%%%%%%%%%%%%%% LuaTeX-ja original
