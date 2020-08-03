@@ -48,8 +48,8 @@
   \let\ltj@ExecuteAfterPackage=\AtEndOfPackageFile
   \let\ltj@ExecuteBeforePackage=\AtBeginOfPackageFile
 \fi
-\def\ltj@pkgpatch@im#1{%
- \@ifnextchar[{\ltj@pkgpatch@im@{#1}}{\ltj@pkgpatch@im@{#1}[lltjp-#1]}}%]
+\def\ltj@pkgpatch@im#1{\@ifnextchar[{\ltj@pkgpatch@im@{#1}}{\ltj@pkgpatch@im@{#1}[lltjp-#1]}}%]
+\def\ltj@pkgpatch@im@#1[#2]{\ltj@ExecuteAfterPackage*{#1}{\ltj@pkgpatch@im@@{#2}}}
 \def\ltj@pkgpatch@im@@#1{%
   \@ifpackageloaded{#1}{}{%
     \if\catcode`@=11\let\ltj@temp\relax\else
@@ -58,15 +58,16 @@
     \@@input{#1.\@pkgextension}\ltj@temp
   }%
 }
-\def\ltj@pkgpatch@im@#1[#2]{\ltj@ExecuteAfterPackage*{#1}{\ltj@pkgpatch@im@@{#2}}}
 
-\def\ltj@pkgpatch#1{%
-  \@ifnextchar[{\ltj@pkgpatch@@{#1}}{\ltj@pkgpatch@@{#1}[lltjp-#1]}}%]
-\def\ltj@pkgpatch@@#1[#2]{%
-  \gpreto\@begindocumenthook{%
-    \@ifpackageloaded{#1}{%
-	  \@ifpackageloaded{#2}{}{\RequirePackage{#2}}%
-	}{}%
+\def\ltj@pkgpatch#1{\@ifnextchar[{\ltj@pkgpatch@{#1}}{\ltj@pkgpatch@{#1}[lltjp-#1]}}%]
+\ifltj@ltfilehook@avail
+  \def\ltj@pkgpatch@@{\AddToHook{env/document/before}[luatexja.autopatch]}
+\else
+  \def\ltj@pkgpatch@@{\gpreto\@begindocumenthook}
+\fi
+\def\ltj@pkgpatch@#1[#2]{%
+  \ltj@pkgpatch@@{%
+    \@ifpackageloaded{#1}{\@ifpackageloaded{#2}{}{\RequirePackage{#2}}}{}%
   }%
 }
 

@@ -31,7 +31,11 @@
 
 %============================================
 \unless\ifdefined\ltj@ExecuteAfterPackage
-\newif\ifltj@ltfilehook@avail
+\expandafter\newif\csname ifltj@ltfilehook@avail\endcsname
+\@ifl@t@r\fmtversion{2020-10-01}{%
+  \ifnum\patch@level<0\relax \ifnum\patch@level<-6 \ltj@ltfilehook@availtrue\fi
+  \else\ltj@ltfilehook@availtrue\fi
+}{}
 \ifltj@ltfilehook@avail
   \def\@@ltj@ExecuteAfterPackage#1{\AddToHook{package/after/#1}}
   \def\@@ltj@ExecuteBeforePackage#1{\AddToHook{package/before/#1}}
