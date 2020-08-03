@@ -12,7 +12,7 @@
 \def\luatexjalatexLoaded{\endinput}
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{ltj-latex}[2020-05-17 LaTeX support of LuaTeX-ja]
+\ProvidesPackage{ltj-latex}[2020-08-03 LaTeX support of LuaTeX-ja]
 
 % cleanup at end of the document
 %\let\ltj@@orig@end=\@@end
@@ -30,11 +30,19 @@
 \newif\ifltj@ltfilehook@avail
 \@ifl@t@r\fmtversion{2020-10-01}{%
   \ifnum\patch@level<0\relax \ifnum\patch@level<-6 \ltj@ltfilehook@availtrue\fi
-  \else\ltj@ltfilehookavailtrue\fi
+  \else\ltj@ltfilehook@availtrue\fi
 }{}
 \ifltj@ltfilehook@avail
-  \def\ltj@ExecuteAfterPackage#1{\AddToHook{package/after/#1}}
-  \def\ltj@ExecuteBeforePackage#1{\AddToHook{package/before/#1}}
+  \def\@@ltj@ExecuteAfterPackage#1{\AddToHook{package/after/#1}}
+  \def\@@ltj@ExecuteBeforePackage#1{\AddToHook{package/before/#1}}
+  \def\ltj@ExecuteAfterPackage{\@ifstar\@@ltj@ExecuteAfterPackage@star\@@ltj@ExecuteAfterPackage}
+  \def\@@ltj@ExecuteAfterPackage@star#1#2{%
+    \@ifpackageloaded{#1}{#2}{\@@ltj@ExecuteAfterPackage{#1}{#2}}%
+  }
+  \def\ltj@ExecuteBeforePackage{\@ifstar\@@ltj@ExecuteBeforePackage@star\@@ltj@ExecuteBeforePackage}
+  \def\@@ltj@ExecuteBeforePackage@star#1#2{%
+    \@ifpackageloaded{#1}{#2}{\@@ltj@ExecuteBeforePackage{#1}{#2}}%
+  }
 \else
   \RequirePackage{filehook}
   \let\ltj@ExecuteAfterPackage=\AtEndOfPackageFile
@@ -50,10 +58,7 @@
     \@@input{#1.\@pkgextension}\ltj@temp
   }%
 }
-\def\ltj@pkgpatch@im@#1[#2]{%
-  \@ifpackageloaded{#1}{\ltj@pkgpatch@im@@{#2}}%
-  {\ltj@ExecuteAfterPackage{#1}{\ltj@pkgpatch@im@@{#2}}}%
-}
+\def\ltj@pkgpatch@im@#1[#2]{\ltj@ExecuteAfterPackage*{#1}{\ltj@pkgpatch@im@@{#2}}}
 
 \def\ltj@pkgpatch#1{%
   \@ifnextchar[{\ltj@pkgpatch@@{#1}}{\ltj@pkgpatch@@{#1}[lltjp-#1]}}%]

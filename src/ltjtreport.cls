@@ -952,8 +952,8 @@
 \fi
 \normalmarginpar
 \@mparswitchfalse
-\AtBeginOfPackageFile*{ftnright}{\let\ltjt@orig@@makefntext=\@makefntext}
-\AtEndOfPackageFile*{ftnright}{\let\@makefntext=\ltjt@orig@@makefntext}
+\ltj@ExecuteBeforePackage*{ftnright}{\let\ltjt@orig@@makefntext=\@makefntext}
+\ltj@ExecuteAfterPackage*{ftnright}{\let\@makefntext=\ltjt@orig@@makefntext}
 \endinput
 %%
 %% End of file `ltjtreport.cls'.

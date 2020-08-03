@@ -133,6 +133,7 @@
 %    新設の|ptexmin|オプション指定時にのみ行うようにした。
 %    句読点を「、」「。」に統一。}
 % \changes{v1.8e-ltj-19}{2020/07/27}{|everyshi|パッケージへのパッチを別パッケージへ分離。}
+% \changes{v1.8e-ltj-20}{2020/08/03}{\LaTeX~2020-10-01への対応．}
 % \fi
 %
 % \iffalse
@@ -4706,8 +4707,12 @@
 % \section{各種パッケージへの対応}
 % もともと縦組での利用を想定されていないいくつかのパッケージについて、
 % 補正するためのコードを記述しておきます。
-% この節のコードは|filehook|パッケージ（Lua\TeX-ja読み込み時に自動でロードされます）
-% の機能を用いています。
+%% この節のコードは|filehook|パッケージ（Lua\TeX-ja読み込み時に自動でロードされます）
+%% の機能を用いています。
+%
+% [2020-08-03 LTJ] \LaTeX\~2020-10-01に対応するため、Lua\TeX-jaの提供する命令
+% （|filehook|パッケージの命令の別名か、新\LaTeX のフック機構を利用して同様の内容を書いたもの）
+% に置き換えました。
 %
 % \subsection{\texttt{ftnright}パッケージ}
 % 脚注番号の書式が|ftnright|パッケージによって勝手に書き換えられるので、
@@ -4715,8 +4720,8 @@
 % \changes{v1.7d}{2017/02/19}{コード追加}
 %    \begin{macrocode}
 %<*article|report|book>
-\AtBeginOfPackageFile*{ftnright}{\let\ltjt@orig@@makefntext=\@makefntext}
-\AtEndOfPackageFile*{ftnright}{\let\@makefntext=\ltjt@orig@@makefntext}
+\ltj@ExecuteBeforePackage*{ftnright}{\let\ltjt@orig@@makefntext=\@makefntext}
+\ltj@ExecuteAfterPackage*{ftnright}{\let\@makefntext=\ltjt@orig@@makefntext}
 %</article|report|book>
 %    \end{macrocode}
 %
