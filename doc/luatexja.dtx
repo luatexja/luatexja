@@ -5177,27 +5177,27 @@ JFMで指定されているそれぞれの値をスケーリングしたもの�
 \end{itemize}
 $i$,~$j\in \omega$に対して，\texttt{char\_type[$i$][$j$]} は
 文字クラス$i$の文字と$j$の文字の間に挿入されるグルーやカーンを格納している．
-\begin{itemize}
-  \item 間に入るものがカーンであれば，この値は\
-\texttt{[$j$]=\{[1]=<kern\_node>, ratio=<ratio>\}} であり，
+
+間に入るものがカーンであれば，この値は%
+\texttt{[$j$]=\{[1]=<kern\_node>, ratio=<ratio>\}}であり，
 <kern\_node>はカーンを表すノードである\footnote{%
       バージョン20150420.0以降ではノードのアクセス手法にdirect access
       modelを用いているため，ノードそのものを表すユーザーデータではなく，
       内部で参照のために使われる添字（整数）である．
 }．
-  \item グルーであれば，この値は以下のキーを持つテーブルである．
-  \begin{description}
-    \item[\texttt{width}, \texttt{stretch}, \texttt{shrink}]
-    グルーのそれぞれ自然長，伸び量，縮み量をsp単位で表したもの．
-    \item[\texttt{priority}] バ（ージョン2以降の）JFMでの指定 \texttt{\{<stretch>,<shrink>\}} を
-    \[
-      (\text{<stretch>}+4)\cdot 8+\text{<shrink>}+4
-    \]
-    として0--63の整数にパックしたもの．
-    \item[\texttt{ratio}, \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch}, \texttt{kanjiskip\_shrink}]
-    JFM中の同名のフィールドの値がそのまま使われている．
-  \end{description}
-\end{itemize}
+
+グルーであれば，この値は以下のキーを持つテーブルである．
+\begin{description}
+  \item[\texttt{width}, \texttt{stretch}, \texttt{shrink}]
+  グルーのそれぞれ自然長，伸び量，縮み量をsp単位で表したもの．
+  \item[\texttt{priority}] （バージョン2以降の）JFMでの指定 \texttt{\{<stretch>,<shrink>\}} を
+  \[
+    (\text{<stretch>}+4)\cdot 8+\text{<shrink>}+4
+  \]
+  として0--63の整数にパックしたもの．
+  \item[\texttt{ratio}, \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch}, \texttt{kanjiskip\_shrink}]
+  JFM中の同名のフィールドの値がそのまま使われている．
+\end{description}
 \item[chars\_cbcache]
 文字クラス決定の処理で．キャッシュとして使われる．
 \end{cslist}
@@ -7171,7 +7171,7 @@ CID番号が<number>の文字を出力する．
   特に縦組用グリフのCID番号を指定した場合は（LuaTeX-ja 20190504.0以降では若干改良されているが）
   意図しない結果になる可能性が高い．
   なお，バージョン20190708.0以降では，CIDからグリフへの選択にグリフ名の情報を使用していない．
-  また，フォントにIVDコレクションAdobe-Japan1が含まれていれば，その情報を用いて
+  また，フォントにAdobe-Japan1のIVSが含まれていれば，その情報を用いて
   グリフを選択する．
 }を出力する．
 
@@ -11018,7 +11018,7 @@ $|\textit{total}|$の分だけが，行中のグルーの伸び量，あるい�
 キャッシュとして保存しているのと同様の方法で，
 \LuaTeX-jaもいくつかのキャッシュファイルを作成するようになった．
 \begin{itemize}
- \item 通常，キャッシュは\texttt{\$TEXMFVAR/luatexja/}以下に保存され，
+ \item 通常，キャッシュは \texttt{\$TEXMFVAR/luatexja/} 以下に保存され，
 そこから読み込みが行われる．
  \item 「通常の」テキスト形式のキャッシュ（拡張子は \texttt{.lua.gz}，gzip圧縮されているため）以外にも，
 それをバイナリ形式（バイトコード）に変換したものもサポートしている．
@@ -11055,9 +11055,9 @@ its binary version is also updated.
 %<*ja>
 \subsection{キャッシュの使用箇所}
 
-\LuaTeX-ja では以下の3種類のキャッシュを使用している：
+\LuaTeX-ja では以下のキャッシュを使用している：
 \begin{cslist}
-\item[ltj-cid-auto-adobe-japan1.lua]
+\item[ltj-cid-auto-adobe-japan1.\{lua.gz,luc\}]
 Ryumin-Lightのような非埋め込みフォントの情報を格納しており，
 （それらが\LuaTeX-jaの標準和文フォントなので）\LuaTeX-jaの読み込み時に自動で読まれる．
 生成には\texttt{UniJIS2004-UTF32-\{H,V\}}, \texttt{Adobe-Japan1-UCS2}という3つの
@@ -11072,7 +11072,7 @@ CMapが必要である．
 
 \LuaTeX-ja uses the following cache:
 \begin{cslist}
-\item[ltj-cid-auto-adobe-japan1.lua]
+\item[ltj-cid-auto-adobe-japan1.\{lua.gz,luc\}]
 The font table of a CID-keyed non-embedded Japanese font.
 This is loaded in every run.
 It is created from three CMaps, \texttt{UniJIS2004-UTF32-\{H,V\}} and
@@ -11095,11 +11095,11 @@ as in Page~\pageref{para-cid}.
 \bf \texttt{cid} key&\bf name of the cache &
 \multicolumn{2}{c}{\bf used CMaps}\\
 \midrule
-Adobe-Japan1-*&ltj-cid-auto-adobe-japan1.lua&UniJIS2004-UTF32-*&Adobe-Japan1-UCS2\\
-Adobe-Korea1-*&ltj-cid-auto-adobe-korea1.lua&UniKS-UTF32-*&Adobe-Korea1-UCS2\\
-Adobe-KR-*&ltj-cid-auto-adobe-kr.lua&UniAKR-UTF32-*&Adobe-KR-UCS2\\
-Adobe-GB1-*&ltj-cid-auto-adobe-gb1.lua&UniGB-UTF32-*&Adobe-GB1-UCS2\\
-Adobe-CNS1-*&ltj-cid-auto-adobe-cns1.lua&UniCNS-UTF32-*&Adobe-CNS1-UCS2\\
+Adobe-Japan1-*&ltj-cid-auto-adobe-japan1.\{lua.gz,luc\}&UniJIS2004-UTF32-*&Adobe-Japan1-UCS2\\
+Adobe-Korea1-*&ltj-cid-auto-adobe-korea1.\{lua.gz,luc\}&UniKS-UTF32-*&Adobe-Korea1-UCS2\\
+Adobe-KR-*&ltj-cid-auto-adobe-kr.\{lua.gz,luc\}&UniAKR-UTF32-*&Adobe-KR-UCS2\\
+Adobe-GB1-*&ltj-cid-auto-adobe-gb1.\{lua.gz,luc\}&UniGB-UTF32-*&Adobe-GB1-UCS2\\
+Adobe-CNS1-*&ltj-cid-auto-adobe-cns1.\{lua.gz,luc\}&UniCNS-UTF32-*&Adobe-CNS1-UCS2\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -11116,13 +11116,34 @@ The bytecode version of \texttt{ltj-jisx0208.lua}.
 This is the conversion table between JIS~X~0208 and Unicode
 which is used in Kanji-code conversion commands for compatibility with \pTeX.
 %</en>
+
+%<*ja>
+\item[ltj-ivd\_aj1.luc]
+\LuaTeX-ja配布中の\texttt{ltj-ivd\_aj1.lua}をバイトコード化したものである．
+これはUnicodeの漢字異体字データベースのAdobe-Japan1コレクションの内容を
+  格納したテーブルであり，\Pkg{luatexja-otf}パッケージの\cs{CID}命令で使われることがある．
+%</ja>
+%<*en>
+\item[ltj-ivd\_aj1.luc]
+The bytecode version of \texttt{ltj-ivd\_aj1.lua}.
+%</en>
+
+%<*ja>
+\item[extra\_***.\{lua.gz,luc\}]
+フォント``\texttt{***}''における，グリフ番号からUnicode値への変換テーブル，縦組時のグリフ回転の有無を格納したテーブル，
+及び縦組時におけるグリフの原点位置・高さのテーブルを格納している．
+%</ja>
+%<*en>
+\item[extra\_***.\{lua.gz,luc\}]
+This file conains some information (especially for vertical typesetting) about the font `\texttt{***}''.
+%</en>
 \end{cslist}
 
 %<*en>
 \subsection{Internal}
 Cache management system of \LuaTeX-ja is stored in \texttt{luatexja.base}
 (\texttt{ltj-base.lua}).
-There are three public functions for cache management in \texttt{luatexja.base},
+There are four public functions for cache management in \texttt{luatexja.base},
 where <filename> stands for the file name \emph{without suffix}:
 \begin{cslist}
 \item[save\_cache(<filename>, <data>)]
@@ -11149,18 +11170,21 @@ its contents is outdated, \texttt{load\_cache} tries to
 read the compressed text form <filename>\texttt{.lua.gz}.
 Hence, the return value of \texttt{load\_cache} is non-nil,
 if and only if the updated cache is found.
+
+\item[remove\_cache(<filename>)]
+Remove the cahce <filename>.
 \end{cslist}
 %</en>
 %<*ja>
 \subsection{内部命令}
 \LuaTeX-jaにおけるキャッシュ管理は，\texttt{luatexja.base}~(\texttt{ltj-base.lua})に
-実装しており，以下の3関数が公開されている．
+実装しており，以下の関数が公開されている．
 ここで，<filename>は保存するキャッシュのファイル名を\emph{拡張子なしで}指定する．
 \begin{cslist}
 \item[save\_cache(<filename>, <data>)]
 nilでない<data>をキャッシュ<filename>に保存する．
 テキスト形式の<filename>\texttt{.lua.gz}\footnote{拡張子からわかる通り，実際にはgzip圧縮される．}のみならず，
-そのバイナリ版も作成/更新される．
+そのバイナリ形式も作成・更新される．
 
 \item[save\_cache\_luc(<filename>, <data>{[, <serialized\_data>]})]
 
@@ -11178,10 +11202,14 @@ nilでない<data>をキャッシュ<filename>に保存する．
 読みこむ．もしその内容が「新しい」，つまり<outdate>の評価結果が \texttt{false} なら
 \texttt{load\_cache}はこのバイナリキャッシュの中身を返す．
 もしバイナリキャッシュが見つからなかったか，「古すぎる」ならば（gzip圧縮された）テキスト形式の
-	     <filename>\texttt{.lua.gz}を読み込み，その値を返す．
+	     <filename>\texttt{.lua.gz}を読み込み，<outdate>で再度評価する．
 
 以上より，\texttt{load\_cache}自体がnilでない値を返すのは，ちょうど「新しい」キャッシュが
 見つかった場合である．
+
+\item[remove\_cache(<filename>)]
+キャッシュ<filename>を削除する．テキスト形式（gzip圧縮されているか否かを問わず）も
+バイナリ形式もまとめて削除する．
 \end{cslist}
 %</ja>
 
