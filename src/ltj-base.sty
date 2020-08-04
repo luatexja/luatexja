@@ -13,7 +13,7 @@
 
 \ifltj@in@latex                 %<*LaTeX>
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{ltj-base}[2020-07-27]
+  \ProvidesPackage{ltj-base}[2020-08-04]
 \fi                             %</LaTeX>
 
 %%------------------ Tiny helpers
@@ -96,13 +96,6 @@
 %! plain であるか.
 \ltj@csletcs{ifltj@in@plain}{iffalse}
 
-%% \ltj@require@package{<package>}{<date>}
-%! サブパッケージを読み込む. LaTeX では \RequirePackage、それ以外では
-%! \input を使う. <date> は必須だが空でもよい.
-\def\ltj@require@package#1#2{
-  \RequirePackage{#1}[#2]
-}
-
 %% \ltj@print{<message>}
 %! 端末への出力.
 \let\ltj@print\typeout
@@ -115,11 +108,6 @@
 \else
   \ltj@csletcs{ifltj@in@plain}{iffalse}
 \fi
-
-%% \ltj@require@package{<package>}{<date>}
-\def\ltj@require@package#1#2{
-  \input #1.sty\relax
-}
 
 %% \ltj@print{<message>}
 \def\ltj@print#1{
@@ -299,6 +287,7 @@
 %% from Sonja Maus, ``Looking Ahead for a <box>'',
 %%      TUGBoat, 11, No. 4, 1990.
 \newbox\ltj@afbox
+\directlua{luatexja.afbox_number=\the\ltj@afbox}
 \protected\def\ltj@afterbox#1{%
   \def\ltj@afb@xarg{#1}%
   \afterassignment\ltj@afb@x

@@ -900,8 +900,7 @@ do
          local sd = to_direct(s)
          local box_dir = get_box_dir(sd, dir_yoko)
          if box_dir%dir_math_mod ~= list_dir then
-            setbox(
-               'ltj@afbox',
+            setbox('ltj@afbox',
                to_node(copy_list(make_dir_whatsit(sd, sd, list_dir, 'box_move')))
                -- copy_list しないとリストの整合性が崩れる……？
             )
@@ -1115,19 +1114,20 @@ do
          end
       end
    end
-   local getbox = tex.getbox
+   local getbox, shipout = tex.getbox, tex.shipout
    local setbox, copy = node.direct.setbox, node.direct.copy
    local lua_mem_kb = 0
-   function luatexja.direction.finalize()
-      local a = to_direct(tex.getbox("AtBeginShipoutBox"))
+   function luatexja.direction.shipout()
+      start_time_measure 'box_primitive_hook'
+      local a = to_direct(getbox 'ltj@afbox')
       local a_dir = get_box_dir(a, dir_yoko)
       if a_dir~=dir_yoko then
          local b = create_dir_node(a, a_dir, dir_yoko, false)
          setfield(b, 'head', a); a = b
       end
-      setfield(shipout_temp, 'head', a)
-      finalize_inner(shipout_temp)
-      setbox('global', "AtBeginShipoutBox", copy(getlist(shipout_temp)))
-      setfield(shipout_temp, 'head',nil)
+      setfield(shipout_temp, 'head', a); finalize_inner(shipout_temp)
+      setbox('ltj@afbox', copy(getlist(shipout_temp))); setfield(shipout_temp, 'head',nil)
+      shipout(luatexja.afbox_number)
+      stop_time_measure 'box_primitive_hook'
    end
 end

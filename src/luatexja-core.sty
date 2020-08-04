@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2020-07-27 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2020-08-04 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -80,7 +80,6 @@
   \RequirePackage{xkeyval}    [2012/10/14] % v2.6b
   \RequirePackage{etoolbox}
   \RequirePackage{lltjp-atbegshi}
-  \AtBeginShipoutInit
   \IfFileExists{everyhook.sty}{\RequirePackage{everyhook}\ltj@everyhook@availtrue}{}
 \else                           %<*!LaTeX>
   \input luatexbase.sty
@@ -89,7 +88,6 @@
   \input pdftexcmds.sty
   \input xkeyval
   \input lltjp-atbegshi.sty
-  \AtBeginShipoutInit
 \fi                             %</LaTeX>
 \endlinechar=-1 %
 
@@ -619,7 +617,7 @@
 
 %%%% \hbox, \vbox, \vtop
 \setbox\z@\hbox{%
-  \primitive\everymath{}
+  \primitive\everymath{}%
   $\directlua{% This value depends on the version of LuaTeX.
      luatexja.stack.mmode = -tex.nest[tex.nest.ptr].mode
   }$%
@@ -655,8 +653,6 @@
 
 \protected\def\ltj@@reset@badness{\luafunction\ltj@@reset@badness@inner}
 
-\AtBeginShipout{\directlua{luatexja.direction.finalize()}}
-
 %%%% \raise, \lower, \moveleft, \moveright
 \newluafunction\ltj@@lua@raisebox@inner
 \directlua{
@@ -686,6 +682,7 @@
 %%%%\vsplit
 \let\ltj@@orig@vsplit=\vsplit
 \protected\def\vsplit{\directlua{luatexja.direction.vsplit()}}
+
 %%%% \vcenter
 \let\ltj@@orig@vcenter=\vcenter
 \protected\def\vcenter{\ltj@afterbox\ltj@@vcenter\vbox}
@@ -693,6 +690,21 @@
   \ltj@@lua@raisebox\ltj@@orig@vcenter{\box\ltj@afbox}%
 }
 
+%%%% \shipout
+\newluafunction\ltj@@lua@shipout@inner
+\directlua{
+  local t = lua.get_functions_table()
+  t[\the\ltj@@lua@shipout@inner]=luatexja.direction.shipout
+}
+\protected\luadef\ltj@@lua@shipout\ltj@@lua@shipout@inner
+\protected\def\ltj@shipout{\ltj@afterbox\ltj@@lua@shipout}
+\ifprimitive\shipout\let\shipout\ltj@shipout\fi
+\ifcsname tex_shipout:D\endcsname
+  \expandafter\let\csname tex_shipout:D\endcsname\ltj@shipout
+\fi
+\ifdefined\AtBeginShipoutOriginalShipout
+  \let\AtBeginShipoutOriginalShipout\ltj@shipout
+\fi
 %%%% \unhbox and \unvbox
 \newluafunction\ltj@@lua@unboxcheckdir@inner
 \directlua{
