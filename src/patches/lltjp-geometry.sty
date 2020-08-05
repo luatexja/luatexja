@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-geometry}[2020-08-03 Patch to geometry for LuaTeX-ja with vertical writing mode]
+\ProvidesPackage{lltjp-geometry}[2020-08-05 Patch to geometry for LuaTeX-ja with vertical writing mode]
 \RequirePackage{expl3}
 \ifdefined\if@ltj@@geometry@tate\expandafter\endinput\fi
 \newif\if@ltj@@geometry@tate
@@ -61,24 +61,32 @@
 % define ifGm@swap@papersize if it is undefined
 \expandafter\newif\csname ifGm@swap@papersize\endcsname
 
+\ExplSyntaxOn
 \ltj@ExecuteBeforePackage{geometry}{%
   \edef\Gm@ltj@topskip{\the\topskip}
   \edef\Gm@ltj@headsep{\the\headsep}
   \edef\Gm@ltj@footskip{\the\footskip}
+\bool_set_false:N \l_tmpa_bool
 \ifluatex
-  \ifnum\ltjgetparameter{direction}=3 \@ltj@@geometry@tatetrue\fi
+  \ifnum\ltjgetparameter{direction}=3 \bool_set_true:N \l_tmpa_bool \fi
 \else
-  \@gobble\iftrue\csname iftdir\endcsname\@ltj@@geometry@tatetrue\fi
+  \@gobble\iftrue\csname iftdir\endcsname \bool_set_true:N \l_tmpa_bool \fi
 \fi
-\csname tl_if_in:NnT\endcsname\@begindocumenthook{\tate}{\@ltj@@geometry@tatetrue}
-\if@ltj@@geometry@tate
+\ifltj@ltfilehook@avail
+  \prop_map_inline:Nn \g__hook_begindocument_code_prop
+    { \tl_if_in:nnT {#2} {\tate} {\bool_set_true:N \l_tmpa_bool} }
+\else
+  \tl_if_in:NnT \@begindocumenthook {\tate} {\bool_set_true:N \l_tmpa_bool}
+\fi
+\bool_if:NT \l_tmpa_bool {
   \if@ltj@@geometry@forceoff
     \@ltj@@geometry@tatefalse
   \else
     \let\PackageWarningNoLine\@gobbletwo% 警告抑止
   \fi
-\fi
 }
+}
+\ExplSyntaxOff
 \ltj@ExecuteAfterPackage{geometry}{%
 \let\PackageWarningNoLine=\orig@PackageWarningNoLine
 \if@ltj@@geometry@tate
