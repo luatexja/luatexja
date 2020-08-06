@@ -101,7 +101,8 @@
 \ltj@pkgpatch@im{unicode-math}
 \ltj@pkgpatch@im{siunitx}
 \ltj@pkgpatch@im{microtype}
-\ltj@pkgpatch@im{everyshi}
+
+\ifltj@ltshipout@avail\else\ltj@pkgpatch@im{everyshi}\fi
 
 \RequirePackage{lltjp-geometry}
 

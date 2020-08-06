@@ -3,17 +3,13 @@
 %
 
 \newif\ifltj@ltshipout@avail
-\ifdefined\NeedsTeXFormat
-  \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{lltjp-atbegshi}[2020-08-04 Patching \string\shipout\space hooks for LuaTeX-ja]
-  \@ifl@t@r\fmtversion{2020-10-01}{%
-    \ifnum\patch@level<0\relax \ifnum\patch@level<-6 \ltj@ltshipout@availtrue\fi
-    \else\ltj@ltshipout@availtrue\fi
-  }{}
-  \ifltj@ltshipout@avail\else\RequirePackage{atbegshi}\fi
-\else
-  \input atbegshi.sty
-\fi
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{lltjp-atbegshi}[2020-08-04 Patching \string\shipout\space hooks for LuaTeX-ja]
+\@ifl@t@r\fmtversion{2020-10-01}{%
+  \ifnum\patch@level<0\relax \ifnum\patch@level<-6 \ltj@ltshipout@availtrue\fi
+  \else\ltj@ltshipout@availtrue\fi
+}{}
+\ifltj@ltshipout@avail\else\RequirePackage{atbegshi}\fi
 
 % concept: execute all hooks inside yoko direction \vbox
 
