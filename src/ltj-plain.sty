@@ -57,16 +57,7 @@
 \def\gt{\tengt\tentgt}
 \mc
 
-\directlua{
-  local s = kpse.find_file('ltj-kinsoku.lua', 'tex')
-  luatexja.stack.charprop_stack_table[0] = s and dofile(s) or {}
-}
-
-\ltjsetparameter{kanjiskip=\z@ plus .4pt minus .4pt,
-  xkanjiskip=.25\zw plus 1pt minus 1pt,
-  autospacing, autoxspacing, jacharrange={-1},
-  yalbaselineshift=\z@, yjabaselineshift=\z@,
-  jcharwidowpenalty=500, differentjfm=paverage,
+\ltjsetparameter{%
   jatextfont={0, \tenmin}, jascriptfont={0, \sevenmin},
   jascriptscriptfont={0, \fivemin},
 }

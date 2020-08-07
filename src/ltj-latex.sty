@@ -70,20 +70,6 @@
     \@ifpackageloaded{#1}{\@ifpackageloaded{#2}{}{\RequirePackage{#2}}}{}%
   }%
 }
-
-%%% default parameters
-\directlua{
-  local s = kpse.find_file('ltj-kinsoku.lua', 'tex')
-  luatexja.stack.charprop_stack_table[0] = s and dofile(s) or {}
-}
-
-\ltjsetparameter{kanjiskip=\z@ plus .4pt minus .5pt,
-  xkanjiskip=.25\zw plus 1pt minus 1pt,
-  autospacing, autoxspacing, jacharrange={-1},
-  yalbaselineshift=\z@, yjabaselineshift=\z@,
-  jcharwidowpenalty=500, differentjfm=paverage
-}
-
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
 
 %%% patch for packages

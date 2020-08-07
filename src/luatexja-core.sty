@@ -756,6 +756,7 @@
 
 %%------------------ Load module for the format
 
+\directlua{luatexja.load_kinsoku()}
 \ifltj@in@latex                 %<*LaTeX>
   \RequirePackage{ltj-latex}
 \else\ifltj@in@plain            %<*plain>
