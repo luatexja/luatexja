@@ -55,16 +55,13 @@ Installation
         src/ltjltxdoc.ins
         src/ltjsclasses.ins
 
-   c. Process src/ltj-kinsoku_make.tex by (plain) LuaTeX to generate ltj-kinsoku.lua,
-      which stores default "kinsoku" parameters.
-
-   d. Put src/ into your TEXMF tree.
+   c. Put src/ into your TEXMF tree.
       An example location is TEXMF/tex/luatex/luatexja.
 
       If you are updating from old version, you MUST remove it before
       extracting the new version of LuaTeX-ja.
 
-   e. You may need to update the filename database, by mktexlsr (or by another program).
+   d. You may need to update the filename database, by mktexlsr (or by another program).
 
 
 Basic Usage
