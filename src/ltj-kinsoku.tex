@@ -464,6 +464,6 @@
 \ltjsetparameter{kansujichar={9,`九}}
 
 \directlua{%
- s = table.copy(luatexja.stack.charprop_stack_table[0])
+ local s = table.copy(luatexja.stack.charprop_stack_table[0])
  luatexja.base.save_cache('ltj-kinsoku_default', {s, version=1})
 }
