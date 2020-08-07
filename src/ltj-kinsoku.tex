@@ -465,6 +465,5 @@
 
 \directlua{%
  s = table.copy(luatexja.stack.charprop_stack_table[0])
- s.kanjiskip = nil; s.xkanjiskip = nil
- luatexja.base.save_cache('ltj-kinsoku', {s, version=1})
+ luatexja.base.save_cache('ltj-kinsoku_default', {s, version=1})
 }

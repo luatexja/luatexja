@@ -350,14 +350,14 @@ end
 do
     local cache_ver = 1 -- must be same as ltj-kinsoku.tex
     local cache_outdate_fn = function (t) return t.version~=cache_ver end
-    local t = luatexja.stack.charprop_stack_table
+    local t = ltjs.charprop_stack_table
     function luatexja.load_kinsoku()
-        for i,_ in pairs(t) do t[i]=nil; end
-        tex.setcount('ltj@@stack',0)
-        local kinsoku = ltjb.load_cache('ltj-kinsoku',cache_outdate_fn)
-        t[0] = kinsoku and kinsoku[1] or {}
-        if t[0] then
-            tex.print(cat_lp, '\\input ltj-kinsoku.tex\\relax')
+        for i,_ in pairs(t) do t[i]=nil end
+        local kinsoku = ltjb.load_cache('ltj-kinsoku_default',cache_outdate_fn)
+        if kinsoku and kinsoku[1] then
+            t[0] = kinsoku[1]
+        else
+            t[0] = {}; tex.print(cat_lp, '\\input ltj-kinsoku.tex\\relax')
         end
         luatexja.load_kinsoku=nil
     end

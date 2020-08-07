@@ -656,10 +656,11 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
   \Pkg{everysel}
 %<en>  (if you want to use \LuaTeX-ja with \LaTeXe)
 %<ja>  （\LaTeX 下で\LuaTeX-jaを使う場合）
-\item \Pkg{ltxcmds}, \Pkg{pdftexcmds}, \Pkg{filehook}, \Pkg{atbegshi}
+\item \Pkg{ltxcmds}, \Pkg{pdftexcmds}
+\item \Pkg{filehook}, \Pkg{atbegshi}
+%<en>  (not needed if you want to use \LuaTeX-ja with \LaTeXe~2020-10-01 or later)
+%<ja>  （\LaTeX 2020-10-01以降で\LuaTeX-jaを使う場合はどちらも不要）
 \item \href{https://github.com/wspr/fontspec/}{\Pkg{fontspec}} v2.7c (or later)
-%%% %<en>\item \emph{IPAex fonts} (\url{http://ipafont.ipa.go.jp/})
-%%% %<ja>\item \emph{IPAexフォント(\url{http://ipafont.ipa.go.jp/})}
 %<*en>
 \item \emph{Harano Aji fonts} (\url{https://github.com/trueroad/HaranoAjiFonts})\\
   More specifically, HaranoAjiMincho-Regular~and~HaranoAjiGothic-Medium.
@@ -766,13 +767,10 @@ But only the contents in \texttt{src/} are needed to work \LuaTeX-ja.
 
 %<*en>
 \item If you downloaded this package from CTAN, you have to run following commands
-    to generate classes
-    and \texttt{ltj-kinsoku.lua} (the file which stores default ``\textit{kinsoku}'' parameters):
+    to generate classes:
 %</en>
 %<*ja>
-\item もしCTANから本パッケージを取得したのであれば，日本語用クラスファイルや
-標準の禁則処理用パラメータを
-格納した \texttt{ltj-kinsoku.lua} を生成するために，
+\item もしCTANから本パッケージを取得したのであれば，日本語用クラスファイルを生成するために，
 以下を実行する必要がある：
 %</ja>
 \begin{lstlisting}
@@ -780,19 +778,7 @@ $ cd src
 $ lualatex ltjclasses.ins
 $ lualatex ltjsclasses.ins
 $ lualatex ltjltxdoc.ins
-$ luatex   ltj-kinsoku_make.tex
 \end{lstlisting}
-%<*en>
-\emph{Do not forget processing \texttt{ltj-kinsoku\_make.tex}}.
-\texttt{*.\{dtx,ins\}} and \texttt{ltj-kinsoku\_make.tex} used here are not needed in regular use.
-%</en>
-%<*ja>
-\emph{最後の \texttt{ltj-kinsoku\_make.tex} の実行を忘れないように注意}．
-ここで使用した \texttt{*.\{dtx,ins\}} と \texttt{ltj-kinsoku\_make.tex} は
-通常の使用にあたっては必要ない．
-%</ja>
-
-
 
 %<*en>
 \item Copy all the contents of \texttt{src/} into one of your \texttt{TEXMF} tree.
@@ -11103,6 +11089,15 @@ Adobe-CNS1-*&ltj-cid-auto-adobe-cns1.\{lua.gz,luc\}&UniCNS-UTF32-*&Adobe-CNS1-UC
 \bottomrule
 \end{tabular}
 \end{table}
+
+%<*ja>
+\item[ltj-kinsoku\_default.\{lua.gz,luc\}]
+禁則処理，\Param{kansujichar}などの標準設定が格納されたファイルである．
+%</ja>
+%<*en>
+\item[ltj-kinsoku.luc]
+The bytecode cache which default \textit{kinsoku} parameters are stored.
+%</en>
 
 %<*ja>
 \item[ltj-jisx0208.luc]
