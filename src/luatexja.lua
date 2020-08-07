@@ -372,8 +372,7 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
    local k = prefix
    local s
    local pt, pic = node_type(p.id), (has_attr(p, attr_icflag) or 0) % icflag_table.PROCESSED_BEGIN_FLAG
-   local base = prefix .. string.format('%X', pic)
-   .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
+   local base = prefix .. string.format('%X', pic) .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
    if pt == 'glyph' then
       s = base .. ' ' 
           .. (p.char<0xF0000 and utfchar(p.char) or '') 
@@ -505,6 +504,9 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
             for i=1,#p.data do
                print_fn(s .. '  [' .. i .. '] = ' .. tostring(p.data[i].csname))
             end
+         elseif p.subtype==16 then
+            s = s .. ' mode=' .. p.mode .. ', literal="' .. p.data .. '"'
+            print_fn(s)
          else
             print_fn(s)
          end

@@ -1058,8 +1058,7 @@ do
    local finalize_inner
    local function finalize_dir_node(db,new_dir)
       local b = getlist(db)
-      if getid(b)==id_whatsit and getsubtype(b)==sid_user
-         and getfield(b, 'user_id')==DIR then
+      while b and ((getid(b)~=id_hlist) and (getid(b)~=id_vlist)) do
          local ob = b; b = node_remove(b,b); setfield(db, 'head', b);
          node_free(ob)
       end
