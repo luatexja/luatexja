@@ -679,9 +679,10 @@ the following distributions:
   \begin{itemize}
   \item \href{https://www.tug.org/texlive/}{\TeX~Live} (in \texttt{texmf-dist/tex/luatex/luatexja})
   \item \href{http://w32tex.org/}{W32\TeX}\ (in \texttt{luatexja.tar.xz})
-  \item MiK\TeX\ (in \texttt{luatexja.tar.lzma}); see the next subsection
+  \item MiK\TeX\ (in \texttt{luatexja.tar.xz})
   \end{itemize}
-Harano Aji fonts are available in \TeX~Live and MiK\TeX.
+Harano Aji fonts are also available in these distributions
+(\texttt{haranoaji} in \TeX~Live and MiK\TeX, and \texttt{luatexja.tar.xz} in W32\TeX).
 %</en>
 %<*ja>
 現在，\LuaTeX-jaはCTAN (\texttt{macros/luatex/generic/luatexja})に収録されている他，
@@ -691,7 +692,8 @@ Harano Aji fonts are available in \TeX~Live and MiK\TeX.
   \item \TeX~Live (\texttt{texmf-dist/tex/luatex/luatexja})
   \item W32\TeX\ (\texttt{luatexja.tar.xz})
   \end{itemize}
-\TeX~Live, MiK\TeX は原ノ味フォントも収録している．
+これらのディストリビューションは原ノ味フォントも収録している
+（\TeX~Live, MiK\TeX では\texttt{haranoaji}，W32\TeX では\texttt{luatexja.tar.xz}）.
 %</ja>
 
 %<*en>
@@ -1135,7 +1137,7 @@ By default, the following fonts are used for these two families.
   フォントを変更する命令）の前で実行することにより使うことができる．
 
   \pLaTeX では標準の欧文フォントはOT1エンコーディングのComputer Modern Roman (\texttt{cmr})%
-  であったが，2017年以降の\LuaLaTeX ではTUエンコーディングのlatin Modern Roman (\texttt{lmr})%
+  であったが，2017年以降の\LuaLaTeX ではTUエンコーディングのLatin Modern Roman (\texttt{lmr})%
   に変更されている．そのため，前段落で述べた「従属欧文」も，Latin Modern Romanに設定している．
 %</ja>
 
@@ -1680,7 +1682,8 @@ as an external package \Pkg{luatexja-otf}.
 %</ja>
 
 \begin{LTXexample}[width=0.4\textwidth]
-森\UTF{9DD7}外と内田百\UTF{9592}とが\UTF{9AD9}島屋に\\
+森\UTF{9DD7}外と\CID{13966}田百\UTF{9592}とが
+\UTF{9AD9}島屋に\\
 \CID{7652}飾区の\CID{13706}野家，
 \CID{1481}城市，葛西駅，\\
 高崎と\CID{8705}\UTF{FA11}，濱と\ajMayuHama\\
@@ -1813,7 +1816,7 @@ determined from the following data:
 %<en>\item Blocks in Unicode~12.0.0.
 %<ja>\item Unicode~12.0のブロック．
 %<en>\item The \texttt{Adobe-Japan1-UCS2} mapping between a CID Adobe-Japan1- and Unicode.
-%<ja>\item Adobe-Japan1-7のCIDとUnicodeの間の対応表\texttt{Adobe-Japan1-UCS2}7．
+%<ja>\item Adobe-Japan1-7のCIDとUnicodeの間の対応表\texttt{Adobe-Japan1-UCS2}．
 %<en>\item The \Pkg{PXbase} bundle for \upTeX\ by Takayuki Yato.
 %<ja>\item 八登崇之氏による\upTeX 用の\Pkg{PXbase}バンドル．
 \end{itemize}
@@ -2005,12 +2008,12 @@ these eight ranges belongs to the character range~217.
                              で構成されている．したがって，ブロックのリストを示す
                              代わりに，範囲の定義そのものを示す．
 %</ja>
-\begin{lstlisting}
+\begin{lstlisting}[escapechar=\!]
 \ltjdefcharrange{4}{%
    "500-"10FF, "1200-"1DFF, "2440-"245F, "27C0-"28FF, "2A00-"2AFF,
   "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A95F, "A980-"ABFF, "E000-"F8FF,
   "FB00-"FE0F, "FE20-"FE2F, "FE70-"FEFF, "10000-"1AFFF, "1B170-"1F0FF,
-  "1F300-"1FFFF, ... (characters in "2000-"206F which are not in range 9)
+  "1F300-"1FFFF, ... !\rmfamily (and characters in \texttt{U+2000}--\texttt{U+206F} which are not in range 9)!
 } % non-Japanese
 \end{lstlisting}
 %<en>\item[Range~5${}^{\text{A}}$] Surrogates and Supplementary Private Use Areas.
