@@ -1,6 +1,6 @@
 %#! lualatex
-\documentclass[a4paper,10pt]{ltjsarticle}
-\usepackage[textwidth=45\zw, lines=45, footskip=2\zh, verbose]{geometry}
+\documentclass[a4paper,10ptj]{ltjsarticle}
+\usepackage[textwidth=42\zw, lines=42, footskip=2\zh, verbose]{geometry}
 \usepackage{listings,amsmath,booktabs,lltjext,bxghost}
 \usepackage{unicode-math}
 \setmathfont{Latin Modern Math}
@@ -48,10 +48,10 @@
 \section{利用方法}
 \Pkg{lltjp-geometry}パッケージは，\LuaTeX-jaに標準で含まれている．
 本パッケージの動作には\href{http://www.ctan.org/pkg/ifluatex}{\Pkg{ifluatex}},
-\href{http://www.ctan.org/pkg/filehook}{\Pkg{filehook}}パッケージが必要である．
+\href{https://www.ctan.org/pkg/etoolbox}{\Pkg{etoolbox}}パッケージが必要である．
+また，\LaTeXe~2020\nobreakdash-02\nobreakdash-02以前では\href{http://www.ctan.org/pkg/filehook}{\Pkg{filehook}}パッケージも必要である．
 
-\LuaTeX-jaでは，\Pkg{geometry}パッケージ読み込み時に
-自動的に\Pkg{lltjp-geometry}パッケージが読み込まれる．
+\LuaTeX-jaでは，自動的に\Pkg{lltjp-geometry}パッケージが読み込まれる．
 縦組クラスか否かの自動判定（\ref{ssec:auto}節）を上書きしたい場合は，
 \begin{lstlisting}
 % \PassOptionsToPackage{force}{lltjp-geometry} % 強制的に有効
@@ -60,7 +60,7 @@
 \usepackage[...]{geometry}
 \end{lstlisting}
 のように\emph{\Pkg{luatexja}の読み込み前}に\cs{PassOptionsToPackage}で
-本パッケージに渡すオプションを指定する（\cs{usepackage\{lltjp-geometry\}}\>は使えない）．
+本パッケージに渡すオプションを指定する（\cs{usepackage\{lltjp-geometry\}}\>を行っても意味がない）．
 
 \pTeX 系列では，\Pkg{tarticle}, \Pkg{tbook}, \Pkg{treport}といった
 \emph{縦組クラスを使う場合}に，
@@ -68,7 +68,7 @@
 \usepackage[...]{lltjp-geometry}
 \usepackage[...]{geometry}
 \end{lstlisting}
-と，\Pkg{geometry}パッケージの前に読み込む．
+と，\Pkg{geometry}パッケージの\emph{前}に読み込む．
 
 \subsection{縦組クラスか否かの判定}
 \label{ssec:auto}
@@ -76,10 +76,12 @@
 \Pkg{geometry}パッケージ読み込み直後にパッチを当てる：
 \begin{enumerate}
   \item \Pkg{geometry}パッケージを読み込む際に，現在の組方向が縦組になっている．
-  \item \cs{AtBeginDocument}により指定される，\cs{begin\{document\}}\>時に実行される内容に
-  \cs{tate}（というトークン）が含まれている．
+  \item \cs{AtBeginDocument}により
+  \footnote{\LaTeXe~2020-10-01以降ではそれと同義な\>\cs{AddToHook\{begindocument\}}\>も含む．}指定される，
+  \cs{begin\{document\}}\>時に実行される内容に\cs{tate}（というトークン）が含まれている．
   \item 本パッケージを読み込む際に\texttt{force}オプションが指定されている．
 \end{enumerate}
+
 \LuaTeX-jaで縦組クラスを利用する場合は主に1.の，
 \pTeX 系列で縦組クラスを利用する場合は主に2.の状況となる
 \footnote{%

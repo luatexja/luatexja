@@ -3,12 +3,10 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjdefs}[2020/03/16 Default font settings of LuaTeX-ja]
+\ProvidesPackage{lltjdefs}[2020-08-08 Default font settings of LuaTeX-ja]
 
 \ifdefined\ltj@stdmcfont\else\def\ltj@stdmcfont{file:HaranoAjiMincho-Regular.otf}\fi
 \ifdefined\ltj@stdgtfont\else\def\ltj@stdgtfont{file:HaranoAjiGothic-Medium.otf}\fi
-%\ifdefined\ltj@stdmcfont\else\def\ltj@stdmcfont{IPAExMincho}\fi
-%\ifdefined\ltj@stdgtfont\else\def\ltj@stdgtfont{IPAExGothic}\fi
 \ifdefined\ltj@stdyokojfm\else\def\ltj@stdyokojfm{ujis}\fi
 \ifdefined\ltj@stdtatejfm\else\def\ltj@stdtatejfm{ujisv}\fi
 \InputIfFileExists{luatexja.cfg}{%
@@ -34,11 +32,9 @@
 \newcommand\kanjiencodingdefault{JY3}
 \newcommand\kanjifamilydefault{\mcdefault}
 \newcommand\kanjiseriesdefault{\mddefault}
-\ifdefined\@rmfamilyhook
-  %% LaTeX 2020-02-02
+\ifdefined\@rmfamilyhook%% LaTeX 2020-02-02
   \newcommand\kanjishapedefault{\shapedefault}
-\else
-  %% LaTeX 2019-10-01
+\else                   %% LaTeX 2019-10-01
   \newcommand\kanjishapedefault{\updefault}
 \fi
 
@@ -78,8 +74,7 @@
 \DeclareOldFontCommand{\gt}{\normalfont\gtfamily}{}
 
 \unless\ifltj@disablejfam
-  \DeclareSymbolFont{mincho}{JY3}{mc}{m}{n}
-  \jfam\symmincho
+  \DeclareSymbolFont{mincho}{JY3}{mc}{m}{n}\jfam\symmincho
   \SetSymbolFont{mincho}{bold}{JY3}{gt}{m}{n}
   \DeclareSymbolFontAlphabet{\mathmc}{mincho}
   \DeclareMathAlphabet{\mathgt}{JY3}{gt}{m}{n}

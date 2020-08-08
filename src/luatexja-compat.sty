@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-compat}[2018/03/29 Compatibility with pTeX]
+  \ProvidesPackage{luatexja-compat}[2020-08-08 Compatibility with pTeX]
 \fi                             %</LaTeX>
 
 % Load core module if not yet.
@@ -99,13 +99,8 @@
 \def\sjis{\ltj@code@conv{sjis}}
 \def\ucs{\ltj@code@conv{ucs}}
 
-\def\ltj@code@conv#1{%
-  \directlua{luatexja.compat.from_#1(token.scan_int())}%
-}
-
-\def\kansuji{%
-  \directlua{luatexja.compat.to_kansuji(token.scan_int())}%
-}
+\def\ltj@code@conv#1{\directlua{luatexja.compat.from_#1(token.scan_int())}}
+\def\kansuji{\directlua{luatexja.compat.to_kansuji(token.scan_int())}}
 
 \define@key[ltj]{japaram}{kansujichar}{\ltj@@set@stack{KSJ}{0}{0x7FFFFFFF}#1 }
 \ltj@@decl@array@param{kansujichar}
