@@ -90,6 +90,10 @@ Notes
 
   No .{dtx,ins} pair generates .sty files of LuaTeX-ja package.
 
-* src/*.{ins.dtx} and src/ltj-kinsoku_make.tex are not needed in regular use.
+* src/*.{ins.dtx} are not needed in regular use.
+
+* ltj-kinsoku_make.tex is removed in version 20200808.0. 
+  This file and ltj-kinsoku.lua are not used anymore.
+  (Do not remove ltj-kinsoku.tex.)
 
 Last commit date: $Format:%cd$
