@@ -2,13 +2,11 @@
 \input luatexja.sty
 \catcode`\@=11
 \jfont \testA=\ltj@stdmcfont:jfm=ujis/hoge,piyo at 9.62216pt
-\jfont \testB=\ltj@stdmcfont:jfm=ujis/piyo,hoge;jp90 at 9.62216pt
-\jfont \testC=\ltj@stdgtfont:jfm=ujis/;+jp90 at 9.62216pt
-\jfont \testD=\ltj@stdgtfont:jfm=/abcd;+trad at 9.62216pt % error
-\jfont \testE=\ltj@stdmcfont:jfm=ujis/piyo,hoge=2,=4,hoge=true;jp90 at 9.62216pt
-\jfont \testF=\ltj@stdmcfont:jfm=ujis/hoge=true,piyo at 9.62216pt
-% note that metrics of \testA and \testF are different; in \testF, the value of 'hoge' is a string 'true',
-% while that in \testA is a boolean true.
+\jfont \testB=\ltj@stdmcfont:jfm=ujis/piyo,,,,,+hoge,,,,;jp90 at 9.62216pt
+\jfont \testC=\ltj@stdgtfont:jfm=ujis/,,,,;+jp90 at 9.62216pt
+%\jfont \testD=\ltj@stdgtfont:jfm=/abcd;+trad at 9.62216pt % error
+\jfont \testE=\ltj@stdmcfont:jfm=ujis/piyo,hoge=2,+foo,-bar,mog=6,,l=true,g=false;jp90 at 9.62216pt
+
 
 
 \ltjsetparameter{differentjfm=both}

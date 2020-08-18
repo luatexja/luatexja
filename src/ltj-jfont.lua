@@ -368,9 +368,39 @@ do
    end
 end
 
+local dec_opt
+do
+    local lpeg = require "lpeg"
+    local P, R, S, V        = lpeg.P, lpeg.R, lpeg.S, lpeg.V
+    local lpegmatch         = lpeg.match
+    local C, Cc, Cf, Ct, Cg = lpeg.C, lpeg.Cc, lpeg.Cf, lpeg.Ct, lpeg.Cg
+    local comma             = P","
+    local field_char        = 1 - S'=' - comma
+    local field             = C(field_char^1)
+    local assignment        = field * P'=' * field
+    local switch            = P"-"    * field * Cc(false) + P"+"^-1 * field * Cc(true)
+    local feature_expr      = Cg(assignment + switch) * comma^0
+    local feature_list      = Cf(Ct"" * feature_expr^0, rawset)
+    dec_opt = function(s) 
+        local flag, t = nil, feature_list:match(s)
+        if t then
+            for i,v in pairs(t) do
+                flag=true
+                if v=='true' then t[i]=true elseif v=='false' then t[i]=false end
+            end
+        end
+        return flag and t
+    end
+    --[[
+    -- "jfm=" <jfm_file_name> ["/" <feature> [ ","+ <feature>]* ]
+    -- <feature>  ::= [<switch>] <name> | <name> "=" <value>
+    -- <switch>   ::= "+" | "-"
+    -- <value>: "true", "false" はブール値へ変換，あとは文字列のまま．
+    --]]
+end
 do
    local gmatch = string.gmatch
-   -- extract jfm_spec and jfm_var
+   -- extract jfm_name, jfm_spec and jfm_var
    -- normalize position of 'jfm=' and 'jfmvar=' keys
    local function extract_jfm_spec(name)
       name = (name:match '^{(.*)}$') or (name:match '^"(.*)"$') or name
@@ -406,17 +436,15 @@ do
       if jfm_name~='' then
          local l = name:sub(-1)
          if s then
-            local t = {}
-            s:gsub('[^,]+',
-               function(a)
-                  local k,v = a:match('^([^=]*)=(.*)$')
-                  if not k then t[a]=true else t[k]=v end
-               end)
-            local t2 = {}
-            for i,v in pairs(t) do t2[#t2+1]=(v==true) and i or (i..'='..tostring(v)) end
-            if #t2>0 then
+            local t = dec_opt(s)
+            if t then
+               local t2 = {}
+               for i,v in pairs(t) do
+                   t2[#t2+1] = (v==true) and i
+                     or ((v==false) and ('-'..i) or (i..'='..tostring(v)))
+               end
                table.sort(t2); jfm_spec = jfm_name .. '/' .. table.concat(t2, ',')
-               luatexja.jfont.jfm_feature = t2
+               luatexja.jfont.jfm_feature = t
             else
                jfm_spec = jfm_name; luatexja.jfont.jfm_feature = nil
             end
@@ -428,7 +456,7 @@ do
             name = name .. ';jfmvar=' .. jfm_var
          end
       end
-      for x in gmatch (name, "[:;]([+%%-]?)ltjks") do
+      for x in gmatch (name, "[:;]([+%-]?)ltjksp") do
          jfm_ksp = not (x=='-')
       end
       if jfm_dir == 'tate' then
