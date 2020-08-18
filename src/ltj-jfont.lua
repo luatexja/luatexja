@@ -42,7 +42,7 @@ local font_metric_table = ltju.font_metric_table -- [font number] -> jfm_name, j
 
 luatexbase.create_callback("luatexja.load_jfm", "data", function (ft, jn) return ft end)
 
-local jfm_file_name, jfm_var, jfm_ksp
+local jfm_spec, jfm_name, jfm_var, jfm_ksp
 local defjfm_res
 local jfm_dir, is_def_jfont, vert_activated, auto_enable_vrt2
 
@@ -177,7 +177,7 @@ function luatexja.jfont.define_jfm(to)
       t.chars.nox_alchar = t.chars.jcharbdd
       t.chars.glue = t.chars.jcharbdd
    end
-   t = luatexbase.call_callback("luatexja.load_jfm", t, jfm_file_name)
+   t = luatexbase.call_callback("luatexja.load_jfm", t, jfm_spec, luatexja.jfont.jfm_feature)
    t.size_cache = {}
    defjfm_res = t
 end
@@ -284,20 +284,16 @@ do
    local cstemp
    local global_flag -- true if \globaljfont, false if \jfont
    load_jfont_metric = function()
-      if jfm_file_name=='' then
-         ltjb.package_error('luatexja',
-                            'no JFM specified',
+     if jfm_name=='' then
+         ltjb.package_error('luatexja', 'no JFM specified',
                             'To load and define a Japanese font, a JFM must be specified.'..
                             "The JFM 'ujis' will be  used for now.")
-         jfm_file_name = 'ujis'
+         jfm_name, jfm_spec = 'ujis', 'ujis'
       end
-      for j,v in ipairs(metrics) do
-         if v.name==jfm_file_name then return j end
-      end
-      luatexja.load_lua('jfm-' .. jfm_file_name .. '.lua')
+      for j,v in ipairs(metrics) do if v.name==jfm_spec then return j end end
+      luatexja.load_lua('jfm-' .. jfm_name .. '.lua')
       if defjfm_res then
-         defjfm_res.name = jfm_file_name
-         table.insert(metrics, defjfm_res)
+         defjfm_res.name = jfm_spec; table.insert(metrics, defjfm_res)
          return #metrics
       else
          return nil
@@ -323,8 +319,7 @@ do
       local fn = font.id(cstemp)
       local f = font_getfont(fn)
       if not j then
-         ltjb.package_error('luatexja',
-                            "bad JFM `" .. jfm_file_name .. "'",
+         ltjb.package_error('luatexja', "bad JFM `" .. jfm_name .. "'",
                             'The JFM file you specified is not valid JFM file.\n'..
                                'So defining Japanese font is cancelled.')
          tex.sprint(cat_lp, global_flag, '\\expandafter\\let\\csname ',
@@ -352,7 +347,7 @@ do
       tex.sprint(cat_lp, global_flag, '\\protected\\expandafter\\def\\csname ',
                     (cstemp==' ') and '\\space' or cstemp, '\\endcsname{\\ltj@cur'..
                     (jfm_dir == 'yoko' and 'j' or 't') .. 'fnt', fn, '\\relax}')
-      jfm_file_name = nil
+      jfm_spec = nil
    end
 end
 
@@ -375,11 +370,11 @@ end
 
 do
    local gmatch = string.gmatch
-   -- extract jfm_file_name and jfm_var
+   -- extract jfm_spec and jfm_var
    -- normalize position of 'jfm=' and 'jfmvar=' keys
-   local function extract_metric(name)
+   local function extract_jfm_spec(name)
       name = (name:match '^{(.*)}$') or (name:match '^"(.*)"$') or name
-      jfm_file_name = ''; jfm_var = ''; jfm_ksp = true
+      jfm_spec, jfm_var, jfm_ksp = '', '', true
       local tmp, index = name:sub(1, 5), 1
       if tmp == 'file:' or tmp == 'name:' or tmp == 'psft:' then
          index = 6
@@ -389,7 +384,7 @@ do
          local l = name:len()+1
          local q = name:find(";", index) or l
          if name:sub(index, index+3)=='jfm=' and q>index+4 then
-            jfm_file_name = name:sub(index+4, q-1)
+            jfm_spec = name:sub(index+4, q-1)
             if l~=q then
                name = name:sub(1,index-1) .. name:sub(q+1)
             else
@@ -406,11 +401,29 @@ do
             index = (l~=q) and (q+1) or nil
          end
       end
-      if jfm_file_name~='' then
+      local s
+      jfm_name, s = jfm_spec:match '^([^/]*)/(.*)'; jfm_name = jfm_name or jfm_spec
+      if jfm_name~='' then
          local l = name:sub(-1)
-         name = name
-            .. ((l==':' or l==';') and '' or ';')
-            .. 'jfm=' .. jfm_file_name
+         if s then
+            local t = {}
+            s:gsub('[^,]+',
+               function(a)
+                  local k,v = a:match('^([^=]*)=(.*)$')
+                  if not k then t[a]=true else t[k]=v end
+               end)
+            local t2 = {}
+            for i,v in pairs(t) do t2[#t2+1]=(v==true) and i or (i..'='..tostring(v)) end
+            if #t2>0 then
+               table.sort(t2); jfm_spec = jfm_name .. '/' .. table.concat(t2, ',')
+               luatexja.jfont.jfm_feature = t2
+            else
+               jfm_spec = jfm_name; luatexja.jfont.jfm_feature = nil
+            end
+         else
+            luatexja.jfont.jfm_feature = nil
+         end
+         name = name .. ((l==':' or l==';') and '' or ';') .. 'jfm=' .. jfm_spec
          if jfm_var~='' then
             name = name .. ';jfmvar=' .. jfm_var
          end
@@ -432,7 +445,7 @@ do
    local otfl_fdr
    local ltjr_font_callback = ltjr.font_callback
    function luatexja.font_callback(name, size, id)
-      local new_name = is_def_jfont and extract_metric(name) or name
+      local new_name = is_def_jfont and extract_jfm_spec(name) or name
       is_def_jfont = false
       local res =  ltjr_font_callback(new_name, size, id, otfl_fdr)
       luatexbase.call_callback('luatexja.define_font', res, new_name, size, id)
@@ -447,7 +460,7 @@ do
    local function load_jfmonly()
       local spec, size = match(scan_arg(), '(.+)%s+at%s*([%.%w]*)')
       local dir = scan_arg()
-      size = sp(size); extract_metric(spec)
+      size = sp(size); extract_jfm_spec(spec)
       jfm_dir = dir
       local i = load_jfont_metric()
       local j = -update_jfm_cache(i, size)
