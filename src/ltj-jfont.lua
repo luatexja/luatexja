@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2020-07-30',
+  date = '2020-08-20',
   description = 'Loader for Japanese fonts',
 })
 
@@ -379,14 +379,14 @@ do
     local semicolon         = P';'
     local comma             = P','
     local equals            = P'='
-    local featuresep        = comma + semicolon
-    local jf_field_char     = 1 - slash - featuresep
+    local jf_field_char     = 1 - S'/{};,'
     local jf_field          = C(jf_field_char^1)
     local jf_assignment     = jf_field * equals * jf_field
     local jf_switch         = P'-'    * jf_field * Cc(false) + P'+'^-1 * jf_field * Cc(true)
     local jf_feature_expr   = Cg(jf_assignment + jf_switch) * comma^0
-    local jf_list           = C((1-slash)^1) * (slash^1 * (Cf(Ct'' * jf_feature_expr^0, rawset)))^-1
-    local jf_value          = (1 - S'{}' - semicolon)^1
+    local jf_feature_list   = P'{' * jf_feature_expr^0 * P'}' + jf_feature_expr^0
+    local jf_list           = C((1-slash)^1) * (slash * Cf(Ct'' * jf_feature_list, rawset))^-1
+    local jf_value          = (1 - semicolon)^1
     local function rem(name,value,sep)
       if name=='jfm' then
         local flag, t; jfm_name, t = lpegmatch(jf_list, value)
@@ -402,7 +402,7 @@ do
     end
     local jf_remainder      = Cs( ( ( B(S':;') *
       C(P'jfm' * P'var'^-1) * ws * equals * ws * C(jf_value) * C(semicolon^-1) ) / rem +1 )^0 )
-    
+
    local parser=luaotfload.parsers.font_request
    function is_feature_specified(s,fname)
      local t = lpegmatch(parser,s); return t and t.features and t.features[fname]
@@ -426,7 +426,7 @@ do
             end
             table.sort(t2); jfm_spec = jfm_name .. '/{' .. table.concat(t2, ',') .. '}'
          else
-            jfm_spec = jfm_name       
+            jfm_spec = jfm_name
          end
          l = name:sub(-1)
          name = name .. ((l==':' or l==';') and '' or ';') .. 'jfm=' .. jfm_spec
