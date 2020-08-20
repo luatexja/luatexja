@@ -379,7 +379,7 @@ do
     local semicolon         = P';'
     local comma             = P','
     local equals            = P'='
-    local jf_field_char     = 1 - S'/{};,'
+    local jf_field_char     = 1 - S'/{};,='
     local jf_field          = C(jf_field_char^1)
     local jf_assignment     = jf_field * equals * jf_field
     local jf_switch         = P'-'    * jf_field * Cc(false) + P'+'^-1 * jf_field * Cc(true)
@@ -421,6 +421,7 @@ do
          if luatexja.jfont.jfm_feature then
             local l, t2 = name:sub(-1), {}
             for i,v in pairs(luatexja.jfont.jfm_feature) do
+               -- print(i,type(v),v)
                t2[#t2+1] = (v==true) and i
                   or ((v==false) and ('-'..i) or (i..'='..tostring(v)))
             end
@@ -433,6 +434,7 @@ do
          if jfm_var~='' then
             name = name .. ';jfmvar=' .. jfm_var
          end
+         -- print('NN>', name)
       end
       jfm_ksp = (is_feature_specified(name,'ltjksp')~=false)
       if jfm_dir == 'tate' then
