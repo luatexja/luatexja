@@ -368,101 +368,77 @@ do
    end
 end
 
-local dec_opt
 do
-    local lpeg = require "lpeg"
     local P, R, S, V        = lpeg.P, lpeg.R, lpeg.S, lpeg.V
     local lpegmatch         = lpeg.match
     local C, Cc, Cf, Ct, Cg = lpeg.C, lpeg.Cc, lpeg.Cf, lpeg.Ct, lpeg.Cg
-    local comma             = P","
-    local field_char        = 1 - S'=' - comma
-    local field             = C(field_char^1)
-    local assignment        = field * P'=' * field
-    local switch            = P"-"    * field * Cc(false) + P"+"^-1 * field * Cc(true)
-    local feature_expr      = Cg(assignment + switch) * comma^0
-    local feature_list      = Cf(Ct"" * feature_expr^0, rawset)
-    dec_opt = function(s) 
-        local flag, t = nil, feature_list:match(s)
-        if t then
-            for i,v in pairs(t) do
-                flag=true
-                if v=='true' then t[i]=true elseif v=='false' then t[i]=false end
+    local Cs, B             = lpeg.Cs, lpeg.B
+    local spacing           = S" \t\v"
+    local ws                = spacing^0
+    local slash             = P'/'
+    local semicolon         = P';'
+    local comma             = P','
+    local equals            = P'='
+    local featuresep        = comma + semicolon
+    local jf_field_char     = 1 - slash - featuresep
+    local jf_field          = C(jf_field_char^1)
+    local jf_assignment     = jf_field * equals * jf_field
+    local jf_switch         = P'-'    * jf_field * Cc(false) + P'+'^-1 * jf_field * Cc(true)
+    local jf_feature_expr   = Cg(jf_assignment + jf_switch) * comma^0
+    local jf_list           = C((1-slash)^1) * (slash^1 * (Cf(Ct'' * jf_feature_expr^0, rawset)))^-1
+    local jf_value          = (1 - S'{}' - semicolon)^1
+    local function rem(name,value,sep)
+      if name=='jfm' then
+        local flag, t; jfm_name, t = lpegmatch(jf_list, value)
+        if type(t)=='table' then
+          for i,v in pairs(t) do
+            flag=true
+            if v=='true' then t[i]=true elseif v=='false' then t[i]=false end
             end
         end
-        return flag and t
+        luatexja.jfont.jfm_feature = flag and t
+      elseif name=='jfmvar' then jfm_var = value end
+      return ''
     end
-    --[[
-    -- "jfm=" <jfm_file_name> ["/" <feature> [ ","+ <feature>]* ]
-    -- <feature>  ::= [<switch>] <name> | <name> "=" <value>
-    -- <switch>   ::= "+" | "-"
-    -- <value>: "true", "false" はブール値へ変換，あとは文字列のまま．
-    --]]
-end
-do
-   local gmatch = string.gmatch
+    local jf_remainder      = Cs( ( ( B(S':;') *
+      C(P'jfm' * P'var'^-1) * ws * equals * ws * C(jf_value) * C(semicolon^-1) ) / rem +1 )^0 )
+    
+   local parser=luaotfload.parsers.font_request
+   function is_feature_specified(s,fname)
+     local t = lpegmatch(parser,s); return t and t.features and t.features[fname]
+   end    
    -- extract jfm_name, jfm_spec and jfm_var
    -- normalize position of 'jfm=' and 'jfmvar=' keys
    local function extract_jfm_spec(name)
       name = (name:match '^{(.*)}$') or (name:match '^"(.*)"$') or name
-      jfm_spec, jfm_var, jfm_ksp = '', '', true
+      jfm_spec, jfm_var = '', ''
       local tmp, index = name:sub(1, 5), 1
       if tmp == 'file:' or tmp == 'name:' or tmp == 'psft:' then
          index = 6
       end
-      local p = name:find(":", index); index = p and (p+1) or index
-      while index do
-         local l = name:len()+1
-         local q = name:find(";", index) or l
-         if name:sub(index, index+3)=='jfm=' and q>index+4 then
-            jfm_spec = name:sub(index+4, q-1)
-            if l~=q then
-               name = name:sub(1,index-1) .. name:sub(q+1)
-            else
-               name = name:sub(1,index-1); index = nil
-            end
-         elseif name:sub(index, index+6)=='jfmvar=' and q>index+6 then
-            jfm_var = name:sub(index+7, q-1)
-            if l~=q then
-               name = name:sub(1,index-1) .. name:sub(q+1)
-            else
-               name = name:sub(1,index-1); index = nil
-            end
-         else
-            index = (l~=q) and (q+1) or nil
-         end
-      end
-      local s
-      jfm_name, s = jfm_spec:match '^([^/]*)/(.*)'; jfm_name = jfm_name or jfm_spec
+      name = lpegmatch(jf_remainder, name)
       if jfm_name~='' then
-         local l = name:sub(-1)
-         if s then
-            local t = dec_opt(s)
-            if t then
-               local t2 = {}
-               for i,v in pairs(t) do
-                   t2[#t2+1] = (v==true) and i
-                     or ((v==false) and ('-'..i) or (i..'='..tostring(v)))
-               end
-               table.sort(t2); jfm_spec = jfm_name .. '/' .. table.concat(t2, ',')
-               luatexja.jfont.jfm_feature = t
-            else
-               jfm_spec = jfm_name; luatexja.jfont.jfm_feature = nil
+         if luatexja.jfont.jfm_feature then
+            local l, t2 = name:sub(-1), {}
+            for i,v in pairs(luatexja.jfont.jfm_feature) do
+               t2[#t2+1] = (v==true) and i
+                  or ((v==false) and ('-'..i) or (i..'='..tostring(v)))
             end
+            table.sort(t2); jfm_spec = jfm_name .. '/{' .. table.concat(t2, ',') .. '}'
          else
-            luatexja.jfont.jfm_feature = nil
+            jfm_spec = jfm_name       
          end
+         l = name:sub(-1)
          name = name .. ((l==':' or l==';') and '' or ';') .. 'jfm=' .. jfm_spec
          if jfm_var~='' then
             name = name .. ';jfmvar=' .. jfm_var
          end
       end
-      for x in gmatch (name, "[:;]([+%-]?)ltjksp") do
-         jfm_ksp = not (x=='-')
-      end
+      jfm_ksp = (is_feature_specified(name,'ltjksp')~=false)
       if jfm_dir == 'tate' then
-         vert_activated = (not name:match '[:;]%-vert') and (not name:match '[:;]%-vrt2')
+         vert_activated = (is_feature_specified(name,'vert')~=false) and (is_feature_specified(name,'vrt2')~=false)
          auto_enable_vrt2 
-           = (not name:match '[:;][+%-]?vert') and (not name:match '[:;][+%-]?vrt2')
+           = (is_feature_specified(name,'vert')~=nil) and (is_feature_specified(name,'vrt2')~=nil)
       else
          vert_activated, auto_enable_vrt2 = nil, nil
       end
