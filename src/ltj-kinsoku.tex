@@ -366,6 +366,7 @@
 \ltjsetparameter{jaxspmode={`．,postonly}}
 \ltjsetparameter{jaxspmode={`；,postonly}}
 \ltjsetparameter{jaxspmode={`？,postonly}}
+\ltjsetparameter{jaxspmode={`！,postonly}}
 \ltjsetparameter{jaxspmode={`）,postonly}}
 \ltjsetparameter{jaxspmode={`（,preonly}}
 \ltjsetparameter{jaxspmode={`］,postonly}}
@@ -464,5 +465,5 @@
 
 \directlua{%
  local s = table.copy(luatexja.stack.charprop_stack_table[0])
- luatexja.base.save_cache('ltj-kinsoku_default', {s, version=1})
+ luatexja.base.save_cache('ltj-kinsoku_default', {s, version=2})
 }
