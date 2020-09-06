@@ -1,19 +1,48 @@
 %#!luatex
-\input luatexja.sty
+\input lua-visual-debug.sty
+\input luatexja-otf.sty
 \catcode`\@=11
 \jfont \testA=\ltj@stdmcfont:jfm=ujis/hoge,piyo at 9.62216pt
 \jfont \testB=\ltj@stdmcfont:jfm=ujis/{piyo,,,,,+hoge,,,,};jp90 at 9.62216pt
 \jfont \testC=\ltj@stdgtfont:jfm=ujis/,,,,;+jp90 at 9.62216pt
 %\jfont \testD=\ltj@stdgtfont:jfm=/abcd;+trad at 9.62216pt % error
 \jfont \testE=\ltj@stdmcfont:jfm=ujis/piyo,hoge=2,+foo,-bar,mog=6,,l=true,g=false;jp90 at 9.62216pt
-\jfont \testE=\ltj@stdmcfont:jp90;jfm=ujis/{-bar,-g,foo,hoge=2,l,mog=6,piyo} at 9.62216pt
+\jfont \testE=\ltj@stdmcfont:jp90;jfm=ujis/{-bar,-g,foo,hoge=2,l,mog=6,piyo};color=6faf5f at 9.62216pt
 
+\def\DISP#1{{\noindent\tentt \string#1: \meaning#1}\par}
 
+\DISP\testA
+\DISP\testB
+\DISP\testC
+\DISP\testD
+\DISP\testE
 
 \ltjsetparameter{differentjfm=both}
-{\testA （あ葛鴎）}{\testB （い葛鴎）}{\testC （う葛鴎）}（え葛鴎）{\tengt（あ葛鴎）}\par
+{\testA （あ葛鴎）}{\testB （い葛鴎）}{\testC （う葛鴎）}（え葛鴎）{\tengt（あ葛鴎）}{\testE あおうえお}\par
 
 \ltjsetparameter{differentjfm=paverage}
-{\testA （あ葛鴎）}{\testB （い葛鴎）}{\testC （う葛鴎）}（え葛鴎）{\tengt（あ葛鴎）}\par
+{\testA （あ葛鴎）}{\testB （い葛鴎）}{\testC （う葛鴎）}（え葛鴎）{\tengt（あ葛鴎）}{\testE あおうえお}\par
+
+\medskip
+\hrule
+\medskip
+\font\testOA=lmroman10-regular:letterspace=0.01
+\jfont\testF=\ltj@stdmcfont:jfm=ujis;letterspace=50 at 9.62216pt
+{\testOA \testF
+  A quick brown fox 跳』\inhibitglue （躍）（した：） over the のろ……まな 犬．
+}
+
+\directlua{
+  local ltb = luatexbase
+  print(table.serialize(ltb.callback_descriptions('pre_linebreak_filter')))
+  print(table.serialize(ltb.callback_descriptions('hpack_filter')))
+}
+
+{\testOA \testF
+  A quick brown fox 跳』\inhibitglue （躍）（した：） over the のろ……まな 犬．
+  A quick fox 跳』\inhibitglue （躍）（した：） over the のろ……まな 犬．ああああああ
+
+}
+
 
 \bye

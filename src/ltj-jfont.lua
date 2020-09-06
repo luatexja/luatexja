@@ -279,7 +279,7 @@ end
 -- LOADING JAPANESE FONTS
 ------------------------------------------------------------------------
 
-local load_jfont_metric
+local load_jfont_metric, check_callback_order
 do
    local cstemp
    local global_flag -- true if \globaljfont, false if \jfont
@@ -328,7 +328,7 @@ do
          return
       end
       if not f then return end
-      update_jfm_cache(j, f.size)
+      update_jfm_cache(j, f.size); check_callback_order()
       local sz = metrics[j].size_cache[f.size]
       local fmtable = { jfm = j, size = f.size, var = jfm_var,
                         with_kanjiskip = jfm_ksp,
@@ -349,6 +349,25 @@ do
                     (jfm_dir == 'yoko' and 'j' or 't') .. 'fnt', fn, '\\relax}')
       jfm_spec = nil
    end
+end
+
+do
+    local ltb = luatexbase
+    local to_be_checked = { 'pre_linebreak_filter', 'hpack_filter' }
+    check_callback_order = function()
+        for i,n in pairs(to_be_checked) do
+            local lotf_cb = ltb.priority_in_callback(n, 'luaotfload.letterspace')
+            local ltj_cb  = ltb.priority_in_callback(n, 'ltj.main')
+            if lotf_cb then
+                to_be_checked[i]=nil
+                if ltj_cb<lotf_cb then
+                    local f = ltb.remove_from_callback(n,'luaotfload.letterspace')
+                    ltb.add_to_callback(n, f, 'luaotfload.letterspace', 
+                        ltb.priority_in_callback(n, 'luaotfload.node_processor') + 1)
+                end
+            end
+        end
+    end
 end
 
 do
@@ -387,7 +406,7 @@ do
     local jf_feature_list   = P'{' * jf_feature_expr^0 * P'}' + jf_feature_expr^0
     local jf_list           = C((1-slash)^1) * (slash * Cf(Ct'' * jf_feature_list, rawset))^-1
     local jf_value          = (1 - semicolon)^1
-    local function rem(name,value,sep)
+    local function rem(name,value)
       if name=='jfm' then
         local flag, t; jfm_name, t = lpegmatch(jf_list, value)
         if type(t)=='table' then
@@ -401,7 +420,7 @@ do
       return ''
     end
     local jf_remainder      = Cs( ( ( B(S':;') *
-      C(P'jfm' * P'var'^-1) * ws * equals * ws * C(jf_value) * C(semicolon^-1) ) / rem +1 )^0 )
+      C(P'jfm' * P'var'^-1) * ws * equals * ws * C(jf_value) * semicolon^-1 ) / rem +1 )^0 )
 
    local parser=luaotfload.parsers.font_request
    function is_feature_specified(s,fname)
