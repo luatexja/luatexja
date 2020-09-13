@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec}[2020-04-01 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec}[2020-09-14 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e,luatexja}
 \ExplSyntaxOn
 
@@ -23,7 +23,7 @@
     pass .code:n = \PassOptionsToPackage{#1} {fontspec},
       % 互換性のために残したオプション
     scale .code:n = \gdef\Cjascale{#1},
-    unknown .code:n = \PassOptionsToPackage { \l_keys_key_tl } {fontspec},
+    unknown .code:n = \PassOptionsToPackage { \l_keys_key_str } {fontspec},
   }
 \ProcessKeysOptions{ luatexja-fontspec }
 
