@@ -4,7 +4,7 @@
 
 \newif\ifltj@ltshipout@avail
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-atbegshi}[2020-08-08 Patching \string\shipout\space hooks for LuaTeX-ja]
+\ProvidesPackage{lltjp-atbegshi}[2020-09-13 Patching \string\shipout\space hooks for LuaTeX-ja]
 \@ifl@t@r\fmtversion{2020-10-01}{%
   \ifnum\patch@level<0\relax \ifnum\patch@level<-6 \ltj@ltshipout@availtrue\fi
   \else\ltj@ltshipout@availtrue\fi
@@ -19,13 +19,14 @@
 \RequirePackage{expl3}
 \ExplSyntaxOn\makeatletter
 \box_new:N \l__platex_shipout_dummy_box
-\pretocmd {\__shipout_execute_cont:}
-  {\tex_setbox:D \l__platex_shipout_dummy_box \tex_vbox:D \c_group_begin_token \yoko } {} {}
-\apptocmd {\__shipout_execute_cont:} {\c_group_end_token} {} {}
+\tl_put_left:Nn {\__shipout_execute_cont:}
+  {\tex_setbox:D \l__platex_shipout_dummy_box \tex_vbox:D \c_group_begin_token \yoko }
+\tl_put_right:Nn {\__shipout_execute_cont:} {\c_group_end_token}
 \ExplSyntaxOff
 %</ltshipout>-----------------------------------
 
-\else
+\expandafter\endinput
+\fi
 \AtBeginShipoutInit
 %<*atbegshi>-------------------------------------
 % patching atbegshi.sty
@@ -89,5 +90,4 @@
 \endgroup
 %% internal macros are no longer effective
 %</atbegshi>-------------------------------------
-\fi
 \endinput

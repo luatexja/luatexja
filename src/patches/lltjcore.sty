@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2019/09/26 Patch to LaTeX2e Kernel for LuaTeX-ja]
+\ProvidesPackage{lltjcore}[2020-09-13 Patch to LaTeX2e Kernel for LuaTeX-ja]
 \RequirePackage{etoolbox}
 
 \def\cleardoublepage{\clearpage\if@twoside
@@ -239,11 +239,13 @@
   \ifmmode\@@underline{#1}%
   \else \leavevmode\null$\@@underline{\hbox{#1}}\m@th$\null\relax\fi}
 
-%%% AtBeginDvi
+%%% AtBeginDvi: NOT needed to patch in LaTeX 2020-10-01 pre-release 9 or later
+\unless\ifltj@ltshipout@avail
 \DeclareRobustCommand \AtBeginDvi [1]{%
   \global \setbox \@begindvibox
     \vbox{\yoko\unvbox \@begindvibox #1}%
 }
+\fi
 
 \newif\iffnfixbottom
 \newif\ifltj@ftn@unvboxed
