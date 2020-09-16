@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2020-08-20',
+  date = '2020-09-16',
   description = 'Loader for Japanese fonts',
 })
 
@@ -459,7 +459,7 @@ do
       if jfm_dir == 'tate' then
          vert_activated = (is_feature_specified(name,'vert')~=false) and (is_feature_specified(name,'vrt2')~=false)
          auto_enable_vrt2 
-           = (is_feature_specified(name,'vert')~=nil) and (is_feature_specified(name,'vrt2')~=nil)
+           = (is_feature_specified(name,'vert')==nil) and (is_feature_specified(name,'vrt2')==nil)
       else
          vert_activated, auto_enable_vrt2 = nil, nil
       end
