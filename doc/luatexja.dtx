@@ -3427,11 +3427,24 @@ so TrueType/OpenType fonts with features can be used for Japanese fonts:
 TrueType/OpenTypeフォントにfeatureを指定したものを和文フォントとして用いる
 ことができる：
 %</ja>
-\begin{LTXexample}[width=0.3\textwidth]
+\begin{LTXexample}[width=0.25\textwidth]
 \jfont\tradmc={IPAexMincho:script=latn;%
   +trad;-kern;jfm=ujis} at 14pt
 \tradmc 当／体／医／区
 \end{LTXexample}
+
+%<*en>
+It is required to specify a (horizontal) \emph{JFM} in at each calling of \cs{jfont}.
+A JFM is a Lua script which contains
+measurements of characters and glues/kerns that are automatically
+inserted for Japanese typesetting.
+The structure of JFM will be described in the next subsection.
+%</en>
+%<*ja>
+\cs{jfont}命令の実行ごとにどの（横組用）JFMを用いるのかを指定する必要がある．
+JFMは文字の寸法情報と和文組版で自動的に挿入される
+グルー／カーンの寸法情報を持っているLuaスクリプトで，その構造は次の節で述べる．
+%</ja>
 
 %<*en>
 Note that the defined control sequence
@@ -3448,22 +3461,89 @@ causes a error.  We denote control sequences which are defined in
 制御綴を<jfont\_cs>で表す．
 %</ja>
 
-\paragraph{JFM}
+%<en>\paragraph{Specifying JFM}
+%<ja>\paragraph{JFMの指定}
+%<en> The general scheme for specifying a JFM is the following:
+%<ja> JFMの一般的な指定は次のようになっている：
+\begin{quote}
+  \cs{jfont}<jfont\_cs>\texttt{=...;jfm=}<JFM name>[\texttt{/\{}<JFM features>\texttt{\}}]%
+  \texttt{;...;}[\texttt{jfmvar=}<identifier>]\texttt{;...}
+\end{quote}
+
+\begin{figure}
+\begin{LTXexample}[width=0.3\textwidth]
+\ltjsetparameter{differentjfm=both}
+\jfont\F=HaranoAjiMincho-Regular:jfm=ujis
+\jfont\G=HaranoAjiGothic-Medium:jfm=ujis
+\jfont\H=HaranoAjiGothic-Medium:jfm=ujis;jfmvar=hoge
+\F ）{\G 【】}（ % halfwidth space
+   ）{\H 『』}（ % fullwidth space
+
+ほげ，{\G 「ほげ」}（ほげ）\par
+ほげ，{\H 「ほげ」}（ほげ）% pTeX-like
+
+\ltjsetparameter{differentjfm=paverage}
+\end{LTXexample}
+\caption{Example of \texttt{jfmvar} key}
+\label{fig:jfmvar}
+\end{figure}
+
 %<*en>
-a JFM has measurements of characters and
-glues/kerns that are automatically inserted for Japanese
-typesetting. The structure of JFM will be described in the next
-subsection. At the calling of \cs{jfont}, you must specify
-which JFM will be used for this font by the following keys:
+\begin{description}
+\item[<JFM name>]
+  The name of a (horizontal) JFM. \LuaTeX-ja searches and loads \texttt{jfm-<JFM name>.lua}.
+\item[<JFM features>]
+  An optional comma-separated list of JFM options.
+  Enclosing braces (\verb+{}+) are optional, but this does not escape any characters.
+  The contents of this list can be accessed by a table \texttt{luatexja.jfont.jfm\_feature}
+  from a JFM, at its loading.
+\item[<identifier>]
+  An optional string.
+\end{description}
+
+LuaTeX-ja ``does not distinguish'' two Japanese fonts which uses same JFM and are the same size.
+Here ``uses same JFM'' means that all~of <JFM name>, <JFM features>~and~<identifier> of two fonts
+agree.
+
+For example, The first ``）'' and ``【'' in \autoref{fig:jfmvar} are typeset in different real fonts.
+However, because they use the same JFMs and their size are same,
+\LuaTeX-ja inserts penalties, glues and kerns as if these two character are typeset in a same font.
+Namely, the glue between these characters is halfwidth, as in ``）\nobreak【''.
+
+However, this does not applies with \cs{F}~and~\cs{H} in \autoref{fig:jfmvar},
+because their <identifier> are different. ...
 %</en>
 %<*ja>
-JFMは文字の寸法情報と和文組版で自動的に挿入される
-グルー／カーンの寸法情報を持っている．JFMの構造は次の節で述べる．
-\cs{jfont} 命令の呼び出しの際には，どのJFMを用いるのかを以下のキーで
-指定する必要がある：
+\begin{description}
+\item[<JFM name>]
+  （横組用）JFMの名称．\LuaTeX-jaは\texttt{jfm-<JFM name>.lua}というファイルを探索して読み込む．
+\item[<JFM features>]
+  省略可能なコンマ区切りリスト．全体を囲む\verb+{}+は省略可能であるが，
+  囲ったからといって<JFM features>の中で使用可能な文字が増えるわけではない．
+  <JFM features>で指定された内容は，テーブル\texttt{luatexja.jfont.jfm\_feature}として
+  JFM読み込み時に（JFMから）アクセス可能である．
+\item[<identifier>]
+  省略可能な文字列．
+\end{description}
+
+\LuaTeX-jaはJFMとサイズが同じで，
+  実フォントだけが異なる2つの和文フォントは「区別されない」．
+ここで「JFMが同じ」とは，両フォントの<JFM name>, <JFM features>, <identifier>が
+全て一致することである．
+
+例えば\autoref{fig:jfmvar}において，最初の「）」と「【」の実フォントは異なるが，
+JFMもサイズも同じなので，普通に「）\nobreak【」と入力した時と同じように組まれる，つまり両文字の間は半角空きとなる．
+
+しかし，JFMとサイズが同じであっても，\texttt{jfmvar} キーの異なる
+2つの和文フォント，例えば\autoref{fig:jfmvar}で言う \cs{F} と \cs{H}，
+は「区別される」．異なる和文フォントに異なる \texttt{jfmvar} キーを割り当て，
+かつ\Param{differentjfm}パラメータを \texttt{both} に設定すれば，
+\pTeX と似た状況で組版されることになる．
 %</ja>
 
 
+%<en>\paragraph{Default horizontal JFMs}
+%<ja>\paragraph{標準の横組用JFM}
 \begin{table}[t]
 %<en>\caption{Differences between horizontal JFMs shipped with \LuaTeX-ja}
 %<ja>\caption{\LuaTeX-ja に同梱されている横組用JFMの違い}
@@ -3515,19 +3595,8 @@ JFMは文字の寸法情報と和文組版で自動的に挿入される
 \ltjsetparameter{jacharrange={-3}}
 \end{table}
 
-\begin{cslist}
-\item[jfm=<name>]
-%<*en>
-Specify the name of (horizontal) JFM.
-If specified JFM has not been loaded, \LuaTeX-ja search and load
-a file named \texttt{jfm-<name>.lua}.
-
-The following horizontal JFMs are shipped with \LuaTeX-ja:
-%</en>
-%<*ja>
-用いる（横組用）JFMの名前を指定する．もし以前に指定されたJFMが読み込まれていなければ，
-\texttt{jfm-<name>.lua}を読み込む．以下の横組用JFMが\LuaTeX-jaには同梱されている：
-%</ja>
+%<en> The following horizontal JFMs are shipped with \LuaTeX-ja:
+%<ja> 以下の横組用JFMが\LuaTeX-jaには同梱されている：
 \begin{description}
 %<*en>
 \item[\texttt{jfm-ujis.lua}] A standard horizontal JFM in \LuaTeX-ja. This JFM is
@@ -3572,24 +3641,6 @@ The difference among these three~JFMs is  shown in \autoref{tab-difjfm}.
 \cite{min10}の図3,~4のものを用いた．
 %</ja>
 
-\begin{figure}
-\begin{LTXexample}[width=0.3\textwidth]
-\ltjsetparameter{differentjfm=both}
-\jfont\F=HaranoAjiMincho-Regular:jfm=ujis
-\jfont\G=HaranoAjiGothic-Medium:jfm=ujis
-\jfont\H=HaranoAjiGothic-Medium:jfm=ujis;jfmvar=hoge
-\F ）{\G 【】}（ % halfwidth space
-   ）{\H 『』}（ % fullwidth space
-
-ほげ，{\G 「ほげ」}（ほげ）\par
-ほげ，{\H 「ほげ」}（ほげ）% pTeX-like
-
-\ltjsetparameter{differentjfm=paverage}
-\end{LTXexample}
-\caption{Example of \texttt{jfmvar} key}
-\label{fig:jfmvar}
-\end{figure}
-
 %<*ja>
 また，プロポーショナル組用に\texttt{jfm-prop.lua}と\texttt{jfm-propw.lua}も用意されている．
 どちらのJFMも文字幅の情報と自動挿入されるグルー・カーンの情報は持たない（つまりグリフの文字幅をそのまま採用する）．
@@ -3604,24 +3655,7 @@ Both JFMs don't have any character width information, nor glues/kerns informatio
 \texttt{jfm-prop.lua} also also not have character height and depth information, while \texttt{jfm-propw.lua} has them.
 %</en>
 
-%<*en>
-\item[jfmvar=<string>]
-Sometimes there is a need that \ldots.
-%</en>
-%<*ja>
-\item[jfmvar=<string>]
-標準では，JFMとサイズが同じで，
-  実フォントだけが異なる2つの和文フォントは「区別されない」．例えば
-\autoref{fig:jfmvar}において，最初の「）」と「【」の実フォントは異なるが，
-JFMもサイズも同じなので，普通に「）【」と入力した時と同じように半角空きとなる．
 
-しかし，JFMとサイズが同じであっても，\texttt{jfmvar} キーの異なる
-2つの和文フォント，例えば\autoref{fig:jfmvar}で言う \cs{F} と \cs{H}，
-は「区別される」．異なる和文フォントに異なる \texttt{jfmvar} キーを割り当て，
-かつ\Param{differentjfm}パラメータを \texttt{both} に設定すれば，
-\pTeX と似た状況で組版されることになる．
-%</ja>
-\end{cslist}
 
 \begin{figure}
 \begin{LTXexample}[pos=t]
@@ -3752,7 +3786,22 @@ as shown in~\autoref{fig:ltjksp}.
 \label{fig:ltjksp}
 \end{figure}
 
+%<*ja>
+\paragraph{JFM feature（\LuaTeX-ja~20200919.0以降）}
+\ref{ssec:jfm-str}節で述べるように，JFMファイルはLuaスクリプトである．
+そのため，JFMを読み込む際にグローバル変数の値を参照して挙動を変えることができる．
+たとえば阿部紀行氏によるjlreqで使われている\texttt{jfm-jlreq.lua}では，
+\begin{quote}
+  JFMを読み込む際に変数\texttt{jlreq.danraku}の値を参照し，
+  この値が\verb+"zenkakunibu"+や\verb+"nibu"+のときは段落行頭の開き括弧の下げ量を設定する
+\end{quote}
+などといったことが行われている．
 
+バージョン20200919.0以降では，JFM指定で...
+%</ja>
+%<*en>
+\paragraph{JFM feature (introduced in \LuaTeX-ja~20200919.0)}
+%</en>
 
 
 %<en>\subsection{\cs{tfont}}
@@ -3809,7 +3858,7 @@ as shown in~\autoref{fig:ltjksp}.
 
 %<*en>
 \cs{tfont} loads a font as a Japanese font for vertical direction.
-This command admits the same syntax used in \cs{font}~and~\cs{jfont}.
+This command admits the same syntax as in \cs{font}~and~\cs{jfont}.
 A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont}:
 \begin{itemize}
  \item OpenType Feature~\texttt{vrt2}%
@@ -3833,7 +3882,7 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
  \item Furthermore, a glyph is automatically rotated 90~degrees,
   if it is not replaced by \texttt{vert} feature for \emph{any} script
   for \emph{any} language, and if it is marked as `r''~or~``Tr'' in UAX~\#50.
- \item One have to specify the name of vertical JFM in  \texttt{jfm=<name>}.
+ \item \cs{tfont} uses a vertical JFM instead of a horizontal JFM.
 \LuaTeX-ja ships following vertical JFMs:
 \begin{description}
 \item[\texttt{jfm-ujisv.lua}] A standard vertical JFM in \LuaTeX-ja. This JFM is
@@ -3865,12 +3914,12 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
 %</en>
 %<*ja>
 \cs{tfont} はフォントを縦組用の和文フォントとして読み込む命令であり，
-\cs{tfont} の文法は \cs{jfont} と同じである．
-\cs{tfont} で定義された縦組用和文フォントは，
-以下の点が \cs{jfont} による横組用和文フォントとは異なる：
+\cs{tfont}の構文は\cs{jfont}と同様である．
+\cs{tfont}で定義された縦組用和文フォントは，
+以下の点が\cs{jfont}による横組用和文フォントとは異なる：
 \begin{itemize}
- \item 明示的に \texttt{vert}, \texttt{vrt2}（のいずれか）の
-  有効・無効を指定した場合を除き，自動的に OpenType機能 \texttt{vrt2} の有効化が
+ \item 明示的に\texttt{vert}, \texttt{vrt2}（のいずれか）の
+  有効・無効を指定した場合を除き，自動的にOpenType機能\texttt{vrt2}の有効化が
   指定されたものとみなされる
  \footnote{もしフォントが\texttt{vrt2}を定義していなかった場合，代わりに
  \texttt{vert}を用いる．}．
@@ -3880,7 +3929,7 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
 \tfont\U=file:ipaexm.ttf:jfm=ujisv
     % vert is automatically activated, since this font does not have vrt2
 \end{lstlisting}
- \item \texttt{vert}, \texttt{vrt2} の少なくとも一つの有効を指定した場合にも関わらず，
+ \item \texttt{vert}, \texttt{vrt2}の少なくとも一つの有効を指定した場合にも関わらず，
   script tagとlanguage system identifierの値の組み合わせによって
   実際には有効にならなかった場合，\LuaTeX-jaは
  \begin{quote}
@@ -3896,7 +3945,7 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
  \item さらに，「いかなるscript,~languageでも\texttt{vert}により置換されない」グリフ
   のうち，UAX~\#50で``r''もしくは``Tr''と指定されているものは90度自動回転させる．
  \item \ref{ssec:math}節で述べる，数式中の和文フォントには縦組用和文フォントは指定できない．
- \item \texttt{jfm=<name>}\ の部分には縦組用JFMを指定する．
+ \item <JFM name>には縦組用JFMを指定する．
 以下の縦組用JFMが\LuaTeX-jaには同梱されている．%おり，違いを\autoref{tab-difjfm-tate}に示した．
 \begin{description}
 \item[\texttt{jfm-ujisv.lua}] \LuaTeX-jaの標準縦組用JFMである．このJFMは\upTeX で
@@ -6232,7 +6281,7 @@ g,\char`g,\ltjalchar`g,\ltjjachar`g       % ALchar unless \ltjjachar
 %<*en>
 \subsection{Loading Japanese fonts in \LaTeXe}
 \label{ssec:ltx-jfm}
-From versoin~20190107, 
+From version~20190107, 
 \emph{\LuaTeX-ja does not load Japanese fonts for horizontal direction and
   that for vertical direction at same time},
 to reduce the number of loaded fonts.
