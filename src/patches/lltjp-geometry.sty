@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-geometry}[2020-08-05 Patch to geometry for LuaTeX-ja with vertical writing mode]
+\ProvidesPackage{lltjp-geometry}[2020-09-18 Patch to geometry for LuaTeX-ja with vertical writing mode]
 \RequirePackage{expl3}
 \ifdefined\if@ltj@@geometry@tate\expandafter\endinput\fi
 \newif\if@ltj@@geometry@tate
@@ -82,6 +82,7 @@
   \if@ltj@@geometry@forceoff
     \@ltj@@geometry@tatefalse
   \else
+    \@ltj@@geometry@tatetrue
     \let\PackageWarningNoLine\@gobbletwo% 警告抑止
   \fi
 }
