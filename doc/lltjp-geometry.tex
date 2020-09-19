@@ -136,35 +136,35 @@
 つまり，横組クラスで\Pkg{geometry}パッケージを普通に使用した場合にも
 当てはまる注意事項である．
 
-\subsection{\Pkg{fontspec}パッケージとの干渉}
-\Pkg{fontspec}パッケージの，読み込み直後に
-\Pkg{geometry}パッケージを用いてレイアウトを設定すると，
-\texttt{lines}による指定が正しく働かないという症状が生じる：
-\begin{lstlisting}
-\documentclass{article}
-\usepackage{geometry}
-\usepackage{fontspec}
-\geometry{lines=20}
-\begin{document}
-hoge\typeout{\the\topskip, \the\baselineskip, \the\textheight}
-\end{document}
-\end{lstlisting}
-\cs{typeout}で\cs{topskip}, \cs{baselineskip}, \cs{textheight}の値を調べると
-\[
- \frac{\cs{textheight} - \cs{topskip}}{\cs{baselineskip}} = 15.8\dot 3
-\]
-となることがわかるから，1ページには16行分入らないことがわかる．
+% \subsection{\Pkg{fontspec}パッケージとの干渉}
+% \Pkg{fontspec}パッケージの，読み込み直後に
+% \Pkg{geometry}パッケージを用いてレイアウトを設定すると，
+% \texttt{lines}による指定が正しく働かないという症状が生じる：
+% \begin{lstlisting}
+% \documentclass{article}
+% \usepackage{geometry}
+% \usepackage{fontspec}
+% \geometry{lines=20}
+% \begin{document}
+% hoge\typeout{\the\topskip, \the\baselineskip, \the\textheight}
+% \end{document}
+% \end{lstlisting}
+% \cs{typeout}で\cs{topskip}, \cs{baselineskip}, \cs{textheight}の値を調べると
+% \[
+%  \frac{\cs{textheight} - \cs{topskip}}{\cs{baselineskip}} = 15.8\dot 3
+% \]
+% となることがわかるから，1ページには16行分入らないことがわかる．
 
-これは，\Pkg{fontspec}の読み込みによって\cs{baselineskip}がなぜか
-10\,ptに変えられてしまい，\cs{geometry}命令はその値に従って本文領域の高さを計算するためで
-ある．とりあえずの対策は，
-\cs{normalsize}によって\cs{baselineskip}を正しい値に再設定し，その後
-レイアウトを設定すれば良い：
-\begin{lstlisting}
-\usepackage{geometry}
-\usepackage{fontspec}
-\normalsize\geometry{lines=20}
-\end{lstlisting}
+% これは，\Pkg{fontspec}の読み込みによって\cs{baselineskip}がなぜか
+% 10\,ptに変えられてしまい，\cs{geometry}命令はその値に従って本文領域の高さを計算するためで
+% ある．とりあえずの対策は，
+% \cs{normalsize}によって\cs{baselineskip}を正しい値に再設定し，その後
+% レイアウトを設定すれば良い：
+% \begin{lstlisting}
+% \usepackage{geometry}
+% \usepackage{fontspec}
+% \normalsize\geometry{lines=20}
+% \end{lstlisting}
 
 
 \subsection{\cs{maxdepth}の調整}
