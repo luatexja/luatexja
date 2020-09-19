@@ -44,5 +44,25 @@
 
 }
 
+\def\printjfmfeat#1{%
+  \relax{\tentt\string#1}: 
+  \directlua{%
+    if myjfm then
+    for i,v in pairs(myjfm) do
+      tex.sprint('[{\string\\tentt ' .. i .. '}]${}={}$')
+      if type(v)=='string' then
+        tex.sprint('``{\string\\tentt ' .. tostring(v) .. "}'', ")
+      else
+        tex.sprint(tostring(v) ..', ')
+      end
+    end
+    else tex.sprint('(nil)')
+    end
+  }\par
+}
+
+\jfont\testP=KozMinPr6N-Regular:jfm=ujis/h,-p,l=g,z=true;jfm=testf/q,-d,l=f,z=h,e,hwid;trad  at 9pt
+\printjfmfeat\testP
+\testP イ医学
 
 \bye
