@@ -3496,7 +3496,7 @@ causes a error.  We denote control sequences which are defined in
   An optional comma-separated list of JFM options.
   Enclosing braces (\verb+{}+) are optional, but this does not escape any characters.
   The contents of this list can be accessed by a table \texttt{luatexja.jfont.jfm\_feature}
-  from a JFM, at its loading.
+  from a JFM, at its loading. See \autoref{fig:jfmfeat} for an example.
 \item[<identifier>]
   An optional string.
 \end{description}
@@ -3509,9 +3509,8 @@ For example, The first ``）'' and ``【'' in \autoref{fig:jfmvar} are typeset i
 However, because they use the same JFMs and their size are same,
 \LuaTeX-ja inserts penalties, glues and kerns as if these two character are typeset in a same font.
 Namely, the glue between these characters is halfwidth, as in ``）\nobreak【''.
-
 However, this does not applies with \cs{F}~and~\cs{H} in \autoref{fig:jfmvar},
-because their <identifier> are different. ...
+because their <identifier> are different.
 %</en>
 %<*ja>
 \begin{description}
@@ -3521,7 +3520,7 @@ because their <identifier> are different. ...
   省略可能なコンマ区切りリスト．全体を囲む\verb+{}+は省略可能であるが，
   囲ったからといって<JFM features>の中で使用可能な文字が増えるわけではない．
   <JFM features>で指定された内容は，テーブル\texttt{luatexja.jfont.jfm\_feature}として
-  JFM読み込み時に（JFMから）アクセス可能である．
+  JFM読み込み時に（JFMから）アクセス可能である．\autoref{fig:jfmfeat}に使用例を載せた．
 \item[<identifier>]
   省略可能な文字列．
 \end{description}
@@ -3541,6 +3540,41 @@ JFMもサイズも同じなので，普通に「）\nobreak【」と入力した
 \pTeX と似た状況で組版されることになる．
 %</ja>
 
+\def\T#1{\texttt{#1}}
+\def\printjfmfeat#1{%
+  \relax\texttt{\string#1}: 
+  \directlua{%
+    if myjfm then
+    for i,v in pairs(myjfm) do
+      tex.sprint('[\string\\T{' .. i .. '}]${}={}$')
+      if type(v)=='string' then
+        tex.sprint('``\string\\T{' .. tostring(v) .. "}'', ")
+      else
+        tex.sprint(tostring(v) ..', ')
+      end
+    end
+    else tex.sprint('(nil)')
+    end
+  }\par
+}
+\begin{figure}
+\begin{LTXexample}[pos=t]
+\small\ltjsetparameter{differentjfm=both}\tabcolsep=.5\zw
+% \printjfmfeat is defined in the source of this document
+\jfont\A=HaranoAjiMincho-Regular:jfm=testf                   at 9pt \printjfmfeat\A
+\jfont\B=HaranoAjiMincho-Bold:jfm=testf/kern=0.5,-ps,+kana   at 9pt \printjfmfeat\B
+\jfont\C=HaranoAjiGothic-Regular:jfm=testf/kern=0.5,down=0.2 at 9pt \printjfmfeat\C
+\jfont\D=HaranoAjiGothic-Bold:jfm=testf/down=0.2,kern=0.5    at 9pt \printjfmfeat\D
+\def\TEST#1{\string#1&{#1あ漢}{\A イ字}&{#1あ漢}{\B イ字}&{#1あ漢}{\C イ字}&{#1あ漢}{\D イ字}}
+\vspace{-4\baselineskip}\hfill\ttfamily
+\begin{tabular}{lllll}
+  &\string\A&\string\B&\string\C&\string\D\\\TEST\A\\\TEST\B\\\TEST\C\\\TEST\D\\
+\end{tabular}
+\ltjsetparameter{differentjfm=paverage}
+\end{LTXexample}
+\caption{Example of <JFM features>}
+\label{fig:jfmfeat}
+\end{figure}
 
 %<en>\paragraph{Default horizontal JFMs}
 %<ja>\paragraph{標準の横組用JFM}
@@ -3713,7 +3747,6 @@ NFSS2用の命令（\ref{ssec:chgfnt}節，\ref{ssec:nfsspat}節）における�
 %</ja>
 
 %<*ja>
-\newpage
 \paragraph{\texttt{extend}と\texttt{slant}}
 OpenType機能と見かけ上同じような形式で指定できるものに，
 \begin{description}
@@ -3736,7 +3769,7 @@ The following setting can be specified as OpenType font features:
 Note that \LuaTeX-ja doesn't adjust JFMs by these \texttt{extend} and \texttt{slant}
 settings; one have to write new JFMs on purpose.
 For example, the following example uses the standard JFM \texttt{jfm-ujis.lua}, hence
-letter-spacing and the width of italic correction are not correct:
+the letterspacing and the width of italic corrections are not correct:
 %</en>
 \begin{LTXexample}[width=0.3\textwidth]
 \jfont\E=HaranoAjiMincho-Regular:extend=1.5;jfm=ujis;-kern
@@ -3745,7 +3778,7 @@ letter-spacing and the width of italic correction are not correct:
 \end{LTXexample}
 
 %<*ja>
-\paragraph{\texttt{ltjksp}指定}
+\paragraph{\texttt{ltjksp}「機能」}
 \label{pg:ltjksp}
 \LuaTeX-ja標準では，
 JFM中における\texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
@@ -3763,7 +3796,7 @@ JFM中における\texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 最後に指定したものが有効となる．
 %</ja>
 %<*en>
-\paragraph{\texttt{ltjksp}}
+\paragraph{\texttt{ltjksp} ``feature''}
 \label{pg:ltjksp}
 \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 \texttt{kanjiskip\_shrink} keys (Page~\pageref{pg:ksp_nat}) makes tha
@@ -3782,27 +3815,9 @@ as shown in~\autoref{fig:ltjksp}.
 \G\leavevmode%
 \vrule\hbox to 15\zw{あ「い」う，えお}\vrule
 \end{LTXexample}
-\caption{\texttt{ltjksp}}
+\caption{\texttt{ltjksp} `feature''}
 \label{fig:ltjksp}
 \end{figure}
-
-%<*ja>
-\paragraph{JFM feature（\LuaTeX-ja~20200919.0以降）}
-\ref{ssec:jfm-str}節で述べるように，JFMファイルはLuaスクリプトである．
-そのため，JFMを読み込む際にグローバル変数の値を参照して挙動を変えることができる．
-たとえば阿部紀行氏によるjlreqで使われている\texttt{jfm-jlreq.lua}では，
-\begin{quote}
-  JFMを読み込む際に変数\texttt{jlreq.danraku}の値を参照し，
-  この値が\verb+"zenkakunibu"+や\verb+"nibu"+のときは段落行頭の開き括弧の下げ量を設定する
-\end{quote}
-などといったことが行われている．
-
-バージョン20200919.0以降では，JFM指定で...
-%</ja>
-%<*en>
-\paragraph{JFM feature (introduced in \LuaTeX-ja~20200919.0)}
-%</en>
-
 
 %<en>\subsection{\cs{tfont}}
 %<ja>\subsection{\cs{tfont} 命令}
@@ -3862,9 +3877,9 @@ This command admits the same syntax as in \cs{font}~and~\cs{jfont}.
 A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont}:
 \begin{itemize}
  \item OpenType Feature~\texttt{vrt2}%
-  \footnote{If the font does not define \texttt{vrt2} feature,
+  \footnote{If the font does not define the \texttt{vrt2} feature,
 	\texttt{vert} is used instead.} is automatically activated,
-  unless \texttt{vert}~and//or~\texttt{vrt2} are explicitly activated
+  unless \texttt{vert}~and//or~\texttt{vrt2} features are explicitly activated
   or deactivated (as the second line in the example below).
 \begin{lstlisting}
 \tfont\S=HaranoAjiMincho-Regular:jfm=ujisv % vrt2 is automatically activated
@@ -3918,7 +3933,7 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
 \cs{tfont}で定義された縦組用和文フォントは，
 以下の点が\cs{jfont}による横組用和文フォントとは異なる：
 \begin{itemize}
- \item 明示的に\texttt{vert}, \texttt{vrt2}（のいずれか）の
+ \item 明示的にOpenType機能\texttt{vert}, \texttt{vrt2}（のいずれか）の
   有効・無効を指定した場合を除き，自動的にOpenType機能\texttt{vrt2}の有効化が
   指定されたものとみなされる
  \footnote{もしフォントが\texttt{vrt2}を定義していなかった場合，代わりに
