@@ -1,4 +1,5 @@
 %#! lualatex
+\directlua{luatexja_debug=1}
 \documentclass{ltjsarticle}
 %\nonstopmode
 
@@ -42,7 +43,16 @@
 \noindent{\Large ◆あいうえおabcかきく{\gt かきくa{\bf uyあ}いう}}
 
 \noindent{\LARGE ◆あいうえおabcかきく{\gt かきくa{\bf uyあ}いう}}
-%\end{document}
+
+
+\makeatletter
+RM {\rmfamily (\f@family, \k@family) XYZかきく}\par
+SF {\sffamily (\f@family, \k@family) XYZかきく}\par
+TT {\ttfamily (\f@family, \k@family) XYZかきく}\verb+あいうABC+\par
+
+\^{A}V\^{A}T\^{A}R
+
+\usefont{OT1}{cmr}{m}{n} \^{A}V\^{A}T\^{A}R
 
 \section{slanted, extended}
 \DeclareFontShape{JY3}{mc}{m}{sl}{<-> s*[0.962216] 
@@ -71,6 +81,8 @@
 \textsl{あいう■\textup{■え■■}■おかき}}
 
 {\fontfamily{gt}\fontseries{x}\selectfont あいう}
+
+\end{document}
 
 \paragraph{italic correction inserted by {\tt\char92text...}}\
 
@@ -119,4 +131,15 @@ font series `ix': 欧文は未定義，和文は機械的斜体．
 あい{うえお\texttt{abc}\globaldefs1あ\/い}うえお
 
 あいうえお{\tt abc}あいうえお
+
+\paragraph{font definition file}
+
+{\fontfamily{afdtest}\selectfont abcあいう
+\fontfamily{kfdtest}\selectfont abcあいう}\par
+
+A
+\fontfamily{kfdtest}\selectfont abcあいう
+
+
+
 \end{document}

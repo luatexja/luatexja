@@ -178,7 +178,7 @@ local function check_box(box_ptr, box_end)
       local pid = getid(p)
       if pid==id_kern and getsubtype(p)==2 then
          p = node_next(node_next(node_next(p))); pid = getid(p) -- p must be glyph_node
-       end
+      end
       if pid==id_glyph then
          repeat
             if find_first_char then first_char = p; find_first_char = false end
@@ -268,7 +268,7 @@ local function check_next_ickern(lp)
    local lx = Np.nuc
    while lp and getid(lp) == id_kern and ( getsubtype(lp)==0 or 
      getsubtype(lp)==3 or ITALIC == get_attr_icflag(lp)) do
-     set_attr(lp, attr_icflag, IC_PROCESSED);
+     set_attr(lp, attr_icflag, IC_PROCESSED)
      lx, lp = lp, node_next(lp)
    end
    Np.last = lx; return lp
@@ -279,7 +279,7 @@ local function calc_np_pbox(lp, last)
    --local lpa = get_attr_icflag(lp)==PACKED and PACKED or KINSOKU -- KINSOKU: dummy
    local lpa = get_attr_icflag(lp)
    Np.first = Np.first or lp; Np.id = id_pbox
-   set_attr(lp, attr_icflag, get_attr_icflag(lp));
+   set_attr(lp, attr_icflag, get_attr_icflag(lp))
    while lp ~=last and (lpa>=PACKED) and (lpa<BOXBDD) do
       local lpi = getid(lp)
       if lpa==PACKED then
@@ -340,9 +340,9 @@ function calc_np_aux_glyph_common(lp, acc_flag)
       local y_adjust = has_attr(lp,attr_ablshift) or 0
       local node_depth = getfield(lp, 'depth') + min(y_adjust, 0)
       local adj_depth = (y_adjust>0) and (getfield(lp, 'depth') + y_adjust) or 0
-      setfield(lp, 'yoffset', getfield(lp, 'yoffset') - y_adjust)
-      lp = node_next(lp)
-      for lx in traverse(lp) do
+      setfield(lp, 'yoffset', getfield(lp, 'yoffset') - y_adjust); lp = node_next(lp)
+      local lx=lp
+      while lx do
          local lai = get_attr_icflag(lx)
          if lx==last or  lai>=PACKED then
             lp=lx; break
@@ -354,7 +354,7 @@ function calc_np_aux_glyph_common(lp, acc_flag)
                y_adjust = has_attr(lx,attr_ablshift) or 0
                node_depth = max(getfield(lx, 'depth') + min(y_adjust, 0), node_depth)
                adj_depth = (y_adjust>0) and max(getfield(lx, 'depth') + y_adjust, adj_depth) or adj_depth
-               setfield(lx, 'yoffset', getfield(lx, 'yoffset') - y_adjust)
+               setfield(lx, 'yoffset', getfield(lx, 'yoffset') - y_adjust); lx = node_next(lx)
             elseif lid==id_kern then
                local ls = getsubtype(lx)
                if ls==2 then -- アクセント用の kern
@@ -367,9 +367,9 @@ function calc_np_aux_glyph_common(lp, acc_flag)
                   end
                   lx = node_next(node_next(lx))
                elseif ls==0  then
-                  Np.last = lx
+                  Np.last = lx; lx = node_next(lx)
                elseif (ls==3) or (lai==ITALIC) then
-                  Np.last = lx; set_attr(lx, attr_icflag, IC_PROCESSED)
+                  Np.last = lx; set_attr(lx, attr_icflag, IC_PROCESSED); lx = node_next(lx)
                else
                   lp=lx; break
                end
@@ -1235,8 +1235,8 @@ end
 -- main interface
 function luatexja.jfmglue.main(ahead, mode, dir)
    if not ahead then return ahead end
-   --luatexja.ext_show_node_list(to_node(ahead ), '>B ', print)
-   --print()
+   -- luatexja.ext_show_node_list(node.direct.tonode(ahead ), '>B ', print)
+   -- print()
    head = ahead;
    local lp, last, par_indented, TEMP = init_var(mode,dir)
    lp = calc_np(last, lp)
