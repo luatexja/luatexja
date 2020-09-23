@@ -29,17 +29,20 @@ end
 \parindent0pt
 \def\ISFEAT#1{}
 
-\def\TESTA#1{\leavevmode\bgroup
+\def\TESTA#1{\newpage
+    \TESTB{#1}{hani}\TESTB{#1}{latn}
+}
+\def\TESTB#1#2{\leavevmode\bgroup
   \def\FN{#1}%
-  \jfont\HN=\FN:jfm=ujis;script=hani
-  \tfont\VN=\FN:-vert;script=hani;jfm=ujisv
-  \tfont\VT=\FN:+vert;script=hani;jfm=ujisv
-  \tfont\VU=\FN:+vrt2;script=hani;jfm=ujisv
-  \tfont\VB=\FN:+vert;script=hani;+vrt2;jfm=ujisv
-  \tfont\VD=\FN:jfm=ujisv;script=hani
+  \jfont\HN=\FN:jfm=ujis;script=#2
+  \tfont\VN=\FN:-vert;script=#2;jfm=ujisv
+  \tfont\VT=\FN:+vert;script=#2;jfm=ujisv
+  \tfont\VU=\FN:+vrt2;script=#2;jfm=ujisv
+  \tfont\VB=\FN:+vert;script=#2;+vrt2;jfm=ujisv
+  \tfont\VD=\FN:jfm=ujisv;script=#2
   \HN\VD font: \texttt{\FN}\directlua{myfeat()}
   \par\nobreak\medskip\ttfamily
-  \parbox<t>{210pt}{\VD ■default\\\TEST0}\ \vrule\ 
+  \parbox<t>{210pt}{\VD ■default (auto)\\\TEST0}\ \vrule\ 
   \parbox<t>{210pt}{\VB ■+vert~+vrt2\\\TEST1}\ \vrule\ 
   \parbox<t>{210pt}{\VN ■-vert~-vrt2\\\TEST1}\ \vrule\ 
   \parbox<t>{210pt}{\VT ■+vert~-vrt2\\\TEST1}\ \vrule\ 
@@ -55,11 +58,14 @@ end
   あ：いーう，え、お．か。き；け\ltjjachar"201Cこ\ltjjachar"301D%
   さ\ltjjachar"301Fし\ltjjachar"201Dす\ltjjachar"2015せ\ltjjachar"2014そ
   ‥…〜ー＝―‐゠㍉㌔㌢㍍㌘㌧㌃㌶㍑㍗㌍㌦㌣㌫㍊㌻㍾㍽㍼㍻＝≒≠≡\ltjjachar`β%
-  \ltjjachar`Å}
+  \ltjjachar`Å\ltjjachar`Б}
 
 
 \TESTA{MogaMincho}
 \TESTA{IPAexMincho}
+\TESTA{hgrsmp04.ttf}
+\TESTA{BIZ-UDMinchoM.ttc}
+
 \TESTA{KozMinPr6N-Regular}
 \TESTA{SourceHanSerif-Regular}
 \TESTA{HiraMinProN-W3}
