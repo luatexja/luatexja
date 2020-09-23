@@ -189,8 +189,8 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
    do
       local pf, pc = getfont(p), getchar(p)
       local feir = ltjf_font_extra_info[pf]
-      if feir and feir.rotation and met.vert_activated then
-         if feir.rotation[pc] and (has_attr(p, attr_vert_ori) or 0)<=0 then
+      if met.rotation and met.vert_activated then
+         if met.rotation[pc] and (has_attr(p, attr_vert_ori) or 0)<=0 then
             return capsule_glyph_tate_rot(p, met, char_data, head, dir, 
               0.5*(get_ascender(pf)-get_descender(pf)))
          end

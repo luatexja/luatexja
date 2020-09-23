@@ -280,6 +280,7 @@ end
 ------------------------------------------------------------------------
 
 local load_jfont_metric, check_callback_order
+local font_extra_info = {} -- defined later
 do
    local cstemp
    local global_flag -- true if \globaljfont, false if \jfont
@@ -314,6 +315,7 @@ do
    luatexbase.create_callback("luatexja.define_jfont", "data", function (ft, fn) return ft end)
 
 -- EXT
+   local fastcopy=table.fastcopy
    function luatexja.jfont.jfontdefY()
       local j = load_jfont_metric(jfm_dir)
       local fn = font.id(cstemp)
@@ -337,9 +339,13 @@ do
                         kanjiskip = sz.kanjiskip, xkanjiskip = sz.xkanjiskip,
                         chars_cbcache = {},
                         vert_activated = vert_activated,
+                        rotation = fastcopy(font_extra_info[fn].rotation),
       }
       if auto_enable_vrt2 then
-         ltju.enable_feature(fn, ltju.exist_feature(fn, 'vrt2') and 'vrt2' or 'vert')
+         local vert_name = ltju.exist_feature(fn, 'vrt2') and 'vrt2' or 'vert'
+         local rot = fmtable.rotation 
+         ltju.enable_feature(fn, vert_name)
+         ltju.loop_over_feat(f, {[vert_name]=true}, function (i,k) rot[i] = nil end)
       end
 
       fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
@@ -775,7 +781,6 @@ end
 ------------------------------------------------------------------------
 -- 追加のフォント情報
 ------------------------------------------------------------------------
-local font_extra_info = {}
 luatexja.jfont.font_extra_info= font_extra_info -- key: fontnumber
 local font_extra_basename = {} -- key: basename
 
@@ -794,7 +799,6 @@ do
     end
     return lo%2==1
   end
-  local vert_vrt2 = { vert=true, vrt2 = true }
   local function list_rorate_dup (i, v, dest)
     local f = dest[i]
     if not f then
@@ -807,7 +811,6 @@ do
     for i,_ in pairs(tfmdata.characters) do
       if rotate_in_uax50(i) then rot[i] = true end
     end
-    ltju.loop_over_feat(tfmdata, vert_vrt2, function (i,k) rot[i] = nil end)
     -- ↓「TeX Live 2019のLuaLaTeXで縦書きの三点リーダーが横書きになる」
     -- (https://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=2722) により無効化
     -- -- 同じグリフが複数の Unicode ポイントを持っている場合．
@@ -829,7 +832,7 @@ do
 end
 
 do
-   local cache_ver = 22
+   local cache_ver = 23
    local nameonly, lower = file.nameonly, string.lower
    local lfs = require"lfs"
    local file_attributes = lfs.attributes

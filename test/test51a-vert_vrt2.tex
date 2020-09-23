@@ -39,27 +39,30 @@ end
   \tfont\VD=\FN:jfm=ujisv;script=hani
   \HN\VD font: \texttt{\FN}\directlua{myfeat()}
   \par\nobreak\medskip\ttfamily
-  \parbox<t>{210pt}{\VD ■default\\\TEST}\ \vrule\ 
-  \parbox<t>{210pt}{\VB ■+vert~+vrt2\\\TEST}\ \vrule\ 
-  \parbox<t>{210pt}{\VN ■-vert~-vrt2\\\TEST}\ \vrule\ 
-  \parbox<t>{210pt}{\VT ■+vert~-vrt2\\\TEST}\ \vrule\ 
-  \parbox<t>{210pt}{\VU ■-vert~+vrt2\\\TEST}
+  \parbox<t>{210pt}{\VD ■default\\\TEST0}\ \vrule\ 
+  \parbox<t>{210pt}{\VB ■+vert~+vrt2\\\TEST1}\ \vrule\ 
+  \parbox<t>{210pt}{\VN ■-vert~-vrt2\\\TEST1}\ \vrule\ 
+  \parbox<t>{210pt}{\VT ■+vert~-vrt2\\\TEST1}\ \vrule\ 
+  \parbox<t>{210pt}{\VU ■-vert~+vrt2\\\TEST1}
   \par\smallskip\hrule\smallskip
-  \parbox<y>{210pt}{\HN ■よこぐみ\\\TEST}
+  \parbox<y>{210pt}{\HN ■よこぐみ\\\TEST0}
   \par\egroup\bigskip
 }
 
-\def\TEST{
+\catcode`\@=11
+\def\TEST#1{\ltj@vert@ori#1
   左←↑↓→☜☝☟☞⇦⇧⇩⇨⬅⬆⬇➡右¶\ltjjachar"253B\ltjjachar"0165\relax
   あ：いーう，え、お．か。き；け\ltjjachar"201Cこ\ltjjachar"301D%
   さ\ltjjachar"301Fし\ltjjachar"201Dす\ltjjachar"2015せ\ltjjachar"2014そ
-  \ltjjachar"205A\ltjjachar"205D‥…〜ー＝―‐゠㍉㌔㌢㍍㌘㌧㌃㌶㍑㍗㌍㌦㌣㌫㍊㌻㍾㍽㍼㍻＝≒≠≡}
+  ‥…〜ー＝―‐゠㍉㌔㌢㍍㌘㌧㌃㌶㍑㍗㌍㌦㌣㌫㍊㌻㍾㍽㍼㍻＝≒≠≡\ltjjachar`β%
+  \ltjjachar`Å}
 
 
 \TESTA{MogaMincho}
 \TESTA{IPAexMincho}
 \TESTA{KozMinPr6N-Regular}
-\TESTA{HaranoAjiMincho-Regular}
+\TESTA{SourceHanSerif-Regular}
+\TESTA{HiraMinProN-W3}
 
 \end{document}
 
