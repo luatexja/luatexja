@@ -19,10 +19,30 @@
 \RequirePackage{expl3}
 \ExplSyntaxOn\makeatletter
 \box_new:N \l__platex_shipout_dummy_box
-\tl_put_left:Nn {\__shipout_execute_cont:}
-  {\tex_setbox:D \l__platex_shipout_dummy_box \tex_vbox:D \c_group_begin_token \yoko }
-\tl_put_right:Nn {\__shipout_execute_cont:} {\c_group_end_token}
-\ExplSyntaxOff
+\cs_new_eq:NN \__platex_original_shipout_execute_cont: \__shipout_execute_cont:
+\cs_set:Npn \__shipout_execute_cont:
+{
+  % if \l_shipout_box is not a \yoko-box (= horizontal writing),
+  % then make it a \yoko-box behorehand.
+  \unless\ifnum\ltjgetparameter{boxdir}{\l_shipout_box}=4
+    \vbox_set:Nn \l_shipout_box { \yoko \box_use:N \l_shipout_box }
+  \fi
+  % if the current direction is not \yoko,
+  % then enclose \__shipout_execute_cont: with
+  % a dummy \yoko-box named \l__platex_shipout_dummy_box.
+  \ifnum\ltjgetparameter{direction}=4
+    \__platex_original_shipout_execute_cont:
+  \else
+    \vbox_set:Nn \l__platex_shipout_dummy_box {
+      \yoko \__platex_original_shipout_execute_cont:
+    }
+    % [Limitation] the code above may discard some contents,
+    % so we'd like to put it back by \box\l__platex_shipout_dummy_box.
+    % however, an infinite loop occurs if we uncomment the line below
+    % so we can't.
+    %\box_use:N \l__platex_shipout_dummy_box
+  \fi
+}
 %</ltshipout>-----------------------------------
 
 \expandafter\endinput

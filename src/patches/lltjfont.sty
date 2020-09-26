@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2020-05-17 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2020-09-26 Patch to NFSS2 for LuaTeX-ja]
 
 %% patching \DeclareTextComposite
 \def\ltj@chardef@text@cmd#1{%
@@ -945,10 +945,10 @@
 
 \let\romanprocess@table\process@table
 \def\kanjiprocess@table{%
-  \kanjiencoding{\kanjiencodingdefault}%
-  \kanjifamily{\kanjifamilydefault}%
-  \kanjiseries{\kanjiseriesdefault}%
-  \kanjishape{\kanjishapedefault}%
+  \kanjiencoding\kanjiencodingdefault%
+  \edef\k@family{\kanjifamilydefault}%
+  \edef\k@series{\kanjiseriesdefault}%
+  \edef\k@shape{\kanjishapedefault}%
 }
 \def\process@table{%
   \romanprocess@table
