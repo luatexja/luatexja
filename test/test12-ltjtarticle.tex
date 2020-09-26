@@ -53,6 +53,33 @@ baselineskip: \the\baselineskip}\par}
 あいうえおabc$-\vcenter{\noindent abc}$あいう$adxvsv\footnote{あいうえおabc}Ha$．
 
 \newpage
+
+\newpage
+\ExplSyntaxOn
+\cs_new:Nn \my_test_dir: {
+  \platex_if_direction_yoko:TF { Y } { y }
+  \platex_if_direction_tate:TF { T } { t }
+  \platex_if_direction_dtou:TF { D } { d }
+}
+\cs_new:Nn \my_test_box: {
+  \platex_if_box_yoko:NTF \l_tmpa_box { Y } { y }
+  \platex_if_box_tate:NTF \l_tmpa_box { T } { t }
+  \platex_if_box_dtou:NTF \l_tmpa_box { D } { d }
+}
+
+\mode_leave_vertical:
+\hbox:n { \platex_direction_yoko: ABCあーいう \my_test_dir: }
+\hbox:n { \platex_direction_tate: ABCあーいう \my_test_dir: }
+\hbox:n { \platex_direction_dtou: ABCあーいう \my_test_dir: }
+
+1.~\hbox_set:Nn \l_tmpa_box { \platex_direction_yoko: ABCあーいう } \my_test_box:~
+2.~\hbox_set:Nn \l_tmpa_box { \platex_direction_tate: ABCあーいう } \my_test_box:~
+3.~\hbox_set:Nn \l_tmpa_box { \platex_direction_dtou: ABCあーいう } \my_test_box:
+\ExplSyntaxOff
+
+
+\newpage
 \dtou
 あいうえお\footnote{あいうえおabc}あ
+
 \end{document}
