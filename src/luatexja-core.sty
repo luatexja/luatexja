@@ -262,8 +262,8 @@
   t[\the\ltj@@fakeparbegin@inner] = luatexja.jfmglue.create_beginpar_node
   t[\the\ltj@@fakeboxbdd@inner] = luatexja.jfmglue.create_boxbdd_node
 }
-\protected\global\luadef\ltj@reset@globaldefs  \ltj@reset@globaldefs@inner
-\protected\global\luadef\ltj@restore@globaldefs\ltj@restore@globaldefs@inner
+\protected\luadef\ltj@reset@globaldefs  \ltj@reset@globaldefs@inner
+\protected\luadef\ltj@restore@globaldefs\ltj@restore@globaldefs@inner
 \protected\def\inhibitglue{\ifhmode\relax\luafunction\ltj@@ihb@inner\fi}
 \protected\def\ltjfakeparbegin{\ifhmode\relax\luafunction\ltj@@fakeparbegin@inner\fi}
 \protected\def\ltjfakeboxbdd{\ifhmode\relax\luafunction\ltj@@fakeboxbdd@inner\fi}
@@ -649,7 +649,7 @@
     \aftergroup\ltj@@reset@badness\the\ltj@@i@everyvbox}
 \fi
 
-\global\luadef\ltj@@reset@badness\ltj@@reset@badness@inner
+\luadef\ltj@@reset@badness\ltj@@reset@badness@inner
 
 %%%% \raise, \lower, \moveleft, \moveright
 \newluafunction\ltj@@lua@raisebox@inner
