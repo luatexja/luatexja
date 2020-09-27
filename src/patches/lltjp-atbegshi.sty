@@ -2,18 +2,12 @@
 % lltjp-atbegshi.sty
 %
 
-\newif\ifltj@ltshipout@avail
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-atbegshi}[2020-09-13 Patching \string\shipout\space hooks for LuaTeX-ja]
-\@ifl@t@r\fmtversion{2020-10-01}{%
-  \ifnum\patch@level<0\relax \ifnum\patch@level<-6 \ltj@ltshipout@availtrue\fi
-  \else\ltj@ltshipout@availtrue\fi
-}{}
-\ifltj@ltshipout@avail\else\RequirePackage{atbegshi}\fi
+\ProvidesPackage{lltjp-atbegshi}[2020-09-27 Patching \string\shipout\space hooks for LuaTeX-ja]
 
 % concept: execute all hooks inside yoko direction \vbox
 
-\ifltj@ltshipout@avail
+\ifltj@ltfilehook@avail
 %<*ltshipout>-----------------------------------
 %
 \RequirePackage{expl3}
@@ -47,12 +41,20 @@
 
 \expandafter\endinput
 \fi
-\AtBeginShipoutInit
+\RequirePackage{atbegshi}
 %<*atbegshi>-------------------------------------
 % patching atbegshi.sty
 %%%  following codes are almost copied from
 %%%  pxatbegshi.sty 2019/09/07 v0.5 (in platex-tools bundle, by H. Yamashita).
 
+\ifdefined\AtBeginShipoutOriginalShipout
+  \let\AtBeginShipoutOriginalShipout\ltj@shipout
+\fi
+\AtBeginShipoutInit
+\DeclareRobustCommand \AtBeginDvi [1]{%
+  \global \setbox \@begindvibox
+    \vbox{\yoko\unvbox \@begindvibox #1}%
+}
 %% internal macros are locally effective
 \begingroup
 

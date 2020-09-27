@@ -12,7 +12,7 @@
     \else\hbox{\yoko\@textsuperscript{\normalfont\@thefnmark}}\fi}
   \makeatother
 \fi
-\usepackage{sansmathfonts}
+%\usepackage{sansmathfonts}
 \usepackage[no-math]{fontspec}
 \usepackage[b5j,lines=20, textwidth=30\zw]{geometry}
 \usepackage[kozuka-pr6n]{luatexja-preset}
@@ -56,25 +56,41 @@ baselineskip: \the\baselineskip}\par}
 
 \newpage
 \ExplSyntaxOn
-\cs_new:Nn \my_test_dir: {
-  \platex_if_direction_yoko:TF { Y } { y }
-  \platex_if_direction_tate:TF { T } { t }
-  \platex_if_direction_dtou:TF { D } { d }
-}
-\cs_new:Nn \my_test_box: {
-  \platex_if_box_yoko:NTF \l_tmpa_box { Y } { y }
-  \platex_if_box_tate:NTF \l_tmpa_box { T } { t }
-  \platex_if_box_dtou:NTF \l_tmpa_box { D } { d }
-}
+\cs_new:Nn \my_test_dir: {\texttt{
+  \platex_if_direction_yoko:T { Y }
+  \platex_if_direction_tate_nomath:T { T }
+  \platex_if_direction_dtou:T { D }
+  \platex_if_direction_utod:T { U }
+  \space
+  \platex_if_direction_tate:T { Tx }
+  \platex_if_direction_tate_math:T { Tm }
+}}
+\cs_new:Nn \my_test_box: {\texttt{
+  \platex_if_box_yoko:NT \l_tmpa_box { Y }
+  \platex_if_box_tate_nomath:NT \l_tmpa_box { T }
+  \platex_if_box_dtou:NT \l_tmpa_box { D }
+  \platex_if_box_utod:NT \l_tmpa_box { U }
+  \space
+  \platex_if_box_tate:NT \l_tmpa_box { Tx }
+  \platex_if_box_tate_math:NT \l_tmpa_box { Tm }
+}}
 
 \mode_leave_vertical:
 \hbox:n { \platex_direction_yoko: ABCあーいう \my_test_dir: }
 \hbox:n { \platex_direction_tate: ABCあーいう \my_test_dir: }
 \hbox:n { \platex_direction_dtou: ABCあーいう \my_test_dir: }
 
-1.~\hbox_set:Nn \l_tmpa_box { \platex_direction_yoko: ABCあーいう } \my_test_box:~
-2.~\hbox_set:Nn \l_tmpa_box { \platex_direction_tate: ABCあーいう } \my_test_box:~
-3.~\hbox_set:Nn \l_tmpa_box { \platex_direction_dtou: ABCあーいう } \my_test_box:
+\par
+\mode_leave_vertical:
+\hbox:n { \platex_direction_tate: $\hbox{PBCあーいう \my_test_dir:}$ }
+\hbox:n { \platex_direction_utod: ABCあーいう \my_test_dir: }
+
+\par
+1.~\hbox_set:Nn \l_tmpa_box { \platex_direction_yoko: ABCあーいう } \my_test_box:\par
+2.~\hbox_set:Nn \l_tmpa_box { \platex_direction_tate: ABCあーいう } \my_test_box:\par
+3.~\hbox_set:Nn \l_tmpa_box { \platex_direction_dtou: ABCあーいう } \my_test_box:\par
+4.~\hbox_set:Nn \l_tmpa_box { \platex_direction_utod: ABCあーいう } \my_test_box:\par
+5.~\hbox:n { \platex_direction_tate: $ \hbox_gset:Nn \l_tmpa_box { ABCあーいう } $ } \my_test_box:
 \ExplSyntaxOff
 
 

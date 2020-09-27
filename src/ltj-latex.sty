@@ -12,7 +12,7 @@
 \def\luatexjalatexLoaded{\endinput}
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{ltj-latex}[2020-08-08 LaTeX support of LuaTeX-ja]
+\ProvidesPackage{ltj-latex}[2020-09-27 LaTeX support of LuaTeX-ja]
 
 % cleanup at end of the document
 %\let\ltj@@orig@end=\@@end
@@ -21,55 +21,23 @@
 
 \endlinechar=13
 
-%%% patch for LaTeX
-\usepackage{lltjfont}
-\usepackage{lltjdefs}
-\usepackage{lltjcore}
-
-%%% expl3
-\RequirePackage{expl3}
-\ExplSyntaxOn
-% additions to l3box.dtx (pTeX/upTeX-specific)
-\cs_set_eq:NN \platex_direction_yoko: \yoko
-\cs_set_eq:NN \platex_direction_tate: \tate
-\cs_set_eq:NN \platex_direction_dtou: \dtou
-\prg_new_conditional:Npnn \platex_if_box_yoko:N #1 { p, T, F, TF }
-  { \if_int_compare:w \ltjgetparameter{boxdir}{#1} = 4 \scan_stop:
-      \prg_return_true: \else: \prg_return_false: \fi: }
-\prg_new_conditional:Npnn \platex_if_box_tate:N #1 { p, T, F, TF }
-  { \if_int_compare:w \ltjgetparameter{boxdir}{#1} = 3 \scan_stop:
-      \prg_return_true:
-    \else: \if_int_compare:w \ltjgetparameter{boxdir}{#1} = 11 \scan_stop: % utod
-      \prg_return_true:
-    \else
-      \prg_return_false:
-    \fi: \fi:}
-\prg_new_conditional:Npnn \platex_if_box_dtou:N #1 { p, T, F, TF }
-  { \if_int_compare:w \ltjgetparameter{boxdir}{#1} = 1 \scan_stop:
-      \prg_return_true: \else: \prg_return_false: \fi: }
-\prg_new_conditional:Npnn \platex_if_direction_yoko: { p, T, F, TF }
-  { \if_int_compare:w \ltjgetparameter{direction} = 4 \scan_stop:
-      \prg_return_true: \else: \prg_return_false: \fi: }
-\prg_new_conditional:Npnn \platex_if_direction_tate: { p, T, F, TF }
-  { \if_int_compare:w \ltjgetparameter{direction} = 3 \scan_stop:
-      \prg_return_true:
-    \else: \if_int_compare:w \ltjgetparameter{direction} = 11 \scan_stop: % utod
-      \prg_return_true:
-    \else
-      \prg_return_false:
-    \fi: \fi:}
-\prg_new_conditional:Npnn \platex_if_direction_dtou: { p, T, F, TF }
-  { \if_int_compare:w \ltjgetparameter{direction} = 1 \scan_stop:
-      \prg_return_true: \else: \prg_return_false: \fi: }
-\ExplSyntaxOff
-
-
-%%% patching commands
+%%% LaTeX version detection
+\ifcsname tex_shipout:D\endcsname
+  \expandafter\let\csname tex_shipout:D\endcsname\ltj@shipout
+\fi
 \newif\ifltj@ltfilehook@avail
 \@ifl@t@r\fmtversion{2020-10-01}{%
   \ifnum\patch@level<0\relax \ifnum\patch@level<-6 \ltj@ltfilehook@availtrue\fi
   \else\ltj@ltfilehook@availtrue\fi
 }{}
+
+%%% patch for LaTeX
+\usepackage{lltjfont}
+\usepackage{lltjdefs}
+\usepackage{lltjcore}
+\RequirePackage{lltjp-atbegshi}
+
+%%% patching commands
 \ifltj@ltfilehook@avail
   \def\@@ltj@ExecuteAfterPackage#1{\AddToHook{package/after/#1}}
   \def\@@ltj@ExecuteBeforePackage#1{\AddToHook{package/before/#1}}
@@ -126,7 +94,7 @@
 \ltj@pkgpatch@im{siunitx}
 \ltj@pkgpatch@im{microtype}
 
-\ifltj@ltshipout@avail\else\ltj@pkgpatch@im{everyshi}\fi
+\ifltj@ltfilehook@avail\else\ltj@pkgpatch@im{everyshi}\fi
 
 \RequirePackage{lltjp-geometry}
 

@@ -110,6 +110,7 @@ do
                      insert_before(head, p, b)
                   end
                   local pf = has_attr(p, attr_curjfnt)
+                  print(pc,pf)
                   pf = (pf and pf>0 and pf) or getfont(p)
                   setfont(p, ltjf_replace_altfont(pf, pc))
                   setlang(p, lang_ja)

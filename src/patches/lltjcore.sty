@@ -3,8 +3,60 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2020-09-13 Patch to LaTeX2e Kernel for LuaTeX-ja]
+\ProvidesPackage{lltjcore}[2020-09-27 Patch to LaTeX2e Kernel for LuaTeX-ja]
 \RequirePackage{etoolbox}
+
+%%% expl3
+\RequirePackage{expl3}
+\ExplSyntaxOn
+\cs_set_eq:NN \platex_direction_yoko: \yoko
+\cs_set_eq:NN \platex_direction_tate: \tate
+\cs_set_eq:NN \platex_direction_dtou: \dtou
+\cs_set_eq:NN \platex_direction_utod: \utod % LuaTeX-ja specific
+\prg_new_conditional:Npnn \platex_if_box_yoko:N #1 { p, T, F, TF }
+  { \if_int_compare:w \ltjgetparameter{boxdir}{#1} = 4 \scan_stop:
+      \prg_return_true: \else: \prg_return_false: \fi: }
+\prg_new_conditional:Npnn \platex_if_box_utod:N #1 { p, T, F, TF }
+  { \if_int_compare:w \ltjgetparameter{boxdir}{#1} = 11 \scan_stop:
+      \prg_return_true: \else: \prg_return_false: \fi: }
+\prg_new_eq_conditional:NNn \platex_if_box_tate_math:N \platex_if_box_utod:N { p, T, F, TF }
+\prg_new_conditional:Npnn \platex_if_box_tate_nomath:N #1 { p, T, F, TF }
+  { \if_int_compare:w \ltjgetparameter{boxdir}{#1} = 3 \scan_stop:
+      \prg_return_true: \else: \prg_return_false: \fi: }
+\prg_new_conditional:Npnn \platex_if_box_tate:N #1 { p, T, F, TF }
+  { \if_int_compare:w \ltjgetparameter{boxdir}{#1} = 3 \scan_stop:
+      \prg_return_true:
+    \else: \if_int_compare:w \ltjgetparameter{boxdir}{#1} = 11 \scan_stop: % utod
+      \prg_return_true:
+    \else
+      \prg_return_false:
+    \fi: \fi:}
+\prg_new_conditional:Npnn \platex_if_box_dtou:N #1 { p, T, F, TF }
+  { \if_int_compare:w \ltjgetparameter{boxdir}{#1} = 1 \scan_stop:
+      \prg_return_true: \else: \prg_return_false: \fi: }
+\prg_new_conditional:Npnn \platex_if_direction_yoko: { p, T, F, TF }
+  { \if_int_compare:w \ltjgetparameter{direction} = 4 \scan_stop:
+      \prg_return_true: \else: \prg_return_false: \fi: }
+\prg_new_conditional:Npnn \platex_if_direction_utod: { p, T, F, TF }
+  { \if_int_compare:w \ltjgetparameter{direction} = 11 \scan_stop:
+      \prg_return_true: \else: \prg_return_false: \fi: }
+\prg_new_eq_conditional:NNn
+  \platex_if_direction_tate_math: \platex_if_direction_utod: { p, T, F, TF }
+\prg_new_conditional:Npnn \platex_if_direction_tate_nomath: { p, T, F, TF }
+  { \if_int_compare:w \ltjgetparameter{direction} = 3 \scan_stop:
+      \prg_return_true: \else: \prg_return_false: \fi: }
+\prg_new_conditional:Npnn \platex_if_direction_tate: { p, T, F, TF }
+  { \if_int_compare:w \ltjgetparameter{direction} = 3 \scan_stop:
+      \prg_return_true:
+    \else: \if_int_compare:w \ltjgetparameter{direction} = 11 \scan_stop: % utod
+      \prg_return_true:
+    \else
+      \prg_return_false:
+    \fi: \fi:}
+\prg_new_conditional:Npnn \platex_if_direction_dtou: { p, T, F, TF }
+  { \if_int_compare:w \ltjgetparameter{direction} = 1 \scan_stop:
+      \prg_return_true: \else: \prg_return_false: \fi: }
+\ExplSyntaxOff
 
 \def\cleardoublepage{\clearpage\if@twoside
   \ifodd\c@page
@@ -238,14 +290,6 @@
   \relax
   \ifmmode\@@underline{#1}%
   \else \leavevmode\null$\@@underline{\hbox{#1}}\m@th$\null\relax\fi}
-
-%%% AtBeginDvi: NOT needed to patch in LaTeX 2020-10-01 pre-release 9 or later
-\unless\ifltj@ltshipout@avail
-\DeclareRobustCommand \AtBeginDvi [1]{%
-  \global \setbox \@begindvibox
-    \vbox{\yoko\unvbox \@begindvibox #1}%
-}
-\fi
 
 \newif\iffnfixbottom
 \newif\ifltj@ftn@unvboxed

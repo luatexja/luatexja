@@ -1235,8 +1235,6 @@ end
 -- main interface
 function luatexja.jfmglue.main(ahead, mode, dir)
    if not ahead then return ahead end
-   -- luatexja.ext_show_node_list(node.direct.tonode(ahead ), '>B ', print)
-   -- print()
    head = ahead;
    local lp, last, par_indented, TEMP = init_var(mode,dir)
    lp = calc_np(last, lp)
