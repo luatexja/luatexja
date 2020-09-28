@@ -32,7 +32,8 @@
 \newcommand\kanjiencodingdefault{JY3}
 \newcommand\kanjifamilydefault{\mcdefault}
 \newcommand\kanjiseriesdefault{\mddefault}
-\ifdefined\@rmfamilyhook%% LaTeX 2020-02-02
+\ifnum 0\ifltj@ltfilehook@avail1\fi\ifdefined\@rmfamilyhook1\fi>0
+  %% LaTeX 2020-02-02
   \newcommand\kanjishapedefault{\shapedefault}
 \else                   %% LaTeX 2019-10-01
   \newcommand\kanjishapedefault{\updefault}
@@ -80,7 +81,7 @@
   \DeclareMathAlphabet{\mathgt}{JY3}{gt}{m}{n}
 \fi
 
-\ifdefined\@rmfamilyhook
+\ifnum 0\ifltj@ltfilehook@avail1\fi\ifdefined\@rmfamilyhook1\fi>0
 %%%% LaTeX 2020-02-02
 \edef\bfseries@mc{\bfdefault}
 \edef\bfseries@gt{\bfdefault}
@@ -95,7 +96,9 @@
 \def\verbatim@font{\normalfont\ttfamily\kanjifamily\jttdefault\selectfont}
 
 \def\@ltj@hook@family#1#2{ % #1: csname #2: contents
-  \ifcsname @#1hook\endcsname % LaTeX 2020-02-02
+  \ifltj@ltfilehook@avail % LaTeX 2020-10-01
+    \AddToHook{#1}{#2}%
+  \else\ifcsname @#1hook\endcsname % LaTeX 2020-02-02
     \csappto{@#1hook}{#2}%
   \else % LaTeX 2019-10-01
     \ifcsname #1 \endcsname
@@ -105,7 +108,7 @@
         Patching to \expandafter\string\csname #1\endcsname\space failed%
       }%
     \fi
-  \fi
+  \fi\fi
 }
 \@ltj@hook@family{rmfamily}{%
   \if@ltj@match@family
@@ -122,6 +125,7 @@
     \prepare@family@series@update@kanji{jtt}\jttdefault
   \fi
 }
+\let\@ltj@hook@family\@undefined
 
 %%% \eminnershape
 \expandafter\patchcmd\csname em \endcsname{\itshape}{\gtfamily\itshape}{}{}

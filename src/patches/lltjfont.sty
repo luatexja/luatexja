@@ -633,24 +633,28 @@
 }
 
 \newcount\ltj@@latex@plv \ltj@@latex@plv=-1
-\ifdefined\@rmfamilyhook
+\ifltj@ltfilehook@avail % 2020-10-01
+  \ltj@@latex@plv=1000
+\else\ifdefined\@rmfamilyhook % 2020-02-02
+  \ifx\@forced@seriestrue\@undefined % 2020-02-02 pl0--2
+    \@latex@error
+     {Please update LaTeX2e!^^J\space\space
+       At least LaTeX2e 2020-02-02 patch level 3 is required}
+     {LaTeX2e 2020-02-02 patch level 2 (and 4) has a bug.}
+  \else
+    \ltj@@latex@plv=300
+    \unless\ifx\series@maybe@drop@one@m@x\@undefined % pl5 + develop
+      \ltj@@latex@plv=501
+    \else\unless\ifx\series@maybe@drop@one@m\@undefined % patch level 5
+      \ltj@@latex@plv=500
+    \fi\fi
+  \fi
+\fi\fi
+
+%%%%%%
+\ifnum\ltj@@latex@plv>0
 %%%% LaTeX 2020-02-02
 \newif\if@shape@roman@kanji
-%%%%%% 2020-02-02 patchlevel detection
-\ifx\@forced@seriestrue\@undefined % 2020-02-02 pl0--2
-  \@latex@error
-   {Please update LaTeX2e!^^J\space\space
-     At least LaTeX2e 2020-02-02 patch level 3 is required}
-   {LaTeX2e 2020-02-02 patch level 2 (and 4) has a bug.}
-\else
-  \ltj@@latex@plv=300
-  \unless\ifx\series@maybe@drop@one@m@x\@undefined % pl5 + develop
-    \ltj@@latex@plv=501
-  \else\unless\ifx\series@maybe@drop@one@m\@undefined % patch level 5
-    \ltj@@latex@plv=500
-  \fi\fi
-\fi
-%%%%%%
 
 \def\merge@kanji@series#1{%
   \expandafter\expandafter\expandafter
@@ -807,12 +811,8 @@
   \ltj@@is@kenc{#1}\ifin@\usekanji{#1}{#2}{#3}{#4}%
   \else\useroman{#1}{#2}{#3}{#4}%
   \fi}
-\DeclareRobustCommand\normalfont{%
-    \useroman\encodingdefault\familydefault\seriesdefault\shapedefault
-    \usekanji\kanjiencodingdefault\kanjifamilydefault\kanjiseriesdefault\kanjishapedefault}
-\let\reset@font\normalfont
 
-\ifdefined\@rmfamilyhook
+\ifnum 0\ifltj@ltfilehook@avail1\fi\ifdefined\@rmfamilyhook1\fi>0
 %%%% LaTeX 2020-02-02
 \let\prepare@family@series@update@kanji=\prepare@family@series@update
 \patchcmd\prepare@family@series@update{\fontfamily}{\romanfamily}{}{}
@@ -834,46 +834,35 @@
 \patchcmd\update@series@target@value@kanji{\f@series}{\k@series}{}{}
 \def\@meta@family@list@kanji{\@elt{mc}\@elt{gt}\@elt{jtt}}
 
-\ifdefined\@setbfseriesdefaultshook % after 2020-04-07
-  \g@addto@macro\@setbfseriesdefaultshook{%
-    \let\bfseries@mc\bfdef@ult
-    \let\bfseries@gt\bfdef@ult
-    \let\bfseries@jtt\bfdef@ult
- }
-\else % 2020-02-02
-  \expandafter\patchcmd\csname bfseries \endcsname{%
-    \let\bfseries@rm\bfdef@ult
-    \let\bfseries@sf\bfdef@ult
-    \let\bfseries@tt\bfdef@ult
-  }{%
-    \let\bfseries@rm\bfdef@ult
-    \let\bfseries@sf\bfdef@ult
-    \let\bfseries@tt\bfdef@ult
-    \let\bfseries@mc\bfdef@ult
-    \let\bfseries@gt\bfdef@ult
-    \let\bfseries@jtt\bfdef@ult
-  }{}{}
-\fi
-\ifdefined\@setmdseriesdefaultshook % after 2020-04-07
-  \g@addto@macro\@setmdseriesdefaultshook{%
-    \let\mdseries@mc\mddef@ult
-    \let\mdseries@gt\mddef@ult
-    \let\mdseries@jtt\mddef@ult
-  }
-\else % 2020-02-02
-  \expandafter\patchcmd\csname mdseries \endcsname{%
-    \let\mdseries@rm\mddef@ult
-    \let\mdseries@sf\mddef@ult
-    \let\mdseries@tt\mddef@ult
-  }{%
-    \let\mdseries@rm\mddef@ult
-    \let\mdseries@sf\mddef@ult
-    \let\mdseries@tt\mddef@ult
-    \let\mdseries@mc\mddef@ult
-    \let\mdseries@gt\mddef@ult
-    \let\mdseries@jtt\mddef@ult
-  }{}{}
-\fi
+\def\@ltj@hook@series@default#1#2#3{
+  \ifltj@ltfilehook@avail % 2020-10-01
+    \AddToHook{#1/defaults}{#2}%
+  \else\ifcsname @set#1defaultshook\endcsname %after 2020-04-07
+    \expandafter\g@addto@macro\csname @set#1defaultshook\endcsname{#2}%
+  \else % 2020-02-02
+    \expandafter\patchcmd\csname #1 \endcsname{#3}{#3#2}{}{}
+  \fi\fi
+}
+\@ltj@hook@series@default{bfseries}{
+  \let\bfseries@mc\bfdef@ult
+  \let\bfseries@gt\bfdef@ult
+  \let\bfseries@jtt\bfdef@ult
+}{
+  \let\bfseries@rm\bfdef@ult
+  \let\bfseries@sf\bfdef@ult
+  \let\bfseries@tt\bfdef@ult
+}
+\@ltj@hook@series@default{mdseries}{
+  \let\mdseries@mc\mddef@ult
+  \let\mdseries@gt\mddef@ult
+  \let\mdseries@jtt\mddef@ult
+}{
+  \let\mdseries@rm\mddef@ult
+  \let\mdseries@sf\mddef@ult
+  \let\mdseries@tt\mddef@ult
+}
+\let\@ltj@hook@series@default\@undefined
+
 \expandafter\patchcmd\csname bfseries \endcsname{%
   \ifx\f@family\rmdef@ult      \fontseries\bfseries@rm
   \else\ifx\f@family\sfdef@ult \fontseries\bfseries@sf
@@ -900,46 +889,83 @@
   \else                        \romanseries\mddefault
   \fi\fi\fi
 }{}{}
-\expandafter\patchcmd\csname bfseries \endcsname{\selectfont}%
-{%
+
+\def\@ltj@hook@series#1#2{
+  \ifltj@ltfilehook@avail % 2020-10-01
+    \AddToHook{#1}{#2}%
+  \else % 2020-02-02
+    \expandafter\patchcmd\csname #1 \endcsname{\selectfont}{#2\selectfont}{}{}
+  \fi
+}
+\@ltj@hook@series{bfseries}{%
   \ifx\k@family\mcdef@ult      \kanjiseries\bfseries@mc
   \else\ifx\k@family\gtdef@ult \kanjiseries\bfseries@gt
   \else\ifx\k@family\jttdef@ult\kanjiseries\bfseries@jtt
   \else                        \kanjiseries\bfdefault
   \fi\fi\fi
-  \selectfont
-}{}{}
-\expandafter\patchcmd\csname mdseries \endcsname{\selectfont}%
-{%
+}
+\@ltj@hook@series{mdseries}{%
   \ifx\k@family\mcdef@ult      \kanjiseries\mdseries@mc
   \else\ifx\k@family\gtdef@ult \kanjiseries\mdseries@gt
   \else\ifx\k@family\jttdef@ult\kanjiseries\mdseries@jtt
   \else                        \kanjiseries\mddefault
   \fi\fi\fi
-  \selectfont
-}{}{}
-\ifdefined\@expandfontdefaultshook % 2020-04-07
-  \g@addto@macro\@expandfontdefaultshook{%
-    \edef\mcdef@ult{\mcdefault}%
-    \edef\gtdef@ult{\gtdefault}%
-    \edef\jttdef@ult{\jttdefault}%
-    \edef\kanjidef@ult{\kanjifamilydefault}%
-  }
-\else % 2020-02-02
-  \appto\expand@font@defaults{%
-    \edef\mcdef@ult{\mcdefault}%
-    \edef\gtdef@ult{\gtdefault}%
-    \edef\jttdef@ult{\jttdefault}%
-    \edef\kanjidef@ult{\kanjifamilydefault}%
-  }
-\fi
+}
+\let\@ltj@hook@series\@undefined
+
+\def\@ltj@hook@efd#1{
+  \ifltj@ltfilehook@avail % 2020-10-01
+    \AddToHook{expand@font@defaults}{#1}%
+  \else\ifdefined\@expandfontdefaultshook %after 2020-04-07
+    \g@addto@macro\@expandfontdefaultshook{#1}%
+  \else % 2020-02-02
+    \appto\expand@font@defaults{#1}%
+  \fi\fi
+}
+\@ltj@hook@efd{%
+  \edef\mcdef@ult{\mcdefault}%
+  \edef\gtdef@ult{\gtdefault}%
+  \edef\jttdef@ult{\jttdefault}%
+  \edef\kanjidef@ult{\kanjifamilydefault}%
+}
+\let\@ltj@hook@efd\@undefined
+
 \appto\init@series@setup{%
   \ifx\kanjidef@ult\mcdef@ult      \mcfamily
   \else\ifx\kanjidef@ult\gtdef@ult \gtfamily
   \else\ifx\kanjidef@ult\jttdef@ult \jttfamily
   \fi\fi\fi
 }
+
+\def\@ltj@hook@dfh#1{
+  \ifltj@ltfilehook@avail % 2020-10-01
+    \AddToHook{normalfont}{#1}%
+  \else\ifdefined\@defaultfamilyhook
+    \g@addto@macro\@defaultfamilyhook{#1}%
+  \else % 2020-02-02
+    \expandafter\patchcmd\csname normalfont \endcsname{\selectfont}{#1\selectfont}{}{}
+    \let\reset@font\normalfont
+  \fi\fi
+}
+\@ltj@hook@dfh{%
+  \kanjiencoding{\kanjiencodingdefault}%
+  \edef\k@family{\kanjifamilydefault}%
+  \edef\k@series{\kanjiseriesdefault}%
+  \edef\k@shape{\kanjishapedefault}%
+}
+\let\@ltj@hook@dfh\@undefined
+%%%% LaTeX 2020-02-02 END
+\else
+%%%% LaTeX 2019-10-01
+\DeclareRobustCommand\normalfont{%
+    \useroman\encodingdefault\familydefault\seriesdefault\shapedefault
+    \usekanji\kanjiencodingdefault\kanjifamilydefault\kanjiseriesdefault\kanjishapedefault}
+\let\reset@font\normalfont
+%%%% LaTeX 2019-10-01 END
 \fi
+
+
+
 \ifdefined\prepare@family@series@update@kanji\else
 %%%% LaTeX 2019-10-01
 \def\prepare@family@series@update@kanji#1{\kanjifamily}
@@ -953,7 +979,6 @@
   \unless\ifltj@disablejfam\not@math@alphabet\gtfamily\mathgt\fi
   \prepare@family@series@update@kanji{gt}\gtdefault
   \selectfont}
-
 
 
 \let\romanprocess@table\process@table
