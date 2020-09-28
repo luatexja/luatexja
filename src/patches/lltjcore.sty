@@ -70,6 +70,10 @@
       \if@twocolumn\hbox{}\newpage\fi
     \fi
   \fi\fi}
+
+\patchcmd\@vtryfc{\global\setbox\@outputbox\vbox{}}
+  {\global\setbox\@outputbox\vbox{\unless\ifnum\ltjgetparameter{direction}=4\hskip\z@\fi}}{}{}
+
 \newif\iftombow \tombowfalse
 \newif\iftombowdate \tombowdatetrue
 \newdimen\@tombowwidth
@@ -323,7 +327,7 @@
        \@texttop
        \dimen@ \dp\@outputbox
        \unvbox \@outputbox
-       \ifnum\ltjgetparameter{direction}=4\else\vbox{\hskip\z@}\fi %%% LuaTeX-ja
+       \unless\ifnum\ltjgetparameter{direction}=4\vbox{\hskip\z@}\fi %%% LuaTeX-ja
        \vskip -\dimen@
        \ifltj@ftn@unvboxed\iffnfixbottom\else\@textbottom\fi\else\@textbottom\fi
        }%
