@@ -83,6 +83,11 @@ dir_table.dir_utod = dir_table.dir_tate + dir_table.dir_math_mod
 
 local load_module = luatexja.load_module
 load_module 'base';      local ltjb = luatexja.base
+if tex.outputmode==0 then
+    ltjb.package_error('luatexja',
+      'DVI output is not supported in LuaTeX-ja',
+      'Use lua*tex instead dvilua*tex.')
+end
 load_module 'rmlgbm';    local ltjr = luatexja.rmlgbm -- must be 1st
 if luatexja_debug then load_module('debug') end
 load_module 'lotf_aux';  local ltju = luatexja.lotf_aux
