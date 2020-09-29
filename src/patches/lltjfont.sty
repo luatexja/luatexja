@@ -653,7 +653,7 @@
 
 %%%%%%
 \ifnum\ltj@@latex@plv>0
-%%%% LaTeX 2020-02-02
+%%%% LaTeX >= 2020-02-02
 \newif\if@shape@roman@kanji
 
 \def\merge@kanji@series#1{%
@@ -774,7 +774,7 @@
 \DeclareRobustCommand\useroman[4]{%
     \romanencoding{#1}\edef\f@family{#2}\edef\f@series{#3}\edef\f@shape{#4}%
     \selectfont\ignorespaces}
-%%%% LaTeX 2020-02-02 END
+%%%% LaTeX >= 2020-02-02 END
 \else
 %%%% LaTeX 2019-10-01
 \DeclareRobustCommand\romanseries[1]{\edef\f@series{#1}}
@@ -813,7 +813,7 @@
   \fi}
 
 \ifnum 0\ifltj@ltfilehook@avail1\fi\ifdefined\@rmfamilyhook1\fi>0
-%%%% LaTeX 2020-02-02
+%%%% LaTeX >= 2020-02-02
 \let\prepare@family@series@update@kanji=\prepare@family@series@update
 \patchcmd\prepare@family@series@update{\fontfamily}{\romanfamily}{}{}
 \patchcmd\prepare@family@series@update@kanji{\fontfamily}{\kanjifamily}{}{}
@@ -913,29 +913,37 @@
 }
 \let\@ltj@hook@series\@undefined
 
-\def\@ltj@hook@efd#1{
+\def\@ltj@hook@efd#1#2{
   \ifltj@ltfilehook@avail % 2020-10-01
     \AddToHook{expand@font@defaults}{#1}%
   \else\ifdefined\@expandfontdefaultshook %after 2020-04-07
-    \g@addto@macro\@expandfontdefaultshook{#1}%
+    \g@addto@macro\@expandfontdefaultshook{#1#2}%
   \else % 2020-02-02
-    \appto\expand@font@defaults{#1}%
+    \appto\expand@font@defaults{#1#2}%
   \fi\fi
 }
 \@ltj@hook@efd{%
   \edef\mcdef@ult{\mcdefault}%
   \edef\gtdef@ult{\gtdefault}%
   \edef\jttdef@ult{\jttdefault}%
-  \edef\kanjidef@ult{\kanjifamilydefault}%
-}
+}{\edef\kanjidef@ult{\kanjifamilydefault}}
 \let\@ltj@hook@efd\@undefined
 
-\appto\init@series@setup{%
-  \ifx\kanjidef@ult\mcdef@ult      \mcfamily
-  \else\ifx\kanjidef@ult\gtdef@ult \gtfamily
-  \else\ifx\kanjidef@ult\jttdef@ult \jttfamily
-  \fi\fi\fi
-}
+\ifltj@ltfilehook@avail % 2020-10-01
+  \appto\init@series@setup{
+    \ifx\kanjiseriesdefault\kanjiseriesdefault@kernel
+      \mdseries
+      \let\kanjiseriesdefault\k@series
+    \fi
+  }
+\else
+  \appto\init@series@setup{%
+    \ifx\kanjidef@ult\mcdef@ult      \mcfamily
+    \else\ifx\kanjidef@ult\gtdef@ult \gtfamily
+    \else\ifx\kanjidef@ult\jttdef@ult \jttfamily
+    \fi\fi\fi
+  }
+\fi
 
 \def\@ltj@hook@dfh#1{
   \ifltj@ltfilehook@avail % 2020-10-01
@@ -954,7 +962,7 @@
   \edef\k@shape{\kanjishapedefault}%
 }
 \let\@ltj@hook@dfh\@undefined
-%%%% LaTeX 2020-02-02 END
+%%%% LaTeX >= 2020-02-02 END
 \else
 %%%% LaTeX 2019-10-01
 \DeclareRobustCommand\normalfont{%

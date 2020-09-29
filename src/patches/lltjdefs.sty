@@ -82,7 +82,7 @@
 \fi
 
 \ifnum 0\ifltj@ltfilehook@avail1\fi\ifdefined\@rmfamilyhook1\fi>0
-%%%% LaTeX 2020-02-02
+%%%% LaTeX >= 2020-02-02
 \edef\bfseries@mc{\bfdefault}
 \edef\bfseries@gt{\bfdefault}
 \def\bfseries@jtt{\bfseries@mc}
@@ -126,6 +126,12 @@
   \fi
 }
 \let\@ltj@hook@family\@undefined
+
+\ifltj@ltfilehook@avail % 2020-10-01
+  \expandafter\def\expandafter\kanjiseriesdefault
+    \expandafter{\kanjiseriesdefault\@empty}
+  \let\kanjiseriesdefault@kernel\kanjiseriesdefault
+\fi
 
 %%% \eminnershape
 \expandafter\patchcmd\csname em \endcsname{\itshape}{\gtfamily\itshape}{}{}
