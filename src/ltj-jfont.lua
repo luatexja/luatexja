@@ -781,7 +781,7 @@ end
 ------------------------------------------------------------------------
 -- 追加のフォント情報
 ------------------------------------------------------------------------
-luatexja.jfont.font_extra_info= font_extra_info -- key: fontnumber
+luatexja.jfont.font_extra_info = font_extra_info -- key: fontnumber
 local font_extra_basename = {} -- key: basename
 
 local list_rotate_glyphs
@@ -873,12 +873,23 @@ do
          return bname
       end
    end
+   local dummytable = { } -- dummy
+   local dtvo, dtvh = {}, {}
+   setmetatable(dtvo, {__index = function () return 0.88 end } )
+   setmetatable(dtvh, {__index = function () return 1 end } )
+   ltjr.vert_addfunc = function(id, s)
+       if not dummytable.rotation then
+           dummytable = list_rotate_glyphs(s, dummytable)
+           dummytable.vorigin, dummytable.vheight = dtvo, dtvh
+       end
+   end
+   
    local function prepare_extra_data_font(id, res)
       if type(res)=='table' and (res.psname or res.filename) then
          local bname = res.psname or nameonly(res.filename)
          local t = font_extra_basename[bname]
          if not t then bname = prepare_extra_data_base(res) end
-         font_extra_info[id] = t or font_extra_basename[bname]
+         font_extra_info[id] = bname and (t or font_extra_basename[bname]) or dummytable
       end
    end
     luatexbase.add_to_callback(
@@ -894,9 +905,6 @@ do
          prepare_extra_data_font(id, res)
       end,
       'ltj.prepare_extra_data', 1)
-
-   local nulltable = {} -- dummy
-   ltjr.vert_addfunc = function (n) font_extra_info[n] = nulltable end
 
    for i=1,font.nextid()-1 do
       local t = font.getfont(i)

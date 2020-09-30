@@ -291,7 +291,6 @@ local function mk_rml(name, size, id)
    local fontdata = {}
    local cachedata = {}
    local s = cidfont_data[cid_name]
-   luatexja.rmlgbm.vert_addfunc(id)
    for k, v in pairs(s) do
       fontdata[k] = v
       cachedata[k] = v
@@ -328,6 +327,7 @@ local function mk_rml(name, size, id)
       fontdata.characters = cache_chars[cid_name][size]
       cachedata.characters = cache_chars[cid_name][size]
    end
+   luatexja.rmlgbm.vert_addfunc(id, fontdata)
 
    -- other parameters
    do
