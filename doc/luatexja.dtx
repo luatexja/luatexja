@@ -170,7 +170,7 @@
 %%%%%%%% other macros
 \newlist{cslist}{description}{2}
 \setlist[cslist]{%
-    style=nextline,font=\bfseries\ttfamily,
+    style=nextline,font=\mdseries\ttfamily,
     before*=\def\<{\char`\<}\def\>{\char`\>}\def\{{\char`\{}\def\}{\char`\}},
     topsep=\medskipamount,
 %<ja> leftmargin=2\zw,
@@ -3292,7 +3292,7 @@ These commands set the dimension of \cs{box<num>}. One does not need
 \ltjsetwd42 20pt,  \ltjsetwd42=20pt,  \ltjsetwd=42 20pt,  \ltjsetwd=42=20pt
 \end{lstlisting}
 
-設定値は「横組」「縦組及びutod方向」「dtou方向」
+設定値は「横組」「縦組またはutod方向」「dtou方向」
 の3種ごとに独立して記録される．参考として，Gitリポジトリ内の
 	      \verb+test/test55-boxdim_diffdir.{tex,pdf}+ を挙げておく．
 
@@ -5792,7 +5792,7 @@ of the result of \cs{kansuji}<digit>.
 %<*en>
 \verb+\ltjgetparameter{adjustdir}+ returns a integer which represents
 the direction of the surrounding vertical list.
-As \Param{direction}, the return value 1 means \emph{down-to-up} direction,
+As \Param{direction}, the return value 1 means \emph{dtou} direction,
 3 means \emph{tate} direction (vertical typesetting),
 and 4 means \emph{yoko} direction (horizontal typesetting).
 %</en>
@@ -6312,7 +6312,7 @@ to reduce the number of loaded fonts.
 This will save time for typesetting and memory consumption of Lua side (\cite{tc18ltja})．
 
 \begin{itemize}
-  \item \cs{selectfont} loads (and chooses) only the Japanese font for current direction,
+  \item \cs{selectfont} loads (and chooses) only the Japanese font for the current direction,
   and does not load the Japanese font for other direction
   (\LuaTeX-ja only detects its size and JFM, to calculate the amount of shifting the baseline).
 
@@ -6953,6 +6953,85 @@ Similarly, \cs{strut} now uses one of these boxes.
 \Pkg{lltjext}パッケージで追加される組方向指定で \texttt{<u>} を指定した時，および
 周囲が縦組の状況で \texttt{<z>} を指定した時に限られている．
 %</ja>
+
+%<*en>
+\section{expl3 interface}
+This section describes expl3 interfaces provided by \LuaTeX-ja.
+All of them belong to te \texttt{platex} module, since they are provided for compatibility with Japanese \pLaTeX.
+Note that commands which are marked with dagger (``\dagger'') are additions by \LuaTeX-ja.
+%</en>
+%<*ja>
+\section{expl3形式の命令}
+expl3の文法に沿った組方向変更命令や組方向による条件判断文である．
+これらは\pLaTeX との互換性の為に用意されているので，\texttt{platex}モジュールとして定義されている．
+なお，``\dagger''がついている命令は\LuaTeX-ja独自のものである．
+%</ja>
+\begin{cslist}
+  \item[\cs{platex\_direction\_yoko:}\textrm{, }\cs{platex\_direction\_tate:}\textrm{, }\cs{platex\_direction\_dtou:}]
+%<ja>  それぞれ\cs{yoko},~\cs{tate},~\cs{dtou}と同義．
+%<en>  Synonyms for \cs{yoko},~\cs{tate}~and~\cs{dtou}, respectively.
+  \item[\cs{platex\_if\_direction\_yoko\_p:}]
+%<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
+%<ja>\ \\[\dimexpr-2\baselineskip\relax]
+  \item[\cs{platex\_if\_direction\_yoko:\underline{\textsl{TF}}} \{<true code>\} \{<false code>\}]
+%<ja>  現在の組方向が横組であるか否かをテストする．
+%<en>  Tests if the current direction is \emph{yoko} (horizontal writing).
+  \item[\cs{platex\_if\_direction\_tate\_nomath\_p:}$^\dagger$]
+%<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
+%<ja>\ \\[\dimexpr-2\baselineskip\relax]
+  \item[\cs{platex\_if\_direction\_tate\_nomath:\underline{\textsl{TF}}}$^\dagger$ \{<true code>\} \{<false code>\}]
+%<ja>  現在の組方向が縦組であるか否かをテストする．
+%<en>  Tests if the current direction is \emph{tate} (vertical writing).
+  \item[\cs{platex\_if\_direction\_tate\_math\_p:}$^\dagger$]
+%<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
+%<ja>\ \\[\dimexpr-2\baselineskip\relax]
+  \item[\cs{platex\_if\_direction\_tate\_math:\underline{\textsl{TF}}}$^\dagger$ \{<true code>\} \{<false code>\}]
+%<ja>  現在の組方向がutod方向（\pTeX でいう「縦数式ディレクション」）であるか否かをテストする．
+%<en>  Tests if the current direction is \emph{utod}.
+  \item[\cs{platex\_if\_direction\_tate\_p:}]
+%<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
+%<ja>\ \\[\dimexpr-2\baselineskip\relax]
+  \item[\cs{platex\_if\_direction\_tate:\underline{\textsl{TF}}} \{<true code>\} \{<false code>\}]
+%<ja>  現在の組方向が縦組またはutod方向であるか否かをテストする．
+%<en>  Tests if the current direction is \emph{tate}~or~\emph{utod}.
+  \item[\cs{platex\_if\_direction\_dtou\_p:}]
+%<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
+%<ja>\ \\[\dimexpr-2\baselineskip\relax]
+  \item[\cs{platex\_if\_direction\_dtou:\underline{\textsl{TF}}} \{<true code>\} \{<false code>\}]
+%<ja>  現在の組方向がdtou方向であるか否かをテストする．
+%<en>  Tests if the current direction is \emph{dtou}.
+  \item[\cs{platex\_if\_box\_yoko\_p:N} <box>]
+%<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
+%<ja>\ \\[\dimexpr-2\baselineskip\relax]
+  \item[\cs{platex\_if\_box\_yoko:N\underline{\textsl{TF}}} <box> \{<true code>\} \{<false code>\}]
+%<ja>  ボックス<box>の組方向が横組であるか否かをテストする．
+%<en>  Tests if the direction of <box> is \emph{yoko}.
+  \item[\cs{platex\_if\_box\_tate\_nomath\_p:N}$^\dagger$ <box>]
+%<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
+%<ja>\ \\[\dimexpr-2\baselineskip\relax]
+  \item[\cs{platex\_if\_box\_tate\_nomath:N\underline{\textsl{TF}}}$^\dagger$ <box> \{<true code>\} \{<false code>\}]
+%<ja>  ボックス<box>の組方向が縦組であるか否かをテストする．
+%<en>  Tests if the direction of <box> is \emph{tate}.
+  \item[\cs{platex\_if\_box\_tate\_math\_p:N}$^\dagger$ <box>]
+%<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
+%<ja>\ \\[\dimexpr-2\baselineskip\relax]
+  \item[\cs{platex\_if\_box\_tate\_math:N\underline{\textsl{TF}}}$^\dagger$ <box> \{<true code>\} \{<false code>\}]
+%<ja>  ボックス<box>の組方向がutod方向であるか否かをテストする．
+%<en>  Tests if the direction of <box> is \emph{utod}.
+  \item[\cs{platex\_if\_box\_tate\_p:N} <box>]
+%<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
+%<ja>\ \\[\dimexpr-2\baselineskip\relax]
+  \item[\cs{platex\_if\_box\_tate:N\underline{\textsl{TF}}} <box> \{<true code>\} \{<false code>\}]
+%<ja>  ボックス<box>の組方向が縦組またはutod方向であるか否かをテストする．
+%<en>  Tests if the direction of <box> is \emph{tate}~or~\emph{utod}.
+  \item[\cs{platex\_if\_box\_dtou\_p:N} <box>]
+%<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
+%<ja>\ \\[\dimexpr-2\baselineskip\relax]
+\item[\cs{platex\_if\_box\_dtou:N\underline{\textsl{TF}}} <box> \{<true code>\} \{<false code>\}]
+%<ja>    ボックス<box>の組方向がdtou方向であるか否かをテストする．
+%<en>  Tests if the direction of <box> is \emph{dtou}.
+\end{cslist}
+
 
 %<*en>
 \section{Addon packages}

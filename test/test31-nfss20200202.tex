@@ -1,4 +1,5 @@
 \documentclass{ltjarticle}
+\typeout{\meaning\kanjiseriesdefault}
 \makeatletter
 %\DeclareFontSeriesDefault[sf]{md}{b}
 \def\mdseries@mc{el}
@@ -33,15 +34,26 @@
   {\fontseries{b}\selectfont \TEST} B
   {\fontseries{bx}\selectfont \TEST} BX
 }
+\typeout{\meaning\kanjiseriesdefault}
 \begin{document}
+\makeatletter
+{\ttfamily
+  \meaning\kanjiseriesdefault, \meaning\kanjiseriesdefault@kernel
+}
 %{\ttfamily\expandafter\meaning\csname bfdefault\endcsname::%
 %  \expandafter\meaning\csname bfdefault@previous\endcsname}\par
 
-{\ttfamily ======DEFAULT======\par}
-\TESTA
-\def\bfdefault{b}\newpage
-{\ttfamily ======\detokenize{\def\bfdefault{bx}}======\par}
 
+%\def\bfdefault{b}\newpage
+{\ttfamily ======DEFAULT \string\bfdefault: \meaning\bfdefault ======\par}
+\TESTA
+
+\def\bfdefault{b}\newpage
+{\ttfamily ======\detokenize{\def\bfdefault{b}}======\par}
+\TESTA
+
+\def\bfdefault{bx}\newpage
+{\ttfamily ======\detokenize{\def\bfdefault{bx}}======\par}
 \TESTA
 
 %\ttfamily
