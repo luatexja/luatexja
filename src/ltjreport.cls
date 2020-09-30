@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjreport}
-  [2020/07/27 v1.8e-ltj-19
+  [2020-09-30 v1.8f-ltj-20
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -780,9 +780,9 @@
 \def\addcontentsline#1#2#3{%
   \protected@write\@auxout
     {\let\label\@gobble \let\index\@gobble \let\glossary\@gobble
-     \@temptokena{\thepage}}%
-    {\string\@writefile{#1}%
-       {\protect\contentsline{#2}{#3}{\the\@temptokena}%
+     \@temptokena{\thepage}%
+    }{\string\@writefile{#1}%
+       {\protect\contentsline{#2}{#3}{\the\@temptokena}{}%
 \protected@file@percent}}%
 }
 \newcommand{\tableofcontents}{%
@@ -951,6 +951,8 @@
 \else
   \@mparswitchfalse
 \fi
+%% この節のコードは|filehook|パッケージ（Lua\TeX-ja読み込み時に自動でロードされます）
+%% の機能を用いています。
 \ltj@ExecuteBeforePackage*{ftnright}{\let\ltjt@orig@@makefntext=\@makefntext}
 \ltj@ExecuteAfterPackage*{ftnright}{\let\@makefntext=\ltjt@orig@@makefntext}
 \endinput
