@@ -12,7 +12,7 @@
 \def\luatexjalatexLoaded{\endinput}
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{ltj-latex}[2020-09-27 LaTeX support of LuaTeX-ja]
+\ProvidesPackage{ltj-latex}[2020-10-01 LaTeX support of LuaTeX-ja]
 
 % cleanup at end of the document
 %\let\ltj@@orig@end=\@@end
@@ -86,8 +86,10 @@
 \ltj@pkgpatch{tascmac}
 \ltj@pkgpatch{ascmac}[lltjp-tascmac]
 \ltj@pkgpatch@im{stfloats}
-\ltj@pkgpatch{preview}  %% at \begin{document}
+\ifltj@ltfilehook@avail\else
+  \ltj@pkgpatch{preview}  %% at \begin{document}
   % (preview package has delayed option)
+\fi
 \ltj@pkgpatch{array}    %% at \begin{document}
 \ltj@pkgpatch{collcell} %% at \begin{document}
 \ltj@pkgpatch@im{unicode-math}

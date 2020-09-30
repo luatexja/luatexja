@@ -8,6 +8,7 @@
 \usepackage{plext}
 \usepackage[dvipdfmx]{xcolor}
 \fi
+\usepackage{pict2e}
 \usepackage[margin=20mm]{geometry}
 \unitlength6mm\fboxsep0mm
 
@@ -16,7 +17,7 @@
   \hbox{#1\color{#3}%
     \vrule width 150pt height .2pt depth .2pt\kern-150pt
     \normalsize あいうABCxyz%
-    \fbox{\begin{picture}<#2>(5,4)(1,2)
+    \fbox{\begin{picture}<#2>(1cm+3cm,4)(1,2)
       \put(0,0){\circle*{0.2}}
       \put(0,0){\vector(0,1){1}}
       \put(1,0){\makebox(0,0)[l]{\scriptsize$x$}}

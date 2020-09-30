@@ -3,20 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-preview}[2018/01/20 Patch to preview for LuaTeX-ja]
-
-\RequirePackage{etoolbox,preview}
-\newbox\ltj@preview@box
-
-\patchcmd\pr@endbox{%
-   \pr@ship@end
-}{%
-   \setbox\ltj@preview@box=\box\AtBeginShipoutBox
-   \setbox\AtBeginShipoutBox=\vbox{\yoko\box\pr@box}%
-   \directlua{luatexja.direction.finalize()}%
-   \setbox\pr@box=\box\AtBeginShipoutBox
-   \setbox\AtBeginShipoutBox=\box\ltj@preview@box
-   \pr@ship@end
-}{}{}
-
+\ProvidesPackage{lltjp-preview}[2020-10-01 Patch to preview for LuaTeX-ja]
+\RequirePackage{preview}
+\let\pr@shipout=\ltj@shipout
 \endinput
