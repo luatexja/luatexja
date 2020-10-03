@@ -95,7 +95,7 @@
 \@ltj@match@familyfalse
 \def\verbatim@font{\normalfont\ttfamily\kanjifamily\jttdefault\selectfont}
 
-\def\@ltj@hook@family#1#2{ % #1: csname #2: contents
+\def\@ltj@hook@family#1#2{% #1: csname #2: contents
   \ifltj@ltfilehook@avail % LaTeX 2020-10-01
     \AddToHook{#1}{#2}%
   \else\ifcsname @#1hook\endcsname % LaTeX 2020-02-02

@@ -639,7 +639,7 @@
   \ifx\@forced@seriestrue\@undefined % 2020-02-02 pl0--2
     \@latex@error
      {Please update LaTeX2e!^^J\space\space
-       At least LaTeX2e 2020-02-02 patch level 3 is required}
+       At least LaTeX2e 2020-02-02 patch level 3 is required}%
      {LaTeX2e 2020-02-02 patch level 2 (and 4) has a bug.}
   \else
     \ltj@@latex@plv=300
@@ -834,29 +834,29 @@
 \patchcmd\update@series@target@value@kanji{\f@series}{\k@series}{}{}
 \def\@meta@family@list@kanji{\@elt{mc}\@elt{gt}\@elt{jtt}}
 
-\def\@ltj@hook@series@default#1#2#3{
+\def\@ltj@hook@series@default#1#2#3{%
   \ifltj@ltfilehook@avail % 2020-10-01
     \AddToHook{#1/defaults}{#2}%
   \else\ifcsname @set#1defaultshook\endcsname %after 2020-04-07
     \expandafter\g@addto@macro\csname @set#1defaultshook\endcsname{#2}%
   \else % 2020-02-02
-    \expandafter\patchcmd\csname #1 \endcsname{#3}{#3#2}{}{}
+    \expandafter\patchcmd\csname #1 \endcsname{#3}{#3#2}{}{}%
   \fi\fi
 }
-\@ltj@hook@series@default{bfseries}{
+\@ltj@hook@series@default{bfseries}{%
   \let\bfseries@mc\bfdef@ult
   \let\bfseries@gt\bfdef@ult
   \let\bfseries@jtt\bfdef@ult
-}{
+}{%
   \let\bfseries@rm\bfdef@ult
   \let\bfseries@sf\bfdef@ult
   \let\bfseries@tt\bfdef@ult
 }
-\@ltj@hook@series@default{mdseries}{
+\@ltj@hook@series@default{mdseries}{%
   \let\mdseries@mc\mddef@ult
   \let\mdseries@gt\mddef@ult
   \let\mdseries@jtt\mddef@ult
-}{
+}{%
   \let\mdseries@rm\mddef@ult
   \let\mdseries@sf\mddef@ult
   \let\mdseries@tt\mddef@ult
@@ -890,11 +890,11 @@
   \fi\fi\fi
 }{}{}
 
-\def\@ltj@hook@series#1#2{
+\def\@ltj@hook@series#1#2{%
   \ifltj@ltfilehook@avail % 2020-10-01
     \AddToHook{#1}{#2}%
   \else % 2020-02-02
-    \expandafter\patchcmd\csname #1 \endcsname{\selectfont}{#2\selectfont}{}{}
+    \expandafter\patchcmd\csname #1 \endcsname{\selectfont}{#2\selectfont}{}{}%
   \fi
 }
 \@ltj@hook@series{bfseries}{%
@@ -913,7 +913,7 @@
 }
 \let\@ltj@hook@series\@undefined
 
-\def\@ltj@hook@efd#1#2{
+\def\@ltj@hook@efd#1#2{%
   \ifltj@ltfilehook@avail % 2020-10-01
     \AddToHook{expand@font@defaults}{#1}%
   \else\ifdefined\@expandfontdefaultshook %after 2020-04-07
@@ -930,7 +930,7 @@
 \let\@ltj@hook@efd\@undefined
 
 \ifltj@ltfilehook@avail % 2020-10-01
-  \appto\init@series@setup{
+  \appto\init@series@setup{%
     \ifx\kanjiseriesdefault\kanjiseriesdefault@kernel
       \mdseries
       \let\kanjiseriesdefault\k@series
@@ -945,13 +945,13 @@
   }
 \fi
 
-\def\@ltj@hook@dfh#1{
+\def\@ltj@hook@dfh#1{%
   \ifltj@ltfilehook@avail % 2020-10-01
     \AddToHook{normalfont}{#1}%
   \else\ifdefined\@defaultfamilyhook
     \g@addto@macro\@defaultfamilyhook{#1}%
   \else % 2020-02-02
-    \expandafter\patchcmd\csname normalfont \endcsname{\selectfont}{#1\selectfont}{}{}
+    \expandafter\patchcmd\csname normalfont \endcsname{\selectfont}{#1\selectfont}{}{}%
     \let\reset@font\normalfont
   \fi\fi
 }
