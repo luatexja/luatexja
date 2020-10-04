@@ -129,6 +129,9 @@ function luatexja.ruby.read_old_break_info()
       local real_file = kpse.find_file(fname)
       if real_file then dofile(real_file) end
       cache_handle = io.open(fname, 'w')
+      if cache_handle then 
+         cache_handle:write('local lrob=luatexja.ruby.old_break_info\n')
+      end
    end
 end
 local make_uniq_id
@@ -143,12 +146,12 @@ end
 -- concatenation of boxes: reusing nodes
 -- ルビ組版が行われている段落/hboxでの設定が使われる．
 -- ルビ文字を格納しているボックスでの設定ではない！
+local function get_attr_icflag(p)
+    return (has_attr(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
+end
 local concat
 do
    local node_prev = node.direct.getprev
-   local function get_attr_icflag(p)
-      return (has_attr(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
-   end
    function concat(f, b)
       if f then
          if b then
@@ -311,11 +314,13 @@ end
 ----------------------------------------------------------------
 
 -- r, p の中身のノードは再利用される
-local function enlarge_parent(r, p, ppre, pmid, ppost, mapre, mapost, intmode)
+local function enlarge_parent(r, p, tmp_tbl, intmode)
    -- r: ルビ部分の格納された box，p: 同，親文字
    local rwidth = getfield(r, 'width')
    local sumprot = rwidth - getfield(p, 'width') -- >0
    local pre_intrusion, post_intrusion
+   local ppre, pmid, ppost = tmp_tbl.ppre, tmp_tbl.pmid, tmp_tbl.ppost
+   local mapre, mapost = tmp_tbl.mapre, tmp_tbl.mapost
    if intmode == 0 then --  とりあえず組んでから決める
       p = enlarge(p, rwidth, ppre, pmid, ppost, 0, 0)
       pre_intrusion  = min(mapre, round(ppre*getfield(p, 'glue_set')*65536))
@@ -351,17 +356,18 @@ end
 -- ルビボックスの生成（単一グループ）
 -- returned value: <new box>, <ruby width>, <post_intrusion>
 local max_margin
-local function new_ruby_box(r, p, ppre, pmid, ppost,
-                            mapre, mapost, imode, rgap, bheight)
+local function new_ruby_box(r, p, tmp_tbl)
    local post_intrusion = 0
-   local intmode = imode%4
+   local imode = tmp_tbl.imode
+   local ppre, pmid, ppost = tmp_tbl.ppre, tmp_tbl.pmid, tmp_tbl.ppost
+   local mapre, mapost = tmp_tbl.mapre, tmp_tbl.mapost
    local rpre, rmid, rpost, rsmash
    imode = floor(imode/262144); rsmash = (imode%2 ==1)
    imode = floor(imode/2); rpost = imode%8;
    imode = (imode-rpost)/8;  rmid  = imode%8;
    imode = (imode-rmid)/8;   rpre  = imode%8
    if getfield(r, 'width') > getfield(p, 'width') then  -- change the width of p
-      r, p, post_intrusion  = enlarge_parent(r, p, ppre, pmid, ppost, mapre, mapost, intmode)
+      r, p, post_intrusion  = enlarge_parent(r, p, tmp_tbl, imode%4)
    elseif getfield(r, 'width') < getfield(p, 'width') then -- change the width of r
       r = enlarge(r, getfield(p, 'width'), rpre, rmid, rpost, 0, 0)
       post_intrusion = 0
@@ -385,12 +391,10 @@ local function new_ruby_box(r, p, ppre, pmid, ppost,
    end
    local a, k = node_new(id_rule), node_new(id_kern, 1)
    setfield(a, 'width', 0); setfield(a, 'height', 0)
-   setfield(a, 'depth', 0); setfield(k, 'kern', rgap)
+   setfield(a, 'depth', 0); setfield(k, 'kern', tmp_tbl.rgap)
    insert_after(r, r, a); insert_after(r, a, k);
    insert_after(r, k, p); setfield(p, 'next', nil)
-   if bheight > 0 then
-       setfield(p, 'height', bheight)
-   end
+   if tmp_tbl.bheight > 0 then setfield(p, 'height', tmp_tbl.bheight) end
    a = node.direct.vpack(r); setfield(a, 'shift', 0)
    set_attr(a, attr_ruby, post_intrusion)
    if rsmash or getfield(a, 'height')<getfield(p, 'height') then
@@ -411,7 +415,10 @@ local max_allow_pre, max_allow_post
 
 -- 中付き熟語ルビ，cmp containers
 -- 「文字の構成を考えた」やつはどうしよう
-local function pre_low_cal_box(w, cmp)
+local pre_low_cal_box
+do
+local tmp_tbl = {}
+pre_low_cal_box = function (w, cmp)
    local rb = {}
    local pb = {}
    local kf = {}
@@ -422,12 +429,14 @@ local function pre_low_cal_box(w, cmp)
    local mdt -- nt*: node temp
    local coef = {} -- 連立一次方程式の拡大係数行列
    local rtb = expand_3bits(has_attr(wv, attr_ruby_stretch))
-   local rgap = has_attr(wv, attr_ruby_intergap)
-   local bheight = has_attr(wv, attr_ruby_baseheight)
-   local intmode = floor(has_attr(wv, attr_ruby_mode)/4)
+   tmp_tbl.rgap = has_attr(wv, attr_ruby_intergap)
+   tmp_tbl.imode = floor(has_attr(wv, attr_ruby_mode)/4)
+   tmp_tbl.bheight = has_attr(wv, attr_ruby_baseheight)
 
    -- node list 展開・行末形の計算
    local nt, nta, ntb = wv, nil, nil -- nt*: node temp
+   tmp_tbl.ppre, tmp_tbl.pmid, tmp_tbl.ppost = rtb[6], rtb[5], rtb[4]
+   tmp_tbl.mapre, tmp_tbl.mapost = max_allow_pre, 0
    for i = 1, cmp do
       nt = node_next(nt); rb[i] = nt; nta = concat(nta, node_copy(nt))
       nt = node_next(nt); pb[i] = nt; ntb = concat(ntb, node_copy(nt))
@@ -435,30 +444,31 @@ local function pre_low_cal_box(w, cmp)
       for j = 1, 2*i do coef[i][j] = 1 end
       for j = 2*i+1, 2*cmp+1 do coef[i][j] = 0 end
       kf[i], coef[i][2*cmp+2]
-         = new_ruby_box(node_copy(nta), node_copy(ntb),
-                        rtb[6], rtb[5], rtb[4], max_allow_pre, 0, intmode, rgap, bheight)
+         = new_ruby_box(node_copy(nta), node_copy(ntb), tmp_tbl)
    end
    node_free(nta); node_free(ntb)
 
    -- 行頭形の計算
    local nta, ntb = nil, nil
+   tmp_tbl.ppre, tmp_tbl.pmid, tmp_tbl.ppost = rtb[9], rtb[8], rtb[7]
+   tmp_tbl.mapre, tmp_tbl.mapost = 0, max_allow_post
    for i = cmp,1,-1 do
       coef[cmp+i] = {}
       for j = 1, 2*i-1 do coef[cmp+i][j] = 0 end
       for j = 2*i, 2*cmp+1 do coef[cmp+i][j] = 1 end
       nta = concat(node_copy(rb[i]), nta); ntb = concat(node_copy(pb[i]), ntb)
       kf[cmp+i], coef[cmp+i][2*cmp+2]
-         = new_ruby_box(node_copy(nta), node_copy(ntb),
-                        rtb[9], rtb[8], rtb[7], 0, max_allow_post, intmode, rgap, bheight)
+         = new_ruby_box(node_copy(nta), node_copy(ntb), tmp_tbl)
    end
 
    -- ここで，nta, ntb には全 container を連結した box が入っているので
    -- それを使って行中形を計算する．
    coef[2*cmp+1] = {}
    for j = 1, 2*cmp+1 do coef[2*cmp+1][j] = 1 end
+   tmp_tbl.ppre, tmp_tbl.pmid, tmp_tbl.ppost = rtb[3], rtb[2], rtb[1]
+   tmp_tbl.mapre, tmp_tbl.mapost = max_allow_pre, max_allow_post
    kf[2*cmp+1], coef[2*cmp+1][2*cmp+2], post_intrusion_backup
-      = new_ruby_box(nta, ntb, rtb[3], rtb[2], rtb[1],
-                     max_allow_pre, max_allow_post, intmode, rgap, bheight)
+      = new_ruby_box(nta, ntb, tmp_tbl)
 
    -- w.value の node list 更新．
    local nt = wv
@@ -471,6 +481,7 @@ local function pre_low_cal_box(w, cmp)
       gauss(coef) -- 掃きだし法で連立方程式形 coef を解く
    end
    return coef
+end
 end
 
 local first_whatsit
@@ -516,6 +527,32 @@ local function pre_low_app_node(head, w, cmp, coef, ht, dp)
    return head, first_whatsit(node_next(nt))
 end
 
+local get_around_skip
+do
+local KANJI_SKIP      = luatexja.icflag_table.KANJI_SKIP
+local XKANJI_SKIP_JFM = luatexja.icflag_table.XKANJI_SKIP_JFM
+local getprev = node.direct.getprev
+local getnext = node.direct.getnext
+get_around_skip = function(head, n)
+    local p = getprev(n)
+    luatexja.ext_show_node(node.direct.tonode(p), 'B> ', print)
+    if getid(p)==id_glue then
+        local pi = get_attr_icflag(p)
+        if pi>=KANJI_SKIP and pi<=XKANJI_SKIP_JFM then
+            print(n, 'before ' .. luatexja.print_scaled(getfield(p, 'width')))
+        end
+    end
+    p = getnext(n)
+    luatexja.ext_show_node(node.direct.tonode(p), 'A> ', print)
+    if getid(p)==id_glue then
+        local pi = get_attr_icflag(p)
+        if pi>=KANJI_SKIP and pi<=XKANJI_SKIP_JFM then
+            print(n, 'after  ' .. luatexja.print_scaled(getfield(p, 'width')))
+        end
+    end
+end
+end
+
 local function pre_high(ahead)
    if not ahead then return ahead end
    local head = to_direct(ahead)
@@ -523,6 +560,7 @@ local function pre_high(ahead)
    local n = first_whatsit(head)
    while n do
       if getsubtype(n) == sid_user and getfield(n, 'user_id') == RUBY_PRE then
+        local around_skip = get_around_skip(head, n) 
         local nv = getfield(n, 'value')
          max_allow_pre = has_attr(nv, attr_ruby_maxprep) or 0
          local atr = has_attr(n, attr_ruby) or 0
@@ -564,9 +602,7 @@ do
       local id = has_attr(wv, attr_ruby_id)
       if id>0 and cache_handle then
          cache_handle:write(
-                    'luatexja.ruby.old_break_info['
-                       .. tostring(id) .. ']=' .. num
-                       .. '\n')
+            'lrob[' .. tostring(id) .. ']=' .. num .. '\n')
       end
    end
 
