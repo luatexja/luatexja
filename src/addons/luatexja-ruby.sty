@@ -4,7 +4,7 @@
 
 % LaTeX only!
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-ruby}[2020-10-04 v0.3]
+\ProvidesPackage{luatexja-ruby}[2020-10-05 v0.3]
 \RequirePackage{luatexja}
 
 %%------------------
@@ -96,9 +96,9 @@
 	  + 512 * \expandafter\ltj@@ruby@cts\ltj@@rubyip@stretcheol
 	  + \expandafter\ltj@@ruby@cts\ltj@@rubyip@stretch,
       mode 
-        = 2097152 * \expandafter\ltj@@ruby@cts\ltj@@rubyip@stretchruby
+        = (2097152 * \expandafter\ltj@@ruby@cts\ltj@@rubyip@stretchruby
           + \ltj@safe@num{\ltj@@rubyip@mode}
-          + 1048576 * \ifltj@ruby@rubysmash1\else0\fi,
+          + 1048576 * \ifltj@ruby@rubysmash1\else0\fi),
       baseheight = \ltj@safe@dimen{\ltj@@rubyip@baseheight\zh},
     \string}
 }

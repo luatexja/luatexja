@@ -42,6 +42,8 @@
   HaranoAjiMincho-Regular:extend=0.67;jfm=ujisc33}{}
 
 \title{\textsf{luatexja-ruby}パッケージ}
+\author{\LuaTeX-jaプロジェクトチーム}
+\date{\texttt{\csname ver@luatexja-ruby.sty\endcsname}（\today）}
 \begin{document}
 \catcode`\<=13
 \def<#1>{{\rmfamily\mdseries\itshape$\langle$#1\/$\rangle$}}
@@ -116,6 +118,7 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 \]
 \end{description}
 
+  \typeout{AAAA}
 組み方の具体例を実際に示す．例示のため，平仮名にはルビが1字まで，「立」にはルビを
 0.5字分までかけてよいことにしている．
 \begin{description}
@@ -131,7 +134,10 @@ plain \LuaTeX でのロードはまだサポートしておらず，
   \quad は\ltjruby{聴衆}{ちようしゆう}と\quad
 は\ltjruby{暁}{あかつき}立\quad
 は\ltjruby{聴衆}{ちようしゆう}立\par}
-\item[10]{\setkeys[ltj]{ruby}{mode=9}%
+\item[10]{%
+  \typeout{MODE: \csname ltj@@rubyip@mode\endcsname.}%
+  \setkeys[ltj]{ruby}{mode=9}%
+  \typeout{MODE: \csname ltj@@rubyip@mode\endcsname.}%
 \ltjsetparameter{rubypreintrusion={`立,0.5}, rubypostintrusion={`立,0.5}}%
 は\ltjruby{美}{うつく}しい
   \quad は\ltjruby{聴衆}{ちようしゆう}と\quad
@@ -363,15 +369,15 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 -\underbrace{0.25\,\mathrm{zw}}_{\text{前のルビの後側進入量（行中形）}}=0.25\,\mathrm{zw}
 \]
 となる．行分割後，「\ltjruby{陵}{りよう}」の実際の後側進入量は
-auxファイルに記述される．
-\item 2回目以降の実行では，auxファイルに保存された「\ltjruby{陵}{りよう}」の後側進入量
+<jobname>\texttt{.ltjruby}ファイルに記述される．
+\item 2回目以降の実行では，<jobname>\texttt{.ltjruby}ファイルに保存された「\ltjruby{陵}{りよう}」の後側進入量
 を用いて，「\ltjruby{陵}{みささぎ}」前側進入許容量を次のように計算する：
 \[
  \underbrace{0.5\,\mathrm{zw}}_{\text{元々の許容量}}
--\underbrace{0.25\,\mathrm{zw}}_{\text{前のルビの後側進入量 (from aux)}}=0.25\,\mathrm{zw}.
+-\underbrace{0.25\,\mathrm{zw}}_{\text{前のルビの後側進入量 (from \texttt{.ltjruby})}}=0.25\,\mathrm{zw}.
 \]
 \end{enumerate}
-auxファイルに保存する際，各 \verb+\ltjruby+ 命令の呼び出しを識別するキーが必要になるが，
+<jobname>\texttt{.ltjruby}ファイルに保存する際，各 \verb+\ltjruby+ 命令の呼び出しを識別するキーが必要になるが，
 そのキーとしては単純に「何個目の \verb+\ltjruby+ 命令か」である．
 
 なお，以上の処理は，1行目と2行目を比較すれば分かるように，

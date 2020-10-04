@@ -358,16 +358,17 @@ end
 local max_margin
 local function new_ruby_box(r, p, tmp_tbl)
    local post_intrusion = 0
-   local imode = tmp_tbl.imode
+   local imode
    local ppre, pmid, ppost = tmp_tbl.ppre, tmp_tbl.pmid, tmp_tbl.ppost
    local mapre, mapost = tmp_tbl.mapre, tmp_tbl.mapost
    local rpre, rmid, rpost, rsmash
-   imode = floor(imode/262144); rsmash = (imode%2 ==1)
+   imode = floor(tmp_tbl.imode/0x100000); rsmash = (imode%2 ==1)
    imode = floor(imode/2); rpost = imode%8;
    imode = (imode-rpost)/8;  rmid  = imode%8;
    imode = (imode-rmid)/8;   rpre  = imode%8
    if getfield(r, 'width') > getfield(p, 'width') then  -- change the width of p
-      r, p, post_intrusion  = enlarge_parent(r, p, tmp_tbl, imode%4)
+      r, p, post_intrusion  = enlarge_parent(r, p, tmp_tbl, 
+        floor(tmp_tbl.imode/4)%4)
    elseif getfield(r, 'width') < getfield(p, 'width') then -- change the width of r
       r = enlarge(r, getfield(p, 'width'), rpre, rmid, rpost, 0, 0)
       post_intrusion = 0
@@ -430,7 +431,7 @@ pre_low_cal_box = function (w, cmp)
    local coef = {} -- 連立一次方程式の拡大係数行列
    local rtb = expand_3bits(has_attr(wv, attr_ruby_stretch))
    tmp_tbl.rgap = has_attr(wv, attr_ruby_intergap)
-   tmp_tbl.imode = floor(has_attr(wv, attr_ruby_mode)/4)
+   tmp_tbl.imode = has_attr(wv, attr_ruby_mode)
    tmp_tbl.bheight = has_attr(wv, attr_ruby_baseheight)
 
    -- node list 展開・行末形の計算
@@ -560,7 +561,7 @@ local function pre_high(ahead)
    local n = first_whatsit(head)
    while n do
       if getsubtype(n) == sid_user and getfield(n, 'user_id') == RUBY_PRE then
-        local around_skip = get_around_skip(head, n) 
+--        local around_skip = get_around_skip(head, n) 
         local nv = getfield(n, 'value')
          max_allow_pre = has_attr(nv, attr_ruby_maxprep) or 0
          local atr = has_attr(n, attr_ruby) or 0
