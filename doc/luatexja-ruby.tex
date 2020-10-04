@@ -188,6 +188,19 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 \frame{\ltjruby[rubysmash=false,intergap=-1.5]
   {本}{ほん}}
 \end{LTXexample}
+\item[baseheight=<real>] 正の値（$r$とする）が指定された場合，
+  ルビの親文字の高さを全角高さの$r$倍と固定する．0以下の値は効力を発揮しない．
+  既定値は0．
+\begin{LTXexample}[width=0.3\textwidth, preset=\Large]
+\noindent
+\ltjruby[baseheight=0.88]{本}{ほん}\ 
+\ltjruby[baseheight=0.88]{dvi}{ディーヴィーアイ}\\
+\ltjruby[baseheight=0.5]{本}{ほん}\ 
+\ltjruby[baseheight=0.5]{dvi}{ディーヴィーアイ}\\
+\ltjruby[baseheight=0]{本}{ほん}\ 
+\ltjruby[baseheight=0]{dvi}{ディーヴィーアイ}
+\end{LTXexample}
+
 
 
 \item[kenten=<command>]各文字につく圏点の出力命令を指定する．既定値は「\verb+\ltjalchar`•+」
@@ -231,7 +244,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
   stretchruby={1}{2}{1}, stretch = {1}{2}{1},
   stretchbol={0}{1}{1}, stretcheol={1}{1}{0},
   maxmargin=0.5, size=0.5, intergap=0, rubysmash=false,
-  kenten=\ltjalchar`•, fontcmd=\relax
+  kenten=\ltjalchar`•, fontcmd=\relax, baseheight=0.88
 \end{verbatim}
 
 \paragraph{\texttt{\textbackslash ltjsetparamater} に追加されるキー}
@@ -244,7 +257,8 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 既定値は，\Param{rubypreintrusion},~\Param{rubypostintrusion}とも
 以下の文字に対しては1，その他の文字については0である：
 \begin{quote}
- 平仮名(\texttt{U+3040}--\texttt{U+309F})，カギ括弧「」，読点「，」「、」，中黒「・」
+ ひらがな(\texttt{U+3040}--\texttt{U+309F})，カタカナ(\texttt{U+30A0}--\texttt{U+30FF})，
+ 仮名補助など(\texttt{U+1B000}--\texttt{U+1B16F})，カギ括弧「」，読点「，」「、」，中黒「・」
 \end{quote}
 また，ここでは「文字コード$-1$の文字」は，「段落開始の \verb+\parindent+」を表す%
 \footnote{通常の\LuaTeX-jaにおける指定では文中数式境界を表していることに注意．}．
@@ -559,6 +573,14 @@ $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_3$を行B�
 あ\rubytest いうえおかきくけこ
 あ\rubytest いうえおかきくけこ}
 %\directlua{ltj.ext_show_node_list(tex.box[0], '? ', print)}
+\fbox{\box0}
+
+\setbox0=\vbox{\hsize=22\zw\noindent
+ふぁいる\ruby[baseheight=0.88]{dvi}{ディーヴィーアイ}ファイル
+  \ruby[baseheight=0.88]{oo}{ほーげーふーが}漢字\\
+ファイル\ruby[baseheight=0.88]{dvi}{ディーヴィーアイ}ふぁいる
+  \ruby[baseheight=0.88]{oo}{ほーげーふーが}漢字
+}
 \fbox{\box0}
 
 \def\rubytest{\ruby{国府津}{こうづ}\relax}

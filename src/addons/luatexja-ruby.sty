@@ -4,7 +4,7 @@
 
 % LaTeX only!
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-ruby}[2017/09/26 v0.23a]
+\ProvidesPackage{luatexja-ruby}[2020-10-04 v0.3]
 \RequirePackage{luatexja}
 
 %%------------------
@@ -66,6 +66,7 @@
 \ltj@@rkeydef{kenten}%% 圏点文字
 \ltj@@rkeydef{fontcmd}%% フォント
 \define@boolkey[ltj]{ruby}{rubysmash}[true]{}
+\ltj@@rkeydef{baseheight}%% 親文字の高さ
 
 
 %%%%%%%% setkeys の別名
@@ -89,7 +90,7 @@
       maxmargin = \ltj@safe@dimen{\ltj@@rubyip@maxmargin\zw},
       pre = \ltj@safe@dimen{\ltj@@rubyip@pre#1},
       post = \ltj@safe@dimen{\ltj@@rubyip@post#1},
-      intergap =  \ltj@safe@dimen{\ltj@@rubyip@intergap\zw},
+      intergap =  \ltj@safe@dimen{\ltj@@rubyip@intergap\zh},
       stretch 
         = 262144 * \expandafter\ltj@@ruby@cts\ltj@@rubyip@stretchbol
 	  + 512 * \expandafter\ltj@@ruby@cts\ltj@@rubyip@stretcheol
@@ -97,7 +98,8 @@
       mode 
         = 2097152 * \expandafter\ltj@@ruby@cts\ltj@@rubyip@stretchruby
           + \ltj@safe@num{\ltj@@rubyip@mode}
-          + 1048576 * \ifltj@ruby@rubysmash1\else0\fi
+          + 1048576 * \ifltj@ruby@rubysmash1\else0\fi,
+      baseheight = \ltj@safe@dimen{\ltj@@rubyip@baseheight\zh},
     \string}
 }
 %%%
@@ -186,6 +188,16 @@
   \ltjsetparameter{rubypreintrusion={\the\count@,1}, 
     rubypostintrusion={\the\count@,1}}
   \advance\count@1\repeat
+%% カタカナ
+\count@="30F0\loop\relax\ifnum \count@<"3100
+  \ltjsetparameter{rubypreintrusion={\the\count@,1}, 
+    rubypostintrusion={\the\count@,1}}
+  \advance\count@1\repeat
+%% Kana Supplement
+\count@="1B000\loop\relax\ifnum \count@<"1B170
+  \ltjsetparameter{rubypreintrusion={\the\count@,1}, 
+    rubypostintrusion={\the\count@,1}}
+  \advance\count@1\repeat
 %% 「」
 \ltjsetparameter{rubypreintrusion={`「,1}, 
   rubypostintrusion={`」,1}}
@@ -205,7 +217,7 @@
   stretchruby={1}{2}{1}, stretch = {1}{2}{1},
   stretchbol={0}{1}{1}, stretcheol={1}{1}{0},
   maxmargin=0.5, size=0.5, intergap=0, rubysmash=false,
-  kenten=\ltjalchar`•, fontcmd=\relax
+  kenten=\ltjalchar`•, fontcmd=\relax, baseheight=0
 }
 
 \endinput
