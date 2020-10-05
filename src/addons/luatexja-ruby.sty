@@ -206,17 +206,17 @@
   \ltjsetparameter{rubypreintrusion={\the\count@,1}, 
     rubypostintrusion={\the\count@,1}}
   \advance\count@1\repeat
-%% 「」
-\ltjsetparameter{rubypreintrusion={`「,1}, 
-  rubypostintrusion={`」,1}}
-%% ，、
-\ltjsetparameter{rubypreintrusion={`，,1}, 
-  rubypostintrusion={`，,1}}
-\ltjsetparameter{rubypreintrusion={`、,1}, 
-  rubypostintrusion={`、,1}}
-%% ・
-\ltjsetparameter{rubypreintrusion={`・,1}, 
-  rubypostintrusion={`・,1}}
+%% 開き括弧・閉じ括弧
+\@for\@tmp:=`\‘,`\“,`\〈,`\《,`\「,`\『,`\【,`\〔,`\〖,`\〘,`\〝,`\（,`\［,`\｛,`\｟ \do
+  {\ltjsetparameter{rubypreintrusion={\@tmp,1}}}
+\@for\@tmp:=`\’,`\”,`\〉,`\》,`\」,`\』,`\】,`\〕,`\〗,`\〙,`\〟,`\）,`\］,`\｝,`\｠ \do
+  {\ltjsetparameter{rubypostintrusion={\@tmp,1}}}
+%% 中点類
+\@for\@tmp:=`\・,`\：,`\；,`\―,`\‥,`\…,`〳,`\〴,`\〵,"2014 \do
+  {\ltjsetparameter{rubypreintrusion={\@tmp,1},rubypostintrusion={\@tmp,1}}}
+%% 読点・句点
+\@for\@tmp:=`\、,`\，,`\。,`\． \do
+  {\ltjsetparameter{rubypostintrusion={\@tmp,1}}}
 %% 段落インデント部分
 \ltjsetparameter{rubypreintrusion={-1,1}}
 

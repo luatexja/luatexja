@@ -1,6 +1,7 @@
 %#! lualatex
 %%% a test of ruby.
 \documentclass[a4paper,10pt]{ltjsarticle}
+\usepackage[rgb]{xcolor}
 \usepackage{luatexja-otf,amsmath,bxghost}
 \usepackage[no-math]{fontspec}
 \usepackage[match]{luatexja-fontspec}
@@ -17,9 +18,11 @@
 \protected\def\Param#1{\eghostguarded{\underline{\smash{\textsf{\mdseries #1}}}}}
 
 \usepackage{luatexja-ruby,showexpl,booktabs}
+\definecolor{mygreen}{rgb}{0,0.5,0}
 \lstset{
   preset=\normalsize, basicstyle=\small\ttfamily, basewidth=0.5em,
   explpreset={numberstyle=\tiny, numbers=left, numbersep=1em, columns=fixed},
+  morecomment=[l]{\%}, commentstyle=\color{mygreen}
 }
 \makeatletter\let\SX@Info=\relax\makeatother
 \fboxsep=0mm
@@ -55,6 +58,9 @@
 \textsf{luatexja-ruby}パッケージは，\LuaTeX-jaの機能を利用してルビの組版処理を行う追加パッケージである．
 \LuaTeX, \LuaTeX-jaの内部処理に割り込むことにより，熟語ルビ中の行分割や，
 行頭形・行中形・行末形の自動検出，また進入許容量の自動設定などを可能とした．
+
+v0.3より前とは親文字の高さの扱いが変わっている（\texttt{baseheight}キーを参照せよ）ほか，
+\Param{rubypreintrusion}, \Param{rubypostintrusion}パラメータの初期値が変わっているので注意すること．
 \end{abstract}
 
 \tableofcontents
@@ -195,10 +201,11 @@ plain \LuaTeX でのロードはまだサポートしておらず，
   {本}{ほん}}
 \end{LTXexample}
 \item[ybaseheight=<real>] 非負の値が指定された場合，
-  \emph{縦組以外での}ルビの親文字の高さを全角高さの<real>倍と強制的に固定する．負の値が指定された場合は固定しない．
-  標準値は0.88．
+  \emph{縦組以外での}ルビの親文字の高さを全角高さの<real>倍と強制的に固定する．
+  負の値が指定された場合は「固定しない」（すなわち，v0.3より前の挙動と同じになる）．
+  既定値は0.88．
 \item[tbaseheight=<real>] \texttt{ybaselineshift}と同様だが，こちらは\emph{縦組での}ルビの親文字の高さを指定する．
-  標準値は0.5．
+  既定値は0.5．
 \item[baseheight=<real>] \texttt{ybaselineshift}，\texttt{tbaselinesift}を同時に指定したことと同義．
 \begin{LTXexample}[width=0.3\textwidth, preset=\Large]
 \noindent
@@ -255,7 +262,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
   stretchruby={1}{2}{1}, stretch = {1}{2}{1},
   stretchbol={0}{1}{1}, stretcheol={1}{1}{0},
   maxmargin=0.5, size=0.5, intergap=0, rubysmash=false,
-  kenten=\ltjalchar`•, fontcmd=\relax, baseheight=0.88
+  kenten=\ltjalchar`•, fontcmd=\relax, ybaseheight=0.88, tbaseheight=0.5
 \end{verbatim}
 
 \paragraph{\texttt{\textbackslash ltjsetparamater} に追加されるキー}
@@ -265,15 +272,32 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \item[\Param{rubypostintrusion}\ttfamily =\{<chr\_code>, <post\_int>\}]
 文字<chr\_code> に，その\textbf{直前}のルビによって掛けられるルビ文字列の最大長をルビ全角単位で指定．
 \end{description}
-既定値は，\Param{rubypreintrusion},~\Param{rubypostintrusion}とも
-以下の文字に対しては1，その他の文字については0である：
+以下の文字は\Param{rubypreintrusion},~\Param{rubypostintrusion}とも初期値は1である：
+\makeatletter
+\def\mybox#1{{\fboxrule=0.1mm\fboxsep=0mm\fcolorbox{cyan}{white}{\hbox{\null\ltjjachar#1\null}}}}
 \begin{quote}
  ひらがな(\texttt{U+3040}--\texttt{U+309F})，カタカナ(\texttt{U+30A0}--\texttt{U+30FF})，
- 仮名補助など(\texttt{U+1B000}--\texttt{U+1B16F})，カギ括弧「」，読点「，」「、」，中黒「・」
+ 仮名補助など(\texttt{U+1B000}--\texttt{U+1B16F})，\\
+ 中点類・分離禁止文字
+ \@for\@tmp:=`\・,`\：,`\；,`\―,`\‥,`\…,`〳,`\〴,`\〵,"2014 \do{\mybox{\@tmp}}
 \end{quote}
-また，ここでは「文字コード$-1$の文字」は，「段落開始の \verb+\parindent+」を表す%
-\footnote{通常の\LuaTeX-jaにおける指定では文中数式境界を表していることに注意．}．
-この「文字」に対する\Param{rubypreintrusion}の値も1である．
+次に，以下の文字は\Param{rubypreintrusion}のみ初期値は1である：
+\begin{quote}
+  始め括弧類
+  \@for\@tmp:=`\‘,`\“,`\〈,`\《,`\「,`\『,`\【,`\〔,`\〖,`\〘,`\〝,`\（,`\［,`\｛,`\｟ \do{\mybox{\@tmp}}，
+  「文字コード$-1$の文字
+  \footnote{段落開始の\ \texttt{\textbackslash parindent}\ を表す．
+    通常の\LuaTeX-jaにおける指定では「文字コード$-1$」は文中数式境界を表していることに注意．}」
+\end{quote}
+また，以下の文字は\Param{rubypostintrusion}のみ初期値は1である：
+\begin{quote}
+  閉じ括弧類
+  \@for\@tmp:=`\’,`\”,`\〉,`\》,`\」,`\』,`\】,`\〕,`\〗,`\〙,`\〟,`\）,`\］,`\｝,`\｠ \do{\mybox{\@tmp}}，
+  句読点類\@for\@tmp:=`\、,`\，,`\。,`\． \do{\mybox{\@tmp}}
+\end{quote}
+\makeatother
+
+以上で記述されていない\Param{rubypreintrusion},~\Param{rubypostintrusion}の初期値はすべて0である．
 
 \paragraph{\texttt{\textbackslash ltjkenten}}
 圏点を出力する命令で，\verb+\kenten+ という別名を定義している．
@@ -351,7 +375,6 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 などの組み方は\emph{想定していない}．
 \end{itemize}
 
-\newpage
 
 \section{\ruby{注|意|点}{ちゆう|い|てん}}
 \begin{description}
@@ -412,8 +435,6 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \ltjruby{承}{うけたまわ}り……\par
 \parindent0.25\zw\ltjruby{陵}{みささぎ}は……
 \end{LTXexample}
-
-
 \end{description}
 
 \newpage
@@ -588,10 +609,12 @@ $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_3$を行B�
 
 \setbox0=\vbox{\hsize=30\zw\noindent
 \texttt{baseheight=0.88}での例\\
-ふぁいる\ruby[baseheight=0.88]{dvi}{ディーヴィーアイ}ファイル
+  ふぁいる\ruby[baseheight=0.88]{dvi}{ディーヴィーアイ}ファイル
   \ruby[baseheight=0.88]{oo}{ほーげーふーが}漢字\\
-ファイル\ruby[baseheight=0.88]{dvi}{ディーヴィーアイ}ふぁいる
-  \ruby[baseheight=0.88]{oo}{ほーげーふーが}漢字
+  ファイル\ruby[baseheight=0.88]{dvi}{ディーヴィーアイ}ふぁいる
+  \ruby[baseheight=0.88]{oo}{ほーげーふーが}漢字\\
+  ああ（\ruby{ほげ}{ふがふがふがふが}）」\ruby{ほげ}{ふがふがふがふが}「
+  【\ruby{ほげ}{ふがふがふがふが}】\ruby{ほげ}{ふがふがふがふが}…
 }
 \fbox{\box0}
 
@@ -745,7 +768,7 @@ $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_3$を行B�
      \ruby{模型}{モデル}\quad \ruby{利用許諾}{ライセンス}}
 % ルビが極端に短い場合
 3.70 \ruby{なげきの聖母像}{ピエタ}\quad% ルビ全角まで許容
-     \ruby[maxmargin=0.75]{なげきの聖母像}{ピエタ}% ルビ全角1.5倍まで
+     \ruby[maxmargin=0.75]{なげきの聖母像}{ピエタ}\\% ルビ全角1.5倍まで
 % ルビが長い場合
 3.71 \ruby{顧客}{クライアント}\quad \ruby{境界面}{インターフエース}
 3.72 {\ltjsetruby{stretch=010, stretchbol=010, stretcheol=010}% はみ出さない流儀
@@ -797,7 +820,7 @@ $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_3$を行B�
 3.80 漢字の部首には「\ruby{偏}{へん}」「\ruby{冠}{かんむり}」「\ruby{脚}{きやく}」%
 「\ruby{旁}{つくり}」がある
 3.80 この\ruby{\噂}{うわさ}好きな人は\ruby{懐}{ふところ}具合もよく、\ruby{檜}{ひのき}材を
-3.81× に\ruby{暁}{あかつき}の\kern-1\zw の\ruby{趣}{おもむき}を
+3.81× に\ruby{暁}{あかつき}の\kern-1\zw の\ruby{趣}{おもむき}を（良くない例）
 3.82 に\ruby{暁}{あかつき}の\ruby{趣}{おもむき}を
 
 % 漢字にルビを2分まで掛けても良い流儀
