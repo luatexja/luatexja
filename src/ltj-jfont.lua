@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2020-09-16',
+  date = '2020-10-05',
   description = 'Loader for Japanese fonts',
 })
 
