@@ -66,8 +66,15 @@
 \ltj@@rkeydef{kenten}%% 圏点文字
 \ltj@@rkeydef{fontcmd}%% フォント
 \define@boolkey[ltj]{ruby}{rubysmash}[true]{}
-\ltj@@rkeydef{baseheight}%% 親文字の高さ
 
+\ltj@@rkeydef{ybaseheight} % 縦組以外 (yoko, utod, dtou)
+\ltj@@rkeydef{tbaseheight} % 縦組
+\define@key[ltj]{ruby}{baseheight}{%
+  \expandafter\def\csname ltj@@rubyip@ybaseheight\endcsname{#1}%
+  \expandafter\def\csname ltj@@rubyip@tbaseheight\endcsname{#1}%
+}
+
+%% これらの値が正のとき，親文字の高さをこの値（\zh 単位）とみなす
 
 %%%%%%%% setkeys の別名
 \protected\def\ltjsetruby{\setkeys[ltj]{ruby}}
@@ -99,7 +106,8 @@
         = (2097152 * \expandafter\ltj@@ruby@cts\ltj@@rubyip@stretchruby
           + \ltj@safe@num{\ltj@@rubyip@mode}
           + 1048576 * \ifltj@ruby@rubysmash1\else0\fi),
-      baseheight = \ltj@safe@dimen{\ltj@@rubyip@baseheight\zh},
+      baseheight = \ltj@safe@dimen{\ifnum\ltjgetparameter{direction}=3
+                     \ltj@@rubyip@tbaseheight\else\ltj@@rubyip@ybaseheight\fi\zh},
     \string}
 }
 %%%
@@ -189,7 +197,7 @@
     rubypostintrusion={\the\count@,1}}
   \advance\count@1\repeat
 %% カタカナ
-\count@="30F0\loop\relax\ifnum \count@<"3100
+\count@="30A0\loop\relax\ifnum \count@<"3100
   \ltjsetparameter{rubypreintrusion={\the\count@,1}, 
     rubypostintrusion={\the\count@,1}}
   \advance\count@1\repeat
@@ -217,7 +225,7 @@
   stretchruby={1}{2}{1}, stretch = {1}{2}{1},
   stretchbol={0}{1}{1}, stretcheol={1}{1}{0},
   maxmargin=0.5, size=0.5, intergap=0, rubysmash=false,
-  kenten=\ltjalchar`•, fontcmd=\relax, baseheight=0
+  kenten=\ltjalchar`•, fontcmd=\relax, ybaseheight=0.88, tbaseheight=0.5
 }
 
 \endinput

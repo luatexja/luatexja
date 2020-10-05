@@ -395,7 +395,7 @@ local function new_ruby_box(r, p, tmp_tbl)
    setfield(a, 'depth', 0); setfield(k, 'kern', tmp_tbl.rgap)
    insert_after(r, r, a); insert_after(r, a, k);
    insert_after(r, k, p); setfield(p, 'next', nil)
-   if tmp_tbl.bheight > 0 then setfield(p, 'height', tmp_tbl.bheight) end
+   if tmp_tbl.bheight >= 0 then setfield(p, 'height', tmp_tbl.bheight) end
    a = node.direct.vpack(r); setfield(a, 'shift', 0)
    set_attr(a, attr_ruby, post_intrusion)
    if rsmash or getfield(a, 'height')<getfield(p, 'height') then
@@ -528,32 +528,6 @@ local function pre_low_app_node(head, w, cmp, coef, ht, dp)
    return head, first_whatsit(node_next(nt))
 end
 
-local get_around_skip
-do
-local KANJI_SKIP      = luatexja.icflag_table.KANJI_SKIP
-local XKANJI_SKIP_JFM = luatexja.icflag_table.XKANJI_SKIP_JFM
-local getprev = node.direct.getprev
-local getnext = node.direct.getnext
-get_around_skip = function(head, n)
-    local p = getprev(n)
-    luatexja.ext_show_node(node.direct.tonode(p), 'B> ', print)
-    if getid(p)==id_glue then
-        local pi = get_attr_icflag(p)
-        if pi>=KANJI_SKIP and pi<=XKANJI_SKIP_JFM then
-            print(n, 'before ' .. luatexja.print_scaled(getfield(p, 'width')))
-        end
-    end
-    p = getnext(n)
-    luatexja.ext_show_node(node.direct.tonode(p), 'A> ', print)
-    if getid(p)==id_glue then
-        local pi = get_attr_icflag(p)
-        if pi>=KANJI_SKIP and pi<=XKANJI_SKIP_JFM then
-            print(n, 'after  ' .. luatexja.print_scaled(getfield(p, 'width')))
-        end
-    end
-end
-end
-
 local function pre_high(ahead)
    if not ahead then return ahead end
    local head = to_direct(ahead)
@@ -561,7 +535,6 @@ local function pre_high(ahead)
    local n = first_whatsit(head)
    while n do
       if getsubtype(n) == sid_user and getfield(n, 'user_id') == RUBY_PRE then
---        local around_skip = get_around_skip(head, n) 
         local nv = getfield(n, 'value')
          max_allow_pre = has_attr(nv, attr_ruby_maxprep) or 0
          local atr = has_attr(n, attr_ruby) or 0
@@ -779,6 +752,11 @@ do
             insert_before(Nq.nuc, Np.first, last_glue)
             Np.first = last_glue
             next_cluster_array[Nq.nuc] = last_glue -- ルビ処理用のグルー
+--            if Nq.gk then 
+--               if type(Nq.gk)=="table" then
+--                  for _,v in ipairs(Nq.gk) do luatexja.ext_show_node(node.direct.tonode(v), 'BBt> ', print) end
+--               else luatexja.ext_show_node(node.direct.tonode(Nq.gk), 'BBB> ', print) end
+--            end
          end
          local nqnv = getfield(Nq.nuc, 'value')
          local x =  node_next(node_next(nqnv))
@@ -821,5 +799,16 @@ do
    end
    luatexbase.add_to_callback("luatexja.jfmglue.whatsit_after", whatsit_after_callback,
                               "luatexja.ruby.np_info_after", 1)
+end
+if false then -- いまは off
+    local function w (s, Nq, Np)
+       if Np.gk then 
+           if type(Np.gk)=="table" then
+               for _,v in ipairs(Np.gk) do luatexja.ext_show_node(node.direct.tonode(v), 'AAt> ', print) end
+           else luatexja.ext_show_node(node.direct.tonode(Np.gk), 'AAA> ', print) end
+       end
+    end
+    luatexbase.add_to_callback("luatexja.jfmglue.whatsit_last_minute", w,
+                              "luatexja.ruby.np_info_last_minute", 1)
 end
 

@@ -258,6 +258,8 @@ luatexbase.create_callback("luatexja.jfmglue.whatsit_getinfo", "data",
                            end)
 luatexbase.create_callback("luatexja.jfmglue.whatsit_after", "data",
                            function (stat, Nq, Np) return false end)
+luatexbase.create_callback("luatexja.jfmglue.whatsit_last_minute", "data",
+                           function (stat, Nq, Np) return false end)
 
 -- calc next Np
 local calc_np 
@@ -543,10 +545,13 @@ end
 function calc_np(last, lp)
    local k
    -- We assume lp = node_next(Np.last)
+   if Nq and Nq.id==id_pbox_w then
+      luatexbase.call_callback("luatexja.jfmglue.whatsit_last_minute", false, Nq, Np)
+   end
    Np, Nq, non_ihb_flag = Nq, Np, true
    -- We clear `predefined' entries of Np before pairs() loop,
    -- because using only pairs() loop is slower.
-   Np.post, Np.pre, Np.xspc = nil, nil, nil
+   Np.post, Np.pre, Np.xspc, Np.gk = nil, nil, nil, nil
    Np.first, Np.id, Np.last, Np.met, Np.class= nil, nil, nil, nil
    Np.auto_kspc, Np.auto_xspc, Np.char, Np.nuc = nil, nil, nil, nil
    -- auto_kspc, auto_xspc: normally true/false, 
@@ -751,6 +756,10 @@ local function real_insert(g)
    if g then
       head  = insert_before(head, Np.first, g)
       Np.first = g
+      local ngk = Np.gk
+      if not ngk then Np.gk = g
+      elseif type(ngk)=="table" then ngk[#ngk+1]=g
+      else  Np.gk = { ngk, g } end
    end
 end
 
@@ -1161,10 +1170,10 @@ do
       {}, {}, {first=nil},
       { auto_kspc=nil, auto_xspc=nil, char=nil, class=nil,
         first=nil, id=nil, last=nil, met=nil, nuc=nil,
-        post=nil, pre=nil, xspc=nil, }, 
+        post=nil, pre=nil, xspc=nil, gk=nil }, 
       { auto_kspc=nil, auto_xspc=nil, char=nil, class=nil,
         first=nil, id=nil, last=nil, met=nil, nuc=nil,
-        post=nil, pre=nil, xspc=nil, },
+        post=nil, pre=nil, xspc=nil, gk=nil },
    }
    init_var = function (mode,dir)
       -- 1073741823: max_dimen

@@ -194,9 +194,12 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 \frame{\ltjruby[rubysmash=false,intergap=-1.5]
   {本}{ほん}}
 \end{LTXexample}
-\item[baseheight=<real>] 正の値（$r$とする）が指定された場合，
-  ルビの親文字の高さを全角高さの$r$倍と固定する．0以下の値は効力を発揮しない．
-  既定値は0．
+\item[ybaseheight=<real>] 非負の値が指定された場合，
+  \emph{縦組以外での}ルビの親文字の高さを全角高さの<real>倍と強制的に固定する．負の値が指定された場合は固定しない．
+  標準値は0.88．
+\item[tbaseheight=<real>] \texttt{ybaselineshift}と同様だが，こちらは\emph{縦組での}ルビの親文字の高さを指定する．
+  標準値は0.5．
+\item[baseheight=<real>] \texttt{ybaselineshift}，\texttt{tbaselinesift}を同時に指定したことと同義．
 \begin{LTXexample}[width=0.3\textwidth, preset=\Large]
 \noindent
 \ltjruby[baseheight=0.88]{本}{ほん}\ 
@@ -204,7 +207,9 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 \ltjruby[baseheight=0.5]{本}{ほん}\ 
 \ltjruby[baseheight=0.5]{dvi}{ディーヴィーアイ}\\
 \ltjruby[baseheight=0]{本}{ほん}\ 
-\ltjruby[baseheight=0]{dvi}{ディーヴィーアイ}
+\ltjruby[baseheight=0]{dvi}{ディーヴィーアイ}\\
+\ltjruby[baseheight=-1]{本}{ほん}\ 
+\ltjruby[baseheight=-1]{dvi}{ディーヴィーアイ}
 \end{LTXexample}
 
 
@@ -581,7 +586,8 @@ $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_3$を行B�
 %\directlua{ltj.ext_show_node_list(tex.box[0], '? ', print)}
 \fbox{\box0}
 
-\setbox0=\vbox{\hsize=22\zw\noindent
+\setbox0=\vbox{\hsize=30\zw\noindent
+\texttt{baseheight=0.88}での例\\
 ふぁいる\ruby[baseheight=0.88]{dvi}{ディーヴィーアイ}ファイル
   \ruby[baseheight=0.88]{oo}{ほーげーふーが}漢字\\
 ファイル\ruby[baseheight=0.88]{dvi}{ディーヴィーアイ}ふぁいる
