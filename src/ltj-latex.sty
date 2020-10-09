@@ -12,7 +12,7 @@
 \def\luatexjalatexLoaded{\endinput}
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{ltj-latex}[2020-10-01 LaTeX support of LuaTeX-ja]
+\ProvidesPackage{ltj-latex}[2020-10-09 LaTeX support of LuaTeX-ja]
 
 % cleanup at end of the document
 %\let\ltj@@orig@end=\@@end
@@ -67,7 +67,7 @@
 
 \def\ltj@pkgpatch#1{\@ifnextchar[{\ltj@pkgpatch@{#1}}{\ltj@pkgpatch@{#1}[lltjp-#1]}}%]
 \ifltj@ltfilehook@avail
-  \def\ltj@pkgpatch@@{\AddToHook{env/document/before}[luatexja.autopatch]}
+  \def\ltj@pkgpatch@@{\AddToHook{begindocument/before}[luatexja.autopatch]}
 \else
   \def\ltj@pkgpatch@@{\gpreto\@begindocumenthook}
 \fi
