@@ -275,7 +275,13 @@ local t = {
    },
 
    [99] = { -- box末尾
-      chars = {'boxbdd', 'parbdd', 'glue'},
+      chars = {'boxbdd', 'glue'},
+   },
+   [199] = { -- box末尾
+      chars = {'parbdd'},
+      glue = {
+        [3] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
+      }
    },
 
 }
