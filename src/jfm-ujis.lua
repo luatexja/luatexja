@@ -6,7 +6,6 @@
 -- kanjiskip:    0pt plus .25zw minus 0pt
 -- xkanjiskip: .25zw plus .25zw (or .0833zw) minus .125zw
 
-
 local t = {
    version = 3,
    dir = 'yoko',
@@ -337,9 +336,6 @@ local t = {
    },
    [199] = { -- box末尾
       chars = {'parbdd'},
-      glue = {
-        [3] = { 0.25, 0.0, 0.25, priority=1, ratio=1 },
-      }
    },
 }
 
@@ -359,6 +355,11 @@ for i,v in pairs(t) do
     if v.glue and v.glue[0] then v.glue[100] = v.glue[0] end
     if v.kern and v.kern[0] then v.kern[100] = v.kern[0] end
   end
+end
+
+local jf = luatexja.jfont.jfm_feature
+if jf and jf.beginpar_middledot_zw==true then
+    t[199].kern = { [3] = 0.25 }
 end
 
 luatexja.jfont.define_jfm(t)
