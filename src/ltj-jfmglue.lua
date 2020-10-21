@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2020-10-05',
+  date = '2020-10-22',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}
@@ -1220,27 +1220,10 @@ do
    end
 end
 
-local ensure_tex_attr = ltjb.ensure_tex_attr
-local function cleanup(mode, TEMP)
-   -- luatexja.ext_show_node_list(to_node(head), '> ', print)
-   -- adjust attr_icflag for avoiding error
-   if tex.getattribute(attr_icflag)~=0 then ensure_tex_attr(attr_icflag, 0) end
-   node_free(kanji_skip); 
-   node_free(xkanji_skip); node_free(TEMP)
-   
-   if mode then
-      local h = node_next(head)
-      if getid(h) == id_penalty and getfield(h, 'penalty') == 10000 then
-         h = node_next(h)
-         if getid(h) == id_glue and getsubtype(h) == 15 and not node_next(h) then
-            return false
-         end
-      end
-   end
-   return head
-end
 -------------------- 外部から呼ばれる関数
 
+local ensure_tex_attr = ltjb.ensure_tex_attr
+local tex_getattr = tex.getattribute
 -- main interface
 function luatexja.jfmglue.main(ahead, mode, dir)
    if not ahead then return ahead end
@@ -1267,9 +1250,11 @@ function luatexja.jfmglue.main(ahead, mode, dir)
       end
       handle_list_tail(mode, last)
    end
-   --luatexja.ext_show_node_list(to_node(ahead ), '>A ', print)
-   --print()
-   return cleanup(mode, TEMP)
+   -- adjust attr_icflag for avoiding error
+   if tex_getattr(attr_icflag)~=0 then ensure_tex_attr(attr_icflag, 0) end
+   node_free(kanji_skip); 
+   node_free(xkanji_skip); node_free(TEMP)
+   return head
 end
 end
 
