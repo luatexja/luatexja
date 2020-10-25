@@ -4,7 +4,7 @@
 
 % LaTeX only!
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-ruby}[2020-10-05 v0.3]
+\ProvidesPackage{luatexja-ruby}[2020-10-25 v0.4]
 \RequirePackage{luatexja}
 
 %%------------------
@@ -73,8 +73,11 @@
   \expandafter\def\csname ltj@@rubyip@ybaseheight\endcsname{#1}%
   \expandafter\def\csname ltj@@rubyip@tbaseheight\endcsname{#1}%
 }
-
 %% これらの値が正のとき，親文字の高さをこの値（\zh 単位）とみなす
+\define@boolkey[ltj]{ruby}{intrude_jfmgk}[true]{}
+\define@boolkey[ltj]{ruby}{intrude_xkanjiskip}[true]{}
+\define@boolkey[ltj]{ruby}{intrude_kanjiskip}[true]{}
+
 
 %%%%%%%% setkeys の別名
 \protected\def\ltjsetruby{\setkeys[ltj]{ruby}}
@@ -91,8 +94,11 @@
 %%%%%%%% 補助関数
 
 % Lua ソースに渡す table 生成
-\def\ltj@@ruby@create@table#1{% #1: ルビ全角
+\bgroup
+\catcode`\_=11
+\gdef\ltj@@ruby@create@table#1{% #1: ルビ全角
     \string{
+      before_jfmgk = 0, after_jfmgk = 0,
       rubyzw = \ltj@safe@dimen{#1}, 
       maxmargin = \ltj@safe@dimen{\ltj@@rubyip@maxmargin\zw},
       pre = \ltj@safe@dimen{\ltj@@rubyip@pre#1},
@@ -108,8 +114,20 @@
           + 1048576 * \ifltj@ruby@rubysmash1\else0\fi),
       baseheight = \ltj@safe@dimen{\ifnum\ltjgetparameter{direction}=3
                      \ltj@@rubyip@tbaseheight\else\ltj@@rubyip@ybaseheight\fi\zh},
+      intrude_jfmgk = \string{
+       \ifltj@ruby@intrude_jfmgk [luatexja.icflag_table.FROM_JFM]=true,\fi
+       \ifltj@ruby@intrude_kanjiskip
+          [luatexja.icflag_table.KANJI_SKIP]=true,
+          [luatexja.icflag_table.KANJI_SKIP_JFM]=true,
+       \fi
+       \ifltj@ruby@intrude_xkanjiskip
+          [luatexja.icflag_table.XKANJI_SKIP]=true,
+          [luatexja.icflag_table.XKANJI_SKIP_JFM]=true,
+       \fi
+       \string}
     \string}
 }
+\egroup
 %%%
 %%% 1098765432109876543210976543210
 %%%   |st_ruby|!               |--| ← mode 
@@ -213,7 +231,7 @@
   {\ltjsetparameter{rubypostintrusion={\@tmp,1}}}
 %% 中点類
 \@for\@tmp:=`\・,`\：,`\；,`\―,`\‥,`\…,`〳,`\〴,`\〵,"2014 \do
-  {\ltjsetparameter{rubypreintrusion={\@tmp,1},rubypostintrusion={\@tmp,1}}}
+  {\ltjsetparameter{rubypreintrusion={\@tmp,0.5},rubypostintrusion={\@tmp,0.5}}}
 %% 読点・句点
 \@for\@tmp:=`\、,`\，,`\。,`\． \do
   {\ltjsetparameter{rubypostintrusion={\@tmp,1}}}
@@ -225,7 +243,8 @@
   stretchruby={1}{2}{1}, stretch = {1}{2}{1},
   stretchbol={0}{1}{1}, stretcheol={1}{1}{0},
   maxmargin=0.5, size=0.5, intergap=0, rubysmash=false,
-  kenten=\ltjalchar`•, fontcmd=\relax, ybaseheight=0.88, tbaseheight=0.5
+  kenten=\ltjalchar`•, fontcmd=\relax, ybaseheight=0.88, tbaseheight=0.5,
+  intrude_jfmgk, intrude_kanjiskip, intrude_xkanjiskip
 }
 
 \endinput
