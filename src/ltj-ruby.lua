@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.ruby',
-  date = '2020-10-25',
+  date = '2020-10-30',
   description = 'Ruby annotation',
 })
 luatexja.ruby = {}

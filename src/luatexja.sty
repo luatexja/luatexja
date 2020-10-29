@@ -35,13 +35,13 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja}[2020-10-05 Japanese Typesetting with Lua(La)TeX]
+  \ProvidesPackage{luatexja}[2020-10-30 Japanese Typesetting with Lua(La)TeX]
   \DeclareOption{disablejfam}{\ltj@disablejfamtrue}
   \DeclareOption*{}
   \ProcessOptions\relax
 \fi                             %</LaTeX>
 %%%% VERSION
-\def\LuaTeXjaversion{20201005.0}
+\def\LuaTeXjaversion{20201030.0}
 
 \directlua{require('ltj-unicode-ccfix.lua')}% catcode of ideographs
 
