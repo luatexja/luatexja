@@ -362,14 +362,14 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 
 \end{center}
 などの組み方は\emph{想定していない}．
+エラーが発生して止まることもあるし，エラーが発生しなくても正しく組まれない．
 \end{itemize}
 
 
 \section{\ruby{注|意|点}{ちゆう|い|てん}}
-\begin{description}
-\item[ルビ文字のはみ出し]
+\paragraph{前後からのルビ文字のはみ出し}
 「日本語組版処理の要件」の図3.82のように，
-ルビ文字のはみ出しが繋がらないようにする処理について述べる．
+前後からのルビ文字のはみ出しが繋がらないようにする処理が組み込まれている．
 
 例えば，
 \begin{LTXexample}[preset=\Large,width=0.3\textwidth]
@@ -401,7 +401,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 「\ltjruby{陵}{みささぎ}」の\emph{\underline{前文字進入許容量}指定(\texttt{pre})が自動}になっている場合のみ
 実施される．
 
-\item[段落末尾のルビ]
+\paragraph{段落末尾のルビ}
 段落がルビで終わった場合，そのルビが行末形で組まれることはない．
 これは，段落の「本当の」末尾には \verb+\penalty10000\parfillskip+ があるためで，
 ルビ処理用に作った最後のグルー（\ref{ssec:impl}\nobreak 小節の説明では$g_2$）が消去されないことによる．
@@ -410,11 +410,10 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 それによって処理を変えるのも可能だが，そのようなことはしなかった．
 段落がルビで終わることは普通ない（最低でも句点が続くだろう）と思うからである．
 
-
-\item[段落先頭のルビ]
+\paragraph{段落先頭のルビ}
 同様に，段落先頭のルビは行頭形にはならない．
 \texttt{pre}が負（つまり，自動指定）のとき，段落最初の \verb+\parindent+ 分への
-進入は可能である．ここ\verb+\parindent+ 分の\underline{インデントへの進入許容量}は
+進入は可能である．ここ\verb+\parindent+ 分のインデントへの\underline{進入許容量}は
 「文字$-1$」に対する\Param{rubypreintrusion}（既定値は1，ルビ全角単位）と
 \ \verb+\parindent+ の長さのうち小さい方である．
 \begin{LTXexample}[preset=\Large,width=0.4\textwidth]
@@ -423,7 +422,39 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \ltjruby{承}{うけたまわ}り……\par
 \parindent0.25\zw\ltjruby{陵}{みささぎ}は……
 \end{LTXexample}
-\end{description}
+
+\paragraph{和文処理グルーの伸縮}
+現バージョンでは，進入量調整に和文処理グルーを考慮させる，
+\begin{quote}
+\texttt{intrude\_jfmgk}, \texttt{intrude\_kanjiskip}, \texttt{intrude\_xkanjiskip}キー
+\end{quote}
+の値が\texttt{true}（真）で
+あった状況でも，考慮されるのは\emph{自然長の値のみ}である．そのため，行の調整処理が発生した場合は
+意図しない結果となる．
+
+例えば，標準設定での中黒「・」の直後のルビからの中黒への進入許容量は
+\begin{quote}
+  中黒「・」への\underline{前進入許容量}はルビ全角の半分で，
+  中黒本体の後の四分空きには進入可能
+\end{quote}
+となっている．そのため，下の例の1, 2行目ともルビの前進入量は0.5\,zwとなる．
+しかし，2行目では詰め量の0.5\,zwがほとんど中黒周囲の四分空きで負担されるため，
+実際には「中黒本体にほぼ0.5\,zwが進入する」という望ましくない結果が得られている．
+\begin{LTXexample}[preset=\Large,width=0.4\textwidth]
+\leavevmode\hbox{あ・\ltjruby{◆}{◆◆◆◆}漢字}\\
+\hbox spread-0.5\zw{あ・\ltjruby{◆}{◆◆◆◆}漢字}
+\end{LTXexample}
+
+また，次の例では2行目では前後の\underline{文字進入量}がルビ1字分と等しくなっているが，
+3行目のように1全角伸ばすという調整が行われた後は\underline{文字進入量}が不揃いになってしまっている．
+これはもともと「\texttt{;}」には後側にのみ和欧文間空白が入ることと，3行目ではこの和欧文間空白が
+伸びているためである．
+\begin{LTXexample}[preset=\Large,width=0.4\textwidth]
+\leavevmode\hbox{……に%
+  \ltjruby{\texttt{;}}{セミコロン}という……}\\
+\hbox spread\zw{……に%
+  \ltjruby{\texttt{;}}{セミコロン}という……}
+\end{LTXexample}
 
 \newpage
 \section{\ruby{実|装}{じつ|そう}について}
@@ -615,7 +646,7 @@ $g_0\rightarrow W\rightarrow r_1\rightarrow g_2 \rightarrow r_2\rightarrow g_2$\
 $g_i$,~$r_i$達の幅は，図\nobreak\ref{fig:node}に示したような対応に沿って算出する．
 例えばこの場合，行中形$n_5$に対して
 \[
- g_0+r_1+g_2+r_2+g_2 = 3\,\mathrm{zw}-(0.25\,\mathrm{zw}\times 2)=2.5\,\mathrm{zw}
+ g_0+r_1+g_2+r_2+g_2 = (3-0.25\times 2)\,\mathrm{zw}=2.5\,\mathrm{zw}
 \]
 という方程式が立つ（zwは親文字全角の幅，進入量込）．
 $n_1$から$n_5$まで計5本の方程式が立つが，これらはGau\ss の消去法で解くことができて

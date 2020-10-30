@@ -255,7 +255,6 @@ local function texiface_low(rst, rtlr, rtlp)
    setfield(w, 'value', to_node(wv))
    setfield(wv, 'type', 108)
    setfield(wv, 'value', rst); rst.count = floor(#rtlr)
-   print(t)
    setfield(wv, 'user_id', RUBY_PRE) -- dummy
    local n = wv
    for i = 1, #rtlr do
