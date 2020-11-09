@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2020-09-27 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2020-11-09 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -151,6 +151,10 @@
 \ltj@charclass\z@
 \ltj@curjfnt\m@ne
 \ltj@curtfnt\m@ne
+\ltj@yablshift\z@
+\ltj@ykblshift\z@
+\ltj@tablshift\z@
+\ltj@tkblshift\z@
 
 %%%%%%%% Attributes for character ranges
 \newcount\ltj@tempcnta
