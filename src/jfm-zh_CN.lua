@@ -150,12 +150,12 @@ luatexja.jfont.define_jfm {
         depth = is_vt and 0.5 or 0.12,
         italic = 0,
         glue = {
-            [0] = is_vt and (is_hwcl and aki(0.5) or nil) or aki(0.5),
-            [1] = is_vt and (is_hwcl and aki(0.5) or nil) or aki(0.5),
+            [0] = is_vt and (is_hwcl and aki(0.5) or {}) or aki(0.5),
+            [1] = is_vt and (is_hwcl and aki(0.5) or {}) or aki(0.5),
             [3] = is_vt and (is_hwcl and aki(0.5) or aki(0.25, 1)) or aki(0.5),
-            [5] = is_vt and (is_hwcl and aki(0.5) or nil) or aki(0.5),
-            [51] = is_vt and (is_hwcl and aki(0.5) or nil) or aki(0.5),
-            [52] = is_vt and (is_hwcl and aki(0.5) or nil) or aki(0.5)
+            [5] = is_vt and (is_hwcl and aki(0.5) or {}) or aki(0.5),
+            [51] = is_vt and (is_hwcl and aki(0.5) or {}) or aki(0.5),
+            [52] = is_vt and (is_hwcl and aki(0.5) or {}) or aki(0.5)
         }
     },
     [3] = {
@@ -211,12 +211,12 @@ luatexja.jfont.define_jfm {
         depth = is_vt and 0.5 or 0.12,
         italic = 0,
         glue = {
-            [0] = is_vt and nil or aki(0.5, 1, true),
-            [1] = is_vt and nil or aki(0.5, 1, true),
+            [0] = is_vt and {} or aki(0.5, 1, true),
+            [1] = is_vt and {} or aki(0.5, 1, true),
             [3] = is_vt and aki(0.25, -1) or aki(0.5, 1, true),
-            [5] = is_vt and nil or aki(0.5, 1, true),
-            [51] = is_vt and nil or aki(0.5, 1, true),
-            [52] = is_vt and nil or aki(0.5, 1, true)
+            [5] = is_vt and {} or aki(0.5, 1, true),
+            [51] = is_vt and {} or aki(0.5, 1, true),
+            [52] = is_vt and {} or aki(0.5, 1, true)
         }
     },
     [42] = {

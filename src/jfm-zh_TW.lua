@@ -45,7 +45,7 @@ luatexja.jfont.define_jfm {
         glue = {
             [1] = aki(0.5, -1),
             [21] = aki(0.25),
-            [22] = is_vt and nil or aki(0.25),
+            [22] = is_vt and {} or aki(0.25),
             [3] = aki(0.25, -1),
             [4] = aki(0.25, 1, true)
         }
@@ -78,7 +78,7 @@ luatexja.jfont.define_jfm {
         italic = 0,
         glue = {
             [21] = aki(0.25),
-            [22] = is_vt and nil or aki(0.25),
+            [22] = is_vt and {} or aki(0.25),
             [3] = aki(0.25, -1),
             [4] = aki(0.25, 1, true)
         }
@@ -114,7 +114,7 @@ luatexja.jfont.define_jfm {
             [0] = aki(0.5, -1),
             [1] = aki(0.5, -1),
             [21] = aki(0.25),
-            [22] = is_vt and nil or aki(0.25),
+            [22] = is_vt and {} or aki(0.25),
             [3] = aki(0.25, -1),
             [4] = aki(0.25, 1, true),
             [5] = aki(0.25, -1),
@@ -159,20 +159,20 @@ luatexja.jfont.define_jfm {
         depth = is_vt and 0.5 or 0.12,
         italic = 0,
         glue = {
-            [0] = is_vt and nil or aki(0.25),
-            [1] = is_vt and nil or aki(0.25),
-            [2] = is_vt and nil or aki(0.25),
+            [0] = is_vt and {} or aki(0.25),
+            [1] = is_vt and {} or aki(0.25),
+            [2] = is_vt and {} or aki(0.25),
             [21] = is_vt and aki(0.25) or aki(0.5),
-            [22] = is_vt and nil or aki(0.5),
+            [22] = is_vt and {} or aki(0.5),
             [3] = is_vt and aki(0.25, -1) or aki(0.5, -1),
             [4] = is_vt and aki(0.25, 1, true) or
                 (is_qj and {0.5, 0, 0.5, priority = {1, -1}} or
                     (is_bj and {0, 0.5, 0, priority = {1, -1}} or
                         {0.25, 0.25, 0.25, priority = {1, -1}})),
-            [41] = is_vt and nil or aki(0.25),
-            [5] = is_vt and nil or aki(0.25),
-            [51] = is_vt and nil or aki(0.25),
-            [52] = is_vt and nil or aki(0.25)
+            [41] = is_vt and {} or aki(0.25),
+            [5] = is_vt and {} or aki(0.25),
+            [51] = is_vt and {} or aki(0.25),
+            [52] = is_vt and {} or aki(0.25)
         }
     },
     [3] = {
@@ -241,7 +241,7 @@ luatexja.jfont.define_jfm {
         italic = 0,
         glue = {
             [21] = aki(0.25),
-            [22] = is_vt and nil or aki(0.25),
+            [22] = is_vt and {} or aki(0.25),
             [3] = aki(0.25, -1),
             [4] = aki(0.25, 1, true)
         }
@@ -266,7 +266,7 @@ luatexja.jfont.define_jfm {
         glue = {
             [1] = aki(0.5, -1),
             [21] = aki(0.25),
-            [22] = is_vt and nil or aki(0.25),
+            [22] = is_vt and {} or aki(0.25),
             [3] = aki(0.25, -1),
             [4] = aki(0.25, -1, true)
         },
@@ -289,7 +289,7 @@ luatexja.jfont.define_jfm {
         glue = {
             [1] = aki(0.5, -1),
             [21] = aki(0.25),
-            [22] = is_vt and nil or aki(0.25),
+            [22] = is_vt and {} or aki(0.25),
             [3] = aki(0.25, -1),
             [4] = aki(0.25, -1, true)
         },
@@ -312,7 +312,7 @@ luatexja.jfont.define_jfm {
         glue = {
             [1] = aki(0.5, -1),
             [21] = aki(0.25),
-            [22] = is_vt and nil or aki(0.25),
+            [22] = is_vt and {} or aki(0.25),
             [3] = aki(0.25, -1),
             [4] = aki(0.25, -1, true)
         },
