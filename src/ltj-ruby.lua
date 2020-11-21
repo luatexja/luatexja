@@ -529,7 +529,7 @@ end
 local function pre_high(ahead)
    if not ahead then return ahead end
    local head = to_direct(ahead)
-   post_intrusion_backup, post_jfmgk_backup = 0, 0
+   post_intrusion_backup, post_jfmgk_backup = 0, false
    local n = first_whatsit(head)
    while n do
       if getsubtype(n) == sid_user and getfield(n, 'user_id') == RUBY_PRE then
@@ -541,19 +541,19 @@ local function pre_high(ahead)
              -- 直前のルビで intrusion がおこる可能性あり．
              -- 前 run のデータが残っていればそれを使用，
              -- そうでなければ行中形のデータを利用する
-             local op = (((atr>0) and old_break_info[atr] or false) or post_intrusion_backup) or 0
+             local op = (atr>0) and (old_break_info[atr] or post_intrusion_backup) or 0
              max_allow_pre = max(0, -max_allow_pre - op)
          end
-         if rst.exclude_pre_from_prev_ruby  and (((atr>0) and old_break_info[-atr]) or post_jfmgk_backup) then
+         if rst.exclude_pre_from_prev_ruby  and ((atr>0) and (old_break_info[-atr]>0) or post_jfmgk_backup) then
             -- 「直前のルビが JFM グルーに進入→現在のルビの前文字進入はなし」という状況
-            max_allow_pre = 0
+            max_allow_pre = 0; rst.exclude_pre_from_prev_ruby=false
          end
          if rst.exclude_pre_jfmgk_from_prev_ruby
-            and ((((atr>0) and old_break_info[atr]) or post_intrusion_backup) > 0) then
+            and (atr>0) and ((old_break_info[atr]  or post_intrusion_backup) > 0) then
             -- 「直前のルビが文字に進入→現在のルビの和文処理グルーへの進入はなし」という状況
             rst.before_jfmgk = 0
          end
-         post_intrusion_backup = 0
+         post_intrusion_backup, post_jfmgk_backup = 0, false
          max_allow_post = rst.post or 0
          max_margin = rst.maxmargin or 0
          local coef = pre_low_cal_box(n, rst.count)
