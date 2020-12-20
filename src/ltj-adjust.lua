@@ -287,7 +287,10 @@ local aw_step2, aw_step2_dummy
 do
 local node_hpack = node.direct.hpack
 local function repack(p)
+   local orig_of, orig_hfuzz, orig_hbad = tex.overfullrule, tex.hfuzz, tex.hbadness
+   tex.overfullrule=0; tex.hfuzz=1073741823; tex.hbadness=10000
    local f = node_hpack(getlist(p), getfield(p, 'width'), 'exactly')
+   tex.overfullrule=orig_of; tex.hfuzz=orig_hfuzz; tex.hbadness=orig_hbad
    setfield(f, 'head', nil)
    setfield(p, 'glue_set', getfield(f, 'glue_set'))
    setfield(p, 'glue_order', getfield(f, 'glue_order'))
