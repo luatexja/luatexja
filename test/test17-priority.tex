@@ -166,6 +166,25 @@ xkanjiskip: \ltjgetparameter{xkanjiskip}}
 }
 }
 
+\newpage
+xkanjiskip手動挿入．
+
+\texttt{\string\insertxkanjiskip}で挿入されたグルーは\\
+\texttt{\string\hskip\string\ltjgetparameter\{xkanjiskip\}}\insertxkanjiskip によるグルー%
+（下段）とは違い，
+優先度付き行長調整でも通常のxkanjiskipと同等の挙動をする．
+
+{\ltjsetparameter{xkanjiskip=10pt plus 50pt minus 50pt,kanjiskip=0pt plus 5pt minus 5pt}%
+\testbox{%
+  \vrule width2.5\zw ◆◆◆◆◆◆◆◆\insertxkanjiskip a\null ◆◆◆◆◆◆◆a%
+}
+\testbox{%
+  \vrule width2.5\zw ◆◆◆◆◆◆◆◆\hskip\ltjgetparameter{xkanjiskip}a\null ◆◆◆◆◆◆◆a%
+}
+}
+
+\bigskip
+
 次ページ以降の出典：
   Wikisource日本語版「竹取物語」（一部），2016/08/11閲覧\\
 {\catcode`\%=11\texttt{https://ja.wikisource.org/wiki/%E7%AB%B9%E5%8F%96%E7%89%A9%E8%AA%9E}}
@@ -234,7 +253,6 @@ xkanjiskip: \ltjgetparameter{xkanjiskip}}
 \noindent
 \vrule\copy40014\vrule\relax\getbadness{40014}
 
-\clearpage
 \R28\zw
 \ltjenableadjust[lineend=extended, priority=true]
 \setbox40000=\vtop{\sample{lineend=extended, priority=true}}
