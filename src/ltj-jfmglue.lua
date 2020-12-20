@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2020-10-22',
+  date = '2020-12-20',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}
@@ -1346,8 +1346,58 @@ do
                               "luatexja.beginpar.np_info", 1)
    luatexbase.add_to_callback("luatexja.jfmglue.whatsit_after", whatsit_after_callback,
                               "luatexja.beginpar.np_info_after", 1)
-
 end
+
+do
+   local node_write = node.direct.write
+   local XKANJI_SKIP   = luatexja.icflag_table.XKANJI_SKIP
+   local XKANJI_SKIP_JFM   = luatexja.icflag_table.XKANJI_SKIP_JFM
+   local XSK  = luatexja.stack_table_index.XSK
+   local KANJI_SKIP   = luatexja.icflag_table.KANJI_SKIP
+   local KANJI_SKIP_JFM   = luatexja.icflag_table.KANJI_SKIP_JFM
+   local KSK  = luatexja.stack_table_index.KSK
+   local get_dir_count = ltjd.get_dir_count
+   local dir_tate = luatexja.dir_table.dir_tate
+   local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
+   local attr_curtfnt = luatexbase.attributes['ltj@curtfnt']
+   -- \insertxkanjiskip
+   function luatexja.jfmglue.insert_xk_skip()
+       local st = ltjs.get_stack_skip(XSK, tex.getcount('ltj@@stack'))
+       if st.width==1073741823 then
+           local j = ltjf_font_metric_table[
+             tex.getattribute((get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
+           ]
+           if j.xkanjiskip then
+               local g, bk = node_new(id_glue), j.xkanjiskip
+               setglue(g, bk[1] or 0, bk[2] or 0, bk[3] or 0, 0, 0)
+               set_attr(g, attr_icflag, XKANJI_SKIP_JFM); node_write(g)
+               return
+           end
+       end
+       local g = node_new(id_glue)
+       setglue(g, st.width, st.stretch, st.shrink, st.stretch_order, st.shrink_order)
+       set_attr(g, attr_icflag, XKANJI_SKIP); node_write(g)
+   end
+   -- \insertkanjiskip
+   function luatexja.jfmglue.insert_k_skip()
+       local st = ltjs.get_stack_skip(KSK, tex.getcount('ltj@@stack'))
+       if st.width==1073741823 then
+           local j = ltjf_font_metric_table[
+             tex.getattribute((get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
+           ]
+           if j.kanjiskip then
+               local g, bk = node_new(id_glue), j.kanjiskip
+               setglue(g, bk[1] or 0, bk[2] or 0, bk[3] or 0, 0, 0)
+               set_attr(g, attr_icflag, KANJI_SKIP_JFM); node_write(g)
+               return
+           end
+       end
+       local g = node_new(id_glue)
+       setglue(g, st.width, st.stretch, st.shrink, st.stretch_order, st.shrink_order)
+       set_attr(g, attr_icflag, KANJI_SKIP); node_write(g)
+   end
+end
+
 
 luatexja.jfmglue.after_hlist = after_hlist
 luatexja.jfmglue.check_box_high = check_box_high

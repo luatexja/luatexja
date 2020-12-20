@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2020-11-09 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2020-12-20 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -256,6 +256,8 @@
 \newluafunction\ltj@@ihb@inner
 \newluafunction\ltj@@fakeparbegin@inner
 \newluafunction\ltj@@fakeboxbdd@inner
+\newluafunction\ltj@@ins@xk@inner
+\newluafunction\ltj@@ins@k@inner
 \directlua{
   local t = lua.get_functions_table()
   t[\the\ltj@reset@globaldefs@inner] 
@@ -265,12 +267,16 @@
   t[\the\ltj@@ihb@inner] = luatexja.jfmglue.create_inhibitglue_node
   t[\the\ltj@@fakeparbegin@inner] = luatexja.jfmglue.create_beginpar_node
   t[\the\ltj@@fakeboxbdd@inner] = luatexja.jfmglue.create_boxbdd_node
+  t[\the\ltj@@ins@xk@inner] = luatexja.jfmglue.insert_xk_skip
+  t[\the\ltj@@ins@k@inner] = luatexja.jfmglue.insert_k_skip
 }
 \protected\luadef\ltj@reset@globaldefs  \ltj@reset@globaldefs@inner
 \protected\luadef\ltj@restore@globaldefs\ltj@restore@globaldefs@inner
 \protected\def\inhibitglue{\ifhmode\relax\luafunction\ltj@@ihb@inner\fi}
 \protected\def\ltjfakeparbegin{\ifhmode\relax\luafunction\ltj@@fakeparbegin@inner\fi}
 \protected\def\ltjfakeboxbdd{\ifhmode\relax\luafunction\ltj@@fakeboxbdd@inner\fi}
+\protected\def\insertxkanjiskip{\ifhmode\relax\luafunction\ltj@@ins@xk@inner\fi}
+\protected\def\insertkanjiskip{\ifhmode\relax\luafunction\ltj@@ins@k@inner\fi}
 
 
 %%%%%%%% \ltjdefcharrange<name>{100-200,3000-,5000,...}
