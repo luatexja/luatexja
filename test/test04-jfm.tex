@@ -1,5 +1,10 @@
 %#!luatex test04-jfm.tex
+
+% 標準フォント・kanjiskip は以前のバージョンとの互換性
+\catcode`\@=11 \def\ltj@stdmcfont{IPAExMincho}\def\ltj@stdgtfont{IPAExGothic}
 \input luatexja-core.sty
+\ltjsetparameter{kanjiskip=0pt plus .4pt minus .4pt}
+
 \def\head#1{\medskip\penalty-100\noindent{\bf\tengt ■ #1}\par\penalty10000 }
 \jfont\rml={psft:Ryumin-Light:jfm=ujis} at 10pt
 \rml あ\inhibitglue\char"201Cあ・い\inhibitglue （）あ←Ryumin-Light

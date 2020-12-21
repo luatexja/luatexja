@@ -459,7 +459,7 @@ calc_np_auxtable = {
       if lps==sid_user then
          if getfield(lp, 'user_id')==luatexja.userid_table.IHB then
             local lq = node_next(lp);
-            head = node_remove(head, lp); node_free(lp); non_ihb_flag = false
+            head = node_remove(head, lp); node_free(lp); non_ihb_flag = getfield(lp, 'value')~=1
             return false, lq;
          elseif getfield(lp, 'user_id')==luatexja.userid_table.JA_AL_BDD then
             local lq = node_next(lp);
@@ -1265,13 +1265,19 @@ do
    local node_prev = node.direct.getprev
    local node_write = node.direct.write
 
-   -- \inhibitglue
-   function luatexja.jfmglue.create_inhibitglue_node()
+   -- \inhibitglue, \disinhibitglue
+   local function ihb_node(v)
       local tn = node_new(id_whatsit, sid_user)
       setfield(tn, 'user_id', IHB)
       setfield(tn, 'type', 100)
-      setfield(tn, 'value', 1)
+      setfield(tn, 'value', v)
       node_write(tn)
+   end
+   function luatexja.jfmglue.create_inhibitglue_node()
+      ihb_node(1)
+   end
+   function luatexja.jfmglue.create_disinhibitglue_node()
+      ihb_node(0)
    end
 
    -- Node for indicating beginning of a paragraph

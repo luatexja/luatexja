@@ -253,6 +253,7 @@
 %%%%%%%% \inhibitglue
 \newluafunction\ltj@reset@globaldefs@inner
 \newluafunction\ltj@restore@globaldefs@inner
+\newluafunction\ltj@@disihb@inner
 \newluafunction\ltj@@ihb@inner
 \newluafunction\ltj@@fakeparbegin@inner
 \newluafunction\ltj@@fakeboxbdd@inner
@@ -264,6 +265,7 @@
      = function() luatexja.global_temp = tex.globaldefs; tex.globaldefs = 0 end
   t[\the\ltj@restore@globaldefs@inner] 
      = function() tex.globaldefs = luatexja.global_temp end
+  t[\the\ltj@@disihb@inner] = luatexja.jfmglue.create_disinhibitglue_node
   t[\the\ltj@@ihb@inner] = luatexja.jfmglue.create_inhibitglue_node
   t[\the\ltj@@fakeparbegin@inner] = luatexja.jfmglue.create_beginpar_node
   t[\the\ltj@@fakeboxbdd@inner] = luatexja.jfmglue.create_boxbdd_node
@@ -272,6 +274,7 @@
 }
 \protected\luadef\ltj@reset@globaldefs  \ltj@reset@globaldefs@inner
 \protected\luadef\ltj@restore@globaldefs\ltj@restore@globaldefs@inner
+\protected\def\disinhibitglue{\ifhmode\relax\luafunction\ltj@@disihb@inner\fi}
 \protected\def\inhibitglue{\ifhmode\relax\luafunction\ltj@@ihb@inner\fi}
 \protected\def\ltjfakeparbegin{\ifhmode\relax\luafunction\ltj@@fakeparbegin@inner\fi}
 \protected\def\ltjfakeboxbdd{\ifhmode\relax\luafunction\ltj@@fakeboxbdd@inner\fi}
