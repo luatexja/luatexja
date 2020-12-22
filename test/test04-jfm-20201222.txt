@@ -968,15 +968,154 @@ l.376 ...\tenmin\setbox1=\hbox{\tate }あ\unhbox1い
 2 hlist 0 (5.0+5.0)x10.0, dir=0 (packed)
 .0 glyph 256  感 (U+611F) 75 (8.48+0.66)x10.0
 ======
- [12])
-(see the transcript file for additional information)</opt/texlive/texmf-local/f
-onts/truetype/sysfnt/OTF/ipaexm.ttf></opt/texlive/texmf-local/fonts/truetype/sy
-sfnt/OTF/ipaexg.ttf></usr/share/fonts/OTF/ipamp.ttf></usr/share/fonts/mine/KozM
-inPr6N-Regular.otf></usr/share/fonts/OTF/ipam.ttf></opt/texlive/2020/texmf-dist
-/fonts/type1/public/amsfonts/cm/cmbx10.pfb></opt/texlive/2020/texmf-dist/fonts/
-type1/public/amsfonts/cm/cmmi10.pfb></opt/texlive/2020/texmf-dist/fonts/type1/p
-ublic/amsfonts/cm/cmr10.pfb></opt/texlive/2020/texmf-dist/fonts/type1/public/am
-sfonts/cm/cmti10.pfb></opt/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/
-cm/cmtt10.pfb>
-Output written on test04-jfm.pdf (12 pages, 714251 bytes).
+======
+49 whatsit 8  userid:4 (direction) (node list) dir: 4
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+45 glue 0  0.0pt plus 0.4pt (kanjiskip, JFM specified)
+28 glue 0  5.0pt minus 5.0pt (from JFM: priority 36)
+2 hlist 0 (8.8+1.2)x5.0, dir=0 (packed)
+.0 glyph 256  （ (U+FF08) 66 (8.32031+0.71777)x5.09766 off: (-0.09766,0.0)
+3 penalty 0  10000 (for kinsoku)
+45 glue 0  0.0pt minus 0.4pt (kanjiskip, JFM specified)
+28 glue 0  0.0pt (from JFM: priority 36)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+45 glue 0  0.0pt plus 0.4pt (kanjiskip, JFM specified)
+28 glue 0  5.0pt minus 5.0pt (from JFM: priority 36)
+2 hlist 0 (8.8+1.2)x5.0, dir=0 (packed)
+.0 glyph 256  （ (U+FF08) 66 (8.32031+0.71777)x5.09766 off: (-0.09766,0.0)
+3 penalty 0  10000 (for kinsoku)
+45 glue 0  0.0pt minus 0.4pt (kanjiskip, JFM specified)
+28 glue 0  0.0pt (from JFM: priority 36)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+45 glue 0  0.0pt plus 0.4pt (kanjiskip, JFM specified)
+28 glue 0  5.0pt minus 5.0pt (from JFM: priority 36)
+2 hlist 0 (8.8+1.2)x5.0, dir=0 (packed)
+.0 glyph 256  （ (U+FF08) 66 (8.32031+0.71777)x5.09766 off: (-0.09766,0.0)
+======
+======
+49 whatsit 8  userid:4 (direction) (node list) dir: 4
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+44 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x5.0, dir=0 (packed)
+.0 glyph 256  （ (U+FF08) 66 (8.32031+0.71777)x5.09766 off: (-0.09766,0.0)
+3 penalty 0  10000 (for kinsoku)
+45 glue 0  0.0pt minus 0.4pt (kanjiskip, JFM specified)
+28 glue 0  0.0pt (from JFM: priority 36)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+44 glue 0  0.0pt plus 0.4pt minus 0.4pt (kanjiskip)
+2 hlist 0 (8.8+1.2)x5.0, dir=0 (packed)
+.0 glyph 256  （ (U+FF08) 66 (8.32031+0.71777)x5.09766 off: (-0.09766,0.0)
+======
+======
+49 whatsit 8  userid:4 (direction) (node list) dir: 4
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+46 glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+2 hlist 0 (8.8+1.2)x5.0, dir=0 (packed)
+.0 glyph 256  （ (U+FF08) 66 (8.32031+0.71777)x5.09766 off: (-0.09766,0.0)
+3 penalty 0  10000 (for kinsoku)
+46 glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+3 penalty 0  10000 (for kinsoku)
+46 glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+2 hlist 0 (8.8+1.2)x5.0, dir=0 (packed)
+.0 glyph 256  ） (U+FF09) 66 (8.32031+0.71777)x5.09766
+45 glue 0  0.0pt plus 0.4pt (kanjiskip, JFM specified)
+28 glue 0  5.0pt minus 5.0pt (from JFM: priority 36)
+2 hlist 0 (8.8+1.2)x5.0, dir=0 (packed)
+.0 glyph 256  （ (U+FF08) 66 (8.32031+0.71777)x5.09766 off: (-0.09766,0.0)
+3 penalty 0  10000 (for kinsoku)
+46 glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+2 hlist 0 (8.8+1.2)x5.0, dir=0 (packed)
+.0 glyph 256  ） (U+FF09) 66 (8.32031+0.71777)x5.09766
+======
+ [12]======
+49 whatsit 8  userid:4 (direction) (node list) dir: 4
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+46 glue 0  2.40553pt plus 1.0pt minus 1.0pt (xkanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+46 glue 0  6.2pt plus 3.0pt (xkanjiskip)
+49 glyph 256  a (U+61) 68 (5.2002+0.03906)x5.49805
+46 glue 0  6.2pt plus 3.0pt (xkanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+46 glue 0  6.2pt plus 3.0pt (xkanjiskip)
+49 glyph 256  c (U+63) 68 (5.22949+0.04883)x5.43945
+46 glue 0  6.2pt plus 3.0pt (xkanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+46 glue 0  6.2pt plus 3.0pt (xkanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+======
+======
+49 whatsit 8  userid:4 (direction) (node list) dir: 4
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+46 glue 0  6.2pt plus 3.0pt (xkanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+46 glue 0  6.2pt plus 3.0pt (xkanjiskip)
+49 glyph 256  a (U+61) 68 (5.2002+0.03906)x5.49805
+46 glue 0  6.2pt plus 3.0pt (xkanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+46 glue 0  6.2pt plus 3.0pt (xkanjiskip)
+49 glyph 256  c (U+63) 68 (5.22949+0.04883)x5.43945
+46 glue 0  6.2pt plus 3.0pt (xkanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+46 glue 0  6.2pt plus 3.0pt (xkanjiskip)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+======
+======
+49 whatsit 8  userid:4 (direction) (node list) dir: 4
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+47 glue 0  2.5pt plus 2.5pt minus 1.25pt (xkanjiskip, JFM specified)
+49 glyph 256  c (U+63) 68 (5.22949+0.04883)x5.43945
+47 glue 0  2.5pt plus 2.5pt minus 1.25pt (xkanjiskip, JFM specified)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+47 glue 0  2.5pt plus 2.5pt minus 1.25pt (xkanjiskip, JFM specified)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+47 glue 0  2.5pt plus 2.5pt minus 1.25pt (xkanjiskip, JFM specified)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+======
+======
+49 whatsit 8  userid:4 (direction) (node list) dir: 4
+2 hlist 0 (8.8+1.2)x5.0, dir=0 (packed)
+.0 glyph 256  ） (U+FF09) 66 (8.32031+0.71777)x5.09766
+45 glue 0  0.0pt plus 0.4pt (kanjiskip, JFM specified)
+28 glue 0  5.0pt minus 5.0pt (from JFM: priority 36)
+2 hlist 0 (8.8+1.2)x10.0, dir=0 (packed)
+.0 glyph 256  あ (U+3042) 66 (8.11035+0.36133)x8.99902
+3 penalty 0  10000 (for kinsoku)
+45 glue 0  0.0pt minus 0.4pt (kanjiskip, JFM specified)
+28 glue 0  0.0pt (from JFM: priority 36)
+2 hlist 0 (8.8+1.2)x5.0, dir=0 (packed)
+.0 glyph 256  ） (U+FF09) 66 (8.32031+0.71777)x5.09766
+======
+ [13])
+(see the transcript file for additional information)</opt/texlive/2020/texmf-di
+st/fonts/truetype/public/ipaex/ipaexm.ttf></opt/texlive/2020/texmf-dist/fonts/t
+ruetype/public/ipaex/ipaexg.ttf></opt/texlive/2020/texmf-dist/fonts/truetype/pu
+blic/ipaex/ipamp.ttf></opt/fonts/kozuka/KozMinPr6N-Regular.otf></usr/share/font
+s/cjk/ipam.ttf></opt/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmb
+x10.pfb></opt/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb
+></opt/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></opt/t
+exlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></opt/texlive/
+2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on test04-jfm.pdf (13 pages, 716694 bytes).
 Transcript written on test04-jfm.log.

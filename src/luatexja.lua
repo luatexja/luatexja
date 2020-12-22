@@ -42,6 +42,9 @@ icflag_table.LINEEND         = 72
 icflag_table.PROCESSED       = 73
 icflag_table.IC_PROCESSED    = 74
 icflag_table.BOXBDD          = 75
+icflag_table.SPECIAL_JAGLUE  = 76
+-- 段落組版中のノードリストでは通常のノード (not whatsit) だが
+-- 和文処理グルー挿入プロセスで長さが決定されるもの
 icflag_table.PROCESSED_BEGIN_FLAG = 4096 -- sufficiently large power of 2
 
 local stack_ind = {}

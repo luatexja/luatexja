@@ -408,9 +408,31 @@ end}}
 \head{その他: kanjiskip with inf stretch}
 \jfont\knx=KozMinPr6N-Regular.otf:jfm=test2;-kern
 
-\ltjsetparameter{kanjiskip=1pt plus 1.25fil minus 2.75fill}
+{\ltjsetparameter{kanjiskip=1pt plus 1.25fil minus 2.75fill}
 \ltjsetparameter{differentjfm=average}
 \setbox0=\hbox{感感」\knx 感}
+\dumplist0}
+
+\head{inhibitglue and disinhibitglue}
+\setbox0=\hbox{あ（あ\disinhibitglue （あ\inhibitglue\disinhibitglue （}
+\dumplist0
+\setbox0=\hbox{あ\inhibitglue （あ\disinhibitglue\inhibitglue （}
+\dumplist0
+
+\head{insertxkanjiskip and insertkanjiskip}
+\setbox0=\hbox{あ\insertxkanjiskip （\insertxkanjiskip あ\insertxkanjiskip ）（\insertxkanjiskip ）}
+\dumplist0
+
+\setbox0=\hbox{あ\insertxkanjiskip あaあ\ltjsetparameter{xkanjiskip=6.2pt plus 3pt}cあ\insertxkanjiskip あ}
+\dumplist0
+
+\setbox0=\hbox{あ\insertxkanjiskip lateあaあ\ltjsetparameter{xkanjiskip=6.2pt plus 3pt}cあ\insertxkanjiskip lateあ}
+\dumplist0
+
+\setbox0=\hbox{あ\ltjsetparameter{xkanjiskip=\maxdimen plus 3pt}cあ\insertxkanjiskip あ\insertxkanjiskip lateあ}
+\dumplist0
+
+\setbox0=\hbox{）\insertxkanjiskip\unskip あ）}
 \dumplist0
 
 \end

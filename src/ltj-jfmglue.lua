@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2020-12-20',
+  date = '2020-12-22',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}
@@ -78,6 +78,7 @@ local FROM_JFM     = luatexja.icflag_table.FROM_JFM
 local PROCESSED    = luatexja.icflag_table.PROCESSED
 local IC_PROCESSED = luatexja.icflag_table.IC_PROCESSED
 local BOXBDD       = luatexja.icflag_table.BOXBDD
+local SPECIAL_JAGLUE = luatexja.icflag_table.SPECIAL_JAGLUE
 local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 
 local attr_icflag = luatexbase.attributes['ltj@icflag']
@@ -499,7 +500,11 @@ calc_np_auxtable = {
    end,
    [id_glue] = function(lp)
       Np.first, Np.nuc, Np.last = (Np.first or lp), lp, lp;
-      Np.id = getid(lp); set_attr(lp, attr_icflag, PROCESSED)
+      Np.id = getid(lp); 
+      local f = luatexbase.call_callback("luatexja.jfmglue.special_jaglue", lp)
+      if f then
+         set_attr(lp, attr_icflag, PROCESSED)
+      end
       return true, node_next(lp)
    end,
    [id_disc] = function(lp)
@@ -562,7 +567,7 @@ function calc_np(last, lp)
    while lp ~= last  do
       local lpa = has_attr(lp, attr_icflag) or 0
       -- unbox 由来ノードの検出
-      if lpa>=PACKED then
+      if (lpa>=PACKED) and (lpa%PROCESSED_BEGIN_FLAG<=BOXBDD) then
          if lpa%PROCESSED_BEGIN_FLAG == BOXBDD then
             local lq = node_next(lp)
             head = node_remove(head, lp); node_free(lp); lp = lq
@@ -1095,13 +1100,15 @@ local adjust_nq
 do
    local adjust_nq_aux = {
       [id_glyph] = function() after_alchar(Nq) end, -- after_alchar(Nq)
-      [id_hlist]  = function() after_hlist(Nq) end,
+      [id_hlist] = function() after_hlist(Nq) end,
       [id_pbox]  = function() after_hlist(Nq) end,
       [id_disc]  = function() after_hlist(Nq) end,
-      [id_pbox_w]  = function()
-                        luatexbase.call_callback("luatexja.jfmglue.whatsit_after",
-                                                 false, Nq, Np)
-                     end,
+      [id_glue]  = function() 
+                      luatexbase.call_callback("luatexja.jfmglue.special_jaglue_after", Nq.nuc)
+                   end,
+      [id_pbox_w]= function()
+                      luatexbase.call_callback("luatexja.jfmglue.whatsit_after", false, Nq, Np)
+                   end,
    }
 
    adjust_nq = function()
@@ -1355,53 +1362,112 @@ do
 end
 
 do
+   local node_prev = node.direct.getprev
    local node_write = node.direct.write
    local XKANJI_SKIP   = luatexja.icflag_table.XKANJI_SKIP
    local XKANJI_SKIP_JFM   = luatexja.icflag_table.XKANJI_SKIP_JFM
-   local XSK  = luatexja.stack_table_index.XSK
    local KANJI_SKIP   = luatexja.icflag_table.KANJI_SKIP
    local KANJI_SKIP_JFM   = luatexja.icflag_table.KANJI_SKIP_JFM
+   local XSK  = luatexja.stack_table_index.XSK
    local KSK  = luatexja.stack_table_index.KSK
-   local get_dir_count = ltjd.get_dir_count
-   local dir_tate = luatexja.dir_table.dir_tate
-   local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
-   local attr_curtfnt = luatexbase.attributes['ltj@curtfnt']
+   local attr_yablshift = luatexbase.attributes['ltj@yablshift']
+   local attr_tablshift = luatexbase.attributes['ltj@tablshift']
+   local getcount, abs, scan_keyword = tex.getcount, math.abs, token.scan_keyword
+   local get_current_jfont
+   do
+       local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
+       local attr_curtfnt = luatexbase.attributes['ltj@curtfnt']
+       local dir_tate = luatexja.dir_table.dir_tate
+       local get_dir_count = ltjd.get_dir_count        
+       function get_current_jfont()
+           return tex.getattribute((get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
+       end
+   end
    -- \insertxkanjiskip
+   -- SPECIAL_JAGLUE のノード：
+   -- * (X)KANJI_SKIP(_JFM): その場で値が決まっている
+   -- * PROCESSED_BEGIN_FLAG + (X)KANJI_SKIP: 段落終了時に決める
+   local function insert_k_skip_common(ind, name, ica, icb)
+       if abs(tex.nest[tex.nest.ptr].mode) ~= ltjs.hmode then return end
+       local g = node_new(id_glue); set_attr(g, attr_icflag, SPECIAL_JAGLUE)
+       local is_late = scan_keyword("late")
+       if not is_late then
+           local st = ltjs.get_stack_skip(ind, getcount('ltj@@stack'))
+           if st.width==1073741823 then
+               local bk = ltjf_font_metric_table[get_current_jfont()][name]
+               if bk then
+                   setglue(g, bk[1] or 0, bk[2] or 0, bk[3] or 0, 0, 0)
+               end
+               set_attr(g, attr_yablshift, icb); node_write(g); return
+           end
+           setglue(g, st.width, st.stretch, st.shrink, st.stretch_order, st.shrink_order)
+           set_attr(g, attr_yablshift, ica)
+       else
+           set_attr(g, attr_yablshift, PROCESSED_BEGIN_FLAG + ica)
+           set_attr(g, attr_tablshift, get_current_jfont())               
+       end
+       node_write(g)
+   end
    function luatexja.jfmglue.insert_xk_skip()
-       local st = ltjs.get_stack_skip(XSK, tex.getcount('ltj@@stack'))
-       if st.width==1073741823 then
-           local j = ltjf_font_metric_table[
-             tex.getattribute((get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
-           ]
-           if j.xkanjiskip then
-               local g, bk = node_new(id_glue), j.xkanjiskip
-               setglue(g, bk[1] or 0, bk[2] or 0, bk[3] or 0, 0, 0)
-               set_attr(g, attr_icflag, XKANJI_SKIP_JFM); node_write(g)
-               return
-           end
-       end
-       local g = node_new(id_glue)
-       setglue(g, st.width, st.stretch, st.shrink, st.stretch_order, st.shrink_order)
-       set_attr(g, attr_icflag, XKANJI_SKIP); node_write(g)
+       insert_k_skip_common(XSK, "xkanjiskip", XKANJI_SKIP, XKANJI_SKIP_JFM)
    end
-   -- \insertkanjiskip
    function luatexja.jfmglue.insert_k_skip()
-       local st = ltjs.get_stack_skip(KSK, tex.getcount('ltj@@stack'))
-       if st.width==1073741823 then
-           local j = ltjf_font_metric_table[
-             tex.getattribute((get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
-           ]
-           if j.kanjiskip then
-               local g, bk = node_new(id_glue), j.kanjiskip
-               setglue(g, bk[1] or 0, bk[2] or 0, bk[3] or 0, 0, 0)
-               set_attr(g, attr_icflag, KANJI_SKIP_JFM); node_write(g)
-               return
-           end
-       end
-       local g = node_new(id_glue)
-       setglue(g, st.width, st.stretch, st.shrink, st.stretch_order, st.shrink_order)
-       set_attr(g, attr_icflag, KANJI_SKIP); node_write(g)
+       insert_k_skip_common(KSK, "kanjiskip", KANJI_SKIP, KANJI_SKIP_JFM)
    end
+   -- callback
+   local getglue = luatexja.getglue
+   local function special_jaglue(lx)
+       local lxi = get_attr_icflag(lx)
+       if lxi==SPECIAL_JAGLUE then
+           non_ihb_flag = false; return false
+       else
+           return lx
+       end
+   end
+   local function special_jaglue_after(lx)
+       if get_attr_icflag(lx)==SPECIAL_JAGLUE then
+           lxi=has_attr(lx, attr_yablshift)
+           if lxi>=PROCESSED_BEGIN_FLAG then
+               lxi = lxi%PROCESSED_BEGIN_FLAG
+               if lxi == KANJI_SKIP then
+                   local w, st, sh, sto, sho = getglue(kanji_skip)
+                   if w~=1073741823 then
+                       setglue(lx, w, st, sh, sto, sho); set_attr(lx, attr_icflag, KANJI_SKIP)
+                   else
+                       local m = ltjf_font_metric_table[has_attr(lx, attr_tablshift)]
+                       local bk = m.kanjiskip or null_skip_table
+                       setglue(lx, bk[1], bk[2], bk[3], 0, 0)
+                       set_attr(lx, attr_icflag, KANJI_SKIP_JFM)
+                   end
+               elseif lxi == XKANJI_SKIP then
+                   local w, st, sh, sto, sho = getglue(xkanji_skip)
+                   if w~=1073741823 then
+                       setglue(lx, w, st, sh, sto, sho); set_attr(lx, attr_icflag, XKANJI_SKIP)
+                   else
+                       local m = ltjf_font_metric_table[has_attr(lx, attr_tablshift)]
+                       local bk = m.xkanjiskip or null_skip_table
+                       setglue(lx, bk[1], bk[2], bk[3], 0, 0)
+                       set_attr(lx, attr_icflag, XKANJI_SKIP_JFM)
+                   end
+               end
+           else
+               set_attr(lx, attr_icflag, lxi)
+           end
+           Np.first = lx
+           if node_prev(lx) then
+               local lxp = node_prev(lx)
+               if lxp and getid(lxp)==id_penalty and get_attr_icflag(lxp)==KINSOKU then
+                   Bp[#Bp+1]=lxp
+               end
+           end
+           non_ihb_flag = false; return false
+       end
+       return true
+   end
+   luatexbase.create_callback("luatexja.jfmglue.special_jaglue", "list",
+                              special_jaglue)
+   luatexbase.create_callback("luatexja.jfmglue.special_jaglue_after", "list",
+                              special_jaglue_after)
 end
 
 

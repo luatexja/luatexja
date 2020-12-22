@@ -212,7 +212,7 @@
   #1\mathstrut\cr\noalign{\vskip1pt\hrule height.4pt\vskip1pt}%
   width:\hfill\ #2\cr height:\hfill\ #3\cr depth:\hfill\ #4\cr
   }}}}}\,}
-
+\protected\def\+{\insertxkanjiskip late}
 \makeatletter
 \def\Param#1{\texorpdfstring{\@Param{#1}}{#1}} % parameter name
 \protected\def\@Param#1{\eghostguarded{\hyperlink{fld:#1}{\underline{\smash{\textsf{#1}}}}}}
@@ -2268,7 +2268,7 @@ JFMは「望ましい\Param{kanjiskip}の値」や
 It is not desirable that \Param{xkanjiskip} is inserted into every
 boundary between \textbf{JAchar}s and \textbf{ALchar}s. For example,
 \Param{xkanjiskip} should not be inserted after opening parenthesis
-(\textit{e.g.}, compare ``(あ'' and ``(\hskip\ltjgetparameter{xkanjiskip}あ'').
+(\textit{e.g.}, compare ``(あ'' and ``(\+あ'').
 \LuaTeX-ja can control whether \Param{xkanjiskip} can be inserted
 before/after a character, by changing \Param{jaxspmode} for \textbf{JAchar}s and
 \Param{alxspmode} parameters \textbf{ALchar}s respectively.
@@ -2276,7 +2276,7 @@ before/after a character, by changing \Param{jaxspmode} for \textbf{JAchar}s and
 %<*ja>
 \Param{xkanjiskip}がすべての\textbf{JAchar}と\textbf{ALchar}の境界に
 挿入されるのは望ましいことではない．例えば，\Param{xkanjiskip}は開き括弧の
-後には挿入されるべきではない（「(あ」と「(\hskip\ltjgetparameter{xkanjiskip}あ」を
+後には挿入されるべきではない（「(あ」と「(\+あ」を
 比べてみよ）．
 \LuaTeX-jaでは\Param{xkanjiskip}をある文字の前／後に挿入するかどうかを，
 \textbf{JAchar}に対しては\Param{jaxspmode}を，\textbf{ALchar}に対しては
@@ -6077,14 +6077,14 @@ To change characters of Chinese numerals for each digit, set \Param{kansujichar}
 %</en>
 
 
-\subsection{\cs{inhibitglue}}
+\subsection{\cs{inhibitglue}, \cs{disinhibitglue}}
 %<*en>
-\cs{inhibitglue} suppresses the insertion of \textbf{JAglue}.
+\cs{inhibitglue} suppresses the insertion of a glue/kern soecified in JFM at the place.
 The following is an example, using a special JFM that there will be a glue between
 the beginning of a box and ``あ'', and also between ``あ''~and~``ウ''.
 %</en>
 %<*ja>
-\cs{inhibitglue} は\textbf{JAglue}の挿入を抑制する．
+\cs{inhibitglue} は発行箇所でのJFM由来グルー／カーンの挿入を抑制する．
 以下は，ボックスの始めと「あ」の間，「あ」「ウ」の間にグルーが入る特別なJFMを用いた例で
 ある．
 %</ja>
@@ -6095,6 +6095,7 @@ the beginning of a box and ``あ'', and also between ``あ''~and~``ウ''.
 \inhibitglue\par\noindent あ1
 \par\inhibitglue\noindent あ2
 \par\noindent\inhibitglue あ3
+\par ）4）\inhibitglue 5
 \par\hrule\noindent あoff\inhibitglue ice
 \end{LTXexample}
 
@@ -6118,11 +6119,20 @@ With the help of this example, we remark the specification of \cs{inhibitglue}:
 %</ja>
 
 %<*en>
+\item \cs{inhibitglue} does \emph{not} suppress \Param{kanjiskip} or \cs{xkanjiskip}.
+%</en>
+%<*ja>
+\item \cs{inhibitglue}は\Param{kanjiskip}, \Param{xkanjiskip}の挿入は抑制しない．
+  例えば上の例の6行目では，「）」と「5」の間には本来はJFM由来の半角空きが挿入されるはずだが，
+  それが\cs{inhibitglue}で無効になったため，\Param{xkanjiskip}が代わりに挿入されている．
+%</ja>
+
+%<*en>
 \item The call of \cs{inhibitglue} in the (restricted) horizontal
       mode is only effective on the spot; does not get over boundary of
       paragraphs. Moreover, \cs{inhibitglue} cancels ligatures and
       kernings, as shown in the last line of above example.
-%</en>
+%</en>i
 %<*ja>
 \item \cs{inhibitglue} の（制限された）水平モード中での呼び出しはその場でのみ
   有効であり，段落の境界を乗り越えない．
@@ -6146,6 +6156,24 @@ With the help of this example, we remark the specification of \cs{inhibitglue}:
 %</ja>
 \end{itemize}
 
+%<*en>
+\cs{disinhibitglue} suppresses the effect of \cs{inhbitglue}.
+In other words, \cs{disinhibitglue} allows the insertion of a glue/kern specified by JFM.
+If \cs{inhibitglue}~and~\cs{disinhibitglue} both specified at the same time,
+the latest one is effective.
+This commans is added in the version 2020****.0.
+
+Note that \cs{disinhibitglue} also cancels ligatures and kernings.
+%</en>
+%<*ja>
+\cs{disinhibitglue}は\cs{inhibitglue}の効果を無効化する．
+言い換えれば，（\cs{inhibitglue}で抑制されたはずの））JFM由来グルー／カーンの挿入を許可する．
+同じ箇所に\cs{inhibitglue}と\cs{disinhibitglue}が両方ある場合は，後ろの指定が有効になる．
+この命令はバージョン2020****.0で追加された．
+
+なお，\cs{disinhibitglue}もリガチャやカーニングを打ち消すことに注意されたい．これは
+（\cs{inhibitglue}と同様に）whatsitノードを使って実装されていることによる．
+%</ja>
 
 \subsection{\cs{ltjfakeboxbdd}, \cs{ltjfakeparbegin}}
 %<*en>
@@ -6205,6 +6233,77 @@ As an example, the example above can be improved as follows:
 「ああああああ \par
 \end{LTXexample}
 
+
+\subsection{\cs{insertxkanjiskip}, \cs{insertkanjiskip}}
+%<*en>
+There are some situations which one wants to insert \Param{xkanjiskip} manually.
+A simple approach is to use \cs{hskip}\cs{ltjgetparamter\{xkanjiskip\}}, but this approach has
+several weak points. To cope with these weak points, \LuaTeX-ja defines a command \cs{insertxkanjiskip} which
+inserts \Param{xkanjiskip} glue manually, from the version 2020****.0.
+\begin{itemize}
+  \item ``\cs{insertxkanjiskip}'' (without any keyword) uses the value of \Param{xkanjiskip} at the place.
+  \item ``\cs{insertxkanjiskip late}'' (with ``\texttt{late}''~keyword) uses the value of \Param{xkanjiskip}
+  at the end of a paragraph/hbox.
+\end{itemize}
+See the example below.
+%</en>
+%<*ja>
+\TeX で日本語の文章を作成していると，
+しばしば「手動で和欧文間空白\Param{xkanjiskip}を挿入したい」という状況に遭遇する．
+このような場合，\cs{hskip}\cs{ltjgetparamter\{xkanjiskip\}}\+とするのがよくある対応であったが，これらには
+次のような難点がある：
+\begin{itemize}
+  \item \cs{xkanjiskip}は「段落やhboxでの終端での値がその段落／hbox全体で用いられる」となっているため，
+  \cs{hskip}\cs{ltjgetparamter\{xkanjiskip\}}\+以降に\Param{xkanjiskip}の値が変わる場合に対応できない．
+  \item \LuaTeX-jaでは，\cs{xkanjiskip}の自然長が$\cs{maxdimen}=(2^{30}-1)\,\mbox{sp}$であった場合，
+  JFMで指定された値を実際に利用することになっているが，それに対応できていない．
+  \item \Pkg{luatexja-adjust}（\ref{ssec:adj}節）による優先度行長調整では，
+  \cs{hskip}\cs{ltjgetparamter\{xkanjiskip\}}\+は手動で挿入したグルーであるから，
+  自動で挿入された\Param{xkanjiskip}とは
+  伸縮の優先順序が異なってしまう．
+\end{itemize}
+
+これらの難点に対処した，\Param{xkanjiskip}をグルーとして手動挿入する命令が\cs{insertxkanjiskip}である．
+これはバージョン2020****.0で追加された．
+以下の実行例に示すように，
+\begin{itemize}
+  \item 単独で\cs{insertxkanjiskip}とした場合は，その時点での\Param{xkanjiskip}の値を使用する
+  \item 「\cs{insertxkanjiskip~late}」と\texttt{late}キーワードを後置した場合は，
+  段落／hbox終了時にそのときの\Param{xkanjiskip}の値に自動設定される
+  （段落／hbox途中での値は未定義）
+  \item どちらであっても，実行箇所に本来なら自動挿入されるはずのJFM由来グルー／カーンは挿入されない
+\end{itemize}
+となっている．
+%</ja>
+\begin{LTXexample}[width=0.3333\textwidth]
+\ltjsetparameter{xkanjiskip=0.25\zw}
+あ（%                        0.5\zw  (from JFM)
+あ\insertxkanjiskip （%      0.25\zw (xkanjiskip at here)
+あ\insertxkanjiskip late （% 0.25\zw (xkanjiskip at EOP)
+あa%                         1.25\zw (xkanjiskip at EOP)
+\\%
+\ltjsetparameter{xkanjiskip=1.25\zw}
+あ\insertxkanjiskip （%      1.25\zw (xkanjiskip at here)
+あa%                         1.25\zw (xkanjiskip at EOP)
+%% At the end of the paragraph (EOP), xkanjiskip is 1.25\zw.
+\end{LTXexample}
+
+%<*en>
+There is a similar command \cs{insertkanjiskip} (\Param{kanjiskip} instead~of \Param{xkanjiskip}) is also defined.
+Note that any shorthand form of \cs{insert}[\texttt{x}]\texttt{kanjiskip} are not defined by \LuaTeX-ja.
+%</en>
+%<*ja>
+\cs{insertxkanjiskip}（または\texttt{late}つき）の短縮形
+\footnote{ちょうど\cs{inhibitglue}の短縮形\cs{\ltjalchar`\<}\+に対応するもの．}は
+\LuaTeX-jaでは定義していない．短縮形を使いたい人は，面倒でも各自で
+\begin{lstlisting}
+ \protected\def\+{\insertxkanjiskip late}
+\end{lstlisting}
+などと定義してほしい．
+
+最後になるが，以上の説明の\Param{xkanjiskip}をすべて標準の和文間空白\Param{kanjiskip}に置き換えた
+\cs{insertkanjiskip}命令も準備されている．
+%</ja>
 
 \subsection{\cs{ltjdeclarealtfont}}
 \label{ssec:altfont}
@@ -10199,9 +10298,9 @@ $q$と$r$の間は（実フォントが同じなのに）\texttt{jfmvar} キー�
 結果として，2つの\textbf{JAchar}間には常に何らかのグルー／カーンが挿入されることとなる．
 \begin{enumerate}
 \item 両クラスタ（厳密には$\mathit{Nq}.\mathit{tail}$，$\mathit{Np}.\mathit{head}$）の中身の文字コードに対する
-\Param{autospacing}パラメタが両方ともfalseだった場合は，長さ0のglueとする．
-\item ユーザ側から見た\Param{kanjiskip}パラメタの自然長が$\cs{maxdimen}=(2^{30}-1)\,{\rm sp}$で
-なければ，\Param{kanjiskip}パラメタの値を持つglueを採用する．
+\Param{autospacing}パラメータが両方ともfalseだった場合は，長さ0のglueとする．
+\item ユーザ側から見た\Param{kanjiskip}パラメータの自然長が$\cs{maxdimen}=(2^{30}-1)\,\mbox{sp}$で
+なければ，\Param{kanjiskip}パラメータの値を持つglueを採用する．
 \item 2.でない場合は，\textit{Nq}, \textit{Np}で使われているJFMに指定されている\Param{kanjiskip}の値を用いる．
 どちらか片方のクラスタだけが\textbf{JAchar}（\textsf{和文A}・\textsf{和文B}）のときは，そちらのクラスタで使われている
 JFM由来の値だけを用いる．もし両者で使われているJFMが異なった場合は，上の[M]~3.と同様の方法を用いて調整する．
@@ -10338,7 +10437,7 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
     \item $\mathit{Np}.\mathit{id}$が\textit{id\_math}のとき（つまりクラスタ\textit{Np}が文中数式を表す）
     ときは，$x=-1$．
     \item \textit{Np}の中身の中身の文字コードについて，「直前への\Param{xkanjiskip}の挿入」が禁止されている
-（つまり，\Param{jaxspmode}~(or \Param{alxspmode})パラメタが偶数）ときは，
+（つまり，\Param{jaxspmode}~(or \Param{alxspmode})パラメータが偶数）ときは，
     $x=\text{\texttt{'nox\_alchar'}}$．
     \item 以上のいずれでもないときは，$x=\text{\texttt{'alchar'}}$．
   \end{itemize}
@@ -10350,14 +10449,14 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 \begin{enumerate}
 \item 以下のいずれかの場合は，\Param{xkanjiskip}の挿入は抑止される．しかし，実際には行分割を許容するために，長さ0のglueを採用する：
 \begin{itemize}
-\item 両クラスタにおいて，それらの中身の文字コードに対する\Param{autoxspacing}パラメタが共にfalseである．
+\item 両クラスタにおいて，それらの中身の文字コードに対する\Param{autoxspacing}パラメータが共にfalseである．
 \item \textit{Nq}の中身の文字コードについて，「直後への\Param{xkanjiskip}の挿入」が禁止されている
-（つまり，\Param{jaxspmode}~(or \Param{alxspmode})パラメタが2以上）．
+（つまり，\Param{jaxspmode}~(or \Param{alxspmode})パラメータが2以上）．
 \item \textit{Np}の中身の文字コードについて，「直前への\Param{xkanjiskip}の挿入」が禁止されている
-（つまり，\Param{jaxspmode}~(or \Param{alxspmode})パラメタが偶数）．
+（つまり，\Param{jaxspmode}~(or \Param{alxspmode})パラメータが偶数）．
 \end{itemize}
-\item ユーザ側から見た\Param{xkanjiskip}パラメタの自然長が$\cs{maxdimen}=(2^{30}-1)\,{\rm sp}$で
-なければ，\Param{xkanjiskip}パラメタの値を持つglueを採用する．
+\item ユーザ側から見た\Param{xkanjiskip}パラメータの自然長が$\cs{maxdimen}=(2^{30}-1)\,{\rm sp}$で
+なければ，\Param{xkanjiskip}パラメータの値を持つglueを採用する．
 \item 2.でない場合は，\textit{Nq}, \textit{Np}（\textsf{和文A}/\textsf{和文B}なのは片方だけ）
 で使われているJFMに指定されている\Param{xkanjiskip}の値を用いる．
 \end{enumerate}
@@ -10385,7 +10484,7 @@ $x$は\textit{Nq}から\textsf{欧文境界B~[\NB]}におけるそれと同じ�
 \texttt{'nox\_alchar'}か\texttt{'alchar'}は
 \begin{quote}
   \textit{Nq}の中身の文字コードについて，「直後への\Param{xkanjiskip}の挿入」が禁止されている
-（つまり，\Param{jaxspmode}~(or \Param{alxspmode})パラメタが2以上）．
+（つまり，\Param{jaxspmode}~(or \Param{alxspmode})パラメータが2以上）．
 \end{quote}
   か否かで判断する．
 \end{enumerate}

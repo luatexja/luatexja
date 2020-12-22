@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2020-12-20 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2020-12-22 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -278,8 +278,8 @@
 \protected\def\inhibitglue{\ifhmode\relax\luafunction\ltj@@ihb@inner\fi}
 \protected\def\ltjfakeparbegin{\ifhmode\relax\luafunction\ltj@@fakeparbegin@inner\fi}
 \protected\def\ltjfakeboxbdd{\ifhmode\relax\luafunction\ltj@@fakeboxbdd@inner\fi}
-\protected\def\insertxkanjiskip{\ifhmode\relax\luafunction\ltj@@ins@xk@inner\fi}
-\protected\def\insertkanjiskip{\ifhmode\relax\luafunction\ltj@@ins@k@inner\fi}
+\protected\luadef\insertxkanjiskip \ltj@@ins@xk@inner
+\protected\luadef\insertkanjiskip  \ltj@@ins@k@inner
 
 
 %%%%%%%% \ltjdefcharrange<name>{100-200,3000-,5000,...}
