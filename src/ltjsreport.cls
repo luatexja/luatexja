@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsreport}
-  [2020/05/30 ltjsclasses ]
+  [2020/12/23 ltjsclasses ]
 \def\jsc@clsname{ltjsreport}
 \def\Cjascale{0.924715}
 \RequirePackage{luatexja}
@@ -1092,11 +1092,11 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \renewcommand{\theenumiii}{\@roman\c@enumiii}
 \renewcommand{\theenumiv}{\@Alph\c@enumiv}
 \newcommand{\labelenumi}{\theenumi.}
-\newcommand{\labelenumii}{\inhibitglue（\theenumii）\inhibitglue}
+\newcommand{\labelenumii}{\inhibitglue （\theenumii）\inhibitglue}
 \newcommand{\labelenumiii}{\theenumiii.}
 \newcommand{\labelenumiv}{\theenumiv.}
 \renewcommand{\p@enumii}{\theenumi}
-\renewcommand{\p@enumiii}{\theenumi\inhibitglue（\theenumii）}
+\renewcommand{\p@enumiii}{\theenumi\inhibitglue （\theenumii）}
 \renewcommand{\p@enumiv}{\p@enumiii\theenumiii}
 \newcommand\labelitemi{\textbullet}
 \newcommand\labelitemii{\normalfont\bfseries \textendash}

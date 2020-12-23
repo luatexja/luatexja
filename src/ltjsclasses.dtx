@@ -6,13 +6,13 @@
 %  pLaTeX2ε新ドキュメントクラス（日本語 TeX 開発コミュニティ版）
 %  原作者：奥村晴彦 <okumura@okumuralab.org>
 %
-%  Copyright 1993-2016
+%  Copyright 1993-2020
 %  The LaTeX3 Project and any individual authors listed elsewhere
 %  in this file.
 %
 %  Copyright 1995-1999 ASCII Corporation.
 %  Copyright 1999-2016 Haruhiko Okumura
-%  Copyright 2016-2018 Japanese TeX Development Community
+%  Copyright 2016-2020 Japanese TeX Development Community
 %  -----------------------------------------
 %
 % \fi
@@ -44,7 +44,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2020/05/30 ltjsclasses ]
+  [2020/12/23 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass[disablejfam]{ltjsarticle}
@@ -3663,7 +3663,7 @@
 %
 %    \begin{macrocode}
 \newcommand{\labelenumi}{\theenumi.}
-\newcommand{\labelenumii}{\inhibitglue（\theenumii）\inhibitglue}
+\newcommand{\labelenumii}{\inhibitglue （\theenumii）\inhibitglue}
 \newcommand{\labelenumiii}{\theenumiii.}
 \newcommand{\labelenumiv}{\theenumiv.}
 %    \end{macrocode}
@@ -3682,7 +3682,7 @@
 %
 %    \begin{macrocode}
 \renewcommand{\p@enumii}{\theenumi}
-\renewcommand{\p@enumiii}{\theenumi\inhibitglue（\theenumii）}
+\renewcommand{\p@enumiii}{\theenumi\inhibitglue （\theenumii）}
 \renewcommand{\p@enumiv}{\p@enumiii\theenumiii}
 %    \end{macrocode}
 % \end{macro}
@@ -4082,7 +4082,7 @@
 %    数式番号の形式です。
 %    デフォルトの値をコメントアウトして示しておきます。
 %
-%    |\inhibitglue（\theequation）\inhibitglue| のように和文かっこ
+%    |\inhibitglue （\theequation）\inhibitglue| のように和文かっこ
 %    を使うことも可能です。
 %
 %    \begin{macrocode}
@@ -4093,7 +4093,7 @@
 %    |amsmath| パッケージを使う場合は |\tagform@| を次のように修正します。
 %
 %    \begin{macrocode}
-% \def\tagform@#1{\maketag@@@{（\ignorespaces#1\unskip\@@italiccorr）}}
+% \def\tagform@#1{\maketag@@@{（\ignorespaces#1\unskip\@@italiccorr ）}}
 %    \end{macrocode}
 %
 % \subsection{フロート}
@@ -4897,7 +4897,7 @@
 % とりあえずコメントアウトしておきますので，必要に応じて生かしてください。
 %
 %    \begin{macrocode}
-% \def\@biblabel#1{\inhibitglue［#1］\inhibitglue}
+% \def\@biblabel#1{\inhibitglue ［#1］\inhibitglue}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -4924,7 +4924,7 @@
 %        \@latex@warning
 %          {Citation `\@citeb' on page \thepage \space undefined}}%
 %        {\@cite@ofmt{\csname b@\@citeb\endcsname}}}}{#1}}
-% \def\@cite#1#2{\inhibitglue［{#1\if@tempswa ，#2\fi}］\inhibitglue}
+% \def\@cite#1#2{\inhibitglue ［{#1\if@tempswa ，#2\fi}］\inhibitglue}
 %    \end{macrocode}
 %
 % 引用番号を上ツキの 1）のようなスタイルにするには次のようにします。
