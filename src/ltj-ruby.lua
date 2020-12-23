@@ -52,6 +52,9 @@ local attr_ruby = luatexbase.attributes['ltj@rubyattr']
 -- * (whatsit).value node ではルビ全角の値（sp単位）
 -- * 行分割で whatsit の前後に並ぶノードでは，「何番目のルビ関連ノード」か
 -- * (whatsit).value に続く整形済み vbox たちでは post_intrusion の値
+local attr_ruby_post_jfmgk = luatexbase.attributes['ltj@kcat3']
+-- JAglue 処理時に，2つ前のクラスタもルビであれば，そのルビが直後の和文処理グルーへ
+-- 正の進入をしたか否か（した：1，しなかった：0）
 local cat_lp = luatexbase.catcodetables['latex-package']
 
 local round, floor = tex.round, math.floor
@@ -341,16 +344,24 @@ local function enlarge_parent(r, p, tmp_tbl, no_begin, no_end)
    setfield(p, 'width', rwidth)
    local ps = getlist(p)
    setfield(ps, 'width', getfield(ps, 'width') - pre_intrusion)
-   local orig_post_intrusion = post_intrusion
-   if no_end   then orig_post_intrusion = max(orig_post_intrusion - tmp_tbl.after_jfmgk, 0) end
-   return r, p, orig_post_intrusion
+   local orig_post_intrusion, post_jfmgk = post_intrusion, false
+   if no_end then
+       if orig_post_intrusion > tmp_tbl.after_jfmgk then
+           orig_post_intrusion = orig_post_intrusion - tmp_tbl.after_jfmgk
+           post_jfmgk = (tmp_tbl.after_jfmgk > 0)
+       else
+           orig_post_intrusion = 0
+           post_jfmgk = (post_intrusion > 0)
+       end
+    end
+   return r, p, orig_post_intrusion, post_jfmgk
 end
 
 -- ルビボックスの生成（単一グループ）
 -- returned value: <new box>, <ruby width>, <post_intrusion>
 local max_margin
 local function new_ruby_box(r, p, tmp_tbl, no_begin, no_end)
-   local post_intrusion = 0
+   local post_intrusion, post_jfmgk = 0, false
    local imode
    local ppre, pmid, ppost = tmp_tbl.ppre, tmp_tbl.pmid, tmp_tbl.ppost
    local mapre, mapost = tmp_tbl.mapre, tmp_tbl.mapost
@@ -360,7 +371,7 @@ local function new_ruby_box(r, p, tmp_tbl, no_begin, no_end)
    imode = (imode-rpost)/8;  rmid  = imode%8;
    imode = (imode-rmid)/8;   rpre  = imode%8
    if getfield(r, 'width') > getfield(p, 'width') then  -- change the width of p
-      r, p, post_intrusion  = enlarge_parent(r, p, tmp_tbl, no_begin, no_end)
+      r, p, post_intrusion, post_jfmgk = enlarge_parent(r, p, tmp_tbl, no_begin, no_end)
    elseif getfield(r, 'width') < getfield(p, 'width') then -- change the width of r
       r = enlarge(r, getfield(p, 'width'), rpre, rmid, rpost, 0, 0)
       post_intrusion = 0
@@ -390,6 +401,7 @@ local function new_ruby_box(r, p, tmp_tbl, no_begin, no_end)
    if tmp_tbl.baseheight >= 0 then setfield(p, 'height', tmp_tbl.baseheight) end
    a = node.direct.vpack(r); setfield(a, 'shift', 0)
    set_attr(a, attr_ruby, post_intrusion)
+   set_attr(a, attr_ruby_post_jfmgk, post_jfmgk and 1 or 0)
    if rsmash or getfield(a, 'height')<getfield(p, 'height') then
       local k = node_new(id_kern, 1)
       setfield(k, 'kern', -getfield(a, 'height')+getfield(p, 'height'))
@@ -397,12 +409,12 @@ local function new_ruby_box(r, p, tmp_tbl, no_begin, no_end)
       setfield(a, 'height', getfield(p, 'height'))
    end
 
-   return a, getfield(r, 'width'), post_intrusion
+   return a, getfield(r, 'width'), post_intrusion, post_jfmgk
 end
 
 
 -- High-level routine in pre_linebreak_filter
-local post_intrusion_backup
+local post_intrusion_backup, post_jfmgk_backup
 local max_allow_pre, max_allow_post
 
 
@@ -425,7 +437,7 @@ local function pre_low_cal_box(w, cmp)
    local nt, nta, ntb = wv, nil, nil -- nt*: node temp
    rst.ppre, rst.pmid, rst.ppost = rtb[6], rtb[5], rtb[4]
    rst.mapre, rst.mapost = max_allow_pre, 0
-   for i = 1, cmp do
+  for i = 1, cmp do
       nt = node_next(nt); rb[i] = nt; nta = concat(nta, node_copy(nt))
       nt = node_next(nt); pb[i] = nt; ntb = concat(ntb, node_copy(nt))
       coef[i] = {}
@@ -455,7 +467,7 @@ local function pre_low_cal_box(w, cmp)
    for j = 1, 2*cmp+1 do coef[2*cmp+1][j] = 1 end
    rst.ppre, rst.pmid, rst.ppost = rtb[3], rtb[2], rtb[1]
    rst.mapre, rst.mapost = max_allow_pre, max_allow_post
-   kf[2*cmp+1], coef[2*cmp+1][2*cmp+2], post_intrusion_backup
+   kf[2*cmp+1], coef[2*cmp+1][2*cmp+2], post_intrusion_backup, post_jfmgk_backup
       = new_ruby_box(nta, ntb, rst, true, true)
 
    -- w.value の node list 更新．
@@ -517,7 +529,7 @@ end
 local function pre_high(ahead)
    if not ahead then return ahead end
    local head = to_direct(ahead)
-   post_intrusion_backup = 0
+   post_intrusion_backup, post_jfmgk_backup = 0, false
    local n = first_whatsit(head)
    while n do
       if getsubtype(n) == sid_user and getfield(n, 'user_id') == RUBY_PRE then
@@ -526,17 +538,22 @@ local function pre_high(ahead)
          max_allow_pre = rst.pre or 0
          local atr = has_attr(n, attr_ruby) or 0
          if max_allow_pre < 0 then
-            if atr>0 then
-               -- 直前のルビで intrusion がおこる可能性あり．
-               -- 前 run のデータが残っていればそれを使用，
-               -- そうでなければ行中形のデータを利用する
-               local op = old_break_info[atr] or post_intrusion_backup
-               max_allow_pre = max(0, -max_allow_pre - op)
-            else
-               max_allow_pre = -max_allow_pre
-            end
+             -- 直前のルビで intrusion がおこる可能性あり．
+             -- 前 run のデータが残っていればそれを使用，
+             -- そうでなければ行中形のデータを利用する
+             local op = (atr>0) and (old_break_info[atr] or post_intrusion_backup) or 0
+             max_allow_pre = max(0, -max_allow_pre - op)
          end
-         post_intrusion_backup = 0
+         if rst.exclude_pre_from_prev_ruby  and ((atr>0) and (old_break_info[-atr]>0) or post_jfmgk_backup) then
+            -- 「直前のルビが JFM グルーに進入→現在のルビの前文字進入はなし」という状況
+            max_allow_pre = 0; rst.exclude_pre_from_prev_ruby=false
+         end
+         if rst.exclude_pre_jfmgk_from_prev_ruby
+            and (atr>0) and ((old_break_info[atr]  or post_intrusion_backup) > 0) then
+            -- 「直前のルビが文字に進入→現在のルビの和文処理グルーへの進入はなし」という状況
+            rst.before_jfmgk = 0
+         end
+         post_intrusion_backup, post_jfmgk_backup = 0, false
          max_allow_post = rst.post or 0
          max_margin = rst.maxmargin or 0
          local coef = pre_low_cal_box(n, rst.count)
@@ -558,11 +575,11 @@ luatexbase.add_to_callback('hpack_filter', pre_high, 'ltj.ruby.pre', 100)
 ----------------------------------------------------------------
 local post_lown
 do
-   local function write_aux(wv, num)
+   local function write_aux(wv, num, bool)
       local id = has_attr(wv, attr_ruby_id)
       if id>0 and cache_handle then
          cache_handle:write(
-            'lrob[' .. tostring(id) .. ']=' .. num .. '\n')
+            'lrob[' .. tostring(id) .. ']=' .. num .. '\nlrob[' .. tostring(-id) .. ']=' .. tostring(bool) .. '\n')
       end
    end
 
@@ -578,7 +595,7 @@ do
             node_remove(wv, hn)
             insert_after(ch, rs[1], hn)
             set_attr(hn, attr_icflag,  PROCESSED)
-            write_aux(wv, has_attr(hn, attr_ruby))-- 行中形
+            write_aux(wv, has_attr(hn, attr_ruby), has_attr(hn, attr_ruby_post_jfmgk))-- 行中形
          else
             local deg, hn = (fn-1)/2, wv
             for i = 1, deg do hn = node_next(hn) end;
@@ -586,7 +603,7 @@ do
             setfield(hn, 'next', nil)
             insert_after(ch, rs[1], hn)
             set_attr(hn, attr_icflag,  PROCESSED)
-            write_aux(wv, has_attr(hn, attr_ruby))
+            write_aux(wv, has_attr(hn, attr_ruby), has_attr(hn, attr_ruby_post_jfmgk))
          end
       else
          local deg, hn = max((hn-1)/2,2), wv
@@ -597,7 +614,7 @@ do
          insert_after(ch, rs[1], hn)
          set_attr(hn, attr_icflag,  PROCESSED)
          if fn == 2*cmp-1 then
-            write_aux(wv, has_attr(hn, attr_ruby))
+            write_aux(wv, has_attr(hn, attr_ruby), has_attr(hn, attr_ruby_post_jfmgk))
          end
       end
       for i = 1,#rs do
@@ -682,6 +699,8 @@ luatexbase.add_to_callback('hpack_filter', post_high_hbox, 'ltj.ruby.post_hbox',
 ----------------------------------------------------------------
 do
    local RIPRE  = luatexja.stack_table_index.RIPRE
+   local RIPOST = luatexja.stack_table_index.RIPOST
+   local abs = math.abs 
    local function whatsit_callback(Np, lp, Nq)
       if Np.nuc then return Np
       elseif  getfield(lp, 'user_id') == RUBY_PRE then
@@ -694,25 +713,27 @@ do
             if type(Nq.char)=='number' then
                -- Nq is a JAchar
                if rst.pre < 0 then -- auto
-                  local p = round((ltjs.table_current_stack[RIPRE + Nq.char] or 0)
-                                     *rst.rubyzw)
+                  local s = ltjs.table_current_stack[RIPRE + Nq.char] or 0
+                  local p = round(abs(s)*rst.rubyzw)
                   if rst.mode%2 == 0 then -- intrusion 無効
                      p = 0
                   end
-                  rst.pre = -p
+                  rst.pre = -p; rst.exclude_pre_from_prev_ruby = (s<0);
+                   rst.exclude_pre_jfmgk_from_prev_ruby = (ltjs.table_current_stack[RIPOST +Nq.char] or 0)<0;
                end
                if Nq.prev_ruby then
                   set_attr(lp, attr_ruby, Nq.prev_ruby)
                end
             elseif rst.pre < 0 then -- auto
                if Nq.char == 'parbdd' then
-                  local p = round((ltjs.table_current_stack[RIPRE-1] or 0)
-                                     *rst.rubyzw)
+                  local s = ltjs.table_current_stack[RIPRE - 1] or 0
+                  local p = round(abs(s)*rst.rubyzw)
                   p = min(p, Nq.width)
-                 if rst.mode%2 == 0 then -- intrusion 無効
+                  if rst.mode%2 == 0 then -- intrusion 無効
                      p = 0
                   end
-                  rst.pre = p
+                  rst.pre = p; rst.exclude_pre_from_prev_ruby = (s<0);
+                  rst.exclude_pre_jfmgk_from_prev_ruby = (ltjs.table_current_stack[RIPOST -1] or 0)<0;
                else
                   rst.pre = 0
                end
@@ -741,6 +762,7 @@ do
       end
    end
    local RIPOST = luatexja.stack_table_index.RIPOST
+   local abs = math.abs
    local function whatsit_after_callback(s, Nq, Np)
       if not s and  getfield(Nq.nuc, 'user_id') == RUBY_PRE then
          if Np then
@@ -764,8 +786,7 @@ do
          if Np and Np.id ~=id_pbox_w and type(Np.char)=='number' then
             -- Np is a JAchar
             if rst.post < 0 then -- auto
-               local p = round((ltjs.table_current_stack[RIPOST + Np.char] or 0)
-                                  *rst.rubyzw)
+               local p = round(abs(ltjs.table_current_stack[RIPOST + Np.char] or 0)*rst.rubyzw)
                if rst.mode%2 == 0 then -- intrusion 無効
                   p = 0
                end

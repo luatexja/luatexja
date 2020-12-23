@@ -52,6 +52,7 @@
 \def\mybox#1{\unskip\ {\Large \fboxrule=0.1mm\fboxsep=0mm\fcolorbox{cyan}{white}{\hbox{\<\ltjjachar#1\<}}}\ }
 
 \begin{document}
+
 \catcode`\<=13
 \def<#1>{{\rmfamily\mdseries\itshape$\langle$#1\/$\rangle$}}
 %\fontsize{13.19873}{15}\selectfont%
@@ -251,14 +252,20 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
   intrude_jfmgk, intrude_kanjiskip, intrude_xkanjiskip
 \end{verbatim}
 
-\paragraph{\texttt{\textbackslash ltjsetparamater} に追加されるキー}
+\paragraph{\cs{ltjsetparamater} に追加されるキー}
 \begin{description}
 \item[\Param{rubypreintrusion}\ttfamily =\{<chr\_code>, <pre\_int>\}]
   文字<chr\_code> に，その\textbf{直後}のルビによって掛けられるルビ文字列の最大長
   （つまり，\underline{前文字進入許容量}）をルビ全角単位で指定．
+
+  もし$-a$~($a>0$)を指定した場合は，実際の\underline{前文字進入許容量}は$a$となるが，
+  文字<chr\_code>の前のJFMグルーに進入が発生した場合には，\underline{前文字進入許容量}が0でなかった場合は，の後のJFMグルーにはルビの進入は発生しない．
 \item[\Param{rubypostintrusion}\ttfamily =\{<chr\_code>, <post\_int>\}]
   文字<chr\_code> に，その\textbf{直前}のルビによって掛けられるルビ文字列の最大長
   （つまり，\underline{後文字進入許容量}）をルビ全角単位で指定．
+
+  もし$-a$~($a>0$)を指定した場合は，実際の\underline{後文字進入許容量}は$a$となるが，
+  実際の\underline{後文字進入量}が0でなかった場合は，文字<chr\_code>の後のJFMグルーにはルビの進入は発生しない．
 \end{description}
 以下の文字は\Param{rubypreintrusion},~\Param{rubypostintrusion}とも初期値は1である：
 \begin{quote}
@@ -271,15 +278,15 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \begin{quote}
  中点類\@for\@tmp:=`\・,`\：,`\； \do{\mybox{\@tmp}}
 \end{quote}
-また，以下の文字は\Param{rubypreintrusion}のみ初期値は1である：
+また，以下の文字は\Param{rubypreintrusion}のみ初期値は$-1$である：
 \begin{quote}
   始め括弧類
   \@for\@tmp:=`\‘,`\“,`\〈,`\《,`\「,`\『,`\【,`\〔,`\〖,`\〘,`\〝,`\（,`\［,`\｛,`\｟ \do{\mybox{\@tmp}}\unskip，
   「文字コード$-1$の文字
-  \footnote{段落開始の\ \texttt{\textbackslash parindent}分インデントを表す．
+  \footnote{段落開始の\ \cs{parindent}分インデントを表す．
     通常の\LuaTeX-jaにおける指定では「文字コード$-1$」は文中数式境界を表していることに注意．}」
 \end{quote}
-さらに，以下の文字は\Param{rubypostintrusion}のみ初期値は1である：
+さらに，以下の文字は\Param{rubypostintrusion}のみ初期値は$-1$である：
 \begin{quote}
   閉じ括弧類
   \@for\@tmp:=`\’,`\”,`\〉,`\》,`\」,`\』,`\】,`\〕,`\〗,`\〙,`\〟,`\）,`\］,`\｝,`\｠ \do{\mybox{\@tmp}}\unskip，
@@ -289,7 +296,8 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 
 以上で記述されていない\Param{rubypreintrusion},~\Param{rubypostintrusion}の初期値はすべて0である．
 
-\paragraph{\texttt{\textbackslash ltjkenten}}
+
+\paragraph{\cs{ltjkenten}}
 圏点を出力する命令で，\verb+\kenten+ という別名を定義している．
 \begin{quote}
  \ttfamily\cs{ltjkenten}[<option>]\{親文字\}
@@ -366,8 +374,8 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 
 
 \section{\ruby{注|意|点}{ちゆう|い|てん}}
-\paragraph{前後からのルビ文字のはみ出し}
-「日本語組版処理の要件」の図3.82のように，
+\paragraph{前後からのルビ文字のはみ出し1}
+「日本語組版処理の要件」の図117\footnote{2020-08-11版での番号．2012-04-03版では図3.82．}のように，
 前後からのルビ文字のはみ出しが繋がらないようにする処理が組み込まれている．
 
 例えば，
@@ -378,8 +386,8 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 において，1行目右側の「\ltjruby{陵}{みささぎ}」のルビが前の「と」にかかる量は次のように決まる：
 \begin{enumerate}
 \item 1回目の実行では，行分割前に「\ltjruby{陵}{りよう}」の\underline{後文字進入量}は前もって知ることはでき
-      ない．なので，「\ltjruby{陵}{りよう}」は行中形で組まれるものとして
-「\ltjruby{陵}{みささぎ}」前文字進入許容量は
+      ない．そのため，「\ltjruby{陵}{りよう}」は行中形で組まれるものと想定し，
+「\ltjruby{陵}{みささぎ}」の前文字進入許容量は
 \[
  \underbrace{0.5\,\mathrm{zw}}_{\text{元々の許容量}}
 -\underbrace{0.25\,\mathrm{zw}}_{\text{前のルビの\underline{後文字進入量}（行中形）}}=0.25\,\mathrm{zw}
@@ -393,12 +401,25 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 -\underbrace{0.25\,\mathrm{zw}}_{\text{前のルビの\underline{後文字進入量}(from \texttt{.ltjruby})}}=0.25\,\mathrm{zw}.
 \]
 \end{enumerate}
+
 <jobname>\texttt{.ltjruby}ファイルに保存する際，各 \verb+\ltjruby+ 命令の呼び出しを識別するキーが必要になるが，
 そのキーとしては単純に「何個目の \verb+\ltjruby+ 命令か」である．
 
 なお，以上の処理は，1行目と2行目を比較すれば分かるように，
 「\ltjruby{陵}{みささぎ}」の\emph{\underline{前文字進入許容量}指定(\texttt{pre})が自動}になっている場合のみ
 実施される．
+
+
+\paragraph{前後からのルビ文字のはみ出し2}
+また，本パッケージのv0.**以降では，「日本語組版処理の要件」にある
+\begin{quote}
+  後ろにくる終わり括弧類，句点類若しくは読点類，又は前にくる始め括弧類には，
+  最大でルビ文字サイズの全角までルビ文字を掛けてもよい．
+  この場合，後ろにくる終わり括弧類，句点類若しくは読点類の後ろの空き量，
+  又は前にくる始め括弧類の前の空き量に掛けてはならない．
+\end{quote}
+という処理も組み込まれており，<jobname>\texttt{.ltjruby}に「前後の和文処理グルーに正の量だけ進入したか」という情報を
+保存することによって実装されている．
 
 \paragraph{段落末尾のルビ}
 段落がルビで終わった場合，そのルビが行末形で組まれることはない．

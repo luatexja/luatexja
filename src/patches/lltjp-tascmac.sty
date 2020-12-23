@@ -44,6 +44,8 @@
 
 %% screen environment
 \def\screen{%
+  \typeout{AL: \the\ltj@yablshift:\the\ltj@tablshift.}
+  \typeout{JA: \the\ltj@ykblshift:\the\ltj@tkblshift.}
   \@saveybaselineshift\ltj@yablshift sp\ltj@yablshift\z@
   \@savetbaselineshift\ltj@tablshift sp\ltj@tablshift\z@
   \@ifnextchar[{\@screen}{\@screen[0]}}

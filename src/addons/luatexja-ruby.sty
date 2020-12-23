@@ -18,9 +18,9 @@
 %% 引数：ルビ全角を単位とした実数
 %% この文字への pre-, post-intrusion の許容量
 \define@key[ltj]{japaram}{rubypreintrusion}{%
-  \ltj@@set@stack@real{RIPRE}{0}{0x7FFFFFFF}#1 }
+  \ltj@@set@stack@real{RIPRE}{-0x7FFFFFFF}{0x7FFFFFFF}#1 }
 \define@key[ltj]{japaram}{rubypostintrusion}{%
-  \ltj@@set@stack@real{RIPOST}{0}{0x7FFFFFFF}#1 }
+  \ltj@@set@stack@real{RIPOST}{-0x7FFFFFFF}{0x7FFFFFFF}#1 }
 \def\ltj@@set@stack@real#1#2#3{%
   \directlua{luatexja.stack.set_stack_perchar(luatexja.stack_table_index.#1,
     #2, #3, token.scan_word)}}
@@ -226,15 +226,15 @@
   \advance\count@1\repeat
 %% 開き括弧・閉じ括弧
 \@for\@tmp:=`\‘,`\“,`\〈,`\《,`\「,`\『,`\【,`\〔,`\〖,`\〘,`\〝,`\（,`\［,`\｛,`\｟ \do
-  {\ltjsetparameter{rubypreintrusion={\@tmp,1}}}
+  {\ltjsetparameter{rubypreintrusion={\@tmp,-1}}}
 \@for\@tmp:=`\’,`\”,`\〉,`\》,`\」,`\』,`\】,`\〕,`\〗,`\〙,`\〟,`\）,`\］,`\｝,`\｠ \do
-  {\ltjsetparameter{rubypostintrusion={\@tmp,1}}}
+  {\ltjsetparameter{rubypostintrusion={\@tmp,-1}}}
 %% 中点類
 \@for\@tmp:=`\・,`\：,`\；,`\―,`\‥,`\…,`〳,`\〴,`\〵,"2014 \do
   {\ltjsetparameter{rubypreintrusion={\@tmp,0.5},rubypostintrusion={\@tmp,0.5}}}
 %% 読点・句点
 \@for\@tmp:=`\、,`\，,`\。,`\． \do
-  {\ltjsetparameter{rubypostintrusion={\@tmp,1}}}
+  {\ltjsetparameter{rubypostintrusion={\@tmp,-1}}}
 %% 段落インデント部分
 \ltjsetparameter{rubypreintrusion={-1,1}}
 

@@ -356,6 +356,15 @@ for i,v in pairs(t) do
     if v.kern and v.kern[0] then v.kern[100] = v.kern[0] end
   end
 end
+t[200]=table.fastcopy(t[0])
+t[200].chars={ 0x3031,0x3032 }
+t[200].height=1.38; t[200].depth=0.62
+for i,v in pairs(t) do
+  if type(i)=='number' and type(v)=='table' then
+    if v.glue and v.glue[0] then v.glue[200] = v.glue[0] end
+    if v.kern and v.kern[0] then v.kern[200] = v.kern[0] end
+  end
+end
 
 local jf = luatexja.jfont.jfm_feature
 if jf and jf.beginpar_middledot_zw==true then
