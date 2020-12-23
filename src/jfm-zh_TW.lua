@@ -48,7 +48,8 @@ luatexja.jfont.define_jfm {
             [22] = is_vt and {} or aki(0.25),
             [3] = aki(0.25, -1),
             [4] = aki(0.25, 1, true)
-        }
+        },
+        round_threshold = 0.01
     },
     [1] = {
         -- 开括号

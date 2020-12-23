@@ -3675,30 +3675,32 @@ JFMもサイズも同じなので，普通に「）\nobreak【」と入力した
 (\verb+min10.tfm+)に相当し，行末で文字が揃うようにするために「っ」など一部の文字幅が変わっ
 	   ている．\verb+min10.tfm+ については\cite{min10}が詳しい．
 %</ja>
+%<*en>
+\item[\texttt{jfm-prop.lua}] A JFM for proportional typesetting.
+  This JFM doesn't have any information of character dimension (width, height, depth), nor glues/kerns information.
+%</en>
+%<*ja>
+\item[\texttt{jfm-prop.lua}] プロポーショナル組用のJFM．
+  文字幅・高さ・深さの情報も自動挿入されるグルー・カーンの情報は持たない（つまりグリフの文字幅をそのまま採用する）．
+%</ja>
+%<*en>
+\item[\texttt{jfm-propw.lua}] Another JFM for proportional typesetting.
+  In contrast to \texttt{jfm-prop.lua}, this JFM has informations of character height and depth.
+%</en>
+%<*ja>
+\item[\texttt{jfm-propw.lua}] プロポーショナル組用のさらなるJFM．
+  \texttt{jfm-prop.lua}と異なり，高さ・深さの情報は持っている．
+%</ja>
 \end{description}
 %<*en>
-The difference among these three~JFMs is  shown in \autoref{tab-difjfm}.
+See \autoref{tab-difjfm} for the difference among \texttt{jfm-ujis.lua}, \texttt{jfm-jis.lua},
+\texttt{jfm-min.lua}.
 %</en>
 %<*ja>
-これら3つのJFMの違いは\autoref{tab-difjfm}に示した．表中の文例の一部には，
+\texttt{jfm-ujis.lua}, \texttt{jfm-jis.lua},
+\texttt{jfm-min.lua}の違いは\autoref{tab-difjfm}に示した．表中の文例の一部には，
 \cite{min10}の図3,~4のものを用いた．
 %</ja>
-
-%<*ja>
-また，プロポーショナル組用に\texttt{jfm-prop.lua}と\texttt{jfm-propw.lua}も用意されている．
-どちらのJFMも文字幅の情報と自動挿入されるグルー・カーンの情報は持たない（つまりグリフの文字幅をそのまま採用する）．
-\texttt{jfm-prop.lua}と\texttt{jfm-propw.lua}の差は，前者が
-文字の高さ・深さ情報も持たないのに対し，後者は持っている点である
-\footnote{プロポーショナル組の状況でルビをつけたい，などという状況では\texttt{jfm-propw.lua}が有用かもしれない．}．
-%</ja>
-%<*en>
-Furthermore, \LuaTeX-ja also ship two JFMs, namely \texttt{jfm-prop.lua}~and~\texttt{jfm-propw.lua},
-  for ``proportional typesetting''.
-Both JFMs don't have any character width information, nor glues/kerns information.
-\texttt{jfm-prop.lua} also also not have character height and depth information, while \texttt{jfm-propw.lua} has them.
-%</en>
-
-
 
 \begin{figure}
 \begin{LTXexample}[pos=t]
@@ -4073,7 +4075,7 @@ makes that IPA~Mincho and IPA~Gothic will be used as default Japanese fonts, ins
 Harano Aji fonts.
 %IPAex~Mincho and IPAex~Gothic.
 
-This feature is intended for classes which use special JFMs
+This feature is intended for classes which use special JFMs%
 \footnote{This is because commands has \texttt{@} in their names.}.
 It is recommended to use \cs{luatexja-preset}~or~\cs{luatexja-fontspec} package
 to select standard fonts in ordinary \LaTeX\ sources.
@@ -6161,7 +6163,7 @@ With the help of this example, we remark the specification of \cs{inhibitglue}:
 In other words, \cs{disinhibitglue} allows the insertion of a glue/kern specified by JFM.
 If \cs{inhibitglue}~and~\cs{disinhibitglue} both specified at the same time,
 the latest one is effective.
-This commans is added in the version 2020****.0.
+This commans is added in the version 20201224.0.
 
 Note that \cs{disinhibitglue} also cancels ligatures and kernings.
 %</en>
@@ -6169,7 +6171,7 @@ Note that \cs{disinhibitglue} also cancels ligatures and kernings.
 \cs{disinhibitglue}は\cs{inhibitglue}の効果を無効化する．
 言い換えれば，（\cs{inhibitglue}で抑制されたはずの））JFM由来グルー／カーンの挿入を許可する．
 同じ箇所に\cs{inhibitglue}と\cs{disinhibitglue}が両方ある場合は，後ろの指定が有効になる．
-この命令はバージョン2020****.0で追加された．
+この命令はバージョン20201224.0で追加された．
 
 なお，\cs{disinhibitglue}もリガチャやカーニングを打ち消すことに注意されたい．これは
 （\cs{inhibitglue}と同様に）whatsitノードを使って実装されていることによる．
@@ -6237,9 +6239,9 @@ As an example, the example above can be improved as follows:
 \subsection{\cs{insertxkanjiskip}, \cs{insertkanjiskip}}
 %<*en>
 There are some situations which one wants to insert \Param{xkanjiskip} manually.
-A simple approach is to use \cs{hskip}\cs{ltjgetparamter\{xkanjiskip\}}, but this approach has
+A simple approach is to use \cs{hskip}\cs{ltjgetparameter\{xkanjiskip\}}, but this approach has
 several weak points. To cope with these weak points, \LuaTeX-ja defines a command \cs{insertxkanjiskip} which
-inserts \Param{xkanjiskip} glue manually, from the version 2020****.0.
+inserts \Param{xkanjiskip} glue manually, from the version 20201224.0.
 \begin{itemize}
   \item ``\cs{insertxkanjiskip}'' (without any keyword) uses the value of \Param{xkanjiskip} at the place.
   \item ``\cs{insertxkanjiskip late}'' (with ``\texttt{late}''~keyword) uses the value of \Param{xkanjiskip}
@@ -6250,21 +6252,21 @@ See the example below.
 %<*ja>
 \TeX で日本語の文章を作成していると，
 しばしば「手動で和欧文間空白\Param{xkanjiskip}を挿入したい」という状況に遭遇する．
-このような場合，\cs{hskip}\cs{ltjgetparamter\{xkanjiskip\}}\+とするのがよくある対応であったが，これらには
+このような場合，\cs{hskip}\cs{ltjgetparameter\{xkanjiskip\}}\+とするのがよくある対応であったが，これらには
 次のような難点がある：
 \begin{itemize}
   \item \cs{xkanjiskip}は「段落やhboxでの終端での値がその段落／hbox全体で用いられる」となっているため，
-  \cs{hskip}\cs{ltjgetparamter\{xkanjiskip\}}\+以降に\Param{xkanjiskip}の値が変わる場合に対応できない．
+  \cs{hskip}\cs{ltjgetparameter\{xkanjiskip\}}\+以降に\Param{xkanjiskip}の値が変わる場合に対応できない．
   \item \LuaTeX-jaでは，\cs{xkanjiskip}の自然長が$\cs{maxdimen}=(2^{30}-1)\,\mbox{sp}$であった場合，
   JFMで指定された値を実際に利用することになっているが，それに対応できていない．
   \item \Pkg{luatexja-adjust}（\ref{ssec:adj}節）による優先度行長調整では，
-  \cs{hskip}\cs{ltjgetparamter\{xkanjiskip\}}\+は手動で挿入したグルーであるから，
+  \cs{hskip}\cs{ltjgetparameter\{xkanjiskip\}}\+は手動で挿入したグルーであるから，
   自動で挿入された\Param{xkanjiskip}とは
   伸縮の優先順序が異なってしまう．
 \end{itemize}
 
 これらの難点に対処した，\Param{xkanjiskip}をグルーとして手動挿入する命令が\cs{insertxkanjiskip}である．
-これはバージョン2020****.0で追加された．
+これはバージョン20201224.0で追加された．
 以下の実行例に示すように，
 \begin{itemize}
   \item 単独で\cs{insertxkanjiskip}とした場合は，その時点での\Param{xkanjiskip}の値を使用する

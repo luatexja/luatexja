@@ -52,7 +52,8 @@ luatexja.jfont.define_jfm {
         glue = {
             [1] = aki(0.5, -1),
             [3] = aki(0.25, -1)
-        }
+        },
+        round_threshold = 0.01
     },
     [1] = {
         -- 开括号
