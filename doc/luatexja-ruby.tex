@@ -248,7 +248,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
   stretchruby={1}{2}{1}, stretch = {1}{2}{1},
   stretchbol={0}{1}{1}, stretcheol={1}{1}{0},
   maxmargin=0.5, size=0.5, intergap=0, rubysmash=false,
-  kenten=\ltjalchar`•, fontcmd=\relax, ybaseheight=0.88, tbaseheight=0.5,
+  kenten=\textbullet, fontcmd=\relax, ybaseheight=0.88, tbaseheight=0.5,
   intrude_jfmgk, intrude_kanjiskip, intrude_xkanjiskip
 \end{verbatim}
 
@@ -258,13 +258,14 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
   文字<chr\_code> に，その\textbf{直後}のルビによって掛けられるルビ文字列の最大長
   （つまり，\underline{前文字進入許容量}）をルビ全角単位で指定．
 
-  もし$-a$~($a>0$)を指定した場合は，実際の\underline{前文字進入許容量}は$a$となるが，
+  \textbf{v0.5以降での変更点}：もし$-a$~($a>0$)を指定した場合は，実際の\underline{前文字進入許容量}は$a$となるが，
   文字<chr\_code>の前のJFMグルーに進入が発生した場合には，\underline{前文字進入許容量}が0でなかった場合は，の後のJFMグルーにはルビの進入は発生しない．
+
 \item[\Param{rubypostintrusion}\ttfamily =\{<chr\_code>, <post\_int>\}]
   文字<chr\_code> に，その\textbf{直前}のルビによって掛けられるルビ文字列の最大長
   （つまり，\underline{後文字進入許容量}）をルビ全角単位で指定．
 
-  もし$-a$~($a>0$)を指定した場合は，実際の\underline{後文字進入許容量}は$a$となるが，
+  \textbf{v0.5以降での変更点}：もし$-a$~($a>0$)を指定した場合は，実際の\underline{後文字進入許容量}は$a$となるが，
   実際の\underline{後文字進入量}が0でなかった場合は，文字<chr\_code>の後のJFMグルーにはルビの進入は発生しない．
 \end{description}
 以下の文字は\Param{rubypreintrusion},~\Param{rubypostintrusion}とも初期値は1である：

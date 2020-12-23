@@ -7,7 +7,7 @@
 % \dimen...=\ybaselineshift ==> \dimen...=\ltj@yablshift sp
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-tascmac}[2017/12/23 Patch to (t)ascmac for LuaTeX-ja]
+\ProvidesPackage{lltjp-tascmac}[2020/12/24 Patch to (t)ascmac for LuaTeX-ja]
 
 \RequirePackage{tascmac}
 
@@ -37,15 +37,13 @@
   \@whiledim \wd\@nbox<\hsize \do{
   \setbox\@nbox=\hbox{\@ascgrp\unhbox\@nbox \hss a\hss b}}
   \setbox\@nbox=\hbox to\hsize{\@ascgrp\unhbox\@nbox \hss a\hss b%
-  \vrule width1.08pt depth35pt}
+  \vrule width1.08pt depth35pt}%
   \@bw=\wd\@nbox\advance\@bw -40pt
   \begin{lrbox}{\@nbody}\begin{minipage}{\@bw}% (KN:1998/02/27)
     \ltj@yablshift\@saveybaselineshift \ltj@tablshift\@savetbaselineshift}%
 
 %% screen environment
 \def\screen{%
-  \typeout{AL: \the\ltj@yablshift:\the\ltj@tablshift.}
-  \typeout{JA: \the\ltj@ykblshift:\the\ltj@tkblshift.}
   \@saveybaselineshift\ltj@yablshift sp\ltj@yablshift\z@
   \@savetbaselineshift\ltj@tablshift sp\ltj@tablshift\z@
   \@ifnextchar[{\@screen}{\@screen[0]}}
