@@ -278,9 +278,9 @@ function luatexja.ruby.texiface(rst, rtlr, rtlp)
                          'the body (' .. #rtlr .. ' != ' .. #rtlp .. ').',
                          '')
    else
-      local f = true
+      local f, eps = true, rst.eps
       for i = 1,#rtlr do
-         if getfield(rtlr[i], 'width') > getfield(rtlp[i], 'width') then
+         if getfield(rtlr[i], 'width') > getfield(rtlp[i], 'width') + eps then
             f = false; break
          end
       end

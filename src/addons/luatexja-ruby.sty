@@ -4,7 +4,7 @@
 
 % LaTeX only!
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-ruby}[2020-12-24 v0.5]
+\ProvidesPackage{luatexja-ruby}[2020-12-25 v0.51]
 \RequirePackage{luatexja}
 
 %%------------------
@@ -63,6 +63,10 @@
 %% attr は sp 単位だが，ユーザーは親文字全角単位で指定
 \ltj@@rkeydef{intergap}
 
+%% epsilon: モノルビ * n にする際に，ルビの方がどれだけ親文字より長い
+%% 状況を許容するか．親文字全角単位．計算誤差を想定．
+\ltj@@rkeydef{epsilon}
+
 \ltj@@rkeydef{kenten}%% 圏点文字
 \ltj@@rkeydef{fontcmd}%% フォント
 \define@boolkey[ltj]{ruby}{rubysmash}[true]{}
@@ -98,6 +102,7 @@
 \catcode`\_=11
 \gdef\ltj@@ruby@create@table#1{% #1: ルビ全角
     \string{
+      eps = \ltj@safe@dimen{\ltj@@rubyip@epsilon\zw},
       before_jfmgk = 0, after_jfmgk = 0,
       rubyzw = \ltj@safe@dimen{#1}, 
       maxmargin = \ltj@safe@dimen{\ltj@@rubyip@maxmargin\zw},
@@ -244,7 +249,8 @@
   stretchbol={0}{1}{1}, stretcheol={1}{1}{0},
   maxmargin=0.5, size=0.5, intergap=0, rubysmash=false,
   kenten=\textbullet, fontcmd=\relax, ybaseheight=0.88, tbaseheight=0.5,
-  intrude_jfmgk, intrude_kanjiskip, intrude_xkanjiskip
+  intrude_jfmgk, intrude_kanjiskip, intrude_xkanjiskip,
+  epsilon=0.0001,
 }
 
 \endinput
