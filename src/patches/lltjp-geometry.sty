@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-geometry}[2020-09-18 Patch to geometry for LuaTeX-ja with vertical writing mode]
+\ProvidesPackage{lltjp-geometry}[2020-12-29 Patch to geometry for LuaTeX-ja with vertical writing mode]
 \RequirePackage{expl3}
 \ifdefined\if@ltj@@geometry@tate\expandafter\endinput\fi
 \newif\if@ltj@@geometry@tate
@@ -33,8 +33,11 @@
 \unless\ifdefined\ltj@ExecuteAfterPackage
 \expandafter\newif\csname ifltj@ltfilehook@avail\endcsname
 \@ifl@t@r\fmtversion{2020-10-01}{%
-  \ifnum\patch@level<0\relax \ifnum\patch@level<-6 \ltj@ltfilehook@availtrue\fi
-  \else\ltj@ltfilehook@availtrue\fi
+  \@ifl@t@r\fmtversion{2020-10-02}{\ltj@ltfilehook@availtrue}
+    {%
+      \ifnum\patch@level<0\relax \ifnum\patch@level<-6 \ltj@ltfilehook@availtrue\fi
+      \else\ltj@ltfilehook@availtrue\fi
+    }%
 }{}
 \ifltj@ltfilehook@avail
   \def\@@ltj@ExecuteAfterPackage#1{\AddToHook{package/after/#1}}

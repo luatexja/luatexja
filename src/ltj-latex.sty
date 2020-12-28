@@ -12,7 +12,7 @@
 \def\luatexjalatexLoaded{\endinput}
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{ltj-latex}[2020-10-09 LaTeX support of LuaTeX-ja]
+\ProvidesPackage{ltj-latex}[2020-12-29 LaTeX support of LuaTeX-ja]
 
 % cleanup at end of the document
 %\let\ltj@@orig@end=\@@end
@@ -27,8 +27,12 @@
 \fi
 \newif\ifltj@ltfilehook@avail
 \@ifl@t@r\fmtversion{2020-10-01}{%
-  \ifnum\patch@level<0\relax \ifnum\patch@level<-6 \ltj@ltfilehook@availtrue\fi
-  \else\ltj@ltfilehook@availtrue\fi
+  \@ifl@t@r\fmtversion{2020-10-02}%
+    {\ltj@ltfilehook@availtrue}
+    {%
+      \ifnum\patch@level<0\relax \ifnum\patch@level<-6 \ltj@ltfilehook@availtrue\fi
+      \else\ltj@ltfilehook@availtrue\fi
+    }%
 }{}
 
 %%% patch for LaTeX

@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2020-10-05 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2020-12-29 Patch to NFSS2 for LuaTeX-ja]
 
 %% patching \DeclareTextComposite
 \def\ltj@chardef@text@cmd#1{%
@@ -634,7 +634,8 @@
 
 \newcount\ltj@@latex@plv \ltj@@latex@plv=-1
 \ifltj@ltfilehook@avail % 2020-10-01
-  \ltj@@latex@plv=1000
+  \@ifl@t@r\fmtversion{2020-10-02}{\ltj@@latex@plv=1300}%
+    {\ifnum\patch@level>2 \ltj@@latex@plv=1300\else \ltj@@latex@plv=1000\fi}
 \else\ifdefined\@rmfamilyhook % 2020-02-02
   \ifx\@forced@seriestrue\@undefined % 2020-02-02 pl0--2
     \@latex@error
@@ -768,12 +769,25 @@
 \DeclareRobustCommand\romanshapeforce[1]{\edef\f@shape{#1}}
 \DeclareRobustCommand\kanjishapeforce[1]{\edef\k@shape{#1}}
 \DeclareRobustCommand\fontshapeforce[1]{\set@safe@kanji@shape{#1}{}\romanshapeforce{#1}}
+\ifnum\ltj@@latex@plv>1000
+%%%% LaTeX >= 2020-10-01 PL3
+\DeclareRobustCommand\usekanji[4]{%
+    \kanjiencoding{#1}\edef\k@family{#2}%
+    \set@target@series@kanji{#3}\edef\k@shape{#4}%
+    \selectfont\ignorespaces}
+\DeclareRobustCommand\useroman[4]{%
+    \romanencoding{#1}\edef\f@family{#2}%
+    \set@target@series{#3}\edef\f@shape{#4}%
+    \selectfont\ignorespaces}
+\else
+%%%% 2020-10-01 <= LaTeX < 2020-10-01 PL3
 \DeclareRobustCommand\usekanji[4]{%
     \kanjiencoding{#1}\edef\k@family{#2}\edef\k@series{#3}\edef\k@shape{#4}%
     \selectfont\ignorespaces}
 \DeclareRobustCommand\useroman[4]{%
     \romanencoding{#1}\edef\f@family{#2}\edef\f@series{#3}\edef\f@shape{#4}%
     \selectfont\ignorespaces}
+\fi
 %%%% LaTeX >= 2020-02-02 END
 \else
 %%%% LaTeX 2019-10-01
