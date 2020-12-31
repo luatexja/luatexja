@@ -43,7 +43,7 @@
 \directlua{
   local cat_str = luatexbase.catcodetables['string']
   local cat_lp  = luatexbase.catcodetables['latex-package']
-  local ubyte = unicode.utf8.byte
+  local ubyte = utf.byte
   local spccmd = string.char(0x5C) .. 'ltj@lst@hss@normal'
   luatexja.listings = {}
   function luatexja.listings.althss(t)
@@ -229,7 +229,7 @@
 }}
 
 \directlua{
-  local utfchar, getcount = unicode.utf8.char, tex.getcount
+  local utfchar, getcount = utf.char, tex.getcount
   luatexja.listings.insert_cb = function()
     if not luatexja.listings.patched then
       luatexja.listings.patched = 1

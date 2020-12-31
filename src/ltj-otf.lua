@@ -1,7 +1,6 @@
 --
 -- ltj-otf.lua
 --
-require 'unicode'
 require 'lualibs'
 
 luatexja.load_module 'base';      local ltjb = luatexja.base
@@ -120,9 +119,9 @@ local function append_jglyph(char)
    setfield(p, 'value', char);  node_write(p)
 end
 
-local utf
+local myutf
 do
-   utf = function (ucs)
+   myutf = function (ucs)
       if ltjd_get_dir_count()==dir_tate then
          ucs = ltju.replace_vert_variant(
             tex_get_attr((ltjd_get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt),
@@ -235,7 +234,7 @@ local disable_ivs = enable_ivs
 luatexja.otf = {
   append_jglyph = append_jglyph,
   enable_ivs = enable_ivs, disable_ivs = disable_ivs,
-  cid = cid, utf = utf,
+  cid = cid, utf = myutf,
 }
 
 
