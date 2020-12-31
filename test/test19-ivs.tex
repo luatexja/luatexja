@@ -12,8 +12,8 @@
    local list_color = 'blue!50!black'     -- リスト表示の色
 
    local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
-   local ubyte = unicode.utf8.byte
-   local uchar = unicode.utf8.char
+   local ubyte = utf.byte
+   local uchar = utf.char
    local sort = table.sort
    function list_ivs(s)
       local c = ubyte(s)

@@ -50,7 +50,7 @@ function adjust_width_toten(head)
        local xc = x.head
        local xcs = tex.round(font.fonts[xc.font].size*0.5)
        -- 句読点の最大補正幅
-       local xcc = unicode.utf8.char(xc.char)
+       local xcc = utf.char(xc.char)
        local cts = compute_total_stretched(p)
        if (xcc == '，'  or xcc == '、' or xcc == '．'  or xcc == '。') and cts>=0 then
          local ag  = node.new(id_glue) -- additional glue

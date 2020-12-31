@@ -3,7 +3,7 @@
 local stderr = io.stderr
 local function show_usage(s)
   stderr:write('Error: ' .. s .. '\n'); 
-  stderr:write('Usage: jfm-convert [-J|-U] <ptex_jfm>\n'); 
+  stderr:write('Usage: texlua jfm-convert [-J|-U] <ptex_jfm>\n'); 
   stderr:write('-J: JIS mode, -U: UCS mode \n'); 
   stderr:write(' * The output will be written to stdout.\n'); 
   stderr:write(' * I do not read  virtual fonts which corresponded to <ptex_jfm>.\n'); 
@@ -13,20 +13,21 @@ local function show_usage(s)
   os.exit(1)
 end
 
-require('unicode'); local uchar = unicode.utf8.char
 kpse.set_program_name('luatex')
+require('lualibs'); local uchar = utf.char
 jisx0208 = require('ltj-jisx0208.lua').table_jisx0208_uptex
 local function pass_ucs(s)
    return  "'" .. uchar(s) .. "'" 
 end
 local function jis_to_ucs(s)
-   local a = jisx0208[s-0x2020]
+   local i = s - 0x2020
+   local a = jisx0208[math.floor(i/256)*94+(i%256)-94] or 0
    return a and pass_ucs(a) or string.format('0x%X',s+0x200000)
 end
 
 -------- 引数解釈 --------
 
-require('unicode')
+
 local filename
 local mode
 
@@ -207,7 +208,8 @@ jfm_ptex:close()
 if not mode then
    mode = jis_to_ucs
    for i=1, #all_ctype do
-      if not jisx0208[all_ctype[i]-0x2020] then
+      local i = all_ctype[i]-0x2020
+      if not jisx0208[math.floor(i/256)*94+(i%256)-94] then
 	 mode = pass_ucs; break
       end
    end
