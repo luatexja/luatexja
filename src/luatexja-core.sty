@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2020-12-22 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2021-01-02 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -526,9 +526,9 @@
     \csname ltj@kcat5\endcsname="7FFFFFFF %"
     \csname ltj@kcat6\endcsname="7FFFFFFF }%"
 
-\protected\def\ltjjachar{\afterassignment\ltj@@jachar\ltj@tempcnta}
+\protected\def\ltjjachar{\leavevmode\afterassignment\ltj@@jachar\ltj@tempcnta}
 \def\ltj@@jachar{{\directlua{tex.globaldefs=0}\ltj@alljachar\ltj@@origchar\ltj@tempcnta}}
-\protected\def\ltjalchar{\afterassignment\ltj@@alchar\ltj@tempcnta}
+\protected\def\ltjalchar{\leavevmode\afterassignment\ltj@@alchar\ltj@tempcnta}
 \def\ltj@@alchar{{\directlua{tex.globaldefs=0}\ltj@allalchar\ltj@@origchar\ltj@tempcnta}}
 
 %%%%%%%% \ltjsetmathletter<number>, \ltjunsetmathletter<number>
