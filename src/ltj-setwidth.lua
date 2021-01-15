@@ -190,13 +190,19 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
       local pf, pc = getfont(p), getchar(p)
       local feir = ltjf_font_extra_info[pf]
       if met.rotation and met.vert_activated then
-         if met.rotation[pc] and (has_attr(p, attr_vert_ori) or 0)<=0 then
+          local f = font_getfont(pf)
+          local r, l = met.rotation[pc], f.properties and f.properties.language
+          if ((r==true) or (type(r)=="table" and not r[l])) and (has_attr(p, attr_vert_ori) or 0)<=0 then
             return capsule_glyph_tate_rot(p, met, char_data, head, dir, 
               0.5*(get_ascender(pf)-get_descender(pf)))
-         end
-     end
-     pwidth, ascender = feir.vheight[pc]*met.size, feir.vorigin[pc]*met.size
+          end
+      end
+      pwidth, ascender = feir.vheight[pc]*met.size, feir.vorigin[pc]*met.size
+     -- print(pwidth/65536.,ascender/65536.)
    end
+   -- luatexja.ext_show_node(node.direct.tonode(p), 'B> ', print)
+   local xo, yo = getoffsets(p)
+   --pwidth = pwidth - yo
    fwidth = fwidth or pwidth
    if pwidth>fwidth and char_data.round_threshold then
       local frac = pwidth / fwidth
@@ -207,7 +213,6 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
    fshift = call_callback("luatexja.set_width", fshift, met, char_data)
    local fheight = char_data.height or 0
    local fdepth  = char_data.depth or 0
-   local xo, yo = getoffsets(p)
    local y_shift = xo + (has_attr(p,attr_tkblshift) or 0)
    local q
    head, q = node_remove(head, p)
@@ -215,7 +220,7 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
    setwhd(box, fwidth, fheight, fdepth)
    setfield(box, 'shift', y_shift)
    setdir(box, dir)
-
+   -- print(yo, ascender, char_data.align, fwidth-pwidth)
    setoffsets(p, -fshift.down,
               yo -(ascender + char_data.align*(fwidth-pwidth) - fshift.left) )
    local ws = node_new(id_whatsit, sid_save)
@@ -231,6 +236,7 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
    setnext(k3, wr);
 
    set_attr(box, attr_icflag, PACKED)
+   -- luatexja.ext_show_node(node.direct.tonode(box), 'A> ', print)
    head = q and node_insert_before(head, q, box)
       or node_insert_after(head, node_tail(head), box)
    return q, head, box

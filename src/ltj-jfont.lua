@@ -784,6 +784,11 @@ end
 luatexja.jfont.font_extra_info = font_extra_info -- key: fontnumber
 local font_extra_basename = {} -- key: basename
 
+local rotate_exception = {
+  [0xFF1A]= { ['zht'] = true, },
+  [0xFF1B]= { ['zht'] = true, },
+}
+luatexja.jfont.rotate_exception = rotate_exception
 local list_rotate_glyphs
 do
   local ceil = math.ceil
@@ -825,14 +830,14 @@ do
     --   end)
     for i,_ in pairs(rot) do
        dest = dest or {}; dest.rotation = dest.rotation or {}
-       dest.rotation[i] = true
+       dest.rotation[i] = rotate_exception[i] or true
     end
     return dest
   end
 end
 
 do
-   local cache_ver = 23
+   local cache_ver = 24
    local nameonly, lower = file.nameonly, string.lower
    local lfs = require"lfs"
    local file_attributes = lfs.attributes
@@ -972,7 +977,8 @@ luatexbase.add_to_callback(
           for j,w in pairs(vform) do
             if (i==j)and(w==k) then vform[j]=nil elseif w==i then vform[j] = k end
           end
-        end)
+      end)
+      print(vform[0xFF1A], vform[0xFF1B])
       return fmtable
    end, 'ltj.get_vert_form', 1
 )
