@@ -978,7 +978,6 @@ luatexbase.add_to_callback(
             if (i==j)and(w==k) then vform[j]=nil elseif w==i then vform[j] = k end
           end
       end)
-      print(vform[0xFF1A], vform[0xFF1B])
       return fmtable
    end, 'ltj.get_vert_form', 1
 )
