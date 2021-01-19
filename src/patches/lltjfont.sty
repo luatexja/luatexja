@@ -350,18 +350,6 @@
 \newif\if@knjcmd
 \DeclareRobustCommand\userelfont{\@knjcmdtrue}
 
-
-\RequirePackage{everysel}
-\let\ltj@@EverySelectfont@Init=\@EverySelectfont@Init
-\expandafter\expandafter\expandafter\let
-\expandafter\expandafter\csname ltj@@orig@selectfont\endcsname\csname selectfont\space\endcsname
-\@EverySelectfont@Init
-%\let\ltj@@font@info\@font@info
-%\let\ltj@@font@warning\@font@warning
-\def\@EverySelectfont@Init{%
-  \expandafter\let\csname selectfont\space \endcsname \ltj@@orig@selectfont
-  \ltj@@EverySelectfont@Init
-}
 \def\ltj@selectfont@tate{%
   \let\k@encoding\ct@encoding
   \xdef\font@name{\csname\curr@kfontshape/\f@size\endcsname}%
@@ -386,7 +374,7 @@
       \directlua{luatexja.jfont.pickup_alt_font_a('\f@size')}%
     }%
   \fi}
-\def\ltj@selectfont@patch{%
+\protected\def\ltj@selectfont@patch{%
   \ltj@@start@time@measure{selectfont}%
   \let\tmp@error@fontshape\error@fontshape
   \let\error@fontshape\error@kfontshape
@@ -427,7 +415,24 @@
   \global\let\font@name=\ltj@afont@name
   \ltj@@stop@time@measure{selectfont}%
 }
-\EverySelectfont{\ltj@selectfont@patch}
+\def\@@ltj@old@selectfont@patch{%
+  \RequirePackage{everysel}
+  \let\ltj@@EverySelectfont@Init=\@EverySelectfont@Init
+  \expandafter\expandafter\expandafter\let
+  \expandafter\expandafter\csname ltj@@orig@selectfont\endcsname\csname selectfont\space\endcsname
+  \@EverySelectfont@Init% for LaTeX2e <=2020-10-01
+  \def\@EverySelectfont@Init{%
+    \expandafter\let\csname selectfont\space \endcsname \ltj@@orig@selectfont
+    \ltj@@EverySelectfont@Init
+  }
+  \EverySelectfont{\ltj@selectfont@patch}
+}
+\ifltj@ltfilehook@avail
+  \IfHookExistsTF{selectfont}{\AddToHook{selectfont}[luatexja]{\ltj@selectfont@patch}}% LaTeX2e 2021-05-01
+    {\@@ltj@old@selectfont@patch}% LaTeX2e 2020-10-01
+\else\@@ltj@old@selectfont@patch % LaTeX2e <=2020-02-02
+\fi
+\let\@@ltj@old@selectfont@patch\undefined
 
 \bgroup
   \def\ltj@@dir@patch#1#2#3{%
