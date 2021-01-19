@@ -351,7 +351,7 @@ do
             r = tostring(n.char)
          end
       end
-      tex.sprint(r)
+      tex.sprint(-2, r)
    end
 end
 
