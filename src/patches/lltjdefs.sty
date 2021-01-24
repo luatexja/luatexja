@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjdefs}[2020-10-05 Default font settings of LuaTeX-ja]
+\ProvidesPackage{lltjdefs}[2021-01-24 Default font settings of LuaTeX-ja]
 
 \ifdefined\ltj@stdmcfont\else\def\ltj@stdmcfont{file:HaranoAjiMincho-Regular.otf}\fi
 \ifdefined\ltj@stdgtfont\else\def\ltj@stdgtfont{file:HaranoAjiGothic-Medium.otf}\fi
@@ -18,8 +18,13 @@
 \DeclareKanjiEncodingDefaults{}{}
 \DeclareErrorKanjiFont{JY3}{mc}{m}{n}{10}
 \kanjifamily{mc}
-\kanjiseries{m}
-\kanjishape{n}
+\ifnum\ltj@@latex@plv<1500 % <=2020-10-01
+  \kanjiseries{m}
+  \kanjishape{n}
+\else % >=2021-05-01
+  \def\k@series{m}
+  \def\k@shape{n}
+\fi
 \fontsize{10}{10}
 \DeclareYokoKanjiEncoding{JY3}{}{}
 \DeclareKanjiSubstitution{JY3}{mc}{m}{n}
@@ -35,7 +40,7 @@
 \ifnum 0\ifltj@ltfilehook@avail1\fi\ifdefined\@rmfamilyhook1\fi>0
   %% LaTeX 2020-02-02
   \newcommand\kanjishapedefault{\shapedefault}
-\else                   %% LaTeX 2019-10-01
+\else%% LaTeX 2019-10-01
   \newcommand\kanjishapedefault{\updefault}
 \fi
 
