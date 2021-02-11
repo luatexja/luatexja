@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2020-12-22',
+  date = '2021-02-11',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}
@@ -347,8 +347,7 @@ function calc_np_aux_glyph_common(lp, acc_flag)
       local lx=lp
       while lx do
          local lai = get_attr_icflag(lx)
-         if lx==last or  lai>=PACKED then
-            lp=lx; break
+         if lx==last or  lai>=PACKED then break
          else
             local lid = getid(lx)
             if lid==id_glyph and not if_lang_ja(lx) then
@@ -368,19 +367,20 @@ function calc_np_aux_glyph_common(lp, acc_flag)
                   else -- アクセントは上下にシフトされている
                      setfield(lx, 'shift', getfield(lx, 'shift') + (has_attr(lx,attr_ablshift) or 0))
                   end
-                  lx = node_next(node_next(lx))
+                  set_attr(lx, attr_icflag, PROCESSED)
+                  lx = node_next(lx); set_attr(lx, attr_icflag, PROCESSED)
+                  lx = node_next(lx); set_attr(lx, attr_icflag, PROCESSED)
                elseif ls==0  then
                   Np.last = lx; lx = node_next(lx)
                elseif (ls==3) or (lai==ITALIC) then
                   Np.last = lx; set_attr(lx, attr_icflag, IC_PROCESSED); lx = node_next(lx)
-               else
-                  lp=lx; break
+               else break
                end
-            else
-               lp=lx; break
+            else break
             end
          end
       end
+      lp=lx
       local r
       if adj_depth>node_depth then
             r = node_new(id_rule,3)
