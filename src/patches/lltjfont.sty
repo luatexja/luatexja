@@ -455,7 +455,7 @@
   \ifx\delayed@k@adjustment\@empty
   \else
     \let\k@shape@saved\k@shape
-    \let\k@series@saved\f@series
+    \let\k@series@saved\k@series
     \delayed@k@adjustment
     \begingroup\let\f@encoding\k@encoding\let\f@family\k@family
     \maybe@load@fontshape\endgroup
@@ -924,16 +924,40 @@
   \DeclareRobustCommand\fontseriesforce[1]{\kanjiseriesforce{#1}\romanseriesforce{#1}}%
   \let\delayed@k@adjustment\@empty
 \fi\fi
-\DeclareRobustCommand\romanshape[1]{\merge@font@shape{#1}}
-\DeclareRobustCommand\kanjishape[1]{\merge@kanji@shape{#1}}
-\DeclareRobustCommand\fontshape[1]{%
-   \@shape@roman@kanjitrue
-   \merge@font@shape{#1}\merge@kanji@shape{#1}%
-   \@shape@roman@kanjifalse
-}
-\DeclareRobustCommand\romanshapeforce[1]{\edef\f@shape{#1}}
-\DeclareRobustCommand\kanjishapeforce[1]{\edef\k@shape{#1}}
-\DeclareRobustCommand\fontshapeforce[1]{\set@safe@kanji@shape{#1}{}\romanshapeforce{#1}}
+\ifnum\ltj@@latex@plv<1500% <=2020-10-01
+  \DeclareRobustCommand\romanshape[1]{\merge@font@shape{#1}}
+  \DeclareRobustCommand\kanjishape[1]{\merge@kanji@shape{#1}}
+  \DeclareRobustCommand\fontshape[1]{%
+     \@shape@roman@kanjitrue
+     \merge@font@shape{#1}\merge@kanji@shape{#1}%
+     \@shape@roman@kanjifalse
+  }
+  \DeclareRobustCommand\romanshapeforce[1]{\edef\f@shape{#1}}
+  \DeclareRobustCommand\kanjishapeforce[1]{\edef\k@shape{#1}}
+  \DeclareRobustCommand\fontshapeforce[1]{\set@safe@kanji@shape{#1}{}\romanshapeforce{#1}}
+\else% >=2021-05-01
+  \DeclareRobustCommand\romanshape[1]
+      {\expandafter\def\expandafter\delayed@f@adjustment\expandafter
+           {\delayed@f@adjustment\delayed@merge@font@shape{#1}}}
+  \DeclareRobustCommand\kanjishape[1]
+      {\expandafter\def\expandafter\delayed@k@adjustment\expandafter
+           {\delayed@k@adjustment\delayed@merge@kanji@shape{#1}}}
+  \DeclareRobustCommand\fontshape[1]{%
+     \romanshape{#1}%
+     \expandafter\def\expandafter\delayed@k@adjustment\expandafter
+         {\delayed@k@adjustment\@shape@roman@kanjitrue
+          \delayed@merge@kanji@shape{#1}\@shape@roman@kanjifalse}}
+  \DeclareRobustCommand\romanshapeforce[1]
+      {\expandafter\def\expandafter\delayed@f@adjustment\expandafter
+           {\delayed@f@adjustment\edef\f@shape{#1}}}
+  \DeclareRobustCommand\kanjishapeforce[1]
+      {\expandafter\def\expandafter\delayed@k@adjustment\expandafter
+           {\delayed@k@adjustment\edef\k@shape{#1}}}
+  \DeclareRobustCommand\fontshapeforce[1]{%
+     \romanshapeforce{#1}%
+     \expandafter\def\expandafter\delayed@k@adjustment\expandafter
+         {\delayed@k@adjustment\set@safe@kanji@shape{#1}{}}}
+\fi
 \ifnum\ltj@@latex@plv>1000
 %%%% LaTeX >= 2020-10-01 PL3
 \DeclareRobustCommand\usekanji[4]{%
