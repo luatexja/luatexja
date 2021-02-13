@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2021-01-24 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2021-02-14 Patch to NFSS2 for LuaTeX-ja]
 
 %%%%%%%% LaTeX2e version detection
 \newcount\ltj@@latex@plv \ltj@@latex@plv=-1
@@ -458,7 +458,7 @@
     \let\k@series@saved\k@series
     \delayed@k@adjustment
     \begingroup\let\f@encoding\k@encoding\let\f@family\k@family
-    \maybe@load@fontshape\endgroup
+      \maybe@load@fontshape\endgroup
     \ifcsname \k@encoding/\k@family/\k@series/\k@shape \endcsname
     \else
       \let\k@shape\k@shape@saved
@@ -839,7 +839,7 @@
     \set@target@series@kanji{#2}%
   \else
     \set@target@series@kanji{#1}%
-\fi
+  \fi
 }
 \let\delayed@merge@kanji@series\merge@kanji@series@without@substitution
 
@@ -936,23 +936,23 @@
   \DeclareRobustCommand\kanjishapeforce[1]{\edef\k@shape{#1}}
   \DeclareRobustCommand\fontshapeforce[1]{\set@safe@kanji@shape{#1}{}\romanshapeforce{#1}}
 \else% >=2021-05-01
-  \DeclareRobustCommand\romanshape[1]
-      {\expandafter\def\expandafter\delayed@f@adjustment\expandafter
+  \DeclareRobustCommand\romanshape[1]{%
+       \expandafter\def\expandafter\delayed@f@adjustment\expandafter
            {\delayed@f@adjustment\delayed@merge@font@shape{#1}}}
-  \DeclareRobustCommand\kanjishape[1]
-      {\expandafter\def\expandafter\delayed@k@adjustment\expandafter
+  \DeclareRobustCommand\kanjishape[1]{%
+       \expandafter\def\expandafter\delayed@k@adjustment\expandafter
            {\delayed@k@adjustment\delayed@merge@kanji@shape{#1}}}
   \DeclareRobustCommand\fontshape[1]{%
-     \romanshape{#1}%
-     \expandafter\def\expandafter\delayed@k@adjustment\expandafter
-         {\delayed@k@adjustment\@shape@roman@kanjitrue
-          \delayed@merge@kanji@shape{#1}\@shape@roman@kanjifalse}}
-  \DeclareRobustCommand\romanshapeforce[1]
-      {\expandafter\def\expandafter\delayed@f@adjustment\expandafter
-           {\delayed@f@adjustment\edef\f@shape{#1}}}
-  \DeclareRobustCommand\kanjishapeforce[1]
-      {\expandafter\def\expandafter\delayed@k@adjustment\expandafter
-           {\delayed@k@adjustment\edef\k@shape{#1}}}
+      \romanshape{#1}%
+      \expandafter\def\expandafter\delayed@k@adjustment\expandafter
+          {\delayed@k@adjustment\@shape@roman@kanjitrue
+           \delayed@merge@kanji@shape{#1}\@shape@roman@kanjifalse}}
+  \DeclareRobustCommand\romanshapeforce[1]{%
+      \expandafter\def\expandafter\delayed@f@adjustment\expandafter
+          {\delayed@f@adjustment\edef\f@shape{#1}}}
+  \DeclareRobustCommand\kanjishapeforce[1]{%
+      \expandafter\def\expandafter\delayed@k@adjustment\expandafter
+          {\delayed@k@adjustment\edef\k@shape{#1}}}
   \DeclareRobustCommand\fontshapeforce[1]{%
      \romanshapeforce{#1}%
      \expandafter\def\expandafter\delayed@k@adjustment\expandafter
