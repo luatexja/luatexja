@@ -25,14 +25,13 @@ Installation
     - LuaTeX 1.10.0 (or later)
     - luaotfload (v3.1 or later recommended)
     - adobemapping (Adobe CMap files)
-    - LaTeX 2020-02-02 patch level 5 or later (if you want to use with LaTeX)
-    - everysel package
+    - LaTeX2e 2020-02-02 patch level 5 or later (if you want to use with LaTeX)
+      Note that support for LaTeX2e 2021-05-01 is work in progress;
+      it will be done after the freeze of TL'20
     - etoolbox package
-    - ltxcmds package
-    - pdftexcmds package
-    - atbegshi package
-    - filehook package
-    - stfloats package
+    - ltxcmds package, pdftexcmds package
+    - filehook package, atbegshi package (for LaTeX2e 2020-02-02)
+    - everysel package (for LaTeXe 2020-02-02 and 2020-10-01)
     - Harano Aji fonts (https://github.com/trueroad/HaranoAjiFonts)
 	  more specifically, HaranoAjiMincho-Regular and HaranoAjiGothic-Medium
 
