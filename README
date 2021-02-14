@@ -26,8 +26,8 @@ Installation
     - luaotfload (v3.1 or later recommended)
     - adobemapping (Adobe CMap files)
     - LaTeX2e 2020-02-02 patch level 5 or later (if you want to use with LaTeX)
-      Note that support for LaTeX2e 2021-05-01 is work in progress;
-      it will be done after the freeze of TL'20
+      Note that the adaptation for LaTeX2e 2021-05-01 is 
+      work in progress; it will be done after the freeze of TL'20
     - etoolbox package
     - ltxcmds package, pdftexcmds package
     - filehook package, atbegshi package (for LaTeX2e 2020-02-02)
