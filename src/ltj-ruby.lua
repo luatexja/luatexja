@@ -312,7 +312,7 @@ local function enlarge_parent(r, p, tmp_tbl, no_begin, no_end)
    local intmode = floor(tmp_tbl.mode/4)%4
    if no_begin then mapre  = mapre + tmp_tbl.before_jfmgk end
    if no_end   then mapost = mapost + tmp_tbl.after_jfmgk end
-   if (tmp_tbl.mode%4 >=2) and (tmp.pre<0) and (tmp.post<0) then
+   if (tmp_tbl.mode%4 >=2) and (tmp_tbl.pre<0) and (tmp_tbl.post<0) then
        mapre = min(mapre,mapost); mapost = mapre
    end
    if intmode == 0 then --  とりあえず組んでから決める
