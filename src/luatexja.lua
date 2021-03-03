@@ -356,7 +356,7 @@ do
 end
 
 do
-    local cache_ver = 2 -- must be same as ltj-kinsoku.tex
+    local cache_ver = 3 -- must be same as ltj-kinsoku.tex
     local cache_outdate_fn = function (t) return t.version~=cache_ver end
     local t = ltjs.charprop_stack_table
     function luatexja.load_kinsoku()
