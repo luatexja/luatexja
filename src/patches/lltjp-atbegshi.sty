@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-atbegshi}[2020-09-30 Patching \string\shipout\space hooks for LuaTeX-ja]
+\ProvidesPackage{lltjp-atbegshi}[2021-03-14 Patching \string\shipout\space hooks for LuaTeX-ja]
 
 % concept: execute all hooks inside yoko direction \vbox
 
@@ -13,22 +13,24 @@
 \RequirePackage{expl3}
 \ExplSyntaxOn\makeatletter
 \box_new:N \l__platex_shipout_dummy_box
-\cs_new_eq:NN \__platex_original_shipout_execute_cont: \__shipout_execute_cont:
-\cs_set:Npn \__shipout_execute_cont:
-{
-  % if \l_shipout_box is not a \yoko-box (= horizontal writing),
+\if_cs_exist:N \__shipout_execute_main_cont:Nnnn %% 2021-05-01
+\cs_new_eq:NN \__platex_original_shipout_execute_main_cont:Nnnn
+              \__shipout_execute_main_cont:Nnnn
+\cs_set:Npn \__shipout_execute_main_cont:Nnnn #1#2#3#4 {
+  % if the box #1 is not a \yoko-box (= horizontal writing),
   % then make it a \yoko-box behorehand.
-  \platex_if_box_yoko:NF \l_shipout_box {
-    \vbox_set:Nn \l_shipout_box { \platex_direction_yoko: \box_use:N \l_shipout_box }
+  \platex_if_box_yoko:NF #1 {
+    \vbox_set:Nn #1 { \platex_direction_yoko: \box_use:N #1 }
   }
   % if the current direction is not \yoko,
-  % then enclose \__shipout_execute_cont: with
+  % then enclose \__shipout_execute_main_cont:Nnnn with
   % a dummy \yoko-box named \l__platex_shipout_dummy_box.
   \platex_if_direction_yoko:TF {
-    \__platex_original_shipout_execute_cont:
+    \__platex_original_shipout_execute_main_cont:Nnnn { #1 } { #2 } { #3 } { #4 }
   }{
     \vbox_set:Nn \l__platex_shipout_dummy_box {
-      \platex_direction_yoko: \__platex_original_shipout_execute_cont:
+      \platex_direction_yoko:
+      \__platex_original_shipout_execute_main_cont:Nnnn { #1 } { #2 } { #3 } { #4 }
     }
     % [Limitation] the code above may discard some contents,
     % so we'd like to put it back by \box\l__platex_shipout_dummy_box.
@@ -37,6 +39,23 @@
     %\box_use:N \l__platex_shipout_dummy_box
   }
 }
+
+\else: %% 2020-10-01
+\cs_new_eq:NN \__platex_original_shipout_execute_cont: \__shipout_execute_cont:
+\cs_set:Npn \__shipout_execute_cont:
+{
+  \platex_if_box_yoko:NF \l_shipout_box {
+    \vbox_set:Nn \l_shipout_box { \platex_direction_yoko: \box_use:N \l_shipout_box }
+  }
+  \platex_if_direction_yoko:TF {
+    \__platex_original_shipout_execute_cont:
+  }{
+    \vbox_set:Nn \l__platex_shipout_dummy_box {
+      \platex_direction_yoko: \__platex_original_shipout_execute_cont:
+    }
+  }
+}
+\fi:
 %</ltshipout>-----------------------------------
 \ExplSyntaxOff
 \expandafter\endinput
