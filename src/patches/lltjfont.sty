@@ -279,6 +279,19 @@
                            \def\default@k@series{#3}%
                            \def\default@k@shape{#4}}%
   \fi}
+\@onlypreamble\DeclareKanjiSubstitution
+
+\def\DeclareErrorKanjiFont#1#2#3#4#5{%
+   \xdef\error@kfontshape{%
+      \noexpand\expandafter\noexpand\split@name\noexpand\string
+      \expandafter\noexpand\csname#1/#2/#3/#4/#5\endcsname
+      \noexpand\@nil}%
+   \gdef\default@k@family{#2}%
+   \gdef\default@k@series{#3}%
+   \gdef\default@k@shape{#4}%
+   }
+\@onlypreamble\DeclareErrorKanjiFont
+
 \let\wrong@ja@fontshape\wrong@fontshape
 \let\wrong@al@fontshape\wrong@fontshape
 \patchcmd\wrong@ja@fontshape{\default@shape}{\default@k@shape}{}{}
@@ -291,17 +304,6 @@
     \wrong@al@fontshape
   \fi
 }
-\@onlypreamble\DeclareKanjiSubstitution
-\def\DeclareErrorKanjiFont#1#2#3#4#5{%
-   \xdef\error@kfontshape{%
-      \noexpand\expandafter\noexpand\split@name\noexpand\string
-      \expandafter\noexpand\csname#1/#2/#3/#4/#5\endcsname
-      \noexpand\@nil}%
-   \gdef\default@k@family{#2}%
-   \gdef\default@k@series{#3}%
-   \gdef\default@k@shape{#4}%
-   }
-\@onlypreamble\DeclareErrorKanjiFont
 
 \newif\ifltjselectfont@force@define
 \def\DeclareFixedFont#1#2#3#4#5#6{%
@@ -310,16 +312,16 @@
       \every@math@size{}%
       \fontsize{#6}\z@
       \ltj@@is@kyenc{#2}\ifin@%
-            \ltjselectfont@force@definetrue
+        \ltjselectfont@force@definetrue
         \usekanji{#2}{#3}{#4}{#5}%
         \global\let#1\getjfont
-            \ltjselectfont@force@definefalse
+        \ltjselectfont@force@definefalse
       \else
         \ltj@@is@ktenc{#2}\ifin@%
-              \ltjselectfont@force@definetrue
+          \ltjselectfont@force@definetrue
           \usekanji{#2}{#3}{#4}{#5}%
           \global\let#1\gettfont
-              \ltjselectfont@force@definefalse
+          \ltjselectfont@force@definefalse
         \else
           \useroman{#2}{#3}{#4}{#5}%
           \global\expandafter\let\expandafter#1\the\font
@@ -639,7 +641,7 @@
     \fi
 }
 \DeclareRobustCommand\fontencoding[1]{%
-  \ltj@@is@kyenc{#1}\ifin@\kanjiencoding{#1}\else\romanencoding{#1}\fi}
+  \ltj@@is@kenc{#1}\ifin@\kanjiencoding{#1}\else\romanencoding{#1}\fi}
 \def\@@kenc@update{%
   \default@KT
   \csname T@\k@encoding\endcsname
@@ -892,21 +894,13 @@
 \ifnum\ltj@@latex@plv=300 % 2020-02-02 pl3, 4
   \DeclareRobustCommand\romanseries[1]{\merge@font@series{#1}}
   \DeclareRobustCommand\kanjiseries[1]{\merge@kanji@series{#1}}
-  \DeclareRobustCommand\fontseries[1]{%
-     \merge@font@series{#1}\merge@kanji@series{#1}}
   \DeclareRobustCommand\romanseriesforce[1]{\edef\f@series{#1}}
   \DeclareRobustCommand\kanjiseriesforce[1]{\edef\k@series{#1}}
-  \DeclareRobustCommand\fontseriesforce[1]{%
-     \edef\f@series{#1}\edef\k@series{#1}}
 \else\ifnum\ltj@@latex@plv<1500% >=2020-02-02 pl5 and <=2020-10-01
   \DeclareRobustCommand\romanseries[1]{\@forced@seriesfalse\merge@font@series{#1}}
   \DeclareRobustCommand\kanjiseries[1]{\@forced@seriesfalse\merge@kanji@series{#1}}
-  \DeclareRobustCommand\fontseries[1]{%
-    \@forced@seriesfalse\merge@font@series{#1}\merge@kanji@series{#1}}
-  \DeclareRobustCommand\romanseriesforce[1]{\@forced@seriestrue\merge@font@series{#1}}
-  \DeclareRobustCommand\kanjiseriesforce[1]{\@forced@seriestrue\merge@kanji@series{#1}}
-  \DeclareRobustCommand\fontseriesforce[1]{%
-     \@forced@seriestrue\merge@font@series{#1}\merge@kanji@series{#1}}
+  \DeclareRobustCommand\romanseriesforce[1]{\@forced@seriestrue\edef\f@series{#1}}
+  \DeclareRobustCommand\kanjiseriesforce[1]{\@forced@seriestrue\edef\k@series{#1}}
 \else% >=2021-05-01
   \DeclareRobustCommand\romanseries[1]{\@forced@seriesfalse
       \expandafter\def\expandafter\delayed@f@adjustment\expandafter
@@ -914,16 +908,17 @@
   \DeclareRobustCommand\kanjiseries[1]{\@forced@seriesfalse
       \expandafter\def\expandafter\delayed@k@adjustment\expandafter
           {\delayed@k@adjustment\delayed@merge@kanji@series{#1}}}
-  \DeclareRobustCommand\fontseries[1]{\kanjiseries{#1}\romanseries{#1}}
   \DeclareRobustCommand\romanseriesforce[1]{\@forced@seriestrue
       \expandafter\def\expandafter\delayed@f@adjustment\expandafter
           {\delayed@f@adjustment\edef\f@series{#1}}}
   \DeclareRobustCommand\kanjiseriesforce[1]{\@forced@seriestrue
       \expandafter\def\expandafter\delayed@k@adjustment\expandafter
           {\delayed@k@adjustment\edef\k@series{#1}}}
-  \DeclareRobustCommand\fontseriesforce[1]{\kanjiseriesforce{#1}\romanseriesforce{#1}}%
   \let\delayed@k@adjustment\@empty
 \fi\fi
+\DeclareRobustCommand\fontseries[1]{\kanjiseries{#1}\romanseries{#1}}%
+\DeclareRobustCommand\fontseriesforce[1]{\kanjiseriesforce{#1}\romanseriesforce{#1}}%
+
 \ifnum\ltj@@latex@plv<1500% <=2020-10-01
   \DeclareRobustCommand\romanshape[1]{\merge@font@shape{#1}}
   \DeclareRobustCommand\kanjishape[1]{\merge@kanji@shape{#1}}
