@@ -1130,4 +1130,17 @@ do
       shipout(afbox)
       stop_time_measure 'box_primitive_hook'
    end
+   function luatexja.direction.shipout_lthook(head)
+      start_time_measure 'box_primitive_hook'
+      local a = to_direct(head)
+      local a_dir = get_box_dir(a, dir_yoko)
+      if a_dir~=dir_yoko then
+         local b = create_dir_node(a, a_dir, dir_yoko, false)
+         setfield(b, 'head', a); a = b
+      end
+      setfield(shipout_temp, 'head', a); finalize_inner(shipout_temp)
+      a = copy(getlist(shipout_temp)); setfield(shipout_temp, 'head',nil)
+      stop_time_measure 'box_primitive_hook'
+      return to_node(a)
+   end
 end

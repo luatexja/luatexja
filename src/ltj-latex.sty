@@ -12,19 +12,11 @@
 \def\luatexjalatexLoaded{\endinput}
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{ltj-latex}[2020-12-29 LaTeX support of LuaTeX-ja]
-
-% cleanup at end of the document
-%\let\ltj@@orig@end=\@@end
-%\protected\def\@@end{%
-%  \directlua{luatexja.ext_cleanup()}\ltj@@orig@end}
+\ProvidesPackage{ltj-latex}[2021-03-16 LaTeX support of LuaTeX-ja]
 
 \endlinechar=13
 
 %%% LaTeX version detection
-\ifcsname tex_shipout:D\endcsname
-  \expandafter\let\csname tex_shipout:D\endcsname\ltj@shipout
-\fi
 \newif\ifltj@ltfilehook@avail
 \@ifl@t@r\fmtversion{2020-10-01}{%
   \@ifl@t@r\fmtversion{2020-10-02}%
@@ -34,6 +26,21 @@
       \else\ltj@ltfilehook@availtrue\fi
     }%
 }{}
+\@ifl@t@r\fmtversion{2021-05-01}{\count@=1 }{\count@=0 }
+\ifnum \count@<1
+  \protected\luadef\ltj@@lua@shipout\ltj@@lua@shipout@inner
+  \protected\def\ltj@shipout{\ltj@afterbox\ltj@@lua@shipout}
+  \let\shipout\ltj@shipout
+  \ifcsname tex_shipout:D\endcsname
+    \expandafter\let\csname tex_shipout:D\endcsname\ltj@shipout
+  \fi
+  \directlua{luatexja.direction.shipout_lthook = nil}
+\else
+  \directlua{%
+    luatexbase.add_to_callback('pre_shipout_filter',luatexja.direction.shipout_lthook, 'ltj.direction', 1)
+    luatexja.direction.shipout = nil
+  }
+\fi
 
 %%% patch for LaTeX
 \usepackage{lltjfont}

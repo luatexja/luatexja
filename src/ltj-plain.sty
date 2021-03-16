@@ -23,10 +23,13 @@
 %! ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 % LuaTeX-ja macros against plain TeX
 
+\protected\luadef\ltj@@lua@shipout\ltj@@lua@shipout@inner
+\protected\def\ltj@shipout{\ltj@afterbox\ltj@@lua@shipout}
+\let\shipout\ltj@shipout
+\directlua{luatexja.direction.shipout_lthook = nil}
+
 \ifdefined\ltj@stdmcfont\else\def\ltj@stdmcfont{file:HaranoAjiMincho-Regular.otf}\fi
 \ifdefined\ltj@stdgtfont\else\def\ltj@stdgtfont{file:HaranoAjiGothic-Medium.otf}\fi
-%\ifdefined\ltj@stdmcfont\else\def\ltj@stdmcfont{IPAExMincho}\fi
-%\ifdefined\ltj@stdgtfont\else\def\ltj@stdgtfont{IPAExGothic}\fi
 \ifdefined\ltj@stdyokojfm\else\def\ltj@stdyokojfm{ujis}\fi
 \ifdefined\ltj@stdtatejfm\else\def\ltj@stdtatejfm{ujisv}\fi
 \newread\ltj@@cfgread
@@ -96,9 +99,6 @@
 \ltjsetparameter{jacharrange={-1, +2, +3, -4, -5, +6, +7, -8, +9}}
 
 \directlua{for x=128,255 do luatexja.math.is_math_letters[x] = true end}
-\let\ltj@@orig@end=\@@end
-\protected\def\@@end{%
-  \directlua{luatexja.ext_cleanup()}\ltj@@orig@end}
 
 \directlua{luatexja.jfont.register_vert_replace{
   ['，']='、', ['．']='。', ['“']=0x301D, ['”']=0x301F,

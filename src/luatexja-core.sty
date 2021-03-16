@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2021-01-02 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2021-03-16 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -707,9 +707,6 @@
   local t = lua.get_functions_table()
   t[\the\ltj@@lua@shipout@inner]=luatexja.direction.shipout
 }
-\protected\luadef\ltj@@lua@shipout\ltj@@lua@shipout@inner
-\protected\def\ltj@shipout{\ltj@afterbox\ltj@@lua@shipout}
-\ifprimitive\shipout\let\shipout\ltj@shipout\fi
 
 %%%% \unhbox and \unvbox
 \newluafunction\ltj@@lua@unboxcheckdir@inner

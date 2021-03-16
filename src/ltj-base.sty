@@ -13,7 +13,7 @@
 
 \ifltj@in@latex                 %<*LaTeX>
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{ltj-base}[2020-08-04]
+  \ProvidesPackage{ltj-base}[2021-03-16]
 \fi                             %</LaTeX>
 
 %%------------------ Tiny helpers
@@ -40,17 +40,7 @@
 %% \ltj@q@mark
 \protected\def\ltj@q@mark{\ltj@q@mark@}
 
-%! etoolbox の \letcs, \cslet, \csletcs.
-%% \ltj@letcs
-\protected\def\ltj@letcs#1#2{
-  \expandafter\let\expandafter#1\csname#2\endcsname
-}
-
-%% \ltj@cslet
-\protected\def\ltj@cslet#1#2{
-  \expandafter\let\csname#1\endcsname#2
-}
-
+%! etoolbox の \csletcs.
 %% \ltj@csletcs
 \protected\def\ltj@csletcs#1#2{
   \expandafter\let\csname#1\expandafter\endcsname
@@ -66,12 +56,6 @@
   \else\expandafter\ltx@secondoftwo\fi
 }
 
-%% \ltj@if@empty{<stuff>}{<yes>}{<no>}
-%! <stuff> が空であるか.
-% Checks if <stuff> is empty.
-\long\def\ltj@if@empty#1{
-  \ltj@ifx{\ltj@@q@empty#1\ltj@@q@empty}
-}
 \protected\def\ltj@@q@empty{\ltj@@q@empty@}
 
 %% \ltj@if@blank{<stuff>}{<yes>}{<no>}
@@ -96,10 +80,6 @@
 %! plain であるか.
 \ltj@csletcs{ifltj@in@plain}{iffalse}
 
-%% \ltj@print{<message>}
-%! 端末への出力.
-\let\ltj@print\typeout
-
 \else                           %<*!LaTeX>
 
 %% \ifltj@in@plain
@@ -108,11 +88,6 @@
 \else
   \ltj@csletcs{ifltj@in@plain}{iffalse}
 \fi
-
-%% \ltj@print{<message>}
-\def\ltj@print#1{
-  \immediate\write16{#1}
-}
 
 \fi                             %</LaTeX>
 %%------------------ Value-token handling
@@ -201,28 +176,6 @@
   }
 }
 
-%% \ltj@safe@real{<real>}
-%! 実数. これは十進表記に限る.
-% For a real number given in decimal notation or a macro that
-% expands to such notation.
-\def\ltj@safe@real#1{
-  (tonumber("\luatexluaescapestring{#1}"))
-}
-
-%% \ltj@val@counter{<counter>}
-%! LaTeX カウンタの現在値.
-% For the current value of a LaTeX counter.
-\def\ltj@val@counter#1{
-  (\expandafter\number\csname c@#1\endcsname)
-}
-
-%% \ltj@val@skip{<skip>}
-% For the current value of a skip (or LaTeX-length) parameter.
-%! グルーレジスタ(LaTeX 長さ変数).
-%! 整形式のグルー値にも使える.
-\def\ltj@val@skip#1{
-  (luatexja.base.to_skip("\the\glueexpr#1\relax"))
-}
 %! 整形式の整数 → 数値 : \number#1
 %! 内部寸法 → 数値 : \number#1
 %! 整形式の寸法 → 数値 : \number\dimexpr#1\relax
@@ -233,17 +186,6 @@
 \def\ltj@safe@str#1{
   "\luatexluaescapestring{\detokenize{#1}}"
 }
-
-%% \ltj@luaescape{<text>}
-%! 非トークン化して Lua エスケープ.
-\def\ltj@luaescape#1{
-  \luatexluaescapestring{\detokenize{#1}}
-}
-%% \ltj@luaxescape{<text>}
-%! 非トークン化せずに(展開ありで) Lua エスケープ.
-%! つまり単なる \luatexescape.
-\let\ltj@luaxescape\luatexluaescapestring
-
 
 %%------------------ debug logging
 \ifdefined\LuaTeXjaDebugEnabled
@@ -284,30 +226,15 @@
 
 %% \ltj@afterbox <token><box>
 %% -> \setbox\ltj@afbox<box><token>
-%% from Sonja Maus, ``Looking Ahead for a <box>'',
-%%      TUGBoat, 11, No. 4, 1990.
+%% idea from the atbegshi package
 \newbox\ltj@afbox
 \directlua{luatexja.afbox_number=\the\ltj@afbox}
 \protected\def\ltj@afterbox#1{%
-  \def\ltj@afb@xarg{#1}%
-  \afterassignment\ltj@afb@x
-  \chardef\ltj@@next`.}
-\def\ltj@afb@x{\futurelet\ltj@@next\ltj@afb@xtest}
-\def\ltj@afb@xtest{%
-  \ifcase\ifx\ltj@@next\hbox\tw@\fi
-         \ifx\ltj@@next\vbox\tw@\fi
-         \ifx\ltj@@next\vtop\tw@\fi
-         \ifx\ltj@@next\box\@ne\fi
-         \ifx\ltj@@next\copy\@ne\fi
-         \ifx\ltj@@next\vsplit\@ne\fi
-         \ifx\ltj@@next\lastbox\@ne\fi
-         0% ``A <box> was ...'' error will be causes by \setbox later anyway.
-  \or\afterassignment\ltj@afb@xarg
-  \or\afterassignment\ltj@afb@xagarg
-  \fi
-  \setbox\ltj@afbox
+  \def\ltj@afbox@@arg{#1}\edef\ltj@afbox@@grouplevel{\number\currentgrouplevel}%
+  \afterassignment\ltj@afbox@@\setbox\ltj@afbox}
+\def\ltj@afbox@@{%
+  \ifnum\ltj@afbox@@grouplevel<\currentgrouplevel\expandafter\aftergroup\fi\ltj@afbox@@arg
 }
-\def\ltj@afb@xagarg{\aftergroup\ltj@afb@xarg}
 
 
 %%------------------ all done

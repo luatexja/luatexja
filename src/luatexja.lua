@@ -332,11 +332,6 @@ do
    ltjb.add_to_callback('hpack_filter', adjust_icflag, 'ltj.adjust_icflag', 1)
 end
 
--- cleanup process
-function luatexja.ext_cleanup()
-   ltjf.cleanup_size_cache(); ltjd.remove_end_whatsit()
-end
-
 -- lastnodechar
 do
    local id_glyph = node.id('glyph')
