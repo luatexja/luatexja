@@ -1,5 +1,5 @@
 %
-% lltjp-stfloats.sty 2017-05-05
+% lltjp-stfloats.sty 2021-03-17
 %
 
 \NeedsTeXFormat{LaTeX2e}
@@ -14,7 +14,9 @@
 \global\let\org@makecol\ltj@orig@makecol
 
 \patchcmd\fn@makecol{\vskip -\dimen@\@textbottom}%
-  {\ifnum\ltjgetparameter{direction}=4\else\vbox{\hskip\z@}\fi %%% LuaTeX-ja
+  {\unless\ifnum\ltjgetparameter{direction}=4
+     \vbox{\primitive\everypar{}\hskip\z@}%
+   \fi %%% LuaTeX-ja
    \vskip -\dimen@
    \ifltj@ftn@unvboxed\iffnfixbottom\else\@textbottom\fi\else\@textbottom\fi}{}{}
 \patchcmd\fn@makecol{\vskip\skip\footins}{\iffnfixbottom\vskip\z@\@plus.0001fil\fi\vskip\skip\footins}{}{}

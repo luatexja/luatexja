@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2021-03-14 Patch to LaTeX2e Kernel for LuaTeX-ja]
+\ProvidesPackage{lltjcore}[2021-03-17 Patch to LaTeX2e Kernel for LuaTeX-ja]
 \RequirePackage{etoolbox}
 
 %%% expl3
@@ -72,7 +72,10 @@
   \fi\fi}
 
 \patchcmd\@vtryfc{\global\setbox\@outputbox\vbox{}}
-  {\global\setbox\@outputbox\vbox{\unless\ifnum\ltjgetparameter{direction}=4\hskip\z@\fi}}{}{}
+  {\global\setbox\@outputbox\vbox{%
+     \unless\ifnum\ltjgetparameter{direction}=4
+       \primitive\everypar{}\hskip\z@\fi
+  }}{}{}
 
 \newif\iftombow \tombowfalse
 \newif\iftombowdate \tombowdatetrue
@@ -297,7 +300,9 @@
        \@texttop
        \dimen@ \dp\@outputbox
        \unvbox \@outputbox
-       \unless\ifnum\ltjgetparameter{direction}=4\vbox{\hskip\z@}\fi %%% LuaTeX-ja
+       \unless\ifnum\ltjgetparameter{direction}=4
+         \vbox{\primitive\everypar{}\hskip\z@}%
+       \fi %%% LuaTeX-ja
        \vskip -\dimen@
        \ifltj@ftn@unvboxed\iffnfixbottom\else\@textbottom\fi\else\@textbottom\fi
        }%
