@@ -1113,24 +1113,8 @@ do
          end
       end
    end
-   local getbox, shipout = tex.getbox, tex.shipout
-   local setbox, copy = node.direct.setbox, node.direct.copy
-   local afbox
-   function luatexja.direction.shipout()
-      start_time_measure 'box_primitive_hook'
-      if (not afbox) and luatexja.afbox_number  then afbox = luatexja.afbox_number end
-      local a = to_direct(getbox 'ltj@afbox')
-      local a_dir = get_box_dir(a, dir_yoko)
-      if a_dir~=dir_yoko then
-         local b = create_dir_node(a, a_dir, dir_yoko, false)
-         setfield(b, 'head', a); a = b
-      end
-      setfield(shipout_temp, 'head', a); finalize_inner(shipout_temp)
-      setbox(afbox, copy(getlist(shipout_temp))); setfield(shipout_temp, 'head',nil)
-      shipout(afbox)
-      stop_time_measure 'box_primitive_hook'
-   end
-   function luatexja.direction.shipout_lthook(head)
+   local copy = node.direct.copy
+   function luatexja.direction.shipout_lthook (head)
       start_time_measure 'box_primitive_hook'
       local a = to_direct(head)
       local a_dir = get_box_dir(a, dir_yoko)

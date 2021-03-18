@@ -23,9 +23,21 @@
 %! ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 % LuaTeX-ja macros against plain TeX
 
+%%%%\shipout
+\newluafunction\ltj@@lua@shipout@inner
+\directlua{
+  local t = lua.get_functions_table()
+  local getbox, setbox = tex.getbox, tex.setbox
+  local shipout_lthook = luatexja.direction.shipout_lthook
+  t[\the\ltj@@lua@shipout@inner]=function ()
+    local a = shipout_lthook(getbox(\the\ltj@afbox))
+  if a then setbox(\the\ltj@afbox, a) end
+  end
+}
 \protected\luadef\ltj@@lua@shipout\ltj@@lua@shipout@inner
-\protected\def\ltj@shipout{\ltj@afterbox\ltj@@lua@shipout}
-\let\shipout\ltj@shipout
+\def\ltj@shipout@{\ltj@@lua@shipout\primitive\shipout\box\ltj@afbox}%
+\protected\def\ltj@shipout{\ltj@afterbox\ltj@shipout@}
+\ifprimitive\shipout\let\shipout\ltj@shipout\fi
 \directlua{luatexja.direction.shipout_lthook = nil}
 
 \ifdefined\ltj@stdmcfont\else\def\ltj@stdmcfont{file:HaranoAjiMincho-Regular.otf}\fi

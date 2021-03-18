@@ -12,7 +12,7 @@
 \def\luatexjalatexLoaded{\endinput}
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{ltj-latex}[2021-03-17 LaTeX support of LuaTeX-ja]
+\ProvidesPackage{ltj-latex}[2021-03-18 LaTeX support of LuaTeX-ja]
 
 \endlinechar=13
 
@@ -28,8 +28,21 @@
 }{}
 \@ifl@t@r\fmtversion{2021-05-01}{\count@=1 }{\count@=0 }
 \ifnum \count@<1
+%%%% \shipout
+  \newluafunction\ltj@@lua@shipout@inner
+  \directlua{
+    local t = lua.get_functions_table()
+    local getbox, setbox = tex.getbox, tex.setbox
+    local shipout_lthook = luatexja.direction.shipout_lthook
+    t[\the\ltj@@lua@shipout@inner]=function ()
+      local a = shipout_lthook(getbox(\the\ltj@afbox))
+      if a then setbox(\the\ltj@afbox, a) end
+    end
+  }
   \protected\luadef\ltj@@lua@shipout\ltj@@lua@shipout@inner
-  \protected\def\ltj@shipout{\ltj@afterbox\ltj@@lua@shipout}
+  \def\ltj@shipout@{\ltj@@lua@shipout\primitive\shipout\box\ltj@afbox}%
+  \protected\def\ltj@shipout{\ltj@afterbox\ltj@shipout@}
+  \ifprimitive\shipout\let\shipout\ltj@shipout\fi
   \ifcsname tex_shipout:D\endcsname
     \expandafter\let\csname tex_shipout:D\endcsname\ltj@shipout
   \fi

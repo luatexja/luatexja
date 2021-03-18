@@ -701,13 +701,6 @@
   \ltj@@lua@raisebox\ltj@@orig@vcenter{\box\ltj@afbox}%
 }
 
-%%%% \shipout
-\newluafunction\ltj@@lua@shipout@inner
-\directlua{
-  local t = lua.get_functions_table()
-  t[\the\ltj@@lua@shipout@inner]=luatexja.direction.shipout
-}
-
 %%%% \unhbox and \unvbox
 \newluafunction\ltj@@lua@unboxcheckdir@inner
 \directlua{
