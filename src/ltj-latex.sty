@@ -50,7 +50,6 @@
 \else
   \directlua{%
     luatexbase.add_to_callback('pre_shipout_filter',luatexja.direction.shipout_lthook, 'ltj.direction', 1)
-    luatexja.direction.shipout = nil
   }
 \fi
 

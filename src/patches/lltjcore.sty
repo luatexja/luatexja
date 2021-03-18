@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2021-03-17 Patch to LaTeX2e Kernel for LuaTeX-ja]
+\ProvidesPackage{lltjcore}[2021-03-19 Patch to LaTeX2e Kernel for LuaTeX-ja]
 \RequirePackage{etoolbox}
 
 %%% expl3
@@ -89,7 +89,7 @@
 \newbox\@BR\newbox\@Br
 \newbox\@CL
 \newbox\@CR
-\font\@bannerfont=cmtt9
+\font\@bannerfont=file:lmmono9-regular.otf % cmtt9 in pLaTeX
 \newtoks\@bannertoken
 \@bannertoken{}
 \def\maketombowbox{%
@@ -137,7 +137,7 @@
 }
 \def\@outputtombow#1#2{%
   \iftombow
-  \vbox to\z@{\kern\dimexpr#1-10mm-\@tombowbleed\relax
+  \setbox0\vbox to\z@{\kern\dimexpr#1-10mm-\@tombowbleed\relax
     \boxmaxdepth\maxdimen
       \moveleft\dimexpr#2+\@tombowbleed\vbox to\@@paperheight{%
 	  \color@begingroup
@@ -153,9 +153,10 @@
       \kern-10mm
       \hbox to\@@paperwidth{\hskip\@tombowbleed\relax
          \copy\@BL\hfill\copy\@BC\hfill\copy\@BR\hskip\@tombowbleed}%
-	\color@endgroup
+	  \color@endgroup
     }\vss
   }%
+  \dp\z@=\z@ \wd\z@=\z@\box\z@
   \fi
 }
 \def\@tombowcolor{\normalcolor}
@@ -169,7 +170,7 @@
 }
 \newdimen\@@paperheight
 \newdimen\@@paperwidth
-
+\newdimen\@@topmargin % not used by LuaTeX-ja; only to avoid existing codes
 \patchcmd\@outputpage{\begingroup\let\protect\noexpand}{% tate direction
 \begingroup
   \ifnum\ltjgetparameter{direction}=4\else
@@ -204,7 +205,6 @@
   \patchcmd\@outputpage{\reset@font}{\@tombowreset@@paper\reset@font}{}{}
   \patchcmd\@outputpage{\@begindvi}{\@begindvi\@outputtombow{0pt}{0pt}}{}{}
 \fi
-
 
 %%% Remove extra xkanjiskip
 \renewcommand\@makefnmark{%
