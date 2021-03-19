@@ -25,10 +25,11 @@
 \setmonofont[RawFeature=-notdef, Ligatures=CommonOff, %CharacterVariant={31,45,61,36},
 %<en>  Scale=0.8132073118633364, FakeStretch=1.183236,
 %<ja>  Scale=MatchLowercase, FakeStretch=1.137121,
-  Contextuals=AlternateOff,
-  ItalicFont=Iosevka Term Slab Oblique,
-  BoldFont=Iosevka Term Slab Bold, BoldItalicFont=Iosevka Term Slab Bold Oblique,
-]{Iosevka Term Slab}
+  Contextuals=AlternateOff, Kerning=Off,
+  Ligatures={CommonOff,RequiredOff,ContextualOff,RareOff,HistoricOff,TeXOff},
+  ItalicFont=Iosevka Slab Oblique,
+  BoldFont=Iosevka Slab Bold, BoldItalicFont=Iosevka Slab Bold Oblique,
+]{Iosevka Slab}
 \setsansfont[Scale=MatchLowercase,Ligatures=TeX,RawFeature=-notdef]{Linux Biolinum O}
 \usepackage[match]{luatexja-fontspec}
 \usepackage[haranoaji]{luatexja-preset}
@@ -225,7 +226,7 @@
 }
 
 \catcode`\<=13
-\def<#1>{{\normalfont\rm\itshape$\langle$#1\/$\rangle$}}
+\def<#1>{{\normalfont\rmfamily\itshape$\langle$#1\/$\rangle$}}
 \let\LARG=<
 \maketitle
 
@@ -5667,7 +5668,7 @@ The default value is \texttt{paverage}. \dots
 \item[\DParam{jacharrange}\,=<ranges>]
 \item[\DParam{kansujichar}\,=\{<digit>, <chr\_code>\}$^\ast$] [\cs{kansujichar}]
 
-\item[\DParam{direction}\,=<dir>\ \hbox{\rm (always local)}]\
+\item[\DParam{direction}\,=<dir>\ \hbox{\normalfont\rmfamily (always local)}]\
 
 %<*en>
 Assigning to this parameter has the same effect as
@@ -10458,7 +10459,7 @@ If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]
 \item \textit{Np}の中身の文字コードについて，「直前への\Param{xkanjiskip}の挿入」が禁止されている
 （つまり，\Param{jaxspmode}~(or \Param{alxspmode})パラメータが偶数）．
 \end{itemize}
-\item ユーザ側から見た\Param{xkanjiskip}パラメータの自然長が$\cs{maxdimen}=(2^{30}-1)\,{\rm sp}$で
+\item ユーザ側から見た\Param{xkanjiskip}パラメータの自然長が$\cs{maxdimen}=(2^{30}-1)\,\textrm{sp}$で
 なければ，\Param{xkanjiskip}パラメータの値を持つglueを採用する．
 \item 2.でない場合は，\textit{Nq}, \textit{Np}（\textsf{和文A}/\textsf{和文B}なのは片方だけ）
 で使われているJFMに指定されている\Param{xkanjiskip}の値を用いる．

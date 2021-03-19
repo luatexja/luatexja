@@ -26,8 +26,6 @@ Installation
     - luaotfload (v3.1 or later recommended)
     - adobemapping (Adobe CMap files)
     - LaTeX2e 2020-02-02 patch level 5 or later (if you want to use with LaTeX)
-      Note that the adaptation for LaTeX2e 2021-05-01 is 
-      work in progress; it will be done after the freeze of TL'20
     - etoolbox package
     - ltxcmds package, pdftexcmds package
     - filehook package, atbegshi package (for LaTeX2e 2020-02-02)
@@ -39,7 +37,7 @@ Installation
    One might be able to typeset documents without an error, but with
    some unwanted results.
 
-1. If you are using TeX Live 2020, you can install LuaTeX-ja via tlmgr.
+1. If you are using TeX Live 2021, you can install LuaTeX-ja via tlmgr.
 
 2. If you must/want to install manually:
 
@@ -91,7 +89,7 @@ Notes
 
 * src/*.{ins.dtx} are not needed in regular use.
 
-* ltj-kinsoku_make.tex is removed in version 20200808.0. 
+* ltj-kinsoku_make.tex is removed in version 20200808.0.
   This file and ltj-kinsoku.lua are not used anymore.
   (Do not remove ltj-kinsoku.tex.)
 
