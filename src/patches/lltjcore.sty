@@ -135,12 +135,11 @@
       \vrule height10mm depth10mm width\@tombowwidth
       \vrule height.5\@tombowwidth depth.5\@tombowwidth width10mm\hss}%
 }
-\def\@outputtombow{\@ifnextchar[{\@@outputtombow}{\@@outputtombow[0pt][0pt]}}%]
-\def\@@outputtombow[#1][#2]{%
+\def\@outputtombow{%
   \iftombow
-  \setbox0\vbox to\z@{\kern\dimexpr#1-10mm-\@tombowbleed\relax
+  \vbox to\z@{\kern\dimexpr-10mm-\@tombowbleed\relax
     \boxmaxdepth\maxdimen
-      \moveleft\dimexpr#2+\@tombowbleed\vbox to\@@paperheight{%
+      \moveleft\@tombowbleed\vbox to\@@paperheight{%
 	  \color@begingroup
 	  \@tombowcolor
       \hbox to\@@paperwidth{\hskip\@tombowbleed\relax
@@ -154,10 +153,9 @@
       \kern-10mm%
       \hbox to\@@paperwidth{\hskip\@tombowbleed\relax
          \copy\@BL\hfill\copy\@BC\hfill\copy\@BR\hskip\@tombowbleed}%
-	  \color@endgroup
+      \color@endgroup
     }\vss
   }%
-  \dp\z@=\z@ \wd\z@=\z@\box\z@
   \fi
 }
 \def\@tombowcolor{\normalcolor}
@@ -197,16 +195,11 @@
   \ifnum\ltjgetparameter{direction}=3 \let\@themargin\oddsidemargin
   \else\let\@themargin\evensidemargin\fi
 }{}{}
-\ifltj@ltfilehook@avail
-  \AddToHook{shipout/before}{%
-    \iftombow\setbox\ShipoutBox\vbox{\vskip1in\moveright1in\box\ShipoutBox}\fi
-  }
-  \AddToHook{shipout/background}{\@tombowreset@@paper\@outputtombow[1in][-1in]}
-\else
-  \patchcmd\@outputpage{\vskip\topmargin}{\vskip\topmargin\iftombow\vskip1in\fi}{}{}
-  \patchcmd\@outputpage{\reset@font}{\@tombowreset@@paper\reset@font}{}{}
-  \patchcmd\@outputpage{\@begindvi}{\@begindvi\@outputtombow}{}{}
-\fi
+
+% 将来は shipout hook で書き直したい
+\patchcmd\@outputpage{\vskip\topmargin}{\vskip\topmargin\iftombow\vskip1in\fi}{}{}
+\patchcmd\@outputpage{\reset@font}{\@tombowreset@@paper\reset@font}{}{}
+\patchcmd\@outputpage{\@begindvi}{\@begindvi\@outputtombow}{}{}
 
 %%% Remove extra xkanjiskip
 \renewcommand\@makefnmark{%
