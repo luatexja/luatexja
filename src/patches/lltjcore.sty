@@ -135,7 +135,8 @@
       \vrule height10mm depth10mm width\@tombowwidth
       \vrule height.5\@tombowwidth depth.5\@tombowwidth width10mm\hss}%
 }
-\def\@outputtombow#1#2{%
+\def\@outputtombow{\@ifnextchar[{\@@outputtombow}{\@@outputtombow[0pt][0pt]}}%]
+\def\@@outputtombow[#1][#2]{%
   \iftombow
   \setbox0\vbox to\z@{\kern\dimexpr#1-10mm-\@tombowbleed\relax
     \boxmaxdepth\maxdimen
@@ -144,13 +145,13 @@
 	  \@tombowcolor
       \hbox to\@@paperwidth{\hskip\@tombowbleed\relax
          \copy\@TL\hfill\copy\@TC\hfill\copy\@TR\hskip\@tombowbleed}%
-      \kern-10mm
+      \kern-10mm%
       \hbox to\@@paperwidth{\copy\@Tl\hfill\copy\@Tr}%
       \vfill
       \hbox to\@@paperwidth{\copy\@CL\hfill\copy\@CR}%
       \vfill
       \hbox to\@@paperwidth{\copy\@Bl\hfill\copy\@Br}%
-      \kern-10mm
+      \kern-10mm%
       \hbox to\@@paperwidth{\hskip\@tombowbleed\relax
          \copy\@BL\hfill\copy\@BC\hfill\copy\@BR\hskip\@tombowbleed}%
 	  \color@endgroup
@@ -162,10 +163,11 @@
 \def\@tombowcolor{\normalcolor}
 \def\@tombowbleed{3mm}
 \def\@tombowreset@@paper{%
+   \@@topmargin \topmargin % only for compatibility
    \iftombow
      \@@paperwidth\dimexpr\paperwidth+2\dimexpr\@tombowbleed\relax
      \@@paperheight\dimexpr\paperheight+10mm+2\dimexpr\@tombowbleed\relax
-     \advance\@themargin 1in\relax
+     \advance\@@topmargin 1in\relax \advance\@themargin 1in\relax
    \fi
 }
 \newdimen\@@paperheight
@@ -199,11 +201,11 @@
   \AddToHook{shipout/before}{%
     \iftombow\setbox\ShipoutBox\vbox{\vskip1in\moveright1in\box\ShipoutBox}\fi
   }
-  \AddToHook{shipout/background}{\@tombowreset@@paper\@outputtombow{1in}{-1in}}
+  \AddToHook{shipout/background}{\@tombowreset@@paper\@outputtombow[1in][-1in]}
 \else
   \patchcmd\@outputpage{\vskip\topmargin}{\vskip\topmargin\iftombow\vskip1in\fi}{}{}
   \patchcmd\@outputpage{\reset@font}{\@tombowreset@@paper\reset@font}{}{}
-  \patchcmd\@outputpage{\@begindvi}{\@begindvi\@outputtombow{0pt}{0pt}}{}{}
+  \patchcmd\@outputpage{\@begindvi}{\@begindvi\@outputtombow}{}{}
 \fi
 
 %%% Remove extra xkanjiskip
