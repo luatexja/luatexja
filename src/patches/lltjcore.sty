@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2021-03-19 Patch to LaTeX2e Kernel for LuaTeX-ja]
+\ProvidesPackage{lltjcore}[2021-03-25 Patch to LaTeX2e Kernel for LuaTeX-ja]
 \RequirePackage{etoolbox}
 
 %%% expl3
@@ -266,44 +266,17 @@
 \newif\iffnfixbottom
 \newif\ifltj@ftn@unvboxed
 %%% @makecol
-\gdef \@makecol {%
-   \ifvoid\footins
-     \ltj@ftn@unvboxedfalse
-     \setbox\@outputbox \box\@cclv
-   \else
-     \ltj@ftn@unvboxedtrue
-     \setbox\@outputbox \vbox {%
-       \boxmaxdepth \@maxdepth
-       \unvbox \@cclv
-       \iffnfixbottom\vskip\z@ \@plus.0001fil\fi
-       \vskip \skip\footins
-       \color@begingroup
-         \normalcolor
-         \footnoterule
-         \unvbox \footins
-       \color@endgroup
-       }%
-   \fi
-   \let\@elt\relax
-   \xdef\@freelist{\@freelist\@midlist}%
-   \global \let \@midlist \@empty
-   \@combinefloats
-   \ifvbox\@kludgeins
-     \@makespecialcolbox
-   \else
-     \setbox\@outputbox \vbox to\@colht {%
-       \@texttop
-       \dimen@ \dp\@outputbox
-       \unvbox \@outputbox
-       \unless\ifnum\ltjgetparameter{direction}=4
-         \vbox{\primitive\everypar{}\hskip\z@}%
-       \fi %%% LuaTeX-ja
-       \vskip -\dimen@
-       \ifltj@ftn@unvboxed\iffnfixbottom\else\@textbottom\fi\else\@textbottom\fi
-       }%
-   \fi
-   \global \maxdepth \@maxdepth
-}
+\def\pltx@adjust@wd@outputbox{%
+  \unless\ifnum\ltjgetparameter{direction}=4
+    \vbox{\primitive\everypar{}\hskip\z@}%
+   \fi}
+\patchcmd\@makecol{\vskip -\dimen@\@textbottom}%
+  {\pltx@adjust@wd@outputbox
+   \vskip -\dimen@
+   \ifltj@ftn@unvboxed\iffnfixbottom\else\@textbottom\fi\else\@textbottom\fi}{}{}
+\patchcmd\@makecol{\vskip\skip\footins}{\iffnfixbottom\vskip\z@\@plus.0001fil\fi\vskip\skip\footins}{}{}
+\patchcmd\@makecol{\ifvoid\footins}{\ifvoid\footins\ltj@ftn@unvboxedfalse}{}{}
+\patchcmd\@makecol{\setbox\@outputbox \vbox}{\ltj@ftn@unvboxedtrue\setbox\@outputbox \vbox}{}{}
 \let\ltj@orig@makecol=\@makecol
 
 \patchcmd\@makespecialcolbox{\@textbottom}{\ifltj@ftn@unvboxed\iffnfixbottom\else\@textbottom\fi\else\@textbottom\fi}{}{}
