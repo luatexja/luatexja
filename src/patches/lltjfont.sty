@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2021-02-14 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2021-04-06 Patch to NFSS2 for LuaTeX-ja]
 
 %%%%%%%% LaTeX2e version detection
 \newcount\ltj@@latex@plv \ltj@@latex@plv=-1
@@ -891,6 +891,7 @@
 \let\delayed@merge@kanji@shape\merge@kanji@shape@without@substitution
 \fi
 
+\newif\if@forced@series@kanji
 \ifnum\ltj@@latex@plv=300 % 2020-02-02 pl3, 4
   \DeclareRobustCommand\romanseries[1]{\merge@font@series{#1}}
   \DeclareRobustCommand\kanjiseries[1]{\merge@kanji@series{#1}}
@@ -898,20 +899,20 @@
   \DeclareRobustCommand\kanjiseriesforce[1]{\edef\k@series{#1}}
 \else\ifnum\ltj@@latex@plv<1500% >=2020-02-02 pl5 and <=2020-10-01
   \DeclareRobustCommand\romanseries[1]{\@forced@seriesfalse\merge@font@series{#1}}
-  \DeclareRobustCommand\kanjiseries[1]{\@forced@seriesfalse\merge@kanji@series{#1}}
+  \DeclareRobustCommand\kanjiseries[1]{\@forced@series@kanjifalse\merge@kanji@series{#1}}
   \DeclareRobustCommand\romanseriesforce[1]{\@forced@seriestrue\edef\f@series{#1}}
-  \DeclareRobustCommand\kanjiseriesforce[1]{\@forced@seriestrue\edef\k@series{#1}}
+  \DeclareRobustCommand\kanjiseriesforce[1]{\@forced@series@kanjitrue\edef\k@series{#1}}
 \else% >=2021-05-01
   \DeclareRobustCommand\romanseries[1]{\@forced@seriesfalse
       \expandafter\def\expandafter\delayed@f@adjustment\expandafter
           {\delayed@f@adjustment\delayed@merge@font@series{#1}}}
-  \DeclareRobustCommand\kanjiseries[1]{\@forced@seriesfalse
+  \DeclareRobustCommand\kanjiseries[1]{\@forced@series@kanjifalse
       \expandafter\def\expandafter\delayed@k@adjustment\expandafter
           {\delayed@k@adjustment\delayed@merge@kanji@series{#1}}}
   \DeclareRobustCommand\romanseriesforce[1]{\@forced@seriestrue
       \expandafter\def\expandafter\delayed@f@adjustment\expandafter
           {\delayed@f@adjustment\edef\f@series{#1}}}
-  \DeclareRobustCommand\kanjiseriesforce[1]{\@forced@seriestrue
+  \DeclareRobustCommand\kanjiseriesforce[1]{\@forced@series@kanjitrue
       \expandafter\def\expandafter\delayed@k@adjustment\expandafter
           {\delayed@k@adjustment\edef\k@series{#1}}}
   \let\delayed@k@adjustment\@empty
@@ -1014,6 +1015,7 @@
 %%%% LaTeX >= 2020-02-02
 \let\prepare@family@series@update@kanji=\prepare@family@series@update
 \patchcmd\prepare@family@series@update{\fontfamily}{\romanfamily}{}{}
+\patchcmd\prepare@family@series@update@kanji{\if@forced@series}{\if@forced@series@kanji}{}{}
 \patchcmd\prepare@family@series@update@kanji{\fontfamily}{\kanjifamily}{}{}
 \patchcmd\prepare@family@series@update@kanji{\update@series@target@value}{\update@series@target@value@kanji}{}{}
 \patchcmd\prepare@family@series@update@kanji{\f@family}{\k@family}{}{}
