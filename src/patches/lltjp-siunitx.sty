@@ -1,5 +1,5 @@
 %
-% lltjp-siunitx.sty 2019-06-06
+% lltjp-siunitx.sty 2021-04-19
 %
 
 \NeedsTeXFormat{LaTeX2e}
@@ -7,6 +7,32 @@
 \RequirePackage{siunitx}
 \makeatletter
 \ExplSyntaxOn
+\cs_if_exist:NTF \siunitx_print_text:n {% siunitx v3.00
+\cs_set_protected:Npn \siunitx_print_text:n #1
+  {
+    \text
+      {
+        \ltj@allalchar % <--- LuaTeX-ja
+        \bool_if:NT \l__siunitx_print_text_family_bool
+          {
+            \fontfamily { \familydefault }
+            \selectfont
+          }
+        \bool_if:NT \l__siunitx_print_text_series_bool
+          {
+            \fontseries { \seriesdefault }
+            \selectfont
+          }
+        \bool_if:NT \l__siunitx_print_text_shape_bool
+          {
+            \fontshape { \shapedefault }
+            \selectfont
+          }
+        \__siunitx_print_text_replace:n {#1}
+      }
+  }
+}% siunitx v3.00 end
+{% siunitx v2.xx
 \cs_generate_variant:Nn \tl_if_in:NnT { coT }
 \cs_new:Nn \__ltj_siunix_patch_inner:n {
   \cs_if_exist:cT { #1_tl } {
@@ -91,6 +117,6 @@
       }
       { }
   }
-
+}
 \ExplSyntaxOff
 \endinput
