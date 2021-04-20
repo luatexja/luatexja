@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjext}[2020-09-30 v1.2k-ltj-12 Macros for vertical writing]
+\ProvidesPackage{lltjext}[2021-04-20 v1.2k-ltj-13 Macros for vertical writing]
 \RequirePackage{luatexja}
 \newcount\ltj@ext@dir
 \let\ltj@lltjext@orig@tabular=\tabular
@@ -28,7 +28,7 @@
    \setlength\dimen@{#2}%
    \edef\@halignto{to\the\dimen@}\p@tabular<#1>}
 \def\p@tabular<#1>{\leavevmode \hbox \bgroup 
-   \ltj@ext@dir=\ltjgetparameter{direction}
+   \ltj@ext@dir=\ltjgetparameter{direction}\relax
    $\let\@acol\@tabacol
    \let\@classz\@tabclassz
    \let\@classiv\@tabclassiv \let\\\@tabularcr\p@tabarray<#1>}
@@ -36,6 +36,7 @@
    {\p@array<#1>}{\p@array<#1>[c]}}
 
 \def\p@array<#1>[#2]#3{%
+  \ifnum\ltj@ext@dir=0 \ltj@ext@dir=\ltjgetparameter{direction}\relax\fi
   \let\box@dir\relax
   \if #1z\relax
     \ifnum\ltj@ext@dir=3\relax
@@ -674,7 +675,7 @@
 
 \def\ltj@lltjext@patch@array{%
   \patchcmd{\@tabular}{\hbox\bgroup}{%
-	\hbox\bgroup\ltj@ext@dir=\ltjgetparameter{direction}}{}{}
+	\hbox\bgroup\ltj@ext@dir=\ltjgetparameter{direction}\relax}{}{}
   \pretocmd{\array}%
 	{\ltj@ext@dir=\ltjgetparameter{direction}\relax}{}{}
   \expandafter\let\csname tabular*\endcsname=\ltj@lltjext@orig@tabularS
@@ -702,6 +703,7 @@
   }%
   \def\@tabarray{\@ifnextchar<\p@tabarray{\p@tabarray<Z>}}
   \def\p@array<##1>[##2]##3{%
+    \ifnum\ltj@ext@dir=0 \ltj@ext@dir=\ltjgetparameter{direction}\relax\fi
     \let\box@dir\relax
     \if ##1z\relax
       \ifnum\ltj@ext@dir=3\relax
@@ -734,7 +736,7 @@
     \fork@array@option<##1>[##2]%
     \begingroup
     \@mkpream{##3}%
-    \xdef\@preamble{\ialign \noexpand \@halignto
+    \xdef\@preamble{\noexpand\ialign \noexpand \@halignto
                     \bgroup \tabskip \z@skip \@arstrut \@preamble
                             \tabskip \z@ \cr}%
     \endgroup
