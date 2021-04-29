@@ -13,7 +13,7 @@
 \RequirePackage{expl3}
 \ExplSyntaxOn\makeatletter
 \box_new:N \l__platex_shipout_dummy_box
-\if_cs_exist:N \__shipout_execute_main_cont:Nnnn %% 2021-05-01
+\if_cs_exist:N \__shipout_execute_main_cont:Nnnn %% 2021-06-01
 \cs_new_eq:NN \__platex_original_shipout_execute_main_cont:Nnnn
               \__shipout_execute_main_cont:Nnnn
 \cs_set:Npn \__shipout_execute_main_cont:Nnnn #1#2#3#4 {

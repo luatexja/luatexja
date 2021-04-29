@@ -3,13 +3,13 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2021-04-06 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2021-04-29 Patch to NFSS2 for LuaTeX-ja]
 
 %%%%%%%% LaTeX2e version detection
 \newcount\ltj@@latex@plv \ltj@@latex@plv=-1
 \ifltj@ltfilehook@avail
   \IfHookExistsTF{selectfont}%
-    {\ltj@@latex@plv=1500}% 2021-05-01
+    {\ltj@@latex@plv=1500}% 2021-06-01
     {\ifnum\patch@level>2 \ltj@@latex@plv=1300\else \ltj@@latex@plv=1000\fi}% 2020-10-01
 \else\ifdefined\@rmfamilyhook % 2020-02-02
   \ifx\@forced@seriestrue\@undefined % 2020-02-02 pl0--2
@@ -451,7 +451,7 @@
   \ltj@@EverySelectfont@Init
 }
 \EverySelectfont{\ltj@selectfont@patch}
-\else % LaTeX2e >=2021-05-01
+\else % LaTeX2e >=2021-06-01
 \AddToHook{selectfont}[luatexja]{%
   \ltj@@start@time@measure{selectfont}%
   \ifx\delayed@k@adjustment\@empty
@@ -473,6 +473,7 @@
     \fi
     \let\delayed@k@adjustment\@empty
   \fi
+  \@forced@series@kanjifalse
   \let\tmp@error@fontshape\error@fontshape
   \let\error@fontshape\error@kfontshape
   \ltj@@is@kyenc{\k@encoding}\ifin@%
@@ -806,7 +807,7 @@
     \fi
   \fi
 }
-\else % >=2021-05-01
+\else % >=2021-06-01
 \def\merge@kanji@series@#1#2#3\@nil{%
   \def\reserved@a{#3}%
   \ifx\reserved@a\@empty
@@ -902,7 +903,7 @@
   \DeclareRobustCommand\kanjiseries[1]{\@forced@series@kanjifalse\merge@kanji@series{#1}}
   \DeclareRobustCommand\romanseriesforce[1]{\@forced@seriestrue\edef\f@series{#1}}
   \DeclareRobustCommand\kanjiseriesforce[1]{\@forced@series@kanjitrue\edef\k@series{#1}}
-\else% >=2021-05-01
+\else% >=2021-06-01
   \DeclareRobustCommand\romanseries[1]{\@forced@seriesfalse
       \expandafter\def\expandafter\delayed@f@adjustment\expandafter
           {\delayed@f@adjustment\delayed@merge@font@series{#1}}}
@@ -931,7 +932,7 @@
   \DeclareRobustCommand\romanshapeforce[1]{\edef\f@shape{#1}}
   \DeclareRobustCommand\kanjishapeforce[1]{\edef\k@shape{#1}}
   \DeclareRobustCommand\fontshapeforce[1]{\set@safe@kanji@shape{#1}{}\romanshapeforce{#1}}
-\else% >=2021-05-01
+\else% >=2021-06-01
   \DeclareRobustCommand\romanshape[1]{%
        \expandafter\def\expandafter\delayed@f@adjustment\expandafter
            {\delayed@f@adjustment\delayed@merge@font@shape{#1}}}
@@ -954,8 +955,20 @@
      \expandafter\def\expandafter\delayed@k@adjustment\expandafter
          {\delayed@k@adjustment\set@safe@kanji@shape{#1}{}}}
 \fi
-\ifnum\ltj@@latex@plv>1000
-%%%% LaTeX >= 2020-10-01 PL3
+\ifnum\ltj@@latex@plv>1499
+%%%% LaTeX >= 2021-06-01
+\DeclareRobustCommand\usekanji[4]{%
+    \kanjiencoding{#1}\edef\k@family{#2}%
+    \set@target@series@kanji{#3}\edef\k@shape{#4}%
+    \let\delayed@k@adjustment\@empty
+    \selectfont\ignorespaces}
+\DeclareRobustCommand\useroman[4]{%
+    \romanencoding{#1}\edef\f@family{#2}%
+    \set@target@series{#3}\edef\f@shape{#4}%
+    \let\delayed@f@adjustment\@empty
+    \selectfont\ignorespaces}
+\else\ifnum\ltj@@latex@plv>1000
+%%%% 2021-10-01 PL3 <= LaTeX < 2021-06-01
 \DeclareRobustCommand\usekanji[4]{%
     \kanjiencoding{#1}\edef\k@family{#2}%
     \set@target@series@kanji{#3}\edef\k@shape{#4}%
@@ -972,7 +985,7 @@
 \DeclareRobustCommand\useroman[4]{%
     \romanencoding{#1}\edef\f@family{#2}\edef\f@series{#3}\edef\f@shape{#4}%
     \selectfont\ignorespaces}
-\fi
+\fi\fi
 %%%% LaTeX >= 2020-02-02 END
 \else
 %%%% LaTeX 2019-10-01
@@ -1155,12 +1168,23 @@
     \let\reset@font\normalfont
   \fi\fi
 }
+
+\ifnum\ltj@@latex@plv>1499
+\@ltj@hook@dfh{%
+  \kanjiencoding{\kanjiencodingdefault}%
+  \edef\k@family{\kanjifamilydefault}%
+  \edef\k@series{\kanjiseriesdefault}%
+  \edef\k@shape{\kanjishapedefault}%
+  \let\delayed@k@adjustment\empty
+}
+\else
 \@ltj@hook@dfh{%
   \kanjiencoding{\kanjiencodingdefault}%
   \edef\k@family{\kanjifamilydefault}%
   \edef\k@series{\kanjiseriesdefault}%
   \edef\k@shape{\kanjishapedefault}%
 }
+\fi
 \let\@ltj@hook@dfh\@undefined
 %%%% LaTeX >= 2020-02-02 END
 \else
