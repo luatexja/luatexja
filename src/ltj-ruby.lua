@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.ruby',
-  date = '2020-10-30',
+  date = '2021-05-04',
   description = 'Ruby annotation',
 })
 luatexja.ruby = {}
@@ -544,12 +544,13 @@ local function pre_high(ahead)
              local op = (atr>0) and (old_break_info[atr] or post_intrusion_backup) or 0
              max_allow_pre = max(0, -max_allow_pre - op)
          end
-         if rst.exclude_pre_from_prev_ruby  and ((atr>0) and (old_break_info[-atr]>0) or post_jfmgk_backup) then
+         if rst.exclude_pre_from_prev_ruby  and atr>0 and old_break_info[-atr]
+           and (old_break_info[-atr]>0 or post_jfmgk_backup) then
             -- 「直前のルビが JFM グルーに進入→現在のルビの前文字進入はなし」という状況
             max_allow_pre = 0; rst.exclude_pre_from_prev_ruby=false
          end
          if rst.exclude_pre_jfmgk_from_prev_ruby
-            and (atr>0) and ((old_break_info[atr]  or post_intrusion_backup) > 0) then
+            and atr>0 and ((old_break_info[atr]  or post_intrusion_backup) > 0) then
             -- 「直前のルビが文字に進入→現在のルビの和文処理グルーへの進入はなし」という状況
             rst.before_jfmgk = 0
          end
