@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2021-03-16 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2021-05-11 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -215,7 +215,10 @@
     stop_time_measure(scan_arg())
   end
 }
-\protected\def\/{\relax\luafunction\ltj@@italic@inner}
+\begingroup\catcode`\/=11
+\protected\gdef\ltj@@/{\relax\luafunction\ltj@@italic@inner}
+\global\let\/\ltj@@/ %% PRIMITIVE
+\endgroup
 \luadef\ltj@@start@time@measure\ltj@@start@time@measure@inner
 \luadef\ltj@@stop@time@measure\ltj@@stop@time@measure@inner
 
@@ -603,7 +606,7 @@
 \yoko
 
 %%%% insert
-\let\orig@insert=\insert
+\let\ltj@@orig@insert\insert
 \newluafunction\ltj@@lua@populate@insertwhatsit@inner
 \directlua{
   local t = lua.get_functions_table()
@@ -611,17 +614,19 @@
     = luatexja.direction.populate_insertion_dir_whatsit
 }
 \luadef\ltj@@lua@populate@insertwhatsit\ltj@@lua@populate@insertwhatsit@inner
-\protected\def\insert{\begingroup\afterassignment\ltj@@insert@A\ltj@tempcnta}
-\protected\def\ltj@@insert@A{\orig@insert\ltj@tempcnta\bgroup
+\protected\def\ltj@@insert{\begingroup\afterassignment\ltj@@insert@A\ltj@tempcnta}
+\let\insert\ltj@@insert %% PRIMITIVE
+\protected\def\ltj@@insert@A{\ltj@@orig@insert\ltj@tempcnta\bgroup
   \aftergroup\ltj@@insert@B\let\ltj@@next}
 \protected\def\ltj@@insert@B{\ltj@@lua@populate@insertwhatsit\endgroup}
 
 %%%% vadjust
-\let\ltj@@orig@vadjust=\vadjust
-\protected\def\vadjust{%
+\let\ltj@@orig@vadjust\vadjust
+\protected\def\ltj@@vadjust{%
   \ltj@@orig@vadjust\bgroup
   \directlua{luatexja.direction.set_list_direction_hook('adj')}%
   \aftergroup\ltj@@vadjust@check@dir\let\ltj@@next}
+\let\vadjust\ltj@@vadjust %% PRIMITIVE
 \protected\def\ltj@@vadjust@check@dir{%
   \directlua{luatexja.direction.check_adjust_direction()}%
 }
@@ -653,9 +658,9 @@
   \PushPreHook{hbox}{\ltj@@box@dirhook\aftergroup\ltj@@reset@badness}
   \PushPreHook{vbox}{\ltj@@box@dirhook\aftergroup\ltj@@reset@badness}
 \else
-  \let\ltj@@everyhbox=\everyhbox\let\ltj@@everyvbox=\everyvbox
+  \let\ltj@@everyhbox\everyhbox\let\ltj@@everyvbox\everyvbox
   \newtoks\ltj@@i@everyhbox\newtoks\ltj@@i@everyvbox
-  \let\everyhbox=\ltj@@i@everyhbox\let\everyvbox=\ltj@@i@everyvbox
+  \let\everyhbox\ltj@@i@everyhbox\let\everyvbox\ltj@@i@everyvbox
   \ltj@@everyhbox{\ltj@@box@dirhook
     \aftergroup\ltj@@reset@badness\the\ltj@@i@everyhbox}
   \ltj@@everyvbox{\ltj@@box@dirhook
@@ -671,35 +676,41 @@
   t[\the\ltj@@lua@raisebox@inner]=luatexja.direction.raise_box
 }
 \protected\luadef\ltj@@lua@raisebox\ltj@@lua@raisebox@inner
-\let\ltj@@orig@raise=\raise
-\let\ltj@@orig@lower=\lower
-\protected\def\raise{\ltj@reset@globaldefs\afterassignment\ltj@@raise\ltj@tempdima}
-\protected\def\lower{\ltj@reset@globaldefs\afterassignment\ltj@@raise\ltj@tempdima-}
-\protected\def\ltj@@raise{%
+\let\ltj@@orig@raise\raise
+\let\ltj@@orig@lower\lower
+\protected\def\ltj@@raise{\ltj@reset@globaldefs\afterassignment\ltj@@raise@\ltj@tempdima}
+\protected\def\ltj@@lower{\ltj@reset@globaldefs\afterassignment\ltj@@raise@\ltj@tempdima-}
+\protected\def\ltj@@raise@{%
   \ltj@restore@globaldefs
   \edef\ltj@@raise@a{%
     \ltj@@lua@raisebox\ltj@@orig@raise\the\ltj@tempdima\noexpand\box\ltj@afbox
   }\ltj@afterbox\ltj@@raise@a}
-\let\ltj@@orig@moveleft=\moveleft
-\let\ltj@@orig@moveright=\moveright
-\protected\def\moveleft{\ltj@reset@globaldefs\afterassignment\ltj@@moveleft\ltj@tempdima}
-\protected\def\moveright{\ltj@reset@globaldefs\afterassignment\ltj@@moveleft\ltj@tempdima-}
-\protected\def\ltj@@moveleft{%
+\let\ltj@@orig@moveleft\moveleft
+\let\ltj@@orig@moveright\moveright
+\protected\def\ltj@@moveleft{\ltj@reset@globaldefs\afterassignment\ltj@@moveleft@\ltj@tempdima}
+\protected\def\ltj@@moveright{\ltj@reset@globaldefs\afterassignment\ltj@@moveleft@\ltj@tempdima-}
+\protected\def\ltj@@moveleft@{%
   \ltj@restore@globaldefs
   \edef\ltj@@moveleft@a{%
     \ltj@@lua@raisebox\ltj@@orig@moveleft\the\ltj@tempdima\noexpand\box\ltj@afbox
   }\ltj@afterbox\ltj@@moveleft@a}
+\let\raise\ltj@@raise %% PRIMITIVE
+\let\lower\ltj@@lower %% PRIMITIVE
+\let\moveleft\ltj@@moveleft %% PRIMITIVE
+\let\moveright\ltj@@moveright %% PRIMITIVE
 
 %%%%\vsplit
-\let\ltj@@orig@vsplit=\vsplit
-\protected\def\vsplit{\directlua{luatexja.direction.vsplit()}}
+\let\ltj@@orig@vsplit\vsplit
+\protected\def\ltj@@vsplit{\directlua{luatexja.direction.vsplit()}}
+\let\vsplit\ltj@@vsplit %% PRIMITIVE
 
 %%%% \vcenter
-\let\ltj@@orig@vcenter=\vcenter
-\protected\def\vcenter{\ltj@afterbox\ltj@@vcenter\vbox}
-\protected\def\ltj@@vcenter{%
+\let\ltj@@orig@vcenter\vcenter
+\protected\def\ltj@@vcenter{\ltj@afterbox\ltj@@vcenter@\vbox}
+\protected\def\ltj@@vcenter@{%
   \ltj@@lua@raisebox\ltj@@orig@vcenter{\box\ltj@afbox}%
 }
+\let\vcenter\ltj@@vcenter %% PRIMITIVE
 
 %%%% \unhbox and \unvbox
 \newluafunction\ltj@@lua@unboxcheckdir@inner
@@ -709,40 +720,38 @@
 }
 \luadef\ltj@@lua@unboxcheckdir\ltj@@lua@unboxcheckdir@inner
 \long\def \@gobbletwo #1#2{}
-\let\ltj@@orig@unhbox=\unhbox
-\let\ltj@@orig@unvbox=\unvbox
-\protected\def\unhbox{\ltj@reset@globaldefs\afterassignment\ltj@@unhbox\ltj@tempcnta}
-\protected\def\unvbox{\ltj@reset@globaldefs\afterassignment\ltj@@unvbox\ltj@tempcnta}
-\protected\def\ltj@@unhbox{%
-  \ltj@@lua@unboxcheckdir\ltj@@orig@unhbox\ltj@tempcnta}
-\protected\def\ltj@@unvbox{%
-  \ltj@@lua@unboxcheckdir\ltj@@orig@unvbox\ltj@tempcnta}
-\let\ltj@@orig@unhcopy=\unhcopy
-\let\ltj@@orig@unvcopy=\unvcopy
-\protected\def\unhcopy{\ltj@reset@globaldefs\afterassignment\ltj@@unhcopy\ltj@tempcnta}
-\protected\def\unvcopy{\ltj@reset@globaldefs\afterassignment\ltj@@unvcopy\ltj@tempcnta}
-\protected\def\ltj@@unhcopy{%
+\let\ltj@@orig@unhbox\unhbox
+\let\ltj@@orig@unvbox\unvbox
+\protected\def\ltj@@unhbox{\ltj@reset@globaldefs\afterassignment\ltj@@unhbox@\ltj@tempcnta}
+\protected\def\ltj@@unvbox{\ltj@reset@globaldefs\afterassignment\ltj@@unvbox@\ltj@tempcnta}
+\protected\def\ltj@@unhbox@{\ltj@@lua@unboxcheckdir\ltj@@orig@unhbox\ltj@tempcnta}
+\protected\def\ltj@@unvbox@{\ltj@@lua@unboxcheckdir\ltj@@orig@unvbox\ltj@tempcnta}
+\let\ltj@@orig@unhcopy\unhcopy
+\let\ltj@@orig@unvcopy\unvcopy
+\protected\def\unhcopy{\ltj@reset@globaldefs\afterassignment\ltj@@unhcopy@\ltj@tempcnta}
+\protected\def\unvcopy{\ltj@reset@globaldefs\afterassignment\ltj@@unvcopy@\ltj@tempcnta}
+\protected\def\ltj@@unhcopy@{%
   \directlua{luatexja.direction.unbox_check_dir(true)}%
   \ltj@@orig@unhcopy\ltj@tempcnta
   \directlua{luatexja.direction.uncopy_restore_whatsit()}}
-\protected\def\ltj@@unvcopy{%
+\protected\def\ltj@@unvcopy@{%
   \directlua{luatexja.direction.unbox_check_dir(true)}%
   \ltj@@orig@unvcopy\ltj@tempcnta
   \directlua{luatexja.direction.uncopy_restore_whatsit()}}
+\let\unhbox\ltj@@unhbox %% PRIMITIVE
+\let\unvbox\ltj@@unvbox %% PRIMITIVE
+\let\unhcopy\ltj@@unhcopy %% PRIMITIVE
+\let\unvcopy\ltj@@unvcopy %% PRIMITIVE
 
 %%%% lastbox
 \let\ltj@@orig@lastbox=\lastbox
-\protected\def\lastbox{%
-  \directlua{luatexja.direction.lastbox_hook()}\ltj@@orig@lastbox
-}
+\protected\def\ltj@@lastbox{\directlua{luatexja.direction.lastbox_hook()}\ltj@@orig@lastbox}
+\let\lastbox\ltj@@lastbox %% PRIMITIVE
 
 %%%%%%%% \ltjgetwd<box_num> etc.
-\def\ltj@@getwd{%
-  \directlua{luatexja.direction.get_box_dim('width', token.scan_int())}}
-\def\ltj@@getht{%
-  \directlua{luatexja.direction.get_box_dim('height', token.scan_int())}}
-\def\ltj@@getdp{%
-  \directlua{luatexja.direction.get_box_dim('depth', token.scan_int())}}
+\def\ltj@@getwd{\directlua{luatexja.direction.get_box_dim('width', token.scan_int())}}
+\def\ltj@@getht{\directlua{luatexja.direction.get_box_dim('height', token.scan_int())}}
+\def\ltj@@getdp{\directlua{luatexja.direction.get_box_dim('depth', token.scan_int())}}
 \let\ltjgetwd=\ltj@@getwd\let\ltjgetht=\ltj@@getht\let\ltjgetdp=\ltj@@getdp
 
 %%%%%%%% \ltjsetwd<box_num>=<dimen> etc.
