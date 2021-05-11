@@ -1,12 +1,19 @@
 \makeatletter
-\def\ltj@stop@overwrite@primitive{\insert\vadjust}
+\def\ltj@stop@overwrite@primitive{\insert\vadjust\/\unhbox\vcenter\piyo}
 \makeatother
 
 \documentclass[landscape]{article}
 \usepackage[margin=10mm,centering]{geometry}
 
 \usepackage{luatexja}
+
+\def\vcenter{aaa}
+\makeatletter
+\ltj@overwrite@primitive{\/\vcenter\hoge\moveleft}
+
 \usepackage{breqn}
+
+\expandafter\expandafter\expandafter\ltj@overwrite@primitive\expandafter{\ltj@stop@overwrite@primitive}
 
 \begin{document}
 \ttfamily\parindent0pt\footnotesize

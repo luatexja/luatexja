@@ -12,7 +12,7 @@
 \def\luatexjalatexLoaded{\endinput}
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{ltj-latex}[2021-03-18 LaTeX support of LuaTeX-ja]
+\ProvidesPackage{ltj-latex}[2021-05-11 LaTeX support of LuaTeX-ja]
 
 \endlinechar=13
 
@@ -122,10 +122,11 @@
 
 \RequirePackage{lltjp-geometry}
 
+\def\ltj@@q@stop{\ltj@@q@stop}
 \ifdefined\ltj@stop@overwrite@primitive
   \begingroup
     \def\ltj@loop#1{%
-      \unless\ifx#1\@nil
+      \unless\ifx#1\ltj@@q@stop
         \escapechar-1
         \ifcsname ltj@@orig@\string#1\endcsname
           \ifcsname ltj@@\string#1\endcsname
@@ -141,9 +142,32 @@
         \let\ltj@@next\ltj@loop
       \else\let\ltj@@next\relax\fi\ltj@@next
     }%
-    \expandafter\ltj@loop\ltj@stop@overwrite@primitive\@nil
+    \expandafter\ltj@loop\ltj@stop@overwrite@primitive\ltj@@q@stop
   \endgroup
 \fi
+\def\ltj@overwrite@primitive#1{%
+  \begingroup
+    \def\ltj@loop##1{%
+      \unless\ifx##1\ltj@@q@stop
+        \escapechar-1
+        \edef\ltj@@next{\unexpanded{\let\ltj@@temp}\csname ltj@@\string##1\endcsname}\ltj@@next
+        \ifx\ltj@@temp\relax
+           \escapechar92
+           \PackageInfo{luatexja}{Cannot redefine \string##1, since it is not redefined\MessageBreak by LuaTeX-ja}%
+        \else\ifx\ltj@@temp##1
+           \escapechar92
+           \PackageInfo{luatexja}{No need to redefine \string##1, since it is not\MessageBreak
+             overwritten by packages other than LuaTeX-ja\MessageBreak}%
+        \else
+          \edef\ltj@@next{\unexpanded{\global\let##1}\csname ltj@@\string##1\endcsname}%
+           \escapechar92\PackageInfo{luatexja}{Redefining \string##1}\ltj@@next%
+        \fi\fi
+        \let\ltj@@next\ltj@loop
+      \else\let\ltj@@next\relax\fi\ltj@@next
+    }%
+    \ltj@loop#1\ltj@@q@stop
+  \endgroup
+}
 
 %%------------------ all done
 \ltj@latex@AtEnd
