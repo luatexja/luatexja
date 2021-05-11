@@ -122,6 +122,29 @@
 
 \RequirePackage{lltjp-geometry}
 
+\ifdefined\ltj@stop@overwrite@primitive
+  \begingroup
+    \def\ltj@loop#1{%
+      \unless\ifx#1\@nil
+        \escapechar-1
+        \ifcsname ltj@@orig@\string#1\endcsname
+          \ifcsname ltj@@\string#1\endcsname
+            \edef\ltj@@next{\unexpanded{\global\let#1}\csname ltj@@orig@\string#1\endcsname}%
+            \edef\ltj@@temp{ltj@@orig@\string#1}%
+            \escapechar92
+            \PackageWarningNoLine{luatexja}{%
+              Restoring \string#1\space into its orignal meaning\MessageBreak
+              (\expandafter\meaning\csname\ltj@@temp\endcsname)}%
+            \ltj@@next%
+          \fi
+        \fi
+        \let\ltj@@next\ltj@loop
+      \else\let\ltj@@next\relax\fi\ltj@@next
+    }%
+    \expandafter\ltj@loop\ltj@stop@overwrite@primitive\@nil
+  \endgroup
+\fi
+
 %%------------------ all done
 \ltj@latex@AtEnd
 \endinput

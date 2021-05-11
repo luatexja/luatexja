@@ -1,0 +1,42 @@
+\makeatletter
+\def\ltj@stop@overwrite@primitive{\insert\vadjust}
+\makeatother
+
+\documentclass[landscape]{article}
+\usepackage[margin=10mm,centering]{geometry}
+
+\usepackage{luatexja}
+\usepackage{breqn}
+
+\begin{document}
+\ttfamily\parindent0pt\footnotesize
+\def\chk#1{%
+  \par\medskip\leavevmode
+  \hbox to 11em{\expandafter\string\csname #1\endcsname:\hss}\ 
+    \expandafter\meaning\csname #1\endcsname\\
+  \hbox to 11em{\expandafter\string\csname ltj@@#1\endcsname:\hss}\ 
+    \expandafter\meaning\csname ltj@@#1\endcsname\\
+  \hbox to 11em{\expandafter\string\csname ltj@@orig@#1\endcsname:\hss}\ 
+    \expandafter\meaning\csname ltj@@orig@#1\endcsname
+}
+
+a\vadjust{\hrule height 1pt width 30pt}bc\\d
+
+\chk{/}
+\chk{insert}
+\chk{vadjust}
+\chk{raise}
+\chk{lower}
+\chk{moveleft}
+\chk{moveright}
+\chk{vsplit}
+\chk{vcenter}
+\chk{unhbox}
+\chk{unvbox}
+\chk{unhcopy}
+\chk{unvcopy}
+\chk{lastbox}
+\end{document}
+
+
+
