@@ -623,14 +623,21 @@
 
 %%%% vadjust
 \let\ltj@@orig@vadjust\vadjust
+\newluafunction\ltj@@vadjust@dirhook@inner
+\newluafunction\ltj@@vadjust@check@dir@inner
+\directlua{
+  local t = lua.get_functions_table()
+  t[\the\ltj@@vadjust@dirhook@inner]
+    = function () luatexja.direction.set_list_direction_hook('adj') end
+  t[\the\ltj@@vadjust@check@dir@inner]
+    = luatexja.direction.check_adjust_direction()
+}
+\luadef\ltj@@vadjust@dirhook\ltj@@vadjust@dirhook@inner
+\protected\luadef\ltj@@vadjust@check@dir\ltj@@vadjust@check@dir@inner
 \protected\def\ltj@@vadjust{%
-  \ltj@@orig@vadjust\bgroup
-  \directlua{luatexja.direction.set_list_direction_hook('adj')}%
+  \ltj@@orig@vadjust\bgroup\ltj@@vadjust@dirhook
   \aftergroup\ltj@@vadjust@check@dir\let\ltj@@next}
 \let\vadjust\ltj@@vadjust %% PRIMITIVE
-\protected\def\ltj@@vadjust@check@dir{%
-  \directlua{luatexja.direction.check_adjust_direction()}%
-}
 
 %%%% \hbox, \vbox, \vtop
 \setbox\z@\hbox{%

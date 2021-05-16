@@ -238,9 +238,6 @@
 grammatical (and contextual) errors.} Also, several parts
 are written in Japanese only.
 %</en>
-%<*ja>
-\emph{\large 本ドキュメントはまだまだ未完成です．}
-%</ja>
 
 \clearpage
 %<en>\part{User's manual}
@@ -3371,28 +3368,36 @@ Returned value&\texttt{4}&\texttt{3}&\texttt{1}&\texttt{11}&\texttt{0}\\
 %</ja>
 
 %<*en>
-\subsection{Overridden box primitives}
-To cope with multiple directions, the following primitives are
-overridden by \LuaTeX-ja, using~\verb+\protected\def+.
+\section{Redefined primitives by \LuaTeX-ja}
+The following primitives are redefined by \LuaTeX-ja (using~\verb+\protected\def+),
+for supporting Japanese typesetting and multiple directions:
 \begin{cslist}[style=standard]
+ \item[\cs{/}]
  \item[\cs{unhbox}<num>\textrm{, }\cs{unvbox}<num>\textrm{, }\cs{unhcopy}<num>\textrm{, }\cs{unvcopy}<num>]
  \item[\cs{vadjust}\{<material>\}]
  \item[\cs{insert}<number>\{<material>\}]
  \item[\cs{lastbox}]
- \item[\cs{raise}<dimen><box>\textrm{, }\cs{lower}<dimen><box>\textrm{\ etc., }\cs{vcenter}]
- \item[\cs{vcenter}]
+ \item[\cs{raise}<dimen><box>\textrm{, }\cs{lower}<dimen><box>\textrm{, }
+   \cs{moveleft}<dimen><box>\textrm{, }\cs{moveright}<dimen><box>\textrm{, }]
+ \item[\cs{split}<number>to<dimen>\textrm{, }\cs{vcenter}\{<material>\}]
 \end{cslist}
+
+On each primitive \cs{<primitive>} in the list above,
+its meaning just before loading \LuaTeX-ja is backed up into \cs{ltj@@orig@<primitive>},
+and the meaning after redefinition by \LuaTeX-ja is stored in \cs{ltj@@<primitive>}.
+For example, \autoref{fig:primitive_meaning} shows the situation of \cs{vadjust} primitive.
 %</en>
 %<*ja>
-\subsection{プリミティブの再定義}
-異なる組方向に対応するために，以下に挙げるプリミティブは
-\LuaTeX-jaによる前処理もしくは後処理が行われるように
-\ \verb+\protected\def+ により再定義してある．
+\section{プリミティブの再定義}
+\LuaTeX-jaでは和文組版や異なる組方向に対応するために，以下に挙げるプリミティブは
+\ \verb+\protected\def+ により再定義を行っている．
 
 \begin{cslist}
- \item[\cs{unhbox}<num>\textrm{, }\cs{unvbox}<num>\textrm{, }\cs{unhcopy}<num>\textrm{, }\cs{unvcopy}<num>]
+ \item[\cs{/}]
+ 和文フォントに対するイタリック補正のサポートが追加されている．
+ \item[\cs{unhbox}<number>\textrm{, }\cs{unvbox}<number>\textrm{, }\cs{unhcopy}<number>\textrm{, }\cs{unvcopy}<number>]
  ボックスの組方向が現在のリストと異なる場合は事前にエラーメッセージを出力する．
- \pTeX と異なり，エラーを無視して無理矢理 \cs{unhbox}, \cs{unvbox} を
+ \pTeX と異なり，エラーを無視して無理矢理 \cs{unhbox}, \cs{unvbox} 等を
  続行させることもできるが，その場合の組版結果は保証しない．
  \item[\cs{vadjust}\{<material>\}] 一旦プリミティブ本来の挙動を行う．その後，<material>の組方向が
  周囲の垂直リストの組方向と一致しない場合にエラーを出力し，
@@ -3403,10 +3408,81 @@ overridden by \LuaTeX-ja, using~\verb+\protected\def+.
  \item[\cs{lastbox}] ボックスの「中身」を現在の組方向に合わせるためのノード
 	      （\textit{dir\_box}という）を必要ならば除去し，
  正しく「中身」のボックスが返されるように前処理をする．
- \item[\cs{raise}<dimen><box>\textrm{, }\cs{lower}<dimen><box>\textrm{\ etc., }\cs{vcenter}]
- 一方，こちらでは必要に応じて\textit{dir\_box}を作成する前処理を追加している．
+ \item[\cs{raise}<dimen><box>\textrm{, }\cs{lower}<dimen><box>\textrm{, }
+   \cs{moveleft}<dimen><box>\textrm{, }\cs{moveright}<dimen><box>\textrm{, }]
+  \leavevmode\vspace{-\baselineskip}
+ \item[\cs{split}<number>to<dimen>\textrm{, }\cs{vcenter}\{<material>\}]
+ これらのプリミティブについては必要に応じて\textit{dir\_box}を作成する前処理を追加している．
 \end{cslist}
+
+上記の一覧中にあるプリミティブ\cs{<primitive>}については，
+\LuaTeX-ja読み込み前の意味が\cs{ltj@@orig@<primitive>}に，
+そして\LuaTeX-jaによる再定義後の意味が\cs{ltj@@<primitive>}に保存される．
+例えば，\cs{vadjust}については\autoref{fig:primitive_meaning}のようになっている．
 %</ja>
+\begin{figure}
+\begin{LTXexample}[width=.55\textwidth]
+\makeatletter\scriptsize\ttfamily
+\meaning\vadjust        \\ % current
+\meaning\ltj@@vadjust   \\ % LuaTeX-ja
+\meaning\ltj@@orig@vadjust % original
+\end{LTXexample}
+\caption{Redefining \cs{vadjust} primitive by \LuaTeX-ja}
+\label{fig:primitive_meaning}
+\end{figure}
+
+%<*en>
+\subsection{Suppressing redefinitions}
+Sometimes redefining primitives by \LuaTeX-ja causes a problem.
+For example, the \Pkg{breqn} package~(v0.98k) assumes that \cs{vadjust}~and~\cs{insert} have
+their primitive meanings.
+So, this package cannot by loaded after \LuaTeX-ja by default.
+
+\LuaTeX-ja version~20210517.0 has features for that problem. Namely:
+\begin{itemize}
+  \item Primitives which is listed in \cs{ltj@stop@overwrite@primitive} are 
+  retain their meanings at just before loading \LuaTeX-ja.
+  \item After loading \LuaTeX-ja,
+  one can specify primitives to \cs{ltj@overwrite@primitive}, to redefine them by \LuaTeX-ja.
+\end{itemize}
+See \autoref{fig:primitive_overwrite} for an example.
+%</en>
+%<*ja>
+\subsection{再定義の抑制}
+場合によっては\LuaTeX-jaによるプリミティブの再定義が不都合を起こすこともある．
+たとえば，\Pkg{breqn}パッケージ（少なくともv0.98k, 2020\nobreakdash-09\nobreakdash-24)）は
+読み込み時に\cs{vadjust}, \cs{insert}がプリミティブのままであることを要請するので，
+このままでは\LuaTeX-jaの後で読み込むことはできない．
+
+この状況に対応するため，バージョン20210517.0以降では
+\begin{itemize}
+  \item 制御綴\cs{ltj@stop@overwrite@primitive}内に並べられたプリミティブは，
+  \LuaTeX-ja読み込み直前時の意味のままとなる．
+  \item \LuaTeX-ja読み込み後に
+  \cs{ltj@overwrite@primitive}に引数として与えたプリミティブを与えることで，
+  それらを「\LuaTeX-jaによって再定義する」際の意味に再定義する
+\end{itemize}
+機能を導入した．使用例については\autoref{fig:primitive_overwrite}を参照．
+%</ja>
+\begin{figure}
+\begin{lstlisting}
+\makeatletter
+\def\ltj@stop@overwrite@primitive{\insert\vadjust\/\unhbox\vcenter\fontseries}
+\makeatother
+  %% Keep the meaning of \insert, \vadjust, \/, \unhbox and \vcenter.
+  %% \fontseries will still be redefined by \LuaTeX-ja, because it is not primitive.
+\usepackage{luatexja}
+...
+\usepackage{breqn}
+...
+\makeatletter
+\ltj@overwrite@primitive\expandafter{\insert\vadjust\/\unhbox\vcenter}
+\makeatother
+  %% Redefine \insert, \vadjust, \/, \unhbox and \vcenter.
+\end{lstlisting}
+\caption{\cs{ltj@stop@overwrite@primitive} and \cs{ltj@overwrite@primitive}}
+\label{fig:primitive_overwrite}
+\end{figure}
 
 %<en>\section{Font Metric and Japanese Font}
 %<ja>\section{フォントメトリックと和文フォント}
