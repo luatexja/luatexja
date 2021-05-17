@@ -132,7 +132,7 @@
             \edef\ltj@@next{\unexpanded{\global\let#1}\csname ltj@@orig@\string#1\endcsname}%
             \edef\ltj@@temp{ltj@@orig@\string#1}%
             \escapechar92
-            \PackageWarningNoLine{luatexja}{%
+            \PackageInfo{luatexja}{%
               Restoring \string#1\space into its orignal meaning\MessageBreak
               (\expandafter\meaning\csname\ltj@@temp\endcsname)}%
             \ltj@@next%
@@ -151,12 +151,9 @@
         \escapechar-1
         \edef\ltj@@next{\unexpanded{\let\ltj@@temp}\csname ltj@@\string##1\endcsname}\ltj@@next
         \ifx\ltj@@temp\relax
-           \escapechar92
-           \PackageInfo{luatexja}{Cannot redefine \string##1, since it is not redefined\MessageBreak by LuaTeX-ja}%
         \else\ifx\ltj@@temp##1
            \escapechar92
-           \PackageInfo{luatexja}{No need to redefine \string##1, since it is not\MessageBreak
-             overwritten by packages other than LuaTeX-ja\MessageBreak}%
+           \PackageInfo{luatexja}{No need to redefine \string##1}%
         \else
           \edef\ltj@@next{\unexpanded{\global\let##1}\csname ltj@@\string##1\endcsname}%
            \escapechar92\PackageInfo{luatexja}{Redefining \string##1}\ltj@@next%
