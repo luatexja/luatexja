@@ -12,7 +12,7 @@
 \def\luatexjalatexLoaded{\endinput}
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{ltj-latex}[2021-05-11 LaTeX support of LuaTeX-ja]
+\ProvidesPackage{ltj-latex}[2021-05-17 LaTeX support of LuaTeX-ja]
 
 \endlinechar=13
 
@@ -46,7 +46,6 @@
   \ifcsname tex_shipout:D\endcsname
     \expandafter\let\csname tex_shipout:D\endcsname\ltj@shipout
   \fi
-  \directlua{luatexja.direction.shipout_lthook = nil}
 \else
   \directlua{%
     luatexbase.add_to_callback('pre_shipout_filter',luatexja.direction.shipout_lthook, 'ltj.direction', 1)

@@ -521,7 +521,7 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
             s = s .. ' stream=' .. p.stream
             print_fn(s)
             for i=1,#p.data do
-               print_fn(s .. '  [' .. i .. '] = ' .. tostring(p.data[i].csname))
+               print_fn(s .. '  [' .. i .. '] = ' .. tostring(p.data[i] and p.date[i].csname))
             end
          elseif p.subtype==16 then
             s = s .. ' mode=' .. p.mode .. ', literal="' .. p.data .. '"'
