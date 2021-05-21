@@ -44,7 +44,6 @@ local function add_comment(buffer)
       end
    end
    stop_time_measure 'inputbuf'
---   print(">>", buffer)
    return buffer
 end
 
