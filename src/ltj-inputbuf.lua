@@ -5,7 +5,6 @@
 luatexja.load_module 'base';      local ltjb = luatexja.base
 luatexja.load_module 'charrange'; local ltjc = luatexja.charrange
 
-require "unicode"
 local utflen = utf.len
 local utfbyte = utf.byte
 local utfchar = utf.char
@@ -24,12 +23,11 @@ local start_time_measure, stop_time_measure
 local function add_comment(buffer)
    start_time_measure 'inputbuf'
    local i = utflen(buffer)
-   while (i>0) and (getcatcode(utfbyte(buffer, i))==1
-         or getcatcode(utfbyte(buffer, i))==2) do
-      i=i-1
+   local c = utfbyte(buffer, i)
+   while (i>0) and (getcatcode(c)==1 or getcatcode(c)==2) do
+      i=i-1; if (i>0) then c = utfbyte(buffer, i) end;
    end
    if i>0 then
-      local c = utfbyte(buffer, i)
       if c>=0x80 then
          local te = tex.endlinechar
          -- Is the catcode of endline character is 5 (end-of-line)?
@@ -46,6 +44,7 @@ local function add_comment(buffer)
       end
    end
    stop_time_measure 'inputbuf'
+--   print(">>", buffer)
    return buffer
 end
 
