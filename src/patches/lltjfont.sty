@@ -3,14 +3,16 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2021-04-29 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2021-05-26 Patch to NFSS2 for LuaTeX-ja]
 
 %%%%%%%% LaTeX2e version detection
 \newcount\ltj@@latex@plv \ltj@@latex@plv=-1
 \ifltj@ltfilehook@avail
-  \IfHookExistsTF{selectfont}%
+\ExplSyntaxOn
+  \cs_if_exist:NTF \__shipout_execute_main_cont:Nnnn
     {\ltj@@latex@plv=1500}% 2021-06-01
-    {\ifnum\patch@level>2 \ltj@@latex@plv=1300\else \ltj@@latex@plv=1000\fi}% 2020-10-01
+    {\ifnum\patch@level>2\relax \ltj@@latex@plv=1300\else \ltj@@latex@plv=1000\fi}% 2020-10-01
+\ExplSyntaxOff
 \else\ifdefined\@rmfamilyhook % 2020-02-02
   \ifx\@forced@seriestrue\@undefined % 2020-02-02 pl0--2
     \@latex@error
@@ -26,7 +28,6 @@
     \fi\fi
   \fi
 \fi\fi
-
 
 %% patching \DeclareTextComposite
 \def\ltj@chardef@text@cmd#1{%
