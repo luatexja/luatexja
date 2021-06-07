@@ -319,7 +319,7 @@ end
 local create_dir_whatsit_vbox
 do
    local wh = {}
-   local id_glue, sid_parskip = node.id 'glue', 3
+   local id_glue = node.id 'glue'
    create_dir_whatsit_vbox = function (hd, gc)
       ltjs.list_dir = get_dir_count()
       -- remove dir whatsit
@@ -331,8 +331,8 @@ do
       if hd==wh[1] then
          ltjs.list_dir =has_attr(hd,attr_dir)
          local x = node_next(hd)
-         if getid(x)==id_glue and getsubtype(x)==sid_parskip then
-            node_remove(hd,x); node_free(x)
+         while x and getid(x)==id_glue and getsubtype(x)==3 do
+            node_remove(hd,x); node_free(x); x = node_next(hd)
          end
       end
       for i=1,#wh do
@@ -345,10 +345,10 @@ do
          end
          return hd
       else
-         local n =node_next(hd)
+         local n = node_next(hd)
          if gc=='vtop' then
             local w = create_dir_whatsit(hd, gc, ltjs.list_dir)
-            -- move  dir whatsit after hd
+            -- move dir whatsit after hd
             setfield(hd, 'next', w); setfield(w, 'next', n)
             return hd
          else
