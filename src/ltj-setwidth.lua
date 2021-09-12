@@ -33,7 +33,6 @@ local getoffsets = node.direct.getoffsets or function(n)
 
 local node_traverse_id = node.direct.traverse_id
 local node_traverse = node.direct.traverse
-local node_new = node.direct.new
 local node_copy = node.direct.copy
 local node_remove = node.direct.remove
 local node_tail = node.direct.tail
@@ -43,6 +42,7 @@ local set_attr = node.direct.set_attribute
 local node_insert_before = node.direct.insert_before
 local node_insert_after = node.direct.insert_after
 local round = tex.round
+local node_new = luatexja.dnode_new
 
 local id_glyph  = node.id 'glyph'
 local id_kern   = node.id 'kern'
@@ -75,6 +75,7 @@ do
       return i - i%PROCESSED_BEGIN_FLAG
    end
 end
+
 
 local ltjw = {} --export
 luatexja.setwidth = ltjw
@@ -114,7 +115,7 @@ local function capsule_glyph_yoko(p, met, char_data, head, dir)
          setoffsets(p, xo - fshift.left, yo - kbl - fshift.down)
          return node_next(p), head, p
       elseif ht_diff >= 0 and dp_diff >=0 then -- rule
-         local box = node_new(id_rule,rule_subtype)
+         local box = node_new(id_rule,rule_subtype, p)
          local xo, yo = getoffsets(p)
          setoffsets(p, xo, yo - kbl - fshift.down)
          setwhd(box, 0, fheight - kbl, fdepth + kbl)
@@ -140,7 +141,7 @@ local function capsule_glyph_yoko(p, met, char_data, head, dir)
    setoffsets(p, xo + char_data.align*(fwidth-pwidth) - fshift.left,
               yo - fshift.down);
    setnext(p, nil)
-   local box = node_new(id_hlist)
+   local box = node_new(id_hlist, nil, p)
    setwhd(box, fwidth, fheight, fdepth)
    setfield(box, 'head', p)
    setfield(box, 'shift', kbl)

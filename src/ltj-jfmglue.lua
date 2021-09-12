@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2021-02-11',
+  date = '2021-09-12',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}
@@ -45,11 +45,12 @@ local node_next = node.direct.getnext
 local ltjd_make_dir_whatsit = ltjd.make_dir_whatsit
 local ltjf_font_metric_table = ltjf.font_metric_table
 local ltjf_find_char_class = ltjf.find_char_class
-local node_new = node.direct.new
+local node_new = luatexja.dnode_new
 local node_copy = node.direct.copy
 local node_tail = node.direct.tail
 local node_free = node.direct.free
 local node_remove = node.direct.remove
+local node_inherit_attr = luatexja.node_inherit_attr
 
 local id_glyph = node.id 'glyph'
 local id_hlist = node.id 'hlist'
@@ -689,7 +690,7 @@ local function handle_penalty_normal(post, pre, g)
    local a = (pre or 0) + (post or 0)
    if #Bp == 0 then
       if (a~=0 and not(g and getid(g)==id_kern)) then
-         local p = node_new(id_penalty)
+         local p = node_new(id_penalty, nil, Nq.nuc, Np.nuc)
          if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
          setfield(p, 'penalty', a); head = insert_before(head, Np.first, p)
          Bp[1]=p; set_attr(p, attr_icflag, KINSOKU)
@@ -703,7 +704,7 @@ local function handle_penalty_always(post, pre, g)
    local a = (pre or 0) + (post or 0)
    if #Bp == 0 then
       if not (g and getid(g)==id_glue) or a~=0 then
-         local p = node_new(id_penalty)
+         local p = node_new(id_penalty, nil, Nq.nuc, Np.nuc)
          if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
          setfield(p, 'penalty', a); head = insert_before(head, Np.first, p)
          Bp[1]=p; set_attr(p, attr_icflag, KINSOKU)
@@ -716,7 +717,7 @@ local function handle_penalty_suppress(post, pre, g)
    luatexbase.call_callback('luatexja.adjust_jfmglue', head, Nq, Np, Bp)
    if #Bp == 0 then
       if g and getid(g)==id_glue then
-         local p = node_new(id_penalty)
+         local p = node_new(id_penalty, nil, Nq.nuc, Np.nuc)
          setfield(p, 'penalty', 10000); head = insert_before(head, Np.first, p)
          Bp[1]=p; set_attr(p, attr_icflag, KINSOKU)
       end
@@ -759,6 +760,7 @@ end
 -- Nq.last (kern w) .... (glue/kern g) Np.first
 local function real_insert(g)
    if g then
+      node_inherit_attr(g, Nq.nuc, Np.nuc)
       head  = insert_before(head, Np.first, g)
       Np.first = g
       local ngk = Np.gk
@@ -1151,7 +1153,7 @@ local function handle_list_head(par_indented)
          if g then
             set_attr(g, attr_icflag, BOXBDD)
             if getid(g)==id_glue and #Bp==0 then
-               local h = node_new(id_penalty)
+               local h = node_new(id_penalty, nil, Nq.nuc, Np.nuc)
                setfield(h, 'penalty', 10000); set_attr(h, attr_icflag, BOXBDD)
             end
             head = insert_before(head, Np.first, g)

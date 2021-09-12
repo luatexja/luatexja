@@ -12,6 +12,33 @@ luatexja.load_lua = load_lua
 function luatexja.load_module(name) require('ltj-' .. name.. '.lua') end
 
 do
+    local dnode = node.direct
+    local getfield, traverse = dnode.getfield, dnode.traverse
+    local node_new, set_attr, get_attr = dnode.new, dnode.set_attribute, dnode.get_attribute
+    local set_attrlist, get_attrlist = dnode.setattributelist, dnode.getattributelist
+    local unset_attr = dnode.unset_attribute
+    local attr_icflag = luatexbase.attributes['ltj@icflag']
+    local function node_inherit_attr(n, b, a)
+        if b or a then
+            local attrlist = get_attrlist(b or a)
+            local nic = get_attr(n, attr_icflag)
+            set_attrlist(n, attrlist); set_attr(n, attr_icflag, nic)
+            if b and a then
+                for na in traverse(attrlist) do
+                    local id = getfield(na, 'number')
+                    if id and id~=attr_icflag and getfield(na, 'value')~=get_attr(a, id) then
+                        unset_attr(n, id)
+                    end
+                end
+            end
+        end                        
+    end
+    luatexja.node_inherit_attr = node_inherit_attr
+    luatexja.dnode_new = function (id, subtype, b, a)
+        local n = node_new(id, subtype); node_inherit_attr(n, b, a); return n
+    end
+end
+do
    local setfield = node.direct.setfield
    luatexja.setglue = node.direct.setglue or
    function(g,w,st,sh,sto,sho)
