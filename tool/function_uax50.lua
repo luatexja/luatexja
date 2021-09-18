@@ -3,7 +3,7 @@ dofile(kpse.find_file('lualibs.lua'))
 
 local function toX(a) return string.format('0x%X',a) end
 
-local uax_revision = '13.0.0'
+local uax_revision = '14.0.0'
 print('  -- UAX#50 for Unicode  ' ..  uax_revision)
 local fh = io.open('VerticalOrientation-' .. uax_revision .. '.txt')
 local t = {}

@@ -6,6 +6,9 @@ table_ivd_aj1 = {
 -- #
 -- # History:
 -- #
+-- # 2020-11-06 Registration of additional sequences in the MSARG
+-- #            collection.
+-- #
 -- # 2017-12-12 Registration of additional sequences in the Adobe-Japan1
 -- #            collection. Combined registration of the KRName collection
 -- #            and of sequences in that collection. Registration of
@@ -31,10 +34,10 @@ table_ivd_aj1 = {
 -- #
 -- # This file is part of the Unicode Ideographic Variation Database (IVD).
 -- # For more details on the IVD, see UTS #37:
--- # http://www.unicode.org/reports/tr37/
+-- # https://www.unicode.org/reports/tr37/
 -- #
--- # Copyright 2006-2017 Unicode, Inc.
--- # For terms of use, see: http://www.unicode.org/terms_of_use.html
+-- # Copyright 2006-2020 Unicode, Inc.
+-- # For terms of use, see: https://www.unicode.org/copyright.html#8
 -- #
 -- # EOF
  f,f,f,f,f,f,f,f,f,f,
