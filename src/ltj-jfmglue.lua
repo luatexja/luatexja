@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2021-09-12',
+  date = '2021-09-18',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}
@@ -384,7 +384,7 @@ function calc_np_aux_glyph_common(lp, acc_flag)
       lp=lx
       local r
       if adj_depth>node_depth then
-            r = node_new(id_rule,3)
+            r = node_new(id_rule,3,first_glyph)
             setfield(r, 'width', 0); setfield(r, 'height', 0)
             setfield(r, 'depth',adj_depth); setfield(r, 'dir', tex_dir)
             set_attr(r, attr_icflag, PROCESSED)
@@ -731,7 +731,7 @@ local function handle_penalty_jwp()
    local a = table_current_stack[luatexja.stack_table_index.JWP]
    if #widow_Bp == 0 then
       if a~=0 then
-         local p = node_new(id_penalty)
+         local p = node_new(id_penalty, widow_Np.nuc)
          if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
          setfield(p, 'penalty', a); head = insert_before(head, widow_Np.first, p)
          widow_Bp[1]=p; set_attr(p, attr_icflag, KINSOKU)
@@ -760,9 +760,7 @@ end
 -- Nq.last (kern w) .... (glue/kern g) Np.first
 local function real_insert(g)
    if g then
-      node_inherit_attr(g, Nq.nuc, Np.nuc)
-      head  = insert_before(head, Np.first, g)
-      Np.first = g
+      head, Np.first = insert_before(head, Np.first, node_inherit_attr(g, Nq.nuc, Np.nuc))
       local ngk = Np.gk
       if not ngk then Np.gk = g
       elseif type(ngk)=="table" then ngk[#ngk+1]=g
@@ -1153,7 +1151,7 @@ local function handle_list_head(par_indented)
          if g then
             set_attr(g, attr_icflag, BOXBDD)
             if getid(g)==id_glue and #Bp==0 then
-               local h = node_new(id_penalty, nil, Nq.nuc, Np.nuc)
+               local h = node_new(id_penalty, nil, Np.nuc)
                setfield(h, 'penalty', 10000); set_attr(h, attr_icflag, BOXBDD)
             end
             head = insert_before(head, Np.first, g)
@@ -1426,31 +1424,27 @@ do
            return lx
        end
    end
+   local function special_jaglue_after_inner(lx, lxi, lxi_jfm, kn, bk)
+       local w, st, sh, sto, sho = getglue(kn)
+       if w~=1073741823 then
+           setglue(lx, w, st, sh, sto, sho); set_attr(lx, attr_icflag, lxi)
+       else
+           local m = ltjf_font_metric_table[has_attr(lx, attr_tablshift)]
+           setglue(lx, bk[1], bk[2], bk[3], 0, 0)
+           set_attr(lx, attr_icflag, lxi_jfm)
+       end
+   end
    local function special_jaglue_after(lx)
        if get_attr_icflag(lx)==SPECIAL_JAGLUE then
            lxi=has_attr(lx, attr_yablshift)
            if lxi>=PROCESSED_BEGIN_FLAG then
                lxi = lxi%PROCESSED_BEGIN_FLAG
                if lxi == KANJI_SKIP then
-                   local w, st, sh, sto, sho = getglue(kanji_skip)
-                   if w~=1073741823 then
-                       setglue(lx, w, st, sh, sto, sho); set_attr(lx, attr_icflag, KANJI_SKIP)
-                   else
-                       local m = ltjf_font_metric_table[has_attr(lx, attr_tablshift)]
-                       local bk = m.kanjiskip or null_skip_table
-                       setglue(lx, bk[1], bk[2], bk[3], 0, 0)
-                       set_attr(lx, attr_icflag, KANJI_SKIP_JFM)
-                   end
-               elseif lxi == XKANJI_SKIP then
-                   local w, st, sh, sto, sho = getglue(xkanji_skip)
-                   if w~=1073741823 then
-                       setglue(lx, w, st, sh, sto, sho); set_attr(lx, attr_icflag, XKANJI_SKIP)
-                   else
-                       local m = ltjf_font_metric_table[has_attr(lx, attr_tablshift)]
-                       local bk = m.xkanjiskip or null_skip_table
-                       setglue(lx, bk[1], bk[2], bk[3], 0, 0)
-                       set_attr(lx, attr_icflag, XKANJI_SKIP_JFM)
-                   end
+                   special_jaglue_after_inner(lx, lxi, KANJI_SKIP_JFM, kanji_skip, 
+                     ltjf_font_metric_table[has_attr(lx, attr_tablshift)].kanjiskip or null_skip_table)
+               else --  lxi == XKANJI_SKIP
+                   special_jaglue_after_inner(lx, lxi, XKANJI_SKIP_JFM, xkanji_skip, 
+                     ltjf_font_metric_table[has_attr(lx, attr_tablshift)].xkanjiskip or null_skip_table)
                end
            else
                set_attr(lx, attr_icflag, lxi)

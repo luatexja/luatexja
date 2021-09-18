@@ -31,11 +31,12 @@ do
                     end
                 end
             end
-        end                        
+        end
+        return n
     end
     luatexja.node_inherit_attr = node_inherit_attr
     luatexja.dnode_new = function (id, subtype, b, a)
-        local n = node_new(id, subtype); node_inherit_attr(n, b, a); return n
+        return node_inherit_attr(node_new(id, subtype), b, a)
     end
 end
 do

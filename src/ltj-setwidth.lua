@@ -115,7 +115,7 @@ local function capsule_glyph_yoko(p, met, char_data, head, dir)
          setoffsets(p, xo - fshift.left, yo - kbl - fshift.down)
          return node_next(p), head, p
       elseif ht_diff >= 0 and dp_diff >=0 then -- rule
-         local box = node_new(id_rule,rule_subtype, p)
+         local box = node_new(id_rule, rule_subtype, p)
          local xo, yo = getoffsets(p)
          setoffsets(p, xo, yo - kbl - fshift.down)
          setwhd(box, 0, fheight - kbl, fdepth + kbl)
@@ -171,7 +171,7 @@ local function capsule_glyph_tate_rot(p, met, char_data, head, dir, asc)
    setoffsets(p, xo + char_data.align*(fwidth-pwidth) - fshift.left,
               yo - fshift.down - asc);
    setnext(p, nil)
-   local box = node_new(id_hlist)
+   local box = node_new(id_hlist, nil, p)
    setwhd(box, fwidth, fheight, fdepth)
    setfield(box, 'head', p)
    setfield(box, 'shift', kbl)
@@ -217,7 +217,7 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
    local y_shift = xo + (has_attr(p,attr_tkblshift) or 0)
    local q
    head, q = node_remove(head, p)
-   local box = node_new(id_hlist)
+   local box = node_new(id_hlist, nil, p)
    setwhd(box, fwidth, fheight, fdepth)
    setfield(box, 'shift', y_shift)
    setdir(box, dir)
@@ -255,7 +255,7 @@ local function capsule_glyph_math(p, met, char_data)
       = - getfield(p, 'yoffset') + (has_attr(p,attr_ykblshift) or 0)
    setfield(p, 'yoffset', -fshift.down)
    setfield(p, 'xoffset', getfield(p, 'xoffset') + char_data.align*(fwidth-pwidth) - fshift.left)
-   local box = node_new(id_hlist);
+   local box = node_new(id_hlist, nil, p);
    setwhd(box, fwidth, fheight, fdepth)
    setfield(box, 'head', p)
    setfield(box, 'shift', y_shift)
@@ -308,7 +308,7 @@ do
          setfield(lp, 'yoffset', getfield(lp, 'yoffset') - y_adjust)
       end
       if adj_depth>node_depth then
-         local r = node_new(id_rule,rule_subtype)
+         local r = node_new(id_rule,rule_subtype, head)
          setwhd(r, 0, 0, adj_depth); setdir(r, tex_dir)
          set_attr(r, attr_icflag, PROCESSED)
          if field=='post' then
