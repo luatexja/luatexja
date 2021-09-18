@@ -45,6 +45,31 @@
 \DeclareFontShape{JY3}{mc}{mc}{n}{<-> [0.92487] 
   HaranoAjiMincho-Regular:extend=0.67;jfm=ujisc33}{}
 
+%%%% \ltjruby 内に \texorpdfstring + | 除去を仕込む
+\RequirePackage{xparse}
+\makeatletter
+\def\removevert#1{\if\noexpand#1|%
+    \expandafter\expandafter\expandafter\@firstofone\expandafter{%
+  \else\ifnum0=1}\fi#1%
+    \ifx#1\relax\expandafter\@gobble%
+    \else\expandafter\@firstofone
+    \fi{\expandafter\@firstofone
+  \fi
+  \removevert}}
+\makeatother
+\ExplSyntaxOn
+\cs_set_eq:NN \myorigltjruby \ltjruby
+\DeclareExpandableDocumentCommand {\ltjruby} { O{} m m } {%
+   \texorpdfstring {
+    \exp_not:n { \myorigltjruby[#1]{#2}{#3} }
+  } {
+    \removevert #2 \relax
+  }
+}
+\cs_set_eq:NN \ruby \ltjruby
+\ExplSyntaxOff
+%%%%
+
 \title{\textsf{luatexja-ruby}パッケージ}
 \author{\LuaTeX-jaプロジェクトチーム}
 \date{\texttt{\csname ver@luatexja-ruby.sty\endcsname}（\today）}
