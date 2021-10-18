@@ -136,7 +136,7 @@ local t = {
       }
    },
 
-   [5] = { -- -- 二分（二重）ダッシュ
+   [105] = { -- -- 二分（二重）ダッシュ
       chars = { '゠', '–' },
       align = 'middle', left = 0.0, down = 0.0,
       width = 0.50, height = 0.50, depth = 0.50, italic=0.0,
