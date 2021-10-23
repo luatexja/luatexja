@@ -23,7 +23,7 @@
 %% File: ltjltxdoc.dtx
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{ltjltxdoc}[2018/01/01 v1.0d-ltj-3 Standard LuaLaTeX-ja file]
+\ProvidesClass{ltjltxdoc}[2021-10-24 v1.0d-ltj-4 Standard LuaLaTeX-ja file]
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{ltxdoc}}
 \ProcessOptions
 \LoadClass{ltxdoc}

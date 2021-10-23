@@ -26,6 +26,9 @@
 \def\luatexjaLoaded{\endinput}
 \newif\ifltj@disablejfam
 
+%%%% VERSION
+\def\LuaTeXjaversion{20211024.0}
+
 %% Check if LaTeX is used.
 \begingroup\expandafter\expandafter\expandafter\endgroup
 \expandafter\ifx\csname RequirePackage\endcsname\relax %<*!LaTeX>
@@ -35,13 +38,17 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja}[2021-06-07 Japanese Typesetting with Lua(La)TeX]
+  \makeatletter
+  \def\ltj@@temp#1#2#3#4#5#6#7#8#9\@nil{%
+    \edef\ltj@@do{\noexpand\ProvidesPackage
+      {luatexja}[#1#2#3#4-#5#6-#7#8 Japanese Typesetting with Lua(La)TeX]%
+    }\ltj@@do\let\ltj@@do\undefined\let\ltj@@temp\undefined
+  }
+  \expandafter\ltj@@temp\LuaTeXjaversion\@nil
   \DeclareOption{disablejfam}{\ltj@disablejfamtrue}
   \DeclareOption*{}
   \ProcessOptions\relax
 \fi                             %</LaTeX>
-%%%% VERSION
-\def\LuaTeXjaversion{20210918.0}
 
 \directlua{require('ltj-unicode-ccfix.lua')}% catcode of ideographs
 
