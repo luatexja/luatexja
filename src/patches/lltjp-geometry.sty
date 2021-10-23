@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-geometry}[2020-12-29 Patch to geometry for LuaTeX-ja with vertical writing mode]
+\ProvidesPackage{lltjp-geometry}[2021-10-24 Patch to geometry for LuaTeX-ja with vertical writing mode]
 \RequirePackage{expl3}
 \ifdefined\if@ltj@@geometry@tate\expandafter\endinput\fi
 \newif\if@ltj@@geometry@tate
@@ -40,15 +40,29 @@
     }%
 }{}
 \ifltj@ltfilehook@avail
-  \def\@@ltj@ExecuteAfterPackage#1{\AddToHook{package/after/#1}}
-  \def\@@ltj@ExecuteBeforePackage#1{\AddToHook{package/before/#1}}
+  %% \ltj@ExecuteBeforePackage <package><code>  and \ltj@ExecuteAfterPackage <package><code>
+  %% no-starred version: do nothing if the <package> is loaded
+  %% starred version: do <code> right away if the <package> is loaded
   \def\ltj@ExecuteAfterPackage{\@ifstar\@@ltj@ExecuteAfterPackage@star\@@ltj@ExecuteAfterPackage}
-  \def\@@ltj@ExecuteAfterPackage@star#1#2{%
-    \@ifpackageloaded{#1}{#2}{\@@ltj@ExecuteAfterPackage{#1}{#2}}%
-  }
   \def\ltj@ExecuteBeforePackage{\@ifstar\@@ltj@ExecuteBeforePackage@star\@@ltj@ExecuteBeforePackage}
-  \def\@@ltj@ExecuteBeforePackage@star#1#2{%
-    \@ifpackageloaded{#1}{#2}{\@@ltj@ExecuteBeforePackage{#1}{#2}}%
+  \@ifl@t@r\fmtversion{2021-11-15}{% 2021-11-15
+    \def\@@ltj@ExecuteAfterPackage@star#1{\AddToHook{package/#1/after}}
+    \def\@@ltj@ExecuteBeforePackage@star#1{\AddToHook{package/#1/before}}
+    \long\def\@@ltj@ExecuteAfterPackage#1#2{%
+      \@ifpackageloaded{#1}{}{\AddToHook{package/#1/after}{#2}}%
+    }
+    \long\def\@@ltj@ExecuteBeforePackage#1#2{%
+      \@ifpackageloaded{#1}{}{\AddToHook{package/#1/before}{#2}}%
+    }
+  }{
+    \def\@@ltj@ExecuteAfterPackage#1{\AddToHook{package/after/#1}}
+    \def\@@ltj@ExecuteBeforePackage#1{\AddToHook{package/before/#1}}
+    \long\def\@@ltj@ExecuteAfterPackage@star#1#2{%
+      \@ifpackageloaded{#1}{#2}{\@@ltj@ExecuteAfterPackage{#1}{#2}}%
+    }
+    \long\def\@@ltj@ExecuteBeforePackage@star#1#2{%
+      \@ifpackageloaded{#1}{#2}{\@@ltj@ExecuteBeforePackage{#1}{#2}}%
+    }
   }
 \else
   \RequirePackage{filehook}
