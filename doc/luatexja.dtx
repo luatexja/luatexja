@@ -2657,69 +2657,23 @@ is controlled by the lowermost bit of the \Param{kcatcode} parameter.
 %</ja>
 
 %<*en>
-Default setting of \cs{catcode} of Unicode characters are located in
-\begin{description}
- \item[plain \LuaTeX] \texttt{luatex-unicode-letters.tex}, which is based on \texttt{unicode-letters.tex}
-(for \XeTeX).
- \item[\LuaLaTeX] now included in \LaTeX\ kernel  as~\texttt{unicode-letters.def}.
-\end{description}
-However, the default setting of \cs{catcode} differs
-between \XeTeX\ and \LuaTeX, by the following reasons:
-\begin{itemize}
- \item (plain format) \texttt{luatex-unicode-letters.tex} is based on old \texttt{unicode-letters.tex}.
- \item The latter half of \texttt{unicode-letters.tex}~and~\texttt{unicode-letters.def}
-sets\cs{catcode} of several characters to 11, via setting \cs{XeTeXcharclass}.
-However, this latter half does not exist (plain case), or not executed (\LaTeX~case) in \LuaTeX.
-\end{itemize}
-In other words,
-\begin{description}
-\item[plain \LuaTeX]
-Kanji nor kana characters cannot be used in
-a control word, in the default setting of plain \LuaTeX.
-\item[\LuaLaTeX]
-In recent (2015-10-01 or later) \LuaLaTeX, Kanji and kana characters in a control word is supported (these catcode are 11),
-but not fullwidth alphanumerics and several other characters.
-\end{description}
-
-This would be inconvenient for \pTeX~users to shifting to \LuaTeX-ja,
-since several control words containing Kanji or other fullwidth characters, such as
-\cs{西暦}~or~\cs{１年目西暦} are used in \pTeX.
-Hence, \LuaTeX-ja have a counterpart of \texttt{unicode-letters.tex}
-for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
+Default setting of \cs{catcode} of Unicode characters with \LuaTeX\ is slightly inconvenient
+for \pTeX~users to shifting to \LuaTeX-ja,
+because several fullwidth characters which can be used in a control word with \pTeX,
+such as ``\texttt{１}''~(FULLWIDTH DIGIT ONE), cannnot be used in a control word with \LuaTeX.
+Hence, \LuaTeX-ja changes the \cs{catcode} of some characters%
+---whose line breaking class is ``ID''~(Ideographic) in UAX~\#14---,
+to allow these characters in the control word.
 %</en>
 %<*ja>
-ネイティブにUnicode全部の文字を扱える\XeTeX や\LuaTeX では，
-文字が制御綴内で使用できるかは通常の欧文文字と同じく\cs{catcode}%
-で指定することとなる．plain \XeTeX における\cs{catcode}の初期設定は%
-\texttt{unicode-letters.tex}中に記述されており，plain \LuaTeX ではそれを
-元にした\texttt{luatex-unicode-letters.tex}を用いている．
-\LaTeX では\cs{catcode}の設定はカーネルに\texttt{unicode-letters.def}として統合され．
-このファイルを\XeLaTeX, \LuaLaTeX の両方が用いている．
+最近の（2015-10-01以降の）\LuaLaTeX では漢字や仮名を制御綴内に
+使用することが可能であるが，全角英数字は使用できない．
+これでは\pTeX で使用できた\cs{１年目西暦}\footnote{科研費\LaTeX で使用されているそうです．}などが使えないため，
+\LuaTeX-jaへの移行で手間が生じることになる．
 
-だが，\XeTeX における\cs{catcode}の初期設定と
-\LuaTeX におけるそれは一致していない：
-\begin{itemize}
- \item \texttt{luatex-unicode-letters.tex} の元になった
-  \texttt{unicode-letters.tex}が古い
- \item \texttt{unicode-letters.tex} 後半部や\texttt{unicode-letters.def}後半部では
-\cs{XeTeXcharclass}の設定を行なっており，
-それによって漢字や仮名，および全角英数字の\cs{catcode}が11に設定されている．
-しかし，\texttt{luatex-unicode-letters.tex}ではこの「後半部」が
-まるごと省略されており，また\LuaLaTeX でも\texttt{unicode-letters.def}後半部は実行されな
-       い．
-\end{itemize}
-言い換えると，
-\begin{description}
- \item[plain \LuaTeX]  漢字や仮名を制御綴内に
-使用することはできない．
- \item[\LuaLaTeX] 最近の（2015-10-01以降の）
-\LuaLaTeX では漢字や仮名を制御綴内に
-使用することが可能になったが，全角英数字は相変わらず使用できない，
-\end{description}
-これでは\pTeX で使用できた\cs{１年目西暦}\footnote{科研費\LaTeX で使用されているそうです．}などが使えないこととなり，
-\LuaTeX-jaへの移行で手間が生じる．そのため，\LuaTeX-jaでは
-\texttt{unicode-letters.tex}の後半部にあたる内容を自前でパッチし，
-結果として\emph{\XeTeX における初期設定と同じになるようにしている．}
+そのため，\LuaTeX-jaでは全角英数字など一部の文字
+\footnote{正確には，Unicodeの行分割アルゴリズム(UAX~\#14)で``ID''~(Ideographic)と指定されている文字．}の
+\cs{catcode}を11に変更し，これらの文字を制御綴中で使用可能にしている．
 %</ja>
 
 \begin{table}
@@ -2731,7 +2685,7 @@ for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 \def\D#1#2#3#4{%
   {\fboxsep0pt\fcolorbox{cyan}{white}%
   {\large\char"#1#2#3#4}}\ (\texttt{U+#1#2#3#4})} %"
-\leavevmode\hbox to 0pt{\hss\begin{tabular}{cccccc}
+\leavevmode\hbox to 0pt{\hss\begin{tabular}[t]{cccccc}
 \toprule
 %<en>&\textbf{row}&\textbf{col.}&\textbf{\pTeX}&\textbf{\upTeX}&\textbf{\LuaTeX-ja}\\
 %<ja>&\emph{区}&\emph{点}&\emph{\pTeX}&\emph{\upTeX}&\emph{\LuaTeX-ja}\\
@@ -2744,25 +2698,26 @@ for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 \D FF3E&1&16&N&N&Y\\
 \D FFE3&1&17&N&N&Y\\
 \D FF3F&1&18&N&N&Y\\
-%\D 30FD&1&19&N&Y&Y\\
-%\D 30FE&1&20&N&Y&Y\\
-%\D 309D&1&21&N&Y&Y\\
-%\D 309E&1&22&N&Y&Y\\
+\D 30FD&1&19&N&Y&Y\\
+\D 30FE&1&20&N&Y&Y\\
+\D 309D&1&21&N&Y&Y\\
+\D 309E&1&22&N&Y&Y\\
 \D 3003&1&23&N&N&Y\\
 \D 4EDD&1&24&N&Y&Y\\
 \D 3005&1&25&N&N&Y\\
 \D 3006&1&26&N&N&Y\\
 \D 3007&1&27&N&N&Y\\
 \D 30FC&1&28&N&Y&Y\\
-\D FF0F&1&31&N&N&Y\\
-\D FF3C&1&32&N&N&Y\\
 \bottomrule
 \end{tabular}\qquad
-\begin{tabular}{cccccc}
+\begin{tabular}[t]{cccccc}
 \toprule
 %<en>&\textbf{row}&\textbf{col.}&\textbf{\pTeX}&\textbf{\upTeX}&\textbf{\LuaTeX-ja}\\
 %<ja>&\emph{区}&\emph{点}&\emph{\pTeX}&\emph{\upTeX}&\emph{\LuaTeX-ja}\\
 \midrule
+\D FF0F&1&31&N&N&Y\\
+\D FF3C&1&32&N&N&Y\\
+\D FF5E&1&33&N&N&Y\\
 \D FF5C&1&35&N&N&Y\\
 \D FF0B&1&60&N&N&Y\\
 \D FF1D&1&65&N&N&Y\\
@@ -2786,11 +2741,13 @@ for \LuaTeX, \emph{to match the \cs{catcode} setting with that of \XeTeX.}
 
 %<*en>
 \subsection{Non-kanji characters in a control word}
+{\def\D#1{%
+  {\fboxsep0pt\fcolorbox{cyan}{white}{#1}}}%
 Because the engine differ, so non-kanji JIS~X~0208 characters
 which can be used in a control word differ in \pTeX, in \upTeX,~and~in \LuaTeX-ja.
 \autoref{tab:kcat-diff} shows the difference.
-Except for four characters ``・'',~``゛'', ``゜'',~``゠'',
-\LuaTeX-ja admits more characters in a control word than \upTeX.
+Except for three characters \D{・},~\D{゛},~and~`\D{゜},
+\LuaTeX-ja admits more characters in a control word than \upTeX.}
 
 Difference becomes larger, if we consider
 non-kanji JIS~X~0213 characters.
@@ -2802,7 +2759,7 @@ For the detail, see \url{https://github.com/h-kitagawa/kct}.
 エンジンが異なるので，\pTeX, \upTeX, \LuaTeX-ja
 において制御綴中に使用可能なJIS~X~0208の文字は異なる．
 異なっているところだけを載せると，\autoref{tab:kcat-diff}のようになる．
-「・」「゛」「゜」「゠」を除けば，\LuaTeX-jaでは\upTeX より多くの文字が
+「・」「゛」「゜」を除けば，\LuaTeX-jaでは\upTeX より多くの文字が
 制御綴に使用可能になっている．
 
 JIS~X~0213の範囲に広げると，差異はさらに大きくなる．
