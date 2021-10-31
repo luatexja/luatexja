@@ -1,5 +1,5 @@
 %
-% lltjp-siunitx.sty 2021-04-19
+% lltjp-siunitx.sty 2021-10-31
 %
 
 \NeedsTeXFormat{LaTeX2e}
@@ -31,6 +31,9 @@
         \__siunitx_print_text_replace:n {#1}
       }
   }
+\cs_set_eq:NN \ltj_orig__siunitx_table_collect_begin:w \__siunitx_table_collect_begin:w
+\cs_set_protected:Npn \__siunitx_table_collect_begin:w #1 \relax
+  { \ltj_orig__siunitx_table_collect_begin:w }
 }% siunitx v3.00 end
 {% siunitx v2.xx
 \cs_generate_variant:Nn \tl_if_in:NnT { coT }
