@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2021-09-18',
+  date = '2021-11-06',
   description = 'Loader for Japanese fonts',
 })
 
@@ -889,12 +889,16 @@ do
        end
    end
    
-   local function prepare_extra_data_font(id, res)
+   local function prepare_extra_data_font(id, res, name)
       if type(res)=='table' and (res.psname or res.filename) then
-         local bname = res.psname or nameonly(res.filename)
-         local t = font_extra_basename[bname]
-         if not t then bname = prepare_extra_data_base(res) end
-         font_extra_info[id] = bname and (t or font_extra_basename[bname]) or dummytable
+         if (res.embedding=='no') and (type(name)=='string') and (name:sub(1,5)=='psft:') then
+            font_extra_info[id] = res.resources.ltj_extra
+         else
+            local bname = res.psname or nameonly(res.filename)
+            local t = font_extra_basename[bname]
+            if not t then bname = prepare_extra_data_base(res) end
+            font_extra_info[id] = bname and (t or font_extra_basename[bname]) or dummytable
+         end
       end
    end
     luatexbase.add_to_callback(
@@ -907,7 +911,7 @@ do
    luatexbase.add_to_callback(
       'luatexja.define_font',
       function (res, name, size, id)
-         prepare_extra_data_font(id, res)
+         prepare_extra_data_font(id, res, name)
       end,
       'ltj.prepare_extra_data', 1)
 

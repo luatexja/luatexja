@@ -5,7 +5,7 @@ luatexja.load_module('base');      local ltjb = luatexja.base
 
 local cidfont_data = {}
 local cache_chars = {}
-local cache_ver = 10
+local cache_ver = 11
 local identifiers = fonts.hashes.identifiers
 
 local cid_reg, cid_order, cid_supp, cid_name
@@ -157,6 +157,7 @@ do
             tth[pricode], cidmo[i], pricode
                = { index = i }, pricode, pricode+1;
          end
+         ttu[i] = cidmo[i]
          ttu[cid_order .. '.' .. i] = cidmo[i]
       end
 
@@ -245,6 +246,9 @@ do
    }
 end
 
+local dummy_vht, dummy_vorg = {}, {}
+setmetatable(dummy_vht, {__index = function () return 1 end } )
+setmetatable(dummy_vorg, {__index = function () return 0.88 end } )
 local function cid_cache_outdated(t) return t.version~=cache_ver end
 local function read_cid_font()
    local dat = ltjb.load_cache("ltj-cid-auto-" .. string.lower(cid_name),
@@ -260,6 +264,9 @@ local function read_cid_font()
    end
    if cidfont_data[cid_name] then
       cidfont_data[cid_name].shared.processes = cidf_vert_processor
+      cidfont_data[cid_name].resources.ltj_extra
+        = { ind_to_uni = cidfont_data[cid_name].resources.unicodes,
+            vheight = dummy_vht, vorigin = dummy_vorg }
       for i,v in pairs(cidfont_data[cid_name].characters) do
          if not v.width then v.width = 655360 end
          v.height, v.depth = 576716.8, 78643.2 -- optimized for jfm-ujis.lua
