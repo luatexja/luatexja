@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesFile{ltjtbk10.clo}
-  [2020-09-30 v1.8f-ltj-20
+  [2021-12-22 v1.8f-ltj-21
   Standard LuaLaTeX-ja file (size option)]
 \renewcommand{\normalsize}{%
     \@setfontsize\normalsize\@xpt{17}%
@@ -306,8 +306,6 @@
 \def\@listvi {\leftmargin\leftmarginvi
               \labelwidth\leftmarginvi
               \advance\labelwidth-\labelsep}
-%% この節のコードは|filehook|パッケージ（Lua\TeX-ja読み込み時に自動でロードされます）
-%% の機能を用いています。
 \endinput
 %%
 %% End of file `ltjtbk10.clo'.

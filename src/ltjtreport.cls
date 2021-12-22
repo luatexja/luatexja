@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjtreport}
-  [2020-09-30 v1.8f-ltj-20
+  [2021-12-22 v1.8f-ltj-21
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -952,8 +952,6 @@
 \fi
 \normalmarginpar
 \@mparswitchfalse
-%% この節のコードは|filehook|パッケージ（Lua\TeX-ja読み込み時に自動でロードされます）
-%% の機能を用いています。
 \ltj@ExecuteBeforePackage*{ftnright}{\let\ltjt@orig@@makefntext=\@makefntext}
 \ltj@ExecuteAfterPackage*{ftnright}{\let\@makefntext=\ltjt@orig@@makefntext}
 \endinput
