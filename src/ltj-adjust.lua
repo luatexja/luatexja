@@ -42,8 +42,8 @@ do
       ['ほ'..cd] = 'ぼ', ['ホ'..cd] = 'ボ', ['ほ'..cp] = 'ぽ', ['ホ'..cp] = 'ポ',
       --
       ['ゝ'..cd] = 'ゞ', ['ヽ'..cd] = 'ヾ',
-      ['ワ'..cp] = uchar(0x30F7), ['ヰ'..cp] = uchar(0x30F8),
-      ['ヱ'..cp] = uchar(0x30F9), ['ヲ'..cp] = uchar(0x30FA),
+      ['ワ'..cd] = uchar(0x30F7), ['ヰ'..cd] = uchar(0x30F8),
+      ['ヱ'..cd] = uchar(0x30F9), ['ヲ'..cd] = uchar(0x30FA),
     }
     combine_voiced_kana = function(buffer) return substituter(buffer) end
 end
