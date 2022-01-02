@@ -4730,8 +4730,8 @@ JFMによって本来挿入されるグルーの他に
  \item 通常の文字「あ」と開き括弧類の間に入るグルーは，自然長・縮み量半角，伸び量0のグルー
 となっているが，さらに\Param{kanjiskip}の伸び量に \texttt{kanjiskip\_stretch}（ここでは1）を掛け
        た分だけ伸びることが許される．
- \item 同様に，閉じ括弧類（全角コンマ「，」も含む）と通常の文字「う」「え」の間にも
-自然長・縮み量半角，伸び量0のグルー
+ \item 同様に，閉じ括弧類（全角コンマ「，」も含む）と和文文字「う」「え」，
+  閉じ括弧類と「f」の間も自然長・縮み量半角，伸び量0のグルー
 となっているが，さらに\Param{kanjiskip}の伸び量に \texttt{kanjiskip\_stretch}（ここでは1）を掛け
        た分だけ伸びることが許される．
  \item 一方，開き括弧類と通常の文字の間，また通常の文字と閉じ括弧類の間は
@@ -4741,16 +4741,16 @@ JFMによって本来挿入されるグルーの他に
 となっている．従って，以下のような組版結果を得る．
 
 \medskip
-\begin{LTXexample}[width=16\zw]
-\leavevmode
-\ltjsetparameter{kanjiskip=0pt plus 3\zw}
-\vrule\hbox to 15\zw{あ「い」う，えお}\vrule
+\begin{LTXexample}[width=18\zw]
+\leavevmode\let\V=\vrule
+\ltjsetparameter{kanjiskip=0pt plus 5\zw}
+\ltjsetparameter{xkanjiskip=0pt plus 0.5\zw}
+\V\hbox spread 7\zw{aあ「い」う，えお」f}\V
 
-\vrule\hbox{あ「い」う，えお}\vrule\par
+\vrule\hbox{ああ「い」う，えお」f}\V\par
 \ltjsetparameter{kanjiskip=0pt minus \zw}
-\vrule\hbox to 6.5\zw{あ「い」う，えお}\vrule
+\V\hbox spread -2.5\zw{aあ「い」う，えお」f}\V
 \end{LTXexample}
-
 \end{cslist}
 %</ja>
 %<*en>
@@ -4778,8 +4778,8 @@ a glue whose natural part and shrink part are both half-width, while its stretch
        zero. However, this glue also can be stretched
        as much as the stretch part of \Param{kanjiskip} times the value of
        \texttt{kanjiskip\_stretch} key (1 in this case).
- \item Between an ideographic closeing brackets (the ideographic comma ``，''
-       is included) and an ordinal letter, we have the same glue.
+ \item Between an ideographic closeing brackets (including the ideographic comma ``，'')
+       and an ordinal letter (including an \textbf{ALchar} ``f\/''), we have the same glue.
        Again, this glue also can be stretched
        as much as the stretch part of \Param{kanjiskip} times the value of
        \texttt{kanjiskip\_stretch} key (1 in this case).
@@ -4791,14 +4791,15 @@ a glue whose natural part and shrink part are both half-width, while its stretch
 Hence we have the following result:
 
 \medskip
-\begin{LTXexample}[width=16\zw]
-\leavevmode
-\ltjsetparameter{kanjiskip=0pt plus 3\zw}
-\vrule\hbox to 15\zw{あ「い」う，えお}\vrule
+\begin{LTXexample}[width=18\zw]
+\leavevmode\let\V=\vrule
+\ltjsetparameter{kanjiskip=0pt plus 5\zw}
+\ltjsetparameter{xkanjiskip=0pt plus 0.5\zw}
+\V\hbox spread 7\zw{aあ「い」う，えお」f}\V
 
-\vrule\hbox{あ「い」う，えお}\vrule\par
+\vrule\hbox{aあ「い」う，えお」f}\V\par
 \ltjsetparameter{kanjiskip=0pt minus \zw}
-\vrule\hbox to 6.5\zw{あ「い」う，えお}\vrule
+\V\hbox spread -2.5\zw{aあ「い」う，えお」f}\V
 \end{LTXexample}
 
 \end{cslist}
@@ -9944,7 +9945,7 @@ u
 
 \begin{table}[t]
 %<ja>  \caption{「基底文字＋合成用濁点・半濁点」から合成済み文字への変換をサポートする組み合わせ}
-%<en>  \caption{Transformation of Kana Character Sequences with Combiing (Semi)-voiced Sound Mark}\medskip
+%<en>  \caption{Normalization of Kana Character Sequences with Combining (Semi)-voiced Sound Mark}\medskip
   \label{tab:kana_composite}
   \def\D#1{%
     {\fboxsep0pt\fcolorbox{cyan}{white}%
@@ -10026,11 +10027,11 @@ In (u)\pTeX, Hiragana and Katakana in the NFD form%
 \footnote{namely, character sequences which contains
   ``COMBINING KATAKANA-HIRAGANA VOICED SOUND MARK''~(\texttt{U+3099}) and
  ``COMBINING KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK''~(\texttt{U+309A}).}
-are transformed to precomposed charaters before (u)\pTeX\ looks into the input line.
-This transformation are shown in \autoref{tab:kana_composite}.
+are normalized to precomposed characters before (u)\pTeX\ looks into the input line.
+Character sequences which are involved in this normalization are shown in \autoref{tab:kana_composite}.
 
-This transformation is also performed in \LuaTeX-ja version~20220103.0 or later, because
-fonts might not have this transformation as an OpenType features.
+The above normalization process is also performed in \LuaTeX-ja version~20220103.0 or later, because
+fonts might not have these transformation as an OpenType feature.
 %</en>
 
 %<*ja>
