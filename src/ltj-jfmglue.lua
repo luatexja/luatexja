@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2021-09-18',
+  date = '2022-01-02',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}
@@ -975,24 +975,20 @@ end
 -- NA, NB: alchar or math
 local function get_NA_skip()
    local pm = Np.met
-   local g, _, kn, kp, kh = new_jfm_glue(
-      pm.char_type,
-      fast_find_char_class(
-        (Nq.id == id_math and -1 or (Nq.xspc>=2 and 'alchar' or 'nox_alchar')), pm), 
-      Np.class)
-   local k = ((Nq.xspc>=2) and (Np.xspc%2==1) and combine_spc 'auto_xspc')
-       and get_xkanjiskip_low(false, pm, kn, kp, kh)
+   local qclass = fast_find_char_class(
+      (Nq.id == id_math and -1 or (Nq.xspc>=2 and 'alchar' or 'nox_alchar')), pm)
+   local g, _, kn, kp, kh = new_jfm_glue(pm.char_type, qclass, Np.class)
+   local k = g and (Nq.xspc>=2) and (Np.xspc%2==1) and combine_spc 'auto_xspc'
+      and get_kanjiskip_low(true, pm, kn, kp, kh)
    return g, k
 end
 local function get_NB_skip()
    local qm = Nq.met
-   local g, _, kn, kp, kh = new_jfm_glue(
-      qm.char_type, Nq.class,
-      fast_find_char_class(
-        (Np.id == id_math and -1 or (Np.xspc%2==1 and 'alchar' or 'nox_alchar')), qm)
-    )
-   local k = ((Nq.xspc>=2) and (Np.xspc%2==1) and combine_spc 'auto_xspc')
-         and get_xkanjiskip_low(false, qm, kn, kp, kh)
+   local pclass = fast_find_char_class(
+      (Np.id == id_math and -1 or (Np.xspc%2==1 and 'alchar' or 'nox_alchar')), qm)
+   local g, _, kn, kp, kh = new_jfm_glue(qm.char_type, Nq.class, pclass)
+   local k = g and (Nq.xspc>=2) and (Np.xspc%2==1) and combine_spc 'auto_xspc'
+      and get_kanjiskip_low(true, qm, kn, kp, kh)
    return g, k
 end
 
@@ -1037,8 +1033,7 @@ local function handle_np_jachar(mode)
       if not g then g = get_kanjiskip() end
       handle_penalty_normal(0, Np.pre, g); real_insert(g); real_insert(k)
    elseif Nq.pre then
-      local g, k
-      if non_ihb_flag then g, k = get_NA_skip() end -- N_A->X
+      local g, k; if non_ihb_flag then g, k = get_NA_skip() end -- N_A->X
       if not g then g = get_xkanjiskip(Np) end
       handle_penalty_normal((qid==id_hlist and 0 or Nq.post), Np.pre, g); 
       real_insert(g); real_insert(k)
@@ -1059,8 +1054,10 @@ end
 -- jachar .. (anything)
 local function handle_nq_jachar()
     if Np.pre then
-      local g = non_ihb_flag and get_NB_skip() or get_xkanjiskip(Nq) -- N_B->X
-      handle_penalty_normal(Nq.post, (Np.id==id_hlist and 0 or Np.pre), g); real_insert(g)
+      local g, k; if non_ihb_flag then g, k =  get_NB_skip()end -- N_B->X
+      if not g then g = get_xkanjiskip(Nq) end
+      handle_penalty_normal(Nq.post, (Np.id==id_hlist and 0 or Np.pre), g);
+      real_insert(g); real_insert(k)
    else
       local g =non_ihb_flag and  (get_OB_skip()) -- O_B
       if Np.id==id_glue then handle_penalty_normal(Nq.post, 0, g)

@@ -435,4 +435,13 @@ end}}
 \setbox0=\hbox{）\insertxkanjiskip\unskip あ）}
 \dumplist0
 
+\message{!!!!!!}
+\head{kanjiskip\_natural and xkanjiskip}
+\ltjsetparameter{autoxspacing, jaxspmode={`亜,allow}, alxspmode={`Z,allow}}
+\setbox0=\hbox{\kmd \ltjsetparameter{kanjiskip=10pt plus 1fil minus 1fill}Z亜Z言Z}
+\dumplist0
+
+\setbox0=\hbox{\kmd \ltjsetparameter{kanjiskip=\maxdimen plus 3pt}Z亜Z言Z}
+\dumplist0
+
 \end

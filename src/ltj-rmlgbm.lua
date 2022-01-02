@@ -232,7 +232,7 @@ do
    cidf_vert_processor = {
       function (head, fnum)
          local fontdata = font_getfont(fnum)
-         if head and luatexja.jfont.font_metric_table[fnum].vert_activated then
+         if head and luatexja.jfont.font_metric_table[fnum] and luatexja.jfont.font_metric_table[fnum].vert_activated then
             local vt = fontdata.ltj_vert_table
             local nh = is_node(head) and to_direct(head) or head 
             for n in traverse_id(id_glyph, head) do
