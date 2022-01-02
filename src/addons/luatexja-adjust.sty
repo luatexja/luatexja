@@ -64,7 +64,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-adjust}[2021-12-27]
+  \ProvidesPackage{luatexja-adjust}[2022-01-03]
 \fi                             %</LaTeX>
 
 % Load core module if not yet.
@@ -91,7 +91,6 @@
 \newcount\ltjadj@status@lp
 \newcount\ltjadj@status@pr
 \newcount\ltjadj@status@ls
-\newcount\ltjadj@status@cd
 \let\ltj@adjust@temp=\relax
 \define@choicekey[ltj]{adjust}{lineend}[\@@temp\ltj@adjust@temp]%
 {false,true,extended}[true]{%
@@ -102,17 +101,15 @@
   \ltjadj@status@lp=\ifltj@adjust@profile1\else0\fi\relax}
 \define@boolkey[ltj]{adjust}{linestep}[true]{%
   \ltjadj@status@ls=\ifltj@adjust@linestep1\else0\fi\relax}
-\define@boolkey[ltj]{adjust}{combinevoicedkana}[true]{%
-  \ltjadj@status@cd=\ifltj@adjust@combinevoicedkana1\else0\fi\relax}
 
 \protected\def\@@ltjenableadjust[#1]{%
    \setkeys[ltj]{adjust}{#1}%
    \directlua{luatexja.adjust.enable_cb(
     \the\ltjadj@status@le, \the\ltjadj@status@pr,
-    \the\ltjadj@status@lp, \the\ltjadj@status@ls,\the\ltjadj@status@cd)}\ignorespaces
+    \the\ltjadj@status@lp, \the\ltjadj@status@ls)}\ignorespaces
 }
 \protected\def\ltjdisableadjust{%
-  \ltjenableadjust[lineend=false,priority=false,profile=false,linestep=false,combinevoicedkana=false]}
+  \ltjenableadjust[lineend=false,priority=false,profile=false,linestep=false]}%
 \protected\def\ltjenableadjust{%
    \ltx@ifnextchar[{\@@ltjenableadjust}{\@@ltjenableadjust[lineend,priority]}}%]
 

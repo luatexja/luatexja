@@ -4721,8 +4721,8 @@ we specify <ratio> to $0.25/(0.5+0.25)=1/3$.
 
 JFMによって本来挿入されるグルーの他に
 \Param{kanjiskip}分の空白を自然長(\texttt{kanjiskip\_natural})，伸び量(\texttt{kanjiskip\_stretch})，
-縮み量(\texttt{kanjiskip\_shrink})ごとに挿入する\footnote{本来\Param{xkanjiskip}が挿入される場所においては
-	     \Param{xkanjiskip}分の空白を自然長・伸び量・縮み量ごとに．追加できる．}%
+縮み量(\texttt{kanjiskip\_shrink})ごとに挿入する
+%  \footnote{本来\Param{xkanjiskip}が挿入される場所においては\Param{xkanjiskip}分の空白を自然長・伸び量・縮み量ごとに}%
 ための指定である．いずれも省略された場合のデフォルト値は0（追加しない）である．
 
 例えば，\LuaTeX-jaの横組標準JFMの \texttt{jfm-ujis.lua} では，
@@ -4767,7 +4767,7 @@ and is also easy to shrink.
 \item[kanjiskip\_natural=<num>\textrm{, }%
   kanjiskip\_stretch=<num>\textrm{, }kanjiskip\_shrink=<num>]\leavevmode
 
-These keys specifies the amount of the natural width of \Param{kanjiskip}
+These keys specifies the amount of the natural width of \Param{kanjiskip}%
 (the stretch/shrink part, respectively) which will be inserted
 in addition to the original JFM glue. Default values of them are all 0.
 
@@ -7764,7 +7764,8 @@ for making the difference obvious.}
 \begin{cslist}
 \item[\cs{ltjenableadjust[...]}]
 \verb+...+ に指定したkey-valueリストに従い，「行末文字の位置調整」「優先順位付きの行長調整」
-  「『中身までみた』行送り計算」「段階的な行送り調整」を有効化/無効化する．
+  「『中身までみた』行送り計算」「段階的な行送り調整」%「濁点・半濁点付き仮名文字の正規化」
+  を有効化/無効化する．
 指定できるキーは以下の通り．
 \begin{description}
   \item[\texttt{lineend=[false,true,extended]}]
@@ -7776,6 +7777,8 @@ for making the difference obvious.}
   「中身までみた」行送り計算を無効化(\texttt{false})，または有効化(\texttt{true})．
   \item[\texttt{linestep=[false,true]}]
   段階的な行送り調整を無効化(\texttt{false})，または有効化(\texttt{true})．
+%  \item[\texttt{composekana=[false,true]}]
+%  濁点・半濁点付き仮名文字の正規化を無効化(\texttt{false})，または有効化(\texttt{true})．
 \end{description}
 どのキーともキー名のみを指定した場合は値として\texttt{true}が指定されたものと扱われる．
 
@@ -9939,6 +9942,116 @@ u
 その行はそこで改行するようにした方がいいだろう．
 %</ja>
 
+\begin{table}[t]
+%<ja>  \caption{「基底文字＋合成用濁点・半濁点」から合成済み文字への変換をサポートする組み合わせ}
+%<en>  \caption{Transformation of Kana Character Sequences with Combiing (Semi)-voiced Sound Mark}\medskip
+  \label{tab:kana_composite}
+  \def\D#1{%
+    {\fboxsep0pt\fcolorbox{cyan}{white}%
+    {\hbox to 1\zw{\hss#1}}}} %"
+  \def\DC#1{\D{\unitlength=1\zw
+     \begin{picture}(1,0)
+       \put(0.5,0.38){\arc[0,15]{0.25}}\put(0.5,0.38){\arc[30,45]{0.25}}\put(0.5,0.38){\arc[60,75]{0.25}}
+       \put(0.5,0.38){\arc[90,105]{0.25}}\put(0.5,0.38){\arc[120,135]{0.25}}\put(0.5,0.38){\arc[150,165]{0.25}}
+       \put(0.5,0.38){\arc[180,195]{0.25}}\put(0.5,0.38){\arc[210,225]{0.25}}\put(0.5,0.38){\arc[240,255]{0.25}}
+       \put(0.5,0.38){\arc[270,285]{0.25}}\put(0.5,0.38){\arc[300,315]{0.25}}\put(0.5,0.38){\arc[330,345]{0.25}}
+     \end{picture}\llap{#1\kern-.7\zw}}}
+  \def\CDJ#1#2{$\mbox{\D{\char"#1}}+\mbox{\DC{゛}}\rightarrow \mbox{\D{\char"#2}}$}
+  \def\CHJ#1#2{$\mbox{\D{\char"#1}}+\mbox{\DC{゜}}\rightarrow \mbox{\D{\char"#2}}$}
+  \small\centering
+  \begin{tabular}{@{}llllll@{}}
+  \CDJ{3046}{3094}&
+  \CDJ{304B}{304C}&
+  \CDJ{304D}{304E}&
+  \CDJ{304F}{3050}&
+  \CDJ{3051}{3052}&
+  \CDJ{3053}{3054}\\
+  \CDJ{3055}{3056}&
+  \CDJ{3057}{3058}&
+  \CDJ{3059}{305A}&
+  \CDJ{305B}{305C}&
+  \CDJ{305D}{305E}&
+  \CDJ{305F}{3060}\\
+  \CDJ{3061}{3062}&
+  \CDJ{3064}{3065}&
+  \CDJ{3066}{3067}&
+  \CDJ{3068}{3069}&
+  \CDJ{306F}{3070}&
+  \CDJ{3072}{3073}\\
+  \CDJ{3075}{3076}&
+  \CDJ{3078}{3079}&
+  \CDJ{307B}{307C}&
+  \CDJ{309D}{309E}&
+  \CDJ{30A6}{30F4}&
+  \CDJ{30AB}{30AC}\\
+  \CDJ{30AD}{30AE}&
+  \CDJ{30AF}{30B0}&
+  \CDJ{30B1}{30B2}&
+  \CDJ{30B3}{30B4}&
+  \CDJ{30B5}{30B6}&
+  \CDJ{30B7}{30B8}\\
+  \CDJ{30B9}{30BA}&
+  \CDJ{30BB}{30BC}&
+  \CDJ{30BD}{30BE}&
+  \CDJ{30BF}{30C0}&
+  \CDJ{30C1}{30C2}&
+  \CDJ{30C4}{30C5}\\
+  \CDJ{30C6}{30C7}&
+  \CDJ{30C8}{30C9}&
+  \CDJ{30CF}{30D0}&
+  \CDJ{30D2}{30D3}&
+  \CDJ{30D5}{30D6}&
+  \CDJ{30D8}{30D9}\\
+  \CDJ{30DB}{30DC}&
+  \CDJ{30EF}{30F7}&
+  \CDJ{30F0}{30F8}&
+  \CDJ{30F1}{30F9}&
+  \CDJ{30F2}{30FA}&
+  \CDJ{30FD}{30FE}\\
+  \CHJ{306F}{3071}&
+  \CHJ{3072}{3074}&
+  \CHJ{3075}{3077}&
+  \CHJ{3078}{307A}&
+  \CHJ{307B}{307D}&
+  \CHJ{30CF}{30D1}\\
+  \CHJ{30D2}{30D4}&
+  \CHJ{30D5}{30D7}&
+  \CHJ{30D8}{30DA}&
+  \CHJ{30DB}{30DD}
+  \end{tabular}
+\end{table}
+%<*en>
+\subsection{Composition of Kana from Combining Character Sequences}
+In (u)\pTeX, Hiragana and Katakana in the NFD form%
+\footnote{namely, character sequences which contains
+  ``COMBINING KATAKANA-HIRAGANA VOICED SOUND MARK''~(\texttt{U+3099}) and
+ ``COMBINING KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK''~(\texttt{U+309A}).}
+are transformed to precomposed charaters before (u)\pTeX\ looks into the input line.
+This transformation are shown in \autoref{tab:kana_composite}.
+
+This transformation is also performed in \LuaTeX-ja version~20220103.0 or later, because
+fonts might not have this transformation as an OpenType features.
+%</en>
+
+%<*ja>
+\subsection{濁点・半濁点付き仮名文字の正規化}
+\TeX~Live~2016以降の(u)\pTeX では，合成用濁点(\texttt{U+3099})・合成用半濁点(\texttt{U+309A})を用いて
+表現された平仮名・片仮名を合成済み文字に変換する（具体的には\autoref{tab:kana_composite}の組み合わせ）という処理を行っている．
+この処理を行っている要因としては，
+\begin{itemize}
+  \item 無用なトラブルを避けるため．
+  濁点・半濁点付きの仮名文字が「合成用濁点・半濁点を使って入力されているか」「最初から合成済み文字で入力されているか」を
+  見た目から判別することは難しい．
+  \item \pTeX との互換性のため．\pTeX は内部コードがJIS~X~0208の範囲に限られるため，
+  合成用濁点・半濁点は利用できない．そのため上記の変換処理はさらに前から行われていた．
+\end{itemize}
+
+一方，\LuaTeX(-ja)では入力の変換は基本的に行わず，文字の合成は使用しているフォントのOpenType機能に委ねるという立場である．
+しかし，\autoref{tab:kana_composite}に挙げた変換はUnicode正規化の範疇であり，この内容を持っているフォントは多くない．
+よって，前段落で述べた2つの理由（と\upTeX との互換性という意味も込めて）も考慮して，
+バージョン20220103.0以降では，\LuaTeX-jaは入力行に対して\autoref{tab:kana_composite}の変換を行う．
+%</ja>
+  
 %<*ja>
 
 %<en>\section{Insertion of JFM glues, \Param{kanjiskip} and \Param{xkanjiskip}}

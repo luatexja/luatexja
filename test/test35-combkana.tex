@@ -1,5 +1,6 @@
-\documentclass{ltjarticle}\usepackage{luatexja-adjust}
-\usepackage[margin=15mm]{geometry}\begin{document}\large FALSE
+\documentclass{ltjarticle}
+\usepackage[margin=15mm]{geometry}
+\begin{document}\large 
 {\obeylines\ttfamily
 U+304x          ぁ      あ      ぃ      い      ぅ      う      ぇ      え      ぉ      お      か      が      き      ぎ      く
 U+305x  ぐ      け      げ      こ      ご      さ      ざ      し      じ      す      ず      せ      ぜ      そ      ぞ      た
@@ -15,38 +16,21 @@ U+30Ex  ム      メ      モ      ャ      ヤ      ュ      ユ      ョ      
 U+30Fx  ヰ      ヱ      ヲ      ン      ヴ      ヵ      ヶ      ヷ      ヸ      ヹ      ヺ      ・      ー      ヽ      ヾ      ヿ 
 \par}
 
-\par
-\newpage\ltjenableadjust[combinevoicedkana] TRUE
-{\obeylines\ttfamily
-U+304x          ぁ      あ      ぃ      い      ぅ      う      ぇ      え      ぉ      お      か      が      き      ぎ      く
-U+305x  ぐ      け      げ      こ      ご      さ      ざ      し      じ      す      ず      せ      ぜ      そ      ぞ      た
-U+306x  だ      ち      ぢ      っ      つ      づ      て      で      と      ど      な      に      ぬ      ね      の      は
-U+307x  ば      ぱ      ひ      び      ぴ      ふ      ぶ      ぷ      へ      べ      ぺ      ほ      ぼ      ぽ      ま      み
-U+308x  む      め      も      ゃ      や      ゅ      ゆ      ょ      よ      ら      り      る      れ      ろ      ゎ      わ
-U+309x  ゐ      ゑ      を      ん      ゔ      ゕ      ゖ                      ゙        ゚        ゛      ゜      ゝ      ゞ      ゟ 
-U+30Ax  ゠      ァ      ア      ィ      イ      ゥ      ウ      ェ      エ      ォ      オ      カ      ガ      キ      ギ      ク
-U+30Bx  グ      ケ      ゲ      コ      ゴ      サ      ザ      シ      ジ      ス      ズ      セ      ゼ      ソ      ゾ      タ
-U+30Cx  ダ      チ      ヂ      ッ      ツ      ヅ      テ      デ      ト      ド      ナ      ニ      ヌ      ネ      ノ      ハ
-U+30Dx  バ      パ      ヒ      ビ      ピ      フ      ブ      プ      ヘ      ベ      ペ      ホ      ボ      ポ      マ      ミ
-U+30Ex  ム      メ      モ      ャ      ヤ      ュ      ユ      ョ      ヨ      ラ      リ      ル      レ      ロ      ヮ      ワ
-U+30Fx  ヰ      ヱ      ヲ      ン      ヴ      ヵ      ヶ      ヷ      ヸ      ヹ      ヺ      ・      ー      ヽ      ヾ      ヿ 
-\par}
+\bigskip
+\def\CB{\char"3099 }\def\CD{\char"309A }
 
-\par
-\newpage\ltjenableadjust[combinevoicedkana=false] FALSE
 {\obeylines\ttfamily
-U+304x          ぁ      あ      ぃ      い      ぅ      う      ぇ      え      ぉ      お      か      が      き      ぎ      く
-U+305x  ぐ      け      げ      こ      ご      さ      ざ      し      じ      す      ず      せ      ぜ      そ      ぞ      た
-U+306x  だ      ち      ぢ      っ      つ      づ      て      で      と      ど      な      に      ぬ      ね      の      は
-U+307x  ば      ぱ      ひ      び      ぴ      ふ      ぶ      ぷ      へ      べ      ぺ      ほ      ぼ      ぽ      ま      み
+U+304x          ぁ      あ      ぃ      い      ぅ      う      ぇ      え      ぉ      お      か      か\CB{}      き      き\CB{}      く
+U+305x  く\CB{}      け      け\CB{}      こ      こ\CB{}      さ      さ\CB{}      し      し\CB{}      す      す\CB{}      せ      せ\CB{}      そ      そ\CB{}      た
+U+306x  た\CB{}      ち      ち\CB{}      っ      つ      つ\CB{}      て      て\CB{}      と      と\CB{}      な      に      ぬ      ね      の      は
+U+307x  は\CB{}      は\CD{}      ひ      ひ\CB{}      ひ\CD{}      ふ      ふ\CB{}      ふ\CD{}      へ      へ\CB{}      へ\CD{}      ほ      ほ\CB{}      ほ\CD{}      ま      み
 U+308x  む      め      も      ゃ      や      ゅ      ゆ      ょ      よ      ら      り      る      れ      ろ      ゎ      わ
-U+309x  ゐ      ゑ      を      ん      ゔ      ゕ      ゖ                      ゙        ゚        ゛      ゜      ゝ      ゞ      ゟ 
-U+30Ax  ゠      ァ      ア      ィ      イ      ゥ      ウ      ェ      エ      ォ      オ      カ      ガ      キ      ギ      ク
-U+30Bx  グ      ケ      ゲ      コ      ゴ      サ      ザ      シ      ジ      ス      ズ      セ      ゼ      ソ      ゾ      タ
-U+30Cx  ダ      チ      ヂ      ッ      ツ      ヅ      テ      デ      ト      ド      ナ      ニ      ヌ      ネ      ノ      ハ
-U+30Dx  バ      パ      ヒ      ビ      ピ      フ      ブ      プ      ヘ      ベ      ペ      ホ      ボ      ポ      マ      ミ
+U+309x  ゐ      ゑ      を      ん      ゔ      ゕ      ゖ                      \CB{}        \CD{}        ゛      ゜      ゝ      ゝ\CB{}      ゟ 
+U+30Ax  ゠      ァ      ア      ィ      イ      ゥ      ウ      ェ      エ      ォ      オ      カ      カ\CB{}      キ      キ\CB{}      ク
+U+30Bx  ク\CB{}      ケ      ケ\CB{}      コ      コ\CB{}      サ      サ\CB{}      シ      シ\CB{}      ス      ス\CB{}      セ      セ\CB{}      ソ      ソ\CB{}      タ
+U+30Cx  タ\CB{}      チ      チ\CB{}      ッ      ツ      ツ\CB{}      テ      テ\CB{}      ト      ト\CB{}      ナ      ニ      ヌ      ネ      ノ      ハ
+U+30Dx  ハ\CB{}      ハ\CD{}      ヒ      ヒ\CB{}      ヒ\CD{}      フ      フ\CB{}      フ\CD{}      ヘ      ヘ\CB{}      ヘ\CD{}      ホ      ホ\CB{}      ホ\CD{}      マ      ミ
 U+30Ex  ム      メ      モ      ャ      ヤ      ュ      ユ      ョ      ヨ      ラ      リ      ル      レ      ロ      ヮ      ワ
-U+30Fx  ヰ      ヱ      ヲ      ン      ヴ      ヵ      ヶ      ヷ      ヸ      ヹ      ヺ      ・      ー      ヽ      ヾ      ヿ 
+U+30Fx  ヰ      ヱ      ヲ      ン      ウ\CB{}      ヵ      ヶ      ワ\CB{}      ヰ\CB{}      ヱ\CB{}      ヲ\CB{}      ・      ー      ヽ      ヽ\CB{}      ヿ 
 \par}
-
 \end{document}

@@ -9,46 +9,6 @@ luatexja.load_module 'direction'; local ltjd = luatexja.direction
 luatexja.load_module 'lineskip';  local ltjl = luatexja.lineskip
 luatexja.adjust = luatexja.adjust or {}
 
-----
-local combine_voiced_kana
-do
-    local uchar = utf.char
-    local cd, cp = uchar(0x3099), uchar(0x309A)
-    local substituter = (utf.substituter or utf.subtituter)      -- typo in lualibs?
-    {
-      ['ウ'..cd] = 'ヴ', ['う'..cd] = uchar(0x30F4),
-      ['か'..cd] = 'が', ['カ'..cd] = 'ガ',
-      ['き'..cd] = 'ぎ', ['キ'..cd] = 'ギ',
-      ['く'..cd] = 'ぐ', ['ク'..cd] = 'グ',
-      ['け'..cd] = 'げ', ['ケ'..cd] = 'ゲ',
-      ['こ'..cd] = 'ご', ['コ'..cd] = 'ゴ',
-      --
-      ['さ'..cd] = 'ざ', ['サ'..cd] = 'ザ',
-      ['し'..cd] = 'じ', ['シ'..cd] = 'ジ',
-      ['す'..cd] = 'ず', ['ス'..cd] = 'ズ',
-      ['せ'..cd] = 'ぜ', ['セ'..cd] = 'ゼ',
-      ['そ'..cd] = 'ぞ', ['ソ'..cd] = 'ゾ',
-      --
-      ['た'..cd] = 'だ', ['タ'..cd] = 'ダ',
-      ['ち'..cd] = 'ぢ', ['チ'..cd] = 'ヂ',
-      ['つ'..cd] = 'づ', ['ツ'..cd] = 'ヅ',
-      ['て'..cd] = 'で', ['テ'..cd] = 'デ',
-      ['と'..cd] = 'ど', ['ト'..cd] = 'ド',
-      --
-      ['は'..cd] = 'ば', ['ハ'..cd] = 'バ', ['は'..cp] = 'ぱ', ['ハ'..cp] = 'パ',
-      ['ひ'..cd] = 'び', ['ヒ'..cd] = 'ビ', ['ひ'..cp] = 'ぴ', ['ヒ'..cp] = 'ピ',
-      ['ふ'..cd] = 'ぶ', ['フ'..cd] = 'ブ', ['ふ'..cp] = 'ぷ', ['フ'..cp] = 'プ',
-      ['へ'..cd] = 'べ', ['ヘ'..cd] = 'ベ', ['へ'..cp] = 'ぺ', ['ヘ'..cp] = 'ペ',
-      ['ほ'..cd] = 'ぼ', ['ホ'..cd] = 'ボ', ['ほ'..cp] = 'ぽ', ['ホ'..cp] = 'ポ',
-      --
-      ['ゝ'..cd] = 'ゞ', ['ヽ'..cd] = 'ヾ',
-      ['ワ'..cd] = uchar(0x30F7), ['ヰ'..cd] = uchar(0x30F8),
-      ['ヱ'..cd] = uchar(0x30F9), ['ヲ'..cd] = uchar(0x30FA),
-    }
-    combine_voiced_kana = function(buffer) return substituter(buffer) end
-end
-----
-
 local to_node = node.direct.tonode
 local to_direct = node.direct.todirect
 
@@ -445,7 +405,7 @@ do
       return to_node(head)
    end
    local is_reg = false
-   local function enable_cb(status_le, status_pr, status_lp, status_ls, status_cd)
+   local function enable_cb(status_le, status_pr, status_lp, status_ls)
       if (status_le>0 or status_pr>0) and (not is_reg) then
          ltjb.add_to_callback('post_linebreak_filter',
             adjust_width, 'Adjust width', 
@@ -475,18 +435,9 @@ do
          status_lp>0 and 'profile' or 'dummy',
          status_ls>0 and 'step' or 'dummy'
       )
-      if status_cd==1 then
-         if not luatexbase.in_callback('process_input_buffer', 'Combine voiced kana-syllables') then
-            ltjb.add_to_callback('process_input_buffer', combine_voiced_kana, 'Combine voiced kana-syllables')
-         end
-      else
-         if luatexbase.in_callback('process_input_buffer', 'Combine voiced kana-syllables') then
-               luatexbase.remove_from_callback('process_input_buffer', 'Combine voiced kana-syllables')
-         end
-      end
    end
    local function disable_cb() -- only for compatibility
-       enable_cs(0,0,0,0,0)
+       enable_cs(0,0,0,0)
    end
    luatexja.adjust.enable_cb=enable_cb
    luatexja.adjust.disable_cb=disable_cb
