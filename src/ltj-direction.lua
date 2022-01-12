@@ -924,6 +924,11 @@ end
 -- adjust
 do
    local id_adjust = node.id 'adjust'
+   local scan_keyword = token.scan_keyword
+   function luatexja.direction.adjust_begin()
+      if scan_keyword 'pre' then tex.sprint(cat_lp, '\\ltj@@vadjust@pre')
+      else tex.sprint(cat_lp, '\\ltj@@vadjust@post') end
+   end
    function luatexja.direction.check_adjust_direction()
       start_time_measure 'box_primitive_hook'
       local list_dir = get_adjust_dir_count()

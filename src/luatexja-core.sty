@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2021-05-21 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2022-01-12 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -623,19 +623,22 @@
 
 %%%% vadjust
 \let\ltj@@orig@vadjust\vadjust
+\newluafunction\ltj@@vadjust@begin@inner
 \newluafunction\ltj@@vadjust@dirhook@inner
 \newluafunction\ltj@@vadjust@check@dir@inner
 \directlua{
   local t = lua.get_functions_table()
+  t[\the\ltj@@vadjust@begin@inner] = luatexja.direction.adjust_begin
   t[\the\ltj@@vadjust@dirhook@inner]
     = function () luatexja.direction.set_list_direction_hook('adj') end
-  t[\the\ltj@@vadjust@check@dir@inner]
-    = luatexja.direction.check_adjust_direction
+  t[\the\ltj@@vadjust@check@dir@inner] = luatexja.direction.check_adjust_direction
 }
+\protected\luadef\ltj@@vadjust\ltj@@vadjust@begin@inner
 \luadef\ltj@@vadjust@dirhook\ltj@@vadjust@dirhook@inner
 \protected\luadef\ltj@@vadjust@check@dir\ltj@@vadjust@check@dir@inner
-\protected\def\ltj@@vadjust{%
-  \ltj@@orig@vadjust\bgroup\ltj@@vadjust@dirhook
+\def\ltj@@vadjust@pre{\ltj@@orig@vadjust pre\bgroup\ltj@@vadjust@dirhook
+  \aftergroup\ltj@@vadjust@check@dir\let\ltj@@next}
+\def\ltj@@vadjust@post{\ltj@@orig@vadjust\bgroup\ltj@@vadjust@dirhook
   \aftergroup\ltj@@vadjust@check@dir\let\ltj@@next}
 \let\vadjust\ltj@@vadjust %% PRIMITIVE
 
