@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2021-03-25 Patch to LaTeX2e Kernel for LuaTeX-ja]
+\ProvidesPackage{lltjcore}[2022-01-17 Patch to LaTeX2e Kernel for LuaTeX-ja]
 \RequirePackage{etoolbox}
 
 %%% expl3
@@ -208,7 +208,7 @@
   \else\hbox{\yoko \@textsuperscript{\normalfont\@thefnmark}}\fi}
 \begingroup
 \@ifpackageloaded{hyperref}
-  {\def\ltj@setrefprefix{real}}
+  {\ifdefined\real@setref\def\ltj@setrefprefix{real}\else\def\ltj@setrefprefix{}\fi}
   {\def\ltj@setrefprefix{}}
 \expandafter\gdef\csname \ltj@setrefprefix @setref\endcsname#1#2#3{%
   \ifx#1\relax
