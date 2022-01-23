@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjdefs}[2021-04-29 Default font settings of LuaTeX-ja]
+\ProvidesPackage{lltjdefs}[2022-01-23 Default font settings of LuaTeX-ja]
 
 \ifdefined\ltj@stdmcfont\else\def\ltj@stdmcfont{file:HaranoAjiMincho-Regular.otf}\fi
 \ifdefined\ltj@stdgtfont\else\def\ltj@stdgtfont{file:HaranoAjiGothic-Medium.otf}\fi
@@ -151,14 +151,14 @@
 \ltjdefcharrange{4}{%
    "500-"10FF, "1200-"1DFF, "2440-"245F, "27C0-"28FF, "2A00-"2AFF,
   "2C00-"2E7F, "4DC0-"4DFF, "A4D0-"A95F, "A980-"ABFF, "E000-"F8FF,
-  "FB00-"FE0F, "FE20-"FE2F, "FE70-"FEFF, "10000-"1AFFF, "1B170-"1F0FF,
+  "FB00-"FE0F, "FE20-"FE2F, "FE70-"FEFF, "10000-"1AFEF, "1B170-"1F0FF,
   "1F300-"1FFFF, "2000-"206F
 } % non-Japanese
 \ltjdefcharrange{5}{"D800-"DFFF, "E0000-"E00FF, "E01F0-"10FFFF}
 \ltjdefcharrange{6}{%
   "2460-"24FF, "2E80-"2EFF, "3000-"30FF, "3190-"319F, "31F0-"4DBF,
   "4E00-"9FFF, "F900-"FAFF, "FE10-"FE1F, "FE30-"FE6F, "FF00-"FFEF,
-  "1B000-"1B16F, "1F100-"1F2FF, "20000-"3FFFF, "E0100-"E01EF
+  "1AFF0-"1B16F, "1F100-"1F2FF, "20000-"3FFFF, "E0100-"E01EF
 }
 \ltjdefcharrange{7}{%
   "1100-"11FF, "2F00-"2FFF, "3100-"318F, "31A0-"31EF, "A000-"A4CF,
