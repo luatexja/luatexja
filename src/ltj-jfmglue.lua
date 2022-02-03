@@ -1104,7 +1104,9 @@ do
                       luatexbase.call_callback("luatexja.jfmglue.special_jaglue_after", Nq.nuc)
                    end,
       [id_pbox_w]= function()
-                      luatexbase.call_callback("luatexja.jfmglue.whatsit_after", false, Nq, Np)
+                      local hh = luatexbase.call_callback("luatexja.jfmglue.whatsit_after", false, Nq, Np, head)
+                      -- hh: new head of false (nott processed)
+                      if hh then head = hh end
                    end,
    }
 
@@ -1323,7 +1325,7 @@ do
       end
    end
 
-    local function whatsit_after_callback(s, Nq, Np)
+    local function whatsit_after_callback(s, Nq, Np, head)
        if not s and getfield(Nq.nuc, 'user_id') == BPAR then
          local x, y = node_prev(Nq.nuc), Nq.nuc
          Nq.first, Nq.nuc, Nq.last = x, x, x
@@ -1334,7 +1336,7 @@ do
             Nq.met = Np.met; Nq.pre = 0; Nq.post = 0; Nq.xspc = 0
             Nq.auto_xspc, Nq.auto_kspc = 0, 0
          end
-         head = node_remove(head, y)
+         s = node_remove(head, y)
          node_free(y)
        elseif not s and getfield(Nq.nuc, 'user_id') == BOXB then
          local x, y = node_prev(Nq.nuc), Nq.nuc
@@ -1346,7 +1348,7 @@ do
             Nq.met = Np.met; Nq.pre = 0; Nq.post = 0; Nq.xspc = 0
             Nq.auto_xspc, Nq.auto_kspc = 0, 0
          end
-         head = node_remove(head, y)
+         s = node_remove(head, y)
          node_free(y)
       end
       return s

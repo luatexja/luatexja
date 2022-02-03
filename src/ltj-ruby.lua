@@ -764,7 +764,7 @@ do
    end
    local RIPOST = luatexja.stack_table_index.RIPOST
    local abs = math.abs
-   local function whatsit_after_callback(s, Nq, Np)
+   local function whatsit_after_callback(s, Nq, Np, head)
       if not s and  getfield(Nq.nuc, 'user_id') == RUBY_PRE then
          if Np then
             local last_glue = node_new(id_glue)
@@ -802,7 +802,7 @@ do
                rst.post = 0
             end
          end
-         return true
+         return head
       else
          return s
       end
