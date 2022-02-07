@@ -7837,6 +7837,21 @@ stretch_priority={kanjiskip=-35,xkanjiskip=-25,others=50}
   負数を指定すると，その絶対値が指定されたかのように扱われる．
   初期値は1（つまり\cs{lineskip}（の自然長））である．
 \end{cslist}
+
+さらに，バージョン20220207.0以降では次の命令が提供される：
+\begin{cslist}
+  \item[\cs{ltjghostjachar}]
+  \LuaTeX-ja本体が提供している\cs{ltjfakeparbegin}, \cs{ltjfakeboxbdd}と類似の命令である．
+  実行された箇所が（限定・非限定を問わず）水平モードであった場合に，実行された箇所は
+  「文字クラス0の\textbf{JAchar}」の直前かつ直後であると，\LuaTeX-jaの和文処理グルー挿入処理に認識させる．
+
+  主な仕様用途は和文ゴーストでの使用である．\Pkg{BXghost}パッケージ(\cite{bxghost})などでは
+  伝統的に全角空白(\texttt{U+3000})と\verb+\kern-1\zw+を組み合わせた方法が使われてきたが，
+  \LuaTeX-jaでは全角空白を使っただけではうまくいかない可能性があるため，新たに命令が用意された．
+
+  なお，本命令は将来的に\LuaTeX-ja本体に組み込む可能性もある．
+\end{cslist}
+
 %</ja>
 
 \subsection{\Pkg{luatexja-ruby}}
@@ -11922,6 +11937,7 @@ ISO 32000-1:2008, \textit{Document management -- Portable document format -- Par
 \url{http://www.iso.org/iso/iso\_catalogue/catalogue_tc/catalogue\_detail.htm?csnumber=51502}
 \bibitem{tc18ltja} 北川弘典．「\LuaTeX-jaの近況」，\TeX Conf~2018．
   \url{https://osdn.net/projects/luatex-ja/wiki/Documentation/attach/tc18ltja.pdf}
+\bibitem{bxghost} Takuto ASAKURA. \newblock The \textsf{BXghost} Package. \url{https://github.com/wtsnjp/BXghost}
 \end{thebibliography}
 
 \end{document}
