@@ -551,4 +551,40 @@ do
   end
 end
 
-
+do
+  local ltja = luatexja.adjust
+  local sid_user = node.subtype 'user_defined'
+  local node_remove = node.direct.remove
+  local node_write = node.direct.write
+  local GHOST_JACHAR = luatexbase.newuserwhatsitid('ghost of a jachar',  'luatexja')
+  luatexja.userid_table.GHOST_JACHAR = GHOST_JACHAR
+  function ltja.create_ghost_jachar_node(cl)
+    local tn = node_new(id_whatsit, sid_user)
+    setfield(tn, 'user_id', GHOST_JACHAR)
+    setfield(tn, 'type', 100)
+    setfield(tn, 'value', cl)
+    node_write(tn)
+  end
+  local function whatsit_callback(Np, lp, Nq)
+    if Np and Np.nuc then return Np
+    elseif Np and getfield(lp, 'user_id') == GHOST_JACHAR then
+      Np.first = lp; Np.nuc = lp; Np.last = lp; Np.class = getfield(lp,'value')
+      if Nq then Np.met = Nq.met; Np.pre = 0; Np.post = 0; Np.xspc = 3 end
+      Np.auto_kspc, Np.auto_xspc = (has_attr(lp, attr_autospc)==1), (has_attr(lp, attr_autoxspc)==1)
+      return Np
+    else return Np end
+  end
+  local function whatsit_after_callback(s, Nq, Np, head)
+    if not s and getfield(Nq.nuc, 'user_id') == GHOST_JACHAR then
+      local x, y = node_prev(Nq.nuc), Nq.nuc
+      Nq.first, Nq.nuc, Nq.last = x, x, x
+      if Np then Nq.met = Np.met end
+      s = node_remove(head, y); node_free(y)
+    end
+    return s
+  end
+  luatexbase.add_to_callback("luatexja.jfmglue.whatsit_getinfo", whatsit_callback,
+                             "ghost of a JACHAR", 1)
+  luatexbase.add_to_callback("luatexja.jfmglue.whatsit_after", whatsit_after_callback,
+                             "ghost of a JACHAR", 1)
+end

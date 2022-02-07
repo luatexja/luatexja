@@ -2,6 +2,8 @@
 
 \documentclass{ltjsarticle}
 \usepackage{luatexja-fontspec,luatexja-adjust,xcolor,amsmath,amssymb}
+\DeclareKanjiFamily{JY3}{piyo}{}
+\DeclareFontShape{JY3}{piyo}{m}{n}{<-> s*[\Cjascale] file:ipaexg.ttf:jfm=jlreq}{}
 
 \def\sq{%
   \hbox to 1\zw{\hss\fboxsep=-.5\fboxrule\fbox{%
@@ -285,5 +287,28 @@ xkanjiskip手動挿入．
 
 
 
+\newpage
 
+\def\MYGUARDA#1{　\kern-\zw#1\kern-\zw 　\ignorespaces}
+\def\MYGUARDB#1{{\kanjifamily{mc}\selectfont 　}%
+        \kern-\zw#1\kern-\zw{\kanjifamily{mc}\selectfont 　}\ignorespaces}
+\def\MYGUARDC#1{\ltjghostjachar#1\ltjghostjachar\ignorespaces}
+\def\MYVRULE{\raisebox{-2pt}{漢}}
+
+\paragraph{jfm: ujis}\ 
+
+\leavevmode\hbox to 15\zw{◆\MYVRULE ◆◆◆◆$f$◆}\par
+\leavevmode\hbox to 15\zw{◆\MYGUARDA{\MYVRULE}◆◆◆◆$f$◆} A\par
+\leavevmode\hbox to 15\zw{◆\MYGUARDB{\MYVRULE}◆◆◆◆$f$◆} B\par
+\leavevmode\hbox to 15\zw{◆\MYGUARDC{\MYVRULE}◆◆◆◆$f$◆} C\par
+\leavevmode\hbox to 15\zw{◆◇◆◆◆◆$f$◆} 比較用\par
+
+\paragraph{jfm: jlreq}\ 
+
+\kanjifamily{piyo}\selectfont
+\leavevmode\hbox to 15\zw{◆\MYVRULE ◆◆◆◆$f$◆}\par
+\leavevmode\hbox to 15\zw{◆\MYGUARDA{\MYVRULE}◆◆◆◆$f$◆} A\par
+\leavevmode\hbox to 15\zw{◆\MYGUARDB{\MYVRULE}◆◆◆◆$f$◆} B\par
+\leavevmode\hbox to 15\zw{◆\MYGUARDC{\MYVRULE}◆◆◆◆$f$◆} C\par
+\leavevmode\hbox to 15\zw{◆◇◆◆◆◆$f$◆} 比較用\par
 \end{document}

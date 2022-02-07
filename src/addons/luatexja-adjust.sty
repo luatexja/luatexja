@@ -64,7 +64,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-adjust}[2022-01-03]
+  \ProvidesPackage{luatexja-adjust}[2022-02-07]
 \fi                             %</LaTeX>
 
 % Load core module if not yet.
@@ -136,6 +136,14 @@
   \directlua{local d = #1; luatexja.adjust.step_factor=math.abs(d)}\relax}
 \define@key[ltj]{japaram}{profile_hgap_factor}{%
   \directlua{luatexja.adjust.profile_hgap_factor = math.abs(#1)}\relax}
+
+\newluafunction\ltj@@ghost@jachar@inner
+\typeout{\the\ltj@@ghost@jachar@inner.}
+\directlua{
+  local t = lua.get_functions_table(); local cgj = luatexja.adjust.create_ghost_jachar_node;
+  t[\the\ltj@@ghost@jachar@inner] = function() cgj(0) end
+}%
+\protected\def\ltjghostjachar{\ifhmode\relax\luafunction\ltj@@ghost@jachar@inner\fi}
 
 
 %%------------------ all done
