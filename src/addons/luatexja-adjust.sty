@@ -64,7 +64,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-adjust}[2022-02-07]
+  \ProvidesPackage{luatexja-adjust}[2022-02-11]
 \fi                             %</LaTeX>
 
 % Load core module if not yet.
@@ -137,13 +137,18 @@
 \define@key[ltj]{japaram}{profile_hgap_factor}{%
   \directlua{luatexja.adjust.profile_hgap_factor = math.abs(#1)}\relax}
 
-\newluafunction\ltj@@ghost@jachar@inner
-\typeout{\the\ltj@@ghost@jachar@inner.}
+\newluafunction\ltj@@ghost@jachar@inner@both
+\newluafunction\ltj@@ghost@jachar@inner@before
+\newluafunction\ltj@@ghost@jachar@inner@after
 \directlua{
   local t = lua.get_functions_table(); local cgj = luatexja.adjust.create_ghost_jachar_node;
-  t[\the\ltj@@ghost@jachar@inner] = function() cgj(0) end
+  t[\the\ltj@@ghost@jachar@inner@both] = function() cgj(0) end;
+  t[\the\ltj@@ghost@jachar@inner@before] = function() cgj(1) end;
+  t[\the\ltj@@ghost@jachar@inner@after] = function() cgj(2) end
 }%
-\protected\def\ltjghostjachar{\ifhmode\relax\luafunction\ltj@@ghost@jachar@inner\fi}
+\protected\def\ltjghostjachar{\ifhmode\relax\luafunction\ltj@@ghost@jachar@inner@both\fi}% will be removed
+\protected\def\ltjghostbeforejachar{\ifhmode\relax\luafunction\ltj@@ghost@jachar@inner@before\fi}
+\protected\def\ltjghostafterjachar{\ifhmode\relax\luafunction\ltj@@ghost@jachar@inner@after\fi}
 
 
 %%------------------ all done

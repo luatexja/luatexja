@@ -7838,19 +7838,45 @@ stretch_priority={kanjiskip=-35,xkanjiskip=-25,others=50}
   初期値は1（つまり\cs{lineskip}（の自然長））である．
 \end{cslist}
 
-さらに，バージョン20220207.0以降では次の命令が提供される：
+さらに，バージョン20220211.0以降では次の命令が提供される．
 \begin{cslist}
-  \item[\cs{ltjghostjachar}]
+  \item[\cs{ltjghostbeginjachar}]
   \LuaTeX-ja本体が提供している\cs{ltjfakeparbegin}, \cs{ltjfakeboxbdd}と類似の命令である．
   実行された箇所が（限定・非限定を問わず）水平モードであった場合に，実行された箇所は
-  「文字クラス0の\textbf{JAchar}」の直前かつ直後であると，\LuaTeX-jaの和文処理グルー挿入処理に認識させる．
+  「文字クラス0の\textbf{JAchar}」の直前であると，
+  \LuaTeX-jaの和文処理グルー挿入処理に認識させる．以下の実行例を参照．
 
-  主な仕様用途は和文ゴーストでの使用である．\Pkg{BXghost}パッケージ(\cite{bxghost})などでは
-  伝統的に全角空白(\texttt{U+3000})と\verb+\kern-1\zw+を組み合わせた方法が使われてきたが，
-  \LuaTeX-jaでは全角空白を使っただけではうまくいかない可能性があるため，新たに命令が用意された．
+\medskip
+\begin{LTXexample}[width=18\zw]
+\ltjsetparameter{kanjiskip=14pt,xkanjiskip=50pt}
+\let\LG=\ltjghostbeforejachar
+A\LG  B   \par% ==> ALchar--(xkanjiskip)--\LG
+A\LG  字  \par% ==> ALchar--(xkanjiskip)--\LG
+漢\LG B   \par% ==> JAchar--(kanjiskip)--\LG
+漢\LG 字  \par% ==> JAchar--(kanjiskip)--\LG
+\end{LTXexample}
 
-  なお，本命令は将来的に\LuaTeX-ja本体に組み込む可能性もある．
+  \item[\cs{ltjghostafterjachar}]
+  \cs{ltjghostbeginjachar}と対を成す命令で，実行された箇所は
+  「文字クラス0の\textbf{JAchar}」の直後であると，
+  \LuaTeX-jaの和文処理グルー挿入処理に認識させる．以下の実行例を参照．
+
+\medskip
+\begin{LTXexample}[width=18\zw]
+\ltjsetparameter{kanjiskip=14pt,xkanjiskip=50pt}
+\let\LG=\ltjghostafterjachar
+A\LG  B   \par% ==> \LG--(xkanjiskip)--ALchar
+漢\LG B   \par% ==> \LG--(xkanjiskip)--ALchar
+A\LG  字  \par% ==> \LG--(kanjiskip)--JAchar
+漢\LG 字  \par% ==> \LG--(kanjiskip)--JAchar
+\end{LTXexample}
 \end{cslist}
+なお，バージョン20220207.0で追加された\cs{ltjghostjachar}は実装にバグがあったのと「両側」
+という点が扱いづらかったので，将来は削除する予定である．
+
+両命令の主な仕様用途は和文ゴーストでの使用である．\Pkg{BXghost}パッケージ(\cite{bxghost})などでは
+伝統的に全角空白(\texttt{U+3000})と\verb+\kern-1\zw+を組み合わせた方法が使われてきたが，
+\LuaTeX-jaでは全角空白を使っただけではうまくいかない可能性があるため，新たに命令が用意された．
 
 %</ja>
 

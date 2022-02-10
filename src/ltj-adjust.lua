@@ -565,11 +565,23 @@ do
     setfield(tn, 'value', cl)
     node_write(tn)
   end
+  local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
+  local attr_curtfnt = luatexbase.attributes['ltj@curtfnt']
+  local dir_tate = luatexja.dir_table.dir_tate
+  local get_dir_count = ltjd.get_dir_count
+  local ltjf_font_metric_table = ltjf.font_metric_table
+  local function get_current_metric(n)
+     local fn = has_attr(n, (get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
+     return fn and ltjf_font_metric_table[fn]
+  end
   local function whatsit_callback(Np, lp, Nq)
     if Np and Np.nuc then return Np
     elseif Np and getfield(lp, 'user_id') == GHOST_JACHAR then
-      Np.first = lp; Np.nuc = lp; Np.last = lp; Np.class = getfield(lp,'value')
-      if Nq then Np.met = Nq.met; Np.pre = 0; Np.post = 0; Np.xspc = 3 end
+      Np.first = lp; Np.nuc = lp; Np.last = lp; Np.class = 0
+      if getfield(lp,'value')<2 then
+        if Nq and Nq.met then Np.met = Nq.met; else Np.met = get_current_metric(lp) end
+        Np.pre = 0; Np.post = 0; Np.xspc = 3
+      else Np.met, Np.pre = nil, nil; end
       Np.auto_kspc, Np.auto_xspc = (has_attr(lp, attr_autospc)==1), (has_attr(lp, attr_autoxspc)==1)
       return Np
     else return Np end
@@ -578,7 +590,10 @@ do
     if not s and getfield(Nq.nuc, 'user_id') == GHOST_JACHAR then
       local x, y = node_prev(Nq.nuc), Nq.nuc
       Nq.first, Nq.nuc, Nq.last = x, x, x
-      if Np then Nq.met = Np.met end
+      if getfield(y,'value')%2==0 then
+        if Np and Nq.met then Nq.met = Np.met; else Nq.met = get_current_metric(y) end
+        Nq.pre = 0; Nq.post = 0; Nq.xspc = 3
+      else Nq.met, Nq.pre = nil, nil; end
       s = node_remove(head, y); node_free(y)
     end
     return s
