@@ -404,12 +404,12 @@ do
     local semicolon         = P';'
     local comma             = P','
     local equals            = P'='
-    local jf_field_char     = 1 - S'/{};,='
+    local jf_field_char     = 1 - S'/{};,= \t\v'
     local jf_field          = C(jf_field_char^1)
-    local jf_assignment     = jf_field * equals * jf_field
-    local jf_switch         = P'-'    * jf_field * Cc(false) + P'+'^-1 * jf_field * Cc(true)
-    local jf_feature_expr   = Cg(jf_assignment + jf_switch) * comma^0
-    local jf_feature_list   = P'{' * jf_feature_expr^0 * P'}' + jf_feature_expr^0
+    local jf_assignment     = jf_field * ws * equals * ws * jf_field
+    local jf_switch         = P'-' * jf_field * Cc(false) + P'+'^-1 * jf_field * Cc(true)
+    local jf_feature_expr   = Cg(jf_assignment + jf_switch) * ws * comma^0 * ws
+    local jf_feature_list   = ws * ( P'{' * ws * jf_feature_expr^0 * P'}' + jf_feature_expr^0 )
     local jf_list           = C((1-slash)^1) * (slash * Cf(Ct'' * jf_feature_list, rawset))^-1
     local jf_value          = (1 - semicolon)^1
     local function rem(name,value)
