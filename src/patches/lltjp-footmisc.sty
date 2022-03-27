@@ -3,9 +3,16 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-footmisc}[2021-03-25 Patch to footmisc for LuaTeX-ja]
-\RequirePackage{footmisc}
+\ProvidesPackage{lltjp-footmisc}[2022-02-19 Patch to footmisc for LuaTeX-ja]
 
+\@ifpackagelater{footmisc}{2022-02-10}{%% v6.0a or later
+  \patchcmd{\@makenormalcolbox}{\vskip -\@outputbox@depth\@textbottom}%
+    {\pltx@adjust@wd@outputbox\vskip -\@outputbox@depth\@textbottom}{}{}%
+  \let\ltj@next\endinput
+}{\let\ltj@next\relax}
+\ltj@next
+
+% old (v5.5)
 \let  \if@tempswa  \ifFN@bottom
 \ifFN@para    \@tempswatrue \fi
 \if@tempswa
