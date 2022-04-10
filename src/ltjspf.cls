@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjspf}
-  [2020/12/23 ltjsclasses ]
+  [2022/04/11 ltjsclasses ]
 \def\jsc@clsname{ltjspf}
 \def\Cjascale{0.903375}
 \RequirePackage{luatexja}
@@ -307,12 +307,12 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \fi
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
 \ifmingoth
-  \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:jfm=min}{}
-  \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:jfm=min}{}
+  \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:jfm=min;-kern}{}
+  \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:jfm=min;-kern}{}
 \else
   \ifptexjis
-    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:jfm=jis}{}
-    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:jfm=jis}{}
+    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:jfm=jis;-kern}{}
+    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:jfm=jis;-kern}{}
   \fi
 \fi
 \DeclareFontShape{JY3}{mc}{bx}{n}{<->ssub*gt/m/n}{}

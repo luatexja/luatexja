@@ -138,6 +138,7 @@
 %    hyperref compability
 %    (sync with ltsect.dtx 2020/07/27 v1.1e)}
 % \changes{v1.8f-ltj-21}{2021-12-22}{余計なコメントの削除．}
+% \changes{v1.8f-ltj-22}{2022-04-11}{kern featureが有効になっていたのを修正．}
 % \fi
 %
 % \iffalse
@@ -167,7 +168,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2021-12-22 v1.8f-ltj-21
+  [2022-04-11 v1.8f-ltj-22
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -645,6 +646,8 @@
 %
 % [2020-05-30 LTJ] 「フォントメトリックの変更」の節の内容の処理をここで行います。
 %
+% [2022-04-11 LTJ] kern featureを無効にするのを忘れていました．
+%
 %    \begin{macrocode}
 \ifptexmin
 \directlua{luatexbase.add_to_callback('luatexja.load_jfm',
@@ -652,8 +655,8 @@
   'ltj.jclasses_load_jfm', 1)}
 {\jfont\g=\ltj@stdmcfont:jfm=min } % loading jfm-min.lua
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
-\DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.962216] \ltj@stdmcfont:jfm=min}{}
-\DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.962216] \ltj@stdgtfont:jfm=min;jfmvar=goth}{}
+\DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.962216] \ltj@stdmcfont:jfm=min;-kern}{}
+\DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.962216] \ltj@stdgtfont:jfm=min;jfmvar=goth;-kern}{}
 \ltjglobalsetparameter{differentjfm=both}
 \directlua{luatexbase.remove_from_callback('luatexja.load_jfm', 'ltj.jclasses_load_jfm')}
 \fi

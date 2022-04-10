@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjarticle}
-  [2021-12-22 v1.8f-ltj-21
+  [2022-04-11 v1.8f-ltj-22
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -137,8 +137,8 @@
   'ltj.jclasses_load_jfm', 1)}
 {\jfont\g=\ltj@stdmcfont:jfm=min } % loading jfm-min.lua
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
-\DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.962216] \ltj@stdmcfont:jfm=min}{}
-\DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.962216] \ltj@stdgtfont:jfm=min;jfmvar=goth}{}
+\DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [0.962216] \ltj@stdmcfont:jfm=min;-kern}{}
+\DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [0.962216] \ltj@stdgtfont:jfm=min;jfmvar=goth;-kern}{}
 \ltjglobalsetparameter{differentjfm=both}
 \directlua{luatexbase.remove_from_callback('luatexja.load_jfm', 'ltj.jclasses_load_jfm')}
 \fi
