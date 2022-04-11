@@ -307,12 +307,12 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \fi
 \expandafter\let\csname JY3/mc/m/n/10\endcsname\relax
 \ifmingoth
-  \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:jfm=min;-kern}{}
-  \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:jfm=min;-kern}{}
+  \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:-kern;jfm=min}{}
+  \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:-kern;jfm=min}{}
 \else
   \ifptexjis
-    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:jfm=jis;-kern}{}
-    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:jfm=jis;-kern}{}
+    \DeclareFontShape{JY3}{mc}{m}{n}{<-> s * [\Cjascale] \ltj@stdmcfont:-kern;jfm=jis}{}
+    \DeclareFontShape{JY3}{gt}{m}{n}{<-> s * [\Cjascale] \ltj@stdgtfont:-kern;jfm=jis}{}
   \fi
 \fi
 \DeclareFontShape{JY3}{mc}{bx}{n}{<->ssub*gt/m/n}{}

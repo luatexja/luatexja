@@ -3759,33 +3759,63 @@ See \autoref{tab-difjfm} for the difference among \texttt{jfm-ujis.lua}, \texttt
 %<*en>
 Some fonts have information for inter-glyph spacing.
 \LuaTeX-ja 20140324.0 or later treats kerning spaces like an italic correction;
-any glue and/or kern from the JFM and a kerning space can coexist.
+any glue and/or kern from the JFM and a kerning space from the font can coexist.
 See \autoref{fig:kern-jfm} for detail.
 
-Note that in \cs{setmainjfont} etc.\ which are provided by \Pkg{luatexja-fontspec}
-package, kerning option is set \emph{off} (\texttt{Kerning=Off}) by default,
-because of the compatibility with previous versions of \LuaTeX-ja.
+At version~20220411.0, defaults Japanese fonts which are defined
+at the loading of \LuaTeX-ja, \Pkg{ltjclasses},~and~\Pkg{ltjsclasses}
+do not insert font-derived kerning spaces by default.
+This is because standard JFMs do not expect font-derived kerning spaces
+between Japanese characters.
+
+Also note that in \cs{setmainjfont} etc.\ which are provided by \Pkg{luatexja-fontspec}
+package, kerning option is set \emph{off} (\texttt{Kerning=Off}) by default.
+This means the following two lines have the same meaning:
+\begin{lstlisting}
+\setmainjfont{HaranoAjiMincho-Regular}
+\setmainjfont[Kerning=Off]{HaranoAjiMincho-Regular}
+\end{lstlisting}
+
 %</en>
 %<*ja>
 いくつかのフォントはグリフ間のスペースについての情報を持っている．
 このカーニング情報は以前の\LuaTeX-ja とはあまり相性が良くなかったが，
 バージョン20140324.0以降ではカーニングによる空白はイタリック補正と同様に扱うことになっている．
-つまり，カーニング由来の空白とJFM由来のグルー・カーンは同時に入りうる．
+つまり，カーニング由来の空白とJFM由来のグルー・カーンは同時に入ることがある．
 \autoref{fig:kern-jfm}を参照．
 \begin{itemize}
- \item \emph{\cs{jfont} や，
-NFSS2用の命令（\ref{ssec:chgfnt}節，\ref{ssec:nfsspat}節）における指定では
-カーニング情報は標準で使用する}ことになっているようである．
-言い換えれば，カーニング情報を使用しない設定にするには，面倒でも
-\begin{lstlisting}
-\jfont\hoge=HaranoAjiMincho-Regular:jfm=ujis;-kern at 3.5mm
-\DeclareFontShape{JY3}{fuga}{m}{n} {<-> s*HaranoAjiMincho-Regular:jfm=ujis;-kern}{}
+ \item \emph{\cs{jfont} や，NFSS2用の命令（\ref{ssec:chgfnt}節，\ref{ssec:nfsspat}節）では，
+カーニング情報を使用する設定（OpenType機能\texttt{kern}）はとくに指定しなくても有効になる}．
+すなわち，以下の2行目と3行目，5行目と6行目はそれぞれ等価である：
+\begin{lstlisting}[numbers=left]
+\jfont\hoge=hogem:jfm=ujis;-kern at 3.5mm % ==> kern 無効（明示）
+\jfont\hoge=hogem:jfm=ujis at 3.5mm       % ==> kern 有効（暗黙）
+\jfont\hoge=hogem:jfm=ujis;+kern at 3.5mm % ==> kern 有効（明示）
+\DeclareFontShape{JY3}{fuga}{m}{n}{<-> s*hogem:jfm=-ujis}{}    % ==> kern 無効（明示）
+\DeclareFontShape{JY3}{fuga}{m}{n}{<-> s*hogem:jfm=ujis}{}     % ==> kern 有効（暗黙）
+\DeclareFontShape{JY3}{fuga}{m}{n}{<-> s*hogem:jfm=ujis+kern}{}% ==> kern 有効（明示）
 \end{lstlisting}
-のように，\texttt{-kern} という指定を自分で追加しなければいけない．
+
+\item バージョン20220411.0以降では，\LuaTeX-ja読み込み時や，\Pkg{ltjclasses}, \Pkg{ltjsclasses}において
+  和文フォントを
+\begin{lstlisting}
+\jfont\tenmin=\ltj@stdmcfont:-kern;jfm=\ltj@stdyokojfm\space at 9.62216pt
+\DeclareFontShape{JY3}{mc}{m}{n}{<-> s*[\ifdefined\Cjascale\Cjascale\else 0.962216\fi]
+  \ltj@stdmcfont:-kern;jfm=\ltj@stdyokojfm}{}
+\end{lstlisting}
+  とOpenType機能\texttt{kern}を明示的に無効化した状態で定義する．
+  これは標準JFM(\texttt{jfm-ujis.lua}, \texttt{jfm-ujisv.lua})が
+  フォント由来のカーニングが入ることを期待していないためである．
+
  \item
 一方，\emph{\Pkg{luatexja-fontspec} の提供する \cs{setmainjfont}\
-などの命令の標準設定ではカーニング情報は使用しない}（\texttt{Kerning=Off}）
-ことになっている．これは以前のバージョンの\LuaTeX-jaとの互換性のためである．
+などの命令の標準設定ではカーニング情報は使用しない}(\texttt{Kerning=Off})．
+すなわち，次の2行は等価である：
+\begin{lstlisting}
+\setmainjfont{HaranoAjiMincho-Regular}
+\setmainjfont[Kerning=Off]{HaranoAjiMincho-Regular}
+\end{lstlisting}
+これは前項目の理由の他に，以前のバージョンの\LuaTeX-jaとの互換性のためもある．
 \end{itemize}
 %</ja>
 
@@ -3828,7 +3858,7 @@ JFM中における\texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 \texttt{kanjiskip\_shrink}キー（\pageref{pg:ksp_nat}ページ）の使用によって，
 「JFM由来のグルーの他に，\Param{kanjiskip}の自然長/伸び量/縮み量の一部が
 同じ場所に挿入される」という状況が起こりうる．
-この機能を無効化し，バージョン20150922.0以前と同じような組版を得るためには
+この機能を無効化し，バージョン20150922.0以前と同じような組版を得るためには，
 他のOpenType機能と同じように\texttt{-ltjksp}指定を行えば良い（\autoref{fig:ltjksp}参照）．
 なお，
 \begin{lstlisting}
