@@ -8404,15 +8404,13 @@ characters designed for ruby.
 %</ja>
 \item[bold]
 %<*en>
-Substitute bold series of gothic for  bold series of mincho.
+Substitute bold series of gothic for medium series of gothic and bold series of mincho.
 If \texttt{nodeluxe} option is enabled, medium series of gothic is also changed,
 since we use same font for both series of gothic.
 %</en>
 %<*ja>
-「明朝の太字」をゴシック体の太字によって代替する．
-もし\texttt{nodeluxe}オプションが指定されている場合は，ゴシック体は1ウェイトしか使用されな
-	   いため，
-「ゴシック体の中字」も同時に変更されることになる．
+\texttt{nodeluxe}オプション指定時には，「明朝の太字」をゴシック体と同じフォントにする．
+\texttt{deluxe}オプション指定時には，「明朝の太字」「ゴシック体の中字」をゴシック体の太字と同じフォントにする．
 %</ja>
 \item[jis90\textrm{,~}90jis]
 %<en>Use JIS~X~0208:1990 glyph variants if possible.
@@ -8439,7 +8437,7 @@ Use the JFM \texttt{jfm-<jfm>.lua} for vertical direction, instead of \texttt{jf
 
 \item[jis]
 %<en>Same as \texttt{jfm\_yoko=jis}.
-%<ja>\texttt{jfm\_yoko=jis}と同じ．ここで用いるJFM\texttt{jfm-jis.lua}はJISフォントメトリックを元にしたものである．
+%<ja>\texttt{jfm\_yoko=jis}と同じ．ここで用いるJFM~\texttt{jfm-jis.lua}はJISフォントメトリックを元にしたものである．
 
 \end{cslist}
 %<*en>
@@ -8917,10 +8915,10 @@ and use them by \cs{ltjapplypreset}. These two commands can only be used in the 
   新たに<name>という名称のプリセットを定義する．この名称は，
   すでに定義されているプリセット名や，
   \ref{sssec:ltjpreset-general}で定義されているオプション，さらに
-  次の11個と重複してはならない．
+  次の13個と重複してはならない．
   \begin{quote}
 	\ttfamily
-	mc mc-l mc-m mc-b mc-bx gt gt-m gt-b gt-bx gt-eb mg-m
+	mc mc-l mc-m mc-b mc-bx gt gt-u gt-d gt-m gt-b gt-bx gt-eb mg-m
   \end{quote}
 
   <specification>は，プリセット名や以下のキー達のコンマ区切りリストを指定する：
@@ -8929,8 +8927,12 @@ and use them by \cs{ltjapplypreset}. These two commands can only be used in the 
    \item[\ttfamily mc-m=<font>] 明朝体中字(\cs{mcfamily}\cs{mdseries})
    \item[\ttfamily mc-b=<font>] 明朝体太字(\cs{mcfamily}\cs{bfseries})
    \item[\ttfamily mc-bx=<font>] \texttt{mc-b=<font>}と同義．
-   \item[\ttfamily gt-m=<font>] ゴシック体中字(\cs{gtfamily}\cs{mdseries})
-   \item[\ttfamily gt-b=<font>] ゴシック体太字(\cs{gtfamily}\cs{bfseries})
+   \item[\ttfamily gt-u=<font>] \texttt{deluxe}オプション未指定時のゴシック体(\cs{gtfamily})・明朝体太字
+   \item[\ttfamily gt-d=<font>] \texttt{deluxe}オプション指定時のゴシック体中字(\cs{gtfamily}\cs{mdseries})
+   \item[\ttfamily gt-m=<font>] \texttt{deluxe}オプションの指定の有無に関係なく
+    ゴシック体中字(\cs{gtfamily}\cs{mdseries})を指定する．「\texttt{gt-u=<font>, gt-d<font>}」と同義．
+   \item[\ttfamily gt-b=<font>] ゴシック体太字(\cs{gtfamily}\cs{bfseries})\\
+    なお，パッケージ読み込み時に\texttt{bold}オプションが指定された場合は，\texttt{mc-b=<font>}を指定したことにもなる．
    \item[\ttfamily gt-bx=<font>] \texttt{gt-b=<font>}と同義．
    \item[\ttfamily gt-eb=<font>] ゴシック体太字(\cs{gtfamily}\cs{ebseries})
    \item[\ttfamily mg-m=<font>] 丸ゴシック体(\cs{mgfamily})
@@ -8942,19 +8944,17 @@ and use them by \cs{ltjapplypreset}. These two commands can only be used in the 
    \item[\ttfamily gt=<font>] ゴシック体の中字・太字・極太全部を設定．
 	以下を指定したことと同じである：
 	\begin{quote}
-	  \ttfamily gt-m=<font>, gt-b=<font>, gt-eb=<font>
+	  \ttfamily gt-u=<font>, gt-d=<font>, gt-b=<font>, gt-eb=<font>
 	\end{quote}
   \end{description}
-  なお，パッケージ読み込み時に \texttt{deluxe} が有効でない場合は，
-  上記11キーのうち\texttt{mc}, \texttt{gt}しか実質的に意味を持たない．
 %</ja>
 %<*en>
   Define new preset~<name>. This <name> cannot be same as other presets,
   options described in Subsubsection~\ref{sssec:ltjpreset-general}, nor
-  following 11~strings:
+  following 13~strings:
   \begin{quote}
-	\ttfamily	
-	mc mc-l mc-m mc-b mc-bx gt gt-m gt-b gt-bx gt-eb mg-m
+	\ttfamily
+	mc mc-l mc-m mc-b mc-bx gt gt-u gt-d gt-m gt-b gt-bx gt-eb mg-m
   \end{quote}
 
   <specification> is a comma-separated list which consists of
@@ -8964,22 +8964,23 @@ and use them by \cs{ltjapplypreset}. These two commands can only be used in the 
    \item[\ttfamily mc-m=<font>] mincho medium
    \item[\ttfamily mc-b=<font>] mincho bold
    \item[\ttfamily mc-bx=<font>] synonym for \texttt{mc-b=<font>}
-   \item[\ttfamily gt-m=<font>] gothic medium
-   \item[\ttfamily gt-b=<font>] gothic bold
+   \item[\ttfamily gt-u=<font>] gothic, when \texttt{deluxe}~option is not specified.
+   \item[\ttfamily gt-d=<font>] gothic medium, when \texttt{deluxe}~option is specified.
+   \item[\ttfamily gt-m=<font>] gothic medium. This key is equivalent to ``\texttt{gt-u=<font>, gt-d<font>}''.
+   \item[\ttfamily gt-b=<font>] gothic bold\\
+    Note that this key also specifies mincho bold if \texttt{bold} option is specified.
    \item[\ttfamily gt-bx=<font>] synonym for \texttt{gt-b=<font>}
    \item[\ttfamily gt-eb=<font>] gothic extra~bold
    \item[\ttfamily mg-m=<font>] rounded gothic
-   \item[\ttfamily mc=<font>] Same as
+   \item[\ttfamily mc=<font>] Equivalent to
 	\begin{quote}
 	  \ttfamily mc-l=<font>, mc-m=<font>, mc-b=<font>
 	\end{quote}
-   \item[\ttfamily gt=<font>] Same as
+   \item[\ttfamily gt=<font>] Equivalent to
 	\begin{quote}
-	  \ttfamily gt-m=<font>, gt-b=<font>, gt-eb=<font>
+	  \ttfamily gt-u=<font>, gt-d=<font>, gt-b=<font>, gt-eb=<font>
 	\end{quote}
   \end{description}
-  If \texttt{deluxe} is not specified at loading the package,
-  only \texttt{mc}~and~\texttt{gt} keys (among above 11~keys) have a meaning.
 %</en>
  \item[\cs{ltjnewpreset}*\{<name>\}\{<specification>\}]
 %<*ja>
