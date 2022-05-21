@@ -128,8 +128,7 @@ local function capsule_glyph_yoko(p, met, char_data, head, dir)
       end
    end
 
-   local q
-   head, q = node_remove(head, p)
+   local q; head, q = node_remove(head, p)
    if pwidth > fwidth then
       if char_data.round_threshold then
          local frac = pwidth / fwidth

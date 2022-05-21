@@ -323,13 +323,14 @@ do
    local to_node = node.direct.tonode
    local to_direct = node.direct.todirect
    local ensure_tex_attr = ltjb.ensure_tex_attr
-
+   local slide = node.slide
    -- mode = true iff main_process is called from pre_linebreak_filter
    local function main_process(head, mode, dir, gc)
       ensure_tex_attr(attr_icflag, 0)
       if gc == 'fin_row' then return head
       else
             start_time_measure('jfmglue')
+            slide(head);
             local p = ltjj.main(to_direct(head),mode, dir)
             stop_time_measure('jfmglue')
             return to_node(p)
