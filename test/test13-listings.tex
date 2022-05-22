@@ -1,8 +1,9 @@
 %#!lualatex
 \documentclass{article}
 
-\usepackage{luatexja-fontspec,amsmath}
 \usepackage{listings,color,showexpl,comment}
+\lstMakeShortInline÷
+\usepackage{luatexja-fontspec,amsmath}
 \usepackage{luatexja-otf}\directlua{luatexja.otf.enable_ivs()}
 \usepackage
 [
@@ -33,7 +34,7 @@
 	\fi
 }{}
 \DeclareKanjiFamily{JY3}{koz}{}
-\DeclareFontShape{JY3}{koz}{m}{n}{<-> s * [1.2] HaranoAjiMincho-Regular:jfm=ujis}{}
+\DeclareFontShape{JY3}{koz}{m}{n}{<-> s * [1.2] KozMinPr6N-Regular:jfm=ujis}{}
 \DeclareFontShape{JY3}{koz}{m}{sl}{<-> s * [1.2] psft:Ryumin-Light:jfm=ujis;slant=0.167}{}
 \DeclareFontShape{JY3}{koz}{m}{it}{<-> ssub* koz/m/sl}{}
 \def\mcdefault{koz}
@@ -186,13 +187,17 @@ IVS対応2: \texttt{vsraw=true}
 
 foo \lstinline[basicstyle=\tt]!ba{}#shr! baz あ
 
-あ\lstinline[basicstyle=\tt]{bar  s}hoge
+1あ\lstinline[basicstyle=\tt]{bar  s}hoge
 
-あ\lstinline[basicstyle=\tt]{bar..{a}hoge
+2あ\lstinline[basicstyle=\tt]{bar..{a}hoge
 
-foo \lstinline[basicstyle=\tt\gtfamily]!あexit 0; #shbar! baz あ
+foo \lstinline[basicstyle=\tt\gtfamily]!exit 0; #shbar! baz あ
 
-あ\lstinline[basicstyle=\tt]{いbexit #sh$ar}hoge
+foo \lstinline[basicstyle=\tt\gtfamily]!あreturn 0; #shbar! baz あ
+
+3あ\lstinline[basicstyle=\tt]{fexit #sh$ar}hoge
+
+4あ\lstinline[basicstyle=\tt]{いbexit #sh$ar}hoge
 
 \bigskip
 \textbf{Ticket \#35484}
@@ -201,8 +206,8 @@ foo \lstinline[basicstyle=\tt\gtfamily]!あexit 0; #shbar! baz あ
 \colorbox{red}{\lstinline!あいexit 0;#shうえお!}
 
 
-\colorbox{red}{\lstinline{aiu#sheoxyz}}
-\colorbox{red}{\lstinline{あいexit 0;#shうえお}}
+\colorbox{red}{\lstinline{aGiu#sheoxyz}}
+\colorbox{red}{\lstinline{あGいexit 0;#shうえお}}
 
 あおいうえお
 \begin{lstlisting}[frame=single]
@@ -216,29 +221,15 @@ aiu
 1234567890123457890
 aiu# \textcolor{red}{e} #o#\textcolor{red}{ka}#ki
 \end{lstlisting}
+\typeout{AAAA}
 
+\bigskip
+\textbf{Ticket \#44426}\lstset{basicstyle=\itshape}
+Foo ÷fo#shbarあ{#}o÷ Foo
+\colorbox{green}{÷fo#shbarあ{#}o÷}
 
-\newpage
-\lstset{basewidth=0.75\zw,basicstyle=\ttfamily,doubleletterspace,backgroundcolor=}
-\noindent
-\def\A{\leavevmode\smash{\hbox to 0.75\zw{\kern-.0625mm\vrule height 0pt depth 200pt width 0.125mm\hss}}}%
-\textcolor{cyan}{\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A\A}%
-
-\begin{lstlisting}
-a.b.c.d.e.f.g.h.i.j.k.l.m.
-123（あいう@（ｶﾝｼﾞabc
-a.b.c.d.e.f.g.h.i.j.k.l.m.
-123あいう）@（ｶﾝｼﾞabc
-a.b.c.d.e.f.g.h.i.j.k.l.m.
-123あい：う@（ｶﾝｼﾞabc
-\end{lstlisting}
-
-\begin{lstlisting}[columns={[l]flexible}]
-a.b.c.d.e.f.g.h.i.j.k.l.m.
-123（あいう@（ｶﾝｼﾞabc
-a.b.c.d.e.f.g.h.i.j.k.l.m.
-123あいう）@（ｶﾝｼﾞabc
-a.b.c.d.e.f.g.h.i.j.k.l.m.
-123あい：う@（ｶﾝｼﾞabc
-\end{lstlisting}
+\lstMakeShortInline あ
+÷いfo#shbarあ{#}}o÷
+あえbazあ
+あbaxあ
 \end{document}

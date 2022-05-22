@@ -1,10 +1,11 @@
 %
-% lltjp-listings.sty 2020-03-23
+% lltjp-listings.sty 2022-05-22
 %
 
 \NeedsTeXFormat{LaTeX2e}
 \RequirePackage{etoolbox,listings,luatexbase-cctb}
 
+\newcount\ltj@lst@japanese@min \ltj@lst@japanese@min=128
 %%%%%%%%%%%%%%%% Japanese support
 %% whether letter-space in a fixed mode box is doubled or not
 \newif\if@ltj@lst@double
@@ -197,9 +198,6 @@
       \lsthk@PreSet\lstset{flexiblecolumns,#1}%
       \lsthk@TextStyle
       \@ifnextchar\bgroup \ltj@lst@InlineG \ltj@lstinline@}
-\def\ltj@lstinline@#1{%
-  \edef\ltj@lst@temp{\the\catcode`#1}\lst@Init\relax\catcode`#1\ltj@lst@temp
-  \lst@InlineJ#1}
 \def\ltj@lst@InlineG{%
   \lst@Init\relax\edef\ltj@lst@temp{\the\catcode`\}}\catcode`\}=2 \catcode`\ =12\relax
   \let\lst@arg\@empty\afterassignment\ltj@lst@InlineG@@\@temptokena}
@@ -207,9 +205,16 @@
   \catcode`\}=\ltj@lst@temp%
   \expandafter\expandafter\expandafter\lst@InsideConvert%
   \expandafter{\the\@temptokena}\lst@arg\lst@DeInit\egroup}
-
-%%%%%%%%%%%%%%%% \lstMakeShortInline
-\patchcmd\lstMakeShortInline@{\lst@shortinlinedef#1}{\lst@shortinlinedef~}{}{}
+\def\ltj@lstinline@#1{%
+  \edef\ltj@lst@temp{\the\catcode`#1}
+  \lst@Init\relax\catcode`#1\ltj@lst@temp
+  \ifnum\ltj@lst@temp=\active
+    \begingroup\lccode`\~=`#1\relax
+    \lowercase{\xdef\lst@next{\noexpand\lst@InlineJ\noexpand~}}\endgroup%
+  \else
+    \edef\lst@next{\noexpand\lst@InlineJ\scantextokens{#1}}%
+  \fi\lst@next
+}
 
 % We redefine \lst@BeginDropInput, since now we have
 % two additional `process macros'.
@@ -239,7 +244,7 @@
            for i = 1, utf.len(buf) do
               local c = utf.sub(buf, i, i)
               local cu = utf.byte(c)
-              if cu >= 0x80 and tex.getcatcode(cu) \string~= 13 then
+              if cu >= \the\ltj@lst@japanese@min\space and tex.getcatcode(cu) \string~= 13 then
                 ret = ret .. utfchar(getcount('ltjlineendcomment'))
               end
               ret = ret .. c
@@ -283,7 +288,7 @@
 \gdef\ltj@lst@MakeActive@#1{\let\lst@next\relax%
     \ifx#1\relax
     \else\let\lst@next\ltj@lst@MakeActive@
-    \ifnum`#1>127 
+    \ifnum`#1>\numexpr\ltj@lst@japanese@min-1
       \lccode`\^^A=`#1 
       \lowercase{\lst@lAddTo\lst@temp{$^^A}}%$
     \else
