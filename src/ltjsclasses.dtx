@@ -5164,12 +5164,13 @@
 % |\@makefnmark| は脚注の番号を出力する命令です。
 % ここでは脚注が左端から一定距離に来るようにしてあります。
 %
+%
 %    \begin{macrocode}
 \newcommand\@makefntext[1]{%
   \advance\leftskip 3\zw
   \parindent 1\zw
   \noindent
-  \llap{\@makefnmark\hskip0.3\zw}#1}
+  \hb@xt@\z@{\hss\@makefnmark\hskip0.3\zw}#1}
 %    \end{macrocode}
 % \end{macro}
 %
