@@ -398,6 +398,7 @@ local function new_ruby_box(r, p, tmp_tbl, no_begin, no_end)
    setfield(a, 'depth', 0); setfield(k, 'kern', tmp_tbl.intergap)
    insert_after(r, r, a); insert_after(r, a, k);
    insert_after(r, k, p); setfield(p, 'next', nil)
+   if tmp_tbl.rubydepth >= 0 then setfield(r, 'depth', tmp_tbl.rubydepth) end
    if tmp_tbl.baseheight >= 0 then setfield(p, 'height', tmp_tbl.baseheight) end
    a = node.direct.vpack(r); setfield(a, 'shift', 0)
    set_attr(a, attr_ruby, post_intrusion)

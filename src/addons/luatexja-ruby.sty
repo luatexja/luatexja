@@ -78,6 +78,14 @@
   \expandafter\def\csname ltj@@rubyip@tbaseheight\endcsname{#1}%
 }
 %% これらの値が正のとき，親文字の高さをこの値（\zh 単位）とみなす
+
+\ltj@@rkeydef{yrubydepth} % 縦組以外 (yoko, utod, dtou)
+\ltj@@rkeydef{trubydepth} % 縦組
+\define@key[ltj]{ruby}{rubydepth}{%
+  \expandafter\def\csname ltj@@rubyip@yrubydepth\endcsname{#1}%
+  \expandafter\def\csname ltj@@rubyip@trubydepth\endcsname{#1}%
+}
+
 \define@boolkey[ltj]{ruby}{intrude_jfmgk}[true]{}
 \define@boolkey[ltj]{ruby}{intrude_xkanjiskip}[true]{}
 \define@boolkey[ltj]{ruby}{intrude_kanjiskip}[true]{}
@@ -119,6 +127,8 @@
           + 1048576 * \ifltj@ruby@rubysmash1\else0\fi),
       baseheight = \ltj@safe@dimen{\ifnum\ltjgetparameter{direction}=3
                      \ltj@@rubyip@tbaseheight\else\ltj@@rubyip@ybaseheight\fi\zh},
+      rubydepth = \ltj@safe@dimen{\ifnum\ltjgetparameter{direction}=3
+                     \ltj@@rubyip@trubydepth\else\ltj@@rubyip@yrubydepth\fi#1},
       intrude_jfmgk = \string{
        \ifltj@ruby@intrude_jfmgk [luatexja.icflag_table.FROM_JFM]=true,\fi
        \ifltj@ruby@intrude_kanjiskip
@@ -249,6 +259,7 @@
   stretchbol={0}{1}{1}, stretcheol={1}{1}{0},
   maxmargin=0.5, size=0.5, intergap=0, rubysmash=false,
   kenten=\textbullet, fontcmd=\relax, ybaseheight=0.88, tbaseheight=0.5,
+  yrubydepth=-1, trubydepth=-1,
   intrude_jfmgk, intrude_kanjiskip, intrude_xkanjiskip,
   epsilon=0.0001,
 }
