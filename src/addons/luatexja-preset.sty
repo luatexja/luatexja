@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2020-09-14 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2022-06-19 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -211,7 +211,7 @@
     mc =   A-OTF-RyuminPr6N-Light.otf,      mc-b = A-OTF-FutoMinA101Pr6N-Bold.otf,
     gt-d = A-OTF-GothicBBBPr6N-Medium.otf , gt-b = A-OTF-FutoGoB101Pr6N-Bold.otf,
     gt-u = A-OTF-GothicBBBPr6N-Medium.otf , gt-eb = A-OTF-MidashiGoPr6N-MB31.otf,
-    mg-m = A-OTF-Jun101Pr6N-Light.otf,
+    mg-m = A-OTF-ShinMGoPr6N-Light.otf,
     __custom = false, __office = false, __noembed = false,
 }
 
@@ -310,6 +310,20 @@
     gt-eb = Noto~Sans~CJK~JP~Black,
     mg-m =  Noto~Sans~CJK~JP~Medium,
     mc-l =  Noto~Serif~CJK~JP~Light,
+    __custom = false, __office = false, __noembed = false,
+}
+\ltjpreset_declare_preset:nx{noto}{
+    noto-otf,
+}
+\ltjpreset_declare_preset:nx{noto-jp}{
+    mc-m =  Noto~Serif~JP~Regular,
+    mc-b =  Noto~Serif~JP~Bold,
+    gt-d =  Noto~Sans~JP~Regular,
+    gt-b =  Noto~Sans~JP~Bold,
+    gt-u =  Noto~Sans~JP~Medium,
+    gt-eb = Noto~Sans~JP~Black,
+    mg-m =  Noto~Sans~JP~Medium,
+    mc-l =  Noto~Serif~JP~Light,
     __custom = false, __office = false, __noembed = false,
 }
 

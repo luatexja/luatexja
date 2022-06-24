@@ -1494,7 +1494,7 @@ class has defined the old font commands like\MessageBreak
   \advance\leftskip 3\zw
   \parindent 1\zw
   \noindent
-  \llap{\@makefnmark\hskip0.3\zw}#1}
+  \hb@xt@\z@{\hss\@makefnmark\hskip0.3\zw}#1}
 \let\@inhibitglue=\ltjfakeparbegin
 \def\@item[#1]{%
   \if@noparitem
