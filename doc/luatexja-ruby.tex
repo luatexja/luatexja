@@ -212,11 +212,11 @@ plain \LuaTeX でのロードはまだサポートしておらず，
   {本}{ほん}}
 \end{LTXexample}
 \item[ybaseheight=<real>] 非負の値が指定された場合，
-  \emph{縦組以外での}ルビの親文字の高さを全角高さの<real>倍と強制的に固定する．
+  \emph{縦組以外での}親文字の高さを親文字全角の<real>倍と強制的に固定する．
   負の値が指定された場合は「固定しない」（すなわち，v0.3より前の挙動と同じになる）．
-  既定値は0.88．
-\item[tbaseheight=<real>] \texttt{ybaseheight}と同様だが，こちらは\emph{縦組での}ルビの親文字の高さを指定する．
-  既定値は0.5．
+  既定値は$0.88$．
+\item[tbaseheight=<real>] \texttt{ybaseheight}と同様だが，こちらは\emph{縦組での}親文字の高さを指定する．
+  既定値は$0.5$．
 \item[baseheight=<real>] \texttt{ybaseheight}，\texttt{tbaseheight}を同時に指定したことと同義．
 \begin{LTXexample}[width=0.3\textwidth, preset=\Large]
 \noindent
@@ -228,6 +228,25 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 \ltjruby[baseheight=0]{dvi}{ディーヴィーアイ}\\
 \ltjruby[baseheight=-1]{本}{ほん}\ 
 \ltjruby[baseheight=-1]{dvi}{ディーヴィーアイ}
+\end{LTXexample}
+\item[yrubydepth=<real>] 非負の値が指定された場合，
+  \emph{縦組以外での}ルビの深さをルビ全角の<real>倍と強制的に固定する．
+  負の値が指定された場合は「固定しない」（すなわち，v0.52以前の挙動と同じになる）．
+  既定値は$0.12$．
+\item[trubydepth=<real>] \texttt{yrubydepth}と同様だが，こちらは\emph{縦組での}ルビの深さを指定する．
+  既定値は$0.5$．
+\item[rubydepth=<real>] \texttt{yrubydepth}，\texttt{trubydepth}を同時に指定したことと同義．
+\begin{LTXexample}[width=0.3\textwidth, preset=\Large]
+\noindent
+\ltjruby[rubydepth=0.12]{◆}{ほん}\ 
+\ltjruby[rubydepth=0.12]{◆}{pdf}\ 
+\ltjruby[rubydepth=0.12]{◆}{dvi}\\
+\ltjruby[rubydepth=0]{◆}{ほん}\ 
+\ltjruby[rubydepth=0]{◆}{pdf}\ 
+\ltjruby[rubydepth=0]{◆}{dvi}\\
+\ltjruby[rubydepth=-1]{◆}{ほん}\ 
+\ltjruby[rubydepth=-1]{◆}{pdf}\
+\ltjruby[rubydepth=-1]{◆}{dvi}
 \end{LTXexample}
 
 
@@ -268,11 +287,12 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 <option>の既定値を指定する．\textsf{luatexja-ruby}読み込み時の値は
 各項目の所で既に説明してあるが，次のようになっている．
 \begin{verbatim}
-  pre=-1, post=-1, mode=1, 
+  pre=-1, post=-1, mode=1,
   stretchruby={1}{2}{1}, stretch = {1}{2}{1},
   stretchbol={0}{1}{1}, stretcheol={1}{1}{0},
   maxmargin=0.5, size=0.5, intergap=0, rubysmash=false,
   kenten=\textbullet, fontcmd=\relax, ybaseheight=0.88, tbaseheight=0.5,
+  yrubydepth=0.12, trubydepth=0.5,
   intrude_jfmgk, intrude_kanjiskip, intrude_xkanjiskip
 \end{verbatim}
 

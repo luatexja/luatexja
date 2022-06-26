@@ -4,7 +4,7 @@
 
 % LaTeX only!
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-ruby}[2021-05-17 v0.52]
+\ProvidesPackage{luatexja-ruby}[2022-06-26 v0.53]
 \RequirePackage{luatexja}
 
 %%------------------
@@ -254,12 +254,12 @@
 \ltjsetparameter{rubypreintrusion={-1,1}}
 
 \setkeys[ltj]{ruby}{
-  pre=-1, post=-1, mode=1, 
+  pre=-1, post=-1, mode=1,
   stretchruby={1}{2}{1}, stretch = {1}{2}{1},
   stretchbol={0}{1}{1}, stretcheol={1}{1}{0},
   maxmargin=0.5, size=0.5, intergap=0, rubysmash=false,
   kenten=\textbullet, fontcmd=\relax, ybaseheight=0.88, tbaseheight=0.5,
-  yrubydepth=-1, trubydepth=-1,
+  yrubydepth=0.12, trubydepth=0.5,
   intrude_jfmgk, intrude_kanjiskip, intrude_xkanjiskip,
   epsilon=0.0001,
 }
