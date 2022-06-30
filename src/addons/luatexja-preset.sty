@@ -144,7 +144,7 @@
 
 % カスタム指定
  \keys_define:nn { luatexja-preset }{
-    custom .meta:n = { #1, __custom = true, }, 
+    custom .meta:n = { #1, __custom = true, },
     custom .value_required:n = true,
     jfm_yoko .tl_set:N = \__ltjpreset_use_jfm_yoko_tl,
     jfm_tate .tl_set:N = \__ltjpreset_use_jfm_tate_tl,
@@ -211,7 +211,7 @@
     mc =   A-OTF-RyuminPr6N-Light.otf,      mc-b = A-OTF-FutoMinA101Pr6N-Bold.otf,
     gt-d = A-OTF-GothicBBBPr6N-Medium.otf , gt-b = A-OTF-FutoGoB101Pr6N-Bold.otf,
     gt-u = A-OTF-GothicBBBPr6N-Medium.otf , gt-eb = A-OTF-MidashiGoPr6N-MB31.otf,
-    mg-m = A-OTF-Jun101Pr6N-Light.otf,
+    mg-m = A-OTF-Jun101Pro-Light.otf,
     __custom = false, __office = false, __noembed = false,
 }
 
@@ -377,7 +377,7 @@
         \prop_map_inline:Nn \g__ltjpreset_font_prop {
            \tl_set:Nn \l_tmpb_tl { ##2 } \tl_remove_all:Nn \l_tmpb_tl {90}
           \prop_put:Nnx \l_tmpa_prop { ##1 } { \tl_use:N \l_tmpb_tl }
-         } 
+         }
          \prop_set_eq:NN \g__ltjpreset_font_prop \l_tmpa_prop
        }
        \tl_if_in:NnT  \l_tmpb_tl { MogaEx90Mincho } {
