@@ -1651,7 +1651,7 @@ The following presets are defined:
   \hyphenchar\font=-1 \exhyphenchar=-1
   haranoaji, hiragino-pro, hiragino-pron, ipa, ipa-hg, ipaex, ipaex-hg,
   kozuka-pr6, kozuka-pr6n, kozuka-pro, moga-mobo, moga-mobo-ex,
-  bizud, morisawa-pr6n, morisawa-pro, ms, ms-hg, noembed, noto-otc, noto-otf,
+  bizud, morisawa-pr6n, morisawa-pro, ms, ms-hg, noembed, noto-otc, noto-otf, noto, noto-jp, 
   sourcehan, sourcehan-jp, ume, yu-osx, yu-win, yu-win10
 \end{quote}
 
@@ -8733,12 +8733,14 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 
  \item[noto-otc]  Noto Serif CJK and Noto Sans CJK fonts (OTC)
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
- \item[noto-otf]  Noto Serif CJK and Noto Sans CJK fonts (Language-specific OTF)
+ \item[noto-otf\textrm{, }noto]  Noto Serif CJK and Noto Sans CJK fonts (Language-specific OTF)
+%<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
+ \item[noto-jp]  Noto Serif CJK and Noto Sans CJK fonts (Region-specific subset OTF)
 \begin{center}\small
-\def\AD#1#2{Noto #1 CJK #2&Noto #1 CJK JP #2}%
+\def\AD#1#2{Noto #1 CJK #2&Noto #1 CJK JP #2&Noto #1 JP #2}%
 \begin{tabular}{lllll}
 \toprule
-\bf family&\bf series&\texttt{noto-otc}&\texttt{noto-otf}\\
+\bf family&\bf series&\texttt{noto-otc}&\texttt{noto-otf}, \texttt{noto}&\texttt{noto-jp}\\
 \midrule
  &light&\AD{Serif}{Light}\\
 %<en>\textit{mincho}%
@@ -8749,7 +8751,7 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
  &&\AD{Sans}{Regular*}\\
  &\smash{\raisebox{1.5ex}{medium}}
  &\AD{Sans}{Medium}\\
-\cmidrule(l){2-4}
+\cmidrule(l){2-5}
 %<en>\smash{\raisebox{2ex}{\textit{gothic}}}%
 %<ja>\smash{\raisebox{2ex}{\textgt{ゴシック}}}%
  &bold&\AD{Sans}{Bold}\\
