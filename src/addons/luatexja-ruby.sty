@@ -4,7 +4,7 @@
 
 % LaTeX only!
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-ruby}[2022-06-26 v0.53]
+\ProvidesPackage{luatexja-ruby}[2022-07-03 v0.53]
 \RequirePackage{luatexja}
 
 %%------------------
@@ -108,7 +108,7 @@
 % Lua ソースに渡す table 生成
 \bgroup
 \catcode`\_=11
-\gdef\ltj@@ruby@create@table#1{% #1: ルビ全角
+\gdef\ltj@@ruby@create@table#1#2{% #1: ルビ全角幅，#2: ルビ全角高さ
     \string{
       eps = \ltj@safe@dimen{\ltj@@rubyip@epsilon\zw},
       before_jfmgk = 0, after_jfmgk = 0,
@@ -128,7 +128,7 @@
       baseheight = \ltj@safe@dimen{\ifnum\ltjgetparameter{direction}=3
                      \ltj@@rubyip@tbaseheight\else\ltj@@rubyip@ybaseheight\fi\zh},
       rubydepth = \ltj@safe@dimen{\ifnum\ltjgetparameter{direction}=3
-                     \ltj@@rubyip@trubydepth\else\ltj@@rubyip@yrubydepth\fi#1},
+                     \ltj@@rubyip@trubydepth\else\ltj@@rubyip@yrubydepth\fi#2},
       intrude_jfmgk = \string{
        \ifltj@ruby@intrude_jfmgk [luatexja.icflag_table.FROM_JFM]=true,\fi
        \ifltj@ruby@intrude_kanjiskip
@@ -191,9 +191,10 @@
 \protected\def\ltjruby{\@ifnextchar[\ltj@@ruby{\ltj@@ruby[]}}%]
 \AtBeginDocument{%
   \ifdefined\ruby\else\let\ruby=\ltjruby\fi
+  \ifdefined\kenten\else\let\kenten=\ltjkenten\fi
   \directlua{luatexja.ruby.read_old_break_info()}%
 }
-\def\ltj@@ruby[#1]#2#3{{% #1: option #2: 親文字群，#3: ルビ文字列群，共に| 区切り
+\protected\def\ltj@@ruby[#1]#2#3{{% #1: option #2: 親文字群，#3: ルビ文字列群，共に| 区切り
   \setkeys[ltj]{ruby}{#1}%
   \directlua{luatexja.ruby.ruby_tmplist_r = \string{\string};
 	luatexja.ruby.ruby_tmplist_p = \string{\string}}%
@@ -201,9 +202,10 @@
   % 引数展開，テーブルにセット
   \pxrr@decompbar{#2}{\let\ltj@@ruby@mark\ltj@@ruby@sp\pxrr@res}%
   \pxrr@decompbar{#3}{\let\ltj@@ruby@mark\ltj@@ruby@sr\pxrr@res}%
-  {\fontsize{\ltj@@rubyip@size\dimen0}\z@\selectfont\ltj@@rubyip@fontcmd\global\dimen1=\zw}%
+  {\fontsize{\ltj@@rubyip@size\dimen0}\z@\selectfont\ltj@@rubyip@fontcmd
+    \global\dimen1=\zw\global\dimen2=\zh}%
   \directlua{%
-    luatexja.ruby.texiface(\ltj@@ruby@create@table{\dimen1},
+    luatexja.ruby.texiface(\ltj@@ruby@create@table{\dimen1}{\dimen2},
     luatexja.ruby.ruby_tmplist_r, luatexja.ruby.ruby_tmplist_p)}%
 }}
 
@@ -217,7 +219,6 @@
 }
 
 \protected\def\ltjkenten{\@ifnextchar[\ltj@@kenten{\ltj@@kenten[]}}%]
-\let\kenten=\ltjkenten
 \def\ltj@@kenten[#1]#2{{%
   \setkeys[ltj]{ruby}{#1, stretchruby=101}%
   \@tfor\ltj@@kenten@temp:=#2\do{\ltj@@ruby[]{\ltj@@kenten@temp}{\ltj@@rubyip@kenten}}%

@@ -2,7 +2,7 @@
 %%% a test of ruby.
 \documentclass[a4paper,10ptj]{ltjsarticle}
 \usepackage[rgb]{xcolor}
-\usepackage{enumitem,mleftright}
+\usepackage{enumitem,mleftright,pict2e}
 \usepackage{luatexja-otf,amsmath,bxghost}
 \usepackage[no-math]{fontspec}
 \usepackage[match]{luatexja-fontspec}
@@ -36,7 +36,6 @@
 	allcolors=blue,
 	pdftitle={luatexja-ruby.sty}
 }
-
 \def\Node#1#2{\,\vcenter{\hbox{\fboxsep=1pt\fbox{\vbox{\small\halign{\hfil##\hfil\cr
   #1\mathstrut\cr\noalign{\smallskip\hrule height.4pt\smallskip}\strut\<#2\cr}}}}}\,}
 \def\LuaTeX{Lua\TeX}
@@ -69,6 +68,15 @@
 \cs_set_eq:NN \ruby \ltjruby
 \ExplSyntaxOff
 %%%%
+
+\makeatletter
+\def\figureautorefname{図}
+\def\HyRef@autoref#1#2{%
+  \begingroup
+    \Hy@safe@activestrue
+    \expandafter\HyRef@autosetref\csname r@#2\endcsname{#2}{#1}%
+  \endgroup\eghostguarded{}%" 欧文ゴースト
+}
 
 \title{\textsf{luatexja-ruby}パッケージ}
 \author{\LuaTeX-jaプロジェクトチーム}
@@ -132,7 +140,12 @@ plain \LuaTeX でのロードはまだサポートしておらず，
   本来foohogeにおいては……
 \end{quote}
 
+また，「親文字全角幅」「親文字全角高さ」という用語は，それぞれ親文字の和文フォントにおける
+\cs{zw},~\cs{zh}命令で取得できる値を表す．多くの場合は両者は同じ値であるが，いつでもそうであるという保証はない．
+「ルビ全角幅」「ルビ全角高さ」についても同様である．
+
 \subsection{\ruby{命|令}{めい|れい}}
+\label{ssec:ltjruby}
 \paragraph{\cs{ltjruby}}
 ルビ出力用命令の本体．\verb+\ruby+ という別名を定義している．
 \begin{quote}
@@ -194,11 +207,11 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 既定値は\ \verb+{1}{1}{0}+ である．
 
 \item[maxmargin=<real>] 親文字の方がルビより長い時に，ルビの先頭と親文字の先頭，及び
-ルビ末尾と親文字の末尾の間に許される最大の空白量．\textbf{親文字全角単位}で指定し，既定値は0.5．
+ルビ末尾と親文字の末尾の間に許される最大の空白量．\textbf{親文字全角幅単位}で指定し，既定値は0.5．
 
 \medskip
 \item[size=<real>] ルビ文字の親文字に対する大きさ．既定値は0.5．
-\item[intergap=<real>] ルビ文字と親文字との空きを親文字全角単位で指定．既定値は0．
+\item[intergap=<real>] ルビ文字と親文字との空きを親文字全角高さ単位で指定．既定値は0．
 \item[rubysmash=<bool>] ルビの高さを0にするか．既定値は偽．次が例である．
 \begin{LTXexample}[width=0.3\textwidth, preset=\Large]
 \ \vrule width 0pt height 2\zw depth 1\zw
@@ -212,12 +225,13 @@ plain \LuaTeX でのロードはまだサポートしておらず，
   {本}{ほん}}
 \end{LTXexample}
 \item[ybaseheight=<real>] 非負の値が指定された場合，
-  \emph{縦組以外での}親文字の高さを親文字全角の<real>倍と強制的に固定する．
+  \emph{縦組以外での}親文字の高さを親文字全角高さの<real>倍と強制的に固定する．
   負の値が指定された場合は「固定しない」（すなわち，v0.3より前の挙動と同じになる）．
   既定値は$0.88$．
 \item[tbaseheight=<real>] \texttt{ybaseheight}と同様だが，こちらは\emph{縦組での}親文字の高さを指定する．
   既定値は$0.5$．
 \item[baseheight=<real>] \texttt{ybaseheight}，\texttt{tbaseheight}を同時に指定したことと同義．
+  次の例や\autoref{fig:ruby_vertical}を参照．
 \begin{LTXexample}[width=0.3\textwidth, preset=\Large]
 \noindent
 \ltjruby[baseheight=0.88]{本}{ほん}\ 
@@ -236,6 +250,7 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 \item[trubydepth=<real>] \texttt{yrubydepth}と同様だが，こちらは\emph{縦組での}ルビの深さを指定する．
   既定値は$0.5$．
 \item[rubydepth=<real>] \texttt{yrubydepth}，\texttt{trubydepth}を同時に指定したことと同義．
+  次の例や\autoref{fig:ruby_vertical}を参照．
 \begin{LTXexample}[width=0.3\textwidth, preset=\Large]
 \noindent
 \ltjruby[rubydepth=0.12]{◆}{ほん}\ 
@@ -249,6 +264,43 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 \ltjruby[rubydepth=-1]{◆}{dvi}
 \end{LTXexample}
 
+\begin{figure}[t]
+  {\centering\fontsize{48}{48}\selectfont\unitlength=\zw
+  \begin{picture}(7,2.5)(-0.5,-0.5)
+    \linethickness{0.4mm}
+    \put(0,0){\makebox(0,0)[l]{\smash{\hbox to 6.5\zw{親文字$\int_0^1 x\,dx$}}}}
+    \polygon(0,-.12)(0,0.88)(6.5,0.88)(6.5,-0.12)
+    \put(0,1.35){\makebox(0,0)[l]{\fontsize{24}{24}\selectfont\smash{\hbox to 13\zw{ルビ文字列◆◆◆◆◆◆◆◆}}}}
+    \polygon(0,1.2)(0,1.79)(6.5,1.79)(6.5,1.2)
+    \linethickness{0.125mm}
+    \put(-0.5,0){\line(1,0){7}}
+    \put(-0.5,1.35){\line(1,0){7}}
+    \put(-0.5,1.2){\line(1,0){0.5}}
+    \put(-0.5,0.88){\line(1,0){0.5}}
+    \put(-0.25,0){\vector(0,1){0.88}}
+    \put(-0.25,1.35){\vector(0,-1){0.15}}
+    \put(-0.25,0.44){\normalsize\makebox(0,0)[r]{$H$\,\,}}
+    \put(-0.25,1.45){\normalsize\makebox(0,0)[b]{$D$}}
+    \put(-0.125,0.88){\vector(0,1){0.32}}
+    \put(-0.125,1.04){\normalsize\makebox(0,0)[l]{\,\,$\mbox{\texttt{intergap}}\cdot p$}}
+  \end{picture}\par}
+
+  \normalsize\leftskip=0.5\dimexpr\textwidth-30\zw \rightskip=\leftskip
+  ここで$p$は親文字における全角高さ，$r$はルビ文字における全角高さであり，
+  \begin{gather*}
+  H=
+  \begin{cases}
+    \mbox{\texttt{[yt]baseheight}}\cdot p&\mbox{if\ $\mbox{\texttt{[yt]baseheight}}\ge 0$,}\\
+    \mbox{（自然高さ）}&\mbox{if\ $\mbox{\texttt{[yt]baseheight}}\string<0$,}
+  \end{cases}\\
+  D=
+  \begin{cases}
+    \mbox{\texttt{[yt]rubydepth}}\cdot r&\mbox{if\ $\mbox{\texttt{[yt]rubydepth}}\ge 0$,}\\
+    \mbox{（自然深さ）}&\mbox{if\ $\mbox{\texttt{[yt]rubydepth}}\string<0$.}
+  \end{cases}
+  \end{gather*}
+  \caption{ルビの垂直配置}\label{fig:ruby_vertical}
+\end{figure}
 
 
 \item[kenten=<command>]各文字につく圏点の出力命令を指定する．
@@ -300,14 +352,14 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \begin{description}
 \item[\Param{rubypreintrusion}\ttfamily =\{<chr\_code>, <pre\_int>\}]
   文字<chr\_code> に，その\textbf{直後}のルビによって掛けられるルビ文字列の最大長
-  （つまり，\underline{前文字進入許容量}）をルビ全角単位で指定．
+  （つまり，\underline{前文字進入許容量}）をルビ全角幅単位で指定．
 
   \textbf{v0.5以降での変更点}：もし$-a$~($a>0$)を指定した場合は，実際の\underline{前文字進入許容量}は$a$となるが，
   文字<chr\_code>の前のJFMグルーに進入が発生した場合には，\underline{前文字進入許容量}が0でなかった場合は，の後のJFMグルーにはルビの進入は発生しない．
 
 \item[\Param{rubypostintrusion}\ttfamily =\{<chr\_code>, <post\_int>\}]
   文字<chr\_code> に，その\textbf{直前}のルビによって掛けられるルビ文字列の最大長
-  （つまり，\underline{後文字進入許容量}）をルビ全角単位で指定．
+  （つまり，\underline{後文字進入許容量}）をルビ全角幅単位で指定．
 
   \textbf{v0.5以降での変更点}：もし$-a$~($a>0$)を指定した場合は，実際の\underline{後文字進入許容量}は$a$となるが，
   実際の\underline{後文字進入量}が0でなかった場合は，文字<chr\_code>の後のJFMグルーにはルビの進入は発生しない．
@@ -343,7 +395,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 
 
 \paragraph{\cs{ltjkenten}}
-圏点を出力する命令で，\verb+\kenten+ という別名を定義している．
+圏点を出力する命令であり，
 \begin{quote}
  \ttfamily\cs{ltjkenten}[<option>]\{親文字\}
 \end{quote}
@@ -375,7 +427,6 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
   親文字全角の$1/1000$だけルビ文字列が長くなることを許容している．
 }であれば，
 単純グループルビの並びとして扱われる．すなわち，次ページ冒頭の2行は全くの等価となる．
-\newpage
 \begin{verbatim}
 \ltjruby{普|通|車}{ふ|つう|しや}
 \ltjruby{普}{ふ}\ltjruby{通}{つう}\ltjruby{車}{しや}
@@ -422,6 +473,12 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 エラーが発生して止まることもあるし，エラーが発生しなくても正しく組まれない．
 \end{itemize}
 
+\paragraph{別名について}
+\verb+\begin{document}+時に%
+\begin{itemize}
+ \item \cs{ruby}がすでに定義されていない場合に限り，\cs{ruby}が\cs{ltjruby}の別名として定義される．
+ \item \cs{kenten}がすでに定義されていない場合に限り，\cs{kenten}が\cs{ltjkenten}の別名として定義される．
+\end{itemize}
 
 \section{\ruby{注|意|点}{ちゆう|い|てん}}
 \paragraph{前後からのルビ文字のはみ出し1}
@@ -527,6 +584,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 
 \newpage
 \section{\ruby{実|装}{じつ|そう}について}
+
 \subsection{進入量の計算}
 \label{ssec:calc_intrusion}
 ルビ文字を自然に組んだときの幅が親文字のそれより多い場合，
@@ -900,6 +958,31 @@ $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_3$を行B�
   \makebox[10\zw][s]{値とは\ruby{\texttt{;}}{セミコロン}で区切}%
 
   \ltjruby{痛}{いたみ}（\ltjruby{病}{びやう}あ
+
+  v0.53\ \ruby{コギト}{Cogito}
+  \ruby{コイト}{Coito}
+  \ruby{ノ}{no}
+  \ruby{ト}{TO}
+  \ruby{ヨ}{yo}
+  \ruby{ぢ}{dji}
+  \\
+  \ruby[intergap=-1.5]{ノ}{no}
+  \ruby[intergap=-1.5]{ト}{TO}
+  \ruby[intergap=-1.5]{ヨ}{yo}
+  \ruby[intergap=-1.5]{ぢ}{dji}
+           
+  v0.52\ \ruby[rubydepth=-1]{コギト}{Cogito}  % too high
+  \ruby[rubydepth=-1]{コイト}{Coito}  % too low
+  \ruby[rubydepth=-1]{ノ}{no}  % too low
+  \ruby[rubydepth=-1]{ト}{TO}  % too low
+  \ruby[rubydepth=-1]{ヨ}{yo}  % too high
+  \ruby[rubydepth=-1]{ぢ}{dji}  % too high
+  \\
+  \ruby[intergap=-1.5,rubydepth=-1]{ノ}{no}  % too low
+  \ruby[intergap=-1.5,rubydepth=-1]{ト}{TO}  % too low
+  \ruby[intergap=-1.5,rubydepth=-1]{ヨ}{yo}  % too high
+  \ruby[intergap=-1.5,rubydepth=-1]{ぢ}{dji}  % too high
+
 }
 \fbox{\box0}
 
