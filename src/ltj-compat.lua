@@ -25,12 +25,12 @@ local function to_kansuji(num)
       num = -num; tex.write '-'
    end
    local s = ""
-   while num~=0 do
+   repeat
       s = utfchar(
          ltjs.get_stack_table(luatexja.stack_table_index.KSJ + num%10,
                                 '', tex.getcount 'ltj@@stack')) .. s
       num=math.floor(num/10)
-   end
+   until num==0
    tex.write(s)
 end
 
