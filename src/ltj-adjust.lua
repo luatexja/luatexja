@@ -544,9 +544,9 @@ do
     end
     if dist < tex.lineskiplimit then
     local f = max(1, bw*ltja.step_factor)
-       copy_glue(g, tex.baselineskip, 1, normal - f * floor((dist-tex.lineskip.width)/f))
+       copy_glue(g, 'baselineskip', 1, normal - f * floor((dist-tex.get('lineskip', false))/f))
     else
-       copy_glue(g, tex.baselineskip, 2, normal)
+       copy_glue(g, 'baselineskip', 2, normal)
     end
   end
 end

@@ -18,12 +18,13 @@ local node_prev = node.direct.getprev
 local node_next = node.direct.getnext
 local getid = node.direct.getid
 local getsubtype = node.direct.getsubtype
+local texget = tex.get
 
 local node_getglue = node.getglue
 local setglue = node.direct.setglue
-local function copy_glue (new_glue, old_glue, subtype, new_w)
+local function copy_glue (new_glue, old_glue_name, subtype, new_w)
    setfield(new_glue, 'subtype', subtype)
-   local w,st,sp,sto,spo = node_getglue(old_glue)
+   local w,st,sp,sto,spo = texget(old_glue_name, true)
    setglue(new_glue, new_w or w, st, sp, sto, spo)
 end
 ltjl.copy_glue = copy_glue
@@ -33,9 +34,9 @@ function ltjl.p_dummy(before, after)
 end
 function ltjl.l_dummy(dist, g, adj, normal, bw, loc)
    if dist < tex.lineskiplimit then
-      copy_glue(g, tex.lineskip, 1, tex.lineskip.width + adj)
+      copy_glue(g, 'lineskip', 1, texget('lineskip', false) + adj)
    else
-      copy_glue(g, tex.baselineskip, 2, normal)
+      copy_glue(g, 'baselineskip', 2, normal)
    end
 end
 
@@ -49,7 +50,7 @@ do
 local traverse_id = node.direct.traverse_id
 local function adjust_glue(nh)
    local h = to_direct(nh)
-   local bw = tex.baselineskip.width
+   local bw = texget('baselineskip',false)
    for x in traverse_id(id_glue, h) do
      local xs = getsubtype(x)
      if (xs==1) or (xs==2) then
@@ -83,7 +84,7 @@ local function dir_adjust_append_vlist(b, loc, prev, mirrored)
    local new_b = loc=='box' and 
       make_dir_whatsit(old_b, old_b, get_dir_count(), 'append_vlist') or old_b
    if prev > -65536000 then
-      local bw = tex.baselineskip.width
+      local bw = texget('baselineskip', false)
       local normal = bw - prev - getfield(new_b, mirrored and 'depth' or 'height')
       local lmin, adj = nil, 0
       local tail = to_direct(tex.nest[tex.nest.ptr].tail)
