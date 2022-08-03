@@ -92,11 +92,12 @@ end
 
 local get_dir_count, get_adjust_dir_count
 do
+   local node_attr = node.has_attribute
    local function get_dir_count_inner(h)
       if h then
          if h.id==id_whatsit and h.subtype==sid_user and h.user_id==DIR then
-            return ((node.has_attribute(h, attr_icflag) or 0)<PROCESSED_BEGIN_FLAG)
-               and (node.has_attribute(h,attr_dir)%dir_node_auto) or 0
+            return ((node_attr(h, attr_icflag) or 0)<PROCESSED_BEGIN_FLAG)
+               and (node_attr(h,attr_dir)%dir_node_auto) or 0
          else
             return 0
          end
@@ -263,13 +264,12 @@ local function create_dir_whatsit(hd, gc, new_dir)
       return hd
    else
       local w = dir_pool[new_dir]()
-      setfield(w, 'next', hd)
       set_attr(w, attr_icflag, PROCESSED_BEGIN_FLAG)
       set_attr(hd, attr_icflag,
                get_attr_icflag(hd) + PROCESSED_BEGIN_FLAG)
       ensure_tex_attr(attr_icflag, 0)
       ensure_tex_attr(attr_dir, 0)
-      return w
+      return insert_before(hd, hd, w)
    end
 end
 
@@ -329,11 +329,12 @@ do
          end
       end
       if hd==wh[1] then
-         ltjs.list_dir =has_attr(hd,attr_dir)
+         ltjs.list_dir = has_attr(hd, attr_dir)
          local x = node_next(hd)
          while x and getid(x)==id_glue and getsubtype(x)==3 do
             node_remove(hd,x); node_free(x); x = node_next(hd)
          end
+         if #wh>1 then wh[#wh], wh[1]=nil, wh[#wh] end
       end
       for i=1,#wh do
          hd = node_remove(hd, wh[i]); node_free(wh[i]); wh[i] = nil
@@ -344,17 +345,14 @@ do
             ensure_tex_attr(attr_icflag, 0)
          end
          return hd
-      else
+      elseif gc=='vtop' then
          local n = node_next(hd)
-         if gc=='vtop' then
-            local w = create_dir_whatsit(hd, gc, ltjs.list_dir)
-            -- move dir whatsit after hd
-            setfield(hd, 'next', w); setfield(w, 'next', n)
-            return hd
-         else
-            hd = create_dir_whatsit(hd, gc, ltjs.list_dir)
-            return hd
-         end
+         local w = create_dir_whatsit(hd, gc, ltjs.list_dir)
+         -- move dir whatsit after hd
+         setfield(hd, 'next', w); setfield(w, 'next', n)
+         return hd
+      else
+         return create_dir_whatsit(hd, gc, ltjs.list_dir)
       end
    end
 end
@@ -1036,23 +1034,12 @@ do
 end
 
 do
-   -- supply direction whatsit to the main vertical list "of the next page"
    local function dir_adjust_pre_output(h, gc)
+   -- ここがメモリリークの原因？ けど削除すると縦書きができない
       return to_node(create_dir_whatsit_vbox(to_direct(h), gc))
    end
-   ltjb.add_to_callback('pre_output_filter',
-                        dir_adjust_pre_output,
+   ltjb.add_to_callback('pre_output_filter', dir_adjust_pre_output, 
                         'ltj.direction', 10000)
-
-   function luatexja.direction.remove_end_whatsit()
-      local h=tex.lists.page_head
-      if h and (not h.next) and
-         h.id==id_whatsit and h.subtype==sid_user and
-         h.user_id == DIR then
-            tex.lists.page_head = nil
-            node.free(h)
-      end
-   end
 end
 
 -- append_to_vlist filter: done in ltj-lineskip.lua
