@@ -514,7 +514,7 @@ do
   end  
   function ltjl.p_profile(before, after, mirrored, bw)
     local range, tls 
-      = init_range(), luatexja.adjust.profile_hgap_factor*tex.lineskip.width
+      = init_range(), luatexja.adjust.profile_hgap_factor*tex.get('lineskip', false)
     profile_inner(before, range, 3, true,     tls)
     profile_inner(after,  range, 4, mirrored, tls)
     range = range:flatten()
