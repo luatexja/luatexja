@@ -583,6 +583,9 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
             debug_show_node_X(q, print_fn, limit, inner_depth)
          end
       end
+   elseif pt == 'attribute' then
+      s = base .. ' [' .. p.number .. '] = ' .. p.value
+      print_fn(s)
    else
       print_fn(base)
    end

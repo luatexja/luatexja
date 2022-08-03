@@ -334,7 +334,7 @@ do
          while x and getid(x)==id_glue and getsubtype(x)==3 do
             node_remove(hd,x); node_free(x); x = node_next(hd)
          end
-         if #wh>1 then wh[#wh], wh[1]=nil, wh[#wh] end
+         if #wh==1 then wh[1]=nil else wh[#wh], wh[1]=nil, wh[#wh] end
       end
       for i=1,#wh do
          hd = node_remove(hd, wh[i]); node_free(wh[i]); wh[i] = nil
@@ -349,10 +349,9 @@ do
          local n = node_next(hd)
          local w = create_dir_whatsit(hd, gc, ltjs.list_dir)
          -- move dir whatsit after hd
-         setfield(hd, 'next', w); setfield(w, 'next', n)
+         setfield(hd, 'next', w); setfield(w, 'next', n); 
          return hd
-      else
-         return create_dir_whatsit(hd, gc, ltjs.list_dir)
+      else return create_dir_whatsit(hd, gc, ltjs.list_dir)
       end
    end
 end
@@ -546,7 +545,7 @@ do
                   and getfield(hd, 'user_id')==DIR then
                      local d = hd
                      nh, hd = node_remove(nh, hd)
-                     if is_copy and (not dir_backup) then
+                     if is_copy==true and (not dir_backup) then
                         dir_backup = d; setfield(dir_backup, 'next', nil)
                      else
                         node_free(d)
@@ -727,7 +726,7 @@ do
             end
             local _, wh =  get_box_dir(b, 0) -- clean dir_node attached to the box
             if wh then
-               node.direct.flush_list(getfield('value', wh))
+               node.direct.flush_list(getfield(wh, 'value'))
                setfield(wh, 'value', nil)
             end
          end
