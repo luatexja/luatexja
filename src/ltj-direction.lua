@@ -1034,7 +1034,6 @@ end
 
 do
    local function dir_adjust_pre_output(h, gc)
-   -- ここがメモリリークの原因？ けど削除すると縦書きができない
       return to_node(create_dir_whatsit_vbox(to_direct(h), gc))
    end
    ltjb.add_to_callback('pre_output_filter', dir_adjust_pre_output, 
