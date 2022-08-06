@@ -229,10 +229,7 @@ do
                   }
             end
             for k,w in pairs(v.kern) do
-               local g = node_new(id_kern, 1)
-               setfield(g, 'kern', w[1])
-               set_attr(g, attr_icflag, FROM_JFM)
-               v[k] = {g, ratio=w[2]/sz}
+               v[k] = {w[1], ratio=w[2]/sz}
             end
          end
          v.glue, v.kern = nil, nil

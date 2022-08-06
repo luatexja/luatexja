@@ -746,12 +746,14 @@ local function new_jfm_glue(mc, bc, ac)
    local g = mc[bc][ac]
    if g then
        if g[1] then
-           return node_copy(g[1]), g.ratio, false, false, false
+          local k = node_new(id_kern, 1); setfield(k, 'kern', g[1]) 
+          set_attr(k, attr_icflag, FROM_JFM)
+          return k, g.ratio, false, false, false
        else
-         local f = node_new(id_glue)
-         set_attr(f, attr_icflag, g.priority)
-         setglue(f, g.width, g.stretch, g.shrink)
-         return f, g.ratio, g.kanjiskip_natural, g.kanjiskip_stretch, g.kanjiskip_shrink
+          local f = node_new(id_glue)
+          set_attr(f, attr_icflag, g.priority)
+          setglue(f, g.width, g.stretch, g.shrink)
+          return f, g.ratio, g.kanjiskip_natural, g.kanjiskip_stretch, g.kanjiskip_shrink
       end
    end
    return false, 0
