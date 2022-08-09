@@ -334,7 +334,9 @@ do
          while x and getid(x)==id_glue and getsubtype(x)==3 do
             node_remove(hd,x); node_free(x); x = node_next(hd)
          end
-         if #wh==1 then wh[1]=nil else wh[#wh], wh[1]=nil, wh[#wh] end
+         --if gc~='vtop' then
+         --    if #wh==1 then wh[1]=nil else wh[#wh], wh[1]=nil, wh[#wh] end
+         --end
       end
       for i=1,#wh do
          hd = node_remove(hd, wh[i]); node_free(wh[i]); wh[i] = nil
