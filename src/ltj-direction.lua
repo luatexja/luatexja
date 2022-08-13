@@ -986,7 +986,9 @@ do
    function luatexja.direction.vsplit()
       local n = scan_int();
       local p = to_direct(tex_getbox(n))
-      split_dir_head = nil
+      if split_dir_head then node_free(split_dir_head); split_dir_head = nil end
+      if split_dir_whatsit then split_dir_watsit = nil end
+      split_dir_head = nil; split_dir_whatsit=nil
       if p then
          local bh = getlist(p)
          if getid(bh)==id_whatsit and getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR 
@@ -1015,8 +1017,8 @@ do
          if split_dir_whatsit then
             -- adjust direction of 'split_keep'
             set_attr(split_dir_whatsit, attr_dir, ltjs.list_dir)
+            split_dir_whatsit=nil
          end
-         split_dir_whatsit=nil
       elseif gc=='preamble' then
          split_dir_whatsit=nil
       else

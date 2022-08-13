@@ -1374,6 +1374,7 @@ do
    local attr_yablshift = luatexbase.attributes['ltj@yablshift']
    local attr_tablshift = luatexbase.attributes['ltj@tablshift']
    local getcount, abs, scan_keyword = tex.getcount, math.abs, token.scan_keyword
+   local tex_nest = tex.nest
    local get_current_jfont
    do
        local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
@@ -1389,7 +1390,7 @@ do
    -- * (X)KANJI_SKIP(_JFM): その場で値が決まっている
    -- * PROCESSED_BEGIN_FLAG + (X)KANJI_SKIP: 段落終了時に決める
    local function insert_k_skip_common(ind, name, ica, icb)
-       if abs(tex.nest[tex.nest.ptr].mode) ~= ltjs.hmode then return end
+       if abs(tex_nest[tex_nest.ptr].mode) ~= ltjs.hmode then return end
        local g = node_new(id_glue); set_attr(g, attr_icflag, SPECIAL_JAGLUE)
        local is_late = scan_keyword("late")
        if not is_late then
