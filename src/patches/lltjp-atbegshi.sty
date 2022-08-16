@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-atbegshi}[2021-04-29 Patching \string\shipout\space hooks for LuaTeX-ja]
+\ProvidesPackage{lltjp-atbegshi}[2022-08-12 Patching \string\shipout\space hooks for LuaTeX-ja]
 
 % concept: execute all hooks inside yoko direction \vbox
 
@@ -37,6 +37,7 @@
     % however, an infinite loop occurs if we uncomment the line below
     % so we can't.
     %\box_use:N \l__platex_shipout_dummy_box
+    \box_clear:N \l__platex_shipout_dummy_box
   }
 }
 
@@ -53,6 +54,7 @@
     \vbox_set:Nn \l__platex_shipout_dummy_box {
       \platex_direction_yoko: \__platex_original_shipout_execute_cont:
     }
+    \box_clear:N \l__platex_shipout_dummy_box
   }
 }
 \fi:
@@ -104,7 +106,7 @@
   {\setbox8\vbox\bgroup\yoko\let\AtBegShi@OrgProtect\protect}
 \pxabgs@patch@cmd\pxabgs@AtBegShi@Output
   {\AtBeginShipoutOriginalShipout\box\AtBeginShipoutBox}%
-  {\AtBeginShipoutOriginalShipout\box\AtBeginShipoutBox\egroup}
+  {\AtBeginShipoutOriginalShipout\box\AtBeginShipoutBox\egroup\setbox8\box\voidb@x}
 \pxabgs@patch@cmd\pxabgs@AtBegShi@Output
   {%
     \begingroup

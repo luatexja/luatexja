@@ -15,21 +15,23 @@ local getfont = node.direct.getfont
 local getlist = node.direct.getlist
 local getchar = node.direct.getchar
 local getsubtype = node.direct.getsubtype
-local getwidth = node.direct.getwidth or function(n) return getfield(n,'width') end
-local getdepth = node.direct.getdepth or function(n) return getfield(n,'depth') end
-local getwhd = node.direct.getwhd or function(n)
-  return getfield(n,'width'), getfield(n,'height'),getfield(n,'depth') end
+local getwidth = node.direct.getwidth
+local getshift = node.direct.getshift
+local getoffsets = node.direct.getoffsets
+local getheight = node.direct.getheight
+local getdepth = node.direct.getdepth
+local getwhd = node.direct.getwhd
 
-local setwhd = node.direct.setwhd or function(n,w,h,d)
-  setfield(n,'width',w); setfield(n,'height',h); setfield(n,'depth',d) end
-local setchar = node.direct.setchar or function(n,c) setfield(n,'char',c) end
-local setnext = node.direct.setnext or function(n,c) setfield(n,'next',c) end
-local setdir = node.direct.setdir or function(n,c) setfield(n,'dir',c) end
-local setkern = node.direct.setkern or function(n,c) setfield(n,'kern',c) end
-local setoffsets = node.direct.setoffsets or function(n,x,y)
-  setfield(n,'xoffset',x); setfield(n,'yoffset',y)  end
-local getoffsets = node.direct.getoffsets or function(n)
-  return getfield(n,'xoffset'), getfield(n,'yoffset')  end
+local setwhd = node.direct.setwhd
+local setchar = node.direct.setchar
+local setnext = node.direct.setnext
+local setdir = node.direct.setdir
+local setkern = node.direct.setkern
+local setshift = node.direct.setshift
+local setoffsets = node.direct.setoffsets
+local setheight = node.direct.setheight
+local setdepth = node.direct.setdepth
+local setlist = node.direct.setlist
 
 local node_traverse_id = node.direct.traverse_id
 local node_traverse = node.direct.traverse
@@ -142,8 +144,7 @@ local function capsule_glyph_yoko(p, met, char_data, head, dir)
    setnext(p, nil)
    local box = node_new(id_hlist, nil, p)
    setwhd(box, fwidth, fheight, fdepth)
-   setfield(box, 'head', p)
-   setfield(box, 'shift', kbl)
+   setlist(box, p); setshift(box, kbl)
    setdir(box, dir)
    set_attr(box, attr_icflag, PACKED)
    head = q and node_insert_before(head, q, box)
@@ -172,8 +173,7 @@ local function capsule_glyph_tate_rot(p, met, char_data, head, dir, asc)
    setnext(p, nil)
    local box = node_new(id_hlist, nil, p)
    setwhd(box, fwidth, fheight, fdepth)
-   setfield(box, 'head', p)
-   setfield(box, 'shift', kbl)
+   setlist(box, p); setshift(box, kbl)
    setdir(box, dir)
    set_attr(box, attr_icflag, PACKED)
    head = q and node_insert_before(head, q, box)
@@ -217,8 +217,7 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
    local q
    head, q = node_remove(head, p)
    local box = node_new(id_hlist, nil, p)
-   setwhd(box, fwidth, fheight, fdepth)
-   setfield(box, 'shift', y_shift)
+   setwhd(box, fwidth, fheight, fdepth); setshift(box, y_shift)
    setdir(box, dir)
    -- print(yo, ascender, char_data.align, fwidth-pwidth)
    setoffsets(p, -fshift.down,
@@ -230,7 +229,7 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
    local k2 = node_new(id_kern, 1); setkern(k2, pwnh)
    local k3 = node_new(id_kern, 1); setkern(k3, -getwidth(p)-pwnh)
    local wr = node_new(id_whatsit, sid_restore)
-   setfield(box, 'head', ws)
+   setlist(box, ws)
    setnext(ws, wm);  setnext(wm, k2);
    setnext(k2, p);   setnext(p,  k3);
    setnext(k3, wr);
@@ -256,8 +255,7 @@ local function capsule_glyph_math(p, met, char_data)
    setfield(p, 'xoffset', getfield(p, 'xoffset') + char_data.align*(fwidth-pwidth) - fshift.left)
    local box = node_new(id_hlist, nil, p);
    setwhd(box, fwidth, fheight, fdepth)
-   setfield(box, 'head', p)
-   setfield(box, 'shift', y_shift)
+   setlist(box, p); setshift(box, y_shift)
    setdir(box, tex.mathdir)
    set_attr(box, attr_icflag, PACKED)
    return box
@@ -272,11 +270,10 @@ function luatexja.setwidth.apply_ashift_math(head, last, attr_ablshift)
          return
       elseif (has_attr(p, attr_icflag) or 0) ~= PROCESSED then
          if pid==id_hlist or pid==id_vlist then
-            setfield(p, 'shift', getfield(p, 'shift') +  (has_attr(p,attr_ablshift) or 0)) 
+            setshift(p, getshift(p) +  (has_attr(p,attr_ablshift) or 0)) 
          elseif pid==id_rule then
             local v = has_attr(p,attr_ablshift) or 0
-            setfield(p, 'height', getfield(p, 'height')-v)
-            setfield(p, 'depth', getdepth(p)+v)
+            setheight(p, getheight(p)-v); setdepth(p, getdepth(p)+v)
             set_attr(p, attr_icflag, PROCESSED)
          elseif pid==id_glyph then
             -- 欧文文字; 和文文字は pid == id_hlist の場合で処理される

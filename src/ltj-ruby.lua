@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.ruby',
-  date = '2022-06-25',
+  date = '2022-08-14',
   description = 'Ruby annotation',
 })
 luatexja.ruby = {}
@@ -13,21 +13,36 @@ luatexja.load_module 'base';      local ltjb = luatexja.base
 local to_node =  node.direct.tonode
 local to_direct =  node.direct.todirect
 
-local setfield =  node.direct.setfield
-local setglue = luatexja.setglue
 local getfield =  node.direct.getfield
 local getid =  node.direct.getid
 local getfont =  node.direct.getfont
 local getlist =  node.direct.getlist
 local getchar =  node.direct.getchar
 local getsubtype =  node.direct.getsubtype
+local getkern = node.direct.getkern
+local getwidth =  node.direct.getwidth
+local getheight = node.direct.getheight
+local getdepth = node.direct.getdepth
+local getwhd = node.direct.getwhd
+local setfield =  node.direct.setfield
+local setglue = luatexja.setglue
+local setkern = node.direct.setkern
+local setnext = node.direct.setnext
+local setshift = node.direct.setshift
+local setwidth = node.direct.setwidth
+local setheight = node.direct.setheight
+local setdepth = node.direct.setdepth
+local setwhd = node.direct.setwhd
+local setlist = node.direct.setlist
 
 local node_new = node.direct.new
 local node_remove = node.direct.remove
 local node_next =  node.direct.getnext
-local node_copy, node_free, node_tail = node.direct.copy, node.direct.free, node.direct.tail
+local node_copy, node_tail = node.direct.copy, node.direct.tail
+local node_free = node.direct.flush_node or node.direct.free
 local has_attr, set_attr = node.direct.has_attribute, node.direct.set_attribute
 local insert_before, insert_after = node.direct.insert_before, node.direct.insert_after
+local hpack = node.direct.hpack
 
 local id_hlist  = node.id 'hlist'
 local id_vlist  = node.id 'vlist'
@@ -157,25 +172,22 @@ do
             end
             set_attr(nh, attr_icflag,
               get_attr_icflag(nh) + PROCESSED_BEGIN_FLAG)
-            setfield(node_tail(h), 'next', nh)
-            setfield(f, 'head', nil); node_free(f)
-            setfield(b, 'head', nil); node_free(b)
+            setnext(node_tail(h), nh)
+            setlist(f, nil); node_free(f)
+            setlist(b, nil); node_free(b)
             local g = luatexja.jfmglue.main(h,false)
-            return node.direct.hpack(g)
+            return hpack(g)
          else
             return f
          end
       elseif b then
          return b
       else
-         local h = node_new(id_hlist)
-         setfield(h, 'subtype', 0)
-         setfield(h, 'width', 0)
-         setfield(h, 'height', 0)
-         setfield(h, 'depth', 0)
+         local h = node_new(id_hlist, 0)
+         setwhd(h, 0, 0, 0)
          setfield(h, 'glue_set', 0)
          setfield(h, 'glue_order', 0)
-         setfield(h, 'head', nil)
+         setlist(h, nil)
          return h
       end
    end
@@ -205,7 +217,7 @@ do
       -- pre, middle, post: 伸縮比率
       -- prenw, postnw: 前後の自然長 (sp)
       local h = getlist(box);
-      local hh, hd = getfield(box, 'height'), getfield(box, 'depth')
+      local _, hh, hd = getwhd(box)
       local hx = h
       while hx do
          local hic = has_attr(hx, attr_icflag) or 0
@@ -214,14 +226,13 @@ do
             or ((hic<=FROM_JFM+63) and (hic>=FROM_JFM)) then
             -- この 5 種類の空白をのばす
                if getid(hx) == id_kern then
-                  local k = node_new(id_glue)
-                  setglue(k, getfield(hx, 'kern'), round(middle*65536), 0,
+                  local k = node_new(id_glue, 0)
+                  setglue(k, getkern(hx), round(middle*65536), 0,
                              2, 0)
-                  setfield(k, 'subtype', 0);
                   h = insert_after(h, hx, k);
                   h = node_remove(h, hx); node_free(hx); hx = k
                else -- glue
-                  setglue(hx, getfield(hx, 'width'), round(middle*65536), 0,
+                  setglue(hx, getwidth(hx), round(middle*65536), 0,
                              2, 0)
                end
          end
@@ -236,10 +247,9 @@ do
       setglue(k, postnw, round(post*65536), 0, 2, 0)
       insert_after(h, node_tail(h), k);
       -- hpack
-      setfield(box, 'head', nil); node_free(box)
-      box = node.direct.hpack(h, new_width, 'exactly')
-      setfield(box, 'height', hh)
-      setfield(box, 'depth', hd)
+      setlist(box, nil); node_free(box)
+      box = hpack(h, new_width, 'exactly')
+      setheight(box, hh); setdepth(box, hd)
       return box
    end
 end
@@ -280,7 +290,7 @@ function luatexja.ruby.texiface(rst, rtlr, rtlp)
    else
       local f, eps = true, rst.eps
       for i = 1,#rtlr do
-         if getfield(rtlr[i], 'width') > getfield(rtlp[i], 'width') + eps then
+         if getwidth(rtlr[i]) > getwidth(rtlp[i]) + eps then
             f = false; break
          end
       end
@@ -304,8 +314,8 @@ end
 -- r, p の中身のノードは再利用される
 local function enlarge_parent(r, p, tmp_tbl, no_begin, no_end)
    -- r: ルビ部分の格納された box，p: 同，親文字
-   local rwidth = getfield(r, 'width')
-   local sumprot = rwidth - getfield(p, 'width') -- >0
+   local rwidth = getwidth(r)
+   local sumprot = rwidth - getwidth(p) -- >0
    local pre_intrusion, post_intrusion
    local ppre, pmid, ppost = tmp_tbl.ppre, tmp_tbl.pmid, tmp_tbl.ppost
    local mapre, mapost = tmp_tbl.mapre, tmp_tbl.mapost
@@ -338,12 +348,11 @@ local function enlarge_parent(r, p, tmp_tbl, no_begin, no_end)
       pre_intrusion = min(mapre, pre_intrusion + round(ppre*getfield(p, 'glue_set')*65536))
       post_intrusion = min(mapost, post_intrusion + round(ppost*getfield(p, 'glue_set')*65536))
    end
-   setfield(r, 'shift', -pre_intrusion)
+   setshift(r, -pre_intrusion)
    local rwidth = rwidth - pre_intrusion - post_intrusion
-   setfield(r, 'width', rwidth)
-   setfield(p, 'width', rwidth)
+   setwidth(r, rwidth); setwidth(p, rwidth)
    local ps = getlist(p)
-   setfield(ps, 'width', getfield(ps, 'width') - pre_intrusion)
+   setwidth(ps, getwidth(ps) - pre_intrusion)
    local orig_post_intrusion, post_jfmgk = post_intrusion, false
    if no_end then
        if orig_post_intrusion > tmp_tbl.after_jfmgk then
@@ -370,47 +379,46 @@ local function new_ruby_box(r, p, tmp_tbl, no_begin, no_end)
    imode = floor(imode/2); rpost = imode%8;
    imode = (imode-rpost)/8;  rmid  = imode%8;
    imode = (imode-rmid)/8;   rpre  = imode%8
-   if getfield(r, 'width') > getfield(p, 'width') then  -- change the width of p
+   if getwidth(r) > getwidth(p) then  -- change the width of p
       r, p, post_intrusion, post_jfmgk = enlarge_parent(r, p, tmp_tbl, no_begin, no_end)
-   elseif getfield(r, 'width') < getfield(p, 'width') then -- change the width of r
-      r = enlarge(r, getfield(p, 'width'), rpre, rmid, rpost, 0, 0)
+   elseif getwidth(r) < getwidth(p) then -- change the width of r
+      r = enlarge(r, getwidth(p), rpre, rmid, rpost, 0, 0)
       post_intrusion = 0
       local need_repack = false
       -- margin が大きくなりすぎた時の処理
       if round(rpre*getfield(r, 'glue_set')*65536) > max_margin then
          local ps = getlist(r); need_repack = true
-         setfield(ps, 'width', max_margin)
+         setwidth(ps, max_margin)
          setfield(ps, 'stretch', 1) -- 全く伸縮しないのも困る
       end
       if round(rpost*getfield(r, 'glue_set')*65536) > max_margin then
          local ps = node_tail(getlist(r)); need_repack = true
-         setfield(ps, 'width', max_margin)
+         setwidth(ps, max_margin)
          setfield(ps, 'stretch', 1) -- 全く伸縮しないのも困る
       end
       if need_repack then
          local rt = r
-         r = node.direct.hpack(getlist(r), getfield(r, 'width'), 'exactly')
-         setfield(rt, 'head', nil); node_free(rt);
+         r = hpack(getlist(r), getwidth(r), 'exactly')
+         setlist(rt, nil); node_free(rt);
       end
    end
    local a, k = node_new(id_rule), node_new(id_kern, 1)
-   setfield(a, 'width', 0); setfield(a, 'height', 0)
-   setfield(a, 'depth', 0); setfield(k, 'kern', tmp_tbl.intergap)
+   setwhd(a, 0, 0, 0); setkern(k, tmp_tbl.intergap)
    insert_after(r, r, a); insert_after(r, a, k);
-   insert_after(r, k, p); setfield(p, 'next', nil)
-   if tmp_tbl.rubydepth >= 0 then setfield(r, 'depth', tmp_tbl.rubydepth) end
-   if tmp_tbl.baseheight >= 0 then setfield(p, 'height', tmp_tbl.baseheight) end
-   a = node.direct.vpack(r); setfield(a, 'shift', 0)
+   insert_after(r, k, p); setnext(p, nil)
+   if tmp_tbl.rubydepth >= 0 then setdepth(r, tmp_tbl.rubydepth) end
+   if tmp_tbl.baseheight >= 0 then setheight(p, tmp_tbl.baseheight) end
+   a = node.direct.vpack(r); setshift(a, 0)
    set_attr(a, attr_ruby, post_intrusion)
    set_attr(a, attr_ruby_post_jfmgk, post_jfmgk and 1 or 0)
-   if rsmash or getfield(a, 'height')<getfield(p, 'height') then
+   if rsmash or getheight(a)<getheight(p) then
       local k = node_new(id_kern, 1)
-      setfield(k, 'kern', -getfield(a, 'height')+getfield(p, 'height'))
-      setfield(a, 'head', k); insert_before(r, r, k)
-      setfield(a, 'height', getfield(p, 'height'))
+      setkern(k, -getheight(a)+getheight(p))
+      setlist(a, k); insert_before(r, r, k)
+      setheight(a, getheight(p))
    end
 
-   return a, getfield(r, 'width'), post_intrusion, post_jfmgk
+   return a, getwidth(r), post_intrusion, post_jfmgk
 end
 
 
@@ -474,7 +482,7 @@ local function pre_low_cal_box(w, cmp)
    -- w.value の node list 更新．
    local nt = wv
    node.direct.flush_list(node_next(wv))
-   for i = 1, 2*cmp+1 do setfield(nt, 'next', kf[i]); nt = kf[i]  end
+   for i = 1, 2*cmp+1 do setnext(nt, kf[i]); nt = kf[i]  end
 
    if cmp==1 then     solve_1(coef)
    elseif cmp==2 then solve_2(coef)
@@ -506,10 +514,8 @@ local function pre_low_app_node(head, w, cmp, coef, ht, dp)
    nt = w
    for i = 1, cmp do
       -- rule
-      local nta = node_new(id_rule);
-      setfield(nta, 'width', coef[i*2][2*cmp+2])
-      setfield(nta, 'height', ht); setfield(nta, 'depth', dp)
-      setfield(nta, 'subtype', 0)
+      local nta = node_new(id_rule, 0);
+      setwhd(nta, coef[i*2][2*cmp+2], ht, dp)
       insert_after(head, nt, nta)
       set_attr(nta, attr_ruby, 2*i+1)
       -- glue
@@ -561,7 +567,7 @@ local function pre_high(ahead)
          local coef = pre_low_cal_box(n, rst.count)
          local s = node_tail(nv) --ルビ文字
          head, n = pre_low_app_node(
-            head, n, rst.count, coef, getfield(s, 'height'), getfield(s, 'depth')
+            head, n, rst.count, coef, getheight(s), getdepth(s)
          )
       else
          n = first_whatsit(node_next(n))
@@ -602,7 +608,7 @@ do
             local deg, hn = (fn-1)/2, wv
             for i = 1, deg do hn = node_next(hn) end;
             node_remove(wv, hn)
-            setfield(hn, 'next', nil)
+            setnext(hn, nil)
             insert_after(ch, rs[1], hn)
             set_attr(hn, attr_icflag,  PROCESSED)
             write_aux(wv, has_attr(hn, attr_ruby), has_attr(hn, attr_ruby_post_jfmgk))
@@ -612,7 +618,7 @@ do
          for i = 1, cmp+deg-1 do hn = node_next(hn) end
          -- -1 is needed except the case hn = 3,
          --   because a ending-line form is removed already from the list
-         node_remove(wv, hn); setfield(hn, 'next', nil)
+         node_remove(wv, hn); setnext(hn, nil)
          insert_after(ch, rs[1], hn)
          set_attr(hn, attr_icflag,  PROCESSED)
          if fn == 2*cmp-1 then
@@ -646,19 +652,19 @@ local function post_high_break(head)
          if i==0 then
             ha = node_next(ha)
          elseif i==1 then
-            setfield(h, 'head', post_lown(rs, rw, cmp, getlist(h)))
+            setlist(h, post_lown(rs, rw, cmp, getlist(h)))
             for i = 2, #rs do rs[i] = nil end -- rs[1] is set by the next statement
             rs[1], rw = ha, nil; ha = node_next(ha)
          elseif i==2 then
             rw = ha
             cmp = getfield(getfield(rw, 'value'), 'value').count
             local hb, hc =  node_remove(getlist(h), rw)
-            setfield(h, 'head', hb); ha = hc
+            setlist(h, hb); ha = hc
          else -- i>=3
             rs[#rs+1] = ha; ha = node_next(ha)
          end
       end
-      setfield(h, 'head', post_lown(rs, rw, cmp, getlist(h)))
+      setlist(h, post_lown(rs, rw, cmp, getlist(h)))
    end
    return head
 end
@@ -759,8 +765,8 @@ do
       local ic = get_attr_icflag(p)
       if ic and (ic>FROM_JFM) and (ic<KANJI_SKIP) then ic = FROM_JFM end
       if t.intrude_jfmgk[ic] then
-          if getid(p)==id_kern then t[index] = t[index] + getfield(p, 'kern')
-          else t[index] = t[index] + getfield(p, 'width') end
+          if getid(p)==id_kern then t[index] = t[index] + getkern(p)
+          else t[index] = t[index] + getwidth(p) end
       end
    end
    local RIPOST = luatexja.stack_table_index.RIPOST

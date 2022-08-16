@@ -11912,12 +11912,16 @@ direction~whatsit内部のノードリストに，\textit{dir\_box}として格�
 	{\fboxsep0pt\fcolorbox{cyan}{white}%
     {\large\KOZM\ltjjachar"#1#2#3#4}}\ (\texttt{U+#1#2#3#4})%"
   }
+  \def\DH#1#2#3#4{%
+	{\fboxsep0pt\fcolorbox{cyan}{white}%
+    {\large\ltjjachar"#1#2#3#4}}\ (\texttt{U+#1#2#3#4})%"
+  }
   \caption{\LuaTeX-ja標準で行われる縦組形への置換}
   \label{tab:vert_replace}\small\centering
   \begin{tabular}{*{3}{l@{}>{${}\longmapsto{}$}c@{}l}}
 	\toprule
-	\D 3001&&\D FE11&\D 3002&&\D FE12&\D 3016&&\D FE17\\
-	\D 3017&&\D FE18&\D 2026&&\D FE19&\D 2025&&\D FE30\\
+	\D 3001&&\D FE11&\D 3002&&\D FE12&\D 3016&&\DH FE17\\
+	\D 3017&&\DH FE18&\D 2026&&\D FE19&\D 2025&&\D FE30\\
 	\D 2014&&\D FE31&\D 2013&&\D FE32&\D FF3F&&\D FE33\\
 	\D FF08&&\D FE35&\D FF09&&\D FE36&\D FF5B&&\D FE37\\
 	\D FF5D&&\D FE38&\D 3014&&\D FE39&\D 3015&&\D FE3A\\

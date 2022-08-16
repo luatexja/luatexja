@@ -17,7 +17,7 @@ local getfont =  node.direct.getfont
 local getchar =  node.direct.getchar
 local getfield =  node.direct.getfield
 local getsubtype =  node.direct.getsubtype
-local getlang = node.direct.getlang or function (n) return getfield(n,'lang') end
+local getlang = node.direct.getlang
 
 local pairs = pairs
 local floor = math.floor
@@ -26,7 +26,7 @@ local set_attr = node.direct.set_attribute
 local node_traverse = node.direct.traverse
 local node_remove = node.direct.remove
 local node_next =  node.direct.getnext
-local node_free = node.direct.free
+local node_free = node.direct.flush_node or node.direct.free
 local node_end_of_math = node.direct.end_of_math
 local tex_getcount = tex.getcount
 
@@ -51,9 +51,9 @@ local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 local dir_tate = luatexja.dir_table.dir_tate
 local lang_ja = luatexja.lang_ja
 
-local setlang = node.direct.setlang or function(n,l) setfield(n,'lang',l) end 
-local setfont = node.direct.setfont or function(n,l) setfield(n,'font',l) end 
-local setchar = node.direct.setchar or function(n,l) setfield(n,'char',l) end 
+local setlang = node.direct.setlang
+local setfont = node.direct.setfont
+local setchar = node.direct.setchar
 
 ------------------------------------------------------------------------
 -- MAIN PROCESS STEP 1: replace fonts
@@ -86,7 +86,7 @@ do
                 { __index = function() return node_next end, })
    local id_boundary = node.id('boundary')
    local node_new, insert_before = node.direct.new, node.direct.insert_before
-   local setsubtype = node.direct.setsubtype or function(n,l) setfield(n,'subtype',l) end 
+   local setsubtype = node.direct.setsubtype
    local function suppress_hyphenate_ja (h)
       start_time_measure('ltj_hyphenate')
       head = to_direct(h)
@@ -135,10 +135,13 @@ do
 end
 
 -- mode: true iff this function is called from hpack_filter
+local set_box_stack_level
+do
 local ltjs_report_stack_level = ltjs.report_stack_level
 local ltjf_font_metric_table  = ltjf.font_metric_table
 local font_getfont = font.getfont
-local function set_box_stack_level(head, mode)
+local traverse_id = node.direct.traverse_id
+function set_box_stack_level(head, mode)
    local box_set, cl = 0, tex.currentgrouplevel + 1
    if mode then
       for _,p  in pairs(wt) do
@@ -150,7 +153,7 @@ local function set_box_stack_level(head, mode)
    ltjs_report_stack_level(tex_getcount('ltj@@stack') + box_set)
    for _,p  in pairs(wtd) do node_free(p) end
    if ltjs.list_dir == dir_tate then
-      for p in node.direct.traverse_id(id_glyph,to_direct(head)) do
+      for p in traverse_id(id_glyph,to_direct(head)) do
          if has_attr(p, attr_icflag, 0) and getlang(p)==lang_ja then
             local nf = ltjf_replace_altfont( has_attr(p, attr_curtfnt) or getfont(p) , ltjs_orig_char_table[p])
             setfont(p, nf)
@@ -162,6 +165,7 @@ local function set_box_stack_level(head, mode)
       end
    end
    return head
+end
 end
 
 -- CALLBACKS

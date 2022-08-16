@@ -18,12 +18,15 @@ local node_prev = node.direct.getprev
 local node_next = node.direct.getnext
 local getid = node.direct.getid
 local getsubtype = node.direct.getsubtype
+local getdepth = node.direct.getdepth
+local getheight = node.direct.getheight
 local texget = tex.get
 
 local node_getglue = node.getglue
-local setglue = node.direct.setglue
+local setglue = luatexja.setglue
+local setsubtype = node.direct.setsubtype
 local function copy_glue (new_glue, old_glue_name, subtype, new_w)
-   setfield(new_glue, 'subtype', subtype)
+   setsubtype(new_glue, subtype)
    local w,st,sp,sto,spo = texget(old_glue_name, true)
    setglue(new_glue, new_w or w, st, sp, sto, spo)
 end
@@ -61,7 +64,7 @@ local function adjust_glue(nh)
              p = node_prev(p); pid = getid(p)
            end
            if pid==id_hlist and getid(n)==id_hlist then
-             local normal = bw - getfield(p, 'depth') - getfield(n, 'height')
+             local normal = bw - getdepth(p) - getheight(n)
              local lmin, adj = ltj_profiler(p, n, false, bw)
              ltj_skip(lmin or normal, x, adj, normal, bw)
            end
@@ -96,7 +99,7 @@ local function dir_adjust_append_vlist(b, loc, prev, mirrored)
       end
       if tail then
          if getid(tail)==id_hlist and getid(new_b)==id_hlist then
-            if getfield(tail, 'depth')==prev then 
+            if getdepth(tail)==prev then 
                lmin, adj = ltj_profiler(tail, new_b, mirrored, bw)
             end
          end

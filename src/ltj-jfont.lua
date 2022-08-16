@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2021-11-06',
+  date = '2022-08-16',
   description = 'Loader for Japanese fonts',
 })
 
@@ -18,11 +18,12 @@ local getid = node.direct.getid
 local to_direct = node.direct.todirect
 
 local node_new = node.direct.new
-local node_free = node.direct.free
+local node_free = node.direct.flush_node or node.direct.free
 local has_attr = node.direct.has_attribute
 local set_attr = node.direct.set_attribute
 local round = tex.round
 local font_getfont = font.getfont
+local setkern = node.direct.setkern
 
 local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
@@ -1036,7 +1037,7 @@ do
                has_attr(p, (get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
                ]
             local g = new_ic_kern()
-            setfield(g, 'kern', j.char_type[find_char_class(getchar(p), j)].italic)
+            setkern(g, j.char_type[find_char_class(getchar(p), j)].italic)
             node_write(g); ensure_tex_attr(attr_icflag, 0)
          else
             local f = getfont(p)
@@ -1044,7 +1045,7 @@ do
             if h then
                if h.characters[getchar(p)] and h.characters[getchar(p)].italic then
                   local g = new_ic_kern()
-                  setfield(g, 'kern', h.characters[getchar(p)].italic)
+                  setkern(g, h.characters[getchar(p)].italic)
                   node_write(g); ensure_tex_attr(attr_icflag, 0)
                end
             end

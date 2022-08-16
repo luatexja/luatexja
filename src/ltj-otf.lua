@@ -21,12 +21,16 @@ local getid = node.direct.getid
 local getfont = node.direct.getfont
 local getchar = node.direct.getchar
 local getsubtype = node.direct.getsubtype
+local setchar = node.direct.setchar
+local setfont = node.direct.setfont
+local setlang = node.direct.setlang
+
 local to_node = node.direct.tonode
 local to_direct = node.direct.todirect
 local node_new = node.direct.new
 local node_remove = node.direct.remove
 local node_next = node.direct.getnext
-local node_free = node.direct.free
+local node_free = node.direct.flush_node or node.direct.free
 local has_attr = node.direct.has_attribute
 local set_attr = node.direct.set_attribute
 local unset_attr = node.direct.unset_attribute
@@ -162,11 +166,10 @@ local function extract(head)
          if getsubtype(p)==sid_user then
             local puid = getfield(p, 'user_id')
             if puid==OTF then
-               local g = node_new(id_glyph)
-               setfield(g, 'subtype', 0)
-               setfield(g, 'char', getfield(p, 'value'))
-               local v = has_attr(p, attr_curfnt); setfield(g, 'font', v)
-               setfield(g, 'lang', lang_ja)
+               local g = node_new(id_glyph, 0)
+               setchar(g, getfield(p, 'value'))
+               setfont(g, has_attr(p, attr_curfnt))
+               setlang(g, lang_ja)
                set_attr(g, attr_kblshift, has_attr(p, attr_kblshift))
                head = node_insert_after(head, p, g)
                head = node_remove(head, p)

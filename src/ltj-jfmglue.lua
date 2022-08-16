@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2022-02-09',
+  date = '2022-08-16',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}
@@ -19,23 +19,29 @@ local pairs = pairs
 --local to_node = node.direct.tonode
 --local to_direct = node.direct.todirect
 
-local setfield = node.direct.setfield
-local setglue = luatexja.setglue
 local getfield = node.direct.getfield
 local getid = node.direct.getid
 local getfont = node.direct.getfont
 local getlist = node.direct.getlist
 local getchar = node.direct.getchar
+local getglue = luatexja.getglue
 local getsubtype = node.direct.getsubtype
+local getshift = node.direct.getshift
+local getwidth = node.direct.getwidth
+local getdepth = node.direct.getdepth
+local getpenalty = node.direct.getpenalty
+local setfield = node.direct.setfield
+local setglue = luatexja.setglue
+local setshift = node.direct.setshift
 local if_lang_ja
 do
     local lang_ja = luatexja.lang_ja
     local getlang = node.direct.getlang
     -- glyph with font number 0 (\nullfont) is always considered an ALchar node
-    if_lang_ja = getlang 
-      and function (n) return (getlang(n)==lang_ja)and(getfont(n)~=0) end
-      or  function (n) return (getfield(n,'lang')==lang_ja)and(getfont(n)~=0) end
+    if_lang_ja = function (n) return (getlang(n)==lang_ja)and(getfont(n)~=0) end
 end
+local setpenalty = node.direct.setpenalty
+local setkern = node.direct.setkern
   
 local has_attr = node.direct.has_attribute
 local set_attr = node.direct.set_attribute
@@ -48,7 +54,7 @@ local ltjf_find_char_class = ltjf.find_char_class
 local node_new = luatexja.dnode_new
 local node_copy = node.direct.copy
 local node_tail = node.direct.tail
-local node_free = node.direct.free
+local node_free = node.direct.flush_node or node.direct.free
 local node_remove = node.direct.remove
 local node_inherit_attr = luatexja.node_inherit_attr
 
@@ -131,8 +137,6 @@ end
 -- penalty 値の計算
 local add_penalty
 do
-local setpenalty = node.direct.setpenalty or function(n, a) setfield(n,'penalty',a) end
-local getpenalty = node.direct.getpenalty or function(n) return getfield(n,'penalty') end
 function add_penalty(p,e)
    local pp = getpenalty(p)
    if (pp>-10000) and (pp<10000) then
@@ -206,7 +210,7 @@ local function check_box(box_ptr, box_end)
             if find_first_char then first_char = s; find_first_char = false end
             last_char = s; found_visible_node = true
          else
-            if getfield(p, 'shift')==0 then
+            if getshift(p)==0 then
                last_char = nil
                if check_box(getlist(p), nil) then found_visible_node = true end
                find_first_char = false
@@ -311,6 +315,8 @@ do -- 002 ---------------------------------------
    local attr_jchar_class = luatexbase.attributes['ltj@charclass']
    local attr_jchar_code = luatexbase.attributes['ltj@charcode']
    local font_getfont = font.getfont
+   local setwhd = node.direct.setwhd
+   local setdir = node.direct.setdir
    local function calc_np_notdef(lp)
       if not font_getfont(getfont(lp)).characters[getchar(lp)] then
          local ln = node_next(lp)
@@ -342,8 +348,8 @@ function calc_np_aux_glyph_common(lp, acc_flag)
       local first_glyph, last_glyph = lp
       set_attr(lp, attr_icflag, PROCESSED); Np.last = lp
       local y_adjust = has_attr(lp,attr_ablshift) or 0
-      local node_depth = getfield(lp, 'depth') + min(y_adjust, 0)
-      local adj_depth = (y_adjust>0) and (getfield(lp, 'depth') + y_adjust) or 0
+      local node_depth = getdepth(lp) + min(y_adjust, 0)
+      local adj_depth = (y_adjust>0) and (getdepth(lp) + y_adjust) or 0
       setfield(lp, 'yoffset', getfield(lp, 'yoffset') - y_adjust); lp = node_next(lp)
       local lx=lp
       while lx do
@@ -355,8 +361,8 @@ function calc_np_aux_glyph_common(lp, acc_flag)
                -- 欧文文字
                last_glyph = lx; set_attr(lx, attr_icflag, PROCESSED); Np.last = lx
                y_adjust = has_attr(lx,attr_ablshift) or 0
-               node_depth = max(getfield(lx, 'depth') + min(y_adjust, 0), node_depth)
-               adj_depth = (y_adjust>0) and max(getfield(lx, 'depth') + y_adjust, adj_depth) or adj_depth
+               node_depth = max(getdepth(lx) + min(y_adjust, 0), node_depth)
+               adj_depth = (y_adjust>0) and max(getdepth(lx) + y_adjust, adj_depth) or adj_depth
                setfield(lx, 'yoffset', getfield(lx, 'yoffset') - y_adjust); lx = node_next(lx)
             elseif lid==id_kern then
                local ls = getsubtype(lx)
@@ -366,7 +372,7 @@ function calc_np_aux_glyph_common(lp, acc_flag)
                   if getid(lx)==id_glyph then
                      setfield(lx, 'yoffset', getfield(lx, 'yoffset') - (has_attr(lx,attr_ablshift) or 0))
                   else -- アクセントは上下にシフトされている
-                     setfield(lx, 'shift', getfield(lx, 'shift') + (has_attr(lx,attr_ablshift) or 0))
+                     setshift(lx, getshift(lx) + (has_attr(lx,attr_ablshift) or 0))
                   end
                   set_attr(lx, attr_icflag, PROCESSED)
                   lx = node_next(lx); set_attr(lx, attr_icflag, PROCESSED)
@@ -385,8 +391,7 @@ function calc_np_aux_glyph_common(lp, acc_flag)
       local r
       if adj_depth>node_depth then
             r = node_new(id_rule,3,first_glyph)
-            setfield(r, 'width', 0); setfield(r, 'height', 0)
-            setfield(r, 'depth',adj_depth); setfield(r, 'dir', tex_dir)
+            setwhd(r, 0, 0, adj_depth); setdir(r, tex_dir)
             set_attr(r, attr_icflag, PROCESSED)
       end
       if last_glyph then
@@ -436,7 +441,7 @@ calc_np_auxtable = {
       head, lp, op, flag = ltjd_make_dir_whatsit(head, lp, list_dir, 'jfm hlist')
       set_attr(op, attr_icflag, PROCESSED)
       Np.first = Np.first or op; Np.last = op; Np.nuc = op;
-      if (flag or getfield(op, 'shift')~=0) then
+      if (flag or getshift(op)~=0) then
          Np.id = id_box_like
       else
          Np.id = id_hlist
@@ -522,7 +527,7 @@ calc_np_auxtable = {
          if getid(lp)==id_glyph then -- アクセント本体
             setfield(lp, 'yoffset', getfield(lp, 'yoffset') - (has_attr(lp,attr_ablshift) or 0))
          else -- アクセントは上下にシフトされている
-            setfield(lp, 'shift', getfield(lp, 'shift') + (has_attr(lp,attr_ablshift) or 0))
+            setshift(lp, getshift(lp) + (has_attr(lp,attr_ablshift) or 0))
          end
          set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
          set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
@@ -692,7 +697,7 @@ local function handle_penalty_normal(post, pre, g)
       if (a~=0 and not(g and getid(g)==id_kern)) then
          local p = node_new(id_penalty, nil, Nq.nuc, Np.nuc)
          if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
-         setfield(p, 'penalty', a); head = insert_before(head, Np.first, p)
+         setpenalty(p, a); head = insert_before(head, Np.first, p)
          Bp[1]=p; set_attr(p, attr_icflag, KINSOKU)
       end
    else for _, v in pairs(Bp) do add_penalty(v,a) end
@@ -706,7 +711,7 @@ local function handle_penalty_always(post, pre, g)
       if not (g and getid(g)==id_glue) or a~=0 then
          local p = node_new(id_penalty, nil, Nq.nuc, Np.nuc)
          if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
-         setfield(p, 'penalty', a); head = insert_before(head, Np.first, p)
+         setpenalty(p, a); head = insert_before(head, Np.first, p)
          Bp[1]=p; set_attr(p, attr_icflag, KINSOKU)
       end
    else for _, v in pairs(Bp) do add_penalty(v,a) end
@@ -718,7 +723,7 @@ local function handle_penalty_suppress(post, pre, g)
    if #Bp == 0 then
       if g and getid(g)==id_glue then
          local p = node_new(id_penalty, nil, Nq.nuc, Np.nuc)
-         setfield(p, 'penalty', 10000); head = insert_before(head, Np.first, p)
+         setpenalty(p, 10000); head = insert_before(head, Np.first, p)
          Bp[1]=p; set_attr(p, attr_icflag, KINSOKU)
       end
    else 
@@ -733,7 +738,7 @@ local function handle_penalty_jwp()
       if a~=0 then
          local p = node_new(id_penalty, widow_Np.nuc)
          if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
-         setfield(p, 'penalty', a); head = insert_before(head, widow_Np.first, p)
+         setpenalty(p, a); head = insert_before(head, widow_Np.first, p)
          widow_Bp[1]=p; set_attr(p, attr_icflag, KINSOKU)
       end
    else for _, v in pairs(widow_Bp) do add_penalty(v,a) end
@@ -746,7 +751,7 @@ local function new_jfm_glue(mc, bc, ac)
    local g = mc[bc][ac]
    if g then
        if g[1] then
-          local k = node_new(id_kern, 1); setfield(k, 'kern', g[1]) 
+          local k = node_new(id_kern, 1); setkern(k, g[1]) 
           set_attr(k, attr_icflag, FROM_JFM)
           return k, g.ratio, false, false, false
        else
@@ -779,6 +784,7 @@ do
    local bg_ak = 2*id_glue - id_kern
    local bk_ag = 2*id_kern - id_glue
    local bk_ak = 2*id_kern - id_kern
+   local getkern = node.direct.getkern
 
    local function blend_diffmet(b, a, rb, ra)
       return round(luatexja.jfmglue.diffmet_rule((1-rb)*b+rb*a, (1-ra)*b+ra*a))
@@ -800,24 +806,24 @@ do
          db, da = 0, 1
       end
       if not gb then
-         if ga then gb = node_new(id_kern, 1); setfield(gb, 'kern', 0)
+         if ga then gb = node_new(id_kern, 1); setkern(gb, 0)
          else return nil end
       elseif not ga then
-         ga = node_new(id_kern, 1); setfield(ga, 'kern', 0)
+         ga = node_new(id_kern, 1); setkern(ga, 0)
       end
       local gbw, gaw, gbst, gast, gbsto, gasto, gbsh, gash, gbsho, gasho
       if getid(gb)==id_glue then
          gbw, gbst, gbsh, gbsto, gbsho = getglue(gb)
       else
-         gbw = getfield(gb, 'kern')
+         gbw = getkern(gb)
       end
       if getid(ga)==id_glue then
          gaw, gast, gash, gasto, gasho = getglue(ga)
       else
-         gaw = getfield(ga, 'kern')
+         gaw = getkern(ga)
       end
       if not (gbst or gast) then -- 両方とも kern
-         setfield(gb, 'kern', blend_diffmet(gbw, gaw, db, da))
+         setkern(gb, blend_diffmet(gbw, gaw, db, da))
          node_free(ga); return gb
       else
          local gr = gb
@@ -858,7 +864,7 @@ do
             local st = bp and (bp*getfield(kanji_skip, 'stretch')) or 0
             local sh = bh and (bh*getfield(kanji_skip, 'shrink')) or 0
             setglue(g,
-               bn and (bn*getfield(kanji_skip, 'width')) or 0,
+               bn and (bn*getwidth(kanji_skip)) or 0,
                st, sh, 
                (st==0) and 0 or getfield(kanji_skip, 'stretch_order'),
                (sh==0) and 0 or getfield(kanji_skip, 'shrink_order'))
@@ -942,13 +948,14 @@ do
          elseif flag then
             return node_copy(xkanji_skip)
          else
-            local g = node_new(id_glue);
+            local g = node_new(id_glue)
+            local w, st, sh, sto, sho = getglue(xkanji_skip) 
             setglue(g,
-               bn and (bn*getfield(xkanji_skip, 'width')) or 0,
-               bp and (bp*getfield(xkanji_skip, 'stretch')) or 0,
-               bh and (bh*getfield(xkanji_skip, 'shrink')) or 0,
-               bp and getfield(xkanji_skip, 'stretch_order') or 0,
-               bh and getfield(xkanji_skip, 'shrink_order') or 0)
+               bn and (bn*w) or 0,
+               bp and (bp*st) or 0,
+               bh and (bh*sh) or 0,
+               bp and sto or 0,
+               bh and sho or 0)
             set_attr(g, attr_icflag, XKANJI_SKIP_JFM)
             return g
          end
@@ -1153,7 +1160,7 @@ local function handle_list_head(par_indented)
             set_attr(g, attr_icflag, BOXBDD)
             if getid(g)==id_glue and #Bp==0 then
                local h = node_new(id_penalty, nil, Np.nuc)
-               setfield(h, 'penalty', 10000); set_attr(h, attr_icflag, BOXBDD)
+               setpenalty(h, 10000); set_attr(h, attr_icflag, BOXBDD)
             end
             head = insert_before(head, Np.first, g)
          end
@@ -1196,18 +1203,15 @@ do
       attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
       local TEMP = node_new(id_glue) 
       -- TEMP is a dummy node, which will be freed at the end of the callback. 
-      -- ithout this node, set_attr(kanji_skip, ...) somehow creates an "orphaned"  attribute list.
-
+      -- Without this node, set_attr(kanji_skip, ...) somehow creates an "orphaned"  attribute list.
       do
           kanji_skip, kanjiskip_jfm_flag = skip_table_to_glue(KSK)
           set_attr(kanji_skip, attr_icflag, KANJI_SKIP)
       end
-
       do
           xkanji_skip, xkanjiskip_jfm_flag = skip_table_to_glue(XSK)
           set_attr(xkanji_skip, attr_icflag, XKANJI_SKIP)
       end
-
       if mode then
          -- the current list is to be line-breaked:
          -- hbox from \parindent is skipped.
@@ -1218,7 +1222,7 @@ do
                or (lpi==id_local)) do
             if (lpi==id_hlist) and (lps==3) then
                Np.char, par_indented = 'parbdd', 'parbdd'
-               Np.width = getfield(lp, 'width')
+               Np.width = getwidth(lp)
             end
             lp=node_next(lp); lpi, lps = getid(lp), getsubtype(lp) end
          return lp, node_tail(head), par_indented, TEMP
@@ -1375,6 +1379,7 @@ do
    local attr_tablshift = luatexbase.attributes['ltj@tablshift']
    local getcount, abs, scan_keyword = tex.getcount, math.abs, token.scan_keyword
    local tex_nest = tex.nest
+   local tex_getattr = tex.getattribute
    local get_current_jfont
    do
        local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
@@ -1382,7 +1387,7 @@ do
        local dir_tate = luatexja.dir_table.dir_tate
        local get_dir_count = ltjd.get_dir_count        
        function get_current_jfont()
-           return tex.getattribute((get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
+           return tex_getattr((get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
        end
    end
    -- \insertxkanjiskip
@@ -1417,7 +1422,6 @@ do
        insert_k_skip_common(KSK, "kanjiskip", KANJI_SKIP, KANJI_SKIP_JFM)
    end
    -- callback
-   local getglue = luatexja.getglue
    local function special_jaglue(lx)
        local lxi = get_attr_icflag(lx)
        if lxi==SPECIAL_JAGLUE then

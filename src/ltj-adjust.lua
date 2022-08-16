@@ -12,18 +12,26 @@ luatexja.adjust = luatexja.adjust or {}
 local to_node = node.direct.tonode
 local to_direct = node.direct.todirect
 
-local setfield = node.direct.setfield
-local setglue = luatexja.setglue
 local getfield = node.direct.getfield
 local getlist = node.direct.getlist
 local getid = node.direct.getid
 local getfont = node.direct.getfont
 local getsubtype = node.direct.getsubtype
+local getlang = node.direct.getlang
+local getkern = node.direct.getkern
+local getshift = node.direct.getshift
+local getwidth = node.direct.getwidth    
+local getdepth = node.direct.getdepth
+local setfield = node.direct.setfield
+local setpenalty = node.direct.setpenalty
+local setglue = luatexja.setglue
+local setkern = node.direct.setkern
+local setlist = node.direct.setlist
 
 local node_traverse_id = node.direct.traverse_id
 local node_new = node.direct.new
 local node_next = node.direct.getnext
-local node_free = node.direct.free
+local node_free = node.direct.flush_node or node.direct.free
 local node_prev = node.direct.getprev
 local node_tail = node.direct.tail
 local has_attr = node.direct.has_attribute
@@ -130,7 +138,7 @@ function get_total_stretched(p)
    if not total_sh.order then
        total_sh.order, total_sh[-65536] = -1,0.1 -- dummy
    end
-   return getfield(p,'width') - dimensions(ph)
+   return getwidth(p) - dimensions(ph)
 end
 end
 
@@ -152,7 +160,7 @@ local function aw_step1(p, total)
        -- 無限大のグルーで処理が行われているときは処理中止．
        return total, false
    end
-   if xi == id_glyph and getfield(x, 'lang')==lang_ja then
+   if xi == id_glyph and getlang(x)==lang_ja then
       -- 和文文字
       xc = x
    elseif xi == id_hlist and get_attr_icflag(x) == PACKED then
@@ -186,7 +194,7 @@ local function aw_step1(p, total)
    end)
    if eadt[eadt_ratio[1][1]]~=0 then
       local kn = node_new(id_kern, 1)
-      setfield(kn, 'kern', eadt[eadt_ratio[1][1]]); set_attr(kn, attr_icflag, LINEEND)
+      setkern(kn, eadt[eadt_ratio[1][1]]); set_attr(kn, attr_icflag, LINEEND)
       insert_after(head, x, kn)
       return eadt_ratio[1][3], true
    else
@@ -196,6 +204,7 @@ end
 
 -- step 1 最終行用
 local min, max = math.min, math.max
+local setsubtype = node.direct.setsubtype
 local function aw_step1_last(p, total)
    local head = getlist(p)
    local x = node_tail(head); if not x then return total, false end
@@ -204,7 +213,7 @@ local function aw_step1_last(p, total)
    if getid(pf) ~= id_glue or getsubtype(pf) ~= 15 then return total, false end
    x = node_prev(node_prev(pf))
    local xi, xc = getid(x)
-   if xi == id_glyph and getfield(x, 'lang')==lang_ja then
+   if xi == id_glyph and getlang(x)==lang_ja then
       -- 和文文字
       xc = x
    elseif xi == id_hlist and get_attr_icflag(x) == PACKED then
@@ -235,11 +244,11 @@ local function aw_step1_last(p, total)
       return total, false
    end
    -- 続行条件2: min(eadt[1], 0)<= \parfillskip <= max(eadt[#eadt], 0)
-   local pfw = getfield(pf, 'width') 
+   local pfw = getwidth(pf)
      + (total>0 and getfield(pf, 'stretch') or -getfield(pf, 'shrink')) *getfield(p, 'glue_set') 
    if pfw<min(0,eadt[1]) or max(0,eadt[#eadt])<pfw then return total, false end
    -- \parfillskip を 0 にする
-   total = total + getfield(pf, 'width') 
+   total = total + getwidth(pf)
    total_st.order, total_sh.order = 0, 0
    if getfield(pf, 'stretch_order')==0 then 
       local i = at2pr_st[-1] 
@@ -253,7 +262,7 @@ local function aw_step1_last(p, total)
       total_sh[i] = total_sh[i] - getfield(pf, 'shrink') 
       total_sh.order = (total_sh[0]==0) and -1 or 0
    end
-   setfield(pf, 'subtype', 1); setglue(pf)
+   setsubtype(pf, 1); setglue(pf)
    local eadt_ratio = {}
    for i, v in ipairs(eadt) do
       local t = total - v
@@ -273,7 +282,7 @@ local function aw_step1_last(p, total)
    end)
    if eadt[eadt_ratio[1][1]]~=0 then
       local kn = node_new(id_kern, 1)
-      setfield(kn, 'kern', eadt[eadt_ratio[1][1]]); set_attr(kn, attr_icflag, LINEEND)
+      setkern(kn, eadt[eadt_ratio[1][1]]); set_attr(kn, attr_icflag, LINEEND)
       insert_after(head, x, kn)
       return eadt_ratio[1][3], true
    else
@@ -289,9 +298,9 @@ local node_hpack = node.direct.hpack
 local function repack(p)
    local orig_of, orig_hfuzz, orig_hbad = tex.overfullrule, tex.hfuzz, tex.hbadness
    tex.overfullrule=0; tex.hfuzz=1073741823; tex.hbadness=10000
-   local f = node_hpack(getlist(p), getfield(p, 'width'), 'exactly')
+   local f = node_hpack(getlist(p), getwidth(p), 'exactly')
    tex.overfullrule=orig_of; tex.hfuzz=orig_hfuzz; tex.hbadness=orig_hbad
-   setfield(f, 'head', nil)
+   setlist(f, nil)
    setfield(p, 'glue_set', getfield(f, 'glue_set'))
    setfield(p, 'glue_order', getfield(f, 'glue_order'))
    setfield(p, 'glue_sign', getfield(f, 'glue_sign'))
@@ -358,27 +367,27 @@ do
          if not eadt then return end
          if eadt[1]~=0 then
             local x = node_new(id_kern, 1)
-            setfield(x, 'kern', eadt[1]); set_attr(x, attr_icflag, LINEEND)
+            setkern(x, eadt[1]); set_attr(x, attr_icflag, LINEEND)
             insert_before(head, np.first, x)
          end
          local eadt_num = #eadt
          for i=2,eadt_num do
             local x = node_new(id_penalty)
-            setfield(x, 'penalty', 0); set_attr(x, attr_icflag, KINSOKU)
+            setpenalty(x, 0); set_attr(x, attr_icflag, KINSOKU)
             insert_before(head, np.first, x); Bp[#Bp+1] = x
             local x = node_new(id_kern, 1)
-            setfield(x, 'kern', eadt[i]-eadt[i-1]); set_attr(x, attr_icflag, LINEEND)
+            setkern(x, eadt[i]-eadt[i-1]); set_attr(x, attr_icflag, LINEEND)
             insert_before(head, np.first, x)
          end
          if eadt_num>1 or eadt[1]~=0 then
             local x = node_new(id_penalty)
-            setfield(x, 'penalty', 0); set_attr(x, attr_icflag, KINSOKU)
+            setpenalty(x, 0); set_attr(x, attr_icflag, KINSOKU)
             insert_before(head, np.first, x); Bp[#Bp+1] = x
             local x = node_new(id_kern, 1)
-            setfield(x, 'kern', -eadt[eadt_num]); set_attr(x, attr_icflag, LINEEND)
+            setkern(x, -eadt[eadt_num]); set_attr(x, attr_icflag, LINEEND)
             insert_before(head, np.first, x)
             local x = node_new(id_penalty)
-            setfield(x, 'penalty', 10000); set_attr(x, attr_icflag, KINSOKU)
+            setpenalty(x, 10000); set_attr(x, attr_icflag, KINSOKU)
             insert_before(head, np.first, x); Bp[#Bp+1] = x
          end
       end
@@ -496,7 +505,7 @@ do
   local insert = table.insert
   local rangedimensions, max = node.direct.rangedimensions, math.max
   local function profile_inner(box, range, ind, vmirrored, adj)
-    local w_acc, d_before = getfield(box,'shift'), 0
+    local w_acc, d_before = getshift(box), 0
     local x = getlist(box); local xn = node_next(x)
     while x do
       local w, h, d
@@ -528,7 +537,7 @@ do
       end
       if lmin==1/0 then lmin = bw end
       return lmin, 
-         bw - lmin - getfield(before, 'depth')
+         bw - lmin - getdepth(before)
             - getfield(after, mirrored and 'depth' or 'height')
     end
   end
