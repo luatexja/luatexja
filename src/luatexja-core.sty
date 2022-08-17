@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2022-01-12 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2022-08-17 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -97,10 +97,10 @@
 \expandafter\endinput\fi\relax
 
 %% Check LuaTeX version.
-\ifnum\luatexversion<100
+\ifnum\luatexversion<110
   \@PackageError{luatexja-core}
     {This LuaTeX engine is too old for this package;\MessageBreak
-     at least 1.0.0 is needed}
+     at least 1.10.0 is needed}
     {Package loading is aborted now.\MessageBreak}
 \expandafter\endinput\fi\relax
 
@@ -162,7 +162,7 @@
 \loop\ifnum\ltj@tempcnta<7
   \expandafter\newattribute%
     \csname ltj@kcat\the\ltj@tempcnta\endcsname
-  \csname ltj@kcat\the\ltj@tempcnta\endcsname=0
+  \csname ltj@kcat\the\ltj@tempcnta\endcsname=\z@
   \advance\ltj@tempcnta\@ne
 \repeat
 
@@ -516,7 +516,7 @@
   t[\the\ltj@alljachar@inner] = function()
     font.current(get_attr(attr_curjfnt)); tex.language=lang_ja;
     for i=0,6 do
-      set_attr(luatexbase.attributes['ltj@kcat' .. floor(i)],0)
+      set_attr(luatexbase.attributes['ltj@kcat' .. floor(i)], 0)
     end
   end
 }

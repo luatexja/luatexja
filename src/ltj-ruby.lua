@@ -584,7 +584,7 @@ luatexbase.add_to_callback('hpack_filter', pre_high, 'ltj.ruby.pre', 100)
 local post_lown
 do
    local function write_aux(wv, num, bool)
-      local id = has_attr(wv, attr_ruby_id)
+      local id = has_attr(wv, attr_ruby_id) or 0
       if id>0 and cache_handle then
          cache_handle:write(
             'lrob[' .. tostring(id) .. ']=' .. num .. '\nlrob[' .. tostring(-id) .. ']=' .. tostring(bool) .. '\n')
