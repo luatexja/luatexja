@@ -406,7 +406,7 @@ do
         else
             t[0] = {}; tex.print(cat_lp, '\\input ltj-kinsoku.tex\\relax')
         end
-        luatexja.load_kinsoku=nil
+        luatexja.load_kinsoku=nil; ltjs.charprop_stack_table = nil
     end
 end
 

@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.charrange',
-  date = '2020-08-17',
+  date = '2022-08-17',
   description = 'Handling the range of Japanese characters',
 })
 luatexja.charrange = {}

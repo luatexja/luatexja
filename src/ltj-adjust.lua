@@ -398,7 +398,6 @@ local adjust_width
 do
    local myaw_step1, myaw_step2, myaw_step1_last
    local dummy =  function(p,t,n) return t, false end
-   local ltjs_fast_get_stack_skip = ltjs.fast_get_stack_skip
    function adjust_width(head)
       if not head then return head end
       local last_p
