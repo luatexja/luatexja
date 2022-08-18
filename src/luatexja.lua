@@ -187,10 +187,10 @@ end
 
 local function print_spec(p)
    local out=print_scaled(p.width or p[1])..'pt'
-   if p.stretch or p[2]~=0 then
+   if (p.stretch or p[2])~=0 then
       out=out..' plus '..print_glue(p.stretch or p[2], p.stretch_order or p[4])
    end
-   if p.shrink or p[3]~=0 then
+   if (p.shrink or p[3])~=0 then
       out=out..' minus '..print_glue(p.shrink or p[3], p.shrink_order or p[5])
    end
 return out
