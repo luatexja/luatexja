@@ -219,10 +219,9 @@ do
          if type(i) == 'number' then -- char_type
             for k,w in pairs(v.glue) do
                v[k] = {
-                  nil,
+                  nil, w[1], w[2], w[3],
                   ratio=w.ratio,
                   priority=FROM_JFM + w.priority,
-                  width = w[1], stretch = w[2], shrink = w[3],
                   kanjiskip_natural = w.kanjiskip_natural,
                   kanjiskip_stretch = w.kanjiskip_stretch,
                   kanjiskip_shrink =  w.kanjiskip_shrink,

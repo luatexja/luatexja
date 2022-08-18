@@ -186,12 +186,12 @@ local function print_glue(d,order)
 end
 
 local function print_spec(p)
-   local out=print_scaled(p.width)..'pt'
-   if p.stretch~=0 then
-      out=out..' plus '..print_glue(p.stretch,p.stretch_order)
+   local out=print_scaled(p.width or p[1])..'pt'
+   if p.stretch or p[2]~=0 then
+      out=out..' plus '..print_glue(p.stretch or p[2], p.stretch_order or p[4])
    end
-   if p.shrink~=0 then
-      out=out..' minus '..print_glue(p.shrink,p.shrink_order)
+   if p.shrink or p[3]~=0 then
+      out=out..' minus '..print_glue(p.shrink or p[3], p.shrink_order or p[5])
    end
 return out
 end
@@ -395,7 +395,7 @@ do
 end
 
 do
-    local cache_ver = 3 -- must be same as ltj-kinsoku.tex
+    local cache_ver = 4 -- must be same as ltj-kinsoku.tex
     local cache_outdate_fn = function (t) return t.version~=cache_ver end
     local t = ltjs.charprop_stack_table
     function luatexja.load_kinsoku()
@@ -406,7 +406,7 @@ do
         else
             t[0] = {}; tex.print(cat_lp, '\\input ltj-kinsoku.tex\\relax')
         end
-        luatexja.load_kinsoku=nil; ltjs.charprop_stack_table = nil
+        luatexja.load_kinsoku=nil
     end
 end
 

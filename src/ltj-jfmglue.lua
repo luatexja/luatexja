@@ -113,11 +113,12 @@ local function fast_find_char_class(c,m)
 end
 
 -- 文字クラスの決定
-local slow_find_char_class
+local slow_find_char_class, skip_table_to_glue
 do
    local start_time_measure = ltjb.start_time_measure
    local stop_time_measure = ltjb.stop_time_measure
-   slow_find_char_class = function (c, m, oc)
+   local fast_get_stack_skip = ltjs.fast_get_stack_skip
+   function slow_find_char_class (c, m, oc)
       local cls = ltjf_find_char_class(oc, m)
       if oc~=c and c and cls==0 then
          return ltjf_find_char_class(c, m)
@@ -125,12 +126,11 @@ do
          return cls
       end
    end
-end
-
-local function skip_table_to_glue(n)
-   local g, st = node_new(id_glue), ltjs.fast_get_stack_skip(n)
-   setglue(g, st.width, st.stretch, st.shrink, st.stretch_order, st.shrink_order)
-   return g, (st.width==1073741823)
+   function skip_table_to_glue(n)
+      local g, st = node_new(id_glue), fast_get_stack_skip(n)
+      setglue(g, st[1], st[2], st[3], st[4], st[5])
+      return g, (st[1]==1073741823)
+   end
 end
 
 
@@ -759,7 +759,7 @@ local function new_jfm_glue(mc, bc, ac)
        else
           local f = node_new(id_glue)
           set_attr(f, attr_icflag, g.priority)
-          setglue(f, g.width, g.stretch, g.shrink)
+          setglue(f, g[2], g[3], g[4])
           return f, g.ratio, g.kanjiskip_natural, g.kanjiskip_stretch, g.kanjiskip_shrink
       end
    end
@@ -1392,6 +1392,7 @@ do
            return tex_getattr((get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
        end
    end
+   local get_stack_skip = ltjs.get_stack_skip
    -- \insertxkanjiskip
    -- SPECIAL_JAGLUE のノード：
    -- * (X)KANJI_SKIP(_JFM): その場で値が決まっている
@@ -1401,15 +1402,15 @@ do
        local g = node_new(id_glue); set_attr(g, attr_icflag, SPECIAL_JAGLUE)
        local is_late = scan_keyword("late")
        if not is_late then
-           local st = ltjs.get_stack_skip(ind, getcount('ltj@@stack'))
-           if st.width==1073741823 then
+           local st = get_stack_skip(ind, getcount('ltj@@stack'))
+           if st[1]==1073741823 then
                local bk = ltjf_font_metric_table[get_current_jfont()][name]
                if bk then
                    setglue(g, bk[1] or 0, bk[2] or 0, bk[3] or 0, 0, 0)
                end
                set_attr(g, attr_yablshift, icb); node_write(g); return
            end
-           setglue(g, st.width, st.stretch, st.shrink, st.stretch_order, st.shrink_order)
+           setglue(g, st[1], st[2], st[3], st[4], st[5])
            set_attr(g, attr_yablshift, ica)
        else
            set_attr(g, attr_yablshift, PROCESSED_BEGIN_FLAG + ica)

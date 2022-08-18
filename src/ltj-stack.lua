@@ -23,8 +23,7 @@ local scan_int, scan_keyword = token.scan_int, token.scan_keyword
 local tex_nest = tex.nest
 ltjs.hmode = 0 -- dummy
 
-local charprop_stack_table={};
-
+local charprop_stack_table={}
 ltjs.charprop_stack_table = charprop_stack_table
 charprop_stack_table[0]={}
 
@@ -94,17 +93,18 @@ local getglue = node.getglue
 function ltjs.set_stack_skip(m,sp)
   local i = get_stack_level()
   if not sp then return end
-  if not charprop_stack_table[i][m] then
-     charprop_stack_table[i][m] = {}
-  end
   local w,st,sh,sto,sho = getglue(sp)
-  local c = charprop_stack_table[i][m]
-  c.width, c.stretch, c.shrink, c.stretch_order, c.shrink_order = w, st, sh, sto, sho
+  if charprop_stack_table[i][m] then
+     local c = charprop_stack_table[i][m]
+     c[1], c[2], c[3], c[4], c[5] = w, st, sh, sto, sho
+  else
+     charprop_stack_table[i][m] = { w,st,sh,sto,sho }
+  end
   if luatexja.isglobal=='global' then
      for j,v in pairs(charprop_stack_table) do
-        if not v[m] then v[m] = {} end
+        if not v[m] then v[m] = { true,true,true,true,true } end
         local c = v[m]
-        c.width, c.stretch, c.shrink, c.stretch_order, c.shrink_order = w, st, sh, sto, sho
+        c[1], c[2], c[3], c[4], c[5] = w, st, sh, sto, sho
      end
   end
 end
@@ -115,7 +115,7 @@ local orig_char_table = {}
 ltjs.orig_char_table = orig_char_table
 ltjs.list_dir = nil -- dummy
 ltjs.table_current_stack = nil -- dummy
-local dummy_skip_table = { width = 0, stretch = 0, shrink = 0, stretch_order = 0, shrink_order = 0 }
+local dummy_skip_table = { 0,0,0,0,0 }
 function ltjs.report_stack_level(bsl)
    ltjs.table_current_stack = charprop_stack_table[bsl]
    return bsl
