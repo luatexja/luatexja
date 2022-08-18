@@ -153,9 +153,9 @@
 \loop\ifnum\ltj@tempcnta<7
   \expandafter\newattribute%
     \csname ltj@kcat\the\ltj@tempcnta\endcsname
-  \csname ltj@kcat\the\ltj@tempcnta\endcsname=\z@
   \advance\ltj@tempcnta\@ne
 \repeat
+\csname ltj@kcat0\endcsname=\z@
 
 
 %%%%%%%% Loading luatexja.lua
@@ -255,17 +255,17 @@
 \newluafunction\ltj@@ins@xk@inner
 \newluafunction\ltj@@ins@k@inner
 \directlua{
-  local t = lua.get_functions_table()
+  local t, ltjj = lua.get_functions_table(), luatexja.jfmglue
   t[\the\ltj@reset@globaldefs@inner] 
      = function() luatexja.global_temp = tex.globaldefs; tex.globaldefs = 0 end
   t[\the\ltj@restore@globaldefs@inner] 
      = function() tex.globaldefs = luatexja.global_temp end
-  t[\the\ltj@@disihb@inner] = luatexja.jfmglue.create_disinhibitglue_node
-  t[\the\ltj@@ihb@inner] = luatexja.jfmglue.create_inhibitglue_node
-  t[\the\ltj@@fakeparbegin@inner] = luatexja.jfmglue.create_beginpar_node
-  t[\the\ltj@@fakeboxbdd@inner] = luatexja.jfmglue.create_boxbdd_node
-  t[\the\ltj@@ins@xk@inner] = luatexja.jfmglue.insert_xk_skip
-  t[\the\ltj@@ins@k@inner] = luatexja.jfmglue.insert_k_skip
+  t[\the\ltj@@disihb@inner] = ltjj.create_disinhibitglue_node
+  t[\the\ltj@@ihb@inner] = ltjj.create_inhibitglue_node
+  t[\the\ltj@@fakeparbegin@inner] = ltjj.create_beginpar_node
+  t[\the\ltj@@fakeboxbdd@inner] = ltjj.create_boxbdd_node
+  t[\the\ltj@@ins@xk@inner] = ltjj.insert_xk_skip
+  t[\the\ltj@@ins@k@inner] = ltjj.insert_k_skip
 }
 \protected\luadef\ltj@reset@globaldefs  \ltj@reset@globaldefs@inner
 \protected\luadef\ltj@restore@globaldefs\ltj@restore@globaldefs@inner

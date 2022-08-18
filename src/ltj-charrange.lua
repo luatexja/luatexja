@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.charrange',
-  date = '2022-08-17',
+  date = '2022-08-19',
   description = 'Handling the range of Japanese characters',
 })
 luatexja.charrange = {}
@@ -23,15 +23,22 @@ local kcat_attr_table = {}
 local pow_table = {}
 local fn_table = {} -- used in is_ucs_in_japanese_char_direct
 local nfn_table = {} -- used in is_ucs_in_japanese_char_node
-for i = 0, 31*ATTR_RANGE-1 do
+do
+   local ka = luatexbase.attributes['ltj@kcat0']
+   for i = 0, 30 do
+      local pw = 2^i; kcat_attr_table[i], pow_table[i] = ka, pw
+      fn_table[i] = function(p) return has_attr(p, ka)&pw==0 end
+      nfn_table[i] = function(p) return has_attr_node(p, ka)&pw==0 end 
+   end
+end
+for i = 31, 31*ATTR_RANGE-1 do
    local ka, pw = luatexbase.attributes['ltj@kcat'..floor(i/31)], 2^(i%31)
    kcat_attr_table[i], pow_table[i] = ka, pw
-   fn_table[i] = function(p) return has_attr(p, ka)&pw==0 end
-   nfn_table[i] = function(p) return has_attr_node(p, ka)&pw==0 end 
+   fn_table[i] = function(p) return (has_attr(p, ka) or 0)&pw==0 end
+   nfn_table[i] = function(p) return (has_attr_node(p, ka) or 0)&pw==0 end 
 end
 fn_table[-1] = function() return false end -- for char --U+007F
 nfn_table[-1] = function() return false end -- for char --U+007F
-pow_table[31*ATTR_RANGE] = 2^31
 
 -- jcr_table_main[chr_code] = index
 -- index : internal 0,   1, 2, ..., 216               0: 'other'
@@ -99,7 +106,9 @@ function luatexja.charrange.toggle_char_range(g, i) -- i: external range number
       local kc
       if i>0 then kc=0 else kc=1; i=-i end; if i>=31*ATTR_RANGE then i=0 end
       local attr, p = kcat_attr_table[i], pow_table[i]
-      tex.setattribute(g, attr, (tex_getattr(attr)&~p)+kc*p)
+      local a = tex_getattr(attr); if a==UNSET then a=0 end
+      a = (a&~p)+kc*p; if a==0 and i>30 then a=UNSET end
+      tex.setattribute(g, attr, a)
    end
 end
 
