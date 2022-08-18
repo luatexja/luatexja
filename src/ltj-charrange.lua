@@ -72,7 +72,7 @@ end
 
 local function get_range_setting(i) -- i: internal range number
    local a = tex_getattr(kcat_attr_table[i])
-   return floor((a==UNSET and 0 or a)/pow_table[i])%2
+   return (a==UNSET and 0 or a)&pow_table[i]
 end
 
 --  glyph_node p は和文文字か？
@@ -85,7 +85,7 @@ function luatexja.charrange.is_ucs_in_japanese_char_direct(p ,c)
 end
 
 function luatexja.charrange.is_japanese_char_curlist(c) -- assume that c>=0x80
-   return get_range_setting(jcr_table_main[c])~= jcr_noncjk
+   return get_range_setting(jcr_table_main[c])==0
 end
 
 -- EXT

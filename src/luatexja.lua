@@ -204,9 +204,9 @@ end
 -- EXT: print parameters that don't need arguments
 do
    local tex_getattr = tex.getattribute
-   local function getattr(a)
-      local r = tex_getattr(a)
-      return (r==-0x7FFFFFFF) and 0 or r
+   local function getattr(a, d)
+      local r = tex_getattr(a); d = d or 0
+      return (r==-0x7FFFFFFF) and d or r
    end 
    luatexja.unary_pars = {
       yalbaselineshift = function(t)
@@ -231,10 +231,10 @@ do
          return ltjs.get_stack_table(stack_ind.JWP, 0, t)
       end,
       autospacing = function(t)
-         return getattr('ltj@autospc')
+         return getattr('ltj@autospc', 1)
       end,
       autoxspacing = function(t)
-         return getattr('ltj@autoxspc')
+         return getattr('ltj@autoxspc', 1)
       end,
       differentjfm = function(t)
          local f, r = luatexja.jfmglue.diffmet_rule, '???'
@@ -284,8 +284,8 @@ do
             c=0 -- external range 217 == internal range 0
          elseif c==31*ltjc.ATTR_RANGE then c=0
          end
-      -- 負の値は <U+0080 の文字の文字範囲，として出てくる．この時はいつも欧文文字なので 1 を返す
-         return (c<0) and 1 or ltjc.get_range_setting(c)
+         -- 負の値は <U+0080 の文字の文字範囲，として出てくる．この時はいつも欧文文字なので 1 を返す
+         if c<0 then return 1 else return (ltjc.get_range_setting(c)==0) and 0 or 1 end
       end,
       prebreakpenalty = function(c, t)
          return ltjs.get_stack_table(stack_ind.PRE + ltjb.in_unicode(c, true), 0, t)

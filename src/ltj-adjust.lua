@@ -590,7 +590,8 @@ do
         if Nq and Nq.met then Np.met = Nq.met; else Np.met = get_current_metric(lp) end
         Np.pre = 0; Np.post = 0; Np.xspc = 3
       else Np.met, Np.pre = nil, nil; end
-      Np.auto_kspc, Np.auto_xspc = (has_attr(lp, attr_autospc)==1), (has_attr(lp, attr_autoxspc)==1)
+      Np.auto_kspc, Np.auto_xspc
+        = not has_attr(lp, attr_autospc, 0), not has_attr(lp, attr_autoxspc, 0)
       return Np
     else return Np end
   end

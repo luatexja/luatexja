@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2022-08-16',
+  date = '2022-08-18',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}
@@ -622,7 +622,8 @@ do
       Nx.post = table_current_stack[POST + c] or 0
       Nx.xspc = table_current_stack[XSP  + c] or 3
       Nx.kcat = table_current_stack[KCAT + c] or 0
-      Nx.auto_kspc, Nx.auto_xspc = (has_attr(x, attr_autospc)==1), (has_attr(x, attr_autoxspc)==1)
+      Nx.auto_kspc, Nx.auto_xspc 
+       = not has_attr(x, attr_autospc, 0), not has_attr(x, attr_autoxspc, 0)
       return m, mc, cls
    end
    function set_np_xspc_jachar_hbox(Nx, x)
@@ -634,7 +635,8 @@ do
       Nx.post = table_current_stack[POST + c] or 0
       Nx.xspc = table_current_stack[XSP  + c] or 3
       Nx.kcat = table_current_stack[KCAT + c] or 0
-      Nx.auto_kspc, Nx.auto_xspc = (has_attr(x, attr_autospc)==1), (has_attr(x, attr_autoxspc)==1)
+      Nx.auto_kspc, Nx.auto_xspc
+       = not has_attr(x, attr_autospc, 0), not has_attr(x, attr_autoxspc, 0)
    end
 
 -- 欧文文字のデータを取得
@@ -657,7 +659,7 @@ do
       end
       Nx.met = nil
       Nx.xspc = table_current_stack[XSP  + c] or 3
-      Nx.auto_xspc = (has_attr(x, attr_autoxspc)==1)
+      Nx.auto_xspc = not has_attr(x, attr_autoxspc, 0)
    end
    local set_np_xspc_alchar = set_np_xspc_alchar
    -- change the information for the next loop

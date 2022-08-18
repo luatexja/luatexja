@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2022-08-17 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2022-08-18 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -125,10 +125,6 @@
 \newdimen\ltj@dimen@jQ \ltj@dimen@jQ=0.25mm
 \let\jQ=\ltj@dimen@jQ \let\jH=\jQ
 
-%%%%%%%% error message
-\def\ltj@defnum{0}
-\def\ltj@defdimen{0}
-
 %%%%%%%% Attributes for Japanese typesetting.
 \newattribute\ltj@icflag    % attribute for italic correction
 \newattribute\ltj@curjfnt   % index for ``current horizontal Japanese font''
@@ -148,13 +144,8 @@
 \newlanguage\ltj@@japanese
 \ltj@dir\z@
 \ltj@icflag\z@
-\ltj@charclass\z@
 \ltj@curjfnt\m@ne
 \ltj@curtfnt\m@ne
-\ltj@yablshift\z@
-\ltj@ykblshift\z@
-\ltj@tablshift\z@
-\ltj@tkblshift\z@
 
 %%%%%%%% Attributes for character ranges
 \newcount\ltj@tempcnta
@@ -357,18 +348,15 @@
 
 % {y,t}{ja,al}baselineshift = <dimen>
 % yjabaselineshift = <dimen>
-\define@key[ltj]{japaram}{yalbaselineshift}{%
-  \directlua{tex.setattribute(luatexja.isglobal,
-    luatexbase.attributes['ltj@yablshift'], token.scan_dimen())}#1\relax}
-\define@key[ltj]{japaram}{yjabaselineshift}{%
-  \directlua{tex.setattribute(luatexja.isglobal,
-    luatexbase.attributes['ltj@ykblshift'], token.scan_dimen())}#1\relax}
-\define@key[ltj]{japaram}{talbaselineshift}{%
-  \directlua{tex.setattribute(luatexja.isglobal,
-    luatexbase.attributes['ltj@tablshift'], token.scan_dimen())}#1\relax}
-\define@key[ltj]{japaram}{tjabaselineshift}{%
-  \directlua{tex.setattribute(luatexja.isglobal,
-    luatexbase.attributes['ltj@tkblshift'], token.scan_dimen())}#1\relax}
+\def\ltj@set@blshift@#1{\directlua{%
+  local n = token.scan_dimen()
+  tex.setattribute(luatexja.isglobal,
+    luatexbase.attributes['#1'], (n==0) and -0x7FFFFFFF or n)%
+}}
+\define@key[ltj]{japaram}{yalbaselineshift}{\ltj@set@blshift@{ltj@yablshift}#1\relax}
+\define@key[ltj]{japaram}{yjabaselineshift}{\ltj@set@blshift@{ltj@ykblshift}#1\relax}
+\define@key[ltj]{japaram}{talbaselineshift}{\ltj@set@blshift@{ltj@tablshift}#1\relax}
+\define@key[ltj]{japaram}{tjabaselineshift}{\ltj@set@blshift@{ltj@tkblshift}#1\relax}
 
 % jaxspmode = {<char_code>, <mode>}
 % mode: inhibit, preonly, postonly, allow
@@ -392,7 +380,7 @@
 % autospacing = <bool> (default: true)
 \define@boolkey[ltj]{japaram}{autospacing}[true]{%
   \ifltj@japaram@autospacing
-    \directlua{luatexja.ext_print_global()}\ltj@autospc\@ne
+    \directlua{luatexja.ext_print_global()}\unsetattribute\ltj@autospc
   \else
     \directlua{luatexja.ext_print_global()}\ltj@autospc\z@
   \fi}
@@ -400,7 +388,7 @@
 % autoxspacing = <bool> (default: true)
 \define@boolkey[ltj]{japaram}{autoxspacing}[true]{%
   \ifltj@japaram@autoxspacing
-    \directlua{luatexja.ext_print_global()}\ltj@autoxspc\@ne
+    \directlua{luatexja.ext_print_global()}\unsetattribute\ltj@autoxspc
   \else
     \directlua{luatexja.ext_print_global()}\ltj@autoxspc\z@
   \fi}
