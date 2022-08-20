@@ -305,8 +305,9 @@ do
       cstemp = csname:sub( (utfbyte(csname,1,1) == tex.escapechar) and 2 or 1, -1)
       cstemp = cstemp:sub(1, ((cstemp:sub(-1,-1)==' ') and (cstemp:len()>=2)) and -2 or -1)
       global_flag = g and '\\global' or ''
-      tex.sprint(cat_lp, '\\expandafter\\font\\csname ',
-                 (cstemp==' ') and '\\space' or cstemp, '\\endcsname')
+      tex.sprint(cat_lp, '\\expandafter\\font\\csname ')
+      tex.sprint(-2, (cstemp==' ') and '\\space' or cstemp)
+      tex.sprint(cat_lp, '\\endcsname')
    end
 
    luatexbase.create_callback("luatexja.define_jfont", "data", function (ft, fn) return ft end)
@@ -347,9 +348,9 @@ do
 
       fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
       font_metric_table[fn]=fmtable
-      tex.sprint(cat_lp, global_flag, '\\protected\\expandafter\\def\\csname ',
-                    (cstemp==' ') and '\\space' or cstemp, '\\endcsname{\\ltj@cur'..
-                    (jfm_dir == 'yoko' and 'j' or 't') .. 'fnt', fn, '\\relax}')
+      tex.sprint(cat_lp, global_flag, '\\protected\\expandafter\\def\\csname ')
+      tex.sprint(-2, (cstemp==' ') and '\\space' or cstemp)
+      tex.sprint(cat_lp, '\\endcsname{\\ltj@cur'.. (jfm_dir == 'yoko' and 'j' or 't') .. 'fnt', fn, '\\relax}')
       jfm_spec = nil
    end
 end
