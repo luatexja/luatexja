@@ -990,7 +990,7 @@ end
 
 -- vsplit
 do
-   local split_dir_whatsit, split_dir_head
+   local split_dir_whatsit, split_dir_head, split_dir_at_2nd
    local cat_lp = luatexbase.catcodetables['latex-package']
    local sprint, scan_int, tex_getbox = tex.sprint, token.scan_int, tex.getbox
    function luatexja.direction.vsplit()
@@ -998,15 +998,20 @@ do
       local p = to_direct(tex_getbox(n))
       if split_dir_head then node_free(split_dir_head); split_dir_head = nil end
       if split_dir_whatsit then split_dir_watsit = nil end
-      split_dir_head = nil; split_dir_whatsit=nil
       if p then
          local bh = getlist(p)
          if getid(bh)==id_whatsit and getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR 
             and node_next(bh) then
             ltjs.list_dir = has_attr(bh, attr_dir)
-            local q = node_next(p)
-            setlist(p, (node_remove(bh,bh,bh)))
-            split_dir_head = bh
+            setlist(p, (node_remove(bh,bh)))
+            split_dir_head, split_dir_2nd = bh, false
+         else
+            local w = node_next(bh)
+            if getid(w)==id_whatsit and getsubtype(w)==sid_user and getfield(w, 'user_id')==DIR then
+               ltjs.list_dir = has_attr(w, attr_dir)
+               setlist(p, (node_remove(bh,w)))
+               split_dir_head, split_dir_2nd = w, true
+            end
          end
       end
       sprint(cat_lp, '\\ltj@@orig@vsplit' .. tostring(n))
@@ -1021,7 +1026,9 @@ do
       elseif gc=='split_off'  then
          if split_dir_head then
             ltjs.list_dir = has_attr(split_dir_head, attr_dir)
-            hd = insert_before(hd, hd, split_dir_head)
+            if split_dir_2nd then hd = insert_after(hd, hd, split_dir_head)
+            else hd = insert_before(hd, hd, split_dir_head)
+            end
             split_dir_head=nil
          end
          if split_dir_whatsit then
