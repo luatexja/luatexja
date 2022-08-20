@@ -44,6 +44,7 @@ local id_whatsit = node.id 'whatsit'
 local sid_save   = node.subtype 'pdf_save'
 local sid_user   = node.subtype 'user_defined'
 
+local getnest = tex.getnest
 local tex_nest = tex.nest
 local tex_getcount = tex.getcount
 local ensure_tex_attr = ltjb.ensure_tex_attr
@@ -110,7 +111,7 @@ do
    end
    function get_dir_count()
        for i=tex_nest.ptr, 1, -1 do
-           local h = tex_nest[i].head.next
+           local h = getnest(i).head.next
            if h then
                local t = get_dir_count_inner(h)
                if t~=0 then return t end
@@ -120,7 +121,7 @@ do
    end
    function get_adjust_dir_count()
       for i=tex_nest.ptr, 1, -1 do
-         local v = tex_nest[i]
+         local v = getnest(i)
          local h, m = v.head.next, v.mode
          if abs(m)== ltjs.vmode and h then
             local t = get_dir_count_inner(h)
@@ -174,21 +175,20 @@ do
    local node_next_node, node_tail_node = node.next, node.tail
    local insert_after_node = node.insert_after
    function luatexja.direction.set_list_direction_hook(v)
-      local lv = tex_nest.ptr -- must be >= 1
       if not v then
          v = get_dir_count()
-         if abs(tex_nest[lv-1].mode) == ltjs.mmode and v == dir_tate then
+         if abs(getnest(tex_nest.ptr-1).mode) == ltjs.mmode and v == dir_tate then
             v = dir_utod
          end
       elseif v=='adj' then
          v = get_adjust_dir_count()
       end
-      local h = tex_nest[lv].head
+      local h = getnest().head
       local hn = node.next(h)
       hn = (hn and hn.id==id_local) and hn or h
       local w = to_node(dir_pool[v]())
       insert_after_node(h, hn, w)
-      tex_nest[lv].tail = node_tail_node(w)
+      getnest().tail = node_tail_node(w)
       ensure_tex_attr(attr_icflag, 0)
       ensure_tex_attr(attr_dir, 0)
    end
@@ -197,13 +197,13 @@ do
       local lv = tex_nest.ptr
       if not v then
          v,name  = get_dir_count(), nil
-         if lv>=1 and abs(tex_nest[lv-1].mode) == ltjs.mmode and v == dir_tate then
+         if lv>=1 and abs(getnest(lv-1).mode) == ltjs.mmode and v == dir_tate then
             v = dir_utod
          end
       elseif v=='adj' then
          v,name = get_adjust_dir_count(), nil
       end
-      local current_nest = tex_nest[lv]
+      local current_nest = getnest()
       if tex.currentgrouptype==6 then
          ltjb.package_error(
                  'luatexja',
@@ -723,9 +723,9 @@ do
    local id_glue = node.id 'glue'
    local function lastbox_hook()
       start_time_measure 'box_primitive_hook'
-      local bn = tex_nest[tex_nest.ptr].tail
+      local bn = getnest().tail
       if bn then
-         local b, head = to_direct(bn), to_direct(tex_nest[tex_nest.ptr].head)
+         local b, head = to_direct(bn), to_direct(getnest().head)
          local bid = getid(b)
          if bid==id_hlist or bid==id_vlist then
             local p = getlist(b)
@@ -740,7 +740,7 @@ do
             if box_dir>= dir_node_auto then -- unwrap dir_node
                local p = node_prev(b)
                local dummy1, dummy2, nb = unwrap_dir_node(b, nil, box_dir)
-               setnext(p, nb);  tex_nest[tex_nest.ptr].tail = to_node(nb)
+               setnext(p, nb);  getnest().tail = to_node(nb)
                setnext(b, nil); setlist(b, nil)
                node_free(b); b = nb
             end
@@ -941,7 +941,7 @@ do
    function luatexja.direction.check_adjust_direction()
       start_time_measure 'box_primitive_hook'
       local list_dir = get_adjust_dir_count()
-      local a = tex_nest[tex_nest.ptr].tail
+      local a = getnest().tail
       local ad = to_direct(a)
       if a and getid(ad)==id_adjust then
          local adj_dir = get_box_dir(ad)
@@ -964,7 +964,7 @@ do
    function luatexja.direction.populate_insertion_dir_whatsit()
       start_time_measure 'box_primitive_hook'
       local list_dir = get_dir_count()
-      local a = tex_nest[tex_nest.ptr].tail
+      local a = getnest().tail
       local ad = to_direct(a)
       if (not a) or getid(ad)~=id_ins then
           a = node.tail(tex.lists.page_head); ad = to_direct(a)

@@ -303,12 +303,12 @@
 
 \setbox\z@\hbox{%
   \directlua{% This value depends on the version of LuaTeX.
-    luatexja.stack.hmode = -tex.nest[tex.nest.ptr].mode
+    luatexja.stack.hmode = -tex.getnest().mode
   }%
 }
 \setbox\z@\vbox{%
   \directlua{% This value depends on the version of LuaTeX.
-    luatexja.stack.vmode = -tex.nest[tex.nest.ptr].mode
+    luatexja.stack.vmode = -tex.getnest().mode
   }%
 }
 \setbox\z@\box\voidb@x
@@ -631,7 +631,7 @@
 \setbox\z@\hbox{%
   \primitive\everymath{}%
   $\directlua{% This value depends on the version of LuaTeX.
-     luatexja.stack.mmode = -tex.nest[tex.nest.ptr].mode
+     luatexja.stack.mmode = -tex.getnest().mode
   }$%
 }
 \setbox\z@\box\voidb@x

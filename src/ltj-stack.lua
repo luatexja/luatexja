@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.stack',
-  date = '2022-08-17',
+  date = '2022-08-20',
   description = 'LuaTeX-ja stack system',
 })
 luatexja.stack = {}
@@ -20,7 +20,7 @@ local STCK = luatexja.userid_table.STCK
 local fastcopy = table.fastcopy
 local setcount, getcount = tex.setcount, tex.getcount
 local scan_int, scan_keyword = token.scan_int, token.scan_keyword
-local tex_nest = tex.nest
+local getnest = tex.getnest
 ltjs.hmode = 0 -- dummy
 
 local charprop_stack_table={}
@@ -42,7 +42,7 @@ local function get_stack_level()
       charprop_stack_table[i] = fastcopy(charprop_stack_table[i-1])
       setcount('ltj@@stack', i)
       if gd~=0 then tex.globaldefs = gd end
-      if  tex_nest[tex_nest.ptr].mode == -ltjs.hmode then -- rest. hmode のみ
+      if getnest().mode == -ltjs.hmode then -- rest. hmode のみ
          local g = node_new(id_whatsit, sid_user)
          g.user_id=STCK; g.type=100; g.value=j; node.write(g)
       end

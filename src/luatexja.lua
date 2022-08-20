@@ -250,7 +250,7 @@ do
       end,
       direction = function()
          local v = ltjd.get_dir_count()
-         if math.abs(tex.nest[tex.nest.ptr].mode) == ltjs.mmode and v == dir_table.dir_tate then
+         if math.abs(tex.getnest().mode) == ltjs.mmode and v == dir_table.dir_tate then
             v = dir_table.dir_utod
          end
          return v
@@ -378,13 +378,14 @@ end
 
 -- lastnodechar
 do
+   local getnest = tex.getnest
    local id_glyph = node.id('glyph')
    function luatexja.pltx_composite_last_node_char()
-      local n = tex.nest[tex.nest.ptr].tail
+      local n = getnest()
       local r = '-1'
       if n then
          if n.id==id_glyph then
-            while n.componetns and  n.subtype and n.subtype%4 >= 2 do
+            while n.components and  n.subtype and n.subtype%4 >= 2 do
                n = node.tail(n)
             end
             r = tostring(n.char)

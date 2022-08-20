@@ -1015,12 +1015,12 @@ do
    local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
    local ensure_tex_attr = ltjb.ensure_tex_attr
    local node_write = node.direct.write
-   local fonts, tex_nest = font.fonts, tex.nest
+   local fonts, getnest = font.fonts, tex.getnest
    local new_ic_kern = function(g)  return node_new(id_kern,3) end
    local dir_tate = luatexja.dir_table.dir_tate
    -- EXT: italic correction
    function luatexja.jfont.append_italic()
-      local p = to_direct(tex_nest[tex_nest.ptr].tail)
+      local p = to_direct(getnest().tail)
       local TEMP = node_new(id_kern)
       if p and getid(p)==id_glyph then
          if is_ucs_in_japanese_char(p) then
