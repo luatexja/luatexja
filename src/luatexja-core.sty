@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2022-08-18 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2022-08-20 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -216,21 +216,21 @@
 
 %%%%%%%% \jfont\CS={...:...;jfm=metric;...}, \globaljfont
 \protected\def\jfont#1{%
-  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false, 'yoko','\luatexluaescapestring{\noexpand#1}')}}
+  \def\ltj@temp{#1}\afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false, 'yoko')}}
 \protected\def\globaljfont#1{%
-  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true,  'yoko','\luatexluaescapestring{\noexpand#1}')}}
+  \def\ltj@temp{#1}\afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true,  'yoko')}}
 \newluafunction\ltj@@jfont@inner
 \directlua{
   local t = lua.get_functions_table()
   t[\the\ltj@@jfont@inner] = luatexja.jfont.jfontdefY
 }
-\def\ltj@@jfont{\luafunction\ltj@@jfont@inner}
+\def\ltj@@jfont{\expandafter\expandafter\expandafter\luafunction\expandafter\ltj@@jfont@inner\ltj@temp}
 
 %%%%%%%% \tfont\CS={...:...;jfm=metric;...}, \globaltfont
 \protected\def\tfont#1{%
-  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false, 'tate','\luatexluaescapestring{\noexpand#1}')}}
+  \def\ltj@temp{#1}\afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false, 'tate')}}
 \protected\def\globaltfont#1{%
-  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true,  'tate','\luatexluaescapestring{\noexpand#1}')}}
+  \def\ltj@temp{#1}\afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true,  'tate')}}
 
 %%%%%%%% \zw, \zh
 \newluafunction\ltj@zw@inner

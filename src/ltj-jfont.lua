@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2022-08-16',
+  date = '2022-08-20',
   description = 'Loader for Japanese fonts',
 })
 
@@ -279,7 +279,6 @@ end
 local load_jfont_metric, check_callback_order
 local font_extra_info = {} -- defined later
 do
-   local cstemp
    local global_flag -- true if \globaljfont, false if \jfont
    load_jfont_metric = function()
      if jfm_name=='' then
@@ -300,14 +299,10 @@ do
 
 -- EXT
    local utfbyte = utf.byte
-   function luatexja.jfont.jfontdefX(g, dir, csname)
+   function luatexja.jfont.jfontdefX(g, dir)
       jfm_dir, is_def_jfont = dir, true
-      cstemp = csname:sub( (utfbyte(csname,1,1) == tex.escapechar) and 2 or 1, -1)
-      cstemp = cstemp:sub(1, ((cstemp:sub(-1,-1)==' ') and (cstemp:len()>=2)) and -2 or -1)
       global_flag = g and '\\global' or ''
-      tex.sprint(cat_lp, '\\expandafter\\font\\csname ')
-      tex.sprint(-2, (cstemp==' ') and '\\space' or cstemp)
-      tex.sprint(cat_lp, '\\endcsname')
+      tex.sprint(cat_lp, '\\expandafter\\font\\ltj@temp')
    end
 
    luatexbase.create_callback("luatexja.define_jfont", "data", function (ft, fn) return ft end)
@@ -316,15 +311,12 @@ do
    local fastcopy=table.fastcopy
    function luatexja.jfont.jfontdefY()
       local j = load_jfont_metric(jfm_dir)
-      local fn = font.id(cstemp)
-      local f = font_getfont(fn)
+      local fn = token.get_next().mode;  local f = font_getfont(fn)
       if not j then
          ltjb.package_error('luatexja', "bad JFM `" .. jfm_name .. "'",
                             'The JFM file you specified is not valid JFM file.\n'..
                                'So defining Japanese font is cancelled.')
-         tex.sprint(cat_lp, global_flag, '\\expandafter\\let\\csname ',
-                    (cstemp==' ') and '\\space' or cstemp,
-                       '\\endcsname=\\relax')
+         tex.sprint(cat_lp, global_flag, '\\expandafter\\let\\ltj@temp\\relax')
          return
       end
       if not f then return end
@@ -348,9 +340,8 @@ do
 
       fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
       font_metric_table[fn]=fmtable
-      tex.sprint(cat_lp, global_flag, '\\protected\\expandafter\\def\\csname ')
-      tex.sprint(-2, (cstemp==' ') and '\\space' or cstemp)
-      tex.sprint(cat_lp, '\\endcsname{\\ltj@cur'.. (jfm_dir == 'yoko' and 'j' or 't') .. 'fnt', fn, '\\relax}')
+      tex.sprint(cat_lp, global_flag, '\\protected\\expandafter\\def\\ltj@temp',
+        '{\\ltj@cur'.. (jfm_dir == 'yoko' and 'j' or 't') .. 'fnt', fn, '\\relax}')
       jfm_spec = nil
    end
 end
