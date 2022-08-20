@@ -6,6 +6,7 @@ luatexja.load_module 'direction'; local ltjd = luatexja.direction
 luatexja.lineskip = luatexja.lineskip or {}
 
 local to_direct = node.direct.todirect
+local to_node = node.direct.tonode
 local ltjl = luatexja.lineskip
 local id_glue    = node.id 'glue'
 local id_penalty = node.id 'penalty'
@@ -80,16 +81,18 @@ do
 local p_dummy = ltjl.p_dummy
 local make_dir_whatsit = luatexja.direction.make_dir_whatsit
 local get_dir_count = luatexja.direction.get_dir_count
-local node_write = node.direct.write
+local getwhd = node.direct.getwhd
+local setnext = node.direct.setnext
 local tex_nest = tex.nest
 
 local function dir_adjust_append_vlist(b, loc, prev, mirrored)
    local old_b = to_direct(b)
    local new_b = loc=='box' and 
       make_dir_whatsit(old_b, old_b, get_dir_count(), 'append_vlist') or old_b
+   local _, ht, dp = getwhd(new_b)
    if prev > -65536000 then
       local bw = texget('baselineskip', false)
-      local normal = bw - prev - getfield(new_b, mirrored and 'depth' or 'height')
+      local normal = bw - prev - (mirrored and dp or ht)
       local lmin, adj = nil, 0
       local tail = to_direct(tex_nest[tex_nest.ptr].tail)
       if p_dummy~=ltj_profiler then
@@ -105,11 +108,10 @@ local function dir_adjust_append_vlist(b, loc, prev, mirrored)
          end
       end
       local g = node_new(id_glue)
-      ltj_skip(lmin or normal, g, adj, normal, bw, loc); node_write(g)
+      ltj_skip(lmin or normal, g, adj, normal, bw, loc)
+      setnext(g, new_b); return to_node(g), (mirrored and ht or dp)
+   else return to_node(new_b), (mirrored and ht or dp)
    end
-   node_write(new_b)
-   tex.prevdepth = getfield(new_b, mirrored and 'height' or 'depth')
-   return nil -- do nothing on tex side
 end
 ltjb.add_to_callback('append_to_vlist_filter', dir_adjust_append_vlist, 'ltj.lineskip', 10000)
 end
