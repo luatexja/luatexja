@@ -417,7 +417,7 @@ do
 
 local node_type = node.type
 local node_next = node.next
-local has_attr = node.has_attribute
+local get_attr = node.get_attribute
 
 local id_penalty = node.id('penalty')
 local id_glyph = node.id('glyph')
@@ -435,7 +435,7 @@ local utfchar = utf.char
 local function debug_show_node_X(p,print_fn, limit, inner_depth)
    local k = prefix
    local s
-   local pt, pic = node_type(p.id), (has_attr(p, attr_icflag) or 0) % icflag_table.PROCESSED_BEGIN_FLAG
+   local pt, pic = node_type(p.id), (get_attr(p, attr_icflag) or 0) % icflag_table.PROCESSED_BEGIN_FLAG
    local base = prefix .. string.format('%X', pic) .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
    if pt == 'glyph' then
       s = base .. ' ' 
@@ -452,11 +452,11 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
       if pt=='ins' then
          s = base .. '(' .. print_scaled(p.height) .. '+'
             .. print_scaled(p.depth) .. ')'
-            .. ', dir=' .. tostring(node.has_attribute(p, attr_dir))
+            .. ', dir=' .. tostring(node.get_attribute(p, attr_dir))
       else
          s = base .. '(' .. print_scaled(p.height) .. '+'
             .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
-            .. ', dir=' .. tostring(node.has_attribute(p, attr_dir))
+            .. ', dir=' .. tostring(node.get_attribute(p, attr_dir))
       end
       if (p.shift or 0)~=0 then
          s = s .. ', shifted ' .. print_scaled(p.shift)
@@ -484,7 +484,7 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
    elseif pt=='rule' then
       s = base .. '(' .. print_scaled(p.height) .. '+'
          .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
-         .. ', dir=' .. tostring(node.has_attribute(p, attr_dir))
+         .. ', dir=' .. tostring(node.get_attribute(p, attr_dir))
       print_fn(s)
    elseif pt=='disc' then
       print_fn(s)
@@ -548,7 +548,7 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
          else
             s = s .. ' userid:' .. t .. '(node list)'
             if p.user_id==uid_table.DIR then
-               s = s .. ' dir: ' .. tostring(node.has_attribute(p, attr_dir))
+               s = s .. ' dir: ' .. tostring(node.get_attribute(p, attr_dir))
             end
             print_fn(s)
             local bid = inner_depth

@@ -40,7 +40,7 @@ local node_remove = node.direct.remove
 local node_next =  node.direct.getnext
 local node_copy, node_tail = node.direct.copy, node.direct.tail
 local node_free = node.direct.flush_node or node.direct.free
-local has_attr, set_attr = node.direct.has_attribute, node.direct.set_attribute
+local get_attr, set_attr = node.direct.get_attribute, node.direct.set_attribute
 local insert_before, insert_after = node.direct.insert_before, node.direct.insert_after
 local hpack = node.direct.hpack
 
@@ -158,7 +158,7 @@ end
 -- ルビ組版が行われている段落/hboxでの設定が使われる．
 -- ルビ文字を格納しているボックスでの設定ではない！
 local function get_attr_icflag(p)
-    return (has_attr(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
+    return (get_attr(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
 end
 local concat
 do
@@ -220,7 +220,7 @@ do
       local _, hh, hd = getwhd(box)
       local hx = h
       while hx do
-         local hic = has_attr(hx, attr_icflag) or 0
+         local hic = get_attr(hx, attr_icflag) or 0
          if (hic == KANJI_SKIP) or (hic == KANJI_SKIP_JFM)
             or (hic == XKANJI_SKIP) or (hic == XKANJI_SKIP_JFM)
             or ((hic<=FROM_JFM+63) and (hic>=FROM_JFM)) then
@@ -543,7 +543,7 @@ local function pre_high(ahead)
          local nv = getfield(n, 'value')
          local rst = getfield(nv, 'value')
          max_allow_pre = rst.pre or 0
-         local atr = has_attr(n, attr_ruby) or 0
+         local atr = get_attr(n, attr_ruby) or 0
          if max_allow_pre < 0 then
              -- 直前のルビで intrusion がおこる可能性あり．
              -- 前 run のデータが残っていればそれを使用，
@@ -584,7 +584,7 @@ luatexbase.add_to_callback('hpack_filter', pre_high, 'ltj.ruby.pre', 100)
 local post_lown
 do
    local function write_aux(wv, num, bool)
-      local id = has_attr(wv, attr_ruby_id) or 0
+      local id = get_attr(wv, attr_ruby_id) or 0
       if id>0 and cache_handle then
          cache_handle:write(
             'lrob[' .. tostring(id) .. ']=' .. num .. '\nlrob[' .. tostring(-id) .. ']=' .. tostring(bool) .. '\n')
@@ -594,8 +594,8 @@ do
    post_lown = function (rs, rw, cmp, ch)
       -- ch: the head of `current' hlist
       if #rs ==0 or not rw then return ch end
-      local hn = has_attr(rs[1], attr_ruby)
-      local fn = has_attr(rs[#rs], attr_ruby)
+      local hn = get_attr(rs[1], attr_ruby)
+      local fn = get_attr(rs[#rs], attr_ruby)
       local wv = getfield(rw, 'value')
       if hn==1 then
          if fn==2*cmp+2 then
@@ -603,7 +603,7 @@ do
             node_remove(wv, hn)
             insert_after(ch, rs[1], hn)
             set_attr(hn, attr_icflag,  PROCESSED)
-            write_aux(wv, has_attr(hn, attr_ruby), has_attr(hn, attr_ruby_post_jfmgk))-- 行中形
+            write_aux(wv, get_attr(hn, attr_ruby), get_attr(hn, attr_ruby_post_jfmgk))-- 行中形
          else
             local deg, hn = (fn-1)/2, wv
             for i = 1, deg do hn = node_next(hn) end;
@@ -611,7 +611,7 @@ do
             setnext(hn, nil)
             insert_after(ch, rs[1], hn)
             set_attr(hn, attr_icflag,  PROCESSED)
-            write_aux(wv, has_attr(hn, attr_ruby), has_attr(hn, attr_ruby_post_jfmgk))
+            write_aux(wv, get_attr(hn, attr_ruby), get_attr(hn, attr_ruby_post_jfmgk))
          end
       else
          local deg, hn = max((hn-1)/2,2), wv
@@ -622,7 +622,7 @@ do
          insert_after(ch, rs[1], hn)
          set_attr(hn, attr_icflag,  PROCESSED)
          if fn == 2*cmp-1 then
-            write_aux(wv, has_attr(hn, attr_ruby), has_attr(hn, attr_ruby_post_jfmgk))
+            write_aux(wv, get_attr(hn, attr_ruby), get_attr(hn, attr_ruby_post_jfmgk))
          end
       end
       for i = 1,#rs do
@@ -648,7 +648,7 @@ local function post_high_break(head)
                        or (hai == id_rule and getsubtype(ha)==0)
                        or (hai == id_whatsit and getsubtype(ha)==sid_user
                               and getfield(ha, 'user_id', RUBY_POST)))
-            and has_attr(ha, attr_ruby) or 0
+            and get_attr(ha, attr_ruby) or 0
          if i==0 then
             ha = node_next(ha)
          elseif i==1 then
@@ -680,7 +680,7 @@ local function post_high_hbox(ahead)
                     or (hai == id_rule and getsubtype(ha)==0)
                     or (hai == id_whatsit and getsubtype(ha)==sid_user
                            and getfield(ha, 'user_id', RUBY_POST)))
-         and has_attr(ha, attr_ruby) or 0
+         and get_attr(ha, attr_ruby) or 0
       if i==0 then
          ha = node_next(ha)
       elseif i==1 then
@@ -800,7 +800,7 @@ do
                end
                rst.post = p
             end
-            Np.prev_ruby = has_attr(getfield(Nq.nuc, 'value'), attr_ruby_id)
+            Np.prev_ruby = get_attr(getfield(Nq.nuc, 'value'), attr_ruby_id)
             -- 前のクラスタがルビであったことのフラグ
          else -- 直前が文字以外
             local nqnv = getfield(Nq.nuc, 'value')

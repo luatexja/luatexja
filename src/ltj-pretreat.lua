@@ -21,6 +21,7 @@ local getlang = node.direct.getlang
 
 local pairs = pairs
 local floor = math.floor
+local get_attr = node.direct.get_attribute
 local has_attr = node.direct.has_attribute
 local set_attr = node.direct.set_attribute
 local node_traverse = node.direct.traverse
@@ -72,8 +73,8 @@ do
             if uid==STCK then
                wt[#wt+1] = p; node_remove(head, p)
             elseif uid==DIR then
-               if has_attr(p, attr_icflag)<PROCESSED_BEGIN_FLAG  then
-                  ltjs.list_dir = has_attr(p, attr_dir)
+               if get_attr(p, attr_icflag)<PROCESSED_BEGIN_FLAG  then
+                  ltjs.list_dir = get_attr(p, attr_dir)
                else -- こっちのケースは通常使用では起こらない
                   wtd[#wtd+1] = p; node_remove(head, p)
                end
@@ -82,7 +83,7 @@ do
          return node_next(p)
       end,
    }
-   setmetatable(suppress_hyphenate_ja_aux, 
+   setmetatable(suppress_hyphenate_ja_aux,
                 { __index = function() return node_next end, })
    local id_boundary = node.id('boundary')
    local node_new, insert_before = node.direct.new, node.direct.insert_before
@@ -109,7 +110,7 @@ do
                      setfield(b, 'type', 100); setfield(b, 'user_id', JA_AL_BDD);
                      insert_before(head, p, b)
                   end
-                  local pf = has_attr(p, attr_curjfnt)
+                  local pf = get_attr(p, attr_curjfnt)
                   pf = (pf and pf>0 and pf) or getfont(p)
                   setfont(p, ltjf_replace_altfont(pf, pc))
                   setlang(p, lang_ja)
@@ -155,7 +156,7 @@ function set_box_stack_level(head, mode)
    if ltjs.list_dir == dir_tate then
       for p in traverse_id(id_glyph,to_direct(head)) do
          if has_attr(p, attr_icflag, 0) and getlang(p)==lang_ja then
-            local nf = ltjf_replace_altfont( has_attr(p, attr_curtfnt) or getfont(p) , ltjs_orig_char_table[p])
+            local nf = ltjf_replace_altfont( get_attr(p, attr_curtfnt) or getfont(p) , ltjs_orig_char_table[p])
             setfont(p, nf)
             if ltjf_font_metric_table[nf].vert_activated then
                local pc = getchar(p); pc = ltjf_font_metric_table[nf].vform[pc]

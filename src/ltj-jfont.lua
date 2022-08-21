@@ -19,7 +19,7 @@ local to_direct = node.direct.todirect
 
 local node_new = node.direct.new
 local node_free = node.direct.flush_node or node.direct.free
-local has_attr = node.direct.has_attribute
+local get_attr = node.direct.get_attribute
 local set_attr = node.direct.set_attribute
 local round = tex.round
 local font_getfont = font.getfont
@@ -1025,7 +1025,7 @@ do
       if p and getid(p)==id_glyph then
          if is_ucs_in_japanese_char(p) then
             local j = font_metric_table[
-               has_attr(p, (get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
+               get_attr(p, (get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
                ]
             local g = new_ic_kern()
             setkern(g, j.char_type[find_char_class(getchar(p), j)].italic)

@@ -34,7 +34,7 @@ local node_next = node.direct.getnext
 local node_free = node.direct.flush_node or node.direct.free
 local node_prev = node.direct.getprev
 local node_tail = node.direct.tail
-local has_attr = node.direct.has_attribute
+local get_attr = node.direct.get_attribute
 local set_attr = node.direct.set_attribute
 local insert_after = node.direct.insert_after
 
@@ -63,7 +63,7 @@ local get_attr_icflag
 do
    local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
    get_attr_icflag = function(p)
-      return (has_attr(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
+      return (get_attr(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
    end
 end
 
@@ -171,7 +171,7 @@ local function aw_step1(p, total)
       return total, false-- それ以外は対象外．
    end
    local eadt = ltjf_font_metric_table[getfont(xc)]
-      .char_type[has_attr(xc, attr_jchar_class) or 0].end_adjust
+      .char_type[get_attr(xc, attr_jchar_class) or 0].end_adjust
    if not eadt then 
       return total, false
    end
@@ -239,7 +239,7 @@ local function aw_step1_last(p, total)
       end
    end
    local eadt = ltjf_font_metric_table[getfont(xc)]
-      .char_type[has_attr(xc, attr_jchar_class) or 0].end_adjust
+      .char_type[get_attr(xc, attr_jchar_class) or 0].end_adjust
    if not eadt then 
       return total, false
    end
@@ -578,8 +578,9 @@ do
   local dir_tate = luatexja.dir_table.dir_tate
   local get_dir_count = ltjd.get_dir_count
   local ltjf_font_metric_table = ltjf.font_metric_table
+  local has_attr = node.direct.has_attribute
   local function get_current_metric(n)
-     local fn = has_attr(n, (get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
+     local fn = get_attr(n, (get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
      return fn and ltjf_font_metric_table[fn]
   end
   local function whatsit_callback(Np, lp, Nq)

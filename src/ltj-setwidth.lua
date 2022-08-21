@@ -39,7 +39,7 @@ local node_copy = node.direct.copy
 local node_remove = node.direct.remove
 local node_tail = node.direct.tail
 local node_next = node.direct.getnext
-local has_attr = node.direct.has_attribute
+local get_attr = node.direct.get_attribute
 local set_attr = node.direct.set_attribute
 local node_insert_before = node.direct.insert_before
 local node_insert_after = node.direct.insert_after
@@ -73,7 +73,7 @@ do
    local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
    local floor = math.floor
    get_pr_begin_flag = function (p)
-      local i = has_attr(p, attr_icflag) or 0
+      local i = get_attr(p, attr_icflag) or 0
       return i - i%PROCESSED_BEGIN_FLAG
    end
 end
@@ -99,7 +99,7 @@ local function capsule_glyph_yoko(p, met, char_data, head, dir)
    if not char_data then return node_next(p), head, p end
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = call_callback("luatexja.set_width", fshift, met, char_data)
-   local kbl = has_attr(p, attr_ykblshift) or 0
+   local kbl = get_attr(p, attr_ykblshift) or 0
    --
    -- f*: whd specified in JFM
    local pwidth, pheight,pdepth = getwhd(p)
@@ -159,7 +159,7 @@ luatexja.setwidth.capsule_glyph_yoko = capsule_glyph_yoko
 local function capsule_glyph_tate_rot(p, met, char_data, head, dir, asc)
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = call_callback("luatexja.set_width", fshift, met, char_data)
-   local kbl = has_attr(p, attr_tkblshift) or 0
+   local kbl = get_attr(p, attr_tkblshift) or 0
    -- f*: whd specified in JFM
    local pwidth, pheight,pdepth = getwhd(p)
    local fwidth = char_data.width or pwidth
@@ -192,7 +192,7 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
       if met.rotation and met.vert_activated then
           local f = font_getfont(pf)
           local r, l = met.rotation[pc], f.properties and f.properties.language
-          if ((r==true) or (type(r)=="table" and not r[l])) and (has_attr(p, attr_vert_ori) or 0)<=0 then
+          if ((r==true) or (type(r)=="table" and not r[l])) and (get_attr(p, attr_vert_ori) or 0)<=0 then
             return capsule_glyph_tate_rot(p, met, char_data, head, dir, 
               0.5*(get_ascender(pf)-get_descender(pf)))
           end
@@ -213,7 +213,7 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
    fshift = call_callback("luatexja.set_width", fshift, met, char_data)
    local fheight = char_data.height or 0
    local fdepth  = char_data.depth or 0
-   local y_shift = xo + (has_attr(p,attr_tkblshift) or 0)
+   local y_shift = xo + (get_attr(p,attr_tkblshift) or 0)
    local q
    head, q = node_remove(head, p)
    local box = node_new(id_hlist, nil, p)
@@ -250,7 +250,7 @@ local function capsule_glyph_math(p, met, char_data)
    fshift = call_callback("luatexja.set_width", fshift, met, char_data)
    local fheight, fdepth = char_data.height, char_data.depth
    local y_shift
-      = - getfield(p, 'yoffset') + (has_attr(p,attr_ykblshift) or 0)
+      = - getfield(p, 'yoffset') + (get_attr(p,attr_ykblshift) or 0)
    setfield(p, 'yoffset', -fshift.down)
    setfield(p, 'xoffset', getfield(p, 'xoffset') + char_data.align*(fwidth-pwidth) - fshift.left)
    local box = node_new(id_hlist, nil, p);
@@ -268,18 +268,18 @@ function luatexja.setwidth.apply_ashift_math(head, last, attr_ablshift)
       local pid = getid(p)
       if p==last then
          return
-      elseif (has_attr(p, attr_icflag) or 0) ~= PROCESSED then
+      elseif (get_attr(p, attr_icflag) or 0) ~= PROCESSED then
          if pid==id_hlist or pid==id_vlist then
-            setshift(p, getshift(p) +  (has_attr(p,attr_ablshift) or 0)) 
+            setshift(p, getshift(p) +  (get_attr(p,attr_ablshift) or 0)) 
          elseif pid==id_rule then
-            local v = has_attr(p,attr_ablshift) or 0
+            local v = get_attr(p,attr_ablshift) or 0
             setheight(p, getheight(p)-v); setdepth(p, getdepth(p)+v)
             set_attr(p, attr_icflag, PROCESSED)
          elseif pid==id_glyph then
             -- 欧文文字; 和文文字は pid == id_hlist の場合で処理される
             -- (see conv_jchar_to_hbox_A in ltj-math.lua)
             setfield(p, 'yoffset',
-                     getfield(p, 'yoffset') - (has_attr(p,attr_ablshift) or 0))
+                     getfield(p, 'yoffset') - (get_attr(p,attr_ablshift) or 0))
          end
          set_attr(p, attr_icflag, PROCESSED)
       end
@@ -297,7 +297,7 @@ do
       if not head then return end
       local y_adjust, node_depth, adj_depth = 0, 0, 0
       for lp in node_traverse_id(id_glyph, head) do
-         y_adjust = has_attr(lp,attr_ablshift) or 0
+         y_adjust = get_attr(lp,attr_ablshift) or 0
          local ld = getdepth(lp)
          node_depth = max(ld + min(y_adjust, 0), node_depth)
          adj_depth = (y_adjust>0) and max(ld + y_adjust, adj_depth) or adj_depth

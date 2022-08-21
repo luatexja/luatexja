@@ -31,7 +31,7 @@ local node_new = node.direct.new
 local node_remove = node.direct.remove
 local node_next = node.direct.getnext
 local node_free = node.direct.flush_node or node.direct.free
-local has_attr = node.direct.has_attribute
+local get_attr = node.direct.get_attribute
 local set_attr = node.direct.set_attribute
 local unset_attr = node.direct.unset_attribute
 local node_insert_after = node.direct.insert_after
@@ -168,9 +168,9 @@ local function extract(head)
             if puid==OTF then
                local g = node_new(id_glyph, 0)
                setchar(g, getfield(p, 'value'))
-               setfont(g, has_attr(p, attr_curfnt))
+               setfont(g, get_attr(p, attr_curfnt))
                setlang(g, lang_ja)
-               set_attr(g, attr_kblshift, has_attr(p, attr_kblshift))
+               set_attr(g, attr_kblshift, get_attr(p, attr_kblshift))
                head = node_insert_after(head, p, g)
                head = node_remove(head, p)
                node_free(p); p = g

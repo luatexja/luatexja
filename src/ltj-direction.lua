@@ -13,7 +13,7 @@ local dnode = node.direct
 local cat_lp = luatexbase.catcodetables['latex-package']
 local to_node = dnode.tonode
 local to_direct = dnode.todirect
-local has_attr = dnode.has_attribute
+local get_attr = dnode.get_attribute
 local set_attr = dnode.set_attribute
 local insert_before = dnode.insert_before
 local insert_after = dnode.insert_after
@@ -60,7 +60,7 @@ local dir_math_mod    = luatexja.dir_table.dir_math_mod
 local dir_node_auto   = luatexja.dir_table.dir_node_auto
 local dir_node_manual = luatexja.dir_table.dir_node_manual
 local function get_attr_icflag(p)
-   return (has_attr(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
+   return (get_attr(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
 end
 
 local page_direction
@@ -96,7 +96,7 @@ end
 
 local get_dir_count, get_adjust_dir_count
 do
-   local node_attr = node.has_attribute
+   local node_attr = node.get_attribute
    local function get_dir_count_inner(h)
       if h then
          if h.id==id_whatsit and h.subtype==sid_user and h.user_id==DIR then
@@ -333,7 +333,7 @@ do
          end
       end
       if hd==wh[1] then
-         ltjs.list_dir = has_attr(hd, attr_dir)
+         ltjs.list_dir = get_attr(hd, attr_dir)
          local x = node_next(hd)
          while x and getid(x)==id_glue and getsubtype(x)==3 do
             node_remove(hd,x); node_free(x); x = node_next(hd)
@@ -530,13 +530,13 @@ end
 -- 2nd ret val はその DIR whatsit
 function get_box_dir(b, default)
    start_time_measure 'get_box_dir'
-   local dir = has_attr(b, attr_dir) or 0
+   local dir = get_attr(b, attr_dir) or 0
    local bh = getfield(b, 'head') -- We cannot use getlist since b may be an unset_node.
    local c
    if bh~=0 then -- bh != nil
       for bh in traverse_id(id_whatsit, bh) do
          if getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR then
-            c = bh; dir = (dir==0) and has_attr(bh, attr_dir) or dir
+            c = bh; dir = (dir==0) and get_attr(bh, attr_dir) or dir
          end
       end
    end
@@ -688,7 +688,7 @@ do
          local db
          local dnh = getfield(dn, 'value')
          for x in traverse(dnh) do
-            if has_attr(x, attr_dir)%dir_math_mod == new_dir then
+            if get_attr(x, attr_dir)%dir_math_mod == new_dir then
                setfield(dn, 'value', to_node(node_remove(dnh, x)))
                db=x; break
             end
@@ -768,7 +768,7 @@ do
       if s_dir ~= l_dir then
          local not_found = true
          for x in traverse(getfield(wh, 'value')) do
-            if l_dir == has_attr(x, attr_dir)%dir_node_auto then
+            if l_dir == get_attr(x, attr_dir)%dir_node_auto then
                setdimen('ltj@tempdima', getfield(x, key))
                not_found = false; break
             end
@@ -818,7 +818,7 @@ do
          local db
          local dnh = getfield(wh, 'value')
          for x in traverse(dnh) do
-            if has_attr(x, attr_dir)%dir_node_auto==l_dir then
+            if get_attr(x, attr_dir)%dir_node_auto==l_dir then
                db = x; break
             end
          end
@@ -835,7 +835,7 @@ do
             -- change dimension of dir_nodes which are created "automatically"
                local bw, bh, bd = getwhd(s)
             for x in traverse(getfield(wh, 'value')) do
-               local x_dir = has_attr(x, attr_dir)
+               local x_dir = get_attr(x, attr_dir)
                if x_dir<dir_node_manual then
                   local info = dir_node_aux[s_dir][x_dir%dir_node_auto]
                   setwhd(x, info.width(bw,bh,bd), info.height(bw,bh,bd), info.depth(bw,bh,bd))
@@ -1002,13 +1002,13 @@ do
          local bh = getlist(p)
          if getid(bh)==id_whatsit and getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR 
             and node_next(bh) then
-            ltjs.list_dir = has_attr(bh, attr_dir)
+            ltjs.list_dir = get_attr(bh, attr_dir)
             setlist(p, (node_remove(bh,bh)))
             split_dir_head, split_dir_2nd = bh, false
          else
             local w = node_next(bh)
             if getid(w)==id_whatsit and getsubtype(w)==sid_user and getfield(w, 'user_id')==DIR then
-               ltjs.list_dir = has_attr(w, attr_dir)
+               ltjs.list_dir = get_attr(w, attr_dir)
                setlist(p, (node_remove(bh,w)))
                split_dir_head, split_dir_2nd = w, true
             end
@@ -1025,7 +1025,7 @@ do
          split_dir_whatsit = hd
       elseif gc=='split_off'  then
          if split_dir_head then
-            ltjs.list_dir = has_attr(split_dir_head, attr_dir)
+            ltjs.list_dir = get_attr(split_dir_head, attr_dir)
             if split_dir_2nd then hd = insert_after(hd, hd, split_dir_head)
             else hd = insert_before(hd, hd, split_dir_head)
             end

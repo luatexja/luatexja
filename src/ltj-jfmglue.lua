@@ -43,7 +43,7 @@ end
 local setpenalty = node.direct.setpenalty
 local setkern = node.direct.setkern
   
-local has_attr = node.direct.has_attribute
+local get_attr = node.direct.get_attribute
 local set_attr = node.direct.set_attribute
 local insert_before = node.direct.insert_before
 local insert_after = node.direct.insert_after
@@ -102,7 +102,7 @@ local set_np_xspc_jachar_hbox
 local ltjs_orig_char_table = ltjs.orig_char_table
 
 local function get_attr_icflag(p)
-   return (has_attr(p, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG
+   return (get_attr(p, attr_icflag) or 0)%PROCESSED_BEGIN_FLAG
 end
 
 -------------------- Helper functions
@@ -299,7 +299,7 @@ local function calc_np_pbox(lp, last)
       else
          nc, lp = lp, node_next(lp)
       end
-      first, lpa = false, (lp and has_attr(lp, attr_icflag) or 0)
+      first, lpa = false, (lp and get_attr(lp, attr_icflag) or 0)
      -- get_attr_icflag() ではいけない！
    end
    Np.nuc = nc
@@ -322,8 +322,8 @@ do -- 002 ---------------------------------------
          local ln = node_next(lp)
          if ltju.specified_feature(getfont(lp), 'notdef') and ln and getid(ln)==id_glyph then 
             set_attr(lp, attr_icflag, PROCESSED)
-            set_attr(ln, attr_jchar_code, has_attr(lp, attr_jchar_code) or getchar(lp))
-            set_attr(ln, attr_jchar_class, has_attr(lp, attr_jchar_class) or 0)
+            set_attr(ln, attr_jchar_code, get_attr(lp, attr_jchar_code) or getchar(lp))
+            set_attr(ln, attr_jchar_class, get_attr(lp, attr_jchar_class) or 0)
             Np.nuc, lp = ln, ln
          end
       end
@@ -347,7 +347,7 @@ function calc_np_aux_glyph_common(lp, acc_flag)
       -- loop
       local first_glyph, last_glyph = lp
       set_attr(lp, attr_icflag, PROCESSED); Np.last = lp
-      local y_adjust = has_attr(lp,attr_ablshift) or 0
+      local y_adjust = get_attr(lp,attr_ablshift) or 0
       local node_depth = getdepth(lp) + min(y_adjust, 0)
       local adj_depth = (y_adjust>0) and (getdepth(lp) + y_adjust) or 0
       setfield(lp, 'yoffset', getfield(lp, 'yoffset') - y_adjust); lp = node_next(lp)
@@ -360,7 +360,7 @@ function calc_np_aux_glyph_common(lp, acc_flag)
             if lid==id_glyph and not if_lang_ja(lx) then
                -- 欧文文字
                last_glyph = lx; set_attr(lx, attr_icflag, PROCESSED); Np.last = lx
-               y_adjust = has_attr(lx,attr_ablshift) or 0
+               y_adjust = get_attr(lx,attr_ablshift) or 0
                node_depth = max(getdepth(lx) + min(y_adjust, 0), node_depth)
                adj_depth = (y_adjust>0) and max(getdepth(lx) + y_adjust, adj_depth) or adj_depth
                setfield(lx, 'yoffset', getfield(lx, 'yoffset') - y_adjust); lx = node_next(lx)
@@ -370,9 +370,9 @@ function calc_np_aux_glyph_common(lp, acc_flag)
                   set_attr(lx, attr_icflag, PROCESSED)
                   lx = node_next(lx) -- lx: アクセント本体
                   if getid(lx)==id_glyph then
-                     setfield(lx, 'yoffset', getfield(lx, 'yoffset') - (has_attr(lx,attr_ablshift) or 0))
+                     setfield(lx, 'yoffset', getfield(lx, 'yoffset') - (get_attr(lx,attr_ablshift) or 0))
                   else -- アクセントは上下にシフトされている
-                     setshift(lx, getshift(lx) + (has_attr(lx,attr_ablshift) or 0))
+                     setshift(lx, getshift(lx) + (get_attr(lx,attr_ablshift) or 0))
                   end
                   set_attr(lx, attr_icflag, PROCESSED)
                   lx = node_next(lx); set_attr(lx, attr_icflag, PROCESSED)
@@ -525,9 +525,9 @@ calc_np_auxtable = {
          Np.first = Np.first or lp
          set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
          if getid(lp)==id_glyph then -- アクセント本体
-            setfield(lp, 'yoffset', getfield(lp, 'yoffset') - (has_attr(lp,attr_ablshift) or 0))
+            setfield(lp, 'yoffset', getfield(lp, 'yoffset') - (get_attr(lp,attr_ablshift) or 0))
          else -- アクセントは上下にシフトされている
-            setshift(lp, getshift(lp) + (has_attr(lp,attr_ablshift) or 0))
+            setshift(lp, getshift(lp) + (get_attr(lp,attr_ablshift) or 0))
          end
          set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
          set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
@@ -571,7 +571,7 @@ function calc_np(last, lp)
 
    for k = 1,#Bp do Bp[k] = nil end
    while lp ~= last  do
-      local lpa = has_attr(lp, attr_icflag) or 0
+      local lpa = get_attr(lp, attr_icflag) or 0
       -- unbox 由来ノードの検出
       if (lpa>=PACKED) and (lpa%PROCESSED_BEGIN_FLAG<=BOXBDD) then
          if lpa%PROCESSED_BEGIN_FLAG == BOXBDD then
@@ -603,6 +603,7 @@ do
   local dir_tate = luatexja.dir_table.dir_tate
 
 -- 和文文字のデータを取得
+   local has_attr = node.direct.has_attribute
    local attr_jchar_class = luatexbase.attributes['ltj@charclass']
    local attr_jchar_code = luatexbase.attributes['ltj@charcode']
    local attr_autospc = luatexbase.attributes['ltj@autospc']
@@ -628,8 +629,8 @@ do
    end
    function set_np_xspc_jachar_hbox(Nx, x)
       local m = ltjf_font_metric_table[getfont(x)]
-      local c = has_attr(x, attr_jchar_code) or getchar(x)
-      Nx.met, Nx.char  = m, c; Nx.class = has_attr(x, attr_jchar_class) or 0;
+      local c = get_attr(x, attr_jchar_code) or getchar(x)
+      Nx.met, Nx.char  = m, c; Nx.class = get_attr(x, attr_jchar_class) or 0;
       local mc = m.char_type; Nx.char_type = mc
       Nx.pre  = table_current_stack[PRE + c]  or 0
       Nx.post = table_current_stack[POST + c] or 0
@@ -1438,22 +1439,22 @@ do
        if w~=1073741823 then
            setglue(lx, w, st, sh, sto, sho); set_attr(lx, attr_icflag, lxi)
        else
-           local m = ltjf_font_metric_table[has_attr(lx, attr_tablshift)]
+           local m = ltjf_font_metric_table[get_attr(lx, attr_tablshift)]
            setglue(lx, bk[1], bk[2], bk[3], 0, 0)
            set_attr(lx, attr_icflag, lxi_jfm)
        end
    end
    local function special_jaglue_after(lx)
        if get_attr_icflag(lx)==SPECIAL_JAGLUE then
-           lxi=has_attr(lx, attr_yablshift)
+           lxi=get_attr(lx, attr_yablshift)
            if lxi>=PROCESSED_BEGIN_FLAG then
                lxi = lxi%PROCESSED_BEGIN_FLAG
                if lxi == KANJI_SKIP then
                    special_jaglue_after_inner(lx, lxi, KANJI_SKIP_JFM, kanji_skip, 
-                     ltjf_font_metric_table[has_attr(lx, attr_tablshift)].kanjiskip or null_skip_table)
+                     ltjf_font_metric_table[get_attr(lx, attr_tablshift)].kanjiskip or null_skip_table)
                else --  lxi == XKANJI_SKIP
                    special_jaglue_after_inner(lx, lxi, XKANJI_SKIP_JFM, xkanji_skip, 
-                     ltjf_font_metric_table[has_attr(lx, attr_tablshift)].xkanjiskip or null_skip_table)
+                     ltjf_font_metric_table[get_attr(lx, attr_tablshift)].xkanjiskip or null_skip_table)
                end
            else
                set_attr(lx, attr_icflag, lxi)

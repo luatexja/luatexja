@@ -32,7 +32,7 @@ local node_new = node.direct.new
 local node_next = node.direct.getnext
 local node_remove = node.direct.remove
 local node_free = node.direct.flush_node or node.direct.free
-local has_attr = node.direct.has_attribute
+local get_attr = node.direct.get_attribute
 local set_attr = node.direct.set_attribute
 local tex_getcount = tex.getcount
 
@@ -77,7 +77,7 @@ local function conv_vcenter(sb)
    if getid(hd)==id_whatsit and getsubtype(hd)==sid_user 
       and getfield(hd, 'user_id')==DIR then
       local d = node_next(hd)
-      if getid(d)==id_vlist and has_attr(d, attr_dir)>=dir_node_auto then
+      if getid(d)==id_vlist and get_attr(d, attr_dir)>=dir_node_auto then
          node_free(hd); setlist(h, nil); node_free(h)
          setlist(sb, d);  set_attr(d, attr_icflag, 0)
       end
@@ -143,14 +143,14 @@ cjh_A = function (p, sty)
             setlist(p, conv_jchar_to_hbox(getlist(p), sty))
          end
       elseif pid == id_mchar then
-         local pc, fam = getchar (p), has_attr(p, attr_jfam) or -1
+         local pc, fam = getchar (p), get_attr(p, attr_jfam) or -1
          if (not is_math_letters[pc]) and is_ucs_in_japanese_char(p) and fam>=0 then
             local f = ltjs.get_stack_table(MJT + 0x100 * sty + fam, -1, tex_getcount('ltj@@stack'))
             if f ~= -1 then
                local q = node_new(id_sub_box)
                local r = node_new(id_glyph, 256); setnext(r, nil)
                setchar(r, pc); setfont(r, f)
-               local k = has_attr(r,attr_ykblshift) or 0; set_attr(r, attr_ykblshift, 0)
+               local k = get_attr(r,attr_ykblshift) or 0; set_attr(r, attr_ykblshift, 0)
                -- ltj-setwidth 内で実際の位置補正はおこなうので，補正量を退避
                local met = ltjf_font_metric_table[f]
                r = capsule_glyph_math(r, met, met.char_type[ltjf_find_char_class(pc, met)]);
