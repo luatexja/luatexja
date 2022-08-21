@@ -119,18 +119,18 @@ function luatexja.jfont.define_jfm(to)
                   v.end_adjust = nil
                elseif #(v.end_adjust)==0 then
                   v.end_adjust = nil
-               else 
+               else
                   table.sort(v.end_adjust)
                end
             end
          else
             v.end_adjust = nil
-            if v.end_stretch and v.end_stretch~=0.0 then 
-               v.end_adjust = (v.end_adjust or {}) 
+            if v.end_stretch and v.end_stretch~=0.0 then
+               v.end_adjust = (v.end_adjust or {})
                v.end_adjust[#(v.end_adjust)+1] = v.end_stretch
             end
-            if v.end_shrink and v.end_ahrink~=0.0 then 
-               v.end_adjust = (v.end_adjust or {}) 
+            if v.end_shrink and v.end_ahrink~=0.0 then
+               v.end_adjust = (v.end_adjust or {})
                v.end_adjust[#(v.end_adjust)+1] = -v.end_shrink
             end
             if v.end_adjust then v.end_adjust[#(v.end_adjust)+1] = 0.0 end
@@ -149,8 +149,8 @@ function luatexja.jfont.define_jfm(to)
                elseif xp and type(xp)~='number' then
                   defjfm_res = nil
                else
-                  xp = (xp or 0)*9+36        
-                  if xp<0 or xp>=64 then defjfm_res=nil end 
+                  xp = (xp or 0)*9+36
+                  if xp<0 or xp>=64 then defjfm_res=nil end
                end
                x.priority = xp
             end
@@ -170,8 +170,8 @@ function luatexja.jfont.define_jfm(to)
       end
    end
    if t.version<3 then
-      -- In version 3, 'jcharbdd' is divided into 
-      -- 'alchar': ALchar (or math boundary) 
+      -- In version 3, 'jcharbdd' is divided into
+      -- 'alchar': ALchar (or math boundary)
       -- 'nox_alchar': ALchar (or math boundary), where xkanjiskip won't inserted
       -- 'glue': glue/kern, 'jcharbdd': other cases (和文B, rule, ...)
       t.chars.alchar = t.chars.jcharbdd
@@ -333,7 +333,7 @@ do
       }
       if auto_enable_vrt2 then
          local vert_name = ltju.exist_feature(fn, 'vrt2') and 'vrt2' or 'vert'
-         local rot = fmtable.rotation 
+         local rot = fmtable.rotation
          ltju.enable_feature(fn, vert_name)
          ltju.loop_over_feat(f, {[vert_name]=true}, function (i,k) rot[i] = nil end)
       end
@@ -357,7 +357,7 @@ do
                 to_be_checked[i]=nil
                 if ltj_cb<lotf_cb then
                     local f = ltb.remove_from_callback(n,'luaotfload.letterspace')
-                    ltb.add_to_callback(n, f, 'luaotfload.letterspace', 
+                    ltb.add_to_callback(n, f, 'luaotfload.letterspace',
                         ltb.priority_in_callback(n, 'luaotfload.node_processor') + 1)
                 end
             end
@@ -420,7 +420,7 @@ do
    local parser=luaotfload.parsers.font_request
    function is_feature_specified(s,fname)
      local t = lpegmatch(parser,s); return t and t.features and t.features[fname]
-   end    
+   end
    -- extract jfm_name, jfm_spec and jfm_var
    -- normalize position of 'jfm=' and 'jfmvar=' keys
    local function extract_jfm_spec(name)
@@ -453,7 +453,7 @@ do
       jfm_ksp = (is_feature_specified(name,'ltjksp')~=false)
       if jfm_dir == 'tate' then
          vert_activated = (is_feature_specified(name,'vert')~=false) and (is_feature_specified(name,'vrt2')~=false)
-         auto_enable_vrt2 
+         auto_enable_vrt2
            = (is_feature_specified(name,'vert')==nil) and (is_feature_specified(name,'vrt2')==nil)
       else
          vert_activated, auto_enable_vrt2 = nil, nil
@@ -789,7 +789,7 @@ do
     local lo, hi = 1, #t
     while lo < hi do
       local mi = ceil((lo+hi)/2)
-      if t[mi]<=i then lo=mi else hi=mi-1 end 
+      if t[mi]<=i then lo=mi else hi=mi-1 end
     end
     return lo%2==1
   end
@@ -836,14 +836,14 @@ do
       local bname = tfmdata.psname or nameonly(tfmdata.filename)
       if not font_extra_basename[bname] then
          -- if the cache is present, read it
-         -- 
+         --
          local newtime = file_attributes(tfmdata.filename,"modification")
          local v = "extra_" .. string.lower(bname)
          local dest = load_cache(
             v,
-            function (t) 
+            function (t)
                 return (t.lotf_version~=luaotfload.version)
-                       or (t.version~=cache_ver) or (t.modtime~=newtime) 
+                       or (t.version~=cache_ver) or (t.modtime~=newtime)
             end
          )
          -- if the cache is not found or outdated, save the cache
@@ -877,7 +877,7 @@ do
            dummytable.vorigin, dummytable.vheight = dtvo, dtvh
        end
    end
-   
+
    local function prepare_extra_data_font(id, res, name)
       if type(res)=='table' and (res.psname or res.filename) then
          if (res.embedding=='no') and (type(name)=='string') and (name:sub(1,5)=='psft:') then
@@ -930,19 +930,19 @@ do
      [0x3014]=0xFE39, [0x3015]=0xFE3A, [0x3010]=0xFE3B, [0x3011]=0xFE3C,
      [0x300A]=0xFE3D, [0x300B]=0xFE3E, [0x3008]=0xFE3F, [0x3009]=0xFE40,
      [0x300C]=0xFE41, [0x300D]=0xFE42, [0x300E]=0xFE43, [0x300F]=0xFE44,
-     [0xFF3B]=0xFE47, [0xFF3D]=0xFE48, 
+     [0xFF3B]=0xFE47, [0xFF3D]=0xFE48,
   }
   local vert_jpotf_table, vert_feat = {}, {vert=true}
   local utfbyte, utfsub = utf.byte, utf.sub
   luatexja.jfont.register_vert_replace = function(t)
     for i,v in pairs(t) do
-      local ic = (type(i)=='number') and i or 
+      local ic = (type(i)=='number') and i or
         ((type(i)=='string') and utfbyte(utfsub(i,1,1)) or nil)
       if ic then
-        vert_jpotf_table[ic] = (type(v)=='number') and v or 
+        vert_jpotf_table[ic] = (type(v)=='number') and v or
           ((type(v)=='string') and utfbyte(utfsub(v,1,1)) or nil)
       end
-    end  
+    end
   end
 
 luatexbase.add_to_callback(

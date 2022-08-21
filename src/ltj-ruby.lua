@@ -140,7 +140,7 @@ function luatexja.ruby.read_old_break_info()
       local real_file = kpse.find_file(fname)
       if real_file then dofile(real_file) end
       cache_handle = io.open(fname, 'w')
-      if cache_handle then 
+      if cache_handle then
          cache_handle:write('local lrob=luatexja.ruby.old_break_info\n')
       end
    end
@@ -708,7 +708,7 @@ luatexbase.add_to_callback('hpack_filter', post_high_hbox, 'ltj.ruby.post_hbox',
 do
    local RIPRE  = luatexja.stack_table_index.RIPRE
    local RIPOST = luatexja.stack_table_index.RIPOST
-   local abs = math.abs 
+   local abs = math.abs
    local function whatsit_callback(Np, lp, Nq)
       if Np.nuc then return Np
       elseif  getfield(lp, 'user_id') == RUBY_PRE then
@@ -782,7 +782,7 @@ do
          end
          local nqnv = getfield(Nq.nuc, 'value')
          local rst = getfield(nqnv, 'value')
-         if Nq.gk then 
+         if Nq.gk then
             if type(Nq.gk)=="table" then
                for _,v in ipairs(Nq.gk) do add_gk(rst, 'before_jfmgk', v) end
             else add_gk(rst, 'before_jfmgk', Nq.gk) end
@@ -819,7 +819,7 @@ do
    local function w (s, Nq, Np)
       if not s and  getfield(Nq.nuc, 'user_id') == RUBY_PRE then
          local rst = getfield(getfield(Nq.nuc, 'value'), 'value')
-         if Np.gk then 
+         if Np.gk then
             if type(Np.gk)=="table" then
                for _,v in ipairs(Np.gk) do add_gk(rst, 'after_jfmgk', v) end
             else add_gk(rst, 'after_jfmgk', Np.gk) end

@@ -7,7 +7,7 @@ local node, table, tex, token = node, table, tex, token
 
 local cat_lp = luatexbase.catcodetables['latex-package']
 
--------------------- 
+--------------------
 local ltjb = {}
 luatexja.base = ltjb
 
@@ -44,7 +44,7 @@ do
   _error_set_message = function (msgcont, main, help)
     err_main = message_cont(main, msgcont):gsub(BEL, LF)
     err_help = (help and help~="") and into_lines(help)
-       or {"Sorry, I don't know how to help in this situation.", 
+       or {"Sorry, I don't know how to help in this situation.",
            "Maybe you should try asking a human?" }
   end
 
@@ -129,7 +129,7 @@ end
 --- Extension to tex.print(). Each argument string may contain
 -- newline characters, in which case the string is output (to
 -- TeX input stream) as multiple lines.
--- @param ... (string) string to output 
+-- @param ... (string) string to output
 local function mprint(...)
    local arg = {...}
    local lines = {}
@@ -202,7 +202,7 @@ do
    local function in_unicode(c, admit_math)
       local low = admit_math and -1 or 0
       if type(c)~='number' or c<low or c>0x10FFFF then
-	 local s = 'A character number must be between ' .. tostring(low) 
+	 local s = 'A character number must be between ' .. tostring(low)
 	    .. ' and 0x10ffff.\n'
 	    .. (admit_math and "(-1 is used for denoting `math boundary')\n" or '')
 	    .. 'So I changed this one to zero.'
@@ -222,7 +222,7 @@ end
 --   * return value: non-nil iff the cache is up-to-date
 -- save_cache (filename, t): no return value
 -- save_cache_luc (filename, t): no return value
---   save_cache always calls save_cache_luc. 
+--   save_cache always calls save_cache_luc.
 --   But sometimes we want to create only the precompiled cache,
 --   when its 'text' version is already present in LuaTeX-ja distribution.
 
@@ -274,8 +274,8 @@ do
       if s then
 	 local sa = load(s)
 	 local f = io.open(fullpath, 'wb')
-	 if f and sa then 
-	    f:write(dump(sa, true)) 
+	 if f and sa then
+	    f:write(dump(sa, true))
 	    texio.write('log', '(save cache: ' .. fullpath .. ')')
             f:close()
 	 end
@@ -307,17 +307,17 @@ do
 	    break
 	 end
       end
-      if (not result) or outdate(result) then 
-	 return nil 
-      else 
-	 return result 
+      if (not result) or outdate(result) then
+	 return nil
+      else
+	 return result
       end
    end
-   
+
    local function load_cache(filename, outdate)
       remove_file_if_exist(savepath .. '/' ..  filename .. '.lua')
       local r = load_cache_a(filename ..  luc_suffix, outdate, false)
-      if r then 
+      if r then
 	 return r
       else
          local r = load_cache_a(filename .. '.lua.gz', outdate, true)

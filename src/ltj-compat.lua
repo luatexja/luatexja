@@ -51,14 +51,14 @@ local function from_kuten(i)
    if type(i)~='number' then error_invalid_charcode(i); i=0 end
    if (i%256==0)or(i%256>94) then
      tex.write '0'
-   else 
+   else
      tex.write(tostring(jisx0208.table_jisx0208_uptex[math.floor(i/256)*94+(i%256)-94] or 0))
    end
 end
 
 -- \euc: EUC-JP による符号位置 => Unicode 符号位置
 local function from_euc(i)
-   if type(i)~='number' then 
+   if type(i)~='number' then
      error_invalid_charcode(i); i=0
    elseif i>=0x10000 or i<0xa0a0 then
       i=0

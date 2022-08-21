@@ -193,7 +193,7 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
           local f = font_getfont(pf)
           local r, l = met.rotation[pc], f.properties and f.properties.language
           if ((r==true) or (type(r)=="table" and not r[l])) and (get_attr(p, attr_vert_ori) or 0)<=0 then
-            return capsule_glyph_tate_rot(p, met, char_data, head, dir, 
+            return capsule_glyph_tate_rot(p, met, char_data, head, dir,
               0.5*(get_ascender(pf)-get_descender(pf)))
           end
       end
@@ -270,7 +270,7 @@ function luatexja.setwidth.apply_ashift_math(head, last, attr_ablshift)
          return
       elseif (get_attr(p, attr_icflag) or 0) ~= PROCESSED then
          if pid==id_hlist or pid==id_vlist then
-            setshift(p, getshift(p) +  (get_attr(p,attr_ablshift) or 0)) 
+            setshift(p, getshift(p) +  (get_attr(p,attr_ablshift) or 0))
          elseif pid==id_rule then
             local v = get_attr(p,attr_ablshift) or 0
             setheight(p, getheight(p)-v); setdepth(p, getdepth(p)+v)

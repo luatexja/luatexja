@@ -74,7 +74,7 @@ local list_dir
 -- vcenter noad は軸に揃えるため，欧文ベースライン補正がかかる
 local function conv_vcenter(sb)
    local h = getlist(sb) ; local hd = getlist(h)
-   if getid(hd)==id_whatsit and getsubtype(hd)==sid_user 
+   if getid(hd)==id_whatsit and getsubtype(hd)==sid_user
       and getfield(hd, 'user_id')==DIR then
       local d = node_next(hd)
       if getid(d)==id_vlist and get_attr(d, attr_dir)>=dir_node_auto then

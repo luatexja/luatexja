@@ -20,7 +20,7 @@ local getsubtype = node.direct.getsubtype
 local getlang = node.direct.getlang
 local getkern = node.direct.getkern
 local getshift = node.direct.getshift
-local getwidth = node.direct.getwidth    
+local getwidth = node.direct.getwidth
 local getdepth = node.direct.getdepth
 local setfield = node.direct.setfield
 local setpenalty = node.direct.setpenalty
@@ -81,7 +81,7 @@ do
          for i=0,63 do tmp[#tmp+1] = { (i%8)-4, FROM_JFM+i } end
       else -- stretch
          for i=0,63 do tmp[#tmp+1] = { math.floor(i/8)-4, FROM_JFM+i } end
-      end    
+      end
       local pt = priority_table[glue_sign]
       tmp[#tmp+1] = { pt[2]/10, XKANJI_SKIP }
       tmp[#tmp+1] = { pt[2]/10, XKANJI_SKIP_JFM }
@@ -119,13 +119,13 @@ function get_total_stretched(p)
    for q in node_traverse_id(id_glue, ph) do
       local a = getfield(q, 'stretch_order')
       if a==0 then
-         local b = at2pr_st[get_attr_icflag(q)]; 
+         local b = at2pr_st[get_attr_icflag(q)];
          total_st[b] = total_st[b]+getfield(q, 'stretch')
       end
       total_st[a*65536] = total_st[a]+getfield(q, 'stretch')
       local a = getfield(q, 'shrink_order')
       if a==0 then
-         local b = at2pr_sh[get_attr_icflag(q)]; 
+         local b = at2pr_sh[get_attr_icflag(q)];
          total_sh[b] = total_sh[b]+getfield(q, 'shrink')
       end
       total_sh[a*65536] = total_sh[a]+getfield(q, 'shrink')
@@ -172,7 +172,7 @@ local function aw_step1(p, total)
    end
    local eadt = ltjf_font_metric_table[getfont(xc)]
       .char_type[get_attr(xc, attr_jchar_class) or 0].end_adjust
-   if not eadt then 
+   if not eadt then
       return total, false
    end
    local eadt_ratio = {}
@@ -184,8 +184,8 @@ local function aw_step1(p, total)
          eadt_ratio[i] = {i, t/total_sh[65536*total_sh.order], t, v}
       end
    end
-   table.sort(eadt_ratio, 
-   function (a,b) 
+   table.sort(eadt_ratio,
+   function (a,b)
        for i=2,4 do
            local at, bt = abs(a[i]), abs(b[i])
            if at~=bt then return at<bt end
@@ -240,26 +240,26 @@ local function aw_step1_last(p, total)
    end
    local eadt = ltjf_font_metric_table[getfont(xc)]
       .char_type[get_attr(xc, attr_jchar_class) or 0].end_adjust
-   if not eadt then 
+   if not eadt then
       return total, false
    end
    -- 続行条件2: min(eadt[1], 0)<= \parfillskip <= max(eadt[#eadt], 0)
    local pfw = getwidth(pf)
-     + (total>0 and getfield(pf, 'stretch') or -getfield(pf, 'shrink')) *getfield(p, 'glue_set') 
+     + (total>0 and getfield(pf, 'stretch') or -getfield(pf, 'shrink')) *getfield(p, 'glue_set')
    if pfw<min(0,eadt[1]) or max(0,eadt[#eadt])<pfw then return total, false end
    -- \parfillskip を 0 にする
    total = total + getwidth(pf)
    total_st.order, total_sh.order = 0, 0
-   if getfield(pf, 'stretch_order')==0 then 
-      local i = at2pr_st[-1] 
-      total_st[0] = total_st[0] - getfield(pf, 'stretch') 
-      total_st[i] = total_st[i] - getfield(pf, 'stretch') 
+   if getfield(pf, 'stretch_order')==0 then
+      local i = at2pr_st[-1]
+      total_st[0] = total_st[0] - getfield(pf, 'stretch')
+      total_st[i] = total_st[i] - getfield(pf, 'stretch')
       total_st.order = (total_st[0]==0) and -1 or 0
    end
-   if getfield(pf, 'shrink_order')==0 then 
-      local i = at2pr_sh[-1] 
-      total_sh[0] = total_sh[0] - getfield(pf, 'shrink') 
-      total_sh[i] = total_sh[i] - getfield(pf, 'shrink') 
+   if getfield(pf, 'shrink_order')==0 then
+      local i = at2pr_sh[-1]
+      total_sh[0] = total_sh[0] - getfield(pf, 'shrink')
+      total_sh[i] = total_sh[i] - getfield(pf, 'shrink')
       total_sh.order = (total_sh[0]==0) and -1 or 0
    end
    setsubtype(pf, 1); setglue(pf)
@@ -272,8 +272,8 @@ local function aw_step1_last(p, total)
          eadt_ratio[i] = {i, t/total_sh[65536*total_sh.order], t, v}
       end
    end
-   table.sort(eadt_ratio, 
-   function (a,b) 
+   table.sort(eadt_ratio,
+   function (a,b)
        for i=2,4 do
            local at, bt = abs(a[i]), abs(b[i])
            if at~=bt then return at<bt end
@@ -337,14 +337,14 @@ function aw_step2(p, total, added_flag)
    local id =  (total>0) and 1 or 2
    local res = total_stsh[id]
    local pnum = priority_num[id]
-   if total==0 or res.order > 0 then 
+   if total==0 or res.order > 0 then
       -- もともと伸縮の必要なしか，残りの伸縮量は無限大
       if added_flag then return repack(p) end
    end
    total = abs(total)
    for i = 1, pnum do
       if total <= res[i] then
-         local a = at2pr[id]  
+         local a = at2pr[id]
          for j = i+1,pnum do
             clear_stretch(p, j, a, name)
          end
@@ -362,7 +362,7 @@ do
    local insert_before = node.direct.insert_before
    local KINSOKU      = luatexja.icflag_table.KINSOKU
    insert_lineend_kern = function (head, nq, np, Bp)
-      if nq.met then 
+      if nq.met then
          local eadt = nq.met.char_type[nq.class].end_adjust
          if not eadt then return end
          if eadt[1]~=0 then
@@ -416,7 +416,7 @@ do
    local function enable_cb(status_le, status_pr, status_lp, status_ls)
       if (status_le>0 or status_pr>0) and (not is_reg) then
          ltjb.add_to_callback('post_linebreak_filter',
-            adjust_width, 'Adjust width', 
+            adjust_width, 'Adjust width',
             luatexbase.priority_in_callback('post_linebreak_filter', 'ltj.lineskip')-1)
          is_reg = true
       elseif is_reg and (status_le==0 and status_pr==0) then
@@ -519,9 +519,9 @@ do
       end
       w_acc = w_new; x = xn; if x then xn = node_next(x) end
     end
-  end  
+  end
   function ltjl.p_profile(before, after, mirrored, bw)
-    local range, tls 
+    local range, tls
       = init_range(), luatexja.adjust.profile_hgap_factor*tex.get('lineskip', false)
     profile_inner(before, range, 3, true,     tls)
     profile_inner(after,  range, 4, mirrored, tls)
@@ -535,7 +535,7 @@ do
         if bw-h-d<lmin then lmin=bw-h-d end
       end
       if lmin==1/0 then lmin = bw end
-      return lmin, 
+      return lmin,
          bw - lmin - getdepth(before)
             - getfield(after, mirrored and 'depth' or 'height')
     end

@@ -48,9 +48,9 @@ do
       setfield(g,'stretch_order',sto or 0)
       setfield(g,'shrink_order', sho or 0)
    end
-   for _,v in pairs({'char', 'depth', 'dir', 'font', 'height', 'kern', 'lang', 'next', 
+   for _,v in pairs({'char', 'depth', 'dir', 'font', 'height', 'kern', 'lang', 'next',
                       'nucleus', 'offsets', 'penalty', 'shift', 'sub', 'subtype', 'sup'}) do
-         if not dnode['set'..v] then 
+         if not dnode['set'..v] then
              dnode['set'..v] = function(n, ...) return setfield(n, v, ...) end
          end
    end
@@ -60,10 +60,10 @@ do
       return getfield(g,'width'), getfield(g,'stretch'), getfield(g,'shrink'),
              getfield(g,'stretch_order'), getfield(g,'shrink_order')
    end
-   for _,v in pairs({'box', 'components', 'char', 'depth', 'font', 'height', 'kern', 'lang', 
+   for _,v in pairs({'box', 'components', 'char', 'depth', 'font', 'height', 'kern', 'lang',
                      'list', 'next', 'nucleus', 'offsets', 'penalty', 'prev', 'shift', 'sub',
                      'subtype', 'sup', 'whd', 'width', 'dir'}) do
-         if not dnode['get'..v] then 
+         if not dnode['get'..v] then
              dnode['get'..v] = function(n, ...) return getfield(n, v, ...) end
          end
     end
@@ -207,7 +207,7 @@ do
    local function getattr(a, d)
       local r = tex_getattr(a); d = d or 0
       return (r==-0x7FFFFFFF) and d or r
-   end 
+   end
    luatexja.unary_pars = {
       yalbaselineshift = function(t)
          return print_scaled(getattr('ltj@yablshift'))..'pt'
@@ -438,8 +438,8 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
    local pt, pic = node_type(p.id), (get_attr(p, attr_icflag) or 0) % icflag_table.PROCESSED_BEGIN_FLAG
    local base = prefix .. string.format('%X', pic) .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
    if pt == 'glyph' then
-      s = base .. ' ' 
-          .. (p.char<0xF0000 and utfchar(p.char) or '') 
+      s = base .. ' '
+          .. (p.char<0xF0000 and utfchar(p.char) or '')
           .. string.format(' (U+%X) ', p.char)
           .. tostring(p.font) .. ' (' .. print_scaled(p.height) .. '+'
           .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)

@@ -18,7 +18,7 @@ function aux.exist_feature(id, name)
     return provides_feature(id, t.properties.script, t.properties.language, name)
   else return false
   end
-end 
+end
 
 function aux.enable_feature(id, name)
   local t = getfont(id)
@@ -57,7 +57,7 @@ local function get_asc_des(id)
   elseif t.hb then -- HARF
     local hbfont, u = t.hb.shared.font, t.hb.shared.upem
     local h = hbfont:get_h_extents()
-    if h and u then 
+    if h and u then
        a, d = h.ascender and h.ascender/u, h.descender and -h.descender/u
     end
   end
@@ -87,7 +87,7 @@ local function get_vmet_table(tfmdata, dest)
    end
    local rawdata = tfmdata.shared.rawdata
    local ascender = rawdata.metadata.ascender or 0
-   local default_vheight 
+   local default_vheight
      = rawdata.metadata.defaultvheight
        or (rawdata.metadata.descender and (ascender+rawdata.metadata.descender) or units)
    local units = tfmdata.units
@@ -135,10 +135,10 @@ local function loop_over_feat(id, feature_name, func, universal)
     for _,i in pairs(t.resources.sequences) do
       if i.order[1] and feature_name[i.order[1]] then
         local f = i.features and i.features[i.order[1]]
-        if i.type == 'gsub_single' and i.steps 
+        if i.type == 'gsub_single' and i.steps
           and f and (universal or (f[t.properties.script] and f[t.properties.script][t.properties.language])) then
           for _,j in pairs(i.steps) do
-            if type(j)=='table' then 
+            if type(j)=='table' then
               if type(j.coverage)=='table' then
                 for i,k in pairs(j.coverage) do
                   local s = func(i,k); if s then return s end
@@ -155,14 +155,14 @@ aux.loop_over_feat = loop_over_feat
 
 local vert_vrt2 = { vert=true, vrt2=true }
 function aux.replace_vert_variant(id, c)
-  return loop_over_feat(id, vert_vrt2, 
+  return loop_over_feat(id, vert_vrt2,
            function (i,k) if i==c then return k end end)
 	 or c
 end
 
 
 --for name, func in pairs(aux) do
---  if type(func)=="function" then 
+--  if type(func)=="function" then
 --    aux[name] = function(...)
 --      print('LOTF_AUX', name, ...);
 --      local a = func(...); print('RESULT', a); return a
@@ -174,8 +174,8 @@ local search
 search = function (t, key, prefix)
   if type(t)=="table" then
     prefix = prefix or ''
-    for i,v in pairs(t) do 
-      if i==key then print(prefix..'.'..i, v) 
+    for i,v in pairs(t) do
+      if i==key then print(prefix..'.'..i, v)
       else  search(v,key,prefix..'.'..tostring(i)) end
     end
   end

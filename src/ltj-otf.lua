@@ -85,7 +85,7 @@ local function get_ucs_from_rmlgbm(c)
    elseif v<0xF0000 then -- 素直に Unicode にマップ可能
       return v
    else -- privete use area
-      local r, aj = nil, ltjr_cidfont_data["Adobe-Japan1"] 
+      local r, aj = nil, ltjr_cidfont_data["Adobe-Japan1"]
       -- 先に ltj_vert_table を見る
       for i,w in pairs(aj.ltj_vert_table) do
          if w==v then r=i; break end

@@ -71,7 +71,7 @@ do
    dir_pool = {}
    for _,i in pairs({dir_tate, dir_yoko, dir_dtou, dir_utod}) do
       local w = node_new(id_whatsit, sid_user)
-      dnode.setattributelist(w, nil) 
+      dnode.setattributelist(w, nil)
       set_attr(w, attr_dir, i); set_attr(w, attr_icflag, 0)
       setfield(w, 'user_id', DIR)
       setfield(w, 'type', 110); setnext(w, nil)
@@ -932,7 +932,7 @@ end
 -- adjust
 do
    local id_adjust = node.id 'adjust'
-   local last_node = dnode.last_node 
+   local last_node = dnode.last_node
    local scan_keyword = token.scan_keyword
    function luatexja.direction.adjust_begin()
       if scan_keyword 'pre' then tex.sprint(cat_lp, '\\ltj@@vadjust@pre')
@@ -1000,7 +1000,7 @@ do
       if split_dir_whatsit then split_dir_watsit = nil end
       if p then
          local bh = getlist(p)
-         if getid(bh)==id_whatsit and getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR 
+         if getid(bh)==id_whatsit and getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR
             and node_next(bh) then
             ltjs.list_dir = get_attr(bh, attr_dir)
             setlist(p, (node_remove(bh,bh)))
@@ -1015,7 +1015,7 @@ do
          end
       end
       sprint(cat_lp, '\\ltj@@orig@vsplit' .. tostring(n))
-   end        
+   end
    local function dir_adjust_vpack(h, gc)
       start_time_measure 'direction_vpack'
       local hd = to_direct(h)
@@ -1057,7 +1057,7 @@ do
    local function dir_adjust_pre_output(h, gc)
       return to_node(create_dir_whatsit_vbox(to_direct(h), gc))
    end
-   ltjb.add_to_callback('pre_output_filter', dir_adjust_pre_output, 
+   ltjb.add_to_callback('pre_output_filter', dir_adjust_pre_output,
                         'ltj.direction', 10000)
 end
 
@@ -1093,7 +1093,7 @@ do
 
    tex.setattribute(attr_dir, dir_yoko)
    local shipout_temp =  node_new(id_hlist)
-   dnode.setattributelist(shipout_temp, nil) 
+   dnode.setattributelist(shipout_temp, nil)
    tex.setattribute(attr_dir, 0)
 
    finalize_inner = function (box)

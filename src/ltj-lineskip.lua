@@ -61,7 +61,7 @@ local function adjust_glue(nh)
         local p, n = node_prev(x), node_next(x)
         if p then
         local pid = getid(p)
-           while (id_glue<=pid) and (pid<=id_penalty) and node_prev(p) do 
+           while (id_glue<=pid) and (pid<=id_penalty) and node_prev(p) do
              p = node_prev(p); pid = getid(p)
            end
            if pid==id_hlist and getid(n)==id_hlist then
@@ -87,7 +87,7 @@ local getnest = tex.getnest
 
 local function dir_adjust_append_vlist(b, loc, prev, mirrored)
    local old_b = to_direct(b)
-   local new_b = loc=='box' and 
+   local new_b = loc=='box' and
       make_dir_whatsit(old_b, old_b, get_dir_count(), 'append_vlist') or old_b
    local _, ht, dp = getwhd(new_b)
    if prev > -65536000 then
@@ -102,7 +102,7 @@ local function dir_adjust_append_vlist(b, loc, prev, mirrored)
       end
       if tail then
          if getid(tail)==id_hlist and getid(new_b)==id_hlist then
-            if getdepth(tail)==prev then 
+            if getdepth(tail)==prev then
                lmin, adj = ltj_profiler(tail, new_b, mirrored, bw)
             end
          end

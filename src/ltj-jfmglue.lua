@@ -42,7 +42,7 @@ do
 end
 local setpenalty = node.direct.setpenalty
 local setkern = node.direct.setkern
-  
+
 local get_attr = node.direct.get_attribute
 local set_attr = node.direct.set_attribute
 local insert_before = node.direct.insert_before
@@ -268,13 +268,13 @@ luatexbase.create_callback("luatexja.jfmglue.whatsit_last_minute", "data",
                            function (stat, Nq, Np) return false end)
 
 -- calc next Np
-local calc_np 
+local calc_np
 do -- 001 -----------------------------------------------
 
 local traverse = node.direct.traverse
 local function check_next_ickern(lp)
    local lx = Np.nuc
-   while lp and getid(lp) == id_kern and ( getsubtype(lp)==0 or 
+   while lp and getid(lp) == id_kern and ( getsubtype(lp)==0 or
      getsubtype(lp)==3 or ITALIC == get_attr_icflag(lp)) do
      set_attr(lp, attr_icflag, IC_PROCESSED)
      lx, lp = lp, node_next(lp)
@@ -320,7 +320,7 @@ do -- 002 ---------------------------------------
    local function calc_np_notdef(lp)
       if not font_getfont(getfont(lp)).characters[getchar(lp)] then
          local ln = node_next(lp)
-         if ltju.specified_feature(getfont(lp), 'notdef') and ln and getid(ln)==id_glyph then 
+         if ltju.specified_feature(getfont(lp), 'notdef') and ln and getid(ln)==id_glyph then
             set_attr(lp, attr_icflag, PROCESSED)
             set_attr(ln, attr_jchar_code, get_attr(lp, attr_jchar_code) or getchar(lp))
             set_attr(ln, attr_jchar_class, get_attr(lp, attr_jchar_class) or 0)
@@ -328,7 +328,7 @@ do -- 002 ---------------------------------------
          end
       end
       return lp
-   end 
+   end
 function calc_np_aux_glyph_common(lp, acc_flag)
    Np.nuc, Np.first = lp, (Np.first or lp)
    if if_lang_ja(lp) then -- JAchar
@@ -506,7 +506,7 @@ calc_np_auxtable = {
    end,
    [id_glue] = function(lp)
       Np.first, Np.nuc, Np.last = (Np.first or lp), lp, lp;
-      Np.id = getid(lp); 
+      Np.id = getid(lp);
       local f = luatexbase.call_callback("luatexja.jfmglue.special_jaglue", lp)
       if f then
          set_attr(lp, attr_icflag, PROCESSED)
@@ -565,7 +565,7 @@ function calc_np(last, lp)
    Np.post, Np.pre, Np.xspc, Np.gk = nil, nil, nil, nil
    Np.first, Np.id, Np.last, Np.met, Np.class= nil, nil, nil, nil
    Np.auto_kspc, Np.auto_xspc, Np.char, Np.nuc = nil, nil, nil, nil
-   -- auto_kspc, auto_xspc: normally true/false, 
+   -- auto_kspc, auto_xspc: normally true/false,
    -- but the number 0 when Np is ''the beginning of the box/paragraph''.
    for k in pairs(Np) do Np[k] = nil end
 
@@ -623,7 +623,7 @@ do
       Nx.post = table_current_stack[POST + c] or 0
       Nx.xspc = table_current_stack[XSP  + c] or 3
       Nx.kcat = table_current_stack[KCAT + c] or 0
-      Nx.auto_kspc, Nx.auto_xspc 
+      Nx.auto_kspc, Nx.auto_xspc
        = not has_attr(x, attr_autospc, 0), not has_attr(x, attr_autoxspc, 0)
       return m, mc, cls
    end
@@ -729,7 +729,7 @@ local function handle_penalty_suppress(post, pre, g)
          setpenalty(p, 10000); head = insert_before(head, Np.first, p)
          Bp[1]=p; set_attr(p, attr_icflag, KINSOKU)
       end
-   else 
+   else
       local a = (pre or 0) + (post or 0)
       for _, v in pairs(Bp) do add_penalty(v,a) end
    end
@@ -754,7 +754,7 @@ local function new_jfm_glue(mc, bc, ac)
    local g = mc[bc][ac]
    if g then
        if g[1] then
-          local k = node_new(id_kern, 1); setkern(k, g[1]) 
+          local k = node_new(id_kern, 1); setkern(k, g[1])
           set_attr(k, attr_icflag, FROM_JFM)
           return k, g.ratio, false, false, false
        else
@@ -857,8 +857,8 @@ do
          if kanjiskip_jfm_flag then
             local g = node_new(id_glue);
             local bk = qm.kanjiskip or null_skip_table
-            setglue(g, bn and (bn*bk[1]) or 0, 
-                       bp and (bp*bk[2]) or 0, 
+            setglue(g, bn and (bn*bk[1]) or 0,
+                       bp and (bp*bk[2]) or 0,
                        bh and (bh*bk[3]) or 0, 0, 0)
             set_attr(g, attr_icflag, KANJI_SKIP_JFM)
             return g
@@ -868,7 +868,7 @@ do
             local sh = bh and (bh*getfield(kanji_skip, 'shrink')) or 0
             setglue(g,
                bn and (bn*getwidth(kanji_skip)) or 0,
-               st, sh, 
+               st, sh,
                (st==0) and 0 or getfield(kanji_skip, 'stretch_order'),
                (sh==0) and 0 or getfield(kanji_skip, 'shrink_order'))
             set_attr(g, attr_icflag, KANJI_SKIP_JFM)
@@ -876,9 +876,9 @@ do
          end
       end
    end
-   
+
    get_kanjiskip = function()
-      if Np.auto_kspc==0 or Nq.auto_kspc==0 then return nil 
+      if Np.auto_kspc==0 or Nq.auto_kspc==0 then return nil
       elseif Np.auto_kspc or Nq.auto_kspc then
          local pm, qm = Np.met, Nq.met
          if (pm.char_type==qm.char_type) and (qm.var==pm.var) then
@@ -886,15 +886,15 @@ do
          else
             local gb = get_kanjiskip_low(false, qm, 1, 1, 1)
             if gb then
-               return calc_ja_ja_aux(gb, 
-                 get_kanjiskip_low(false, pm, 1, 1, 1) or node_copy(kanji_skip), 0, 1) 
+               return calc_ja_ja_aux(gb,
+                 get_kanjiskip_low(false, pm, 1, 1, 1) or node_copy(kanji_skip), 0, 1)
             else
                local ga = get_kanjiskip_low(false, pm, 1, 1, 1)
                return (ga and calc_ja_ja_aux(node_copy(kanji_skip), ga, 0, 1))
                  or node_copy(kanji_skip)
             end
          end
-      else   
+      else
          local g = node_new(id_glue)
          set_attr(g, attr_icflag, kanjiskip_jfm_flag and KANJI_SKIP_JFM or KANJI_SKIP)
          return g
@@ -909,11 +909,11 @@ do
          return g, (Np.auto_kspc or Nq.auto_kspc) and get_kanjiskip_low(true, qm, kn, kp, kh)
       else
          local npn, nqn = Np.nuc, Nq.nuc
-         local gb, db, bn, bp, bh 
+         local gb, db, bn, bp, bh
             = new_jfm_glue(qmc, Nq.class,
                            slow_find_char_class(Np.char,
                                                 qm, getchar(npn)))
-         local ga, da, an, ap, ah 
+         local ga, da, an, ap, ah
             = new_jfm_glue(pmc,
                            slow_find_char_class(Nq.char,
                                                 pm, getchar(nqn)),
@@ -952,7 +952,7 @@ do
             return node_copy(xkanji_skip)
          else
             local g = node_new(id_glue)
-            local w, st, sh, sto, sho = getglue(xkanji_skip) 
+            local w, st, sh, sto, sho = getglue(xkanji_skip)
             setglue(g,
                bn and (bn*w) or 0,
                bp and (bp*st) or 0,
@@ -964,10 +964,10 @@ do
          end
       end
    end
-   
+
    get_xkanjiskip = function(Nn)
       if Np.auto_xspc==0 or Nq.auto_xspc==0 then
-        return nil 
+        return nil
       elseif (Nq.xspc>=2) and (Np.xspc%2==1) and (Nq.auto_xspc or Np.auto_xspc) then
          return get_xkanjiskip_low(true, Nn.met, 1, 1, 1)
       else
@@ -1009,7 +1009,7 @@ local function get_OA_skip(insert_ksp)
    local g, _, kn, kp, kh = new_jfm_glue(
       pm.char_type,
       fast_find_char_class(
-        (((Nq.id==id_glue)or(Nq.id==id_kern)) and 'glue' or 'jcharbdd'), pm), 
+        (((Nq.id==id_glue)or(Nq.id==id_kern)) and 'glue' or 'jcharbdd'), pm),
       Np.class)
    local k
    if insert_ksp then
@@ -1037,7 +1037,7 @@ local function handle_np_jachar(mode)
       local g, k
       if non_ihb_flag then g, k = calc_ja_ja_glue() end -- M->K
       if not g then g = get_kanjiskip() end
-      handle_penalty_normal(Nq.post, Np.pre, g); 
+      handle_penalty_normal(Nq.post, Np.pre, g);
       real_insert(g); real_insert(k)
    elseif Nq.met then  -- qid==id_hlist
       local g, k
@@ -1047,7 +1047,7 @@ local function handle_np_jachar(mode)
    elseif Nq.pre then
       local g, k; if non_ihb_flag then g, k = get_NA_skip() end -- N_A->X
       if not g then g = get_xkanjiskip(Np) end
-      handle_penalty_normal((qid==id_hlist and 0 or Nq.post), Np.pre, g); 
+      handle_penalty_normal((qid==id_hlist and 0 or Nq.post), Np.pre, g);
       real_insert(g); real_insert(k)
    else
       local g = non_ihb_flag and (get_OA_skip()) -- O_A
@@ -1112,7 +1112,7 @@ do
       [id_hlist] = function() after_hlist(Nq) end,
       [id_pbox]  = function() after_hlist(Nq) end,
       [id_disc]  = function() after_hlist(Nq) end,
-      [id_glue]  = function() 
+      [id_glue]  = function()
                       luatexbase.call_callback("luatexja.jfmglue.special_jaglue_after", Nq.nuc)
                    end,
       [id_pbox_w]= function()
@@ -1140,7 +1140,7 @@ local function handle_list_tail(mode, last)
       -- Insert \jcharwidowpenalty
       if widow_Np.first then handle_penalty_jwp() end
    else
-      Np = Nq          
+      Np = Nq
       -- the current list is the contents of a hbox
       local npi, pm = Np.id, Np.met
       if npi == id_jglyph or (npi==id_pbox and pm) then
@@ -1188,7 +1188,7 @@ do
       {}, {}, {first=nil},
       { auto_kspc=nil, auto_xspc=nil, char=nil, class=nil,
         first=nil, id=nil, last=nil, met=nil, nuc=nil,
-        post=nil, pre=nil, xspc=nil, gk=nil }, 
+        post=nil, pre=nil, xspc=nil, gk=nil },
       { auto_kspc=nil, auto_xspc=nil, char=nil, class=nil,
         first=nil, id=nil, last=nil, met=nil, nuc=nil,
         post=nil, pre=nil, xspc=nil, gk=nil },
@@ -1204,8 +1204,8 @@ do
       local is_dir_tate = list_dir==dir_tate
       capsule_glyph = is_dir_tate and ltjw.capsule_glyph_tate or ltjw.capsule_glyph_yoko
       attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
-      local TEMP = node_new(id_glue) 
-      -- TEMP is a dummy node, which will be freed at the end of the callback. 
+      local TEMP = node_new(id_glue)
+      -- TEMP is a dummy node, which will be freed at the end of the callback.
       -- Without this node, set_attr(kanji_skip, ...) somehow creates an "orphaned"  attribute list.
       do
           kanji_skip, kanjiskip_jfm_flag = skip_table_to_glue(KSK)
@@ -1219,7 +1219,7 @@ do
          -- the current list is to be line-breaked:
          -- hbox from \parindent is skipped.
          local lp, par_indented, lpi, lps  = head, 'boxbdd', getid(head), getsubtype(head)
-         while lp and 
+         while lp and
             ((lpi==id_whatsit and lps~=sid_user)
                or ((lpi==id_hlist) and (lps==3))
                or (lpi==id_local)) do
@@ -1247,7 +1247,7 @@ function luatexja.jfmglue.main(ahead, mode, dir)
    lp = calc_np(last, lp)
    if Np then
       handle_list_head(par_indented)
-      lp = calc_np(last,lp); 
+      lp = calc_np(last,lp);
       while Np do
          adjust_nq();
          local pid, pm = Np.id, Np.met
@@ -1267,14 +1267,14 @@ function luatexja.jfmglue.main(ahead, mode, dir)
    end
    -- adjust attr_icflag for avoiding error
    if tex_getattr(attr_icflag)~=0 then ensure_tex_attr(attr_icflag, 0) end
-   node_free(kanji_skip); 
+   node_free(kanji_skip);
    node_free(xkanji_skip); node_free(TEMP)
    return head
 end
 end
 
 do
-   local IHB  = luatexja.userid_table.IHB 
+   local IHB  = luatexja.userid_table.IHB
    local BPAR = luatexja.userid_table.BPAR
    local BOXB = luatexja.userid_table.BOXB
    local node_prev = node.direct.getprev
@@ -1327,7 +1327,7 @@ do
             end
             Np.met = Nq.met; Np.pre = 0; Np.post = 0; Np.xspc = 0
             Np.auto_xspc, Np.auto_kspc = 0, 0
-         end         
+         end
          return Np
       else
          return Np
@@ -1388,7 +1388,7 @@ do
        local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
        local attr_curtfnt = luatexbase.attributes['ltj@curtfnt']
        local dir_tate = luatexja.dir_table.dir_tate
-       local get_dir_count = ltjd.get_dir_count        
+       local get_dir_count = ltjd.get_dir_count
        function get_current_jfont()
            return tex_getattr((get_dir_count()==dir_tate) and attr_curtfnt or attr_curjfnt)
        end
@@ -1415,7 +1415,7 @@ do
            set_attr(g, attr_yablshift, ica)
        else
            set_attr(g, attr_yablshift, PROCESSED_BEGIN_FLAG + ica)
-           set_attr(g, attr_tablshift, get_current_jfont())               
+           set_attr(g, attr_tablshift, get_current_jfont())
        end
        node_write(g)
    end
@@ -1450,10 +1450,10 @@ do
            if lxi>=PROCESSED_BEGIN_FLAG then
                lxi = lxi%PROCESSED_BEGIN_FLAG
                if lxi == KANJI_SKIP then
-                   special_jaglue_after_inner(lx, lxi, KANJI_SKIP_JFM, kanji_skip, 
+                   special_jaglue_after_inner(lx, lxi, KANJI_SKIP_JFM, kanji_skip,
                      ltjf_font_metric_table[get_attr(lx, attr_tablshift)].kanjiskip or null_skip_table)
                else --  lxi == XKANJI_SKIP
-                   special_jaglue_after_inner(lx, lxi, XKANJI_SKIP_JFM, xkanji_skip, 
+                   special_jaglue_after_inner(lx, lxi, XKANJI_SKIP_JFM, xkanji_skip,
                      ltjf_font_metric_table[get_attr(lx, attr_tablshift)].xkanjiskip or null_skip_table)
                end
            else
