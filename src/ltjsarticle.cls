@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsarticle}
-  [2022/04/11 ltjsclasses ]
+  [2022/08/23 ltjsclasses ]
 \def\jsc@clsname{ltjsarticle}
 \def\Cjascale{0.924715}
 \RequirePackage{luatexja}
@@ -249,13 +249,15 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \begingroup\catcode`\%=12\relax
   \directlua{
     local getdimen, mpt=tex.getdimen, tex.getdimen('jsc@mpt')/65536
+    local floor, cnt_dimen_at = math.floor, luatexbase.registernumber 'dimen@'
+    local print_scaled, sprint = luatexja.print_scaled, tex.sprint
     local t = lua.get_functions_table()
     t[\the\ltjs@@magnify@font@calc] = function()
-      tex.sprint(-2,math.floor(0.5+mpt*getdimen('dimen@')))
+      sprint(-2,floor(0.5+mpt*getdimen(cnt_dimen_at)))
     end
     function luatexja.ltjs_unmagnify_fsize(a)
-      local s = luatexja.print_scaled(math.floor(0.5+a/mpt*65536))
-      tex.sprint(-2, (s:match('%.0$')) and s:sub(1,-3) or s )
+      local s = print_scaled(floor(0.5+a/mpt*65536))
+      sprint(-2, (s:match('%.0$')) and s:sub(1,-3) or s )
     end
   }
   \endgroup

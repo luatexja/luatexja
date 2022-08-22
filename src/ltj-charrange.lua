@@ -32,7 +32,7 @@ do
    end
 end
 for i = 31, 31*ATTR_RANGE-1 do
-   local ka, pw = luatexbase.attributes['ltj@kcat'..floor(i/31)], 2^(i%31)
+   local ka, pw = luatexbase.attributes['ltj@kcat'..(i//31)], 2^(i%31)
    kcat_attr_table[i], pow_table[i] = ka, pw
    fn_table[i] = function(p) return (get_attr(p, ka) or 0)&pw==0 end
    nfn_table[i] = function(p) return (get_attr_node(p, ka) or 0)&pw==0 end

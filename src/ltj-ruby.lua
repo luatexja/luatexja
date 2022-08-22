@@ -195,9 +195,7 @@ end
 
 local function expand_3bits(num)
    local t = {}; local a = num
-   for i = 1, 10 do
-      t[i] = a%8; a = floor(a/8)
-   end
+   for i = 1, 10 do t[i], a = a%8, a//8 end
    return t
 end
 ----------------------------------------------------------------
@@ -267,7 +265,7 @@ local function texiface_low(rst, rtlr, rtlp)
    local wv = node_new(id_whatsit, sid_user)
    setfield(w, 'value', to_node(wv))
    setfield(wv, 'type', 108)
-   setfield(wv, 'value', rst); rst.count = floor(#rtlr)
+   setfield(wv, 'value', rst); rst.count = #rtlr
    setfield(wv, 'user_id', RUBY_PRE) -- dummy
    local n = wv
    for i = 1, #rtlr do
@@ -319,7 +317,7 @@ local function enlarge_parent(r, p, tmp_tbl, no_begin, no_end)
    local pre_intrusion, post_intrusion
    local ppre, pmid, ppost = tmp_tbl.ppre, tmp_tbl.pmid, tmp_tbl.ppost
    local mapre, mapost = tmp_tbl.mapre, tmp_tbl.mapost
-   local intmode = floor(tmp_tbl.mode/4)%4
+   local intmode = (tmp_tbl.mode//4)%4
    if no_begin then mapre  = mapre + tmp_tbl.before_jfmgk end
    if no_end   then mapost = mapost + tmp_tbl.after_jfmgk end
    if (tmp_tbl.mode%4 >=2) and (tmp_tbl.pre<0) and (tmp_tbl.post<0) then
@@ -342,7 +340,7 @@ local function enlarge_parent(r, p, tmp_tbl, no_begin, no_end)
       if n < sumprot then
          pre_intrusion = n/2; post_intrusion = n/2
       else
-         pre_intrusion = floor(sumprot/2); post_intrusion = sumprot - pre_intrusion
+         pre_intrusion = sumprot//2; post_intrusion = sumprot - pre_intrusion
       end
       p = enlarge(p, rwidth, ppre, pmid, ppost, pre_intrusion, post_intrusion)
       pre_intrusion = min(mapre, pre_intrusion + round(ppre*getfield(p, 'glue_set')*65536))
@@ -375,8 +373,8 @@ local function new_ruby_box(r, p, tmp_tbl, no_begin, no_end)
    local ppre, pmid, ppost = tmp_tbl.ppre, tmp_tbl.pmid, tmp_tbl.ppost
    local mapre, mapost = tmp_tbl.mapre, tmp_tbl.mapost
    local rpre, rmid, rpost, rsmash
-   imode = floor(tmp_tbl.mode/0x100000); rsmash = (imode%2 ==1)
-   imode = floor(imode/2); rpost = imode%8;
+   imode = tmp_tbl.mode//0x100000; rsmash = (imode%2 ==1)
+   imode = imode//2; rpost = imode%8;
    imode = (imode-rpost)/8;  rmid  = imode%8;
    imode = (imode-rmid)/8;   rpre  = imode%8
    if getwidth(r) > getwidth(p) then  -- change the width of p
@@ -426,7 +424,7 @@ end
 local post_intrusion_backup, post_jfmgk_backup
 local max_allow_pre, max_allow_post
 
-
+local flush_list = node.direct.flush_list
 -- 中付き熟語ルビ，cmp containers
 -- 「文字の構成を考えた」やつはどうしよう
 local function pre_low_cal_box(w, cmp)
@@ -481,7 +479,7 @@ local function pre_low_cal_box(w, cmp)
 
    -- w.value の node list 更新．
    local nt = wv
-   node.direct.flush_list(node_next(wv))
+   flush_list(node_next(wv))
    for i = 1, 2*cmp+1 do setnext(nt, kf[i]); nt = kf[i]  end
 
    if cmp==1 then     solve_1(coef)
@@ -635,11 +633,12 @@ do
    end
 end
 
+local traverse_id = node.direct.traverse_id
 local function post_high_break(head)
    local rs = {}   -- rs: sequence of ruby_nodes,
    local rw = nil  -- rw: main whatsit
    local cmp = -2  -- dummy
-   for h in node.direct.traverse_id(id_hlist, to_direct(head)) do
+   for h in traverse_id(id_hlist, to_direct(head)) do
       for i = 1, #rs do rs[i] = nil end
       local ha = getlist(h)
       while ha do

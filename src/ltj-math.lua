@@ -34,7 +34,8 @@ local node_remove = node.direct.remove
 local node_free = node.direct.flush_node or node.direct.free
 local get_attr = node.direct.get_attribute
 local set_attr = node.direct.set_attribute
-local tex_getcount = tex.getcount
+local getcount = tex.getcount
+local cnt_stack = luatexbase.registernumber 'ltj@@stack'
 
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local attr_dir = luatexbase.attributes['ltj@dir']
@@ -145,7 +146,7 @@ cjh_A = function (p, sty)
       elseif pid == id_mchar then
          local pc, fam = getchar (p), get_attr(p, attr_jfam) or -1
          if (not is_math_letters[pc]) and is_ucs_in_japanese_char(p) and fam>=0 then
-            local f = ltjs.get_stack_table(MJT + 0x100 * sty + fam, -1, tex_getcount('ltj@@stack'))
+            local f = ltjs.get_stack_table(MJT + 0x100 * sty + fam, -1, getcount(cnt_stack))
             if f ~= -1 then
                local q = node_new(id_sub_box)
                local r = node_new(id_glyph, 256); setnext(r, nil)

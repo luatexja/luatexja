@@ -1384,6 +1384,7 @@ do
    local getnest = tex.getnest
    local tex_getattr = tex.getattribute
    local get_current_jfont
+   local cnt_stack = luatexbase.registernumber 'ltj@@stack'
    do
        local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
        local attr_curtfnt = luatexbase.attributes['ltj@curtfnt']
@@ -1401,9 +1402,9 @@ do
    local function insert_k_skip_common(ind, name, ica, icb)
        if abs(getnest().mode) ~= ltjs.hmode then return end
        local g = node_new(id_glue); set_attr(g, attr_icflag, SPECIAL_JAGLUE)
-       local is_late = scan_keyword("late")
+       local is_late = scan_keyword 'late'
        if not is_late then
-           local st = get_stack_skip(ind, getcount('ltj@@stack'))
+           local st = get_stack_skip(ind, getcount(cnt_stack))
            if st[1]==1073741823 then
                local bk = ltjf_font_metric_table[get_current_jfont()][name]
                if bk then

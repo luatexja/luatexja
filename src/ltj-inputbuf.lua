@@ -11,7 +11,7 @@ local utfchar = utf.char
 local id_glyph = node.id 'glyph'
 local getcatcode, getcount = tex.getcatcode, tex.getcount
 local ltjc_is_japanese_char_curlist = ltjc.is_japanese_char_curlist
-
+local cnt_lineend = luatexbase.registernumber 'ltjlineendcomment'
 local substituter
 do
     local uchar = utf.char
@@ -69,7 +69,7 @@ local function add_comment(buffer)
          if (te ~= -1) and (getcatcode(te)==5) then
             local ct = getcatcode(c)
             if (ct==11) or (ct==12) then
-               local lec = getcount 'ltjlineendcomment'
+               local lec = getcount(cnt_lineend)
                -- Is the catcode of \ltjlineendcomment (new comment char) is 14 (comment)?
                if ltjc_is_japanese_char_curlist(c) and (getcatcode(lec)==14) then
                   stop_time_measure 'inputbuf'; return buffer .. utfchar(lec)

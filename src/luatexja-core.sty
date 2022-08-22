@@ -147,8 +147,11 @@
 \ltj@curjfnt\m@ne
 \ltj@curtfnt\m@ne
 
-%%%%%%%% Attributes for character ranges
 \newcount\ltj@tempcnta
+\newcount\ltj@@stack \newcount\ltj@@group@level
+\ltj@@group@level\z@\ltj@@stack\z@
+
+%%%%%%%% Attributes for character ranges
 \ltj@tempcnta\z@
 \loop\ifnum\ltj@tempcnta<7
   \expandafter\newattribute%
@@ -298,9 +301,6 @@
   }
 
 %%%%%%%% \ltjsetparameter
-\newcount\ltj@@stack \newcount\ltj@@group@level
-\ltj@@group@level\z@\ltj@@stack\z@
-
 \setbox\z@\hbox{%
   \directlua{% This value depends on the version of LuaTeX.
     luatexja.stack.hmode = -tex.getnest().mode

@@ -46,7 +46,7 @@ local sid_user   = node.subtype 'user_defined'
 
 local getnest = tex.getnest
 local tex_nest = tex.nest
-local tex_getcount = tex.getcount
+local getcount = tex.getcount
 local ensure_tex_attr = ltjb.ensure_tex_attr
 local PROCESSED    = luatexja.icflag_table.PROCESSED
 local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
@@ -545,12 +545,13 @@ function get_box_dir(b, default)
 end
 
 do
+   local ltj_tempcnta = luatexbase.registernumber 'ltj@tempcnta'
    local getbox = tex.getbox
    local dir_backup
    function luatexja.direction.unbox_check_dir(is_copy)
       start_time_measure 'box_primitive_hook'
       local list_dir = get_dir_count()%dir_math_mod
-      local b = getbox(tex_getcount 'ltj@tempcnta')
+      local b = getbox(getcount(ltj_tempcnta))
       if b and getlist(to_direct(b)) then
          local box_dir = get_box_dir(to_direct(b), dir_yoko)
          if box_dir%dir_math_mod ~= list_dir then
@@ -587,7 +588,7 @@ do
       stop_time_measure 'box_primitive_hook'
    end
    function luatexja.direction.uncopy_restore_whatsit()
-      local b = getbox(tex_getcount 'ltj@tempcnta')
+      local b = getbox(getcount(ltj_tempcnta))
       if b then
          local bd = to_direct(b)
          if dir_backup then

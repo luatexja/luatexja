@@ -21,6 +21,8 @@ local fastcopy = table.fastcopy
 local setcount, getcount = tex.setcount, tex.getcount
 local scan_int, scan_keyword = token.scan_int, token.scan_keyword
 local getnest = tex.getnest
+local cnt_stack = luatexbase.registernumber 'ltj@@stack'
+local cnt_grplvl = luatexbase.registernumber 'ltj@@group@level'
 ltjs.hmode = 0 -- dummy
 
 local charprop_stack_table={}
@@ -28,19 +30,19 @@ ltjs.charprop_stack_table = charprop_stack_table
 charprop_stack_table[0]={}
 
 local function get_stack_level()
-   local i = getcount 'ltj@@stack'
+   local i = getcount(cnt_stack)
    local j = tex.currentgrouplevel
-   if j > getcount 'ltj@@group@level' then
+   if j > getcount(cnt_grplvl) then
       i = i+1 -- new stack level
       local gd = tex.globaldefs
       if gd~=0 then tex.globaldefs = 0 end
       --  'tex.globaldefs = 0' is local even if \globaldefs > 0.
-      setcount('ltj@@group@level', j)
+      setcount(cnt_grplvl, j)
       for k,v in pairs(charprop_stack_table) do -- clear the stack above i
          if k>=i then charprop_stack_table[k]=nil end
       end
       charprop_stack_table[i] = fastcopy(charprop_stack_table[i-1])
-      setcount('ltj@@stack', i)
+      setcount(cnt_stack, i)
       if gd~=0 then tex.globaldefs = gd end
       if getnest().mode == -ltjs.hmode then -- rest. hmode のみ
          local g = node_new(id_whatsit, sid_user)

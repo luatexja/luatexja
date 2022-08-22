@@ -29,7 +29,7 @@ local node_remove = node.direct.remove
 local node_next =  node.direct.getnext
 local node_free = node.direct.flush_node or node.direct.free
 local node_end_of_math = node.direct.end_of_math
-local tex_getcount = tex.getcount
+local getcount = tex.getcount
 
 local id_glyph = node.id('glyph')
 local id_math = node.id('math')
@@ -142,6 +142,7 @@ local ltjs_report_stack_level = ltjs.report_stack_level
 local ltjf_font_metric_table  = ltjf.font_metric_table
 local font_getfont = font.getfont
 local traverse_id = node.direct.traverse_id
+local cnt_stack = luatexbase.registernumber 'ltj@@stack'
 function set_box_stack_level(head, mode)
    local box_set, cl = 0, tex.currentgrouplevel + 1
    if mode then
@@ -151,7 +152,7 @@ function set_box_stack_level(head, mode)
    else
       for _,p  in pairs(wt) do node_free(p) end
    end
-   ltjs_report_stack_level(tex_getcount('ltj@@stack') + box_set)
+   ltjs_report_stack_level(getcount(cnt_stack) + box_set)
    for _,p  in pairs(wtd) do node_free(p) end
    if ltjs.list_dir == dir_tate then
       for p in traverse_id(id_glyph,to_direct(head)) do

@@ -164,11 +164,11 @@ local floor = math.floor
 local function print_scaled(s)
    local out, delta = '', 10
    if s<0 then s, out = -s, out..'-' end
-   out=out..tostring(floor(s/65536)) .. '.'
+   out=out..tostring(s//65536) .. '.'
    s=10*(s%65536)+5
    repeat
       if delta>65536 then s=s+32768-50000 end
-      out=out .. tostring(floor(s/65536))
+      out=out .. tostring(s//65536)
       s=10*(s%65536); delta=delta*10
    until s<=delta
    return out
@@ -200,6 +200,8 @@ end
 ------------------------------------------------------------------------
 -- CODE FOR GETTING/SETTING PARAMETERS
 ------------------------------------------------------------------------
+local getcount, texwrite = tex.getcount, tex.write
+local cnt_stack = luatexbase.registernumber 'ltj@@stack'
 
 -- EXT: print parameters that don't need arguments
 do
@@ -263,7 +265,7 @@ do
    function luatexja.ext_get_parameter_unary()
       local k= scan_arg()
       if unary_pars[k] then
-         tex.write(tostring(unary_pars[k](tex.getcount('ltj@@stack'))))
+         texwrite(tostring(unary_pars[k](getcount(cnt_stack))))
       end
       ltjb.stop_time_measure('get_par')
    end
@@ -318,7 +320,7 @@ do
    binary_pars.alxspmode = binary_pars.jaxspmode
    function luatexja.ext_get_parameter_binary(k, c)
       if binary_pars[k] then
-         tex.write(tostring(binary_pars[k](c,tex.getcount('ltj@@stack'))))
+         texwrite(tostring(binary_pars[k](c, getcount(cnt_stack))))
       end
       ltjb.stop_time_measure('get_par')
    end

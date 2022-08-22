@@ -501,28 +501,26 @@ luatexja.unary_pars.profile_hgap_factor = function(t)
    return luatexja.adjust.profile_hgap_factor
 end
 do
-  local insert = table.insert
+  local insert, texget = table.insert, tex.get
   local rangedimensions, max = node.direct.rangedimensions, math.max
   local function profile_inner(box, range, ind, vmirrored, adj)
     local w_acc, d_before = getshift(box), 0
     local x = getlist(box); local xn = node_next(x)
     while x do
       local w, h, d
-      if xn then w, h, d= rangedimensions(box,x,xn)
-      else w, h, d= rangedimensions(box,x) end
+      if xn then w, h, d = rangedimensions(box,x,xn)
+      else w, h, d = rangedimensions(box,x) end
       if vmirrored then h=d end
       local w_new = w_acc + w
-      if w>=0 then
-        range:insert(ind, h, w_acc-adj, w_new)
-      else
-        range:insert(ind, h, w_new-adj, w_acc)
+      if w>=0 then range:insert(ind, h, w_acc-adj, w_new)
+      else range:insert(ind, h, w_new-adj, w_acc)
       end
       w_acc = w_new; x = xn; if x then xn = node_next(x) end
     end
   end
   function ltjl.p_profile(before, after, mirrored, bw)
     local range, tls
-      = init_range(), luatexja.adjust.profile_hgap_factor*tex.get('lineskip', false)
+      = init_range(), luatexja.adjust.profile_hgap_factor*texget('lineskip', false)
     profile_inner(before, range, 3, true,     tls)
     profile_inner(after,  range, 4, mirrored, tls)
     range = range:flatten()
@@ -544,7 +542,7 @@ end
 
 do
   local ltja = luatexja.adjust
-  local copy_glue = ltjl.copy_glue
+  local copy_glue, texget = ltjl.copy_glue, tex.get
   local floor, max = math.floor, math.max
   function ltjl.l_step(dist, g, adj, normal, bw, loc)
     if loc=='alignment' then
@@ -552,7 +550,7 @@ do
     end
     if dist < tex.lineskiplimit then
     local f = max(1, bw*ltja.step_factor)
-       copy_glue(g, 'baselineskip', 1, normal - f * floor((dist-tex.get('lineskip', false))/f))
+       copy_glue(g, 'baselineskip', 1, normal - f * floor((dist-texget('lineskip', false))/f))
     else
        copy_glue(g, 'baselineskip', 2, normal)
     end
