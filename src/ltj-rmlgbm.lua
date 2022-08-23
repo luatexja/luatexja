@@ -1,7 +1,7 @@
 --
 -- ltj-rmlgbm.lua
 --
-luatexja.load_module('base');      local ltjb = luatexja.base
+luatexja.load_module 'base';      local ltjb = luatexja.base
 
 local cidfont_data = {}
 local cache_chars = {}
@@ -224,7 +224,7 @@ local cidf_vert_processor
 do
    local traverse_id, is_node = node.direct.traverse_id, node.is_node
    local to_direct = node.direct.todirect
-   local id_glyph = node.id('glyph')
+   local id_glyph = node.id 'glyph'
    local getfont = node.direct.getfont
    local getchar = node.direct.getchar
    local setchar = node.direct.setchar

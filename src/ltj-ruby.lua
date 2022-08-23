@@ -24,6 +24,7 @@ local getwidth =  node.direct.getwidth
 local getheight = node.direct.getheight
 local getdepth = node.direct.getdepth
 local getwhd = node.direct.getwhd
+local getvalue = node.direct.getdata
 local setfield =  node.direct.setfield
 local setglue = luatexja.setglue
 local setkern = node.direct.setkern
@@ -34,6 +35,7 @@ local setheight = node.direct.setheight
 local setdepth = node.direct.setdepth
 local setwhd = node.direct.setwhd
 local setlist = node.direct.setlist
+local setvalue = node.direct.setdata
 
 local node_new = node.direct.new
 local node_remove = node.direct.remove
@@ -263,9 +265,8 @@ local function texiface_low(rst, rtlr, rtlp)
    local w = node_new(id_whatsit, sid_user)
    setfield(w, 'type', 110); setfield(w, 'user_id', RUBY_PRE)
    local wv = node_new(id_whatsit, sid_user)
-   setfield(w, 'value', to_node(wv))
    setfield(wv, 'type', 108)
-   setfield(wv, 'value', rst); rst.count = #rtlr
+   setvalue(w, to_node(wv)); setvalue(wv, rst); rst.count = #rtlr
    setfield(wv, 'user_id', RUBY_PRE) -- dummy
    local n = wv
    for i = 1, #rtlr do
@@ -434,8 +435,8 @@ local function pre_low_cal_box(w, cmp)
    -- kf[i] : container 1--i からなる行末形
    -- kf[cmp+i] : container i--cmp からなる行頭形
    -- kf[2cmp+1] : 行中形
-   local wv = getfield(w, 'value')
-   local rst = getfield(wv, 'value')
+   local wv = getvalue(w)
+   local rst = getvalue(wv)
    local mdt -- nt*: node temp
    local coef = {} -- 連立一次方程式の拡大係数行列
    local rtb = expand_3bits(rst.stretch)
@@ -538,8 +539,8 @@ local function pre_high(ahead)
    local n = first_whatsit(head)
    while n do
       if getsubtype(n) == sid_user and getfield(n, 'user_id') == RUBY_PRE then
-         local nv = getfield(n, 'value')
-         local rst = getfield(nv, 'value')
+         local nv = getvalue(n)
+         local rst = getvalue(nv)
          max_allow_pre = rst.pre or 0
          local atr = get_attr(n, attr_ruby) or 0
          if max_allow_pre < 0 then
@@ -594,7 +595,7 @@ do
       if #rs ==0 or not rw then return ch end
       local hn = get_attr(rs[1], attr_ruby)
       local fn = get_attr(rs[#rs], attr_ruby)
-      local wv = getfield(rw, 'value')
+      local wv = getvalue(rw)
       if hn==1 then
          if fn==2*cmp+2 then
             local hn = node_tail(wv)
@@ -656,7 +657,7 @@ local function post_high_break(head)
             rs[1], rw = ha, nil; ha = node_next(ha)
          elseif i==2 then
             rw = ha
-            cmp = getfield(getfield(rw, 'value'), 'value').count
+            cmp = getvalue(getvalue(rw)).count
             local hb, hc =  node_remove(getlist(h), rw)
             setlist(h, hb); ha = hc
          else -- i>=3
@@ -688,7 +689,7 @@ local function post_high_hbox(ahead)
          rs[1], rw = ha, nil; ha = node_next(ha)
       elseif i==2 then
          rw = ha
-         cmp = getfield(getfield(rw, 'value'), 'value').count
+         cmp = getvalue(getvalue(rw)).count
          head, ha = node_remove(head, rw)
       else -- i >= 3
          rs[#rs+1] = ha; ha = node_next(ha)
@@ -712,8 +713,8 @@ do
       if Np.nuc then return Np
       elseif  getfield(lp, 'user_id') == RUBY_PRE then
          Np.first, Np.nuc, Np.last = lp, lp, lp
-         local lpv = getfield(lp, 'value')
-         local rst = getfield(lpv, 'value')
+         local lpv = getvalue(lp)
+         local rst = getvalue(lpv)
          local x = node_next(node_next(lpv))
          Np.last_char = luatexja.jfmglue.check_box_high(Np, getlist(x), nil)
          if Nq.id ~=id_pbox_w then
@@ -779,8 +780,8 @@ do
             Np.first = last_glue
             next_cluster_array[Nq.nuc] = last_glue -- ルビ処理用のグルー
          end
-         local nqnv = getfield(Nq.nuc, 'value')
-         local rst = getfield(nqnv, 'value')
+         local nqnv = getvalue(Nq.nuc)
+         local rst = getvalue(nqnv)
          if Nq.gk then
             if type(Nq.gk)=="table" then
                for _,v in ipairs(Nq.gk) do add_gk(rst, 'before_jfmgk', v) end
@@ -799,11 +800,11 @@ do
                end
                rst.post = p
             end
-            Np.prev_ruby = get_attr(getfield(Nq.nuc, 'value'), attr_ruby_id)
+            Np.prev_ruby = get_attr(getvalue(Nq.nuc), attr_ruby_id)
             -- 前のクラスタがルビであったことのフラグ
          else -- 直前が文字以外
-            local nqnv = getfield(Nq.nuc, 'value')
-            local rst = getfield(nqnv, 'value')
+            local nqnv = getvalue(Nq.nuc)
+            local rst = getvalue(nqnv)
             if rst.post < 0 then -- auto
                rst.post = 0
             end
@@ -817,7 +818,7 @@ do
                               "luatexja.ruby.np_info_after", 1)
    local function w (s, Nq, Np)
       if not s and  getfield(Nq.nuc, 'user_id') == RUBY_PRE then
-         local rst = getfield(getfield(Nq.nuc, 'value'), 'value')
+         local rst = getvalue(getvalue(Nq.nuc))
          if Np.gk then
             if type(Np.gk)=="table" then
                for _,v in ipairs(Np.gk) do add_gk(rst, 'after_jfmgk', v) end

@@ -562,13 +562,15 @@ do
   local sid_user = node.subtype 'user_defined'
   local node_remove = node.direct.remove
   local node_write = node.direct.write
+  local getvalue = node.direct.getdata
+  local setvalue = node.direct.setdata
   local GHOST_JACHAR = luatexbase.newuserwhatsitid('ghost of a jachar',  'luatexja')
   luatexja.userid_table.GHOST_JACHAR = GHOST_JACHAR
   function ltja.create_ghost_jachar_node(cl)
     local tn = node_new(id_whatsit, sid_user)
     setfield(tn, 'user_id', GHOST_JACHAR)
     setfield(tn, 'type', 100)
-    setfield(tn, 'value', cl)
+    setvalue(tn, cl)
     node_write(tn)
   end
   local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
@@ -585,7 +587,7 @@ do
     if Np and Np.nuc then return Np
     elseif Np and getfield(lp, 'user_id') == GHOST_JACHAR then
       Np.first = lp; Np.nuc = lp; Np.last = lp; Np.class = 0
-      if getfield(lp,'value')<2 then
+      if getvalue(lp)<2 then
         if Nq and Nq.met then Np.met = Nq.met; else Np.met = get_current_metric(lp) end
         Np.pre = 0; Np.post = 0; Np.xspc = 3
       else Np.met, Np.pre = nil, nil; end
@@ -598,7 +600,7 @@ do
     if not s and getfield(Nq.nuc, 'user_id') == GHOST_JACHAR then
       local x, y = node_prev(Nq.nuc), Nq.nuc
       Nq.first, Nq.nuc, Nq.last = x, x, x
-      if getfield(y,'value')%2==0 then
+      if getvalue(y)%2==0 then
         if Np and Nq.met then Nq.met = Np.met; else Nq.met = get_current_metric(y) end
         Nq.pre = 0; Nq.post = 0; Nq.xspc = 3
       else Nq.met, Nq.pre = nil, nil; end

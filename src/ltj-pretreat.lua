@@ -31,10 +31,10 @@ local node_free = node.direct.flush_node or node.direct.free
 local node_end_of_math = node.direct.end_of_math
 local getcount = tex.getcount
 
-local id_glyph = node.id('glyph')
-local id_math = node.id('math')
-local id_whatsit = node.id('whatsit')
-local sid_user = node.subtype('user_defined')
+local id_glyph = node.id 'glyph'
+local id_math = node.id 'math'
+local id_whatsit = node.id 'whatsit'
+local sid_user = node.subtype 'user_defined'
 
 local attr_dir = luatexbase.attributes['ltj@dir']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
@@ -85,11 +85,11 @@ do
    }
    setmetatable(suppress_hyphenate_ja_aux,
                 { __index = function() return node_next end, })
-   local id_boundary = node.id('boundary')
+   local id_boundary = node.id 'boundary'
    local node_new, insert_before = node.direct.new, node.direct.insert_before
    local setsubtype = node.direct.setsubtype
    local function suppress_hyphenate_ja (h)
-      start_time_measure('ltj_hyphenate')
+      start_time_measure 'ltj_hyphenate'
       head = to_direct(h)
       for i = 1,#wt do wt[i]=nil end
       for i = 1,#wtd do wtd[i]=nil end
@@ -126,9 +126,9 @@ do
             p = (suppress_hyphenate_ja_aux[pid])(p)
          end
       end
-      stop_time_measure('ltj_hyphenate'); start_time_measure('tex_hyphenate')
+      stop_time_measure 'ltj_hyphenate'; start_time_measure 'tex_hyphenate'
       lang.hyphenate(h, nil)
-      stop_time_measure('tex_hyphenate')
+      stop_time_measure 'tex_hyphenate'
       return h
    end
 
@@ -143,14 +143,17 @@ local ltjf_font_metric_table  = ltjf.font_metric_table
 local font_getfont = font.getfont
 local traverse_id = node.direct.traverse_id
 local cnt_stack = luatexbase.registernumber 'ltj@@stack'
+local texget, getvalue = tex.get, node.direct.getdata
 function set_box_stack_level(head, mode)
-   local box_set, cl = 0, tex.currentgrouplevel + 1
+   local box_set = 0
    if mode then
-      for _,p  in pairs(wt) do
-         if getfield(p, 'value')==cl then box_set = 1 end; node_free(p)
+      local cl = (texget 'currentgrouplevel') + 1
+      for i=1,#wt do
+         local p = wt[i]
+         if getvalue(p)==cl then box_set = 1 end; node_free(p)
       end
    else
-      for _,p  in pairs(wt) do node_free(p) end
+      for i=1,#wt do node_free(wt[i]) end
    end
    ltjs_report_stack_level(getcount(cnt_stack) + box_set)
    for _,p  in pairs(wtd) do node_free(p) end

@@ -150,7 +150,7 @@ cjh_A = function (p, sty)
             if f ~= -1 then
                local q = node_new(id_sub_box)
                local r = node_new(id_glyph, 256); setnext(r, nil)
-               setchar(r, pc); setfont(r, f)
+               setfont(r, f, pc)
                local k = get_attr(r,attr_ykblshift) or 0; set_attr(r, attr_ykblshift, 0)
                -- ltj-setwidth 内で実際の位置補正はおこなうので，補正量を退避
                local met = ltjf_font_metric_table[f]

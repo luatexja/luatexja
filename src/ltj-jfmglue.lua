@@ -42,6 +42,7 @@ do
 end
 local setpenalty = node.direct.setpenalty
 local setkern = node.direct.setkern
+local call_callback = luatexbase.call_callback
 
 local get_attr = node.direct.get_attribute
 local set_attr = node.direct.set_attribute
@@ -402,7 +403,7 @@ function calc_np_aux_glyph_common(lp, acc_flag)
          Np.last_char = npn
          if r then
             local nf, nc = getfont(npn), getchar(npn)
-            local ct = (font.getfont(nf) or font.fonts[nf] ).characters[nc]
+            local ct = (font_getfont(nf) or font.fonts[nf] ).characters[nc]
             if not ct then -- variation selector
                node_free(r)
             elseif (ct.left_protruding or 0) == 0 then
@@ -434,6 +435,7 @@ local sid_start_link   = node.subtype 'pdf_start_link'
 local sid_start_thread = node.subtype 'pdf_start_thread'
 local sid_end_link     = node.subtype 'pdf_end_link'
 local sid_end_thread   = node.subtype 'pdf_end_thread'
+local getvalue = node.direct.getdata
 calc_np_auxtable = {
    [id_glyph] = calc_np_aux_glyph_common,
    [id_hlist] = function(lp)
@@ -466,7 +468,7 @@ calc_np_auxtable = {
       if lps==sid_user then
          if getfield(lp, 'user_id')==luatexja.userid_table.IHB then
             local lq = node_next(lp);
-            head = node_remove(head, lp); node_free(lp); non_ihb_flag = getfield(lp, 'value')~=1
+            head = node_remove(head, lp); node_free(lp); non_ihb_flag = getvalue(lp)~=1
             return false, lq;
          elseif getfield(lp, 'user_id')==luatexja.userid_table.JA_AL_BDD then
             local lq = node_next(lp);
@@ -474,7 +476,7 @@ calc_np_auxtable = {
             return false, lq;
          else
             set_attr(lp, attr_icflag, PROCESSED)
-            luatexbase.call_callback("luatexja.jfmglue.whatsit_getinfo",
+            call_callback("luatexja.jfmglue.whatsit_getinfo",
                                      Np, lp, Nq)
             if Np.nuc then
                Np.id = id_pbox_w; Np.first = Np.nuc; Np.last = Np.nuc;
@@ -507,7 +509,7 @@ calc_np_auxtable = {
    [id_glue] = function(lp)
       Np.first, Np.nuc, Np.last = (Np.first or lp), lp, lp;
       Np.id = getid(lp);
-      local f = luatexbase.call_callback("luatexja.jfmglue.special_jaglue", lp)
+      local f = call_callback("luatexja.jfmglue.special_jaglue", lp)
       if f then
          set_attr(lp, attr_icflag, PROCESSED)
       end
@@ -557,7 +559,7 @@ function calc_np(last, lp)
    local k
    -- We assume lp = node_next(Np.last)
    if Nq and Nq.id==id_pbox_w then
-      luatexbase.call_callback("luatexja.jfmglue.whatsit_last_minute", false, Nq, Np)
+      call_callback("luatexja.jfmglue.whatsit_last_minute", false, Nq, Np)
    end
    Np, Nq, non_ihb_flag = Nq, Np, true
    -- We clear `predefined' entries of Np before pairs() loop,
@@ -694,7 +696,7 @@ luatexbase.create_callback('luatexja.adjust_jfmglue', 'simple', function(n) retu
 
 -- change penalties (or create a new penalty, if needed)
 local function handle_penalty_normal(post, pre, g)
-   luatexbase.call_callback('luatexja.adjust_jfmglue', head, Nq, Np, Bp)
+   call_callback('luatexja.adjust_jfmglue', head, Nq, Np, Bp)
    local a = (pre or 0) + (post or 0)
    if #Bp == 0 then
       if (a~=0 and not(g and getid(g)==id_kern)) then
@@ -708,7 +710,7 @@ local function handle_penalty_normal(post, pre, g)
 end
 
 local function handle_penalty_always(post, pre, g)
-   luatexbase.call_callback('luatexja.adjust_jfmglue', head, Nq, Np, Bp)
+   call_callback('luatexja.adjust_jfmglue', head, Nq, Np, Bp)
    local a = (pre or 0) + (post or 0)
    if #Bp == 0 then
       if not (g and getid(g)==id_glue) or a~=0 then
@@ -722,7 +724,7 @@ local function handle_penalty_always(post, pre, g)
 end
 
 local function handle_penalty_suppress(post, pre, g)
-   luatexbase.call_callback('luatexja.adjust_jfmglue', head, Nq, Np, Bp)
+   call_callback('luatexja.adjust_jfmglue', head, Nq, Np, Bp)
    if #Bp == 0 then
       if g and getid(g)==id_glue then
          local p = node_new(id_penalty, nil, Nq.nuc, Np.nuc)
@@ -1113,10 +1115,10 @@ do
       [id_pbox]  = function() after_hlist(Nq) end,
       [id_disc]  = function() after_hlist(Nq) end,
       [id_glue]  = function()
-                      luatexbase.call_callback("luatexja.jfmglue.special_jaglue_after", Nq.nuc)
+                      call_callback("luatexja.jfmglue.special_jaglue_after", Nq.nuc)
                    end,
       [id_pbox_w]= function()
-                      local hh = luatexbase.call_callback("luatexja.jfmglue.whatsit_after", false, Nq, Np, head)
+                      local hh = call_callback("luatexja.jfmglue.whatsit_after", false, Nq, Np, head)
                       -- hh: new head of false (nott processed)
                       if hh then head = hh end
                    end,
@@ -1279,13 +1281,14 @@ do
    local BOXB = luatexja.userid_table.BOXB
    local node_prev = node.direct.getprev
    local node_write = node.direct.write
+   local setvalue = node.direct.setdata
 
    -- \inhibitglue, \disinhibitglue
    local function ihb_node(v)
       local tn = node_new(id_whatsit, sid_user)
       setfield(tn, 'user_id', IHB)
       setfield(tn, 'type', 100)
-      setfield(tn, 'value', v)
+      setvalue(tn, v)
       node_write(tn)
    end
    function luatexja.jfmglue.create_inhibitglue_node()
@@ -1301,7 +1304,7 @@ do
       local tn = node_new(id_whatsit, sid_user)
       setfield(tn, 'user_id', BPAR)
       setfield(tn, 'type', 100)
-      setfield(tn, 'value', 1)
+      setvalue(tn, 1)
       node_write(tn)
    end
 
@@ -1310,7 +1313,7 @@ do
       local tn = node_new(id_whatsit, sid_user)
       setfield(tn, 'user_id', BOXB)
       setfield(tn, 'type', 100)
-      setfield(tn, 'value', 1)
+      setvalue(tn, 1)
       node_write(tn)
    end
 

@@ -135,7 +135,7 @@ if tex.outputmode==0 then
       'Use lua*tex instead dvilua*tex.')
 end
 load_module 'rmlgbm';    local ltjr = luatexja.rmlgbm -- must be 1st
-if luatexja_debug then load_module('debug') end
+if luatexja_debug then load_module 'debug' end
 load_module 'lotf_aux';  local ltju = luatexja.lotf_aux
 load_module 'charrange'; local ltjc = luatexja.charrange
 load_module 'stack';     local ltjs = luatexja.stack
@@ -267,7 +267,7 @@ do
       if unary_pars[k] then
          texwrite(tostring(unary_pars[k](getcount(cnt_stack))))
       end
-      ltjb.stop_time_measure('get_par')
+      ltjb.stop_time_measure 'get_par'
    end
 end
 
@@ -322,7 +322,7 @@ do
       if binary_pars[k] then
          texwrite(tostring(binary_pars[k](c, getcount(cnt_stack))))
       end
-      ltjb.stop_time_measure('get_par')
+      ltjb.stop_time_measure 'get_par'
    end
 end
 
@@ -346,10 +346,10 @@ do
       ensure_tex_attr(attr_icflag, 0)
       if gc == 'fin_row' then return head
       else
-            start_time_measure('jfmglue')
+            start_time_measure 'jfmglue'
             slide(head);
             local p = ltjj.main(to_direct(head),mode, dir)
-            stop_time_measure('jfmglue')
+            stop_time_measure 'jfmglue'
             return to_node(p)
       end
    end
@@ -381,7 +381,7 @@ end
 -- lastnodechar
 do
    local getnest = tex.getnest
-   local id_glyph = node.id('glyph')
+   local id_glyph = node.id 'glyph'
    function luatexja.pltx_composite_last_node_char()
       local n = getnest()
       local r = '-1'
@@ -421,16 +421,16 @@ local node_type = node.type
 local node_next = node.next
 local get_attr = node.get_attribute
 
-local id_penalty = node.id('penalty')
-local id_glyph = node.id('glyph')
-local id_glue = node.id('glue')
-local id_kern = node.id('kern')
-local id_hlist = node.id('hlist')
-local id_vlist = node.id('vlist')
-local id_rule = node.id('rule')
-local id_math = node.id('math')
-local id_whatsit = node.id('whatsit')
-local sid_user = node.subtype('user_defined')
+local id_penalty = node.id 'penalty'
+local id_glyph = node.id 'glyph'
+local id_glue = node.id 'glue'
+local id_kern = node.id 'kern'
+local id_hlist = node.id 'hlist'
+local id_vlist = node.id 'vlist'
+local id_rule = node.id 'rule'
+local id_math = node.id 'math'
+local id_whatsit = node.id 'whatsit'
+local sid_user = node.subtype 'user_defined'
 
 local prefix, inner_depth
 local utfchar = utf.char

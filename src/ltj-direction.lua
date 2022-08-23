@@ -22,10 +22,12 @@ local getsubtype = dnode.getsubtype
 local getlist = dnode.getlist
 local getfield = dnode.getfield
 local getwhd = dnode.getwhd
+local getvalue = node.direct.getdata
 local setfield = dnode.setfield
 local setwhd = dnode.setwhd
 local setnext = dnode.setnext
 local setlist = dnode.setlist
+local setvalue = node.direct.setdata
 
 local node_new = dnode.new
 local node_free = dnode.flush_node or dnode.free
@@ -614,8 +616,7 @@ local function unwrap_dir_node(b, head, box_dir)
    end
    local shift_old, b_dir, wh = nil, get_box_dir(bh, 0)
    if wh then
-      dnode.flush_list(getfield(wh, 'value'))
-      setfield(wh, 'value', nil)
+      dnode.flush_list(getvalue(wh)); setvalue(wh, nil)
    end
    return nh, nb, bh, b_dir
 end
@@ -664,8 +665,7 @@ do
             -- dir_node としてカプセル化されている
             local _, dnc = get_box_dir(b, 0)
             if dnc then -- free all other dir_node
-               dnode.flush_list(getfield(dnc, 'value'))
-               setfield(dnc, 'value', nil)
+               dnode.flush_list(getvalue(dnc)); setvalue(dnc, nil)
             end
             set_attr(b, attr_dir, box_dir%dir_math_mod + dir_node_auto)
             return head, node_next(b), b, true
@@ -687,15 +687,14 @@ do
          end
          box_dir = box_dir%dir_math_mod
          local db
-         local dnh = getfield(dn, 'value')
+         local dnh = getvalue(dn)
          for x in traverse(dnh) do
             if get_attr(x, attr_dir)%dir_math_mod == new_dir then
-               setfield(dn, 'value', to_node(node_remove(dnh, x)))
+               setvalue(dn, to_node(node_remove(dnh, x)))
                db=x; break
             end
          end
-         dnode.flush_list(getfield(dn, 'value'))
-         setfield(dn, 'value', nil)
+         dnode.flush_list(getvalue(dn)); setvalue(dn, nil)
          db = db or create_dir_node(b, box_dir, new_dir, false)
          local w, h, d = getwhd(b)
          nh, nb =  insert_before(head, b, db), nil
@@ -747,8 +746,7 @@ do
             end
             local _, wh =  get_box_dir(b, 0) -- clean dir_node attached to the box
             if wh then
-               dnode.flush_list(getfield(wh, 'value'))
-               setfield(wh, 'value', nil)
+               dnode.flush_list(getvalue(wh)); setvalue(wh, nil)
             end
          end
       end
@@ -762,25 +760,25 @@ end
 -- \wd, \ht, \dp の代わり
 do
    local getbox, setdimen = tex.getbox, tex.setdimen
+   local ltj_tempdima = luatexbase.registernumber 'ltj@tempdima'
    local function get_box_dim_common(key, s, l_dir)
       -- s: not dir_node.
       local s_dir, wh = get_box_dir(s, dir_yoko)
       s_dir = s_dir%dir_math_mod
       if s_dir ~= l_dir then
          local not_found = true
-         for x in traverse(getfield(wh, 'value')) do
+         for x in traverse(getvalue(wh)) do
             if l_dir == get_attr(x, attr_dir)%dir_node_auto then
-               setdimen('ltj@tempdima', getfield(x, key))
+               setdimen(ltj_tempdima, getfield(x, key))
                not_found = false; break
             end
          end
          if not_found then
             local w, h, d = getwhd(s)
-            setdimen('ltj@tempdima',
-                         dir_node_aux[s_dir][l_dir][key](w,h,d))
+            setdimen(ltj_tempdima, dir_node_aux[s_dir][l_dir][key](w,h,d))
          end
       else
-         setdimen('ltj@tempdima', getfield(s, key))
+         setdimen(ltj_tempdima, getfield(s, key))
       end
    end
    local function get_box_dim(key, n)
@@ -793,12 +791,12 @@ do
          if b_dir<dir_node_auto then
             get_box_dim_common(key, s, l_dir)
          elseif b_dir%dir_math_mod==l_dir then
-            setdimen('ltj@tempdima', getfield(s, key))
+            setdimen(ltj_tempdima, getfield(s, key))
          else
             get_box_dim_common(key, getlist(s), l_dir)
          end
       else
-         setdimen('ltj@tempdima', 0)
+         setdimen(ltj_tempdima, 0)
       end
       tex.sprint(cat_lp, '\\ltj@tempdima')
       tex.globaldefs = gt
@@ -817,7 +815,7 @@ do
             setlist(s, wh)
          end
          local db
-         local dnh = getfield(wh, 'value')
+         local dnh = getvalue(wh)
          for x in traverse(dnh) do
             if get_attr(x, attr_dir)%dir_node_auto==l_dir then
                db = x; break
@@ -825,8 +823,7 @@ do
          end
          if not db then
             db = create_dir_node(s, s_dir, l_dir, true)
-            setnext(db, dnh)
-            setfield(wh, 'value',to_node(db))
+            setnext(db, dnh); setvalue(wh, to_node(db))
          end
          setfield(db, key, scan_dimen())
          return false
@@ -835,7 +832,7 @@ do
          if wh then
             -- change dimension of dir_nodes which are created "automatically"
                local bw, bh, bd = getwhd(s)
-            for x in traverse(getfield(wh, 'value')) do
+            for x in traverse(getvalue(wh)) do
                local x_dir = get_attr(x, attr_dir)
                if x_dir<dir_node_manual then
                   local info = dir_node_aux[s_dir][x_dir%dir_node_auto]
