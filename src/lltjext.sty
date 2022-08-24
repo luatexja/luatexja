@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjext}[2022-08-18 v1.2k-ltj-14 Macros for vertical writing]
+\ProvidesPackage{lltjext}[2022-08-24 v1.2k-ltj-14 Macros for vertical writing]
 \RequirePackage{luatexja}
 \newcount\ltj@ext@dir
 \let\ltj@lltjext@orig@tabular=\tabular
@@ -509,8 +509,10 @@
    {\@@picture<#1>(#2,#3)}{\@@picture<#1>(#2,#3)(0,0)}}
 \newdimen\@picwd
 \def\ltj@@pic@reset@blshift{%
-  \unsetattribute\ltj@yablshift\unsetattribute\ltj@ykblshift
-  \unsetattribute\ltj@tablshift\unsetattribute\ltj@tkblshift
+  \ltj@yablshift\z@\ltj@ykblshift\z@
+  \ltj@tablshift\z@\ltj@tkblshift\z@
+  %\unsetattribute\ltj@yablshift\unsetattribute\ltj@ykblshift
+  %\unsetattribute\ltj@tablshift\unsetattribute\ltj@tkblshift
 }%
 \def\@@picture<#1>(#2,#3)(#4,#5){%
   \edef\ltj@@pic@save@blshift{%

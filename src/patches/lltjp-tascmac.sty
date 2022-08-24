@@ -3,7 +3,7 @@
 %  based on tascmac.sty [2016/04/15 v2.0b (community edition)]
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-tascmac}[2022-08-18 Patch to (t)ascmac for LuaTeX-ja]
+\ProvidesPackage{lltjp-tascmac}[2022-08-24 Patch to (t)ascmac for LuaTeX-ja]
 
 \RequirePackage{tascmac}
 
@@ -26,8 +26,10 @@
 }
 
 %% boxnote environment
-\def\ltj@backup@attr#1#2{\ifnum#1=-"7FFFFFFF #2\z@\else #2=#1sp\fi\unsetattribute#1}
-\def\ltj@restore@attr#1#2{\ifdim#2=\z@ \unsetattribute#1\else #1#2\fi}
+\def\ltj@backup@attr#1#2{\ifnum#1=-"7FFFFFFF #2\z@\else #2=#1sp\fi#1=0 }
+\def\ltj@restore@attr#1#2{#1#2}
+%\def\ltj@backup@attr#1#2{\ifnum#1=-"7FFFFFFF #2\z@\else #2=#1sp\fi\unsetattribute#1}
+%\def\ltj@restore@attr#1#2{\ifdim#2=\z@ \unsetattribute#1\else #1#2\fi}
 \def\boxnote{\par\vspace{.3\baselineskip}%
   \ltj@backup@attr\ltj@yablshift\@saveybaselineshift
   \ltj@backup@attr\ltj@tablshift\@savetbaselineshift
@@ -78,7 +80,8 @@
 
 %% \keytop
 \def\@keytop[#1]#2{%
-  {\setbox0=\hbox{\shortstack{#2}}\unsetattribute\ltj@yablshift\unsetattribute\ltj@tablshift%
+  {\setbox0=\hbox{\shortstack{#2}}\ltj@yablshift\z@\ltj@tablshift\z@%
+  %\unsetattribute\ltj@yablshift\unsetattribute\ltj@tablshift%
   \dimen0=\wd0\advance\dimen0 5pt\dimen1=\dp0\advance\dimen1 2.5pt%
   \setbox\scscb@x=\hbox to\dimen0{%
   \@scw\wd0\hfil\vtop{\offinterlineskip
@@ -93,7 +96,8 @@
 
 %% \mask
 \def\mask#1#2{{\setbox\@bwsp=\hbox{#1}%
-  \setbox0=\hbox{\unsetattribute\ltj@yablshift\unsetattribute\ltj@tablshift \@ascgrp#2}%
+%  \setbox0=\hbox{\unsetattribute\ltj@yablshift\unsetattribute\ltj@tablshift \@ascgrp#2}%
+  \setbox0=\hbox{\ltj@yablshift\z@\ltj@tablshift\z@ \@ascgrp#2}%
   \dimen0=\wd\@bwsp\dimen1=\ht\@bwsp\advance\dimen1\dp\@bwsp\dimen2=-\dimen1
   \setdim@{\dimen0}{\wd0}\setdim@{\dimen1}{\ht0}%
   \setbox\@@bwsp=\hbox to\dimen0{\leaders
@@ -105,7 +109,8 @@
 
 %% \maskbox
 \def\Maskbox#1#2#3#4#5#6{{%
-  \setbox0=\hbox{\unsetattribute\ltj@yablshift\unsetattribute\ltj@tablshift \@ascgrp#3}%
+%  \setbox0=\hbox{\unsetattribute\ltj@yablshift\unsetattribute\ltj@tablshift \@ascgrp#3}%
+  \setbox0=\hbox{\ltj@yablshift\z@\ltj@tablshift\z@ \@ascgrp#3}%
   \dimen0=#1\@setdim{\dimen0}{\wd0}\dimen1=#2\@setdim{\dimen1}{\ht0}%
   \ifx#4c\skip0=0pt plus1fil\skip1=\skip0\fi
   \ifx#4r\skip0=0pt plus1fil\skip1=0pt\fi

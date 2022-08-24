@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2022-08-20 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2022-08-24 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -146,6 +146,10 @@
 \ltj@icflag\z@
 \ltj@curjfnt\m@ne
 \ltj@curtfnt\m@ne
+\ltj@yablshift\z@
+\ltj@ykblshift\z@
+\ltj@tablshift\z@
+\ltj@tkblshift\z@
 
 \newcount\ltj@tempcnta\newdimen\ltj@tempdima
 \newcount\ltj@@stack \newcount\ltj@@group@level
@@ -348,7 +352,8 @@
 \def\ltj@set@blshift@#1{\directlua{%
   local n = token.scan_dimen()
   tex.setattribute(luatexja.isglobal,
-    luatexbase.attributes['#1'], (n==0) and -0x7FFFFFFF or n)%
+    luatexbase.attributes['#1'], (n==0) and 0 or n)
+  %次期バージョンで ... and -0x7FFFFFFF or ... に変える
 }}
 \define@key[ltj]{japaram}{yalbaselineshift}{\ltj@set@blshift@{ltj@yablshift}#1\relax}
 \define@key[ltj]{japaram}{yjabaselineshift}{\ltj@set@blshift@{ltj@ykblshift}#1\relax}
