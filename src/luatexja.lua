@@ -164,11 +164,11 @@ local floor = math.floor
 local function print_scaled(s)
    local out, delta = '', 10
    if s<0 then s, out = -s, out..'-' end
-   out=out..tostring(s//65536) .. '.'
+   out=out..tostring(floor(s/65536)) .. '.'
    s=10*(s%65536)+5
    repeat
       if delta>65536 then s=s+32768-50000 end
-      out=out .. tostring(s//65536)
+      out=out .. tostring(floor(s/65536))
       s=10*(s%65536); delta=delta*10
    until s<=delta
    return out
