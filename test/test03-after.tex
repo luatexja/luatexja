@@ -129,4 +129,22 @@ abc\ltjgetparameter{yalbaselineshift}
 {\globaldefs-4 \ltjglobalsetparameter{yalbaselineshift=-5pt}}% local (by \globaldefs)
 \ltjgetparameter{yalbaselineshift}
 a
+
+{\tengt ■unset vs set attr of baselineshifts}
+
+\catcode`\@=11
+\ltjsetparameter{yalbaselineshift=0pt}
+\ltjsetparameter{yjabaselineshift=2pt}
+ABCあいう\ltjgetparameter{yalbaselineshift}, \ltjgetparameter{yjabaselineshift},
+\the\ltj@yablshift, \the\ltj@ykblshift
+
+\ltj@yablshift=-"7FFFFFFF
+ABCあいう\ltjgetparameter{yalbaselineshift}, \ltjgetparameter{yjabaselineshift},
+\the\ltj@yablshift, \the\ltj@ykblshift
+
+\ltj@ykblshift=-"7FFFFFFF
+\ltjsetparameter{yalbaselineshift=0pt}
+ABCあいう\ltjgetparameter{yalbaselineshift}, \ltjgetparameter{yjabaselineshift},
+\the\ltj@yablshift, \the\ltj@ykblshift
+
 \end
