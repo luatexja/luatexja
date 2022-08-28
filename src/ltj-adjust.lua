@@ -24,7 +24,7 @@ local getwidth = node.direct.getwidth
 local getdepth = node.direct.getdepth
 local setfield = node.direct.setfield
 local setpenalty = node.direct.setpenalty
-local setglue = luatexja.setglue
+local setglue = node.direct.setglue
 local setkern = node.direct.setkern
 local setlist = node.direct.setlist
 

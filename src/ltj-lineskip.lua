@@ -22,7 +22,7 @@ local getheight = node.direct.getheight
 local texget = tex.get
 
 local node_getglue = node.getglue
-local setglue = luatexja.setglue
+local setglue = node.direct.setglue
 local setsubtype = node.direct.setsubtype
 local function copy_glue (new_glue, old_glue_name, subtype, new_w)
    setsubtype(new_glue, subtype)

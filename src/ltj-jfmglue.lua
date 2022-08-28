@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2022-08-18',
+  date = '2022-08-29',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}
@@ -24,14 +24,14 @@ local getid = node.direct.getid
 local getfont = node.direct.getfont
 local getlist = node.direct.getlist
 local getchar = node.direct.getchar
-local getglue = luatexja.getglue
+local getglue = node.direct.getglue
 local getsubtype = node.direct.getsubtype
 local getshift = node.direct.getshift
 local getwidth = node.direct.getwidth
 local getdepth = node.direct.getdepth
 local getpenalty = node.direct.getpenalty
 local setfield = node.direct.setfield
-local setglue = luatexja.setglue
+local setglue = node.direct.setglue
 local setshift = node.direct.setshift
 local if_lang_ja
 do
@@ -804,7 +804,6 @@ do
          return round(r/2.^(64*ro)), ro
       end
    end
-   local getglue = luatexja.getglue
    calc_ja_ja_aux = function (gb, ga, db, da)
       if luatexja.jfmglue.diffmet_rule ~= math.two_pleft and diffmet_rule ~= math.two_pright
           and luatexja.jfmglue.diffmet_rule ~= math.two_paverage then

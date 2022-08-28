@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.ruby',
-  date = '2022-08-14',
+  date = '2022-08-29',
   description = 'Ruby annotation',
 })
 luatexja.ruby = {}
@@ -26,7 +26,7 @@ local getdepth = node.direct.getdepth
 local getwhd = node.direct.getwhd
 local getvalue = node.direct.getdata
 local setfield =  node.direct.setfield
-local setglue = luatexja.setglue
+local setglue = node.direct.setglue
 local setkern = node.direct.setkern
 local setnext = node.direct.setnext
 local setshift = node.direct.setshift

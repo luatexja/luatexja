@@ -39,36 +39,6 @@ do
         return node_inherit_attr(node_new(id, subtype), b, a)
     end
 end
-do
-   local dnode = node.direct
-   local setfield = dnode.setfield
-   luatexja.setglue = node.direct.setglue or
-   function(g,w,st,sh,sto,sho)
-      setfield(g,'width', w or 0); setfield(g,'stretch',st or 0); setfield(g,'shrink', sh or 0)
-      setfield(g,'stretch_order',sto or 0)
-      setfield(g,'shrink_order', sho or 0)
-   end
-   for _,v in pairs({'char', 'depth', 'dir', 'font', 'height', 'kern', 'lang', 'next',
-                      'nucleus', 'offsets', 'penalty', 'shift', 'sub', 'subtype', 'sup'}) do
-         if not dnode['set'..v] then
-             dnode['set'..v] = function(n, ...) return setfield(n, v, ...) end
-         end
-   end
-   local getfield = dnode.getfield
-   luatexja.getglue = node.direct.getglue or
-   function(g)
-      return getfield(g,'width'), getfield(g,'stretch'), getfield(g,'shrink'),
-             getfield(g,'stretch_order'), getfield(g,'shrink_order')
-   end
-   for _,v in pairs({'box', 'components', 'char', 'depth', 'font', 'height', 'kern', 'lang',
-                     'list', 'next', 'nucleus', 'offsets', 'penalty', 'prev', 'shift', 'sub',
-                     'subtype', 'sup', 'whd', 'width', 'dir'}) do
-         if not dnode['get'..v] then
-             dnode['get'..v] = function(n, ...) return getfield(n, v, ...) end
-         end
-    end
-end
-
 
 --- 以下は全ファイルで共有される定数
 local icflag_table = {}
