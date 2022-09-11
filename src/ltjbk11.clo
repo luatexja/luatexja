@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesFile{ltjbk11.clo}
-  [2022-04-11 v1.8f-ltj-22
+  [2022-09-12 v1.8f-ltj-23
   Standard LuaLaTeX-ja file (size option)]
 \renewcommand{\normalsize}{%
     \@setfontsize\normalsize\@xipt{15.5}%

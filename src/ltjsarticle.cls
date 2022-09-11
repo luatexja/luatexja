@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsarticle}
-  [2022/08/23 ltjsclasses ]
+  [2022/09/12 ltjsclasses ]
 \def\jsc@clsname{ltjsarticle}
 \def\Cjascale{0.924715}
 \RequirePackage{luatexja}
@@ -287,8 +287,8 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \newskip\jsc@smallskipamount
 \jsc@smallskipamount=3\jsc@mpt plus 1\jsc@mpt minus 1\jsc@mpt
 \iftombow
-  \newlength{\stockwidth}
-  \newlength{\stockheight}
+  \ifdefined\stockwidth\else\newlength{\stockwidth}\fi
+  \ifdefined\stockheight\else\newlength{\stockheight}\fi
   \setlength{\stockwidth}{\paperwidth}
   \setlength{\stockheight}{\paperheight}
   \advance \stockwidth 2in

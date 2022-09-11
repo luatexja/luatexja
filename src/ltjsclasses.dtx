@@ -44,7 +44,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2022/08/23 ltjsclasses ]
+  [2022/09/12 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass[disablejfam]{ltjsarticle}
@@ -894,10 +894,13 @@
 % [2017-01-11] トンボオプションが指定されているとき「だけ」|\stockwidth|，
 % |\stockheight|を定義するようにしました。
 %
+% [2022-09-12 LTJ] \LaTeXeカーネルに|\stockwidth|、|\stockheight|が追加されるようですので、
+% クラスファイル側では未定義のときのみこれらの長さ変数を定義します。h20y6mさん、ありがとうございます。
+%
 %    \begin{macrocode}
 \iftombow
-  \newlength{\stockwidth}
-  \newlength{\stockheight}
+  \ifdefined\stockwidth\else\newlength{\stockwidth}\fi
+  \ifdefined\stockheight\else\newlength{\stockheight}\fi
   \setlength{\stockwidth}{\paperwidth}
   \setlength{\stockheight}{\paperheight}
   \advance \stockwidth 2in
