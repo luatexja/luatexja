@@ -13,7 +13,7 @@ local dnode = node.direct
 local cat_lp = luatexbase.catcodetables['latex-package']
 local to_node = dnode.tonode
 local to_direct = dnode.todirect
-local has_attr = dnode.has_attribute
+local get_attr = dnode.get_attribute
 local set_attr = dnode.set_attribute
 local insert_before = dnode.insert_before
 local insert_after = dnode.insert_after
@@ -22,10 +22,12 @@ local getsubtype = dnode.getsubtype
 local getlist = dnode.getlist
 local getfield = dnode.getfield
 local getwhd = dnode.getwhd
+local getvalue = node.direct.getdata
 local setfield = dnode.setfield
 local setwhd = dnode.setwhd
 local setnext = dnode.setnext
 local setlist = dnode.setlist
+local setvalue = node.direct.setdata
 
 local node_new = dnode.new
 local node_free = dnode.flush_node or dnode.free
@@ -44,8 +46,9 @@ local id_whatsit = node.id 'whatsit'
 local sid_save   = node.subtype 'pdf_save'
 local sid_user   = node.subtype 'user_defined'
 
+local getnest = tex.getnest
 local tex_nest = tex.nest
-local tex_getcount = tex.getcount
+local getcount = tex.getcount
 local ensure_tex_attr = ltjb.ensure_tex_attr
 local PROCESSED    = luatexja.icflag_table.PROCESSED
 local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
@@ -59,7 +62,7 @@ local dir_math_mod    = luatexja.dir_table.dir_math_mod
 local dir_node_auto   = luatexja.dir_table.dir_node_auto
 local dir_node_manual = luatexja.dir_table.dir_node_manual
 local function get_attr_icflag(p)
-   return (has_attr(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
+   return (get_attr(p, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG
 end
 
 local page_direction
@@ -70,7 +73,7 @@ do
    dir_pool = {}
    for _,i in pairs({dir_tate, dir_yoko, dir_dtou, dir_utod}) do
       local w = node_new(id_whatsit, sid_user)
-      dnode.setattributelist(w, nil) 
+      dnode.setattributelist(w, nil)
       set_attr(w, attr_dir, i); set_attr(w, attr_icflag, 0)
       setfield(w, 'user_id', DIR)
       setfield(w, 'type', 110); setnext(w, nil)
@@ -95,7 +98,7 @@ end
 
 local get_dir_count, get_adjust_dir_count
 do
-   local node_attr = node.has_attribute
+   local node_attr = node.get_attribute
    local function get_dir_count_inner(h)
       if h then
          if h.id==id_whatsit and h.subtype==sid_user and h.user_id==DIR then
@@ -110,7 +113,7 @@ do
    end
    function get_dir_count()
        for i=tex_nest.ptr, 1, -1 do
-           local h = tex_nest[i].head.next
+           local h = getnest(i).head.next
            if h then
                local t = get_dir_count_inner(h)
                if t~=0 then return t end
@@ -120,7 +123,7 @@ do
    end
    function get_adjust_dir_count()
       for i=tex_nest.ptr, 1, -1 do
-         local v = tex_nest[i]
+         local v = getnest(i)
          local h, m = v.head.next, v.mode
          if abs(m)== ltjs.vmode and h then
             local t = get_dir_count_inner(h)
@@ -174,21 +177,20 @@ do
    local node_next_node, node_tail_node = node.next, node.tail
    local insert_after_node = node.insert_after
    function luatexja.direction.set_list_direction_hook(v)
-      local lv = tex_nest.ptr -- must be >= 1
       if not v then
          v = get_dir_count()
-         if abs(tex_nest[lv-1].mode) == ltjs.mmode and v == dir_tate then
+         if abs(getnest(tex_nest.ptr-1).mode) == ltjs.mmode and v == dir_tate then
             v = dir_utod
          end
       elseif v=='adj' then
          v = get_adjust_dir_count()
       end
-      local h = tex_nest[lv].head
+      local h = getnest().head
       local hn = node.next(h)
       hn = (hn and hn.id==id_local) and hn or h
       local w = to_node(dir_pool[v]())
       insert_after_node(h, hn, w)
-      tex_nest[lv].tail = node_tail_node(w)
+      getnest().tail = node_tail_node(w)
       ensure_tex_attr(attr_icflag, 0)
       ensure_tex_attr(attr_dir, 0)
    end
@@ -197,13 +199,13 @@ do
       local lv = tex_nest.ptr
       if not v then
          v,name  = get_dir_count(), nil
-         if lv>=1 and abs(tex_nest[lv-1].mode) == ltjs.mmode and v == dir_tate then
+         if lv>=1 and abs(getnest(lv-1).mode) == ltjs.mmode and v == dir_tate then
             v = dir_utod
          end
       elseif v=='adj' then
          v,name = get_adjust_dir_count(), nil
       end
-      local current_nest = tex_nest[lv]
+      local current_nest = getnest()
       if tex.currentgrouptype==6 then
          ltjb.package_error(
                  'luatexja',
@@ -333,7 +335,7 @@ do
          end
       end
       if hd==wh[1] then
-         ltjs.list_dir = has_attr(hd, attr_dir)
+         ltjs.list_dir = get_attr(hd, attr_dir)
          local x = node_next(hd)
          while x and getid(x)==id_glue and getsubtype(x)==3 do
             node_remove(hd,x); node_free(x); x = node_next(hd)
@@ -530,13 +532,13 @@ end
 -- 2nd ret val はその DIR whatsit
 function get_box_dir(b, default)
    start_time_measure 'get_box_dir'
-   local dir = has_attr(b, attr_dir) or 0
+   local dir = get_attr(b, attr_dir) or 0
    local bh = getfield(b, 'head') -- We cannot use getlist since b may be an unset_node.
    local c
    if bh~=0 then -- bh != nil
       for bh in traverse_id(id_whatsit, bh) do
          if getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR then
-            c = bh; dir = (dir==0) and has_attr(bh, attr_dir) or dir
+            c = bh; dir = (dir==0) and get_attr(bh, attr_dir) or dir
          end
       end
    end
@@ -545,12 +547,13 @@ function get_box_dir(b, default)
 end
 
 do
+   local ltj_tempcnta = luatexbase.registernumber 'ltj@tempcnta'
    local getbox = tex.getbox
    local dir_backup
    function luatexja.direction.unbox_check_dir(is_copy)
       start_time_measure 'box_primitive_hook'
       local list_dir = get_dir_count()%dir_math_mod
-      local b = getbox(tex_getcount 'ltj@tempcnta')
+      local b = getbox(getcount(ltj_tempcnta))
       if b and getlist(to_direct(b)) then
          local box_dir = get_box_dir(to_direct(b), dir_yoko)
          if box_dir%dir_math_mod ~= list_dir then
@@ -587,7 +590,7 @@ do
       stop_time_measure 'box_primitive_hook'
    end
    function luatexja.direction.uncopy_restore_whatsit()
-      local b = getbox(tex_getcount 'ltj@tempcnta')
+      local b = getbox(getcount(ltj_tempcnta))
       if b then
          local bd = to_direct(b)
          if dir_backup then
@@ -613,8 +616,7 @@ local function unwrap_dir_node(b, head, box_dir)
    end
    local shift_old, b_dir, wh = nil, get_box_dir(bh, 0)
    if wh then
-      dnode.flush_list(getfield(wh, 'value'))
-      setfield(wh, 'value', nil)
+      dnode.flush_list(getvalue(wh)); setvalue(wh, nil)
    end
    return nh, nb, bh, b_dir
 end
@@ -663,8 +665,7 @@ do
             -- dir_node としてカプセル化されている
             local _, dnc = get_box_dir(b, 0)
             if dnc then -- free all other dir_node
-               dnode.flush_list(getfield(dnc, 'value'))
-               setfield(dnc, 'value', nil)
+               dnode.flush_list(getvalue(dnc)); setvalue(dnc, nil)
             end
             set_attr(b, attr_dir, box_dir%dir_math_mod + dir_node_auto)
             return head, node_next(b), b, true
@@ -686,15 +687,14 @@ do
          end
          box_dir = box_dir%dir_math_mod
          local db
-         local dnh = getfield(dn, 'value')
+         local dnh = getvalue(dn)
          for x in traverse(dnh) do
-            if has_attr(x, attr_dir)%dir_math_mod == new_dir then
-               setfield(dn, 'value', to_node(node_remove(dnh, x)))
+            if get_attr(x, attr_dir)%dir_math_mod == new_dir then
+               setvalue(dn, to_node(node_remove(dnh, x)))
                db=x; break
             end
          end
-         dnode.flush_list(getfield(dn, 'value'))
-         setfield(dn, 'value', nil)
+         dnode.flush_list(getvalue(dn)); setvalue(dn, nil)
          db = db or create_dir_node(b, box_dir, new_dir, false)
          local w, h, d = getwhd(b)
          nh, nb =  insert_before(head, b, db), nil
@@ -723,9 +723,9 @@ do
    local id_glue = node.id 'glue'
    local function lastbox_hook()
       start_time_measure 'box_primitive_hook'
-      local bn = tex_nest[tex_nest.ptr].tail
+      local bn = getnest().tail
       if bn then
-         local b, head = to_direct(bn), to_direct(tex_nest[tex_nest.ptr].head)
+         local b, head = to_direct(bn), to_direct(getnest().head)
          local bid = getid(b)
          if bid==id_hlist or bid==id_vlist then
             local p = getlist(b)
@@ -740,14 +740,13 @@ do
             if box_dir>= dir_node_auto then -- unwrap dir_node
                local p = node_prev(b)
                local dummy1, dummy2, nb = unwrap_dir_node(b, nil, box_dir)
-               setnext(p, nb);  tex_nest[tex_nest.ptr].tail = to_node(nb)
+               setnext(p, nb);  getnest().tail = to_node(nb)
                setnext(b, nil); setlist(b, nil)
                node_free(b); b = nb
             end
             local _, wh =  get_box_dir(b, 0) -- clean dir_node attached to the box
             if wh then
-               dnode.flush_list(getfield(wh, 'value'))
-               setfield(wh, 'value', nil)
+               dnode.flush_list(getvalue(wh)); setvalue(wh, nil)
             end
          end
       end
@@ -761,25 +760,25 @@ end
 -- \wd, \ht, \dp の代わり
 do
    local getbox, setdimen = tex.getbox, tex.setdimen
+   local ltj_tempdima = luatexbase.registernumber 'ltj@tempdima'
    local function get_box_dim_common(key, s, l_dir)
       -- s: not dir_node.
       local s_dir, wh = get_box_dir(s, dir_yoko)
       s_dir = s_dir%dir_math_mod
       if s_dir ~= l_dir then
          local not_found = true
-         for x in traverse(getfield(wh, 'value')) do
-            if l_dir == has_attr(x, attr_dir)%dir_node_auto then
-               setdimen('ltj@tempdima', getfield(x, key))
+         for x in traverse(getvalue(wh)) do
+            if l_dir == get_attr(x, attr_dir)%dir_node_auto then
+               setdimen(ltj_tempdima, getfield(x, key))
                not_found = false; break
             end
          end
          if not_found then
             local w, h, d = getwhd(s)
-            setdimen('ltj@tempdima',
-                         dir_node_aux[s_dir][l_dir][key](w,h,d))
+            setdimen(ltj_tempdima, dir_node_aux[s_dir][l_dir][key](w,h,d))
          end
       else
-         setdimen('ltj@tempdima', getfield(s, key))
+         setdimen(ltj_tempdima, getfield(s, key))
       end
    end
    local function get_box_dim(key, n)
@@ -792,12 +791,12 @@ do
          if b_dir<dir_node_auto then
             get_box_dim_common(key, s, l_dir)
          elseif b_dir%dir_math_mod==l_dir then
-            setdimen('ltj@tempdima', getfield(s, key))
+            setdimen(ltj_tempdima, getfield(s, key))
          else
             get_box_dim_common(key, getlist(s), l_dir)
          end
       else
-         setdimen('ltj@tempdima', 0)
+         setdimen(ltj_tempdima, 0)
       end
       tex.sprint(cat_lp, '\\ltj@tempdima')
       tex.globaldefs = gt
@@ -816,16 +815,15 @@ do
             setlist(s, wh)
          end
          local db
-         local dnh = getfield(wh, 'value')
+         local dnh = getvalue(wh)
          for x in traverse(dnh) do
-            if has_attr(x, attr_dir)%dir_node_auto==l_dir then
+            if get_attr(x, attr_dir)%dir_node_auto==l_dir then
                db = x; break
             end
          end
          if not db then
             db = create_dir_node(s, s_dir, l_dir, true)
-            setnext(db, dnh)
-            setfield(wh, 'value',to_node(db))
+            setnext(db, dnh); setvalue(wh, to_node(db))
          end
          setfield(db, key, scan_dimen())
          return false
@@ -834,8 +832,8 @@ do
          if wh then
             -- change dimension of dir_nodes which are created "automatically"
                local bw, bh, bd = getwhd(s)
-            for x in traverse(getfield(wh, 'value')) do
-               local x_dir = has_attr(x, attr_dir)
+            for x in traverse(getvalue(wh)) do
+               local x_dir = get_attr(x, attr_dir)
                if x_dir<dir_node_manual then
                   local info = dir_node_aux[s_dir][x_dir%dir_node_auto]
                   setwhd(x, info.width(bw,bh,bd), info.height(bw,bh,bd), info.depth(bw,bh,bd))
@@ -932,7 +930,7 @@ end
 -- adjust
 do
    local id_adjust = node.id 'adjust'
-   local last_node = dnode.last_node 
+   local last_node = dnode.last_node
    local scan_keyword = token.scan_keyword
    function luatexja.direction.adjust_begin()
       if scan_keyword 'pre' then tex.sprint(cat_lp, '\\ltj@@vadjust@pre')
@@ -941,7 +939,7 @@ do
    function luatexja.direction.check_adjust_direction()
       start_time_measure 'box_primitive_hook'
       local list_dir = get_adjust_dir_count()
-      local a = tex_nest[tex_nest.ptr].tail
+      local a = getnest().tail
       local ad = to_direct(a)
       if a and getid(ad)==id_adjust then
          local adj_dir = get_box_dir(ad)
@@ -964,7 +962,7 @@ do
    function luatexja.direction.populate_insertion_dir_whatsit()
       start_time_measure 'box_primitive_hook'
       local list_dir = get_dir_count()
-      local a = tex_nest[tex_nest.ptr].tail
+      local a = getnest().tail
       local ad = to_direct(a)
       if (not a) or getid(ad)~=id_ins then
           a = node.tail(tex.lists.page_head); ad = to_direct(a)
@@ -1000,22 +998,22 @@ do
       if split_dir_whatsit then split_dir_watsit = nil end
       if p then
          local bh = getlist(p)
-         if getid(bh)==id_whatsit and getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR 
+         if getid(bh)==id_whatsit and getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR
             and node_next(bh) then
-            ltjs.list_dir = has_attr(bh, attr_dir)
+            ltjs.list_dir = get_attr(bh, attr_dir)
             setlist(p, (node_remove(bh,bh)))
             split_dir_head, split_dir_2nd = bh, false
          else
             local w = node_next(bh)
             if getid(w)==id_whatsit and getsubtype(w)==sid_user and getfield(w, 'user_id')==DIR then
-               ltjs.list_dir = has_attr(w, attr_dir)
+               ltjs.list_dir = get_attr(w, attr_dir)
                setlist(p, (node_remove(bh,w)))
                split_dir_head, split_dir_2nd = w, true
             end
          end
       end
       sprint(cat_lp, '\\ltj@@orig@vsplit' .. tostring(n))
-   end        
+   end
    local function dir_adjust_vpack(h, gc)
       start_time_measure 'direction_vpack'
       local hd = to_direct(h)
@@ -1025,7 +1023,7 @@ do
          split_dir_whatsit = hd
       elseif gc=='split_off'  then
          if split_dir_head then
-            ltjs.list_dir = has_attr(split_dir_head, attr_dir)
+            ltjs.list_dir = get_attr(split_dir_head, attr_dir)
             if split_dir_2nd then hd = insert_after(hd, hd, split_dir_head)
             else hd = insert_before(hd, hd, split_dir_head)
             end
@@ -1057,7 +1055,7 @@ do
    local function dir_adjust_pre_output(h, gc)
       return to_node(create_dir_whatsit_vbox(to_direct(h), gc))
    end
-   ltjb.add_to_callback('pre_output_filter', dir_adjust_pre_output, 
+   ltjb.add_to_callback('pre_output_filter', dir_adjust_pre_output,
                         'ltj.direction', 10000)
 end
 
@@ -1093,7 +1091,7 @@ do
 
    tex.setattribute(attr_dir, dir_yoko)
    local shipout_temp =  node_new(id_hlist)
-   dnode.setattributelist(shipout_temp, nil) 
+   dnode.setattributelist(shipout_temp, nil)
    tex.setattribute(attr_dir, 0)
 
    finalize_inner = function (box)

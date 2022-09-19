@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2022-08-17 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2022-08-24 Core of LuaTeX-ja]
 \fi                             %</LaTeX>
 
 %% Load prerequisite packages.
@@ -125,10 +125,6 @@
 \newdimen\ltj@dimen@jQ \ltj@dimen@jQ=0.25mm
 \let\jQ=\ltj@dimen@jQ \let\jH=\jQ
 
-%%%%%%%% error message
-\def\ltj@defnum{0}
-\def\ltj@defdimen{0}
-
 %%%%%%%% Attributes for Japanese typesetting.
 \newattribute\ltj@icflag    % attribute for italic correction
 \newattribute\ltj@curjfnt   % index for ``current horizontal Japanese font''
@@ -148,7 +144,6 @@
 \newlanguage\ltj@@japanese
 \ltj@dir\z@
 \ltj@icflag\z@
-\ltj@charclass\z@
 \ltj@curjfnt\m@ne
 \ltj@curtfnt\m@ne
 \ltj@yablshift\z@
@@ -156,15 +151,18 @@
 \ltj@tablshift\z@
 \ltj@tkblshift\z@
 
+\newcount\ltj@tempcnta\newdimen\ltj@tempdima
+\newcount\ltj@@stack \newcount\ltj@@group@level
+\ltj@@group@level\z@\ltj@@stack\z@
+
 %%%%%%%% Attributes for character ranges
-\newcount\ltj@tempcnta
 \ltj@tempcnta\z@
 \loop\ifnum\ltj@tempcnta<7
   \expandafter\newattribute%
     \csname ltj@kcat\the\ltj@tempcnta\endcsname
-  \csname ltj@kcat\the\ltj@tempcnta\endcsname=\z@
   \advance\ltj@tempcnta\@ne
 \repeat
+\csname ltj@kcat0\endcsname=\z@
 
 
 %%%%%%%% Loading luatexja.lua
@@ -225,21 +223,21 @@
 
 %%%%%%%% \jfont\CS={...:...;jfm=metric;...}, \globaljfont
 \protected\def\jfont#1{%
-  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false, 'yoko','\luatexluaescapestring{\noexpand#1}')}}
+  \def\ltj@temp{#1}\afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false, 'yoko')}}
 \protected\def\globaljfont#1{%
-  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true,  'yoko','\luatexluaescapestring{\noexpand#1}')}}
+  \def\ltj@temp{#1}\afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true,  'yoko')}}
 \newluafunction\ltj@@jfont@inner
 \directlua{
   local t = lua.get_functions_table()
   t[\the\ltj@@jfont@inner] = luatexja.jfont.jfontdefY
 }
-\def\ltj@@jfont{\luafunction\ltj@@jfont@inner}
+\def\ltj@@jfont{\expandafter\expandafter\expandafter\luafunction\expandafter\ltj@@jfont@inner\ltj@temp}
 
 %%%%%%%% \tfont\CS={...:...;jfm=metric;...}, \globaltfont
 \protected\def\tfont#1{%
-  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false, 'tate','\luatexluaescapestring{\noexpand#1}')}}
+  \def\ltj@temp{#1}\afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false, 'tate')}}
 \protected\def\globaltfont#1{%
-  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true,  'tate','\luatexluaescapestring{\noexpand#1}')}}
+  \def\ltj@temp{#1}\afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true,  'tate')}}
 
 %%%%%%%% \zw, \zh
 \newluafunction\ltj@zw@inner
@@ -264,17 +262,17 @@
 \newluafunction\ltj@@ins@xk@inner
 \newluafunction\ltj@@ins@k@inner
 \directlua{
-  local t = lua.get_functions_table()
+  local t, ltjj = lua.get_functions_table(), luatexja.jfmglue
   t[\the\ltj@reset@globaldefs@inner] 
      = function() luatexja.global_temp = tex.globaldefs; tex.globaldefs = 0 end
   t[\the\ltj@restore@globaldefs@inner] 
      = function() tex.globaldefs = luatexja.global_temp end
-  t[\the\ltj@@disihb@inner] = luatexja.jfmglue.create_disinhibitglue_node
-  t[\the\ltj@@ihb@inner] = luatexja.jfmglue.create_inhibitglue_node
-  t[\the\ltj@@fakeparbegin@inner] = luatexja.jfmglue.create_beginpar_node
-  t[\the\ltj@@fakeboxbdd@inner] = luatexja.jfmglue.create_boxbdd_node
-  t[\the\ltj@@ins@xk@inner] = luatexja.jfmglue.insert_xk_skip
-  t[\the\ltj@@ins@k@inner] = luatexja.jfmglue.insert_k_skip
+  t[\the\ltj@@disihb@inner] = ltjj.create_disinhibitglue_node
+  t[\the\ltj@@ihb@inner] = ltjj.create_inhibitglue_node
+  t[\the\ltj@@fakeparbegin@inner] = ltjj.create_beginpar_node
+  t[\the\ltj@@fakeboxbdd@inner] = ltjj.create_boxbdd_node
+  t[\the\ltj@@ins@xk@inner] = ltjj.insert_xk_skip
+  t[\the\ltj@@ins@k@inner] = ltjj.insert_k_skip
 }
 \protected\luadef\ltj@reset@globaldefs  \ltj@reset@globaldefs@inner
 \protected\luadef\ltj@restore@globaldefs\ltj@restore@globaldefs@inner
@@ -307,17 +305,14 @@
   }
 
 %%%%%%%% \ltjsetparameter
-\newcount\ltj@@stack \newcount\ltj@@group@level
-\ltj@@group@level\z@\ltj@@stack\z@
-
 \setbox\z@\hbox{%
   \directlua{% This value depends on the version of LuaTeX.
-    luatexja.stack.hmode = -tex.nest[tex.nest.ptr].mode
+    luatexja.stack.hmode = -tex.getnest().mode
   }%
 }
 \setbox\z@\vbox{%
   \directlua{% This value depends on the version of LuaTeX.
-    luatexja.stack.vmode = -tex.nest[tex.nest.ptr].mode
+    luatexja.stack.vmode = -tex.getnest().mode
   }%
 }
 \setbox\z@\box\voidb@x
@@ -328,9 +323,6 @@
 \define@key[ltj]{japaram}{postbreakpenalty}{\ltj@@set@stack{POST}{-10000}{10000}#1\relax}
 \def\ltj@@set@stack#1#2#3{%
   \directlua{luatexja.stack.set_stack_perchar(luatexja.stack_table_index.#1,#2,#3)}}
-%\def\ltj@@set@stack#1,#2:#3#4#5{%
-%  \directlua{luatexja.stack.set_stack_perchar(luatexja.stack_table_index.#3,
-%    \ltj@safe@num@or{nil}{#1},\ltj@safe@num@or{nil}{#2},#4,#5)}}
 
 % jatextfont = {<char_code>, <font_cs>}
 % only horizontal font is supported
@@ -357,18 +349,16 @@
 
 % {y,t}{ja,al}baselineshift = <dimen>
 % yjabaselineshift = <dimen>
-\define@key[ltj]{japaram}{yalbaselineshift}{%
-  \directlua{tex.setattribute(luatexja.isglobal,
-    luatexbase.attributes['ltj@yablshift'], token.scan_dimen())}#1\relax}
-\define@key[ltj]{japaram}{yjabaselineshift}{%
-  \directlua{tex.setattribute(luatexja.isglobal,
-    luatexbase.attributes['ltj@ykblshift'], token.scan_dimen())}#1\relax}
-\define@key[ltj]{japaram}{talbaselineshift}{%
-  \directlua{tex.setattribute(luatexja.isglobal,
-    luatexbase.attributes['ltj@tablshift'], token.scan_dimen())}#1\relax}
-\define@key[ltj]{japaram}{tjabaselineshift}{%
-  \directlua{tex.setattribute(luatexja.isglobal,
-    luatexbase.attributes['ltj@tkblshift'], token.scan_dimen())}#1\relax}
+\def\ltj@set@blshift@#1{\directlua{%
+  local n = token.scan_dimen()
+  tex.setattribute(luatexja.isglobal,
+    luatexbase.attributes['#1'], (n==0) and 0 or n)
+  %次期バージョンで ... and -0x7FFFFFFF or ... に変える
+}}
+\define@key[ltj]{japaram}{yalbaselineshift}{\ltj@set@blshift@{ltj@yablshift}#1\relax}
+\define@key[ltj]{japaram}{yjabaselineshift}{\ltj@set@blshift@{ltj@ykblshift}#1\relax}
+\define@key[ltj]{japaram}{talbaselineshift}{\ltj@set@blshift@{ltj@tablshift}#1\relax}
+\define@key[ltj]{japaram}{tjabaselineshift}{\ltj@set@blshift@{ltj@tkblshift}#1\relax}
 
 % jaxspmode = {<char_code>, <mode>}
 % mode: inhibit, preonly, postonly, allow
@@ -392,7 +382,7 @@
 % autospacing = <bool> (default: true)
 \define@boolkey[ltj]{japaram}{autospacing}[true]{%
   \ifltj@japaram@autospacing
-    \directlua{luatexja.ext_print_global()}\ltj@autospc\@ne
+    \directlua{luatexja.ext_print_global()}\unsetattribute\ltj@autospc
   \else
     \directlua{luatexja.ext_print_global()}\ltj@autospc\z@
   \fi}
@@ -400,7 +390,7 @@
 % autoxspacing = <bool> (default: true)
 \define@boolkey[ltj]{japaram}{autoxspacing}[true]{%
   \ifltj@japaram@autoxspacing
-    \directlua{luatexja.ext_print_global()}\ltj@autoxspc\@ne
+    \directlua{luatexja.ext_print_global()}\unsetattribute\ltj@autoxspc
   \else
     \directlua{luatexja.ext_print_global()}\ltj@autoxspc\z@
   \fi}
@@ -646,7 +636,7 @@
 \setbox\z@\hbox{%
   \primitive\everymath{}%
   $\directlua{% This value depends on the version of LuaTeX.
-     luatexja.stack.mmode = -tex.nest[tex.nest.ptr].mode
+     luatexja.stack.mmode = -tex.getnest().mode
   }$%
 }
 \setbox\z@\box\voidb@x

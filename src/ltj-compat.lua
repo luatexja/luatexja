@@ -4,7 +4,6 @@
 
 luatexja.load_module 'base';   local ltjb = luatexja.base
 luatexja.load_module 'stack';  local ltjs = luatexja.stack
-local stack_table_index = luatexja.stack_table_index
 
 -- load jisx0208 table
 local cache_ver = 3
@@ -18,20 +17,21 @@ end
 
 
 -- \kuten, \jis, \euc, \sjis, \ucs, \kansuji
-local utfchar=utf.char
+local utfchar, floor = utf.char, math.floor
+local texwrite, getcount = tex.write, tex.getcount
+local cnt_stack = luatexbase.registernumber 'ltj@@stack'
+local KSJ = luatexja.stack_table_index.KSJ
+local get_stack_table = ltjs.get_stack_table
 local function to_kansuji(num)
    if not num then num=0; return
-   elseif num<0 then
-      num = -num; tex.write '-'
+   elseif num<0 then num = -num; texwrite '-' 
    end
    local s = ""
    repeat
-      s = utfchar(
-         ltjs.get_stack_table(luatexja.stack_table_index.KSJ + num%10,
-                                '', tex.getcount 'ltj@@stack')) .. s
-      num=math.floor(num/10)
+      s = utfchar(get_stack_table(KSJ + num%10, '', getcount(cnt_stack))) .. s
+      num=num//10
    until num==0
-   tex.write(s)
+   texwrite(s)
 end
 
 local function error_invalid_charcode(i)
@@ -43,22 +43,22 @@ end
 -- \ucs: 単なる identity
 local function from_ucs(i)
    if type(i)~='number' then error_invalid_charcode(i); i=0 end
-   tex.write(i)
+   texwrite(i)
 end
 
 -- \kuten: 面区点 （それぞれで16進2桁を使用）=> Unicode 符号位置
 local function from_kuten(i)
    if type(i)~='number' then error_invalid_charcode(i); i=0 end
    if (i%256==0)or(i%256>94) then
-     tex.write '0'
-   else 
-     tex.write(tostring(jisx0208.table_jisx0208_uptex[math.floor(i/256)*94+(i%256)-94] or 0))
+     texwrite '0'
+   else
+     texwrite(tostring(jisx0208.table_jisx0208_uptex[(i//256)*94+(i%256)-94] or 0))
    end
 end
 
 -- \euc: EUC-JP による符号位置 => Unicode 符号位置
 local function from_euc(i)
-   if type(i)~='number' then 
+   if type(i)~='number' then
      error_invalid_charcode(i); i=0
    elseif i>=0x10000 or i<0xa0a0 then
       i=0
@@ -75,10 +75,9 @@ end
 -- \sjis: Shift_JIS による符号位置 => Unicode 符号位置
 local function from_sjis(i)
    if (type(i)~='number') or i>=0x10000 or i<0 then
-      error_invalid_charcode(i); tex.write '0'; return
+      error_invalid_charcode(i); texwrite '0'; return
    end
-   local c2 = math.floor(i/256)
-   local c1 = i%256
+   local c2, c1 = i//256, i%256
    local shift_jisx0213_s1a3_table = {
       { [false]= 1, [true]= 8},
       { [false]= 3, [true]= 4},
@@ -113,7 +112,7 @@ luatexja.binary_pars.kansujichar = function(c, t)
                         'So I changed this one to zero.')
       c=0
    end
-   return ltjs.get_stack_table(stack_table_index.KSJ + c, 0, t)
+   return get_stack_table(KSJ + c, 0, t)
 end
 
 

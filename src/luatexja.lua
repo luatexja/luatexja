@@ -39,36 +39,6 @@ do
         return node_inherit_attr(node_new(id, subtype), b, a)
     end
 end
-do
-   local dnode = node.direct
-   local setfield = dnode.setfield
-   luatexja.setglue = node.direct.setglue or
-   function(g,w,st,sh,sto,sho)
-      setfield(g,'width', w or 0); setfield(g,'stretch',st or 0); setfield(g,'shrink', sh or 0)
-      setfield(g,'stretch_order',sto or 0)
-      setfield(g,'shrink_order', sho or 0)
-   end
-   for _,v in pairs({'char', 'depth', 'dir', 'font', 'height', 'kern', 'lang', 'next', 
-                      'nucleus', 'offsets', 'penalty', 'shift', 'sub', 'subtype', 'sup'}) do
-         if not dnode['set'..v] then 
-             dnode['set'..v] = function(n, ...) return setfield(n, v, ...) end
-         end
-   end
-   local getfield = dnode.getfield
-   luatexja.getglue = node.direct.getglue or
-   function(g)
-      return getfield(g,'width'), getfield(g,'stretch'), getfield(g,'shrink'),
-             getfield(g,'stretch_order'), getfield(g,'shrink_order')
-   end
-   for _,v in pairs({'box', 'components', 'char', 'depth', 'font', 'height', 'kern', 'lang', 
-                     'list', 'next', 'nucleus', 'offsets', 'penalty', 'prev', 'shift', 'sub',
-                     'subtype', 'sup', 'whd', 'width', 'dir'}) do
-         if not dnode['get'..v] then 
-             dnode['get'..v] = function(n, ...) return getfield(n, v, ...) end
-         end
-    end
-end
-
 
 --- 以下は全ファイルで共有される定数
 local icflag_table = {}
@@ -135,7 +105,7 @@ if tex.outputmode==0 then
       'Use lua*tex instead dvilua*tex.')
 end
 load_module 'rmlgbm';    local ltjr = luatexja.rmlgbm -- must be 1st
-if luatexja_debug then load_module('debug') end
+if luatexja_debug then load_module 'debug' end
 load_module 'lotf_aux';  local ltju = luatexja.lotf_aux
 load_module 'charrange'; local ltjc = luatexja.charrange
 load_module 'stack';     local ltjs = luatexja.stack
@@ -186,12 +156,12 @@ local function print_glue(d,order)
 end
 
 local function print_spec(p)
-   local out=print_scaled(p.width)..'pt'
-   if p.stretch~=0 then
-      out=out..' plus '..print_glue(p.stretch,p.stretch_order)
+   local out=print_scaled(p.width or p[1])..'pt'
+   if (p.stretch or p[2])~=0 then
+      out=out..' plus '..print_glue(p.stretch or p[2], p.stretch_order or p[4])
    end
-   if p.shrink~=0 then
-      out=out..' minus '..print_glue(p.shrink,p.shrink_order)
+   if (p.shrink or p[3])~=0 then
+      out=out..' minus '..print_glue(p.shrink or p[3], p.shrink_order or p[5])
    end
 return out
 end
@@ -200,14 +170,16 @@ end
 ------------------------------------------------------------------------
 -- CODE FOR GETTING/SETTING PARAMETERS
 ------------------------------------------------------------------------
+local getcount, texwrite = tex.getcount, tex.write
+local cnt_stack = luatexbase.registernumber 'ltj@@stack'
 
 -- EXT: print parameters that don't need arguments
 do
    local tex_getattr = tex.getattribute
-   local function getattr(a)
-      local r = tex_getattr(a)
-      return (r==-0x7FFFFFFF) and 0 or r
-   end 
+   local function getattr(a, d)
+      local r = tex_getattr(a); d = d or 0
+      return (r==-0x7FFFFFFF) and d or r
+   end
    luatexja.unary_pars = {
       yalbaselineshift = function(t)
          return print_scaled(getattr('ltj@yablshift'))..'pt'
@@ -231,10 +203,10 @@ do
          return ltjs.get_stack_table(stack_ind.JWP, 0, t)
       end,
       autospacing = function(t)
-         return getattr('ltj@autospc')
+         return getattr('ltj@autospc', 1)
       end,
       autoxspacing = function(t)
-         return getattr('ltj@autoxspc')
+         return getattr('ltj@autoxspc', 1)
       end,
       differentjfm = function(t)
          local f, r = luatexja.jfmglue.diffmet_rule, '???'
@@ -250,7 +222,7 @@ do
       end,
       direction = function()
          local v = ltjd.get_dir_count()
-         if math.abs(tex.nest[tex.nest.ptr].mode) == ltjs.mmode and v == dir_table.dir_tate then
+         if math.abs(tex.getnest().mode) == ltjs.mmode and v == dir_table.dir_tate then
             v = dir_table.dir_utod
          end
          return v
@@ -263,9 +235,9 @@ do
    function luatexja.ext_get_parameter_unary()
       local k= scan_arg()
       if unary_pars[k] then
-         tex.write(tostring(unary_pars[k](tex.getcount('ltj@@stack'))))
+         texwrite(tostring(unary_pars[k](getcount(cnt_stack))))
       end
-      ltjb.stop_time_measure('get_par')
+      ltjb.stop_time_measure 'get_par'
    end
 end
 
@@ -284,8 +256,8 @@ do
             c=0 -- external range 217 == internal range 0
          elseif c==31*ltjc.ATTR_RANGE then c=0
          end
-      -- 負の値は <U+0080 の文字の文字範囲，として出てくる．この時はいつも欧文文字なので 1 を返す
-         return (c<0) and 1 or ltjc.get_range_setting(c)
+         -- 負の値は <U+0080 の文字の文字範囲，として出てくる．この時はいつも欧文文字なので 1 を返す
+         if c<0 then return 1 else return (ltjc.get_range_setting(c)==0) and 0 or 1 end
       end,
       prebreakpenalty = function(c, t)
          return ltjs.get_stack_table(stack_ind.PRE + ltjb.in_unicode(c, true), 0, t)
@@ -318,9 +290,9 @@ do
    binary_pars.alxspmode = binary_pars.jaxspmode
    function luatexja.ext_get_parameter_binary(k, c)
       if binary_pars[k] then
-         tex.write(tostring(binary_pars[k](c,tex.getcount('ltj@@stack'))))
+         texwrite(tostring(binary_pars[k](c, getcount(cnt_stack))))
       end
-      ltjb.stop_time_measure('get_par')
+      ltjb.stop_time_measure 'get_par'
    end
 end
 
@@ -344,10 +316,10 @@ do
       ensure_tex_attr(attr_icflag, 0)
       if gc == 'fin_row' then return head
       else
-            start_time_measure('jfmglue')
+            start_time_measure 'jfmglue'
             slide(head);
             local p = ltjj.main(to_direct(head),mode, dir)
-            stop_time_measure('jfmglue')
+            stop_time_measure 'jfmglue'
             return to_node(p)
       end
    end
@@ -378,13 +350,14 @@ end
 
 -- lastnodechar
 do
-   local id_glyph = node.id('glyph')
+   local getnest = tex.getnest
+   local id_glyph = node.id 'glyph'
    function luatexja.pltx_composite_last_node_char()
-      local n = tex.nest[tex.nest.ptr].tail
+      local n = getnest()
       local r = '-1'
       if n then
          if n.id==id_glyph then
-            while n.componetns and  n.subtype and n.subtype%4 >= 2 do
+            while n.components and  n.subtype and n.subtype%4 >= 2 do
                n = node.tail(n)
             end
             r = tostring(n.char)
@@ -395,7 +368,7 @@ do
 end
 
 do
-    local cache_ver = 3 -- must be same as ltj-kinsoku.tex
+    local cache_ver = 4 -- must be same as ltj-kinsoku.tex
     local cache_outdate_fn = function (t) return t.version~=cache_ver end
     local t = ltjs.charprop_stack_table
     function luatexja.load_kinsoku()
@@ -406,7 +379,7 @@ do
         else
             t[0] = {}; tex.print(cat_lp, '\\input ltj-kinsoku.tex\\relax')
         end
-        luatexja.load_kinsoku=nil; ltjs.charprop_stack_table = nil
+        luatexja.load_kinsoku=nil
     end
 end
 
@@ -416,29 +389,29 @@ do
 
 local node_type = node.type
 local node_next = node.next
-local has_attr = node.has_attribute
+local get_attr = node.get_attribute
 
-local id_penalty = node.id('penalty')
-local id_glyph = node.id('glyph')
-local id_glue = node.id('glue')
-local id_kern = node.id('kern')
-local id_hlist = node.id('hlist')
-local id_vlist = node.id('vlist')
-local id_rule = node.id('rule')
-local id_math = node.id('math')
-local id_whatsit = node.id('whatsit')
-local sid_user = node.subtype('user_defined')
+local id_penalty = node.id 'penalty'
+local id_glyph = node.id 'glyph'
+local id_glue = node.id 'glue'
+local id_kern = node.id 'kern'
+local id_hlist = node.id 'hlist'
+local id_vlist = node.id 'vlist'
+local id_rule = node.id 'rule'
+local id_math = node.id 'math'
+local id_whatsit = node.id 'whatsit'
+local sid_user = node.subtype 'user_defined'
 
 local prefix, inner_depth
 local utfchar = utf.char
 local function debug_show_node_X(p,print_fn, limit, inner_depth)
    local k = prefix
    local s
-   local pt, pic = node_type(p.id), (has_attr(p, attr_icflag) or 0) % icflag_table.PROCESSED_BEGIN_FLAG
+   local pt, pic = node_type(p.id), (get_attr(p, attr_icflag) or 0) % icflag_table.PROCESSED_BEGIN_FLAG
    local base = prefix .. string.format('%X', pic) .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
    if pt == 'glyph' then
-      s = base .. ' ' 
-          .. (p.char<0xF0000 and utfchar(p.char) or '') 
+      s = base .. ' '
+          .. (p.char<0xF0000 and utfchar(p.char) or '')
           .. string.format(' (U+%X) ', p.char)
           .. tostring(p.font) .. ' (' .. print_scaled(p.height) .. '+'
           .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
@@ -451,11 +424,11 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
       if pt=='ins' then
          s = base .. '(' .. print_scaled(p.height) .. '+'
             .. print_scaled(p.depth) .. ')'
-            .. ', dir=' .. tostring(node.has_attribute(p, attr_dir))
+            .. ', dir=' .. tostring(node.get_attribute(p, attr_dir))
       else
          s = base .. '(' .. print_scaled(p.height) .. '+'
             .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
-            .. ', dir=' .. tostring(node.has_attribute(p, attr_dir))
+            .. ', dir=' .. tostring(node.get_attribute(p, attr_dir))
       end
       if (p.shift or 0)~=0 then
          s = s .. ', shifted ' .. print_scaled(p.shift)
@@ -483,7 +456,7 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
    elseif pt=='rule' then
       s = base .. '(' .. print_scaled(p.height) .. '+'
          .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
-         .. ', dir=' .. tostring(node.has_attribute(p, attr_dir))
+         .. ', dir=' .. tostring(node.get_attribute(p, attr_dir))
       print_fn(s)
    elseif pt=='disc' then
       print_fn(s)
@@ -547,7 +520,7 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
          else
             s = s .. ' userid:' .. t .. '(node list)'
             if p.user_id==uid_table.DIR then
-               s = s .. ' dir: ' .. tostring(node.has_attribute(p, attr_dir))
+               s = s .. ' dir: ' .. tostring(node.get_attribute(p, attr_dir))
             end
             print_fn(s)
             local bid = inner_depth

@@ -1,13 +1,9 @@
 %
 % lltjp-tascmac.sty
 %  based on tascmac.sty [2016/04/15 v2.0b (community edition)]
-% \tbaselineshift=\z@ ==> \ltj@tablshift=\z@
-% \ybaselineshift=\z@ ==> \ltj@yablshift=\z@
-% \dimen...=\tbaselineshift ==> \dimen...=\ltj@tablshift sp
-% \dimen...=\ybaselineshift ==> \dimen...=\ltj@yablshift sp
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-tascmac}[2020/12/24 Patch to (t)ascmac for LuaTeX-ja]
+\ProvidesPackage{lltjp-tascmac}[2022-08-24 Patch to (t)ascmac for LuaTeX-ja]
 
 \RequirePackage{tascmac}
 
@@ -30,9 +26,13 @@
 }
 
 %% boxnote environment
+\def\ltj@backup@attr#1#2{\ifnum#1=-"7FFFFFFF #2\z@\else #2=#1sp\fi#1=0 }
+\def\ltj@restore@attr#1#2{#1#2}
+%\def\ltj@backup@attr#1#2{\ifnum#1=-"7FFFFFFF #2\z@\else #2=#1sp\fi\unsetattribute#1}
+%\def\ltj@restore@attr#1#2{\ifdim#2=\z@ \unsetattribute#1\else #1#2\fi}
 \def\boxnote{\par\vspace{.3\baselineskip}%
-  \@saveybaselineshift\ltj@yablshift sp\ltj@yablshift\z@
-  \@savetbaselineshift\ltj@tablshift sp\ltj@tablshift\z@
+  \ltj@backup@attr\ltj@yablshift\@saveybaselineshift
+  \ltj@backup@attr\ltj@tablshift\@savetbaselineshift
   \setbox\@nbox=\hbox{\@ascgrp\vrule width1.08pt depth35pt b\hss a\hss b}
   \@whiledim \wd\@nbox<\hsize \do{
   \setbox\@nbox=\hbox{\@ascgrp\unhbox\@nbox \hss a\hss b}}
@@ -40,12 +40,13 @@
   \vrule width1.08pt depth35pt}%
   \@bw=\wd\@nbox\advance\@bw -40pt
   \begin{lrbox}{\@nbody}\begin{minipage}{\@bw}% (KN:1998/02/27)
-    \ltj@yablshift\@saveybaselineshift \ltj@tablshift\@savetbaselineshift}%
+    \ltj@restore@attr\ltj@yablshift\@saveybaselineshift
+    \ltj@restore@attr\ltj@tablshift\@savetbaselineshift}%
 
 %% screen environment
 \def\screen{%
-  \@saveybaselineshift\ltj@yablshift sp\ltj@yablshift\z@
-  \@savetbaselineshift\ltj@tablshift sp\ltj@tablshift\z@
+  \ltj@backup@attr\ltj@yablshift\@saveybaselineshift
+  \ltj@backup@attr\ltj@tablshift\@savetbaselineshift
   \@ifnextchar[{\@screen}{\@screen[0]}}
 \def\@screen[#1]{\ifcase#1\def\@r{20}\def\@s{9.8pt}\def\@sx{10pt}\or
   \def\@r{18}\def\@s{8.8pt}\def\@sx{9pt}\or
@@ -58,26 +59,29 @@
   \def\@r{4}\def\@s{1.8pt}\def\@sx{2pt}\fi
   \par\vspace{.3\baselineskip}\@scw\linewidth \advance\@scw -\@r pt
   \setbox\scb@x=\hbox to\@scw\bgroup\begin{minipage}{\@scw}% (KN:1998/02/27)
-    \ltj@yablshift\@saveybaselineshift \ltj@tablshift\@savetbaselineshift}%
+    \ltj@restore@attr\ltj@yablshift\@saveybaselineshift
+    \ltj@restore@attr\ltj@tablshift\@savetbaselineshift}%
 
 %% itembox environment
 \def\@itembox[#1]#2{%
-  \@saveybaselineshift\ltj@yablshift sp\ltj@yablshift\z@
-  \@savetbaselineshift\ltj@tablshift sp\ltj@tablshift\z@
+  \ltj@backup@attr\ltj@yablshift\@saveybaselineshift
+  \ltj@backup@attr\ltj@tablshift\@savetbaselineshift
   \par\vspace{.3\baselineskip}%
   \setbox\@iboxstr=\hbox{%
-  \ltj@yablshift\@saveybaselineshift \ltj@tablshift\@savetbaselineshift #2}%
+    \ltj@restore@attr\ltj@yablshift\@saveybaselineshift
+    \ltj@restore@attr\ltj@tablshift\@savetbaselineshift #2}%
   \@itemh\ht\@iboxstr\advance\@itemh\dp\@iboxstr
   \vspace{.5\@itemh}\bgroup\@scw\linewidth
   \advance\@scw-20pt\@iboxpos={#1}%
   \setbox\scb@x=\hbox to\@scw\bgroup\begin{minipage}{\@scw}%
-  \ltj@yablshift\@saveybaselineshift
-  \ltj@tablshift\@savetbaselineshift
+  \ltj@restore@attr\ltj@yablshift\@saveybaselineshift
+  \ltj@restore@attr\ltj@tablshift\@savetbaselineshift
   \vspace*{.5\@itemh}}%
 
 %% \keytop
 \def\@keytop[#1]#2{%
   {\setbox0=\hbox{\shortstack{#2}}\ltj@yablshift\z@\ltj@tablshift\z@%
+  %\unsetattribute\ltj@yablshift\unsetattribute\ltj@tablshift%
   \dimen0=\wd0\advance\dimen0 5pt\dimen1=\dp0\advance\dimen1 2.5pt%
   \setbox\scscb@x=\hbox to\dimen0{%
   \@scw\wd0\hfil\vtop{\offinterlineskip
@@ -92,6 +96,7 @@
 
 %% \mask
 \def\mask#1#2{{\setbox\@bwsp=\hbox{#1}%
+%  \setbox0=\hbox{\unsetattribute\ltj@yablshift\unsetattribute\ltj@tablshift \@ascgrp#2}%
   \setbox0=\hbox{\ltj@yablshift\z@\ltj@tablshift\z@ \@ascgrp#2}%
   \dimen0=\wd\@bwsp\dimen1=\ht\@bwsp\advance\dimen1\dp\@bwsp\dimen2=-\dimen1
   \setdim@{\dimen0}{\wd0}\setdim@{\dimen1}{\ht0}%
@@ -104,6 +109,7 @@
 
 %% \maskbox
 \def\Maskbox#1#2#3#4#5#6{{%
+%  \setbox0=\hbox{\unsetattribute\ltj@yablshift\unsetattribute\ltj@tablshift \@ascgrp#3}%
   \setbox0=\hbox{\ltj@yablshift\z@\ltj@tablshift\z@ \@ascgrp#3}%
   \dimen0=#1\@setdim{\dimen0}{\wd0}\dimen1=#2\@setdim{\dimen1}{\ht0}%
   \ifx#4c\skip0=0pt plus1fil\skip1=\skip0\fi
@@ -119,12 +125,13 @@
 
 %% shadebox environment
 \def\shadebox{\par\vspace{.3\baselineskip}%
-  \@saveybaselineshift\ltj@yablshift sp\ltj@yablshift\z@
-  \@savetbaselineshift\ltj@tablshift sp\ltj@tablshift\z@
+  \ltj@backup@attr\ltj@yablshift\@saveybaselineshift
+  \ltj@backup@attr\ltj@tablshift\@savetbaselineshift
   \dimen0\linewidth \advance\dimen0-20pt
   \advance\dimen0-2\fboxrule \advance\dimen0-\shaderule
   \setbox\@tempboxa=\hbox\bgroup\minipage{\dimen0}%
-    \ltj@yablshift\@saveybaselineshift \ltj@tablshift\@savetbaselineshift}
+    \ltj@restore@attr\ltj@yablshift\@saveybaselineshift
+    \ltj@restore@attr\ltj@tablshift\@savetbaselineshift}%
 
 %% \yen
 %

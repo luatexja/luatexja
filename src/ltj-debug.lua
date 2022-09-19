@@ -79,7 +79,7 @@ end
 local function pformat(fmt, ...)
   if type(fmt) == "string" then
     return do_pformat(fmt, ...)
-  else 
+  else
     return tosource(fmt)
   end
 end
@@ -105,7 +105,7 @@ do
    end
 
    local function print_measure()
-      stop_time_measure('RUN')
+      stop_time_measure 'RUN'
       local temp = {}
       for i,v in pairs(time_stat) do
 	 temp[#temp+1] = { i, v[1], v[2], v[2]/v[1] }
@@ -121,10 +121,10 @@ do
       luatexja.base.start_time_measure = start_time_measure
       luatexja.base.stop_time_measure = stop_time_measure
       luatexbase.add_to_callback('stop_run', print_measure, 'luatexja.time_measure', 1)
-      luatexbase.add_to_callback('pre_linebreak_filter', 
-				 function(p) 
-				    start_time_measure('tex_linebreak'); return p 
-				 end, 
+      luatexbase.add_to_callback('pre_linebreak_filter',
+				 function(p)
+				    start_time_measure 'tex_linebreak'; return p
+				 end,
 				 'measure_tex_linebreak', 20000)
    end
 end

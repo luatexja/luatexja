@@ -21,6 +21,7 @@ local getlang = node.direct.getlang
 
 local pairs = pairs
 local floor = math.floor
+local get_attr = node.direct.get_attribute
 local has_attr = node.direct.has_attribute
 local set_attr = node.direct.set_attribute
 local node_traverse = node.direct.traverse
@@ -28,12 +29,12 @@ local node_remove = node.direct.remove
 local node_next =  node.direct.getnext
 local node_free = node.direct.flush_node or node.direct.free
 local node_end_of_math = node.direct.end_of_math
-local tex_getcount = tex.getcount
+local getcount = tex.getcount
 
-local id_glyph = node.id('glyph')
-local id_math = node.id('math')
-local id_whatsit = node.id('whatsit')
-local sid_user = node.subtype('user_defined')
+local id_glyph = node.id 'glyph'
+local id_math = node.id 'math'
+local id_whatsit = node.id 'whatsit'
+local sid_user = node.subtype 'user_defined'
 
 local attr_dir = luatexbase.attributes['ltj@dir']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
@@ -72,8 +73,8 @@ do
             if uid==STCK then
                wt[#wt+1] = p; node_remove(head, p)
             elseif uid==DIR then
-               if has_attr(p, attr_icflag)<PROCESSED_BEGIN_FLAG  then
-                  ltjs.list_dir = has_attr(p, attr_dir)
+               if get_attr(p, attr_icflag)<PROCESSED_BEGIN_FLAG  then
+                  ltjs.list_dir = get_attr(p, attr_dir)
                else -- こっちのケースは通常使用では起こらない
                   wtd[#wtd+1] = p; node_remove(head, p)
                end
@@ -82,13 +83,13 @@ do
          return node_next(p)
       end,
    }
-   setmetatable(suppress_hyphenate_ja_aux, 
+   setmetatable(suppress_hyphenate_ja_aux,
                 { __index = function() return node_next end, })
-   local id_boundary = node.id('boundary')
+   local id_boundary = node.id 'boundary'
    local node_new, insert_before = node.direct.new, node.direct.insert_before
    local setsubtype = node.direct.setsubtype
    local function suppress_hyphenate_ja (h)
-      start_time_measure('ltj_hyphenate')
+      start_time_measure 'ltj_hyphenate'
       head = to_direct(h)
       for i = 1,#wt do wt[i]=nil end
       for i = 1,#wtd do wtd[i]=nil end
@@ -109,7 +110,7 @@ do
                      setfield(b, 'type', 100); setfield(b, 'user_id', JA_AL_BDD);
                      insert_before(head, p, b)
                   end
-                  local pf = has_attr(p, attr_curjfnt)
+                  local pf = get_attr(p, attr_curjfnt)
                   pf = (pf and pf>0 and pf) or getfont(p)
                   setfont(p, ltjf_replace_altfont(pf, pc))
                   setlang(p, lang_ja)
@@ -125,9 +126,9 @@ do
             p = (suppress_hyphenate_ja_aux[pid])(p)
          end
       end
-      stop_time_measure('ltj_hyphenate'); start_time_measure('tex_hyphenate')
+      stop_time_measure 'ltj_hyphenate'; start_time_measure 'tex_hyphenate'
       lang.hyphenate(h, nil)
-      stop_time_measure('tex_hyphenate')
+      stop_time_measure 'tex_hyphenate'
       return h
    end
 
@@ -141,21 +142,25 @@ local ltjs_report_stack_level = ltjs.report_stack_level
 local ltjf_font_metric_table  = ltjf.font_metric_table
 local font_getfont = font.getfont
 local traverse_id = node.direct.traverse_id
+local cnt_stack = luatexbase.registernumber 'ltj@@stack'
+local texget, getvalue = tex.get, node.direct.getdata
 function set_box_stack_level(head, mode)
-   local box_set, cl = 0, tex.currentgrouplevel + 1
+   local box_set = 0
    if mode then
-      for _,p  in pairs(wt) do
-         if getfield(p, 'value')==cl then box_set = 1 end; node_free(p)
+      local cl = (texget 'currentgrouplevel') + 1
+      for i=1,#wt do
+         local p = wt[i]
+         if getvalue(p)==cl then box_set = 1 end; node_free(p)
       end
    else
-      for _,p  in pairs(wt) do node_free(p) end
+      for i=1,#wt do node_free(wt[i]) end
    end
-   ltjs_report_stack_level(tex_getcount('ltj@@stack') + box_set)
+   ltjs_report_stack_level(getcount(cnt_stack) + box_set)
    for _,p  in pairs(wtd) do node_free(p) end
    if ltjs.list_dir == dir_tate then
       for p in traverse_id(id_glyph,to_direct(head)) do
          if has_attr(p, attr_icflag, 0) and getlang(p)==lang_ja then
-            local nf = ltjf_replace_altfont( has_attr(p, attr_curtfnt) or getfont(p) , ltjs_orig_char_table[p])
+            local nf = ltjf_replace_altfont( get_attr(p, attr_curtfnt) or getfont(p) , ltjs_orig_char_table[p])
             setfont(p, nf)
             if ltjf_font_metric_table[nf].vert_activated then
                local pc = getchar(p); pc = ltjf_font_metric_table[nf].vform[pc]

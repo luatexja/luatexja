@@ -6059,44 +6059,6 @@ that is, without executing \cs{ltj@setpar@global} in advance, is \emph{not} supp
 \cs{ltj@setpar@global}を直前に実行せず，単独で
 \cs{ltjsetkanjiskip}, \cs{ltjsetxkanjiskip}を実行することは想定されていないので注意．
 
-
-
-\paragraph{ベースライン補正量の設定}
-\pLaTeX の\Pkg{ascmac}パッケージでは，縦組の欧文ベースライン補正量の一時待避・復帰処理に
-\ \cs{@saveybaselineshift}\ という寸法レジスタを用い
-\begin{lstlisting}
-\@savetbaselineshift\tbaselineshift\tbaselineshift\z@
-...
-\tbaselineshift\@savetbaselineshift
-\end{lstlisting}
-という処理を行っている．
-
-これを\LuaTeX-ja 用に \cs{ltjsetparameter} を使って書き直すと，
-\begin{lstlisting}
-\@savetbaselineshift\ltjgetparameter{talbaselineshift}
-\ltjsetparameter{talbaselineshift=\z@}
-...
-\ltjsetparameter{talbaselineshift=\@savetbaselineshift}
-\end{lstlisting}
-となる．
-
-さて，縦組の欧文ベースライン補正量\Param{talbaselineshift}は，
-実際には \cs{ltj@tablshift} という属性レジスタに格納されている
-（\ref{sec-para}\nobreak 節参照）．属性レジスタは長さではなく整数値を格納する\footnote{%
-  従って，\texttt{\textbackslash @savetbaselineshift=\textbackslash ltj@tablshift}\
-  のように記述することはできない．属性レジスタを \cs{tbaselineshift} という名称にしなかっ
-  たのはそのためである．
-}ものであり，\cs{ltj@tablshift} は補正量を sp 単位で保持することから，
-上記のコードと同じ内容をより速い以下のコードで実現することができる．
-\begin{lstlisting}
-\@savetbaselineshift\ltj@tablshift sp%
-\ltj@tablshift\z@
-...
-\ltj@tablshift\@savetbaselineshift
-\end{lstlisting}
-この手法は \Pkg{ascmac} パッケージの\LuaTeX-ja対応パッチ \Pkg{lltjp-tascmac.sty} で
-実際に用いられている．\Pkg{lltjp-tascmac.sty} は自動的に読み込まれるので，
-ユーザは何も気にせず普通に \Pkg{ascmac} パッケージを \cs{usepackage} で読みこめば良い．
 %</ja>
 
 
@@ -9152,9 +9114,11 @@ The character class of a \textbf{JAchar}. This attribute is only set on a
 \attr{ltj@yablshift}
 %<*en>
 The amount of shifting the baseline of alphabetic fonts in scaled point ($2^{-16}\,\textrm{pt}$).
+``unset'' means zero.
 %</en>
 %<*ja>
 スケールド・ポイント($2^{-16}\,\textrm{pt}$)を単位とした欧文フォントのベースラインの移動量．
+この属性が「未設定」(\texttt{-"7FFFFFFF})のときは0であるとみなされる．\cs{ltj@ykblshift}他も同様．
 %</ja>
 
 \attr{ltj@ykblshift}
@@ -9171,17 +9135,21 @@ The amount of shifting the baseline of Japanese fonts in scaled point ($2^{-16}\
 \attr{ltj@autospc}
 %<*en>
 Whether the auto insertion of \Param{kanjiskip} is allowed at the node.
+0 means ``not allowed'', and the other value (including ``unset'') means ``allowed''.
 %</en>
 %<*ja>
 そのノードで\Param{kanjiskip}の自動挿入が許されるかどうか．
+0は「許可しない」，0以外の値（「未設定」も含む）は「許可する」．
 %</ja>
 
 \attr{ltj@autoxspc}
 %<*en>
 Whether the auto insertion of \Param{xkanjiskip} is allowed at the node.
+0 means ``not allowed'', and the other value (including ``unset'') means ``allowed''.
 %</en>
 %<*ja>
 そのノードで\Param{xkanjiskip}の自動挿入が許されるかどうか．
+0は「許可しない」，0以外の値（「未設定」も含む）は「許可する」．
 %</ja>
 
 \attr{ltj@icflag}
@@ -12003,6 +11971,17 @@ ISO 32000-1:2008, \textit{Document management -- Portable document format -- Par
 \bibitem{bxghost} Takuto ASAKURA. \newblock The \textsf{BXghost} Package. \url{https://github.com/wtsnjp/BXghost}
 \end{thebibliography}
 
+{\catcode`\%=12\relax\catcode`\~=12\relax
+\typeout{attributes:}
+\directlua{
+  for i=0,65535 do
+    local a = tex.getattribute(i)
+    if a~=-0x7FFFFFFF then
+      texio.write_nl('term and log',
+        string.format('attr %6d, %d', i, a))
+    end
+  end
+}}
 \end{document}
 %</!showexpl>
 %<*showexpl>

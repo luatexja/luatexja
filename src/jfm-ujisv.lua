@@ -26,7 +26,7 @@ local t = {
 	 [207] = { 0, 0, 0, kanjiskip_shrink=1 },
          [8] = { 0, 0, 0, kanjiskip_shrink=1 },
       },
-      kern = { [307] = 0 },	 
+      kern = { [307] = 0 },
       round_threshold = 0.01,
    },
 
