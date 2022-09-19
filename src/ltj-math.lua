@@ -18,11 +18,13 @@ local getchar = node.direct.getchar
 local getnucleus = node.direct.getnucleus
 local getsup = node.direct.getsup
 local getsub = node.direct.getsub
+local getshift = node.direct.getshift
 local setnext = node.direct.setnext
 local setnucleus = node.direct.setnucleus
 local setsup = node.direct.setsup
 local setsub = node.direct.setsub
 local setlist = node.direct.setlist
+local setshift = node.direct.setshift
 
 local to_node = node.direct.tonode
 local to_direct = node.direct.todirect
@@ -151,17 +153,18 @@ cjh_A = function (p, sty)
                local q = node_new(id_sub_box)
                local r = node_new(id_glyph, 256); setnext(r, nil)
                setfont(r, f, pc)
-               local k = get_attr(r,attr_ykblshift) or 0; set_attr(r, attr_ykblshift, 0)
-               -- ltj-setwidth 内で実際の位置補正はおこなうので，補正量を退避
+               local ks = (get_attr(r,attr_ykblshift) or 0) -- - (get_attr(r, attr_yablshift) or 0)
+               set_attr(r, attr_ykblshift, 0); --set_attr(r, attr_yablshift, 0)
                local met = ltjf_font_metric_table[f]
                r = capsule_glyph_math(r, met, met.char_type[ltjf_find_char_class(pc, met)]);
-               setlist(q, r); node_free(p); p=q; set_attr(r, attr_yablshift, k)
+               setlist(q, r); node_free(p); p=q; setshift(r, ks);
             end
          end
       elseif pid == id_sub_box and getlist(p) then
          -- \hbox で直に与えられた内容は上下位置を補正する必要はない
          local h = getlist(p); h = ltjd_make_dir_whatsit(h, h, list_dir, 'math')
-         setlist(p, h); set_attr(h, attr_icflag, PROCESSED)
+         setlist(p, h); setshift(h, getshift(h)-get_attr(h, attr_yablshift))
+         --set_attr(h, attr_icflag, PROCESSED)
       end
    end
    return p
