@@ -58,6 +58,7 @@ local sid_restore = node.subtype 'pdf_restore'
 local sid_matrix  = node.subtype 'pdf_setmatrix'
 local dir_tate = luatexja.dir_table.dir_tate
 
+local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 local attr_ykblshift = luatexbase.attributes['ltj@ykblshift']
 local attr_tkblshift = luatexbase.attributes['ltj@tkblshift']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
@@ -242,15 +243,19 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
 end
 luatexja.setwidth.capsule_glyph_tate = capsule_glyph_tate
 
-local function capsule_glyph_math(p, met, char_data)
+do
+    local cap_math_aux = {[0]=1, [1]=0 }
+    setmetatable(cap_math_aux, {__index=function() return 0.5 end})
+local function capsule_glyph_math(p, met, char_data, sty)
    if not char_data then return nil end
    local fwidth, pwidth = char_data.width, getwidth(p)
    fwidth = fwidth or pwidth
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = call_callback("luatexja.set_width", fshift, met, char_data)
    local fheight, fdepth = char_data.height, char_data.depth
-   local y_shift
-      = - getfield(p, 'yoffset') + (get_attr(p,attr_ykblshift) or 0)
+   print(utf.char(getchar(p)), get_attr(p,attr_ykblshift) or 0, get_attr(p,attr_yablshift) or 0, sty)
+   local y_shift = - getfield(p, 'yoffset') 
+                   + cap_math_aux[sty]*((get_attr(p,attr_ykblshift) or 0) - (get_attr(p,attr_yablshift) or 0))
    setfield(p, 'yoffset', -fshift.down)
    setfield(p, 'xoffset', getfield(p, 'xoffset') + char_data.align*(fwidth-pwidth) - fshift.left)
    local box = node_new(id_hlist, nil, p);
@@ -261,6 +266,7 @@ local function capsule_glyph_math(p, met, char_data)
    return box
 end
 luatexja.setwidth.capsule_glyph_math = capsule_glyph_math
+end
 
 -- 数式の位置補正
 function luatexja.setwidth.apply_ashift_math(head, last, attr_ablshift)

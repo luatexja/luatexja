@@ -151,13 +151,11 @@ cjh_A = function (p, sty)
             local f = ltjs.get_stack_table(MJT + 0x100 * sty + fam, -1, getcount(cnt_stack))
             if f ~= -1 then
                local q = node_new(id_sub_box)
-               local r = node_new(id_glyph, 256); setnext(r, nil)
-               setfont(r, f, pc)
-               local ks = (get_attr(r,attr_ykblshift) or 0) -- - (get_attr(r, attr_yablshift) or 0)
-               set_attr(r, attr_ykblshift, 0); --set_attr(r, attr_yablshift, 0)
+               local r = node_new(id_glyph, 256); setnext(r, nil); setfont(r, f, pc)
                local met = ltjf_font_metric_table[f]
-               r = capsule_glyph_math(r, met, met.char_type[ltjf_find_char_class(pc, met)]);
-               setlist(q, r); node_free(p); p=q; setshift(r, ks);
+               r = capsule_glyph_math(
+                 r, met, met.char_type[ltjf_find_char_class(pc, met)], sty)
+               setlist(q, r); node_free(p); p=q;
             end
          end
       elseif pid == id_sub_box and getlist(p) then
