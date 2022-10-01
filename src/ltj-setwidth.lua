@@ -244,8 +244,20 @@ end
 luatexja.setwidth.capsule_glyph_tate = capsule_glyph_tate
 
 do
-    local cap_math_aux = {[0]=1, [1]=0 }
-    setmetatable(cap_math_aux, {__index=function() return 0.5 end})
+local font_getfont = font.getfont
+local cap_math_aux = {
+  [-1]=function() return 1 end,
+  [0]=function() return 1 end,
+  [1]=function()
+     local sf, tf = node.family_font(2,1), node.family_font(2,0)
+     return font_getfont(sf).size/font_getfont(tf).size
+  end,
+  [2]=function()
+     local ssf, tf = node.family_font(2,2), node.family_font(2,0)
+     return font_getfont(ssf).size/font_getfont(tf).size
+  end
+}
+setmetatable(cap_math_aux, {__index=function(t,k) return t[2] end})
 local function capsule_glyph_math(p, met, char_data, sty)
    if not char_data then return nil end
    local fwidth, pwidth = char_data.width, getwidth(p)
@@ -253,9 +265,9 @@ local function capsule_glyph_math(p, met, char_data, sty)
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = call_callback("luatexja.set_width", fshift, met, char_data)
    local fheight, fdepth = char_data.height, char_data.depth
-   print(utf.char(getchar(p)), get_attr(p,attr_ykblshift) or 0, get_attr(p,attr_yablshift) or 0, sty)
    local y_shift = - getfield(p, 'yoffset') 
-                   + cap_math_aux[sty]*((get_attr(p,attr_ykblshift) or 0) - (get_attr(p,attr_yablshift) or 0))
+     + cap_math_aux[sty]()*
+       ((get_attr(p,attr_ykblshift) or 0) - (get_attr(p,attr_yablshift) or 0))
    setfield(p, 'yoffset', -fshift.down)
    setfield(p, 'xoffset', getfield(p, 'xoffset') + char_data.align*(fwidth-pwidth) - fshift.left)
    local box = node_new(id_hlist, nil, p);

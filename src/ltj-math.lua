@@ -102,7 +102,7 @@ local function conv_jchar_to_hbox(head, sty)
          setsub(p, cjh_A(getsub(p), sty+1))
          setsup(p, cjh_A(getsup(p), sty+1))
       elseif pid == id_choice then
-         setfield(p, 'display', cjh_A(getfield(p, 'display'), 0))
+         setfield(p, 'display', cjh_A(getfield(p, 'display'), -1))
          setfield(p, 'text', cjh_A(getfield(p, 'text'), 0))
          setfield(p, 'script', cjh_A(getfield(p, 'script'), 1))
          setfield(p, 'scriptscript', cjh_A(getfield(p, 'scriptscript'), 2))
@@ -118,7 +118,9 @@ local function conv_jchar_to_hbox(head, sty)
          end
       elseif pid == id_style then
          local ps = getfield(p, 'style')
-         if ps == "display'" or  ps == 'display' or ps == "text'" or ps == 'text' then
+         if ps == "display'" or  ps == 'display' then
+            sty = -1
+         elseif ps == "text'" or ps == 'text' then
             sty = 0
          elseif  ps == "script'" or  ps == 'script' then
             sty = 1
@@ -137,6 +139,7 @@ local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
 local setfont = node.direct.setfont
 local setchar = node.direct.setchar
 
+local max = math.max
 cjh_A = function (p, sty)
    if not p then return nil
    else
@@ -148,7 +151,7 @@ cjh_A = function (p, sty)
       elseif pid == id_mchar then
          local pc, fam = getchar (p), get_attr(p, attr_jfam) or -1
          if (not is_math_letters[pc]) and is_ucs_in_japanese_char(p) and fam>=0 then
-            local f = ltjs.get_stack_table(MJT + 0x100 * sty + fam, -1, getcount(cnt_stack))
+            local f = ltjs.get_stack_table(MJT + 0x100 * max(sty,0) + fam, -1, getcount(cnt_stack))
             if f ~= -1 then
                local q = node_new(id_sub_box)
                local r = node_new(id_glyph, 256); setnext(r, nil); setfont(r, f, pc)
