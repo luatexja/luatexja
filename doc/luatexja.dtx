@@ -2439,56 +2439,58 @@ becuse a \emph{JAchar} is encapsulated by a horizontal box if needed.
 \paragraph{数式における挙動：\pTeX との違い}
 \textbf{ALchar}のベースラインを補正する\Param{yalbaselineshift}, \Param{talbaselineshift}パラメータは
 ほぼ\pTeX における \cs{ybaselineshift}, \cs{tbaselineshift} に対応しているものであるが，
-数式中の挙動は異なっているので注意が必要である．
-例えば，\autoref{tab:math_bsa}のように，数式中に明示的に現れた \cs{hbox},~\cs{vbox} は，横組において
+数式中の挙動は異なっているので注意が必要である（\autoref{tab:math_bsa}参照）．
 \begin{itemize}
- \item 2015年以前の\pTeX では，ボックス全体が \cs{ybaselineshift} だとシフトされるので，
- \autoref{tab:math_bsa}中の``い''のように，ボックス中の和文文字は
- \ \cs{ybaselineshift} だけシフトされ，一方，``for all''のように，
- ボックス内の欧文文字は2重にシフトされることになる．
- \item 一方，\LuaTeX-jaではそのようなことはおこらず，
- 数式中に明示的に現れた \cs{hbox},~\cs{vbox} はシフトしない．そのため，
- \autoref{tab:math_bsa}中の``い''も``for all''も，それぞれ本文中に
- 書かれたときと同じ上下位置に組まれる．
+ \item バージョン20221002.0以降では，
+  \pTeX~4.0.0と同様に数式が\Param{yalbaselineshift}だけシフトされる．
 
- なお，\TeX~Live~2016以降の\pTeX では改修がなされ，\LuaTeX-jaと
- 近い挙動になるようにしているが，数式中に直に書かれた``あ''のベースラインについては
- まだ違いが見られる．
+  しかしそれでは数式中に直に書かれた\cs{hbox},~\cs{vbox}中の欧文には
+  \Param{yalbaselineshift}が二重に適用されることになるので，
+  数式中に直に書かれた\cs{hbox},~\cs{vbox}には
+  \Param{yalbaselineshift}を打ち消す補正をしている．
+
+  なお，\cs{vcenter}によるボックスにはこの「打ち消す補正」は行われないので注意．
+\item \pTeX では数式のスタイルごとに「打ち消す補正」の割合を\cs{textbaselineshiftfactor},
+  \cs{scriptbaselineshiftfactor}, \cs{scriptscriptbaselineshiftfactor}で
+  指定できるようにしたが，\LuaTeX-jaでは2番の数式ファミリ(\cs{fam2})に使われているフォントの
+  大きさから自動で計算する．
+
+\item 数式中に直に書かれた和文文字（\autoref{tab:math_bsa}中の``あ''）については
+  \pTeX と\LuaTeX-jaで違いが見られる．
+  \pTeX では，欧文文字と変わらず欧文ベースライン補正(\cs{ybaselineshift})がかかり，
+  また周囲に和欧文間空白(\cs{xkanjiskip})が入りうる．
+  その一方，\LuaTeX-jaでは「和文ベースライン補正(\Param{yjabaselineshift})がかかる」見た目に
+  なり，また周囲に和欧文間空白は入らない．
 \end{itemize}
-
-なお，バージョン20170401.0以降の\LuaTeX-jaでは，\cs{vcenter} によるボックスには
-全体が\Param{yalbaselineshift}, \Param{talbaselineshift} パラメータが反映されるようにしている．
-その方が結果が自然であることによる変更なのだが，結果的に\cs{vcenter} については\pTeX と同じ挙動となった．
-
 \begin{table}
 \small\centering
 \caption{数式関係のベースライン補正($\Param{yalbaselineshift}=10\,\textrm{pt}$)}
 \label{tab:math_bsa}
 \newdimen\origbaselineskip
 \origbaselineskip=\baselineskip
-\begin{tabular}{lp{30\zw}}
+\begin{tabular}{lp{35\zw}}
 \toprule
 \emph{入力}&\vspace*{\dimexpr-\origbaselineskip-\smallskipamount}
 \begin{lstlisting}
 数式abc: $あa\hbox{い}$, $\int_0^x t\,dt=x^2/2$,
-$\Phi\vdash F(x)\ \hbox{for all}\ x\in A$
+$\Phi\vdash F(x)\ \hbox{for all}\ x\in A$,
+$\sqrt{A}-\underline{X}+\frac{あ3}{2あ}-\vcenter{\hbox{aお}}$
 \end{lstlisting}\\
 \noalign{\vskip-\origbaselineskip}
 \midrule
-\emph{\pTeX~(--2015)}&
+\emph{\pTeX~(p4.0.0)}&
 {\ltjsetparameter{yalbaselineshift=10pt}%
-数式abc: $\lower10pt\hbox{あ}a\lower10pt\hbox{い}$, $\int_0^x t\,dt=x^2/2$,
-$\Phi\vdash F(x)\ \lower10pt\hbox{for all}\ x\in A$
-\par}\\\noalign{\vskip-\origbaselineskip}\midrule
-\emph{\pTeX~(2016--)}&
-{\ltjsetparameter{yalbaselineshift=10pt}%
-数式abc: $\lower10pt\hbox{あ}a\hbox{い}$, $\int_0^x t\,dt=x^2/2$,
+\protected\def\>{\hskip\ltjgetparameter{xkanjiskip}}
+数式abc: $\lower10pt\hbox{あ}\>a\hbox{い}$, $\int_0^x t\,dt=x^2/2$,
 $\Phi\vdash F(x)\ \hbox{for all}\ x\in A$
+$\sqrt{A}-\underline{X}
+  +\frac{\lower10pt\hbox{\scalebox{0.7}{あ}}3}{2\>\lower10pt\hbox{\scalebox{0.7}{あ}}}-\vcenter{\hbox{aお}}$
 \par}\\\noalign{\vskip-\origbaselineskip}\midrule
 \emph{\LuaTeX-ja}&
 {\ltjsetparameter{yalbaselineshift=10pt}%
 数式abc: $あa\hbox{い}$, $\int_0^x t\,dt=x^2/2$,
-$\Phi\vdash F(x)\ \hbox{for all}\ x\in A$
+$\Phi\vdash F(x)\ \hbox{for all}\ x\in A$,
+$\sqrt{A}-\underline{X}+\frac{あ\>3}{2あ}-\vcenter{\hbox{aお}}$
 \par}\\
 \noalign{\vskip-\origbaselineskip}
 \bottomrule
@@ -11971,7 +11973,10 @@ ISO 32000-1:2008, \textit{Document management -- Portable document format -- Par
 \bibitem{bxghost} Takuto ASAKURA. \newblock The \textsf{BXghost} Package. \url{https://github.com/wtsnjp/BXghost}
 \end{thebibliography}
 
+\makeatletter
+\let\ltj@@end=\@@end
 {\catcode`\%=12\relax\catcode`\~=12\relax
+\protected\gdef\@@end{%
 \typeout{attributes:}
 \directlua{
   for i=0,65535 do
@@ -11980,8 +11985,10 @@ ISO 32000-1:2008, \textit{Document management -- Portable document format -- Par
       texio.write_nl('term and log',
         string.format('attr %6d, %d', i, a))
     end
+    tex.setbox('global', i, nil)
   end
-}}
+  print('IC', luatexja.inherit_na_count )
+}\ltj@@end}}
 \end{document}
 %</!showexpl>
 %<*showexpl>
