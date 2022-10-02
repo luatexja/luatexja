@@ -64,7 +64,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-otf}[2019-09-26]
+  \ProvidesPackage{luatexja-otf}[2022-10-02]
 \fi                             %</LaTeX>
 
 % Load core module if not yet.
@@ -85,8 +85,7 @@
 %! Main part of luatexja-otf
 \RequireLuaTeXjaSubmodule{otf}
 
-\newcount\ltj@tempcnta
-
+%\newcount\ltj@tempcnta % defined at luatexja-core.sty
 \protected\def\CID#1{\ifvmode\leavevmode\fi\ltj@tempcnta#1\relax\directlua{luatexja.otf.cid(\the\ltj@tempcnta)}\relax}
 
 %% \UTF compatible with the OTF package for pLaTeX
