@@ -225,9 +225,7 @@
   vscmd=\IVSB
 }
 
-\catcode`\<=13
-\def<#1>{{\normalfont\rmfamily\itshape$\langle$#1\/$\rangle$}}
-\let\LARG=<
+\def\meta#1{{\normalfont\rmfamily\itshape$\langle$#1\/$\rangle$}}
 \maketitle
 
 \tableofcontents
@@ -1111,7 +1109,7 @@ By default, the following fonts are used for these two families.
   \LaTeX へのパッチを読み込まない．
 
   \texttt{disablejfam}のない状況では，以前と同様に和文文字を数式モード中に
-  直に書くことができる（但し\autoref{para:jachar_in_math}ページの記述も参照）．
+  直に書くことができる（但し\pageref{para:jachar_in_math}ページの記述も参照）．
   その際には明朝体(\texttt{mc})で出力される．
 %</ja>
 
@@ -1333,13 +1331,13 @@ auto select&\cs{fontencoding}&\cs{fontfamily}&---&---&\cs{usefont}\\
 \item \cs{fontfamily}, \cs{fontseries}, \cs{fontshape} は欧文・和文フォント両方の属性を変更しようとする．
       もちろん，それらを実際に反映させるには手動で \cs{selectfont} を実行する必要がある．
 
-      なお，\cs{fontshape\{<shape>\}}は常に欧文フォントのシェイプを設定するが，
+      なお，\cs{fontshape\{\meta{shape}\}}は常に欧文フォントのシェイプを設定するが，
       もしも現在の和文フォントファミリ・シリーズで要求されたシェイプが利用不能だった場合には，和文フォントのシェイプは変更しない．
       詳細は\ref{ssec:nfsspat}節を参照すること．
 %</ja>
 
 %<*en>
-\item \verb+\fontencoding{+<encoding>\verb+}+ changes the encoding of alphabetic fonts
+\item \verb+\fontencoding{+\meta{encoding}\verb+}+ changes the encoding of alphabetic fonts
       or Japanese fonts depending on the argument. For example,
       \verb+\fontencoding{JY3}+ changes the encoding of Japanese fonts to
       \texttt{JY3}, and \verb+\fontencoding{T1}+ changes the encoding of
@@ -1349,7 +1347,7 @@ auto select&\cs{fontencoding}&\cs{fontfamily}&---&---&\cs{usefont}\\
       For the detail, see Subsection~\ref{ssec:nfsspat}.
 %</en>
 %<*ja>
-\item  ここで，\cs{fontencoding\{<encoding>\}}は，引数により和文側か欧文
+\item  ここで，\cs{fontencoding\{\meta{encoding}\}}は，引数により和文側か欧文
       側かのどちらかのエンコーディングを変更する．例えば，
       \verb+\fontencoding{JY3}+ は和文フォントのエンコーディングを
       \texttt{JY3}に変更し，\verb+\fontencoding{T1}+ は欧文フォント側を
@@ -1469,7 +1467,7 @@ this chapter. For the method, please see Subsection~\ref{ssec:math}.
 To use the functionality of the \Pkg{fontspec} package to Japanese fonts,
 it is needed to load the \Pkg{luatexja-fontspec} package in the preamble, as follows:
 \begin{quote}
-\ttfamily \textbackslash usepackage[<options>]\{luatexja-fontspec\}
+\ttfamily \textbackslash usepackage[\meta{options}]\{luatexja-fontspec\}
 \end{quote}
 This \Pkg{luatexja-fontspec} package
 automatically loads \Pkg{luatexja} and \Pkg{fontspec}
@@ -1485,7 +1483,7 @@ TrueType・OpenTypeフォントを容易に扱うためのパッケージであ�
 \LuaTeX-ja上において，\Pkg{fontspec}パッケージと同様の機能を和文フォントに対しても用いる場
 合は\Pkg{luatexja-fontspec}パッケージを読み込む：
 \begin{quote}
-\ttfamily \textbackslash usepackage[<options>]\{luatexja-fontspec\}
+\ttfamily \textbackslash usepackage[\meta{options}]\{luatexja-fontspec\}
 \end{quote}
 このパッケージは自動で\Pkg{luatexja}パッケージと\Pkg{fontspec}パッケージを読み込む．
 %</ja>
@@ -1566,11 +1564,11 @@ If this option is specified, usual family-changing commands such as
 欧文フォントだけでなく和文フォントも変更するようになる．
 %</ja>
 
- \item[pass=<opts>]
-%<en> \emph{(Obsoleted)}\ Specify options <opts> which will be passed to the \Pkg{fontspec} package.
-%<ja> \Pkg{fontspec} パッケージに渡すオプション <opts> を指定する．本オプションは時代遅れである．
+ \item[pass=\meta{options}]
+%<en> \emph{(Obsoleted)}\ Specify options \meta{options} which will be passed to the \Pkg{fontspec} package.
+%<ja> \Pkg{fontspec} パッケージに渡すオプション \meta{options} を指定する．本オプションは時代遅れである．
 
-\item[scale=<float>]
+\item[scale=\meta{float}]
 %<*en>
 Override the ratio of the font size of Japanese fonts to that of alphabetic fonts.
 The default value is determined as follows:
@@ -2484,7 +2482,7 @@ $\sqrt{A}-\underline{X}+\frac{あ3}{2あ}-\vcenter{\hbox{aお}}$
 数式abc: $\lower10pt\hbox{あ}\>a\hbox{い}$, $\int_0^x t\,dt=x^2/2$,
 $\Phi\vdash F(x)\ \hbox{for all}\ x\in A$
 $\sqrt{A}-\underline{X}
-  +\frac{\lower10pt\hbox{\scalebox{0.7}{あ}}3}{2\>\lower10pt\hbox{\scalebox{0.7}{あ}}}-\vcenter{\hbox{aお}}$
+  +\frac{\lower10pt\hbox{\scalebox{0.7}{あ}}\>3}{2\>\lower10pt\hbox{\scalebox{0.7}{あ}}}-\vcenter{\hbox{aお}}$
 \par}\\\noalign{\vskip-\origbaselineskip}\midrule
 \emph{\LuaTeX-ja}&
 {\ltjsetparameter{yalbaselineshift=10pt}%
@@ -3159,9 +3157,9 @@ To access box dimensions \emph{with respect to current direction},
 one have to use the following commands instead of \cs{wd} wtc.
 \begin{cslist}
 
- \item[\cs{ltjgetwd}<num>\textrm{, }\cs{ltjgetht}<num>\textrm{, }%
-  \cs{ltjgetdp}<num>]
-These commands return \emph{an internal dimension} of \cs{box<num>} with respect to
+ \item[\cs{ltjgetwd}\meta{num}\textrm{, }\cs{ltjgetht}\meta{num}\textrm{, }%
+  \cs{ltjgetdp}\meta{num}]
+These commands return \emph{an internal dimension} of \cs{box\meta{num}} with respect to
 the current direction. One can use these in \cs{dimexpr} primitive, as the followings.
 \begin{lstlisting}
 \dimexpr 2\ltjgetwd42-3pt\relax, \the\ltjgetwd1701
@@ -3182,10 +3180,10 @@ The following is an example.
   \the\ltjgetht32767, \\ \the\ltjgetdp32767.}
 \end{LTXexample}
 
- \item[\cs{ltjsetwd}<num>=<dimen>\textrm{, }\cs{ltjsetht}<num>=<dimen>\textrm{, }%
-  \cs{ltjsetdp}<num>=<dimen>]
-These commands set the dimension of \cs{box<num>}. One does not need
-	to group the argument <num>; four calls of \cs{ltjsetwd} below have the same meaning.
+ \item[\cs{ltjsetwd}\meta{num}=\meta{dimen}\textrm{, }\cs{ltjsetht}\meta{num}=\meta{dimen}\textrm{, }%
+  \cs{ltjsetdp}\meta{num}=\meta{dimen}]
+These commands set the dimension of \cs{box\meta{num}}. One does not need
+	to group the argument \meta{num}; four calls of \cs{ltjsetwd} below have the same meaning.
 \begin{lstlisting}
 \ltjsetwd42 20pt,  \ltjsetwd42=20pt,  \ltjsetwd=42 20pt,  \ltjsetwd=42=20pt
 \end{lstlisting}
@@ -3194,7 +3192,7 @@ These commands set the dimension of \cs{box<num>}. One does not need
 %</en>
 %<*ja>
 \paragraph{\cs{wd} 達と組方向}
-ボックスレジスタ \cs{box}<num> にセットされているボックスの幅・高さ・深さの取得や
+ボックスレジスタ \cs{box}\meta{num} にセットされているボックスの幅・高さ・深さの取得や
 変更にはそれぞれ \cs{wd},~\cs{ht},~\cs{dp} プリミティブを用いるのであった．
 \pTeX ではこれらのプリミティブは，「現在の組方向におけるボックスの寸法」を指すもので，
 同じボックスに対しても現在の組方向によって返る値は異なるものであった．
@@ -3216,13 +3214,13 @@ These commands set the dimension of \cs{box<num>}. One does not need
 
 \begin{cslist}
 
- \item[\cs{ltjgetwd}<num>\textrm{, }\cs{ltjgetht}<num>\textrm{, }%
-  \cs{ltjgetdp}<num>]
+ \item[\cs{ltjgetwd}\meta{num}\textrm{, }\cs{ltjgetht}\meta{num}\textrm{, }%
+  \cs{ltjgetdp}\meta{num}]
 現在の組方向に応じたボックスの寸法の取得を行う．結果は内部長さであるため，
 \begin{lstlisting}
 \dimexpr 2\ltjgetwd42-3pt\relax, \the\ltjgetwd1701
 \end{lstlisting}
-のように \cs{wd}<num> の代わりとして扱うことができる．
+のように \cs{wd}\meta{num} の代わりとして扱うことができる．
 使用例は以下の通りである．
 \begin{LTXexample}[width=0.3\textwidth]
 \parindent0pt
@@ -3239,8 +3237,8 @@ These commands set the dimension of \cs{box<num>}. One does not need
   \the\ltjgetht32767, \\ \the\ltjgetdp32767.}
 \end{LTXexample}
 
- \item[\cs{ltjsetwd}<num>=<dimen>\textrm{, }\cs{ltjsetht}<num>=<dimen>\textrm{, }%
-  \cs{ltjsetdp}<num>=<dimen>]
+ \item[\cs{ltjsetwd}\meta{num}=\meta{dimen}\textrm{, }\cs{ltjsetht}\meta{num}=\meta{dimen}\textrm{, }%
+  \cs{ltjsetdp}\meta{num}=\meta{dimen}]
 現在の組方向に応じたボックスの寸法の設定を行う．\cs{afterassignment} を2回利用して
 実装しているので，次の4通りは全て同じ意味である．
 \begin{lstlisting}
@@ -3257,8 +3255,8 @@ These commands set the dimension of \cs{box<num>}. One does not need
 %<*en>
 \subsection{Getting current direction}
 The \Param{direction} parameter returns the current direction, and
-the \Param{boxdir} parameter (with the argument <num>)
-returns the direction of a box register \cs{box}<num>.
+the \Param{boxdir} parameter (with the argument \meta{num})
+returns the direction of a box register \cs{box}\meta{num}.
 The returned value of these parameters are a \emph{string}:
 \begin{center}
 \small
@@ -3281,15 +3279,15 @@ Returned value&\texttt{4}&\texttt{3}&\texttt{1}&\texttt{11}&\texttt{0}\\
 %</en>
 %<*ja>
 \subsection{組方向の取得}
-「現在の組方向」や「<num>番のボックスの組方向」は，
-\pTeX では \cs{ifydir} や \cs{ifybox}<num> といった条件判断文を使って
+「現在の組方向」や「\meta{num}番のボックスの組方向」は，
+\pTeX では \cs{ifydir} や \cs{ifybox}\meta{num} といった条件判断文を使って
 判断することができた．
 しかし，\LuaTeX-jaはあくまでも\TeX マクロとLuaコードで
 記述されており，それでは新たな条件判断命令を作るのは難しい．
 
 \LuaTeX-jaでは，\Param{direction}パラメータで現在の組方向を，
-\Param{boxdir}パラメータ（と追加の引数<num>）によって
-\cs{box}<num>の組方向をそれぞれ取得できるようにした．
+\Param{boxdir}パラメータ（と追加の引数\meta{num}）によって
+\cs{box}\meta{num}の組方向をそれぞれ取得できるようにした．
 戻り値は文字列である：
 \begin{center}
 \small
@@ -3332,18 +3330,18 @@ The following primitives are redefined by \LuaTeX-ja (using~\verb+\protected\def
 for supporting Japanese typesetting and multiple directions:
 \begin{cslist}[style=standard]
  \item[\cs{/}]
- \item[\cs{unhbox}<num>\textrm{, }\cs{unvbox}<num>\textrm{, }\cs{unhcopy}<num>\textrm{, }\cs{unvcopy}<num>]
- \item[\cs{vadjust}\{<material>\}]
- \item[\cs{insert}<number>\{<material>\}]
+ \item[\cs{unhbox}\meta{num}\textrm{, }\cs{unvbox}\meta{num}\textrm{, }\cs{unhcopy}\meta{num}\textrm{, }\cs{unvcopy}\meta{num}]
+ \item[\cs{vadjust}\{\meta{material}\}]
+ \item[\cs{insert}\meta{number}\{\meta{material}\}]
  \item[\cs{lastbox}]
- \item[\cs{raise}<dimen><box>\textrm{, }\cs{lower}<dimen><box>\textrm{, }
-   \cs{moveleft}<dimen><box>\textrm{, }\cs{moveright}<dimen><box>\textrm{, }]
- \item[\cs{split}<number>to<dimen>\textrm{, }\cs{vcenter}\{<material>\}]
+ \item[\cs{raise}\meta{dimen}\meta{box}\textrm{, }\cs{lower}\meta{dimen}\meta{box}\textrm{, }
+   \cs{moveleft}\meta{dimen}\meta{box}\textrm{, }\cs{moveright}\meta{dimen}\meta{box}\textrm{, }]
+ \item[\cs{split}\meta{number}to\meta{dimen}\textrm{, }\cs{vcenter}\{\meta{material}\}]
 \end{cslist}
 
-On each primitive \cs{<primitive>} in the list above,
-its meaning just before loading \LuaTeX-ja is backed up into \cs{ltj@@orig@<primitive>},
-and the meaning after redefinition by \LuaTeX-ja is stored in \cs{ltj@@<primitive>}.
+On each primitive \cs{\meta{primitive}} in the list above,
+its meaning just before loading \LuaTeX-ja is backed up into \cs{ltj@@orig@\meta{primitive}},
+and the meaning after redefinition by \LuaTeX-ja is stored in \cs{ltj@@\meta{primitive}}.
 For example, \autoref{fig:primitive_meaning} shows the situation of \cs{vadjust} primitive.
 %</en>
 %<*ja>
@@ -3354,29 +3352,29 @@ For example, \autoref{fig:primitive_meaning} shows the situation of \cs{vadjust}
 \begin{cslist}
  \item[\cs{/}]
  和文フォントに対するイタリック補正のサポートが追加されている．
- \item[\cs{unhbox}<number>\textrm{, }\cs{unvbox}<number>\textrm{, }\cs{unhcopy}<number>\textrm{, }\cs{unvcopy}<number>]
+ \item[\cs{unhbox}\meta{number}\textrm{, }\cs{unvbox}\meta{number}\textrm{, }\cs{unhcopy}\meta{number}\textrm{, }\cs{unvcopy}\meta{number}]
  ボックスの組方向が現在のリストと異なる場合は事前にエラーメッセージを出力する．
  \pTeX と異なり，エラーを無視して無理矢理 \cs{unhbox}, \cs{unvbox} 等を
  続行させることもできるが，その場合の組版結果は保証しない．
- \item[\cs{vadjust}\{<material>\}] 一旦プリミティブ本来の挙動を行う．その後，<material>の組方向が
+ \item[\cs{vadjust}\{\meta{material}\}] 一旦プリミティブ本来の挙動を行う．その後，\meta{material}の組方向が
  周囲の垂直リストの組方向と一致しない場合にエラーを出力し，
  該当の \cs{vadjust} を無効にする．
- \item[\cs{insert}<number>\{<material>\}]
- 一旦プリミティブ本来の挙動を行い，その後<material>内の各ボックス・罫線の直前に組方向を示
+ \item[\cs{insert}\meta{number}\{\meta{material}\}]
+ 一旦プリミティブ本来の挙動を行い，その後\meta{material}内の各ボックス・罫線の直前に組方向を示
 	      すdirection whatsitを挿入する．
  \item[\cs{lastbox}] ボックスの「中身」を現在の組方向に合わせるためのノード
 	      （\textit{dir\_box}という）を必要ならば除去し，
  正しく「中身」のボックスが返されるように前処理をする．
- \item[\cs{raise}<dimen><box>\textrm{, }\cs{lower}<dimen><box>\textrm{, }
-   \cs{moveleft}<dimen><box>\textrm{, }\cs{moveright}<dimen><box>\textrm{, }]
+ \item[\cs{raise}\meta{dimen}\meta{box}\textrm{, }\cs{lower}\meta{dimen}\meta{box}\textrm{, }
+   \cs{moveleft}\meta{dimen}\meta{box}\textrm{, }\cs{moveright}\meta{dimen}\meta{box}\textrm{, }]
   \leavevmode\vspace{-\baselineskip}
- \item[\cs{split}<number>to<dimen>\textrm{, }\cs{vcenter}\{<material>\}]
+ \item[\cs{split}\meta{number}to\meta{dimen}\textrm{, }\cs{vcenter}\{\meta{material}\}]
  これらのプリミティブについては必要に応じて\textit{dir\_box}を作成する前処理を追加している．
 \end{cslist}
 
-上記の一覧中にあるプリミティブ\cs{<primitive>}については，
-\LuaTeX-ja読み込み前の意味が\cs{ltj@@orig@<primitive>}に，
-そして\LuaTeX-jaによる再定義後の意味が\cs{ltj@@<primitive>}に保存される．
+上記の一覧中にあるプリミティブ\cs{\meta{primitive}}については，
+\LuaTeX-ja読み込み前の意味が\cs{ltj@@orig@\meta{primitive}}に，
+そして\LuaTeX-jaによる再定義後の意味が\cs{ltj@@\meta{primitive}}に保存される．
 例えば，\cs{vadjust}については\autoref{fig:primitive_meaning}のようになっている．
 %</ja>
 \begin{figure}
@@ -3489,13 +3487,13 @@ Note that the defined control sequence
 \textit{font\_def} token,  but a macro.
 Hence the input like \verb+\fontname\tradmc+
 causes a error.  We denote control sequences which are defined in
-\cs{jfont} by <jfont\_cs>.
+\cs{jfont} by \meta{jfont\_cs}.
 %</en>
 %<*ja>
 なお，\cs{jfont} で定義された制御綴（上の例だと \cs{tradmc}）
 は\textit{font\_def}トークンではなくマクロである．従って，\verb+\fontname\tradmc+のような
 入力はエラーとなる．以下では \cs{jfont} で定義された
-制御綴を<jfont\_cs>で表す．
+制御綴を\meta{jfont\_cs}で表す．
 %</ja>
 
 %<en>\paragraph{Specifying JFM}
@@ -3503,8 +3501,8 @@ causes a error.  We denote control sequences which are defined in
 %<en> The general scheme for specifying a JFM is the following:
 %<ja> JFMの一般的な指定は次のようになっている：
 \begin{quote}
-  \cs{jfont}<jfont\_cs>\texttt{=...;jfm=}<JFM name>[\texttt{/\{}<JFM features>\texttt{\}}]%
-  \texttt{;...;}[\texttt{jfmvar=}<identifier>]\texttt{;...}
+  \cs{jfont}\meta{jfont\_cs}\texttt{=...;jfm=}\meta{JFM name}[\texttt{/\{}\meta{JFM features}\texttt{\}}]%
+  \texttt{;...;}[\texttt{jfmvar=}\meta{identifier}]\texttt{;...}
 \end{quote}
 
 \begin{figure}
@@ -3527,21 +3525,21 @@ causes a error.  We denote control sequences which are defined in
 
 %<*en>
 \begin{description}
-\item[<JFM name>]
-  The name of a (horizontal) JFM. \LuaTeX-ja searches and loads \texttt{jfm-<JFM name>.lua}.
-\item[<JFM features>]
+\item[\meta{JFM name}]
+  The name of a (horizontal) JFM. \LuaTeX-ja searches and loads \texttt{jfm-\meta{JFM name}.lua}.
+\item[\meta{JFM features}]
   An optional comma-separated list of JFM options.
   Enclosing braces (\verb+{}+) are optional, but this does not escape any characters.
   The contents of this list can be accessed by a table \texttt{luatexja.jfont.jfm\_feature}
   from a JFM, at its loading. See \autoref{fig:jfmfeat} for an example.
 
   Note that any JFM files which is shipped with \LuaTeX-ja does not use this feature.
-\item[<identifier>]
+\item[\meta{identifier}]
   An optional string.
 \end{description}
 
 LuaTeX-ja ``does not distinguish'' two Japanese fonts which uses same JFM and are the same size.
-Here ``uses same JFM'' means that all~of <JFM name>, <JFM features>~and~<identifier> of two fonts
+Here ``uses same JFM'' means that all~of \meta{JFM name}, \meta{JFM features}~and~\meta{identifier} of two fonts
 agree.
 
 For example, The first ``）'' and ``【'' in \autoref{fig:jfmvar} are typeset in different real fonts.
@@ -3549,35 +3547,35 @@ However, because they use the same JFMs and their size are same,
 \LuaTeX-ja inserts penalties, glues and kerns as if these two character are typeset in a same font.
 Namely, the glue between these characters is halfwidth, as in ``）\nobreak【''.
 However, this does not applies with \cs{F}~and~\cs{H} in \autoref{fig:jfmvar},
-because their <identifier> are different.
+because their \meta{identifier} are different.
 %</en>
 %<*ja>
 \begin{description}
-\item[<JFM name>]
-  （横組用）JFMの名称．\LuaTeX-jaは\texttt{jfm-<JFM name>.lua}というファイルを探索して読み込む．
-\item[<JFM features>]
+\item[\meta{JFM name}]
+  （横組用）JFMの名称．\LuaTeX-jaは\texttt{jfm-\meta{JFM name}.lua}というファイルを探索して読み込む．
+\item[\meta{JFM features}]
   省略可能なコンマ区切りリスト．全体を囲む \verb+{}+ は省略可能であるが，
-  囲ったからといって<JFM features>の中で使用可能な文字が増えるわけではない．
-  <JFM features>で指定された内容は，テーブル\texttt{luatexja.jfont.jfm\_feature}として
+  囲ったからといって\meta{JFM features}の中で使用可能な文字が増えるわけではない．
+  \meta{JFM features}で指定された内容は，テーブル\texttt{luatexja.jfont.jfm\_feature}として
   JFM読み込み時に（JFMから）アクセス可能である．\autoref{fig:jfmfeat}に使用例を載せた．
 
   なお，\LuaTeX-jaが標準で提供するJFMではこの機能は用いられていない．
-\item[<identifier>]
+\item[\meta{identifier}]
   省略可能な文字列．
 \end{description}
 
 \LuaTeX-jaはJFMとサイズが同じで，
   実フォントだけが異なる2つの和文フォントは「区別されない」．
-ここで「JFMが同じ」とは，両フォントの<JFM name>, <JFM features>, <identifier>が
+ここで「JFMが同じ」とは，両フォントの\meta{JFM name}, \meta{JFM features}, \meta{identifier}が
 全て一致することである．
 
 例えば\autoref{fig:jfmvar}において，最初の「）」と「【」の実フォントは異なるが，
 JFMもサイズも同じなので，普通に「）\nobreak【」と入力した時と同じように組まれる，つまり両文字の間は半角空きとなる．
 
-しかし，JFMとサイズが同じであっても，\texttt{jfmvar}キーの値<identifier>の異なる
-2つの和文フォント，例えば\autoref{fig:jfmvar}で言う \cs{F} と \cs{H}，
-は「区別される」．異なる和文フォントに異なる \texttt{jfmvar} キーを割り当て，
-かつ\Param{differentjfm}パラメータを \texttt{both} に設定すれば，
+しかし，JFMとサイズが同じであっても，\texttt{jfmvar}キーの値\meta{identifier}の異なる
+2つの和文フォント，例えば\autoref{fig:jfmvar}で言う\cs{F}と\cs{H}，
+は「区別される」．異なる和文フォントに異なる \texttt{jfmvar}キーを割り当て，
+かつ\Param{differentjfm}パラメータを\texttt{both}に設定すれば，
 \pTeX と似た状況で組版されることになる．
 %</ja>
 
@@ -3825,8 +3823,8 @@ This means the following two lines have the same meaning:
 \paragraph{\texttt{extend}と\texttt{slant}}
 OpenType機能と見かけ上同じような形式で指定できるものに，
 \begin{description}
-\item[\texttt{extend=}<extend>] 横方向に<extend>倍拡大する．
-\item[\texttt{slant=}<slant>] <slant>に指定された割合だけ傾ける．
+\item[\texttt{extend=}\meta{extend}] 横方向に\meta{extend}倍拡大する．
+\item[\texttt{slant=}\meta{slant}] \meta{slant}に指定された割合だけ傾ける．
 \end{description}
 の2つがある．
 \texttt{extend}や\texttt{slant}を指定した場合は，それに応じたJFMを指定すべきである%
@@ -3838,8 +3836,8 @@ OpenType機能と見かけ上同じような形式で指定できるものに，
 \paragraph{\texttt{extend} and \texttt{slant}}
 The following setting can be specified as OpenType font features:
 \begin{cslist}[style=standard]
-\item[\texttt{extend=}<extend>] expand the font horizontally by <extend>.
-\item[\texttt{slant=}<slant>] slant the font.
+\item[\texttt{extend=}\meta{extend}] expand the font horizontally by \meta{extend}.
+\item[\texttt{slant=}\meta{slant}] slant the font.
 \end{cslist}
 Note that \LuaTeX-ja doesn't adjust JFMs by these \texttt{extend} and \texttt{slant}
 settings; one have to write new JFMs on purpose.
@@ -3899,7 +3897,6 @@ as shown in~\autoref{fig:ltjksp}.
 \label{ssec:tfont}
 
 \begin{comment}
-  {\catcode`\<=12\catcode`\>=12
 \begin{table}[t]
 %<en>\caption{Differences between vertical JFMs shipped with \LuaTeX-ja}
 %<ja>\caption{\LuaTeX-ja に同梱されている縦組用 JFM の違い}
@@ -3943,7 +3940,6 @@ as shown in~\autoref{fig:ltjksp}.
 \end{minipage}
 \ltjsetparameter{jacharrange={-3}}
 \end{table}
-}
 \end{comment}
 
 %<*en>
@@ -4035,7 +4031,7 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
  \item さらに，「いかなるscript,~languageでも\texttt{vert}により置換されない」グリフ
   のうち，UAX~\#50で``r''もしくは``Tr''と指定されているものは90度自動回転させる．
  \item \ref{ssec:math}節で述べる，数式中の和文フォントには縦組用和文フォントは指定できない．
- \item <JFM name>には縦組用JFMを指定する．
+ \item \meta{JFM name}には縦組用JFMを指定する．
 以下の縦組用JFMが\LuaTeX-jaには同梱されている．%おり，違いを\autoref{tab-difjfm-tate}に示した．
 \begin{description}
 \item[\texttt{jfm-ujisv.lua}] \LuaTeX-jaの標準縦組用JFMである．このJFMは\upTeX で
@@ -4301,7 +4297,7 @@ floating-point numbers in design-size unit.
 
 \begin{cslist}[style=standard]
 
-\item[version=<version>]
+\item[version=\meta{version}]
 %<en>(optional, default value is~1)
 %<ja>（任意，既定値は1）
 
@@ -4312,7 +4308,7 @@ The version JFM. Currently 1,~2,~and,~3 are supported
 JFMのバージョン．1,~2,~3がサポートされる．
 %</ja>
   
-\item[dir=<direction>]
+\item[dir=\meta{direction}]
 %<en>(required)
 %<ja>（必須）
 
@@ -4324,7 +4320,7 @@ or \texttt{'tate'}~(vertical) are supported.
 JFMの書字方向．\texttt{'yoko'}（横組）と \texttt{'tate'}（縦組）がサポートされる．
 %</ja>
 
-\item[zw=<length>]
+\item[zw=\meta{length}]
 %<en>(required)
 %<ja>（必須）
 
@@ -4335,7 +4331,7 @@ JFMの書字方向．\texttt{'yoko'}（横組）と \texttt{'tate'}（縦組）�
 \LuaTeX-jaではここで指定する．
 %</ja>
 
-\item[zh=<length>]
+\item[zh=\meta{length}]
 %<en>(required)
 %<ja>（必須）
 
@@ -4346,7 +4342,7 @@ JFMの書字方向．\texttt{'yoko'}（横組）と \texttt{'tate'}（縦組）�
 \LuaTeX-jaではここで指定する．
 %</ja>
 
-\item[kanjiskip=\{<natural>, <stretch>, <shrink>\}]
+\item[kanjiskip=\{\meta{natural}, \meta{stretch}, \meta{shrink}\}]
 %<en>(optional)
 %<ja>（任意）
 
@@ -4355,17 +4351,17 @@ This field specifies the ``ideal'' amount of \Param{kanjiskip}. As noted
 	     in Subsection~\ref{subs-kskip}, if the parameter
 	     \Param{kanjiskip} is \cs{maxdimen}, the value specified
 	     in this field is actually used (if this field is not specified in
-	     JFM, it is regarded as 0\,pt). Note that <stretch> and <shrink>
+	     JFM, it is regarded as 0\,pt). Note that \meta{stretch} and \meta{shrink}
 	     fields are in design-size unit too.
 %</en>
 %<*ja>
 理想的な\Param{kanjiskip}の量を指定する．\ref{subs-kskip}節で述べたように，
 もし\Param{kanjiskip}が \cs{maxdimen} の値ならば，このフィールドで指定された
-値が実際には用いられる（指定なしは0\,ptとして扱われる）．<stretch>と<shrink>のフィールドもdesign size
+値が実際には用いられる（指定なしは0\,ptとして扱われる）．\meta{stretch}と\meta{shrink}のフィールドもdesign size
 が単位であることに注意せよ．
 %</ja>
 
-\item[xkanjiskip=\{<natural>, <stretch>, <shrink>\}]
+\item[xkanjiskip=\{\meta{natural}, \meta{stretch}, \meta{shrink}\}]
 %<en>(optional)
 %<ja>（任意）
 
@@ -4398,7 +4394,7 @@ the following fields:
 %</ja>
 
 \begin{cslist}[style=standard]
-\item[chars=\{<character>, ...\}]
+\item[chars=\{\meta{character}, ...\}]
 %<en>(required except character class~0)
 %<ja>（文字クラス0を除いて必須）
 
@@ -4428,7 +4424,7 @@ This field is a list of characters which are in this character
 \end{itemize}
 %</ja>
 
-\item[width=<length>, height=<length>, depth=<length>, italic=<length>]
+\item[width=\meta{length}, height=\meta{length}, depth=\meta{length}, italic=\meta{length}]
 %<en>(required)
 %<ja>（必須）
 
@@ -4478,7 +4474,7 @@ JFM書字方向&\emph{\texttt{'yoko'}（横組）}&\multicolumn{1}{l}{\emph{\tex
 	     すれば，これによってプロポーショナル組を行うことができる．
 %</ja>
 
-\item[left=<length>, down=<length>, align=<align>]\
+\item[left=\meta{length}, down=\meta{length}, align=\meta{align}]\
 
 %<*en>
 These fields are for adjusting the position of the ``real'' glyph. Legal
@@ -4698,14 +4694,14 @@ Furthermore, the glyph is shifted according to values of fields
 \label{fig:pos-tate}
 \end{figure}
 
-\item[kern={\{[$j$]=<kern>, [$j'$]=\{<kern>, [ratio=<ratio>]\}, ...\}}]
+\item[kern={\{[$j$]=\meta{kern}, [$j'$]=\{\meta{kern}, [ratio=\meta{ratio}]\}, ...\}}]
 \nopagebreak
-\item[glue={\{[$j$]=\{<width>, <stretch>, <shrink>, [ratio=<ratio>, ...]\}, ...\}}]\leavevmode
+\item[glue={\{[$j$]=\{\meta{width}, \meta{stretch}, \meta{shrink}, [ratio=\meta{ratio}, ...]\}, ...\}}]\leavevmode
 %<*ja>
 
 文字クラス$i$の文字と$j$の文字の間に挿入されるカーンやグルーの量を指定する．
 
-<ratio>は，グルーの自然長のうちどれだけの割合が「後の文字」由来かを示す量で，
+\meta{ratio}は，グルーの自然長のうちどれだけの割合が「後の文字」由来かを示す量で，
 $0$から$+1$の実数値をとる．省略時の値は$0.5$である．
 このフィールドの値は\Param{differentjfm}の値が
 \texttt{pleft},~\texttt{pright},~\texttt{paverage}の値のときのみ実際に用いられる．
@@ -4713,8 +4709,8 @@ $0$から$+1$の実数値をとる．省略時の値は$0.5$である．
 例えば，\cite{x4051}では，句点と中点の間には，
 句点由来の二分空きと中点由来の四分空きが挿入されるが，この場合には
 \begin{itemize}
-\item <width>には$0.5+0.25=0.75$を指定する．
-\item <ratio>には$0.25/(0.5+0.25)=1/3$を指定する．
+\item \meta{width}には$0.5+0.25=0.75$を指定する．
+\item \meta{ratio}には$0.25/(0.5+0.25)=1/3$を指定する．
 \end{itemize}
 %</ja>
 %<*en>
@@ -4723,32 +4719,32 @@ $0$から$+1$の実数値をとる．省略時の値は$0.5$である．
 Specifies the amount of kern or glue which will be inserted
 between characters in character class~$i$ and those in character class~$j$.
 
-<ratio> specifies how much the glue is originated in the ``right'' character.
+\meta{ratio} specifies how much the glue is originated in the ``right'' character.
 It is a real number between 0 and 1, and treated as 0.5 if omitted. For example,
 The width of a glue between an ideographic full stop ``。''
 and a fullwidth middle dot ``・'' is three-fourth of fullwidth,
 namely halfwidth from the ideographic full stop, and
 quarter-width from the fullwidth middle dot.  In this case,
-we specify <ratio> to $0.25/(0.5+0.25)=1/3$.
+we specify \meta{ratio} to $0.25/(0.5+0.25)=1/3$.
 %</en>
 
 %<*ja>
 グルーの指定においては，上記に加えて各 \texttt{[$j$]} の各サブテーブル内に
 次のキーを指定できる，
 \begin{cslist}[style=standard]
-\item[priority=<priority>]
+\item[priority=\meta{priority}]
              \Pkg{luatexja-adjust}による優先順位付き
 	     行長調整（\ref{ssec:adj}節）において，このグルーの優先度を指定する．許される値は以下の通り：
   \begin{description}
     \item[バージョン1] $-4$から$+3$の間の整数
-    \item[バージョン2以降] $-4$から$+3$の間の整数の2つ組\texttt{\{<stretch>, <shrink>\}}か，
-    または$-4$から$+3$の間の整数．<stretch>, <shrink>はそれぞれこのグルーが伸びるときの優先度，縮むときの
+    \item[バージョン2以降] $-4$から$+3$の間の整数の2つ組\texttt{\{\meta{stretch}, \meta{shrink}\}}か，
+    または$-4$から$+3$の間の整数．\meta{stretch}, \meta{shrink}はそれぞれこのグルーが伸びるときの優先度，縮むときの
     優先度であり，単に整数$i$が指定された場合は\texttt{\{$i$, $i$\}}であると解釈される．
   \end{description}
   ここで指定する値は，大きい値ほど「先に伸ばされる」「先に縮ませる」ことを意味しており，省略時の値
              は0である．範囲外の値が指定されたときの動作は未定義である．
-\item[kanjiskip\_natural=<num>\textrm{, }%
-  kanjiskip\_stretch=<num>\textrm{, }kanjiskip\_shrink=<num>]\leavevmode
+\item[kanjiskip\_natural=\meta{num}\textrm{, }%
+  kanjiskip\_stretch=\meta{num}\textrm{, }kanjiskip\_shrink=\meta{num}]\leavevmode
   \label{pg:ksp_nat}
 
 JFMによって本来挿入されるグルーの他に
@@ -4789,15 +4785,15 @@ JFMによって本来挿入されるグルーの他に
 In case of glue, one can specify following additional keys in each \texttt{[$j$]}
 	     subtable:
 \begin{cslist}[style=standard]
-\item[priority=<priority>]
+\item[priority=\meta{priority}]
 An integer in $[-4,3]$ (treated as 0 if omitted), or
-a pair of these integers \texttt{\{<stretch>, <shrink>\}} (version 2~or~later).
+a pair of these integers \texttt{\{\meta{stretch}, \meta{shrink}\}} (version 2~or~later).
 This is
 used only in line adjustment with priority by \Pkg{luatexja-adjust}
 (see Subsection~\ref{ssec:adj}). Higher value means the glue is easy to stretch,
 and is also easy to shrink. 
-\item[kanjiskip\_natural=<num>\textrm{, }%
-  kanjiskip\_stretch=<num>\textrm{, }kanjiskip\_shrink=<num>]\leavevmode
+\item[kanjiskip\_natural=\meta{num}\textrm{, }%
+  kanjiskip\_stretch=\meta{num}\textrm{, }kanjiskip\_shrink=\meta{num}]\leavevmode
 
 These keys specifies the amount of the natural width of \Param{kanjiskip}%
 (the stretch/shrink part, respectively) which will be inserted
@@ -4837,7 +4833,7 @@ Hence we have the following result:
 \end{cslist}
 %</en>
   
-\item[end\_stretch=<kern>, end\_shrink=<kern>]
+\item[end\_stretch=\meta{kern}, end\_shrink=\meta{kern}]
 %<*ja>
 （任意，バージョン1のみ）
 
@@ -4849,7 +4845,7 @@ Hence we have the following result:
 (optional, version~1 only)
 %</en>
 
-  \item[end\_adjust=\{<kern>, <kern>, ...\}]
+  \item[end\_adjust=\{\meta{kern}, \meta{kern}, ...\}]
 %<*ja>
 （任意，バージョン2以降）
 
@@ -4871,7 +4867,7 @@ Hence we have the following result:
 (optional, version~2 or~later)
 %</en>
 
-  \item[round\_threshold=<float>]
+  \item[round\_threshold=\meta{float}]
 %<*ja>
 （任意，バージョン3以降，文字クラス0のみ）
 
@@ -5132,7 +5128,7 @@ an external package is needed to support this in plain \TeX\ and
 font families. There is no relation between the value of
 \cs{fam} and that of \cs{jfam}; with appropriate settings,
 one can set both \cs{fam} and \cs{jfam} to the same value.
-Here <jfont\_cs> in the argument of \Param{jatextfont} etc.\ is
+Here \meta{jfont\_cs} in the argument of \Param{jatextfont} etc.\ is
 a control sequence which is defined by \cs{jfont}, i.e.,
 a \emph{horizontal} Japanese font.
 %</en>
@@ -5141,7 +5137,7 @@ a \emph{horizontal} Japanese font.
 \autoref{tab-math}は数式フォントファミリに対する \TeX のプリミティブと対応する
 ものを示している．\cs{fam} と \cs{jfam} の値の間には関係はなく，
 適切な設定の下では \cs{fam} と \cs{jfam} の両方に同じ値を設定することができる．
-\Param{jatextfont} 他の第2引数<jfont\_cs>は，\cs{jfont} で定義された
+\Param{jatextfont} 他の第2引数\meta{jfont\_cs}は，\cs{jfont} で定義された
 \emph{横組用}和文フォントである．\cs{tfont} で定義された
 \emph{縦組用}和文フォントを指定することは想定していない．
 %</ja>
@@ -5159,9 +5155,9 @@ a \emph{horizontal} Japanese font.
 %<ja>\bf 和文フォント&\bf 欧文フォント\\
 \midrule
 \cs{jfam}${}\in [0,256)$&\cs{fam}\\
-\ttfamily\Param{jatextfont}\,=\{<jfam>,<jfont\_cs>\}&\ttfamily\cs{textfont}<fam>=<font\_cs>\\
-\ttfamily\Param{jascriptfont}\,=\{<jfam>,<jfont\_cs>\}&\ttfamily\cs{scriptfont}<fam>=<font\_cs>\\
-\ttfamily\Param{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}&\ttfamily\cs{scriptscriptfont}<fam>=<font\_cs>\\
+\ttfamily\Param{jatextfont}\,=\{\meta{jfam},\meta{jfont\_cs}\}&\ttfamily\cs{textfont}\meta{fam}=\meta{font\_cs}\\
+\ttfamily\Param{jascriptfont}\,=\{\meta{jfam},\meta{jfont\_cs}\}&\ttfamily\cs{scriptfont}\meta{fam}=\meta{font\_cs}\\
+\ttfamily\Param{jascriptscriptfont}\,=\{\meta{jfam},\meta{jfont\_cs}\}&\ttfamily\cs{scriptscriptfont}\meta{fam}=\meta{font\_cs}\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -5249,8 +5245,8 @@ The value of \texttt{jfmvar}~key, which is specified at \cs{jfont}.
 The default value is the empty string.
 \item[\texttt{chars}]
 The mapping table from character codes to its character classes.\\
-The specification \texttt{[i].chars=\{<character>, ...\}} in the JFM will be  stored in this
-	   field as \texttt{chars=\{[<character>]=\,$i$, ...\}}.
+The specification \texttt{[i].chars=\{\meta{character}, ...\}} in the JFM will be  stored in this
+	   field as \texttt{chars=\{[\meta{character}]=\,$i$, ...\}}.
 \item[\texttt{char\_type}]
 For $i\in\omega$, \texttt{char\_type[$i$]} is information of characters whose class is
 	   $i$, and has the following fields:
@@ -5285,8 +5281,8 @@ sp単位で格納している．
 \cs{jfont},~\cs{tfont} で指定された \texttt{jfmvar} キーの値（未指定のときは空文字列）．
 \item[chars]
 文字コードから文字クラスへの対応が記述されたテーブル．\\
-JFM内の \texttt{[i].chars=\{<character>, ...\}} という指定は\
-\texttt{chars=\{[<character>]=\,$i$, ...\}} という形式に変換されている．
+JFM内の \texttt{[i].chars=\{\meta{character}, ...\}} という指定は\
+\texttt{chars=\{[\meta{character}]=\,$i$, ...\}} という形式に変換されている．
 \item[char\_type]
 $i\in\omega$に対して，\texttt{char\_type[$i$]} は文字クラス$i$の文字の寸法を格納しており，
 以下のフィールドを持つ．
@@ -5305,23 +5301,19 @@ JFMで指定されているそれぞれの値をスケーリングしたもの�
 のいずれかの値をとる．
 \end{itemize}
 $i$,~$j\in \omega$に対して，\texttt{char\_type[$i$][$j$]} は
-文字クラス$i$の文字と$j$の文字の間に挿入されるグルーやカーンを格納している．
+文字クラス$i$の文字と$j$の文字の間に挿入されるグルーやカーンの情報を格納している．
 
 間に入るものがカーンであれば，この値は%
-\texttt{[$j$]=\{[1]=<kern\_node>, ratio=<ratio>\}}であり，
-<kern\_node>はカーンを表すノードである\footnote{%
-      バージョン20150420.0以降ではノードのアクセス手法にdirect access
-      modelを用いているため，ノードそのものを表すユーザーデータではなく，
-      内部で参照のために使われる添字（整数）である．
-}．
-
-グルーであれば，この値は以下のキーを持つテーブルである．
+\texttt{[$j$]=\{\meta{kern}, ratio=\meta{ratio}\}}であり，
+\meta{kern}はカーンの値をsp単位で表したものである．
+  
+一方，間に入るものがグルーであれば，この値は以下のキーを持つテーブルである．
 \begin{description}
-  \item[\texttt{width}, \texttt{stretch}, \texttt{shrink}]
+  \item[{[1], [2], [3]}]
   グルーのそれぞれ自然長，伸び量，縮み量をsp単位で表したもの．
-  \item[\texttt{priority}] （バージョン2以降の）JFMでの指定 \texttt{\{<stretch>,<shrink>\}} を
+  \item[\texttt{priority}] （バージョン2以降の）JFMでの指定 \texttt{\{\meta{stretch},\meta{shrink}\}} を
   \[
-    (\text{<stretch>}+4)\cdot 8+\text{<shrink>}+4
+    (\text{\meta{stretch}}+4)\cdot 8+\text{\meta{shrink}}+4
   \]
   として0--63の整数にパックしたもの．
   \item[\texttt{ratio}, \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch}, \texttt{kanjiskip\_shrink}]
@@ -5368,7 +5360,7 @@ A function used in this callback should be in the following form:
 このコールバックで呼び出される関数は次の形をしていなければならない：
 %</ja>
 \begin{lstlisting}[numbers=left]
-function (<number> char_class, <table> jfont_info, <number> chr_code)
+function (<number> char_class, <table> jfont_info, <number> char_code)
   if char_class~=0 then return char_class
   else
     ....
@@ -5517,7 +5509,7 @@ adopted in the whole paragraph or the whole hbox.
 \end{itemize}
 
 \begin{cslist}[style=standard]
-\item[\DParam{jcharwidowpenalty}\,=<penalty>$^\ast$] [\cs{jcharwidowpenalty}]\
+\item[\DParam{jcharwidowpenalty}\,=\meta{penalty}$^\ast$] [\cs{jcharwidowpenalty}]\
 
 %<*en>
 Penalty value for suppressing orphans. This penalty is inserted just
@@ -5530,24 +5522,24 @@ Penalty value for suppressing orphans. This penalty is inserted just
 挿入される．
 %</ja>
 
-\item[\DParam{kcatcode}\,=\{<chr\_code>,<natural number>\}$^\ast$]\
+\item[\DParam{kcatcode}\,=\{\meta{char\_code},\meta{natural number}\}$^\ast$]\
 
 %<*en>
-An additional attributes which each character whose character code is <chr\_code> has.
-At version~20120506.0 or later, the lowermost bit of <natural number> indicates
+An additional attributes which each character whose character code is \meta{char\_code} has.
+At version~20120506.0 or later, the lowermost bit of \meta{natural number} indicates
 	     whether the character is considered as a punctuation mark
 	     (see the description of \Param{jcharwidowpenalty} above).
 %</en>
 %<*ja>
-文字コードが<chr\_code>の文字が持つ付加的な属性値．
-バージョン20120506.0以降では，<natural number>の最下位ビットが，その文字が句読点と
+文字コードが\meta{char\_code}の文字が持つ付加的な属性値．
+バージョン20120506.0以降では，\meta{natural number}の最下位ビットが，その文字が句読点と
 みなされるかどうかを表している（上の\Param{jcharwidowpenalty}の記述を参照）．
 %</ja>
 
-\item[\DParam{prebreakpenalty}\,=\{<chr\_code>,<penalty>\}$^\ast$] [\cs{prebreakpenalty}]\
+\item[\DParam{prebreakpenalty}\,=\{\meta{char\_code},\meta{penalty}\}$^\ast$] [\cs{prebreakpenalty}]\
 
 %<*ja>
-文字コード<chr\_code>の\textbf{JAchar}が行頭にくることを抑止するために，
+文字コード\meta{char\_code}の\textbf{JAchar}が行頭にくることを抑止するために，
 	     この文字の前に挿入/追加されるペナルティの量を指定する．
 
 例えば閉じ括弧「〗」は絶対に行頭にきてはならないので，
@@ -5567,7 +5559,7 @@ At version~20120506.0 or later, the lowermost bit of <natural number> indicates
 という制限があったが，\LuaTeX-jaではこれらの制限は解消されている．
 %</ja>
 %<*en>
-Set a penalty which is inserted automatically before the character <chr\_code>,
+Set a penalty which is inserted automatically before the character \meta{char\_code},
 to prevent a line starts from this character. For example, a line cannot started
 with one of closing brackets ``〗'', so \LuaTeX-ja sets
 \begin{lstlisting}
@@ -5584,42 +5576,42 @@ for the same character.
 \end{itemize}
 %</en>
 
-\item[\DParam{postbreakpenalty}\,=\{<chr\_code>,<penalty>\}$^\ast$]
+\item[\DParam{postbreakpenalty}\,=\{\meta{char\_code},\meta{penalty}\}$^\ast$]
 	   [\cs{postbreakpenalty}]\
 
 %<*ja>
-文字コード<chr\_code>の\textbf{JAchar}が行末にくることを抑止するために，
+文字コード\meta{char\_code}の\textbf{JAchar}が行末にくることを抑止するために，
 	     この文字の後に挿入/追加されるペナルティの量を指定する．
 %</ja>
 %<*en>
-Set a penalty which is inserted automatically after the character <chr\_code>,
+Set a penalty which is inserted automatically after the character \meta{char\_code},
 to prevent a line ends with this character.
 %</en>
 
-\item[\DParam{jatextfont}\,=\{<jfam>,<jfont\_cs>\}$^\ast$]
+\item[\DParam{jatextfont}\,=\{\meta{jfam},\meta{jfont\_cs}\}$^\ast$]
 %<en>[\cs{textfont} in \TeX]
 %<ja>[\TeX の \cs{textfont}]
-\item[\DParam{jascriptfont}\,=\{<jfam>,<jfont\_cs>\}$^\ast$]
+\item[\DParam{jascriptfont}\,=\{\meta{jfam},\meta{jfont\_cs}\}$^\ast$]
 %<en>[\cs{scriptfont} in \TeX]
 %<ja>[\TeX の \cs{scriptfont}]
-\item[\DParam{jascriptscriptfont}\,=\{<jfam>,<jfont\_cs>\}$^\ast$]
+\item[\DParam{jascriptscriptfont}\,=\{\meta{jfam},\meta{jfont\_cs}\}$^\ast$]
 %<en>[\cs{scriptscriptfont} in \TeX]
 %<ja>[\TeX の \cs{scriptscriptfont}]
-\item[\DParam{yjabaselineshift}\,=<dimen>]\
-\item[\DParam{yalbaselineshift}\,=<dimen>] [\cs{ybaselineshift}]
-\item[\DParam{tjabaselineshift}\,=<dimen>]\
-\item[\DParam{talbaselineshift}\,=<dimen>] [\cs{tbaselineshift}]
+\item[\DParam{yjabaselineshift}\,=\meta{dimen}]\
+\item[\DParam{yalbaselineshift}\,=\meta{dimen}] [\cs{ybaselineshift}]
+\item[\DParam{tjabaselineshift}\,=\meta{dimen}]\
+\item[\DParam{talbaselineshift}\,=\meta{dimen}] [\cs{tbaselineshift}]
 
-\item[\DParam{jaxspmode}\,=\{<chr\_code>,<mode>\}$^\ast$]\
+\item[\DParam{jaxspmode}\,=\{\meta{char\_code},\meta{mode}\}$^\ast$]\
 
 %<*en>
-Set whether inserting \Param{xkanjiskip} is allowed before/after a \textbf{JAchar} whose character code is <chr\_code>.
-The followings are allowed for <mode>:
+Set whether inserting \Param{xkanjiskip} is allowed before/after a \textbf{JAchar} whose character code is \meta{char\_code}.
+The followings are allowed for \meta{mode}:
 %</en>
 %<*ja>
-文字コードが<chr\_code>の\textbf{JAchar}の前／後ろに\Param{xkanjiskip}の
+文字コードが\meta{char\_code}の\textbf{JAchar}の前／後ろに\Param{xkanjiskip}の
 挿入を許すかどうかの設定．
-以下の<mode>が許される：
+以下の\meta{mode}が許される：
 %</ja>
 \begin{description}
 %<en>\item[0, \texttt{inhibit}] Insertion of \Param{xkanjiskip} is inhibited before the character, nor after the character.
@@ -5638,17 +5630,17 @@ This parameter is similar to the \cs{inhibitxspcode} primitive of \pTeX, but not
 このパラメータは\pTeX の \cs{inhibitxspcode} プリミティブと似ているが，
 互換性はない．
 %</ja>
-\item[\DParam{alxspmode}\,=\{<chr\_code>,<mode>\}$^\ast$] [\cs{xspcode}]\
+\item[\DParam{alxspmode}\,=\{\meta{char\_code},\meta{mode}\}$^\ast$] [\cs{xspcode}]\
 
 %<*en>
 Set whether inserting \Param{xkanjiskip} is allowed before/after a
-	     \textbf{ALchar} whose character code is <chr\_code>.
-             The followings are allowed for <mode>:
+	     \textbf{ALchar} whose character code is \meta{char\_code}.
+             The followings are allowed for \meta{mode}:
 %</en>
 %<*ja>
-文字コードが<chr\_code>の\textbf{ALchar}の前／後ろに\Param{xkanjiskip}の
+文字コードが\meta{char\_code}の\textbf{ALchar}の前／後ろに\Param{xkanjiskip}の
 挿入を許すかどうかの設定．
-以下の<mode>が許される：
+以下の\meta{mode}が許される：
 %</ja>
 \begin{description}
 %<en>\item[0, \texttt{inhibit}] Insertion of \Param{xkanjiskip} is inhibited before the character, nor after the character.
@@ -5668,9 +5660,9 @@ Note that parameters \Param{jaxspmode} and \Param{alxspmode} share a common tabl
 これら2つのパラメータは互いの別名となっていることに注意する．
 %</ja>
 
-\item[\DParam{autospacing}\,=<bool>] [\cs{autospacing}]
-\item[\DParam{autoxspacing}\,=<bool>] [\cs{autoxspacing}]
-\item[\DParam{kanjiskip}\,=<skip>$^\ast$] [\cs{kanjiskip}]\
+\item[\DParam{autospacing}\,=\meta{bool}] [\cs{autospacing}]
+\item[\DParam{autoxspacing}\,=\meta{bool}] [\cs{autoxspacing}]
+\item[\DParam{kanjiskip}\,=\meta{skip}$^\ast$] [\cs{kanjiskip}]\
 
 %<*ja>
 デフォルトで2つの\textbf{JAchar}の間に挿入されるグルーである．
@@ -5686,7 +5678,7 @@ If the natural width of this parameter is \cs{maxdimen}, \LuaTeX-ja uses
 the value which is specified in the JFM for current Japanese font (See Subsection~\ref{ssec:jfm-str}).
 %</en>
 
-\item[\DParam{xkanjiskip}\,=<skip>$^\ast$] [\cs{xkanjiskip}]\
+\item[\DParam{xkanjiskip}\,=\meta{skip}$^\ast$] [\cs{xkanjiskip}]\
 
 %<*ja>
 デフォルトで\textbf{JAchar}と\textbf{ALchar}の間に挿入されるグルーである．
@@ -5703,7 +5695,7 @@ the value which is specified in the JFM for current Japanese font (See Subsectio
 %</en>
 
 
-\item[\DParam{differentjfm}\,=<mode>$^\dagger$]\
+\item[\DParam{differentjfm}\,=\meta{mode}$^\dagger$]\
 
 %<*en>
 Specify how glues/kerns between two \textbf{JAchar}s whose JFM (or size) are different.
@@ -5731,22 +5723,22 @@ The default value is \texttt{paverage}. \dots
 各々の値による差異の詳細は\ref{ssec:cluster-wa}節の「『右空白』の算出」を参照してほしい．
 %</ja>
 
-\item[\DParam{jacharrange}\,=<ranges>]
-\item[\DParam{kansujichar}\,=\{<digit>, <chr\_code>\}$^\ast$] [\cs{kansujichar}]
+\item[\DParam{jacharrange}\,=\meta{ranges}]
+\item[\DParam{kansujichar}\,=\{\meta{digit}, \meta{char\_code}\}$^\ast$] [\cs{kansujichar}]
 
-\item[\DParam{direction}\,=<dir>\ \hbox{\normalfont\rmfamily (always local)}]\
+\item[\DParam{direction}\,=\meta{dir}\ \hbox{\normalfont\rmfamily (always local)}]\
 
 %<*en>
 Assigning to this parameter has the same effect as
-\cs{yoko}~(if $\hbox{<dir>}=4$), \cs{tate}~(if $\hbox{<dir>}=3$),
-\cs{dtou}~(if $\hbox{<dir>}=1$) or \cs{utod}~(if $\hbox{<dir>}=11$).
-If the argument <dir> is not one of 4,~3, 1~nor~11,
+\cs{yoko}~(if $\hbox{\meta{dir}}=4$), \cs{tate}~(if $\hbox{\meta{dir}}=3$),
+\cs{dtou}~(if $\hbox{\meta{dir}}=1$) or \cs{utod}~(if $\hbox{\meta{dir}}=11$).
+If the argument \meta{dir} is not one of 4,~3, 1~nor~11,
 the behavior of this assignment is undefined.
 %</en>
 %<*ja>
-組方向を変更する \cs{yoko}~(if $\hbox{<dir>}=4$), \cs{tate}~(if $\hbox{<dir>}=3$),
-\cs{dtou}~(if $\hbox{<dir>}=1$), \cs{utod}~(if $\hbox{<dir>}=11$) と同じ役割を持つ．
-利用可能な状況もこれら4命令と同一である．引数<dir>が4,~3, 1,~11のいずれでも無いときの
+組方向を変更する \cs{yoko}~(if $\hbox{\meta{dir}}=4$), \cs{tate}~(if $\hbox{\meta{dir}}=3$),
+\cs{dtou}~(if $\hbox{\meta{dir}}=1$), \cs{utod}~(if $\hbox{\meta{dir}}=11$) と同じ役割を持つ．
+利用可能な状況もこれら4命令と同一である．引数\meta{dir}が4,~3, 1,~11のいずれでも無いときの
 動作は未定義である．
 %</ja>
 
@@ -5831,27 +5823,27 @@ returns 0,~1, 2,~or~3, instead of \texttt{preonly} etc.
 
 \item
 %<*en>
-\verb+\ltjgetparameter{jacharrange}{+<range>\verb+}+ returns \texttt{0}
-if ``characters which belong to the character range~<range> are \textbf{JAchar}'',
+\verb+\ltjgetparameter{jacharrange}{+\meta{range}\verb+}+ returns \texttt{0}
+if ``characters which belong to the character range~\meta{range} are \textbf{JAchar}'',
 \texttt{1} if ``\dots~are \textbf{ALchar}''.
-Although there is no character range~$-1$, specifying $-1$ to <range> does not cause an
+Although there is no character range~$-1$, specifying $-1$ to \meta{range} does not cause an
       error (returns 1).
 %</en>
 %<*ja>
-\verb+\ltjgetparameter{jacharrange}{+<range>\verb+}+ は，<range>が\textbf{JAchar}達の
-範囲ならば0を，そうでなければ1を返す．「$-1$番の文字範囲」は存在しないが，<range>に$-1$を
+\verb+\ltjgetparameter{jacharrange}{+\meta{range}\verb+}+ は，\meta{range}が\textbf{JAchar}達の
+範囲ならば0を，そうでなければ1を返す．「$-1$番の文字範囲」は存在しないが，\meta{range}に$-1$を
 指定してもエラーは発生しない（1を返す）．
 %</ja>
 
 \item
 %<*en>
-For an integer~<digit> between 0~and~9,
-     \verb+\ltjgetparameter{kansujichar}{+<digit>\verb+}+ returns the character code
-of the result of \cs{kansuji}<digit>.
+For an integer~\meta{digit} between 0~and~9,
+     \verb+\ltjgetparameter{kansujichar}{+\meta{digit}\verb+}+ returns the character code
+of the result of \cs{kansuji}\meta{digit}.
 %</en>
 %<*ja>
-0--9の数<digit>に対して，
-\verb+\ltjgetparameter{kansujichar}{+<digit>\verb+}+ は，\cs{kansuji}<digit>で出力され
+0--9の数\meta{digit}に対して，
+\verb+\ltjgetparameter{kansujichar}{+\meta{digit}\verb+}+ は，\cs{kansuji}\meta{digit}で出力され
      る文字の文字コードを返す．
 %</ja>
 
@@ -5872,13 +5864,13 @@ and 4 means \emph{yoko} direction (horizontal typesetting).
 
 \item
 %<*en>
-For an integer~<reg\_num> between 0~and~65535,
-\verb+\ltjgetparameter{boxdir}{+<reg\_num>\verb+}+ returns the direction of
-\cs{box}<reg\_num>. If this box register is void, the returned value is zero.
+For an integer~\meta{register} between 0~and~65535,
+\verb+\ltjgetparameter{boxdir}{+\meta{register}\verb+}+ returns the direction of
+\cs{box}\meta{register}. If this box register is void, the returned value is zero.
 %</en>
 %<*ja>
-0--65535の数<reg\_num>に対して，
-\verb+\ltjgetparameter{boxdir}{+<reg\_num>\verb+}+ は，\cs{box}<reg\_num>に
+0--65535の数\meta{register}に対して，
+\verb+\ltjgetparameter{boxdir}{+\meta{register}\verb+}+ は，\cs{box}\meta{register}に
 格納されているボックスの組方向を表す．もしこのレジスタが空の場合は，0が返される．
 %</ja>
 
@@ -5896,31 +5888,31 @@ jatextfont, jascriptfont, jascriptscriptfont, jacharrange
 
 \item
 %<*en>
-\verb+\ltjgetparameter{chartorange}{+<chr\_code>\verb+}+ returns
-the range number which <chr\_code> belongs to
+\verb+\ltjgetparameter{chartorange}{+\meta{char\_code}\verb+}+ returns
+the range number which \meta{char\_code} belongs to
 (although there is no parameter named ``chartorange'').
 
-If <chr\_code> is between 0 and 127, this <chr\_code> does not belong to
+If \meta{char\_code} is between 0 and 127, this \meta{char\_code} does not belong to
 any character range. In this case,
-      \verb+\ltjgetparameter{chartorange}{+<chr\_code>\verb+}+
+      \verb+\ltjgetparameter{chartorange}{+\meta{char\_code}\verb+}+
 returns $-1$.
 
-Hence, one can know whether <chr\_code> is \textbf{JAchar} or not
+Hence, one can know whether \meta{char\_code} is \textbf{JAchar} or not
 by the following:
 %</en>
 %<*ja>
-\verb+\ltjgetparameter{chartorange}{+<chr\_code>\verb+}+ によって
-<chr\_code>の属する文字範囲の番号を知ることができる．
+\verb+\ltjgetparameter{chartorange}{+\meta{char\_code}\verb+}+ によって
+\meta{char\_code}の属する文字範囲の番号を知ることができる．
 
-<chr\_code>に0--127の値を指定した場合（このとき，<chr\_code>が属する
+\meta{char\_code}に0--127の値を指定した場合（このとき，\meta{char\_code}が属する
 文字範囲は存在しない）は$-1$が返る．
 
-そのため，<chr\_code>が\textbf{JAchar}か\textbf{ALchar}かは
+そのため，\meta{char\_code}が\textbf{JAchar}か\textbf{ALchar}かは
 次で知ることができる：
 %</ja>
 \begin{quote}
 \ttfamily \verb+\ltjgetparameter{jacharrange}{\ltjgetparameter{chartorange}{+%
-  <chr\_code>\verb+}}+\\\null\hfill\verb+% 0 if JAchar, 1 if ALchar+
+  \meta{char\_code}\verb+}}+\\\null\hfill\verb+% 0 if JAchar, 1 if ALchar+
 \end{quote}
 
 %<*en>
@@ -6340,17 +6332,17 @@ Note that any shorthand form of \cs{insert}[\texttt{x}]\texttt{kanjiskip} are no
 Using \cs{ltjdeclarealtfont}, one can ``compose'' more than one Japanese fonts.
 This \cs{ltjdeclarealtfont} uses in the following form:
 \begin{quote}
-\ttfamily \textbackslash ltjdeclarealtfont<base\_font\_cs><alt\_font\_cs>\{<range>\}
+\ttfamily \textbackslash ltjdeclarealtfont\meta{base\_font\_cs}\meta{alt\_font\_cs}\{\meta{range}\}
 \end{quote}
-where  <base\_font\_cs>~and~<alt\_font\_cs> are defined by \cs{jfont}.
+where  \meta{base\_font\_cs}~and~\meta{alt\_font\_cs} are defined by \cs{jfont}.
 Its meaning is
 \begin{quote}
-If the current Japanese font is <base\_font\_cs>, characters which belong to <range>
-is typeset by another Japanese font <alt\_font\_cs>, instead of <base\_font\_cs>.
+If the current Japanese font is \meta{base\_font\_cs}, characters which belong to \meta{range}
+is typeset by another Japanese font \meta{alt\_font\_cs}, instead of \meta{base\_font\_cs}.
 \end{quote}
-Here <range> is a comma-separated list of character codes, but also accepts negative integers:
+Here \meta{range} is a comma-separated list of character codes, but also accepts negative integers:
 $-n$~($n≥1$) means that all characters of character classes~$n$, with respect to JFM used
-by <base\_font\_cs>. Note that characters which do not exist in <alt\_font\_cs> are
+by \meta{base\_font\_cs}. Note that characters which do not exist in \meta{alt\_font\_cs} are
 ignored.
 
 For example, if \cs{hoge} uses \texttt{jfm-ujis.lua}, the standard JFM of \LuaTeX-ja,
@@ -6375,18 +6367,18 @@ because simple ``\texttt{-1}'' is treated as the range between 0~and~1.
 
 \cs{ltjdeclarealtfont} は以下の書式で使用する：
 \begin{quote}
-\ttfamily \textbackslash ltjdeclarealtfont<base\_font\_cs><alt\_font\_cs>\{<range>\}
+\ttfamily \textbackslash ltjdeclarealtfont\meta{base\_font\_cs}\meta{alt\_font\_cs}\{\meta{range}\}
 \end{quote}
-これは「現在の和文フォント」が<base\_font\_cs>であるとき，
-<range>に属する文字は<alt\_font\_cs>を用いて組版される，という意味である．
+これは「現在の和文フォント」が\meta{base\_font\_cs}であるとき，
+\meta{range}に属する文字は\meta{alt\_font\_cs}を用いて組版される，という意味である．
 \begin{itemize}
- \item <base\_font\_cs>, <alt\_font\_cs>は
+ \item \meta{base\_font\_cs}, \meta{alt\_font\_cs}は
 \cs{jfont} によって定義された和文フォントである．
- \item <range>は文字コードの範囲を表すコンマ区切りのリストであるが，
-   例外として負数$-n$は「<base\_font\_cs>のJFMの文字クラス$n$に属する全ての文字」
+ \item \meta{range}は文字コードの範囲を表すコンマ区切りのリストであるが，
+   例外として負数$-n$は「\meta{base\_font\_cs}のJFMの文字クラス$n$に属する全ての文字」
    を意味する．
 
-<range>中に<alt\_font\_cs>中に実際には存在しない文字が指定された場合は，
+\meta{range}中に\meta{alt\_font\_cs}中に実際には存在しない文字が指定された場合は，
 その文字に対する設定は無視される．
 \end{itemize}
 
@@ -6405,17 +6397,17 @@ because simple ``\texttt{-1}'' is treated as the range between 0~and~1.
 
 %<*ja>
 \subsection{\cs{ltjalchar} と \cs{ltjjachar}}
-文字コードが$\text{<chr\_code>}~(\geq 128=\mathtt{0x80})$の文字を
-\ \cs{char} プリミティブを使い \cs{char}<chr\_code> として出力させると，
+文字コードが$\text{\meta{char\_code}}~(\geq 128=\mathtt{0x80})$の文字を
+\ \cs{char} プリミティブを使い \cs{char}\meta{char\_code} として出力させると，
 その文字の属する文字範囲（\ref{ssec:setrange}節参照）によって
 \textbf{ALchar}か\textbf{JAchar}か，つまり欧文フォントで出力されるか和文フォントで出力され
 るかが決まる．
 
-文字範囲の設定を無視し，文字コードが<chr\_code>の文字を強制的に
+文字範囲の設定を無視し，文字コードが\meta{char\_code}の文字を強制的に
 \textbf{ALchar}, \textbf{JAchar}で出力する命令がそれぞれ
 \ \cs{ltjalchar},~\cs{ltjjachar} である．使用方法は \cs{char} と同じく
-\ \cs{ltjalchar}<chr\_code>, \cs{ltjjachar}<chr\_code>とすればよい．
-\LuaTeX-ja~20190926.0から，<chr\_code>が127以下の場合でも\cs{ltjjachar}<chr\_code>が
+\ \cs{ltjalchar}\meta{char\_code}, \cs{ltjjachar}\meta{char\_code}とすればよい．
+\LuaTeX-ja~20190926.0から，\meta{char\_code}が127以下の場合でも\cs{ltjjachar}\meta{char\_code}が
 \textbf{JAchar}として出力されるようになっている．
 
 以下は\ref{ssec:setrange}節に載せた例に，\cs{char} の動作などを追加したものである．
@@ -6558,10 +6550,10 @@ but on the other hand \cs{zw}~and~\cs{zh} are specified by JFM.
 %</en>
 
 
-\item[\cs{DeclareYokoKanjiEncoding}\{<encoding>\}\{<text-settings>\}\{<math-settings>\}]
+\item[\cs{DeclareYokoKanjiEncoding}\{\meta{encoding}\}\{\meta{text-settings}\}\{\meta{math-settings}\}]
 %<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
 %<ja>\ \\[\dimexpr-2\baselineskip\relax]
-\item[\cs{DeclareTateKanjiEncoding}\{<encoding>\}\{<text-settings>\}\{<math-settings>\}]
+\item[\cs{DeclareTateKanjiEncoding}\{\meta{encoding}\}\{\meta{text-settings}\}\{\meta{math-settings}\}]
 
 %<*en>
 In NFSS2 under \LuaTeX-ja, distinction between alphabetic fonts
@@ -6580,13 +6572,13 @@ In NFSS2 under \LuaTeX-ja, distinction between alphabetic fonts
 それぞれ定義する．
 %</ja>
 
-\item[\cs{DeclareKanjiEncodingDefaults}\{<text-settings>\}\{<math-settings>\}]
+\item[\cs{DeclareKanjiEncodingDefaults}\{\meta{text-settings}\}\{\meta{math-settings}\}]
 %<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
 %<ja>\ \\[\dimexpr-2\baselineskip\relax]
-\item[\cs{DeclareKanjiSubstitution}\{<encoding>\}\{<family>\}\{<series>\}\{<shape>\}]
+\item[\cs{DeclareKanjiSubstitution}\{\meta{encoding}\}\{\meta{family}\}\{\meta{series}\}\{\meta{shape}\}]
 %<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
 %<ja>\ \\[\dimexpr-2\baselineskip\relax]
-\item[\cs{DeclareErrorKanjiFont}\{<encoding>\}\{<family>\}\{<series>\}\{<shape>\}\{<size>\}]
+\item[\cs{DeclareErrorKanjiFont}\{\meta{encoding}\}\{\meta{family}\}\{\meta{series}\}\{\meta{shape}\}\{\meta{size}\}]
 
 %<*en>
 The above 3~commands are just the counterparts for \cs{DeclareFontEncodingDefaults} and~others.
@@ -6595,34 +6587,34 @@ The above 3~commands are just the counterparts for \cs{DeclareFontEncodingDefaul
 上記3つのコマンドはちょうどNFSS2 の \cs{DeclareFontEncodingDefaults} などに対応するものである．
 %</ja>
 
-\item[\cs{reDeclareMathAlphabet}\{<unified-cmd>\}\{<al-cmd>\}\{<ja-cmd>\}]
+\item[\cs{reDeclareMathAlphabet}\{\meta{unified-cmd}\}\{\meta{al-cmd}\}\{\meta{ja-cmd}\}]
 
 % ToDo: en
 %<*ja>
 和文・欧文の数式用フォントファミリを一度に変更する命令を作成する．
-具体的には，欧文数式用フォントファミリ変更の命令<al-cmd>（\cs{mathrm} 等）と，和文数式用フォ
-	     ントファミリ変更の命令<ja-cmd>（\cs{mathmc} 等）の2つを同時に行う命令として
-	     <unified-cmd>を（再）定義する．実際の使用では<unified-cmd>と
-	     <al-cmd>に同じものを指定する，すなわち，<al-cmd>で和文側も変
+具体的には，欧文数式用フォントファミリ変更の命令\meta{al-cmd}（\cs{mathrm} 等）と，和文数式用フォ
+	     ントファミリ変更の命令\meta{ja-cmd}（\cs{mathmc} 等）の2つを同時に行う命令として
+	     \meta{unified-cmd}を（再）定義する．実際の使用では\meta{unified-cmd}と
+	     \meta{al-cmd}に同じものを指定する，すなわち，\meta{al-cmd}で和文側も変
 	     更させるようにするのが一般的と思われる．
 
 本命令は
 \begin{center}
-<unified-cmd>\texttt{\{}<arg>\texttt{\}}\quad$\longrightarrow$\quad
-(<al-cmd>の1段展開結果)\texttt{\{}<ja-cmd>の1段展開結果)\texttt{\{<arg>\}\}}
+\meta{unified-cmd}\texttt{\{}\meta{arg}\texttt{\}}\quad$\longrightarrow$\quad
+(\meta{al-cmd}の1段展開結果)\texttt{\{}\meta{ja-cmd}の1段展開結果)\texttt{\{\meta{arg}\}\}}
 \end{center}
 と定義を行うので，使用には注意が必要である：
 %<en>\vspace{-\medskipamount}
 \begin{itemize}
-\item <al-cmd>,~<ja-cmd>は既に定義されていなければならない．
+\item \meta{al-cmd},~\meta{ja-cmd}は既に定義されていなければならない．
       \cs{reDeclareMathAlphabet}\\の後に
-両命令の内容を再定義しても，<unified-cmd>の内容にそれは反映されない．
-\item <al-cmd>,~<ja-cmd>に\verb+\@mathrm+などと \texttt{@} をつけた命令を指定した時の動作は保証できない．
+両命令の内容を再定義しても，\meta{unified-cmd}の内容にそれは反映されない．
+\item \meta{al-cmd},~\meta{ja-cmd}に\verb+\@mathrm+などと \texttt{@} をつけた命令を指定した時の動作は保証できない．
 \end{itemize}
 %</ja>
 
-\item[\cs{DeclareRelationFont}\{<ja-encoding>\}\{<ja-family>\}\{<ja-series>\}\{<ja-shape>\}\\*
-  \null\hfill\{<al-encoding>\}\{<al-family>\}\{<al-series>\}\{<al-shape>\}]
+\item[\cs{DeclareRelationFont}\{\meta{ja-encoding}\}\{\meta{ja-family}\}\{\meta{ja-series}\}\{\meta{ja-shape}\}\\*
+  \null\hfill\{\meta{al-encoding}\}\{\meta{al-family}\}\{\meta{al-series}\}\{\meta{al-shape}\}]
 %<*en>
 This command sets the ``accompanied'' alphabetic font (given by the latter 4~arguments)
 with respect to a Japanese font given by the former 4~arguments.
@@ -6697,17 +6689,17 @@ In \LuaTeX-ja, this \cs{adjustbaseline} does similar task, namely setting the
   設定処理も行っていたが，\LuaTeX-jaでも全く同様である．
 %</ja>
 
-\item[\cs{fontfamily}\{<family>\}]
+\item[\cs{fontfamily}\{\meta{family}\}]
 %<*en>
 As in \LaTeXe, this command changes current font family (alphabetic, Japanese,~\emph{or both})
-to <family>. See Subsection~\ref{ssec:fontfamilycmd} for detail.
+to \meta{family}. See Subsection~\ref{ssec:fontfamilycmd} for detail.
 %</en>
 %<*ja>
 元々の\LaTeXe におけるものと同様に，このコマンドは現在のフォントファミリ（欧文，
-和文，\emph{もしくは両方}）を<family>に変更する．詳細は\ref{ssec:fontfamilycmd}節を参照すること．
+和文，\emph{もしくは両方}）を\meta{family}に変更する．詳細は\ref{ssec:fontfamilycmd}節を参照すること．
 %</ja>
 
-\item[\cs{fontshape}\{<shape>\}\textrm{, }\cs{fontshapeforce}\{<shape>\}]
+\item[\cs{fontshape}\{\meta{shape}\}\textrm{, }\cs{fontshapeforce}\{\meta{shape}\}]
 %<*en>
 As in \LaTeXe, this command changes current alphabetic font shape
 according to shape change rules.
@@ -6722,8 +6714,8 @@ when \cs{itshape} is called,
 because almost all Japanese fonts only have shape ``\texttt{n}'', and \cs{itshape} calls \cs{fontshape}.
 
 \LuaTeX-ja~20200323.0 change the behavior. Namely,
-\cs{fontshape\{<shape>\}}~and~\cs{fontshapeforce\{<shape>\}} change current Japanese font shape, only if
-the required shape (according to shape changing rules) or <shape> is avaliable in current Japanese font family/series.
+\cs{fontshape\{\meta{shape}\}}~and~\cs{fontshapeforce\{\meta{shape}\}} change current Japanese font shape, only if
+the required shape (according to shape changing rules) or \meta{shape} is avaliable in current Japanese font family/series.
 When this is not the case, an info such as
 \begin{verbatim}
     Kanji font shape JY3/mc/m/it' undefined
@@ -6744,8 +6736,8 @@ is issued instead of a warning.
 といった警告をもたらしてしまっていた．
 
 一方，\LuaTeX-ja 20200323.0以降では，
-\cs{fontshape\{<shape>\}}, \cs{fontshapeforce\{<shape>\}}が和文フォントシェイプを更新するのは，
-シェイプ更新規則に基づいた値や<shape>の少なくとも一つが現在の和文フォントファミリ・シリーズで利用可能なときに限られる．
+\cs{fontshape\{\meta{shape}\}}, \cs{fontshapeforce\{\meta{shape}\}}が和文フォントシェイプを更新するのは，
+シェイプ更新規則に基づいた値や\meta{shape}の少なくとも一つが現在の和文フォントファミリ・シリーズで利用可能なときに限られる．
 どちらでもなく，和文フォントシェイプが変更されなかった場合には
 \begin{verbatim}
     Kanji font shape JY3/mc/m/it' undefined
@@ -6754,10 +6746,10 @@ is issued instead of a warning.
 というinfo（警告でなく）を出力する．
 %</ja>
 
-\item[\cs{kanjishape}\{<shape>\}\textrm{, }\cs{kanjishapeforce}\{<shape>\}]
+\item[\cs{kanjishape}\{\meta{shape}\}\textrm{, }\cs{kanjishapeforce}\{\meta{shape}\}]
 %<*en>
-\cs{kanjishape\{<shape>\}} changes current Japanese font shape according to shape change rules, and
-\cs{kanjishapeforce\{<shape>\}} changes current Japanese font shape to <shape>, regardless of the rules.
+\cs{kanjishape\{\meta{shape}\}} changes current Japanese font shape according to shape change rules, and
+\cs{kanjishapeforce\{\meta{shape}\}} changes current Japanese font shape to \meta{shape}, regardless of the rules.
 Hence \cs{kanjishape\{it\}} produces a warning
 \begin{verbatim}
     Font shape `JY3/mc/m/it' undefined
@@ -6786,12 +6778,13 @@ which is not produced by \cs{fontshape\{it\}}.
 \label{fig:altkanji}
 \end{figure}
 
-\item[\cs{DeclareAlternateKanjiFont}\{<base-encoding>\}\{<base-family>\}\{<base-series>\}\{<base-shape>\}\\
-  \null\hfill\{<alt-encoding>\}\{<alt-family>\}\{<alt-series>\}\{<alt-shape>\}\{<range>\}]
+\item[\cs{DeclareAlternateKanjiFont}\\
+  \{\meta{base-encoding}\}\{\meta{base-family}\}\{\meta{base-series}\}\{\meta{base-shape}\}\\
+  \{\meta{alt-encoding}\}\{\meta{alt-family}\}\{\meta{alt-series}\}\{\meta{alt-shape}\}\{\meta{range}\}]
 %<*ja>
 \ref{ssec:altfont}節の\
 \cs{ltjdeclarealtfont} と同様に，前半の4引数の
-和文フォント（基底フォント）のうち<range>中の文字を
+和文フォント（基底フォント）のうち\meta{range}中の文字を
 第5から第8引数の和文フォントを使って組むように指示する．
 使用例を図\nobreak\ref{fig:altkanji}に載せた．
 
@@ -6804,13 +6797,13 @@ which is not produced by \cs{fontshape\{it\}}.
 あるいは（これらを含むが）\cs{selectfont} が実行された時である．
  \item
 段落やhboxの最後での設定値が段落／hbox全体にわたって通用する点や，
-<range>に負数$-n$を指定した場合，それが「基底フォントの文字クラス$n$に属する文字全体」
+\meta{range}に負数$-n$を指定した場合，それが「基底フォントの文字クラス$n$に属する文字全体」
 と解釈されるのは \cs{ltjdeclarealtfont} と同じである．
 \end{itemize}%
 %</ja>
 %<*en>
 As \cs{ltjdeclarealtfont}~(Subsection~\ref{ssec:altfont}),
-characters in <range> of the Japanese font (we say the \emph{base font})
+characters in \meta{range} of the Japanese font (we say the \emph{base font})
 which specified by first 4 arguments are typeset
 by the Japanese font which specified by fifth to eighth arguments
 (we say the \emph{alternate font}).
@@ -6862,11 +6855,11 @@ The code below does not work either:
 %<ja>\subsection{\cs{fontfamily}コマンドの詳細}
 \label{ssec:fontfamilycmd}
 %<*en>
-In this subsection, we describe when \cs{fontfamily}<family> changes current
+In this subsection, we describe when \cs{fontfamily}\meta{family} changes current
 Japanese/alphabetic font family. Basically, current Japanese fotn family is changed to
-<family> if it is recognized as a Japanese font family, and similar with alphabetic font
+\meta{family} if it is recognized as a Japanese font family, and similar with alphabetic font
 family. There is a case that current Japanese/alphabetic font family are both changed to
-<family>, and another case that <family> isn't recognized as a Japanese/alphabetic font
+\meta{family}, and another case that \meta{family} isn't recognized as a Japanese/alphabetic font
 family either.
 
 \paragraph{Recognition as Japanese font family}
@@ -6875,56 +6868,56 @@ This order is very similar to \cs{fontfamily} in \pLaTeXe, but we re-implemented
 We use an auxiliary list~$N_{\mathrm{J}}$.
 %</en>
 %<*ja>
-本節では，\cs{fontfamily}<family> がいつ和文/欧文フォントファミリを変更するかについて解説
-する．基本的には，<family>が和文フォントファミリだと認識されれば和文側が，欧文フォントファ
+本節では，\cs{fontfamily}\meta{family} がいつ和文/欧文フォントファミリを変更するかについて解説
+する．基本的には，\meta{family}が和文フォントファミリだと認識されれば和文側が，欧文フォントファ
 ミリだと認識されれば欧文側が変更される．どちらとも認識されれば和文・欧文の両方が変わるこ
 とになるし，当然どちらとも認識されないこともある．
 
 \paragraph{和文フォントファミリとしての認識}
-まず，<family>が和文フォントファミリとして認識されるかは以下の順序で決定される．
+まず，\meta{family}が和文フォントファミリとして認識されるかは以下の順序で決定される．
 これは\pLaTeXe の \cs{fontfamily} にとても似ているが，ここではLuaによって実装している．
 補助的に「和文フォントファミリではないと認識された」ファミリを格納したリスト$N_{\mathrm{J}}$を用いる．
 %</ja>
 \begin{enumerate}
 %<*en>
-\item If the family~<family> has been defined already by \cs{DeclareKanjiFamily},
-      <family> is recognized as a  Japanese font family.
-      Note that <family> need not be defined under \emph{current} Japanese font encoding.
+\item If the family~\meta{family} has been defined already by \cs{DeclareKanjiFamily},
+      \meta{family} is recognized as a  Japanese font family.
+      Note that \meta{family} need not be defined under \emph{current} Japanese font encoding.
 %</en>
 %<*ja>
-\item ファミリ<family>が既に \cs{DeclareKanjiFamily} によって定義されている場合，
-      <family>は和文フォントファミリであると認識される．
-      ここで，<family>は現在の和文フォントエンコーディングで定義されていなくてもよい．
+\item ファミリ\meta{family}が既に \cs{DeclareKanjiFamily} によって定義されている場合，
+      \meta{family}は和文フォントファミリであると認識される．
+      ここで，\meta{family}は現在の和文フォントエンコーディングで定義されていなくてもよい．
 %</ja>
 %<*en>
-\item If the family~<family> has been listed in a list~$N_{\mathrm{J}}$, this means
-      that <family> is not a Japanese font family.
+\item If the family~\meta{family} has been listed in a list~$N_{\mathrm{J}}$, this means
+      that \meta{family} is not a Japanese font family.
 %</en>
 %<*ja>
-\item ファミリ<family>がリスト$N_{\mathrm{J}}$に既に含まれていれば，それは
-      <family>が和文フォントファミリではないことを意味する．
+\item ファミリ\meta{family}がリスト$N_{\mathrm{J}}$に既に含まれていれば，それは
+      \meta{family}が和文フォントファミリではないことを意味する．
 %</ja>
 %<*en>
-\item If the \Pkg{luatexja-fontspec} package is loaded, we stop here, and <family> is not
+\item If the \Pkg{luatexja-fontspec} package is loaded, we stop here, and \meta{family} is not
       recognized as a Japanese font family.
 
       If the \Pkg{luatexja-fontspec} package is \emph{not} loaded,
-now \LuaTeX-ja looks whether there exists a Japanese font encoding~<enc> such that
-      a font definition named \texttt{<enc><family>.fd} (the file name is
-      all lowercase) exists. If so, <family> is recognized as a  Japanese font family (the font definition file won't be loaded here).
-      If not, <family> is not a Japanese font family, and
-      <family> is appended to the list~$N_{\mathrm{J}}$.
+now \LuaTeX-ja looks whether there exists a Japanese font encoding~\meta{enc} such that
+      a font definition named \texttt{\meta{enc}\meta{family}.fd} (the file name is
+      all lowercase) exists. If so, \meta{family} is recognized as a  Japanese font family (the font definition file won't be loaded here).
+      If not, \meta{family} is not a Japanese font family, and
+      \meta{family} is appended to the list~$N_{\mathrm{J}}$.
 %</en>
 %<*ja>
 \item もし\Pkg{luatexja-fontspec}パッケージが読み込まれていれば，ここで終了であり，
-<family>は和文フォントファミリとして認識されないことになる．
+\meta{family}は和文フォントファミリとして認識されないことになる．
 
-もし\Pkg{luatexja-fontspec}パッケージが読み込まれていなければ，和文エンコーディング<enc>で
-フォント定義ファイル\texttt{<enc><family>.fd}（ファイル名は全て小文字）が存在するようなも
+もし\Pkg{luatexja-fontspec}パッケージが読み込まれていなければ，和文エンコーディング\meta{enc}で
+フォント定義ファイル\texttt{\meta{enc}\meta{family}.fd}（ファイル名は全て小文字）が存在するようなも
       のがあるかどうかを調べる．
-存在すれば，<family>は和文フォントファミリと認識される（フォント定義ファイルは読み込まれな
+存在すれば，\meta{family}は和文フォントファミリと認識される（フォント定義ファイルは読み込まれな
       い）．
-存在しなければ，<family>は和文フォントファミリでないと認識され，リスト$N_{\mathrm{J}}$に<family>を追加することでそれを記憶する．
+存在しなければ，\meta{family}は和文フォントファミリでないと認識され，リスト$N_{\mathrm{J}}$に\meta{family}を追加することでそれを記憶する．
 
 %</ja>
 \end{enumerate}
@@ -6936,52 +6929,52 @@ We use auxiliary lists $F_{\mathrm{A}}$~and~$N_{\mathrm{A}}$,
 %</en>
 %<*ja>
 \paragraph{欧文フォントファミリとしての認識}
-同様に，<family>が和文フォントファミリとして認識されるかは以下の順序で決定される．
+同様に，\meta{family}が和文フォントファミリとして認識されるかは以下の順序で決定される．
 補助的に「欧文フォントファミリと既に認識された」ファミリのリスト$F_{\textrm{A}}$と，
 「欧文フォントファミリではないと認識された」ファミリを格納したリスト$N_{\mathrm{A}}$を用いる．
 %</ja>
 
 \begin{enumerate}
 %<*en>
-\item If the family~<family> has been listed in a list~$F_{\mathrm{A}}$,
-      <family> is recognized as an alphabetic font family.
+\item If the family~\meta{family} has been listed in a list~$F_{\mathrm{A}}$,
+      \meta{family} is recognized as an alphabetic font family.
 %</en>
 %<*ja>
-\item ファミリ<family>がリスト$F_{\mathrm{A}}$に既に含まれていれば，
-      <family>は欧文フォントファミリと認識される．
+\item ファミリ\meta{family}がリスト$F_{\mathrm{A}}$に既に含まれていれば，
+      \meta{family}は欧文フォントファミリと認識される．
 %</ja>
 %<*en>
-\item If the family~<family> has been listed in a list~$N_{\mathrm{A}}$, this means
-      that <family> is not  an alphabetic font family.
+\item If the family~\meta{family} has been listed in a list~$N_{\mathrm{A}}$, this means
+      that \meta{family} is not  an alphabetic font family.
 %</en>
 %<*ja>
-\item ファミリ<family>がリスト$N_{\mathrm{A}}$に既に含まれていれば，それは
-      <family>が欧文フォントファミリではないことを意味する．
+\item ファミリ\meta{family}がリスト$N_{\mathrm{A}}$に既に含まれていれば，それは
+      \meta{family}が欧文フォントファミリではないことを意味する．
 %</ja>
 %<*en>
-\item If there exists an alphabetic font encoding such that the family~<family> has been
-      defined under it, <family> is recognized as an alphabetic font family, and
-      to memorize this, <family> is appended to the list~$F_{\mathrm{A}}$.
+\item If there exists an alphabetic font encoding such that the family~\meta{family} has been
+      defined under it, \meta{family} is recognized as an alphabetic font family, and
+      to memorize this, \meta{family} is appended to the list~$F_{\mathrm{A}}$.
 %</en>
 %<*ja>
-\item ある欧文フォントエンコーディング下でファミリ<family>が定義されていれば，
-      <family>は欧文フォントファミリと認識され，リスト$F_{\mathrm{A}}$に<family>を追加することでこのことを記憶する．
+\item ある欧文フォントエンコーディング下でファミリ\meta{family}が定義されていれば，
+      \meta{family}は欧文フォントファミリと認識され，リスト$F_{\mathrm{A}}$に\meta{family}を追加することでこのことを記憶する．
 %</ja>
 %<*en>
-\item Now \LuaTeX-ja looks whether there exists an alphabetic font encoding~<enc> such that
-      a font definition named \texttt{<enc><family>.fd} (the file name is
+\item Now \LuaTeX-ja looks whether there exists an alphabetic font encoding~\meta{enc} such that
+      a font definition named \texttt{\meta{enc}\meta{family}.fd} (the file name is
       all lowercase) exists. If so, current alphabetic font family will be changed to
-      <family>~(the font definition file won't be loaded here).
+      \meta{family}~(the font definition file won't be loaded here).
       If not, current alphabetic font family won't be changed, and
-      <family> is appended to the list~$N_{\mathrm{A}}$.
+      \meta{family} is appended to the list~$N_{\mathrm{A}}$.
 %</en>
 %<*ja>
-\item 最終段階では，欧文エンコーディング<enc>で
-フォント定義ファイル\texttt{<enc><family>.fd}（ファイル名は全て小文字）が存在するようなも
+\item 最終段階では，欧文エンコーディング\meta{enc}で
+フォント定義ファイル\texttt{\meta{enc}\meta{family}.fd}（ファイル名は全て小文字）が存在するようなも
       のがあるかどうかを調べる．
-存在すれば，<family>は欧文フォントファミリと認識される（フォント定義ファイルは読み込まれない）．
-存在しなければ，<family>は欧文フォントファミリと認識されないので，リスト$N_{\mathrm{A}}$に
-      <family>を追加してそのことを記憶する．
+存在すれば，\meta{family}は欧文フォントファミリと認識される（フォント定義ファイルは読み込まれない）．
+存在しなければ，\meta{family}は欧文フォントファミリと認識されないので，リスト$N_{\mathrm{A}}$に
+      \meta{family}を追加してそのことを記憶する．
 %</ja>
 \end{enumerate}
 
@@ -7010,17 +7003,17 @@ loaded.
 %<en>\paragraph{Remarks}
 %<ja>\paragraph{注意}
 %<*en>
-Of course, there is a case that <family> is not recognized as a Japanese font family,  nor
+Of course, there is a case that \meta{family} is not recognized as a Japanese font family,  nor
 an alphabetic font family.
-In this case, \LuaTeX-ja treats ``the argument <family> is wrong'', so
-set both current alphabetic and Japanese font family to <family>,
+In this case, \LuaTeX-ja treats ``the argument \meta{family} is wrong'', so
+set both current alphabetic and Japanese font family to \meta{family},
 to use the default family for font substitution.
 %</en>
 %<*ja>
 さて，引数によっては，「和文フォントファミリとも欧文フォントファミリも認識されなかった」
 という事態もあり得る．
-  この場合，引数<family>は不正だった，ということになるので，
-和文・欧文の両方のフォントファミリを<family>に設定し，代用フォントが使われるに任せることにする．
+  この場合，引数\meta{family}は不正だった，ということになるので，
+和文・欧文の両方のフォントファミリを\meta{family}に設定し，代用フォントが使われるに任せることにする．
 %</ja>
 
 %<*en>
@@ -7101,63 +7094,63 @@ expl3の文法に沿った組方向変更命令や組方向による条件判断
   \item[\cs{platex\_if\_direction\_yoko\_p:}]
 %<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
 %<ja>\ \\[\dimexpr-2\baselineskip\relax]
-  \item[\cs{platex\_if\_direction\_yoko:\underline{\textsl{TF}}} \{<true code>\} \{<false code>\}]
+  \item[\cs{platex\_if\_direction\_yoko:\underline{\textsl{TF}}} \{\meta{true code}\} \{\meta{false code}\}]
 %<ja>  現在の組方向が横組であるか否かをテストする．
 %<en>  Tests if the current direction is \emph{yoko} (horizontal writing).
   \item[\cs{platex\_if\_direction\_tate\_nomath\_p:}$^\dagger$]
 %<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
 %<ja>\ \\[\dimexpr-2\baselineskip\relax]
-  \item[\cs{platex\_if\_direction\_tate\_nomath:\underline{\textsl{TF}}}$^\dagger$ \{<true code>\} \{<false code>\}]
+  \item[\cs{platex\_if\_direction\_tate\_nomath:\underline{\textsl{TF}}}$^\dagger$ \{\meta{true code}\} \{\meta{false code}\}]
 %<ja>  現在の組方向が縦組であるか否かをテストする．
 %<en>  Tests if the current direction is \emph{tate} (vertical writing).
   \item[\cs{platex\_if\_direction\_tate\_math\_p:}$^\dagger$]
 %<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
 %<ja>\ \\[\dimexpr-2\baselineskip\relax]
-  \item[\cs{platex\_if\_direction\_tate\_math:\underline{\textsl{TF}}}$^\dagger$ \{<true code>\} \{<false code>\}]
+  \item[\cs{platex\_if\_direction\_tate\_math:\underline{\textsl{TF}}}$^\dagger$ \{\meta{true code}\} \{\meta{false code}\}]
 %<ja>  現在の組方向がutod方向（\pTeX でいう「縦数式ディレクション」）であるか否かをテストする．
 %<en>  Tests if the current direction is \emph{utod}.
   \item[\cs{platex\_if\_direction\_tate\_p:}]
 %<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
 %<ja>\ \\[\dimexpr-2\baselineskip\relax]
-  \item[\cs{platex\_if\_direction\_tate:\underline{\textsl{TF}}} \{<true code>\} \{<false code>\}]
+  \item[\cs{platex\_if\_direction\_tate:\underline{\textsl{TF}}} \{\meta{true code}\} \{\meta{false code}\}]
 %<ja>  現在の組方向が縦組またはutod方向であるか否かをテストする．
 %<en>  Tests if the current direction is \emph{tate}~or~\emph{utod}.
   \item[\cs{platex\_if\_direction\_dtou\_p:}]
 %<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
 %<ja>\ \\[\dimexpr-2\baselineskip\relax]
-  \item[\cs{platex\_if\_direction\_dtou:\underline{\textsl{TF}}} \{<true code>\} \{<false code>\}]
+  \item[\cs{platex\_if\_direction\_dtou:\underline{\textsl{TF}}} \{\meta{true code}\} \{\meta{false code}\}]
 %<ja>  現在の組方向がdtou方向であるか否かをテストする．
 %<en>  Tests if the current direction is \emph{dtou}.
-  \item[\cs{platex\_if\_box\_yoko\_p:N} <box>]
+  \item[\cs{platex\_if\_box\_yoko\_p:N} \meta{box}]
 %<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
 %<ja>\ \\[\dimexpr-2\baselineskip\relax]
-  \item[\cs{platex\_if\_box\_yoko:N\underline{\textsl{TF}}} <box> \{<true code>\} \{<false code>\}]
-%<ja>  ボックス<box>の組方向が横組であるか否かをテストする．
-%<en>  Tests if the direction of <box> is \emph{yoko}.
-  \item[\cs{platex\_if\_box\_tate\_nomath\_p:N}$^\dagger$ <box>]
+  \item[\cs{platex\_if\_box\_yoko:N\underline{\textsl{TF}}} \meta{box} \{\meta{true code}\} \{\meta{false code}\}]
+%<ja>  ボックス\meta{box}の組方向が横組であるか否かをテストする．
+%<en>  Tests if the direction of \meta{box} is \emph{yoko}.
+  \item[\cs{platex\_if\_box\_tate\_nomath\_p:N}$^\dagger$ \meta{box}]
 %<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
 %<ja>\ \\[\dimexpr-2\baselineskip\relax]
-  \item[\cs{platex\_if\_box\_tate\_nomath:N\underline{\textsl{TF}}}$^\dagger$ <box> \{<true code>\} \{<false code>\}]
-%<ja>  ボックス<box>の組方向が縦組であるか否かをテストする．
-%<en>  Tests if the direction of <box> is \emph{tate}.
-  \item[\cs{platex\_if\_box\_tate\_math\_p:N}$^\dagger$ <box>]
+  \item[\cs{platex\_if\_box\_tate\_nomath:N\underline{\textsl{TF}}}$^\dagger$ \meta{box} \{\meta{true code}\} \{\meta{false code}\}]
+%<ja>  ボックス\meta{box}の組方向が縦組であるか否かをテストする．
+%<en>  Tests if the direction of \meta{box} is \emph{tate}.
+  \item[\cs{platex\_if\_box\_tate\_math\_p:N}$^\dagger$ \meta{box}]
 %<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
 %<ja>\ \\[\dimexpr-2\baselineskip\relax]
-  \item[\cs{platex\_if\_box\_tate\_math:N\underline{\textsl{TF}}}$^\dagger$ <box> \{<true code>\} \{<false code>\}]
-%<ja>  ボックス<box>の組方向がutod方向であるか否かをテストする．
-%<en>  Tests if the direction of <box> is \emph{utod}.
-  \item[\cs{platex\_if\_box\_tate\_p:N} <box>]
+  \item[\cs{platex\_if\_box\_tate\_math:N\underline{\textsl{TF}}}$^\dagger$ \meta{box} \{\meta{true code}\} \{\meta{false code}\}]
+%<ja>  ボックス\meta{box}の組方向がutod方向であるか否かをテストする．
+%<en>  Tests if the direction of \meta{box} is \emph{utod}.
+  \item[\cs{platex\_if\_box\_tate\_p:N} \meta{box}]
 %<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
 %<ja>\ \\[\dimexpr-2\baselineskip\relax]
-  \item[\cs{platex\_if\_box\_tate:N\underline{\textsl{TF}}} <box> \{<true code>\} \{<false code>\}]
-%<ja>  ボックス<box>の組方向が縦組またはutod方向であるか否かをテストする．
-%<en>  Tests if the direction of <box> is \emph{tate}~or~\emph{utod}.
-  \item[\cs{platex\_if\_box\_dtou\_p:N} <box>]
+  \item[\cs{platex\_if\_box\_tate:N\underline{\textsl{TF}}} \meta{box} \{\meta{true code}\} \{\meta{false code}\}]
+%<ja>  ボックス\meta{box}の組方向が縦組またはutod方向であるか否かをテストする．
+%<en>  Tests if the direction of \meta{box} is \emph{tate}~or~\emph{utod}.
+  \item[\cs{platex\_if\_box\_dtou\_p:N} \meta{box}]
 %<en>\ \\[\dimexpr-\medskipamount-2\baselineskip\relax]
 %<ja>\ \\[\dimexpr-2\baselineskip\relax]
-\item[\cs{platex\_if\_box\_dtou:N\underline{\textsl{TF}}} <box> \{<true code>\} \{<false code>\}]
-%<ja>    ボックス<box>の組方向がdtou方向であるか否かをテストする．
-%<en>  Tests if the direction of <box> is \emph{dtou}.
+\item[\cs{platex\_if\_box\_dtou:N\underline{\textsl{TF}}} \meta{box} \{\meta{true code}\} \{\meta{false code}\}]
+%<ja>    ボックス\meta{box}の組方向がdtou方向であるか否かをテストする．
+%<en>  Tests if the direction of \meta{box} is \emph{dtou}.
 \end{cslist}
 
 
@@ -7195,7 +7188,7 @@ the commands of Japanese version:
 
 
 \begin{cslist}
-\item[CID=<name>\textrm{, }JFM=<name>\textrm{, }JFM-var=<name>]
+\item[CID=\meta{name}\textrm{, }JFM=\meta{name}\textrm{, }JFM-var=\meta{name}]
 
 %<*en>
 These 3 keys correspond to \texttt{cid}, \texttt{jfm} and
@@ -7246,7 +7239,7 @@ will not be embedded in the output PDF file. See Subsection~\ref{ssec:psft}.
 \label{fig:yokotate-fontspec}
 \end{figure}
 
-\item[Kanjiskip=<bool>]
+\item[Kanjiskip=\meta{bool}]
 %<*ja>
 \pageref{pg:ltjksp}ページで説明した \verb+\jfont+ 中での \texttt{ltjksp} 指定と
 同一の効力を持ち，
@@ -7255,7 +7248,7 @@ JFM中における \texttt{kanjiskip\_natural}, \texttt{kanjiskip\_stretch},\
 標準値は \texttt{true} である．
 %</ja>
 
-\item[TateFeatures=\{<features>\}\textrm{, }TateFont=<font>]
+\item[TateFeatures=\{\meta{features}\}\textrm{, }TateFont=\meta{font}]
 %<*en>
 The \texttt{TateFeatures} key specifies font features which are only turned~on in
 vertical writing, such as \texttt{Style=VerticalKana}~(\texttt{vkna} feature).
@@ -7268,7 +7261,7 @@ A demonstrarion is shown in \autoref{fig:yokotate-fontspec}.
 指定する．使用例は\autoref{fig:yokotate-fontspec}参照．
 %</ja>
 
-\item[YokoFeatures=\{<features>\}]
+\item[YokoFeatures=\{\meta{features}\}]
 %<*en>
 The \texttt{YokoFeatures} key specifies font features which are only turned~on in
 horizontal writing,.
@@ -7316,9 +7309,9 @@ as the following:
 \begin{lstlisting}[escapechar=\#]
 AltFont = {
   ...
-  { Range=#\LARG range>#, #\LARG features>#},
-  { Range=#\LARG range>#, Font=#\LARG font~name>#, #\LARG features># },
-  { Range=#\LARG range>#, Font=#\LARG font~name># },
+  { Range=#\meta{range}#, #\meta{features}#},
+  { Range=#\meta{range}#, Font=#\meta{font~name}#, #\meta{features}# },
+  { Range=#\meta{range}#, Font=#\meta{font~name}># },
   ...
 }
 \end{lstlisting}
@@ -7335,7 +7328,7 @@ A demonstrarion is shown in \autoref{fig:altkanji-fontspec}.
 
 %<*ja>
 なお，\Pkg{luatexja-fontspec} 読み込み時には和文フォント定義ファイル%
-\texttt{<ja-enc><family>.fd}は全く参照されなくなる．
+\texttt{\meta{ja-enc}\meta{family}.fd}は全く参照されなくなる．
 %</ja>
 
 
@@ -7421,21 +7414,21 @@ commands:
 \Pkg{luatexja-otf}は以下の2つの低レベルコマンドを提供する：
 %</ja>
 \begin{cslist}
-\item[\cs{CID}\{<number>\}]
+\item[\cs{CID}\{\meta{number}\}]
 %<*en>
-Typeset a glyph whose CID number is <number>.
+Typeset a glyph whose CID number is \meta{number}.
 If the Japanese font is neither Adobe-Japan1,~Adobe-GB1, Adobe-CNS1,
 Adobe-Korea1,~nor~Adobe-KR CID-keyed font,
-\LuaTeX-ja treats that <number> is a CID number of Adobe-Japan1 character collection,
+\LuaTeX-ja treats that \meta{number} is a CID number of Adobe-Japan1 character collection,
 and tries to typeset a ``most suitable glyph''.
 
 Note that if the Japanese font is loaded using the HarfBuzz library, this \cs{CID}
 command does not work.
 %</en>
 %<*ja>
-CID番号が<number>の文字を出力する．
+CID番号が\meta{number}の文字を出力する．
 もし現在の和文フォントがAdobe-Japan1,~Adobe-GB1, Adobe-CNS1, Adobe-Korea1,~Adobe-KRの
-  いずれのCID-keyed fontでもない場合，<number>はAdobe-Japan1のCID番号であると解釈し
+  いずれのCID-keyed fontでもない場合，\meta{number}はAdobe-Japan1のCID番号であると解釈し
   「適切なグリフ」\footnote{%
   特に縦組用グリフのCID番号を指定した場合は（LuaTeX-ja 20190504.0以降では若干改良されているが）
   意図しない結果になる可能性が高い．
@@ -7447,15 +7440,15 @@ CID番号が<number>の文字を出力する．
 なお，現在の和文フォントがHarfBuzzを用いて読み込まれた場合には，\cs{CID}は正しく動作しない．
 %</ja>
 
-\item[\cs{UTF}\{<hex\_number>\}]
+\item[\cs{UTF}\{\meta{hex\_number}\}]
 %<*en>
-Typeset a character whose character code is <hex\_number> (in hexadecimal).
-This command is similar to \verb+\char"+<hex\_number>,\ %"
+Typeset a character whose character code is \meta{hex\_number} (in hexadecimal).
+This command is similar to \verb+\char"+\meta{hex\_number},\ %"
 but please remind remarks below.
 %</en>
 %<*ja>
-文字コードが（16進で）<hex\_number>の文字を出力する．
-このコマンドは \verb+\char"+<hex\_number>と似ているが，下の注意を参照すること．%"
+文字コードが（16進で）\meta{hex\_number}の文字を出力する．
+このコマンドは \verb+\char"+\meta{hex\_number}と似ているが，下の注意を参照すること．%"
 %</ja>
 \end{cslist}
 
@@ -7630,7 +7623,7 @@ for making the difference obvious.}
    \item $d\ge\cs{lineskiplimit}$の場合，
 	標準の行送り\cs{baselineskip}で組んでも十分な間隔があると判断され，
 	2行の間には長さ$d$の空白が挿入される．つまり行送りは\cs{baselineskip}．
-   \item {\catcode`\<=12$d<\cs{lineskiplimit}$}の場合，
+   \item $d<\cs{lineskiplimit}$の場合，
 	2行の間には長さ\cs{lineskip}の空白が挿入される．
 	そのため（設定値によるが，多くの場合）行送りは\cs{baselineskip}より広がる．
   \end{itemize}
@@ -7737,7 +7730,7 @@ for making the difference obvious.}
   場合によっては行送りを「\cs{baselineskip}の整数倍」などと切りのいい値に揃えたいという状況が
   考えられなくもない．
   
-  \Pkg{luatexja-adjust}パッケージでは，{\catcode`\<=12$d<\cs{lineskiplimit}$}のときに
+  \Pkg{luatexja-adjust}パッケージでは，$d<\cs{lineskiplimit}$のときに
   行送りを\cs{baselineskip}の\Param{linestep\_factor}倍ずつ増減させて
   \begin{quote}
 	行間が\cs{lineskip}以上となるような，
@@ -7794,11 +7787,11 @@ for making the difference obvious.}
 また，次のパラメータが\cs{ltjsetparameter}内で
 追加される．いずれもグローバルに効力を発揮する．
 \begin{cslist}[style=standard]
-\item[\DParam{stretch\_priority}\,=\{<list>\}]
+\item[\DParam{stretch\_priority}\,=\{\meta{list}\}]
 \Param{kanjiskip}, \Param{xkanjiskip}，および「\textbf{JAglue}以外のグルー」を，
 「行を自然長より伸ばす」場合の調整に用いる優先度を指定する．
 
-指定方法は，<list>の中にkey-value listの形で
+指定方法は，\meta{list}の中にkey-value listの形で
 \begin{lstlisting}
 stretch_priority={kanjiskip=-35,xkanjiskip=-25,others=50}
 \end{lstlisting}
@@ -7813,17 +7806,17 @@ stretch_priority={kanjiskip=-35,xkanjiskip=-25,others=50}
 \end{lstlisting}
 であり，「優先度$-4$」と指定されているJFMグルーが最も伸びにくいようになっている．
 
-\item[\DParam{shrink\_priority}\,=\{<list>\}]
+\item[\DParam{shrink\_priority}\,=\{\meta{list}\}]
 同様に，「行を自然長より縮める」場合の調整に用いる優先度を指定する．
 それ以外は\Param{stretch\_priority}と指定の形式は変わらない（初期値も変わらない）．
 
- \item[\DParam{linestep\_factor}\,=<float>]
+ \item[\DParam{linestep\_factor}\,=\meta{float}]
   段階的な行送り調整の際，\cs{baselineskip}の自然長の何倍単位で行送りを変えるかを指定する．
   0を指定すると無効になるのと変わらない．また負数を指定すると，
   その絶対値が指定されたかのように扱われる．
   初期値は0.5（つまり半行単位）である．
 
-  \item[\DParam{profile\_hgap\_factor}\,=<float>]
+  \item[\DParam{profile\_hgap\_factor}\,=\meta{float}]
   「中身まで見た」行送り計算の際，
   前の行にある深さが大きいものと次の行にある高さが大きいものが
   水平方向にどれだけ離れていないといけないかを
@@ -7983,7 +7976,6 @@ among the line-head form, the line-middle form, and the line-end form.
 それを\LuaTeX-ja用に書きなおしたものが本追加パッケージ \Pkg{lltjext} である．
 
 従来の \Pkg{plext} パッケージとの違いは，
-{\catcode`\<=12
 \begin{itemize}
  \item 組方向オプション \texttt{<y>}（横組），\texttt{<t>}（縦組），
 \texttt{<z>}\ の他に\ \texttt{<d>}（dtou方向），\texttt{<u>}（utod方向）を追加した．
@@ -7996,7 +7988,6 @@ among the line-head form, the line-middle form, and the line-end form.
  \item 連数字用命令 \cs{rensuji} における位置合わせオプション \texttt{[l]}, \texttt{[c]},
        \texttt{[r]} の挙動を若干変更した．
 \end{itemize}
-}
 
 %</ja>
 %<*en>
@@ -8026,13 +8017,13 @@ counterpart of the \Pkg{plext} package.
  \item[d] dtou方向
  \item[u] utod方向
 \end{description}
-\item[\cs{parbox}\<<dir>\>{[<pos>]}\{<width>\}\{<contents>\}]
+\item[\cs{parbox}<\meta{dir}>{[\meta{pos}]}\{\meta{width}\}\{\meta{contents}\}]
 \cs{parbox} 命令も同様に，組方向の指定ができるように拡張されている．
 
-\item[\cs{pbox}\<<dir>\>{[<width>][<pos>]}\{<contents>\}]
-組方向<dir>で<contents>の中身をLRモードで組む命令である．
-<width>が正の値であるときは，ボックス全体の幅がその値となる．
-その際，中身は<pos>の値に従い，左寄せ(\texttt{l})，右揃え(\texttt{r})，
+\item[\cs{pbox}<\meta{dir}>{[\meta{width}][\meta{pos}]}\{\meta{contents}\}]
+組方向\meta{dir}で\meta{contents}の中身をLRモードで組む命令である．
+\meta{width}が正の値であるときは，ボックス全体の幅がその値となる．
+その際，中身は\meta{pos}の値に従い，左寄せ(\texttt{l})，右揃え(\texttt{r})，
 中央揃え（それ以外）される．
 \item[picture環境]
 図表作成に用いる\texttt{picture}環境も，
@@ -8048,11 +8039,11 @@ $x$成分の増加方向は字送り方向，$y$成分の増加方向は行送�
 \cs{put},~\cs{line}, \cs{vector}, \cs{dashbox}, \cs{oval},~\cs{circle}も
 ベースライン補正を受けないように再定義されている．
 
-\item[\cs{rensuji}{[<pos>]}\{<contents>\}\textrm{, }\cs{rensujiskip}]
+\item[\cs{rensuji}{[\meta{pos}]}\{\meta{contents}\}\textrm{, }\cs{rensujiskip}]
 
-\item[\cs{Kanji}\{<counter\_name>\}]
+\item[\cs{Kanji}\{\meta{counter\_name}\}]
 
-\item[\cs{kasen}\{<contents>\}\textrm{, }\cs{bou}\{<contents>\}\textrm{,
+\item[\cs{kasen}\{\meta{contents}\}\textrm{, }\cs{bou}\{\meta{contents}\}\textrm{,
 		     }\cs{boutenchar}]
 
 \item[参照番号]
@@ -8077,28 +8068,28 @@ the direction inside the environment is same as that outside the enviromnent.
  \item[d] \emph{dtou} direction
  \item[u] \emph{utod} direction
 \end{description}
-\item[\cs{parbox}\<<dir>\>{[<pos>]}\{<width>\}\{<contents>\}]
-\cs{parbox} command is also extended by \texttt{\<<dir>\>}.
+\item[\cs{parbox}<\meta{dir}>{[\meta{pos}]}\{\meta{width}\}\{\meta{contents}\}]
+\cs{parbox} command is also extended by \texttt{<\meta{dir}>}.
 
-\item[\cs{pbox}\<<dir>\>{[<width>][<pos>]}\{<contents>\}]
-This commands typeset <contents> in LR-mode, in <dir> direction.
-If <width> is positive, the width of the box becomes this <width>.
-In this case, <contents> will be aligned to left (when <pos> is \texttt{l}),
+\item[\cs{pbox}<\meta{dir}>{[\meta{width}][\meta{pos}]}\{\meta{contents}\}]
+This commands typeset \meta{contents} in LR-mode, in \meta{dir} direction.
+If \meta{width} is positive, the width of the box becomes this \meta{width}.
+In this case, \meta{contents} will be aligned to left (when \meta{pos} is \texttt{l}),
 center (\texttt{c}), or~right (\texttt{r}).
   
 \item[picture\textrm{\ environment}]
-\texttt{picture} environment also extended by \texttt{\<<dir>\>}, as follows:
+\texttt{picture} environment also extended by \texttt{<\meta{dir}>}, as follows:
 \begin{lstlisting}
 \begin{picture}<dir>(x_size, y_size)(x_offset,y_offset)
   ...
 \end{picture}
 \end{lstlisting}
 
-\item[\cs{rensuji}{[<pos>]}\{<contents>\}\textrm{, }\cs{rensujiskip}]
+\item[\cs{rensuji}{[\meta{pos}]}\{\meta{contents}\}\textrm{, }\cs{rensujiskip}]
 
-\item[\cs{Kanji}\{<counter\_name>\}]
+\item[\cs{Kanji}\{\meta{counter\_name}\}]
 
-\item[\cs{kasen}\{<contents>\}\textrm{, }\cs{bou}\{<contents>\}\textrm{,
+\item[\cs{kasen}\{\meta{contents}\}\textrm{, }\cs{bou}\{\meta{contents}\}\textrm{,
 		     }\cs{boutenchar}]
 
 \item[参照番号]
@@ -8382,20 +8373,20 @@ since we use same font for both series of gothic.
 \item[jis2004\textrm{,~}2004jis]
 %<en>Use JIS~X~0213:2004 glyph variants if possible.
 %<ja>出来る限りJIS~X~0213:2004の字形を使う．
-\item[jfm\_yoko=<jfm>]
+\item[jfm\_yoko=\meta{jfm}]
 %<*en>
-Use the JFM \texttt{jfm-<jfm>.lua} for horizontal direction, instead of \texttt{jfm-ujis.lua}~(default JFM).
+Use the JFM \texttt{jfm-\meta{jfm}.lua} for horizontal direction, instead of \texttt{jfm-ujis.lua}~(default JFM).
 %</en>
 %<*ja>
-横組用和文フォントで用いるJFMを\texttt{jfm-<jfm>.lua}にする．このオプションがない時は
+横組用和文フォントで用いるJFMを\texttt{jfm-\meta{jfm}.lua}にする．このオプションがない時は
 \LuaTeX\nobreakdash -ja標準の\texttt{jfm-ujis.lua}が用いられる．
 %</ja>
-\item[jfm\_tate=<jfm>]
+\item[jfm\_tate=\meta{jfm}]
 %<*en>
-Use the JFM \texttt{jfm-<jfm>.lua} for vertical direction, instead of \texttt{jfm-ujisv.lua}~(default JFM).
+Use the JFM \texttt{jfm-\meta{jfm}.lua} for vertical direction, instead of \texttt{jfm-ujisv.lua}~(default JFM).
 %</en>
 %<*ja>
-縦用和文フォントで用いるJFMを\texttt{jfm-<jfm>.lua}にする．このオプションがない時は
+縦用和文フォントで用いるJFMを\texttt{jfm-\meta{jfm}.lua}にする．このオプションがない時は
 \LuaTeX-ja標準の\texttt{jfm-ujisv.lua}が用いられる．
 %</ja>
 
@@ -8876,9 +8867,9 @@ From version~20170904.0, one can define new presets using \cs{ltjnewpreset},
 and use them by \cs{ltjapplypreset}. These two commands can only be used in the preamble.
 %</en>
 \begin{cslist}
- \item[\cs{ltjnewpreset}\{<name>\}\{<specification>\}]
+ \item[\cs{ltjnewpreset}\{\meta{name}\}\{\meta{specification}\}]
 %<*ja>
-  新たに<name>という名称のプリセットを定義する．この名称は，
+  新たに\meta{name}という名称のプリセットを定義する．この名称は，
   すでに定義されているプリセット名や，
   \ref{sssec:ltjpreset-general}で定義されているオプション，さらに
   次の13個と重複してはならない．
@@ -8887,35 +8878,35 @@ and use them by \cs{ltjapplypreset}. These two commands can only be used in the 
 	mc mc-l mc-m mc-b mc-bx gt gt-u gt-d gt-m gt-b gt-bx gt-eb mg-m
   \end{quote}
 
-  <specification>は，プリセット名や以下のキー達のコンマ区切りリストを指定する：
+  \meta{specification}は，プリセット名や以下のキー達のコンマ区切りリストを指定する：
   \begin{description}
-   \item[\ttfamily mc-l=<font>] 明朝体細字(\cs{mcfamily}\cs{ltseries})
-   \item[\ttfamily mc-m=<font>] 明朝体中字(\cs{mcfamily}\cs{mdseries})
-   \item[\ttfamily mc-b=<font>] 明朝体太字(\cs{mcfamily}\cs{bfseries})
-   \item[\ttfamily mc-bx=<font>] \texttt{mc-b=<font>}と同義．
-   \item[\ttfamily gt-u=<font>] \texttt{deluxe}オプション未指定時のゴシック体(\cs{gtfamily})・明朝体太字
-   \item[\ttfamily gt-d=<font>] \texttt{deluxe}オプション指定時のゴシック体中字(\cs{gtfamily}\cs{mdseries})
-   \item[\ttfamily gt-m=<font>] \texttt{deluxe}オプションの指定の有無に関係なく
-    ゴシック体中字(\cs{gtfamily}\cs{mdseries})を指定する．「\texttt{gt-u=<font>, gt-d<font>}」と同義．
-   \item[\ttfamily gt-b=<font>] ゴシック体太字(\cs{gtfamily}\cs{bfseries})\\
-    なお，パッケージ読み込み時に\texttt{bold}オプションが指定された場合は，\texttt{mc-b=<font>}を指定したことにもなる．
-   \item[\ttfamily gt-bx=<font>] \texttt{gt-b=<font>}と同義．
-   \item[\ttfamily gt-eb=<font>] ゴシック体太字(\cs{gtfamily}\cs{ebseries})
-   \item[\ttfamily mg-m=<font>] 丸ゴシック体(\cs{mgfamily})
-   \item[\ttfamily mc=<font>] 明朝体の細字・中字・太字全部を設定．
+   \item[\ttfamily mc-l=\meta{font}] 明朝体細字(\cs{mcfamily}\cs{ltseries})
+   \item[\ttfamily mc-m=\meta{font}] 明朝体中字(\cs{mcfamily}\cs{mdseries})
+   \item[\ttfamily mc-b=\meta{font}] 明朝体太字(\cs{mcfamily}\cs{bfseries})
+   \item[\ttfamily mc-bx=\meta{font}] \texttt{mc-b=\meta{font}}と同義．
+   \item[\ttfamily gt-u=\meta{font}] \texttt{deluxe}オプション未指定時のゴシック体(\cs{gtfamily})・明朝体太字
+   \item[\ttfamily gt-d=\meta{font}] \texttt{deluxe}オプション指定時のゴシック体中字(\cs{gtfamily}\cs{mdseries})
+   \item[\ttfamily gt-m=\meta{font}] \texttt{deluxe}オプションの指定の有無に関係なく
+    ゴシック体中字(\cs{gtfamily}\cs{mdseries})を指定する．「\texttt{gt-u=\meta{font}, gt-d\meta{font}}」と同義．
+   \item[\ttfamily gt-b=\meta{font}] ゴシック体太字(\cs{gtfamily}\cs{bfseries})\\
+    なお，パッケージ読み込み時に\texttt{bold}オプションが指定された場合は，\texttt{mc-b=\meta{font}}を指定したことにもなる．
+   \item[\ttfamily gt-bx=\meta{font}] \texttt{gt-b=\meta{font}}と同義．
+   \item[\ttfamily gt-eb=\meta{font}] ゴシック体太字(\cs{gtfamily}\cs{ebseries})
+   \item[\ttfamily mg-m=\meta{font}] 丸ゴシック体(\cs{mgfamily})
+   \item[\ttfamily mc=\meta{font}] 明朝体の細字・中字・太字全部を設定．
 	以下を指定したことと同じである：
 	\begin{quote}
-	  \ttfamily mc-l=<font>, mc-m=<font>, mc-b=<font>
+	  \ttfamily mc-l=\meta{font}, mc-m=\meta{font}, mc-b=\meta{font}
 	\end{quote}
-   \item[\ttfamily gt=<font>] ゴシック体の中字・太字・極太全部を設定．
+   \item[\ttfamily gt=\meta{font}] ゴシック体の中字・太字・極太全部を設定．
 	以下を指定したことと同じである：
 	\begin{quote}
-	  \ttfamily gt-u=<font>, gt-d=<font>, gt-b=<font>, gt-eb=<font>
+	  \ttfamily gt-u=\meta{font}, gt-d=\meta{font}, gt-b=\meta{font}, gt-eb=\meta{font}
 	\end{quote}
   \end{description}
 %</ja>
 %<*en>
-  Define new preset~<name>. This <name> cannot be same as other presets,
+  Define new preset~\meta{name}. This <name> cannot be same as other presets,
   options described in Subsubsection~\ref{sssec:ltjpreset-general}, nor
   following 13~strings:
   \begin{quote}
@@ -8923,47 +8914,47 @@ and use them by \cs{ltjapplypreset}. These two commands can only be used in the 
 	mc mc-l mc-m mc-b mc-bx gt gt-u gt-d gt-m gt-b gt-bx gt-eb mg-m
   \end{quote}
 
-  <specification> is a comma-separated list which consists of
+  \meta{specification} is a comma-separated list which consists of
   other presets and/or the following keys:
   \begin{description}
-   \item[\ttfamily mc-l=<font>] mincho light
-   \item[\ttfamily mc-m=<font>] mincho medium
-   \item[\ttfamily mc-b=<font>] mincho bold
-   \item[\ttfamily mc-bx=<font>] synonym for \texttt{mc-b=<font>}
-   \item[\ttfamily gt-u=<font>] gothic, when \texttt{deluxe}~option is not specified.
-   \item[\ttfamily gt-d=<font>] gothic medium, when \texttt{deluxe}~option is specified.
-   \item[\ttfamily gt-m=<font>] gothic medium. This key is equivalent to ``\texttt{gt-u=<font>, gt-d<font>}''.
-   \item[\ttfamily gt-b=<font>] gothic bold\\
+   \item[\ttfamily mc-l=\meta{font}] mincho light
+   \item[\ttfamily mc-m=\meta{font}] mincho medium
+   \item[\ttfamily mc-b=\meta{font}] mincho bold
+   \item[\ttfamily mc-bx=\meta{font}] synonym for \texttt{mc-b=\meta{font}}
+   \item[\ttfamily gt-u=\meta{font}] gothic, when \texttt{deluxe}~option is not specified.
+   \item[\ttfamily gt-d=\meta{font}] gothic medium, when \texttt{deluxe}~option is specified.
+   \item[\ttfamily gt-m=\meta{font}] gothic medium. This key is equivalent to ``\texttt{gt-u=\meta{font}, gt-d\meta{font}}''.
+   \item[\ttfamily gt-b=\meta{font}] gothic bold\\
     Note that this key also specifies mincho bold if \texttt{bold} option is specified.
-   \item[\ttfamily gt-bx=<font>] synonym for \texttt{gt-b=<font>}
-   \item[\ttfamily gt-eb=<font>] gothic extra~bold
-   \item[\ttfamily mg-m=<font>] rounded gothic
-   \item[\ttfamily mc=<font>] Equivalent to
+   \item[\ttfamily gt-bx=\meta{font}] synonym for \texttt{gt-b=\meta{font}}
+   \item[\ttfamily gt-eb=\meta{font}] gothic extra~bold
+   \item[\ttfamily mg-m=\meta{font}] rounded gothic
+   \item[\ttfamily mc=\meta{font}] Equivalent to
 	\begin{quote}
-	  \ttfamily mc-l=<font>, mc-m=<font>, mc-b=<font>
+	  \ttfamily mc-l=\meta{font}, mc-m=\meta{font}, mc-b=\meta{font}
 	\end{quote}
-   \item[\ttfamily gt=<font>] Equivalent to
+   \item[\ttfamily gt=\meta{font}] Equivalent to
 	\begin{quote}
-	  \ttfamily gt-u=<font>, gt-d=<font>, gt-b=<font>, gt-eb=<font>
+	  \ttfamily gt-u=\meta{font}, gt-d=\meta{font}, gt-b=\meta{font}, gt-eb=\meta{font}
 	\end{quote}
   \end{description}
 %</en>
- \item[\cs{ltjnewpreset}*\{<name>\}\{<specification>\}]
+ \item[\cs{ltjnewpreset}*\{\meta{name}\}\{\meta{specification}\}]
 %<*ja>
   \cs{ltjnewpreset}とほぼ同じであるが，こちらはすでに定義されているプリセット名
-  を<name>に指定した場合にはエラーを出さずに定義を置き換える．
+  を\meta{name}に指定した場合にはエラーを出さずに定義を置き換える．
 %</ja>
 %<*en>
-  Almost same as \cs{ltjnewpreset}. However, if <name> matches a preset which already defined,
+  Almost same as \cs{ltjnewpreset}. However, if \meta{name} matches a preset which already defined,
   this command simply overwrite it.
 %</en>
- \item[\cs{ltjapplypreset}\{<name>\}]
-%<ja> <name>で指定されたプリセットを使って和文フォントを設定する．
-%<en> Set Japanese font families using preset~<name>.
+ \item[\cs{ltjapplypreset}\{\meta{name}\}]
+%<ja> \meta{name}で指定されたプリセットを使って和文フォントを設定する．
+%<en> Set Japanese font families using preset~\meta{name}.
 \end{cslist}
 
 %<*ja>
-なお，\cs{ltjnewpreset}の第二引数<specification>に含まれる
+なお，\cs{ltjnewpreset}の第二引数\meta{specification}に含まれる
 プリセット名は\cs{ltjnewpreset}の時点で定義されている必要はなく，
 \cs{ltjapplypreset}で実際に使うときに定義されていれば良い．
 そのため，次のような記述も可能である：
@@ -9642,17 +9633,17 @@ but also by the value of \cs{globaldefs}.
 %</en>
 %<*ja>
 \paragraph{パラメータの設定}
-\cs{ltjsetparameter} と，\cs{ltjglobalsetparameter} の定義は\autoref{fig:setpar-def}の
+\cs{ltjsetparameter}と，\cs{ltjglobalsetparameter}の定義は\autoref{fig:setpar-def}の
 のようになっている．
-本質的なのは最後の \cs{setkeys} で，これは\Pkg{xkeyval}パッケージの提供する命令である．
+本質的なのは最後の\cs{setkeys}で，これは\Pkg{xkeyval}パッケージの提供する命令である．
 
-このため，\cs{ltjsetparameter} に指定可能なパラメータを追加するには，
-<prefix>を \texttt{ltj}，<family>を \texttt{japaram} としたキーを
+このため，\cs{ltjsetparameter}に指定可能なパラメータを追加するには，
+\meta{prefix}を\texttt{ltj}，\meta{family}を\texttt{japaram}としたキーを
 \begin{lstlisting}
 \define@key[ltj]{japaram}{...}{...}
 \end{lstlisting}
 のように定義すれば良いだけである．
-なお，パラメータ指定がグローバルかローカルかどうかを示す \texttt{luatexja.isglobal} が，
+なお，パラメータ指定がグローバルかローカルかどうかを示す\texttt{luatexja.isglobal}が，
 \begin{align}
  \texttt{luatexja.isglobal} =
 \begin{cases*}
@@ -9660,8 +9651,8 @@ but also by the value of \cs{globaldefs}.
  \texttt{''}&（パラメータ設定はローカル）．
 \end{cases*}
 \end{align}
-として自動的にセットされる\footnote{命令が \cs{ltjglobalsetparameter} かどうかだけでは
-なく，実行時の \cs{globaldefs} の値にも依存して定まる．}．
+として自動的にセットされる\footnote{命令が\cs{ltjglobalsetparameter}かどうかだけでは
+なく，実行時の\cs{globaldefs}の値にも依存して定まる．}．
 %</ja>
 
 %<*en>
@@ -10108,11 +10099,11 @@ fonts might not have these transformation as an OpenType feature.
 \LuaTeX-jaにおける \textbf{JAglue} の挿入方法は，\pTeX のそれとは全く異なる．
 \pTeX では次のような仕様であった：
 \begin{itemize}
-\item JFMグルーの挿入は，和文文字を表すトークンを元に水平リストに（文字を表す）<char\_node>を
+\item JFMグルーの挿入は，和文文字を表すトークンを元に水平リストに（文字を表す）\meta{char\_node}を
 追加する過程で行われる．
 \item \Param{xkanjiskip}の挿入は，hboxへのパッケージングや行分割前に行われる．
 \item \Param{kanjiskip}はノードとしては挿入されない．パッケージングや行分割の計算時に
-「和文文字を表す2つの<char\_node>の間には\Param{kanjiskip}がある」ものとみなされる．
+「和文文字を表す2つの\meta{char\_node}の間には\Param{kanjiskip}がある」ものとみなされる．
 \end{itemize}
 しかし，\LuaTeX-jaでは，hboxへのパッケージングや行分割前に全ての
 \textbf{JAglue}，即ちJFMグルー・\Param{xkanjiskip}・\Param{kanjiskip}の
@@ -10428,16 +10419,16 @@ ga&(\inhibitglue 「使用フォントが\textit{Np}のそれと同じで，\hfi
 \]
 として，前側の文字のJFMを使った時の空白（グルー／カーン）と，後側の文字のJFMを使った時のそれを求める．
 
-$\mathit{gb}$,~$\mathit{ga}$それぞれに対する<ratio>の値を$d_b$,~$d_a$とする．
+$\mathit{gb}$,~$\mathit{ga}$それぞれに対する\meta{ratio}の値を$d_b$,~$d_a$とする．
 \begin{itemize}
 \item
 $\mathit{ga}$と$\mathit{gb}$の両方が未定義であるならば，JFM由来のグルーは挿入されず，
 \Param{kanjiskip}を採用することとなる．
-どちらか片方のみが未定義であるならば，次のステップでその未定義の方は長さ0のkernで，<ratio>の値は0であるかのように扱われる．
+どちらか片方のみが未定義であるならば，次のステップでその未定義の方は長さ0のkernで，\meta{ratio}の値は0であるかのように扱われる．
 \item
 \Param{diffrentjfm}の値が \texttt{pleft}, \texttt{pright},
       \texttt{paverage} のとき，
-<ratio>の指定に従って比例配分を行う．
+\meta{ratio}の指定に従って比例配分を行う．
 JFM由来のグルー／カーンは以下の値となる：
 \[
  f\left(\frac{1-d_b}2\textit{gb} + \frac{1+d_b}2\textit{ga},
@@ -10452,7 +10443,7 @@ y&($\Param{diffrentjfm}=\texttt{pright}$),\\
 \end{dcases*}
 \]
 \item
-\Param{differentjfm}がそれ以外の値の時は，<ratio>の値は無視され，JFM由来のグルー／カーンは以下の値となる：
+\Param{differentjfm}がそれ以外の値の時は，\meta{ratio}の値は無視され，JFM由来のグルー／カーンは以下の値となる：
 \[
  f(\textit{gb},\textit{ga})
 \]
@@ -10819,7 +10810,6 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 さて，\texttt{yoffset} の増減によって見かけのグリフ位置は上下に移動するが，
 仮想ボディの高さ$h$，深さ$d$については
 \begin{description}
-\catcode`\<=12\catcode`\>=12
  \item[$\texttt{yoffset}\geq 0$のとき]
 $h = \max(\texttt{height} + \texttt{yoffset}, 0)$,
 $d = \max(\texttt{depth} - \texttt{yoffset}, 0)$,
@@ -11337,7 +11327,6 @@ T^{+}&:=T^{+}_{L^+},&L^{+} = \max \{l\in
 「行末に$a_{i}$全角だけのカーンを追加した時の，\textit{glue\_set}の値」を
 $b_{i}$とおく．式で書くと，
 \[
-\catcode`\<=12
 b_{i} = \begin{dcases*}
   \frac{\lvert\textit{total}-a_{i}\text{\cs{zw}}\rvert}{T^{+}}
 	  &($\textit{total}-a_{i}\text{\cs{zw}}\geq 0$),\\
@@ -11422,7 +11411,7 @@ $|\textit{total}|$の分だけが，行中のグルーの伸び量，あるい�
 \item \textit{total}が「(A)の伸び量の合計」以上ならば，(A)--(K)のどこまで負担すれば
 \textit{total}以上になるかを計算する．
 例えば，
-\[\catcode`\<=12
+\[
  \textit{total} = (\text{(A)--(B)の伸び量の合計}) + p\cdot (\text{(C)の伸び量の合計}),
  \qquad 0\le p<1
 \]
@@ -11588,71 +11577,71 @@ This file conains some information (especially for vertical typesetting) about t
 Cache management system of \LuaTeX-ja is stored in \texttt{luatexja.base}
 (\texttt{ltj-base.lua}).
 There are four public functions for cache management in \texttt{luatexja.base},
-where <filename> stands for the file name \emph{without suffix}:
+where \meta{filename} stands for the file name \emph{without suffix}:
 \begin{cslist}
-\item[save\_cache(<filename>, <data>)]
-Save a non-nil table <data> into a cache <filename>.
-Both the compressed text form <filename>\texttt{.lua.gz} and its binary version
+\item[save\_cache(\meta{filename}, \meta{data})]
+Save a non-nil table \meta{data} into a cache \meta{filename}.
+Both the compressed text form \meta{filename}\texttt{.lua.gz} and its binary version
 are created or updated.
 
-\item[save\_cache\_luc(<filename>, <data>{[, <serialized\_data>]})]
+\item[save\_cache\_luc(\meta{filename}, \meta{data}{[, \meta{serialized\_data}]})]
 
 Same as \texttt{save\_cache}, except that only the binary cache is updated.
-The third argument <serialized\_data> is not usually given.
-But if this is given, it is treated as a string representation of <data>.
+The third argument \meta{serialized\_data} is not usually given.
+But if this is given, it is treated as a string representation of \meta{data}.
 
-\item[load\_cache(<filename>, <outdate>)]
-Load the cache <filename>.
-<outdate> is a function which takes one argument (the contents of the cache),
+\item[load\_cache(\meta{filename}, \meta{outdate})]
+Load the cache \meta{filename}.
+\meta{outdate} is a function which takes one argument (the contents of the cache),
 and its return value is whether the cache is outdated.
 
 \texttt{load\_cache} first tries to
-read the binary cache <filename>\texttt{.luc}.
+read the binary cache \meta{filename}\texttt{.luc}.
 If its contents is up-to-date, \texttt{load\_cache} returns the contents.
 If the binary cache is not found or
 its contents is outdated, \texttt{load\_cache} tries to
-read the compressed text form <filename>\texttt{.lua.gz}.
+read the compressed text form \meta{filename}\texttt{.lua.gz}.
 Hence, the return value of \texttt{load\_cache} is non-nil,
 if and only if the updated cache is found.
 
-\item[remove\_cache(<filename>)]
-Remove the cahce <filename>.
+\item[remove\_cache(\meta{filename})]
+Remove the cahce \meta{filename}.
 \end{cslist}
 %</en>
 %<*ja>
 \subsection{内部命令}
 \LuaTeX-jaにおけるキャッシュ管理は，\texttt{luatexja.base}~(\texttt{ltj-base.lua})に
 実装しており，以下の関数が公開されている．
-ここで，<filename>は保存するキャッシュのファイル名を\emph{拡張子なしで}指定する．
+ここで，\meta{filename}は保存するキャッシュのファイル名を\emph{拡張子なしで}指定する．
 \begin{cslist}
-\item[save\_cache(<filename>, <data>)]
-nilでない<data>をキャッシュ<filename>に保存する．
-テキスト形式の<filename>\texttt{.lua.gz}\footnote{拡張子からわかる通り，実際にはgzip圧縮される．}のみならず，
+\item[save\_cache(\meta{filename}, \meta{data})]
+nilでない\meta{data}をキャッシュ\meta{filename}に保存する．
+テキスト形式の\meta{filename}\texttt{.lua.gz}\footnote{拡張子からわかる通り，実際にはgzip圧縮される．}のみならず，
 そのバイナリ形式も作成・更新される．
 
-\item[save\_cache\_luc(<filename>, <data>{[, <serialized\_data>]})]
+\item[save\_cache\_luc(\meta{filename}, \meta{data}{[, \meta{serialized\_data}]})]
 
 \texttt{save\_cache}と同様だが，バイナリキャッシュのみが更新される．
-第3引数<serialized\_data>が与えられた場合，それを
-<data>の文字列化表現として使用する．
-そのため，<serialized\_data>は普通は指定しないことになるだろう．
+第3引数\meta{serialized\_data}が与えられた場合，それを
+\meta{data}の文字列化表現として使用する．
+そのため，\meta{serialized\_data}は普通は指定しないことになるだろう．
 
-\item[load\_cache(<filename>, <outdate>)]
-キャッシュ<filename>を読み込む．
-<outdate>は1引数（キャッシュの中身）をとる関数であり，
+\item[load\_cache(\meta{filename}, \meta{outdate})]
+キャッシュ\meta{filename}を読み込む．
+\meta{outdate}は1引数（キャッシュの中身）をとる関数であり，
 その戻り値は「キャッシュの更新が必要」かどうかを示すブール値でないといけない．
 
-\texttt{load\_cache}は，まずバイナリキャッシュ<filename>\texttt{.luc}を
-読みこむ．もしその内容が「新しい」，つまり<outdate>の評価結果が \texttt{false} なら
+\texttt{load\_cache}は，まずバイナリキャッシュ\meta{filename}\texttt{.luc}を
+読みこむ．もしその内容が「新しい」，つまり\meta{outdate}の評価結果が \texttt{false} なら
 \texttt{load\_cache}はこのバイナリキャッシュの中身を返す．
 もしバイナリキャッシュが見つからなかったか，「古すぎる」ならば（gzip圧縮された）テキスト形式の
-	     <filename>\texttt{.lua.gz}を読み込み，<outdate>で再度評価する．
+	     \meta{filename}\texttt{.lua.gz}を読み込み，\meta{outdate}で再度評価する．
 
 以上より，\texttt{load\_cache}自体がnilでない値を返すのは，ちょうど「新しい」キャッシュが
 見つかった場合である．
 
-\item[remove\_cache(<filename>)]
-キャッシュ<filename>を削除する．テキスト形式（gzip圧縮されているか否かを問わず）も
+\item[remove\_cache(\meta{filename})]
+キャッシュ\meta{filename}を削除する．テキスト形式（gzip圧縮されているか否かを問わず）も
 バイナリ形式もまとめて削除する．
 \end{cslist}
 %</ja>
