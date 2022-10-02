@@ -244,16 +244,15 @@ end
 luatexja.setwidth.capsule_glyph_tate = capsule_glyph_tate
 
 do
-local font_getfont = font.getfont
+local font_getfont, famfont = font.getfont, node.family_font
 local cap_math_aux = {
-  [-1]=function() return 1 end,
-  [0]=function() return 1 end,
+  [-1]=function() return 1 end, [0]=function() return 1 end,
   [1]=function()
-     local sf, tf = node.family_font(2,1), node.family_font(2,0)
+     local sf, tf = famfont(2,1), famfont(2,0)
      return font_getfont(sf).size/font_getfont(tf).size
   end,
   [2]=function()
-     local ssf, tf = node.family_font(2,2), node.family_font(2,0)
+     local ssf, tf = famfont(2,2), famfont(2,0)
      return font_getfont(ssf).size/font_getfont(tf).size
   end
 }

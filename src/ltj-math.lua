@@ -89,7 +89,8 @@ local function conv_vcenter(sb)
 end
 
 local cjhh_A
--- sty : 0 (display or text), 1 (script), >=2 (scriptscript)
+local max, min = math.max, math.min
+-- sty : -1 (display), 0 (text), 1 (script), >=2 (scriptscript)
 local function conv_jchar_to_hbox(head, sty)
    for p in node_traverse(head) do
       local pid = getid(p)
@@ -99,8 +100,8 @@ local function conv_jchar_to_hbox(head, sty)
          else
             setnucleus(p, cjh_A(getnucleus(p), sty))
          end
-         setsub(p, cjh_A(getsub(p), sty+1))
-         setsup(p, cjh_A(getsup(p), sty+1))
+         setsub(p, cjh_A(getsub(p), max(sty+1,1)))
+         setsup(p, cjh_A(getsup(p), max(sty+1,1)))
       elseif pid == id_choice then
          setfield(p, 'display', cjh_A(getfield(p, 'display'), -1))
          setfield(p, 'text', cjh_A(getfield(p, 'text'), 0))
@@ -111,10 +112,10 @@ local function conv_jchar_to_hbox(head, sty)
          setfield(p, 'denom', cjh_A(getfield(p, 'denom'), sty+1))
       elseif pid == id_radical then
          setnucleus(p, cjh_A(getnucleus(p), sty))
-         setsub(p, cjh_A(getsub(p), sty+1))
-         setsup(p, cjh_A(getsup(p), sty+1))
+         setsub(p, cjh_A(getsub(p), max(sty+1,1)))
+         setsup(p, cjh_A(getsup(p), max(sty+1,1)))
          if getfield(p, 'degree') then
-            setfield(p, 'degree', cjh_A(getfield(p, 'degree'), sty + 1))
+            setfield(p, 'degree', cjh_A(getfield(p, 'degree'), 2))
          end
       elseif pid == id_style then
          local ps = getfield(p, 'style')
@@ -139,7 +140,6 @@ local is_ucs_in_japanese_char = ltjc.is_ucs_in_japanese_char_direct
 local setfont = node.direct.setfont
 local setchar = node.direct.setchar
 
-local max = math.max
 cjh_A = function (p, sty)
    if not p then return nil
    else
@@ -151,7 +151,7 @@ cjh_A = function (p, sty)
       elseif pid == id_mchar then
          local pc, fam = getchar (p), get_attr(p, attr_jfam) or -1
          if (not is_math_letters[pc]) and is_ucs_in_japanese_char(p) and fam>=0 then
-            local f = ltjs.get_stack_table(MJT + 0x100 * max(sty,0) + fam, -1, getcount(cnt_stack))
+            local f = ltjs.get_stack_table(MJT + 0x100 * min(max(sty,0),2) + fam, -1, getcount(cnt_stack))
             if f ~= -1 then
                local q = node_new(id_sub_box)
                local r = node_new(id_glyph, 256); setnext(r, nil); setfont(r, f, pc)
@@ -172,13 +172,13 @@ cjh_A = function (p, sty)
 end
 
 do
-  local function mlist_callback_ltja(n)
+  local function mlist_callback_ltja(n, display_type)
     local n = to_direct(n); list_dir = ltjd_get_dir_count()
     if getid(n)==id_whatsit and getsubtype(n)==sid_user and getfield(n, 'user_id') == DIR then
       local old_n = n; n = node_remove(n, n)
       node_free(old_n); if not n then return nil end
     end
-    return to_node(conv_jchar_to_hbox(n, 0))
+    return to_node(conv_jchar_to_hbox(n, (display_type=='display') and -1 or 0))
   end
   -- LaTeX 2020-02-02 seems to have pre_mlist_to_hlist_filter callback
   if luatexbase.callbacktypes['pre_mlist_to_hlist_filter'] then
