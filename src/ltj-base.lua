@@ -226,9 +226,12 @@ end
 --   But sometimes we want to create only the precompiled cache,
 --   when its 'text' version is already present in LuaTeX-ja distribution.
 
-require('lualibs-lpeg') -- string.split
-require('lualibs-os')   -- os.type
-require('lualibs-gzip') -- gzip.*
+if not os.type then require'lualibs-os' end
+if not string.split then  require'lualibs-lpeg' end
+if not gzip then
+  if kpse.find_file('lualibs-util-zip', 'lua') then require'lualibs-util-zip' 
+  else require'lualibs-gzip' end
+end
 
 do
    local kpse_var_value = kpse.var_value
