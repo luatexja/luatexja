@@ -12,7 +12,7 @@
 \def\luatexjalatexLoaded{\endinput}
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{ltj-latex}[2021-10-24 LaTeX support of LuaTeX-ja]
+\ProvidesPackage{ltj-latex}[2022-10-15 LaTeX support of LuaTeX-ja]
 
 \endlinechar=13
 
@@ -134,6 +134,15 @@
 \ifltj@ltfilehook@avail\else\ltj@pkgpatch@im{everyshi}\fi
 
 \RequirePackage{lltjp-geometry}
+
+\ltj@ExecuteBeforePackage{breqn}{%
+  \let\ltj@@vadjust@breqn\vadjust \let\ltj@@insert@breqn\insert
+  \let\vadjust\ltj@@orig@vadjust  \let\insert\ltj@@orig@insert
+}
+\ltj@ExecuteAfterPackage{breqn}{%
+  \let\vadjust\ltj@@vadjust@breqn   \let\insert\ltj@@insert@breqn
+  \let\ltj@@vadjust@breqn\undefined \let\ltj@@insert@breqn\undefined
+}
 
 \def\ltj@@q@stop{\ltj@@q@stop}
 \ifdefined\ltj@stop@overwrite@primitive
