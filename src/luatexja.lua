@@ -175,7 +175,7 @@ local cnt_stack = luatexbase.registernumber 'ltj@@stack'
 
 -- EXT: print parameters that don't need arguments
 do
-   local tex_getattr = tex.getattribute
+   local tex_getattr, getnest = tex.getattribute, tex.getnest
    local function getattr(a, d)
       local r = tex_getattr(a); d = d or 0
       return (r==-0x7FFFFFFF) and d or r
@@ -222,7 +222,7 @@ do
       end,
       direction = function()
          local v = ltjd.get_dir_count()
-         if math.abs(tex.getnest().mode) == ltjs.mmode and v == dir_table.dir_tate then
+         if math.abs(getnest().mode) == ltjs.mmode and v == dir_table.dir_tate then
             v = dir_table.dir_utod
          end
          return v
@@ -353,7 +353,7 @@ do
    local getnest = tex.getnest
    local id_glyph = node.id 'glyph'
    function luatexja.pltx_composite_last_node_char()
-      local n = getnest()
+      local n = getnest().tail
       local r = '-1'
       if n then
          if n.id==id_glyph then
