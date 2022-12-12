@@ -1,7 +1,8 @@
 \documentclass{scrbook}
-  %\usepackage{luatexja}
-  \usepackage{fontspec}
-  \usepackage{luatexja-fontspec}
+\usepackage{luatexja}
+\usepackage{tabularray}
+\usepackage{fontspec}
+%  \usepackage{luatexja-fontspec}
   \usepackage[
     mode=text,
     detect-all,
@@ -9,6 +10,10 @@
   %\usepackage{luatexja-fontspec}
 \makeatletter
 %\typeout{\meaning\@begindocumenthook}
+\usepackage{collcell}
+\newcolumntype{s}{>{\collectcell\si}c<{\endcollectcell}}
+\DeclareSIUnit\angstrom{Å}
+\UseTblrLibrary{siunitx}
 \begin{document}
   \ifdefined\gtfamily\gtfamily\fi Ω
   {\ExplSyntaxOn\makeatletter
@@ -17,16 +22,25 @@
   \SI{-2.5e-10}{mol.L^{-1}}\SI{1}{\micro\metre\angstrom\arcminute\arcsecond\ohm}
   \vrule\SI{}{\ohm}\vrule
 
- $\begin{array}{lSs}
+ \vrule$\begin{array}{Ss}
 %   \typeout{\meaning\@preamble}
-   a&-.123 & J.mol^{-1} \\
-   a&1.23e-3 & Hartree \\
+   -.123 & J.mol^{-1} \\
+   1.23e-3 & Hartree \\
   \end{array}$
 
-\begin{tabular}{lSs}
-%  \typeout{\meaning\@preamble}
-  a&-.123 & J.mol^{-1} \\
-  a&1.23e-3 & Hartree \\
+ \vrule\begin{tabular}{Ssl}
+  -.123 & J.mol^{-1} &「\\
+  1.23e-3 & Hartree & あ\\
+\end{tabular}
+
+X\vrule\begin{tblr}{Ssl}
+  -.123 & J.mol^{-1} &「\\
+  1.23e-3 & Hartree & あ\\
+\end{tblr}
+
+ \vrule\begin{tabular}{Ssl}
+  -.123 & J.mol^{-1} &「\\
+  1.23e-3 & Hartree & あ\\
 \end{tabular}
 
 \end{document}
