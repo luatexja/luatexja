@@ -20,7 +20,13 @@
    \ttfamily\meaning\@begindocumenthook}
   
   \SI{-2.5e-10}{mol.L^{-1}}\SI{1}{\micro\metre\angstrom\arcminute\arcsecond\ohm}
-  \vrule\SI{}{\ohm}\vrule
+\vrule\SI{}{\ohm}\vrule
+
+\vrule
+\begin{tabular}{S}
+    0 \\   12345 \\   e3 \\   0.0+-0.1
+  \end{tabular}
+\vrule
 
  \vrule$\begin{array}{Ss}
 %   \typeout{\meaning\@preamble}
@@ -33,24 +39,17 @@
   1.23e-3 & Hartree & あ\\
 \end{tabular}
 
+\begin{tabular}{@{}llr@{}}
+  hogehoge&hogehoge&hogehoge\\
+  \multicolumn{2}{c}{\tablenum{1.246e-3}}&hoge\\
+  \multicolumn{2}{c}{\tablenum{-.362}}&hoge\\
+\end{tabular}
+
+\end{document}
 X\vrule\begin{tblr}{Ssl}
   -.123 & J.mol^{-1} &「\\
   1.23e-3 & Hartree & あ\\
 \end{tblr}
 
- \vrule\begin{tabular}{Ssl}
-  -.123 & J.mol^{-1} &「\\
-  1.23e-3 & Hartree & あ\\
-\end{tabular}
 
 \end{document}
-
-
-LTJ
-\d@llarbegin \__siunitx_table_collect_begin:Nn S{}\relax
-\pltx@next@inhibitglue \ltjfakeboxbdd \ignorespaces
-\@sharp \unskip \ltjfakeboxbdd \__siunitx_table_print:\relax \d@llarend
-
-non-LTJ
-\d@llarbegin \__siunitx_table_collect_begin:Nn S{}
-\ignorespaces \@sharp \unskip \__siunitx_table_print:\relax \d@llarend

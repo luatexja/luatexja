@@ -1,5 +1,5 @@
 %
-% lltjp-siunitx.sty 2022-12-12
+% lltjp-siunitx.sty 2022-12-14
 %
 
 \NeedsTeXFormat{LaTeX2e}
@@ -34,17 +34,15 @@
 \cs_set_eq:NN \ltj_orig__siunitx_table_collect_begin:w \__siunitx_table_collect_begin:w
 \cs_set_protected:Npn \__siunitx_table_collect_begin:w #1 \relax
   { \ltj_orig__siunitx_table_collect_begin:w }
-\AtBeginDocument{
-    \cs_if_exist:NT \TblrNum
-    { \RenewDocumentCommand \TblrNum { m }
-      {
-        \__tblr_siunitx_process:Nn
-          { \cs_set_eq:NN \__siunitx_table_collect_begin:w
-                          \ltj_orig__siunitx_table_collect_begin:w
-            \tablenum}
-          {#1}
-      }
-    }
+\RenewDocumentCommand \tablenum { O { } m }
+  {
+    \mode_leave_vertical:
+    \group_begin:
+      \keys_set:nn { siunitx } {#1}
+      \siunitx_cell_begin:w
+        \relax \ignorespaces #2
+      \siunitx_cell_end:
+    \group_end:
   }
 }% siunitx v3.00 end
 {% siunitx v2.xx
