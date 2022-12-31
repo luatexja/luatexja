@@ -4,7 +4,7 @@
 
 % LaTeX only!
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-ruby}[2022-07-03 v0.53]
+\ProvidesPackage{luatexja-ruby}[2022-12-31 v0.6]
 \RequirePackage{luatexja}
 
 %%------------------
@@ -32,14 +32,16 @@
 %% attr_ruby_mode
 %% bit 0: intrusion を有効にするか（1: 有効）
 %% bit 1: 前後の intrusion 許容量を小さい方に揃える (1: yes)
-%% bit 2, 3: intrusion をどう使って親文字を配置するか
-%%   00: intrusion なしでとりあえず計算し，左右の突出分を進入に割り当てる
-%%   01: pre-intrusion でまかなえるだけまかない，無理なら post- も使う
-%%   10: post を優先
-%%   11: 2 min (pre,post) までは pre, post に均等配分しようとする
-%%     >=01 で，intrusion で賄えきれなかった場合はいつものように伸長する．
-%% bit 4: 熟語ルビの際の処理方法（0: 常にグループ，1: 可能な限りブロックごとに）
-%%        ↑bit 4 は今は無効
+%% bit 2--4: intrusion をどう使って親文字を配置するか
+%%    00: intrusion なしでとりあえず計算し，左右の突出分を進入に割り当てる
+%%    01: pre-intrusion でまかなえるだけまかない，無理なら post- も使う
+%%    10: post を優先
+%%    11: 2 min (pre,post) までは pre, post に均等配分しようとする
+%%   100: 2 min (pre,post) までは pre, post に均等配分．
+%%        それでだめでも pre, post でまかなえるまでまかなう
+%% ※ 01--100 で，intrusion で賄えきれなかった場合はいつものように伸長する．
+%% bit 5: 熟語ルビの際の処理方法（0: 常にグループ，1: 可能な限りブロックごとに）
+%%        ↑bit 5 は今は無効
 \ltj@@rkeydef{mode}
 %% intrusion 量強制固定（bit 0, bit 1 より優先，負数で「自動」）
 %% attr は sp 単位だが，ユーザーはルビ全角単位で指定する

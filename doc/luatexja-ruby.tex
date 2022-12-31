@@ -10,6 +10,7 @@
 \setmonojfont{HaranoAjiGothic-Regular.otf}
 \usepackage{unicode-math}
 \setmathfont{Latin Modern Math}
+%\usepackage{lua-visual-debug}
 
 \def\emph#1{\textbf{\textgt{#1}}}
 \def\headfont{\normalfont\bfseries\gtfamily}
@@ -168,12 +169,12 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 \item[post=<real>] 同様に，\underline{後文字進入許容量}を指定する．既定値は負（自動指定）．
 
 \item[mode] 進入処理のモードを表すbit vector．下位2\,bitは，\texttt{pre}や
-\texttt{post}が負である場合にしか効力を発揮しない．既定値は$(0001)_2 = 1$．
+\texttt{post}が負である場合にしか効力を発揮しない．既定値は$(00001)_2 = 1$．
 \begin{description}
  \item[bit 0] 前後の\underline{文字への進入}を無効にするならば0，有効にするならば1．
  \item[bit 1] 前進入許容量$B$と後進入許容量$A$が異なった場合，
   そのまま処理する場合は0，小さい方に揃えるならば1．
- \item[bit 2--3] ルビ文字の突出量から実際の前・後進入量の計算方法を指定する．
+ \item[bit 2--4] ルビ文字の突出量から実際の前・後進入量の計算方法を指定する．
   詳しい計算方法については\ref{ssec:calc_intrusion}\nobreak 小節を参照．
 \end{description}
 \item[intrude\_jfmgk=<bool>] 進入量算出の際に，前後のJFMグルーの自然長を考慮するか否か．既定値は真．
@@ -630,50 +631,68 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
   
   ルビ文字の突出量を$x$，
   親文字の文字数を$k+1$，親文字の前に入る空白量・間の空白量・後ろの空白量の比を$p:q:r$とする．
-  このとき，\texttt{mode}のbit 2,~3の値によって$b$,~$a$を次のように算出する：
+  このとき，\texttt{mode}のbit 2--4の値によって$b$,~$a$を次のように算出する：
 \begin{description}[labelindent=\zw]
- \item[00] $b=\min(B, xp/(p+kq+r))$, \ $a=\min(A, xr/(p+kq+r))$
- \item[01] $b=\min(B, x)$, \ $a=\min(A, \max(x-b,0))$
- \item[10] $a=\min(A, x)$, \ $b=\min(B, \max(x-a,0))$
- \item[11] $M=\min(B,A)$とおく．もし$x\le 2M$ならば$b=a=x/2$．そうでなければ
+ \item[000] $b=\min(B, xp/(p+kq+r))$, \ $a=\min(A, xr/(p+kq+r))$
+ \item[001] $b=\min(B, x)$, \ $a=\min(A, \max(x-b,0))$
+ \item[010] $a=\min(A, x)$, \ $b=\min(B, \max(x-a,0))$
+ \item[011] $M=\min(B,A)$とおく．もし$x\le 2M$ならば$b=a=x/2$．そうでなければ
 \[
- b=\min\mleft(B, M + \frac{(x-2M)p}{p+kq+r}\mright),\qquad 
+ b=\min\mleft(B, M + \frac{(x-2M)p}{p+kq+r}\mright),\quad 
  a=\min\mleft(A, M + \frac{(x-2M)r}{p+kq+r}\mright).
+\]
+ \item[100] $M=\min(B,A)$とおく．もし$x\le 2M$ならば$b=a=x/2$．そうでなければ
+\[
+ b=\min(B, x-M),\quad a=\min(A,x-M)\quad \mbox{（どちらかは必ず$M$となる）}.
 \]
 \end{description}
 
+大雑把に言うと，最初の「000」は「組んだ後に進入量を決定」する方針，
+それ以外は「進入量を先に決定し，その後で組む」方針である．
 組み方の具体例を実際に示す．例示のため，平仮名にはルビが1字まで，「立」にはルビを
 0.5字分までかけてよいことにしている．
 \begin{description}[labelindent=\zw]
-\item[00]{\setkeys[ltj]{ruby}{mode=1}%
+\item[000]{\setkeys[ltj]{ruby}{mode=1}%
 \ltjsetparameter{rubypreintrusion={`立,0.5}, rubypostintrusion={`立,0.5}}%
 は\ltjruby{美}{うつく}しい
   \quad は\ltjruby{聴衆}{ちようしゆう}と\quad
 は\ltjruby{暁}{あかつき}立\quad
 は\ltjruby{峠}{とうげ}立\quad
-は\ltjruby{聴衆}{ちようしゆう}立\par}
-\item[01]{\setkeys[ltj]{ruby}{mode=5}%
+は\ltjruby{聴衆}{ちようしゆう}立\quad
+は\ltjruby{聴衆}{ちようしゆう}達\par}
+\item[001]{\setkeys[ltj]{ruby}{mode=5}%
 \ltjsetparameter{rubypreintrusion={`立,0.5}, rubypostintrusion={`立,0.5}}%
 は\ltjruby{美}{うつく}しい
   \quad は\ltjruby{聴衆}{ちようしゆう}と\quad
 は\ltjruby{暁}{あかつき}立\quad
 は\ltjruby{峠}{とうげ}立\quad
-は\ltjruby{聴衆}{ちようしゆう}立\par}
-\item[10]{%
+は\ltjruby{聴衆}{ちようしゆう}立\quad
+は\ltjruby{聴衆}{ちようしゆう}達\par}
+\item[010]{%
 \setkeys[ltj]{ruby}{mode=9}%
 \ltjsetparameter{rubypreintrusion={`立,0.5}, rubypostintrusion={`立,0.5}}%
 は\ltjruby{美}{うつく}しい
   \quad は\ltjruby{聴衆}{ちようしゆう}と\quad
 は\ltjruby{暁}{あかつき}立\quad
 は\ltjruby{峠}{とうげ}立\quad
-は\ltjruby{聴衆}{ちようしゆう}立\par}
-\item[11]{\setkeys[ltj]{ruby}{mode=13}%
+は\ltjruby{聴衆}{ちようしゆう}立\quad
+は\ltjruby{聴衆}{ちようしゆう}達\par}
+\item[011]{\setkeys[ltj]{ruby}{mode=13}%
 \ltjsetparameter{rubypreintrusion={`立,0.5}, rubypostintrusion={`立,0.5}}%
 は\ltjruby{美}{うつく}しい\quad
 は\ltjruby{聴衆}{ちようしゆう}と\quad
 は\ltjruby{暁}{あかつき}立\quad
 は\ltjruby{峠}{とうげ}立\quad
-は\ltjruby{聴衆}{ちようしゆう}立\par}
+は\ltjruby{聴衆}{ちようしゆう}立\quad
+は\ltjruby{聴衆}{ちようしゆう}達\par}
+\item[100]{\setkeys[ltj]{ruby}{mode=17}%
+\ltjsetparameter{rubypreintrusion={`立,0.5}, rubypostintrusion={`立,0.5}}%
+は\ltjruby{美}{うつく}しい\quad
+は\ltjruby{聴衆}{ちようしゆう}と\quad
+は\ltjruby{暁}{あかつき}立\quad
+は\ltjruby{峠}{とうげ}立\quad
+は\ltjruby{聴衆}{ちようしゆう}立\quad
+は\ltjruby{聴衆}{ちようしゆう}達\par}
 \end{description}
 \end{enumerate}
 

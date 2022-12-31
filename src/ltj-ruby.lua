@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.ruby',
-  date = '2022-08-29',
+  date = '2022-12-31',
   description = 'Ruby annotation',
 })
 luatexja.ruby = {}
@@ -318,7 +318,7 @@ local function enlarge_parent(r, p, tmp_tbl, no_begin, no_end)
    local pre_intrusion, post_intrusion
    local ppre, pmid, ppost = tmp_tbl.ppre, tmp_tbl.pmid, tmp_tbl.ppost
    local mapre, mapost = tmp_tbl.mapre, tmp_tbl.mapost
-   local intmode = (tmp_tbl.mode//4)%4
+   local intmode = (tmp_tbl.mode//4)%8
    if no_begin then mapre  = mapre + tmp_tbl.before_jfmgk end
    if no_end   then mapost = mapost + tmp_tbl.after_jfmgk end
    if (tmp_tbl.mode%4 >=2) and (tmp_tbl.pre<0) and (tmp_tbl.post<0) then
@@ -336,7 +336,7 @@ local function enlarge_parent(r, p, tmp_tbl, no_begin, no_end)
       post_intrusion = min(mapost, sumprot);
       pre_intrusion = min(mapre, max(sumprot-post_intrusion, 0))
       p = enlarge(p, rwidth, ppre, pmid, ppost, pre_intrusion, post_intrusion)
-   else --  intmode == 3
+   elseif intmode==3 then
       local n = min(mapre, mapost)*2
       if n < sumprot then
          pre_intrusion = n/2; post_intrusion = n/2
@@ -346,6 +346,15 @@ local function enlarge_parent(r, p, tmp_tbl, no_begin, no_end)
       p = enlarge(p, rwidth, ppre, pmid, ppost, pre_intrusion, post_intrusion)
       pre_intrusion = min(mapre, pre_intrusion + round(ppre*getfield(p, 'glue_set')*65536))
       post_intrusion = min(mapost, post_intrusion + round(ppost*getfield(p, 'glue_set')*65536))
+   else  --  intmode == 4
+      if 2*min(mapre, mapost) > sumprot then
+         pre_intrusion = sumprot//2; post_intrusion = sumprot/2
+      elseif mapre>=mapost then 
+         pre_intrusion, post_intrusion = min(mapre, sumprot-mapost), mapost
+      else
+         pre_intrusion, post_intrusion = mapre, min(mapost, sumprot-mapre)
+      end
+      p = enlarge(p, rwidth, ppre, pmid, ppost, pre_intrusion, post_intrusion)
    end
    setshift(r, -pre_intrusion)
    local rwidth = rwidth - pre_intrusion - post_intrusion
