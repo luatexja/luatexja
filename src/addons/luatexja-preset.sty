@@ -519,7 +519,8 @@
     \group_end:
   }
 
-  \msg_warning:nnx { luatexja-preset }{ scale }{ \Cjascale }
+  \fp_compare:nNnF  \Cjascale = 1
+    { \msg_warning:nnx { luatexja-preset }{ scale }{ \Cjascale } }
 
   % {1: encoding}{2: family}{3: series}{4: shape}{5: fontname}{6: feature}{7: scale}
   \cs_new:Nn \__ltjpreset_declare_font_shape:nnnnnnn {
