@@ -4,7 +4,7 @@
 
 % LaTeX only!
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-ruby}[2022-12-31 v0.6]
+\ProvidesPackage{luatexja-ruby}[2023-01-21 v0.61]
 \RequirePackage{luatexja}
 
 %%------------------
@@ -155,36 +155,36 @@
 
 %%%%%%%% ZR さんの PXrubrica パッケージ中のコードから引用・改変
 % \pxrr@decompbar: a|bc -> \ltj@@ruby@mark{a}\ltj@@ruby@mark{bc}
-\let\pxrr@res\empty
-\def\pxrr@ifx#1{%
+\let\ltj@@ruby@res\empty
+\def\ltj@@ruby@ifx#1{%
   \ifx#1\expandafter\@firstoftwo
   \else\expandafter\@secondoftwo
   \fi
 }
-\def\pxrr@nil{\noexpand\pxrr@nil}
-\def\pxrr@end{\noexpand\pxrr@end}
-\def\pxrr@appto#1#2{%
+\def\ltj@@ruby@nil{\noexpand\ltj@@ruby@nil}
+\def\ltj@@ruby@end{\noexpand\ltj@@ruby@end}
+\def\ltj@@ruby@appto#1#2{%
   \expandafter\def\expandafter#1\expandafter{#1#2}%
 }
-\def\pxrr@decompbar#1{%
-  \let\pxrr@res\@empty
-  \pxrr@decompbar@loopa\pxrr@nil#1|\pxrr@end|%
+\def\ltj@@ruby@decompbar#1{%
+  \let\ltj@@ruby@res\@empty
+  \ltj@@ruby@decompbar@loopa\ltj@@ruby@nil#1|\ltj@@ruby@end|%
 }
-\def\pxrr@decompbar@loopa#1|{%
-  \expandafter\pxrr@decompbar@loopb\expandafter{\@gobble#1}%
+\def\ltj@@ruby@decompbar@loopa#1|{%
+  \expandafter\ltj@@ruby@decompbar@loopb\expandafter{\@gobble#1}%
 }
-\def\pxrr@decompbar@loopb#1{%
-  \pxrr@decompbar@loopc#1\relax\pxrr@nil{#1}%
+\def\ltj@@ruby@decompbar@loopb#1{%
+  \ltj@@ruby@decompbar@loopc#1\relax\ltj@@ruby@nil{#1}%
 }
-\def\pxrr@decompbar@loopc#1#2\pxrr@nil#3{%
-  \pxrr@ifx{#1\pxrr@end}{}{%
-    \ifx\pxrr@res\@empty
-      \def\pxrr@res{\ltj@@ruby@mark}%
+\def\ltj@@ruby@decompbar@loopc#1#2\ltj@@ruby@nil#3{%
+  \ltj@@ruby@ifx{#1\ltj@@ruby@end}{}{%
+    \ifx\ltj@@ruby@res\@empty
+      \def\ltj@@ruby@res{\ltj@@ruby@mark}%
     \else
-      \pxrr@appto\pxrr@res{\ltj@@ruby@mark}%
+      \ltj@@ruby@appto\ltj@@ruby@res{\ltj@@ruby@mark}%
     \fi
-    \pxrr@appto\pxrr@res{{#3}}%
-    \pxrr@decompbar@loopa\pxrr@nil
+    \ltj@@ruby@appto\ltj@@ruby@res{{#3}}%
+    \ltj@@ruby@decompbar@loopa\ltj@@ruby@nil
   }%
 }
 %%%%%%%% ここまで
@@ -202,8 +202,8 @@
 	luatexja.ruby.ruby_tmplist_p = \string{\string}}%
   \leavevmode\dimen0=\f@size pt\dimen1=\ltj@@rubyip@size\dimen0%
   % 引数展開，テーブルにセット
-  \pxrr@decompbar{#2}{\let\ltj@@ruby@mark\ltj@@ruby@sp\pxrr@res}%
-  \pxrr@decompbar{#3}{\let\ltj@@ruby@mark\ltj@@ruby@sr\pxrr@res}%
+  \ltj@@ruby@decompbar{#2}{\let\ltj@@ruby@mark\ltj@@ruby@sp\ltj@@ruby@res}%
+  \ltj@@ruby@decompbar{#3}{\let\ltj@@ruby@mark\ltj@@ruby@sr\ltj@@ruby@res}%
   {\fontsize{\ltj@@rubyip@size\dimen0}\z@\selectfont\ltj@@rubyip@fontcmd
     \global\dimen1=\zw\global\dimen2=\zh}%
   \directlua{%
