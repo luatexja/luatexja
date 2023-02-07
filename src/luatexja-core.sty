@@ -723,22 +723,22 @@
 \long\def \@gobbletwo #1#2{}
 \let\ltj@@orig@unhbox\unhbox
 \let\ltj@@orig@unvbox\unvbox
-\protected\def\ltj@@unhbox{\ltj@reset@globaldefs\afterassignment\ltj@@unhbox@\ltj@tempcnta}
-\protected\def\ltj@@unvbox{\ltj@reset@globaldefs\afterassignment\ltj@@unvbox@\ltj@tempcnta}
-\protected\def\ltj@@unhbox@{\ltj@@lua@unboxcheckdir\ltj@@orig@unhbox\ltj@tempcnta}
-\protected\def\ltj@@unvbox@{\ltj@@lua@unboxcheckdir\ltj@@orig@unvbox\ltj@tempcnta}
+\protected\def\ltj@@unhbox{\begingroup\ltj@reset@globaldefs\afterassignment\ltj@@unhbox@\ltj@tempcnta}
+\protected\def\ltj@@unvbox{\begingroup\ltj@reset@globaldefs\afterassignment\ltj@@unvbox@\ltj@tempcnta}
+\protected\def\ltj@@unhbox@{\ltj@@lua@unboxcheckdir\ltj@@orig@unhbox\ltj@tempcnta\endgroup}
+\protected\def\ltj@@unvbox@{\ltj@@lua@unboxcheckdir\ltj@@orig@unvbox\ltj@tempcnta\endgroup}
 \let\ltj@@orig@unhcopy\unhcopy
 \let\ltj@@orig@unvcopy\unvcopy
-\protected\def\ltj@@unhcopy{\ltj@reset@globaldefs\afterassignment\ltj@@unhcopy@\ltj@tempcnta}
-\protected\def\ltj@@unvcopy{\ltj@reset@globaldefs\afterassignment\ltj@@unvcopy@\ltj@tempcnta}
+\protected\def\ltj@@unhcopy{\begingroup\ltj@reset@globaldefs\afterassignment\ltj@@unhcopy@\ltj@tempcnta}
+\protected\def\ltj@@unvcopy{\begingroup\ltj@reset@globaldefs\afterassignment\ltj@@unvcopy@\ltj@tempcnta}
 \protected\def\ltj@@unhcopy@{%
   \directlua{luatexja.direction.unbox_check_dir(true)}%
   \ltj@@orig@unhcopy\ltj@tempcnta
-  \directlua{luatexja.direction.uncopy_restore_whatsit()}}
+  \directlua{luatexja.direction.uncopy_restore_whatsit()}\endgroup}
 \protected\def\ltj@@unvcopy@{%
   \directlua{luatexja.direction.unbox_check_dir(true)}%
   \ltj@@orig@unvcopy\ltj@tempcnta
-  \directlua{luatexja.direction.uncopy_restore_whatsit()}}
+  \directlua{luatexja.direction.uncopy_restore_whatsit()}\endgroup}
 \let\unhbox\ltj@@unhbox %% PRIMITIVE
 \let\unvbox\ltj@@unvbox %% PRIMITIVE
 \let\unhcopy\ltj@@unhcopy %% PRIMITIVE
