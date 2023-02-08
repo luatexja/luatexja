@@ -715,30 +715,34 @@
 
 %%%% \unhbox and \unvbox
 \newluafunction\ltj@@lua@unboxcheckdir@inner
+\newluafunction\ltj@@lua@uncopycheckdir@inner
+\newluafunction\ltj@@lua@uncopy@restore@whatsit@inner
 \directlua{
   local t = lua.get_functions_table()
   t[\the\ltj@@lua@unboxcheckdir@inner]=luatexja.direction.unbox_check_dir
+  t[\the\ltj@@lua@uncopycheckdir@inner]=luatexja.direction.uncopy_check_dir
+  t[\the\ltj@@lua@uncopy@restore@whatsit@inner]=luatexja.direction.uncopy_restore_whatsit
 }
 \luadef\ltj@@lua@unboxcheckdir\ltj@@lua@unboxcheckdir@inner
+\luadef\ltj@@lua@uncopycheckdir\ltj@@lua@uncopycheckdir@inner
+\luadef\ltj@@lua@uncopy@restore@whatsit\ltj@@lua@uncopy@restore@whatsit@inner
 \long\def \@gobbletwo #1#2{}
 \let\ltj@@orig@unhbox\unhbox
 \let\ltj@@orig@unvbox\unvbox
-\protected\def\ltj@@unhbox{\begingroup\ltj@reset@globaldefs\afterassignment\ltj@@unhbox@\ltj@tempcnta}
-\protected\def\ltj@@unvbox{\begingroup\ltj@reset@globaldefs\afterassignment\ltj@@unvbox@\ltj@tempcnta}
-\protected\def\ltj@@unhbox@{\ltj@@lua@unboxcheckdir\ltj@@orig@unhbox\ltj@tempcnta\endgroup}
-\protected\def\ltj@@unvbox@{\ltj@@lua@unboxcheckdir\ltj@@orig@unvbox\ltj@tempcnta\endgroup}
+\protected\def\ltj@@unhbox{\ltj@reset@globaldefs\afterassignment\ltj@@unhbox@\ltj@tempcnta}
+\protected\def\ltj@@unvbox{\ltj@reset@globaldefs\afterassignment\ltj@@unvbox@\ltj@tempcnta}
+\protected\def\ltj@@unhbox@{\ltj@@lua@unboxcheckdir\expandafter\ltj@@orig@unhbox\the\ltj@tempcnta\relax}
+\protected\def\ltj@@unvbox@{\ltj@@lua@unboxcheckdir\expandafter\ltj@@orig@unvbox\the\ltj@tempcnta\relax}
 \let\ltj@@orig@unhcopy\unhcopy
 \let\ltj@@orig@unvcopy\unvcopy
-\protected\def\ltj@@unhcopy{\begingroup\ltj@reset@globaldefs\afterassignment\ltj@@unhcopy@\ltj@tempcnta}
-\protected\def\ltj@@unvcopy{\begingroup\ltj@reset@globaldefs\afterassignment\ltj@@unvcopy@\ltj@tempcnta}
+\protected\def\ltj@@unhcopy{\ltj@reset@globaldefs\afterassignment\ltj@@unhcopy@\ltj@tempcnta}
+\protected\def\ltj@@unvcopy{\ltj@reset@globaldefs\afterassignment\ltj@@unvcopy@\ltj@tempcnta}
 \protected\def\ltj@@unhcopy@{%
-  \directlua{luatexja.direction.unbox_check_dir(true)}%
-  \ltj@@orig@unhcopy\ltj@tempcnta
-  \directlua{luatexja.direction.uncopy_restore_whatsit()}\endgroup}
+  \ltj@@lua@uncopycheckdir\expandafter\ltj@@orig@unhcopy\the\ltj@tempcnta\relax
+  \ltj@@lua@uncopy@restore@whatsit}%
 \protected\def\ltj@@unvcopy@{%
-  \directlua{luatexja.direction.unbox_check_dir(true)}%
-  \ltj@@orig@unvcopy\ltj@tempcnta
-  \directlua{luatexja.direction.uncopy_restore_whatsit()}\endgroup}
+  \ltj@@lua@uncopycheckdir\expandafter\ltj@@orig@unvcopy\the\ltj@tempcnta\relax
+  \ltj@@lua@uncopy@restore@whatsit}%
 \let\unhbox\ltj@@unhbox %% PRIMITIVE
 \let\unvbox\ltj@@unvbox %% PRIMITIVE
 \let\unhcopy\ltj@@unhcopy %% PRIMITIVE

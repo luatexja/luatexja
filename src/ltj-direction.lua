@@ -550,7 +550,41 @@ do
    local ltj_tempcnta = luatexbase.registernumber 'ltj@tempcnta'
    local getbox = tex.getbox
    local dir_backup
-   function luatexja.direction.unbox_check_dir(is_copy)
+   function luatexja.direction.unbox_check_dir()
+      start_time_measure 'box_primitive_hook'
+      local list_dir = get_dir_count()%dir_math_mod
+      local b = getbox(getcount(ltj_tempcnta))
+      if b and getlist(to_direct(b)) then
+         local box_dir = get_box_dir(to_direct(b), dir_yoko)
+         if box_dir%dir_math_mod ~= list_dir then
+            ltjb.package_error(
+               'luatexja',
+               "Incompatible direction list can't be unboxed",
+               'I refuse to unbox a box in differrent direction.')
+            tex.sprint(cat_lp, '\\@gobbletwo')
+         else
+            dir_backup = nil
+            local bd = to_direct(b)
+            local hd = getlist(bd)
+            local nh = hd
+            while hd do
+               if getid(hd)==id_whatsit and getsubtype(hd)==sid_user
+                  and getfield(hd, 'user_id')==DIR then
+                     local d = hd
+                     nh, hd = node_remove(nh, hd); node_free(d)
+               else
+                  hd = node_next(hd)
+               end
+            end
+            setlist(bd, nh)
+         end
+      end
+      if luatexja.global_temp and tex.globaldefs~=luatexja.global_temp then
+         tex.globaldefs = luatexja.global_temp
+      end
+      stop_time_measure 'box_primitive_hook'
+   end
+   function luatexja.direction.uncopy_check_dir()
       start_time_measure 'box_primitive_hook'
       local list_dir = get_dir_count()%dir_math_mod
       local b = getbox(getcount(ltj_tempcnta))
@@ -572,7 +606,7 @@ do
                   and getfield(hd, 'user_id')==DIR then
                      local d = hd
                      nh, hd = node_remove(nh, hd)
-                     if is_copy==true and (not dir_backup) then
+                     if not dir_backup then
                         dir_backup = d; setnext(dir_backup, nil)
                      else
                         node_free(d)
