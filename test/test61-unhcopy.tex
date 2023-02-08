@@ -1,0 +1,88 @@
+\documentclass{minimal}
+\usepackage{luatexja}
+
+\begin{document}
+\output={\setbox60000=\box255\deadcycles=0\relax}
+\newcount\mycnt
+\typeout{00> \the\ht\strutbox}
+
+\everypar{\strut}
+
+%%% \expandafter...\relax
+
+\directlua{
+  socket=require'socket'
+  my_a=socket.gettime()
+}
+
+\mycnt=0
+\loop\ifnum\mycnt<100000\relax
+  \leavevmode TEST\par
+  \advance\mycnt by1\relax
+\repeat
+
+\directlua{
+  my_b=socket.gettime()
+}
+\typeout{01> \the\ht\strutbox, \directlua{tex.sprint(my_b-my_a)}}
+
+%%% \expandafter...(space)
+\makeatletter
+\protected\def\ltj@@unhbox{\ltj@reset@globaldefs\afterassignment\ltj@@unhbox@\ltj@tempcnta}
+\protected\def\ltj@@unhcopy{\ltj@reset@globaldefs\afterassignment\ltj@@unhcopy@\ltj@tempcnta}
+\def\ltj@@unhbox@#1{%
+  \protected\def\ltj@@unhbox@{\ltj@@lua@unboxcheckdir\expandafter\ltj@@orig@unhbox\the\ltj@tempcnta#1}%
+}
+\def\ltj@@unhcopy@#1{%
+  \protected\def\ltj@@unhcopy@{%
+    \ltj@@lua@uncopycheckdir\expandafter\ltj@@orig@unhcopy\the\ltj@tempcnta#1
+    \ltj@@lua@uncopy@restore@whatsit}%
+}
+\ltj@@unhbox@{ }\ltj@@unhcopy@{ }
+\let\unhbox\ltj@@unhbox %% PRIMITIVE
+\let\unhcopy\ltj@@unhcopy %% PRIMITIVE
+
+\directlua{
+  my_a=socket.gettime()
+}
+
+\mycnt=0
+\loop\ifnum\mycnt<100000\relax
+  \leavevmode TEST\par
+  \advance\mycnt by1\relax
+\repeat
+
+\directlua{
+  my_b=socket.gettime()
+}
+\typeout{02> \the\ht\strutbox, \directlua{tex.sprint(my_b-my_a)}}
+
+%%% \begingroup...\endgroup
+\makeatletter
+\protected\def\ltj@@unhbox{\begingroup\ltj@reset@globaldefs\afterassignment\ltj@@unhbox@\ltj@tempcnta}
+\protected\def\ltj@@unhbox@{\ltj@@lua@unboxcheckdir\ltj@@orig@unhbox\ltj@tempcnta\endgroup}
+\protected\def\ltj@@unhcopy{\begingroup\ltj@reset@globaldefs\afterassignment\ltj@@unhcopy@\ltj@tempcnta}
+\protected\def\ltj@@unhcopy@{%
+  \ltj@@lua@uncopycheckdir\ltj@@orig@unhcopy\ltj@tempcnta
+  \ltj@@lua@uncopy@restore@whatsit\endgroup}%
+\let\unhbox\ltj@@unhbox %% PRIMITIVE
+\let\unhcopy\ltj@@unhcopy %% PRIMITIVE
+
+\directlua{
+  my_a=socket.gettime()
+}
+
+\mycnt=0
+\loop\ifnum\mycnt<100000\relax
+  \leavevmode TEST\par
+  \advance\mycnt by1\relax
+\repeat
+
+\directlua{
+  my_b=socket.gettime()
+}
+\typeout{03> \the\ht\strutbox, \directlua{tex.sprint(my_b-my_a)}}
+
+
+\end{document}
+
