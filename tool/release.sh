@@ -6,34 +6,34 @@ TEMP=/tmp
 
 echo "Making Release $VER. Ctrl-C to cancel."
 read REPLY
-if test -d "$TEMP/$PROJECT-$VER"; then
-  echo "Warning: the directory '$TEMP/$PROJECT-$VER' is found:"
+if test -d "$TEMP/$PROJECT"; then
+  echo "Warning: the directory '$TEMP/$PROJECT' is found:"
   echo
-  ls $TEMP/$PROJECT-$VER
+  ls $TEMP/$PROJECT
   echo
   echo -n "I'm going to remove this directory. Continue? yes/No"
   echo
   read REPLY <&2
   case $REPLY in
-    y*|Y*) rm -rf $TEMP/$PROJECT-$VER;;
+    y*|Y*) rm -rf $TEMP/$PROJECT;;
     *) echo "Aborted."; exit 1;;
   esac
 fi
 echo
 git commit -m "Releases $VER" --allow-empty
-git archive --format=tar --prefix=$PROJECT-$VER/ HEAD | (cd $TEMP && tar xf -)
+git archive --format=tar --prefix=$PROJECT/ HEAD | (cd $TEMP && tar xf -)
 cd $TEMP
-rm -rf $PROJECT-$VER/test
-rm -rf $PROJECT-$VER/src/*.cl*
-rm -rf $PROJECT-$VER/src/ltj-kinsoku.lua
-rm -rf $PROJECT-$VER-orig
-cp -r $PROJECT-$VER $PROJECT-$VER-orig
-cd $PROJECT-$VER
+rm -rf $PROJECT/test
+rm -rf $PROJECT/src/*.cl*
+rm -rf $PROJECT/src/ltj-kinsoku.lua
+rm -rf $PROJECT-orig
+cp -r $PROJECT $PROJECT-orig
+cd $PROJECT
 perl -pi.bak -e "s/\\\$VER\\\$/$VER/g" README
 rm -f README.bak
 cd ..
-diff -urN $PROJECT-$VER-orig $PROJECT-$VER
-tar zcf $DIR/$PROJECT-$VER.tar.gz $PROJECT-$VER
+diff -urN $PROJECTR-orig $PROJECT
+tar zcf $DIR/$PROJECT.tar.gz $PROJECT
 echo
 echo You should execute
 echo
