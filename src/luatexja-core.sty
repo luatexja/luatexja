@@ -228,8 +228,7 @@
   \def\ltj@temp{#1}\afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true,  'yoko')}}
 \newluafunction\ltj@@jfont@inner
 \directlua{
-  local t = lua.get_functions_table()
-  t[\the\ltj@@jfont@inner] = luatexja.jfont.jfontdefY
+  (lua.get_functions_table())[\the\ltj@@jfont@inner] = luatexja.jfont.jfontdefY
 }
 \def\ltj@@jfont{\expandafter\expandafter\expandafter\luafunction\expandafter\ltj@@jfont@inner\ltj@temp}
 
@@ -487,8 +486,7 @@
 }
 \newluafunction\ltj@@getparam@one@inner
 \directlua{
-  local t = lua.get_functions_table()
-  t[\the\ltj@@getparam@one@inner] = luatexja.ext_get_parameter_unary
+  (lua.get_functions_table())[\the\ltj@@getparam@one@inner] = luatexja.ext_get_parameter_unary
 }
 \luadef\ltj@@getparam@one\ltj@@getparam@one@inner
 \def\ltj@@getparam@two#1#2{%
@@ -600,8 +598,7 @@
 \let\ltj@@orig@insert\insert
 \newluafunction\ltj@@lua@populate@insertwhatsit@inner
 \directlua{
-  local t = lua.get_functions_table()
-  t[\the\ltj@@lua@populate@insertwhatsit@inner]
+  (lua.get_functions_table())[\the\ltj@@lua@populate@insertwhatsit@inner]
     = luatexja.direction.populate_insertion_dir_whatsit
 }
 \luadef\ltj@@lua@populate@insertwhatsit\ltj@@lua@populate@insertwhatsit@inner
@@ -673,8 +670,7 @@
 %%%% \raise, \lower, \moveleft, \moveright
 \newluafunction\ltj@@lua@raisebox@inner
 \directlua{
-  local t = lua.get_functions_table()
-  t[\the\ltj@@lua@raisebox@inner]=luatexja.direction.raise_box
+  (lua.get_functions_table())[\the\ltj@@lua@raisebox@inner]=luatexja.direction.raise_box
 }
 \protected\luadef\ltj@@lua@raisebox\ltj@@lua@raisebox@inner
 \let\ltj@@orig@raise\raise
@@ -701,8 +697,12 @@
 \let\moveright\ltj@@moveright %% PRIMITIVE
 
 %%%%\vsplit
+\newluafunction\ltj@@vsplit@inner
+\directlua{
+  (lua.get_functions_table())[\the\ltj@@vsplit@inner]=luatexja.direction.vsplit
+}
 \let\ltj@@orig@vsplit\vsplit
-\protected\def\ltj@@vsplit{\directlua{luatexja.direction.vsplit()}}
+\protected\def\ltj@@vsplit{\luafunction\ltj@@vsplit@inner}
 \let\vsplit\ltj@@vsplit %% PRIMITIVE
 
 %%%% \vcenter
