@@ -201,6 +201,20 @@
 \patchcmd\@outputpage{\reset@font}{\@tombowreset@@paper\reset@font}{}{}
 \patchcmd\@outputpage{\@begindvi}{\@begindvi\@outputtombow}{}{}
 
+%
+\pretocmd\@floatboxreset{\pltx@save@float@dir}{}{}
+\patchcmd\@endfloatbox{\outer@nobreak}{\outer@nobreak\pltx@check@float@dir}{}{}
+\def\pltx@save@float@dir{%
+  \edef\pltx@float@dir@first{\ltjgetparameter{direction}}}
+\def\pltx@check@float@dir{%
+  \ifx\pltx@float@dir@first\@undefined\else
+    \ifnum\ltjgetparameter{direction}=\pltx@float@dir@first\else
+      \pltx@err@float@dir
+    \fi
+  \fi}
+\def\pltx@err@float@dir{%
+  \@latex@error{Direction change inside float!?\MessageBreak
+    Use \noexpand\layoutcaption provided in \string\usepackage{lltjext}}\@ehc}
 %%% Remove extra xkanjiskip
 \renewcommand\@makefnmark{%
   \unless\ifnum\ltjgetparameter{direction}=3
