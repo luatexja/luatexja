@@ -285,12 +285,17 @@ do
       end
    end
 
+   local compress, decompress = gzip.compress, gzip.decompress
    local function save_cache(filename, t)
       local fullpath = savepath .. '/' ..  filename .. '.lua.gz'
       local s = serialize(t, 'return', false, serial_spec)
       if s then
-         gzip.save(fullpath, s, 1)
-         texio.write('log', '(save cache: ' .. fullpath .. ')')
+	 local f = io.open(fullpath, 'wb')
+	 if f then
+	    f:write(compress(s, 31))
+	    texio.write('log', '(save cache: ' .. fullpath .. ')')
+            f:close()
+	 end
          save_cache_luc(filename, t, s)
       end
    end
@@ -302,7 +307,8 @@ do
 	 if isreadable(fn) then
 	    texio.write('log','(load cache: ' .. filename .. ')')
 	    if compressed then
-	      result = loadstring(gzip.load(fn))
+	      local f = io.open(fn, 'rb');  result = f:read'*a'; f:close()
+	      result = loadstring(decompress(result, 31))
 	    else
 	      result = loadfile(fn)
 	    end
