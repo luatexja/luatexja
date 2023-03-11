@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2022-08-20',
+  date = '2023-03-11',
   description = 'Loader for Japanese fonts',
 })
 
@@ -43,7 +43,7 @@ local font_metric_table = ltju.font_metric_table -- [font number] -> jfm_name, j
 
 luatexbase.create_callback("luatexja.load_jfm", "data", function (ft, jn) return ft end)
 
-local jfm_spec, jfm_name, jfm_var, jfm_ksp
+local jfm_spec, jfm_name, jfm_var, jfm_ksp, jfm_pci
 local defjfm_res
 local jfm_dir, is_def_jfont, vert_activated, auto_enable_vrt2
 
@@ -323,7 +323,7 @@ do
       update_jfm_cache(j, f.size); check_callback_order()
       local sz = metrics[j].size_cache[f.size]
       local fmtable = { jfm = j, size = f.size, var = jfm_var,
-                        with_kanjiskip = jfm_ksp,
+                        with_kanjiskip = jfm_ksp, protect_compat_ig = jfm_pci,
                         zw = sz.zw, zh = sz.zh,
                         chars = sz.chars, char_type = sz.char_type,
                         kanjiskip = sz.kanjiskip, xkanjiskip = sz.xkanjiskip,
@@ -451,6 +451,7 @@ do
          -- print('NN>', name)
       end
       jfm_ksp = (is_feature_specified(name,'ltjksp')~=false)
+      jfm_pci = (is_feature_specified(name,'ltjpci')~=false)
       if jfm_dir == 'tate' then
          vert_activated = (is_feature_specified(name,'vert')~=false) and (is_feature_specified(name,'vrt2')~=false)
          auto_enable_vrt2
@@ -623,7 +624,6 @@ function luatexja.jfont.replace_altfont(pf, pc)
    local a = alt_font_table[pf]
    return a and a[pc] or pf
 end
-
 ------ for LaTeX interface
 
 local alt_font_table_latex = {}

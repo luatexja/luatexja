@@ -110,9 +110,6 @@ do
                      setfield(b, 'type', 100); setfield(b, 'user_id', JA_AL_BDD);
                      insert_before(head, p, b)
                   end
-                  local pf = get_attr(p, attr_curjfnt)
-                  pf = (pf and pf>0 and pf) or getfont(p)
-                  setfont(p, ltjf_replace_altfont(pf, pc))
                   setlang(p, lang_ja)
                   ltjs_orig_char_table[p], prev_chartype = pc, 2
                elseif prev_chartype==2 then
@@ -144,6 +141,12 @@ local font_getfont = font.getfont
 local traverse_id = node.direct.traverse_id
 local cnt_stack = luatexbase.registernumber 'ltj@@stack'
 local texget, getvalue = tex.get, node.direct.getdata
+--
+  local compat_ig = {}
+  for i=0xf900, 0xfaff do compat_ig[i] = true end
+  for i=0x2f800, 0x2fa1f do compat_ig[i] = true end
+  local protect_glyph  = node.direct.protect_glyph
+--
 function set_box_stack_level(head, mode)
    local box_set = 0
    if mode then
@@ -160,11 +163,25 @@ function set_box_stack_level(head, mode)
    if ltjs.list_dir == dir_tate then
       for p in traverse_id(id_glyph,to_direct(head)) do
          if has_attr(p, attr_icflag, 0) and getlang(p)==lang_ja then
-            local nf = ltjf_replace_altfont( get_attr(p, attr_curtfnt) or getfont(p) , ltjs_orig_char_table[p])
+            local pf, pc = get_attr(p, attr_curtfnt), ltjs_orig_char_table[p]
+            local nf = ltjf_replace_altfont( (pf and pf>0 and pf) or getfont(p), pc)
             setfont(p, nf)
+            if compat_ig[pc] and ltjf_font_metric_table[nf].protect_compat_ig then
+               protect_glyph(p)
+            end
             if ltjf_font_metric_table[nf].vert_activated then
-               local pc = getchar(p); pc = ltjf_font_metric_table[nf].vform[pc]
-               if pc then setchar(p,  pc) end
+               pc = ltjf_font_metric_table[nf].vform[pc]; if pc then setchar(p,  pc) end
+            end
+         end
+      end
+   else
+      for p in traverse_id(id_glyph,to_direct(head)) do
+         if has_attr(p, attr_icflag, 0) and getlang(p)==lang_ja then
+            local pf, pc = get_attr(p, attr_curjfnt), ltjs_orig_char_table[p]
+            local nf = ltjf_replace_altfont( (pf and pf>0 and pf) or getfont(p), pc)
+            setfont(p, nf)
+            if compat_ig[pc] and ltjf_font_metric_table[nf].protect_compat_ig then
+               protect_glyph(p)
             end
          end
       end
