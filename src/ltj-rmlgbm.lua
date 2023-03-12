@@ -222,7 +222,7 @@ end
 --
 local cidf_vert_processor
 do
-   local traverse_id, is_node = node.direct.traverse_id, node.is_node
+   local traverse_glyph, is_node = node.direct.traverse_glyph, node.is_node
    local to_direct = node.direct.todirect
    local id_glyph = node.id 'glyph'
    local getfont = node.direct.getfont
@@ -235,10 +235,8 @@ do
          if head and luatexja.jfont.font_metric_table[fnum] and luatexja.jfont.font_metric_table[fnum].vert_activated then
             local vt = fontdata.ltj_vert_table
             local nh = is_node(head) and to_direct(head) or head
-            for n in traverse_id(id_glyph, head) do
-               if getfont(n)==fnum then
-                 local c = getchar(n); setchar(n, vt[c] or c)
-               end
+            for n, f, c in traverse_glyph(head) do
+               if f==fnum then setchar(n, vt[c] or c) end
             end
             return head, false
          end

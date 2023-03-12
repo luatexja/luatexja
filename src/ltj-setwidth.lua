@@ -33,7 +33,6 @@ local setheight = node.direct.setheight
 local setdepth = node.direct.setdepth
 local setlist = node.direct.setlist
 
-local node_traverse_id = node.direct.traverse_id
 local node_traverse = node.direct.traverse
 local node_copy = node.direct.copy
 local node_remove = node.direct.remove
@@ -281,8 +280,7 @@ end
 
 -- 数式の位置補正
 function luatexja.setwidth.apply_ashift_math(head, last, attr_ablshift)
-   for p in node_traverse(head) do
-      local pid = getid(p)
+   for p, pid in node_traverse(head) do
       if p==last then
          return
       elseif (get_attr(p, attr_icflag) or 0) ~= PROCESSED then
@@ -309,11 +307,12 @@ do
    local attr_tablshift = luatexbase.attributes['ltj@tablshift']
    local attr_ablshift
    local disc, tex_dir
+   local traverse_glyph = node.direct.traverse_glyph
    local function ashift_disc_inner(field)
       local head = getfield(disc, field)
       if not head then return end
       local y_adjust, node_depth, adj_depth = 0, 0, 0
-      for lp in node_traverse_id(id_glyph, head) do
+      for lp in traverse_glyph(head) do
          y_adjust = get_attr(lp,attr_ablshift) or 0
          local ld = getdepth(lp)
          node_depth = max(ld + min(y_adjust, 0), node_depth)

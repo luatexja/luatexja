@@ -620,9 +620,22 @@ function luatexja.jfont.clear_alt_font(bfnt)
 end
 
 ------ used in ltjp.suppress_hyphenate_ja callback
-function luatexja.jfont.replace_altfont(pf, pc)
-   local a = alt_font_table[pf]
-   return a and a[pc] or pf
+do
+   local compat_ig = {}
+   for i=0xf900, 0xfaff do compat_ig[i] = true end
+   for i=0x2f800, 0x2fa1f do compat_ig[i] = true end
+   local protect_glyph  = node.direct.protect_glyph
+--
+   local getfont, setfont = node.direct.getfont, node.direct.setfont
+   function luatexja.jfont.replace_altfont(a, pc, p)
+      local pf = get_attr(p, a); pf = (pf and pf>0 and pf) or getfont(p) 
+      local af = alt_font_table[pf]
+      pf = af and af[pc] or pf; setfont(p, pf)
+      if compat_ig[pc] and font_metric_table[pf].protect_compat_ig then
+         protect_glyph(p)
+      end
+      return pf
+   end
 end
 ------ for LaTeX interface
 

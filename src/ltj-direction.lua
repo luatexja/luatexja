@@ -1008,8 +1008,8 @@ do
                local n = h; h = node_remove(h,h)
                node_free(n)
          end
-         for box_rule in traverse(h) do
-            if getid(box_rule)<id_rule then
+         for box_rule, bi in traverse(h) do
+            if bi<id_rule then
                h = insert_before(h, box_rule, dir_pool[list_dir]())
             end
          end
@@ -1129,8 +1129,7 @@ do
    tex.setattribute(attr_dir, 0)
 
    finalize_inner = function (box)
-      for n in traverse(getlist(box)) do
-         local nid = getid(n)
+      for n, nid in traverse(getlist(box)) do
          if (nid==id_hlist or nid==id_vlist) then
             local ndir = get_box_dir(n, dir_yoko)
             if ndir>=dir_node_auto then -- n is dir_node
