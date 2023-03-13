@@ -235,8 +235,9 @@ do
          if head and luatexja.jfont.font_metric_table[fnum] and luatexja.jfont.font_metric_table[fnum].vert_activated then
             local vt = fontdata.ltj_vert_table
             local nh = is_node(head) and to_direct(head) or head
-            for n, f, c in traverse_glyph(head) do
-               if f==fnum then setchar(n, vt[c] or c) end
+            for n in traverse_glyph(head) do
+               local c = getchar(n)
+               if getfont(n)==fnum then setchar(n, vt[c] or c) end
             end
             return head, false
          end
