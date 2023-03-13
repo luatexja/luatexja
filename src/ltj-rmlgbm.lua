@@ -3,9 +3,19 @@
 --
 luatexja.load_module 'base';      local ltjb = luatexja.base
 
+local get_modtime
+do
+   local find_file = kpse.find_file
+   local lfs = require"lfs"
+   local file_attributes = lfs.attributes
+   get_modtime = function (f)
+      f = f and find_file(f, 'cmap files')
+      return f and file_attributes(f, 'modification')
+   end
+end
 local cidfont_data = {}
 local cache_chars = {}
-local cache_ver = 11
+local cache_ver = 12
 local identifiers = fonts.hashes.identifiers
 
 local cid_reg, cid_order, cid_supp, cid_name
@@ -213,7 +223,11 @@ do
         k.characters[46].width = math.floor(655360/14);
       end
       ltjb.save_cache("ltj-cid-auto-" .. string.lower(cid_name),
-                      {version = cache_ver, k})
+        {version = cache_ver,
+         cid2ucs_modtime = get_modtime(cid_name .. '-UCS2'),
+         ucs2cid = kx[1],
+         ucs2cid_modtime = get_modtime(kx[1]..'-H'),
+         k})
       k.shared.rawdata.resources=k.resources
       k.shared.rawdata.descriptions=k.descriptions
    end
@@ -248,7 +262,11 @@ end
 local dummy_vht, dummy_vorg = {}, {}
 setmetatable(dummy_vht, {__index = function () return 1 end } )
 setmetatable(dummy_vorg, {__index = function () return 0.88 end } )
-local function cid_cache_outdated(t) return t.version~=cache_ver end
+local function cid_cache_outdated(t)
+  return (t.version~=cache_ver)
+    or (t.cid2ucs_modtime ~= get_modtime(cid_name .. '-UCS2'))
+    or (t.ucs2cid_modtime ~= get_modtime(t.ucs2cid .. '-H'))
+end
 local function read_cid_font()
    local dat = ltjb.load_cache("ltj-cid-auto-" .. string.lower(cid_name),
                                cid_cache_outdated)
