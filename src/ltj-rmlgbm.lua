@@ -224,8 +224,8 @@ do
       end
       ltjb.save_cache("ltj-cid-auto-" .. string.lower(cid_name),
         {version = cache_ver,
-         cid2ucs_modtime = get_modtime(cid_name .. '-UCS2'),
-         ucs2cid = kx[1],
+         cid2ucs_modtime = get_modtime(cid_name..'-UCS2'),
+         ucs2cid = kx[1]..'-H',
          ucs2cid_modtime = get_modtime(kx[1]..'-H'),
          k})
       k.shared.rawdata.resources=k.resources
@@ -264,8 +264,8 @@ setmetatable(dummy_vht, {__index = function () return 1 end } )
 setmetatable(dummy_vorg, {__index = function () return 0.88 end } )
 local function cid_cache_outdated(t)
   return (t.version~=cache_ver)
-    or (t.cid2ucs_modtime ~= get_modtime(cid_name .. '-UCS2'))
-    or (t.ucs2cid_modtime ~= get_modtime(t.ucs2cid .. '-H'))
+    or (t.cid2ucs_modtime ~= get_modtime(cid_name..'-UCS2'))
+    or (t.ucs2cid_modtime ~= get_modtime(t.ucs2cid))
 end
 local function read_cid_font()
    local dat = ltjb.load_cache("ltj-cid-auto-" .. string.lower(cid_name),
