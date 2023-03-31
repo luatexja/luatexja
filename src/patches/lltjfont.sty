@@ -1433,4 +1433,18 @@
   \ltj@@getjfontnumber#1%
   \directlua{luatexja.jfont.pickup_alt_font_b(\the\ltj@tempcntc,'\luatexluaescapestring{#2}')}%
 }
+
+%%%% send \input@path data to lua
+\def\ltj@@convert@input@path@to@lua{%
+  \ltj@@cipath@clear
+  \ifdefined\input@path
+    \@tfor\ltj@temp:=\input@path\do{\ltj@@cipath@add{\ltj@temp}}%
+  \fi
+}
+\newluafunction\ltj@@cipath@clear@inner
+\directlua{
+  (lua.get_functions_table())[\the\ltj@@cipath@clear@inner] = luatexja.input_path_clear
+}
+\protected\luadef\ltj@@cipath@clear\ltj@@cipath@clear@inner
+\def\ltj@@cipath@add#1{\directlua{luatexja.input_path_add('\luatexluaescapestring#1')}}
 \endinput

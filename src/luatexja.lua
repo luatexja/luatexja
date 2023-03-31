@@ -1,14 +1,23 @@
 require 'lualibs'
 ------------------------------------------------------------------------
-local function load_lua(fn)
-   local found = kpse.find_file(fn, 'tex')
-   if not found then
-      tex.error("LuaTeX-ja error: File `" .. fn .. "' not found")
-   else
-      texio.write_nl('(' .. found .. ')'); dofile(found)
-   end
+do
+    local ipath = {}
+    function luatexja.input_path_clear() for i in ipairs(ipath) do ipath[i]=nil end end
+    function luatexja.input_path_add(s) ipath[#ipath+1]=s end
+    function luatexja.load_lua(fn)
+        local found = kpse.find_file(fn, 'tex')
+        if not found then
+            for _,v in ipairs(ipath) do
+                found = kpse.find_file(v .. fn, 'tex'); if found then break end
+            end
+        end
+        if not found then
+            tex.error("LuaTeX-ja error: File `" .. fn .. "' not found")
+        else
+            texio.write_nl('(' .. found .. ')'); dofile(found)
+        end
+    end
 end
-luatexja.load_lua = load_lua
 function luatexja.load_module(name) require('ltj-' .. name.. '.lua') end
 
 do

@@ -221,11 +221,15 @@
 \luadef\ltj@@start@time@measure\ltj@@start@time@measure@inner
 \luadef\ltj@@stop@time@measure\ltj@@stop@time@measure@inner
 
+\let\ltj@@convert@input@path@to@lua\relax % defined in LaTeX only (ltj-latex.sty)
+
 %%%%%%%% \jfont\CS={...:...;jfm=metric;...}, \globaljfont
 \protected\def\jfont#1{%
-  \def\ltj@temp{#1}\afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false, 'yoko')}}
+  \ltj@@convert@input@path@to@lua\def\ltj@temp{#1}%
+  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false, 'yoko')}}
 \protected\def\globaljfont#1{%
-  \def\ltj@temp{#1}\afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true,  'yoko')}}
+  \ltj@@convert@input@path@to@lua\def\ltj@temp{#1}%
+  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true,  'yoko')}}
 \newluafunction\ltj@@jfont@inner
 \directlua{
   (lua.get_functions_table())[\the\ltj@@jfont@inner] = luatexja.jfont.jfontdefY
@@ -234,9 +238,11 @@
 
 %%%%%%%% \tfont\CS={...:...;jfm=metric;...}, \globaltfont
 \protected\def\tfont#1{%
-  \def\ltj@temp{#1}\afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false, 'tate')}}
+  \ltj@@convert@input@path@to@lua\def\ltj@temp{#1}%
+  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(false, 'tate')}}
 \protected\def\globaltfont#1{%
-  \def\ltj@temp{#1}\afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true,  'tate')}}
+  \ltj@@convert@input@path@to@lua\def\ltj@temp{#1}%
+  \afterassignment\ltj@@jfont\directlua{luatexja.jfont.jfontdefX(true,  'tate')}}
 
 %%%%%%%% \zw, \zh
 \newluafunction\ltj@zw@inner
