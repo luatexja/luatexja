@@ -397,20 +397,31 @@ do
     local jf_field          = C(jf_field_char^1)
     local jf_assignment     = jf_field * ws * equals * ws * jf_field
     local jf_switch         = P'-' * jf_field * Cc(false) + P'+'^-1 * jf_field * Cc(true)
-    local jf_feature_expr   = Cg(jf_assignment + jf_switch) * ws * comma^0 * ws
+    local jf_feature_expr   =
+        P{
+             'FE',
+             FE = Cg(V'AT'+ jf_assignment + jf_switch) * ws * comma^0 * ws,
+             AT = jf_field * ws * equals * ws * Cf(Ct'' * P'{' * ws * (V'FE')^0 * P'}', rawset),
+        }
     local jf_feature_list   = ws * ( P'{' * ws * jf_feature_expr^0 * P'}' + jf_feature_expr^0 )
     local jf_list           = C((1-slash)^1) * (slash * Cf(Ct'' * jf_feature_list, rawset))^-1
     local jf_value          = (1 - semicolon)^1
+    local norm
+    norm = function (t)
+      local flag
+      if type(t)=='table' then
+        for i,v in pairs(t) do
+          flag=true
+          if v=='true' then t[i]=true elseif v=='false' then t[i]=false
+          elseif type(v)=='table' then norm(v) end
+        end
+        return flag and t
+      end
+    end
     local function rem(name,value)
       if name=='jfm' then
-        local flag, t; jfm_name, t = lpegmatch(jf_list, value)
-        if type(t)=='table' then
-          for i,v in pairs(t) do
-            flag=true
-            if v=='true' then t[i]=true elseif v=='false' then t[i]=false end
-            end
-        end
-        luatexja.jfont.jfm_feature = flag and t
+        local t; jfm_name, t = lpegmatch(jf_list, value)
+        luatexja.jfont.jfm_feature = norm(t)
       elseif name=='jfmvar' then jfm_var = value end
       return ''
     end

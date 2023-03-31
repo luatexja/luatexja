@@ -40,6 +40,7 @@
 
 {\testOA \testF
   A quick brown fox 跳』\inhibitglue （躍）（した：） over the のろ……まな 犬．
+  
   A quick fox 跳』\inhibitglue （躍）（した：） over the のろ……まな 犬．ああああああ
 
 }
@@ -47,22 +48,30 @@
 \def\printjfmfeat#1{%
   \relax{\tentt\string#1}: 
   \directlua{%
-    if myjfm then
-    for i,v in pairs(myjfm) do
-      tex.sprint('[{\string\\tentt ' .. i .. '}]${}={}$')
-      if type(v)=='string' then
-        tex.sprint('``{\string\\tentt ' .. tostring(v) .. "}'', ")
-      else
-        tex.sprint(tostring(v) ..', ')
+    local fn
+    fn = function (t) 
+      for i,v in pairs(t) do
+        tex.sprint('[{\string\\tentt ' .. i .. '}]${}={}$')
+        if type(v)=='string' then
+          tex.sprint('``{\string\\tentt ' .. tostring(v) .. "}'', ")
+        elseif type(v)=='table' then
+          tex.sprint('$\string\\{$'); fn(v); tex.sprint('$\string\\}$, ')
+        else
+          tex.sprint(tostring(v) ..', ')
+        end
       end
     end
-    else tex.sprint('(nil)')
-    end
+    if myjfm then fn(myjfm) else tex.sprint('(nil)')  end
   }\par
 }
 
-\jfont\testP="KozMinPr6N-Regular:jfm=ujis/h,-p,l=g,z=true;jfm=testf/ -so , lw = tr ,q,-d,-po, l=f,z=h,e, hwid;trad"  at 9pt
+\jfont\testP=KozMinPr6N-Regular:jfm=ujis/h,-p,l=g,z=true;jfm=testf/q,-d,l=f,z=h,e,hwid;trad  at 9pt
 \printjfmfeat\testP
 \testP イ医学
 
+\jfont\testQ=KozMinPr6N-Regular:jfm=testf/{+w,h={+a,-b,c=true,u=x,t={s,a}},-o,d={}};trad  at 9pt
+\printjfmfeat\testQ
+
+\jfont\testR=KozMinPr6N-Regular:jfm=testf/{};trad  at 9pt
+\printjfmfeat\testR
 \bye
