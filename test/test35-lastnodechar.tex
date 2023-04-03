@@ -22,10 +22,9 @@
 \setbox0=\hbox{\tate 、%
   \unskip
   \count255=\lastnodechar
-  \immediate\write16{\the\count255}}% -> 12290
-\directlua{luatexja.ext_show_node(tex.getbox(0), '> ', texio.write_nl)}
+  \immediate\write16{\the\count255}}% -> 12289
 \setbox0=\hbox{\tate\unhbox0
   \count255=\lastnodechar
-  \immediate\write16{\the\count255}}% -> -1
+  \immediate\write16{\the\count255}}% -> 65041 (LuaTeX-ja), 12289 (e-upTeX)
 
 \bye
