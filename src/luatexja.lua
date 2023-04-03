@@ -1,22 +1,22 @@
 require 'lualibs'
 ------------------------------------------------------------------------
 do
-    local ipath = {}
-    function luatexja.input_path_clear() for i in ipairs(ipath) do ipath[i]=nil end end
-    function luatexja.input_path_add(s) ipath[#ipath+1]=s end
-    function luatexja.load_lua(fn)
-        local found = kpse.find_file(fn, 'tex')
-        if not found then
-            for _,v in ipairs(ipath) do
-                found = kpse.find_file(v .. fn, 'tex'); if found then break end
-            end
-        end
-        if not found then
-            tex.error("LuaTeX-ja error: File `" .. fn .. "' not found")
-        else
-            texio.write_nl('(' .. found .. ')'); dofile(found)
-        end
+  local ipath = {}
+  function luatexja.input_path_clear() for i in ipairs(ipath) do ipath[i]=nil end end
+  function luatexja.input_path_add(s) ipath[#ipath+1]=s end
+  function luatexja.load_lua(fn)
+    local found = kpse.find_file(fn, 'tex')
+    if not found then
+      for _,v in ipairs(ipath) do
+        found = kpse.find_file(v .. fn, 'tex'); if found then break end
+      end
     end
+    if not found then
+      tex.error("LuaTeX-ja error: File `" .. fn .. "' not found")
+    else
+      texio.write_nl('(' .. found .. ')'); dofile(found)
+    end
+  end
 end
 function luatexja.load_module(name) require('ltj-' .. name.. '.lua') end
 
@@ -109,9 +109,9 @@ dir_table.dir_utod = dir_table.dir_tate + dir_table.dir_math_mod
 local load_module = luatexja.load_module
 load_module 'base';      local ltjb = luatexja.base
 if tex.outputmode==0 then
-    ltjb.package_error('luatexja',
-      'DVI output is not supported in LuaTeX-ja',
-      'Use lua*tex instead dvilua*tex.')
+  ltjb.package_error('luatexja',
+    'DVI output is not supported in LuaTeX-ja',
+    'Use lua*tex instead dvilua*tex.')
 end
 load_module 'rmlgbm';    local ltjr = luatexja.rmlgbm -- must be 1st
 if luatexja_debug then load_module 'debug' end
@@ -359,21 +359,28 @@ end
 
 -- lastnodechar
 do
-   local getnest = tex.getnest
-   local id_glyph = node.id 'glyph'
-   function luatexja.pltx_composite_last_node_char()
-      local n = getnest().tail
-      local r = '-1'
-      if n then
-         if n.id==id_glyph then
-            while n.components and  n.subtype and n.subtype%4 >= 2 do
-               n = node.tail(n)
-            end
-            r = tostring(n.char)
-         end
+  local get_attr, traverse_glyph = node.get_attribute, node.traverse_glyph
+  local getnest = tex.getnest
+  local id_hlist = node.id 'hlist'
+  local id_glyph = node.id 'glyph'
+  local PACKED, PROCESSED_BEGIN_FLAG = icflag_table.PACKED, icflag_table.PROCESSED_BEGIN_FLAG
+  function luatexja.pltx_composite_last_node_char()
+    local n = getnest().tail
+    local r = '-1'
+    if n then
+      if n.id==id_hlist
+        and (get_attr(n, attr_icflag) or 0) % PROCESSED_BEGIN_FLAG == PACKED then
+        for i in traverse_glyph(n.head) do n = i; break end
       end
-      tex.sprint(-2, r)
-   end
+      if n.id==id_glyph then
+        while n.components and  n.subtype and n.subtype%4 >= 2 do
+          n = node.tail(n)
+        end
+        r = tostring(n.char)
+      end
+    end
+  tex.sprint(-2, r)
+  end
 end
 
 do
@@ -589,24 +596,24 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
    p=node_next(p)
 end
 function luatexja.ext_show_node_list(head,depth,print_fn, lim)
-   prefix = depth
-   inner_depth = 0
-   if head then
-      while head do
-         debug_show_node_X(head, print_fn, lim or 1/0, inner_depth); head = node_next(head)
-      end
-   else
-      print_fn(prefix .. ' (null list)')
-   end
+  prefix = depth
+  inner_depth = 0
+  if head then
+    while head do
+      debug_show_node_X(head, print_fn, lim or 1/0, inner_depth); head = node_next(head)
+    end
+  else
+    print_fn(prefix .. ' (null list)')
+  end
 end
 function luatexja.ext_show_node(head,depth,print_fn, lim)
-   prefix = depth
-   inner_depth = 0
-   if head then
-      debug_show_node_X(head, print_fn, lim or 1/0, inner_depth)
-   else
-      print_fn(prefix .. ' (null list)')
-   end
+  prefix = depth
+  inner_depth = 0
+  if head then
+    debug_show_node_X(head, print_fn, lim or 1/0, inner_depth)
+  else
+    print_fn(prefix .. ' (null list)')
+  end
 end
 
 end

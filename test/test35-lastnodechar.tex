@@ -1,0 +1,31 @@
+ %#!luatex or euptex
+
+\ifx\directlua\undefined\else
+  \input luatexja.sty
+  \def\lastnodechar{\numexpr\directlua{luatexja.pltx_composite_last_node_char()}}
+\fi
+
+\setbox0=\hbox{あ
+  \count255=\lastnodechar
+  \immediate\write16{\the\count255}}% -> 12354
+\setbox0=\hbox{\unhbox0
+  \count255=\lastnodechar
+  \immediate\write16{\the\count255}}% -> 12354
+\setbox0=\hbox{。
+  \unskip
+  \count255=\lastnodechar
+  \immediate\write16{\the\count255}}% -> 12290
+\setbox0=\hbox{\unhbox0
+  \count255=\lastnodechar
+  \immediate\write16{\the\count255}}% -> -1
+
+\setbox0=\hbox{\tate 、%
+  \unskip
+  \count255=\lastnodechar
+  \immediate\write16{\the\count255}}% -> 12290
+\directlua{luatexja.ext_show_node(tex.getbox(0), '> ', texio.write_nl)}
+\setbox0=\hbox{\tate\unhbox0
+  \count255=\lastnodechar
+  \immediate\write16{\the\count255}}% -> -1
+
+\bye
