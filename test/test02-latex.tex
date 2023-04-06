@@ -82,6 +82,23 @@ TT {\ttfamily (\f@family, \k@family) XYZかきく}\verb+あいうABC+\par
 
 {\fontfamily{gt}\fontseries{x}\selectfont あいう}
 
+
+\makeatletter
+\def\input@path{}
+%\tracingall
+\jfont\a=HaranoAjiMincho-Regular.otf:jfm=test_01
+
+\def\input@path{{speed/}}
+\jfont\a=HaranoAjiMincho-Light.otf:jfm=test_01
+\jfont\az=HaranoAjiMincho-Light.otf:jfm=test_02
+
+\def\input@path{{speed/}{zh/}}
+\jfont\aw=HaranoAjiMincho-Bold.otf:jfm=test_01
+\jfont\as=HaranoAjiGothic-Bold.otf:jfm=test_02
+
+\def\input@path{}
+\jfont\ar=HaranoAjiMincho-Medium.otf:jfm=test_01
+\jfont\af=HaranoAjiMincho-Medium.otf:jfm=test_02
 \end{document}
 
 \paragraph{italic correction inserted by {\tt\char92text...}}\

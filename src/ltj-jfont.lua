@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2023-03-11',
+  date = '2023-04-06',
   description = 'Loader for Japanese fonts',
 })
 
@@ -288,7 +288,7 @@ do
          jfm_name, jfm_spec = 'ujis', 'ujis'
       end
       for j,v in ipairs(metrics) do if v.name==jfm_spec then return j end end
-      luatexja.load_lua('jfm-' .. jfm_name .. '.lua')
+      defjfm_res=nil; luatexja.load_lua('jfm-' .. jfm_name .. '.lua')
       if defjfm_res then
          defjfm_res.name = jfm_spec; table.insert(metrics, defjfm_res)
          return #metrics
