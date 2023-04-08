@@ -3526,7 +3526,10 @@ causes a error.  We denote control sequences which are defined in
 %<*en>
 \begin{description}
 \item[\meta{JFM name}]
-  The name of a (horizontal) JFM. \LuaTeX-ja searches and loads \texttt{jfm-\meta{JFM name}.lua}.
+  The name of a (horizontal) JFM. \LuaTeX-ja searches and loads \texttt{jfm-\meta{JFM name}.lua}
+  \footnote{When \LuaTeX-ja (version~20230409 or later)
+    is used under \LaTeXe, \LuaTeX-ja searches a JFM also in directories
+    which are specified in \cs{input@path}.}.
 \item[\meta{JFM features}]
   An optional comma-separated list of JFM options.
   Enclosing braces (\verb+{}+) are optional, but this does not escape any characters.
@@ -3552,7 +3555,9 @@ because their \meta{identifier} are different.
 %<*ja>
 \begin{description}
 \item[\meta{JFM name}]
-  （横組用）JFMの名称．\LuaTeX-jaは\texttt{jfm-\meta{JFM name}.lua}というファイルを探索して読み込む．
+  （横組用）JFMの名称．\LuaTeX-jaは\texttt{jfm-\meta{JFM name}.lua}というファイルを探索して読み込む
+  \footnote{\LuaTeX-ja 20230409.0以降では，\LaTeXe 下で読み込まれた場合には
+    \cs{input@path}で指定された箇所も加えてJFMを探索する．}．
 \item[\meta{JFM features}]
   省略可能なコンマ区切りリスト．全体を囲む \verb+{}+ は省略可能であるが，
   囲ったからといって\meta{JFM features}の中で使用可能な文字が増えるわけではない．
