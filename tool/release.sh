@@ -33,7 +33,7 @@ perl -pi.bak -e "s/\\\$VER\\\$/$VER/g" README
 rm -f README.bak
 cd ..
 diff -urN $PROJECT-orig $PROJECT
-tar zcf $DIR/$PROJECT.tar.gz $PROJECT
+tar zcf $DIR/$PROJECT-$VER.tar.gz $PROJECT
 echo
 echo You should execute
 echo
