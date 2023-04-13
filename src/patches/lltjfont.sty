@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2023-04-06 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2023-04-13 Patch to NFSS2 for LuaTeX-ja]
 
 %%%%%%%% LaTeX2e version detection
 \newcount\ltj@@latex@plv \ltj@@latex@plv=-1
@@ -1316,12 +1316,12 @@
 }
 \luadef\ltj@@jfont@@jfmonly  \ltj@@jfont@@jfmonly@@inner
 \def\extract@jfont@onlyjfm{%
-  \get@external@font
+  \get@external@font\ltj@@convert@input@path@to@lua
   \csxdef{ltj@@fontjfm/\expandafter\string\font@name}{%
     \ltj@@jfont@@jfmonly{\external@font}{yoko}%
 }}
 \def\extract@tfont@onlyjfm{%
-  \get@external@font
+  \get@external@font\ltj@@convert@input@path@to@lua
   \csxdef{ltj@@fontjfm/\expandafter\string\font@name}{%
     \ltj@@jfont@@jfmonly{\external@font}{tate}%
 }}
