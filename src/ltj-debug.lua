@@ -86,10 +86,9 @@ end
 ltjdbg.pformat = pformat
 
 -------------------- 所要時間合計
-require("socket")
 do
    local max = math.max
-   local gettime = socket.gettime
+   local gettime = os.socketgettime or (socket and socket.gettime)
    local time_stat = {}
    local function start_time_measure(n)
       if not time_stat[n] then

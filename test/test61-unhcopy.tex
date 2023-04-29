@@ -11,7 +11,9 @@
 %%% \expandafter...\relax
 
 \directlua{
-  socket=require'socket'
+  if not socket then
+    socket = socket or {}; socket.gettime = os.socketgettime
+  end
   my_a=socket.gettime()
 }
 

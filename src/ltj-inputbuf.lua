@@ -57,7 +57,6 @@ end
 end
 --- the following function is modified from jafontspec.lua (by K. Maeda).
 --- Instead of "%", we use U+FFFFF for suppressing spaces.
---DEBUG require"socket"
 local time_line = 0
 local start_time_measure, stop_time_measure
    = ltjb.start_time_measure, ltjb.stop_time_measure
