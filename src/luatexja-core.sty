@@ -61,12 +61,23 @@
 \expandafter\ifx\csname RequirePackage\endcsname\relax %<*!LaTeX>
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iffalse\endcsname
+  \endlinechar=13 %
+  \input infwarerr.sty
+  \endlinechar=-1 %
 \else                           %<*LaTeX>
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
   \ProvidesPackage{luatexja-core}[2023-04-06 Core of LuaTeX-ja]
+  \endlinechar=13 %
+  \RequirePackage{infwarerr}
+  \endlinechar=-1 %
 \fi                             %</LaTeX>
+
+%% Check if LuaTeX is used
+\expandafter\ifx\csname directlua\endcsname\relax
+  \@PackageError{luatexja-core}{This package requires Lua(HB)(La)TeX}{}
+\expandafter\endinput\fi\relax
 
 %% Load prerequisite packages.
 \endlinechar=13 %
@@ -89,12 +100,7 @@
 \fi                             %</LaTeX>
 \endlinechar=-1 %
 
-%% Check if LuaTeX is used
-\ltx@LocalExpandAfter\ifx\csname directlua\endcsname\relax
-  % Loading is silently aborted, since the notice of the wrong
-  % engine is already shown in luaotfload.
-  \ltj@core@AtEnd
-\expandafter\endinput\fi\relax
+\directlua{require('ltj-unicode-ccfix.lua')}% catcode of ideographs
 
 %% Check LuaTeX version.
 \ifnum\luatexversion<110
