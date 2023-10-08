@@ -424,7 +424,8 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
    local k = prefix
    local s
    local pt, pic = node_type(p.id), (get_attr(p, attr_icflag) or 0) % icflag_table.PROCESSED_BEGIN_FLAG
-   local base = prefix .. string.format('%X', pic) .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
+   local base = prefix .. '[' .. string.format('%7d', node.direct.todirect(p)) .. '] ' ..
+     string.format('%X', pic) .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
    if pt == 'glyph' then
       s = base .. ' '
           .. (p.char<0xF0000 and utfchar(p.char) or '')
@@ -531,7 +532,7 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
          local t = tostring(p.user_id) .. ' (' ..
             luatexbase.get_user_whatsit_name(p.user_id) .. ') '
          if p.type ~= 110 then
-            s = s .. ' userid:' .. t .. p.value
+            s = s .. ' userid:' .. t .. tostring(p.value)
             print_fn(s)
          else
             s = s .. ' userid:' .. t .. '(node list)'

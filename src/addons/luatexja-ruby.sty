@@ -4,7 +4,7 @@
 
 % LaTeX only!
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-ruby}[2023-01-21 v0.61]
+\ProvidesPackage{luatexja-ruby}[2023-10-08 v0.62]
 \RequirePackage{luatexja}
 
 %%------------------
@@ -197,7 +197,7 @@
   \directlua{luatexja.ruby.read_old_break_info()}%
 }
 \protected\def\ltj@@ruby[#1]#2#3{{% #1: option #2: 親文字群，#3: ルビ文字列群，共に| 区切り
-  \setkeys[ltj]{ruby}{#1}%
+  \leavevmode\setkeys[ltj]{ruby}{#1}%
   \directlua{luatexja.ruby.ruby_tmplist_r = \string{\string};
 	luatexja.ruby.ruby_tmplist_p = \string{\string}}%
   \leavevmode\dimen0=\f@size pt\dimen1=\ltj@@rubyip@size\dimen0%
@@ -222,7 +222,7 @@
 
 \protected\def\ltjkenten{\@ifnextchar[\ltj@@kenten{\ltj@@kenten[]}}%]
 \def\ltj@@kenten[#1]#2{{%
-  \setkeys[ltj]{ruby}{#1, stretchruby=101}%
+  \leavevmode\setkeys[ltj]{ruby}{#1, stretchruby=101}%
   \@tfor\ltj@@kenten@temp:=#2\do{\ltj@@ruby[]{\ltj@@kenten@temp}{\ltj@@rubyip@kenten}}%
 }}
 
