@@ -15,7 +15,7 @@ do
 end
 local cidfont_data = {}
 local cache_chars = {}
-local cache_ver = 12
+local cache_ver = 13
 local identifiers = fonts.hashes.identifiers
 
 local cid_reg, cid_order, cid_supp, cid_name
@@ -38,7 +38,7 @@ local cid_replace = {
                              return 327680 -- 655360/2
                           end
                        end},
-   ["Adobe-GB1"]    = {"UniGB-UTF32",  30283, 5,
+   ["Adobe-GB1"]    = {"UniGB-UTF32",  30571, 6,
                        function (i)
                           if (814<=i and i<=939) or (i==7716)
                              or (22355<=i and i<=22357) then
