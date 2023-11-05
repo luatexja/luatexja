@@ -64,6 +64,7 @@ local attr_icflag = luatexbase.attributes['ltj@icflag']
 local attr_vert_ori = luatexbase.attributes['ltj@vert@ori']
 
 local ltjf_font_extra_info = ltjf.font_extra_info
+local ltjs_orig_char_table = ltjs.orig_char_table
 
 local PACKED       = luatexja.icflag_table.PACKED
 local PROCESSED    = luatexja.icflag_table.PROCESSED
@@ -191,7 +192,8 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
       local feir = ltjf_font_extra_info[pf]
       if met.rotation and met.vert_activated then
           local f = font_getfont(pf)
-          local r, l = met.rotation[pc], f.properties and f.properties.language
+          local pco = ltjs_orig_char_table[p] or pc
+          local r, l = (pco==pc) and met.rotation[pc], f.properties and f.properties.language
           if ((r==true) or (type(r)=="table" and not r[l])) and (get_attr(p, attr_vert_ori) or 0)<=0 then
             return capsule_glyph_tate_rot(p, met, char_data, head, dir,
               0.5*(get_ascender(pf)-get_descender(pf)))
