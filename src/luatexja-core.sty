@@ -546,7 +546,7 @@
   \ltj@reset@globaldefs
   \begingroup\ltj@curjfnt\m@ne\ltj@curtfnt\m@ne\relax
   #1\directlua{luatexja.__temp = -(\the\ltj@curjfnt)*(\the\ltj@curtfnt)}\endgroup
-  \ltj@tempcntc=\directlua{tex.sprint(luatexja.__temp)}\relax
+  \ltj@tempcntc=\directlua{tex.sprint(-2,luatexja.__temp)}\relax
   \ifnum\ltj@tempcntc=\m@ne
     \@PackageError{luatexja-core}%
     {\string#1 is not a control sequence that represents \MessageBreak
