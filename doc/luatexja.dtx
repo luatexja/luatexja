@@ -596,21 +596,21 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %<ja>\paragraph{プロジェクトWiki} プロジェクトWikiは構築中である．
 %<*en>
 \begin{itemize}
-\item \url{https://osdn.jp/projects/luatex-ja/wiki/FrontPage%28en%29} (English)
-\item \url{https://osdn.jp/projects/luatex-ja/wiki/FrontPage} (Japanese)
-\item \url{https://osdn.jp/projects/luatex-ja/wiki/FrontPage%28zh%29} (Chinese)
+\item \url{https://github.com/luatexja/luatexja/wiki/Home(en)} (English)
+\item \url{https://github.com/luatexja/luatexja/wiki} (Japanese)
+\item \url{https://github.com/luatexja/luatexja/wiki/Home(zh)} (Chinese)
 \end{itemize}
 %</en>
 %<*ja>
 \begin{itemize}
-\item \url{https://osdn.jp/projects/luatex-ja/wiki/FrontPage}（日本語）
-\item \url{https://osdn.jp/projects/luatex-ja/wiki/FrontPage%28en%29}（英語）
-\item \url{https://osdn.jp/projects/luatex-ja/wiki/FrontPage%28zh%29}（中国語）
+\item \url{https://github.com/luatexja/luatexja/wiki}（日本語）
+\item \url{https://github.com/luatexja/luatexja/wiki/Home(en)}（英語）
+\item \url{https://github.com/luatexja/luatexja/wiki/Home(zh)}（中国語）
 \end{itemize}
 %</ja>
 
-%<en>This project is hosted by OSDN.
-%<ja>本プロジェクトはOSDNのサービスを用いて運営されている．
+%<en>This project is hosted by GitHub.
+%<ja>本プロジェクトはGitHubのサービスを用いて運営されている．
 
 %<en>\paragraph{Members}\
 %<ja>\clearpage\paragraph{開発メンバー}\
@@ -724,11 +724,11 @@ by specifying \texttt{Renderer=Harfbuzz}~etc.\ (\Pkg{fontspec}) or~{mode=harf} (
 \begin{itemize}
 \item Clone the Git repository by
 \begin{lstlisting}
-$ git clone git://git.osdn.jp/gitroot/luatex-ja/luatexja.git
+$ git clone https://github.com/luatexja/luatexja.git
 \end{lstlisting}
-\item Download the \texttt{tar.gz} archive of HEAD in the \texttt{master} branch from
+\item Download the \texttt{zip} archive of HEAD in the \texttt{master} branch from
 \begin{flushleft}
-\url{http://git.osdn.jp/view?p=luatex-ja/luatexja.git;a=snapshot;h=HEAD;sf=tgz}.
+\url{https://github.com/luatexja/luatexja/archive/refs/heads/master.zip}.
 \end{flushleft}
 \end{itemize}
 
@@ -742,11 +742,11 @@ the forefront of development is not the \texttt{master} branch.
 \begin{itemize}
 \item Gitリポジトリを次のコマンドでクローンする：
 \begin{lstlisting}
-$ git clone git://git.osdn.jp/gitroot/luatex-ja/luatexja.git
+$ git clone https://github.com/luatexja/luatexja.git
 \end{lstlisting}
-\item \texttt{master} ブランチのスナップショット（\texttt{tar.gz} 形式）をダウンロードする：
+\item \texttt{master} ブランチのスナップショット（\texttt{zip} 形式）をダウンロードする：
 \begin{flushleft}
-\url{http://git.osdn.jp/view?p=luatex-ja/luatexja.git;a=snapshot;h=HEAD;sf=tgz}.
+\url{https://github.com/luatexja/luatexja/archive/refs/heads/master.zip}.
 \end{flushleft}
 \end{itemize}
 \texttt{master} ブランチ（従って，CTAN内のアーカイブも）はたまにしか更新されないことに注意．
@@ -828,43 +828,6 @@ For changes from \pTeX, see Subsection~\ref{ssec:chgptex}.
 \item \LuaTeX-jaは動作が\pTeX に比べて非常に遅い．
   コードを調整して徐々に速くしているが，まだ満足できる速度ではない．
   また，和文フォントを読み込むために多量のメモリを消費することにも注意が必要である．
-%</ja>
-
-\item%
-%<*en>
-\textbf{(Outdated) note for MiK\TeX\ users}\quad
-\LuaTeX-ja requires that several CMap files%
-\footnote{\texttt{UniJIS2004-UTF32-\{H,V\}} and \texttt{Adobe-Japan1-UCS2}.}
-must be found from \LuaTeX.
-Strictly speaking, those CMaps are needed
-only in the first run of \LuaTeX-ja after installing or updating.
-But it seems that MiK\TeX\ does not satisfy this condition,
-so you will encounter an error like the following:
-%</en>
-%<*ja>
-\LuaTeX-jaが動作するためには，\emph{導入・更新後の初回起動時に}
-\texttt{UniJIS2004-UTF32-\{H,V\}}, \texttt{Adobe-Japan1-UCS2}という3つのCMapが
-\LuaTeX によって見つけられることが必要である．
-しかし古いバージョンのMiK\TeX ではそのようになっていないので，次のエラーが発生するだろう：
-%</ja>
-\begin{lstlisting}
-! LuaTeX error ...iles (x86)/MiKTeX 2.9/tex/luatex/luatexja/ltj-rmlgbm.lua
-bad argument #1 to 'open' (string expected, got nil)
-\end{lstlisting}
-
-%<*en>
-If so, please execute a batch file which is written on
-\href{https://osdn.jp/projects/luatex-ja/wiki/FrontPage%28en%29}{ the Project Wiki (English)}.
-This batch file creates a temporary directory, copy CMaps in it,
-run a test file which loads \LuaTeX-ja in this directory,
-and finally delete the temporary directory.
-%</en>
-%<*ja>
-そのような場合には，
-\href{https://osdn.jp/projects/luatex-ja/wiki/FrontPage%28en%29}{%
-  プロジェクトWiki英語版トップページ}中に書かれているバッチファイルを
-実行して欲しい．このバッチファイルは，作業用ディレクトリにCMap達を
-コピーし，その中で\LuaTeX-jaの初回起動を行い，作業用ディレクトリを消す作業をしている．
 %</ja>
 
 \item
@@ -11918,7 +11881,7 @@ ISO 32000-1:2008, \textit{Document management -- Portable document format -- Par
       1.7}, 2008. \newblock
 \url{http://www.iso.org/iso/iso\_catalogue/catalogue_tc/catalogue\_detail.htm?csnumber=51502}
 \bibitem{tc18ltja} 北川弘典．「\LuaTeX-jaの近況」，\TeX Conf~2018．
-  \url{https://osdn.net/projects/luatex-ja/wiki/Documentation/attach/tc18ltja.pdf}
+  \url{https://raw.githubusercontent.com/h-kitagawa/presentations/main/tc18ltja.pdf}
 \bibitem{bxghost} Takuto ASAKURA. \newblock The \textsf{BXghost} Package. \url{https://github.com/wtsnjp/BXghost}
 \end{thebibliography}
 

@@ -11,10 +11,9 @@ and specifications are subject to change. Documentations are located at
   doc/luatexja-en.pdf (en), doc/luatexja-ja.pdf (ja).
 
 LuaTeX-ja is developed on
-  <https://osdn.jp/projects/luatex-ja/wiki/FrontPage(en)>.
+  <https://github.com/luatexja/luatexja>.
 If you have questions or recognize bugs/have feature requests,
-we would like you to create a thread in the forum or a ticket
-in the way which OSDN supplies, via links found in the page above.
+we would like you to create an issue.
 
 
 Installation
@@ -43,8 +42,7 @@ Installation
 
    a. Download the source archive from CTAN,
       or tagged as $VER$ in the Git repository by
-      <http://git.osdn.jp/view?p=luatex-ja/luatexja.git
-                              ;a=snapshot;h=refs/tags/$VER$;sf=tgz>
+      <https://github.com/luatexja/luatexja/archive/refs/tags/$VER.zip>
 
    b. Extract the archive and process following three files by LuaLaTeX
       to generate classes for Japanese typesetting:
