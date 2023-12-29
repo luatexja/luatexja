@@ -193,8 +193,14 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
       if met.rotation and met.vert_activated then
           local f = font_getfont(pf)
           local pco = ltjs_orig_char_table[p] or pc
-          local r, l = (pco==pc) and met.rotation[pc], f.properties and f.properties.language
-          if ((r==true) or (type(r)=="table" and not r[l])) and (get_attr(p, attr_vert_ori) or 0)<=0 then
+          local r = met.rotation[pco]
+          local l = f.properties and f.properties.language
+          r = (r==true) or (type(r)=="table" and not r[l])
+          if r then
+            r = met.rotation[pc]
+            r = (r==true) or (type(r)=="table" and not r[l])
+          end
+          if r and (get_attr(p, attr_vert_ori) or 0)<=0 then
             return capsule_glyph_tate_rot(p, met, char_data, head, dir,
               0.5*(get_ascender(pf)-get_descender(pf)))
           end

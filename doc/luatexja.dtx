@@ -675,11 +675,10 @@ CTAN (in the \texttt{macros/luatex/generic/luatexja} directory), and
 the following distributions:
   \begin{itemize}
   \item \href{https://www.tug.org/texlive/}{\TeX~Live} (in \texttt{texmf-dist/tex/luatex/luatexja})
-  \item \href{http://w32tex.org/}{W32\TeX}\ (in \texttt{luatexja.tar.xz})
   \item MiK\TeX\ (in \texttt{luatexja.tar.xz})
   \end{itemize}
 Harano Aji fonts are also available in these distributions
-(\texttt{haranoaji} in \TeX~Live and MiK\TeX, and \texttt{luatexja.tar.xz} in W32\TeX).
+(\texttt{haranoaji} in \TeX~Live and MiK\TeX).
 %</en>
 %<*ja>
 現在，\LuaTeX-jaはCTAN (\texttt{macros/luatex/generic/luatexja})に収録されている他，
@@ -687,10 +686,9 @@ Harano Aji fonts are also available in these distributions
   \begin{itemize}
   \item MiK\TeX\ (\texttt{luatexja.tar.lzma})
   \item \TeX~Live (\texttt{texmf-dist/tex/luatex/luatexja})
-  \item W32\TeX\ (\texttt{luatexja.tar.xz})
   \end{itemize}
 これらのディストリビューションは原ノ味フォントも収録している
-（\TeX~Live, MiK\TeX では\texttt{haranoaji}，W32\TeX では\texttt{luatexja.tar.xz}）.
+（\TeX~Live, MiK\TeX では\texttt{haranoaji}）.
 %</ja>
 
 %<*en>
@@ -3979,9 +3977,6 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
 
  In this situation, \LuaTeX-ja performs all replacements which is defined in~\texttt{vert}
  feature for \emph{some} scripts for \emph{some} languages.
- \item Furthermore, a glyph is automatically rotated 90~degrees,
-  if it is not replaced by \texttt{vert} feature for \emph{any} script
-  for \emph{any} language, and if it is marked as `r''~or~``Tr'' in UAX~\#50.
  \item \cs{tfont} uses a vertical JFM instead of a horizontal JFM.
 \LuaTeX-ja ships following vertical JFMs:
 \begin{description}
@@ -4042,8 +4037,7 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
   このscript,~languageの組み合わせを指定することはできないので，
   \Pkg{luaotfload}そのままでは\texttt{vert}を適用させることはできない．
  }．
- \item さらに，「いかなるscript,~languageでも\texttt{vert}により置換されない」グリフ
-  のうち，UAX~\#50で``r''もしくは``Tr''と指定されているものは90度自動回転させる．
+ \item さらに，置換前と置換後のグリフがどちらも「UAX~\#50で``r''もしくは``Tr''と指定されている」ものは90度自動回転させる．
  \item \ref{ssec:math}節で述べる，数式中の和文フォントには縦組用和文フォントは指定できない．
  \item \meta{JFM name}には縦組用JFMを指定する．
 以下の縦組用JFMが\LuaTeX-jaには同梱されている．%おり，違いを\autoref{tab-difjfm-tate}に示した．
