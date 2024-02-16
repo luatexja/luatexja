@@ -137,22 +137,28 @@
 }
 \def\@outputtombow{%
   \iftombow
-  \vbox to\z@{\kern\dimexpr-10mm-\@tombowbleed\relax
+  \vbox to\z@{\kern-\@tombowbleed\relax
     \boxmaxdepth\maxdimen
       \moveleft\@tombowbleed\vbox to\@@paperheight{%
 	  \color@begingroup
 	  \@tombowcolor
-      \hbox to\@@paperwidth{\hskip\@tombowbleed\relax
-         \copy\@TL\hfill\copy\@TC\hfill\copy\@TR\hskip\@tombowbleed}%
-      \kern-10mm%
-      \hbox to\@@paperwidth{\copy\@Tl\hfill\copy\@Tr}%
+      \setbox\z@\hbox to\@@paperwidth{\hskip\@tombowbleed\relax
+         \copy\@TL\hfill\copy\@TC\hfill\copy\@TR\hskip\@tombowbleed}
+      \ht\z@=\z@\dp\z@=\z@\box\z@%
+      \kern\@tombowbleed
+      \setbox\z@\hbox to\@@paperwidth{\copy\@Tl\hfill\copy\@Tr}%
+      \ht\z@=\z@\dp\z@=\z@\box\z@%
       \vfill
-      \hbox to\@@paperwidth{\copy\@CL\hfill\copy\@CR}%
+      \setbox\z@\hbox to\@@paperwidth{\copy\@CL\hfill\copy\@CR}%
+      \ht\z@=\z@\dp\z@=\z@\box\z@%
       \vfill
-      \hbox to\@@paperwidth{\copy\@Bl\hfill\copy\@Br}%
-      \kern-10mm%
-      \hbox to\@@paperwidth{\hskip\@tombowbleed\relax
+      \setbox\z@\hbox to\@@paperwidth{\copy\@Bl\hfill\copy\@Br}%
+      \ht\z@=\z@\dp\z@=\z@\box\z@
+      \kern\@tombowbleed
+      \setbox\z@\hbox to\@@paperwidth{\hskip\@tombowbleed\relax
          \copy\@BL\hfill\copy\@BC\hfill\copy\@BR\hskip\@tombowbleed}%
+      \ht\z@=\z@\dp\z@=\z@\box\z@%
+      \kern\dimexpr10mm%
       \color@endgroup
     }\vss
   }%
