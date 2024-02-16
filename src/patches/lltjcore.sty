@@ -143,20 +143,20 @@
 	  \color@begingroup
 	  \@tombowcolor
       \setbox\z@\hbox to\@@paperwidth{\hskip\@tombowbleed\relax
-         \copy\@TL\hfill\copy\@TC\hfill\copy\@TR\hskip\@tombowbleed}
+         \copy\@TL\hss\copy\@TC\hss\copy\@TR\hskip\@tombowbleed}
       \ht\z@=\z@\dp\z@=\z@\box\z@%
       \kern\@tombowbleed
       \setbox\z@\hbox to\@@paperwidth{\copy\@Tl\hfill\copy\@Tr}%
       \ht\z@=\z@\dp\z@=\z@\box\z@%
-      \vfill
+      \vss
       \setbox\z@\hbox to\@@paperwidth{\copy\@CL\hfill\copy\@CR}%
       \ht\z@=\z@\dp\z@=\z@\box\z@%
-      \vfill
+      \vss
       \setbox\z@\hbox to\@@paperwidth{\copy\@Bl\hfill\copy\@Br}%
       \ht\z@=\z@\dp\z@=\z@\box\z@
       \kern\@tombowbleed
       \setbox\z@\hbox to\@@paperwidth{\hskip\@tombowbleed\relax
-         \copy\@BL\hfill\copy\@BC\hfill\copy\@BR\hskip\@tombowbleed}%
+         \copy\@BL\hss\copy\@BC\hss\copy\@BR\hskip\@tombowbleed}%
       \ht\z@=\z@\dp\z@=\z@\box\z@%
       \kern\dimexpr10mm%
       \color@endgroup
