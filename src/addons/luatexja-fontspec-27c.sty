@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec-27c}[2024-02-18 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec-27c}[2024-02-19 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e}
 \ExplSyntaxOn
 
@@ -90,16 +90,16 @@
 %% save and restore global variable
 \tl_new:N \g__ltj_fontspec_kanji_nfss_family_tl
 \tl_new:N \g__ltj_fontspec_orig_nfss_family_tl
-\seq_new:N \g__ltj_fontspec_kanji_bf_series_seq
-\seq_new:N \g__ltj_fontspec_orig_bf_series_seq
+\seq_new:N \l__ltj_fontspec_kanji_bf_series_seq
+\seq_new:N \l__ltj_fontspec_orig_bf_series_seq
 \clist_new:N \g__ltj_fontspec_kanji_default_fontopts_clist
 \clist_new:N \g__ltj_fontspec_orig_default_fontopts_clist
 
 \cs_new:Nn \__ltj_set_global_variable_for_kanji: {
   \tl_gset_eq:NN \g__ltj_fontspec_orig_nfss_family_tl \g__fontspec_nfss_family_tl
   \tl_gset_eq:NN \g__fontspec_nfss_family_tl \g__ltj_fontspec_kanji_nfss_family_tl
-  \seq_gset_eq:NN \g__ltj_fontspec_orig_bf_series_seq \g__fontspec_bf_series_seq
-  \seq_gset_eq:NN \g__fontspec_bf_series_seq \g__ltj_fontspec_kanji_bf_series_seq
+  \seq_set_eq:NN \l__ltj_fontspec_orig_bf_series_seq \l__fontspec_bf_series_seq
+  \seq_set_eq:NN \l__fontspec_bf_series_seq \l__ltj_fontspec_kanji_bf_series_seq
   %\seq_gclear:N \g__fontspec_bf_series_seq
   \clist_set_eq:NN \g__ltj_fontspec_orig_default_fontopts_clist \g__fontspec_default_fontopts_clist
   \clist_set_eq:NN \g__fontspec_default_fontopts_clist \g__ltj_fontspec_kanji_default_fontopts_clist
@@ -108,8 +108,8 @@
 \cs_new:Nn \__ltj_restore_global_variable: {
   \tl_gset_eq:NN \g__ltj_fontspec_kanji_nfss_family_tl \g__fontspec_nfss_family_tl
   \tl_gset_eq:NN \g__fontspec_nfss_family_tl \g__ltj_fontspec_orig_nfss_family_tl
-  \seq_gset_eq:NN \g__ltj_fontspec_kanji_bf_series_seq \g__fontspec_bf_series_seq
-  \seq_gset_eq:NN \g__fontspec_bf_series_seq \g__ltj_fontspec_orig_bf_series_seq
+  \seq_set_eq:NN \l__ltj_fontspec_kanji_bf_series_seq \l__fontspec_bf_series_seq
+  \seq_set_eq:NN \l__fontspec_bf_series_seq \l__ltj_fontspec_orig_bf_series_seq
   \clist_set_eq:NN \g__ltj_fontspec_kanji_default_fontopts_clist \g__fontspec_default_fontopts_clist
   \clist_set_eq:NN \g__fontspec_default_fontopts_clist \g__ltj_fontspec_orig_default_fontopts_clist
 }
