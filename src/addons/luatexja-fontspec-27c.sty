@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec-27c}[2020-04-04 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec-27c}[2024-02-18 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e}
 \ExplSyntaxOn
 
@@ -364,6 +364,7 @@
   \newjfontfamily #1 [ BoldFont={},ItalicFont={},SmallCapsFont={},#2,#4 ] {#3}
 }
 
+\prop_new:N \l__ltj_fontspec_tmp_prop
 \prop_new:N \g__ltj_fontspec_fontopts_prop
 \DeclareDocumentCommand \defaultjfontfeatures { t+ o m }
  {
