@@ -137,28 +137,22 @@
 }
 \def\@outputtombow{%
   \iftombow
-  \vbox to\z@{\kern-\@tombowbleed\relax
+  \vbox to\z@{\kern\dimexpr-10mm-\@tombowbleed\relax
     \boxmaxdepth\maxdimen
       \moveleft\@tombowbleed\vbox to\@@paperheight{%
 	  \color@begingroup
 	  \@tombowcolor
-      \setbox\z@\hbox to\@@paperwidth{\hskip\@tombowbleed\relax
-         \copy\@TL\hss\copy\@TC\hss\copy\@TR\hskip\@tombowbleed}
-      \ht\z@=\z@\dp\z@=\z@\box\z@%
-      \kern\@tombowbleed
-      \setbox\z@\hbox to\@@paperwidth{\copy\@Tl\hfill\copy\@Tr}%
-      \ht\z@=\z@\dp\z@=\z@\box\z@%
-      \vss
-      \setbox\z@\hbox to\@@paperwidth{\copy\@CL\hfill\copy\@CR}%
-      \ht\z@=\z@\dp\z@=\z@\box\z@%
-      \vss
-      \setbox\z@\hbox to\@@paperwidth{\copy\@Bl\hfill\copy\@Br}%
-      \ht\z@=\z@\dp\z@=\z@\box\z@
-      \kern\@tombowbleed
-      \setbox\z@\hbox to\@@paperwidth{\hskip\@tombowbleed\relax
-         \copy\@BL\hss\copy\@BC\hss\copy\@BR\hskip\@tombowbleed}%
-      \ht\z@=\z@\dp\z@=\z@\box\z@%
-      \kern\dimexpr10mm%
+      \hbox to\@@paperwidth{\hskip\@tombowbleed\relax
+         \copy\@TL\hfill\copy\@TC\hfill\copy\@TR\hskip\@tombowbleed}%
+      \kern-10mm%
+      \hbox to\@@paperwidth{\copy\@Tl\hfill\copy\@Tr}%
+      \vfill
+      \hbox to\@@paperwidth{\copy\@CL\hfill\copy\@CR}%
+      \vfill
+      \hbox to\@@paperwidth{\copy\@Bl\hfill\copy\@Br}%
+      \kern-10mm%
+      \hbox to\@@paperwidth{\hskip\@tombowbleed\relax
+         \copy\@BL\hfill\copy\@BC\hfill\copy\@BR\hskip\@tombowbleed}%
       \color@endgroup
     }\vss
   }%
@@ -182,6 +176,7 @@
   \ifnum\ltjgetparameter{direction}=4\else
     \dimen\z@\textwidth \textwidth\textheight \textheight\dimen\z@
   \fi
+  \directlua{luatexja.lineskip.setting_backup()}
   \let \protect \noexpand
 }{}{}
 \patchcmd\@outputpage{% supply \yoko
@@ -206,6 +201,8 @@
 \patchcmd\@outputpage{\vskip\topmargin}{\vskip\topmargin\iftombow\vskip1in\fi}{}{}
 \patchcmd\@outputpage{\reset@font}{\@tombowreset@@paper\reset@font}{}{}
 \patchcmd\@outputpage{\@begindvi}{\@begindvi\@outputtombow}{}{}
+\patchcmd\@outputpage{\stepcounter{page}}%
+  {\stepcounter{page}\directlua{luatexja.lineskip.setting_restore()}}{}{}
 
 %
 \pretocmd\@floatboxreset{\pltx@save@float@dir}{}{}

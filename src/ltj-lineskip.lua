@@ -49,6 +49,19 @@ function ltjl.setting(profiler, skip_method)
 end
 
 do
+    local backup
+    function ltjl.setting_backup()
+        backup = { ltj_profiler, ltj_skip }
+        ltj_profiler, ltj_skip = ltjl.p_dummy, ltjl.l_dummy
+    end
+    function ltjl.setting_restore()
+        if backup then
+            ltj_profiler, ltj_skip, backup = backup[1], backup[2], nil
+        end
+    end
+end
+
+do
 local traverse_id = node.direct.traverse_id
 local function adjust_glue(nh)
    local h = to_direct(nh)
