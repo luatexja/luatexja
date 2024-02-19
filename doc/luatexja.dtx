@@ -7675,7 +7675,7 @@ for making the difference obvious.}
 	\begin{itemize}
 	 \item 現在のリストにおける最後のノード
 	  \footnote{最後のノードが\cs{parskip}によるグルーであった場合のみ
-		さらに一つ前のノードを参照する}が水平ボックス$h'$であり，かつ
+		さらに一つ前のノードを参照する．}が水平ボックス$h'$であり，かつ
 	  \item \cs{prevdepth}の値とその$h'$の深さの値が一致している
 	\end{itemize}
 	場合にのみ発動するようにしている．
@@ -7683,7 +7683,10 @@ for making the difference obvious.}
 	参照せず，あくまでも$h''$自身の高さ・深さのみを参照する．
 	参照するようにしてしまうと，\cs{smash}など手動で行った高さ・深さ調整の意味がなくなってしまうからである．
   \end{itemize}
-  
+  なお，現在の実装では，「中身までみる行間調整」は，外部垂直モードにおける
+  前の段落の最終行と次の段落の先頭行との間では
+  満足に動作しないことがある．これについては今後の課題である．
+
   \begin{figure}[t]
 	\noindent\centering
 	\begin{minipage}[b]{16\zw}
