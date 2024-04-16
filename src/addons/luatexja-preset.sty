@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2022-06-19 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2024-03-30 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -100,6 +100,7 @@
   mc .groups:n = { preset }, mc .value_required:n = true,
   mc-bx .code:n =
      \prop_put:Nnn \g__ltjpreset_font_prop { mc-b } {#1},
+  mc-bx .groups:n = { preset }, mc-bx .value_required:n = true,
   gt .code:n =
      \prop_put:Nnn \g__ltjpreset_font_prop { gt-u } {#1}
      \prop_put:Nnn \g__ltjpreset_font_prop { gt-d } {#1}
@@ -112,6 +113,7 @@
      \prop_put:Nnn \g__ltjpreset_font_prop { gt-d } {#1},
   gt .groups:n = { preset },   gt .value_required:n = true,
   gt-m .groups:n = { preset }, gt-m .value_required:n = true,
+  gt-bx .groups:n = { preset }, gt-bx .value_required:n = true,
 }
 \cs_set:Nn \ltjpreset_define_preset_prop:n {
   \keys_define:nn { luatexja-preset } {
