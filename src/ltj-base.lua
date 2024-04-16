@@ -398,6 +398,19 @@ function ltjb.add_to_callback(name,fun,description,priority)
     return
 end
 
+--- fix \e@alloc@luafunction@count (gh:5)
+do
+    local t = lua.get_functions_table()
+    local m = 0
+    local n = tex.getcount('e@alloc@luafunction@count')
+    for i = 1,math.max(n, #t)+100 do-- I think 100 is sufficient
+        if t[i] then m = i end
+    end
+    if m>n then
+        tex.setcount('global', 'e@alloc@luafunction@count', m)
+    end
+end
+
 -------------------- mock of debug logger
 if not ltjb.out_debug then
    local function no_op() end
