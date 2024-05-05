@@ -17,7 +17,7 @@
        { \mathord \mathalpha \mathbin \mathrel \mathpunct \mathop \mathfence }
        {##3}
       {
-        \exp_last_unbraced:NNx \cs_gset_eq:NN ##2 { \char_generate:nn {##1} {12} }
+        \exp_last_unbraced:NNe \cs_gset_eq:NN ##2 { \char_generate:nn {##1} {12} }
       }
      }
     \__um_input_math_symbol_table:
@@ -46,9 +46,9 @@
 	  % ltjsclasses: use lua
 	  \cs_new:Nn \lltjp_um_unmag_fsize:
 	    {
-		  \cs_gset:Nx \lltjp_um_f@size: {\directlua{luatexja.ltjs_unmagnify_fsize(\f@size)}}
-		  \cs_gset:Nx \lltjp_um_sf@size: {\directlua{luatexja.ltjs_unmagnify_fsize(\sf@size)}}
-		  \cs_gset:Nx \lltjp_um_ssf@size: {\directlua{luatexja.ltjs_unmagnify_fsize(\ssf@size)}}
+		  \cs_gset:Ne \lltjp_um_f@size: {\directlua{luatexja.ltjs_unmagnify_fsize(\f@size)}}
+		  \cs_gset:Ne \lltjp_um_sf@size: {\directlua{luatexja.ltjs_unmagnify_fsize(\sf@size)}}
+		  \cs_gset:Ne \lltjp_um_ssf@size: {\directlua{luatexja.ltjs_unmagnify_fsize(\ssf@size)}}
 		}
 	}{
 	  % bxjscls: use \jsc@preadjust@extract@font
