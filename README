@@ -25,6 +25,7 @@ Installation
     - luaotfload (v3.1 or later recommended)
     - adobemapping (Adobe CMap files)
     - LaTeX2e 2020-02-02 patch level 5 or later (if you want to use with LaTeX)
+    - l3kernel about 2023-10-10 or later
     - etoolbox package
     - ltxcmds package, pdftexcmds package
     - filehook package, atbegshi package (for LaTeX2e 2020-02-02)
@@ -32,7 +33,7 @@ Installation
     - Harano Aji fonts (https://github.com/trueroad/HaranoAjiFonts)
 	  more specifically, HaranoAjiMincho-Regular and HaranoAjiGothic-Medium
 
-   Using LuaTeX-ja with LuaHBTeX is not well tested.
+   Using LuaTeX-ja with Harfbuzz is not well tested.
    One might be able to typeset documents without an error, but with
    some unwanted results.
 
