@@ -24,7 +24,7 @@ Installation
     - LuaTeX 1.10.0 (or later)
     - luaotfload (v3.1 or later recommended)
     - adobemapping (Adobe CMap files)
-    - LaTeX2e 2020-02-02 patch level 5 or later (if you want to use with LaTeX)
+    - LaTeX2e 2021-06-01 or later (if you want to use with LaTeX)
     - l3kernel about 2023-10-10 or later
     - etoolbox package
     - ltxcmds package, pdftexcmds package
