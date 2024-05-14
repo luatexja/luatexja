@@ -3,11 +3,10 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-atbegshi}[2022-08-12 Patching \string\shipout\space hooks for LuaTeX-ja]
+\ProvidesPackage{lltjp-atbegshi}[2024-05-14 Patching \string\shipout\space hooks for LuaTeX-ja]
 
 % concept: execute all hooks inside yoko direction \vbox
 
-\ifltj@ltfilehook@avail
 %<*ltshipout>-----------------------------------
 %
 \RequirePackage{expl3}
@@ -60,77 +59,4 @@
 \fi:
 %</ltshipout>-----------------------------------
 \ExplSyntaxOff
-\expandafter\endinput
-\fi
-\RequirePackage{atbegshi}
-%<*atbegshi>-------------------------------------
-% patching atbegshi.sty
-%%%  following codes are almost copied from
-%%%  pxatbegshi.sty 2019/09/07 v0.5 (in platex-tools bundle, by H. Yamashita).
-
-\ifdefined\AtBeginShipoutOriginalShipout
-  \let\AtBeginShipoutOriginalShipout\ltj@shipout
-\fi
-\AtBeginShipoutInit
-\DeclareRobustCommand \AtBeginDvi [1]{%
-  \global \setbox \@begindvibox
-    \vbox{\yoko\unvbox \@begindvibox #1}%
-}
-%% internal macros are locally effective
-\begingroup
-
-% helpers
-%% unique tokens
-\def\pxabgs@mark{\pxabgs@mark@}
-\def\pxabgs@fin{\pxabgs@fin@}
-
-%% \pxabgs@patch@cmd\CMD{<orig>}{<new>}
-\def\pxabgs@patch@cmd#1#2#3{%
-  \ifx#1\relax\else
-  \def\pxabgs@next##1#2##2\pxabgs@mark##3\pxabgs@fin{%
-    \ifx\pxabgs@mark##3\pxabgs@mark\let#1\relax
-    \else
-      \def\pxabgs@fragment{##2}\def#1{##1#3##2}%
-    \fi}%
-  \expandafter\pxabgs@next#1\pxabgs@mark#2\pxabgs@mark\pxabgs@fin
-  \fi
-}
-
-% prepare
-\ifdefined\AtBegShi@Output
-  \let\pxabgs@AtBegShi@Output\AtBegShi@Output
-\else\let\pxabgs@AtBegShi@Output\relax\fi
-% try first patch
-\pxabgs@patch@cmd\pxabgs@AtBegShi@Output
-  {\let\AtBegShi@OrgProtect\protect}%
-  {\setbox8\vbox\bgroup\yoko\let\AtBegShi@OrgProtect\protect}
-\pxabgs@patch@cmd\pxabgs@AtBegShi@Output
-  {\AtBeginShipoutOriginalShipout\box\AtBeginShipoutBox}%
-  {\AtBeginShipoutOriginalShipout\box\AtBeginShipoutBox\egroup\setbox8\box\voidb@x}
-\pxabgs@patch@cmd\pxabgs@AtBegShi@Output
-  {%
-    \begingroup
-      \setbox\AtBeginShipoutBox\box\AtBeginShipoutBox
-    \endgroup
-    \let\protect\AtBegShi@OrgProtect
-  }{%
-    \begingroup
-      \setbox\AtBeginShipoutBox\box\AtBeginShipoutBox
-    \endgroup
-    \let\protect\AtBegShi@OrgProtect
-    \egroup
-  }
-% commit the change only when successful
-\ifx\pxabgs@AtBegShi@Output\relax
-  \@PackageWarningNoLine{lltjp-atbegshi}{%
-    Failed in patching \string\AtBegShi@Output.\MessageBreak
-    This may cause error in tate direction%
-  }
-\else
-  \global\let\AtBegShi@Output\pxabgs@AtBegShi@Output
-\fi
-
-\endgroup
-%% internal macros are no longer effective
-%</atbegshi>-------------------------------------
 \endinput
