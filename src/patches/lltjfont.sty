@@ -3,31 +3,10 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2023-04-13 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2023-05-16 Patch to NFSS2 for LuaTeX-ja]
 
 %%%%%%%% LaTeX2e version detection
-\newcount\ltj@@latex@plv \ltj@@latex@plv=-1
-\ifltj@ltfilehook@avail
-\ExplSyntaxOn
-  \cs_if_exist:NTF \__shipout_execute_main_cont:Nnnn
-    {\ltj@@latex@plv=1500}% 2021-06-01
-    {\ifnum\patch@level>2\relax \ltj@@latex@plv=1300\else \ltj@@latex@plv=1000\fi}% 2020-10-01
-\ExplSyntaxOff
-\else\ifdefined\@rmfamilyhook % 2020-02-02
-  \ifx\@forced@seriestrue\@undefined % 2020-02-02 pl0--2
-    \@latex@error
-     {Please update LaTeX2e!^^J\space\space
-       At least LaTeX2e 2020-02-02 patch level 3 is required}%
-     {LaTeX2e 2020-02-02 patch level 2 (and 4) has a bug.}
-  \else
-    \ltj@@latex@plv=300
-    \unless\ifx\series@maybe@drop@one@m@x\@undefined % pl5 + develop
-      \ltj@@latex@plv=501
-    \else\unless\ifx\series@maybe@drop@one@m\@undefined % patch level 5
-      \ltj@@latex@plv=500
-    \fi\fi
-  \fi
-\fi\fi
+\newcount\ltj@@latex@plv \ltj@@latex@plv=1500
 
 %% patching \DeclareTextComposite
 \def\ltj@chardef@text@cmd#1{%
@@ -400,59 +379,7 @@
       \directlua{luatexja.jfont.pickup_alt_font_a('\f@size')}%
     }%
   \fi}
-\ifnum\ltj@@latex@plv<1500 % <=2020-10-01
-\protected\def\ltj@selectfont@patch{%
-  \ltj@@start@time@measure{selectfont}%
-  \let\tmp@error@fontshape\error@fontshape
-  \let\error@fontshape\error@kfontshape
-  \ltj@@is@kyenc{\k@encoding}\ifin@%
-    \let\cy@encoding\k@encoding
-    \ensure@KanjiEncodingPair{t}%
-    \edef\ct@encoding{\csname t@enc@\k@encoding\endcsname}%
-  \else
-    \ltj@@is@ktenc{\k@encoding}\ifin@%
-      \let\ct@encoding\k@encoding
-      \ensure@KanjiEncodingPair{y}%
-      \edef\cy@encoding{\csname y@enc@\k@encoding\endcsname}%
-    \else
-      \@latex@error{KANJI Encoding scheme `\k@encoding' unknown}\@eha
-    \fi
-  \fi
-  \global\let\ltj@afont@name=\font@name
-  \ltj@selectfont@tate\ltj@selectfont@yoko
-%
-  \edef\tmp@item{{\k@encoding}}\expandafter\def\expandafter\k@encoding\tmp@item
-  \kenc@update
-  \global\let\font@name=\ltj@afont@name
-  \let\error@fontshape\tmp@error@fontshape
-  \if@knjcmd \@knjcmdfalse
-    \expandafter\ifx
-    \csname rel@\k@encoding/\k@family/\k@series/\k@shape\endcsname\relax
-      \expandafter\ifx
-         \csname rel@\k@encoding/\k@family/\k@series/all\endcsname\relax
-      \else
-         \csname rel@\k@encoding/\k@family/\k@series/all\endcsname\selectfont
-         % 警告: 再び \selectfont を呼んでいる．無限ループの可能性あり
-      \fi
-    \else
-       \csname rel@\k@encoding/\k@family/\k@series/\k@shape\endcsname\selectfont
-       % 警告: 再び \selectfont を呼んでいる．無限ループの可能性あり
-    \fi
-  \fi
-  \global\let\font@name=\ltj@afont@name
-  \ltj@@stop@time@measure{selectfont}%
-}
-\RequirePackage{everysel}
-\let\ltj@@EverySelectfont@Init=\@EverySelectfont@Init
-\expandafter\expandafter\expandafter\let
-\expandafter\expandafter\csname ltj@@orig@selectfont\endcsname\csname selectfont\space\endcsname
-\@EverySelectfont@Init% for LaTeX2e <=2020-10-01
-\def\@EverySelectfont@Init{%
-  \expandafter\let\csname selectfont\space \endcsname \ltj@@orig@selectfont
-  \ltj@@EverySelectfont@Init
-}
-\EverySelectfont{\ltj@selectfont@patch}
-\else % LaTeX2e >=2021-06-01
+
 \AddToHook{selectfont}[luatexja]{%
   \ltj@@start@time@measure{selectfont}%
   \ifx\delayed@k@adjustment\@empty
@@ -514,7 +441,6 @@
   \global\let\font@name=\ltj@afont@name
   \ltj@@stop@time@measure{selectfont}%
 }
-\fi
 
 \bgroup
   \def\ltj@@dir@patch#1#2#3{%
@@ -721,8 +647,6 @@
 }
 
 %%%%%%
-\ifnum\ltj@@latex@plv>0
-%%%% LaTeX >= 2020-02-02
 \newif\if@shape@roman@kanji
 
 \def\merge@kanji@series#1{%
@@ -740,76 +664,11 @@
     \@nil
 }
 
-\ifnum\ltj@@latex@plv>500 % !!! pl5 + develop
   \def\set@target@series@kanji#1{%
       \edef\k@series{#1}%
       \series@maybe@drop@one@m\k@series\k@series
   }
-\else\ifnum\ltj@@latex@plv>300 % !!! pl5
-  \def\set@target@series@kanji#1{%
-      \edef\k@series{#1}%
-      \expandafter\series@maybe@drop@one@m\expandafter{\k@series}\k@series
-  }
-\else % !!! pl 3, 4
-  \def\set@target@series@kanji#1{%
-    \edef\k@series{#1}%
-    \edef\k@series{\expandafter\series@drop@one@m\k@series mm\series@drop@one@m}%
-  }
-\fi\fi
 
-\ifnum\ltj@@latex@plv<1500% <=2020-10-01
-\def\merge@kanji@series@#1#2#3\@nil{%
-  \def\reserved@a{#3}%
-  \ifx\reserved@a\@empty
-    \set@target@series@kanji{#2}%
-  \else
-    \begingroup\let\f@encoding\k@encoding\let\f@family\k@family
-    \maybe@load@fontshape\endgroup
-    \edef\reserved@a{\k@encoding /\k@family /#1/\k@shape}%
-     \ifcsname \reserved@a \endcsname
-       \set@target@series@kanji{#1}%
-    \else
-       \ifcsname \k@encoding /\k@family /#2/\k@shape \endcsname
-         \set@target@series@kanji{#2}%
-         {\let\curr@fontshape\curr@kfontshape\@font@shape@subst@warning}%
-       \else
-         \set@target@series@kanji{#3}%
-         {\let\curr@fontshape\curr@kfontshape\@font@shape@subst@warning}%
-       \fi
-    \fi
-  \fi
-}
-\def\merge@kanji@shape@#1#2#3\@nil{%
-  \def\reserved@a{#3}%
-  \ifx\reserved@a\@empty
-    \if@shape@roman@kanji
-      \set@safe@kanji@shape{#2}{}%
-    \else
-      \edef\k@shape{#2}%
-    \fi
-  \else
-    \begingroup\let\f@encoding\k@encoding\let\f@family\k@family
-           \maybe@load@fontshape\endgroup
-    \edef\reserved@a{\k@encoding /\k@family /\k@series/#1}%
-     \ifcsname \reserved@a\endcsname
-       \edef\k@shape{#1}%
-    \else
-       \ifcsname \k@encoding /\k@family /\k@series/#2\endcsname
-         \edef\k@shape{#2}%
-         {\let\curr@fontshape\curr@kfontshape\@font@shape@subst@warning}%
-       \else
-         \if@shape@roman@kanji
-           \set@safe@kanji@shape{#3}%
-           {{\let\curr@fontshape\curr@kfontshape\@font@shape@subst@warning}}%
-         \else
-           \edef\k@shape{#3}%
-           {\let\curr@fontshape\curr@kfontshape\@font@shape@subst@warning}%
-         \fi
-       \fi
-    \fi
-  \fi
-}
-\else % >=2021-06-01
 \def\merge@kanji@series@#1#2#3\@nil{%
   \def\reserved@a{#3}%
   \ifx\reserved@a\@empty
@@ -892,20 +751,8 @@
   \fi
 }
 \let\delayed@merge@kanji@shape\merge@kanji@shape@without@substitution
-\fi
 
 \newif\if@forced@series@kanji
-\ifnum\ltj@@latex@plv=300 % 2020-02-02 pl3, 4
-  \DeclareRobustCommand\romanseries[1]{\merge@font@series{#1}}
-  \DeclareRobustCommand\kanjiseries[1]{\merge@kanji@series{#1}}
-  \DeclareRobustCommand\romanseriesforce[1]{\edef\f@series{#1}}
-  \DeclareRobustCommand\kanjiseriesforce[1]{\edef\k@series{#1}}
-\else\ifnum\ltj@@latex@plv<1500% >=2020-02-02 pl5 and <=2020-10-01
-  \DeclareRobustCommand\romanseries[1]{\@forced@seriesfalse\merge@font@series{#1}}
-  \DeclareRobustCommand\kanjiseries[1]{\@forced@series@kanjifalse\merge@kanji@series{#1}}
-  \DeclareRobustCommand\romanseriesforce[1]{\@forced@seriestrue\edef\f@series{#1}}
-  \DeclareRobustCommand\kanjiseriesforce[1]{\@forced@series@kanjitrue\edef\k@series{#1}}
-\else% >=2021-06-01
   \DeclareRobustCommand\romanseries[1]{\@forced@seriesfalse
       \expandafter\def\expandafter\delayed@f@adjustment\expandafter
           {\delayed@f@adjustment\delayed@merge@font@series{#1}}}
@@ -919,22 +766,9 @@
       \expandafter\def\expandafter\delayed@k@adjustment\expandafter
           {\delayed@k@adjustment\edef\k@series{#1}}}
   \let\delayed@k@adjustment\@empty
-\fi\fi
 \DeclareRobustCommand\fontseries[1]{\kanjiseries{#1}\romanseries{#1}}%
 \DeclareRobustCommand\fontseriesforce[1]{\kanjiseriesforce{#1}\romanseriesforce{#1}}%
 
-\ifnum\ltj@@latex@plv<1500% <=2020-10-01
-  \DeclareRobustCommand\romanshape[1]{\merge@font@shape{#1}}
-  \DeclareRobustCommand\kanjishape[1]{\merge@kanji@shape{#1}}
-  \DeclareRobustCommand\fontshape[1]{%
-     \@shape@roman@kanjitrue
-     \merge@font@shape{#1}\merge@kanji@shape{#1}%
-     \@shape@roman@kanjifalse
-  }
-  \DeclareRobustCommand\romanshapeforce[1]{\edef\f@shape{#1}}
-  \DeclareRobustCommand\kanjishapeforce[1]{\edef\k@shape{#1}}
-  \DeclareRobustCommand\fontshapeforce[1]{\set@safe@kanji@shape{#1}{}\romanshapeforce{#1}}
-\else% >=2021-06-01
   \DeclareRobustCommand\romanshape[1]{%
        \expandafter\def\expandafter\delayed@f@adjustment\expandafter
            {\delayed@f@adjustment\delayed@merge@font@shape{#1}}}
@@ -956,9 +790,6 @@
      \romanshapeforce{#1}%
      \expandafter\def\expandafter\delayed@k@adjustment\expandafter
          {\delayed@k@adjustment\set@safe@kanji@shape{#1}{}}}
-\fi
-\ifnum\ltj@@latex@plv>1499
-%%%% LaTeX >= 2021-06-01
 \DeclareRobustCommand\usekanji[4]{%
     \kanjiencoding{#1}\edef\k@family{#2}%
     \set@target@series@kanji{#3}\edef\k@shape{#4}%
@@ -969,42 +800,6 @@
     \set@target@series{#3}\edef\f@shape{#4}%
     \let\delayed@f@adjustment\@empty
     \selectfont\ignorespaces}
-\else\ifnum\ltj@@latex@plv>1000
-%%%% 2021-10-01 PL3 <= LaTeX < 2021-06-01
-\DeclareRobustCommand\usekanji[4]{%
-    \kanjiencoding{#1}\edef\k@family{#2}%
-    \set@target@series@kanji{#3}\edef\k@shape{#4}%
-    \selectfont\ignorespaces}
-\DeclareRobustCommand\useroman[4]{%
-    \romanencoding{#1}\edef\f@family{#2}%
-    \set@target@series{#3}\edef\f@shape{#4}%
-    \selectfont\ignorespaces}
-\else
-%%%% 2020-10-01 <= LaTeX < 2020-10-01 PL3
-\DeclareRobustCommand\usekanji[4]{%
-    \kanjiencoding{#1}\edef\k@family{#2}\edef\k@series{#3}\edef\k@shape{#4}%
-    \selectfont\ignorespaces}
-\DeclareRobustCommand\useroman[4]{%
-    \romanencoding{#1}\edef\f@family{#2}\edef\f@series{#3}\edef\f@shape{#4}%
-    \selectfont\ignorespaces}
-\fi\fi
-%%%% LaTeX >= 2020-02-02 END
-\else
-%%%% LaTeX 2019-10-01
-\DeclareRobustCommand\romanseries[1]{\edef\f@series{#1}}
-\DeclareRobustCommand\kanjiseries[1]{\edef\k@series{#1}}
-\DeclareRobustCommand\fontseries[1]{\kanjiseries{#1}\romanseries{#1}}
-\DeclareRobustCommand\romanshape[1]{\edef\f@shape{#1}}
-\DeclareRobustCommand\kanjishape[1]{\edef\k@shape{#1}}
-\DeclareRobustCommand\fontshape[1]{\set@safe@kanji@shape{#1}{}\romanshape{#1}}
-\DeclareRobustCommand\usekanji[4]{%
-    \kanjiencoding{#1}\kanjifamily{#2}\kanjiseries{#3}\kanjishape{#4}%
-    \selectfont\ignorespaces}
-\DeclareRobustCommand\useroman[4]{%
-    \romanencoding{#1}\romanfamily{#2}\romanseries{#3}\romanshape{#4}%
-    \selectfont\ignorespaces}
-%%%% LaTeX 2019-10-01 END
-\fi
 %%%%
 
 \def\set@safe@kanji@shape#1#2{%
@@ -1026,8 +821,6 @@
   \else\useroman{#1}{#2}{#3}{#4}%
   \fi}
 
-\ifnum 0\ifltj@ltfilehook@avail1\fi\ifdefined\@rmfamilyhook1\fi>0
-%%%% LaTeX >= 2020-02-02
 \let\prepare@family@series@update@kanji=\prepare@family@series@update
 \patchcmd\prepare@family@series@update{\fontfamily}{\romanfamily}{}{}
 \patchcmd\prepare@family@series@update@kanji{\if@forced@series}{\if@forced@series@kanji}{}{}
@@ -1049,34 +842,16 @@
 \patchcmd\update@series@target@value@kanji{\f@series}{\k@series}{}{}
 \def\@meta@family@list@kanji{\@elt{mc}\@elt{gt}\@elt{jtt}}
 
-\def\@ltj@hook@series@default#1#2#3{%
-  \ifltj@ltfilehook@avail % 2020-10-01
-    \AddToHook{#1/defaults}{#2}%
-  \else\ifcsname @set#1defaultshook\endcsname %after 2020-04-07
-    \expandafter\g@addto@macro\csname @set#1defaultshook\endcsname{#2}%
-  \else % 2020-02-02
-    \expandafter\patchcmd\csname #1 \endcsname{#3}{#3#2}{}{}%
-  \fi\fi
-}
-\@ltj@hook@series@default{bfseries}{%
+\AddToHook{bfseries/defaults}{%
   \let\bfseries@mc\bfdef@ult
   \let\bfseries@gt\bfdef@ult
   \let\bfseries@jtt\bfdef@ult
-}{%
-  \let\bfseries@rm\bfdef@ult
-  \let\bfseries@sf\bfdef@ult
-  \let\bfseries@tt\bfdef@ult
 }
-\@ltj@hook@series@default{mdseries}{%
+\AddToHook{mdseries/defaults}{%
   \let\mdseries@mc\mddef@ult
   \let\mdseries@gt\mddef@ult
   \let\mdseries@jtt\mddef@ult
-}{%
-  \let\mdseries@rm\mddef@ult
-  \let\mdseries@sf\mddef@ult
-  \let\mdseries@tt\mddef@ult
 }
-\let\@ltj@hook@series@default\@undefined
 
 \expandafter\patchcmd\csname bfseries \endcsname{%
   \ifx\f@family\rmdef@ult      \fontseries\bfseries@rm
@@ -1105,105 +880,41 @@
   \fi\fi\fi
 }{}{}
 
-\def\@ltj@hook@series#1#2{%
-  \ifltj@ltfilehook@avail % 2020-10-01
-    \AddToHook{#1}{#2}%
-  \else % 2020-02-02
-    \expandafter\patchcmd\csname #1 \endcsname{\selectfont}{#2\selectfont}{}{}%
-  \fi
-}
-\@ltj@hook@series{bfseries}{%
+\AddToHook{bfseries}{%
   \ifx\k@family\mcdef@ult      \kanjiseries\bfseries@mc
   \else\ifx\k@family\gtdef@ult \kanjiseries\bfseries@gt
   \else\ifx\k@family\jttdef@ult\kanjiseries\bfseries@jtt
   \else                        \kanjiseries\bfdefault
   \fi\fi\fi
 }
-\@ltj@hook@series{mdseries}{%
+\AddToHook{mdseries}{%
   \ifx\k@family\mcdef@ult      \kanjiseries\mdseries@mc
   \else\ifx\k@family\gtdef@ult \kanjiseries\mdseries@gt
   \else\ifx\k@family\jttdef@ult\kanjiseries\mdseries@jtt
   \else                        \kanjiseries\mddefault
   \fi\fi\fi
 }
-\let\@ltj@hook@series\@undefined
 
-\def\@ltj@hook@efd#1#2{%
-  \ifltj@ltfilehook@avail % 2020-10-01
-    \AddToHook{expand@font@defaults}{#1}%
-  \else\ifdefined\@expandfontdefaultshook %after 2020-04-07
-    \g@addto@macro\@expandfontdefaultshook{#1#2}%
-  \else % 2020-02-02
-    \appto\expand@font@defaults{#1#2}%
-  \fi\fi
-}
-\@ltj@hook@efd{%
+\AddToHook{expand@font@defaults}{%
   \edef\mcdef@ult{\mcdefault}%
   \edef\gtdef@ult{\gtdefault}%
   \edef\jttdef@ult{\jttdefault}%
-}{\edef\kanjidef@ult{\kanjifamilydefault}}
-\let\@ltj@hook@efd\@undefined
+  \edef\kanjidef@ult{\kanjifamilydefault}}
 
-\ifltj@ltfilehook@avail % 2020-10-01
-  \appto\init@series@setup{%
-    \ifx\kanjiseriesdefault\kanjiseriesdefault@kernel
-      \mdseries
-      \let\kanjiseriesdefault\k@series
-    \fi
-  }
-\else
-  \appto\init@series@setup{%
-    \ifx\kanjidef@ult\mcdef@ult      \mcfamily
-    \else\ifx\kanjidef@ult\gtdef@ult \gtfamily
-    \else\ifx\kanjidef@ult\jttdef@ult \jttfamily
-    \fi\fi\fi
-  }
-\fi
-
-\def\@ltj@hook@dfh#1{%
-  \ifltj@ltfilehook@avail % 2020-10-01
-    \AddToHook{normalfont}{#1}%
-  \else\ifdefined\@defaultfamilyhook
-    \g@addto@macro\@defaultfamilyhook{#1}%
-  \else % 2020-02-02
-    \expandafter\patchcmd\csname normalfont \endcsname{\selectfont}{#1\selectfont}{}{}%
-    \let\reset@font\normalfont
-  \fi\fi
+\appto\init@series@setup{%
+  \ifx\kanjiseriesdefault\kanjiseriesdefault@kernel
+    \mdseries
+    \let\kanjiseriesdefault\k@series
+  \fi
 }
 
-\ifnum\ltj@@latex@plv>1499
-\@ltj@hook@dfh{%
+\AddToHook{normalfont}{%
   \kanjiencoding{\kanjiencodingdefault}%
   \edef\k@family{\kanjifamilydefault}%
   \edef\k@series{\kanjiseriesdefault}%
   \edef\k@shape{\kanjishapedefault}%
   \let\delayed@k@adjustment\empty
 }
-\else
-\@ltj@hook@dfh{%
-  \kanjiencoding{\kanjiencodingdefault}%
-  \edef\k@family{\kanjifamilydefault}%
-  \edef\k@series{\kanjiseriesdefault}%
-  \edef\k@shape{\kanjishapedefault}%
-}
-\fi
-\let\@ltj@hook@dfh\@undefined
-%%%% LaTeX >= 2020-02-02 END
-\else
-%%%% LaTeX 2019-10-01
-\DeclareRobustCommand\normalfont{%
-    \useroman\encodingdefault\familydefault\seriesdefault\shapedefault
-    \usekanji\kanjiencodingdefault\kanjifamilydefault\kanjiseriesdefault\kanjishapedefault}
-\let\reset@font\normalfont
-%%%% LaTeX 2019-10-01 END
-\fi
-
-
-
-\ifdefined\prepare@family@series@update@kanji\else
-%%%% LaTeX 2019-10-01
-\def\prepare@family@series@update@kanji#1{\kanjifamily}
-\fi
 
 \DeclareRobustCommand\mcfamily{%
   \unless\ifltj@disablejfam\not@math@alphabet\mcfamily\mathmc\fi

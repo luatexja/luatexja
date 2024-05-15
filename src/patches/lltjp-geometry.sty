@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-geometry}[2021-10-24 Patch to geometry for LuaTeX-ja with vertical writing mode]
+\ProvidesPackage{lltjp-geometry}[2024-05-16 Patch to geometry for LuaTeX-ja with vertical writing mode]
 \RequirePackage{expl3}
 \ifdefined\if@ltj@@geometry@tate\expandafter\endinput\fi
 \newif\if@ltj@@geometry@tate
@@ -31,15 +31,6 @@
 
 %============================================
 \unless\ifdefined\ltj@ExecuteAfterPackage
-\expandafter\newif\csname ifltj@ltfilehook@avail\endcsname
-\@ifl@t@r\fmtversion{2020-10-01}{%
-  \@ifl@t@r\fmtversion{2020-10-02}{\ltj@ltfilehook@availtrue}
-    {%
-      \ifnum\patch@level<0\relax \ifnum\patch@level<-6 \ltj@ltfilehook@availtrue\fi
-      \else\ltj@ltfilehook@availtrue\fi
-    }%
-}{}
-\ifltj@ltfilehook@avail
   %% \ltj@ExecuteBeforePackage <package><code>  and \ltj@ExecuteAfterPackage <package><code>
   %% no-starred version: do nothing if the <package> is loaded
   %% starred version: do <code> right away if the <package> is loaded
@@ -64,11 +55,6 @@
       \@ifpackageloaded{#1}{#2}{\@@ltj@ExecuteBeforePackage{#1}{#2}}%
     }
   }
-\else
-  \RequirePackage{filehook}
-  \let\ltj@ExecuteAfterPackage=\AtEndOfPackageFile
-  \let\ltj@ExecuteBeforePackage=\AtBeginOfPackageFile
-\fi
 \fi
 %============================================
 
@@ -89,12 +75,8 @@
 \else
   \@gobble\iftrue\csname iftdir\endcsname \bool_set_true:N \l_tmpa_bool \fi
 \fi
-\ifltj@ltfilehook@avail
-  \prop_map_inline:Nn \g__hook_begindocument_code_prop
-    { \tl_if_in:nnT {#2} {\tate} {\bool_set_true:N \l_tmpa_bool} }
-\else
-  \tl_if_in:NnT \@begindocumenthook {\tate} {\bool_set_true:N \l_tmpa_bool}
-\fi
+\prop_map_inline:Nn \g__hook_begindocument_code_prop
+  { \tl_if_in:nnT {#2} {\tate} {\bool_set_true:N \l_tmpa_bool} }
 \bool_if:NT \l_tmpa_bool {
   \if@ltj@@geometry@forceoff
     \@ltj@@geometry@tatefalse

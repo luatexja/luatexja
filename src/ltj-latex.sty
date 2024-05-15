@@ -12,45 +12,14 @@
 \def\luatexjalatexLoaded{\endinput}
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{ltj-latex}[2022-10-15 LaTeX support of LuaTeX-ja]
+\ProvidesPackage{ltj-latex}[2024-05-16 LaTeX support of LuaTeX-ja]
 
 \endlinechar=13
 
 %%% LaTeX version detection
-\newif\ifltj@ltfilehook@avail
-\@ifl@t@r\fmtversion{2020-10-01}{%
-  \@ifl@t@r\fmtversion{2020-10-02}%
-    {\ltj@ltfilehook@availtrue}
-    {%
-      \ifnum\patch@level<0\relax \ifnum\patch@level<-6 \ltj@ltfilehook@availtrue\fi
-      \else\ltj@ltfilehook@availtrue\fi
-    }%
-}{}
-\@ifl@t@r\fmtversion{2021-05-01}{\count@=1 }{\count@=0 }
-\ifnum \count@<1
-%%%% \shipout
-  \newluafunction\ltj@@lua@shipout@inner
-  \directlua{
-    local t = lua.get_functions_table()
-    local getbox, setbox = tex.getbox, tex.setbox
-    local shipout_lthook = luatexja.direction.shipout_lthook
-    t[\the\ltj@@lua@shipout@inner]=function ()
-      local a = shipout_lthook(getbox(\the\ltj@afbox))
-      if a then setbox(\the\ltj@afbox, a) end
-    end
-  }
-  \protected\luadef\ltj@@lua@shipout\ltj@@lua@shipout@inner
-  \def\ltj@shipout@{\ltj@@lua@shipout\primitive\shipout\box\ltj@afbox}%
-  \protected\def\ltj@shipout{\ltj@afterbox\ltj@shipout@}
-  \ifprimitive\shipout\let\shipout\ltj@shipout\fi
-  \ifcsname tex_shipout:D\endcsname
-    \expandafter\let\csname tex_shipout:D\endcsname\ltj@shipout
-  \fi
-\else
-  \directlua{%
-    luatexbase.add_to_callback('pre_shipout_filter',luatexja.direction.shipout_lthook, 'ltj.direction', 1)
-  }
-\fi
+\directlua{%
+  luatexbase.add_to_callback('pre_shipout_filter',luatexja.direction.shipout_lthook, 'ltj.direction', 1)
+}
 
 %%% patch for LaTeX
 \usepackage{lltjfont}
@@ -59,36 +28,30 @@
 \RequirePackage{lltjp-atbegshi}
 
 %%% patching commands
-\ifltj@ltfilehook@avail
-  %% \ltj@ExecuteBeforePackage <package><code>  and \ltj@ExecuteAfterPackage <package><code>
-  %% no-starred version: do nothing if the <package> is loaded
-  %% starred version: do <code> right away if the <package> is loaded
-  \def\ltj@ExecuteAfterPackage{\@ifstar\@@ltj@ExecuteAfterPackage@star\@@ltj@ExecuteAfterPackage}
-  \def\ltj@ExecuteBeforePackage{\@ifstar\@@ltj@ExecuteBeforePackage@star\@@ltj@ExecuteBeforePackage}
-  \@ifl@t@r\fmtversion{2021-11-15}{% 2021-11-15
-    \def\@@ltj@ExecuteAfterPackage@star#1{\AddToHook{package/#1/after}}
-    \def\@@ltj@ExecuteBeforePackage@star#1{\AddToHook{package/#1/before}}
-    \long\def\@@ltj@ExecuteAfterPackage#1#2{%
-      \@ifpackageloaded{#1}{}{\AddToHook{package/#1/after}{#2}}%
-    }
-    \long\def\@@ltj@ExecuteBeforePackage#1#2{%
-      \@ifpackageloaded{#1}{}{\AddToHook{package/#1/before}{#2}}%
-    }
-  }{
-    \def\@@ltj@ExecuteAfterPackage#1{\AddToHook{package/after/#1}}
-    \def\@@ltj@ExecuteBeforePackage#1{\AddToHook{package/before/#1}}
-    \long\def\@@ltj@ExecuteAfterPackage@star#1#2{%
-      \@ifpackageloaded{#1}{#2}{\@@ltj@ExecuteAfterPackage{#1}{#2}}%
-    }
-    \long\def\@@ltj@ExecuteBeforePackage@star#1#2{%
-      \@ifpackageloaded{#1}{#2}{\@@ltj@ExecuteBeforePackage{#1}{#2}}%
-    }
+%% \ltj@ExecuteBeforePackage <package><code>  and \ltj@ExecuteAfterPackage <package><code>
+%% no-starred version: do nothing if the <package> is loaded
+%% starred version: do <code> right away if the <package> is loaded
+\def\ltj@ExecuteAfterPackage{\@ifstar\@@ltj@ExecuteAfterPackage@star\@@ltj@ExecuteAfterPackage}
+\def\ltj@ExecuteBeforePackage{\@ifstar\@@ltj@ExecuteBeforePackage@star\@@ltj@ExecuteBeforePackage}
+\@ifl@t@r\fmtversion{2021-11-15}{% 2021-11-15
+  \def\@@ltj@ExecuteAfterPackage@star#1{\AddToHook{package/#1/after}}
+  \def\@@ltj@ExecuteBeforePackage@star#1{\AddToHook{package/#1/before}}
+  \long\def\@@ltj@ExecuteAfterPackage#1#2{%
+    \@ifpackageloaded{#1}{}{\AddToHook{package/#1/after}{#2}}%
   }
-\else
-  \RequirePackage{filehook}
-  \let\ltj@ExecuteAfterPackage=\AtEndOfPackageFile
-  \let\ltj@ExecuteBeforePackage=\AtBeginOfPackageFile
-\fi
+  \long\def\@@ltj@ExecuteBeforePackage#1#2{%
+    \@ifpackageloaded{#1}{}{\AddToHook{package/#1/before}{#2}}%
+  }
+}{
+  \def\@@ltj@ExecuteAfterPackage#1{\AddToHook{package/after/#1}}
+  \def\@@ltj@ExecuteBeforePackage#1{\AddToHook{package/before/#1}}
+  \long\def\@@ltj@ExecuteAfterPackage@star#1#2{%
+    \@ifpackageloaded{#1}{#2}{\@@ltj@ExecuteAfterPackage{#1}{#2}}%
+  }
+  \long\def\@@ltj@ExecuteBeforePackage@star#1#2{%
+    \@ifpackageloaded{#1}{#2}{\@@ltj@ExecuteBeforePackage{#1}{#2}}%
+  }
+}
 \def\ltj@pkgpatch@im#1{\@ifnextchar[{\ltj@pkgpatch@im@{#1}}{\ltj@pkgpatch@im@{#1}[lltjp-#1]}}%]
 \def\ltj@pkgpatch@im@#1[#2]{\ltj@ExecuteAfterPackage*{#1}{\ltj@pkgpatch@im@@{#2}}}
 \def\ltj@pkgpatch@im@@#1{%
@@ -101,11 +64,7 @@
 }
 
 \def\ltj@pkgpatch#1{\@ifnextchar[{\ltj@pkgpatch@{#1}}{\ltj@pkgpatch@{#1}[lltjp-#1]}}%]
-\ifltj@ltfilehook@avail
-  \def\ltj@pkgpatch@@{\AddToHook{begindocument/before}[luatexja.autopatch]}
-\else
-  \def\ltj@pkgpatch@@{\gpreto\@begindocumenthook}
-\fi
+\def\ltj@pkgpatch@@{\AddToHook{begindocument/before}[luatexja.autopatch]}
 \def\ltj@pkgpatch@#1[#2]{%
   \ltj@pkgpatch@@{%
     \@ifpackageloaded{#1}{\@ifpackageloaded{#2}{}{\RequirePackage{#2}}}{}%
@@ -121,17 +80,11 @@
 \ltj@pkgpatch{tascmac}
 \ltj@pkgpatch{ascmac}[lltjp-tascmac]
 \ltj@pkgpatch@im{stfloats}
-\ifltj@ltfilehook@avail\else
-  \ltj@pkgpatch{preview}  %% at \begin{document}
-  % (preview package has delayed option)
-\fi
 \ltj@pkgpatch{array}    %% at \begin{document}
 \ltj@pkgpatch{collcell} %% at \begin{document}
 \ltj@pkgpatch@im{unicode-math}
 \ltj@pkgpatch@im{siunitx}
 \ltj@pkgpatch@im{microtype}
-
-\ifltj@ltfilehook@avail\else\ltj@pkgpatch@im{everyshi}\fi
 
 \RequirePackage{lltjp-geometry}
 

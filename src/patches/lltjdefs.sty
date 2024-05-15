@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjdefs}[2022-01-23 Default font settings of LuaTeX-ja]
+\ProvidesPackage{lltjdefs}[2024-05-16 Default font settings of LuaTeX-ja]
 
 \ifdefined\ltj@stdmcfont\else\def\ltj@stdmcfont{file:HaranoAjiMincho-Regular.otf}\fi
 \ifdefined\ltj@stdgtfont\else\def\ltj@stdgtfont{file:HaranoAjiGothic-Medium.otf}\fi
@@ -18,13 +18,8 @@
 \DeclareKanjiEncodingDefaults{}{}
 \DeclareErrorKanjiFont{JY3}{mc}{m}{n}{10}
 \kanjifamily{mc}
-\ifnum\ltj@@latex@plv<1500 % <=2020-10-01
-  \kanjiseries{m}
-  \kanjishape{n}
-\else % >=2021-06-01
-  \def\k@series{m}
-  \def\k@shape{n}
-\fi
+\def\k@series{m}
+\def\k@shape{n}
 \fontsize{10}{10}
 \DeclareYokoKanjiEncoding{JY3}{}{}
 \DeclareKanjiSubstitution{JY3}{mc}{m}{n}
@@ -37,12 +32,7 @@
 \newcommand\kanjiencodingdefault{JY3}
 \newcommand\kanjifamilydefault{\mcdefault}
 \newcommand\kanjiseriesdefault{\mddefault}
-\ifnum 0\ifltj@ltfilehook@avail1\fi\ifdefined\@rmfamilyhook1\fi>0
-  %% LaTeX 2020-02-02
-  \newcommand\kanjishapedefault{\shapedefault}
-\else%% LaTeX 2019-10-01
-  \newcommand\kanjishapedefault{\updefault}
-\fi
+\newcommand\kanjishapedefault{\shapedefault}
 
 \DeclareKanjiFamily{JY3}{mc}{}
 \DeclareFontShape{JY3}{mc}{m}{n}{<-> s*[\ifdefined\Cjascale\Cjascale\else 0.962216\fi]
@@ -90,57 +80,36 @@
   \DeclareMathAlphabet{\mathgt}{JY3}{gt}{m}{n}
 \fi
 
-\ifnum 0\ifltj@ltfilehook@avail1\fi\ifdefined\@rmfamilyhook1\fi>0
-%%%% LaTeX >= 2020-02-02
 \edef\bfseries@mc{\bfdefault}
 \edef\bfseries@gt{\bfdefault}
 \def\bfseries@jtt{\bfseries@mc}
 \edef\mdseries@mc{\mddefault}
 \edef\mdseries@gt{\mddefault}
 \def\mdseries@jtt{\mdseries@mc}
-\fi
 
 \newif\if@ltj@match@family
 \@ltj@match@familyfalse
 \def\verbatim@font{\normalfont\ttfamily\kanjifamily\jttdefault\selectfont}
 
-\def\@ltj@hook@family#1#2{% #1: csname #2: contents
-  \ifltj@ltfilehook@avail % LaTeX 2020-10-01
-    \AddToHook{#1}{#2}%
-  \else\ifcsname @#1hook\endcsname % LaTeX 2020-02-02
-    \csappto{@#1hook}{#2}%
-  \else % LaTeX 2019-10-01
-    \ifcsname #1 \endcsname
-      \expandafter\patchcmd\csname #1 \endcsname{\selectfont}{#2\selectfont}{}{}%
-    \else
-      \PackageWarningNoLine{luatexja}{%
-        Patching to \expandafter\string\csname #1\endcsname\space failed%
-      }%
-    \fi
-  \fi\fi
-}
-\@ltj@hook@family{rmfamily}{%
+\AddToHook{rmfamily}{%
   \if@ltj@match@family
     \prepare@family@series@update@kanji{mc}\mcdefault
   \fi
 }
-\@ltj@hook@family{sffamily}{%
+\AddToHook{sffamily}{%
   \if@ltj@match@family
     \prepare@family@series@update@kanji{gt}\gtdefault
   \fi
 }
-\@ltj@hook@family{ttfamily}{%
+\AddToHook{ttfamily}{%
   \if@ltj@match@family
     \prepare@family@series@update@kanji{jtt}\jttdefault
   \fi
 }
-\let\@ltj@hook@family\@undefined
 
-\ifltj@ltfilehook@avail % 2020-10-01
-  \expandafter\def\expandafter\kanjiseriesdefault
-    \expandafter{\kanjiseriesdefault\@empty}
-  \let\kanjiseriesdefault@kernel\kanjiseriesdefault
-\fi
+\expandafter\def\expandafter\kanjiseriesdefault
+  \expandafter{\kanjiseriesdefault\@empty}
+\let\kanjiseriesdefault@kernel\kanjiseriesdefault
 
 %%% \eminnershape
 \expandafter\patchcmd\csname em \endcsname{\itshape}{\gtfamily\itshape}{}{}

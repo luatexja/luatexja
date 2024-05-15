@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjext}[2022-08-24 v1.2k-ltj-14 Macros for vertical writing]
+\ProvidesPackage{lltjext}[2024-05-16 v1.2k-ltj-15 Macros for vertical writing]
 \RequirePackage{luatexja}
 \newcount\ltj@ext@dir
 \let\ltj@lltjext@orig@tabular=\tabular
@@ -541,17 +541,11 @@
        \else \let\box@dir\utod
     \fi
   \fi
-\ifltj@ltfilehook@avail % LaTeX2e >= 2020-10-01
   \@defaultunitsset\@picht{#3}\unitlength
   \@defaultunitsset\@picwd{#2}\unitlength
   \setbox\@picbox\hbox to\@picwd\bgroup\box@dir
     \@defaultunitsset\@tempdimc{#4}\unitlength\hskip-\@tempdimc
     \@defaultunitsset\@tempdimc{#5}\unitlength\lower\@tempdimc\hbox\bgroup
-\else % <= 2020-02-02
-  \@picwd=#2\unitlength \@picht=#3\unitlength
-  \setbox\@picbox\hbox to\@picwd\bgroup\box@dir
-  \hskip-#4\unitlength\lower#5\unitlength\hbox\bgroup
-\fi
   \ltj@@pic@reset@blshift
   \ignorespaces}
 \def\endpicture{%
