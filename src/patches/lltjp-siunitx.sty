@@ -1,5 +1,5 @@
 %
-% lltjp-siunitx.sty 2022-12-14
+% lltjp-siunitx.sty 2024-06-10
 %
 
 \NeedsTeXFormat{LaTeX2e}
@@ -7,7 +7,6 @@
 \RequirePackage{siunitx}
 \makeatletter
 \ExplSyntaxOn
-\cs_if_exist:NTF \siunitx_print_text:n {% siunitx v3.00
 \cs_set_protected:Npn \siunitx_print_text:n #1
   {
     \text
@@ -32,104 +31,26 @@
       }
   }
 \cs_set_eq:NN \ltj_orig__siunitx_table_collect_begin:w \__siunitx_table_collect_begin:w
-\cs_set_protected:Npn \__siunitx_table_collect_begin:w #1 \relax
-  { \ltj_orig__siunitx_table_collect_begin:w }
-\RenewDocumentCommand \tablenum { O { } m }
-  {
-    \mode_leave_vertical:
-    \group_begin:
-      \keys_set:nn { siunitx } {#1}
-      \siunitx_cell_begin:w
-        \relax \ignorespaces #2
-      \siunitx_cell_end:
-    \group_end:
+\cs_set_protected:Npn \__siunitx_table_collect_begin:w #1 {
+   \token_if_eq_meaning:NNTF #1 \relax
+     {\ltj_orig__siunitx_table_collect_begin:w }
+     {\ltj_orig__siunitx_table_collect_begin:w #1 }
   }
-}% siunitx v3.00 end
-{% siunitx v2.xx
-\cs_generate_variant:Nn \tl_if_in:NnT { coT }
-\cs_new:Nn \__ltj_siunix_patch_inner:n {
-  \cs_if_exist:cT { #1_tl } {
-    \tl_if_in:coT { #1_tl } { \tex_char:D } {
-	  \tl_replace_all:cnn { #1_tl } { \tex_char:D } { \ltjalchar }
-	}
-  }
-}
-\cs_new:Nn \__ltj_siunix_patch_inner_math:n {
-   \__ltj_siunix_patch_inner:n { l__siunitx_#1_math }
-   \__ltj_siunix_patch_inner:n { l__siunitx_#1_text }
-}
-\AtBeginDocument {
-  \__ltj_siunix_patch_inner:n { c__siunitx_minus }
-  \__ltj_siunix_patch_inner:n { c__siunitx_mu }
-  \__ltj_siunix_patch_inner_math:n { angstrom }
-  \__ltj_siunix_patch_inner_math:n { arcminute }
-  \__ltj_siunix_patch_inner_math:n { arcsecond }
-  \__ltj_siunix_patch_inner_math:n { ohm }
-}
-
-%%%% new table column: S and s
-\bool_new:N \l__ltj_siunitx_table_collect_relax_bool
-\cs_set_protected:Npn \__siunitx_table_collect_begin_s: {
-  \bool_set_false:N \l__ltj_siunitx_table_collect_relax_bool
-  \cs_set_eq:NN \__siunitx_table_collect_token:N
-    \__siunitx_table_collect_token_s:N
-  \cs_set_eq:NN \__siunitx_table_print: \__siunitx_table_print_s:
-  \__siunitx_table_collect_init_s:
-  \__siunitx_table_collect_get:
-}
-
-\cs_set_protected:Npn \__siunitx_table_collect_not_braced:N #1
+\cs_set_protected:Npn \__siunitx_table_collect_token:N #1
   {
-	\token_if_eq_meaning:NNTF #1 \tex_relax:D {
-      \bool_if:NTF \l__ltj_siunitx_table_collect_relax_bool {
-		\__siunitx_table_collect_not_braced_aux_i:N #1
-	  } {
-	    \bool_set_true:N \l__ltj_siunitx_table_collect_relax_bool
-	  }
-	} {
-    \token_if_eq_meaning:NNF #1 \ltjfakeboxbdd {
-    \token_if_eq_meaning:NNF #1 \pltx@next@inhibitglue {
-    \token_if_eq_meaning:NNF #1 \tex_ignorespaces:D
+    \__siunitx_table_collect_search:NnF #1
       {
-        \token_if_eq_meaning:NNF #1 \tex_unskip:D
-          { \__siunitx_table_collect_not_braced_aux_i:N #1 }
+        \ignorespaces     { \__siunitx_table_collect_ignore_spaces:N #1}
+        \pltx@next@inhibitglue     { \__siunitx_table_collect_loop:}
+        \ltjfakeboxbdd     { \__siunitx_table_collect_loop:}
+        \textonly@unskip   { \__siunitx_table_collect_loop:}
+        \unskip            { \__siunitx_table_collect_loop:}
+        \end               { \tabularnewline \end }
+        \relax             { \__siunitx_table_collect_relax:N #1 }
+        \tabularnewline    { \tabularnewline }
+        \siunitx_cell_end: { \siunitx_cell_end:}
       }
-	}}}
-    \__siunitx_table_collect_next:
-  }
-
-\AtBeginDocument
-  {
-    \@ifpackageloaded { mdwtab }
-      {
-        \cs_set_protected:Npn \__siunitx_table_collect_not_braced:N #1
-          { 
-	        \token_if_eq_meaning:NNTF #1 \tex_relax:D {
-              \bool_if:NTF \l__ltj_siunitx_table_collect_relax_bool {
-		        \__siunitx_table_collect_not_braced_aux_i:N #1
-	          } {
-	            \bool_set_true:N \l__ltj_siunitx_table_collect_relax_bool
-	          }
-	        } {
-            \token_if_eq_meaning:NNF #1 \ltjfakeboxbdd {
-            \token_if_eq_meaning:NNF #1 \pltx@next@inhibitglue {
-            \token_if_eq_meaning:NNF #1 \tex_ignorespaces:D
-              {
-                \token_if_eq_meaning:NNF #1 \tex_unskip:D
-                  {
-                    \token_if_eq_meaning:NNF #1 \tab@setcr
-                      {
-                        \token_if_eq_meaning:NNF #1 \@maybe@unskip
-                          { \__siunitx_table_collect_not_braced_aux_i:N #1 }
-                      }
-                  }
-              }
-            }}}
-            \__siunitx_table_collect_next:
-          }
-      }
-      { }
-  }
+      { \__siunitx_table_collect_token_aux:N #1 }
 }
 \ExplSyntaxOff
 \endinput
