@@ -1,6 +1,7 @@
+\RequirePackage[2024-05-01]{latexrelease}
 \documentclass{scrbook}
 \usepackage{luatexja}
-\usepackage{tabularray}
+%\usepackage{tabularray}
 \usepackage{fontspec}
 %  \usepackage{luatexja-fontspec}
   \usepackage[
@@ -12,8 +13,10 @@
 %\typeout{\meaning\@begindocumenthook}
 \usepackage{collcell}
 \newcolumntype{s}{>{\collectcell\si}c<{\endcollectcell}}
+\newcolumntype{u}{>{\collectcell\DF}c<{\endcollectcell}}
+\protected\def\DF#1{\typeout{\unexpanded{#1}}<<#1>>}
 \DeclareSIUnit\angstrom{Å}
-\UseTblrLibrary{siunitx}
+%\UseTblrLibrary{siunitx}
 \begin{document}
   \ifdefined\gtfamily\gtfamily\fi Ω
   {\ExplSyntaxOn\makeatletter
@@ -27,16 +30,17 @@
     0 \\   12345 \\   e3 \\   0.0+-0.1
   \end{tabular}
 \vrule
+%\tracingall
 
- \vrule$\begin{array}{Ss}
-%   \typeout{\meaning\@preamble}
+\vrule$\begin{array}{Ss}
    -.123 & J.mol^{-1} \\
    1.23e-3 & Hartree \\
   \end{array}$
 
- \vrule\begin{tabular}{Ssl}
-  -.123 & J.mol^{-1} &「\\
-  1.23e-3 & Hartree & あ\\
+ \vrule\begin{tabular}{Sslu}
+   &&\typeout{\meaning\@preamble}\\
+  -.123 & J.mol^{-1} &「&「FFFあ\\
+  1.23e-3 & Hartree & あ&あKKK」\\
 \end{tabular}
 
 \begin{tabular}{@{}llr@{}}
