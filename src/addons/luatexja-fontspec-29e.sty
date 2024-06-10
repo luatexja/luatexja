@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec-29e}[2024-05-14 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec-29e}[2024-05-27 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e}
 \ExplSyntaxOn
 
@@ -359,9 +359,23 @@
   \setfontfamily #1 [#2,#4] {#3}
   \cs_set_eq:NN \fontspec_set_family:Nnn \__ltj_orig_fontspec_set_family:Nnn
 }
+\DeclareDocumentCommand \providejfontfamily { m O{} m O{} } {
+  \cs_set_eq:NN \fontspec_set_family:Nnn \__ltj_fontspec_set_family:Nnn
+  \providefontfamily #1 [#2,#4] {#3}
+  \cs_set_eq:NN \fontspec_set_family:Nnn \__ltj_orig_fontspec_set_family:Nnn
+}
 
 \DeclareDocumentCommand \newjfontface { m O{} m O{} } {
   \newjfontfamily #1 [ BoldFont={},ItalicFont={},SmallCapsFont={},#2,#4 ] {#3}
+}
+\DeclareDocumentCommand \renewjfontface { m O{} m O{} } {
+  \renewjfontfamily #1 [ BoldFont={},ItalicFont={},SmallCapsFont={},#2,#4 ] {#3}
+}
+\DeclareDocumentCommand \setjfontface { m O{} m O{} } {
+  \setjfontfamily #1 [ BoldFont={},ItalicFont={},SmallCapsFont={},#2,#4 ] {#3}
+}
+\DeclareDocumentCommand \providejfontface { m O{} m O{} } {
+  \providejfontfamily #1 [ BoldFont={},ItalicFont={},SmallCapsFont={},#2,#4 ] {#3}
 }
 
 \prop_new:N \l__ltj_fontspec_tmp_prop
