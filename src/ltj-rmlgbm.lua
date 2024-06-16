@@ -15,7 +15,7 @@ do
 end
 local cidfont_data = {}
 local cache_chars = {}
-local cache_ver = 13
+local cache_ver = 14
 local identifiers = fonts.hashes.identifiers
 
 local cid_reg, cid_order, cid_supp, cid_name
@@ -147,7 +147,7 @@ do
             descender = 655360*0.12,
          },
          embedding = "no", cache = "yes", factor = 0, hfactor = 0, vfactor = 0,
-         tounicode = 1,
+         tounicode = 1, filename="",
          properties = { language = "dflt", script = "dflt" },
       }
       cidfont_data[cid_name] = k
