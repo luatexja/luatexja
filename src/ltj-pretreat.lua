@@ -156,16 +156,17 @@ function set_box_stack_level(head, mode)
    if ltjs.list_dir == dir_tate then
       for p in traverse_glyph(to_direct(head)) do
          if getlang(p)==lang_ja and has_attr(p, attr_icflag, 0) then
-            local pf = ltjf_replace_altfont(attr_curtfnt, getchar(p), p)
+            local pc = ltjs_orig_char_table[p] or getchar(p)
+            local pf = ltjf_replace_altfont(attr_curtfnt, pc, p)
             if ltjf_font_metric_table[pf].vert_activated then
-               local pc = ltjf_font_metric_table[pf].vform[pc]; if pc then setchar(p,  pc) end
+               pc = ltjf_font_metric_table[pf].vform[pc]; if pc then setchar(p,  pc) end
             end
          end
       end
    else
       for p in traverse_glyph(to_direct(head)) do
          if getlang(p)==lang_ja and has_attr(p, attr_icflag, 0) then
-            ltjf_replace_altfont(attr_curjfnt, getchar(p), p)
+            ltjf_replace_altfont(attr_curjfnt, ltjs_orig_char_table[p] or getchar(p), p)
          end
       end
    end
