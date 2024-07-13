@@ -7833,7 +7833,7 @@ stretch_priority={kanjiskip=-35,xkanjiskip=-25,others=50}
 
 さらに，バージョン20220211.0以降では次の命令が提供される．
 \begin{cslist}
-  \item[\cs{ltjghostbeginjachar}]
+  \item[\cs{ltjghostbeforejachar}]
   \LuaTeX-ja本体が提供している\cs{ltjfakeparbegin}, \cs{ltjfakeboxbdd}と類似の命令である．
   実行された箇所が（限定・非限定を問わず）水平モードであった場合に，実行された箇所は
   「文字クラス0の\textbf{JAchar}」の直前であると，
@@ -7850,7 +7850,7 @@ A\LG  字  \par% ==> ALchar--(xkanjiskip)--\LG
 \end{LTXexample}
 
   \item[\cs{ltjghostafterjachar}]
-  \cs{ltjghostbeginjachar}と対を成す命令で，実行された箇所は
+  \cs{ltjghostbeforejachar}と対を成す命令で，実行された箇所は
   「文字クラス0の\textbf{JAchar}」の直後であると，
   \LuaTeX-jaの和文処理グルー挿入処理に認識させる．以下の実行例を参照．
 
