@@ -3,7 +3,9 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-array}[2024-06-10 Patch to array for LuaTeX-ja]
+\ProvidesPackage{lltjp-array}[2024-07-21 Patch to array for LuaTeX-ja]
+
+\@ifpackageloaded{array}{\def\lltjp@array@array@loaded{1}}{\let\lltjp@array@array@loaded\relax}
 
 \RequirePackage{etoolbox,array}
 
@@ -22,12 +24,12 @@
 
 \@ifpackageloaded{lltjext}{}{%
 %% remove extra \xkanjiskip (pLaTeX2e 2016/04/17)
-\def\@tabular{%
-	    \leavevmode \null
-	    \hbox \bgroup $\col@sep\tabcolsep \let\d@llarbegin\begingroup
-	                                      \let\d@llarend\endgroup
-	    \@tabarray}
-\def\endtabular{\endarray $\egroup\null}
+\ifnum0<0\lltjp@array@array@loaded
+  \patchcmd{\@tabular}{\leavevmode}{\leavevmode\null}{}{}
+  \patchcmd{\@tabular}{\leavevmode\null\null}{\leavevmode\null}{}{}
+  \apptocmd{\endtabular}{\null}{}{}
+  \let\lltjp@array@array@loaded\undefined
+\fi
 \expandafter \let \csname endtabular*\endcsname = \endtabular
 }
 \endinput
