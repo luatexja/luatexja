@@ -3,63 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-footmisc}[2022-02-19 Patch to footmisc for LuaTeX-ja]
+\ProvidesPackage{lltjp-footmisc}[2024-07-22 Patch to footmisc for LuaTeX-ja]
 
-\@ifpackagelater{footmisc}{2022-02-10}{%% v6.0a or later
-  \patchcmd{\@makenormalcolbox}{\vskip -\@outputbox@depth\@textbottom}%
-    {\pltx@adjust@wd@outputbox\vskip -\@outputbox@depth\@textbottom}{}{}%
-  \let\ltj@next\endinput
-}{\let\ltj@next\relax}
-\ltj@next
-
-% old (v5.5)
-\let  \if@tempswa  \ifFN@bottom
-\ifFN@para    \@tempswatrue \fi
-\if@tempswa
-  \ifFN@bottom
-    \toks@{\setbox\@outputbox \box\@cclv
-      \xdef\@freelist{\@freelist\@midlist}%
-      \global\let\@midlist\@empty
-      \@combinefloats
-      \ifvoid\footins
-      \else
-        \setbox\@outputbox \vbox\bgroup
-          \boxmaxdepth\@maxdepth
-          \unvbox\@outputbox
-          \vfill\relax
-    }
-    \the\FN@temptoken
-    \toks@\expandafter{\the\toks@\egroup\fi}
-  \else
-    \toks@{\ifvoid\footins
-        \setbox\@outputbox\box\@cclv
-      \else
-        \setbox\@outputbox \vbox\bgroup
-        \boxmaxdepth\@maxdepth
-        \unvbox\@cclv
-    }
-    \the\FN@temptoken
-    \toks@\expandafter{\the\toks@
-      \egroup
-      \fi
-      \xdef\@freelist{\@freelist\@midlist}%
-      \global\let\@midlist\@empty
-      \@combinefloats
-    }%
-  \fi
-  \toks@\expandafter{\the\toks@
-    \ifvbox\@kludgeins
-      \@makespecialcolbox
-    \else
-      \setbox\@outputbox \vbox to\@colht{%
-        \@texttop \dimen@\dp\@outputbox
-        \unvbox\@outputbox
-        \pltx@adjust@wd@outputbox
-        \vskip -\dimen@\@textbottom
-      }%
-    \fi
-    \global\maxdepth\@maxdepth
-  }
-  \edef\@makecol{\the\toks@}
-\fi
-\endinput
+\patchcmd{\@makenormalcolbox}{\vskip -\@outputbox@depth\@textbottom}%
+  {\pltx@adjust@wd@outputbox\vskip -\@outputbox@depth\@textbottom}{}{}%

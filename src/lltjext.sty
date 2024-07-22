@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjext}[2024-05-16 v1.2k-ltj-15 Macros for vertical writing]
+\ProvidesPackage{lltjext}[2024-07-22 v1.2k-ltj-16 Macros for vertical writing]
 \RequirePackage{luatexja}
 \newcount\ltj@ext@dir
 \let\ltj@lltjext@orig@tabular=\tabular
@@ -676,10 +676,6 @@
 	{\ltj@ext@dir=\ltjgetparameter{direction}\relax}{}{}
   \expandafter\let\csname tabular*\endcsname=\ltj@lltjext@orig@tabularS
   \patchcmd{\p@stabular}{\p@tabular}{\@tabular}{}{}
-  \@ifpackagelater{array}{2018/09/13}
-    {\expandafter\@firstoftwo}
-    {\expandafter\@secondoftwo}
-  {% = for 2018/09/13 v2.4i or newer
   \def\@startpbox##1{\bgroup
     \color@begingroup
     \box@dir\adjustbaseline%%% これを追加
@@ -688,15 +684,6 @@
          \vrule \@height \ltjgetht\@arstrutbox \@width \z@
          \everypar{}}%
       }%
-  }{ % = for 2018/04/30 v2.4h or older
-  \def\@startpbox##1{\bgroup
-    \box@dir\adjustbaseline%%% これを追加
-    \setlength\hsize{##1}\@arrayparboxrestore
-      \everypar{%
-         \vrule \@height \ltjgetht\@arstrutbox \@width \z@
-         \everypar{}}%
-      }%
-  }%
   \def\@tabarray{\@ifnextchar<\p@tabarray{\p@tabarray<Z>}}
   \def\p@array<##1>[##2]##3{%
     \ifnum\ltj@ext@dir=0 \ltj@ext@dir=\ltjgetparameter{direction}\relax\fi
