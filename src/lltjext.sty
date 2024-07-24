@@ -27,7 +27,7 @@
 \def\p@stabular<#1>#2{%
    \setlength\dimen@{#2}%
    \edef\@halignto{to\the\dimen@}\p@tabular<#1>}
-\def\p@tabular<#1>{\leavevmode \hbox \bgroup 
+\def\p@tabular<#1>{\leavevmode\null \hbox \bgroup % fixed for unwanted xkanjiskip
    \ltj@ext@dir=\ltjgetparameter{direction}\relax
    $\let\@acol\@tabacol
    \let\@classz\@tabclassz
@@ -686,6 +686,7 @@
          \everypar{}}%
       }%
   \def\@tabarray{\@ifnextchar<\p@tabarray{\p@tabarray<Z>}}
+\ifcsname tbl_save_outer_table_cols:\endcsname %%%%%% >=2024-06-01
   \def\p@array<##1>[##2]##3{%
     \ifnum\ltj@ext@dir=0 \ltj@ext@dir=\ltjgetparameter{direction}\relax\fi
     \let\box@dir\relax
@@ -752,6 +753,62 @@
     \egroup\@end@alignbox
     \@arrayright \gdef\@preamble{}%
   }
+\else %%%%%% <2024-06-01
+  \def\p@array<##1>[##2]##3{%
+    \ifnum\ltj@ext@dir=0 \ltj@ext@dir=\ltjgetparameter{direction}\relax\fi
+    \let\box@dir\relax
+    \if ##1z\relax
+      \ifnum\ltj@ext@dir=3\relax
+        \let\box@dir\utod\@tempcnta=\zstrutbox
+      \fi
+    \else
+      \if ##1y\relax
+        \let\box@dir\yoko\@tempcnta=\ystrutbox
+      \else\if ##1t\relax
+        \let\box@dir\tate\@tempcnta=\tstrutbox
+      \else\if ##1d\relax
+         \let\box@dir\dtou\@tempcnta=\dstrutbox
+      \else\if ##1u\relax
+         \let\box@dir\utod\@tempcnta=\zstrutbox
+      \fi\fi\fi\fi
+    \fi
+    \ifx\box@dir\relax
+      \ifcase\ltj@ext@dir
+         \or   \let\box@dir\dtou\@tempcnta=\dstrutbox% dtou
+         \or\or\let\box@dir\tate\@tempcnta=\tstrutbox% tate
+         \or   \let\box@dir\yoko\@tempcnta=\ystrutbox% yoko
+         \else \let\box@dir\utod\@tempcnta=\zstrutbox% utod
+      \fi
+    \fi
+    \setbox \@arstrutbox \hbox{\box@dir\vrule
+               \@height \arraystretch
+                 \dimexpr \ltjgetht\@tempcnta+\extrarowheight\relax
+               \@depth \arraystretch \ltjgetdp \@tempcnta
+               \@width \z@}%
+    \fork@array@option<##1>[##2]%
+    \begingroup
+    \@mkpream{##3}%
+    \xdef\@preamble{\noexpand\ialign \@halignto
+      \bgroup \@arstrut\@preamble \tabskip \z@ \cr}%
+    \endgroup
+    \@arrayleft
+    \@begin@alignbox
+    \bgroup
+    \box@dir\adjustbaseline
+    \let\@sharp####\let\protect\relax
+    \lineskip \z@
+    \baselineskip \z@
+    \m@th
+    \let\\\@arraycr \let\tabularnewline\\\let\par\@empty
+    \@preamble
+  }
+  \def\endtabular{\endarray\m@th$\egroup\null}
+  \def\endarray{
+    \crcr\egroup\egroup\@end@alignbox
+    \@arrayright \gdef\@preamble{}%
+  }
+\fi
+  \expandafter \let \csname endtabular*\endcsname = \endtabular
 }
 \ExplSyntaxOff
 \@ifpackageloaded{array}{%
