@@ -434,17 +434,18 @@ do
    end
    -- extract jfm_name, jfm_spec and jfm_var
    -- normalize position of 'jfm=' and 'jfmvar=' keys
+   local match, sub = string.match, string.sub
    local function extract_jfm_spec(name)
-      name = (name:match '^{(.*)}$') or (name:match '^"(.*)"$') or name
+      name = (match(name,'^{(.*)}$')) or (match(name,'^"(.*)"$')) or name
       jfm_spec, jfm_var = '', ''
-      local tmp, index = name:sub(1, 5), 1
+      local tmp, index = sub(name,1, 5), 1
       if tmp == 'file:' or tmp == 'name:' or tmp == 'psft:' then
          index = 6
       end
       name = lpegmatch(jf_remainder, name)
       if jfm_name~='' then
          if luatexja.jfont.jfm_feature then
-            local l, t2 = name:sub(-1), {}
+            local l, t2 = sub(name,-1), {}
             for i,v in pairs(luatexja.jfont.jfm_feature) do
                -- print(i,type(v),v)
                t2[#t2+1] = (v==true) and i
@@ -454,7 +455,7 @@ do
          else
             jfm_spec = jfm_name
          end
-         l = name:sub(-1)
+         l = sub(name,-1)
          name = name .. ((l==':' or l==';') and '' or ';') .. 'jfm=' .. jfm_spec
          if jfm_var~='' then
             name = name .. ';jfmvar=' .. jfm_var
@@ -902,9 +903,10 @@ do
        end
    end
 
+   local sub = string.sub
    local function prepare_extra_data_font(id, res, name)
       if type(res)=='table' and (res.psname or res.filename) then
-         if (res.embedding=='no') and (type(name)=='string') and (name:sub(1,5)=='psft:') then
+         if (res.embedding=='no') and (type(name)=='string') and (sub(name,1,5)=='psft:') then
             font_extra_info[id] = res.resources.ltj_extra
          else
             local bname = res.psname or nameonly(res.filename)

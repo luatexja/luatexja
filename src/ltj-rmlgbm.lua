@@ -16,6 +16,7 @@ end
 local cidfont_data = {}
 local cache_chars = {}
 local cache_ver = 14
+local sub = string.sub
 local identifiers = fonts.hashes.identifiers
 
 local cid_reg, cid_order, cid_supp, cid_name
@@ -300,7 +301,6 @@ local function prepare_cid_font(reg, ord)
    return cidfont_data[cid_name] or read_cid_font()
 end
 
-
 local definers = fonts.definers
 local function mk_rml(name, size, id)
    local specification = definers.analyze(name,size)
@@ -308,8 +308,8 @@ local function mk_rml(name, size, id)
    specification.detail = specification.detail or ''
    do
       local n = specification.name
-      if n:sub(1,1)=="{" then n=n:sub(2) end
-      if n:sub(-1)=="}" then  n=n:sub(1,-2) end
+      if sub(n,1,1)=="{" then n=sub(n,2) end
+      if sub(n,-1)=="}" then  n=sub(n,1,-2) end
       specification.name=n
    end
    local fontdata = {}
@@ -382,11 +382,11 @@ local function mk_rml(name, size, id)
 end
 
 local function font_callback(name, size, id, fallback)
-   if name:sub(1,1)=="{" and name:sub(-1)=="}" then name = name:sub(2,-2) end
+   if sub(name,1,1)=="{" and sub(name,-1)=="}" then name = sub(name,2,-2) end
    local p = name:find(":") or 0
-   if name:sub(1, p-1) == 'psft' then
+   if sub(name,1, p-1) == 'psft' then
       local s = "Adobe-Japan1-7"
-      local basename = name:sub(p+1)
+      local basename = sub(name,p+1)
       local p = basename:find(":")
       local q = basename:find("/[BI][BI]?")
       if q and p and q<=p then
@@ -394,12 +394,12 @@ local function font_callback(name, size, id, fallback)
          p = basename:find(":")
       end
       if p then
-         local xname = basename:sub(p+1)
+         local xname = sub(basename,p+1)
          p = 1
          while p do
             local q = xname:find(";", p+1) or xname:len()+1
-            if xname:sub(p, p+3)=='cid=' and q>p+4 then
-               s = xname:sub(p+4, q-1)
+            if sub(xname,p, p+3)=='cid=' and q>p+4 then
+               s = sub(xname,p+4, q-1)
             end
             if xname:len()+1==q then p = nil else p = q + 1 end
          end
