@@ -1,0 +1,28 @@
+\documentclass{ltjsarticle}
+\usepackage{lltjext,luatexja-ruby}
+\usepackage{luacolor,lua-ul}
+\begin{document}
+\ltjsetruby{size=0.6}
+\def\test#1#2{%
+  \par\leavevmode\vrule#1{#2
+  \highLight{%
+    あ\ruby{隼}{はやぶさ}あ
+    漢\ruby{◆|a|◆}{１１１|２２２|３３３}歩
+	漢\ruby{◆|a|◆}{１１|２２|３３}歩
+	漢\ruby{◆|a|◆}{１１|２２|３３３}歩
+	漢\ruby{◆|a|◆}{１１|２２２|３３}歩
+	漢\ruby{◆|a|◆}{１１１|２２|３３}歩
+  }}\vrule}
+
+
+\test{}{}
+
+\test{\hbox}{\yoko}
+\test{\hbox}{\tate}
+\newpage
+\test{\vbox}{\yoko}
+\test{\vbox}{\tate}
+
+\end{document}
+
+

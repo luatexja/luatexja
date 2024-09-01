@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.ruby',
-  date = '2022-12-31',
+  date = '2024-09-01',
   description = 'Ruby annotation',
 })
 luatexja.ruby = {}
@@ -37,7 +37,7 @@ local setwhd = node.direct.setwhd
 local setlist = node.direct.setlist
 local setvalue = node.direct.setdata
 
-local node_new = node.direct.new
+local node_new = luatexja.dnode_new
 local node_remove = node.direct.remove
 local node_next =  node.direct.getnext
 local node_copy, node_tail = node.direct.copy, node.direct.tail
@@ -45,6 +45,7 @@ local node_free = node.direct.flush_node or node.direct.free
 local get_attr, set_attr = node.direct.get_attribute, node.direct.set_attribute
 local insert_before, insert_after = node.direct.insert_before, node.direct.insert_after
 local hpack = node.direct.hpack
+local node_inherit_attr = luatexja.node_inherit_attr
 
 local id_hlist  = node.id 'hlist'
 local id_vlist  = node.id 'vlist'
@@ -175,10 +176,10 @@ do
             set_attr(nh, attr_icflag,
               get_attr_icflag(nh) + PROCESSED_BEGIN_FLAG)
             setnext(node_tail(h), nh)
-            setlist(f, nil); node_free(f)
+            setlist(f, nil)
             setlist(b, nil); node_free(b)
             local g = luatexja.jfmglue.main(h,false)
-            return hpack(g)
+            g = node_inherit_attr(hpack(g),f); node_free(f); return g
          else
             return f
          end
@@ -247,10 +248,10 @@ do
       setglue(k, postnw, round(post*65536), 0, 2, 0)
       insert_after(h, node_tail(h), k);
       -- hpack
-      setlist(box, nil); node_free(box)
-      box = hpack(h, new_width, 'exactly')
-      setheight(box, hh); setdepth(box, hd)
-      return box
+      setlist(box, nil);
+      local new_box = node_inherit_attr(hpack(h, new_width, 'exactly'), box)
+      setheight(new_box, hh); setdepth(new_box, hd)
+      node_free(box); return new_box
    end
 end
 
@@ -377,7 +378,7 @@ end
 -- ルビボックスの生成（単一グループ）
 -- returned value: <new box>, <ruby width>, <post_intrusion>
 local max_margin
-local function new_ruby_box(r, p, tmp_tbl, no_begin, no_end)
+local function new_ruby_box(r, p, tmp_tbl, no_begin, no_end, w)
    local post_intrusion, post_jfmgk = 0, false
    local imode
    local ppre, pmid, ppost = tmp_tbl.ppre, tmp_tbl.pmid, tmp_tbl.ppost
@@ -406,7 +407,7 @@ local function new_ruby_box(r, p, tmp_tbl, no_begin, no_end)
       end
       if need_repack then
          local rt = r
-         r = hpack(getlist(r), getwidth(r), 'exactly')
+         r = node_inherit_attr(hpack(getlist(r), getwidth(r), 'exactly'), r)
          setlist(rt, nil); node_free(rt);
       end
    end
@@ -416,7 +417,8 @@ local function new_ruby_box(r, p, tmp_tbl, no_begin, no_end)
    insert_after(r, k, p); setnext(p, nil)
    if tmp_tbl.rubydepth >= 0 then setdepth(r, tmp_tbl.rubydepth) end
    if tmp_tbl.baseheight >= 0 then setheight(p, tmp_tbl.baseheight) end
-   a = node.direct.vpack(r); setshift(a, 0)
+   a = node_inherit_attr(node.direct.vpack(r), p) 
+   setshift(a, 0)
    set_attr(a, attr_ruby, post_intrusion)
    set_attr(a, attr_ruby_post_jfmgk, post_jfmgk and 1 or 0)
    if rsmash or getheight(a)<getheight(p) then
@@ -454,14 +456,14 @@ local function pre_low_cal_box(w, cmp)
    local nt, nta, ntb = wv, nil, nil -- nt*: node temp
    rst.ppre, rst.pmid, rst.ppost = rtb[6], rtb[5], rtb[4]
    rst.mapre, rst.mapost = max_allow_pre, 0
-  for i = 1, cmp do
+   for i = 1, cmp do
       nt = node_next(nt); rb[i] = nt; nta = concat(nta, node_copy(nt))
       nt = node_next(nt); pb[i] = nt; ntb = concat(ntb, node_copy(nt))
       coef[i] = {}
       for j = 1, 2*i do coef[i][j] = 1 end
       for j = 2*i+1, 2*cmp+1 do coef[i][j] = 0 end
       kf[i], coef[i][2*cmp+2]
-         = new_ruby_box(node_copy(nta), node_copy(ntb), rst, true, false)
+         = new_ruby_box(node_copy(nta), node_copy(ntb), rst, true, false, w)
    end
    node_free(nta); node_free(ntb)
 
@@ -475,7 +477,7 @@ local function pre_low_cal_box(w, cmp)
       for j = 2*i, 2*cmp+1 do coef[cmp+i][j] = 1 end
       nta = concat(node_copy(rb[i]), nta); ntb = concat(node_copy(pb[i]), ntb)
       kf[cmp+i], coef[cmp+i][2*cmp+2]
-         = new_ruby_box(node_copy(nta), node_copy(ntb), rst, false, true)
+         = new_ruby_box(node_copy(nta), node_copy(ntb), rst, false, true, w)
    end
 
    -- ここで，nta, ntb には全 container を連結した box が入っているので
@@ -485,7 +487,7 @@ local function pre_low_cal_box(w, cmp)
    rst.ppre, rst.pmid, rst.ppost = rtb[3], rtb[2], rtb[1]
    rst.mapre, rst.mapost = max_allow_pre, max_allow_post
    kf[2*cmp+1], coef[2*cmp+1][2*cmp+2], post_intrusion_backup, post_jfmgk_backup
-      = new_ruby_box(nta, ntb, rst, true, true)
+      = new_ruby_box(nta, ntb, rst, true, true, w)
 
    -- w.value の node list 更新．
    local nt = wv
@@ -515,20 +517,21 @@ local next_cluster_array = {}
 -- ノード追加
 local function pre_low_app_node(head, w, cmp, coef, ht, dp)
    -- メインの node list 更新
-   local nt = node_new(id_glue)
+   local nt = node_new(id_glue, nil, w) -- INHERIT ATTRIBUTES OF w
    setglue(nt, coef[1][2*cmp+2], 0, 0, 0, 0)
    set_attr(nt, attr_ruby, 1); set_attr(w, attr_ruby, 2)
    head = insert_before(head, w, nt)
    nt = w
    for i = 1, cmp do
       -- rule
-      local nta = node_new(id_rule, 0);
+      local nta = node_new(id_rule, 0, w); -- INHERIT ATTRIBUTES OF w
       setwhd(nta, coef[i*2][2*cmp+2], ht, dp)
       insert_after(head, nt, nta)
       set_attr(nta, attr_ruby, 2*i+1)
       -- glue
       if i~=cmp or not next_cluster_array[w] then
-         nt = node_new(id_glue); insert_after(head, nta, nt)
+         nt = node_new(id_glue, nil, w);  -- INHERIT ATTRIBUTE OF w
+         insert_after(head, nta, nt)
       else
          nt = next_cluster_array[w]
       end
@@ -783,7 +786,7 @@ do
    local function whatsit_after_callback(s, Nq, Np, head)
       if not s and  getfield(Nq.nuc, 'user_id') == RUBY_PRE then
          if Np then
-            local last_glue = node_new(id_glue)
+            local last_glue = node_new(id_glue, nil, Nq.nuc) -- INHERIT ATTRIBUTE OF Nq.nuc
             set_attr(last_glue, attr_icflag, 0)
             insert_before(Nq.nuc, Np.first, last_glue)
             Np.first = last_glue

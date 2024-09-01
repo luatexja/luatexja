@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2022-08-29',
+  date = '2024-09-01',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}
@@ -741,7 +741,7 @@ local function handle_penalty_jwp()
    local a = table_current_stack[luatexja.stack_table_index.JWP]
    if #widow_Bp == 0 then
       if a~=0 then
-         local p = node_new(id_penalty, widow_Np.nuc)
+         local p = node_new(id_penalty, nil, widow_Np.nuc)
          if a<-10000 then a = -10000 elseif a>10000 then a = 10000 end
          setpenalty(p, a); head = insert_before(head, widow_Np.first, p)
          widow_Bp[1]=p; set_attr(p, attr_icflag, KINSOKU)
@@ -1059,7 +1059,7 @@ local function handle_np_jachar(mode)
       real_insert(g)
    end
    if mode and Np.kcat%2~=1 then
-      widow_Np.first, widow_Bp, Bp = Np.first, Bp, widow_Bp
+      widow_Np.nuc, widow_Np.first, widow_Bp, Bp = Np.nuc, Np.first, Bp, widow_Bp
    end
 end
 
