@@ -1,7 +1,7 @@
 %#! lualatex
 %%% a test of ruby.
 \documentclass[a4paper,10ptj]{ltjsarticle}
-\usepackage[rgb]{xcolor}
+\usepackage[cmyk]{xcolor}
 \usepackage{enumitem,mleftright,pict2e}
 \usepackage{luatexja-otf,amsmath,bxghost}
 \usepackage[no-math]{fontspec}
@@ -20,11 +20,14 @@
 \protected\def\Param#1{\eghostguarded{\underline{\smash{\textsf{\mdseries #1}}}}}
 
 \usepackage{luatexja-ruby,showexpl,booktabs}
-\definecolor{mygreen}{rgb}{0,0.5,0}
+\usepackage{luacolor,lua-ul}
+\definecolor{green}{cmyk}{.75,0,.65,0}
+\definecolor{blue}{cmyk}{1,.45,0,0}
+\definecolor{b_blue}{cmyk}{.3,0,0,0}
 \lstset{
   preset=\normalsize, basicstyle=\small\ttfamily, basewidth=0.5em,
   explpreset={numberstyle=\tiny, numbers=left, numbersep=1em, columns=fixed},
-  morecomment=[l]{\%}, commentstyle=\color{mygreen}
+  morecomment=[l]{\%}, commentstyle=\color{green}
 }
 \makeatletter\let\SX@Info=\relax\makeatother
 \fboxsep=0mm
@@ -83,8 +86,24 @@
 \author{\LuaTeX-jaプロジェクトチーム}
 \date{\texttt{\csname ver@luatexja-ruby.sty\endcsname}（\today）}
 \makeatletter
-\def\mybox#1{\unskip\ {\Large \fboxrule=0.1mm\fboxsep=0mm\fcolorbox{cyan}{white}{\hbox{\<\ltjjachar#1\<}}}\ }
+\def\mybox{\@ifnextchar({\mybox@@{2}{0}}{%
+  \@ifnextchar){\mybox@@{0}{2}}{\@ifnextchar={\mybox@@{1}{1}}{\mybox@@{0}{0}.}}}}
+\def\mybox@@#1#2#3#4{\unskip\ {\Large \fboxrule=0.1mm\fboxsep=0mm%
+  \ifnum#1>0\fcolorbox{blue}{b_blue}{\vrule width 0pt height .88\zw depth .12\zw\kern#1\dimexpr.25\zw}\kern-\fboxrule\fi%
+  \fcolorbox{blue}{white}{\hbox{\<\ltjjachar#4\<}}%
+  \ifnum#2>0\kern-\fboxrule\fcolorbox{blue}{b_blue}{\vrule width 0pt height .88\zw depth .12\zw\kern#2\dimexpr.25\zw}\fi%
+}\ }
 
+\def\RULER#1#2{%
+  \noindent
+  \rlap{\smash{\phantom{#1}\ \color{cyan}%
+    \@tempcnta=0
+    \loop\ifnum\@tempcnta<20
+       \kern-.05mm\vrule height \dimexpr-\baselineskip+0.88\zw depth \dimexpr #2\baselineskip+0.12\zw width0.1mm\kern-.05mm%
+       \kern\zw\advance\@tempcnta 1
+    \repeat
+  }}\ignorespaces
+}
 \begin{document}
 
 \catcode`\<=13
@@ -374,22 +393,23 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \end{quote}
 次に，以下の文字は\Param{rubypreintrusion},~\Param{rubypostintrusion}とも初期値は0.5である：
 \begin{quote}
- 中点類\@for\@tmp:=`\・,`\：,`\； \do{\mybox{\@tmp}}
+ 中点類\@for\@tmp:=`\・,`\：,`\； \do{\mybox={\@tmp}}
 \end{quote}
 また，以下の文字は\Param{rubypreintrusion}のみ初期値は$-1$である：
-\begin{quote}
+\begin{itemize}
+ \item 
   始め括弧類
-  \@for\@tmp:=`\‘,`\“,`\〈,`\《,`\「,`\『,`\【,`\〔,`\〖,`\〘,`\〝,`\（,`\［,`\｛,`\｟ \do{\mybox{\@tmp}}\unskip，
-  「文字コード$-1$の文字
-  \footnote{段落開始の\ \cs{parindent}分インデントを表す．
+  \@for\@tmp:=`\‘,`\“,`\〈,`\《,`\「,`\『,`\【,`\〔,`\〖,`\〘,`\〝,`\（,`\［,`\｛,`\｟ \do{\mybox({\@tmp}}\unskip
+ \item 「文字コード$-1$の文字
+  \footnote{ここでは段落開始の\ \cs{parindent}分インデントを表す．
     通常の\LuaTeX-jaにおける指定では「文字コード$-1$」は文中数式境界を表していることに注意．}」
-\end{quote}
+\end{itemize}
 さらに，以下の文字は\Param{rubypostintrusion}のみ初期値は$-1$である：
-\begin{quote}
-  閉じ括弧類
-  \@for\@tmp:=`\’,`\”,`\〉,`\》,`\」,`\』,`\】,`\〕,`\〗,`\〙,`\〟,`\）,`\］,`\｝,`\｠ \do{\mybox{\@tmp}}\unskip，
-  句読点類\@for\@tmp:=`\、,`\，,`\。,`\． \do{\mybox{\@tmp}}
-\end{quote}
+\begin{itemize}
+  \item 閉じ括弧類
+  \@for\@tmp:=`\’,`\”,`\〉,`\》,`\」,`\』,`\】,`\〕,`\〗,`\〙,`\〟,`\）,`\］,`\｝,`\｠ \do{\mybox){\@tmp}}
+  \item 句読点類\@for\@tmp:=`\、,`\，,`\。,`\． \do{\mybox){\@tmp}}
+\end{itemize}
 \makeatother
 
 以上で記述されていない\Param{rubypreintrusion},~\Param{rubypostintrusion}の初期値はすべて0である．
@@ -518,7 +538,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 
 
 \paragraph{前後からのルビ文字のはみ出し2}
-また，本パッケージのv0.**以降では，「日本語組版処理の要件」にある
+また，本パッケージでは，「日本語組版処理の要件」にある
 \begin{quote}
   後ろにくる終わり括弧類，句点類若しくは読点類，又は前にくる始め括弧類には，
   最大でルビ文字サイズの全角までルビ文字を掛けてもよい．
@@ -961,7 +981,6 @@ $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_3$を行B�
 \end{LTXexample}
 
 
-\typeout{AAAAAA}
 \setbox0=\vbox{\hsize20\zw
   \ltjsetparameter{rubypreintrusion={`◆,1}}
   \ltjsetparameter{rubypostintrusion={`◆,1}}
@@ -1004,6 +1023,17 @@ $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_3$を行B�
 
 }
 \fbox{\box0}
+
+\medskip
+\begin{LTXexample}[pos=t]
+% lua-ul
+たとえば\strikeThrough{\ruby{取|消|線}{とりけしの|いちじゆう|せん}を}引いてみる．
+\strikeThrough{\ruby{取|消|線}{とりけしの|いちじゆう|せん}}だとどうかな
+
+\highLight{周囲が}\ruby{aaaaaaaaaaa}{全く}\highLight{ない}
+ああああああああああああああああああああああああああ
+周囲が\highLight{\ruby{あ|い|う|え}{たぶん|きっと|おそらく|maybe}}ないと思う
+\end{LTXexample}
 
 \newpage
 \section{『日本語組版処理の要件』20120403の例}
@@ -1053,7 +1083,6 @@ $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_3$を行B�
 \obeylines
 3.62 の\ruby{葯}{やく}に
 3.63 版面の\ruby{地}{ち}に\quad 版面の\ruby[kata]{地}{ち}に
-% 横組肩つきはしないが，現状では縦組未サポートだし，仕方ないね
 3.65 の\ruby{砦}{とりで}に
 {\ltjsetruby{kata}%
 3.66上 の\ruby{旬}{しゆん}に\quad 後\ruby{旬}{しゆん}に
@@ -1094,29 +1123,32 @@ $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_3$を行B�
      の\ruby{成|就}{じよう|じゆ}を\quad の\ruby{紋|章}{もん|しよう}を\quad%
      の\ruby{象|徴}{しよう|ちよう}を}
 % モノルビ配置．望ましくない
-3.76× の\ruby{流}{りゆう}\ruby{儀}{ぎ}を\quad の\ruby{無}{む}\ruby{常}{じよう}を\quad%
-
-3.77  {\ltjsetruby{stretchbol=121, stretcheol=121}% 行頭・行末揃えず
-     \hbox{\vrule\vbox{\hsize=10\zw\noindent\kern.75\zw
-       あああああああの\ruby{流|儀}{りゆう|ぎ}がある．}\vrule}\quad%
+3.76× の\ruby{流}{りゆう}\ruby{儀}{ぎ}を\quad の\ruby{無}{む}\ruby{常}{じよう}を
+3.77 {\ltjsetruby{stretchbol=121, stretcheol=121}% 行頭・行末揃えず
+     \hbox{\vrule\vbox{\hsize=5.25\zw ……等を\ruby{流|儀}{りゆう|ぎ}が}\vrule}\quad%
      \hbox{\vrule\vbox{\hsize=5\zw ……等の\ruby{無|常}{む|じよう}を}\vrule}}
 \end{LTXexample} 
 
 \paragraph{3.3.8節 ルビはみ出し}\ 
 \begin{LTXexample}[pos=t]
-\obeylines
+\obeylines\RULER{3.78}{4}
 3.78 \ruby{人}{ひと}は\ruby{死}{し}して\ruby{名}{な}を\ruby{残}{のこ}す
 3.79 漢字の部首には\ruby{偏}{へん}・\ruby{冠}{かんむり}・\ruby{脚}{きやく}・%
      \ruby{旁}{つくり}がある
+3.79 {\ltjsetparameter{rubypreintrusion={`\，,1}}%
+漢字の部首には\ruby{偏}{へん}，\ruby{冠}{かんむり}，\ruby{脚}{きやく}，%
+\ruby{旁}{つくり}がある}
+% 上が『要件』にある例．標準（下）では句読点の直前にはルビがかからない．
 3.79 漢字の部首には\ruby{偏}{へん}，\ruby{冠}{かんむり}，\ruby{脚}{きやく}，%
-     \ruby{旁}{つくり}がある
+\ruby{旁}{つくり}がある
 \end{LTXexample}
 \begin{LTXexample}[pos=t]
-\obeylines
+\obeylines\RULER{3.79}{9}
 3.79 この\ruby{\噂}{うわさ}の好きな人は\ruby{懐}{ふところ}ぐあいもよく、\ruby{檜}{ひのき}を
 3.80 漢字の部首には「\ruby{偏}{へん}」「\ruby{冠}{かんむり}」「\ruby{脚}{きやく}」%
 「\ruby{旁}{つくり}」がある
-3.80 この\ruby{\噂}{うわさ}好きな人は\ruby{懐}{ふところ}具合もよく、\ruby{檜}{ひのき}材を
+3.80 {\ltjsetparameter{rubypreintrusion={`\，,1}}%
+この\ruby{\噂}{うわさ}好きな人は\ruby{懐}{ふところ}具合もよく、\ruby{檜}{ひのき}材を}
 3.81× に\ruby{暁}{あかつき}の\kern-1\zw の\ruby{趣}{おもむき}を（良くない例）
 3.82 に\ruby{暁}{あかつき}の\ruby{趣}{おもむき}を
 

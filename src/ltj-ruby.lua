@@ -787,10 +787,12 @@ do
    end
    local RIPOST = luatexja.stack_table_index.RIPOST
    local abs = math.abs
+   local ltjj_after_hlist=luatexja.jfmglue.after_hlist
+   local ltjj_check_box_high=luatexja.jfmglue.check_box_high
    local function whatsit_after_callback(s, Nq, Np, head)
       if not s and  getfield(Nq.nuc, 'user_id') == RUBY_PRE then
          if Np then
-            local last_glue = node_new(id_glue, nil, Nq.nuc) -- INHERIT ATTRIBUTE OF Nq.nuc
+            local last_glue = node_new(id_glue, nil, Nq.nuc, Np.nuc) -- INHERIT ATTRIBUTE OF Nq.nuc
             set_attr(last_glue, attr_icflag, 0)
             insert_before(Nq.nuc, Np.first, last_glue)
             Np.first = last_glue
@@ -805,8 +807,8 @@ do
          end
          local x =  node_next(node_next(nqnv))
          for i = 2, rst.count do x = node_next(node_next(x)) end
-         Nq.last_char = luatexja.jfmglue.check_box_high(Nq, getlist(x), nil)
-         luatexja.jfmglue.after_hlist(Nq)
+         Nq.last_char = ltjj_check_box_high(Nq, getlist(x), nil)
+         ltjj_after_hlist(Nq)
          if Np and Np.id ~=id_pbox_w and type(Np.char)=='number' then
             -- Np is a JAchar
             if rst.post < 0 then -- auto
