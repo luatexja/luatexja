@@ -7,14 +7,6 @@
 \ProvidesPackage{luatexja-ruby}[2024-09-01 v0.63]
 \RequirePackage{luatexja}
 
-\@ifpackageloaded{lua-ul}{%
-  \PackageWarningNoLine{luatexja-ruby}{%
-    lua-ul is loeded BEFORE luatexja-ruby;\MessageBreak
-    this causes a conflict between underlining/\MessageBreak
-    strikethough/... commands by lua-ul and \string\ruby
-  }
-}
-
 %%------------------
 \newattribute\ltj@rubyattr
 \ltj@rubyattr=0

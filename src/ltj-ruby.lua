@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.ruby',
-  date = '2024-09-01',
+  date = '2024-09-02',
   description = 'Ruby annotation',
 })
 luatexja.ruby = {}
@@ -587,7 +587,6 @@ local function pre_high(ahead)
    return to_node(head)
 end
 luatexbase.add_to_callback('pre_linebreak_filter', pre_high, 'ltj.ruby.pre', 100)
-luatexbase.add_to_callback('hpack_filter', pre_high, 'ltj.ruby.pre', 100)
 
 ----------------------------------------------------------------
 -- post_line_break
@@ -710,9 +709,14 @@ local function post_high_hbox(ahead)
    return to_node(post_lown(rs, rw, cmp, head))
 end
 
-luatexbase.add_to_callback('post_linebreak_filter', post_high_break, 'ltj.ruby.post_break', 100)
-luatexbase.add_to_callback('hpack_filter', post_high_hbox, 'ltj.ruby.post_hbox', 101)
-
+do 
+  local luaul_callback_priority 
+    = luatexbase.priority_in_callback('hpack_filter', 'add underlines to list')
+  luatexbase.add_to_callback('post_linebreak_filter', post_high_break, 'ltj.ruby.post_break')
+  luatexbase.add_to_callback('hpack_filter', 
+    function(head) return post_high_hbox(pre_high(head)) end, 'ltj.ruby', 
+    luaul_callback_priority and luaul_callback_priority or nil)
+end
 
 ----------------------------------------------------------------
 -- for jfmglue callbacks
