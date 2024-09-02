@@ -533,7 +533,17 @@ local function pre_low_app_node(head, w, cmp, coef, ht, dp)
          nt = node_new(id_glue, nil, w);  -- INHERIT ATTRIBUTE OF w
          insert_after(head, nta, nt)
       else
-         nt = next_cluster_array[w]
+         nt = next_cluster_array[w]; local f = node_next(nta)
+         while f and f~=nt do
+            if getid(f)==id_glue then
+               node_remove(head, nt); insert_before(head, f, nt); f = nil
+            else if getid(f)==id_penalty then
+                 local ic = get_attr_icflag(f); node_inherit_attr(f, nt) -- for lua-ul
+                 set_attr(f, attr_icflag, ic)
+               end
+               f = node_next(f)
+            end
+         end
       end
       setglue(nt, coef[i*2+1][2*cmp+2], 0, 0, 0, 0)
       set_attr(nt, attr_ruby, 2*i+2)
@@ -743,7 +753,7 @@ do
                      p = 0
                   end
                   rst.pre = -p; rst.exclude_pre_from_prev_ruby = (s<0);
-                   rst.exclude_pre_jfmgk_from_prev_ruby = (ltjs.table_current_stack[RIPOST +Nq.char] or 0)<0;
+                  rst.exclude_pre_jfmgk_from_prev_ruby = (ltjs.table_current_stack[RIPOST +Nq.char] or 0)<0;
                end
                if Nq.prev_ruby then
                   set_attr(lp, attr_ruby, Nq.prev_ruby)
@@ -792,7 +802,7 @@ do
    local function whatsit_after_callback(s, Nq, Np, head)
       if not s and  getfield(Nq.nuc, 'user_id') == RUBY_PRE then
          if Np then
-            local last_glue = node_new(id_glue, nil, Nq.nuc, Np.nuc) -- INHERIT ATTRIBUTE OF Nq.nuc
+            local last_glue = node_new(id_glue, nil, Nq.nuc) -- INHERIT ATTRIBUTE OF Nq.nuc
             set_attr(last_glue, attr_icflag, 0)
             insert_before(Nq.nuc, Np.first, last_glue)
             Np.first = last_glue

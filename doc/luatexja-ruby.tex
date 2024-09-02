@@ -49,7 +49,6 @@
   HaranoAjiMincho-Regular:extend=0.67;jfm=ujisc33}{}
 
 %%%% \ltjruby 内に \texorpdfstring + | 除去を仕込む
-\RequirePackage{xparse}
 \makeatletter
 \def\removevert#1{\if\noexpand#1|%
     \expandafter\expandafter\expandafter\@firstofone\expandafter{%
@@ -59,18 +58,17 @@
     \fi{\expandafter\@firstofone
   \fi
   \removevert}}
-\makeatother
 \ExplSyntaxOn
-\cs_set_eq:NN \myorigltjruby \ltjruby
 \DeclareExpandableDocumentCommand {\ltjruby} { O{} m m } {%
-   \texorpdfstring {
-    \exp_not:n { \myorigltjruby[#1]{#2}{#3} }
+  \texorpdfstring {
+    \exp_not:n { \ltj@@ruby[#1]{#2}{#3} }
   } {
     \removevert #2 \relax
   }
 }
 \cs_set_eq:NN \ruby \ltjruby
 \ExplSyntaxOff
+\makeatother
 %%%%
 
 \makeatletter
@@ -105,7 +103,6 @@
   }}\ignorespaces
 }
 \begin{document}
-
 \catcode`\<=13
 \def<#1>{{\rmfamily\mdseries\itshape$\langle$#1\/$\rangle$}}
 %\fontsize{13.19873}{15}\selectfont%
@@ -1030,6 +1027,7 @@ $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_3$を行B�
 たとえば\strikeThrough{\ruby{取|消|線}{とりけしの|いちじゆう|せん}を}引いてみる．
 \strikeThrough{\ruby{取|消|線}{とりけしの|いちじゆう|せん}}だとどうかな
 
+\ltjsetparameter{prebreakpenalty={`な,2893}}% デバッグ用．あっても正常動作を確認．
 \highLight{周囲が}\ruby{aaaaaaaaaaa}{全く}\highLight{ない}
 ああああああああああああああああああああああああああ
 周囲が\highLight{\ruby{あ|い|う|え}{たぶん|きっと|おそらく|maybe}}ないと思う
