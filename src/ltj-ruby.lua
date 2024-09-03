@@ -583,7 +583,7 @@ local function pre_high(ahead)
          if rst.exclude_pre_jfmgk_from_prev_ruby
             and atr>0 and ((old_break_info[atr]  or post_intrusion_backup) > 0) then
             -- 「直前のルビが文字に進入→現在のルビの和文処理グルーへの進入はなし」という状況
-            rst.before_jfmgk = 0
+            max_allow_pre = 0;rst.before_jfmgk = 0
          end
          post_intrusion_backup, post_jfmgk_backup = 0, false
          max_allow_post = rst.post or 0

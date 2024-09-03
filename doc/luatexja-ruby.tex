@@ -29,6 +29,8 @@
   explpreset={numberstyle=\tiny, numbers=left, numbersep=1em, columns=fixed},
   morecomment=[l]{\%}, commentstyle=\color{green}
 }
+\newunderlinetype\beginActIntr{\color{blue}\leaders\vrule height -.16\zh depth .24\zh}
+\NewDocumentCommand\ActIntr{+m}{{\beginActIntr#1}}
 \makeatletter\let\SX@Info=\relax\makeatother
 \fboxsep=0mm
 
@@ -72,6 +74,9 @@
 %%%%
 
 \makeatletter
+\let\origunderscore=\_
+\def\_{\ifx\f@family\ttdefault\origunderscore\else
+  \leavevmode \kern .06em\vbox {\hrule \@width .333em}\fi}
 \def\figureautorefname{図}
 \def\HyRef@autoref#1#2{%
   \begingroup
@@ -141,15 +146,15 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 
 なお，本パッケージでは親文字と直前・直後の文字の間に0でない和文処理グルー
 \footnote{JFMで指定されたグルーや，標準の和文間空白(\Param{kanjiskip})，標準の和欧文間空白(\Param{xkanjiskip})．}%
-がくることも考慮しているため，「\emph{前後の文字への}\underline{進入（許容）量}」と「進入（許容）量」とは異なる可能性がある．
+がくることも考慮しているため，「\emph{前後の文字への}\ActIntr{進入（許容）量}」と「進入（許容）量」とは異なる可能性がある．
 この文書では次のように称する：
 \begin{description}
-  \item[\underline{文字進入量}] 前後の文字へルビ文字が実際にかかる長さ．常に下線を引くことにする．
+  \item[\ActIntr{文字進入量}] 前後の文字へルビ文字が実際にかかる長さ．常に下線を引くことにする．
   \item[進入量] 前後の文字，およびそれとルビの間の和文処理グルーにかかる長さ
 \end{description}
-多くの場合，和文処理グルーは0以上の長さのため，進入量は\underline{文字進入量}以上である．
+多くの場合，和文処理グルーは0以上の長さのため，進入量は\ActIntr{文字進入量}以上である．
 
-例えば次の例では，直前の文字「来」への\underline{前文字進入量}は0であるが，
+例えば次の例では，直前の文字「来」への\ActIntr{前文字進入量}は0であるが，
 前進入量は（和欧文間空白にかかる分まで含めるので）正である．
 \begin{quote}
   \Large
@@ -178,16 +183,16 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 
 \begin{description}
 \def\makelabel#1{\ttfamily\bfseries #1}
-\item[pre=<real>] \underline{前文字進入許容量}をルビ全角単位で指定．
+\item[pre=<real>] \ActIntr{前文字進入許容量}をルビ全角単位で指定．
 負の長さを指定した場合は，ルビの状況や直前の文字に応じた自動指定を意味する．
 既定値は負（つまり，自動指定）．
 
-\item[post=<real>] 同様に，\underline{後文字進入許容量}を指定する．既定値は負（自動指定）．
+\item[post=<real>] 同様に，\ActIntr{後文字進入許容量}を指定する．既定値は負（自動指定）．
 
 \item[mode] 進入処理のモードを表すbit vector．下位2\,bitは，\texttt{pre}や
 \texttt{post}が負である場合にしか効力を発揮しない．既定値は$(00001)_2 = 1$．
 \begin{description}
- \item[bit 0] 前後の\underline{文字への進入}を無効にするならば0，有効にするならば1．
+ \item[bit 0] 前後の\ActIntr{文字への進入}を無効にするならば0，有効にするならば1．
  \item[bit 1] 前進入許容量$B$と後進入許容量$A$が異なった場合，
   そのまま処理する場合は0，小さい方に揃えるならば1．
  \item[bit 2--4] ルビ文字の突出量から実際の前・後進入量の計算方法を指定する．
@@ -224,7 +229,7 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 既定値は\ \verb+{1}{1}{0}+ である．
 
 \item[maxmargin=<real>] 親文字の方がルビより長い時に，ルビの先頭と親文字の先頭，及び
-ルビ末尾と親文字の末尾の間に許される最大の空白量．\textbf{親文字全角幅単位}で指定し，既定値は0.5．
+ルビ末尾と親文字の末尾の間に許される最大の空白量．\emph{親文字全角幅単位}で指定し，既定値は0.5．
 
 \medskip
 \item[size=<real>] ルビ文字の親文字に対する大きさ．既定値は0.5．
@@ -368,26 +373,44 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \paragraph{\cs{ltjsetparamater} に追加されるキー}
 \begin{description}
 \item[\Param{rubypreintrusion}\ttfamily =\{<chr\_code>, <pre\_int>\}]
-  文字<chr\_code> に，その\textbf{直後}のルビによって掛けられるルビ文字列の最大長
-  （つまり，\underline{前文字進入許容量}）をルビ全角幅単位で指定．
+  文字<chr\_code> に，その\emph{直後}のルビによって掛けられるルビ文字列の最大長
+  （つまり，\ActIntr{前文字進入許容量}）をルビ全角幅単位で指定．
 
-  \textbf{v0.5以降での変更点}：もし$-a$~($a>0$)を指定した場合は，次のようになる．
+  \emph{v0.5以降での変更点}：もし$-a$~($a>0$)を指定した場合は，次のようになる．
   \begin{itemize}
-    \item 実際の\underline{前文字進入許容量}は$a$となる．
-    \item 文字<chr\_code>の前のJFMグルー$G$に進入が発生し，
-    かつ\underline{前文字進入許容量}が0でなかった場合は，JFMグルー$G$にはこのルビの進入は発生しない．
+    \item 実際の\ActIntr{前文字進入許容量}は$a$となる．
+    \item ただし，文字<chr\_code>の直前のルビによって
+    文字の前のJFMグルーに進入が発生した場合，文字<chr\_code>の直後のルビの前進入は発生しない．
   \end{itemize}
-  後者の状況がわかりにくいので
+  後者の状況の例を以下に載せる．
+\begin{LTXexample}[width=0.333\textwidth, preset=\Large]
+\ltjsetparameter{rubypreintrusion={`\【,-1}}
+\ruby{鴎}{かもめ}【\ruby{隼}{はやぶさ}
+% 「\ruby{鴎}{かもめ}」は，「【」直前のJFMグルーに
+% ルビ半角だけ進入している
+% →「\ruby{隼}{はやぶさ}」の「【」への進入はない．
+\end{LTXexample}
+  
   
 \item[\Param{rubypostintrusion}\ttfamily =\{<chr\_code>, <post\_int>\}]
-  文字<chr\_code> に，その\textbf{直前}のルビによって掛けられるルビ文字列の最大長
-  （つまり，\underline{後文字進入許容量}）をルビ全角幅単位で指定．
+  文字<chr\_code>に，その\emph{直前}のルビによって掛けられるルビ文字列の最大長
+  （つまり，\ActIntr{後文字進入許容量}）をルビ全角幅単位で指定．
 
-  \textbf{v0.5以降での変更点}：もし$-a$~($a>0$)を指定した場合は，次のようになる．
+  \emph{v0.5以降での変更点}：もし$-a$~($a>0$)を指定した場合は，次のようになる．
   \begin{itemize}
-    \item 実際の\underline{後文字進入許容量}は$a$となる．
-    \item 実際の\underline{後文字進入量}が0でなかった場合は，文字<chr\_code>の後のJFMグルーにはルビの進入は発生しない．
+    \item 実際の\ActIntr{後文字進入許容量}は$a$となる．
+    \item ただし，文字<chr\_code>の直前のルビによってこの文字への実際の\ActIntr{後文字進入}が
+    発生した場合，文字<chr\_code>の直後のJFMグルーにはルビの前進入は発生しない．
   \end{itemize}
+  今回も後者の状況の例を以下に載せる．
+\begin{LTXexample}[width=0.333\textwidth, preset=\Large]
+\ltjsetparameter{rubypostintrusion={`\】,-1}}
+\ruby{鴎}{かもめ}】\ruby{隼}{はやぶさ}\\
+\hskip.25\zw 鴎】隼\\% 比較用
+% 「\ruby{鴎}{かもめ}」は，「】」にルビ半角だけ進入
+% →「\ruby{隼}{はやぶさ}」は「】」直前のJFMグルー
+% には進入しない．
+\end{LTXexample}
 \end{description}
 以下の文字は\Param{rubypreintrusion},~\Param{rubypostintrusion}とも初期値は1である：
 \begin{quote}
@@ -419,14 +442,13 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 
 以上で記述されていない\Param{rubypreintrusion},~\Param{rubypostintrusion}の初期値はすべて0である．
 
-
 \paragraph{\cs{ltjkenten}}
 圏点を出力する命令であり，
 \begin{quote}
  \ttfamily\cs{ltjkenten}[<option>]\{親文字\}
 \end{quote}
 のように使用する．複数文字に圏点をつける場合でも，\verb+\ltjruby+ のように「\texttt{|}」を使って
-文字を区切る\textbf{必要はない}（\verb+\kenten+内では「\texttt{|}」は特別な意味を持たない）
+文字を区切る\emph{必要はない}（\verb+\kenten+内では「\texttt{|}」は特別な意味を持たない）
 ことに注意してほしい．
 
 圏点として出力される文字は\texttt{kenten}キーによって指定し，
@@ -520,20 +542,20 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \end{LTXexample} 
 において，1行目右側の「\ltjruby{陵}{みささぎ}」のルビが前の「と」にかかる量は次のように決まる：
 \begin{enumerate}
-\item 1回目の実行では，行分割前に「\ltjruby{陵}{りよう}」の\underline{後文字進入量}は前もって知ることはでき
+\item 1回目の実行では，行分割前に「\ltjruby{陵}{りよう}」の\ActIntr{後文字進入量}は前もって知ることはでき
       ない．そのため，「\ltjruby{陵}{りよう}」は行中形で組まれるものと想定し，
 「\ltjruby{陵}{みささぎ}」の前文字進入許容量は
 \[
  \underbrace{0.5\,\mathrm{zw}}_{\text{元々の許容量}}
--\underbrace{0.25\,\mathrm{zw}}_{\text{前のルビの\underline{後文字進入量}（行中形）}}=0.25\,\mathrm{zw}
+-\underbrace{0.25\,\mathrm{zw}}_{\text{前のルビの\ActIntr{後文字進入量}（行中形）}}=0.25\,\mathrm{zw}
 \]
-となる．行分割後，「\ltjruby{陵}{りよう}」の実際の\underline{後文字進入量}は
+となる．行分割後，「\ltjruby{陵}{りよう}」の実際の\ActIntr{後文字進入量}は
 <jobname>\texttt{.ltjruby}ファイルに記述される．
-\item 2回目以降の実行では，<jobname>\texttt{.ltjruby}ファイルに保存された「\ltjruby{陵}{りよう}」の\underline{後文字進入量}
-を用いて，「\ltjruby{陵}{みささぎ}」の\underline{前文字進入許容量}を次のように計算する：
+\item 2回目以降の実行では，<jobname>\texttt{.ltjruby}ファイルに保存された「\ltjruby{陵}{りよう}」の\ActIntr{後文字進入量}
+を用いて，「\ltjruby{陵}{みささぎ}」の\ActIntr{前文字進入許容量}を次のように計算する：
 \[
  \underbrace{0.5\,\mathrm{zw}}_{\text{元々の許容量}}
--\underbrace{0.25\,\mathrm{zw}}_{\text{前のルビの\underline{後文字進入量}(from \texttt{.ltjruby})}}=0.25\,\mathrm{zw}.
+-\underbrace{0.25\,\mathrm{zw}}_{\text{前のルビの\ActIntr{後文字進入量}(from \texttt{.ltjruby})}}=0.25\,\mathrm{zw}.
 \]
 \end{enumerate}
 
@@ -541,8 +563,8 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 そのキーとしては単純に「何個目の \verb+\ltjruby+ 命令か」である．
 
 なお，以上の処理は，1行目と2行目を比較すれば分かるように，
-「\ltjruby{陵}{みささぎ}」の\emph{\underline{前文字進入許容量}指定(\texttt{pre})が自動}になっている場合のみ
-実施される．
+「\ltjruby{陵}{みささぎ}」の\emph{\ActIntr{前文字進入許容量}指定が自動（\texttt{pre}の値が負）}に
+なっている場合のみ実施される．
 
 
 \paragraph{前後からのルビ文字のはみ出し2}
@@ -568,7 +590,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \paragraph{段落先頭のルビ}
 同様に，段落先頭のルビは行頭形にはならない．
 \texttt{pre}が負（つまり，自動指定）のとき，段落最初の \verb+\parindent+ 分への
-進入は可能である．この\verb+\parindent+ 分のインデントへの\underline{進入許容量}は
+進入は可能である．この\verb+\parindent+ 分のインデントへの\ActIntr{進入許容量}は
 「文字$-1$」に対する\Param{rubypreintrusion}（既定値は1，ルビ全角単位）と
 \ \verb+\parindent+ の長さのうち小さい方である．
 \begin{LTXexample}[preset=\Large,width=0.4\textwidth]
@@ -589,7 +611,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 
 例えば，標準設定での中黒「・」の直後のルビからの中黒への進入許容量は
 \begin{quote}
-  中黒「・」への\underline{前進入許容量}はルビ全角の半分で，
+  中黒「・」への\ActIntr{前進入許容量}はルビ全角の半分で，
   中黒本体の後の四分空きには進入可能
 \end{quote}
 となっている．そのため，下の例の1, 2行目ともルビの前進入量は0.5\,zwとなる．
@@ -600,8 +622,8 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \hbox spread-0.5\zw{あ・\ltjruby{◆}{◆◆◆◆}漢字}
 \end{LTXexample}
 
-また，次の例では2行目では前後の\underline{文字進入量}がルビ1字分と等しくなっているが，
-3行目のように1全角伸ばすという調整が行われた後は\underline{文字進入量}が不揃いになってしまっている．
+また，次の例では2行目では前後の\ActIntr{文字進入量}がルビ1字分と等しくなっているが，
+3行目のように1全角伸ばすという調整が行われた後は\ActIntr{文字進入量}が不揃いになってしまっている．
 これはもともと「\texttt{;}」には後側にのみ和欧文間空白が入ることと，3行目ではこの和欧文間空白が
 伸びているためである．
 \begin{LTXexample}[preset=\Large,width=0.4\textwidth]
@@ -619,24 +641,24 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 ルビ文字を自然に組んだときの幅が親文字のそれより多い場合，
 ルビの前後への進入量は次のように決定される．
 \begin{enumerate}[label=\emph{Step~\arabic*},labelindent=0pt,itemindent=*,itemsep=\medskipamount]
-  \item \underline{前文字進入許容量}$B_0$，\underline{後進入文字許容量}$A_0$の算出．
+  \item \ActIntr{前文字進入許容量}$B_0$，\ActIntr{後進入文字許容量}$A_0$の算出．
   
   ルビ全角の長さを$r$とする．
   \begin{enumerate}
-   \item \texttt{pre}の指定値が非負であった場合は，それに$r$を掛けたものを$B_0$とする．\\
+   \item \texttt{pre}の指定値が非負であった場合は，それに$r$を掛けたものを$B_0$とする．
+
     そうでなかった場合は，「ルビの直前の文字」に対する
-    \Param{rubypreintrusion}の値に$r$を掛けたものを$B_0$とする
+    \Param{rubypreintrusion}の絶対値に$r$を掛けたものを$B_0$とする
     \footnote{%
       なお，「ルビの直前の文字」が段落最初の\cs{parindent}分のインデントであった場合，
       $B_0$を，「文字コード$-1$の文字」\Param{rubypreintrusion}の値に$r$を掛けた値と\cs{parindent}のうち
       小さい方とする．
-    }．
+    }．ここで，もし2つ前の文字がルビで，その直後（つまりいま処理しているルビから見れば直前）
+    の文字へ$a'$だけの進入があった場合，現在のルビについて$B_0←\min(0,B_0-a')$とする．
    \item \texttt{post}の指定値が非負であった場合は，それに$r$を掛けたものを$A_0$とする．\\
     そうでなかった場合は，「ルビの直後の文字」に対する
-    \Param{rubypostintrusion}の値にルビ全角の値を掛けたものを$A_0$とする．
-   \item \texttt{mode}の最下位ビット(bit~0)が0であった場合は，$B_0\leftarrow 0$, $A\leftarrow 0$とする．
-   \item もし2つ前の文字がルビで，その直後（つまりいま処理しているルビから見れば直前）
-    の文字へ$a'$だけの進入があった場合，現在のルビについて$B_0←\min(0,B_0-a')$とする．
+    \Param{rubypostintrusion}の絶対値にルビ全角の値を掛けたものを$A_0$とする．
+   \item \texttt{mode}の最下位ビット(bit~0)が0であった場合は，$B_0\leftarrow 0$, $A_0\leftarrow 0$とする．
   \end{enumerate}
   \item 前進入許容量$B$，後進入許容量$A$の算出．
   \begin{enumerate}
@@ -652,8 +674,12 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
     それぞれ$g$の自然長を$B$に加算する．
 
     ルビとその直後の文字との間に和文処理グルーが挿入された場合も同様である．
+
+    \medskip
+    \emph{TODO: \Param{rubypreintrusion}, \Param{rubypostintrusion}が負のとき}
+    \medskip
     
-    \item \texttt{mode}の2番目のビット(bit~1)が0であった場合は，$B$,~$A\leftarrow \min(B,A)$とする．
+    \item \texttt{mode}の2番目のビット(bit~1)が1であった場合は，$B$,~$A\leftarrow \min(B,A)$とする．
   \end{enumerate}
   \item 実際の前進入量$b$，後進入量$a$の計算．
   
