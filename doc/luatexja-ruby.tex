@@ -371,15 +371,23 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
   文字<chr\_code> に，その\textbf{直後}のルビによって掛けられるルビ文字列の最大長
   （つまり，\underline{前文字進入許容量}）をルビ全角幅単位で指定．
 
-  \textbf{v0.5以降での変更点}：もし$-a$~($a>0$)を指定した場合は，実際の\underline{前文字進入許容量}は$a$となるが，
-  文字<chr\_code>の前のJFMグルーに進入が発生した場合には，\underline{前文字進入許容量}が0でなかった場合は，の後のJFMグルーにはルビの進入は発生しない．
-
+  \textbf{v0.5以降での変更点}：もし$-a$~($a>0$)を指定した場合は，次のようになる．
+  \begin{itemize}
+    \item 実際の\underline{前文字進入許容量}は$a$となる．
+    \item 文字<chr\_code>の前のJFMグルー$G$に進入が発生し，
+    かつ\underline{前文字進入許容量}が0でなかった場合は，JFMグルー$G$にはこのルビの進入は発生しない．
+  \end{itemize}
+  後者の状況がわかりにくいので
+  
 \item[\Param{rubypostintrusion}\ttfamily =\{<chr\_code>, <post\_int>\}]
   文字<chr\_code> に，その\textbf{直前}のルビによって掛けられるルビ文字列の最大長
   （つまり，\underline{後文字進入許容量}）をルビ全角幅単位で指定．
 
-  \textbf{v0.5以降での変更点}：もし$-a$~($a>0$)を指定した場合は，実際の\underline{後文字進入許容量}は$a$となるが，
-  実際の\underline{後文字進入量}が0でなかった場合は，文字<chr\_code>の後のJFMグルーにはルビの進入は発生しない．
+  \textbf{v0.5以降での変更点}：もし$-a$~($a>0$)を指定した場合は，次のようになる．
+  \begin{itemize}
+    \item 実際の\underline{後文字進入許容量}は$a$となる．
+    \item 実際の\underline{後文字進入量}が0でなかった場合は，文字<chr\_code>の後のJFMグルーにはルビの進入は発生しない．
+  \end{itemize}
 \end{description}
 以下の文字は\Param{rubypreintrusion},~\Param{rubypostintrusion}とも初期値は1である：
 \begin{quote}
@@ -456,20 +464,23 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \begin{verbatim}
 …の\ltjruby{表|現|力}{ひよう|げん|りよく}は…
 \end{verbatim}
-という入力からは得られる組版結果は，次のいずれかになる．
-\begin{center}
- \begin{tabular}{ll}
+という入力からは得られる組版結果は，\autoref{tab:group_ruby}のいずれかになる．
+\begin{table}[t]
+\centering\small
+ \begin{tabular}{lll}
  \toprule
  改行なし（行中形）&\Large …の\ltjruby{表|現|力}{ひよう|げん|りよく}は…\\
  直前で改行&\Large \vrule \ltjruby[stretch=011]{表|現|力}{ひよう|げん|りよく}は…\\
-&\Large …の\ltjruby[stretch=110]{表}{ひよう}
-    \vrule\ltjruby[stretch=011]{現|力}{げん|りよく}は…\\
-&\Large …の\ltjruby[stretch=110]{表|現}{ひよう|げん}
-    \vrule\ltjruby[stretch=011]{力}{りよく}は…\\
+ 途中で改行&\Large …の\ltjruby[stretch=110]{表}{ひよう}
+    \vrule\ltjruby[stretch=011]{現|力}{げん|りよく}は…
+    &\Large …の\ltjruby[stretch=110]{表|現}{ひよう|げん}
+      \vrule\ltjruby[stretch=011]{力}{りよく}は…\\
  直後に改行&\Large …の\ltjruby[stretch=110]{表|現|力}{ひよう|げん|りよく}\vrule\\
 \bottomrule
  \end{tabular}
-\end{center}
+ \caption{可動グループルビの組まれ方（縦線は行の境目）}
+ \label{tab:group_ruby}
+\end{table}
 \begin{itemize}
  \item これらの行分割によってペナルティは発生しない．
  \item 上記の例で見られるように，
@@ -552,12 +563,12 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 
 \verb+\parfillskip+ の長さ（や，場合によっては \verb+\rightskip+）を実測し，
 それによって処理を変えるのも可能だが，そのようなことはしなかった．
-段落がルビで終わることは普通ない（最低でも句点が続くだろう）と思うからである．
+段落がルビで終わることは普通ない（最低でも句点が続くだろう）と考えられるからである．
 
 \paragraph{段落先頭のルビ}
 同様に，段落先頭のルビは行頭形にはならない．
 \texttt{pre}が負（つまり，自動指定）のとき，段落最初の \verb+\parindent+ 分への
-進入は可能である．ここ\verb+\parindent+ 分のインデントへの\underline{進入許容量}は
+進入は可能である．この\verb+\parindent+ 分のインデントへの\underline{進入許容量}は
 「文字$-1$」に対する\Param{rubypreintrusion}（既定値は1，ルビ全角単位）と
 \ \verb+\parindent+ の長さのうち小さい方である．
 \begin{LTXexample}[preset=\Large,width=0.4\textwidth]
@@ -767,7 +778,7 @@ $s_i$達の中の文字は既にルビの大きさである．
 のようになったとしたら，「\ltjruby{流}{りゆう}」「\ltjruby{暢}{ちよう}」の間で行分割が起きた，ということがわかり，
 $g_i$,~$r_i$達のノードを適切に置き換えればよい（後で詳しく説明する）．
 
-\begin{figure}\centering\small
+\begin{table}\centering\small
 \begin{tabular}{cllll}
 \toprule
 \multicolumn{1}{c}{\bf ノード}&\multicolumn{1}{c}{\bf 組み方}&\multicolumn{1}{c}{\bf サンプル}%
@@ -802,11 +813,11 @@ $g_0\rightarrow W\rightarrow r_1\rightarrow g_2 \rightarrow r_2\rightarrow g_2$\
 \bottomrule
 \end{tabular}
 \caption{ルビの組み方と対応するノード並び}
-\label{fig:node}
-\end{figure}
+\label{tag:node}
+\end{table}
 
 \item なお，$r_i$達の高さ・深さは組み上がった後のそれである．
-$g_i$,~$r_i$達の幅は，図\nobreak\ref{fig:node}に示したような対応に沿って算出する．
+$g_i$,~$r_i$達の幅は，\autoref{tab:node}に示したような対応に沿って算出する．
 例えばこの場合，行中形$n_5$に対して
 \[
  g_0+r_1+g_2+r_2+g_2 = (3-0.25\times 2)\,\mathrm{zw}=2.5\,\mathrm{zw}

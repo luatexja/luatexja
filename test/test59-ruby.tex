@@ -1,18 +1,27 @@
 \documentclass{ltjsarticle}
-\usepackage{lltjext,luatexja-ruby}
 \usepackage{luacolor,lua-ul}
+\usepackage{lltjext,luatexja-ruby}
 \begin{document}
-\ltjsetruby{size=0.6}
+\ltjsetparameter{rubypreintrusion={`◇,1},rubypostintrusion={`◇,1}}
+\ltjsetparameter{rubypreintrusion={`）,1},rubypostintrusion={`（,1}}
+\ltjsetruby{size=0.5}
 \def\test#1#2{%
-  \par\leavevmode\vrule#1{#2
-  \highLight{%
-    あ\ruby{隼}{はやぶさ}あ
-    漢\ruby{◆|a|◆}{１１１|２２２|３３３}歩
-	漢\ruby{◆|a|◆}{１１|２２|３３}歩
-	漢\ruby{◆|a|◆}{１１|２２|３３３}歩
-	漢\ruby{◆|a|◆}{１１|２２２|３３}歩
-	漢\ruby{◆|a|◆}{１１１|２２|３３}歩
-  }}\vrule}
+  \par\leavevmode\vrule
+  #1{#2
+    \highLight{あ\ruby{◆}{◆◆◆◆◆◆}あ}
+    い\highLight{\ruby{◆}{◆◆◆◆◆◆}}い
+    \highLight{い}\ruby{◆}{◆◆◆◆◆◆}\highLight{い}
+    い\highLight{\ruby{◆}{◆◆◆◆◆◆}}）
+    ）\highLight{\ruby{◆}{◆◆◆◆◆◆◆◆}}（
+    1◇\highLight{\ruby{）}{◆◆◆◆◆}\vadjust{}}◇
+    2◇\highLight{\ruby{）}{◆◆◆◆◆}}\vadjust{}◇
+    3◇\highLight{\ruby{）}{◆◆◆◆◆}}◇
+    4◇\highLight{\ruby{）}{◆◆◆◆◆}\vadjust{}}\<◇
+    5◇\highLight{\ruby{）}{◆◆◆◆◆}}\vadjust{}\<◇
+    6◇\highLight{\ruby{）}{◆◆◆◆◆}}\<◇
+    え\highLight{】}\vadjust{}え\highLight{】\vadjust{}}え
+    
+  }\vrule}
 
 
 \test{}{}
@@ -23,6 +32,10 @@
 \test{\vbox}{\yoko}
 \test{\vbox}{\tate}
 
+\setbox0=\hbox{\highLight{◇\highLight{\ruby{）}{◆◆◆}}◇}}
+\directlua{
+  luatexja.ext_show_node(tex.getbox(0), '> ', print)
+}
 \end{document}
 
 

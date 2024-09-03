@@ -514,8 +514,11 @@ do
 end
 
 local next_cluster_array = {}
+local pre_low_app_node
 -- ノード追加
-local function pre_low_app_node(head, w, cmp, coef, ht, dp)
+do
+   local KINSOKU = luatexja.icflag_table.KINSOKU
+pre_low_app_node = function(head, w, cmp, coef, ht, dp)
    -- メインの node list 更新
    local nt = node_new(id_glue, nil, w) -- INHERIT ATTRIBUTES OF w
    setglue(nt, coef[1][2*cmp+2], 0, 0, 0, 0)
@@ -537,9 +540,9 @@ local function pre_low_app_node(head, w, cmp, coef, ht, dp)
          while f and f~=nt do
             if getid(f)==id_glue then
                node_remove(head, nt); insert_before(head, f, nt); f = nil
-            else if getid(f)==id_penalty then
-                 local ic = get_attr_icflag(f); node_inherit_attr(f, nt) -- for lua-ul
-                 set_attr(f, attr_icflag, ic)
+            else if getid(f)==id_penalty and get_attr_icflag(f)==KINSOKU then
+                 node_inherit_attr(f, w) -- INHERIT ATTRIBUTE OF w; for lua-ul
+                 set_attr(f, attr_icflag, KINSOKU)
                end
                f = node_next(f)
             end
@@ -553,7 +556,7 @@ local function pre_low_app_node(head, w, cmp, coef, ht, dp)
    next_cluster_array[w]=nil
    return head, first_whatsit(node_next(nt))
 end
-
+end
 local function pre_high(ahead)
    if not ahead then return ahead end
    local head = to_direct(ahead)
