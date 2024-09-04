@@ -820,16 +820,16 @@ $n_2$&行末2グループ&
 \fbox{を}{\color{blue!50!black}\gt\ltjruby[pre=1,mode=1,stretch=110]{流|暢}{りゆう|ちよう}}\vrule
 &
 $g_0\rightarrow W\rightarrow r_1\rightarrow g_2 \rightarrow r_2$\\
-$n_3$&行頭1グループ&
-\Large
-\vrule{\color{blue!50!black}\gt\ltjruby[post=1,mode=1,stretch=011]{暢}{ちよう}}\fbox{に}
-&
-$r_2\rightarrow g_2$\\
-$n_4$&行頭2グループ&
+$n_3$&行頭2グループ&
 \Large
 \vrule{\color{blue!50!black}\gt\ltjruby[post=1,mode=1,stretch=011]{流|暢}{りゆう|ちよう}}\fbox{に}
 &
 $W\rightarrow r_1\rightarrow g_2 \rightarrow r_2\rightarrow g_2$\\
+$n_4$&行頭1グループ&
+\Large
+\vrule{\color{blue!50!black}\gt\ltjruby[post=1,mode=1,stretch=011]{暢}{ちよう}}\fbox{に}
+&
+$r_2\rightarrow g_2$\\
 $n_5$&行中&
 \Large
 \fbox{を}{\color{blue!50!black}\gt\ltjruby[post=0.5,pre=0.5,mode=1]{流|暢}{りゆう|ちよう}}\fbox{に}
@@ -856,8 +856,8 @@ $g_i$,~$r_i$達の幅が求まる．
  \Node{whatsit $w$}{value: 2}\longrightarrow 
  \Node{vlist $n_1$}{末1}\longrightarrow
  \Node{vlist $n_2$}{末2}\longrightarrow
- \Node{vlist $n_3$}{頭1}\longrightarrow
- \Node{vlist $n_4$}{頭2}\longrightarrow
+ \Node{vlist $n_3$}{頭2}\longrightarrow
+ \Node{vlist $n_4$}{頭1}\longrightarrow
  \Node{vlist $n_5$}{中}
 \]
 に置き換えておく．
@@ -890,7 +890,7 @@ $g_0$,~$r_1$を行Aから除去・メモリ解放し，代わりに$n_1$を行A�
 \item 次に行Bの処理にうつる．行Aでルビの処理は完了していない（2グループのルビなのにまだ1グループしか使っていない）ので，
 「whatsit~$W$由来」のノードがいくつか行B内に残っているはずである．
 
-案の定，$r_2$,~$g_2$というノード列が見つかった．これは「行頭1グループ」$n_3$に対応しているので，
+案の定，$r_2$,~$g_2$というノード列が見つかった．これは「行頭1グループ」$n_4$に対応しているので，
 $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_3$を行Bの中身に挿入する．
 
 \item これで2グループとも使い切ったことになるので，

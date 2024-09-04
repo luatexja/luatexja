@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.ruby',
-  date = '2024-09-02',
+  date = '2024-09-04',
   description = 'Ruby annotation',
 })
 luatexja.ruby = {}
@@ -208,6 +208,7 @@ end
 -- box の中身のノードは再利用される
 local enlarge
 do
+   local dimensions = node.direct.dimensions
    local FROM_JFM       = luatexja.icflag_table.FROM_JFM
    local PROCESSED      = luatexja.icflag_table.PROCESSED
    local KANJI_SKIP     = luatexja.icflag_table.KANJI_SKIP
@@ -240,18 +241,22 @@ do
          hx = node_next(hx)
       end
       -- 先頭の空白を挿入
-      local k = node_new(id_glue);
-      setglue(k, prenw, round(pre*65536), 0, 2, 0)
-      h = insert_before(h, h, k);
+      local k1 = node_new(id_glue);
+      setglue(k1, prenw, round(pre*65536), 0, 2, 0)
+      h = insert_before(h, h, k1);
       -- 末尾の空白を挿入
-      local k = node_new(id_glue);
-      setglue(k, postnw, round(post*65536), 0, 2, 0)
-      insert_after(h, node_tail(h), k);
+      local k2 = node_new(id_glue);
+      setglue(k2, postnw, round(post*65536), 0, 2, 0)
+      insert_after(h, node_tail(h), k2);
       -- hpack
       setlist(box, nil);
       local new_box = node_inherit_attr(hpack(h, new_width, 'exactly'), box)
       setheight(new_box, hh); setdepth(new_box, hd)
-      node_free(box); return new_box
+      node_free(box); 
+      local gset, gsign, go 
+        = getfield(new_box,'glue_set'), getfield(new_box,'glue_sign'), getfield(new_box,'glue_order')
+      return new_box, (dimensions(gset, gsign, go, k1, node_next(k1))), (dimensions(gset, gsign, go, k2))
+      -- return value: (enlarged box), (width of left glue), (width of right glue)
    end
 end
 
@@ -314,9 +319,12 @@ end
 -- r, p の中身のノードは再利用される
 local function enlarge_parent(r, p, tmp_tbl, no_begin, no_end)
    -- r: ルビ部分の格納された box，p: 同，親文字
+   -- no_begin: 行頭形ではないか
+   -- no_end: 行末形ではないか
    local rwidth = getwidth(r)
    local sumprot = rwidth - getwidth(p) -- >0
    local pre_intrusion, post_intrusion
+   local pre_protrusion, post_protrusion
    local ppre, pmid, ppost = tmp_tbl.ppre, tmp_tbl.pmid, tmp_tbl.ppost
    local mapre, mapost = tmp_tbl.mapre, tmp_tbl.mapost
    local intmode = (tmp_tbl.mode//4)%8
@@ -326,17 +334,17 @@ local function enlarge_parent(r, p, tmp_tbl, no_begin, no_end)
        mapre = min(mapre,mapost); mapost = mapre
    end
    if intmode == 0 then --  とりあえず組んでから決める
-      p = enlarge(p, rwidth, ppre, pmid, ppost, 0, 0)
+      p, pre_protrusion, post_protrusion = enlarge(p, rwidth, ppre, pmid, ppost, 0, 0)
       pre_intrusion  = min(mapre, round(ppre*getfield(p, 'glue_set')*65536))
       post_intrusion = min(mapost, round(ppost*getfield(p, 'glue_set')*65536))
    elseif intmode == 1 then
       pre_intrusion = min(mapre, sumprot);
       post_intrusion = min(mapost, max(sumprot-pre_intrusion, 0))
-      p = enlarge(p, rwidth, ppre, pmid, ppost, pre_intrusion, post_intrusion)
+      p, pre_protrusion, post_protrusion = enlarge(p, rwidth, ppre, pmid, ppost, pre_intrusion, post_intrusion)
    elseif intmode == 2 then
       post_intrusion = min(mapost, sumprot);
       pre_intrusion = min(mapre, max(sumprot-post_intrusion, 0))
-      p = enlarge(p, rwidth, ppre, pmid, ppost, pre_intrusion, post_intrusion)
+      p, pre_protrusion, post_protrusion = enlarge(p, rwidth, ppre, pmid, ppost, pre_intrusion, post_intrusion)
    elseif intmode==3 then
       local n = min(mapre, mapost)*2
       if n < sumprot then
@@ -344,7 +352,7 @@ local function enlarge_parent(r, p, tmp_tbl, no_begin, no_end)
       else
          pre_intrusion = sumprot//2; post_intrusion = sumprot - pre_intrusion
       end
-      p = enlarge(p, rwidth, ppre, pmid, ppost, pre_intrusion, post_intrusion)
+      p, pre_protrusion, post_protrusion = enlarge(p, rwidth, ppre, pmid, ppost, pre_intrusion, post_intrusion)
       pre_intrusion = min(mapre, pre_intrusion + round(ppre*getfield(p, 'glue_set')*65536))
       post_intrusion = min(mapost, post_intrusion + round(ppost*getfield(p, 'glue_set')*65536))
    else  --  intmode == 4
@@ -355,7 +363,7 @@ local function enlarge_parent(r, p, tmp_tbl, no_begin, no_end)
       else
          pre_intrusion, post_intrusion = mapre, min(mapost, sumprot-mapre)
       end
-      p = enlarge(p, rwidth, ppre, pmid, ppost, pre_intrusion, post_intrusion)
+      p, pre_protrusion, post_protrusion = enlarge(p, rwidth, ppre, pmid, ppost, pre_intrusion, post_intrusion)
    end
    setshift(r, -pre_intrusion)
    local rwidth = rwidth - pre_intrusion - post_intrusion
@@ -372,24 +380,29 @@ local function enlarge_parent(r, p, tmp_tbl, no_begin, no_end)
            post_jfmgk = (post_intrusion > 0)
        end
     end
-   return r, p, orig_post_intrusion, post_jfmgk
+    return r, p, orig_post_intrusion, post_jfmgk, 
+      pre_protrusion - pre_intrusion, post_protrusion - orig_post_intrusion
 end
 
 -- ルビボックスの生成（単一グループ）
 -- returned value: <new box>, <ruby width>, <post_intrusion>
 local max_margin
 local function new_ruby_box(r, p, tmp_tbl, no_begin, no_end, w)
+   -- no_begin: 行頭形ではないか
+   -- no_end: 行末形ではないか
    local post_intrusion, post_jfmgk = 0, false
    local imode
    local ppre, pmid, ppost = tmp_tbl.ppre, tmp_tbl.pmid, tmp_tbl.ppost
    local mapre, mapost = tmp_tbl.mapre, tmp_tbl.mapost
    local rpre, rmid, rpost, rsmash
+   local protrusion = {0, 0}; tmp_tbl[tmp_tbl.index] = protrusion
    imode = tmp_tbl.mode//0x100000; rsmash = (imode%2 ==1)
    imode = imode//2; rpost = imode%8;
    imode = (imode-rpost)/8;  rmid  = imode%8;
    imode = (imode-rmid)/8;   rpre  = imode%8
    if getwidth(r) > getwidth(p) then  -- change the width of p
-      r, p, post_intrusion, post_jfmgk = enlarge_parent(r, p, tmp_tbl, no_begin, no_end)
+      r, p, post_intrusion, post_jfmgk, protrusion[1], protrusion[2]
+        = enlarge_parent(r, p, tmp_tbl, no_begin, no_end)
    elseif getwidth(r) < getwidth(p) then -- change the width of r
       r = enlarge(r, getwidth(p), rpre, rmid, rpost, 0, 0)
       post_intrusion = 0
@@ -462,6 +475,7 @@ local function pre_low_cal_box(w, cmp)
       coef[i] = {}
       for j = 1, 2*i do coef[i][j] = 1 end
       for j = 2*i+1, 2*cmp+1 do coef[i][j] = 0 end
+      rst.index = i
       kf[i], coef[i][2*cmp+2]
          = new_ruby_box(node_copy(nta), node_copy(ntb), rst, true, false, w)
    end
@@ -476,6 +490,7 @@ local function pre_low_cal_box(w, cmp)
       for j = 1, 2*i-1 do coef[cmp+i][j] = 0 end
       for j = 2*i, 2*cmp+1 do coef[cmp+i][j] = 1 end
       nta = concat(node_copy(rb[i]), nta); ntb = concat(node_copy(pb[i]), ntb)
+      rst.index = 2*cmp+1-i
       kf[cmp+i], coef[cmp+i][2*cmp+2]
          = new_ruby_box(node_copy(nta), node_copy(ntb), rst, false, true, w)
    end
@@ -486,6 +501,7 @@ local function pre_low_cal_box(w, cmp)
    for j = 1, 2*cmp+1 do coef[2*cmp+1][j] = 1 end
    rst.ppre, rst.pmid, rst.ppost = rtb[3], rtb[2], rtb[1]
    rst.mapre, rst.mapost = max_allow_pre, max_allow_post
+   rst.index = 2*cmp+1
    kf[2*cmp+1], coef[2*cmp+1][2*cmp+2], post_intrusion_backup, post_jfmgk_backup
       = new_ruby_box(nta, ntb, rst, true, true, w)
 
@@ -622,12 +638,15 @@ do
       local wv = getvalue(rw)
       if hn==1 then
          if fn==2*cmp+2 then
+            -- 行中形  
             local hn = node_tail(wv)
             node_remove(wv, hn)
             insert_after(ch, rs[1], hn)
             set_attr(hn, attr_icflag,  PROCESSED)
-            write_aux(wv, get_attr(hn, attr_ruby), get_attr(hn, attr_ruby_post_jfmgk))-- 行中形
+            write_aux(wv, get_attr(hn, attr_ruby), get_attr(hn, attr_ruby_post_jfmgk))
+            print('MIDDLE ', '', getvalue(wv)[fn-1][1], getvalue(wv)[fn-1][2])
          else
+            -- 行末形
             local deg, hn = (fn-1)/2, wv
             for i = 1, deg do hn = node_next(hn) end;
             node_remove(wv, hn)
@@ -635,8 +654,10 @@ do
             insert_after(ch, rs[1], hn)
             set_attr(hn, attr_icflag,  PROCESSED)
             write_aux(wv, get_attr(hn, attr_ruby), get_attr(hn, attr_ruby_post_jfmgk))
+            print('TAIL ', deg, getvalue(wv)[deg][1], getvalue(wv)[deg][2])
          end
       else
+         -- 行頭形
          local deg, hn = max((hn-1)/2,2), wv
          for i = 1, cmp+deg-1 do hn = node_next(hn) end
          -- -1 is needed except the case hn = 3,
@@ -647,6 +668,7 @@ do
          if fn == 2*cmp-1 then
             write_aux(wv, get_attr(hn, attr_ruby), get_attr(hn, attr_ruby_post_jfmgk))
          end
+         print('HEAD ', deg+1, getvalue(wv)[cmp+deg+1][1], getvalue(wv)[cmp+deg+1][2])
       end
       for i = 1,#rs do
          local ri = rs[i]
@@ -665,7 +687,7 @@ local function post_high_break(head)
    local cmp = -2  -- dummy
    for h in traverse_id(id_hlist, to_direct(head)) do
       for i = 1, #rs do rs[i] = nil end
-      local ha = getlist(h)
+      local ha = getlist(h);
       while ha do
          local hai = getid(ha)
          local i = ((hai == id_glue and getsubtype(ha)==0)
