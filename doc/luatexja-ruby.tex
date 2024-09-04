@@ -891,7 +891,7 @@ $g_0$,~$r_1$を行Aから除去・メモリ解放し，代わりに$n_1$を行A�
 「whatsit~$W$由来」のノードがいくつか行B内に残っているはずである．
 
 案の定，$r_2$,~$g_2$というノード列が見つかった．これは「行頭1グループ」$n_4$に対応しているので，
-$r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_3$を行Bの中身に挿入する．
+$r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_4$を行Bの中身に挿入する．
 
 \item これで2グループとも使い切ったことになるので，
 隔離しておいた$W$を，（使われなかった$n_2$,~$n_4$,~$n_5$などと共に）メモリ解放する．結果として
@@ -900,7 +900,7 @@ $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_3$を行B�
  (\text{other nodes})\longrightarrow
  \Node{vlist $n_1$}{末1}\tag{行A}\\
 \noalign{\hrulefill 行の境目\hrulefill}
-\Node{vlist $n_3$}{頭1}\longrightarrow (\text{other nodes})\tag{行B}
+\Node{vlist $n_4$}{頭1}\longrightarrow (\text{other nodes})\tag{行B}
 \end{gather*}
 \end{enumerate}
 \end{enumerate}
