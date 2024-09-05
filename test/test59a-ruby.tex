@@ -1,0 +1,29 @@
+\documentclass{ltjarticle}
+\usepackage{luatexja-ruby}
+\usepackage{luacolor,lua-ul}
+\directlua{
+  luatexbase.add_to_callback('vpack_filter',
+    function (head)
+      print("=====")
+      luatexja.ext_show_node_list(head, 'a> ', print, 1)
+      return head
+    end,
+    luatexbase.priority_in_callback('vpack_filter', 'add underlines to list')-1
+  )
+}
+
+\begin{document}
+
+  あ\highLight{\ruby[mode=65]{い}{えええええええええ}}あ
+  あ\highLight{\ruby[mode=1]{い}{えええええええええ}}あ
+
+\hbox{
+  あ\highLight{\ruby[mode=65]{い}{えええええええええ}}あ
+  あ\highLight{\ruby[mode=1]{い}{えええええええええ}}あ
+}
+
+\vbox{
+  あ\highLight{\ruby[mode=65]{い}{えええええええええ}}あ
+  あ\highLight{\ruby[mode=1]{い}{えええええええええ}}あ
+}
+\end{document}

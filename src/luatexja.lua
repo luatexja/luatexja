@@ -423,9 +423,10 @@ local utfchar = utf.char
 local function debug_show_node_X(p,print_fn, limit, inner_depth)
    local k = prefix
    local s
-   local pt, pic = node_type(p.id), (get_attr(p, attr_icflag) or 0) % icflag_table.PROCESSED_BEGIN_FLAG
-   local base = prefix .. '[' .. string.format('%7d', node.direct.todirect(p)) .. '] ' ..
-     string.format('%X', pic) .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
+   local pt, pic = node_type(p.id), (get_attr(p, attr_icflag) or 0) --% icflag_table.PROCESSED_BEGIN_FLAG
+   local base = prefix .. '[' .. string.format('%7d', node.direct.todirect(p)) 
+     .. ', ' .. tostring(get_attr(p, 27)) .. '] '
+     .. string.format('%X', pic) .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
    if pt == 'glyph' then
       s = base .. ' '
           .. (p.char<0xF0000 and utfchar(p.char) or '')

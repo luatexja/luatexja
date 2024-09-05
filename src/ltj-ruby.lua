@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.ruby',
-  date = '2024-09-04',
+  date = '2024-09-05',
   description = 'Ruby annotation',
 })
 luatexja.ruby = {}
@@ -280,6 +280,7 @@ local function texiface_low(rst, rtlr, rtlp)
       _, n = insert_after(wv, n, rtlp[i])
    end
    -- w.value: (whatsit) .. r1 .. p1 .. r2 .. p2
+   rst.quirk_protrusion = (rst.mode%128>=64)
    node.direct.write(w); return w,wv
 end
 
@@ -452,7 +453,10 @@ local max_allow_pre, max_allow_post
 local flush_list = node.direct.flush_list
 -- 中付き熟語ルビ，cmp containers
 -- 「文字の構成を考えた」やつはどうしよう
-local function pre_low_cal_box(w, cmp)
+local pre_low_cal_box
+do
+   local node_prev = node.direct.getprev
+pre_low_cal_box = function (w, cmp)
    local rb = {}
    local pb = {}
    local kf = {}
@@ -465,6 +469,11 @@ local function pre_low_cal_box(w, cmp)
    local coef = {} -- 連立一次方程式の拡大係数行列
    local rtb = expand_3bits(rst.stretch)
 
+   local kb, ka
+   if rst.quirk_protrusion then
+       kb = node_prev(node_tail(wv)); ka = node_next(kb)
+       node_remove(wv, kb); node_remove(wv, ka)
+   end
    -- node list 展開・行末形の計算
    local nt, nta, ntb = wv, nil, nil -- nt*: node temp
    rst.ppre, rst.pmid, rst.ppost = rtb[6], rtb[5], rtb[4]
@@ -509,6 +518,9 @@ local function pre_low_cal_box(w, cmp)
    local nt = wv
    flush_list(node_next(wv))
    for i = 1, 2*cmp+1 do setnext(nt, kf[i]); nt = kf[i]  end
+   if rst.quirk_protrusion then
+       insert_after(wv, nt, kb); insert_after(wv, kb, ka);
+   end
 
    if cmp==1 then     solve_1(coef)
    elseif cmp==2 then solve_2(coef)
@@ -516,6 +528,7 @@ local function pre_low_cal_box(w, cmp)
       gauss(coef) -- 掃きだし法で連立方程式形 coef を解く
    end
    return coef
+end
 end
 
 local first_whatsit
@@ -626,53 +639,58 @@ do
       local id = get_attr(wv, attr_ruby_id) or 0
       if id>0 and cache_handle then
          cache_handle:write(
-            'lrob[' .. tostring(id) .. ']=' .. num .. '\nlrob[' .. tostring(-id) .. ']=' .. tostring(bool) .. '\n')
+            'lrob[' .. tostring(id) .. ']=' .. tostring(num) .. '\nlrob[' .. tostring(-id) .. ']=' .. tostring(bool) .. '\n')
       end
    end
-
+   local node_prev = node.direct.getprev
+   local function new_kern(inherit, num)
+    local k = node_new(id_kern, 1, inherit); setkern(k, num); set_attr(kt, attr_icflag, PROCESSED);
+      return k;
+   end
+   local function insert_main_node(ch, rw, wv, nn, rst, deg, first)
+      if rst.quirk_protrusion then
+         local prot_b, prot_a = rst[deg][1], rst[deg][2]
+         ka=nn; kb = node_prev(nn); nn = node_prev(kb);
+         node_remove(wv, nn); node_remove(wv, kb); node_remove(wv, ka); 
+         setkern(kb, prot_b); insert_after(ch, first, kb);
+         local kt = new_kern(rw, -prot_b); insert_after(ch, kb, kt); insert_after(ch, kt, nn);
+         local kt = new_kern(rw, -prot_a); insert_after(ch, nn, kt); 
+         setkern(ka, prot_a); insert_after(ch, kt, ka);
+      else node_remove(wv, nn); insert_after(ch, first, nn)
+      end
+      set_attr(nn, attr_icflag, PROCESSED)
+   end
    post_lown = function (rs, rw, cmp, ch)
       -- ch: the head of `current' hlist
       if #rs ==0 or not rw then return ch end
       local hn = get_attr(rs[1], attr_ruby)
       local fn = get_attr(rs[#rs], attr_ruby)
-      local wv = getvalue(rw)
+      local wv = getvalue(rw); local rst = getvalue(wv)
+      local ka
       if hn==1 then
          if fn==2*cmp+2 then
             -- 行中形  
-            local hn = node_tail(wv)
-            node_remove(wv, hn)
-            insert_after(ch, rs[1], hn)
-            set_attr(hn, attr_icflag,  PROCESSED)
-            write_aux(wv, get_attr(hn, attr_ruby), get_attr(hn, attr_ruby_post_jfmgk))
-            print('MIDDLE ', '', getvalue(wv)[fn-1][1], getvalue(wv)[fn-1][2])
+            local nn = node_tail(wv)
+            insert_main_node(ch, rw, wv, nn, rst, fn-1, rs[1])
+            write_aux(wv, get_attr(nn, attr_ruby), get_attr(nn, attr_ruby_post_jfmgk))
          else
             -- 行末形
-            local deg, hn = (fn-1)/2, wv
-            for i = 1, deg do hn = node_next(hn) end;
-            node_remove(wv, hn)
-            setnext(hn, nil)
-            insert_after(ch, rs[1], hn)
-            set_attr(hn, attr_icflag,  PROCESSED)
-            write_aux(wv, get_attr(hn, attr_ruby), get_attr(hn, attr_ruby_post_jfmgk))
-            print('TAIL ', deg, getvalue(wv)[deg][1], getvalue(wv)[deg][2])
+            local deg, nn = (fn-1)/2, wv; for i = 1, deg do nn = node_next(nn) end
+            insert_main_node(ch, rw, wv, nn, rst, deg, rs[1])
+            write_aux(wv, get_attr(nn, attr_ruby), get_attr(nn, attr_ruby_post_jfmgk))
          end
       else
          -- 行頭形
-         local deg, hn = max((hn-1)/2,2), wv
-         for i = 1, cmp+deg-1 do hn = node_next(hn) end
+         local nn = wv; for i = 1, cmp+max((hn-1)/2,2)-1 do nn = node_next(nn) end
          -- -1 is needed except the case hn = 3,
          --   because a ending-line form is removed already from the list
-         node_remove(wv, hn); setnext(hn, nil)
-         insert_after(ch, rs[1], hn)
-         set_attr(hn, attr_icflag,  PROCESSED)
+         insert_main_node(ch, rw, wv, nn, rst, cmp+(hn-1)/2+1, rs[1])
          if fn == 2*cmp-1 then
-            write_aux(wv, get_attr(hn, attr_ruby), get_attr(hn, attr_ruby_post_jfmgk))
+            write_aux(wv, get_attr(nn, attr_ruby), get_attr(nn, attr_ruby_post_jfmgk))
          end
-         print('HEAD ', deg+1, getvalue(wv)[cmp+deg+1][1], getvalue(wv)[cmp+deg+1][2])
       end
       for i = 1,#rs do
-         local ri = rs[i]
-         ch = node_remove(ch, ri); node_free(ri);
+         local ri = rs[i]; ch = node_remove(ch, ri); node_free(ri)
       end
       -- cleanup
       if fn >= 2*cmp+1 then node_free(rw) end
@@ -800,6 +818,11 @@ do
          elseif rst.pre < 0 then -- auto
             rst.pre = 0
          end
+         if rst.quirk_protrusion then
+            local lk = node_new(id_kern, 1, Nq.nuc, lp); set_attr(lk, attr_icflag, PROCESSED)
+            insert_after(lpv, node_tail(lpv), lk)
+            insert_after(lpv, node_tail(lpv), node_new(id_kern, 1))
+         end
          return Np
       else
         return Np
@@ -856,11 +879,14 @@ do
             Np.prev_ruby = get_attr(getvalue(Nq.nuc), attr_ruby_id)
             -- 前のクラスタがルビであったことのフラグ
          else -- 直前が文字以外
-            local nqnv = getvalue(Nq.nuc)
-            local rst = getvalue(nqnv)
             if rst.post < 0 then -- auto
                rst.post = 0
             end
+         end
+         if rst.quirk_protrusion then
+            local lk = node_tail(lpv)
+            node_inherit_attr(lk, Nq.nuc, Np and Np.nuc)
+            set_attr(lk, attr_icflag, PROCESSED)
          end
          return head
       else

@@ -29,7 +29,6 @@
 \def\ltj@@rkeydef#1{
   \define@key[ltj]{ruby}{#1}{\expandafter\def\csname ltj@@rubyip@#1\endcsname{##1}}
 }
-%% attr_ruby_mode
 %% bit 0: intrusion を有効にするか（1: 有効）
 %% bit 1: 前後の intrusion 許容量を小さい方に揃える (1: yes)
 %% bit 2--4: intrusion をどう使って親文字を配置するか
@@ -42,10 +41,10 @@
 %% ※ 01--100 で，intrusion で賄えきれなかった場合はいつものように伸長する．
 %% bit 5: 熟語ルビの際の処理方法（0: 常にグループ，1: 可能な限りブロックごとに）
 %%        ↑bit 5 は今は無効
+%% bit 6: 突出部分について lua-ul 有効範囲から除外する処理するか
 \ltj@@rkeydef{mode}
 %% intrusion 量強制固定（bit 0, bit 1 より優先，負数で「自動」）
 %% attr は sp 単位だが，ユーザーはルビ全角単位で指定する
-%% attr_ruby_maxprep, attr_ruby_maxpostp
 \ltj@@rkeydef{pre}
 \ltj@@rkeydef{post}
 %% 親文字伸長の際の比，{0}{1}{1} などと0--7 の数 3 つで指定
@@ -54,14 +53,11 @@
 \ltj@@rkeydef{stretcheol}  % 行末形
 \ltj@@rkeydef{stretch}     % 行中形
 %% ルビが伸長するときの比 {1}{2}{1} などと0--7 の数 3 つで指定
-%% attr_ruby_mode 上位部分
 \ltj@@rkeydef{stretchruby}
 %% ルビ<親のとき，ルビと親文字の端の最大値 
-%% attr_ruby_maxmargin
 %% attr は sp 単位だが，ユーザーは親文字全角単位で指定
 \ltj@@rkeydef{maxmargin}
 %% ルビと親文字の垂直方向の空き
-%% attr_ruby_intergap
 %% attr は sp 単位だが，ユーザーは親文字全角単位で指定
 \ltj@@rkeydef{intergap}
 
@@ -257,7 +253,7 @@
 \ltjsetparameter{rubypreintrusion={-1,1}}
 
 \setkeys[ltj]{ruby}{
-  pre=-1, post=-1, mode=1,
+  pre=-1, post=-1, mode=65,
   stretchruby={1}{2}{1}, stretch = {1}{2}{1},
   stretchbol={0}{1}{1}, stretcheol={1}{1}{0},
   maxmargin=0.5, size=0.5, intergap=0, rubysmash=false,
