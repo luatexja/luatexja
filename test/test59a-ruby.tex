@@ -1,29 +1,60 @@
 \documentclass{ltjarticle}
-\usepackage{luatexja-ruby}
 \usepackage{luacolor,lua-ul}
+\usepackage{luatexja-ruby}
 \directlua{
-  luatexbase.add_to_callback('vpack_filter',
+  local name = 'pre_append_to_vlist_filter'
+  luatexbase.add_to_callback(name,
     function (head)
       print("=====")
-      luatexja.ext_show_node_list(head, 'a> ', print, 1)
+      luatexja.ext_show_node_list(head, 'b> ', print, 2)
       return head
     end,
-    luatexbase.priority_in_callback('vpack_filter', 'add underlines to list')-1
+    'test', luatexbase.priority_in_callback(name, 'add underlines to list')
   )
+  luatexbase.add_to_callback(name,
+    function (head)
+      print("=====")
+      luatexja.ext_show_node_list(head, 'a> ', print, 2)
+      return head
+    end,
+    'test A', luatexbase.priority_in_callback(name, 'add underlines to list')+1
+  )
+  local a = luatexbase.callback_descriptions(name)
+  print(table.serialize(a))
 }
-
+\ltjsetruby{mode=65}
 \begin{document}
 
-  あ\highLight{\ruby[mode=65]{い}{えええええええええ}}あ
+  あ\highLight{\ruby{い}{えええええええええ}}あ
   あ\highLight{\ruby[mode=1]{い}{えええええええええ}}あ
 
 \hbox{
-  あ\highLight{\ruby[mode=65]{い}{えええええええええ}}あ
+  あ\highLight{\ruby{い}{えええええええええ}}あ
   あ\highLight{\ruby[mode=1]{い}{えええええええええ}}あ
 }
 
 \vbox{
-  あ\highLight{\ruby[mode=65]{い}{えええええええええ}}あ
+  あ\highLight{\ruby{い}{えええええええええ}}あ
   あ\highLight{\ruby[mode=1]{い}{えええええええええ}}あ
 }
+
+
+\noindent
+\vrule\vbox{\hsize=10\zw\parindent0pt
+  あああああああああ漢%
+  \highLight{\ruby{◇|◇|◇}{アイウ|エオカ|キクケコ}}あ
+
+  ああああああああ漢%
+  \highLight{\ruby{◇|◇|◇}{アイウ|エオカ|キクケコ}}あ
+
+  ああああああ漢%
+  \highLight{\ruby{◇|◇|◇}{アイウ|エオカ|キクケコ}}あ
+
+  ああ||ああ漢%
+  \highLight{\ruby{◇|◇|◇}{アイウ|エオカ|キクケ}}あ
+
+  あああああああ\highLight{\ruby{漢}{アアアアア}い\\
+  い\ruby{漢}{あああああ}}あ
+}\vrule
+
 \end{document}

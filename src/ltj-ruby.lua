@@ -314,7 +314,7 @@ function luatexja.ruby.texiface(rst, rtlr, rtlp)
 end
 
 ----------------------------------------------------------------
--- pre_line_break
+-- pre_linebreak
 ----------------------------------------------------------------
 
 -- r, p の中身のノードは再利用される
@@ -543,11 +543,12 @@ do
 end
 
 local next_cluster_array = {}
-local pre_low_app_node
+local pre_high
 -- ノード追加
 do
+   local node_prev = node.direct.getprev
    local KINSOKU = luatexja.icflag_table.KINSOKU
-pre_low_app_node = function(head, w, cmp, coef, ht, dp)
+   local function pre_low_app_node (head, w, cmp, coef, ht, dp)
    -- メインの node list 更新
    local nt = node_new(id_glue, nil, w) -- INHERIT ATTRIBUTES OF w
    setglue(nt, coef[1][2*cmp+2], 0, 0, 0, 0)
@@ -585,8 +586,7 @@ pre_low_app_node = function(head, w, cmp, coef, ht, dp)
    next_cluster_array[w]=nil
    return head, first_whatsit(node_next(nt))
 end
-end
-local function pre_high(ahead)
+pre_high = function (ahead)
    if not ahead then return ahead end
    local head = to_direct(ahead)
    post_intrusion_backup, post_jfmgk_backup = 0, false
@@ -618,7 +618,7 @@ local function pre_high(ahead)
          max_allow_post = rst.post or 0
          max_margin = rst.maxmargin or 0
          local coef = pre_low_cal_box(n, rst.count)
-         local s = node_tail(nv) --ルビ文字
+         local s = node_tail(nv); if rst.quirk_protrusion then s = node_prev(node_prev(s)) end --ルビ文字
          head, n = pre_low_app_node(
             head, n, rst.count, coef, getheight(s), getdepth(s)
          )
@@ -628,10 +628,11 @@ local function pre_high(ahead)
    end
    return to_node(head)
 end
+end
 luatexbase.add_to_callback('pre_linebreak_filter', pre_high, 'ltj.ruby.pre', 100)
 
 ----------------------------------------------------------------
--- post_line_break
+-- post_linebreak
 ----------------------------------------------------------------
 local post_lown
 do
@@ -666,17 +667,58 @@ do
       local hn = get_attr(rs[1], attr_ruby)
       local fn = get_attr(rs[#rs], attr_ruby)
       local wv = getvalue(rw); local rst = getvalue(wv)
-      local ka
       if hn==1 then
          if fn==2*cmp+2 then
             -- 行中形  
-            local nn = node_tail(wv)
-            insert_main_node(ch, rw, wv, nn, rst, fn-1, rs[1])
+            local nn = node_tail(wv); 
+            if rst.quirk_protrusion then
+               local prot_b,prot_a = rst[fn-1][1], rst[fn-1][2]
+               local ka=nn; local kb = node_prev(nn); nn = node_prev(kb)
+               node_remove(wv, nn); node_remove(wv, kb); node_remove(wv, ka)
+               if prot_b~=0 then
+                   setkern(kb, prot_b); insert_after(ch, rs[1], kb);
+                   local kt = new_kern(rw, -prot_b); insert_after(ch, kb, kt); 
+                   insert_after(ch, kt, nn);
+               else 
+                   node_free(kb); insert_after(ch, rs[1], nn)
+               end
+               if prot_a~=0 then
+                  local kt = new_kern(rw, -prot_a); insert_after(ch, nn, kt);
+                  setkern(ka, prot_a); insert_after(ch, kt, ka);
+               else node_free(ka)
+               end   
+            else 
+               node_remove(wv, nn); insert_after(ch, rs[1], nn)
+            end
+            set_attr(nn, attr_icflag, PROCESSED)
             write_aux(wv, get_attr(nn, attr_ruby), get_attr(nn, attr_ruby_post_jfmgk))
          else
             -- 行末形
             local deg, nn = (fn-1)/2, wv; for i = 1, deg do nn = node_next(nn) end
-            insert_main_node(ch, rw, wv, nn, rst, deg, rs[1])
+            if rst.quirk_protrusion then
+               local prot_b = rst[deg][1]
+               local ka = node_tail(wv); local kb = node_prev(ka);
+               node_remove(wv, nn); setnext(nn, nil); node_remove(wv, kb);
+               if prot_b~=0 then
+                   setkern(kb, prot_b); insert_after(ch, rs[1], kb);
+                   local kt = new_kern(rw, -prot_b); insert_after(ch, kb, kt); 
+                   insert_after(ch, kt, nn);
+               else 
+                   node_free(kb); insert_after(ch, rs[1], nn)
+               end
+               if deg==cmp then
+                  local prot_a = rst[deg][2]; node_remove(wv,ka)
+                  if prot_a~=0 then
+                     local kt = new_kern(rw, -prot_a); insert_after(ch, nn, kt);
+                     setkern(ka, prot_a); insert_after(ch, kt, ka);
+                  else node_free(ka)
+                  end   
+               end   
+            else 
+               node_remove(wv, nn); setnext(nn, nil); insert_after(ch, rs[1], nn)
+            end
+
+            set_attr(nn, attr_icflag, PROCESSED)
             write_aux(wv, get_attr(nn, attr_ruby), get_attr(nn, attr_ruby_post_jfmgk))
          end
       else
@@ -684,7 +726,31 @@ do
          local nn = wv; for i = 1, cmp+max((hn-1)/2,2)-1 do nn = node_next(nn) end
          -- -1 is needed except the case hn = 3,
          --   because a ending-line form is removed already from the list
-         insert_main_node(ch, rw, wv, nn, rst, cmp+(hn-1)/2+1, rs[1])
+         if rst.quirk_protrusion then
+            local deg=(hn-1)/2; local prot_b = rst[2*cmp+1-deg][1]
+            local ka = node_tail(wv); node_remove(wv, nn); setnext(nn, nil);
+            if deg==1 then
+               local kb = node_prev(ka); node_remove(wv, kb);
+               if prot_b~=0 then
+                   setkern(kb, prot_b); insert_after(ch, rs[1], kb);
+                   local kt = new_kern(rw, -prot_b); insert_after(ch, kb, kt); 
+                   insert_after(ch, kt, nn);
+               else 
+                   node_free(kb); insert_after(ch, rs[1], nn)
+               end
+            else insert_after(ch, rs[1], nn)
+            end
+            local prot_a = rst[2*cmp+1-deg][2]; node_remove(wv,ka)
+            if prot_a~=0 then
+               local kt = new_kern(rw, -prot_a); insert_after(ch, nn, kt);
+               setkern(ka, prot_a); insert_after(ch, kt, ka);
+            else node_free(ka)
+            end
+         else
+            node_remove(wv, nn); setnext(nn, nil); insert_after(ch, rs[1], nn)
+         end
+
+         set_attr(nn, attr_icflag, PROCESSED)
          if fn == 2*cmp-1 then
             write_aux(wv, get_attr(nn, attr_ruby), get_attr(nn, attr_ruby_post_jfmgk))
          end
@@ -699,76 +765,81 @@ do
 end
 
 local traverse_id = node.direct.traverse_id
-local function post_high_break(head)
-   local rs = {}   -- rs: sequence of ruby_nodes,
-   local rw = nil  -- rw: main whatsit
-   local cmp = -2  -- dummy
-   for h in traverse_id(id_hlist, to_direct(head)) do
-      for i = 1, #rs do rs[i] = nil end
-      local ha = getlist(h);
+local post_high_hbox, post_high_break
+do
+   local rs, rw = {}, nil -- rs: sequence of ruby_nodes, rw: main whatsit
+   local cmp
+   post_high_break =  function (head, loc)
+      if loc~='post_linebreak' then return head end
+      for h in traverse_id(id_hlist, to_direct(head)) do
+         for i = 1, #rs do rs[i] = nil end
+         local ha = getlist(h);
+         while ha do
+            local hai = getid(ha)
+            local i = ((hai == id_glue and getsubtype(ha)==0)
+                       or (hai == id_rule and getsubtype(ha)==0)
+                       or (hai == id_whatsit and getsubtype(ha)==sid_user
+                           and getfield(ha, 'user_id', RUBY_POST)))
+                  and get_attr(ha, attr_ruby) or 0
+            if i==0 then
+               ha = node_next(ha)
+            elseif i==1 then
+               setlist(h, post_lown(rs, rw, cmp, getlist(h)))
+               for i = 2, #rs do rs[i] = nil end -- rs[1] is set by the next statement
+               rs[1], rw = ha, nil; ha = node_next(ha)
+            elseif i==2 then
+               rw = ha
+               cmp = getvalue(getvalue(rw)).count
+               local hb, hc =  node_remove(getlist(h), rw)
+               setlist(h, hb); ha = hc
+            else -- i>=3
+               rs[#rs+1] = ha; ha = node_next(ha)
+            end
+         end
+         setlist(h, post_lown(rs, rw, cmp, getlist(h)))
+      end
+      return head
+   end
+   post_high_hbox = function (ahead)
+      for i = 1, #rs do rs[i] = nil end; rw = nil
+      local ha = to_direct(ahead); local head = ha
       while ha do
          local hai = getid(ha)
          local i = ((hai == id_glue and getsubtype(ha)==0)
-                       or (hai == id_rule and getsubtype(ha)==0)
-                       or (hai == id_whatsit and getsubtype(ha)==sid_user
-                              and getfield(ha, 'user_id', RUBY_POST)))
-            and get_attr(ha, attr_ruby) or 0
+                    or (hai == id_rule and getsubtype(ha)==0)
+                    or (hai == id_whatsit and getsubtype(ha)==sid_user
+                        and getfield(ha, 'user_id', RUBY_POST)))
+               and get_attr(ha, attr_ruby) or 0
          if i==0 then
             ha = node_next(ha)
          elseif i==1 then
-            setlist(h, post_lown(rs, rw, cmp, getlist(h)))
+            head = post_lown(rs, rw, cmp, head)
             for i = 2, #rs do rs[i] = nil end -- rs[1] is set by the next statement
             rs[1], rw = ha, nil; ha = node_next(ha)
          elseif i==2 then
             rw = ha
             cmp = getvalue(getvalue(rw)).count
-            local hb, hc =  node_remove(getlist(h), rw)
-            setlist(h, hb); ha = hc
-         else -- i>=3
+            head, ha = node_remove(head, rw)
+         else -- i >= 3
             rs[#rs+1] = ha; ha = node_next(ha)
          end
       end
-      setlist(h, post_lown(rs, rw, cmp, getlist(h)))
+      return to_node(post_lown(rs, rw, cmp, head))
    end
-   return head
 end
-
-local function post_high_hbox(ahead)
-   local ha = to_direct(ahead); local head = ha
-   local rs = {};  -- rs: sequence of ruby_nodes,
-   local rw = nil; -- rw: main whatsit
-   local cmp
-   while ha do
-      local hai = getid(ha)
-      local i = ((hai == id_glue and getsubtype(ha)==0)
-                    or (hai == id_rule and getsubtype(ha)==0)
-                    or (hai == id_whatsit and getsubtype(ha)==sid_user
-                           and getfield(ha, 'user_id', RUBY_POST)))
-         and get_attr(ha, attr_ruby) or 0
-      if i==0 then
-         ha = node_next(ha)
-      elseif i==1 then
-         head = post_lown(rs, rw, cmp, head)
-         for i = 2, #rs do rs[i] = nil end -- rs[1] is set by the next statement
-         rs[1], rw = ha, nil; ha = node_next(ha)
-      elseif i==2 then
-         rw = ha
-         cmp = getvalue(getvalue(rw)).count
-         head, ha = node_remove(head, rw)
-      else -- i >= 3
-         rs[#rs+1] = ha; ha = node_next(ha)
-      end
+do
+   -- pre_append_to_vlist_filter.lua: distributed with lua-ul
+   local found = kpse.find_file('pre_append_to_vlist_filter.lua', 'lua')
+   if not found then
+      luatexbase.add_to_callback('post_linebreak_filter', post_high_break, 'ltj.ruby.post_break')
+   else
+      require 'pre_append_to_vlist_filter'
+      luatexbase.add_to_callback('pre_append_to_vlist_filter', post_high_break, 'ltj.ruby.post_break',
+         (luatexbase.priority_in_callback('pre_append_to_vlist_filter', 'add underlines to list') or 1))
    end
-   return to_node(post_lown(rs, rw, cmp, head))
-end
-
-do 
-  local luaul_callback_priority 
-    = luatexbase.priority_in_callback('hpack_filter', 'add underlines to list')
-  luatexbase.add_to_callback('post_linebreak_filter', post_high_break, 'ltj.ruby.post_break')
-  luatexbase.add_to_callback('hpack_filter', 
-    function(head) return post_high_hbox(pre_high(head)) end, 'ltj.ruby', 
-    luaul_callback_priority and luaul_callback_priority or nil)
+   luatexbase.add_to_callback('hpack_filter', 
+     function(head) return post_high_hbox(pre_high(head)) end, 'ltj.ruby', 
+     luatexbase.priority_in_callback('hpack_filter', 'add underlines to list') or 1)
 end
 
 ----------------------------------------------------------------
@@ -884,7 +955,7 @@ do
             end
          end
          if rst.quirk_protrusion then
-            local lk = node_tail(lpv)
+            local lk = node_tail(nqnv); print(lk)
             node_inherit_attr(lk, Nq.nuc, Np and Np.nuc)
             set_attr(lk, attr_icflag, PROCESSED)
          end
