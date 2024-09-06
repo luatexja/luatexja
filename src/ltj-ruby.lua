@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.ruby',
-  date = '2024-09-05',
+  date = '2024-09-06',
   description = 'Ruby annotation',
 })
 luatexja.ruby = {}
@@ -382,7 +382,7 @@ local function enlarge_parent(r, p, tmp_tbl, no_begin, no_end)
        end
     end
     return r, p, orig_post_intrusion, post_jfmgk, 
-      pre_protrusion - pre_intrusion, post_protrusion - orig_post_intrusion
+      pre_protrusion - pre_intrusion, post_protrusion - post_intrusion
 end
 
 -- ルビボックスの生成（単一グループ）
