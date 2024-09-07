@@ -280,7 +280,6 @@ local function texiface_low(rst, rtlr, rtlp)
       _, n = insert_after(wv, n, rtlp[i])
    end
    -- w.value: (whatsit) .. r1 .. p1 .. r2 .. p2
-   rst.quirk_protrusion = (rst.mode%128>=64)
    node.direct.write(w); return w,wv
 end
 
@@ -592,7 +591,7 @@ pre_high = function (ahead)
    post_intrusion_backup, post_jfmgk_backup = 0, false
    local n = first_whatsit(head)
    while n do
-      if getsubtype(n) == sid_user and getfield(n, 'user_id') == RUBY_PRE then
+       if getsubtype(n) == sid_user and getfield(n, 'user_id') == RUBY_PRE then
          local nv = getvalue(n)
          local rst = getvalue(nv)
          max_allow_pre = rst.pre or 0
@@ -769,8 +768,7 @@ local post_high_hbox, post_high_break
 do
    local rs, rw = {}, nil -- rs: sequence of ruby_nodes, rw: main whatsit
    local cmp
-   post_high_break =  function (head, loc)
-      if loc~='post_linebreak' then return head end
+   post_high_break =  function (head)
       for h in traverse_id(id_hlist, to_direct(head)) do
          for i = 1, #rs do rs[i] = nil end
          local ha = getlist(h);
@@ -834,12 +832,16 @@ do
       luatexbase.add_to_callback('post_linebreak_filter', post_high_break, 'ltj.ruby.post_break')
    else
       require 'pre_append_to_vlist_filter'
-      luatexbase.add_to_callback('pre_append_to_vlist_filter', post_high_break, 'ltj.ruby.post_break',
+      luatexbase.add_to_callback('pre_append_to_vlist_filter', 
+         function(head, loc) 
+             return (loc~='post_linebreak') and head or post_high_break(head)
+         end,
+         'ltj.ruby.post_break',
          (luatexbase.priority_in_callback('pre_append_to_vlist_filter', 'add underlines to list') or 1))
    end
    luatexbase.add_to_callback('hpack_filter', 
      function(head) return post_high_hbox(pre_high(head)) end, 'ltj.ruby', 
-     luatexbase.priority_in_callback('hpack_filter', 'add underlines to list') or 1)
+     luatexbase.priority_in_callback('hpack_filter', 'add underlines to list') or nil)
 end
 
 ----------------------------------------------------------------
@@ -955,7 +957,7 @@ do
             end
          end
          if rst.quirk_protrusion then
-            local lk = node_tail(nqnv); print(lk)
+            local lk = node_tail(nqnv);
             node_inherit_attr(lk, Nq.nuc, Np and Np.nuc)
             set_attr(lk, attr_icflag, PROCESSED)
          end

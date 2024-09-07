@@ -88,6 +88,7 @@
 \define@boolkey[ltj]{ruby}{intrude_xkanjiskip}[true]{}
 \define@boolkey[ltj]{ruby}{intrude_kanjiskip}[true]{}
 
+\define@boolkey[ltj]{ruby}{always_highlight_protrusion}[true]{}
 
 %%%%%%%% setkeys の別名
 \protected\def\ltjsetruby{\setkeys[ltj]{ruby}}
@@ -137,7 +138,8 @@
           [luatexja.icflag_table.XKANJI_SKIP]=true,
           [luatexja.icflag_table.XKANJI_SKIP_JFM]=true,
        \fi
-       \string}
+       \string},
+       quirk_protrusion =  \ifltj@ruby@always_highlight_protrusion false \else true \fi
     \string}
 }
 \egroup
@@ -260,7 +262,7 @@
   kenten=\textbullet, fontcmd=\relax, ybaseheight=0.88, tbaseheight=0.5,
   yrubydepth=0.12, trubydepth=0.5,
   intrude_jfmgk, intrude_kanjiskip, intrude_xkanjiskip,
-  epsilon=0.0001,
+  epsilon=0.0001, always_highlight_protrusion=false,
 }
 
 \endinput
