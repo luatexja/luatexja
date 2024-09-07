@@ -43,8 +43,11 @@
 	allcolors=blue,
 	pdftitle={luatexja-ruby.sty}
 }
-\def\Node#1#2{\,\vcenter{\hbox{\fboxsep=1pt\fbox{\vbox{\small\halign{\hfil##\hfil\cr
-  #1\mathstrut\cr\noalign{\smallskip\hrule height.4pt\smallskip}\strut\<#2\cr}}}}}\,}
+\makeatletter
+\def\Node{\@ifstar{\@Node[b_blue]}{\@Node[white]}}
+\def\@Node[#1]#2#3{\,\vcenter{\hbox{\fboxsep=1pt\fcolorbox{black}{#1}{%
+  \vbox{\small\halign{\hfil##\hfil\cr
+  #2\mathstrut\cr\noalign{\smallskip\hrule height.4pt\smallskip}\strut\<#3\cr}}}}}\,}
 \def\LuaTeX{Lua\TeX}
 
 % 三分ルビ用
@@ -147,12 +150,12 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 \subsection[命令]{\ruby{命|令}{めい|れい}}
 \label{ssec:ltjruby}
 \paragraph{\cs{ltjruby}}
-ルビ出力用命令の本体．\verb+\ruby+ という別名を定義している．
+ルビ出力用命令の本体．\cs{ruby}という別名を定義している．
 \begin{quote}
 \ttfamily \textbackslash ltjruby[<option>]\{親|文|字\}\{おや|も|じ\}
 \end{quote}
 のように親文字→ルビの順序で指定する．
-第2・第3引数内の「\verb+|+」はグループの区切りを表す．詳細は\ref{ssec:grp}\nobreak 小節を参照．
+第2・第3引数内の「\texttt{|}」はグループの区切りを表す．詳細は\ref{ssec:grp}\nobreak 小節を参照．
 
 \medskip
 <option>には以下の内容をkey-valueリストで指定可能である．
@@ -185,26 +188,26 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 \item[stretchruby=\{<left>\}\{<middle>\}\{<right>\}] 親文字の合計長が
 ルビ文字の合計長より長い時に，ルビ文字の前・間・後に入れる空白の割合であり，
 それぞれ0--7の自然数で指定する．
-既定値は\ \verb+{1}{2}{1}+ である．
+既定値は\>\verb+{1}{2}{1}+\>である．
 <left>はルビ文字の先頭までの空き量，<middle>はルビ文字間の空き量，<right>はルビ文字の末尾からの
 空き量（の比）を表す．以下が例である．
-\begin{LTXexample}[width=0.3\textwidth, preset=\Large]
+\begin{LTXexample}[width=0.25\textwidth, preset=\Large]
 \ltjruby[stretchruby=123,maxmargin=2]%
   {◯◯◯◯}{◆◆}
 \end{LTXexample}
 \item[stretch=\{<left>\}\{<middle>\}\{<right>\}]
 行中形でルビ文字の方が長い場合，親文字の前・中・後に入れる空白の割合．
-既定値は\ \verb+{1}{2}{1}+ である．それ以外の代表的な値としては，例えば次のようなものがある．
+既定値は\>\verb+{1}{2}{1}+\>である．それ以外の代表的な値としては，例えば次のようなものがある．
 \begin{description}
-\item[親文字均等割禁止] \verb+{1}{0}{1}+\ など<middle>を0にした値
+\item[親文字均等割禁止] \verb+{1}{0}{1}+\>など<middle>を0にした値
 \item[前突出禁止] \verb+{0}{1}{1}+
 \item[後突出禁止] \verb+{1}{1}{0}+
 \end{description}
 
 \item[stretchbol=\{<left>\}\{<middle>\}\{<right>\}] 行頭形に対する\texttt{stretch}と同様の指定．
-既定値は\ \verb+{0}{1}{1}+ である．
+既定値は\>\verb+{0}{1}{1}+\>である．
 \item[stretcheol=\{<left>\}\{<middle>\}\{<right>\}] 行末形に対する\texttt{stretch}と同様の指定．
-既定値は\ \verb+{1}{1}{0}+ である．
+既定値は\>\verb+{1}{1}{0}+\>である．
 
 \item[maxmargin=<real>] 親文字の方がルビより長い時に，ルビの先頭と親文字の先頭，及び
 ルビ末尾と親文字の末尾の間に許される最大の空白量．\emph{親文字全角幅単位}で指定し，既定値は0.5．
@@ -213,16 +216,13 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 \item[size=<real>] ルビ文字の親文字に対する大きさ．既定値は0.5．
 \item[intergap=<real>] ルビ文字と親文字との空きを親文字全角高さ単位で指定．既定値は0．
 \item[rubysmash=<bool>] ルビの高さを0にするか．既定値は偽．次が例である．
-\begin{LTXexample}[width=0.3\textwidth, preset=\Large]
+\begin{LTXexample}[width=0.25\textwidth, preset=\Large]
 \ \vrule width 0pt height 2\zw depth 1\zw
 \frame{\ltjruby[rubysmash=false]{本}{ほん}}\ 
 \frame{\ltjruby[rubysmash=true]{本}{ほん}}\ 
-\frame{\ltjruby[rubysmash=false,intergap=0.2]
-  {本}{ほん}}\ 
-\frame{\ltjruby[rubysmash=true,intergap=0.2]
-  {本}{ほん}}\ 
-\frame{\ltjruby[rubysmash=false,intergap=-1.5]
-  {本}{ほん}}
+\frame{\ltjruby[rubysmash=false,intergap=0.2]{本}{ほん}}\ 
+\frame{\ltjruby[rubysmash=true,intergap=0.2]{本}{ほん}}\ 
+\frame{\ltjruby[rubysmash=false,intergap=-1.5]{本}{ほん}}
 \end{LTXexample}
 \item[ybaseheight=<real>] 非負の値が指定された場合，
   \emph{縦組以外での}親文字の高さを親文字全角高さの<real>倍と強制的に固定する．
@@ -232,7 +232,7 @@ plain \LuaTeX でのロードはまだサポートしておらず，
   既定値は$0.5$．
 \item[baseheight=<real>] \texttt{ybaseheight}，\texttt{tbaseheight}を同時に指定したことと同義．
   次の例や\autoref{fig:ruby_vertical}を参照．
-\begin{LTXexample}[width=0.3\textwidth, preset=\Large]
+\begin{LTXexample}[width=0.25\textwidth, preset=\Large]
 \noindent
 \ltjruby[baseheight=0.88]{本}{ほん}\ 
 \ltjruby[baseheight=0.88]{dvi}{ディーヴィーアイ}\\
@@ -251,7 +251,7 @@ plain \LuaTeX でのロードはまだサポートしておらず，
   既定値は$0.5$．
 \item[rubydepth=<real>] \texttt{yrubydepth}，\texttt{trubydepth}を同時に指定したことと同義．
   次の例や\autoref{fig:ruby_vertical}を参照．
-\begin{LTXexample}[width=0.3\textwidth, preset=\Large]
+\begin{LTXexample}[width=0.25\textwidth, preset=\Large]
 \noindent
 \ltjruby[rubydepth=0.12]{◆}{ほん}\ 
 \ltjruby[rubydepth=0.12]{◆}{pdf}\ 
@@ -304,11 +304,11 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 
 
 \item[kenten=<command>]各文字につく圏点の出力命令を指定する．
-  既定値は「\verb+\textbullet+」である．
+  既定値は「\cs{textbullet}」である．
 
 \item[fontcmd=<command>]ルビ用のフォント切り替え命令を指定する．
 このキーの内容が実行された後に\ \verb+\fontsize...\selectfont+\ が実行されるので，
-このキーの指定では最後に\ \verb+\selectfont+ を加える必要はない．
+このキーの指定では最後に\cs{selectfont}を加える必要はない．
 
 この \texttt{fontcmd}キーの内容は多くの回数実行される．
 例えば，\Pkg{luatexja-fontspec}パッケージを用いてOpenTypeフォントを用いる場合，
@@ -385,7 +385,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
     文字の前のJFMグルーに進入が発生した場合，文字<chr\_code>の直後のルビの前進入は発生しない．
   \end{itemize}
   後者の状況の例を以下に載せる．
-\begin{LTXexample}[width=0.333\textwidth, preset=\Large]
+\begin{LTXexample}[width=0.25\textwidth, preset=\Large]
 \ltjsetparameter{rubypreintrusion={`\【,-1}}
 \ruby{鴎}{かもめ}【\ruby{隼}{はやぶさ}
 % 「\ruby{鴎}{かもめ}」は，「【」直前のJFMグルーに
@@ -405,7 +405,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
     発生した場合，文字<chr\_code>の直後のJFMグルーにはルビの前進入は発生しない．
   \end{itemize}
   今回も後者の状況の例を以下に載せる．
-\begin{LTXexample}[width=0.333\textwidth, preset=\Large]
+\begin{LTXexample}[width=0.25\textwidth, preset=\Large]
 \ltjsetparameter{rubypostintrusion={`\】,-1}}
 \ruby{鴎}{かもめ}】\ruby{隼}{はやぶさ}\\
 \hskip.25\zw 鴎】隼\\% 比較用
@@ -449,8 +449,8 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \begin{quote}
  \ttfamily\cs{ltjkenten}[<option>]\{親文字\}
 \end{quote}
-のように使用する．複数文字に圏点をつける場合でも，\verb+\ltjruby+ のように「\texttt{|}」を使って
-文字を区切る\emph{必要はない}（\verb+\kenten+内では「\texttt{|}」は特別な意味を持たない）
+のように使用する．複数文字に圏点をつける場合でも，\cs{ltjruby}のように「\texttt{|}」を使って
+文字を区切る\emph{必要はない}（\cs{kenten}内では「\texttt{|}」は特別な意味を持たない）
 ことに注意してほしい．
 
 圏点として出力される文字は\texttt{kenten}キーによって指定し，
@@ -461,13 +461,13 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \begin{quote}
 \ttfamily\cs{ltjruby}[<option>]\{親|文|字\}\{おや|も|じ\}
 \end{quote}
-のように，\verb+\ltjruby+\ の第2・第3引数内の「\verb+|+」はグループの区切りを表す．
+のように，\cs{ltjruby}の第2・第3引数内の「\texttt{|}」はグループの区切りを表す．
 グループの数は両者で一致しなければならず，
 \verb+\ltjruby{紋章}{もん|しよう}+ のようには\emph{できない}．
 
 1グループのみのルビ（単純グループルビ）はグループルビとして組まれる．そのため，
 もしモノルビを使いたければ，面倒でも
-\begin{LTXexample}[width=0.4\textwidth, preset=\Large]
+\begin{LTXexample}[width=0.25\textwidth, preset=\Large]
 の\ltjruby{紋}{もん}\ltjruby{章}{しよう}が
 \end{LTXexample}
 のように，複数回使用すること．
@@ -538,7 +538,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 「日本語組版処理の要件」の図117\footnote{2020-08-11版での番号．2012-04-03版では図3.82．}のように，
 前後からのルビ文字のはみ出しが繋がらないようにする処理が組み込まれている．
 例えば，
-\begin{LTXexample}[preset=\Large,width=0.3\textwidth]
+\begin{LTXexample}[preset=\Large,width=0.25\textwidth]
 \ltjruby{陵}{りよう}と\ltjruby{陵}{みささぎ}\\
 \ltjruby{陵}{りよう}と\ltjruby[pre=1]{陵}{みささぎ}
 \end{LTXexample} 
@@ -561,8 +561,8 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \]
 \end{enumerate}
 
-<jobname>\texttt{.ltjruby}ファイルに保存する際，各 \verb+\ltjruby+ 命令の呼び出しを識別するキーが必要になるが，
-そのキーとしては単純に「何個目の \verb+\ltjruby+ 命令か」である．
+<jobname>\texttt{.ltjruby}ファイルに保存する際，各\cs{ltjruby}命令の呼び出しを識別するキーが必要になるが，
+そのキーとしては単純に「何個目の\cs{ltjruby}命令か」である．
 
 なお，以上の処理は，1行目と2行目を比較すれば分かるように，
 「\ltjruby{陵}{みささぎ}」の\emph{\ActIntr{前文字進入許容量}指定が自動（\texttt{pre}の値が負）}に
@@ -585,17 +585,17 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 これは，段落の「本当の」末尾には \verb+\penalty10000\parfillskip+ があるためで，
 ルビ処理用に作った最後のグルー（\ref{ssec:impl}\nobreak 小節の説明では$g_2$）が消去されないことによる．
 
-\verb+\parfillskip+ の長さ（や，場合によっては \verb+\rightskip+）を実測し，
+\cs{parfillskip}（や，場合によっては\cs{rightskip}）の長さを実測し，
 それによって処理を変えるのも可能だが，そのようなことはしなかった．
 段落がルビで終わることは普通ない（最低でも句点が続くだろう）と考えられるからである．
 
 \paragraph{段落先頭のルビ}
 同様に，段落先頭のルビは行頭形にはならない．
-\texttt{pre}が負（つまり，自動指定）のとき，段落最初の \verb+\parindent+ 分への
-進入は可能である．この\verb+\parindent+ 分のインデントへの\ActIntr{進入許容量}は
+\texttt{pre}が負（つまり，自動指定）のとき，段落最初の\cs{parindent}分への
+進入は可能である．この\cs{parindent}分のインデントへの\ActIntr{進入許容量}は
 「文字$-1$」に対する\Param{rubypreintrusion}（既定値は1，ルビ全角単位）と
-\ \verb+\parindent+ の長さのうち小さい方である．
-\begin{LTXexample}[preset=\Large,width=0.4\textwidth]
+\cs{parindent}の長さのうち小さい方である．
+\begin{LTXexample}[preset=\Large,width=0.25\textwidth]
 \parindent1\zw\noindent ０１２３４５\par
 \ltjruby{陵}{みささぎ}は……\par
 \ltjruby{承}{うけたまわ}り……\par
@@ -629,11 +629,9 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 3行目のように1全角伸ばすという調整が行われた後は\ActIntr{文字進入量}が不揃いになってしまっている．
 これはもともと「\texttt{;}」には後側にのみ和欧文間空白が入ることと，3行目ではこの和欧文間空白が
 伸びているためである．
-\begin{LTXexample}[preset=\Large,width=0.4\textwidth]
-\leavevmode\hbox{……に%
-  \ltjruby{\texttt{;}}{セミコロン}という……}\\
-\hbox spread\zw{……に%
-  \ltjruby{\texttt{;}}{セミコロン}という……}
+\begin{LTXexample}[preset=\Large,width=0.25\textwidth]
+\leavevmode\hbox{に\ltjruby{\texttt{;}}{セミコロン}という}\\
+\hbox spread\zw{に\ltjruby{\texttt{;}}{セミコロン}という}
 \end{LTXexample}
 
 \newpage
@@ -757,21 +755,28 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \end{LTXexample}
 
 \begin{enumerate}
-\item \verb|\ltjruby|コマンド自体は，一旦次のnode listを値とするwhatsit~$W$を作って，
-現在の水平リストへと挿入する（必要ならば\verb|\leavevmode|も実行）：
+\item \cs{ltjruby}命令自体は，一旦次のnode listを値とするwhatsit~$W$を作って，
+現在の水平リストへと挿入する（必要ならば\cs{leavevmode}も実行）：
 \[
  \Node{whatsit $w$}{value: 2}\longrightarrow 
  \Node{hlist $s_1$}{「りゆう」}\longrightarrow
  \Node{hlist $p_1$}{「流」}\longrightarrow
  \Node{hlist $s_2$}{「ちよう」}\longrightarrow
- \Node{hlist $p_2$}{「暢」}
+ \Node{hlist $p_2$}{「暢」}\longrightarrow
+ \Node{kern $k_b$}{}\longrightarrow
+ \Node{kern $k_a$}{}
 \]
 ここで，最初の$w$の値2は，ルビが2つのパーツ「\ltjruby{流}{りゆう}」「\ltjruby{暢}{ちよう}」からなっていることを
 表している．この値を$\mathit{cmp}$とおこう．
 $s_i$達の中の文字は既にルビの大きさである．
+  
+また，$k_b$,~$k_a$は\texttt{always\_highlight\_protrusion}キーが偽の場合にのみ生成されるが，
+実際に使われるのは行分割後になってからである．\Pkg{lua-ul}対応のためには，和文処理グルーの挿入処理で
+「前・後のクラスタそれぞれとのattributeの共通部分」を保存する必要があり，この段階でノードとして$k_b$,~$k_a$を
+準備している．
 \item \LuaTeX-jaの和文処理グルー挿入処理において，
 このwhatsit~$W$はまとめて
-「先頭が『流』，最後が『暢』であるようなhboxを \verb|\unhbox| で展開したもの」と扱われる．
+「先頭が『流』，最後が『暢』であるようなhboxを\cs{unhbox}で展開したもの」と扱われる．
 言い換えれば，ルビ部分を無視した単なる「流暢」という和文文字の並びとして扱われる\footnote{「流」「暢」の間のグルーは既に入っている，と扱われる．}．
 次のサンプルを参照
 \begin{LTXexample}[preset=\Large]
@@ -782,7 +787,10 @@ $s_i$達の中の文字は既にルビの大きさである．
 \end{LTXexample}
 \item 和文処理グルーの挿入が終わった後で，可動グループルビのためのノードの挿入に入る．
 \begin{enumerate}
-\item $W$の前後に$2\mathit{cmp}+1=5$個のノードが挿入され，$W$の周辺は次のようなノード列になる．
+\item $W$の前後に$2\mathit{cmp}+1=5$個のノードが挿入され，$W$の周辺は次のようなノード列になる
+  \footnote{%
+    $r_2$と$g_2$の間には，ルビと直後の文字の間にある禁則処理のためのペナルティなどが入っているかもしれない．
+  }．
 \begin{align*}
  (\text{other nodes})&\longrightarrow
  \Node{glue $g_0$}{}\longrightarrow \Node{whatsit~$W$}{元からある}\longrightarrow \Node{rule $r_1$}{}
@@ -796,7 +804,7 @@ $s_i$達の中の文字は既にルビの大きさである．
 \begin{gather*}
  (\text{other nodes})\longrightarrow
  \Node{glue $g_0$}{}\longrightarrow \Node{whatsit~$W$}{元からある}\longrightarrow \Node{rule $r_1$}{}\\
-\noalign{\hrulefill 行の境目\hrulefill}
+\noalign{\leavevmode\hskip 2\zw\hrulefill 行の境目\hrulefill\kern 2\zw\null}
 \Node{rule $r_2$}{}\longrightarrow 
  \Node{glue $g_2$}{}\longrightarrow (\text{other nodes})
 \end{gather*}
@@ -843,27 +851,26 @@ $g_0\rightarrow W\rightarrow r_1\rightarrow g_2 \rightarrow r_2\rightarrow g_2$\
 
 \item なお，$r_i$達の高さ・深さは組み上がった後のそれである．
 $g_i$,~$r_i$達の幅は，\autoref{tab:node}に示したような対応に沿って算出する．
-例えばこの場合，行中形$n_5$に対して
+例えば，行中形$n_5$に対して，記号は乱用気味であるが，
 \[
  g_0+r_1+g_2+r_2+g_2 = (3-0.25\times 2)\,\mathrm{zw}=2.5\,\mathrm{zw}
 \]
-という方程式が立つ（zwは親文字全角の幅，進入量込）．
-$n_1$から$n_5$まで計5本の方程式が立つが，これらはGau\ss の消去法で解くことができて
-$g_i$,~$r_i$達の幅が求まる．
+という方程式が立つ（zwは親文字全角の幅，引き算は進入量の分）．
+方程式と未知数（$g_i$,~$r_i$達の幅）はどちらも$2\mathit{cmp}+1$であるので，
+Gau\ss の消去法により$g_i$,~$r_i$達の幅が求まる．
 \item また，ルビ処理を統括しているwhatsit~$W$の値も
-\[
- \Node{whatsit $w$}{value: 2}\longrightarrow 
- \Node{vlist $n_1$}{末1}\longrightarrow
- \Node{vlist $n_2$}{末2}\longrightarrow
- \Node{vlist $n_3$}{頭2}\longrightarrow
- \Node{vlist $n_4$}{頭1}\longrightarrow
- \Node{vlist $n_5$}{中}
-\]
+\begin{align*}
+ \Node{whatsit $w$}{value: 2}
+ &\longrightarrow\Node{vlist $n_1$}{末1}\longrightarrow\Node{vlist $n_2$}{末2}
+  \longrightarrow\Node{vlist $n_3$}{頭2}\longrightarrow\Node{vlist $n_4$}{頭1}
+  \longrightarrow\Node{vlist $n_5$}{中}\\
+ &\longrightarrow\Node{kern $k_b$}{}\longrightarrow\Node{kern $k_a$}{}
+\end{align*}
 に置き換えておく．
 
 \end{enumerate}
 
-\item \LuaTeX の行分割処理を普通に行う．
+\item \LuaTeX の行分割処理を通常通りに行う．
 \item 行分割の結果に従って，$g_i$,~$r_i$達を適切に置換する．
 
 例えば行分割の結果
@@ -871,7 +878,7 @@ $g_i$,~$r_i$達の幅が求まる．
  (\text{other nodes})\longrightarrow
  \Node{glue $g_0$}{}\longrightarrow \Node{whatsit~$W$}{元からある}\longrightarrow \Node{rule $r_1$}{}
   \tag{行A}\\
-\noalign{\hrulefill 行の境目\hrulefill}
+\noalign{\leavevmode\hskip 2\zw\hrulefill 行の境目\hrulefill\kern 2\zw\null}
 \Node{rule $r_2$}{}\longrightarrow 
  \Node{glue $g_2$}{}\longrightarrow (\text{other nodes})\tag{行B}
 \end{gather*}
@@ -886,21 +893,29 @@ $g_i$,~$r_i$達の幅が求まる．
 $g_0$,~($W$,)~$r_1$というノードの並びは，「行末1グループ」$n_1$に対応しているので，
 $g_0$,~$r_1$を行Aから除去・メモリ解放し，代わりに$n_1$を行Aの中身に追加する．
 
+\item 
+\texttt{always\_highlight\_protrusion}キーが偽であり，かつルビの前への突出量から\ActIntr{前文字進入量}を引いた値
+  $\mathit{prot\_b}$が0でない場合は，$n_1$の直前にkern~$k_b$（長さ$\mathit{prot\_b}$）と，それを打ち消すkern（長さ$-\mathit{prot\_b}$）を挿入する．
+
 \item 次に行Bの処理にうつる．行Aでルビの処理は完了していない（2グループのルビなのにまだ1グループしか使っていない）ので，
 「whatsit~$W$由来」のノードがいくつか行B内に残っているはずである．
 
 案の定，$r_2$,~$g_2$というノード列が見つかった．これは「行頭1グループ」$n_4$に対応しているので，
 $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_4$を行Bの中身に挿入する．
-
+\texttt{always\_highlight\_protrusion}キーが偽であったときは，行Aのときと同様にkernを2つ挿入する．
+  
 \item これで2グループとも使い切ったことになるので，
 隔離しておいた$W$を，（使われなかった$n_2$,~$n_4$,~$n_5$などと共に）メモリ解放する．結果として
-次のようになった：
+次のようになる．
 \begin{gather*}
- (\text{other nodes})\longrightarrow
- \Node{vlist $n_1$}{末1}\tag{行A}\\
-\noalign{\hrulefill 行の境目\hrulefill}
-\Node{vlist $n_4$}{頭1}\longrightarrow (\text{other nodes})\tag{行B}
+ (\text{other nodes})\longrightarrow \Node{kern~$k_b$}{$\mathit{prot\_b}$}
+ \longrightarrow \Node*{kern}{$-\mathit{prot\_b}$}\longrightarrow \Node*{vlist $n_1$}{末1}\tag{行A}\\
+\noalign{\leavevmode\hskip 2\zw\hrulefill 行の境目\hrulefill\kern 2\zw\null}
+\Node*{vlist $n_4$}{頭1}\longrightarrow \Node*{kern}{$-\mathit{prot\_a}$}
+  \longrightarrow \Node{kern~$k_a$}{$\mathit{prot\_a}$}\longrightarrow (\text{other nodes})\tag{行B}
 \end{gather*}
+  ここで，色付きの4ノードは，\Pkg{lua-ul}パッケージの提供する「下線」命令が
+  \cs{ltjruby}のみを有効範囲として発行された場合の，「下線」がかかってくるノードたちである．
 \end{enumerate}
 \end{enumerate}
 

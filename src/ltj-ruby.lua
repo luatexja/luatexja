@@ -647,19 +647,6 @@ do
     local k = node_new(id_kern, 1, inherit); setkern(k, num); set_attr(kt, attr_icflag, PROCESSED);
       return k;
    end
-   local function insert_main_node(ch, rw, wv, nn, rst, deg, first)
-      if rst.quirk_protrusion then
-         local prot_b, prot_a = rst[deg][1], rst[deg][2]
-         ka=nn; kb = node_prev(nn); nn = node_prev(kb);
-         node_remove(wv, nn); node_remove(wv, kb); node_remove(wv, ka); 
-         setkern(kb, prot_b); insert_after(ch, first, kb);
-         local kt = new_kern(rw, -prot_b); insert_after(ch, kb, kt); insert_after(ch, kt, nn);
-         local kt = new_kern(rw, -prot_a); insert_after(ch, nn, kt); 
-         setkern(ka, prot_a); insert_after(ch, kt, ka);
-      else node_remove(wv, nn); insert_after(ch, first, nn)
-      end
-      set_attr(nn, attr_icflag, PROCESSED)
-   end
    post_lown = function (rs, rw, cmp, ch)
       -- ch: the head of `current' hlist
       if #rs ==0 or not rw then return ch end
