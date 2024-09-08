@@ -59,6 +59,7 @@
 \def\_{\ifx\f@family\ttdefault\origunderscore\else
   \leavevmode \kern .06em\vbox {\hrule \@width .333em}\fi}
 \def\figureautorefname{図}
+\def\tableautorefname{表}
 \def\HyRef@autoref#1#2{%
   \begingroup
     \Hy@safe@activestrue
@@ -325,18 +326,18 @@ plain \LuaTeX でのロードはまだサポートしておらず，
   限られる．\autoref{fig:always-highlight-protrusion}を参照．
 \end{description}
 \begin{figure}[t]
-\begin{LTXexample}[width=12\zw, preset=\large]
+\begin{LTXexample}[width=13.2\zw, preset=\large]
   \ltjsetruby{stretchbol=121,stretcheol=121}
-  あ\highLight{\ruby{◆}{□□□□□□□□}}あ\\
-  あ\highLight{\ruby{◆}{□□□□□□□□}あ}\\
-  \highLight{あ\ruby{◆}{□□□□□□□□}}あ\\
-  ああああああ\highLight{\ruby{◆|◆}{□□□□□|□□□□□}}あ
+  あ\highLight{\ruby{◆}{□□□□□□□□}}あ
+  い\highLight{\ruby{◆}{□□□□□□□□}い}\\
+  \highLight{う\ruby{◆}{□□□□□□□□}}う\\\kern7\zw
+  あ\highLight{\ruby{◆|◆}{□□□□□|□□□□□}}あ
 
   \ltjsetruby{always_highlight_protrusion}
-  あ\highLight{\ruby{◆}{□□□□□□□□}}あ\\
-  あ\highLight{\ruby{◆}{□□□□□□□□}あ}\\
-  \highLight{あ\ruby{◆}{□□□□□□□□}}あ\\
-  ああああああ\highLight{\ruby{◆|◆}{□□□□□|□□□□□}}あ
+  あ\highLight{\ruby{◆}{□□□□□□□□}}あ
+  い\highLight{\ruby{◆}{□□□□□□□□}い}\\
+  \highLight{う\ruby{◆}{□□□□□□□□}}う\\\kern7\zw
+  あ\highLight{\ruby{◆|◆}{□□□□□|□□□□□}}あ
 \end{LTXexample}
   \caption{\texttt{always\_highlight\_protrusion}キー有無による組版結果の違い}
   \label{fig:always-highlight-protrusion}
@@ -476,7 +477,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
   実際には\TeX での長さの計算誤差（$2^{-16}$~ptの整数倍として計算していることによる）を考慮し，
   親文字全角の$1/1000$だけルビ文字列が長くなることを許容している．
 }であれば，
-単純グループルビの並びとして扱われる．すなわち，次ページ冒頭の2行は全くの等価となる．
+単純グループルビの並びとして扱われる．すなわち，次の2行は全くの等価となる．
 \begin{verbatim}
 \ltjruby{普|通|車}{ふ|つう|しや}
 \ltjruby{普}{ふ}\ltjruby{通}{つう}\ltjruby{車}{しや}
@@ -568,7 +569,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 「\ltjruby{陵}{みささぎ}」の\emph{\ActIntr{前文字進入許容量}指定が自動（\texttt{pre}の値が負）}に
 なっている場合のみ実施される．
 
-
+\newpage
 \paragraph{前後からのルビ文字のはみ出し2}
 また，本パッケージでは，「日本語組版処理の要件」にある
 \begin{quote}
@@ -634,7 +635,6 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \hbox spread\zw{に\ltjruby{\texttt{;}}{セミコロン}という}
 \end{LTXexample}
 
-\newpage
 \section[実装について]{\ruby{実|装}{じつ|そう}について}
 
 \subsection{進入量の計算}
@@ -919,7 +919,6 @@ $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_4$を行B�
 \end{enumerate}
 \end{enumerate}
 
-\newpage
 \section{いくつかの例}
 \def\rubytest{\ruby{黄金橋}{ゴールデンゲートブリッジ}\relax}
 
@@ -1017,7 +1016,6 @@ $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_4$を行B�
 \item[肩つき] {\ltjsetruby{kata}\sample}
 \end{description}
 
-\newpage
 \begin{LTXexample}[pos=t]
 {\ltjsetruby{stretch=101}% 親文字均等割り禁止
     \ruby{休|憩|中}{きゆう|けい|ちゆう}かつ\ruby{視|聴|中}{し|ちよう|ちゆう}%
