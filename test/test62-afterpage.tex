@@ -1,0 +1,84 @@
+\documentclass{minimal}
+\usepackage{luatexja}
+\usepackage{afterpage}
+\newcommand\AAA{\par\vrule height 1pt depth 9pt width 50pt}
+\newdimen\dimenA\dimenA=50pt
+\newcommand\BBB{\par\vrule height 1pt depth 9pt width \dimexpr 50pt+\dimenA\global\advance\dimenA1pt\par}
+
+\makeatletter
+\def\AP@savetop{%
+  \ifvmode
+    \let\AP@noindent\empty
+  \else\ifhmode
+    \setbox\z@\lastbox
+    \directlua{
+      luatexja.ext_show_node_list(tex.getlist('contrib_head'), ' c!> ', print)
+      local n = tex.getlist('contrib_head')
+      local na = node.tail(n)
+      if na and na.id==node.id('glue') and na.subtype==3 then
+        node.remove(n,na); node.free(na)
+      end
+    }
+    \edef\AP@noindent
+      {%
+  \noexpand\directlua{luatexja.ext_show_node_list(tex.getlist('contrib_head'), ' c1> ', print)}%
+        {\everypar{}\let\par\@@par%
+  \noexpand\directlua{luatexja.ext_show_node_list(tex.getlist('contrib_head'), ' c2> ', print)}%
+        \ifvoid\z@\noindent\else\indent\fi}
+  \noexpand\directlua{luatexja.ext_show_node_list(tex.getlist('page_head'), ' c3> ', print)}%
+      }%
+    \par
+  \else
+    \abovedisplayshortskip\z@\abovedisplayskip\z@
+    \belowdisplayshortskip\z@\belowdisplayskip\z@
+    \xdef\AP@disp{%
+      \predisplaysize\the\predisplaysize
+      \prevgraf\the\prevgraf\relax}%
+    $$\vskip-\baselineskip\vskip-\parskip
+    \edef\AP@noindent{%
+      \toks@{\the\everydisplay}\everydisplay{}%
+      {\everypar{}\noindent}$$\AP@disp\aftergroup\noexpand\AP@ed}%
+  \fi\fi
+  \begingroup
+  \nointerlineskip\null
+    \output{%
+      \global\setbox\AP@partial\vbox{%
+        \unvbox\@cclv
+         \global\setbox\@ne\lastbox}%
+       \global\setbox\AP@footins\box\footins}%
+  \eject
+  \endgroup}
+
+\def\AP@@{%
+  \AP@savetop
+  \global\expandafter\let\expandafter\AP@\expandafter\relax\AP@
+  \par
+   \addboxcontents\AP@partial
+  \ifvoid\AP@footins\else
+         \insert\footins{\unvbox\AP@footins}\fi
+  \directlua{luatexja.ext_show_node_list(tex.getlist('contrib_head'), 'C0> ', print)}%
+  \typeout{\meaning\AP@noindent}%
+  \AP@noindent
+  \directlua{luatexja.ext_show_node_list(tex.getlist('contrib_head'), 'C1> ', print)}%
+}
+\directlua{
+  luatexbase.add_to_callback('buildpage_filter',
+    function(extrainfo)
+      print('======', extrainfo, '======', \the\outputbox, tex.inputlineno)
+%      luatexja.ext_show_node_list(tex.getlist('page_head'), 'P> ', print)
+      luatexja.ext_show_node_list(tex.getlist('contrib_head'), 'C> ', print)
+      luatexja.ext_show_node_list(tex.getlist('hold_head'), 'H> ', print)
+    end, 'test'
+  )
+}
+\begin{document}
+\AAA \AAA \AAA \AAA \AAA \AAA \AAA \AAA \AAA \AAA
+\AAA \AAA \AAA \AAA \AAA \AAA \AAA \AAA \AAA \AAA
+\AAA \AAA \AAA \AAA \AAA \AAA \AAA \AAA \AAA \AAA
+\afterpage{}
+
+\BBB \BBB \BBB \BBB \BBB \BBB \BBB \BBB \BBB \BBB
+\BBB \BBB \BBB \BBB \BBB \BBB \BBB \BBB \directlua{print('1111111111')}\BBB
+
+\end{document}
+
