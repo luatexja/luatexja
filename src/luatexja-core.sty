@@ -68,7 +68,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-core}[2023-04-06 Core of LuaTeX-ja]
+  \ProvidesPackage{luatexja-core}[2023-10-07 Core of LuaTeX-ja]
   \endlinechar=13 %
   \RequirePackage{infwarerr}
   \endlinechar=-1 %
@@ -774,10 +774,9 @@
 
 
 %%------------------ Load module for the format
-
 \directlua{luatexja.load_kinsoku()}
 \ifltj@in@latex                 %<*LaTeX>
-  \RequirePackage{ltj-latex}
+  \usepackage{ltj-latex}
 \else\ifltj@in@plain            %<*plain>
   \input ltj-plain.sty %
 \fi\fi                          %</LaTeX|plain>

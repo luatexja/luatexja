@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2024-09-01',
+  date = '2024-10-07',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}
@@ -587,7 +587,7 @@ function calc_np(last, lp)
          if k then return lp end
       end
    end
-   Np=nil
+   Np.id = nil
 end
 end -- 001 -----------------------------------------------
 
@@ -693,6 +693,7 @@ end
 -------------------- 最下層の処理
 
 luatexbase.create_callback('luatexja.adjust_jfmglue', 'simple', function(n) return n end)
+luatexbase.create_callback('luatexja.adjust_jfmglue_tail', 'simple', function(n) return n end)
 
 -- change penalties (or create a new penalty, if needed)
 local function handle_penalty_normal(post, pre, g)
@@ -1138,6 +1139,7 @@ local function handle_list_tail(mode, last)
    adjust_nq()
    if mode then
       -- the current list is to be line-breaked.
+      call_callback('luatexja.adjust_jfmglue_tail', head, Nq, last)
       -- Insert \jcharwidowpenalty
       if widow_Np.first then handle_penalty_jwp() end
    else
@@ -1249,7 +1251,7 @@ function luatexja.jfmglue.main(ahead, mode, dir)
    if Np then
       handle_list_head(par_indented)
       lp = calc_np(last,lp);
-      while Np do
+      while Np.id do
          adjust_nq();
          local pid, pm = Np.id, Np.met
          -- 挿入部

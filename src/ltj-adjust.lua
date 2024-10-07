@@ -37,6 +37,7 @@ local node_tail = node.direct.tail
 local get_attr = node.direct.get_attribute
 local set_attr = node.direct.set_attribute
 local insert_after = node.direct.insert_after
+local node_remove = node.direct.remove
 
 local id_glyph   = node.id 'glyph'
 local id_kern    = node.id 'kern'
@@ -205,7 +206,7 @@ end
 -- step 1 最終行用
 local min, max = math.min, math.max
 local setsubtype = node.direct.setsubtype
-local function aw_step1_last(p, total)
+local function aw_step1_last(p, total, removed_le)
    local head = getlist(p)
    local x = node_tail(head); if not x then return total, false end
    -- x: \rightskip
@@ -246,6 +247,7 @@ local function aw_step1_last(p, total)
    -- 続行条件2: min(eadt[1], 0)<= \parfillskip <= max(eadt[#eadt], 0)
    local pfw = getwidth(pf)
      + (total>0 and getfield(pf, 'stretch') or -getfield(pf, 'shrink')) *getfield(p, 'glue_set')
+     + removed_le
    if pfw<min(0,eadt[1]) or max(0,eadt[#eadt])<pfw then return total, false end
    -- \parfillskip を 0 にする
    total = total + getwidth(pf)
@@ -393,6 +395,21 @@ do
       end
    end
 end
+local insert_lineend_kern_tail
+do
+   local insert_before = node.direct.insert_before
+   local KINSOKU      = luatexja.icflag_table.KINSOKU
+   insert_lineend_kern_tail = function (head, nq, last)
+      if nq.met then
+         local eadt = nq.met.char_type[nq.class].end_adjust
+         if eadt and eadt[1]<0 then
+            local x = node_new(id_kern, 1)
+            setkern(x, eadt[1]); set_attr(x, attr_icflag, LINEEND)
+            insert_before(head, node_prev(last), x)
+         end
+      end
+   end
+end
 
 local adjust_width
 do
@@ -408,7 +425,15 @@ do
          last_p = p
       end
       if last_p then
-         myaw_step2(last_p, myaw_step1_last(last_p, get_total_stretched(last_p)))
+         local removed_le = 0
+         local p = getlist(last_p); local pf = node_prev(node_tail(p))
+         if getid(pf) == id_glue and getsubtype(pf) == 15 then
+           pf = node_prev(node_prev(pf))
+           if getid(pf) == id_kern and get_attr_icflag(pf)==LINEEND then
+             removed_le = getwidth(pf); node_remove(p, pf)
+           end
+         end
+         myaw_step2(last_p, myaw_step1_last(last_p, get_total_stretched(last_p), removed_le))
       end
       return to_node(head)
    end
@@ -426,6 +451,7 @@ do
       if status_le==2 then
          if not luatexbase.in_callback('luatexja.adjust_jfmglue', 'luatexja.adjust') then
             ltjb.add_to_callback('luatexja.adjust_jfmglue', insert_lineend_kern, 'luatexja.adjust')
+            ltjb.add_to_callback('luatexja.adjust_jfmglue_tail', insert_lineend_kern_tail, 'luatexja.adjust')
          end
          myaw_step1, myaw_step1_last = dummy, aw_step1_last
       else
@@ -435,7 +461,8 @@ do
             myaw_step1, myaw_step1_last = aw_step1, aw_step1_last
          end
          if luatexbase.in_callback('luatexja.adjust_jfmglue', 'luatexja.adjust') then
-               luatexbase.remove_from_callback('luatexja.adjust_jfmglue', 'luatexja.adjust')
+           luatexbase.remove_from_callback('luatexja.adjust_jfmglue', 'luatexja.adjust')
+           luatexbase.remove_from_callback('luatexja.adjust_jfmglue_tail', 'luatexja.adjust')
          end
       end
       myaw_step2 = (status_pr>0) and aw_step2 or aw_step2_dummy
@@ -560,7 +587,6 @@ end
 do
   local ltja = luatexja.adjust
   local sid_user = node.subtype 'user_defined'
-  local node_remove = node.direct.remove
   local node_write = node.direct.write
   local getvalue = node.direct.getdata
   local setvalue = node.direct.setdata
