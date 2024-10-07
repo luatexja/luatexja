@@ -430,7 +430,7 @@ do
          if getid(pf) == id_glue and getsubtype(pf) == 15 then
            pf = node_prev(node_prev(pf))
            if getid(pf) == id_kern and get_attr_icflag(pf)==LINEEND then
-             removed_le = getwidth(pf); node_remove(p, pf)
+             removed_le = getwidth(pf); node_remove(p, pf); node_free(pf)
            end
          end
          myaw_step2(last_p, myaw_step1_last(last_p, get_total_stretched(last_p), removed_le))

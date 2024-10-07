@@ -1248,7 +1248,7 @@ function luatexja.jfmglue.main(ahead, mode, dir)
    head = ahead;
    local lp, last, par_indented, TEMP = init_var(mode,dir)
    lp = calc_np(last, lp)
-   if Np then
+   if Np.id then
       handle_list_head(par_indented)
       lp = calc_np(last,lp);
       while Np.id do
@@ -1342,7 +1342,7 @@ do
        if not s and getfield(Nq.nuc, 'user_id') == BPAR then
          local x, y = node_prev(Nq.nuc), Nq.nuc
          Nq.first, Nq.nuc, Nq.last = x, x, x
-         if Np then
+         if Np.id then
             if Np.met then
                Nq.class = fast_find_char_class('parbdd', Np.met)
             end
@@ -1354,7 +1354,7 @@ do
        elseif not s and getfield(Nq.nuc, 'user_id') == BOXB then
          local x, y = node_prev(Nq.nuc), Nq.nuc
          Nq.first, Nq.nuc, Nq.last = x, x, x
-         if Np then
+         if Np.id then
             if Np.met then
                Nq.class = fast_find_char_class('boxbdd', Np.met)
             end
