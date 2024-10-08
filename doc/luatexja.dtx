@@ -3762,9 +3762,9 @@ This means the following two lines have the same meaning:
 \jfont\hoge=hogem:jfm=ujis;-kern at 3.5mm % ==> kern 無効（明示）
 \jfont\hoge=hogem:jfm=ujis at 3.5mm       % ==> kern 有効（暗黙）
 \jfont\hoge=hogem:jfm=ujis;+kern at 3.5mm % ==> kern 有効（明示）
-\DeclareFontShape{JY3}{fuga}{m}{n}{<-> s*hogem:jfm=-ujis}{}    % ==> kern 無効（明示）
-\DeclareFontShape{JY3}{fuga}{m}{n}{<-> s*hogem:jfm=ujis}{}     % ==> kern 有効（暗黙）
-\DeclareFontShape{JY3}{fuga}{m}{n}{<-> s*hogem:jfm=ujis+kern}{}% ==> kern 有効（明示）
+\DeclareFontShape{JY3}{fuga}{m}{n}{<-> s*hogem:jfm=ujis;-kern}{} % ==> kern 無効（明示）
+\DeclareFontShape{JY3}{fuga}{m}{n}{<-> s*hogem:jfm=ujis}{}       % ==> kern 有効（暗黙）
+\DeclareFontShape{JY3}{fuga}{m}{n}{<-> s*hogem:jfm=ujis;+kern}{} % ==> kern 有効（明示）
 \end{lstlisting}
 
 \item バージョン20220411.0以降では，\LuaTeX-ja読み込み時や，\Pkg{ltjclasses}, \Pkg{ltjsclasses}において
@@ -3775,7 +3775,7 @@ This means the following two lines have the same meaning:
   \ltj@stdmcfont:-kern;jfm=\ltj@stdyokojfm}{}
 \end{lstlisting}
   とOpenType機能\texttt{kern}を明示的に無効化した状態で定義する．
-  これは標準JFM(\texttt{jfm-ujis.lua}, \texttt{jfm-ujisv.lua})が
+  これは標準JFM\ (\texttt{jfm-ujis.lua}, \texttt{jfm-ujisv.lua})が
   フォント由来のカーニングが入ることを期待していないためである．
 
  \item
@@ -4862,7 +4862,7 @@ Hence we have the following result:
 %<*ja>
 （任意，バージョン2以降）
 
-優先順位付き行長調整が有効であり，かつ現在の文字クラスの文字が
+  行末文字の位置調整が有効であり，かつ現在の文字クラスの文字が
   行末に来た時に，この文字と行末の間には指定された値のいずれかの大きさのカーンが
   挿入される（\autoref{ssec:adj}参照）．
 
@@ -7629,7 +7629,7 @@ for making the difference obvious.}
  \item[「中身までみた」行送り計算]
   複数行に渡る文章を組版するときには行間に空きが入ることが普通である．
   \TeX では各行が一つずつの水平ボックスをなしていることを思い出すと，隣り合った
-  2つの行（つまり水平ボックス）の間の空きは次のようにして決まるのだった：
+  2\nobreak つの行（つまり水平ボックス）の間の空きは次のようにして決まるのだった：
   \begin{itemize}
    \item 「通常に組んだときの行間」$d$を，\cs{baselineskip}から
 	「前の行」の深さと「次の行」の高さを加えたものを引いた値とする．
@@ -11296,7 +11296,16 @@ $n$個あるペナルティの箇所が改行可能箇所である．いずれ�
 
 なお，段落の末尾には\cs{penalty10000}と\cs{parfillskip}由来のグルーが自動的に入るが，
 これらとの兼ね合いのため\emph{最後のクラスタについては上記のノード挿入処理は行われない}．
-段落最終行の行末文字の位置調整は，すでに述べた「行分割後の場合」における最終行の処理をそのまま用いている．
+段落最終行の行末文字の位置調整は，すでに述べた「行分割後の場合」における最終行の処理を流用しているが，
+そのままでは「段落末尾をぶら下げ組($a_1=-0.5$)にする」ことができない
+\footnote{通常時は\cs{parfillskip}の内容は\texttt{0pt plus 1fil}であるため，
+  負の長さになることはない．これに伴って，「段落末尾はぶら下げ組が望ましい」状況であっても，
+  実際には末尾の句点（とその前の数文字）がまとめて次の行に追い出されてしまう．}ため，
+\begin{itemize}
+  \item 段落末尾の\cs{penalty10000}\cs{parfillskip}の直前に，$a_1\text{\cs{zw}}$のカーンを挿入する
+  \item 行分割後，行末文字の位置調整を行う前に，そのカーンを削除する
+\end{itemize}
+という前処理を追加している．
 
 \subsection{グルーの調整}
 $|\textit{total}|$の分だけが，行中のグルーの伸び量，あるいは縮み量に応じて負担されることになる．
