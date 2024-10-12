@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2024-10-07',
+  date = '2024-10-12',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}
@@ -587,7 +587,7 @@ function calc_np(last, lp)
          if k then return lp end
       end
    end
-   Np.id = nil
+   Np = nil
 end
 end -- 001 -----------------------------------------------
 
@@ -1248,10 +1248,10 @@ function luatexja.jfmglue.main(ahead, mode, dir)
    head = ahead;
    local lp, last, par_indented, TEMP = init_var(mode,dir)
    lp = calc_np(last, lp)
-   if Np.id then
+   if Np then
       handle_list_head(par_indented)
       lp = calc_np(last,lp);
-      while Np.id do
+      while Np do
          adjust_nq();
          local pid, pm = Np.id, Np.met
          -- 挿入部
@@ -1342,7 +1342,7 @@ do
        if not s and getfield(Nq.nuc, 'user_id') == BPAR then
          local x, y = node_prev(Nq.nuc), Nq.nuc
          Nq.first, Nq.nuc, Nq.last = x, x, x
-         if Np.id then
+         if Np then
             if Np.met then
                Nq.class = fast_find_char_class('parbdd', Np.met)
             end
@@ -1354,7 +1354,7 @@ do
        elseif not s and getfield(Nq.nuc, 'user_id') == BOXB then
          local x, y = node_prev(Nq.nuc), Nq.nuc
          Nq.first, Nq.nuc, Nq.last = x, x, x
-         if Np.id then
+         if Np then
             if Np.met then
                Nq.class = fast_find_char_class('boxbdd', Np.met)
             end
