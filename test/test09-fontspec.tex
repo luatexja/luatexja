@@ -101,4 +101,10 @@
 あいうえお芦\int_0^∞ e^{-x^2}\,dx\mathrm{ABC}\textrm{ABC}\textsf{ABC}
 \]
 
+\jfontspec[BoldFont=HaranoAjiGothic-Bold.otf]{HaranoAjiGothic-Light.otf}
+\fontspec[BoldFont=texgyrebonum-bold.otf]{texgyrebonum-regular.otf}
+{ABCあいうえお}\par
+{\addjfontfeatures{FakeBold=2}\addfontfeatures{FakeBold=2}ABCあいうえお}\par% 欧文は問題なし
+{\addjfontfeatures{FakeBold=8}\addfontfeatures{FakeBold=8}ABCあいうえお}\par% 欧文は問題なし
+{\addjfontfeatures{FakeBold=8}ABCあいうえお}
 \end{document}
