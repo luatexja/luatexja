@@ -9896,7 +9896,8 @@ process it}, if and only if the following three conditions are satisfied:
 \item The category code of \cs{ltjlineendcomment} itself is 14~(\textit{comment}).
 \item The input line matches the following ``regular expression'':
 \[
-  (\text{any char})^*(\textbf{JAchar})
+  (\text{any char})^*
+  \Bigl(\textbf{JAchar}\cap\bigl(\{\text{catcode}=11\}\cup\{\text{catcode}=12\}\bigr)\Bigr)
   \bigl(\{\text{catcode}=1\}\cup\{\text{catcode}=2\}\bigr)^*
 \]
 \end{enumerate}
@@ -9957,7 +9958,8 @@ emits a space.
 \item \cs{ltjlineendcomment}のカテゴリーコードが14~(\textit{comment})である．
 \item 入力行は次の「正規表現」にマッチしている：
 \[
-  (\text{any char})^*(\textbf{JAchar})
+  (\text{any char})^*
+  \Bigl(\textbf{JAchar}\cap\bigl(\{\text{catcode}=11\}\cup\{\text{catcode}=12\}\bigr)\Bigr)
   \bigl(\{\text{catcode}=1\}\cup\{\text{catcode}=2\}\bigr)^*
 \]
 \end{enumerate}
