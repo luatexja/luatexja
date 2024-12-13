@@ -723,7 +723,7 @@
       \leavevmode\bfseries
       \setlength\@lnumwidth{1.5em}%
       \advance\leftskip\@lnumwidth \hskip-\leftskip
-      #1\nobreak\hfil\nobreak\hb@xt@\@pnumwidth{\hss#2}\par
+      #1\nobreak\hfil\nobreak\hb@xt@\@pnumwidth{\hss\rensuji{#2}}\par
     \endgroup
   \fi}
 \newcommand*{\l@subsection}   {\@dottedtocline{2}{1\zw}{4\zw}}

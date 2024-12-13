@@ -4234,6 +4234,7 @@
 %
 % \begin{macro}{\l@section}
 % sectionレベルの目次です。
+% \changes{v1.8f-ltj-24}{2024-12-13}{TOCファイルに\cs{rensuji}を書き出すことをやめた}
 %    \begin{macrocode}
 %<*article>
 \newcommand*{\l@section}[2]{%
@@ -4245,7 +4246,8 @@
       \leavevmode\bfseries
       \setlength\@lnumwidth{1.5em}%
       \advance\leftskip\@lnumwidth \hskip-\leftskip
-      #1\nobreak\hfil\nobreak\hb@xt@\@pnumwidth{\hss#2}\par
+%<yoko>      #1\nobreak\hfil\nobreak\hb@xt@\@pnumwidth{\hss#2}\par
+%<tate>      #1\nobreak\hfil\nobreak\hb@xt@\@pnumwidth{\hss\rensuji{#2}}\par
     \endgroup
   \fi}
 %</article>
