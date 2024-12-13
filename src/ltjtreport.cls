@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjtreport}
-  [2022-09-12 v1.8f-ltj-23
+  [2024-12-13 v1.8f-ltj-24
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -777,18 +777,9 @@
      {#4}\nobreak
      \leaders\hbox{$\m@th \mkern \@dotsep mu.\mkern \@dotsep mu$}%
      \hfill\nobreak
-     \hb@xt@\@pnumwidth{\hss\normalfont \normalcolor #5}%
+     \hb@xt@\@pnumwidth{\hss\normalfont \normalcolor\rensuji{#5}}%
      \par}%
   \fi}
-\providecommand*\protected@file@percent{}
-\def\addcontentsline#1#2#3{%
-  \protected@write\@auxout
-    {\let\label\@gobble \let\index\@gobble \let\glossary\@gobble
-     \@temptokena{\rensuji{\thepage}}%
-    }{\string\@writefile{#1}%
-       {\protect\contentsline{#2}{#3}{\the\@temptokena}{}%
-\protected@file@percent}}%
-}
 \newcommand{\tableofcontents}{%
   \if@twocolumn\@restonecoltrue\onecolumn
   \else\@restonecolfalse\fi
@@ -807,7 +798,7 @@
     {\leavevmode\large\bfseries
      \setlength\@lnumwidth{4\zw}%
      #1\hfil\nobreak
-     \hb@xt@\@pnumwidth{\hss#2}}\par
+     \hb@xt@\@pnumwidth{\hss\rensuji{#2}}}\par
     \nobreak
     \global\@nobreaktrue
     \everypar{\global\@nobreakfalse\everypar{}}%
@@ -822,7 +813,7 @@
       \leavevmode\bfseries
       \setlength\@lnumwidth{4\zw}%
       \advance\leftskip\@lnumwidth \hskip-\leftskip
-      #1\nobreak\hfil\nobreak\hb@xt@\@pnumwidth{\hss#2}\par
+      #1\nobreak\hfil\nobreak\hb@xt@\@pnumwidth{\hss\rensuji{#2}}\par
       \penalty\@highpenalty
     \endgroup
   \fi}

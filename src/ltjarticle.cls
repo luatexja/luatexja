@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjarticle}
-  [2022-09-12 v1.8f-ltj-23
+  [2024-12-13 v1.8f-ltj-24
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -687,15 +687,6 @@
      \hb@xt@\@pnumwidth{\hss\normalfont \normalcolor #5}%
      \par}%
   \fi}
-\providecommand*\protected@file@percent{}
-\def\addcontentsline#1#2#3{%
-  \protected@write\@auxout
-    {\let\label\@gobble \let\index\@gobble \let\glossary\@gobble
-     \@temptokena{\thepage}%
-    }{\string\@writefile{#1}%
-       {\protect\contentsline{#2}{#3}{\the\@temptokena}{}%
-\protected@file@percent}}%
-}
 \newcommand{\tableofcontents}{%
   \section*{\contentsname
     \@mkboth{\contentsname}{\contentsname}%
