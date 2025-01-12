@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2023-02-26 Patch to LaTeX2e Kernel for LuaTeX-ja]
+\ProvidesPackage{lltjcore}[2025-01-12 Patch to LaTeX2e Kernel for LuaTeX-ja]
 \RequirePackage{etoolbox}
 
 %%% expl3
@@ -353,4 +353,10 @@
 \def\ltj@unhbox@curfield{\ltjfakeboxbdd\unhbox\@curfield\ltjfakeboxbdd}
 %\patchcmd\@contfield{\unhbox\@curfield}{\ltj@unhbox@curfield}{}{}
 \patchcmd\@addfield{\unhbox\@curfield}{\ltj@unhbox@curfield}{}{}
+
+%\def\m@th{\mathsurround\z@\ltj@yablshift0 }
+\def\mathsm@sh#1#2{%
+  \setbox\z@\hbox{\ltj@yablshift0$\m@th#1{#2}$}%
+  {}\finsm@sh}
+
 \endinput
