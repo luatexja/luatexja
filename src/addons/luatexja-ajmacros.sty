@@ -68,7 +68,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-ajmacros}[2020-10-09]
+  \ProvidesPackage{luatexja-ajmacros}[2025-02-05]
 \fi                             %</LaTeX>
 
 %%------------------
@@ -651,24 +651,24 @@
 	\@tempdimb.94\@tempdimb
 	\@tempskipa.94\@tempskipa
 	\fontsize{\@tempdimb}{\@tempskipa}\selectfont\aj訓点レ}}
-\gdef\aj訓点一レ{\mbox{\tate\kern-.24zw\aj訓点一\kern-.65zw\raise.15zw\hbox{\aj@smallReten}}}
-\gdef\aj訓点上レ{\mbox{\tate\aj訓点上\kern-.3zw\raise.15zw\hbox{\aj@smallReten}}}
-\gdef\aj訓点甲レ{\mbox{\tate\aj訓点甲\kern-.25zw\raise.15zw\hbox{\aj@smallReten}}}
-\gdef\aj訓点天レ{\mbox{\tate\aj訓点天\kern-.4zw\raise.1zw\hbox{\aj@smallReten}}}
+\gdef\aj訓点一レ{\mbox{\tate\kern-.24\zw\aj訓点一\kern-.65\zw\raise.15\zw\hbox{\aj@smallReten}}}
+\gdef\aj訓点上レ{\mbox{\tate\aj訓点上\kern-.3\zw\raise.15\zw\hbox{\aj@smallReten}}}
+\gdef\aj訓点甲レ{\mbox{\tate\aj訓点甲\kern-.25\zw\raise.15\zw\hbox{\aj@smallReten}}}
+\gdef\aj訓点天レ{\mbox{\tate\aj訓点天\kern-.4\zw\raise.1\zw\hbox{\aj@smallReten}}}
 \def\@ajongofudef#1{\ifx\@nil#1%
 	\else\expandafter\xdef\csname aj訓点#1｜\endcsname
 	{\noexpand\mbox{\yoko\expandafter\noexpand\csname aj訓点#1\endcsname
-		\hbox to\z@{\hss\expandafter\noexpand\csname aj訓点｜\endcsname\kern-.5zw}}}%
+		\hbox to\z@{\hss\expandafter\noexpand\csname aj訓点｜\endcsname\kern-.5\zw}}}%
 	\expandafter\@ajongofudef\fi}
 \@ajongofudef 二三四中下乙丙丁地人\@nil
-\expandafter\gdef\csname aj訓点　｜\endcsname{\mbox{\yoko{　}\hbox to\z@{\hss\csname aj訓点｜\endcsname\kern-.5zw}}}
+\expandafter\gdef\csname aj訓点　｜\endcsname{\mbox{\yoko{　}\hbox to\z@{\hss\csname aj訓点｜\endcsname\kern-.5\zw}}}
 \def\@ajkungofudef#1{\ifx\@nil#1%
 	\else\expandafter\xdef\csname aj訓点｜#1\endcsname
-	{\noexpand\mbox{\yoko\hbox to\z@{\hss\expandafter\noexpand\csname aj訓点｜\endcsname\kern-.5zw}%
+	{\noexpand\mbox{\yoko\hbox to\z@{\hss\expandafter\noexpand\csname aj訓点｜\endcsname\kern-.5\zw}%
 		\expandafter\noexpand\csname aj訓点#1\endcsname}}%
 	\expandafter\@ajkungofudef\fi}
 \@ajkungofudef 二三四中下乙丙丁地人\@nil
-\expandafter\gdef\csname aj訓点｜　\endcsname{\mbox{\yoko\hbox to\z@{\hss\csname aj訓点｜\endcsname\kern-.5zw}{　}}}
+\expandafter\gdef\csname aj訓点｜　\endcsname{\mbox{\yoko\hbox to\z@{\hss\csname aj訓点｜\endcsname\kern-.5\zw}{　}}}
 %
 \gdef\ajKunten#1{\csname aj訓点#1\endcsname}
 %
