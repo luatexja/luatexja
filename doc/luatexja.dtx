@@ -1920,7 +1920,7 @@ these eight ranges belongs to the character range~217.
 \label{tab:rng9}
 \centering\footnotesize
 \def\ch#1{%
-  {\fboxsep0pt\fcolorbox{cyan}{white}%
+  {\fboxsep0pt\fcolorbox{b_cyan}{white}%
   {\normalsize\KOZM\UTF{20#1}}}\ (\texttt{U+20#1})} %"
 % 13: JIS X0213, AJ, Adobe-Japan-1 only
 \begin{tabular}{ll>{\color{white}}lll>{\color{white}}l}
@@ -2530,7 +2530,7 @@ For the detail, see \autoref{tab:kcat}.
 
 \begin{table}[t]
 \small
-\caption{\cs{kcatcode} in \upTeX}
+\caption{\cs{kcatcode} in \upTeX~u1.30}
 \label{tab:kcat}
 %<en>\medskip
 
@@ -2649,7 +2649,7 @@ to allow these characters in the control word.
 %<en>\medskip
 \label{tab:kcat-diff}
 \def\D#1#2#3#4{%
-  {\fboxsep0pt\fcolorbox{cyan}{white}%
+  {\fboxsep0pt\fcolorbox{b_cyan}{white}%
   {\large\char"#1#2#3#4}}\ (\texttt{U+#1#2#3#4})} %"
 \leavevmode\hbox to 0pt{\hss\begin{tabular}[t]{cccccc}
 \toprule
@@ -2708,7 +2708,7 @@ to allow these characters in the control word.
 %<*en>
 \subsection{Non-kanji characters in a control word}
 {\def\D#1{%
-  {\fboxsep0pt\fcolorbox{cyan}{white}{#1}}}%
+  {\fboxsep0pt\fcolorbox{b_cyan}{white}{#1}}}%
 Because the engine differ, so non-kanji JIS~X~0208 characters
 which can be used in a control word differ in \pTeX, in \upTeX,~and~in \LuaTeX-ja.
 \autoref{tab:kcat-diff} shows the difference.
@@ -4071,7 +4071,7 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
 \end{figure}
 \begin{table}[t]
   \def\D#1#2#3#4{%
-	{\fboxsep0pt\fcolorbox{cyan}{white}%
+	{\fboxsep0pt\fcolorbox{b_cyan}{white}%
     {\large\lower-\cdp\hbox{\tate\ltjjachar"#1#2#3#4}}}\ (\texttt{U+#1#2#3#4})%"
   }
   \caption{\texttt{jpotf}が指定された際に行われる追加の縦組形への置換}
@@ -7551,7 +7551,7 @@ JFMの\texttt{chars}テーブルのエントリとして \verb+'AJ1-xxx'+ の形
 \def\outbox#1{{\Large%
   \ltjsetparameter{kanjiskip=0pt plus .2\zw minus .2\zw}%
   \setbox\gridbox=\hbox to 20\zw{\sq\sq\sq\sq\sb\sq\sq\sq\sq\sb\sq\sq\sq\sq\sb\sq\sq\sq\sq\sb}%
-  \hbox{\textcolor{cyan}{\copy\gridbox}\hskip-20\zw%
+  \hbox{\textcolor{b_cyan}{\copy\gridbox}\hskip-20\zw%
   \vbox{\hsize=20\zw\noindent\leftskip0pt\rightskip0pt\parfillskip0pt#1}\vrule}%
 }}
 
