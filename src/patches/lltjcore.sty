@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2025-01-12 Patch to LaTeX2e Kernel for LuaTeX-ja]
+\ProvidesPackage{lltjcore}[2025-02-19 Patch to LaTeX2e Kernel for LuaTeX-ja]
 \RequirePackage{etoolbox}
 
 %%% expl3
@@ -285,6 +285,8 @@
   \relax
   \ifmmode\@@underline{#1}%
   \else \leavevmode\null$\@@underline{\hbox{#1}}\m@th$\null\relax\fi}
+
+\patchcmd\@finalstrut{\nobreak}{\nobreak\ltjfakeboxbdd}{}{}
 
 \newif\iffnfixbottom
 \newif\ifltj@ftn@unvboxed
