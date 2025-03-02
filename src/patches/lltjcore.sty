@@ -286,6 +286,8 @@
   \ifmmode\@@underline{#1}%
   \else \leavevmode\null$\@@underline{\hbox{#1}}\m@th$\null\relax\fi}
 
+\patchcmd\@finalstrut{\nobreak}{\nobreak\ltjfakeboxbdd}{}{}
+
 \newif\iffnfixbottom
 \newif\ifltj@ftn@unvboxed
 %%% @makecol
