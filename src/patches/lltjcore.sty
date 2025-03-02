@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2025-01-12 Patch to LaTeX2e Kernel for LuaTeX-ja]
+\ProvidesPackage{lltjcore}[2025-03-02 Patch to LaTeX2e Kernel for LuaTeX-ja]
 \RequirePackage{etoolbox}
 
 %%% expl3
@@ -230,7 +230,7 @@
     \@latex@warning{Reference `#3' on page \thepage \space
               undefined}%
   \else
-    \expandafter#2#1\protect\@setref@{}% change \null to \protect\@setref@{}
+    \expandafter#2#1\@empty\@empty\@empty\protect\@setref@{}% change \null to \protect\@setref@{}
   \fi}
 \gdef\@setref@{\ifhmode\spacefactor\@m\fi}
 \endgroup
