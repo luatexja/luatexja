@@ -3,8 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2025-03-03
-  Patch to LaTeX2e Kernel for LuaTeX-ja (for LaTeX2e 2025-06-01)]
+\ProvidesPackage{lltjcore-241201}[2025-03-02 Patch to LaTeX2e Kernel for LuaTeX-ja]
 \RequirePackage{etoolbox}
 
 %%% expl3
@@ -78,7 +77,6 @@
        \primitive\everypar{}\hskip\z@\fi
   }}{}{}
 
-%%%%%% tombow
 \newif\iftombow \tombowfalse
 \newif\iftombowdate \tombowdatetrue
 \newdimen\@tombowwidth
@@ -173,21 +171,14 @@
 \newdimen\@@paperheight
 \newdimen\@@paperwidth
 \newdimen\@@topmargin % not used by LuaTeX-ja; only to avoid existing codes
-
-%%%%%% output routine
-\AddToHook{build/page/reset}[lltjcore]{%
+\patchcmd\@outputpage{\begingroup\let\protect\noexpand}{% tate direction
+\begingroup
   \ifnum\ltjgetparameter{direction}=4\else
     \dimen\z@\textwidth \textwidth\textheight \textheight\dimen\z@
-    \let\@themargin\evensidemargin
-    \let\evensidemargin\oddsidemargin
-    \let\oddsidemargin\@themargin
   \fi
-  \directlua{luatexja.lineskip.setting_backup()}%
-}
-\AddToHook{build/page/after}[lltjcore]{%
-  \directlua{luatexja.lineskip.setting_restore()}%
-}
-
+  \directlua{luatexja.lineskip.setting_backup()}
+  \let \protect \noexpand
+}{}{}
 \patchcmd\@outputpage{% supply \yoko
     \set@typeset@protect
     \aftergroup \endgroup
@@ -195,22 +186,25 @@
     \yoko \set@typeset@protect
     \aftergroup \endgroup
 }{}{}
+\patchcmd\@outputpage{\let\@thefoot\@oddfoot\let\@themargin\oddsidemargin}{% tate direction
+  \let\@thefoot\@oddfoot
+  \ifnum\ltjgetparameter{direction}=3 \let\@themargin\evensidemargin
+  \else\let\@themargin\oddsidemargin\fi
+}{}{}
+\patchcmd\@outputpage{\let\@thefoot\@evenfoot\let\@themargin\evensidemargin}{% tate direction
+  \let\@thefoot\@evenfoot
+  \ifnum\ltjgetparameter{direction}=3 \let\@themargin\oddsidemargin
+  \else\let\@themargin\evensidemargin\fi
+}{}{}
 
-% \@make@normalcolbox
-\def\pltx@adjust@wd@outputbox{%
-  \unless\ifnum\ltjgetparameter{direction}=4
-    \vbox{\primitive\everypar{}\hskip\z@}%
-   \fi}
-\patchcmd{\@make@normalcolbox}{\vskip -\@outputbox@depth\@textbottom}%
-  {\pltx@adjust@wd@outputbox\vskip -\@outputbox@depth\@textbottom}{}{}%
-\patchcmd\@makespecialcolbox{\@textbottom}{\ifltj@ftn@unvboxed\iffnfixbottom\else\@textbottom\fi\else\@textbottom\fi}{}{}
-
-% トンボ対応用．将来は shipout hook で書き直したい
+% 将来は shipout hook で書き直したい
 \patchcmd\@outputpage{\vskip\topmargin}{\vskip\topmargin\iftombow\vskip1in\fi}{}{}
 \patchcmd\@outputpage{\reset@font}{\@tombowreset@@paper\reset@font}{}{}
 \patchcmd\@outputpage{\@begindvi}{\@begindvi\@outputtombow}{}{}
+\patchcmd\@outputpage{\stepcounter{page}}%
+  {\stepcounter{page}\directlua{luatexja.lineskip.setting_restore()}}{}{}
 
-%%%%%% direction of floats
+%
 \pretocmd\@floatboxreset{\pltx@save@float@dir}{}{}
 \patchcmd\@endfloatbox{\outer@nobreak}{\outer@nobreak\pltx@check@float@dir}{}{}
 \def\pltx@save@float@dir{%
@@ -224,8 +218,7 @@
 \def\pltx@err@float@dir{%
   \@latex@error{Direction change inside float!?\MessageBreak
     Use \noexpand\layoutcaption provided in \string\usepackage{lltjext}}\@ehc}
-
-%%%%%% Remove extra xkanjiskip
+%%% Remove extra xkanjiskip
 \begingroup
 \@ifpackageloaded{hyperref}
   {\ifdefined\real@setref\def\ltj@setrefprefix{real}\else\def\ltj@setrefprefix{}\fi}
@@ -253,7 +246,6 @@
 \gdef\@stopfield{%
   \inhibitglue\@tempskipa\lastskip\unskip
   \hskip\@tempskipa\color@endgroup\egroup}
-
 %%%%%% footnote
 \renewcommand\@makefnmark{%
   \unless\ifnum\ltjgetparameter{direction}=3
@@ -265,8 +257,12 @@
   \unless\ifnum\ltjgetparameter{direction}=3 #1%
   \else\hbox to\z@{\hskip-.25\zw\raise.9\zh#1\hss}\fi%
 }%
-\let\ltj@orig@kernel@process@makefnmark=\@kernel@process@makefnmark
-\def\@kernel@process@makefnmark#1{\ltj@orig@kernel@process@makefnmark{\@ltj@process@makefnmark#1}}
+\ifdefined\@kernel@process@makefnmark %% 2022-06-01 latex-lab?
+  \let\ltj@orig@kernel@process@makefnmark=\@kernel@process@makefnmark
+  \def\@kernel@process@makefnmark#1{\ltj@orig@kernel@process@makefnmark{\@ltj@process@makefnmark#1}}
+\else
+  \patchcmd{\@footnotemark}{\@makefnmark}{\@ltj@process@makefnmark\@makefnmark}{}{}
+\fi
 \long\def\@iiiparbox#1#2[#3]#4#5{%
   \leavevmode
   \@pboxswfalse
@@ -292,6 +288,24 @@
 
 \patchcmd\@finalstrut{\nobreak}{\nobreak\ltjfakeboxbdd}{}{}
 
+\newif\iffnfixbottom
+\newif\ifltj@ftn@unvboxed
+%%% @makecol
+\def\pltx@adjust@wd@outputbox{%
+  \unless\ifnum\ltjgetparameter{direction}=4
+    \vbox{\primitive\everypar{}\hskip\z@}%
+   \fi}
+\patchcmd\@makecol{\vskip -\dimen@\@textbottom}%
+  {\pltx@adjust@wd@outputbox
+   \vskip -\dimen@
+   \ifltj@ftn@unvboxed\iffnfixbottom\else\@textbottom\fi\else\@textbottom\fi}{}{}
+\patchcmd\@makecol{\vskip\skip\footins}{\iffnfixbottom\vskip\z@\@plus.0001fil\fi\vskip\skip\footins}{}{}
+\patchcmd\@makecol{\ifvoid\footins}{\ifvoid\footins\ltj@ftn@unvboxedfalse}{}{}
+\patchcmd\@makecol{\setbox\@outputbox \vbox}{\ltj@ftn@unvboxedtrue\setbox\@outputbox \vbox}{}{}
+\let\ltj@orig@makecol=\@makecol
+
+\patchcmd\@makespecialcolbox{\@textbottom}{\ifltj@ftn@unvboxed\iffnfixbottom\else\@textbottom\fi\else\@textbottom\fi}{}{}
+
 \def\@gnewline #1{%
   \ifvmode
     \@nolnerr
@@ -300,6 +314,7 @@
     % \null は \break の効果が行頭禁則文字で打ち消されないために必要
   \ignorespaces
 \fi}
+
 
 %%%%%% tabular (platex/#43) \@tabclassz
 \def\ltj@sharp{\relax\pltx@next@inhibitglue\ltjfakeboxbdd\ignorespaces\@sharp\unskip\ltjfakeboxbdd}
@@ -341,6 +356,7 @@
 %\patchcmd\@contfield{\unhbox\@curfield}{\ltj@unhbox@curfield}{}{}
 \patchcmd\@addfield{\unhbox\@curfield}{\ltj@unhbox@curfield}{}{}
 
+%\def\m@th{\mathsurround\z@\ltj@yablshift0 }
 \def\mathsm@sh#1#2{%
   \setbox\z@\hbox{\ltj@yablshift0$\m@th#1{#2}$}%
   {}\finsm@sh}
