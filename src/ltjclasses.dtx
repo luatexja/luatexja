@@ -3083,6 +3083,7 @@
 %   そうでないときと違うのを修正(ありがとう、鈴木＠津さん)}
 % \changes{v1.7a}{2016/11/16}{replace \cs{reset@font} with
 %    \cs{normalfont} (sync with classes.dtx v1.3c)}
+% \changes{v1.8f-ltj-25}{2025-03-05}{見出しのPDF taggingが働かない問題を修正．}
 %    \begin{macrocode}
 \def\@makechapterhead#1{\hbox{}%
   \vskip2\Cvs
@@ -3097,7 +3098,7 @@
      \addtolength\@tempdima{-\wd\z@}%
      \unhbox\z@\nobreak
 %<book>    \fi
-     \vtop{\hsize\@tempdima#1}%
+     \vtop{\hsize\@tempdima#1\par}%
    \else
      #1\relax
    \fi}\nobreak\vskip3\Cvs}
@@ -3124,6 +3125,7 @@
 %   そうでないときと違うのを修正(ありがとう、鈴木＠津さん)}
 % \changes{v1.7a}{2016/11/16}{replace \cs{reset@font} with
 %    \cs{normalfont} (sync with classes.dtx v1.3c)}
+% \changes{v1.8f-ltj-25}{2025-03-05}{見出しのPDF taggingが働かない問題を修正．}
 %    \begin{macrocode}
 \def\@makeschapterhead#1{\hbox{}%
   \vskip2\Cvs
@@ -3132,7 +3134,7 @@
    \normalfont\huge\bfseries
    \leavevmode
    \setlength\@tempdima{\linewidth}%
-   \vtop{\hsize\@tempdima#1}}\vskip3\Cvs}
+   \vtop{\hsize\@tempdima#1\par}}\vskip3\Cvs}
 %</report|book>
 %    \end{macrocode}
 % \end{macro}
@@ -4672,6 +4674,7 @@
 % [2017-02-19 LTJ] p\LaTeX とLua\TeX-jaの|\@makecol|が違うことを
 %   考慮していなかった。
 %
+% \changes{v1.8f-ltj-25}{2025-03-05}{\LaTeXe~2025-06-01の更新に追従．}
 % [2025-03-05 LTJ] \LaTeXe~2025-06-01での変更に追従．
 %    \begin{macrocode}
 %<book>\pagestyle{headings}

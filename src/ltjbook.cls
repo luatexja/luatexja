@@ -534,7 +534,7 @@
      \addtolength\@tempdima{-\wd\z@}%
      \unhbox\z@\nobreak
     \fi
-     \vtop{\hsize\@tempdima#1}%
+     \vtop{\hsize\@tempdima#1\par}%
    \else
      #1\relax
    \fi}\nobreak\vskip3\Cvs}
@@ -548,7 +548,7 @@
    \normalfont\huge\bfseries
    \leavevmode
    \setlength\@tempdima{\linewidth}%
-   \vtop{\hsize\@tempdima#1}}\vskip3\Cvs}
+   \vtop{\hsize\@tempdima#1\par}}\vskip3\Cvs}
 \newcommand{\section}{\@startsection{section}{1}{\z@}%
    {1.5\Cvs \@plus.5\Cvs \@minus.2\Cvs}%
    {.5\Cvs \@plus.3\Cvs}%

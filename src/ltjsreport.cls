@@ -755,30 +755,32 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
     \ifvoid\@abstractbox\else\centerline{\box\@abstractbox}\vskip1.5em\fi
   }
 \fi
-\def\@startsection#1#2#3#4#5#6{%
-  \if@noskipsec \leavevmode \fi
-  \par
-  \@tempskipa #4\relax
-  \if@english \@afterindentfalse \else \@afterindenttrue \fi
-  \ifdim \@tempskipa <\z@
-    \@tempskipa -\@tempskipa \@afterindentfalse
-  \fi
-  \if@nobreak
-    \everypar{}%
-  \else
-    \addpenalty\@secpenalty
-    \ifdim \@tempskipa >\z@
-      \if@slide\else
-        \null
-        \vspace*{-\baselineskip}%
+\def\ltjs@patching@startsection{%
+  \ExplSyntaxOn
+  \patchcmd{\@startsection}{%
+    \@afterindenttrue
+  }{%
+    \if@english \@afterindentfalse \else \@afterindenttrue \fi
+  }{}{}
+  \patchcmd{\@startsection}{%
+    \addvspace\@tempskipa
+  }{%
+      \ifdim \@tempskipa >\z@
+        \if@slide\else
+          \null
+          \vspace*{-\baselineskip}%
+        \fi
+        \vskip\@tempskipa
       \fi
-      \vskip\@tempskipa
-    \fi
-  \fi
-  \noindent
-  \@ifstar
-    {\@ssect{#3}{#4}{#5}{#6}}%
-    {\@dblarg{\@sect{#1}{#2}{#3}{#4}{#5}{#6}}}}
+  }{}{}
+  \ExplSyntaxOff
+}
+\ltjs@patching@startsection
+\let\ltjs@orig@startsection=\@startsection
+\AtBeginDocument{%
+  \ifx\@startsection\ltjs@orig@startsection\else\expandafter\ltjs@patching@startsection\fi
+  \let\ltjs@patching@startsection\undefined
+}
 \def\@sect#1#2#3#4#5#6[#7]#8{%
   \ifnum #2>\c@secnumdepth
     \let\@svsec\@empty
