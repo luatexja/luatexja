@@ -141,6 +141,7 @@
 % \changes{v1.8f-ltj-22}{2022-04-11}{kern featureが有効になっていたのを修正．}
 % \changes{v1.8f-ltj-23}{2022-09-12}{|\stockwidth|がカーネルで定義される可能性に対応．}
 % \changes{v1.8f-ltj-24}{2024-12-13}{TOCファイルに\cs{rensuji}を書き出すことをやめた}
+% \changes{v1.8f-ltj-25}{2025-03-05}{\LaTeXe~2025-06-01の更新に追従．}
 % \fi
 %
 % \iffalse
@@ -4663,20 +4664,26 @@
 % \end{macro}
 % \end{macro}
 %
-% |stfloats|パッケージがシステムにインストールされている場合は、このパッケージを使って
-% p\LaTeX の標準時と同じようにボトムフロートの下に脚注が組まれるようにします。
+% \pLaTeX の標準時と同じようにボトムフロートの下に脚注が組まれるようにします。
+% \LaTeXe~2025-06-01より以前のバージョンでは|stfloats|パッケージを使います。
 % \changes{v1.0d}{1996/02/29}{articleとreportのデフォルトを
 %                              \pstyle{plain}に修正}
 % \changes{v1.4}{2002/04/09}{縦組スタイルで\cs{flushbottom}しないようにした}
 % [2017-02-19 LTJ] p\LaTeX とLua\TeX-jaの|\@makecol|が違うことを
 %   考慮していなかった。
+%
+% [2025-03-05 LTJ] \LaTeXe~2025-06-01での変更に追従．
 %    \begin{macrocode}
 %<book>\pagestyle{headings}
 %<!book>\pagestyle{plain}
 \pagenumbering{arabic}
 \raggedbottom
-\fnfixbottomtrue % 2017-02-19
-\IfFileExists{stfloats.sty}{\RequirePackage{stfloats}\fnbelowfloat}{}
+\@ifl@t@r\fmtversion{2025-06-01}{%
+  \ltj@ftn@below@floattrue\fnfixbottomtrue
+}{%
+  \fnfixbottomtrue % 2017-02-19
+  \IfFileExists{stfloats.sty}{\RequirePackage{stfloats}\fnbelowfloat}{}
+}
 \if@twocolumn
   \twocolumn
   \sloppy

@@ -44,7 +44,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2023/07/26 ltjsclasses ]
+  [2025-03-05 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass[disablejfam]{ltjsarticle}
@@ -5679,19 +5679,25 @@
 % \paragraph{ページ設定}
 %
 % ページ設定の初期化です。
-% |stfloats|パッケージがシステムにインストールされている場合は，このパッケージを使って
 % \pLaTeX の標準時と同じようにボトムフロートの下に脚注が組まれるようにします。
+% \LaTeXe~2025-06-01より以前のバージョンでは|stfloats|パッケージを使います。
 %
 % [2017-02-19] \pLaTeX とLua\TeX-jaの|\@makecol|が違うことを
 %   考慮していませんでした。
+%
+% [2025-03-05 LTJ] \LaTeXe~2025-06-01での変更に追従．
 %    \begin{macrocode}
 %<article>\if@slide \pagestyle{empty} \else \pagestyle{plain} \fi
 %<book>\if@report \pagestyle{plain} \else \pagestyle{headings} \fi
 %<report|kiyou>\pagestyle{plain}
 %<jspf>\pagestyle{headings}
 \pagenumbering{arabic}
-\fnfixbottomtrue % 2017-02-19
-\IfFileExists{stfloats.sty}{\RequirePackage{stfloats}\fnbelowfloat}{}
+\@ifl@t@r\fmtversion{2025-06-01}{%
+  \ltj@ftn@below@floattrue\fnfixbottomtrue
+}{%
+  \fnfixbottomtrue % 2017-02-19
+  \IfFileExists{stfloats.sty}{\RequirePackage{stfloats}\fnbelowfloat}{}
+}
 \if@twocolumn
   \twocolumn
   \sloppy

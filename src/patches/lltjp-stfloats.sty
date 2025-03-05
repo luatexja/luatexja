@@ -13,15 +13,26 @@
 \let\ltj@fn@makecol=\relax
 \global\let\org@makecol\ltj@orig@makecol
 
-\patchcmd\fn@makecol{\vskip -\dimen@\@textbottom}%
-  {\pltx@adjust@wd@outputbox
-   \vskip -\dimen@
-   \ifltj@ftn@unvboxed\iffnfixbottom\else\@textbottom\fi\else\@textbottom\fi}{}{}
-\patchcmd\fn@makecol{\vskip\skip\footins}{\iffnfixbottom\vskip\z@\@plus.0001fil\fi\vskip\skip\footins}{}{}
-\patchcmd\fn@makecol{\ifvoid\footins}{\ifvoid\footins\ltj@ftn@unvboxedfalse}{}{}
-\patchcmd\fn@makecol{\setbox\@outputbox \vbox}{\ltj@ftn@unvboxedtrue\setbox\@outputbox \vbox}{}{}
+%%%%%% <= LaTeX2e 2024-12-01
+\def\ltj@stfloats@patch@old@ltx{%
+  \patchcmd\fn@makecol{\vskip -\dimen@\@textbottom}%
+    {\pltx@adjust@wd@outputbox
+     \vskip -\dimen@
+     \ifltj@ftn@unvboxed\iffnfixbottom\else\@textbottom\fi\else\@textbottom\fi}{}{}
+  \patchcmd\fn@makecol{\vskip\skip\footins}{\iffnfixbottom\vskip\z@\@plus.0001fil\fi\vskip\skip\footins}{}{}
+  \patchcmd\fn@makecol{\ifvoid\footins}{\ifvoid\footins\ltj@ftn@unvboxedfalse}{}{}
+  \patchcmd\fn@makecol{\setbox\@outputbox \vbox}{\ltj@ftn@unvboxedtrue\setbox\@outputbox \vbox}{}{}}
+  \ifltj@stfloats@fnbelowfloat
+    \global\let\@makecol\fn@makecol
+  \fi
+  \let\ltj@stfloats@patch@old@ltx\undefined
+  \endinput
+}
 
-\ifltj@stfloats@fnbelowfloat
-  \global\let\@makecol\fn@makecol
-\fi
+\@ifl@t@r\fmtversion{2025-06-01}{}{\ltj@stfloats@patch@old@ltx}
+%%%%%% >= LaTeX2e 2025-06-01
+\def\fnbelowfloat{\ltj@ftn@below@floattrue\ltj@replace@bco@socket}
+\def\fnunderfloat{\ltj@ftn@below@floatfalse\ltj@replace@bco@socket}
+\ifltj@stfloats@fnbelowfloat\fnbelowfloat\fi
+
 \endinput

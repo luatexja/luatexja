@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjspf}
-  [2023/07/26 ltjsclasses ]
+  [2025-03-05 ltjsclasses ]
 \def\jsc@clsname{ltjspf}
 \def\Cjascale{0.903375}
 \RequirePackage{luatexja}
@@ -1526,8 +1526,12 @@ class has defined the old font commands like\MessageBreak
 \hyphenation{ado-be post-script ghost-script phe-nom-e-no-log-i-cal man-u-script}
 \pagestyle{headings}
 \pagenumbering{arabic}
-\fnfixbottomtrue % 2017-02-19
-\IfFileExists{stfloats.sty}{\RequirePackage{stfloats}\fnbelowfloat}{}
+\@ifl@t@r\fmtversion{2025-06-01}{%
+  \ltj@ftn@below@floattrue\fnfixbottomtrue
+}{%
+  \fnfixbottomtrue % 2017-02-19
+  \IfFileExists{stfloats.sty}{\RequirePackage{stfloats}\fnbelowfloat}{}
+}
 \if@twocolumn
   \twocolumn
   \sloppy
