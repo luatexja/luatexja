@@ -1,5 +1,5 @@
 %
-% lltjp-listings.sty 2022-05-22
+% lltjp-listings.sty 2025-03-25
 %
 
 \NeedsTeXFormat{LaTeX2e}
@@ -206,7 +206,7 @@
   \expandafter\expandafter\expandafter\lst@InsideConvert%
   \expandafter{\the\@temptokena}\lst@arg\lst@DeInit\egroup}
 \def\ltj@lstinline@#1{%
-  \edef\ltj@lst@temp{\the\catcode`#1}
+  \edef\ltj@lst@temp{\the\catcode`#1}%
   \lst@Init\relax\catcode`#1\ltj@lst@temp
   \ifnum\ltj@lst@temp=\active
     \begingroup\lccode`\~=`#1\relax
