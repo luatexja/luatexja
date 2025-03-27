@@ -141,7 +141,7 @@
 % \changes{v1.8f-ltj-22}{2022-04-11}{kern featureが有効になっていたのを修正．}
 % \changes{v1.8f-ltj-23}{2022-09-12}{|\stockwidth|がカーネルで定義される可能性に対応．}
 % \changes{v1.8f-ltj-24}{2024-12-13}{TOCファイルに\cs{rensuji}を書き出すことをやめた}
-% \changes{v1.8f-ltj-25}{2025-03-05}{\LaTeXe~2025-06-01の更新に追従．}
+% \changes{v1.8f-ltj-25}{2025-03-28}{\LaTeXe~2025-06-01の更新に追従．}
 % \fi
 %
 % \iffalse
@@ -171,7 +171,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2024-12-13 v1.8f-ltj-24
+  [2025-03-28 v1.8f-ltj-25
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -3083,7 +3083,7 @@
 %   そうでないときと違うのを修正(ありがとう、鈴木＠津さん)}
 % \changes{v1.7a}{2016/11/16}{replace \cs{reset@font} with
 %    \cs{normalfont} (sync with classes.dtx v1.3c)}
-% \changes{v1.8f-ltj-25}{2025-03-05}{見出しのPDF taggingが働かない問題を修正．}
+% \changes{v1.8f-ltj-25}{2025-03-28}{見出しのPDF taggingが働かない問題を修正．}
 %    \begin{macrocode}
 \def\@makechapterhead#1{\hbox{}%
   \vskip2\Cvs
@@ -3125,7 +3125,7 @@
 %   そうでないときと違うのを修正(ありがとう、鈴木＠津さん)}
 % \changes{v1.7a}{2016/11/16}{replace \cs{reset@font} with
 %    \cs{normalfont} (sync with classes.dtx v1.3c)}
-% \changes{v1.8f-ltj-25}{2025-03-05}{見出しのPDF taggingが働かない問題を修正．}
+% \changes{v1.8f-ltj-25}{2025-03-28}{見出しのPDF taggingが働かない問題を修正．}
 %    \begin{macrocode}
 \def\@makeschapterhead#1{\hbox{}%
   \vskip2\Cvs
@@ -4674,15 +4674,15 @@
 % [2017-02-19 LTJ] p\LaTeX とLua\TeX-jaの|\@makecol|が違うことを
 %   考慮していなかった。
 %
-% \changes{v1.8f-ltj-25}{2025-03-05}{\LaTeXe~2025-06-01の更新に追従．}
-% [2025-03-05 LTJ] \LaTeXe~2025-06-01での変更に追従．
+% \changes{v1.8f-ltj-25}{2025-03-28}{\LaTeXe~2025-06-01の更新に追従．}
+% [2025-03-28 LTJ] \LaTeXe~2025-06-01での変更に追従．
 %    \begin{macrocode}
 %<book>\pagestyle{headings}
 %<!book>\pagestyle{plain}
 \pagenumbering{arabic}
 \raggedbottom
 \@ifl@t@r\fmtversion{2025-06-01}{%
-  \ltj@ftn@below@floattrue\fnfixbottomtrue
+  \AssignSocketPlug{build/column/outputbox}{space-floats-footnotes}
 }{%
   \fnfixbottomtrue % 2017-02-19
   \IfFileExists{stfloats.sty}{\RequirePackage{stfloats}\fnbelowfloat}{}

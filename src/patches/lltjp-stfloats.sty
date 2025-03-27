@@ -1,5 +1,5 @@
 %
-% lltjp-stfloats.sty 2025-03-05
+% lltjp-stfloats.sty 2025-03-28
 %
 
 \NeedsTeXFormat{LaTeX2e}
@@ -30,8 +30,20 @@
 
 \@ifl@t@r\fmtversion{2025-06-01}{}{\ltj@stfloats@patch@old@ltx}
 %%%%%% >= LaTeX2e 2025-06-01
-\def\fnbelowfloat{\ltj@ftn@below@floattrue\ltj@replace@bco@socket}
-\def\fnunderfloat{\ltj@ftn@below@floatfalse\ltj@replace@bco@socket}
+\def\fnbelowfloat{%
+  \iffnfixbottom
+    \AssignSocketPlug{build/column/outputbox}{space-floats-footnotes}%
+  \else
+    \AssignSocketPlug {build/column/outputbox}{floats-footnotes}%
+  \fi
+}
+\def\fnunderfloat{%
+  \iffnfixbottom
+    \AssignSocketPlug {build/column/outputbox}{space-footnotes-floats}%
+  \else
+    \AssignSocketPlug {build/column/outputbox}{footnotes-floats}%
+  \fi
+}
 \if@tempswa\fnbelowfloat\fi
 
 \endinput

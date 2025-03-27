@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjarticle}
-  [2024-12-13 v1.8f-ltj-24
+  [2025-03-28 v1.8f-ltj-25
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -829,7 +829,7 @@
 \pagenumbering{arabic}
 \raggedbottom
 \@ifl@t@r\fmtversion{2025-06-01}{%
-  \ltj@ftn@below@floattrue\fnfixbottomtrue
+  \AssignSocketPlug{build/column/outputbox}{space-floats-footnotes}
 }{%
   \fnfixbottomtrue % 2017-02-19
   \IfFileExists{stfloats.sty}{\RequirePackage{stfloats}\fnbelowfloat}{}

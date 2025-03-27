@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjskiyou}
-  [2025-03-05 ltjsclasses ]
+  [2025-03-28 ltjsclasses ]
 \def\jsc@clsname{ltjskiyou}
 \def\Cjascale{0.924715}
 \RequirePackage{luatexja}
@@ -1635,7 +1635,7 @@ class has defined the old font commands like\MessageBreak
 \pagestyle{plain}
 \pagenumbering{arabic}
 \@ifl@t@r\fmtversion{2025-06-01}{%
-  \ltj@ftn@below@floattrue\fnfixbottomtrue
+  \AssignSocketPlug{build/column/outputbox}{space-floats-footnotes}
 }{%
   \fnfixbottomtrue % 2017-02-19
   \IfFileExists{stfloats.sty}{\RequirePackage{stfloats}\fnbelowfloat}{}

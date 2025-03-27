@@ -44,7 +44,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2025-03-05 ltjsclasses ]
+  [2025-03-28 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass[disablejfam]{ltjsarticle}
@@ -5680,7 +5680,7 @@
 % [2017-02-19] \pLaTeX とLua\TeX-jaの|\@makecol|が違うことを
 %   考慮していませんでした。
 %
-% [2025-03-05 LTJ] \LaTeXe~2025-06-01での変更に追従．
+% [2025-03-28 LTJ] \LaTeXe~2025-06-01での変更に追従．
 %    \begin{macrocode}
 %<article>\if@slide \pagestyle{empty} \else \pagestyle{plain} \fi
 %<book>\if@report \pagestyle{plain} \else \pagestyle{headings} \fi
@@ -5688,7 +5688,7 @@
 %<jspf>\pagestyle{headings}
 \pagenumbering{arabic}
 \@ifl@t@r\fmtversion{2025-06-01}{%
-  \ltj@ftn@below@floattrue\fnfixbottomtrue
+  \AssignSocketPlug{build/column/outputbox}{space-floats-footnotes}
 }{%
   \fnfixbottomtrue % 2017-02-19
   \IfFileExists{stfloats.sty}{\RequirePackage{stfloats}\fnbelowfloat}{}

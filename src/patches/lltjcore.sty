@@ -197,29 +197,6 @@
 }{}{}
 
 \newif\iffnfixbottom
-\newif\ifltj@ftn@below@float
-% (\iffnfixbottom, \ifltj@ftn@below@float)
-% (T,T) ==> pLaTeX default, bottom+belowfloats in footmisc
-% (F,T) ==> \fnbelowfloat in stfloats, belowfloats in footmisc
-% (T,F) ==> bottom+abovefloats in footmisc
-% (F,F) ==> LaTeX (\DocumentMetadata) default
-\def\ltj@replace@bco@socket{%
-  \typeout{lltjcore: set "build/column/outputbox" socketplug:
-      (\iffnfixbottom T\else F\fi, \ifltj@ftn@below@float T\else F\fi)}
-  \ifltj@ftn@below@float
-    \iffnfixbottom
-      \AssignSocketPlug {build/column/outputbox}{space-floats-footnotes}
-    \else
-      \AssignSocketPlug {build/column/outputbox}{floats-footnotes}
-    \fi
-  \else
-    \iffnfixbottom
-      \AssignSocketPlug {build/column/outputbox}{space-footnotes-floats}
-    \else
-      \AssignSocketPlug {build/column/outputbox}{footnotes-floats}
-    \fi
-  \fi
-}
 \let\ltj@@fnfixbottomfalse\fnfixbottomfalse
 \let\ltj@@fnfixbottomtrue\fnfixbottomtrue
 \def\fnfixbottomfalse{\ltj@@fnfixbottomfalse\ltj@replace@bco@socket}
