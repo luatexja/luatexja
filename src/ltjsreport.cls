@@ -1759,7 +1759,7 @@ class has defined the old font commands like\MessageBreak
 \pagestyle{plain}
 \pagenumbering{arabic}
 \@ifl@t@r\fmtversion{2025-06-01}{%
-  \AssignSocketPlug{build/column/outputbox}{space-floats-footnotes}
+  \AssignSocketPlug{build/column/outputbox}{floats-footnotes-platex}
 }{%
   \fnfixbottomtrue % 2017-02-19
   \IfFileExists{stfloats.sty}{\RequirePackage{stfloats}\fnbelowfloat}{}

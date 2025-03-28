@@ -196,12 +196,16 @@
     \aftergroup \endgroup
 }{}{}
 
-\newif\iffnfixbottom
-\let\ltj@@fnfixbottomfalse\fnfixbottomfalse
-\let\ltj@@fnfixbottomtrue\fnfixbottomtrue
-\def\fnfixbottomfalse{\ltj@@fnfixbottomfalse\ltj@replace@bco@socket}
-\def\fnfixbottomtrue{\ltj@@fnfixbottomtrue\ltj@replace@bco@socket}
+\NewSocketPlug {build/column/outputbox}{floats-footnotes-platex} {%
+  \@outputbox@reinsertbskip
+  \@outputbox@attachfloats
+  \@if@footnotes@TF
+    {\@outputbox@append{\@textbottom}\let\@textbottom\relax}%
+    {}%
+  \@outputbox@appendfootnotes
+}
 
+\newif\iffnfixbottom % only for old codes
 
 % \@make@normalcolbox
 \def\pltx@adjust@wd@outputbox{%
@@ -210,8 +214,6 @@
    \fi}
 \patchcmd{\@make@normalcolbox}{\vskip -\@outputbox@depth\@textbottom}%
   {\pltx@adjust@wd@outputbox\vskip -\@outputbox@depth\@textbottom}{}{}%
-
-
 
 % トンボ対応用．将来は shipout hook で書き直したい
 \patchcmd\@outputpage{\vskip\topmargin}{\vskip\topmargin\iftombow\vskip1in\fi}{}{}
