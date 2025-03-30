@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2024-10-12',
+  date = '2025-03-31',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}
@@ -196,7 +196,7 @@ local function check_box(box_ptr, box_end)
       end
       if pid==id_kern then
          local pa = get_attr_icflag(p)
-         if pa==IC_PROCESSED then
+         if (pa==IC_PROCESSED) or (getsubtype(p)==0) then
             -- do nothing
          elseif getsubtype(p)==2 then
             p = node_next(node_next(p));
@@ -275,9 +275,10 @@ do -- 001 -----------------------------------------------
 local traverse = node.direct.traverse
 local function check_next_ickern(lp)
    local lx = Np.nuc
-   while lp and getid(lp) == id_kern and ( getsubtype(lp)==0 or
-     getsubtype(lp)==3 or ITALIC == get_attr_icflag(lp)) do
-     set_attr(lp, attr_icflag, IC_PROCESSED)
+   while lp and getid(lp) == id_kern and 
+     ( getsubtype(lp)==0 or  getsubtype(lp)==3 or ITALIC == get_attr_icflag(lp)) do
+     set_attr(lp, attr_icflag, 
+       (getsubtype(lp)==3) and IC_PROCESSED or PROCESSED)
      lx, lp = lp, node_next(lp)
    end
    Np.last = lx; return lp
@@ -285,7 +286,6 @@ end
 
 local function calc_np_pbox(lp, last)
    local first, nc = (not Np.first), nil
-   --local lpa = get_attr_icflag(lp)==PACKED and PACKED or KINSOKU -- KINSOKU: dummy
    local lpa = get_attr_icflag(lp)
    Np.first = Np.first or lp; Np.id = id_pbox
    set_attr(lp, attr_icflag, get_attr_icflag(lp))
@@ -535,6 +535,9 @@ calc_np_auxtable = {
          set_attr(lp, attr_icflag, PROCESSED); lp = node_next(lp)
          set_attr(lp, attr_icflag, PROCESSED);
          return calc_np_aux_glyph_common(lp, true)
+      elseif getsubtype(lp)==0 then
+         Np.first = Np.first or lp; set_attr(lp, attr_icflag, PROCESSED)
+         return false, node_next(lp)
       else
          Np.first = Np.first or lp
          Np.id = id_kern; set_attr(lp, attr_icflag, PROCESSED)
