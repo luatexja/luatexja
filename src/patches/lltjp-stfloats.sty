@@ -1,5 +1,5 @@
 %
-% lltjp-stfloats.sty 2021-03-25
+% lltjp-stfloats.sty 2025-03-28
 %
 
 \NeedsTeXFormat{LaTeX2e}
@@ -7,21 +7,43 @@
 \RequirePackage{stfloats}
 \RequirePackage{etoolbox}
 
-\newif\ifltj@stfloats@fnbelowfloat
 \let\ltj@fn@makecol=\fn@makecol
-\ifx\@makecol\ltj@fn@makecol\ltj@stfloats@fnbelowfloattrue\fi % \fnbelowfloat 発行済
+\ifx\@makecol\ltj@fn@makecol\@tempswatrue\fi % \fnbelowfloat 発行済
 \let\ltj@fn@makecol=\relax
 \global\let\org@makecol\ltj@orig@makecol
 
-\patchcmd\fn@makecol{\vskip -\dimen@\@textbottom}%
-  {\pltx@adjust@wd@outputbox
-   \vskip -\dimen@
-   \ifltj@ftn@unvboxed\iffnfixbottom\else\@textbottom\fi\else\@textbottom\fi}{}{}
-\patchcmd\fn@makecol{\vskip\skip\footins}{\iffnfixbottom\vskip\z@\@plus.0001fil\fi\vskip\skip\footins}{}{}
-\patchcmd\fn@makecol{\ifvoid\footins}{\ifvoid\footins\ltj@ftn@unvboxedfalse}{}{}
-\patchcmd\fn@makecol{\setbox\@outputbox \vbox}{\ltj@ftn@unvboxedtrue\setbox\@outputbox \vbox}{}{}
+%%%%%% <= LaTeX2e 2024-12-01
+\def\ltj@stfloats@patch@old@ltx{%
+  \patchcmd\fn@makecol{\vskip -\dimen@\@textbottom}%
+    {\pltx@adjust@wd@outputbox
+     \vskip -\dimen@
+     \ifltj@ftn@unvboxed\iffnfixbottom\else\@textbottom\fi\else\@textbottom\fi}{}{}
+  \patchcmd\fn@makecol{\vskip\skip\footins}{\iffnfixbottom\vskip\z@\@plus.0001fil\fi\vskip\skip\footins}{}{}
+  \patchcmd\fn@makecol{\ifvoid\footins}{\ifvoid\footins\ltj@ftn@unvboxedfalse}{}{}
+  \patchcmd\fn@makecol{\setbox\@outputbox \vbox}{\ltj@ftn@unvboxedtrue\setbox\@outputbox \vbox}{}{}
+  \if@tempswa
+    \global\let\@makecol\fn@makecol
+  \fi
+  \let\ltj@stfloats@patch@old@ltx\undefined
+  \endinput
+}
 
-\ifltj@stfloats@fnbelowfloat
-  \global\let\@makecol\fn@makecol
-\fi
+\@ifl@t@r\fmtversion{2025-06-01}{}{\ltj@stfloats@patch@old@ltx}
+%%%%%% >= LaTeX2e 2025-06-01
+\def\fnbelowfloat{%
+  \iffnfixbottom
+    \AssignSocketPlug{build/column/outputbox}{space-floats-footnotes}%
+  \else
+    \AssignSocketPlug {build/column/outputbox}{floats-footnotes}%
+  \fi
+}
+\def\fnunderfloat{%
+  \iffnfixbottom
+    \AssignSocketPlug {build/column/outputbox}{space-footnotes-floats}%
+  \else
+    \AssignSocketPlug {build/column/outputbox}{footnotes-floats}%
+  \fi
+}
+\if@tempswa\fnbelowfloat\fi
+
 \endinput

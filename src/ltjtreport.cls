@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjtreport}
-  [2024-12-13 v1.8f-ltj-24
+  [2025-03-28 v1.8f-ltj-25
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -534,7 +534,7 @@
      \setbox\z@\hbox{\@chapapp\thechapter\@chappos\hskip1\zw}%
      \addtolength\@tempdima{-\wd\z@}%
      \unhbox\z@\nobreak
-     \vtop{\hsize\@tempdima#1}%
+     \vtop{\hsize\@tempdima#1\par}%
    \else
      #1\relax
    \fi}\nobreak\vskip3\Cvs}
@@ -548,7 +548,7 @@
    \normalfont\huge\bfseries
    \leavevmode
    \setlength\@tempdima{\linewidth}%
-   \vtop{\hsize\@tempdima#1}}\vskip3\Cvs}
+   \vtop{\hsize\@tempdima#1\par}}\vskip3\Cvs}
 \newcommand{\section}{\@startsection{section}{1}{\z@}%
    {1.5\Cvs \@plus.5\Cvs \@minus.2\Cvs}%
    {.5\Cvs \@plus.3\Cvs}%
@@ -933,8 +933,12 @@
 \pagestyle{plain}
 \pagenumbering{arabic}
 \raggedbottom
-\fnfixbottomtrue % 2017-02-19
-\IfFileExists{stfloats.sty}{\RequirePackage{stfloats}\fnbelowfloat}{}
+\@ifl@t@r\fmtversion{2025-06-01}{%
+  \AssignSocketPlug{build/column/outputbox}{floats-footnotes-platex}
+}{%
+  \fnfixbottomtrue % 2017-02-19
+  \IfFileExists{stfloats.sty}{\RequirePackage{stfloats}\fnbelowfloat}{}
+}
 \if@twocolumn
   \twocolumn
   \sloppy

@@ -1149,35 +1149,54 @@ so \Pkg{ltjsclasses} uses the \texttt{nomag*} option\footnote{Same effect as
 \pLaTeX ではそのように変更されており，
 さらに\cs{raggedbottom}命令を実行した後でも脚注は常にページの下端に固定されるようになっている．
 
-\LuaTeX-jaでは「欧文クラスの中にちょっとだけ日本語を入れる」という利用も考慮し，
-脚注とボトムフロートの順序，及び\cs{raggedbottom}時の脚注の垂直位置は\LaTeX 通りとした．
-これらを制御するには以下の手段がある：
-\begin{itemize}
- \item \pLaTeX のように，脚注をボトムフロートの下に組む場合には
-  \Pkg{stfloats}パッケージを利用して
+\emph{脚注とボトムフロートの順序，及び\cs{raggedbottom}時の脚注の垂直位置は，
+\LuaTeX-jaパッケージはとくに変更しない}
+\footnote{\LuaTeX-jaを「欧文の中にちょっとだけ日本語を入れる」ため使うことも考慮したためである}が，
+これら2点については，以下のような制御手段がある：
+
+\begin{description}
+  \item[\LaTeXe\ 2024-12-01以前]
+  \Pkg{footmisc}パッケージか\Pkg{stfloats}パッケージを利用する．
+  例えば\Pkg{stfloats}パッケージを利用して脚注をボトムフロートの下に組む場合は，次のようにする：
   \begin{lstlisting}
     \usepackage{stfloats}\fnbelowfloat
   \end{lstlisting}
-  とする．この状況から「脚注をボトムフロートの上に組む」という\LaTeX の標準の挙動に戻したければ，
-  \Pkg{stfloats}パッケージの\cs{fnunderfloat}命令を使用する．
-  \item \cs{raggedbottom}時の脚注の垂直位置は，\cs{iffnfixbottom}という真偽値で制御する．
+
+  また，\cs{raggedbottom}時の脚注の垂直位置は，\cs{iffnfixbottom}という真偽値で制御する．
   \begin{description}
     \item[偽(\cs{fnfixbottomfalse})の場合] \LaTeX 標準と同じく，本文と脚注の間の空白は\cs{skip}\cs{footins}のみ．
     従って脚注の垂直位置はページにより変動する．
     \item[真(\cs{fnfixbottomtrue})の場合] \pLaTeX や\Pkg{footmisc}パッケージを\texttt{bottom}オプションで
     読み込んだ場合のように，脚注は常にページの下端に固定される．
   \end{description}
-\item ただし，\LuaTeX-jaが提供する「互換クラス」(\Pkg{ltjclasses}, \Pkg{ltjsclasses})では，
-  \pLaTeX と合わせるために以下のようにしている：
+  \item[\LaTeXe\ 2025-06-01以降]
+  \LaTeXe 本体の提供する\texttt{build/column/outputbox}ソケットを利用する．
+  このソケットには1つのプラグを選択して挿すことができるが，
+  「脚注を下端に」という目的で使えるプラグは以下の通りである：
   \begin{itemize}
-    \item \cs{fnfixbottomtrue}が自動的に実行される
-    \item \Pkg{stfloats}パッケージが\LuaTeX から参照できる場所にあった場合は
-    自動的に読み込み，\cs{fnbelowfloat}を実行する．
+    \item \texttt{space-floats-footnotes}プラグ：
+    余分の空白→ボトムフロート→脚注の順に出力する．
+    \lstinline+\usepackage[bottomfloats,belowfloats]{footmisc}+の場合の組み方．
+    \item \texttt{floats-space-footnotes}プラグ：
+    ボトムフロート→余分の空白→脚注の順に出力する．
+    \lstinline+\usepackage[bottom]{footmisc}+の場合の組み方．
+    \item \texttt{floats-footnotes-platex}プラグ：
+    \pLaTeX の挙動を再現したもの．
   \end{itemize}
-\end{itemize}
-なお，\Pkg{stfloats}パッケージを使う代わりに，
-\Pkg{footmisc}パッケージを \texttt{bottom}オプションを指定して読み込む
-という「解決法」もある．
+  たとえば\texttt{floats-footnotes-platex}プラグを挿す場合は，次のようにする：
+  \begin{lstlisting}
+    \AssignSocketPlug{build/column/outputbox}{floats-footnotes-platex}
+  \end{lstlisting}
+  \item[「互換クラス」\Pkg{ltjclasses}, \Pkg{ltjsclasses}の挙動]
+  \pLaTeX と合わせるために，以下のようにしている：
+  \begin{description}
+    \item[\LaTeXe\ 2024-12-01以前]
+      \cs{iffnfixbottom}を真にし，かつ\\
+      \lstinline+\fnfixbottomtrue\usepackage{stfloats}\fnbelowfloat+を実行する．
+    \item[\LaTeXe\ 2025-06-01以降]
+      \texttt{build/column/outputbox}ソケットに\texttt{floats-footnotes-platex}プラグを挿す．
+  \end{description}
+\end{description}
 %</ja>
 %%% ↑は英訳しない
 
@@ -2440,7 +2459,7 @@ becuse a \emph{JAchar} is encapsulated by a horizontal box if needed.
 $\Phi\vdash F(x)\ \hbox{for all}\ x\in A$,
 $\sqrt{A}-\underline{X}+\frac{あ3}{2あ}-\vcenter{\hbox{aお}}$
 \end{lstlisting}\\
-\noalign{\vskip-\origbaselineskip}
+\noalign{\vskip-0\origbaselineskip}
 \midrule
 \emph{\pTeX~(p4.0.0)}&
 {\ltjsetparameter{yalbaselineshift=10pt}%
@@ -2449,14 +2468,14 @@ $\sqrt{A}-\underline{X}+\frac{あ3}{2あ}-\vcenter{\hbox{aお}}$
 $\Phi\vdash F(x)\ \hbox{for all}\ x\in A$
 $\sqrt{A}-\underline{X}
   +\frac{\lower10pt\hbox{\scalebox{0.7}{あ}}\>3}{2\>\lower10pt\hbox{\scalebox{0.7}{あ}}}-\vcenter{\hbox{aお}}$
-\par}\\\noalign{\vskip-\origbaselineskip}\midrule
+\par}\\\noalign{\vskip-0\origbaselineskip}\midrule
 \emph{\LuaTeX-ja}&
 {\ltjsetparameter{yalbaselineshift=10pt}%
 数式abc: $あa\hbox{い}$, $\int_0^x t\,dt=x^2/2$,
 $\Phi\vdash F(x)\ \hbox{for all}\ x\in A$,
 $\sqrt{A}-\underline{X}+\frac{あ\>3}{2あ}-\vcenter{\hbox{aお}}$
 \par}\\
-\noalign{\vskip-\origbaselineskip}
+\noalign{\vskip-0\origbaselineskip}
 \bottomrule
 \end{tabular}
 \end{table}

@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsbook}
-  [2023/07/26 ltjsclasses ]
+  [2025-03-28 ltjsclasses ]
 \def\jsc@clsname{ltjsbook}
 \def\Cjascale{0.924715}
 \RequirePackage{luatexja}
@@ -782,30 +782,32 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
     \par\vskip 1.5em
   }
 \fi
-\def\@startsection#1#2#3#4#5#6{%
-  \if@noskipsec \leavevmode \fi
-  \par
-  \@tempskipa #4\relax
-  \if@english \@afterindentfalse \else \@afterindenttrue \fi
-  \ifdim \@tempskipa <\z@
-    \@tempskipa -\@tempskipa \@afterindentfalse
-  \fi
-  \if@nobreak
-    \everypar{}%
-  \else
-    \addpenalty\@secpenalty
-    \ifdim \@tempskipa >\z@
-      \if@slide\else
-        \null
-        \vspace*{-\baselineskip}%
+\def\ltjs@patching@startsection{%
+  \ExplSyntaxOn
+  \patchcmd{\@startsection}{%
+    \@afterindenttrue
+  }{%
+    \if@english \@afterindentfalse \else \@afterindenttrue \fi
+  }{}{}
+  \patchcmd{\@startsection}{%
+    \addvspace\@tempskipa
+  }{%
+      \ifdim \@tempskipa >\z@
+        \if@slide\else
+          \null
+          \vspace*{-\baselineskip}%
+        \fi
+        \vskip\@tempskipa
       \fi
-      \vskip\@tempskipa
-    \fi
-  \fi
-  \noindent
-  \@ifstar
-    {\@ssect{#3}{#4}{#5}{#6}}%
-    {\@dblarg{\@sect{#1}{#2}{#3}{#4}{#5}{#6}}}}
+  }{}{}
+  \ExplSyntaxOff
+}
+\ltjs@patching@startsection
+\let\ltjs@orig@startsection=\@startsection
+\AtBeginDocument{%
+  \ifx\@startsection\ltjs@orig@startsection\else\expandafter\ltjs@patching@startsection\fi
+  \let\ltjs@patching@startsection\undefined
+}
 \def\@sect#1#2#3#4#5#6[#7]#8{%
   \ifnum #2>\c@secnumdepth
     \let\@svsec\@empty
@@ -1762,8 +1764,12 @@ class has defined the old font commands like\MessageBreak
 \hyphenation{ado-be post-script ghost-script phe-nom-e-no-log-i-cal man-u-script}
 \if@report \pagestyle{plain} \else \pagestyle{headings} \fi
 \pagenumbering{arabic}
-\fnfixbottomtrue % 2017-02-19
-\IfFileExists{stfloats.sty}{\RequirePackage{stfloats}\fnbelowfloat}{}
+\@ifl@t@r\fmtversion{2025-06-01}{%
+  \AssignSocketPlug{build/column/outputbox}{floats-footnotes-platex}
+}{%
+  \fnfixbottomtrue % 2017-02-19
+  \IfFileExists{stfloats.sty}{\RequirePackage{stfloats}\fnbelowfloat}{}
+}
 \if@twocolumn
   \twocolumn
   \sloppy
