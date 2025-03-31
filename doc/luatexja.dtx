@@ -7,7 +7,7 @@
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 
 %<en>\documentclass[a4paper,titlepage]{article}
-%<ja>\documentclass[a4paper,10ptj,titlepage]{ltjsarticle}
+%<ja>\documentclass[a4paper,14Q,titlepage]{ltjsarticle}
 
 %%%%%%%%
 \makeatletter
@@ -15,13 +15,13 @@
 \def\pgfsysdriver{pgfsys-pdftex.def}
 \usepackage{metalogo,amsmath,array,tikz,pict2e,multienum,float,mathtools}
 \usepackage{booktabs,multicol,luatexja-ruby}
-\usepackage[all]{xy}
 \usepackage{lltjext,alltt,comment}
 
 %%%%%%%% fonts
 \usepackage{luatexja-otf}
+\usepackage[libertinus]{newtxmath}
 \usepackage[no-math]{fontspec}
-\setmainfont[Ligatures=TeX,RawFeature=-notdef]{Linux Libertine O}
+\setmainfont[Ligatures=TeX,RawFeature=-notdef]{Libertinus Serif}
 \setmonofont[RawFeature=-notdef, Ligatures=CommonOff, %CharacterVariant={31,45,61,36},
 %<en>  Scale=0.8132073118633364, FakeStretch=1.183236,
 %<ja>  Scale=MatchLowercase, FakeStretch=1.137121,
@@ -33,9 +33,7 @@
 \setsansfont[Scale=MatchLowercase,Ligatures=TeX,RawFeature=-notdef]{Linux Biolinum O}
 \usepackage[match]{luatexja-fontspec}
 \usepackage[haranoaji]{luatexja-preset}
-\usepackage{unicode-math}
 \setmonojfont{HaranoAjiGothic-Regular.otf}
-\setmathfont[Scale=MatchLowercase]{XITSMath}
 \newjfontface\KOZM{KozMinPr6N-Regular.otf}
 
 \setLaTeXa{\scshape a}
@@ -52,10 +50,10 @@
 \renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
     {3.25ex \@plus1ex \@minus.2ex}%
     {-1em}%
-    {\normalfont\normalsize\bfseries\raisebox{.2ex}{$\mdlgblksquare\mkern1mu$}}}
+    {\normalfont\normalsize\bfseries\raisebox{.2ex}{$\blacksquare\mkern1mu$}}}
 %</en>
 %<*ja>
-\usepackage[textwidth=44\zw, lines=41, footskip=6mm]{geometry}
+\usepackage[textwidth=45\zw, lines=41, footskip=6mm]{geometry}
 \usepackage{luatexja-adjust}%\ltjdisableadjust
 \advance\leftmargini-1\zw
 %</ja>
@@ -88,13 +86,17 @@
     \fboxsep=0.5pt\fbox{\hbox to0.75em{\hss\tiny \oalign{\hss#1\hss\crcr\hss#2\hss\crcr}\hss}}}}\hss}%
 }
 
+\usepackage{accsupp}
 \usepackage{listings,showexpl,enumitem}
 \lstset{
   basicstyle=\ttfamily\small, pos=r, breaklines=true,
-  numbers=none, rframe={}, basewidth=0.5em, numberstyle=\tiny, numbersep=0.5em,
-  explpreset={numberstyle=\tiny, numbers=left, numbersep=1em, columns=fixed},
+  numbers=none, rframe={}, basewidth=0.5em, numberstyle=\scriptsize, numbersep=0.5em,
+  explpreset={numberstyle=\scriptsize, numbers=left, numbersep=1em, columns=fixed},
   morecomment=[l]{\%}, commentstyle=\color{green}
 }
+\renewcommand{\thelstnumber}{% Line number printing mechanism
+    \protect\BeginAccSupp{ActualText={}}\arabic{lstnumber}\protect\EndAccSupp{}%
+  }
 % Suppress output from showexpl to stdout.
 \makeatletter
 \let\SX@Info\relax
@@ -151,6 +153,7 @@
 %</ja>
 
 %%%%%%%% definition env.
+\let\openbox\relax
 \usepackage{amsthm}
 \theoremstyle{definition}
 %<en>\newtheorem{defn}{Definition}
@@ -219,6 +222,9 @@
 \protected\def\@Param#1{\eghostguarded{\hyperlink{fld:#1}{\underline{\smash{\textsf{#1}}}}}}
 \protected\def\DParam#1{\eghostguarded{\hypertarget{fld:#1}{\underline{\smash{\textsf{#1}}}}}} % parameter name (definition)
 \def\Pkg#1{\texorpdfstring{\textsf{#1}}{#1}} % packages/classes
+
+\usepackage[all]{xy}
+\xypdfon
 
 \begin{document}
 \lstset{
@@ -3896,7 +3902,7 @@ CJK互換漢字がCJK統合漢字に変換されてしまうという問題が�
 
 以上の事情に対応するため，\LuaTeX-jaでは，標準で
 \emph{CJK互換漢字・CJK互換漢字補助の文字には\Pkg{luaotfload}パッケージによる処理は働かない}ようにしている．
-この機能を無効化するには，他のOpenType機能と同じように\texttt{-ltjpci}指定を行えば良い（\autoref{fig:ltjpci}参照）．
+この機能を無効化するには，他のOpenType機能と同じように\>\texttt{-ltjpci}指定を行えば良い（\autoref{fig:ltjpci}参照）．
 \texttt{ltjksp}と同様に，\texttt{-ltjpci}, \texttt{+ltjpci}を複数回指定した場合は，
 最後に指定したものが有効となる．
 %</ja>
@@ -4121,7 +4127,7 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
 \directlua{luatexja.jfont.register_vert_replace{[!$i_1$!]=!$v_1$!, [!$i_2$!]=!$v_2$!, ...}}
 	\end{lstlisting}
   を実行する．
-  \verb+luatexja.jfont.register_vert_replace+による変更はこの関数の\emph{実行後}に定義される
+  \verb+luatexja.jfont.register_vert_replace+による変更はこの関数の\emph{実行後に定義}される
   フォントについてのみ有効である．
   
 \end{itemize}
@@ -9061,9 +9067,22 @@ Here the following is the list of dimensions and attributes which are used in \L
 So one should not change the value of this dimension.
 %</en>
 %<*ja>
-\cs{jQ} は写植で用いられた$1\,\textrm{Q}=0.25\,\textrm{mm}$%
-（「級」とも書かれる）に等しい．したがって，
+\cs{jQ}は写真植字で用いられた$1\,\textrm{Q}=0.25\,\textrm{mm}$%
+（「級」とも書かれる）を格納している．したがって，
 この寸法レジスタの値を変更してはならない．
+
+なお，\TeX では長さはスケールド・ポイント($2^{-16}\,\textrm{pt}$)を最小単位としており，
+実際の値は$46616\,\textrm{sp}\simeq 0.249994662\textrm{mm}$である
+  \footnote{%
+  $0.25\,\textrm{mm}\simeq 46616.99527\,\textrm{sp}$なので
+  $46617\,\textrm{sp}\simeq 0.250000025\,\textrm{mm}$の方が近いが，
+  \TeX で「\texttt{\cs{dimen0}=0.25mm}」とすると，\cs{dimen0}の値は$46616\,\textrm{sp}$となる．
+  }．
+そのため，次のように若干の誤差が出ることは気をつけてほしい．
+\begin{LTXexample}[width=0.3\textwidth]
+\dimen0=1000\jQ \the\dimen0, % ==> 46616000 sp
+\dimen0=250mm   \the\dimen0  % ==> 46616995 sp
+\end{LTXexample}
 %</ja>
 
 \dim{jH}
@@ -9073,8 +9092,8 @@ There is also a unit called ``歯'' which equals to $0.25\,\textrm{mm}$ and
 This \cs{jH} is the same \cs{dimen} register as \cs{jQ}.
 %</en>
 %<*ja>
-同じく写植で用いられていた単位として「歯」があり，これも$0.25\,\textrm{mm}$と
-等しい．この \cs{jH} は \cs{jQ} と同じ寸法レジスタを指す．
+同じく写真植字で用いられていた単位として「歯」があり，これも$0.25\,\textrm{mm}$と
+等しい．この\cs{jH}は\cs{jQ}と同じ寸法レジスタを指す．
 %</ja>
 
 \dim{ltj@dimen@zw}
@@ -9085,7 +9104,7 @@ The command \cs{zw} sets this register to the correct value, and
 %</en>
 %<*ja>
 現在の和文フォントの「全角幅」を保持する一時レジスタ．
-\cs{zw} 命令は，このレジスタを適切な値に設定した後，
+\cs{zw}命令は，このレジスタを適切な値に設定した後，
 「このレジスタ自体を返す」．
 %</ja>
 
@@ -9655,13 +9674,13 @@ whose prefix is \texttt{ltj} and whose family is \texttt{japaram}, as the follow
 
 \cs{ltjsetparameter}~and~\cs{ltjglobalsetparameter} automatically sets
 \texttt{luatexja.isglobal}. Its meaning is the following.
-\begin{align}
+\begin{align*}
  \texttt{luatexja.isglobal} =
 \begin{cases*}
  \texttt{'global'}&(global assignment),\\
  \texttt{''}&(local assignment).
 \end{cases*}
-\end{align}
+\end{align*}
 This is determined not only by command name
 (\cs{ltjsetparameter}~or~\cs{ltjglobalsetparameter}),
 but also by the value of \cs{globaldefs}.
@@ -9679,13 +9698,13 @@ but also by the value of \cs{globaldefs}.
 \end{lstlisting}
 のように定義すれば良いだけである．
 なお，パラメータ指定がグローバルかローカルかどうかを示す\texttt{luatexja.isglobal}が，
-\begin{align}
+\begin{align*}
  \texttt{luatexja.isglobal} =
 \begin{cases*}
  \texttt{'global'}&（パラメータ設定はグローバル），\\
  \texttt{''}&（パラメータ設定はローカル）．
 \end{cases*}
-\end{align}
+\end{align*}
 として自動的にセットされる\footnote{命令が\cs{ltjglobalsetparameter}かどうかだけでは
 なく，実行時の\cs{globaldefs}の値にも依存して定まる．}．
 %</ja>
@@ -9802,7 +9821,7 @@ after ``beginning/ending of a group'' characters.
 \end{itemize}
 また，状態遷移は，\autoref{fig:ptexipro}のようになっており，図中の数字は
 カテゴリーコードを表している．最初の3状態は\TeX の入力処理部と同じであり，
-図中から状態$K$と「$j$」と書かれた矢印を取り除けば，\TeX の入力処理部と同
+図中から状態$K$と「J」と書かれた矢印を取り除けば，\TeX の入力処理部と同
 じものになる．
 
 この図から分かることは，
@@ -9820,7 +9839,7 @@ after ``beginning/ending of a group'' characters.
 \begin{tikzpicture}[
   ->, auto, shorten >=1pt
 ]
-\node [shape=rectangle, font=\scriptsize] (init) at (2,7) {start};
+\node [shape=rectangle, font=\footnotesize] (init) at (2,7) {start};
 \node [shape=circle,draw, fill=b_cyan] (newline) at (4,7) {$N$};
 \node [shape=circle,draw, fill=b_cyan] (midline) at (4,4) {$M$};
 \node [shape=circle,draw, fill=b_cyan] (skipspc) at (8,7) {$S$};
@@ -9839,7 +9858,7 @@ after ``beginning/ending of a group'' characters.
       (newline) edge [loop right]    node {10} (newline)
       (scanacs) edge [bend left]     node [left=3,below]{$(*)$} (skipspc)
       (scanacs) edge [bend right]    node [right=30,above=20]{$(*)$} (midline)
-      (midline) edge                 node {5\ [\sp]} (endm)
+      (midline) edge                 node {5\ [\,\sp\,]} (endm)
       (midline) edge [loop left]     node {G, O} (midline)
       (skipspc) edge                 node [right] {5} (ends)
       (newline) edge                 node {5 [\cs{par}]} (endn);
@@ -9863,9 +9882,9 @@ after ``beginning/ending of a group'' characters.
  and ending of group (usually \verb+}+).
 \item[\textsf{J}] Japanese characters.
 \item[\textsf{5}] \textit{end-of-line} (usually \verb+^+\verb+^J+).
-\item[\textsf{10}] space (usually \sp).
+\item[\textsf{10}] space (usually \sp\,).
 \item[\textsf{O}] other characters, whose category code is in $\{3,4,6,7,8,11,12,13\}$.
-\item[\textsf{[\sp]}, \textsf{[\cs{par}]}]
+\item[\textsf{[\,\sp\,]}, \textsf{[\cs{par}]}]
 emits a space, or~\cs{par}.
 \end{description}
 \end{minipage}
@@ -9925,7 +9944,7 @@ process it}, if and only if the following three conditions are satisfied:
 \paragraph{Remark}
 The following example shows the major difference from the behavior of \pTeX.
 \begin{LTXexample}
-\fontspec[Ligatures=TeX]{Linux Libertine O}
+\fontspec[Ligatures=TeX]{Libertinus Serif}
 \ltjsetparameter{autoxspacing=false}
 \ltjsetparameter{jacharrange={-6}}xあ
 y\ltjsetparameter{jacharrange={+6}}zい
@@ -10031,7 +10050,7 @@ u
 \LuaTeX(-ja)では入力の変換は基本的に行わず，
 文字の合成は使用しているフォントのOpenType機能に委ねるという立場であったが，
 \Pkg{luaotfload}~v3.19以降では，標準でNFCへのUnicode正規化を行っている．
-そのため，バージョン2023****.0以降では，\LuaTeX-jaによる自前の変換\footnote{バージョン20220103.0で実装した．}は
+そのため，バージョン20230409.0以降では，\LuaTeX-jaによる自前の変換\footnote{バージョン20220103.0で実装した．}は
 行わないようにしている．
 %</ja>
 
@@ -10119,22 +10138,31 @@ with the \textit{id} of it:
 \item[(b)] An accent attached to $p$ by \cs{accent}.
 %</en>
 %<*ja>
-\item[(b)] \cs{accent} による$p$に付随したアクセント．
+\item[(b)] \cs{accent}による$p$に付随したアクセント．
+%</ja>
+
+%<*en>
+\item[(c)] A kern for~re-spacing the~glyph $p$, from \texttt{palt}~feature etc.
+  The subtype of this node is~0.
+%</en>
+%<*ja>
+\item[(c)] OpenTypeの\texttt{palt}機能などに由来する，$p$の位置補正を行うための$p$の直前/直後に配置されたカーン．
+  これらのsubtypeは0．
 %</ja>
 \end{enumerate}
-\[
+\begin{gather*}
 \overbrace{%
- \Node{kern}{$\mathit{subtype}=2$}\longrightarrow
+ \Node{kern}{$\textrm{subtype}=2$}\longrightarrow
 \left\{\begin{array}{c}
 \Node{glyph}{accent}\\\noalign{\medskip}
 \Node{hbox}{accent (shifted vert.)}
 \end{array}\right\}\longrightarrow
-\Node{kern}{$\mathit{subtype}=2$}}^{\text{(b)}}
+\Node{kern}{$\textrm{subtype}=2$}}^{\text{(b)}}
 \longrightarrow
 \Node{glyph}{$p$}\longrightarrow
 \overbrace{%
 \Node{kern}{italic corr.}}^{\text{(a)}}
-\]
+\end{gather*}
 
 %<*en>
 In this case, the \textit{id} is \textit{id\_jglyph}.
@@ -10280,7 +10308,7 @@ JFMグルーの挿入が行われない（\Param{xkanjiskip},~\Param{kanjiskip}�
 まず，段落／hboxの一番最初にあるクラスタ\textit{Np}を探索する．
 hboxの場合は何の問題もないが，段落の場合では以下のノード達を事前に読み飛ばしておく：
 \begin{itemize}
-\item \cs{parindent} 由来のhbox($\mathit{subtype}=3$)
+\item \cs{parindent} 由来のhbox($\textrm{subtype}=3$)
 \item \textit{subtype}が44~(\textit{user\_defined})でないようなwhatsit
 \end{itemize}
 これは，\cs{parindent}由来のhboxがクラスタを構成しないようにするためである．
@@ -10343,8 +10371,51 @@ $g$は「文字コード \texttt{'boxbdd'} の文字」と\textit{Np}の間に�
 以後，\emph{典型的な例として，クラスタ\textit{Nq}と\textit{Np}が共に\textsf{\textmd{和文A}}である場合を見ていこう，}
 この場合が全ての場合の基本となる．
 
+\paragraph{カーニングの算出}
+クラスタ\textit{Np}の先頭がsubtype~0のカーン$k$である場合，$k$は次の2つを合計した量である：
+\begin{itemize}
+  \item $\mathit{Nq}.\mathit{last}$,~$\mathit{Np}.\mathit{head}$という2つの\textbf{JAchar}の間に入るカーニング
+  \item OpenTypeの\texttt{palt}機能などによる，$\mathit{Np}.\mathit{head}$の位置補正
+\end{itemize}
+たとえば
+\begin{lstlisting}
+\jfont\KMPK = KozMinPr6N-Regular.otf:jfm=prop;+palt;+kern at 10pt
+\KMPK アイ
+\end{lstlisting}
+からは，次のノード列が得られる：
+\begin{equation}
+\overbrace{%
+ {\mathop{\Node{kern}{$-0.4$\,pt}}\limits_{\textrm{subtype}=0}}\longrightarrow
+ \Node{glyph}{\cs{KMPK}, `ア'}\longrightarrow
+ {\mathop{\Node{kern}{$-0.5$\,pt}}\limits_{\textrm{subtype}=0}}}^{\mathit{Nq}}\longrightarrow
+\overbrace{%
+ {\mathop{\Node{kern}{$-1.2$\,pt}}\limits_{\textrm{subtype}=0}}\longrightarrow
+ \Node{glyph}{\cs{KMPK}, `イ'}\longrightarrow
+ {\mathop{\Node{kern}{$-0.6$\,pt}}\limits_{\textrm{subtype}=0}}}^{\mathit{Np}}
+\label{eq:node1}
+\end{equation}
+ここで，subtypeの値が0であるカーンは行分割でも除去されない．また
+3つ目のカーン$-1.2$\,ptは，カーニング$-0.9$\,ptと「イ」の位置補正$-0.3\,pt$の和である．
+「ア」「イ」間で行分割が起こる場合，前者$-0.9$\,pt分はなくなってほしいが，後者$-0.3$\,pt分は残ることが望ましい．
+
+そのため，\LuaTeX-jaでは\autoref{eq:node1}というノード列を
+\begin{equation*}
+\overbrace{%
+ {\mathop{\Node{kern}{$-0.4$\,pt}}\limits_{\textrm{subtype}=0}}\longrightarrow
+ \Node{glyph}{\cs{KMPK}, `ア'}\longrightarrow
+ {\mathop{\Node{kern}{$-0.5$\,pt}}\limits_{\textrm{subtype}=0}}}^{\mathit{Nq}}
+ \mathrel{\mathop{\longrightarrow}\limits^{(*)}}
+\overbrace{%
+ {\mathop{\Node{kern}{$-0.9$\,pt}}\limits_{\textrm{subtype}=1}}\longrightarrow
+ {\mathop{\Node{kern}{$-0.3$\,pt}}\limits_{\textrm{subtype}=0}}\longrightarrow
+ \Node{glyph}{\cs{KMPK}, `イ'}\longrightarrow
+ {\mathop{\Node{kern}{$-0.6$\,pt}}\limits_{\textrm{subtype}=0}}}^{\mathit{Np}}
+\end{equation*}
+と変換し，$(*)$の箇所にJFMグルーを挿入することになる．
+
+  
 \paragraph{「右空白」の算出}
-まず，「右空白」にあたる量を算出する．通常はこれが，隣り合った2つの\textbf{JAchar}間に入る空白量となる．
+次に，「右空白」にあたる量を算出する．通常はこれが，隣り合った2つの\textbf{JAchar}間に入る空白量となる．
 \begin{description}
 \item[JFM由来{[M]}] JFMの文字クラス指定によって入る空白を以下によって求める．この段階で空白量が未定義（未指定）だった場合，
       デフォルト値\Param{kanjiskip}を採用することとなるので，次へ．
@@ -10413,7 +10484,7 @@ x+y&($\Param{diffrentjfm}=\texttt{both}$).
 \end{lstlisting}
 という3フォントを考え，
 \[
- \overbrace{\Node{glyph}{\cs{ foo}, `あ'}}^{p}
+ \overbrace{\Node{glyph}{\cs{foo}, `あ'}}^{p}
 \longrightarrow \overbrace{\Node{glyph}{\cs{bar}, `い'}}^{q}
 \longrightarrow \overbrace{\Node{glyph}{\cs{baz}, `う'}}^{r}
 \]
