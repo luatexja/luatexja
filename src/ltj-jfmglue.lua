@@ -273,13 +273,24 @@ local calc_np
 do -- 001 -----------------------------------------------
 
 local traverse = node.direct.traverse
+local getproperty = node.direct.getproperty
 local function check_next_ickern(lp)
    local lx = Np.nuc
-   while lp and getid(lp) == id_kern and 
-     ( getsubtype(lp)==0 or  getsubtype(lp)==3 or ITALIC == get_attr_icflag(lp)) do
-     set_attr(lp, attr_icflag, 
-       (getsubtype(lp)==3) and IC_PROCESSED or PROCESSED)
-     lx, lp = lp, node_next(lp)
+   local already_rightkern = false
+   while lp and getid(lp) == id_kern do
+      if (getsubtype(lp)==3) or (ITALIC == get_attr_icflag(lp)) then
+         set_attr(lp, attr_icflag, IC_PROCESSED)
+         lx, lp = lp, node_next(lp)
+      elseif getsubtype(lp)==0 then
+         local np = getproperty(Np.nuc)
+         if already_rightkern then break
+         else 
+            if type(np)=='table' and np.injections and np.injections.rightkern~=0 then
+               set_attr(lp, attr_icflag, PROCESSED)
+               lx, lp = lp, node_next(lp); already_rightkern = true
+            else break end
+         end
+      else break end
    end
    Np.last = lx; return lp
 end
@@ -757,7 +768,7 @@ end
 -- 和文文字間の JFM glue を node 化
 local function new_jfm_glue(mc, bc, ac)
 -- bc, ac: char classes
-   local g = mc[bc][ac]
+   local g = mc[bc] and mc[bc][ac]
    if g then
        if g[1] then
           local k = node_new(id_kern, 1); setkern(k, g[1])
@@ -984,6 +995,30 @@ do
 end
 
 -------------------- 隣接した「塊」間の処理
+local inspect_np_first
+do
+local getkern = node.direct.getkern
+local font_getfont, round = font.getfont, tex.round
+inspect_np_first = function()
+-- Np.first は leftkern => palt 等の位置補正由来か kern 等のカーニング由来かを調べ
+-- 後者の部分を explicit kern として Np.first の前に挿入する
+   local pn = Np.nuc; if getid(pn)~=id_glyph then return end
+   local pf = getfont(pn); if getfont(Nq.nuc)~=pf then return end
+   if ltju.specified_feature(pf, 'kern') then
+      local qc, pc = Nq.char, Np.char; local kern
+      ltju.loop_over_feat(pf, { kern=true }, 
+         function(i,k) if i==qc and type(k)=='table' and k[pc] then kern = k[pc] end end,
+         false, 'gpos_pair')
+      local pft = font_getfont(pf); kern = round((kern or 0)/pft.units*pft.size)
+      if kern==getkern(Np.first) then setfield(Np.first, 'subtype', 1)
+      elseif kern~=0 then
+         local k = node_new(id_kern, 1); set_attr(k, attr_icflag, PROCESSED)
+         setkern(k, kern); setkern(Np.first, getkern(Np.first)-kern)
+         insert_before(head, Np.first, k); Np.first = k
+      end
+   end
+end
+end
 
 local function combine_spc(name)
    return (Np[name] or Nq[name]) and ((Np[name]~=0) and (Nq[name]~=0))
@@ -1040,6 +1075,9 @@ local function handle_np_jachar(mode)
    local qid = Nq.id
    if qid==id_jglyph or ((qid==id_pbox or qid==id_pbox_w) and Nq.met) then
       local g, k
+      if getid(Np.first)==id_kern and getsubtype(Np.first)==0 then
+          inspect_np_first()
+      end
       if non_ihb_flag then g, k = calc_ja_ja_glue() end -- M->K
       if not g then g = get_kanjiskip() end
       handle_penalty_normal(Nq.post, Np.pre, g);

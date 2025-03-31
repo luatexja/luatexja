@@ -47,6 +47,7 @@ local ltjf_replace_altfont = ltjf.replace_altfont
 local STCK  = luatexja.userid_table.STCK
 local DIR   = luatexja.userid_table.DIR
 local JA_AL_BDD = luatexja.userid_table.JA_AL_BDD
+local KERN_ORIGIN = luatexja.userid_table.KERN_ORIGIN
 local PROCESSED_BEGIN_FLAG = luatexja.icflag_table.PROCESSED_BEGIN_FLAG
 
 local dir_tate = luatexja.dir_table.dir_tate
@@ -110,7 +111,7 @@ do
                      setfield(b, 'type', 100); setfield(b, 'user_id', JA_AL_BDD);
                      insert_before(head, p, b)
                   end
-                  setlang(p, lang_ja);
+                  setlang(p, lang_ja)
                   ltjs_orig_char_table[p], prev_chartype = pc, 2
                elseif prev_chartype==2 then
                   local b = node_new(id_whatsit,sid_user);

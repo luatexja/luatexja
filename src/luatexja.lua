@@ -420,12 +420,20 @@ local sid_user = node.subtype 'user_defined'
 
 local prefix, inner_depth
 local utfchar = utf.char
+local function print_attr(p)
+--    local s= "      ==> "
+--    local n = p.attr.next
+--    while n do
+--        s = s .. ' [' .. tostring(n.number) .. ']=' .. tostring(n.value)
+--        n = node_next(n)
+--    end
+--    print(s)
+end
 local function debug_show_node_X(p,print_fn, limit, inner_depth)
    local k = prefix
    local s
    local pt, pic = node_type(p.id), (get_attr(p, attr_icflag) or 0) --% icflag_table.PROCESSED_BEGIN_FLAG
-   local base = prefix .. '[' .. string.format('%7d', node.direct.todirect(p)) 
-     .. ', ' .. tostring(get_attr(p, 27)) .. '] '
+   local base = prefix .. '[' .. string.format('%7d', node.direct.todirect(p)) .. '] '
      .. string.format('%X', pic) .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
    if pt == 'glyph' then
       s = base .. ' '
@@ -437,7 +445,7 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
          s = s .. ' off: (' .. print_scaled(p.xoffset)
                .. ',' .. print_scaled(p.yoffset) .. ')'
       end
-      print_fn(s)
+      print_fn(s); print_attr(p)
    elseif pt=='hlist' or pt=='vlist' or pt=='unset'or pt=='ins' then
       if pt=='ins' then
          s = base .. '(' .. print_scaled(p.height) .. '+'
@@ -510,9 +518,11 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
       print_fn(s)
    elseif pt == 'kern' then
       s = base .. ' ' .. print_scaled(p.kern) .. 'pt'
-      if p.subtype==2 then
+      if p.subtype==0 then
+         s = s .. ' (font)'
+      elseif p.subtype==2 then
          s = s .. ' (for accent)'
-      elseif pic==icflag_table.IC_PROCESSED then
+      elseif p.subtype==3 or pic==icflag_table.IC_PROCESSED then
          s = s .. ' (italic correction)'
       elseif pic==icflag_table.LINEEND then
          s = s .. ' (end-of-line)'
@@ -520,7 +530,7 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
          and pic<icflag_table.KANJI_SKIP then
          s = s .. ' (from JFM: priority ' .. pic-icflag_table.FROM_JFM .. ')'
       end
-      print_fn(s)
+      print_fn(s); print_attr(p)
    elseif pt == 'penalty' then
       s = base .. ' ' .. tostring(p.penalty)
       if pic==icflag_table.KINSOKU then s = s .. ' (for kinsoku)' end
