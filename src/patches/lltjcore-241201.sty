@@ -1,5 +1,6 @@
 %
-% lltjcore.sty: derived from plcore.dtx in pLaTeX.
+% lltjcore-241201.sty: derived from plcore.dtx in pLaTeX.
+% This file is used for LaTeX2e <=2024-12-01.
 %
 
 \NeedsTeXFormat{LaTeX2e}
@@ -356,7 +357,6 @@
 %\patchcmd\@contfield{\unhbox\@curfield}{\ltj@unhbox@curfield}{}{}
 \patchcmd\@addfield{\unhbox\@curfield}{\ltj@unhbox@curfield}{}{}
 
-%\def\m@th{\mathsurround\z@\ltj@yablshift0 }
 \def\mathsm@sh#1#2{%
   \setbox\z@\hbox{\ltj@yablshift0$\m@th#1{#2}$}%
   {}\finsm@sh}
