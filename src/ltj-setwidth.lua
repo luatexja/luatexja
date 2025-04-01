@@ -184,11 +184,14 @@ end
 
 local font_getfont = font.getfont
 local get_ascender, get_descender = ltju.get_ascender, ltju.get_descender
+local loop_over_feat = ltju.loop_over_feat
+local specified_feature = ltju.specified_feature
+local feat_vpal_table = { vpal=true };
 local function capsule_glyph_tate(p, met, char_data, head, dir)
    if not char_data then return node_next(p), head end
    local fwidth, pwidth, ascender = char_data.width
+   local pf, pc = getfont(p), getchar(p)
    do
-      local pf, pc = getfont(p), getchar(p)
       local feir = ltjf_font_extra_info[pf]
       if met.rotation and met.vert_activated then
           local f = font_getfont(pf)
@@ -210,14 +213,14 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
    local xo, yo = getoffsets(p)
    local t = node.direct.getproperty(p)
    do -- special treatment for "vpal" feature
-       local tx; local pf = getfont(p)
-       if ltju.specified_feature(pf, 'vpal') then
-           ltju.loop_over_feat(pf, { vpal=true },
-               function(i,k) if i==getchar(p) then tx=k end end,
+       local tx
+       if specified_feature(pf, 'vpal') then
+           loop_over_feat(pf, feat_vpal_table,
+               function(i,k) if i==pc then tx=k end end,
                false, 'gpos_single')
            if type(tx)=='table' and #tx==4 then
-              local pft = font.getfont(pf); local factor = 1.0/pft.units*pft.size
-              pwidth = pwidth + round(tx[4]*factor); yo = round(tx[2]*factor);
+              local pft = font_getfont(pf); local corr_adv = tx[4]/pft.units*pft.size
+              pwidth = pwidth + corr_adv; yo = yo + corr_adv
            end
        end
    end

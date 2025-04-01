@@ -329,10 +329,11 @@ do -- 002 ---------------------------------------
    local font_getfont = font.getfont
    local setwhd = node.direct.setwhd
    local setdir = node.direct.setdir
+   local specified_feature = ltju.specified_feature
    local function calc_np_notdef(lp)
       if not font_getfont(getfont(lp)).characters[getchar(lp)] then
          local ln = node_next(lp)
-         if ltju.specified_feature(getfont(lp), 'notdef') and ln and getid(ln)==id_glyph then
+         if specified_feature(getfont(lp), 'notdef') and ln and getid(ln)==id_glyph then
             set_attr(lp, attr_icflag, PROCESSED)
             set_attr(ln, attr_jchar_code, get_attr(lp, attr_jchar_code) or getchar(lp))
             set_attr(ln, attr_jchar_class, get_attr(lp, attr_jchar_class) or 0)
@@ -999,14 +1000,17 @@ local inspect_np_first
 do
 local getkern = node.direct.getkern
 local font_getfont, round = font.getfont, tex.round
+local loop_over_feat = ltju.loop_over_feat
+local specified_feature = ltju.specified_feature
+local feat_kern_table = { kern=true }
 inspect_np_first = function()
 -- Np.first は leftkern => palt 等の位置補正由来か kern 等のカーニング由来かを調べ
 -- 後者の部分を explicit kern として Np.first の前に挿入する
    local pn = Np.nuc; if getid(pn)~=id_glyph then return end
    local pf = getfont(pn); if getfont(Nq.nuc)~=pf then return end
-   if ltju.specified_feature(pf, 'kern') then
+   if specified_feature(pf, 'kern') then
       local qc, pc = Nq.char, Np.char; local kern
-      ltju.loop_over_feat(pf, { kern=true }, 
+      loop_over_feat(pf, feat_kern_table, 
          function(i,k) if i==qc and type(k)=='table' and k[pc] then kern = k[pc] end end,
          false, 'gpos_pair')
       local pft = font_getfont(pf); kern = round((kern or 0)/pft.units*pft.size)
