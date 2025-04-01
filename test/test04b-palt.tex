@@ -1,0 +1,63 @@
+\documentclass{article}
+\usepackage{luatexja}
+\begin{document}
+\def\FN{KozMinPr6N-Regular.otf}
+%\input lua-visual-debug.sty
+
+\jfont\kzdfn=\FN:jfm=prop;-kern
+\jfont\kzdfk=\FN:jfm=prop;+kern
+\jfont\kzpan=\FN:jfm=prop;+palt;-kern
+\jfont\kzpak=\FN:jfm=prop;+palt;+kern
+\jfont\kzpwn=\FN:jfm=prop;+pwid;-kern
+\jfont\kzpwk=\FN:jfm=prop;+pwid;+kern
+\ltjsetparameter{xkanjiskip=10pt}
+\tracingonline1\showboxdepth1000\showboxbreadth10000
+\def\TEST#1{%
+  \setbox0=\hbox{#1アイちょっと}
+  %\setbox0=\hbox{アイ}
+  \directlua{
+    print("TEST \luatexluaescapestring{\string#1}")
+    luatexja.ext_show_node_list(tex.getbox(0), '> ', print)
+  }\par\texttt{\string#1}: \hbox to 80pt{\vrule\copy0\vrule\hss}\the\wd0
+}
+
+\TEST\kzdfn
+\TEST\kzdfk
+\TEST\kzpan
+\TEST\kzpak
+\TEST\kzpwn
+\TEST\kzpwk
+
+\par
+\vbox{\tate%
+\tfont\tkzdf=\FN:jfm=propv;-vkrn;-kern
+\tfont\tkzdk=\FN:jfm=propv;-vkrn;+kern
+\tfont\tkzdv=\FN:jfm=propv;+vkrn;-kern
+\tfont\tkzwn=\FN:jfm=propv;-pwid;-kern
+\tfont\tkzva=\FN:jfm=propv;+vpal;-kern
+\tfont\tkzvb=\FN:jfm=propv;+vpal;+vkrn;-kern
+\tfont\tkzvc=\FN:jfm=propv;+vpal;+kern
+\tfont\tkzvp=\FN:jfm=propv;+pwid;-kern
+\tfont\tkzvq=\FN:jfm=propv;+pwid;+kern
+
+\def\TEST#1{%
+  \setbox0=\hbox{\tate#1あッちょっと}
+  \directlua{
+    print('TEST \luatexluaescapestring{\string#1}')
+    luatexja.ext_show_node_list(tex.getbox(0), '> ', print)
+  }%
+  \par\texttt{\string#1}: \hbox to 80pt{\vrule\copy0\vrule\hss}\the\wd0
+}
+\TEST\tkzdf
+\TEST\tkzdk
+\TEST\tkzdv
+\TEST\tkzwn
+\TEST\tkzva
+\TEST\tkzvb
+\TEST\tkzvc
+\TEST\tkzvp
+\TEST\tkzvq
+}
+
+\end{document}
+

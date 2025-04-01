@@ -206,11 +206,22 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
           end
       end
       pwidth, ascender = feir.vheight[pc]*met.size, feir.vorigin[pc]*met.size
-     -- print(pwidth/65536.,ascender/65536.)
    end
-   -- luatexja.ext_show_node(node.direct.tonode(p), 'B> ', print)
    local xo, yo = getoffsets(p)
-   --pwidth = pwidth - yo
+   local t = node.direct.getproperty(p)
+   do -- special treatment for "vpal" feature
+       local tx; local pf = getfont(p)
+       if ltju.specified_feature(pf, 'vpal') then
+           ltju.loop_over_feat(pf, { vpal=true },
+               function(i,k) if i==getchar(p) then tx=k end end,
+               false, 'gpos_single')
+           if type(tx)=='table' and #tx==4 then
+              local pft = font.getfont(pf); local factor = 1.0/pft.units*pft.size
+              pwidth = pwidth + round(tx[4]*factor); yo = round(tx[2]*factor);
+           end
+       end
+   end
+
    fwidth = fwidth or pwidth
    if pwidth>fwidth and char_data.round_threshold then
       local frac = pwidth / fwidth
@@ -224,10 +235,10 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
    local y_shift = xo + (get_attr(p,attr_tkblshift) or 0)
    local q
    head, q = node_remove(head, p)
+
    local box = node_new(id_hlist, nil, p)
    setwhd(box, fwidth, fheight, fdepth); setshift(box, y_shift)
    setdir(box, dir)
-   -- print(yo, ascender, char_data.align, fwidth-pwidth)
    setoffsets(p, -fshift.down,
               yo -(ascender + char_data.align*(fwidth-pwidth) - fshift.left) )
    local ws = node_new(id_whatsit, sid_save)

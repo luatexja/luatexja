@@ -427,7 +427,6 @@ local function print_attr(p)
 --        s = s .. ' [' .. tostring(n.number) .. ']=' .. tostring(n.value)
 --        n = node_next(n)
 --    end
---    print(s)
 end
 local function debug_show_node_X(p,print_fn, limit, inner_depth)
    local k = prefix
