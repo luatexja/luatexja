@@ -1,5 +1,5 @@
 %
-% lltjp-listings.sty 2025-03-25
+% lltjp-listings.sty 2025-04-01
 %
 
 \NeedsTeXFormat{LaTeX2e}
@@ -130,11 +130,30 @@
   \fi
   \lst@Append#1}
 
+%
+\def\ltj@lst@Append@ivs#1{%
+% \lst@token: ABC...DE ==> ABC...D{E#1}
+  \@temptokena{}\def\@@tempa{}%
+  \expandafter\ltj@lst@Append@ivs@\the\lst@token\@empty\@empty
+  \lst@token\@temptokena%
+  \edef\@@tempa{{\@@tempa#1}}%
+  \lst@token\expandafter\expandafter\expandafter\expandafter%
+  \expandafter\expandafter\expandafter{\expandafter\expandafter%
+  \expandafter\the\expandafter\lst@token\@@tempa}%
+}
+\def\ltj@lst@Append@ivs@#1#2{%
+  \@temptokena\expandafter\expandafter\expandafter\expandafter%
+  \expandafter\expandafter\expandafter{\expandafter\expandafter%
+  \expandafter\the\expandafter\@temptokena\@@tempa}\def\@@tempa{#1}%
+  \ifx#2\@empty\else
+  \expandafter\expandafter\expandafter\ltj@lst@Append@ivs@\expandafter#2\fi
+}
+
 % 漢字用異体字セレクタ命令
 \def\ltj@lst@ProcessIVS#1{%
   \lst@whitespacefalse
   \if@ltj@lst@vsraw
-    \lst@Append#1\advance\lst@length\m@ne
+    \ltj@lst@Append@ivs#1%
   \else
     \lst@TrackNewLines\lst@OutputLostSpace \lst@PrintToken
     \setbox\@tempboxa\hbox to 2\lst@width{\hss
@@ -149,7 +168,7 @@
 \def\ltj@lst@ProcessVS#1{%
   \lst@whitespacefalse
   \if@ltj@lst@vsraw
-    \lst@Append#1\advance\lst@length\m@ne
+    \ltj@lst@Append@ivs#1%
   \else
     \lst@TrackNewLines\lst@OutputLostSpace \lst@PrintToken
     \setbox\@tempboxa\hbox to 2\lst@width{\hss
