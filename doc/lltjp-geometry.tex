@@ -1,6 +1,6 @@
 %#! lualatex
-\documentclass[a4paper,10ptj]{ltjsarticle}
-\usepackage[textwidth=42\zw, lines=42, footskip=2\zh, verbose]{geometry}
+\documentclass[a4paper,14Q]{ltjsarticle}
+\usepackage[textwidth=43\zw, lines=42, footskip=2\zh, verbose]{geometry}
 \usepackage{listings,amsmath,booktabs,lltjext,bxghost}
 \usepackage{unicode-math}
 \setmathfont{Latin Modern Math}
@@ -34,7 +34,7 @@
 
 \title{\Pkg{lltjp-geometry}パッケージ}
 \author{\LuaTeX-jaプロジェクト\null%
-  \thanks{\url{http://osdn.jp/projects/luatex-ja/wiki/FrontPage}}}
+  \thanks{\url{https://github.com/luatexja/luatexja/}}}
 \begin{document}
 \maketitle
 
@@ -237,16 +237,16 @@ $5\,\textrm{pt} + 3.41666\,\textrm{pt}=8.41666\,\textrm{pt}$である．}
 位置が狂う危険があるため，
 \Pkg{geometry}パッケージでは
 \begin{quote}
- \texttt{lines}オプション指定時，\cs{topskip}の値を最低でも
- \cs{strutbox}の高さ($0.7\cs{baselineskip}$)まで引き上げる
+ \texttt{lines}オプション指定時には，\cs{topskip}の値を最低でも
+ \cs{strutbox}の高さ\\($0.7\cs{baselineskip}$)まで引き上げる
 \end{quote}
 という仕様になっている．
 
 縦組の場合は，\cs{strutbox}に対応するボックスは\cs{tstrutbox}であるため，
 \Pkg{lltjp-geometry}では
 \begin{quote}
- \texttt{lines}オプション指定時，\cs{topskip}の値を最低でも
- \emph{\cs{tstrutbox}の高さ}($\cs{baselineskip}/2$)まで引き上げる
+ \texttt{lines}オプション指定時には，\cs{topskip}の値を最低でも
+ \emph{\cs{tstrutbox}の高さ}\\($\cs{baselineskip}/2$)まで引き上げる
 \end{quote}
 という挙動にした．見かけ上は\cs{topskip}の値制限が緩くなったが，前節で述べたように
 欧文フォントのベースラインは和文に合うように下にずらされるので，
