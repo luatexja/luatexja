@@ -21,11 +21,10 @@ if test -d "$TEMP/$PROJECT"; then
 fi
 echo
 git commit -m "Releases $VER" --allow-empty
-git archive --format=tar --prefix=$PROJECT/ HEAD | (cd $TEMP && tar xf -)
+git archive --format=tar --prefix=$PROJECT/ HEAD | (cd $TEMP && tar xpf -)
 cd $TEMP
 rm -rf $PROJECT/test
 rm -rf $PROJECT/src/*.cl*
-rm -rf $PROJECT/src/ltj-kinsoku.lua
 rm -rf $PROJECT-orig
 cp -r $PROJECT $PROJECT-orig
 cd $PROJECT
@@ -33,7 +32,7 @@ perl -pi.bak -e "s/\\\$VER\\\$/$VER/g" README
 rm -f README.bak
 cd ..
 diff -urN $PROJECT-orig $PROJECT
-tar zcf $DIR/$PROJECT-$VER.tar.gz $PROJECT
+tar zpcf $DIR/$PROJECT-$VER.tar.gz $PROJECT
 echo
 echo You should execute
 echo
