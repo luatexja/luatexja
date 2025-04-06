@@ -1079,8 +1079,8 @@ local function handle_np_jachar(mode)
    local qid = Nq.id
    if qid==id_jglyph or ((qid==id_pbox or qid==id_pbox_w) and Nq.met) then
       local g, k
-      if getid(Np.first)==id_kern then
-          if getsubtype(Np.first)==0 then inspect_np_first() end -- leftkern by luaotfload
+      if getid(Np.first)==id_kern and getsubtype(Np.first)==0 then
+          inspect_np_first()
       end
       if non_ihb_flag then g, k = calc_ja_ja_glue() end -- M->K
       if not g then g = get_kanjiskip() end
@@ -1283,44 +1283,6 @@ do
    end
 end
 
--------------------- vkrn 由来の yoffset を kern に変える
-local conv_vkrn_to_kernnode
-do
-local font_getfont, round = font.getfont, tex.round
-local loop_over_feat = ltju.loop_over_feat
-local specified_feature = ltju.specified_feature
-local feat_vkrn_table = { vkrn=true }
-local traverse_glyph = node.direct.traverse_glyph
-conv_vkrn_to_kernnode= function(ahead)
-   local np, nn = ahead, node_next(ahead)
-   while nn do
-      if getid(nn)~=id_glyph or not if_lang_ja(nn) then
-         nn = node_next(nn)
-         while nn and getid(nn)==id_kern and getsubtype(nn)==0 do nn = node_next(nn) end
-         if not nn then break end
-      elseif (getid(np)==getid(nn))and(getid(nn)==id_glyph) then
-         local nf = getfont(nn)
-         if if_lang_ja(np) and if_lang_ja(nn) and getfont(np)==nf
-            and specified_feature(nf, 'vkrn') then
-            local pc, tx = getchar(np), nil
-            loop_over_feat(nf, feat_vkrn_table, function(i,k) if i==pc then tx=k end end,
-               false, 'gpos_pair')
-            tx = tx and tx[getchar(nn)]; tx = tx and tx[1]
-            if type(tx)=='table' and #tx==4 then
-               local pft = font_getfont(nf); local corr_adv = tx[4]/pft.units*pft.size
-               setfield(np, 'yoffset', getfield(np, 'yoffset') + corr_adv)
-               local k = node_new(id_kern, 0); setkern(k, corr_adv); insert_before(ahead, nn, k)
-               -- TODO: subtype of this node should be converted to 1 in inspect_np_first
-            end
-         end
-      end
-      np, nn = nn, node_next(nn)
-      while nn and getid(nn)==id_kern and getsubtype(nn)==0 do nn = node_next(nn) end
-   end
-   return ahead
-end
-end
-
 -------------------- 外部から呼ばれる関数
 
 local ensure_tex_attr = ltjb.ensure_tex_attr
@@ -1328,7 +1290,7 @@ local tex_getattr = tex.getattribute
 -- main interface
 function luatexja.jfmglue.main(ahead, mode, dir)
    if not ahead then return ahead end
-   head = conv_vkrn_to_kernnode(ahead)
+   head = ahead;
    local lp, last, par_indented, TEMP = init_var(mode,dir)
    lp = calc_np(last, lp)
    if Np then
