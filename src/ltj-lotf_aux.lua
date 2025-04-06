@@ -3,7 +3,7 @@
 --
 
 -- functions which access to caches by luaotfload gathered in this file.
--- lines with marked by "-- HARFLOAD" are codes for harfload
+-- lines with marked by "-- HARF" are codes for harfbuzz
 local aux = {}
 luatexja.lotf_aux = aux
 
@@ -26,7 +26,14 @@ function aux.enable_feature(id, name)
     t.shared.features[name] = true
   elseif t and t.hb then -- HARF
     local hb, tf = luaotfload.harfbuzz, t.hb.spec.hb_features
-    tf[#tf+1] = hb.Feature.new(name)
+    tf[#tf+1] = hb.Feature.new(name); tf.raw[name]=true
+  end
+end
+function aux.disable_feature(id, name)
+  local t = getfont(id)
+  if t and t.shared and t.shared.features then
+    t.shared.features[name] = false
+  -- HARF: not supported
   end
 end
 function aux.specified_feature(id, name)
@@ -115,6 +122,43 @@ local function get_vmet_table(tfmdata, dest)
 end
 aux.get_vmet_table = get_vmet_table
 end
+
+do
+local dummy_table = {}
+local feat_list = { vkrn=true, vapk=true }
+local function construct_features_for_tate(tfmdata,dest)
+   if (not tfmdata) or (not tfmdata.resources) or (not tfmdata.resources.sequences) then
+     dest = dest or {}
+     dest.ltj_feat = dummy_table; return dest
+   end
+   local ltj_feat = {}
+   for _,i in pairs(tfmdata.resources.sequences) do
+     fname = i.order[1] or false
+     if feat_list[fname] then
+       local l1 = ltj_feat[fname]; if not l1 then l1 = {}; ltj_feat[fname] = l1 end
+       if i.type == 'gpos_pair' and i.steps then
+         local l2 = { features=i.features and i.features[i.order[1]] }; l1[#l1+1] = l2
+         local l3
+         for _,j in pairs(i.steps) do
+           if type(j)=='table' then
+             if type(j.coverage)=='table' then
+               for i,k in pairs(j.coverage) do
+                  if not l3 then l3 = {} end; l3[i] = {}
+                  for i2,k2 in pairs(k) do l3[i][i2]=k2[1] and k2[1][4] end
+               end
+             end
+           end
+         end
+         l2.data = l3
+       end
+     end
+  end
+  dest.ltj_feat = ltj_feat
+  return dest  
+end
+aux.construct_features_for_tate = construct_features_for_tate
+end
+
 local function loop_over_duplicates(id, func)
 -- func: return non-nil iff abort this fn
   local t = (type(id)=="table") and id or getfont(id)

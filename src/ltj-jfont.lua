@@ -34,6 +34,7 @@ local cat_lp = luatexbase.catcodetables['latex-package']
 local FROM_JFM     = luatexja.icflag_table.FROM_JFM
 
 luatexja.jfont = luatexja.jfont or {}
+local feat_tate_kern = { vkrn='vkrn_ltj', vapk='vapk_aux' }
 ------------------------------------------------------------------------
 -- LOADING JFM
 ------------------------------------------------------------------------
@@ -336,6 +337,13 @@ do
          local rot = fmtable.rotation
          ltju.enable_feature(fn, vert_name)
          ltju.loop_over_feat(f, {[vert_name]=true}, function (i,k) rot[i] = nil end)
+      end
+      if jfm_dir=='tate' then
+         for i,v in pairs(feat_tate_kern) do
+            if ltju.specified_feature(fn, i) then
+               ltju.disable_feature(fn, i); ltju.enable_feature(fn, v)
+            end
+         end
       end
 
       fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
@@ -851,11 +859,12 @@ do
 end
 
 do
-   local cache_ver = 24
+   local cache_ver = 25
    local nameonly, lower = file.nameonly, string.lower
    local lfs = require"lfs"
    local file_attributes = lfs.attributes
    local load_cache, save_cache = ltjb.load_cache, ltjb.save_cache
+   local addfeature = fonts.handlers.otf.addfeature
    local function prepare_extra_data_base(tfmdata)
       if (not tfmdata) or (not tfmdata.filename) then return end
       local bname = tfmdata.psname or nameonly(tfmdata.filename)
@@ -880,6 +889,7 @@ do
             setmetatable(vorigin, {__index = function () return vod end } )
          else
             local dest = ltju.get_vmet_table(tfmdata, nil)
+            dest = ltju.construct_features_for_tate(tfmdata,dest)
             dest = list_rotate_glyphs(tfmdata, dest)
             font_extra_basename[bname] = dest or {}
             save_cache(v,
@@ -888,6 +898,12 @@ do
                          lotf_version = luaotfload.version,
                          dest,
                        })
+         end
+         if font_extra_basename[bname] and font_extra_basename[bname].ltj_feat then
+            local ff =font_extra_basename[bname].ltj_feat
+            for i,v in pairs(feat_tate_kern) do
+               if ff[i] then addfeature({name=v, type='kern', dataset=ff[i]}) end
+            end
          end
          return bname
       end
