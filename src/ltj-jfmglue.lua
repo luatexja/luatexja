@@ -628,7 +628,8 @@ do
    local getcomponents = node.direct.getcomponents
    --local ltjf_get_vert_glyph = ltjf.get_vert_glyph
    function set_np_xspc_jachar(Nx, x)
-      local m = ltjf_font_metric_table[getfont(x)]
+      local nf = getfont(x); Nx.font = nf
+      local m = ltjf_font_metric_table[nf]
       local c, c_glyph = (not getcomponents(x) and ltjs_orig_char_table[x]), getchar(x)
       if c and c~=c_glyph then set_attr(x, attr_jchar_code, c) end
       c = c or c_glyph
@@ -1002,17 +1003,22 @@ local getkern = node.direct.getkern
 local font_getfont, round = font.getfont, tex.round
 local loop_over_feat = ltju.loop_over_feat
 local specified_feature = ltju.specified_feature
-local feat_kern_table = { kern=true }
+local feat_kern_table = { kern={kern=true}, vkrn_ltj={vkrn_ltj=true}, vapk_ltj={vapk_ltj=true} }
 inspect_np_first = function()
 -- Np.first は leftkern => palt 等の位置補正由来か kern 等のカーニング由来かを調べ
 -- 後者の部分を explicit kern として Np.first の前に挿入する
-   local pn = Np.nuc; if getid(pn)~=id_glyph then return end
-   local pf = getfont(pn); if getfont(Nq.nuc)~=pf then return end
-   if specified_feature(pf, 'kern') then
-      local qc, pc = Nq.char, Np.char; local kern
-      loop_over_feat(pf, feat_kern_table, 
-         function(i,k) if i==qc and type(k)=='table' and k[pc] then kern = k[pc] end end,
-         false, 'gpos_pair')
+   print(Np.id, Np.font, Nq.char, Np.char)
+   if Np.id~=id_jglyph then return end
+   local pf = Np.font; if Nq.font~=pf then return end
+   local qc, pc = Nq.char, Np.char; local kern
+   for fn,ft in pairs(feat_kern_table) do
+      if specified_feature(pf, fn) then
+         loop_over_feat(pf, ft, 
+            function(i,k) if i==qc and type(k)=='table' and k[pc] then kern = (kern or 0) + k[pc] end end,
+            false, 'gpos_pair')
+      end
+   end
+   if kern then
       local pft = font_getfont(pf); kern = round((kern or 0)/pft.units*pft.size)
       if kern==getkern(Np.first) then setfield(Np.first, 'subtype', 1)
       elseif kern~=0 then

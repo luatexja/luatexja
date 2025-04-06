@@ -34,7 +34,7 @@ local cat_lp = luatexbase.catcodetables['latex-package']
 local FROM_JFM     = luatexja.icflag_table.FROM_JFM
 
 luatexja.jfont = luatexja.jfont or {}
-local feat_tate_kern = { vkrn='vkrn_ltj', vapk='vapk_aux' }
+local feat_tate_kern = { vkrn='vkrn_ltj', vapk='vapk_ltj' }
 ------------------------------------------------------------------------
 -- LOADING JFM
 ------------------------------------------------------------------------
