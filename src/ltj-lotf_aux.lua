@@ -144,7 +144,9 @@ local function construct_features_for_tate(tfmdata,dest)
              if type(j.coverage)=='table' then
                for i,k in pairs(j.coverage) do
                   if not l3 then l3 = {} end; l3[i] = {}
-                  for i2,k2 in pairs(k) do l3[i][i2]=k2[1] and k2[1][4] end
+                  for i2,k2 in pairs(k) do
+                     if type(k2)=='table' and type(k2[1])=='table' then l3[i][i2]=k2[1] and k2[1][4] end
+                  end
                end
              end
            end
