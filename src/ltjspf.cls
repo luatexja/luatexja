@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjspf}
-  [2025-03-28 ltjsclasses ]
+  [2025-04-27 ltjsclasses ]
 \def\jsc@clsname{ltjspf}
 \def\Cjascale{0.903375}
 \RequirePackage{luatexja}
@@ -1256,7 +1256,8 @@ class has defined the old font commands like\MessageBreak
       \futurelet\jsc@next\jsc@fo@t}
 \def\jsc@fo@t{\ifcat\bgroup\noexpand\jsc@next \let\jsc@next\jsc@f@@t
                                 \else \let\jsc@next\jsc@f@t\fi \jsc@next}
-\def\jsc@f@@t{\bgroup\aftergroup\jsc@@foot\let\jsc@next}
+\def\jsc@f@@t@prefix{\inhibitglue\ignorespaces}
+\def\jsc@f@@t{\bgroup\aftergroup\jsc@@foot\afterassignment\jsc@f@@t@prefix\let\jsc@next}
 \def\jsc@f@t#1{#1\jsc@@foot}
 \def\jsc@@foot{\@finalstrut\strutbox\color@endgroup\egroup}
 \newcommand\@makefntext[1]{%
