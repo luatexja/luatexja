@@ -44,7 +44,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2025-03-28 ltjsclasses ]
+  [2025-04-27 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass[disablejfam]{ltjsarticle}
@@ -5141,6 +5141,9 @@
 % parhook対応として\cs{par}が追加されていますが，
 % 実は同時に\cs{color@endgroup}も\cs{endgraf}するように変更
 % されていますので，不要だと思います。というわけで追加しません。
+%
+% [2025-04-27] |\footnote|の内容の先頭に |\inhibitglue\ignorespaces|
+% が挿入されるようにしました。
 %    \begin{macrocode}
 \long\def\@footnotetext{%
   \insert\footins\bgroup
@@ -5159,7 +5162,8 @@
       \futurelet\jsc@next\jsc@fo@t}
 \def\jsc@fo@t{\ifcat\bgroup\noexpand\jsc@next \let\jsc@next\jsc@f@@t
                                 \else \let\jsc@next\jsc@f@t\fi \jsc@next}
-\def\jsc@f@@t{\bgroup\aftergroup\jsc@@foot\let\jsc@next}
+\def\jsc@f@@t@prefix{\inhibitglue\ignorespaces}
+\def\jsc@f@@t{\bgroup\aftergroup\jsc@@foot\afterassignment\jsc@f@@t@prefix\let\jsc@next}
 \def\jsc@f@t#1{#1\jsc@@foot}
 \def\jsc@@foot{\@finalstrut\strutbox\color@endgroup\egroup}
 %    \end{macrocode}
