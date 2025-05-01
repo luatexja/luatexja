@@ -1003,7 +1003,7 @@ local getkern = node.direct.getkern
 local font_getfont, round = font.getfont, tex.round
 local loop_over_feat = ltju.loop_over_feat
 local specified_feature = ltju.specified_feature
-local feat_kern_table = { kern={kern=true}, vkrn_ltj={vkrn_ltj=true}, vapk_ltj={vapk_ltj=true} }
+local feat_kern_table = { 'kern', 'vkrn_ltj', 'vapk_ltj' }
 inspect_np_first = function()
 -- Np.first は leftkern => palt 等の位置補正由来か kern 等のカーニング由来かを調べ
 -- 後者の部分を explicit kern として Np.first の前に挿入する
@@ -1011,9 +1011,10 @@ inspect_np_first = function()
    if Np.id~=id_jglyph then return end
    local pf = Np.font; if Nq.font~=pf then return end
    local qc, pc = Nq.char, Np.char; local kern
-   for fn,ft in pairs(feat_kern_table) do
-      if specified_feature(pf, fn) then
-         loop_over_feat(pf, ft, 
+   for _,fn in ipairs(feat_kern_table) do
+      local real_fn = (type(fn)=='string') and fn or fn(fp)
+      if specified_feature(pf, real_fn) then
+         loop_over_feat(pf, real_fn, 
             function(i,k) if i==qc and type(k)=='table' and k[pc] then kern = (kern or 0) + k[pc] end end,
             false, 'gpos_pair')
       end

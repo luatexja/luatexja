@@ -186,7 +186,6 @@ local font_getfont = font.getfont
 local get_ascender, get_descender = ltju.get_ascender, ltju.get_descender
 local loop_over_feat = ltju.loop_over_feat
 local specified_feature = ltju.specified_feature
-local feat_vpal_table = { vpal=true };
 local function capsule_glyph_tate(p, met, char_data, head, dir)
    if not char_data then return node_next(p), head end
    local fwidth, pwidth, ascender = char_data.width
@@ -215,7 +214,7 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
    do -- special treatment for "vpal" feature
        local tx
        if specified_feature(pf, 'vpal') then
-           loop_over_feat(pf, feat_vpal_table,
+           loop_over_feat(pf, 'vpal',
                function(i,k) if i==pc then tx=k end end,
                false, 'gpos_single')
            if type(tx)=='table' and #tx==4 then

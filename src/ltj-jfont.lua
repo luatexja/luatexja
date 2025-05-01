@@ -336,7 +336,7 @@ do
          local vert_name = ltju.exist_feature(fn, 'vrt2') and 'vrt2' or 'vert'
          local rot = fmtable.rotation
          ltju.enable_feature(fn, vert_name)
-         ltju.loop_over_feat(f, {[vert_name]=true}, function (i,k) rot[i] = nil end)
+         ltju.loop_over_feat(f, vert_name, function (i,k) rot[i] = nil end)
       end
       if jfm_dir=='tate' then
          for i,v in pairs(feat_tate_kern) do
@@ -974,7 +974,7 @@ do
      [0x300C]=0xFE41, [0x300D]=0xFE42, [0x300E]=0xFE43, [0x300F]=0xFE44,
      [0xFF3B]=0xFE47, [0xFF3D]=0xFE48,
   }
-  local vert_jpotf_table, vert_feat = {}, {vert=true}
+  local vert_jpotf_table = {}
   local utfbyte, utfsub = utf.byte, utf.sub
   luatexja.jfont.register_vert_replace = function(t)
     for i,v in pairs(t) do
@@ -1004,10 +1004,10 @@ luatexbase.add_to_callback(
       if not ltju.exist_feature(fnum, 'vert') and not ltju.exist_feature(fnum, 'vrt2') then
         -- 現在の (script, lang) で vert もvrt2 も有効にできない場合，
         -- 全 (script,lang) の vert を強制的に適用
-        ltju.loop_over_feat(t, vert_feat, function (i,k) vform[i] = vform[i] or k end, true)
+        ltju.loop_over_feat(t, 'vert', function (i,k) vform[i] = vform[i] or k end, true)
       end
       -- vform の中身を vert 適用結果に変える
-      ltju.loop_over_feat(t, vert_feat,
+      ltju.loop_over_feat(t, 'vert',
         function (i,k)
           for j,w in pairs(vform) do
             if (i==j)and(w==k) then vform[j]=nil elseif w==i then vform[j] = k end
