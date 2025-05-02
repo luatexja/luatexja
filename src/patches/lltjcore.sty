@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2025-04-01
+\ProvidesPackage{lltjcore}[2025-05-03
   Patch to LaTeX2e Kernel for LuaTeX-ja (for LaTeX2e >=2025-06-01)]
 \RequirePackage{etoolbox}
 
@@ -167,7 +167,9 @@
    \iftombow
      \@@paperwidth\dimexpr\paperwidth+2\dimexpr\@tombowbleed\relax
      \@@paperheight\dimexpr\paperheight+10mm+2\dimexpr\@tombowbleed\relax
-     \advance\@@topmargin 1in\relax \advance\@themargin 1in\relax
+     \advance\topmargin 1in\relax
+     \advance\oddsidemargin 1in\relax
+     \advance\evensidemargin 1in\relax
    \fi
 }
 \newdimen\@@paperheight
@@ -215,10 +217,13 @@
 \patchcmd{\@make@normalcolbox}{\vskip -\@outputbox@depth\@textbottom}%
   {\pltx@adjust@wd@outputbox\vskip -\@outputbox@depth\@textbottom}{}{}%
 
-% トンボ対応用．将来は shipout hook で書き直したい
-\patchcmd\@outputpage{\vskip\topmargin}{\vskip\topmargin\iftombow\vskip1in\fi}{}{}
-\patchcmd\@outputpage{\reset@font}{\@tombowreset@@paper\reset@font}{}{}
-\patchcmd\@outputpage{\@begindvi}{\@begindvi\@outputtombow}{}{}
+% トンボ対応用
+\AddToHook{build/page/reset}[lltjcore.tombow]{%
+  \@tombowreset@@paper
+}
+\AddToHook{shipout/background}[lltjcore.tombow]{%
+  \put(72.27,-72.27){\lineskip\z@skip\lineskiplimit\z@\@outputtombow}%
+}
 
 %%%%%% direction of floats
 \pretocmd\@floatboxreset{\pltx@save@float@dir}{}{}
