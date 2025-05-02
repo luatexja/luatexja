@@ -341,6 +341,7 @@ do
       if jfm_dir=='tate' then
          for i,v in pairs(feat_tate_kern) do
             if ltju.specified_feature(fn, i) then
+               local v = v..tostring(font_extra_info[fn].index)
                ltju.disable_feature(fn, i); ltju.enable_feature(fn, v)
             end
          end
@@ -805,7 +806,7 @@ end
 ------------------------------------------------------------------------
 luatexja.jfont.font_extra_info = font_extra_info -- key: fontnumber
 local font_extra_basename = {} -- key: basename
-
+local font_extra_basename_index = 0
 local rotate_exception = {
   [0xFF1A]= { ['zht'] = true, },
   [0xFF1B]= { ['zht'] = true, },
@@ -883,6 +884,8 @@ do
          -- if the cache is not found or outdated, save the cache
          if dest then
             font_extra_basename[bname] = dest[1] or {}
+            dest[1].index = font_extra_basename_index
+            font_extra_basename_index = font_extra_basename_index + 1
             local vheight, vorigin = dest[1].vheight, dest[1].vorigin
             local vhd, vod = vheight.default, vorigin.default
             setmetatable(vheight, {__index = function () return vhd end } )
@@ -898,11 +901,18 @@ do
                          lotf_version = luaotfload.version,
                          dest,
                        })
+            dest.index = font_extra_basename_index
+            font_extra_basename_index = font_extra_basename_index + 1
          end
          if font_extra_basename[bname] and font_extra_basename[bname].ltj_feat then
             local ff =font_extra_basename[bname].ltj_feat
             for i,v in pairs(feat_tate_kern) do
-               if ff[i] then addfeature({name=v, type='kern', dataset=ff[i]}) end
+               if ff[i] then
+                 addfeature({
+                   name=v..tostring(font_extra_basename[bname].index), 
+                   type='kern', dataset=ff[i]
+                 })
+               end
             end
          end
          return bname
