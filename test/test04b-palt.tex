@@ -1,7 +1,8 @@
 \documentclass{article}
 \usepackage{luatexja}
 \begin{document}
-\def\FN{KozMinPr6N-Regular.otf}
+\def\FN{KozMinPr6N-Regular.otf}\let\FT=\FN
+%\def\FT{JJSYuMinchoPr6N-R.otf}
 %\input lua-visual-debug.sty
 
 \jfont\kzdfn=\FN:jfm=prop;-kern
@@ -30,15 +31,19 @@
 
 \par
 \vbox{\tate%
-\tfont\tkzdf=\FN:jfm=propv;-vkrn;-kern
-\tfont\tkzdv=\FN:jfm=propv;+vkrn;-kern
-\tfont\tkzva=\FN:jfm=propv;+vpal;-kern
-\tfont\tkzvb=\FN:jfm=propv;+vpal;+vkrn;-kern
-\tfont\tkzvp=\FN:jfm=propv;+pwid;-kern
-\tfont\tkzvq=\FN:jfm=propv;+pwid;+vkrn;-kern
+\tfont\tkzdf=\FT:jfm=propv;-vkrn;-kern
+\tfont\tkzdv=\FT:jfm=propv;+vkrn;-kern
+\tfont\tkzva=\FT:jfm=propv;+vpal;-kern
+\tfont\tkzvb=\FT:jfm=propv;+vpal;+vkrn;-kern
+\tfont\tkzvp=\FT:jfm=propv;+pwid;-kern
+\tfont\tkzvq=\FT:jfm=propv;+pwid;+vkrn;-kern
+\tfont\thrdv=HiraMinProN-W3.otf:jfm=propv;+vkrn;-kern
+\tfont\ttmdv=FOT-TsukuMinPr6N-R.otf:jfm=propv;+vkrn;-kern
+\tfont\tyudf=JJSYuMinchoPr6N-R.otf:jfm=propv;-vkrn;-kern
+\tfont\tyudv=JJSYuMinchoPr6N-R.otf:jfm=propv;+vkrn;-kern
 
 \def\TEST#1{%
-  \setbox0=\hbox{\tate#1ａア、ツノちょっと}
+  \setbox0=\hbox{\tate#1ａアノちょっと}
   \directlua{
     print('TEST \luatexluaescapestring{\string#1}')
     luatexja.ext_show_node_list(tex.getbox(0), '> ', print)
@@ -51,6 +56,10 @@
 \TEST\tkzvb\ \texttt{+vpal +vkrn}
 \TEST\tkzvp\ \texttt{+pwid}
 \TEST\tkzvq\ \texttt{+pwid +vkrn}
+\TEST\thrdv\ \texttt{\ \ \ \ \ \ +vkrn}
+\TEST\ttmdv\ \texttt{\ \ \ \ \ \ +vkrn}
+\TEST\tyudf\ \texttt{}
+\TEST\tyudv\ \texttt{\ \ \ \ \ \ +vkrn}
 }
 
 \end{document}

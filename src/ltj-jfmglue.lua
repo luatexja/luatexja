@@ -1015,10 +1015,14 @@ inspect_np_first = function()
    local pf = Np.font; if Nq.font~=pf then return end
    local qc, pc = Nq.char, Np.char; local kern
    for fn,ft in pairs(feat_kern_table) do
-      local real_fn =(type(ft)=='string' ) and ft or ft(font_extra_info[pf].index)
+      local real_fn =(type(ft)=='string') and ft or ft(font_extra_info[pf].index)
       if specified_feature(pf, real_fn) then
          loop_over_feat(pf, real_fn, 
-            function(i,k) if i==qc and type(k)=='table' and k[pc] then kern = (kern or 0) + k[pc] end end,
+            function(i,k) 
+              if i==qc and type(k)=='table' and k[pc] then 
+                kern = (kern or 0) + k[pc] 
+              end
+            end,
             false, 'gpos_pair')
       end
    end
