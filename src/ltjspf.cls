@@ -1258,7 +1258,7 @@ class has defined the old font commands like\MessageBreak
                                 \else \let\jsc@next\jsc@f@t\fi \jsc@next}
 \def\jsc@f@@t@prefix{\inhibitglue\ignorespaces}
 \def\jsc@f@@t{\bgroup\aftergroup\jsc@@foot\afterassignment\jsc@f@@t@prefix\let\jsc@next}
-\def\jsc@f@t#1{#1\jsc@@foot}
+\def\jsc@f@t#1{\jsc@f@@t@prefix#1\jsc@@foot}
 \def\jsc@@foot{\@finalstrut\strutbox\color@endgroup\egroup}
 \newcommand\@makefntext[1]{%
   \advance\leftskip 3\zw
