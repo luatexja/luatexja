@@ -1,8 +1,9 @@
 \documentclass{article}
 \usepackage{luatexja}
-\begin{document}
-\def\FN{KozMinPr6N-Regular.otf}
 %\input lua-visual-debug.sty
+\begin{document}
+\def\FN{KozMinPr6N-Regular.otf}\let\FT=\FN
+\def\FT{KozMinPr6N-Regular.otf}
 
 \jfont\kzdfn=\FN:jfm=prop;-kern
 \jfont\kzdfk=\FN:jfm=prop;+kern
@@ -30,27 +31,47 @@
 
 \par
 \vbox{\tate%
-\tfont\tkzdf=\FN:jfm=propv;-vkrn;-kern
-\tfont\tkzdv=\FN:jfm=propv;+vkrn;-kern
-\tfont\tkzva=\FN:jfm=propv;+vpal;-kern
-\tfont\tkzvb=\FN:jfm=propv;+vpal;+vkrn;-kern
-\tfont\tkzvp=\FN:jfm=propv;+pwid;-kern
-\tfont\tkzvq=\FN:jfm=propv;+pwid;+vkrn;-kern
+\tfont\tkzdf=\FT:jfm=propv;-vkrn;-kern
+\tfont\tkzdv=\FT:jfm=propv;+vkrn;-kern
+\tfont\tkzva=\FT:jfm=propv;+vpal;-kern
+\tfont\tkzvb=\FT:jfm=propv;+vpal;+vkrn;-kern
+\tfont\tkzvc=\FT:jfm=propv;+vpal;+vapk;-kern
+\tfont\tkzvp=\FT:jfm=propv;+pwid;-kern
+\tfont\tkzvq=\FT:jfm=propv;+pwid;+vkrn;-kern
+\tfont\thrdv=HiraMinProN-W3.otf:jfm=propv;+vkrn;-kern
+\tfont\ttmdf=FOT-TsukuMinPr6N-R.otf:jfm=propv;-vkrn;-kern
+\tfont\ttmdv=FOT-TsukuMinPr6N-R.otf:jfm=propv;+vkrn;-kern
+\tfont\ttmva=FOT-TsukuMinPr6N-R.otf:jfm=propv;+vpal;-kern
+\tfont\ttmvb=FOT-TsukuMinPr6N-R.otf:jfm=propv;+vpal;+vkrn;-kern
+\tfont\ttmvq=FOT-TsukuMinPr6N-R.otf:jfm=propv;+pwid;+vkrn;-kern
+\tfont\tyudv=JJSYuMinchoPr6N-R.otf:jfm=propv;+vkrn;-kern
+\tfont\tyudf=JJSYuMinchoPr6N-R.otf:jfm=propv;-vkrn;-kern
 
+\catcode`\@=11\relax
 \def\TEST#1{%
-  \setbox0=\hbox{\tate#1ａアイちょっと}
+  \setbox0=\hbox{\tate#1ちょっとアノ、}
   \directlua{
     print('TEST \luatexluaescapestring{\string#1}')
-    luatexja.ext_show_node_list(tex.getbox(0), '> ', print)
+    luatexja.ext_show_node_list(tex.getbox(0), '> ', print, 3)
   }%
-  \par\texttt{\string#1}: \hbox to 80pt{\vrule\copy0\vrule\hss}%\the\wd0
+  \par\texttt{\string#1}: \hbox to 120pt{\vrule\copy0\vrule\hss}%
+  \hbox to 40pt{\strip@pt\wd0\hss}\relax
 }
 \TEST\tkzdf
 \TEST\tkzdv\ \texttt{\ \ \ \ \ \ +vkrn}
 \TEST\tkzva\ \texttt{+vpal}
 \TEST\tkzvb\ \texttt{+vpal +vkrn}
+%\TEST\tkzvc\ \texttt{+vpal +vapk}
 \TEST\tkzvp\ \texttt{+pwid}
 \TEST\tkzvq\ \texttt{+pwid +vkrn}
+\TEST\thrdv\ \texttt{\ \ \ \ \ \ +vkrn}
+\TEST\ttmdf\ \texttt{}
+\TEST\ttmdv\ \texttt{\ \ \ \ \ \ +vkrn}
+\TEST\ttmva\ \texttt{+vpal}
+\TEST\ttmvb\ \texttt{+vpal +vkrn}
+\TEST\ttmvq\ \texttt{+pwid +vkrn}
+\TEST\tyudf\ \texttt{}
+\TEST\tyudv\ \texttt{\ \ \ \ \ \ +vkrn}
 }
 
 \end{document}

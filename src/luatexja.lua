@@ -432,8 +432,8 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
    local k = prefix
    local s
    local pt, pic = node_type(p.id), (get_attr(p, attr_icflag) or 0) --% icflag_table.PROCESSED_BEGIN_FLAG
-   local base = prefix .. '[' .. string.format('%7d', node.direct.todirect(p)) .. '] '
-     .. string.format('%X', pic) .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
+   local base = prefix 
+     .. string.format('%4X', pic) .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
    if pt == 'glyph' then
       s = base .. ' '
           .. (p.char<0xF0000 and utfchar(p.char) or '')
@@ -502,7 +502,7 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
       end
       prefix=k
    elseif pt == 'glue' then
-      s = base .. ' ' ..  print_spec(p)
+      s = base .. print_spec(p)
       if pic>icflag_table.KINSOKU and pic<icflag_table.KANJI_SKIP then
          s = s .. ' (from JFM: priority ' .. pic-icflag_table.FROM_JFM .. ')'
       elseif pic==icflag_table.KANJI_SKIP then
@@ -516,7 +516,7 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
       end
       print_fn(s)
    elseif pt == 'kern' then
-      s = base .. ' ' .. print_scaled(p.kern) .. 'pt'
+      s = base .. print_scaled(p.kern) .. 'pt'
       if p.subtype==0 then
          s = s .. ' (font)'
       elseif p.subtype==2 then
@@ -542,10 +542,10 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
          local t = tostring(p.user_id) .. ' (' ..
             luatexbase.get_user_whatsit_name(p.user_id) .. ') '
          if p.type ~= 110 then
-            s = s .. ' userid:' .. t .. tostring(p.value)
+            s = s .. 'userid:' .. t .. tostring(p.value)
             print_fn(s)
          else
-            s = s .. ' userid:' .. t .. '(node list)'
+            s = s .. 'userid:' .. t .. '(node list)'
             if p.user_id==uid_table.DIR then
                s = s .. ' dir: ' .. tostring(node.get_attribute(p, attr_dir))
             end
@@ -562,7 +562,7 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
       else
          s = s .. (node.subtype(p.subtype) or '')
          if p.subtype==1 then
-            s = s .. ' stream=' .. p.stream
+            s = s .. 'stream=' .. p.stream
             print_fn(s)
             for i=1,#p.data do
                print_fn(s .. '  [' .. i .. '] = ' .. tostring(p.data[i] and p.date[i].csname))

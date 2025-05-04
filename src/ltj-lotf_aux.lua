@@ -3,7 +3,7 @@
 --
 
 -- functions which access to caches by luaotfload gathered in this file.
--- lines with marked by "-- HARFLOAD" are codes for harfload
+-- lines with marked by "-- HARF" are codes for harfbuzz
 local aux = {}
 luatexja.lotf_aux = aux
 
@@ -22,11 +22,19 @@ end
 
 function aux.enable_feature(id, name)
   local t = getfont(id)
+    
   if t and t.shared and t.shared.features then
     t.shared.features[name] = true
   elseif t and t.hb then -- HARF
     local hb, tf = luaotfload.harfbuzz, t.hb.spec.hb_features
-    tf[#tf+1] = hb.Feature.new(name)
+    tf[#tf+1] = hb.Feature.new(name); tf.raw[name]=true
+  end
+end
+function aux.disable_feature(id, name)
+  local t = getfont(id)
+  if t and t.shared and t.shared.features then
+    t.shared.features[name] = false
+  -- HARF: not supported
   end
 end
 function aux.specified_feature(id, name)
@@ -115,6 +123,7 @@ local function get_vmet_table(tfmdata, dest)
 end
 aux.get_vmet_table = get_vmet_table
 end
+
 local function loop_over_duplicates(id, func)
 -- func: return non-nil iff abort this fn
   local t = (type(id)=="table") and id or getfont(id)
@@ -127,17 +136,18 @@ end
 aux.loop_over_duplicates = loop_over_duplicates
 
 local function loop_over_feat(id, feature_name, func, universal, typ)
--- feature_name: like { vert=true, vrt2 = true, ...}
+-- feature_name: string
 -- func: return non-nil iff abort this fn
 -- universal: true iff look up all (script, lang) pair
   typ = typ or 'gsub_single'
   local t = (type(id)=="table") and id or getfont(id)
   if t and t.resources and t.resources.sequences then -- HARF: not executed
+    local scr, lang = t.properties.script, t.properties.language
     for _,i in pairs(t.resources.sequences) do
-      if i.order[1] and feature_name[i.order[1]] then
+      if feature_name==i.order[1] then
         local f = i.features and i.features[i.order[1]]
         if i.type == typ and i.steps
-          and f and (universal or (f[t.properties.script] and f[t.properties.script][t.properties.language])) then
+          and f and (universal or (f[scr] and f[scr][lang])) then
           for _,j in pairs(i.steps) do
             if type(j)=='table' then
               if type(j.coverage)=='table' then
@@ -154,11 +164,10 @@ local function loop_over_feat(id, feature_name, func, universal, typ)
 end
 
 aux.loop_over_feat = loop_over_feat
-local vert_vrt2 = { vert=true, vrt2=true }
 function aux.replace_vert_variant(id, c)
-  return loop_over_feat(id, vert_vrt2,
-           function (i,k) if i==c then return k end end)
-	 or c
+  local fn = function (i,k) if i==c then return k end end
+  return loop_over_feat(id, 'vrt2', fn) 
+    or loop_over_feat(id, 'vert', fn) or c
 end
 
 
