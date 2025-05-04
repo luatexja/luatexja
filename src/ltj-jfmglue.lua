@@ -1012,7 +1012,6 @@ inspect_np_first = function()
    local pf = Np.font; if Nq.font~=pf then return end
    local qc, pc = Nq.char, Np.char; local kern
    if get_attr(Np.first, attr_jchar_class)==-40112 then
-      print("BYPASSED", getkern(Np.first)/65536)
       setfield(Np.first, 'subtype', 1); return
    elseif specified_feature(pf, 'kern') then
       loop_over_feat(pf, 'kern', 

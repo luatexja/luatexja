@@ -796,7 +796,6 @@ end
 ------------------------------------------------------------------------
 luatexja.jfont.font_extra_info = font_extra_info -- key: fontnumber
 local font_extra_basename = {} -- key: basename
-local font_extra_basename_index = 0
 local rotate_exception = {
   [0xFF1A]= { ['zht'] = true, },
   [0xFF1B]= { ['zht'] = true, },
@@ -812,7 +811,7 @@ do
   local function rotate_in_uax50(i)
     local lo, hi = 1, #t
     while lo < hi do
-      local mi = math.ceil((lo+hi)/2)
+      local mi = ceil((lo+hi)/2)
       if t[mi]<=i then lo=mi else hi=mi-1 end
     end
     return lo%2==1
@@ -855,7 +854,6 @@ do
    local lfs = require"lfs"
    local file_attributes = lfs.attributes
    local load_cache, save_cache = ltjb.load_cache, ltjb.save_cache
-   local addfeature = fonts.handlers.otf.addfeature
    local function prepare_extra_data_base(tfmdata)
       if (not tfmdata) or (not tfmdata.filename) then return end
       local bname = tfmdata.psname or nameonly(tfmdata.filename)
@@ -874,8 +872,6 @@ do
          -- if the cache is not found or outdated, save the cache
          if dest then
             font_extra_basename[bname] = dest[1] or {}
-            dest[1].index = font_extra_basename_index
-            font_extra_basename_index = font_extra_basename_index + 1
             local vheight, vorigin = dest[1].vheight, dest[1].vorigin
             local vhd, vod = vheight.default, vorigin.default
             setmetatable(vheight, {__index = function () return vhd end } )
@@ -890,8 +886,6 @@ do
                          lotf_version = luaotfload.version,
                          dest,
                        })
-            dest.index = font_extra_basename_index
-            font_extra_basename_index = font_extra_basename_index + 1
          end
          return bname
       end
