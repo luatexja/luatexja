@@ -34,7 +34,6 @@ local cat_lp = luatexbase.catcodetables['latex-package']
 local FROM_JFM     = luatexja.icflag_table.FROM_JFM
 
 luatexja.jfont = luatexja.jfont or {}
-local feat_tate_kern = { vkrn='vkrn_ltj', vapk='vapk_ltj' }
 ------------------------------------------------------------------------
 -- LOADING JFM
 ------------------------------------------------------------------------
@@ -338,16 +337,6 @@ do
          ltju.enable_feature(fn, vert_name)
          ltju.loop_over_feat(f, vert_name, function (i,k) rot[i] = nil end)
       end
-      if jfm_dir=='tate' then
-         for i,v in pairs(feat_tate_kern) do
-            if ltju.specified_feature(fn, i) then
-               local v = v..tostring(font_extra_info[fn].index)
-               print('TATE', fn, '-'..i, '+'..v)
-               ltju.disable_feature(fn, i); ltju.enable_feature(fn, v)
-            end
-         end
-      end
-
       fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
       font_metric_table[fn]=fmtable
       tex.sprint(cat_lp, global_flag, '\\protected\\expandafter\\def\\ltj@temp',
@@ -904,19 +893,6 @@ do
                        })
             dest.index = font_extra_basename_index
             font_extra_basename_index = font_extra_basename_index + 1
-         end
-         if font_extra_basename[bname] and font_extra_basename[bname].ltj_feat then
-            local ff =font_extra_basename[bname].ltj_feat
-            for i,v in pairs(feat_tate_kern) do
-               if ff[i] then
-                 print('EXTRA', bname, v..tostring(font_extra_basename[bname].index))
-                 addfeature({
-                   name=v..tostring(font_extra_basename[bname].index), 
-                   type='kern', dataset=ff[i]
-                 })
-               end
-            end
-         else print('EXTRA', bname, '======')
          end
          return bname
       end

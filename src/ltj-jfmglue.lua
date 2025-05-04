@@ -1003,36 +1003,33 @@ local getkern = node.direct.getkern
 local font_getfont, round = font.getfont, tex.round
 local loop_over_feat = ltju.loop_over_feat
 local specified_feature = ltju.specified_feature
-local feat_kern_table = { kern='kern',
-  vkrn_ltj=function (i) return 'vkrn_ltj'..tostring(i) end,
-  vapk_ltj=function (i) return 'vapk_ltj'..tostring(i) end
-}
-local font_extra_info = ltjf.font_extra_info  
+local font_extra_info = ltjf.font_extra_info
+local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 inspect_np_first = function()
 -- Np.first は leftkern => palt 等の位置補正由来か kern 等のカーニング由来かを調べ
 -- 後者の部分を explicit kern として Np.first の前に挿入する
    if Np.id~=id_jglyph then return end
    local pf = Np.font; if Nq.font~=pf then return end
    local qc, pc = Nq.char, Np.char; local kern
-   for fn,ft in pairs(feat_kern_table) do
-      local real_fn =(type(ft)=='string') and ft or ft(font_extra_info[pf].index)
-      if specified_feature(pf, real_fn) then
-         loop_over_feat(pf, real_fn, 
-            function(i,k) 
-              if i==qc and type(k)=='table' and k[pc] then 
-                kern = (kern or 0) + k[pc] 
-              end
-            end,
-            false, 'gpos_pair')
-      end
-   end
-   if kern then
-      local pft = font_getfont(pf); kern = round((kern or 0)/pft.units*pft.size)
-      if kern==getkern(Np.first) then setfield(Np.first, 'subtype', 1)
-      elseif kern~=0 then
-         local k = node_new(id_kern, 1); set_attr(k, attr_icflag, PROCESSED)
-         setkern(k, kern); setkern(Np.first, getkern(Np.first)-kern)
-         insert_before(head, Np.first, k); Np.first = k
+   if get_attr(Np.first, attr_jchar_class)==-40112 then
+      print("BYPASSED", getkern(Np.first)/65536)
+      setfield(Np.first, 'subtype', 1); return
+   elseif specified_feature(pf, 'kern') then
+      loop_over_feat(pf, 'kern', 
+         function(i,k) 
+           if i==qc and type(k)=='table' and k[pc] then 
+             kern = (kern or 0) + k[pc] 
+           end
+         end,
+         false, 'gpos_pair')
+      if kern then
+         local pft = font_getfont(pf); kern = round((kern or 0)/pft.units*pft.size)
+         if kern==getkern(Np.first) then setfield(Np.first, 'subtype', 1)
+         elseif kern~=0 then
+            local k = node_new(id_kern, 1); set_attr(k, attr_icflag, PROCESSED)
+            setkern(k, kern); setkern(Np.first, getkern(Np.first)-kern)
+            insert_before(head, Np.first, k); Np.first = k
+         end
       end
    end
 end
@@ -1235,6 +1232,7 @@ end
 
 -- initialize
 -- return value: (the initial cursor lp), (last node)
+local conv_vkrn_to_kernnode
 local init_var
 do
    local id_local = node.id 'local_par'
@@ -1266,6 +1264,7 @@ do
       local is_dir_tate = list_dir==dir_tate
       capsule_glyph = is_dir_tate and ltjw.capsule_glyph_tate or ltjw.capsule_glyph_yoko
       attr_ablshift = is_dir_tate and attr_tablshift or attr_yablshift
+      if is_dir_tate then head = conv_vkrn_to_kernnode(head, mode) end
       local TEMP = node_new(id_glue)
       -- TEMP is a dummy node, which will be freed at the end of the callback.
       -- Without this node, set_attr(kanji_skip, ...) somehow creates an "orphaned"  attribute list.
@@ -1297,6 +1296,55 @@ do
    end
 end
 
+-------------------- vkrn 由来の yoffset を kern に変える
+do
+local font_getfont, round = font.getfont, tex.round
+local loop_over_feat = ltju.loop_over_feat
+local specified_feature = ltju.specified_feature
+local feat_vkrn_table = { vkrn=true }
+local traverse_glyph = node.direct.traverse_glyph
+local attr_jchar_class = luatexbase.attributes['ltj@charclass']
+local function get_vkrn(nf, pc, pn, fn)
+   local k = 0
+   loop_over_feat(nf, fn,
+      function(i,t) 
+         if i==pc then
+            t = t[pn]; t = t and t[1]
+            if type(t)=='table' and #t==4 then k = k + t[4] end
+         end
+      end,
+   false, 'gpos_pair')
+   return k
+end
+conv_vkrn_to_kernnode= function(ahead, mode)
+   local np, nn = ahead, node_next(ahead)
+   while nn do
+      if getid(nn)~=id_glyph or not if_lang_ja(nn) then
+         nn = node_next(nn)
+         while nn and getid(nn)==id_kern and getsubtype(nn)==0 do nn = node_next(nn) end
+         if not nn then break end
+      elseif (getid(np)==getid(nn))and(getid(nn)==id_glyph) then
+         local nf = getfont(nn)
+         if if_lang_ja(np) and if_lang_ja(nn) and getfont(np)==nf then
+            local pc, pn, k = getchar(np), getchar(nn), 0
+            if specified_feature(nf, 'vkrn') then k = get_vkrn(nf, pc, pn, 'vkrn') end
+            if specified_feature(nf, 'vapk') then k = k + get_vkrn(nf, pc, pn, 'vapk') end
+            if k~=0 then
+               local pft = font_getfont(nf); local corr_adv = k/pft.units*pft.size
+               setfield(np, 'yoffset', getfield(np, 'yoffset') + corr_adv)
+               local k = node_new(id_kern, 0); setkern(k, corr_adv); insert_before(ahead, nn, k)
+               set_attr(k, attr_jchar_class, -40112)
+               -- TODO: subtype of this node should be converted to 1 in inspect_np_first
+            end
+         end
+      end
+      np, nn = nn, node_next(nn)
+      while nn and getid(nn)==id_kern and getsubtype(nn)==0 do nn = node_next(nn) end
+   end
+   return ahead
+end
+end
+
 -------------------- 外部から呼ばれる関数
 
 local ensure_tex_attr = ltjb.ensure_tex_attr
@@ -1304,7 +1352,7 @@ local tex_getattr = tex.getattribute
 -- main interface
 function luatexja.jfmglue.main(ahead, mode, dir)
    if not ahead then return ahead end
-   head = ahead;
+   head = ahead
    local lp, last, par_indented, TEMP = init_var(mode,dir)
    lp = calc_np(last, lp)
    if Np then
