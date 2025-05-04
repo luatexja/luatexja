@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2025-05-02',
+  date = '2025-05-04',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}
@@ -1334,7 +1334,6 @@ conv_vkrn_to_kernnode= function(ahead, mode)
                setfield(np, 'yoffset', getfield(np, 'yoffset') + corr_adv)
                local k = node_new(id_kern, 0); setkern(k, corr_adv); insert_before(ahead, nn, k)
                set_attr(k, attr_jchar_class, -40112)
-               -- TODO: subtype of this node should be converted to 1 in inspect_np_first
             end
          end
       end

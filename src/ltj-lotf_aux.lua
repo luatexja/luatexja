@@ -124,44 +124,6 @@ end
 aux.get_vmet_table = get_vmet_table
 end
 
-do
-local dummy_table = {}
-local feat_list = { vkrn=true, vapk=true }
-local function construct_features_for_tate(tfmdata,dest)
-   if (not tfmdata) or (not tfmdata.resources) or (not tfmdata.resources.sequences) then
-     dest = dest or {}
-     dest.ltj_feat = dummy_table; return dest
-   end
-   local ltj_feat = {}
-   for _,i in pairs(tfmdata.resources.sequences) do
-     fname = i.order[1] or false
-     if feat_list[fname] then
-       local l1 = ltj_feat[fname]; if not l1 then l1 = {}; ltj_feat[fname] = l1 end
-       if i.type == 'gpos_pair' and i.steps then
-         local l2 = { features=i.features and i.features[i.order[1]] }; l1[#l1+1] = l2
-         local l3
-         for _,j in pairs(i.steps) do
-           if type(j)=='table' then
-             if type(j.coverage)=='table' then
-               for i,k in pairs(j.coverage) do
-                  if not l3 then l3 = {} end; l3[i] = {}
-                  for i2,k2 in pairs(k) do
-                     if type(k2)=='table' and type(k2[1])=='table' then l3[i][i2]=k2[1] and k2[1][4] end
-                  end
-               end
-             end
-           end
-         end
-         l2.data = l3
-       end
-     end
-  end
-  dest.ltj_feat = ltj_feat
-  return dest  
-end
-aux.construct_features_for_tate = construct_features_for_tate
-end
-
 local function loop_over_duplicates(id, func)
 -- func: return non-nil iff abort this fn
   local t = (type(id)=="table") and id or getfont(id)
@@ -180,11 +142,12 @@ local function loop_over_feat(id, feature_name, func, universal, typ)
   typ = typ or 'gsub_single'
   local t = (type(id)=="table") and id or getfont(id)
   if t and t.resources and t.resources.sequences then -- HARF: not executed
+    local scr, lang = t.properties.script, t.properties.language
     for _,i in pairs(t.resources.sequences) do
       if feature_name==i.order[1] then
         local f = i.features and i.features[i.order[1]]
         if i.type == typ and i.steps
-          and f and (universal or (f[t.properties.script] and f[t.properties.script][t.properties.language])) then
+          and f and (universal or (f[scr] and f[scr][lang])) then
           for _,j in pairs(i.steps) do
             if type(j)=='table' then
               if type(j.coverage)=='table' then
@@ -201,7 +164,6 @@ local function loop_over_feat(id, feature_name, func, universal, typ)
 end
 
 aux.loop_over_feat = loop_over_feat
-local vert_vrt2 = { vert=true, vrt2=true }
 function aux.replace_vert_variant(id, c)
   local fn = function (i,k) if i==c then return k end end
   return loop_over_feat(id, 'vrt2', fn) 

@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2025-05-02',
+  date = '2025-05-04',
   description = 'Loader for Japanese fonts',
 })
 
@@ -850,7 +850,7 @@ do
 end
 
 do
-   local cache_ver = 25
+   local cache_ver = 30
    local nameonly, lower = file.nameonly, string.lower
    local lfs = require"lfs"
    local file_attributes = lfs.attributes
@@ -882,7 +882,6 @@ do
             setmetatable(vorigin, {__index = function () return vod end } )
          else
             local dest = ltju.get_vmet_table(tfmdata, nil)
-            dest = ltju.construct_features_for_tate(tfmdata,dest)
             dest = list_rotate_glyphs(tfmdata, dest)
             font_extra_basename[bname] = dest or {}
             save_cache(v,
