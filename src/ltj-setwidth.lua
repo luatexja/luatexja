@@ -185,8 +185,23 @@ end
 local font_getfont = font.getfont
 local get_ascender, get_descender = ltju.get_ascender, ltju.get_descender
 local loop_over_feat = ltju.loop_over_feat
+local capsule_glyph_tate
+do
 local specified_feature = ltju.specified_feature
-local function capsule_glyph_tate(p, met, char_data, head, dir)
+local function get_valt(pf, fn, pc)
+   local k = 0
+   if specified_feature(pf, fn) then
+      loop_over_feat(pf, fn,
+         function(i,t)
+            if i==pc and type(t)=='table' then
+               if #t==4 then k = k + t[4] end
+            end
+         end,
+         false, 'gpos_single')
+   end
+   return k
+end
+local capsule_glyph_tate = function (p, met, char_data, head, dir)
    if not char_data then return node_next(p), head end
    local fwidth, pwidth, ascender = char_data.width
    local pf, pc = getfont(p), getchar(p)
@@ -210,17 +225,11 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
       pwidth, ascender = feir.vheight[pc]*met.size, feir.vorigin[pc]*met.size
    end
    local xo, yo = getoffsets(p)
-   local t = node.direct.getproperty(p)
-   do -- special treatment for "vpal" feature
-       local tx
-       if specified_feature(pf, 'vpal') then
-           loop_over_feat(pf, 'vpal',
-               function(i,k) if i==pc then tx=k end end,
-               false, 'gpos_single')
-           if type(tx)=='table' and #tx==4 then
-              local pft = font_getfont(pf); local corr_adv = tx[4]/pft.units*pft.size
-              pwidth = pwidth + corr_adv; yo = yo + corr_adv
-           end
+   do -- special treatment for 'vpal'/'vhal/ feature
+       local k = get_valt(pf, 'vpal', pc) + get_valt(pf, 'vhal', pc)
+       if k~=0 then
+           local pft = font_getfont(pf); local corr_adv = k/pft.units*pft.size
+           pwidth = pwidth + corr_adv; yo = yo + corr_adv
        end
    end
 
@@ -256,12 +265,12 @@ local function capsule_glyph_tate(p, met, char_data, head, dir)
    setnext(k3, wr);
 
    set_attr(box, attr_icflag, PACKED)
-   -- luatexja.ext_show_node(node.direct.tonode(box), 'A> ', print)
    head = q and node_insert_before(head, q, box)
       or node_insert_after(head, node_tail(head), box)
    return q, head, box
 end
 luatexja.setwidth.capsule_glyph_tate = capsule_glyph_tate
+end
 
 do
 local font_getfont, famfont = font.getfont, node.family_font

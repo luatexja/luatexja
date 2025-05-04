@@ -1300,7 +1300,6 @@ do
 local font_getfont, round = font.getfont, tex.round
 local loop_over_feat = ltju.loop_over_feat
 local specified_feature = ltju.specified_feature
-local feat_vkrn_table = { vkrn=true }
 local traverse_glyph = node.direct.traverse_glyph
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local function get_vkrn(nf, pc, pn, fn)
