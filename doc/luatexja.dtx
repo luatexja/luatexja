@@ -1189,7 +1189,7 @@ so \Pkg{ltjsclasses} uses the \texttt{nomag*} option\footnote{Same effect as
     \item \texttt{floats-footnotes-platex}プラグ：
     \pLaTeX の挙動を再現したもの．
   \end{itemize}
-  たとえば\texttt{floats-footnotes-platex}プラグを挿す場合は，次のようにする：
+  例えば\texttt{floats-footnotes-platex}プラグを挿す場合は，次のようにする：
   \begin{lstlisting}
     \AssignSocketPlug{build/column/outputbox}{floats-footnotes-platex}
   \end{lstlisting}
@@ -3398,7 +3398,7 @@ See \autoref{fig:primitive_overwrite} for an example.
 %<*ja>
 \subsection{再定義の抑制}
 場合によっては\LuaTeX-jaによるプリミティブの再定義が不都合を起こすこともある．
-たとえば，\Pkg{breqn}パッケージ（少なくともv0.98k, 2020\nobreakdash-09\nobreakdash-24)）は
+例えば，\Pkg{breqn}パッケージ（少なくともv0.98k, 2020\nobreakdash-09\nobreakdash-24)）は
 読み込み時に\cs{vadjust}, \cs{insert}がプリミティブのままであることを要請するので，
 このままでは\LuaTeX-jaの後で読み込むことはできない．
 
@@ -3892,11 +3892,11 @@ as shown in~\autoref{fig:ltjksp}.
 \paragraph{\texttt{ltjpci}「機能」}
 \label{pg:ltjpci}
 \Pkg{luaotfload}~v3.19以降では，標準でUnicode（文字から作られるノードたち）がNFCに正規化される
-ようになっている．これにより，ソース中でたとえば「か」と合成用濁点(\texttt{U+3099})を続けて入力した場合，
+ようになっている．これにより，ソース中で例えば「か」と合成用濁点(\texttt{U+3099})を続けて入力した場合，
 両者それぞれからノードが生成されるが，結果的には「が」を表す1ノードになるわけである．
 
 しかし，NFCに正規化することで，
-たとえば「\UTF{FA19}」(\texttt{U+FA19})が「神」(\texttt{U+795E})にというふうに，
+例えば「\UTF{FA19}」(\texttt{U+FA19})が「神」(\texttt{U+795E})にというふうに，
 CJK互換漢字がCJK統合漢字に変換されてしまうという問題がある．
 異体字セレクタを用いればこのようなことは起きないが，古くからあるフォントでは異体字セレクタをサポートしていない．
 
@@ -10371,18 +10371,18 @@ $g$は「文字コード \texttt{'boxbdd'} の文字」と\textit{Np}の間に�
 以後，\emph{典型的な例として，クラスタ\textit{Nq}と\textit{Np}が共に\textsf{\textmd{和文A}}である場合を見ていこう，}
 この場合が全ての場合の基本となる．
 
-\paragraph{カーニングの算出}
+\paragraph{カーニングの算出（横組）}
 クラスタ\textit{Np}の先頭がsubtype~0のカーン$k$である場合，$k$は次の2つを合計した量である：
 \begin{itemize}
   \item $\mathit{Nq}.\mathit{last}$,~$\mathit{Np}.\mathit{head}$という2つの\textbf{JAchar}の間に入るカーニング
   \item OpenTypeの\texttt{palt}機能などによる，$\mathit{Np}.\mathit{head}$の位置補正
 \end{itemize}
-たとえば
+例えば
 \begin{lstlisting}
 \jfont\KMPK = KozMinPr6N-Regular.otf:jfm=prop;+palt;+kern at 10pt
 \KMPK アイ
 \end{lstlisting}
-からは，次のノード列が得られる：
+からは，\Pkg{luaotfload}により次のノード列が得られる：
 \begin{equation}
 \overbrace{%
  {\mathop{\Node{kern}{$-0.4$\,pt}}\limits_{\textrm{subtype}=0}}\longrightarrow
@@ -10395,10 +10395,10 @@ $g$は「文字コード \texttt{'boxbdd'} の文字」と\textit{Np}の間に�
 \label{eq:node1}
 \end{equation}
 ここで，subtypeの値が0であるカーンは行分割でも除去されない．また
-3つ目のカーン$-1.2$\,ptは，カーニング$-0.9$\,ptと「イ」の位置補正$-0.3\,pt$の和である．
+3つ目のカーン$-1.2$\,ptは，カーニング$-0.9$\,ptと「イ」の位置補正$-0.3$\,ptの和である．
 「ア」「イ」間で行分割が起こる場合，前者$-0.9$\,pt分はなくなってほしいが，後者$-0.3$\,pt分は残ることが望ましい．
 
-そのため，\LuaTeX-jaでは\autoref{eq:node1}というノード列を
+そのため，\LuaTeX-jaでは(\ref{eq:node1})というノード列を
 \begin{equation*}
 \overbrace{%
  {\mathop{\Node{kern}{$-0.4$\,pt}}\limits_{\textrm{subtype}=0}}\longrightarrow
@@ -10413,7 +10413,41 @@ $g$は「文字コード \texttt{'boxbdd'} の文字」と\textit{Np}の間に�
 \end{equation*}
 と変換し，$(*)$の箇所にJFMグルーを挿入することになる．
 
-  
+\paragraph{カーニングの算出（縦組）}
+\Pkg{luaotfload}パッケージは，\texttt{vpal},~\texttt{vkrn}などの縦組時に用いられるOpenType機能を
+\textit{glyph\_node}の\texttt{yoffset}フィールド（\ref{ssec:yoffset}小節を参照）の値を増減することで
+「実装」している．これも，例えば
+\begin{lstlisting}
+\tate
+\tfont\KMVPK = KozMinPr6N-Regular.otf:jfm=propv;+vpal;+vkrn at 10pt
+\KMVPK アノ
+\end{lstlisting}
+からは，次のノード列が得られる：
+\begin{equation}
+\overbrace{%
+ {\mathop{\Node{glyph}{\cs{KMVPK}, `ア'}}\limits_{\texttt{yoffset}=1.2\,\textrm{pt}}}
+}^{\mathit{Nq}}
+ \longrightarrow
+\overbrace{%
+ {\mathop{\Node{glyph}{\cs{KMVPK}, `ノ'}}\limits_{\texttt{yoffset}=1.3\,\textrm{pt}}}
+}^{\mathit{Np}}
+  \label{eq:node2}
+\end{equation}
+
+各\textit{glyph\_node}の\texttt{yoffset}の値は
+\begin{enumerate}[label=(\roman*)]
+  \item OpenTypeの\texttt{vpal}, \texttt{vhal}機能によるグリフ高さの補正（狭める方向が正）
+  \item OpenTypeの\texttt{vkrn}, \texttt{vapk}機能によって入るカーニング（詰める方向が正）
+  \item その他
+\end{enumerate}
+の3種類に分かれる．例えば，(\ref{eq:node2})における1つ目のノード「ア」の\texttt{yoffset}の値は
+\begin{quote}
+  \leavevmode
+  \llap{(i)~}$0.6$\,pt\hfill (ii)~$0.7$\,pt（「ア」「イ」間のカーニング）\<\hfill
+  (iii)~上に$0.1$\,ptずらす（\texttt{vpal}機能由来）
+\end{quote}
+の和である．Lua\TeX-jaは(i),~(ii)の補正量を認識し，正しい位置になるように調整する．
+
 \paragraph{「右空白」の算出}
 次に，「右空白」にあたる量を算出する．通常はこれが，隣り合った2つの\textbf{JAchar}間に入る空白量となる．
 \begin{description}
@@ -10819,9 +10853,10 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 %<*ja>
 \section{ベースライン補正の方法}
 \subsection{\texttt{yoffset} フィールド}
+\label{ssec:yoffset}
 \Param{yalbaselineshift}等のベースライン補正は，基本的には対象となっている
-\textit{glyph\_node}の \texttt{yoffset} フィールドの値を増減することによって
-実装されている．なお，\texttt{yoffset} の値は上方向への移動量であるのに対し，
+\textit{glyph\_node}の\texttt{yoffset}フィールドの値を増減することによって
+実装されている．なお，\texttt{yoffset}の値は上方向への移動量であるのに対し，
 \Param{yalbaselineshift}などは下方向への移動量である．
 
 さて，\texttt{yoffset} の増減によって見かけのグリフ位置は上下に移動するが，

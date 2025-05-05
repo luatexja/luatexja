@@ -1304,14 +1304,16 @@ local traverse_glyph = node.direct.traverse_glyph
 local attr_jchar_class = luatexbase.attributes['ltj@charclass']
 local function get_vkrn(nf, pc, pn, fn)
    local k = 0
-   loop_over_feat(nf, fn,
-      function(i,t) 
-         if i==pc then
-            t = t[pn]; t = t and t[1]
-            if type(t)=='table' and #t==4 then k = k + t[4] end
-         end
-      end,
-   false, 'gpos_pair')
+   if specified_feature(nf, fn) then
+      loop_over_feat(nf, fn,
+         function(i,t) 
+            if i==pc then
+               t = t[pn]; t = t and t[1]
+               if type(t)=='table' and #t==4 then k = k + t[4] end
+            end
+         end,
+      false, 'gpos_pair')
+   end
    return k
 end
 conv_vkrn_to_kernnode= function(ahead, mode)
@@ -1324,9 +1326,8 @@ conv_vkrn_to_kernnode= function(ahead, mode)
       elseif (getid(np)==getid(nn))and(getid(nn)==id_glyph) then
          local nf = getfont(nn)
          if if_lang_ja(np) and if_lang_ja(nn) and getfont(np)==nf then
-            local pc, pn, k = getchar(np), getchar(nn), 0
-            if specified_feature(nf, 'vkrn') then k = get_vkrn(nf, pc, pn, 'vkrn') end
-            if specified_feature(nf, 'vapk') then k = k + get_vkrn(nf, pc, pn, 'vapk') end
+            local pc, pn = getchar(np), getchar(nn)
+            local k = get_vkrn(nf, pc, pn, 'vkrn') + get_vkrn(nf, pc, pn, 'vapk')
             if k~=0 then
                local pft = font_getfont(nf); local corr_adv = k/pft.units*pft.size
                setfield(np, 'yoffset', getfield(np, 'yoffset') + corr_adv)
