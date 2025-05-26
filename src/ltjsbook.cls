@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsbook}
-  [2025-04-27 ltjsclasses ]
+  [2025-05-26 ltjsclasses ]
 \def\jsc@clsname{ltjsbook}
 \def\Cjascale{0.924715}
 \RequirePackage{luatexja}
@@ -158,6 +158,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \DeclareOption{openright}{\@openrighttrue\@openleftfalse}
 \DeclareOption{openleft}{\@openlefttrue\@openrightfalse}
 \DeclareOption{openany}{\@openrightfalse\@openleftfalse}
+\providecommand\dollardollar@begin{$$}
 \def\eqnarray{%
    \stepcounter{equation}%
    \def\@currentlabel{\p@equation\theequation}%
@@ -166,7 +167,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
    \global\@eqcnt\z@
    \tabskip\@centering
    \let\\\@eqncr
-   $$\everycr{}\halign to\displaywidth\bgroup
+   \dollardollar@begin\everycr{}\halign to\displaywidth\bgroup
        \hskip\@centering$\displaystyle\tabskip\z@skip{##}$\@eqnsel
       &\global\@eqcnt\@ne \hfil$\displaystyle{{}##{}}$\hfil
       &\global\@eqcnt\tw@ $\displaystyle{##}$\hfil\tabskip\@centering
@@ -190,7 +191,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
     \setlength\belowdisplayskip{\abovedisplayskip}%
     \setlength\belowdisplayshortskip{\abovedisplayskip}%
     \setlength\abovedisplayshortskip{\abovedisplayskip}%
-    $$\everycr{}\halign to\linewidth% $$
+    \dollardollar@begin\everycr{}\halign to\linewidth% $$
     \bgroup
       \hskip\@centering$\displaystyle\tabskip\z@skip{##}$\@eqnsel
       &\global\@eqcnt\@ne \hfil$\displaystyle{{}##{}}$\hfil
