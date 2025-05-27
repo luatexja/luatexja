@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2025-05-05',
+  date = '2025-05-27',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}
@@ -415,7 +415,8 @@ function calc_np_aux_glyph_common(lp, acc_flag)
          Np.last_char = npn
          if r then
             local nf, nc = getfont(npn), getchar(npn)
-            local ct = (font_getfont(nf) or font.fonts[nf] ).characters[nc]
+            local ct = font_getfont(nf) or font.fonts[nf]
+            ct = ct and ct.characters; ct = ct and ct[nc]
             if not ct then -- variation selector
                node_free(r)
             elseif (ct.left_protruding or 0) == 0 then
