@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2025-05-03
+\ProvidesPackage{lltjcore}[2025-06-08
   Patch to LaTeX2e Kernel for LuaTeX-ja (for LaTeX2e >=2025-06-01)]
 \RequirePackage{etoolbox}
 
@@ -218,10 +218,10 @@
   {\pltx@adjust@wd@outputbox\vskip -\@outputbox@depth\@textbottom}{}{}%
 
 % トンボ対応用
-\AddToHook{build/page/reset}[lltjcore.tombow]{%
+\AddToHook{build/page/reset}[lltjcore/tombow]{%
   \@tombowreset@@paper
 }
-\AddToHook{shipout/background}[lltjcore.tombow]{%
+\AddToHook{shipout/background}[lltjcore/tombow]{%
   \put(72.27,-72.27){\lineskip\z@skip\lineskiplimit\z@\@outputtombow}%
 }
 

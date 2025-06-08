@@ -12,7 +12,7 @@
 \def\luatexjalatexLoaded{\endinput}
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{ltj-latex}[2024-05-16 LaTeX support of LuaTeX-ja]
+\ProvidesPackage{ltj-latex}[2025-06-08 LaTeX support of LuaTeX-ja]
 
 \endlinechar=13
 
@@ -64,7 +64,7 @@
 }
 
 \def\ltj@pkgpatch#1{\@ifnextchar[{\ltj@pkgpatch@{#1}}{\ltj@pkgpatch@{#1}[lltjp-#1]}}%]
-\def\ltj@pkgpatch@@{\AddToHook{begindocument/before}[luatexja.autopatch]}
+\def\ltj@pkgpatch@@{\AddToHook{begindocument/before}[luatexja/autopatch]}
 \def\ltj@pkgpatch@#1[#2]{%
   \ltj@pkgpatch@@{%
     \@ifpackageloaded{#1}{\@ifpackageloaded{#2}{}{\RequirePackage{#2}}}{}%
