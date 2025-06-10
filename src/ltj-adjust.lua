@@ -335,6 +335,8 @@ local function set_stretch(p, after, before, ind, ap, name)
 end
 
 function aw_step2(p, total, added_flag)
+   print('AW_STEP2')
+   luatexja.ext_show_node_list (node.direct.tonode(p), 'B> ', print)
    local name = (total>0) and 'stretch' or 'shrink'
    local id =  (total>0) and 1 or 2
    local res = total_stsh[id]
@@ -354,7 +356,9 @@ function aw_step2(p, total, added_flag)
       end
       total = total - res[i]
    end
-   return repack(p)
+   local f = repack(p);
+   luatexja.ext_show_node_list (node.direct.tonode(p), 'A> ', print); return f;
+   -- return repack(p)
 end
 end
 
@@ -437,15 +441,32 @@ do
       end
       return to_node(head)
    end
+   function adjust_width_vl(head, loc)
+     if loc=='post_linebreak' then
+       local p = to_direct(head)
+       local pf = node_prev(node_tail(p))
+       if getid(pf) == id_glue and getsubtype(pf) == 15 then
+         local removed_le = 0
+         pf = node_prev(node_prev(pf))
+         if getid(pf) == id_kern and get_attr_icflag(pf)==LINEEND then
+           removed_le = getwidth(pf); node_remove(p, pf); node_free(pf)
+         end
+         myaw_step2(p, myaw_step1_last(p, get_total_stretched(p), removed_le))
+       else
+         myaw_step2(p, myaw_step1(p, get_total_stretched(p)))
+       end
+       return to_node(p)
+    else return head end
+   end
    local is_reg = false
+   require'pre_append_to_vlist_filter'
    local function enable_cb(status_le, status_pr, status_lp, status_ls)
       if (status_le>0 or status_pr>0) and (not is_reg) then
-         ltjb.add_to_callback('post_linebreak_filter',
-            adjust_width, 'Adjust width',
-            luatexbase.priority_in_callback('post_linebreak_filter', 'ltj.lineskip')-1)
+         ltjb.add_to_callback('pre_append_to_vlist_filter',
+            adjust_width_vl, 'Adjust width', 1)
          is_reg = true
       elseif is_reg and (status_le==0 and status_pr==0) then
-         luatexbase.remove_from_callback('post_linebreak_filter', 'Adjust width')
+         luatexbase.remove_from_callback('pre_append_to_vlist_filter', 'Adjust width')
          is_reg = false
       end
       if status_le==2 then
