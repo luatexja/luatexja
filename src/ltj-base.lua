@@ -398,7 +398,34 @@ function ltjb.add_to_callback(name,fun,description,priority)
     return
 end
 
---- fix \e@alloc@luafunction@count (gh:5)
+---- use pre_append_to_vlist_filter if possible
+do
+   -- pre_append_to_vlist_filter.lua: distributed with lua-ul
+   local found = kpse.find_file('pre_append_to_vlist_filter.lua', 'lua')
+   if found then 
+      require 'pre_append_to_vlist_filter'
+      function ltjb.register_pre_append_to_vlist(func, desc, priority)
+         luatexbase.add_to_callback('pre_append_to_vlist_filter', 
+            function(head, loc) return (loc~='post_linebreak') and head or func(head) end,
+            desc,
+            (luatexbase.priority_in_callback('pre_append_to_vlist_filter', 'add underlines to list'))
+               or priority)
+      end
+      function ltjb.remove_from_pre_append_to_vlist(desc)
+         luatexbase.remove_from_callback('pre_append_to_vlist_filter', desc)
+      end
+   else
+      function ltjb.register_pre_append_to_vlist(func, desc, priority)
+         luatexbase.add_to_callback('post_linebreak_filter', func, desc)
+      end
+      function ltjb.remove_from_pre_append_to_vlist(desc)
+         luatexbase.remove_from_callback('post_linebreak_filter', desc)
+      end
+   end
+end
+
+
+---- fix \e@alloc@luafunction@count (gh:5)
 do
     local t = lua.get_functions_table()
     local m = 0

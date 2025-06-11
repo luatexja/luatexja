@@ -813,19 +813,7 @@ do
    end
 end
 do
-   -- pre_append_to_vlist_filter.lua: distributed with lua-ul
-   local found = kpse.find_file('pre_append_to_vlist_filter.lua', 'lua')
-   if not found then
-      luatexbase.add_to_callback('post_linebreak_filter', post_high_break, 'ltj.ruby.post_break')
-   else
-      require 'pre_append_to_vlist_filter'
-      luatexbase.add_to_callback('pre_append_to_vlist_filter', 
-         function(head, loc) 
-             return (loc~='post_linebreak') and head or post_high_break(head)
-         end,
-         'ltj.ruby.post_break',
-         (luatexbase.priority_in_callback('pre_append_to_vlist_filter', 'add underlines to list') or 1))
-   end
+   ltjb.register_pre_append_to_vlist(post_high_break, 'ltj.ruby.post_break', 1)
    luatexbase.add_to_callback('hpack_filter', 
      function(head) return post_high_hbox(pre_high(head)) end, 'ltj.ruby', 
      luatexbase.priority_in_callback('hpack_filter', 'add underlines to list') or nil)

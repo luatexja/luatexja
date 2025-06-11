@@ -335,8 +335,6 @@ local function set_stretch(p, after, before, ind, ap, name)
 end
 
 function aw_step2(p, total, added_flag)
-   print('AW_STEP2')
-   luatexja.ext_show_node_list (node.direct.tonode(p), 'B> ', print)
    local name = (total>0) and 'stretch' or 'shrink'
    local id =  (total>0) and 1 or 2
    local res = total_stsh[id]
@@ -356,9 +354,7 @@ function aw_step2(p, total, added_flag)
       end
       total = total - res[i]
    end
-   local f = repack(p);
-   luatexja.ext_show_node_list (node.direct.tonode(p), 'A> ', print); return f;
-   -- return repack(p)
+   return repack(p)
 end
 end
 
@@ -419,54 +415,29 @@ local adjust_width
 do
    local myaw_step1, myaw_step2, myaw_step1_last
    local dummy =  function(p,t,n) return t, false end
-   function adjust_width(head)
-      if not head then return head end
-      local last_p
+   function adjust_width(head, loc)
       for p in node_traverse_id(id_hlist, to_direct(head)) do
-         if last_p then
-            myaw_step2(last_p, myaw_step1(last_p, get_total_stretched(last_p)))
-         end
-         last_p = p
-      end
-      if last_p then
-         local removed_le = 0
-         local p = getlist(last_p); local pf = node_prev(node_tail(p))
+         local pf = node_prev(node_tail(getlist(p)))
          if getid(pf) == id_glue and getsubtype(pf) == 15 then
-           pf = node_prev(node_prev(pf))
-           if getid(pf) == id_kern and get_attr_icflag(pf)==LINEEND then
-             removed_le = getwidth(pf); node_remove(p, pf); node_free(pf)
-           end
-         end
-         myaw_step2(last_p, myaw_step1_last(last_p, get_total_stretched(last_p), removed_le))
-      end
-      return to_node(head)
-   end
-   function adjust_width_vl(head, loc)
-     if loc=='post_linebreak' then
-       local p = to_direct(head)
-       local pf = node_prev(node_tail(p))
-       if getid(pf) == id_glue and getsubtype(pf) == 15 then
-         local removed_le = 0
-         pf = node_prev(node_prev(pf))
-         if getid(pf) == id_kern and get_attr_icflag(pf)==LINEEND then
-           removed_le = getwidth(pf); node_remove(p, pf); node_free(pf)
-         end
-         myaw_step2(p, myaw_step1_last(p, get_total_stretched(p), removed_le))
-       else
-         myaw_step2(p, myaw_step1(p, get_total_stretched(p)))
+            local removed_le = 0
+            pf = node_prev(node_prev(pf))
+            if getid(pf) == id_kern and get_attr_icflag(pf)==LINEEND then
+               removed_le = getwidth(pf); node_remove(p, pf); node_free(pf)
+            end
+            myaw_step2(p, myaw_step1_last(p, get_total_stretched(p), removed_le))
+          else
+            myaw_step2(p, myaw_step1(p, get_total_stretched(p)))
+          end
        end
-       return to_node(p)
-    else return head end
+       return to_node(head)
    end
    local is_reg = false
-   require'pre_append_to_vlist_filter'
    local function enable_cb(status_le, status_pr, status_lp, status_ls)
       if (status_le>0 or status_pr>0) and (not is_reg) then
-         ltjb.add_to_callback('pre_append_to_vlist_filter',
-            adjust_width_vl, 'Adjust width', 1)
+         ltjb.register_pre_append_to_vlist(adjust_width, 'Adjust width', 1)
          is_reg = true
       elseif is_reg and (status_le==0 and status_pr==0) then
-         luatexbase.remove_from_callback('pre_append_to_vlist_filter', 'Adjust width')
+         ltjb.remove_from_pre_append_to_vlist 'Adjust width'
          is_reg = false
       end
       if status_le==2 then
