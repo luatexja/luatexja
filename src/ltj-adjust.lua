@@ -29,7 +29,7 @@ local setkern = node.direct.setkern
 local setlist = node.direct.setlist
 
 local node_traverse_id = node.direct.traverse_id
-local node_new = node.direct.new
+local node_new = luatexja.dnode_new
 local node_next = node.direct.getnext
 local node_free = node.direct.flush_node or node.direct.free
 local node_prev = node.direct.getprev
@@ -368,27 +368,27 @@ do
          local eadt = nq.met.char_type[nq.class].end_adjust
          if not eadt then return end
          if eadt[1]~=0 then
-            local x = node_new(id_kern, 1)
+            local x = node_new(id_kern, 1, nq.nuc, np.nuc)
             setkern(x, eadt[1]); set_attr(x, attr_icflag, LINEEND)
             insert_before(head, np.first, x)
          end
          local eadt_num = #eadt
          for i=2,eadt_num do
-            local x = node_new(id_penalty)
+            local x = node_new(id_penalty, nq.nuc, np.nuc)
             setpenalty(x, 0); set_attr(x, attr_icflag, KINSOKU)
             insert_before(head, np.first, x); Bp[#Bp+1] = x
-            local x = node_new(id_kern, 1)
+            local x = node_new(id_kern, 1, nq.nuc, np.nuc)
             setkern(x, eadt[i]-eadt[i-1]); set_attr(x, attr_icflag, LINEEND)
             insert_before(head, np.first, x)
          end
          if eadt_num>1 or eadt[1]~=0 then
-            local x = node_new(id_penalty)
+            local x = node_new(id_penalty, nq.nuc, np.nuc)
             setpenalty(x, 0); set_attr(x, attr_icflag, KINSOKU)
             insert_before(head, np.first, x); Bp[#Bp+1] = x
-            local x = node_new(id_kern, 1)
+            local x = node_new(id_kern, 1, nq.nuc, np.nuc)
             setkern(x, -eadt[eadt_num]); set_attr(x, attr_icflag, LINEEND)
             insert_before(head, np.first, x)
-            local x = node_new(id_penalty)
+            local x = node_new(id_penalty, nq.nuc, np.nuc)
             setpenalty(x, 10000); set_attr(x, attr_icflag, KINSOKU)
             insert_before(head, np.first, x); Bp[#Bp+1] = x
          end
@@ -403,7 +403,7 @@ do
       if nq.met then
          local eadt = nq.met.char_type[nq.class].end_adjust
          if eadt and eadt[1]<0 then
-            local x = node_new(id_kern, 1)
+            local x = node_new(id_kern, 1, nq.nuc)
             setkern(x, eadt[1]); set_attr(x, attr_icflag, LINEEND)
             insert_before(head, node_prev(last), x)
          end

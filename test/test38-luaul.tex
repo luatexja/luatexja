@@ -1,0 +1,28 @@
+\documentclass{article}
+\makeatletter
+\def\ltj@stdyokojfm{jlreq}
+\usepackage{luatexja-adjust,lua-ul}
+\ltjenableadjust[priority=false,lineend=extended]
+\newunderlinetype\beginUnderWaby{\cleaders\hbox{%
+ \vrule height -0.1em depth 0.15em width 0.3\zw
+}}
+
+\NewDocumentCommand{\underWaby}{+m}{{\beginUnderWaby#1}}
+\textwidth=20\zw
+
+\begin{document}
+\underWaby{あああ【いいい】ううう}\par\underWaby{「かかか」きく・けけ}\par
+\underWaby{ああ（ほげ）いいい}，\underWaby{ほげ，ふが．ぴよ」}
+
+\parindent0pt
+\def\R#1{\par \underWaby{あああああ\vrule width #1\zw ああああああああああああああ」あああ}}
+
+\R{0}
+\R{0.25}
+\R{0.5}
+\R{0.75}
+\R{1}
+\R{1.25}
+\R{1.5}
+
+\end{document}
