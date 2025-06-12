@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2025-06-08
+\ProvidesPackage{lltjcore}[2025-06-12
   Patch to LaTeX2e Kernel for LuaTeX-ja (for LaTeX2e >=2025-06-01)]
 \RequirePackage{etoolbox}
 
@@ -180,9 +180,6 @@
 \AddToHook{build/page/reset}[lltjcore]{%
   \ifnum\ltjgetparameter{direction}=4\else
     \dimen\z@\textwidth \textwidth\textheight \textheight\dimen\z@
-    \let\@themargin\evensidemargin
-    \let\evensidemargin\oddsidemargin
-    \let\oddsidemargin\@themargin
   \fi
   \directlua{luatexja.lineskip.setting_backup()}%
 }
