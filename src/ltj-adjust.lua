@@ -194,7 +194,7 @@ local function aw_step1(p, total)
        return a[4]<b[4]
    end)
    if eadt[eadt_ratio[1][1]]~=0 then
-      local kn = node_new(id_kern, 1)
+      local kn = node_new(id_kern, 1,x)
       setkern(kn, eadt[eadt_ratio[1][1]]); set_attr(kn, attr_icflag, LINEEND)
       insert_after(head, x, kn)
       return eadt_ratio[1][3], true

@@ -1,21 +1,29 @@
 \documentclass{article}
 \makeatletter
+\directlua{jlreq = { burasage = true } }
 \def\ltj@stdyokojfm{jlreq}
-\usepackage{luatexja-adjust,lua-ul}
-\ltjenableadjust[priority=false,lineend=extended]
-\newunderlinetype\beginUnderWaby{\cleaders\hbox{%
- \vrule height -0.1em depth 0.15em width 0.3\zw
+\usepackage{luatexja-adjust}
+\usepackage{lua-ul}
+\ltjenableadjust[priority=true,lineend=extended]
+\newunderlinetype\beginUnderBLine{\cleaders\hbox{%
+ \vrule height -0.1em depth 0.25em width 0.3\zw
 }}
 
-\NewDocumentCommand{\underWaby}{+m}{{\beginUnderWaby#1}}
+\NewDocumentCommand{\underBLine}{+m}{{\beginUnderBLine#1}}
 \textwidth=20\zw
 
 \begin{document}
-\underWaby{あああ【いいい】ううう}\par\underWaby{「かかか」きく・けけ}\par
-\underWaby{ああ（ほげ）いいい}，\underWaby{ほげ，ふが．ぴよ」}
-
 \parindent0pt
-\def\R#1{\par \underWaby{あああああ\vrule width #1\zw ああああああああああああああ」あああ}}
+\underBLine{あああ【いいい】ううう}\par\underBLine{「かかか」きく・けけ}\par
+\underBLine{ああ（ほげ）いいい}，\underBLine{ほげ，ふが．ぴよ」}
+
+\underLine{ほげほげ}．ふが．\par % これはうまく機能する
+あいうえ\underLine{お123いああああああああああああああああああああああ%
+ああああああああああああああああああああ}かきくけこ\par % 波線がページ端まで伸びてしまう
+ほげ，\underLine{あいうお}あああええええええええ1238ええええ$y=x$ええええええええええ
+ええええええええええx
+
+\def\R#1{\par \underBLine{あああああ\vrule width #1\zw ああああああああああああああ．あああ}}
 
 \R{0}
 \R{0.25}
@@ -24,5 +32,20 @@
 \R{1}
 \R{1.25}
 \R{1.5}
+
+\par\bigskip
+
+\ltjenableadjust[priority=false,lineend=true]
+\underBLine{あああ【いいい】ううう}\par\underBLine{「かかか」きく・けけ}\par
+\underBLine{ああ（ほげ）いいい}，\underBLine{ほげ，ふが．ぴよ」}
+
+\R{0}
+\R{0.25}
+\R{0.5}
+\R{0.75}
+\R{1}
+\R{1.25}
+\R{1.5}
+
 
 \end{document}
