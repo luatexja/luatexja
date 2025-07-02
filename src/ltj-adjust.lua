@@ -422,7 +422,7 @@ do
             local removed_le = 0
             pf = node_prev(node_prev(pf))
             if getid(pf) == id_kern and get_attr_icflag(pf)==LINEEND then
-               removed_le = getwidth(pf); node_remove(p, pf); node_free(pf)
+               removed_le = getwidth(pf); node_remove(getlist(p), pf); node_free(pf)
             end
             myaw_step2(p, myaw_step1_last(p, get_total_stretched(p), removed_le))
           else

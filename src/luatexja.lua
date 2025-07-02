@@ -433,6 +433,7 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
    local s
    local pt, pic = node_type(p.id), (get_attr(p, attr_icflag) or 0) --% icflag_table.PROCESSED_BEGIN_FLAG
    local base = prefix 
+--     .. string.format('[%9d] ', (node.direct.todirect(p)))
      .. string.format('%4X', pic) .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
    if pt == 'glyph' then
       s = base .. ' '
