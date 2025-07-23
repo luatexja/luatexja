@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec-29e}[2024-05-27 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec-29e}[2024-07-23 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e}
 \ExplSyntaxOn
 
@@ -275,7 +275,7 @@
 
         \keys_set_known:neN {fontspec-ltjaltfont} { \exp_after:wN \use:n ##1 }
           \l__ltj_fontspec_altfont_leftover_clist
-        \keys_set_known:nn {fontspec-ltjaltfont-reparse} { \exp_after:wN \use:n ##1 }
+        \keys_set_known:ne {fontspec-ltjaltfont-reparse} { \exp_after:wN \use:n ##1 }
 
         \tl_if_empty:NT \l__ltj_fontspec_altrange_tl {
           \msg_warning:nnn  {luatexja-fontspec} {altfont-ignored-by-norange} { ##1 }
