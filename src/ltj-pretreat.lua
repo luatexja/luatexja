@@ -67,7 +67,11 @@ do
       = ltjb.start_time_measure, ltjb.stop_time_measure
    local head
    local suppress_hyphenate_ja_aux = {
-      [id_math] = function(p) return node_next(node_end_of_math(node_next(p))) end,
+      [id_math] = function(p)
+        return node_next(
+          (getsubtype(p)==0) and (node_end_of_math(node_next(p))) or p
+        )
+      end,
       [id_whatsit] = function(p)
          if getsubtype(p)==sid_user then
             local uid = getfield(p, 'user_id')
