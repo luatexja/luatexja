@@ -1,5 +1,5 @@
 %
-% lltjp-listings.sty 2025-04-01
+% lltjp-listings.sty 2025-09-18
 %
 
 \NeedsTeXFormat{LaTeX2e}
@@ -402,20 +402,48 @@
                   \lst@newlines\z@ \lst@whitespacefalse}%
                  {}%
          \fi%
-         \ltj@lst@escape@setup#2%
+         \ltj@lst@escape@setup#2\@nil%
          #3\catcode\ltjlineendcomment=9\lst@escapebegin\expandafter\lst@next%"
          \fi}%
         {}}
 \def\ltj@lst@emptygrp{{}}
-\def\ltj@lst@escape@setup#1{%
-  \begingroup\lccode`\~=`#1\lowercase{%
-  \gdef\lst@next##1~{%
-     \let\lst@arg\@empty\ltj@lst@remove@jacmd{##1}%
-     \expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter
-	   \scantokens\expandafter\expandafter\expandafter{\expandafter\ltj@lst@emptygrp\lst@arg\empty}%
-     ~}%
-  }\endgroup
+\ifdefined\@temptokenb\else\newtoks\@temptokenb\fi
+\def\ltj@lst@escape@setup#1\@nil{%
+  \begingroup\@temptokenb{}\ltj@lst@escape@append@partext#1\@nil
+  \@temptokena\expandafter{\expanded{%
+    \noexpand\gdef\noexpand\lst@next##1\the\@temptokenb{%
+    \unexpanded{
+       \let\lst@arg\@empty\ltj@lst@remove@jacmd{##1}%
+       \expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter
+  	   \scantokens\expandafter\expandafter\expandafter{\expandafter\ltj@lst@emptygrp\lst@arg\empty}%
+    }%
+    \the\@temptokenb}}%
+  }%
+  \the\@temptokena\endgroup
 }
+\def\ltj@lst@escape@append@partext#1{%
+   \ifx#1\@nil\else
+      \begingroup\lccode`\~=`#1 \relax
+        \lowercase{%
+          \def\lst@temp{\@temptokenb\expandafter{\the\@temptokenb~}%
+             \expandafter\ltj@lst@escape@append@partext@A}%
+        }%
+      \expandafter\endgroup\lst@temp
+    \fi}
+\def\ltj@lst@escape@append@partext@A#1{%
+   \ifx#1\@nil\else
+     \@temptokenb\expandafter{\the\@temptokenb#1}%
+     \expandafter\ltj@lst@escape@append@partext@A
+  \fi}
+%  \begingroup\lccode`\~=`#1\lowercase{%
+%  \gdef\lst@next##1~{%
+%     \let\lst@arg\@empty\ltj@lst@remove@jacmd{##1}%
+%     \typeout{ltj@next: <\lst@arg>}%
+%     \expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter
+%	   \scantokens\expandafter\expandafter\expandafter{\expandafter\ltj@lst@emptygrp\lst@arg\empty}%
+%     ~}%
+%  }\endgroup
+%}
 \begingroup
   \lccode`\|=\ltjlineendcomment \lowercase{%"
   \gdef\ltj@lst@remove@jacmd#1{%

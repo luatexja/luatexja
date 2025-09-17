@@ -153,9 +153,11 @@ IVS対応1: \texttt{vsraw=false} (default)
 
 IVS対応2: \texttt{vsraw=true}
 
-\begin{LTXexample}[escapechar=\%,vsraw, basicstyle=\tt]
+\begin{LTXexample}[escapechar=\%,vsraw=true, basicstyle=\tt]
 123456789012345678
 1葛󠄀城，葛󠄁飾ｱｲｳ
+1葛󠄀城，葛󠄁飾
+󠄀a
 \end{LTXexample}
 
 \newpage
@@ -232,4 +234,13 @@ Foo ÷fo#shbarあ{#}o÷ Foo
 ÷いfo#shbarあ{#}}o÷
 あえbazあ
 あbaxあ
+
+\newpage
+\textbf{gh/\#33}
+\begin{lstlisting}[escapeinside={(*@}{@*)}]
+  (*@\sffamily\gtfamily Testあa@>うbいr@*)あ@*)か;
+  (*@\sffamily\gtfamily Testあa@*)あ@>か;
+  (*@Test@*);
+\end{lstlisting}
+
 \end{document}
