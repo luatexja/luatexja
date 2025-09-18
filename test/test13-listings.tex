@@ -35,7 +35,7 @@
 }{}
 \DeclareKanjiFamily{JY3}{koz}{}
 \DeclareFontShape{JY3}{koz}{m}{n}{<-> s * [1.2] KozMinPr6N-Regular:jfm=ujis}{}
-\DeclareFontShape{JY3}{koz}{m}{sl}{<-> s * [1.2] psft:Ryumin-Light:jfm=ujis;slant=0.167}{}
+\DeclareFontShape{JY3}{koz}{m}{sl}{<-> s * [1.2] KozMinPr6N-Medium:jfm=ujis;slant=0.167}{}
 \DeclareFontShape{JY3}{koz}{m}{it}{<-> ssub* koz/m/sl}{}
 \def\mcdefault{koz}
 
@@ -52,14 +52,14 @@ This test file is based on a.tex\footnote{This can be downloaded from {\tt https
 The cause of the latter problem is that Japanese fonts don't have italic shape by default.
 In this document, we define them by
 \begin{lstlisting}[language={[AlLaTeX]TeX}, basicstyle=\ttfamily]
-\DeclareFontShape{JY3}{mc}{m}{sl}{<-> s * [0.92489] psft:Ryumin-Light:jfm=ujis;slant=0.167}{}
+\DeclareFontShape{JY3}{mc}{m}{sl}{<-> s * [0.92489] KozMinPr6N-Medium:jfm=ujis;slant=0.167}{}
 \DeclareFontShape{JY3}{mc}{m}{it}{<-> ssub* mc/m/sl}{}
 \end{lstlisting}
 \newpage
 
 We also avoid white band problem, by setting the value of \cs{lineskiplimit} to
 \begin{multline}
- -\min(\cs{cht}-\cs{ht}\cs{strutbox}, 0)\\
+ {-\min(\cs{cht}-\cs{ht}\cs{strutbox}, 0)}\\
  -\min(\cs{cdp}-\cs{dp}\cs{strutbox}, 0).
 \end{multline}
 
@@ -242,5 +242,12 @@ Foo ÷fo#shbarあ{#}o÷ Foo
   (*@\sffamily\gtfamily Testあa@*)あ@>か;
   (*@Test@*);
 \end{lstlisting}
+
+\begin{lstlisting}[escapeinside={//*}{\^^M},escapebegin=\tiny]
+  aあ//*あいa\the\lineskiplimit
+  かa6sい
+\end{lstlisting}
+
+Note that white bands appear again.
 
 \end{document}

@@ -1,5 +1,5 @@
 %
-% lltjp-listings.sty 2025-09-18
+% lltjp-listings.sty 2025-09-19
 %
 
 \NeedsTeXFormat{LaTeX2e}
@@ -412,12 +412,12 @@
   \begingroup\@temptokenb{}\ltj@lst@escape@append@partext#1\@nil
   \@temptokena\expandafter{\expanded{%
     \noexpand\gdef\noexpand\lst@next##1\the\@temptokenb{%
-    \unexpanded{
+    \unexpanded{%
        \let\lst@arg\@empty\ltj@lst@remove@jacmd{##1}%
        \expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter
   	   \scantokens\expandafter\expandafter\expandafter{\expandafter\ltj@lst@emptygrp\lst@arg\empty}%
     }%
-    \the\@temptokenb}}%
+    \ifx\^^M#1\else\the\@temptokenb\fi}}%
   }%
   \the\@temptokena\endgroup
 }
@@ -444,15 +444,18 @@
 %     ~}%
 %  }\endgroup
 %}
+\def\ltj@lst@relax{}
 \begingroup
   \lccode`\|=\ltjlineendcomment \lowercase{%"
   \gdef\ltj@lst@remove@jacmd#1{%
     \expandafter\ltj@lst@remove@jacmd@\detokenize{#1}|\@nil|}
   \gdef\ltj@lst@remove@jacmd@#1|{%
-    \ifx#1\@nil\else
-       \lst@lAddTo\lst@arg{#1}%
-       \expandafter\ltj@lst@remove@jacmd@
-    \fi}}
+    \ifx#1\@nil\empty
+    \else
+      \ifx\empty#1\empty\else\lst@lAddTo\lst@arg{#1}\fi
+      \expandafter\ltj@lst@remove@jacmd@
+    \fi
+  }}
 \endgroup
 
 %%%%%%%%%%%%%%%% texcl
