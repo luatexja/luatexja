@@ -1,5 +1,5 @@
 %
-% lltjp-listings.sty 2025-09-19
+% lltjp-listings.sty 2025-09-21
 %
 
 \NeedsTeXFormat{LaTeX2e}
@@ -334,7 +334,8 @@
 
 % 白線対策
 \newif\ifltj@lst@frame@top
-\newdimen\ltj@lst@frame@lslimit
+\newdimen\ltj@lst@frame@lslimit@h
+\newdimen\ltj@lst@frame@lslimit@d
 \gdef\lst@frameInit{%
     \ltj@lst@frame@toptrue
     \ifx\lst@framelshape\@empty \let\lst@frameL\@empty \fi
@@ -354,13 +355,12 @@
     \fi
     \lst@frameMakeBoxV\lst@framebox{\ht\strutbox}{\dp\strutbox}%
     %%%%  ここから
-    \@tempdima\z@
-    \ifdim\ht\strutbox<\cht\@tempdima=\dimexpr\cht-\ht\strutbox\relax\fi
-    \ifdim\dp\strutbox<\cdp\@tempdima=\dimexpr\cdp-\dp\strutbox\relax\fi
-    \ltj@lst@frame@lslimit=-\@tempdima
-    \def\lst@framelr{%
-      \ifltj@lst@frame@top\ltj@lst@frame@topfalse\else\lineskiplimit\ltj@lst@frame@lslimit\fi
-      \copy\lst@framebox}%
+    \ltj@lst@frame@lslimit@h\z@
+    \ifdim\ht\strutbox<\cht\ltj@lst@frame@lslimit@h\dimexpr-\cht+\ht\strutbox\relax\fi
+    \ltj@lst@frame@lslimit@d\z@
+    \ifdim\dp\strutbox<\cdp\ltj@lst@frame@lslimit@d\dimexpr-\cdp+\dp\strutbox\relax\fi
+    \lineskiplimit\dimexpr\ltj@lst@frame@lslimit@h+\ltj@lst@frame@lslimit@d\relax
+    \def\lst@framelr{\copy\lst@framebox}%
     %%%% ここまで
     \ifx\lst@frametshape\@empty\else
         \lst@frameH T\lst@frametshape
@@ -376,10 +376,8 @@
             \noindent\box\z@\par
             \lineskiplimit\maxdimen \lineskip\z@
         \fi
-        \lst@frameSpreadV\lst@framextopmargin
+        \lst@frameSpreadV\lst@framextopmargin\vspace*{\ltj@lst@frame@lslimit@h}%
     \fi}
-
-
 
 %%%%%%%%%%%%%%%% escape to \LaTeX
 \lstloadaspects{escape}

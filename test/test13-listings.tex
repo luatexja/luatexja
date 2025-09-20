@@ -1,6 +1,5 @@
 %#!lualatex
 \documentclass{article}
-
 \usepackage{listings,color,showexpl,comment}
 \lstMakeShortInline÷
 \usepackage{luatexja-fontspec,amsmath}
@@ -64,6 +63,7 @@ We also avoid white band problem, by setting the value of \cs{lineskiplimit} to
 \end{multline}
 
 Note: we still have a white band if the first line is line-broken.
+(This is resolved at 2025-09-21)
 
 \begin{env}{\relax}
 #!/bin/sh
@@ -213,7 +213,7 @@ foo \lstinline[basicstyle=\tt\gtfamily]!あreturn 0; #shbar! baz あ
 
 あおいうえお
 \begin{lstlisting}[frame=single]
-aiu
+aiuあ
 \end{lstlisting}
 あいうえお
 
@@ -237,17 +237,16 @@ Foo ÷fo#shbarあ{#}o÷ Foo
 
 \newpage
 \textbf{gh/\#33}
+%\tracingall\tracingassigns=2
 \begin{lstlisting}[escapeinside={(*@}{@*)}]
   (*@\sffamily\gtfamily Testあa@>うbいr@*)あ@*)か;
   (*@\sffamily\gtfamily Testあa@*)あ@>か;
   (*@Test@*);
 \end{lstlisting}
+%\tracingnone
 
-\begin{lstlisting}[escapeinside={//*}{\^^M},escapebegin=\tiny]
-  aあ//*あいa\the\lineskiplimit
-  かa6sい
+\begin{lstlisting}[escapeinside={//*}{\^^M},escapebegin=]
+  aあ//*あいa
+  かa6sい//*i
 \end{lstlisting}
-
-Note that white bands appear again.
-
 \end{document}
