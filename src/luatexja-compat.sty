@@ -65,7 +65,7 @@
   \expandafter\let\csname ifltj@in@latex\expandafter\endcsname
     \csname iftrue\endcsname
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesPackage{luatexja-compat}[2020-08-08 Compatibility with pTeX]
+  \ProvidesPackage{luatexja-compat}[2025-09-21 Compatibility with pTeX]
 \fi                             %</LaTeX>
 
 % Load core module if not yet.
@@ -113,9 +113,11 @@
     \everypar{\unexpanded\expandafter{\the\everypar}}%
     \unexpanded\expandafter{\the\everypar}\inhibitglue}}%
 \@tempa\fi}
-  \newcommand\printglossary{\@input@{\jobname.gls}}
-\csname newcount\endcsname\hour
-\csname newcount\endcsname\minute
+\AtBeginDocument{%
+  \ifdefined\printglossary\else\newcommand\printglossary{\@input@{\jobname.gls}}\fi
+}%
+\ifdefined\hour\else\csname newcount\endcsname\hour\fi
+\ifdefined\minute\else\csname newcount\endcsname\minute\fi
 \fi
 
 %%------------------ all done
