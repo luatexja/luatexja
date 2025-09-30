@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2024-07-23 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2025-09-30 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -19,7 +19,8 @@
 
 \msg_new:nnn { luatexja-preset }{ exist-preset-nooverwrite }{
   The~ preset~ `#1'~ is~ already~ defined.~
-  To~ redefine~ this~ preset,~ use~ \str_use:N \c_backslash_str ltjnewpreset*~ instead.
+  To~ redefine~ this~ preset,~ use~
+  \str_use:N \c_backslash_str ltjnewpreset*~ instead.
 }
 \msg_new:nnn { luatexja-preset }{ exist-preset-overwrite }{
   The~ preset~ `#1'~ is~ redefined.
@@ -40,9 +41,12 @@
     \renewcommand\jttdefault{\gtdefault}\@ltj@match@familytrue
     \PassOptionsToPackage { match } { luatexja-fontspec },
   match .value_forbidden:n = true,
-  __custom  .bool_set:N = \g__ltjpreset_custom_bool,  __custom  .groups:n = { preset },
-  __office  .bool_set:N = \g__ltjpreset_office_bool,  __office  .groups:n = { preset },
-  __noembed .bool_set:N = \g__ltjpreset_noembed_bool, __noembed .groups:n = { preset },
+  __custom  .bool_set:N = \g__ltjpreset_custom_bool,
+  __custom  .groups:n = { preset },
+  __office  .bool_set:N = \g__ltjpreset_office_bool,
+  __office  .groups:n = { preset },
+  __noembed .bool_set:N = \g__ltjpreset_noembed_bool,
+  __noembed .groups:n = { preset },
 }
 \cs_new:Nn \__ltjpreset_declare_option:nn {
   \keys_define:nn { luatexja-preset }{
@@ -76,19 +80,25 @@
 \__ltjpreset_declare_bool_option:nn { nocheck }{ check }
 
 % JFM
-\tl_new:N \__ltjpreset_use_jfm_yoko_tl % 使用する JFM（横）
-\tl_set:Nn \__ltjpreset_use_jfm_yoko_tl {\ltj@stdyokojfm}
-\tl_new:N \__ltjpreset_use_jfm_tate_tl % 使用する JFM（縦）
-\tl_set:Nn \__ltjpreset_use_jfm_tate_tl {\ltj@stdtatejfm}
-\__ltjpreset_declare_option:nn{jis}{\tl_set:Nn  \__ltjpreset_use_jfm_yoko_tl {jis}}     % jis
-\__ltjpreset_declare_option:nn{ujis}{\tl_set:Nn  \__ltjpreset_use_jfm_yoko_tl {ujis}}   % ujis
+\tl_new:N \l__ltjpreset_use_jfm_yoko_tl % 使用する JFM（横）
+\tl_set:Nn \l__ltjpreset_use_jfm_yoko_tl {\ltj@stdyokojfm}
+\tl_new:N \l__ltjpreset_use_jfm_tate_tl % 使用する JFM（縦）
+\tl_set:Nn \l__ltjpreset_use_jfm_tate_tl {\ltj@stdtatejfm}
+\__ltjpreset_declare_option:nn{jis}
+  {\tl_set:Nn  \l__ltjpreset_use_jfm_yoko_tl {jis}}     % jis
+\__ltjpreset_declare_option:nn{ujis}
+  {\tl_set:Nn  \l__ltjpreset_use_jfm_yoko_tl {ujis}}   % ujis
 
 % 漢字字形
 \tl_new:N \l__ltjpreset_kanji_shape_tl
-\__ltjpreset_declare_option:nn{90jis}{  \tl_set:Nn \l__ltjpreset_kanji_shape_tl { , CJKShape=JIS1990 }} % 90jis
-\__ltjpreset_declare_option:nn{jis90}{  \tl_set:Nn \l__ltjpreset_kanji_shape_tl { , CJKShape=JIS1990 }} % 90jis
-\__ltjpreset_declare_option:nn{jis2004}{\tl_set:Nn \l__ltjpreset_kanji_shape_tl { , CJKShape=JIS2004 }} % jis2004
-\__ltjpreset_declare_option:nn{2004jis}{\tl_set:Nn \l__ltjpreset_kanji_shape_tl { , CJKShape=JIS2004 }} % jis2004
+\__ltjpreset_declare_option:nn{90jis}
+  {  \tl_set:Nn \l__ltjpreset_kanji_shape_tl { , CJKShape=JIS1990 }} % 90jis
+\__ltjpreset_declare_option:nn{jis90}
+  {  \tl_set:Nn \l__ltjpreset_kanji_shape_tl { , CJKShape=JIS1990 }} % 90jis
+\__ltjpreset_declare_option:nn{jis2004}
+  {\tl_set:Nn \l__ltjpreset_kanji_shape_tl { , CJKShape=JIS2004 }} % jis2004
+\__ltjpreset_declare_option:nn{2004jis}
+  {\tl_set:Nn \l__ltjpreset_kanji_shape_tl { , CJKShape=JIS2004 }} % jis2004
 
 % font preset
 \prop_new:N \g__ltjpreset_font_prop
@@ -148,8 +158,8 @@
  \keys_define:nn { luatexja-preset }{
     custom .meta:n = { #1, __custom = true, }, 
     custom .value_required:n = true,
-    jfm_yoko .tl_set:N = \__ltjpreset_use_jfm_yoko_tl,
-    jfm_tate .tl_set:N = \__ltjpreset_use_jfm_tate_tl,
+    jfm_yoko .tl_set:N = \l__ltjpreset_use_jfm_yoko_tl,
+    jfm_tate .tl_set:N = \l__ltjpreset_use_jfm_tate_tl,
 }
 
 % 小塚 (Adobe)
@@ -210,9 +220,12 @@
     __custom = false, __office = false, __noembed = false,
 }
 \ltjpreset_declare_preset:ne{morisawa-pr6n}{
-    mc =   A-OTF-RyuminPr6N-Light.otf,      mc-b = A-OTF-FutoMinA101Pr6N-Bold.otf,
-    gt-d = A-OTF-GothicBBBPr6N-Medium.otf , gt-b = A-OTF-FutoGoB101Pr6N-Bold.otf,
-    gt-u = A-OTF-GothicBBBPr6N-Medium.otf , gt-eb = A-OTF-MidashiGoPr6N-MB31.otf,
+    mc =   A-OTF-RyuminPr6N-Light.otf,
+    mc-b = A-OTF-FutoMinA101Pr6N-Bold.otf,
+    gt-d = A-OTF-GothicBBBPr6N-Medium.otf,
+    gt-b = A-OTF-FutoGoB101Pr6N-Bold.otf,
+    gt-u = A-OTF-GothicBBBPr6N-Medium.otf,
+    gt-eb = A-OTF-MidashiGoPr6N-MB31.otf,
     mg-m = A-OTF-ShinMGoPr6N-Light.otf,
     __custom = false, __office = false, __noembed = false,
 }
@@ -407,14 +420,22 @@
     }
   }
   %%%%  リストからの展開
-  \cs_set:Ne \__ltjpreset_font_mc_l:  { \prop_item:Nn \g__ltjpreset_font_prop { mc-l } }
-  \cs_set:Ne \__ltjpreset_font_mc_m:  { \prop_item:Nn \g__ltjpreset_font_prop { mc-m } }
-  \cs_set:Ne \__ltjpreset_font_mc_b:  { \prop_item:Nn \g__ltjpreset_font_prop { mc-b } }
-  \cs_set:Ne \__ltjpreset_font_gt_m:  { \prop_item:Nn \g__ltjpreset_font_prop { gt-d } }
-  \cs_set:Ne \__ltjpreset_font_gt_u:  { \prop_item:Nn \g__ltjpreset_font_prop { gt-u } }
-  \cs_set:Ne \__ltjpreset_font_gt_b:  { \prop_item:Nn \g__ltjpreset_font_prop { gt-b } }
-  \cs_set:Ne \__ltjpreset_font_gt_eb: { \prop_item:Nn \g__ltjpreset_font_prop { gt-eb } }
-  \cs_set:Ne \__ltjpreset_font_mg_m:  { \prop_item:Nn \g__ltjpreset_font_prop { mg-m } }
+  \cs_set:Ne \__ltjpreset_font_mc_l:
+             { \prop_item:Nn \g__ltjpreset_font_prop { mc-l } }
+  \cs_set:Ne \__ltjpreset_font_mc_m:
+             { \prop_item:Nn \g__ltjpreset_font_prop { mc-m } }
+  \cs_set:Ne \__ltjpreset_font_mc_b:
+             { \prop_item:Nn \g__ltjpreset_font_prop { mc-b } }
+  \cs_set:Ne \__ltjpreset_font_gt_m:
+             { \prop_item:Nn \g__ltjpreset_font_prop { gt-d } }
+  \cs_set:Ne \__ltjpreset_font_gt_u:
+             { \prop_item:Nn \g__ltjpreset_font_prop { gt-u } }
+  \cs_set:Ne \__ltjpreset_font_gt_b:
+             { \prop_item:Nn \g__ltjpreset_font_prop { gt-b } }
+  \cs_set:Ne \__ltjpreset_font_gt_eb:
+             { \prop_item:Nn \g__ltjpreset_font_prop { gt-eb } }
+  \cs_set:Ne \__ltjpreset_font_mg_m:
+             { \prop_item:Nn \g__ltjpreset_font_prop { mg-m } }
   %% HG 系フォント + JIS2004/90JIS のときはフォント名を置換
   \bool_if:nT { !\g__ltjpreset_custom_bool && \g__ltjpreset_office_bool } {
     \tl_set:Nn \l_tmpa_tl {, CJKShape=JIS2004 }
@@ -438,7 +459,8 @@
   \tl_set:Ne \l_tmpa_tl { \__ltjpreset_font_mc_l: }
   \tl_if_empty:NT \l_tmpa_tl {\tl_set:Nn \l_tmpa_tl {~}}
   \cs_set:Ne \__ltjpreset_font_mc_l: {
-    \tl_if_blank:nTF \l_tmpa_tl { \__ltjpreset_font_mc_m: } {\tl_use:N \l_tmpa_tl }
+    \tl_if_blank:nTF \l_tmpa_tl
+      { \__ltjpreset_font_mc_m: } {\tl_use:N \l_tmpa_tl }
   }
   %% bold オプションの処理
   \bool_if:NTF \g__ltjpreset_deluxe_bool {
@@ -463,7 +485,7 @@
     \tl_if_in:nnT {#1 <= end_of_string} {##1 <= end_of_string}
       { \bool_set_true:N \l_tmpa_bool \clist_map_break: }
   }
-  \bool_if:NTF \l_tmpa_bool \prg_return_true: \prg_return_false:
+  \bool_if:NTF \l_tmpa_bool { \prg_return_true: } { \prg_return_false: }
 }
 \cs_new:Nn \__ltjpreset_wrap_fontname:n {
   \__ltjpreset_if_detect_external:nTF { #1 }
@@ -499,10 +521,13 @@
     \__ltjpreset_substitute:nnnn { mc } { l  } { mc } { m }
   }
   \def\ltdefault{l}
-  \DeclareRobustCommand\ltseries { \not@math@alphabet\ltseries\relax\fontseries\ltdefault\selectfont }
+  \DeclareRobustCommand\ltseries
+    { \not@math@alphabet\ltseries\relax\fontseries\ltdefault\selectfont }
   \def\ebdefault{eb}
-  \DeclareRobustCommand\ebseries { \not@math@alphabet\ebseries\relax\fontseries\ebdefault\selectfont }
-  \DeclareRobustCommand\gtebfamily { \gtfamily\fontseries{\ebdefault}\selectfont }
+  \DeclareRobustCommand\ebseries
+    { \not@math@alphabet\ebseries\relax\fontseries\ebdefault\selectfont }
+  \DeclareRobustCommand\gtebfamily
+    { \gtfamily\fontseries{\ebdefault}\selectfont }
   \DeclareTextFontCommand{\textlt}{\ltseries}
   \DeclareTextFontCommand{\texteb}{\ebseries}
 } {
@@ -534,22 +559,24 @@
 	\__ltjpreset_wrap_fontname:e { #3 }
     \__ltjpreset_declare_font_shape:nnnnnnn { JY3 }
       { ltjp #1 \int_to_arabic:n { \g__ltjpreset_applycount_int }} { #2 } { n }
-      { \l__ltjpreset_font_name: : jfm=\tl_use:N \__ltjpreset_use_jfm_yoko_tl }
+      { \l__ltjpreset_font_name: : jfm=\tl_use:N \l__ltjpreset_use_jfm_yoko_tl }
       { script=hani \bool_if:NT \g__ltjpreset_expert_bool { ;+hkna } }
 	  { \Cjascale }
     \__ltjpreset_declare_font_shape:nnnnnnn { JT3 }
       { ltjp #1 \int_to_arabic:n { \g__ltjpreset_applycount_int }} { #2 } { n }
-      { \l__ltjpreset_font_name:  : jfm=\tl_use:N \__ltjpreset_use_jfm_tate_tl }
+      { \l__ltjpreset_font_name: : jfm=\tl_use:N \l__ltjpreset_use_jfm_tate_tl }
       { script=hani \bool_if:NT \g__ltjpreset_expert_bool { ;+vkna } }
 	  { \Cjascale }
     \bool_if:NT \g__ltjpreset_expert_bool {
       \__ltjpreset_declare_font_shape:nnnnnnn { JY3 }
         { ltjp #1 \int_to_arabic:n { \g__ltjpreset_applycount_int }} { #2 } { rb }
-        { \l__ltjpreset_font_name:  : jfm=\tl_use:N \__ltjpreset_use_jfm_yoko_tl } { script=kana; +ruby }
+        { \l__ltjpreset_font_name: : jfm=\tl_use:N \l__ltjpreset_use_jfm_yoko_tl }
+        { script=kana; +ruby }
 	    { \Cjascale }
       \__ltjpreset_declare_font_shape:nnnnnnn { JT3 }
         { ltjp #1 \int_to_arabic:n { \g__ltjpreset_applycount_int }} { #2 } { rb }
-        { \l__ltjpreset_font_name:  : jfm=\tl_use:N \__ltjpreset_use_jfm_tate_tl } { script=kana; +ruby }
+        { \l__ltjpreset_font_name: : jfm=\tl_use:N \l__ltjpreset_use_jfm_tate_tl }
+        { script=kana; +ruby }
 	    { \Cjascale }
     }
     \cs_if_exist:NT \ltjpreset_define_family_hook_nfssonly:nnn
@@ -559,7 +586,8 @@
     \let\mgfamily\undefined
     \DeclareRobustCommand\mgfamily {
       \not@math@alphabet\mgfamily\relax
-      \kanjifamily{ltjpmg \int_to_arabic:n { \g__ltjpreset_applycount_int }}\selectfont
+      \kanjifamily{ltjpmg \int_to_arabic:n { \g__ltjpreset_applycount_int }}
+      \selectfont
     }
     \DeclareTextFontCommand{\textmg}{\mgfamily}
   }
@@ -581,8 +609,10 @@
       \DeclareMathAlphabet{\mathgt}{JY3}{\gtdefault}{m}{n}
     \fi
     \bool_if:NT \g__ltjpreset_deluxe_bool {
-      \DeclareKanjiFamily{JY3}{ltjpmg \int_to_arabic:n { \g__ltjpreset_applycount_int }}{}
-      \DeclareKanjiFamily{JT3}{ltjpmg \int_to_arabic:n { \g__ltjpreset_applycount_int }}{}
+      \DeclareKanjiFamily{JY3}
+        {ltjpmg \int_to_arabic:n { \g__ltjpreset_applycount_int }}{}
+      \DeclareKanjiFamily{JT3}
+        {ltjpmg \int_to_arabic:n { \g__ltjpreset_applycount_int }}{}
     }
     % ======
     \tl_set:Nn \l_tmpa_tl {, CJKShape=JIS1990 }
@@ -617,7 +647,8 @@
 
   \bool_if:NT \g__ltjpreset_expert_bool {
     \cs_set:Npn \rubyfamily { \addjfontfeatures {
-      Style=Ruby , YokoFeatures={RawFeature=-hkna} , TateFeatures={RawFeature=-vkna}
+      Style=Ruby, YokoFeatures={RawFeature=-hkna},
+      TateFeatures={RawFeature=-vkna}
     } }
   }
   \addjfontfeature{ Kerning=Off }
@@ -625,14 +656,15 @@
   \cs_new:Nn \__ltjpreset_do_fontset: { \group_begin:
       \tl_gset:Ne \l__ltjpreset_add_features_tl {
         \tl_use:N \l__ltjpreset_kanji_shape_tl,
-        YokoFeatures = { JFM = \tl_use:N \__ltjpreset_use_jfm_yoko_tl },
-        TateFeatures = { JFM = \tl_use:N \__ltjpreset_use_jfm_tate_tl },
+        YokoFeatures = { JFM = \tl_use:N \l__ltjpreset_use_jfm_yoko_tl },
+        TateFeatures = { JFM = \tl_use:N \l__ltjpreset_use_jfm_tate_tl },
         Script=CJK, \bool_if:NT \g__ltjpreset_noembed_bool { , NoEmbed }
       }
     \group_end:
     \bool_if:NT \g__ltjpreset_expert_bool {
       \tl_put_left:Nn \l__ltjpreset_add_features_tl {
-        , YokoFeatures = {Style = HorizontalKana}, TateFeatures = {Style = VerticalKana}
+        , YokoFeatures = {Style = HorizontalKana},
+          TateFeatures = {Style = VerticalKana}
       }
     }
     \cs_set:Ne \l__ltjpreset_fontspec_call: {
@@ -645,7 +677,8 @@
                 }
                   },
             }
-        BoldFont = \__ltjpreset_font_mc_b: \tl_use:N \l__ltjpreset_add_features_tl,
+        BoldFont = \__ltjpreset_font_mc_b:
+          \tl_use:N \l__ltjpreset_add_features_tl,
         \cs_if_exist:NT \ltjpreset_define_family_hook_fontspec:nnn {
           UprightFeatures = { \ltjpreset_define_family_hook_fontspec:nnn
                     { mc } { m } { \__ltjpreset_font_mc_m: } },
@@ -662,7 +695,8 @@
               }
             },
           }
-        BoldFont = \__ltjpreset_font_gt_b: \tl_use:N \l__ltjpreset_add_features_tl,
+        BoldFont = \__ltjpreset_font_gt_b:
+          \tl_use:N \l__ltjpreset_add_features_tl,
         \cs_if_exist:NT \ltjpreset_define_family_hook_fontspec:nnn {
           UprightFeatures = { \ltjpreset_define_family_hook_fontspec:nnn
             { gt } { m } { \__ltjpreset_font_gt_m: } },
@@ -674,7 +708,8 @@
         %% mg
         \bool_if_exist:NTF \setfontfamily {
           \exp_not:N \setjfontfamily \exp_not:N \mgfamily [
-            BoldFont = \__ltjpreset_font_mg_m: \tl_use:N \l__ltjpreset_add_features_tl,
+            BoldFont = \__ltjpreset_font_mg_m:
+              \tl_use:N \l__ltjpreset_add_features_tl,
             \cs_if_exist:NT \ltjpreset_define_family_hook_fontspec:nnn {
               \ltjpreset_define_family_hook_fontspec:nnn
                 { mg } { m } { \__ltjpreset_font_mg_m: },
@@ -682,14 +717,16 @@
           ] { \__ltjpreset_font_mg_m: }
         } {
           \exp_not:N \newjfontfamily \exp_not:N \mgfamily [
-            BoldFont = \__ltjpreset_font_mg_m: \tl_use:N \l__ltjpreset_add_features_tl,
+            BoldFont = \__ltjpreset_font_mg_m:
+              \tl_use:N \l__ltjpreset_add_features_tl,
             \cs_if_exist:NT \ltjpreset_define_family_hook_fontspec:nnn {
               \ltjpreset_define_family_hook_fontspec:nnn
                 { mg } { m } { \__ltjpreset_font_mg_m: },
             }
           ] { \__ltjpreset_font_mg_m: }
         }
-        \exp_not:N \DeclareTextFontCommand { \exp_not:N \textmg }{ \exp_not:N \mgfamily }
+        \exp_not:N \DeclareTextFontCommand
+          { \exp_not:N \textmg }{ \exp_not:N \mgfamily }
       }
     }
     \l__ltjpreset_fontspec_call:
@@ -697,15 +734,17 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 }
 
-\def\ltjnewpreset{
-    \@ifstar{\__ltjpreset_new_preset:nnn{ true }}{\__ltjpreset_new_preset:nnn{ false }}}
+\def\ltjnewpreset{%
+    \@ifstar{\__ltjpreset_new_preset:nnn{ true }}
+            {\__ltjpreset_new_preset:nnn{ false }}}
 \cs_set:Nn \__ltjpreset_new_preset:nnn {
   \keys_if_exist:nnTF { luatexja-preset } { #2 } {
     \seq_if_in:NnTF \g__ltjpreset_presets_seq { #2 } {
       \bool_if:cTF { c_ #1 _bool } {
         \msg_warning:nnn { luatexja-preset }{ exist-preset-overwrite } { #2 }
         \keys_define:nn { luatexja-preset } {
-        #2 .meta:n = { #3, __custom = true, __noembed = false, __office = false, },
+        #2 .meta:n = { #3, __custom = true, __noembed = false,
+                       __office = false, },
         #2 .value_forbidden:n = true, #2 .groups:n = { preset },
         }
       } {
@@ -716,7 +755,8 @@
     }
   } {
     \keys_define:nn { luatexja-preset } {
-      #2 .meta:n = { #3, __custom = true, __noembed = false, __office = false, },
+      #2 .meta:n = { #3, __custom = true, __noembed = false,
+                     __office = false, },
       #2 .value_forbidden:n = true, #2 .groups:n = { preset },
     }
     \seq_put_right:Nn \g__ltjpreset_presets_seq { #2 }
@@ -727,7 +767,6 @@
 \cs_set:Npn \ltjapplypreset #1 {
   \int_gincr:N \g__ltjpreset_applycount_int
   \keys_set_groups:nnn { luatexja-preset } { preset } { #1 }
-  % \prop_map_inline:Nn \g__ltjpreset_font_prop {\typeout{ [##1] = "##2" } }
   \__ltjpreset_extract_fonts:
   \__ltjpreset_check_deluxe_existence:
   \__ltjpreset_do_fontset:
