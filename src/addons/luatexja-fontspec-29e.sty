@@ -8,7 +8,7 @@
 \ExplSyntaxOn
 
 %%%%%%%% Change Japanese font family by \rmfamily or not
-\bool_if:NT  \__ltj_fontspec_match_bool {
+\bool_if:NT  \l__ltj_fontspec_match_bool {
   \renewcommand\jttdefault{\gtdefault}
   \@ltj@match@familytrue
 }

@@ -407,7 +407,7 @@
            \tl_set:Nn \l_tmpb_tl { ##2 } \tl_remove_all:Nn \l_tmpb_tl {90}
           \prop_put:Nne \l_tmpa_prop { ##1 } { \tl_use:N \l_tmpb_tl }
          } 
-         \prop_set_eq:NN \g__ltjpreset_font_prop \l_tmpa_prop
+         \prop_gset_eq:NN \g__ltjpreset_font_prop \l_tmpa_prop
        }
        \tl_if_in:NnT  \l_tmpb_tl { MogaEx90Mincho } {
          \prop_clear:N \l_tmpa_prop
@@ -415,7 +415,7 @@
            \tl_set:Nn \l_tmpb_tl { ##2 } \tl_remove_all:Nn \l_tmpb_tl {90}
            \prop_put:Nne \l_tmpa_prop { ##1 } { \tl_use:N \l_tmpb_tl }
          }
-         \prop_set_eq:NN \g__ltjpreset_font_prop \l_tmpa_prop
+         \prop_gset_eq:NN \g__ltjpreset_font_prop \l_tmpa_prop
        }
     }
   }
