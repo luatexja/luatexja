@@ -25,7 +25,7 @@
   % then enclose \__shipout_execute_main_cont:Nnnn with
   % a dummy \yoko-box named \l__platex_shipout_dummy_box.
   \platex_if_direction_yoko:TF {
-    \__platex_original_shipout_execute_main_cont:Nnnn { #1 } { #2 } { #3 } { #4 }
+    \__platex_original_shipout_execute_main_cont:Nnnn #1 { #2 } { #3 } { #4 }
   }{
     \vbox_set:Nn \l__platex_shipout_dummy_box {
       \platex_direction_yoko:

@@ -169,20 +169,27 @@
   \keys_define:nn {fontspec-opentype} {
     Kerning/Off.code:n=\__fontspec_update_featstr:n {-kern}
   }
-  %% following \**_set_... assignments must be local ...
-  \clist_set:Ne \g__fontspec_default_fontopts_clist {
+  \prop_gset_eq:NN \g__fontspec_fontopts_prop \g__ltj_fontspec_fontopts_prop
+  \clist_gset:NN \g__ltj_fontspec_orig_default_fontopts_clist
+                 \g__fontspec_default_fontopts_clist
+  \clist_gset:Ne \g__fontspec_default_fontopts_clist {
     YokoFeatures = { JFM=\ltj@stdyokojfm },
     TateFeatures = { JFM=\ltj@stdtatejfm },
     Scale=\Cjascale, Kerning=Off, Script=CJK,
     \g__ltj_fontspec_kanji_default_fontopts_clist
   }
-  \prop_set_eq:NN \g__fontspec_fontopts_prop \g__ltj_fontspec_fontopts_prop
+  \tl_gset:Nn \g__ltj_fontspec_orig_encoding_tl \g_fontspec_encoding_tl
+  \tl_gset:Nn \g_fontspec_encoding_tl {JY3}
+  %% following \**_set_... assignments must be local ...
   \cs_set_eq:NN \__fontspec_make_font_shapes:Nnnnn
                 \__ltj_fontspec_make_font_shapes:Nnnnn
   \cs_set_eq:NN \DeclareFontFamily \__ltj_fontspec_DeclareFontFamily:
-  \tl_set:Nn \g_fontspec_encoding_tl {JY3}
   \__ltj_orig_fontspec_select_font_family:nn{#1}{#2}
 
+  \prop_gset_eq:NN \g__ltj_fontspec_fontopts_prop \g__fontspec_fontopts_prop
+  \clist_gset:NN \g__fontspec_default_fontopts_clist
+                 \g__ltj_fontspec_orig_default_fontopts_clist
+  \tl_gset:Nn \g_fontspec_encoding_tl \g__ltj_fontspec_orig_encoding_tl
   \cs_gset:Npx \__ltj_fontspec_aftergroup: {
     \exp_not:N \tl_set:Nn
     \exp_not:N \l_fontspec_family_tl { \l_fontspec_family_tl }
