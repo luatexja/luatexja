@@ -3,10 +3,11 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2023-05-16 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2025-10-25 Patch to NFSS2 for LuaTeX-ja]
 
 %%%%%%%% LaTeX2e version detection
-\newcount\ltj@@latex@plv \ltj@@latex@plv=1500
+\newcount\ltj@@latex@plv
+\@ifl@t@r\fmtversion{2025-11-01}{\ltj@@latex@plv=2000}{\ltj@@latex@plv=1500}
 
 %% patching \DeclareTextComposite
 \def\ltj@chardef@text@cmd#1{%
@@ -610,6 +611,47 @@
 \newif\if@notffam
 \newif\if@tempswz
 \def\@ltj@use@fd{true}
+
+\ifnum\ltj@@latex@plv>1500 % LaTeX2e 2025-11-01
+%%%%%%
+\DeclareRobustCommand\romanfamily[1]{\edef\f@family{#1}\set@current@meta@family}
+\DeclareRobustCommand\kanjifamily[1]{\edef\k@family{#1}\set@current@meta@kanjifamily}
+\DeclareRobustCommand\fontfamily[1]{%
+  \@notkfamfalse\@notffamfalse
+  %
+  \directlua{luatexja.jfont.search_kfam()}{#1}{\@ltj@use@fd}%
+  \ifin@\edef\k@family{#1}\set@current@meta@kanjifamily\else\@notkfamtrue\fi
+  %
+  % alphabetic fonts part
+  \ltj@@is@ffam{#1}%
+  \ifin@\edef\f@family{#1}\set@current@meta@family\else
+    % checking is_stored_ffam is not sufficient,
+    % since LuaTeX-ja doesn't know whats fonts are defined before LuaTeX-ja is loaded.
+    \ifcsname \f@encoding+#1\endcsname % easy case
+      \ltj@@add@ffam{#1}\edef\f@family{#1}\set@current@meta@family%
+    \else
+      \@tempswafalse
+      \def\cdp@elt##1{\ifcsname ##1+#1\endcsname%
+        \@tempswatrue\def\cdp@elt####1\relax{}%
+      \fi}%
+      \directlua{luatexja.jfont.search_ffam_declared()}\relax%
+      \if@tempswz
+        \ltj@@add@ffam{#1}\edef\f@family{#1}\set@current@meta@family%
+      \else
+        % now we search Nffam_list and font definition files.
+        \directlua{luatexja.jfont.search_ffam_fd()}{#1}%
+        \ifin@\edef\f@family{#1}\set@current@meta@family\else\@notffamtrue\fi
+      \fi
+    \fi
+  \fi
+  %
+  \if@notkfam\if@notffam
+    \edef\k@family{#1}\set@current@meta@kanjifamily
+    \edef\f@family{#1}\set@current@meta@family
+  \fi\fi
+}
+\else % <=LaTeX2e 2025-06-01
+%%%%%%
 \DeclareRobustCommand\romanfamily[1]{\edef\f@family{#1}}
 \DeclareRobustCommand\kanjifamily[1]{\edef\k@family{#1}}
 \DeclareRobustCommand\fontfamily[1]{%
@@ -645,6 +687,8 @@
     \edef\k@family{#1}\edef\f@family{#1}%
   \fi\fi
 }
+\fi
+%%%%%%
 
 %%%%%%
 \newif\if@shape@roman@kanji
@@ -823,6 +867,9 @@
 
 \let\prepare@family@series@update@kanji=\prepare@family@series@update
 \patchcmd\prepare@family@series@update{\fontfamily}{\romanfamily}{}{}
+\ifnum\ltj@@latex@plv>1500 % LaTeX2e 2025-11-01
+  \patchcmd\prepare@family@series@update@kanji{\@currentmetafamily}{\@currentmetakanjifamily}{}{}
+\fi
 \patchcmd\prepare@family@series@update@kanji{\if@forced@series}{\if@forced@series@kanji}{}{}
 \patchcmd\prepare@family@series@update@kanji{\fontfamily}{\kanjifamily}{}{}
 \patchcmd\prepare@family@series@update@kanji{\update@series@target@value}{\update@series@target@value@kanji}{}{}
@@ -840,6 +887,10 @@
 \patchcmd\update@series@target@value@kanji{\f@series}{\k@series}{}{}
 \patchcmd\update@series@target@value@kanji{\f@series}{\k@series}{}{}
 \patchcmd\update@series@target@value@kanji{\f@series}{\k@series}{}{}
+\ifnum\ltj@@latex@plv>1500 % LaTeX2e 2025-11-01
+  \patchcmd\update@series@target@value@kanji{\@currentmetafamily}{\@currentmetakanjifamily}{}{}
+  \patchcmd\update@series@target@value@kanji{\@currentmetafamily}{\@currentmetakanjifamily}{}{}
+\fi
 \def\@meta@family@list@kanji{\@elt{mc}\@elt{gt}\@elt{jtt}}
 
 \AddToHook{bfseries/defaults}{%
@@ -908,6 +959,23 @@
   \fi
 }
 
+\ifnum\ltj@@latex@plv>1500 % LaTeX2e 2025-11-01
+%%%%%%
+\def\set@current@meta@kanjifamily {%
+  \ifx\k@family\mcdef@ult
+    \def\@currentmetakanjifamily{mc}%
+  \else
+    \ifx\k@family\gtdef@ult
+      \def\@currentmetakanjifamily{gt}%
+    \else
+      \ifx\k@family\jttdef@ult
+        \def\@currentmetakanjifamily{jtt}%
+      \else
+        \def\@currentmetakanjifamily{??}%
+      \fi
+    \fi
+  \fi
+}
 \AddToHook{normalfont}{%
   \kanjiencoding{\kanjiencodingdefault}%
   \edef\k@family{\kanjifamilydefault}%
@@ -915,6 +983,16 @@
   \edef\k@shape{\kanjishapedefault}%
   \let\delayed@k@adjustment\empty
 }
+\else % <=LaTeX2e 2025-06-01
+%%%%%%
+\AddToHook{normalfont}{%
+  \kanjiencoding{\kanjiencodingdefault}%
+  \edef\k@family{\kanjifamilydefault}%
+  \edef\k@series{\kanjiseriesdefault}%
+  \edef\k@shape{\kanjishapedefault}%
+  \let\delayed@k@adjustment\empty
+}
+\fi
 
 \DeclareRobustCommand\mcfamily{%
   \unless\ifltj@disablejfam\not@math@alphabet\mcfamily\mathmc\fi
