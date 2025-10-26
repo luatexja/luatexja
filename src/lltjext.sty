@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjext}[2024-07-23 v1.2k-ltj-16 Macros for vertical writing]
+\ProvidesPackage{lltjext}[2025-10-26 v1.2k-ltj-17 Macros for vertical writing]
 \RequirePackage{luatexja}
 \newcount\ltj@ext@dir
 \let\ltj@lltjext@orig@tabular=\tabular
@@ -686,7 +686,75 @@
          \everypar{}}%
       }%
   \def\@tabarray{\@ifnextchar<\p@tabarray{\p@tabarray<Z>}}
-\ifcsname tbl_save_outer_table_cols:\endcsname %%%%%% >=2024-06-01
+\ifnum\ltj@@latex@plv>1500 %%%%%% >=2025-11-01
+  \def\p@array<##1>[##2]##3{%
+    \ifnum\ltj@ext@dir=0 \ltj@ext@dir=\ltjgetparameter{direction}\relax\fi
+    \let\box@dir\relax
+    \if ##1z\relax
+      \ifnum\ltj@ext@dir=3\relax
+        \let\box@dir\utod\@tempcnta=\zstrutbox
+      \fi
+    \else
+      \if ##1y\relax
+        \let\box@dir\yoko\@tempcnta=\ystrutbox
+      \else\if ##1t\relax
+        \let\box@dir\tate\@tempcnta=\tstrutbox
+      \else\if ##1d\relax
+         \let\box@dir\dtou\@tempcnta=\dstrutbox
+      \else\if ##1u\relax
+         \let\box@dir\utod\@tempcnta=\zstrutbox
+      \fi\fi\fi\fi
+    \fi
+    \ifx\box@dir\relax
+      \ifcase\ltj@ext@dir
+         \or   \let\box@dir\dtou\@tempcnta=\dstrutbox% dtou
+         \or\or\let\box@dir\tate\@tempcnta=\tstrutbox% tate
+         \or   \let\box@dir\yoko\@tempcnta=\ystrutbox% yoko
+         \else \let\box@dir\utod\@tempcnta=\zstrutbox% utod
+      \fi
+    \fi
+    \setbox \@arstrutbox \hbox{\box@dir\vrule
+               \@height \arraystretch
+                 \dimexpr \ltjgetht\@tempcnta+\extrarowheight\relax
+               \@depth \arraystretch \ltjgetdp \@tempcnta
+               \@width \z@}%
+    \fork@array@option<##1>[##2]%
+    \tbl_init_cell_data_for_table:
+    \begingroup
+    \@mkpream{##3}%
+    \tbl_count_table_cols:
+    \xdef\@preamble{
+      \noexpand\ar@ialign
+      \@halignto
+          \bgroup \@arstrut
+        \UseTaggingSocket{tbl/row/begin}
+        \tbl_init_cell_data_for_row:
+        \@preamble
+        \tabskip \z@ \cr}%
+    \endgroup
+    \@arrayleft
+    \@begin@alignbox
+    \bgroup
+    \box@dir\adjustbaseline
+    \let\@sharp####\let\protect\relax
+    \lineskip \z@
+    \baselineskip \z@
+    \mathsurround \z@
+    \let\\\@arraycr \let\tabularnewline\\
+    \def\par{\ifnum\currentgrouptype=6~ \else\@@par\fi}%
+    \UseTaggingSocket{tbl/init}
+    \@preamble
+  }
+  \def\endtabular{\endarray$\egroup
+    \UseTaggingSocket {tbl/hmode/end}\null}
+  \def\endarray{
+    \tbl_crcr:n{endarray} \egroup
+    \UseTaggingSocket{tbl/finalize}
+    \tbl_restore_outer_cell_data:
+    \egroup\@end@alignbox
+    \@arrayright \gdef\@preamble{}%
+  }
+\else\ifcsname tbl_save_outer_table_cols:\endcsname %%%%%% >=2024-06-01
   \def\p@array<##1>[##2]##3{%
     \ifnum\ltj@ext@dir=0 \ltj@ext@dir=\ltjgetparameter{direction}\relax\fi
     \let\box@dir\relax
@@ -807,7 +875,7 @@
     \crcr\egroup\egroup\@end@alignbox
     \@arrayright \gdef\@preamble{}%
   }
-\fi
+\fi\fi
   \expandafter \let \csname endtabular*\endcsname = \endtabular
 }
 \ExplSyntaxOff

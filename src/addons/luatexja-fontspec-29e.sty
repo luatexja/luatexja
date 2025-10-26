@@ -451,7 +451,7 @@
  }
 
 \DeclareDocumentCommand \addjfontfeatures {m} {
-  \__ltj_fontspec_if_fontspec_font:TF
+  \ltj_fontspec_if_fontspec_font:TF
    {
     \__ltj_fontspec_set_variable_for_kanji:
     \group_begin:
@@ -470,7 +470,7 @@
 
 \cs_set_eq:NN \addjfontfeature \addjfontfeatures
 
-\prg_new_conditional:Nnn \__ltj_fontspec_if_fontspec_font: {TF,T,F}
+\prg_new_conditional:Nnn \ltj_fontspec_if_fontspec_font: {TF,T,F}
 {
   \cs_if_exist:cTF {g__fontspec_fontinfo_ \k@family _prop}
     { \prg_return_true: } { \prg_return_false: }
