@@ -1,5 +1,5 @@
 % luatexja-preset.sty
-\ProvidesPackage{luatexja-preset}[2025-09-30 Japanese font presets]
+\ProvidesPackage{luatexja-preset}[2025-10-26 Japanese font presets]
 
 \RequirePackage{expl3,l3keys2e}
 \RequirePackage{luatexja}
@@ -502,8 +502,8 @@
     \cs_if_exist:cTF { __ltjpreset_font_#1_#2: } {
       \bool_if:NF \g__ltjpreset_nocheck_bool {
         \__ltjpreset_wrap_fontname:e { \cs:w __ltjpreset_font_#1_#2: \cs_end: }
-        \font \g__ltjpreset_font_test: = \tl_use:N \l__ltjpreset_font_name_tl\relax
-        \ifx \g__ltjpreset_font_test: \nullfont
+        \font \l__ltjpreset_font_test = \tl_use:N \l__ltjpreset_font_name_tl\relax
+        \ifx \l__ltjpreset_font_test \nullfont
           \msg_warning:nneeee { luatexja-preset }{ no-font }
             { \cs:w __ltjpreset_font_#1_#2: \cs_end: }{ #1/#2 }
             { \cs:w __ltjpreset_font_#3_#4: \cs_end: }{ #3/#4 }

@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec-29e}[2025-09-30 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec-29e}[2025-10-26 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e}
 \ExplSyntaxOn
 
@@ -88,39 +88,39 @@
   \DeclareKanjiFamily {JT3} {#2} {#3}
 }
 
-%% save and restore global variable
+%% save and restore variable
 \tl_new:N \g__ltj_fontspec_kanji_nfss_family_tl
-\tl_new:N \g__ltj_fontspec_orig_nfss_family_tl
+\tl_new:N \l__ltj_fontspec_orig_nfss_family_tl
+\tl_new:N \l__ltj_fontspec_orig_encoding_tl
 \seq_new:N \l__ltj_fontspec_kanji_bf_series_seq
 \seq_new:N \l__ltj_fontspec_orig_bf_series_seq
 \clist_new:N \g__ltj_fontspec_kanji_default_fontopts_clist
-\clist_new:N \g__ltj_fontspec_orig_default_fontopts_clist
+\clist_new:N \l__ltj_fontspec_orig_default_fontopts_clist
 
-\cs_new:Nn \__ltj_set_global_variable_for_kanji: {
-  \tl_gset_eq:NN \g__ltj_fontspec_orig_nfss_family_tl
+\cs_new:Nn \__ltj_fontspec_set_variable_for_kanji: {
+  \tl_set_eq:NN  \l__ltj_fontspec_orig_nfss_family_tl
                  \g__fontspec_nfss_family_tl
   \tl_gset_eq:NN \g__fontspec_nfss_family_tl
                  \g__ltj_fontspec_kanji_nfss_family_tl
   \seq_set_eq:NN \l__ltj_fontspec_orig_bf_series_seq \l__fontspec_bf_series_seq
   \seq_set_eq:NN \l__fontspec_bf_series_seq \l__ltj_fontspec_kanji_bf_series_seq
-  %\seq_gclear:N \g__fontspec_bf_series_seq
-  \clist_gset_eq:NN \g__ltj_fontspec_orig_default_fontopts_clist
+  \clist_set_eq:NN  \l__ltj_fontspec_orig_default_fontopts_clist
                     \g__fontspec_default_fontopts_clist
   \clist_gset_eq:NN \g__fontspec_default_fontopts_clist
                     \g__ltj_fontspec_kanji_default_fontopts_clist
 }
 
-\cs_new:Nn \__ltj_restore_global_variable: {
+\cs_new:Nn \__ltj_fontspec_restore_variable: {
   \tl_gset_eq:NN \g__ltj_fontspec_kanji_nfss_family_tl
                  \g__fontspec_nfss_family_tl
   \tl_gset_eq:NN \g__fontspec_nfss_family_tl
-                 \g__ltj_fontspec_orig_nfss_family_tl
+                 \l__ltj_fontspec_orig_nfss_family_tl
   \seq_set_eq:NN \l__ltj_fontspec_kanji_bf_series_seq \l__fontspec_bf_series_seq
   \seq_set_eq:NN \l__fontspec_bf_series_seq \l__ltj_fontspec_orig_bf_series_seq
   \clist_gset_eq:NN \g__ltj_fontspec_kanji_default_fontopts_clist
                     \g__fontspec_default_fontopts_clist
   \clist_gset_eq:NN \g__fontspec_default_fontopts_clist
-                    \g__ltj_fontspec_orig_default_fontopts_clist
+                    \l__ltj_fontspec_orig_default_fontopts_clist
 }
 
 \cs_set_eq:NN \__ltj_orig_fontspec_select_font_family:nn
@@ -170,15 +170,15 @@
     Kerning/Off.code:n=\__fontspec_update_featstr:n {-kern}
   }
   \prop_gset_eq:NN \g__fontspec_fontopts_prop \g__ltj_fontspec_fontopts_prop
-  \clist_gset:NN \g__ltj_fontspec_orig_default_fontopts_clist
-                 \g__fontspec_default_fontopts_clist
+  \clist_set_eq:NN \l__ltj_fontspec_orig_default_fontopts_clist
+                   \g__fontspec_default_fontopts_clist
   \clist_gset:Ne \g__fontspec_default_fontopts_clist {
     YokoFeatures = { JFM=\ltj@stdyokojfm },
     TateFeatures = { JFM=\ltj@stdtatejfm },
     Scale=\Cjascale, Kerning=Off, Script=CJK,
     \g__ltj_fontspec_kanji_default_fontopts_clist
   }
-  \tl_gset:Nn \g__ltj_fontspec_orig_encoding_tl \g_fontspec_encoding_tl
+  \tl_set_eq:NN \l__ltj_fontspec_orig_encoding_tl \g_fontspec_encoding_tl
   \tl_gset:Nn \g_fontspec_encoding_tl {JY3}
   %% following \**_set_... assignments must be local ...
   \cs_set_eq:NN \__fontspec_make_font_shapes:Nnnnn
@@ -187,9 +187,9 @@
   \__ltj_orig_fontspec_select_font_family:nn{#1}{#2}
 
   \prop_gset_eq:NN \g__ltj_fontspec_fontopts_prop \g__fontspec_fontopts_prop
-  \clist_gset:NN \g__fontspec_default_fontopts_clist
-                 \g__ltj_fontspec_orig_default_fontopts_clist
-  \tl_gset:Nn \g_fontspec_encoding_tl \g__ltj_fontspec_orig_encoding_tl
+  \clist_gset_eq:NN \g__fontspec_default_fontopts_clist
+                    \l__ltj_fontspec_orig_default_fontopts_clist
+  \tl_gset_eq:NN \g_fontspec_encoding_tl \l__ltj_fontspec_orig_encoding_tl
   \cs_gset:Npx \__ltj_fontspec_aftergroup: {
     \exp_not:N \tl_set:Nn
     \exp_not:N \l_fontspec_family_tl { \l_fontspec_family_tl }
@@ -217,15 +217,18 @@
 \cs_generate_variant:Nn \__ltj_fontspec_declare_shape_yoko:nnnn {nnxx}
 \cs_generate_variant:Nn \__ltj_fontspec_declare_shape_tate:nnnn {nnxx}
 
+\tl_new:N  \l__ltj_fontspec_orig_encoding_shapeaux_tl
+\tl_new:N  \l__ltj_fontspec_orig_nfss_enc_shapeaux_tl
 \cs_new:Nn \__ltj_fontspec_declare_shape_aux:nnnnnn
 {
   \tl_build_begin:N \l__fontspec_nfss_tl
   \tl_build_begin:N \l__fontspec_nfss_sc_tl
   \tl_set_eq:NN \l__fontspec_saved_fontname_tl \l_fontspec_fontname_tl
 
-  % the following two \tl_set:Nn must be local
-  \tl_set:Nn \g_fontspec_encoding_tl {#5}
-  \tl_set:Nn \g__fontspec_nfss_enc_tl {#5}
+  \tl_set_eq:NN \l__ltj_fontspec_orig_encoding_shapeaux_tl \g_fontspec_encoding_tl
+  \tl_set_eq:NN \l__ltj_fontspec_orig_nfss_enc_shapeaux_tl \g__fontspec_nfss_enc_tl
+  \tl_gset:Nn \g_fontspec_encoding_tl {#5}
+  \tl_gset:Nn \g__fontspec_nfss_enc_tl {#5}
   \exp_args:Ne \clist_map_inline:nn {#4}
     { \__ltj_fontspec_setup_single_size:nn {#3, #6} {##1} }
   \tl_build_end:N \l__fontspec_nfss_tl
@@ -234,6 +237,8 @@
   \bool_set_true:N \l__fontspec_nosc_bool
   \__fontspec_declare_shapes_normal:nn  {#1} {#2}
   \__fontspec_declare_shape_slanted:nn  {#1} {#2}
+  \tl_gset_eq:NN \g_fontspec_encoding_tl \l__ltj_fontspec_orig_encoding_shapeaux_tl
+  \tl_gset_eq:NN \g__fontspec_nfss_enc_tl \l__ltj_fontspec_orig_nfss_enc_shapeaux_tl
 }
 
 \cs_new:Nn \__ltj_fontspec_setup_single_size:nn
@@ -264,13 +269,13 @@
 }
 
 \cs_new:Nn \__ltj_fontspec_set_family:Nnn {
-  \__ltj_set_global_variable_for_kanji:
+  \__ltj_fontspec_set_variable_for_kanji:
   \cs_set_eq:NN \__fontspec_select_font_family:nn
                 \__ltj_fontspec_select_font_family:nn
   \__ltj_orig_fontspec_set_family:Nnn #1 {#2} {#3}
   \cs_set_eq:NN \__fontspec_select_font_family:nn
                 \__ltj_orig_fontspec_select_font_family:nn
-  \__ltj_restore_global_variable:
+  \__ltj_fontspec_restore_variable:
 }
 \cs_set_eq:NN \__ltj_orig_fontspec_set_family:Nnn \fontspec_set_family:Nnn
 \cs_set_eq:NN \__ltj_orig_fontspec_make_font_shapes:Nnnnn
@@ -432,9 +437,9 @@
  }
 \cs_new:Nn \__ltj_fontspec_set_default_features:nn
  {
-   \__ltj_set_global_variable_for_kanji:
+   \__ltj_fontspec_set_variable_for_kanji:
    \__fontspec_set_default_features:nn {#1} {#2}
-   \__ltj_restore_global_variable:
+   \__ltj_fontspec_restore_variable:
  }
 \cs_new:Nn \__ltj_fontspec_set_font_default_features:nnn
  {
@@ -448,7 +453,7 @@
 \DeclareDocumentCommand \addjfontfeatures {m} {
   \__ltj_fontspec_if_fontspec_font:TF
    {
-    \__ltj_set_global_variable_for_kanji:
+    \__ltj_fontspec_set_variable_for_kanji:
     \group_begin:
       \tl_set_eq:NN \f@family \k@family
       \cs_set_eq:NN \__fontspec_select_font_family:nn
@@ -456,7 +461,7 @@
       \addfontfeatures {#1}
     \group_end:
     \kanjifamily\g__fontspec_nfss_family_tl\selectfont
-    \__ltj_restore_global_variable:
+    \__ltj_fontspec_restore_variable:
    }{
     \msg_warning:nn  {luatexja-fontspec} {addjfontfeatures-ignored}
    }

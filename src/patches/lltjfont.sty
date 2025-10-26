@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2025-10-25 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2025-10-26 Patch to NFSS2 for LuaTeX-ja]
 
 %%%%%%%% LaTeX2e version detection
 \newcount\ltj@@latex@plv
@@ -890,6 +890,10 @@
 \ifnum\ltj@@latex@plv>1500 % LaTeX2e 2025-11-01
   \patchcmd\update@series@target@value@kanji{\@currentmetafamily}{\@currentmetakanjifamily}{}{}
   \patchcmd\update@series@target@value@kanji{\@currentmetafamily}{\@currentmetakanjifamily}{}{}
+  \def\@restoremetafamily{%
+    \csname \@currentmetafamily family\endcsname
+    \csname \@currentmetakanjifamily family\endcsname % LuaTeX-ja added
+  }
 \fi
 \def\@meta@family@list@kanji{\@elt{mc}\@elt{gt}\@elt{jtt}}
 
@@ -981,6 +985,7 @@
   \edef\k@family{\kanjifamilydefault}%
   \edef\k@series{\kanjiseriesdefault}%
   \edef\k@shape{\kanjishapedefault}%
+  \set@current@meta@kanjifamily
   \let\delayed@k@adjustment\empty
 }
 \else % <=LaTeX2e 2025-06-01
@@ -1139,6 +1144,27 @@
 {\catcode`M=12%
 \gdef\ltj@@mathJapaneseFonts#1M#2#3/#4\relax{\ltj@@is@kenc{#3}}}
 
+\ifnum\ltj@@latex@plv>1500 % LaTeX2e 2025-11-01
+%%%%%%
+\let\ltj@@al@getanddefine@fonts=\getanddefine@fonts
+\def\ltj@@ja@getanddefine@fonts#1#2{%
+  \csletcs{if@ltj@tempif}{ifltjselectfont@force@define}%
+  \ltjselectfont@force@definetrue
+  \xdef\font@name{\csname \string#2/\tf@size\endcsname}%
+  \pickup@jfont\let\textfont@name\font@name
+  \xdef\font@name{\csname \transform@scriptfont {sf}{#2}/\sf@size\endcsname}%
+  \pickup@jfont\let\scriptfont@name\font@name
+  \xdef\font@name{\csname \transform@scriptfont {ssf}{#2}/\ssf@size\endcsname}%
+  \pickup@jfont
+  \csletcs{ifltjselectfont@force@define}{if@ltj@tempif}%
+  \edef\math@fonts{\math@fonts\ltj@setpar@global%
+    \ltj@@set@stackfont#1,\textfont@name:{MJT}%
+    \ltj@@set@stackfont#1,\scriptfont@name:{MJS}%
+    \ltj@@set@stackfont#1,\font@name:{MJSS}%
+  }%
+}
+\else % <=LaTeX2e 2025-06-01
+%%%%%%
 \let\ltj@@al@getanddefine@fonts=\getanddefine@fonts
 \def\ltj@@ja@getanddefine@fonts#1#2{%
   \csletcs{if@ltj@tempif}{ifltjselectfont@force@define}%
@@ -1156,6 +1182,7 @@
     \ltj@@set@stackfont#1,\font@name:{MJSS}%
   }%
 }
+\fi
 
 \def\getanddefine@fonts#1#2{%
   \ltj@tempcnta=#1\expandafter\ltj@@IsFontJapanese\string#2/\relax%
