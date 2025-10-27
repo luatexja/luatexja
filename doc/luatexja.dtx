@@ -35,6 +35,8 @@
 \usepackage[haranoaji]{luatexja-preset}
 \setmonojfont{HaranoAjiGothic-Regular.otf}
 \newjfontface\KOZM{KozMinPr6N-Regular.otf}
+\newjfontface\SHS{Source Han Serif Regular}[YokoFeatures={JFM=prop}]
+\protected\def\TED{\mbox{\null\SHS ――\null}}
 
 \setLaTeXa{\scshape a}
 %<*ja>
@@ -277,7 +279,7 @@ ASCII \pTeX やそれの拡張物が用いられることが一般的であっ�
 のエンジン拡張であり，（少々仕様上不便な点はあるものの）商業印刷の分野に
 も用いられるほどの高品質な日本語組版を可能としている．だが，それは弱点に
 もなってしまった．\pTeX という（組版的に）満足なものがあったため，海外で
-行われている数々の\TeX の拡張――例えば\eTeX や\pdfTeX ――や，TrueType,
+行われている数々の\TeX の拡張\TED 例えば\eTeX や\pdfTeX \TED や，TrueType,
 OpenType, Unicodeといった計算機で日本語を扱う際の状況の変化に追従すること
 を怠ってしまったのだ．
 %</ja>
@@ -658,7 +660,7 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
 %<en>  (if you want to use \LuaTeX-ja with \LaTeXe)
 %<ja>  （\LaTeXe 下で\LuaTeX-jaを使う場合）
 \item \Pkg{ltxcmds}, \Pkg{pdftexcmds}
-\item \href{https://github.com/wspr/fontspec/}{\Pkg{fontspec}} v2.7c (or later)
+\item \href{https://github.com/wspr/fontspec/}{\Pkg{fontspec}} v2.9e (or later)
 %<*en>
 \item \emph{Harano Aji fonts} (\url{https://github.com/trueroad/HaranoAjiFonts})\\
   More specifically, HaranoAjiMincho-Regular~and~HaranoAjiGothic-Medium.
@@ -1422,7 +1424,7 @@ We also believe that using Japanese characters as identifiers is rare,
 hence we don't describe how to change Japanese fonts in math mode in
 this chapter. For the method, please see Subsection~\ref{ssec:math}.
 
-{\emshape When \LuaTeX-ja is loaded with \texttt{disablejfam}~option,
+\em{When \LuaTeX-ja is loaded with \texttt{disablejfam}~option,
   one cannot write Japanese characters in math mode as~\verb+$素$+.
   At that case, one have to use \cs{mbox} (or~\cs{text} in the \Pkg{amsmath} package).
 }
@@ -7048,7 +7050,7 @@ set both current alphabetic and Japanese font family to \meta{family},
 to use the default family for font substitution.
 %</en>
 %<*ja>
-さて，引数によっては，「和文フォントファミリとも欧文フォントファミリも認識されなかった」
+さて，引数によっては，「和文フォントファミリとも欧文フォントファミリとも認識されなかった」
 という事態もあり得る．
   この場合，引数\meta{family}は不正だった，ということになるので，
 和文・欧文の両方のフォントファミリを\meta{family}に設定し，代用フォントが使われるに任せることにする．
@@ -7403,10 +7405,10 @@ has no effect, because a color specification is already done in
 \texttt{YokoFeatures}~and~\texttt{TateFeatures} keys.
 %</en>
 %<*ja>
-\paragraph{\texttt{AltFont}, \texttt{YokoFeatures}, \texttt{TateFeatures} 等の制限}
+\paragraph{\texttt{AltFont}, \texttt{YokoFeatures}, \texttt{TateFeatures}等の制限}
 \texttt{AltFont},~\texttt{YokoFeatures},~\texttt{TateFeatures}の各キーは
 シェイプ別に指定されるべきものであり，
-内部では \texttt{BoldFeatures} などのシェイプ別の指定は行うことが出来ない．
+内部では\texttt{BoldFeatures}などのシェイプ別の指定は行うことが出来ない．
 例えば．
 \begin{lstlisting}
 AltFont = {
@@ -7426,16 +7428,15 @@ BoldFeatures = {
 のように指定しなければならない．
 
 一方，\texttt{AltFont} キー内の各リストでは
-\ \texttt{YokoFeatures},~\texttt{TateFeatures} 及び \texttt{TateFont} キーを
+\texttt{YokoFeatures}, \texttt{TateFeatures}及び\texttt{TateFont}キーを
 指定することは可能であり．また\ \texttt{YokoFeatures},~\texttt{TateFeatures} キーの
 中身に \texttt{AltFont} を指定することができる．
 
-また，\autoref{fig:yokotate-fontspec}後半部では6行目の疑似太字無効化の指定が効かず，
-2行目で指定した\ \texttt{YokoFeatures},~\texttt{TateFeatures}\ による疑似太字の指定が有効になっ
-たままである．これは\emph{\ \texttt{YokoFeatures},~\texttt{TateFeatures}\ による
+また，\autoref{fig:yokotate-fontspec}後半部では6行目の色定が効かず，
+2行目で指定した\texttt{YokoFeatures}, \texttt{TateFeatures}による色指定が有効になっ
+たままである．これは\emph{\texttt{YokoFeatures}, \texttt{TateFeatures}による
 OpenType機能指定は
 組方向に依存しないOpenType機能の指定より後に解釈される}からである．
-
 %</ja>
 
 
@@ -7668,7 +7669,7 @@ for making the difference obvious.}
 
   \begin{figure}[t]
 	\noindent\centering
-	\begin{minipage}[b]{18\zw}
+	\begin{minipage}[b]{18\zw}\lineskip.15\zw
 	  \ltjenableadjust[profile=false, linestep=false]
 	  ……だから，①より$\dfrac{a^2}{b} = \dfrac{1+\sqrt{5}}2$．\\
 	  よって$b=\dfrac{1-\sqrt{5}}2$である．\\
@@ -7679,7 +7680,7 @@ for making the difference obvious.}
 	\end{minipage}%
 	\kern2\zw
 	\begin{minipage}[b]{18\zw}
-	  \ltjenableadjust[profile]
+	  \ltjenableadjust[profile]\lineskip.15\zw
 	  ……だから，①より$\dfrac{a^2}{b} = \dfrac{1+\sqrt{5}}2$．\\
 	  よって$b=\dfrac{1-\sqrt{5}}2$である．\\
 	  これを②式に代入すると……
@@ -7720,7 +7721,7 @@ for making the difference obvious.}
   \begin{figure}[t]
 	\noindent\centering
 	\begin{minipage}[b]{16\zw}
-	  \ltjenableadjust[profile]
+	  \ltjenableadjust[profile]\lineskip.15\zw
 	  ……だから，①より$\dfrac{a^2}{b}= \dfrac{1+\sqrt{5}}2$．\\
 	  よって$b=\dfrac{1-\sqrt{5}}2$である．\\
 	  これを②式に代入すると……
@@ -7731,7 +7732,7 @@ for making the difference obvious.}
 	\kern2\zw
 	\begin{minipage}[b]{16\zw}
 	  \ltjsetparameter{linestep_factor=0.25}
-	  \ltjenableadjust[profile, linestep]
+	  \ltjenableadjust[profile, linestep]\lineskip.15\zw
 	  ……だから，①より$\dfrac{a^2}{b} = \dfrac{1+\sqrt{5}}2$．\\
 	  よって$b=\dfrac{1-\sqrt{5}}2$である．\\
 	  これを②式に代入すると……
@@ -7741,7 +7742,7 @@ for making the difference obvious.}
 	\end{minipage}\par\medskip
 	\begin{minipage}[b]{16\zw}
 	  \ltjsetparameter{linestep_factor=0.5}
-	  \ltjenableadjust[profile, linestep]
+	  \ltjenableadjust[profile, linestep]\lineskip.15\zw
 	  ……だから，①より$\dfrac{a^2}{b} = \dfrac{1+\sqrt{5}}2$．\\
 	  よって$b=\dfrac{1-\sqrt{5}}2$である．\\
 	  これを②式に代入すると……
@@ -7752,7 +7753,7 @@ for making the difference obvious.}
 	\kern2\zw
 	\begin{minipage}[b]{16\zw}
 	  \ltjsetparameter{linestep_factor=1}
-	  \ltjenableadjust[profile, linestep]
+	  \ltjenableadjust[profile, linestep]\lineskip.15\zw
 	  ……だから，①より$\dfrac{a^2}{b} = \dfrac{1+\sqrt{5}}2$．\\
 	  よって$b=\dfrac{1-\sqrt{5}}2$である．\\
 	  これを②式に代入すると……
