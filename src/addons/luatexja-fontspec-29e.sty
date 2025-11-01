@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec-29e}[2025-10-26 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec-29e}[2025-11-01 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e}
 \ExplSyntaxOn
 
@@ -96,6 +96,8 @@
 \seq_new:N \l__ltj_fontspec_orig_bf_series_seq
 \clist_new:N \g__ltj_fontspec_kanji_default_fontopts_clist
 \clist_new:N \l__ltj_fontspec_orig_default_fontopts_clist
+\prop_new:N \l__ltj_fontspec_tmp_prop
+\prop_new:N \g__ltj_fontspec_fontopts_prop
 
 \cs_new:Nn \__ltj_fontspec_set_variable_for_kanji: {
   \tl_set_eq:NN  \l__ltj_fontspec_orig_nfss_family_tl
@@ -169,6 +171,7 @@
   \keys_define:nn {fontspec-opentype} {
     Kerning/Off.code:n=\__fontspec_update_featstr:n {-kern}
   }
+  \prop_set_eq:NN \l__ltj_fontspec_tmp_prop \g__fontspec_fontopts_prop
   \prop_gset_eq:NN \g__fontspec_fontopts_prop \g__ltj_fontspec_fontopts_prop
   \clist_set_eq:NN \l__ltj_fontspec_orig_default_fontopts_clist
                    \g__fontspec_default_fontopts_clist
@@ -187,6 +190,7 @@
   \__ltj_orig_fontspec_select_font_family:nn{#1}{#2}
 
   \prop_gset_eq:NN \g__ltj_fontspec_fontopts_prop \g__fontspec_fontopts_prop
+  \prop_gset_eq:NN \g__fontspec_fontopts_prop \l__ltj_fontspec_tmp_prop
   \clist_gset_eq:NN \g__fontspec_default_fontopts_clist
                     \l__ltj_fontspec_orig_default_fontopts_clist
   \tl_gset_eq:NN \g_fontspec_encoding_tl \l__ltj_fontspec_orig_encoding_tl
@@ -426,8 +430,6 @@
     {#3}
 }
 
-\prop_new:N \l__ltj_fontspec_tmp_prop
-\prop_new:N \g__ltj_fontspec_fontopts_prop
 \DeclareDocumentCommand \defaultjfontfeatures { t+ o m }
  {
   \IfNoValueTF {#2}
