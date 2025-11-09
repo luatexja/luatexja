@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjext}[2025-10-26 v1.2k-ltj-17 Macros for vertical writing]
+\ProvidesPackage{lltjext}[2025-11-09 v1.2k-ltj-18 Macros for vertical writing]
 \RequirePackage{luatexja}
 \newcount\ltj@ext@dir
 \let\ltj@lltjext@orig@tabular=\tabular
@@ -302,6 +302,7 @@
      \if b\caption@posa\else\hss\fi}}
 
 %%% minipage and parbox
+%\ExplSyntaxOn
 \def\minipage{\@ifnextchar<%>
    {\X@minipage}{\X@minipage<Z>}}
 \def\X@minipage<#1>{\@ifnextchar[%]
@@ -311,7 +312,7 @@
 \def\@iiminipage<#1>#2[#3]{\@ifnextchar[%]
    {\@iiiminipage<#1>{#2}{#3}}{\@iiiminipage<#1>{#2}{#3}[#2]}}
 \def\@iiiminipage<#1>#2#3[#4]#5{%
-  \leavevmode\bgroup
+  \leavevmode\@pboxswfalse\bgroup
   \setlength\@tempdima{#5}%
   \def\@mpargs{<#1>{#2}{#3}[#4]{#5}}%
   \let\box@dir\relax
@@ -368,7 +369,7 @@
 \def\@iiparbox<#1>#2[#3]{\@ifnextchar[%]%
    {\@iiiparbox<#1>{#2}{#3}}{\@iiiparbox<#1>{#2}{#3}[#2]}}
 \long\def\@iiiparbox<#1>#2#3[#4]#5#6{%
-  \leavevmode
+  \leavevmode\@pboxswfalse
   \setlength\@tempdima{#5}%
   \fork@parbox@option<#1>[#2]%
   \@begin@tempboxa\vbox{\box@dir
@@ -379,8 +380,10 @@
     \fi
     \@begin@parbox\@parboxto{\box@dir\adjustbaseline
        \let\hss\vss\let\unhbox\unvbox
-       \csname bm@#4\endcsname}\@end@parbox
+       \csname bm@#4\endcsname}%
+       \if@pboxsw\m@th$\null\else\@end@parbox\fi
   \@end@tempboxa}
+%\ExplSyntaxOff
 
 
 % ↓中身＼周囲→　yoko  tate  utod  dtou
@@ -392,6 +395,8 @@
 % B: 周囲と中身が90度ずれ．上端が和文の高さ or 下端が和文の深さに揃うように
 % C: 周囲と中身が180度ずれ．（コードは B のものを流用）
 % D: 上端が和文の高さ or 下端が和文の深さに揃うように（コードは B のものを流用）
+% 従来では \@end@parbox --> \m@th$\null としていたケースは，
+% （\__math_grab_dollar_delim:w 使用によりうまく動かなくなったので）\@pboxswtrue に変更
 
 \def\fork@parbox@option@@A#1{%
   \let\@end@parbox\relax
@@ -399,10 +404,10 @@
   \else\if #1b\relax\let\@begin@parbox\vbox
   \else
     \ifmmode
-      \let\@begin@parbox\vcenter\let\@end@parbox\relax
+      \let\@begin@parbox\vcenter
     \else
       \def\@begin@parbox{\null$\vcenter}%
-      \def\@end@parbox{\m@th$\null}%
+      \@pboxswtrue
     \fi
   \fi\fi}
 \def\lltjext@getjablshift{%
@@ -420,7 +425,7 @@
       \let\@begin@parbox\vcenter\let\@end@parbox\relax
     \else
       \def\@begin@parbox{\null$\vcenter}%
-      \def\@end@parbox{\m@th$\null}%
+      \@pboxswtrue
     \fi
   \fi\fi}
 \let\fork@parbox@option@@C=\fork@parbox@option@@B
