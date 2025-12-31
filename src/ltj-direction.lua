@@ -1099,6 +1099,7 @@ end
 -- we supply correct pdfsavematrix nodes etc. inside dir_node
 do
    local finalize_inner
+   local join_rotated_tate_glyphs
    local function finalize_dir_node(db,new_dir)
       local b = getlist(db)
       while b and ((getid(b)~=id_hlist) and (getid(b)~=id_vlist)) do
@@ -1128,16 +1129,72 @@ do
    dnode.setattributelist(shipout_temp, nil)
    tex.setattribute(attr_dir, 0)
 
+   local id_penalty = node.id 'penalty'
+   local id_glue = node.id 'glue'
+do
+   local setkern = node.direct.setkern
+   local sid_save   = node.subtype 'pdf_save'
+   local sid_restore = node.subtype 'pdf_restore'
+   local sid_matrix  = node.subtype 'pdf_setmatrix'
+   local setdir = dnode.setdir
+   local getwidth = dnode.getwidth
+   local setwidth = dnode.setwidth
+   join_rotated_tate_glyphs= function (box, b, e) -- b から e の直前まで
+     local orig_head = getlist(box)
+     local w = dnode.rangedimensions(box, b, e)
+     local joined_box = node_new(id_hlist); setdir(joined_box, 'TLT')
+     local jb_inner = node_new(id_hlist); setdir(jb_inner, 'RTT')
+     setfield(joined_box, 'width', w); setfield(jb_inner, 'width', w)
+     setfield(jb_inner, 'glue_set', getfield(box, 'glue_set'))
+     setfield(jb_inner, 'glue_order', getfield(box, 'glue_order'))
+     dnode.insert_before(orig_head, b, joined_box);
+     node_remove(orig_head, b); 
+     setnext(joined_box, e);
+     local jl, jn; local n = b
+     while n and n~=e do
+        if getid(n)==id_hlist then 
+           jl, jn = insert_after(jl, jn, getlist(n)); setlist(n,nil); 
+           local nn = node_next(n); node_free(n); n = nn
+        else
+           local nn = node_next(n); jl, jn = insert_after(jl, jn, n)
+--           if getid(n)==id_glue then setwidth(n,-getwidth(n)) end
+           n = nn
+        end               
+     end
+     local ws = node_new(id_whatsit, sid_save)
+     local wm = node_new(id_whatsit, sid_matrix)
+     setfield(wm, 'data', '0 1 -1 0')
+     local wr = node_new(id_whatsit, sid_restore)
+     local k2 = node_new(id_kern); setkern(k2,w)
+     setlist(jb_inner, jl);
+     setlist(joined_box, k2); setnext(k2, ws); setnext(ws, wm); setnext(wm, jb_inner); setnext(jb_inner, wr); 
+     return joined_box
+   end
+end
+
    finalize_inner = function (box)
-      for n, nid in traverse(getlist(box)) do
+      local n = getlist(box); local nid = getid(n)
+      while n do
          if (nid==id_hlist or nid==id_vlist) then
             local ndir = get_box_dir(n, dir_yoko)
-            if ndir>=dir_node_auto then -- n is dir_node
+            if get_attr_icflag(n)==PACKED then
+               local j_start = n; local jn = node_next(n)
+               while jn do
+                  local jnid = getid(jn)
+                  if (jnid==id_hlist and get_attr_icflag(jn)==PACKED)
+                        or (jnid==id_penalty) or (jnid==id_kern) or (jnid==id_glue) then
+                     jn = node_next(jn)
+                  else break
+                  end
+               end
+               n = join_rotated_tate_glyphs(box, j_start, jn)
+            elseif ndir>=dir_node_auto then -- n is dir_node
                finalize_dir_node(n, ndir%dir_math_mod)
-            elseif get_attr_icflag(n)~=PACKED then
-               finalize_inner(n)
+            else
+               finalize_inner(n); 
             end
          end
+         n = node_next(n); nid = getid(n)
       end
    end
    local copy = dnode.copy
@@ -1152,6 +1209,7 @@ do
       setlist(shipout_temp, a); finalize_inner(shipout_temp)
       a = copy(getlist(shipout_temp)); setlist(shipout_temp, nil)
       stop_time_measure 'box_primitive_hook'
+      luatexja.ext_show_node_list(to_node(a), '>>> ', print)
       return to_node(a)
    end
 end

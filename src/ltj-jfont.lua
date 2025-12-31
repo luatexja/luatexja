@@ -480,8 +480,9 @@ do
       local new_name = is_def_jfont and extract_jfm_spec(name) or name
       is_def_jfont = false
       local res =  ltjr_font_callback(new_name, size, id, otfl_fdr)
-      luatexbase.call_callback('luatexja.define_font', res, new_name, size, id)
+      luatexbase.call_callback('luatexja.define_font', res, new_name, size, id, jfm_dir)
       -- this callback processes variation selector, so we execute it always
+      print(id, jfm_dir, res)
       return res
    end
    luatexbase.create_callback('luatexja.define_font', 'simple', function (n) return n end)
@@ -923,8 +924,18 @@ do
        'ltj.prepare_extra_data', 1)
    luatexbase.add_to_callback(
       'luatexja.define_font',
-      function (res, name, size, id)
+      function (res, name, size, id, jfm_dir)
          prepare_extra_data_font(id, res, name)
+         if type(res)=='table' and jfm_dir=='tate' then
+            res.identity='vertical'; res.writingmode='vertical'; res.direction = 8
+            local feir = font_extra_info[id]
+            local rsize = (size<0) and round(-655360*size/1000) or size
+            for i,v in pairs(res.characters) do
+               local a,b = v.height, v.depth
+               v.height = feir.vorigin[i] and (feir.vorigin[i]*rsize) or v.height
+               v.depth = feir.vheight[i] and (feir.vheight[i]*rsize - v.height) or v.depth
+            end
+         end
       end,
       'ltj.prepare_extra_data', 1)
 

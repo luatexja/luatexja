@@ -250,19 +250,21 @@ local capsule_glyph_tate = function (p, met, char_data, head, dir)
    local box = node_new(id_hlist, nil, p)
    setwhd(box, fwidth, fheight, fdepth); setshift(box, y_shift)
    setdir(box, dir)
-   setoffsets(p, -fshift.down,
-              yo -(ascender + char_data.align*(fwidth-pwidth) - fshift.left) )
-   local ws = node_new(id_whatsit, sid_save)
-   local wm = node_new(id_whatsit, sid_matrix)
-   setfield(wm, 'data', '0 1 -1 0')
-   local pwnh = -round(0.5*getwidth(p))
-   local k2 = node_new(id_kern, 1); setkern(k2, pwnh)
-   local k3 = node_new(id_kern, 1); setkern(k3, -getwidth(p)-pwnh)
-   local wr = node_new(id_whatsit, sid_restore)
-   setlist(box, ws)
-   setnext(ws, wm);  setnext(wm, k2);
-   setnext(k2, p);   setnext(p,  k3);
-   setnext(k3, wr);
+   setoffsets(p, -ascender-fshift.down,
+              yo + .5*getwidth(p)- (char_data.align*(fwidth-pwidth) - fshift.left) )
+--   local ws = node_new(id_whatsit, sid_save)
+--   local wm = node_new(id_whatsit, sid_matrix)
+--   setfield(wm, 'data', '0 1 -1 0')
+--   local pwnh = -round(0.5*getwidth(p))
+--   local k2 = node_new(id_kern, 1); setkern(k2, pwnh)
+--   local k3 = node_new(id_kern, 1); setkern(k3, -getwidth(p)-pwnh)
+--   local wr = node_new(id_whatsit, sid_restore)
+--   setlist(box, ws)
+--   setnext(ws, wm);  setnext(wm, k2);
+--   setnext(k2, p);   setnext(p,  k3);
+--   setnext(k3, wr);
+
+   setlist(box, p); setnext(p,nil);
 
    set_attr(box, attr_icflag, PACKED)
    head = q and node_insert_before(head, q, box)
