@@ -1134,7 +1134,7 @@ do
             local ndir = get_box_dir(n, dir_yoko)
             if ndir>=dir_node_auto then -- n is dir_node
                finalize_dir_node(n, ndir%dir_math_mod)
-            else
+            elseif get_attr_icflag(n)~=PACKED then
                finalize_inner(n)
             end
          end
