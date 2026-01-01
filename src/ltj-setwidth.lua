@@ -47,6 +47,7 @@ local node_new = luatexja.dnode_new
 
 local id_glyph  = node.id 'glyph'
 local id_kern   = node.id 'kern'
+local id_glue   = node.id 'glue'
 local id_hlist  = node.id 'hlist'
 local id_vlist  = node.id 'vlist'
 local id_rule   = node.id 'rule'
@@ -201,6 +202,7 @@ local function get_valt(pf, fn, pc)
    end
    return k
 end
+local setwidth = node.direct.setwidth
 local capsule_glyph_tate = function (p, met, char_data, head, dir)
    if not char_data then return node_next(p), head end
    local fwidth, pwidth, ascender = char_data.width
@@ -250,8 +252,14 @@ local capsule_glyph_tate = function (p, met, char_data, head, dir)
    local box = node_new(id_hlist, nil, p)
    setwhd(box, fwidth, fheight, fdepth); setshift(box, y_shift)
    setdir(box, dir)
-   setoffsets(p, -ascender-fshift.down,
-              yo + .5*getwidth(p)- (char_data.align*(fwidth-pwidth) - fshift.left) )
+   local pht, cwa = getfield(p,'height'), char_data.align*(fwidth-pwidth)
+   setoffsets(p, 0, .5*getwidth(p) - fshift.down)
+   local k2 = node_new(id_kern, 1); setkern(k2, -pht + cwa)
+   set_attr(k2, attr_icflag, round(-ascender + pht + cwa))
+   local k3 = node_new(id_kern, 1); 
+   setkern(k3, fwidth - 2*pwidth + ascender + getfield(p, 'depth') - cwa)
+
+   
 --   local ws = node_new(id_whatsit, sid_save)
 --   local wm = node_new(id_whatsit, sid_matrix)
 --   setfield(wm, 'data', '0 1 -1 0')
@@ -264,7 +272,7 @@ local capsule_glyph_tate = function (p, met, char_data, head, dir)
 --   setnext(k2, p);   setnext(p,  k3);
 --   setnext(k3, wr);
 
-   setlist(box, p); setnext(p,nil);
+   setlist(box, k2); setnext(k2, p); setnext(p, k3); setnext(k3, nil)
 
    set_attr(box, attr_icflag, PACKED)
    head = q and node_insert_before(head, q, box)

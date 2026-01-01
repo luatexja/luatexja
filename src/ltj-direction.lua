@@ -955,8 +955,7 @@ end
 do
    local function glyph_from_packed(h)
       local b = getlist(h)
-      return (getid(b)==id_kern or (getid(b)==id_whatsit and getsubtype(b)==sid_save) )
-         and node_next(node_next(node_next(b))) or b
+      return (getid(b)==id_kern) and node_next(b) or b
    end
    luatexja.direction.glyph_from_packed = glyph_from_packed
 end
@@ -1137,8 +1136,19 @@ do
    local sid_restore = node.subtype 'pdf_restore'
    local sid_matrix  = node.subtype 'pdf_setmatrix'
    local setdir = dnode.setdir
-   local getwidth = dnode.getwidth
-   local setwidth = dnode.setwidth
+   local getwidth, setwidth = dnode.getwidth, dnode.setwidth
+   local getkern = dnode.getkern
+   local node_tail = dnode.tail
+   local FROM_JFM         = luatexja.icflag_table.FROM_JFM
+   local KANJI_SKIP       = luatexja.icflag_table.KANJI_SKIP
+   local KANJI_SKIP_JFM   = luatexja.icflag_table.KANJI_SKIP_JFM
+   local function negate(n)
+     if getid(n)==id_glue then
+        setwidth(n, -getwidth(n))
+        setfield(n, 'stretch', -getfield(n, 'stretch')) 
+        setfield(n, 'shrink', -getfield(n, 'shrink'))
+     elseif getid(n)==id_kern then setkern(n, -getkern(n)) end
+   end
    join_rotated_tate_glyphs= function (box, b, e) -- b から e の直前まで
      local orig_head = getlist(box)
      local w = dnode.rangedimensions(box, b, e)
@@ -1152,12 +1162,17 @@ do
      setnext(joined_box, e);
      local jl, jn; local n = b
      while n and n~=e do
-        if getid(n)==id_hlist then 
-           jl, jn = insert_after(jl, jn, getlist(n)); setlist(n,nil); 
-           local nn = node_next(n); node_free(n); n = nn
+        if getid(n)==id_hlist then
+           local nn = getlist(n); 
+           if not jl then 
+             jl = nn 
+           else
+             setkern(nn, get_attr(nn, attr_icflag)); negate(nn); setnext(jn, nn)
+           end
+           jn = node_next(node_next(nn)); negate(jn); setlist(n,nil); 
+           nn = node_next(n); node_free(n); n = nn
         else
-           local nn = node_next(n); jl, jn = insert_after(jl, jn, n)
---           if getid(n)==id_glue then setwidth(n,-getwidth(n)) end
+           local nn = node_next(n); jl, jn = insert_after(jl, jn, n); negate(n)
            n = nn
         end               
      end
@@ -1209,7 +1224,6 @@ end
       setlist(shipout_temp, a); finalize_inner(shipout_temp)
       a = copy(getlist(shipout_temp)); setlist(shipout_temp, nil)
       stop_time_measure 'box_primitive_hook'
-      luatexja.ext_show_node_list(to_node(a), '>>> ', print)
       return to_node(a)
    end
 end
