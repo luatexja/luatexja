@@ -183,13 +183,6 @@ local function capsule_glyph_tate_rot(p, met, char_data, head, dir, asc)
    return q, head, box
 end
 
-------debug
-local function print_bp(a)
-  return luatexja.print_scaled(a*7200./7227)
-end
-------end debug
-
-
 local font_getfont = font.getfont
 local get_ascender, get_descender = ltju.get_ascender, ltju.get_descender
 local loop_over_feat = ltju.loop_over_feat
@@ -212,7 +205,7 @@ end
 local setwidth = node.direct.setwidth
 local capsule_glyph_tate = function (p, met, char_data, head, dir)
    if not char_data then return node_next(p), head end
-   local fwidth, pwidth, ascender = char_data.width
+   local fwidth = char_data.width; local vadv, ascender, ascender_def
    local pwidth, pheight, pdepth = getwhd(p)
    local pf, pc = getfont(p), getchar(p)
    do
@@ -233,6 +226,7 @@ local capsule_glyph_tate = function (p, met, char_data, head, dir)
           end
       end
       vadv, ascender = feir.vheight[pc]*met.size, feir.vorigin[pc]*met.size
+      ascender_def = feir.vorigin[-1]*met.size
    end
    local xo, yo = getoffsets(p)
    do -- special treatment for 'vpal'/'vhal/ feature
@@ -259,21 +253,17 @@ local capsule_glyph_tate = function (p, met, char_data, head, dir)
    setwhd(box, fwidth, char_data.height or 0, char_data.depth or 0); setshift(box, y_shift)
    setdir(box, dir)
 
-   --print ('SWT', string.format('"%s" (U+%4x) ', 
-   --  utf.char(pc), pc), 
-   --  print_bp(getwidth(p)), print_bp(getfield(p, 'height')), print_bp(getfield(p, 'depth')),
-   --  print_bp(yo), print_bp(fwidth), print_bp(vadv)
-   --)
-   
+   ---- I don't know why these values work...
+   yo = yo - 2*(ascender - ascender_def)
    local cwa = char_data.align*(fwidth-vadv)
    setoffsets(p, 0, .5*pwidth - fshift.down)
    local k2 = node_new(id_kern, 1); setkern(k2, -pheight + cwa - yo)
-   set_attr(k2, attr_icflag, round(-ascender + pheight + cwa - yo))
+   set_attr(k2, attr_icflag, round( -ascender + pheight + cwa - yo))
    local k3 = node_new(id_kern, 1); 
    setkern(k3, fwidth - 2*pwidth + ascender + pdepth - cwa + yo)
-
    setlist(box, k2); setnext(k2, p); setnext(p, k3); setnext(k3, nil)
-
+   ----
+   
    set_attr(box, attr_icflag, PACKED)
    head = q and node_insert_before(head, q, box)
       or node_insert_after(head, node_tail(head), box)
