@@ -1105,7 +1105,7 @@ do
          local ob = b; b = node_remove(b,b); setlist(db, b);
          node_free(ob)
       end
-      finalize_inner(b)
+      finalize_inner(b, get_box_dir(b, dir_yoko))
       local w, h, d = getwhd(b)
       local dw, dh, dd = getwhd(db)
       local db_head, db_tail
@@ -1151,12 +1151,13 @@ do
    end
    join_rotated_tate_glyphs= function (box, b, e) -- b から e の直前まで
      local orig_head = getlist(box)
-     local w = dnode.rangedimensions(box, b, e)
      local joined_box = node_new(id_hlist); setdir(joined_box, 'TLT')
      local jb_inner = node_new(id_hlist); setdir(jb_inner, 'RTT')
-     setfield(joined_box, 'width', w); setfield(jb_inner, 'width', w)
+     local jb_width = dnode.rangedimensions(box, b, e)
+     setfield(joined_box, 'width', jb_width); setfield(jb_inner, 'width', jb_width)
      setfield(jb_inner, 'glue_set', getfield(box, 'glue_set'))
      setfield(jb_inner, 'glue_order', getfield(box, 'glue_order'))
+     setfield(jb_inner, 'glue_sign', getfield(box, 'glue_sign'))
      dnode.insert_before(orig_head, b, joined_box);
      node_remove(orig_head, b); 
      setnext(joined_box, e);
@@ -1165,7 +1166,7 @@ do
         if getid(n)==id_hlist then
            local nn = getlist(n); 
            if not jl then 
-             jl = nn 
+             jl = nn
            else
              setkern(nn, get_attr(nn, attr_icflag)); negate(nn); setnext(jn, nn)
            end
@@ -1180,20 +1181,20 @@ do
      local wm = node_new(id_whatsit, sid_matrix)
      setfield(wm, 'data', '0 1 -1 0')
      local wr = node_new(id_whatsit, sid_restore)
-     local k2 = node_new(id_kern); setkern(k2,w)
+     local k2 = node_new(id_kern); setkern(k2, jb_width)
      setlist(jb_inner, jl);
      setlist(joined_box, k2); setnext(k2, ws); setnext(ws, wm); setnext(wm, jb_inner); setnext(jb_inner, wr); 
      return joined_box
    end
-end
 
-   finalize_inner = function (box)
+   finalize_inner = function (box, box_dir)
       local n = getlist(box); local nid = getid(n)
       while n do
          if (nid==id_hlist or nid==id_vlist) then
             local ndir = get_box_dir(n, dir_yoko)
-            if get_attr_icflag(n)==PACKED then
-               local j_start = n; local jn = node_next(n)
+            if box_dir==dir_tate and get_attr_icflag(n)==PACKED then
+               local j_start = n
+               local jn = node_next(n)
                while jn do
                   local jnid = getid(jn)
                   if (jnid==id_hlist and get_attr_icflag(jn)==PACKED)
@@ -1206,12 +1207,14 @@ end
             elseif ndir>=dir_node_auto then -- n is dir_node
                finalize_dir_node(n, ndir%dir_math_mod)
             else
-               finalize_inner(n); 
+               finalize_inner(n, ndir); 
             end
          end
          n = node_next(n); nid = getid(n)
       end
    end
+end
+
    local copy = dnode.copy
    function luatexja.direction.shipout_lthook (head)
       start_time_measure 'box_primitive_hook'
@@ -1221,7 +1224,7 @@ end
          local b = create_dir_node(a, a_dir, dir_yoko, false)
          setlist(b, a); a = b
       end
-      setlist(shipout_temp, a); finalize_inner(shipout_temp)
+      setlist(shipout_temp, a); finalize_inner(shipout_temp, dir_yoko)
       a = copy(getlist(shipout_temp)); setlist(shipout_temp, nil)
       stop_time_measure 'box_primitive_hook'
       return to_node(a)

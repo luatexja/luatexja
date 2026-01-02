@@ -163,7 +163,7 @@ local function capsule_glyph_tate_rot(p, met, char_data, head, dir, asc)
    fshift = call_callback("luatexja.set_width", fshift, met, char_data)
    local kbl = get_attr(p, attr_tkblshift) or 0
    -- f*: whd specified in JFM
-   local pwidth, pheight,pdepth = getwhd(p)
+   local pwidth, pheight, pdepth = getwhd(p)
    local fwidth = char_data.width or pwidth
    local fheight= char_data.height or pheight
    local fdepth = char_data.depth or pdepth
@@ -182,6 +182,13 @@ local function capsule_glyph_tate_rot(p, met, char_data, head, dir, asc)
       or node_insert_after(head, node_tail(head), box)
    return q, head, box
 end
+
+------debug
+local function print_bp(a)
+  return luatexja.print_scaled(a*7200./7227)
+end
+------end debug
+
 
 local font_getfont = font.getfont
 local get_ascender, get_descender = ltju.get_ascender, ltju.get_descender
@@ -206,6 +213,7 @@ local setwidth = node.direct.setwidth
 local capsule_glyph_tate = function (p, met, char_data, head, dir)
    if not char_data then return node_next(p), head end
    local fwidth, pwidth, ascender = char_data.width
+   local pwidth, pheight, pdepth = getwhd(p)
    local pf, pc = getfont(p), getchar(p)
    do
       local feir = ltjf_font_extra_info[pf]
@@ -224,53 +232,45 @@ local capsule_glyph_tate = function (p, met, char_data, head, dir)
               0.5*(get_ascender(pf)-get_descender(pf)))
           end
       end
-      pwidth, ascender = feir.vheight[pc]*met.size, feir.vorigin[pc]*met.size
+      vadv, ascender = feir.vheight[pc]*met.size, feir.vorigin[pc]*met.size
    end
    local xo, yo = getoffsets(p)
    do -- special treatment for 'vpal'/'vhal/ feature
        local k = get_valt(pf, 'vpal', pc) + get_valt(pf, 'vhal', pc)
        if k~=0 then
            local pft = font_getfont(pf); local corr_adv = k/pft.units*pft.size
-           pwidth = pwidth + corr_adv; yo = yo + corr_adv
+           vadv = vadv + corr_adv
+           yo = yo + corr_adv
        end
    end
-
-   fwidth = fwidth or pwidth
-   if pwidth>fwidth and char_data.round_threshold then
-      local frac = pwidth / fwidth
+   fwidth = fwidth or vadv
+   if vadv>fwidth and char_data.round_threshold then
+      local frac = vadv / fwidth
       local quot = floor(frac+0.5)
       if abs(frac-quot) <char_data.round_threshold then fwidth = fwidth * quot end
    end
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = call_callback("luatexja.set_width", fshift, met, char_data)
-   local fheight = char_data.height or 0
-   local fdepth  = char_data.depth or 0
    local y_shift = xo + (get_attr(p,attr_tkblshift) or 0)
    local q
    head, q = node_remove(head, p)
 
    local box = node_new(id_hlist, nil, p)
-   setwhd(box, fwidth, fheight, fdepth); setshift(box, y_shift)
+   setwhd(box, fwidth, char_data.height or 0, char_data.depth or 0); setshift(box, y_shift)
    setdir(box, dir)
-   local pht, cwa = getfield(p,'height'), char_data.align*(fwidth-pwidth)
-   setoffsets(p, 0, .5*getwidth(p) - fshift.down)
-   local k2 = node_new(id_kern, 1); setkern(k2, -pht + cwa)
-   set_attr(k2, attr_icflag, round(-ascender + pht + cwa))
-   local k3 = node_new(id_kern, 1); 
-   setkern(k3, fwidth - 2*pwidth + ascender + getfield(p, 'depth') - cwa)
 
+   --print ('SWT', string.format('"%s" (U+%4x) ', 
+   --  utf.char(pc), pc), 
+   --  print_bp(getwidth(p)), print_bp(getfield(p, 'height')), print_bp(getfield(p, 'depth')),
+   --  print_bp(yo), print_bp(fwidth), print_bp(vadv)
+   --)
    
---   local ws = node_new(id_whatsit, sid_save)
---   local wm = node_new(id_whatsit, sid_matrix)
---   setfield(wm, 'data', '0 1 -1 0')
---   local pwnh = -round(0.5*getwidth(p))
---   local k2 = node_new(id_kern, 1); setkern(k2, pwnh)
---   local k3 = node_new(id_kern, 1); setkern(k3, -getwidth(p)-pwnh)
---   local wr = node_new(id_whatsit, sid_restore)
---   setlist(box, ws)
---   setnext(ws, wm);  setnext(wm, k2);
---   setnext(k2, p);   setnext(p,  k3);
---   setnext(k3, wr);
+   local cwa = char_data.align*(fwidth-vadv)
+   setoffsets(p, 0, .5*pwidth - fshift.down)
+   local k2 = node_new(id_kern, 1); setkern(k2, -pheight + cwa - yo)
+   set_attr(k2, attr_icflag, round(-ascender + pheight + cwa - yo))
+   local k3 = node_new(id_kern, 1); 
+   setkern(k3, fwidth - 2*pwidth + ascender + pdepth - cwa + yo)
 
    setlist(box, k2); setnext(k2, p); setnext(p, k3); setnext(k3, nil)
 

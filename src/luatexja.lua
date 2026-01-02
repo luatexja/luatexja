@@ -431,7 +431,7 @@ end
 local function debug_show_node_X(p,print_fn, limit, inner_depth)
    local k = prefix
    local s
-   local pt, pic = node_type(p.id), (get_attr(p, attr_icflag) or 0) --% icflag_table.PROCESSED_BEGIN_FLAG
+   local pt, pic = node_type(p.id), (get_attr(p, attr_icflag) or 0) % icflag_table.PROCESSED_BEGIN_FLAG
    local base = prefix 
 --     .. string.format('[%9d] ', (node.direct.todirect(p)))
      .. string.format('%4X', pic) .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '
@@ -454,8 +454,9 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
       else
          s = base .. '(' .. print_scaled(p.height) .. '+'
             .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
-            .. ', dir=' .. tostring(node.get_attribute(p, attr_dir))
+            .. ', dir_ltj=' .. tostring(node.get_attribute(p, attr_dir))
       end
+      s = s .. p.dir
       if (p.shift or 0)~=0 then
          s = s .. ', shifted ' .. print_scaled(p.shift)
       end
@@ -482,7 +483,7 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
    elseif pt=='rule' then
       s = base .. '(' .. print_scaled(p.height) .. '+'
          .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
-         .. ', dir=' .. tostring(node.get_attribute(p, attr_dir))
+         .. ', dir_ltj=' .. tostring(node.get_attribute(p, attr_dir))
       print_fn(s)
    elseif pt=='disc' then
       print_fn(s)
@@ -548,7 +549,7 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
          else
             s = s .. 'userid:' .. t .. '(node list)'
             if p.user_id==uid_table.DIR then
-               s = s .. ' dir: ' .. tostring(node.get_attribute(p, attr_dir))
+               s = s .. ' dir_ltj: ' .. tostring(node.get_attribute(p, attr_dir))
             end
             print_fn(s)
             local bid = inner_depth

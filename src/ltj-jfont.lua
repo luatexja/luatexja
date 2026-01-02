@@ -446,7 +446,6 @@ do
          if luatexja.jfont.jfm_feature then
             local l, t2 = sub(name,-1), {}
             for i,v in pairs(luatexja.jfont.jfm_feature) do
-               -- print(i,type(v),v)
                t2[#t2+1] = (v==true) and i
                   or ((v==false) and ('-'..i) or (i..'='..tostring(v)))
             end
@@ -459,7 +458,6 @@ do
          if jfm_var~='' then
             name = name .. ';jfmvar=' .. jfm_var
          end
-         -- print('NN>', name)
       end
       jfm_ksp = (is_feature_specified(name,'ltjksp')~=false)
       jfm_pci = (is_feature_specified(name,'ltjpci')~=false)
@@ -482,7 +480,6 @@ do
       local res =  ltjr_font_callback(new_name, size, id, otfl_fdr)
       luatexbase.call_callback('luatexja.define_font', res, new_name, size, id, jfm_dir)
       -- this callback processes variation selector, so we execute it always
-      print(id, jfm_dir, res)
       return res
    end
    luatexbase.create_callback('luatexja.define_font', 'simple', function (n) return n end)
@@ -927,6 +924,8 @@ do
       function (res, name, size, id, jfm_dir)
          prepare_extra_data_font(id, res, name)
          if type(res)=='table' and jfm_dir=='tate' then
+            print(id, res, 'TATE')
+            res.fullname = res.fullname .. ' (Identity-V)' 
             res.identity='vertical'; res.writingmode='vertical'; res.direction = 8
          end
       end,

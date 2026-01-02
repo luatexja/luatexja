@@ -1,0 +1,22 @@
+\makeatletter
+\pdfvariable compresslevel 0
+\pdfvariable objcompresslevel 0
+\documentclass[twocolumn]{ltjtarticle}
+\textwidth=620bp\columnsep=20bp
+\usepackage{luacode,bxjalipsum}
+\begin{document}
+\pagestyle{empty}\fontsize{10.39267bp}{17.5bp}\selectfont
+
+\ltjsetparameter{kanjiskip=0bp plus 0.4bp minus 0.5bp}
+\tfont\AM=file:KozMinPr6N-Regular.otf:-kern;jfm=ujisv at 10bp
+\AM\vrule ，あい」うxyzちょっとアノ、sか：「く」ーけ、こbc\vrule
+
+\tfont\AB=file:KozMinPr6N-Regular.otf:+vpal;-kern;jfm=propv at 10.bp
+\AB\vrule ，あい」うxyzちょっとアノ、sか：「く」ーけ、こbc\vrule
+
+\tfont\AC=file:KozMinPr6N-Regular.otf:+vpal;kern;vkrn;jfm=propv at 10bp
+\AC\vrule ，あい」うxyzちょっとアノ、sか：「く」ーけ、こbc\vrule
+
+\AM\jalipsum{kusamakura}\jalipsum{wagahai}
+\end{document}
+
