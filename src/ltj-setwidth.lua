@@ -209,9 +209,9 @@ local capsule_glyph_tate = function (p, met, char_data, head, dir)
    local pwidth, pheight, pdepth = getwhd(p)
    local pf, pc = getfont(p), getchar(p)
    do
+      local f = font_getfont(pf)
       local feir = ltjf_font_extra_info[pf]
       if met.rotation and met.vert_activated then
-          local f = font_getfont(pf)
           local pco = ltjs_orig_char_table[p] or pc
           local r = met.rotation[pco]
           local l = f.properties and f.properties.language
@@ -228,13 +228,12 @@ local capsule_glyph_tate = function (p, met, char_data, head, dir)
       vadv, ascender = feir.vheight[pc]*met.size, feir.vorigin[pc]*met.size
       ascender_def = feir.vorigin[-1]*met.size
    end
-   local xo, yo = getoffsets(p)
+   local xo, yo = getoffsets(p); local corr_adv = 0
    do -- special treatment for 'vpal'/'vhal/ feature
        local k = get_valt(pf, 'vpal', pc) + get_valt(pf, 'vhal', pc)
        if k~=0 then
-           local pft = font_getfont(pf); local corr_adv = k/pft.units*pft.size
+           local pft = font_getfont(pf); corr_adv = k/pft.units*pft.size
            vadv = vadv + corr_adv
-           yo = yo + corr_adv
        end
    end
    fwidth = fwidth or vadv
@@ -252,17 +251,25 @@ local capsule_glyph_tate = function (p, met, char_data, head, dir)
    local box = node_new(id_hlist, nil, p)
    setwhd(box, fwidth, char_data.height or 0, char_data.depth or 0); setshift(box, y_shift)
    setdir(box, dir)
+   --print(string.format('"%s"(U+%04X) ', utf.char(pc),pc), 
+   --  luatexja.print_scaled(fwidth or 0), luatexja.print_scaled(pwidth or 0),
+   --  luatexja.print_scaled(pheight or 0), luatexja.print_scaled(pdepth or 0))
+   --print('',
+   --  luatexja.print_scaled(vadv), luatexja.print_scaled(ascender),
+   --  luatexja.print_scaled(vadv_def), luatexja.print_scaled(ascender_def)
+   --)
 
    ---- I don't know why these values work...
-   yo = yo - 2*(ascender - ascender_def)
-   local cwa = char_data.align*(fwidth-vadv)
+   local cwa, ad = char_data.align*(fwidth-vadv) - fshift.left, (ascender - ascender_def)
    setoffsets(p, 0, .5*pwidth - fshift.down)
-   local k2 = node_new(id_kern, 1); setkern(k2, -pheight + cwa - yo)
-   set_attr(k2, attr_icflag, round( -ascender + pheight + cwa - yo))
+   local k2 = node_new(id_kern, 1) 
+   setkern(k2, -pheight + ((yo+corr_adv<0) and 0 or yo + 2*corr_adv) + cwa + ad - (0.88*met.size - ascender_def) )
+   set_attr(k2, attr_icflag, round( -ascender + pheight + cwa - yo - corr_adv + 2*ad))
    local k3 = node_new(id_kern, 1); 
-   setkern(k3, fwidth - 2*pwidth + ascender + pdepth - cwa + yo)
+   setkern(k3, -met.size + fwidth - pwidth + ascender + pdepth - cwa + yo +corr_adv - 2*ad)
    setlist(box, k2); setnext(k2, p); setnext(p, k3); setnext(k3, nil)
    ----
+   --print('', luatexja.print_scaled(cwa), luatexja.print_scaled(yo), luatexja.print_scaled(corr_adv))
    -- "PACKED" hbox のうち，リストが kern->glyph->kern のはこの種類だけ
 
    set_attr(box, attr_icflag, PACKED)
