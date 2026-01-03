@@ -208,6 +208,7 @@ local capsule_glyph_tate = function (p, met, char_data, head, dir)
    local fwidth = char_data.width; local vadv, ascender, ascender_def
    local pwidth, pheight, pdepth = getwhd(p)
    local pf, pc = getfont(p), getchar(p)
+   local embed
    do
       local f = font_getfont(pf)
       local feir = ltjf_font_extra_info[pf]
@@ -225,6 +226,7 @@ local capsule_glyph_tate = function (p, met, char_data, head, dir)
               0.5*(get_ascender(pf)-get_descender(pf)))
           end
       end
+      embed = (f.filename~="")
       vadv, ascender = feir.vheight[pc]*met.size, feir.vorigin[pc]*met.size
       ascender_def = feir.vorigin[-1]*met.size
    end
@@ -251,22 +253,22 @@ local capsule_glyph_tate = function (p, met, char_data, head, dir)
    local box = node_new(id_hlist, nil, p)
    setwhd(box, fwidth, char_data.height or 0, char_data.depth or 0); setshift(box, y_shift)
    setdir(box, dir)
-   --print(string.format('"%s"(U+%04X) ', utf.char(pc),pc), 
+   --print(string.format('"%s"(U+%04X) ', utf.char(pc),pc),
    --  luatexja.print_scaled(fwidth or 0), luatexja.print_scaled(pwidth or 0),
    --  luatexja.print_scaled(pheight or 0), luatexja.print_scaled(pdepth or 0))
    --print('',
-   --  luatexja.print_scaled(vadv), luatexja.print_scaled(ascender),
-   --  luatexja.print_scaled(vadv_def), luatexja.print_scaled(ascender_def)
-   --)
+   --  luatexja.print_scaled(vadv or -1), luatexja.print_scaled(ascender or -1),
+   --  luatexja.print_scaled(ascender_def or -1)
+--)
 
    ---- I don't know why these values work...
    local cwa, ad = char_data.align*(fwidth-vadv) - fshift.left, (ascender - ascender_def)
-   setoffsets(p, 0, .5*pwidth - fshift.down)
+   setoffsets(p, 0, (embed and (.5*pwidth) or 0) - fshift.down)
    local k2 = node_new(id_kern, 1) 
    setkern(k2, -pheight + ((yo+corr_adv<0) and 0 or yo + 2*corr_adv) + cwa + ad - (0.88*met.size - ascender_def) )
    set_attr(k2, attr_icflag, round( -ascender + pheight + cwa - yo - corr_adv + 2*ad))
    local k3 = node_new(id_kern, 1); 
-   setkern(k3, -met.size + fwidth - pwidth + ascender + pdepth - cwa + yo +corr_adv - 2*ad)
+   setkern(k3, -met.size + fwidth - (embed and pwidth or 0) + ascender + pdepth - cwa + yo +corr_adv - 2*ad)
    setlist(box, k2); setnext(k2, p); setnext(p, k3); setnext(k3, nil)
    ----
    --print('', luatexja.print_scaled(cwa), luatexja.print_scaled(yo), luatexja.print_scaled(corr_adv))
