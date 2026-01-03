@@ -168,15 +168,18 @@ local function capsule_glyph_tate_rot(p, met, char_data, head, dir, asc)
    local fheight= char_data.height or pheight
    local fdepth = char_data.depth or pdepth
    local q
+
    head, q = node_remove(head, p)
    local xo, yo = getoffsets(p)
-   setoffsets(p, xo + char_data.align*(fwidth-pwidth) - fshift.left,
-              yo - fshift.down - asc);
+   setoffsets(p, xo + char_data.align*(fwidth-pwidth) - fshift.left + .5*pwidth, 0)
    setnext(p, nil)
    local box = node_new(id_hlist, nil, p)
+   local inner_box = node_new(id_hlist, nil, p)
    setwhd(box, fwidth, fheight, fdepth)
-   setlist(box, p); setshift(box, kbl)
-   setdir(box, dir)
+   setwhd(inner_box, 0,0,0)
+   setlist(box, inner_box); setlist(inner_box, p);
+   setshift(box, kbl); setshift(inner_box, yo-fshift.down - asc)
+   setdir(box, dir); setdir(inner_box, dir)
    set_attr(box, attr_icflag, PACKED)
    head = q and node_insert_before(head, q, box)
       or node_insert_after(head, node_tail(head), box)
@@ -211,6 +214,7 @@ local capsule_glyph_tate = function (p, met, char_data, head, dir)
    local embed
    do
       local f = font_getfont(pf)
+      ascender_def = get_ascender(pf) 
       local feir = ltjf_font_extra_info[pf]
       if met.rotation and met.vert_activated then
           local pco = ltjs_orig_char_table[p] or pc
@@ -223,12 +227,11 @@ local capsule_glyph_tate = function (p, met, char_data, head, dir)
           end
           if r and (get_attr(p, attr_vert_ori) or 0)<=0 then
             return capsule_glyph_tate_rot(p, met, char_data, head, dir,
-              0.5*(get_ascender(pf)-get_descender(pf)))
+              1.38*met.size - ascender_def )
           end
       end
       embed = (f.filename~="")
       vadv, ascender = feir.vheight[pc]*met.size, feir.vorigin[pc]*met.size
-      ascender_def = feir.vorigin[-1]*met.size
    end
    local xo, yo = getoffsets(p); local corr_adv = 0
    do -- special treatment for 'vpal'/'vhal/ feature
@@ -259,7 +262,7 @@ local capsule_glyph_tate = function (p, met, char_data, head, dir)
    --print('',
    --  luatexja.print_scaled(vadv or -1), luatexja.print_scaled(ascender or -1),
    --  luatexja.print_scaled(ascender_def or -1)
---)
+   --)
 
    ---- I don't know why these values work...
    local cwa, ad = char_data.align*(fwidth-vadv) - fshift.left, (ascender - ascender_def)
