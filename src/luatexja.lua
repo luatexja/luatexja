@@ -456,7 +456,7 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
             .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
             .. ', dir_ltj=' .. tostring(node.get_attribute(p, attr_dir))
       end
-      s = s .. p.dir
+      s = s .. ' ' .. tostring(p.dir)
       if (p.shift or 0)~=0 then
          s = s .. ', shifted ' .. print_scaled(p.shift)
       end

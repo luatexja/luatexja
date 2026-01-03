@@ -341,7 +341,7 @@ do
       font_metric_table[fn]=fmtable
       tex.sprint(cat_lp, global_flag, '\\protected\\expandafter\\def\\ltj@temp',
         '{\\ltj@cur'.. (jfm_dir == 'yoko' and 'j' or 't') .. 'fnt', fn, '\\relax}')
-      jfm_spec = nil
+      jfm_spec = nil; jfm_dir = nil
    end
 end
 
@@ -924,7 +924,6 @@ do
       function (res, name, size, id, jfm_dir)
          prepare_extra_data_font(id, res, name)
          if type(res)=='table' and jfm_dir=='tate' then
-            print(id, res, 'TATE')
             res.fullname = res.fullname .. ' (Identity-V)' 
             res.identity='vertical'; res.writingmode='vertical'; res.direction = 8
          end

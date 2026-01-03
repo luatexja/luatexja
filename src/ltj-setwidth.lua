@@ -263,7 +263,8 @@ local capsule_glyph_tate = function (p, met, char_data, head, dir)
    setkern(k3, fwidth - 2*pwidth + ascender + pdepth - cwa + yo)
    setlist(box, k2); setnext(k2, p); setnext(p, k3); setnext(k3, nil)
    ----
-   
+   -- "PACKED" hbox のうち，リストが kern->glyph->kern のはこの種類だけ
+
    set_attr(box, attr_icflag, PACKED)
    head = q and node_insert_before(head, q, box)
       or node_insert_after(head, node_tail(head), box)
