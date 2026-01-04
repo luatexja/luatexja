@@ -1128,9 +1128,11 @@ do
    local shipout_temp =  node_new(id_hlist)
    dnode.setattributelist(shipout_temp, nil)
    tex.setattribute(attr_dir, 0)
+   local attr_vert_aux = luatexbase.attributes['ltj@kcat0']
 
 do
    local setkern = node.direct.setkern
+   local setshift = node.direct.setshift
    local sid_save   = node.subtype 'pdf_save'
    local sid_restore = node.subtype 'pdf_restore'
    local sid_matrix  = node.subtype 'pdf_setmatrix'
@@ -1150,7 +1152,7 @@ do
         setfield(n, 'shrink', -getfield(n, 'shrink'))
      elseif getid(n)==id_kern then setkern(n, -getkern(n)) end
    end
-   join_tate_glyphs= function (box, b) -- b から
+   join_tate_glyphs= function (box, b, y_shift) -- b から
      local orig_head = getlist(box)
      local joined_box = node_new(id_hlist); setdir(joined_box, 'TLT')
      local jb_inner = node_new(id_hlist); setdir(jb_inner, 'RTT')
@@ -1161,7 +1163,10 @@ do
        if (nid==id_hlist) and (get_attr_icflag(n)==PACKED) then
          local nn = getlist(n)
          if nn and getid(nn)==id_kern then
-           n = node_next(n)
+           if get_attr(node_next(nn),attr_vert_aux)==y_shift then
+             n = node_next(n)
+           else break
+           end
          else break
          end
        elseif (nid==id_penalty) or (nid==id_kern) or (nid==id_glue) then
@@ -1183,7 +1188,7 @@ do
          if not jl then 
            jl = nn 
          else
-           setkern(nn, get_attr(nn, attr_icflag)); negate(nn); setnext(jn, nn) 
+           setkern(nn, get_attr(nn, attr_vert_aux)); negate(nn); setnext(jn, nn) 
          end
          jn = node_next(node_next(nn)); negate(jn)
          setlist(n, nil); _, nn = node_remove(orig_head, n); node_free(n); n = nn
@@ -1197,7 +1202,7 @@ do
      setfield(wm, 'data', '0 1 -1 0')
      local wr = node_new(id_whatsit, sid_restore)
      local k2 = node_new(id_kern); setkern(k2, jw)
-     setlist(jb_inner, jl); setnext(jn, nil)
+     setlist(jb_inner, jl); setnext(jn, nil); setshift(joined_box, y_shift)
      setlist(joined_box, k2); setnext(k2, ws); setnext(ws, wm); setnext(wm, jb_inner); setnext(jb_inner, wr);
      return joined_box
    end
@@ -1211,7 +1216,7 @@ end
             if box_dir==dir_tate and get_attr_icflag(n)==PACKED then
                local nn = getlist(n)
                if nn and getid(nn)==id_kern then
-                 n = join_tate_glyphs(box, n)
+                 n = join_tate_glyphs(box, n, get_attr(node_next(nn), attr_vert_aux) or 0)
                end
             elseif ndir>=dir_node_auto then -- n is dir_node
                finalize_dir_node(n, ndir%dir_math_mod)

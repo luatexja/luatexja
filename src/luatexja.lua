@@ -133,7 +133,9 @@ local attr_jchar_code = luatexbase.attributes['ltj@charcode']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
-local attr_uniqid = luatexbase.attributes['ltj@uniqid']
+local attr_vert_aux = luatexbase.attributes['ltj@kcat0']
+   -- 本来は文字範囲の和文/欧文設定の格納用→流用！
+-- local attr_uniqid = luatexbase.attributes['ltj@uniqid'] 未定義・未使用
 local attr_dir = luatexbase.attributes['ltj@dir']
 local cat_lp = luatexbase.catcodetables['latex-package']
 
