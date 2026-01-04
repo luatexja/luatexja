@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2025-05-04',
+  date = '2026-01-04',
   description = 'Loader for Japanese fonts',
 })
 
@@ -923,10 +923,6 @@ do
       'luatexja.define_font',
       function (res, name, size, id, jfm_dir)
          prepare_extra_data_font(id, res, name)
-         if type(res)=='table' and jfm_dir=='tate' then
-            res.fullname = res.fullname .. ' (Identity-V)' 
-            res.identity='vertical'; res.writingmode='vertical'; res.direction = 8
-         end
       end,
       'ltj.prepare_extra_data', 1)
 
@@ -970,6 +966,24 @@ do
       end
     end
   end
+luatexbase.add_to_callback(
+   'luatexja.define_font',
+   function (res, name, size, id, jfm_dir)
+      if type(res)=='table' and jfm_dir=='tate' then
+         -- use Identity-V CMap
+         res.fullname = res.fullname .. ' (Identity-V)' 
+         res.identity='vertical'; res.writingmode='vertical'; res.direction = 8
+         -- replace ToUnicode entry of vertical forms
+         if res.tounicode==1 then
+            for i,v in pairs(vert_form_table) do
+               if res.characters[v] then
+                 res.characters[v].tounicode=string.format("%04X", i)
+               end
+            end
+         end
+      end
+   end,
+   'ltj.patch_tounicode_for_vertical_font', 1)
 
 luatexbase.add_to_callback(
    "luatexja.define_jfont",
