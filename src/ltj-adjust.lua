@@ -593,6 +593,8 @@ do
   end
   local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
   local attr_curtfnt = luatexbase.attributes['ltj@curtfnt']
+  local attr_autospc = luatexbase.attributes['ltj@autospc']
+  local attr_autoxspc = luatexbase.attributes['ltj@autoxspc']
   local dir_tate = luatexja.dir_table.dir_tate
   local get_dir_count = ltjd.get_dir_count
   local ltjf_font_metric_table = ltjf.font_metric_table
