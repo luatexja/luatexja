@@ -54,21 +54,30 @@ end
 
 \catcode`\@=11
 \def\TEST#1{\ltj@vert@ori#1
-  左←↑↓→☜☝☟☞⇦⇧⇩⇨⬅⬆⬇➡右¶\ltjjachar"253B\ltjjachar"0165\relax
+%  あ\vrule ㍗
+  \smash{\llap{\vrule depth 100pt width 0.1mm\kern-0.05mm}}%
+  左%
+  \smash{\rlap{\kern-0.05mm\vrule depth 100pt width 0.1mm}}%
+  ←↑↓→☜☝☟☞⇦⇧⇩⇨⬅⬆⬇➡右¶\ltjjachar"253B\ltjjachar"0165\relax
   あ：いーう，え、お．か。き；け\ltjjachar"201Cこ\ltjjachar"301D%
-  さ\ltjjachar"301Fし\ltjjachar"201Dす\ltjjachar"2015せ\ltjjachar"2014そ
-  ‥…〜ー＝―‐゠㍉㌔㌢㍍㌘㌧㌃㌶㍑㍗㌍㌦㌣㌫㍊㌻㍾㍽㍼㍻＝≒≠≡\ltjjachar`β%
-  \ltjjachar`Å\ltjjachar`Б}
+  さ\ltjjachar"301Fゃ\ltjjachar"201Dす\ltjjachar"2015せ\ltjjachar"2014そ
+  ‥…〜ー＝―‐゠㍉㌔㌢㍍㌘㌧㌃㌶㍑㍗㌍㌦㌣㌫㍊㌻㍿㍾㍽㍼㍻＝≒≠≡\ltjjachar`β%
+  \ltjjachar`Å\ltjjachar`Бあっと\ltjjachar"205D…‥あ
+}
 
 
 \TESTA{MogaMincho}
 \TESTA{IPAexMincho}
+\TESTA{HGSeiKaishotai-PRO}
 \TESTA{hgrsmp04.ttf}
 \TESTA{BIZ-UDMinchoM.ttc}
 
 \TESTA{KozMinPr6N-Regular}
 \TESTA{SourceHanSerif-Regular}
+\TESTA{HaranoAjiMincho-Regular}
 \TESTA{HiraMinProN-W3}
+
+\TESTA{psft:Ryumin-Light}
 
 \end{document}
 

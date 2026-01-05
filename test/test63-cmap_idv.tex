@@ -1,0 +1,54 @@
+\makeatletter
+\pdfvariable compresslevel 0
+\pdfvariable objcompresslevel 0
+\documentclass[twocolumn]{ltjtarticle}
+\textwidth=620bp\columnsep=20bp
+\usepackage{luacode,bxjalipsum}
+%\usepackage{lua-visual-debug}
+\begin{document}
+\makeatletter
+\def\TEST{aa㍗◆星星あああ\ltjjachar`β\ltjjachar`Ё\ltjjachar`µ\vrule width 4bp漢字ф海◆\vrule width 3bp星aa}
+%\def\TEST{㍗星x\vrule width 3bp幕あ}
+\hbox{\tate\vrule width 2bp%
+  \tfont\MM=MogaMincho:jfm=testv at 10bp\MM 
+  \ltj@vert@ori0\TEST
+  \vrule width 2pt
+}
+\hbox{\tate\vrule width 2bp%
+  \tfont\MK=KozMinPr6n-Regular:jfm=testv at 10bp\MK
+  \ltj@vert@ori0\TEST
+  \vrule width 2pt
+}
+\hbox{\tate\vrule width 2bp%
+  \tfont\MT=FOT-TsukuMinPr6N-R:jfm=testv at 10bp\MT
+  \ltj@vert@ori0\TEST
+  \vrule width 2pt
+}
+\hbox{\tate\tfont\MX=KozMinPr6N-Regular:pwid;jfm=propv at 10pt
+  \MX ◆ちょっと◆
+  \vrule width 2pt
+  \vrule width2pt}
+
+\hbox{\yoko 
+  \font\MK=KozMinPr6n-Regular at 10pt\MK
+  \vrule\setbox0\hbox{\ltjalchar`β}\copy0 \the\wd0\vrule}
+
+\end{document}
+
+\pagestyle{empty}\fontsize{10.39267bp}{17.5bp}\selectfont
+
+\makeatletter
+\ltj@vert@ori1
+\ltjsetparameter{kanjiskip=0bp plus 0.4bp minus 0.5bp}
+\tfont\AM=MogaMincho;jfm=ujisv at 10bp
+\AM\vrule ，あい」うxyzちょ\ltjjachar`βっとアノ、sか：「く」ーけ、こbc\vrule
+
+\tfont\AB=file:KozMinPr6N-Regular.otf:+vpal;-kern;jfm=propv at 10.bp
+\AB\vrule ，あい」うxyzちょっとアノ、sか：「く」ーけ、こbc\vrule
+
+\tfont\AC=file:KozMinPr6N-Regular.otf:+vpal;kern;vkrn;jfm=propv at 10bp
+\AC\vrule ，あい」うxyzちょっとアノ、sか：「く」ーけ、こbc\vrule
+
+\AM\jalipsum{kusamakura}\jalipsum{wagahai}
+\end{document}
+

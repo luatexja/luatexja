@@ -18,8 +18,19 @@ do
     end
   end
 end
-function luatexja.load_module(name) require('ltj-' .. name.. '.lua') end
-
+do
+   if luatexja_cmapidv then
+      texio.write_nl('*** LuaTeX-ja: Using "Identity-V" CMap for vertical fonts. ***')
+      function luatexja.load_module(name) require('ltj-' .. name.. '.lua') end
+   else
+      function luatexja.load_module(name)
+         local status = pcall(require, 'ltj-' .. name.. '-20251230.lua')
+         if not status then
+            require('ltj-' .. name.. '.lua')
+         end
+      end
+   end
+end
 do
     local dnode = node.direct
     local getfield, traverse = dnode.getfield, dnode.traverse
@@ -133,7 +144,9 @@ local attr_jchar_code = luatexbase.attributes['ltj@charcode']
 local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
 local attr_yablshift = luatexbase.attributes['ltj@yablshift']
 local attr_icflag = luatexbase.attributes['ltj@icflag']
-local attr_uniqid = luatexbase.attributes['ltj@uniqid']
+local attr_vert_aux = luatexbase.attributes['ltj@kcat0']
+   -- 本来は文字範囲の和文/欧文設定の格納用→流用！
+-- local attr_uniqid = luatexbase.attributes['ltj@uniqid'] 未定義・未使用
 local attr_dir = luatexbase.attributes['ltj@dir']
 local cat_lp = luatexbase.catcodetables['latex-package']
 
@@ -431,7 +444,7 @@ end
 local function debug_show_node_X(p,print_fn, limit, inner_depth)
    local k = prefix
    local s
-   local pt, pic = node_type(p.id), (get_attr(p, attr_icflag) or 0) --% icflag_table.PROCESSED_BEGIN_FLAG
+   local pt, pic = node_type(p.id), (get_attr(p, attr_icflag) or 0) % icflag_table.PROCESSED_BEGIN_FLAG
    local base = prefix 
 --     .. string.format('[%9d] ', (node.direct.todirect(p)))
      .. string.format('%4X', pic) .. ' ' .. pt .. ' ' .. tostring(p.subtype) .. ' '

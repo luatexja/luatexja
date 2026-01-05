@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfont',
-  date = '2026-01-04',
+  date = '2025-05-04',
   description = 'Loader for Japanese fonts',
 })
 
@@ -317,9 +317,9 @@ do
                             'The JFM file you specified is not valid JFM file.\n'..
                                'So defining Japanese font is cancelled.')
          tex.sprint(cat_lp, global_flag, '\\expandafter\\let\\ltj@temp\\relax')
-         jfm_dir = nil; return
+         return
       end
-      if not f then jfm_dir = nil; return end
+      if not f then return end
       update_jfm_cache(j, f.size); check_callback_order()
       local sz = metrics[j].size_cache[f.size]
       local fmtable = { jfm = j, size = f.size, var = jfm_var,
@@ -341,7 +341,7 @@ do
       font_metric_table[fn]=fmtable
       tex.sprint(cat_lp, global_flag, '\\protected\\expandafter\\def\\ltj@temp',
         '{\\ltj@cur'.. (jfm_dir == 'yoko' and 'j' or 't') .. 'fnt', fn, '\\relax}')
-      jfm_spec = nil; jfm_dir = nil
+      jfm_spec = nil
    end
 end
 
@@ -446,6 +446,7 @@ do
          if luatexja.jfont.jfm_feature then
             local l, t2 = sub(name,-1), {}
             for i,v in pairs(luatexja.jfont.jfm_feature) do
+               -- print(i,type(v),v)
                t2[#t2+1] = (v==true) and i
                   or ((v==false) and ('-'..i) or (i..'='..tostring(v)))
             end
@@ -458,6 +459,7 @@ do
          if jfm_var~='' then
             name = name .. ';jfmvar=' .. jfm_var
          end
+         -- print('NN>', name)
       end
       jfm_ksp = (is_feature_specified(name,'ltjksp')~=false)
       jfm_pci = (is_feature_specified(name,'ltjpci')~=false)
@@ -478,7 +480,7 @@ do
       local new_name = is_def_jfont and extract_jfm_spec(name) or name
       is_def_jfont = false
       local res =  ltjr_font_callback(new_name, size, id, otfl_fdr)
-      luatexbase.call_callback('luatexja.define_font', res, new_name, size, id, jfm_dir)
+      luatexbase.call_callback('luatexja.define_font', res, new_name, size, id)
       -- this callback processes variation selector, so we execute it always
       return res
    end
@@ -496,7 +498,6 @@ do
       local j = -update_jfm_cache(i, size)
       font_metric_table[j]=metrics[i].size_cache[size]
       tex.sprint(cat_lp, '\\ltj@cur' .. (dir=='yoko' and 'j' or 't') .. 'fnt' .. tostring(j) .. '\\relax')
-      jfm_dir = nil
    end
    luatexja.jfont.load_jfmonly = load_jfmonly
 end
@@ -922,7 +923,7 @@ do
        'ltj.prepare_extra_data', 1)
    luatexbase.add_to_callback(
       'luatexja.define_font',
-      function (res, name, size, id, jfm_dir)
+      function (res, name, size, id)
          prepare_extra_data_font(id, res, name)
       end,
       'ltj.prepare_extra_data', 1)
@@ -967,24 +968,6 @@ do
       end
     end
   end
-luatexbase.add_to_callback(
-   'luatexja.define_font',
-   function (res, name, size, id, jfm_dir)
-      if type(res)=='table' and jfm_dir=='tate' then
-         -- use Identity-V CMap
-         res.fullname = res.fullname .. ' (Identity-V)' 
-         res.identity='vertical'; res.writingmode='vertical'; res.direction = 8
-         -- replace ToUnicode entry of vertical forms
-         if res.tounicode==1 then
-            for i,v in pairs(vert_form_table) do
-               if res.characters[v] then
-                 res.characters[v].tounicode=string.format("%04X", i)
-               end
-            end
-         end
-      end
-   end,
-   'ltj.patch_tounicode_for_vertical_font', 1)
 
 luatexbase.add_to_callback(
    "luatexja.define_jfont",

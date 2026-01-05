@@ -1,6 +1,7 @@
 --
 -- ltj-setwidth.lua
 --
+
 luatexja.load_module 'base';      local ltjb = luatexja.base
 luatexja.load_module 'stack';     local ltjs = luatexja.stack
 luatexja.load_module 'jfont';     local ltjf = luatexja.jfont
@@ -46,7 +47,6 @@ local node_new = luatexja.dnode_new
 
 local id_glyph  = node.id 'glyph'
 local id_kern   = node.id 'kern'
-local id_glue   = node.id 'glue'
 local id_hlist  = node.id 'hlist'
 local id_vlist  = node.id 'vlist'
 local id_rule   = node.id 'rule'
@@ -68,10 +68,6 @@ local ltjs_orig_char_table = ltjs.orig_char_table
 
 local PACKED       = luatexja.icflag_table.PACKED
 local PROCESSED    = luatexja.icflag_table.PROCESSED
-
---local function mypt(a)
---  return tostring(math.floor(tonumber(luatexja.print_scaled(a*7200./7227))*1000+0.5)/1000)
---end
 
 local get_pr_begin_flag
 do
@@ -166,23 +162,20 @@ local function capsule_glyph_tate_rot(p, met, char_data, head, dir, asc)
    fshift = call_callback("luatexja.set_width", fshift, met, char_data)
    local kbl = get_attr(p, attr_tkblshift) or 0
    -- f*: whd specified in JFM
-   local pwidth, pheight, pdepth = getwhd(p)
+   local pwidth, pheight,pdepth = getwhd(p)
    local fwidth = char_data.width or pwidth
    local fheight= char_data.height or pheight
    local fdepth = char_data.depth or pdepth
    local q
-
    head, q = node_remove(head, p)
    local xo, yo = getoffsets(p)
-   setoffsets(p, xo + char_data.align*(fwidth-pwidth) - fshift.left + .5*pwidth, 0)
+   setoffsets(p, xo + char_data.align*(fwidth-pwidth) - fshift.left,
+              yo - fshift.down - asc);
    setnext(p, nil)
    local box = node_new(id_hlist, nil, p)
-   local inner_box = node_new(id_hlist, nil, p)
    setwhd(box, fwidth, fheight, fdepth)
-   setwhd(inner_box, 0,0,0)
-   setlist(box, inner_box); setlist(inner_box, p);
-   setshift(box, kbl); setshift(inner_box, yo-fshift.down - asc)
-   setdir(box, dir); setdir(inner_box, dir)
+   setlist(box, p); setshift(box, kbl)
+   setdir(box, dir)
    set_attr(box, attr_icflag, PACKED)
    head = q and node_insert_before(head, q, box)
       or node_insert_after(head, node_tail(head), box)
@@ -208,20 +201,14 @@ local function get_valt(pf, fn, pc)
    end
    return k
 end
-
-local setwidth = node.direct.setwidth
-local attr_vert_aux = luatexbase.attributes['ltj@kcat0']
 local capsule_glyph_tate = function (p, met, char_data, head, dir)
    if not char_data then return node_next(p), head end
-   local fwidth = char_data.width; local vadv, ascender, ascender_def
-   local pwidth, pheight, pdepth = getwhd(p)
+   local fwidth, pwidth, ascender = char_data.width
    local pf, pc = getfont(p), getchar(p)
-   local embed
    do
-      local f = font_getfont(pf)
-      ascender_def = get_ascender(pf) 
       local feir = ltjf_font_extra_info[pf]
       if met.rotation and met.vert_activated then
+          local f = font_getfont(pf)
           local pco = ltjs_orig_char_table[p] or pc
           local r = met.rotation[pco]
           local l = f.properties and f.properties.language
@@ -232,53 +219,50 @@ local capsule_glyph_tate = function (p, met, char_data, head, dir)
           end
           if r and (get_attr(p, attr_vert_ori) or 0)<=0 then
             return capsule_glyph_tate_rot(p, met, char_data, head, dir,
-              1.38*met.size - ascender_def )
+              0.5*(get_ascender(pf)-get_descender(pf)))
           end
       end
-      embed = (f.filename~="")
-      vadv, ascender = feir.vheight[pc]*met.size, feir.vorigin[pc]*met.size
+      pwidth, ascender = feir.vheight[pc]*met.size, feir.vorigin[pc]*met.size
    end
-   local xo, yo = getoffsets(p); local corr_adv = 0
+   local xo, yo = getoffsets(p)
    do -- special treatment for 'vpal'/'vhal/ feature
        local k = get_valt(pf, 'vpal', pc) + get_valt(pf, 'vhal', pc)
        if k~=0 then
-           local pft = font_getfont(pf); corr_adv = k/pft.units*pft.size
-           vadv = vadv + corr_adv
+           local pft = font_getfont(pf); local corr_adv = k/pft.units*pft.size
+           pwidth = pwidth + corr_adv; yo = yo + corr_adv
        end
    end
-   fwidth = fwidth or vadv
-   if vadv>fwidth and char_data.round_threshold then
-      local frac = vadv / fwidth
+
+   fwidth = fwidth or pwidth
+   if pwidth>fwidth and char_data.round_threshold then
+      local frac = pwidth / fwidth
       local quot = floor(frac+0.5)
       if abs(frac-quot) <char_data.round_threshold then fwidth = fwidth * quot end
    end
    fshift.down = char_data.down; fshift.left = char_data.left
    fshift = call_callback("luatexja.set_width", fshift, met, char_data)
+   local fheight = char_data.height or 0
+   local fdepth  = char_data.depth or 0
    local y_shift = xo + (get_attr(p,attr_tkblshift) or 0)
    local q
    head, q = node_remove(head, p)
 
    local box = node_new(id_hlist, nil, p)
-   setwhd(box, fwidth, char_data.height or 0, char_data.depth or 0); setshift(box, y_shift)
+   setwhd(box, fwidth, fheight, fdepth); setshift(box, y_shift)
    setdir(box, dir)
-   --print(string.format('"%s"(U+%04X) ', utf.char(pc),pc),
-   --  mypt(fwidth or 0), mypt(pwidth or 0), mypt(pheight or 0), mypt(pdepth or 0))
-   --print('', mypt(vadv or -1), mypt(ascender or -1), mypt(ascender_def or -1))
-
-   ---- I don't know why these values work...
-   local cwa = char_data.align*(fwidth-vadv) - fshift.left
-   local ad = (ascender - ascender_def)
-   setoffsets(p, 0, (embed and (.5*pwidth) or 0))
-   set_attr(p, attr_vert_aux, round( y_shift + fshift.down) )
-   local k2 = node_new(id_kern, 1) 
-   setkern(k2, -pheight + ((yo+corr_adv<0) and 0 or yo + 2*corr_adv) + cwa + ad - (0.88*met.size - ascender_def) )
-   set_attr(k2, attr_vert_aux, round( -ascender + pheight + cwa - yo - corr_adv + 2*ad))
-   local k3 = node_new(id_kern, 1); 
-   setkern(k3, -met.size + fwidth - (embed and pwidth or 0) + ascender + pdepth - cwa + yo +corr_adv - 2*ad)
-   setlist(box, k2); setnext(k2, p); setnext(p, k3); setnext(k3, nil)
-   ----
-   --print('', mypt(getfield(k2, 'kern')), mypt(getfield(k3,'kern')), mypt(corr_adv))
-   -- "PACKED" hbox のうち，リストが kern->glyph->kern のはこの種類だけ
+   setoffsets(p, -fshift.down,
+              yo -(ascender + char_data.align*(fwidth-pwidth) - fshift.left) )
+   local ws = node_new(id_whatsit, sid_save)
+   local wm = node_new(id_whatsit, sid_matrix)
+   setfield(wm, 'data', '0 1 -1 0')
+   local pwnh = -round(0.5*getwidth(p))
+   local k2 = node_new(id_kern, 1); setkern(k2, pwnh)
+   local k3 = node_new(id_kern, 1); setkern(k3, -getwidth(p)-pwnh)
+   local wr = node_new(id_whatsit, sid_restore)
+   setlist(box, ws)
+   setnext(ws, wm);  setnext(wm, k2);
+   setnext(k2, p);   setnext(p,  k3);
+   setnext(k3, wr);
 
    set_attr(box, attr_icflag, PACKED)
    head = q and node_insert_before(head, q, box)

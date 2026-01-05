@@ -955,8 +955,8 @@ end
 do
    local function glyph_from_packed(h)
       local b = getlist(h)
-      b = (getid(b)==id_kern) and node_next(b) or b
-      return (getid(b)==id_hlist) and getlist(b) or b
+      return (getid(b)==id_kern or (getid(b)==id_whatsit and getsubtype(b)==sid_save) )
+         and node_next(node_next(node_next(b))) or b
    end
    luatexja.direction.glyph_from_packed = glyph_from_packed
 end
@@ -1099,14 +1099,13 @@ end
 -- we supply correct pdfsavematrix nodes etc. inside dir_node
 do
    local finalize_inner
-   local join_tate_glyphs
    local function finalize_dir_node(db,new_dir)
       local b = getlist(db)
       while b and ((getid(b)~=id_hlist) and (getid(b)~=id_vlist)) do
          local ob = b; b = node_remove(b,b); setlist(db, b);
          node_free(ob)
       end
-      finalize_inner(b, get_box_dir(b, dir_yoko))
+      finalize_inner(b)
       local w, h, d = getwhd(b)
       local dw, dh, dd = getwhd(db)
       local db_head, db_tail
@@ -1128,116 +1127,19 @@ do
    local shipout_temp =  node_new(id_hlist)
    dnode.setattributelist(shipout_temp, nil)
    tex.setattribute(attr_dir, 0)
-   local attr_vert_aux = luatexbase.attributes['ltj@kcat0']
 
-do
-   local setkern = node.direct.setkern
-   local setshift = node.direct.setshift
-   local sid_save   = node.subtype 'pdf_save'
-   local sid_restore = node.subtype 'pdf_restore'
-   local sid_matrix  = node.subtype 'pdf_setmatrix'
-   local setdir = dnode.setdir
-   local getwidth, setwidth = dnode.getwidth, dnode.setwidth
-   local getkern = dnode.getkern
-   local node_tail = dnode.tail
-   local id_penalty = node.id 'penalty'
-   local id_glue = node.id 'glue'
-   local FROM_JFM         = luatexja.icflag_table.FROM_JFM
-   local KANJI_SKIP       = luatexja.icflag_table.KANJI_SKIP
-   local KANJI_SKIP_JFM   = luatexja.icflag_table.KANJI_SKIP_JFM
-   local function negate(n)
-     if getid(n)==id_glue then
-        setwidth(n, -getwidth(n))
-        setfield(n, 'stretch', -getfield(n, 'stretch')) 
-        setfield(n, 'shrink', -getfield(n, 'shrink'))
-     elseif getid(n)==id_kern then setkern(n, -getkern(n)) end
-   end
-   join_tate_glyphs= function (box, b, y_shift) -- b から
-     local orig_head = getlist(box)
-     local jb_inner = node_new(id_hlist); setdir(jb_inner, 'RTT')
-     -- find the last node
-     local n = node_next(b)
-     while n do
-       local nid = getid(n)
-       if (nid==id_hlist) and (get_attr_icflag(n)==PACKED) then
-         local nn = getlist(n)
-         if nn and getid(nn)==id_kern then
-           if get_attr(node_next(nn),attr_vert_aux)==y_shift then
-             n = node_next(n)
-           else break
-           end
-         else break
-         end
-       elseif (nid==id_penalty) or (nid==id_kern) or (nid==id_glue) then
-         n = node_next(n)
-       else break
-       end
-     end
-     local e = n; local jw = dnode.rangedimensions(box, b, n)
-     setfield(jb_inner, 'width', 0)
-     setfield(jb_inner, 'glue_set', getfield(box, 'glue_set'))
-     setfield(jb_inner, 'glue_order', getfield(box, 'glue_order'))
-     setfield(jb_inner, 'glue_sign', getfield(box, 'glue_sign'))
-     local joined_box = node_new(id_hlist)
-     dnode.insert_before(orig_head, b, joined_box); n=b
-     local jl, jn
-     while n~=e do
-       local nid = getid(n)
-       if nid==id_hlist then
-         local nn = getlist(n)
-         if not jl then 
-           jl = nn 
-         else
-           setkern(nn, get_attr(nn, attr_vert_aux)); negate(nn); setnext(jn, nn) 
-         end
-         jn = node_next(node_next(nn)); negate(jn)
-         setlist(n, nil); _, nn = node_remove(orig_head, n); node_free(n); n = nn
-       else
-         local _, nn = node_remove(orig_head, n); setnext(n, nil)
-         jl, jn = insert_after(jl, jn, n); negate(n); n = nn
-       end
-     end
-     local ws = node_new(id_whatsit, sid_save)
-     local wm = node_new(id_whatsit, sid_matrix)
-     setfield(wm, 'data', '0 1 -1 0')
-     local wr = node_new(id_whatsit, sid_restore)
-     setlist(jb_inner, jl); setnext(jn, nil); setshift(joined_box, y_shift)
-     if y_shift==0 then
-       insert_after(orig_head, joined_box, ws);
-       insert_after(orig_head, ws, wm);
-       insert_after(orig_head, wm, jb_inner);
-       insert_after(orig_head, jb_inner, wr);
-       local k2 = node_new(id_kern); setkern(k2, jw);
-       insert_after(orig_head, wr, k2);
-       node_remove(orig_head, joined_box); node_free(joined_box); return k2
-     else
-       setdir(joined_box, 'TLT'); setfield(joined_box, 'width', jw);
-       setlist(joined_box, ws); setnext(ws, wm); setnext(wm, jb_inner); setnext(jb_inner, wr);
-       return joined_box
-     end
-   end
-end
-
-   finalize_inner = function (box, box_dir)
-      local n = getlist(box); local nid = getid(n)
-      while n do
+   finalize_inner = function (box)
+      for n, nid in traverse(getlist(box)) do
          if (nid==id_hlist or nid==id_vlist) then
             local ndir = get_box_dir(n, dir_yoko)
-            if box_dir==dir_tate and get_attr_icflag(n)==PACKED then
-               local nn = getlist(n)
-               if nn and getid(nn)==id_kern then
-                 n = join_tate_glyphs(box, n, get_attr(node_next(nn), attr_vert_aux) or 0)
-               end
-            elseif ndir>=dir_node_auto then -- n is dir_node
+            if ndir>=dir_node_auto then -- n is dir_node
                finalize_dir_node(n, ndir%dir_math_mod)
-            else
-               finalize_inner(n, ndir); 
+            elseif get_attr_icflag(n)~=PACKED then
+               finalize_inner(n)
             end
          end
-         n = node_next(n); nid = getid(n)
       end
    end
-
    local copy = dnode.copy
    function luatexja.direction.shipout_lthook (head)
       start_time_measure 'box_primitive_hook'
@@ -1247,7 +1149,7 @@ end
          local b = create_dir_node(a, a_dir, dir_yoko, false)
          setlist(b, a); a = b
       end
-      setlist(shipout_temp, a); finalize_inner(shipout_temp, dir_yoko)
+      setlist(shipout_temp, a); finalize_inner(shipout_temp)
       a = copy(getlist(shipout_temp)); setlist(shipout_temp, nil)
       stop_time_measure 'box_primitive_hook'
       return to_node(a)
