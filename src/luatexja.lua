@@ -19,7 +19,7 @@ do
   end
 end
 do
-   if luatexja_cmapidv~=false then
+   if luatexja_cmapidv then
       texio.write_nl('*** LuaTeX-ja: Using "Identity-V" CMap for vertical fonts. ***')
       function luatexja.load_module(name) require('ltj-' .. name.. '.lua') end
    else
