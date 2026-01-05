@@ -18,8 +18,19 @@ do
     end
   end
 end
-function luatexja.load_module(name) require('ltj-' .. name.. '.lua') end
-
+do
+   if luatexja_cmapidv~=false then
+      texio.write_nl('*** LuaTeX-ja: Using "Identity-V" CMap for vertical fonts. ***')
+      function luatexja.load_module(name) require('ltj-' .. name.. '.lua') end
+   else
+      function luatexja.load_module(name)
+         local status = pcall(require, 'ltj-' .. name.. '-20251230.lua')
+         if not status then
+            require('ltj-' .. name.. '.lua')
+         end
+      end
+   end
+end
 do
     local dnode = node.direct
     local getfield, traverse = dnode.getfield, dnode.traverse
@@ -456,9 +467,8 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
       else
          s = base .. '(' .. print_scaled(p.height) .. '+'
             .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
-            .. ', dir_ltj=' .. tostring(node.get_attribute(p, attr_dir))
+            .. ', dir=' .. tostring(node.get_attribute(p, attr_dir))
       end
-      s = s .. ' ' .. tostring(p.dir)
       if (p.shift or 0)~=0 then
          s = s .. ', shifted ' .. print_scaled(p.shift)
       end
@@ -485,7 +495,7 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
    elseif pt=='rule' then
       s = base .. '(' .. print_scaled(p.height) .. '+'
          .. print_scaled(p.depth) .. ')x' .. print_scaled(p.width)
-         .. ', dir_ltj=' .. tostring(node.get_attribute(p, attr_dir))
+         .. ', dir=' .. tostring(node.get_attribute(p, attr_dir))
       print_fn(s)
    elseif pt=='disc' then
       print_fn(s)
@@ -551,7 +561,7 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
          else
             s = s .. 'userid:' .. t .. '(node list)'
             if p.user_id==uid_table.DIR then
-               s = s .. ' dir_ltj: ' .. tostring(node.get_attribute(p, attr_dir))
+               s = s .. ' dir: ' .. tostring(node.get_attribute(p, attr_dir))
             end
             print_fn(s)
             local bid = inner_depth
