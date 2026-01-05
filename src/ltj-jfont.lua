@@ -317,9 +317,9 @@ do
                             'The JFM file you specified is not valid JFM file.\n'..
                                'So defining Japanese font is cancelled.')
          tex.sprint(cat_lp, global_flag, '\\expandafter\\let\\ltj@temp\\relax')
-         return
+         jfm_dir = nil; return
       end
-      if not f then return end
+      if not f then jfm_dir = nil; return end
       update_jfm_cache(j, f.size); check_callback_order()
       local sz = metrics[j].size_cache[f.size]
       local fmtable = { jfm = j, size = f.size, var = jfm_var,
@@ -496,6 +496,7 @@ do
       local j = -update_jfm_cache(i, size)
       font_metric_table[j]=metrics[i].size_cache[size]
       tex.sprint(cat_lp, '\\ltj@cur' .. (dir=='yoko' and 'j' or 't') .. 'fnt' .. tostring(j) .. '\\relax')
+      jfm_dir = nil
    end
    luatexja.jfont.load_jfmonly = load_jfmonly
 end
