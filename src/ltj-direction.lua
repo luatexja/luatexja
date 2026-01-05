@@ -1168,7 +1168,8 @@ do
            end
          else break
          end
-       elseif (nid==id_penalty) or (nid==id_kern) or (nid==id_glue) then
+       elseif (nid==id_penalty) or (nid==id_kern) 
+          or ((nid==id_glue)and (getsubtype(n)<100)) then
          n = node_next(n)
        else break
        end
