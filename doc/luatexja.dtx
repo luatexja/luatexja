@@ -1427,7 +1427,7 @@ We also believe that using Japanese characters as identifiers is rare,
 hence we don't describe how to change Japanese fonts in math mode in
 this chapter. For the method, please see Subsection~\ref{ssec:math}.
 
-\em{When \LuaTeX-ja is loaded with \texttt{disablejfam}~option,
+{\em When \LuaTeX-ja is loaded with \texttt{disablejfam}~option,
   one cannot write Japanese characters in math mode as~\verb+$素$+.
   At that case, one have to use \cs{mbox} (or~\cs{text} in the \Pkg{amsmath} package).
 }
@@ -3346,7 +3346,10 @@ Returned value&\texttt{4}&\texttt{3}&\texttt{1}&\texttt{11}&\texttt{0}\\
   
  \item[方式B] 縦組用和文フォントは，PDF中でIdentity-Vエンコーディング（縦組用）を用いる．
   同じ「水平位置」で出力可能な\textbf{JAchar}たちの並びは，$\Omega$でいう組方向\texttt{RTT}のボックス
-  としてまとめられる．PDFでは，個々の\texttt{RTT}ボックスごとに1つのTJオペレータでまとめて描画されることになる．
+  としてまとめられる
+  \footnote{%
+    まとめる作業は\cs{shipout}の直前に行われるため，ユーザが意識することは通常はない．
+  }．PDFでは，個々の\texttt{RTT}ボックスごとに1つのTJオペレータでまとめて描画されることになる．
   
   方式Aと比べるとテキスト抽出がまともに行えるが，未だ不安が残るのは確かである：
   \begin{itemize}

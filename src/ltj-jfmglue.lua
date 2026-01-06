@@ -3,7 +3,7 @@
 --
 luatexbase.provides_module({
   name = 'luatexja.jfmglue',
-  date = '2025-05-27',
+  date = '2026-01-07',
   description = 'Insertion process of JFM glues, [x]kanjiskip and others',
 })
 luatexja.jfmglue = luatexja.jfmglue or {}
