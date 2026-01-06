@@ -29,7 +29,6 @@ Installation
     - etoolbox package
     - ltxcmds package, pdftexcmds package
     - filehook package, atbegshi package (for LaTeX2e 2020-02-02)
-    - everysel package (for LaTeXe 2020-02-02 and 2020-10-01)
     - Harano Aji fonts (https://github.com/trueroad/HaranoAjiFonts)
 	  more specifically, HaranoAjiMincho-Regular and HaranoAjiGothic-Medium
 

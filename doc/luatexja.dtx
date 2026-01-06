@@ -5,6 +5,7 @@
 %%%%% section ==> 章
 %%%%% subsection => 節
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
+\directlua{luatexja_cmapidv = true}
 
 %<en>\documentclass[a4paper,titlepage]{article}
 %<ja>\documentclass[a4paper,14Q,titlepage]{ltjsarticle}
@@ -666,7 +667,7 @@ and \emph{Japanese fonts} for fonts used in \textbf{JAchar}.
   More specifically, HaranoAjiMincho-Regular~and~HaranoAjiGothic-Medium.
 %</en>
 %<*ja>
-\item \emph{原ノ味フォント(\url{https://github.com/trueroad/HaranoAjiFonts})}\\
+\item \emph{原ノ味フォント}(\url{https://github.com/trueroad/HaranoAjiFonts})\\
 \LuaTeX-jaの最低限の動作には原ノ味明朝Regular~(HaranoAjiMincho-Regular)と
 原ノ味角ゴシックMedium~(HaranoAjiGothic-Medium)があれば十分である．
 %</ja>
@@ -806,10 +807,12 @@ $ lualatex ltjltxdoc.ins
 
 %<*en>
 \subsection{Cautions}
+\label{ssec:caution}
 For changes from \pTeX, see Subsection~\ref{ssec:chgptex}.
 %</en>
 %<*ja>
 \subsection{注意点}
+\label{ssec:caution}
 \pTeX からの変更点として，\ref{ssec:chgptex}節も熟読するのが望ましい．
 ここでは一般的な注意点を述べる．
 %</ja>
@@ -831,27 +834,26 @@ For changes from \pTeX, see Subsection~\ref{ssec:chgptex}.
   また，和文フォントを読み込むために多量のメモリを消費することにも注意が必要である．
 %</ja>
 
-\item
-%<*en>
-Note that when \LuaTeX-ja is loaded in plain \LuaTeX,
-we cannot use color specification on font loading, such as
-\begin{lstlisting}
-  \font\hoge=lmroman10-regular.otf:color=FF0000 % \font primitive
-\end{lstlisting}
-This is because codes for shifting baseline in math mode (\LuaTeX-ja) collide with and prevents loading
-codes for font color (\Pkg{luaotfload}) in these environments.
-\emph{We recommend to use \LaTeX\ 2020-02-02 (or later)}, since we can avoid this collision in there.
-%</en>
+  \item 
 %<*ja>
-なお，\LuaTeX-jaをplain~\LuaTeX で用いる場合，
-以下のような\emph{フォント読み込み時の色指定}（\cs{textcolor}命令ではなく！）\emph{は利用できない}．
-\begin{lstlisting}
-  \font\hoge=lmroman10-regular.otf:color=FF0000 % \font primitive
-\end{lstlisting}
-これは，\LuaTeX-jaによる数式内のベースライン補正（\ref{ssec:baseline}節）のコードが
-\Pkg{luaotfload}パッケージのフォント色処理のコードと衝突するためである．
-\LaTeX\ 2020-02-02以降では衝突回避のための仕組みが備わっているので．\emph{\LaTeX\ 2020-02-02以降での使用を勧める}．
+  現在\texttt{RTT}とIdentity-V~CMapを用いた縦組の実装を試験中である
+  （\ref{ssec:imple_tate_two_method}小節を参照）．
+  この新たな実装は「縦組時でもあってもpdfからのテキスト抽出がまともになる」という
+  利点があるが，荒削りであるのでまだ標準では有効になっていない．
+  有効にするには，\LuaTeX-ja\emph{読み込み前}
+  \footnote{\LaTeX で使う場合には，\cs{documentclass}より前に記述するのが安全である．}に，
+  次を実行する：
 %</ja>
+%<*en>
+  This version of \LuaTeX-ja has an experimental method of vertical typesetting
+  (which~uses \texttt{RTT}~direction and Identity-V~CMap).
+  This is not enabled by default; to enable it, one should execute the following
+  \emph{before} the loading of \LuaTeX-ja:
+%</en>
+\begin{lstlisting}
+\directlua{luatexja_cmapidv = true}
+\end{lstlisting}
+
 \end{itemize}
 
 %<en>\subsection{Using in plain \TeX}
@@ -1204,6 +1206,7 @@ so \Pkg{ltjsclasses} uses the \texttt{nomag*} option\footnote{Same effect as
     \item[\LaTeXe\ 2025-06-01以降]
       \texttt{build/column/outputbox}ソケットに\texttt{floats-footnotes-platex}プラグを挿す．
   \end{description}
+  \vspace*{-\medskipamount}
 \end{description}
 %</ja>
 %%% ↑は英訳しない
@@ -2481,7 +2484,7 @@ $\sqrt{A}-\underline{X}
 {\ltjsetparameter{yalbaselineshift=10pt}%
 数式abc: $あa\hbox{い}$, $\int_0^x t\,dt=x^2/2$,
 $\Phi\vdash F(x)\ \hbox{for all}\ x\in A$,
-$\sqrt{A}-\underline{X}+\frac{あ\>3}{2あ}-\vcenter{\hbox{aお}}$
+$\sqrt{A}-\underline{X}+\frac{あ3}{2あ}-\vcenter{\hbox{aお}}$
 \par}\\
 \noalign{\vskip-0\origbaselineskip}
 \bottomrule
@@ -3303,18 +3306,187 @@ Returned value&\texttt{4}&\texttt{3}&\texttt{1}&\texttt{11}&\texttt{0}\\
 \end{LTXexample}
 
 これらを用いれば，例えば
-\pTeX の \cs{ifydir},~\cs{ifybox200} と同等の条件判断を
+\pTeX の\cs{ifydir},~\cs{ifybox200}と同等の条件判断を
 \begin{lstlisting}
 \ifnum\ltjgetparameter{direction}=4
 \ifnum\ltjgetparameter{boxdir}{200}=4
 \end{lstlisting}
 のように行うことができる．
-\cs{iftdir} は少々面倒であるが，8で割った余りが3であるか否かを判断すれば良いから
+\cs{iftdir}は少々面倒であるが，8で割った余りが3であるか否かを判断すれば良いから
 \begin{lstlisting}
 \ifnum\numexpr
   \ltjgetparameter{direction}-(\ltjgetparameter{direction}/8)*8=3
 \end{lstlisting}
 とすればよい．
+%</ja>
+
+%<*ja>
+\subsection{実装の比較}
+\label{ssec:imple_tate_two_method}
+現バージョンの\LuaTeX-jaでは，縦組みの実装方法について
+従来からの「一文字ずつ回転」方式（以下，\emph{方式A}）と試験中の「\texttt{RTT}とIDentity-V~CMapを用いた」方式
+（以下，\emph{方式B}）の2つから選べるようになっている．
+\ref{ssec:caution}小節で述べたように，今のところ標準は方式Aであり，方式Bを試すには
+\begin{lstlisting}
+\directlua{luatexja_cmapidv = true}
+\end{lstlisting}
+を\LuaTeX-ja読み込み前\footnote{\LaTeX で使う場合には，\cs{documentclass}より前に記述するのが安全である．}%
+に記述する必要がある．
+
+どちらの方式でも，「横組(TLT)でボックスを組み，最後にボックス全体を時計回りに90度回転させる」ことと
+使うグリフは同じだが，
+それ以外の点では異なる：
+\begin{description}
+  \item[方式A] 縦組用和文フォントであっても，PDF中ではIdentity-Hエンコーディング（横組用）を用いる．
+  ボックス内の\textbf{JAchar}は一文字ずつ反時計周りに回転される．
+  
+  \LuaTeX-jaの縦組みとして10年以上用いられており安定した方法であるが，
+  PDFでは一文字ずつ別々のTJオペレータで描画されるという性質上，この方式で組まれた縦組からは
+  まともにテキスト抽出ができないというのが難点である．
+  
+ \item[方式B] 縦組用和文フォントは，PDF中でIdentity-Vエンコーディング（縦組用）を用いる．
+  同じ「水平位置」で出力可能な\textbf{JAchar}たちの並びは，$\Omega$でいう組方向\texttt{RTT}のボックス
+  としてまとめられる．PDFでは，個々の\texttt{RTT}ボックスごとに1つのTJオペレータでまとめて描画されることになる．
+  
+  方式Aと比べるとテキスト抽出がまともに行えるが，未だ不安が残るのは確かである：
+  \begin{itemize}
+    \item Identity-V~CMapや，フォントの書字方向(WMode)として縦書きを用いることは
+    \LuaTeX のundocumentedな機能である
+    \item 組方向\texttt{RTT}はほとんど使用されておらず，\LuaTeX でもほとんどテストされていない．
+    現状ではグリフ出力位置の計算がどこかおかしいようである
+    \footnote{%
+      \LuaTeX-jaでは適宜カーンで補正しているが，その補正量の根拠は「色々な場合で試してみて
+      とりあえずこれでうまくいっているようだ」以上にはない．
+    }
+  \end{itemize}
+\end{description}
+
+両者の比較として，\pageref{src:tate_impl_compare}ページに載せた入力例と，
+その下にあるPDFの一部も参照してほしい．
+
+\begin{figure}[p]
+  \begin{lstlisting}
+\documentclass{ltjarticle}
+\pagestyle{empty}\pdfcompresslevel=0
+\begin{document}
+\hbox{\tate あいう\ltjjachar`α漢字}% 「α」は90度寝た形で出力される
+\end{document}
+  \end{lstlisting}
+  \caption{縦組みの2方式の比較用入力}
+  \label{src:tate_impl_compare}
+
+  \centering
+  \begin{minipage}[b]{20\zw}
+    \begin{lstlisting}[basicstyle=\scriptsize\ttfamily]
+<< /Length 937 >>
+stream
+1 0 0 1 133.768 655.585 cm
+q
+0 -1 1 0 0 0 cm
+1 0 0 1 -57.517 4.793 cm
+q
+0 1 -1 0 0 0 cm
+1 0 0 1 -76.251 -660.378 cm
+BT
+/F18 9.58624 Tf
+1 0 0 1 71.458 651.942 Tm [<034B>]TJ
+ET
+1 0 0 1 76.251 660.378 cm
+Q
+1 0 0 1 9.586 0 cm
+q
+0 1 -1 0 0 0 cm
+1 0 0 1 -85.837 -660.378 cm
+BT
+/F18 9.58624 Tf
+1 0 0 1 81.044 651.942 Tm [<034D>]TJ
+ET
+1 0 0 1 85.837 660.378 cm
+Q
+1 0 0 1 9.586 0 cm
+q
+0 1 -1 0 0 0 cm
+1 0 0 1 -95.423 -660.378 cm
+BT
+/F18 9.58624 Tf
+1 0 0 1 90.63 651.942 Tm [<034F>]TJ
+ET
+1 0 0 1 95.423 660.378 cm
+Q
+1 0 0 1 -95.423 -660.378 cm
+BT
+/F18 9.58624 Tf
+1 0 0 1 105.01 656.736 Tm [<040B>]TJ
+ET
+1 0 0 1 114.596 660.378 cm
+q
+0 1 -1 0 0 0 cm
+1 0 0 1 -114.596 -660.378 cm
+BT
+/F18 9.58624 Tf
+1 0 0 1 109.803 651.942 Tm [<05FD>]TJ
+ET
+1 0 0 1 114.596 660.378 cm
+Q
+1 0 0 1 9.586 0 cm
+q
+0 1 -1 0 0 0 cm
+1 0 0 1 -124.182 -660.378 cm
+BT
+/F18 9.58624 Tf
+1 0 0 1 119.389 651.942 Tm [<08C8>]TJ
+ET
+1 0 0 1 124.182 660.378 cm
+Q
+1 0 0 1 9.586 -4.793 cm
+Q
+
+endstream
+\end{lstlisting}
+    \caption{方式Aによる出力の一部}
+%    \label{}
+  \end{minipage}\hfil
+  \begin{minipage}[b]{20\zw}
+    \begin{lstlisting}[basicstyle=\scriptsize\ttfamily]
+<< /Length 493 >>
+stream
+1 0 0 1 133.768 655.585 cm
+q
+0 -1 1 0 0 0 cm
+1 0 0 1 -57.517 4.793 cm
+q
+0 1 -1 0 0 0 cm
+1 0 0 1 -76.251 -660.378 cm
+BT
+/F18 9.58624 Tf
+1 0 0 1 76.251 660.378 Tm [<034B034D034F>]TJ
+ET
+1 0 0 1 76.251 660.378 cm
+Q
+1 0 0 1 -76.251 -660.378 cm
+BT
+/F18 9.58624 Tf
+1 0 0 1 109.803 665.172 Tm [<040B>]TJ
+ET
+1 0 0 1 114.596 660.378 cm
+q
+0 1 -1 0 0 0 cm
+1 0 0 1 -114.596 -660.378 cm
+BT
+/F18 9.58624 Tf
+1 0 0 1 114.596 660.378 Tm [<05FD08C8>]TJ
+ET
+1 0 0 1 114.596 660.378 cm
+Q
+1 0 0 1 19.172 -4.793 cm
+Q
+
+endstream
+\end{lstlisting}
+    \caption{方式Bによる出力の一部}
+%    \label{}
+  \end{minipage}
+\end{figure}
 %</ja>
 
 %<*en>
@@ -3340,7 +3512,7 @@ For example, \autoref{fig:primitive_meaning} shows the situation of \cs{vadjust}
 %<*ja>
 \section{プリミティブの再定義}
 \LuaTeX-jaでは和文組版や異なる組方向に対応するために，以下に挙げるプリミティブは
-\ \verb+\protected\def+ により再定義を行っている．
+\>\verb+\protected\def+\>により再定義を行っている．
 
 \begin{cslist}
  \item[\cs{/}]
