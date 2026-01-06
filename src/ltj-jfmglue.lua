@@ -514,7 +514,7 @@ calc_np_auxtable = {
       set_attr(lp, attr_icflag, PROCESSED)
       set_np_xspc_alchar(Np, -1, lp)
       local end_math  = node_end_of_math(lp)
-      ltjw_apply_ashift_math(lp, end_math, attr_ablshift)
+      ltjw_apply_ashift_math(lp, end_math, attr_ablshift, tex_dir)
       set_attr(end_math, attr_icflag, PROCESSED)
       Np.last, Np.id = end_math, id_math;
       return true, node_next(end_math);

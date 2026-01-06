@@ -325,7 +325,7 @@ luatexja.setwidth.capsule_glyph_math = capsule_glyph_math
 end
 
 -- 数式の位置補正
-function luatexja.setwidth.apply_ashift_math(head, last, attr_ablshift)
+function luatexja.setwidth.apply_ashift_math(head, last, attr_ablshift, dir)
    for p, pid in node_traverse(head) do
       if p==last then
          return
@@ -339,8 +339,14 @@ function luatexja.setwidth.apply_ashift_math(head, last, attr_ablshift)
          elseif pid==id_glyph then
             -- 欧文文字; 和文文字は pid == id_hlist の場合で処理される
             -- (see conv_jchar_to_hbox_A in ltj-math.lua)
-            setfield(p, 'yoffset',
-                     getfield(p, 'yoffset') - (get_attr(p,attr_ablshift) or 0))
+            local d, yo, abl = getdepth(p), getfield(p, 'yoffset'), get_attr(p,attr_ablshift) or 0
+            setfield(p, 'yoffset', yo - abl)
+            if yo-abl<0 then
+              local box = node_new(id_rule, rule_subtype, p)
+              setwhd(box, 0, 0, d - yo + abl); setdir(box, dir)
+              set_attr(box, attr_icflag, PACKED)
+              head = node_insert_before(head, p, box)
+            end
          end
          set_attr(p, attr_icflag, PROCESSED)
       end
