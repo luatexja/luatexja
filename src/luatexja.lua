@@ -517,6 +517,16 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
       prefix=k
    elseif pt == 'glue' then
       s = base .. print_spec(p)
+      if p.subtype>=100 then
+         s = s .. ' leders'; print_fn(s);
+         local bid = inner_depth
+         prefix, inner_depth = prefix.. '.', inner_depth + 1
+         if inner_depth < limit then
+            for q in node.traverse(p.head) do
+               debug_show_node_X(q, print_fn, limit, inner_depth)
+            end
+         end
+      else
       if pic>icflag_table.KINSOKU and pic<icflag_table.KANJI_SKIP then
          s = s .. ' (from JFM: priority ' .. pic-icflag_table.FROM_JFM .. ')'
       elseif pic==icflag_table.KANJI_SKIP then
@@ -529,6 +539,7 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
          s = s .. ' (xkanjiskip, JFM specified)'
       end
       print_fn(s)
+      end
    elseif pt == 'kern' then
       s = base .. print_scaled(p.kern) .. 'pt'
       if p.subtype==0 then
@@ -579,7 +590,7 @@ local function debug_show_node_X(p,print_fn, limit, inner_depth)
             s = s .. 'stream=' .. p.stream
             print_fn(s)
             for i=1,#p.data do
-               print_fn(s .. '  [' .. i .. '] = ' .. tostring(p.data[i] and p.date[i].csname))
+               print_fn(s .. '  [' .. i .. '] = ' .. tostring(p.data[i] and p.data[i].csname))
             end
          elseif p.subtype==16 then
             s = s .. ' mode=' .. p.mode .. ', literal="' .. p.data .. '"'

@@ -1129,6 +1129,7 @@ do
    dnode.setattributelist(shipout_temp, nil)
    tex.setattribute(attr_dir, 0)
    local attr_vert_aux = luatexbase.attributes['ltj@kcat0']
+   local id_glue = node.id 'glue'
 
 do
    local setkern = node.direct.setkern
@@ -1141,7 +1142,6 @@ do
    local getkern = dnode.getkern
    local node_tail = dnode.tail
    local id_penalty = node.id 'penalty'
-   local id_glue = node.id 'glue'
    local FROM_JFM         = luatexja.icflag_table.FROM_JFM
    local KANJI_SKIP       = luatexja.icflag_table.KANJI_SKIP
    local KANJI_SKIP_JFM   = luatexja.icflag_table.KANJI_SKIP_JFM
@@ -1234,6 +1234,8 @@ end
             else
                finalize_inner(n, ndir); 
             end
+         elseif (nid==id_glue)and(getsubtype(n)>=100) then
+            finalize_inner(getfield(n,'leader'), box_dir)
          end
          n = node_next(n); nid = getid(n)
       end
@@ -1249,6 +1251,7 @@ end
          setlist(b, a); a = b
       end
       setlist(shipout_temp, a); finalize_inner(shipout_temp, dir_yoko)
+      --luatexja.ext_show_node(node.direct.tonode(shipout_temp), '> ', print)
       a = copy(getlist(shipout_temp)); setlist(shipout_temp, nil)
       stop_time_measure 'box_primitive_hook'
       return to_node(a)
