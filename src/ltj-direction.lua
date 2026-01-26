@@ -1129,7 +1129,8 @@ do
    dnode.setattributelist(shipout_temp, nil)
    tex.setattribute(attr_dir, 0)
    local attr_vert_aux = luatexbase.attributes['ltj@kcat0']
-   local id_glue = node.id 'glue'
+   local id_glue, id_disc = node.id 'glue', node.id 'disc'
+   local setdir = dnode.setdir
 
 do
    local setkern = node.direct.setkern
@@ -1137,7 +1138,6 @@ do
    local sid_save   = node.subtype 'pdf_save'
    local sid_restore = node.subtype 'pdf_restore'
    local sid_matrix  = node.subtype 'pdf_setmatrix'
-   local setdir = dnode.setdir
    local getwidth, setwidth = dnode.getwidth, dnode.setwidth
    local getkern = dnode.getkern
    local node_tail = dnode.tail
@@ -1236,6 +1236,10 @@ end
             end
          elseif (nid==id_glue)and(getsubtype(n)>=100) then
             finalize_inner(getfield(n,'leader'), box_dir)
+         elseif nid==id_disc then
+            local nb = node_new(id_hlist); setdir(nb,'TLT');
+            setlist(nb, getfield(n,'replace')); finalize_inner(nb, box_dir)
+            setlist(n,'replace', getlist(nb)); setlist(nb,nil); node_remove(nb);
          end
          n = node_next(n); nid = getid(n)
       end
