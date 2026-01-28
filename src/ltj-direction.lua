@@ -1203,7 +1203,7 @@ do
      setfield(wm, 'data', '0 1 -1 0')
      local wr = node_new(id_whatsit, sid_restore)
      setlist(jb_inner, jl); setnext(jn, nil); setshift(joined_box, y_shift)
-     if y_shift==0 then
+     if false and y_shift==0 then
        insert_after(orig_head, joined_box, ws);
        insert_after(orig_head, ws, wm);
        insert_after(orig_head, wm, jb_inner);
@@ -1212,8 +1212,17 @@ do
        insert_after(orig_head, wr, k2);
        node_remove(orig_head, joined_box); node_free(joined_box); return k2
      else
+         local na = node_new(node.id'rule')
+         setfield(na, 'width', 6553.6); setfield(na, 'height', 655360/2); setfield(na, 'depth', 655360/2)
+         local nb = node_new(id_kern); setkern(nb, -6553.6)
        setdir(joined_box, 'TLT'); setfield(joined_box, 'width', jw);
-       setlist(joined_box, ws); setnext(ws, wm); setnext(wm, jb_inner); setnext(jb_inner, wr);
+       setlist(joined_box, na); setnext(na, nb); setnext(nb, ws);
+       -- setlist(joined_box, ws); 
+       setnext(ws, wm); setnext(wm, jb_inner); setnext(jb_inner, wr);
+         local na = node_new(node.id'rule')
+         setfield(na, 'width', 6553.6); setfield(na, 'height', 655360/2); setfield(na, 'depth', 655360/2)
+         local nb = node_new(id_kern); setkern(nb, jw-6553.6)
+         setnext(wr,nb); setnext(nb,na)
        return joined_box
      end
    end
