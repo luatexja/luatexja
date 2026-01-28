@@ -1139,7 +1139,7 @@ do
    local sid_restore = node.subtype 'pdf_restore'
    local sid_matrix  = node.subtype 'pdf_setmatrix'
    local getwidth, setwidth = dnode.getwidth, dnode.setwidth
-   local getkern = dnode.getkern
+   local getkern, getfont = dnode.getkern, dnode.getfont
    local node_tail = dnode.tail
    local id_penalty = node.id 'penalty'
    local FROM_JFM         = luatexja.icflag_table.FROM_JFM
@@ -1152,7 +1152,7 @@ do
         setfield(n, 'shrink', -getfield(n, 'shrink'))
      elseif getid(n)==id_kern then setkern(n, -getkern(n)) end
    end
-   join_tate_glyphs= function (box, b, y_shift) -- b から
+   join_tate_glyphs= function (box, b, y_shift, font_id) -- b から
      local orig_head = getlist(box)
      local jb_inner = node_new(id_hlist); setdir(jb_inner, 'RTT')
      -- find the last node
@@ -1162,7 +1162,7 @@ do
        if (nid==id_hlist) and (get_attr_icflag(n)==PACKED) then
          local nn = getlist(n)
          if nn and getid(nn)==id_kern then
-           if get_attr(node_next(nn),attr_vert_aux)==y_shift then
+           if getfont(node_next(nn))==font_id and get_attr(node_next(nn),attr_vert_aux)==y_shift then
              n = node_next(n)
            else break
            end
@@ -1187,7 +1187,7 @@ do
        if nid==id_hlist then
          local nn = getlist(n)
          if not jl then 
-           jl = nn 
+           jl = nn
          else
            setkern(nn, get_attr(nn, attr_vert_aux)); negate(nn); setnext(jn, nn) 
          end
@@ -1218,7 +1218,8 @@ do
      end
    end
 end
-
+do
+   local getfont = dnode.getfont
    finalize_inner = function (box, box_dir)
       local n = getlist(box); local nid = getid(n)
       while n do
@@ -1227,12 +1228,13 @@ end
             if box_dir==dir_tate and get_attr_icflag(n)==PACKED then
                local nn = getlist(n)
                if nn and getid(nn)==id_kern then
-                 n = join_tate_glyphs(box, n, get_attr(node_next(nn), attr_vert_aux) or 0)
+                 n = join_tate_glyphs( box, n, get_attr(node_next(nn), attr_vert_aux) or 0,
+                       getfont(node_next(nn)) )
                end
             elseif ndir>=dir_node_auto then -- n is dir_node
                finalize_dir_node(n, ndir%dir_math_mod)
             else
-               finalize_inner(n, ndir); 
+               finalize_inner(n, ndir);
             end
          elseif (nid==id_glue)and(getsubtype(n)>=100) then
             finalize_inner(getfield(n,'leader'), box_dir)
@@ -1244,6 +1246,7 @@ end
          n = node_next(n); nid = getid(n)
       end
    end
+end
 
    local copy = dnode.copy
    function luatexja.direction.shipout_lthook (head)
