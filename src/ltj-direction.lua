@@ -1129,6 +1129,8 @@ do
    dnode.setattributelist(shipout_temp, nil)
    tex.setattribute(attr_dir, 0)
    local attr_vert_aux = luatexbase.attributes['ltj@kcat0']
+   local id_glue, id_disc = node.id 'glue', node.id 'disc'
+   local setdir = dnode.setdir
 
 do
    local setkern = node.direct.setkern
@@ -1136,12 +1138,10 @@ do
    local sid_save   = node.subtype 'pdf_save'
    local sid_restore = node.subtype 'pdf_restore'
    local sid_matrix  = node.subtype 'pdf_setmatrix'
-   local setdir = dnode.setdir
    local getwidth, setwidth = dnode.getwidth, dnode.setwidth
-   local getkern = dnode.getkern
+   local getkern, getfont = dnode.getkern, dnode.getfont
    local node_tail = dnode.tail
    local id_penalty = node.id 'penalty'
-   local id_glue = node.id 'glue'
    local FROM_JFM         = luatexja.icflag_table.FROM_JFM
    local KANJI_SKIP       = luatexja.icflag_table.KANJI_SKIP
    local KANJI_SKIP_JFM   = luatexja.icflag_table.KANJI_SKIP_JFM
@@ -1152,7 +1152,7 @@ do
         setfield(n, 'shrink', -getfield(n, 'shrink'))
      elseif getid(n)==id_kern then setkern(n, -getkern(n)) end
    end
-   join_tate_glyphs= function (box, b, y_shift) -- b から
+   join_tate_glyphs= function (box, b, y_shift, font_id) -- b から
      local orig_head = getlist(box)
      local jb_inner = node_new(id_hlist); setdir(jb_inner, 'RTT')
      -- find the last node
@@ -1162,7 +1162,7 @@ do
        if (nid==id_hlist) and (get_attr_icflag(n)==PACKED) then
          local nn = getlist(n)
          if nn and getid(nn)==id_kern then
-           if get_attr(node_next(nn),attr_vert_aux)==y_shift then
+           if getfont(node_next(nn))==font_id and get_attr(node_next(nn),attr_vert_aux)==y_shift then
              n = node_next(n)
            else break
            end
@@ -1187,7 +1187,7 @@ do
        if nid==id_hlist then
          local nn = getlist(n)
          if not jl then 
-           jl = nn 
+           jl = nn
          else
            setkern(nn, get_attr(nn, attr_vert_aux)); negate(nn); setnext(jn, nn) 
          end
@@ -1218,7 +1218,8 @@ do
      end
    end
 end
-
+do
+   local getfont = dnode.getfont
    finalize_inner = function (box, box_dir)
       local n = getlist(box); local nid = getid(n)
       while n do
@@ -1227,17 +1228,25 @@ end
             if box_dir==dir_tate and get_attr_icflag(n)==PACKED then
                local nn = getlist(n)
                if nn and getid(nn)==id_kern then
-                 n = join_tate_glyphs(box, n, get_attr(node_next(nn), attr_vert_aux) or 0)
+                 n = join_tate_glyphs( box, n, get_attr(node_next(nn), attr_vert_aux) or 0,
+                       getfont(node_next(nn)) )
                end
             elseif ndir>=dir_node_auto then -- n is dir_node
                finalize_dir_node(n, ndir%dir_math_mod)
             else
-               finalize_inner(n, ndir); 
+               finalize_inner(n, ndir);
             end
+         elseif (nid==id_glue)and(getsubtype(n)>=100) then
+            finalize_inner(getfield(n,'leader'), box_dir)
+         elseif nid==id_disc then
+            local nb = node_new(id_hlist); setdir(nb,'TLT');
+            setlist(nb, getfield(n,'replace')); finalize_inner(nb, box_dir)
+            setlist(n,'replace', getlist(nb)); setlist(nb,nil); node_remove(nb);
          end
          n = node_next(n); nid = getid(n)
       end
    end
+end
 
    local copy = dnode.copy
    function luatexja.direction.shipout_lthook (head)
@@ -1249,6 +1258,7 @@ end
          setlist(b, a); a = b
       end
       setlist(shipout_temp, a); finalize_inner(shipout_temp, dir_yoko)
+      --luatexja.ext_show_node(node.direct.tonode(shipout_temp), '> ', print)
       a = copy(getlist(shipout_temp)); setlist(shipout_temp, nil)
       stop_time_measure 'box_primitive_hook'
       return to_node(a)
