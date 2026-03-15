@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2025-10-26 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2026-03-15 Patch to NFSS2 for LuaTeX-ja]
 
 %%%%%%%% LaTeX2e version detection
 \newcount\ltj@@latex@plv
@@ -1207,7 +1207,7 @@
   \edef\@temp{#9}%
   \ifx\@temp\@empty\else
     {\def\ltj@temp@bfont{#1/#2/#3/#4}\def\ltj@temp@afont{#5/#6/#7/#8}%
-     \expandafter\ltj@@altfont@latex#9,,}\ignorespaces
+     \expanded{\noexpand\ltj@@altfont@latex#9,,}}\ignorespaces
   \fi}
 \def\ltj@@altfont@latex#1,{\def\ltj@temp{#1}%
   \ifx\ltj@temp\empty\let\@next=\relax\else
