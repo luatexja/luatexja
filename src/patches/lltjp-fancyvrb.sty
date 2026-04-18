@@ -1,0 +1,10 @@
+%
+% lltjp-fancyvrb.sty 2026-04-18
+%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{lltjp-fancyvrb}[2026-04-18 Patch to fancyvrb for LuaTeX-ja]
+
+\apptocmd\FV@SetupFont{\ltj@verb@fontsetup}{}{}
+
+\endinput
