@@ -1162,7 +1162,9 @@ do
        if (nid==id_hlist) and (get_attr_icflag(n)==PACKED) then
          local nn = getlist(n)
          if nn and getid(nn)==id_kern then
-           if getfont(node_next(nn))==font_id and get_attr(node_next(nn),attr_vert_aux)==y_shift then
+           nn = node_next(nn)
+           if nn and getid(nn)==id_whatsit then nn=node_next(nn)  end
+           if getfont(nn)==font_id and get_attr(nn,attr_vert_aux)==y_shift then
              n = node_next(n)
            else break
            end
@@ -1210,7 +1212,8 @@ do
        insert_after(orig_head, jb_inner, wr);
        local k2 = node_new(id_kern); setkern(k2, jw);
        insert_after(orig_head, wr, k2);
-       node_remove(orig_head, joined_box); node_free(joined_box); return k2
+       node_remove(orig_head, joined_box); node_free(joined_box)
+       return k2
      else
        setdir(joined_box, 'TLT'); setfield(joined_box, 'width', jw);
        setlist(joined_box, ws); setnext(ws, wm); setnext(wm, jb_inner); setnext(jb_inner, wr);
@@ -1228,8 +1231,9 @@ do
             if box_dir==dir_tate and get_attr_icflag(n)==PACKED then
                local nn = getlist(n)
                if nn and getid(nn)==id_kern then
-                 n = join_tate_glyphs( box, n, get_attr(node_next(nn), attr_vert_aux) or 0,
-                       getfont(node_next(nn)) )
+                 nn = node_next(nn)
+                 if nn and getid(nn)==id_whatsit then nn=node_next(nn)  end
+                 n = join_tate_glyphs( box, n, get_attr(nn, attr_vert_aux) or 0, getfont(nn) )
                end
             elseif ndir>=dir_node_auto then -- n is dir_node
                finalize_dir_node(n, ndir%dir_math_mod)
