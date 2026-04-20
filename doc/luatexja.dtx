@@ -381,7 +381,7 @@ As shown above, \emph{they are changed to \cs{zw}~and~\cs{zh} respectively} in \
 %</en>
 %<*ja>
 特に注意してほしいのは，\pTeX で追加された\texttt{zw}と\texttt{zh}という単位は
-\LuaTeX-ja では使用できず，\emph{\cs{zw}, \cs{zh} と制御綴の形にしないといけない}という点である
+\LuaTeX-jaでは使用できず，\emph{\cs{zw}, \cs{zh} と制御綴の形にしないといけない}という点である
 \footnote{%
   別のパッケージやユーザが\cs{zw},~\cs{zh}を書き換えてしまうことに対応するため，
   \LuaTeX-ja 20200127.0以降では，\cs{ltj@zw},~\cs{ltj@zh}がそれぞれ\cs{zw},~\cs{zh}の
@@ -401,7 +401,7 @@ In \pTeX, a line break after Japanese character is ignored (and
 \paragraph{和文文字直後の改行}
 日本語の文書中では改行はほとんどどこでも許されるので，\pTeX では和文文字
       直後の改行は無視される（スペースが入らない）ようになっていた．しかし，
-      \LuaTeX-ja では \LuaTeX の仕様のためにこの機能は完全には実装されていない．
+      \LuaTeX-jaでは \LuaTeX の仕様のためにこの機能は完全には実装されていない．
       詳しくは\ref{sec-lbreak}章を参照．
 %</ja>
 
@@ -482,7 +482,7 @@ on the content of the register \emph{only}. This is major difference with \pTeX.
 %</en>
 %<*ja>
 \paragraph{組方向}
-バージョン20150420.0からは，不安定ながらも\LuaTeX-ja における縦組みをサポートしている．
+バージョン20150420.0からは，不安定ながらも\LuaTeX-jaにおける縦組みをサポートしている．
 なお，\LuaTeX 本体も$\Omega$流の組方向をサポートしているが，それとは全くの別物であること
 に注意してほしい．
 特に，異なった組方向のボックスを扱う場合には
@@ -535,7 +535,7 @@ such as \P~and~\S, are now typeset in alphabetic fonts.
 \label{para:xkanjiskip_verb}
 From version~20260420.0, \LuaTeX-ja does not insert space between Japanese characters~and~alphabets
 \emph{inside} \cs{verb} and \texttt{verbatim} environment%
-\footnote{Includes \texttt{macrocode environment} (in dtx)
+\footnote{Includes \texttt{macrocode environment} (in \texttt{.dtx} files)
   and \texttt{Verbatim} environment (\Pkg{fancyvrb} package).
   See Subsection~\ref{ssec:xkanjiskip_verb} for implementation.}.
 However, \LuaTeX-ja inserts these spaces before/after \cs{verb}, and inside \cs{texttt\{\}}.
@@ -544,7 +544,7 @@ However, \LuaTeX-ja inserts these spaces before/after \cs{verb}, and inside \cs{
 \paragraph{\cs{verb}や\texttt{verbatim}環境中の和欧文間空白}
 \label{para:xkanjiskip_verb}
 バージョン20260420.0以降では，\cs{verb}や\texttt{verbatim}環境
-\footnote{dtx内の\texttt{macrocode}環境や，\Pkg{fancyvrb}パッケージの
+\footnote{\texttt{.dtx}内の\texttt{macrocode}環境や，\Pkg{fancyvrb}パッケージの
   提供する\texttt{Verbatim}環境も含む．実装方法については\ref{ssec:xkanjiskip_verb}節を参照．}%
 内部では和欧文間空白を入れないようにした．
 これは，「入力通りに組まれる」状況で，和欧文間空白と明示的な空白を混同してしまうことを避けるためである．
@@ -1617,7 +1617,7 @@ The default value is determined as follows:
 標準では
 \begin{itemize}
   \item \cs{Cjascale}が定義されている場合
-  \footnote{\LuaTeX-ja が用意しているクラスファイル(\Pkg{ltjclasses},~\Pkg{ltjsclasses})を
+  \footnote{\LuaTeX-jaが用意しているクラスファイル(\Pkg{ltjclasses},~\Pkg{ltjsclasses})を
   使う場合はこちらに当てはまる．}は，それを用いる．
   \item \cs{Cjascale}が未定義の場合は，\Pkg{luatexja-fontspec}読み込み時の和文フォントから自動計算される．
 \end{itemize}
@@ -2581,9 +2581,9 @@ However, the penalty inserted after it is 10 which is the \Param{postbreakpenalt
 %<*ja>
 \section{\LuaTeX-jaにおける\cs{catcode}}
 \label{sec-catcode}
-\subsection{予備知識：\pTeX と\upTeX における \cs{kcatcode}}
+\subsection{予備知識：\pTeX と\upTeX における\cs{kcatcode}}
 \pTeX，\upTeX においては，和文文字が制御綴内で利用できるかどうか
-は \cs{kcatcode} の値によって決定されるのであった．
+は\cs{kcatcode}の値によって決定されるのであった．
 詳細は\autoref{tab:kcat}を参照されたい．
 %</ja>
 %<*en>
@@ -2645,11 +2645,11 @@ in \upTeX. So characters which can be used in a control word
 slightly differ between \pTeX~and~\upTeX.
 %</en>
 %<*ja>
-\pTeX では \cs{kcatcode} はJIS~X~0208の区単位，
+\pTeX では\cs{kcatcode}はJIS~X~0208の区単位，
 \upTeX では概ねUnicodeブロック単位\footnote{%
   \texttt{U+FF00}--\texttt{U+FFEF} (Halfwidth and Fullwidth Forms)は
   「全角英数字」「半角カナ」「その他」と3つに分割されており，
-  それぞれ別々に \cs{kcatcode} が指定できるようになっている．
+  それぞれ別々に\cs{kcatcode}が指定できるようになっている．
 }で設定可能になっている．そのため，\pTeX と\upTeX の初期状態では
 制御綴内で使用可能な文字が微妙に異なっている．
 %</ja>
@@ -2681,7 +2681,7 @@ is controlled by the lowermost bit of the \Param{kcatcode} parameter.
  \item[欧文/和文の区別 (\upTeX)]
 \cs{ltjdefcharrange} と\textsf{jacharrange}パラメータ（\ref{ssec:setrange}節）
  \item[制御綴中に使用可か]
-\LuaTeX 自身の \cs{catcode} でよい
+\LuaTeX 自身の\cs{catcode}でよい
  \item[\Param{jcharwidowpenalty}が挿入可か]
 \Param{kcatcode}パラメータの最下位ビット
  \item[直後の改行]
@@ -2822,7 +2822,7 @@ implemented vertical writing by rotating \texttt{TLT}-box by 90~degrees.
 
 %<ja>\subsection{サポートする組方向}
 \begin{table}[t]
-%<ja>\caption{\LuaTeX-ja のサポートする組方向}
+%<ja>\caption{\LuaTeX-jaのサポートする組方向}
 %<en>\caption{Directions supported by \LuaTeX-ja}
 %<en>\medskip
 \label{tab-dir}
@@ -2911,17 +2911,17 @@ The direction of a math formula is changed to
 
 %<*ja>
 \LuaTeX-jaがサポートする組方向は\autoref{tab-dir}に示す4つである．
-4列目の \cs{dtou} は聞き慣れない命令だと思うが，
+4列目の\cs{dtou}は聞き慣れない命令だと思うが，
 実は\pTeX に同名の命令が（ドキュメントには書かれていないが）存在する．
-Down-TO-Upの意味なのだろう．\cs{dtou} を使用する機会はないだろうが，
+Down-TO-Upの意味なのだろう．\cs{dtou}を使用する機会はないだろうが，
 \LuaTeX-jaではデバッグ用に実装している．
-5列目の \cs{utod} は，\pTeX で言う「縦数式ディレクション」に相当するものである．
+5列目の\cs{utod}は，\pTeX で言う「縦数式ディレクション」に相当するものである．
 
-組方向は，\cs{yoko},~\cs{tate}, \cs{dtou},~\cs{utod} をそれぞれ使用することで，
+組方向は，\cs{yoko},~\cs{tate}, \cs{dtou},~\cs{utod}をそれぞれ使用することで，
 現在作成中のリストやボックスが空の時にのみ変更可能である．
 ただし，現在のモードが非制限水平モードや（文中，別行立て問わず）数式モードであるときには
 組方向を変更することは出来ない．
-また，縦組中の数式内のボックスは\pTeX と同じように組方向が \cs{utod} となる．
+また，縦組中の数式内のボックスは\pTeX と同じように組方向が\cs{utod}となる．
 
 なお，\LaTeX の下で\LuaTeX-jaを使用する場合，組方向変更命令には
 「新たな組方向下での和文フォントを必要なら読み込み（・選択する）」という
@@ -3010,7 +3010,7 @@ the direction  inside the box and that outside the box differ.
 \begin{tabular}{ccc}
 \toprule
 %<ja>\emph{横組中に配置}&\emph{縦組中に配置}&%
-%<ja>\emph{組方向 \cs{dtou} 中に配置}\\
+%<ja>\emph{組方向\cs{dtou}中に配置}\\
 %<en>\textbf{typeset in \emph{yoko} direction}
 %<en>&\textbf{typeset in \emph{tate} or \emph{utod} direction}
 %<en>&\textbf{typeset in \emph{dtou} direction}\\
@@ -3225,12 +3225,12 @@ These commands set the dimension of \cs{box\meta{num}}. One does not need
 %</en>
 %<*ja>
 \paragraph{\cs{wd} 達と組方向}
-ボックスレジスタ \cs{box}\meta{num} にセットされているボックスの幅・高さ・深さの取得や
-変更にはそれぞれ \cs{wd},~\cs{ht},~\cs{dp} プリミティブを用いるのであった．
+ボックスレジスタ\cs{box}\meta{num}にセットされているボックスの幅・高さ・深さの取得や
+変更にはそれぞれ\cs{wd},~\cs{ht},~\cs{dp}プリミティブを用いるのであった．
 \pTeX ではこれらのプリミティブは，「現在の組方向におけるボックスの寸法」を指すもので，
 同じボックスに対しても現在の組方向によって返る値は異なるものであった．
 
-\LuaTeX-jaにおいては状況が異なり，\cs{wd},~\cs{ht},~\cs{dp} が返す値は
+\LuaTeX-jaにおいては状況が異なり，\cs{wd},~\cs{ht},~\cs{dp}が返す値は
 現在の組方向には依存しない．下の例のように，横組のボックスが格納されていれば
 \cs{wd}等は常に「横組におけるボックスの寸法」を意味する．
 
@@ -3253,7 +3253,7 @@ These commands set the dimension of \cs{box\meta{num}}. One does not need
 \begin{lstlisting}
 \dimexpr 2\ltjgetwd42-3pt\relax, \the\ltjgetwd1701
 \end{lstlisting}
-のように \cs{wd}\meta{num} の代わりとして扱うことができる．
+のように\cs{wd}\meta{num}の代わりとして扱うことができる．
 使用例は以下の通りである．
 \begin{LTXexample}[width=0.3\textwidth]
 \parindent0pt
@@ -3313,7 +3313,7 @@ Returned value&\texttt{4}&\texttt{3}&\texttt{1}&\texttt{11}&\texttt{0}\\
 %<*ja>
 \subsection{組方向の取得}
 「現在の組方向」や「\meta{num}番のボックスの組方向」は，
-\pTeX では \cs{ifydir} や \cs{ifybox}\meta{num} といった条件判断文を使って
+\pTeX では\cs{ifydir}や\cs{ifybox}\meta{num}といった条件判断文を使って
 判断することができた．
 しかし，\LuaTeX-jaはあくまでも\TeX マクロとLuaコードで
 記述されており，それでは新たな条件判断命令を作るのは難しい．
@@ -3559,11 +3559,11 @@ For example, \autoref{fig:primitive_meaning} shows the situation of \cs{vadjust}
  和文フォントに対するイタリック補正のサポートが追加されている．
  \item[\cs{unhbox}\meta{number}\textrm{, }\cs{unvbox}\meta{number}\textrm{, }\cs{unhcopy}\meta{number}\textrm{, }\cs{unvcopy}\meta{number}]
  ボックスの組方向が現在のリストと異なる場合は事前にエラーメッセージを出力する．
- \pTeX と異なり，エラーを無視して無理矢理 \cs{unhbox}, \cs{unvbox} 等を
+ \pTeX と異なり，エラーを無視して無理矢理\cs{unhbox}, \cs{unvbox}等を
  続行させることもできるが，その場合の組版結果は保証しない．
  \item[\cs{vadjust}\{\meta{material}\}] 一旦プリミティブ本来の挙動を行う．その後，\meta{material}の組方向が
  周囲の垂直リストの組方向と一致しない場合にエラーを出力し，
- 該当の \cs{vadjust} を無効にする．
+ 該当の\cs{vadjust}を無効にする．
  \item[\cs{insert}\meta{number}\{\meta{material}\}]
  一旦プリミティブ本来の挙動を行い，その後\meta{material}内の各ボックス・罫線の直前に組方向を示
 	      すdirection whatsitを挿入する．
@@ -3660,9 +3660,9 @@ To load a font as a Japanese font (for horizontal direction), you must use the
 so TrueType/OpenType fonts with features can be used for Japanese fonts:
 %</en>
 %<*ja>
-フォントを（横組用）和文フォントとして読み込むためには，\cs{jfont} を
-\ \cs{font} プリミティブの代わりに用いる．
-\cs{jfont} の文法は \cs{font} と同じである．
+フォントを（横組用）和文フォントとして読み込むためには，\cs{jfont}を
+\cs{font}プリミティブの代わりに用いる．
+\cs{jfont}の文法は\cs{font}と同じである．
 \LuaTeX-jaは\Pkg{luaotfload}パッケージを自動的に読み込むので，
 TrueType/OpenTypeフォントにfeatureを指定したものを和文フォントとして用いる
 ことができる：
@@ -3695,9 +3695,9 @@ causes a error.  We denote control sequences which are defined in
 \cs{jfont} by \meta{jfont\_cs}.
 %</en>
 %<*ja>
-なお，\cs{jfont} で定義された制御綴（上の例だと \cs{tradmc}）
+なお，\cs{jfont}で定義された制御綴（上の例だと\cs{tradmc}）
 は\textit{font\_def}トークンではなくマクロである．従って，\verb+\fontname\tradmc+のような
-入力はエラーとなる．以下では \cs{jfont} で定義された
+入力はエラーとなる．以下では\cs{jfont}で定義された
 制御綴を\meta{jfont\_cs}で表す．
 %</ja>
 
@@ -3989,7 +3989,7 @@ This means the following two lines have the same meaning:
 %</en>
 %<*ja>
 いくつかのフォントはグリフ間のスペースについての情報を持っている．
-このカーニング情報は以前の\LuaTeX-ja とはあまり相性が良くなかったが，
+このカーニング情報は以前の\LuaTeX-jaとはあまり相性が良くなかったが，
 バージョン20140324.0以降ではカーニングによる空白はイタリック補正と同様に扱うことになっている．
 つまり，カーニング由来の空白とJFM由来のグルー・カーンは同時に入ることがある．
 \autoref{fig:kern-jfm}を参照．
@@ -4018,7 +4018,7 @@ This means the following two lines have the same meaning:
   フォント由来のカーニングが入ることを期待していないためである．
 
  \item
-一方，\emph{\Pkg{luatexja-fontspec} の提供する \cs{setmainjfont}\
+一方，\emph{\Pkg{luatexja-fontspec} の提供する\cs{setmainjfont}%
 などの命令の標準設定ではカーニング情報は使用しない}(\texttt{Kerning=Off})．
 すなわち，次の2行は等価である：
 \begin{lstlisting}
@@ -4443,8 +4443,8 @@ with \texttt{psft} prefix, because they are only simple linear transformations.
 %<*ja>
 \Pkg{luaotfload}で使用可能になった
 \texttt{file}\ と \texttt{name}\ のプリフィックスに加えて，
-\cs{jfont}（と \cs{font} プリミティブ）では
-\texttt{psft}\ プリフィックスを用いることができる．
+\cs{jfont}（と\cs{font}プリミティブ）では
+\texttt{psft}プリフィックスを用いることができる．
 このプリフィックスを用いることで，PDFには埋め込まれない「名前だけの」
 和文フォントを指定することができる．
 なお，現行の\LuaTeX で非埋め込みフォントを作成するとPDF内でのエンコーディングが
@@ -4578,8 +4578,8 @@ JFMの書字方向．\texttt{'yoko'}（横組）と \texttt{'tate'}（縦組）�
 
 %<en>The amount of the length of the ``full-width''.
 %<*ja>
-「全角幅」の長さ．この量が \cs{zw} の長さとなる．\pTeX では
-「全角幅」\texttt{1zw} は「文字クラス0の文字」の幅と決められていたが，
+「全角幅」の長さ．この量が\cs{zw}の長さとなる．\pTeX では
+「全角幅」\texttt{1zw}は「文字クラス0の文字」の幅と決められていたが，
 \LuaTeX-jaではここで指定する．
 %</ja>
 
@@ -4590,7 +4590,7 @@ JFMの書字方向．\texttt{'yoko'}（横組）と \texttt{'tate'}（縦組）�
 %<en>The amount of the ``full-height'' (height + depth).
 %<*ja>
 「全角高さ」(height + depth)の長さ．通常は全角幅と同じ長さになるだろう．
-\pTeX では 「全角高さ」\texttt{1zh} は「文字クラス0の文字」の高さと深さの和と決められていたが，
+\pTeX では 「全角高さ」\texttt{1zh}は「文字クラス0の文字」の高さと深さの和と決められていたが，
 \LuaTeX-jaではここで指定する．
 %</ja>
 
@@ -4608,7 +4608,7 @@ This field specifies the ``ideal'' amount of \Param{kanjiskip}. As noted
 %</en>
 %<*ja>
 理想的な\Param{kanjiskip}の量を指定する．\ref{subs-kskip}節で述べたように，
-もし\Param{kanjiskip}が \cs{maxdimen} の値ならば，このフィールドで指定された
+もし\Param{kanjiskip}が\cs{maxdimen}の値ならば，このフィールドで指定された
 値が実際には用いられる（指定なしは0\,ptとして扱われる）．\meta{stretch}と\meta{shrink}のフィールドもdesign size
 が単位であることに注意せよ．
 %</ja>
@@ -5255,7 +5255,7 @@ If a hbox~$b$ begins (resp.~ends) a glue or kern between this ``charater'' and a
 \Param{kanjiskip}~and~\Param{xkanjiskip} around a hbox.
 %</en>
 %<*ja>
-hboxの先頭と末尾，及びインデントされていない（\cs{noindent} で開始された）段落の先頭を表す．
+hboxの先頭と末尾，及びインデントされていない（\cs{noindent}で開始された）段落の先頭を表す．
 この「文字」との間に設定したグルー・カーンがボックス$b$の先頭（もしくは末尾）に来た場合，
   そのボックス$b$の直前（もしくは直後）には和文処理グルーは入らない．
 %</ja>
@@ -5325,14 +5325,14 @@ See Japanese version of this manual.
       文字クラスに関してはグルー／カーンの設定はしない．
 
 これは，\pTeX では，
-      hboxの先頭・末尾とインデントされていない（\cs{noindent} で開始さ
+      hboxの先頭・末尾とインデントされていない（\cs{noindent}で開始さ
       れた）段落の先頭にはJFMグルーは入らないという仕様を実現させるためである．
 \item \pTeX の組版を再現させようというのが目的であれば以上の注意を守れば十分である．
 
 ところで，\pTeX では通常の段落の先頭にJFMグルーが残るという仕様があるので，
       段落先頭の開き括弧は全角二分下がりになる．全角下がりを実現させるに
-      は，段落の最初に手動で \cs{inhibitglue} を追加するか，あるいは
-      \ \cs{everypar} のハックを行い，それを自動化させるしかなかった．
+      は，段落の最初に手動で\cs{inhibitglue}を追加するか，あるいは
+      \cs{everypar}のハックを行い，それを自動化させるしかなかった．
 
 一方，\LuaTeX-jaでは，\texttt{'parbdd'}によって，それがJFM側で調整できるよ
 うになった．例えば，\LuaTeX-ja同梱のJFMのように，\texttt{'boxbdd'}と同じ文字クラスに
@@ -5347,8 +5347,8 @@ See Japanese version of this manual.
 \end{LTXexample}
 \end{itemize}
 
-但し，\cs{everypar} を利用している場合にはこの仕組みは正しく動かない．
-そのような例としては箇条書き中の \cs{item} で始まる段落があり，\Pkg{ltjsclasses}では
+但し，\cs{everypar}を利用している場合にはこの仕組みは正しく動かない．
+そのような例としては箇条書き中の\cs{item}で始まる段落があり，\Pkg{ltjsclasses}では
 人工的に「\texttt{'parbdd'}の意味を持つ」whatsitノードを作ることによって対処している%
 \footnote{\texttt{ltjsclasses.dtx} を参照されたい．
 JFM側で一部の対処ができることにより，\Pkg{jsclasses}のようにif文の判定はしていない．}．
@@ -5370,8 +5370,8 @@ an external package is needed to support this in plain \TeX\ and
 \TeX\ は数式フォントを16のファミリ\footnote{Omega, Aleph, \LuaTeX，そして
   $\varepsilon$-\kern-.125em(u)\pTeX\ では256の数式ファミリを扱うことができるが，
   これをサポートするためにplain \TeX と\LaTeX では外部パッケージを読み込む必要が
-  ある．}で管理し，それぞれのファミリは3つのフォントを持っている：
-\cs{textfont}, \cs{scriptfont} そして \cs{scriptscriptfont} である.
+  ある．}で管理し，それぞれのファミリは
+  \cs{textfont}, \cs{scriptfont}, \cs{scriptscriptfont}という3つのフォントを持っている．
 %</ja>
 
 %<*en>
@@ -5387,10 +5387,10 @@ a \emph{horizontal} Japanese font.
 %<*ja>
 \LuaTeX-jaの数式中での和文フォントの扱いも同様である．
 \autoref{tab-math}は数式フォントファミリに対する \TeX のプリミティブと対応する
-ものを示している．\cs{fam} と \cs{jfam} の値の間には関係はなく，
-適切な設定の下では \cs{fam} と \cs{jfam} の両方に同じ値を設定することができる．
-\Param{jatextfont} 他の第2引数\meta{jfont\_cs}は，\cs{jfont} で定義された
-\emph{横組用}和文フォントである．\cs{tfont} で定義された
+ものを示している．\cs{fam}と\cs{jfam}の値の間には関係はなく，
+適切な設定の下では\cs{fam}と\cs{jfam}の両方に同じ値を設定することができる．
+\Param{jatextfont} 他の第2引数\meta{jfont\_cs}は，\cs{jfont}で定義された
+\emph{横組用}和文フォントである．\cs{tfont}で定義された
 \emph{縦組用}和文フォントを指定することは想定していない．
 %</ja>
 
@@ -5710,9 +5710,9 @@ of \LuaTeX, see Section~\ref{sec-para}.
 %</en>
 %<*ja>
 先に述べたように，\LuaTeX-jaの内部パラメータにアクセスするには
-\cs{ltjsetparameter}（または \cs{ltjglobalsetparameter}）と \cs{ltjgetparameter} を用いる．
+\cs{ltjsetparameter}（または\cs{ltjglobalsetparameter}）と\cs{ltjgetparameter}を用いる．
 \LuaTeX-jaが\pTeX のような文法（例えば，\verb+\prebreakpenalty`）=10000+）を
-採用しない理由の一つは，\LuaTeX のソースにおける \verb+hpack_filter+
+採用しない理由の一つは，\LuaTeX のソースにおける\verb+hpack_filter+%
 コールバックの位置にある．\ref{sec-para}章を参照．
 %</ja>
 
@@ -5726,12 +5726,12 @@ scope of assignment;
 They also obey the value of \cs{globaldefs}, like other assignments.
 %</en>
 %<*ja>
-\cs{ltjsetparameter} と \cs{ltjglobalsetparameter} はパラメータを
+\cs{ltjsetparameter}と\cs{ltjglobalsetparameter}はパラメータを
 指定するための命令で，key-valueリストを
 引数としてとる．両者の違いはスコープであり，標準では
-\cs{ltjsetparameter} はローカルな設定を行うのに対し，
-\cs{ltjglobalsetparameter} はグローバルな設定を行う．
-また，他のパラメータ指定と同様に \cs{globaldefs} の値にも従う．
+\cs{ltjsetparameter}はローカルな設定を行うのに対し，
+\cs{ltjglobalsetparameter}はグローバルな設定を行う．
+また，他のパラメータ指定と同様に\cs{globaldefs}の値にも従う．
 %</ja>
 
 %<*en>
@@ -5740,7 +5740,7 @@ The following is the list of parameters which can be specified by the
 in \pTeX, and symbols beside each parameter has the following meaning:
 %</en>
 %<*ja>
-以下は \cs{ltjsetparameter} に指定することができるパラメータの一覧である．
+以下は\cs{ltjsetparameter}に指定することができるパラメータの一覧である．
 [\cs{cs}]は\pTeX における対応物を示す．
 また，それぞれのパラメータの右上の記号には次の意味がある：
 %</ja>
@@ -5842,13 +5842,13 @@ to prevent a line ends with this character.
 
 \item[\DParam{jatextfont}\,=\{\meta{jfam},\meta{jfont\_cs}\}$^\ast$]
 %<en>[\cs{textfont} in \TeX]
-%<ja>[\TeX の \cs{textfont}]
+%<ja>[\TeX の\cs{textfont}]
 \item[\DParam{jascriptfont}\,=\{\meta{jfam},\meta{jfont\_cs}\}$^\ast$]
 %<en>[\cs{scriptfont} in \TeX]
-%<ja>[\TeX の \cs{scriptfont}]
+%<ja>[\TeX の\cs{scriptfont}]
 \item[\DParam{jascriptscriptfont}\,=\{\meta{jfam},\meta{jfont\_cs}\}$^\ast$]
 %<en>[\cs{scriptscriptfont} in \TeX]
-%<ja>[\TeX の \cs{scriptscriptfont}]
+%<ja>[\TeX の\cs{scriptscriptfont}]
 \item[\DParam{yjabaselineshift}\,=\meta{dimen}]\
 \item[\DParam{yalbaselineshift}\,=\meta{dimen}] [\cs{ybaselineshift}]
 \item[\DParam{tjabaselineshift}\,=\meta{dimen}]\
@@ -5879,7 +5879,7 @@ The followings are allowed for \meta{mode}:
 This parameter is similar to the \cs{inhibitxspcode} primitive of \pTeX, but not compatible with \cs{inhibitxspcode}.
 %</en>
 %<*ja>
-このパラメータは\pTeX の \cs{inhibitxspcode} プリミティブと似ているが，
+このパラメータは\pTeX の\cs{inhibitxspcode}プリミティブと似ているが，
 互換性はない．
 %</ja>
 \item[\DParam{alxspmode}\,=\{\meta{char\_code},\meta{mode}\}$^\ast$] [\cs{xspcode}]\
@@ -5919,7 +5919,7 @@ Note that parameters \Param{jaxspmode} and \Param{alxspmode} share a common tabl
 %<*ja>
 デフォルトで2つの\textbf{JAchar}の間に挿入されるグルーである．
 通常では，\pTeX と同じようにフォントサイズに比例して変わることはない．
-しかし，自然長が \cs{maxdimen} の場合は，例外的に和文フォントのJFM側で指定されている
+しかし，自然長が\cs{maxdimen}の場合は，例外的に和文フォントのJFM側で指定されている
 値を採用（こちらはフォントサイズに比例）することになっている．
 %</ja>
 %<*en>
@@ -5935,7 +5935,7 @@ the value which is specified in the JFM for current Japanese font (See Subsectio
 %<*ja>
 デフォルトで\textbf{JAchar}と\textbf{ALchar}の間に挿入されるグルーである．
 \Param{kanjiskip}と同じように，通常ではフォントサイズに比例して変わることはないが，
-自然長が \cs{maxdimen} の場合が例外である．
+自然長が\cs{maxdimen}の場合が例外である．
 %</ja>
 %<*en>
 The default glue which inserted between a \textbf{JAchar} and an
@@ -5988,8 +5988,8 @@ If the argument \meta{dir} is not one of 4,~3, 1~nor~11,
 the behavior of this assignment is undefined.
 %</en>
 %<*ja>
-組方向を変更する \cs{yoko}~(if $\hbox{\meta{dir}}=4$), \cs{tate}~(if $\hbox{\meta{dir}}=3$),
-\cs{dtou}~(if $\hbox{\meta{dir}}=1$), \cs{utod}~(if $\hbox{\meta{dir}}=11$) と同じ役割を持つ．
+組方向を変更する\cs{yoko}~(if $\hbox{\meta{dir}}=4$), \cs{tate}~(if $\hbox{\meta{dir}}=3$),
+\cs{dtou}~(if $\hbox{\meta{dir}}=1$), \cs{utod}~(if $\hbox{\meta{dir}}=11$)と同じ役割を持つ．
 利用可能な状況もこれら4命令と同一である．引数\meta{dir}が4,~3, 1,~11のいずれでも無いときの
 動作は未定義である．
 %</ja>
@@ -6110,7 +6110,7 @@ and 4 means \emph{yoko} direction (horizontal typesetting).
 %<*ja>
 \verb+\ltjgetparameter{adjustdir}+ は，周囲のvboxの組方向（言い換えれば，
 \cs{vadjust} で用いられる組方向）を表す数値を返す．
-\Param{direction}と同様に，1は \cs{dtou} 方向を，
+\Param{direction}と同様に，1は\cs{dtou}方向を，
 3は縦組みを，4は横組みを表す．
 %</ja>
 
@@ -6131,7 +6131,7 @@ For an integer~\meta{register} between 0~and~65535,
 The following parameter names \emph{cannot be specified} in \cs{ltjgetparameter}.
 %</en>
 %<*ja>
-次のパラメータ名を \cs{ltjgetparameter} に指定することはできない．
+次のパラメータ名を\cs{ltjgetparameter}に指定することはできない．
 %</ja>
 \begin{quote}
 \sffamily
@@ -6182,7 +6182,7 @@ The correct way is using a temporary register.
 %</en>
 %<*ja>
 \item 返り値が文字列であることから，\Param{kanjiskip}や\Param{xkanjiskip}を直接
-\ \cs{ifdim} を使って比較することは望ましくない．伸び量や縮み量を持っている時には，
+\cs{ifdim}を使って比較することは望ましくない．伸び量や縮み量を持っている時には，
 次はエラーを発生させる：
 \begin{lstlisting}
 \ifdim\ltjgetparameter{kanjiskip}>\z@ ... \fi
@@ -6249,10 +6249,10 @@ that is, without executing \cs{ltj@setpar@global} in advance, is \emph{not} supp
 
 %<*ja>
 \subsection{\cs{ltjsetparameter} の代替}
-原則として各種内部パラメータの設定には \cs{ltjsetparameter} もしくは
-\ \cs{ltjglobalsetparameter}\ を用いることになるが，
-\cs{ltjsetparameter} の実行には時間がかかるという難点があり，
-\LuaTeX-ja の内部ではより高速に実行できる別の形式を用いている．
+原則として各種内部パラメータの設定には\cs{ltjsetparameter}もしくは
+\cs{ltjglobalsetparameter}を用いることになるが，
+\cs{ltjsetparameter}の実行には時間がかかるという難点があり，
+\LuaTeX-jaの内部ではより高速に実行できる別の形式を用いている．
 \emph{本節は一般利用者むけの内容ではない．}
 
 \paragraph{\Param{kanjiskip}, \Param{xkanjiskip}の設定}
@@ -6267,9 +6267,9 @@ that is, without executing \cs{ltj@setpar@global} in advance, is \emph{not} supp
     \fi
   \fi}
 \end{lstlisting}
-と，フォントサイズを変更するごとに \cs{kanjiskip}, \cs{xkanjiskip} を変更している．
-この \cs{@setfontsize} は文書の中で多数回実行されるので．
-\LuaTeX-ja 用に素直に書き換えた
+と，フォントサイズを変更するごとに\cs{kanjiskip}, \cs{xkanjiskip}を変更している．
+この\cs{@setfontsize}は文書の中で多数回実行されるので．
+\LuaTeX-ja用に素直に書き換えた
 \begin{lstlisting}
   \ltjsetparameter{kanjiskip=0\zw plus .1\zw minus .01\zw}
   \@tempskipa=\ltjgetparameter{xkanjiskip}
@@ -6282,11 +6282,11 @@ that is, without executing \cs{ltj@setpar@global} in advance, is \emph{not} supp
   \fi
 \end{lstlisting}
 としたのではタイプセットが遅くなってしまう．
-そこで，\cs{ltjsetparameter} の中で
+そこで，\cs{ltjsetparameter}の中で
 \begin{itemize}
-\item \cs{globaldefs} の値を読み取る \cs{ltj@setpar@global}
-\item \Param{kanjiskip} の設定を行う \cs{ltjsetkanjiskip}
-\item \Param{xkanjiskip} の設定を行う \cs{ltjsetxkanjiskip}
+\item \cs{globaldefs}の値を読み取る\cs{ltj@setpar@global}
+\item \Param{kanjiskip}の設定を行う\cs{ltjsetkanjiskip}
+\item \Param{xkanjiskip}の設定を行う\cs{ltjsetxkanjiskip}
 \end{itemize}
 を独立させ，\Pkg{ltjsclasses}では，
 \begin{lstlisting}
@@ -6384,8 +6384,8 @@ With the help of this example, we remark the specification of \cs{inhibitglue}:
       simply ignored.
 %</en>
 %<*ja>
-\item \emph{\cs{inhibitglue} の垂直モード中での呼び出しは意味を持たない}\footnote{%
-  この点は\TeX~Live~2014での\pTeX における \cs{inhibitglue} の仕様変更と同じである．
+\item \emph{\cs{inhibitglue}の垂直モード中での呼び出しは意味を持たない}\footnote{%
+  この点は\TeX~Live~2014での\pTeX における\cs{inhibitglue}の仕様変更と同じである．
 }．
 4行目の入力で有効にならないのは，\cs{inhibitglue} の時点では垂直モードであり，
 \cs{noindent} の時点で水平モードになるからである．
@@ -6407,10 +6407,10 @@ With the help of this example, we remark the specification of \cs{inhibitglue}:
       kernings, as shown in the last line of above example.
 %</en>i
 %<*ja>
-\item \cs{inhibitglue} の（制限された）水平モード中での呼び出しはその場でのみ
+\item \cs{inhibitglue}の（制限された）水平モード中での呼び出しはその場でのみ
   有効であり，段落の境界を乗り越えない．
   さらに，\cs{inhibitglue} は上の例の最終行のように（欧文における）リガチャとカーニングを
-  打ち消す．これは，\cs{inhibitglue} が内部的には「現在のリスト中にwhatsitノードを
+  打ち消す．これは，\cs{inhibitglue}が内部的には「現在のリスト中にwhatsitノードを
   追加する」ことを行なっているからである．
 %</ja>
 
@@ -6422,9 +6422,9 @@ With the help of this example, we remark the specification of \cs{inhibitglue}:
 %</ja>
 
 %<*ja>
-\item \LaTeX で\LuaTeX-ja を使用する場合は，
-\cs{inhibitglue} の代わりとして \verb+\<+ を使うことができる．
-既に \verb+\<+ が定義されていた場合は，\LuaTeX-ja の読み込みで強制的に上書きされるので
+\item \LaTeX で\LuaTeX-jaを使用する場合は，
+\cs{inhibitglue} の代わりとして\verb+\<+を使うことができる．
+既に\verb+\<+が定義されていた場合は，\LuaTeX-jaの読み込みで強制的に上書きされるので
 注意すること．
 %</ja>
 \end{itemize}
@@ -7327,6 +7327,28 @@ Similarly, \cs{strut} now uses one of these boxes.
 周囲が縦組の状況で \texttt{<z>} を指定した時に限られている．
 %</ja>
 
+%<*en>
+\subsection{\cs{verb}~and~\Param{xkanjiskip}}
+\label{ssec:xkanjiskip_verb}
+As described in page~\pageref{para:xkanjiskip_verb},
+\LuaTeX-ja~20260420.0 does not insert space between Japanese characters~and~alphabets
+\emph{inside} \cs{verb} and \texttt{verbatim} environment.
+This is implemented by
+\begin{itemize}
+  \item Appends \cs{ltj@verb@fontsetup} to the replacement text of \cs{verbatim@font},
+  \cs{MacroFont}~and \cs{AltMacroFont}.
+  \cs{verbatim@font} determines the font for vebatim typesetting,
+  and \cs{MacroFont} and \cs{AltMacroFont} determines the font for \texttt{macrocode} environment
+  which is used in \texttt{.dtx} files.
+  \item Define \cs{ltj@verb@fontsetup} as \verb+\ltjsetparameter{autoxspacing=false}+.
+\end{itemize}
+
+So, if \cs{verbatim@font} is overwritten by hand~or~other packages,
+one has to re-append one wants to \cs{ltj@verb@fontsetup} by
+\begin{verbatim}
+\makeatletter\apptocmd\verbatim@font{\ltj@verb@fontsetup}{}{}\makeatother
+\end{verbatim}
+%</en>
 %<*ja>
 \subsection{\cs{verb}と\Param{xkanjiskip}}
 \label{ssec:xkanjiskip_verb}
@@ -7337,8 +7359,8 @@ Similarly, \cs{strut} now uses one of these boxes.
 \begin{itemize}
   \item \cs{verb}や\texttt{verbatim}環境で用いられるフォントを決める
   \cs{verbatim@font}定義の末尾に\cs{ltj@verb@fontsetup}を追加
-  \item dtx内の\texttt{macrocode}環境で使われるフォントを決める\cs{MacroFont}, \cs{AltMacroFont}の
-  末尾にも\cs{ltj@verb@fontsetup}を追加
+  \item \texttt{.dtx}内の\texttt{macrocode}環境で使われるフォントを決める
+  \cs{MacroFont}, \cs{AltMacroFont}の末尾にも\cs{ltj@verb@fontsetup}を追加
   \item \cs{ltj@verb@fontsetup}を，\verb+\ltjsetparameter{autoxspacing=false}+と定義
 \end{itemize}
 することで行っている．そのため
@@ -9478,7 +9500,7 @@ Penalties inserted for the word-wrapping process (\emph{kinsoku shori}) of Japan
 %<ja>和欧文間空白\Param{xkanjiskip}を表すグルー．
 \item[\textit{processed} (73)]
 %<en>Nodes which is already processed by \ldots.
-%<ja>\LuaTeX-ja の内部処理によって既に処理されたノード．
+%<ja>\LuaTeX-jaの内部処理によって既に処理されたノード．
 \item[\textit{ic\_processed} (74)]
 %<*en>
 Glues from an italic correction, but already processed in the insertion process of \textbf{JAglue}s.
@@ -10864,8 +10886,8 @@ In the table above, {\small\gkf{E}{M→K}{PN}} means that
 If this attempt fails, \LuaTeX-ja use the method ``\textsf{\Param{kanjiskip}~[K]}''.
 %</en>
 %<*ja>
-\item 「右空白」を決めるために，\LuaTeX-ja はまず「JFM由来{[M]}」の方法を試みる．
-  これが失敗したら，\LuaTeX-ja は「\Param{kanjiskip}~{[K]}」の方法を試みる．
+\item 「右空白」を決めるために，\LuaTeX-jaはまず「JFM由来{[M]}」の方法を試みる．
+  これが失敗したら，\LuaTeX-jaは「\Param{kanjiskip}~{[K]}」の方法を試みる．
 %</ja>
 
 % %<*en>
@@ -11005,7 +11027,7 @@ $x$は\textit{Nq}から\textsf{欧文境界B~[\NB]}におけるそれと同じ�
 それらの各ノードにおいてペナルティ値を$a$だけ増加させる．
 
 (a)部分にペナルティが存在していない場合，
-\LuaTeX-ja は\textit{Nq}と\textit{Np}の間の行分割を可能にしようとする．
+\LuaTeX-jaは\textit{Nq}と\textit{Np}の間の行分割を可能にしようとする．
 そのために，以下のいずれかの場合に$a$をもつ\textit{penalty\_node}を作って
 「右空白」の（もし未定義なら\textit{Np}の）直前に挿入する：
 \begin{itemize}
@@ -11019,7 +11041,7 @@ $x$は\textit{Nq}から\textsf{欧文境界B~[\NB]}におけるそれと同じ�
 
 (a)部分にペナルティが存在していない場合，
 \textit{Nq}と\textit{Np}の間の行分割は元々不可能のはずだったのであるが，
-\LuaTeX-ja はそれをわざわざ行分割可能にはしない．
+\LuaTeX-jaはそれをわざわざ行分割可能にはしない．
 そのため，「右空白」がglueであれば，その直前に \cs{penalty10000} を挿入する．
 \end{description}
 
@@ -11091,7 +11113,7 @@ $\mathit{Nq}.\mathit{tail}$は無意味なので，
 
 %<*ja>
 \section{ベースライン補正の方法}
-\subsection{\texttt{yoffset} フィールド}
+\subsection{\texttt{yoffset}フィールド}
 \label{ssec:yoffset}
 \Param{yalbaselineshift}等のベースライン補正は，基本的には対象となっている
 \textit{glyph\_node}の\texttt{yoffset}フィールドの値を増減することによって
@@ -11107,7 +11129,7 @@ $d = \max(\texttt{depth} - \texttt{yoffset}, 0)$,
  \item[$\texttt{yoffset}<0$のとき]
 $h = \max(\texttt{height} + \texttt{yoffset}, 0)$, $d=\texttt{depth}$.
 \end{description}
-という仕様になっている．つまり，\texttt{yoffset} が負（グリフを下ける）の場合に深さは増加しな
+という仕様になっている．つまり，\texttt{yoffset}が負（グリフを下ける）の場合に深さは増加しな
 い（\autoref{tab:yoffset_and_im}参照）．
 
 \begin{table}[t]
@@ -11165,13 +11187,13 @@ For \pTeX{} series, there is no method to make Japanese characters active;
 a patch \Pkg{jlisting.sty}~(\cite{jlisting}) resolves the problem forcibly.
 %</en>
 %<*ja>
-\Pkg{listings} パッケージが，そのままでは日本語をまともに出力できないこと
+\Pkg{listings}パッケージが，そのままでは日本語をまともに出力できないこと
 はよく知られている．きちんと整形して出力するために，\Pkg{listings}パッケー
 ジは内部で「ほとんどの文字」をアクティブにし，各文字に対してその文字の出
 力命令を割り当てている(\cite{listings})．
 しかし，そこでアクティブにする文字の中に，和文文
 字がないためである．\pTeX 系列では，和文文字をアクティブにする手法がなく，
-\Pkg{jlisting.sty} というパッチ(\cite{jlisting})を用いることで無理やり解決していた．
+\Pkg{jlisting.sty}というパッチ(\cite{jlisting})を用いることで無理やり解決していた．
 %</ja>
 
 %<*en>
@@ -11182,7 +11204,7 @@ This method can omits the process to make all Japanese characters active
 (most of the activated characters are not used in many cases).
 %</en>
 %<*ja>
-\LuaTeX-jaでは，\verb+process_input_buffer+ コールバックを利用することで，
+\LuaTeX-jaでは，\verb+process_input_buffer+コールバックを利用することで，
 「各行に出現する\texttt{U+0080}以降の文字に対して，それらの出力命令を前置する」
 という方法をとっている．出力命令としては，アクティブ文字化した\cs{ltjlineendcomment}を用いている．
 これにより，（入力には使用されていないかもしれない）和文文字をもすべてアクティブ化する手間もなく，
@@ -11195,7 +11217,7 @@ If the \Pkg{listings} package  and \LuaTeX-ja were loaded,
 then the patch \Pkg{lltjp-listings} is loaded automatically at \verb+\begin{document}+.
 %</en>
 %<*ja>
-\LuaTeX-ja で利用される \Pkg{listings} パッケージへのパッチ \Pkg{lltjp-listings} は，
+\LuaTeX-jaで利用される \Pkg{listings} パッケージへのパッチ \Pkg{lltjp-listings} は，
 \Pkg{listings} と\LuaTeX-jaを読み込んでおけば，
 \verb+\begin{document}+ の箇所において自動的に読み込まれるので，通常はあまり
 意識する必要はない．
@@ -11779,7 +11801,7 @@ its binary version is also updated.
 %<*ja>
 \subsection{キャッシュの使用箇所}
 
-\LuaTeX-ja では以下のキャッシュを使用している：
+\LuaTeX-jaでは以下のキャッシュを使用している：
 \begin{cslist}
 \item[ltj-cid-auto-adobe-japan1.\{lua.gz,luc\}]
 Ryumin-Lightのような非埋め込みフォントの情報を格納しており，
@@ -11961,25 +11983,25 @@ nilでない\meta{data}をキャッシュ\meta{filename}に保存する．
 \textit{direction}~whatsitとは，\textit{direction}という特定の \verb+user_id+ を持つ
 whatsitのことであり，以下のタイミングで作られる．
 \begin{itemize}
- \item 組方向を \cs{tate} 等で変更したとき．
- \item \cs{hbox}, \cs{vbox}, \cs{vtop} による明示的なボックスの開始時．\\
-\verb+\hbox{}+, \verb+\vbox{}+ といった，
+ \item 組方向を\cs{tate}等で変更したとき．
+ \item \cs{hbox}, \cs{vbox}, \cs{vtop}による明示的なボックスの開始時．\\
+\verb+\hbox{}+, \verb+\vbox{}+といった，
 \begin{itemize}
  \item \cs{tate} 等によりボックス内部の組方向を変更していない
  \item ボックスの中身のリストが空である
 \end{itemize}
-場合は，\LuaTeX の \verb+hpack_filter+, \verb+vpack_filter+ といった
-callbackに処理が回らない．そこで，\LuaTeX-ja では，\cs{everyhbox}, \cs{everyvbox} を利用す
+場合は，\LuaTeX の\verb+hpack_filter+, \verb+vpack_filter+といった
+callbackに処理が回らない．そこで，\LuaTeX-jaでは，\cs{everyhbox}, \cs{everyvbox}を利用す
        ることで各ボックスの先頭に確実に追加するようにしている\footnote{%
   問題は \cs{hbox to 25pt\{\}} という状況である．実際のこのボックスの中身は空でない（少な
        くともdirection whatsitがある）ため，何も対策をしなければhpack時にUnderfill警告が発
        生してしまうことになる．\LuaTeX-jaではそうならないように「\cs{hbadness},
-       \cs{vbadness} を一時的に10000に変更し，hpack, vpack後に元の値に戻す」処理を行ってい
+       \cs{vbadness}を一時的に10000に変更し，hpack, vpack後に元の値に戻す」処理を行ってい
        る．
 }．
  \item \cs{vsplit}によってvboxを分割した時の「残り」の先頭．
- \item \LuaTeX-ja読み込み前に作成したボックスの寸法を \cs{ltjsetwd} 等によって変更した時．
- \item \cs{insert} によるinsertionでは，中身の先頭に\textit{direction}~whatsitは作られず，
+ \item \LuaTeX-ja読み込み前に作成したボックスの寸法を \cs{ltjsetwd}等によって変更した時．
+ \item \cs{insert}によるinsertionでは，中身の先頭に\textit{direction}~whatsitは作られず，
 その代わりに中身の各ボックス・罫線の直前に作られる\footnote{%
  これは，ページ分割の過程でinsertionが分割される時，「現在のページで出力される部分」が空と
        なることがあることによる．先頭にwhatsitを置くと，最悪でも「現在のページにwhatsitが
