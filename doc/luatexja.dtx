@@ -530,6 +530,43 @@ such as \P~and~\S, are now typeset in alphabetic fonts.
 を使えばよい．
 %</ja>
 
+%<*en>
+\paragraph{Space between Japanese characters and alphabets inside \cs{verb} and \texttt{verbatim}}
+\label{para:xkanjiskip_verb}
+From version~20260420.0, \LuaTeX-ja does not insert space between Japanese characters~and~alphabets
+\emph{inside} \cs{verb} and \texttt{verbatim} environment%
+\footnote{Includes \texttt{macrocode environment} (in dtx)
+  and \texttt{Verbatim} environment (\Pkg{fancyvrb} package).
+  See Subsection~\ref{ssec:xkanjiskip_verb} for implementation.}.
+However, \LuaTeX-ja inserts these spaces before/after \cs{verb}, and inside \cs{texttt\{\}}.
+%</en>
+%<*ja>
+\paragraph{\cs{verb}や\texttt{verbatim}環境中の和欧文間空白}
+\label{para:xkanjiskip_verb}
+バージョン20260420.0以降では，\cs{verb}や\texttt{verbatim}環境
+\footnote{dtx内の\texttt{macrocode}環境や，\Pkg{fancyvrb}パッケージの
+  提供する\texttt{Verbatim}環境も含む．実装方法については\ref{ssec:xkanjiskip_verb}節を参照．}%
+内部では和欧文間空白を入れないようにした．
+これは，「入力通りに組まれる」状況で，和欧文間空白と明示的な空白を混同してしまうことを避けるためである．
+ただ，以下に示すように，\cs{verb}の前後や，単なる\cs{texttt\{\}}の内部には和欧文間空白は入る．
+%</ja>
+\begin{LTXexample}
+1\texttt{漢字12 34漢 字5}漢\\
+1\verb|漢字12 34漢 字5|漢\\
+1\verb*|漢字12 34漢 字5|漢
+\begin{verbatim}
+漢字12 34漢 字
+\end{verbatim}
+\end{LTXexample}
+
+%<*ja>
+バージョン20260420.0より前の挙動に戻したければ，\LuaTeX-ja読込み後に
+プリアンブルに次のように記述すれば良い：
+\begin{lstlisting}
+\makeatletter\let\ltj@verb@fontsetup\relax\makeatother
+\end{lstlisting}
+%</ja>
+
 %<en>\subsection{Notations}
 %<ja>\subsection{用語と記法}
 
@@ -2542,7 +2579,7 @@ However, the penalty inserted after it is 10 which is the \Param{postbreakpenalt
 \label{part-ref}
 \suppressfloats[t]
 %<*ja>
-\section{\LuaTeX-jaにおける \cs{catcode}}
+\section{\LuaTeX-jaにおける\cs{catcode}}
 \label{sec-catcode}
 \subsection{予備知識：\pTeX と\upTeX における \cs{kcatcode}}
 \pTeX，\upTeX においては，和文文字が制御綴内で利用できるかどうか
@@ -7288,6 +7325,32 @@ Similarly, \cs{strut} now uses one of these boxes.
 実際に使われるのは\cs{zstrut}が明示的に発行された時，そして
 \Pkg{lltjext}パッケージで追加される組方向指定で \texttt{<u>} を指定した時，および
 周囲が縦組の状況で \texttt{<z>} を指定した時に限られている．
+%</ja>
+
+%<*ja>
+\subsection{\cs{verb}と\Param{xkanjiskip}}
+\label{ssec:xkanjiskip_verb}
+\pageref{para:xkanjiskip_verb}ページで述べたように，
+バージョン20260420.0以降では，\cs{verb}や\texttt{verbatim}環境の
+内部では\Param{xkanjiskip}を入れないようにした．
+これは
+\begin{itemize}
+  \item \cs{verb}や\texttt{verbatim}環境で用いられるフォントを決める
+  \cs{verbatim@font}定義の末尾に\cs{ltj@verb@fontsetup}を追加
+  \item dtx内の\texttt{macrocode}環境で使われるフォントを決める\cs{MacroFont}, \cs{AltMacroFont}の
+  末尾にも\cs{ltj@verb@fontsetup}を追加
+  \item \cs{ltj@verb@fontsetup}を，\verb+\ltjsetparameter{autoxspacing=false}+と定義
+\end{itemize}
+することで行っている．そのため
+\begin{itemize}
+  \item 以前の挙動に戻したければ，\pageref{para:xkanjiskip_verb}ページで述べたように
+  \cs{ltj@verb@fontsetup}に\cs{relax}を\cs{let}すればよい．
+  \item \cs{verbatim@font}が手動/別パッケージにより再定義された際には，
+  例えば次のように末尾に\cs{ltj@verb@fontsetup}を追加する必要がある．
+  \begin{verbatim}
+\makeatletter\apptocmd\verbatim@font{\ltj@verb@fontsetup}{}{}\makeatother
+  \end{verbatim}
+\end{itemize}
 %</ja>
 
 %<*en>

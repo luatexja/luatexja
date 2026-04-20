@@ -4,7 +4,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore-241201}[2025-03-02 Patch to LaTeX2e Kernel for LuaTeX-ja]
+\ProvidesPackage{lltjcore-241201}[2026-04-20 Patch to LaTeX2e Kernel for LuaTeX-ja]
 \RequirePackage{etoolbox}
 
 %%% expl3
@@ -247,6 +247,9 @@
 \gdef\@stopfield{%
   \inhibitglue\@tempskipa\lastskip\unskip
   \hskip\@tempskipa\color@endgroup\egroup}
+\def\ltj@verb@fontsetup{\ltjsetparameter{autoxspacing=false}}
+\apptocmd\verbatim@font{\ltj@verb@fontsetup}{}{}
+
 %%%%%% footnote
 \renewcommand\@makefnmark{%
   \unless\ifnum\ltjgetparameter{direction}=3

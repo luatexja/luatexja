@@ -23,7 +23,7 @@
 %% File: ltjltxdoc.dtx
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{ltjltxdoc}[2021-10-24 v1.0d-ltj-4 Standard LuaLaTeX-ja file]
+\ProvidesClass{ltjltxdoc}[2026-04-20 v1.0d-ltj-4 Standard LuaLaTeX-ja file]
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{ltxdoc}}
 \ProcessOptions
 \LoadClass{ltxdoc}
@@ -69,7 +69,7 @@
   \hss\vrule width.1pt\egroup}
 \def\verb{\relax\ifmmode\hbox\else\leavevmode\vadjust{}\fi
   \bgroup \let\do\do@noligs \verbatim@nolig@list
-    \ttfamily \verb@eol@error \let\do\@makeother \dospecials
+    \ttfamily \ltj@verb@fontsetup \verb@eol@error \let\do\@makeother \dospecials
     \@ifstar{\@sverb}{\@vobeyspaces \frenchspacing \@sverb}}
 \ltjsetparameter{alxspmode={"5C,3}} %% \
 \ltjsetparameter{alxspmode={"22,3}} %% "

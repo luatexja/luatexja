@@ -12,7 +12,7 @@
 \def\luatexjalatexLoaded{\endinput}
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{ltj-latex}[2026-04-18 LaTeX support of LuaTeX-ja]
+\ProvidesPackage{ltj-latex}[2026-04-20 LaTeX support of LuaTeX-ja]
 
 \endlinechar=13
 
@@ -95,6 +95,17 @@
    % gh/#42
 }{}
 \ExplSyntaxOff
+\AtBeginDocument{%
+  \IfPackageLoadedTF{hypdoc}{%
+    \apptocmd\MacroFont{\ltj@verb@fontsetup}{}{}%
+    \let\macro@font\MacroFont
+    \apptocmd\AltMacroFont{\ltj@verb@fontsetup}{}{}%
+  }{\IfPackageLoadedTF{doc}{%
+    \apptocmd\MacroFont{\ltj@verb@fontsetup}{}{}%
+    \let\macro@font\MacroFont
+    \apptocmd\AltMacroFont{\ltj@verb@fontsetup}{}{}%
+  }{}}
+}
 
 \RequirePackage{lltjp-geometry}
 
