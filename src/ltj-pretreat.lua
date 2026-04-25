@@ -145,6 +145,9 @@ local ltjf_font_metric_table  = ltjf.font_metric_table
 local traverse_glyph = node.direct.traverse_glyph
 local cnt_stack = luatexbase.registernumber 'ltj@@stack'
 local texget, getvalue = tex.get, node.direct.getdata
+local function is_ucs_var_sel(a)
+   return (a>=0xFE00 and a<=0xFE0F) or (a>=0xE0100 and a<=0xE01EF)
+end
 function set_box_stack_level(head, mode)
    local box_set = 0
    if mode then
@@ -159,19 +162,37 @@ function set_box_stack_level(head, mode)
    ltjs_report_stack_level(getcount(cnt_stack) + box_set)
    for _,p  in pairs(wtd) do node_free(p) end
    if ltjs.list_dir == dir_tate then
-      for p in traverse_glyph(to_direct(head)) do
-         if getlang(p)==lang_ja and has_attr(p, attr_icflag, 0) then
-            local pc = ltjs_orig_char_table[p] or getchar(p)
-            local pf = ltjf_replace_altfont(attr_curtfnt, pc, p)
-            if ltjf_font_metric_table[pf].vert_activated then
-               pc = ltjf_font_metric_table[pf].vform[pc]; if pc then setchar(p,  pc) end
+      local p = to_direct(head)
+      while p do
+         if getid(p)==id_glyph then
+            if getlang(p)==lang_ja and has_attr(p, attr_icflag, 0) then
+               local pc = ltjs_orig_char_table[p] or getchar(p)
+               local pf = ltjf_replace_altfont(attr_curtfnt, pc, p)
+               if ltjf_font_metric_table[pf].vert_activated then
+                  pc = ltjf_font_metric_table[pf].vform[pc]; if pc then setchar(p,  pc) end
+               end
+               p = node_next(p)
+               if p and getid(p)==id_glyph then
+                  if is_ucs_var_sel(getchar(p)) then setfont(p,pf); p = node_next(p) end
+               end
+            else p = node_next(p)
             end
+         else p = node_next(p)
          end
       end
    else
-      for p in traverse_glyph(to_direct(head)) do
-         if getlang(p)==lang_ja and has_attr(p, attr_icflag, 0) then
-            ltjf_replace_altfont(attr_curjfnt, ltjs_orig_char_table[p] or getchar(p), p)
+      local p = to_direct(head)
+      while p do
+         if getid(p)==id_glyph then
+            if getlang(p)==lang_ja and has_attr(p, attr_icflag, 0) then
+               local pf = ltjf_replace_altfont(attr_curjfnt, ltjs_orig_char_table[p] or getchar(p), p)
+               p = node_next(p)
+               if p and getid(p)==id_glyph then
+                  if is_ucs_var_sel(getchar(p)) then setfont(p,pf); p = node_next(p) end
+               end
+            else p = node_next(p)
+            end
+         else p = node_next(p)
          end
       end
    end
