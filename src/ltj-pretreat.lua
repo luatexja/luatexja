@@ -57,6 +57,10 @@ local setlang = node.direct.setlang
 local setfont = node.direct.setfont
 local setchar = node.direct.setchar
 
+local function is_ucs_var_sel(a)
+   return (a>=0xFE00 and a<=0xFE0F) or (a>=0xE0100 and a<=0xE01EF)
+end
+
 ------------------------------------------------------------------------
 -- MAIN PROCESS STEP 1: replace fonts
 ------------------------------------------------------------------------
@@ -109,7 +113,8 @@ do
             -- prev_chartype: 0: not char 1: ALchar 2: JAchar
             while pid==id_glyph do
                local pc = getchar(p)
-               if has_attr(p, attr_icflag, 0) and is_ucs_in_japanese_char(p, pc) then
+               if is_ucs_var_sel(pc) then -- do nothing
+               elseif has_attr(p, attr_icflag, 0) and is_ucs_in_japanese_char(p, pc) then
                   if prev_chartype==1 then
                      local b = node_new(id_whatsit,sid_user);
                      setfield(b, 'type', 100); setfield(b, 'user_id', JA_AL_BDD);
@@ -145,9 +150,6 @@ local ltjf_font_metric_table  = ltjf.font_metric_table
 local traverse_glyph = node.direct.traverse_glyph
 local cnt_stack = luatexbase.registernumber 'ltj@@stack'
 local texget, getvalue = tex.get, node.direct.getdata
-local function is_ucs_var_sel(a)
-   return (a>=0xFE00 and a<=0xFE0F) or (a>=0xE0100 and a<=0xE01EF)
-end
 function set_box_stack_level(head, mode)
    local box_set = 0
    if mode then
@@ -173,7 +175,9 @@ function set_box_stack_level(head, mode)
                end
                p = node_next(p)
                if p and getid(p)==id_glyph then
-                  if is_ucs_var_sel(getchar(p)) then setfont(p,pf); p = node_next(p) end
+                  if is_ucs_var_sel(getchar(p)) then 
+                     setfont(p, pf); setlang(p, lang_ja); p = node_next(p)
+                  end
                end
             else p = node_next(p)
             end
@@ -188,7 +192,9 @@ function set_box_stack_level(head, mode)
                local pf = ltjf_replace_altfont(attr_curjfnt, ltjs_orig_char_table[p] or getchar(p), p)
                p = node_next(p)
                if p and getid(p)==id_glyph then
-                  if is_ucs_var_sel(getchar(p)) then setfont(p,pf); p = node_next(p) end
+                  if is_ucs_var_sel(getchar(p)) then 
+                     setfont(p, pf); setlang(p, lang_ja); p = node_next(p)
+                  end
                end
             else p = node_next(p)
             end

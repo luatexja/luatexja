@@ -1,0 +1,49 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{array}
+\usepackage{luatexja-fontspec}
+\setmainjfont{HanaMinA.ttf}
+
+\def\IVS#1{\relax\Uchar"#1\relax\ignorespaces}
+\begin{document}
+\parindent0pt
+
+\ltjdefcharrange{42}{"FE00-"FE0F,"E0100-"E01EF}
+\ltjsetparameter{jacharrange={-42}}
+
+{\jfontspec[AltFont={{Range="20000-"10FFFF, Font=BabelStoneHanExtra.ttf, Color=FF0000}}]{BabelStoneHanBasic.ttf}
+
+\begin{tabular}{>{\tt}ll}
+  514F          & 兏 \\
+  514F E0102    & 兏\IVS{E0102} \\
+  2017F         & 𠅿 \\
+  2017F E0105   & 𠅿\IVS{E0105} \\
+\end{tabular}\par}
+
+{\jfontspec[AltFont={{Range="3400-"FFFF, Font=BabelStoneHanBasic.ttf, Color=FF0000}}]{BabelStoneHanExtra.ttf}
+
+\begin{tabular}{>{\tt}ll}
+  514F          & 兏 \\
+  514F E0102    & 兏\IVS{E0102} \\
+  2017F         & 𠅿 \\
+  2017F E0105   & 𠅿\IVS{E0105} \\
+\end{tabular}\par}
+
+\medskip
+HanaMinA.ttf\\
+\def\AX{6717}
+\begin{tabular}[t]{>{\tt}ll}
+  \AX          & \Uchar\expandafter"\AX\relax\\
+  \AX\ E0100    & \Uchar\expandafter"\AX\relax\IVS{E0100}\\
+  \AX\ E0101    & \Uchar\expandafter"\AX\relax\IVS{E0101}\\
+  \AX\ E0102    & \Uchar\expandafter"\AX\relax\IVS{E0102}\\
+  \AX\ E0103    & \Uchar\expandafter"\AX\relax\IVS{E0103}\\
+  \AX\ E0104    & \Uchar\expandafter"\AX\relax\IVS{E0104}\\
+  \AX\ E0105    & \Uchar\expandafter"\AX\relax\IVS{E0105}\\
+  \AX\ E0106    & \Uchar\expandafter"\AX\relax\IVS{E0106}\\
+  \AX\ E0107    & \Uchar\expandafter"\AX\relax\IVS{E0107}\\
+  \AX\ FE00    & \Uchar\expandafter"\AX\relax\IVS{FE00}\\
+  \AX\ FE01    & \Uchar\expandafter"\AX\relax\IVS{FE01}\\
+  \AX\ FE02    & \Uchar\expandafter"\AX\relax\IVS{FE02}\\
+\end{tabular}
+
+\end{document}
