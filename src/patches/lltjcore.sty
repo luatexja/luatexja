@@ -7,6 +7,8 @@
   Patch to LaTeX2e Kernel for LuaTeX-ja (for LaTeX2e >=2025-06-01)]
 \RequirePackage{etoolbox}
 
+\def\ltj@ptcerr#1{\typeout{luatexja-core: patch FAILED (\detokenize{#1})}}
+
 %%% expl3
 \RequirePackage{expl3}
 \ExplSyntaxOn
@@ -76,7 +78,7 @@
   {\global\setbox\@outputbox\vbox{%
      \unless\ifnum\ltjgetparameter{direction}=4
        \primitive\everypar{}\hskip\z@\fi
-  }}{}{}
+  }}{}{\ltj@ptcerr{\@vtryfc}}
 
 %%%%%% tombow
 \newif\iftombow \tombowfalse
@@ -193,7 +195,7 @@
 }{%
     \yoko \set@typeset@protect
     \aftergroup \endgroup
-}{}{}
+}{}{\ltj@ptcerr{\@outputpage}}
 
 \NewSocketPlug {build/column/outputbox}{floats-footnotes-platex} {%
   \@outputbox@reinsertbskip
@@ -212,7 +214,7 @@
     \vbox{\primitive\everypar{}\hskip\z@}%
    \fi}
 \patchcmd{\@make@normalcolbox}{\vskip -\@outputbox@depth\@textbottom}%
-  {\pltx@adjust@wd@outputbox\vskip -\@outputbox@depth\@textbottom}{}{}%
+  {\pltx@adjust@wd@outputbox\vskip -\@outputbox@depth\@textbottom}{}{\ltj@ptcerr{\@make@normalcolbox}}%
 
 % トンボ対応用
 \AddToHook{build/page/reset}[lltjcore/tombow]{%
@@ -223,8 +225,8 @@
 }
 
 %%%%%% direction of floats
-\pretocmd\@floatboxreset{\pltx@save@float@dir}{}{}
-\patchcmd\@endfloatbox{\outer@nobreak}{\outer@nobreak\pltx@check@float@dir}{}{}
+\pretocmd\@floatboxreset{\pltx@save@float@dir}{}{\ltj@ptcerr{\@floatboxreset}}
+\patchcmd\@endfloatbox{\outer@nobreak}{\outer@nobreak\pltx@check@float@dir}{}{\ltj@ptcerr{\@endfloatbox}}
 \def\pltx@save@float@dir{%
   \edef\pltx@float@dir@first{\ltjgetparameter{direction}}}
 \def\pltx@check@float@dir{%
@@ -261,50 +263,34 @@
     \language\l@nohyphenation
     \@ifstar\@sverb\@verb}
 \fi
-\patchcmd{\do@noligs}{\kern\z@}{\vadjust{}}{}{} % reported by p_typo
+\patchcmd{\do@noligs}{\kern\z@}{\vadjust{}}{}{\ltj@ptcerr{\do@noligs}} % reported by p_typo
 \gdef\@stopfield{%
   \inhibitglue\@tempskipa\lastskip\unskip
   \hskip\@tempskipa\color@endgroup\egroup}
 \def\ltj@verb@fontsetup{\ltjsetparameter{autoxspacing=false}}
-\apptocmd\verbatim@font{\ltj@verb@fontsetup}{}{}
+\apptocmd\verbatim@font{\ltj@verb@fontsetup}{}{\ltj@ptcerr{\verbatim@font}}
 
 %%%%%% footnote
 \renewcommand\@makefnmark{%
   \unless\ifnum\ltjgetparameter{direction}=3
     \hbox{}\hbox{\@textsuperscript{\normalfont\@thefnmark}}\hbox{}%
   \else\hbox{\yoko \@textsuperscript{\normalfont\@thefnmark}}\fi}
-\pretocmd{\footnote}{\inhibitglue}{}{}
-\pretocmd{\footnotemark}{\inhibitglue}{}{}
+\pretocmd{\footnote}{\inhibitglue}{}{\ltj@ptcerr{\footnote}}
+\pretocmd{\footnotemark}{\inhibitglue}{}{\ltj@ptcerr{\footnotemark}}
 \def\@ltj@process@makefnmark#1{%
   \unless\ifnum\ltjgetparameter{direction}=3 #1%
   \else\hbox to\z@{\hskip-.25\zw\raise.9\zh#1\hss}\fi%
 }%
 \let\ltj@orig@kernel@process@makefnmark=\@kernel@process@makefnmark
 \def\@kernel@process@makefnmark#1{\ltj@orig@kernel@process@makefnmark{\@ltj@process@makefnmark#1}}
-\long\def\@iiiparbox#1#2[#3]#4#5{%
-  \leavevmode
-  \@pboxswfalse
-  \setlength\@tempdima{#4}%
-  \@begin@tempboxa\vbox{\hsize\@tempdima\@parboxrestore#5\@@par}%
-    \ifx\relax#2\else
-      \setlength\@tempdimb{#2}%
-      \edef\@parboxto{to\the\@tempdimb}%
-    \fi
-    \if#1b\vbox
-    \else\if #1t\vtop
-    \else\ifmmode\vcenter
-    \else\@pboxswtrue\null$\vcenter% !!!
-    \fi\fi\fi
-    \@parboxto{\let\hss\vss\let\unhbox\unvbox
-       \csname bm@#3\endcsname}%
-    \if@pboxsw \m@th$\null\fi% !!!
-  \@end@tempboxa}
+\patchcmd\@iiiparbox{\@pboxswtrue$\vcenter}{\@pboxswtrue\null$\vcenter}{}{\ltj@ptcerr{\@iiiparbox 1}}
+\patchcmd\@iiiparbox{\m@th$}{\m@th$\null}{}{\ltj@ptcerr{\@iiiparbox 2}}
 \DeclareRobustCommand\underline[1]{%
   \relax
   \ifmmode\@@underline{#1}%
   \else \leavevmode\null$\@@underline{\hbox{#1}}\m@th$\null\relax\fi}
 
-\patchcmd\@finalstrut{\nobreak}{\nobreak\ltjfakeboxbdd}{}{}
+\patchcmd\@finalstrut{\nobreak}{\nobreak\ltjfakeboxbdd}{}{\ltj@ptcerr{\@finalstrut}}
 
 \def\@gnewline #1{%
   \ifvmode
@@ -340,20 +326,22 @@
       \or
         \hfil\hskip1sp\ltj@sharp
       \fi}}}
-\patchcmd\@classv{%
-   \ignorespaces\@sharp
-}{%
-   \everypar\expandafter{\the\everypar\ltjfakeboxbdd}\ignorespaces\@sharp\unskip
-}{}{}
-\patchcmd{\@tabular}{\leavevmode}{\leavevmode\null}{}{}
-\apptocmd{\endtabular}{\null}{}{}
+\@ifpackageloaded{array}{}{
+  \patchcmd\@classv{%
+     \ignorespaces\@sharp
+  }{%
+     \everypar\expandafter{\the\everypar\ltjfakeboxbdd}\ignorespaces\@sharp\unskip
+  }{}{\ltj@ptcerr{\@classv}}
+  \apptocmd\endtabular{\null}{}{\ltj@ptcerr{\endtabular}}
+}
+\patchcmd\@tabular{\leavevmode}{\leavevmode\null}{}{\ltj@ptcerr{\@tabular}}
 \expandafter \let \csname endtabular*\endcsname = \endtabular
 
 %%%%%% tabbing (platex/#53)
-\patchcmd\@startline{\strut}{\strut\inhibitglue}{}{}
+\patchcmd\@startline{\strut}{\strut\inhibitglue}{}{\ltj@ptcerr{\strut}}
 \def\ltj@unhbox@curfield{\ltjfakeboxbdd\unhbox\@curfield\ltjfakeboxbdd}
 %\patchcmd\@contfield{\unhbox\@curfield}{\ltj@unhbox@curfield}{}{}
-\patchcmd\@addfield{\unhbox\@curfield}{\ltj@unhbox@curfield}{}{}
+\patchcmd\@addfield{\unhbox\@curfield}{\ltj@unhbox@curfield}{}{\ltj@ptcerr{\@addfield}}
 
 \def\mathsm@sh#1#2{%
   \setbox\z@\hbox{\ltj@yablshift0$\m@th#1{#2}$}%

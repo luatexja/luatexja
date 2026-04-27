@@ -1,38 +1,53 @@
 %
 % lltjext.sty: derived from plext.sty in pLaTeX.
+% This file is used for LaTeX2e <=2025-11-01.
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjext}[2026-04-27 v1.2k-ltj-19 Macros for vertical writing]
+\ProvidesPackage{lltjext-251101}[2025-11-09 v1.2k-ltj-18 Macros for vertical writing]
 \RequirePackage{luatexja}
-
-\@ifl@t@r\fmtversion{2026-06-01}{}{\usepackage{lltjext-251101}\endinput}
-
-\RequirePackage{array}
 \newcount\ltj@ext@dir
-
-\ExplSyntaxOn
-\@ifpackageloaded{tagpdf}{\catcode`\^^A=9\relax}{\catcode`\^^A=14\relax}
-^^A \typeout{tagpdf loaded!}
+\let\ltj@lltjext@orig@tabular=\tabular
+\let\ltj@lltjext@orig@array=\array
 
 %%% array and tabular
-\pretocmd{\array}{\ltj@ext@dir=\ltjgetparameter{direction}\relax}{}{}
-\def\@tabarray{\@ifnextchar<\p@tabarray{\p@tabarray<Z>}}
-\def\p@tabarray<#1>{\@ifnextchar[%]
+\def\array{\let\@acol\@arrayacol \let\@classz\@arrayclassz
+ \let\@classiv\@arrayclassiv
+ \let\\\@arraycr\let\@halignto\@empty
+ \ltj@ext@dir=\ltjgetparameter{direction}\relax\X@tabarray}
+\def\tabular{\let\@halignto\@empty\X@tabular}
+\@namedef{tabular*}{\@ifnextchar<%>
+   {\p@stabular}{\p@stabular<Z>}}
+{\catcode`\*=11
+\global\let\ltj@lltjext@orig@tabularS=\tabular*
+}%
+\def\X@tabarray{\@ifnextchar<%>
+   {\p@tabarray}{\p@tabarray<Z>}}
+\def\X@tabular{\@ifnextchar<%>
+   {\p@tabular}{\p@tabular<Z>}}
+\def\p@stabular<#1>#2{%
+   \setlength\dimen@{#2}%
+   \edef\@halignto{to\the\dimen@}\p@tabular<#1>}
+\def\p@tabular<#1>{\leavevmode\null \hbox \bgroup % fixed for unwanted xkanjiskip
+   \ltj@ext@dir=\ltjgetparameter{direction}\relax
+   $\let\@acol\@tabacol
+   \let\@classz\@tabclassz
+   \let\@classiv\@tabclassiv \let\\\@tabularcr\p@tabarray<#1>}
+\def\p@tabarray<#1>{\m@th\@ifnextchar[%]
    {\p@array<#1>}{\p@array<#1>[c]}}
+
 \def\p@array<#1>[#2]#3{%
   \ifnum\ltj@ext@dir=0 \ltj@ext@dir=\ltjgetparameter{direction}\relax\fi
   \let\box@dir\relax
-  %% determine strutbox
   \if #1z\relax
     \ifnum\ltj@ext@dir=3\relax
       \let\box@dir\utod\@tempcnta=\zstrutbox
     \fi
   \else
     \if #1y\relax
-      \let\box@dir\yoko\@tempcnta=\ystrutbox
+       \let\box@dir\yoko\@tempcnta=\ystrutbox
     \else\if #1t\relax
-      \let\box@dir\tate\@tempcnta=\tstrutbox
+       \let\box@dir\tate\@tempcnta=\tstrutbox
     \else\if #1d\relax
        \let\box@dir\dtou\@tempcnta=\dstrutbox
     \else\if #1u\relax
@@ -47,60 +62,25 @@
        \else \let\box@dir\utod\@tempcnta=\zstrutbox% utod
     \fi
   \fi
-  %%
-  \setbox \@arstrutbox \hbox{\box@dir\vrule
-             \@height \arraystretch
-               \dimexpr \ltjgetht\@tempcnta+\extrarowheight\relax
-             \@depth \arraystretch \ltjgetdp \@tempcnta
-             \@width \z@}%
-  \fork@array@option<#1>[#2]%
-  \tbl_init_cell_data_for_table:
-  \begingroup
-  \@mkpream{#3}%
-  \tbl_count_table_cols:
-  \xdef\@preamble{%
-    \noexpand\ar@ialign
-    \@halignto \bgroup \@arstrut
-      \UseTaggingSocket{tbl/row/begin}
-      \__tbl_hook_use_protected:nV {tbl/row/begin} \g__tbl_row_int
-      \tbl_init_cell_data_for_row:
-      \@preamble
-      \tabskip \z@ \cr}%
-  \endgroup
-  \exp_args:Nnno \hook_use:nnw {tbl/init}{2} \g__tbl_table_cols_tl {#3}
-  \@arrayleft
-  \@begin@alignbox % <=== ltj
-  \bgroup
-  \box@dir\adjustbaseline
-  \let\@sharp##\let\protect\relax
-  \lineskip \z@
-  \baselineskip \z@
-  \mathsurround \z@
-  \let\\\@arraycr \let\tabularnewline\\
-  \def\par{\ifnum\currentgrouptype=6~ \else\@@par\fi}%
-  \UseTaggingSocket{tbl/init}
-  \@preamble
-}
-\def\endarray{%
-  \tbl_crcr:n {endarray}
-  \tag_socket_use_expandable:n {math/luamml/array/save}
-  \egroup \tag_socket_use:n {tbl/finalize}
-  \tbl_restore_outer_cell_data:
-  \egroup \@end@alignbox % <=== ltj
-  \tag_socket_use:n {math/luamml/array/finalize}
-  \@arrayright \gdef \@preamble {}
-}
-
-\patchcmd{\@tabular}{\hbox\bgroup}{%
-  \hbox\bgroup\ltj@ext@dir=\ltjgetparameter{direction}\relax}{}{\typeout{lltjext patch failed @tabular}}
-\@namedef{tabular*}{\@ifnextchar<{\p@stabular}{\p@stabular<Z>}}%>
-\def\p@stabular<#1>#2{%
-   \setlength\dimen@{#2}%
-   \edef\@halignto{to\the\dimen@}\@tabarray<#1>}
-\def\endtabular{\endarray\m@th$\egroup
-   \UseTaggingSocket {tbl/hmode/end}\null}
+  \fork@array@option<#1>[#2]\@begin@alignbox
+  \bgroup\box@dir\adjustbaseline
+  \setbox\@arstrutbox\hbox{%
+    \box@dir
+    \vrule\@height\arraystretch\ltjgetht\@tempcnta
+          \@depth\arraystretch\ltjgetdp\@tempcnta \@width\z@}%
+  \@mkpream{#3}\edef\@preamble{\ialign \noexpand\@halignto
+  \bgroup\@arstrut \@preamble \tabskip\z@skip \cr}%
+  \let\@startpbox\@@startpbox \let\@endpbox\@@endpbox
+  \let\tabularnewline\\%
+    \let\par\@empty
+    \let\@sharp##%
+	\set@typeset@protect
+    \lineskip\z@skip\baselineskip\z@skip
+    \ifhmode \@preamerr\z@ \@@par\fi
+	\@preamble}
+\def\endarray{\crcr\egroup\egroup\@end@alignbox}
+\def\endtabular{\endarray$\egroup\null}
 \expandafter \let \csname endtabular*\endcsname = \endtabular
-
 % ↓中身＼周囲→　yoko  tate  utod  dtou
 % yoko          A*    B*    B     B
 % tate          B*    A*    D     C
@@ -323,6 +303,7 @@
      \if b\caption@posa\else\hss\fi}}
 
 %%% minipage and parbox
+%\ExplSyntaxOn
 \def\minipage{\@ifnextchar<%>
    {\X@minipage}{\X@minipage<Z>}}
 \def\X@minipage<#1>{\@ifnextchar[%]
@@ -336,7 +317,6 @@
   \leavevmode\@pboxswfalse\bgroup%<=== lltj
   \setlength\@tempdima{#5}%
   \def\@mpargs{<#1>{#2}{#3}[#4]{#5}}%
-  ^^A\UseTaggingSocket{minipage/before}% new
   \let\box@dir\relax
   \if #1z\relax
     \ifnum\ltjgetparameter{direction}=3\relax
@@ -363,10 +343,8 @@
       \hsize\@tempdima
       \textwidth\hsize \columnwidth\hsize
       \@parboxrestore
-      ^^A\UseTaggingSocket{para/restore}
       \def\@mpfn{mpfootnote}\def\thempfn{\thempfootnote}%
       \c@mpfootnote\z@
-      ^^A\socket_assign_plug:nn{fntext/process}{mp}%
       \let\@footnotetext\@mpfootnotetext
       \let\@listdepth\@mplistdepth \@mplistdepth\z@
       \@minipagerestore
@@ -383,11 +361,8 @@
     \@minipagefalse   %% added 24 May 89
   \color@endgroup
   \egroup
-  ^^A\tag_suspend:n{minipage}
   \expandafter\@iiiparbox\@mpargs{\unvbox\@tempboxa}%
-  ^^A\tag_resume:n{minipage}
   \egroup%<=== lltj
-  ^^A\UseTaggingSocket{minipage/after} %new end ...
   }
 \DeclareRobustCommand\parbox{\@ifnextchar<%>
    {\X@parbox}{\X@parbox<Z>}}
@@ -401,10 +376,8 @@
   \leavevmode\@pboxswfalse
   \setlength\@tempdima{#5}%
   \fork@parbox@option<#1>[#2]%
-  ^^A\UseTaggingSocket{parbox/before}
   \@begin@tempboxa\vbox{\box@dir
     \hsize\@tempdima\@parboxrestore\adjustbaseline
-       ^^A\UseTaggingSocket{para/restore}
        #6\@@par}%
     \ifx\relax#3\else
       \setlength\@tempdimb{#3}%
@@ -415,7 +388,6 @@
        \csname bm@#4\endcsname}%
        \if@pboxsw\m@th$\null\else\@end@parbox\fi
   \@end@tempboxa
-  ^^A\UseTaggingSocket{parbox/after}
   }
 %\ExplSyntaxOff
 
@@ -508,14 +480,6 @@
 \fi\fi\fi}
 
 %%% pbox
-\def\@startpbox#1{\bgroup
-  \color@begingroup
-  \box@dir\adjustbaseline%%% これを追加
-  \setlength\hsize{#1}\@arrayparboxrestore
-    \everypar{%
-       \vrule \@height \ltjgetht\@arstrutbox \@width \z@
-       \everypar{}}%
-    }%
 \DeclareRobustCommand\pbox{\leavevmode\@ifnextchar<{\X@makePbox}{\X@makePbox<Z>}}
 \def\X@makePbox<#1>{%
   \@ifnextchar[{\@imakePbox<#1>}{\@imakePbox<#1>[-5\p@]}}
@@ -552,7 +516,7 @@
 %%% picture
 \RenewDocumentCommand\picture{O{} D<>{Z} m}{
   \leavevmode
-  \tag_socket_use:nn{graphic/init}{#1}
+  %%%\tag_socket_use:nn{graphic/init}{#1}
   \X@pictur@<#2>#3}
 \def\X@pictur@<#1>(#2,#3){\@ifnextchar(%)
    {\@@picture<#1>(#2,#3)}{\@@picture<#1>(#2,#3)(0,0)}}
@@ -590,8 +554,6 @@
   \fi
   \@defaultunitsset\@picht{#3}\unitlength
   \@defaultunitsset\@picwd{#2}\unitlength
-  ^^A\tag_socket_use:nn{graphic/begin}{picture~environment}
-  ^^A\tag_suspend:n{\@picture} %do not tag inside the picture box
   \setbox\@picbox\hbox to\@picwd\bgroup\box@dir
     \@defaultunitsset\@tempdimc{#4}\unitlength\hskip-\@tempdimc
     \@defaultunitsset\@tempdimc{#5}\unitlength\lower\@tempdimc\hbox\bgroup
@@ -603,17 +565,15 @@
     \ltjsetht\@picbox\@picht \ltjsetdp\@picbox\z@
   }%
   \@tempswafalse
-  \ifnum\ltjgetparameter{direction}=3~  \@tempswatrue\fi
-  \ifnum\ltjgetparameter{direction}=11~  \@tempswatrue\fi
+  \ifnum\ltjgetparameter{direction}=3  \@tempswatrue\fi
+  \ifnum\ltjgetparameter{direction}=11  \@tempswatrue\fi
   \if@tempswa
     \ifx\box@dir\yoko % この場合だけ垂直位置補正が必要
      \ltjsetht\@picbox\dimexpr\ltjgetht\@picbox+\ltjgetdp\@picbox\relax
       \ltjsetdp\@picbox\z@
     \fi
   \fi
-  ^^A\tag_resume:n{\@picture}
-  ^^A\tag_socket_use:nnn{graphic/end}{\picture@tag@bbox@attribute}%
-  {\mbox{\box\@picbox}}%
+  \mbox{\box\@picbox}%
   \egroup\ltj@@pic@save@blshift}
 \let\org@put\put
 \def\put{\ltj@@pic@reset@blshift\org@put}
@@ -718,5 +678,227 @@
 \def\@thecounter#1{\noexpand\rensuji{\noexpand\arabic{#1}}}
 \def\@thmcounter#1{\noexpand\rensuji{\noexpand\arabic{#1}}}
 
+%% Compatibility with array package
+
+\ExplSyntaxOn
+\def\ltj@lltjext@patch@array{%
+  \patchcmd{\@tabular}{\hbox\bgroup}{%
+	\hbox\bgroup\ltj@ext@dir=\ltjgetparameter{direction}\relax}{}{}
+  \pretocmd{\array}%
+	{\ltj@ext@dir=\ltjgetparameter{direction}\relax}{}{}
+  \expandafter\let\csname tabular*\endcsname=\ltj@lltjext@orig@tabularS
+  \patchcmd{\p@stabular}{\p@tabular}{\@tabular}{}{}
+  \def\@startpbox##1{\bgroup
+    \color@begingroup
+    \box@dir\adjustbaseline%%% これを追加
+    \setlength\hsize{##1}\@arrayparboxrestore
+      \everypar{%
+         \vrule \@height \ltjgetht\@arstrutbox \@width \z@
+         \everypar{}}%
+      }%
+  \def\@tabarray{\@ifnextchar<\p@tabarray{\p@tabarray<Z>}}
+\ifnum\ltj@@latex@plv>1500 %%%%%% >=2025-11-01
+  \def\p@array<##1>[##2]##3{%
+    \ifnum\ltj@ext@dir=0 \ltj@ext@dir=\ltjgetparameter{direction}\relax\fi
+    \let\box@dir\relax
+    \if ##1z\relax
+      \ifnum\ltj@ext@dir=3\relax
+        \let\box@dir\utod\@tempcnta=\zstrutbox
+      \fi
+    \else
+      \if ##1y\relax
+        \let\box@dir\yoko\@tempcnta=\ystrutbox
+      \else\if ##1t\relax
+        \let\box@dir\tate\@tempcnta=\tstrutbox
+      \else\if ##1d\relax
+         \let\box@dir\dtou\@tempcnta=\dstrutbox
+      \else\if ##1u\relax
+         \let\box@dir\utod\@tempcnta=\zstrutbox
+      \fi\fi\fi\fi
+    \fi
+    \ifx\box@dir\relax
+      \ifcase\ltj@ext@dir
+         \or   \let\box@dir\dtou\@tempcnta=\dstrutbox% dtou
+         \or\or\let\box@dir\tate\@tempcnta=\tstrutbox% tate
+         \or   \let\box@dir\yoko\@tempcnta=\ystrutbox% yoko
+         \else \let\box@dir\utod\@tempcnta=\zstrutbox% utod
+      \fi
+    \fi
+    \setbox \@arstrutbox \hbox{\box@dir\vrule
+               \@height \arraystretch
+                 \dimexpr \ltjgetht\@tempcnta+\extrarowheight\relax
+               \@depth \arraystretch \ltjgetdp \@tempcnta
+               \@width \z@}%
+    \fork@array@option<##1>[##2]%
+    \tbl_init_cell_data_for_table:
+    \begingroup
+    \@mkpream{##3}%
+    \tbl_count_table_cols:
+    \xdef\@preamble{
+      \noexpand\ar@ialign
+      \@halignto
+          \bgroup \@arstrut
+        \UseTaggingSocket{tbl/row/begin}
+        \tbl_init_cell_data_for_row:
+        \@preamble
+        \tabskip \z@ \cr}%
+    \endgroup
+    \@arrayleft
+    \@begin@alignbox
+    \bgroup
+    \box@dir\adjustbaseline
+    \let\@sharp####\let\protect\relax
+    \lineskip \z@
+    \baselineskip \z@
+    \mathsurround \z@
+    \let\\\@arraycr \let\tabularnewline\\
+    \def\par{\ifnum\currentgrouptype=6~ \else\@@par\fi}%
+    \UseTaggingSocket{tbl/init}
+    \@preamble
+  }
+  \def\endtabular{\endarray$\egroup
+    \UseTaggingSocket {tbl/hmode/end}\null}
+  \def\endarray{
+    \tbl_crcr:n{endarray}
+    \egroup
+    \UseTaggingSocket{tbl/finalize}
+    \tbl_restore_outer_cell_data:
+    \egroup\@end@alignbox
+    \@arrayright \gdef\@preamble{}%
+  }
+\else\ifcsname tbl_save_outer_table_cols:\endcsname %%%%%% >=2024-06-01
+  \def\p@array<##1>[##2]##3{%
+    \ifnum\ltj@ext@dir=0 \ltj@ext@dir=\ltjgetparameter{direction}\relax\fi
+    \let\box@dir\relax
+    \if ##1z\relax
+      \ifnum\ltj@ext@dir=3\relax
+        \let\box@dir\utod\@tempcnta=\zstrutbox
+      \fi
+    \else
+      \if ##1y\relax
+        \let\box@dir\yoko\@tempcnta=\ystrutbox
+      \else\if ##1t\relax
+        \let\box@dir\tate\@tempcnta=\tstrutbox
+      \else\if ##1d\relax
+         \let\box@dir\dtou\@tempcnta=\dstrutbox
+      \else\if ##1u\relax
+         \let\box@dir\utod\@tempcnta=\zstrutbox
+      \fi\fi\fi\fi
+    \fi
+    \ifx\box@dir\relax
+      \ifcase\ltj@ext@dir
+         \or   \let\box@dir\dtou\@tempcnta=\dstrutbox% dtou
+         \or\or\let\box@dir\tate\@tempcnta=\tstrutbox% tate
+         \or   \let\box@dir\yoko\@tempcnta=\ystrutbox% yoko
+         \else \let\box@dir\utod\@tempcnta=\zstrutbox% utod
+      \fi
+    \fi
+    \setbox \@arstrutbox \hbox{\box@dir\vrule
+               \@height \arraystretch
+                 \dimexpr \ltjgetht\@tempcnta+\extrarowheight\relax
+               \@depth \arraystretch \ltjgetdp \@tempcnta
+               \@width \z@}%
+    \fork@array@option<##1>[##2]%
+    \tbl_save_outer_table_cols:
+    \begingroup
+    \@mkpream{##3}%
+    \tbl_count_table_cols:
+    \xdef\@preamble{
+      \noexpand\ar@ialign
+      \@halignto
+          \bgroup \@arstrut
+        \UseTaggingSocket{tbl/row/begin}
+        \tbl_init_cell_data_for_row:
+        \@preamble
+        \tabskip \z@ \cr}%
+    \endgroup
+    \@arrayleft
+    \@begin@alignbox
+    \bgroup
+    \box@dir\adjustbaseline
+    \let\@sharp####\let\protect\relax
+    \lineskip \z@
+    \baselineskip \z@
+    \mathsurround \z@
+    \let\\\@arraycr \let\tabularnewline\\\let\par\@empty
+    \UseTaggingSocket{tbl/init}
+    \@preamble
+  }
+  \def\endtabular{\endarray$\egroup
+    \UseTaggingSocket {tbl/hmode/end}\null}
+  \def\endarray{
+    \tbl_crcr:n{endarray} \egroup
+    \UseTaggingSocket{tbl/finalize}
+    \tbl_restore_outer_cell_data:
+    \egroup\@end@alignbox
+    \@arrayright \gdef\@preamble{}%
+  }
+\else %%%%%% <2024-06-01
+  \def\p@array<##1>[##2]##3{%
+    \ifnum\ltj@ext@dir=0 \ltj@ext@dir=\ltjgetparameter{direction}\relax\fi
+    \let\box@dir\relax
+    \if ##1z\relax
+      \ifnum\ltj@ext@dir=3\relax
+        \let\box@dir\utod\@tempcnta=\zstrutbox
+      \fi
+    \else
+      \if ##1y\relax
+        \let\box@dir\yoko\@tempcnta=\ystrutbox
+      \else\if ##1t\relax
+        \let\box@dir\tate\@tempcnta=\tstrutbox
+      \else\if ##1d\relax
+         \let\box@dir\dtou\@tempcnta=\dstrutbox
+      \else\if ##1u\relax
+         \let\box@dir\utod\@tempcnta=\zstrutbox
+      \fi\fi\fi\fi
+    \fi
+    \ifx\box@dir\relax
+      \ifcase\ltj@ext@dir
+         \or   \let\box@dir\dtou\@tempcnta=\dstrutbox% dtou
+         \or\or\let\box@dir\tate\@tempcnta=\tstrutbox% tate
+         \or   \let\box@dir\yoko\@tempcnta=\ystrutbox% yoko
+         \else \let\box@dir\utod\@tempcnta=\zstrutbox% utod
+      \fi
+    \fi
+    \setbox \@arstrutbox \hbox{\box@dir\vrule
+               \@height \arraystretch
+                 \dimexpr \ltjgetht\@tempcnta+\extrarowheight\relax
+               \@depth \arraystretch \ltjgetdp \@tempcnta
+               \@width \z@}%
+    \fork@array@option<##1>[##2]%
+    \begingroup
+    \@mkpream{##3}%
+    \xdef\@preamble{\noexpand\ialign \@halignto
+      \bgroup \@arstrut\@preamble \tabskip \z@ \cr}%
+    \endgroup
+    \@arrayleft
+    \@begin@alignbox
+    \bgroup
+    \box@dir\adjustbaseline
+    \let\@sharp####\let\protect\relax
+    \lineskip \z@
+    \baselineskip \z@
+    \m@th
+    \let\\\@arraycr \let\tabularnewline\\\let\par\@empty
+    \@preamble
+  }
+  \def\endtabular{\endarray\m@th$\egroup\null}
+  \def\endarray{
+    \crcr\egroup\egroup\@end@alignbox
+    \@arrayright \gdef\@preamble{}%
+  }
+\fi\fi
+  \expandafter \let \csname endtabular*\endcsname = \endtabular
+}
 \ExplSyntaxOff
+\@ifpackageloaded{array}{%
+  \let\tabular=\ltj@lltjext@orig@tabular
+  \let\array=\ltj@lltjext@orig@array
+  \ltj@lltjext@patch@array
+}{%
+  \let\ltj@lltjext@orig@tabular\relax
+  \let\ltj@lltjext@orig@array\relax
+  \ltj@ExecuteAfterPackage{array}{\ltj@lltjext@patch@array}
+}
+
 \endinput
