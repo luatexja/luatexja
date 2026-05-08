@@ -514,7 +514,7 @@
                \if #3r\relax\else\hss\fi}\fi\egroup}
 
 %%% picture
-\RenewDocumentCommand\picture{O{} D<>{Z} m}{
+\RenewDocumentCommand\picture{O{} D<>{Z} m}{%
   \leavevmode
   %%%\tag_socket_use:nn{graphic/init}{#1}
   \X@pictur@<#2>#3}
