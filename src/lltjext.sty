@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjext}[2026-04-27 v1.2k-ltj-19 Macros for vertical writing]
+\ProvidesPackage{lltjext}[2026-05-09 v1.2k-ltj-20 Macros for vertical writing]
 \RequirePackage{luatexja}
 
 \@ifl@t@r\fmtversion{2026-06-01}{}{\usepackage{lltjext-251101}\endinput}
@@ -259,16 +259,14 @@
      \@latex@error{Use \noexpand\pcaption with `\protect\layoutfloat'}\@eha
   \fi
   \make@pcaptionbox{#3}%
-  \@pboxswfalse
   \setbox\@tempboxa\vbox{\hbox to\hsize{\if l\float@pos\else\hss\fi
     \if l\caption@posb\box\@captionbox\kern\captionfloatsep\fi
     \if t\caption@posa\vtop
     \else\if b\caption@posa\vbox
-    \else\@pboxswtrue $\vcenter \fi\fi
+    \else\vcenter@text \fi\fi
     {\if u\caption@posb\box\@captionbox\kern\captionfloatsep\fi
      \unvbox\@floatbox
      \if d\caption@posb\kern\captionfloatsep\box\@captionbox\fi}%
-    \if@pboxsw \m@th$\fi
     \if r\caption@posb\kern\captionfloatsep\box\@captionbox\fi
     \if r\float@pos\else\hss\fi}}%
   \par\vskip.25\baselineskip
@@ -301,19 +299,18 @@
   \if@tempswa\@tempdima\ltjgetht0 \advance\@tempdima\ltjgetdp0
   \else\@tempdima\ltjgetwd0 \fi
   \ifdim\@tempdima>\captionwidth \@tempdima\captionwidth \fi
-  \@pboxswfalse
   \setbox0\hbox{%
     \if u\caption@posb\vbox
     \else\if d\caption@posb\vbox
     \else\if t\caption@posa\vtop
     \else\if b\caption@posa\vbox
-    \else\ifmmode\vcenter\else\@pboxswtrue $\vcenter\fi
+    \else\ifmmode\vcenter\else\vcenter@text\fi
     \fi\fi\fi\fi
     {\hsize\@tempdima\kern\z@
     \vbox{\captiondir\hsize\@tempdima
       \captionfontsetup\parindent\z@\inhibitglue
       \csname fnum@\@captype\endcsname 　#1}\kern\z@
-    }\if@pboxsw \m@th$\fi}%
+    }}%
   \let\to@captionboxwidth\relax
   \if l\caption@posb \else\if r\caption@posb\else
   \def\to@captionboxwidth{to\floatwidth}\fi\fi
@@ -398,7 +395,7 @@
 \def\@iiparbox<#1>#2[#3]{\@ifnextchar[%]%
    {\@iiiparbox<#1>{#2}{#3}}{\@iiiparbox<#1>{#2}{#3}[#2]}}
 \long\def\@iiiparbox<#1>#2#3[#4]#5#6{%
-  \leavevmode\@pboxswfalse
+  \leavevmode
   \setlength\@tempdima{#5}%
   \fork@parbox@option<#1>[#2]%
   ^^A\UseTaggingSocket{parbox/before}
@@ -412,8 +409,12 @@
     \fi
     \@begin@parbox\@parboxto{\box@dir\adjustbaseline
        \let\hss\vss\let\unhbox\unvbox
-       \csname bm@#4\endcsname}%
-       \if@pboxsw\m@th$\null\else\@end@parbox\fi
+       \ifcsname bm@#4\endcsname
+         \lastnamedcs
+       \else
+         \@latex@warning{Unexpected alignment #4}%
+       \fi}%
+       \@end@parbox
   \@end@tempboxa
   ^^A\UseTaggingSocket{parbox/after}
   }
@@ -429,8 +430,6 @@
 % B: 周囲と中身が90度ずれ．上端が和文の高さ or 下端が和文の深さに揃うように
 % C: 周囲と中身が180度ずれ．（コードは B のものを流用）
 % D: 上端が和文の高さ or 下端が和文の深さに揃うように（コードは B のものを流用）
-% 従来では \@end@parbox --> \m@th$\null としていたケースは，
-% （\__math_grab_dollar_delim:w 使用によりうまく動かなくなったので）\@pboxswtrue に変更
 
 \def\fork@parbox@option@@A#1{%
   \let\@end@parbox\relax
@@ -440,8 +439,7 @@
     \ifmmode
       \let\@begin@parbox\vcenter
     \else
-      \def\@begin@parbox{\null$\vcenter}%
-      \@pboxswtrue
+      \def\@begin@parbox\vcenter@text
     \fi
   \fi\fi}
 \def\lltjext@getjablshift{%
@@ -458,8 +456,7 @@
     \ifmmode
       \let\@begin@parbox\vcenter\let\@end@parbox\relax
     \else
-      \def\@begin@parbox{\null$\vcenter}%
-      \@pboxswtrue
+      \def\@begin@parbox\vcenter@text\let\@end@parbox\relax
     \fi
   \fi\fi}
 \let\fork@parbox@option@@C=\fork@parbox@option@@B
