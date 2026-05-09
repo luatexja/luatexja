@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjext}[2026-05-09 v1.2k-ltj-20 Macros for vertical writing]
+\ProvidesPackage{lltjext}[2026-05-10 v1.2k-ltj-20 Macros for vertical writing]
 \RequirePackage{luatexja}
 
 \@ifl@t@r\fmtversion{2026-06-01}{}{\usepackage{lltjext-251101}\endinput}
@@ -439,7 +439,7 @@
     \ifmmode
       \let\@begin@parbox\vcenter
     \else
-      \def\@begin@parbox\vcenter@text
+      \let\@begin@parbox\vcenter@text
     \fi
   \fi\fi}
 \def\lltjext@getjablshift{%
@@ -456,7 +456,7 @@
     \ifmmode
       \let\@begin@parbox\vcenter\let\@end@parbox\relax
     \else
-      \def\@begin@parbox\vcenter@text\let\@end@parbox\relax
+      \let\@begin@parbox\vcenter@text\let\@end@parbox\relax
     \fi
   \fi\fi}
 \let\fork@parbox@option@@C=\fork@parbox@option@@B

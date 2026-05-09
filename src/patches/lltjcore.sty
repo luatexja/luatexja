@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2026-04-20
+\ProvidesPackage{lltjcore}[2026-05-10
   Patch to LaTeX2e Kernel for LuaTeX-ja (for LaTeX2e >=2025-06-01)]
 \RequirePackage{etoolbox}
 
@@ -284,7 +284,17 @@
 \let\ltj@orig@kernel@process@makefnmark=\@kernel@process@makefnmark
 \def\@kernel@process@makefnmark#1{\ltj@orig@kernel@process@makefnmark{\@ltj@process@makefnmark#1}}
 \@ifl@t@r\fmtversion{2026-06-01}{%
-  % not needed
+  \protected\def\vcenter@text@auxii{%
+    \begingroup
+      \dimen0\dimexpr\ltjgetht0+\ltjgetdp0\relax
+      \ltjsetht0\dimexpr\dimexpr\ifodd\dimen0 1sp + \fi\dimen0\relax/2
+        +\vcenter@text@axis
+        -\ifnum\ltjgetparameter{direction}=3 \ltjgetparameter{talbaselineshift}
+         \else\ltjgetparameter{yalbaselineshift}\fi\relax
+      \ltjsetdp0\dimexpr\dimen0-\ltjgetht0\relax
+      \box0 %
+    \endgroup
+  }
 }{
   \patchcmd\@iiiparbox{\@pboxswtrue$\vcenter}{\@pboxswtrue\null$\vcenter}{}{\ltj@ptcerr{\@iiiparbox 1}}
   \patchcmd\@iiiparbox{\m@th$}{\m@th$\null}{}{\ltj@ptcerr{\@iiiparbox 2}}
