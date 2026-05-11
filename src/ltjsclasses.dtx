@@ -44,7 +44,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2025-05-26 ltjsclasses ]
+  [2026-05-11 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass[disablejfam]{ltjsarticle}
@@ -2751,7 +2751,80 @@
 % を参考にさせていただきましたが，完全に行送りが |\baselineskip|
 % の整数倍にならなくてもいいから前の行と重ならないようにしました。
 %
+% [2026-05-11 LTJ] |latex-lab-sec-template|では|\@startsection|が書き直されたので，
+% それに合わせて再定義をやり直します．
 %    \begin{macrocode}
+\ExplSyntaxOn
+\ifdefined\ParseLaTeXeHeading
+\typeout{ltjsclasses: @startsection patched!}
+\DeclareDocumentCommand \@startsection {mmmmmm s ={shorttitle}o m}{
+  \typeout{ltjsclasses: patched @startsection called}
+  \IfInstanceExistsF{heading}{#1-@startsection}{
+    \typeout{ltjsclasses: patches definition of instances}
+    \__head_debug_typeout:n{Info:~ setting~ up~ instances~ for~
+                       legacy~ \string\@startsection (ltjsclasses)}
+    \@tempskipa #4\relax
+    \@afterindenttrue
+    \ifdim \@tempskipa <\z@
+      \@tempskipa -\@tempskipa
+      \@afterindentfalse
+    \fi
+    \@tempskipb #5\relax
+    \ifdim \@tempskipb>\z@
+      \use:e {
+        \DeclareInstance{heading}{#1-@startsection}{display}{
+         , name          = #1
+         , level         = #2
+         , mark-cmd      = \exp_not:c {#1mark} {##1}
+         , before-vspace = \the\@tempskipa
+         , para-indent   = \if@english false\else \if@afterindent true \else false\fi\fi
+         , heading-decls = \exp_not:n {#6}
+         , headformat-instance = #1-@startsection
+         , final-code = 
+           \ifdim \@tempskipb >\z@
+             \unexpanded{\if@slide\else\null\vspace*{-\baselineskip}\fi}%
+             \vskip\@tempskipb
+           \fi
+      }}
+      \DeclareInstance{headformat}{#1-@startsection}{hang}{heading-indent = #3,title-format={#6{##1}}}
+    \else
+      \@tempskipb=-\@tempskipb
+      \use:e {
+       \DeclareInstance{heading}{#1-@startsection}{runin}{
+         , name          = #1
+         , level         = #2
+         , mark-cmd      = \exp_not:c {#1mark} {##1}
+         , before-vspace = \the\@tempskipa
+         , after-vspace  = \the\@tempskipb
+         , heading-decls = \exp_not:n{#6}
+         , headformat-instance = #1-@startsection
+       }
+%    \end{macrocode}
+%
+% [2026-05-11 LTJ] |\paragraph|の最初にマークをつける処理は，
+% 従来は\@startsection|の第6引数に|\jsParagraphmark|を追加する方法で
+% 実装していましたが，新たな|\@startsection|では失敗します．
+% そのため，|\@startsection|の再定義の中に仕込んでしまうことにします．
+%
+%    \begin{macrocode}
+       \DeclareInstance{headformat}{#1-@startsection}{runin}{
+         heading-indent = #3,
+         title-format = {\exp_not:n{#6} 
+           \str_if_eq:nnT {#1} {paragraph} {\exp_not:N \jsParagraphMark} 
+%<!jspf>           {##1}}
+       }
+      }
+    \fi
+  }
+  \ParseLaTeXeHeading {#1-@startsection}{#7}{#8}{#9}
+}
+\RenewCommandCopy\kernel@startsection\@startsection
+%    \end{macrocode}
+%
+% [2026-05-11 LTJ] 旧来の|\@startsection|の再定義です．
+%
+%    \begin{macrocode}
+\else
 \def\ltjs@patching@startsection{%
   \ExplSyntaxOn
   \patchcmd{\@startsection}{%
@@ -2778,6 +2851,8 @@
   \ifx\@startsection\ltjs@orig@startsection\else\expandafter\ltjs@patching@startsection\fi
   \let\ltjs@patching@startsection\undefined
 }
+\fi
+\ExplSyntaxOff
 %    \end{macrocode}
 %
 % |\@sect| と |\@xsect| は，
@@ -3266,9 +3341,7 @@
   \plainifnotempty % 元: \thispagestyle{plain}
   \global\@topnum\z@
   \if@english \@afterindentfalse \else \@afterindenttrue \fi
-  \secdef
-    {\@omit@numberfalse\@chapter}%
-    {\@omit@numbertrue\@schapter}}
+  \secdef\@chapter\@schapter}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -3279,6 +3352,7 @@
 %
 %    \begin{macrocode}
 \def\@chapter[#1]#2{%
+  \@omit@numberfalse
   \ifnum \c@secnumdepth >\m@ne
 %<book>    \if@mainmatter
       \refstepcounter{chapter}%
@@ -3333,6 +3407,7 @@
 %
 %    \begin{macrocode}
 \def\@schapter#1{%
+  \@omit@numbertrue
   \chaptermark{#1}%
   \if@twocolumn
     \@topnewpage[\@makeschapterhead{#1}]%
@@ -3442,20 +3517,27 @@
 % とすれば「★」に変更できますし，マークを空にすることも容易です。
 % なお，某学会クラスでは従来どおりマークは付きません。
 %
+% [2026-05-11 LTJ] |\paragraph|の最初にマークをつける処理は，
+% |latex-lab-sec-template|が読み込まれている状況下では
+% |\@startsection|の再定義に移しました．
+%
 %    \begin{macrocode}
 %<!jspf>\newcommand{\jsParagraphMark}{■}
-\if@twocolumn
-  \newcommand{\paragraph}{\@startsection{paragraph}{4}{\z@}%
-    {\z@}{\if@slide .4\Cvs \else -1\zw\fi}% 改行せず 1\zw のアキ
-%<jspf>    {\normalfont\normalsize\headfont}}
-%<!jspf>    {\normalfont\normalsize\headfont\jsParagraphMark}}
-\else
-  \newcommand{\paragraph}{\@startsection{paragraph}{4}{\z@}%
-    {0.5\Cvs \@plus.5\Cdp \@minus.2\Cdp}%
-    {\if@slide .5\Cvs \@plus.3\Cdp \else -1\zw\fi}% 改行せず 1\zw のアキ
-%<jspf>    {\normalfont\normalsize\headfont}}
-%<!jspf>    {\normalfont\normalsize\headfont\jsParagraphMark}}
-\fi
+\expanded{%
+  \noexpand\newcommand{\noexpand\paragraph}{%
+    \noexpand\@startsection{paragraph}{4}{\z@}%
+    \if@twocolumn
+      {\z@}%
+      {\unexpanded{\if@slide .4\Cvs \else -1\zw\fi}}% 改行せず 1\zw のアキ
+    \else
+      {0.5\Cvs \@plus.5\Cdp \@minus.2\Cdp}%
+      {\unexpanded{\if@slide .5\Cvs \@plus.3\Cdp \else -1\zw\fi}}% 改行せず 1\zw のアキ
+    \fi
+    {\unexpanded{\normalfont\normalsize\headfont}%
+%<!jspf>      \ifdefined\ParseLaTeXeHeading\else\noexpand\jsParagraphMark\fi
+    }%
+  }%
+}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}

@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsreport}
-  [2025-05-26 ltjsclasses ]
+  [2026-05-11 ltjsclasses ]
 \def\jsc@clsname{ltjsreport}
 \def\Cjascale{0.924715}
 \RequirePackage{luatexja}
@@ -772,6 +772,64 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   }
 \fi
 \ExplSyntaxOff
+\ExplSyntaxOn
+\ifdefined\ParseLaTeXeHeading
+\typeout{ltjsclasses: @startsection patched!}
+\DeclareDocumentCommand \@startsection {mmmmmm s ={shorttitle}o m}{
+  \typeout{ltjsclasses: patched @startsection called}
+  \IfInstanceExistsF{heading}{#1-@startsection}{
+    \typeout{ltjsclasses: patches definition of instances}
+    \__head_debug_typeout:n{Info:~ setting~ up~ instances~ for~
+                       legacy~ \string\@startsection (ltjsclasses)}
+    \@tempskipa #4\relax
+    \@afterindenttrue
+    \ifdim \@tempskipa <\z@
+      \@tempskipa -\@tempskipa
+      \@afterindentfalse
+    \fi
+    \@tempskipb #5\relax
+    \ifdim \@tempskipb>\z@
+      \use:e {
+        \DeclareInstance{heading}{#1-@startsection}{display}{
+         , name          = #1
+         , level         = #2
+         , mark-cmd      = \exp_not:c {#1mark} {##1}
+         , before-vspace = \the\@tempskipa
+         , para-indent   = \if@english false\else \if@afterindent true \else false\fi\fi
+         , heading-decls = \exp_not:n {#6}
+         , headformat-instance = #1-@startsection
+         , final-code =
+           \ifdim \@tempskipb >\z@
+             \unexpanded{\if@slide\else\null\vspace*{-\baselineskip}\fi}%
+             \vskip\@tempskipb
+           \fi
+      }}
+      \DeclareInstance{headformat}{#1-@startsection}{hang}{heading-indent = #3,title-format={#6{##1}}}
+    \else
+      \@tempskipb=-\@tempskipb
+      \use:e {
+       \DeclareInstance{heading}{#1-@startsection}{runin}{
+         , name          = #1
+         , level         = #2
+         , mark-cmd      = \exp_not:c {#1mark} {##1}
+         , before-vspace = \the\@tempskipa
+         , after-vspace  = \the\@tempskipb
+         , heading-decls = \exp_not:n{#6}
+         , headformat-instance = #1-@startsection
+       }
+       \DeclareInstance{headformat}{#1-@startsection}{runin}{
+         heading-indent = #3,
+         title-format = {\exp_not:n{#6}
+           \str_if_eq:nnT {#1} {paragraph} {\exp_not:N \jsParagraphMark}
+           {##1}}
+       }
+      }
+    \fi
+  }
+  \ParseLaTeXeHeading {#1-@startsection}{#7}{#8}{#9}
+}
+\RenewCommandCopy\kernel@startsection\@startsection
+\else
 \def\ltjs@patching@startsection{%
   \ExplSyntaxOn
   \patchcmd{\@startsection}{%
@@ -798,6 +856,8 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \ifx\@startsection\ltjs@orig@startsection\else\expandafter\ltjs@patching@startsection\fi
   \let\ltjs@patching@startsection\undefined
 }
+\fi
+\ExplSyntaxOff
 \def\@sect#1#2#3#4#5#6[#7]#8{%
   \ifnum #2>\c@secnumdepth
     \let\@svsec\@empty
@@ -952,10 +1012,9 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \plainifnotempty % 元: \thispagestyle{plain}
   \global\@topnum\z@
   \if@english \@afterindentfalse \else \@afterindenttrue \fi
-  \secdef
-    {\@omit@numberfalse\@chapter}%
-    {\@omit@numbertrue\@schapter}}
+  \secdef\@chapter\@schapter}
 \def\@chapter[#1]#2{%
+  \@omit@numberfalse
   \ifnum \c@secnumdepth >\m@ne
       \refstepcounter{chapter}%
       \typeout{\@chapapp\thechapter\@chappos}%
@@ -988,6 +1047,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
     \Huge \headfont #1\par\nobreak
     \vskip 3\Cvs}} % 欧文は40pt
 \def\@schapter#1{%
+  \@omit@numbertrue
   \chaptermark{#1}%
   \if@twocolumn
     \@topnewpage[\@makeschapterhead{#1}]%
@@ -1035,16 +1095,21 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
     {\normalfont\normalsize\headfont}}
 \fi
 \newcommand{\jsParagraphMark}{■}
-\if@twocolumn
-  \newcommand{\paragraph}{\@startsection{paragraph}{4}{\z@}%
-    {\z@}{\if@slide .4\Cvs \else -1\zw\fi}% 改行せず 1\zw のアキ
-    {\normalfont\normalsize\headfont\jsParagraphMark}}
-\else
-  \newcommand{\paragraph}{\@startsection{paragraph}{4}{\z@}%
-    {0.5\Cvs \@plus.5\Cdp \@minus.2\Cdp}%
-    {\if@slide .5\Cvs \@plus.3\Cdp \else -1\zw\fi}% 改行せず 1\zw のアキ
-    {\normalfont\normalsize\headfont\jsParagraphMark}}
-\fi
+\expanded{%
+  \noexpand\newcommand{\noexpand\paragraph}{%
+    \noexpand\@startsection{paragraph}{4}{\z@}%
+    \if@twocolumn
+      {\z@}%
+      {\unexpanded{\if@slide .4\Cvs \else -1\zw\fi}}% 改行せず 1\zw のアキ
+    \else
+      {0.5\Cvs \@plus.5\Cdp \@minus.2\Cdp}%
+      {\unexpanded{\if@slide .5\Cvs \@plus.3\Cdp \else -1\zw\fi}}% 改行せず 1\zw のアキ
+    \fi
+    {\unexpanded{\normalfont\normalsize\headfont}%
+      \ifdefined\ParseLaTeXeHeading\else\noexpand\jsParagraphMark\fi
+    }%
+  }%
+}
 \if@twocolumn
   \newcommand{\subparagraph}{\@startsection{subparagraph}{5}{\z@}%
     {\z@}{\if@slide .4\Cvs \@plus.3\Cdp \else -1\zw\fi}%
