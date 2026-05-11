@@ -1103,8 +1103,20 @@ class has defined the old font commands like\MessageBreak
       \parfillskip -\rightskip
       {\leavevmode
         \large \headfont
+        \UseHookWithArguments{contentsline/text/before}{4}%
+          {\toclevel@part}{#1}{#2}{\@contentsline@destination}
         \setlength\@lnumwidth{4\zw}%
-        #1\hfil \hb@xt@\@pnumwidth{\hss #2}}\par
+        \csname contentsline@text@-1@format\endcsname{#1}%
+        \UseHookWithArguments{contentsline/text/after}{4}%
+          {\toclevel@part}{#1}{#2}{\@contentsline@destination}
+        \hfil\nobreak
+        \hb@xt@\@pnumwidth{\hss
+          \UseHookWithArguments{contentsline/page/before}{4}%
+             {\toclevel@part}{#1}{#2}{\@contentsline@destination}%
+          #2%
+        \UseHookWithArguments{contentsline/page/after}{4}%
+          {\toclevel@part}{#1}{#2}{\@contentsline@destination}%
+        \kern-\p@\kern\p@}}\par
       \nobreak
     \endgroup
   \fi}
@@ -1120,7 +1132,19 @@ class has defined the old font commands like\MessageBreak
       %\setlength\@lnumwidth{4\zw}% 元1.5em [2003-03-02]
       \setlength\@lnumwidth{\jsc@tocl@width}\advance\@lnumwidth 2\zw
       \advance\leftskip\@lnumwidth \hskip-\leftskip
-      #1\nobreak\hfil\nobreak\hbox to\@pnumwidth{\hss#2}\par
+      \UseHookWithArguments{contentsline/text/before}{4}%
+        {\toclevel@section}{#1}{#2}{\@contentsline@destination}%
+      \csname contentsline@text@1@format\endcsname{#1}%
+      \UseHookWithArguments{contentsline/text/after}{4}%
+        {\toclevel@section}{#1}{#2}{\@contentsline@destination}%
+      \nobreak\hfil
+      \nobreak\hbox to\@pnumwidth{%
+        \UseHookWithArguments{contentsline/page/before}{4}%
+          {\toclevel@section}{#1}{#2}{\@contentsline@destination}%
+        #2%
+        \UseHookWithArguments{contentsline/page/after}{4}%
+          {\toclevel@section}{#1}{#2}{\@contentsline@destination}%
+        \kern-\p@\kern\p@}\par
     \endgroup
   \fi}
 \newcommand*{\l@subsection}{%
@@ -1136,7 +1160,11 @@ class has defined the old font commands like\MessageBreak
           \@tempdima\jsc@tocl@width \advance\@tempdima 2\zw
           \@dottedtocline{5}{\@tempdima}{6\zw}}
 \newdimen\@lnumwidth
-\def\numberline#1{\hb@xt@\@lnumwidth{#1\hfil}\hspace{0pt}}
+\def\numberline#1{\hb@xt@\@lnumwidth{%
+  \UseHookWithArguments{contentsline/number/before}{1}{#1}%
+  #1\hfil
+  \UseHookWithArguments{contentsline/number/after}{1}{#1}%
+}\hspace{0pt}}
 \def\jsTocLine{\leaders\hbox{%
   $\m@th \mkern \@dotsep mu\hbox{.}\mkern \@dotsep mu$}\hfill}
 \def\@dottedtocline#1#2#3#4#5{\ifnum #1>\c@tocdepth \else
@@ -1147,9 +1175,25 @@ class has defined the old font commands like\MessageBreak
    \leavevmode
    \@lnumwidth #3\relax
    \advance\leftskip \@lnumwidth \null\nobreak\hskip -\leftskip
-    {#4}\nobreak
-    \jsTocLine \nobreak\hb@xt@\@pnumwidth{%
-         \hfil\normalfont \normalcolor #5}\par}\fi}
+   \UseHookWithArguments{contentsline/text/before}{4}%
+     {#1}{#4}{#5}{\@contentsline@destination}%
+   \csname contentsline@text@#1@format\endcsname{#4}%
+   \UseHookWithArguments{contentsline/text/after}{4}%
+     {#1}{#4}{#5}{\@contentsline@destination}%
+   \nobreak
+   \UseTaggingSocket{toc/leaders/before}\SuspendTagging{toc/leaders}%
+   \jsTocLine
+   \ResumeTagging{toc/leaders}\UseTaggingSocket{toc/leaders/after}%
+   \nobreak
+   \hb@xt@\@pnumwidth{\hfil\normalfont \normalcolor
+     \UseHookWithArguments{contentsline/page/before}{4}%
+       {#1}{#4}{#5}{\@contentsline@destination}%
+       {#5}%
+     \UseHookWithArguments{contentsline/page/after}{4}%
+       {#1}{#4}{#5}{\@contentsline@destination}%
+     \kern-\p@\kern\p@}%
+   \par}%
+\fi}
 \newcommand{\listoffigures}{%
   \section*{\listfigurename}%
   \@mkboth{\listfigurename}{\listfigurename}%

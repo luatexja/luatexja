@@ -705,9 +705,11 @@
      \leavevmode
      \@lnumwidth #3\relax
      \advance\leftskip \@lnumwidth \null\nobreak\hskip -\leftskip
-     \UseHookWithArguments{contentsline/text/before}{4}{#1}{#4}{#5}{\@contentsline@destination}%
+     \UseHookWithArguments{contentsline/text/before}{4}%
+       {#1}{#4}{#5}{\@contentsline@destination}%
      \csname contentsline@text@#1@format\endcsname{#4}%
-     \UseHookWithArguments{contentsline/text/after}{4}{#1}{#4}{#5}{\@contentsline@destination}%
+     \UseHookWithArguments{contentsline/text/after}{4}%
+       {#1}{#4}{#5}{\@contentsline@destination}%
      \nobreak
      \UseTaggingSocket{toc/leaders/before}\SuspendTagging{toc/leaders}%
        \leaders\hbox{$\m@th \mkern \@dotsep mu.\mkern \@dotsep mu$}%
@@ -715,9 +717,11 @@
      \ResumeTagging{toc/leaders}\UseTaggingSocket{toc/leaders/after}%
      \nobreak
      \hb@xt@\@pnumwidth{\hss\normalfont \normalcolor
-       \UseHookWithArguments{contentsline/page/before}{4}{#1}{#4}{#5}{\@contentsline@destination}%
+       \UseHookWithArguments{contentsline/page/before}{4}%
+         {#1}{#4}{#5}{\@contentsline@destination}%
        {\rensuji{#5}}%
-       \UseHookWithArguments{contentsline/page/after}{4}{#1}{#4}{#5}{\@contentsline@destination}%
+       \UseHookWithArguments{contentsline/page/after}{4}%
+         {#1}{#4}{#5}{\@contentsline@destination}%
        \kern-\p@\kern\p@}%
      \par}%
   \fi}
@@ -734,16 +738,18 @@
     \parindent\z@\rightskip\@pnumwidth
     \parfillskip-\@pnumwidth
     {\leavevmode\large\bfseries
-     \UseHookWithArguments{contentsline/text/before}{4}
+     \UseHookWithArguments{contentsline/text/before}{4}%
        {\toclevel@part}{#1}{#2}{\@contentsline@destination}
      \setlength\@lnumwidth{4\zw}%
      \csname contentsline@text@-1@format\endcsname{#1}%
+     \UseHookWithArguments{contentsline/text/after}{4}%
+       {\toclevel@part}{#1}{#2}{\@contentsline@destination}
      \hfil\nobreak
      \hb@xt@\@pnumwidth{\hss
-       \UseHookWithArguments{contentsline/page/before}{4}
+       \UseHookWithArguments{contentsline/page/before}{4}%
          {\toclevel@part}{#1}{#2}{\@contentsline@destination}%
      \rensuji{#2}%
-       \UseHookWithArguments{contentsline/page/after}{4}
+       \UseHookWithArguments{contentsline/page/after}{4}%
          {\toclevel@part}{#1}{#2}{\@contentsline@destination}%
       \kern-\p@\kern\p@}}\par
     \nobreak
@@ -762,17 +768,17 @@
       \leavevmode\bfseries
       \setlength\@lnumwidth{1.5em}%
       \advance\leftskip\@lnumwidth \hskip-\leftskip
-      \UseHookWithArguments{contentsline/text/before}{4}
+      \UseHookWithArguments{contentsline/text/before}{4}%
         {\toclevel@section}{#1}{#2}{\@contentsline@destination}%
       \csname contentsline@text@1@format\endcsname{#1}%
-      \UseHookWithArguments{contentsline/text/after}{4}
+      \UseHookWithArguments{contentsline/text/after}{4}%
         {\toclevel@section}{#1}{#2}{\@contentsline@destination}%
       \nobreak\hfil
       \nobreak\hb@xt@\@pnumwidth{\hss
-        \UseHookWithArguments{contentsline/page/before}{4}
+        \UseHookWithArguments{contentsline/page/before}{4}%
           {\toclevel@section}{#1}{#2}{\@contentsline@destination}%
         \rensuji{#2}%
-        \UseHookWithArguments{contentsline/page/after}{4}
+        \UseHookWithArguments{contentsline/page/after}{4}%
           {\toclevel@section}{#1}{#2}{\@contentsline@destination}%
         \kern-\p@\kern\p@}\par
     \endgroup

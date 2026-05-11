@@ -682,9 +682,11 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \else
     \thispagestyle{plainhead}%
   \fi}
+\ExplSyntaxOn
 \if@titlepage
   \newcommand{\maketitle}{%
     \begin{titlepage}%
+      \cs_if_exist_use:N\__tag_tbl_disable:
       \let\footnotesize\small
       \let\footnoterule\relax
       \let\footnote\thanks
@@ -705,7 +707,13 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
       \else
       \vskip 60\jsc@mpt
       \begin{center}%
-        {\LARGE \@title \par}%
+        \tag_if_active:TF {%
+          \pdf_version_compare:NnTF > {1.7}
+            {{\LARGE \tag_struct_begin:n{tag=Title}\@title \par\tag_struct_end:}}
+            {{\LARGE \tagtool{paratag=Title}\@title \par}}%
+        }{%
+          {\LARGE \@title \par}%
+        }%
         \vskip 3em%
         {\large
           \lineskip .75em
@@ -734,6 +742,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \else
   \newcommand{\maketitle}{\par
     \begingroup
+      \cs_if_exist_use:N\__tag_tbl_disable:
       \renewcommand\thefootnote{\@fnsymbol\c@footnote}%
       \def\@makefnmark{\rlap{\@textsuperscript{\normalfont\@thefnmark}}}%
       \long\def\@makefntext##1{\advance\leftskip 3\zw
@@ -770,7 +779,13 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
     \vskip 2em
     \begin{center}%
       \let\footnote\thanks
-      {\LARGE \@title \par}%
+      \tag_if_active:TF {%
+        \pdf_version_compare:NnTF > {1.7}
+          {{\LARGE \tag_struct_begin:n{tag=Title}\@title \par\tag_struct_end:}}
+          {{\LARGE \tagtool{paratag=Title}\@title \par}}%
+      }{%
+        {\LARGE \@title \par}%
+      }%
       \vskip 1.5em
       {\large
         \lineskip .5em
@@ -783,6 +798,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
     \par\vskip 1.5em
   }
 \fi
+\ExplSyntaxOff
 \def\ltjs@patching@startsection{%
   \ExplSyntaxOn
   \patchcmd{\@startsection}{%
@@ -1323,8 +1339,20 @@ class has defined the old font commands like\MessageBreak
       \parfillskip -\rightskip
       {\leavevmode
         \large \headfont
+        \UseHookWithArguments{contentsline/text/before}{4}%
+          {\toclevel@part}{#1}{#2}{\@contentsline@destination}
         \setlength\@lnumwidth{4\zw}%
-        #1\hfil \hb@xt@\@pnumwidth{\hss #2}}\par
+        \csname contentsline@text@-1@format\endcsname{#1}%
+        \UseHookWithArguments{contentsline/text/after}{4}%
+          {\toclevel@part}{#1}{#2}{\@contentsline@destination}
+        \hfil\nobreak
+        \hb@xt@\@pnumwidth{\hss
+          \UseHookWithArguments{contentsline/page/before}{4}%
+             {\toclevel@part}{#1}{#2}{\@contentsline@destination}%
+          #2%
+        \UseHookWithArguments{contentsline/page/after}{4}%
+          {\toclevel@part}{#1}{#2}{\@contentsline@destination}%
+        \kern-\p@\kern\p@}}\par
       \nobreak
     \global\@nobreaktrue
     \everypar{\global\@nobreakfalse\everypar{}}%
@@ -1342,7 +1370,18 @@ class has defined the old font commands like\MessageBreak
       % \if@english\setlength\@lnumwidth{5.5em}\else\setlength\@lnumwidth{4.683\zw}\fi
       \setlength\@lnumwidth{\jsc@tocl@width}\advance\@lnumwidth 2.683\zw
       \advance\leftskip\@lnumwidth \hskip-\leftskip
-      #1\nobreak\hfil\nobreak\hbox to\@pnumwidth{\hss#2}\par
+      \UseHookWithArguments{contentsline/text/before}{4}%
+        {\toclevel@chapter}{#1}{#2}{\@contentsline@destination}%
+      \csname contentsline@text@0@format\endcsname{#1}%
+      \UseHookWithArguments{contentsline/text/after}{4}%
+        {\toclevel@chapter}{#1}{#2}{\@contentsline@destination}%
+      \nobreak\hfil\nobreak\hbox to\@pnumwidth{\hss
+        \UseHookWithArguments{contentsline/page/before}{4}%
+          {\toclevel@chapter}{#1}{#2}{\@contentsline@destination}%
+        #2%
+        \UseHookWithArguments{contentsline/page/after}{4}
+          {\toclevel@chapter}{#1}{#2}{\@contentsline@destination}%%
+        \kern-\p@\kern\p@}\par
       \penalty\@highpenalty
     \endgroup
   \fi}
@@ -1363,7 +1402,11 @@ class has defined the old font commands like\MessageBreak
           \@tempdima\jsc@tocl@width \advance\@tempdima 16.183\zw
           \@dottedtocline{5}{\@tempdima}{6.5\zw}}
 \newdimen\@lnumwidth
-\def\numberline#1{\hb@xt@\@lnumwidth{#1\hfil}\hspace{0pt}}
+\def\numberline#1{\hb@xt@\@lnumwidth{%
+  \UseHookWithArguments{contentsline/number/before}{1}{#1}%
+  #1\hfil
+  \UseHookWithArguments{contentsline/number/after}{1}{#1}%
+}\hspace{0pt}}
 \def\jsTocLine{\leaders\hbox{%
   $\m@th \mkern \@dotsep mu\hbox{.}\mkern \@dotsep mu$}\hfill}
 \def\@dottedtocline#1#2#3#4#5{\ifnum #1>\c@tocdepth \else
@@ -1374,9 +1417,25 @@ class has defined the old font commands like\MessageBreak
    \leavevmode
    \@lnumwidth #3\relax
    \advance\leftskip \@lnumwidth \null\nobreak\hskip -\leftskip
-    {#4}\nobreak
-    \jsTocLine \nobreak\hb@xt@\@pnumwidth{%
-         \hfil\normalfont \normalcolor #5}\par}\fi}
+   \UseHookWithArguments{contentsline/text/before}{4}%
+     {#1}{#4}{#5}{\@contentsline@destination}%
+   \csname contentsline@text@#1@format\endcsname{#4}%
+   \UseHookWithArguments{contentsline/text/after}{4}%
+     {#1}{#4}{#5}{\@contentsline@destination}%
+   \nobreak
+   \UseTaggingSocket{toc/leaders/before}\SuspendTagging{toc/leaders}%
+   \jsTocLine
+   \ResumeTagging{toc/leaders}\UseTaggingSocket{toc/leaders/after}%
+   \nobreak
+   \hb@xt@\@pnumwidth{\hfil\normalfont \normalcolor
+     \UseHookWithArguments{contentsline/page/before}{4}%
+       {#1}{#4}{#5}{\@contentsline@destination}%
+       {#5}%
+     \UseHookWithArguments{contentsline/page/after}{4}%
+       {#1}{#4}{#5}{\@contentsline@destination}%
+     \kern-\p@\kern\p@}%
+   \par}%
+\fi}
 \newcommand{\listoffigures}{%
   \if@twocolumn\@restonecoltrue\onecolumn
   \else\@restonecolfalse\fi
