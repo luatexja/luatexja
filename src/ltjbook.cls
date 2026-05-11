@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjbook}
-  [2025-03-28 v1.8f-ltj-25
+  [2026-05-11 v1.8f-ltj-26
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -347,15 +347,23 @@
 \def\p@thanks#1{\footnotemark
   \protected@xdef\@thanks{\@thanks
     \protect{\noindent\hbox{\yoko$\m@th^\thefootnote$}#1\protect\par}}}
+\ExplSyntaxOn
 \if@titlepage
   \newcommand{\maketitle}{\begin{titlepage}%
+  \cs_if_exist_use:N\__tag_tbl_disable:
   \let\footnotesize\small
   \let\footnoterule\relax
   \let\footnote\thanks
   \null\vfil
   \vskip 60\p@
   \begin{center}%
-    {\LARGE \@title \par}%
+    \tag_if_active:TF {%
+      \pdf_version_compare:NnTF > {1.7}
+        {{\LARGE \tag_struct_begin:n{tag=Title}\@title \par\tag_struct_end:}}
+        {{\LARGE \tagtool{paratag=Title}\@title \par}}%
+    }{%
+      {\LARGE \@title \par}%
+    }%
     \vskip 3em%
     {\Large
      \lineskip .75em%
@@ -383,8 +391,9 @@
 \else
   \newcommand{\maketitle}{\par
   \begingroup
+    \cs_if_exist_use:N\__tag_tbl_disable:
     \renewcommand{\thefootnote}{\fnsymbol{footnote}}%
-    \def\@makefnmark{\hbox{\unless\ifnum\ltjgetparameter{direction}=3 $\m@th^{\@thefnmark}$
+    \def\@makefnmark{\hbox{\unless\ifnum\ltjgetparameter{direction}=3 $\m@th^{\@thefnmark}$%
       \else\hbox{\yoko$\m@th^{\@thefnmark}$}\fi}}%
      \long\def\@makefntext##1{\parindent 1em\noindent
        \hb@xt@1.8em{\hss$\m@th^{\@thefnmark}$}##1}%
@@ -418,7 +427,13 @@
   \vskip 2em%
   \begin{center}%
   \let\footnote\thanks
-    {\LARGE \@title \par}%
+    \tag_if_active:TF {%
+      \pdf_version_compare:NnTF > {1.7}
+        {{\LARGE \tag_struct_begin:n{tag=Title}\@title \par\tag_struct_end:}}
+        {{\LARGE \tagtool{paratag=Title}\@title \par}}%
+    }{%
+      {\LARGE \@title \par}%
+    }%
     \vskip 1.5em%
     {\large
       \lineskip .5em%
@@ -430,6 +445,7 @@
   \end{center}%
   \par\vskip 1.5em}
 \fi
+\ExplSyntaxOff
 \newcommand*{\chaptermark}[1]{}
 \setcounter{secnumdepth}{2}
 \newcounter{part}
@@ -764,7 +780,11 @@
 \newdimen\toclineskip
 \setlength\toclineskip{\z@}
 \newdimen\@lnumwidth
-\def\numberline#1{\hb@xt@\@lnumwidth{#1\hfil}}
+\def\numberline#1{\hb@xt@\@lnumwidth{%
+  \UseHookWithArguments{contentsline/number/before}{1}{#1}%
+  #1\hfil
+  \UseHookWithArguments{contentsline/number/after}{1}{#1}%
+}}
 \def\@dottedtocline#1#2#3#4#5{%
   \ifnum #1>\c@tocdepth \else
     \vskip\toclineskip \@plus.2\p@
@@ -774,10 +794,20 @@
      \leavevmode
      \@lnumwidth #3\relax
      \advance\leftskip \@lnumwidth \null\nobreak\hskip -\leftskip
-     {#4}\nobreak
-     \leaders\hbox{$\m@th \mkern \@dotsep mu.\mkern \@dotsep mu$}%
-     \hfill\nobreak
-     \hb@xt@\@pnumwidth{\hss\normalfont \normalcolor #5}%
+     \UseHookWithArguments{contentsline/text/before}{4}{#1}{#4}{#5}{\@contentsline@destination}%
+     \csname contentsline@text@#1@format\endcsname{#4}%
+     \UseHookWithArguments{contentsline/text/after}{4}{#1}{#4}{#5}{\@contentsline@destination}%
+     \nobreak
+     \UseTaggingSocket{toc/leaders/before}\SuspendTagging{toc/leaders}%
+       \leaders\hbox{$\m@th \mkern \@dotsep mu.\mkern \@dotsep mu$}%
+     \hfill
+     \ResumeTagging{toc/leaders}\UseTaggingSocket{toc/leaders/after}%
+     \nobreak
+     \hb@xt@\@pnumwidth{\hss\normalfont \normalcolor
+       \UseHookWithArguments{contentsline/page/before}{4}{#1}{#4}{#5}{\@contentsline@destination}%
+       {#5}%
+       \UseHookWithArguments{contentsline/page/after}{4}{#1}{#4}{#5}{\@contentsline@destination}%
+       \kern-\p@\kern\p@}%
      \par}%
   \fi}
 \newcommand{\tableofcontents}{%
@@ -796,13 +826,22 @@
     \parindent\z@\rightskip\@pnumwidth
     \parfillskip-\@pnumwidth
     {\leavevmode\large\bfseries
+     \UseHookWithArguments{contentsline/text/before}{4}
+       {\toclevel@part}{#1}{#2}{\@contentsline@destination}
      \setlength\@lnumwidth{4\zw}%
-     #1\hfil\nobreak
-     \hb@xt@\@pnumwidth{\hss#2}}\par
+     \csname contentsline@text@-1@format\endcsname{#1}%
+     \hfil\nobreak
+     \hb@xt@\@pnumwidth{\hss
+       \UseHookWithArguments{contentsline/page/before}{4}
+         {\toclevel@part}{#1}{#2}{\@contentsline@destination}%
+     #2%
+       \UseHookWithArguments{contentsline/page/after}{4}
+         {\toclevel@part}{#1}{#2}{\@contentsline@destination}%
+      \kern-\p@\kern\p@}}\par
     \nobreak
     \global\@nobreaktrue
     \everypar{\global\@nobreakfalse\everypar{}}%
-     \endgroup
+    \endgroup
   \fi}
 \newcommand*{\l@chapter}[2]{%
   \ifnum \c@tocdepth >\m@ne
@@ -813,7 +852,14 @@
       \leavevmode\bfseries
       \setlength\@lnumwidth{4\zw}%
       \advance\leftskip\@lnumwidth \hskip-\leftskip
-      #1\nobreak\hfil\nobreak\hb@xt@\@pnumwidth{\hss#2}\par
+      \UseHookWithArguments{contentsline/text/before}{4}
+        {\toclevel@chapter}{#1}{#2}{\@contentsline@destination}%
+      \csname contentsline@text@0@format\endcsname{#1}%
+      \nobreak\hfil\nobreak\hb@xt@\@pnumwidth{\hss
+      #2%
+      \UseHookWithArguments{contentsline/page/after}{4}
+        {\toclevel@chapter}{#1}{#2}{\@contentsline@destination}%%
+      \kern-\p@\kern\p@}\par
       \penalty\@highpenalty
     \endgroup
   \fi}

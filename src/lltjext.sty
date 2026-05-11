@@ -96,8 +96,8 @@
 \@namedef{tabular*}{\@ifnextchar<{\p@stabular}{\p@stabular<Z>}}%>
 \def\p@stabular<#1>#2{%
    \setlength\dimen@{#2}%
-   \edef\@halignto{to\the\dimen@}\@tabarray<#1>}
-\def\endtabular{\endarray\m@th$\egroup
+   \edef\@halignto{to\the\dimen@}\@tabular<#1>}
+\def\endtabular{\endarray\egroup
    \UseTaggingSocket {tbl/hmode/end}\null}
 \expandafter \let \csname endtabular*\endcsname = \endtabular
 
