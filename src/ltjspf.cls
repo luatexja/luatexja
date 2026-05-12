@@ -705,7 +705,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
        \DeclareInstance{headformat}{#1-@startsection}{runin}{
          heading-indent = #3,
          title-format = {\exp_not:n{#6}
-           \str_if_eq:nnT {#1} {paragraph} {\exp_not:N \jsParagraphMark}
+           {##1}}
        }
       }
     \fi

@@ -2802,7 +2802,7 @@
 %    \end{macrocode}
 %
 % [2026-05-11 LTJ] |\paragraph|の最初にマークをつける処理は，
-% 従来は\@startsection|の第6引数に|\jsParagraphmark|を追加する方法で
+% 従来は|\@startsection|の第6引数に|\jsParagraphMark|を追加する方法で
 % 実装していましたが，新たな|\@startsection|では失敗します．
 % そのため，|\@startsection|の再定義の中に仕込んでしまうことにします．
 %
@@ -2810,8 +2810,8 @@
        \DeclareInstance{headformat}{#1-@startsection}{runin}{
          heading-indent = #3,
          title-format = {\exp_not:n{#6} 
-           \str_if_eq:nnT {#1} {paragraph} {\exp_not:N \jsParagraphMark} 
-%<!jspf>           {##1}}
+%<!jspf>           \str_if_eq:nnT {#1} {paragraph} {\exp_not:N \jsParagraphMark} 
+           {##1}}
        }
       }
     \fi
