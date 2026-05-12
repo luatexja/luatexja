@@ -7,3 +7,6 @@
 *~
 .#*
 *.ltjruby
+test/tagging/*.txt
+test/tagging/*.html
+test/tagging/*.pdf

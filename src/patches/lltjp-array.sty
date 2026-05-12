@@ -3,24 +3,28 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-array}[2024-07-21 Patch to array for LuaTeX-ja]
+\ProvidesPackage{lltjp-array}[2026-05-13 Patch to array for LuaTeX-ja]
 
 \@ifpackageloaded{array}{\def\lltjp@array@array@loaded{1}}{\let\lltjp@array@array@loaded\relax}
 
 \RequirePackage{etoolbox,array}
 
 \patchcmd\insert@column{%
+   \ignorespaces
+}{%
+   \pltx@next@inhibitglue\ltjfakeboxbdd\ignorespaces
+}{}{}
+\patchcmd\insert@column{%
+   \@sharp\textonly@unskip
+}{%
+   \@sharp\textonly@unskip\ltjfakeboxbdd
+}{}{}
+\patchcmd\insert@pcolumn{%
    \ignorespaces\@sharp\unskip
 }{%
    \ltj@sharp
-}{}{% >=2024-06-01
-  \def\ltj@sharp{\relax\pltx@next@inhibitglue\ltjfakeboxbdd\ignorespaces\@sharp\textonly@unskip\ltjfakeboxbdd}
-  \patchcmd\insert@column{%
-     \ignorespaces\@sharp\textonly@unskip
-  }{%
-     \ltj@sharp
-  }{}{}
-}
+}{}{}
+\ExplSyntaxOff
 
 \@ifpackageloaded{lltjext}{}{%
 %% remove extra \xkanjiskip (pLaTeX2e 2016/04/17)

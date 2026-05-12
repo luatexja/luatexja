@@ -1,0 +1,59 @@
+\DocumentMetadata{tagging=on}
+\documentclass{\LTJ book}
+\usepackage{unicode-math}
+\title{hoge}
+\author{chobi\thanks{hamu}\and hiyo\thanks{kimi}}
+%\ifdefined\ltjsetparameter \usepackage{lltjext}\fi
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+aaa
+\chapter{Chapter} % errors
+aaa
+\section{Section}
+aaa
+\section{Section}
+aaa
+\section{Section}
+aaa
+\subsection{Subsection}
+aaa
+\chapter*{Starred Chapter}
+aaa
+\section{Section}
+aaa
+\subsection{Subsection}
+aaa
+\subsection*{Starred Subsection}
+aaa
+\subsection{Subsection}
+text
+\paragraph{foobar}
+foobar
+\[
+\int_0^∞ e^{-x^2}\,dx=\frac{\sqrt{π}}2.
+\]
+This is a pen.
+That is a%
+\tabcolsep0pt
+\begin{tabular}[t]{llcp{10em}}
+  abc&def&a-a-a&ghjasg\\
+  iuo&ghj&uit4y&ghjgj\\
+  （あ）&（い）&（うああああ）\\
+  ◆◆&◆◆&◆◆◆◆◆◆
+\end{tabular}
+
+{\ExplSyntaxOn
+\cs_if_exist_use:N\__tag_tbl_disable:
+\begin{tabular}[t]{llcp{10em}}
+  \makeatletter
+  \xdef\AAA{\expandonce{\@preamble}}abc&def&a-a-a&ghjasgjdasd\\
+  iuo&ghj&uit4y&ghjgjhhj
+\end{tabular}
+\ExplSyntaxOff}
+  
+\typeout{\meaning\AAA}
+
+\end{document}
