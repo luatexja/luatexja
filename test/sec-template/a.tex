@@ -1,0 +1,13 @@
+\ifdefined\LTJ\DocumentMetadata{tagging=on}\fi
+\documentclass{ltjbook}
+\usepackage{unicode-math}
+%\usepackage{array}
+\begin{document}
+\chapter{あいうえお$\int\displaystyle\sum$Chapter}
+\begin{tabular}{c}
+  \makeatletter
+  a\global\let\AAA=\@preamble
+\end{tabular}
+\tracingnone
+\typeout{\meaning\AAA}
+\end{document}
