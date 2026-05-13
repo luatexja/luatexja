@@ -109,10 +109,10 @@
 % \pltx@next@inhibitglue (pLaTeX 2018-03-09)
 \protected\def\pltx@next@inhibitglue{%
   \ifhmode\inhibitglue\else
-  \edef\@tempa{\everypar{%
+  \expanded{\everypar{%
     \everypar{\unexpanded\expandafter{\the\everypar}}%
     \unexpanded\expandafter{\the\everypar}\inhibitglue}}%
-\@tempa\fi}
+\fi}
 \AtBeginDocument{%
   \ifdefined\printglossary\else\newcommand\printglossary{\@input@{\jobname.gls}}\fi
 }%

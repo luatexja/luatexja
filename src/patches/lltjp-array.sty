@@ -6,32 +6,33 @@
 \ProvidesPackage{lltjp-array}[2026-05-13 Patch to array for LuaTeX-ja]
 
 \@ifpackageloaded{array}{\def\lltjp@array@array@loaded{1}}{\let\lltjp@array@array@loaded\relax}
+\def\ltj@ptc@array@err#1{\typeout{lltjp-array: patch FAILED (\detokenize{#1})}}
 
 \RequirePackage{etoolbox,array}
 
 \patchcmd\insert@column{%
    \ignorespaces
 }{%
-   \pltx@next@inhibitglue\ltjfakeboxbdd\ignorespaces
-}{}{}
+   \ltjfakeboxbdd\ignorespaces
+}{}{\ltj@ptc@array@err{ic1}}
 \patchcmd\insert@column{%
    \@sharp\textonly@unskip
 }{%
    \@sharp\textonly@unskip\ltjfakeboxbdd
-}{}{}
+}{}{\ltj@ptc@array@err{ic2}}
 \patchcmd\insert@pcolumn{%
    \ignorespaces\@sharp\unskip
 }{%
    \ltj@sharp
-}{}{}
+}{}{\ltj@ptc@array@err{ipc}}
 \ExplSyntaxOff
 
 \@ifpackageloaded{lltjext}{}{%
 %% remove extra \xkanjiskip (pLaTeX2e 2016/04/17)
 \ifnum0<0\lltjp@array@array@loaded
-  \patchcmd{\@tabular}{\leavevmode}{\leavevmode\null}{}{}
-  \patchcmd{\@tabular}{\leavevmode\null\null}{\leavevmode\null}{}{}
-  \apptocmd{\endtabular}{\null}{}{}
+  \patchcmd{\@tabular}{\leavevmode}{\leavevmode\null}{}{\ltj@ptc@array@err{\@tabular1}}
+  \patchcmd{\@tabular}{\leavevmode\null\null}{\leavevmode\null}{}{\ltj@ptc@array@err{\@tabular2}}
+  \apptocmd{\endtabular}{\null}{}{\ltj@ptc@array@err{\endtabular}}
   \let\lltjp@array@array@loaded\undefined
 \fi
 \expandafter \let \csname endtabular*\endcsname = \endtabular
