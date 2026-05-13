@@ -590,7 +590,7 @@
      \if@openleft \cleardoublepage \else
      \if@openright \cleardoublepage \else \clearpage \fi \fi
      \thispagestyle{jpl@in}%
-     \global\@topnum\z@\hbox{}\vskip2\Cvs%
+     \global\@topnum\z@\hbox{}\vskip\dimexpr2\Cvs+\lineskip\nointerlineskip%
   , final-code     = \typeout{\@chapapp\space\thechapter\space\@chappos}
   , after-vspace   = 3\Cvs
   , number-format  = \@chapapp\thechapter\@chappos
@@ -601,14 +601,15 @@
   , mark-cmd       = \chaptermark {#1}
   , contents-extra = \addtocontents{lof}{\protect\addvspace{10\p@}}
                      \addtocontents{lot}{\protect\addvspace{10\p@}}
-  , para-indent = true
+  , para-indent    = true
 }%
-  , after-penalty-vspace = \the\dimexpr-\Cwd
+  , after-penalty-vspace = 0pt %%% TODO
 }
-\DeclareInstance{headformat}{ltjhang}{hang}{%
-  , heading-indent = 0pt
+\DeclareInstance{headformat}{ltjhang}{hang}
+{
+  , heading-indent   = 0pt
   , number-title-sep = \the\dimen0
-}%
+}
 }
 \fi
 \newcommand{\section}{\@startsection{section}{1}{\z@}%
