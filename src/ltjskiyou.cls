@@ -631,7 +631,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \if@titlepage
   \newcommand{\maketitle}{%
     \begin{titlepage}%
-      \cs_if_exist_use:N\__tag_tbl_disable:
+      \tagpdfsetup{table/tagging=false}%-
       \let\footnotesize\small
       \let\footnoterule\relax
       \let\footnote\thanks
@@ -687,12 +687,13 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \else
   \newcommand{\maketitle}{\par
     \begingroup
-      \cs_if_exist_use:N\__tag_tbl_disable:
+      \tagpdfsetup{table/tagging=false}%-
       \renewcommand\thefootnote{\@fnsymbol\c@footnote}%
       \def\@makefnmark{\rlap{\@textsuperscript{\normalfont\@thefnmark}}}%
       \long\def\@makefntext##1{\advance\leftskip 3\zw
         \parindent 1\zw\noindent
         \llap{\@textsuperscript{\normalfont\@thefnmark}\hskip0.3\zw}##1}%
+      \cs_set_eq:NN \thanks \__tag_patch_thanks:n
       \if@twocolumn
         \ifnum \col@number=\@ne
           \@maketitle

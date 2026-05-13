@@ -3155,9 +3155,61 @@
    \leavevmode
    \setlength\@tempdima{\linewidth}%
    \vtop{\hsize\@tempdima#1\par}}\vskip3\Cvs}
-%</report|book>
 %    \end{macrocode}
 % \end{macro}
+%
+% \subsection{|latex-lab-sec-template|への対応}
+%    \begin{macrocode}
+\ifdefined\ParseLaTeXeHeading
+\DeclareDocumentCommand \chapter {s ={shorttitle}o m} {
+%<book>    \if@mainmatter
+    \ParseLaTeXeHeading {chapter} {#1} {#2} {#3}
+%<*book>
+    \else
+      \IfBooleanTF{#1} {% starred:
+        \ParseLaTeXeHeading {chapter}{\BooleanTrue} {#2} {#3}
+      }{ \IfNoValueTF{#2}
+         {\ParseLaTeXeHeading {chapter}{\BooleanTrue} {shorttitle={#3}} {#3}}
+         {\ParseLaTeXeHeading {chapter}{\BooleanTrue} {#2} {#3}}
+      }
+    \fi
+%</book>
+}
+\setbox0\hbox{\huge\global\dimen0=1\zw}
+\expanded{%
+\DeclareInstance{heading}{chapter}{display}
+{
+\unexpanded{
+  , name           = chapter
+  , level          = 0
+  , placement      = normal
+  , start-code     =
+     \if@openleft \cleardoublepage \else
+     \if@openright \cleardoublepage \else \clearpage \fi \fi
+     \thispagestyle{jpl@in}%
+     \global\@topnum\z@\hbox{}\vskip2\Cvs%
+  , final-code     = \typeout{\@chapapp\space\thechapter\space\@chappos}
+  , after-vspace   = 3\Cvs
+  , number-format  = \@chapapp\thechapter\@chappos
+  , heading-decls  = \raggedright \parindent0pt \bfseries
+  , number-decls   = \huge
+  , title-decls    = \huge
+  , headformat-instance = ltjhang
+  , mark-cmd       = \chaptermark {#1}
+  , contents-extra = \addtocontents{lof}{\protect\addvspace{10\p@}}
+                     \addtocontents{lot}{\protect\addvspace{10\p@}}
+  , para-indent = true
+}%
+  , after-penalty-vspace = \the\dimexpr-\Cwd %%% TODO
+}
+\DeclareInstance{headformat}{ltjhang}{hang}{%
+  , heading-indent = 0pt
+  , number-title-sep = \the\dimen0
+}%
+}
+\fi
+%</report|book>
+%    \end{macrocode}
 %
 % \subsubsection{下位レベルの見出し}
 %

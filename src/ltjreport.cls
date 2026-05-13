@@ -561,6 +561,43 @@
    \leavevmode
    \setlength\@tempdima{\linewidth}%
    \vtop{\hsize\@tempdima#1\par}}\vskip3\Cvs}
+\ifdefined\ParseLaTeXeHeading
+\DeclareDocumentCommand \chapter {s ={shorttitle}o m} {
+    \ParseLaTeXeHeading {chapter} {#1} {#2} {#3}
+}
+\setbox0\hbox{\huge\global\dimen0=1\zw}
+\expanded{%
+\DeclareInstance{heading}{chapter}{display}
+{
+\unexpanded{
+  , name           = chapter
+  , level          = 0
+  , placement      = normal
+  , start-code     =
+     \if@openleft \cleardoublepage \else
+     \if@openright \cleardoublepage \else \clearpage \fi \fi
+     \thispagestyle{jpl@in}%
+     \global\@topnum\z@\hbox{}\vskip2\Cvs%
+  , final-code     = \typeout{\@chapapp\space\thechapter\space\@chappos}
+  , after-vspace   = 3\Cvs
+  , number-format  = \@chapapp\thechapter\@chappos
+  , heading-decls  = \raggedright \parindent0pt \bfseries
+  , number-decls   = \huge
+  , title-decls    = \huge
+  , headformat-instance = ltjhang
+  , mark-cmd       = \chaptermark {#1}
+  , contents-extra = \addtocontents{lof}{\protect\addvspace{10\p@}}
+                     \addtocontents{lot}{\protect\addvspace{10\p@}}
+  , para-indent = true
+}%
+  , after-penalty-vspace = \the\dimexpr-\Cwd
+}
+\DeclareInstance{headformat}{ltjhang}{hang}{%
+  , heading-indent = 0pt
+  , number-title-sep = \the\dimen0
+}%
+}
+\fi
 \newcommand{\section}{\@startsection{section}{1}{\z@}%
    {1.5\Cvs \@plus.5\Cvs \@minus.2\Cvs}%
    {.5\Cvs \@plus.3\Cvs}%
