@@ -602,15 +602,18 @@
   , contents-extra = \addtocontents{lof}{\protect\addvspace{10\p@}}
                      \addtocontents{lot}{\protect\addvspace{10\p@}}
   , para-indent    = true
+  , after-penalty-vspace = 0pt
 }%
-  , after-penalty-vspace = 0pt %%% TODO
 }
 \DeclareInstance{headformat}{ltjhang}{hang}
 {
   , heading-indent   = 0pt
   , number-title-sep = \the\dimen0
+  , title-format     = \dimen@\hangindent\vtop{\hsize\dimexpr\linewidth-\dimen@#1}
 }
 }
+\fi
+\ifdefined\ParseLaTeXeHeading
 \fi
 \newcommand{\section}{\@startsection{section}{1}{\z@}%
    {1.5\Cvs \@plus.5\Cvs \@minus.2\Cvs}%

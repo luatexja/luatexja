@@ -478,6 +478,22 @@
   \interlinepenalty\@M\normalfont
   \huge\bfseries#1\par}%
   \nobreak\vskip3ex\@afterheading}
+\ifdefined\ParseLaTeXeHeading
+\DeclareInstance{heading}{part}{display}
+{
+  , name          = part
+  , level         = -1
+  , placement     = page
+  , after-penalty-vspace = 4ex
+  , number-format = \prepartname\thepart\postpartname
+  , heading-decls =
+  , number-decls  = \Large\bfseries
+  , title-decls   = \Huge\bfseries
+  , headformat-instance = display
+  , after-vspace = 3ex
+  , mark-cmd      = \partmark {#1}
+}
+\fi
 \newcommand{\section}{\@startsection{section}{1}{\z@}%
    {1.5\Cvs \@plus.5\Cvs \@minus.2\Cvs}%
    {.5\Cvs \@plus.3\Cvs}%
