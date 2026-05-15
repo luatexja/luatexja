@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjtreport}
-  [2026-05-11 v1.8f-ltj-26
+  [2026-05-17 v1.8f-ltj-26
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -566,6 +566,29 @@
    \setlength\@tempdima{\linewidth}%
    \vtop{\hsize\@tempdima#1\par}}\vskip3\Cvs}
 \ifdefined\ParseLaTeXeHeading
+\DeclareInstance{heading}{part}{display}
+{
+  , name          = part
+  , level         = -1
+  , after-penalty-vspace = 0pt
+  , number-format = \prepartname\thepart\postpartname
+  , heading-decls = \centering\bfseries
+  , number-decls  = \huge
+  , title-decls   = \Huge
+  , headformat-instance = part
+  , mark-cmd      = \partmark {#1}
+  , start-code     =
+     \if@openleft \cleardoublepage \else
+     \if@openright \cleardoublepage \else \clearpage \fi \fi
+     \thispagestyle{empty}%
+     \if@twocolumn\onecolumn\@tempswatrue\else\@tempswafalse\fi
+     \null\vfil
+  , final-code     = \@endpart
+}
+\DeclareInstance{headformat}{part}{display}
+{
+  , heading-indent = 0pt
+}
 \DeclareDocumentCommand \chapter {s ={shorttitle}o m} {
     \ParseLaTeXeHeading {chapter} {#1} {#2} {#3}
 }
@@ -603,8 +626,6 @@
   , title-format     = \dimen@\hangindent\vtop{\hsize\dimexpr\linewidth-\dimen@#1}
 }
 }
-\fi
-\ifdefined\ParseLaTeXeHeading
 \fi
 \newcommand{\section}{\@startsection{section}{1}{\z@}%
    {1.5\Cvs \@plus.5\Cvs \@minus.2\Cvs}%

@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjarticle}
-  [2026-05-11 v1.8f-ltj-26
+  [2026-05-17 v1.8f-ltj-26
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -479,19 +479,26 @@
   \huge\bfseries#1\par}%
   \nobreak\vskip3ex\@afterheading}
 \ifdefined\ParseLaTeXeHeading
+\DeclareDocumentCommand \part {s ={shorttitle}o m}
+  { \ParseLaTeXeHeading {part} {#1} {#2} {#3} }
 \DeclareInstance{heading}{part}{display}
 {
   , name          = part
   , level         = -1
-  , placement     = page
-  , after-penalty-vspace = 4ex
-  , number-format = \prepartname\thepart\postpartname
-  , heading-decls =
-  , number-decls  = \Large\bfseries
-  , title-decls   = \Huge\bfseries
-  , headformat-instance = display
+  , before-vspace = 4ex
   , after-vspace = 3ex
   , mark-cmd      = \partmark {#1}
+  , number-format = \prepartname\thepart\postpartname
+  , heading-decls = \raggedright\parindent\z@\bfseries
+  , number-decls  = \Large
+  , title-decls   = \huge
+  , headformat-instance = part
+  , para-indent    = true
+}
+\DeclareInstance{headformat}{part}{display}
+{
+  , heading-indent   = 0pt
+  , number-title-sep = 0pt
 }
 \fi
 \newcommand{\section}{\@startsection{section}{1}{\z@}%

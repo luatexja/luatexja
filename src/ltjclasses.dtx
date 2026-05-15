@@ -142,8 +142,8 @@
 % \changes{v1.8f-ltj-23}{2022-09-12}{|\stockwidth|がカーネルで定義される可能性に対応．}
 % \changes{v1.8f-ltj-24}{2024-12-13}{TOCファイルに\cs{rensuji}を書き出すことをやめた}
 % \changes{v1.8f-ltj-25}{2025-03-28}{\LaTeXe~2025-06-01の更新に追従．}
-% \changes{v1.8f-ltj-26}{2026-05-11}{|latex-lab-title|, |latex-lab-toc-kernel-changes|と
-%    同様の変更を仕込みました．}
+% \changes{v1.8f-ltj-26}{2026-05-17}{|latex-lab-title|, |latex-lab-toc-kernel-changes|,
+%    |latex-lab-sec-templates|にある「新実装」と同様の変更を仕込みました．}
 % \fi
 %
 % \iffalse
@@ -173,7 +173,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2026-05-11 v1.8f-ltj-26
+  [2026-05-17 v1.8f-ltj-26
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -2498,7 +2498,7 @@
 % タイトルが組版されたら、|\title|コマンドなどの宣言を無効にできます。
 % |\and|の定義は、|\author|の引数でのみ使用しますので、破棄します。
 %
-% \changes{v1.8f-ltj-26}{2026-05-11}{|latex-lab-title|と同様の変更を仕込みました．}
+% \changes{v1.8f-ltj-26}{2026-05-17}{|latex-lab-title|と同様の変更を仕込みました．}
 %    \begin{macrocode}
   \global\let\title\relax
   \global\let\author\relax
@@ -3155,17 +3155,79 @@
    \leavevmode
    \setlength\@tempdima{\linewidth}%
    \vtop{\hsize\@tempdima#1\par}}\vskip3\Cvs}
+%</report|book>
 %    \end{macrocode}
 % \end{macro}
 %
-% \subsection{|latex-lab-sec-template|への対応}
-% \LaTeXe~2026-06-01では，|latex-lab|に新たな見出し命令の書式が追加されました．
-% 新書式では．
-% |\@startsection|を使って定義された|\section|以下の見出しは新書式への対応が
-% 自動的になされますが，|\secdef|命令を使って定義された|\part|,~|\chapter|は
-% そうではないので，ここで新しくコードを書いておきます．
+% \subsubsection{\texttt{latex-lab-sec-template}への対応}
+% [2026-05-17 LTJ]
+% \LaTeXe~2026-06-01では，|latex-lab-sec-template|に見出し命令の新実装が追加されました．
+% この新実装は，ソースの先頭（|\documentclass|より先）に|\DocumentMetaData|が
+% 指定された場合に自動で読み込まれるようになっています．
+%
+% 本クラスでの見出し命令は，前節までのように
+% sectionレベル以下の見出しは|\@startsection|マクロを，
+% partレベルとchapterレベルは|\secdef|マクロを使って定義しています．
+% 前者は新実装でも（ある程度）サポートされますが，後者はそうではないので，
+% 新しくコードを記述します．
+%
+% \paragraph{partレベル}
+% まず，partレベルの見出しの再定義です．
+% TODO: 目次．|\prepartname|, |\pospartname|を追加したい．
 %    \begin{macrocode}
 \ifdefined\ParseLaTeXeHeading
+%<*article>
+\DeclareDocumentCommand \part {s ={shorttitle}o m}
+  { \ParseLaTeXeHeading {part} {#1} {#2} {#3} }
+\DeclareInstance{heading}{part}{display}
+{
+  , name          = part
+  , level         = -1
+  , before-vspace = 4ex
+  , after-vspace = 3ex
+  , mark-cmd      = \partmark {#1}
+  , number-format = \prepartname\thepart\postpartname
+  , heading-decls = \raggedright\parindent\z@\bfseries
+  , number-decls  = \Large
+  , title-decls   = \huge
+  , headformat-instance = part
+  , para-indent    = true
+}
+\DeclareInstance{headformat}{part}{display}
+{
+  , heading-indent   = 0pt
+  , number-title-sep = 0pt
+}
+%</article>
+%<*report|book>
+\DeclareInstance{heading}{part}{display}
+{
+  , name          = part
+  , level         = -1
+  , after-penalty-vspace = 0pt
+  , number-format = \prepartname\thepart\postpartname
+  , heading-decls = \centering\bfseries
+  , number-decls  = \huge
+  , title-decls   = \Huge
+  , headformat-instance = part
+  , mark-cmd      = \partmark {#1}
+  , start-code     =
+     \if@openleft \cleardoublepage \else
+     \if@openright \cleardoublepage \else \clearpage \fi \fi
+     \thispagestyle{empty}%
+     \if@twocolumn\onecolumn\@tempswatrue\else\@tempswafalse\fi
+     \null\vfil
+  , final-code     = \@endpart
+}
+\DeclareInstance{headformat}{part}{display}
+{
+  , heading-indent = 0pt
+}
+%    \end{macrocode}
+%
+% \paragraph{chapterレベル}
+% 次に，chapterレベルの見出しの再定義です．
+%    \begin{macrocode}
 \DeclareDocumentCommand \chapter {s ={shorttitle}o m} {
 %<book>    \if@mainmatter
     \ParseLaTeXeHeading {chapter} {#1} {#2} {#3}
@@ -3230,25 +3292,7 @@
   , title-format     = \dimen@\hangindent\vtop{\hsize\dimexpr\linewidth-\dimen@#1}
 }
 }
-\fi
 %</report|book>
-\ifdefined\ParseLaTeXeHeading
-%<*article>
-\DeclareInstance{heading}{part}{display}
-{
-  , name          = part
-  , level         = -1
-  , placement     = page
-  , after-penalty-vspace = 4ex
-  , number-format = \prepartname\thepart\postpartname
-  , heading-decls = \parindent\z@
-  , number-decls  = \Large\bfseries
-  , title-decls   = \Huge\bfseries
-  , headformat-instance = display
-  , after-vspace = 3ex
-  , mark-cmd      = \partmark {#1}
-}
-%</article>
 \fi
 %    \end{macrocode}
 %
@@ -4234,7 +4278,7 @@
 % 切替えてもよいのですが、一時変数を意識したくないので、
 % 見出し番号の入るボックスを|\@lnumwidth|変数を用いて組み立てるように
 % |\numberline|マクロを再定義します。
-% \changes{v1.8f-ltj-26}{2026-05-11}{|latex-lab-toc-kernel-changes|での変更を追加}
+% \changes{v1.8f-ltj-26}{2026-05-17}{|latex-lab-toc-kernel-changes|での変更を追加}
 %    \begin{macrocode}
 \newdimen\@lnumwidth
 \def\numberline#1{\hb@xt@\@lnumwidth{%
@@ -4253,7 +4297,7 @@
 % \changes{v1.7a}{2016/11/16}{Added \cs{nobreak} for
 %    latex/2343 (sync with ltsect.dtx v1.0z)}
 % \changes{v1.8f-ltj-24}{2024-12-13}{TOCファイルに\cs{rensuji}を書き出すことをやめた}
-% \changes{v1.8f-ltj-26}{2026-05-11}{|latex-lab-toc-kernel-changes|での変更を追加}
+% \changes{v1.8f-ltj-26}{2026-05-17}{|latex-lab-toc-kernel-changes|での変更を追加}
 %    \begin{macrocode}
 \def\@dottedtocline#1#2#3#4#5{%
   \ifnum #1>\c@tocdepth \else
@@ -4292,6 +4336,7 @@
 % 縦組時には\cs{rensuji}でくくっていました。これでは|hyperref|パッケージと干渉してしまうので、
 % \cs{rensuji}は\cs{l@chapter}など実際の出力命令のほうに押し込めることにし、
 % \cs{addcontentsline}の再定義は削除します。
+%
 % \changes{v1.8f-ltj-24}{2024-12-13}{TOCファイルに\cs{rensuji}を書き出すことをやめた}
 %
 % \subsubsection{本文目次}
@@ -4321,7 +4366,7 @@
 % \begin{macro}{\l@part}
 % partレベルの目次です。
 % \changes{v1.8f-ltj-24}{2024-12-13}{TOCファイルに\cs{rensuji}を書き出すことをやめた}
-% \changes{v1.8f-ltj-26}{2026-05-11}{|latex-lab-toc-kernel-changes|での変更を追加}
+% \changes{v1.8f-ltj-26}{2026-05-17}{|latex-lab-toc-kernel-changes|での変更を追加}
 %    \begin{macrocode}
 \newcommand*{\l@part}[2]{%
   \ifnum \c@tocdepth >-2\relax
@@ -4360,7 +4405,7 @@
 % \begin{macro}{\l@chapter}
 % chapterレベルの目次です。
 % \changes{v1.8f-ltj-24}{2024-12-13}{TOCファイルに\cs{rensuji}を書き出すことをやめた}
-% \changes{v1.8f-ltj-26}{2026-05-11}{|latex-lab-toc-kernel-changes|での変更を追加}
+% \changes{v1.8f-ltj-26}{2026-05-17}{|latex-lab-toc-kernel-changes|での変更を追加}
 %    \begin{macrocode}
 %<*report|book>
 \newcommand*{\l@chapter}[2]{%
@@ -4395,7 +4440,7 @@
 % \begin{macro}{\l@section}
 % sectionレベルの目次です。
 % \changes{v1.8f-ltj-24}{2024-12-13}{TOCファイルに\cs{rensuji}を書き出すことをやめた}
-% \changes{v1.8f-ltj-26}{2026-05-11}{|latex-lab-toc-kernel-changes|での変更を追加}
+% \changes{v1.8f-ltj-26}{2026-05-17}{|latex-lab-toc-kernel-changes|での変更を追加}
 %    \begin{macrocode}
 %<*article>
 \newcommand*{\l@section}[2]{%
