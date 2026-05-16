@@ -2958,13 +2958,20 @@
 % reportとbookクラスの場合は、\Lcount{secnumdepth}が$-2$よりも大きいときに、
 % 見出し番号を付けます。$-2$以下では付けません。
 %
+% [2026-05-17 LTJ] |\addcontentsline{toc}|で\file{.toc}ファイルに書き出す内容を
+% 欧文グラスに合わせ
+%
+% |\contentsline{part}{\numberline{|\meta{num}|}|\meta{title}|}{|\meta{page}|}|
+%
+% \noindent の形式に合わせました．実際の目次内での書式を保つため，
+% |\l@part|内で|\numberline|の再定義を行うことにします．
 %    \begin{macrocode}
 %<*report|book>
 \def\@part[#1]#2{%
   \ifnum \c@secnumdepth >-2\relax
     \refstepcounter{part}%
     \addcontentsline{toc}{part}{%
-       \prepartname\thepart\postpartname\hspace{1em}#1}%
+       \protect\numberline{\thepart}#1}%
   \else
     \addcontentsline{toc}{part}{#1}%
   \fi
@@ -3076,6 +3083,11 @@
 % ますが、アスキーによる\file{jclasses}では二段組のままにされています。
 % したがって、チャプタータイトルより高い位置に右カラムの始点が来るという
 % 挙動になっていますが、コミュニティ版でもアスキー版の挙動を維持しています。
+%
+% [2026-05-17 LTJ] partレベルと同様に，|\addcontentsline{toc}|で\file{.toc}ファイルに
+% 書き出す内容を欧文グラスに合わせました．やはり実際の目次内での書式を保つため，
+% |\l@chapter|内で|\numberline|の再定義を行うことにします．
+%
 %    \begin{macrocode}
 \def\@chapter[#1]#2{%
   \ifnum \c@secnumdepth >\m@ne
@@ -3083,7 +3095,7 @@
     \refstepcounter{chapter}%
     \typeout{\@chapapp\space\thechapter\space\@chappos}%
     \addcontentsline{toc}{chapter}%
-      {\protect\numberline{\@chapapp\thechapter\@chappos}#1}%
+      {\protect\numberline{\thechapter}#1}%
 %<book>    \else\addcontentsline{toc}{chapter}{#1}\fi
   \else
     \addcontentsline{toc}{chapter}{#1}%
@@ -4269,6 +4281,9 @@
 % 切替えてもよいのですが、一時変数を意識したくないので、
 % 見出し番号の入るボックスを|\@lnumwidth|変数を用いて組み立てるように
 % |\numberline|マクロを再定義します。
+%
+% [2026-05-17 LTJ] |\l@part|,~|\l@chapter|内ではこの命令は再定義されるので，
+% |\numberline@orig|としてコピーしておきます．
 % \changes{v1.8f-ltj-26}{2026-05-17}{|latex-lab-toc-kernel-changes|での変更を追加}
 %    \begin{macrocode}
 \newdimen\@lnumwidth
@@ -4277,6 +4292,7 @@
   #1\hfil
   \UseHookWithArguments{contentsline/number/after}{1}{#1}%
 }}
+\let\numberline@orig\numberline
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -4368,12 +4384,10 @@
 % \noindent の形式で\file{.toc}ファイルに書き出されることに対応するための，
 % 「partレベル用|\numberline|」です．
 %    \begin{macrocode}
-\ifdefined\ParseLaTeXeHeading
 \def\numberline@part#1{\prepartname
 %<yoko>  #1%
 %<tate>  \rensuji{#1}%
   \postpartname\hspace{1em}}
-\fi
 \newcommand*{\l@part}[2]{%
   \ifnum \c@tocdepth >-2\relax
 %<article>    \addpenalty{\@secpenalty}%
@@ -4383,7 +4397,7 @@
     \parindent\z@\rightskip\@pnumwidth
     \parfillskip-\@pnumwidth
     {\leavevmode\large\bfseries
-     \ifdefined\numberline@part\let\numberline\numberline@part\fi
+     \let\numberline\numberline@part
      \UseHookWithArguments{contentsline/text/before}{4}%
        {\toclevel@part}{#1}{#2}{\@contentsline@destination}
      \setlength\@lnumwidth{4\zw}%
@@ -4416,24 +4430,19 @@
 % \changes{v1.8f-ltj-24}{2024-12-13}{\file{.toc}ファイルにページ番号を\cs{rensuji}を書き出すことをやめた}
 % \changes{v1.8f-ltj-26}{2026-05-17}{|latex-lab-toc-kernel-changes|での変更を追加}
 %
-% |\numberline@chapter|は|\numberline@part|のchapterレベルにおける対応物ですが，
-% 旧実装においても|\numberline|が使われることに注意が必要です．
+% |\numberline@chapter|は|\numberline@part|のchapterレベルにおける対応物です．
 %    \begin{macrocode}
 %<*report|book>
-\ifdefined\ParseLaTeXeHeading
 \def\numberline@chapter#1{\numberline@orig{\@chapapp
 %<yoko>  #1%
 %<tate>  \rensuji{#1}%
   \@chappos}}
-\fi
 \newcommand*{\l@chapter}[2]{%
   \ifnum \c@tocdepth >\m@ne
     \addpenalty{-\@highpenalty}%
     \addvspace{1.0em \@plus\p@}%
     \begingroup
-      \ifdefined\numberline@chapter
-        \let\numberline@orig\numberline\let\numberline\numberline@chapter
-      \fi
+      \let\numberline\numberline@chapter
       \parindent\z@ \rightskip\@pnumwidth \parfillskip-\rightskip
       \leavevmode\bfseries
       \setlength\@lnumwidth{4\zw}%

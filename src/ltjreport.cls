@@ -488,7 +488,7 @@
   \ifnum \c@secnumdepth >-2\relax
     \refstepcounter{part}%
     \addcontentsline{toc}{part}{%
-       \prepartname\thepart\postpartname\hspace{1em}#1}%
+       \protect\numberline{\thepart}#1}%
   \else
     \addcontentsline{toc}{part}{#1}%
   \fi
@@ -527,7 +527,7 @@
     \refstepcounter{chapter}%
     \typeout{\@chapapp\space\thechapter\space\@chappos}%
     \addcontentsline{toc}{chapter}%
-      {\protect\numberline{\@chapapp\thechapter\@chappos}#1}%
+      {\protect\numberline{\thechapter}#1}%
   \else
     \addcontentsline{toc}{chapter}{#1}%
   \fi
@@ -837,6 +837,7 @@
   #1\hfil
   \UseHookWithArguments{contentsline/number/after}{1}{#1}%
 }}
+\let\numberline@orig\numberline
 \def\@dottedtocline#1#2#3#4#5{%
   \ifnum #1>\c@tocdepth \else
     \vskip\toclineskip \@plus.2\p@
@@ -874,11 +875,9 @@
   }\@starttoc{toc}%
   \if@restonecol\twocolumn\fi
 }
-\ifdefined\ParseLaTeXeHeading
 \def\numberline@part#1{\prepartname
   #1%
   \postpartname\hspace{1em}}
-\fi
 \newcommand*{\l@part}[2]{%
   \ifnum \c@tocdepth >-2\relax
     \addpenalty{-\@highpenalty}%
@@ -887,7 +886,7 @@
     \parindent\z@\rightskip\@pnumwidth
     \parfillskip-\@pnumwidth
     {\leavevmode\large\bfseries
-     \ifdefined\numberline@part\let\numberline\numberline@part\fi
+     \let\numberline\numberline@part
      \UseHookWithArguments{contentsline/text/before}{4}%
        {\toclevel@part}{#1}{#2}{\@contentsline@destination}
      \setlength\@lnumwidth{4\zw}%
@@ -907,19 +906,15 @@
     \everypar{\global\@nobreakfalse\everypar{}}%
     \endgroup
   \fi}
-\ifdefined\ParseLaTeXeHeading
 \def\numberline@chapter#1{\numberline@orig{\@chapapp
   #1%
   \@chappos}}
-\fi
 \newcommand*{\l@chapter}[2]{%
   \ifnum \c@tocdepth >\m@ne
     \addpenalty{-\@highpenalty}%
     \addvspace{1.0em \@plus\p@}%
     \begingroup
-      \ifdefined\numberline@chapter
-        \let\numberline@orig\numberline\let\numberline\numberline@chapter
-      \fi
+      \let\numberline\numberline@chapter
       \parindent\z@ \rightskip\@pnumwidth \parfillskip-\rightskip
       \leavevmode\bfseries
       \setlength\@lnumwidth{4\zw}%

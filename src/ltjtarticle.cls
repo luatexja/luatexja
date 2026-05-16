@@ -721,6 +721,7 @@
   #1\hfil
   \UseHookWithArguments{contentsline/number/after}{1}{#1}%
 }}
+\let\numberline@orig\numberline
 \def\@dottedtocline#1#2#3#4#5{%
   \ifnum #1>\c@tocdepth \else
     \vskip\toclineskip \@plus.2\p@
@@ -755,11 +756,9 @@
     \@mkboth{\contentsname}{\contentsname}%
   }\@starttoc{toc}%
 }
-\ifdefined\ParseLaTeXeHeading
 \def\numberline@part#1{\prepartname
   \rensuji{#1}%
   \postpartname\hspace{1em}}
-\fi
 \newcommand*{\l@part}[2]{%
   \ifnum \c@tocdepth >-2\relax
     \addpenalty{\@secpenalty}%
@@ -768,7 +767,7 @@
     \parindent\z@\rightskip\@pnumwidth
     \parfillskip-\@pnumwidth
     {\leavevmode\large\bfseries
-     \ifdefined\numberline@part\let\numberline\numberline@part\fi
+     \let\numberline\numberline@part
      \UseHookWithArguments{contentsline/text/before}{4}%
        {\toclevel@part}{#1}{#2}{\@contentsline@destination}
      \setlength\@lnumwidth{4\zw}%
