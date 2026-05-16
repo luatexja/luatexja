@@ -9,7 +9,7 @@
 \def\ltj@ptc@array@err#1{\typeout{lltjp-array: patch FAILED (\detokenize{#1})}}
 
 \RequirePackage{etoolbox,array}
-
+\ExplSyntaxOn
 \patchcmd\insert@column{%
    \ignorespaces
 }{%
