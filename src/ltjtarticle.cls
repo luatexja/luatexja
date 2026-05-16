@@ -483,6 +483,7 @@
   \huge\bfseries#1\par}%
   \nobreak\vskip3ex\@afterheading}
 \ifdefined\ParseLaTeXeHeading
+\ExplSyntaxOn
 \DeclareDocumentCommand \part {s ={shorttitle}o m}
   { \ParseLaTeXeHeading {part} {#1} {#2} {#3} }
 \DeclareInstance{heading}{part}{display}
@@ -504,6 +505,7 @@
   , heading-indent   = 0pt
   , number-title-sep = 0pt
 }
+\ExplSyntaxOff
 \fi
 \newcommand{\section}{\@startsection{section}{1}{\z@}%
    {1.5\Cvs \@plus.5\Cvs \@minus.2\Cvs}%
@@ -753,6 +755,11 @@
     \@mkboth{\contentsname}{\contentsname}%
   }\@starttoc{toc}%
 }
+\ifdefined\ParseLaTeXeHeading
+\def\numberline@part#1{\prepartname
+  \rensuji{#1}%
+  \postpartname\hspace{1em}}
+\fi
 \newcommand*{\l@part}[2]{%
   \ifnum \c@tocdepth >-2\relax
     \addpenalty{\@secpenalty}%
@@ -761,6 +768,7 @@
     \parindent\z@\rightskip\@pnumwidth
     \parfillskip-\@pnumwidth
     {\leavevmode\large\bfseries
+     \ifdefined\numberline@part\let\numberline\numberline@part\fi
      \UseHookWithArguments{contentsline/text/before}{4}%
        {\toclevel@part}{#1}{#2}{\@contentsline@destination}
      \setlength\@lnumwidth{4\zw}%

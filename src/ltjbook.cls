@@ -566,6 +566,7 @@
    \setlength\@tempdima{\linewidth}%
    \vtop{\hsize\@tempdima#1\par}}\vskip3\Cvs}
 \ifdefined\ParseLaTeXeHeading
+\ExplSyntaxOn
 \DeclareInstance{heading}{part}{display}
 {
   , name          = part
@@ -601,40 +602,33 @@
       }
     \fi
 }
-\setbox0\hbox{\huge\global\dimen0=1\zw}
-\expanded{%
 \DeclareInstance{heading}{chapter}{display}
 {
-\unexpanded{
   , name           = chapter
   , level          = 0
   , placement      = normal
   , start-code     =
      \if@openleft \cleardoublepage \else
      \if@openright \cleardoublepage \else \clearpage \fi \fi
-     \thispagestyle{jpl@in}%
-     \global\@topnum\z@\hbox{}\vskip\dimexpr2\Cvs+\lineskip\nointerlineskip%
-  , final-code     = \typeout{\@chapapp\space\thechapter\space\@chappos}
+     \thispagestyle{jpl@in}\global\@topnum\z@\hbox{}%
+  , final-code     = \typeout{\@chapapp\space\arabic{chapter}\space\@chappos}
   , after-vspace   = 3\Cvs
   , number-format  = \@chapapp\thechapter\@chappos
-  , heading-decls  = \raggedright \parindent0pt \bfseries
-  , number-decls   = \huge
-  , title-decls    = \huge
-  , headformat-instance = ltjhang
+  , heading-decls  = \raggedright \parindent0pt \huge \bfseries
+  , headformat-instance = chapter
   , mark-cmd       = \chaptermark {#1}
   , contents-extra = \addtocontents{lof}{\protect\addvspace{10\p@}}
                      \addtocontents{lot}{\protect\addvspace{10\p@}}
   , para-indent    = true
-  , after-penalty-vspace = 0pt
-}%
+  , after-penalty-vspace = 2\Cvs
 }
-\DeclareInstance{headformat}{ltjhang}{hang}
+\DeclareInstance{headformat}{chapter}{hang}
 {
-  , heading-indent   = 0pt
-  , number-title-sep = \the\dimen0
-  , title-format     = \dimen@\hangindent\vtop{\hsize\dimexpr\linewidth-\dimen@#1}
+  , number-title-sep = 1\zw
+  , title-format     = \dimen@\hangindent\vtop{\hsize\dimexpr\linewidth-\dimen@#1}%
+                       \baselineskip\Cvs
 }
-}
+\ExplSyntaxOff
 \fi
 \newcommand{\section}{\@startsection{section}{1}{\z@}%
    {1.5\Cvs \@plus.5\Cvs \@minus.2\Cvs}%
@@ -893,6 +887,11 @@
   }\@starttoc{toc}%
   \if@restonecol\twocolumn\fi
 }
+\ifdefined\ParseLaTeXeHeading
+\def\numberline@part#1{\prepartname
+  #1%
+  \postpartname\hspace{1em}}
+\fi
 \newcommand*{\l@part}[2]{%
   \ifnum \c@tocdepth >-2\relax
     \addpenalty{-\@highpenalty}%
@@ -901,6 +900,7 @@
     \parindent\z@\rightskip\@pnumwidth
     \parfillskip-\@pnumwidth
     {\leavevmode\large\bfseries
+     \ifdefined\numberline@part\let\numberline\numberline@part\fi
      \UseHookWithArguments{contentsline/text/before}{4}%
        {\toclevel@part}{#1}{#2}{\@contentsline@destination}
      \setlength\@lnumwidth{4\zw}%
@@ -920,11 +920,19 @@
     \everypar{\global\@nobreakfalse\everypar{}}%
     \endgroup
   \fi}
+\ifdefined\ParseLaTeXeHeading
+\def\numberline@chapter#1{\numberline@orig{\@chapapp
+  #1%
+  \@chappos}}
+\fi
 \newcommand*{\l@chapter}[2]{%
   \ifnum \c@tocdepth >\m@ne
     \addpenalty{-\@highpenalty}%
     \addvspace{1.0em \@plus\p@}%
     \begingroup
+      \ifdefined\numberline@chapter
+        \let\numberline@orig\numberline\let\numberline\numberline@chapter
+      \fi
       \parindent\z@ \rightskip\@pnumwidth \parfillskip-\rightskip
       \leavevmode\bfseries
       \setlength\@lnumwidth{4\zw}%

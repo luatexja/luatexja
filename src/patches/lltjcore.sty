@@ -211,7 +211,7 @@
 % \@make@normalcolbox
 \def\pltx@adjust@wd@outputbox{%
   \unless\ifnum\ltjgetparameter{direction}=4
-    \vbox{\primitive\everypar{}\hskip\z@}%
+    \vbox{\primitive\everypar{}\hskip\z@\primitive\par}%
    \fi}
 \patchcmd{\@make@normalcolbox}{\vskip -\@outputbox@depth\@textbottom}%
   {\pltx@adjust@wd@outputbox\vskip -\@outputbox@depth\@textbottom}{}{\ltj@ptcerr{\@make@normalcolbox}}%

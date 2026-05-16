@@ -140,7 +140,7 @@
 % \changes{v1.8f-ltj-21}{2021-12-22}{余計なコメントの削除．}
 % \changes{v1.8f-ltj-22}{2022-04-11}{kern featureが有効になっていたのを修正．}
 % \changes{v1.8f-ltj-23}{2022-09-12}{|\stockwidth|がカーネルで定義される可能性に対応．}
-% \changes{v1.8f-ltj-24}{2024-12-13}{TOCファイルに\cs{rensuji}を書き出すことをやめた}
+% \changes{v1.8f-ltj-24}{2024-12-13}{\file{.toc}ファイルにページ番号を\cs{rensuji}を書き出すことをやめた}
 % \changes{v1.8f-ltj-25}{2025-03-28}{\LaTeXe~2025-06-01の更新に追従．}
 % \changes{v1.8f-ltj-26}{2026-05-17}{|latex-lab-title|, |latex-lab-toc-kernel-changes|,
 %    |latex-lab-sec-templates|にある「新実装」と同様の変更を仕込みました．}
@@ -3173,9 +3173,9 @@
 %
 % \paragraph{partレベル}
 % まず，partレベルの見出しの再定義です．
-% TODO: 目次．|\prepartname|, |\pospartname|を追加したい．
 %    \begin{macrocode}
 \ifdefined\ParseLaTeXeHeading
+\ExplSyntaxOn
 %<*article>
 \DeclareDocumentCommand \part {s ={shorttitle}o m}
   { \ParseLaTeXeHeading {part} {#1} {#2} {#3} }
@@ -3242,57 +3242,48 @@
     \fi
 %</book>
 }
-\setbox0\hbox{\huge\global\dimen0=1\zw}
-\expanded{%
 \DeclareInstance{heading}{chapter}{display}
 {
-\unexpanded{
   , name           = chapter
   , level          = 0
   , placement      = normal
 %    \end{macrocode}
+%
 % もともとの|\chapter|命令の最初で実行されていた，改ページ処理と
 % ページスタイル・|\@topnum|の変更処理です．
 %
-% 本来なら前空きの設定は|after-penalty-vspace|キーに設定します．しかし，
-% 上の|\@makechapterhead|命令では見出しが出力される段落の終了前で
-% |\huge|の有効範囲が終わっている一方で，headformat~|hang|ではそのようになっていません．
-% そのため，
-% \begin{itemize}
-%  \item |\makechapterhead|で作られる見出しの直前には|\lineskip|が
-%   入ることを想定し，前空きに|\lineskip|の分量を加えておく
-%  \item 空きの直後と見出し本体の間に空白（|\baselineskip|由来）が入ることを避けるため
-%   |\nointerlineskip|を発行する
-% \end{itemize}
-% ことで|\@makechapterhead|に挙動を合わせておくことにします．
 %    \begin{macrocode}
   , start-code     =
      \if@openleft \cleardoublepage \else
      \if@openright \cleardoublepage \else \clearpage \fi \fi
-     \thispagestyle{jpl@in}%
-     \global\@topnum\z@\hbox{}\vskip\dimexpr2\Cvs+\lineskip\nointerlineskip%
-  , final-code     = \typeout{\@chapapp\space\thechapter\space\@chappos}
+     \thispagestyle{jpl@in}\global\@topnum\z@\hbox{}%
+  , final-code     = \typeout{\@chapapp\space\arabic{chapter}\space\@chappos}
   , after-vspace   = 3\Cvs
   , number-format  = \@chapapp\thechapter\@chappos
-  , heading-decls  = \raggedright \parindent0pt \bfseries
-  , number-decls   = \huge
-  , title-decls    = \huge
-  , headformat-instance = ltjhang
+  , heading-decls  = \raggedright \parindent0pt \huge \bfseries
+  , headformat-instance = chapter
   , mark-cmd       = \chaptermark {#1}
   , contents-extra = \addtocontents{lof}{\protect\addvspace{10\p@}}
                      \addtocontents{lot}{\protect\addvspace{10\p@}}
   , para-indent    = true
-  , after-penalty-vspace = 0pt
-}%
+  , after-penalty-vspace = 2\Cvs
 }
-\DeclareInstance{headformat}{ltjhang}{hang}
+%    \end{macrocode}
+%
+% 見出し本体の組み立て（周囲の空白は除く）部分です．
+% 見出し本体が収まる段落は|heading-decls|の有効範囲終了\emph{内}で終了する関係上，
+% この段落と前後の空きをもともとの|\chapter|に揃えるため，タイトル出力後に
+% |\baselineskip|を本文の行送り|\Cvs|に上書きしています．
+%
+%    \begin{macrocode}
+\DeclareInstance{headformat}{chapter}{hang}
 {
-  , heading-indent   = 0pt
-  , number-title-sep = \the\dimen0
-  , title-format     = \dimen@\hangindent\vtop{\hsize\dimexpr\linewidth-\dimen@#1}
-}
+  , number-title-sep = 1\zw
+  , title-format     = \dimen@\hangindent\vtop{\hsize\dimexpr\linewidth-\dimen@#1}%
+                       \baselineskip\Cvs
 }
 %</report|book>
+\ExplSyntaxOff
 \fi
 %    \end{macrocode}
 %
@@ -4296,7 +4287,7 @@
 % \changes{v1.3}{2001/10/04}{第５引数の書体を\cs{rmfamily}から\cs{normalfont}に変更}
 % \changes{v1.7a}{2016/11/16}{Added \cs{nobreak} for
 %    latex/2343 (sync with ltsect.dtx v1.0z)}
-% \changes{v1.8f-ltj-24}{2024-12-13}{TOCファイルに\cs{rensuji}を書き出すことをやめた}
+% \changes{v1.8f-ltj-24}{2024-12-13}{\file{.toc}ファイルにページ番号を\cs{rensuji}を書き出すことをやめた}
 % \changes{v1.8f-ltj-26}{2026-05-17}{|latex-lab-toc-kernel-changes|での変更を追加}
 %    \begin{macrocode}
 \def\@dottedtocline#1#2#3#4#5{%
@@ -4337,7 +4328,7 @@
 % \cs{rensuji}は\cs{l@chapter}など実際の出力命令のほうに押し込めることにし、
 % \cs{addcontentsline}の再定義は削除します。
 %
-% \changes{v1.8f-ltj-24}{2024-12-13}{TOCファイルに\cs{rensuji}を書き出すことをやめた}
+% \changes{v1.8f-ltj-24}{2024-12-13}{\file{.toc}ファイルにページ番号を\cs{rensuji}を書き出すことをやめた}
 %
 % \subsubsection{本文目次}
 %
@@ -4364,10 +4355,25 @@
 % \end{macro}
 %
 % \begin{macro}{\l@part}
+% \begin{macro}{\numberline@part}
 % partレベルの目次です。
-% \changes{v1.8f-ltj-24}{2024-12-13}{TOCファイルに\cs{rensuji}を書き出すことをやめた}
+% \changes{v1.8f-ltj-24}{2024-12-13}{\file{.toc}ファイルにページ番号を\cs{rensuji}を書き出すことをやめた}
 % \changes{v1.8f-ltj-26}{2026-05-17}{|latex-lab-toc-kernel-changes|での変更を追加}
+%
+% |\numberline@part|は，|latex-lab-sec-template|による見出し命令の再実装では，
+% partレベルやchapterレベルでも
+%
+% |\contentsline{part}{\numberline{|\meta{num}|}|\meta{title}|}{|\meta{page}|}|
+%
+% \noindent の形式で\file{.toc}ファイルに書き出されることに対応するための，
+% 「partレベル用|\numberline|」です．
 %    \begin{macrocode}
+\ifdefined\ParseLaTeXeHeading
+\def\numberline@part#1{\prepartname
+%<yoko>  #1%
+%<tate>  \rensuji{#1}%
+  \postpartname\hspace{1em}}
+\fi
 \newcommand*{\l@part}[2]{%
   \ifnum \c@tocdepth >-2\relax
 %<article>    \addpenalty{\@secpenalty}%
@@ -4377,6 +4383,7 @@
     \parindent\z@\rightskip\@pnumwidth
     \parfillskip-\@pnumwidth
     {\leavevmode\large\bfseries
+     \ifdefined\numberline@part\let\numberline\numberline@part\fi
      \UseHookWithArguments{contentsline/text/before}{4}%
        {\toclevel@part}{#1}{#2}{\@contentsline@destination}
      \setlength\@lnumwidth{4\zw}%
@@ -4401,18 +4408,32 @@
   \fi}
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
 %
 % \begin{macro}{\l@chapter}
+% \begin{macro}{\numberline@chapter}
 % chapterレベルの目次です。
-% \changes{v1.8f-ltj-24}{2024-12-13}{TOCファイルに\cs{rensuji}を書き出すことをやめた}
+% \changes{v1.8f-ltj-24}{2024-12-13}{\file{.toc}ファイルにページ番号を\cs{rensuji}を書き出すことをやめた}
 % \changes{v1.8f-ltj-26}{2026-05-17}{|latex-lab-toc-kernel-changes|での変更を追加}
+%
+% |\numberline@chapter|は|\numberline@part|のchapterレベルにおける対応物ですが，
+% 旧実装においても|\numberline|が使われることに注意が必要です．
 %    \begin{macrocode}
 %<*report|book>
+\ifdefined\ParseLaTeXeHeading
+\def\numberline@chapter#1{\numberline@orig{\@chapapp
+%<yoko>  #1%
+%<tate>  \rensuji{#1}%
+  \@chappos}}
+\fi
 \newcommand*{\l@chapter}[2]{%
   \ifnum \c@tocdepth >\m@ne
     \addpenalty{-\@highpenalty}%
     \addvspace{1.0em \@plus\p@}%
     \begingroup
+      \ifdefined\numberline@chapter
+        \let\numberline@orig\numberline\let\numberline\numberline@chapter
+      \fi
       \parindent\z@ \rightskip\@pnumwidth \parfillskip-\rightskip
       \leavevmode\bfseries
       \setlength\@lnumwidth{4\zw}%
@@ -4436,10 +4457,11 @@
 %</report|book>
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
 %
 % \begin{macro}{\l@section}
 % sectionレベルの目次です。
-% \changes{v1.8f-ltj-24}{2024-12-13}{TOCファイルに\cs{rensuji}を書き出すことをやめた}
+% \changes{v1.8f-ltj-24}{2024-12-13}{\file{.toc}ファイルにページ番号を\cs{rensuji}を書き出すことをやめた}
 % \changes{v1.8f-ltj-26}{2026-05-17}{|latex-lab-toc-kernel-changes|での変更を追加}
 %    \begin{macrocode}
 %<*article>

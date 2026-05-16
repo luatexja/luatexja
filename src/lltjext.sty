@@ -115,7 +115,8 @@
   \let\@end@alignbox\relax
   \if #1t\relax     \let\@begin@alignbox\vtop
   \else\if #1b\relax\let\@begin@alignbox\vbox
-  \else             \let\@begin@alignbox\vcenter
+  \else             
+    \ifmmode\let\@begin@alignbox\vcenter\else\let\@begin@alignbox\vcenter@text\fi
   \fi\fi}
 \def\fork@array@option@@B#1{%
   \if #1t\relax
@@ -125,14 +126,15 @@
     \def\@begin@alignbox{\vbox\bgroup\vbox}%
     \def\@end@alignbox{\kern\z@\egroup}%
   \else
-    \let\@begin@alignbox\vcenter
+    \ifmmode\let\@begin@alignbox\vcenter\else\let\@begin@alignbox\vcenter@text\fi
     \let\@end@alignbox\relax
   \fi\fi}
 \def\fork@array@option@@C#1{%
   \let\@end@alignbox\relax
   \if #1t\relax     \let\@begin@alignbox\vbox
   \else\if #1b\relax\let\@begin@alignbox\vtop
-  \else             \let\@begin@alignbox\vcenter
+  \else
+    \ifmmode\let\@begin@alignbox\vcenter\else\let\@begin@alignbox\vcenter@text\fi
   \fi\fi}
 \def\fork@array@option<#1>[#2]{%
 \ifnum\ltj@ext@dir=4 % yoko
@@ -158,7 +160,7 @@
          \ltjgetparameter{talbaselineshift}-\ltjgetparameter{yalbaselineshift}\vbox}
       \let\@end@alignbox\relax
     \else
-      \let\@begin@alignbox\vcenter
+      \ifmmode\let\@begin@alignbox\vcenter\else\let\@begin@alignbox\vcenter@text\fi
       \let\@end@alignbox\relax
     \fi\fi
   \fi\fi\fi
@@ -176,7 +178,7 @@
          \ltjgetparameter{yalbaselineshift}-\ltjgetparameter{talbaselineshift}\vbox}
       \let\@end@alignbox\relax
     \else
-      \let\@begin@alignbox\vcenter
+      \ifmmode\let\@begin@alignbox\vcenter\else\let\@begin@alignbox\vcenter@text\fi
       \let\@end@alignbox\relax
     \fi\fi
   \fi\fi\fi
