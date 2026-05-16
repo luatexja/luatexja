@@ -616,8 +616,11 @@
 \DeclareInstance{headformat}{chapter}{hang}
 {
   , number-title-sep = 1\zw
-  , title-format     = \dimen@\hangindent\vtop{\hsize\dimexpr\linewidth-\dimen@#1}%
-                       \baselineskip\Cvs
+  , title-format     =
+    \dimen@\hangindent
+    \vtop{\hsize\dimexpr\linewidth-\dimen@
+      \primitive\everypar{}#1\primitive\par}%
+    \baselineskip\Cvs
 }
 \ExplSyntaxOff
 \fi
@@ -892,11 +895,11 @@
     {\leavevmode\large\bfseries
      \let\numberline\numberline@part
      \UseHookWithArguments{contentsline/text/before}{4}%
-       {\toclevel@part}{#1}{#2}{\@contentsline@destination}
+       {\toclevel@part}{#1}{#2}{\@contentsline@destination}%
      \setlength\@lnumwidth{4\zw}%
      \csname contentsline@text@-1@format\endcsname{#1}%
      \UseHookWithArguments{contentsline/text/after}{4}%
-       {\toclevel@part}{#1}{#2}{\@contentsline@destination}
+       {\toclevel@part}{#1}{#2}{\@contentsline@destination}%
      \hfil\nobreak
      \hb@xt@\@pnumwidth{\hss
        \UseHookWithArguments{contentsline/page/before}{4}%

@@ -44,7 +44,7 @@
 %<*driver>
 \ProvidesFile{ltjsclasses.dtx}
 %</driver>
-  [2026-05-11 ltjsclasses ]
+  [2026-05-17 ltjsclasses ]
 %<*driver>
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \documentclass[disablejfam]{ltjsarticle}
@@ -2513,7 +2513,7 @@
 % |\jsc@smallskip| に置き換えました。|\smallskip| のままでは
 % \texttt{nomag(*)} の場合にスケールしなくなり，レイアウトが変わってしまいます。
 %
-% [2026-05-11 LTJ] |latex-lab-title|での変更を取り込みました．
+% [2026-05-17 LTJ] |latex-lab-title|での変更を取り込みました．
 %
 %    \begin{macrocode}
 %<*article|book|report|kiyou>
@@ -2617,7 +2617,7 @@
 %
 % 独立した表題ページを作らない場合の表題の出力形式です。
 %
-% [2026-05-11 LTJ] |latex-lab-title|での変更を取り込みました．
+% [2026-05-17 LTJ] |latex-lab-title|での変更を取り込みました．
 %
 %    \begin{macrocode}
   \def\@maketitle{%
@@ -2752,7 +2752,7 @@
 % を参考にさせていただきましたが，完全に行送りが |\baselineskip|
 % の整数倍にならなくてもいいから前の行と重ならないようにしました。
 %
-% [2026-05-11 LTJ] |latex-lab-sec-template|では|\@startsection|が書き直されたので，
+% [2026-05-17 LTJ] |latex-lab-sec-template|では|\@startsection|が書き直されたので，
 % それに合わせて再定義をやり直します．
 %    \begin{macrocode}
 \ExplSyntaxOn
@@ -2802,10 +2802,11 @@
        }
 %    \end{macrocode}
 %
-% [2026-05-11 LTJ] |\paragraph|の最初にマークをつける処理は，
+% [2026-05-17 LTJ] |\paragraph|の最初にマークをつける処理は，
 % 従来は|\@startsection|の第6引数に|\jsParagraphMark|を追加する方法で
 % 実装していましたが，新たな|\@startsection|では失敗します．
-% そのため，|\@startsection|の再定義の中に仕込んでしまうことにします．
+% そのため，どう見ても気持ち悪いですが，
+% |\@startsection|の再定義の中に仕込んでしまうことにします．
 %
 %    \begin{macrocode}
        \DeclareInstance{headformat}{#1-@startsection}{runin}{
@@ -2822,7 +2823,7 @@
 \RenewCommandCopy\kernel@startsection\@startsection
 %    \end{macrocode}
 %
-% [2026-05-11 LTJ] 旧来の|\@startsection|の再定義です．
+% [2026-05-17 LTJ] 旧来の|\@startsection|の再定義です．
 %
 %    \begin{macrocode}
 \else
@@ -3218,13 +3219,21 @@
 % |book| および |report| クラス以外では |secnumdepth| が $-1$ より大きいとき
 % 部番号を付けます。
 %
+% [2026-05-17 LTJ] |\addcontentsline{toc}|で\file{.toc}ファイルに書き出す内容を
+% 欧文グラスやltjclassesに合わせ
+%
+% |\contentsline{part}{\numberline{|\meta{num}|}|\meta{title}|}{|\meta{page}|}|
+%
+% \noindent の形式に合わせました．実際の目次内での書式を保つため，
+% |\l@part|内で|\numberline|の再定義を行うことにします．
+%
 %    \begin{macrocode}
 %<*!book&!report>
 \def\@part[#1]#2{%
   \ifnum \c@secnumdepth >\m@ne
     \refstepcounter{part}%
     \addcontentsline{toc}{part}{%
-      \prepartname\thepart\postpartname\hspace{1\zw}#1}%
+      \protect\numberline{\thepart}#1}%
   \else
     \addcontentsline{toc}{part}{#1}%
   \fi
@@ -3253,7 +3262,7 @@
   \ifnum \c@secnumdepth >-2\relax
     \refstepcounter{part}%
     \addcontentsline{toc}{part}{%
-      \prepartname\thepart\postpartname\hspace{1\zw}#1}%
+      \protect\numberline{\thepart}#1}%
   \else
     \addcontentsline{toc}{part}{#1}%
   \fi
@@ -3351,6 +3360,10 @@
 % 章見出しを出力します。
 % |secnumdepth| が0以上かつ |\@mainmatter| が真のとき章番号を出力します。
 %
+% [2026-05-17 LTJ] partレベルと同様に，|\addcontentsline{toc}|で\file{.toc}ファイルに
+% 書き出す内容を欧文グラスやltjclassesに合わせました．やはり実際の目次内での書式を保つため，
+% |\l@chapter|内で|\numberline|の再定義を行うことにします．
+%
 %    \begin{macrocode}
 \def\@chapter[#1]#2{%
   \@omit@numberfalse
@@ -3359,10 +3372,7 @@
       \refstepcounter{chapter}%
       \typeout{\@chapapp\thechapter\@chappos}%
       \addcontentsline{toc}{chapter}%
-        {\protect\numberline
-        % {\if@english\thechapter\else\@chapapp\thechapter\@chappos\fi}%
-        {\@chapapp\thechapter\@chappos}%
-        #1}%
+        {\protect\numberline{\thechapter}#1}%
 %<book>    \else\addcontentsline{toc}{chapter}{#1}\fi
   \else
     \addcontentsline{toc}{chapter}{#1}%
@@ -3433,6 +3443,116 @@
 %</book|report>
 %    \end{macrocode}
 % \end{macro}
+%
+% \paragraph{\texttt{latex-lab-sec-template}への対応}
+% [2026-05-17 LTJ]
+% \LaTeXe~2026-06-01では，|latex-lab-sec-template|に見出し命令の新実装が追加されました．
+% この新実装は，ソースの先頭（|\documentclass|より先）に|\DocumentMetaData|が
+% 指定された場合に自動で読み込まれるようになっています．
+%
+% partレベルとchapterレベルは従来|\secdef|マクロを使って定義しており，
+% 新実装でのサポートレベルは高くないので，新しくコードを記述します．
+%
+% まず，partレベルの見出しの再定義です．
+%    \begin{macrocode}
+\ifdefined\ParseLaTeXeHeading
+\ExplSyntaxOn
+%<*article>
+\DeclareDocumentCommand \part {s ={shorttitle}o m}
+  { \ParseLaTeXeHeading {part} {#1} {#2} {#3} }
+\DeclareInstance{heading}{part}{display}
+{
+  , name          = part
+  , level         = -1
+  , before-vspace = 4ex
+  , after-vspace = 3ex
+  , mark-cmd      = \partmark {#1}
+  , number-format = \prepartname\thepart\postpartname
+  , heading-decls = \raggedright\parindent\z@\headfont
+  , number-decls  = \Large
+  , title-decls   = \huge
+  , headformat-instance = part
+  , para-indent    =  \if@english false\else true \fi
+}
+\DeclareInstance{headformat}{part}{display}
+{
+  , heading-indent   = 0pt
+  , number-title-sep = 0pt
+}
+%</article>
+%<*report|book>
+\DeclareInstance{heading}{part}{display}
+{
+  , name          = part
+  , level         = -1
+  , after-penalty-vspace = 0pt
+  , number-format = \prepartname\thepart\postpartname
+  , heading-decls = \centering\headfont
+  , number-decls  = \huge
+  , title-decls   = \Huge
+  , headformat-instance = part
+  , mark-cmd      = \partmark {#1}
+  , start-code    =
+     \if@openleft \cleardoublepage \else
+     \if@openright \cleardoublepage \else \clearpage \fi \fi
+     \thispagestyle{empty}%
+     \if@twocolumn\onecolumn\@restonecoltrue\else\@restonecolfalse\fi
+     \null\vfil
+  , final-code    = \@endpart
+}
+\DeclareInstance{headformat}{part}{display}
+{
+  , heading-indent = 0pt
+  , number-title-sep = 20pt
+}
+%    \end{macrocode}
+%
+% 次に，chapterレベルです．
+%
+%    \begin{macrocode}
+\DeclareDocumentCommand \chapter {s ={shorttitle}o m} {
+%<book>    \if@mainmatter
+    \ParseLaTeXeHeading {chapter} {#1} {#2} {#3}
+%<*book>
+    \else
+      \IfBooleanTF{#1} {% starred:
+        \ParseLaTeXeHeading {chapter}{\BooleanTrue} {#2} {#3}
+      }{ \IfNoValueTF{#2}
+         {\ParseLaTeXeHeading {chapter}{\BooleanTrue} {shorttitle={#3}} {#3}}
+         {\ParseLaTeXeHeading {chapter}{\BooleanTrue} {#2} {#3}}
+      }
+    \fi
+%</book>
+}
+\DeclareInstance{heading}{chapter}{display}
+{
+  , name           = chapter
+  , level          = 0
+  , placement      = normal
+  , start-code     =
+     \if@openleft \cleardoublepage \else
+     \if@openright \cleardoublepage \else \clearpage \fi \fi
+     \plainifnotempty\global\@topnum\z@
+  , final-code     = \typeout{\@chapapp\space\arabic{chapter}\space\@chappos}
+  , after-vspace   = 3\Cvs
+  , number-format  = \@chapapp\thechapter\@chappos
+  , heading-decls  = \raggedright \parindent0pt \huge \headfont
+  , title-decls    = \Huge
+  , headformat-instance = chapter
+  , mark-cmd       = \chaptermark {#1}
+  , contents-extra = \addtocontents{lof}{\protect\addvspace{10\p@}}
+                     \addtocontents{lot}{\protect\addvspace{10\p@}}
+  , para-indent    = true
+  , after-penalty-vspace = 2\Cvs
+}
+\DeclareInstance{headformat}{chapter}{display}
+{
+  , number-title-sep = \Cvs
+}
+%</report|book>
+\ExplSyntaxOff
+\fi
+%    \end{macrocode}
 %
 % \paragraph{下位レベルの見出し}
 %
@@ -3518,7 +3638,7 @@
 % とすれば「★」に変更できますし，マークを空にすることも容易です。
 % なお，某学会クラスでは従来どおりマークは付きません。
 %
-% [2026-05-11 LTJ] |\paragraph|の最初にマークをつける処理は，
+% [2026-05-17 LTJ] |\paragraph|の最初にマークをつける処理は，
 % |latex-lab-sec-template|が読み込まれている状況下では
 % |\@startsection|の再定義に移しました．
 %
@@ -4651,12 +4771,20 @@
 % \end{macro}\end{macro}
 %
 % \begin{macro}{\l@part}
-%
+% \begin{macro}{\numberline@part}
 % 部の目次です。
 %
-% [2026-05-11 LTJ] |latex-lab-toc-kerel-changes|での変更を取り込みました．
+% [2026-05-17 LTJ] |latex-lab-toc-kerel-changes|での変更を取り込みました．
+% |\numberline@part|は，|latex-lab-sec-template|による見出し命令の再実装では，
+% partレベルやchapterレベルでも
+%
+% |\contentsline{part}{\numberline{|\meta{num}|}|\meta{title}|}{|\meta{page}|}|
+%
+% \noindent の形式で\file{.toc}ファイルに書き出されることに対応するための，
+% 「partレベル用|\numberline|」です．
 %
 %    \begin{macrocode}
+\def\numberline@part#1{\prepartname#1\postpartname\hspace{1\zw}}
 \newcommand*{\l@part}[2]{%
   \ifnum \c@tocdepth >-2\relax
 %<!book&!report>    \addpenalty\@secpenalty
@@ -4670,12 +4798,13 @@
       \parfillskip -\rightskip
       {\leavevmode
         \large \headfont
+        \let\numberline\numberline@part
         \UseHookWithArguments{contentsline/text/before}{4}%
-          {\toclevel@part}{#1}{#2}{\@contentsline@destination}
+          {\toclevel@part}{#1}{#2}{\@contentsline@destination}%
         \setlength\@lnumwidth{4\zw}%
-        \csname contentsline@text@-1@format\endcsname{#1}%
+        \relax\csname contentsline@text@-1@format\endcsname{#1}%
         \UseHookWithArguments{contentsline/text/after}{4}%
-          {\toclevel@part}{#1}{#2}{\@contentsline@destination}
+          {\toclevel@part}{#1}{#2}{\@contentsline@destination}%
         \hfil\nobreak
         \hb@xt@\@pnumwidth{\hss
           \UseHookWithArguments{contentsline/page/before}{4}%
@@ -4699,16 +4828,19 @@
 % [2013-12-30] |\@lnumwidth| を |\jsc@tocl@width| から
 % 決めるようにしてみました。(by ts)
 %
-% [2026-05-11 LTJ] |latex-lab-toc-kerel-changes|での変更を取り込みました．
+% [2026-05-17 LTJ] |latex-lab-toc-kerel-changes|での変更を取り込みました．
+% |\numberline@chapter|は|\numberline@part|のchapterレベルにおける対応物です．
 %
 %    \begin{macrocode}
 %<*book|report>
+\def\numberline@chapter#1{\numberline@orig{\@chapapp#1\@chappos}}
 \newcommand*{\l@chapter}[2]{%
   \ifnum \c@tocdepth >\m@ne
     \addpenalty{-\@highpenalty}%
     \addvspace{1.0em \@plus\jsc@mpt}
 %   \vskip 1.0em \@plus\p@   % book.clsでは↑がこうなっている
     \begingroup
+      \let\numberline\numberline@chapter
       \parindent\z@
 %     \rightskip\@pnumwidth
       \rightskip\@tocrmarg
@@ -4740,7 +4872,7 @@
 %
 % 節の目次です。
 %
-% [2026-05-11 LTJ] |latex-lab-toc-kerel-changes|での変更を取り込みました．
+% [2026-05-17 LTJ] |latex-lab-toc-kerel-changes|での変更を取り込みました．
 %
 %    \begin{macrocode}
 %<*!book&!report>
@@ -4860,6 +4992,9 @@
 % 後続文字が全角か半角かでスペースが変わらないように |\hspace|
 % を入れておきました。
 %
+% [2026-05-17 LTJ] |\l@part|,~|\l@chapter|内ではこの命令は再定義されるので，
+% |\numberline@orig|としてコピーしておきます．
+%
 %    \begin{macrocode}
 \newdimen\@lnumwidth
 \def\numberline#1{\hb@xt@\@lnumwidth{%
@@ -4867,6 +5002,7 @@
   #1\hfil
   \UseHookWithArguments{contentsline/number/after}{1}{#1}%
 }\hspace{0pt}}
+\let\numberline@orig\numberline
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}

@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsarticle}
-  [2026-05-11 ltjsclasses ]
+  [2026-05-17 ltjsclasses ]
 \def\jsc@clsname{ltjsarticle}
 \def\Cjascale{0.924715}
 \RequirePackage{luatexja}
@@ -974,7 +974,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \ifnum \c@secnumdepth >\m@ne
     \refstepcounter{part}%
     \addcontentsline{toc}{part}{%
-      \prepartname\thepart\postpartname\hspace{1\zw}#1}%
+      \protect\numberline{\thepart}#1}%
   \else
     \addcontentsline{toc}{part}{#1}%
   \fi
@@ -1000,6 +1000,31 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \nobreak
   \vskip 3ex
   \@afterheading}
+\ifdefined\ParseLaTeXeHeading
+\ExplSyntaxOn
+\DeclareDocumentCommand \part {s ={shorttitle}o m}
+  { \ParseLaTeXeHeading {part} {#1} {#2} {#3} }
+\DeclareInstance{heading}{part}{display}
+{
+  , name          = part
+  , level         = -1
+  , before-vspace = 4ex
+  , after-vspace = 3ex
+  , mark-cmd      = \partmark {#1}
+  , number-format = \prepartname\thepart\postpartname
+  , heading-decls = \raggedright\parindent\z@\headfont
+  , number-decls  = \Large
+  , title-decls   = \huge
+  , headformat-instance = part
+  , para-indent    =  \if@english false\else true \fi
+}
+\DeclareInstance{headformat}{part}{display}
+{
+  , heading-indent   = 0pt
+  , number-title-sep = 0pt
+}
+\ExplSyntaxOff
+\fi
 \if@twocolumn
   \newcommand{\section}{%
     \@startsection{section}{1}{\z@}%
@@ -1317,6 +1342,7 @@ class has defined the old font commands like\MessageBreak
   \@mkboth{\contentsname}{\contentsname}%
   \@starttoc{toc}%
 }
+\def\numberline@part#1{\prepartname#1\postpartname\hspace{1\zw}}
 \newcommand*{\l@part}[2]{%
   \ifnum \c@tocdepth >-2\relax
     \addpenalty\@secpenalty
@@ -1327,12 +1353,13 @@ class has defined the old font commands like\MessageBreak
       \parfillskip -\rightskip
       {\leavevmode
         \large \headfont
+        \let\numberline\numberline@part
         \UseHookWithArguments{contentsline/text/before}{4}%
-          {\toclevel@part}{#1}{#2}{\@contentsline@destination}
+          {\toclevel@part}{#1}{#2}{\@contentsline@destination}%
         \setlength\@lnumwidth{4\zw}%
-        \csname contentsline@text@-1@format\endcsname{#1}%
+        \relax\csname contentsline@text@-1@format\endcsname{#1}%
         \UseHookWithArguments{contentsline/text/after}{4}%
-          {\toclevel@part}{#1}{#2}{\@contentsline@destination}
+          {\toclevel@part}{#1}{#2}{\@contentsline@destination}%
         \hfil\nobreak
         \hb@xt@\@pnumwidth{\hss
           \UseHookWithArguments{contentsline/page/before}{4}%
@@ -1389,6 +1416,7 @@ class has defined the old font commands like\MessageBreak
   #1\hfil
   \UseHookWithArguments{contentsline/number/after}{1}{#1}%
 }\hspace{0pt}}
+\let\numberline@orig\numberline
 \def\jsTocLine{\leaders\hbox{%
   $\m@th \mkern \@dotsep mu\hbox{.}\mkern \@dotsep mu$}\hfill}
 \def\@dottedtocline#1#2#3#4#5{\ifnum #1>\c@tocdepth \else

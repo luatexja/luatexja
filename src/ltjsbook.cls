@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsbook}
-  [2026-05-11 ltjsclasses ]
+  [2026-05-17 ltjsclasses ]
 \def\jsc@clsname{ltjsbook}
 \def\Cjascale{0.924715}
 \RequirePackage{luatexja}
@@ -1020,7 +1020,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \ifnum \c@secnumdepth >-2\relax
     \refstepcounter{part}%
     \addcontentsline{toc}{part}{%
-      \prepartname\thepart\postpartname\hspace{1\zw}#1}%
+      \protect\numberline{\thepart}#1}%
   \else
     \addcontentsline{toc}{part}{#1}%
   \fi
@@ -1065,10 +1065,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
       \refstepcounter{chapter}%
       \typeout{\@chapapp\thechapter\@chappos}%
       \addcontentsline{toc}{chapter}%
-        {\protect\numberline
-        % {\if@english\thechapter\else\@chapapp\thechapter\@chappos\fi}%
-        {\@chapapp\thechapter\@chappos}%
-        #1}%
+        {\protect\numberline{\thechapter}#1}%
     \else\addcontentsline{toc}{chapter}{#1}\fi
   \else
     \addcontentsline{toc}{chapter}{#1}%
@@ -1110,6 +1107,71 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
     \interlinepenalty\@M
     \Huge \headfont #1\par\nobreak
     \vskip 3\Cvs}} % 欧文は40pt
+\ifdefined\ParseLaTeXeHeading
+\ExplSyntaxOn
+\DeclareInstance{heading}{part}{display}
+{
+  , name          = part
+  , level         = -1
+  , after-penalty-vspace = 0pt
+  , number-format = \prepartname\thepart\postpartname
+  , heading-decls = \centering\headfont
+  , number-decls  = \huge
+  , title-decls   = \Huge
+  , headformat-instance = part
+  , mark-cmd      = \partmark {#1}
+  , start-code    =
+     \if@openleft \cleardoublepage \else
+     \if@openright \cleardoublepage \else \clearpage \fi \fi
+     \thispagestyle{empty}%
+     \if@twocolumn\onecolumn\@restonecoltrue\else\@restonecolfalse\fi
+     \null\vfil
+  , final-code    = \@endpart
+}
+\DeclareInstance{headformat}{part}{display}
+{
+  , heading-indent = 0pt
+  , number-title-sep = 20pt
+}
+\DeclareDocumentCommand \chapter {s ={shorttitle}o m} {
+    \if@mainmatter
+    \ParseLaTeXeHeading {chapter} {#1} {#2} {#3}
+    \else
+      \IfBooleanTF{#1} {% starred:
+        \ParseLaTeXeHeading {chapter}{\BooleanTrue} {#2} {#3}
+      }{ \IfNoValueTF{#2}
+         {\ParseLaTeXeHeading {chapter}{\BooleanTrue} {shorttitle={#3}} {#3}}
+         {\ParseLaTeXeHeading {chapter}{\BooleanTrue} {#2} {#3}}
+      }
+    \fi
+}
+\DeclareInstance{heading}{chapter}{display}
+{
+  , name           = chapter
+  , level          = 0
+  , placement      = normal
+  , start-code     =
+     \if@openleft \cleardoublepage \else
+     \if@openright \cleardoublepage \else \clearpage \fi \fi
+     \plainifnotempty\global\@topnum\z@
+  , final-code     = \typeout{\@chapapp\space\arabic{chapter}\space\@chappos}
+  , after-vspace   = 3\Cvs
+  , number-format  = \@chapapp\thechapter\@chappos
+  , heading-decls  = \raggedright \parindent0pt \huge \headfont
+  , title-decls    = \Huge
+  , headformat-instance = chapter
+  , mark-cmd       = \chaptermark {#1}
+  , contents-extra = \addtocontents{lof}{\protect\addvspace{10\p@}}
+                     \addtocontents{lot}{\protect\addvspace{10\p@}}
+  , para-indent    = true
+  , after-penalty-vspace = 2\Cvs
+}
+\DeclareInstance{headformat}{chapter}{display}
+{
+  , number-title-sep = \Cvs
+}
+\ExplSyntaxOff
+\fi
 \if@twocolumn
   \newcommand{\section}{%
     \@startsection{section}{1}{\z@}%
@@ -1395,6 +1457,7 @@ class has defined the old font commands like\MessageBreak
   \@starttoc{toc}%
   \if@restonecol\twocolumn\fi
 }
+\def\numberline@part#1{\prepartname#1\postpartname\hspace{1\zw}}
 \newcommand*{\l@part}[2]{%
   \ifnum \c@tocdepth >-2\relax
     \addpenalty{-\@highpenalty}%
@@ -1405,12 +1468,13 @@ class has defined the old font commands like\MessageBreak
       \parfillskip -\rightskip
       {\leavevmode
         \large \headfont
+        \let\numberline\numberline@part
         \UseHookWithArguments{contentsline/text/before}{4}%
-          {\toclevel@part}{#1}{#2}{\@contentsline@destination}
+          {\toclevel@part}{#1}{#2}{\@contentsline@destination}%
         \setlength\@lnumwidth{4\zw}%
-        \csname contentsline@text@-1@format\endcsname{#1}%
+        \relax\csname contentsline@text@-1@format\endcsname{#1}%
         \UseHookWithArguments{contentsline/text/after}{4}%
-          {\toclevel@part}{#1}{#2}{\@contentsline@destination}
+          {\toclevel@part}{#1}{#2}{\@contentsline@destination}%
         \hfil\nobreak
         \hb@xt@\@pnumwidth{\hss
           \UseHookWithArguments{contentsline/page/before}{4}%
@@ -1424,11 +1488,13 @@ class has defined the old font commands like\MessageBreak
     \everypar{\global\@nobreakfalse\everypar{}}%
     \endgroup
   \fi}
+\def\numberline@chapter#1{\numberline@orig{\@chapapp#1\@chappos}}
 \newcommand*{\l@chapter}[2]{%
   \ifnum \c@tocdepth >\m@ne
     \addpenalty{-\@highpenalty}%
     \addvspace{1.0em \@plus\jsc@mpt}
     \begingroup
+      \let\numberline\numberline@chapter
       \parindent\z@
       \rightskip\@tocrmarg
       \parfillskip-\rightskip
@@ -1473,6 +1539,7 @@ class has defined the old font commands like\MessageBreak
   #1\hfil
   \UseHookWithArguments{contentsline/number/after}{1}{#1}%
 }\hspace{0pt}}
+\let\numberline@orig\numberline
 \def\jsTocLine{\leaders\hbox{%
   $\m@th \mkern \@dotsep mu\hbox{.}\mkern \@dotsep mu$}\hfill}
 \def\@dottedtocline#1#2#3#4#5{\ifnum #1>\c@tocdepth \else

@@ -765,11 +765,11 @@
     {\leavevmode\large\bfseries
      \let\numberline\numberline@part
      \UseHookWithArguments{contentsline/text/before}{4}%
-       {\toclevel@part}{#1}{#2}{\@contentsline@destination}
+       {\toclevel@part}{#1}{#2}{\@contentsline@destination}%
      \setlength\@lnumwidth{4\zw}%
      \csname contentsline@text@-1@format\endcsname{#1}%
      \UseHookWithArguments{contentsline/text/after}{4}%
-       {\toclevel@part}{#1}{#2}{\@contentsline@destination}
+       {\toclevel@part}{#1}{#2}{\@contentsline@destination}%
      \hfil\nobreak
      \hb@xt@\@pnumwidth{\hss
        \UseHookWithArguments{contentsline/page/before}{4}%
