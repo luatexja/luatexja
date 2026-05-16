@@ -3,8 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2026-05-10
-  Patch to LaTeX2e Kernel for LuaTeX-ja (for LaTeX2e >=2025-06-01)]
+\ProvidesPackage{lltjcore}[2026-05-17 Patch to LaTeX2e Kernel for LuaTeX-ja]
 \RequirePackage{etoolbox}
 
 \def\ltj@ptcerr#1{\typeout{lltj-core: patch FAILED (\detokenize{#1})}}
@@ -283,6 +282,8 @@
 }%
 \let\ltj@orig@kernel@process@makefnmark=\@kernel@process@makefnmark
 \def\@kernel@process@makefnmark#1{\ltj@orig@kernel@process@makefnmark{\@ltj@process@makefnmark#1}}
+
+%%%%%% \vcenter@text (>=LaTeX  2026-06-01)
 \@ifl@t@r\fmtversion{2026-06-01}{%
   \protected\def\vcenter@text@auxii{%
     \begingroup

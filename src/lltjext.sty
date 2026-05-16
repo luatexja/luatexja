@@ -12,8 +12,6 @@
 \newcount\ltj@ext@dir
 
 \ExplSyntaxOn
-\@ifpackageloaded{tagpdf}{\catcode`\^^A=9\relax}{\catcode`\^^A=14\relax}
-^^A \typeout{tagpdf loaded!}
 
 %%% array and tabular
 \pretocmd{\array}{\ltj@ext@dir=\ltjgetparameter{direction}\relax}{}{}
@@ -21,11 +19,11 @@
 \def\p@tabarray<#1>{\@ifnextchar[%]
    {\p@array<#1>}{\p@array<#1>[c]}}
 \def\p@array<#1>[#2]#3{%
-  \ifnum\ltj@ext@dir=0 \ltj@ext@dir=\ltjgetparameter{direction}\relax\fi
+  \ifnum\ltj@ext@dir=0~ \ltj@ext@dir=\ltjgetparameter{direction}\relax\fi
   \let\box@dir\relax
   %% determine strutbox
   \if #1z\relax
-    \ifnum\ltj@ext@dir=3\relax
+    \ifnum\ltj@ext@dir=3~
       \let\box@dir\utod\@tempcnta=\zstrutbox
     \fi
   \else
@@ -115,7 +113,7 @@
   \let\@end@alignbox\relax
   \if #1t\relax     \let\@begin@alignbox\vtop
   \else\if #1b\relax\let\@begin@alignbox\vbox
-  \else             
+  \else
     \ifmmode\let\@begin@alignbox\vcenter\else\let\@begin@alignbox\vcenter@text\fi
   \fi\fi}
 \def\fork@array@option@@B#1{%
@@ -137,16 +135,16 @@
     \ifmmode\let\@begin@alignbox\vcenter\else\let\@begin@alignbox\vcenter@text\fi
   \fi\fi}
 \def\fork@array@option<#1>[#2]{%
-\ifnum\ltj@ext@dir=4 % yoko
+\ifnum\ltj@ext@dir=4~ % yoko
   \ifx\box@dir\yoko      \fork@array@option@@A{#2}%
   \else                  \fork@array@option@@B{#2}%
   \fi
-\else\ifnum\ltj@ext@dir=1 % dtou
+\else\ifnum\ltj@ext@dir=1~ % dtou
   \ifx\box@dir\yoko      \fork@array@option@@B{#2}%
   \else\ifx\box@dir\dtou \fork@array@option@@A{#2}%
   \else                  \fork@array@option@@C{#2}%
   \fi\fi
-\else\ifnum\ltj@ext@dir=3 % tate
+\else\ifnum\ltj@ext@dir=3~ % tate
   \ifx\box@dir\yoko      \fork@array@option@@B{#2}%
   \else\ifx\box@dir\tate \fork@array@option@@A{#2}%
   \else\ifx\box@dir\dtou \fork@array@option@@C{#2}%
@@ -287,7 +285,7 @@
   \if y\caption@dir \let\captiondir\yoko
     \ifodd\ltjgetparameter{direction}\relax\@tempswatrue\fi
   \else\if z\caption@dir \let\captiondir\relax
-    \ifnum\ltjgetparameter{direction}=3\relax\let\captiondir\utod\fi
+    \ifnum\ltjgetparameter{direction}=3~ \let\captiondir\utod\fi
   \else\if d\caption@dir \let\captiondir\dtou
     \ifodd\ltjgetparameter{direction}\else\@tempswatrue\fi
   \else\if u\caption@dir \let\captiondir\utod
@@ -335,10 +333,10 @@
   \leavevmode\@pboxswfalse\bgroup%<=== lltj
   \setlength\@tempdima{#5}%
   \def\@mpargs{<#1>{#2}{#3}[#4]{#5}}%
-  ^^A\UseTaggingSocket{minipage/before}% new
+  \UseTaggingSocket{minipage/before}% new
   \let\box@dir\relax
   \if #1z\relax
-    \ifnum\ltjgetparameter{direction}=3\relax
+    \ifnum\ltjgetparameter{direction}=3~
       \let\box@dir\utod
     \fi
   \else
@@ -362,10 +360,10 @@
       \hsize\@tempdima
       \textwidth\hsize \columnwidth\hsize
       \@parboxrestore
-      ^^A\UseTaggingSocket{para/restore}
+      \UseTaggingSocket{para/restore}
       \def\@mpfn{mpfootnote}\def\thempfn{\thempfootnote}%
       \c@mpfootnote\z@
-      ^^A\socket_assign_plug:nn{fntext/process}{mp}%
+      \socket_assign_plug:nn{fntext/process}{mp}%
       \let\@footnotetext\@mpfootnotetext
       \let\@listdepth\@mplistdepth \@mplistdepth\z@
       \@minipagerestore
@@ -382,11 +380,11 @@
     \@minipagefalse   %% added 24 May 89
   \color@endgroup
   \egroup
-  ^^A\tag_suspend:n{minipage}
+  \tag_suspend:n{minipage}
   \expandafter\@iiiparbox\@mpargs{\unvbox\@tempboxa}%
-  ^^A\tag_resume:n{minipage}
+  \tag_resume:n{minipage}
   \egroup%<=== lltj
-  ^^A\UseTaggingSocket{minipage/after} %new end ...
+  \UseTaggingSocket{minipage/after} %new end ...
   }
 \DeclareRobustCommand\parbox{\@ifnextchar<%>
    {\X@parbox}{\X@parbox<Z>}}
@@ -400,10 +398,10 @@
   \leavevmode
   \setlength\@tempdima{#5}%
   \fork@parbox@option<#1>[#2]%
-  ^^A\UseTaggingSocket{parbox/before}
+  \UseTaggingSocket{parbox/before}
   \@begin@tempboxa\vbox{\box@dir
     \hsize\@tempdima\@parboxrestore\adjustbaseline
-       ^^A\UseTaggingSocket{para/restore}
+       \UseTaggingSocket{para/restore}
        #6\@@par}%
     \ifx\relax#3\else
       \setlength\@tempdimb{#3}%
@@ -418,7 +416,7 @@
        \fi}%
        \@end@parbox
   \@end@tempboxa
-  ^^A\UseTaggingSocket{parbox/after}
+  \UseTaggingSocket{parbox/after}
   }
 %\ExplSyntaxOff
 
@@ -445,7 +443,7 @@
     \fi
   \fi\fi}
 \def\lltjext@getjablshift{%
-  \ifnum\ltj@ext@dir=3 \ltjgetparameter{tjabaselineshift}\else
+  \ifnum\ltj@ext@dir=3~ \ltjgetparameter{tjabaselineshift}\else
   \ltjgetparameter{yjabaselineshift}\fi}
 \def\fork@parbox@option@@B#1{%
   \if #1t\relax
@@ -465,7 +463,7 @@
 \def\fork@parbox@option<#1>[#2]{%
   \let\box@dir\relax \ltj@ext@dir=\ltjgetparameter{direction}\relax
   \if #1z\relax
-    \ifnum\ltj@ext@dir=3\relax
+    \ifnum\ltj@ext@dir=3~
       \let\box@dir\utod
     \fi
   \else
@@ -483,16 +481,16 @@
        \else \let\box@dir\utod
     \fi
   \fi
-\ifnum\ltj@ext@dir=4 % yoko
+\ifnum\ltj@ext@dir=4~ % yoko
   \ifx\box@dir\yoko      \fork@parbox@option@@A{#2}%
   \else                  \fork@parbox@option@@B{#2}%
   \fi
-\else\ifnum\ltj@ext@dir=1 % dtou
+\else\ifnum\ltj@ext@dir=1~ % dtou
   \ifx\box@dir\yoko      \fork@parbox@option@@B{#2}%
   \else\ifx\box@dir\dtou \fork@parbox@option@@A{#2}%
   \else                  \fork@parbox@option@@C{#2}%
   \fi\fi
-\else\ifnum\ltj@ext@dir=3 % tate
+\else\ifnum\ltj@ext@dir=3~ % tate
   \ifx\box@dir\yoko      \fork@parbox@option@@B{#2}%
   \else\ifx\box@dir\tate \fork@parbox@option@@A{#2}%
   \else\ifx\box@dir\dtou \fork@parbox@option@@C{#2}%
@@ -523,7 +521,7 @@
 \def\@iimakePbox<#1>#2[#3]#4{%
   \bgroup\let\box@dir\relax
   \if #1z\relax
-    \ifnum\ltjgetparameter{direction}=3 \relax
+    \ifnum\ltjgetparameter{direction}=3~
       \let\box@dir\utod
     \fi
   \else
@@ -569,7 +567,7 @@
   }%
   \bgroup\let\box@dir\relax
   \if #1z\relax
-    \ifnum\ltjgetparameter{direction}=3 \relax
+    \ifnum\ltjgetparameter{direction}=3~
       \let\box@dir\utod
     \fi
   \else
@@ -589,8 +587,8 @@
   \fi
   \@defaultunitsset\@picht{#3}\unitlength
   \@defaultunitsset\@picwd{#2}\unitlength
-  ^^A\tag_socket_use:nn{graphic/begin}{picture~environment}%
-  ^^A\tag_suspend:n{\@picture} %do not tag inside the picture box
+  \tag_socket_use:nn{graphic/begin}{picture~environment}%
+  \tag_suspend:n{\@picture} %do not tag inside the picture box
   \setbox\@picbox\hbox to\@picwd\bgroup\box@dir
     \@defaultunitsset\@tempdimc{#4}\unitlength\hskip-\@tempdimc
     \@defaultunitsset\@tempdimc{#5}\unitlength\lower\@tempdimc\hbox\bgroup
@@ -603,15 +601,15 @@
   }%
   \@tempswafalse
   \ifnum\ltjgetparameter{direction}=3~  \@tempswatrue\fi
-  \ifnum\ltjgetparameter{direction}=11~  \@tempswatrue\fi
+  \ifnum\ltjgetparameter{direction}=11~ \@tempswatrue\fi
   \if@tempswa
     \ifx\box@dir\yoko % この場合だけ垂直位置補正が必要
      \ltjsetht\@picbox\dimexpr\ltjgetht\@picbox+\ltjgetdp\@picbox\relax
       \ltjsetdp\@picbox\z@
     \fi
   \fi
-  ^^A\tag_resume:n{\@picture}
-  ^^A\tag_socket_use:nnn{graphic/end}{\picture@tag@bbox@attribute}%
+  \tag_resume:n{\@picture}
+  \tag_socket_use:nnn{graphic/end}{\picture@tag@bbox@attribute}%
   {\mbox{\box\@picbox}}%
   \egroup\ltj@@pic@save@blshift}
 \let\org@put\put
@@ -636,14 +634,14 @@
 \def\@rensuji{\@ifnextchar[{\@@rensuji}{\@@rensuji[c]}}
 \def\@@rensuji[#1]#2{%
   \ifvmode\leavevmode\fi
-  \ifnum\ltjgetparameter{direction}=4\relax\hbox{#2}\else
+  \ifnum\ltjgetparameter{direction}=4~ \hbox{#2}\else
   \hskip\rensujiskip
   \setbox\tw@\hbox{漢}% 「あ」では仮名書体使用時がまずそう
   \@tempdimb\ltjgetht\tw@ \advance\@tempdimb\ltjgetdp\tw@
   \ifnot@advanceline\not@advancelinefalse\else
     \setbox\z@\hbox{\yoko#2}%
     \@tempdima\ltjgetht\z@ \advance\@tempdima\ltjgetdp\z@
-    \ifnum\ltjgetparameter{direction}=1\relax
+    \ifnum\ltjgetparameter{direction}=1~
       % 周囲が dtou の場合には，高さ \ltjgetht\tw@, 深さ \ltjgetdp\tw@ のボックスを基準としている．
       \if #1c\relax\vrule \@width \z@ \@height\dimexpr.5\@tempdima+.5\ltjgetht\tw@-.5\ltjgetdp\tw@
                           \@depth\dimexpr.5\@tempdima-.5\ltjgetht\tw@+.5\ltjgetdp\tw@
@@ -659,7 +657,7 @@
       \fi\fi
     \fi
   \fi
-  \ifnum\ltjgetparameter{direction}=1\relax
+  \ifnum\ltjgetparameter{direction}=1~
     \if #1c\relax\hbox to\@tempdimb{\yoko\hss#2\hss\kern-\ltjgetdp\tw@}%
     \else\if #1r\relax\vbox{\hbox to\@tempdimb{\yoko\hss#2\kern-\ltjgetdp\tw@}}%
     \else\lower\ltjgetdp\tw@\vtop{\hbox to\@tempdimb{\yoko#2\hss}}%
@@ -681,7 +679,7 @@
 %%% kanji
 \def\Kanji#1{\expandafter\@Kanji\csname c@#1\endcsname}
 \def\@Kanji#1{\kansuji #1}
-\def\kanji{\ifnum\ltjgetparameter{direction}=3 \expandafter\kansuji\fi}
+\def\kanji{\ifnum\ltjgetparameter{direction}=3~ \expandafter\kansuji\fi}
 
 %%% bou
 %%%
@@ -690,7 +688,7 @@
 \def\@bou#1{%
   \ifx#1\end \let\ltj@@next=\relax
   \else
-    \ifnum\ltjgetparameter{direction}=3\relax
+    \ifnum\ltjgetparameter{direction}=3~
       \hbox to\z@{\vbox to\z@{\boxmaxdepth\maxdimen
         \vss\moveleft0.2\zw\hbox{\yoko\boutenchar}\nointerlineskip
         \hbox{\char\euc"A1A1}}\hss}\nobreak#1\relax
@@ -704,7 +702,7 @@
 
 %%% kasen
 \DeclareRobustCommand\kasen[1]{%
-  \ifnum\ltjgetparameter{direction}=3\relax
+  \ifnum\ltjgetparameter{direction}=3~
     \setbox\z@\hbox{#1}\leavevmode\raise.7\zw
     \hbox to\z@{\vrule\@width\wd\z@ \@depth\z@ \@height.4\p@\hss}%
     \box\z@
@@ -712,7 +710,7 @@
 
 %%% references
 \def\@eqnnum{{\reset@font\rmfamily \normalcolor
-  \ifnum\ltjgetparameter{direction}=11\raise.25\zh\hbox{\yoko(\theequation)}%
+  \ifnum\ltjgetparameter{direction}=11~\raise.25\zh\hbox{\yoko(\theequation)}%
   \else (\theequation)\fi}}
 \def\@thecounter#1{\noexpand\rensuji{\noexpand\arabic{#1}}}
 \def\@thmcounter#1{\noexpand\rensuji{\noexpand\arabic{#1}}}

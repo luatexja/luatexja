@@ -12,7 +12,7 @@
 \def\luatexjalatexLoaded{\endinput}
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{ltj-latex}[2026-04-20 LaTeX support of LuaTeX-ja]
+\ProvidesPackage{ltj-latex}[2026-05-17 LaTeX support of LuaTeX-ja]
 
 \endlinechar=13
 
@@ -24,7 +24,7 @@
 %%% patch for LaTeX
 \usepackage{lltjfont}
 \usepackage{lltjdefs}
-\@ifl@t@r\fmtversion{2025-06-01}{\usepackage{lltjcore}}{\usepackage{lltjcore-241201}}
+\usepackage{lltjcore}
 \RequirePackage{lltjp-atbegshi}
 
 %%% patching commands
@@ -33,24 +33,13 @@
 %% starred version: do <code> right away if the <package> is loaded
 \def\ltj@ExecuteAfterPackage{\@ifstar\@@ltj@ExecuteAfterPackage@star\@@ltj@ExecuteAfterPackage}
 \def\ltj@ExecuteBeforePackage{\@ifstar\@@ltj@ExecuteBeforePackage@star\@@ltj@ExecuteBeforePackage}
-\@ifl@t@r\fmtversion{2021-11-15}{% 2021-11-15
-  \def\@@ltj@ExecuteAfterPackage@star#1{\AddToHook{package/#1/after}}
-  \def\@@ltj@ExecuteBeforePackage@star#1{\AddToHook{package/#1/before}}
-  \long\def\@@ltj@ExecuteAfterPackage#1#2{%
-    \@ifpackageloaded{#1}{}{\AddToHook{package/#1/after}{#2}}%
-  }
-  \long\def\@@ltj@ExecuteBeforePackage#1#2{%
-    \@ifpackageloaded{#1}{}{\AddToHook{package/#1/before}{#2}}%
-  }
-}{
-  \def\@@ltj@ExecuteAfterPackage#1{\AddToHook{package/after/#1}}
-  \def\@@ltj@ExecuteBeforePackage#1{\AddToHook{package/before/#1}}
-  \long\def\@@ltj@ExecuteAfterPackage@star#1#2{%
-    \@ifpackageloaded{#1}{#2}{\@@ltj@ExecuteAfterPackage{#1}{#2}}%
-  }
-  \long\def\@@ltj@ExecuteBeforePackage@star#1#2{%
-    \@ifpackageloaded{#1}{#2}{\@@ltj@ExecuteBeforePackage{#1}{#2}}%
-  }
+\def\@@ltj@ExecuteAfterPackage@star#1{\AddToHook{package/#1/after}}
+\def\@@ltj@ExecuteBeforePackage@star#1{\AddToHook{package/#1/before}}
+\long\def\@@ltj@ExecuteAfterPackage#1#2{%
+  \@ifpackageloaded{#1}{}{\AddToHook{package/#1/after}{#2}}%
+}
+\long\def\@@ltj@ExecuteBeforePackage#1#2{%
+  \@ifpackageloaded{#1}{}{\AddToHook{package/#1/before}{#2}}%
 }
 \def\ltj@pkgpatch@im#1{\@ifnextchar[{\ltj@pkgpatch@im@{#1}}{\ltj@pkgpatch@im@{#1}[lltjp-#1]}}%]
 \def\ltj@pkgpatch@im@#1[#2]{\ltj@ExecuteAfterPackage*{#1}{\ltj@pkgpatch@im@@{#2}}}

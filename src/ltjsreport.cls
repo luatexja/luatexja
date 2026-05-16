@@ -1097,15 +1097,15 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
      \if@openleft \cleardoublepage \else
      \if@openright \cleardoublepage \else \clearpage \fi \fi
      \plainifnotempty\global\@topnum\z@
-  , final-code     = \typeout{\@chapapp\space\arabic{chapter}\space\@chappos}
+  , final-code     = \typeout{\@chapapp\arabic{chapter}\@chappos}
   , after-vspace   = 3\Cvs
   , number-format  = \@chapapp\thechapter\@chappos
   , heading-decls  = \raggedright \parindent0pt \huge \headfont
   , title-decls    = \Huge
   , headformat-instance = chapter
   , mark-cmd       = \chaptermark {#1}
-  , contents-extra = \addtocontents{lof}{\protect\addvspace{10\p@}}
-                     \addtocontents{lot}{\protect\addvspace{10\p@}}
+  , contents-extra = \addtocontents{lof}{\protect\addvspace{10\jsc@mpt}}
+                     \addtocontents{lot}{\protect\addvspace{10\jsc@mpt}}
   , para-indent    = true
   , after-penalty-vspace = 2\Cvs
 }
