@@ -139,6 +139,10 @@
 %   \end{itemize}
 %   標準では\texttt{nomag*}オプションが有効になっています。\texttt{jsclasses}で用意され，かつ既定になっている
 %   \texttt{usemag}オプションを指定すると警告を出します。
+% \item 2026-05-17付けのものから，partレベル・chapterレベルの見出しについて
+% |.toc|ファイルに書き出す内容を欧文クラスの形式に合わせました．
+% 再タイプセットの際，初回は目次の出力形式が乱れますが，|.toc|ファイルが
+% 更新される2回目からは問題ありません．
 % \end{itemize}
 %
 % [2014-02-07 LTJ] jsclasses 2014-02-07 ベースにしました。
@@ -2521,7 +2525,7 @@
 \if@titlepage
   \newcommand{\maketitle}{%
     \begin{titlepage}%
-      \tagpdfsetup{table/tagging=false}%-
+      \ifdefined\tagpdfsetup\tagpdfsetup{table/tagging=false}\fi
       \let\footnotesize\small
       \let\footnoterule\relax
       \let\footnote\thanks
@@ -2576,14 +2580,14 @@
   }%
 \else
   \newcommand{\maketitle}{\par
-    \begingroup
-      \tagpdfsetup{table/tagging=false}%-
+    \begingroup 
+      \ifdefined\tagpdfsetup\tagpdfsetup{table/tagging=false}\fi%-
       \renewcommand\thefootnote{\@fnsymbol\c@footnote}%
-      \def\@makefnmark{\rlap{\@textsuperscript{\normalfont\@thefnmark}}}%
+      \def\@makefnmark{\rlap{\null\@textsuperscript{\normalfont\@thefnmark}}}%
       \long\def\@makefntext##1{\advance\leftskip 3\zw
         \parindent 1\zw\noindent
         \llap{\@textsuperscript{\normalfont\@thefnmark}\hskip0.3\zw}##1}%
-      \cs_set_eq:NN \thanks \__tag_patch_thanks:n
+      \ifdefined\__tag_patch:thanks:n \cs_set_eq:NN \thanks \__tag_patch_thanks:n\fi
       \if@twocolumn
         \ifnum \col@number=\@ne
           \@maketitle
@@ -2642,7 +2646,9 @@
       {\large \@date}%
     \end{center}%
     \par\vskip 1.5em
-%<article|report|kiyou>    \ifvoid\@abstractbox\else\centerline{\box\@abstractbox}\vskip1.5em\fi
+%<*article|report|kiyou>
+     \ifvoid\@abstractbox\else\centerline{\box\@abstractbox}\vskip1.5em\fi
+%</article|report|kiyou>
   }
 \fi
 \ExplSyntaxOff
@@ -2753,15 +2759,12 @@
 % の整数倍にならなくてもいいから前の行と重ならないようにしました。
 %
 % [2026-05-17 LTJ] |latex-lab-sec-template|では|\@startsection|が書き直されたので，
-% それに合わせて再定義をやり直します．
+% |\@startsection|の再定義もコードが別になります．
 %    \begin{macrocode}
 \ExplSyntaxOn
 \ifdefined\ParseLaTeXeHeading
-\typeout{ltjsclasses: @startsection patched!}
 \DeclareDocumentCommand \@startsection {mmmmmm s ={shorttitle}o m}{
-  \typeout{ltjsclasses: patched @startsection called}
   \IfInstanceExistsF{heading}{#1-@startsection}{
-    \typeout{ltjsclasses: patches definition of instances}
     \__head_debug_typeout:n{Info:~ setting~ up~ instances~ for~
                        legacy~ \string\@startsection (ltjsclasses)}
     \@tempskipa #4\relax
@@ -2812,7 +2815,7 @@
        \DeclareInstance{headformat}{#1-@startsection}{runin}{
          heading-indent = #3,
          title-format = {\exp_not:n{#6} 
-%<!jspf>           \str_if_eq:nnT {#1} {paragraph} {\exp_not:N \jsParagraphMark} 
+%<!jspf>           \str_if_eq:nnT {#1} {paragraph} {\exp_not:N \jsParagraphMark}
            {##1}}
        }
       }
@@ -2850,7 +2853,8 @@
 \ltjs@patching@startsection
 \let\ltjs@orig@startsection=\@startsection
 \AtBeginDocument{%
-  \ifx\@startsection\ltjs@orig@startsection\else\expandafter\ltjs@patching@startsection\fi
+  \ifx\@startsection\ltjs@orig@startsection
+    \else\expandafter\ltjs@patching@startsection\fi
   \let\ltjs@patching@startsection\undefined
 }
 \fi
@@ -3219,12 +3223,12 @@
 % |book| および |report| クラス以外では |secnumdepth| が $-1$ より大きいとき
 % 部番号を付けます。
 %
-% [2026-05-17 LTJ] |\addcontentsline{toc}|で\file{.toc}ファイルに書き出す内容を
-% 欧文グラスやltjclassesに合わせ
+% [2026-05-17 LTJ] |\addcontentsline{toc}|で|.toc|ファイルに書き出す内容を
+% 欧文クラスやltjclassesに合わせ
 %
 % |\contentsline{part}{\numberline{|\meta{num}|}|\meta{title}|}{|\meta{page}|}|
 %
-% \noindent の形式に合わせました．実際の目次内での書式を保つため，
+% \noindent の形式にしました．実際の目次内での書式を保つため，
 % |\l@part|内で|\numberline|の再定義を行うことにします．
 %
 %    \begin{macrocode}
@@ -3360,8 +3364,8 @@
 % 章見出しを出力します。
 % |secnumdepth| が0以上かつ |\@mainmatter| が真のとき章番号を出力します。
 %
-% [2026-05-17 LTJ] partレベルと同様に，|\addcontentsline{toc}|で\file{.toc}ファイルに
-% 書き出す内容を欧文グラスやltjclassesに合わせました．やはり実際の目次内での書式を保つため，
+% [2026-05-17 LTJ] partレベルと同様に，|\addcontentsline{toc}|で|.toc|ファイルに
+% 書き出す内容を欧文クラスやltjclassesに合わせました．やはり実際の目次内での書式を保つため，
 % |\l@chapter|内で|\numberline|の再定義を行うことにします．
 %
 %    \begin{macrocode}
@@ -3450,8 +3454,8 @@
 % この新実装は，ソースの先頭（|\documentclass|より先）に|\DocumentMetaData|が
 % 指定された場合に自動で読み込まれるようになっています．
 %
-% partレベルとchapterレベルは従来|\secdef|マクロを使って定義しており，
-% 新実装でのサポートレベルは高くないので，新しくコードを記述します．
+% partレベルとchapterレベルの見出しは，すでで述べたように|\secdef|マクロを使って定義して
+% いました．しかし，新実装での|\secdef|のサポートレベルは高くないので，新しくコードを記述します．
 %
 % まず，partレベルの見出しの再定義です．
 %    \begin{macrocode}
@@ -4768,7 +4772,8 @@
 %<book|report>  \if@restonecol\twocolumn\fi
 }
 %    \end{macrocode}
-% \end{macro}\end{macro}
+% \end{macro}
+% \end{macro}
 %
 % \begin{macro}{\l@part}
 % \begin{macro}{\numberline@part}
@@ -4780,7 +4785,7 @@
 %
 % |\contentsline{part}{\numberline{|\meta{num}|}|\meta{title}|}{|\meta{page}|}|
 %
-% \noindent の形式で\file{.toc}ファイルに書き出されることに対応するための，
+% \noindent の形式で|.toc|ファイルに書き出されることに対応するための，
 % 「partレベル用|\numberline|」です．
 %
 %    \begin{macrocode}
@@ -4820,8 +4825,10 @@
   \fi}
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
 %
 % \begin{macro}{\l@chapter}
+% \begin{macro}{\numberline@chapter}
 %
 % 章の目次です。|\@lnumwidth| を |4.683\zw| に増やしました。
 %
@@ -4866,6 +4873,7 @@
   \fi}
 %</book|report>
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\l@section}

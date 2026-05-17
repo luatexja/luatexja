@@ -345,12 +345,13 @@
     }
 \fi
 \def\p@thanks#1{\footnotemark
-  \protected@xdef\@thanks{\@thanks
-    \protect{\noindent\hbox{\yoko$\m@th^\thefootnote$}#1\protect\par}}}
+  \xdef\@thanks{\expandonce{\@thanks}\unexpanded{\noindent\hbox to \z@}%
+    {\unexpanded{\yoko\footnotesize\hss\protect\@textsuperscript}%
+    {\thefootnote}\noexpand\hss}\expandonce{#1}\noexpand\par}}
 \ExplSyntaxOn
 \if@titlepage
   \newcommand{\maketitle}{\begin{titlepage}%
-  \cs_if_exist_use:N\__tag_tbl_disable:
+  \ifdefined\tagpdfsetup\tagpdfsetup{table/tagging=false}\fi
   \let\footnotesize\small
   \let\footnoterule\relax
   \let\footnote\thanks
@@ -391,12 +392,14 @@
 \else
   \newcommand{\maketitle}{\par
   \begingroup
-    \cs_if_exist_use:N\__tag_tbl_disable:
+    \ifdefined\tagpdfsetup\tagpdfsetup{table/tagging=false}\fi
+    \ifdefined\__tag_patch:thanks:n \cs_set_eq:NN \thanks \__tag_patch_thanks:n\fi
     \renewcommand{\thefootnote}{\fnsymbol{footnote}}%
-    \def\@makefnmark{\hbox{\unless\ifnum\ltjgetparameter{direction}=3 $\m@th^{\@thefnmark}$%
-      \else\hbox{\yoko$\m@th^{\@thefnmark}$}\fi}}%
+    \def\@makefnmark{\hbox{\unless\ifnum\ltjgetparameter{direction}=3~%
+      \@textsuperscript{\@thefnmark}%
+      \else\hbox{\yoko\@textsuperscript{\yoko\@thefnmark}}\fi}}%
      \long\def\@makefntext##1{\parindent 1em\noindent
-       \hb@xt@1.8em{\hss$\m@th^{\@thefnmark}$}##1}%
+       \hb@xt@1.8em{\hss\@textsuperscript{\@thefnmark}}##1}%
     \if@twocolumn
       \ifnum \col@number=\@ne \@maketitle
       \else \twocolumn[\@maketitle]%

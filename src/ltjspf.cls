@@ -659,11 +659,8 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \vskip 1.5em}
 \ExplSyntaxOn
 \ifdefined\ParseLaTeXeHeading
-\typeout{ltjsclasses: @startsection patched!}
 \DeclareDocumentCommand \@startsection {mmmmmm s ={shorttitle}o m}{
-  \typeout{ltjsclasses: patched @startsection called}
   \IfInstanceExistsF{heading}{#1-@startsection}{
-    \typeout{ltjsclasses: patches definition of instances}
     \__head_debug_typeout:n{Info:~ setting~ up~ instances~ for~
                        legacy~ \string\@startsection (ltjsclasses)}
     \@tempskipa #4\relax
@@ -737,7 +734,8 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \ltjs@patching@startsection
 \let\ltjs@orig@startsection=\@startsection
 \AtBeginDocument{%
-  \ifx\@startsection\ltjs@orig@startsection\else\expandafter\ltjs@patching@startsection\fi
+  \ifx\@startsection\ltjs@orig@startsection
+    \else\expandafter\ltjs@patching@startsection\fi
   \let\ltjs@patching@startsection\undefined
 }
 \fi

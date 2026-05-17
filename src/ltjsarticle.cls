@@ -670,7 +670,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \if@titlepage
   \newcommand{\maketitle}{%
     \begin{titlepage}%
-      \tagpdfsetup{table/tagging=false}%-
+      \ifdefined\tagpdfsetup\tagpdfsetup{table/tagging=false}\fi
       \let\footnotesize\small
       \let\footnoterule\relax
       \let\footnote\thanks
@@ -726,13 +726,13 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \else
   \newcommand{\maketitle}{\par
     \begingroup
-      \tagpdfsetup{table/tagging=false}%-
+      \ifdefined\tagpdfsetup\tagpdfsetup{table/tagging=false}\fi%-
       \renewcommand\thefootnote{\@fnsymbol\c@footnote}%
-      \def\@makefnmark{\rlap{\@textsuperscript{\normalfont\@thefnmark}}}%
+      \def\@makefnmark{\rlap{\null\@textsuperscript{\normalfont\@thefnmark}}}%
       \long\def\@makefntext##1{\advance\leftskip 3\zw
         \parindent 1\zw\noindent
         \llap{\@textsuperscript{\normalfont\@thefnmark}\hskip0.3\zw}##1}%
-      \cs_set_eq:NN \thanks \__tag_patch_thanks:n
+      \ifdefined\__tag_patch:thanks:n \cs_set_eq:NN \thanks \__tag_patch_thanks:n\fi
       \if@twocolumn
         \ifnum \col@number=\@ne
           \@maketitle
@@ -781,17 +781,14 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
       {\large \@date}%
     \end{center}%
     \par\vskip 1.5em
-    \ifvoid\@abstractbox\else\centerline{\box\@abstractbox}\vskip1.5em\fi
+     \ifvoid\@abstractbox\else\centerline{\box\@abstractbox}\vskip1.5em\fi
   }
 \fi
 \ExplSyntaxOff
 \ExplSyntaxOn
 \ifdefined\ParseLaTeXeHeading
-\typeout{ltjsclasses: @startsection patched!}
 \DeclareDocumentCommand \@startsection {mmmmmm s ={shorttitle}o m}{
-  \typeout{ltjsclasses: patched @startsection called}
   \IfInstanceExistsF{heading}{#1-@startsection}{
-    \typeout{ltjsclasses: patches definition of instances}
     \__head_debug_typeout:n{Info:~ setting~ up~ instances~ for~
                        legacy~ \string\@startsection (ltjsclasses)}
     \@tempskipa #4\relax
@@ -866,7 +863,8 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \ltjs@patching@startsection
 \let\ltjs@orig@startsection=\@startsection
 \AtBeginDocument{%
-  \ifx\@startsection\ltjs@orig@startsection\else\expandafter\ltjs@patching@startsection\fi
+  \ifx\@startsection\ltjs@orig@startsection
+    \else\expandafter\ltjs@patching@startsection\fi
   \let\ltjs@patching@startsection\undefined
 }
 \fi

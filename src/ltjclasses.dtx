@@ -226,11 +226,14 @@
 % \begin{itemize}
 % \item もし
 % \begin{quotation}
-%   |! LaTeX Error: Too many math alphabets used in version ****.|
+% |! LaTeX Error: Too many math alphabets used in version ****.|
 % \end{quotation}
 % のエラーが起こった場合は、|lualatex-math|パッケージを読み込んでみて下さい。
 % \item 出力PDFの用紙サイズが自動的に設定されるようにしてあります。
-% %%%\item 縦組みクラスにおいて、|geometry|パッケージを読み込んだときに意図通りにならない問題に対応しました。%
+% \item 2026-05-17付けのものから，partレベル・chapterレベルの見出しについて
+% \file{.toc}ファイルに書き出す内容を欧文クラスの形式に合わせました．
+% 再タイプセットの際，初回は目次の出力形式が乱れますが，\file{.toc}ファイルが
+% 更新される2回目からは問題ありません．
 % \end{itemize}
 %
 % \section{Lua\TeX-ja の読み込み}
@@ -2439,10 +2442,14 @@
 % 著者名の脇に表示される合印は直立した数字、注釈側は横に寝た数字となっていまし
 % たが、不自然なので|\hbox{\yoko ...}|を追加し、両方とも直立するようにしました。
 % \changes{v1.7d}{2017/02/15}{縦組クラスの所属表示の番号を直立にした}
+%
+% [2026-05-17 LTJ] |\unexpanded|を使った形に書き換えました．
+% \changes{v1.8f-ltj-26}{2026-05-17}{\texttt{unexpanded}を使った形に書き換えました．}
 %    \begin{macrocode}
 \def\p@thanks#1{\footnotemark
-  \protected@xdef\@thanks{\@thanks
-    \protect{\noindent\hbox{\yoko$\m@th^\thefootnote$}#1\protect\par}}}
+  \xdef\@thanks{\expandonce{\@thanks}\unexpanded{\noindent\hbox to \z@}%
+    {\unexpanded{\yoko\footnotesize\hss\protect\@textsuperscript}%
+    {\thefootnote}\noexpand\hss}\expandonce{#1}\noexpand\par}}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -2450,7 +2457,7 @@
 \ExplSyntaxOn
 \if@titlepage
   \newcommand{\maketitle}{\begin{titlepage}%
-  \cs_if_exist_use:N\__tag_tbl_disable:
+  \ifdefined\tagpdfsetup\tagpdfsetup{table/tagging=false}\fi
   \let\footnotesize\small
   \let\footnoterule\relax
 %<tate>  \let\thanks\p@thanks
@@ -2508,17 +2515,19 @@
 \else
   \newcommand{\maketitle}{\par
   \begingroup
-    \cs_if_exist_use:N\__tag_tbl_disable:
+    \ifdefined\tagpdfsetup\tagpdfsetup{table/tagging=false}\fi
+    \ifdefined\__tag_patch:thanks:n \cs_set_eq:NN \thanks \__tag_patch_thanks:n\fi
     \renewcommand{\thefootnote}{\fnsymbol{footnote}}%
-    \def\@makefnmark{\hbox{\unless\ifnum\ltjgetparameter{direction}=3 $\m@th^{\@thefnmark}$%
-      \else\hbox{\yoko$\m@th^{\@thefnmark}$}\fi}}%
+    \def\@makefnmark{\hbox{\unless\ifnum\ltjgetparameter{direction}=3~%
+      \@textsuperscript{\@thefnmark}%
+      \else\hbox{\yoko\@textsuperscript{\yoko\@thefnmark}}\fi}}%
 %<*tate>
     \long\def\@makefntext##1{\parindent 1\zw\noindent
        \hb@xt@ 2\zw{\hss\@makefnmark}##1}%
 %</tate>
 %<*yoko>
      \long\def\@makefntext##1{\parindent 1em\noindent
-       \hb@xt@1.8em{\hss$\m@th^{\@thefnmark}$}##1}%
+       \hb@xt@1.8em{\hss\@textsuperscript{\@thefnmark}}##1}%
 %</yoko>
     \if@twocolumn
       \ifnum \col@number=\@ne \@maketitle
@@ -2959,11 +2968,11 @@
 % 見出し番号を付けます。$-2$以下では付けません。
 %
 % [2026-05-17 LTJ] |\addcontentsline{toc}|で\file{.toc}ファイルに書き出す内容を
-% 欧文グラスに合わせ
+% 欧文クラスに合わせ
 %
 % |\contentsline{part}{\numberline{|\meta{num}|}|\meta{title}|}{|\meta{page}|}|
 %
-% \noindent の形式に合わせました．実際の目次内での書式を保つため，
+% \noindent の形式にしました．実際の目次内での書式を保つため，
 % |\l@part|内で|\numberline|の再定義を行うことにします．
 %    \begin{macrocode}
 %<*report|book>
@@ -3085,7 +3094,7 @@
 % 挙動になっていますが、コミュニティ版でもアスキー版の挙動を維持しています。
 %
 % [2026-05-17 LTJ] partレベルと同様に，|\addcontentsline{toc}|で\file{.toc}ファイルに
-% 書き出す内容を欧文グラスに合わせました．やはり実際の目次内での書式を保つため，
+% 書き出す内容を欧文クラスに合わせました．やはり実際の目次内での書式を保つため，
 % |\l@chapter|内で|\numberline|の再定義を行うことにします．
 %
 %    \begin{macrocode}
@@ -3177,9 +3186,9 @@
 % この新実装は，ソースの先頭（|\documentclass|より先）に|\DocumentMetaData|が
 % 指定された場合に自動で読み込まれるようになっています．
 %
-% 本クラスでの見出し命令は，前節までのように
+% 本クラスでの見出し命令は，前小節までのように
 % sectionレベル以下の見出しは|\@startsection|マクロを，
-% partレベルとchapterレベルは|\secdef|マクロを使って定義しています．
+% partレベルとchapterレベルは|\secdef|マクロを使って定義されています．
 % 前者は新実装でも（ある程度）サポートされますが，後者はそうではないので，
 % 新しくコードを記述します．
 %

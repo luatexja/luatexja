@@ -280,6 +280,13 @@
   \unless\ifnum\ltjgetparameter{direction}=3 #1%
   \else\hbox to\z@{\hskip-.25\zw\raise.9\zh#1\hss}\fi%
 }%
+\def\@footnotemark{%
+   \leavevmode
+   \ifhmode\edef\@x@sf{\the\spacefactor}\nobreak\fi
+   \@ltj@process@makefnmark{\@makefnmark}%
+   \ifhmode\spacefactor\@x@sf\fi
+   \relax
+}
 \let\ltj@orig@kernel@process@makefnmark=\@kernel@process@makefnmark
 \def\@kernel@process@makefnmark#1{\ltj@orig@kernel@process@makefnmark{\@ltj@process@makefnmark#1}}
 
@@ -300,6 +307,7 @@
   \patchcmd\@iiiparbox{\@pboxswtrue$\vcenter}{\@pboxswtrue\null$\vcenter}{}{\ltj@ptcerr{\@iiiparbox 1}}
   \patchcmd\@iiiparbox{\m@th$}{\m@th$\null}{}{\ltj@ptcerr{\@iiiparbox 2}}
 }%
+
 \DeclareRobustCommand\underline[1]{%
   \relax
   \ifmmode\@@underline{#1}%
@@ -361,5 +369,7 @@
 \def\mathsm@sh#1#2{%
   \setbox\z@\hbox{\ltj@yablshift0$\m@th#1{#2}$}%
   {}\finsm@sh}
+
+
 
 \endinput

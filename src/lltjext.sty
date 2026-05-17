@@ -363,7 +363,7 @@
       \UseTaggingSocket{para/restore}
       \def\@mpfn{mpfootnote}\def\thempfn{\thempfootnote}%
       \c@mpfootnote\z@
-      \socket_assign_plug:nn{fntext/process}{mp}%
+      \socket_if_exist:nT {fntext/process} {\socket_assign_plug:nn{fntext/process}{mp}}%
       \let\@footnotetext\@mpfootnotetext
       \let\@listdepth\@mplistdepth \@mplistdepth\z@
       \@minipagerestore
