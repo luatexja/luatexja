@@ -6,7 +6,6 @@
 %%%%% subsection => 節
 \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
 \directlua{luatexja_cmapidv = true}
-
 %<en>\documentclass[a4paper,titlepage]{article}
 %<ja>\documentclass[a4paper,14Q,titlepage]{ltjsarticle}
 
@@ -132,7 +131,7 @@
 \hypersetup{%
 	unicode,
 	colorlinks,
-	allbordercolors=1 1 1,
+	allbordercolors=white,
 	allcolors=blue,
 %<*en>
 	pdfauthor={The LuaTeX-ja project team},
@@ -2159,27 +2158,15 @@ setting, you can use \cs{ltjalchar} and \cs{ltjjachar} respectively, as the foll
 %</ja>
 
 %<*ja>
-\paragraph{絵文字など，複数コードポイントの列で表現される字形をを利用する場合の注意}
+\paragraph{絵文字を利用する場合の注意}
 （\Pkg{luaotfload}による）OpenType機能や合字等の処理は，\LuaTeX-jaが
 段落・水平ボックスの中身全体に対して「この文字は\textbf{JAchar}だから和文フォントで組む」と
 フォントを置き換えた後に適用される．
-そのため，異体字セレクタや絵文字といった複数のコードポイントの列で表現される文字を
+そのため，絵文字など複数のコードポイントの列で表現される文字を
 組む場合には，列全体で\textbf{JAchar}の範囲か\textbf{ALchar}の範囲かが
 統一されていないといけない．
 
-例えば，CJK統合漢字（とその拡張達）と
-IVS用の異体字セレクタ(\texttt{U+E0100}--\texttt{U+E01EF})は標準では
-どちらも同じ文字範囲6であるため，（フォントがサポートしていれば）IVSは正しく機能する．
-しかし，下の例のように異体字セレクタを\textbf{ALchar}の文字範囲(4)に移動させると，
-IVSは機能しなくなる：
-\ltjdefcharrange{4}{"E0100-"E01EF}
-\begin{LTXexample}
-\ltjdefcharrange{4}{"E0100-"E01EF}
-葛󠄀城市，葛󠄁飾区，葛西
-\end{LTXexample}
-\ltjdefcharrange{6}{"E0100-"E01EF}
-
-また，標準では絵文字として使われる可能性が大きい一部の文字が\textbf{JAchar}となっている
+標準では絵文字として使われる可能性が大きい一部の文字が\textbf{JAchar}となっている
 \footnote{同じUnicodeブロック内にAdobe-Japan1-6の文字があったため．}．
 絵文字を用いる場合にはこの点に留意する必要がある．
 
@@ -2202,6 +2189,25 @@ IVSは機能しなくなる：
   \end{minipage}
 \end{center}
 \ltjsetparameter{jacharrange={+3}}
+
+\paragraph{異体字セレクタの扱い}
+バージョン20260517.0以降，異体字セレクタ（SVS用の\texttt{U+FE00}--\texttt{FE0F}と
+IVS用の\texttt{U+E0100}--\texttt{U+E01EF}）が
+\textbf{JAchar}か\textbf{ALchar}かは直前の文字（すなわち，基底文字）によって判断されることになった．
+歴史的経緯により\texttt{U+FE00}--\texttt{FE0F}は\textbf{ALchar}の文字範囲に，
+\texttt{U+E0100}--\texttt{U+E01EF}は\textbf{JAchar}の文字範囲に属することになっているが，
+この設定は実際には効力を持たない．
+
+実際，下の例のように異体字セレクタを\textbf{ALchar}の文字範囲(4)に移動させても
+IVSは機能する：
+
+\ltjdefcharrange{4}{"E0100-"E01EF}
+\begin{LTXexample}
+\ltjdefcharrange{4}{"E0100-"E01EF}
+葛󠄀城市，葛󠄁飾区，葛西
+\end{LTXexample}
+\ltjdefcharrange{6}{"E0100-"E01EF}
+
 %</ja>
 
 
@@ -8274,21 +8280,22 @@ among the line-head form, the line-middle form, and the line-end form.
 
 %<*ja>
 \subsection{\Pkg{lltjext}}
-\pLaTeX では縦組用の拡張として \Pkg{plext} パッケージが用意されていたが，
-それを\LuaTeX-ja用に書きなおしたものが本追加パッケージ \Pkg{lltjext} である．
+\pLaTeX では縦組用の拡張として \Pkg{plext}パッケージが用意されていたが，
+それを\LuaTeX-ja用に書きなおしたものが本\Pkg{lltjext}パッケージである．
 
-従来の \Pkg{plext} パッケージとの違いは，
+従来の\Pkg{plext}パッケージとの違いは，
 \begin{itemize}
- \item 組方向オプション \texttt{<y>}（横組），\texttt{<t>}（縦組），
-\texttt{<z>}\ の他に\ \texttt{<d>}（dtou方向），\texttt{<u>}（utod方向）を追加した．
-\texttt{<z>} と \texttt{<u>} の違いは，\texttt{<z>} が（\Pkg{plext} パッケージと同様に）
+ \item シンプル化のため，\Pkg{array}パッケージを常に読み込むことにした．
+ \item 組方向オプション\>\texttt{<y>}（横組），\texttt{<t>}（縦組），
+\texttt{<z>}\>の他に\>\texttt{<d>}（dtou方向），\texttt{<u>}（utod方向）を追加した．
+\texttt{<z>}\>と\>\texttt{<u>}\>の違いは，\texttt{<z>}\>が（\Pkg{plext}パッケージと同様に）
 周囲の組方向が縦組のときにしか意味を持たない
   \footnote{%
-    周囲の組方向が縦組以外のときは，\texttt{<z>} を指定しても中身の組方向は周囲の組方向と変わらない．
+    周囲の組方向が縦組以外のときは，\texttt{<z>}\>を指定しても中身の組方向は周囲の組方向と変わらない．
   }%
-のに対し，\texttt{<u>} にはそのような制限がないことである．
- \item 連数字用命令 \cs{rensuji} における位置合わせオプション \texttt{[l]}, \texttt{[c]},
-       \texttt{[r]} の挙動を若干変更した．
+のに対し，\texttt{<u>}\>にはそのような制限がないことである．
+ \item 連数字用命令 \cs{rensuji} における位置合わせオプション\texttt{[l]}, \texttt{[c]},
+       \texttt{[r]}\>の挙動を若干変更した．
 \end{itemize}
 
 %</ja>
@@ -8297,6 +8304,7 @@ among the line-head form, the line-middle form, and the line-end form.
 \pLaTeX\ supplies additional macros for vertical writing in the \Pkg{plext} package.
 The \Pkg{lltjext} package which we want to describe here is the \LuaTeX-ja
 counterpart of the \Pkg{plext} package.
+Unlike the \Pkg{plext} package, \Pkg{lltjext} loads the \Pkg{array} package automatically.
 %</en>
 
 %<*ja>
@@ -8394,7 +8402,6 @@ center (\texttt{c}), or~right (\texttt{r}).
 \item[\cs{kasen}\{\meta{contents}\}\textrm{, }\cs{bou}\{\meta{contents}\}\textrm{,
 		     }\cs{boutenchar}]
 
-\item[参照番号]
 \end{cslist}
 %</en>
 
