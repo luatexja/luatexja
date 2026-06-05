@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjext}[2026-05-10 v1.2k-ltj-20 Macros for vertical writing]
+\ProvidesPackage{lltjext}[2026-06-05 v1.2k-ltj-21 Macros for vertical writing]
 \RequirePackage{luatexja}
 
 \@ifl@t@r\fmtversion{2026-06-01}{}{\usepackage{lltjext-251101}\endinput}
@@ -519,16 +519,29 @@
 \def\@imakePbox<#1>[#2]{\@ifnextchar[%]
   {\@iimakePbox<#1>{#2}}{\@iimakePbox<#1>{#2}[c]}}
 \def\@iimakePbox<#1>#2[#3]#4{%
-  \bgroup\let\box@dir\relax
+  \bgroup\let\box@dir\relax\let\pbox@vertical@adjust\relax
   \if #1z\relax
-    \ifnum\ltjgetparameter{direction}=3~
+    \ifnum\ltjgetparameter{direction}=3\relax
       \let\box@dir\utod
+      \def\pbox@vertical@adjust{%
+        \raise\the\dimexpr
+        \ltjgetparameter{yalbaselineshift}-\ltjgetparameter{talbaselineshift}}
     \fi
   \else
-    \if #1y\relax     \let\box@dir\yoko
-    \else\if #1t\relax\let\box@dir\tate
-    \else\if #1d\relax\let\box@dir\dtou
-    \else\if #1u\relax\let\box@dir\utod
+    \if #1y     \let\box@dir\yoko
+    \else\if #1t\let\box@dir\tate
+      \ifnum\ltjgetparameter{direction}=11\relax
+      \def\pbox@vertical@adjust{%
+        \raise\the\dimexpr
+        \ltjgetparameter{talbaselineshift}-\ltjgetparameter{yalbaselineshift}}
+      \fi
+    \else\if #1d\let\box@dir\dtou
+    \else\if #1u\let\box@dir\utod
+      \ifnum\ltjgetparameter{direction}=3\relax
+        \def\pbox@vertical@adjust{%
+          \raise\the\dimexpr
+          \ltjgetparameter{yalbaselineshift}-\ltjgetparameter{talbaselineshift}}
+      \fi
     \fi\fi\fi\fi
   \fi
   \ifx\box@dir\relax
@@ -540,8 +553,8 @@
     \fi
   \fi
     \setlength{\@tempdima}{#2}%
-    \ifdim\@tempdima<\z@ \hbox{\box@dir#4}\else
-    \hb@xt@\@tempdima{\box@dir
+    \ifdim\@tempdima<\z@ \pbox@vertical@adjust\hbox{\box@dir#4}\else
+    \pbox@vertical@adjust\hb@xt@\@tempdima{\box@dir
                \if #3l\relax\else\hss\fi
                #4\relax
                \if #3r\relax\else\hss\fi}\fi\egroup}
