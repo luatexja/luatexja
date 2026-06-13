@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec-29e}[2025-11-01 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec-29e}[2026-06-13 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e}
 \ExplSyntaxOn
 
@@ -281,6 +281,7 @@
                 \__ltj_orig_fontspec_select_font_family:nn
   \__ltj_fontspec_restore_variable:
 }
+\cs_generate_variant:Nn \__ltj_fontspec_set_family:Nnn {c}
 \cs_set_eq:NN \__ltj_orig_fontspec_set_family:Nnn \fontspec_set_family:Nnn
 \cs_set_eq:NN \__ltj_orig_fontspec_make_font_shapes:Nnnnn
               \__fontspec_make_font_shapes:Nnnnn
@@ -394,25 +395,45 @@
   \normalfont
 }
 
+\cs_set_eq:NN \__ltj_orig_fontspec_main_newfontfamily:NnnN
+              \__fontspec_main_newfontfamily:NnnN
+\cs_new:Nn \__ltj_fontspec_main_newfontfamily:NnnN {
+  \__ltj_fontspec_set_family:cnn { l__fontspec_ \cs_to_str:N #1 _family_tl } {#2} {#3}
+  \use:x {
+    \exp_not:N #4 \exp_not:N #1 {} {
+      \exp_not:N \kanjifamily { \use:c { l__fontspec_ \cs_to_str:N #1 _family_tl } }
+      \exp_not:N \selectfont
+    }
+  }
+}
+
 \DeclareDocumentCommand \newjfontfamily { m O{} m O{} } {
-  \cs_set_eq:NN \fontspec_set_family:Nnn \__ltj_fontspec_set_family:Nnn
+  \cs_set_eq:NN \__fontspec_main_newfontfamily:NnnN
+                \__ltj_fontspec_main_newfontfamily:NnnN
   \newfontfamily #1 [#2,#4] {#3}
-  \cs_set_eq:NN \fontspec_set_family:Nnn \__ltj_orig_fontspec_set_family:Nnn
+  \cs_set_eq:NN \__fontspec_main_newfontfamily:NnnN
+                \__ltj_orig_fontspec_main_newfontfamily:NnnN
 }
 \DeclareDocumentCommand \renewjfontfamily { m O{} m O{} } {
-  \cs_set_eq:NN \fontspec_set_family:Nnn \__ltj_fontspec_set_family:Nnn
+  \cs_set_eq:NN \__fontspec_main_newfontfamily:NnnN
+                \__ltj_fontspec_main_newfontfamily:NnnN
   \renewfontfamily #1 [#2,#4] {#3}
-  \cs_set_eq:NN \fontspec_set_family:Nnn \__ltj_orig_fontspec_set_family:Nnn
+  \cs_set_eq:NN \__fontspec_main_newfontfamily:NnnN
+                \__ltj_orig_fontspec_main_newfontfamily:NnnN
 }
 \DeclareDocumentCommand \setjfontfamily { m O{} m O{} } {
-  \cs_set_eq:NN \fontspec_set_family:Nnn \__ltj_fontspec_set_family:Nnn
+  \cs_set_eq:NN \__fontspec_main_newfontfamily:NnnN
+                \__ltj_fontspec_main_newfontfamily:NnnN
   \setfontfamily #1 [#2,#4] {#3}
-  \cs_set_eq:NN \fontspec_set_family:Nnn \__ltj_orig_fontspec_set_family:Nnn
+  \cs_set_eq:NN \__fontspec_main_newfontfamily:NnnN
+                \__ltj_orig_fontspec_main_newfontfamily:NnnN
 }
 \DeclareDocumentCommand \providejfontfamily { m O{} m O{} } {
-  \cs_set_eq:NN \fontspec_set_family:Nnn \__ltj_fontspec_set_family:Nnn
+  \cs_set_eq:NN \__fontspec_main_newfontfamily:NnnN
+                \__ltj_fontspec_main_newfontfamily:NnnN
   \providefontfamily #1 [#2,#4] {#3}
-  \cs_set_eq:NN \fontspec_set_family:Nnn \__ltj_orig_fontspec_set_family:Nnn
+  \cs_set_eq:NN \__fontspec_main_newfontfamily:NnnN
+                \__ltj_orig_fontspec_main_newfontfamily:NnnN
 }
 
 \DeclareDocumentCommand \newjfontface { m O{} m O{} } {
@@ -457,6 +478,7 @@
    {
     \__ltj_fontspec_set_variable_for_kanji:
     \group_begin:
+      \tl_set_eq:NN \f@encoding \k@encoding
       \tl_set_eq:NN \f@family \k@family
       \cs_set_eq:NN \__fontspec_select_font_family:nn
                     \__ltj_fontspec_select_font_family:nn
