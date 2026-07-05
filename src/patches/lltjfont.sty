@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2026-03-15 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2026-07-05 Patch to NFSS2 for LuaTeX-ja]
 
 %%%%%%%% LaTeX2e version detection
 \newcount\ltj@@latex@plv
@@ -888,6 +888,7 @@
 \patchcmd\update@series@target@value@kanji{\f@series}{\k@series}{}{}
 \patchcmd\update@series@target@value@kanji{\f@series}{\k@series}{}{}
 \ifnum\ltj@@latex@plv>1500 % LaTeX2e 2025-11-01
+  \patchcmd\update@series@target@value@kanji{\@currentmetafamily}{\@currentmetakanjifamily}{}{}
   \patchcmd\update@series@target@value@kanji{\@currentmetafamily}{\@currentmetakanjifamily}{}{}
   \patchcmd\update@series@target@value@kanji{\@currentmetafamily}{\@currentmetakanjifamily}{}{}
   \def\@restoremetafamily{%
