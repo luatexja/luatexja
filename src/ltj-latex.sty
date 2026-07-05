@@ -12,7 +12,7 @@
 \def\luatexjalatexLoaded{\endinput}
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{ltj-latex}[2026-05-17 LaTeX support of LuaTeX-ja]
+\ProvidesPackage{ltj-latex}[2026-07-05 LaTeX support of LuaTeX-ja]
 
 \endlinechar=13
 
@@ -105,6 +105,46 @@
 \ltj@ExecuteAfterPackage{breqn}{%
   \let\vadjust\ltj@@vadjust@breqn   \let\insert\ltj@@insert@breqn
   \let\ltj@@vadjust@breqn\undefined \let\ltj@@insert@breqn\undefined
+}
+
+\ltj@ExecuteAfterPackage*{luamml-patches-amsmath}{%
+  \directlua{
+    local math_t = node.id'math'
+    local id_whatsit = node.id'whatsit'
+    local sid_user = node.subtype'user_defined'
+    local userid_DIR = luatexja.userid_table.DIR
+    local store_column = require'luamml-table'.store_column
+
+    local funcid = (token.create('__luamml_amsmath_add_box_to_row:')).mode
+    lua.get_functions_table()[funcid] = function()
+      local boxnum = 0
+      local startmath = tex.box[boxnum].list
+      if startmath.id == id_whatsit and startmath.subtype == sid_user then
+        if startmath.user_id == userid_DIR then
+          startmath = startmath.next
+        end
+      end
+      assert(startmath.id == math_t)
+      store_column(startmath)
+    end
+    %
+    local funcid = (token.create('__luamml_amsmath_add_last_to_row:')).mode
+    lua.get_functions_table()[funcid] = function()
+      local nest = tex.nest.top
+      local head, startmath = nest.head, nest.tail
+      repeat
+        startmath = startmath.prev
+      until startmath == head or (startmath.id == math_t and startmath.subtype == 0)
+      if startmath.id == id_whatsit and startmath.subtype == sid_user then
+        if startmath.user_id == userid_DIR then
+          startmath = startmath.next
+        end
+      end
+      if startmath == head then return end
+      assert(startmath.id == math_t)
+      store_column(startmath)
+    end
+  }%
 }
 
 \def\ltj@@q@stop{\ltj@@q@stop}
