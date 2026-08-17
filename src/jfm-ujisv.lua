@@ -315,9 +315,19 @@ if jf then
     t[199].kern = { [3] = 0.25 }
   end
   local d = tonumber(jf.down)
-  for i,v in pairs(t) do
-    if type(i)=='number' and i>=0 then
-      v.down = (type(v.down)=='number') and (v.down+d) or d
+  if d and d~=0 then
+    for i,v in pairs(t) do
+      if type(i)=='number' and i>=0 then
+        v.down = (type(v.down)=='number') and (v.down+d) or d
+      end
+    end
+  end
+  local d = tonumber(jf.left)
+  if d and d~=0 then
+    for i,v in pairs(t) do
+      if type(i)=='number' and i>=0 then
+        v.left = (type(v.left)=='number') and (v.left+d) or d
+      end
     end
   end
 end

@@ -9,7 +9,8 @@ local t = {
 }
 local jf = luatexja.jfont.jfm_feature
 if jf then
-  t[0].down = tonumber(jf.down)
+  t[0].down = tonumber(jf.down) or 0.0
+  t[0].left = tonumber(jf.left) or 0.0
 end
 
 luatexja.jfont.define_jfm(t)
