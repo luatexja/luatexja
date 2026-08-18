@@ -43,7 +43,7 @@ local font_metric_table = ltju.font_metric_table -- [font number] -> jfm_name, j
 
 luatexbase.create_callback("luatexja.load_jfm", "data", function (ft, jn) return ft end)
 
-local jfm_spec, jfm_name, jfm_var, jfm_ksp, jfm_pci
+local jfm_spec, jfm_name, jfm_var, jfm_ksp, jfm_pci, jfm_down, jfm_left
 local defjfm_res
 local jfm_dir, is_def_jfont, vert_activated, auto_enable_vrt2
 
@@ -325,6 +325,8 @@ do
       local fmtable = { jfm = j, size = f.size, var = jfm_var,
                         with_kanjiskip = jfm_ksp, protect_compat_ig = jfm_pci,
                         zw = sz.zw, zh = sz.zh,
+                        down = (type(jfm_down)=='number') and round(jfm_down*f.size), 
+                        left = (type(jfm_left)=='number') and round(jfm_left*f.size), 
                         chars = sz.chars, char_type = sz.char_type,
                         kanjiskip = sz.kanjiskip, xkanjiskip = sz.xkanjiskip,
                         chars_cbcache = {},
@@ -461,6 +463,8 @@ do
          end
          -- print('NN>', name)
       end
+      jfm_down = tonumber(is_feature_specified(name, 'down'))
+      jfm_left = tonumber(is_feature_specified(name, 'left'))
       jfm_ksp = (is_feature_specified(name,'ltjksp')~=false)
       jfm_pci = (is_feature_specified(name,'ltjpci')~=false)
       if jfm_dir == 'tate' then

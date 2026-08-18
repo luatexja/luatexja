@@ -1,0 +1,33 @@
+\documentclass{ltjtbook}
+\usepackage{luatexja-fontspec,lltjext}
+\setmainjfont[
+  AltFont = {
+    {
+        Range = {"80-},
+        Font = {FandolSong-Regular.otf}, YokoFeatures = {Down = -0.1},
+        },
+    },
+]{NotoSerifCJKsc-Regular.otf}
+
+\newjfontfamily\TATEFONT[
+  AltFont = {
+    {
+        Range = {"80-},
+        Font = {cwTeXQMing-Medium.ttf}, TateFeatures = {Left = 0.45},
+        },
+    },
+]{LXGWWenKai-Regular.ttf}
+\usepackage{zhlipsum}
+
+\begin{document}
+\fboxsep=0pt
+\fbox{%
+  \parbox<y>{20\zw}{%
+    abc\zhlipsum[name=xiangyu]
+  }}
+\newpage
+\fbox{%
+  \parbox<t>{20\zw}{
+    \TATEFONT abc\zhlipsum[name=nanshanjing]
+  }}
+\end{document}

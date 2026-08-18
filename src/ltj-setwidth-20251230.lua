@@ -83,14 +83,20 @@ end
 local ltjw = {} --export
 luatexja.setwidth = ltjw
 
-luatexbase.create_callback("luatexja.set_width", "data",
-                           function (fstable, fmtable, char_data)
-                              return fstable
-                           end)
-local call_callback = luatexbase.call_callback
-
+local init_fshift
 local fshift =  { down = 0, left = 0 }
-
+do
+  luatexbase.create_callback("luatexja.set_width", "data",
+    function (fstable, fmtable, char_data)
+      return fstable
+    end)
+  local call_callback = luatexbase.call_callback
+  init_fshift = function(fmtable, char_data)
+    fshift.down = char_data.down + (fmtable.down or 0)
+    fshift.left = char_data.left + (fmtable.left or 0)
+    return call_callback("luatexja.set_width", fshift, fmtable, char_data)
+  end
+end
 local min, max, floor, abs = math.min, math.max, math.floor, math.abs
 
 local rule_subtype = (status.luatex_version>=85) and 3 or 0
@@ -98,8 +104,7 @@ local rule_subtype = (status.luatex_version>=85) and 3 or 0
 -- 和文文字の位置補正（横）
 local function capsule_glyph_yoko(p, met, char_data, head, dir)
    if not char_data then return node_next(p), head, p end
-   fshift.down = char_data.down; fshift.left = char_data.left
-   fshift = call_callback("luatexja.set_width", fshift, met, char_data)
+   fshift = init_fshift(met, char_data)
    local kbl = get_attr(p, attr_ykblshift) or 0
    --
    -- f*: whd specified in JFM
@@ -158,8 +163,7 @@ luatexja.setwidth.capsule_glyph_yoko = capsule_glyph_yoko
 -- 和文文字の位置補正（縦）
 -- UTR#50 で R もしくは Tr と指定されているが，縦組用グリフがないもの
 local function capsule_glyph_tate_rot(p, met, char_data, head, dir, asc)
-   fshift.down = char_data.down; fshift.left = char_data.left
-   fshift = call_callback("luatexja.set_width", fshift, met, char_data)
+   fshift = init_fshift(met, char_data)
    local kbl = get_attr(p, attr_tkblshift) or 0
    -- f*: whd specified in JFM
    local pwidth, pheight,pdepth = getwhd(p)
@@ -239,8 +243,7 @@ local capsule_glyph_tate = function (p, met, char_data, head, dir)
       local quot = floor(frac+0.5)
       if abs(frac-quot) <char_data.round_threshold then fwidth = fwidth * quot end
    end
-   fshift.down = char_data.down; fshift.left = char_data.left
-   fshift = call_callback("luatexja.set_width", fshift, met, char_data)
+   fshift = init_fshift(met, char_data)
    local fheight = char_data.height or 0
    local fdepth  = char_data.depth or 0
    local y_shift = xo + (get_attr(p,attr_tkblshift) or 0)
@@ -290,8 +293,7 @@ local function capsule_glyph_math(p, met, char_data, sty)
    if not char_data then return nil end
    local fwidth, pwidth = char_data.width, getwidth(p)
    fwidth = fwidth or pwidth
-   fshift.down = char_data.down; fshift.left = char_data.left
-   fshift = call_callback("luatexja.set_width", fshift, met, char_data)
+   fshift = init_fshift(met, char_data)
    local fheight, fdepth = char_data.height, char_data.depth
    local y_shift = - getfield(p, 'yoffset') 
      + cap_math_aux[sty]()*
@@ -321,7 +323,7 @@ function luatexja.setwidth.apply_ashift_math(head, last, attr_ablshift, dir)
             setheight(p, getheight(p)-v); setdepth(p, getdepth(p)+v)
             set_attr(p, attr_icflag, PROCESSED)
          elseif pid==id_glyph then
-            -- 欧文文字; 和文文字は pid == id_hlist の場合で処理される
+            -- 欧文文字; 和文文字は pid == id_hlist の場合で処理さleれる
             -- (see conv_jchar_to_hbox_A in ltj-math.lua)
             local d, yo, abl = getdepth(p), getfield(p, 'yoffset'), get_attr(p,attr_ablshift) or 0
             setfield(p, 'yoffset', yo - abl)
