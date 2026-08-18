@@ -1,4 +1,4 @@
-local t = {
+luatexja.jfont.define_jfm {
    dir = 'tate',
    zw = 1.0, zh = 1.0,
 
@@ -7,10 +7,3 @@ local t = {
       width = 'prop', height = 0.50, depth = 0.50, italic=0.0,
    }
 }
-local jf = luatexja.jfont.jfm_feature
-if jf then
-  t[0].down = tonumber(jf.down)
-end
-
-luatexja.jfont.define_jfm(t)
-
