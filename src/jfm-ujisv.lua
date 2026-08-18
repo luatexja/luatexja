@@ -310,16 +310,8 @@ for i,v in pairs(t) do
 end
 
 local jf = luatexja.jfont.jfm_feature
-if jf then
-  if jf.beginpar_middledot_zw==true then
+if jf and jf.beginpar_middledot_zw==true then
     t[199].kern = { [3] = 0.25 }
-  end
-  local d = tonumber(jf.down)
-  for i,v in pairs(t) do
-    if type(i)=='number' and i>=0 then
-      v.down = (type(v.down)=='number') and (v.down+d) or d
-    end
-  end
 end
 
 luatexja.jfont.define_jfm(t)
