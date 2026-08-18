@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2026-05-17 Patch to LaTeX2e Kernel for LuaTeX-ja]
+\ProvidesPackage{lltjcore}[2026-08-18 Patch to LaTeX2e Kernel for LuaTeX-ja]
 \RequirePackage{etoolbox}
 
 \def\ltj@ptcerr#1{\typeout{lltj-core: patch FAILED (\detokenize{#1})}}
@@ -255,12 +255,7 @@
 \gdef\@setref@{\ifhmode\spacefactor\@m\fi}
 \endgroup
 \if@compatibility\else
-\def\verb{\relax\ifmmode\hbox\else\leavevmode\vadjust{}\fi
-  \bgroup
-    \verb@eol@error \let\do\@makeother \dospecials
-    \verbatim@font\@noligs
-    \language\l@nohyphenation
-    \@ifstar\@sverb\@verb}
+\patchcmd\verb{\leavevmode\null}{\leavevmode\vadjust{}}{}{}
 \fi
 \patchcmd{\do@noligs}{\kern\z@}{\vadjust{}}{}{\ltj@ptcerr{\do@noligs}} % reported by p_typo
 \gdef\@stopfield{%
