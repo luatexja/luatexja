@@ -129,7 +129,7 @@ local function capsule_glyph_yoko(p, met, char_data, head, dir)
       elseif ht_diff >= 0 and dp_diff >=0 then -- rule
          local box = node_new(id_rule, rule_subtype, p)
          local xo, yo = getoffsets(p)
-         setoffsets(p, xo, yo - kbl - fshift.down)
+         setoffsets(p, xo - fshift.left, yo - kbl - fshift.down)
          setwhd(box, 0, fheight - kbl, fdepth + kbl)
          setdir(box, dir)
          set_attr(box, attr_icflag, PACKED)
