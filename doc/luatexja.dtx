@@ -3397,13 +3397,13 @@ Returned value&\texttt{4}&\texttt{3}&\texttt{1}&\texttt{11}&\texttt{0}\\
   方式Aと比べるとテキスト抽出がまともに行えるが，未だ不安が残るのは確かである：
   \begin{itemize}
     \item Identity-V~CMapや，フォントの書字方向(WMode)として縦書きを用いることは
-    \LuaTeX のundocumentedな機能である
+    \LuaTeX のundocumentedな機能である．
     \item 組方向\texttt{RTT}はほとんど使用されておらず，\LuaTeX でもほとんどテストされていない．
     現状ではグリフ出力位置の計算がどこかおかしいようである
     \footnote{%
       \LuaTeX-jaでは適宜カーンで補正しているが，その補正量の根拠は「色々な場合で試してみて
       とりあえずこれでうまくいっているようだ」以上にはない．
-    }
+    }．
   \end{itemize}
 \end{description}
 
@@ -3896,7 +3896,7 @@ JFMもサイズも同じなので，普通に「）\nobreak【」と入力した
 %</en>
 %<*ja>
 \item[\texttt{jfm-ujis.lua}] \LuaTeX-jaの標準JFMファイルであり，このJFMは\upTeX で
-  用いられるUTF/OTFパッケージ用の和文用TFMである \verb+upnmlminr-h.tfm+ を
+  用いられるUTF/OTFパッケージ用の和文用TFMである\verb+upnmlminr-h.tfm+を
   元にしている．\Pkg{luatexja-otf}パッケージを使うときはこのJFMを指定するべきである．
 %</ja>
 %<*en>
@@ -3909,10 +3909,10 @@ JFMもサイズも同じなので，普通に「）\nobreak【」と入力した
 %</en>
 %<*ja>
 \item[\texttt{jfm-jis.lua}] \pTeX で広く用いられている「JISフォントメトリック」
-  \verb+jis.tfm+ に相当するJFMである．\texttt{jfm-ujis.lua} とこの
-  \texttt{jfm-jis.lua} の主な違いは，\texttt{jfm-ujis.lua} ではほとんどの文字が
+  \verb+jis.tfm+に相当するJFMである．\texttt{jfm-ujis.lua}とこの
+  \texttt{jfm-jis.lua}の主な違いは，\texttt{jfm-ujis.lua}ではほとんどの文字が
   正方形状であるのに対し，\texttt{jfm-jis.lua} では横長の長方形状であることと，
-  \texttt{jfm-ujis.lua} では「？」「！」の直後に半角空白が挿入されることである．
+  \texttt{jfm-ujis.lua}では「？」「！」の直後に半角空白が挿入されることである．
 %</ja>
 %<*en>
 \item[\texttt{jfm-min.lua}] A counterpart for \verb+min10.tfm+, which is one
@@ -3921,7 +3921,7 @@ JFMもサイズも同じなので，普通に「）\nobreak【」と入力した
 %<*ja>
 \item[\texttt{jfm-min.lua}] \pTeX に同梱されているデフォルトの和文用TFM
 (\verb+min10.tfm+)に相当し，行末で文字が揃うようにするために「っ」など一部の文字幅が変わっ
-	   ている．\verb+min10.tfm+ については\cite{min10}が詳しい．
+	   ている．\verb+min10.tfm+については\cite{min10}が詳しい．
 %</ja>
 %<*en>
 \item[\texttt{jfm-prop.lua}] A JFM for proportional typesetting.
@@ -4069,19 +4069,26 @@ the letterspacing and the width of italic corrections are not correct:
 %<*ja>
 \paragraph{\texttt{down}と\texttt{left}}
 他のOpenType機能と同じような形式で\texttt{down=}\meta{real}を
-指定した場合，これらは「JFMのすべての文字クラスで\texttt{down}の値を\meta{real}だけ増やす」のと
+指定した場合，これらは「JFM中のすべての文字クラスで\texttt{down}の値を\meta{real}だけ増やす」のと
 同じ効力を発揮する．\meta{real}の単位はdesign sizeである．
 言い換えれば，\autoref{fig:downleft}に示すように，JFMで指定された文字の幅・高さ・深さは\emph{変えず}に，
 実際のグリフは\meta{real}だけ下に下がって組まれることになる．
 その意味で，この\texttt{down=}\meta{real}指定は\Param{yjabaselineshift}の代替ではない．
 
 \texttt{down}と同様に，
-「JFMのすべての文字クラスで\texttt{down}の値を\meta{real}だけ増やす」のと
+「JFMのすべての文字クラスで\texttt{left}の値を\meta{real}だけ増やす」のと
 同じ効力を発揮する\texttt{left=}\meta{real}も使用可能である．
 %</ja>
 %<*en>
 \paragraph{\texttt{down} and \texttt{left}}
-...
+A specification \texttt{down=}<real> has the same effect as
+that \texttt{down} fields in every character class are increased by <real>.
+This means that every characters are set lower by <real>, without changing the imaginary body
+ (see~\autoref{fig:downleft}). The unit of <real> is the design size, 
+and this \texttt{down=}<real> specification is not a substitute of Param{yjabaselineshift}.
+
+We have another specification \texttt{left=}<real>, which has the same effect as
+that \texttt{left} fields in every character class are increased.
 %</en>
 \begin{figure}
 \begin{LTXexample}[width=0.3\textwidth]
@@ -4089,7 +4096,7 @@ the letterspacing and the width of italic corrections are not correct:
 \jfont\Js=HaranoAjiMincho-Regular:jfm=ujis;-kern
 \jfont\Jd=HaranoAjiMincho-Regular:down=0.5;jfm=ujis;-kern
 \jfont\Jl=HaranoAjiMincho-Regular:left=0.25;jfm=ujis;-kern
-\fbox{\Js 漢字「A」あ}\ \fbox{\Jd 漢字「B」あ}\\
+\fbox{\Js 漢字「A」あ}\ \fbox{\Jd 漢字「B」あ}\\[10pt]
 \fbox{\Jl 漢字「C」あ}\ 
 \fbox{\Js\ltjsetparameter{yjabaselineshift=.5\zh}漢字「D」あ}
 \end{LTXexample}
@@ -4184,9 +4191,6 @@ as shown in~\autoref{fig:ltjpci}.
 \caption{\texttt{ltjpci} ``feature''}
 \label{fig:ltjpci}
 \end{figure}
-
-
-\textcolor{red}{\Large ここまで見た}
 
 %<en>\subsection{\cs{tfont}}
 %<ja>\subsection{\cs{tfont} 命令}
@@ -4292,7 +4296,7 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
 \end{itemize}
 %</en>
 %<*ja>
-\cs{tfont} はフォントを縦組用の和文フォントとして読み込む命令であり，
+\cs{tfont}はフォントを縦組用の和文フォントとして読み込む命令であり，
 \cs{tfont}の構文は\cs{jfont}と同様である．
 \cs{tfont}で定義された縦組用和文フォントは，
 以下の点が\cs{jfont}による横組用和文フォントとは異なる：
@@ -4327,10 +4331,10 @@ A font defined by~\cs{tfont} differs the following points from that by~\cs{jfont
 以下の縦組用JFMが\LuaTeX-jaには同梱されている．%おり，違いを\autoref{tab-difjfm-tate}に示した．
 \begin{description}
 \item[\texttt{jfm-ujisv.lua}] \LuaTeX-jaの標準縦組用JFMである．このJFMは\upTeX で
-  用いられるUTF/OTFパッケージ用の和文用TFMである \verb+upnmlminr-v.tfm+ を
+  用いられるUTF/OTFパッケージ用の和文用TFMである\verb+upnmlminr-v.tfm+を
   元にしている．
 \item[\texttt{jfm-tmin.lua}] \pTeX に同梱されているデフォルトの和文用縦組TFM
-  である \verb+tmin10.tfm+ に相当し，\texttt{min10.tfm} と同様に
+  である\verb+tmin10.tfm+に相当し，\texttt{min10.tfm} と同様に
   「っ」など一部の文字幅が狭められている．
 \end{description}
 
@@ -4459,7 +4463,7 @@ the definition of \cs{ltj@stdmcfont} and others.
 旧バージョンとの互換性のため，
 \LuaTeX から見える位置に\texttt{luatexja.cfg}があれば，\LuaTeX-jaはそれを読み込む．
 しかし，\texttt{luatexja.cfg}内で\cs{ltj@stdmcfont}等が定義されていた場合はそちらが
-優先されるので，もはや\texttt{luatexja.cfg}は使わないほうが良いだろう．
+優先されるので，もはや\texttt{luatexja.cfg}は使わないほうが良い．
 %</ja>
 
 %<en>\subsection{Prefix \texttt{psft}}
@@ -4482,7 +4486,7 @@ with \texttt{psft} prefix, because they are only simple linear transformations.
 %</en>
 %<*ja>
 \Pkg{luaotfload}で使用可能になった
-\texttt{file}\ と \texttt{name}\ のプリフィックスに加えて，
+\texttt{file}と\texttt{name}のプリフィックスに加えて，
 \cs{jfont}（と\cs{font}プリミティブ）では
 \texttt{psft}プリフィックスを用いることができる．
 このプリフィックスを用いることで，PDFには埋め込まれない「名前だけの」
@@ -4492,11 +4496,11 @@ Identity-Hとなり，PDFの標準規格ISO32000-1:2008~(\cite{pdfstd})に非準
 ので注意してほしい．
 
 \emph{\texttt{psft} プリフィックスの下では
-\texttt{+jp90} などのOpenType機能の効力はない．
+\>\texttt{+jp90}などのOpenType機能の効力はない．
 非埋込フォントをPDFに使用すると，実際にどのようなフォントが
 表示に用いられるか予測できないからである．}\
-\texttt{extend} と \texttt{slant} 指定は単なる変形のため
-\texttt{psft} プリフィックスでも使用可能である．
+\texttt{extend}と\texttt{slant}指定は単なる変形のため
+\texttt{psft}プリフィックスでも使用可能である．
 %</ja>
 
 %<en>\paragraph{\texttt{cid} key}
@@ -4510,7 +4514,7 @@ One can specify \texttt{cid} key to use other CID-keyed non-embedded fonts
 for Chinese or Korean typesetting.
 %</en>
 %<*ja>
-標準で\texttt{psft}\ プリフィックスで定義されるフォントは日本語用のもので
+標準で\texttt{psft}プリフィックスで定義されるフォントは日本語用のもので
 あり，Adobe-Japan1-7のCIDに対応したものとなる．しかし，\LuaTeX-jaは中国語
 の組版にも威力を発揮することが分かり，日本語フォントでない非埋込フォント
 の対応も必要となった．そのために追加されたのが\texttt{cid}キーである．
@@ -4581,7 +4585,7 @@ structure of this table.  Note that all lengths in a JFM file are
 floating-point numbers in design-size unit.
 %</en>
 %<*ja>
-実際のデータは上で \verb+{ ... }+ で示されたテーブルの中に格納されている．
+実際のデータは上で\>\verb+{ ... }+\>で示されたテーブルの中に格納されている．
 以下ではこのテーブルの構造について記す．
 なお，JFMファイル中の長さは全てdesign sizeを単位とする浮動小数点数であることに
 注意する．
@@ -4649,7 +4653,7 @@ This field specifies the ``ideal'' amount of \Param{kanjiskip}. As noted
 %<*ja>
 理想的な\Param{kanjiskip}の量を指定する．\ref{subs-kskip}節で述べたように，
 もし\Param{kanjiskip}が\cs{maxdimen}の値ならば，このフィールドで指定された
-値が実際には用いられる（指定なしは0\,ptとして扱われる）．\meta{stretch}と\meta{shrink}のフィールドもdesign size
+値が実際には用いられる（指定なしは0\,ptとして扱われる）．\meta{stretch}と\meta{shrink}のフィールドもdesign size%
 が単位であることに注意せよ．
 %</ja>
 
@@ -4672,8 +4676,8 @@ Like the \texttt{kanjiskip} field, this field specifies the ``ideal''
 Besides from above fields, a JFM file have several sub-tables those
 indices are natural numbers.  The table indexed by~$i\in\omega$ stores
 information of \emph{character class}~$i$. At least, the character class~0 is
-always present, so each JFM file must have a sub-table whose index is
-\texttt{[0]}.  Each sub-table (its numerical index is denoted by $i$) has
+always present, so each JFM file must have a sub-table whose index is zero.
+Each sub-table (its numerical index is denoted by $i$) has
 the following fields:
 %</en>
 %<*ja>
@@ -4681,7 +4685,7 @@ the following fields:
 上記のフィールドに加えて，JFMファイルはそのインデックスが自然数であるいくつかの
 サブテーブルを持つ．インデックスが$i\in\omega$であるテーブルは\emph{文字クラス}$i$の
 情報を格納する．少なくとも，文字クラス0は常に存在するので，JFMファイルはインデックス
-が\texttt{[0]}のサブテーブルを持たなければならない．それぞれのサブテーブル
+が0のサブテーブルを持たなければならない．それぞれのサブテーブル
 （そのインデックスを$i$で表わす）は以下のフィールドを持つ：
 %</ja>
 
@@ -4890,7 +4894,7 @@ Furthermore, the glyph is shifted according to values of fields
       glyph is indicated by the red rectangle.
 %</en>
 %<*ja>
-さらに，グリフは \texttt{left} と \texttt{down} の値に従ってシフトされる．
+さらに，グリフは\texttt{left}と\texttt{down}の値に従ってシフトされる．
 最終的な実際のグリフの位置は赤色の長方形で示された位置になる．
 %</ja>
 \end{itemize}
@@ -4985,7 +4989,7 @@ field is \texttt{'right'}.
 また，この場合\texttt{align}フィールドは\>\texttt{'right'}\>なので，
 「水平位置」は字送り方向に「右寄せ」したものとなる（緑色の長方形）．
 \item
-その後さらに\texttt{left} と\texttt{down}の値に従ってシフトされる
+その後さらに\texttt{left}と\texttt{down}の値に従ってシフトされる
 のは横組用和文フォントと変わらない．
 \end{itemize}
 %</ja>
@@ -5034,7 +5038,7 @@ we specify \meta{ratio} to $0.25/(0.5+0.25)=1/3$.
 %</en>
 
 %<*ja>
-グルーの指定においては，上記に加えて各 \texttt{[$j$]} の各サブテーブル内に
+グルーの指定においては，上記に加えて各\>\texttt{[$j$]}\>の各サブテーブル内に
 次のキーを指定できる，
 \begin{cslist}[style=standard]
 \item[priority=\meta{priority}]
@@ -5042,9 +5046,9 @@ we specify \meta{ratio} to $0.25/(0.5+0.25)=1/3$.
 	     行長調整（\ref{ssec:adj}節）において，このグルーの優先度を指定する．許される値は以下の通り：
   \begin{description}
     \item[バージョン1] $-4$から$+3$の間の整数
-    \item[バージョン2以降] $-4$から$+3$の間の整数の2つ組\texttt{\{\meta{stretch}, \meta{shrink}\}}か，
+    \item[バージョン2以降] $-4$から$+3$の間の整数の2つ組\>\texttt{\{\meta{stretch}, \meta{shrink}\}}\>か，
     または$-4$から$+3$の間の整数．\meta{stretch}, \meta{shrink}はそれぞれこのグルーが伸びるときの優先度，縮むときの
-    優先度であり，単に整数$i$が指定された場合は\texttt{\{$i$, $i$\}}であると解釈される．
+    優先度であり，単に整数$i$が指定された場合は\>\texttt{\{$i$, $i$\}}\>であると解釈される．
   \end{description}
   ここで指定する値は，大きい値ほど「先に伸ばされる」「先に縮ませる」ことを意味しており，省略時の値
              は0である．範囲外の値が指定されたときの動作は未定義である．
@@ -5058,14 +5062,14 @@ JFMによって本来挿入されるグルーの他に
 %  \footnote{本来\Param{xkanjiskip}が挿入される場所においては\Param{xkanjiskip}分の空白を自然長・伸び量・縮み量ごとに}%
 ための指定である．いずれも省略された場合のデフォルト値は0（追加しない）である．
 
-例えば，\LuaTeX-jaの横組標準JFMの \texttt{jfm-ujis.lua} では，
+例えば，\LuaTeX-jaの横組標準JFMの\texttt{jfm-ujis.lua}では，
 \begin{itemize}
  \item 通常の文字「あ」と開き括弧類の間に入るグルーは，自然長・縮み量半角，伸び量0のグルー
-となっているが，さらに\Param{kanjiskip}の伸び量に \texttt{kanjiskip\_stretch}（ここでは1）を掛け
+となっているが，さらに\Param{kanjiskip}の伸び量に\texttt{kanjiskip\_stretch}（ここでは1）を掛け
        た分だけ伸びることが許される．
  \item 同様に，閉じ括弧類（全角コンマ「，」も含む）と和文文字「う」「え」，
   閉じ括弧類と「f」の間も自然長・縮み量半角，伸び量0のグルー
-となっているが，さらに\Param{kanjiskip}の伸び量に \texttt{kanjiskip\_stretch}（ここでは1）を掛け
+となっているが，さらに\Param{kanjiskip}の伸び量に\texttt{kanjiskip\_stretch}（ここでは1）を掛け
        た分だけ伸びることが許される．
  \item 一方，開き括弧類と通常の文字の間，また通常の文字と閉じ括弧類の間は
   自然長・縮み量・伸び量0のグルーだが，\Param{kanjiskip}の縮み量に
@@ -5082,7 +5086,7 @@ JFMによって本来挿入されるグルーの他に
 
 \vrule\hbox{ああ「い」う，えお」f}\V\par
 \ltjsetparameter{kanjiskip=0pt minus \zw}
-\V\hbox spread -2.5\zw{aあ「い」う，えお」f}\V
+\V\hbox spread-2.5\zw{aあ「い」う，えお」f}\V
 \end{LTXexample}
 \end{cslist}
 %</ja>
@@ -5101,7 +5105,7 @@ and is also easy to shrink.
   kanjiskip\_stretch=\meta{num}\textrm{, }kanjiskip\_shrink=\meta{num}]\leavevmode
   \label{pg:ksp_nat}
 
-These keys specifies the amount of the natural width of \Param{kanjiskip}%
+These keys specifies the amount of the natural width of \Param{kanjiskip}~%
 (the stretch/shrink part, respectively) which will be inserted
 in addition to the original JFM glue. Default values of them are all 0.
 
@@ -5157,7 +5161,7 @@ Hence we have the following result:
 
   行末文字の位置調整が有効であり，かつ現在の文字クラスの文字が
   行末に来た時に，この文字と行末の間には指定された値のいずれかの大きさのカーンが
-  挿入される（\autoref{ssec:adj}参照）．
+  挿入される（\ref{ssec:adj}節参照）．
 
 バージョン1における
 \begin{lstlisting}[escapechar=\$]
@@ -5167,7 +5171,7 @@ Hence we have the following result:
 \begin{lstlisting}[escapechar=\$]
     end_adjust = {$-b$, 0.0, $a$}
 \end{lstlisting}
-もし真ん中の \texttt{0.0} がない場合は，$a$か$-b$かいずれかのカーンが常に行末に追加される．
+もし真ん中の\texttt{0.0}がない場合は，$a$か$-b$かいずれかのカーンが常に行末に追加される．
 %</ja>
 %<*en>
 (optional, version~2 or~later)
@@ -5198,7 +5202,7 @@ JFM側で番号を指定することができない．
 %<*ja>
 \paragraph{文字クラスの決定}
 文字からその文字の属する文字クラスを算出する過程について，
-次の内容を含んだ \texttt{jfm-test.lua} を用いて説明する．
+次の内容を含んだ\texttt{jfm-test.lua}を用いて説明する．
 %</ja>
 %<*en>
 \paragraph{Character to character classes}
@@ -5252,6 +5256,7 @@ The following input is an example.
 %</en>
 %<*ja>
 但し，JFMによって決まる置換後のグリフの文字クラスが0である場合は，置換前の文字クラスを採用する．
+次の例を参照のこと．
 %</ja>
 \begin{LTXexample}[width=0.3\textwidth]
 \jfont\a=HaranoAjiMincho-Regular:jfm=test;+vert
@@ -5273,7 +5278,7 @@ as follows:
 ここで，句点「。」(\texttt{U+3002})の文字クラスは，以下のようにして決まる．
 \begin{enumerate}
 \item \Pkg{luaotfload}によって縦組用句点のグリフに置き換わる．
-\item 置換後のグリフは \texttt{U+FE12} であり，JFMに従えば文字クラスは\emph{0}と判定される．
+\item 置換後のグリフは\texttt{U+FE12}であり，JFMに従えば文字クラスは\emph{0}と判定される．
 \item この場合，置換前の横組用句点のグリフによって文字クラスを判定する．
 \item 結果として，上の出力例中の句点の文字クラスは2000となる．
 \end{enumerate}
@@ -5422,7 +5427,7 @@ an external package is needed to support this in plain \TeX\ and
 %</en>
 %<*ja>
 \TeX\ は数式フォントを16のファミリ\footnote{Omega, Aleph, \LuaTeX，そして
-  $\varepsilon$-\kern-.125em(u)\pTeX\ では256の数式ファミリを扱うことができるが，
+  $\varepsilon$-\kern-.125em(u)\pTeX では256の数式ファミリを扱うことができるが，
   これをサポートするためにplain \TeX と\LaTeX では外部パッケージを読み込む必要が
   ある．}で管理し，それぞれのファミリは
   \cs{textfont}, \cs{scriptfont}, \cs{scriptscriptfont}という3つのフォントを持っている．
@@ -5477,7 +5482,7 @@ be accessed via \verb+luatexbase.add_to_callback+ function and so on, as other c
 %</en>
 %<*ja>
 \LuaTeX 自体のものに加えて，\LuaTeX-jaもコールバックを持っている．
-これらのコールバックには，他のコールバックと同様に \verb+luatexbase.add_to_callback+
+これらのコールバックには，他のコールバックと同様に\verb+luatexbase.add_to_callback+%
 関数などを用いることでアクセスすることができる．
 %</ja>
 \begin{description}[font=\bfseries, style=nextline]
@@ -5504,7 +5509,7 @@ this argument has \texttt{chars} field which contains character codes
 	     whose character class is not~0.
 %</en>
 %<*ja>
-引数 \verb+jfm_info+ はJFMファイルのテーブルと似たものが格納されるが，
+引数\verb+jfm_info+はJFMファイルのテーブルと似たものが格納されるが，
 クラス0を除いた文字のコードを含んだ\texttt{chars}フィールドを持つ点が異なる．
 %</ja>
 
@@ -5574,7 +5579,7 @@ between character class~$i$ and class~$j$.
 \end{description}
 %</en>
 %<*ja>
-\verb+jfont_info+ は最低限以下のフィールドを持つが，これらを書き換えてはならない：
+\verb+jfont_info+は最低限以下のフィールドを持つが，これらを書き換えてはならない：
 \begin{cslist}
 \item[size]
 実際に使われるフォントサイズ（sp単位）．$1\,\mathrm{sp}=2^{-16}\,\mathrm{pt}$．
@@ -5584,40 +5589,40 @@ sp単位で格納している．
 \item[jfm]
 利用されているJFMを識別するための番号．
 \item[var]
-\cs{jfont},~\cs{tfont} で指定された \texttt{jfmvar} キーの値（未指定のときは空文字列）．
+\cs{jfont},~\cs{tfont}で指定された\texttt{jfmvar}キーの値（未指定のときは空文字列）．
 \item[chars]
 文字コードから文字クラスへの対応が記述されたテーブル．\\
-JFM内の \texttt{[i].chars=\{\meta{character}, ...\}} という指定は\
-\texttt{chars=\{[\meta{character}]=\,$i$, ...\}} という形式に変換されている．
+JFM内の\>\texttt{[i].chars=\{\meta{character}, ...\}}\>という指定は\>%
+\texttt{chars=\{[\meta{character}]=\,$i$, ...\}}\>という形式に変換されている．
 \item[char\_type]
-$i\in\omega$に対して，\texttt{char\_type[$i$]} は文字クラス$i$の文字の寸法を格納しており，
+$i\in\omega$に対して，\texttt{char\_type[$i$]}\>は文字クラス$i$の文字の寸法を格納しており，
 以下のフィールドを持つ．
 \begin{itemize}
  \item \texttt{width},~\texttt{height}, \texttt{depth},
-  \texttt{italic}, \texttt{down},~\texttt{left}\ は
+  \texttt{italic}, \texttt{down},~\texttt{left}は
 JFMで指定されているそれぞれの値をスケーリングしたものである．
- \item \texttt{align} はJFMで指定されている値によって，
+ \item \texttt{align}はJFMで指定されている値によって，
 \[
  \begin{cases*}
   1&(\texttt{'right'} in JFM),\\
   0.5&(\texttt{'middle'} in JFM),\\
-  0&(otherwise).
+  0&(otherwise)
  \end{cases*}
 \]
 のいずれかの値をとる．
 \end{itemize}
-$i$,~$j\in \omega$に対して，\texttt{char\_type[$i$][$j$]} は
+$i$,~$j\in \omega$に対して，\texttt{char\_type[$i$][$j$]}\>は
 文字クラス$i$の文字と$j$の文字の間に挿入されるグルーやカーンの情報を格納している．
 
 間に入るものがカーンであれば，この値は%
-\texttt{[$j$]=\{\meta{kern}, ratio=\meta{ratio}\}}であり，
+\>\texttt{[$j$]=\{\meta{kern}, ratio=\meta{ratio}\}}\>であり，
 \meta{kern}はカーンの値をsp単位で表したものである．
   
 一方，間に入るものがグルーであれば，この値は以下のキーを持つテーブルである．
 \begin{description}
   \item[{[1], [2], [3]}]
   グルーのそれぞれ自然長，伸び量，縮み量をsp単位で表したもの．
-  \item[\texttt{priority}] （バージョン2以降の）JFMでの指定 \texttt{\{\meta{stretch},\meta{shrink}\}} を
+  \item[\texttt{priority}] （バージョン2以降の）JFMでの指定\>\texttt{\{\meta{stretch},\meta{shrink}\}}\>を
   \[
     (\text{\meta{stretch}}+4)\cdot 8+\text{\meta{shrink}}+4
   \]
@@ -5636,9 +5641,9 @@ you are free to add more fields (to use them in the \texttt{luatexja.find\_char\
 The \verb+font_number+ is a font number.
 %</en>
 %<*ja>
-戻り値の \verb+new_jfont_info+ テーブルも上に述べたフィールドをそのまま含まなければならないが，
+戻り値の\verb+new_jfont_info+テーブルも上に述べたフィールドをそのまま含まなければならないが，
 それ以外にユーザが勝手にフィールドを付け加えることは自由である．
-\verb+font_number+ はフォント番号である．
+\verb+font_number+はフォント番号である．
 %</ja>
 
 %<*en>
@@ -5649,7 +5654,7 @@ A good example of this and the next callbacks is the \Pkg{luatexja-otf}
 %</en>
 %<*ja>
 これと次のコールバックの良い使用例は\Pkg{luatexja-otf}パッケージであり，
-JFM中でAdobe-Japan1 CIDの文字を \verb+"AJ1-xxx"+ の形で指定するために
+JFM中でAdobe-Japan1 CIDの文字を\>\verb+"AJ1-xxx"+\>の形で指定するために
 用いられている．
 %</ja>
 
@@ -5684,10 +5689,10 @@ The argument \verb+char_class+ is the result of \LuaTeX-ja's default
 	     default routine.
 %</en>
 %<*ja>
-引数 \verb+char_class+ は\LuaTeX-jaのデフォルトルーチンか，このコールバックの
-直前の関数呼び出しの結果を含んでおり，したがってこの値は0ではないかもしれない．
-さらに，戻り値の \verb+new_char_class+ は \verb+char_class+ が非零のときには
-\verb+char_class+ の値と同じであるべきで，そうでないときは\LuaTeX-jaの
+引数\>\verb+char_class+\>は\LuaTeX-jaのデフォルトルーチンか，このコールバックの
+以前の関数呼び出しの結果を含んでおり，したがってこの値は0ではないかもしれない．
+さらに，戻り値の\>\verb+new_char_class+\>は\>\verb+char_class+\>が非零のときには
+\>\verb+char_class+\>の値と同じであるべきで，そうでないときは\LuaTeX-jaの
 デフォルトルーチンを書き換えることになる．
 %</ja>
 
@@ -5714,7 +5719,7 @@ The argument \verb+shift_info+ and the returned \verb+new_shift_info+ have
 	     down/left the character in a scaled point.
 %</en>
 %<*ja>
-引数 \verb+shift_info+ と戻り値の \verb+new_shift_info+ は
+引数\>\verb+shift_info+\>と戻り値の\>\verb+new_shift_info+\>は
 \texttt{down}と\texttt{left}のフィールドを持ち，これらの値は
 文字の下／左へのシフト量（sp単位）である．
 %</ja>
@@ -5734,9 +5739,9 @@ Then, the position of glyphs is shifted up by
 %</en>
 %<*ja>
 良い例が\Pkg{test/valign.lua}である．このファイルが読み込まれた状態では，
-	     JFM内で規定された文字クラス0の文字における$(\hbox{高
-	     さ}):(\hbox{深さ})$の比になるように，実際のフォントの出力上
-	     下位置が自動調整される．例えば，
+  JFM内で規定された文字クラス0の文字における
+  $(\hbox{高さ}):(\hbox{深さ})$の比になるように，実際のフォントの出力
+  上下位置が自動調整される．例えば，
 \begin{itemize}
 \item JFM側の設定：$(\hbox{高さ})=88x$, $(\hbox{深さ})=12x$%
 （和文OpenTypeフォントの標準値）
@@ -7072,7 +7077,7 @@ which is not produced by \cs{fontshape\{it\}}.
 \begin{LTXexample}[pos=b]
 \DeclareKanjiFamily{JY3}{edm}{}
 \DeclareFontShape{JY3}{edm}{m}{n}   {<-> s*HaranoAjiMincho-Regular:jfm=ujis}{}
-\DeclareFontShape{JY3}{edm}{m}{fb}  {<-> s*HaranoAjiGothic-Regular:jfm=ujis;color=003FFF}{}
+\DeclareFontShape{JY3}{edm}{m}{fb}  {<-> s*HaranoAjiGothic-Regular:jfm=ujis;color=003FFF;down=0.1}{}
 \DeclareFontShape{JY3}{edm}{m}{fb2} {<-> s*HaranoAjiGothic-Regular:jfm=ujis;color=FF1900}{}
 \DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{fb}{ "4E00-"67FF,{-2}-{-2}}
 \DeclareAlternateKanjiFont{JY3}{edm}{m}{n}{JY3}{edm}{m}{fb2}{"6800-"9FFF}
@@ -7634,7 +7639,7 @@ A demonstrarion is shown in \autoref{fig:yokotate-fontspec}.
 \begin{LTXexample}[pos=b]
 \jfontspec[
   AltFont={
-    {Range="4E00-"67FF, Font=HaranoAjiGothic-Regular, Color=003FFF},
+    {Range="4E00-"67FF, Font=HaranoAjiGothic-Regular, Color=003FFF, Down=0.1},
     {Range="6800-"9EFF, Color=FF1900},
     {Range="3040-"306F, Font=HaranoAjiGothic-Regular, Color=35A16B},
   }
@@ -8893,8 +8898,6 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{tabular}
 \end{center}
 
-%<en>\newpage
-
  \item[morisawa-pro]  Morisawa Pro (Adobe-Japan1-4) fonts.
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[morisawa-pr6n]  Morisawa Pr6N (Adobe-Japan1-6, JIS04-savvy) fonts.
@@ -8986,8 +8989,10 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 %<ja>\texttt{moga-mobo-ex}オプション指定時にはMogaEx90MinchoなどのExが名前についたフォントが使われる．
 
 \item[ume]  Ume Mincho and Ume Gothic.
-%<en>\par These fonts can be downloaded from\\\hfill \url{https://ja.osdn.net/projects/ume-font/wiki/FrontPage}.
-%<ja>これらのフォントは \url{https://ja.osdn.net/projects/ume-font/wiki/FrontPage} からダウンロードできる．
+%<en>\par These fonts were available from \url{https://ja.osdn.net/projects/ume-font/wiki/FrontPage},
+%<en> but this link is now broken.
+%<ja>これらのフォントは\url{https://ja.osdn.net/projects/ume-font/wiki/FrontPage}からダウンロードできたが，
+%<ja>現在ではリンク切れである．
 \begin{center}\small
 \begin{tabular}{lll}
 \toprule
@@ -9013,7 +9018,6 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{tabular}
 \end{center}
 
-%<en>\newpage
  \item[sourcehan]  Source Han Serif and Source Han Sans fonts (Language-specific OTF \textit{or} OTC)
 %<en>    \\*[-\dimexpr\medskipamount+\baselineskip\relax]
  \item[sourcehan-jp]  Source Han Serif JP and Source Han Sans JP fonts (Region-specific Subset OTF)
@@ -9080,8 +9084,8 @@ Std/StdNフォントであり，その他はAdobe-Japan1-5対応である．
 \end{center}
 
 \item[haranoaji]  Harano Aji Fonts.
-%<en>\par These fonts can be downloaded from\\\hfill \url{https://github.com/trueroad/HaranoAjiFonts}.
-%<ja>これらのフォントは \url{https://github.com/trueroad/HaranoAjiFonts} からダウンロードできる．
+%<en>\par These fonts can be downloaded from \url{https://github.com/trueroad/HaranoAjiFonts}.
+%<ja>これらのフォントは\url{https://github.com/trueroad/HaranoAjiFonts}からダウンロードできる．
 %<*en>
 There is not rounded gothic family in Harano Aji Fonts.
 %</en>
