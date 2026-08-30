@@ -4,7 +4,7 @@
 
 % LaTeX only!
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-ruby}[2024-09-09 v0.7]
+\ProvidesPackage{luatexja-ruby}[2026-08-30 v0.71]
 \RequirePackage{luatexja}
 
 %%------------------
@@ -187,6 +187,39 @@
 }
 %%%%%%%% ここまで
 
+% Tagging
+\ExplSyntaxOn
+\ifcsname ver@tagpdf.sty\endcsname
+\socket_new:nn{tagsupport/luatexja/ruby/begin}{0}
+\socket_new:nn{tagsupport/luatexja/ruby/end}{0}
+\socket_new:nn{tagsupport/luatexja/ruby/text/begin}{1}
+\socket_new:nn{tagsupport/luatexja/ruby/text/end}{0}
+\socket_new_plug:nnn{tagsupport/luatexja/ruby/begin}{default}
+{
+    \leavevmode
+    \tag_mc_end_push:
+    \tag_struct_begin:n{tag=Ruby}
+  }
+\socket_new_plug:nnn{tagsupport/luatexja/ruby/end}{default}
+{
+    \tag_struct_end:
+    \tag_mc_begin_pop:n{}
+  }
+\socket_new_plug:nnn{tagsupport/luatexja/ruby/text/begin}{default}
+{
+    \tag_struct_begin:n{tag=#1}
+    \tag_mc_begin:n{}
+  }
+\socket_new_plug:nnn{tagsupport/luatexja/ruby/text/end}{default}
+{
+    \tag_mc_end:
+    \tag_struct_end:
+  }
+\socket_assign_plug:nn{tagsupport/luatexja/ruby/begin}{default}
+\socket_assign_plug:nn{tagsupport/luatexja/ruby/end}{default}
+\socket_assign_plug:nn{tagsupport/luatexja/ruby/text/begin}{default}
+\socket_assign_plug:nn{tagsupport/luatexja/ruby/text/end}{default}
+\fi
 %%%%%%%% TeX command
 \protected\def\ltjruby{\@ifnextchar[\ltj@@ruby{\ltj@@ruby[]}}%]
 \AtBeginDocument{%
@@ -196,6 +229,7 @@
 }
 \protected\def\ltj@@ruby[#1]#2#3{{% #1: option #2: 親文字群，#3: ルビ文字列群，共に| 区切り
   \leavevmode\setkeys[ltj]{ruby}{#1}%
+  \tag_socket_use:n{luatexja/ruby/begin}
   \directlua{luatexja.ruby.ruby_tmplist_r = \string{\string};
 	luatexja.ruby.ruby_tmplist_p = \string{\string}}%
   \leavevmode\dimen0=\f@size pt\dimen1=\ltj@@rubyip@size\dimen0%
@@ -207,23 +241,32 @@
   \directlua{%
     luatexja.ruby.texiface(\ltj@@ruby@create@table{\dimen1}{\dimen2},
     luatexja.ruby.ruby_tmplist_r, luatexja.ruby.ruby_tmplist_p)}%
+  \tag_socket_use:n{luatexja/ruby/end}
 }}
 
 \def\ltj@@ruby@sr#1{%
-  \setbox0=\hbox{\fontsize{\dimen1}\z@\ltj@@rubyip@fontcmd\selectfont#1}%
+  \setbox0=\hbox{\fontsize{\dimen1}\z@\ltj@@rubyip@fontcmd\selectfont
+    \tag_socket_use:nn{luatexja/ruby/text/begin}{RT}%
+    #1%
+    \tag_socket_use:n{luatexja/ruby/text/end}}%
   \directlua{table.insert(luatexja.ruby.ruby_tmplist_r, luatexja.ruby.cpbox())}%
 }
 \def\ltj@@ruby@sp#1{%
-  \setbox0=\hbox{\selectfont#1}%
+  \setbox0=\hbox{\selectfont
+  \tag_socket_use:nn{luatexja/ruby/text/begin}{RB}%
+  #1%
+  \tag_socket_use:n{luatexja/ruby/text/end}}%
   \directlua{table.insert(luatexja.ruby.ruby_tmplist_p, luatexja.ruby.cpbox())}%
 }
+\ExplSyntaxOff
+
+%%% TODO: 圏点のタグ付けどうする
 
 \protected\def\ltjkenten{\@ifnextchar[\ltj@@kenten{\ltj@@kenten[]}}%]
 \def\ltj@@kenten[#1]#2{{%
   \leavevmode\setkeys[ltj]{ruby}{#1, stretchruby=101}%
   \@tfor\ltj@@kenten@temp:=#2\do{\ltj@@ruby[]{\ltj@@kenten@temp}{\ltj@@rubyip@kenten}}%
 }}
-
 % 初期値．要調整
 %% ひらがな
 \count@="3040\loop\relax\ifnum \count@<"30A0
