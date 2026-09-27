@@ -1,0 +1,30 @@
+\documentclass{ltjsarticle}
+\makeatletter
+\let\ltj@orig@DeclareFontShape@=\DeclareFontShape@
+\def\DeclareFontShape@#1#2#3#4#5#6{%
+  \immediate\typeout{debug DeclareFontShape: #1/#2/#3/#4 => |#5|#6|}%
+  \ltj@orig@DeclareFontShape@{#1}{#2}{#3}{#4}{#5}{#6}%
+}
+\expandafter\let\expandafter\ltj@orig@selectfont\csname selectfont \endcsname
+\@namedef{selectfont }{%
+  \immediate\typeout{debug selectfont before:}%
+  \immediate\typeout{==> AL: \f@encoding/\f@family/\f@series/\f@shape}%
+  \immediate\typeout{==> JA: \k@encoding/\k@family/\k@series/\k@shape}%
+  \ltj@orig@selectfont
+  \immediate\typeout{debug selectfont after:}%
+  \immediate\typeout{==> AL: \f@encoding/\f@family/\f@series/\f@shape\
+    \expandafter\meaning\csname \f@encoding/\f@family/\f@series/\f@shape/\f@size\endcsname}%
+  \immediate\typeout{==> JA: \k@encoding/\k@family/\k@series/\k@shape\ 
+    \expandafter\meaning\csname \k@encoding/\k@family/\k@series/\k@shape/\f@size\endcsname}%
+  \ltj@orig@selectfont
+}
+\makeatother
+
+
+\usepackage{luatexja-fontspec}
+\setmainjfont{HiraMinProN-W3.otf}
+\begin{document}
+\fontsize{24}{36}\selectfont
+あいうえお\par
+{\typeout{CCCCCCCCC}\addjfontfeatures{Style=Ruby}あいうえお\par}
+\end{document}

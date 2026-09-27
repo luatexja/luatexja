@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec-29e}[2026-06-13 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec-29e}[2026-09-27 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e}
 \ExplSyntaxOn
 
@@ -479,6 +479,12 @@
    \prop_gset_eq:NN \g__fontspec_fontopts_prop \l__ltj_fontspec_tmp_prop
  }
 
+\RequirePackage{regexpatch}
+\cs_set_eq:NN \__ltj_fontspec_main_addfontfeatures:n \__fontspec_main_addfontfeatures:n
+\xpatchcmd {\__ltj_fontspec_main_addfontfeatures:n }
+  { \fontfamily \g__fontspec_nfss_family_tl \selectfont }
+  { } % \selectfont will be executed later (outside a group)
+  { } { }
 \DeclareDocumentCommand \addjfontfeatures {m} {
   \ltj_fontspec_if_fontspec_font:TF
    {
@@ -488,7 +494,8 @@
       \tl_set_eq:NN \f@family \k@family
       \cs_set_eq:NN \__fontspec_select_font_family:nn
                     \__ltj_fontspec_select_font_family:nn
-      \let\fontfamily\@gobble
+      \cs_set_eq:NN \__fontspec_main_addfontfeatures:n
+                    \__ltj_fontspec_main_addfontfeatures:n
       \addfontfeatures {#1}
     \group_end:
     \kanjifamily\g__fontspec_nfss_family_tl\selectfont
