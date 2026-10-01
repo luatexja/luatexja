@@ -483,8 +483,37 @@
   \nobreak\vskip3ex\@afterheading}
 \ifdefined\ParseLaTeXeHeading
 \ExplSyntaxOn
-\DeclareDocumentCommand \part {s ={shorttitle}o m}
-  { \ParseLaTeXeHeading {part} {#1} {#2} {#3} }
+\IfFormatAtLeastTF{2026-11-01}{
+\DeclareDocumentCommand \part {s ={shorttitle}o m} {
+  \IfBooleanTF{#1} {% starred:
+    \ParseLaTeXeHeading {part} {\BooleanTrue} {#2} {#3}
+  }{% non-starred:
+    \ParseLaTeXeHeading {part-nostar} {\BooleanFalse} {#2} {#3}
+  }}
+\DeclareInstance{heading}{part}{display}
+{
+  , name          = part
+  , level         = -1
+  , before-vspace = 4ex
+  , after-vspace = 3ex
+  , mark-cmd      = \partmark {#1}
+  , number-format = \Large\prepartname\thepart\postpartname
+  , heading-decls = \huge\raggedright\parindent\z@\bfseries
+  , headformat-instance = part
+  , para-indent    = true
+}
+\DeclareInstanceCopy{heading}{part-nostar}{part}
+\EditInstance{heading}{part-nostar}{
+  , before-vspace = 2.4ex
+}
+\DeclareInstance{headformat}{part}{display}{
+  , heading-indent   = 0pt
+  , separator-b = \par\nobreak
+  , separator-a =
+}}
+{\DeclareDocumentCommand \part {s ={shorttitle}o m} {
+  \ParseLaTeXeHeading {part} {#1} {#2} {#3}
+}
 \DeclareInstance{heading}{part}{display}
 {
   , name          = part
@@ -503,7 +532,7 @@
 {
   , heading-indent   = 0pt
   , number-title-sep = 0pt
-}
+}}
 \ExplSyntaxOff
 \fi
 \newcommand{\section}{\@startsection{section}{1}{\z@}%

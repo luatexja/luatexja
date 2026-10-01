@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjp-geometry}[2024-05-16 Patch to geometry for LuaTeX-ja with vertical writing mode]
+\ProvidesPackage{lltjp-geometry}[2026-10-01 Patch to geometry for LuaTeX-ja with vertical writing mode]
 \RequirePackage{expl3}
 \ifdefined\if@ltj@@geometry@tate\expandafter\endinput\fi
 \newif\if@ltj@@geometry@tate
@@ -36,7 +36,7 @@
   %% starred version: do <code> right away if the <package> is loaded
   \def\ltj@ExecuteAfterPackage{\@ifstar\@@ltj@ExecuteAfterPackage@star\@@ltj@ExecuteAfterPackage}
   \def\ltj@ExecuteBeforePackage{\@ifstar\@@ltj@ExecuteBeforePackage@star\@@ltj@ExecuteBeforePackage}
-  \@ifl@t@r\fmtversion{2021-11-15}{% 2021-11-15
+  \IfFormatAtLeastTF\fmtversion{2021-11-15}{% 2021-11-15
     \def\@@ltj@ExecuteAfterPackage@star#1{\AddToHook{package/#1/after}}
     \def\@@ltj@ExecuteBeforePackage@star#1{\AddToHook{package/#1/before}}
     \long\def\@@ltj@ExecuteAfterPackage#1#2{%

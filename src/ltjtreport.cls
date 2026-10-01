@@ -570,7 +570,41 @@
    \vtop{\hsize\@tempdima#1\par}}\vskip3\Cvs}
 \ifdefined\ParseLaTeXeHeading
 \ExplSyntaxOn
+\IfFormatAtLeastTF{2026-11-01}{
+\DeclareDocumentCommand \part {s ={shorttitle}o m} {
+  \IfBooleanTF{#1} {% starred:
+    \ParseLaTeXeHeading {part} {\BooleanTrue} {#2} {#3}
+  }{% non-starred:
+    \ParseLaTeXeHeading {part-nostar} {\BooleanFalse} {#2} {#3}
+  }}
 \DeclareInstance{heading}{part}{display}
+{
+  , name          = part
+  , level         = -1
+  , after-penalty-vspace = 0pt
+  , number-format = \huge\prepartname\thepart\postpartname
+  , heading-decls = \Huge\centering\bfseries
+  , headformat-instance = part
+  , mark-cmd      = \partmark {#1}
+  , placement-start-code    =
+     \if@openleft \cleardoublepage \else
+     \if@openright \cleardoublepage \else \clearpage \fi \fi
+     \thispagestyle{empty}%
+     \if@twocolumn\onecolumn\@tempswatrue\else\@tempswafalse\fi
+     \null{\huge\vskip \l__head_before_skip}\vfil
+  , final-code    = \@endpart
+}
+\DeclareInstance{headformat}{part}{display}
+{
+  , heading-indent = 0pt
+}%    \end{macrocode}
+\DeclareInstanceCopy{heading}{part-nostar}{part}
+\EditInstance{heading}{part-nostar}{
+  , before-vspace = -.5\zw
+}}
+{\DeclareDocumentCommand \part {s ={shorttitle}o m} {
+  \ParseLaTeXeHeading {part} {#1} {#2} {#3}
+}\DeclareInstance{heading}{part}{display}
 {
   , name          = part
   , level         = -1
@@ -581,18 +615,18 @@
   , title-decls   = \Huge
   , headformat-instance = part
   , mark-cmd      = \partmark {#1}
-  , start-code     =
+  , start-code    =
      \if@openleft \cleardoublepage \else
      \if@openright \cleardoublepage \else \clearpage \fi \fi
      \thispagestyle{empty}%
      \if@twocolumn\onecolumn\@tempswatrue\else\@tempswafalse\fi
      \null\vfil
-  , final-code     = \@endpart
+  , final-code    = \@endpart
 }
 \DeclareInstance{headformat}{part}{display}
 {
   , heading-indent = 0pt
-}
+}}
 \DeclareDocumentCommand \chapter {s ={shorttitle}o m} {
     \ParseLaTeXeHeading {chapter} {#1} {#2} {#3}
 }
@@ -616,7 +650,12 @@
   , para-indent    = true
   , after-penalty-vspace = 2\Cvs
 }
+\IfFormatAtLeastTF{2026-11-01}{
 \DeclareInstance{headformat}{chapter}{hang}
+{%TODO
+  , separator-b = \hspace*{1\zw}
+}}
+{\DeclareInstance{headformat}{chapter}{hang}
 {
   , number-title-sep = 1\zw
   , title-format     =
@@ -624,7 +663,7 @@
     \vtop{\hsize\dimexpr\linewidth-\dimen@
       \primitive\everypar{}#1\primitive\par}%
     \baselineskip\Cvs
-}
+}}
 \ExplSyntaxOff
 \fi
 \newcommand{\section}{\@startsection{section}{1}{\z@}%

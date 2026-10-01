@@ -3,11 +3,11 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjfont}[2026-07-05 Patch to NFSS2 for LuaTeX-ja]
+\ProvidesPackage{lltjfont}[2026-10-01 Patch to NFSS2 for LuaTeX-ja]
 
 %%%%%%%% LaTeX2e version detection
 \newcount\ltj@@latex@plv
-\@ifl@t@r\fmtversion{2025-11-01}{\ltj@@latex@plv=2000}{\ltj@@latex@plv=1500}
+\IfFormatAtLeastTF{2025-11-01}{\ltj@@latex@plv=2000}{\ltj@@latex@plv=1500}
 
 %% patching \DeclareTextComposite
 \def\ltj@chardef@text@cmd#1{%

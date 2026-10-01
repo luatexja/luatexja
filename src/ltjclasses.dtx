@@ -3198,8 +3198,41 @@
 \ifdefined\ParseLaTeXeHeading
 \ExplSyntaxOn
 %<*article>
-\DeclareDocumentCommand \part {s ={shorttitle}o m}
-  { \ParseLaTeXeHeading {part} {#1} {#2} {#3} }
+\IfFormatAtLeastTF{2026-11-01}{
+\DeclareDocumentCommand \part {s ={shorttitle}o m} {
+  \IfBooleanTF{#1} {% starred:
+    \ParseLaTeXeHeading {part} {\BooleanTrue} {#2} {#3} 
+  }{% non-starred:
+    \ParseLaTeXeHeading {part-nostar} {\BooleanFalse} {#2} {#3} 
+  }}
+\DeclareInstance{heading}{part}{display}
+{
+  , name          = part
+  , level         = -1
+  , before-vspace = 4ex
+  , after-vspace = 3ex
+  , mark-cmd      = \partmark {#1}
+  , number-format = \Large\prepartname\thepart\postpartname
+  , heading-decls = \huge\raggedright\parindent\z@\bfseries
+  , headformat-instance = part
+  , para-indent    = true
+}
+%    \end{macrocode}
+% TODO: 番号ありの場合は|before-vspace|の値を小さくしないとレイアウトが崩れます．
+% ひとまず目分量で下のようにしていますが，なぜこの値でよいのかはよくわかりません．
+%    \begin{macrocode}
+\DeclareInstanceCopy{heading}{part-nostar}{part}
+\EditInstance{heading}{part-nostar}{
+  , before-vspace = 2.4ex
+}
+\DeclareInstance{headformat}{part}{display}{
+  , heading-indent   = 0pt
+  , separator-b = \par\nobreak
+  , separator-a =
+}}
+{\DeclareDocumentCommand \part {s ={shorttitle}o m} {
+  \ParseLaTeXeHeading {part} {#1} {#2} {#3}
+}
 \DeclareInstance{heading}{part}{display}
 {
   , name          = part
@@ -3218,10 +3251,46 @@
 {
   , heading-indent   = 0pt
   , number-title-sep = 0pt
-}
+}}
 %</article>
 %<*report|book>
+\IfFormatAtLeastTF{2026-11-01}{
+\DeclareDocumentCommand \part {s ={shorttitle}o m} {
+  \IfBooleanTF{#1} {% starred:
+    \ParseLaTeXeHeading {part} {\BooleanTrue} {#2} {#3} 
+  }{% non-starred:
+    \ParseLaTeXeHeading {part-nostar} {\BooleanFalse} {#2} {#3} 
+  }}
 \DeclareInstance{heading}{part}{display}
+{
+  , name          = part
+  , level         = -1
+  , after-penalty-vspace = 0pt
+  , number-format = \huge\prepartname\thepart\postpartname
+  , heading-decls = \Huge\centering\bfseries
+  , headformat-instance = part
+  , mark-cmd      = \partmark {#1}
+  , placement-start-code    =
+     \if@openleft \cleardoublepage \else
+     \if@openright \cleardoublepage \else \clearpage \fi \fi
+     \thispagestyle{empty}%
+     \if@twocolumn\onecolumn\@tempswatrue\else\@tempswafalse\fi
+     \null{\huge\vskip \l__head_before_skip}\vfil
+  , final-code    = \@endpart
+}
+\DeclareInstance{headformat}{part}{display}
+{
+  , heading-indent = 0pt
+}%    \end{macrocode}
+% TODO: こちらも番号ありの場合，上記の定義のままでは崩れます．
+%    \begin{macrocode}
+\DeclareInstanceCopy{heading}{part-nostar}{part}
+\EditInstance{heading}{part-nostar}{
+  , before-vspace = -.5\zw
+}}
+{\DeclareDocumentCommand \part {s ={shorttitle}o m} {
+  \ParseLaTeXeHeading {part} {#1} {#2} {#3}
+}\DeclareInstance{heading}{part}{display}
 {
   , name          = part
   , level         = -1
@@ -3232,18 +3301,18 @@
   , title-decls   = \Huge
   , headformat-instance = part
   , mark-cmd      = \partmark {#1}
-  , start-code     =
+  , start-code    =
      \if@openleft \cleardoublepage \else
      \if@openright \cleardoublepage \else \clearpage \fi \fi
      \thispagestyle{empty}%
      \if@twocolumn\onecolumn\@tempswatrue\else\@tempswafalse\fi
      \null\vfil
-  , final-code     = \@endpart
+  , final-code    = \@endpart
 }
 \DeclareInstance{headformat}{part}{display}
 {
   , heading-indent = 0pt
-}
+}}
 %    \end{macrocode}
 %
 % \paragraph{chapterレベル}
@@ -3297,7 +3366,12 @@
 % |\baselineskip|を本文の行送り|\Cvs|に上書きしています．
 %
 %    \begin{macrocode}
+\IfFormatAtLeastTF{2026-11-01}{
 \DeclareInstance{headformat}{chapter}{hang}
+{%TODO
+  , separator-b = \hspace*{1\zw}
+}}
+{\DeclareInstance{headformat}{chapter}{hang}
 {
   , number-title-sep = 1\zw
   , title-format     = 
@@ -3305,7 +3379,7 @@
     \vtop{\hsize\dimexpr\linewidth-\dimen@
       \primitive\everypar{}#1\primitive\par}%
     \baselineskip\Cvs
-}
+}}
 %</report|book>
 \ExplSyntaxOff
 \fi
