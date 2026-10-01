@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luatexja-fontspec-29e}[2026-09-27 fontspec support of LuaTeX-ja]
+\ProvidesPackage{luatexja-fontspec-29e}[2026-09-29 fontspec support of LuaTeX-ja]
 \RequirePackage{l3keys2e}
 \ExplSyntaxOn
 
@@ -494,9 +494,7 @@
       \tl_set_eq:NN \f@family \k@family
       \cs_set_eq:NN \__fontspec_select_font_family:nn
                     \__ltj_fontspec_select_font_family:nn
-      \cs_set_eq:NN \__fontspec_main_addfontfeatures:n
-                    \__ltj_fontspec_main_addfontfeatures:n
-      \addfontfeatures {#1}
+      \__ltj_fontspec_main_addfontfeatures:n {#1}
     \group_end:
     \kanjifamily\g__fontspec_nfss_family_tl\selectfont
     \__ltj_fontspec_restore_variable:
