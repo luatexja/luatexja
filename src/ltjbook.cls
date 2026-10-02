@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjbook}
-  [2026-10-01 v1.8f-ltj-27
+  [2026-10-02 v1.8f-ltj-27
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -649,10 +649,11 @@
      \if@openleft \cleardoublepage \else
      \if@openright \cleardoublepage \else \clearpage \fi \fi
      \thispagestyle{jpl@in}\global\@topnum\z@\hbox{}%
-  , final-code     = \typeout{\@chapapp\space\arabic{chapter}\space\@chappos}
+  , final-code     =
+     \bool_if:NF \l__head_unnumbered_bool {\typeout{\@chapapp\space\arabic{chapter}\space\@chappos}}
   , after-vspace   = 3\Cvs
   , number-format  = \@chapapp\thechapter\@chappos
-  , heading-decls  = \normalfont\bfseries\huge\hrule height 0pt\vskip\lineskip
+  , heading-decls  = \normalfont\bfseries\huge\baselineskip\Cvs
   , title-decls    = \raggedright \parindent0pt
   , headformat-instance = chapter
   , mark-cmd       = \chaptermark {#1}
@@ -660,7 +661,15 @@
                      \addtocontents{lot}{\protect\addvspace{10\p@}}
   , para-indent    = true
   , after-penalty-vspace = 2\Cvs
-}}
+}
+\DeclareInstance{headformat}{chapter}{hang}{%
+  , order-hang  = { number, separator-a }
+  , order       = { separator-b, title, separator-c, subtitle, separator-d }
+  , separator-a = \hspace*{1\zw}
+  , separator-b = \dimen@\hangindent\vtop\bgroup\hsize\dimexpr\linewidth-\dimen@\huge
+  , separator-d = \par\egroup\baselineskip\Cvs
+}
+}
 {\DeclareInstance{heading}{chapter}{display}
 {
   , name           = chapter
@@ -670,22 +679,23 @@
      \if@openleft \cleardoublepage \else
      \if@openright \cleardoublepage \else \clearpage \fi \fi
      \thispagestyle{jpl@in}\global\@topnum\z@\hbox{}%
-  , final-code     = \typeout{\@chapapp\space\arabic{chapter}\space\@chappos}
+  , final-code     =
+     \bool_if:NF \l__head_unnumbered_bool {\typeout{\@chapapp\space\arabic{chapter}\space\@chappos}}
   , after-vspace   = 3\Cvs
   , number-format  = \@chapapp\thechapter\@chappos
-  , heading-decls  = \normalfont\bfseries\huge\hrule height 0pt\vskip\lineskip
+  , heading-decls  = \normalfont\bfseries\raggedright\huge
   , headformat-instance = chapter
   , mark-cmd       = \chaptermark {#1}
   , contents-extra = \addtocontents{lof}{\protect\addvspace{10\p@}}
                      \addtocontents{lot}{\protect\addvspace{10\p@}}
   , para-indent    = true
   , after-penalty-vspace = 2\Cvs
-}}
-\IfFormatAtLeastTF{2026-11-01}{
-  \DeclareInstance{headformat}{chapter}{hang}{, separator-b = \hspace*{1\zw}}
-}{
-  \DeclareInstance{headformat}{chapter}{hang}{, number-title-sep = 1\zw}
 }
+\DeclareInstance{headformat}{chapter}{hang}{
+  , number-title-sep = 1\zw
+  , title-format     = \dimen@\hangindent\vtop{\hsize\dimexpr\linewidth-\dimen@
+     \primitive\everypar{}#1\primitive\par}\baselineskip\Cvs
+}}
 \ExplSyntaxOff
 \fi
 \newcommand{\section}{\@startsection{section}{1}{\z@}%
