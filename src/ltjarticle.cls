@@ -498,19 +498,15 @@
   , after-vspace = 3ex
   , mark-cmd      = \partmark {#1}
   , number-format = \Large\prepartname\thepart\postpartname
-  , heading-decls = \huge\raggedright\parindent\z@\bfseries
-  \dimen2\prevdepth\typeout{PD\the\dimen2}
+  , heading-decls = \raggedright\parindent\z@\bfseries
+  , title-decls   = \huge
   , headformat-instance = part
   , para-indent    = true
 }
 \DeclareInstanceCopy{heading}{part-nostar}{part}
 \EditInstance{heading}{part-nostar}{
-  , heading-decls = \huge\raggedright\parindent\z@\bfseries
+  , heading-decls = \Large\raggedright\parindent\z@\bfseries
     \setbox0\hbox{\Large \thepart}\setbox2\hbox{\Large あ}
-    \dimen2\dimexpr\baselineskip-\prevdepth-1.5\ht2-\lineskip
-    \ifdim\dimen2<\lineskiplimit\dimen2\lineskip\fi
-    \ifdim\pagetotal>0pt\hrule height0pt\vskip\dimen2\fi
-
 }
 \DeclareInstance{headformat}{part}{display}{
   , heading-indent   = 0pt

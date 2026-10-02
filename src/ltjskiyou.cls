@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjskiyou}
-  [2026-05-17 ltjsclasses ]
+  [2026-10-02 ltjsclasses ]
 \def\jsc@clsname{ltjskiyou}
 \def\Cjascale{0.924715}
 \RequirePackage{luatexja}
@@ -748,6 +748,64 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
 \ExplSyntaxOff
 \ExplSyntaxOn
 \ifdefined\ParseLaTeXeHeading
+\IfFormatAtLeastTF{2026-11-01}{
+\DeclareDocumentCommand \@startsection {mmmmmm s ={shorttitle}o m}{
+  \IfInstanceExistsF{heading}{#1-@startsection}{
+    \__head_debug_typeout:n{Info:~ setting~ up~ instances~ for~
+                       legacy~ \string\@startsection (ltjsclasses)}
+    \__head_prep_decls_and_format_from_tl:nNN {#6}
+        \l__head_heading_decls_tl
+        \l__head_title_format_tl
+    \@tempskipa #4\relax
+    \@afterindenttrue
+    \ifdim \@tempskipa <\z@
+      \@tempskipa -\@tempskipa
+      \@afterindentfalse
+    \fi
+    \@tempskipb #5\relax
+    \ifdim \@tempskipb>\z@
+      \use:e {
+        \DeclareInstance{heading}{#1-@startsection}{display}{
+         , name          = #1
+         , level         = #2
+         , mark-cmd      = \exp_not:c {#1mark} {##1}
+         , after-penalty-vspace =  \the\@tempskipa
+         , after-vspace = \the\@tempskipb
+         , para-indent   = \if@english false\else \if@afterindent true \else false\fi\fi
+         , heading-decls = \exp_not:o \l__head_heading_decls_tl
+         , title-format  = \exp_not:o \l__head_title_format_tl {##1} \exp_not:N \par
+         , headformat-instance = #1-@startsection
+         , placement-start-code =
+           \ifdim \@tempskipa >\z@
+             \unexpanded{\if@slide\else\null\vspace*{-\baselineskip}\fi}%
+           \fi
+      }}
+      \DeclareInstance{headformat}{#1-@startsection}{hang}{heading-indent = #3}
+    \else
+      \@tempskipb=-\@tempskipb
+      \use:e {
+       \DeclareInstance{heading}{#1-@startsection}{runin}{
+         , name          = #1
+         , level         = #2
+         , mark-cmd      = \exp_not:c {#1mark} {##1}
+         , after-vspace = \the\@tempskipb
+         , after-penalty-vspace =  \the\@tempskipa
+         , heading-decls = \exp_not:o \l__head_heading_decls_tl
+         , title-format  = \exp_not:o \l__head_title_format_tl {##1}
+         , headformat-instance = #1-@startsection
+       }
+       \DeclareInstance{headformat}{#1-@startsection}{runin}{ heading-indent = #3 }
+       \str_if_eq:nnT {#1} {paragraph} {
+         \EditInstance{heading}{#1-@startsection}{
+            , title-format  = \exp_not:N \jsParagraphMark \exp_not:o \l__head_title_format_tl {##1}
+         }
+       }
+      }
+    \fi
+  }
+  \ParseLaTeXeHeading {#1-@startsection}{#7}{#8}{#9}
+}
+}{
 \DeclareDocumentCommand \@startsection {mmmmmm s ={shorttitle}o m}{
   \IfInstanceExistsF{heading}{#1-@startsection}{
     \__head_debug_typeout:n{Info:~ setting~ up~ instances~ for~
@@ -765,15 +823,15 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
          , name          = #1
          , level         = #2
          , mark-cmd      = \exp_not:c {#1mark} {##1}
-         , before-vspace = \the\@tempskipa
+         , after-penalty-vspace =  \the\@tempskipa
+         , after-vspace = \the\@tempskipb
          , para-indent   = \if@english false\else \if@afterindent true \else false\fi\fi
          , heading-decls = \exp_not:n {#6}
          , headformat-instance = #1-@startsection
-         , final-code =
-           \ifdim \@tempskipb >\z@
-             \unexpanded{\if@slide\else\null\vspace*{-\baselineskip}\fi}%
-             \vskip\@tempskipb
-           \fi
+         , start-code =
+           {\ifdim \@tempskipa >\z@
+             \unexpanded{\if@slide\else\par\null\vspace*{-\baselineskip}\par\fi}%
+           \fi}
       }}
       \DeclareInstance{headformat}{#1-@startsection}{hang}{heading-indent = #3,title-format={#6{##1}}}
     \else
@@ -798,6 +856,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
     \fi
   }
   \ParseLaTeXeHeading {#1-@startsection}{#7}{#8}{#9}
+}
 }
 \RenewCommandCopy\kernel@startsection\@startsection
 \else
@@ -961,6 +1020,17 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   \@afterheading}
 \ifdefined\ParseLaTeXeHeading
 \ExplSyntaxOn
+\IfFormatAtLeastTF{2026-11-01}{
+\DeclareDocumentCommand \part {s ={shorttitle}o m} {
+  \IfBooleanTF{#1} {% starred:
+    \ParseLaTeXeHeading {part} {\BooleanTrue} {#2} {#3}
+  }{% non-starred:
+    \ParseLaTeXeHeading {part-nostar} {\BooleanFalse} {#2} {#3}
+  }}
+}{
+\DeclareDocumentCommand \part {s ={shorttitle}o m}
+  { \ParseLaTeXeHeading {part} {#1} {#2} {#3} }
+}
 \ExplSyntaxOff
 \fi
 \if@twocolumn
