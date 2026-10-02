@@ -143,7 +143,8 @@
 % \changes{v1.8f-ltj-24}{2024-12-13}{\file{.toc}ファイルにページ番号を\cs{rensuji}を書き出すことをやめた}
 % \changes{v1.8f-ltj-25}{2025-03-28}{\LaTeXe~2025-06-01の更新に追従．}
 % \changes{v1.8f-ltj-26}{2026-05-17}{|latex-lab-title|, |latex-lab-toc-kernel-changes|,
-%    |latex-lab-sec-templates|にある「新実装」と同様の変更を仕込みました．}
+%    |latex-lab-sec-template|にある「新実装」と同様の変更を仕込みました．}
+% \changes{v1.8f-ltj-27}{2026-10-02}{\LaTeXe~2026-11-01における|latex-lab-sec-template|の更新に追従．}
 % \fi
 %
 % \iffalse
@@ -173,7 +174,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2026-05-17 v1.8f-ltj-26
+  [2026-10-02 v1.8f-ltj-27
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -3214,21 +3215,23 @@
   , mark-cmd      = \partmark {#1}
   , number-format = \Large\prepartname\thepart\postpartname
   , heading-decls = \huge\raggedright\parindent\z@\bfseries
+  \dimen2\prevdepth\typeout{PD\the\dimen2}
   , headformat-instance = part
   , para-indent    = true
 }
-%    \end{macrocode}
-% TODO: 番号ありの場合は|before-vspace|の値を小さくしないとレイアウトが崩れます．
-% ひとまず目分量で下のようにしていますが，なぜこの値でよいのかはよくわかりません．
-%    \begin{macrocode}
 \DeclareInstanceCopy{heading}{part-nostar}{part}
 \EditInstance{heading}{part-nostar}{
-  , before-vspace = 2.4ex
+  , heading-decls = \huge\raggedright\parindent\z@\bfseries
+    \setbox0\hbox{\Large \thepart}\setbox2\hbox{\Large あ}
+%<yoko>    \dimen2\dimexpr\baselineskip-\prevdepth-1.5\ht2-\lineskip
+%<tate>    \dimen2\dimexpr\baselineskip-\prevdepth-2\ht0
+    \ifdim\dimen2<\lineskiplimit\dimen2\lineskip\fi
+    \ifdim\pagetotal>0pt\hrule height0pt\vskip\dimen2\fi
+
 }
 \DeclareInstance{headformat}{part}{display}{
   , heading-indent   = 0pt
   , separator-b = \par\nobreak
-  , separator-a =
 }}
 {\DeclareDocumentCommand \part {s ={shorttitle}o m} {
   \ParseLaTeXeHeading {part} {#1} {#2} {#3}
@@ -3281,9 +3284,7 @@
 \DeclareInstance{headformat}{part}{display}
 {
   , heading-indent = 0pt
-}%    \end{macrocode}
-% TODO: こちらも番号ありの場合，上記の定義のままでは崩れます．
-%    \begin{macrocode}
+}
 \DeclareInstanceCopy{heading}{part-nostar}{part}
 \EditInstance{heading}{part-nostar}{
   , before-vspace = -.5\zw
@@ -3332,17 +3333,34 @@
     \fi
 %</book>
 }
+\IfFormatAtLeastTF{2026-11-01}{
 \DeclareInstance{heading}{chapter}{display}
 {
   , name           = chapter
   , level          = 0
   , placement      = normal
-%    \end{macrocode}
-%
-% もともとの|\chapter|命令の最初で実行されていた，改ページ処理と
-% ページスタイル・|\@topnum|の変更処理です．
-%
-%    \begin{macrocode}
+  , placement-start-code     =
+     \if@openleft \cleardoublepage \else
+     \if@openright \cleardoublepage \else \clearpage \fi \fi
+     \thispagestyle{jpl@in}\global\@topnum\z@\hbox{}%
+  , final-code     = \typeout{\@chapapp\space\arabic{chapter}\space\@chappos}
+  , after-vspace   = 3\Cvs
+  , number-format  = \@chapapp\thechapter\@chappos
+%<yoko>  , heading-decls  = \normalfont\bfseries\huge\hrule height 0pt\vskip\lineskip
+%<tate>  , heading-decls  = \normalfont\bfseries\huge\hrule height 0pt\prevdepth\dimexpr\cdp+\lineskip
+  , title-decls    = \raggedright \parindent0pt
+  , headformat-instance = chapter
+  , mark-cmd       = \chaptermark {#1}
+  , contents-extra = \addtocontents{lof}{\protect\addvspace{10\p@}}
+                     \addtocontents{lot}{\protect\addvspace{10\p@}}
+  , para-indent    = true
+  , after-penalty-vspace = 2\Cvs
+}}
+{\DeclareInstance{heading}{chapter}{display}
+{
+  , name           = chapter
+  , level          = 0
+  , placement      = normal
   , start-code     =
      \if@openleft \cleardoublepage \else
      \if@openright \cleardoublepage \else \clearpage \fi \fi
@@ -3350,36 +3368,19 @@
   , final-code     = \typeout{\@chapapp\space\arabic{chapter}\space\@chappos}
   , after-vspace   = 3\Cvs
   , number-format  = \@chapapp\thechapter\@chappos
-  , heading-decls  = \raggedright \parindent0pt \huge \bfseries
+  , heading-decls  = \normalfont\bfseries\huge\hrule height 0pt\vskip\lineskip
   , headformat-instance = chapter
   , mark-cmd       = \chaptermark {#1}
   , contents-extra = \addtocontents{lof}{\protect\addvspace{10\p@}}
                      \addtocontents{lot}{\protect\addvspace{10\p@}}
   , para-indent    = true
   , after-penalty-vspace = 2\Cvs
-}
-%    \end{macrocode}
-%
-% 見出し本体の組み立て（周囲の空白は除く）部分です．
-% 見出し本体が収まる段落は|heading-decls|の有効範囲終了\emph{内}で終了する関係上，
-% この段落と前後の空きをもともとの|\chapter|に揃えるため，タイトル出力後に
-% |\baselineskip|を本文の行送り|\Cvs|に上書きしています．
-%
-%    \begin{macrocode}
+}}
 \IfFormatAtLeastTF{2026-11-01}{
-\DeclareInstance{headformat}{chapter}{hang}
-{%TODO
-  , separator-b = \hspace*{1\zw}
-}}
-{\DeclareInstance{headformat}{chapter}{hang}
-{
-  , number-title-sep = 1\zw
-  , title-format     = 
-    \dimen@\hangindent
-    \vtop{\hsize\dimexpr\linewidth-\dimen@
-      \primitive\everypar{}#1\primitive\par}%
-    \baselineskip\Cvs
-}}
+  \DeclareInstance{headformat}{chapter}{hang}{, separator-b = \hspace*{1\zw}}
+}{
+  \DeclareInstance{headformat}{chapter}{hang}{, number-title-sep = 1\zw}
+}
 %</report|book>
 \ExplSyntaxOff
 \fi

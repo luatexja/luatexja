@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjarticle}
-  [2026-05-17 v1.8f-ltj-26
+  [2026-10-01 v1.8f-ltj-27
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -499,17 +499,22 @@
   , mark-cmd      = \partmark {#1}
   , number-format = \Large\prepartname\thepart\postpartname
   , heading-decls = \huge\raggedright\parindent\z@\bfseries
+  \dimen2\prevdepth\typeout{PD\the\dimen2}
   , headformat-instance = part
   , para-indent    = true
 }
 \DeclareInstanceCopy{heading}{part-nostar}{part}
 \EditInstance{heading}{part-nostar}{
-  , before-vspace = 2.4ex
+  , heading-decls = \huge\raggedright\parindent\z@\bfseries
+    \setbox0\hbox{\Large \thepart}\setbox2\hbox{\Large あ}
+    \dimen2\dimexpr\baselineskip-\prevdepth-1.5\ht2-\lineskip
+    \ifdim\dimen2<\lineskiplimit\dimen2\lineskip\fi
+    \ifdim\pagetotal>0pt\hrule height0pt\vskip\dimen2\fi
+
 }
 \DeclareInstance{headformat}{part}{display}{
   , heading-indent   = 0pt
   , separator-b = \par\nobreak
-  , separator-a =
 }}
 {\DeclareDocumentCommand \part {s ={shorttitle}o m} {
   \ParseLaTeXeHeading {part} {#1} {#2} {#3}
