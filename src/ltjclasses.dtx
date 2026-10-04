@@ -144,7 +144,7 @@
 % \changes{v1.8f-ltj-25}{2025-03-28}{\LaTeXe~2025-06-01の更新に追従．}
 % \changes{v1.8f-ltj-26}{2026-05-17}{|latex-lab-title|, |latex-lab-toc-kernel-changes|,
 %    |latex-lab-sec-template|にある「新実装」と同様の変更を仕込みました．}
-% \changes{v1.8f-ltj-27}{2026-10-02}{\LaTeXe~2026-11-01における|latex-lab-sec-template|の更新に追従．}
+% \changes{v1.8f-ltj-27}{2026-10-04}{\LaTeXe~2026-11-01における|latex-lab-sec-template|の更新に追従．}
 % \fi
 %
 % \iffalse
@@ -174,7 +174,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2026-10-02 v1.8f-ltj-27
+  [2026-10-04 v1.8f-ltj-27
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -3187,6 +3187,10 @@
 % この新実装は，ソースの先頭（|\documentclass|より先）に|\DocumentMetaData|が
 % 指定された場合に自動で読み込まれるようになっています．
 %
+% [2026-10-02 LTJ]
+% \LaTeXe~2026-11-01では，|latex-lab-sec-template|による新実装で
+% キーの名称などが変更される予定なので，それに追従します．
+%
 % 本クラスでの見出し命令は，前小節までのように
 % sectionレベル以下の見出しは|\@startsection|マクロを，
 % partレベルとchapterレベルは|\secdef|マクロを使って定義されています．
@@ -3194,7 +3198,8 @@
 % 新しくコードを記述します．
 %
 % \paragraph{partレベル}
-% まず，partレベルの見出しの再定義です．
+% まず，articleクラスにおける，partレベルの見出しの，\LaTeXe~2026-11-01用の再定義です．
+% ここでは\>|*|\>の有無で実装を分けていますが，より工夫すれば一つにまとめられるかもしれません．
 %    \begin{macrocode}
 \ifdefined\ParseLaTeXeHeading
 \ExplSyntaxOn
@@ -3222,12 +3227,14 @@
 \DeclareInstanceCopy{heading}{part-nostar}{part}
 \EditInstance{heading}{part-nostar}{
   , heading-decls = \Large\raggedright\parindent\z@\bfseries
-    \setbox0\hbox{\Large \thepart}\setbox2\hbox{\Large あ}
 }
 \DeclareInstance{headformat}{part}{display}{
   , heading-indent   = 0pt
   , separator-b = \par\nobreak
 }}
+%    \end{macrocode}
+% 次に，\LaTeXe~2026-05-01用の再定義です．
+%    \begin{macrocode}
 {\DeclareDocumentCommand \part {s ={shorttitle}o m} {
   \ParseLaTeXeHeading {part} {#1} {#2} {#3}
 }
@@ -3251,6 +3258,14 @@
   , number-title-sep = 0pt
 }}
 %</article>
+%    \end{macrocode}
+%
+% report, bookクラスでも，\LaTeXe~2026-11-01用と2026-05-01用で
+% 再定義の内容が変わります．まず2026-11-01用から．
+%
+% はじめに行う改ページ処理は，|placement|\>キーで設定可能な値の中には
+% うまく合うものがないので，|placement-start-code|\>キー内に直接記述しています．
+%    \begin{macrocode}
 %<*report|book>
 \IfFormatAtLeastTF{2026-11-01}{
 \DeclareDocumentCommand \part {s ={shorttitle}o m} {
@@ -3280,10 +3295,17 @@
 {
   , heading-indent = 0pt
 }
+%    \end{macrocode}
+% |*|\>なしの場合は，以前の実装と出力位置を合わせるため，垂直位置調整を行います．
+% 2026-10-04現在，この量で「うまくいく」理由は特定できていません．
+%    \begin{macrocode}
 \DeclareInstanceCopy{heading}{part-nostar}{part}
 \EditInstance{heading}{part-nostar}{
   , before-vspace = -.5\zw
 }}
+%    \end{macrocode}
+% 次に，2026-05-01用です．
+%    \begin{macrocode}
 {\DeclareDocumentCommand \part {s ={shorttitle}o m} {
   \ParseLaTeXeHeading {part} {#1} {#2} {#3}
 }\DeclareInstance{heading}{part}{display}
@@ -3312,7 +3334,7 @@
 %    \end{macrocode}
 %
 % \paragraph{chapterレベル}
-% 次に，chapterレベルの見出しの再定義です．
+% chapterレベルの見出しの再定義です．
 %    \begin{macrocode}
 \DeclareDocumentCommand \chapter {s ={shorttitle}o m} {
 %<book>    \if@mainmatter
@@ -3338,8 +3360,9 @@
      \if@openleft \cleardoublepage \else
      \if@openright \cleardoublepage \else \clearpage \fi \fi
      \thispagestyle{jpl@in}\global\@topnum\z@\hbox{}%
-  , final-code     = 
-     \bool_if:NF \l__head_unnumbered_bool {\typeout{\@chapapp\space\arabic{chapter}\space\@chappos}}
+  , final-code     =
+     \bool_if:NF \l__head_unnumbered_bool {%
+       \typeout{\@chapapp\space\arabic{chapter}\space\@chappos}}
   , after-vspace   = 3\Cvs
   , number-format  = \@chapapp\thechapter\@chappos
   , heading-decls  = \normalfont\bfseries\huge\baselineskip\Cvs
@@ -3353,9 +3376,11 @@
 }
 \DeclareInstance{headformat}{chapter}{hang}{%
   , order-hang  = { number, separator-a }
-  , order       = { separator-b, title, separator-c, subtitle, separator-d }
+  , order       = { separator-b, title, separator-c,
+                    subtitle, separator-d }
   , separator-a = \hspace*{1\zw}
-  , separator-b = \dimen@\hangindent\vtop\bgroup\hsize\dimexpr\linewidth-\dimen@\huge
+  , separator-b = \dimen@\hangindent\vtop\bgroup
+     \hsize\dimexpr\linewidth-\dimen@\huge
   , separator-d = \par\egroup\baselineskip\Cvs
 }
 }
@@ -3368,8 +3393,9 @@
      \if@openleft \cleardoublepage \else
      \if@openright \cleardoublepage \else \clearpage \fi \fi
      \thispagestyle{jpl@in}\global\@topnum\z@\hbox{}%
-  , final-code     = 
-     \bool_if:NF \l__head_unnumbered_bool {\typeout{\@chapapp\space\arabic{chapter}\space\@chappos}}
+  , final-code     =
+     \bool_if:NF \l__head_unnumbered_bool {%
+       \typeout{\@chapapp\space\arabic{chapter}\space\@chappos}}
   , after-vspace   = 3\Cvs
   , number-format  = \@chapapp\thechapter\@chappos
   , heading-decls  = \normalfont\bfseries\raggedright\huge
@@ -3382,7 +3408,8 @@
 }
 \DeclareInstance{headformat}{chapter}{hang}{
   , number-title-sep = 1\zw
-  , title-format     = \dimen@\hangindent\vtop{\hsize\dimexpr\linewidth-\dimen@
+  , title-format     =
+     \dimen@\hangindent\vtop{\hsize\dimexpr\linewidth-\dimen@
      \primitive\everypar{}#1\primitive\par}\baselineskip\Cvs
 }}
 %</report|book>

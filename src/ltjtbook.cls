@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjtbook}
-  [2026-10-02 v1.8f-ltj-27
+  [2026-10-04 v1.8f-ltj-27
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -654,7 +654,8 @@
      \if@openright \cleardoublepage \else \clearpage \fi \fi
      \thispagestyle{jpl@in}\global\@topnum\z@\hbox{}%
   , final-code     =
-     \bool_if:NF \l__head_unnumbered_bool {\typeout{\@chapapp\space\arabic{chapter}\space\@chappos}}
+     \bool_if:NF \l__head_unnumbered_bool {%
+       \typeout{\@chapapp\space\arabic{chapter}\space\@chappos}}
   , after-vspace   = 3\Cvs
   , number-format  = \@chapapp\thechapter\@chappos
   , heading-decls  = \normalfont\bfseries\huge\baselineskip\Cvs
@@ -668,9 +669,11 @@
 }
 \DeclareInstance{headformat}{chapter}{hang}{%
   , order-hang  = { number, separator-a }
-  , order       = { separator-b, title, separator-c, subtitle, separator-d }
+  , order       = { separator-b, title, separator-c,
+                    subtitle, separator-d }
   , separator-a = \hspace*{1\zw}
-  , separator-b = \dimen@\hangindent\vtop\bgroup\hsize\dimexpr\linewidth-\dimen@\huge
+  , separator-b = \dimen@\hangindent\vtop\bgroup
+     \hsize\dimexpr\linewidth-\dimen@\huge
   , separator-d = \par\egroup\baselineskip\Cvs
 }
 }
@@ -684,7 +687,8 @@
      \if@openright \cleardoublepage \else \clearpage \fi \fi
      \thispagestyle{jpl@in}\global\@topnum\z@\hbox{}%
   , final-code     =
-     \bool_if:NF \l__head_unnumbered_bool {\typeout{\@chapapp\space\arabic{chapter}\space\@chappos}}
+     \bool_if:NF \l__head_unnumbered_bool {%
+       \typeout{\@chapapp\space\arabic{chapter}\space\@chappos}}
   , after-vspace   = 3\Cvs
   , number-format  = \@chapapp\thechapter\@chappos
   , heading-decls  = \normalfont\bfseries\raggedright\huge
@@ -697,7 +701,8 @@
 }
 \DeclareInstance{headformat}{chapter}{hang}{
   , number-title-sep = 1\zw
-  , title-format     = \dimen@\hangindent\vtop{\hsize\dimexpr\linewidth-\dimen@
+  , title-format     =
+     \dimen@\hangindent\vtop{\hsize\dimexpr\linewidth-\dimen@
      \primitive\everypar{}#1\primitive\par}\baselineskip\Cvs
 }}
 \ExplSyntaxOff

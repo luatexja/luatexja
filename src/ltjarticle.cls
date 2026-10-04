@@ -23,7 +23,7 @@
 %% File: ltjclasses.dtx
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjarticle}
-  [2026-10-02 v1.8f-ltj-27
+  [2026-10-04 v1.8f-ltj-27
  Standard LuaLaTeX-ja class]
 \RequirePackage{luatexja}
 \newcounter{@paper}
@@ -506,7 +506,6 @@
 \DeclareInstanceCopy{heading}{part-nostar}{part}
 \EditInstance{heading}{part-nostar}{
   , heading-decls = \Large\raggedright\parindent\z@\bfseries
-    \setbox0\hbox{\Large \thepart}\setbox2\hbox{\Large あ}
 }
 \DeclareInstance{headformat}{part}{display}{
   , heading-indent   = 0pt
