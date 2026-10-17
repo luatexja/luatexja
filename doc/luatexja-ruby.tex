@@ -39,7 +39,7 @@
 \hypersetup{%
 	unicode,
 	colorlinks,
-	allbordercolors=1 1 1,
+	allbordercolors=white,
 	allcolors=blue,
 	pdftitle={luatexja-ruby.sty}
 }
@@ -47,7 +47,7 @@
 \def\Node{\@ifstar{\@Node[b_blue]}{\@Node[white]}}
 \def\@Node[#1]#2#3{\,\vcenter{\hbox{\fboxsep=1pt\fcolorbox{black}{#1}{%
   \vbox{\small\halign{\hfil##\hfil\cr
-  #2\mathstrut\cr\noalign{\smallskip\hrule height.4pt\smallskip}\strut\<#3\cr}}}}}\,}
+  #2\mathstrut\cr\noalign{\smallskip\hrule height.4pt\smallskip}\strut\inhibitglue#3\cr}}}}}\,}
 \def\LuaTeX{Lua\TeX}
 
 % 三分ルビ用
@@ -75,7 +75,7 @@
   \@ifnextchar){\mybox@@{0}{2}}{\@ifnextchar={\mybox@@{1}{1}}{\mybox@@{0}{0}.}}}}
 \def\mybox@@#1#2#3#4{\unskip\ {\Large \fboxrule=0.1mm\fboxsep=0mm%
   \ifnum#1>0\fcolorbox{blue}{b_blue}{\vrule width 0pt height .88\zh depth .12\zh\kern#1\dimexpr.25\zw}\kern-\fboxrule\fi%
-  \fcolorbox{blue}{white}{\hbox{\<\ltjjachar#4\<}}%
+  \fcolorbox{blue}{white}{\hbox{\inhibitglue\ltjjachar#4\inhibitglue}}%
   \ifnum#2>0\kern-\fboxrule\fcolorbox{blue}{b_blue}{\vrule width 0pt height .88\zh depth .12\zh\kern#2\dimexpr.25\zw}\fi%
 }\ }
 
@@ -90,8 +90,8 @@
   }}\ignorespaces
 }
 \begin{document}
-\catcode`\<=13
-\def<#1>{{\rmfamily\mdseries\itshape$\langle$#1\/$\rangle$}}
+\protected\def\<#1>{{\rmfamily\mdseries\itshape$\langle$#1\/$\rangle$}}
+\errorcontextlines=100
 %\fontsize{13.19873}{15}\selectfont%
 
 \maketitle
@@ -153,23 +153,23 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 \paragraph{\cs{ltjruby}}
 ルビ出力用命令の本体．\cs{ruby}という別名を定義している．
 \begin{quote}
-\ttfamily \textbackslash ltjruby[<option>]\{親|文|字\}\{おや|も|じ\}
+\ttfamily \textbackslash ltjruby[\<option>]\{親|文|字\}\{おや|も|じ\}
 \end{quote}
 のように親文字→ルビの順序で指定する．
 第2・第3引数内の「\texttt{|}」はグループの区切りを表す．詳細は\ref{ssec:grp}\nobreak 小節を参照．
 
 \medskip
-<option>には以下の内容をkey-valueリストで指定可能である．
-<real>は10進の実数値を表す．<bool>は真偽値\texttt{true}（真）か\texttt{false}（偽）であり，
+\<option>には以下の内容をkey-valueリストで指定可能である．
+\<real>は10進の実数値を表す．\<bool>は真偽値\texttt{true}（真）か\texttt{false}（偽）であり，
 値を省略したときには\texttt{true}の意味になる．
 
 \begin{description}
 \def\makelabel#1{\ttfamily\bfseries #1}
-\item[pre=<real>] \ActIntr{前文字進入許容量}をルビ全角単位で指定．
+\item[pre=\<real>] \ActIntr{前文字進入許容量}をルビ全角単位で指定．
 負の長さを指定した場合は，ルビの状況や直前の文字に応じた自動指定を意味する．
 既定値は負（つまり，自動指定）．
 
-\item[post=<real>] 同様に，\ActIntr{後文字進入許容量}を指定する．既定値は負（自動指定）．
+\item[post=\<real>] 同様に，\ActIntr{後文字進入許容量}を指定する．既定値は負（自動指定）．
 
 \item[mode] 進入処理のモードを表すbit vector．下位2\,bitは，\texttt{pre}や
 \texttt{post}が負である場合にしか効力を発揮しない．既定値は$(00001)_2 = 1$．
@@ -180,43 +180,43 @@ plain \LuaTeX でのロードはまだサポートしておらず，
  \item[bit 2--4] ルビ文字の突出量から実際の前・後進入量の計算方法を指定する．
   詳しい計算方法については\ref{ssec:calc_intrusion}\nobreak 小節を参照．
 \end{description}
-\item[intrude\_jfmgk=<bool>] 進入量算出の際に，前後のJFMグルーの自然長を考慮するか否か．既定値は真．
-\item[intrude\_kanjiskip=<bool>] 進入量算出の際に，ルビ前後に挿入される
+\item[intrude\_jfmgk=\<bool>] 進入量算出の際に，前後のJFMグルーの自然長を考慮するか否か．既定値は真．
+\item[intrude\_kanjiskip=\<bool>] 進入量算出の際に，ルビ前後に挿入される
   標準の和文間空白(\Param{kanjiskip})の自然長を
   考慮するか否か．既定値は真．
-\item[intrude\_xkanjiskip=<bool>] 進入量算出の際に，ルビ前後に挿入される
+\item[intrude\_xkanjiskip=\<bool>] 進入量算出の際に，ルビ前後に挿入される
   標準の和欧文間空白(\Param{xkanjiskip})の自然長を考慮するか否か．既定値は真．
-\item[stretchruby=\{<left>\}\{<middle>\}\{<right>\}] 親文字の合計長が
+\item[stretchruby=\{\<left>\}\{\<middle>\}\{\<right>\}] 親文字の合計長が
 ルビ文字の合計長より長い時に，ルビ文字の前・間・後に入れる空白の割合であり，
 それぞれ0--7の自然数で指定する．
 既定値は\>\verb+{1}{2}{1}+\>である．
-<left>はルビ文字の先頭までの空き量，<middle>はルビ文字間の空き量，<right>はルビ文字の末尾からの
+\<left>はルビ文字の先頭までの空き量，\<middle>はルビ文字間の空き量，\<right>はルビ文字の末尾からの
 空き量（の比）を表す．以下が例である．
 \begin{LTXexample}[width=0.25\textwidth, preset=\Large]
 \ltjruby[stretchruby=123,maxmargin=2]%
   {◯◯◯◯}{◆◆}
 \end{LTXexample}
-\item[stretch=\{<left>\}\{<middle>\}\{<right>\}]
+\item[stretch=\{\<left>\}\{\<middle>\}\{\<right>\}]
 行中形でルビ文字の方が長い場合，親文字の前・中・後に入れる空白の割合．
 既定値は\>\verb+{1}{2}{1}+\>である．それ以外の代表的な値としては，例えば次のようなものがある．
 \begin{description}
-\item[親文字均等割禁止] \verb+{1}{0}{1}+\>など<middle>を0にした値
+\item[親文字均等割禁止] \verb+{1}{0}{1}+\>など\<middle>を0にした値
 \item[前突出禁止] \verb+{0}{1}{1}+
 \item[後突出禁止] \verb+{1}{1}{0}+
 \end{description}
 
-\item[stretchbol=\{<left>\}\{<middle>\}\{<right>\}] 行頭形に対する\texttt{stretch}と同様の指定．
+\item[stretchbol=\{\<left>\}\{\<middle>\}\{\<right>\}] 行頭形に対する\texttt{stretch}と同様の指定．
 既定値は\>\verb+{0}{1}{1}+\>である．
-\item[stretcheol=\{<left>\}\{<middle>\}\{<right>\}] 行末形に対する\texttt{stretch}と同様の指定．
+\item[stretcheol=\{\<left>\}\{\<middle>\}\{\<right>\}] 行末形に対する\texttt{stretch}と同様の指定．
 既定値は\>\verb+{1}{1}{0}+\>である．
 
-\item[maxmargin=<real>] 親文字の方がルビより長い時に，ルビの先頭と親文字の先頭，及び
+\item[maxmargin=\<real>] 親文字の方がルビより長い時に，ルビの先頭と親文字の先頭，及び
 ルビ末尾と親文字の末尾の間に許される最大の空白量．\emph{親文字全角幅単位}で指定し，既定値は0.5．
 
 \medskip
-\item[size=<real>] ルビ文字の親文字に対する大きさ．既定値は0.5．
-\item[intergap=<real>] ルビ文字と親文字との空きを親文字全角高さ単位で指定．既定値は0．
-\item[rubysmash=<bool>] ルビの高さを0にするか．既定値は偽．次が例である．
+\item[size=\<real>] ルビ文字の親文字に対する大きさ．既定値は0.5．
+\item[intergap=\<real>] ルビ文字と親文字との空きを親文字全角高さ単位で指定．既定値は0．
+\item[rubysmash=\<bool>] ルビの高さを0にするか．既定値は偽．次が例である．
 \begin{LTXexample}[width=0.25\textwidth, preset=\Large]
 \ \vrule width 0pt height 2\zw depth 1\zw
 \frame{\ltjruby[rubysmash=false]{本}{ほん}}\ 
@@ -225,13 +225,13 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 \frame{\ltjruby[rubysmash=true,intergap=0.2]{本}{ほん}}\ 
 \frame{\ltjruby[rubysmash=false,intergap=-1.5]{本}{ほん}}
 \end{LTXexample}
-\item[ybaseheight=<real>] 非負の値が指定された場合，
-  \emph{縦組以外での}親文字の高さを親文字全角高さの<real>倍と強制的に固定する．
+\item[ybaseheight=\<real>] 非負の値が指定された場合，
+  \emph{縦組以外での}親文字の高さを親文字全角高さの\<real>倍と強制的に固定する．
   負の値が指定された場合は「固定しない」（すなわち，v0.3より前の挙動と同じになる）．
   既定値は$0.88$．
-\item[tbaseheight=<real>] \texttt{ybaseheight}と同様だが，こちらは\emph{縦組での}親文字の高さを指定する．
+\item[tbaseheight=\<real>] \texttt{ybaseheight}と同様だが，こちらは\emph{縦組での}親文字の高さを指定する．
   既定値は$0.5$．
-\item[baseheight=<real>] \texttt{ybaseheight}，\texttt{tbaseheight}を同時に指定したことと同義．
+\item[baseheight=\<real>] \texttt{ybaseheight}，\texttt{tbaseheight}を同時に指定したことと同義．
   次の例や\autoref{fig:ruby_vertical}を参照．
 \begin{LTXexample}[width=0.25\textwidth, preset=\Large]
 \noindent
@@ -244,13 +244,13 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 \ltjruby[baseheight=-1]{本}{ほん}\ 
 \ltjruby[baseheight=-1]{dvi}{ディーヴィーアイ}
 \end{LTXexample}
-\item[yrubydepth=<real>] 非負の値が指定された場合，
-  \emph{縦組以外での}ルビの深さをルビ全角の<real>倍と強制的に固定する．
+\item[yrubydepth=\<real>] 非負の値が指定された場合，
+  \emph{縦組以外での}ルビの深さをルビ全角の\<real>倍と強制的に固定する．
   負の値が指定された場合は「固定しない」（すなわち，v0.52以前の挙動と同じになる）．
   既定値は$0.12$．
-\item[trubydepth=<real>] \texttt{yrubydepth}と同様だが，こちらは\emph{縦組での}ルビの深さを指定する．
+\item[trubydepth=\<real>] \texttt{yrubydepth}と同様だが，こちらは\emph{縦組での}ルビの深さを指定する．
   既定値は$0.5$．
-\item[rubydepth=<real>] \texttt{yrubydepth}，\texttt{trubydepth}を同時に指定したことと同義．
+\item[rubydepth=\<real>] \texttt{yrubydepth}，\texttt{trubydepth}を同時に指定したことと同義．
   次の例や\autoref{fig:ruby_vertical}を参照．
 \begin{LTXexample}[width=0.25\textwidth, preset=\Large]
 \noindent
@@ -292,23 +292,23 @@ plain \LuaTeX でのロードはまだサポートしておらず，
   H=
   \begin{cases}
     \mbox{\texttt{[yt]baseheight}}\cdot p&\mbox{if\ $\mbox{\texttt{[yt]baseheight}}\ge 0$,}\\
-    \mbox{（自然高さ）}&\mbox{if\ $\mbox{\texttt{[yt]baseheight}}\string<0$,}
+    \mbox{（自然高さ）}&\mbox{if\ $\mbox{\texttt{[yt]baseheight}}<0$,}
   \end{cases}\\
   D=
   \begin{cases}
     \mbox{\texttt{[yt]rubydepth}}\cdot r&\mbox{if\ $\mbox{\texttt{[yt]rubydepth}}\ge 0$,}\\
-    \mbox{（自然深さ）}&\mbox{if\ $\mbox{\texttt{[yt]rubydepth}}\string<0$.}
+    \mbox{（自然深さ）}&\mbox{if\ $\mbox{\texttt{[yt]rubydepth}}<0$.}
   \end{cases}
   \end{gather*}
   \caption{ルビの垂直配置}\label{fig:ruby_vertical}
 \end{figure}
 
 
-\item[kenten=<command>]各文字につく圏点の出力命令を指定する．
+\item[kenten=\<command>]各文字につく圏点の出力命令を指定する．
   既定値は「\cs{textbullet}」である．
 
-\item[fontcmd=<command>]ルビ用のフォント切り替え命令を指定する．
-このキーの内容が実行された後に\ \verb+\fontsize...\selectfont+\ が実行されるので，
+\item[fontcmd=\<command>]ルビ用のフォント切り替え命令を指定する．
+このキーの内容が実行された後に\>\verb+\fontsize...\selectfont+\>が実行されるので，
 このキーの指定では最後に\cs{selectfont}を加える必要はない．
 
 この \texttt{fontcmd}キーの内容は多くの回数実行される．
@@ -318,7 +318,7 @@ plain \LuaTeX でのロードはまだサポートしておらず，
 \end{lstlisting}
 のようにしてルビ用字形を用いることが可能だが，現在の実装ではタイプセットに時間がかかるようになる．
 
- \item[always\_highlight\_protrusion=<bool>] この\cs{ltjruby}命令が\Pkg{lua-ul}パッケージの提供する「下線」命令
+ \item[always\_highlight\_protrusion=\<bool>] この\cs{ltjruby}命令が\Pkg{lua-ul}パッケージの提供する「下線」命令
   \footnote{\cs{underLine}, \cs{highLight}，およびそのほか．}の引数に含まれていた場合，
   ルビの突出部（ただし\ActIntr{文字進入部分}は除く）に「下線」がいつでも引かれるか否か．
 
@@ -359,8 +359,8 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \end{verbatim}
 \end{description}
 
-\paragraph{\cs{ltjsetruby}\{<option>\}}
-<option>の既定値を指定する．\Pkg{luatexja-ruby}読み込み時の値は
+\paragraph{\cs{ltjsetruby}\{\<option>\}}
+\<option>の既定値を指定する．\Pkg{luatexja-ruby}読み込み時の値は
 各項目の所で既に説明してあるが，次のようになっている．
 \begin{verbatim}
   pre=-1, post=-1, mode=1,
@@ -375,15 +375,15 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 
 \paragraph{\cs{ltjsetparamater} に追加されるキー}
 \begin{description}
-\item[\Param{rubypreintrusion}\ttfamily =\{<chr\_code>, <pre\_int>\}]
-  文字<chr\_code> に，その\emph{直後}のルビによって掛けられるルビ文字列の最大長
+\item[\Param{rubypreintrusion}\ttfamily =\{\<chr\_code>, \<pre\_int>\}]
+  文字\<chr\_code> に，その\emph{直後}のルビによって掛けられるルビ文字列の最大長
   （つまり，\ActIntr{前文字進入許容量}）をルビ全角幅単位で指定．
 
   \emph{v0.5以降での変更点}：もし$-a$~($a>0$)を指定した場合は，次のようになる．
   \begin{itemize}
     \item 実際の\ActIntr{前文字進入許容量}は$a$となる．
-    \item ただし，文字<chr\_code>の直前のルビによって
-    文字の前のJFMグルーに進入が発生した場合，文字<chr\_code>の直後のルビの前進入は発生しない．
+    \item ただし，文字\<chr\_code>の直前のルビによって
+    文字の前のJFMグルーに進入が発生した場合，文字\<chr\_code>の直後のルビの前進入は発生しない．
   \end{itemize}
   後者の状況の例を以下に載せる．
 \begin{LTXexample}[width=0.25\textwidth, preset=\Large]
@@ -395,15 +395,15 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \end{LTXexample}
   
   
-\item[\Param{rubypostintrusion}\ttfamily =\{<chr\_code>, <post\_int>\}]
-  文字<chr\_code>に，その\emph{直前}のルビによって掛けられるルビ文字列の最大長
+\item[\Param{rubypostintrusion}\ttfamily =\{\<chr\_code>, \<post\_int>\}]
+  文字\<chr\_code>に，その\emph{直前}のルビによって掛けられるルビ文字列の最大長
   （つまり，\ActIntr{後文字進入許容量}）をルビ全角幅単位で指定．
 
   \emph{v0.5以降での変更点}：もし$-a$~($a>0$)を指定した場合は，次のようになる．
   \begin{itemize}
     \item 実際の\ActIntr{後文字進入許容量}は$a$となる．
-    \item ただし，文字<chr\_code>の直前のルビによってこの文字への実際の\ActIntr{後文字進入}が
-    発生した場合，文字<chr\_code>の直後のJFMグルーにはルビの前進入は発生しない．
+    \item ただし，文字\<chr\_code>の直前のルビによってこの文字への実際の\ActIntr{後文字進入}が
+    発生した場合，文字\<chr\_code>の直後のJFMグルーにはルビの前進入は発生しない．
   \end{itemize}
   今回も後者の状況の例を以下に載せる．
 \begin{LTXexample}[width=0.25\textwidth, preset=\Large]
@@ -448,7 +448,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \paragraph{\cs{ltjkenten}}
 圏点を出力する命令であり，
 \begin{quote}
- \ttfamily\cs{ltjkenten}[<option>]\{親文字\}
+ \ttfamily\cs{ltjkenten}[\<option>]\{親文字\}
 \end{quote}
 のように使用する．複数文字に圏点をつける場合でも，\cs{ltjruby}のように「\texttt{|}」を使って
 文字を区切る\emph{必要はない}（\cs{kenten}内では「\texttt{|}」は特別な意味を持たない）
@@ -460,7 +460,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \subsection[グループの指定]{グループの\ruby{指|定}{し|てい}}
 \label{ssec:grp}
 \begin{quote}
-\ttfamily\cs{ltjruby}[<option>]\{親|文|字\}\{おや|も|じ\}
+\ttfamily\cs{ltjruby}[\<option>]\{親|文|字\}\{おや|も|じ\}
 \end{quote}
 のように，\cs{ltjruby}の第2・第3引数内の「\texttt{|}」はグループの区切りを表す．
 グループの数は両者で一致しなければならず，
@@ -553,8 +553,8 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 -\underbrace{0.25\,\mathrm{zw}}_{\text{前のルビの\ActIntr{後文字進入量}（行中形）}}=0.25\,\mathrm{zw}
 \]
 となる．行分割後，「\ltjruby{陵}{りよう}」の実際の\ActIntr{後文字進入量}は
-<jobname>\texttt{.ltjruby}ファイルに記述される．
-\item 2回目以降の実行では，<jobname>\texttt{.ltjruby}ファイルに保存された「\ltjruby{陵}{りよう}」の\ActIntr{後文字進入量}
+\<jobname>\texttt{.ltjruby}ファイルに記述される．
+\item 2回目以降の実行では，\<jobname>\texttt{.ltjruby}ファイルに保存された「\ltjruby{陵}{りよう}」の\ActIntr{後文字進入量}
 を用いて，「\ltjruby{陵}{みささぎ}」の\ActIntr{前文字進入許容量}を次のように計算する：
 \[
  \underbrace{0.5\,\mathrm{zw}}_{\text{元々の許容量}}
@@ -562,7 +562,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
 \]
 \end{enumerate}
 
-<jobname>\texttt{.ltjruby}ファイルに保存する際，各\cs{ltjruby}命令の呼び出しを識別するキーが必要になるが，
+\<jobname>\texttt{.ltjruby}ファイルに保存する際，各\cs{ltjruby}命令の呼び出しを識別するキーが必要になるが，
 そのキーとしては単純に「何個目の\cs{ltjruby}命令か」である．
 
 なお，以上の処理は，1行目と2行目を比較すれば分かるように，
@@ -578,7 +578,7 @@ mode=9, stretch={1}{2}{1}, stretchruby={0}{0}{1}
   この場合，後ろにくる終わり括弧類，句点類若しくは読点類の後ろの空き量，
   又は前にくる始め括弧類の前の空き量に掛けてはならない．
 \end{quote}
-という処理も組み込まれており，<jobname>\texttt{.ltjruby}に「前後の和文処理グルーに正の量だけ進入したか」という情報を
+という処理も組み込まれており，\<jobname>\texttt{.ltjruby}に「前後の和文処理グルーに正の量だけ進入したか」という情報を
 保存することによって実装されている．
 
 \paragraph{段落末尾のルビ}
@@ -1201,7 +1201,6 @@ $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_4$を行B�
 
 % 漢字・ひらがな・カタカナにルビを2分まで掛けても良い流儀
 {%
-  \catcode`\<12%
   \makeatletter\count@="3040\loop\relax\ifnum \count@<"30FF%
   \ltjsetparameter{rubypreintrusion={\the\count@,0.5}, %
     rubypostintrusion={\the\count@,0.5}}%
@@ -1213,7 +1212,7 @@ $r_2$,~$g_2$を行Bから除去・メモリ解放し，代わりに$n_4$を行B�
 3.83 この\ruby{\噂}{うわさ}好きな人は\ruby{懐}{ふところ}具合もよく、\ruby{檜}{ひのき}材を
 }
 % 平仮名にもルビを掛けない流儀
-{\catcode`\<12%
+{%
   \makeatletter\count@="3040\loop\relax\ifnum \count@<"30A0%
   \ltjsetparameter{rubypreintrusion={\the\count@,0}, %
     rubypostintrusion={\the\count@,0}}%
