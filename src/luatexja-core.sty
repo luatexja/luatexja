@@ -448,7 +448,7 @@
   \edef\ltj@temp{#1}%
   \ifx\ltj@temp\empty\let\ltj@@next=\relax\else\let\ltj@@next=\ltj@@scrange
     \directlua{luatexja.charrange.toggle_char_range(%
-      luatexja.is_global,\ltj@safe@num@or{nil}{#1})}%
+      luatexja.isglobal,\ltj@safe@num@or{nil}{#1})}%
   \fi\ltj@@next
 }
 
