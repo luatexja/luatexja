@@ -1022,14 +1022,14 @@ end
 
 -- vsplit
 do
-   local split_dir_whatsit, split_dir_head, split_dir_at_2nd
+   local split_dir_whatsit, split_dir_head, split_dir_2nd
    local cat_lp = luatexbase.catcodetables['latex-package']
    local sprint, scan_int, tex_getbox = tex.sprint, token.scan_int, tex.getbox
    function luatexja.direction.vsplit()
       local n = scan_int();
       local p = to_direct(tex_getbox(n))
       if split_dir_head then node_free(split_dir_head); split_dir_head = nil end
-      if split_dir_whatsit then split_dir_watsit = nil end
+      if split_dir_whatsit then split_dir_whatsit = nil end
       if p then
          local bh = getlist(p)
          if getid(bh)==id_whatsit and getsubtype(bh)==sid_user and getfield(bh, 'user_id')==DIR
@@ -1194,7 +1194,7 @@ do
            setkern(nn, get_attr(nn, attr_vert_aux)); negate(nn); setnext(jn, nn) 
          end
          jn = node_next(node_next(nn)); negate(jn)
-         setlist(n, nil); _, nn = node_remove(orig_head, n); node_free(n); n = nn
+         setlist(n, nil); local _; _, nn = node_remove(orig_head, n); node_free(n); n = nn
        else
          local _, nn = node_remove(orig_head, n); setnext(n, nil)
          jl, jn = insert_after(jl, jn, n); negate(n); n = nn
