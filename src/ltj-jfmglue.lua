@@ -823,7 +823,7 @@ do
       end
    end
    calc_ja_ja_aux = function (gb, ga, db, da)
-      if luatexja.jfmglue.diffmet_rule ~= math.two_pleft and diffmet_rule ~= math.two_pright
+      if luatexja.jfmglue.diffmet_rule ~= math.two_pleft and luatexja.jfmglue.diffmet_rule ~= math.two_pright
           and luatexja.jfmglue.diffmet_rule ~= math.two_paverage then
          db, da = 0, 1
       end
