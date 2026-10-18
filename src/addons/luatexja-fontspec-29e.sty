@@ -479,9 +479,9 @@
    \prop_gset_eq:NN \g__fontspec_fontopts_prop \l__ltj_fontspec_tmp_prop
  }
 
-\RequirePackage{regexpatch}
 \cs_set_eq:NN \__ltj_fontspec_main_addfontfeatures:n \__fontspec_main_addfontfeatures:n
-\xpatchcmd {\__ltj_fontspec_main_addfontfeatures:n }
+% not regexpatch: it clashes with xpatch, which e.g. newtxtext loads
+\patchcmd {\__ltj_fontspec_main_addfontfeatures:n }
   { \fontfamily \g__fontspec_nfss_family_tl \selectfont }
   { } % \selectfont will be executed later (outside a group)
   { } { }
