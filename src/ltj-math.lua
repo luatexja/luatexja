@@ -88,7 +88,7 @@ local function conv_vcenter(sb)
    return sb
 end
 
-local cjhh_A
+local cjh_A
 local max, min = math.max, math.min
 -- sty : -1 (display), 0 (text), 1 (script), >=2 (scriptscript)
 local function conv_jchar_to_hbox(head, sty)

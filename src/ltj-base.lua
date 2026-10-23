@@ -120,7 +120,7 @@ do
     package_error(public_name, main, help)
   end
   ltj_warning_no_line = function (main)
-    package_warning_no_line(public_name, main, help)
+    package_warning_no_line(public_name, main)
   end
 
 end
