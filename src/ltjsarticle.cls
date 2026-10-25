@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsarticle}
-  [2026-10-02 ltjsclasses ]
+  [2026-10-25 ltjsclasses ]
 \def\jsc@clsname{ltjsarticle}
 \def\Cjascale{0.924715}
 \RequirePackage{luatexja}
@@ -808,16 +808,16 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
          , name          = #1
          , level         = #2
          , mark-cmd      = \exp_not:c {#1mark} {##1}
-         , after-penalty-vspace =  \the\@tempskipa
          , after-vspace = \the\@tempskipb
          , para-indent   = \if@english false\else \if@afterindent true \else false\fi\fi
          , heading-decls = \exp_not:o \l__head_heading_decls_tl
          , title-format  = \exp_not:o \l__head_title_format_tl {##1} \exp_not:N \par
          , headformat-instance = #1-@startsection
          , placement-start-code =
-           \ifdim \@tempskipa >\z@
+           {\ifdim \@tempskipa >\z@
              \unexpanded{\if@slide\else\null\vspace*{-\baselineskip}\fi}%
-           \fi
+             \vskip\the\@tempskipa
+           \fi}
       }}
       \DeclareInstance{headformat}{#1-@startsection}{hang}{heading-indent = #3}
     \else

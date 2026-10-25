@@ -145,6 +145,7 @@
 % \changes{v1.8f-ltj-26}{2026-05-17}{|latex-lab-title|, |latex-lab-toc-kernel-changes|,
 %    |latex-lab-sec-template|にある「新実装」と同様の変更を仕込みました．}
 % \changes{v1.8f-ltj-27}{2026-10-04}{\LaTeXe~2026-11-01における|latex-lab-sec-template|の更新に追従．}
+% \changes{v1.8f-ltj-28}{2026-10-25}{さらなる|latex-lab-sec-template|の更新に追従．}
 % \fi
 %
 % \iffalse
@@ -174,7 +175,7 @@
 %<11pt&bk>\ProvidesFile{ltjtbk11.clo}
 %<12pt&bk>\ProvidesFile{ltjtbk12.clo}
 %</tate>
-  [2026-10-04 v1.8f-ltj-27
+  [2026-10-04 v1.8f-ltj-28
 %<article|report|book> Standard LuaLaTeX-ja class]
 %<10pt|11pt|12pt>  Standard LuaLaTeX-ja file (size option)]
 %<*driver>
@@ -3359,7 +3360,8 @@
   , placement-start-code     =
      \if@openleft \cleardoublepage \else
      \if@openright \cleardoublepage \else \clearpage \fi \fi
-     \thispagestyle{jpl@in}\global\@topnum\z@\hbox{}%
+     \thispagestyle{jpl@in}\global\@topnum\z@\null
+     \vskip\dimexpr\Cht\relax
   , final-code     =
      \bool_if:NF \l__head_unnumbered_bool {%
        \typeout{\@chapapp\space\arabic{chapter}\space\@chappos}}

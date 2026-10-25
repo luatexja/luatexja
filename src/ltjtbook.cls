@@ -652,7 +652,8 @@
   , placement-start-code     =
      \if@openleft \cleardoublepage \else
      \if@openright \cleardoublepage \else \clearpage \fi \fi
-     \thispagestyle{jpl@in}\global\@topnum\z@\hbox{}%
+     \thispagestyle{jpl@in}\global\@topnum\z@\null
+     \vskip\dimexpr\Cht\relax
   , final-code     =
      \bool_if:NF \l__head_unnumbered_bool {%
        \typeout{\@chapapp\space\arabic{chapter}\space\@chappos}}

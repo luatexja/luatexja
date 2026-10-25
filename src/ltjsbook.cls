@@ -38,7 +38,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{ltjsbook}
-  [2026-10-02 ltjsclasses ]
+  [2026-10-25 ltjsclasses ]
 \def\jsc@clsname{ltjsbook}
 \def\Cjascale{0.924715}
 \RequirePackage{luatexja}
@@ -823,16 +823,16 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
          , name          = #1
          , level         = #2
          , mark-cmd      = \exp_not:c {#1mark} {##1}
-         , after-penalty-vspace =  \the\@tempskipa
          , after-vspace = \the\@tempskipb
          , para-indent   = \if@english false\else \if@afterindent true \else false\fi\fi
          , heading-decls = \exp_not:o \l__head_heading_decls_tl
          , title-format  = \exp_not:o \l__head_title_format_tl {##1} \exp_not:N \par
          , headformat-instance = #1-@startsection
          , placement-start-code =
-           \ifdim \@tempskipa >\z@
+           {\ifdim \@tempskipa >\z@
              \unexpanded{\if@slide\else\null\vspace*{-\baselineskip}\fi}%
-           \fi
+             \vskip\the\@tempskipa
+           \fi}
       }}
       \DeclareInstance{headformat}{#1-@startsection}{hang}{heading-indent = #3}
     \else
@@ -1188,7 +1188,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
      \if@openright \cleardoublepage \else \clearpage \fi \fi
      \thispagestyle{empty}%
      \if@twocolumn\onecolumn\@restonecoltrue\else\@restonecolfalse\fi
-     \null\vfil
+     \null{\Huge\vskip\dimexpr-20pt+\baselineskip}\vfil
   , final-code    = \@endpart
 }
 \DeclareInstance{headformat}{part}{display}
@@ -1203,7 +1203,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
      \if@openright \cleardoublepage \else \clearpage \fi \fi
      \thispagestyle{empty}%
      \if@twocolumn\onecolumn\@restonecoltrue\else\@restonecolfalse\fi
-     \null{\huge\vskip .5\zw}\vfil
+     \null{\Huge\vskip\zw}\vfil
 }
 }{
 \DeclareDocumentCommand \part {s ={shorttitle}o m}
@@ -1264,7 +1264,7 @@ option, since LuaTeX does not support \string\mag\MessageBreak in pdf output}%
   , contents-extra = \addtocontents{lof}{\protect\addvspace{10\jsc@mpt}}
                      \addtocontents{lot}{\protect\addvspace{10\jsc@mpt}}
   , para-indent    = true
-  , after-penalty-vspace = 2\Cvs
+  , after-penalty-vspace = 2\Cvs+\topskip
 }
 \DeclareInstance{headformat}{chapter}{display}
 {
