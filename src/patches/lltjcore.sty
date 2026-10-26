@@ -3,7 +3,7 @@
 %
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lltjcore}[2026-10-01 Patch to LaTeX2e Kernel for LuaTeX-ja]
+\ProvidesPackage{lltjcore}[2026-10-26 Patch to LaTeX2e Kernel for LuaTeX-ja]
 \RequirePackage{etoolbox}
 
 \def\ltj@ptcerr#1{\typeout{lltj-core: patch FAILED (\detokenize{#1})}}
@@ -255,7 +255,7 @@
 \gdef\@setref@{\ifhmode\spacefactor\@m\fi}
 \endgroup
 \if@compatibility\else
-\patchcmd\verb{\leavevmode\null}{\leavevmode\vadjust{}}{}{}
+\patchcmd\verb{\leavevmode\null}{\leavevmode\vadjust{}}{}{\ltj@ptcerr{\verb}}
 \fi
 \patchcmd{\do@noligs}{\kern\z@}{\vadjust{}}{}{\ltj@ptcerr{\do@noligs}} % reported by p_typo
 \gdef\@stopfield{%
@@ -285,7 +285,7 @@
 \let\ltj@orig@kernel@process@makefnmark=\@kernel@process@makefnmark
 \def\@kernel@process@makefnmark#1{\ltj@orig@kernel@process@makefnmark{\@ltj@process@makefnmark#1}}
 
-%%%%%% \vcenter@text (>=LaTeX  2026-06-01)
+%%%%%% \vcenter@text (>=LaTeX 2026-06-01)
 \IfFormatAtLeastTF{2026-06-01}{%
   \protected\def\vcenter@text@auxii{%
     \begingroup
@@ -303,10 +303,17 @@
   \patchcmd\@iiiparbox{\m@th$}{\m@th$\null}{}{\ltj@ptcerr{\@iiiparbox 2}}
 }%
 
-\DeclareRobustCommand\underline[1]{%
-  \relax
-  \ifmmode\@@underline{#1}%
-  \else \leavevmode\null$\@@underline{\hbox{#1}}\m@th$\null\relax\fi}
+%%%%%% \underline@text (>=LaTeX 2026-11-01) / \underline (<= LaTeX 2026-06-01)
+\IfFormatAtLeastTF{2026-11-01}{%
+  \patchcmd\underline@text{\leavevmode\check@mathfonts}{\leavevmode\null\check@mathfonts}%
+    {}{\ltj@ptcerr{\underline@text 1}}
+  \patchcmd\underline@text{\endgroup}{\endgroup\null}{}{\ltj@ptcerr{\underline@text 2}}
+}{%
+  \DeclareRobustCommand\underline[1]{%
+    \relax
+    \ifmmode\@@underline{#1}%
+    \else \leavevmode\null$\@@underline{\hbox{#1}}\m@th$\null\relax\fi}
+}
 
 \patchcmd\@finalstrut{\nobreak}{\nobreak\ltjfakeboxbdd}{}{\ltj@ptcerr{\@finalstrut}}
 
