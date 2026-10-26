@@ -1,0 +1,15 @@
+%
+% lltjp-lua-unicode-math.sty 2026-10-26
+%
+
+\NeedsTeXFormat{LaTeX2e}
+
+\RequirePackage{lua-unicode-math}
+
+\ExplSyntaxOn
+\cs_new:Npn \UnicodeMathSymbol #1 #2 #3 #4 { \ltjsetmathletter{ #1 } }
+\input {unicode-math-table}
+\cs_undefine:N \UnicodeMathSymbol
+\ExplSyntaxOff
+
+\endinput

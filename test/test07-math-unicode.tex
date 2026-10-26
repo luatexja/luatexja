@@ -1,23 +1,31 @@
 %#!lualatex
-\documentclass{article}
+\documentclass{ltjsarticle}
 \usepackage[a4paper]{geometry}
 \makeatletter
+    \csname ltj@kcat0\endcsname=0 
+    \csname ltj@kcat1\endcsname=0 
+    \csname ltj@kcat2\endcsname=0 
+    \csname ltj@kcat3\endcsname=0 
+    \csname ltj@kcat4\endcsname=0 
+    \csname ltj@kcat5\endcsname=0 
+    \csname ltj@kcat6\endcsname=0 
+%←全部の（>=U+0080な）文字を和文文字扱いに！
 
+\usepackage{luatexja-preset}
 \usepackage{unicode-math}
 
-\usepackage{luatexja-fontspec}
-\setmainjfont{IPAGothic}
+
 \setmathfont{XITSMath}
+\setmainjfont{KozMinPr6N-Regular}
 
-\ltj@alljachar %←全部の（>=U+0080な）文字を和文文字扱いに！
-\setmainfont{TexGyreTermes}
-
+\makeatletter
 \reDeclareMathAlphabet{\mathtestA}{\mathrm}{\mathmc}
 \reDeclareMathAlphabet{\mathtestB}{\mathrm}{\mathtestb}
 \reDeclareMathAlphabet{\mathtestC}{\mathtesta}{\mathmc}
 \reDeclareMathAlphabet{\mathtestD}{\mathtesta}{\mathtestb}
 \reDeclareMathAlphabet{\mathtestE}{\mathtestE}{\mathmc}
 \begin{document}\makeatletter
+
 \[
  \frac1{1^2}+\frac1{2^2}+\cdots=
 \sum_{n=1}^\infty \frac1{n^s}=\zeta(2)=\frac{\pi^2}{6}
@@ -29,15 +37,15 @@ $\hslash$
 ○×○漢×漢\times え\ltjjachar`\“え\ltjalchar`\“え\textquotedblleft え“え←数式外では和文文字扱いのままになっている．
 
 \kanjifamily{mc}\selectfont
-$あいうえおabcde a^\mathrm{b}$
+$あいうえおabcde a^\mathrm{b}$\typeout{A}
 
-mathrm: $\mathrm{\alpha あいうえおabcde}^\mathrm{b}$
+mathrm: $\mathrm{\alpha あいうえおabcde}^\mathrm{b}$\typeout{B}
 
-mathbf: $\mathbf{\alpha あいうえおabcde}$
+mathbf: $\mathbf{\alpha あいうえおabcde}$\typeout{C}
 
-mathmc: $\mathmc{\alpha あいうえおabcde}$
+mathmc: $\mathmc{\alpha あいうえおabcde}$\typeout{D}
 
-mathgt: $\mathgt{\alpha あいうえおabcde}$
+mathgt: $\mathgt{\alpha あいうえおabcde}$\typeout{E}
 
 \tt\meaning\mathtestA
 
@@ -49,8 +57,19 @@ mathgt: $\mathgt{\alpha あいうえおabcde}$
 
 \tt\meaning\mathtestE
 
-\meaning\lfloor
+
+
+$abcdefghijklmnopqrstuvwxyz$    % OK
+
+$ABCDEFGHIJKLMNOPQRSTUVWXYZ$    % OK
+
+h\textit{h}\textbf{h\itshape h} % OK
+
+$\cdots\vdots\ddots\cdot$       % OK
+
 \[
 \lceil x\rceil + \lfloor x\rfloor +\hat a-\sqrt{a} - [\hbar]
+\underbrace{\left\lceil \frac 12\right\rceil}_{a}
 \]
+
 \end{document}
