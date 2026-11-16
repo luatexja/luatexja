@@ -264,7 +264,14 @@
 
 \def\ltj@verb@fontsetup{\ltjsetparameter{autoxspacing=false}}
 \apptocmd\verbatim@font{\ltj@verb@fontsetup}{}{\ltj@ptcerr{\verbatim@font}}
-\AddToHook{build/page/reset}[verbatim in luatexja]{\ltjsetparameter{autoxspacing=true}}
+\AtBeginDocument{%
+  \ifnum\ltjgetparameter{autoxspacing}>0 % true
+    \gdef\ltj@set@document@default@autoxspacing{\ltjsetparameter{autoxspacing=true}}
+  \else
+    \gdef\ltj@set@document@default@autoxspacing{\ltjsetparameter{autoxspacing=false}}
+  \fi}
+\let\ltj@set@document@default@autoxspacing\relax % dummy
+\AddToHook{build/page/reset}[luatexja_restore_autoxspacing]{\ltj@set@document@default@autoxspacing}
 
 %%%%%% footnote
 \renewcommand\@makefnmark{%
