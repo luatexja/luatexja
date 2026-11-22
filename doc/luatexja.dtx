@@ -545,7 +545,7 @@ However, \LuaTeX-ja inserts these spaces before/after \cs{verb}, and inside \cs{
 \label{para:xkanjiskip_verb}
 バージョン20260420.0以降では，\cs{verb}や\texttt{verbatim}環境
 \footnote{\texttt{.dtx}内の\texttt{macrocode}環境や，\Pkg{fancyvrb}パッケージの
-  提供する\texttt{Verbatim}環境も含む．実装方法については\ref{ssec:xkanjiskip_verb}節を参照．}%
+  提供する\texttt{Verbatim}環境も含む．実装方法については\ref{ssec:xkanjiskip_verb}\nobreak 節を参照．}%
 内部では和欧文間空白を入れないようにした．
 これは，「入力通りに組まれる」状況で，和欧文間空白と明示的な空白を混同してしまうことを避けるためである．
 ただ，以下に示すように，\cs{verb}の前後や，単なる\cs{texttt\{\}}の内部には和欧文間空白は入る．
@@ -2355,12 +2355,26 @@ One can use also numbers to specify these two parameters (see Subsection~\ref{ss
 %<*en>
 If you want to enable/disable all insertions of \Param{kanjiskip} and
 \Param{xkanjiskip}, set \Param{autospacing} and \Param{autoxspacing}
-parameters to \texttt{true}/\texttt{false}, respectively.
+parameters to \texttt{true}/\texttt{false}, respectively
+\footnote{%
+  In version~20261122.0 and~later, \Param{xkanjiskip} is reset when headers and footers are typeset,
+  to that the value at \cs{begin\{document\}},
+  
+}.
 %</en>
 %<*ja>
 もし全ての\Param{kanjiskip}と\Param{xkanjiskip}の挿入を有効化／無効化
 したければ，それぞれ\Param{autospacing}と\Param{autoxspacing}を
-\texttt{true}/\texttt{false}に設定すればよい．
+\texttt{true}/\texttt{false}に設定すればよい
+\footnote{%
+  バージョン20261122.0以降では，各ページのヘッダやフッタの組版時には（つまり，output routineの内部では）
+  \Param{autoxspacing}の値が\cs{begin\{document\}}実行時の値にリセットされる．
+  これはバージョン20260420.0で導入された\ref{ssec:xkanjiskip_verb}節の措置における
+  副作用への対応である．
+  
+  もし「文書全体で，ヘッダやフッタも含め\Param{xkanjiskip}の挿入を無効化したい」場合は
+  \cs{begin\{document\}}\emph{より前}に設定を行なっておく必要がある．
+}．
 %</ja>
 
 %<en>\subsection{Shifting the baseline}
