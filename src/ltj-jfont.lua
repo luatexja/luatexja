@@ -1,7 +1,8 @@
 --
 -- ltj-jfont.lua
 --
-luatexbase.provides_module({
+local ltb = luatexbase
+ltb.provides_module({
   name = 'luatexja.jfont',
   date = '2026-01-07',
   description = 'Loader for Japanese fonts',
@@ -25,12 +26,12 @@ local round = tex.round
 local font_getfont = font.getfont
 local setkern = node.direct.setkern
 
-local attr_icflag = luatexbase.attributes['ltj@icflag']
-local attr_curjfnt = luatexbase.attributes['ltj@curjfnt']
-local attr_curtfnt = luatexbase.attributes['ltj@curtfnt']
+local attr_icflag = ltb.attributes['ltj@icflag']
+local attr_curjfnt = ltb.attributes['ltj@curjfnt']
+local attr_curtfnt = ltb.attributes['ltj@curtfnt']
 local id_glyph = node.id 'glyph'
 local id_kern = node.id 'kern'
-local cat_lp = luatexbase.catcodetables['latex-package']
+local cat_lp = ltb.catcodetables['latex-package']
 local FROM_JFM     = luatexja.icflag_table.FROM_JFM
 
 luatexja.jfont = luatexja.jfont or {}
@@ -41,7 +42,7 @@ luatexja.jfont = luatexja.jfont or {}
 local metrics = {} -- this table stores all metric informations
 local font_metric_table = ltju.font_metric_table -- [font number] -> jfm_name, jfm_var, size
 
-luatexbase.create_callback("luatexja.load_jfm", "data", function (ft, jn) return ft end)
+ltb.create_callback("luatexja.load_jfm", "data", function (ft, jn) return ft end)
 
 local jfm_spec, jfm_name, jfm_var, jfm_ksp, jfm_pci, jfm_down, jfm_left
 local defjfm_res
@@ -178,7 +179,7 @@ function luatexja.jfont.define_jfm(to)
       t.chars.nox_alchar = t.chars.jcharbdd
       t.chars.glue = t.chars.jcharbdd
    end
-   t = luatexbase.call_callback("luatexja.load_jfm", t, jfm_spec, luatexja.jfont.jfm_feature)
+   t = ltb.call_callback("luatexja.load_jfm", t, jfm_spec, luatexja.jfont.jfm_feature)
    t.size_cache = {}
    defjfm_res = t
 end
@@ -245,7 +246,7 @@ do
    end
 end
 
-luatexbase.create_callback("luatexja.find_char_class", "data",
+ltb.create_callback("luatexja.find_char_class", "data",
                            function (arg, fmtable, char)
                               return 0
                           end)
@@ -264,7 +265,7 @@ do
       local r = (m or fcc_temp).chars_cbcache[c]
       if not r then
          r = m.chars[c] or
-            luatexbase.call_callback("luatexja.find_char_class", 0, m, c)
+            ltb.call_callback("luatexja.find_char_class", 0, m, c)
          m.chars_cbcache[c or 0] = r
       end
       return r
@@ -305,7 +306,7 @@ do
       tex.sprint(cat_lp, '\\expandafter\\font\\ltj@temp')
    end
 
-   luatexbase.create_callback("luatexja.define_jfont", "data", function (ft, fn) return ft end)
+   ltb.create_callback("luatexja.define_jfont", "data", function (ft, fn) return ft end)
 
 -- EXT
    local fastcopy=table.fastcopy
@@ -339,7 +340,7 @@ do
          ltju.enable_feature(fn, vert_name)
          ltju.loop_over_feat(f, vert_name, function (i,k) rot[i] = nil end)
       end
-      fmtable = luatexbase.call_callback("luatexja.define_jfont", fmtable, fn)
+      fmtable = ltb.call_callback("luatexja.define_jfont", fmtable, fn)
       font_metric_table[fn]=fmtable
       tex.sprint(cat_lp, global_flag, '\\protected\\expandafter\\def\\ltj@temp',
         '{\\ltj@cur'.. (jfm_dir == 'yoko' and 'j' or 't') .. 'fnt', fn, '\\relax}')
@@ -348,7 +349,6 @@ do
 end
 
 do
-    local ltb = luatexbase
     local to_be_checked = { 'pre_linebreak_filter', 'hpack_filter' }
     check_callback_order = function()
         for i,n in pairs(to_be_checked) do
@@ -482,13 +482,13 @@ do
       local new_name = is_def_jfont and extract_jfm_spec(name) or name
       is_def_jfont = false
       local res =  ltjr_font_callback(new_name, size, id, otfl_fdr)
-      luatexbase.call_callback('luatexja.define_font', res, new_name, size, id, jfm_dir)
+      ltb.call_callback('luatexja.define_font', res, new_name, size, id, jfm_dir)
       -- this callback processes variation selector, so we execute it always
       return res
    end
-   luatexbase.create_callback('luatexja.define_font', 'simple', function (n) return n end)
-   otfl_fdr= luatexbase.remove_from_callback('define_font', 'luaotfload.define_font')
-   luatexbase.add_to_callback('define_font',luatexja.font_callback,"luatexja.font_callback", 1)
+   ltb.create_callback('luatexja.define_font', 'simple', function (n) return n end)
+   otfl_fdr= ltb.remove_from_callback('define_font', 'luaotfload.define_font')
+   ltb.add_to_callback('define_font',luatexja.font_callback,"luatexja.font_callback", 1)
 
    local match, sp, scan_arg = string.match, tex.sp, token.scan_argument
    local function load_jfmonly()
@@ -917,14 +917,14 @@ do
          end
       end
    end
-    luatexbase.add_to_callback(
+   ltb.add_to_callback(
        'luaotfload.patch_font',
        function (tfmdata)
           -- these function is executed one time per one fontfile
           prepare_extra_data_base(tfmdata); return tfmdata
        end,
        'ltj.prepare_extra_data', 1)
-   luatexbase.add_to_callback(
+   ltb.add_to_callback(
       'luatexja.define_font',
       function (res, name, size, id, jfm_dir)
          prepare_extra_data_font(id, res, name)
@@ -971,7 +971,7 @@ do
       end
     end
   end
-luatexbase.add_to_callback(
+ltb.add_to_callback(
    'luatexja.define_font',
    function (res, name, size, id, jfm_dir)
       if type(res)=='table' and jfm_dir=='tate' then
@@ -990,7 +990,7 @@ luatexbase.add_to_callback(
    end,
    'ltj.patch_tounicode_for_vertical_font', 1)
 
-luatexbase.add_to_callback(
+ltb.add_to_callback(
    "luatexja.define_jfont",
    function (fmtable, fnum)
       local vform = {}; fmtable.vform = vform
@@ -1026,7 +1026,7 @@ end
 ------------------------------------------------------------------------
 do
   local ltjr_prepare_cid_font = ltjr.prepare_cid_font
-  luatexbase.add_to_callback(
+  ltb.add_to_callback(
      'luaotfload.patch_font',
      function (tfmdata)
         local cidinfo = tfmdata.cidinfo or (tfmdata.resource and tfmdata.resources.cidinfo)

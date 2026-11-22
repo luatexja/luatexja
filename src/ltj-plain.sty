@@ -22,16 +22,21 @@
 \endlinechar=13
 %! ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 % LuaTeX-ja macros against plain TeX
-
 %%%%\shipout
+% In [dvi]luatex, pre_shipout_filter callback was not defined in the format.
+% This callback is used in luaotfload.dvi, so we define it here.
 \newluafunction\ltj@@lua@shipout@inner
 \directlua{
+  luatexbase.create_callback('pre_shipout_filter', 'list')
+  luatexbase.add_to_callback('pre_shipout_filter',luatexja.direction.shipout_lthook, 'ltj.direction', 1)
+  local call = luatexbase.call_callback
   local t = lua.get_functions_table()
   local getbox, setbox = tex.getbox, tex.setbox
   local shipout_lthook = luatexja.direction.shipout_lthook
   t[\the\ltj@@lua@shipout@inner]=function ()
-    local a = shipout_lthook(getbox(\the\ltj@afbox))
-  if a then setbox(\the\ltj@afbox, a) end
+    local head = getbox(\the\ltj@afbox)
+    local result = call('pre_shipout_filter', head)
+    if not (result == head) then setbox(\the\ltj@afbox, result or nil) end
   end
 }
 \protected\luadef\ltj@@lua@shipout\ltj@@lua@shipout@inner
