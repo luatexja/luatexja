@@ -71,7 +71,7 @@ do
     local sid_special = node.subtype 'special'
     function mwt.mk_save_node()
         local t
-        if tex.outputmode>1 then t = dnode_new(id_whatsit, sid_save)
+        if tex.outputmode>0 then t = dnode_new(id_whatsit, sid_save)
         else
             t = dnode_new(id_whatsit, sid_special)
             if luatexja.driver=='dvipdfmx' then
@@ -84,7 +84,7 @@ do
     end
     function mwt.mk_restore_node(b)
         local t
-        if tex.outputmode>1 then t = dnode_new(id_whatsit, sid_restore)
+        if tex.outputmode>0 then t = dnode_new(id_whatsit, sid_restore)
         else
             t = dnode_new(id_whatsit, sid_special)
             if luatexja.driver=='dvipdfmx' then
@@ -97,7 +97,7 @@ do
     end
     function mwt.mk_matrix_node(m, b)
         local t
-        if tex.outputmode>1 then 
+        if tex.outputmode>0 then 
             t = dnode_new(id_whatsit, sid_matrix); setfield(t, 'data', m)
         else print('matrix', m)
             t = dnode_new(id_whatsit, sid_special)
