@@ -46,6 +46,8 @@
   }
   \expandafter\ltj@@temp\LuaTeXjaversion\@nil
   \DeclareOption{disablejfam}{\ltj@disablejfamtrue}
+  \DeclareOption{dvipdfmx}{%
+    \directlua{luatexja = {}; luatexja.driver = 'dvipdfmx'}}
   \DeclareOption*{}
   \ProcessOptions\relax
 \fi                             %</LaTeX>

@@ -60,6 +60,57 @@ do
     end
 end
 
+-- whatsit node (pdf_save, pdf_setmatrix, pdf_restore)
+luatexja.make_whatsit = {}
+do
+    local mwt = luatexja.make_whatsit
+    local dnode_new, setfield = node.direct.new, node.direct.setfield
+    local id_whatsit = node.id 'whatsit'
+    local sid_save, sid_restore, sid_matrix 
+      = node.subtype 'pdf_save', node.subtype 'pdf_restore', node.subtype 'pdf_setmatrix' 
+    local sid_special = node.subtype 'special'
+    function mwt.mk_save_node()
+        local t
+        if tex.outputmode>1 then t = dnode_new(id_whatsit, sid_save)
+        else
+            t = dnode_new(id_whatsit, sid_special)
+            if luatexja.driver=='dvipdfmx' then
+                setfield(t, 'data', 'pdf:code q')
+            else
+                setfield(t, 'data', 'ps: gsave')        
+            end
+        end
+        return t
+    end
+    function mwt.mk_restore_node(b)
+        local t
+        if tex.outputmode>1 then t = dnode_new(id_whatsit, sid_restore)
+        else
+            t = dnode_new(id_whatsit, sid_special)
+            if luatexja.driver=='dvipdfmx' then
+                setfield(t, 'data', 'pdf:code Q')
+            else
+                setfield(t, 'data', 'ps: grestore')        
+            end
+        end
+        return t
+    end
+    function mwt.mk_matrix_node(m, b)
+        local t
+        if tex.outputmode>1 then 
+            t = dnode_new(id_whatsit, sid_matrix); setfield(t, 'data', m)
+        else print('matrix', m)
+            t = dnode_new(id_whatsit, sid_special)
+            if luatexja.driver=='dvipdfmx' then
+                setfield(t, 'data', 'pdf:code ' .. m .. ' 0 0 cm')
+            else
+                setfield(t, 'data', '')        
+            end
+        end
+        return t
+    end
+end
+
 --- 以下は全ファイルで共有される定数
 local icflag_table = {}
 luatexja.icflag_table = icflag_table

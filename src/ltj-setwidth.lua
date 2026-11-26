@@ -52,9 +52,6 @@ local id_vlist  = node.id 'vlist'
 local id_rule   = node.id 'rule'
 local id_math   = node.id 'math'
 local id_whatsit= node.id 'whatsit'
-local sid_save   = node.subtype 'pdf_save'
-local sid_restore = node.subtype 'pdf_restore'
-local sid_matrix  = node.subtype 'pdf_setmatrix'
 local dir_tate = luatexja.dir_table.dir_tate
 
 local attr_yablshift = luatexbase.attributes['ltj@yablshift']

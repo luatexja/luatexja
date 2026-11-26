@@ -177,7 +177,7 @@
 \protected\def\ltj@@q@escapenum{\ltj@@q@escapenum@}
 
 \directlua{%
-  luatexja = {};
+  luatexja = (type(luatexja)=="table") and luatexja or {};
   luatexja.lang_ja = \the\ltj@@japanese;
   dofile(assert(kpse.find_file('luatexja.lua', 'tex'),
       "File `luatexja.lua' not found"))

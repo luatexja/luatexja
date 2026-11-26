@@ -43,7 +43,6 @@ local id_kern    = node.id 'kern'
 local id_hlist   = node.id 'hlist'
 local id_vlist   = node.id 'vlist'
 local id_whatsit = node.id 'whatsit'
-local sid_save   = node.subtype 'pdf_save'
 local sid_user   = node.subtype 'user_defined'
 
 local getnest = tex.getnest
@@ -369,8 +368,6 @@ local dir_node_aux
 do
    local setkern = dnode.setkern
    local setshift = dnode.setshift
-   local sid_restore= node.subtype 'pdf_restore'
-   local sid_matrix = node.subtype 'pdf_setmatrix'
    local floor = math.floor
    local get_h =function (w,h,d) return h end
    local get_d =function (w,h,d) return d end
@@ -389,10 +386,9 @@ do
    local function gen_whatsit(arg)
       return node_new(id_whatsit, arg)
    end
-   local function gen_rotate(arg)
-      local nn = node_new(id_whatsit, sid_matrix)
-      setfield(nn, 'data', arg); return nn
-   end
+   local gen_save = luatexja.make_whatsit.mk_save_node
+   local gen_restore = luatexja.make_whatsit.mk_restore_node
+   local gen_rotate = luatexja.make_whatsit.mk_matrix_node
    local function gen_box(arg, b, w,h,d,dw,dh,dd)
       local nn = b; setnext(b, nil)
       setshift(nn, arg(w, h, d, dw, dh, dd)); return nn
@@ -404,20 +400,20 @@ do
             height = get_w_half,
             depth  = get_w_half_rem,
             [id_hlist] = {
-               { gen_whatsit, sid_save },
+               { gen_save },
                { gen_rotate, '0 1 -1 0' },
                { gen_kern, function(w,h,d,nw,nh,nd) return -nd end },
                { gen_box , get_h},
                { gen_kern, function(w,h,d,nw,nh,nd) return nd-w end },
-               { gen_whatsit, sid_restore },
+               { gen_restore },
             },
             [id_vlist] = {
-               { gen_whatsit, sid_save },
+               { gen_save },
                { gen_rotate, '0 1 -1 0' },
                { gen_kern , zero },
                { gen_box , function(w,h,d,nw,nh,nd) return -nh-nd end },
                { gen_kern, get_h_d_neg},
-               { gen_whatsit, sid_restore },
+               { gen_restore },
             },
          },
          [dir_dtou] = { -- dtou 中で組む
@@ -425,19 +421,19 @@ do
             height = get_w,
             depth  = zero,
             [id_hlist] = {
-               { gen_whatsit, sid_save },
+               { gen_save },
                { gen_rotate, '0 -1 1 0' },
                { gen_kern, function(w,h,d,nw,nh,nd) return -nh end },
                { gen_box, get_d_neg },
                { gen_kern, function(w,h,d,nw,nh,nd) return nh-w end },
-               { gen_whatsit, sid_restore },
+               { gen_restore },
             },
             [id_vlist] = {
-               { gen_whatsit, sid_save },
+               { gen_save },
                { gen_rotate, '0 -1 1 0' },
                { gen_kern, get_h_d_neg },
                { gen_box, zero },
-               { gen_whatsit, sid_restore },
+               { gen_restore },
             },
          },
       },
@@ -447,19 +443,19 @@ do
             height = get_w,
             depth  = zero,
             [id_hlist] = {
-               { gen_whatsit, sid_save },
+               { gen_save },
                { gen_rotate, '0 -1 1 0' },
                { gen_kern, function (w,h,d,nw,nh,nd) return -nh end },
                { gen_box , get_d_neg },
                { gen_kern, function (w,h,d,nw,nh,nd) return nh-w end },
-               { gen_whatsit, sid_restore },
+               { gen_restore },
             },
             [id_vlist] = {
-               { gen_whatsit, sid_save },
+               { gen_save },
                { gen_rotate, '0 -1 1 0' },
                { gen_kern, get_h_d_neg },
                { gen_box, zero },
-               { gen_whatsit, sid_restore },
+               { gen_restore },
             },
          },
          [dir_dtou] = { -- dtou 中で組む
@@ -467,18 +463,18 @@ do
             height = get_d,
             depth  = get_h,
             [id_hlist] = {
-               { gen_whatsit, sid_save },
+               { gen_save },
                { gen_rotate, '-1 0 0 -1' },
                { gen_kern, get_w_neg },
                { gen_box,  function (w,h,d,nw,nh,nd) return h-nd end },
-               { gen_whatsit, sid_restore },
+               { gen_restore },
             },
             [id_vlist] = {
-               { gen_whatsit, sid_save },
+               { gen_save },
                { gen_rotate, '-1 0 0 -1' },
                { gen_kern, get_h_d_neg },
                { gen_box, get_w_neg },
-               { gen_whatsit, sid_restore },
+               { gen_restore },
             },
          },
       },
@@ -488,20 +484,20 @@ do
             height = get_w,
             depth  = zero,
             [id_hlist] = {
-               { gen_whatsit, sid_save },
+               { gen_save },
                { gen_rotate, '0 1 -1 0' },
                { gen_kern, function (w,h,d,nw,nh,nd) return -nd end },
                { gen_box, get_h },
                { gen_kern, function (w,h,d,nw,nh,nd) return nd-w end },
-               { gen_whatsit, sid_restore },
+               { gen_restore },
             },
             [id_vlist] = {
                { gen_kern, zero },
-               { gen_whatsit, sid_save },
+               { gen_save },
                { gen_rotate, '0 1 -1 0' },
                { gen_box, function (w,h,d,nw,nh,nd) return -nd-nh end },
                { gen_kern, get_h_d_neg },
-               { gen_whatsit, sid_restore },
+               { gen_restore },
             },
          },
          [dir_tate] = { -- tate 中で組む
@@ -509,19 +505,19 @@ do
             height = get_d,
             depth  = get_h,
             [id_hlist] = {
-               { gen_whatsit, sid_save },
+               { gen_save },
                { gen_rotate, '-1 0 0 -1' },
                { gen_kern, get_w_neg },
                { gen_box, function (w,h,d,nw,nh,nd) return h-nd end },
-               { gen_whatsit, sid_restore },
+               { gen_restore },
             },
             [id_vlist] = {
-               { gen_whatsit, sid_save },
+               { gen_save },
                { gen_rotate, ' -1 0 0 -1' },
                { gen_kern, function (w,h,d,nw,nh,nd) return -nh-nd end },
                { gen_box, get_w_neg },
                { gen_kern, function (w,h,d,nw,nh,nd) return nh+nd-h-d end },
-               { gen_whatsit, sid_restore },
+               { gen_restore },
             },
          },
       },
@@ -1135,9 +1131,6 @@ do
 do
    local setkern = node.direct.setkern
    local setshift = node.direct.setshift
-   local sid_save   = node.subtype 'pdf_save'
-   local sid_restore = node.subtype 'pdf_restore'
-   local sid_matrix  = node.subtype 'pdf_setmatrix'
    local getwidth, setwidth = dnode.getwidth, dnode.setwidth
    local getkern, getfont = dnode.getkern, dnode.getfont
    local node_tail = dnode.tail
@@ -1145,6 +1138,9 @@ do
    local FROM_JFM         = luatexja.icflag_table.FROM_JFM
    local KANJI_SKIP       = luatexja.icflag_table.KANJI_SKIP
    local KANJI_SKIP_JFM   = luatexja.icflag_table.KANJI_SKIP_JFM
+   local mk_save_node = luatexja.make_whatsit.mk_save_node
+   local mk_restore_node = luatexja.make_whatsit.mk_restore_node
+   local mk_matrix_node = luatexja.make_whatsit.mk_matrix_node
    local function negate(n)
      if getid(n)==id_glue then
         setwidth(n, -getwidth(n))
@@ -1200,10 +1196,9 @@ do
          jl, jn = insert_after(jl, jn, n); negate(n); n = nn
        end
      end
-     local ws = node_new(id_whatsit, sid_save)
-     local wm = node_new(id_whatsit, sid_matrix)
-     setfield(wm, 'data', '0 1 -1 0')
-     local wr = node_new(id_whatsit, sid_restore)
+     local ws = mk_save_node()
+     local wm = mk_matrix_node('0 1 -1 0')
+     local wr = mk_restore_node()
      setlist(jb_inner, jl); setnext(jn, nil); setshift(joined_box, y_shift)
      if y_shift==0 then
        insert_after(orig_head, joined_box, ws);
